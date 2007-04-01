@@ -25,6 +25,7 @@
 #include "stdafx.h"
 #include "../X-FLR5.h"
 #include "CpScaleDlg.h"
+#include ".\cpscaledlg.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,6 +39,7 @@ CCpScaleDlg::CCpScaleDlg(CWnd* pParent /*=NULL*/)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 	m_bAutoCpScale = true;
+	m_bShowCpScale = true;
 	m_CpMin = -1.0;
 	m_CpMax =  1.0;
 }
@@ -47,6 +49,7 @@ void CCpScaleDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CCpScaleDlg)
+	DDX_Control(pDX, IDC_SHOWCPSCALE, m_ctrlShowCpScale);
 	DDX_Control(pDX, IDC_MIN, m_ctrlMin);
 	DDX_Control(pDX, IDC_MAX, m_ctrlMax);
 	//}}AFX_DATA_MAP
@@ -57,6 +60,7 @@ BEGIN_MESSAGE_MAP(CCpScaleDlg, CDialog)
 	//{{AFX_MSG_MAP(CCpScaleDlg)
 	ON_BN_CLICKED(IDC_RADIO1, OnScaleType)
 	ON_BN_CLICKED(IDC_RADIO2, OnScaleType)
+	ON_BN_CLICKED(IDC_SHOWCPSCALE, OnShowCpScale)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -66,7 +70,9 @@ END_MESSAGE_MAP()
 BOOL CCpScaleDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	
+
+	if(m_bShowCpScale) m_ctrlShowCpScale.SetCheck(TRUE);
+
 	if(m_bAutoCpScale) {
 		m_ctrlMin.EnableWindow(false);
 		m_ctrlMax.EnableWindow(false);
@@ -115,4 +121,10 @@ void CCpScaleDlg::OnOK()
 		}
 	}
 	CDialog::OnOK();
+}
+
+void CCpScaleDlg::OnShowCpScale()
+{
+	if(m_ctrlShowCpScale.GetCheck())	m_bShowCpScale = true;
+	else								m_bShowCpScale = false;
 }

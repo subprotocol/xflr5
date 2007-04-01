@@ -41,6 +41,7 @@ public:
 	enum { IDD = IDD_CPSCALEDLG };
 	CFloatEdit	m_ctrlMin;
 	CFloatEdit	m_ctrlMax;
+	CButton m_ctrlShowCpScale;
 	//}}AFX_DATA
 
 
@@ -55,6 +56,7 @@ public:
 protected:
 	double m_CpMin, m_CpMax;
 	bool m_bAutoCpScale;
+	bool m_bShowCpScale;
 	// Generated message map functions
 	//{{AFX_MSG(CCpScaleDlg)
 	afx_msg void OnScaleType();
@@ -62,5 +64,7 @@ protected:
 	virtual void OnOK();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnShowCpScale();
 };
 

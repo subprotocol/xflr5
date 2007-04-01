@@ -9517,7 +9517,7 @@ void CMiarex::GLRenderView()
 	int width = m_rCltRect.Width();
 
 	glPushMatrix();
-		if (pFrame->m_b3DVLMCl && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
+		if (pFrame->m_b3DVLMCl && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 && pFrame->m_bShowCpScale)
 			glCallList(WOPPCPLEGEND);
 		
 		if(m_pCurWing) 
