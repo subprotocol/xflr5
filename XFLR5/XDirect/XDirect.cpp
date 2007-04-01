@@ -2843,7 +2843,7 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	}
 	else if (m_pCurGraph){
 		CMenu menu;
-		if (menu.LoadMenu(IDR_CTXXFLR5FOILMENU)){
+		if (menu.LoadMenu(IDR_CTXXDIRECTFOILMENU)){
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
@@ -2862,6 +2862,8 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			if(m_bCurOppOnly) pPopup->CheckMenuItem(IDM_SHOWCUROPP, MF_BYCOMMAND | MF_CHECKED);
 			
 			if(m_bShowInviscid) pPopup->CheckMenuItem(IDM_CPI, MF_BYCOMMAND | MF_CHECKED);
+
+			if(m_bCpGraph) pPopup->CheckMenuItem(IDM_SHOWCPGRAPH, MF_BYCOMMAND  | MF_CHECKED);
 
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 				ScreenPoint.x, ScreenPoint.y, m_pFrame); // use main window for cmds
@@ -5771,6 +5773,9 @@ void CXDirect::CheckMenu()
 
 		if(m_bCurOppOnly) pMenu->CheckMenuItem(IDM_SHOWCUROPP, MF_BYCOMMAND  | MF_CHECKED);
 		else              pMenu->CheckMenuItem(IDM_SHOWCUROPP, MF_BYCOMMAND  | MF_UNCHECKED);
+
+		if(m_bCpGraph) pMenu->CheckMenuItem(IDM_SHOWCPGRAPH, MF_BYCOMMAND  | MF_CHECKED);
+		else           pMenu->CheckMenuItem(IDM_SHOWCPGRAPH, MF_BYCOMMAND  | MF_UNCHECKED);
 	}
 
 	pMenu = m_pFrame->GetMenu()->GetSubMenu(5);
