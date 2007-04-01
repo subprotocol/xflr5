@@ -1549,21 +1549,23 @@ BEGIN
     LTEXT           "Fast",IDC_STATIC,68,81,20,9
 END
 
-IDD_CPSCALEDLG DIALOGEX 0, 0, 164, 110
+IDD_CPSCALEDLG DIALOGEX 0, 0, 164, 127
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Cp Scale"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Auto Adjust",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,21,16,52,10
-    CONTROL         "Fixed Range",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,21,
-                    31,52,10
-    EDITTEXT        IDC_MAX,67,46,40,12,ES_RIGHT
-    EDITTEXT        IDC_MIN,67,64,40,12,ES_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,24,89,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,95,89,50,14
-    LTEXT           "Min",IDC_STATIC,36,66,12,8
-    LTEXT           "Max",IDC_STATIC,36,48,14,8
+                    WS_GROUP,30,31,52,10
+    CONTROL         "Fixed Range",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,30,
+                    46,52,10
+    EDITTEXT        IDC_MAX,76,61,40,12,ES_RIGHT
+    EDITTEXT        IDC_MIN,76,79,40,12,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,24,106,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,95,106,50,14
+    LTEXT           "Min",IDC_STATIC,45,81,12,8
+    LTEXT           "Max",IDC_STATIC,45,63,14,8
+    CONTROL         "Show Cp Scale",IDC_SHOWCPSCALE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,33,16,70,8
 END
 
 IDD_CLRDLG DIALOGEX 0, 0, 122, 113
@@ -2443,7 +2445,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 157
         TOPMARGIN, 7
-        BOTTOMMARGIN, 103
+        BOTTOMMARGIN, 120
     END
 
     IDD_CLRDLG, DIALOG
@@ -2718,6 +2720,7 @@ BEGIN
         MENUITEM "Hide All Operating Points",   33191
         MENUITEM SEPARATOR
         MENUITEM "Graph Settings\t(G)",         IDM_XFLR5_GRAPHDLG
+        MENUITEM "Show Cp Graph",               33234
         MENUITEM "Reset Graph Scales",          IDM_RESETGRAPH
         POPUP "X Variable Plots"
         BEGIN
@@ -2742,7 +2745,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Reset Foil Scale",            32917
         MENUITEM "Show Panels",                 32864
-        MENUITEM "&Foil Style",                 32936
+        MENUITEM "&Foil Style",                 32805
     END
 END
 
@@ -3231,6 +3234,7 @@ BEGIN
     POPUP "&Operating Point"
     BEGIN
         MENUITEM "Cp &Graph Options",           IDM_CPGRAPHDLG
+        MENUITEM "Show Cp Graph",               IDM_SHOWCPGRAPH
         POPUP "&X variable plots"
         BEGIN
             MENUITEM "&Cp",                         IDM_XFLR5_CPGRAPH

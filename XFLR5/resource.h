@@ -77,7 +77,6 @@
 #define IDC_HANDCURSOR                  214
 #define IDC_HMOVE                       215
 #define IDD_USERVARDLG                  219
-#define IDR_CTXXFLR5PLRMENU             220
 #define IDR_CTXXDIRECTPLRMENU           220
 #define IDR_CTXWINGPLRMENU              221
 #define IDD_EDITPLRDLG                  222
@@ -649,6 +648,7 @@
 #define IDC_PROGRESS                    5167
 #define IDC_CONTROLLIST                 5169
 #define IDC_NFLAPS                      5174
+#define IDC_SHOWCPSCALE                 5175
 #define IDM_LOADREFFOIL                 32772
 #define ID_EDIT_NEW                     32773
 #define IDM_DEFINEWING                  32777
@@ -959,8 +959,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        349
-#define _APS_NEXT_COMMAND_VALUE         33252
-#define _APS_NEXT_CONTROL_VALUE         5175
+#define _APS_NEXT_COMMAND_VALUE         33253
+#define _APS_NEXT_CONTROL_VALUE         5176
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
