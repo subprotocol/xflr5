@@ -234,6 +234,7 @@ CMainFrame::CMainFrame()
 	m_bSaveOpps      = false;
 	m_bSaveWOpps     = true;
 	m_bAutoCpScale   = true;
+	m_bShowCpScale   = true;
 
 	m_GLScale = 0.01;
 
@@ -6210,12 +6211,14 @@ void CMainFrame::OnCpLegend()
 	CCpScaleDlg dlg;
 	dlg.m_CpMin = m_LegendMin;
 	dlg.m_CpMax = m_LegendMax;
+	dlg.m_bShowCpScale = m_bShowCpScale;
 	dlg.m_bAutoCpScale = m_bAutoCpScale;
 
 	if(dlg.DoModal() == IDOK){
-		m_LegendMin        = dlg.m_CpMin;
-		m_LegendMax        = dlg.m_CpMax;
-		m_bAutoCpScale = dlg.m_bAutoCpScale;
+		m_LegendMin     = dlg.m_CpMin;
+		m_LegendMax     = dlg.m_CpMax;
+		m_bAutoCpScale  = dlg.m_bAutoCpScale;
+		m_bShowCpScale  = dlg.m_bShowCpScale;
 		if(m_iApp==MIAREX)        Miarex.m_bResetglOpp = true;
 		UpdateView();
 	}

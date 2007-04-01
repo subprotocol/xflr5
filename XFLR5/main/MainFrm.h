@@ -134,7 +134,7 @@ private:
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bSaveOpps, m_bSaveWOpps; // true if Opps and WOpps should we saved in the .wpa project file
-
+	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
 	int m_iApp;	// the currently active application, may be XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, or MIAREX
 
 	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
