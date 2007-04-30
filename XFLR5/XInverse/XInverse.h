@@ -119,7 +119,7 @@ private:
 	bool PrintAll(CDC *pDC, CRect DrawRect);
 
 	double qincom(double qc, double qinf, double tklam);
-	double qcomp(double g);
+//	double qcomp(double g);
 
 	void ApplySpline();
 	void CreateMCurve();
@@ -182,12 +182,12 @@ protected:
 	afx_msg void OnSelectFoil();
 	afx_msg void OnResetFoil();
 	afx_msg void OnLoad();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void OnResetRefCurves();
 	afx_msg void OnShowRefCurves();
 	afx_msg void OnStoreRefCurve();
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+public:
 };
 
 /////////////////////////////////////////////////////////////////////////////

@@ -193,7 +193,7 @@ bool CXInverse::SetParams()
 	CFoil*pFoil;
 	//is a foil set as current in the mainframe ?
 	if (pFrame->m_pCurFoil
-		&& m_pXFoil->m_FoilName==pFrame->m_pCurFoil->m_FoilName){
+		&& m_pXFoil->m_FoilName==pFrame->m_pCurFoil->m_FoilName && m_pXFoil->lqspec){
 		m_pRefFoil->CopyFoil(pFrame->m_pCurFoil);
 		m_pRefFoil->m_FoilColor = m_pQCurve->GetColor();
 //		m_pXFoil->m_FoilName    = m_pRefFoil->m_FoilName ;
@@ -226,6 +226,7 @@ bool CXInverse::SetParams()
 		}
 	}
 
+
 	//XFOIL has already been initialized so retrieve the foil
 	for (int i=1; i<=m_pXFoil->n; i++){
 		m_pRefFoil->x[i-1]  = m_pXFoil->x[i];
@@ -240,8 +241,8 @@ bool CXInverse::SetParams()
 	m_pModFoil->m_FoilName = m_pXFoil->m_FoilName + " Modified";
 
 	SetFoil();
-	if(m_bFullInverse)  ResetQ();
-	else				ResetMixedQ();
+//	if(m_bFullInverse)  ResetQ();
+//	else				ResetMixedQ();
 
 	CheckMenu();
 
@@ -285,6 +286,7 @@ void CXInverse::OnShowWindow(BOOL bShow, UINT nStatus)
 
 BOOL CXInverse::PreTranslateMessage(MSG* pMsg)
 {
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	if (pMsg->message == WM_KEYDOWN){
 		if (pMsg->wParam == VK_ESCAPE){
 			if(m_bZoomPlus)	{
@@ -308,10 +310,22 @@ BOOL CXInverse::PreTranslateMessage(MSG* pMsg)
 			}
 		}
 		else if (pMsg->wParam == VK_RETURN){
+			CWnd* pWnd = GetFocus();
 			if (m_bSmooth) {
 				Smooth(-1);
 				m_bGetPos = false;
 			}
+			else {
+				if(m_bFullInverse){
+                    if(pFrame->m_FInvCtrlBar.IsWindowVisible())
+						pFrame->m_FInvCtrlBar.m_ctrlExec.SetFocus();
+				}
+				else {
+                    if(pFrame->m_MInvCtrlBar.IsWindowVisible())
+						pFrame->m_MInvCtrlBar.m_ctrlExec.SetFocus();
+				}
+				return true;
+			}	
 		}
 		else if (pMsg->wParam == 'O' && 
 			(GetAsyncKeyState(VK_LCONTROL) || GetAsyncKeyState(VK_RCONTROL))) { 
@@ -893,15 +907,14 @@ void CXInverse::ApplySpline()
 	UpdateView();
 }
 
-
+/*
 double CXInverse::qcomp(double g)
 {
 //---- statement function for compressible karman-tsien velocity
     double qq =  g*(1.0-m_pXFoil->tklam) 
 		        / (1.0 - m_pXFoil->tklam*(g/m_pXFoil->qinf)*(g/m_pXFoil->qinf));
 	return qq;
-}
-
+}*/
 
 
 double CXInverse::qincom(double qc, double qinf, double tklam)
@@ -1317,7 +1330,7 @@ void CXInverse::CreateQCurve()
 
 	for (int i=1; i<=points; i++){
 		x = 1.0 - m_pXFoil->sspec[i];
-		y = qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
+		y = m_pXFoil->qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
 		m_pQCurve->AddPoint(x,y);
 	}
 }
@@ -1334,7 +1347,7 @@ void CXInverse::CreateMCurve()
 
 	for (int i=1; i<=points; i++){
 		x = 1.0 - m_pXFoil->sspec[i];
-		y = qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
+		y = m_pXFoil->qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
 		m_pMCurve->AddPoint(x,y);
 	}
 }
@@ -1793,7 +1806,6 @@ void CXInverse::OnLoadFoil()
 
 bool CXInverse::InitXFoil(CFoil * pFoil)
 {
-
 	//loads pFoil in XFoil, calculates normal vectors, and sets results in current foil
 	
 	if(!pFoil) return  false;
@@ -1805,12 +1817,15 @@ bool CXInverse::InitXFoil(CFoil * pFoil)
 		m_pXFoil->xb[i+1] = pFoil->x[i];
 		m_pXFoil->yb[i+1] = pFoil->y[i];
 	}
-	m_pXFoil->nb = pFoil->n;
-	m_pXFoil->lflap = false;
+	m_pXFoil->nb     = pFoil->n;
+	m_pXFoil->lflap  = false;
 	m_pXFoil->lbflap = false;
-	m_pXFoil->ddef = 0.0;
-	m_pXFoil->xbf = 1.0;
-	m_pXFoil->ybf = 0.0;
+	m_pXFoil->ddef   = 0.0;
+	m_pXFoil->xbf    = 1.0;
+	m_pXFoil->ybf    = 0.0;
+
+	m_pXFoil->lqspec = false;
+	m_pXFoil->lscini = false;
 
 	if(m_pXFoil->Preprocess()){
 
@@ -1843,13 +1858,15 @@ void CXInverse::OnRestore()
 	if(m_bFullInverse){
 		m_pXFoil->InitMDES();
 		CreateQCurve();
-		ResetQ();
+		CreateMCurve();
+//		ResetQ();
 	}
 	else {
 		// Mixed Inverse
 		m_pXFoil->InitQDES();
 		CreateQCurve();
-		ResetMixedQ();
+		CreateMCurve();
+//		ResetMixedQ();
 	}
 	for(i=1; i<=m_pXFoil->n; i++){
 		m_pModFoil->x[i-1] = m_pXFoil->x[i];
@@ -1861,32 +1878,7 @@ void CXInverse::OnRestore()
 	UpdateView();
 }
 
-/*	if(IDOK == Adlg.DoModal()){
-		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
-		pNewFoil->CopyFoil(m_pBufferFoil);
-		pNewFoil->m_FoilColor  = pFrame->m_crColors[m_poaFoil->GetSize()%24];
-		pNewFoil->m_nFoilStyle = PS_SOLID;
-		pNewFoil->m_nFoilWidth = 1;
-		pNewFoil->m_bPoints = false;
-		if(pFrame->SetModFoil(pNewFoil)){
-			m_pACtrl->m_pRefFoil = NULL;
-			m_pACtrl->UpdateFoils();
-			m_pACtrl->SetFoil(pNewFoil);
-		}
-		else {
-			pNewFoil = NULL;
-			m_pACtrl->UpdateFoils();
-			m_pACtrl->SetFoil();
-		}
-	}
 
-	else{
-		m_pACtrl->UpdateFoils();
-		m_pACtrl->SetFoil(pCurFoil);
-
-	}
-*/
 void CXInverse::OnStoreFoil() 
 {
 	if(!m_bLoaded) return;
@@ -1894,7 +1886,6 @@ void CXInverse::OnStoreFoil()
 
 	CFoil* pFoil = new CFoil();
 	pFoil->CopyFoil(m_pModFoil);
-//	pFoil->m_FoilColor  = pFrame->m_crColors[m_poaFoil->GetSize()%24];
 	pFoil->m_nFoilStyle = PS_SOLID;
 	pFoil->m_nFoilWidth = 1;
 	memcpy(pFoil->xb, m_pModFoil->x, sizeof(m_pModFoil->x));
@@ -1937,27 +1928,26 @@ void CXInverse::SetFoil()
 	m_pModFoil->n = m_pXFoil->n;
 
 	if(m_bFullInverse){
-
 		m_pXFoil->InitMDES();
 		CreateQCurve();
-		ResetQ();
+		CreateMCurve();
+//		ResetQ();
 
 		m_pFInvCtrlBar->m_ctrlSpec.SetValue(m_pXFoil->alqsp[1]*180.0/3.141592654);
 		m_pFInvCtrlBar->m_ctrlTAngle.SetValue(m_pXFoil->agte*180.0);//agte expressed in pi units:!?!?
 		m_pFInvCtrlBar->m_ctrlTGapx.SetValue(real(m_pXFoil->dzte));
 		m_pFInvCtrlBar->m_ctrlTGapy.SetValue(imag(m_pXFoil->dzte));
-
 	}
 	else {
 		// Mixed Inverse
 		m_pXFoil->InitQDES();
 		CreateQCurve();
-		ResetMixedQ();
+		CreateMCurve();
+//		ResetMixedQ();
 		strong.Format("Alpha = %.3f \r\n      Cl = %.3f", m_pXFoil->algam/m_pXFoil->dtor, m_pXFoil->clgam);
 		m_pMInvCtrlBar->m_ctrlSpec.SetWindowText(strong);
 		m_pMInvCtrlBar->m_ctrlIter.SetValue(m_pXFoil->niterq);
 	}
-
 
 	if(m_pXFoil->lvisc){
 		//a previous xfoil calculation is still active, so add the associated viscous curve
@@ -1969,8 +1959,8 @@ void CXInverse::SetFoil()
 			dqv = m_pXFoil->qcomp(m_pXFoil->qvis[i]) - m_pXFoil->qcomp(m_pXFoil->qvis[i-1]);
 			sp1 = (m_pXFoil->s[i-1] + 0.25*dsp)/m_pXFoil->s[m_pXFoil->n];
 			sp2 = (m_pXFoil->s[i]   - 0.25*dsp)/m_pXFoil->s[m_pXFoil->n];
-			qv1 = qcomp(m_pXFoil->qvis[i-1]) + 0.25*dqv;
-			qv2 = qcomp(m_pXFoil->qvis[i]  ) - 0.25*dqv;
+			qv1 = m_pXFoil->qcomp(m_pXFoil->qvis[i-1]) + 0.25*dqv;
+			qv2 = m_pXFoil->qcomp(m_pXFoil->qvis[i]  ) - 0.25*dqv;
 			x = 1.0 - sp1;
 			y = qv1/m_pXFoil->qinf;
 			m_pQVCurve->AddPoint(x,y);
