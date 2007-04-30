@@ -109,7 +109,7 @@ bool CFoil::InitFoil()
 	// so has been the number of points defining the foil
 	bool bNotFound = true;
 	int k = 0;
-	NormalizeGeometry();
+//	NormalizeGeometry();
 
 	//first time is to calculate the base foil's thickness and camber
 
@@ -929,10 +929,12 @@ void CFoil::SetFlap()
 			iLowerh++;
 			m_iInt++;
 
-			m_rpIntrados[iLowerh-1].x += 100.0*(m_rpIntrados[iLowerh-1].x-m_rpIntrados[iLowerh-2].x);
-			m_rpIntrados[iLowerh-1].y += 100.0*(m_rpIntrados[iLowerh-1].y-m_rpIntrados[iLowerh-2].y);
-			m_rpIntrados[iLowerh].x   += 100.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh+1].x);
-			m_rpIntrados[iLowerh].y   += 100.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh+1].y);
+			// extend to infinity last segments around hinge on flap internal side to make sure 
+			// they intersect the spline on the other side
+			m_rpIntrados[iLowerh-1].x += 30.0*(m_rpIntrados[iLowerh-1].x-m_rpIntrados[iLowerh-2].x);
+			m_rpIntrados[iLowerh-1].y += 30.0*(m_rpIntrados[iLowerh-1].y-m_rpIntrados[iLowerh-2].y);
+			m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh+1].x);
+			m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh+1].y);
 		}
 		if(m_LEFlapAngle<0.0){
 			//insert an extra point on extrados
@@ -943,10 +945,12 @@ void CFoil::SetFlap()
 			iUpperh++;
 			m_iExt++;
 
-			m_rpExtrados[iUpperh-1].x += 100.0 * (m_rpExtrados[iUpperh-1].x - m_rpExtrados[iUpperh-2].x);
-			m_rpExtrados[iUpperh-1].y += 100.0 * (m_rpExtrados[iUpperh-1].y - m_rpExtrados[iUpperh-2].y);
-			m_rpExtrados[iUpperh].x   += 100.0 * (m_rpExtrados[iUpperh].x   - m_rpExtrados[iUpperh+1].x);
-			m_rpExtrados[iUpperh].y   += 100.0 * (m_rpExtrados[iUpperh].y   - m_rpExtrados[iUpperh+1].y);
+			// extend to infinity last segments around hinge on flap internal side to make sure 
+			// they intersect the spline on the other side
+			m_rpExtrados[iUpperh-1].x += 30.0 * (m_rpExtrados[iUpperh-1].x - m_rpExtrados[iUpperh-2].x);
+			m_rpExtrados[iUpperh-1].y += 30.0 * (m_rpExtrados[iUpperh-1].y - m_rpExtrados[iUpperh-2].y);
+			m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x   - m_rpExtrados[iUpperh+1].x);
+			m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y   - m_rpExtrados[iUpperh+1].y);
 		}
 		for (i=0; i<iUpperh; i++){
 			dx = m_rpExtrados[i].x-xh;
@@ -961,8 +965,6 @@ void CFoil::SetFlap()
 			m_rpIntrados[i].y = yh + sina * dx + cosa * dy;
 		}
 
-		// extend to infinity last segments around hinge on flap internal side to make sure they intersect
-		// spline the other side
 		CSpline LinkSpline;
 		LinkSpline.m_iRes = 4;
 		LinkSpline.m_iDegree = 3;
@@ -1127,10 +1129,12 @@ void CFoil::SetFlap()
 				m_rpIntrados[i] = m_rpIntrados[i-1];
 			}
 			m_iInt++;
-			m_rpIntrados[iLowerh+1].x += 100.0*(m_rpIntrados[iLowerh+1].x - m_rpIntrados[iLowerh+2].x);
-			m_rpIntrados[iLowerh+1].y += 100.0*(m_rpIntrados[iLowerh+1].y - m_rpIntrados[iLowerh+2].y);
-			m_rpIntrados[iLowerh].x   += 100.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh-1].x);
-			m_rpIntrados[iLowerh].y   += 100.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh-1].y);
+			// extend to infinity last segments around hinge on flap internal side to make sure 
+			// they intersect the spline on the other side
+			m_rpIntrados[iLowerh+1].x += 30.0*(m_rpIntrados[iLowerh+1].x - m_rpIntrados[iLowerh+2].x);
+			m_rpIntrados[iLowerh+1].y += 30.0*(m_rpIntrados[iLowerh+1].y - m_rpIntrados[iLowerh+2].y);
+			m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh-1].x);
+			m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh-1].y);
 		}
 		if(m_TEFlapAngle<0.0){
 			//insert an extra point on extrados
@@ -1139,10 +1143,12 @@ void CFoil::SetFlap()
 			}
 			m_iExt++;
 
-			m_rpExtrados[iUpperh+1].x += 100.0*(m_rpExtrados[iUpperh+1].x-m_rpExtrados[iUpperh+2].x);
-			m_rpExtrados[iUpperh+1].y += 100.0*(m_rpExtrados[iUpperh+1].y-m_rpExtrados[iUpperh+2].y);
-			m_rpExtrados[iUpperh].x   += 100.0 * (m_rpExtrados[iUpperh].x-m_rpExtrados[iUpperh-1].x);
-			m_rpExtrados[iUpperh].y   += 100.0 * (m_rpExtrados[iUpperh].y-m_rpExtrados[iUpperh-1].y);
+			// extend to infinity last segments around hinge on flap internal side to make sure 
+			// they intersect the spline on the other side
+			m_rpExtrados[iUpperh+1].x += 30.0*(m_rpExtrados[iUpperh+1].x-m_rpExtrados[iUpperh+2].x);
+			m_rpExtrados[iUpperh+1].y += 30.0*(m_rpExtrados[iUpperh+1].y-m_rpExtrados[iUpperh+2].y);
+			m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x-m_rpExtrados[iUpperh-1].x);
+			m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y-m_rpExtrados[iUpperh-1].y);
 		}
 		for (i=iUpperh+1; i<=m_iExt; i++){
 			dx = m_rpExtrados[i].x-xh;
@@ -1157,8 +1163,6 @@ void CFoil::SetFlap()
 			m_rpIntrados[i].y = yh - sina * dx + cosa * dy;
 		}
 
-		// extend to infinity last segments around hinge on flap internal side to make sure they intersect
-		// spline the other side
 		CSpline LinkSpline;
 		LinkSpline.m_iRes = 4;
 		LinkSpline.m_iDegree = 3;

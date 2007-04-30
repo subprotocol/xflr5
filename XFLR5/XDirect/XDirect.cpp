@@ -2761,7 +2761,7 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 		if (m_iPlrView==1){// we have only a single graph
 //			if(m_pCurGraph && m_pCurGraph->IsInDrawRect(ClientPoint)){
 				CMenu menu;
-				if (menu.LoadMenu(IDR_CTXXFLR5PLRMENU)){
+				if (menu.LoadMenu(IDR_CTXXDIRECTPLRMENU)){
 					CMenu* pPopup = menu.GetSubMenu(0);
 					ASSERT(pPopup != NULL);
 					
@@ -2791,7 +2791,7 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			else m_pCurGraph = NULL;
 //			if(bInGraph){
 				CMenu menu;
-				if (menu.LoadMenu(IDR_CTXXFLR5PLRMENU)){
+				if (menu.LoadMenu(IDR_CTXXDIRECTPLRMENU)){
 					CMenu* pPopup = menu.GetSubMenu(0);
 					ASSERT(pPopup != NULL);
 
@@ -2827,7 +2827,7 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			else m_pCurGraph = NULL;
 //			if(bInGraph){
 				CMenu menu;
-				if (menu.LoadMenu(IDR_CTXXFLR5PLRMENU)){
+				if (menu.LoadMenu(IDR_CTXXDIRECTPLRMENU)){
 					CMenu* pPopup = menu.GetSubMenu(0);
 					ASSERT(pPopup != NULL);
 					pPopup->CheckMenuItem(IDM_ALLFOUR,MF_BYCOMMAND | MF_CHECKED);
@@ -5965,6 +5965,9 @@ bool CXDirect::InitXFoil(CFoil * pFoil)
 	m_pXFoil->xbf  = 1.0;
 	m_pXFoil->ybf  = 0.0;
 
+	m_pXFoil->lscini = false;
+	m_pXFoil->lqspec = false;
+	m_pXFoil->lvisc  = false;
 //	m_pXFoil->acrit      = pFoil->m_NCrit;
 //	m_pXFoil->xstrip[1]  = pFoil->m_XTopTr;
 //	m_pXFoil->xstrip[2]  = pFoil->m_XBotTr;

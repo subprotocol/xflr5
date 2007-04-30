@@ -10833,7 +10833,8 @@ void XFoil::zlefind(complex<double>*zle,complex<double>zc[],double wc[],
 	return;
 }
 
-void XFoil::mapgam(int iac, double &alg, double &clg, double &cmg){
+void XFoil::mapgam(int iac, double &alg, double &clg, double &cmg)
+{
 //--------------------------------------------
 //     sets mapped q for current airfoil
 //     for angle of attack or cl.
@@ -10867,10 +10868,10 @@ void XFoil::qccalc(int ispec,double *alfa, double *cl, double *cm,
 				  double xcir[], double ycir[], double scir[], double qcir[])
 {
 //---------------------------------------------------
-//    calculates the surface speed from the complex
+//    Calculates the surface speed from the complex
 //    speed function so that either a prescribed
 //    alfa or cl is achieved, depending on whether 
-//    ispec=1 or 2.  the cl calculation uses the 
+//    ispec=1 or 2.  The cl calculation uses the 
 //    transformed karman-tsien cp.
 	//---------------------------------------------------
 	complex<double> dz, za, eia, cmt,cft,cft_a;
@@ -10882,7 +10883,7 @@ void XFoil::qccalc(int ispec,double *alfa, double *cl, double *cm,
 	double cpinc1, cpi_q1, cpcom1,cpc_q1, cpc_a1;
 	double cpinc2, cpi_q2, cpcom2,cpc_q2, cpc_a2;
 	double qc_a[ICX+1];
-	//	double minf;
+//	double minf;
 //	double aeps = 5.0 *pow(10,-7);
 	double aeps = 5.0e-007;	
 	
@@ -10987,7 +10988,8 @@ void XFoil::qccalc(int ispec,double *alfa, double *cl, double *cm,
 }
 
 
-void XFoil::mapgen(int n, double x[],double y[]){
+void XFoil::mapgen(int n, double x[],double y[])
+{
 	//-------------------------------------------------------
 	//     calculates the geometry from the speed function
 	//     fourier coefficients cn, modifying them as needed
@@ -11175,7 +11177,8 @@ double XFoil::qincom(double qc, double qinf, double tklam){
       }
 }
 
-void XFoil::cncalc(double qc[], bool lsymm){
+void XFoil::cncalc(double qc[], bool lsymm)
+{
 //----------------------------------------------------------
 //     calculates the complex fourier coefficients cn of
 //     the real part of the harmonic function p(w) + iq(w)
@@ -11597,7 +11600,8 @@ void XFoil::pert_init(int kqsp){
 
 }
 
-void XFoil::pert_process(int kqsp){
+void XFoil::pert_process(int kqsp)
+{
 
 	int m, ncn;
 //	double dx,dy,qimoff;

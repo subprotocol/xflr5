@@ -38,8 +38,18 @@ CEditFoilDlg::CEditFoilDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CEditFoilDlg)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
-	m_bApplied = true;
+	m_bApplied  = true;
 	m_bModified = false;
+	m_pChildView  = NULL;
+	m_pMemFoil    = NULL;
+	m_pBufferFoil = NULL;
+	m_pPF         = NULL;
+	m_pSF         = NULL;
+	m_pmemSF      = NULL;
+	m_pmemPF      = NULL;
+
+	m_iInt = -1;
+	m_iExt = -1;
 }
 
 
@@ -48,6 +58,8 @@ void CEditFoilDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CEditFoilDlg)
 	DDX_Control(pDX, IDOK, m_ctrlOK);
+	DDX_Control(pDX, IDC_INSERTPT, m_ctrlInsert);
+	DDX_Control(pDX, IDC_DELETEPT, m_ctrlDelete);
 	DDX_Control(pDX, IDC_COORDLIST, m_ctrlCoordList);
 	//}}AFX_DATA_MAP
 }
@@ -75,7 +87,22 @@ BOOL CEditFoilDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_pBufferFoil->m_iHighLight = 0;
+	if(m_pBufferFoil) m_pBufferFoil->m_iHighLight = 0;
+	if(m_pSF || m_pPF){
+		m_ctrlDelete.EnableWindow(false);
+		m_ctrlInsert.EnableWindow(false);
+	}
+
+	if(m_pSF){
+		m_iExt = m_pSF->m_Extrados.m_iCtrlPoints;
+		m_iInt = m_pSF->m_Intrados.m_iCtrlPoints;
+		SetWindowText("Spline Ctrl Points Edition");
+	}
+	else if(m_pPF){
+		m_iExt = m_pPF->m_Extrados.m_iPoints;
+		m_iInt = m_pPF->m_Intrados.m_iPoints;
+		SetWindowText("Spline Ctrl Points Edition");
+	}
 
 	m_ctrlCoordList.InsertColumn(0," ",LVCFMT_LEFT, 20);
 	m_ctrlCoordList.InsertColumn(1,"X",LVCFMT_RIGHT, 90);
@@ -111,20 +138,65 @@ void CEditFoilDlg::SetSelection(int sel)
 void CEditFoilDlg::SetList()
 {
 	CString strong;
+	int i,j,off;
 	m_ctrlCoordList.DeleteAllItems();
-	for (int i=0; i<m_pBufferFoil->n; i++){
-		strong.Format("%d", i+1);
-		m_ctrlCoordList.InsertItem(i, strong);
-		strong.Format("%8.5f", m_pBufferFoil->x[i]);
-		m_ctrlCoordList.SetItemText(i, 1, strong);
-		strong.Format("%8.5f", m_pBufferFoil->y[i]);
-		m_ctrlCoordList.SetItemText(i, 2, strong);
+	if(m_pSF){
+		for (i=0; i<=m_pSF->m_Extrados.m_iCtrlPoints; i++){
+			strong.Format("u%d", i);
+			m_ctrlCoordList.InsertItem(i, strong);
+			strong.Format("%8.5f", m_pSF->m_Extrados.m_Input[i].x);
+			m_ctrlCoordList.SetItemText(i, 1, strong);
+			strong.Format("%8.5f", m_pSF->m_Extrados.m_Input[i].y);
+			m_ctrlCoordList.SetItemText(i, 2, strong);
+		}
+		off = m_pSF->m_Extrados.m_iCtrlPoints+1;
+		for (j=0; j<=m_pSF->m_Intrados.m_iCtrlPoints; j++){
+			strong.Format("l%d", j);
+			m_ctrlCoordList.InsertItem(j+off, strong);
+			strong.Format("%8.5f", m_pSF->m_Intrados.m_Input[j].x);
+			m_ctrlCoordList.SetItemText(j+off, 1, strong);
+			strong.Format("%8.5f", m_pSF->m_Intrados.m_Input[j].y);
+			m_ctrlCoordList.SetItemText(j+off, 2, strong);
+		}
+	}
+	else if(m_pPF){
+		for (i=0; i<=m_pPF->m_Extrados.m_iPoints; i++){
+			strong.Format("u%d", i);
+			m_ctrlCoordList.InsertItem(i, strong);
+			strong.Format("%8.5f", m_pPF->m_Extrados.m_ctrlPoint[i].x);
+			m_ctrlCoordList.SetItemText(i, 1, strong);
+			strong.Format("%8.5f", m_pPF->m_Extrados.m_ctrlPoint[i].y);
+			m_ctrlCoordList.SetItemText(i, 2, strong);
+		}
+		off = m_pPF->m_Extrados.m_iPoints+1;
+		for (j=0; j<=m_pPF->m_Intrados.m_iPoints; j++){
+			strong.Format("l%d", j);
+			m_ctrlCoordList.InsertItem(j+off, strong);
+			strong.Format("%8.5f", m_pPF->m_Intrados.m_ctrlPoint[j].x);
+			m_ctrlCoordList.SetItemText(j+off, 1, strong);
+			strong.Format("%8.5f", m_pPF->m_Intrados.m_ctrlPoint[j].y);
+			m_ctrlCoordList.SetItemText(j+off, 2, strong);
+		}
+	}
+	else if(m_pBufferFoil){
+		for (int i=0; i<m_pBufferFoil->n; i++){
+			strong.Format("%d", i+1);
+			m_ctrlCoordList.InsertItem(i, strong);
+			strong.Format("%8.5f", m_pBufferFoil->x[i]);
+			m_ctrlCoordList.SetItemText(i, 1, strong);
+			strong.Format("%8.5f", m_pBufferFoil->y[i]);
+			m_ctrlCoordList.SetItemText(i, 2, strong);
+		}
 	}
 }
 
 
 void CEditFoilDlg::OnLvnEndLabelEditCoordList(NMHDR *pNMHDR, LRESULT *pResult)
 {
+	double d,X,Y;
+	int res, position;
+	CString strong;
+
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	*pResult = 0;
 	if(pDispInfo->item.iItem == -1 || pDispInfo->item.iSubItem == -1 )
@@ -135,17 +207,50 @@ void CEditFoilDlg::OnLvnEndLabelEditCoordList(NMHDR *pNMHDR, LRESULT *pResult)
 //	m_iSelection = pDispInfo->item.iItem;
 	POSITION pos = m_ctrlCoordList.GetFirstSelectedItemPosition();
 	int sel  = m_ctrlCoordList.GetNextSelectedItem(pos);
+	strong = m_ctrlCoordList.GetItemText(sel,1);
+	res = sscanf(strong, "%lf",&d);
+	if(res==1) X =d;
 
-	//first read the section
+	strong = m_ctrlCoordList.GetItemText(sel,2);
+	res = sscanf(strong, "%lf",&d);
+	if(res==1) Y=d;
 
-	double X,Y;
-	ReadSectionData(sel, X, Y);
-	//modify buffre foil coordinates
-	m_pBufferFoil->x[sel]  = X;
-	m_pBufferFoil->y[sel]  = Y;
-	m_pBufferFoil->xb[sel] = X;
-	m_pBufferFoil->yb[sel] = Y;
+	if(m_pSF){
+		strong = m_ctrlCoordList.GetItemText(sel,0);
+		position = strong.Find("u",0);
+		if(position>=0){//extrados
+			m_pSF->m_Extrados.m_Input[sel].x = X;
+			m_pSF->m_Extrados.m_Input[sel].y = Y;
+			m_pSF->Update(true);
+		}
+		else if(sel-m_iExt>=0){
+			m_pSF->m_Intrados.m_Input[sel-m_iExt-1].x = X;
+			m_pSF->m_Intrados.m_Input[sel-m_iExt-1].y = Y;
+			m_pSF->Update(false);
+		}
+	}
+	else if(m_pPF){
+		strong = m_ctrlCoordList.GetItemText(sel,0);
+		position = strong.Find("u",0);
+		if(position>=0){//extrados
+			m_pPF->m_Extrados.m_ctrlPoint[sel].x = X;
+			m_pPF->m_Extrados.m_ctrlPoint[sel].y = Y;
+			m_pPF->Update(true);
+		}
+		else if(sel-m_iExt>=0){
+			m_pPF->m_Intrados.m_ctrlPoint[sel-m_iExt-1].x = X;
+			m_pPF->m_Intrados.m_ctrlPoint[sel-m_iExt-1].y = Y;
+			m_pPF->Update(false);
+		}
+	}
+	else{
 
+		//modify buffer foil coordinates
+		m_pBufferFoil->x[sel]  = X;
+		m_pBufferFoil->y[sel]  = Y;
+		m_pBufferFoil->xb[sel] = X;
+		m_pBufferFoil->yb[sel] = Y;
+	}
 	m_bApplied = false;
 //	SetList();
 //	SetSelection(sel);
@@ -157,10 +262,37 @@ void CEditFoilDlg::OnNMClickCoordList(NMHDR *pNMHDR, LRESULT *pResult)
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
 	{
+		if(m_pSF){
+		}
+		else if(m_pPF){
+		}
+		else if(m_pBufferFoil)	m_pBufferFoil->m_iHighLight = -1;
 		*pResult =0;
 		return ;
 	}
+	if(m_pSF){
+		if(pNMListView->iItem <= m_iExt)	{
+			m_pSF->m_Extrados.m_iHighlight = pNMListView->iItem;
+			m_pSF->m_Intrados.m_iHighlight = -1;
+		}
+		else{
+			m_pSF->m_Extrados.m_iHighlight = -1;
+			m_pSF->m_Intrados.m_iHighlight = pNMListView->iItem-m_iExt-1;
+		}
+	}
+	else if(m_pPF){
+		if(pNMListView->iItem <= m_iExt)	{
+			m_pPF->m_Extrados.m_iHighlight = pNMListView->iItem;
+			m_pPF->m_Intrados.m_iHighlight = -1;
+		}
+		else{
+			m_pPF->m_Extrados.m_iHighlight = -1;
+			m_pPF->m_Intrados.m_iHighlight = pNMListView->iItem-m_iExt-1;
+		}
+	}
+	else if(m_pBufferFoil)	m_pBufferFoil->m_iHighLight = pNMListView->iItem;
 
+	m_pChildView->Invalidate();
 	*pResult = 0;
 }
 
@@ -202,24 +334,31 @@ void CEditFoilDlg::ReadSectionData(int sel, double &X, double &Y)
 	strong = m_ctrlCoordList.GetItemText(sel,2);
 	res = sscanf(strong, "%lf",&d);
 	if(res==1) Y=d;
-
-
 }
+
 
 void CEditFoilDlg::OnRestore() 
 {
-	for (int i=0;i<m_pMemFoil->nb; i++){
-		m_pBufferFoil->xb[i] = m_pMemFoil->xb[i];
-		m_pBufferFoil->yb[i] = m_pMemFoil->yb[i];
+	if(m_pSF){
+		m_pSF->Copy(m_pmemSF);
 	}
-	m_pBufferFoil->nb = m_pMemFoil->n;
-	for (i=0;i<m_pMemFoil->n; i++){
-		m_pBufferFoil->x[i]  = m_pMemFoil->x[i];
-		m_pBufferFoil->y[i]  = m_pMemFoil->y[i];
+	else if(m_pPF){
+		m_pPF->Copy(m_pmemPF);
 	}
-	m_pBufferFoil->n = m_pMemFoil->n;
-	SetList();
+	else{
+		for (int i=0;i<m_pMemFoil->nb; i++){
+			m_pBufferFoil->xb[i] = m_pMemFoil->xb[i];
+			m_pBufferFoil->yb[i] = m_pMemFoil->yb[i];
+		}
+		m_pBufferFoil->nb = m_pMemFoil->n;
+		for (i=0;i<m_pMemFoil->n; i++){
+			m_pBufferFoil->x[i]  = m_pMemFoil->x[i];
+			m_pBufferFoil->y[i]  = m_pMemFoil->y[i];
+		}
+		m_pBufferFoil->n = m_pMemFoil->n;
+	}
 
+	SetList();
 	m_bApplied = true;
 	m_bModified = false;
 
@@ -270,16 +409,22 @@ void CEditFoilDlg::OnDeletePt()
 	int sel = m_ctrlCoordList.GetNextSelectedItem(pos);
 	if(sel<0) return;
 
-	for (int i=sel;i<m_pBufferFoil->nb-1; i++){
-		m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i+1];
-		m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i+1];
+	if(m_pSF){
 	}
-	for (i=sel;i<m_pBufferFoil->n-1; i++){
-		m_pBufferFoil->x[i] = m_pBufferFoil->x[i+1];
-		m_pBufferFoil->y[i] = m_pBufferFoil->y[i+1];
+	else if(m_pPF){
 	}
-	m_pBufferFoil->nb--;
-	m_pBufferFoil->n--;
+	else{
+		for (int i=sel;i<m_pBufferFoil->nb-1; i++){
+			m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i+1];
+			m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i+1];
+		}
+		for (i=sel;i<m_pBufferFoil->n-1; i++){
+			m_pBufferFoil->x[i] = m_pBufferFoil->x[i+1];
+			m_pBufferFoil->y[i] = m_pBufferFoil->y[i+1];
+		}
+		m_pBufferFoil->nb--;
+		m_pBufferFoil->n--;
+	}
 
 	SetList();
 	SetSelection(sel);
@@ -295,25 +440,29 @@ void CEditFoilDlg::OnInsertPt()
 	int sel = m_ctrlCoordList.GetNextSelectedItem(pos);
 	if(sel<=0) return;
 
-
-	for (int i=m_pBufferFoil->nb; i>sel; i--){
-		m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i-1];
-		m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i-1];
+	if(m_pSF){
 	}
-	m_pBufferFoil->xb[sel] = (m_pBufferFoil->xb[sel-1] + m_pBufferFoil->xb[sel+1])/2.0;
-	m_pBufferFoil->yb[sel] = (m_pBufferFoil->yb[sel-1] + m_pBufferFoil->yb[sel+1])/2.0 ;
-
-	for (i=m_pBufferFoil->n; i>sel; i--){
-		m_pBufferFoil->x[i] = m_pBufferFoil->x[i-1];
-		m_pBufferFoil->y[i] = m_pBufferFoil->y[i-1];
+	else if(m_pPF){
 	}
-	m_pBufferFoil->x[sel] = (m_pBufferFoil->x[sel-1] + m_pBufferFoil->x[sel+1])/2.;
-	m_pBufferFoil->y[sel] = (m_pBufferFoil->y[sel-1] + m_pBufferFoil->y[sel+1])/2.;
+	else{
+		for (int i=m_pBufferFoil->nb; i>sel; i--){
+			m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i-1];
+			m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i-1];
+		}
+		m_pBufferFoil->xb[sel] = (m_pBufferFoil->xb[sel-1] + m_pBufferFoil->xb[sel+1])/2.0;
+		m_pBufferFoil->yb[sel] = (m_pBufferFoil->yb[sel-1] + m_pBufferFoil->yb[sel+1])/2.0 ;
+
+		for (i=m_pBufferFoil->n; i>sel; i--){
+			m_pBufferFoil->x[i] = m_pBufferFoil->x[i-1];
+			m_pBufferFoil->y[i] = m_pBufferFoil->y[i-1];
+		}
+		m_pBufferFoil->x[sel] = (m_pBufferFoil->x[sel-1] + m_pBufferFoil->x[sel+1])/2.;
+		m_pBufferFoil->y[sel] = (m_pBufferFoil->y[sel-1] + m_pBufferFoil->y[sel+1])/2.;
 
 
-	m_pBufferFoil->nb++;
-	m_pBufferFoil->n++;
-
+		m_pBufferFoil->nb++;
+		m_pBufferFoil->n++;
+	}
 	SetList();
 	SetSelection(sel);
 
@@ -328,28 +477,34 @@ void CEditFoilDlg::OnAppend()
 	int sel = m_ctrlCoordList.GetNextSelectedItem(pos);
 	if(sel<=0) return;
 
-	if (sel>=m_pBufferFoil->nb-1 || sel>=m_pBufferFoil->n-1) return;
-
-	for (int i=m_pBufferFoil->nb; i>sel; i--){
-		m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i-1];
-		m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i-1];
+	if(m_pSF){
 	}
-	m_pBufferFoil->xb[sel+1] = (m_pBufferFoil->xb[sel] + m_pBufferFoil->xb[sel+2])/2.0;
-	m_pBufferFoil->yb[sel+1] = (m_pBufferFoil->yb[sel] + m_pBufferFoil->yb[sel+2])/2.0 ;
-
-	for (i=m_pBufferFoil->n; i>sel; i--){
-		m_pBufferFoil->x[i] = m_pBufferFoil->x[i-1];
-		m_pBufferFoil->y[i] = m_pBufferFoil->y[i-1];
+	else if(m_pPF){
 	}
-	m_pBufferFoil->x[sel+1] = (m_pBufferFoil->x[sel] + m_pBufferFoil->x[sel+2])/2.;
-	m_pBufferFoil->y[sel+1] = (m_pBufferFoil->y[sel] + m_pBufferFoil->y[sel+2])/2.;
+	else{
+		if (sel>=m_pBufferFoil->nb-1 || sel>=m_pBufferFoil->n-1) return;
 
-	m_pBufferFoil->nb++;
-	m_pBufferFoil->n++;
+		for (int i=m_pBufferFoil->nb; i>sel; i--){
+			m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i-1];
+			m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i-1];
+		}
+		m_pBufferFoil->xb[sel+1] = (m_pBufferFoil->xb[sel] + m_pBufferFoil->xb[sel+2])/2.0;
+		m_pBufferFoil->yb[sel+1] = (m_pBufferFoil->yb[sel] + m_pBufferFoil->yb[sel+2])/2.0 ;
 
-	SetList();
-	SetSelection(sel);
+		for (i=m_pBufferFoil->n; i>sel; i--){
+			m_pBufferFoil->x[i] = m_pBufferFoil->x[i-1];
+			m_pBufferFoil->y[i] = m_pBufferFoil->y[i-1];
+		}
+		m_pBufferFoil->x[sel+1] = (m_pBufferFoil->x[sel] + m_pBufferFoil->x[sel+2])/2.;
+		m_pBufferFoil->y[sel+1] = (m_pBufferFoil->y[sel] + m_pBufferFoil->y[sel+2])/2.;
 
-	m_bModified = true;
-	m_pChildView->Invalidate();
+		m_pBufferFoil->nb++;
+		m_pBufferFoil->n++;
+
+		SetList();
+		SetSelection(sel);
+
+		m_bModified = true;
+		m_pChildView->Invalidate();
+	}
 }

@@ -24,7 +24,9 @@
 // EditFoilDlg.h : header file
 //
 #include "../misc/EditListCtrl.h"
-#include "Foil.h"
+#include "../Design/SF.h"
+#include "../Design/PF.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CEditFoilDlg dialog
@@ -63,6 +65,9 @@ protected:
 
 	CFoil* m_pMemFoil;
 	CFoil* m_pBufferFoil;
+	CSF *m_pSF, *m_pmemSF;
+	CPF *m_pPF, *m_pmemPF;
+	int m_iExt, m_iInt;
 
 	CWnd *m_pChildView;
 
@@ -80,5 +85,8 @@ protected:
 	afx_msg void OnInsertPt();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	CButton m_ctrlInsert;
+	CButton m_ctrlDelete;
 };
 
