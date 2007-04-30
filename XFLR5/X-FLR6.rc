@@ -739,82 +739,98 @@ BEGIN
     LTEXT           "Color",IDC_STATIC,9,76,22,10
 END
 
-IDD_PLANEDLG DIALOGEX 0, 0, 331, 255
+IDD_PLANEDLG DIALOGEX 0, 0, 342, 289
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Plane Geometry"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PLANENAME,50,7,264,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "Define",IDC_DEFINEWING,16,40,42,14
-    PUSHBUTTON      "Import",IDC_IMPORTWING,64,40,40,14
-    PUSHBUTTON      "Export",IDC_EXPORTWING,110,40,40,14
-    EDITTEXT        IDC_WINGTILT,253,41,31,12,ES_RIGHT
+    PUSHBUTTON      "Define",IDC_DEFINEWING,21,35,31,12
+    PUSHBUTTON      "Import",IDC_IMPORTWING,21,50,31,12
+    PUSHBUTTON      "Export",IDC_EXPORTWING,21,66,31,12
+    EDITTEXT        IDC_WINGTILT,97,64,31,12,ES_RIGHT
     CONTROL         "Elevator",IDC_STAB,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,82,42,10
-    EDITTEXT        IDC_XLESTAB,41,116,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLESTAB,41,132,31,12,ES_RIGHT
-    EDITTEXT        IDC_STABTILT,41,152,30,12,ES_RIGHT
+                    WS_TABSTOP,18,100,42,10
+    EDITTEXT        IDC_XLESTAB,41,134,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLESTAB,41,150,31,12,ES_RIGHT
+    EDITTEXT        IDC_STABTILT,41,170,30,12,ES_RIGHT
     CONTROL         "Check Panels on Exit",IDC_CHECKPANELS,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,99,114,62,15
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,24,186,126,
+                    15
     CONTROL         "Fin",IDC_FIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,
-                    82,25,10
-    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,80,40,14
-    EDITTEXT        IDC_XLEFIN,208,108,31,12,ES_RIGHT
-    EDITTEXT        IDC_YLEFIN,208,123,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLEFIN,208,137,31,12,ES_RIGHT
-    EDITTEXT        IDC_FINTILT,208,154,31,12,ES_RIGHT
+                    100,25,10
+    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,98,31,12
+    EDITTEXT        IDC_XLEFIN,200,130,31,12,ES_RIGHT
+    EDITTEXT        IDC_YLEFIN,200,145,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEFIN,200,159,31,12,ES_RIGHT
+    EDITTEXT        IDC_FINTILT,200,176,31,12,ES_RIGHT
     CONTROL         "Symetric Fin",IDC_SYMFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,261,111,54,10
+                    WS_TABSTOP,253,133,54,10
     CONTROL         "Double Fin",IDC_DOUBLEFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,261,124,50,10
+                    WS_TABSTOP,253,146,50,10
     CONTROL         "Identical",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,265,138,43,10
+                    WS_GROUP,257,160,43,10
     CONTROL         "Left and Right",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,
-                    265,150,61,10
-    DEFPUSHBUTTON   "OK",IDOK,78,234,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,191,234,50,14
-    RTEXT           "Stab Volume",IDC_STABVOLUME,246,205,35,8
-    GROUPBOX        "Elevator",IDC_STATIC,6,68,160,107
-    LTEXT           "LE Position",IDC_STATIC,26,102,36,8
-    RTEXT           "x",IDC_STATIC,27,118,8,8
-    RTEXT           "z",IDC_STATIC,27,134,8,8
-    LTEXT           "LE Position",IDC_STATIC,195,97,36,8
-    RTEXT           "x",IDC_STATIC,179,110,8,8
-    RTEXT           "z",IDC_STATIC,179,139,8,8
-    GROUPBOX        "Fin",IDC_STATIC,169,68,155,107
-    RTEXT           "Elev. Area",IDC_STABSURFACE,84,193,35,8
-    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,193,35,8
-    RTEXT           "Fin Area",IDC_FINSURFACE,84,205,35,8
-    RTEXT           "Tilt Angle",IDC_STATIC,9,154,30,8
+                    257,172,61,10
+    DEFPUSHBUTTON   "OK",IDOK,78,268,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,191,268,50,14
+    RTEXT           "Stab Volume",IDC_STABVOLUME,246,234,35,8
+    GROUPBOX        "Elevator",IDC_STATIC,6,86,139,117
+    LTEXT           "LE Position",IDC_STATIC,37,120,36,8
+    RTEXT           "x",IDC_STATIC,27,136,8,8
+    RTEXT           "z",IDC_STATIC,27,152,8,8
+    LTEXT           "LE Position",IDC_STATIC,192,119,36,8
+    RTEXT           "x",IDC_STATIC,171,132,8,8
+    RTEXT           "z",IDC_STATIC,171,161,8,8
+    GROUPBOX        "Fin",IDC_STATIC,152,86,183,117
+    RTEXT           "Elev. Area",IDC_STABSURFACE,84,222,35,8
+    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,222,35,8
+    RTEXT           "Fin Area",IDC_FINSURFACE,84,234,35,8
+    RTEXT           "Tilt Angle",IDC_STATIC,9,172,30,8
     LTEXT           "Name",IDC_STATIC,7,9,20,8
-    RTEXT           "Tilt Angle",IDC_STATIC,219,43,30,8
-    RTEXT           "Wing Span",IDC_WINGSPAN,246,180,35,8
-    RTEXT           "Wing Area",IDC_WINGSURFACE,84,180,35,8
-    LTEXT           "dm²",IDC_SURF1,128,180,21,8
-    LTEXT           "dm²",IDC_SURF2,128,193,21,8
-    LTEXT           "dm²",IDC_SURF3,128,205,21,8
-    LTEXT           "mm",IDC_LEN1,290,180,15,8
-    LTEXT           "mm",IDC_LEN2,290,193,15,8
-    RTEXT           "Wing Area =",IDC_STATIC,11,180,66,8
-    RTEXT           "Elevator Area =",IDC_STATIC,11,193,66,8
-    RTEXT           "Fin Area =",IDC_STATIC,11,205,66,8
-    RTEXT           "Wing Span =",IDC_STATIC,172,180,66,8
-    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,193,66,8
-    RTEXT           "Tail Volume =",IDC_STATIC,172,206,66,8
-    GROUPBOX        "Wing",IDC_STATIC,7,26,317,41
-    RTEXT           "y",IDC_STATIC,179,125,8,8
-    LTEXT           "°",IDC_SURF4,289,43,11,8
-    LTEXT           "°",IDC_SURF5,77,154,8,8
-    RTEXT           "total",IDC_VLMTOTALPANELS,84,217,35,8
-    RTEXT           "Total Panels =",IDC_STATIC,11,217,66,8
-    LTEXT           "mm",IDC_LEN3,242,110,15,8
-    LTEXT           "mm",IDC_LEN4,242,125,15,8
-    LTEXT           "mm",IDC_LEN5,242,139,15,8
-    LTEXT           "mm",IDC_LEN6,76,118,15,8
-    LTEXT           "mm",IDC_LEN7,76,135,15,8
-    RTEXT           "Tilt Angle",IDC_STATIC,173,156,30,8
-    LTEXT           "°",IDC_SURF6,247,156,8,8
-    PUSHBUTTON      "Define",IDC_DEFINEELEV,72,79,45,13
+    RTEXT           "Tilt Angle",IDC_STATIC,63,66,30,8
+    RTEXT           "Wing Span",IDC_WINGSPAN,246,209,35,8
+    RTEXT           "Wing Area",IDC_WINGSURFACE,84,209,35,8
+    LTEXT           "dm²",IDC_SURF1,128,209,21,8
+    LTEXT           "dm²",IDC_SURF2,128,222,21,8
+    LTEXT           "dm²",IDC_SURF3,128,234,21,8
+    LTEXT           "mm",IDC_LEN1,290,209,15,8
+    LTEXT           "mm",IDC_LEN2,290,222,15,8
+    RTEXT           "Wing Area =",IDC_STATIC,11,209,66,8
+    RTEXT           "Elevator Area =",IDC_STATIC,11,222,66,8
+    RTEXT           "Fin Area =",IDC_STATIC,11,234,66,8
+    RTEXT           "Wing Span =",IDC_STATIC,172,209,66,8
+    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,222,66,8
+    RTEXT           "Tail Volume =",IDC_STATIC,172,235,66,8
+    GROUPBOX        "Main Wing",IDC_STATIC,7,23,139,61
+    RTEXT           "y",IDC_STATIC,171,147,8,8
+    LTEXT           "°",IDC_SURF4,135,65,8,8
+    LTEXT           "°",IDC_SURF5,77,172,8,8
+    RTEXT           "total",IDC_VLMTOTALPANELS,84,246,35,8
+    RTEXT           "Total Panels =",IDC_STATIC,11,246,66,8
+    LTEXT           "mm",IDC_LEN3,234,132,15,8
+    LTEXT           "mm",IDC_LEN4,234,147,15,8
+    LTEXT           "mm",IDC_LEN5,234,161,15,8
+    LTEXT           "mm",IDC_LEN6,76,136,15,8
+    LTEXT           "mm",IDC_LEN7,76,153,15,8
+    RTEXT           "Tilt Angle",IDC_STATIC,165,178,30,8
+    LTEXT           "°",IDC_SURF6,239,178,8,8
+    PUSHBUTTON      "Define",IDC_DEFINEELEV,72,97,31,12
+    PUSHBUTTON      "Define",IDC_DEFINEWING2,203,36,31,12
+    PUSHBUTTON      "Import",IDC_IMPORTWING2,203,51,31,12
+    PUSHBUTTON      "Export",IDC_EXPORTWING2,203,65,31,12
+    CONTROL         "Biplane",IDC_BIPLANE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,161,36,39,10
+    EDITTEXT        IDC_WINGTILT2,273,65,31,12,ES_RIGHT
+    RTEXT           "Tilt Angle",IDC_STATIC,241,67,30,8
+    LTEXT           "°",IDC_SURF7,313,67,11,8
+    EDITTEXT        IDC_XLEWING2,273,36,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEWING2,273,51,31,12,ES_RIGHT
+    RTEXT           "x",IDC_STATIC,258,38,8,8
+    RTEXT           "z",IDC_STATIC,258,53,8,8
+    LTEXT           "mm",IDC_LEN8,309,38,15,8
+    LTEXT           "mm",IDC_LEN9,309,53,15,8
+    GROUPBOX        "Biplane",IDC_STATIC,152,23,183,61
 END
 
 IDD_PERTDLG DIALOGEX 0, 0, 240, 239
@@ -1835,7 +1851,7 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5 v3.19",IDC_STATIC,41,14,75,8,SS_NOPREFIX
+    LTEXT           "XFLR5 v3.20",IDC_STATIC,41,14,75,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,175,50,14,WS_GROUP
     LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
                     IDC_STATIC,10,42,185,8
@@ -2187,9 +2203,9 @@ BEGIN
     IDD_PLANEDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 324
+        RIGHTMARGIN, 335
         TOPMARGIN, 7
-        BOTTOMMARGIN, 248
+        BOTTOMMARGIN, 282
     END
 
     IDD_PERTDLG, DIALOG
@@ -2565,6 +2581,11 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Load File\t(Ctrl+O)",        ID_APP_OPEN
         MENUITEM SEPARATOR
+        MENUITEM "1 ",                          IDM_RECENTFILE1
+        MENUITEM "2 ",                          IDM_RECENTFILE2
+        MENUITEM "3 ",                          IDM_RECENTFILE3
+        MENUITEM "4 ",                          IDM_RECENTFILE4
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
     POPUP "&Application"
@@ -2896,6 +2917,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Show Elliptic Loading",       IDM_SHOWELLIPTIC
         MENUITEM "Show XCmRef location",        IDM_SHOWXCMREF
+        MENUITEM "Show 2nd Wing Curve",         33253
         MENUITEM "Show Elevator Curve",         IDM_SHOWSTAB
         MENUITEM "Show Fin Curve",              IDM_SHOWFIN
         MENUITEM SEPARATOR
@@ -2992,6 +3014,7 @@ IDR_CTXDESIGNMENU MENU
 BEGIN
     POPUP "Design"
     BEGIN
+        MENUITEM "Edit Ctrl Points",            33263
         MENUITEM "Delete Ctrl Point \t(Shift + LeftClick)", IDM_DELETEPOINT
         MENUITEM "Insert Ctrl Point \t(Ctrl + Left Click)", IDM_ADDPOINT
         MENUITEM SEPARATOR
@@ -3062,11 +3085,14 @@ BEGIN
         MENUITEM "Insert Project\t(Ctrl+I)",    IDM_INSERTPROJECT
         MENUITEM "&Save Project\t(Ctrl+S)",     IDM_SAVEPROJECT
         MENUITEM "Save Project As...",          IDM_SAVEPROJECTAS
+        MENUITEM "Save Options...",             33127
         MENUITEM "Close Project\t(Ctrl+W)",     IDM_CLOSEPROJECT
         MENUITEM SEPARATOR
         MENUITEM "Load File \t(Ctrl+O)",        IDM_LOAD
         MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
         MENUITEM "&Print\t(Ctrl+P)",            IDM_PRINT
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
     POPUP "&Application"
@@ -3129,9 +3155,10 @@ BEGIN
         MENUITEM "Close Project\t(Ctrl+W)",     IDM_CLOSEPROJECT
         MENUITEM SEPARATOR
         MENUITEM "Load &File\t(Ctrl+O)",        IDM_LOAD
-        MENUITEM "Sa&ve File\t(Ctrl+E)",        IDM_SAVE
+        MENUITEM SEPARATOR
         MENUITEM SEPARATOR
         MENUITEM "&Print\t(Ctrl+P)",            IDM_PRINT
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
     POPUP "&Application"
@@ -3292,7 +3319,9 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "L&oad File\t(Ctrl+O)",        IDM_LOADFILE
         MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
         MENUITEM "&Print\t(Ctrl+P)",            IDM_PRINT
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
     POPUP "&Application"
@@ -3408,7 +3437,8 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Show Elliptic Loading",       IDM_SHOWELLIPTIC
         MENUITEM "Show XCmRef location",        IDM_SHOWXCMREF
-        MENUITEM "Show Elevator Curve",         IDM_SHOWSTAB
+        MENUITEM "Show 2nd Wing Curve",         IDM_SHOWWING2
+        MENUITEM "Show Elevator Curve",         33169
         MENUITEM "Show Fin Curve",              IDM_SHOWFIN
         MENUITEM SEPARATOR
         MENUITEM "LLT and VLM Settings...",     IDM_ADVSETTINGS
@@ -3433,9 +3463,11 @@ BEGIN
         MENUITEM "Save Options...",             IDM_SAVEOPTIONS
         MENUITEM "Close Project\t(Ctrl+W)",     IDM_CLOSEPROJECT
         MENUITEM SEPARATOR
-        MENUITEM "L&oad File\t(Ctrl+O)",        IDM_AFOIL_SFLOAD
+        MENUITEM "L&oad File\t(Ctrl+O)",        IDM_LOADFILE
+        MENUITEM SEPARATOR
         MENUITEM SEPARATOR
         MENUITEM "&Print\t(Ctrl+P)",            IDM_AFOIL_PRINT
+        MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
     POPUP "&Application"
@@ -3493,6 +3525,7 @@ BEGIN
     BEGIN
         MENUITEM "&New Splines",                IDM_AFOIL_NEWSPLINES
         MENUITEM "Spline Controls \t(F6)",      IDM_SPLINECONTROLS
+        MENUITEM "Edit Ctrl Points",            IDM_EDITCTRLPOINTS
         MENUITEM SEPARATOR
         MENUITEM "B-Splines\t(Ctrl+1)",         IDM_BSPLINES
         MENUITEM "Splined Points\t(Ctrl+2)",    IDM_SPLINEDPOINTS

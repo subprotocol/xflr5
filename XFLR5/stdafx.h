@@ -50,7 +50,7 @@
 
 #define MAXPANELS          30
 #define MAXSTATIONS	      100 //max number of stations for LLT or VLM analysis
-#define MAXVLMSURFACES     30 
+#define MAXVLMSURFACES     80 
 #define VLMMATSIZE       2000
 #define MAXCONTROLS        10 //max controls per wing section
 #define SPLINECONTROLSIZE  50 //maximum number of control points

@@ -48,7 +48,17 @@ Licence :
 
                        **************************
 
+TODO :
 
+v3.20 April xxx,2007
+	Introduced a Biblane option in wing analysis
+	Corrected the tail volume calculation for V-Tails
+	Introduced an option to edit spline ctrl points coordinates
+	Released the constraint on spline leading and trailing points to allow their translation
+	Added Recent File management
+	Corrected the initilization of the Inverse Design to take into account the latest foil loaded in XFoil
+	Corrected a few minor cosmetic bugs
+	
 
 v3.19 March 31st, 2007 - First release at SourceForge.net
 	Corrected cosmetic bugs

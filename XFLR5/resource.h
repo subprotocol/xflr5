@@ -480,6 +480,7 @@
 #define IDC_LEFT                        1463
 #define IDC_XLESTAB                     1464
 #define IDC_MIN                         1465
+#define IDC_XLEWING2                    1465
 #define IDC_CORESIZE                    1466
 #define IDC_RIGHT                       1467
 #define IDC_MAX                         1469
@@ -495,11 +496,13 @@
 #define IDC_SPANFACTOR                  1480
 #define IDC_ZLESTAB                     1481
 #define IDC_PAPERSIZE                   1482
+#define IDC_ZLEWING2                    1482
 #define IDC_CHORDFACTOR                 1483
 #define IDC_GRAPHPREFS                  1484
 #define IDC_NEUTRAL                     1485
 #define IDC_FIN                         1486
 #define IDC_STAB                        1487
+#define IDC_BIPLANE                     1488
 #define IDC_STABLEVERARM                1495
 #define IDC_STABSURFACE                 1496
 #define IDC_STABVOLUME                  1497
@@ -519,6 +522,7 @@
 #define IDC_LEN1                        1511
 #define IDC_LEN2                        1512
 #define IDC_VLMTOTALPANELS              1513
+#define IDC_WINGTILT2                   1514
 #define IDC_LEN3                        1515
 #define IDC_VLM1                        1516
 #define IDC_LEN4                        1516
@@ -539,7 +543,12 @@
 #define IDC_LENGTH7                     1523
 #define IDC_CHECKPANELS                 1524
 #define IDC_SURF6                       1525
+#define IDC_IMPORTWING2                 1526
+#define IDC_EXPORTWING2                 1527
+#define IDC_SURF7                       1528
 #define IDC_RESETWAKE                   1529
+#define IDC_LEN8                        1529
+#define IDC_LEN9                        1530
 #define IDC_SSURFACE                    1533
 #define IDC_FORCE                       1534
 #define IDC_SSPEED                      1535
@@ -564,6 +573,7 @@
 #define IDC_DEFINEFIN                   1560
 #define IDC_DEFINEELEV                  1561
 #define IDC_DEFINEWING                  1562
+#define IDC_DEFINEWING2                 1563
 #define IDC_CLR1                        5001
 #define IDC_CLR2                        5002
 #define IDC_CLR3                        5003
@@ -950,6 +960,12 @@
 #define IDC_MFC                         33242
 #define IDM_NEWSPLINES                  33243
 #define IDM_EXPORTVLMPANELS             33251
+#define IDM_SHOWWING2                   33253
+#define IDM_RECENTFILE3                 33257
+#define IDM_RECENTFILE4                 33258
+#define IDM_RECENTFILE1                 33261
+#define IDM_RECENTFILE2                 33262
+#define IDM_EDITCTRLPOINTS              33263
 #define ID_APP_EXIT2                    57666
 #define ID_VIEW_STATUS_BAR2             59394
 
@@ -959,7 +975,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        349
-#define _APS_NEXT_COMMAND_VALUE         33253
+#define _APS_NEXT_COMMAND_VALUE         33265
 #define _APS_NEXT_CONTROL_VALUE         5176
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
