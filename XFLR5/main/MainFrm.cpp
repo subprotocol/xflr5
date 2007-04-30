@@ -155,6 +155,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_TGAPDX, OnSpecFInv)
 	ON_UPDATE_COMMAND_UI(IDC_TGAPDY, OnSpecFInv)
 	ON_UPDATE_COMMAND_UI(IDC_SYMM, OnSpecFInv)
+	ON_COMMAND(IDM_RECENTFILE1, OnRecentFile1)
+	ON_COMMAND(IDM_RECENTFILE2, OnRecentFile2)
+	ON_COMMAND(IDM_RECENTFILE3, OnRecentFile3)
+	ON_COMMAND(IDM_RECENTFILE4, OnRecentFile4)
 	END_MESSAGE_MAP()
 
 static UINT XFLR5indicators[] =
@@ -184,7 +188,7 @@ CMainFrame::CMainFrame()
 	
 	m_wndView.m_pFrameWnd = this;
 
-	m_VersionName = "XFLR5_v3.19";
+	m_VersionName = "XFLR5_v3.20";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame     = this;
@@ -209,7 +213,7 @@ CMainFrame::CMainFrame()
 	Miarex.m_VLMDlg.m_pFrame    = this;
 	Miarex.m_VLMDlg.m_pMiarex   = &Miarex;
 
-	AFoil.m_pFrame= this;
+	AFoil.m_pFrame = this;
 	AFoil.m_pChildWnd = &m_wndView;
 	AFoil.m_poaFoil = &m_oaFoil;
 	AFoil.m_pXFoil  = &m_XFoil;
@@ -625,6 +629,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//Trace("CMainFrame::OnCreate - Loading settings");
 	LoadSettings();
+	SetRecentFileMenu();
 //	m_wndView.GLLoadFont();
 	m_W3DBar.SetChecks();
 	m_ScaleOppBar.SetPos();
@@ -742,6 +747,7 @@ void CMainFrame::OnXDirect()
 
 	m_wndView.SetScale();
 	SetMenu(&m_XDirectMenu);
+	SetRecentFileMenu();
 
 	XDirect.SetFoil(m_pCurFoil);
 	XDirect.SetParams();
@@ -804,6 +810,8 @@ void CMainFrame::OnMiarex()
 	}
 	m_wndView.SetScale();
 	SetMenu(&m_MiarexMenu);
+	SetRecentFileMenu();
+
 	Miarex.SetParams();
 	UpdateUFOs();
 	if(Miarex.m_pCurWing && Miarex.m_iView==1) Miarex.OnAdjustToWing();
@@ -840,6 +848,8 @@ void CMainFrame::OnFoilDirectDesign()
 	DockControlBar(&m_AFoilCtrlBar, AFX_IDW_DOCKBAR_BOTTOM, rectBar);
 
 	SetMenu(&m_AFoilMenu);	
+	SetRecentFileMenu();
+
 	AFoil.SetParams(m_pCurFoil);
 	m_AFoilCtrlBar.SetParams(m_pCurFoil);
 
@@ -1492,6 +1502,8 @@ void CMainFrame::OnFullInverse()
 	XInverse.m_bFullInverse = true;
 
 	SetMenu(&m_XInverseMenu);	
+	SetRecentFileMenu();
+
 	XInverse.SetParams();
 
 	m_XInverseBar.ShowWindow(SW_SHOW);
@@ -1517,6 +1529,8 @@ void CMainFrame::OnMixedInverse()
 	XInverse.m_bFullInverse = false;
 
 	SetMenu(&m_XInverseMenu);	
+	SetRecentFileMenu();
+
 	XInverse.SetParams();
 
 	m_XInverseBar.ShowWindow(SW_SHOW);
@@ -3152,6 +3166,8 @@ void CMainFrame::SaveSettings()
 		ar << m_WakeStyle << m_WakeWidth << m_WakeColor;
 		ar << m_LiftScale << m_DragScale << m_DownwashScale;
 		ar << m_LegendMin << m_LegendMax;
+
+		ar << m_RecentFile[0] << m_RecentFile[1] << m_RecentFile[2] << m_RecentFile[3] ;
 		
 		if(m_bAutoCpScale)        ar <<1; else ar <<0;
 		if(m_W3DBar.m_bSurfaces)  ar << 1; else ar<<0;
@@ -3451,7 +3467,10 @@ void CMainFrame::LoadSettings()
 			m_ScaleOppBar.m_DragScale     = m_DragScale;
 			m_ScaleOppBar.m_DownwashScale = m_DownwashScale;
 
+
 			ar >> m_LegendMin >> m_LegendMax;
+
+			ar >> m_RecentFile[0] >> m_RecentFile[1] >> m_RecentFile[2] >> m_RecentFile[3] ;
 
 			ar >> k;
 			if(k<0 || k>1){
@@ -4452,7 +4471,7 @@ bool CMainFrame::SerializeProject(CArchive &ar, CString UFOName)
 	// last write the plane, if any
 	if(pPlane){
 		ar << 1;
-		pPlane->m_pParent = this;
+		pPlane->m_pMiarex = &Miarex;
 		pPlane->SerializePlane(ar);
 	}
 	else 
@@ -4543,7 +4562,7 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 		ar << (int)m_oaPlane.GetSize();
 		for (i=0; i<m_oaPlane.GetSize();i++){
 			pPlane = (CPlane*)m_oaPlane.GetAt(i);
-			pPlane->m_pParent = this;
+			pPlane->m_pMiarex = &Miarex;
 			pPlane->SerializePlane(ar);
 		}
 
@@ -4848,7 +4867,7 @@ int CMainFrame::LoadFile(CString FileName, CString PathName)
 			if(end==".wpa"){
 				if(!m_bSaved){
 					int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
-					if (IDCANCEL == resp) return 0;
+					if (IDCANCEL == resp) return -1;
 					if (IDYES == resp) OnSaveProject();
 				}
 
@@ -4856,13 +4875,15 @@ int CMainFrame::LoadFile(CString FileName, CString PathName)
 				SetProjectName(PathName);
 				if(ReadProject(PathName)){
 					SetSaveState(true);
+					AddRecentFile(PathName);
 					if(m_oaWing.GetSize() || m_oaPlane.GetSize())	return MIAREX;
 					else if (m_oaFoil.GetSize())                    return XFOILANALYSIS;
+					else return 0;
 				}
 			}
 		}
 	}
-	return 0;
+	return -1;
 }
 
 BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct) 
@@ -4873,42 +4894,44 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 		FileName = (LPCTSTR)pCopyDataStruct->lpData;
 		FileName = FileName.Left(pCopyDataStruct->cbData);
 		
-		LoadFile(FileName, FileName);
-		
-		int pos1 = FileName.Find(".plr");
-		int pos2 = FileName.Find(".PLR");
-		if (pos1>0 || pos2>0) {
-			OnXDirect();
-		}
-		else {
-			pos1 = FileName.Find(".dat");
-			pos2 = FileName.Find(".DAT");
-			if(pos1>0 || pos2>0) {
+		if(LoadFile(FileName, FileName)>0) {
+			
+			int pos1 = FileName.Find(".plr");
+			int pos2 = FileName.Find(".PLR");
+			if (pos1>0 || pos2>0) {
 				OnXDirect();
 			}
-			else{
-				pos1 = FileName.Find(".wpa");
-				pos2 = FileName.Find(".WPA");
+			else {
+				pos1 = FileName.Find(".dat");
+				pos2 = FileName.Find(".DAT");
 				if(pos1>0 || pos2>0) {
-					if(m_iApp==MIAREX) {
-						UpdateUFOs();
-						Miarex.SetUFO();
-						OnMiarex();
-					}
-					else if(m_iApp==XFOILANALYSIS) {
-						UpdateFoils();
-						XDirect.SetFoil();
-						OnXDirect();
-					}
-					else if(m_oaWing.GetSize() || m_oaPlane.GetSize()){
-						UpdateUFOs();
-						Miarex.SetUFO();
-						OnMiarex();
-					}
-					else if(m_oaFoil.GetSize()) {
-						UpdateFoils();
-						XDirect.SetFoil();
-						OnXDirect();
+					OnXDirect();
+				}
+				else{
+					pos1 = FileName.Find(".wpa");
+					pos2 = FileName.Find(".WPA");
+					if(pos1>0 || pos2>0) {
+						AddRecentFile(FileName);
+						if(m_iApp==MIAREX) {
+							UpdateUFOs();
+							Miarex.SetUFO();
+							OnMiarex();
+						}
+						else if(m_iApp==XFOILANALYSIS) {
+							UpdateFoils();
+							XDirect.SetFoil();
+							OnXDirect();
+						}
+						else if(m_oaWing.GetSize() || m_oaPlane.GetSize()){
+							UpdateUFOs();
+							Miarex.SetUFO();
+							OnMiarex();
+						}
+						else if(m_oaFoil.GetSize()) {
+							UpdateFoils();
+							XDirect.SetFoil();
+							OnXDirect();
+						}
 					}
 				}
 			}
@@ -5002,83 +5025,6 @@ void CMainFrame::OnCloseProject()
 	
 	m_wndView.Invalidate();
 }
-
-
-void CMainFrame::OnLoadProject() 
-{
-	CFile fp;
-	CString strong;
-
-	if(!m_bSaved){
-		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
-		if (IDCANCEL == resp) return;
-		if (IDYES == resp) OnSaveProject();
-	}
-
-	//load new project
-	CFileDialog WPlrDlg(true, "wpa", NULL, OFN_HIDEREADONLY, _T("XFLR5 Project (.wpa)|*.wpa|"));
-	if(IDOK==WPlrDlg.DoModal()){
-		DeleteProject();
-
-		UpdateView();
-		SetProjectName(WPlrDlg.GetPathName());
-		if(ReadProject(m_FileName)){
-			SetSaveState(true);
-			if( m_oaWing.GetSize() || m_oaPlane.GetSize()){
-				if(m_iApp==0){
-					OnMiarex();
-					return;
-				}
-				else if(m_iApp==MIAREX) {
-					UpdateUFOs();
-					Miarex.SetUFO();
-					Miarex.UpdateView();
-					return;
-				}
-			}
-			if(m_oaFoil.GetSize())  {
-				if(m_iApp==0)
-					OnXDirect();
-				else if(m_iApp==XFOILANALYSIS) {
-					UpdateFoils();
-					XDirect.SetFoil();
-					XDirect.UpdateView();
-				}
-			}
-		}
-	}	
-}
-
-
-void CMainFrame::OnAppOpen() 
-{
-	CString FileName, PathName;
-	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, 
-		_T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
-
-	if(IDOK==XFileDlg.DoModal()) {
-		int app = LoadFile(XFileDlg.GetFileName(),XFileDlg.GetPathName());
-
-		UpdateView();
-		if(m_iApp==0){
-			if (app == XFOILANALYSIS) OnXDirect();
-			else if(app==MIAREX)      OnMiarex();
-		}
-		else if(m_iApp==XFOILANALYSIS){
-			UpdateFoils();
-			XDirect.SetFoil();
-			XDirect.UpdateView();
-		}
-		else if(m_iApp==MIAREX){
-			UpdateUFOs();
-			Miarex.SetUFO();
-			Miarex.UpdateView();
-		}
-	}
-}
-
-
-
 
 
 void CMainFrame::OnInsertProject() 
@@ -6295,3 +6241,203 @@ void CMainFrame::OnPlanePrefs()
 	}		
 }
 	
+void CMainFrame::OnLoadProject() 
+{
+	CFile fp;
+	CString strong;
+
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
+
+	//load new project
+	CFileDialog XFileDlg(true, "wpa", NULL, OFN_HIDEREADONLY, _T("XFLR5 Project (.wpa)|*.wpa|"));
+	if(IDOK==XFileDlg.DoModal()){
+		if(LoadProject(XFileDlg.GetPathName()))
+			AddRecentFile(XFileDlg.GetPathName());
+	}	
+}
+
+bool CMainFrame::LoadProject(CString PathName) 
+{
+	DeleteProject();
+
+	UpdateView();
+	SetProjectName(PathName);
+	if(ReadProject(m_FileName)){
+		SetSaveState(true);
+		if( m_oaWing.GetSize() || m_oaPlane.GetSize()){
+			if(m_iApp==0){
+				OnMiarex();
+				return TRUE;
+			}
+			else if(m_iApp==MIAREX) {
+				UpdateUFOs();
+				Miarex.SetUFO();
+				Miarex.UpdateView();
+				return TRUE;
+			}
+		}
+		if(m_oaFoil.GetSize())  {
+			if(m_iApp==0)
+				OnXDirect();
+			else if(m_iApp==XFOILANALYSIS) {
+				UpdateFoils();
+				XDirect.SetFoil();
+				XDirect.UpdateView();
+			}
+			else if(m_iApp==DIRECTDESIGN){
+				AFoil.SetFoils();
+			}
+		}
+		return TRUE;
+	}
+	else return FALSE;
+}
+
+
+
+void CMainFrame::OnAppOpen() 
+{
+//	CString FileName, PathName;
+	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, 
+		_T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
+
+	if(IDOK==XFileDlg.DoModal()) {
+		int app = LoadFile(XFileDlg.GetFileName(),XFileDlg.GetPathName());
+//		if(app>=0) AddRecentFile(XFileDlg.GetPathName());
+
+		UpdateView();
+		if(m_iApp==0){
+			if (app == XFOILANALYSIS) OnXDirect();
+			else if(app==MIAREX)      OnMiarex();
+		}
+		else if(m_iApp==XFOILANALYSIS){
+			UpdateFoils();
+			XDirect.SetFoil();
+			XDirect.UpdateView();
+		}
+		else if(m_iApp==MIAREX){
+			UpdateUFOs();
+			Miarex.SetUFO();
+			Miarex.UpdateView();
+		}
+		else if(m_iApp==DIRECTDESIGN){
+			AFoil.SetFoils();
+		}
+	}
+}
+
+
+
+void CMainFrame::AddRecentFile(CString FileName)
+{
+	for(int j=0; j<4;j++){
+		if(m_RecentFile[j]==FileName){
+			for (int l=j; l<3; l++){
+				m_RecentFile[l]=m_RecentFile[l+1];
+			}
+			break;
+		}
+	}
+
+	m_RecentFile[3] = m_RecentFile[2];
+	m_RecentFile[2] = m_RecentFile[1];
+	m_RecentFile[1] = m_RecentFile[0];
+	m_RecentFile[0] = FileName;
+	SetRecentFileMenu();
+}
+
+void CMainFrame::SetRecentFileMenu()
+{
+	CString strong;
+	CMenu* pMenu = GetMenu()->GetSubMenu(0);
+	if(pMenu){
+		pMenu->RemoveMenu(IDM_RECENTFILE1, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE2, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE3, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE4, MF_BYCOMMAND);
+
+		if(m_RecentFile[3].GetLength()) {
+			strong = m_RecentFile[3];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE4,"4 "+strong);
+		}
+		if(m_RecentFile[2].GetLength()) {
+			strong = m_RecentFile[2];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE3,"3 "+strong);
+		}
+		if(m_RecentFile[1].GetLength()) {
+			strong = m_RecentFile[1];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE2,"2 "+strong);
+		}
+		if(m_RecentFile[0].GetLength()) {
+			strong = m_RecentFile[0];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE1,"1 "+strong);
+		}
+
+		DrawMenuBar();
+	}
+}
+void CMainFrame::ShortenFileName(CString &PathName)
+{
+	CString strong, strange;
+	if(PathName.GetLength()>40){
+		int pos = PathName.ReverseFind(92);
+		if (pos>0) {
+			strong = char(92)+PathName.Right(PathName.GetLength()-pos-1);
+			pos = PathName.Find(92);
+			if(pos>0) strange = PathName.Left(pos)+char(92)+"...";
+			strong = strange+strong;
+		}
+		else strong = PathName.Left(40);
+
+	}
+	else strong = PathName;
+	PathName = strong;
+}
+
+void CMainFrame::OnRecentFile1()
+{
+	LoadProject(m_RecentFile[0]);
+}
+
+void CMainFrame::OnRecentFile2()
+{
+	CString strong;
+	LoadProject(m_RecentFile[1]);
+	strong = m_RecentFile[1];
+	m_RecentFile[1] = m_RecentFile[0];
+	m_RecentFile[0] = strong;
+	SetRecentFileMenu();
+}
+
+void CMainFrame::OnRecentFile3()
+{
+	CString strong;
+	LoadProject(m_RecentFile[2]);
+	strong = m_RecentFile[2];
+	m_RecentFile[2] = m_RecentFile[1];
+	m_RecentFile[1] = m_RecentFile[0];
+	m_RecentFile[0] = strong;
+	SetRecentFileMenu();
+}
+
+void CMainFrame::OnRecentFile4()
+{
+	CString strong;
+	LoadProject(m_RecentFile[3]);
+	strong = m_RecentFile[3];
+	m_RecentFile[3] = m_RecentFile[2];
+	m_RecentFile[2] = m_RecentFile[1];
+	m_RecentFile[1] = m_RecentFile[0];
+	m_RecentFile[0] = strong;
+	SetRecentFileMenu();
+}
+
+

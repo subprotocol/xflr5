@@ -120,6 +120,7 @@ protected:  // control bar embedded members
 	CComboBox m_ctrlWPlr;
 	CComboBox m_ctrlWOpp;
 
+
 private:
 	void UpdateView();
 
@@ -161,6 +162,10 @@ private:
 	CMenu m_MiarexMenu;
 	CMenu m_AFoilMenu;
 	CMenu m_XInverseMenu;
+	CString m_RecentFile[4];
+	void AddRecentFile(CString FileName);
+	void SetRecentFileMenu();
+	void ShortenFileName(CString &PathName);
 
 	//The applications
 	CXDirect XDirect;
@@ -171,6 +176,7 @@ private:
 
 	bool DeleteFoil(CFoil *pFoil, bool bAsk = true);
 	void DeletePlane(CPlane *pPlane, bool bResultsOnly = false);
+	bool LoadProject(CString PathName);
 	bool LoadPolarFile(CArchive &ar);
 	bool LoadPolarFileV3(CArchive &ar, int ArchiveFormat=0);
 	bool ReadProject(CString FileName);
@@ -213,6 +219,7 @@ private:
 	void UpdateUFOs();
 	void UpdateWPlrs();
 	COLORREF GetColor(int type);
+
 
 	CPolar* AddPolar(CPolar *pPolar);
 	CFoil* GetFoil(CString strFoilName);
@@ -343,6 +350,10 @@ protected:
 	afx_msg void OnPlanePrefs();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnFoilDirectDesign();
+	afx_msg void OnRecentFile1();
+	afx_msg void OnRecentFile2();
+	afx_msg void OnRecentFile3();
+	afx_msg void OnRecentFile4();
 
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
