@@ -41,7 +41,8 @@ public:
 	void GetBWStyle(COLORREF &color, int &style, int &width);
 
 private:
-	CWOpp m_WingWOpp;		// the wing's operating points
+	CWOpp m_WingWOpp;		// the wing's operating point
+	CWOpp m_Wing2WOpp;		// the second wing's operating point
 	CWOpp m_StabWOpp;		// the elevator's operating point
 	CWOpp m_FinWOpp;		// the fin's operating point
 
@@ -57,7 +58,8 @@ private:
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
-	bool m_bStab, m_bFin; 		// if there is an elevator and a fin, respectively
+	bool m_bBiplane; 		// if a biplane
+	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
 	bool m_bMiddle;			// true if the POpp is the result of a calculation on the middle surface
 	bool m_bOut;			// true if the point is unconverged (interpolation outside the polar mesh)

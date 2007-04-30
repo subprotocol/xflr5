@@ -110,8 +110,9 @@ protected:
 	afx_msg void OnDefinePlane();
 	afx_msg void OnEditPlane();
 	afx_msg void OnSaveUFO();
-	afx_msg void OnElevator();
-	afx_msg void OnFin();
+	afx_msg void OnShowWing2();
+	afx_msg void OnShowElevator();
+	afx_msg void OnShowFin();
 	afx_msg void OnAutoScales();
 	afx_msg void OnAutoWingScales();
 	afx_msg void OnDeleteAll();
@@ -369,6 +370,7 @@ private:
 	bool m_bAnimate;			// true if there is an animation going on, 
 	bool m_bAnimatePlus;			// true if the animation is going in aoa crescending order
 	bool m_bTransGraph;			// true if a graph is being dragged
+	bool m_bShowWing2;			// true if the biplane's second wing OpPoint results should be displayed
 	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
 	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
 	bool m_bIs2DScaleSet;			// true if the 2D scale has been set, false if needs to be reset 
@@ -445,6 +447,7 @@ private:
 	CWPolar * m_pCurWPolar;			// the currently selected WPolar
 	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
 	CPlane * m_pCurPlane;			// the currently selected Plane
+	CWing * m_pCurWing2;			// the currently selected Plane's 2nd wing, if any
 	CWing * m_pCurStab;			// the currently selected Plane's elevator
 	CWing * m_pCurFin;			// the currently selected Plane's fin
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point

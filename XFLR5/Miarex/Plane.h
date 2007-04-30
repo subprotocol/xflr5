@@ -47,11 +47,9 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CPlane)
 	enum { IDD = IDD_PLANEDLG };
-	CButton	m_ctrlCheckPanels;
-	CButton	m_ctrlSymFin;
-	CStatic	m_ctrlSurf3;
-	CStatic	m_ctrlSurf2;
 	CStatic	m_ctrlSurf1;
+	CStatic	m_ctrlSurf2;
+	CStatic	m_ctrlSurf3;
 	CStatic	m_ctrlLen1;
 	CStatic	m_ctrlLen2;
 	CStatic	m_ctrlLen3;
@@ -59,30 +57,41 @@ public:
 	CStatic	m_ctrlLen5;
 	CStatic	m_ctrlLen6;
 	CStatic	m_ctrlLen7;
+	CStatic m_ctrlLen8;
+	CStatic m_ctrlLen9;
 	CStatic	m_ctrlWingSpan;
 	CStatic	m_ctrlWingSurface;
-	CFloatEdit	m_ctrlWingTilt;
-	CButton	m_ctrlDefineFin;
-	CButton	m_ctrlDefineStab;
-	CEdit	m_ctrlPlaneName;
 	CStatic	m_ctrlStabVolume;
 	CStatic	m_ctrlFinSurface;
 	CStatic	m_ctrlStabLeverArm;
 	CStatic	m_ctrlStabSurface;
-	CButton	m_ctrlVTail;
 	CFloatEdit	m_ctrlXLEFin;
 	CFloatEdit	m_ctrlYLEFin;
 	CFloatEdit	m_ctrlZLEFin;
-	CFloatEdit	m_ctrlStabTilt;
 	CFloatEdit	m_ctrlZLEStab;
 	CFloatEdit	m_ctrlXLEStab;
+	CFloatEdit	m_ctrlXLEWing2;
+	CFloatEdit	m_ctrlZLEWing2;
+	CFloatEdit	m_ctrlStabTilt;
 	CFloatEdit m_ctrlFinTilt;
+	CFloatEdit	m_ctrlWingTilt;
+	CFloatEdit	m_ctrlWingTilt2;
 	CNumEdit m_ctrlVLMTotalPanels;
+	CEdit	m_ctrlPlaneName;
 	CButton m_ctrlDoubleFin;
 	CButton	m_ctrlStabCheck;
 	CButton	m_ctrlFinCheck;
 	CButton	m_ctrlRadio1;
 	CButton	m_ctrlRadio2;
+	CButton m_ctrlBiplane;
+	CButton m_ctrlDefineWing2;
+	CButton m_ctrlImportWing2;
+	CButton m_ctrlExportWing2;
+	CButton	m_ctrlDefineFin;
+	CButton	m_ctrlVTail;
+	CButton	m_ctrlDefineStab;
+	CButton	m_ctrlCheckPanels;
+	CButton	m_ctrlSymFin;
 	CButton m_ctrlOK;
 
 	//}}AFX_DATA
@@ -99,10 +108,9 @@ public:
 
 // Implementation
 protected:
-	CWnd * m_pParent;
+	CWnd * m_pMiarex;
 	CWnd * m_pFrame;
-//	CWing *m_pWing;
-	CWing m_Wing;
+	CWing m_Wing, m_Wing2;
 	CWing m_Stab;
 	CWing m_Fin;
 	bool m_bActive;
@@ -110,15 +118,17 @@ protected:
 	bool m_bFin, m_bStab, m_bCheckName;
 	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
 	bool m_bCheckPanels;
+	bool m_bBiplane;
 	double m_StabTilt;
 	double m_FinTilt;
-	double m_WingTilt;
+	double m_WingTilt, m_WingTilt2;
+
 	double m_XCmRef;
 	double m_TailVolume;
 	CObArray *m_poaWing;
 	CObArray *m_poaPlane;
 
-	CVector m_LEStab, m_LEFin;
+	CVector m_LEStab, m_LEFin, m_LEWing2;
 	CString m_PlaneName;
 
 	// Generated message map functions
@@ -139,6 +149,10 @@ protected:
 	afx_msg void OnCheckPanels();
 	afx_msg void OnDoubleFin();
 	afx_msg void OnExportWing();
+	afx_msg void OnBiplane();
+	afx_msg void OnDefineWing2();
+	afx_msg void OnImportWing2();
+	afx_msg void OnExportWing2();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -152,5 +166,6 @@ private:
 	bool SerializePlane(CArchive& ar) ;
 
 
+public:
 };
 

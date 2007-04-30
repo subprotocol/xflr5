@@ -68,7 +68,6 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 
 	m_AlphaCalc  = 0.0;//calculation on a tilted geometry
 
-
 	m_CoreSize   = 0.0;
 
 	m_XCP = 0.0;
@@ -85,6 +84,7 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 	m_strOut = "";
 
 	m_pWing   = NULL;
+	m_pWing2  = NULL;
 	m_pStab   = NULL;
 	m_pFin    = NULL;
 	m_pWPolar = NULL;
@@ -157,13 +157,14 @@ BOOL CVLMDlg::OnInitDialog()
 	SetFileHeader();
 
 	m_bVLMSymetric = m_pWing->m_bVLMSymetric;
-	if(m_pFin || m_pStab)		m_bVLMSymetric = false;
+	if(m_pFin || m_pStab || m_pWing2)		m_bVLMSymetric = false;
 	if(!m_pWPolar->m_bMiddle)	m_bVLMSymetric = false;
 
 	m_pWing->m_bVLMSymetric = m_bVLMSymetric;
 	
-	if(m_pStab)	m_pStab->m_bVLMSymetric = m_bVLMSymetric;
-	if(m_pFin)	m_pFin->m_bVLMSymetric  = m_bVLMSymetric;
+	if(m_pWing2)	m_pWing2->m_bVLMSymetric = m_bVLMSymetric;
+	if(m_pStab)		m_pStab->m_bVLMSymetric = m_bVLMSymetric;
+	if(m_pFin)		m_pFin->m_bVLMSymetric  = m_bVLMSymetric;
 
 	if(m_pWPolar->m_AnalysisType==2){ //no way it could be anything else
 		m_pVLMThread = new CVLMThread();
@@ -625,7 +626,7 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		}
 	}
 
-//	memcpy(row, m_Gamma, sizeof(row));
+	memcpy(row, m_Gamma, sizeof(row));
 	AddString("\r\n");
 
 	return  true;
@@ -650,6 +651,12 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	m_pWing->m_pWakeNode  = m_pWakeNode;
 	m_pWing->m_pWakePanel = m_pWakePanel;
 
+	if(m_pWing2) {
+		m_pWing2->m_pVLMDlg  = this;
+		m_pWing2->m_bTrace   = false;
+		m_pWing2->m_bVLM1    = m_pWPolar->m_bVLM1;
+		m_pWing2->m_bTrace   = true;
+	}
 
 	if(m_pStab) {
 		m_pStab->m_pVLMDlg  = this;
@@ -666,8 +673,9 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	for(i=0; i<=nrhs; i++){
 		if(m_bCancel) break;
 		m_pWing->m_bWingOut = false;
-		if(m_pStab) m_pStab->m_bWingOut = false;
-		if(m_pFin)  m_pFin->m_bWingOut  = false;
+		if(m_pWing2)	m_pWing2->m_bWingOut = false;
+		if(m_pStab)		m_pStab->m_bWingOut = false;
+		if(m_pFin)		m_pFin->m_bWingOut  = false;
 
 		if(m_pWPolar->m_Type!=4) m_Alpha = V0+i*VDelta;		
 		if(!m_pWPolar->m_bTiltedGeom) m_AlphaCalc = m_Alpha;
@@ -711,6 +719,28 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 			Station = m_pWing->m_NStation;
 			
+			if(m_pWing2) {
+				AddString("       Calculating elevator...\r\n");
+				WingLift  = 0.0;
+				WingIDrag = 0.0;
+				m_pWing2->m_Alpha     = m_Alpha;
+				m_pWing2->m_QInf      = m_QInf;
+				m_pWing2->m_Viscosity = m_pWPolar->m_Viscosity;
+				m_pWing2->m_Density   = m_pWPolar->m_Density;
+				m_pWing2->VLMComputeWing(m_Gamma+i*m_VLMMatSize+m_pWing->m_VLMMatSize,
+										m_Ai+m_pWing->m_NStation,
+										m_Cp+m_pWing->m_VLMMatSize,
+										WingLift, WingIDrag, VDrag, XCP, YCP, LinPm, Rm, IYm, GYm,
+										m_pWPolar->m_bViscous);
+				Lift  += WingLift;
+				IDrag += WingIDrag;
+
+				m_pWing2->VLMSetBending();
+				if(m_pWing2->m_bWingOut) m_bPointOut = true;
+
+				Station += m_pWing2->m_NStation;
+			}
+
 			if(m_pStab) {
 				AddString("       Calculating elevator...\r\n");
 				WingLift  = 0.0;
@@ -719,9 +749,13 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->m_QInf      = m_QInf;
 				m_pStab->m_Viscosity = m_pWPolar->m_Viscosity;
 				m_pStab->m_Density   = m_pWPolar->m_Density;
-				m_pStab->VLMComputeWing(m_Gamma+i*m_VLMMatSize+m_pWing->m_VLMMatSize,
-										m_Ai+m_pWing->m_NStation,
-										m_Cp+m_pWing->m_VLMMatSize,
+
+				pos = m_pWing->m_VLMMatSize;
+				if(m_pWing2)	pos += m_pWing2->m_VLMMatSize;
+
+				m_pStab->VLMComputeWing(m_Gamma+i*m_VLMMatSize+pos,
+										m_Ai+Station,
+										m_Cp+pos,
 										WingLift, WingIDrag, VDrag, XCP, YCP, LinPm, Rm, IYm, GYm,
 										m_pWPolar->m_bViscous);
 				Lift  += WingLift;
@@ -743,7 +777,8 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->m_Density    = m_pWPolar->m_Density;
 
 				pos = m_pWing->m_VLMMatSize;
-				if(m_pStab) pos += m_pStab->m_VLMMatSize;
+				if(m_pWing2)	pos += m_pWing2->m_VLMMatSize;
+				if(m_pStab)		pos += m_pStab->m_VLMMatSize;
 				
 				m_pFin->VLMComputeWing( m_Gamma+i*m_VLMMatSize+pos,
 										m_Ai+Station,
@@ -773,8 +808,10 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GCm         =  2.0 * LinPm / m_pWing->m_Area/m_pWing->m_MAChord/m_QInf/m_QInf;
 			m_VCm         =        m_pWing->m_VCm;
 			m_TCm         =  m_GCm + m_pWing->m_VCm;
-			if(m_pStab) m_TCm += m_pStab->m_VCm;
-			if(m_pFin)  m_TCm += m_pFin->m_VCm;
+
+			if(m_pWing2)	m_TCm += m_pWing2->m_VCm;
+			if(m_pStab)		m_TCm += m_pStab->m_VCm;
+			if(m_pFin)		m_TCm += m_pFin->m_VCm;
 
 			if(!m_pWPolar->m_bMiddle) 
 				VLMComputeTBCp(m_Gamma+i*m_VLMMatSize);
@@ -1094,6 +1131,25 @@ void CVLMDlg::VLMSetDownwash(double *Gamma)
 			m++;
 		}
 		nSurf++;
+	}
+
+	m=0;
+	if(m_pWing2){
+		memset(m_pWing2->m_Vd, 0, sizeof(m_pWing2->m_Vd));
+		for (j=0; j<m_pWing2->m_NSurfaces; j++){
+			for (k=0; k<m_pWing2->m_Surface[j].m_NYPanels; k++){
+				m_pSurface[j+nSurf].GetTrailingPt(C, k);
+
+				for (pp=0; pp<m_VLMMatSize; pp++){			
+					VLMGetVortexInfluence(pp,C,V,false);
+					m_pWing2->m_Vd[m].x += Gamma[pp]*V.x;// is zero anyways
+					m_pWing2->m_Vd[m].y += Gamma[pp]*V.y;
+					m_pWing2->m_Vd[m].z += Gamma[pp]*V.z;
+				}
+				m++;
+			}
+		}
+		nSurf += m_pWing2->m_NSurfaces;
 	}
 
 	m=0;

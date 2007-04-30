@@ -39,6 +39,7 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_bActive = false;
 
 	m_Wing.m_pFrame = pParent;
+	m_Wing2.m_pFrame = pParent;
 	m_Stab.m_pFrame = pParent;
 	m_Fin.m_pFrame  = pParent;
 
@@ -46,6 +47,9 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 
 	m_Wing.m_WingName   = "Wing";
 	m_Wing.ComputeGeometry();
+	m_Wing2.m_WingName   = "2nd Wing";
+	m_Wing2.ComputeGeometry();
+
 
 	m_Stab.m_WingName      = "Elevator";
 	m_Stab.m_bIsFin        = false;
@@ -85,6 +89,7 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_XCmRef        =   0.0;
 	m_TailVolume    =   0.0;
 	m_WingTilt      =   0.0;
+	m_WingTilt2     =   0.0;
 	m_LEStab.x      = 0.600;
 	m_LEStab.y      =   0.0;
 	m_LEStab.z      =   0.0;
@@ -102,6 +107,7 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_bDoubleSymFin = false;
 	m_bChanged      = false;
 	m_bCheckPanels  = true;
+	m_bBiplane      = false;
 
 	m_PlaneName  = "Plane Name";
 
@@ -112,7 +118,7 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 void CPlane::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CPlane)
+
 	DDX_Control(pDX, IDC_CHECKPANELS, m_ctrlCheckPanels);
 	DDX_Control(pDX, IDC_SYMFIN, m_ctrlSymFin);
 	DDX_Control(pDX, IDC_SURF3, m_ctrlSurf3);
@@ -125,9 +131,15 @@ void CPlane::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LEN5, m_ctrlLen5);
 	DDX_Control(pDX, IDC_LEN6, m_ctrlLen6);
 	DDX_Control(pDX, IDC_LEN7, m_ctrlLen7);
+	DDX_Control(pDX, IDC_LEN8, m_ctrlLen8);
+	DDX_Control(pDX, IDC_LEN9, m_ctrlLen9);
 	DDX_Control(pDX, IDC_WINGSPAN, m_ctrlWingSpan);
 	DDX_Control(pDX, IDC_WINGSURFACE, m_ctrlWingSurface);
 	DDX_Control(pDX, IDC_WINGTILT, m_ctrlWingTilt);
+	DDX_Control(pDX, IDC_WINGTILT2, m_ctrlWingTilt2);
+	DDX_Control(pDX, IDC_DEFINEWING2, m_ctrlDefineWing2);
+	DDX_Control(pDX, IDC_IMPORTWING2, m_ctrlImportWing2);
+	DDX_Control(pDX, IDC_EXPORTWING2, m_ctrlExportWing2);
 	DDX_Control(pDX, IDC_DEFINEFIN, m_ctrlDefineFin);
 	DDX_Control(pDX, IDC_DEFINEELEV, m_ctrlDefineStab);
 	DDX_Control(pDX, IDC_PLANENAME, m_ctrlPlaneName);
@@ -141,15 +153,17 @@ void CPlane::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_STABTILT, m_ctrlStabTilt);
 	DDX_Control(pDX, IDC_ZLESTAB, m_ctrlZLEStab);
 	DDX_Control(pDX, IDC_XLESTAB, m_ctrlXLEStab);
+	DDX_Control(pDX, IDC_XLEWING2, m_ctrlXLEWing2);
+	DDX_Control(pDX, IDC_ZLEWING2, m_ctrlZLEWing2);
 	DDX_Control(pDX, IDC_STAB, m_ctrlStabCheck);
 	DDX_Control(pDX, IDC_FIN, m_ctrlFinCheck);
 	DDX_Control(pDX, IDC_VLMTOTALPANELS, m_ctrlVLMTotalPanels);
-	DDX_Control(pDX, IDOK, m_ctrlOK);
 	DDX_Control(pDX, IDC_DOUBLEFIN, m_ctrlDoubleFin);
 	DDX_Control(pDX, IDC_RADIO1, m_ctrlRadio1);
 	DDX_Control(pDX, IDC_RADIO2, m_ctrlRadio2);
 	DDX_Control(pDX, IDC_FINTILT, m_ctrlFinTilt);
-	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_BIPLANE, m_ctrlBiplane);
+	DDX_Control(pDX, IDOK, m_ctrlOK);
 }
 
 
@@ -176,6 +190,10 @@ BEGIN_MESSAGE_MAP(CPlane, CDialog)
 	ON_EN_KILLFOCUS(IDC_PLANENAME, OnPlaneName)
 	ON_BN_CLICKED(IDC_EXPORTWING, OnExportWing)
 	ON_BN_CLICKED(IDC_DOUBLEFIN, OnDoubleFin)
+	ON_BN_CLICKED(IDC_BIPLANE, OnBiplane)
+	ON_BN_CLICKED(IDC_DEFINEWING2, OnDefineWing2)
+	ON_BN_CLICKED(IDC_IMPORTWING2, OnImportWing2)
+	ON_BN_CLICKED(IDC_EXPORTWING2, OnExportWing2)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -203,30 +221,16 @@ BOOL CPlane::OnInitDialog()
 	m_ctrlLen5.SetWindowText(len);
 	m_ctrlLen6.SetWindowText(len);
 	m_ctrlLen7.SetWindowText(len);
-	
+	m_ctrlLen8.SetWindowText(len);
+	m_ctrlLen9.SetWindowText(len);
+
+		
 	m_ctrlSurf1.SetWindowText(surf);
 	m_ctrlSurf2.SetWindowText(surf);
 	m_ctrlSurf3.SetWindowText(surf);
 
 	m_ctrlPlaneName.SetWindowText(m_PlaneName);
-/*	m_ctrlWingTilt.SetValue(m_WingTilt);
-	m_ctrlStabTilt.SetValue(m_StabTilt);
-	m_ctrlXLEStab.SetValue(m_LEStab.x);
-	m_ctrlZLEStab.SetValue(m_LEStab.z);
-	m_ctrlXLEFin.SetValue(m_LEFin.x);
-	m_ctrlYLEFin.SetValue(m_LEFin.y);
-	m_ctrlZLEFin.SetValue(m_LEFin.z);
-	if(m_bFin)       m_ctrlFinCheck.SetCheck(TRUE);
-	if(m_bDoubleFin) m_ctrlDoubleFin.SetCheck(TRUE);
-	if(m_bSymFin)	 m_ctrlSymFin.SetCheck(TRUE);
-	OnFin();
-	if(m_bStab)	     m_ctrlStabCheck.SetCheck(TRUE);
-	OnStab();
 
-	m_ctrlFinColor.SetColor(m_FinColor);
-	m_ctrlStabColor.SetColor(m_StabColor);
-	m_ctrlWingColor.SetColor(m_WingColor);
-*/
 	SetParams();
 	SetResults(); 
 
@@ -235,7 +239,7 @@ BOOL CPlane::OnInitDialog()
 
 	m_bActive = true;
 
-	m_ctrlCheckPanels.SetCheck(m_bCheckPanels);;
+	m_ctrlCheckPanels.SetCheck(m_bCheckPanels);
 	return FALSE;
 }
 
@@ -287,6 +291,8 @@ void CPlane::OnStab()
 
 void CPlane::OnOK() 
 {
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	CString strong;
 	ReadParams();
 	ComputePlane();
 
@@ -294,13 +300,41 @@ void CPlane::OnOK()
 	if(m_bStab) n+= m_Stab.VLMGetPanelTotal();
 	if(m_bFin)  n+= m_Fin.VLMGetPanelTotal();
 	if(n>VLMMATSIZE){
-		CString strong;
-		strong.Format("Total number of panels =%d\n Max Number =%d\nA reduction of the number of VLM panels is required",n, VLMMATSIZE);
+		strong.Format("Total number of VLM panels =%d\n Max Number =%d\nA reduction of the number of VLM panels is required",n, VLMMATSIZE);
 		AfxMessageBox(strong, MB_OK);
 		return ;
 	}
 
-	if(m_ctrlCheckPanels.GetCheck())	CheckPanelDisposition();
+	//check the number of surfaces
+	int nSurfaces = 0;
+	for (int j=0; j<m_Wing.m_NPanel; j++){
+		if(fabs(m_Wing.m_TPos[j]-m_Wing.m_TPos[j+1]) > pMiarex->m_MinPanelSize) nSurfaces+=2;
+	}
+	if(m_bStab){
+		for (j=0; j<m_Stab.m_NPanel; j++){
+			if(fabs(m_Stab.m_TPos[j]-m_Stab.m_TPos[j+1]) > pMiarex->m_MinPanelSize) nSurfaces+=2;
+		}
+	}
+	if(m_bFin){
+		for (j=0; j<m_Fin.m_NPanel; j++){
+			if(fabs(m_Fin.m_TPos[j]-m_Fin.m_TPos[j+1]) > pMiarex->m_MinPanelSize) {
+				if((m_bSymFin) || (m_bDoubleFin && m_bDoubleSymFin))
+					nSurfaces += 2;
+				else 
+					nSurfaces += 1;
+			}
+		}
+	}
+	if(nSurfaces >MAXVLMSURFACES){
+		strong.Format("Total number of wing panels =%d\n Max Number =%d\nA reduction of the number of wing panels is required",
+			nSurfaces, MAXVLMSURFACES);
+		AfxMessageBox(strong, MB_OK);
+		return ;
+	}
+
+
+
+	if(m_bCheckPanels)	CheckPanelDisposition();
 
 	m_bActive = false;
 	CDialog::OnOK();
@@ -320,7 +354,8 @@ bool CPlane::SerializePlane(CArchive& ar)
 	int ArchiveFormat;// identifies the format of the file
 	if (ar.IsStoring())
 	{	// storing code
-		ar << 1006;
+		ar << 1007;
+		//1007 : added second wing data, CheckPanel
 		//1006 : Converted lengths to m
 		//1005 : stored double sym fin
 		//1004 : suppressed colors
@@ -328,6 +363,7 @@ bool CPlane::SerializePlane(CArchive& ar)
 		//1002 : Added doublefin;
 		ar << m_PlaneName;
 		m_Wing.SerializeWing(ar);
+		m_Wing2.SerializeWing(ar);
 		m_Stab.SerializeWing(ar);
 		m_Fin.SerializeWing(ar);
 		if(m_bStab)          ar <<1; else ar <<0;
@@ -335,10 +371,12 @@ bool CPlane::SerializePlane(CArchive& ar)
 		if(m_bDoubleFin)     ar <<1; else ar <<0;
 		if(m_bSymFin)		 ar <<1; else ar <<0;
 		if(m_bDoubleSymFin)  ar <<1; else ar <<0;
+		if(m_bCheckPanels)   ar <<1; else ar <<0;
+		if(m_bBiplane)       ar <<1; else ar <<0;
+		ar << m_LEWing2.x << m_LEWing2.y << m_LEWing2.z << m_WingTilt2; 
 		ar << m_LEStab.x << m_LEStab.y << m_LEStab.z; 
 		ar << m_WingTilt << m_StabTilt << m_FinTilt;
 		ar << m_LEFin.x << m_LEFin.y << m_LEFin.z; 
-//		ar << m_WingColor << m_StabColor << m_FinColor;
 		return true;
 	}
 	else
@@ -356,6 +394,7 @@ bool CPlane::SerializePlane(CArchive& ar)
 		}
 
 		m_Wing.SerializeWing(ar);
+		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar);
 		m_Stab.SerializeWing(ar);
 		m_Fin.SerializeWing(ar);
 
@@ -377,6 +416,13 @@ bool CPlane::SerializePlane(CArchive& ar)
 			if(k) m_bDoubleSymFin = true;  else m_bDoubleSymFin = false;
 			m_Fin.m_bDoubleSymFin = m_bDoubleSymFin;
 		}
+		if(ArchiveFormat>=1007){
+			ar >>k;
+			if(k) m_bCheckPanels = true;  else m_bCheckPanels = false;
+			ar >>k;
+			if(k) m_bBiplane = true;  else m_bBiplane = false;
+			ar >> m_LEWing2.x >> m_LEWing2.y >> m_LEWing2.z >> m_WingTilt2;
+		}
 		ar >> m_LEStab.x >> m_LEStab.y >> m_LEStab.z; 
 		ar >> m_WingTilt >> m_StabTilt;
 		if(ArchiveFormat>=1003){
@@ -388,7 +434,6 @@ bool CPlane::SerializePlane(CArchive& ar)
 			ar >> cr ;
 			ar >> cr ;
 			ar >> cr ;
-	
 		}
 
 		if(ArchiveFormat<1006){//convert to m
@@ -401,7 +446,6 @@ bool CPlane::SerializePlane(CArchive& ar)
 		}
 
 		ComputePlane();
-
 		return true;
 	}
 }
@@ -445,6 +489,19 @@ void CPlane::OnDefineWing()
 	else                         m_Wing.Duplicate(&SaveWing);
 }
 
+void CPlane::OnDefineWing2()
+{
+	CWing SaveWing;
+	SaveWing.Duplicate(&m_Wing2);
+	m_Wing2.m_bCheckName= false;
+	if(m_Wing2.DoModal() ==IDOK)	 {
+		SetResults();
+		if(m_Wing2.m_bChanged) m_bChanged = true;
+	}
+	else                         m_Wing2.Duplicate(&SaveWing);
+}
+
+
 void CPlane::Duplicate(CPlane *pPlane)
 {
 	m_PlaneName     = pPlane->m_PlaneName;
@@ -453,21 +510,28 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_bDoubleFin    = pPlane->m_bDoubleFin;
 	m_bDoubleSymFin = pPlane->m_bDoubleSymFin;
 	m_bStab         = pPlane->m_bStab;
+	m_bBiplane      = pPlane->m_bBiplane;
+	m_bCheckPanels  = pPlane->m_bCheckPanels;
 
 	m_WingTilt   = pPlane->m_WingTilt;
+	m_WingTilt2  = pPlane->m_WingTilt2;
 	m_StabTilt   = pPlane->m_StabTilt;
+	m_LEWing2.Copy(pPlane->m_LEWing2);
 	m_LEFin.Copy(pPlane->m_LEFin);
 	m_LEStab.Copy(pPlane->m_LEStab);
 
 	m_Wing.Duplicate(&pPlane->m_Wing);
+	m_Wing2.Duplicate(&pPlane->m_Wing2);
 	m_Fin.Duplicate(&pPlane->m_Fin);
 	m_Stab.Duplicate(&pPlane->m_Stab);
 
-	m_Wing.m_WingColor = pPlane->m_Wing.m_WingColor;
-	m_Stab.m_WingColor = pPlane->m_Stab.m_WingColor;
-	m_Fin.m_WingColor  = pPlane->m_Fin.m_WingColor;
+	m_Wing.m_WingColor  = pPlane->m_Wing.m_WingColor;
+	m_Wing2.m_WingColor = pPlane->m_Wing2.m_WingColor;
+	m_Stab.m_WingColor  = pPlane->m_Stab.m_WingColor;
+	m_Fin.m_WingColor   = pPlane->m_Fin.m_WingColor;
 
 	m_Wing.m_pFrame  = m_pFrame;
+	m_Wing2.m_pFrame = m_pFrame;
 	m_Stab.m_pFrame  = m_pFrame;
 	m_Fin.m_pFrame   = m_pFrame;
 
@@ -489,11 +553,15 @@ void CPlane::ReadParams()
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	OnPlaneName();
 	m_WingTilt      = m_ctrlWingTilt.GetValue();
+	m_WingTilt2     = m_ctrlWingTilt2.GetValue();
 	m_StabTilt      = m_ctrlStabTilt.GetValue();
 	m_FinTilt       = m_ctrlFinTilt.GetValue();
 	
 	m_LEStab.x      = m_ctrlXLEStab.GetValue() / pFrame->m_mtoUnit;
 	m_LEStab.z      = m_ctrlZLEStab.GetValue() / pFrame->m_mtoUnit;
+
+	m_LEWing2.x      = m_ctrlXLEWing2.GetValue() / pFrame->m_mtoUnit;
+	m_LEWing2.z      = m_ctrlZLEWing2.GetValue() / pFrame->m_mtoUnit;
 
 	m_LEFin.x       = m_ctrlXLEFin.GetValue() / pFrame->m_mtoUnit;
 	m_LEFin.y       = m_ctrlYLEFin.GetValue() / pFrame->m_mtoUnit;
@@ -513,12 +581,19 @@ void CPlane::SetParams()
 
 	m_ctrlPlaneName.SetWindowText(m_PlaneName);
 	m_ctrlWingTilt.SetValue(m_WingTilt);
+	m_ctrlWingTilt2.SetValue(m_WingTilt2);
 	m_ctrlStabTilt.SetValue(m_StabTilt);
 	m_ctrlFinTilt.SetValue(m_FinTilt);
 	
 	m_ctrlXLEStab.SetValue(m_LEStab.x * pFrame->m_mtoUnit);
 	m_ctrlZLEStab.SetValue(m_LEStab.z* pFrame->m_mtoUnit);
 
+	m_ctrlXLEWing2.SetValue(m_LEWing2.x * pFrame->m_mtoUnit);
+	m_ctrlZLEWing2.SetValue(m_LEWing2.z* pFrame->m_mtoUnit);
+
+	m_ctrlBiplane.SetCheck(m_bBiplane);
+	OnBiplane();
+    
 	m_ctrlXLEFin.SetValue(m_LEFin.x* pFrame->m_mtoUnit);
 	m_ctrlYLEFin.SetValue(m_LEFin.y* pFrame->m_mtoUnit);
 	m_ctrlZLEFin.SetValue(m_LEFin.z* pFrame->m_mtoUnit);
@@ -538,7 +613,6 @@ void CPlane::SetParams()
 	}
 	if(m_bDoubleSymFin)	CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
 	else                CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
-
 }
 
 
@@ -547,7 +621,10 @@ void CPlane::SetResults()
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CString str;
 
-	str.Format("%7.2f", m_Wing.m_Area*pFrame->m_m2toUnit);
+	double area = m_Wing.m_Area;
+	if(m_bBiplane) area += m_Wing2.m_Area;
+
+	str.Format("%7.2f", area*pFrame->m_m2toUnit);
 	m_ctrlWingSurface.SetWindowText(str);
 
 	if(m_bStab)	str.Format("%7.2f", m_Stab.m_Area*pFrame->m_m2toUnit);
@@ -558,7 +635,9 @@ void CPlane::SetResults()
 	else str=" ";
 	m_ctrlFinSurface.SetWindowText(str);
 
-	str.Format("%5.2f", m_Wing.m_Span*pFrame->m_mtoUnit);
+	double span = m_Wing.m_Span;
+	if(m_bBiplane) span = max(m_Wing.m_Span, m_Wing2.m_Span);
+	str.Format("%5.2f", span*pFrame->m_mtoUnit);
 	m_ctrlWingSpan.SetWindowText(str);
 
 	ComputePlane();
@@ -576,7 +655,8 @@ void CPlane::SetResults()
 	m_ctrlStabVolume.SetWindowText(str);
 
 	int total = m_Wing.VLMGetPanelTotal();
-	if(m_bStab) total += m_Stab.VLMGetPanelTotal();
+	if(m_bBiplane)	total += m_Wing2.VLMGetPanelTotal();
+	if(m_bStab)		total += m_Stab.VLMGetPanelTotal();
 	if(m_bFin)  {
 		if(m_bDoubleFin ||m_bSymFin) total += 2*m_Fin.VLMGetPanelTotal();
 		else total += m_Fin.VLMGetPanelTotal();
@@ -589,7 +669,17 @@ void CPlane::ComputePlane(void)
 {
 	if(m_bStab){
 		double SLA = m_LEStab.x + m_Stab.m_TChord[0]/4.0 - m_Wing.m_TChord[0]/4.0;
-		m_TailVolume = m_Stab.m_Area * SLA / m_Wing.m_Area/m_Wing.m_MAChord ;
+		double area = m_Wing.m_Area;
+		if(m_bBiplane) area += m_Wing2.m_Area;
+
+		double ProjectedArea = 0.0;
+		for (int i=0;i<m_Stab.m_NPanel; i++){
+			ProjectedArea += m_Stab.m_TLength[i+1]*(m_Stab.m_TChord[i]+m_Stab.m_TChord[i+1])/2.0
+							*cos(m_Stab.m_TDihedral[i])*cos(m_Stab.m_TDihedral[i]);//m²
+		
+		}
+		ProjectedArea *=2.0;
+		m_TailVolume = ProjectedArea * SLA / area/m_Wing.m_MAChord ;
 	}
 	else m_TailVolume = 0.0;
 	
@@ -661,7 +751,36 @@ void CPlane::OnExportWing()
 	pFrame->Miarex.UpdateView();
 
 }
+void CPlane::OnImportWing2() 
+{
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CImportWingDlg dlg;
+	dlg.m_WingName = m_Wing2.m_WingName;
+	dlg.m_poaWing = m_poaWing;
 
+	if(dlg.DoModal() ==IDOK){
+		m_bChanged = true;
+		CWing *pWing = pFrame->Miarex.GetWing(dlg.m_WingName);
+		if(pWing) {
+			m_Wing2.Duplicate(pWing);
+			m_Wing2.m_WingColor = pWing->m_WingColor;
+		}
+	}
+}
+
+
+void CPlane::OnExportWing2() 
+{
+
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CWing *pNewWing = new CWing();
+	pNewWing->Duplicate(&m_Wing2);
+	pNewWing->m_WingName = "";
+	pFrame->Miarex.AddWing(pNewWing);
+	pFrame->Miarex.UpdateUFOs();
+	pFrame->Miarex.UpdateView();
+
+}
 void CPlane::OnPlaneName() 
 {
 	m_ctrlPlaneName.GetWindowText(m_PlaneName);
@@ -757,3 +876,25 @@ BOOL CPlane::PreTranslateMessage(MSG* pMsg)
 
 	return CDialog::PreTranslateMessage(pMsg);
 }
+
+void CPlane::OnBiplane()
+{
+	if(m_ctrlBiplane.GetCheck()) m_bBiplane = true; else m_bBiplane = false;
+	if(m_bBiplane){
+		m_ctrlDefineWing2.EnableWindow(TRUE);
+		m_ctrlImportWing2.EnableWindow(TRUE);
+		m_ctrlExportWing2.EnableWindow(TRUE);
+		m_ctrlWingTilt2.EnableWindow(TRUE);	
+		m_ctrlZLEWing2.EnableWindow(TRUE);
+		m_ctrlXLEWing2.EnableWindow(TRUE);
+	}
+	else{
+		m_ctrlDefineWing2.EnableWindow(FALSE);
+		m_ctrlImportWing2.EnableWindow(FALSE);
+		m_ctrlExportWing2.EnableWindow(FALSE);
+		m_ctrlWingTilt2.EnableWindow(FALSE);	
+		m_ctrlZLEWing2.EnableWindow(FALSE);
+		m_ctrlXLEWing2.EnableWindow(FALSE);
+	}
+}
+

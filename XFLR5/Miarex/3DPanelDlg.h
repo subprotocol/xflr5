@@ -141,7 +141,8 @@ protected:
 	CSurface *m_pSurface;
 	
 	CWPolar *m_pWPolar;
-	CWing *m_pWing;//pointer to the geometry class of the wing 
+	CWing *m_pWing; //pointer to the geometry class of the wing 
+	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
 	CWing *m_pStab;
 	CWing *m_pFin;
 

@@ -46,6 +46,7 @@ CPOpp::CPOpp()
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
+	m_bBiplane    = false;
 	m_bStab       = false;
 	m_bFin        = false;
 	m_bOut        = false;
@@ -81,7 +82,8 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 	float f;
 
 	if(ar.IsStoring()){
-		ar << 1004;
+		ar << 1005;
+		//1005 : added second wing results for a biplane
 		//1004 : converted units to SI
 		//1003 : added vortices strengths
 		//1002 : added Cp, suppressed Cl and other parameters
@@ -89,6 +91,7 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 
 		//write variables
 		ar << m_PlaneName << m_PlrName;
+		if(m_bBiplane)    ar << 1; else ar<<0;
 		if(m_bStab)       ar << 1; else ar<<0;
 		if(m_bFin)        ar << 1; else ar<<0;
 		if(m_bIsVisible)  ar << 1; else ar<<0;
@@ -108,8 +111,9 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 		ar << m_VLMType;
 
 		m_WingWOpp.SerializeWOpp(ar);
-		if(m_bStab) m_StabWOpp.SerializeWOpp(ar);
-		if(m_bFin)  m_FinWOpp.SerializeWOpp(ar);
+		if(m_bBiplane)	m_Wing2WOpp.SerializeWOpp(ar);
+		if(m_bStab)		m_StabWOpp.SerializeWOpp(ar);
+		if(m_bFin)		m_FinWOpp.SerializeWOpp(ar);
 	}
 	else {
 		try{			
@@ -118,6 +122,16 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 			//read variables
 			ar >> m_PlaneName >> m_PlrName;
 			if(!m_PlaneName.GetLength() || !m_PlrName.GetLength()) return false;
+
+			if(ArchiveFormat>=1005){
+				ar >> a;
+				if (a!=0 && a!=1){
+					CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+					pfe->m_strFileName = ar.m_strFileName;
+					throw pfe;
+				}
+				if(a) m_bBiplane = true; else m_bBiplane = false;
+			}
 
 			ar >> a;
 			if (a!=0 && a!=1){
@@ -223,23 +237,22 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
-/*			p=0;
-			for(k=0; k< m_WingWOpp.m_NVLMPanels; k++){
-				m_Cp[p] = m_WingWOpp.m_Cp[p];
-				p++;
-			}*/
 
+			if(ArchiveFormat>=1005){
+				if(m_bBiplane){
+					if (!m_Wing2WOpp.SerializeWOpp(ar)){
+						CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+						pfe->m_strFileName = ar.m_strFileName;
+						throw pfe;
+					}
+				}
+			}
 			if(m_bStab){
 				if (!m_StabWOpp.SerializeWOpp(ar)){
 					CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 					pfe->m_strFileName = ar.m_strFileName;
 					throw pfe;
 				}
-/*				p0=p;
-				for(k=p0; k< p0+m_StabWOpp.m_NVLMPanels; k++){
-					m_Cp[p] = m_StabWOpp.m_Cp[p];
-					p++;
-				}*/
 			}
 			if(m_bFin){
 				if (!m_FinWOpp.SerializeWOpp(ar)){
@@ -247,11 +260,6 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 					pfe->m_strFileName = ar.m_strFileName;
 					throw pfe;
 				}
-/*				p0=p;
-				for(k=p0; k< p0+m_FinWOpp.m_NVLMPanels; k++){
-					m_Cp[p] = m_FinWOpp.m_Cp[p];
-					p++;
-				}*/
 			}
 		}
 		catch (CArchiveException *ex){

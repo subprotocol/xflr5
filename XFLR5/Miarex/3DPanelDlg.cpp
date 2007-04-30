@@ -56,6 +56,7 @@ C3DPanelDlg::C3DPanelDlg(CWnd* pParent /*=NULL*/)
 	m_strOut = "";
 
 	m_pWing   = NULL;//pointer to the geometry class of the wing 
+	m_pWing2  = NULL;
 	m_pStab   = NULL;
 	m_pFin    = NULL;
 	m_pPlane  = NULL;

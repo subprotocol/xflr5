@@ -104,7 +104,8 @@ protected:
 	double m_CoreSize;
 
 	CWPolar *m_pWPolar;
-	CWing *m_pWing;//pointer to the geometry class of the wing 
+	CWing *m_pWing;//pointer to the main wing 
+	CWing *m_pWing2;//pointer to the second wing if Biplane
 	CWnd* m_pMiarex;
 
 	CPlane *m_pPlane;
