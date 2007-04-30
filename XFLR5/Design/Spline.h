@@ -53,6 +53,8 @@ public:
 	int IsControlPoint(double x, double y, double zx, double zy);
 	int IsControlPoint(CVector Real, double ZoomFactor);
 	double SplineBlend(int i, int p, double t);
+
+	void Copy(CSpline *pSpline);
 	void DrawCtrlPoints(CDC *pDC,double scx, double scy, CPoint Offset, bool IsPrinting);
 	void DrawOutputPoint(CDC *pDC, int i,double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	void Export(CStdioFile *pFile, bool bExtrados);

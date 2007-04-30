@@ -182,7 +182,19 @@ void CSF::ExportToBuffer(CFoil *pFoil)
 	pFoil->m_FoilName = m_strFoilName;
 }
 
-
+void CSF::Copy(CSF* pSF)
+{
+	m_FoilColor = pSF->m_FoilColor;
+	m_FoilStyle = pSF->m_FoilStyle;
+	m_FoilWidth = pSF->m_FoilWidth;
+	m_Extrados.Copy(&pSF->m_Extrados);
+	m_Intrados.Copy(&pSF->m_Intrados);
+	m_OutPoints  = pSF->m_OutPoints;
+	m_fCamber    = pSF->m_fCamber;
+	m_fThickness = pSF->m_fThickness;
+	m_fxCambMax  = pSF->m_fxCambMax; 
+	m_fxThickMax = pSF->m_fxThickMax;
+}
 
 bool CSF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {

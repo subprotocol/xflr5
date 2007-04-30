@@ -175,7 +175,7 @@ public:
 protected:
 	//{{AFX_MSG(CAFoil)
 	afx_msg void OnSFSave();
-	afx_msg void OnLoad();
+//	afx_msg void OnLoad();
 	afx_msg void OnExportSplines();
 	afx_msg void OnNewSplines();
 	afx_msg void OnPrint();
@@ -211,14 +211,15 @@ protected:
 	afx_msg void OnEditCoord();
 	afx_msg void OnSetFlap();
 	afx_msg void OnNacaFoils();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void OnLECircle();
 	afx_msg void OnSplineControls();
 	afx_msg void OnShowLegend();
 	afx_msg void OnBSplines();
 	afx_msg void OnSplinedpoints();
+	afx_msg void OnEditCtrlPoints();
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+public:
 };
 
 /////////////////////////////////////////////////////////////////////////////

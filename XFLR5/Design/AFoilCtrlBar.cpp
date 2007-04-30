@@ -214,6 +214,7 @@ void CAFoilCtrlBar::UpdateBlt()
 BOOL CAFoilCtrlBar::PreTranslateMessage(MSG* pMsg) 
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	CMainFrame *pFrame = (CMainFrame*)(pADlg->m_pFrame);
 	CWnd* pWnd = GetFocus();
 
 
@@ -260,7 +261,8 @@ BOOL CAFoilCtrlBar::PreTranslateMessage(MSG* pMsg)
 	} 
 	if (pMsg->wParam == 'O' && 
 			( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
-		pADlg->OnLoad();
+//		pADlg->OnLoad();
+		pFrame->OnLoadProject();
 		return true;
 	} 
 

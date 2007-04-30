@@ -152,6 +152,21 @@ bool CPF::InitSplinedFoil()
 	return true;
 }
 
+void CPF::Copy(CPF* pPF)
+{
+	memcpy(&m_Extrados, &pPF->m_Extrados, sizeof(m_Extrados));
+	memcpy(&m_Intrados, &pPF->m_Intrados, sizeof(m_Intrados));
+	memcpy(&m_rpMid, pPF->m_rpMid, sizeof(m_rpMid));
+	m_fCamber    = pPF->m_fCamber;
+	m_fThickness = pPF->m_fThickness;
+	m_fxCambMax  = pPF->m_fxCambMax;
+	m_fxThickMax = pPF->m_fxThickMax;
+	m_FoilColor  = pPF->m_FoilColor;
+	m_FoilStyle  = pPF->m_FoilStyle;
+	m_FoilWidth  = pPF->m_FoilWidth;
+	
+}
+
 bool CPF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
 	for (int i=0; i<=m_Extrados.m_iPoints;i++){

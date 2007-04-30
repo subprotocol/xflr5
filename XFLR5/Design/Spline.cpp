@@ -67,6 +67,23 @@ bool CSpline::AddPoint(double x, double y){
 	return true;
 }
 
+
+void CSpline::Copy(CSpline *pSpline)
+{
+	m_iCtrlPoints = pSpline->m_iCtrlPoints;
+	m_iDegree     = pSpline->m_iDegree;
+	m_iHighlight  = pSpline->m_iHighlight;
+	m_iKnots      = pSpline->m_iKnots;
+	m_iRes        = pSpline->m_iRes;
+	m_iSelect     = pSpline->m_iSelect;
+
+	memcpy(m_Input, &pSpline->m_Input, sizeof(m_Input));
+	memcpy(m_Output, &pSpline->m_Output, sizeof(m_Output));
+	memcpy(m_knots, &pSpline->m_knots, sizeof(m_knots));
+	m_rViewRect.CopyRect(&pSpline->m_rViewRect);
+}
+
+
 bool CSpline::DrawControlPoint(CDC *pDC, int i, double scalex,  double scaley,
 							   CPoint Offset, bool IsPrinting)
 {

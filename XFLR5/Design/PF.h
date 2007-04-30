@@ -72,6 +72,7 @@ class CPF
 	friend class CSplinesCtrlDlg;
 	friend class CAFoilCtrlBar;
 	friend class CMainFrame;
+	friend class CEditFoilDlg;
 
 public:
 	CPF();
@@ -107,6 +108,7 @@ private:
 	bool SaveFile(CStdioFile *pFile);
 	bool Serialize(CArchive &ar);
 
+	void Copy(CPF* pPF);
 	void DrawFoil(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	void DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	void ExportToBuffer(CFoil *pFoil);

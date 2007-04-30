@@ -133,7 +133,7 @@ CAFoil::~CAFoil()
 BEGIN_MESSAGE_MAP(CAFoil, CWnd)
 	//{{AFX_MSG_MAP(CAFoil)
 	ON_COMMAND(IDM_AFOIL_SFSAVE, OnSFSave)
-	ON_COMMAND(IDM_AFOIL_SFLOAD, OnLoad)
+//	ON_COMMAND(IDM_AFOIL_SFLOAD, OnLoad)
 	ON_COMMAND(IDM_AFOIL_EXPORTSPLINES, OnExportSplines)
 	ON_COMMAND(IDM_NEWSPLINES, OnNewSplines)
 	ON_COMMAND(IDM_AFOIL_PRINT, OnPrint)
@@ -171,15 +171,16 @@ BEGIN_MESSAGE_MAP(CAFoil, CWnd)
 	ON_COMMAND(IDM_NACAFOILS, OnNacaFoils)
 	ON_COMMAND(IDM_AFOIL_NEWSPLINES, OnNewSplines)
 	ON_COMMAND(IDM_AFOIL_PRINT, OnPrint)
-	ON_COMMAND(IDT_LOAD, OnLoad)
+//	ON_COMMAND(IDT_LOAD, OnLoad)
 	ON_COMMAND(IDT_PRINT, OnPrint)
 	ON_COMMAND(IDM_EXPORTTOAPP, OnStoreFoil)
 	ON_COMMAND(IDM_LECIRCLE, OnLECircle)
 	ON_COMMAND(IDM_SPLINECONTROLS, OnSplineControls)
 	ON_COMMAND(IDM_SHOWLEGEND, OnShowLegend)
-	//}}AFX_MSG_MAP
 	ON_COMMAND(IDM_BSPLINES, OnBSplines)
 	ON_COMMAND(IDM_SPLINEDPOINTS, OnSplinedpoints)
+	ON_COMMAND(IDM_EDITCTRLPOINTS, OnEditCtrlPoints)
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 
@@ -630,7 +631,6 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 				n =  m_pPF->m_Intrados.IsRearPoint(Real, m_fScale/m_fRefScale) ;
 				if(n==-1) m_pPF->m_Intrados.m_iSelect = n;
 
-
 				TakePicture();
 			}
 			if(m_pPF->m_Extrados.m_iSelect ==-10 && m_pPF->m_Intrados.m_iSelect ==-10){
@@ -891,9 +891,9 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 		if(m_rDrawRect.PtInRect(point)){
 			if(m_bSF){
 				int n = m_pSF->m_Extrados.m_iSelect;
-				if (n>0 && n<m_pSF->m_Extrados.m_iCtrlPoints) {
+				if (n>=0 && n<=m_pSF->m_Extrados.m_iCtrlPoints) {
 					if(!m_stored) StorePicture();//save for undo only the first time
-					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
+//					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 					m_pSF->m_Extrados.m_Input[n].x = m_MousePos.x;
 					m_pSF->m_Extrados.m_Input[n].y = m_MousePos.y;
 					m_pSF->m_Extrados.SplineCurve();
@@ -903,9 +903,9 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				else {
 					int n = m_pSF->m_Intrados.m_iSelect;
-					if (n>0 && n<m_pSF->m_Intrados.m_iCtrlPoints) {
+					if (n>=0 && n<=m_pSF->m_Intrados.m_iCtrlPoints) {
 						if(!m_stored) StorePicture();//save for undo only the first time
-						if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
+//						if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
 						m_pSF->m_Intrados.m_Input[n].y = m_MousePos.y;
 						m_pSF->m_Intrados.SplineCurve();
@@ -917,7 +917,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 			}
 			else{
 				int n = m_pPF->m_Extrados.m_iSelect;
-				if (n>0 && n<m_pPF->m_Extrados.m_iPoints) {
+				if (n>=0 && n<=m_pPF->m_Extrados.m_iPoints) {
 					if(!m_stored) StorePicture();//save for undo only the first time
 					m_pPF->m_Extrados.m_ctrlPoint[n].x = m_MousePos.x;
 					m_pPF->m_Extrados.m_ctrlPoint[n].y = m_MousePos.y;
@@ -926,7 +926,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				else {
 					n = m_pPF->m_Intrados.m_iSelect;
-					if (n>0 && n<m_pPF->m_Intrados.m_iPoints) {
+					if (n>=0 && n<=m_pPF->m_Intrados.m_iPoints) {
 						if(!m_stored) StorePicture();//save for undo only the first time
 						m_pPF->m_Intrados.m_ctrlPoint[n].x = m_MousePos.x;
 						m_pPF->m_Intrados.m_ctrlPoint[n].y = m_MousePos.y;
@@ -1398,6 +1398,7 @@ BOOL CAFoil::PreTranslateMessage(MSG* pMsg)
 	double fZoom;
 	double fDelta = 0.005;
 	fZoom = m_fScale/630.0;
+	CMainFrame *pFrame = (CMainFrame*)(m_pFrame);
 
 	if (pMsg->message == WM_KEYDOWN){
 		if (pMsg->wParam == VK_ESCAPE){
@@ -1532,7 +1533,8 @@ BOOL CAFoil::PreTranslateMessage(MSG* pMsg)
 		} 
 		if (pMsg->wParam == 'O' && 
 				( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
-			OnLoad();
+//			OnLoad();
+			pFrame->OnLoadProject();
 			return true;
 		}
 		if (pMsg->wParam == 'P' && 
@@ -1923,7 +1925,7 @@ void CAFoil::ReleaseZoom()
 	SetCursor(m_hcCross);
 }
 
-
+/*
 
 void CAFoil::OnLoad() 
 {
@@ -2009,7 +2011,7 @@ void CAFoil::OnLoad()
 //	m_pACtrl->SelectFoil();
 	UpdateView();
 
-}
+}*/
 
 void CAFoil::OnDuplicate() 
 {
@@ -3297,7 +3299,34 @@ void CAFoil::OnInterpolate()
 	
 }
 
-
+void CAFoil::OnEditCtrlPoints()
+{
+	CEditFoilDlg dlg(this);
+	dlg.m_pChildView  = m_pChildWnd;
+	if(m_bSF){
+		CSF memSF;
+		memSF.Copy(m_pSF);
+		dlg.m_pSF = m_pSF;
+		dlg.m_pmemSF = &memSF;
+		TakePicture();
+		if(IDOK == dlg.DoModal()){
+			StorePicture();
+		}
+		else m_pSF->Copy(&memSF);
+	}
+	else{
+		CPF memPF;
+		memPF.Copy(m_pPF);
+		dlg.m_pmemPF = &memPF;
+		dlg.m_pPF = m_pPF;
+		TakePicture();
+		if(IDOK == dlg.DoModal()){
+			StorePicture();
+		}
+		else m_pPF->Copy(&memPF);
+	}
+	UpdateView();
+}
 
 void CAFoil::OnEditCoord() 
 {
@@ -3341,7 +3370,6 @@ void CAFoil::OnEditCoord()
 			m_pACtrl->SelectFoil();
 		}
 	}
-
 	else{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pCurFoil);
@@ -3350,8 +3378,8 @@ void CAFoil::OnEditCoord()
 	}
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
-	
 }
+
 
 
 void CAFoil::OnGeom() 

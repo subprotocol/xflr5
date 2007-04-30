@@ -34,6 +34,8 @@ class CSF  {
 	friend class CSplinesCtrlDlg;
 	friend class CAFoilCtrlBar;
 	friend class CMainFrame;
+	friend class CEditFoilDlg;
+
 public:
 	CSF();
 	virtual ~CSF();
@@ -47,6 +49,7 @@ private:
 	bool SaveFile(CStdioFile *pFile);
 	bool Serialize(CArchive &ar);	
 
+	void Copy(CSF* pSF);
 	void DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	void DrawFoil(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	void DrawOutPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
