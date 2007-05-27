@@ -29,8 +29,8 @@
 #define IDS_TR                          139
 #define IDD_CLRDLG                      140
 #define IDS_RTTIPSWEEP                  140
-#define IDD_PREFERENCES                 141
 #define IDS_POINTOUT                    141
+#define IDD_PREFERENCES                 141
 #define IDD_VISCDLG                     142
 #define IDS_LIFTCOEF                    142
 #define IDS_DRAGCOEF                    143
@@ -101,6 +101,7 @@
 #define IDD_OPERDLGBAR                  262
 #define IDD_AFOILCTRLBAR                263
 #define IDD_GAPDLG                      264
+#define IDD_VALUEDLG                    264
 #define IDR_DOCUMENT                    265
 #define IDD_PRINTOPTIONSDLG             269
 #define IDD_TEGAPDLG                    273
@@ -110,7 +111,7 @@
 #define IDD_IMPORTWINGDLG               311
 #define IDD_SCALEOPPBAR                 312
 #define IDD_CPSCALEDLG                  314
-#define IDD_3DPANELDLG                  318
+#define IDD_3DPANELDLG                  315
 #define IDC_MAXWAKEITER                 320
 #define IDD_MODDLG                      325
 #define IDD_FLOWLINESDLG                327
@@ -217,6 +218,8 @@
 #define IDC_IDRAG                       1110
 #define IDC_DOWNWASH                    1111
 #define IDC_WAKE                        1112
+#define IDC_XCP2                        1113
+#define IDC_MOMENTS                     1113
 #define IDC_CL                          1114
 #define IDC_VDRAG                       1114
 #define IDC_XMIN                        1115
@@ -276,6 +279,7 @@
 #define IDC_QUESTION                    1180
 #define IDC_OUTPUT                      1182
 #define IDC_QUESTION4                   1183
+#define IDC_TEXT2                       1183
 #define IDC_FOILCOLOR                   1184
 #define IDC_SHOWPOINTS                  1187
 #define IDC_CAMBER                      1195
@@ -329,6 +333,7 @@
 #define IDC_RRE                         1272
 #define IDC_SURFACE                     1273
 #define IDC_QINFCL                      1274
+#define IDC_VOLUME                      1274
 #define IDC_VISCOUS                     1275
 #define IDC_WINGNAME                    1276
 #define IDC_UNIFORM2                    1277
@@ -416,6 +421,7 @@
 #define IDC_LENGTH2                     1374
 #define IDC_LENGTH3                     1375
 #define IDC_AREA                        1376
+#define IDC_VOLUMEUNIT                  1377
 #define IDC_LENGTH5                     1378
 #define IDC_WEIGHTUNIT                  1379
 #define IDC_SPEEDUNIT                   1380
@@ -614,6 +620,8 @@
 #define IDD_ITERDLG                     5115
 #define IDD_LISTPLRDLG                  5116
 #define IDD_SETTINGSLDG                 5117
+#define IDD_PREFSDLG                    5117
+#define IDD_3DCOLORDLG                  5117
 #define IDD_WOPERDLGBAR                 5119
 #define IDD_VLMDLG                      5120
 #define IDD_W3DBAR                      5121
@@ -659,6 +667,8 @@
 #define IDC_CONTROLLIST                 5169
 #define IDC_NFLAPS                      5174
 #define IDC_SHOWCPSCALE                 5175
+#define IDC_SHOWMOMENTS                 5176
+#define IDC_TEXT1                       5178
 #define IDM_LOADREFFOIL                 32772
 #define ID_EDIT_NEW                     32773
 #define IDM_DEFINEWING                  32777
@@ -962,10 +972,15 @@
 #define IDM_EXPORTVLMPANELS             33251
 #define IDM_SHOWWING2                   33253
 #define IDM_RECENTFILE3                 33257
-#define IDM_RECENTFILE4                 33258
 #define IDM_RECENTFILE1                 33261
 #define IDM_RECENTFILE2                 33262
 #define IDM_EDITCTRLPOINTS              33263
+#define IDM_RECENTFILE5                 33266
+#define IDM_RECENTFILE6                 33267
+#define IDM_RECENTFILE7                 33268
+#define IDM_RECENTFILE8                 33269
+#define IDM_RECENTFILE4                 33270
+#define IDM_CPVIEW                      33272
 #define ID_APP_EXIT2                    57666
 #define ID_VIEW_STATUS_BAR2             59394
 
@@ -975,8 +990,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        349
-#define _APS_NEXT_COMMAND_VALUE         33265
-#define _APS_NEXT_CONTROL_VALUE         5176
+#define _APS_NEXT_COMMAND_VALUE         33273
+#define _APS_NEXT_CONTROL_VALUE         5179
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
