@@ -99,6 +99,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(ID_INDPROJECT, OnIndicatorProject)
 	ON_UPDATE_COMMAND_UI(IDC_AMIN, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWLIFT, OnWOpp)
+	ON_UPDATE_COMMAND_UI(IDC_SHOWMOMENTS, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWICD, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWVCD, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_3DAXES, On3DAxes)
@@ -159,6 +160,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_RECENTFILE2, OnRecentFile2)
 	ON_COMMAND(IDM_RECENTFILE3, OnRecentFile3)
 	ON_COMMAND(IDM_RECENTFILE4, OnRecentFile4)
+	ON_COMMAND(IDM_RECENTFILE5, OnRecentFile5)
+	ON_COMMAND(IDM_RECENTFILE6, OnRecentFile6)
+	ON_COMMAND(IDM_RECENTFILE7, OnRecentFile7)
+	ON_COMMAND(IDM_RECENTFILE8, OnRecentFile8)
 	END_MESSAGE_MAP()
 
 static UINT XFLR5indicators[] =
@@ -188,7 +193,7 @@ CMainFrame::CMainFrame()
 	
 	m_wndView.m_pFrameWnd = this;
 
-	m_VersionName = "XFLR5_v3.20";
+	m_VersionName = "XFLR5_v3.21_beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame     = this;
@@ -229,6 +234,7 @@ CMainFrame::CMainFrame()
 	m_bXTop          = true;
 	m_bXBot          = true;
 	m_bXCP           = true;
+	m_bMoments       = true;
 	m_bICd           = true;
 	m_bVCd           = true;
 	m_bStream        = false;
@@ -330,6 +336,9 @@ CMainFrame::CMainFrame()
 	m_XCPStyle       = PS_SOLID;
 	m_XCPWidth       = 1;
 	m_XCPColor       = RGB(50, 150, 50);
+	m_MomentStyle    = PS_SOLID;
+	m_MomentWidth    = 1;
+	m_MomentColor    = RGB(200, 100, 100);
 	m_IDragStyle     = PS_SOLID;
 	m_IDragWidth     = 1;
 	m_IDragColor     = RGB(255,200,0);
@@ -2274,6 +2283,7 @@ CFoil* CMainFrame::ReadFoilFile(CString FileName, bool bKeepExistingFoil)
 		return NULL;
 	}
 }
+
 COLORREF CMainFrame::GetColor(int type)
 {
 	//type
@@ -3135,6 +3145,9 @@ void CMainFrame::SaveSettings()
 	CFile fp;
 	CString str;
 
+	WINDOWPLACEMENT wndpl;
+	GetWindowPlacement(&wndpl);
+
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
 	::GetModuleFileName(0, szAppPath, sizeof(szAppPath)-1);
@@ -3144,9 +3157,13 @@ void CMainFrame::SaveSettings()
 	str =strAppDirectory + "XFLR5.set";
 	if(fp.Open(str ,CFile::modeCreate | CFile::modeWrite)){
 		CArchive ar(&fp, CArchive::store);
-		ar << 100311;
+		ar << 100320;
+			//100320 : added window placement data
 			//100304 at version 3.04
 
+		ar << wndpl.rcNormalPosition.left <<wndpl.rcNormalPosition.top 
+		   << wndpl.rcNormalPosition.right <<wndpl.rcNormalPosition.bottom;
+		ar << wndpl.showCmd;
 		// Proceed with order...
 		ar << m_LengthUnit;
 		ar << m_AreaUnit;
@@ -3160,6 +3177,7 @@ void CMainFrame::SaveSettings()
 		ar << m_XTopStyle << m_XTopWidth << m_XTopColor;
 		ar << m_XBotStyle << m_XBotWidth << m_XBotColor;
 		ar << m_XCPStyle << m_XCPWidth << m_XCPColor;
+		ar << m_MomentStyle << m_MomentWidth << m_MomentColor;
 		ar << m_IDragStyle << m_IDragWidth << m_IDragColor;
 		ar << m_VDragStyle << m_VDragWidth << m_VDragColor;
 		ar << m_DownwashStyle << m_DownwashWidth << m_DownwashColor;
@@ -3168,6 +3186,7 @@ void CMainFrame::SaveSettings()
 		ar << m_LegendMin << m_LegendMax;
 
 		ar << m_RecentFile[0] << m_RecentFile[1] << m_RecentFile[2] << m_RecentFile[3] ;
+		ar << m_RecentFile[4] << m_RecentFile[5] << m_RecentFile[6] << m_RecentFile[7] ;
 		
 		if(m_bAutoCpScale)        ar <<1; else ar <<0;
 		if(m_W3DBar.m_bSurfaces)  ar << 1; else ar<<0;
@@ -3178,6 +3197,7 @@ void CMainFrame::SaveSettings()
 		if(m_bXTop)	              ar << 1; else ar<<0;
 		if(m_bXBot)               ar << 1; else ar<<0;
 		if(m_bXCP)                ar << 1; else ar<<0;
+		if(m_bMoments)            ar << 1; else ar<<0;
 		if(m_bStream)             ar << 1; else ar<<0;
 		if(m_bFlow)               ar << 1; else ar<<0;
 		if(m_bICd)                ar << 1; else ar<<0;
@@ -3204,6 +3224,7 @@ void CMainFrame::SaveSettings()
 void CMainFrame::LoadSettings()
 {
 	CFile fp;
+	WINDOWPLACEMENT wndpl;
 	int k;
 	CString str;
 	CString strAppDirectory;
@@ -3218,12 +3239,15 @@ void CMainFrame::LoadSettings()
 		if(fp.Open(str,CFile::modeRead)){
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
-			if(k!=100311){
+			if(k!=100320){
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
-		//  we're reading/loading
+			ar >> wndpl.rcNormalPosition.left  >> wndpl.rcNormalPosition.top; //used in XFLR5App
+			ar >> wndpl.rcNormalPosition.right >> wndpl.rcNormalPosition.bottom;//used in XFLR5App
+			ar >> wndpl.showCmd;//used in XFLR5App
+			//  we're reading/loading
 			ar >> m_LengthUnit;
 			ar >> m_AreaUnit;
 			ar >> m_SpeedUnit;
@@ -3289,8 +3313,6 @@ void CMainFrame::LoadSettings()
 			}			
 			m_OutlineWidth  = k;
 			
-
-
 			ar >> k;
 			if(k<0 || k>10){
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
@@ -3362,6 +3384,30 @@ void CMainFrame::LoadSettings()
 				throw pfe;
 			}
 			m_XCPColor = k;
+
+			ar >> k;
+			if(k<0 || k>10){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}			
+			m_MomentStyle  = k;
+
+			ar >> k;
+			if(k<0 || k>10){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}			
+			m_MomentWidth  = k;
+			
+			ar >> k;
+			if(k<0 || k>RGB(255,255,255)){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}
+			m_MomentColor = k;
 
 			ar >> k;
 			if(k<0 || k>10){
@@ -3471,6 +3517,7 @@ void CMainFrame::LoadSettings()
 			ar >> m_LegendMin >> m_LegendMax;
 
 			ar >> m_RecentFile[0] >> m_RecentFile[1] >> m_RecentFile[2] >> m_RecentFile[3] ;
+			ar >> m_RecentFile[4] >> m_RecentFile[5] >> m_RecentFile[6] >> m_RecentFile[7] ;
 
 			ar >> k;
 			if(k<0 || k>1){
@@ -3544,6 +3591,14 @@ void CMainFrame::LoadSettings()
 				throw pfe;
 			}
 			if(k) m_bXCP = true; else m_bXCP = false;
+
+			ar >> k;
+			if(k<0 || k>1){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}
+			if(k) m_bMoments = true; else m_bMoments = false;
 
 			ar >> k;
 			if(k<0 || k>1){
@@ -4154,8 +4209,9 @@ bool CMainFrame::ReadProject(CString FileName)
 			}
 			ar.Close();
 			fp.Close();
+			return true;
 		}
-		return true;
+		else return false;
 	}
 	catch (CException *ex){
 		TCHAR   szCause[255];
@@ -4195,6 +4251,7 @@ bool CMainFrame::SaveProjectAs()
 		if(SaveProject(FileName)){
 			m_FileName    = WProjectDlg.GetPathName();
 			SetProjectName(m_FileName);
+			AddRecentFile(m_FileName);
 			m_wndStatusBar.SetWindowText("The project " + m_ProjectName + " has been saved");
 			SetSaveState(true);	
 			return true;
@@ -5139,8 +5196,7 @@ void CMainFrame::DeleteProject()
 	}
 
 	XInverse.Clear();
-	m_ProjectName = "";
-	m_FileName    = "";
+	SetProjectName("");
 	SetSaveState(true);
 }
 
@@ -6173,7 +6229,7 @@ void CMainFrame::OnCpLegend()
 
 void CMainFrame::OnPlanePrefs() 
 {
-	CSettingsDlg SDlg(this);
+	C3DColorDlg SDlg(this);
 //	SDlg.m_WingSurfaces   = m_WingSurfaces;
 	SDlg.m_VLMColor       = m_VLMColor;
 	SDlg.m_VLMStyle       = m_VLMStyle;
@@ -6190,6 +6246,9 @@ void CMainFrame::OnPlanePrefs()
 	SDlg.m_XCPColor       = m_XCPColor;
 	SDlg.m_XCPStyle       = m_XCPStyle;
 	SDlg.m_XCPWidth       = m_XCPWidth;
+	SDlg.m_MomentColor    = m_MomentColor;
+	SDlg.m_MomentStyle    = m_MomentStyle;
+	SDlg.m_MomentWidth    = m_MomentWidth;
 	SDlg.m_IDragColor     = m_IDragColor;
 	SDlg.m_IDragStyle     = m_IDragStyle;
 	SDlg.m_IDragWidth     = m_IDragWidth;
@@ -6220,6 +6279,9 @@ void CMainFrame::OnPlanePrefs()
 		m_XCPColor     = SDlg.m_XCPColor;
 		m_XCPStyle     = SDlg.m_XCPStyle;
 		m_XCPWidth     = SDlg.m_XCPWidth;
+		m_MomentColor  = SDlg.m_MomentColor;
+		m_MomentStyle  = SDlg.m_MomentStyle;
+		m_MomentWidth  = SDlg.m_MomentWidth;
 		m_IDragColor     = SDlg.m_IDragColor;
 		m_IDragStyle     = SDlg.m_IDragStyle;
 		m_IDragWidth     = SDlg.m_IDragWidth;
@@ -6294,7 +6356,10 @@ bool CMainFrame::LoadProject(CString PathName)
 		}
 		return TRUE;
 	}
-	else return FALSE;
+	else {
+		DeleteProject();
+		return FALSE;
+	}
 }
 
 
@@ -6334,15 +6399,19 @@ void CMainFrame::OnAppOpen()
 
 void CMainFrame::AddRecentFile(CString FileName)
 {
-	for(int j=0; j<4;j++){
+	for(int j=0; j<8;j++){
 		if(m_RecentFile[j]==FileName){
-			for (int l=j; l<3; l++){
+			for (int l=j; l<7; l++){
 				m_RecentFile[l]=m_RecentFile[l+1];
 			}
 			break;
 		}
 	}
 
+	m_RecentFile[7] = m_RecentFile[6];
+	m_RecentFile[6] = m_RecentFile[5];
+	m_RecentFile[5] = m_RecentFile[4];
+	m_RecentFile[4] = m_RecentFile[3];
 	m_RecentFile[3] = m_RecentFile[2];
 	m_RecentFile[2] = m_RecentFile[1];
 	m_RecentFile[1] = m_RecentFile[0];
@@ -6359,7 +6428,31 @@ void CMainFrame::SetRecentFileMenu()
 		pMenu->RemoveMenu(IDM_RECENTFILE2, MF_BYCOMMAND);
 		pMenu->RemoveMenu(IDM_RECENTFILE3, MF_BYCOMMAND);
 		pMenu->RemoveMenu(IDM_RECENTFILE4, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE5, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE6, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE7, MF_BYCOMMAND);
+		pMenu->RemoveMenu(IDM_RECENTFILE8, MF_BYCOMMAND);
 
+		if(m_RecentFile[7].GetLength()) {
+			strong = m_RecentFile[7];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE8,"8 "+strong);
+		}
+		if(m_RecentFile[6].GetLength()) {
+			strong = m_RecentFile[6];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE7,"7 "+strong);
+		}
+		if(m_RecentFile[5].GetLength()) {
+			strong = m_RecentFile[5];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE6,"6 "+strong);
+		}
+		if(m_RecentFile[4].GetLength()) {
+			strong = m_RecentFile[4];
+			ShortenFileName(strong);
+			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE5,"5 "+strong);
+		}
 		if(m_RecentFile[3].GetLength()) {
 			strong = m_RecentFile[3];
 			ShortenFileName(strong);
@@ -6404,40 +6497,156 @@ void CMainFrame::ShortenFileName(CString &PathName)
 
 void CMainFrame::OnRecentFile1()
 {
-	LoadProject(m_RecentFile[0]);
+	if(!LoadProject(m_RecentFile[0])){
+		m_RecentFile[0] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+		SetRecentFileMenu();
+	}
 }
 
 void CMainFrame::OnRecentFile2()
 {
 	CString strong;
-	LoadProject(m_RecentFile[1]);
-	strong = m_RecentFile[1];
-	m_RecentFile[1] = m_RecentFile[0];
-	m_RecentFile[0] = strong;
+	if(!LoadProject(m_RecentFile[1])){
+		m_RecentFile[1] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
 	SetRecentFileMenu();
 }
 
 void CMainFrame::OnRecentFile3()
 {
 	CString strong;
-	LoadProject(m_RecentFile[2]);
-	strong = m_RecentFile[2];
-	m_RecentFile[2] = m_RecentFile[1];
-	m_RecentFile[1] = m_RecentFile[0];
-	m_RecentFile[0] = strong;
+	if(!LoadProject(m_RecentFile[2])){
+		m_RecentFile[2] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
 	SetRecentFileMenu();
 }
 
 void CMainFrame::OnRecentFile4()
 {
 	CString strong;
-	LoadProject(m_RecentFile[3]);
-	strong = m_RecentFile[3];
-	m_RecentFile[3] = m_RecentFile[2];
-	m_RecentFile[2] = m_RecentFile[1];
-	m_RecentFile[1] = m_RecentFile[0];
-	m_RecentFile[0] = strong;
+	if(!LoadProject(m_RecentFile[3])){
+		m_RecentFile[3] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
+	SetRecentFileMenu();
+}
+
+void CMainFrame::OnRecentFile5()
+{
+	CString strong;
+	if(!LoadProject(m_RecentFile[4])){
+		m_RecentFile[4] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
 	SetRecentFileMenu();
 }
 
 
+void CMainFrame::OnRecentFile6()
+{
+	CString strong;
+	if(!LoadProject(m_RecentFile[5])){
+		m_RecentFile[5] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
+	SetRecentFileMenu();
+}
+
+void CMainFrame::OnRecentFile7()
+{
+	CString strong;
+	if(!LoadProject(m_RecentFile[6])){
+		m_RecentFile[6] = m_RecentFile[7];
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
+	SetRecentFileMenu();
+}
+
+void CMainFrame::OnRecentFile8()
+{
+	CString strong;
+	if(!LoadProject(m_RecentFile[7])){
+		m_RecentFile[7].Empty();
+	}
+	else{
+		strong = m_RecentFile[7];
+		m_RecentFile[7] = m_RecentFile[6];
+		m_RecentFile[6] = m_RecentFile[5];
+		m_RecentFile[5] = m_RecentFile[4];
+		m_RecentFile[4] = m_RecentFile[3];
+		m_RecentFile[3] = m_RecentFile[2];
+		m_RecentFile[2] = m_RecentFile[1];
+		m_RecentFile[1] = m_RecentFile[0];
+		m_RecentFile[0] = strong;
+	}
+	SetRecentFileMenu();
+}

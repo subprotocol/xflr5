@@ -131,6 +131,7 @@ private:
 	bool m_bSaved; //true if the project hasn't been modified since the last save
 	bool m_b3DVLMCl, m_b3DDownwash, m_b3DBar; 	// defines whether the corresponfing data should be displayed
 	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
+	bool m_bMoments;
 	bool m_bICd, m_bVCd, m_bStream, m_bFlow;  	// defines whether the corresponfing data should be displayed
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
@@ -162,7 +163,7 @@ private:
 	CMenu m_MiarexMenu;
 	CMenu m_AFoilMenu;
 	CMenu m_XInverseMenu;
-	CString m_RecentFile[4];
+	CString m_RecentFile[8];
 	void AddRecentFile(CString FileName);
 	void SetRecentFileMenu();
 	void ShortenFileName(CString &PathName);
@@ -270,6 +271,9 @@ private:
 	int m_XCPStyle, m_XCPWidth;
 	COLORREF m_XCPColor;
 
+	int m_MomentStyle, m_MomentWidth;
+	COLORREF m_MomentColor;
+
 	int m_IDragStyle, m_IDragWidth;
 	COLORREF m_IDragColor;
 
@@ -354,6 +358,10 @@ protected:
 	afx_msg void OnRecentFile2();
 	afx_msg void OnRecentFile3();
 	afx_msg void OnRecentFile4();
+	afx_msg void OnRecentFile5();
+	afx_msg void OnRecentFile6();
+	afx_msg void OnRecentFile7();
+	afx_msg void OnRecentFile8();
 
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
