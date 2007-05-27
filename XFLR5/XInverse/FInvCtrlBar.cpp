@@ -115,15 +115,14 @@ void CFInvCtrlBar::OnApplySpline()
 	CXInverse* pXInv = (CXInverse*)m_pParent;
 	if(!pXInv->m_bSplined)  pXInv->ApplySpline();
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
-	pXInv->m_bSpline = false;
+//	pXInv->m_bSpline = false;
 	pXInv->m_nPos    = 0;
 	pXInv->m_tmpPos  = -1;
 	pXInv->m_Pos1    = -1;
 	pXInv->m_Pos2    = -1;
-	m_ctrlShowSpline.SetCheck(false);
+//	m_ctrlShowSpline.SetCheck(false);
 	
 	pXInv->UpdateView();
-	m_ctrlShowSpline.SetCheck(0);
 	m_ctrlShowSpline.Invalidate();
 }
 
@@ -187,9 +186,9 @@ void CFInvCtrlBar::CancelSpline()
 {
 	CXInverse* pXInv = (CXInverse*)m_pParent;
 	m_ctrlOutput.SetWindowText(" ");
-	pXInv->m_bSpline = false;
+//	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
-	m_ctrlShowSpline.SetCheck(0);
+//	m_ctrlShowSpline.SetCheck(0);
 	m_ctrlNewSpline.SetCheck(0);
 	pXInv->m_bSmooth = false;
 	pXInv->m_bGetPos = false;
@@ -203,8 +202,8 @@ void CFInvCtrlBar::OnShowSpline()
 {
 	CXInverse* pXInv = (CXInverse*)m_pParent;
 	
-	if(m_ctrlShowSpline.GetCheck()) pXInv->m_bSpline = true;
-	else  pXInv->m_bSpline = false;
+	if(m_ctrlShowSpline.GetCheck())	pXInv->m_bSpline = true;
+	else							pXInv->m_bSpline = false;
 	pXInv->m_bSplined =   !pXInv->m_bSpline;
 	pXInv->UpdateView();
 }

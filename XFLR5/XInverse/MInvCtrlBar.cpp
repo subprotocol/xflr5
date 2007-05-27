@@ -180,8 +180,8 @@ void CMInvCtrlBar::OnShowSpline()
 {
 	CXInverse* pXInv = (CXInverse*)m_pParent;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
-	if(m_ctrlShowSpline.GetCheck()) pXInv->m_bSpline = true;
-	else  pXInv->m_bSpline = false;
+	if(m_ctrlShowSpline.GetCheck())	pXInv->m_bSpline = true;
+	else							pXInv->m_bSpline = false;
 	pXInv->m_bSplined =   !pXInv->m_bSpline;
 
 	pXInv->UpdateView();
@@ -210,7 +210,7 @@ void CMInvCtrlBar::OnApplySpline()
 	CXInverse* pXInv = (CXInverse*)m_pParent;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(!pXInv->m_bSplined) pXInv->ApplySpline();
-	CancelSpline();
+//	CancelSpline();
 	
 	pXInv->UpdateView();
 }
@@ -260,31 +260,31 @@ BOOL CMInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 void CMInvCtrlBar::CancelSmooth()
 {
 	CXInverse* pXInv = (CXInverse*)m_pParent;
-	pXInv->m_bSpline = false;
+//	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
-	pXInv->m_bGetPos = false;
-	pXInv->m_bMark   = false;
-	pXInv->m_nPos    = 0;
+	pXInv->m_bGetPos  = false;
+	pXInv->m_bMark    = false;
+	pXInv->m_nPos    =  0;
 	pXInv->m_tmpPos  = -1;
 	pXInv->m_Pos1    = -1;
 	pXInv->m_Pos2    = -1;
-	m_ctrlShowSpline.SetCheck(false);
+//	m_ctrlShowSpline.SetCheck(false);
 	m_ctrlSmooth.SetCheck(false);
 }
 
 void CMInvCtrlBar::CancelSpline()
 {
 	CXInverse* pXInv = (CXInverse*)m_pParent;
-	pXInv->m_bSpline = false;
+//	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
-	pXInv->m_bGetPos = false;
-	pXInv->m_bMark   = false;
-	pXInv->m_nPos    = 0;
+	pXInv->m_bGetPos  = false;
+	pXInv->m_bMark    = false;
+	pXInv->m_nPos    =  0;
 	pXInv->m_tmpPos  = -1;
 	pXInv->m_Pos1    = -1;
 	pXInv->m_Pos2    = -1;
 	m_ctrlNewSpline.SetCheck(false);
-	m_ctrlShowSpline.SetCheck(false);
+//	m_ctrlShowSpline.SetCheck(false);
 }
 
 void CMInvCtrlBar::CancelMark()
