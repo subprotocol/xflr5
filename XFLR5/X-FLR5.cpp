@@ -41,8 +41,6 @@ END_MESSAGE_MAP()
 
 CXFLR5App::CXFLR5App()
 {
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
 }
 
 
@@ -182,10 +180,48 @@ BOOL CXFLR5App::InitInstance()
 		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,
 		NULL);
 
-	//Trace("CX5App::InitInstance::Loaded frame");
-	// The one and only window has been initialized, so show and update it.
-	//Trace("CX5App::InitInstance::Showing window", pFrame);
-	pFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	//load previously saved size and position
+
+	CFile fp;
+	int k,x,y,cx,cy;
+	int l,t,r,b;
+	UINT showCmd;
+
+	CString str, strAppDirectory;
+	char    szAppPath[MAX_PATH] = "";
+	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
+	// Extract directory
+	strAppDirectory = szAppPath;
+	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
+ 	str =strAppDirectory + "XFLR5.set";
+	x=0; y=0; cx = GetSystemMetrics(SM_CXSCREEN); cy = GetSystemMetrics(SM_CYSCREEN);
+	showCmd = SW_SHOWMAXIMIZED;
+
+	try{
+		if(fp.Open(str,CFile::modeRead)){
+			CArchive ar(&fp, CArchive::load);
+			ar >> k;
+			if(k!=100320){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}
+		//  we're reading/loading
+			ar >> l >> t >> r >> b >> showCmd;
+			x=l; y=t; cx = max(r-l,200); cy = max(b-t,200);
+			ar.Close();
+			fp.Close();
+		}
+	}
+	catch (CArchiveException *ex){
+		ex->Delete();
+	}
+	catch (CException *ex){
+		ex->Delete();
+	}
+	pFrame->SetWindowPos(&CWnd::wndTop, x, y, cx, cy,SWP_NOREDRAW);
+	pFrame->ShowWindow(showCmd);
+	
 	//Trace("CX5App::InitInstance::Window displayed" );
 	pFrame->UpdateWindow();
 
