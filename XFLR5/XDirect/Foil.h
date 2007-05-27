@@ -141,6 +141,7 @@ private:
 	double GetCamberAngle(double x);
 	double GetCamberSlope(double x);
 	double GetLength();
+	double GetArea();
 	double GetTopSlope(double x);
 	double GetBotSlope(double x);
 	double NormalizeGeometry();

@@ -700,7 +700,18 @@ double CFoil::GetLength()
 	return max(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
 }
 
+double CFoil::GetArea()
+{
+	int i,ip;
+	double area = 0.0;
+	for (i=0; i<nb; i++){
+		if(i==nb-1)	ip = 0;
+		else		ip = i+1;
+		area +=  0.5*(yb[i]+yb[ip]) * (xb[i]-xb[ip]);
+	}
 
+	return abs(area);
+}
 double CFoil::GetCamber(double x)
 {
 	//returns the camber value at position x
