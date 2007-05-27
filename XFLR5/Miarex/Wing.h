@@ -74,6 +74,8 @@ public:
 	CButton	m_ctrlSymetric;
 	CClrBtn m_ctrlWingColor;
 	CStatic	m_ctrlArea;
+	CStatic	m_ctrlVolumeUnit;
+	CStatic	m_ctrlVolume;
 	CStatic	m_ctrlLength3;
 	CStatic	m_ctrlLength2;
 	CStatic	m_ctrlLength1;
@@ -126,8 +128,8 @@ protected:
 	void LLTComputeWing();
 	int  LLTIterate();
 
-	void PanelComputeWing(double *Ai, double *Cp, double &Lift, double &IDrag,  double &VDrag, double &XCP, double &YCP,
-						double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
+//	void PanelComputeWing(double *Ai, double *Cp, double &Lift, double &IDrag,  double &VDrag, double &XCP, double &YCP,
+//						double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
 
 	CString GetFormat(double f, int precision);
 
@@ -144,8 +146,11 @@ protected:
 	void ComputeGeometry();
 	void FillPanelList();
 	void GetxDist(int l, int NXPanels, int XDistType, double &xA1, double &xA2, double &xB1, double &xB2, CFoil* pFoilA,  CFoil* pFoilB);
+	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, CString Foil,int NChord, int NSpan, int SSpan);
+	void PanelComputeWing(double *Ai, double *Cp, double &Lift,  double &IDrag, double &VDrag, double &XCP, double &YCP,
+							 double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
 	void SetResults();
 	void SetParams();
 	void SetSectionData();
@@ -176,11 +181,11 @@ protected:
 	double GetZPos(double y);
 	double Getyrel(double SpanPos);
 	double GetViewZPos(double xrel, double y, int pos =0);
-	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	double GetTopz(double x, double y);
 	double GetBotz(double x, double y);
 	double IntegralC2(double y1, double y2, double c1, double c2);
 	double IntegralCy(double y1, double y2, double c1, double c2);
+
 
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
@@ -252,6 +257,7 @@ protected:
 	double m_yMac;		// mean aerodynamic chord span position
 	double m_Density, m_Viscosity; //fluid properties
 	double m_Area;		// wing surface
+	double m_Volume;	// for tentative wieght calculations
 	double m_AR;		// Aspect ratio
 	double m_TR;		// Taper ratio
 	double m_CL;		//Lift

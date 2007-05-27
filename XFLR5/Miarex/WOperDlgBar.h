@@ -50,6 +50,7 @@ protected:
 	CButton m_ctrlAnimate;
 	CSliderCtrl	m_ctrlSpeed;
 	CButton m_ctrlLift;
+	CButton m_ctrlMoments;
 	CButton m_ctrlICd, m_ctrlVCd;
 	CButton m_ctrlTopTrans;
 	CButton m_ctrlBotTrans;
@@ -110,6 +111,7 @@ protected:
 	afx_msg void OnAnalyze();
 	afx_msg void OnAnimate();
 	afx_msg void OnShowLift();
+	afx_msg void OnShowMoments();
 	afx_msg void OnShowICd();
 	afx_msg void OnShowVCd();
 	afx_msg void OnShowTrans();

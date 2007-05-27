@@ -96,7 +96,7 @@ bool C3DPanelThread::AlphaLoop(void)
 	str.Format("   Solving the problem... \r\n");
 	pDlg->AddString(str);
 
-	if (!pDlg->CreateRHS()) {
+	if (!pDlg->CreateRHS(m_Alpha, m_DeltaAlpha, nrhs)) {
 		pDlg->AddString("\r\nFailed to create RHS Vector....\r\n");
 		pDlg->m_bWarning = true;
 		return true;

@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(CWOperDlgBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_WSEQUENCE, OnWSequence)
 	ON_BN_CLICKED(IDC_HALFWING, OnHalfWing)
 	ON_BN_CLICKED(IDC_SHOWLIFT, OnShowLift)
+	ON_BN_CLICKED(IDC_SHOWMOMENTS, OnShowMoments)
 	ON_BN_CLICKED(IDC_SHOWICD, OnShowICd)
 	ON_BN_CLICKED(IDC_SHOWVCD, OnShowVCd)
 	ON_BN_CLICKED(IDC_TOPTRANS, OnShowTrans)
@@ -167,6 +168,7 @@ void CWOperDlgBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_ANIMATE, m_ctrlAnimate);
 	DDX_Control(pDX, IDC_SPEED, m_ctrlSpeed);
 	DDX_Control(pDX, IDC_SHOWLIFT, m_ctrlLift);
+	DDX_Control(pDX, IDC_SHOWMOMENTS, m_ctrlMoments);
 	DDX_Control(pDX, IDC_SHOWICD, m_ctrlICd);
 	DDX_Control(pDX, IDC_SHOWVCD, m_ctrlVCd);
 	DDX_Control(pDX, IDC_TOPTRANS, m_ctrlTopTrans);
@@ -184,6 +186,8 @@ void CWOperDlgBar::DoDataExchange(CDataExchange* pDX)
 
 void CWOperDlgBar::OnWSequence() 
 {
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->Animate(false);
 	if(m_ctrlSequence.GetCheck()) m_bSequence = true;
 	else						  m_bSequence = false;
 }
@@ -325,7 +329,17 @@ void CWOperDlgBar::OnShowLift()
 //	pMiarex->m_bResetglLift = true;
 	if(!pMiarex->m_bAnimate) pMiarex->UpdateView();
 }
-
+void CWOperDlgBar::OnShowMoments() 
+{
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlMoments.GetCheck()){
+		pFrame->m_bMoments = true;
+	}
+	else pFrame->m_bMoments = false;
+//	pMiarex->m_bResetglLift = true;
+	if(!pMiarex->m_bAnimate) pMiarex->UpdateView();
+}
 void CWOperDlgBar::OnShowICd() 
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -396,6 +410,8 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 
 	if(pFrame->m_bXCP)			m_ctrlLift.SetCheck(true);
 	else						m_ctrlLift.SetCheck(false);
+	if(pFrame->m_bMoments)		m_ctrlMoments.SetCheck(true);
+	else						m_ctrlMoments.SetCheck(false);
 	if(pFrame->m_bStream)		m_ctrlStream.SetCheck(true);
 	else						m_ctrlStream.SetCheck(false);
 	if(pFrame->m_bICd)			m_ctrlICd.SetCheck(true);
@@ -452,14 +468,17 @@ void CWOperDlgBar::OnStream()
 	if(m_ctrlStream.GetCheck()){
 		if(!pMiarex->m_bAnimate){
 			pFrame->m_bStream = true;
+//			pFrame->m_bFlow = true;
 			pMiarex->UpdateView();
 		}
 		else m_ctrlStream.SetCheck(FALSE);
 	}
 	else {
 		pFrame->m_bStream = false;
+//		pFrame->m_bFlow = false;
 		pMiarex->m_FlowLinesDlg.ShowWindow(SW_HIDE);
 		pMiarex->UpdateView();
 	}
 }
+
 

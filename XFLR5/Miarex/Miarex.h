@@ -125,6 +125,7 @@ protected:
 	afx_msg void OnGLLight();
 	afx_msg void OnStreamOptions();
 	afx_msg void OnManageUFO();
+	afx_msg void OnCpView();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -210,9 +211,9 @@ private:
 	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, UINT List);
 	void GLCreateLift(CWing *pWing, CWOpp *pWOpp, UINT List);
 	void GLCreateLiftForce();
+	void GLCreateMoments();
 	void GLCreateWingLegend();
 	void GLCreateWOppLegend();
-//	void GLCreateXFlow();
 	void GLCreateSurfFlow();
 	void GLCreateStreamLines();
 	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0);
@@ -232,6 +233,7 @@ private:
 	void CreateWPolarCurves();
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void CreateWOppCurves();
+	void CreateCpCurves();
 	void DeleteProject();
 	void DrawWOppLegend(CDC* pDC, bool bIsPrinting, CPoint place, int bottom);
 	void DrawWPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bottom);
@@ -399,11 +401,11 @@ private:
 	int m_WakeSize;				// Max Size for the VLMMatrix if there is a wake
 	int m_NXWakePanels;			// wake panel number
 	int m_MaxWakeIter;			// wake roll-up iteration limit
-	int m_WakeInterNodes;			// number of intermediate nodes between wake panels
+	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 
-
-	double m_WakePanelFactor;		// incremental factor for wake lines
-	double m_FirstPanelSize;		// wake lines first panel size
+	double m_CurSpanPos;		//Span position for Cp Grpah
+	double m_WakePanelFactor;	// incremental factor for wake lines
+	double m_FirstPanelSize;	// wake lines first panel size
 	double m_CoreSize;			// core size for VLM vortices
 	double m_MinPanelSize;			// wing minimum panel size ; panels of less length are ignored
 	double m_Relax;				// LLT relaxation factor
@@ -453,6 +455,4 @@ private:
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
 
 	COLORREF m_WingColor, m_StabColor, m_FinColor;
-
-public:
 };

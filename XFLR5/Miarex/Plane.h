@@ -50,6 +50,8 @@ public:
 	CStatic	m_ctrlSurf1;
 	CStatic	m_ctrlSurf2;
 	CStatic	m_ctrlSurf3;
+	CStatic m_ctrlVolume;
+	CStatic m_ctrlVolumeUnit;
 	CStatic	m_ctrlLen1;
 	CStatic	m_ctrlLen2;
 	CStatic	m_ctrlLen3;
@@ -122,7 +124,7 @@ protected:
 	double m_StabTilt;
 	double m_FinTilt;
 	double m_WingTilt, m_WingTilt2;
-
+	double m_Volume;
 	double m_XCmRef;
 	double m_TailVolume;
 	CObArray *m_poaWing;

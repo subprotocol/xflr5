@@ -108,7 +108,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 //	float x,y,z;
 
 	if(ar.IsStoring()){
-		ar << 1010;
+		ar << 1011;
+		//1011 : added m_Sigma
 		//1010 : added flap moments, changed lengths to m
 		//1009 : added Vortex strengths
 		//1008 : added wake node number and pos
@@ -148,6 +149,9 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 		ar << m_NVLMPanels;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
+		if(m_AnalysisType==3){
+			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
+		}
 
 		ar << m_WingType;
 		ar << m_nWakeNodes << m_NXWakePanels << m_FirstWakePanel << m_WakeFactor;
@@ -291,7 +295,13 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				for (p=0; p<m_NVLMPanels;p++){
 					ar >> f; m_G[p] =f;
 					if(ArchiveFormat<1010) m_G[p] =  f/1000.0;
-
+				}
+			}
+			if(ArchiveFormat>1010){
+				if(m_AnalysisType==3){	
+					for (p=0; p<m_NVLMPanels;p++)	{
+						ar >> f; m_Sigma[p] = f;
+					}
 				}
 			}
 			if(ArchiveFormat>=1004){

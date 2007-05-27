@@ -491,6 +491,7 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	memset(m_row, 0, sizeof(m_row));
 	memset(row,   0, sizeof(row));
 
+
 	if(m_pWPolar->m_Type!=4){
 		p=0;
 
@@ -513,7 +514,6 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		}
 	}
 
-//memcpy(row, m_row, sizeof(row));
 	AddString("      Solving the linear system...\r\n");
 
 	if(m_pWPolar->m_Type!=4) nrhs = nval;
@@ -526,7 +526,6 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	}
 	else m_bConverged = true;
 
-//memcpy(row, m_row, sizeof(row));
 	AddString("      Calculating the vortices strengths...\r\n");
 
 	//so far we have a unit Vortex Strength
@@ -1474,85 +1473,6 @@ void CVLMDlg::VLMMoveWakeNodes(double *Gamma, int size)
 	}
 }*/
 
-
-void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
-{
-	//CLASSIC VLM FORMULATION
-	double pi  = 3.141592654;
-	// creates the VLM matrix coefficient
-	// corresponding to the influence of the vortex located at segment AB 
-	// at the tangential point C
-	double Omega;
-	double ftmp;
-	CVector Psi;
-	CVector r0, r1, r2;
-
-	V.x = 0.0;
-	V.y = 0.0;
-	V.z = 0.0;
-
-	if(bAll){
-		r0.x = B.x - A.x;
-		r0.y = B.y - A.y;
-		r0.z = B.z - A.z;
-
-		//First calculate finite vortex contribution
-		r1.x = C.x - A.x;
-		r1.y = C.y - A.y;
-		r1.z = C.z - A.z;
-
-		r2.x = C.x - B.x;
-		r2.y = C.y - B.y;
-		r2.z = C.z - B.z;
-		
-		CrossProduct(r1,r2,Psi);
-		ftmp = Psi.VAbs();
-		if(r1.VAbs()>m_CoreSize && r2.VAbs()>m_CoreSize && ftmp>m_CoreSize){
-			ftmp *= ftmp;
-			Psi.x /= ftmp;
-			Psi.y /= ftmp;
-			Psi.z /= ftmp;
-
-			Omega = DotProduct(r0,r1)/r1.VAbs() - DotProduct(r0,r2)/r2.VAbs();
-
-			V.x = Psi.x * Omega/4.0/pi;
-			V.y = Psi.y * Omega/4.0/pi;
-			V.z = Psi.z * Omega/4.0/pi;
-		}
-	}
-
-	//Next add 'left'  semi-infinite contribution
-	//eq.6-56
-	ftmp = (C.z-A.z)*(C.z-A.z) + (A.y-C.y) * (A.y-C.y);
-	if(ftmp>m_CoreSize){
-		Psi.x = 0.0;//? unused...
-		Psi.y = (C.z-A.z)/ftmp;
-		Psi.z = (A.y-C.y)/ftmp;
-
-		ftmp = sqrt((C.x-A.x)*(C.x-A.x) + (A.y-C.y)*(A.y-C.y) + (C.z-A.z)*(C.z-A.z));
-		if(ftmp>m_CoreSize){
-			Omega = 1.0 + (C.x-A.x)/ftmp;
-			V.y += Psi.y * Omega/4.0/pi;
-			V.z += Psi.z * Omega/4.0/pi;
-		}
-	}
-
-	//Last add 'right' semi-infinite contribution
-	//eq.6-57
-	ftmp = (C.z-B.z)*(C.z-B.z) + (B.y-C.y) * (B.y-C.y);
-	if(ftmp>m_CoreSize){
-		Psi.x = 0.0;//? unused...
-		Psi.y = (C.z-B.z)/ftmp;
-		Psi.z = (B.y-C.y)/ftmp;
-		ftmp = sqrt((C.x-B.x)*(C.x-B.x) + (B.y-C.y)*(B.y-C.y) + (C.z-B.z)*(C.z-B.z));
-		if(ftmp>m_CoreSize){
-			Omega = 1.0 + (C.x-B.x)/ftmp;
-			V.y -= Psi.y * Omega/4.0/pi;
-			V.z -= Psi.z * Omega/4.0/pi;
-		}
-	}
-}
-
 void CVLMDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V)
 {//Quadrilateral VLM FORMULATION
 	// LA, LB, TA, TB are the vortex's four corners
@@ -1678,3 +1598,112 @@ void CVLMDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, 
 }
 
 
+
+
+void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
+{
+	//CLASSIC VLM FORMULATION
+	double pi  = 3.141592654;
+	// creates the VLM matrix coefficient
+	// corresponding to the influence of the vortex located at segment AB 
+	// at the tangential point C
+	double Omega;
+	double ftmp;
+	CVector Psi;
+	CVector r0, r1, r2;
+
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	if(bAll){
+		r0.x = B.x - A.x;
+		r0.y = B.y - A.y;
+		r0.z = B.z - A.z;
+
+		//First calculate finite vortex contribution
+		r1.x = C.x - A.x;
+		r1.y = C.y - A.y;
+		r1.z = C.z - A.z;
+
+		r2.x = C.x - B.x;
+		r2.y = C.y - B.y;
+		r2.z = C.z - B.z;
+		
+		CrossProduct(r1,r2,Psi);
+		ftmp = Psi.VAbs();
+		if(r1.VAbs()>m_CoreSize && r2.VAbs()>m_CoreSize && ftmp>m_CoreSize){
+			ftmp *= ftmp;
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
+
+			Omega = DotProduct(r0,r1)/r1.VAbs() - DotProduct(r0,r2)/r2.VAbs();
+
+			V.x = Psi.x * Omega/4.0/pi;
+			V.y = Psi.y * Omega/4.0/pi;
+			V.z = Psi.z * Omega/4.0/pi;
+		}
+	}
+	
+	//Next add 'left'  semi-infinite contribution
+	//eq.6-56
+	ftmp = (C.z-A.z)*(C.z-A.z) + (A.y-C.y) * (A.y-C.y);
+	if(ftmp>m_CoreSize){
+		Psi.x = 0.0;//? unused...
+		Psi.y = (C.z-A.z)/ftmp;
+		Psi.z = (A.y-C.y)/ftmp;
+
+		ftmp = sqrt((C.x-A.x)*(C.x-A.x) + (A.y-C.y)*(A.y-C.y) + (C.z-A.z)*(C.z-A.z));
+		if(ftmp>m_CoreSize){
+			Omega = 1.0 + (C.x-A.x)/ftmp;
+			V.y += Psi.y * Omega/4.0/pi;
+			V.z += Psi.z * Omega/4.0/pi;
+		}
+	}
+
+	//Last add 'right' semi-infinite contribution
+	//eq.6-57
+	ftmp = (C.z-B.z)*(C.z-B.z) + (B.y-C.y) * (B.y-C.y);
+	if(ftmp>m_CoreSize){
+		Psi.x = 0.0;//? unused...
+		Psi.y = (C.z-B.z)/ftmp;
+		Psi.z = (B.y-C.y)/ftmp;
+		ftmp = sqrt((C.x-B.x)*(C.x-B.x) + (B.y-C.y)*(B.y-C.y) + (C.z-B.z)*(C.z-B.z));
+		if(ftmp>m_CoreSize){
+			Omega = 1.0 + (C.x-B.x)/ftmp;
+			V.y -= Psi.y * Omega/4.0/pi;
+			V.z -= Psi.z * Omega/4.0/pi;
+		}
+	}
+
+/*	else {//we need to re-align the trailing vortices with the flow direction
+		t.Set(cos(m_pWPolar->m_Beta*pi/180.0), sin(m_pWPolar->m_Beta*pi/180.0), 0.0);
+
+		//left trailing vortex
+		Far = A + t * 1000000.0 * (B-A).VAbs();
+		r0 = Far - A;
+		r1 = C  - A;
+		r2 = C  - Far ;
+		u  = r1 * r2;
+		uv = u.VAbs();
+		VL = u /uv/uv/4.0/pi;
+		r1.Normalize();
+		r2.Normalize();
+		VL *= r0.dot(r1-r2);
+		
+		//right trailing vortex
+		Far = B + t * 1000000.0 * (B-A).VAbs();
+		r0 = Far - B;
+		r1 = C  - B;
+		r2 = C  - Far ;
+		u  = r1 * r2;
+		uv = u.VAbs();
+		VR = u /uv/uv/4.0/pi;
+		r1.Normalize();
+		r2.Normalize();
+		VR *= r0.dot(r1-r2);
+	
+		V +=  VR-VL;
+	}*/
+}

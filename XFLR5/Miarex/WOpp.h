@@ -92,7 +92,7 @@ private:
 	double m_BendingMoment[MAXSTATIONS+1];
 	double m_Cp[VLMMATSIZE];		// lift coeffs for each panel
 	double m_G[VLMMATSIZE];			// vortice or doublet strengths
-	double m_Sigma[VLMMATSIZE];		// vortice or doublet strengths
+	double m_Sigma[VLMMATSIZE];		// source strengths
 	double m_FlapMoment[20]; 		// flap hinge moments
 	CVector m_F[MAXSTATIONS];		// Stripforce
 	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge

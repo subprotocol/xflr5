@@ -129,6 +129,10 @@ private:
 	double m_GYm, m_IYm;
 
 	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, VG;
+	CVector Far, u;
+	CVector r0, r1, r2, VL, VR;
+	CVector t;
+	double uv;
 
 	int m_nWakeNodes;
 	int m_NXWakePanels;

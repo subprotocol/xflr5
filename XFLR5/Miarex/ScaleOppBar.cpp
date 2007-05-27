@@ -121,6 +121,7 @@ void CScaleOppBar::Apply()
 	pFrame->m_DownwashScale = m_DownwashScale;
 	if(pFrame->m_iApp == MIAREX){
 		pFrame->Miarex.m_bResetglDownwash = m_bDownwashChanged;
+		pFrame->Miarex.m_bResetglFlow = m_bDownwashChanged;
 		pFrame->Miarex.m_bResetglLift     = m_bLiftChanged;
 		pFrame->Miarex.m_bResetglDrag     = m_bDragChanged;
 	}

@@ -52,12 +52,14 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 	m_pWPolar    = NULL;
 
 	m_AnalysisType = 1;
+
 	m_bVLM1       = true;
 	m_bMiddle     = true;
 	m_bTiltedGeom = false;
 	m_bWakeRollUp = false;
 	m_bViscous    = true;
 	m_bGround     = false;
+
 	m_SymbolFont.CreatePointFont(100, "Symbol");
 	m_UnitType  = 1;
 }
@@ -66,7 +68,6 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-
 	DDX_Control(pDX, IDC_WAKEROLLUP, m_ctrlWakeRollUp);
 	DDX_Control(pDX, IDC_TILTEDGEOM, m_ctrlTiltedGeom);
 	DDX_Control(pDX, IDC_VLM2, m_ctrlVLM2);

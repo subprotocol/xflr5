@@ -98,7 +98,8 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_LEFin.x       = 0.650;
 	m_LEFin.y       =   0.0;
 	m_LEFin.z       =   0.0;
-	
+	m_Volume        =   0.0;
+
 	m_bCheckName    = true;
 	m_bFin          = true;
 	m_bDoubleFin    = false;
@@ -133,6 +134,8 @@ void CPlane::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LEN7, m_ctrlLen7);
 	DDX_Control(pDX, IDC_LEN8, m_ctrlLen8);
 	DDX_Control(pDX, IDC_LEN9, m_ctrlLen9);
+	DDX_Control(pDX, IDC_VOLUME, m_ctrlVolume);
+	DDX_Control(pDX, IDC_VOLUMEUNIT, m_ctrlVolumeUnit);
 	DDX_Control(pDX, IDC_WINGSPAN, m_ctrlWingSpan);
 	DDX_Control(pDX, IDC_WINGSURFACE, m_ctrlWingSurface);
 	DDX_Control(pDX, IDC_WINGTILT, m_ctrlWingTilt);
@@ -223,11 +226,12 @@ BOOL CPlane::OnInitDialog()
 	m_ctrlLen7.SetWindowText(len);
 	m_ctrlLen8.SetWindowText(len);
 	m_ctrlLen9.SetWindowText(len);
-
 		
 	m_ctrlSurf1.SetWindowText(surf);
 	m_ctrlSurf2.SetWindowText(surf);
 	m_ctrlSurf3.SetWindowText(surf);
+
+	m_ctrlVolumeUnit.SetWindowText(len+"3");
 
 	m_ctrlPlaneName.SetWindowText(m_PlaneName);
 
@@ -331,8 +335,6 @@ void CPlane::OnOK()
 		AfxMessageBox(strong, MB_OK);
 		return ;
 	}
-
-
 
 	if(m_bCheckPanels)	CheckPanelDisposition();
 
@@ -662,6 +664,8 @@ void CPlane::SetResults()
 		else total += m_Fin.VLMGetPanelTotal();
 	}
 	m_ctrlVLMTotalPanels.SetValue(total);
+	str.Format("%5.2e", m_Volume*pFrame->m_mtoUnit*pFrame->m_mtoUnit*pFrame->m_mtoUnit);
+	m_ctrlVolume.SetWindowText(str);
 }
 
 
@@ -685,6 +689,13 @@ void CPlane::ComputePlane(void)
 	
 	m_Fin.m_bDoubleFin = m_bDoubleFin;
 	m_Fin.m_bSymFin    = m_bSymFin;
+	m_Volume = m_Wing.m_Volume;
+	if(m_bBiplane)	m_Volume += m_Wing2.m_Volume;
+	if(m_bStab)		m_Volume += m_Stab.m_Volume;
+	if(m_bFin)	{
+		m_Volume += m_Fin.m_Volume;
+		if(m_bDoubleFin || m_bSymFin) m_Volume += m_Fin.m_Volume;
+	}
 }
 
 

@@ -258,12 +258,12 @@ void CWingScaleDlg::OnKillFocusSpanFactor()
 {
 	m_SpanFactor = m_ctrlSpanFactor.GetValue();
 	m_NewSpan = m_InitialSpan * m_SpanFactor;
-	m_ctrlNewSpan.SetValue(m_NewSpan);
+	m_ctrlNewSpan.SetValue(m_NewSpan*m_mtoUnit);
 }
 
 void CWingScaleDlg::OnKillFocusChordFactor() 
 {
 	m_ChordFactor = m_ctrlChordFactor.GetValue();
 	m_NewChord = m_InitialChord * m_ChordFactor;
-	m_ctrlNewChord.SetValue(m_NewChord);
+	m_ctrlNewChord.SetValue(m_NewChord*m_mtoUnit);
 }

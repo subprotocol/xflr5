@@ -105,9 +105,10 @@ void CPanel::SetFrame(CVector LA, CVector LB, CVector TA, CVector TB)
 	CtrlPt.y = (yA+yB)/2.0;
 	CtrlPt.z = (zA+zB)/2.0;
 
-	CollPt.x = (LA.x+LB.x+TA.x+TB.x)/4.0;
-	CollPt.y = (LA.y+LB.y+TA.y+TB.y)/4.0;
-	CollPt.z = (LA.z+LB.z+TA.z+TB.z)/4.0;
+	CollPt = (LA + LB + TA + TB)/4.0;
+//	CollPt.x = (LA.x+LB.x+TA.x+TB.x)/4.0;
+//	CollPt.y = (LA.y+LB.y+TA.y+TB.y)/4.0;
+//	CollPt.z = (LA.z+LB.z+TA.z+TB.z)/4.0;
 
 	//Use VSAERO figure 8. p23
 	if(m_iPos>=0)	m = (LB + TB) *0.5 - CollPt;

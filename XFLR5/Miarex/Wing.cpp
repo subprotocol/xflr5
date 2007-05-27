@@ -168,6 +168,7 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 	m_Span      = 0.0;
 	m_CvPrec    = 0.01;
 	m_Area      = 0.0;
+	m_Volume    = 0.0;
 	m_AR        = 0.0;// Aspect ratio
 	m_TR        = 0.0;// Taper ratio
 	m_GChord    = 0.0;// mean geometric chord
@@ -225,6 +226,7 @@ void CWing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SYMETRIC, m_ctrlSymetric);
 	DDX_Control(pDX, IDC_PANELLIST, m_ctrlPanelList);
 	DDX_Control(pDX, IDC_AREA, m_ctrlArea);
+	DDX_Control(pDX, IDC_VOLUMEUNIT, m_ctrlVolumeUnit);
 	DDX_Control(pDX, IDC_LENGTH3, m_ctrlLength3);
 	DDX_Control(pDX, IDC_LENGTH2, m_ctrlLength2);
 	DDX_Control(pDX, IDC_LENGTH1, m_ctrlLength1);
@@ -236,6 +238,7 @@ void CWing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MEANCHORD, m_ctrlMeanChord);
 	DDX_Control(pDX, IDC_TAPERRATIO, m_ctrlTaperRatio);
 	DDX_Control(pDX, IDC_SURFACE, m_ctrlSurface);
+	DDX_Control(pDX, IDC_VOLUME, m_ctrlVolume);
 	DDX_Control(pDX, IDC_WINGCOLOR, m_ctrlWingColor);
 	DDX_Control(pDX, IDC_ASPECTRATIO, m_ctrlAspectRatio);
 	DDX_Control(pDX, IDC_VLMPANELS, m_ctrlVLMPanels);
@@ -326,7 +329,8 @@ BOOL CWing::OnInitDialog()
 	m_ctrlLength3.SetWindowText(len);
 	m_ctrlLength5.SetWindowText(len);
 	m_ctrlArea.SetWindowText(surf);
-	
+	m_ctrlVolumeUnit.SetWindowText(len+"3");
+
 	CFoil*pFoil= NULL;
 
 	m_ctrlWingName.SetWindowText(m_WingName);
@@ -433,6 +437,9 @@ void CWing::SetResults()
 
 	str.Format("%7.2f", m_Area*pFrame->m_m2toUnit);
 	m_ctrlSurface.SetWindowText(str);
+
+	str.Format("%5.2e", m_Volume*pFrame->m_mtoUnit*pFrame->m_mtoUnit*pFrame->m_mtoUnit);
+	m_ctrlVolume.SetWindowText(str);
 
 	str.Format("%5.2f", m_Span*pFrame->m_mtoUnit);
 	m_ctrlSpan.SetWindowText(str);
@@ -948,8 +955,12 @@ void CWing::Duplicate(CWing *pWing)
 void CWing::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
-
+	CMainFrame *pFrame  = (CMainFrame*)m_pFrame;
+	CMiarex    *pMiarex = (CMiarex*)m_pMiarex;
+	CFoil *pFoilA, *pFoilB;
+	double MinPanelSize;
 	int i;
+
 	double surface = 0.0;
 	m_TLength[0] = 0.0;
 	m_TYProj[0]  = m_TPos[0];
@@ -960,16 +971,22 @@ void CWing::ComputeGeometry()
 		m_TYProj[i] = m_TYProj[i-1] + m_TLength[i] * cos(m_TDihedral[i-1]*pi/180.0);
 	}
 
-	m_Span = 2.0 * m_TPos[m_NPanel]; 
+	m_Span    = 2.0 * m_TPos[m_NPanel]; 
 	m_MAChord = 0.0;
-	m_yMac   = 0.0;
+	m_yMac    = 0.0;
+	m_Volume  = 0.0;
 	for (int k=0; k<m_NPanel; k++){
-		surface  += m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0;//m²
+		pFoilA = pFrame->GetFoil(m_RFoil[k]);
+		pFoilB = pFrame->GetFoil(m_RFoil[k+1]);
+		surface   += m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0;//m²
+		if(pFoilA && pFoilB) 
+			m_Volume  += m_TLength[k+1]*(pFoilA->GetArea()*m_TChord[k] + pFoilB->GetArea()*m_TChord[k+1])/2.0;//m3
 		m_MAChord += IntegralC2(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
-		m_yMac   += IntegralCy(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
+		m_yMac    += IntegralCy(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 	}
 	if(!m_bIsFin){
-		m_Area = 2.0 * surface;
+		m_Area    = 2.0 * surface;
+		m_Volume *= 2.0;
 		m_MAChord = m_MAChord * 2.0 / m_Area;
 		m_yMac    = m_yMac   * 2.0 / m_Area;
 
@@ -989,11 +1006,7 @@ void CWing::ComputeGeometry()
 	else						m_TR = 99999.0;
 
 	//calculate the number of flaps
-	CMainFrame *pFrame  = (CMainFrame*)m_pFrame;
-	CMiarex    *pMiarex = (CMiarex*)m_pMiarex;
 	m_nFlaps = 0;
-	CFoil *pFoilA, *pFoilB;
-	double MinPanelSize;
 	if(pMiarex->m_MinPanelSize>0.0) MinPanelSize = pMiarex->m_MinPanelSize;
 	else                            MinPanelSize = m_Span;
 
@@ -4092,7 +4105,7 @@ void CWing::PanelComputeWing(double *Ai,    double *Cp,
 			bPointOutRe = false;
 			bPointOutCl = false;
 			StripForce.Set(0.0,0.0,0.0);//sum lift of all panels along chord
-			StripArea    = 0.0;
+			StripArea   = 0.0;
 			CP          = 0.0;
 			m_CmAirf[m] = 0.0;
 
@@ -4109,7 +4122,7 @@ void CWing::PanelComputeWing(double *Ai,    double *Cp,
 			LeverArm.RotateY(m_Alpha);
 
 			for (l=0; l<2*m_Surface[j].m_NXPanels; l++){
-				PanelForce = m_pPanel[p].Normal * Cp[p] * m_pPanel[p].Area;
+				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
 
 				LeverArmC4 = m_pPanel[p].CollPt- PtC4;
 				LeverArmC4.RotateY(m_Alpha);
@@ -4135,15 +4148,18 @@ void CWing::PanelComputeWing(double *Ai,    double *Cp,
 				CP        += m_pPanel[p].CollPt.x * NForce;
 
 				p++;
-			}
-		
+//if(l==m_Surface[j].m_NXPanels-1) TRACE("%d    %10.5f", m, StripForce.z);
 
-			m_Cl[m]  = 2.0*StripForce.z/StripArea/m_QInf;
+			}
+//	TRACE("    %10.5f\n", StripForce.z);
+			StripArea /=2.0; //average over top and bottom
+
+			m_Cl[m]  = StripForce.z/StripArea;
 			m_CL    +=     StripForce.z;
 
-			m_F[m]  = StripForce *2.0/StripArea/m_QInf;
+			m_F[m]  = StripForce *StripArea;
 
-			m_CmAirf[m]     *=    2.0/chord/StripArea/m_QInf;//vectorial formulation
+			m_CmAirf[m]     *=    1.0/chord/StripArea/m_QInf;//vectorial formulation
 
 			NForce = StripForce.dot(Normal);
 			

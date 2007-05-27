@@ -62,7 +62,7 @@ CWPolar::CWPolar(CWnd* pParent)
 	m_Weight    = 1.0;
 	m_XCmRef    = 0.0;
 	m_ASpec     = 0.0;
-	m_WArea  = 0.0;
+	m_WArea     = 0.0;
 	m_WMAChord  = 0.0;
 	m_WSpan     = 0.0;
 	m_AMem      = 0.0;
@@ -273,7 +273,7 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar << m_Type;
 		ar << (float)m_QInf;
 		ar << (float)m_Weight;
-		ar << (float)m_ASpec;
+		ar << (float)m_ASpec ;
 		ar << (float)m_XCmRef;
 		ar <<(float)m_Density << (float)m_Viscosity;
 
@@ -429,18 +429,16 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		}
 		m_Type = n;
 
-		ar >> f;
-		m_QInf = f;;
-		ar >> f;
-		m_Weight = f;
-		ar >> f;
-		m_ASpec = f;
+		ar >> f;	m_QInf = f;
+		ar >> f;	m_Weight = f;
+		ar >> f;	m_ASpec = f;
+
 		if(ArchiveFormat>=1002) {
 			ar >> f; m_XCmRef = f;
 		}
 
-		ar >> f; m_Density=f;
-		ar >> f; m_Viscosity=f;
+		ar >> f;	m_Density=f;
+		ar >> f;	m_Viscosity=f;
 
 		ar >> n;
 		if (n<0 || n> 100000){

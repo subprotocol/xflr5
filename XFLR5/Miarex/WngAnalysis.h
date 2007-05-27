@@ -156,6 +156,7 @@ private:
 	DECLARE_MESSAGE_MAP()
 
 
+public:
 };
 
 //{{AFX_INSERT_LOCATION}}

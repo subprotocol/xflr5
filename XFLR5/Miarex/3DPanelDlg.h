@@ -45,36 +45,34 @@ protected:
 	CVector P1, P2, P3, P4;
 
 	CEdit m_ctrlOutput;
-	virtual void DoDataExchange(CDataExchange* pDX);    // Prise en charge DDX/DDV
+	virtual void DoDataExchange(CDataExchange* pDX);    
+
 	bool Gauss(double *A, int n, double *B, int m);
 	bool CreateMatrix();
-	bool CreateRHS();
+	bool CreateRHS(double V0, double VDelta, int nval);
 	bool StartPanelThread();
 	bool SolveMultiple(double V0, double VDelta, int nval);
+	bool ComputeOnBody(double *Mu, double *Sigma, double frac);
+	bool ComputeSurfSpeeds(double *Mu, double *Sigma, double frac);
 	void AddString(CString strong);
 	void ComputePlane(double V0, double VDelta, int nrhs);
-	void ComputeSurfaceSpeed(double *Mu, double *Sigma);
 	void EndSequence();
-	void SetProgress(int p);
+	void SetProgress(int progress,double fraction);
 	void SetFileHeader();
+	void SourceNACA4023(CVector TestPt,  int K, CVector &V, double &phi);
+	void DoubletNACA4023(CVector TestPt, int K, CVector &V, double &phi);
+	void SourcePotentialKP(int p,  CVector C, double &phi);
+	void DoubletPotentialKP(int p, CVector C, double &phi);
+	void SourceVelocityKP(int p,  CVector C, CVector &V);
+	void DoubletVelocityKP(int p, CVector C, CVector &V);
 
-	void Source(int J,  int K, CVector &V, double &phi);
-	void Doublet(int J, int K, CVector &V, double &phi);
-
-	void SourcePotential(int p,  CVector C, double &phi);
-	void DoubletPotential(int p, CVector C, double &phi);
-	void SourceVelocity(int p,  CVector C, CVector &V);
-	void DoubletVelocity(int p, CVector C, CVector &V);
-
-	CVector GetSpeedVector(CVector Pt, double *Mu, double *Sigma);
+	CVector GetSpeedVector(CVector C, double *Mu, double *Sigma);
 
 	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
 	double m_RHS[VLMMATSIZE*100];			// RHS vector
 	double m_Sigma[VLMMATSIZE];				// Source strengths
 	double m_Mu[VLMMATSIZE];				// Doublet strengths
-
-//	double m_row[VLMMATSIZE*100];
-	double m_Cp[VLMMATSIZE];//lift coef per panel
+	double m_Cp[VLMMATSIZE];				//lift coef per panel
 
 	double m_3DQInf[100];
 
@@ -93,6 +91,7 @@ protected:
 	bool m_b3DSymetric;
 	bool m_bPointOut;
 	bool m_bConverged;
+	bool m_bNeumann;// true if Neumann boundary conditions, false if Dirichlet
 
 	double pi;
 	double m_Alpha;//Angle of Attack in °
@@ -123,12 +122,13 @@ protected:
 	int m_nNodes;
 	int m_MatSize;
 	int m_NSurfaces;
-
+	int m_Progress;
 	int RFF;
 
 	CString m_strOut;
 	CString m_VersionName;
 
+	double m_row[VLMMATSIZE];
 //	CPanel *m_pRefPanels;
 //	CVector *m_pRefNodes;
 //	CSurface *m_pRefSurfaces;
