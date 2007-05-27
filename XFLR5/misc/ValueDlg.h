@@ -33,15 +33,17 @@
 class CValueDlg : public CDialog
 {
 	friend class CXDirect;
+	friend class CMiarex;
 // Construction
 public:
 	CValueDlg(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CValueDlg)
-	enum { IDD = IDD_GAPDLG };
+	enum { IDD = IDD_VALUEDLG };
 	CFloatEdit	m_ctrlValue;
-
+	CButton m_ctrlText1;
+	CButton m_ctrlText2;
 	//}}AFX_DATA
 
 
@@ -55,6 +57,9 @@ public:
 // Implementation
 protected:
 	double m_Value;
+	CString m_WindowText;
+	CString m_Text1;
+	CString m_Text2;
 	// Generated message map functions
 	//{{AFX_MSG(CValueDlg)
 	virtual void OnOK();

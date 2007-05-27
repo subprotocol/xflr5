@@ -35,7 +35,7 @@ class CPrefsDlg : public CDialog
 // Construction
 public:
 	CPrefsDlg(CWnd* pParent = NULL);   // standard constructor
-
+ 
 // Dialog Data
 	//{{AFX_DATA(CPrefsDlg)
 	enum { IDD = IDD_PREFERENCES };
@@ -82,10 +82,11 @@ protected:
 	COLORREF m_DownwashColor;
 
 // XFLR5 foil settings
-	COLORREF m_crFoilColor, m_crBLColor, m_crPressureColor;
+	COLORREF m_crFoilColor, m_crBLColor, m_crPressureColor, m_crMomentColor;
 	int m_iFoilStyle, m_iFoilWidth;
 	int m_iBLStyle, m_iBLWidth;
 	int m_iPressureStyle, m_iPressureWidth;
+	int m_iMomentStyle, m_iMomentWidth;
 
 
 

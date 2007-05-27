@@ -30,27 +30,28 @@
 
 
 /////////////////////////////////////////////////////////////////////////////
-// CSettingsDlg dialog
+// C3DColorDlg dialog
 
 
-CSettingsDlg::CSettingsDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CSettingsDlg::IDD, pParent)
+C3DColorDlg::C3DColorDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(C3DColorDlg::IDD, pParent)
 {
-	//{{AFX_DATA_INIT(CSettingsDlg)
+	//{{AFX_DATA_INIT(C3DColorDlg)
 	//}}AFX_DATA_INIT
 	m_pParent = pParent;
+
 }
 
  
-void CSettingsDlg::DoDataExchange(CDataExchange* pDX)
+void C3DColorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CSettingsDlg)
+	//{{AFX_DATA_MAP(C3DColorDlg)
 	DDX_Control(pDX, IDC_VLMMESH, m_ctrlVLMMesh);
-//	DDX_Control(pDX, IDC_WINGSURFACES, m_ctrlWingSurfaces);
 	DDX_Control(pDX, IDC_DOWNWASH, m_ctrlDownwash);
 	DDX_Control(pDX, IDC_WAKE, m_ctrlWake);
 	DDX_Control(pDX, IDC_XCP, m_ctrlXCP);
+	DDX_Control(pDX, IDC_MOMENTS, m_ctrlMoments);
 	DDX_Control(pDX, IDC_IDRAG, m_ctrlIDrag);
 	DDX_Control(pDX, IDC_VDRAG, m_ctrlVDrag);
 	DDX_Control(pDX, IDC_BOTTRANS, m_ctrlBotTrans);
@@ -60,13 +61,14 @@ void CSettingsDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CSettingsDlg, CDialog)
-	//{{AFX_MSG_MAP(CSettingsDlg)
+BEGIN_MESSAGE_MAP(C3DColorDlg, CDialog)
+	//{{AFX_MSG_MAP(C3DColorDlg)
 	ON_WM_DRAWITEM()
 	ON_BN_CLICKED(IDC_WINGOUTLINE, OnWingColor)
 	ON_BN_CLICKED(IDC_TOPTRANS, OnTopTrans)
 	ON_BN_CLICKED(IDC_BOTTRANS, OnBotTrans)
 	ON_BN_CLICKED(IDC_XCP, OnXCP)
+	ON_BN_CLICKED(IDC_MOMENTS, OnMoments)
 	ON_BN_CLICKED(IDC_IDRAG, OnIDrag)
 	ON_BN_CLICKED(IDC_VDRAG, OnVDrag)
 	ON_BN_CLICKED(IDC_DOWNWASH, OnDownwash)
@@ -76,12 +78,12 @@ BEGIN_MESSAGE_MAP(CSettingsDlg, CDialog)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CSettingsDlg message handlers
+// C3DColorDlg message handlers
 
 
 
 
-void CSettingsDlg::OnWingColor() 
+void C3DColorDlg::OnWingColor() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_OutlineColor);
@@ -97,7 +99,7 @@ void CSettingsDlg::OnWingColor()
 	
 }
 
-void CSettingsDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) 
+void C3DColorDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) 
 {
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
@@ -248,6 +250,35 @@ void CSettingsDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 //		FillBrush.DeleteObject();
 //		pDC->Detach();
 	}
+	else if(nIDCtl==IDC_MOMENTS ){
+		LOGBRUSH lb;
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = RGB(100,100,100);
+		CPen DotPen(PS_GEOMETRIC | PS_DOT, 1, &lb);
+		CPen *pOldPen =  pDC->SelectObject(&DotPen);
+		CBrush FillBrush(GetSysColor(COLOR_3DFACE));
+		CBrush* pOldBrush = pDC->SelectObject(&FillBrush);
+		CRect SRect ;
+		GetDlgItem(IDC_MOMENTS)->GetClientRect(&SRect);
+		SRect.DeflateRect(2,2,2,2);
+		pDC->Rectangle(&SRect);
+
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor =m_MomentColor;
+		CPen BotPen(PS_GEOMETRIC | m_MomentStyle, GetPenWidth(m_MomentWidth,false), &lb);
+
+		pDC->SelectObject(&BotPen);
+
+		pDC->MoveTo(5,8);
+		pDC->LineTo(SRect.right-5,8);
+
+		pDC->SelectObject(pOldPen);
+		BotPen.DeleteObject();
+
+		pDC->SelectObject(pOldBrush);
+//		FillBrush.DeleteObject();
+//		pDC->Detach();
+	}
 	else if(nIDCtl==IDC_VDRAG ){
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
@@ -371,7 +402,7 @@ void CSettingsDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 }
 
-void CSettingsDlg::OnTopTrans() 
+void C3DColorDlg::OnTopTrans() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_TopColor);
@@ -386,7 +417,7 @@ void CSettingsDlg::OnTopTrans()
 	m_ctrlTopTrans.Invalidate(true);	
 }
 
-void CSettingsDlg::OnBotTrans() 
+void C3DColorDlg::OnBotTrans() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_BotColor);
@@ -401,7 +432,7 @@ void CSettingsDlg::OnBotTrans()
 	m_ctrlBotTrans.Invalidate(true);	
 	
 }
-void CSettingsDlg::OnIDrag() 
+void C3DColorDlg::OnIDrag() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_IDragColor);
@@ -416,7 +447,7 @@ void CSettingsDlg::OnIDrag()
 	m_ctrlIDrag.Invalidate(true);
 }
 
-void CSettingsDlg::OnVDrag() 
+void C3DColorDlg::OnVDrag() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_VDragColor);
@@ -431,7 +462,7 @@ void CSettingsDlg::OnVDrag()
 	m_ctrlVDrag.Invalidate(true);
 }
 
-void CSettingsDlg::OnXCP() 
+void C3DColorDlg::OnXCP() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_XCPColor);
@@ -445,8 +476,21 @@ void CSettingsDlg::OnXCP()
 	}
 	m_ctrlXCP.Invalidate(true);
 }
+void C3DColorDlg::OnMoments() 
+{
+	CLinePickerDlg LPdlg;
+	LPdlg.SetColor(m_MomentColor);
+	LPdlg.SetStyle(m_MomentStyle);
+	LPdlg.SetWidth(m_MomentWidth);
 
-void CSettingsDlg::OnDownwash() 
+	if (IDOK==LPdlg.DoModal()){
+		m_MomentColor = LPdlg.GetColor();
+		m_MomentStyle = LPdlg.GetStyle();
+		m_MomentWidth = LPdlg.GetWidth();
+	}
+	m_ctrlMoments.Invalidate(true);
+}
+void C3DColorDlg::OnDownwash() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_DownwashColor);
@@ -461,7 +505,7 @@ void CSettingsDlg::OnDownwash()
 	m_ctrlDownwash.Invalidate(true);		
 }
 
-void CSettingsDlg::OnWake() 
+void C3DColorDlg::OnWake() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_WakeColor);
@@ -478,14 +522,14 @@ void CSettingsDlg::OnWake()
 
 
 
-//DEL BOOL CSettingsDlg::OnInitDialog() 
+//DEL BOOL C3DColorDlg::OnInitDialog() 
 //DEL {
 //DEL 	CDialog::OnInitDialog();
 //DEL 	
 //DEL 	return TRUE;  
 //DEL }
 
-void CSettingsDlg::OnVLMMesh() 
+void C3DColorDlg::OnVLMMesh() 
 {
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_VLMColor);

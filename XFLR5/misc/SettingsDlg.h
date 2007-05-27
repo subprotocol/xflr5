@@ -25,29 +25,29 @@
 //
 
 /////////////////////////////////////////////////////////////////////////////
-// CSettingsDlg dialog
+// C3DColorDlg dialog
 #include "FloatEdit.h"
 #include "NumEdit.h"
 #include "ClrClasses.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// CSettingsDlg dialog
+// C3DColorDlg dialog
 
-class CSettingsDlg : public CDialog
+class C3DColorDlg : public CDialog
 {     
 	friend class CMainFrame;
 // Construction
 public:
-	CSettingsDlg(CWnd* pParent = NULL);   // standard constructor
+	C3DColorDlg(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CSettingsDlg)
-	enum { IDD = IDD_SETTINGSLDG };
+	//{{AFX_DATA(C3DColorDlg)
+	enum { IDD = IDD_3DCOLORDLG };
 	CButton	m_ctrlVLMMesh;
-//	CClrBtn	m_ctrlWingSurfaces;
 	CButton	m_ctrlDownwash;
 	CButton	m_ctrlWake;
 	CButton	m_ctrlXCP;
+	CButton	m_ctrlMoments;
 	CButton	m_ctrlIDrag, m_ctrlVDrag;
 	CButton	m_ctrlBotTrans;
 	CButton	m_ctrlTopTrans;
@@ -57,7 +57,7 @@ public:
 
 // Overrides
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CSettingsDlg)
+	//{{AFX_VIRTUAL(C3DColorDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
@@ -79,6 +79,8 @@ private:
 	COLORREF m_BotColor;
 	int m_XCPStyle, m_XCPWidth;
 	COLORREF m_XCPColor;
+	int m_MomentStyle, m_MomentWidth;
+	COLORREF m_MomentColor;
 	int m_IDragStyle, m_IDragWidth;
 	COLORREF m_IDragColor;
 	int m_VDragStyle, m_VDragWidth;
@@ -89,12 +91,13 @@ private:
 	COLORREF m_WakeColor;
 
 	// Generated message map functions
-	//{{AFX_MSG(CSettingsDlg)
+	//{{AFX_MSG(C3DColorDlg)
 	afx_msg void OnWingColor();
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnTopTrans();
 	afx_msg void OnBotTrans();
 	afx_msg void OnXCP();
+	afx_msg void OnMoments();
 	afx_msg void OnIDrag();
 	afx_msg void OnVDrag();
 	afx_msg void OnDownwash();

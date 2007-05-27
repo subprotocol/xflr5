@@ -46,6 +46,8 @@ void CValueDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CValueDlg)
 	DDX_Control(pDX, IDC_VALUE, m_ctrlValue);
+	DDX_Control(pDX, IDC_TEXT1, m_ctrlText1);
+	DDX_Control(pDX, IDC_TEXT2, m_ctrlText2);
 
 	//}}AFX_DATA_MAP
 }
@@ -68,6 +70,10 @@ void CValueDlg::OnOK()
 BOOL CValueDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	SetWindowText(m_WindowText);
+	m_ctrlText1.SetWindowText(m_Text1);
+	m_ctrlText2.SetWindowText(m_Text2);
 
 	m_ctrlValue.SetPrecision(4);
 	m_ctrlValue.SetValue(m_Value);
