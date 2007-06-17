@@ -174,23 +174,14 @@ BOOL CXFLR5App::InitInstance()
 	//Trace("CX5App::InitInstance::MainFrame created=", pFrame);
 	//Trace("CX5App::InitInstance::ChildView created=", &(pFrame->m_wndView));
 
-	// create and load the frame with its resources
-
-	pFrame->LoadFrame(IDR_MAINFRAME,
-		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,
-		NULL);
-
-	//load previously saved size and position
-
 	CFile fp;
-	int k,x,y,cx,cy;
-	int l,t,r,b;
+	int k,x,y,cx,cy,l,t,r,b;
 	UINT showCmd;
 
+	//load previously saved size and position
 	CString str, strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
 	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
 	strAppDirectory = szAppPath;
 	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
  	str =strAppDirectory + "XFLR5.set";
@@ -209,6 +200,12 @@ BOOL CXFLR5App::InitInstance()
 		//  we're reading/loading
 			ar >> l >> t >> r >> b >> showCmd;
 			x=l; y=t; cx = max(r-l,200); cy = max(b-t,200);
+//			pFrame->m_wndRect.SetRect(l,t,r,b);
+			pFrame->m_wndpl.rcNormalPosition.left   = l;
+			pFrame->m_wndpl.rcNormalPosition.right  = r;
+			pFrame->m_wndpl.rcNormalPosition.top    = t;
+			pFrame->m_wndpl.rcNormalPosition.bottom = b;
+			pFrame->m_wndpl.showCmd = showCmd;
 			ar.Close();
 			fp.Close();
 		}
@@ -219,6 +216,11 @@ BOOL CXFLR5App::InitInstance()
 	catch (CException *ex){
 		ex->Delete();
 	}
+
+	// create and load the frame with its resources
+	pFrame->LoadFrame(IDR_MAINFRAME,WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,	NULL);
+
+	//set previously saved size and position
 	pFrame->SetWindowPos(&CWnd::wndTop, x, y, cx, cy,SWP_NOREDRAW);
 	pFrame->ShowWindow(showCmd);
 	
@@ -231,7 +233,6 @@ BOOL CXFLR5App::InitInstance()
 
 		if (app == MIAREX)			pFrame->OnMiarex();
 		if (app == XFOILANALYSIS)	pFrame->OnXDirect();
-
 	}
 	
 	//Trace("CX5App::InitInstance::App launched successfully");
@@ -962,7 +963,7 @@ void Trace(int n)
 	SYSTEMTIME tm;
 	GetLocalTime(&tm);
 	CString str;
-	str.Format("time = %2d:%2d:%2d.%03d    nnn=%d \n", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds,n);
+	str.Format("time = %2d:%2d:%2d.%03d    nnn=%d \r\n", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds,n);
 	tf.WriteString(str);
 
 	tf.Close();
@@ -977,7 +978,7 @@ void Trace(CString msg)
 	CString str;
 	str.Format("time = %2d:%2d:%2d.%03d  ", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
 	str += msg;
-	str += "\n";
+	str += "\r\n";
 	CStdioFile tf;
 	tf.Open(((CXFLR5App*)AfxGetApp())->TraceFileName, CFile::modeWrite | CFile::typeText);
 	tf.SeekToEnd();
@@ -1001,7 +1002,7 @@ void Trace(CString msg, int n)
 	CString str;
 	str.Format("time = %2d:%2d:%2d.%03d  ", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
 	str += strong;
-	str += "\n";
+	str += "\r\n";
 	tf.WriteString(str);
 	tf.Close();
 }
@@ -1020,7 +1021,7 @@ void Trace(CString msg, double f)
 	CString str;
 	str.Format("time = %2d:%2d:%2d.%03d  ", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
 	str += strong;
-	str += "\n";
+	str += "\r\n";
 	tf.WriteString(str);
 
 	tf.Close();
@@ -1040,7 +1041,7 @@ void Trace(CString msg, void *p)
 	CString str;
 	str.Format("time = %2d:%2d:%2d.%03d  ", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
 	str += strong;
-	str += "\n";
+	str += "\r\n";
 	tf.WriteString(str);
 
 	tf.Close();

@@ -69,8 +69,7 @@
 #define IMX 64// number of complex mapping coefficients  Cn
 #define IMX4 16 // = IMX/4 added arcds
 
-#define V_ENDTHREAD (WM_APP+10) //to notify parent window that the thread has ended
-#define W_ENDTHREAD (WM_APP+11)
+//#define V_ENDTHREAD (WM_APP+1) //to notify parent window that the analysis thread has ended
 
 
 #define QUESTION (BB || !BB) //Shakespeare

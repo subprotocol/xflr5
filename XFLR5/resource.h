@@ -44,7 +44,6 @@
 #define IDS_MAXCAMBER                   148
 #define IDD_NAMEDLG                     149
 #define IDS_MAXCAMBERPOS                149
-#define IDD_PANELDLG                    150
 #define IDS_UPPERTRANS                  150
 #define IDD_2DPANELDLG                  150
 #define IDS_LOWERTRANS                  151
@@ -70,7 +69,6 @@
 #define IDR_CTXDESIGNMENU               187
 #define IDR_CTXWNGMENU                  188
 #define IDR_CTXMAINMENU                 193
-#define IDM_XFLR5_MENU                  195
 #define IDM_XDIRECT_MENU                195
 #define IDD_FOILANALYSISDLG             204
 #define IDD_UNITSDLG                    212
@@ -80,7 +78,6 @@
 #define IDR_CTXXDIRECTPLRMENU           220
 #define IDR_CTXWINGPLRMENU              221
 #define IDD_EDITPLRDLG                  222
-#define IDR_CTXXFLR5FOILMENU            223
 #define IDR_CTXXDIRECTFOILMENU          223
 #define IDD_GRIDDLG                     224
 #define IDD_FONTDLG                     225
@@ -100,7 +97,6 @@
 #define IDD_POLARBAR                    261
 #define IDD_OPERDLGBAR                  262
 #define IDD_AFOILCTRLBAR                263
-#define IDD_GAPDLG                      264
 #define IDD_VALUEDLG                    264
 #define IDR_DOCUMENT                    265
 #define IDD_PRINTOPTIONSDLG             269
@@ -131,6 +127,7 @@
 #define IDS_FOILNORMALIZATION           348
 #define IDS_FORCEDUPPERTRANS            349
 #define IDS_FORCEDLOWERTRANS            350
+#define ID_THREADTIMER                  351
 #define IDC_SHOWPRESSURE                1001
 #define IDC_REMAX                       1003
 #define IDC_REYNOLDS                    1004
@@ -218,7 +215,6 @@
 #define IDC_IDRAG                       1110
 #define IDC_DOWNWASH                    1111
 #define IDC_WAKE                        1112
-#define IDC_XCP2                        1113
 #define IDC_MOMENTS                     1113
 #define IDC_CL                          1114
 #define IDC_VDRAG                       1114
@@ -377,14 +373,12 @@
 #define IDC_STOREWOPP                   1325
 #define IDC_INITCALC                    1326
 #define IDC_KEEPOUTOPPS                 1328
-#define IDC_XFLR5FOILBAR                1329
 #define IDC_XDIRECTFOILBAR              1329
 #define IDC_REFFOIL                     1330
 #define IDC_SHOW                        1331
 #define IDC_MODFOIL                     1332
 #define IDC_MIAREXWANABAR               1333
 #define IDC_SPLINESTYLE                 1334
-#define IDC_XFLR5ANABAR                 1335
 #define IDC_XDIRECTANABAR               1335
 #define IDC_POLARBAR                    1336
 #define IDC_MIAREXW3DBAR                1338
@@ -619,8 +613,6 @@
 #define IDC_OTHERCLR                    5040
 #define IDD_ITERDLG                     5115
 #define IDD_LISTPLRDLG                  5116
-#define IDD_SETTINGSLDG                 5117
-#define IDD_PREFSDLG                    5117
 #define IDD_3DCOLORDLG                  5117
 #define IDD_WOPERDLGBAR                 5119
 #define IDD_VLMDLG                      5120
@@ -711,7 +703,6 @@
 #define IDC_CBWING                      32830
 #define IDM_AFOIL_SFSAVE                32832
 #define IDC_CBWPLR                      32833
-#define IDM_LOADXFLR5POLAR              32834
 #define IDT_ZOOMLESS                    32835
 #define IDC_CBWOPP                      32836
 #define IDM_SINGLEGRAPH                 32837
@@ -776,7 +767,6 @@
 #define IDM_ADDPOINT                    32907
 #define IDM_XFLR5_SHOWUSERGRAPH         32908
 #define IDM_RESETQGRAPH                 32908
-#define IDM_XFLR5DEFINEUSERGRAPH        32909
 #define IDM_XFLR5_GRAPHOPTIONS          32910
 #define IDM_RESETGRAPH                  32911
 #define IDM_XFLR5_CPGRAPH               32912
@@ -788,7 +778,6 @@
 #define IDM_XFLR5_BATCHANALYSIS         32919
 #define IDT_LOAD                        32920
 #define IDC_FOILSTYLE                   32921
-#define IDM_EXPORTXFOIL                 32922
 #define IDM_EXPORTTOAPP                 32924
 #define IDT_PRINT                       32925
 #define IDM_COLORSTYLES                 32926
@@ -801,7 +790,6 @@
 #define IDC_STOREFOIL                   32935
 #define IDM_SHOWREF                     32937
 #define IDM_SHOWMOD                     32938
-#define IDM_SHOWCONTROLS                32939
 #define IDT_ZOOMIN                      32940
 #define IDM_AFOIL_LOAD                  32941
 #define IDT_ZOOMOUT                     32943
@@ -813,15 +801,12 @@
 #define IDM_QVISC                       32949
 #define ID_APP_OPEN                     32951
 #define IDM_LOAD                        32952
-#define IDM_SHOWPOINTS                  32953
-#define IDM_XFLR5_ALLFOUR               32954
 #define IDM_INITXFOIL2                  32955
 #define IDC_PEDIT                       32956
 #define IDC_IPEDIT                      32957
 #define IDM_DELETEWPOLARS               32958
 #define IDM_DELETEWOPPS                 32959
 #define IDM_FOURGRAPHS                  32960
-#define IDM_EDITPLANE                   32961
 #define IDM_PREFERENCES                 32962
 #define IDM_EXPORTWOPP                  32963
 #define IDM_SELECTFOIL                  32964
@@ -955,20 +940,8 @@
 #define ID_CURRENTFOIL_MANAGEFOILS      33201
 #define IDM_INSERTBEFORE                33204
 #define IDM_FOILDIRECTDESIGN            33215
-#define IDM_EXPORTRESULTS               33225
-#define IDM_RESETREFCURVES              33228
-#define IDM_SHOWREFCURVES               33230
-#define IDM_STOREREFCURVE               33232
 #define IDM_SHOWCPGRAPH                 33234
-#define IDM_EXIT                        33235
-#define IDM_LOADPOLAR                   33236
-#define IDM_SHOWCPOINTS                 33237
-#define IDM_SINGLEWINGGRAPH             33238
-#define IDT_SAVE                        33239
-#define IDM_XFLOW                       33240
-#define IDM_CHORDCP                     33241
 #define IDC_MFC                         33242
-#define IDM_NEWSPLINES                  33243
 #define IDM_EXPORTVLMPANELS             33251
 #define IDM_SHOWWING2                   33253
 #define IDM_RECENTFILE3                 33257

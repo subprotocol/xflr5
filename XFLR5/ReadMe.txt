@@ -47,16 +47,38 @@ Licence :
 
 
                        **************************
+                       
+v3.21e June 17th,2007
+	Trouble with internal messaging issues :
+	- 	Deleted all V/W_ENDTHREAD messages, replaced them with idle loop checking for end of analysis
+	
+v3.21d June 6th,2007
+	Trouble with internal messaging issues :
+	- 	Removed autoclose of dialog box in XDirect single analysis
 
-TODO :
+v3.21c June 2nd,2007
+	Trouble with internal messaging issues :
+	- Restored the  V_ENDTHREAD and W_ENDTHREAD parameters and changed them to WM_APP+1
 
-v3.20 April xxx,2007
-	Introduced a Biblane option in wing analysis
+v3.21b June 2nd,2007
+	Trouble with internal messaging issues :
+	- Deleted V_ and W_ENDTHREAD parameters and replaced them by EndDialog(0) messages
+
+v3.21a May xxxth,2007
+	Improved some cosmetic aspects
+
+v3.21_Beta May 27th,2007
+	Added tentative volume calculations to plane and wing definitions
+	
+v3.20 May 4th,2007
+	Introduced a Biplane option in wing analysis
 	Corrected the tail volume calculation for V-Tails
 	Introduced an option to edit spline ctrl points coordinates
 	Released the constraint on spline leading and trailing points to allow their translation
 	Added Recent File management
-	Corrected the initilization of the Inverse Design to take into account the latest foil loaded in XFoil
+	Removed the foil's automatic length normalization : operation will need to be performed manually
+	Corrected the initialization of the Inverse Design to take into account the latest foil loaded in XFoil
+	Introduced Moment display in the Wing 3D view
 	Corrected a few minor cosmetic bugs
 	
 

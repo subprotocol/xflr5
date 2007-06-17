@@ -76,7 +76,7 @@ BEGIN
     CONTROL         "Lift",IDC_SHOWLIFT,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,9,163,27,8
     CONTROL         "Downw.",IDC_DOWNWASH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,163,41,8
+                    WS_TABSTOP,46,193,41,8
     CONTROL         "IDrag",IDC_SHOWICD,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,9,172,33,10
     CONTROL         "VDrag",IDC_SHOWVCD,"Button",BS_AUTOCHECKBOX | 
@@ -88,7 +88,7 @@ BEGIN
     CONTROL         "Cp",IDC_CL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,193,
                     30,8
     CONTROL         "Stream",IDC_STREAM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,192,38,10
+                    WS_TABSTOP,46,202,38,10
     CONTROL         "Anim.",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,9,202,33,10
     CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | 
@@ -101,86 +101,89 @@ BEGIN
     GROUPBOX        "Display",IDC_STATIC,4,143,85,94
     LTEXT           "Slow",IDC_STATIC,9,226,20,8
     RTEXT           "Fast",IDC_STATIC,64,226,20,8
+    CONTROL         "Mom.",IDC_SHOWMOMENTS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,46,163,33,8
 END
 
-IDD_WNGANALYSIS DIALOGEX 0, 0, 323, 295
+IDD_WNGANALYSIS DIALOGEX 0, 0, 323, 305
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Polar Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Auto Analysis Name",IDC_AUTONAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,22,26,76,8
-    EDITTEXT        IDC_WPOLARNAME,106,24,208,13,ES_AUTOHSCROLL
+                    BS_AUTOCHECKBOX | WS_TABSTOP,22,24,76,8
+    EDITTEXT        IDC_WPOLARNAME,106,22,208,13,ES_AUTOHSCROLL
     CONTROL         "Type 1 (Fixed Speed)",IDC_WTYPE1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,20,50,83,10
+                    BS_AUTORADIOBUTTON | WS_GROUP,20,52,83,10
     CONTROL         "Type 2 (Fixed Lift)",IDC_WTYPE2,"Button",
-                    BS_AUTORADIOBUTTON,122,50,72,10
+                    BS_AUTORADIOBUTTON,122,52,72,10
     CONTROL         "Type 4 (Fixed Alpha)",IDC_WTYPE4,"Button",
-                    BS_AUTORADIOBUTTON,214,50,81,10
-    EDITTEXT        IDC_QINF,86,82,40,12,ES_RIGHT
-    EDITTEXT        IDC_WEIGHT,86,96,40,12,ES_RIGHT
-    EDITTEXT        IDC_ALPHA,86,111,40,12,ES_RIGHT
-    EDITTEXT        IDC_XCMREF,86,125,40,12,ES_RIGHT
+                    BS_AUTORADIOBUTTON,214,52,81,10
+    EDITTEXT        IDC_QINF,86,84,40,12,ES_RIGHT
+    EDITTEXT        IDC_WEIGHT,86,98,40,12,ES_RIGHT
+    EDITTEXT        IDC_ALPHA,86,113,40,12,ES_RIGHT
+    EDITTEXT        IDC_XCMREF,86,127,40,12,ES_RIGHT
     CONTROL         "LLT",IDC_METHOD1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    20,162,29,10
-    CONTROL         "VLM",IDC_METHOD2,"Button",BS_AUTORADIOBUTTON,20,174,31,
+                    20,163,29,10
+    CONTROL         "VLM",IDC_METHOD2,"Button",BS_AUTORADIOBUTTON,20,175,31,
                     10
     CONTROL         "3D Panels",IDC_METHOD3,"Button",BS_AUTORADIOBUTTON,20,
-                    211,49,10
+                    200,49,10
     CONTROL         "Classic ",IDC_VLM1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,40,187,40,10
-    CONTROL         "Quads",IDC_VLM2,"Button",BS_AUTORADIOBUTTON,40,199,37,
+                    WS_GROUP,62,175,40,10
+    CONTROL         "Quads",IDC_VLM2,"Button",BS_AUTORADIOBUTTON,62,187,37,
                     10
     CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,84,167,47,8
+                    WS_TABSTOP,21,233,47,8
     CONTROL         "Top/Bottom",IDC_TOPBOTTOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,84,176,54,10
+                    WS_TABSTOP,93,232,54,10
     CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,84,189,57,8
+                    WS_TABSTOP,93,247,57,8
     CONTROL         "Wake Roll-Up",IDC_WAKEROLLUP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,84,199,57,8
+                    WS_TABSTOP,21,247,57,8
     CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,196,165,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,165,
+                    WS_GROUP,196,166,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,166,
                     39,8
-    EDITTEXT        IDC_DENSITY,208,183,41,12,ES_RIGHT
-    EDITTEXT        IDC_VISCOSITY,208,200,41,12,ES_RIGHT
+    EDITTEXT        IDC_DENSITY,208,181,41,12,ES_RIGHT
+    EDITTEXT        IDC_VISCOSITY,208,198,41,12,ES_RIGHT
     CONTROL         "Ground Effect",IDC_GROUNDEFFECT,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,64,245,67,8
-    EDITTEXT        IDC_HEIGHT,208,243,41,12,ES_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,80,274,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,194,274,50,14
-    GROUPBOX        "Polar Type",IDC_STATIC,14,39,301,26
-    LTEXT           "Free Stream Speed",IDC_STATIC,18,83,61,8
-    RTEXT           "Plane Weight",IDC_STATIC,24,98,55,8
-    LTEXT           "m/s",IDC_SPEEDUNIT,130,83,20,8
-    LTEXT           "kg",IDC_WEIGHTUNIT,128,98,20,8
-    RTEXT           "Root Re =",IDC_REROOT,174,98,58,8
-    RTEXT           "Tip Re =",IDC_RETIP,174,111,58,8
-    RTEXT           "Static",IDC_RRE,254,98,50,8
-    RTEXT           "Static",IDC_SRE,254,111,50,8
-    LTEXT           "Wing Name",IDC_WINGNAME,24,11,247,8
-    RTEXT           "Angle of Attack",IDC_STATIC,24,112,55,8
-    LTEXT           "°",IDC_STATIC,128,112,8,8
-    RTEXT           "Wing Loading",IDC_STATIC,188,83,45,8
-    RTEXT           "Static",IDC_WINGLOAD,236,83,34,8
-    LTEXT           "kg/dm²",IDC_WLUNIT,278,83,25,8
-    RTEXT           "r =",IDC_RHO,182,184,15,13
-    LTEXT           "kg/m3",IDC_SDENSITY,258,184,41,8
-    RTEXT           "n =",IDC_NU,180,202,17,12
-    LTEXT           "m²/s",IDC_SVISCOSITY,258,202,41,8
-    GROUPBOX        "Airplane and Flight Data",IDC_STATIC,14,69,144,77
-    GROUPBOX        "Aerodynamic Data",IDC_STATIC,164,151,151,76
-    LTEXT           "Unit",IDC_STATIC,174,165,14,8
-    GROUPBOX        "Flight Characteristics",IDC_STATIC,164,69,151,77
-    RTEXT           "QInf =",IDC_QINFSTAT,174,125,58,8
-    RTEXT           "Static",IDC_QINFCL,254,125,50,8
-    GROUPBOX        "Solution method",IDC_STATIC,14,151,144,76
-    RTEXT           "Mom. ref. location",IDC_STATIC,18,128,60,8
-    LTEXT           "mm",IDC_LENGTHUNIT,128,128,20,8
-    GROUPBOX        "Ground effect",IDC_STATIC,14,232,301,29
-    RTEXT           "Height =",IDC_STATIC,172,245,28,8
-    LTEXT           "mm",IDC_LENGTHUNIT2,254,245,25,8
+                    BS_AUTOCHECKBOX | WS_TABSTOP,181,233,67,8
+    EDITTEXT        IDC_HEIGHT,216,247,41,12,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,80,283,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,194,283,50,14
+    GROUPBOX        "Polar Type",IDC_STATIC,6,41,309,26
+    LTEXT           "Free Stream Speed",IDC_STATIC,18,85,61,8
+    RTEXT           "Plane Weight",IDC_STATIC,24,100,55,8
+    LTEXT           "m/s",IDC_SPEEDUNIT,130,85,20,8
+    LTEXT           "kg",IDC_WEIGHTUNIT,128,100,20,8
+    RTEXT           "Root Re =",IDC_REROOT,170,100,58,8
+    RTEXT           "Tip Re =",IDC_RETIP,170,113,58,8
+    RTEXT           "Static",IDC_RRE,254,100,50,8
+    RTEXT           "Static",IDC_SRE,254,113,50,8
+    LTEXT           "Wing Name",IDC_WINGNAME,11,11,247,8
+    RTEXT           "Angle of Attack",IDC_STATIC,24,114,55,8
+    LTEXT           "°",IDC_STATIC,128,114,8,8
+    RTEXT           "Wing Loading",IDC_STATIC,183,85,45,8
+    RTEXT           "Static",IDC_WINGLOAD,236,85,34,8
+    LTEXT           "kg/dm²",IDC_WLUNIT,278,85,25,8
+    RTEXT           "r =",IDC_RHO,182,182,15,13
+    LTEXT           "kg/m3",IDC_SDENSITY,258,182,41,8
+    RTEXT           "n =",IDC_NU,180,200,17,12
+    LTEXT           "m²/s",IDC_SVISCOSITY,258,200,41,8
+    GROUPBOX        "Airplane and Flight Data",IDC_STATIC,6,71,151,77
+    GROUPBOX        "Aerodynamic Data",IDC_STATIC,164,152,151,63
+    LTEXT           "Unit",IDC_STATIC,174,166,14,8
+    GROUPBOX        "Flight Characteristics",IDC_STATIC,164,71,151,77
+    RTEXT           "QInf =",IDC_QINFSTAT,170,127,58,8
+    RTEXT           "Static",IDC_QINFCL,254,127,50,8
+    GROUPBOX        "Solution method",IDC_STATIC,6,152,151,63
+    RTEXT           "Mom. ref. location",IDC_STATIC,18,129,60,8
+    LTEXT           "mm",IDC_LENGTHUNIT,128,129,20,8
+    GROUPBOX        "Ground effect",IDC_STATIC,164,219,151,50
+    RTEXT           "Height =",IDC_STATIC,180,249,28,8
+    LTEXT           "mm",IDC_LENGTHUNIT2,262,249,25,8
+    GROUPBOX        "Options",IDC_STATIC,6,219,151,50
 END
 
 IDD_WINGSCALEDLG DIALOG  0, 0, 331, 193
@@ -234,36 +237,36 @@ BEGIN
     CONTROL         "Symetric",IDC_SYMETRIC,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,19,37,41,8
     CONTROL         "Right Wing",IDC_SIDE2,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,27,47,52,8
-    CONTROL         "Left Wing",IDC_SIDE1,"Button",BS_AUTORADIOBUTTON,27,57,
+                    WS_GROUP,72,37,52,8
+    CONTROL         "Left Wing",IDC_SIDE1,"Button",BS_AUTORADIOBUTTON,72,49,
                     50,8
     CONTROL         "Color",IDC_WINGCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    89,36,59,14
-    PUSHBUTTON      "Reset VLM Mesh",IDC_VLMMESH,89,56,60,14
-    EDITTEXT        IDC_VLMPANELS,230,56,40,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    23,69,59,11
+    PUSHBUTTON      "Reset VLM Mesh",IDC_VLMMESH,94,68,59,11
+    EDITTEXT        IDC_VLMPANELS,236,69,45,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER
     CONTROL         "",IDC_PANELLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
                     WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,76,462,86,WS_EX_RIGHT
+                    WS_TABSTOP,7,88,462,86,WS_EX_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,164,322,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,293,322,50,14
     LTEXT           "Wing Name",IDC_STATIC,16,18,38,8
-    GROUPBOX        "Wing Data",IDC_STATIC,7,7,461,65
+    GROUPBOX        "Wing Data",IDC_STATIC,7,7,461,78
     RTEXT           "Wing Span",IDC_STATIC,197,15,42,8
     RTEXT           "Aspect Ratio",IDC_STATIC,346,25,42,8
     RTEXT           "Taper Ratio",IDC_STATIC,346,35,42,8
     RTEXT           "Area",IDC_STATIC,197,25,42,8
-    RTEXT           "Mean Geom. Chord",IDC_STATIC,177,35,61,8
-    RTEXT           "Mean Aero. Chord",IDC_STATIC,177,45,61,8
-    LTEXT           "mm",IDC_LENGTH1,285,15,16,8
-    LTEXT           "dm²",IDC_AREA,285,25,20,8
-    LTEXT           "mm",IDC_LENGTH2,285,35,20,8
-    LTEXT           "mm",IDC_LENGTH3,285,45,20,8
-    RTEXT           "Span",IDC_SPAN,249,15,30,8
-    RTEXT           "Surf",IDC_SURFACE,249,25,30,8
-    RTEXT           "chm",IDC_MEANCHORD,249,35,30,8
-    RTEXT           "aec",IDC_AEROCHORD,249,45,30,8
+    RTEXT           "Mean Geom. Chord",IDC_STATIC,177,47,61,8
+    RTEXT           "Mean Aero. Chord",IDC_STATIC,177,57,61,8
+    LTEXT           "mm",IDC_LENGTH1,298,15,16,8
+    LTEXT           "dm²",IDC_AREA,298,25,20,8
+    LTEXT           "mm",IDC_LENGTH2,298,47,20,8
+    LTEXT           "mm",IDC_LENGTH3,298,57,20,8
+    RTEXT           "Span",IDC_SPAN,250,15,44,8
+    RTEXT           "Surf",IDC_SURFACE,250,25,44,8
+    RTEXT           "chm",IDC_MEANCHORD,250,47,44,8
+    RTEXT           "aec",IDC_AEROCHORD,250,57,44,8
     RTEXT           "AR",IDC_ASPECTRATIO,398,25,30,8
     RTEXT           "TR",IDC_TAPERRATIO,398,35,30,8
     RTEXT           "M.A.C. Span Pos",IDC_STATIC,326,15,61,8
@@ -272,10 +275,13 @@ BEGIN
     RTEXT           "Root to Tip Sweep",IDC_STATIC,328,45,60,8
     RTEXT           "00",IDC_SWEEP,398,45,30,8
     LTEXT           "°",IDC_STATIC,434,44,11,10
-    RTEXT           "Total VLM Panels",IDC_STATIC,164,58,61,8
-    LTEXT           "(Max is 1000)",IDC_STATIC,278,58,43,8
+    RTEXT           "Total VLM Panels",IDC_STATIC,170,71,61,8
+    LTEXT           "(Max is 1000)",IDC_STATIC,289,71,43,8
     RTEXT           "Number of Flaps",IDC_STATIC,328,56,59,8
     RTEXT           "00",IDC_NFLAPS,398,56,30,8
+    RTEXT           "Volume",IDC_STATIC,197,36,42,8
+    LTEXT           "m3",IDC_VOLUMEUNIT,298,36,20,8
+    RTEXT           "Vol",IDC_VOLUME,250,36,44,8
 END
 
 IDD_WGRAPHVARDLG DIALOGEX 0, 0, 186, 202
@@ -375,8 +381,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Viscous Iterations"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    PUSHBUTTON      "Cancel Analysis",IDCANCEL,163,185,76,14
-    PUSHBUTTON      "Skip OpPoint",IDC_SKIP,50,185,76,14
+    PUSHBUTTON      "Cancel Analysis",IDCANCEL,179,185,64,14
+    PUSHBUTTON      "Skip OpPoint",IDC_SKIP,55,185,64,14
 END
 
 IDD_USERVARDLG DIALOG  0, 0, 274, 305
@@ -524,10 +530,10 @@ BEGIN
     LTEXT           "% Chord",IDC_STATIC,84,62,28,8
 END
 
-IDD_SETTINGSLDG DIALOG  0, 0, 212, 215
+IDD_3DCOLORDLG DIALOGEX 0, 0, 212, 231
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Preferences"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Outline",IDC_WINGOUTLINE,"Button",BS_OWNERDRAW | 
                     BS_NOTIFY | WS_TABSTOP,115,11,72,11
@@ -540,24 +546,27 @@ BEGIN
     CONTROL         "Button4",IDC_XCP,"Button",BS_OWNERDRAW | BS_NOTIFY | 
                     WS_TABSTOP,115,83,72,11
     CONTROL         "Button5",IDC_DOWNWASH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,137,72,11
-    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | 
                     WS_TABSTOP,115,155,72,11
-    DEFPUSHBUTTON   "OK",IDOK,36,190,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,124,190,50,14
+    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,173,72,11
+    DEFPUSHBUTTON   "OK",IDOK,35,206,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,124,206,50,14
     LTEXT           "Wing Outline",IDC_STATIC,23,12,76,8
     LTEXT           "Top Transition",IDC_STATIC,23,48,76,8
     LTEXT           "Bottom Transition",IDC_STATIC,23,66,76,8
-    LTEXT           "Centre of Pressure",IDC_STATIC,23,84,76,8
-    LTEXT           "Downwash",IDC_STATIC,23,138,76,8
+    LTEXT           "Lift",IDC_STATIC,23,84,51,8
+    LTEXT           "Downwash",IDC_STATIC,23,156,76,8
     LTEXT           "VLM Mesh",IDC_STATIC,24,30,76,8
-    LTEXT           "Wake panels",IDC_STATIC,23,156,76,8
+    LTEXT           "Wake panels",IDC_STATIC,23,174,76,8
     CONTROL         "DragStyle",IDC_IDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,101,72,11
-    LTEXT           "Induced Drag",IDC_STATIC,23,102,76,8
-    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
                     WS_TABSTOP,115,119,72,11
-    LTEXT           "Viscous Drag",IDC_STATIC,23,120,76,8
+    LTEXT           "Induced Drag",IDC_STATIC,23,120,76,8
+    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,137,72,11
+    LTEXT           "Viscous Drag",IDC_STATIC,23,138,76,8
+    CONTROL         "Button5",IDC_MOMENTS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,101,72,11
+    LTEXT           "Moments",IDC_STATIC,23,102,51,8
 END
 
 IDD_SELECTFOILDLG DIALOG  0, 0, 300, 226
@@ -580,7 +589,7 @@ BEGIN
     LTEXT           "Downwash scale",IDC_STATIC,7,50,55,8
     CONTROL         "",IDC_LIFTSCALE,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,7,16,80,12
-    LTEXT           "Liftline scale",IDC_STATIC,7,8,40,8
+    LTEXT           "Lift and Moment Scale",IDC_STATIC,7,8,72,8
     CONTROL         "",IDC_DRAGSCALE,"msctls_trackbar32",TBS_AUTOTICKS | 
                     WS_TABSTOP,7,37,80,12
     LTEXT           "Drag scale",IDC_STATIC,7,29,35,8
@@ -750,72 +759,72 @@ BEGIN
     PUSHBUTTON      "Export",IDC_EXPORTWING,21,66,31,12
     EDITTEXT        IDC_WINGTILT,97,64,31,12,ES_RIGHT
     CONTROL         "Elevator",IDC_STAB,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,100,42,10
-    EDITTEXT        IDC_XLESTAB,41,134,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLESTAB,41,150,31,12,ES_RIGHT
-    EDITTEXT        IDC_STABTILT,41,170,30,12,ES_RIGHT
+                    WS_TABSTOP,18,97,42,10
+    EDITTEXT        IDC_XLESTAB,43,125,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLESTAB,43,153,31,12,ES_RIGHT
+    EDITTEXT        IDC_STABTILT,43,168,31,12,ES_RIGHT
     CONTROL         "Check Panels on Exit",IDC_CHECKPANELS,"Button",
-                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,24,186,126,
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,27,245,126,
                     15
     CONTROL         "Fin",IDC_FIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,
-                    100,25,10
-    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,98,31,12
-    EDITTEXT        IDC_XLEFIN,200,130,31,12,ES_RIGHT
-    EDITTEXT        IDC_YLEFIN,200,145,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLEFIN,200,159,31,12,ES_RIGHT
-    EDITTEXT        IDC_FINTILT,200,176,31,12,ES_RIGHT
+                    97,25,10
+    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,96,31,12
+    EDITTEXT        IDC_XLEFIN,197,125,31,12,ES_RIGHT
+    EDITTEXT        IDC_YLEFIN,197,139,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEFIN,197,153,31,12,ES_RIGHT
+    EDITTEXT        IDC_FINTILT,197,168,31,12,ES_RIGHT
     CONTROL         "Symetric Fin",IDC_SYMFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,253,133,54,10
+                    WS_TABSTOP,256,127,54,10
     CONTROL         "Double Fin",IDC_DOUBLEFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,253,146,50,10
+                    WS_TABSTOP,256,140,50,10
     CONTROL         "Identical",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,257,160,43,10
+                    WS_GROUP,260,154,43,10
     CONTROL         "Left and Right",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,
-                    257,172,61,10
+                    260,166,61,10
     DEFPUSHBUTTON   "OK",IDOK,78,268,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,191,268,50,14
-    RTEXT           "Stab Volume",IDC_STABVOLUME,246,234,35,8
-    GROUPBOX        "Elevator",IDC_STATIC,6,86,139,117
-    LTEXT           "LE Position",IDC_STATIC,37,120,36,8
-    RTEXT           "x",IDC_STATIC,27,136,8,8
-    RTEXT           "z",IDC_STATIC,27,152,8,8
-    LTEXT           "LE Position",IDC_STATIC,192,119,36,8
-    RTEXT           "x",IDC_STATIC,171,132,8,8
-    RTEXT           "z",IDC_STATIC,171,161,8,8
-    GROUPBOX        "Fin",IDC_STATIC,152,86,183,117
-    RTEXT           "Elev. Area",IDC_STABSURFACE,84,222,35,8
-    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,222,35,8
-    RTEXT           "Fin Area",IDC_FINSURFACE,84,234,35,8
-    RTEXT           "Tilt Angle",IDC_STATIC,9,172,30,8
+    RTEXT           "Stab Volume",IDC_STABVOLUME,246,220,35,8
+    GROUPBOX        "Elevator",IDC_STATIC,6,86,139,102
+    LTEXT           "LE Position",IDC_STATIC,37,114,36,8
+    RTEXT           "x",IDC_STATIC,27,127,8,8
+    RTEXT           "z",IDC_STATIC,27,155,8,8
+    LTEXT           "LE Position",IDC_STATIC,189,113,36,8
+    RTEXT           "x",IDC_STATIC,168,127,8,8
+    RTEXT           "z",IDC_STATIC,168,155,8,8
+    GROUPBOX        "Fin",IDC_STATIC,152,86,183,102
+    RTEXT           "Elev. Area",IDC_STABSURFACE,83,208,43,8
+    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,208,35,8
+    RTEXT           "Fin Area",IDC_FINSURFACE,83,220,43,8
+    RTEXT           "Tilt Angle",IDC_STATIC,9,170,30,8
     LTEXT           "Name",IDC_STATIC,7,9,20,8
     RTEXT           "Tilt Angle",IDC_STATIC,63,66,30,8
-    RTEXT           "Wing Span",IDC_WINGSPAN,246,209,35,8
-    RTEXT           "Wing Area",IDC_WINGSURFACE,84,209,35,8
-    LTEXT           "dm²",IDC_SURF1,128,209,21,8
-    LTEXT           "dm²",IDC_SURF2,128,222,21,8
-    LTEXT           "dm²",IDC_SURF3,128,234,21,8
-    LTEXT           "mm",IDC_LEN1,290,209,15,8
-    LTEXT           "mm",IDC_LEN2,290,222,15,8
-    RTEXT           "Wing Area =",IDC_STATIC,11,209,66,8
-    RTEXT           "Elevator Area =",IDC_STATIC,11,222,66,8
-    RTEXT           "Fin Area =",IDC_STATIC,11,234,66,8
-    RTEXT           "Wing Span =",IDC_STATIC,172,209,66,8
-    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,222,66,8
-    RTEXT           "Tail Volume =",IDC_STATIC,172,235,66,8
+    RTEXT           "Wing Span",IDC_WINGSPAN,246,196,35,8
+    RTEXT           "Wing Area",IDC_WINGSURFACE,83,196,43,8
+    LTEXT           "dm²",IDC_SURF1,133,196,21,8
+    LTEXT           "dm²",IDC_SURF2,133,208,21,8
+    LTEXT           "dm²",IDC_SURF3,133,220,21,8
+    LTEXT           "mm",IDC_LEN1,290,196,15,8
+    LTEXT           "mm",IDC_LEN2,290,208,15,8
+    RTEXT           "Wing Area =",IDC_STATIC,11,196,66,8
+    RTEXT           "Elevator Area =",IDC_STATIC,11,208,66,8
+    RTEXT           "Fin Area =",IDC_STATIC,11,220,66,8
+    RTEXT           "Wing Span =",IDC_STATIC,172,196,66,8
+    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,208,66,8
+    RTEXT           "Tail Volume =",IDC_STATIC,172,220,66,8
     GROUPBOX        "Main Wing",IDC_STATIC,7,23,139,61
-    RTEXT           "y",IDC_STATIC,171,147,8,8
+    RTEXT           "y",IDC_STATIC,168,141,8,8
     LTEXT           "°",IDC_SURF4,135,65,8,8
-    LTEXT           "°",IDC_SURF5,77,172,8,8
-    RTEXT           "total",IDC_VLMTOTALPANELS,84,246,35,8
-    RTEXT           "Total Panels =",IDC_STATIC,11,246,66,8
-    LTEXT           "mm",IDC_LEN3,234,132,15,8
-    LTEXT           "mm",IDC_LEN4,234,147,15,8
-    LTEXT           "mm",IDC_LEN5,234,161,15,8
-    LTEXT           "mm",IDC_LEN6,76,136,15,8
-    LTEXT           "mm",IDC_LEN7,76,153,15,8
-    RTEXT           "Tilt Angle",IDC_STATIC,165,178,30,8
-    LTEXT           "°",IDC_SURF6,239,178,8,8
-    PUSHBUTTON      "Define",IDC_DEFINEELEV,72,97,31,12
+    LTEXT           "°",IDC_SURF5,80,170,8,8
+    RTEXT           "total",IDC_VLMTOTALPANELS,246,232,35,8
+    RTEXT           "Total Panels =",IDC_STATIC,172,232,66,8
+    LTEXT           "mm",IDC_LEN3,231,127,15,8
+    LTEXT           "mm",IDC_LEN4,231,141,15,8
+    LTEXT           "mm",IDC_LEN5,231,155,15,8
+    LTEXT           "mm",IDC_LEN6,79,127,15,8
+    LTEXT           "mm",IDC_LEN7,79,155,15,8
+    RTEXT           "Tilt Angle",IDC_STATIC,162,170,30,8
+    LTEXT           "°",IDC_SURF6,236,170,8,8
+    PUSHBUTTON      "Define",IDC_DEFINEELEV,72,96,31,12
     PUSHBUTTON      "Define",IDC_DEFINEWING2,203,36,31,12
     PUSHBUTTON      "Import",IDC_IMPORTWING2,203,51,31,12
     PUSHBUTTON      "Export",IDC_EXPORTWING2,203,65,31,12
@@ -831,6 +840,9 @@ BEGIN
     LTEXT           "mm",IDC_LEN8,309,38,15,8
     LTEXT           "mm",IDC_LEN9,309,53,15,8
     GROUPBOX        "Biplane",IDC_STATIC,152,23,183,61
+    RTEXT           "Volume",IDC_VOLUME,83,232,43,8
+    LTEXT           "m3",IDC_VOLUMEUNIT,133,232,21,8
+    RTEXT           "Plane Volume =",IDC_STATIC,11,232,66,8
 END
 
 IDD_PERTDLG DIALOGEX 0, 0, 240, 239
@@ -932,7 +944,7 @@ BEGIN
     LISTBOX         IDC_LIST,7,75,223,135,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
                     NOT WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE | 
                     WS_EX_STATICEDGE
-    LTEXT           "Noms existants",IDC_STATIC,7,62,111,11
+    LTEXT           "Existing names",IDC_STATIC,7,62,111,11
 END
 
 IDD_NACADLG DIALOG  0, 0, 186, 105
@@ -1343,16 +1355,16 @@ BEGIN
     LTEXT           "0 %",IDC_STATIC,210,82,18,11
 END
 
-IDD_GAPDLG DIALOG  0, 0, 199, 95
+IDD_VALUEDLG DIALOGEX 0, 0, 199, 95
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "TE Gap"
-FONT 8, "MS Sans Serif"
+CAPTION "Window Title"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,30,74,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,110,74,50,14
-    EDITTEXT        IDC_VALUE,98,37,34,13,ES_RIGHT
-    RTEXT           "New gap value :",IDC_QUESTION,24,39,67,8
-    LTEXT           "%chord",IDC_QUESTION4,139,39,24,8
+    DEFPUSHBUTTON   "OK",IDOK,32,74,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,112,74,50,14
+    EDITTEXT        IDC_VALUE,88,37,52,13,ES_RIGHT
+    RTEXT           "Text 1",IDC_TEXT1,14,39,67,8
+    LTEXT           "Text 2",IDC_TEXT2,147,39,21,8
 END
 
 IDD_FONTDLG DIALOG  0, 0, 203, 107
@@ -1851,7 +1863,7 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5 v3.20",IDC_STATIC,41,14,75,8,SS_NOPREFIX
+    LTEXT           "XFLR5 v3.21e",IDC_STATIC,41,14,75,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,175,50,14,WS_GROUP
     LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
                     IDC_STATIC,10,42,185,8
@@ -1862,7 +1874,7 @@ BEGIN
     LTEXT           "http://xflr5.sourceforge.net",IDC_SLINK,7,146,98,9
     LTEXT           "This program is distributed in the hope that it will be useful,",
                     IDC_STATIC,10,82,230,8
-    LTEXT           "Copyright (C) André Deperrois 2003-2006",IDC_STATIC,10,
+    LTEXT           "Copyright (C) André Deperrois 2003-2007",IDC_STATIC,10,
                     64,130,8
     LTEXT           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
                     IDC_STATIC,10,103,234,8
@@ -2013,7 +2025,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 315
         TOPMARGIN, 7
-        BOTTOMMARGIN, 287
+        BOTTOMMARGIN, 297
     END
 
     IDD_WINGSCALEDLG, DIALOG
@@ -2120,12 +2132,12 @@ BEGIN
         BOTTOMMARGIN, 103
     END
 
-    IDD_SETTINGSLDG, DIALOG
+    IDD_3DCOLORDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 205
         TOPMARGIN, 7
-        BOTTOMMARGIN, 204
+        BOTTOMMARGIN, 220
     END
 
     IDD_SELECTFOILDLG, DIALOG
@@ -2376,7 +2388,7 @@ BEGIN
         BOTTOMMARGIN, 160
     END
 
-    IDD_GAPDLG, DIALOG
+    IDD_VALUEDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 192
@@ -2585,6 +2597,10 @@ BEGIN
         MENUITEM "2 ",                          IDM_RECENTFILE2
         MENUITEM "3 ",                          IDM_RECENTFILE3
         MENUITEM "4 ",                          IDM_RECENTFILE4
+        MENUITEM "5 ",                          IDM_RECENTFILE5
+        MENUITEM "6 ",                          IDM_RECENTFILE6
+        MENUITEM "7  ",                         IDM_RECENTFILE7
+        MENUITEM "8  ",                         IDM_RECENTFILE8
         MENUITEM SEPARATOR
         MENUITEM "E&xit\t(Alt+F4)",             ID_APP_EXIT
     END
@@ -3340,6 +3356,7 @@ BEGIN
         MENUITEM "3D\t(F4)",                    IDM_3DVIEW
         MENUITEM "Operating Point\t(F5)",       IDM_WOPP
         MENUITEM "Polars\t(F8)",                IDM_SHOWPOLAR
+        MENUITEM "Cp View\t(F9)",               IDM_CPVIEW
         MENUITEM SEPARATOR
         MENUITEM "3D Light Options",            33184
         MENUITEM "Streamlines Options",         33186
@@ -3554,6 +3571,8 @@ BEGIN
     BUTTON      IDT_LOAD
     BUTTON      IDM_SAVEPROJECT
     BUTTON      IDM_PRINT
+    SEPARATOR
+    BUTTON      IDM_SELECTFOIL
     BUTTON      IDC_STOREFOIL
     SEPARATOR
     BUTTON      IDT_ZOOMIN
@@ -3885,6 +3904,7 @@ BEGIN
     IDM_FOURGRAPHS          "Show all four graphs"
     IDM_PREFERENCES         "Set calculations preferences and units"
     IDM_EXPORTWOPP          "Export the current operating point to a text file"
+    IDM_SELECTFOIL          "Select a foil from the foil's database and load it for modification"
     IDC_WOPP                "Show operating point"
     IDC_WPOLARS             "Show Polars"
     IDT_WOPP                "Operating point view"
