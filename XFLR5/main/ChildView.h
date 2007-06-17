@@ -86,18 +86,18 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnClrSettings();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
 	afx_msg void OnPaletteChanged(CWnd* pFocusWnd);
 	afx_msg BOOL OnQueryNewPalette();
-	void GLSetupPalette();
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
 
 private:
-	void SaveSettings(CArchive &ar);
 	bool LoadSettings(CArchive &ar);
-	void SetScale();
 	bool GLLoadFont();
 	int GetStringWidth(CString strong);
+	void GLSetupPalette();
+	void SaveSettings(CArchive &ar);
+	void SetScale();
 	void ApplyClrSettings(bool bBW, COLORREF WingPanels, COLORREF XCPColor,
 						  COLORREF XTopColor, COLORREF XBotColor, COLORREF DownwashColor,
 						  COLORREF crFoilColor, COLORREF crBLColor, COLORREF crPressureColor) ;
@@ -112,6 +112,8 @@ private:
 	COLORREF m_crBorderClr;
 	int m_iBorderStyle;
 	int m_iBorderWidth;
+	int m_dz;
+	int m_LetterWidth;
 	bool m_bBorder;
 
 	LOGFONT  m_WndLogFont;
@@ -124,10 +126,8 @@ private:
 	CMiarex* m_pMiarex;
 	CAFoil* m_pAFoil;
 	CXInverse* m_pXInverse;
-	int m_dz;
 
 	Graph m_DefaultGraph;
 
-	int m_LetterWidth;
 };
 

@@ -186,6 +186,9 @@ static UINT indicators[] = // the extra indicator does not work on some PCs
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame construction/destruction
 
+
+
+
 CMainFrame::CMainFrame()
 {
 	pi = 3.141592654;
@@ -193,7 +196,7 @@ CMainFrame::CMainFrame()
 	
 	m_wndView.m_pFrameWnd = this;
 
-	m_VersionName = "XFLR5_v3.21_beta";
+	m_VersionName = "XFLR5_v3.21e";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame     = this;
@@ -429,29 +432,29 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (!m_wndView.Create(NULL, NULL, AFX_WS_DEFAULT_VIEW,
 		CRect(0, 0, 0, 0), this, AFX_IDW_PANE_FIRST, NULL))
 	{
-		Trace("CMainFrame::OnCreate - Failed to create view window\n");
+		Trace("CMainFrame::OnCreate - Failed to create view window");
 		return -1;
 	}
-		Trace("CMainFrame::OnCreate creating status bar\n");
+		Trace("CMainFrame::OnCreate creating status bar");
 
 	if (!m_wndStatusBar.Create(this)){
-		Trace("CMainFrame::OnCreate - Failed to create status bar\n");
+		Trace("CMainFrame::OnCreate - Failed to create status bar");
 		return -1;      // fail to create
 	}
-	Trace("CMainFrame::OnCreate created status bar -1\n");
+	Trace("CMainFrame::OnCreate created status bar -1");
 
 	if(!m_wndStatusBar.SetIndicators(XFLR5indicators, sizeof(XFLR5indicators)/sizeof(UINT)))
 	{
 //		TRACE("CMainFrame::OnCreate - Failed to set extended indicators\n");
 		//try with the reduced indicator list
 		if(!m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT))){
-			Trace("CMainFrame::OnCreate - Failed to set std indicator list\n");
+			Trace("CMainFrame::OnCreate - Failed to set std indicator list");
 			return -1;
 		}
 		else 
-			Trace("CMainFrame::OnCreate - no indicators are set\n");
+			Trace("CMainFrame::OnCreate - no indicators are set");
 	}
-	Trace("CMainFrame::OnCreate created status bar\n");
+	Trace("CMainFrame::OnCreate Indicators are set");
 
 /*	UINT identity, style;
 	int w;
@@ -485,7 +488,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	Trace("CMainFrame::OnCreate - created MIAREX Bar");
 
 	m_OperDlgBar.m_pXDirect = &XDirect;
-	m_OperDlgBar.m_pXFoil  = XDirect.m_pXFoil;
+	m_OperDlgBar.m_pXFoil   = XDirect.m_pXFoil;
 	if (!m_OperDlgBar.Create(this, IDD_OPERDLGBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
 	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_OPERDLGBAR))
 	{ 
@@ -586,8 +589,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_FInvCtrlBar.SetWindowText("Full inverse controls");
 	m_FInvCtrlBar.m_pParent = &XInverse;
 	Trace("CMainFrame::OnCreate - created MInvCtrlBar Bar");
-	
-
 
 	m_MiarexBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_XDirectBar.EnableDocking(CBRS_ALIGN_ANY);
@@ -630,7 +631,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	XInverse.m_pMInvCtrlBar = &m_MInvCtrlBar;
 	XInverse.m_pXInverseBar = &m_XInverseBar;
 
-	m_XDirectMenu.LoadMenu(IDM_XFLR5_MENU);
+	m_XDirectMenu.LoadMenu(IDM_XDIRECT_MENU);
 	m_MiarexMenu.LoadMenu(IDM_MIAREX_MENU);
 	m_AFoilMenu.LoadMenu(IDM_AFOIL_MENU);
 	m_XInverseMenu.LoadMenu(IDM_XINVERSE_MENU);
@@ -3758,70 +3759,21 @@ void CMainFrame::CreateXInverseBar()
 }
 
 
-void CMainFrame::CreateXDirectBar()
-{
-	CClientDC dc(this);
-	int LogPixelsY = dc.GetDeviceCaps(LOGPIXELSY);
-	LOGFONT LgFt; 
-	ZeroMemory(&LgFt, sizeof(LOGFONT));
-	LgFt.lfHeight = - MulDiv(8, LogPixelsY, 72);
-	LgFt.lfWeight = FW_NORMAL;
-	strcpy(LgFt.lfFaceName,"Arial"); 
-	m_FFont.CreateFontIndirect(&LgFt);
-
-	m_XDirectBar.Create(this);
-	m_XDirectBar.LoadToolBar(IDR_XFLR5BAR);
-	m_XDirectBar.SetBarStyle(CBRS_TOP	| CBRS_GRIPPER | CBRS_TOOLTIPS | 
-						   CBRS_FLYBY | CBRS_SIZE_DYNAMIC| CBRS_FLOAT_MULTI);
-
-	m_XDirectBar.SetWindowText("Foil selection");
-
-	int cx = GetSystemMetrics(SM_CXSCREEN);
-	int nWidth=(int)(cx/3);//listbox width
-	int nHeight = 600;
-
-	m_XDirectBar.SetHeight(34);
-
-	int  index = 0;
-    while(m_XDirectBar.GetItemID(index)!=IDC_CBFOIL && index <100) index++;
-	m_XDirectBar.SetButtonInfo(index, IDC_CBFOIL, TBBS_SEPARATOR, nWidth);
-	CRect rect;
-	m_XDirectBar.GetItemRect(index, &rect);
-	rect.bottom = rect.top + nHeight;
-
-	m_ctrlFoil.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT,
-		              rect, &m_XDirectBar, IDC_CBFOIL);
-	m_ctrlFoil.SetFont(&m_FFont);
-
-	index = 0;
-    while(m_XDirectBar.GetItemID(index)!=IDC_CBPLR && index <100) index++;
-	m_XDirectBar.SetButtonInfo(index, IDC_CBPLR, TBBS_SEPARATOR, nWidth);
-	m_XDirectBar.GetItemRect(index, &rect);
-	rect.bottom = rect.top + nHeight;
-	m_ctrlPlr.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT,
-		              rect, &m_XDirectBar, IDC_CBPLR);
-	m_ctrlPlr.SetFont(&m_FFont);
-
-	index = 0;
-    while(m_XDirectBar.GetItemID(index)!=IDC_CBOPP && index <100) index++;
-	m_XDirectBar.SetButtonInfo(index, IDC_CBOPP, TBBS_SEPARATOR, 80);
-	m_XDirectBar.GetItemRect(index, &rect);
-	rect.bottom = rect.top + nHeight;
-	m_ctrlOpp.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST ,
-		              rect, &m_XDirectBar, IDC_CBOPP);
-	m_ctrlOpp.SetFont(&m_FFont);
-
-	m_ctrlFoil.EnableWindow(false);
-	m_ctrlPlr.EnableWindow(false);
-	m_ctrlOpp.EnableWindow(false);
-}
- 
 void CMainFrame::CreateMiarexBar()
 {
+	int cx, nWidth, nHeight, index;
+	CRect rect;
+	if(m_wndpl.showCmd == SW_SHOWMAXIMIZED){
+		cx = GetSystemMetrics(SM_CXSCREEN);
+		nWidth=(int)(cx/3);
+	}
+	else{
+		cx = m_wndpl.rcNormalPosition.right - m_wndpl.rcNormalPosition.left;
+		nWidth = (int)((cx-190)/3);
+	}
 
-	int cx = GetSystemMetrics(SM_CXSCREEN);
-	int nWidth=(int)(cx/3);
-	int nHeight = 600;
+	nWidth = (int)((cx-240-80)/2);
+	nHeight = 600;
 
 	m_MiarexBar.Create(this);
 	m_MiarexBar.LoadToolBar(IDR_MIAREXBAR);
@@ -3831,10 +3783,9 @@ void CMainFrame::CreateMiarexBar()
 	m_MiarexBar.SetWindowText("Wing selection");
 	m_MiarexBar.SetHeight(34);
 
-	int  index = 0;
+	index = 0;
     while(m_MiarexBar.GetItemID(index)!=IDC_CBWING && index <100) index++;
 	m_MiarexBar.SetButtonInfo(index, IDC_CBWING, TBBS_SEPARATOR, nWidth);
-	CRect rect;
 	m_MiarexBar.GetItemRect(index, &rect);
 	rect.bottom = rect.top + nHeight;
 	m_ctrlUFO.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT,
@@ -3864,6 +3815,72 @@ void CMainFrame::CreateMiarexBar()
 	m_ctrlUFO.EnableWindow(false);
 	m_ctrlWPlr.EnableWindow(false);
 	m_ctrlWOpp.EnableWindow(false);
+}
+
+void CMainFrame::CreateXDirectBar()
+{
+	int cx, nWidth, nHeight, index;
+	CRect rect;
+	if(m_wndpl.showCmd == SW_SHOWMAXIMIZED){
+		cx = GetSystemMetrics(SM_CXSCREEN);
+	}
+	else{
+		cx = m_wndpl.rcNormalPosition.right - m_wndpl.rcNormalPosition.left;
+	}
+	nWidth = (int)((cx-210-80)/2);
+
+	CClientDC dc(this);
+	int LogPixelsY = dc.GetDeviceCaps(LOGPIXELSY);
+	LOGFONT LgFt; 
+	ZeroMemory(&LgFt, sizeof(LOGFONT));
+	LgFt.lfHeight = - MulDiv(8, LogPixelsY, 72);
+	LgFt.lfWeight = FW_NORMAL;
+	strcpy(LgFt.lfFaceName,"Arial"); 
+	m_FFont.CreateFontIndirect(&LgFt);
+
+	m_XDirectBar.Create(this);
+	m_XDirectBar.LoadToolBar(IDR_XFLR5BAR);
+	m_XDirectBar.SetBarStyle(CBRS_TOP	| CBRS_GRIPPER | CBRS_TOOLTIPS | 
+						   CBRS_FLYBY | CBRS_SIZE_DYNAMIC| CBRS_FLOAT_MULTI);
+
+	m_XDirectBar.SetWindowText("Foil selection");
+
+
+	nHeight = 600;
+
+	m_XDirectBar.SetHeight(34);
+
+	index = 0;
+    while(m_XDirectBar.GetItemID(index)!=IDC_CBFOIL && index <100) index++;
+	m_XDirectBar.SetButtonInfo(index, IDC_CBFOIL, TBBS_SEPARATOR, nWidth);
+	m_XDirectBar.GetItemRect(index, &rect);
+	rect.bottom = rect.top + nHeight;
+
+	m_ctrlFoil.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT,
+		              rect, &m_XDirectBar, IDC_CBFOIL);
+	m_ctrlFoil.SetFont(&m_FFont);
+
+	index = 0;
+    while(m_XDirectBar.GetItemID(index)!=IDC_CBPLR && index <100) index++;
+	m_XDirectBar.SetButtonInfo(index, IDC_CBPLR, TBBS_SEPARATOR, nWidth);
+	m_XDirectBar.GetItemRect(index, &rect);
+	rect.bottom = rect.top + nHeight;
+	m_ctrlPlr.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_SORT,
+		              rect, &m_XDirectBar, IDC_CBPLR);
+	m_ctrlPlr.SetFont(&m_FFont);
+
+	index = 0;
+    while(m_XDirectBar.GetItemID(index)!=IDC_CBOPP && index <100) index++;
+	m_XDirectBar.SetButtonInfo(index, IDC_CBOPP, TBBS_SEPARATOR, 80);
+	m_XDirectBar.GetItemRect(index, &rect);
+	rect.bottom = rect.top + nHeight;
+	m_ctrlOpp.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST ,
+		              rect, &m_XDirectBar, IDC_CBOPP);
+	m_ctrlOpp.SetFont(&m_FFont);
+
+	m_ctrlFoil.EnableWindow(false);
+	m_ctrlPlr.EnableWindow(false);
+	m_ctrlOpp.EnableWindow(false);
 }
 
 //XOperDlgBar controls
@@ -4120,6 +4137,7 @@ void CMainFrame::OnIndicatorProject(CCmdUI* pCmdUI)
 	pCmdUI->SetText(m_ProjectName);
 //	Trace(m_ProjectName);
 }
+
 
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
@@ -5339,8 +5357,10 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 {
 	CFrameWnd::RecalcLayout(bNotify);
 
-	if (m_iApp == MIAREX) 
+	if (m_iApp == MIAREX) {
+
 		Miarex.SetWPlrLegendPos();
+	}
 	else if (m_iApp==DIRECTDESIGN){
 		CRect ViewRect;
 		m_wndView.GetWindowRect(ViewRect);
@@ -5367,11 +5387,6 @@ void CMainFrame::OnGuidelines()
 	// Extract directory
 	strAppDirectory = szAppPath;
 	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
-/*	TraceFileName = strAppDirectory + "Trace.txt";
-	CStdioFile tf;
-	tf.Open(TraceFileName, CFile::modeCreate | CFile::modeWrite | CFile::typeText);
-	tf.Close();*/
-
 
 	CString strText(strAppDirectory + "Guidelines.pdf");
 	hInstReturn = ShellExecute(GetSafeHwnd(),
@@ -6498,6 +6513,7 @@ void CMainFrame::ShortenFileName(CString &PathName)
 void CMainFrame::OnRecentFile1()
 {
 	if(!LoadProject(m_RecentFile[0])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[0]);
 		m_RecentFile[0] = m_RecentFile[1];
 		m_RecentFile[1] = m_RecentFile[2];
 		m_RecentFile[2] = m_RecentFile[3];
@@ -6514,6 +6530,7 @@ void CMainFrame::OnRecentFile2()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[1])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[1]);
 		m_RecentFile[1] = m_RecentFile[2];
 		m_RecentFile[2] = m_RecentFile[3];
 		m_RecentFile[3] = m_RecentFile[4];
@@ -6534,6 +6551,7 @@ void CMainFrame::OnRecentFile3()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[2])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[2]);
 		m_RecentFile[2] = m_RecentFile[3];
 		m_RecentFile[3] = m_RecentFile[4];
 		m_RecentFile[4] = m_RecentFile[5];
@@ -6554,6 +6572,7 @@ void CMainFrame::OnRecentFile4()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[3])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[3]);
 		m_RecentFile[3] = m_RecentFile[4];
 		m_RecentFile[4] = m_RecentFile[5];
 		m_RecentFile[5] = m_RecentFile[6];
@@ -6574,6 +6593,7 @@ void CMainFrame::OnRecentFile5()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[4])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[4]);
 		m_RecentFile[4] = m_RecentFile[5];
 		m_RecentFile[5] = m_RecentFile[6];
 		m_RecentFile[6] = m_RecentFile[7];
@@ -6595,6 +6615,7 @@ void CMainFrame::OnRecentFile6()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[5])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[5]);
 		m_RecentFile[5] = m_RecentFile[6];
 		m_RecentFile[6] = m_RecentFile[7];
 		m_RecentFile[7].Empty();
@@ -6615,6 +6636,7 @@ void CMainFrame::OnRecentFile7()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[6])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[6]);
 		m_RecentFile[6] = m_RecentFile[7];
 		m_RecentFile[7].Empty();
 	}
@@ -6635,6 +6657,7 @@ void CMainFrame::OnRecentFile8()
 {
 	CString strong;
 	if(!LoadProject(m_RecentFile[7])){
+		AfxMessageBox("Could not find the file\n"+m_RecentFile[7]);
 		m_RecentFile[7].Empty();
 	}
 	else{
@@ -6650,3 +6673,4 @@ void CMainFrame::OnRecentFile8()
 	}
 	SetRecentFileMenu();
 }
+

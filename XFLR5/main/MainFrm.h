@@ -120,6 +120,7 @@ protected:  // control bar embedded members
 	CComboBox m_ctrlWPlr;
 	CComboBox m_ctrlWOpp;
 
+	WINDOWPLACEMENT m_wndpl;
 
 private:
 	void UpdateView();
@@ -362,7 +363,6 @@ protected:
 	afx_msg void OnRecentFile6();
 	afx_msg void OnRecentFile7();
 	afx_msg void OnRecentFile8();
-
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
