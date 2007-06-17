@@ -135,7 +135,7 @@ BEGIN_MESSAGE_MAP(CAFoil, CWnd)
 	ON_COMMAND(IDM_AFOIL_SFSAVE, OnSFSave)
 //	ON_COMMAND(IDM_AFOIL_SFLOAD, OnLoad)
 	ON_COMMAND(IDM_AFOIL_EXPORTSPLINES, OnExportSplines)
-	ON_COMMAND(IDM_NEWSPLINES, OnNewSplines)
+//	ON_COMMAND(IDM_NEWSPLINES, OnNewSplines)
 	ON_COMMAND(IDM_AFOIL_PRINT, OnPrint)
 	ON_COMMAND(IDT_ZOOMIN, OnZoomIn)
 	ON_COMMAND(IDT_ZOOMLESS, OnZoomLess)
@@ -954,7 +954,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				m_pPF->CompMidLine();
 			}
-//			m_pACtrl->FillFoilList();
+			m_pACtrl->FillFoilList();
 		}
 
 		UpdateView();
@@ -2765,7 +2765,8 @@ void CAFoil::OnStoreFoil()
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-
+		Trace("m_iRes_Ext=",m_pSF->m_Extrados.m_iRes);
+		Trace("m_iRes_Int=",m_pSF->m_Intrados.m_iRes);
 		CFoil *pNewFoil = new CFoil();
 		m_pSF->ExportToBuffer(pNewFoil);
 
@@ -2793,6 +2794,7 @@ void CAFoil::OnStoreFoil()
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
+		Trace("m_iPts_Ext=",size);
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) + 1;
 		if(size>IQX2) {
 			CString strong;
@@ -2800,6 +2802,7 @@ void CAFoil::OnStoreFoil()
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
+		Trace("m_iPts_Int=",size);
 
 		CFoil *pNewFoil = new CFoil();
 		m_pPF->ExportToBuffer(pNewFoil);
