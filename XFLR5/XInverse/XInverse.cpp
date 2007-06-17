@@ -105,11 +105,11 @@ BEGIN_MESSAGE_MAP(CXInverse, CWnd)
 	ON_COMMAND(IDT_ZOOMLESS, OnZoomLess)
 	ON_COMMAND(IDM_GRAPHOPTIONS, OnGraphOptions)
 	ON_COMMAND(IDM_RESETGRAPH, OnResetGraph)
-	ON_COMMAND(IDM_SHOWCONTROLS, OnShowControls)
+//	ON_COMMAND(IDM_SHOWCONTROLS, OnShowControls)
 	ON_COMMAND(IDM_PRINT, OnPrint)
 	ON_COMMAND(IDM_QINIT, OnQInit)
 	ON_COMMAND(IDM_QMOD, OnQMod)
-	ON_COMMAND(IDM_SHOWPOINTS, OnShowPoints)
+//	ON_COMMAND(IDM_SHOWPOINTS, OnShowPoints)
 	ON_COMMAND(IDM_EXPORTFOIL, OnExportFoil)
 	ON_COMMAND(IDM_QVISC, OnQVisc)
 	ON_COMMAND(IDM_COLORSTYLES, OnColorStyles)
@@ -130,9 +130,9 @@ BEGIN_MESSAGE_MAP(CXInverse, CWnd)
 	ON_COMMAND(IDM_EXPORTREFFOIL, OnExportFoil)
 	ON_COMMAND(IDC_STOREFOIL, OnStoreFoil)
 	ON_COMMAND(IDT_LOAD, OnLoadFoil)
-	ON_COMMAND(IDM_RESETREFCURVES, OnResetRefCurves)
-	ON_COMMAND(IDM_SHOWREFCURVES, OnShowRefCurves)
-	ON_COMMAND(IDM_STOREREFCURVE, OnStoreRefCurve)
+//	ON_COMMAND(IDM_RESETREFCURVES, OnResetRefCurves)
+//	ON_COMMAND(IDM_SHOWREFCURVES, OnShowRefCurves)
+//	ON_COMMAND(IDM_STOREREFCURVE, OnStoreRefCurve)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -794,8 +794,8 @@ void CXInverse::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			else							pPopup->CheckMenuItem(IDM_QVISC,MF_BYCOMMAND | MF_UNCHECKED);
 			if (m_bShowPoints)				pPopup->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_CHECKED);
 			else							pPopup->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_UNCHECKED);
-			if (m_bRefCurves)				pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
-			else							pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
+//			if (m_bRefCurves)				pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
+//			else							pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
 			
 
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
@@ -2114,8 +2114,8 @@ void CXInverse::CheckMenu()
 	else                         pMenu->CheckMenuItem(IDM_QVISC,MF_BYCOMMAND | MF_UNCHECKED);
 	if (m_bShowPoints)           pMenu->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_CHECKED);
 	else                         pMenu->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_UNCHECKED);
-	if (m_bRefCurves)            pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
-	else                         pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
+//	if (m_bRefCurves)            pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
+//	else                         pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
 
 	
 	pMenu = m_pFrame->GetMenu()->GetSubMenu(3);
