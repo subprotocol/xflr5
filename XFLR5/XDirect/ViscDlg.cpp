@@ -27,6 +27,7 @@
 #include "XDirect.h"
 #include "ViscDlg.h"
 #include "../main/MainFrm.h"
+#include ".\viscdlg.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,7 +78,7 @@ void CViscDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CViscDlg, CDialog)
 	//{{AFX_MSG_MAP(CViscDlg)
-	ON_WM_DESTROY()
+	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_SKIP, OnSkip)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -116,24 +117,6 @@ BOOL CViscDlg::OnInitDialog()
 	m_RmsGraph.SetTitleLogFont(&LgFt);
 	LgFt.lfHeight = - MulDiv(8, dc.GetDeviceCaps(LOGPIXELSY), 72);
 	m_RmsGraph.SetLabelLogFont(&LgFt);
-
-	m_pIterThread = new CViscThread(this);
-
-	m_pIterThread->CreateThread(CREATE_SUSPENDED);
-	VERIFY(m_pIterThread->SetThreadPriority(THREAD_PRIORITY_LOWEST));
-	m_pIterThread->m_pParent = this;
-	m_pIterThread->m_pXFoil = m_pXFoil;
-	m_pIterThread->m_bType4 = m_bType4;
-
-	m_pIterThread->SetAlphaMin(m_fAlphaMin);
-	m_pIterThread->SetAlphaMax(m_fAlphaMax);
-	m_pIterThread->SetDAlpha(m_fDAlpha);
-	m_pIterThread->m_bAutoDelete = true;
-	m_pIterThread->m_bAutoInitBL = pXDirect->m_bAutoInitBL;
-
-	m_pIterThread->m_IterLim     = m_IterLim;
-	m_pIterThread->ResumeThread();
-
 	m_Iterations = 0;
 	ResetCurves();
 	if (IsBlackAndWhite()) {
@@ -142,23 +125,63 @@ BOOL CViscDlg::OnInitDialog()
 		m_RmsGraph.SetLabelColor(RGB(0,0,0));
 		m_RmsGraph.SetLegendColor(RGB(0,0,0));
 	}
-	
+
+	m_pIterThread = new CViscThread(this);
+
+	m_pIterThread->CreateThread(CREATE_SUSPENDED);
+	m_pIterThread->SetThreadPriority(THREAD_PRIORITY_LOWEST);
+	m_pIterThread->m_pParent = this;
+	m_pIterThread->m_pXFoil = m_pXFoil;
+	m_pIterThread->m_bType4 = m_bType4;
+
+	m_pIterThread->SetAlphaMin(m_fAlphaMin);
+	m_pIterThread->SetAlphaMax(m_fAlphaMax);
+	m_pIterThread->SetDAlpha(m_fDAlpha);
+//	m_pIterThread->m_bAutoDelete = true;
+	m_pIterThread->m_bAutoDelete = false;
+	m_pIterThread->m_bAutoInitBL = pXDirect->m_bAutoInitBL;
+
+	m_pIterThread->m_IterLim     = m_IterLim;
+	m_pIterThread->ResumeThread();
+	SetTimer(ID_THREADTIMER, 100, NULL);
 	return false;  
 }
 
 
+void CViscDlg::OnTimer(UINT nIDEvent)
+{
+	if(m_pIterThread && m_pIterThread->m_bFinished){
+		delete m_pIterThread;
+		m_XFile.Close();
+		EndDialog(0);
+	}
+
+	CDialog::OnTimer(nIDEvent);
+}
+
+/*
 void CViscDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 	
-	HANDLE hThread = m_pIterThread->m_hThread;
-	WaitForSingleObject(hThread, INFINITE);
-
-
+//	HANDLE hThread = m_pIterThread->m_hThread;
+//	WaitForSingleObject(hThread, INFINITE);
+	DWORD response = WaitForSingleObject(m_pIterThread->m_hThread, INFINITE);
+	if(response == WAIT_ABANDONED){
+		Trace("Abandoned thread");
+		TRACE("Abandoned thread\n");
+	}
+	else if(response == WAIT_TIMEOUT){
+		Trace("Thread time out");
+		TRACE("Thread time out\n");
+	}
+	else if(response == WAIT_OBJECT_0){
+		Trace("Thread returned correctly");
+		TRACE("Thread returned correctly\n");
+	}
+	delete m_pIterThread;
 	m_XFile.Close();
-}
-
-
+}*/
 
 
 void CViscDlg::ResetCurves()
@@ -184,11 +207,9 @@ void CViscDlg::ResetCurves()
 }
 
 
-
 void CViscDlg::OnCancel()
 {
-	if(m_pIterThread->m_bFinished) EndDialog(0);
-	else{
+	if(m_pIterThread && !m_pIterThread->m_bFinished) {
 		m_pIterThread->m_bSkip = true;
 		m_pIterThread->m_bExit = true;
 		m_pIterThread->m_bSuspend = false;
@@ -228,16 +249,22 @@ void CViscDlg::OnSkip()
 
 BOOL CViscDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	if(pMsg->message == V_ENDTHREAD){
+/*	if(pMsg->message == V_ENDTHREAD){
+		Trace("Received V_ENDTHREAD message");
 		EndDialog(0);
+		Trace("Ended dialog");
 		return true; // no need to process further
 	} 
-	else if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_ESCAPE)){
+	else */
+	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_ESCAPE)){
 		m_pIterThread->m_bSkip = true;
 		return true;
 	}
 	else if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN)){
-		if(GetDlgItem(IDCANCEL) == GetFocus())	OnCancel();
+		if(GetDlgItem(IDCANCEL) == GetFocus())	{
+			OnCancel();
+			return true;
+		}
 	}
 	return CDialog::PreTranslateMessage(pMsg);
 }
@@ -361,44 +388,26 @@ void CViscDlg::UpdateView()
 
 	if(!m_bType4){
 		if (m_bAlpha)
-			Title.Format("Alfa = %.3f°", m_pXFoil->alfa*180.0/3.141592);
+			Title.Format("Alfa = %7.2f°", m_pXFoil->alfa*180.0/3.141592654);
 		else
-			Title.Format("Cl = %.2f°", m_pXFoil->clspec);
+			Title.Format("Cl = %7.2f", m_pXFoil->clspec);
 	}
 	else{
-		Title.Format("Re = %.f°", m_pXFoil->reinf);
+		ReynoldsFormat(Title, m_pXFoil->reinf);
+		Title = "Re = " + Title;
 	}
 	dcMem.TextOut(150,5,Title);
 
 	if(m_pXFoil->lvconv){
-/*		CPen BorderPen(PS_SOLID, 1, RGB(0,0,0));
-		CPen *pOldPen = dcMem.SelectObject(&BorderPen);
-		CBrush BackBrush(RGB(50,50,50));
-		CBrush * pOldBrush = dcMem.SelectObject(&BackBrush);
-		dcMem.Rectangle(200,30,400,60);
-		dcMem.SelectObject(pOldPen);
-		dcMem.SelectObject(pOldBrush);	*/
-
 		dcMem.SetTextColor(RGB(0,150,0));
 		dcMem.TextOut(160,45,"CONVERGED !");
 	}
 	else {
-
 		if(m_pIterThread->m_Iterations>=m_IterLim && !m_pXFoil->lvconv){
-
-/*			CPen BorderPen(PS_SOLID, 1, RGB(0,0,0));
-			CPen *pOldPen = dcMem.SelectObject(&BorderPen);
-			CBrush BackBrush(RGB(50,50,50));
-			CBrush * pOldBrush = dcMem.SelectObject(&BackBrush);
-			dcMem.Rectangle(250,30,450,60);
-			dcMem.SelectObject(pOldPen);
-			dcMem.SelectObject(pOldBrush);*/
-		
 			dcMem.SetTextColor(RGB(255,0,0));
 			dcMem.TextOut(160,45,"UNCONVERGED...");
 		}
 	}
-
 
 	dc.BitBlt(0, CltRect.top, CltRect.Width(), m_ViscRect.Height()+42, &dcMem,0, 0, SRCCOPY);	
 	dcMem.SelectObject(pOldFont);
@@ -406,8 +415,5 @@ void CViscDlg::UpdateView()
 	bmb.DeleteObject();
 	CvFont.DeleteObject();
 	FillBrush.DeleteObject();
-
 }
-
-
 

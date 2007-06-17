@@ -59,7 +59,8 @@ int CBatchThread::ExitInstance()
 	CBatchDlg* pBDlg = (CBatchDlg*) m_pParent;
 	pBDlg->ResetCurves();
 	pBDlg->UpdateGraph(-100.0, 0.0);
-	m_pParent->PostMessage(V_ENDTHREAD);
+//	m_pParent->PostMessage(WM_CLOSE);
+//	pBDlg->EndDialog(0);
 	return CWinThread::ExitInstance();
 }
 

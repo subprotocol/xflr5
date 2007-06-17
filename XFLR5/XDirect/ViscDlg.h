@@ -77,8 +77,9 @@ private:
 	int m_Iterations, m_IterLim;
 
 	XFoil* m_pXFoil;
-	//http://www.codeguru.com/forum/showthread.php?s=&threadid=231246
+	
 	void AddOpPoint();
+//	void EndSequence();
 	void SetAlphaMin(double alpha);
 	void SetAlphaMax(double alpha);
 	void SetDAlpha(double alpha);
@@ -88,13 +89,18 @@ private:
 
 protected:
 
+
 	// Generated message map functions
 	//{{AFX_MSG(CViscDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnDestroy();
 	virtual void OnCancel();
+//	afx_msg void OnDestroy();
+//	afx_msg void OnTimer();
 	afx_msg void OnSkip();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+
+	afx_msg void OnTimer(UINT nIDEvent);
 };
 

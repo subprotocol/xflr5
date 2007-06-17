@@ -77,7 +77,7 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_XFLR5_EXPORTPLR, OnExportPlr)
 	ON_COMMAND(IDM_DEFINEGRAPH, OnDefineGraph)
 	ON_COMMAND(IDM_XFLR5_COUPLEGRAPH, OnCoupleGraph)
-	ON_COMMAND(IDM_XFLR5DEFINEUSERGRAPH, OnDefineUserGraph)
+//	ON_COMMAND(IDM_XFLR5DEFINEUSERGRAPH, OnDefineUserGraph)
 	ON_COMMAND(IDM_XFLR5_GRAPHOPTIONS, OnAllGraphOptions)
 	ON_COMMAND(IDM_DELFOILPOLARS, OnDelFoilPolars)
 	ON_COMMAND(IDM_DELCUROPP, OnDelCurOpp)
@@ -149,7 +149,7 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_HIDEFOILOPPS, OnHideFoilOpps)
 	ON_COMMAND(IDM_CPI, OnCpi)
 	ON_COMMAND(ID_CURRENTFOIL_MANAGEFOILS, OnManageFoils)
-	ON_COMMAND(IDM_EXPORTXFOIL, OnExportResults)
+//	ON_COMMAND(IDM_EXPORTXFOIL, OnExportResults)
 	ON_COMMAND(IDM_SHOWCPGRAPH, OnShowCpGraph)
 END_MESSAGE_MAP()
 
@@ -5306,8 +5306,10 @@ void CXDirect::Analysis2(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 			m_ViscDlg.SetDAlpha(100.0);
 		}
 	}
+	Trace("Launching Viscous Analysis2");
 	m_ViscDlg.DoModal();
 
+	Trace("Finished Viscous Analysis2");
 }
 
 
@@ -5782,8 +5784,9 @@ void CXDirect::CheckMenu()
 	if(pMenu){
 		if(m_bShowUserGraph)  pMenu->CheckMenuItem(IDM_XFLR5_SHOWUSERGRAPH,MF_BYCOMMAND | MF_CHECKED);
 		else                  pMenu->CheckMenuItem(IDM_XFLR5_SHOWUSERGRAPH,MF_BYCOMMAND | MF_UNCHECKED);
-		if (m_iPlrView == 0) pMenu->CheckMenuItem(IDM_XFLR5_ALLFOUR, MF_BYCOMMAND | MF_CHECKED);
-		else if (m_iPlrView == 1){
+//		if (m_iPlrView == 0) pMenu->CheckMenuItem(IDM_XFLR5_ALLFOUR, MF_BYCOMMAND | MF_CHECKED);
+//		else 
+		if (m_iPlrView == 1){
 			switch (m_iPlrGraph){
 				case 1:{
 					pMenu->CheckMenuItem(IDM_XFLR5_CLCD, MF_BYCOMMAND | MF_CHECKED);

@@ -623,13 +623,13 @@ BOOL CBatchDlg::PreTranslateMessage(MSG* pMsg)
 			OnAnalysis();
 			return true;
 	}
-	else if(pMsg->message == V_ENDTHREAD){// notification that thread has stopped
+/*	else if(pMsg->message == V_ENDTHREAD){// notification that thread has stopped
 		m_ctrlClose.EnableWindow(true);
 		m_ctrlSkipPoint.EnableWindow(false);
 		m_ctrlSkipPolar.EnableWindow(false);
 		m_ctrlAnalysis.SetWindowText("Analyze");
 		return true; // no need to process further
-	}
+	}*/
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
@@ -640,6 +640,9 @@ void CBatchDlg::CleanUp()
 	m_ctrlAnalysis.SetWindowText("Start Analysis");
 	m_XFile.Close();
 	m_ctrlClose.EnableWindow(true);
+	m_ctrlSkipPoint.EnableWindow(false);
+	m_ctrlSkipPolar.EnableWindow(false);
+	m_ctrlAnalysis.SetWindowText("Analyze");
 	m_ctrlClose.SetFocus();
 }
 

@@ -68,8 +68,11 @@ BOOL CViscThread::InitInstance()
 
 int CViscThread::ExitInstance()
 {
-	m_pParent->PostMessage(V_ENDTHREAD);
+	CViscDlg* pVDlg = (CViscDlg*) m_pParent;
 	m_bFinished = true;
+//	pVDlg->EndSequence();
+//	m_pParent->PostMessage(V_ENDTHREAD);
+//	pVDlg->EndDialog(0);
 	return CWinThread::ExitInstance();
 }
 
