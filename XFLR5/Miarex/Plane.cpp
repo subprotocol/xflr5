@@ -27,6 +27,7 @@
 #include "ImportWingDlg.h"
 #include ".\plane.h"
 
+bool CPlane::m_bCheckPanels = false;
 /////////////////////////////////////////////////////////////////////////////
 // CPlane dialog
 
@@ -49,7 +50,6 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_Wing.ComputeGeometry();
 	m_Wing2.m_WingName   = "2nd Wing";
 	m_Wing2.ComputeGeometry();
-
 
 	m_Stab.m_WingName      = "Elevator";
 	m_Stab.m_bIsFin        = false;
@@ -107,7 +107,7 @@ CPlane::CPlane(CWnd* pParent /*=NULL*/)
 	m_bStab         = true;
 	m_bDoubleSymFin = false;
 	m_bChanged      = false;
-	m_bCheckPanels  = true;
+//	m_bCheckPanels  = true;
 	m_bBiplane      = false;
 
 	m_PlaneName  = "Plane Name";

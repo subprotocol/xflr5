@@ -293,7 +293,7 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_bResetglFlow      = true;
 
 	m_bShowLight        = false;
-	m_bLogFile          = true;
+	m_bLogFile          = false;
 	m_bHalfWing         = true;
 	m_bTransGraph       = true;
 	m_bIsPrinting       = false;
@@ -489,7 +489,7 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_SINGLEGRAPH3, OnSingleGraph3)
 	ON_COMMAND(IDM_SINGLEGRAPH4, OnSingleGraph4)
 	ON_COMMAND(IDM_DEFINEPLANE, OnDefinePlane)
-	ON_COMMAND(IDM_EDITPLANE, OnEditPlane)
+//	ON_COMMAND(IDM_EDITPLANE, OnEditPlane)
 	ON_COMMAND(IDM_SAVEWING, OnSaveUFO)
 	ON_COMMAND(IDM_SHOWWING2, OnShowWing2)
 	ON_COMMAND(IDM_SHOWSTAB, OnShowElevator)
@@ -500,7 +500,7 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_WINGGRAPH3, OnWingGraph3)
 	ON_COMMAND(IDM_WINGGRAPH2, OnWingGraph2)
 	ON_COMMAND(IDM_WINGGRAPH1, OnWingGraph1)
-	ON_COMMAND(IDM_EXIT, OnExit)
+//	ON_COMMAND(IDM_EXIT, OnExit)
 	ON_WM_ERASEBKGND()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
@@ -542,7 +542,7 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_EDITWPLR, OnEditWPlr)
 	ON_COMMAND(IDM_INSERTPROJECT, OnInsertProject)
 	ON_COMMAND(IDM_WGRAPHVAR, OnWGraphVar)
-	ON_COMMAND(IDM_SINGLEWINGGRAPH, OnSingleWingGraph)
+//	ON_COMMAND(IDM_SINGLEWINGGRAPH, OnSingleWingGraph)
 	ON_COMMAND(IDM_FOURWINGGRAPHS, OnFourWingGraphs)
 	ON_COMMAND(IDM_TWOWINGGRAPHS, OnTwoWingGraphs)
 	ON_COMMAND(IDM_SHOWCURWOPP, OnShowCurWOpp)
@@ -567,13 +567,13 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_SHOWWOPPS, OnShowWOpps)
 	ON_COMMAND(IDM_DELALLWOPPS, OnDelAllWOpps)
 	ON_COMMAND(IDM_HIDEWINGOPPS, OnHideWingOpps)
-	ON_COMMAND(IDT_SAVE, OnSaveProject)
+//	ON_COMMAND(IDT_SAVE, OnSaveProject)
 	ON_COMMAND(IDT_WOPP, OnWOpp)
 	ON_COMMAND(IDT_WPOLARS, OnShowWPolar)
 	ON_COMMAND(IDM_SAVEPROJECTAS, OnSaveAs)
 	ON_COMMAND(IDM_LOADPROJECT, OnLoadProject)
 	ON_COMMAND(IDM_SHOWWINGOPPS, OnShowWingOpps)
-	ON_COMMAND(IDM_XFLOW, OnStreamLines)
+//	ON_COMMAND(IDM_XFLOW, OnStreamLines)
 	ON_COMMAND(IDM_GLLIGHT, OnGLLight)
 	ON_COMMAND(IDM_STREAMOPTIONS, OnStreamOptions)
 	ON_COMMAND(IDM_MANAGEWINGS, OnManageUFO)
@@ -3630,7 +3630,7 @@ void CMiarex::On3DView()
 	pTB->PressButton(IDT_WOPP, false);
 	pTB->PressButton(IDT_WPOLARS, false);
 	pTB->PressButton(IDM_3DVIEW, true);
-	pTB->PressButton(IDM_CHORDCP, false);
+//	pTB->PressButton(IDM_CHORDCP, false);
 
 	if(m_iView==3) {
 		UpdateView();
@@ -8055,7 +8055,7 @@ void CMiarex::GLCreateMoments()
 	
 		amp *= pFrame->m_LiftScale*factor;
 		
-		if (amp>0.0) sign = 1.0; else sign = -1.0;
+		if (amp>0.0) sign = -1.0; else sign = 1.0;
 
 		glBegin(GL_LINE_STRIP);
 			for (int i=0; i<=int(abs(amp)); i++){
@@ -11274,7 +11274,7 @@ void CMiarex::OnCpView()
 	pTB->PressButton(IDT_WOPP,    true);
 	pTB->PressButton(IDT_WPOLARS, false);
 	pTB->PressButton(IDM_3DVIEW,  false);
-	pTB->PressButton(IDM_CHORDCP, false);
+//	pTB->PressButton(IDM_CHORDCP, false);
 
 	CValueDlg dlg;
 	dlg.m_WindowText = "Span Position Dlg";
@@ -11310,7 +11310,7 @@ void CMiarex::OnWOpp()
 	pTB->PressButton(IDT_WOPP,    true);
 	pTB->PressButton(IDT_WPOLARS, false);
 	pTB->PressButton(IDM_3DVIEW,  false);
-	pTB->PressButton(IDM_CHORDCP, false);
+//	pTB->PressButton(IDM_CHORDCP, false);
 
 	if(m_iView==1) {
 		UpdateView();
@@ -11393,7 +11393,7 @@ void CMiarex::OnShowWPolar()
 	pTB->PressButton(IDT_WOPP,    false);
 	pTB->PressButton(IDT_WPOLARS, true);
 	pTB->PressButton(IDM_3DVIEW,  false);
-	pTB->PressButton(IDM_CHORDCP, false);
+//	pTB->PressButton(IDM_CHORDCP, false);
 
 	if(m_iView==2) {
 		UpdateView();

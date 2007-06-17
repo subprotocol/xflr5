@@ -110,6 +110,7 @@ public:
 
 // Implementation
 protected:
+	static bool m_bCheckPanels;
 	CWnd * m_pMiarex;
 	CWnd * m_pFrame;
 	CWing m_Wing, m_Wing2;
@@ -119,7 +120,6 @@ protected:
 	bool m_bChanged;
 	bool m_bFin, m_bStab, m_bCheckName;
 	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
-	bool m_bCheckPanels;
 	bool m_bBiplane;
 	double m_StabTilt;
 	double m_FinTilt;

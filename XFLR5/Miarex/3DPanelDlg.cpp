@@ -86,7 +86,9 @@ void C3DPanelDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(C3DPanelDlg, CDialog)
+//	ON_MESSAGE(V_ENDTHREAD, OnEndViscDialog)
 	ON_BN_CLICKED(IDC_CANCEL, OnCancel)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -119,14 +121,27 @@ BOOL C3DPanelDlg::OnInitDialog()
 
 	m_b3DSymetric = false;
 
+	SetTimer(ID_THREADTIMER, 100, NULL);
 	return FALSE;
 }
+
+void C3DPanelDlg::OnTimer(UINT nIDEvent)
+{
+	if(m_pPanelThread && m_pPanelThread->m_bFinished){
+		delete m_pPanelThread;
+		m_XFile.Close();
+		EndDialog(0);
+	}
+	CDialog::OnTimer(nIDEvent);
+}
+
 
 bool C3DPanelDlg::StartPanelThread()
 {
 	m_pPanelThread = new C3DPanelThread();
 	m_pPanelThread->m_pParent = this;
-	m_pPanelThread->m_bAutoDelete = true;
+//	m_pPanelThread->m_bAutoDelete = true;
+	m_pPanelThread->m_bAutoDelete = false;
 
 	m_pPanelThread->m_pWPolar  = m_pWPolar;
 
@@ -299,14 +314,20 @@ void C3DPanelDlg::EndSequence()
 
 	EndDialog(0);
 }
-
+     
+/*LRESULT C3DPanelDlg::OnEndViscDialog(WPARAM wParam, LPARAM lParam)
+{
+	EndSequence();
+	return 0;
+}*/
 BOOL C3DPanelDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	if(pMsg->message == W_ENDTHREAD){
+/*	if(pMsg->message == V_ENDTHREAD){
 		EndSequence();
 		return true; 
 	} 
-	else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
+	else */
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
 		OnCancel();
 		return true;
 	}
@@ -1053,6 +1074,10 @@ void C3DPanelDlg::ComputePlane(double V0, double VDelta, int nrhs)
 
 	AddString("Computing Plane\r\n\r\n");
 
+	if(m_pWing2) {
+		m_pWing2->m_pVLMDlg  = this;
+		m_pWing2->m_bTrace   = true;
+	}
 	if(m_pStab) {
 		m_pStab->m_pVLMDlg  = this;
 		m_pStab->m_bTrace   = true;
@@ -1066,8 +1091,9 @@ void C3DPanelDlg::ComputePlane(double V0, double VDelta, int nrhs)
 		if(m_bCancel) break;
 
 		m_pWing->m_bWingOut = false;
-		if(m_pStab) m_pStab->m_bWingOut = false;
-		if(m_pFin)  m_pFin->m_bWingOut  = false;
+		if(m_pWing2)	m_pStab->m_bWingOut = false;
+		if(m_pStab)		m_pStab->m_bWingOut = false;
+		if(m_pFin)		m_pFin->m_bWingOut  = false;
 
 		if(m_pWPolar->m_Type!=4) m_Alpha = V0+q*VDelta;		
 		if(!m_pWPolar->m_bTiltedGeom) m_AlphaCalc = m_Alpha;
@@ -1626,5 +1652,6 @@ bool C3DPanelDlg::ComputeSurfSpeeds(double *Mu, double *Sigma, double frac)
 	}
 	return true;
 }
+
 
 

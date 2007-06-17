@@ -86,8 +86,11 @@ BOOL CVLMThread::InitInstance()
 
 int CVLMThread::ExitInstance()
 {
-	m_pParent->PostMessage(W_ENDTHREAD);
 	m_bFinished = true;
+//	m_pParent->PostMessage(WM_CLOSE);
+//	m_pParent->PostMessage(V_ENDTHREAD);
+//	CVLMDlg * pVLMDlg = (CVLMDlg*)m_pParent;
+//	pVLMDlg->EndDialog(0);
 	return CWinThread::ExitInstance();
 }
 

@@ -67,8 +67,10 @@ BOOL C3DPanelThread::InitInstance()
 
 int C3DPanelThread::ExitInstance()
 {
-	m_pParent->PostMessage(W_ENDTHREAD);
 	m_bFinished = true;
+//	m_pParent->PostMessage(V_ENDTHREAD);
+//	C3DPanelDlg * pDlg = (C3DPanelDlg*)m_pParent;
+//	pDlg->EndDialog(0);
 	return CWinThread::ExitInstance();
 }
 

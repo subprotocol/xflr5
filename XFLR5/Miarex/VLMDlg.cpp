@@ -30,6 +30,7 @@
 #include "../main/MainFrm.h"
 #include "VLMDlg.h"
 #include "Miarex.h"
+#include ".\vlmdlg.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CVLMDlg dialog
@@ -114,6 +115,7 @@ void CVLMDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CVLMDlg, CDialog)
 	ON_BN_CLICKED(IDC_CANCEL, OnCancel)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,7 +128,8 @@ BOOL CVLMDlg::OnInitDialog()
 	CRect WndRect;
 	GetWindowRect(WndRect);
 	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
-	
+
+
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
@@ -169,7 +172,8 @@ BOOL CVLMDlg::OnInitDialog()
 	if(m_pWPolar->m_AnalysisType==2){ //no way it could be anything else
 		m_pVLMThread = new CVLMThread();
 		m_pVLMThread->m_pParent = this;
-		m_pVLMThread->m_bAutoDelete = true;
+//		m_pVLMThread->m_bAutoDelete = true;
+		m_pVLMThread->m_bAutoDelete = false;
 		m_pVLMThread->m_bType4      = (m_pWPolar->m_Type==4);
 		m_pVLMThread->m_MaxWakeIter = m_MaxWakeIter;
 		m_pVLMThread->m_bSequence   = m_bSequence;
@@ -186,10 +190,18 @@ BOOL CVLMDlg::OnInitDialog()
 
 		m_pVLMThread->ResumeThread();
 	}
+	SetTimer(ID_THREADTIMER, 100, NULL);
 	return FALSE;
 }
 
 
+void CVLMDlg::OnTimer(UINT nIDEvent)
+{
+	if(m_pVLMThread && m_pVLMThread->m_bFinished){
+		EndSequence();
+	}
+	CDialog::OnTimer(nIDEvent);
+}
 
 bool CVLMDlg::Gauss(double *A, int n, double *B, int m)
 {
@@ -355,8 +367,7 @@ void CVLMDlg::SetFileHeader()
 		}
 	}
 	str.Format(" %02d, %d  at  %02d:%02d:%02d \n\n",
-		 tm.wDay, tm.wYear,
-		tm.wHour, tm.wMinute, tm.wSecond);
+		 tm.wDay, tm.wYear,	tm.wHour, tm.wMinute, tm.wSecond);
 
 	m_XFile.WriteString(strong + str);
 	m_XFile.WriteString("\n___________________________________\n\n");
@@ -372,14 +383,16 @@ void CVLMDlg::AddString(CString strong)
 		m_ctrlOutput.ReplaceSel(strong);
 	}
 }
+      
 
 BOOL CVLMDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	if(pMsg->message == W_ENDTHREAD){
+/*	if(pMsg->message == V_ENDTHREAD){
 		EndSequence();
 		return true; 
 	} 
-	else if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
+	else*/
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
 		OnCancel();
 		return true;
 	}
@@ -394,9 +407,7 @@ void CVLMDlg::OnCancel()
 		CDialog::OnCancel();
 		return;
 	}
-	if(m_pVLMThread->m_bFinished) 
-		EndSequence();
-	else {
+	if(m_pVLMThread && !m_pVLMThread->m_bFinished) {
 		m_bCancel               = true;
 		m_pWing->m_bCancel      = true;
 		m_pVLMThread->m_bCancel = true;
@@ -433,7 +444,7 @@ void CVLMDlg::EndSequence()
 			}
 		}
 	}
-
+	delete m_pVLMThread;
 	EndDialog(0);
 }
 
@@ -1707,3 +1718,4 @@ void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
 		V +=  VR-VL;
 	}*/
 }
+

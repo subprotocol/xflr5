@@ -159,4 +159,6 @@ private:
 	bool Gauss(double *A, int n, double *B, int m);
 //	int  VLMIsWakeNode(CVector Pt);
 
+public:
+	afx_msg void OnTimer(UINT nIDEvent);
 };

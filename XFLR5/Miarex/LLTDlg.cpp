@@ -29,6 +29,7 @@
 #include "../main/MainFrm.h"
 #include "LLTDlg.h"
 #include "Miarex.h"
+#include ".\lltdlg.h"
 
 
 
@@ -79,6 +80,7 @@ BEGIN_MESSAGE_MAP(CLLTDlg, CDialog)
 	//{{AFX_MSG_MAP(CLLTDlg)
 	ON_BN_CLICKED(IDC_SKIP, OnSkip)
 	//}}AFX_MSG_MAP
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -128,8 +130,8 @@ BOOL CLLTDlg::OnInitDialog()
 	if(m_pWing->m_bLLT){ 
 		m_pWThread = new CLLTThread(this);
 		m_pWThread->m_pParent = this;
-		m_pWThread->m_bAutoDelete = true;
-
+//		m_pWThread->m_bAutoDelete = true;
+		m_pWThread->m_bAutoDelete = false;
 		m_pWThread->m_bSequence  = m_bSequence;
 		m_pWThread->m_bType4     = m_bType4;
 		m_pWThread->m_Alpha      = m_Alpha;
@@ -143,12 +145,24 @@ BOOL CLLTDlg::OnInitDialog()
 
 		m_pWThread->ResumeThread();
 	}
-	else PostMessage(W_ENDTHREAD);
+	else PostMessage(WM_CLOSE);
 
 	GetDlgItem(IDCANCEL)->SetFocus();
+	SetTimer(ID_THREADTIMER, 100, NULL);
 	return FALSE; 
-
 }
+
+
+void CLLTDlg::OnTimer(UINT nIDEvent)
+{
+	if(m_pWThread && m_pWThread->m_bFinished){
+		delete m_pWThread;
+		m_XFile.Close();
+		EndDialog(0);
+	}
+	CDialog::OnTimer(nIDEvent);
+}
+
 
 void CLLTDlg::UpdateView(double Alpha)
 {
@@ -233,30 +247,29 @@ void CLLTDlg::UpdateView(double Alpha)
 
 void CLLTDlg::OnCancel() 
 {
-	if (m_pWThread->m_bFinished){
-		EndSequence();
-	}
-	else m_pWThread->Cancel();
+	if (m_pWThread && !m_pWThread->m_bFinished)
+		 m_pWThread->Cancel();
 	
 //	CDialog::OnCancel();
 }
 
-BOOL CLLTDlg::PreTranslateMessage(MSG* pMsg) 
-{
-	if(pMsg->message == W_ENDTHREAD){
-		TRACE("Received EndThread Message\n");
-		EndSequence();
-		return true; // no need to process further
-	} 
-	
-	return CDialog::PreTranslateMessage(pMsg);
-}
+
 
 void CLLTDlg::OnSkip() 
 {
 	m_pWThread->m_bSkip = true;
 }
+/*
+void CLLTDlg::OnDestroy()
+{
+	CDialog::OnDestroy();
+	
+	HANDLE hThread = m_pWThread->m_hThread;
+	WaitForSingleObject(hThread, INFINITE);
 
+//	m_XFile.Close();
+}
+*/
 
 
 void CLLTDlg::SetFileHeader()
@@ -364,6 +377,7 @@ bool CLLTDlg::EndSequence()
 			}
 		}
 	}
+	delete m_pWThread;
 	EndDialog(0);
 	return true;
 }

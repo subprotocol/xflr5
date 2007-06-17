@@ -70,15 +70,17 @@ BOOL CLLTThread::InitInstance()
 
 	if (!m_bCancel) if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString("\r\nAnalysis completed successfully\r\n");
 
-	Sleep(100);
+//	Sleep(100);
 	return FALSE;
 }
 
 int CLLTThread::ExitInstance()
 {
-	m_pParent->PostMessage(W_ENDTHREAD);
 	m_bFinished = true;
-
+//	m_pParent->PostMessage(WM_CLOSE);
+//	m_pParent->PostMessage(V_ENDTHREAD);
+//	CLLTDlg * pIDlg = (CLLTDlg*)m_pParent;
+//	pIDlg->EndDialog(0);
 	return CWinThread::ExitInstance();
 }
 

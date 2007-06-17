@@ -155,6 +155,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
+//	LRESULT OnEndViscDialog(WPARAM wParam, LPARAM lParam);            
 
 	afx_msg void OnCancel();
+	afx_msg void OnTimer(UINT nIDEvent);
 };

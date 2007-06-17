@@ -50,7 +50,6 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CLLTDlg)
 	public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
@@ -84,9 +83,12 @@ private :
 	// Generated message map functions
 	//{{AFX_MSG(CLLTDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnSkip();
 	virtual void OnCancel();
+//	afx_msg void OnDestroy();
+	afx_msg void OnSkip();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTimer(UINT nIDEvent);
 };
 
