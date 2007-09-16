@@ -29,14 +29,21 @@
 #include <QPainter>
 #include <QColor>
 #include <QString>
+#include <vector>
+#include <iostream>
 #include "../misc/ComDef.h"
 #include "../misc/Vector.h"
 
+#define cMaxFoilName			1024
+
+
+typedef std::vector<double> tFoilCoo;
 
 
 class CFoil  //: public CObject
 {
 	friend class DesignChild;
+	friend class FoilMidLinePath;
 // 	friend class CAFoil;
 // 	friend class CBatchDlg;
 // 	friend class CAFoilCtrlBar;
@@ -73,6 +80,14 @@ public:
 	CFoil();
 	virtual ~CFoil();
 
+	const tFoilCoo &Getx(){return xV;};
+	const tFoilCoo &Gety(){return yV;};
+	const QString &GetFoilName(){return m_FoilName;};
+	bool empty(){return xV.empty()||yV.empty();}
+
+	// read a foil from a std istream
+	bool Read(std::istream& stream);
+
 private:
 	QString m_FoilName;		// the foil's name...
 	QColor m_FoilColor;	//... and its color
@@ -89,6 +104,8 @@ private:
 	int m_iHighLight;
 
 	int n;				// the number of points of the current foil
+	tFoilCoo xV;
+	tFoilCoo yV;
 	double  x[IBX],  y[IBX];	// the point coordinates of the current foil
 	double nx[IBX], ny[IBX];	// the normal vector coordinates of the current foil's points
 	//Base geometry;

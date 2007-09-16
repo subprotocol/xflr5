@@ -28,9 +28,9 @@
 #include <iostream>
 #include <QPainterPath>
 
-#include "XDirect/Foil.h"
-#include "Design/Spline.h"
-#include "misc/helper.h"
+#include "Foil.h"
+#include "Spline.h"
+#include "helper.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -58,14 +58,15 @@ CFoil::CFoil()
 	m_fXThickness = 0.0;
 
 	n = 0;
-	memset(x, 0, sizeof(x));
-	memset(y, 0, sizeof(y));
-	memset(nx, 0, sizeof(nx));
-	memset(ny, 0, sizeof(ny));
+
+ 	memset(x, 0, sizeof(x));
+ 	memset(y, 0, sizeof(y));
+ 	memset(nx, 0, sizeof(nx));
+ 	memset(ny, 0, sizeof(ny));
 
 	nb = 0;
-	memset(xb, 0, sizeof(xb));
-	memset(yb, 0, sizeof(yb));
+ 	memset(xb, 0, sizeof(xb));
+ 	memset(yb, 0, sizeof(yb));
 
 
 	m_iInt = 0;
@@ -75,12 +76,20 @@ CFoil::CFoil()
 
 	m_Gap  = 0.0;
 
-	memset(m_rpExtrados, 0, sizeof(m_rpExtrados));
-	memset(m_rpIntrados, 0, sizeof(m_rpIntrados));
-	memset(m_rpMid, 0, sizeof(m_rpMid));
+// 	for(unsigned int i=0;i<IQX;i++){
+// 		m_rpExtrados[i]=0;
+// 		m_rpIntrados[i]=0;
+// 		m_BaseExtrados[i]=0;
+// 		m_BaseIntrados[i]=0;
+// 	}
+// 	for(unsigned int i=0;i<1001;i++)m_rpMid[i]=0;
 
-	memset(m_BaseExtrados, 0, sizeof(m_BaseExtrados));
-	memset(m_BaseIntrados, 0, sizeof(m_BaseIntrados));
+// 	memset(m_rpExtrados, 0, sizeof(m_rpExtrados));
+// 	memset(m_rpIntrados, 0, sizeof(m_rpIntrados));
+// 	memset(m_rpMid, 0, sizeof(m_rpMid));
+// 
+// 	memset(m_BaseExtrados, 0, sizeof(m_BaseExtrados));
+// 	memset(m_BaseIntrados, 0, sizeof(m_BaseIntrados));
 
 //	m_rViewRect.SetRectEmpty();
 
@@ -93,7 +102,6 @@ CFoil::CFoil()
 	m_LEFlapAngle = 0.0;
 	m_LEXHinge    = 20.0;
 	m_LEYHinge    = 50.0;
-
 }
 
 CFoil::~CFoil()
@@ -563,6 +571,8 @@ void CFoil::CopyFoil(CFoil *pSrcFoil)
 
 void CFoil::SetNaca009()
 {	
+	m_FoilName="NACA009";
+
 	// Reset the foil to Naca 009
 	x[0]  = 1.00000    ; y[0]  = 0.00000;
 	x[1]  = 0.99572    ; y[1]  = 0.00057;
@@ -606,6 +616,49 @@ void CFoil::SetNaca009()
 	n = 69;
 	nb = 69;
 	memcpy(xb,x, sizeof(x));
+
+	// set xV, yV coordinates
+	xV.push_back(1.00000);      yV.push_back(0.00000);
+	xV.push_back(0.99572);      yV.push_back(0.00057);
+	xV.push_back(0.98296);      yV.push_back(0.00218);
+	xV.push_back(0.96194);      yV.push_back(0.00463);
+	xV.push_back(0.93301);      yV.push_back(0.00770);
+	xV.push_back(0.89668);      yV.push_back(0.01127);
+	xV.push_back(0.85355);      yV.push_back(0.01522);
+	xV.push_back(0.80438);      yV.push_back(0.01945);
+	xV.push_back(0.75000);      yV.push_back(0.02384);
+	xV.push_back(0.69134);      yV.push_back(0.02823);
+	xV.push_back(0.62941);      yV.push_back(0.03247);
+	xV.push_back(0.56526);      yV.push_back(0.03638);
+	xV.push_back(0.50000);      yV.push_back(0.03978);
+	xV.push_back(0.43474);      yV.push_back(0.04248);
+	xV.push_back(0.37059);      yV.push_back(0.04431);
+	xV.push_back(0.33928);      yV.push_back(0.04484);
+	xV.push_back(0.30866);      yV.push_back(0.04509);
+	xV.push_back(0.27886);      yV.push_back(0.04504);
+	xV.push_back(0.25000);      yV.push_back(0.04466);
+	xV.push_back(0.22221);      yV.push_back(0.04397);
+	xV.push_back(0.19562);      yV.push_back(0.04295);
+	xV.push_back(0.17033);      yV.push_back(0.04161);
+	xV.push_back(0.14645);      yV.push_back(0.03994);
+	xV.push_back(0.12408);      yV.push_back(0.03795);
+	xV.push_back(0.10332);      yV.push_back(0.03564);
+	xV.push_back(0.08427);      yV.push_back(0.03305);
+	xV.push_back(0.06699);      yV.push_back(0.03023);
+	xV.push_back(0.05156);      yV.push_back(0.02720);
+	xV.push_back(0.03806);      yV.push_back(0.02395);
+	xV.push_back(0.02653);      yV.push_back(0.02039);
+	xV.push_back(0.01704);      yV.push_back(0.01646);
+	xV.push_back(0.00961);      yV.push_back(0.01214);
+	xV.push_back(0.00428);      yV.push_back(0.00767);
+	xV.push_back(0.00107);      yV.push_back(0.00349);
+	xV.push_back(0.00000);      yV.push_back(0.00000);
+
+	for (int i=0; i<34; i++){
+		xV.push_back(xV[33-i]);
+		yV.push_back(-yV[33-i]);
+	}
+
 	InitFoil();
 }
 
@@ -1351,6 +1404,96 @@ bool CFoil::CompMidLine(bool bParams)
 }
 
 
+bool CFoil::Read(std::istream& stream)
+{
+	char foilName[cMaxFoilName];
+	tFoilCoo xCoo,yCoo;
+	double xMom, yMom;
+	int fileType=0;
+	
+	m_FoilName="";
+	xV.clear(); yV.clear();
+	// first Line is Foil Name
+	stream.getline(foilName,cMaxFoilName);
+	if(!stream.good()){
+		return false;
+	}
+	
+	while(stream.good()){
+		stream>>xMom; stream>>yMom;
+		// seems to be the amount of points
+		if(xMom>1.||yMom>1.){
+			fileType=1;
+			continue;
+		}
+		if(!stream.good())continue;
+		// else normal file or next entries after amount of points
+		xCoo.push_back(xMom);
+		yCoo.push_back(yMom);
+// 		std::cerr<<xMom<<" "<<yMom<<"\n";
+	}
+
+	if(xCoo.size()<3||xCoo.size()!=yCoo.size())return false;
+
+	if(foilName[strlen(foilName)-1]=='\r')foilName[strlen(foilName)-1]=0;
+	m_FoilName=foilName;
+
+	// now order points if needed
+	if(fileType==0){
+// 		std::cerr<<"normal type";
+		xV=xCoo; yV=yCoo;
+
+// 		tFoilCoo::const_iterator iterX=xV.begin();
+// 		tFoilCoo::const_iterator iterY=yV.begin();
+// 		while(iterX!=xV.end()){
+// 			std::cerr<<(*iterX)<<" "<<(*iterY)<<"\n";
+// 			++iterX; ++iterY;
+// 		}
+		return true;
+	}
+	
+	tFoilCoo::const_iterator iterX=xCoo.begin();
+	tFoilCoo::const_iterator iterY=yCoo.begin();
+
+	// search for greatest "jump" in x;
+	double dX=0.;
+	int i=0,iJump=0;
+	
+	++iterX;++i;
+	while(iterX!=xCoo.end()){
+		if(fabs((*iterX)-(*(iterX-1)))>dX){
+			dX=fabs((*iterX)-(*(iterX-1)));
+			iJump=i-1;
+		}
+		++iterX; ++i;
+	}
+// 	std::cerr<<"Largest Jump "<<iJump<<" "<<dX<<" "<<xCoo[iJump]<<" "<<yCoo[iJump]<<"\n";
+	// reorganize the first block before "jump"
+	i=0;
+	iterX=xCoo.begin();iterY=yCoo.begin();
+
+	while(iterX!=xCoo.end()||iterY!=yCoo.end()){
+		if(i<=iJump){
+			xV.insert(xV.begin(),*iterX);
+			yV.insert(yV.begin(),*iterY);
+		}else{
+			xV.push_back(*iterX);
+			yV.push_back(*iterY);
+		}
+		++iterX; ++iterY; ++i;
+	}
+
+// 	iterX=xV.begin();
+// 	iterY=yV.begin();
+// 	std::cerr<<"\nUnormal\n";
+// 	while(iterX!=xV.end()){
+// 		std::cerr<<(*iterX)<<" "<<(*iterY)<<"\n";
+// 		++iterX; ++iterY;
+// 	}
+
+
+	return true;
+}
 
 
 

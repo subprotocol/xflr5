@@ -26,6 +26,9 @@
 
 #include <QWidget>
 #include "Foil.h"
+#include "FoilPath.h"
+#include "FoilPointPath.h"
+#include "FoilMidLinePath.h"
 
 class DesignChild : public QWidget
 {
@@ -55,7 +58,8 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
-	CFoil foil;
+ 	CFoil foil;
+// 	FoilPath *foilPath;
 
     QString curFile;
     bool isUntitled;

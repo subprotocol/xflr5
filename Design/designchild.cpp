@@ -22,15 +22,19 @@
 ****************************************************************************/
 
 #include <QtGui>
+#include <fstream>
 
 #include "designchild.h"
 
-DesignChild::DesignChild()
+DesignChild::DesignChild() 
 {
     setAttribute(Qt::WA_DeleteOnClose);
     isUntitled = true;
 	
-	foil.SetNaca009();
+	// something to see...
+	//foil.SetNaca009();
+	resize(1000,600);
+	//foilPath=new FoilPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()));
 }
 
 DesignChild::~DesignChild()
@@ -52,24 +56,13 @@ void DesignChild::newFile()
 
 bool DesignChild::loadFile(const QString &fileName)
 {
-/*    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("MDI"),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return false;
-    }
-
-    QTextStream in(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    setPlainText(in.readAll());
-    QApplication::restoreOverrideCursor();
+	std::ifstream file(fileName.toStdString().c_str());
+	
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+ 	bool retVal=foil.Read(file);
+	QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
-
-    connect(document(), SIGNAL(contentsChanged()),
-            this, SLOT(documentWasModified()));*/
 
     return true;
 }
@@ -115,7 +108,7 @@ bool DesignChild::saveFile(const QString &fileName)
 
 QString DesignChild::userFriendlyCurrentFile()
 {
-    return "Foil direct design";//strippedName(curFile);
+    return /*foil.GetFoilName()+*/" direct design";
 }
 
 void DesignChild::closeEvent(QCloseEvent *event)
@@ -130,70 +123,21 @@ void DesignChild::closeEvent(QCloseEvent *event)
 
 void DesignChild::paintEvent(QPaintEvent * event)
 {
-	/*static const QPoint hourHand[3] = {
-         QPoint(7, 8),
-         QPoint(-7, 8),
-         QPoint(0, -40)
-     };
-     static const QPoint minuteHand[3] = {
-         QPoint(7, 8),
-         QPoint(-7, 8),
-         QPoint(0, -70)
-     };
-
-     QColor hourColor(127, 0, 127);
-     QColor minuteColor(0, 127, 127, 191);
-
-     int side = qMin(width(), height());
-     QTime time = QTime::currentTime();
-
-     QPainter painter(this);
-     painter.setRenderHint(QPainter::Antialiasing);
-     painter.translate(width() / 2, height() / 2);
-     painter.scale(side / 200.0, side / 200.0);
-
-     painter.setPen(Qt::NoPen);
-     painter.setBrush(hourColor);
-
-     painter.save();
-     painter.rotate(30.0 * ((time.hour() + time.minute() / 60.0)));
-     painter.drawConvexPolygon(hourHand, 3);
-     painter.restore();
-
-     painter.setPen(hourColor);
-
-     for (int i = 0; i < 12; ++i) {
-         painter.drawLine(88, 0, 96, 0);
-         painter.rotate(30.0);
-     }
-
-     painter.setPen(Qt::NoPen);
-     painter.setBrush(minuteColor);
-
-     painter.save();
-     painter.rotate(6.0 * (time.minute() + time.second() / 60.0));
-     painter.drawConvexPolygon(minuteHand, 3);
-     painter.restore();
-
-     painter.setPen(minuteColor);
-
-     for (int j = 0; j < 60; ++j) {
-         if ((j % 5) != 0)
-             painter.drawLine(92, 0, 96, 0);
-         painter.rotate(6.0);
-     }*/
-
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
-	foil.DrawFoil(painter,0.0,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
-	foil.DrawMidLine(painter,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
+	
+	painter.drawPath(FoilPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
+	painter.drawPath(FoilPointPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
+	//painter.drawPath(FoilMidLinePath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
+	//foil.DrawFoil(painter,0.0,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
+// 	foil.DrawMidLine(painter,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
 }
 
 
 
 void DesignChild::documentWasModified()
 {
-/*    setWindowModified(document()->isModified());*/
+//     setWindowModified(document()->isModified());
 }
 
 bool DesignChild::maybeSave()
@@ -216,11 +160,11 @@ bool DesignChild::maybeSave()
 
 void DesignChild::setCurrentFile(const QString &fileName)
 {
-/*    curFile = QFileInfo(fileName).canonicalFilePath();
+    curFile = QFileInfo(fileName).canonicalFilePath();
     isUntitled = false;
-    document()->setModified(false);
+    //document()->setModified(false);
     setWindowModified(false);
-    setWindowTitle(userFriendlyCurrentFile() + "[*]");*/
+    setWindowTitle(userFriendlyCurrentFile() + "[*]");
 }
 
 QString DesignChild::strippedName(const QString &fullFileName)

@@ -30,7 +30,7 @@ bool IsBetween(int f, double f1, double f2)
 
 
 
-bool Intersect(int &x, int &y, const QRect &DRect, const QPoint &Pt1, const QPoint &Pt2)
+bool Intersect(int &x, int &y, const QRectF &DRect, const QPointF &Pt1, const QPointF &Pt2)
 {
 
 	int xt, yt;

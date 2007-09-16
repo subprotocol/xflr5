@@ -58,6 +58,7 @@ private slots:
     void updateMenus();
     void updateWindowMenu();
     MdiChild *createMdiChild();
+	DesignChild *createDesignChild();
     void switchLayoutDirection();
 
 	//Application slots

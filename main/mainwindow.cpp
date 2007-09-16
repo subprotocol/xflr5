@@ -174,19 +174,17 @@ void MainWindow::about()
 
 void MainWindow::directDesign()
 {
-/*   QMessageBox::information(this, tr("Direct Design"),
-            tr("Direct design slot"));*/
-  	DesignChild *child = new DesignChild;
-	//QWidget *child = new QWidget;
-    workspace->addWindow(child);
-	child->show();
+	QString fileName = QFileDialog::getOpenFileName(this);
+    if (!fileName.isEmpty()) {
+	  	DesignChild *child = createDesignChild();
 
-//     connect(child, SIGNAL(copyAvailable(bool)),
-//             cutAct, SLOT(setEnabled(bool)));
-//     connect(child, SIGNAL(copyAvailable(bool)),
-//             copyAct, SLOT(setEnabled(bool)));
-
-//     return child;
+        if (child->loadFile(fileName)) {
+            statusBar()->showMessage(tr("Foil loaded"), 2000);
+            child->show();
+        } else {
+            child->close();
+        }
+    }
 }
 
 
@@ -313,6 +311,16 @@ MdiChild *MainWindow::createMdiChild()
 
     return child;
 }
+
+
+DesignChild *MainWindow::createDesignChild()
+{
+    DesignChild *child = new DesignChild;
+    workspace->addWindow(child);
+
+    return child;
+}
+
 
 void MainWindow::createActions()
 {
