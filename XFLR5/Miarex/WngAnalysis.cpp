@@ -152,7 +152,7 @@ BOOL CWngAnalysis::OnInitDialog()
 		m_ctrlMethod1.EnableWindow(false);
 	}
 
-	m_ctrlMethod3.EnableWindow(false);
+//	m_ctrlMethod3.EnableWindow(true);
 	m_ctrlRho.SetFont(&m_SymbolFont);
 	m_ctrlNu.SetFont(&m_SymbolFont);
 
@@ -656,16 +656,22 @@ void CWngAnalysis::OnMethod()
 		m_bMiddle  = true;
 		m_ctrlViscous.SetCheck(TRUE);
 		m_ctrlTopBottom.SetCheck(FALSE);
+		m_bWakeRollUp = false;
+		m_ctrlWakeRollUp.SetCheck(FALSE);
 	}
 	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2){ 
 		m_AnalysisType=2;
 		m_bMiddle  = true;
 		m_ctrlTopBottom.SetCheck(FALSE);
+		m_bWakeRollUp = false;
+		m_ctrlWakeRollUp.SetCheck(FALSE);
 	}
 	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3){ 
 		m_AnalysisType=3;
 		m_bMiddle  = false;
 		m_ctrlTopBottom.SetCheck(TRUE);
+		m_bWakeRollUp = true;
+		m_ctrlWakeRollUp.SetCheck(TRUE);
 	}
 	EnableControls();
 	SetWPolarName();

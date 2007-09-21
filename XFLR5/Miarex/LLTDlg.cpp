@@ -156,6 +156,8 @@ BOOL CLLTDlg::OnInitDialog()
 void CLLTDlg::OnTimer(UINT nIDEvent)
 {
 	if(m_pWThread && m_pWThread->m_bFinished){
+		HANDLE hThread = m_pWThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 		delete m_pWThread;
 		m_XFile.Close();
 		EndDialog(0);
@@ -313,7 +315,7 @@ void CLLTDlg::SetFileHeader()
 			break;
 		}
 		case 6:{
-			strong = "Jun";
+			strong = "June";
 			break;
 		}
 		case 7:{
@@ -352,6 +354,8 @@ void CLLTDlg::SetFileHeader()
 bool CLLTDlg::EndSequence()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(!m_pWThread) return false;
+
 	m_XFile.Close();
 	if(m_bWarning && pMiarex->m_bLogFile){
 		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL)){
@@ -378,6 +382,7 @@ bool CLLTDlg::EndSequence()
 		}
 	}
 	delete m_pWThread;
+	m_pWThread = NULL;
 	EndDialog(0);
 	return true;
 }

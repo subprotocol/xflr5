@@ -114,6 +114,15 @@ bool C3DPanelThread::AlphaLoop(void)
 		pDlg->AddString("\r\n\r\nAnalysis cancelled per user request....\r\n");
 		return true;
 	}
+	if (!pDlg->AddWakeContribution()) {
+		pDlg->AddString("\r\nFailed to create the matrix....\r\n");
+		pDlg->m_bWarning = true;
+		return true;
+	}
+	if (m_bCancel) {
+		pDlg->AddString("\r\n\r\nAnalysis cancelled per user request....\r\n");
+		return true;
+	}
 
 	if (!pDlg->SolveMultiple(m_Alpha, m_DeltaAlpha, nrhs))	{
 		pDlg->AddString("\r\n\r\nSingular matrix - aborting....\r\n");

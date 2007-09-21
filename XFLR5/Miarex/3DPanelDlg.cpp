@@ -43,7 +43,7 @@ C3DPanelDlg::C3DPanelDlg(CWnd* pParent /*=NULL*/)
 	m_bPlaneAnalysis = false;
 	m_b3DSymetric    = true;
 	m_bConverged     = false;
-	m_bNeumann       = true;
+	m_bNeumann       = false;
 
 	m_QInf       = 0.0;//Speed vector in m/s
 	m_Alpha      = 0.0;//Angle of Attack in °
@@ -53,6 +53,8 @@ C3DPanelDlg::C3DPanelDlg(CWnd* pParent /*=NULL*/)
 	m_MatSize   = 0;
 	m_nNodes    = 0;
 	m_NSurfaces = 0;
+	m_NWakeColumn  = 0;
+	m_NXWakePanels = 0;
 
 	m_strOut = "";
 
@@ -108,7 +110,12 @@ BOOL C3DPanelDlg::OnInitDialog()
 	str =strAppDirectory + "XFLR5.log";
 	BOOL bOpen = m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	if(bOpen) m_bXFile = true;
-	else m_bXFile = false;
+	else      m_bXFile = false;
+
+	m_bPointOut = false;
+	m_bCancel   = false;
+	m_bWarning  = false;
+
 
 	SetFileHeader();
 	m_ctrlOutput.SetLimitText(100000);
@@ -128,6 +135,8 @@ BOOL C3DPanelDlg::OnInitDialog()
 void C3DPanelDlg::OnTimer(UINT nIDEvent)
 {
 	if(m_pPanelThread && m_pPanelThread->m_bFinished){
+		HANDLE hThread = m_pPanelThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 		delete m_pPanelThread;
 		m_XFile.Close();
 		EndDialog(0);
@@ -165,8 +174,11 @@ void C3DPanelDlg::OnCancel()
 		CDialog::OnCancel();
 		return;
 	}
-	if(m_pPanelThread->m_bFinished) 
+	if(m_pPanelThread->m_bFinished) {
+		HANDLE hThread = m_pPanelThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 		EndSequence();
+	}
 	else {
 		m_bCancel               = true;
 		m_pWing->m_bCancel      = true;
@@ -180,106 +192,6 @@ void C3DPanelDlg::SetProgress(int progress,double fraction)
 
 
 
-bool C3DPanelDlg::Gauss(double *A, int n, double *B, int m)
-{
-////////////////////////////////////////////////////////////////////////////////
-//  int Gaussian_Elimination(double *A, int n, double *B)                     //
-//                                                                            //
-//     Solve the linear system of equations AX=B where A is an n x n matrix   //
-//     B is an n-dimensional column vector (n x 1 matrix) for the             //
-//     n-dimensional column vector (n x 1 matrix) X.                          //
-//                                                                            //
-//     This routine performs partial pivoting and the elements of A are       //
-//     modified during computation.  The result X is returned in B.           //
-//     If the matrix A is singular, the return value of the function call is  //
-//     false. If the solution was found, the function return value is true    //
-//                                                                            //
-//  Arguments:                                                                //
-//     double *A      On input, the pointer to the first element of the       //
-//                    matrix A[n][n].  On output, the matrix A is destroyed.  //
-//     int     n      The number of rows and columns of the matrix A and the  //
-//                    dimension of B.                                         //
-//     double *B      On input, the pointer to the first element of the       //
-//                    vector B[n].  On output, the vector B is replaced by the//
-//                    vector X, the solution of AX = B.                       //
-//     int m          The number of right hand side vectors                   //
-//                    The default is m=0                                      //
-//                                                                            //
-//  Return Values:                                                            //
-//     true :  Success                                                        //
-//     false :  Failure - The matrix A is singular.                           //
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
-
-	int row, i, j, pivot_row, k;
-	double max, dum, *pa, *pA, *A_pivot_row;
-	// for each variable find pivot row and perform forward substitution
-	pa = A;
-	for (row = 0; row < (n - 1); row++, pa += n) {
-		//  find the pivot row
-		A_pivot_row = pa;
-		max = abs(*(pa + row));
-		pA = pa + n;
-		pivot_row = row;
-		for (i=row+1; i < n; pA+=n, i++)
-			if ((dum = abs(*(pA+row))) > max) { 
-				max = dum; 
-				A_pivot_row = pA; 
-				pivot_row = i; 
-			}
-		if (max <= 0.0) 
-			return false;                // the matrix A is singular
-		
-			// and if it differs from the current row, interchange the two rows.
-			
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
-				dum = *(pa + i);
-				*(pa + i) = *(A_pivot_row + i);
-				*(A_pivot_row + i) = dum;
-			}
-			for(k=0; k<=m; k++){
-				dum = B[row+k*n];
-				B[row+k*n] = B[pivot_row+k*n];
-				B[pivot_row+k*n] = dum;
-			}
-		}
-		
-		// Perform forward substitution
-		
-		for (i = row+1; i<n; i++) {
-			pA = A + i * n;
-			dum = - *(pA + row) / *(pa + row);
-			*(pA + row) = 0.0;
-			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
-			for (k=0; k<=m; k++) 
-				B[i+k*n] += dum * B[row+k*n];
-		}
-		SetProgress((int)(100*row/(n-1)/2),.15);
-	}
-	m_Progress +=15;
-
-	// Perform backward substitution
-	
-	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
-		if ( *(pa + row) == 0.0 ) 
-			return false;           // matrix is singular
-		dum = 1.0 / *(pa + row);
-		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
-		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
-			dum = *(pA + row);
-			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
-			for(k=0; k<=m; k++) 
-				B[i+k*n] -= dum * B[row+k*n];
-		}
-		SetProgress((int)(100*(n-1-row)/(n-1)/2),.15);
-	}
-	m_Progress +=15;
-	return true;
-}
 
 void C3DPanelDlg::EndSequence()
 {
@@ -369,7 +281,7 @@ void C3DPanelDlg::SetFileHeader()
 			break;
 		}
 		case 6:{
-			strong = "Jun";
+			strong = "June";
 			break;
 		}
 		case 7:{
@@ -409,427 +321,6 @@ void C3DPanelDlg::SetFileHeader()
 }
 
 
-void C3DPanelDlg::SourcePotentialKP(int p, CVector C, double &phi)
-{
-	// Quadrilateral source
-	// Katz & Plotkin 10.89 and following
-	// all four corners are assumed to lie in the same plane
-	// the transformation matrix from global to local coordinates has been set previously
-
-	double dist = (C-m_pPanel[p].CollPt).VAbs();
-	
-	if(dist>RFF*m_pPanel[p].Size){ // use far-field formula
-		phi = -1./4./pi * m_pPanel[p].Area /dist;
-		return;
-	}
-
-	P1 = m_pPanel[p].P1; P2 = m_pPanel[p].P2; P3 = m_pPanel[p].P3; P4 = m_pPanel[p].P4; 
-
-	//Convert coordinates
-	x  = m_pPanel[p].lij[0]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[1]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[2]*(C.z-m_pPanel[p].CollPt.z);
-	y  = m_pPanel[p].lij[3]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[4]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[5]*(C.z-m_pPanel[p].CollPt.z);
-	z  = m_pPanel[p].lij[6]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[7]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[8]*(C.z-m_pPanel[p].CollPt.z);
-
-	//calculate the influence
-	r1 = sqrt((x-P1.x)*(x-P1.x)+(y-P1.y)*(y-P1.y)+z*z);
-	r2 = sqrt((x-P2.x)*(x-P2.x)+(y-P2.y)*(y-P2.y)+z*z);
-	r3 = sqrt((x-P3.x)*(x-P3.x)+(y-P3.y)*(y-P3.y)+z*z);
-	r4 = sqrt((x-P4.x)*(x-P4.x)+(y-P4.y)*(y-P4.y)+z*z);
-
-	e1 = (x-P1.x)*(x-P1.x) + z*z;
-	e2 = (x-P2.x)*(x-P2.x) + z*z;
-	e3 = (x-P3.x)*(x-P3.x) + z*z;
-	e4 = (x-P4.x)*(x-P4.x) + z*z;
-
-	h1 = (x-P1.x)*(y-P1.y);
-	h2 = (x-P2.x)*(y-P2.y);
-	h3 = (x-P3.x)*(y-P3.y);
-	h4 = (x-P4.x)*(y-P4.y);
-
-	d12 =sqrt((P2.x-P1.x)*(P2.x-P1.x)+(P2.y-P1.y)*(P2.y-P1.y));
-	d23 =sqrt((P3.x-P2.x)*(P3.x-P2.x)+(P3.y-P2.y)*(P3.y-P2.y));
-	d34 =sqrt((P4.x-P3.x)*(P4.x-P3.x)+(P4.y-P3.y)*(P4.y-P3.y));
-	d41 =sqrt((P1.x-P4.x)*(P1.x-P4.x)+(P1.y-P4.y)*(P1.y-P4.y));
-	
-	phi1 = 0.0;
-	phi2 = 0.0;
-
-	if(d12>eps){
-		f = (P2.y-P1.y)*e1 - (P2.x-P1.x)*h1;
-		g = (P2.y-P1.y)*e2 - (P2.x-P1.x)*h2;
-		phi1  = ((x-P1.x)*(P2.y-P1.y) 
-			   - (y-P1.y)*(P2.x-P1.x))/d12 * log((r1+r2+d12)/(r1+r2-d12));
-		phi2  = atan2(abs(z)*(P2.x-P1.x)*(f*r2-g*r1), z*z*(P2.x-P1.x)*(P2.x-P1.x)*r1*r2+f*g);
-	}
-	else 
-		ASSERT(FALSE);
-	if(d23>eps){
-		f = (P3.y-P2.y)*e2 - (P3.x-P2.x)*h2;
-		g = (P3.y-P2.y)*e3 - (P3.x-P2.x)*h3;
-		phi1 += ((x-P2.x)*(P3.y-P2.y) 
-			   - (y-P2.y)*(P3.x-P2.x))/d23 * log((r2+r3+d23)/(r2+r3-d23));
-		phi2 += atan2(abs(z)*(P3.x-P2.x)*(f*r3-g*r2), z*z*(P3.x-P2.x)*(P3.x-P2.x)*r2*r3+f*g);
-	}
-	else 
-		ASSERT(FALSE);
-
-	if(d34>eps){
-
-		f = (P4.y-P3.y)*e3 - (P4.x-P3.x)*h3;
-		g = (P4.y-P3.y)*e4 - (P4.x-P3.x)*h4;
-		phi1 += ((x-P3.x)*(P4.y-P3.y) 
-			   - (y-P3.y)*(P4.x-P3.x))/d34 * log((r3+r4+d34)/(r3+r4-d34));
-		phi2 += atan2(abs(z)*(P4.x-P3.x)*(f*r4-g*r3), z*z*(P4.x-P3.x)*(P4.x-P3.x)*r3*r4+f*g);
-	}
-	else
-		ASSERT(FALSE);
-
-	if(d41>eps){
-
-		f = (P1.y-P4.y)*e4 - (P1.x-P4.x)*h4;
-		g = (P1.y-P4.y)*e1 - (P1.x-P4.x)*h1;
-		phi1 += ((x-P4.x)*(P1.y-P4.y) 
-			   - (y-P4.y)*(P1.x-P4.x))/d41 * log((r4+r1+d41)/(r4+r1-d41));
-		phi2 += atan2(abs(z)*(P1.x-P4.x)*(f*r1-g*r4), z*z*(P1.x-P4.x)*(P1.x-P4.x)*r4*r1+f*g);
-	}
-	else 
-		ASSERT(FALSE);
-	
-	phi2 *= abs(z);
-	phi = -(phi1 - phi2)/4./pi;
-}
-
-
-
-void C3DPanelDlg::DoubletPotentialKP(int p, CVector C, double &phi)
-{
-	// Quadrilateral doublet
-	// Katz & Plotkin 10.89 and following
-	// all four corners are assumed to lie in the same plane
-	// the transformation matrix from global to local coordinates has been set previously
-	// returns V, panel p influence at point C
-	phiw = 0.0;
-
-	if(C.IsSame(m_pPanel[p].CollPt)) {
-//		phi = -1.0/2.0;
-		phi = 2.0*pi;
-	}
-	else{
-
-		R = C-m_pPanel[p].CollPt;
-		rz = R.dot(m_pPanel[p].Normal);
-		dist = R.VAbs();
-		if(abs(rz)<eps){
-	//		if(rz>=0.0)	phi = -1.0/2.0;
-	//		else		phi =  1.0/2.0;
-			phi = 0.0;
-		}
-		else{
-			if(dist>RFF*m_pPanel[p].Size){ // use far-field formula
-				phi = -rz * m_pPanel[p].Area /dist/dist/dist;// * 1/4/pi
-			}
-			else{
-				//Convert coordinates
-				x  = m_pPanel[p].lij[0]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[1]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[2]*(C.z-m_pPanel[p].CollPt.z);
-				y  = m_pPanel[p].lij[3]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[4]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[5]*(C.z-m_pPanel[p].CollPt.z);
-				z  = m_pPanel[p].lij[6]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[7]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[8]*(C.z-m_pPanel[p].CollPt.z);
-
-				r1 = sqrt((x-m_pPanel[p].P1.x)*(x-m_pPanel[p].P1.x)+(y-m_pPanel[p].P1.y)*(y-m_pPanel[p].P1.y)+z*z);
-				r2 = sqrt((x-m_pPanel[p].P2.x)*(x-m_pPanel[p].P2.x)+(y-m_pPanel[p].P2.y)*(y-m_pPanel[p].P2.y)+z*z);
-				r3 = sqrt((x-m_pPanel[p].P3.x)*(x-m_pPanel[p].P3.x)+(y-m_pPanel[p].P3.y)*(y-m_pPanel[p].P3.y)+z*z);
-				r4 = sqrt((x-m_pPanel[p].P4.x)*(x-m_pPanel[p].P4.x)+(y-m_pPanel[p].P4.y)*(y-m_pPanel[p].P4.y)+z*z);
-
-				e1 = (x-m_pPanel[p].P1.x)*(x-m_pPanel[p].P1.x) + z*z;
-				e2 = (x-m_pPanel[p].P2.x)*(x-m_pPanel[p].P2.x) + z*z;
-				e3 = (x-m_pPanel[p].P3.x)*(x-m_pPanel[p].P3.x) + z*z;
-				e4 = (x-m_pPanel[p].P4.x)*(x-m_pPanel[p].P4.x) + z*z;
-
-				h1 = (x-m_pPanel[p].P1.x)*(y-m_pPanel[p].P1.y);
-				h2 = (x-m_pPanel[p].P2.x)*(y-m_pPanel[p].P2.y);
-				h3 = (x-m_pPanel[p].P3.x)*(y-m_pPanel[p].P3.y);
-				h4 = (x-m_pPanel[p].P4.x)*(y-m_pPanel[p].P4.y);
-
-				d12 = sqrt((m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)+(m_pPanel[p].P2.y-m_pPanel[p].P1.y)*(m_pPanel[p].P2.y-m_pPanel[p].P1.y));
-				d23 = sqrt((m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)+(m_pPanel[p].P3.y-m_pPanel[p].P2.y)*(m_pPanel[p].P3.y-m_pPanel[p].P2.y));
-				d34 = sqrt((m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)+(m_pPanel[p].P4.y-m_pPanel[p].P3.y)*(m_pPanel[p].P4.y-m_pPanel[p].P3.y));
-				d41 = sqrt((m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)+(m_pPanel[p].P1.y-m_pPanel[p].P4.y)*(m_pPanel[p].P1.y-m_pPanel[p].P4.y));
-
-				phi = 0.0;
-
-				if(d12>eps){
-					f = (m_pPanel[p].P2.y-m_pPanel[p].P1.y)*e1 - (m_pPanel[p].P2.x-m_pPanel[p].P1.x)*h1;
-					g = (m_pPanel[p].P2.y-m_pPanel[p].P1.y)*e2 - (m_pPanel[p].P2.x-m_pPanel[p].P1.x)*h2;
-					phi  = -atan2(z*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(f*r2-g*r1), z*z*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*r1*r2+f*g);
-				}
-				if(d23>eps){
-					f = (m_pPanel[p].P3.y-m_pPanel[p].P2.y)*e2 - (m_pPanel[p].P3.x-m_pPanel[p].P2.x)*h2;
-					g = (m_pPanel[p].P3.y-m_pPanel[p].P2.y)*e3 - (m_pPanel[p].P3.x-m_pPanel[p].P2.x)*h3;
-					phi  -= atan2(z*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(f*r3-g*r2), z*z*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*r2*r3+f*g);
-				}
-
-				if(d34>eps){
-					f = (m_pPanel[p].P4.y-m_pPanel[p].P3.y)*e3 - (m_pPanel[p].P4.x-m_pPanel[p].P3.x)*h3;
-					g = (m_pPanel[p].P4.y-m_pPanel[p].P3.y)*e4 - (m_pPanel[p].P4.x-m_pPanel[p].P3.x)*h4;
-					phi  -= atan2(z*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(f*r4-g*r3), z*z*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*r3*r4+f*g);
-				}
-
-				if(d41>eps){
-					f = (m_pPanel[p].P1.y-m_pPanel[p].P4.y)*e4 - (m_pPanel[p].P1.x-m_pPanel[p].P4.x)*h4;
-					g = (m_pPanel[p].P1.y-m_pPanel[p].P4.y)*e1 - (m_pPanel[p].P1.x-m_pPanel[p].P4.x)*h1;
-					phi  -= atan2(z*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(f*r1-g*r4), z*z*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*r4*r1+f*g);
-				}
-			}
-		}
-	}
-
-	if(m_pPanel[p].m_bIsTrailing){
-		//add the wake panel contribution to enforce Kutta's condition
-		// we start at the first wake panel and go thru the wake
-
-		int pw = m_pPanel[p].m_iWake;
-		while (pw>=0)
-		{
-			R = C-m_pWakePanel[pw].CollPt;
-			rz = R.dot(m_pWakePanel[pw].Normal);
-			dist = R.VAbs();
-			if(abs(rz)<eps){
-//				if(rz>=0.0)	phiw = -1.0/2.0;
-//				else		phiw =  1.0/2.0;
-				phiw = 0.0;
-			}
-			else{
-				if(dist>RFF*m_pWakePanel[pw].Size){ // use far-field formula
-					phiw = -rz * m_pWakePanel[pw].Area /dist/dist/dist;// * -1/4/pi
-					if(m_pWakePanel[pw].m_iPos==-1) phiw = -phiw;
-				}
-				else{
-
-					//Convert coordinates
-					x  = m_pWakePanel[pw].lij[0]*(C.x-m_pWakePanel[pw].CollPt.x)  + m_pWakePanel[pw].lij[1]*(C.y-m_pWakePanel[pw].CollPt.y)  + m_pWakePanel[pw].lij[2]*(C.z-m_pWakePanel[pw].CollPt.z);
-					y  = m_pWakePanel[pw].lij[3]*(C.x-m_pWakePanel[pw].CollPt.x)  + m_pWakePanel[pw].lij[4]*(C.y-m_pWakePanel[pw].CollPt.y)  + m_pWakePanel[pw].lij[5]*(C.z-m_pWakePanel[pw].CollPt.z);
-					z  = m_pWakePanel[pw].lij[6]*(C.x-m_pWakePanel[pw].CollPt.x)  + m_pWakePanel[pw].lij[7]*(C.y-m_pWakePanel[pw].CollPt.y)  + m_pWakePanel[pw].lij[8]*(C.z-m_pWakePanel[pw].CollPt.z);
-
-					r1 = sqrt((x-m_pWakePanel[pw].P1.x)*(x-m_pWakePanel[pw].P1.x)+(y-m_pWakePanel[pw].P1.y)*(y-m_pWakePanel[pw].P1.y)+z*z);
-					r2 = sqrt((x-m_pWakePanel[pw].P2.x)*(x-m_pWakePanel[pw].P2.x)+(y-m_pWakePanel[pw].P2.y)*(y-m_pWakePanel[pw].P2.y)+z*z);
-					r3 = sqrt((x-m_pWakePanel[pw].P3.x)*(x-m_pWakePanel[pw].P3.x)+(y-m_pWakePanel[pw].P3.y)*(y-m_pWakePanel[pw].P3.y)+z*z);
-					r4 = sqrt((x-m_pWakePanel[pw].P4.x)*(x-m_pWakePanel[pw].P4.x)+(y-m_pWakePanel[pw].P4.y)*(y-m_pWakePanel[pw].P4.y)+z*z);
-
-					e1 = (x-m_pWakePanel[pw].P1.x)*(x-m_pWakePanel[pw].P1.x) + z*z;
-					e2 = (x-m_pWakePanel[pw].P2.x)*(x-m_pWakePanel[pw].P2.x) + z*z;
-					e3 = (x-m_pWakePanel[pw].P3.x)*(x-m_pWakePanel[pw].P3.x) + z*z;
-					e4 = (x-m_pWakePanel[pw].P4.x)*(x-m_pWakePanel[pw].P4.x) + z*z;
-
-					h1 = (x-m_pWakePanel[pw].P1.x)*(y-m_pWakePanel[pw].P1.y);
-					h2 = (x-m_pWakePanel[pw].P2.x)*(y-m_pWakePanel[pw].P2.y);
-					h3 = (x-m_pWakePanel[pw].P3.x)*(y-m_pWakePanel[pw].P3.y);
-					h4 = (x-m_pWakePanel[pw].P4.x)*(y-m_pWakePanel[pw].P4.y);
-
-					d12 = sqrt((m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*(m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)+
-						       (m_pWakePanel[pw].P2.y-m_pWakePanel[pw].P1.y)*(m_pWakePanel[pw].P2.y-m_pWakePanel[pw].P1.y));
-					d23 = sqrt((m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*(m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)+
-						       (m_pWakePanel[pw].P3.y-m_pWakePanel[pw].P2.y)*(m_pWakePanel[pw].P3.y-m_pWakePanel[pw].P2.y));
-					d34 = sqrt((m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*(m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)+
-						       (m_pWakePanel[pw].P4.y-m_pWakePanel[pw].P3.y)*(m_pWakePanel[pw].P4.y-m_pWakePanel[pw].P3.y));
-					d41 = sqrt((m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*(m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)+
-						       (m_pWakePanel[pw].P1.y-m_pWakePanel[pw].P4.y)*(m_pWakePanel[pw].P1.y-m_pWakePanel[pw].P4.y));
-
-					phiw = 0.0;
-
-					if(d12>eps){				
-						f = (m_pWakePanel[pw].P2.y-m_pWakePanel[pw].P1.y)*e1 - (m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*h1;
-						g = (m_pWakePanel[pw].P2.y-m_pWakePanel[pw].P1.y)*e2 - (m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*h2;
-						phiw  = atan2(z*(m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*(f*r2-g*r1), z*z*(m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*(m_pWakePanel[pw].P2.x-m_pWakePanel[pw].P1.x)*r1*r2+f*g);
-					}
-					if(d23>eps){
-						f = (m_pWakePanel[pw].P3.y-m_pWakePanel[pw].P2.y)*e2 - (m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*h2;
-						g = (m_pWakePanel[pw].P3.y-m_pWakePanel[pw].P2.y)*e3 - (m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*h3;
-						phiw  += atan2(z*(m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*(f*r3-g*r2), z*z*(m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*(m_pWakePanel[pw].P3.x-m_pWakePanel[pw].P2.x)*r2*r3+f*g);
-					}
-
-					if(d34>eps){
-						f = (m_pWakePanel[pw].P4.y-m_pWakePanel[pw].P3.y)*e3 - (m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*h3;
-						g = (m_pWakePanel[pw].P4.y-m_pWakePanel[pw].P3.y)*e4 - (m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*h4;
-						phiw  += atan2(z*(m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*(f*r4-g*r3), z*z*(m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*(m_pWakePanel[pw].P4.x-m_pWakePanel[pw].P3.x)*r3*r4+f*g);
-					}
-
-					if(d41>eps){
-						f = (m_pWakePanel[pw].P1.y-m_pWakePanel[pw].P4.y)*e4 - (m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*h4;
-						g = (m_pWakePanel[pw].P1.y-m_pWakePanel[pw].P4.y)*e1 - (m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*h1;
-						phiw  += atan2(z*(m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*(f*r1-g*r4), z*z*(m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*(m_pWakePanel[pw].P1.x-m_pWakePanel[pw].P4.x)*r4*r1+f*g);
-					}
-				}
-			}
-			pw = m_pWakePanel[pw].m_iPD;
-		}
-	}
-
-	if(m_pPanel[p].m_iPos>0)	phi = -(phi+phiw)/4.0/pi;
-	else						phi = -(phi-phiw)/4.0/pi;
-}
-
-
-void C3DPanelDlg::DoubletVelocityKP(int p, CVector C, CVector &V)
-{
-	// Quadrilateral source
-	// Katz & Plotkin 10.89 and following
-	// all four corners are assumed to lie in the same plane
-	// the transformation matrix from global to local coordinates has been set previously
-
-	//returns V, panel p influence at point C
-
-	R = C-m_pPanel[p].CollPt;
-	dist = R.VAbs();
-	//Convert coordinates to local
-	x  = m_pPanel[p].lij[0]*(R.x)  + m_pPanel[p].lij[1]*(R.y)  + m_pPanel[p].lij[2]*(R.z);
-	y  = m_pPanel[p].lij[3]*(R.x)  + m_pPanel[p].lij[4]*(R.y)  + m_pPanel[p].lij[5]*(R.z);
-	z  = m_pPanel[p].lij[6]*(R.x)  + m_pPanel[p].lij[7]*(R.y)  + m_pPanel[p].lij[8]*(R.z);
-
-	if(dist>RFF*m_pPanel[p].Size){ // use far-field formula
-		V.x =  3./4./pi * m_pPanel[p].Area * x * z /dist/dist/dist/dist/dist;
-		V.y =  3./4./pi * m_pPanel[p].Area * y * z /dist/dist/dist/dist/dist;
-		V.z = -1./4./pi * m_pPanel[p].Area * (x*x+y*y-2.0*z*z) /dist/dist/dist/dist/dist;
-//		TRACE ("%10.6f    %10.6f    %10.6f\n",V.x, V.y, V.z);
-		return;
-	} 
-
-	x1 = m_pPanel[p].P1.x; y1 = m_pPanel[p].P1.y; 
-	x2 = m_pPanel[p].P2.x; y2 = m_pPanel[p].P2.y; 
-	x3 = m_pPanel[p].P3.x; y3 = m_pPanel[p].P3.y; 
-	x4 = m_pPanel[p].P4.x; y4 = m_pPanel[p].P4.y; 
-
-	r1 = sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)+z*z);
-	r2 = sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2)+z*z);
-	r3 = sqrt((x-x3)*(x-x3)+(y-y3)*(y-y3)+z*z);
-	r4 = sqrt((x-x4)*(x-x4)+(y-y4)*(y-y4)+z*z);
-
-	if(abs(z)>eps){
-		us  = z*(y1-y2)*(r1+r2)/r1/r2/(r1*r2-((x-x1)*(x-x2)+(y-y1)*(y-y2)+z*z));
-		us += z*(y2-y3)*(r2+r3)/r2/r3/(r2*r3-((x-x2)*(x-x3)+(y-y2)*(y-y3)+z*z));
-		us += z*(y3-y4)*(r3+r4)/r3/r4/(r3*r4-((x-x3)*(x-x4)+(y-y3)*(y-y4)+z*z));
-		us += z*(y4-y1)*(r4+r1)/r4/r1/(r4*r1-((x-x4)*(x-x1)+(y-y4)*(y-y1)+z*z));
-
-		vs  = z*(x2-x1)*(r1+r2)/r1/r2/(r1*r2-((x-x1)*(x-x2)+(y-y1)*(y-y2)+z*z));
-		vs += z*(x3-x2)*(r2+r3)/r2/r3/(r2*r3-((x-x2)*(x-x3)+(y-y2)*(y-y3)+z*z));
-		vs += z*(x4-x3)*(r3+r4)/r3/r4/(r3*r4-((x-x3)*(x-x4)+(y-y3)*(y-y4)+z*z));
-		vs += z*(x1-x4)*(r4+r1)/r4/r1/(r4*r1-((x-x4)*(x-x1)+(y-y4)*(y-y1)+z*z));
-	}
-	else {
-		us = 0.0;
-		vs = 0.0;
-	}
-
-	ws  = ((x-x2)*(y-y1)-(x-x1)*(y-y2))*(r1+r2)/r1/r2/(r1*r2-((x-x1)*(x-x2)+(y-y1)*(y-y2)+z*z));
-	ws += ((x-x3)*(y-y2)-(x-x2)*(y-y3))*(r2+r3)/r2/r3/(r2*r3-((x-x2)*(x-x3)+(y-y2)*(y-y3)+z*z));
-	ws += ((x-x4)*(y-y3)-(x-x3)*(y-y4))*(r3+r4)/r3/r4/(r3*r4-((x-x3)*(x-x4)+(y-y3)*(y-y4)+z*z));
-	ws += ((x-x1)*(y-y4)-(x-x4)*(y-y1))*(r4+r1)/r4/r1/(r4*r1-((x-x4)*(x-x1)+(y-y4)*(y-y1)+z*z));
-
-	V.x = us/4.0/pi;
-	V.y = vs/4.0/pi;
-	V.z = ws/4.0/pi;
-}
-
-
-void C3DPanelDlg::SourceVelocityKP(int p, CVector C, CVector &V)
-{
-		// Quadrilateral source
-	// Katz & Plotkin 10.89 and following
-	// all four corners are assumed to lie in the same plane
-	// the transformation matrix from global to local coordinates has been set previously
-
-	R = C-m_pPanel[p].CollPt;
-	dist = R.VAbs();
-
-	//Convert coordinates
-	x  = m_pPanel[p].lij[0]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[1]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[2]*(C.z-m_pPanel[p].CollPt.z);
-	y  = m_pPanel[p].lij[3]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[4]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[5]*(C.z-m_pPanel[p].CollPt.z);
-	z  = m_pPanel[p].lij[6]*(C.x-m_pPanel[p].CollPt.x)  + m_pPanel[p].lij[7]*(C.y-m_pPanel[p].CollPt.y)  + m_pPanel[p].lij[8]*(C.z-m_pPanel[p].CollPt.z);
-
-	if(dist>RFF*m_pPanel[p].Size){ // use far-field formula
-		V.x =  1./4./pi * m_pPanel[p].Area * x /dist/dist/dist;
-		V.y =  1./4./pi * m_pPanel[p].Area * y /dist/dist/dist;
-		V.z =  1./4./pi * m_pPanel[p].Area * z /dist/dist/dist;
-//		TRACE ("%10.6f    %10.6f    %10.6f\n",V.x, V.y, V.z);
-		return;
-	}
-	
-	r1 = sqrt((x-m_pPanel[p].P1.x)*(x-m_pPanel[p].P1.x)+(y-m_pPanel[p].P1.y)*(y-m_pPanel[p].P1.y)+z*z);
-	r2 = sqrt((x-m_pPanel[p].P2.x)*(x-m_pPanel[p].P2.x)+(y-m_pPanel[p].P2.y)*(y-m_pPanel[p].P2.y)+z*z);
-	r3 = sqrt((x-m_pPanel[p].P3.x)*(x-m_pPanel[p].P3.x)+(y-m_pPanel[p].P3.y)*(y-m_pPanel[p].P3.y)+z*z);
-	r4 = sqrt((x-m_pPanel[p].P4.x)*(x-m_pPanel[p].P4.x)+(y-m_pPanel[p].P4.y)*(y-m_pPanel[p].P4.y)+z*z);
-
-	e1 = (x-m_pPanel[p].P1.x)*(x-m_pPanel[p].P1.x) + z*z;
-	e2 = (x-m_pPanel[p].P2.x)*(x-m_pPanel[p].P2.x) + z*z;
-	e3 = (x-m_pPanel[p].P3.x)*(x-m_pPanel[p].P3.x) + z*z;
-	e4 = (x-m_pPanel[p].P4.x)*(x-m_pPanel[p].P4.x) + z*z;
-
-	h1 = (x-m_pPanel[p].P1.x)*(y-m_pPanel[p].P1.y);
-	h2 = (x-m_pPanel[p].P2.x)*(y-m_pPanel[p].P2.y);
-	h3 = (x-m_pPanel[p].P3.x)*(y-m_pPanel[p].P3.y);
-	h4 = (x-m_pPanel[p].P4.x)*(y-m_pPanel[p].P4.y);
-
-	d12 = sqrt((m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)+(m_pPanel[p].P2.y-m_pPanel[p].P1.y)*(m_pPanel[p].P2.y-m_pPanel[p].P1.y));
-	d23 = sqrt((m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)+(m_pPanel[p].P3.y-m_pPanel[p].P2.y)*(m_pPanel[p].P3.y-m_pPanel[p].P2.y));
-	d34 = sqrt((m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)+(m_pPanel[p].P4.y-m_pPanel[p].P3.y)*(m_pPanel[p].P4.y-m_pPanel[p].P3.y));
-	d41 = sqrt((m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)+(m_pPanel[p].P1.y-m_pPanel[p].P4.y)*(m_pPanel[p].P1.y-m_pPanel[p].P4.y));
-
-	us = 0.0;
-	vs = 0.0;
-	ws = 0.0;
-
-	if((r1+r2+d12)!=0.0 && (r1+r2-d12)/(r1+r2+d12)>0.0){
-		us  = (m_pPanel[p].P2.y-m_pPanel[p].P1.y)/d12*log((r1+r2-d12)/(r1+r2+d12));
-		vs  = (m_pPanel[p].P1.x-m_pPanel[p].P2.x)/d12*log((r1+r2-d12)/(r1+r2+d12));
-	}
-	if((r2+r3+d23)!=0.0 && (r2+r3-d23)/(r2+r3+d23)>0.0){
-		us += (m_pPanel[p].P3.y-m_pPanel[p].P2.y)/d23*log((r2+r3-d23)/(r2+r3+d23));
-		vs += (m_pPanel[p].P2.x-m_pPanel[p].P3.x)/d23*log((r2+r3-d23)/(r2+r3+d23));
-	}
-	if((r3+r4+d34)!=0.0 && (r3+r4-d34)/(r3+r4+d34)>0.0) {
-		us += (m_pPanel[p].P4.y-m_pPanel[p].P3.y)/d34*log((r3+r4-d34)/(r3+r4+d34));
-		vs += (m_pPanel[p].P3.x-m_pPanel[p].P4.x)/d34*log((r3+r4-d34)/(r3+r4+d34));
-	}
-	if((r4+r1+d41)!=0.0 && (r4+r1-d41)/(r4+r1+d41)>0.0){
-		us += (m_pPanel[p].P1.y-m_pPanel[p].P4.y)/d41*log((r4+r1-d41)/(r4+r1+d41));
-		vs += (m_pPanel[p].P4.x-m_pPanel[p].P1.x)/d41*log((r4+r1-d41)/(r4+r1+d41));
-	}
-
-	if(abs(z)<eps){
-		if(z>=0.0){
-			ws =  1.0/2.0;
-		}
-		else{
-			ws = -1.0/2.0; 
-		}
-	}
-	else{
-		if(d12>eps){
-			f = (m_pPanel[p].P2.y-m_pPanel[p].P1.y)*e1 - (m_pPanel[p].P2.x-m_pPanel[p].P1.x)*h1;
-			g = (m_pPanel[p].P2.y-m_pPanel[p].P1.y)*e2 - (m_pPanel[p].P2.x-m_pPanel[p].P1.x)*h2;
-			ws  = atan2(z*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(f*r2-g*r1), z*z*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*(m_pPanel[p].P2.x-m_pPanel[p].P1.x)*r1*r2+f*g);
-		}
-		if(d23>eps){
-			f = (m_pPanel[p].P3.y-m_pPanel[p].P2.y)*e2 - (m_pPanel[p].P3.x-m_pPanel[p].P2.x)*h2;
-			g = (m_pPanel[p].P3.y-m_pPanel[p].P2.y)*e3 - (m_pPanel[p].P3.x-m_pPanel[p].P2.x)*h3;
-			ws += atan2(z*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(f*r3-g*r2), z*z*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*(m_pPanel[p].P3.x-m_pPanel[p].P2.x)*r2*r3+f*g);
-		}
-
-		if(d34>eps){
-			f = (m_pPanel[p].P4.y-m_pPanel[p].P3.y)*e3 - (m_pPanel[p].P4.x-m_pPanel[p].P3.x)*h3;
-			g = (m_pPanel[p].P4.y-m_pPanel[p].P3.y)*e4 - (m_pPanel[p].P4.x-m_pPanel[p].P3.x)*h4;
-			ws += atan2(z*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(f*r4-g*r3), z*z*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*(m_pPanel[p].P4.x-m_pPanel[p].P3.x)*r3*r4+f*g);
-		}
-
-		if(d41>eps){
-			f = (m_pPanel[p].P1.y-m_pPanel[p].P4.y)*e4 - (m_pPanel[p].P1.x-m_pPanel[p].P4.x)*h4;
-			g = (m_pPanel[p].P1.y-m_pPanel[p].P4.y)*e1 - (m_pPanel[p].P1.x-m_pPanel[p].P4.x)*h1;
-			ws += atan2(z*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(f*r1-g*r4), z*z*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*(m_pPanel[p].P1.x-m_pPanel[p].P4.x)*r4*r1+f*g);
-		}
-	}
-	V.x = us/4.0/pi;
-	V.y = vs/4.0/pi;
-	V.z = ws/4.0/pi;
-}
-
 void C3DPanelDlg::AddString(CString strong)
 {
 	if(m_bXFile) {
@@ -839,30 +330,7 @@ void C3DPanelDlg::AddString(CString strong)
 		m_ctrlOutput.ReplaceSel(strong);
 	}
 }
-/*	CVector Inc, Tan, Pt;
-	double dl =  m_pPanel[3].Size/20.0;
-	Pt = m_pPanel[3].CollPt;
-	Tan = m_pNode[m_pPanel[3].m_iLA]-m_pNode[m_pPanel[3].m_iTA];
-	Tan.Normalize();
-	Inc = Tan * dl;
-//	Pt += m_pPanel[3].Normal * (-0.75) * m_pPanel[3].Size;
-//	Inc = m_pPanel[3].Normal * dl;
-	Pt += Inc*(-500.0);
-	for (i=00; i<1000; i++){
-		Pt += Inc;
-//		DoubletNACA4023(Pt, 3, V, phi1);
-//		TRACE("%10.5f     %e", DotProduct((Pt-m_pPanel[3].CollPt),Tan) , -phi1/4.0/3.141592654);
-//		DoubletPotentialKP(3,Pt,phi);
-//		TRACE("        %e\n", phi);
-//		SourceNACA4023(Pt, 3, V, phi);
-		DoubletNACA4023(Pt, 3, V, phi);
-		TRACE("%10.5f       %10.5f", DotProduct((Pt-m_pPanel[3].CollPt),Tan), phi);
-		SourceNACA4023(Pt, 3, V, phi);
-		TRACE("       %10.5f\n", phi);
-//		TRACE("%10.5f       %10.5f       %10.5f\n", V.dot(m_pPanel[3].l),V.dot(m_pPanel[3].m), V.dot(m_pPanel[3].Normal));
-//		TRACE("%10.5f       %10.5f       %10.5f       %10.5f", 	DotProduct((Pt-m_pPanel[3].CollPt),Tan),			V.dot(m_pPanel[3].l), V.dot(m_pPanel[3].m), V.dot(m_pPanel[3].Normal));
-	}
-	return false;*/
+
 
 bool  C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 {
@@ -873,13 +341,32 @@ bool  C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 	CVector QInf;
 	AddString("      Creating RHS vector...\r\n");
 
+//_____________________________________________________________________________________
+	int N=2;//panel number
+	CVector D, TestPt;
+	D = m_pPanel[N].Normal;
+//	D = m_pPanel[N].l;
+	double h = -0.2;	//m
+	double Delta = -2.0*h/100.0;	//m
+	
+/*	for (int l=0; l<=100;l++){	
+		TestPt = m_pPanel[N].CollPt + D * h ;//+ m_pPanel[N].l * m_pPanel[N].SMP*2.0;
+		DoubletNASA4023(TestPt, m_pPanel+N, V, phi);
+//		SourceNASA4023(TestPt, m_pPanel+N, V, phi);
+		TRACE("%10.5f      %10.5e      %10.5e      %10.5e\n", h, V.x, V.y, V.z);
+		h += Delta;
+	}
+	return false;	
+//_____________________________________________________________________________________s
+*/
+
 	m=0;
 	for (q=0; q<=nval;q++){
 		alpha = V0+q*VDelta;
 		QInf.Set(m_QInf*cos(alpha*pi/180.0), 0.0, m_QInf * sin(alpha*pi/180.0));
 		for (p=0; p< m_MatSize; p++){
 			if(m_bCancel) return false;
-			m_Sigma[m]= -1.0/4.0/pi * QInf.dot(m_pPanel[p].Normal);
+			m_Sigma[m]= -1.0/4.0/pi* QInf.dot(m_pPanel[p].Normal);// 
 			m++;
 		}
 		SetProgress((int)(100*q/(nval+1)),0.05);
@@ -892,9 +379,9 @@ bool  C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 			if(m_bCancel) return false;
 			m_RHS[m] = 0.0;
 			if(m_bNeumann) m_RHS[m] = -QInf.dot(m_pPanel[p].Normal);
-			C = m_pPanel[p].CollPt;// - m_pPanel[p].Normal*m_pPanel[p].Size/100.0;
+			C = m_pPanel[p].CollPt; 
 			for (pp=0; pp<m_MatSize; pp++){
-				SourceNACA4023(C, pp, V, phi);
+				SourceNASA4023(C, m_pPanel+pp, V, phi);
 				if(!m_bNeumann)	m_RHS[m] -=  phi* m_Sigma[pp+q*m_MatSize];
 				else			m_RHS[m] -=  V.dot(m_pPanel[p].Normal) * m_Sigma[pp+q*m_MatSize];
 			}
@@ -910,32 +397,115 @@ bool  C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 
 bool C3DPanelDlg::CreateMatrix()
 {
-	int p,pp;
-	int pos = 0;
-	double phi = 0.0; 
 	CVector C,V;
+	int p, pp;
+	int pos = 0;
+	double phi = 0.0;
+			
 	AddString("      Creating the influence matrix...\r\n");
 
 	for(p=0; p<m_MatSize; p++){
 		if(m_bCancel) return false;
-		C = m_pPanel[p].CollPt;// - m_pPanel[p].Normal*m_pPanel[p].Size/10000.0;
-		for(pp=0; pp<m_MatSize; pp++){
+		C = m_pPanel[p].CollPt;// - m_pPanel[p].Normal*m_pPanel[p].Size/100.0;
+
+		for(pp=0; pp<m_MatSize; pp++)
+		{
 			if(m_bCancel) return false;
-			DoubletNACA4023(C, pp, V, phi);
+
+			DoubletNASA4023(C, m_pPanel+pp, V, phi);
 			if(!m_bNeumann)	m_aij[p*m_MatSize+pp] = phi;
 			else			m_aij[p*m_MatSize+pp] = V.dot(m_pPanel[p].Normal);
-		}	
-		SetProgress((int)(100*p/m_MatSize),.20);
+
+
+		}
+		SetProgress((int)(100*p/m_MatSize),0.20);
 	}
 	m_Progress =35;
 	return true;
 }
 
+bool C3DPanelDlg::AddWakeContribution()
+{
+	int kw, lw, pw, p, pp;
+	CVector V, C;
+	double phi;
+	double Delta_phi_inf = 0.0;
+	double phiw[MAXSTATIONS];	
+
+	for(p=0; p<m_MatSize; p++)//for each matrix row 
+	{
+		if(m_bCancel) return false;
+		C = m_pPanel[p].CollPt;
+
+		//build contributions of each wake column at point C
+		//we have m_NWakeColum to consider
+		pw=0;
+		for (kw=0; kw<m_NWakeColumn; kw++)
+		{
+			phiw[kw] = 0.0;
+			//each wake column has m_pWing->m_NXWakePanels
+			for(lw=0; lw<m_NXWakePanels; lw++)
+			{
+				DoubletNASA4023(C, m_pWakePanel+pw, V, phi, true);
+				phiw[kw] += phi;
+				pw++;
+			}
+		}
+		for(pp=0; pp<m_MatSize; pp++) //for each matrix column
+		{
+			if(m_bCancel) return false;
+
+			// Is the panel pp shedding a wake ?
+			if(m_pPanel[pp].m_bIsTrailing)
+			{
+				//If so, we need to add, to the matrix, the contribution of the wake column shedded by this panel
+				if(m_pPanel[pp].m_iPos == -1)
+				{
+					//bottom side, substract the wake contribution
+					m_aij[p*m_MatSize+pp] -= phiw[m_pPanel[pp].m_iWakeColumn];
+				}
+				else
+				{
+					//top side, add the wake contribution
+					m_aij[p*m_MatSize+pp] += phiw[m_pPanel[pp].m_iWakeColumn];
+				}
+			} 
+		}
+		// for each wake column, add, to the RHS, the contribution of Phi_top - Phi_bot
+		// i.a.w.  NASA4023 eq. 44
+
+		for(pp=0; pp<m_MatSize; pp++)
+		{
+			Delta_phi_inf = 0.0;
+
+			//for each trailing point from the bottom side
+			if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_iPos==-1)
+			{
+				// The corresponding trailing upper panel is the next coming up
+				// TODO : upper panel should be indexed in panel definition
+				for(int i=pp; i<m_MatSize; i++){
+					if(m_pPanel[i].m_bIsTrailing && m_pPanel[i].m_iPos==1)
+					{
+						//calculate the freestream potential difference at the two collocation points
+						Delta_phi_inf += m_QInf * ( cos(m_Alpha*pi/180) * (m_pPanel[i].CollPt.x - m_pPanel[pp].CollPt.x)
+												   -sin(m_Alpha*pi/180) * (m_pPanel[i].CollPt.z - m_pPanel[pp].CollPt.z));
+	//					TRACE("pp=%d   i=%d   Delta_phi_inf=%e\n", pp, i, Delta_phi_inf);
+						break;
+					}
+					
+				}
+			}
+			//finally add the contribution to RHS
+			m_RHS[p] -= Delta_phi_inf * phiw[m_pPanel[pp].m_iWakeColumn];
+		}
+	}
+	return true;
+}
 
 bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 {
 	// solves the linear system for all DeltaAlphas (or Delta QInfs) simultaneously
-	// solves the system for vortices Strength stored in the m_Gamma array
+	// solves the system for doublet strength stored in the m_Gamma array
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CString strong, strange;
 	int p, q, pp,Size, j, k, l, nrhs;
@@ -960,7 +530,7 @@ bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 	}
 	else m_bConverged = true;
 
-	//so far we have a unit Vortex Strength
+	//so far we have a unit Doublet Strength
 	if(m_pWPolar->m_Type==2){
 		//type 2; find the speeds which will create a lift equal to the weight
 		AddString("      Calculating speeds to balance the weight\r\n");
@@ -972,7 +542,6 @@ bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 			p=0;
 			for (p=0; p<Size; p++){
 				// for each panel, add the lift coef
-//				CrossProduct(VInf, m_pPanel[p].Vortex, Force);
 				Lift += Force.z * row[p];
 			}
 			if(m_b3DSymetric) Lift *=2.0;
@@ -1046,11 +615,102 @@ bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 				}
 			}
 		}
-	}
-	
-//	memcpy(row, m_Mu, sizeof(row));
+	}	
 	AddString("\r\n");
 	return true;
+}
+
+
+bool C3DPanelDlg::Gauss(double *A, int n, double *B, int m)
+{
+ 	int row, i, j, pivot_row, k;
+	double max, dum, *pa, *pA, *A_pivot_row;
+	// for each variable find pivot row and perform forward substitution
+	pa = A;
+	for (row = 0; row < (n - 1); row++, pa += n) {
+		//  find the pivot row
+		A_pivot_row = pa;
+		max = abs(*(pa + row));
+		pA = pa + n;
+		pivot_row = row;
+		for (i=row+1; i < n; pA+=n, i++)
+			if ((dum = abs(*(pA+row))) > max) { 
+				max = dum; 
+				A_pivot_row = pA; 
+				pivot_row = i; 
+			}
+		if (max <= 0.0) 
+			return false;                // the matrix A is singular
+		
+			// and if it differs from the current row, interchange the two rows.
+			
+		if (pivot_row != row) {
+			for (i = row; i < n; i++) {
+				dum = *(pa + i);
+				*(pa + i) = *(A_pivot_row + i);
+				*(A_pivot_row + i) = dum;
+			}
+			for(k=0; k<=m; k++){
+				dum = B[row+k*n];
+				B[row+k*n] = B[pivot_row+k*n];
+				B[pivot_row+k*n] = dum;
+			}
+		}
+		
+		// Perform forward substitution
+		for (i = row+1; i<n; i++) {
+			pA = A + i * n;
+			dum = - *(pA + row) / *(pa + row);
+			*(pA + row) = 0.0;
+			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
+			for (k=0; k<=m; k++) 
+				B[i+k*n] += dum * B[row+k*n];
+		}
+		SetProgress((int)(100*row/(n-1)/2),.15);
+	}
+	m_Progress +=15;
+
+	// Perform backward substitution
+	
+	pa = A + (n - 1) * n;
+	for (row = n - 1; row >= 0; pa -= n, row--) {
+		if ( *(pa + row) == 0.0 ) 
+			return false;           // matrix is singular
+		dum = 1.0 / *(pa + row);
+		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
+		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for ( i = 0, pA = A; i < row; pA += n, i++) {
+			dum = *(pA + row);
+			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
+			for(k=0; k<=m; k++) 
+				B[i+k*n] -= dum * B[row+k*n];
+		}
+		SetProgress((int)(100*(n-1-row)/(n-1)/2),.15);
+	}
+	m_Progress +=15;
+	return true;
+}
+
+
+void C3DPanelDlg::CheckSolution()
+{
+	CVector C,V;
+	int p, pp;
+	double phi, phiS, phiD, row;
+	if(m_bNeumann) return;//...
+	for (p=0; p<m_MatSize; p++){
+		row = 0.0;
+		C = m_pPanel[p].CollPt;// - m_pPanel[p].Normal*m_pPanel[p].Size/100.0;
+		phiS = 0.0; phiD = 0.0;
+		for (pp=0; pp<m_MatSize; pp++){
+			SourceNASA4023(C, m_pPanel+pp, V, phi);
+			phiS+= phi * m_Sigma[pp];
+			DoubletNASA4023(C, m_pPanel+pp, V, phi);
+			phiD+= phi * m_Mu[pp];
+			row = phiS+phiD;
+		}
+TRACE("Potential[%d] =   %12.6e   %12.6e   %12.6e\n", p, phiS, phiD, row);
+	}
 }
 
 
@@ -1214,51 +874,59 @@ void C3DPanelDlg::ComputePlane(double V0, double VDelta, int nrhs)
 			AddString("\r\n");
 		}
 		else m_bPointOut = true;
+
+		SetDownwash(m_Mu+q*m_MatSize, m_Sigma+q*m_MatSize);
+
 		SetProgress((int)(100*q/(nrhs+1)),.35);
 	}
 	SetProgress(100,.35);
 }
 
 
-void C3DPanelDlg::DoubletNACA4023(CVector TestPt, int K, CVector &V, double &phi)
+void C3DPanelDlg::DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake)
 {
 	//VSAERO theory Manual
 	//Influence of panel pp at coll pt of panel p
 	int i;
+	double side, sign;
 	double eps = 1.e-7;
+	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
 	CVector PJK, a, b, s, T;
 	CVector R[5];
-	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk;
+	CVector *pNode;
+	if(bWake)	pNode = m_pWakeNode;
+	else		pNode = m_pNode;
 
 	phi = 0.0;
 	V.Set(0.0,0.0,0.0);
 
-	PJK = TestPt - m_pPanel[K].CollPt;
-	PN  = PJK.dot(m_pPanel[K].Normal);
+	PJK = TestPt - pPanel->CollPt;
+	PN  = PJK.dot(pPanel->Normal);
 	pjk = PJK.VAbs();
 
-	if(pjk> RFF*m_pPanel[K].Size){ // use far-field formula
-		phi = PN * m_pPanel[K].Area /pjk/pjk/pjk;
-		V   = (PJK*3.0*PN - m_pPanel[K].Normal*pjk*pjk)*m_pPanel[K].Area /pjk/pjk/pjk/pjk/pjk;
+	if(pjk> RFF*pPanel->Size){ // use far-field formula
+		phi = PN * pPanel->Area /pjk/pjk/pjk;
+		V   = (PJK*3.0*PN - pPanel->Normal*pjk*pjk)*pPanel->Area /pjk/pjk/pjk/pjk/pjk;
+		return;
 	}  
 	else
 	{
 		phi = 0.0;
 		V.Set(0.0,0.0,0.0);
 
-		if(m_pPanel[K].m_iPos>=0){
-			R[0] = m_pNode[m_pPanel[K].m_iLA];
-			R[1] = m_pNode[m_pPanel[K].m_iTA];
-			R[2] = m_pNode[m_pPanel[K].m_iTB];
-			R[3] = m_pNode[m_pPanel[K].m_iLB];
-			R[4] = m_pNode[m_pPanel[K].m_iLA];	
+		if(pPanel->m_iPos>=0){
+			R[0] = pNode[pPanel->m_iLA];
+			R[1] = pNode[pPanel->m_iTA];
+			R[2] = pNode[pPanel->m_iTB];
+			R[3] = pNode[pPanel->m_iLB];
+			R[4] = pNode[pPanel->m_iLA];	
 		}
 		else{
-			R[0] = m_pNode[m_pPanel[K].m_iLB];
-			R[1] = m_pNode[m_pPanel[K].m_iTB];
-			R[2] = m_pNode[m_pPanel[K].m_iTA];
-			R[3] = m_pNode[m_pPanel[K].m_iLA];
-			R[4] = m_pNode[m_pPanel[K].m_iLB];	
+			R[0] = pNode[pPanel->m_iLB];
+			R[1] = pNode[pPanel->m_iTB];
+			R[2] = pNode[pPanel->m_iTA];
+			R[3] = pNode[pPanel->m_iLA];
+			R[4] = pNode[pPanel->m_iLB];	
 		}
 		for (i=0; i<4; i++){
 			a  = TestPt - R[i];
@@ -1266,126 +934,58 @@ void C3DPanelDlg::DoubletNACA4023(CVector TestPt, int K, CVector &V, double &phi
 			s    = R[i+1] - R[i];
 			A    = a.VAbs();
 			B    = b.VAbs();
-			SM   = s.dot(m_pPanel[K].m);
-			SL   = s.dot(m_pPanel[K].l);
-			AM   = a.dot(m_pPanel[K].m);
-			AL   = a.dot(m_pPanel[K].l);
+			SM   = s.dot(pPanel->m);
+			SL   = s.dot(pPanel->l);
+			AM   = a.dot(pPanel->m);
+			AL   = a.dot(pPanel->l);
 			Al   = AM*SL - AL*SM;
 			PA   = PN*PN*SL + Al*AM;
-			PB   = PA - Al*SM;
+			PB   = PA - Al*SM; //try alternative PB   = PN*PN*SL + Al*BM;
+
 
 	//first the potential
-			RNUM = SM*PN * (B*PA-A*PB);
-			DNOM = PA*PB + PN*PN*A*B*SM*SM;
-
-			if(abs(PN)<eps){
-				if(DNOM<0.0){
-					if(PN>0.0)	phi += pi;
-					else		phi -= pi;
-				}
-				else if(DNOM == 0.0){
-					if(PN>0.0)	phi += pi/2.0;
-					else		phi -= pi/2.0;
-				}
-				else
-					phi += 0.0;
+			if(R[i].IsSame(R[i+1])) 
+			{
+				CJKi = 0.0;
+				//no contribution to speed either
 			}
-			else {
-				phi += atan2(RNUM,DNOM);
-			}
-
-	// next the induced velocity
-			V += (a * b) * (A+B) /A/B/ (A*B + a.dot(b));
-		}
-		if(TestPt.IsSame(m_pPanel[K].CollPt)){
-			phi = -2.0*pi;
-			
-		}
-	}
-	
-	if(m_pPanel[K].m_bIsTrailing){
-		//then it is shedding a wake
-		//we need to create a specific wake panel
-		//and add its influence
-
-		//create a horizontal wake panel for the present time
-		CVector m,l,C,N;
-		T.Set(0.0,0.0,0.0);
-
-		double phiw = 0.0;
-		double xw = m_pNode[m_pPanel[K].m_iTA].x - m_pNode[m_pPanel[K].m_iLA].x;
-
-		R[0] = m_pNode[m_pPanel[K].m_iTA];
-		R[1] = m_pNode[m_pPanel[K].m_iTA];
-		R[1].x += xw;
-		R[2] = m_pNode[m_pPanel[K].m_iTB];
-		R[2].x += xw;
-		R[3] = m_pNode[m_pPanel[K].m_iTB];
-		R[4] = m_pNode[m_pPanel[K].m_iTA];	
-
-		C = (R[0]+R[1]+R[2]+R[3])/4.0;
-
-		m = (R[2]+R[3]) *0.5 - C;
-		m.Normalize();
-		N.Set(0.0,0.0,1.0);
-
-		l = m * N;
-
-		PJK = TestPt - C;
-		PN  = PJK.dot(N);
-		pjk = PJK.VAbs();
-
-		for (i=0; i<4; i++){
-			a  = TestPt - R[i];
-			b  = TestPt - R[i+1];
-			s    = R[i+1] - R[i];
-			A    = a.VAbs();
-			B    = b.VAbs();
-			SM   = s.dot(m);
-			SL   = s.dot(l);
-			AM   = a.dot(m);
-			AL   = a.dot(l);
-			Al   = AM*SL - AL*SM;
-			PA   = PN*PN*SL + Al*AM;
-			PB   = PA - Al*SM;
-
-//first the potential
-			RNUM = SM*PN * (B*PA-A*PB);
-			DNOM = PA*PB + PN*PN*A*B*SM*SM;
-
-			if(abs(PN)<eps){
-				if(DNOM<0.0){
-					if(PN>0.0)	phiw += pi;
-					else		phiw -= pi;
+			else
+			{
+				RNUM = SM*PN * (B*PA-A*PB);
+				DNOM = PA*PB + PN*PN*A*B*SM*SM;
+				if(abs(PN)<eps)
+				{
+					side = pPanel->Normal.dot(a * s); // Positive if on the panel's right side
+					if(side >=0.0) sign = 1.0; else sign = -1.0;
+					if(DNOM<0.0){
+						if(PN>0.0)	CJKi =  pi * sign;
+						else		CJKi = -pi * sign;
+					}
+					else if(DNOM == 0.0){
+						if(PN>0.0)	CJKi =  pi/2.0 * sign;
+						else		CJKi = -pi/2.0 * sign;
+					}
+					else
+						CJKi = 0.0;
 				}
-				else if(DNOM == 0.0){
-					if(PN>0.0)	phiw += pi/2.0;
-					else		phiw -= pi/2.0;
+				else 
+				{
+					CJKi = atan2(RNUM,DNOM);
 				}
-				else
-					phiw += 0.0;
+				// next the induced velocity
+				V += (a * b) * (A+B) /A/B/ (A*B + a.dot(b));
 			}
-			else 
-				phiw += atan2(RNUM,DNOM);
+			phi += CJKi;
 
-// next the induced velocity
-
-			T += (a * b) * (A+B) /A/B/ (A*B + a.dot(b));
 		}
-
-		if(m_pPanel[K].m_iPos==-1){
-			V   -= T;
-			phi -= phiw;
-		}
-		else {
-			V   += T;
-			phi += phiw;
+		if(TestPt.IsSame(pPanel->CollPt)){
+			phi  = -2.0*pi;	
 		}
 	}
 }
 
 
-void C3DPanelDlg::SourceNACA4023(CVector TestPt, int K, CVector &V, double &phi)
+void C3DPanelDlg::SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi)
 {
 	//VSAERO theory Manual
 	//Influence of panel pp at coll pt of panel p
@@ -1395,83 +995,94 @@ void C3DPanelDlg::SourceNACA4023(CVector TestPt, int K, CVector &V, double &phi)
 	CVector R[5];
 	double PN, A, B, PA, PB, S, SM, SL, AM, AL, Al, GL, CJKi, pjk;
 	double RNUM, DNOM;
+	double side, sign;
 	
 	phi = 0.0;
 	V.Set(0.0,0.0,0.0);
 
-	PJK = TestPt - m_pPanel[K].CollPt;
-	PN  = PJK.dot(m_pPanel[K].Normal);
+	PJK = TestPt - pPanel->CollPt;
+	PN  = PJK.dot(pPanel->Normal);
 	pjk = PJK.VAbs();
 
-	if(pjk> RFF*m_pPanel[K].Size){
+	if(pjk> RFF*pPanel->Size){
 		// use far-field formula
-		phi = m_pPanel[K].Area /pjk;
-		V = PJK * m_pPanel[K].Area/pjk/pjk/pjk;
-//		TRACE ("%10.6f    %10.6f    %10.6f\n", V.x, V.y, V.z);
+		phi = pPanel->Area /pjk;
+		V = PJK * pPanel->Area/pjk/pjk/pjk;
 		return;
 	}
 	
 	phi = 0.0;
 	V.Set(0.0,0.0,0.0);
-	if(m_pPanel[K].m_iPos>=0){
-		R[0] = m_pNode[m_pPanel[K].m_iLA];
-		R[1] = m_pNode[m_pPanel[K].m_iTA];
-		R[2] = m_pNode[m_pPanel[K].m_iTB];
-		R[3] = m_pNode[m_pPanel[K].m_iLB];
-		R[4] = m_pNode[m_pPanel[K].m_iLA];	
+	if(pPanel->m_iPos>=0){
+		R[0] = m_pNode[pPanel->m_iLA];
+		R[1] = m_pNode[pPanel->m_iTA];
+		R[2] = m_pNode[pPanel->m_iTB];
+		R[3] = m_pNode[pPanel->m_iLB];
+		R[4] = m_pNode[pPanel->m_iLA];	
 	}
 	else{
-		R[0] = m_pNode[m_pPanel[K].m_iLB];
-		R[1] = m_pNode[m_pPanel[K].m_iTB];
-		R[2] = m_pNode[m_pPanel[K].m_iTA];
-		R[3] = m_pNode[m_pPanel[K].m_iLA];
-		R[4] = m_pNode[m_pPanel[K].m_iLB];	
+		R[0] = m_pNode[pPanel->m_iLB];
+		R[1] = m_pNode[pPanel->m_iTB];
+		R[2] = m_pNode[pPanel->m_iTA];
+		R[3] = m_pNode[pPanel->m_iLA];
+		R[4] = m_pNode[pPanel->m_iLB];	
 	}
 	for (i=0; i<4; i++){
-		a  = TestPt - R[i];
+		a  = TestPt - R[i]; 
 		b  = TestPt - R[i+1];
 		s    = R[i+1] - R[i];
 		A    = a.VAbs();
 		B    = b.VAbs();
 		S    = s.VAbs();
-		SM   = DotProduct(s, m_pPanel[K].m);
-		SL   = DotProduct(s, m_pPanel[K].l);
-		AM   = DotProduct(a, m_pPanel[K].m);
-		AL   = DotProduct(a, m_pPanel[K].l);
+		SM   = s.dot(pPanel->m);
+		SL   = s.dot(pPanel->l);
+		AM   = a.dot(pPanel->m);
+		AL   = a.dot(pPanel->l);
 		Al   = AM*SL - AL*SM;
 		PA   = PN*PN * SL + Al*AM;
 		PB   = PA - Al*SM;
 
-//first the potential
-		if(S>0.0 && A+B-S>0.0)		GL = 1.0/S * log((A+B+S)/(A+B-S));
-		else						GL = 0.0;
-		RNUM = SM*PN * (B*PA-A*PB);
-		DNOM = PA*PB + PN*PN*A*B*SM*SM;
-		if(abs(PN)<eps){
-			if(DNOM<0.0){
-				if(PN>0.0)	CJKi =  pi;
-				else		CJKi = -pi;
-			}
-			else if(DNOM == 0.0){
-				if(PN>0.0)	CJKi = pi/2.0;
-				else		CJKi = pi/2.0;
-			}
-			else
-				CJKi = 0.0;
+		if(R[i].IsSame(R[i+1])){
+			//no contribution from this side
+			CJKi = 0.0;
 		}
-		else {
-			CJKi = atan2(RNUM, DNOM);
-//			CJKi = atan(RNUM/DNOM);
-		}
-		phi += Al*GL - PN*CJKi;
+		else
+		{
 
-// next the induced velocity
-		T1   = m_pPanel[K].l      * SM*GL;
-		T2   = m_pPanel[K].m      * SL*GL;
-		T    = m_pPanel[K].Normal * CJKi;
-		V   += T + T1 - T2;
+		//first the potential
+			if(A+B-S>0.0)	GL = 1.0/S * log((A+B+S)/(A+B-S));
+			RNUM = SM*PN * (B*PA-A*PB);
+			DNOM = PA*PB + PN*PN*A*B*SM*SM;
+
+			if(abs(PN)<eps){
+				side = pPanel->Normal.dot(a * s); // Positive if on the panel's right side
+				if(side >=0.0) sign = 1.0; else sign = -1.0;
+				if(DNOM<0.0){
+					if(PN>0.0)	CJKi =  pi * sign;
+					else		CJKi = -pi * sign;
+				}
+				else if(DNOM == 0.0){
+					if(PN>0.0)	CJKi =  pi/2.0 * sign;
+					else		CJKi = -pi/2.0 * sign;
+				}
+				else
+					CJKi = 0.0;
+			}
+
+			else 
+			{
+				CJKi = atan2(RNUM, DNOM);
+			}
+
+			phi += Al*GL - PN*CJKi;
+
+	// next the induced velocity
+			T1   = pPanel->l      * SM*GL;
+			T2   = pPanel->m      * SL*GL;
+			T    = pPanel->Normal * CJKi;
+			V   += T + T1 - T2;
+		}
 	}
-//	if(bTrace) TRACE ("%10.6f    %10.6f    %10.6f\n", V.x, V.y, V.z);
 }
 
 
@@ -1544,7 +1155,7 @@ bool C3DPanelDlg::ComputeOnBody(double *Mu, double *Sigma, double frac)
 		}
 		else {
 			DELQ = 0.0;
-			ASSERT(FALSE);
+//			ASSERT(FALSE);
 		}
 
 		if(PU>=0 && PD>=0){
@@ -1594,7 +1205,7 @@ bool C3DPanelDlg::ComputeOnBody(double *Mu, double *Sigma, double frac)
 		}
 		else {
 			DELP = 0.0;
-			ASSERT(FALSE);
+//			ASSERT(FALSE);
 		}
 
 		//find middle of side 2
@@ -1612,28 +1223,31 @@ bool C3DPanelDlg::ComputeOnBody(double *Mu, double *Sigma, double frac)
 		Speed2 = QInfl.x*QInfl.x + QInfl.y*QInfl.y + QInfl.z*QInfl.z;
 		m_Cp[p]  = 1.0-Speed2/m_QInf/m_QInf;
 		m_Speed[p] = m_pPanel[p].LocalToGlobal(QInfl);
-		m_Cp[p] = m_Speed[p].VAbs();
 		SetProgress((int)(100*p/m_MatSize), frac);
 	}
 	return true;
 }
 
 
+
 CVector C3DPanelDlg::GetSpeedVector(CVector C, double *Mu, double *Sigma)
 {	
 	CVector V;
 	int pp;
+
 	double phi;
 	CVector VT(0.0,0.0,0.0);
 	for (pp=0; pp<m_MatSize;pp++){
 		if(m_bCancel) return VT;
-		DoubletNACA4023(C, pp, V, phi);
+		DoubletNASA4023(C,m_pPanel+pp, V, phi);
 		VT += V * Mu[pp];
-		SourceNACA4023(C, pp, V, phi);
+		SourceNASA4023(C, m_pPanel+pp, V, phi);
 		VT += V * Sigma[pp];
 	}
 	return VT;
 }
+
+
 
 bool C3DPanelDlg::ComputeSurfSpeeds(double *Mu, double *Sigma, double frac)
 {
@@ -1643,14 +1257,38 @@ bool C3DPanelDlg::ComputeSurfSpeeds(double *Mu, double *Sigma, double frac)
 
 	for (p=0; p<m_MatSize; p++){
 		if(m_bCancel) return false;
-		C = m_pPanel[p].CollPt;//+m_pPanel[p].Normal*m_pPanel[p].Size/10.0;
+		C = m_pPanel[p].CollPt + m_pPanel[p].Normal*m_pPanel[p].Size/20.0;
 
-		m_Speed[p] = GetSpeedVector(C, Mu, Sigma) ;
-		m_Speed[p] +=Q;
+		m_Speed[p]  = GetSpeedVector(C, Mu, Sigma);
+		m_Speed[p] += Q;
 
 		SetProgress((int)(100*p/m_MatSize), frac);
 	}
 	return true;
+}
+
+
+
+void C3DPanelDlg::SetDownwash(double *Mu, double *Sigma)
+{
+	// calculates the induced angles from the vortices strengths
+	int j, k, m, nSurf;
+	CVector C;
+	CVector X(0.001, 0.0, 0.0);
+	m=0;
+	nSurf = 0;
+	//wing first
+	memset(m_pWing->m_Vd, 0, sizeof(m_pWing->m_Vd));
+	for (j=0; j<m_pWing->m_NSurfaces; j++){
+		for (k=0; k<m_pWing->m_Surface[j].m_NYPanels; k++)
+		{
+			m_pSurface[j].GetTrailingPt(C, k);
+			C += X;
+			m_pWing->m_Vd[m] = GetSpeedVector(C, Mu, Sigma);
+			m++;
+		}
+		nSurf++;
+	}
 }
 
 

@@ -988,7 +988,7 @@ void CWing::ComputeGeometry()
 		m_Area    = 2.0 * surface;
 		m_Volume *= 2.0;
 		m_MAChord = m_MAChord * 2.0 / m_Area;
-		m_yMac    = m_yMac   * 2.0 / m_Area;
+		m_yMac    = m_yMac          / m_Area;
 
 		m_GChord  = m_Area/m_Span;
 		m_AR      = m_Span*m_Span/m_Area;

@@ -219,9 +219,9 @@ void CWAdvDlg::OnResetDefaults()
 	m_NStation        = 20;
 	m_MaxWakeIter     = 5;
 	m_WakePanels      = 5;
-	m_FirstPanelSize  = 0.2;//% mac
+	m_FirstPanelSize  = 1.0;//x mac
 	m_WakePanelFactor = 1.02;
-	m_CoreSize        = 1.0;
+	m_CoreSize        = 0.0001;
 	m_WakeInterNodes  = 6;
 	m_bResetWake      = true;
 	m_BLogFile        = TRUE;

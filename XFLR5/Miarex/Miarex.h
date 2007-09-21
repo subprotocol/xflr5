@@ -257,6 +257,7 @@ private:
 	void PaintWCoupleGraphs(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
 	void PaintWFourGraphs(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
 	void PrintAll(CDC *pDC, CRect *pCltRect);
+	void ResetElements();
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
@@ -400,6 +401,7 @@ private:
 	int m_nWakeNodes;			// Max Size for the node array if there is a wake
 	int m_WakeSize;				// Max Size for the VLMMatrix if there is a wake
 	int m_NXWakePanels;			// wake panel number
+	int m_NWakeColumn;			// number of wake columns
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 

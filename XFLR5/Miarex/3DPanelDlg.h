@@ -47,6 +47,7 @@ protected:
 	CEdit m_ctrlOutput;
 	virtual void DoDataExchange(CDataExchange* pDX);    
 
+	bool AddWakeContribution();
 	bool Gauss(double *A, int n, double *B, int m);
 	bool CreateMatrix();
 	bool CreateRHS(double V0, double VDelta, int nval);
@@ -59,12 +60,10 @@ protected:
 	void EndSequence();
 	void SetProgress(int progress,double fraction);
 	void SetFileHeader();
-	void SourceNACA4023(CVector TestPt,  int K, CVector &V, double &phi);
-	void DoubletNACA4023(CVector TestPt, int K, CVector &V, double &phi);
-	void SourcePotentialKP(int p,  CVector C, double &phi);
-	void DoubletPotentialKP(int p, CVector C, double &phi);
-	void SourceVelocityKP(int p,  CVector C, CVector &V);
-	void DoubletVelocityKP(int p, CVector C, CVector &V);
+	void SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi);
+	void DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
+	void SetDownwash(double *Mu, double *Sigma);
+	void CheckSolution();
 
 	CVector GetSpeedVector(CVector C, double *Mu, double *Sigma);
 
@@ -124,6 +123,8 @@ protected:
 	int m_NSurfaces;
 	int m_Progress;
 	int RFF;
+	int m_NWakeColumn;
+	int m_NXWakePanels;
 
 	CString m_strOut;
 	CString m_VersionName;

@@ -460,7 +460,6 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 }
 
 
-
 void CWOperDlgBar::OnStream() 
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -468,14 +467,14 @@ void CWOperDlgBar::OnStream()
 	if(m_ctrlStream.GetCheck()){
 		if(!pMiarex->m_bAnimate){
 			pFrame->m_bStream = true;
-//			pFrame->m_bFlow = true;
+			pFrame->m_bFlow = true;
 			pMiarex->UpdateView();
 		}
 		else m_ctrlStream.SetCheck(FALSE);
 	}
 	else {
 		pFrame->m_bStream = false;
-//		pFrame->m_bFlow = false;
+		pFrame->m_bFlow = false;
 		pMiarex->m_FlowLinesDlg.ShowWindow(SW_HIDE);
 		pMiarex->UpdateView();
 	}
