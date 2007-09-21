@@ -38,6 +38,11 @@ double CPanel::m_CtrlPos   = 0.75;
 
 CPanel::CPanel()
 {
+	Reset();
+}
+
+void CPanel::Reset()
+{
 	dl     = 0.0;
 	Size   = 0.0;
 	SMP    = 0.0;
@@ -58,8 +63,10 @@ CPanel::CPanel()
 	m_iPU = -1;
 	m_iPD = -1;
 	m_iWake = -1;
+	m_iWakeColumn = -1;
 
 	memset(lij, 0, sizeof(lij));
+
 }
 
 CPanel::~CPanel()

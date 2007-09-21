@@ -41,6 +41,7 @@ public:
 	virtual ~CPanel();
 
 protected:
+	void Reset();
 	void SetVortex(CVector LA, CVector LB, CVector TA, CVector TB);
 	void SetFrame(CVector LA, CVector LB, CVector TA, CVector TB);
 	CVector GlobalToLocal(CVector V);
@@ -54,6 +55,7 @@ protected:
 	int m_iPL, m_iPR, m_iPU, m_iPD;//Panels left, rigth; upstream, downstream
 	int m_iPos;//-1 is bottom surface, 0 is middle, 1 is top;
 	int m_iWake;//-1 if not followed by a wake panel, else equal to wake panel number
+	int m_iWakeColumn;
 	//Local frame of refernce
 	CVector Normal;
 	CVector VortexPos;

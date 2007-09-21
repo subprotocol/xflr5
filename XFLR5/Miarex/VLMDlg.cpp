@@ -198,6 +198,8 @@ BOOL CVLMDlg::OnInitDialog()
 void CVLMDlg::OnTimer(UINT nIDEvent)
 {
 	if(m_pVLMThread && m_pVLMThread->m_bFinished){
+		HANDLE hThread = m_pVLMThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 		EndSequence();
 	}
 	CDialog::OnTimer(nIDEvent);
@@ -338,7 +340,7 @@ void CVLMDlg::SetFileHeader()
 			break;
 		}
 		case 6:{
-			strong = "Jun";
+			strong = "June";
 			break;
 		}
 		case 7:{
@@ -417,6 +419,9 @@ void CVLMDlg::OnCancel()
 void CVLMDlg::EndSequence()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(pMiarex->m_bVLMFinished && !m_bXFile){
+		return;
+	}
 	pMiarex->m_bVLMFinished = true;
 	m_bXFile = false;
 	m_XFile.Close();
@@ -445,6 +450,7 @@ void CVLMDlg::EndSequence()
 		}
 	}
 	delete m_pVLMThread;
+	m_pVLMThread = NULL;
 	EndDialog(0);
 }
 
@@ -503,6 +509,7 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	memset(row,   0, sizeof(row));
 
 
+	//Creating RHS
 	if(m_pWPolar->m_Type!=4){
 		p=0;
 
