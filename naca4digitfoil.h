@@ -43,7 +43,7 @@ public:
 	virtual double operator()(double s,int coo);
 	//get members
 	double Chord() const {return 1.;}
-	double Camber() const {retrn m;}
+	double Camber() const {return m;}
 protected:
 	// mean camber line
 	double yc(const double c){
