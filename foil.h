@@ -17,52 +17,68 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FOILPOINTPATH_H
-#define FOILPOINTPATH_H
+#ifndef FOIL_H
+#define FOIL_H
 
-#include "FoilPath.h"
+#include <iostream>
+#include <vector>
+#include <string>
 
+#include "cubicspline.h"
 
-class FoilPointPath : public FoilPath
-{
+typedef std::vector<double> tFoilCoo;
+
+/**
+An abstract foil class
+
+	@author Andres <andres@hal9000>
+*/
+
+class Foil{
 public:
-		FoilPointPath(){;}
-    FoilPointPath(Foil &foil,double alpha, double scalex, double scaley,
- 					 QPoint Offset, QRect DrawRect): FoilPath(foil,alpha,scalex,scaley,Offset,DrawRect){;};
-	virtual ~FoilPointPath(){;};
+	Foil();
+	Foil(const Foil &foil);
+  virtual ~Foil();
 
-	virtual void CreatePath(Foil &foil,double alpha, double scalex, double scaley,QPoint Offset, QRectF DrawRect){
-		if(foil.Empty())return;
-		drawRect=DrawRect;
-		offset=Offset;
-		Scalex=scalex;
-		Scaley=scaley;
-		Alpha=alpha;
+	// operators
+	virtual double operator()(double s,int coo);
+	virtual Foil &operator=(const Foil &foil);
+	virtual Foil &operator+=(const Foil &foil);
+	friend std::ostream &operator<<(std::ostream &stream, const Foil &foil);
+  friend std::istream &operator>>(std::istream &stream, Foil &foil);
 
+	// get members
+	// non-constant
+	tFoilCoo &X(){return x;}
+	tFoilCoo &Y(){return y;}
+	std::string &Name(){return name;}
+	// constant
+	const tFoilCoo &X() const {return x;}
+	const tFoilCoo &Y() const {return y;}
+	const std::string &Name() const {return name;}
+	virtual double Chord() const {return xMax-xMin;}
+	virtual double Camber() const {return m;}
+	int N() const {return x.size();}
+	bool Empty(){return x.size()==0;}
 
-		int width=2;
-		double xa,ya;
-		const double cosa = cos(ToRad(alpha));
-		const double sina = sin(ToRad(alpha));
+protected:
+	int EraseConcurrentPoints();
+	void Characteristics();
 
-		std::vector<double>::const_iterator iterX=foil.X().begin();
-		std::vector<double>::const_iterator iterY=foil.Y().begin();
+protected:
+	std::string name;
+	tFoilCoo	x;
+	tFoilCoo	y;
 
-		while(iterX!=foil.X().end()&&iterY!=foil.Y().end()){
-			xa = (((*iterX)-0.5)*cosa - (*iterY)*sina + 0.5)*scalex+Offset.x();
-			ya = -(((*iterX)-0.5)*sina + (*iterY)*cosa)*scaley+Offset.y();
-			QRectF pointRect(xa-width, ya-width, 2*width, 2*width);
-
-			/*if(DrawRect.contains(pointRect))*/addRect(pointRect);
-			++iterX; ++iterY;
-		}
-	};
+	nNumerics::CubicSpline2D	spline;
+	
+	double xMax,xMin,yMax,yMin;
+	
+	// foil characteristics
+	double m; 
+	double p;
+	double t;
 };
 
 
-
 #endif
-
-
-
-

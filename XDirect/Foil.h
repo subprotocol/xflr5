@@ -33,11 +33,11 @@
 #include <iostream>
 #include "../misc/ComDef.h"
 #include "../misc/Vector.h"
+#include "helper.h"
 
 #define cMaxFoilName			1024
 
 
-typedef std::vector<double> tFoilCoo;
 
 
 class CFoil  //: public CObject
@@ -84,6 +84,8 @@ public:
 	const tFoilCoo &Gety(){return yV;};
 	const QString &GetFoilName(){return m_FoilName;};
 	bool empty(){return xV.empty()||yV.empty();}
+	double Length(){return xMax-xMin;}
+	void Scale(double scaleX, double scaleY);
 
 	// read a foil from a std istream
 	bool Read(std::istream& stream);
@@ -106,6 +108,8 @@ private:
 	int n;				// the number of points of the current foil
 	tFoilCoo xV;
 	tFoilCoo yV;
+	double xMin,xMax;
+	double yMin,yMax;
 	double  x[IBX],  y[IBX];	// the point coordinates of the current foil
 	double nx[IBX], ny[IBX];	// the normal vector coordinates of the current foil's points
 	//Base geometry;

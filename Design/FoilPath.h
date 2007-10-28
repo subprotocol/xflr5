@@ -21,37 +21,42 @@
 #define FOILPATH_H
 
 #include <QPainterPath>
+#include <QPen>
 #include <QFont>
 #include <QFontMetrics>
 #include <math.h>
-#include "Foil.h"
+//#include "Foil.h"
+#include "foil.h"
 #include "helper.h"
 
 
 class FoilPath : public QPainterPath
 {
-private:
-	CFoil &foil;
-	double alpha;
-	double scalex;
-	double scaley;
-	QPoint Offset;
-	QRectF DrawRect;
+protected:
+	QPen pen;
+// 	CFoil &foil;
+ 	double Alpha;
+ 	double Scalex;
+ 	double Scaley;
+ 	QPoint offset;
+ 	QRectF drawRect;
 
 public:
-    FoilPath(CFoil &Foil,double Alpha, double Scalex, double Scaley,
- 					 QPoint offset, QRect drawRect): foil(Foil){
-		CreatePath(Alpha,Scalex,Scaley,offset,drawRect);
+		FoilPath(){;}
+    FoilPath(Foil &foil, double alpha, double scalex, double scaley,
+ 					 QPoint Offset, QRect DrawRect){
+			CreatePath(foil, alpha, scalex, scaley, Offset, DrawRect);
 	};
 	virtual ~FoilPath(){;};
 
-	void CreatePath(double Alpha, double Scalex, double Scaley,QPoint offset, QRectF drawRect){
-		if(foil.empty())return;
-		DrawRect=drawRect;
-		Offset=offset;
-		scalex=Scalex;
-		scaley=Scaley;
-		alpha=Alpha;
+	virtual QPen &GetPen(){return pen;}
+	virtual void CreatePath(Foil &foil, double alpha, double scalex, double scaley, QPoint Offset, QRectF DrawRect){
+		if(foil.Empty())return;
+ 		drawRect=DrawRect;
+ 		offset=Offset;
+ 		Scalex=scalex;
+ 		Scaley=scaley;
+ 		Alpha=alpha;
 
 		QPointF From, To;
 		int xp, yp;
@@ -59,8 +64,8 @@ public:
 		const double cosa = cos(ToRad(alpha));
 		const double sina = sin(ToRad(alpha));
 
-		std::vector<double>::const_iterator iterX=foil.Getx().begin();
-		std::vector<double>::const_iterator iterY=foil.Gety().begin();
+		std::vector<double>::const_iterator iterX=foil.X().begin();
+		std::vector<double>::const_iterator iterY=foil.Y().begin();
 
 		xa = ((*iterX)-0.5)*cosa - (*iterY)*sina + 0.5;
 		ya = ((*iterX)-0.5)*sina + (*iterY)*cosa;
@@ -68,17 +73,18 @@ public:
 		From.ry() = -ya*scaley+Offset.y();
 
 		//create path
-		if(DrawRect.contains(From)) moveTo(From);
+		/*if(DrawRect.contains(From))*/ moveTo(From);
 
-		while(iterX!=foil.Getx().end()&&iterY!=foil.Gety().end()){
+		while(iterX!=foil.X().end()&&iterY!=foil.Y().end()){
  			xa = ((*iterX)-0.5)*cosa - (*iterY)*sina+ 0.5;
  			ya = ((*iterX)-0.5)*sina + (*iterY)*cosa;
  			To.rx() = xa*scalex+Offset.x();
  			To.ry() = -ya*scaley+Offset.y();
  
- 			if(DrawRect.contains(From) && DrawRect.contains(To)){
- 				lineTo(To);
- 			}else if(DrawRect.contains(From) && !DrawRect.contains(To)){
+//  			if(DrawRect.contains(From) && DrawRect.contains(To)){
+ 			lineTo(To);
+// 			std::cerr<<To.rx()<<" "<<To.ry()<<"\n";
+/* 			}else if(DrawRect.contains(From) && !DrawRect.contains(To)){
  				xp = From.x();
  				yp = From.y();
  				if(Intersect(xp,yp, DrawRect, From, To)){
@@ -91,7 +97,7 @@ public:
  					moveTo(xp,yp);
  					lineTo(To);
  				}
- 			}else moveTo(To);
+ 			}else moveTo(To);*/
  			From = To;
 			++iterX; ++iterY;
  		}
@@ -101,7 +107,7 @@ public:
 		QFontMetrics fm(sansFont);
  		//QPointF baseline(DrawRect.x()-fm.width(foil.GetFoilName())*1.1, DrawRect.y()-fm.height()*1.1);
 		QPointF baseline(DrawRect.x()+fm.height()*1.1,DrawRect.y()+fm.height()*1.1);
-		addText(baseline, sansFont, foil.GetFoilName());
+		addText(baseline, sansFont, foil.Name().c_str());
 	};
 };
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <list>
 #include "helper.h"
 
 
@@ -106,3 +107,56 @@ bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M)
 	else										return false;//M is outside
 }
  
+
+void TransformFoil(const tFoilCoo &x,const tFoilCoo &y, tFoilCoo &xT,tFoilCoo &yT)
+{
+	tFoilCoo::const_iterator iterX=x.begin();
+	tFoilCoo::const_iterator iterY=y.begin();
+
+	xT.clear(); yT.clear();
+	
+	while(iterX!=x.end()||iterY!=y.end()){
+		// do some sorting
+		const double x=*iterY >=0. ? *iterX : -*iterX;
+		tFoilCoo::iterator iterSortX=xT.begin();
+		tFoilCoo::iterator iterSortY=yT.begin();
+		while(iterSortX!=xT.end()&&iterSortY!=yT.end()&&*iterSortX<x){++iterSortX; ++iterSortY;}
+		if(iterSortX!=xT.end()&&(*iterSortX)==x){
+			++iterX; ++iterY;
+			continue;
+		}
+		
+		xT.insert(iterSortX,x);
+		yT.insert(iterSortY,*iterY);
+		++iterX; ++iterY;		
+	}
+}
+
+
+int EraseDoublePointsFoil(tFoilCoo &x,tFoilCoo &y)
+{
+	tFoilCoo::iterator iterX=x.begin();
+	tFoilCoo::iterator iterY=y.begin();
+	std::list<tFoilCoo::iterator> toDeleteX;
+	std::list<tFoilCoo::iterator> toDeleteY;
+
+	while(iterX!=x.end()-1||iterY!=y.end()-1){
+		if(*iterX==*(iterX+1)&&*iterY==*(iterY+1)){
+			toDeleteX.push_front(iterX);
+			toDeleteY.push_front(iterY);
+		}
+		++iterX; ++iterY;		
+	}
+	
+	std::list<tFoilCoo::iterator>::iterator iterDelX=toDeleteX.begin();
+	std::list<tFoilCoo::iterator>::iterator iterDelY=toDeleteY.begin();
+	int erasedNum=0;
+
+	while(iterDelX!=toDeleteX.end()&&iterDelY!=toDeleteY.end()){
+		x.erase(*iterDelX);
+		y.erase(*iterDelY);
+		++iterDelX; ++iterDelY; ++erasedNum;
+	}
+	return erasedNum;
+}
+

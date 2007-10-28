@@ -110,7 +110,8 @@ void MainWindow::insertProject()
 
 void MainWindow::openFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this);
+	directDesign();
+/*    QString fileName = QFileDialog::getOpenFileName(this);
     if (!fileName.isEmpty()) {
         MdiChild *existing = findMdiChild(fileName);
         if (existing) {
@@ -125,7 +126,7 @@ void MainWindow::openFile()
         } else {
             child->close();
         }
-    }
+    }*/
 }
 
 
@@ -163,6 +164,21 @@ void MainWindow::paste()
 {
 //     activeMdiChild()->paste();
 }
+
+
+void MainWindow::print()
+{
+    QPrinter printer;
+
+    QPrintDialog *dlg = new QPrintDialog(&printer, this);
+    if (dlg->exec() != QDialog::Accepted)
+        return;
+		activeMdiChild()->print(&printer);
+//    document->print(&printer);
+
+    statusBar()->showMessage(tr("Ready"), 2000);
+}
+
 
 void MainWindow::about()
 {
@@ -354,6 +370,12 @@ void MainWindow::createActions()
     connect(saveOptionsAct, SIGNAL(triggered()), this, SLOT(saveOptions()));
 
 
+    printAct = new QAction(QIcon(":/images/print.png"), tr("&Print..."), this);
+    printAct->setShortcut(tr("Ctrl+P"));
+    printAct->setStatusTip(tr("Print the current foil"));
+    connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+
+
     openFileAct = new QAction(tr("&Open file..."), this);
     openFileAct->setShortcut(tr("Ctrl+O"));
     openFileAct->setStatusTip(tr("Open an existing file"));
@@ -483,6 +505,7 @@ void MainWindow::createMenus()
     fileMenu->addAction(saveAsAct);
 	fileMenu->addAction(saveOptionsAct);
     fileMenu->addSeparator();
+	fileMenu->addAction(printAct);
 	fileMenu->addAction(openFileAct);
 	fileMenu->addSeparator();
     QAction *action = fileMenu->addAction(tr("Switch layout direction"));
@@ -526,6 +549,7 @@ void MainWindow::createToolBars()
     fileToolBar->addAction(newAct);
     fileToolBar->addAction(openProjectAct);
     fileToolBar->addAction(saveAct);
+	fileToolBar->addAction(printAct);
 
     editToolBar = addToolBar(tr("Edit"));
     editToolBar->addAction(cutAct);

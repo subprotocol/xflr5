@@ -39,6 +39,8 @@
 
 CFoil::CFoil()
 {
+	xMax=xMin=yMax=yMin=0.;
+
 	m_nFoilStyle = Qt::SolidLine;//PS_SOLID;
 	m_nFoilWidth = 1;
 	m_FoilColor  = QColor(0,0,0);
@@ -1404,13 +1406,32 @@ bool CFoil::CompMidLine(bool bParams)
 }
 
 
+void CFoil::Scale(double scaleX, double scaleY)
+{
+	tFoilCoo::iterator iterX=xV.begin();
+	tFoilCoo::iterator iterY=yV.begin();
+
+	xMax=xMin=(*iterX)*scaleX; yMax=yMin=(*iterY)*scaleY;
+	while(iterX!=xV.end()||iterY!=yV.end()){
+		(*iterX)*=scaleX; (*iterY)*=scaleY;
+
+		xMax=std::max((*iterX),xMax);
+		xMin=std::min((*iterX),xMin);
+		yMax=std::max((*iterY),yMax);
+		yMin=std::min((*iterY),yMin);
+		++iterX; ++iterY;
+	}
+}
+
+
 bool CFoil::Read(std::istream& stream)
 {
 	char foilName[cMaxFoilName];
 	tFoilCoo xCoo,yCoo;
-	double xMom, yMom;
+	double xMom, yMom, xFirst, yFirst;
 	int fileType=0;
-	
+	bool firstTime=true;	
+
 	m_FoilName="";
 	xV.clear(); yV.clear();
 	// first Line is Foil Name
@@ -1418,18 +1439,29 @@ bool CFoil::Read(std::istream& stream)
 	if(!stream.good()){
 		return false;
 	}
-	
+
+	// get the first two separately to find out file format
+	stream>>xFirst; stream>>yFirst;
+
 	while(stream.good()){
 		stream>>xMom; stream>>yMom;
 		// seems to be the amount of points
-		if(xMom>1.||yMom>1.){
-			fileType=1;
-			continue;
+ 		if(xMom==0.&&yMom==0.&&firstTime){
+ 			fileType=1;
+ 		}else if(firstTime){
+			fileType=0;
+			xCoo.push_back(xFirst);
+			yCoo.push_back(yFirst);
 		}
 		if(!stream.good())continue;
-		// else normal file or next entries after amount of points
+
 		xCoo.push_back(xMom);
 		yCoo.push_back(yMom);
+		xMax=firstTime ? xMom : std::max(xMom,xMax);
+		xMin=firstTime ? xMom : std::min(xMom,xMin);
+		yMax=firstTime ? yMom : std::max(yMom,yMax);
+		yMin=firstTime ? yMom : std::min(yMom,yMin);
+		firstTime=false;
 // 		std::cerr<<xMom<<" "<<yMom<<"\n";
 	}
 
@@ -1437,6 +1469,8 @@ bool CFoil::Read(std::istream& stream)
 
 	if(foilName[strlen(foilName)-1]=='\r')foilName[strlen(foilName)-1]=0;
 	m_FoilName=foilName;
+
+
 
 	// now order points if needed
 	if(fileType==0){
@@ -1449,13 +1483,14 @@ bool CFoil::Read(std::istream& stream)
 // 			std::cerr<<(*iterX)<<" "<<(*iterY)<<"\n";
 // 			++iterX; ++iterY;
 // 		}
+		EraseDoublePointsFoil(xV,yV);
 		return true;
 	}
-	
+
+	// search for greatest "jump" in x;
 	tFoilCoo::const_iterator iterX=xCoo.begin();
 	tFoilCoo::const_iterator iterY=yCoo.begin();
 
-	// search for greatest "jump" in x;
 	double dX=0.;
 	int i=0,iJump=0;
 	
@@ -1491,7 +1526,7 @@ bool CFoil::Read(std::istream& stream)
 // 		++iterX; ++iterY;
 // 	}
 
-
+	EraseDoublePointsFoil(xV,yV);
 	return true;
 }
 

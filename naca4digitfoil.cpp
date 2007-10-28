@@ -17,52 +17,59 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FOILPOINTPATH_H
-#define FOILPOINTPATH_H
 
-#include "FoilPath.h"
+#include <sstream>
+#include "naca4digitfoil.h"
 
-
-class FoilPointPath : public FoilPath
+Naca4DigitFoil::Naca4DigitFoil(const double M, const double P,const double T,const unsigned int N) : Foil()
 {
-public:
-		FoilPointPath(){;}
-    FoilPointPath(Foil &foil,double alpha, double scalex, double scaley,
- 					 QPoint Offset, QRect DrawRect): FoilPath(foil,alpha,scalex,scaley,Offset,DrawRect){;};
-	virtual ~FoilPointPath(){;};
-
-	virtual void CreatePath(Foil &foil,double alpha, double scalex, double scaley,QPoint Offset, QRectF DrawRect){
-		if(foil.Empty())return;
-		drawRect=DrawRect;
-		offset=Offset;
-		Scalex=scalex;
-		Scaley=scaley;
-		Alpha=alpha;
+	Init(M,P,T,N);
+}
 
 
-		int width=2;
-		double xa,ya;
-		const double cosa = cos(ToRad(alpha));
-		const double sina = sin(ToRad(alpha));
-
-		std::vector<double>::const_iterator iterX=foil.X().begin();
-		std::vector<double>::const_iterator iterY=foil.Y().begin();
-
-		while(iterX!=foil.X().end()&&iterY!=foil.Y().end()){
-			xa = (((*iterX)-0.5)*cosa - (*iterY)*sina + 0.5)*scalex+Offset.x();
-			ya = -(((*iterX)-0.5)*sina + (*iterY)*cosa)*scaley+Offset.y();
-			QRectF pointRect(xa-width, ya-width, 2*width, 2*width);
-
-			/*if(DrawRect.contains(pointRect))*/addRect(pointRect);
-			++iterX; ++iterY;
-		}
-	};
-};
+Naca4DigitFoil::~Naca4DigitFoil()
+{
+}
 
 
+void Naca4DigitFoil::Init(double M, double P,double T, const unsigned int N)
+{
+	m=M; p=P;	t=T;
 
-#endif
+	for(unsigned int i=0;i<N/2;i++){
+		const double c=1.-static_cast<double>(i)/(N/2-1);
+		x.push_back(Xu(c));
+		y.push_back(Yu(c));
+	}
+
+	for(unsigned int i=1;i<N/2;i++){
+		const double c=static_cast<double>(i)/(N/2-1);
+		x.push_back(Xl(c));
+		y.push_back(Yl(c));
+	}
+
+	std::ostringstream s;
+	s<<"NACA "<<static_cast<int>(M*100)<<static_cast<int>(P*10)<<static_cast<int>(T*100);
+	name=s.str();
+}
 
 
+/////////////////
+//
+// Operators
+//
+/////////////////
 
+// return coordinate
+double Naca4DigitFoil::operator()(double s,int coo)
+{
+// 	std::cerr<<"Naca4DigitFoil::operator()\n";
+	double val=0.;
+	switch(coo){
+		case	0	:	val=s<0.5 ? Xu(1.-s*2.) : Xl(s*2.-1.);break;
+		case	1	:	val=s<0.5 ? Yu(1.-s*2.) : Yl(s*2.-1.);break;
+		default	:	val=std::numeric_limits<double>::quiet_NaN();
+	}
+	return val;
+}
 

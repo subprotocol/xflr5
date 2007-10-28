@@ -26,15 +26,14 @@
 
 #include "designchild.h"
 
-DesignChild::DesignChild() 
+DesignChild::DesignChild() : naca4Foil(0.02,0.4,0.15,60)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     isUntitled = true;
 	
-	// something to see...
-	//foil.SetNaca009();
 	resize(1000,600);
-	//foilPath=new FoilPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()));
+	scale=width()*0.8;
+	offset=QPoint(width()*0.1, height() / 2.);
 }
 
 DesignChild::~DesignChild()
@@ -59,7 +58,17 @@ bool DesignChild::loadFile(const QString &fileName)
 	std::ifstream file(fileName.toStdString().c_str());
 	
 	QApplication::setOverrideCursor(Qt::WaitCursor);
- 	bool retVal=foil.Read(file);
+	// A foil file is to be read, therefore change to foil object
+	// 	foilPtr=&naca4Foil;
+	// 	bool retVal=true;
+	foilPtr=&foil;
+ 	bool retVal=(file>>*foilPtr).fail();
+
+	//foil.Read(file);
+	//foil.Scale(1.,0.5);
+
+	scale=(retVal ? width()*0.8/foilPtr->Chord() : width()*0.8);
+	documentWasModified();
 	QApplication::restoreOverrideCursor();
 
     setCurrentFile(fileName);
@@ -108,7 +117,7 @@ bool DesignChild::saveFile(const QString &fileName)
 
 QString DesignChild::userFriendlyCurrentFile()
 {
-    return /*foil.GetFoilName()+*/" direct design";
+    return (foilPtr->Name()+" direct design").c_str();
 }
 
 void DesignChild::closeEvent(QCloseEvent *event)
@@ -121,13 +130,35 @@ void DesignChild::closeEvent(QCloseEvent *event)
 }
 
 
+void DesignChild::print(QPrinter * printer)
+{
+	QPainter painter(printer);
+// 	painter.drawPath(foilPath);
+	painter.drawPath(foilPointPath);
+	painter.drawPath(foilInterpolPath);
+}
+
+
 void DesignChild::paintEvent(QPaintEvent * event)
 {
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing);
 	
-	painter.drawPath(FoilPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
-	painter.drawPath(FoilPointPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
+	//painter.drawPath(FoilPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
+	QPen oldPen=painter.pen();
+
+// 	painter.setPen(foilPath.GetPen());
+// 	painter.drawPath(foilPath);
+
+	painter.setPen(foilPointPath.GetPen());
+	painter.drawPath(foilPointPath);
+	//painter.drawPath(foilPointPolarPath);
+
+	painter.setPen(Qt::green);//foilInterpolPath.GetPen());
+	painter.drawPath(foilInterpolPath);
+	painter.setPen(oldPen);
+
+	//painter.drawPath(FoilPointPath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
 	//painter.drawPath(FoilMidLinePath(foil,0.,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height())));
 	//foil.DrawFoil(painter,0.0,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
 // 	foil.DrawMidLine(painter,1000.,1000.,QPoint(width()*0.1, height() / 2),QRect(0,0,width(),height()),false);
@@ -137,7 +168,11 @@ void DesignChild::paintEvent(QPaintEvent * event)
 
 void DesignChild::documentWasModified()
 {
-//     setWindowModified(document()->isModified());
+	setWindowModified(foilModified());
+	foilPath.CreatePath(*foilPtr, 0.,scale,scale,offset,QRect());//alpha, scalex, scaley, Offset, DrawRect);
+	foilPointPath.CreatePath(*foilPtr, 0.,scale,scale,offset,QRect());
+	foilPointPolarPath.CreatePath(*foilPtr, 0.,scale,scale,offset,QRect());
+	foilInterpolPath.CreatePath(*foilPtr, 0.,scale,scale,offset,QRect());
 }
 
 bool DesignChild::maybeSave()

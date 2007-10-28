@@ -17,21 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FOILPOINTPATH_H
-#define FOILPOINTPATH_H
+#ifndef FOILINTERPOLPATH_H
+#define FOILINTERPOLPATH_H
 
 #include "FoilPath.h"
+#include "cubicspline.h"
 
 
-class FoilPointPath : public FoilPath
+class FoilInterpolPath : public FoilPath
 {
+protected:
+	double nFine;
 public:
-		FoilPointPath(){;}
-    FoilPointPath(Foil &foil,double alpha, double scalex, double scaley,
- 					 QPoint Offset, QRect DrawRect): FoilPath(foil,alpha,scalex,scaley,Offset,DrawRect){;};
-	virtual ~FoilPointPath(){;};
+		FoilInterpolPath(){;}
+    FoilInterpolPath(int nFine,Foil &foil,double alpha, double scalex, double scaley,
+ 					 QPoint Offset, QRect DrawRect){
+			CreatePath(nFine,foil,alpha,scalex,scaley,Offset,DrawRect);
+			pen.setColor(Qt::green);
+		}
+	virtual ~FoilInterpolPath(){;};
 
 	virtual void CreatePath(Foil &foil,double alpha, double scalex, double scaley,QPoint Offset, QRectF DrawRect){
+		CreatePath(20, foil,alpha, scalex, scaley,Offset, DrawRect);
+	}
+	virtual void CreatePath(int nFine, Foil &foil,double alpha, double scalex, double scaley,QPoint Offset, QRectF DrawRect){
 		if(foil.Empty())return;
 		drawRect=DrawRect;
 		offset=Offset;
@@ -39,22 +48,23 @@ public:
 		Scaley=scaley;
 		Alpha=alpha;
 
-
-		int width=2;
+		int width=1;
 		double xa,ya;
 		const double cosa = cos(ToRad(alpha));
 		const double sina = sin(ToRad(alpha));
-
-		std::vector<double>::const_iterator iterX=foil.X().begin();
-		std::vector<double>::const_iterator iterY=foil.Y().begin();
-
-		while(iterX!=foil.X().end()&&iterY!=foil.Y().end()){
-			xa = (((*iterX)-0.5)*cosa - (*iterY)*sina + 0.5)*scalex+Offset.x();
-			ya = -(((*iterX)-0.5)*sina + (*iterY)*cosa)*scaley+Offset.y();
-			QRectF pointRect(xa-width, ya-width, 2*width, 2*width);
-
-			/*if(DrawRect.contains(pointRect))*/addRect(pointRect);
-			++iterX; ++iterY;
+		for(unsigned int i=0;i<foil.N()-1;i++){
+			for(double j=0.;j<nFine;j++){
+				const double s=(i+j/(nFine-1.))/(foil.N()-1);
+				xa = ((foil(s,0)-0.5)*cosa - foil(s,1)*sina + 0.5)*scalex+Offset.x();
+				ya = -((foil(s,0)-0.5)*sina + foil(s,1)*cosa)*scaley+Offset.y();
+ 				if(i==0&&j==0.){
+ 					moveTo(xa,ya);
+ 					continue;
+ 				}
+ 				QRectF pointRect(xa-width, ya-width, 2*width, 2*width);
+//  				addEllipse(pointRect);
+ 				lineTo(xa,ya);
+			}
 		}
 	};
 };

@@ -25,9 +25,14 @@
 #define DESIGNCHILD_H
 
 #include <QWidget>
+#include "foil.h"
+#include "naca4digitfoil.h"
+
 #include "Foil.h"
 #include "FoilPath.h"
 #include "FoilPointPath.h"
+#include "FoilPointPolarPath.h"
+#include "FoilInterpolPath.h"
 #include "FoilMidLinePath.h"
 
 class DesignChild : public QWidget
@@ -45,7 +50,7 @@ public:
     bool saveFile(const QString &fileName);
     QString userFriendlyCurrentFile();
     QString currentFile() { return curFile; }
-
+		void print(QPrinter *printer);
 protected:
     void closeEvent(QCloseEvent *event);
 	virtual void paintEvent ( QPaintEvent * event );
@@ -54,15 +59,24 @@ private slots:
     void documentWasModified();
 
 private:
-    bool maybeSave();
+		bool foilModified(){return false;}
+		bool maybeSave();
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
- 	CFoil foil;
-// 	FoilPath *foilPath;
+ 	Foil foil;
+	Naca4DigitFoil	naca4Foil;
+	Foil *foilPtr;
+	FoilPath foilPath;
+	FoilPointPath foilPointPath;
+	FoilPointPolarPath foilPointPolarPath;
+	FoilInterpolPath foilInterpolPath;
 
     QString curFile;
     bool isUntitled;
+	// properties for foil display
+	double scale;
+	QPoint offset;
 };
 
 #endif
