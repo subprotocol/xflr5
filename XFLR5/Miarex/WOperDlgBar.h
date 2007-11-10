@@ -43,7 +43,6 @@ protected:
 
 	CButton	m_ctrlInitCalc;
 	CButton	m_ctrlStoreWOpp;
-	CButton	m_ctrlKeepOutOpps;
 	CButton	m_ctrlSequence;
 	CButton m_ctrlAnalyze;
 	CStatic m_ctrlSpec;
@@ -118,7 +117,6 @@ protected:
 	afx_msg void OnShowDownwash();
 	afx_msg void OnShowCl();
 	afx_msg void OnStoreWOpp();
-	afx_msg void OnKeepOutOpps();
 	afx_msg void OnWSequence();
 	afx_msg void OnStream();
 	afx_msg void OnHalfWing();

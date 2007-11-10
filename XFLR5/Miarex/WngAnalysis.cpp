@@ -28,7 +28,6 @@
 #include <math.h>
 #include ".\wnganalysis.h"
 
-
 /////////////////////////////////////////////////////////////////////////////
 // CWngAnalysis dialog
 
@@ -54,11 +53,15 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 	m_AnalysisType = 1;
 
 	m_bVLM1       = true;
-	m_bMiddle     = true;
+//	m_bMiddle     = true;
 	m_bTiltedGeom = false;
 	m_bWakeRollUp = false;
 	m_bViscous    = true;
 	m_bGround     = false;
+
+	m_NXWakePanels    = 5;
+	m_TotalWakeLength = 10.0;//x mac
+	m_WakePanelFactor = 1.1;
 
 	m_SymbolFont.CreatePointFont(100, "Symbol");
 	m_UnitType  = 1;
@@ -69,7 +72,6 @@ void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_WAKEROLLUP, m_ctrlWakeRollUp);
-	DDX_Control(pDX, IDC_TILTEDGEOM, m_ctrlTiltedGeom);
 	DDX_Control(pDX, IDC_VLM2, m_ctrlVLM2);
 	DDX_Control(pDX, IDC_VLM1, m_ctrlVLM1);
 	DDX_Control(pDX, IDC_LENGTHUNIT, m_ctrlLengthUnit);
@@ -103,10 +105,11 @@ void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SRE, m_ctrlSRe);
 	DDX_Control(pDX, IDC_RRE, m_ctrlRRe);
 	DDX_Control(pDX, IDC_VISCOUS, m_ctrlViscous);
+	DDX_Control(pDX, IDC_TILTEDGEOM, m_ctrlTiltGeom);
 	DDX_Check(pDX, IDC_AUTONAME, m_BAutoName);
-	DDX_Control(pDX, IDC_TOPBOTTOM, m_ctrlTopBottom);
 	DDX_Control(pDX, IDC_GROUNDEFFECT, m_ctrlGroundEffect);
 	DDX_Control(pDX, IDC_HEIGHT, m_ctrlHeight);
+	DDX_Control(pDX, IDC_WAKEPARAMS, m_ctrlWakeParams);
 }
 
 
@@ -131,10 +134,10 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 	ON_BN_CLICKED(IDC_UNIT2, OnUnit)
 	ON_BN_CLICKED(IDC_VLM2, OnVLMMethod)
 	ON_BN_CLICKED(IDC_WAKEROLLUP, OnWakeRollUp)
-	ON_BN_CLICKED(IDC_TILTEDGEOM, OnTiltedGeom)
 	ON_BN_CLICKED(IDC_VISCOUS, OnViscous)
-	ON_BN_CLICKED(IDC_TOPBOTTOM, OnTopBottom)
+	ON_BN_CLICKED(IDC_TILTEDGEOM, OnTiltedGeom)
 	ON_BN_CLICKED(IDC_GROUNDEFFECT, OnGroundEffect)
+	ON_BN_CLICKED(IDC_WAKEPARAMS, OnWakeParams)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -147,12 +150,24 @@ BOOL CWngAnalysis::OnInitDialog()
 
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	CString str;
+	int i;
+
 	if(m_pPlane) {
 		if(m_AnalysisType==0 || m_AnalysisType==1) m_AnalysisType=2;
 		m_ctrlMethod1.EnableWindow(false);
 	}
+	
+	bool bWarning = false;
+	for (i=0; i<m_pWing->m_NPanel-1; i++)
+	{
+		if(m_pWing->m_NXPanels[i]!= m_pWing->m_NXPanels[i+1])
+			{
+				AfxMessageBox("The number of chordwise VLM-panels across the span is not uniform\n Panel method is disabled", MB_OK);
+				bWarning = true;
+				break;
+			}
+	}
 
-//	m_ctrlMethod3.EnableWindow(true);
 	m_ctrlRho.SetFont(&m_SymbolFont);
 	m_ctrlNu.SetFont(&m_SymbolFont);
 
@@ -202,34 +217,46 @@ BOOL CWngAnalysis::OnInitDialog()
 	SetWingLoad();
 	SetReynolds();
 
-	if(m_bMiddle)  m_ctrlTopBottom.SetCheck(FALSE);
-	if(m_bViscous) m_ctrlViscous.SetCheck(TRUE);
-	if(m_bWakeRollUp) m_ctrlWakeRollUp.SetCheck(TRUE);
-	if(m_bTiltedGeom) m_ctrlTiltedGeom.SetCheck(TRUE);
-	m_ctrlTiltedGeom.EnableWindow(false);
+	if(bWarning)
+	{
+		m_ctrlMethod3.EnableWindow(false);
+		if(m_AnalysisType==3) m_AnalysisType=2;
+	}
+
+	if(m_bViscous)		m_ctrlViscous.SetCheck(TRUE);
+	if(m_bTiltedGeom)	m_ctrlTiltGeom.SetCheck(TRUE);
+	if(m_bWakeRollUp) 	m_ctrlWakeRollUp.SetCheck(TRUE);
+
+	m_ctrlWakeRollUp.EnableWindow(FALSE);
+	m_ctrlWakeParams.EnableWindow(FALSE);
+
+	OnTiltedGeom();
 
 	if(m_AnalysisType==0) m_AnalysisType=2;//former m_bLLT=false;
-	if(m_AnalysisType==1) {
+	if(m_AnalysisType==1) 
+	{
 		CheckRadioButton(IDC_METHOD1, IDC_METHOD3, IDC_METHOD1);
 		m_ctrlViscous.SetCheck(TRUE);
 		m_ctrlViscous.EnableWindow(false);
+		m_ctrlWakeRollUp.SetCheck(FALSE);
+		m_ctrlWakeParams.EnableWindow(FALSE);
 	}
-	else if(m_AnalysisType==2) {
+	else if(m_AnalysisType==2) 
+	{
 		CheckRadioButton(IDC_METHOD1, IDC_METHOD3, IDC_METHOD2);
 		m_ctrlViscous.EnableWindow(true);
 	}
 	else if(m_AnalysisType==3) {
+
 		CheckRadioButton(IDC_METHOD1, IDC_METHOD3, IDC_METHOD3);
 		m_ctrlViscous.EnableWindow(true);
 	}
 
 	if(m_bVLM1)	{
 		CheckRadioButton(IDC_VLM1, IDC_VLM2, IDC_VLM1);
-//		m_ctrlWakeRollUp.EnableWindow(false);
 	}
 	else {
 		CheckRadioButton(IDC_VLM1, IDC_VLM2, IDC_VLM2);
-//		m_ctrlWakeRollUp.EnableWindow(true);
 	}
 
 	SetWPolarName();
@@ -239,10 +266,13 @@ BOOL CWngAnalysis::OnInitDialog()
 	EnableControls();
 	OnMethod();
 
+	m_WakeParamsdlg.m_NXWakePanels    = m_NXWakePanels;
+	m_WakeParamsdlg.m_TotalWakeLength = m_TotalWakeLength;
+	m_WakeParamsdlg.m_WakePanelFactor = m_WakePanelFactor;
+
 	m_ctrlQInf.SetSel(0,-1);
 	m_ctrlQInf.SetFocus();
 
-	m_ctrlWakeRollUp.EnableWindow(false);
 	return FALSE; 
 }
 
@@ -328,7 +358,6 @@ void CWngAnalysis::SetWPolarName()
 	else if(m_AnalysisType==2) {
 		if(m_bVLM1)	m_WPolarName += "-VLM1";
 		else		m_WPolarName += "-VLM2";
-		if(!m_bMiddle) m_WPolarName +="-T&B";
 	}
 	else if(m_AnalysisType==3) m_WPolarName += "-Panel";
 	
@@ -336,15 +365,16 @@ void CWngAnalysis::SetWPolarName()
 	strong.Format("-%6.2f", m_XCmRef*pFrame->m_mtoUnit);
 	m_WPolarName += strong + str;
 
-	if(m_bWakeRollUp) {
-		m_WPolarName += "-W";
+	if(m_bTiltedGeom) 
+	{
+		m_WPolarName += "-TG";
+		if(m_bWakeRollUp) m_WPolarName += "-W";
 	}
-	if(m_bTiltedGeom) {
-		m_WPolarName += "-tg";
-	}
+
 	if(!m_bViscous) {
 		m_WPolarName += "-Inviscid";
 	}
+
 	if(m_bGround) {
 		strong.Format("%.2f", m_Height),
 		m_WPolarName += "-G"+strong;
@@ -377,6 +407,11 @@ void CWngAnalysis::OnOK()
 				return;
 			}
 		}
+	}
+
+	if(!m_bWakeRollUp && m_AnalysisType==3){
+		m_TotalWakeLength = 100.0;
+		m_NXWakePanels    = 1;
 	}
 	CDialog::OnOK();
 }
@@ -498,19 +533,16 @@ void CWngAnalysis::EnableControls()
 		m_ctrlVLM1.EnableWindow(false);
 		m_ctrlVLM2.EnableWindow(false);
 		m_ctrlViscous.EnableWindow(false);
-		m_ctrlTopBottom.EnableWindow(false);
 	}
 	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2){ 
 		m_ctrlVLM1.EnableWindow(true);
 		m_ctrlVLM2.EnableWindow(true);
 		m_ctrlViscous.EnableWindow(true);
-		m_ctrlTopBottom.EnableWindow(false);
 	}
 	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3){
 		m_ctrlVLM1.EnableWindow(false);
 		m_ctrlVLM2.EnableWindow(false);
 		m_ctrlViscous.EnableWindow(true);
-		m_ctrlTopBottom.EnableWindow(false);
 	}
 }
 
@@ -628,6 +660,7 @@ void CWngAnalysis::SetDensity()
 	}	
 }
 
+
 void CWngAnalysis::OnAutoName() 
 {
 	if (m_ctrlAutoName.GetCheck()){
@@ -641,7 +674,7 @@ void CWngAnalysis::OnAutoName()
 	}
 }
 
-
+ 
 void CWngAnalysis::OnSetFocusWPolarName() 
 {
  	m_BAutoName = false;
@@ -650,28 +683,35 @@ void CWngAnalysis::OnSetFocusWPolarName()
 
 void CWngAnalysis::OnMethod() 
 {
-	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1){
+	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1)
+	{
 		m_AnalysisType=1;
 		m_bViscous = true;
-		m_bMiddle  = true;
 		m_ctrlViscous.SetCheck(TRUE);
-		m_ctrlTopBottom.SetCheck(FALSE);
 		m_bWakeRollUp = false;
 		m_ctrlWakeRollUp.SetCheck(FALSE);
+		m_ctrlTiltGeom.EnableWindow(false);
+		OnTiltedGeom();
+//		m_ctrlWakeRollUp.EnableWindow(FALSE);
+//		m_ctrlWakeParams.EnableWindow(FALSE);
 	}
-	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2){ 
+	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2)
+	{ 
 		m_AnalysisType=2;
-		m_bMiddle  = true;
-		m_ctrlTopBottom.SetCheck(FALSE);
-		m_bWakeRollUp = false;
-		m_ctrlWakeRollUp.SetCheck(FALSE);
+		m_ctrlTiltGeom.EnableWindow(true);
+		OnTiltedGeom();
+//		m_ctrlWakeRollUp.EnableWindow(TRUE);
+//		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
+//		else				m_ctrlWakeParams.EnableWindow(FALSE);
 	}
-	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3){ 
+	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3)
+	{ 
 		m_AnalysisType=3;
-		m_bMiddle  = false;
-		m_ctrlTopBottom.SetCheck(TRUE);
-		m_bWakeRollUp = true;
-		m_ctrlWakeRollUp.SetCheck(TRUE);
+		m_ctrlTiltGeom.EnableWindow(true);
+		OnTiltedGeom();
+//		m_ctrlWakeRollUp.EnableWindow(TRUE);
+//		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
+//		else				m_ctrlWakeParams.EnableWindow(FALSE);	
 	}
 	EnableControls();
 	SetWPolarName();
@@ -691,20 +731,41 @@ void CWngAnalysis::OnVLMMethod()
 }
 
 
-void CWngAnalysis::OnTiltedGeom() 
+void CWngAnalysis::OnWakeRollUp() 
 {
-	if(m_ctrlTiltedGeom.GetCheck()) m_bTiltedGeom = true;
-	else                            m_bTiltedGeom = false;
+	if(m_ctrlWakeRollUp.GetCheck()) 
+	{
+		m_bWakeRollUp = true;
+		m_ctrlWakeParams.EnableWindow(TRUE);
+	}
+	else
+	{
+		m_bWakeRollUp = false;
+		m_ctrlWakeParams.EnableWindow(FALSE);
+	}
 	SetWPolarName();
 }
 
 
-
-void CWngAnalysis::OnWakeRollUp() 
+void CWngAnalysis::OnTiltedGeom()
 {
-	if(m_ctrlWakeRollUp.GetCheck()) m_bWakeRollUp = true;
-	else                            m_bWakeRollUp = false;
+	if(m_ctrlTiltGeom.GetCheck()) 
+	{
+		m_bTiltedGeom = true;
+//		m_ctrlWakeRollUp.EnableWindow(true);
+//		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
+//		else				m_ctrlWakeParams.EnableWindow(FALSE);
+	}
+	else 
+	{
+		m_bTiltedGeom = false;
+//		m_bWakeRollUp = false;
+//		m_ctrlWakeRollUp.SetCheck(false);
+//		m_ctrlWakeRollUp.EnableWindow(false);
+	}
+
 	SetWPolarName();
+	EnableControls();
 }
 
 
@@ -716,13 +777,6 @@ void CWngAnalysis::OnViscous()
 	EnableControls();
 }
 
-void CWngAnalysis::OnTopBottom()
-{
-	if(m_ctrlTopBottom.GetCheck())	m_bMiddle = false;
-	else							m_bMiddle = true;
-	SetWPolarName();
-	EnableControls();
-}
 
 void CWngAnalysis::OnGroundEffect()
 {
@@ -737,3 +791,20 @@ void CWngAnalysis::OnGroundEffect()
 	SetWPolarName();
 }
 
+
+void CWngAnalysis::OnWakeParams()
+{
+	m_WakeParamsdlg.DoModal();
+
+	m_WakePanelFactor = m_WakeParamsdlg.m_WakePanelFactor;
+	m_TotalWakeLength = m_WakeParamsdlg.m_TotalWakeLength;
+	if(m_bWakeRollUp)
+	{
+		m_NXWakePanels = m_WakeParamsdlg.m_NXWakePanels;
+	}
+	else
+	{
+		m_NXWakePanels    = 1;
+		m_TotalWakeLength  = 100.0;
+	}
+}

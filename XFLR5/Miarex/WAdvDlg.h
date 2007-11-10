@@ -41,6 +41,9 @@ public:
 	//{{AFX_DATA(CWAdvDlg)
 	enum { IDD = IDD_WADVDLG };
 	CButton	m_ctrlLogFile;
+	CButton m_ctrlOK;
+	CButton m_ctrlResetWake;
+	CButton	m_ctrlKeepOutOpps;
 	CNumEdit	m_ctrlInterNodes;
 	CFloatEdit	m_ctrlRelax;
 	CFloatEdit	m_ctrlAlphaPrec;
@@ -48,14 +51,10 @@ public:
 	CNumEdit	m_ctrlNStation;
 	CNumEdit	m_ctrlIterMax;
 	CNumEdit    m_ctrlMaxWakeIter;
-	CNumEdit    m_ctrlWakePanels;
-	CFloatEdit m_ctrlFirstPanelSize;
-	CFloatEdit m_ctrlPanelFactor;
 	CFloatEdit m_ctrlCoreSize;
 	CFloatEdit m_ctrlVortexPos;
 	CFloatEdit m_ctrlControlPos;
 	CStatic	m_ctrlAStat;
-	CButton m_ctrlResetWake;
 	CStatic m_ctrlLength;
 	BOOL	m_BLogFile;
 	//}}AFX_DATA
@@ -66,22 +65,26 @@ public:
 	//{{AFX_VIRTUAL(CWAdvDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
-	double m_ControlPos, m_VortexPos;
-	double m_Relax, m_AlphaPrec;
+
+	bool m_bDirichlet;
+	bool m_bTrefftz;
+	bool m_bKeepOutOpps;
+	bool m_bResetWake;
+
 	int m_Iter;
 	int m_NStation;
 	int m_WakeInterNodes;
 	int m_MaxWakeIter;
-	int m_WakePanels;
-	double m_FirstPanelSize;//% mac
-	double m_WakePanelFactor;
+
+	double m_ControlPos, m_VortexPos;
+	double m_Relax, m_AlphaPrec;
 	double m_CoreSize;
 	double m_MinPanelSize;
-	bool m_bResetWake;
 	CFont m_SymbolFont;
 
 	void ReadParams();
@@ -92,14 +95,15 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CWAdvDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnClose();
-	afx_msg void OnResetWake();
 	virtual void OnOK();
+	afx_msg void OnClose();
+	afx_msg void OnKeepOutOpps();
+	afx_msg void OnResetWake();
+	afx_msg void OnRadio1();
+	afx_msg void OnRadio3();
 	afx_msg void OnResetDefaults();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CButton m_ctrlOK;
 };
 

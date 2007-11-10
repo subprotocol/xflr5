@@ -43,14 +43,16 @@ CWPolar::CWPolar(CWnd* pParent)
 	m_bShowPoints = false;
 
 	m_bVLM1       = true;
-	m_bMiddle     = true;
+//	m_bMiddle     = true;
 	m_bWakeRollUp = false;
 	m_bTiltedGeom = false;
 	m_bViscous    = true;
 	m_bPolar      = true;
 	m_bGround     = false;
 
-	m_NXWakePanels = 0;
+	m_NXWakePanels = 1;
+	m_TotalWakeLength = 1.0;
+	m_WakePanelFactor =1.1;
 
 	m_AnalysisType = 0;
 	m_Type   = 1;
@@ -76,7 +78,7 @@ CWPolar::CWPolar(CWnd* pParent)
 void CWPolar::Copy(CWPolar *pWPolar)
 {
 	m_bIsVisible  = pWPolar->m_bIsVisible;
-	m_bMiddle     = pWPolar->m_bMiddle;
+//	m_bMiddle     = pWPolar->m_bMiddle;
 	m_bPolar      = pWPolar->m_bPolar;
 	m_bShowPoints = pWPolar->m_bShowPoints;
 	m_bTiltedGeom = pWPolar->m_bTiltedGeom;
@@ -243,7 +245,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 	if(ar.IsStoring()){
 		//write variables
 		
-		ar << 1010; // identifies the format of the file
+		ar << 1011; // identifies the format of the file
+					// 1011 : added wake roll-up parameters
 					// 1010 : added ground effect variables langth changed length unit to m
 					// 1009 : added viscous flag
 					// 1008 : added Tilted Geometry flag
@@ -259,14 +262,15 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar << m_Style  << m_Width << m_Color;
 		ar << m_AnalysisType;
 		if (m_bVLM1)       ar << 1; else ar << 0;
-		if (m_bMiddle)     ar << 1; else ar << 0;
+//		if (m_bMiddle)     ar << 1; else ar << 0;
+		ar<<1;
 		if (m_bTiltedGeom) ar << 1; else ar << 0;
 		if (m_bWakeRollUp) ar << 1; else ar << 0;
 		if (m_bViscous)    ar << 1; else ar << 0;
 		if (m_bGround)     ar << 1; else ar << 0;
 		ar << (float)m_Height;
 
-		ar << m_NXWakePanels;
+		ar << m_NXWakePanels << (float)m_TotalWakeLength << (float)m_WakePanelFactor;
 
 		if (m_bIsVisible)  ar << 1; else ar << 0;
 		if (m_bShowPoints) ar << 1; else ar << 0;
@@ -358,7 +362,7 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 				m_PlrName ="";
 				return false;
 			}
-			if(n) m_bMiddle =true; else m_bMiddle = false;
+//			if(n) m_bMiddle =true; else m_bMiddle = false;
 		}
 		if(ArchiveFormat>=1008){
 			ar >> n; 
@@ -403,6 +407,11 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 				m_PlrName ="";
 				return false;
 			}
+		}
+
+		if(ArchiveFormat>=1011){
+			ar >> f; 			m_TotalWakeLength  = f;
+			ar >> f; 			m_WakePanelFactor = f;
 		}
 
 		ar >> n; 

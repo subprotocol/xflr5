@@ -49,7 +49,7 @@ BEGIN_MESSAGE_MAP(CW3DBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_3DSURFACES, On3DSurfaces)
 	ON_BN_CLICKED(IDC_3DOUTLINE, On3DOutline)
 	ON_BN_CLICKED(IDC_3DVORTICES, On3DVortices)
-	ON_BN_CLICKED(IDC_3DVLMPANELS, On3DVLMPanels)
+	ON_BN_CLICKED(IDC_3DPANELS, On3DPanels)
 	ON_BN_CLICKED(IDC_3DRESET, On3DReset)
 	ON_BN_CLICKED(IDC_3DISO, On3DIso)
 	ON_BN_CLICKED(IDC_3DLEFT, On3DLeft)
@@ -72,6 +72,9 @@ CW3DBar::CW3DBar(CWnd* pParent)
 	m_glXRotatef = 125.0;
 	m_glYRotatef = 180.0;
 	m_glZRotatef = -35.0;
+//	m_glXRotatef =    90.0;
+//	m_glYRotatef =   180.0;
+//	m_glZRotatef =   180.0;
 	m_glXTransf  =   0.0;
 	m_glYTransf  = 0.0;
 	m_glScalef   = 1.0;
@@ -182,13 +185,10 @@ void CW3DBar::On3DVortices()
 
 
 
-void CW3DBar::On3DVLMPanels()
+void CW3DBar::On3DPanels()
 {
-	if(m_ctrlVLMPanels.GetCheck()) {
+	if(m_ctrlVLMPanels.GetCheck())
 		m_bVLMPanels = true;
-		m_bSurfaces  = false;
-		m_ctrlSurfaces.SetCheck(false);
-	}
 	else		
 		m_bVLMPanels = false;
 	
@@ -233,8 +233,8 @@ void CW3DBar::On3DLeft()
 }
 void CW3DBar::On3DFront()
 {
-	m_glXRotatef = -90.0;
-	m_glYRotatef =   0.0;
+	m_glXRotatef =  90.0;
+	m_glYRotatef = 180.0;
 	m_glZRotatef =  90.0;
 	CMainFrame *pFrame = (CMainFrame*)m_pParent;
 	pFrame->UpdateView();

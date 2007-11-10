@@ -23,7 +23,7 @@
 #pragma once
 // WngAnalysis.h : header file
 //
-
+#include "WakeParamsDlg.h"
 #include "../misc/FloatEdit.h"
 #include "../misc/NumEdit.h"
 #include "Plane.h"
@@ -46,10 +46,8 @@ public:
 	//{{AFX_DATA(CWngAnalysis)
 	enum { IDD = IDD_WNGANALYSIS };
 	CButton	m_ctrlWakeRollUp;
-	CButton	m_ctrlTiltedGeom;
 	CButton	m_ctrlVLM2;
 	CButton	m_ctrlVLM1;
-	CButton m_ctrlTopBottom;
 	CStatic	m_ctrlLengthUnit;
 	CStatic	m_ctrlLengthUnit2;
 	CFloatEdit	m_ctrlXCmRef;
@@ -77,7 +75,9 @@ public:
 	CButton	m_ctrlType1;
 	CButton	m_ctrlOK;
 	CButton m_ctrlViscous;
+	CButton m_ctrlTiltGeom;
 	CEdit	m_ctrlWPolarName;
+	CButton m_ctrlWakeParams;
 	CStatic	m_ctrlWingName;
 	CFloatEdit	m_ctrlQInf;
 	CStatic	m_ctrlSRe;
@@ -98,6 +98,8 @@ public:
 // Implementation
 
 private:
+
+	CWakeParamsDlg m_WakeParamsdlg;
 	CFont m_SymbolFont;
 	void SetWingLoad();
 	void EnableControls();
@@ -126,6 +128,10 @@ private:
 	double m_WingLoad;
 	double m_Height;
 
+	int m_NXWakePanels;
+	double m_TotalWakeLength;//% mac
+	double m_WakePanelFactor;
+
 	CWing* m_pWing;
 	CPlane * m_pPlane;
 	CWPolar *m_pWPolar;
@@ -149,14 +155,14 @@ private:
 	afx_msg void OnMethod();
 	afx_msg void OnKillFocusXCmRef();
 	afx_msg void OnVLMMethod();
-	afx_msg void OnTiltedGeom();
 	afx_msg void OnWakeRollUp();
 	afx_msg void OnViscous();
-	afx_msg void OnTopBottom();
+	afx_msg void OnTiltedGeom();
 	DECLARE_MESSAGE_MAP()
 
 
 public:
+	afx_msg void OnWakeParams();
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -25,13 +25,15 @@
 #include "3DPanelThread.h"
 
 #include "afxwin.h"
-
+ 
 // Boîte de dialogue C3DPanelDlg
 
 class C3DPanelDlg : public CDialog
 {
 	friend class CMiarex;
+	friend class CWing;
 	friend class C3DPanelThread;
+
 public:
 	C3DPanelDlg(CWnd* pParent = NULL);   // constructeur standard
 	virtual ~C3DPanelDlg();
@@ -42,37 +44,41 @@ public:
 	enum { IDD = IDD_3DPANELDLG };
  
 protected:
-	CVector P1, P2, P3, P4;
 
 	CEdit m_ctrlOutput;
 	virtual void DoDataExchange(CDataExchange* pDX);    
 
-	bool AddWakeContribution();
-	bool Gauss(double *A, int n, double *B, int m);
+	bool StartPanelThread();
+	bool SolveMultiple(int nval);
+	bool ComputeOnBody(int q, double Alpha);
+	bool ComputeSurfSpeeds(double *Mu, double *Sigma);
+	bool ComputeAerodynamics(double V0, double VDelta, int nrhs);
+	bool ComputePlane(double Alpha, int qrhs);
+	bool CreateWakeContribution(double V0, double VDelta, int nval);
+	bool CreateDoubletStrength(double V0, double VDelta, int nval);
 	bool CreateMatrix();
 	bool CreateRHS(double V0, double VDelta, int nval);
-	bool StartPanelThread();
-	bool SolveMultiple(double V0, double VDelta, int nval);
-	bool ComputeOnBody(double *Mu, double *Sigma, double frac);
-	bool ComputeSurfSpeeds(double *Mu, double *Sigma, double frac);
 	void AddString(CString strong);
-	void ComputePlane(double V0, double VDelta, int nrhs);
 	void EndSequence();
-	void SetProgress(int progress,double fraction);
+	void SetProgress(int TaskSize,double TaskProgress);
 	void SetFileHeader();
 	void SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi);
 	void DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void SetDownwash(double *Mu, double *Sigma);
+	void SetAi(int qrhs);
 	void CheckSolution();
+	void RelaxWake();
+	bool Test();
 
 	CVector GetSpeedVector(CVector C, double *Mu, double *Sigma);
 
-	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
-	double m_RHS[VLMMATSIZE*100];			// RHS vector
-	double m_Sigma[VLMMATSIZE];				// Source strengths
-	double m_Mu[VLMMATSIZE];				// Doublet strengths
-	double m_Cp[VLMMATSIZE];				//lift coef per panel
+	double *m_aij, *m_aijRef;
+	double *m_RHS;
+	double *m_RHSRef;
 
+	double m_Sigma[VLMMATSIZE*100];			// Source strengths
+	double m_Mu[VLMMATSIZE*100];			// Doublet strengths
+	double m_Cp[VLMMATSIZE*100];			// lift coef per panel
 	double m_3DQInf[100];
 
 	CVector m_Speed[VLMMATSIZE];
@@ -90,11 +96,11 @@ protected:
 	bool m_b3DSymetric;
 	bool m_bPointOut;
 	bool m_bConverged;
-	bool m_bNeumann;// true if Neumann boundary conditions, false if Dirichlet
+	bool m_bDirichlet;// true if Dirichlet boundary conditions, false if Neumann
 
 	double pi;
 	double m_Alpha;//Angle of Attack in °
-	double m_AlphaCalc;
+	double m_OpAlpha;
 	double m_AlphaMax;
 	double m_DeltaAlpha;
 	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
@@ -106,40 +112,45 @@ protected:
 	double m_GYm, m_IYm;
 	double m_QInf, m_QInfMax, m_DeltaQInf;
 
-	double f,g;
-	double x,y,z;//local coordinates
-	double x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4;
-	double r1, r2, r3, r4, e1, e2, e3, e4, h1, h2, h3, h4;
-	double d12, d23, d34, d41;
-	double d1, d2, d3, d4;
-	double phi1, phi2;
-	double us, vs, ws;
 	double eps;
-	double phiw, rz, dist;
-	CVector R;
+	double phiw, rz;
+	double RFF;
 
 	int m_nNodes;
 	int m_MatSize;
 	int m_NSurfaces;
 	int m_Progress;
-	int RFF;
+
+	int m_nWakeNodes;
+	int m_WakeSize;	
 	int m_NWakeColumn;
-	int m_NXWakePanels;
+	int m_WakeInterNodes;
+	int m_MaxWakeIter;
+
+	double *m_pCoreSize;
+
+	double side, sign, dist, S, GL;
+	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
+	CVector R[5];
+	CVector PJK, a, b, s, T1, T2, T, h;
 
 	CString m_strOut;
 	CString m_VersionName;
 
 	double m_row[VLMMATSIZE];
-//	CPanel *m_pRefPanels;
-//	CVector *m_pRefNodes;
-//	CSurface *m_pRefSurfaces;
 
-	CPanel *m_pPanel;
-	CVector *m_pNode;
-	CPanel *m_pWakePanel;
-	CVector *m_pWakeNode;
+	CPanel **m_ppPanel;//the sorted array of panel pointers
+	CPanel *m_pPanel; //the original array of panels
+	CPanel *m_pWakePanel;// the current working wake panel array
+	CPanel *m_pRefWakePanel;// a copy of the reference wake node array if wake needs to be reset
+	CPanel *m_pMemPanel;// a copy of the reference panel array for tilted calc
 
-	CSurface *m_pSurface;
+	CVector *m_pNode;	// the working array of Nodes 
+	CVector *m_pMemNode;	// a copy of the reference node array for tilted calc
+	CVector *m_pWakeNode;	// the current working wake node array
+	CVector *m_pRefWakeNode; // a copy of the reference wake node array if wake needs to be reset
+	CVector *m_pTempWakeNode;// the temporary wake node array during relaxation calc
+
 	
 	CWPolar *m_pWPolar;
 	CWing *m_pWing; //pointer to the geometry class of the wing 
@@ -154,10 +165,10 @@ protected:
 
 	CPlane *m_pPlane;
 
+
 	DECLARE_MESSAGE_MAP()
 public:
 //	LRESULT OnEndViscDialog(WPARAM wParam, LPARAM lParam);            
-
 	afx_msg void OnCancel();
 	afx_msg void OnTimer(UINT nIDEvent);
 };

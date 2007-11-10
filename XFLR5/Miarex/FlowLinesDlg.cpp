@@ -170,3 +170,4 @@ void CFlowLinesDlg::PostNcDestroy()
 
 	CDialog::PostNcDestroy();
 }
+

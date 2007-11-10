@@ -52,16 +52,17 @@ private:
 	double m_Alpha, m_QInf; 	// angle of attack and speed 
 	double m_Weight;		// the plane's wieght
 	double m_Cp[VLMMATSIZE];	// the Cp array
-	double m_G[VLMMATSIZE];		// the VLM vortex strengths
+	double m_G[VLMMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
+	double m_Sigma[VLMMATSIZE];		// the panel's source strengths
 	int m_NStation;			// unused
-	int m_NVLMPanels;		// the number of VLM panels
+	int m_NPanels;		// the number of VLM or 3D-panels
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
 	bool m_bBiplane; 		// if a biplane
 	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
-	bool m_bMiddle;			// true if the POpp is the result of a calculation on the middle surface
+//	bool m_bMiddle;			// true if the POpp is the result of a calculation on the middle surface
 	bool m_bOut;			// true if the point is unconverged (interpolation outside the polar mesh)
 	bool m_bIsVisible;
 	bool m_bShowPoints;

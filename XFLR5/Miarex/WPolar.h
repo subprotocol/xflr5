@@ -87,7 +87,7 @@ private:
 	bool m_bShowPoints;
 //	bool m_bLLT;
 	bool m_bVLM1;
-	bool m_bMiddle;
+//	bool m_bMiddle;
 	bool m_bGround;
 	bool m_bWakeRollUp;
 	bool m_bTiltedGeom;
@@ -95,7 +95,8 @@ private:
 	bool m_bPolar;//true if classic polar, false, if control polar
 
 	int m_NXWakePanels;
-
+	double m_TotalWakeLength;
+	double m_WakePanelFactor;
 
 	void CalculatePoint(int i);
 	void ResetWPlr();

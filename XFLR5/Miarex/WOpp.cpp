@@ -38,7 +38,7 @@ CWOpp::CWOpp()
 {
 	m_bOut        = false;
 	m_bVLM1       = true;
-	m_bMiddle     = true;
+//	m_bMiddle     = true;
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -126,7 +126,7 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 		if(m_bOut)        ar << 1; else ar<<0;
 		ar << m_AnalysisType;
 		if(m_bVLM1)       ar << 1; else ar<<0;
-		if(m_bMiddle)     ar << 1; else ar<<0;
+		ar<<1;
 		ar << m_Style << m_Width << m_Color;
 		ar << m_Type << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight << (float)m_Span << (float)m_MAChord;
@@ -214,7 +214,7 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 					pfe->m_strFileName = ar.m_strFileName;
 					throw pfe;
 				}
-				if(a) m_bMiddle = true; else m_bMiddle = false;
+//				if(a) m_bMiddle = true; else m_bMiddle = false;
 			}
 
 			ar >> m_Style >> m_Width >> m_Color;

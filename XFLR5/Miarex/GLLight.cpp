@@ -44,7 +44,7 @@ CGLLight::CGLLight(CWnd* pParent /*=NULL*/)
 	m_bDepthTest = true;
 	m_bColorMaterial = true;
 
-	m_Ambient      = 0.2f;
+	m_Ambient      = 0.5f;
 	m_Diffuse      = 0.01f;
 	m_Specular     = 0.01f;
 
@@ -296,7 +296,7 @@ void CGLLight::OnDefaults()
 	m_Green = 1.0f;
 	m_Blue  = 1.0f;
 
-	m_Ambient      = 0.2f;
+	m_Ambient      = 0.5f;
 	m_Diffuse      = 0.01f;
 	m_Specular     = 0.01f;
 

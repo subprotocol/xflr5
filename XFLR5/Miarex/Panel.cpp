@@ -51,18 +51,20 @@ void CPanel::Reset()
 
 	m_bIsLeading   = false;
 	m_bIsTrailing  = false;
+	m_bIsInSymPlane = false;
 	m_bIsWakePanel = false;
 
-	m_iPos = 0;
-	m_iLA = 0;
-	m_iLB = 0;
-	m_iTA = 0;
-	m_iTB = 0;
-	m_iPL = -1;
-	m_iPR = -1;
-	m_iPU = -1;
-	m_iPD = -1;
-	m_iWake = -1;
+	m_iElement    = -1;
+	m_iPos        =  0;
+	m_iLA         =  0;
+	m_iLB         =  0;
+	m_iTA         =  0;
+	m_iTB         =  0;
+	m_iPL         = -1;
+	m_iPR         = -1;
+	m_iPU         = -1;
+	m_iPD         = -1;
+	m_iWake       = -1;
 	m_iWakeColumn = -1;
 
 	memset(lij, 0, sizeof(lij));
@@ -74,52 +76,34 @@ CPanel::~CPanel()
 
 }
 
-void CPanel::SetVortex(CVector LA, CVector LB, CVector TA, CVector TB)
-{
-	A.x = LA.x*(1.0-m_VortexPos)+TA.x*m_VortexPos;
-	A.y = LA.y*(1.0-m_VortexPos)+TA.y*m_VortexPos;
-	A.z = LA.z*(1.0-m_VortexPos)+TA.z*m_VortexPos;
-	B.x = LB.x*(1.0-m_VortexPos)+TB.x*m_VortexPos;
-	B.y = LB.y*(1.0-m_VortexPos)+TB.y*m_VortexPos;
-	B.z = LB.z*(1.0-m_VortexPos)+TB.z*m_VortexPos;
-
-	Vortex.x = B.x - A.x;
-	Vortex.y = B.y - A.y;
-	Vortex.z = B.z - A.z;
-
-	dl = Vortex.VAbs();
-
-	VortexPos.x = (A.x+B.x)/2.0;
-	VortexPos.y = (A.y+B.y)/2.0;
-	VortexPos.z = (A.z+B.z)/2.0;
-}
-
-
 
 void CPanel::SetFrame(CVector LA, CVector LB, CVector TA, CVector TB)
 {
 	//assumes the normal vector has already been set
-	CVector smp, smq;
-	double xA = LA.x*(1.0-m_CtrlPos)+TA.x*m_CtrlPos;
-	double yA = LA.y*(1.0-m_CtrlPos)+TA.y*m_CtrlPos;
-	double zA = LA.z*(1.0-m_CtrlPos)+TA.z*m_CtrlPos;
 
-	double xB = LB.x*(1.0-m_CtrlPos)+TB.x*m_CtrlPos;
-	double yB = LB.y*(1.0-m_CtrlPos)+TB.y*m_CtrlPos;
-	double zB = LB.z*(1.0-m_CtrlPos)+TB.z*m_CtrlPos;
+	A = LA*(1.0-m_VortexPos)+TA*m_VortexPos;
+	B = LB*(1.0-m_VortexPos)+TB*m_VortexPos;
 
-	CtrlPt.x = (xA+xB)/2.0;
-	CtrlPt.y = (yA+yB)/2.0;
-	CtrlPt.z = (zA+zB)/2.0;
+	Vortex = B - A;
+
+	dl = Vortex.VAbs();
+
+	VortexPos = (A+B)/2.0;
+
+	if(abs(LA.y)<1.e-5 && abs(TA.y)<1.e-5 && abs(LB.y)<1.e-5 && abs(TB.y)<1.e-5) m_bIsInSymPlane = true;
+	else m_bIsInSymPlane = false;
+
+	CVector smp, smq, MidA, MidB;
+	MidA = LA*(1.0-m_CtrlPos)+TA*m_CtrlPos;
+	MidB = LB*(1.0-m_CtrlPos)+TB*m_CtrlPos;
+
+	CtrlPt = (MidA+MidB)/2.0;
 
 	CollPt = (LA + LB + TA + TB)/4.0;
-//	CollPt.x = (LA.x+LB.x+TA.x+TB.x)/4.0;
-//	CollPt.y = (LA.y+LB.y+TA.y+TB.y)/4.0;
-//	CollPt.z = (LA.z+LB.z+TA.z+TB.z)/4.0;
 
 	//Use VSAERO figure 8. p23
-	if(m_iPos>=0)	m = (LB + TB) *0.5 - CollPt;
-	else            m = (LA + TA) *0.5 - CollPt;
+	if(m_iPos==0 || m_iPos==1)	m = (LB + TB) *0.5 - CollPt;
+	else						m = (LA + TA) *0.5 - CollPt;
 	m.Normalize();
 
 	l = m * Normal;

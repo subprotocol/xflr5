@@ -42,7 +42,7 @@ class CPlane : public CDialog
 
 // Construction
 public:
-	CPlane(CWnd* pParent = NULL);   // standard constructor
+	CPlane(CWnd* pParent, CWnd* pMiarex);   // standard constructor
  
 // Dialog Data
 	//{{AFX_DATA(CPlane)

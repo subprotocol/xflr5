@@ -46,7 +46,6 @@ BEGIN_MESSAGE_MAP(CWOperDlgBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_WANALYSIS, OnAnalyze)
 	ON_BN_CLICKED(IDC_STOREWOPP, OnStoreWOpp)
 	ON_BN_CLICKED(IDC_INITCALC, OnInitCalc)
-	ON_BN_CLICKED(IDC_KEEPOUTOPPS, OnKeepOutOpps)
 	ON_BN_CLICKED(IDC_WSEQUENCE, OnWSequence)
 	ON_BN_CLICKED(IDC_ANIMATE, OnAnimate)
 	ON_BN_CLICKED(IDC_WSEQUENCE, OnWSequence)
@@ -122,7 +121,7 @@ BOOL CWOperDlgBar::OnInitDialogBar()
 	m_ctrlSequence.SetCheck(m_bSequence);
 	
 	m_ctrlStoreWOpp.SetCheck(true);
-	m_ctrlKeepOutOpps.SetCheck(false);
+//	m_ctrlKeepOutOpps.SetCheck(false);
 
 	m_SymbolFont.CreatePointFont(100, "Symbol");
 	m_ctrlDeltaStat.SetFont(&m_SymbolFont);
@@ -157,7 +156,6 @@ void CWOperDlgBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INITCALC, m_ctrlInitCalc);
 	DDX_Control(pDX, IDC_STOREWOPP, m_ctrlStoreWOpp);
 	DDX_Control(pDX, IDC_INITCALC, m_ctrlInitCalc);
-	DDX_Control(pDX, IDC_KEEPOUTOPPS, m_ctrlKeepOutOpps);
 	DDX_Control(pDX, IDC_WSEQUENCE, m_ctrlSequence);
 	DDX_Control(pDX, IDC_WANALYSIS, m_ctrlAnalyze);
 	DDX_Control(pDX, IDC_SPEC, m_ctrlSpec);
@@ -187,7 +185,7 @@ void CWOperDlgBar::DoDataExchange(CDataExchange* pDX)
 void CWOperDlgBar::OnWSequence() 
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->Animate(false);
+//	pMiarex->Animate(false);
 	if(m_ctrlSequence.GetCheck()) m_bSequence = true;
 	else						  m_bSequence = false;
 }
@@ -309,14 +307,6 @@ void CWOperDlgBar::OnAnimate()
 	else pMiarex->Animate(false);
 }
 
-void CWOperDlgBar::OnKeepOutOpps() 
-{
-	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	if(m_ctrlKeepOutOpps.GetCheck()){
-		pMiarex->m_bKeepOutOpps = true;
-	}
-	else pMiarex->m_bKeepOutOpps = false;
-}
 
 void CWOperDlgBar::OnShowLift() 
 {
@@ -434,7 +424,6 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 	if(m_bSequence)             m_ctrlSequence.SetCheck(1);    else m_ctrlSequence.SetCheck(0);
 	if(m_bInitCalc)             m_ctrlInitCalc.SetCheck(1);    else m_ctrlInitCalc.SetCheck(0);
 	if(pMiarex->m_bStoreWOpp)   m_ctrlStoreWOpp.SetCheck(1);   else m_ctrlStoreWOpp.SetCheck(0);
-	if(pMiarex->m_bKeepOutOpps) m_ctrlKeepOutOpps.SetCheck(1); else m_ctrlKeepOutOpps.SetCheck(0);
 
 	if(pWPolar  && !pWPolar->m_bPolar){//we have a control polar
 		m_ctrlSpec.SetWindowText("Ctrl");
@@ -467,14 +456,14 @@ void CWOperDlgBar::OnStream()
 	if(m_ctrlStream.GetCheck()){
 		if(!pMiarex->m_bAnimate){
 			pFrame->m_bStream = true;
-			pFrame->m_bFlow = true;
+//			pFrame->m_bFlow = true;
 			pMiarex->UpdateView();
 		}
 		else m_ctrlStream.SetCheck(FALSE);
 	}
 	else {
 		pFrame->m_bStream = false;
-		pFrame->m_bFlow = false;
+//		pFrame->m_bFlow = false;
 		pMiarex->m_FlowLinesDlg.ShowWindow(SW_HIDE);
 		pMiarex->UpdateView();
 	}

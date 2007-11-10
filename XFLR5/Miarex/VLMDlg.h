@@ -59,8 +59,34 @@ public:
 	//}}AFX_VIRTUAL
 
 // Implementation
+	// Generated message map functions
+	//{{AFX_MSG(CVLMDlg)
+	virtual BOOL OnInitDialog();
+	afx_msg void OnCancel();
+	afx_msg void OnTimer(UINT nIDEvent);
+	//}}AFX_MSG
+	DECLARE_MESSAGE_MAP()
+
+	CVector GetSpeedVector(CVector C, double *Gamma);
+	void AddString(CString strong);
+	void SetFileHeader();
+	void EndSequence();
+	void VLMRotateGeomY(double Angle, CVector P);
+	bool VLMCreateRHS(double V0, double VDelta, int nval);
+	bool VLMCreateMatrix();
+	bool VLMSolveMultiple(double V0, double VDelta, int nval);
+	void VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V, bool bAll, bool bGround = false, double Height = 0.0);
+	void VLMSetAi(double *Gamma);
+	void VLMComputePlane(double V0, double VDelta, int nrhs);
+	void VLMSetDownwash(double *Gamma);
+	void VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll=true);
+	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
+	void ResetWakeNodes();
+	void RelaxWake();
+
 protected:
-	CStdioFile m_XFile;
+	CWnd* m_pMiarex;
+	CWnd *m_pFrame;
 
 	bool m_bSequence;
 	bool m_bWarning;
@@ -71,55 +97,25 @@ protected:
 	bool m_bConverged;
 	bool m_bCancel;
 	bool m_bPointOut;
-
-	double pi;
-	double m_row[VLMMATSIZE*100];
-	double m_aij[VLMMATSIZE*VLMMATSIZE];// coefficient matrix
-	double m_VLMQInf[100];
-	double m_Gamma[VLMMATSIZE*100];//Vortex circulation for VLM method
-	double m_Cp[VLMMATSIZE];//lift coef per panel
-
-	double m_AlphaCalc;
-
-	double m_QInf, m_QInfMax, m_DeltaQInf;
-	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
-	CString m_strOut;
-	CString m_VersionName;
-
-	CPanel *m_pRefPanels;
-	CVector *m_pRefNodes;
-	CSurface *m_pRefSurfaces;
-
-	CPanel m_pPanel[VLMMATSIZE];
-	CVector m_pNode[2*VLMMATSIZE];
-	CSurface m_pSurface[MAXVLMSURFACES];
-
-	CVLMThread *m_pVLMThread;
-
-	int m_VLMMatSize;
+ 
+	int m_MatSize;
 	int m_nNodes;
 	int m_NSurfaces;
 	int m_MaxWakeIter;
 	int m_WakeInterNodes;
-	double m_CoreSize;
+	int m_nWakeNodes;
+	int m_WakeSize;// Max Size for the VLMMatrix
+	int m_NWakeColumn;
 
-	CWPolar *m_pWPolar;
-	CWing *m_pWing;//pointer to the main wing 
-	CWing *m_pWing2;//pointer to the second wing if Biplane
-	CWnd* m_pMiarex;
-
-	CPlane *m_pPlane;
-	CWing *m_pStab;
-	CWing *m_pFin;
-
-	CWnd *m_pFrame;
-	// Generated message map functions
-	//{{AFX_MSG(CVLMDlg)
-	virtual BOOL OnInitDialog();
-	afx_msg void OnCancel();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-private:
+	double pi;
+	double *m_RHS;
+	double *m_aij;
+	double *m_Gamma;
+	double m_Cp[VLMMATSIZE];//lift coef per panel
+	double m_VLMQInf[100];
+	double m_OpAlpha;
+	double m_QInf, m_QInfMax, m_DeltaQInf;
+	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
 	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
 	double m_ICd[MAXSTATIONS];
 	double m_CL, m_ViscousDrag, m_InducedDrag;
@@ -127,38 +123,44 @@ private:
 	double m_TCm, m_GCm, m_VCm;
 	double m_Rm;
 	double m_GYm, m_IYm;
+	double Omega;
+	double ftmp;
+	double *m_pCoreSize;
 
+	CString m_strOut;
+	CString m_VersionName;
+
+	CStdioFile m_XFile;
+
+	CPanel *m_pMemPanel;//pointer to the reference panels array created in Miarex
+
+	CPanel *m_pPanel; 	// the original array of panels
+	CPanel **m_ppPanel;	// the re-ordered array of pointers to the panels
+	CPanel  *m_pWakePanel;
+	CPanel  *m_pRefWakePanel;
+
+	CVector *m_pNode;	// the working array of Nodes 
+	CVector *m_pMemNode;	// a copy of the reference node array for tilted calcs
+	CVector *m_pWakeNode;	// the current working wake node array
+	CVector *m_pRefWakeNode; // the reference wake node array if wake needs to be reset
+	CVector *m_pTempWakeNode;// the temporary wake node array during relaxation calc
+
+	CVLMThread *m_pVLMThread;
+
+	CPlane *m_pPlane;
+	CWing *m_pWing;//pointer to the main wing 
+	CWing *m_pWing2;//pointer to the second wing if Biplane
+	CWing *m_pStab;
+	CWing *m_pFin;
+	CWPolar *m_pWPolar;
+
+
+//	CVector m_UInf;
 	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, VG;
-	CVector Far, u;
-	CVector r0, r1, r2, VL, VR;
+	CVector Far;
+	CVector r0, r1, r2;
 	CVector t;
-	double uv;
-
-	int m_nWakeNodes;
-	int m_NXWakePanels;
-	int m_VLMWakeSize;// Max Size for the VLMMatrix
-	CPanel  * m_pWakePanel;
-	CVector *m_pWakeNode;
-	CVector m_WakeNode[2*VLMMATSIZE];
-	CVector GetSpeedVector(CVector C, double *Gamma);
-	void AddString(CString strong);
-	void SetFileHeader();
-	void EndSequence();
-	bool VLMCreateMatrix();
-	bool VLMSolveMultiple(double V0, double VDelta, int nval);
-	void VLMGetVortexInfluence(int p, CVector C, CVector &V, bool bAll, bool bGround = false, double Height = 0.0);
-	void VLMSetAi(double *Gamma);
-	void VLMComputePlane(double V0, double VDelta, int nrhs);
-	void VLMComputeTBCp(double *Gamma);
-	void VLMSetDownwash(double *Gamma);
-	void VLMResetWakeNodes();
-	void VLMMoveWakeNodes();
-	void VLMRotateGeomY(double Angle, CVector P);
-	void VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll=true);
-	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
-	bool Gauss(double *A, int n, double *B, int m);
-//	int  VLMIsWakeNode(CVector Pt);
+	CVector Psi;
 
 public:
-	afx_msg void OnTimer(UINT nIDEvent);
 };

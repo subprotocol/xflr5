@@ -31,18 +31,24 @@ bool CPlane::m_bCheckPanels = false;
 /////////////////////////////////////////////////////////////////////////////
 // CPlane dialog
 
-CPlane::CPlane(CWnd* pParent /*=NULL*/)
+CPlane::CPlane(CWnd* pParent, CWnd* pMiarex)
 	: CDialog(CPlane::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPlane)
 	//}}AFX_DATA_INIT
 	m_pFrame = pParent;
+	m_pMiarex = pMiarex;
 	m_bActive = false;
 
-	m_Wing.m_pFrame = pParent;
+	m_Wing.m_pMiarex  = pMiarex;
+	m_Wing2.m_pMiarex = pMiarex;
+	m_Stab.m_pMiarex  = pMiarex;
+	m_Fin.m_pMiarex   = pMiarex;
+
+	m_Wing.m_pFrame  = pParent;
 	m_Wing2.m_pFrame = pParent;
-	m_Stab.m_pFrame = pParent;
-	m_Fin.m_pFrame  = pParent;
+	m_Stab.m_pFrame  = pParent;
+	m_Fin.m_pFrame   = pParent;
 
 	m_poaWing = NULL;
 

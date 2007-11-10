@@ -49,7 +49,7 @@ private:
 	bool m_bShowPoints;	// true if the curve' points should be displayed in the WOpp graphs
 	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
 	bool m_bVLM1;		// true if the WOpp is the result to a classic VLM calculation
-	bool m_bMiddle;		// true if the WOpp is the results of a calculation on the middle surface
+//	bool m_bMiddle;		// true if the WOpp is the results of a calculation on the middle surface
 
 	int m_Style;		//WOpp display style
 	int m_Width;

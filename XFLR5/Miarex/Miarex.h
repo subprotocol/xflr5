@@ -80,8 +80,11 @@ class CMiarex : public CWnd
 	friend class CListWing;
 	friend class CWingScaleDlg;
 	friend class CScaleOppBar;
+	friend class CSpanPosBar;
 	friend class CGLLight;
 	friend class CUFOListDlg;
+	friend class CWAdvDlg;
+	friend class C3DPanelThread;
 
 // Construction
 public:
@@ -113,7 +116,6 @@ protected:
 	afx_msg void OnShowWing2();
 	afx_msg void OnShowElevator();
 	afx_msg void OnShowFin();
-	afx_msg void OnAutoScales();
 	afx_msg void OnAutoWingScales();
 	afx_msg void OnDeleteAll();
 	afx_msg void OnExportPanels();
@@ -133,6 +135,7 @@ protected:
 private:
 
 	BOOL OnEraseBkgnd(CDC* pDC);
+	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
 	void OnExit();
 	void OnWingAnalysis();
 	void OnShowWPolar();
@@ -154,7 +157,6 @@ private:
 	void OnDefineWing();
 	void OnDelCurWOpp();
 	void OnWOpp();
-//	void OnShowPoints();
 	void OnEditWing();
 	void OnDuplicateWing();
 	void OnRenameUFO();
@@ -180,7 +182,6 @@ private:
 	void OnShowAllWOpps();
 	void OnHideAllWOpps();
 	void OnDelAllPlrWOpps();
-	void OnAdvSettings();
 	void OnShowXCmRef();
 	void OnHideAllWPlrs();
 	void OnShowAllWPlrs();
@@ -199,13 +200,13 @@ private:
 	void OnDelAllWOpps();
 	void OnHideWingOpps();
 	void OnShowWingOpps();
+	void OnWAdvSettings();
 	void OnWPolarExport();
+
 	void GLCreateAxes();
 	void GLCreateGeom(CWing *pWing, UINT List, COLORREF wingcolor);
-	void GLCreateVLMMesh();
-	void GLCreateWakePanels(int LIST, CWOpp *pWOpp);
-	void GLCreateWakeLines(int LIST);
-	void GLCreateWakeSurfaces(int LIST);
+	void GLCreateMesh();
+	void GLCreateWakePanels(int LIST);
 	void GLCreateCp();
 	void GLCreateTrans(CWing *pWing, CWOpp *pWOpp, UINT List);
 	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, UINT List);
@@ -225,9 +226,26 @@ private:
 	void GLCreateCtrlPts();
 	void GLCreateVortices();
 
-	void AddWOpp(bool bPointOut, double *Gamma = NULL);
+	bool CreateWakeElems(int PanelIndex);
+	bool InitializePanels();
+	bool VLMIsSameSide(int p, int pp);
+	bool LoadSettings(CArchive &ar);
+	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
+	bool SetModWing(CWing *pWing);
+	bool SetModPlane(CPlane *pModPlane);
+	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
+	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
+	bool AVLImportFile(CString FileName);
+
+	int CreateElements(CSurface *pSurface, CPanel *pPanel);
+	int IsNode(CVector Pt);
+	int IsWakeNode(CVector Pt);
+	int ReadFoilPoints(CStdioFile *pXFile, double *x, double *y);
+
+	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
 	void AddWOpp(CWOpp *pNewPoint);
-	void AddPOpp(double *Gamma = NULL, CPOpp *pPOpp = NULL);
+	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
+	void Analyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void Animate(bool bAnimate);
 	void CheckMenus();
 	void CreateWPolarCurves();
@@ -237,17 +255,16 @@ private:
 	void DeleteProject();
 	void DrawWOppLegend(CDC* pDC, bool bIsPrinting, CPoint place, int bottom);
 	void DrawWPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bottom);
+	void DuplicatePlane();
 	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve, int Var);
 	void FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar);
 	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
-	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
+	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
+	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void PaintWing(CDC *pDC, CPoint ORef, double scale, bool bIsPrinting);
-	void PrintSingleWingGraph(CDC *pDC, CRect *pCltRect);
 	void PaintSingleWingGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
 	void PaintTwoWingGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
-	void PrintTwoWingGraph(CDC *pDC, CRect *pCltRect);
 	void PaintFourWingGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
-	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
 	void PaintXCmRef(CDC *pDC, CPoint ORef, double scale, bool bIsPrinting);
 	void PaintXCP(CDC *pDC, CPoint ORef, CPoint OLegend, double scale, bool bIsPrinting);
 	void PaintXTr(CDC *pDC, CPoint ORef, CPoint OLegend, double scale, bool bIsPrinting);
@@ -256,12 +273,17 @@ private:
 	void PaintWSingleGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
 	void PaintWCoupleGraphs(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
 	void PaintWFourGraphs(CDC *pDC, CRect *pCltRect, CRect *pDrawRect);
+	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void PrintAll(CDC *pDC, CRect *pCltRect);
+	void PrintSingleWingGraph(CDC *pDC, CRect *pCltRect);
+	void PrintTwoWingGraph(CDC *pDC, CRect *pCltRect);
+	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
 	void ResetElements();
+	void RotateGeomY(double Angle, CVector P);
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
-//	void SetWing(bool bCurrent=true, CString WingName="");
+	void SetUFO(CString UFOName="");
 	void SetWPlr(bool bCurrent = true, CString WPlrName = "");
 	void SetWingLegendPos();
 	void SetWPlrLegendPos();
@@ -276,22 +298,19 @@ private:
 	void UpdateWPlrs();
 	void UpdateUFOs();
 	void UpdateUnits();
-	bool LoadSettings(CArchive &ar);
-	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
-	bool SetModWing(CWing *pWing);
-	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
-	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
-	bool AVLImportFile(CString FileName);
+	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
+
+	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
+	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
+	double GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
+	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
+
 	BOOL AVLReadSurface(CStdioFile *pXFile, int &Line, CWing *pWing, int &NSpan, int &NChord, double &Sspace);
 	BOOL AVLReadSection(CStdioFile *pXFile, int &Line, CWing *pWing, int PanelPos);
 	CString RenameUFO(CString UFOName);
 
 	LRESULT KickIdle();
 
-	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
-	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
-	double GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
-	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
 	Graph* GetGraph(CPoint pt);
 	CWPolar* AddWPolar(CWPolar* pWPolar);
 	CWPolar* GetWPolar(CString WPolarName);
@@ -299,40 +318,28 @@ private:
 	CWOpp* GetWOpp(double Alpha);
 	CPOpp* GetPOpp(double Alpha);
 
-	int ReadFoilPoints(CStdioFile *pXFile, double *x, double *y);
-
-	bool CreateElements(CWing *pWing, CPanel *pPanel);
-	bool CreateWakeElems(int pw);
-	int  IsNode(CVector Pt);
-	int  IsWakeNode(CVector Pt);
-	bool VLMInitializePanels();
-	bool VLMIsSameSide(int p, int pp);
-
-	void Analyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
-	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
-	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
-	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 
 	CPlane * CreatePlane();
 	CPlane * AddPlane(CPlane *pPlane);
 	CPlane * GetPlane(CString PlaneName);
 	CWing * GetWing(CString WingName);
-	bool SetModPlane(CPlane *pModPlane);
-	void DuplicatePlane();
-	void SetUFO(CString UFOName="");
-	void CreateSurfaces(CWing *pWing, CVector T, double XTilt, double YTilt, COLORREF color);
 
 
 //____________________Variables______________________________________
 //
 	CPanel m_Panel[VLMMATSIZE];		// the panel array for the currently loaded UFO
+	CPanel m_WakePanel[VLMMATSIZE];	// the reference current wake panel array
+	CPanel m_MemPanel[VLMMATSIZE];		// used if the analysis should be performed on the tilted geometry
+	CPanel m_RefWakePanel[VLMMATSIZE]; 	// the reference wake panel array if wake needs to be reset
+	CPanel *m_pPanel[VLMMATSIZE];		// an array to the re-ordered VLM panels for a calculation
+
 	CVector m_Node[2*VLMMATSIZE];		// the node array for the currently loaded UFO
-	CPanel m_TiltedPanels[VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
-	CVector m_TiltedNodes[2*VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
-	CPanel  m_WakePanel[VLMMATSIZE];	// used for wake roll-up
-	CVector m_WakeNode[2*VLMMATSIZE];	// used for wake roll-up
-	CSurface m_Surface[MAXVLMSURFACES];	// the Surface array for the currently loaded UFO
+	CVector m_MemNode[2*VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
+	CVector m_WakeNode[2*VLMMATSIZE];	// the reference current wake node array
+	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
+	CVector m_TempWakeNode[2*VLMMATSIZE];	// the temporary wake node array during relaxation calc
+
+	CSurface *m_pSurface[MAXVLMSURFACES];	// An array with the pointers to the diferrent wing's surfaces
 
 	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
 	
@@ -371,24 +378,27 @@ private:
 	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be refreshed
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
 	bool m_bAnimate;			// true if there is an animation going on, 
-	bool m_bAnimatePlus;			// true if the animation is going in aoa crescending order
+	bool m_bAnimatePlus;		// true if the animation is going in aoa crescending order
 	bool m_bTransGraph;			// true if a graph is being dragged
 	bool m_bShowWing2;			// true if the biplane's second wing OpPoint results should be displayed
 	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
 	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
-	bool m_bIs2DScaleSet;			// true if the 2D scale has been set, false if needs to be reset 
-	bool m_bIs3DScaleSet;			// true if the 3D scale has been set, false if needs to be reset 
+	bool m_bIs2DScaleSet;		// true if the 2D scale has been set, false if needs to be reset 
+	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset 
 	bool m_bAutoScales;			// true if the scale is to be reset after each UFO selection
-	bool m_bCheckPlanePanels;		// true if the plane elevator panels should be aligned with the wing's panels
+	bool m_bCheckPlanePanels;	// true if the plane elevator panels should be aligned with the wing's panels
 	bool m_bLogFile;			// true if the log file warning is turned on
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bResetWake;
-	bool m_bVLMFinished;			// true if the VLM calculation is finished
+	bool m_bVLMFinished;		// true if the VLM calculation is finished
 	bool m_bSetNewWake;			// true if the wake needs to be reset
+	bool m_bDirichlet;			// true if Dirichlet BC are applied in 3D panel analysis, false if Neumann
+	bool m_bTrefftz;			// true if the induced drag should be calculated in the Trefftz plane, false if calculated by summation over panels
+	bool m_bWakePanels;
 
 	int m_NSurfaces;
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
-	int m_VLMMatSize;			// the matrix size
+	int m_MatSize;			// the matrix size
 	int m_iView;				//1=opp, 2=plr, 3=3D
 	int m_GLList;				// number of current Open Gl Lists
 	int m_iWingView;			// defines how many graphs will be displayed in WOpp view
@@ -398,16 +408,18 @@ private:
 	int m_Iter ;				// the number of iterations for LLT
 	int m_NStation ;			// the number of stations for LLT
 	int m_posAnimate;			// the current animation aoa index
-	int m_nWakeNodes;			// Max Size for the node array if there is a wake
-	int m_WakeSize;				// Max Size for the VLMMatrix if there is a wake
-	int m_NXWakePanels;			// wake panel number
+	int m_nWakeNodes;			// Size of the node array if there is a wake
+	int m_WakeSize;				// Size of the Matrix if there is a wake
 	int m_NWakeColumn;			// number of wake columns
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 
+//	double m_WakePanelFactor;	// incremental factor for wake lines
+//	double m_TotalWakeLength;	// wake lines first panel size
+//	int m_NXWakePanels;			// wake panel number
+
+
 	double m_CurSpanPos;		//Span position for Cp Grpah
-	double m_WakePanelFactor;	// incremental factor for wake lines
-	double m_FirstPanelSize;	// wake lines first panel size
 	double m_CoreSize;			// core size for VLM vortices
 	double m_MinPanelSize;			// wing minimum panel size ; panels of less length are ignored
 	double m_Relax;				// LLT relaxation factor
@@ -415,6 +427,10 @@ private:
 	double pi;				// ???
 	double m_WingScale;			// scale for 2D display
 	double m_LastWOpp;			// last WOPP selected, try to set the same if it exists, for the new polar
+	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
+	double m_aijRef[VLMMATSIZE*VLMMATSIZE]; // coefficient matrix
+	double m_RHS[VLMMATSIZE*100];			// RHS vector
+	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
 
 	CStdioFile* m_pXFile;			// a pointer to the output .log file
 	CUFOListDlg m_UFOdlg;			// the dialog class for UFO management

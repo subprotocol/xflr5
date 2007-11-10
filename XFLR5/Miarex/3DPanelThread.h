@@ -39,12 +39,15 @@ public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 	CWnd* m_pParent;
+	CWnd* m_pMiarex;
 	CWPolar * m_pWPolar;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
+	double m_QInf, m_QInfMax, m_DeltaQInf;
 
 protected:
 	DECLARE_MESSAGE_MAP()
 	bool AlphaLoop(void);
+	bool UnitLoop(void);
 	bool ReLoop(void);
 	bool m_bCancel;
 	bool m_bSequence;

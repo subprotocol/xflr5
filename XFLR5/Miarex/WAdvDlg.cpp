@@ -26,6 +26,7 @@
 #include "../X-FLR5.h"
 #include "../main/MainFrm.h"
 #include "WAdvDlg.h"
+#include ".\wadvdlg.h"
 
 
 
@@ -45,14 +46,13 @@ CWAdvDlg::CWAdvDlg(CWnd* pParent /*=NULL*/)
 	m_Iter      = 100;
 
 	m_MaxWakeIter     = 1;
-	m_WakePanels      = 5;
-	m_FirstPanelSize  = 0.2;//% mac
-	m_WakePanelFactor = 1.02;
 	m_CoreSize        = 0.0;
 	m_WakeInterNodes  = 6;
 	m_MinPanelSize    = 1.0;
 	m_bResetWake      = true;
+	m_bDirichlet      = true;
 	m_BLogFile        = true;
+	m_bKeepOutOpps    = true;
 
 	m_pMiarex = NULL;
 	m_pFrame  = NULL;
@@ -72,10 +72,8 @@ void CWAdvDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_NSTAT, m_ctrlNStation);
 	DDX_Control(pDX, IDC_ITERMAX, m_ctrlIterMax);
 	DDX_Control(pDX, IDC_MAXWAKEITER, m_ctrlMaxWakeIter);
-	DDX_Control(pDX, IDC_WAKEPANELS, m_ctrlWakePanels);
-	DDX_Control(pDX, IDC_FIRSTPANELSIZE, m_ctrlFirstPanelSize);
-	DDX_Control(pDX, IDC_PANELFACTOR, m_ctrlPanelFactor);
 	DDX_Control(pDX, IDC_CORESIZE, m_ctrlCoreSize);
+	DDX_Control(pDX, IDC_KEEPOUTOPPS, m_ctrlKeepOutOpps);
 	DDX_Control(pDX, IDC_ASTAT2, m_ctrlAStat);
 	DDX_Control(pDX, IDC_MINPANELSIZE, m_ctrlMinPanelSize);
 	DDX_Control(pDX, IDC_RESETWAKE, m_ctrlResetWake);
@@ -92,8 +90,13 @@ void CWAdvDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CWAdvDlg, CDialog)
 	//{{AFX_MSG_MAP(CWAdvDlg)
 	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDC_KEEPOUTOPPS, OnKeepOutOpps)
 	ON_BN_CLICKED(IDC_RESETWAKE, OnResetWake)
 	ON_BN_CLICKED(IDC_RESET, OnResetDefaults)
+	ON_BN_CLICKED(IDC_RADIO1, OnRadio1)
+	ON_BN_CLICKED(IDC_RADIO2, OnRadio1)
+	ON_BN_CLICKED(IDC_RADIO3, OnRadio3)
+	ON_BN_CLICKED(IDC_RADIO4, OnRadio3)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -117,21 +120,11 @@ BOOL CWAdvDlg::OnInitDialog()
 	m_ctrlNStation.SetMin(0);
 	m_ctrlNStation.SetMax(MAXSTATIONS);
 
-	
-	m_ctrlWakePanels.SetMin(0);
-	m_ctrlWakePanels.SetMax(100000);
-
 	m_ctrlMaxWakeIter.SetMin(0);
 	m_ctrlMaxWakeIter.SetMax(100000);
 
-	m_ctrlPanelFactor.SetMin(0.0);
-	m_ctrlPanelFactor.SetMax(1000.0);
 	m_ctrlCoreSize.SetMin(0.0);
 	m_ctrlCoreSize.SetMax(1000000.0);
-
-	m_ctrlFirstPanelSize.SetMin(0.0);
-	m_ctrlFirstPanelSize.SetMax(1000.0);
-	m_ctrlFirstPanelSize.SetPrecision(2);
 
 /*	m_ctrlInterNodes.EnableWindow(false);
 	m_ctrlPanelFactor.EnableWindow(false);
@@ -140,7 +133,7 @@ BOOL CWAdvDlg::OnInitDialog()
 	m_ctrlMaxWakeIter.EnableWindow(false);
 	m_ctrlPanelFactor.EnableWindow(false);
 	m_ctrlCoreSize.EnableWindow(false);
-	m_ctrlFirstPanelSize.EnableWindow(false);*/
+	m_ctrlTotalWakeLength.EnableWindow(false);*/
 
 	CString len;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -164,9 +157,6 @@ void CWAdvDlg::ReadParams()
 	}
 	if(m_NStation>MAXSTATIONS) m_NStation=MAXSTATIONS;
 
-	m_WakePanels      = m_ctrlWakePanels.GetValue();
-	m_FirstPanelSize  = m_ctrlFirstPanelSize.GetValue();
-	m_WakePanelFactor = m_ctrlPanelFactor.GetValue();
 	m_CoreSize        = m_ctrlCoreSize.GetValue();
 	m_MaxWakeIter     = m_ctrlMaxWakeIter.GetValue();
 	m_WakeInterNodes  = m_ctrlInterNodes.GetValue();
@@ -180,29 +170,36 @@ void CWAdvDlg::ReadParams()
 
 void CWAdvDlg::SetParams()
 {
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CMiarex * pMiarex = (CMiarex*)m_pMiarex;
 	m_ctrlIterMax.SetValue(m_Iter);
 	m_ctrlRelax.SetValue(m_Relax);
 	m_ctrlAlphaPrec.SetValue(m_AlphaPrec);
 	m_ctrlNStation.SetValue(m_NStation);
 
-	m_ctrlWakePanels.SetValue(m_WakePanels);
-	m_ctrlFirstPanelSize.SetValue(m_FirstPanelSize);
-	m_ctrlPanelFactor.SetValue(m_WakePanelFactor);
 	m_ctrlCoreSize.SetValue(m_CoreSize);
 	m_ctrlMaxWakeIter.SetValue(m_MaxWakeIter);
 	m_ctrlInterNodes.SetValue(m_WakeInterNodes);
 
-	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	m_ctrlMinPanelSize.SetValue(m_MinPanelSize * pFrame->m_mtoUnit);
 
-	if(m_bResetWake) m_ctrlResetWake.SetCheck(TRUE);
-	else             m_ctrlResetWake.SetCheck(FALSE);
+	if(m_bResetWake)	m_ctrlResetWake.SetCheck(TRUE);
+	else				m_ctrlResetWake.SetCheck(FALSE);
 
-	if(m_BLogFile) m_ctrlLogFile.SetCheck(TRUE);
-	else           m_ctrlLogFile.SetCheck(FALSE);
+	if(m_BLogFile)		m_ctrlLogFile.SetCheck(TRUE);
+	else				m_ctrlLogFile.SetCheck(FALSE);
+
+	if(m_bKeepOutOpps)	m_ctrlKeepOutOpps.SetCheck(1); 
+	else				m_ctrlKeepOutOpps.SetCheck(0);
+
+	if(m_bDirichlet) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
+	else			 CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
+	if(m_bTrefftz)   CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO3);
+	else			 CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO4);
 
 	m_ctrlControlPos.SetValue(m_ControlPos*100.0);
 	m_ctrlVortexPos.SetValue(m_VortexPos*100.0);
+
 }
 
 void CWAdvDlg::OnResetWake() 
@@ -218,15 +215,15 @@ void CWAdvDlg::OnResetDefaults()
 	m_Iter            = 100;
 	m_NStation        = 20;
 	m_MaxWakeIter     = 5;
-	m_WakePanels      = 5;
-	m_FirstPanelSize  = 1.0;//x mac
-	m_WakePanelFactor = 1.02;
-	m_CoreSize        = 0.0001;
+	m_CoreSize        = 0.00001;
 	m_WakeInterNodes  = 6;
-	m_bResetWake      = true;
 	m_BLogFile        = TRUE;
 	m_VortexPos       = 0.25;
 	m_ControlPos      = 0.75;
+	m_bDirichlet      = true;
+	m_bResetWake      = true;
+	m_bTrefftz        = true;
+	m_bKeepOutOpps    = false;
 	SetParams();
 }
 
@@ -256,4 +253,25 @@ BOOL CWAdvDlg::PreTranslateMessage(MSG* pMsg)
 		}
 	}	
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CWAdvDlg::OnRadio1()
+{
+	if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)==IDC_RADIO1)	m_bDirichlet = true;
+	else															m_bDirichlet = false;
+}
+
+void CWAdvDlg::OnRadio3()
+{
+	if(GetCheckedRadioButton(IDC_RADIO3, IDC_RADIO4)==IDC_RADIO3)	m_bTrefftz = true;
+	else															m_bTrefftz = false;
+}
+
+void CWAdvDlg::OnKeepOutOpps() 
+{
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlKeepOutOpps.GetCheck()){
+		pMiarex->m_bKeepOutOpps = true;
+	}
+	else pMiarex->m_bKeepOutOpps = false;
 }

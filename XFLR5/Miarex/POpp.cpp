@@ -37,7 +37,7 @@ CPOpp::CPOpp()
 	m_PlaneName   = "";
 	m_PlrName     = "";
 	m_NStation    = 0;
-	m_NVLMPanels  = 0;
+	m_NPanels  = 0;
 	m_Color       = RGB(255,0,0);
 	m_Style       = PS_SOLID;
 	m_Width       = 1;
@@ -51,7 +51,7 @@ CPOpp::CPOpp()
 	m_bFin        = false;
 	m_bOut        = false;
 	m_bVLM1       = true;
-	m_bMiddle     = true;
+//	m_bMiddle     = true;
 
 	m_Weight              = 0.0;
 	m_Alpha               = 0.0;
@@ -82,7 +82,8 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 	float f;
 
 	if(ar.IsStoring()){
-		ar << 1005;
+		ar << 1006;
+		//1006 : added Panel's source strengths Sigma
 		//1005 : added second wing results for a biplane
 		//1004 : converted units to SI
 		//1003 : added vortices strengths
@@ -98,15 +99,16 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 		if(m_bShowPoints) ar << 1; else ar<<0;
 		if(m_bOut)        ar << 1; else ar<<0;
 		if(m_bVLM1)       ar << 1; else ar<<0;
-		if(m_bMiddle)     ar << 1; else ar<<0;
+		ar << 1;
 
 		ar << m_Style << m_Width << m_Color;
 		ar << m_Type << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight;
 
-		ar << m_NVLMPanels;
-		for (k=0; k<=m_NVLMPanels; k++) ar << (float)m_Cp[k];
-		for (k=0; k<=m_NVLMPanels; k++) ar << (float)m_G[k];
+		ar << m_NPanels;
+		for (k=0; k<=m_NPanels; k++) ar << (float)m_Cp[k];
+		for (k=0; k<=m_NPanels; k++) ar << (float)m_G[k];
+		for (k=0; k<=m_NPanels; k++) ar << (float)m_Sigma[k];
 
 		ar << m_VLMType;
 
@@ -184,7 +186,7 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
-			if(a) m_bMiddle = true; else m_bMiddle = false;
+//			if(a) m_bMiddle = true; else m_bMiddle = false;
 		
 			ar >> m_Style >> m_Width >> m_Color;
 			ar >> m_Type >> m_NStation;
@@ -216,20 +218,28 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 				}
 			}
 			if(ArchiveFormat>=1002){
-				ar >>m_NVLMPanels;
+				ar >>m_NPanels;
 
-				for (k=0; k<=m_NVLMPanels; k++) {
+				for (k=0; k<=m_NPanels; k++) {
 					ar >> f;
 					m_Cp[k] = f;
 				}
 			}
 			if(ArchiveFormat>=1003){
-				for (k=0; k<=m_NVLMPanels; k++) {
+				for (k=0; k<=m_NPanels; k++) {
 					ar >> f;
 					if(ArchiveFormat<1004)	m_G[k] = f/1000.0;
 					else 					m_G[k] = f;
 				}
 			}
+
+			if(ArchiveFormat>=1006){
+				for (k=0; k<=m_NPanels; k++) {
+					ar >> f;
+					m_Sigma[k] = f;
+				}
+			}
+
 			ar >> m_VLMType;
 			
 			if (!m_WingWOpp.SerializeWOpp(ar)){

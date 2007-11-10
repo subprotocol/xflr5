@@ -40,12 +40,12 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);  
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual BOOL OnInitDialog();
+	virtual void PostNcDestroy();
 
 	DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	virtual BOOL OnInitDialog();
-	afx_msg void OnApply();
 	void SetUnits();
 	void SetParams();
 	void ReadParams();
@@ -55,7 +55,9 @@ public:
 	CFloatEdit m_ctrlXFactor;
 	CFloatEdit m_ctrlDeltaL;
 	CButton m_ctrlApply;
-
+	CStatic m_ctrlLength2;
+	CStatic m_ctrlLength3;
+	CStatic m_ctrlLength1;
 protected:
 	bool m_bLE;
 	int m_NX;
@@ -66,12 +68,8 @@ protected:
 	CWnd *m_pFrame;
 
 public:
+	afx_msg void OnApply();
 	afx_msg void OnClose();
-	CStatic m_ctrlLength2;
-	CStatic m_ctrlLength3;
-	CStatic m_ctrlLength1;
 	afx_msg void OnChanged();
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
 protected:
-	virtual void PostNcDestroy();
 };

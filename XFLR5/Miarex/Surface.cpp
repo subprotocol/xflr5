@@ -71,10 +71,16 @@ CSurface::CSurface()
 	m_NX2       = 0;
 	m_XDistType = 0;
 	m_YDistType = 3;
-	m_iPos      = 0;
+
 	m_pFoilA   = NULL;
 	m_pFoilB   = NULL;
+	m_NElements = 0;
 
+	m_bIsTipLeft  = false;
+	m_bIsTipRight = false;
+
+	m_bIsLeftSurf  = false;
+	m_bIsRightSurf = false;
 
 /*  3        equal         |   |   |   |   |   |   |   |   |
 
@@ -181,9 +187,26 @@ double CSurface::GetTwist(int k)
 	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
 }
 
+void CSurface::GetNormal(double yrel, CVector &N)
+{
+	N = NormalA * (1.0-yrel) + NormalB * yrel;
+	N.Normalize();
+}
+
 void CSurface::SetTwist()
 {
 	double xc4,zc4;
+	CVector LATB, TALB;
+	CVector O(0.0,0.0,0.0);
+
+	LATB = m_TB - m_LA;
+	TALB = m_LB - m_TA;
+	Normal = LATB * TALB;
+	Normal.Normalize();
+
+	NormalA = Normal;
+	NormalB = Normal;
+
 	//"A" section first
 	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
 	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
@@ -191,6 +214,8 @@ void CSurface::SetTwist()
 	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *pi/180.0);
 	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *pi/180.0);
 	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *pi/180.0);
+	NormalA.RotateY(O, m_TwistA);
+
 	//"B" Section next
 	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
 	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
@@ -198,12 +223,17 @@ void CSurface::SetTwist()
 	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *pi/180.0);
 	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *pi/180.0);
 	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *pi/180.0);
+	NormalB.RotateY(O, m_TwistB);
 }
-
 
 double CSurface::GetChord(int k)
 {
-	double tau;
+	double y1, y2;
+	GetyDist(k, y1, y2);
+	return GetChord((y1+y2)/2.0);
+
+
+/*	double tau;
 	CVector V1, V2;
 	V1.x = 0.0;
 	V1.y = LA.y-m_LA.y;
@@ -212,24 +242,20 @@ double CSurface::GetChord(int k)
 	V2.y = LB.y-m_LA.y;
 	V2.z = LB.z-m_LA.z;
 	tau = (V1.VAbs()+V2.VAbs())/2.0/m_Length;
-	return GetChord(tau);
+	return GetChord(tau);*/
 }
 
 double CSurface::GetChord(double tau)
 {
 	//assumes LA-TB have already been loaded
 	CVector V1, V2;
-	V1.x = m_TA.x-m_LA.x;
-	V1.y = m_TA.y-m_LA.y;
-	V1.z = m_TA.z-m_LA.z;
-	V2.x = m_TB.x-m_LB.x;
-	V2.y = m_TB.y-m_LB.y;
-	V2.z = m_TB.z-m_LB.z;
+	V1 = m_TA-m_LA;
+	V2 = m_TB-m_LB;
 
 	double ChordA = V1.VAbs();
 	double ChordB = V2.VAbs();
 	
-	return ChordA + (ChordB-ChordA) * fabs(tau);
+	return ChordA + (ChordB-ChordA) * abs(tau);
 }
 
 double CSurface::GetOffset(double tau)
@@ -237,25 +263,29 @@ double CSurface::GetOffset(double tau)
 	//chord spacing
 	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
 }
-void CSurface::GetNormal(CVector &N)
+
+void CSurface::Init()
 {
+	DL.Set(m_LB.x-m_LA.x,m_LB.y-m_LA.y,m_LB.z-m_LA.z);
+	DC.Set(m_TA.x-m_LA.x,m_TA.y-m_LA.y,m_TA.z-m_LA.z);
+	Length = DL.VAbs();
+	Chord  = DC.VAbs();
+	u.Set(DC.x/Chord,  DC.y/Chord,  DC.z/Chord);
+	v.Set(DL.x/Length, DL.y/Length, DL.z/Length);
+
+	m_bIsTipLeft   = false;
+	m_bIsTipRight  = false;
+	m_bIsLeftSurf  = false;
+	m_bIsRightSurf = false;
+
 	CVector LATB, TALB;
 
-	LATB.x = m_TB.x - m_LA.x;
-	LATB.y = m_TB.y - m_LA.y;
-	LATB.z = m_TB.z - m_LA.z;
-	TALB.x = m_LB.x - m_TA.x;
-	TALB.y = m_LB.y - m_TA.y;
-	TALB.z = m_LB.z - m_TA.z;
-	CrossProduct(LATB, TALB, N);
-	N.Normalize();
+	LATB = m_TB - m_LA;
+	TALB = m_LB - m_TA;
+	Normal = LATB * TALB;
+	Normal.Normalize();
 }
 
-
-int CSurface::GetNPanels()
-{
-	return m_NXPanels * m_NYPanels;
-}
 
 void CSurface::GetPanel(int k, int l, CVector &dF, int pos)
 {
@@ -264,84 +294,57 @@ void CSurface::GetPanel(int k, int l, CVector &dF, int pos)
 	// pos = -1 : bottom
 	// loads the corner points of the panel k,l in TA, TB, LA, LB
 
-	double y1, y2, xA1, xA2, xB1, xB2;
-	double chordA, chordB, zA, zB;
-	CVector V1, V2;
-	CVector DL(m_LB.x-m_LA.x,m_LB.y-m_LA.y,m_LB.z-m_LA.z);
-	CVector DC(m_TA.x-m_LA.x,m_TA.y-m_LA.y,m_TA.z-m_LA.z);
-	double Length = DL.VAbs();
-	double Chord  = DC.VAbs();
-	CVector u(DC.x/Chord,  DC.y/Chord,  DC.z/Chord);
-	CVector v(DL.x/Length, DL.y/Length, DL.z/Length);
-
-	GetxDist(l, xA1, xA2, xB1, xB2);
+	GetxDist(l, xLA, xTA, xLB, xTB);
 	GetyDist(k,y1,y2);
 
 	chordA  = GetChord(0.0);
 	chordB  = GetChord(1.0);
-	GetPoint(xA1, xB1, y1, LA); 
-	GetPoint(xA1, xB1, y2, LB);
-	GetPoint(xA2, xB2, y1, TA);
-	GetPoint(xA2, xB2, y2, TB);
+	GetPoint(xLA, xLB, y1, LA); 
+	GetPoint(xLA, xLB, y2, LB);
+	GetPoint(xTA, xTB, y1, TA);
+	GetPoint(xTA, xTB, y2, TB);
 
-	V1.x = TB.x - LA.x;
-	V1.y = TB.y - LA.y;
-	V1.z = TB.z - LA.z;
-	V2.x = LB.x - TA.x;
-	V2.y = LB.y - TA.y;
-	V2.z = LB.z - TA.z;
-	CrossProduct(V1, V2, dF);
-	dF.Normalize();
+	GetNormal(y1, NA);
+	GetNormal(y2, NB);
 
 	if (m_pFoilA && m_pFoilB){
 		if(pos==1){
-			zA = m_pFoilA->GetUpperY(xA1)*chordA;
-			zB = m_pFoilB->GetUpperY(xB1)*chordB;
+			zA = m_pFoilA->GetUpperY(xLA)*chordA;
+			zB = m_pFoilB->GetUpperY(xLB)*chordB;
 		}
 		else if(pos==-1){
-			zA = m_pFoilA->GetLowerY(xA1)*chordA;
-			zB = m_pFoilB->GetLowerY(xB1)*chordB;
+			zA = m_pFoilA->GetLowerY(xLA)*chordA;
+			zB = m_pFoilB->GetLowerY(xLB)*chordB;
 		}
 		else{
-			zA = m_pFoilA->GetMidY(xA1)*chordA;
-			zB = m_pFoilB->GetMidY(xB1)*chordB;
+			zA = m_pFoilA->GetMidY(xLA)*chordA;
+			zB = m_pFoilB->GetMidY(xLB)*chordB;
 		}
-		LA.x += (zA+ (zB-zA)*y1) *dF.x;
-		LA.y += (zA+ (zB-zA)*y1) *dF.y;
-		LA.z += (zA+ (zB-zA)*y1) *dF.z;
-		LB.x += (zA+ (zB-zA)*y2) *dF.x;
-		LB.y += (zA+ (zB-zA)*y2) *dF.y;
-		LB.z += (zA+ (zB-zA)*y2) *dF.z;
+		LA += NA * (zA+ (zB-zA)*y1) ;
+		LB += NB * (zA+ (zB-zA)*y2);
 
 		if(pos==1){
-			zA = m_pFoilA->GetUpperY(xA2)*chordA;
-			zB = m_pFoilB->GetUpperY(xB2)*chordB;
+			zA = m_pFoilA->GetUpperY(xTA)*chordA;
+			zB = m_pFoilB->GetUpperY(xTB)*chordB;
 		}
 		else if(pos==-1){
-			zA = m_pFoilA->GetLowerY(xA2)*chordA;
-			zB = m_pFoilB->GetLowerY(xB2)*chordB;
+			zA = m_pFoilA->GetLowerY(xTA)*chordA;
+			zB = m_pFoilB->GetLowerY(xTB)*chordB;
 		}
 		else{
-			zA = m_pFoilA->GetMidY(xA2)*chordA;
-			zB = m_pFoilB->GetMidY(xB2)*chordB;
+			zA = m_pFoilA->GetMidY(xTA)*chordA;
+			zB = m_pFoilB->GetMidY(xTB)*chordB;
 		}
-		TA.x += (zA+ (zB-zA)*y1) *dF.x;
-		TA.y += (zA+ (zB-zA)*y1) *dF.y;
-		TA.z += (zA+ (zB-zA)*y1) *dF.z;
-		TB.x += (zA+ (zB-zA)*y2) *dF.x;
-		TB.y += (zA+ (zB-zA)*y2) *dF.y;
-		TB.z += (zA+ (zB-zA)*y2) *dF.z;
+		TA += NA * (zA+ (zB-zA)*y1);
+		TB += NB * (zA+ (zB-zA)*y2);
 	}
-	V1.x = TB.x - LA.x;
-	V1.y = TB.y - LA.y;
-	V1.z = TB.z - LA.z;
-	V2.x = LB.x - TA.x;
-	V2.y = LB.y - TA.y;
-	V2.z = LB.z - TA.z;
+	V1 = TB - LA;
+	V2 = LB - TA;
 
-	if(pos==1 || pos==0) CrossProduct(V1, V2, dF);
-	else                 CrossProduct(V2, V1, dF);
+	if(pos==1 || pos==0) dF = V1 * V2;
+	else                 dF = V2 * V1;
 
+	dF = (NA + NB) *0.5;
 	dF.Normalize();
 }
 
@@ -349,42 +352,23 @@ void CSurface::GetPoint(double xArel, double xBrel, double yrel, CVector &Point,
 {
 	//xrel, yrel are the planform positions, i.e. with the surface in the x-y plane
 	CVector APt, BPt;
-	CVector N;
-	GetNormal(N);
 
-	APt.x = m_LA.x * (1.0-xArel) + m_TA.x * xArel;
-	APt.y = m_LA.y * (1.0-xArel) + m_TA.y * xArel;
-	APt.z = m_LA.z * (1.0-xArel) + m_TA.z * xArel;
-
-	BPt.x = m_LB.x * (1.0-xBrel) + m_TB.x * xBrel;
-	BPt.y = m_LB.y * (1.0-xBrel) + m_TB.y * xBrel;
-	BPt.z = m_LB.z * (1.0-xBrel) + m_TB.z * xBrel;
+	APt = m_LA * (1.0-xArel) + m_TA * xArel;
+	BPt = m_LB * (1.0-xBrel) + m_TB * xBrel;
 
 	if(pos==1 && m_pFoilA && m_pFoilB){
 		double TopA = m_pFoilA->GetUpperY(xArel)*GetChord(0.0);
 		double TopB = m_pFoilB->GetUpperY(xBrel)*GetChord(1.0);
-		APt.x += TopA * N.x;
-		APt.y += TopA * N.y;
-		APt.z += TopA * N.z;
-
-		BPt.x += TopB * N.x;
-		BPt.y += TopB * N.y;
-		BPt.z += TopB * N.z;
+		APt +=  Normal * TopA;
+		BPt +=  Normal * TopB;
 	}
 	else if(pos==-1 && m_pFoilA && m_pFoilB){
 		double BotA = m_pFoilA->GetLowerY(xArel)*GetChord(0.0);
 		double BotB = m_pFoilB->GetLowerY(xBrel)*GetChord(1.0);
-		APt.x += BotA * N.x;
-		APt.y += BotA * N.y;
-		APt.z += BotA * N.z;
-
-		BPt.x += BotB * N.x;
-		BPt.y += BotB * N.y;
-		BPt.z += BotB * N.z;
+		APt += Normal * BotA;
+		BPt += Normal * BotB;
 	}
-	Point.x = (1.0-yrel)*APt.x + yrel * BPt.x;
-	Point.y = (1.0-yrel)*APt.y + yrel * BPt.y;
-	Point.z = (1.0-yrel)*APt.z + yrel * BPt.z;
+	Point = APt * (1.0-yrel)+  BPt * yrel ;
 }
 
 
@@ -398,7 +382,7 @@ void CSurface::Copy(CSurface &Surface)
 	m_Dihedral  = Surface.m_Dihedral;
 	m_XDistType = Surface.m_XDistType;
 	m_YDistType = Surface.m_YDistType;
-	m_iPos      = Surface.m_iPos;
+
 	m_Length    = Surface.m_Length;
 	m_NXPanels  = Surface.m_NXPanels;
 	m_NYPanels  = Surface.m_NYPanels;
@@ -406,6 +390,13 @@ void CSurface::Copy(CSurface &Surface)
 	m_pFoilB    = Surface.m_pFoilB;
 	m_TwistA    = Surface.m_TwistA;
 	m_TwistB    = Surface.m_TwistB;
+
+	Normal= Surface.Normal;
+	NormalA= Surface.NormalA;
+	NormalB= Surface.NormalB;
+
+	m_bIsTipLeft = Surface.m_bIsTipLeft;
+	m_bIsTipRight = Surface.m_bIsTipRight;
 
 }
 
@@ -423,6 +414,11 @@ void CSurface::RotateX(CVector O, double XTilt)
 	m_LB.RotateX(O, XTilt);
 	m_TA.RotateX(O, XTilt);
 	m_TB.RotateX(O, XTilt);
+
+	CVector Origin(0.0,0.0,0.0);
+	Normal.RotateX(Origin, XTilt);
+	NormalA.RotateX(Origin, XTilt);
+	NormalB.RotateX(Origin, XTilt);
 }
 
 void CSurface::RotateY(CVector O, double YTilt)
@@ -431,6 +427,11 @@ void CSurface::RotateY(CVector O, double YTilt)
 	m_LB.RotateY(O, YTilt);
 	m_TA.RotateY(O, YTilt);
 	m_TB.RotateY(O, YTilt);
+
+	CVector Origin(0.0,0.0,0.0);
+	Normal.RotateY(Origin, YTilt);
+	NormalA.RotateY(Origin, YTilt);
+	NormalB.RotateY(Origin, YTilt);
 }
 
 
@@ -440,6 +441,11 @@ void CSurface::RotateZ(CVector O, double ZTilt)
 	m_LB.RotateZ(O, ZTilt);
 	m_TA.RotateZ(O, ZTilt);
 	m_TB.RotateZ(O, ZTilt);
+
+	CVector Origin(0.0,0.0,0.0);
+	Normal.RotateZ(Origin, ZTilt);
+	NormalA.RotateZ(Origin, ZTilt);
+	NormalB.RotateZ(Origin, ZTilt);
 }
 
 void CSurface::GetyDist(int k, double &y1, double &y2)

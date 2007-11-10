@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////
@@ -50,8 +49,7 @@ public:
 // Implementation
 protected:
 	bool AlphaLoop();
-	bool AlphaTiltedLoop();
-	bool AlphaWakeLoop();
+	bool UnitLoop();
 	bool ReLoop();
 	virtual ~CVLMThread();
 

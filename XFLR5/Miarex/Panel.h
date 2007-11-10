@@ -42,7 +42,6 @@ public:
 
 protected:
 	void Reset();
-	void SetVortex(CVector LA, CVector LB, CVector TA, CVector TB);
 	void SetFrame(CVector LA, CVector LB, CVector TA, CVector TB);
 	CVector GlobalToLocal(CVector V);
 	CVector LocalToGlobal(CVector V);
@@ -50,12 +49,16 @@ protected:
 
 	bool m_bIsLeading;
 	bool m_bIsTrailing;
+	bool m_bIsInSymPlane;
 	bool m_bIsWakePanel;
+
+	int m_iElement; // panel identification number ; used when panel array is re-arranged in non sequential order
 	int m_iLA, m_iLB, m_iTA, m_iTB;//Corner Node numbers
 	int m_iPL, m_iPR, m_iPU, m_iPD;//Panels left, rigth; upstream, downstream
 	int m_iPos;//-1 is bottom surface, 0 is middle, 1 is top;
 	int m_iWake;//-1 if not followed by a wake panel, else equal to wake panel number
 	int m_iWakeColumn;
+
 	//Local frame of refernce
 	CVector Normal;
 	CVector VortexPos;

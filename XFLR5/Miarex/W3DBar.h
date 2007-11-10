@@ -97,7 +97,7 @@ protected:
 	afx_msg void On3DSurfaces();
 	afx_msg void On3DOutline();
 	afx_msg void On3DVortices();
-	afx_msg void On3DVLMPanels();
+	afx_msg void On3DPanels();
 	afx_msg void On3DReset();
 	afx_msg void On3DIso();
 	afx_msg void On3DLeft();

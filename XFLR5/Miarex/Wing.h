@@ -214,6 +214,7 @@ protected:
 	CWnd* m_pFrame;		//pointer to the Frame window
 	CWnd* m_pMiarex;	//pointer to the Miarex Application window
 	CWnd* m_pVLMDlg;	//pointer to the VLM analysis dialog class
+	CWnd* m_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 
 	CString m_WingName;	//the wing's name
 
@@ -233,7 +234,6 @@ protected:
 	bool m_bTrans;		// true if the wing is being dragged 
 	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
 	bool m_bVLM1;		// true if classic, false if quad ring (K&P) method
-	bool m_bMiddle;		// true if the calculation is to be performed on the middle surface, false if top and bottom
 	bool m_bCancel;		// true if the calculation is to be aborted
 	bool m_bChanged;	// true if the user has made changes to the wing's definition
 
@@ -243,8 +243,7 @@ protected:
 	int m_iSection;		// the currently selected section
 	int m_nNodes;		// the number of VLM panel nodes
 	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
-	int m_VLMMatSize;	// Max Size for the VLMMatrix
-	int m_3DMatSize;	// Max size for the panel matrix
+	int m_MatSize;	// Max Size for the VLMMatrix
 	int m_AVLIndex;		// need to export to AVL
 
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
