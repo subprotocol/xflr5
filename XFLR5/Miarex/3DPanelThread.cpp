@@ -46,13 +46,13 @@ C3DPanelThread::C3DPanelThread()
 	m_pWPolar = NULL;
 
 //ESTIMATED UNIT TIMES FOR OPERATION
-//CreateMatrix :		15
-//CreateRHS :			 5 x nrhs
-//CreateWakeContribution :	 1 x nrhs
-//SolveMultiple :		10
-//CreateDoubletStrength : 	 1 x nrhs
-//ComputeAerodynamics :		 5 x nrhs
-//RelaxWake :			20 x nrhs
+//CreateMatrix :			15
+//CreateRHS :				5 x nrhs
+//CreateWakeContribution :	1 x nrhs
+//SolveMultiple :			10
+//CreateDoubletStrength :	1 x nrhs
+//ComputeAerodynamics :		5 x nrhs
+//RelaxWake :				20 x nrhs
 
 }
 
@@ -68,6 +68,12 @@ BOOL C3DPanelThread::InitInstance()
 
 	strong.Format("Type %d Analysis\r\n", m_pWPolar->m_Type);
 	p3DDlg->AddString(strong);
+
+	if(p3DDlg->m_bDirichlet)	strong.Format("Dirichlet boundary conditions\r\n");
+	else						strong.Format("Neumann boundary conditions\r\n");
+	p3DDlg->AddString(strong);
+
+
 	p3DDlg->m_bCancel = false;
 
 	if(m_pWPolar->m_Type != 4 && (m_pWPolar->m_bWakeRollUp || m_pWPolar->m_bTiltedGeom))	UnitLoop();
@@ -127,6 +133,8 @@ bool C3DPanelThread::UnitLoop()
 	
 	TotalTime = 15+ (10+5) * nrhs + (1+10+1) * nrhs * MaxWakeIter;
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20 * nrhs * MaxWakeIter;
+	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+
 	p3DDlg->m_ctrlProgress.SetRange(0,TotalTime);
 	p3DDlg->m_Progress = 0;
 
@@ -260,6 +268,9 @@ bool C3DPanelThread::AlphaLoop(void)
 //ComputeAerodynamics :		 5 x nrhs
 	
 	TotalTime = 15+ (10+5) * nrhs + 10 * MaxWakeIter + (1+1) * nrhs * MaxWakeIter;
+
+	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+
 	p3DDlg->m_ctrlProgress.SetRange(0,TotalTime);
 	p3DDlg->m_Progress = 0;
 
@@ -350,6 +361,9 @@ bool C3DPanelThread::ReLoop(void)
 //ComputeAerodynamics :		 3 x nrhs
 	
 	TotalTime = 15+ (10+3) * nrhs + 10 * MaxWakeIter + (1+1) * nrhs * MaxWakeIter;
+
+	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+
 	p3DDlg->m_ctrlProgress.SetRange(0,TotalTime);
 	p3DDlg->m_Progress = 0;
 

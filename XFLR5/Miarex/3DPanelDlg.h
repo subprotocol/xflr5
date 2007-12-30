@@ -20,10 +20,11 @@
 *****************************************************************************/
 
 #pragma once
+#include "Body.h"
 #include "Wing.h"
 #include "WPolar.h"
 #include "3DPanelThread.h"
-
+ 
 #include "afxwin.h"
  
 // Boîte de dialogue C3DPanelDlg
@@ -39,6 +40,10 @@ public:
 	virtual ~C3DPanelDlg();
 	virtual BOOL OnInitDialog();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void DoDataExchange(CDataExchange* pDX);    
+
+	afx_msg void OnCancel();
+	afx_msg void OnTimer(UINT nIDEvent);
 
 // Données de boîte de dialogue
 	enum { IDD = IDD_3DPANELDLG };
@@ -46,29 +51,31 @@ public:
 protected:
 
 	CEdit m_ctrlOutput;
-	virtual void DoDataExchange(CDataExchange* pDX);    
 
-	bool StartPanelThread();
-	bool SolveMultiple(int nval);
-	bool ComputeOnBody(int q, double Alpha);
-	bool ComputeSurfSpeeds(double *Mu, double *Sigma);
 	bool ComputeAerodynamics(double V0, double VDelta, int nrhs);
+	bool ComputeOnBody(int q, double Alpha);
 	bool ComputePlane(double Alpha, int qrhs);
-	bool CreateWakeContribution(double V0, double VDelta, int nval);
+	bool ComputeSurfSpeeds(double *Mu, double *Sigma);
 	bool CreateDoubletStrength(double V0, double VDelta, int nval);
 	bool CreateMatrix();
 	bool CreateRHS(double V0, double VDelta, int nval);
+	bool CreateWakeContribution(double V0, double VDelta, int nval);
+	bool Gauss(double *A, int n, double *B, int m, int TaskSize);
+	bool StartPanelThread();
+	bool SolveMultiple(int nval);
+	bool Test();
+
 	void AddString(CString strong);
+	void CheckSolution();
+	void DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void EndSequence();
+	void Qmn(CVector C, CPanel *pPanel, CVector &V);
+	void RelaxWake();
 	void SetProgress(int TaskSize,double TaskProgress);
 	void SetFileHeader();
 	void SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi);
-	void DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void SetDownwash(double *Mu, double *Sigma);
 	void SetAi(int qrhs);
-	void CheckSolution();
-	void RelaxWake();
-	bool Test();
 
 	CVector GetSpeedVector(CVector C, double *Mu, double *Sigma);
 
@@ -103,8 +110,6 @@ protected:
 	double m_OpAlpha;
 	double m_AlphaMax;
 	double m_DeltaAlpha;
-	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
-	double m_ICd[MAXSTATIONS];
 	double m_CL, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
 	double m_TCm, m_GCm, m_VCm;
@@ -131,7 +136,8 @@ protected:
 
 	double side, sign, dist, S, GL;
 	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
-	CVector R[5];
+	double ftmp, Omega, r1v, r2v;
+	CVector R[5], r0, r1, r2, Psi, t;
 	CVector PJK, a, b, s, T1, T2, T, h;
 
 	CString m_strOut;
@@ -158,6 +164,8 @@ protected:
 	CWing *m_pStab;
 	CWing *m_pFin;
 
+	CBody **m_ppBody;
+
 	CWnd *m_pFrame;
 	CWnd *m_pMiarex;
 
@@ -168,7 +176,4 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-//	LRESULT OnEndViscDialog(WPARAM wParam, LPARAM lParam);            
-	afx_msg void OnCancel();
-	afx_msg void OnTimer(UINT nIDEvent);
 };
