@@ -547,7 +547,7 @@ void CAFoilCtrlBar::FillFoilList()
 		Camber     = m_pPF->m_fCamber*100.0;
 		xCamber    = m_pPF->m_fxCambMax*100.0;
 		points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
-			         +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1)+1;
+			         +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
 
 		m_ctrlFoilList.InsertItem(0, "Spline Points Foil");
 	}
@@ -631,6 +631,13 @@ void CAFoilCtrlBar::FillFoilList()
 	}
 }
 
+
+void CAFoilCtrlBar::SetSaveState(bool bState) 
+{
+	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	pADlg->SetSaveState(bState);
+}
+
 void CAFoilCtrlBar::OnSize(UINT nType, int cx, int cy) 
 {
 //
@@ -651,13 +658,6 @@ void CAFoilCtrlBar::OnSize(UINT nType, int cx, int cy)
 		ReSizeCtrls();
 	}
 }
-
-void CAFoilCtrlBar::SetSaveState(bool bState) 
-{
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	pADlg->SetSaveState(bState);
-}
-
 void CAFoilCtrlBar::ReSizeCtrls() 
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;

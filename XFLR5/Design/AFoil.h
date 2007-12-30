@@ -76,7 +76,7 @@ private:
 	bool m_bNeutralLine;
 	bool m_bTrans;
 	bool m_bCircle;
-	bool m_stored;
+	bool m_bStored;
 	bool m_bXGrid,m_bYGrid;
 	bool m_bXMinGrid, m_bYMinGrid;
 	bool m_bShowLegend;
@@ -86,7 +86,7 @@ private:
 	int m_XMinStyle, m_YMinStyle;
 	int m_XMinWidth, m_YMinWidth;
 	int m_NeutralStyle, m_NeutralWidth;
-	int m_stack, m_stackmax;// undo : stack position and stack size
+	int m_StackPos, m_StackSize;// undo : stack position and stack size
 
 	double m_LERad;
 	double m_fScale;
@@ -132,7 +132,6 @@ private:
 	bool SetAFoilCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
 	int GetFoilCount();
 	int ReadData(CStdioFile *pXFile, CFoil *pFoil);
-	void DrawNeutralLine(CDC *pDC, int xmin, int xmax, int y);
 	void DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting);
 	void DrawScale(CDC *pDC, CRect* pCltRect, double scale, CPoint ptOffset, bool bIsPrinting);
 	void DrawXGrid(CDC *pDC, double scalex, double scaley, CPoint Offset, CRect dRect, bool bIsPrinting = false);

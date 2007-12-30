@@ -43,19 +43,19 @@ public:
 	CComboBox	m_ctrlDegIntrados;
 	CSpinButtonCtrl	m_ctrlSpinOut;
 	CSpinButtonCtrl	m_ctrlSpinIn;
-	CFloatEdit	m_ctrlTEGap;
 	CButton m_ctrlOutText;
 
 // Données de boîte de dialogue
 	enum { IDD = IDD_SPLINECONTROLSDLG };
 
 protected:
-	double m_Gap;
+
 	bool m_bSF;
 	CSF *m_pSF;
 	CPF *m_pPF;
+
 	CWnd* m_pADlg;
-	void SetParams();
+//	void SetParams();
 
 	virtual void DoDataExchange(CDataExchange* pDX);
 protected:
@@ -66,7 +66,6 @@ protected:
 	afx_msg void OnEditChangeDegIntrados();
 	afx_msg void OnKillFocusOutExtrados();
 	afx_msg void OnKillFocusOutIntrados();
-	afx_msg void OnKillFocusTEgap();
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	//}}AFX_MSG
 

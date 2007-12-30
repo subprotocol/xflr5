@@ -32,6 +32,7 @@
 class CAGridDlg : public CDialog
 {
 	friend class CAFoil;
+	friend class CMiarex;
 // Construction
 public:
 	CAGridDlg(CWnd* pParent = NULL);   // standard constructor

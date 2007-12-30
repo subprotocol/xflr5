@@ -36,7 +36,6 @@ CSplinesCtrlDlg::CSplinesCtrlDlg(CWnd* pParent /*=NULL*/)
 	m_pADlg = pParent;
 	m_pSF = NULL;
 	m_pPF = NULL;
-	m_Gap = 0.0;
 }
 
 CSplinesCtrlDlg::~CSplinesCtrlDlg()
@@ -47,7 +46,6 @@ void CSplinesCtrlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(CAGridDlg)
-	DDX_Control(pDX, IDC_TEGAP, m_ctrlTEGap);
 	DDX_Control(pDX, IDC_SPINOUT, m_ctrlSpinOut);
 	DDX_Control(pDX, IDC_SPININ, m_ctrlSpinIn);
 	DDX_Control(pDX, IDC_DEGEXTRADOS, m_ctrlDegExtrados);
@@ -67,7 +65,6 @@ BEGIN_MESSAGE_MAP(CSplinesCtrlDlg, CDialog)
 	ON_CBN_EDITCHANGE(IDC_DEGINTRADOS, OnEditChangeDegIntrados)
 	ON_EN_KILLFOCUS(IDC_OUTEXTRADOS, OnKillFocusOutExtrados)
 	ON_EN_KILLFOCUS(IDC_OUTINTRADOS, OnKillFocusOutIntrados)
-	ON_EN_KILLFOCUS(IDC_TEGAP, OnKillFocusTEgap)
 	ON_WM_VSCROLL()
 //}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -78,7 +75,7 @@ END_MESSAGE_MAP()
 void CSplinesCtrlDlg::OnSelChangeDegExtrados()
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	m_pSF->m_Extrados.m_iDegree = m_ctrlDegExtrados.GetCurSel()+1;
+	m_pSF->m_Extrados.m_iDegree = m_ctrlDegExtrados.GetCurSel()+2;
 	m_pSF->Update(true);
 	pADlg->UpdateView();
 }
@@ -87,7 +84,7 @@ void CSplinesCtrlDlg::OnSelChangeDegExtrados()
 void CSplinesCtrlDlg::OnSelChangeDegIntrados() 
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	m_pSF->m_Intrados.m_iDegree = m_ctrlDegIntrados.GetCurSel()+1;
+	m_pSF->m_Intrados.m_iDegree = m_ctrlDegIntrados.GetCurSel()+2;
 	m_pSF->Update(false);
 	pADlg->UpdateView();
 }
@@ -168,54 +165,34 @@ void CSplinesCtrlDlg::OnEditChangeDegIntrados()
 }
 
 
-void CSplinesCtrlDlg::OnKillFocusTEgap() 
-{
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	double gap = m_ctrlTEGap.GetValue();
-	if(pADlg->m_bSF){
-		m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y =  gap/2.0/100.0;
-		m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y = -gap/2.0/100.0;
-		m_pSF->Update(true);
-		m_pSF->Update(false);
-	}
-	else{
-		m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y =  gap/2.0/100.0;
-		m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y = -gap/2.0/100.0;
-		m_pPF->Update(true);
-		m_pPF->Update(false);
-	}
-	pADlg->UpdateView();
-}
-
 
 BOOL CSplinesCtrlDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	int i;
 
 	CString str;
 	m_ctrlDegExtrados.ResetContent();
 	m_ctrlDegIntrados.ResetContent();
-	for (int i=2; i<6; i++){
+	for (i=2; i<6; i++){
 		str.Format("%d", i);
 		m_ctrlDegExtrados.AddString(str);
 		m_ctrlDegIntrados.AddString(str);
 	}
 	m_ctrlDegExtrados.EnableWindow(true);
 	m_ctrlDegIntrados.EnableWindow(true);
-	if(m_bSF){
-		m_ctrlDegExtrados.SetCurSel(m_pSF->m_Extrados.m_iDegree-1);
-		m_ctrlDegIntrados.SetCurSel(m_pSF->m_Intrados.m_iDegree-1);
+
+	if(m_bSF)
+	{
+		m_ctrlDegExtrados.SetCurSel(m_pSF->m_Extrados.m_iDegree-2);
+		m_ctrlDegIntrados.SetCurSel(m_pSF->m_Intrados.m_iDegree-2);
 		m_ctrlOutExtrados.SetValue(m_pSF->m_Extrados.m_iRes);
 		m_ctrlOutIntrados.SetValue(m_pSF->m_Intrados.m_iRes);
-		m_Gap =  m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
-					 -m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y;
 		m_ctrlSpinIn.SetRange(10,140);
 		m_ctrlSpinOut.SetRange(10,140);
 	}
-	else{
-		m_Gap =  m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y
-					 -m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y;
-
+	else
+	{
 		m_ctrlDegExtrados.EnableWindow(false);
 		m_ctrlDegIntrados.EnableWindow(false);
 		m_ctrlOutExtrados.m_iMin = 3;
@@ -229,8 +206,6 @@ BOOL CSplinesCtrlDlg::OnInitDialog()
 		m_ctrlSpinIn.SetRange(3,30);
 		m_ctrlSpinOut.SetRange(3,30);
 	}
-
-	m_ctrlTEGap.SetValue(m_Gap*100.0);
 
 	m_ctrlDegExtrados.SetFocus();
 	return FALSE; 
@@ -247,7 +222,7 @@ void CSplinesCtrlDlg::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 //	CInitDialogBar::OnVScroll(nSBCode, nPos, pScrollBar);
 }
-
+/*
 void CSplinesCtrlDlg::SetParams()
 {
 	CString str;
@@ -271,8 +246,10 @@ void CSplinesCtrlDlg::SetParams()
 		}
 		m_ctrlDegExtrados.EnableWindow(true);
 		m_ctrlDegIntrados.EnableWindow(true);
-		m_ctrlDegExtrados.SetCurSel(m_pSF->m_Extrados.m_iDegree-1);
-		m_ctrlDegIntrados.SetCurSel(m_pSF->m_Intrados.m_iDegree-1);
+
+		m_ctrlDegExtrados.SetCurSel(m_pSF->m_Extrados.m_iDegree);
+		m_ctrlDegIntrados.SetCurSel(m_pSF->m_Intrados.m_iDegree);
+
 		m_ctrlOutExtrados.SetValue(m_pSF->m_Extrados.m_iRes);
 		m_ctrlOutIntrados.SetValue(m_pSF->m_Intrados.m_iRes);
 
@@ -299,4 +276,4 @@ void CSplinesCtrlDlg::SetParams()
 		m_ctrlSpinOut.SetRange(3,30);
 	}
 
-}
+}*/

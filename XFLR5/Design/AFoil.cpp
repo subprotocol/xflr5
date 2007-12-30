@@ -77,6 +77,7 @@ CAFoil::CAFoil()
 	m_bScale       = true;
 	m_bCircle      = false;
 	m_bShowLegend  = true;
+	m_bStored      = false;
 
 	memset(&m_TmpPic,0, sizeof(Picture));
 
@@ -96,12 +97,12 @@ CAFoil::CAFoil()
 	m_bXMinGrid  = false;
 	m_XMinorUnit = 0.01;
 	m_XMinStyle  = PS_DASH;
-	m_XMinWidth  = PS_DASH;
+	m_XMinWidth  = 1;
 	m_XMinColor  = RGB(70,70,70);
 	m_bYMinGrid  = false;
 	m_YMinorUnit = 0.01;
 	m_YMinStyle  = PS_DASH;
-	m_YMinWidth  = PS_DASH;
+	m_YMinWidth  = 1;
 	m_YMinColor  = RGB(70,70,70);
 
 	m_NeutralStyle = 3;
@@ -133,9 +134,7 @@ CAFoil::~CAFoil()
 BEGIN_MESSAGE_MAP(CAFoil, CWnd)
 	//{{AFX_MSG_MAP(CAFoil)
 	ON_COMMAND(IDM_AFOIL_SFSAVE, OnSFSave)
-//	ON_COMMAND(IDM_AFOIL_SFLOAD, OnLoad)
 	ON_COMMAND(IDM_AFOIL_EXPORTSPLINES, OnExportSplines)
-//	ON_COMMAND(IDM_NEWSPLINES, OnNewSplines)
 	ON_COMMAND(IDM_AFOIL_PRINT, OnPrint)
 	ON_COMMAND(IDT_ZOOMIN, OnZoomIn)
 	ON_COMMAND(IDT_ZOOMLESS, OnZoomLess)
@@ -171,7 +170,6 @@ BEGIN_MESSAGE_MAP(CAFoil, CWnd)
 	ON_COMMAND(IDM_NACAFOILS, OnNacaFoils)
 	ON_COMMAND(IDM_AFOIL_NEWSPLINES, OnNewSplines)
 	ON_COMMAND(IDM_AFOIL_PRINT, OnPrint)
-//	ON_COMMAND(IDT_LOAD, OnLoad)
 	ON_COMMAND(IDT_PRINT, OnPrint)
 	ON_COMMAND(IDM_EXPORTTOAPP, OnStoreFoil)
 	ON_COMMAND(IDM_LECIRCLE, OnLECircle)
@@ -198,12 +196,12 @@ void CAFoil::SetParams(CFoil *pFoil)
 
 	//	SetScale();	
 
-	m_pSF->CompMidLine();
-	m_pPF->CompMidLine(true);
+	if(m_bSF) m_pSF->CompMidLine();
+	else      m_pPF->CompMidLine(true);
 
 	// no undo yet
-	m_stack = 0;
-	m_stackmax = 0;
+	m_StackPos = 0;
+	m_StackSize = 0;
 
 	SetFoils(pFoil);
 
@@ -293,7 +291,8 @@ void CAFoil::UpdateView(CDC* pDC)
 		lb.lbColor = color;
 		CPen NeutralPen(PS_GEOMETRIC | style,GetPenWidth(width,false), &lb);
 		memdc.SelectObject(&NeutralPen);
-		DrawNeutralLine(&memdc, m_rDrawRect.right, m_rDrawRect.left, m_ptOffset.y);
+		memdc.MoveTo(m_rDrawRect.right,m_ptOffset.y);
+		memdc.LineTo(m_rDrawRect.left,m_ptOffset.y);
 	}
 
 //draw grids
@@ -388,7 +387,8 @@ void CAFoil::UpdateView(CDC* pDC)
 			}
 		}
 	}
-	else if(m_pPF->m_bVisible){
+	else if(m_pPF->m_bVisible)
+	{
 		color = m_pPF->m_FoilColor;
 		style = m_pPF->m_FoilStyle;
 		width = m_pPF->m_FoilWidth;
@@ -401,6 +401,7 @@ void CAFoil::UpdateView(CDC* pDC)
 
 		CPen CtrlPen(PS_SOLID, 1, color);
 		memdc.SelectObject(&CtrlPen);
+
 		m_pPF->DrawCtrlPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
 
 		if (m_pPF->m_bCenterLine){
@@ -457,12 +458,6 @@ CFoil* CAFoil::GetFoil(CString FoilName)
 }
 
 
-void CAFoil::DrawNeutralLine(CDC *pDC, int xmin, int xmax, int y)
-{
-	pDC->MoveTo(xmin,y);
-	pDC->LineTo(xmax,y);
-}
-
 
 int CAFoil::ReadData(CStdioFile *pXFile, CFoil *pFoil)
 {
@@ -508,7 +503,7 @@ void CAFoil::OnZoomLess()
 	// can't do two things at the same time can we ?
 	ReleaseZoom();
 
-	double ZoomFactor = 0.8f;
+	double ZoomFactor = 0.8;
 	double newScale = __max(ZoomFactor*m_fScale, m_fRefScale);
 
 	ZoomFactor = __max(ZoomFactor, newScale/m_fScale);
@@ -648,6 +643,7 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 void CAFoil::OnLButtonUp(UINT nFlags, CPoint point) 
 {
 	m_bTrans = false;
+	m_pACtrl->FillFoilList();
 
 	if(m_bZoomPlus && m_rDrawRect.PtInRect(point)){
 		CRect ZRect(&m_ZoomRect);
@@ -691,7 +687,7 @@ void CAFoil::OnLButtonUp(UINT nFlags, CPoint point)
 //			ReleaseCapture();// in case we have a grip cursor
 			m_pSF->CompMidLine();
 
-			int n = m_pSF->m_Extrados.m_iSelect;
+/*			int n = m_pSF->m_Extrados.m_iSelect;
 			if (n>0 && n<m_pSF->m_Extrados.m_iCtrlPoints) {
 				double x = m_pSF->m_Extrados.m_Input[n].x;
 				double y = m_pSF->m_Extrados.m_Input[n].y;
@@ -702,13 +698,13 @@ void CAFoil::OnLButtonUp(UINT nFlags, CPoint point)
 					double x = m_pSF->m_Intrados.m_Input[n].x;
 					double y = m_pSF->m_Intrados.m_Input[n].y;
 				}
-			}
+			}*/
 		}
 		else{
 //			ReleaseCapture();// in case we have a grip cursor
 			m_pPF->CompMidLine();
 
-			int n = m_pPF->m_Extrados.m_iSelect;
+/*			int n = m_pPF->m_Extrados.m_iSelect;
 			if (n>0 && n<m_pPF->m_Extrados.m_iPoints) {
 				double x = m_pPF->m_Extrados.m_ctrlPoint[n].x;
 				double y = m_pPF->m_Extrados.m_ctrlPoint[n].y;
@@ -719,7 +715,7 @@ void CAFoil::OnLButtonUp(UINT nFlags, CPoint point)
 					double x = m_pPF->m_Intrados.m_ctrlPoint[n].x;
 					double y = m_pPF->m_Intrados.m_ctrlPoint[n].y;
 				}
-			}
+			}*/
 		}
 		SetCursor(m_hcCross);
 	}
@@ -812,7 +808,14 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	m_MousePos = MousetoReal(&point);
 
-	SHORT shZ = GetKeyState(90);//capital 'Z'
+	bool bCtrl = false;
+	SHORT sh1  = GetKeyState(VK_LCONTROL);
+	SHORT sh2  = GetKeyState(VK_RCONTROL);
+	SHORT shZ  = GetKeyState('Z');
+	SHORT shX = GetKeyState('X');
+	SHORT shY = GetKeyState('Y');
+
+	if ((sh1 & 0x8000)||(sh2 & 0x8000)) bCtrl =true;
 
 	if(m_bZoomPlus && (nFlags & MK_LBUTTON )){
 		// we're zooming in using the rectangle method
@@ -861,7 +864,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 		else if (m_pPF->m_bVisible){
 			bool bFound = false;
 			int n = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pSF->m_Extrados.m_iCtrlPoints) {
+			if (n>0 && n<=m_pPF->m_Extrados.m_iPoints) {
 				m_pPF->m_Extrados.m_iHighlight = n;
 				bFound = true;
 			}
@@ -871,7 +874,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 			}
 
 			n = m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pSF->m_Intrados.m_iCtrlPoints) {
+			if (n>0 && n<=m_pPF->m_Intrados.m_iPoints) {
 				m_pPF->m_Intrados.m_iHighlight = n;
 				bFound = true;
 			}
@@ -892,11 +895,11 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 			if(m_bSF){
 				int n = m_pSF->m_Extrados.m_iSelect;
 				if (n>=0 && n<=m_pSF->m_Extrados.m_iCtrlPoints) {
-					if(!m_stored) StorePicture();//save for undo only the first time
+					if(!m_bStored) StorePicture();//save for undo only the first time
 //					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 					m_pSF->m_Extrados.m_Input[n].x = m_MousePos.x;
 					m_pSF->m_Extrados.m_Input[n].y = m_MousePos.y;
-					m_pSF->m_Extrados.SplineCurve();
+//					m_pSF->m_Extrados.SplineCurve();
 					m_pSF->m_bModified = true;
 					SetSaveState(false);
 					m_pSF->Update(true);
@@ -904,11 +907,11 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				else {
 					int n = m_pSF->m_Intrados.m_iSelect;
 					if (n>=0 && n<=m_pSF->m_Intrados.m_iCtrlPoints) {
-						if(!m_stored) StorePicture();//save for undo only the first time
+						if(!m_bStored) StorePicture();//save for undo only the first time
 //						if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
 						m_pSF->m_Intrados.m_Input[n].y = m_MousePos.y;
-						m_pSF->m_Intrados.SplineCurve();
+//						m_pSF->m_Intrados.SplineCurve();
 						m_pSF->m_bModified = true;
 						SetSaveState(false);
 						m_pSF->Update(false);
@@ -917,8 +920,8 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 			}
 			else{
 				int n = m_pPF->m_Extrados.m_iSelect;
-				if (n>=0 && n<=m_pPF->m_Extrados.m_iPoints) {
-					if(!m_stored) StorePicture();//save for undo only the first time
+				if (n>=0 && n<m_pPF->m_Extrados.m_iPoints) {
+					if(!m_bStored) StorePicture();//save for undo only the first time
 					m_pPF->m_Extrados.m_ctrlPoint[n].x = m_MousePos.x;
 					m_pPF->m_Extrados.m_ctrlPoint[n].y = m_MousePos.y;
 					m_pPF->m_bModified = true;
@@ -926,8 +929,8 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				else {
 					n = m_pPF->m_Intrados.m_iSelect;
-					if (n>=0 && n<=m_pPF->m_Intrados.m_iPoints) {
-						if(!m_stored) StorePicture();//save for undo only the first time
+					if (n>=0 && n<m_pPF->m_Intrados.m_iPoints) {
+						if(!m_bStored) StorePicture();//save for undo only the first time
 						m_pPF->m_Intrados.m_ctrlPoint[n].x = m_MousePos.x;
 						m_pPF->m_Intrados.m_ctrlPoint[n].y = m_MousePos.y;
 						m_pPF->m_bModified = true;
@@ -936,7 +939,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				if(n<0) {//check for rear point
 					if(m_pPF->m_Extrados.m_iSelect == -1){
-						if(!m_stored) StorePicture();//save for undo only the first time
+						if(!m_bStored) StorePicture();//save for undo only the first time
 						m_pPF->m_Extrados.m_RearPoint.x = m_MousePos.x;
 						m_pPF->m_Extrados.m_RearPoint.y = m_MousePos.y;
 						m_pPF->m_bModified = true;
@@ -944,7 +947,7 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 						m_pPF->Update(true);
 					}
 					else if(m_pPF->m_Intrados.m_iSelect == -1){
-						if(!m_stored) StorePicture();//save for undo only the first time
+						if(!m_bStored) StorePicture();//save for undo only the first time
 						m_pPF->m_Intrados.m_RearPoint.x = m_MousePos.x;
 						m_pPF->m_Intrados.m_RearPoint.y = m_MousePos.y;
 						m_pPF->m_bModified = true;
@@ -954,14 +957,13 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 				}
 				m_pPF->CompMidLine();
 			}
-			m_pACtrl->FillFoilList();
+//			m_pACtrl->FillFoilList();
 		}
 
 		UpdateView();
 		return;
 	}
-	else if ((nFlags & MK_MBUTTON) ||
-		     (shZ & 0x8000)) {
+	else if (((nFlags & MK_MBUTTON) || (shZ & 0x8000))  && !bCtrl) {
 		// user is zooming with mouse button down rather than with wheel
 		if(m_rDrawRect.PtInRect(point)){		
 			double scale = m_fScale;
@@ -1053,14 +1055,14 @@ void CAFoil::OnExportSplines()
 		}
 	}
 	else {
-		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) + 1;
+		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2) {
 			CString strong;
 			strong.Format("Too many output points on upper surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) + 1;
+		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2) {
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
@@ -1128,6 +1130,9 @@ void CAFoil::OnNewSplines()
 {
 	if(m_bSF) SFNew();
 	else PFNew();
+
+	m_StackPos  = 0;
+	m_StackSize = 0;
 
 	SetSaveState(false);
 	UpdateView();
@@ -1271,7 +1276,8 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 		lb.lbColor = color;
 		CPen NeutralPen(PS_GEOMETRIC | style, GetPenWidth(width,true), &lb);
 		CPen *pOld1 = (CPen*)pDC->SelectObject(&NeutralPen);
-		DrawNeutralLine(pDC, pRect.right, pRect.left, Offset.y);
+		pDC->MoveTo(pRect.right,Offset.y);
+		pDC->LineTo(pRect.left,Offset.y);
 		pDC->SelectObject(pOld1);
 	}
 
@@ -1531,12 +1537,7 @@ BOOL CAFoil::PreTranslateMessage(MSG* pMsg)
 			OnSFSave();
 			return true;
 		} 
-		if (pMsg->wParam == 'O' && 
-				( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
-//			OnLoad();
-			pFrame->OnLoadProject();
-			return true;
-		}
+
 		if (pMsg->wParam == 'P' && 
 				( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
 			OnPrint();
@@ -1551,21 +1552,6 @@ BOOL CAFoil::PreTranslateMessage(MSG* pMsg)
 	return CWnd::PreTranslateMessage(pMsg);
 }
 
-
-/*
-void CAFoil::OnSize(CRect CltRect, int cx, int cy) 
-{
-	m_rDrawRect.CopyRect(CltRect);
-	m_rCltRect.CopyRect(CltRect);
-	double zoom = m_fScale/m_fRefScale;
-
-	SetScale();
-	m_fScale = zoom*m_fRefScale;
-	
-	m_pSF->SetViewRect(m_rDrawRect);
-	m_pPF->SetViewRect(m_rDrawRect);
-}
-*/
 
 void CAFoil::SetScale()
 {//scale is set by user zooming
@@ -1708,8 +1694,9 @@ void CAFoil::OnAddPoint()
 }
 
 
-void CAFoil::TakePicture(){
-	m_stored = false;
+void CAFoil::TakePicture()
+{
+	m_bStored = false;
 	if(m_bSF){
 		m_TmpPic.m_iExt = m_pSF->m_Extrados.m_iCtrlPoints;
 		for (int i=0; i<=m_TmpPic.m_iExt; i++){
@@ -1743,17 +1730,17 @@ void CAFoil::TakePicture(){
 
 void CAFoil::StorePicture()
 {
-	if(m_stack>=50){
+	if(m_StackPos>=50){
 		for (int i=1; i<50; i++){
 			memcpy(&m_UndoPic[i-1],&m_UndoPic[i], sizeof(Picture));
 		}
-		m_stack = 49;
-		m_stackmax = 49;
+		m_StackPos = 49;
+		m_StackSize = 49;
 	}
-	memcpy(&m_UndoPic[m_stack], &m_TmpPic, sizeof(Picture));
-	m_stored = true;
-	m_stack++;
-	m_stackmax = m_stack;
+	memcpy(&m_UndoPic[m_StackPos], &m_TmpPic, sizeof(Picture));
+	m_bStored = true;
+	m_StackPos++;
+	m_StackSize = m_StackPos;
 
 	CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
 	pTB->EnableButton(IDT_UNDO, true);
@@ -1764,16 +1751,16 @@ void CAFoil::SetPicture()
 	double gap;
 
 	if(m_bSF){
-		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_stack].m_iExt;
-		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_stack].m_iInt;
+		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
+		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
 
-		for (int i=0; i<=m_UndoPic[m_stack].m_iExt; i++){
-			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_stack].xExt[i];
-			m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_stack].yExt[i];
+		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++){
+			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
+			m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_StackPos].yExt[i];
 		}
-		for (i=0; i<=m_UndoPic[m_stack].m_iInt; i++){
-			m_pSF->m_Intrados.m_Input[i].x = m_UndoPic[m_stack].xInt[i];
-			m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_stack].yInt[i];
+		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++){
+			m_pSF->m_Intrados.m_Input[i].x = m_UndoPic[m_StackPos].xInt[i];
+			m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_StackPos].yInt[i];
 		}
 
 		gap =   m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
@@ -1783,21 +1770,21 @@ void CAFoil::SetPicture()
 		m_pSF->Update(false);
 	}
 	else {
-		 m_pPF->m_Extrados.m_iPoints = m_UndoPic[m_stack].m_iExt;
-		 m_pPF->m_Intrados.m_iPoints = m_UndoPic[m_stack].m_iInt;
+		 m_pPF->m_Extrados.m_iPoints = m_UndoPic[m_StackPos].m_iExt;
+		 m_pPF->m_Intrados.m_iPoints = m_UndoPic[m_StackPos].m_iInt;
 
-		 m_pPF->m_Extrados.m_RearPoint.x = m_UndoPic[m_stack].ExtRearPt.x;
-		 m_pPF->m_Extrados.m_RearPoint.y = m_UndoPic[m_stack].ExtRearPt.y;
-		 m_pPF->m_Intrados.m_RearPoint.x = m_UndoPic[m_stack].IntRearPt.x;
-		 m_pPF->m_Intrados.m_RearPoint.y = m_UndoPic[m_stack].IntRearPt.y;
+		 m_pPF->m_Extrados.m_RearPoint.x = m_UndoPic[m_StackPos].ExtRearPt.x;
+		 m_pPF->m_Extrados.m_RearPoint.y = m_UndoPic[m_StackPos].ExtRearPt.y;
+		 m_pPF->m_Intrados.m_RearPoint.x = m_UndoPic[m_StackPos].IntRearPt.x;
+		 m_pPF->m_Intrados.m_RearPoint.y = m_UndoPic[m_StackPos].IntRearPt.y;
 
-		for (int i=0; i<=m_UndoPic[m_stack].m_iExt; i++){
-			m_pPF->m_Extrados.m_ctrlPoint[i].x = m_UndoPic[m_stack].xExt[i];
-			m_pPF->m_Extrados.m_ctrlPoint[i].y = m_UndoPic[m_stack].yExt[i];
+		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++){
+			m_pPF->m_Extrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xExt[i];
+			m_pPF->m_Extrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yExt[i];
 		}
-		for (i=0; i<=m_UndoPic[m_stack].m_iInt; i++){
-			m_pPF->m_Intrados.m_ctrlPoint[i].x = m_UndoPic[m_stack].xInt[i];
-			m_pPF->m_Intrados.m_ctrlPoint[i].y = m_UndoPic[m_stack].yInt[i];
+		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++){
+			m_pPF->m_Intrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xInt[i];
+			m_pPF->m_Intrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yInt[i];
 		}
 		gap =   m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y
 			  - m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y;
@@ -1812,34 +1799,34 @@ void CAFoil::SetPicture()
 
 void CAFoil::OnUndo() 
 {
-	if(m_stack>0) {
-		if(m_stack == m_stackmax){
+	if(m_StackPos>0) {
+		if(m_StackPos == m_StackSize){
 			//if we're at the first undo command, save current state
 			TakePicture();
 			StorePicture();//in case we redo
-			m_stack--;
+			m_StackPos--;
 		}
-		m_stack--;
+		m_StackPos--;
 		SetPicture();
 		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-		if(m_stack==0){
+		if(m_StackPos==0){
 			pTB->EnableButton(IDT_UNDO, false);
 		}
 		pTB->EnableButton(IDT_REDO, true);
 	}
 	else {
-		m_stack = 0;
+		m_StackPos = 0;
 	}
 }
 
 void CAFoil::OnRedo() 
 {
-	if(m_stack<m_stackmax-1) {
-		m_stack++;
+	if(m_StackPos<m_StackSize-1) {
+		m_StackPos++;
 		SetPicture();
 		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
 		pTB->EnableButton(IDT_UNDO, true);
-		if(m_stack==m_stackmax-1) {
+		if(m_StackPos==m_StackSize-1) {
 			pTB->EnableButton(IDT_REDO, false);
 		}
 	}
@@ -1925,93 +1912,6 @@ void CAFoil::ReleaseZoom()
 	SetCursor(m_hcCross);
 }
 
-/*
-
-void CAFoil::OnLoad() 
-{
-	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	CString FileName;
-	CString PathName;
-	CStdioFile XFile;
-	CFileException fe;
-
-	// deselect points so as not to interfere with other mouse commands
-	m_pSF->m_Intrados.m_iSelect = -10;
-	m_pSF->m_Extrados.m_iSelect = -10;
-	m_pPF->m_Intrados.m_iSelect = -10;
-	m_pPF->m_Extrados.m_iSelect = -10;
-			
-	CFileDialog XFileDlg(true, NULL, NULL, NULL,
-		_T("XFLR5 file (.sfl; .cfl; .dat; .plr; .wpa)|*.sfl; *.cfl; *.dat; *.plr; *.wpa|"));
-	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
-		PathName = XFileDlg.GetPathName();
-			// we're set to load spline control points
-		int pos1 = FileName.Find(".sfl");
-		int pos2 = FileName.Find(".SFL");
-		if (pos1>0 || pos2>0) {
-			if(m_bSF && m_pSF->m_bModified){// if something already loaded & modified
-				if(IDNO==AfxMessageBox("Discard changes to Splines ?", MB_YESNO)){
-					return;
-				}
-			}
-			else if(!m_bSF && m_pPF->m_bModified){// if something already loaded & modified
-				if(IDNO==AfxMessageBox("Discard changes to Splines ?", MB_YESNO)){
-					return;
-				}
-			}
-			if (XFile.Open(FileName, CFile::modeRead, &fe)){
-				CString FoilName, strong;
-				XFile.ReadString(FoilName);
-				m_pSF->LoadFile(&XFile);
-				XFile.Close();
-				SetSaveState(false);
-				m_pSF->m_strFoilName = FoilName;
-
-				m_bSF =true;
-			}
-			else AfxMessageBox("Could not open file", MB_OK);
-		}
-		else {
-			pos1 = FileName.Find(".cfl");
-			pos2 = FileName.Find(".CFL");
-			if (pos1>0 || pos2>0) {
-				if(m_bSF && m_pSF->m_bModified){// if something already loaded & modified
-					if(IDNO==AfxMessageBox("Discard changes to Splines ?", MB_YESNO)){
-						return;
-					}
-				}
-				else if(!m_bSF && m_pPF->m_bModified){// if something already loaded & modified
-					if(IDNO==AfxMessageBox("Discard changes to Splines ?", MB_YESNO)){
-						return;
-					}
-				}
-				if (XFile.Open(FileName, CFile::modeRead, &fe)){
-					CString FoilName, strong;
-					XFile.ReadString(FoilName);
-					m_pPF->LoadFile(&XFile);
-					XFile.Close();
-					SetSaveState(false);
-					m_pPF->m_strFoilName = FoilName;
-
-					m_bSF = false;
-				}
-				else AfxMessageBox("Could not open file", MB_OK);
-			}
-			else {
-				pFrame->LoadFile(FileName, PathName);
-				CString end;
-				end = PathName.Right(4);
-				end.MakeLower();
-				if(end==".plr" || end ==".wpa") 
-					SetFoils();
-			}
-		}
-	}
-//	m_pACtrl->SelectFoil();
-	UpdateView();
-
-}*/
 
 void CAFoil::OnDuplicate() 
 {
@@ -2744,9 +2644,6 @@ void CAFoil::SaveSettings(CArchive& ar)
 	ar << m_XMinorUnit  << m_YMinorUnit;
 
 	ar << m_NeutralStyle << m_NeutralWidth << m_NeutralColor;
-	
-
-	
 }
 
 void CAFoil::OnStoreFoil() 
@@ -2787,22 +2684,22 @@ void CAFoil::OnStoreFoil()
 		}
 	}
 	else{
-		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) + 1;
+		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2) {
 			CString strong;
 			strong.Format("Too many output points on upper surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-		Trace("m_iPts_Ext=",size);
-		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) + 1;
+//		Trace("m_iPts_Ext=",size);
+		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2) {
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-		Trace("m_iPts_Int=",size);
+//		Trace("m_iPts_Int=",size);
 
 		CFoil *pNewFoil = new CFoil();
 		m_pPF->ExportToBuffer(pNewFoil);
@@ -3323,7 +3220,8 @@ void CAFoil::OnEditCtrlPoints()
 		dlg.m_pmemPF = &memPF;
 		dlg.m_pPF = m_pPF;
 		TakePicture();
-		if(IDOK == dlg.DoModal()){
+		if(IDOK == dlg.DoModal())
+		{
 			StorePicture();
 		}
 		else m_pPF->Copy(&memPF);

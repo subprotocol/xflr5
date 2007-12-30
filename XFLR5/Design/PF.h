@@ -33,11 +33,12 @@ class CSplinedPoints
 {
 public:
 	bool CompSlopes();
-	bool DrawControlPoint(CDC *pDC, int i, double scalex, double scaley, CPoint Offset, bool IsPrinting);
+//	bool DrawControlPoint(CDC *pDC, int i, double scalex, double scaley, CPoint Offset, bool IsPrinting);
+	bool DrawControlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
 	bool DrawSplines(CDC* pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting);
-	bool InsertPoint(double x, double y);
 	bool RemovePoint(int k);
 
+	int InsertPoint(double x, double y);
 	int IsControlPoint(CVector Real, double ZoomFactor);
 	int IsControlPoint(double x, double y, double Zoom);
 	int IsRearPoint(CVector Real, double ZoomFactor);

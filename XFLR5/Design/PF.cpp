@@ -53,7 +53,8 @@ CPF::~CPF()
 
 bool CPF::CompMidLine(bool first)
 {
-	double x, yex, yin;
+	double x, yex, yin, step;
+	int l;
 	m_fThickness = 0.0;
 	m_fCamber    = 0.0;
 	m_fxCambMax  = 0.0;
@@ -65,8 +66,8 @@ bool CPF::CompMidLine(bool first)
 	m_rpMid[100].y = 0.0;
 
 	
-	double step = 0.001;
-	for (int l=0; l<=1000; l++){
+	step = 0.001;
+	for (l=0; l<=1000; l++){
 		x = l*step;
 		if(first){
 			yex = m_Extrados.GetY(x);
@@ -78,11 +79,11 @@ bool CPF::CompMidLine(bool first)
 		}
 		m_rpMid[l].x = x;
 		m_rpMid[l].y = (yex+yin)/2.0;
-		if(fabs(yex-yin)>m_fThickness){
-			m_fThickness = (double)fabs(yex-yin);
+		if(abs(yex-yin)>m_fThickness){
+			m_fThickness = abs(yex-yin);
 			m_fxThickMax = x;
 		}
-		if(fabs(m_rpMid[l].y)>fabs(m_fCamber)){
+		if(abs(m_rpMid[l].y)>fabs(m_fCamber)){
 			m_fCamber = m_rpMid[l].y;
 			m_fxCambMax = x;
 		}
@@ -103,12 +104,12 @@ void CPF::DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, boo
 	if (IsPrinting){
 		scaley=-scaley;
 	}
-	pDC->MoveTo((int)(m_rpMid[0].x*scalex)  +Offset.x,
-				(int)(m_rpMid[0].y*scaley)  +Offset.y);
+	pDC->MoveTo((int)( m_rpMid[0].x*scalex)  +Offset.x,
+				(int)(-m_rpMid[0].y*scaley)  +Offset.y);
 
 	for (int k=1; k<=100; k++){
 		pDC->LineTo((int)(m_rpMid[k*10].x*scalex)+Offset.x,
-					(int)(m_rpMid[k*10].y*scaley)+Offset.y);
+					(int)(- m_rpMid[k*10].y*scaley)+Offset.y);
 	}
 }
 
@@ -118,7 +119,7 @@ bool CPF::InitSplinedFoil()
 {
 	m_bModified   = false;
 	m_strFoilName = "Splined Points Foil";
-	m_Extrados.m_iPoints = -1;
+	m_Extrados.m_iPoints = 0;
 	m_Extrados.InsertPoint(1.00,  0.0000);
 	m_Extrados.InsertPoint(0.887, 0.0173);
 	m_Extrados.InsertPoint(0.657, 0.0438);
@@ -132,7 +133,7 @@ bool CPF::InitSplinedFoil()
 	m_Extrados.m_RearPoint.x = 1.06119;
 	m_Extrados.m_RearPoint.y = -0.00948;
 
-	m_Intrados.m_iPoints = -1;
+	m_Intrados.m_iPoints = 0;
 	m_Intrados.InsertPoint(1.000,  0.0000);
 	m_Intrados.InsertPoint(0.032, -0.0196);
 	m_Intrados.InsertPoint(0.119, -0.0300);
@@ -169,12 +170,8 @@ void CPF::Copy(CPF* pPF)
 
 bool CPF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	for (int i=0; i<=m_Extrados.m_iPoints;i++){
-		m_Extrados.DrawControlPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
-	}
-	for (i=0; i<=m_Intrados.m_iPoints;i++){
-		m_Intrados.DrawControlPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
-	}
+	m_Extrados.DrawControlPoints(pDC, scalex, scaley, Offset, IsPrinting);
+	m_Intrados.DrawControlPoints(pDC, scalex, scaley, Offset, IsPrinting);
 	m_Extrados.DrawRearPoint(pDC, scalex, scaley, Offset, IsPrinting);
 	m_Intrados.DrawRearPoint(pDC, scalex, scaley, Offset, IsPrinting);
 	return true;
@@ -207,7 +204,7 @@ void CPF::SetViewRect(CRect rc){
 CSplinedPoints::CSplinedPoints(){
 	m_iHighlight = -10;
 	m_iSelect    = -10;
-	m_iPoints    = -1;
+	m_iPoints    = 0;
 	m_bOutPts    = false;
 	m_Freq       = 8;
 	m_rViewRect.SetRectEmpty();
@@ -220,12 +217,9 @@ CSplinedPoints::~CSplinedPoints(){
 
 }
 
-
-bool CSplinedPoints::DrawControlPoint(CDC *pDC, int i, double scalex, double scaley, CPoint Offset, bool IsPrinting)
+bool CSplinedPoints::DrawControlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	if(i<0 && i>m_iPoints) return false;
-
-	int width;
+	int i, width;
 	if (IsPrinting){
 		scaley=-scaley;
 		width = 60;
@@ -235,80 +229,102 @@ bool CSplinedPoints::DrawControlPoint(CDC *pDC, int i, double scalex, double sca
 	}
 
 	CPoint pt;
-	pt.x = (int)( m_ctrlPoint[i].x*scalex)+Offset.x;
-	pt.y = (int)(-m_ctrlPoint[i].y*scaley)+Offset.y;
-	if(!m_rViewRect.PtInRect(pt)) return false;
+	for(i=0; i<m_iPoints; i++)
+	{
+		pt.x = (int)( m_ctrlPoint[i].x*scalex)+Offset.x;
+		pt.y = (int)(-m_ctrlPoint[i].y*scaley)+Offset.y;
+		if(m_rViewRect.PtInRect(pt)) 
+		{
 
-	if (!IsPrinting && m_iSelect==i) {
-		CPen SelectPen(PS_SOLID, 2, RGB(0,0,150));
-		CPen *pOldPen = pDC->SelectObject(&SelectPen);
-		pDC->Ellipse(pt.x-width,
-					 pt.y-width,
-					 pt.x+width,
-					 pt.y+width);
-		pDC->SelectObject(pOldPen);
+			if (!IsPrinting && m_iSelect==i) {
+				CPen SelectPen(PS_SOLID, 2, RGB(130,130,255));
+				CPen *pOldPen = pDC->SelectObject(&SelectPen);
+				pDC->Ellipse(pt.x-width-1,
+							 pt.y-width-1,
+							 pt.x+width+1,
+							 pt.y+width+1);
+				pDC->SelectObject(pOldPen);
+			}
+			else if(!IsPrinting && m_iHighlight==i) {
+				CPen HighlightPen(PS_SOLID, 2, RGB(255,0,0));
+				CPen *pOldPen = pDC->SelectObject(&HighlightPen);
+				pDC->Ellipse(pt.x-width,
+							 pt.y-width,
+							 pt.x+width,
+							 pt.y+width);
+				pDC->SelectObject(pOldPen);
+			}
+			else pDC->Ellipse(pt.x-width,
+							 pt.y-width,
+							 pt.x+width,
+							 pt.y+width);
+		}
 	}
-	else if(!IsPrinting && m_iHighlight==i) {
-		CPen HighlightPen(PS_SOLID, 2, RGB(255,0,0));
-		CPen *pOldPen = pDC->SelectObject(&HighlightPen);
-		pDC->Ellipse(pt.x-width,
-					 pt.y-width,
-					 pt.x+width,
-					 pt.y+width);
-		pDC->SelectObject(pOldPen);
-	}
-	else pDC->Ellipse(pt.x-width,
-					  pt.y-width,
-					  pt.x+width,
-					  pt.y+width);
 	return true;
 }
 
 
-bool CSplinedPoints::InsertPoint(double x, double y){
-	if (x>=0. && x<=1.){//No points yet
-		if(m_iPoints<0){
-			m_iPoints=0;
+int CSplinedPoints::InsertPoint(double x, double y)
+{
+	int j,k;
+	int ipoint = 0;
+
+	if(m_iPoints==0)
+	{	//No points yet
+		m_ctrlPoint[0].x = x;
+		m_ctrlPoint[0].y = y;
+		m_iPoints++;
+	}
+	else{
+		if(x<m_ctrlPoint[0].x)
+		{	// if we're the new minimum point
+			for (j=m_iPoints; j>=0; j--){
+				m_ctrlPoint[j] = m_ctrlPoint[j-1];
+			}
 			m_ctrlPoint[0].x = x;
 			m_ctrlPoint[0].y = y;
+			ipoint = 0;
+			m_iPoints++;
 		}
-		else{
-			if(x<m_ctrlPoint[0].x){// if we're the new minimum point
+		else{// if we're the new maximum point
+			if(x>=m_ctrlPoint[m_iPoints-1].x)
+			{
+				m_ctrlPoint[m_iPoints].x = x;
+				m_ctrlPoint[m_iPoints].y = y;
+				ipoint = m_iPoints;
 				m_iPoints++;
-				for (int j=m_iPoints; j>=0; j--){
-					m_ctrlPoint[j] = m_ctrlPoint[j-1];
-				}
-				m_ctrlPoint[0].x = x;
-				m_ctrlPoint[0].y = y;
 			}
-			else{// if we're the new maximum point
-				if(x>=m_ctrlPoint[m_iPoints].x){
-					m_iPoints++;
-					m_ctrlPoint[m_iPoints].x = x;
-					m_ctrlPoint[m_iPoints].y = y;
-				}
-				else{// else if we're in between
-					for (int k=0; k<m_iPoints; k++){
-						if (x>m_ctrlPoint[k].x && x<m_ctrlPoint[k+1].x){
-							m_iPoints++;
-							for (int j=m_iPoints; j>k+1; j--){
-								m_ctrlPoint[j] = m_ctrlPoint[j-1];
-							}
-							m_ctrlPoint[k+1].x = x;
-							m_ctrlPoint[k+1].y = y;
+			else
+			{
+				// else if we're in between
+				for (k=0; k<m_iPoints; k++)
+				{
+					if (x>m_ctrlPoint[k].x && x<m_ctrlPoint[k+1].x)
+					{
+						for (j=m_iPoints; j>k+1; j--)
+						{
+							m_ctrlPoint[j] = m_ctrlPoint[j-1];
 						}
+						m_ctrlPoint[k+1].x = x;
+						m_ctrlPoint[k+1].y = y;
+						ipoint = k;
+						m_iPoints++;
+						break;
 					}
 				}
 			}
 		}
 	}
+
 	CompSlopes();
-	return true;
+	return ipoint;
 }
 
-bool CSplinedPoints::RemovePoint(int k){
+bool CSplinedPoints::RemovePoint(int k)
+{
+	int j;
 	if (k>0 && k<m_iPoints){
-		for (int j=k; j<=m_iPoints; j++){
+		for (j=k; j<m_iPoints; j++){
 			m_ctrlPoint[j] = m_ctrlPoint[j+1];
 		}
 		m_iPoints--;
@@ -319,13 +335,17 @@ bool CSplinedPoints::RemovePoint(int k){
 
 
 
-double CSplinedPoints::GetY(double x){
+double CSplinedPoints::GetY(double x)
+{
+	int k;
 	CSpline LinkSpline;
 	LinkSpline.m_iRes = m_Freq;
-	LinkSpline.m_iCtrlPoints = -1;
-	for (int k=0; k<m_iPoints; k++){
-		if(fabs(x-m_ctrlPoint[k].x )<0.001f) return m_ctrlPoint[k].y;
-		if (m_ctrlPoint[k].x < x && x<=m_ctrlPoint[k+1].x){
+	LinkSpline.m_iCtrlPoints = 0;
+	for (k=0; k<m_iPoints; k++)
+	{
+		if(abs(x-m_ctrlPoint[k].x )<0.001) return m_ctrlPoint[k].y;
+		if (m_ctrlPoint[k].x < x && x<=m_ctrlPoint[k+1].x)
+		{
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
 								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
@@ -334,11 +354,10 @@ double CSplinedPoints::GetY(double x){
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
-			double y = LinkSpline.GetY(x);
-			return y;
+			return LinkSpline.GetY(x);;
 		}
 	}
-	return 0.f;
+	return 0.0;
 }
 
 
@@ -347,7 +366,8 @@ double CSplinedPoints::GetY(double x){
 bool CSplinedPoints::DrawSplines(CDC* pDC, double scalex, double scaley, CPoint Offset,
 								 bool IsPrinting)
 {
-	int l;
+	int j,k,l;
+	double dist, x1, x2;
 	CSpline LinkSpline;
 	LinkSpline.m_iRes = m_Freq;
 	LinkSpline.m_iDegree = 3;
@@ -358,72 +378,80 @@ bool CSplinedPoints::DrawSplines(CDC* pDC, double scalex, double scaley, CPoint 
 	lb.lbStyle = BS_SOLID;
 	lb.lbColor = RGB(200,200,200);
 
-
-	for (int k=0; k<m_iPoints; k++){
-
-		double dist = (double)fabs(m_ctrlPoint[k+1].x-m_ctrlPoint[k].x);
-		LinkSpline.m_iCtrlPoints = -1;
-		LinkSpline.AddPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-		LinkSpline.AddPoint(m_ctrlPoint[k].x   + (dist)/3.0 * m_Slope[k].x,
+	l=0;
+	for (k=0; k<m_iPoints-1; k++)
+	{
+		dist = abs(m_ctrlPoint[k+1].x-m_ctrlPoint[k].x);
+		LinkSpline.m_iCtrlPoints = 0;
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x   + (dist)/3.0 * m_Slope[k].x,
 						    m_ctrlPoint[k].y   + (dist)/3.0 * m_Slope[k].y);
-		LinkSpline.AddPoint(m_ctrlPoint[k+1].x - (dist)/3.0 * m_Slope[k+1].x,
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (dist)/3.0 * m_Slope[k+1].x,
 							m_ctrlPoint[k+1].y - (dist)/3.0 * m_Slope[k+1].y);
-		LinkSpline.AddPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 		LinkSpline.SplineCurve();
 		LinkSpline.DrawSpline(pDC, scalex, scaley, Offset, IsPrinting);
 
 		if(m_bOutPts){
-			for (int k=1; k<LinkSpline.m_iRes-1; k++){
-				LinkSpline.DrawOutputPoint(pDC,k,scalex,scaley,Offset, IsPrinting);
+			for (j=1; j<LinkSpline.m_iRes-1; j++){
+				LinkSpline.DrawOutputPoint(pDC,j,scalex,scaley,Offset, IsPrinting);
 			}
 		}
-		
-		double x1 = __min(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
-		double x2 = __max(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+	
+		x1 = min(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+		x2 = max(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
 
-		while(x1>=0 && x1<=x2 && x2<=1.0){
-			l=(int)(x1*1000.001);
+		while(x1>=0 && x1<x2 && l<=1000)
+		{
+//			l=(int)(x1*1000.001);
 			m_Outy[l] = LinkSpline.GetY(x1);
-			x1+=0.001;
+			x1 =0.001*(double)l;
+			l++;
 		}
-		l=(int)(x2*1000);
-		m_Outy[l] = LinkSpline.GetY(x2);
+//		l=(int)(x2*1000);
+//		m_Outy[l] = LinkSpline.GetY(x2);
 	}
 
 	return true;
 }
 
 
-
 bool CSplinedPoints::CompSlopes()
 {
 	double val;
-	//infinite slope at origin, set in CPF
-	//because depends on whether upper or lower surface
-	m_Slope[m_iPoints].x = m_RearPoint.x-1.f;
-	m_Slope[m_iPoints].y = m_RearPoint.y-0.f;
-	val = m_Slope[m_iPoints].x*m_Slope[m_iPoints].x + m_Slope[m_iPoints].y * m_Slope[m_iPoints].y;
-	val = (double) sqrt(val);
-	if(fabs(val)>0.0000001f){
-		m_Slope[m_iPoints].x = m_Slope[m_iPoints].x /val;
-		m_Slope[m_iPoints].y = m_Slope[m_iPoints].y /val;
+	int k;
+	
+	// infinite slope at origin, set in CPF
+	// depends on wether upper or lower surface
+	m_Slope[m_iPoints-1].x = m_RearPoint.x-1.0;
+	m_Slope[m_iPoints-1].y = m_RearPoint.y-0.0;
+	val = m_Slope[m_iPoints-1].x*m_Slope[m_iPoints-1].x + m_Slope[m_iPoints-1].y * m_Slope[m_iPoints-1].y;
+	val = sqrt(val);
+	if(abs(val)>0.0000001)
+	{
+		m_Slope[m_iPoints-1].x = m_Slope[m_iPoints-1].x /val;
+		m_Slope[m_iPoints-1].y = m_Slope[m_iPoints-1].y /val;
 	}
-	else{// anything, points are merged
-		m_Slope[m_iPoints].x = (double)sqrt(1.f/2.f);
-		m_Slope[m_iPoints].y = (double)sqrt(1.f/2.f);
+	else
+	{// anything, points are merged
+		m_Slope[m_iPoints-1].x = sqrt(1.0/2.0);
+		m_Slope[m_iPoints-1].y = sqrt(1.0/2.0);
 	}
-	for (int k=1; k<m_iPoints; k++){
+	for (k=1; k<m_iPoints-1; k++)
+	{
 		m_Slope[k].x = m_ctrlPoint[k+1].x-m_ctrlPoint[k-1].x;
 		m_Slope[k].y = m_ctrlPoint[k+1].y-m_ctrlPoint[k-1].y;
 		val = m_Slope[k].x*m_Slope[k].x + m_Slope[k].y * m_Slope[k].y;
-		val = (double) sqrt(val);
-		if(fabs(val)>0.0000001f){
+		val = sqrt(val);
+		if(abs(val)>0.0000001)
+		{
 			m_Slope[k].x = m_Slope[k].x /val;
 			m_Slope[k].y = m_Slope[k].y /val;
 		}
-		else{// anything, points are merged
-			m_Slope[k].x = (double)sqrt(1.f/2.f);
-			m_Slope[k].y = (double)sqrt(1.f/2.f);
+		else
+		{// anything, points are merged
+			m_Slope[k].x = sqrt(1.0/2.0);
+			m_Slope[k].y = sqrt(1.0/2.0);
 		}		
 	}
 	return true;
@@ -439,9 +467,9 @@ void CPF::Update(bool bExtrados)
 
 int CSplinedPoints::IsControlPoint(CVector Real, double ZoomFactor)
 {
-	for (int k=0; k<=m_iPoints; k++){
-		if (fabs(Real.x-m_ctrlPoint[k].x)<0.003f/ZoomFactor &&
-			fabs(Real.y-m_ctrlPoint[k].y)<0.003f/ZoomFactor) return k;
+	for (int k=0; k<m_iPoints; k++){
+		if (abs(Real.x-m_ctrlPoint[k].x)<0.003/ZoomFactor &&
+			abs(Real.y-m_ctrlPoint[k].y)<0.003/ZoomFactor) return k;
 	}
 	return -10;
 }
@@ -449,9 +477,9 @@ int CSplinedPoints::IsControlPoint(CVector Real, double ZoomFactor)
 
 int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 {
-	for (int k=0; k<=m_iPoints; k++){
-		if (fabs(x-m_ctrlPoint[k].x)/Zoom<0.003f &&
-			fabs(y-m_ctrlPoint[k].y)/Zoom<0.003f) return k;
+	for (int k=0; k<m_iPoints; k++){
+		if (abs(x-m_ctrlPoint[k].x)/Zoom<0.003 &&
+			abs(y-m_ctrlPoint[k].y)/Zoom<0.003) return k;
 	}
 	return -10;
 }
@@ -459,42 +487,41 @@ int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 
 int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 {
-	if (fabs(Real.x-m_RearPoint.x)<0.003f/ZoomFactor &&
-		fabs(Real.y-m_RearPoint.y)<0.003f/ZoomFactor) return -1;
+	if (abs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
+		abs(Real.y-m_RearPoint.y)<0.003/ZoomFactor) return -1;
 	return -10;
 }
 
 
 void CSplinedPoints::DrawRearPoint(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	double scale = scalex;
 	if (!IsPrinting){
 		if(m_iHighlight ==-1){
 			CPen RearPen(PS_SOLID, 2, RGB(255,0,0));
 			CPen *pOldPen = pDC->SelectObject(&RearPen);
-			pDC->Ellipse((int)( m_RearPoint.x*scale+Offset.x-3),
-						 (int)(-m_RearPoint.y*scale+Offset.y-3),
-						 (int)( m_RearPoint.x*scale+Offset.x+3),
-						 (int)(-m_RearPoint.y*scale+Offset.y+3));
+			pDC->Ellipse((int)( m_RearPoint.x*scalex+Offset.x-3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y-3),
+						 (int)( m_RearPoint.x*scalex+Offset.x+3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y+3));
 			pDC->SelectObject(pOldPen);
 		}
 		else if(m_iSelect ==-1){
 			CPen RearPen(PS_SOLID, 2, RGB(0,0,150));
 			CBrush RearBrush(RGB(186,100,100));
 			CPen *pOldPen = pDC->SelectObject(&RearPen);
-			pDC->Ellipse((int)( m_RearPoint.x*scale+Offset.x-3),
-						 (int)(-m_RearPoint.y*scale+Offset.y-3),
-						 (int)( m_RearPoint.x*scale+Offset.x+3),
-						 (int)(-m_RearPoint.y*scale+Offset.y+3));
+			pDC->Ellipse((int)( m_RearPoint.x*scalex+Offset.x-3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y-3),
+						 (int)( m_RearPoint.x*scalex+Offset.x+3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y+3));
 			pDC->SelectObject(pOldPen);
 		}
 		else{
 			CPen RearPen(PS_SOLID, 1, RGB(100,100,100));
 			CPen *pOldPen = pDC->SelectObject(&RearPen);
-			pDC->Ellipse((int)( m_RearPoint.x*scale+Offset.x-3),
-						 (int)(-m_RearPoint.y*scale+Offset.y-3),
-						 (int)( m_RearPoint.x*scale+Offset.x+3),
-						 (int)(-m_RearPoint.y*scale+Offset.y+3));
+			pDC->Ellipse((int)( m_RearPoint.x*scalex+Offset.x-3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y-3),
+						 (int)( m_RearPoint.x*scalex+Offset.x+3),
+						 (int)(-m_RearPoint.y*scaley+Offset.y+3));
 			pDC->SelectObject(pOldPen);
 		}
 	}
@@ -565,15 +592,18 @@ void CSplinedPoints::Export(CStdioFile *pFile, bool bExtrados)
 	}
 }
 
-void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados){
+void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
+{
+	int j,k;
 	CString strOut;
 	CSpline LinkSpline;
 	LinkSpline.m_iRes = m_Freq;
 	LinkSpline.m_rViewRect.CopyRect(&m_rViewRect);
 	if(bExtrados){
 		pFoil->n = 0;
-		for (int k=m_iPoints-1;k>=0; k--){
-			LinkSpline.m_iCtrlPoints = -1;
+		for (k=m_iPoints-2;k>=0; k--)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
 								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
@@ -582,7 +612,8 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados){
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
-			for (int j=LinkSpline.m_iRes-1;j>=1; j--){
+			for (j=LinkSpline.m_iRes-1;j>=1; j--)
+			{
 				pFoil->x[pFoil->n] = LinkSpline.m_Output[j].x;
 				pFoil->y[pFoil->n] = LinkSpline.m_Output[j].y;
 				pFoil->n++;
@@ -591,8 +622,9 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados){
 		
 	}
 	else {
-		for (int k=0; k<m_iPoints; k++){
-			LinkSpline.m_iCtrlPoints = -1;
+		for (k=0; k<m_iPoints-1; k++)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
 								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
@@ -601,14 +633,14 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados){
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
-			for (int j=0; j<LinkSpline.m_iRes-1;j++){
+			for (j=0; j<LinkSpline.m_iRes-1;j++){
 				pFoil->x[pFoil->n] = LinkSpline.m_Output[j].x;
 				pFoil->y[pFoil->n] = LinkSpline.m_Output[j].y;
 				pFoil->n++;
 			}
 		}
-		pFoil->x[pFoil->n] = 1.0f;
-		pFoil->y[pFoil->n] = 0.0f;	
+		pFoil->x[pFoil->n] = 1.0;
+		pFoil->y[pFoil->n] = 0.0;	
 		pFoil->n++;
 	}
 }
@@ -616,10 +648,11 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados){
 
 bool CPF::LoadFile(CStdioFile *pFile)
 {
+	int k;
 	CString strIn;
 	m_bModified = false;
-	m_Extrados.m_iPoints = -1;
-	m_Intrados.m_iPoints = -1;
+	m_Extrados.m_iPoints = 0;
+	m_Intrados.m_iPoints = 0;
 
 	// read FoilColor
 	pFile->ReadString(strIn);
@@ -629,7 +662,7 @@ bool CPF::LoadFile(CStdioFile *pFile)
 	pFile->ReadString(strIn);
 	sscanf(strIn, "%d", &m_Extrados.m_iPoints);
 	// then extrados coords
-	for (int k=0; k<=m_Extrados.m_iPoints;k++){
+	for (k=0; k<m_Extrados.m_iPoints;k++){
 		pFile->ReadString(strIn);
 		sscanf(strIn,"%lf%lf", &m_Extrados.m_ctrlPoint[k].x, &m_Extrados.m_ctrlPoint[k].y);
 	}
@@ -637,7 +670,7 @@ bool CPF::LoadFile(CStdioFile *pFile)
 	pFile->ReadString(strIn);
 	sscanf(strIn, "%d", &m_Intrados.m_iPoints);
 	// then intrados coords
-	for (k=0; k<=m_Intrados.m_iPoints;k++){
+	for (k=0; k<m_Intrados.m_iPoints;k++){
 		pFile->ReadString(strIn);
 		sscanf(strIn,"%lf%lf", &m_Intrados.m_ctrlPoint[k].x, &m_Intrados.m_ctrlPoint[k].y);
 	}
@@ -654,6 +687,7 @@ bool CPF::LoadFile(CStdioFile *pFile)
 
 bool CPF::SaveFile(CStdioFile *pFile)
 {
+	int k;
 	CString strong;
 	// FoilName
 	strong = m_strFoilName + "\n";
@@ -667,7 +701,7 @@ bool CPF::SaveFile(CStdioFile *pFile)
 	strong.Format("%d\n", m_Extrados.m_iPoints);
 	pFile->WriteString(strong);
 	// then extrados coords
-	for (int k=0; k<=m_Extrados.m_iPoints;k++){
+	for (k=0; k<m_Extrados.m_iPoints;k++){
 		strong.Format(" %f  %f\n", 
 			m_Extrados.m_ctrlPoint[k].x, m_Extrados.m_ctrlPoint[k].y);
 		pFile->WriteString(strong);
@@ -678,7 +712,7 @@ bool CPF::SaveFile(CStdioFile *pFile)
 	pFile->WriteString(strong);
 
 	// then extrados coords
-	for (k=0; k<=m_Intrados.m_iPoints;k++){
+	for (k=0; k<m_Intrados.m_iPoints;k++){
 		strong.Format(" %f  %f\n", 
 			m_Intrados.m_ctrlPoint[k].x, m_Intrados.m_ctrlPoint[k].y);
 		pFile->WriteString(strong);
@@ -703,22 +737,25 @@ bool CPF::Serialize(CArchive &ar)
 		float f;
 		int ArchiveFormat,k ;
 		ar >> ArchiveFormat;
-		if(ArchiveFormat  != 100305) 
-			return false;
+		if(ArchiveFormat<100000 || ArchiveFormat>100500 ) return false;
 		ar >> m_strFoilName; m_strFoilName = "Splined Points Foil";
 		ar >> m_FoilColor >> m_FoilStyle >> m_FoilWidth;
+
 		ar >> m_Extrados.m_iPoints;
-		for (k=0; k<=m_Extrados.m_iPoints;k++){
+		for (k=0; k<m_Extrados.m_iPoints;k++)
+		{
 			ar >> f; m_Extrados.m_ctrlPoint[k].x =f;
 			ar >> f; m_Extrados.m_ctrlPoint[k].y =f;
 		}
+		if(ArchiveFormat<100306) {ar >>f; ar >>f; m_Extrados.m_iPoints++;}
 
-		// number of points on intrados (minus 1, C++ convention ?)
 		ar >> m_Intrados.m_iPoints;
-		for (k=0; k<=m_Intrados.m_iPoints;k++){
+		for (k=0; k<m_Intrados.m_iPoints;k++)
+		{
 			ar >> f; m_Intrados.m_ctrlPoint[k].x =f;
 			ar >> f; m_Intrados.m_ctrlPoint[k].y =f;
 		}
+		if(ArchiveFormat<100306) {ar >>f; ar >>f; m_Intrados.m_iPoints++;}
 
 		ar >> f; m_Extrados.m_RearPoint.x =f;
 		ar >> f; m_Extrados.m_RearPoint.y =f;
@@ -752,17 +789,17 @@ bool CPF::Serialize(CArchive &ar)
 		return true;
 	}
 	else{
-		ar << 100305;
+		ar << 100306;
 		ar << m_strFoilName;
 		ar << m_FoilColor << m_FoilStyle << m_FoilWidth;
 		ar << m_Extrados.m_iPoints;
-		for (int k=0; k<=m_Extrados.m_iPoints;k++){
+		for (int k=0; k<m_Extrados.m_iPoints;k++){
 			ar << (float)m_Extrados.m_ctrlPoint[k].x << (float)m_Extrados.m_ctrlPoint[k].y;
 		}
 
 		// number of points on intrados (minus 1, C++ convention ?)
 		ar << m_Intrados.m_iPoints;
-		for (k=0; k<=m_Intrados.m_iPoints;k++){
+		for (k=0; k<m_Intrados.m_iPoints;k++){
 			ar << (float)m_Intrados.m_ctrlPoint[k].x << (float)m_Intrados.m_ctrlPoint[k].y;
 		}
 

@@ -54,8 +54,8 @@ bool CSF::InitSplineFoil()
 	m_bModified   = false;
 	m_strFoilName = "Spline Foil";
 
-	m_Extrados.m_iCtrlPoints = -1;
-	m_Extrados.m_iRes = 40;
+	m_Extrados.m_iCtrlPoints = 0;
+	m_Extrados.m_iRes = 30;
 	m_Extrados.InsertPoint(0.f , 0.f);
 	m_Extrados.InsertPoint(0.f , 0.00774066f);
 	m_Extrados.InsertPoint(0.0306026f, 0.0343829f);
@@ -66,8 +66,8 @@ bool CSF::InitSplineFoil()
 	m_Extrados.SplineKnots();
 	m_Extrados.SplineCurve();
 
-	m_Intrados.m_iCtrlPoints = -1;
-	m_Intrados.m_iRes = 40;
+	m_Intrados.m_iCtrlPoints = 0;
+	m_Intrados.m_iRes = 30;
 	m_Intrados.InsertPoint(0.f , 0.f);
 	m_Intrados.InsertPoint(0.f , -0.00774066f);
 	m_Intrados.InsertPoint(0.0306026f, -0.0343829f);
@@ -104,11 +104,11 @@ bool CSF::CompMidLine()
 		yin = m_Intrados.GetY(x);
 		m_rpMid[k].x = x;
 		m_rpMid[k].y = (yex+yin)/2.0;
-		if(fabs(yex-yin)>m_fThickness){
-			m_fThickness = (double)fabs(yex-yin);
+		if(abs(yex-yin)>m_fThickness){
+			m_fThickness = abs(yex-yin);
 			m_fxThickMax = x;
 		}
-		if(fabs(m_rpMid[k].y)>fabs(m_fCamber)){
+		if(abs(m_rpMid[k].y)>abs(m_fCamber)){
 			m_fCamber = m_rpMid[k].y;
 			m_fxCambMax = x;
 		}	
@@ -127,13 +127,15 @@ void CSF::DrawFoil(CDC *pDC, double scalex, double scaley, CPoint Offset, bool I
 
 void CSF::DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
+	int k;
 	if (IsPrinting){
 		scaley=-scaley;
 	}
 
 	pDC->MoveTo((int)( m_rpMid[0].x*scalex)  +Offset.x,
 				(int)(-m_rpMid[0].y*scaley)  +Offset.y);
-	for (int k=1; k<=100; k++){
+	for (k=1; k<=100; k++)
+	{
 		pDC->LineTo((int)( m_rpMid[k*10].x*scalex)+Offset.x,
 					(int)(-m_rpMid[k*10].y*scaley)+Offset.y);
 	}
@@ -143,11 +145,11 @@ void CSF::DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, boo
 void CSF::Update(bool bExtrados)
 {
 	if(bExtrados){
-		m_Extrados.SplineKnots();
+//		m_Extrados.SplineKnots();
 		m_Extrados.SplineCurve();
 	}
 	else{
-		m_Intrados.SplineKnots();
+//		m_Intrados.SplineKnots();
 		m_Intrados.SplineCurve();
 	}
 	CompMidLine();
@@ -198,10 +200,12 @@ void CSF::Copy(CSF* pSF)
 
 bool CSF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	for (int i=0; i<=m_Extrados.m_iCtrlPoints;i++){
+	for (int i=0; i<m_Extrados.m_iCtrlPoints;i++)
+	{
 		m_Extrados.DrawControlPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
-	for (i=0; i<=m_Intrados.m_iCtrlPoints;i++){
+	for (i=0; i<m_Intrados.m_iCtrlPoints;i++)
+	{
 		m_Intrados.DrawControlPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
 	return true;
@@ -211,16 +215,20 @@ bool CSF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, 
 
 void CSF::UpdateSelected(double x, double y)
 {
-	for (int i=0; i<=m_Extrados.m_iCtrlPoints;i++){
-		if (m_Extrados.m_iSelect == i){
+	for (int i=0; i<m_Extrados.m_iCtrlPoints;i++)
+	{
+		if (m_Extrados.m_iSelect == i)
+		{
 			m_Extrados.m_Input[i].x = x;
 			m_Extrados.m_Input[i].y = y;
 			Update(true);
 			return;
 		}
 	}
-	for (i=0; i<=m_Intrados.m_iCtrlPoints;i++){
-		if (m_Intrados.m_iSelect == i){
+	for (i=0; i<m_Intrados.m_iCtrlPoints;i++)
+	{
+		if (m_Intrados.m_iSelect == i)
+		{
 			m_Intrados.m_Input[i].x = x;
 			m_Intrados.m_Input[i].y = y;
 			Update(false);
@@ -231,10 +239,12 @@ void CSF::UpdateSelected(double x, double y)
 
 void CSF::DrawOutPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	for (int i=0; i<m_Extrados.m_iRes;i++){
+	for (int i=0; i<m_Extrados.m_iRes;i++)
+	{
 		m_Extrados.DrawOutputPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
-	for (i=0; i<m_Intrados.m_iRes;i++){
+	for (i=0; i<m_Intrados.m_iRes;i++)
+	{
 		m_Intrados.DrawOutputPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
 	return;
@@ -263,7 +273,8 @@ bool CSF::LoadFile(CStdioFile *pFile)
 	pFile->ReadString(strIn);
 	sscanf(strIn, "%d", &m_Extrados.m_iDegree);
 	// then extrados coords
-	for (int k=0; k<=m_Extrados.m_iCtrlPoints;k++){
+	for (int k=0; k<m_Extrados.m_iCtrlPoints;k++)
+	{
 		pFile->ReadString(strIn);
 		sscanf(strIn,"%lf%lf", &m_Extrados.m_Input[k].x, &m_Extrados.m_Input[k].y);
 	}
@@ -274,7 +285,8 @@ bool CSF::LoadFile(CStdioFile *pFile)
 	pFile->ReadString(strIn);
 	sscanf(strIn, "%d", &m_Intrados.m_iDegree);
 	// then intrados coords
-	for (k=0; k<=m_Intrados.m_iCtrlPoints;k++){
+	for (k=0; k<m_Intrados.m_iCtrlPoints;k++)
+	{
 		pFile->ReadString(strIn);
 		sscanf(strIn,"%lf%lf", &m_Intrados.m_Input[k].x, &m_Intrados.m_Input[k].y);
 	}
@@ -316,7 +328,8 @@ bool CSF::SaveFile(CStdioFile *pFile)
 	strong.Format("%d\n", m_Extrados.m_iDegree);
 	pFile->Write(strong, strong.GetLength());
 	// then extrados coords
-	for (int k=0; k<=m_Extrados.m_iCtrlPoints;k++){
+	for (int k=0; k<m_Extrados.m_iCtrlPoints;k++)
+	{
 		strong.Format(" %f  %f\n", 
 			m_Extrados.m_Input[k].x, m_Extrados.m_Input[k].y);
 		pFile->Write(strong, strong.GetLength());
@@ -329,7 +342,8 @@ bool CSF::SaveFile(CStdioFile *pFile)
 	strong.Format("%d\n", m_Intrados.m_iDegree);
 	pFile->Write(strong, strong.GetLength());
 	// then extrados coords
-	for (k=0; k<=m_Intrados.m_iCtrlPoints;k++){
+	for (k=0; k<m_Intrados.m_iCtrlPoints;k++)
+	{
 		strong.Format(" %f  %f\n", 
 			m_Intrados.m_Input[k].x, m_Intrados.m_Input[k].y);
 		pFile->Write(strong, strong.GetLength());
@@ -347,42 +361,54 @@ bool CSF::SaveFile(CStdioFile *pFile)
 }
 
 
-void CSF::SetViewRect(CRect rc){
+void CSF::SetViewRect(CRect rc)
+{
 	m_Intrados.m_rViewRect = rc;
 	m_Extrados.m_rViewRect = rc;
 }
 
 
-
-
 bool CSF::Serialize(CArchive &ar)
 {
-	if(ar.IsLoading()){
-		float f;
+	float f;
 		int ArchiveFormat,k ;
+
+	if(ar.IsLoading())
+	{
 		ar >> ArchiveFormat;
-		if(ArchiveFormat != 100305) 
-			return false;
+		if(ArchiveFormat < 100000 || ArchiveFormat > 110000) return false;
 		ar >> m_strFoilName; m_strFoilName = "Spline Foil";
 		ar >> m_FoilColor >> m_FoilStyle >> m_FoilWidth;
 
 		ar >> m_Extrados.m_iCtrlPoints;
 		ar >> m_Extrados.m_iDegree;
-		for (k=0; k<=m_Extrados.m_iCtrlPoints;k++){
+		for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
+		{
+			ar >> f; m_Extrados.m_Input[k].x =f;
+			ar >> f; m_Extrados.m_Input[k].y =f;
+		}
+		if(ArchiveFormat<100306) 
+		{
 			ar >> f; m_Extrados.m_Input[k].x =f;
 			ar >> f; m_Extrados.m_Input[k].y =f;
 		}
 
 		ar >> m_Intrados.m_iCtrlPoints;
 		ar >> m_Intrados.m_iDegree;
-		for (k=0; k<=m_Intrados.m_iCtrlPoints;k++){
+		for (k=0; k<m_Intrados.m_iCtrlPoints;k++)
+		{
 			ar >> f; m_Intrados.m_Input[k].x =f;
 			ar >> f; m_Intrados.m_Input[k].y =f;
 		}
-
+		if(ArchiveFormat<100306) 
+		{
+			ar >> f; m_Extrados.m_Input[k].x =f;
+			ar >> f; m_Extrados.m_Input[k].y =f;
+		}
 		ar >> m_Extrados.m_iRes >> m_Intrados.m_iRes;
 		ar >> k;
-		if(k !=0 && k !=1){
+		if(k !=0 && k !=1)
+		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 			throw pfe;
 		}
@@ -402,25 +428,32 @@ bool CSF::Serialize(CArchive &ar)
 		}
 		if(k) m_bCenterLine = true; else m_bCenterLine = false;
 
+		m_Extrados.SplineKnots();
+		m_Intrados.SplineKnots();
 		Update(true);
 		Update(false);
 		m_bModified = false;
 		return true;
 	}
-	else{
-		ar << 100305;
+	else
+	{
+		ar << 100306;
+		// 100306 : changed to C convention	the number of control points
+
 		ar << m_strFoilName;
 		ar << m_FoilColor << m_FoilStyle << m_FoilWidth;
 
 		ar << m_Extrados.m_iCtrlPoints;
 		ar << m_Extrados.m_iDegree;
-		for (int k=0; k<=m_Extrados.m_iCtrlPoints;k++){
+		for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
+		{
 			ar << (float)m_Extrados.m_Input[k].x << (float)m_Extrados.m_Input[k].y;
 		}
 
 		ar << m_Intrados.m_iCtrlPoints;
 		ar << m_Intrados.m_iDegree;
-		for (k=0; k<=m_Intrados.m_iCtrlPoints;k++){
+		for (k=0; k<m_Intrados.m_iCtrlPoints;k++)
+		{
 			ar << (float)m_Intrados.m_Input[k].x << (float)m_Intrados.m_Input[k].y;
 		}
 
