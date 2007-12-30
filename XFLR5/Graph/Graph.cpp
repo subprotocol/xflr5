@@ -1303,13 +1303,16 @@ void CCurve::SetTitle(LPCTSTR Title){
 	m_strName = Title;
 }
 
-void CCurve::SetColor(COLORREF clr){
+void CCurve::SetColor(COLORREF clr)
+{
 	CurveColor = clr;
 }
-void CCurve::SetStyle(int nStyle){
+void CCurve::SetStyle(int nStyle)
+{
 	CurveStyle = nStyle;
 }
-void CCurve::SetWidth(int nWidth){
+void CCurve::SetWidth(int nWidth)
+{
 	CurveWidth = nWidth;
 }
 
@@ -1810,12 +1813,12 @@ bool Graph::SerializeLogFont(CArchive &ar, LOGFONT *plgft){
 
 double Graph::ClientTox(int x)
 {
-	return (x-m_offset.x)*m_scalex;
+	return ((double)x-(double)m_offset.x)*m_scalex;
 }
 
 double Graph::ClientToy(int y)
 {
-	return (y-m_offset.y)*m_scaley;
+	return ((double)y-(double)m_offset.y)*m_scaley;
 }
 
 int Graph::xToClient(double x)
