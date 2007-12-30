@@ -37,9 +37,8 @@
 #include "../misc/SaveOptionsDlg.h"
 #include "../misc/UnitsDlg.h"
 #include "../Miarex/POpp.h"
-#include "../Miarex/CpScaleDlg.h"
 #include ".\MainFrm.h"
-
+#include "../misc/MessageDlg.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
@@ -52,7 +51,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_COPYDATA()
 	ON_WM_CONTEXTMENU()
 	ON_WM_CLOSE()
-	ON_WM_SHOWWINDOW()
 	ON_WM_ERASEBKGND()
 	ON_COMMAND(IDM_XFLR5, OnXDirect)
 	ON_COMMAND(IDM_TOOLBARS, OnToolbars)
@@ -73,7 +71,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_GUIDELINES, OnGuidelines)
 	ON_COMMAND(IDM_LOGFILE, OnLogFile)
 	ON_COMMAND(IDM_SAVEOPTIONS, OnSaveOptions)
-	ON_COMMAND(IDM_CPLEGEND, OnCpLegend)
 	ON_COMMAND(IDM_FOILDIRECTDESIGN, OnFoilDirectDesign)
 	ON_CBN_SELCHANGE(IDC_CBWING, OnSelChangeWing)
 	ON_CBN_SELCHANGE(IDC_CBWPLR, OnSelChangeWPlr)
@@ -96,6 +93,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_3DSURFACES, On3DSurfaces)
 	ON_UPDATE_COMMAND_UI(IDC_CL, OnMiarexW3DOppVLM)
 	ON_UPDATE_COMMAND_UI(IDC_STREAM, OnStreamLines)
+	ON_UPDATE_COMMAND_UI(IDC_SURFSPEED, OnStreamLines)
 	ON_UPDATE_COMMAND_UI(ID_INDPROJECT, OnIndicatorProject)
 	ON_UPDATE_COMMAND_UI(IDC_AMIN, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWLIFT, OnWOpp)
@@ -103,7 +101,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWICD, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWVCD, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_3DAXES, On3DAxes)
-	ON_UPDATE_COMMAND_UI(IDC_MFC, OnMFC)
 	ON_UPDATE_COMMAND_UI(IDC_RENAME, OnAFoilCtrl)
 	ON_UPDATE_COMMAND_UI(IDC_DELETE, OnAFoilCtrl)
 	ON_UPDATE_COMMAND_UI(IDC_DUPLICATE, OnAFoilCtrl)
@@ -142,9 +139,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_WSEQUENCE, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_APPLYSPLINE, OnSpecInv)
 	ON_UPDATE_COMMAND_UI(IDC_EXEC, OnSpecInv)
-	ON_UPDATE_COMMAND_UI(IDC_SHOWREFCURVES, OnSpecInv)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWSPLINE, OnSpecInv)
 	ON_UPDATE_COMMAND_UI(IDC_NEWSPLINE, OnSpecInv)
+	ON_UPDATE_COMMAND_UI(IDC_TANGENTSPLINE, OnSpecInv)
 	ON_UPDATE_COMMAND_UI(IDC_SMOOTH, OnSpecInv)
 	ON_UPDATE_COMMAND_UI(IDC_CPXX, OnSpecMInv)
 	ON_UPDATE_COMMAND_UI(IDC_INVITER, OnSpecMInv)
@@ -156,6 +153,12 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_TGAPDX, OnSpecFInv)
 	ON_UPDATE_COMMAND_UI(IDC_TGAPDY, OnSpecFInv)
 	ON_UPDATE_COMMAND_UI(IDC_SYMM, OnSpecFInv)
+	ON_UPDATE_COMMAND_UI(IDC_SPANSLIDE, OnSpanPos)
+	ON_UPDATE_COMMAND_UI(IDC_SPANPOS, OnSpanPos)
+	ON_UPDATE_COMMAND_UI(IDC_RESETCURVES, OnSpanPos)
+	ON_UPDATE_COMMAND_UI(IDC_KEEPCURVE, OnSpanPos)
+	ON_UPDATE_COMMAND_UI(IDC_BODYCOLOR, OnBodyCtrl)
+	ON_UPDATE_COMMAND_UI(IDC_BODYLIST, OnBodyCtrl)
 	ON_COMMAND(IDM_RECENTFILE1, OnRecentFile1)
 	ON_COMMAND(IDM_RECENTFILE2, OnRecentFile2)
 	ON_COMMAND(IDM_RECENTFILE3, OnRecentFile3)
@@ -187,27 +190,31 @@ static UINT indicators[] = // the extra indicator does not work on some PCs
 // CMainFrame construction/destruction
 
 
-
-
 CMainFrame::CMainFrame()
 {
 	pi = 3.141592654;
 	m_bSaved   = true;
+	WINDOWPLACEMENT wndpl;
 	
 	m_wndView.m_pFrameWnd = this;
+	wndpl.rcNormalPosition.left = 0; wndpl.rcNormalPosition.top = 0;
+	wndpl.rcNormalPosition.right = 800;
+	wndpl.rcNormalPosition.bottom = 768; 
+	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v3.21e";
+	m_VersionName = "XFLR5_v4.00";
 	m_ProjectName = "";
 
-	XDirect.m_pFrame     = this;
-	XDirect.m_poaFoil    = &m_oaFoil;
-	XDirect.m_poaPolar   = &m_oaPolar;
-	XDirect.m_poaOpp     = &m_oaOpp;
-	XDirect.m_pXFoil     = &m_XFoil;
+	XDirect.m_pFrame    = this;
+	XDirect.m_poaFoil   = &m_oaFoil;
+	XDirect.m_poaPolar  = &m_oaPolar;
+	XDirect.m_poaOpp    = &m_oaOpp;
+	XDirect.m_pXFoil    = &m_XFoil;
 	
 	Miarex.m_pFrame     = this;
 	Miarex.m_poaFoil    = &m_oaFoil;
 	Miarex.m_poaPolar   = &m_oaPolar;
+	Miarex.m_poaBody    = &m_oaBody;
 	Miarex.m_poaWing    = &m_oaWing;
 	Miarex.m_poaPlane   = &m_oaPlane;
 	Miarex.m_poaWPolar  = &m_oaWPolar;
@@ -217,7 +224,6 @@ CMainFrame::CMainFrame()
 	Miarex.m_FlowLinesDlg.m_pMiarex   = &Miarex;
 	Miarex.m_FlowLinesDlg.m_pChildWnd = &m_wndView;
 	Miarex.m_FlowLinesDlg.m_pFrame    = this;
-
 	Miarex.m_VLMDlg.m_pFrame    = this;
 	Miarex.m_VLMDlg.m_pMiarex   = &Miarex;
 
@@ -227,36 +233,27 @@ CMainFrame::CMainFrame()
 	AFoil.m_pXFoil  = &m_XFoil;
 
 	XInverse.m_pFrame =this;
+	m_FInvCtrlBar.m_pXInverse = &XInverse;
+	m_MInvCtrlBar.m_pXInverse = &XInverse;
+
+	CPlane::s_poaWing = &m_oaWing;
+	CPlane::s_poaBody  = &m_oaBody;
+
+	CBody::s_pMainFrame = this;
+
+	CWing::s_pFrame      =  this;		//pointer to the Frame window
+	CWing::s_pMiarex     = &Miarex;	//pointer to the Miarex Application window
 
 	m_pCurFoil = NULL;
 
-	m_W3DBar.m_pParent = &Miarex;
-	m_b3DVLMCl       = false;
-	m_b3DDownwash    = true;
-	m_b3DBar         = true;
-	m_bXTop          = true;
-	m_bXBot          = true;
-	m_bXCP           = true;
-	m_bMoments       = true;
-	m_bICd           = true;
-	m_bVCd           = true;
-	m_bStream        = false;
-	m_bVortices      = false;
-	m_bFlow          = false;
-	m_bXCmRef        = true;
-	m_bSaveOpps      = false;
-	m_bSaveWOpps     = true;
-	m_bAutoCpScale   = true;
-	m_bShowCpScale   = true;
-
-	m_GLScale = 0.01;
+	m_W3DBar.m_pFrame = this;
+	m_bSaveOpps       = false;
+	m_bSaveWOpps      = true;
 
 	m_LiftScale     = 0.7;
 	m_DragScale     = 0.7;
 	m_DownwashScale = 0.7;
 
-	m_LegendMax = -10000.0;
-	m_LegendMin =  10000.0;
 
 // second line
 	m_crColors[0] = RGB(255,0,0),
@@ -456,27 +453,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	Trace("CMainFrame::OnCreate Indicators are set");
 
-/*	UINT identity, style;
-	int w;
-	CString strong;
-	m_wndStatusBar.GetPaneInfo(0,identity, style, w);
-	strong.Format("%d   %d   %d   %d", 0, identity, style, w);
-	Trace(strong);
-	m_wndStatusBar.GetPaneInfo(1,identity, style, w);
-	strong.Format("%d   %d   %d   %d", 1, identity, style, w);
-	Trace(strong);
-	m_wndStatusBar.GetPaneInfo(2,identity, style, w);
-	strong.Format("%d   %d   %d   %d", 2, identity, style, w);
-	Trace(strong);
-	m_wndStatusBar.GetPaneInfo(3,identity, style, w);
-	strong.Format("%d   %d   %d   %d", 3, identity, style, w);
-	Trace(strong);
-	m_wndStatusBar.GetPaneInfo(4,identity, style, w);
-	strong.Format("%d   %d   %d   %d", 4, identity, style, w);
-	Trace(strong);*/
-	//Trace("CMainFrame::OnCreate - created status bar");
-	Trace("CMainFrame::OnCreate - creating control bars");
-
 	CreateAFoilBar();
 	//Trace("CMainFrame::OnCreate - created AFoil Bar");
 	CreateXInverseBar();
@@ -539,7 +515,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_WOperDlgBar.m_pMiarex = &Miarex;
 	//Trace("CMainFrame::OnCreate - created m_WOperDlgBar Bar");
 
-	m_W3DBar.m_pParent = this;
+	m_W3DBar.m_pFrame = this;
 	m_W3DBar.m_pMiarex = &Miarex;
 	if (!m_W3DBar.Create(this, IDD_W3DBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
 	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_W3DBAR))
@@ -552,9 +528,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//Trace("CMainFrame::OnCreate - created W3DBar Bar");
 
-	m_ScaleOppBar.m_pParent = this;
+	m_ScaleOppBar.m_pFrame = this;
 	m_ScaleOppBar.m_pChildView = &m_wndView;
-//	m_ScaleOppBar.m_pMiarex = &Miarex;
 	if (!m_ScaleOppBar.Create(this, IDD_SCALEOPPBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
 	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_SCALEOPPBAR))
 	{
@@ -564,7 +539,35 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	m_ScaleOppBar.SetWindowText("Scale controls");
 
-	Trace("CMainFrame::OnCreate - created W3DBar Bar");
+	m_SpanPosBar.m_pFrame = this;
+	m_SpanPosBar.m_pMiarex = &Miarex;
+	m_SpanPosBar.m_pChildView = &m_wndView;
+	if (!m_SpanPosBar.Create(this, IDD_SPANPOSBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
+	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_SPANPOSBAR))
+	{
+		//Trace("Failed to create W3DBar\n");
+		return -1;
+		// fail to create
+	}
+	m_SpanPosBar.SetWindowText("Span Position");
+
+	Trace("CMainFrame::OnCreate - created Span Position Bar");
+
+	m_BodyCtrlBar.m_pMainFrame = this;
+	m_BodyCtrlBar.m_pMiarex    = &Miarex;
+	m_BodyCtrlBar.m_pChildView = &m_wndView;
+	m_BodyCtrlBar.m_poaBody    = &m_oaBody;
+	m_BodyCtrlBar.m_ppCurBody  = &Miarex.m_pCurBody;
+	Miarex.m_pBodyCtrlBar = &m_BodyCtrlBar;
+	if (!m_BodyCtrlBar.Create(this, IDD_BODYCTRLBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
+	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_BODYCTRLBAR))
+	{
+		//Trace("Failed to create W3DBar\n");
+		return -1;
+		// fail to create
+	}
+	m_BodyCtrlBar.SetWindowText("Body control Bar");
+
 
 	if (!m_MInvCtrlBar.Create(this, IDD_MINVCTRLBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
 	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_MINVCTRLBAR))
@@ -577,7 +580,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//Trace("CMainFrame::OnCreate - created MInvCtrlBar Bar");
 
 	m_MInvCtrlBar.SetWindowText("Mixed inverse controls");
-	m_MInvCtrlBar.m_pParent = &XInverse;
 
 	if (!m_FInvCtrlBar.Create(this, IDD_FINVCTRLBAR,	WS_CHILD | WS_VISIBLE | CBRS_BOTTOM
 	| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC , IDD_FINVCTRLBAR))
@@ -587,15 +589,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// fail to create
 	}
 	m_FInvCtrlBar.SetWindowText("Full inverse controls");
-	m_FInvCtrlBar.m_pParent = &XInverse;
 	Trace("CMainFrame::OnCreate - created MInvCtrlBar Bar");
 
 	m_MiarexBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_XDirectBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_OperDlgBar.EnableDocking(CBRS_ALIGN_ANY);
+	m_BodyCtrlBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_WOperDlgBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_W3DBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_ScaleOppBar.EnableDocking(CBRS_ALIGN_ANY);
+	m_SpanPosBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_PolarDlgBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_AFoilBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_AFoilCtrlBar.EnableDocking(CBRS_ALIGN_ANY);
@@ -767,14 +770,15 @@ void CMainFrame::OnXDirect()
 }
 
 
-
 void CMainFrame::OnMiarex() 
 {
-	if(m_iApp == MIAREX) {
-//		UpdateUFOs();
+	if(m_iApp == MIAREX) 
+	{
 		Miarex.UpdateView();
 		return;
 	}
+
+	CPoint pt(500,100);
 
 	XDirect.m_bAnimate  = false;
 
@@ -788,45 +792,37 @@ void CMainFrame::OnMiarex()
 
 	m_MiarexBar.ShowWindow(SW_SHOW);
 	DockControlBar(&m_MiarexBar);
+
 	m_WOperDlgBar.ShowWindow(SW_SHOW);
 	DockControlBar(&m_WOperDlgBar,AFX_IDW_DOCKBAR_RIGHT);
 
-	CRect rectBar;
-	CRect rectBar1, rectBar2;	
-	RecalcLayout();	
+	if(Miarex.m_iView ==5)
+	{
+		m_BodyCtrlBar.ShowWindow(SW_SHOW);
+		DockControlBar(&m_BodyCtrlBar,AFX_IDW_DOCKBAR_BOTTOM);
+	}
 
-	m_WOperDlgBar.GetWindowRect(rectBar);
-	if(Miarex.m_iView !=3) m_PolarDlgBar.GetWindowRect(rectBar1);
-	else{
-		m_W3DBar.GetWindowRect(rectBar1);
-		m_ScaleOppBar.GetWindowRect(rectBar2);
-	}
-	int h = rectBar1.Height();
-	rectBar1.left   = rectBar.left;
-	rectBar1.top    = rectBar.bottom+1;
-	rectBar1.right  = rectBar.right ;
-	rectBar2.left   = rectBar.left;
-	rectBar2.top    = rectBar1.top+h+1;
-	rectBar2.right  = rectBar.right ;
-	if(Miarex.m_iView !=3){
-		DockControlBar(&m_PolarDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar1);   //will be second
-		m_PolarDlgBar.ShowWindow(SW_SHOW);
-	}
-	else{
-		DockControlBar(&m_W3DBar, AFX_IDW_DOCKBAR_RIGHT, rectBar1);   //will be second
-		m_W3DBar.ShowWindow(SW_SHOW);
-		DockControlBar(&m_ScaleOppBar, AFX_IDW_DOCKBAR_RIGHT, rectBar2);   //will be third
-		m_ScaleOppBar.ShowWindow(SW_SHOW);
-	}
-	m_wndView.SetScale();
+	DockMiarexBars();
+
 	SetMenu(&m_MiarexMenu);
 	SetRecentFileMenu();
 
 	Miarex.SetParams();
 	UpdateUFOs();
+	Miarex.SetUFO();
+
+	m_wndView.SetScale();
+
 	if(Miarex.m_pCurWing && Miarex.m_iView==1) Miarex.OnAdjustToWing();
 	else if (Miarex.m_iView==2)                Miarex.CreateWPolarCurves();
-	
+	else if (Miarex.m_iView==5)
+	{
+		m_BodyCtrlBar.UpdateBodies();
+		Miarex.SetBody();
+		Miarex.m_bIs3DScaleSet = false;
+		Miarex.SetBodyScale();
+	}
+
 	Miarex.UpdateView();
 	m_wndView.SetFocus();
 }
@@ -842,11 +838,9 @@ void CMainFrame::OnFoilDirectDesign()
 	HideBars();
 
 	m_iApp = DIRECTDESIGN;
-//
 
 	m_AFoilBar.ShowWindow(SW_SHOW);
 	DockControlBar(&m_AFoilBar, AFX_IDW_DOCKBAR_TOP);
-
 
 	CRect ViewRect;
 	m_wndView.GetWindowRect(ViewRect);
@@ -867,19 +861,28 @@ void CMainFrame::OnFoilDirectDesign()
 	AFoil.UpdateView();
 }
 
-void CMainFrame::DockW3DBar() 
+void CMainFrame::DockMiarexBars() 
 {
-	CPoint pt(500,100);
+	CPoint pt(500,5);
+	CRect CltRect, rectBar, rectBar1, rectBar2;;
+	GetClientRect(&CltRect);
+	
+	RecalcLayout();
 
-	CRect rectBar;
-	CRect rectBar1, rectBar2;	
-	RecalcLayout();	
-	if(m_iApp==MIAREX){
+	if(m_iApp==MIAREX)
+	{
 		m_WOperDlgBar.GetWindowRect(rectBar);
-		if(Miarex.m_iView !=3) m_PolarDlgBar.GetWindowRect(rectBar1);
-		else{
+		
+		if(Miarex.m_iView ==1 || Miarex.m_iView ==2) m_PolarDlgBar.GetWindowRect(rectBar1);
+		else if(Miarex.m_iView ==3)
+		{
 			m_W3DBar.GetWindowRect(rectBar1);
 			m_ScaleOppBar.GetWindowRect(rectBar2);
+		}
+		else if(Miarex.m_iView ==4)
+		{
+			m_PolarDlgBar.GetWindowRect(rectBar1);
+			m_SpanPosBar.GetWindowRect(rectBar2);
 		}
 		int h = rectBar1.Height();
 		rectBar1.left   = rectBar.left;
@@ -888,27 +891,90 @@ void CMainFrame::DockW3DBar()
 		rectBar2.left   = rectBar.left;
 		rectBar2.top    = rectBar1.top+h+1;
 		rectBar2.right  = rectBar.right ;
-		if(Miarex.m_iView!=3){
+
+		if(Miarex.m_iView==1 || Miarex.m_iView==2)
+		{
+			DockControlBar(&m_WOperDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar);
+			m_WOperDlgBar.ShowWindow(SW_SHOW);
 			DockControlBar(&m_PolarDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar1);
 			m_PolarDlgBar.ShowWindow(SW_SHOW);
+
 			m_W3DBar.ShowWindow(SW_HIDE);
+			m_SpanPosBar.ShowWindow(SW_HIDE);
 			m_ScaleOppBar.ShowWindow(SW_HIDE);
+			m_BodyCtrlBar.ShowWindow(SW_HIDE);
 			FloatControlBar(&m_W3DBar, pt);
+			FloatControlBar(&m_SpanPosBar, pt);
 			FloatControlBar(&m_ScaleOppBar, pt);
+			FloatControlBar(&m_BodyCtrlBar, pt);
 		}
-		else{
-			m_PolarDlgBar.ShowWindow(SW_HIDE);
+		else if(Miarex.m_iView==3)
+		{
+			DockControlBar(&m_WOperDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar);
+			m_WOperDlgBar.ShowWindow(SW_SHOW);
 			DockControlBar(&m_W3DBar, AFX_IDW_DOCKBAR_RIGHT, rectBar1);
 			m_W3DBar.ShowWindow(SW_SHOW);
 			DockControlBar(&m_ScaleOppBar, AFX_IDW_DOCKBAR_RIGHT, rectBar2);
 			m_ScaleOppBar.ShowWindow(SW_SHOW);
+
+			m_PolarDlgBar.ShowWindow(SW_HIDE);
+			m_SpanPosBar.ShowWindow(SW_HIDE);
+			m_BodyCtrlBar.ShowWindow(SW_HIDE);
 			FloatControlBar(&m_PolarDlgBar, pt);
+			FloatControlBar(&m_SpanPosBar, pt);
+			FloatControlBar(&m_BodyCtrlBar, pt);
+		}
+		else if(Miarex.m_iView==4)
+		{
+			DockControlBar(&m_WOperDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar);
+			m_WOperDlgBar.ShowWindow(SW_SHOW);
+			DockControlBar(&m_PolarDlgBar, AFX_IDW_DOCKBAR_RIGHT, rectBar1);
+			m_PolarDlgBar.ShowWindow(SW_SHOW);
+			DockControlBar(&m_SpanPosBar, AFX_IDW_DOCKBAR_RIGHT, rectBar2);
+			m_SpanPosBar.ShowWindow(SW_SHOW);
+
+			m_W3DBar.ShowWindow(SW_HIDE);
+			m_ScaleOppBar.ShowWindow(SW_HIDE);
+			m_BodyCtrlBar.ShowWindow(SW_HIDE);
+			FloatControlBar(&m_W3DBar, pt);
+			FloatControlBar(&m_ScaleOppBar, pt);
+			FloatControlBar(&m_BodyCtrlBar, pt);
+		}
+		else if(Miarex.m_iView==5)
+		{
+			m_WOperDlgBar.ShowWindow(SW_HIDE);
+			m_ScaleOppBar.ShowWindow(SW_HIDE);
+			m_SpanPosBar.ShowWindow(SW_HIDE);
+			m_PolarDlgBar.ShowWindow(SW_HIDE);
+			m_W3DBar.ShowWindow(SW_HIDE);
+
+			FloatControlBar(&m_W3DBar, pt);
+			FloatControlBar(&m_SpanPosBar, pt);
+			FloatControlBar(&m_ScaleOppBar, pt);
+			FloatControlBar(&m_PolarDlgBar, pt);
+
+			
+			DockControlBar(&m_BodyCtrlBar, AFX_IDW_DOCKBAR_BOTTOM);
+			m_BodyCtrlBar.ShowWindow(SW_SHOW);
+			RecalcLayout();
+			m_BodyCtrlBar.GetWindowRect(rectBar1);
+			m_W3DBar.GetWindowRect(rectBar2);
+
+			int width  = abs(rectBar2.right - rectBar2.left);
+			int height = abs(rectBar2.bottom - rectBar2.top);
+			rectBar2.left   = rectBar1.right;
+			rectBar2.top    = rectBar1.top;
+			rectBar2.bottom = rectBar1.top+height;
+			rectBar2.right  = rectBar2.left+width;
+
+			DockControlBar(&m_W3DBar, AFX_IDW_DOCKBAR_BOTTOM, rectBar2);
+			m_W3DBar.ShowWindow(SW_SHOW);
 		}
 	}
-//	m_wndView.SetScale();
+	RecalcLayout();
+
 	m_wndView.SetFocus();
 }
-
 
 
 void CMainFrame::HideBars()
@@ -929,11 +995,17 @@ void CMainFrame::HideBars()
 	m_WOperDlgBar.ShowWindow(SW_HIDE);
 	FloatControlBar(&m_WOperDlgBar, pt);
 
+	m_BodyCtrlBar.ShowWindow(SW_HIDE);
+	FloatControlBar(&m_BodyCtrlBar, pt);
+
 	m_W3DBar.ShowWindow(SW_HIDE);
 	FloatControlBar(&m_W3DBar, pt);
 
 	m_ScaleOppBar.ShowWindow(SW_HIDE);
 	FloatControlBar(&m_ScaleOppBar, pt);
+
+	m_SpanPosBar.ShowWindow(SW_HIDE);
+	FloatControlBar(&m_SpanPosBar, pt);
 
 	m_AFoilBar.ShowWindow(SW_HIDE);
 	FloatControlBar(&m_AFoilBar, pt);
@@ -1570,7 +1642,7 @@ void CMainFrame::OnSelChangeWing()
 
 	m_iApp = MIAREX;
 	UpdateWPlrs();
-
+//	Miarex.SetWPlr();
 	Miarex.UpdateView();
 }
 
@@ -1596,7 +1668,9 @@ void CMainFrame::OnSelChangeWOpp()
 	// Gets the new selected WOpp name and notifies Miarex
 	if(!m_ctrlWOpp.GetCount()){
 		Miarex.m_pCurWOpp = NULL;
-		Miarex.CreateWOppCurves();
+		if (Miarex.m_iView==1)     Miarex.CreateWOppCurves();
+		else if(Miarex.m_iView==4) Miarex.CreateCpCurves();
+
 		Miarex.UpdateView();
 		return;
 	}
@@ -1719,31 +1793,31 @@ void CMainFrame::UpdateUFOs()
 			int pos = m_ctrlUFO.FindStringExact(-1, pCurPlane->m_PlaneName);
 			if(pos!=CB_ERR) {
 				m_ctrlUFO.SetCurSel(pos);
-				Miarex.SetUFO();
+//				Miarex.SetUFO();
 			}
 			else {// if error, select the first
 				m_ctrlUFO.SetCurSel(0);
 				m_ctrlUFO.GetLBText(0, strong);
-				Miarex.SetUFO(strong);
+//				Miarex.SetUFO(strong);
 			}		
 		}
 		else if(pCurWing){
 			int pos = m_ctrlUFO.FindStringExact(-1, pCurWing->m_WingName);
 			if(pos!=CB_ERR) {
 				m_ctrlUFO.SetCurSel(pos);
-				Miarex.SetUFO();
+//				Miarex.SetUFO();
 			}
 			else {// if error, select the first
 				m_ctrlUFO.SetCurSel(0);
 				m_ctrlUFO.GetLBText(0, strong);
-				Miarex.SetUFO(strong);
+//				Miarex.SetUFO(strong);
 			}		
 		}
 		//... else select the first
 		else {
 			m_ctrlUFO.SetCurSel(0);
 			m_ctrlUFO.GetLBText(0, strong);
-			Miarex.SetUFO(strong);
+//			Miarex.SetUFO(strong);
 		}
 	}
  	else {
@@ -1755,7 +1829,7 @@ void CMainFrame::UpdateUFOs()
 		Miarex.m_pCurWPolar = NULL;
 		Miarex.m_pCurWOpp   = NULL;
 		Miarex.m_pCurPOpp   = NULL;
-		Miarex.SetUFO();
+//		Miarex.SetUFO();
 	}
 	UpdateWPlrs();
 }
@@ -1780,7 +1854,7 @@ void CMainFrame::UpdateWPlrs()
 
 	if(!UFOName.GetLength()){
 		Miarex.m_pCurWPolar = NULL;
-		Miarex.SetWPlr();
+//		Miarex.SetWPlr();
  		m_ctrlWPlr.EnableWindow(false);
 		UpdateWOpps();
 		return;
@@ -1809,14 +1883,14 @@ void CMainFrame::UpdateWPlrs()
 			else {// if error, select the first
 				m_ctrlWPlr.SetCurSel(0);
 				m_ctrlWPlr.GetLBText(0, strong);
-				Miarex.SetWPlr(false, strong);
+//				Miarex.SetWPlr(false, strong);
 			}		
 		}
 		//... else select the first
 		else {
 			m_ctrlWPlr.SetCurSel(0);
 			m_ctrlWPlr.GetLBText(0, strong);
-			Miarex.SetWPlr(false, strong);
+//			Miarex.SetWPlr(false, strong);
 		}
 
 	}
@@ -1824,7 +1898,7 @@ void CMainFrame::UpdateWPlrs()
  		m_ctrlWPlr.EnableWindow(false);
 		Miarex.m_pCurWPolar = NULL;
 		Miarex.m_pCurWOpp = NULL;
-		Miarex.SetWPlr();
+//		Miarex.SetWPlr();
 	}
 	UpdateWOpps();
 }
@@ -1877,7 +1951,7 @@ void CMainFrame::UpdateWOpps()
  					m_ctrlWOpp.AddString(str);
  				}
  			}
-			Miarex.SetPOpp(true);
+//			Miarex.SetPOpp(true);
 			if(Miarex.m_pCurPOpp){
 				if(pCurWPlr->m_Type != 4) str.Format("%8.2f", Miarex.m_pCurPOpp->m_Alpha);
 				else                      str.Format("%8.2f", Miarex.m_pCurPOpp->m_QInf);
@@ -1898,7 +1972,7 @@ void CMainFrame::UpdateWOpps()
  		else {// otherwise disable control
  			m_ctrlWOpp.EnableWindow(false);
 			Miarex.m_pCurPOpp = NULL;
-			Miarex.SetPOpp(true);
+//			Miarex.SetPOpp(true);
 		}
 	}
 	else {
@@ -2158,6 +2232,9 @@ void CMainFrame::OnClose()
 	DeleteProject();
 
 	SaveSettings();
+
+	Miarex.m_FlowLinesDlg.ShowWindow(SW_HIDE);
+	
 	CFrameWnd::OnClose();
 }
 
@@ -2253,7 +2330,6 @@ CFoil* CMainFrame::ReadFoilFile(CString FileName, bool bKeepExistingFoil)
 					pFoil->yb[pFoil->nb-i-1] = ytmp;
 				}
 			}
-
 
 			memcpy(pFoil->x, pFoil->xb, sizeof(pFoil->xb));
 			memcpy(pFoil->y, pFoil->yb, sizeof(pFoil->yb));
@@ -3116,31 +3192,6 @@ CPolar* CMainFrame::AddPolar(CPolar *pPolar)
 
 
 
-void CMainFrame::OnShowWindow(BOOL bShow, UINT nStatus) 
-{
-	CFrameWnd::OnShowWindow(bShow, nStatus);
-	//Trace("CMainFrame::launching module application=%d", m_iApp);
-	if(!bShow) return;
-	switch(m_iApp){
-		case XFOILANALYSIS:{
-			UpdateFoils();
-			//Trace("CMainFrame::launching FOIL ANALYSIS");
-			break;
-		}
-		case DIRECTDESIGN:{
-			break;
-		}
-		case INVERSEDESIGN:{
-			break;
-		}
-		case MIAREX:{
-			UpdateUFOs();
-			//Trace("CMainFrame::launching WING DESIGN");
-			break;
-		}
-	}
-}
-
 void CMainFrame::SaveSettings()
 {
 	CFile fp;
@@ -3184,29 +3235,10 @@ void CMainFrame::SaveSettings()
 		ar << m_DownwashStyle << m_DownwashWidth << m_DownwashColor;
 		ar << m_WakeStyle << m_WakeWidth << m_WakeColor;
 		ar << m_LiftScale << m_DragScale << m_DownwashScale;
-		ar << m_LegendMin << m_LegendMax;
 
 		ar << m_RecentFile[0] << m_RecentFile[1] << m_RecentFile[2] << m_RecentFile[3] ;
 		ar << m_RecentFile[4] << m_RecentFile[5] << m_RecentFile[6] << m_RecentFile[7] ;
 		
-		if(m_bAutoCpScale)        ar <<1; else ar <<0;
-		if(m_W3DBar.m_bSurfaces)  ar << 1; else ar<<0;
-		if(m_W3DBar.m_bOutline)   ar << 1; else ar<<0;
-		if(m_W3DBar.m_bVLMPanels) ar << 1; else ar<<0;
-		if(m_W3DBar.m_bAxes)      ar << 1; else ar<<0;
-		if(m_W3DBar.m_bglLight)   ar << 1; else ar<<0;
-		if(m_bXTop)	              ar << 1; else ar<<0;
-		if(m_bXBot)               ar << 1; else ar<<0;
-		if(m_bXCP)                ar << 1; else ar<<0;
-		if(m_bMoments)            ar << 1; else ar<<0;
-		if(m_bStream)             ar << 1; else ar<<0;
-		if(m_bFlow)               ar << 1; else ar<<0;
-		if(m_bICd)                ar << 1; else ar<<0;
-		if(m_bVCd)                ar << 1; else ar<<0;
-		if(m_bXCmRef)             ar << 1; else ar<<0;
-		if(m_b3DVLMCl)            ar << 1; else ar<<0;
-		if(m_b3DDownwash)         ar << 1; else ar<<0;
-		if(m_b3DBar)              ar << 1; else ar<<0;
 		if(m_bSaveOpps)           ar << 1; else ar<<0;
 		if(m_bSaveWOpps)          ar << 1; else ar<<0;
 
@@ -3514,160 +3546,10 @@ void CMainFrame::LoadSettings()
 			m_ScaleOppBar.m_DragScale     = m_DragScale;
 			m_ScaleOppBar.m_DownwashScale = m_DownwashScale;
 
-
-			ar >> m_LegendMin >> m_LegendMax;
-
 			ar >> m_RecentFile[0] >> m_RecentFile[1] >> m_RecentFile[2] >> m_RecentFile[3] ;
 			ar >> m_RecentFile[4] >> m_RecentFile[5] >> m_RecentFile[6] >> m_RecentFile[7] ;
 
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bAutoCpScale = true; else m_bAutoCpScale = false;
-			
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_W3DBar.m_bSurfaces = true; else m_W3DBar.m_bSurfaces = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_W3DBar.m_bOutline = true; else m_W3DBar.m_bOutline = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_W3DBar.m_bVLMPanels = true; else m_W3DBar.m_bVLMPanels = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_W3DBar.m_bAxes = true; else m_W3DBar.m_bAxes = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_W3DBar.m_bglLight = true; else m_W3DBar.m_bglLight = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bXTop = true; else m_bXTop = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bXBot = true; else m_bXBot = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bXCP = true; else m_bXCP = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bMoments = true; else m_bMoments = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bStream = true; else m_bStream = false;
-			m_bStream  = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bFlow = true; else m_bFlow = false;
-			m_bFlow  = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bICd = true; else m_bICd = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bVCd = true; else m_bVCd = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_bXCmRef = true; else m_bXCmRef = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_b3DVLMCl = true; else m_b3DVLMCl = false;
-
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_b3DDownwash = true; else m_b3DDownwash = false;
-
-			ar >> k;
-			if(k<0 || k>1){
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
-			}
-			if(k) m_b3DBar = true; else m_b3DBar = false;
-
+		
 			ar >> k;
 			if(k<0 || k>1){
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
@@ -3765,14 +3647,14 @@ void CMainFrame::CreateMiarexBar()
 	CRect rect;
 	if(m_wndpl.showCmd == SW_SHOWMAXIMIZED){
 		cx = GetSystemMetrics(SM_CXSCREEN);
-		nWidth=(int)(cx/3);
 	}
 	else{
 		cx = m_wndpl.rcNormalPosition.right - m_wndpl.rcNormalPosition.left;
-		nWidth = (int)((cx-190)/3);
 	}
 
-	nWidth = (int)((cx-240-80)/2);
+	nWidth = (int)((cx-400)/2);
+	nWidth = min(nWidth,500);
+	nWidth = max(150, nWidth);
 	nHeight = 600;
 
 	m_MiarexBar.Create(this);
@@ -3827,7 +3709,9 @@ void CMainFrame::CreateXDirectBar()
 	else{
 		cx = m_wndpl.rcNormalPosition.right - m_wndpl.rcNormalPosition.left;
 	}
-	nWidth = (int)((cx-210-80)/2);
+	nWidth = (int)((cx-240-80)/2);
+	nWidth = min(nWidth,500);
+	nWidth = max(150, nWidth);
 
 	CClientDC dc(this);
 	int LogPixelsY = dc.GetDeviceCaps(LOGPIXELSY);
@@ -3986,20 +3870,20 @@ void CMainFrame::OnSpecMInv(CCmdUI* pCmdUI)
 void CMainFrame::On3D(CCmdUI* pCmdUI)
 {
 	if(m_iApp==MIAREX){
-		if(Miarex.m_iView==3) pCmdUI->Enable(true);
-		else                  pCmdUI->Enable(false);
+		if(Miarex.m_iView==3 || Miarex.m_iView==5) pCmdUI->Enable(true);
+		else                                       pCmdUI->Enable(false);
 	}
 }
 
 void CMainFrame::On3DAxes(CCmdUI* pCmdUI)
 {
-	if(m_W3DBar.m_bAxes) pCmdUI->SetCheck(true);
+	if(Miarex.m_bAxes)   pCmdUI->SetCheck(true);
 	else                 pCmdUI->SetCheck(false);
 }
 
 void CMainFrame::OnglLight(CCmdUI* pCmdUI)
 {
-	if(m_W3DBar.m_bglLight) pCmdUI->SetCheck(true);
+	if(Miarex.m_bglLight)   pCmdUI->SetCheck(true);
 	else					pCmdUI->SetCheck(false);
 }
 
@@ -4018,13 +3902,13 @@ void CMainFrame::OnHalfWing(CCmdUI* pCmdUI)
 
 void CMainFrame::On3DSurfaces(CCmdUI* pCmdUI)
 {
-	if(m_W3DBar.m_bSurfaces) pCmdUI->SetCheck(true);
+	if(Miarex.m_bSurfaces)   pCmdUI->SetCheck(true);
 	else                     pCmdUI->SetCheck(false);
 }
 
 void CMainFrame::On3DOutline(CCmdUI* pCmdUI)
 {
-	if(m_W3DBar.m_bOutline) pCmdUI->SetCheck(true);
+	if(Miarex.m_bOutline)   pCmdUI->SetCheck(true);
 	else                    pCmdUI->SetCheck(false);
 }
 
@@ -4062,8 +3946,8 @@ void CMainFrame::OnMiarexW3DOppVLM(CCmdUI* pCmdUI)
 												  pCmdUI->Enable(true);
 		else  									  pCmdUI->Enable(false);
 
-		if (Miarex.m_iView==3 && m_W3DBar.m_bSurfaces) pCmdUI->SetCheck(false);
-		else if (Miarex.m_iView==3 && m_b3DVLMCl)      pCmdUI->SetCheck(true);
+		if (Miarex.m_iView==3 && Miarex.m_bSurfaces)		pCmdUI->SetCheck(false);
+		else if (Miarex.m_iView==3 && Miarex.m_b3DVLMCl)    pCmdUI->SetCheck(true);
 	}
 	else pCmdUI->Enable(false);
 } 
@@ -4131,6 +4015,34 @@ void CMainFrame::OnAFoilCtrl(CCmdUI* pCmdUI)
 	}
 }
 //End AFoilCtrlBar controls
+
+void CMainFrame::OnSpanPos(CCmdUI* pCmdUI)
+{
+	if(m_iApp ==MIAREX && Miarex.m_pCurWOpp && Miarex.m_iView==4) {
+		pCmdUI->Enable(true);
+	}
+	else  {
+		pCmdUI->Enable(false);
+	}
+}
+
+//BodyCtrlBar controls
+
+void CMainFrame::OnBodyCtrl(CCmdUI* pCmdUI)
+{
+	if(m_iApp ==MIAREX) 
+	{
+		if(m_oaBody.GetCount()) pCmdUI->Enable(true);
+		else				   pCmdUI->Enable(false);
+	
+	}
+	else  
+		pCmdUI->Enable(false);
+	
+}
+//End BodyCtrlBar controls
+
+
 //Status Bar
 void CMainFrame::OnIndicatorProject(CCmdUI* pCmdUI)
 {
@@ -4142,7 +4054,13 @@ void CMainFrame::OnIndicatorProject(CCmdUI* pCmdUI)
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
 {
-	if (pMsg->message == WM_KEYDOWN){
+	if (pMsg->message == WM_SYSKEYDOWN && pMsg->wParam == VK_F10 )
+	{
+		if(m_iApp==MIAREX)	Miarex.OnBodyDesign();
+		return true;
+	}
+	if (pMsg->message == WM_KEYDOWN)
+	{
 		SHORT sh1 = GetKeyState(VK_LCONTROL);
 		SHORT sh2 = GetKeyState(VK_RCONTROL);
 		if (pMsg->wParam == 'W' && 
@@ -4219,9 +4137,11 @@ bool CMainFrame::ReadProject(CString FileName)
 {
 	CFile fp;
 	try{
-		if (fp.Open(FileName, CFile::modeRead)) {
+		if (fp.Open(FileName, CFile::modeRead))
+		{
 			CArchive ar(&fp, CArchive::load);
-			if(!SerializeProject(ar)) {
+			if(!SerializeProject(ar))
+			{
 				DeleteProject();
 				return false;
 			}
@@ -4310,6 +4230,96 @@ bool CMainFrame::SaveProject(CString FileName)
 		return false;
 	}
 }
+bool CMainFrame::SaveBodyProject(CBody *pBody)
+{
+	CString strong;
+	if(!pBody) 		AfxMessageBox("Nothing to save", MB_OK);
+
+	CFileException fe;
+	CFile fp;
+	CFileDialog XFileDlg(false, "wpa", strong, OFN_OVERWRITEPROMPT, _T("XFLR5 file (.wpa)|*.wpa|"));
+
+	if(IDOK==XFileDlg.DoModal()) {
+
+		BOOL bOpen = fp.Open(XFileDlg.GetFileName(),  CFile::modeCreate | CFile::modeWrite, &fe);
+		try{
+			if (bOpen) {
+				CArchive ar(&fp, CArchive::store);
+				CWaitCursor Wait;
+
+				CString strong;
+				if (ar.IsStoring())
+				{	// storing code
+					ar << 100011;					// 100011 : Added Body serialization
+					ar << m_LengthUnit;
+					ar << m_AreaUnit;
+					ar << m_WeightUnit;
+					ar << m_SpeedUnit;
+					ar << m_ForceUnit;
+					ar << m_MomentUnit;
+					ar << Miarex.m_WngAnalysis.m_Type;
+					ar << (float)Miarex.m_WngAnalysis.m_Weight;
+					ar << (float)Miarex.m_WngAnalysis.m_QInf;
+					ar << (float)Miarex.m_WngAnalysis.m_XCmRef;
+					ar << (float)Miarex.m_WngAnalysis.m_Density;
+					ar << (float)Miarex.m_WngAnalysis.m_Viscosity;
+					ar << (float)Miarex.m_WngAnalysis.m_Alpha;
+					ar << Miarex.m_WngAnalysis.m_AnalysisType;
+
+					if (Miarex.m_WngAnalysis.m_bVLM1)   ar << 1;
+					else								ar << 0;
+					ar <<1;//		if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+
+					if (Miarex.m_WngAnalysis.m_bTiltedGeom) ar << 1;
+					else									ar << 0;
+					if (Miarex.m_WngAnalysis.m_bWakeRollUp) ar << 1;
+					else									ar << 0;
+					ar << 0; //number of wings
+					ar << 0; // store all the WPolars
+					ar << 0; // next store all the WOpps
+				
+					ar << 100001;//unused 
+					ar << 0;//write the number of foils
+					
+					ar << 0;//then write polars
+					ar << 0;//no Opps... keep it simple
+
+					if(pBody)
+					{
+						ar << 1;
+						pBody->SerializeBody(ar);
+					}
+					else ar<<0;
+
+					ar << 0; // last write the planes...
+					ar << 0; // not forgetting their POpps
+
+
+					AFoil.m_pSF->Serialize(ar);
+					AFoil.m_pPF->Serialize(ar);
+
+				}
+				ar.Close();
+				fp.Close();
+
+				return true;
+			}
+			else{
+				throw &fe;
+			}
+		}
+		catch (CFileException *ex){
+			TCHAR   szCause[255];
+			CString str;
+			ex->GetErrorMessage(szCause, 255);
+			str = _T("Error saving project : ");
+			str += szCause;
+			AfxMessageBox(str);
+			return false;
+		}
+	}
+	else return false;
+}
 
 bool CMainFrame::SaveUFOProject()
 {
@@ -4332,7 +4342,7 @@ bool CMainFrame::SaveUFOProject()
 		try{
 			if (bOpen) {
 				CArchive ar(&fp, CArchive::store);
-				SerializeProject(ar, strong);
+				SerializeUFOProject(ar, strong);
 				ar.Close();
 				fp.Close();
 				return true;
@@ -4355,7 +4365,7 @@ bool CMainFrame::SaveUFOProject()
 	else return false;
 }
 
-bool CMainFrame::SerializeProject(CArchive &ar, CString UFOName)
+bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 {
 	CWaitCursor Wait;
 
@@ -4397,8 +4407,8 @@ bool CMainFrame::SerializeProject(CArchive &ar, CString UFOName)
 	
 	if (Miarex.m_WngAnalysis.m_bVLM1)   ar << 1;
 	else                         ar << 0;
-	if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1;
-	else                         ar << 0;
+//	if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+	ar <<1;
 	if (Miarex.m_WngAnalysis.m_bTiltedGeom) ar << 1;
 	else                             ar << 0;
 	if (Miarex.m_WngAnalysis.m_bWakeRollUp) ar << 1;
@@ -4554,10 +4564,13 @@ bool CMainFrame::SerializeProject(CArchive &ar, CString UFOName)
 
 //	ar<<0;//no PPolars any more
 	ar<<0;//no POpps... keep it simple
+	ar<<0;//No bodies : TODO change, need for a plane
+	
 	AFoil.m_pSF->Serialize(ar);
 	AFoil.m_pPF->Serialize(ar);
 	return true;
 }
+
 
 bool CMainFrame::SerializeProject(CArchive &ar)
 {
@@ -4569,10 +4582,15 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 	CWOpp *pWOpp     = NULL;
 	CPOpp *pPOpp     = NULL;
 	CPlane *pPlane   = NULL;
+	CBody *pBody     = NULL;;
+
 	int i;
 	CString strong;
-	if (ar.IsStoring()){	// storing code
-		ar << 100010;
+	if (ar.IsStoring())
+	{	
+		// storing code
+		ar << 100011;
+		// 100011 : Added Body serialization
 		// 100010 : Converted to I.S. units
 		// 100009 : added serialization of opps in numbered format
 		// 100008 : Added m_WngAnalysis.m_bTiltedGeom, m_WngAnalysis.m_bWakeRollUp
@@ -4598,14 +4616,14 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 
 		if (Miarex.m_WngAnalysis.m_bVLM1)   ar << 1;
 		else								ar << 0;
-		if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1;
-		else								ar << 0;
+//		if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+		ar <<1;
 		if (Miarex.m_WngAnalysis.m_bTiltedGeom) ar << 1;
 		else									ar << 0;
 		if (Miarex.m_WngAnalysis.m_bWakeRollUp) ar << 1;
 		else									ar << 0;
-		ar << (int)m_oaWing.GetSize() ;//number of wings
 
+		ar << (int)m_oaWing.GetSize() ;//number of wings
 		// Store the wings
 		for (i=0; i<m_oaWing.GetSize();i++){
 			pWing = (CWing*)m_oaWing.GetAt(i);
@@ -4633,6 +4651,14 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 		// then the foils,  polars and Opps
 		WritePolars(ar);
 
+		// next the bodies
+		ar << (int)m_oaBody.GetSize();
+		for (i=0; i<m_oaBody.GetSize();i++)
+		{
+			pBody = (CBody*)m_oaBody.GetAt(i);
+			pBody->SerializeBody(ar);
+		}
+
 		// last write the planes...
 		ar << (int)m_oaPlane.GetSize();
 		for (i=0; i<m_oaPlane.GetSize();i++){
@@ -4646,7 +4672,6 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 			ar << (int)m_oaPOpp.GetSize();
 			for (i=0; i<m_oaPOpp.GetSize();i++){
 				pPOpp = (CPOpp*)m_oaPOpp.GetAt(i);
-	//			pPPOpp->m_pParent = this;
 				pPOpp->SerializePOpp(ar);
 			}
 		}
@@ -4701,8 +4726,8 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 					else   Miarex.m_WngAnalysis.m_bVLM1 = false;
 
 					ar >> k;
-					if (k) Miarex.m_WngAnalysis.m_bMiddle = true;
-					else   Miarex.m_WngAnalysis.m_bMiddle = false;
+//					if (k) Miarex.m_WngAnalysis.m_bMiddle = true;
+//					else   Miarex.m_WngAnalysis.m_bMiddle = false;
 				}
 			
 				if(ArchiveFormat>=100008){
@@ -4720,18 +4745,19 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 			
 			// WINGS FIRST
 
-			for (i=0;i<n; i++){
-				pWing = new CWing(this);
-				pWing->m_pMiarex = &Miarex;
+			for (i=0;i<n; i++)
+			{
+				pWing = new CWing();
 								
-				if (!pWing->SerializeWing(ar)){
+				if (!pWing->SerializeWing(ar))
+				{
 					CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 					pfe->m_strFileName = ar.m_strFileName;
 					if(pWing) delete pWing;
 					throw pfe;
 				}
 				if(pWing){
-					pWing->ComputeGeometry();
+//					pWing->ComputeGeometry();
 					pWing = Miarex.AddWing(pWing);
 				}
 				else{
@@ -4840,6 +4866,22 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 				}
 			} 
 
+			if(ArchiveFormat>=100011)
+			{
+				ar >> n;// number of Bodies to load
+				for (i=0;i<n; i++){
+					pBody = new CBody();
+					
+					if (!pBody->SerializeBody(ar)){
+						CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+						pfe->m_strFileName = ar.m_strFileName;
+						if(pPOpp) delete pPOpp;
+						throw pfe;
+					}
+					Miarex.AddBody(pBody);
+				}
+			}
+
 			if(ArchiveFormat>=100006){ //read the planes
 				ar >> n;
 				// last read the planes
@@ -4878,13 +4920,15 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 						if(pPOpp) delete pPOpp;
 						throw pfe;
 					}
-					Miarex.AddPOpp(NULL, pPOpp);
+					Miarex.AddPOpp(false, NULL, NULL, NULL, pPOpp);
 				}
 			}
+
 			AFoil.m_pSF->Serialize(ar);
 			AFoil.m_pPF->Serialize(ar);
 
-			for (i=0; i<m_oaWing.GetSize();i++){
+			for (i=0; i<m_oaWing.GetSize();i++)
+			{
 				pWing = (CWing*)m_oaWing[i];
 				pWing->ComputeGeometry();
 			}
@@ -4902,6 +4946,7 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 		}
 	}
 }
+
 
 
 int CMainFrame::LoadFile(CString FileName, CString PathName)
@@ -4987,9 +5032,11 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 					pos2 = FileName.Find(".WPA");
 					if(pos1>0 || pos2>0) {
 						AddRecentFile(FileName);
-						if(m_iApp==MIAREX) {
+						if(m_iApp==MIAREX)
+						{
 							UpdateUFOs();
 							Miarex.SetUFO();
+							Miarex.SetBody();
 							OnMiarex();
 						}
 						else if(m_iApp==XFOILANALYSIS) {
@@ -4997,9 +5044,11 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 							XDirect.SetFoil();
 							OnXDirect();
 						}
-						else if(m_oaWing.GetSize() || m_oaPlane.GetSize()){
+						else if(m_oaWing.GetSize() || m_oaPlane.GetSize())
+						{
 							UpdateUFOs();
 							Miarex.SetUFO();
+							Miarex.SetBody();
 							OnMiarex();
 						}
 						else if(m_oaFoil.GetSize()) {
@@ -5112,10 +5161,19 @@ void CMainFrame::OnInsertProject()
 	if(IDOK==WPlrDlg.DoModal()){
 		CString FileName = WPlrDlg.GetFileName();
 		ReadProject(FileName);
-		if(m_iApp == MIAREX){
+		if(m_iApp == MIAREX)
+		{
+			UpdateUFOs();
+			Miarex.SetUFO();
+
 			if(Miarex.m_iView==2)      Miarex.CreateWPolarCurves();
 			else if(Miarex.m_iView==1) Miarex.CreateWOppCurves();
-			 UpdateUFOs();
+			else if(Miarex.m_iView==4) Miarex.CreateCpCurves();
+			else if(Miarex.m_iView==5)
+			{
+				m_BodyCtrlBar.UpdateBodies();
+				Miarex.SetBody();
+			}
 		}
 		else if(m_iApp == XFOILANALYSIS){
 			if(XDirect.m_bPolar) XDirect.CreatePolarCurves();
@@ -5189,14 +5247,22 @@ void CMainFrame::DeleteProject()
 		m_oaOpp.RemoveAt(i);
 		delete pObj;
 	}
+	for (i=(int)m_oaBody.GetSize()-1; i>=0; i--){
+		pObj = m_oaBody.GetAt(i);
+		m_oaBody.RemoveAt(i);
+		delete pObj;
+	}
 
 	Miarex.m_pCurPlane  = NULL;
 	Miarex.m_pCurPOpp   = NULL;
 	Miarex.m_pCurWing   = NULL;
 	Miarex.m_pCurWPolar = NULL;
 	Miarex.m_pCurWOpp   = NULL;
+	Miarex.m_pCurBody   = NULL;
+	Miarex.m_pCurFrame  = NULL;
 	Miarex.CreateWPolarCurves();
 	Miarex.CreateWOppCurves();
+	Miarex.CreateCpCurves();
 
 	XDirect.m_pXFoil->m_FoilName = "";
 	XDirect.m_pCurFoil  = NULL;
@@ -5204,11 +5270,17 @@ void CMainFrame::DeleteProject()
 	XDirect.m_pCurOpp   = NULL;
 	XDirect.SetFoil();
 
-	if(m_iApp == MIAREX)			UpdateUFOs();
+	if(m_iApp == MIAREX)
+	{
+		UpdateUFOs();
+		Miarex.SetUFO();
+		Miarex.SetBody();
+	}
 	else if (m_iApp==XFOILANALYSIS) UpdateFoils();
 
 	m_AFoilCtrlBar.m_pRefFoil = NULL;
-	if(m_iApp==DIRECTDESIGN) {
+	if(m_iApp==DIRECTDESIGN) 
+{
 		m_AFoilCtrlBar.FillFoilList();
 		m_AFoilCtrlBar.SelectFoil();
 	}
@@ -5346,6 +5418,7 @@ void CMainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 				Miarex.m_pCurWing  = NULL;
 				Miarex.m_pCurStab  = NULL;
 				Miarex.m_pCurFin   = NULL;
+				Miarex.m_pCurBody  = NULL;
 			}
 			break;
 		}
@@ -5357,8 +5430,10 @@ void CMainFrame::RecalcLayout(BOOL bNotify)
 {
 	CFrameWnd::RecalcLayout(bNotify);
 
-	if (m_iApp == MIAREX) {
-
+	if (m_iApp == MIAREX) 
+	{
+		Miarex.m_bIs2DScaleSet=false;
+		Miarex.m_bIs3DScaleSet=false;
 		Miarex.SetWPlrLegendPos();
 	}
 	else if (m_iApp==DIRECTDESIGN){
@@ -6018,8 +6093,6 @@ void CMainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 			break;
 		}
 	}
-
-
 }
 
 void CMainFrame::SetWGraphTitles(Graph* pGraph, int iX, int iY)
@@ -6222,30 +6295,10 @@ void CMainFrame::SetWGraphTitles(Graph* pGraph, int iX, int iY)
 	}
 }
 
-
-void CMainFrame::OnCpLegend() 
-{
-	CCpScaleDlg dlg;
-	dlg.m_CpMin = m_LegendMin;
-	dlg.m_CpMax = m_LegendMax;
-	dlg.m_bShowCpScale = m_bShowCpScale;
-	dlg.m_bAutoCpScale = m_bAutoCpScale;
-
-	if(dlg.DoModal() == IDOK){
-		m_LegendMin     = dlg.m_CpMin;
-		m_LegendMax     = dlg.m_CpMax;
-		m_bAutoCpScale  = dlg.m_bAutoCpScale;
-		m_bShowCpScale  = dlg.m_bShowCpScale;
-		if(m_iApp==MIAREX)        Miarex.m_bResetglOpp = true;
-		UpdateView();
-	}
-}
-
-
 void CMainFrame::OnPlanePrefs() 
 {
 	C3DColorDlg SDlg(this);
-//	SDlg.m_WingSurfaces   = m_WingSurfaces;
+	SDlg.m_bWakePanels    = Miarex.m_bWakePanels;
 	SDlg.m_VLMColor       = m_VLMColor;
 	SDlg.m_VLMStyle       = m_VLMStyle;
 	SDlg.m_VLMWidth       = m_VLMWidth;
@@ -6278,7 +6331,7 @@ void CMainFrame::OnPlanePrefs()
 	SDlg.m_WakeWidth      = m_WakeWidth;
 
 	if(SDlg.DoModal() == IDOK){
-//		m_WingSurfaces = SDlg.m_WingSurfaces;
+		Miarex.m_bWakePanels    = SDlg.m_bWakePanels;
 		m_VLMColor     = SDlg.m_VLMColor;
 		m_VLMStyle     = SDlg.m_VLMStyle;
 		m_VLMWidth     = SDlg.m_VLMWidth;
@@ -6310,6 +6363,7 @@ void CMainFrame::OnPlanePrefs()
 		m_WakeStyle      = SDlg.m_WakeStyle;
 		m_WakeWidth      = SDlg.m_WakeWidth;
 		Miarex.m_bResetglWake = true;
+		Miarex.m_bResetglBody = true;
 		Miarex.m_bResetglGeom = true;
 		Miarex.m_bResetglMesh = true;
 		Miarex.m_bResetglOpp  = true;
@@ -6320,6 +6374,7 @@ void CMainFrame::OnPlanePrefs()
 	
 void CMainFrame::OnLoadProject() 
 {
+	CWaitCursor wait;
 	CFile fp;
 	CString strong;
 
@@ -6339,39 +6394,65 @@ void CMainFrame::OnLoadProject()
 
 bool CMainFrame::LoadProject(CString PathName) 
 {
+	CWaitCursor wait;
+	CString strong;
+	int cx = GetSystemMetrics(SM_CXSCREEN);
+	int cy = GetSystemMetrics(SM_CYSCREEN);
+
+	int pos = PathName.ReverseFind(92);
+	if (pos>0) strong = PathName.Right(PathName.GetLength()-pos-1);
+	else       strong = PathName;
+
+	strong = "Loading the Project \n"+ strong;
+	CMessageDlg dlg;
+	dlg.Create(IDD_MESSAGEDLG,this);
+	dlg.SetWindowPos(this, (int)(cx/2)-150,(int)(cy/2)-100,0,0,SWP_NOSIZE);
+	dlg.m_bCancel = false;
+	dlg.ShowWindow(SW_SHOW);
+	dlg.SetMessage(strong);
+
 	DeleteProject();
 
 	UpdateView();
 	SetProjectName(PathName);
-	if(ReadProject(m_FileName)){
+
+	if(ReadProject(m_FileName))
+	{
 		SetSaveState(true);
-		if( m_oaWing.GetSize() || m_oaPlane.GetSize()){
+		if( m_oaWing.GetSize() || m_oaPlane.GetSize() || m_oaBody.GetSize()){
 			if(m_iApp==0){
 				OnMiarex();
 				return TRUE;
 			}
-			else if(m_iApp==MIAREX) {
+			else if(m_iApp==MIAREX) 
+			{
 				UpdateUFOs();
+				m_BodyCtrlBar.UpdateBodies();
 				Miarex.SetUFO();
+				if(Miarex.m_iView==5) Miarex.SetBody();
 				Miarex.UpdateView();
 				return TRUE;
 			}
 		}
-		if(m_oaFoil.GetSize())  {
+		if(m_oaFoil.GetSize())  
+		{
 			if(m_iApp==0)
 				OnXDirect();
-			else if(m_iApp==XFOILANALYSIS) {
+			else if(m_iApp==XFOILANALYSIS) 
+			{
 				UpdateFoils();
 				XDirect.SetFoil();
 				XDirect.UpdateView();
 			}
-			else if(m_iApp==DIRECTDESIGN){
+			else if(m_iApp==DIRECTDESIGN)
+			{
 				AFoil.SetFoils();
 			}
 		}
 		return TRUE;
 	}
-	else {
+	else 
+	{
 		DeleteProject();
 		return FALSE;
 	}
@@ -6382,29 +6463,34 @@ bool CMainFrame::LoadProject(CString PathName)
 void CMainFrame::OnAppOpen() 
 {
 //	CString FileName, PathName;
-	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, 
-		_T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
+	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, _T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
 
-	if(IDOK==XFileDlg.DoModal()) {
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 		int app = LoadFile(XFileDlg.GetFileName(),XFileDlg.GetPathName());
 //		if(app>=0) AddRecentFile(XFileDlg.GetPathName());
 
 		UpdateView();
-		if(m_iApp==0){
+		if(m_iApp==0)
+		{
 			if (app == XFOILANALYSIS) OnXDirect();
 			else if(app==MIAREX)      OnMiarex();
 		}
-		else if(m_iApp==XFOILANALYSIS){
+		else if(m_iApp==XFOILANALYSIS)
+		{
 			UpdateFoils();
 			XDirect.SetFoil();
 			XDirect.UpdateView();
 		}
-		else if(m_iApp==MIAREX){
+		else if(m_iApp==MIAREX)
+		{
 			UpdateUFOs();
 			Miarex.SetUFO();
+			Miarex.SetBody();
 			Miarex.UpdateView();
 		}
-		else if(m_iApp==DIRECTDESIGN){
+		else if(m_iApp==DIRECTDESIGN)
+		{
 			AFoil.SetFoils();
 		}
 	}
@@ -6512,8 +6598,13 @@ void CMainFrame::ShortenFileName(CString &PathName)
 
 void CMainFrame::OnRecentFile1()
 {
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[0])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[0]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[0]);
 		m_RecentFile[0] = m_RecentFile[1];
 		m_RecentFile[1] = m_RecentFile[2];
 		m_RecentFile[2] = m_RecentFile[3];
@@ -6529,8 +6620,15 @@ void CMainFrame::OnRecentFile1()
 void CMainFrame::OnRecentFile2()
 {
 	CString strong;
-	if(!LoadProject(m_RecentFile[1])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[1]);
+	if(!m_bSaved)
+	{
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
+	if(!LoadProject(m_RecentFile[1]))
+	{
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[1]);
 		m_RecentFile[1] = m_RecentFile[2];
 		m_RecentFile[2] = m_RecentFile[3];
 		m_RecentFile[3] = m_RecentFile[4];
@@ -6550,8 +6648,13 @@ void CMainFrame::OnRecentFile2()
 void CMainFrame::OnRecentFile3()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[2])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[2]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[2]);
 		m_RecentFile[2] = m_RecentFile[3];
 		m_RecentFile[3] = m_RecentFile[4];
 		m_RecentFile[4] = m_RecentFile[5];
@@ -6571,8 +6674,13 @@ void CMainFrame::OnRecentFile3()
 void CMainFrame::OnRecentFile4()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[3])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[3]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[3]);
 		m_RecentFile[3] = m_RecentFile[4];
 		m_RecentFile[4] = m_RecentFile[5];
 		m_RecentFile[5] = m_RecentFile[6];
@@ -6592,8 +6700,13 @@ void CMainFrame::OnRecentFile4()
 void CMainFrame::OnRecentFile5()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[4])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[4]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[4]);
 		m_RecentFile[4] = m_RecentFile[5];
 		m_RecentFile[5] = m_RecentFile[6];
 		m_RecentFile[6] = m_RecentFile[7];
@@ -6614,8 +6727,13 @@ void CMainFrame::OnRecentFile5()
 void CMainFrame::OnRecentFile6()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[5])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[5]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[5]);
 		m_RecentFile[5] = m_RecentFile[6];
 		m_RecentFile[6] = m_RecentFile[7];
 		m_RecentFile[7].Empty();
@@ -6635,8 +6753,13 @@ void CMainFrame::OnRecentFile6()
 void CMainFrame::OnRecentFile7()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[6])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[6]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[6]);
 		m_RecentFile[6] = m_RecentFile[7];
 		m_RecentFile[7].Empty();
 	}
@@ -6656,8 +6779,13 @@ void CMainFrame::OnRecentFile7()
 void CMainFrame::OnRecentFile8()
 {
 	CString strong;
+	if(!m_bSaved){
+		int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
+		if (IDCANCEL == resp) return;
+		if (IDYES == resp) OnSaveProject();
+	}
 	if(!LoadProject(m_RecentFile[7])){
-		AfxMessageBox("Could not find the file\n"+m_RecentFile[7]);
+		AfxMessageBox("Could not read the file\n"+m_RecentFile[7]);
 		m_RecentFile[7].Empty();
 	}
 	else{
@@ -6674,3 +6802,28 @@ void CMainFrame::OnRecentFile8()
 	SetRecentFileMenu();
 }
 
+void CMainFrame::DeleteBody(CBody *pThisBody)
+{
+	if(!pThisBody){
+		return;
+	}
+	SetSaveState(false);
+	int i;
+
+
+	// ... Find the Body in the object array and remove it...
+	CBody* pBody;
+	for (i=(int)m_oaBody.GetSize()-1; i>=0; i--){
+		pBody = (CBody*)m_oaBody.GetAt(i);
+		if (pBody == pThisBody){
+			m_oaBody.RemoveAt(i);
+			delete pBody;
+			if(pBody == Miarex.m_pCurBody)	
+			{
+				Miarex.m_pCurBody = NULL;
+				Miarex.m_pCurFrame = NULL;
+			}
+			break;
+		}
+	}
+}

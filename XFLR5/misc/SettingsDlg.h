@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #pragma once
-
+ 
 // SettingsDlg.h : header file
 //
 
@@ -29,6 +29,7 @@
 #include "FloatEdit.h"
 #include "NumEdit.h"
 #include "ClrClasses.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // C3DColorDlg dialog
@@ -52,6 +53,7 @@ public:
 	CButton	m_ctrlBotTrans;
 	CButton	m_ctrlTopTrans;
 	CButton	m_ctrlWingPanels;
+	CButton m_ctrlWakePanels;
 	//}}AFX_DATA
 
 
@@ -90,6 +92,8 @@ private:
 	int m_WakeStyle, m_WakeWidth;
 	COLORREF m_WakeColor;
 
+	bool m_bWakePanels;
+
 	// Generated message map functions
 	//{{AFX_MSG(C3DColorDlg)
 	afx_msg void OnWingColor();
@@ -103,6 +107,9 @@ private:
 	afx_msg void OnDownwash();
 	afx_msg void OnWake();
 	afx_msg void OnVLMMesh();
+	afx_msg void OnWakeDisplay();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
 };

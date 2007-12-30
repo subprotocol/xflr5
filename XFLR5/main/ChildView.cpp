@@ -31,6 +31,7 @@
 #include "ChildView.h"
 #include "MainFrm.h"
 #include "../misc/PrefsDlg.h"
+#include ".\childview.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -83,6 +84,7 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_WM_LBUTTONDBLCLK()
 	ON_COMMAND(IDM_CLRSETTINGS, OnClrSettings)
 	//}}AFX_MSG_MAP
+	ON_WM_KEYUP()
 END_MESSAGE_MAP()
 
 
@@ -180,26 +182,14 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 			m_pXInverse->SetRect(m_rCltRect);
 			break;
 		}
-		case MIAREX:{
-			m_pMiarex->m_bIs3DScaleSet  = false;
+		case MIAREX:
+		{
+			m_pMiarex->m_bResetglBody2D = true;
 			m_pMiarex->SetScale(m_rCltRect);
+			m_pMiarex->GLSetViewport();
 			break;
 		}
 	}
-	// Change OpenGL's rendering context size and
-	// viewing frustrum.
-	CClientDC dcClient(this);
-	wglMakeCurrent(dcClient.m_hDC,m_hRC);
-	glViewport(0,0,max(cx,cy),max(cx,cy));
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	double s = pFrame->m_GLScale;
-	glOrtho(-1.0*s,1.0*s,-1.0*s,1.0*s,-10.0*s,20.0*s);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslated(0.0,0.0,0.0);
-	wglMakeCurrent(dcClient.m_hDC,NULL);
 }
 
 
@@ -597,7 +587,8 @@ void CChildView::OnShowWindow(BOOL bShow, UINT nStatus)
 			m_pXInverse->OnShowWindow(bShow, nStatus);
 			break;
 		}
-		case MIAREX:{
+		case MIAREX:
+		{
 			break;
 		}
 	}		
@@ -920,4 +911,26 @@ void CChildView::ApplyClrSettings(bool bBW, COLORREF WingPanels, COLORREF XCPCol
 
 	Invalidate();
 		
+}
+
+void CChildView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	CMainFrame * pFrame  = (CMainFrame*)m_pFrameWnd; 
+	switch (pFrame->m_iApp)
+	{
+		case MIAREX:
+		{
+			if(m_pMiarex->m_iView==3 || m_pMiarex->m_iView==5) 
+			{
+				SHORT sh   = GetKeyState(VK_CONTROL);
+				if(!(sh & 0x8000)) 
+				{
+					m_pMiarex->m_bArcball = false;
+					m_pMiarex->UpdateView();
+				}
+			}
+			break;
+		}
+	}
+	CWnd::OnKeyUp(nChar, nRepCnt, nFlags);
 }

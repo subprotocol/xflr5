@@ -97,7 +97,6 @@
 #define IDD_POLARBAR                    261
 #define IDD_OPERDLGBAR                  262
 #define IDD_AFOILCTRLBAR                263
-#define IDD_VALUEDLG                    264
 #define IDR_DOCUMENT                    265
 #define IDD_PRINTOPTIONSDLG             269
 #define IDD_TEGAPDLG                    273
@@ -126,14 +125,21 @@
 #define IDS_POLARTYPE                   347
 #define IDS_FOILNORMALIZATION           348
 #define IDS_FORCEDUPPERTRANS            349
-#define IDS_FORCEDLOWERTRANS            350
+#define IDD_SPANPOSBAR                  350
 #define ID_THREADTIMER                  351
+#define IDD_WAKEPARAMSDLG               353
+#define IDR_CTXBODYCTRLMENU             353
+#define IDR_CTXBODYFRAMECTRLMENU        353
+#define IDS_FORCEDLOWERTRANS            354
+#define IDR_CTXBODYPOINTCTRLMENU        354
 #define IDC_SHOWPRESSURE                1001
 #define IDC_REMAX                       1003
 #define IDC_REYNOLDS                    1004
 #define IDC_MACH                        1005
 #define IDC_NCRIT                       1006
 #define IDC_SEQUENCE                    1007
+#define IDC_PEDIT                       1008
+#define IDC_IPEDIT                      1009
 #define IDC_REINC                       1010
 #define IDC_TAPERRATIO                  1011
 #define IDC_ANALYZE                     1012
@@ -157,18 +163,20 @@
 #define IDC_YMAINGRID                   1034
 #define IDC_XGRIDSTYLE                  1036
 #define IDC_RELAX                       1037
+#define IDC_GRIDSTYLE2                  1037
 #define IDC_YGRIDSTYLE                  1038
 #define IDC_VORTEXPOS                   1038
 #define IDC_ITERMAX                     1039
-#define IDC_FIRSTPANELSIZE              1040
+#define IDC_TOTALWAKELENGTH             1040
 #define IDC_ALPHAPREC                   1041
 #define IDC_LEGENDFONT                  1042
-#define IDC_PANELFACTOR                 1042
+#define IDC_WAKEPANELFACTOR             1042
 #define IDC_NSTAT                       1043
 #define IDC_UNIFORM                     1044
 #define IDC_MINPANELSIZE                1044
 #define IDC_INTERNODES                  1045
 #define IDC_CTRLPOS                     1046
+#define IDC_SINEFACTOR                  1047
 #define IDC_TO                          1048
 #define IDC_CTRRAT                      1054
 #define IDC_XSREF1                      1055
@@ -266,7 +274,6 @@
 #define IDC_SHOWSPLINE                  1171
 #define IDC_TGAPDX                      1172
 #define IDC_TANGLE                      1173
-#define IDC_SHOWREFCURVES               1174
 #define IDC_SYMM                        1175
 #define IDC_TGAPDY                      1176
 #define IDC_NEWSPLINE                   1177
@@ -274,8 +281,6 @@
 #define IDC_SPEC                        1179
 #define IDC_QUESTION                    1180
 #define IDC_OUTPUT                      1182
-#define IDC_QUESTION4                   1183
-#define IDC_TEXT2                       1183
 #define IDC_FOILCOLOR                   1184
 #define IDC_SHOWPOINTS                  1187
 #define IDC_CAMBER                      1195
@@ -338,6 +343,7 @@
 #define IDC_ANGTOL                      1281
 #define IDC_NPANELS                     1283
 #define IDC_FOILNAME                    1284
+#define IDC_NXPANELS                    1284
 #define IDC_CVPAR                       1285
 #define IDC_CTERAT                      1288
 #define IDC_XPREF1                      1291
@@ -359,6 +365,7 @@
 #define IDC_XMINSTYLE                   1311
 #define IDC_LEYHINGE                    1311
 #define IDC_ANALYSIS                    1312
+#define IDC_MINSTYLE2                   1312
 #define IDC_WTYPE1                      1313
 #define IDC_WTYPE2                      1314
 #define IDC_WTYPE4                      1315
@@ -380,6 +387,8 @@
 #define IDC_MIAREXWANABAR               1333
 #define IDC_SPLINESTYLE                 1334
 #define IDC_XDIRECTANABAR               1335
+#define IDC_SPLINESTYLE2                1335
+#define IDC_REFLECTEDSTYLE              1335
 #define IDC_POLARBAR                    1336
 #define IDC_MIAREXW3DBAR                1338
 #define IDC_AMAXSTAT                    1339
@@ -391,10 +400,12 @@
 #define IDC_NEUTRALLINE                 1346
 #define IDC_XMAINGRID                   1347
 #define IDC_FINVCTRLBAR                 1348
+#define IDC_MAINGRID2                   1348
 #define IDC_FOILSEL                     1349
 #define IDC_XINVERSEBAR                 1350
 #define IDC_XMINORGRID                  1351
 #define IDC_PLRLIST                     1352
+#define IDC_MINORGRID2                  1352
 #define IDC_YMINORGRID                  1353
 #define IDC_SPECAL                      1355
 #define IDC_SPECCL                      1356
@@ -424,10 +435,10 @@
 #define IDC_UNIT2                       1383
 #define IDC_WLUNIT                      1384
 #define IDC_XMINORUNIT                  1385
-#define IDC_LENGTHUNIT3                 1385
 #define IDC_LENGTHUNIT2                 1385
 #define IDC_YMINORUNIT                  1386
 #define IDC_PANELLIST                   1387
+#define IDC_MINORUNIT2                  1387
 #define IDC_TWIST                       1395
 #define IDC_SPECINV                     1396
 #define IDC_FILTERPARAM                 1398
@@ -454,6 +465,8 @@
 #define IDC_RADIO1                      1430
 #define IDC_RADIO2                      1431
 #define IDC_WINGSEL                     1432
+#define IDC_RADIO3                      1432
+#define IDC_RADIO4                      1433
 #define IDC_3DSURFACES                  1434
 #define IDC_3DFRONT                     1437
 #define IDC_3DLEFT                      1438
@@ -461,12 +474,11 @@
 #define IDC_3DISO                       1440
 #define IDC_3DRESET                     1441
 #define IDC_NEWSPAN                     1442
-#define IDC_VALUE                       1444
 #define IDC_3DOUTLINE                   1445
 #define IDC_3DAXES                      1446
 #define IDC_STDSETTINGS                 1447
 #define IDC_3DLIGHT                     1447
-#define IDC_3DVLMPANELS                 1448
+#define IDC_3DPANELS                    1448
 #define IDC_SHOWLIFT                    1451
 #define IDC_WINDOWBK                    1452
 #define IDC_SHOWICD                     1452
@@ -484,7 +496,7 @@
 #define IDC_CORESIZE                    1466
 #define IDC_RIGHT                       1467
 #define IDC_MAX                         1469
-#define IDC_WAKEPANELS                  1470
+#define IDC_NXWAKEPANELS                1470
 #define IDC_TOP                         1471
 #define IDC_BOTTOM                      1472
 #define IDC_SPANSCALE                   1473
@@ -499,6 +511,7 @@
 #define IDC_ZLEWING2                    1482
 #define IDC_CHORDFACTOR                 1483
 #define IDC_GRAPHPREFS                  1484
+#define IDC_YFACTOR                     1484
 #define IDC_NEUTRAL                     1485
 #define IDC_FIN                         1486
 #define IDC_STAB                        1487
@@ -535,7 +548,6 @@
 #define IDC_TILTEDGEOM                  1520
 #define IDC_LENGTH                      1521
 #define IDC_EXPORTWING                  1521
-#define IDC_TOPBOTTOM                   1521
 #define IDC_SLENGTH                     1522
 #define IDC_LEN7                        1522
 #define IDC_LENGTH6                     1522
@@ -549,6 +561,7 @@
 #define IDC_RESETWAKE                   1529
 #define IDC_LEN8                        1529
 #define IDC_LEN9                        1530
+#define IDC_BODY                        1531
 #define IDC_SSURFACE                    1533
 #define IDC_FORCE                       1534
 #define IDC_SSPEED                      1535
@@ -574,6 +587,7 @@
 #define IDC_DEFINEELEV                  1561
 #define IDC_DEFINEWING                  1562
 #define IDC_DEFINEWING2                 1563
+#define IDC_TANGENTSPLINE               1564
 #define IDC_CLR1                        5001
 #define IDC_CLR2                        5002
 #define IDC_CLR3                        5003
@@ -622,6 +636,9 @@
 #define IDD_RELISTDLG                   5124
 #define IDD_ABOUTBOX                    5125
 #define IDD_CTRLANALYSIS                5126
+#define IDD_BODYCTRLBAR                 5127
+#define IDD_BODYSCALEDLG                5128
+#define IDD_BGRIDDLG                    5129
 #define ID_INDPROJECT                   5130
 #define IDC_LOGFILE                     5137
 #define IDC_SAVEASNEW                   5138
@@ -660,7 +677,28 @@
 #define IDC_NFLAPS                      5174
 #define IDC_SHOWCPSCALE                 5175
 #define IDC_SHOWMOMENTS                 5176
-#define IDC_TEXT1                       5178
+#define IDC_WAKEPARAMS                  5179
+#define IDC_SPANSLIDE                   5182
+#define IDC_SPANPOS                     5183
+#define IDC_WAKEDISPLAY                 5185
+#define IDC_SURFSPEED                   5186
+#define IDC_KEEPCURVE                   5187
+#define IDC_RESETCURVES                 5188
+#define IDC_FRAMEPOINTS                 5189
+#define IDC_FRAMELIST                   5190
+#define IDC_BODYCOLOR                   5191
+#define IDC_BODYLIST                    5192
+#define IDC_ZFACTOR                     5193
+#define IDC_CLOSEDSURFACE               5196
+#define IDC_SPLINEDEGREE                5204
+#define IDC_NHPANELS                    5206
+#define IDC_UNIT                        5207
+#define IDC_MINORUNIT                   5208
+#define IDC_MINSTYLE                    5209
+#define IDC_GRIDSTYLE                   5210
+#define IDC_MINORGRID                   5211
+#define IDC_MAINGRID                    5212
+#define IDC_LENGTH4                     5213
 #define IDM_LOADREFFOIL                 32772
 #define ID_EDIT_NEW                     32773
 #define IDM_DEFINEWING                  32777
@@ -777,7 +815,6 @@
 #define IDM_XFLR5_SINGLEANALYSIS        32918
 #define IDM_XFLR5_BATCHANALYSIS         32919
 #define IDT_LOAD                        32920
-#define IDC_FOILSTYLE                   32921
 #define IDM_EXPORTTOAPP                 32924
 #define IDT_PRINT                       32925
 #define IDM_COLORSTYLES                 32926
@@ -802,8 +839,6 @@
 #define ID_APP_OPEN                     32951
 #define IDM_LOAD                        32952
 #define IDM_INITXFOIL2                  32955
-#define IDC_PEDIT                       32956
-#define IDC_IPEDIT                      32957
 #define IDM_DELETEWPOLARS               32958
 #define IDM_DELETEWOPPS                 32959
 #define IDM_FOURGRAPHS                  32960
@@ -941,7 +976,6 @@
 #define IDM_INSERTBEFORE                33204
 #define IDM_FOILDIRECTDESIGN            33215
 #define IDM_SHOWCPGRAPH                 33234
-#define IDC_MFC                         33242
 #define IDM_EXPORTVLMPANELS             33251
 #define IDM_SHOWWING2                   33253
 #define IDM_RECENTFILE3                 33257
@@ -954,6 +988,25 @@
 #define IDM_RECENTFILE8                 33269
 #define IDM_RECENTFILE4                 33270
 #define IDM_CPVIEW                      33272
+#define IDM_WADVSETTINGS                33274
+#define IDM_INSERTPOINT                 33278
+#define IDM_INSERTFRAME                 33279
+#define IDM_DELETEFRAME                 33280
+#define IDM_BODYDESIGN                  33282
+#define ID_BODYDESIGN_CURRENTBODY       33283
+#define IDM_DELETECURBODY               33292
+#define IDM_RENAMECURBODY               33293
+#define IDM_DUPLICATECURBODY            33294
+#define IDM_SCALECURBODY                33295
+#define IDM_EXPORTCURBODY               33296
+#define IDM_SAVECURBODYASPROJECT        33297
+#define IDM_NEWBODY                     33298
+#define ID_Menu                         33299
+#define IDM_RESETFRAMESCALE             33302
+#define IDM_RESETBODYSCALE              33303
+#define ID_Menu33304                    33304
+#define IDM_BODYGRIDOPTIONS             33306
+#define IDM_SHOWREFLECTED               33308
 #define ID_APP_EXIT2                    57666
 #define ID_VIEW_STATUS_BAR2             59394
 
@@ -962,9 +1015,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        349
-#define _APS_NEXT_COMMAND_VALUE         33273
-#define _APS_NEXT_CONTROL_VALUE         5179
+#define _APS_NEXT_RESOURCE_VALUE        352
+#define _APS_NEXT_COMMAND_VALUE         33310
+#define _APS_NEXT_CONTROL_VALUE         5214
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

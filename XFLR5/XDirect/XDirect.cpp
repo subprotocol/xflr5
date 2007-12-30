@@ -29,7 +29,6 @@
 #include "../XDirect/XFoilAdvDlg.h"
 #include "../Graph/GraphOptions.h"
 #include "../misc/PolarFilter.h"
-#include "../misc/ValueDlg.h"
 #include "../misc/PrintOptionsDlg.h"
 #include "../misc/EditPlrDlg.h"
 #include "../misc/NameDlg.h"
@@ -134,7 +133,7 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_NPLOT, OnNPlot)
 	ON_COMMAND(IDM_CTPLOT, OnCtPlot)
 	ON_COMMAND(IDM_RTPLOT, OnRtPlot)
-	ON_COMMAND(IDC_FOILSTYLE, OnFoilStyle)
+//	ON_COMMAND(IDC_FOILSTYLE, OnFoilStyle)
 	ON_COMMAND(IDM_LOAD, OnLoad)
 	ON_COMMAND(IDT_OPPS, OnOper)
 	ON_COMMAND(IDT_POLARS, OnPolars)
@@ -452,12 +451,12 @@ OpPoint* CXDirect::GetCurOpPoint()
 			if (pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName){
 				if(m_pCurPolar->m_Type !=4){
 
-					if(fabs(pOpPoint->Alpha - point) <0.01){
+					if(abs(pOpPoint->Alpha - point) <0.01){
 						return pOpPoint;
 					}
 				}
 				else{
-					if(fabs(pOpPoint->Reynolds - point) <0.1){
+					if(abs(pOpPoint->Reynolds - point) <0.1){
 						return pOpPoint;
 					}
 				}
@@ -477,12 +476,12 @@ OpPoint* CXDirect::GetOpPoint(double Alpha)
 		if (pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName){
 			if (pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName){
 				if(m_pCurPolar->m_Type !=4){
-					if(fabs(pOpPoint->Alpha - Alpha) <0.01){
+					if(abs(pOpPoint->Alpha - Alpha) <0.01){
 						return pOpPoint;
 					}
 				}
 				else{
-					if(fabs(pOpPoint->Reynolds - Alpha) <0.1){
+					if(abs(pOpPoint->Reynolds - Alpha) <0.1){
 						return pOpPoint;
 					}
 				}
@@ -542,14 +541,14 @@ OpPoint* CXDirect::AddOpPoint(OpPoint *pNewPoint)
 					bIsInserted = true;
 					i = (int)m_poaOpp->GetSize();// to break
 				}
-				else if (fabs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0){
+				else if (abs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0){
 					if (pNewPoint->Alpha < pOpPoint->Alpha){
 						//insert point
 						m_poaOpp->InsertAt(i, pNewPoint);
 						bIsInserted = true;
 						i = (int)m_poaOpp->GetSize();// to break
 					}
-					else if(fabs(pNewPoint->Alpha - pOpPoint->Alpha)<0.001){
+					else if(abs(pNewPoint->Alpha - pOpPoint->Alpha)<0.001){
 						//replace existing point
 						m_poaOpp->RemoveAt(i);
 						delete pOpPoint;
@@ -4372,7 +4371,7 @@ void CXDirect::SetPolar(CString PlrName)
 				pOpp = (OpPoint*)m_poaOpp->GetAt(l);
 				if (pOpp->m_strFoilName == m_pCurFoil->m_FoilName &&
 					pOpp->m_strPlrName  == PlrName){
-					if(fabs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001){
+					if(abs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001){
 						m_pCurOpp = pOpp;
 						bFound = true;
 						break;
@@ -5083,7 +5082,7 @@ void CXDirect::UpdateOpps(){
 			if (pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName &&
 				pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName){
 				if(m_pCurPolar->m_Type !=4)	{
-//					if(fabs(pOpPoint->Alpha)<0.0001) pOpPoint->Alpha = 0.0001;
+//					if(abs(pOpPoint->Alpha)<0.0001) pOpPoint->Alpha = 0.0001;
 					strong.Format("%8.2f", pOpPoint->Alpha);
 				}
 				else strong.Format("%8.0f", pOpPoint->Reynolds);
@@ -5128,27 +5127,27 @@ void CXDirect::OnAnalyze()
 			m_pXFoil->lvisc = true;
 			if(m_pCurPolar->m_Type!=4){
 				if (bSequence){
-					if (fabs(DeltaAlpha)<0.001){
+					if (abs(DeltaAlpha)<0.001){
 						AfxMessageBox("Increase Delta_Alpha", MB_OK);
 						return;
 					}
 					else if(AlphaMax < Alpha )
-						DeltaAlpha = -fabs(DeltaAlpha);
+						DeltaAlpha = -abs(DeltaAlpha);
 					else if(AlphaMax > Alpha)
-						DeltaAlpha = fabs(DeltaAlpha);
+						DeltaAlpha = abs(DeltaAlpha);
 				}
 				Analysis2(Alpha, AlphaMax, DeltaAlpha, bSequence);
 			}
 			else {
 				if (bSequence){
-					if (fabs(DeltaRe) < 10.0){
+					if (abs(DeltaRe) < 10.0){
 						AfxMessageBox("Increase Delta_Re", MB_OK);
 						return;
 					}
 					else if(ReMax < Re)
-						DeltaRe = -fabs(DeltaRe);
+						DeltaRe = -abs(DeltaRe);
 					else if(ReMax > Re)
-						DeltaRe = fabs(DeltaRe);
+						DeltaRe = abs(DeltaRe);
 				}
 				Analysis3(Re, ReMax, DeltaRe, bSequence);
 			}
@@ -6319,15 +6318,13 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		strong.Format(str1, m_pCurPolar->m_XBot);
 		pDC->TextOut(XPos,ZPos+D, strong);
 		D+=12;
-
 	}
-
 
 	if(m_pCurOpp)  {
 		Back =6;
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
-		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0) Back++;
+		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0) Back++;
 		if(m_pCurPolar->m_Type==2 ) Back++;
 		if(m_pCurPolar->m_Type!=1 && m_pCurPolar->m_Type!=4) Back++;
 
@@ -6363,7 +6360,7 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		pDC->TextOut(XPos,ZPos+D, Result);
 		D+=12;
 
-		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0){
+		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0){
 			Result.Format("L/D = %9.2f", m_pCurOpp->Cl/m_pCurOpp->Cd);
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;

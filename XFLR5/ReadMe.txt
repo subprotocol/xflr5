@@ -47,7 +47,33 @@ Licence :
 
 
                        **************************
-                       
+
+TODO :
+	Use AVL DWWAKE formula for Far-field wake downwash at center of strip
+	Add Cyff to Oswald calculation
+	check if XFLR5 uses dy or dl, use normal rather than vs. z direction
+	Core implementation : investigate AVL formulation
+
+v4.00 December xxth,2007
+	- Introduced 3D-Panel Method
+	- Changed the fin definition : all planes with fins will need to be redefined...
+	- Changed 3D view rotation woth arcball
+	- Added Reflected curve display in XInverse 
+	- Added Slope tangency constraint on spline in XInverse
+	- Corrected the area of double fins or symetrical fins : factor 2 had been ommitted
+	- Corrected occasional crash bug when deleting all Opps associated to a Wing or Plane Polar
+	- Corrected chord calculations when there is a gap in the middle of the wing
+	- Corrected a potential crash bug when loading a project file which includes a plane object
+	- Added a save check before loading a file from the recent file menu
+	- Modified the panel Normal definition as a necessary step for 3d panel methods. VLM results are slightly modified for twisted surfaces.
+	- Changed X-View in 3D display to view the plane from the rear
+	- Corrected MAC span position calculation
+	- Corrected mid line inversion bug in Splined Points App
+	- Corrected "Reset Default" values in LLT/VLM advanced setttings, to set default vortex core size at 0.1mm
+	- Corrected potential file write error at the end of Foil, LLT, or VLM analysis
+	- Corrected minor bug in the panel VLM creation routine which could define a non-trailing panel as trailing ; no impact on results
+	- Corrected other minor cosmetic bugs
+	
 v3.21e June 17th,2007
 	Trouble with internal messaging issues :
 	- 	Deleted all V/W_ENDTHREAD messages, replaced them with idle loop checking for end of analysis

@@ -379,6 +379,7 @@ void CBatchDlg::OnType1()
 			m_ctrlReTyp.SetWindowText("&Alpha =");
 			m_ctrlMaTyp.SetWindowText("&Mach =");
 			m_ctrlList.EnableWindow(false);
+			CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
 			m_Type = 4;
 			break;
 		default:

@@ -145,15 +145,18 @@ BOOL CXFLR5App::InitInstance()
 	CCommandLineInfo CmdInfo;
 	ParseCommandLine(CmdInfo);
 
+
 	//Trace("CX5App::InitInstance::Command Line Info processed");
 
-	if (!FirstInstance(CmdInfo)){
+
+	//TODO : restore
+/*	if (!FirstInstance(CmdInfo)){
 		//Trace("CX5App::InitInstance::Redirected input to first instance");
 		//Trace("CX5App::InitInstance::Closing App");
 
 		return FALSE;
 
-	}
+	}*/
 
 
 	//Trace("CX5App::InitInstance::System time acquired");
@@ -186,6 +189,8 @@ BOOL CXFLR5App::InitInstance()
 	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
  	str =strAppDirectory + "XFLR5.set";
 	x=0; y=0; cx = GetSystemMetrics(SM_CXSCREEN); cy = GetSystemMetrics(SM_CYSCREEN);
+	l=x; t = y;
+	r = cx; b = cy;
 	showCmd = SW_SHOWMAXIMIZED;
 
 	try{
@@ -200,12 +205,6 @@ BOOL CXFLR5App::InitInstance()
 		//  we're reading/loading
 			ar >> l >> t >> r >> b >> showCmd;
 			x=l; y=t; cx = max(r-l,200); cy = max(b-t,200);
-//			pFrame->m_wndRect.SetRect(l,t,r,b);
-			pFrame->m_wndpl.rcNormalPosition.left   = l;
-			pFrame->m_wndpl.rcNormalPosition.right  = r;
-			pFrame->m_wndpl.rcNormalPosition.top    = t;
-			pFrame->m_wndpl.rcNormalPosition.bottom = b;
-			pFrame->m_wndpl.showCmd = showCmd;
 			ar.Close();
 			fp.Close();
 		}
@@ -216,6 +215,11 @@ BOOL CXFLR5App::InitInstance()
 	catch (CException *ex){
 		ex->Delete();
 	}
+	pFrame->m_wndpl.rcNormalPosition.left   = l;
+	pFrame->m_wndpl.rcNormalPosition.right  = r;
+	pFrame->m_wndpl.rcNormalPosition.top    = t;
+	pFrame->m_wndpl.rcNormalPosition.bottom = b;
+	pFrame->m_wndpl.showCmd = showCmd;
 
 	// create and load the frame with its resources
 	pFrame->LoadFrame(IDR_MAINFRAME,WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,	NULL);
@@ -725,18 +729,6 @@ bool IsEven(int n)
 	else return false;
 }
 
-bool IsBetween(int f, int f1, int f2)
-{
-	if (f2 < f1){
-		int tmp = f2;
-		f2 = f1;
-		f1 = tmp;
-	}
-	if(f<f1) return false;
-	else if(f>f2) return false;
-	return true;
-}
-
 
 double sign(double a)
 {
@@ -1046,21 +1038,6 @@ void Trace(CString msg, void *p)
 
 	tf.Close();
 }
-
-void CrossProduct(CVector V1, CVector V2, CVector &V)
-{
-	V.x  =  V1.y * V2.z - V1.z * V2.y;
-	V.y  = -V1.x * V2.z + V1.z * V2.x;
-	V.z  =  V1.x * V2.y - V1.y * V2.x;
-}
-
-
-
-double DotProduct(CVector V1, CVector V2)
-{
-	return  V1.x * V2.x + V1.y * V2.y + V1.z * V2.z;
-}
-
 
 
 void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
@@ -1388,6 +1365,18 @@ bool operator==(CVector V1, CVector V2)
 }*/
 
 
+bool IsBetween(int f, int f1, int f2)
+{
+	if (f2 < f1){
+		int tmp = f2;
+		f2 = f1;
+		f1 = tmp;
+	}
+	if(f<f1) return false;
+	else if(f>f2) return false;
+	return true;
+}
+
 bool IsBetween(int f, double f1, double f2)
 {
 	double ff = f;
@@ -1403,7 +1392,6 @@ bool IsBetween(int f, double f1, double f2)
 
 bool Intersect(int &x, int &y, CRect &DRect, CPoint &Pt1, CPoint &Pt2)
 {
-
 	int xt, yt;
 	double x1 = (double)Pt1.x;
 	double x2 = (double)Pt2.x;
@@ -1476,3 +1464,60 @@ bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M)
 	if (0.0<=t && t<=1.0 && 0.0<=u && u<=1.0)	return true;//M is between A and B
 	else										return false;//M is outside
 }
+
+
+
+
+bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax)
+{
+	int iter, i, j;
+	double sum, max;
+	double xk1[VLMMATSIZE];
+
+	for (iter=0; iter<IterMax; iter++)
+	{
+		for (i=0; i<MatSize ; i++)
+		{
+			sum = b[i];
+			for (j=0;   j<i;        j++)	sum -= a[i*MatSize +j]*xk1[j];
+			for (j=i+1; j<MatSize ; j++)	sum -= a[i*MatSize +j]*xk[j];
+			xk1[i] = sum/a[i*MatSize +i];
+		}
+
+		max = 0.0;
+		for (i=0; i<MatSize ; i++) 
+			if(abs(xk1[i]-xk[i])>max) max=abs(xk1[i]-xk[i]);
+
+//		TRACE("%3d   %10.3e\n",iter, max);
+		if(max<eps) return true;
+		memcpy(xk, xk1, MatSize*sizeof(double));
+	}
+	return false;
+}
+
+CDoubleRect::CDoubleRect()
+{
+	left   = 0.0;
+	right  = 0.0;
+	top    = 0.0;
+	bottom = 0.0;
+}
+
+bool CDoubleRect::PtInRect(double x, double y)
+{
+	if(x>=left && x<=right && y<=top && y>=bottom) return true;
+	else return false;
+}
+
+
+bool CDoubleRect::PtInRect(CVector Real)
+{
+	if(Real.x>=left && Real.x<=right && Real.y<=top && Real.y>=bottom) return true;
+	else return false;
+}
+
+
+
+
+
+

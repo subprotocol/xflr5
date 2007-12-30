@@ -29,6 +29,7 @@
 class CMessageDlg : public CDialog
 {
 	friend class CMiarex;
+	friend class CMainFrame;
 	DECLARE_DYNAMIC(CMessageDlg)
 
 public:

@@ -25,6 +25,8 @@
 #include "ChildView.h"
 #include "../Miarex/Miarex.h"
 #include "../Miarex/ScaleOppBar.h"
+#include "../Miarex/BodyCtrlBar.h"
+#include "../Miarex/SpanPosBar.h"
 #include "../Miarex/WOperDlgBar.h"
 #include "../Miarex/W3DBar.h"
 #include "../Design/AFoil.h"
@@ -40,6 +42,7 @@ class CMainFrame : public CFrameWnd
 	friend class CXFLR5App;
 	friend class CLLTDlg;
 	friend class CBatchDlg;
+	friend class CBody;
 	friend class CPolar;
 	friend class CViscDlg;
 	friend class CXDirect;
@@ -59,6 +62,7 @@ class CMainFrame : public CFrameWnd
 	friend class CCtrlAnalysisDlg;
 	friend class CWingScaleDlg;
 	friend class CScaleOppBar;
+	friend class CSpanPosBar;
 	friend class CVLMDlg;
 	friend class C3DPanelDlg;
 	friend class CFlowLinesDlg;
@@ -66,8 +70,10 @@ class CMainFrame : public CFrameWnd
 	friend class CBatchThread;
 	friend class CUFOListDlg;
 	friend class CAFoilCtrlBar;
+	friend class CBodyCtrlBar;
 	friend class CWngAnalysis;
 	friend class CCtrlAnalysis;
+	friend class CBodyGridDlg;
 
 public:
 	CMainFrame();
@@ -110,7 +116,8 @@ protected:  // control bar embedded members
 	CFInvCtrlBar  m_FInvCtrlBar;
 	CMInvCtrlBar  m_MInvCtrlBar;
 	CScaleOppBar  m_ScaleOppBar;
-
+	CSpanPosBar   m_SpanPosBar;
+	CBodyCtrlBar  m_BodyCtrlBar;
 	CChildView  m_wndView;
 
 	CComboBox m_ctrlFoil;
@@ -130,18 +137,9 @@ private:
 	CString m_FileName;
 
 	bool m_bSaved; //true if the project hasn't been modified since the last save
-	bool m_b3DVLMCl, m_b3DDownwash, m_b3DBar; 	// defines whether the corresponfing data should be displayed
-	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
-	bool m_bMoments;
-	bool m_bICd, m_bVCd, m_bStream, m_bFlow;  	// defines whether the corresponfing data should be displayed
-	bool m_bVortices;				// defines whether the corresponfing data should be displayed
-	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bSaveOpps, m_bSaveWOpps; // true if Opps and WOpps should we saved in the .wpa project file
-	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
 	int m_iApp;	// the currently active application, may be XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, or MIAREX
 
-	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
-				// this is not the scale to display the model in the OpenGL view
 
 	//printing parameters
 	double m_LeftMargin, m_RightMargin, m_TopMargin, m_BottomMargin;
@@ -155,6 +153,7 @@ private:
 	CObArray m_oaWOpp;
 	CObArray m_oaPlane;
 	CObArray m_oaPOpp;
+	CObArray m_oaBody;
 
 	COLORREF m_crColors[30];
 
@@ -183,12 +182,13 @@ private:
 	bool LoadPolarFileV3(CArchive &ar, int ArchiveFormat=0);
 	bool ReadProject(CString FileName);
 	bool SerializeProject(CArchive &ar);
-	bool SerializeProject(CArchive &ar, CString UFOName);
+	bool SerializeUFOProject(CArchive &ar, CString UFOName);
 	bool RenameFoil(CFoil* pFoil);
 	bool ReadPolarFile(CString FileName);
 	bool SaveProject(CString FileName);
 	bool SaveProjectAs();
 	bool SaveUFOProject();
+	bool SaveBodyProject(CBody *pBody);
 
 	int LoadFile(CString FileName, CString PathName);
 
@@ -199,7 +199,7 @@ private:
 	void CreateXInverseBar();
 	void CreateXDirectBar();
 	void DeleteProject();
-	void DockW3DBar();
+	void DockMiarexBars();
 	void HideBars();
 	void LoadOldPolarFile(CArchive &ar, int n);
 	void LoadSettings();
@@ -212,6 +212,7 @@ private:
 	void WritePolars(CArchive &ar, CFoil *pFoil=NULL);
 	void ExportWPlr(CWPolar * pWPolar);
 	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
+	void DeleteBody(CBody *pThisBody);
 	void SetWGraphTitles(Graph* pGraph, int iX, int iY);
 
 	void UpdateOpps();
@@ -261,7 +262,6 @@ private:
 	double m_LiftScale;
 	double m_DragScale;
 	double m_DownwashScale;
-	double m_LegendMin, m_LegendMax;
 
 	int m_VLMStyle, m_VLMWidth;
 	COLORREF m_VLMColor;
@@ -306,7 +306,6 @@ protected:
 	afx_msg void OnSelChangePlr();
 	afx_msg void OnSelChangeOpp();
 	afx_msg void OnClose();
-	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnIndicatorProject(CCmdUI* pCmdUI);
 	afx_msg void OnXDirectSequence(CCmdUI* pCmdUI);
@@ -318,6 +317,7 @@ protected:
 	afx_msg void OnXMPolar(CCmdUI* pCmdUI);
 	afx_msg void OnWAMax(CCmdUI* pCmdUI);
 	afx_msg void OnInitCalc(CCmdUI* pCmdUI);
+	afx_msg void OnSpanPos(CCmdUI* pCmdUI);
 	afx_msg void OnDAlpha(CCmdUI* pCmdUI);
 	afx_msg void OnMiarex();
 	afx_msg void OnFoilColor(CCmdUI* pCmdUI);
@@ -339,6 +339,7 @@ protected:
 	afx_msg void OnSpecInv(CCmdUI* pCmdUI);
 	afx_msg void OnSpecFInv(CCmdUI* pCmdUI);
 	afx_msg void OnSpecMInv(CCmdUI* pCmdUI);
+	afx_msg void OnBodyCtrl(CCmdUI* pCmdUI);
 	afx_msg void OnAppOpen();
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnUnits();
@@ -351,7 +352,6 @@ protected:
 	afx_msg void OnGuidelines();
 	afx_msg void OnLogFile();
 	afx_msg void OnSaveOptions();
-	afx_msg void OnCpLegend();
 	afx_msg void OnPlanePrefs();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnFoilDirectDesign();

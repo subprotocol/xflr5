@@ -742,12 +742,18 @@ double CFoil::GetCamberSlope(double x)
 {
 	//returns the camber slope at position x
 
-	for (int i=0; i<=1000; i++){
+	for (int i=0; i<1000; i++){
 		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
 			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
 			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
-			return -atan2(dy,dx);
+			return atan2(dy,dx);
 		}
+	}
+	if(x>=1.0)
+	{
+			double dx = m_rpMid[1000].x-m_rpMid[999].x;
+			double dy = m_rpMid[1000].y-m_rpMid[999].y;
+			return atan2(dy,dx);
 	}
 	return 0.0;
 }
@@ -986,9 +992,9 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpIntrados[iLowerh-2], m_rpIntrados[iLowerh-1],
 					  m_rpIntrados[iLowerh],   m_rpIntrados[iLowerh+1], &M);
-			LinkSpline.AddPoint(m_rpIntrados[iLowerh-1].x,m_rpIntrados[iLowerh-1].y);
-			LinkSpline.AddPoint(M.x, M.y);
-			LinkSpline.AddPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
+			LinkSpline.InsertPoint(m_rpIntrados[iLowerh-1].x,m_rpIntrados[iLowerh-1].y);
+			LinkSpline.InsertPoint(M.x, M.y);
+			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
 			//retrieve point 1 and 2 and insert them
@@ -1009,9 +1015,9 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpExtrados[iUpperh-2], m_rpExtrados[iUpperh-1],
 					  m_rpExtrados[iUpperh],   m_rpExtrados[iUpperh+1], &M);
-			LinkSpline.AddPoint(m_rpExtrados[iUpperh-1].x,m_rpExtrados[iUpperh-1].y);
-			LinkSpline.AddPoint(M.x, M.y);
-			LinkSpline.AddPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
+			LinkSpline.InsertPoint(m_rpExtrados[iUpperh-1].x,m_rpExtrados[iUpperh-1].y);
+			LinkSpline.InsertPoint(M.x, M.y);
+			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
 			//retrieve point 1 and 2 and insert them
@@ -1184,9 +1190,9 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpIntrados[iLowerh-1], m_rpIntrados[iLowerh],
 					  m_rpIntrados[iLowerh+1], m_rpIntrados[iLowerh+2], &M);
-			LinkSpline.AddPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
-			LinkSpline.AddPoint(M.x, M.y);
-			LinkSpline.AddPoint(m_rpIntrados[iLowerh+1].x,m_rpIntrados[iLowerh+1].y);
+			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
+			LinkSpline.InsertPoint(M.x, M.y);
+			LinkSpline.InsertPoint(m_rpIntrados[iLowerh+1].x,m_rpIntrados[iLowerh+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
 			//retrieve point 1 and 2 and insert them
@@ -1207,9 +1213,9 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpExtrados[iUpperh-1], m_rpExtrados[iUpperh],
 					  m_rpExtrados[iUpperh+1], m_rpExtrados[iUpperh+2], &M);
-			LinkSpline.AddPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
-			LinkSpline.AddPoint(M.x, M.y);
-			LinkSpline.AddPoint(m_rpExtrados[iUpperh+1].x,m_rpExtrados[iUpperh+1].y);
+			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
+			LinkSpline.InsertPoint(M.x, M.y);
+			LinkSpline.InsertPoint(m_rpExtrados[iUpperh+1].x,m_rpExtrados[iUpperh+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
 			//retrieve point 1 and 2 and insert them

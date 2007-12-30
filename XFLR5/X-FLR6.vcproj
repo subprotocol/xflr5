@@ -33,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OpenGL32.lib"
+				AdditionalDependencies="OpenGL32.lib Glu32.lib"
 				OutputFile="$(OutDir)/XFLR5.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -86,7 +86,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="OpenGL32.lib"
+				AdditionalDependencies="OpenGL32.lib Glu32.lib"
 				OutputFile="$(OutDir)/XFLR5.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -202,10 +202,25 @@
 				RelativePath=".\Design\AGridDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\ArcBall.cpp">
+			</File>
+			<File
 				RelativePath=".\XDirect\BatchDlg.cpp">
 			</File>
 			<File
 				RelativePath=".\XDirect\BatchThread.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\Body.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyCtrlBar.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyGridDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyScaleDlg.cpp">
 			</File>
 			<File
 				RelativePath=".\XDirect\CAddDlg.cpp">
@@ -248,6 +263,9 @@
 			</File>
 			<File
 				RelativePath=".\XDirect\FoilClrDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\Frame.cpp">
 			</File>
 			<File
 				RelativePath=".\XDirect\GeomDlg.cpp">
@@ -457,6 +475,9 @@
 				RelativePath=".\Design\SF.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\SpanPosBar.cpp">
+			</File>
+			<File
 				RelativePath=".\Design\Spline.cpp">
 			</File>
 			<File
@@ -520,9 +541,6 @@
 				RelativePath=".\Graph\UserVarDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\ValueDlg.cpp">
-			</File>
-			<File
 				RelativePath=".\misc\Vector.cpp">
 			</File>
 			<File
@@ -542,6 +560,9 @@
 			</File>
 			<File
 				RelativePath=".\Miarex\WAdvDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\WakeParamsDlg.cpp">
 			</File>
 			<File
 				RelativePath=".\Miarex\WGraphVarDlg.cpp">
@@ -603,10 +624,25 @@
 				RelativePath=".\Design\AGridDlg.h">
 			</File>
 			<File
+				RelativePath=".\Miarex\ArcBall.h">
+			</File>
+			<File
 				RelativePath=".\XDirect\BatchDlg.h">
 			</File>
 			<File
 				RelativePath=".\XDirect\BatchThread.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\Body.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyCtrlBar.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyGridDlg.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyScaleDlg.h">
 			</File>
 			<File
 				RelativePath=".\XDirect\CAddDlg.h">
@@ -655,6 +691,9 @@
 			</File>
 			<File
 				RelativePath=".\XDirect\FoilClrDlg.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\Frame.h">
 			</File>
 			<File
 				RelativePath=".\XDirect\GeomDlg.h">
@@ -801,6 +840,9 @@
 				RelativePath=".\Design\SF.h">
 			</File>
 			<File
+				RelativePath=".\Miarex\SpanPosBar.h">
+			</File>
+			<File
 				RelativePath=".\Design\Spline.h">
 			</File>
 			<File
@@ -828,9 +870,6 @@
 				RelativePath=".\Graph\UserVarDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\ValueDlg.h">
-			</File>
-			<File
 				RelativePath=".\misc\Vector.h">
 			</File>
 			<File
@@ -850,6 +889,9 @@
 			</File>
 			<File
 				RelativePath=".\Miarex\WAdvDlg.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\WakeParamsDlg.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\WGraphVarDlg.h">

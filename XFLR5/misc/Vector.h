@@ -37,6 +37,7 @@ public:
 	void RotateZ(CVector O, double ZTilt);
 	void RotateY(double YTilt);
 	void Translate(CVector T);
+	bool operator ==(CVector V);
 	void operator =(CVector T);
 	void operator+=(CVector T);
 	void operator-=(CVector T);
@@ -57,6 +58,6 @@ public:
 	double x;
 	double y;
 	double z;
-
+ 
 };
 

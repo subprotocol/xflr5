@@ -71,7 +71,6 @@ BEGIN_MESSAGE_MAP(CGeomDlg, CDialog)
 	ON_EN_CHANGE(IDC_THICKNESS, OnChanged)
 	ON_EN_CHANGE(IDC_XTHICKNESS, OnChangedX)
 	ON_EN_CHANGE(IDC_XCAMBER, OnChangedX)
-//	ON_BN_CLICKED(IDC_APPLY, OnApply)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -95,28 +94,28 @@ BOOL CGeomDlg::OnInitDialog()
 
 	m_ctrlCamber.SetPrecision(2);
 	m_ctrlThickness.SetPrecision(2);
-	m_ctrlCamber.SetValue(m_fCamber*100.f);
-	m_ctrlThickness.SetValue(m_fThickness*100.f);
+	m_ctrlCamber.SetValue(m_fCamber*100.0);
+	m_ctrlThickness.SetValue(m_fThickness*100.0);
 
 	m_ctrlCamberSlide.SetRange(0,100,false);
-	m_ctrlCamberSlide.SetPos((int)(m_fCamber*1000.f));
+	m_ctrlCamberSlide.SetPos((int)(m_fCamber*1000.0));
 	m_ctrlCamberSlide.SetTicFreq(5);
 
 	m_ctrlThickSlide.SetRange(0,200,false);
-	m_ctrlThickSlide.SetPos((int)(m_fThickness*1000.f));
+	m_ctrlThickSlide.SetPos((int)(m_fThickness*1000.0));
 	m_ctrlThickSlide.SetTicFreq(10);
 	
 	m_ctrlXCamber.SetPrecision(2);
 	m_ctrlXThickness.SetPrecision(2);
-	m_ctrlXCamber.SetValue(m_fXCamber*100.f);
-	m_ctrlXThickness.SetValue(m_fXThickness*100.f);
+	m_ctrlXCamber.SetValue(m_fXCamber*100.0);
+	m_ctrlXThickness.SetValue(m_fXThickness*100.0);
 
 	m_ctrlXCamberSlide.SetRange(0,1000,false);
-	m_ctrlXCamberSlide.SetPos((int)(m_fXCamber*1000.f));
+	m_ctrlXCamberSlide.SetPos((int)(m_fXCamber*1000.0));
 	m_ctrlXCamberSlide.SetTicFreq(100);
 
 	m_ctrlXThickSlide.SetRange(0,1000,false);
-	m_ctrlXThickSlide.SetPos((int)(m_fXThickness*1000.f));
+	m_ctrlXThickSlide.SetPos((int)(m_fXThickness*1000.0));
 	m_ctrlXThickSlide.SetTicFreq(100);
 
 	m_bApplied  = true;
@@ -147,15 +146,15 @@ void CGeomDlg::OnRestore()
 	m_pXFoil->thickb  = m_fThickness;
 	m_pXFoil->cambrb = m_fCamber;
 
-	m_ctrlThickness.SetValue(m_fThickness*100.f);
-	m_ctrlCamber.SetValue(m_fCamber*100.f);
-	m_ctrlThickSlide.SetPos((int)(m_fThickness*1000.f));
-	m_ctrlCamberSlide.SetPos((int)(m_fCamber*1000.f));
+	m_ctrlThickness.SetValue(m_fThickness*100.0);
+	m_ctrlCamber.SetValue(m_fCamber*100.0);
+	m_ctrlThickSlide.SetPos((int)(m_fThickness*1000.0));
+	m_ctrlCamberSlide.SetPos((int)(m_fCamber*1000.0));
 
-	m_ctrlXThickness.SetValue(m_fXThickness*100.f);
-	m_ctrlXCamber.SetValue(m_fXCamber*100.f);
-	m_ctrlXThickSlide.SetPos((int)(m_fXThickness*1000.f));
-	m_ctrlXCamberSlide.SetPos((int)(m_fXCamber*1000.f));
+	m_ctrlXThickness.SetValue(m_fXThickness*100.0);
+	m_ctrlXCamber.SetValue(m_fXCamber*100.0);
+	m_ctrlXThickSlide.SetPos((int)(m_fXThickness*1000.0));
+	m_ctrlXCamberSlide.SetPos((int)(m_fXCamber*1000.0));
 
 	m_bApplied  = true;
 	m_bAppliedX = true;
@@ -189,22 +188,22 @@ BOOL CGeomDlg::PreTranslateMessage(MSG* pMsg)
 void CGeomDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_CAMBERSLIDE)->GetSafeHwnd())    {
-		m_fCamber = (double)m_ctrlCamberSlide.GetPos()/10.f;
+		m_fCamber = (double)m_ctrlCamberSlide.GetPos()/10.0;
 		m_ctrlCamber.SetValue(m_fCamber);
 		Apply();
 	}
 	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_THICKSLIDE)->GetSafeHwnd())    {
-		m_fThickness = (double)m_ctrlThickSlide.GetPos()/10.f;
+		m_fThickness = (double)m_ctrlThickSlide.GetPos()/10.0;
 		m_ctrlThickness.SetValue(m_fThickness);
 		Apply();
 	}
 	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_XCAMBERSLIDE)->GetSafeHwnd())    {
-		m_fXCamber = (double)m_ctrlXCamberSlide.GetPos()/10.f;
+		m_fXCamber = (double)m_ctrlXCamberSlide.GetPos()/10.0;
 		m_ctrlXCamber.SetValue(m_fXCamber);
 		Apply();
 	}
 	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_XTHICKSLIDE)->GetSafeHwnd())    {
-		m_fXThickness = (double)m_ctrlXThickSlide.GetPos()/10.f;
+		m_fXThickness = (double)m_ctrlXThickSlide.GetPos()/10.0;
 		m_ctrlXThickness.SetValue(m_fXThickness);
 		Apply();
 	}
@@ -247,8 +246,8 @@ void CGeomDlg::Apply()
 	}
 
 	if(!m_bApplied){
-		double thickness = m_ctrlThickness.GetValue()/100.f;
-		double camber    = m_ctrlCamber.GetValue()/100.f;
+		double thickness = m_ctrlThickness.GetValue()/100.0;
+		double camber    = m_ctrlCamber.GetValue()/100.0;
 		m_pXFoil->tcset(camber, thickness);
 		m_ctrlCamberSlide.SetPos((int)(camber*100*10));
 		m_ctrlThickSlide.SetPos((int)(thickness*100*10));
@@ -256,8 +255,8 @@ void CGeomDlg::Apply()
 	}
 
 	if(!m_bAppliedX){
-		double Xthickness = m_ctrlXThickness.GetValue()/100.f;
-		double Xcamber    = m_ctrlXCamber.GetValue()/100.f;
+		double Xthickness = m_ctrlXThickness.GetValue()/100.0;
+		double Xcamber    = m_ctrlXCamber.GetValue()/100.0;
 		m_pXFoil->hipnt(Xcamber, Xthickness);
 		m_ctrlXCamberSlide.SetPos((int)(Xcamber*100*10));
 		m_ctrlXThickSlide.SetPos((int)(Xthickness*100*10));

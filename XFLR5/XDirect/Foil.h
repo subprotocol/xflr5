@@ -62,6 +62,8 @@ class CFoil  : public CObject
 	friend class CNacaDlg;
 	friend class CUFOListDlg;
 	friend class OpPoint;
+	friend class CVLMDlg;
+	friend class C3DPanelDlg;
 
 public:
 	int IsPoint(CVector Real);

@@ -101,7 +101,7 @@ double CFloatEdit::GetValue()
 		sscanf(str, "%lf", &f);
 		return f;
 	}
-	else return 0.f;//perfectible...
+	else return 0.0;//perfectible...
 }
 
 bool CFloatEdit::GetValue(double &f)

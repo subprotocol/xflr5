@@ -151,7 +151,11 @@ BOOL CViscDlg::OnInitDialog()
 void CViscDlg::OnTimer(UINT nIDEvent)
 {
 	if(m_pIterThread && m_pIterThread->m_bFinished){
+		if(!m_pIterThread) return;
+		HANDLE hThread = m_pIterThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 		delete m_pIterThread;
+		m_pIterThread = NULL;
 		m_XFile.Close();
 		EndDialog(0);
 	}
@@ -213,6 +217,8 @@ void CViscDlg::OnCancel()
 		m_pIterThread->m_bSkip = true;
 		m_pIterThread->m_bExit = true;
 		m_pIterThread->m_bSuspend = false;
+		HANDLE hThread = m_pIterThread->m_hThread;
+		WaitForSingleObject(hThread, INFINITE);
 	}
 //	OnSuspend();
 
@@ -314,7 +320,7 @@ void CViscDlg::SetFileHeader()
 			break;
 		}
 		case 6:{
-			strong = "Jun";
+			strong = "June";
 			break;
 		}
 		case 7:{

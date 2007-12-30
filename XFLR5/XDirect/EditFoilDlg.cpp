@@ -159,8 +159,10 @@ void CEditFoilDlg::SetList()
 			m_ctrlCoordList.SetItemText(j+off, 2, strong);
 		}
 	}
-	else if(m_pPF){
-		for (i=0; i<=m_pPF->m_Extrados.m_iPoints; i++){
+	else if(m_pPF)
+	{
+		for (i=0; i<m_pPF->m_Extrados.m_iPoints; i++)
+		{
 			strong.Format("u%d", i);
 			m_ctrlCoordList.InsertItem(i, strong);
 			strong.Format("%8.5f", m_pPF->m_Extrados.m_ctrlPoint[i].x);
@@ -168,8 +170,9 @@ void CEditFoilDlg::SetList()
 			strong.Format("%8.5f", m_pPF->m_Extrados.m_ctrlPoint[i].y);
 			m_ctrlCoordList.SetItemText(i, 2, strong);
 		}
-		off = m_pPF->m_Extrados.m_iPoints+1;
-		for (j=0; j<=m_pPF->m_Intrados.m_iPoints; j++){
+		off = m_pPF->m_Extrados.m_iPoints;
+		for (j=0; j<m_pPF->m_Intrados.m_iPoints; j++)
+		{
 			strong.Format("l%d", j);
 			m_ctrlCoordList.InsertItem(j+off, strong);
 			strong.Format("%8.5f", m_pPF->m_Intrados.m_ctrlPoint[j].x);
@@ -406,7 +409,8 @@ void CEditFoilDlg::OnDeletePt()
 {
 	POSITION pos = m_ctrlCoordList.GetFirstSelectedItemPosition();
 	if(!pos) return;
-	int sel = m_ctrlCoordList.GetNextSelectedItem(pos);
+	int i, sel;
+	sel = m_ctrlCoordList.GetNextSelectedItem(pos);
 	if(sel<0) return;
 
 	if(m_pSF){
@@ -414,11 +418,13 @@ void CEditFoilDlg::OnDeletePt()
 	else if(m_pPF){
 	}
 	else{
-		for (int i=sel;i<m_pBufferFoil->nb-1; i++){
+		for (i=sel;i<m_pBufferFoil->nb-1; i++)
+		{
 			m_pBufferFoil->xb[i] = m_pBufferFoil->xb[i+1];
 			m_pBufferFoil->yb[i] = m_pBufferFoil->yb[i+1];
 		}
-		for (i=sel;i<m_pBufferFoil->n-1; i++){
+		for (i=sel;i<m_pBufferFoil->n-1; i++)
+		{
 			m_pBufferFoil->x[i] = m_pBufferFoil->x[i+1];
 			m_pBufferFoil->y[i] = m_pBufferFoil->y[i+1];
 		}

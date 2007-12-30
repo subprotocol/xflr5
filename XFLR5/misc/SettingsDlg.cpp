@@ -1,7 +1,7 @@
 /****************************************************************************
 
     SettingsDlg Class
-    Copyright (C) 2006 André Deperrois XFLR5@yahoo.com
+    Copyright (C) 2007 André Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "../X-FLR5.h"
 #include "LinePickerDlg.h"
 #include "SettingsDlg.h"
+#include ".\settingsdlg.h"
 
 
 
@@ -57,6 +58,7 @@ void C3DColorDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BOTTRANS, m_ctrlBotTrans);
 	DDX_Control(pDX, IDC_TOPTRANS, m_ctrlTopTrans);
 	DDX_Control(pDX, IDC_WINGOUTLINE, m_ctrlWingPanels);
+	DDX_Control(pDX, IDC_WAKEDISPLAY, m_ctrlWakePanels);
 	//}}AFX_DATA_MAP
 }
 
@@ -74,6 +76,7 @@ BEGIN_MESSAGE_MAP(C3DColorDlg, CDialog)
 	ON_BN_CLICKED(IDC_DOWNWASH, OnDownwash)
 	ON_BN_CLICKED(IDC_WAKE, OnWake)
 	ON_BN_CLICKED(IDC_VLMMESH, OnVLMMesh)
+	ON_BN_CLICKED(IDC_WAKEDISPLAY, OnWakeDisplay)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -521,14 +524,6 @@ void C3DColorDlg::OnWake()
 }
 
 
-
-//DEL BOOL C3DColorDlg::OnInitDialog() 
-//DEL {
-//DEL 	CDialog::OnInitDialog();
-//DEL 	
-//DEL 	return TRUE;  
-//DEL }
-
 void C3DColorDlg::OnVLMMesh() 
 {
 	CLinePickerDlg LPdlg;
@@ -542,4 +537,19 @@ void C3DColorDlg::OnVLMMesh()
 		m_VLMWidth = LPdlg.GetWidth();
 	}
 	m_ctrlVLMMesh.Invalidate(true);
+}
+
+void C3DColorDlg::OnWakeDisplay() 
+{
+	if(m_ctrlWakePanels.GetCheck()) m_bWakePanels = true;
+	else m_bWakePanels = false;
+}
+
+BOOL C3DColorDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	if(m_bWakePanels) m_ctrlWakePanels.SetCheck(TRUE);
+	else              m_ctrlWakePanels.SetCheck(FALSE);
+	return FALSE;  
 }

@@ -50,10 +50,12 @@
 
 #define MAXPANELS          30
 #define MAXSTATIONS	      100 //max number of stations for LLT or VLM analysis
+#define MAXCHORDPANELS	   50
 #define MAXVLMSURFACES     80 
 #define VLMMATSIZE       2000
 #define MAXCONTROLS        10 //max controls per wing section
 #define SPLINECONTROLSIZE  50 //maximum number of control points
+#define MAXBODYFRAMES      30
 
 #define IQX  302	//300 = number of surface panel nodes + 6
 #define IQX2 151	//IQX/2 added arcds

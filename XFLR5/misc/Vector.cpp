@@ -90,12 +90,17 @@ double CVector::dot(CVector V)
 bool CVector::IsSame(CVector V)
 {
 	double d2 = (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z) ;
-	double L = VAbs();
+/*	double L = VAbs();
 	double L2 = L*L;
 	if(d2==0.0) return true;
 	if(d2/L2 < 1.0/1000000.0) 
 		return true;
 	else 
+		return false;*/
+
+	if(sqrt(d2)<0.00001) //less than 1/100 mm
+		return true;
+	else
 		return false;
 
 }
@@ -112,6 +117,16 @@ void CVector::operator +=(CVector T)
 	x += T.x;
 	y += T.y;
 	z += T.z;
+}
+
+bool CVector::operator ==(CVector V)
+{
+	double d = sqrt((V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z));
+
+	if(d<=0.000001) //1 micron... for distances only, not Forces, Moments etc...
+		return true;
+	else 
+		return false;
 }
 
 void CVector::operator =(CVector T)
@@ -165,7 +180,7 @@ CVector CVector::operator -(CVector V)
 	return T;
 }
 
-void  CVector::RotateX(CVector O, double XTilt)
+void CVector::RotateX(CVector O, double XTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;
@@ -177,7 +192,7 @@ void  CVector::RotateX(CVector O, double XTilt)
 	z = O.z + OP.y * sin(XTilt) + OP.z * cos(XTilt);
 }
 
-void  CVector::RotateY(CVector O, double YTilt)
+void CVector::RotateY(CVector O, double YTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;
@@ -191,7 +206,7 @@ void  CVector::RotateY(CVector O, double YTilt)
 }
 
 
-void  CVector::RotateZ(CVector O, double ZTilt)
+void CVector::RotateZ(CVector O, double ZTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;

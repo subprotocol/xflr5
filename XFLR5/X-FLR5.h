@@ -47,7 +47,6 @@ bool IsEven(int n);
 bool Rewind1Line(CStdioFile *pXFile, int &Line, CString &strong);
 BOOL ReadAVLString(CStdioFile *pXFile, int &Line, CString &strong);
 
-double DotProduct(CVector V1, CVector V2);
 double sign(double a);
 
 void GetPaperSize(DEVMODE *pDevMode, int &pw, int &ph);
@@ -59,7 +58,6 @@ void GetAreaUnit(CString &str, UINT unit);
 void GetLengthUnit(CString &str, UINT unit);
 void GetMomentUnit(CString &str, UINT unit);
 void GetForceUnit(CString &str, UINT unit);
-void CrossProduct(CVector V1, CVector V2, CVector &V);
 void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			  double &mtoUnit, double &m2toUnit, double &mstoUnit,
 			  double &kgtoUnit, double &NtoUnit, double &NmtoUnit);
@@ -76,18 +74,17 @@ void Trace(CString msg, int n);
 void Trace(CString msg, double f);
 void Trace(CString msg, void *p);
 
-bool IsBlackAndWhite();
 void SetBlackAndWhite(bool bBW);
 void GetBWColor(COLORREF &color, int &nStyle, int &nWidth);
 void SetGraphDlgPage(int page);
+void SetPrintOptions(bool bWindowBk, bool bGraphBk, bool bColor);
 int GetGraphDlgPage();
+bool IsBlackAndWhite();
 bool GetGraphBk();
 bool GetWindowBk();
 bool GetPrintColor();
-bool  Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
-void SetPrintOptions(bool bWindowBk, bool bGraphBk, bool bColor);
-//bool operator==(CVector V1, CVector V2);
-
+bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
+bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax);
 
 
 // CXFLR5App:
@@ -163,3 +160,12 @@ public:
 };
 
 extern CXFLR5App theApp;
+
+struct CDoubleRect
+{
+	public:
+		CDoubleRect();
+		double left, top, right, bottom;
+		bool PtInRect(CVector Real);
+		bool PtInRect(double x, double y);
+};
