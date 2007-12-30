@@ -49,16 +49,18 @@ void CXInvClrDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_MODFOIL, m_ctrlModFoil);
 	DDX_Control(pDX, IDC_SPLINESTYLE, m_ctrlSpline);
 	DDX_Control(pDX, IDC_REFFOIL, m_ctrlRefFoil);
+	DDX_Control(pDX, IDC_REFLECTEDSTYLE, m_ctrlReflected);
 	//}}AFX_DATA_MAP
 }
 
 
 BEGIN_MESSAGE_MAP(CXInvClrDlg, CDialog)
 	//{{AFX_MSG_MAP(CXInvClrDlg)
-	ON_BN_CLICKED(IDC_SPLINESTYLE, OnSplineStyle)
 	ON_WM_DRAWITEM()
+	ON_BN_CLICKED(IDC_SPLINESTYLE, OnSplineStyle)
 	ON_BN_CLICKED(IDC_MODFOIL, OnModFoilStyle)
 	ON_BN_CLICKED(IDC_REFFOIL, OnRefFoilStyle)
+	ON_BN_CLICKED(IDC_REFLECTEDSTYLE, OnReflectedStyle)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -71,7 +73,8 @@ void CXInvClrDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 	if (!pDC) return;
 	int nSavedDC = pDC->SaveDC();
-	if(nIDCtl==IDC_SPLINESTYLE){
+	if(nIDCtl==IDC_SPLINESTYLE)
+	{
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = RGB(100,100,100);
@@ -95,7 +98,33 @@ void CXInvClrDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->SelectObject(pOldBrush);
 		pDC->RestoreDC(nSavedDC);	
 	}
-	else if(nIDCtl==IDC_MODFOIL){
+	if(nIDCtl==IDC_REFLECTEDSTYLE)
+	{
+		LOGBRUSH lb;
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = RGB(100,100,100);
+		CPen DotPen(PS_GEOMETRIC | PS_DOT, 1, &lb);
+		CPen *pOldPen =  pDC->SelectObject(&DotPen);
+		CBrush FillBrush(GetSysColor(COLOR_3DFACE));
+		CBrush* pOldBrush = pDC->SelectObject(&FillBrush);
+		CRect SRect ;
+		GetDlgItem(IDC_REFLECTEDSTYLE)->GetClientRect(&SRect);
+		SRect.DeflateRect(2,2,2,2);
+		pDC->Rectangle(&SRect);
+
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = m_ReflectedClr;
+		CPen CurvePen(PS_GEOMETRIC | m_ReflectedStyle, GetPenWidth(m_ReflectedWidth,false), &lb);
+
+		pDC->SelectObject(&CurvePen);
+		pDC->MoveTo(5,8);
+		pDC->LineTo(SRect.right-5,8);
+		pDC->SelectObject(pOldPen);
+		pDC->SelectObject(pOldBrush);
+		pDC->RestoreDC(nSavedDC);	
+	}
+	else if(nIDCtl==IDC_MODFOIL)
+	{
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = RGB(100,100,100);
@@ -119,7 +148,8 @@ void CXInvClrDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 		pDC->SelectObject(pOldBrush);
 		pDC->RestoreDC(nSavedDC);	
 	}
-	else if(nIDCtl==IDC_REFFOIL){
+	else if(nIDCtl==IDC_REFFOIL)
+	{
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = RGB(100,100,100);
@@ -178,6 +208,22 @@ void CXInvClrDlg::OnRefFoilStyle()
 	m_ctrlRefFoil.Invalidate(TRUE);
 }
 
+
+void CXInvClrDlg::OnReflectedStyle() 
+{
+	CLinePickerDlg LPdlg;
+	LPdlg.SetColor(m_ReflectedClr);
+	LPdlg.SetStyle(m_ReflectedStyle);
+	LPdlg.SetWidth(m_ReflectedWidth);
+
+	if (IDOK==LPdlg.DoModal()){
+		m_ReflectedClr = LPdlg.GetColor();
+		m_ReflectedStyle  = LPdlg.GetStyle();
+		m_ReflectedWidth  = LPdlg.GetWidth();
+	}
+
+	m_ctrlReflected.Invalidate(TRUE);
+}
 void CXInvClrDlg::OnSplineStyle(){
 	CLinePickerDlg LPdlg;
 	LPdlg.SetColor(m_SplineClr);

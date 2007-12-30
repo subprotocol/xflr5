@@ -71,17 +71,24 @@ private:
 	bool m_bZoomPlus;
 	bool m_bFullInverse;// mixed inverse if false
 	bool m_bSaved;
+	bool m_bReflected;
 	bool m_bShowPoints;
 	bool m_bTransGraph;
 	bool m_bRefCurves;
+	bool m_bTangentSpline;
+
 
 	int m_Mk1, m_Mk2;
-	int m_tmpPos, m_Pos1, m_Pos2, m_nPos;
+	int m_tmpPos, m_Pos1, m_Pos2, m_nPos, m_SplineLeftPos, m_SplineRightPos;
 	int m_LogPixelsY;
 	int m_SplineStyle, m_SplineWidth;
 	double xd, yd;
 	double xu, yu;
 	double m_fScale, m_fRefScale;
+
+	int m_ReflectedStyle, m_ReflectedWidth;
+	COLORREF m_ReflectedClr;
+
 
 	CWnd * m_pChildWnd;
 	CWnd * m_pFrame;
@@ -95,6 +102,7 @@ private:
 	CCurve* m_pQCurve;
 	CCurve* m_pQVCurve;
 	CCurve* m_pMCurve;
+	CCurve* m_pReflectedCurve;
 
 	HCURSOR m_hcArrow;
 	HCURSOR m_hcCross;
@@ -114,6 +122,11 @@ private:
 	CFoil* m_pModFoil;
 
 	CSpline m_Spline;
+
+// temporary allocations
+	CPoint tanpt;
+	CPoint P0, P1, P2;
+
 
 	bool ExecQDES();
 	bool PrintAll(CDC *pDC, CRect DrawRect);
@@ -188,6 +201,7 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg void OnShowReflected();
 };
 
 /////////////////////////////////////////////////////////////////////////////

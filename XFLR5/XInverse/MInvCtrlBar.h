@@ -54,6 +54,7 @@ class CMInvCtrlBar : public CInitDialogBar
 	CButton	m_ctrlNewSpline;
 	CButton	m_ctrlShowSpline;
 	CButton	m_ctrlCpxx;
+	CButton	m_ctrlTangentSpline;
 	CButton m_ctrlExec;
 	CButton m_ctrlSmooth;
 
@@ -79,7 +80,7 @@ private:
 	void CancelMark();
 	void CancelSpline();
 	void CancelSmooth();
-	CWnd* m_pParent;
+	CWnd* m_pXInverse;
 
 	// Generated message map functions
 	protected:
@@ -88,6 +89,7 @@ private:
 	afx_msg void OnExec();
 	afx_msg void OnNewSpline();
 	afx_msg void OnQReset();
+	afx_msg void OnTangentSpline();
 	afx_msg void OnShowSpline();
 	afx_msg void OnSmooth();
 	afx_msg void OnApplySpline();

@@ -56,6 +56,7 @@ class CFInvCtrlBar : public CInitDialogBar
 	CButton	m_ctrlNewSpline;
 	CButton	m_ctrlSmooth;
 	CButton	m_ctrlShowSpline;
+	CButton	m_ctrlTangentSpline;
 	CFloatEdit	m_ctrlSpec;
 	CFloatEdit  m_ctrlFilterParam;
 	CFloatEdit	m_ctrlTGapy;
@@ -83,7 +84,7 @@ class CFInvCtrlBar : public CInitDialogBar
 	// Implementation
 private:
 	void CancelSpline();
-	CWnd* m_pParent;
+	CWnd* m_pXInverse;
 
 	// Generated message map functions
 	protected:
@@ -97,6 +98,7 @@ private:
 	afx_msg void OnFilter();
 	afx_msg void OnNewSpline();
 	afx_msg void OnShowSpline();
+	afx_msg void OnTangentSpline();
 	afx_msg void OnSpecal();
 	afx_msg void OnKillFocusSpec();
 	afx_msg void OnKillFocusTGap();

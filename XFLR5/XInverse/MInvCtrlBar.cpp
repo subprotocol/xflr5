@@ -33,6 +33,7 @@ BEGIN_MESSAGE_MAP(CMInvCtrlBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_EXEC, OnExec)
 	ON_BN_CLICKED(IDC_NEWSPLINE, OnNewSpline)
 	ON_BN_CLICKED(IDC_QRESET, OnQReset)
+	ON_BN_CLICKED(IDC_TANGENTSPLINE, OnTangentSpline)
 	ON_BN_CLICKED(IDC_SHOWSPLINE, OnShowSpline)
 	ON_BN_CLICKED(IDC_SMOOTH, OnSmooth)
 	ON_BN_CLICKED(IDC_APPLYSPLINE, OnApplySpline)
@@ -44,7 +45,7 @@ END_MESSAGE_MAP()
 CMInvCtrlBar::CMInvCtrlBar()
 {
 	//Set Initial conditions for controls
-
+	m_pXInverse = NULL;
 }
 
 
@@ -54,19 +55,6 @@ CMInvCtrlBar::~CMInvCtrlBar()
 }
 
 
-BOOL CMInvCtrlBar::OnInitDialogBar()
-{
-	// Support for DDX mechanism
-	// If you do not want DDX then
-	// do not call base class
-	CInitDialogBar::OnInitDialogBar();
-
-	// Update any controls NOT supported by DDX
-//	CXInverse* pXInv = (CXInverse*)m_pParent;
-//	m_ctrlIter.SetValue(pXInv->m_pXFoil->niterq);
-
-	return TRUE;
-}
 
 void CMInvCtrlBar::DoDataExchange(CDataExchange* pDX)
 {
@@ -85,6 +73,7 @@ void CMInvCtrlBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_INVITER, m_ctrlIter);
 	DDX_Control(pDX, IDC_MARK, m_ctrlMark);
 	DDX_Control(pDX, IDC_NEWSPLINE, m_ctrlNewSpline);
+	DDX_Control(pDX, IDC_TANGENTSPLINE, m_ctrlTangentSpline);
 	DDX_Control(pDX, IDC_SMOOTH, m_ctrlSmooth);
 	DDX_Control(pDX, IDC_SHOWSPLINE, m_ctrlShowSpline);
 	DDX_Control(pDX, IDC_EXEC, m_ctrlExec);
@@ -93,11 +82,25 @@ void CMInvCtrlBar::DoDataExchange(CDataExchange* pDX)
 } 
 
 
+BOOL CMInvCtrlBar::OnInitDialogBar()
+{
+	// Support for DDX mechanism
+	// If you do not want DDX then
+	// do not call base class
+	CInitDialogBar::OnInitDialogBar();
+
+	// Update any controls NOT supported by DDX
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
+	if(pXInv->m_bTangentSpline) m_ctrlTangentSpline.SetCheck(TRUE);
+//	m_ctrlIter.SetValue(pXInv->m_pXFoil->niterq);
+
+	return TRUE;
+}
 void CMInvCtrlBar::OnMarkSegment() 
 {
 	CancelSpline();
 	CancelSmooth();
-	CXInverse * pXInv = (CXInverse*)m_pParent;
+	CXInverse * pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	
 	if(m_ctrlMark.GetCheck()) m_ctrlOutput.SetWindowText("Mark target segment for modification");
@@ -121,7 +124,7 @@ void CMInvCtrlBar::OnCpxx()
 	CancelSpline();
 	CancelSmooth();
 	CancelMark();
-	CXInverse * pXInv = (CXInverse*)m_pParent;
+	CXInverse * pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(m_ctrlCpxx.GetCheck()) pXInv->m_pXFoil->lcpxx = true;
 	else  pXInv->m_pXFoil->lcpxx = false;
@@ -133,7 +136,7 @@ void CMInvCtrlBar::OnExec()
 	CancelSpline();
 	CancelSmooth();
 	CancelMark();
-	CXInverse * pXInv = (CXInverse*)m_pParent;
+	CXInverse * pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->m_pXFoil->niterq = m_ctrlIter.GetValue();
 	m_ctrlOutput.SetWindowText(" ");
@@ -147,7 +150,7 @@ void CMInvCtrlBar::OnQReset()
 	CancelSpline();
 	CancelSmooth();
 	CancelMark();
-	CXInverse * pXInv = (CXInverse*)m_pParent;
+	CXInverse * pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->ResetMixedQ();
 	pXInv->UpdateView();
@@ -156,7 +159,7 @@ void CMInvCtrlBar::OnQReset()
 
 void CMInvCtrlBar::OnNewSpline() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(m_ctrlNewSpline.GetCheck()){
 		CancelMark();
@@ -175,10 +178,17 @@ void CMInvCtrlBar::OnNewSpline()
 	pXInv->UpdateView();	
 }
 
+void CMInvCtrlBar::OnTangentSpline() 
+{
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
+	if(m_ctrlTangentSpline.GetCheck())	pXInv->m_bTangentSpline = true;
+	else								pXInv->m_bTangentSpline = false;
+}
+
 
 void CMInvCtrlBar::OnShowSpline() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(m_ctrlShowSpline.GetCheck())	pXInv->m_bSpline = true;
 	else							pXInv->m_bSpline = false;
@@ -190,7 +200,7 @@ void CMInvCtrlBar::OnShowSpline()
 
 void CMInvCtrlBar::OnSmooth() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	m_ctrlOutput.SetWindowText("Mark target segment for smoothing or 'Return' to smooth entire distribution");
 	CancelSpline();
@@ -207,7 +217,7 @@ void CMInvCtrlBar::OnSmooth()
 
 void CMInvCtrlBar::OnApplySpline()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(!pXInv->m_bSplined) pXInv->ApplySpline();
 //	CancelSpline();
@@ -220,7 +230,7 @@ BOOL CMInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN){
 		CWnd *pWnd = GetFocus();
-		CXInverse* pXInv = (CXInverse*)m_pParent;
+		CXInverse* pXInv = (CXInverse*)m_pXInverse;
 		if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 		if (pMsg->wParam == VK_ESCAPE){
 			CancelSmooth();
@@ -246,7 +256,7 @@ BOOL CMInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 		}
 	}	
 	else if(pMsg->message == WM_MOUSEWHEEL){
-		CXInverse* pXInv = (CXInverse*)m_pParent;
+		CXInverse* pXInv = (CXInverse*)m_pXInverse;
 
 		CPoint pt((short) LOWORD(pMsg->lParam),(short) HIWORD(pMsg->lParam));
 
@@ -259,7 +269,7 @@ BOOL CMInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 
 void CMInvCtrlBar::CancelSmooth()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 //	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
 	pXInv->m_bGetPos  = false;
@@ -274,7 +284,7 @@ void CMInvCtrlBar::CancelSmooth()
 
 void CMInvCtrlBar::CancelSpline()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 //	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
 	pXInv->m_bGetPos  = false;
@@ -289,7 +299,7 @@ void CMInvCtrlBar::CancelSpline()
 
 void CMInvCtrlBar::CancelMark()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	m_ctrlMark.SetCheck(false);
 	pXInv->m_bGetPos = false;
 	pXInv->m_bMark   = false;

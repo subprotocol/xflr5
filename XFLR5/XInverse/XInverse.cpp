@@ -46,11 +46,13 @@ CXInverse::CXInverse()
 	m_hcCross = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
 	m_hcMove  = AfxGetApp()->LoadCursor(IDC_HMOVE);
 
-	m_bLoaded     = false;
-	m_bSaved      = true;
-	m_bZoomPlus   = false;
-	m_bShowPoints = false;
-	m_bRefCurves  = false;
+	m_bLoaded        = false;
+	m_bSaved         = true;
+	m_bZoomPlus      = false;
+	m_bShowPoints    = false;
+	m_bRefCurves     = false;
+	m_bTangentSpline = true;
+	m_bReflected     = false;
 
 	m_pRefFoil = new CFoil();
 	m_pModFoil = new CFoil();
@@ -72,11 +74,17 @@ CXInverse::CXInverse()
 	m_SplineStyle = 0;
 	m_SplineWidth = 1;
 	m_SplineClr = RGB(170,120, 0);
+
+	m_ReflectedStyle = PS_DASH;
+	m_ReflectedWidth = 1;
+	m_ReflectedClr = RGB(170,120, 0);
 	
 	m_nPos    = 0;
 	m_tmpPos  = -1;
 	m_Pos1    = -1;
 	m_Pos2    = -1;
+	m_SplineLeftPos   = -1;
+	m_SplineRightPos  = -1;
 
 	m_QGraph.SetType(2);
 	m_QGraph.SetDefaults();
@@ -89,7 +97,8 @@ CXInverse::CXInverse()
 	m_pQCurve  = m_QGraph.AddCurve();
 	m_pMCurve  = m_QGraph.AddCurve();
 	m_pQVCurve = m_QGraph.AddCurve();
-
+	m_pReflectedCurve = m_QGraph.AddCurve();
+	m_pReflectedCurve->SetVisible(m_bReflected);
 }
 
 CXInverse::~CXInverse()
@@ -105,11 +114,9 @@ BEGIN_MESSAGE_MAP(CXInverse, CWnd)
 	ON_COMMAND(IDT_ZOOMLESS, OnZoomLess)
 	ON_COMMAND(IDM_GRAPHOPTIONS, OnGraphOptions)
 	ON_COMMAND(IDM_RESETGRAPH, OnResetGraph)
-//	ON_COMMAND(IDM_SHOWCONTROLS, OnShowControls)
 	ON_COMMAND(IDM_PRINT, OnPrint)
 	ON_COMMAND(IDM_QINIT, OnQInit)
 	ON_COMMAND(IDM_QMOD, OnQMod)
-//	ON_COMMAND(IDM_SHOWPOINTS, OnShowPoints)
 	ON_COMMAND(IDM_EXPORTFOIL, OnExportFoil)
 	ON_COMMAND(IDM_QVISC, OnQVisc)
 	ON_COMMAND(IDM_COLORSTYLES, OnColorStyles)
@@ -134,6 +141,7 @@ BEGIN_MESSAGE_MAP(CXInverse, CWnd)
 //	ON_COMMAND(IDM_SHOWREFCURVES, OnShowRefCurves)
 //	ON_COMMAND(IDM_STOREREFCURVE, OnStoreRefCurve)
 	//}}AFX_MSG_MAP
+	ON_COMMAND(IDM_SHOWREFLECTED, OnShowReflected)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -171,6 +179,11 @@ bool CXInverse::SetParams()
 	m_pQVCurve->SetTitle("Q - Viscous");
 	m_pQVCurve->SetColor(RGB(50,170,0));
 	m_pQVCurve->SetStyle(PS_SOLID);
+
+	m_pReflectedCurve->SetColor(m_ReflectedClr);
+	m_pReflectedCurve->SetStyle(m_ReflectedStyle);
+	m_pReflectedCurve->SetWidth(m_ReflectedWidth);
+	m_pReflectedCurve->SetTitle("Reflected");
 
 	m_bTrans   = false;
 	m_bSpline  = false;
@@ -256,6 +269,7 @@ void CXInverse::Clear()
 	m_pRefFoil->m_FoilName = "";
 	m_pModFoil->m_FoilName = "";
 	m_bLoaded = false;
+	m_pReflectedCurve->ResetCurve();
 	m_pMCurve->ResetCurve();
 	m_pQCurve->ResetCurve();
 	m_pQVCurve->ResetCurve();
@@ -379,17 +393,23 @@ void CXInverse::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void CXInverse::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	if(!m_bGetPos){
+	int CtrlPt;
+	CPoint pttmp;
+
+	if(!m_bGetPos)
+	{
 		m_PointDown.x = point.x;
 		m_PointDown.y = point.y;
-		CPoint pttmp(point.x, point.y);
-		if(m_QGraph.IsInDrawRect(pttmp)){
+		pttmp.SetPoint(point.x, point.y);
+
+		if(m_QGraph.IsInDrawRect(pttmp))
+		{
 			m_bTransGraph = true;
 			SetCursor(m_hcMove);
 			xd = m_QGraph.ClientTox(point.x);
 			yd = m_QGraph.ClientToy(point.y);
 			if(m_bSpline){
-				int CtrlPt = m_Spline.IsControlPoint(xd, yd,
+				CtrlPt = m_Spline.IsControlPoint(xd, yd,
 												m_QGraph.GetXScale(),
 												m_QGraph.GetYScale());
 				if(CtrlPt<0) m_Spline.m_iSelect = -1;
@@ -400,7 +420,8 @@ void CXInverse::OnLButtonDown(UINT nFlags, CPoint point)
 				SHORT sh1 = GetKeyState(VK_LCONTROL);
 				SHORT sh2 = GetKeyState(VK_RCONTROL);
 				SHORT sh3 = GetKeyState(VK_SHIFT);
-				if ((sh1 & 0x8000) || (sh2 & 0x8000)){
+				if ((sh1 & 0x8000) || (sh2 & 0x8000))
+				{
 					if(CtrlPt>=0) {
 						if (m_Spline.m_iSelect>=0) {
 							m_Spline.RemovePoint(m_Spline.m_iSelect);
@@ -409,7 +430,8 @@ void CXInverse::OnLButtonDown(UINT nFlags, CPoint point)
 						}
 					}
 				}
-				else if (sh3 & 0x8000) {
+				else if (sh3 & 0x8000) 
+				{
 					m_Spline.InsertPoint(xd,yd);
 					m_Spline.SplineKnots();
 					m_Spline.SplineCurve();
@@ -442,7 +464,13 @@ void CXInverse::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	m_bTrans = false;
 
-	if(m_bZoomPlus && m_rCltRect.PtInRect(point)){
+	int tmp, width, height;
+	double x1,x2,w,h,xw,yh,xm,ym;
+	double xmin, ymin, xmax, ymax;
+	double ratio,x, y, ux, uy, xpt, ypt, norm;
+
+	if(m_bZoomPlus && m_rCltRect.PtInRect(point))
+	{
 		CRect ZRect(&m_ZoomRect);
 		ZRect.NormalizeRect();
 		if (!ZRect.IsRectEmpty() ){
@@ -450,31 +478,30 @@ void CXInverse::OnLButtonUp(UINT nFlags, CPoint point)
 			xu = m_QGraph.ClientTox(point.x);
 			yu = m_QGraph.ClientToy(point.y);
 
-			int width  = abs(m_PointDown.x-point.x);
-			int height = abs(m_PointDown.y-point.y);
+			width  = abs(m_PointDown.x-point.x);
+			height = abs(m_PointDown.y-point.y);
 			//preserve ratio
-			double w = (double)fabs(xu-xd);
-			double h = (double)fabs(yu-yd);
-			double xw = 	m_QGraph.GetXMax() - m_QGraph.GetXMin();
-			double yh = 	m_QGraph.GetYMax() - m_QGraph.GetYMin();
-			double xm = (xu+xd)/2.f;
-			double ym = (yu+yd)/2.f;
-			double xmin, ymin, xmax, ymax;
-			double ratio;
+			w = abs(xu-xd);
+			h = abs(yu-yd);
+			xw = 	m_QGraph.GetXMax() - m_QGraph.GetXMin();
+			yh = 	m_QGraph.GetYMax() - m_QGraph.GetYMin();
+			xm = (xu+xd)/2.0;
+			ym = (yu+yd)/2.0;
+
 			if(width>=height){
-				xmin  = xm - w/2.f;
-				xmax  = xm + w/2.f;
+				xmin  = xm - w/2.0;
+				xmax  = xm + w/2.0;
 				ratio = w/xw;
 
-				ymin  = ym - ratio*yh/2.f;
-				ymax  = ym + ratio*yh/2.f;
+				ymin  = ym - ratio*yh/2.0;
+				ymax  = ym + ratio*yh/2.0;
 			}
 			else {
-				ymin  = ym - h/2.f;
-				ymax  = ym + h/2.f;
+				ymin  = ym - h/2.0;
+				ymax  = ym + h/2.0;
 				ratio = h/yh;
-				xmin  = xm - ratio * xw/2.f;
-				xmax  = xm + ratio * xw/2.f;
+				xmin  = xm - ratio * xw/2.0;
+				xmax  = xm + ratio * xw/2.0;
 			}
 			if (m_QGraph.IsInDrawRect(ZRect.left, ZRect.top) &&
 				m_QGraph.IsInDrawRect(ZRect.right, ZRect.bottom)){
@@ -486,61 +513,109 @@ void CXInverse::OnLButtonUp(UINT nFlags, CPoint point)
 			ReleaseZoom();
 		}
 	}
-	else if(m_bZoomPlus && !m_rCltRect.PtInRect(point)){
+	else if(m_bZoomPlus && !m_rCltRect.PtInRect(point))
+	{
 			ReleaseZoom();
 	}
-	else if(m_bGetPos && m_rCltRect.PtInRect(point)){
-		if(m_nPos == 0){
+	else if(m_bGetPos && m_rCltRect.PtInRect(point))
+	{
+		if(m_nPos == 0)
+		{
 			m_Pos1 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
 		}
-		if(m_nPos == 1){
+		if(m_nPos == 1)
+		{
 			m_Pos2 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
 		}
 		m_nPos++;
-		if(m_nPos == 2) {
-			if(m_bSmooth) {
+		if(m_nPos == 2) 
+		{
+			if(m_bSmooth) 
+			{
 				if (m_bFullInverse) m_pFInvCtrlBar->m_ctrlOutput.SetWindowText(" ");
 				else m_pMInvCtrlBar->m_ctrlOutput.SetWindowText(" ");
 				Smooth(m_Pos1, m_Pos2);
 			}
-			else if(m_bSpline) {
-				double x1 = m_pMCurve->x[m_Pos1];
-				double x2 = m_pMCurve->x[m_Pos2];
-				if(fabs(x2-x1)<0.00001) return;
-				if(x2<x1){
-					int tmp = m_Pos2;
+			else if(m_bSpline) 
+			{
+				x1 = m_pMCurve->x[m_Pos1];
+				x2 = m_pMCurve->x[m_Pos2];
+				if(abs(x2-x1)<0.00001) return;
+				if(x2<x1)
+				{
+					tmp    = m_Pos2;
 					m_Pos2 = m_Pos1;
 					m_Pos1 = tmp;
 				}
-				m_Spline.m_iCtrlPoints = -1;
+
+				m_SplineLeftPos  = m_Pos1;
+				m_SplineRightPos = m_Pos2;
+
+				m_Spline.m_iCtrlPoints = 0;
 				m_Spline.InsertPoint(m_pMCurve->x[m_Pos1], m_pMCurve->y[m_Pos1]);
 				m_Spline.InsertPoint(m_pMCurve->x[m_Pos2], m_pMCurve->y[m_Pos2]);
-				double x, y;
-				x = (3.f*m_pMCurve->x[m_Pos1] + m_pMCurve->x[m_Pos2])/4.f;
-				y = (3.f*m_pMCurve->y[m_Pos1] + m_pMCurve->y[m_Pos2])/4.f;
+
+				x = (3.0*m_pMCurve->x[m_Pos1] + m_pMCurve->x[m_Pos2])/4.0;
+				y = (3.0*m_pMCurve->y[m_Pos1] + m_pMCurve->y[m_Pos2])/4.0;
 				m_Spline.InsertPoint(x,y);
-				x = (m_pMCurve->x[m_Pos1] + m_pMCurve->x[m_Pos2])/2.f;
-				y = (m_pMCurve->y[m_Pos1] + m_pMCurve->y[m_Pos2])/2.f;
+
+				x = (m_pMCurve->x[m_Pos1] + m_pMCurve->x[m_Pos2])/2.0;
+				y = (m_pMCurve->y[m_Pos1] + m_pMCurve->y[m_Pos2])/2.0;
 				m_Spline.InsertPoint(x,y);
-				x = (m_pMCurve->x[m_Pos1] + 3.f*m_pMCurve->x[m_Pos2])/4.f;
-				y = (m_pMCurve->y[m_Pos1] + 3.f*m_pMCurve->y[m_Pos2])/4.f;
+
+				x = (m_pMCurve->x[m_Pos1] + 3.0*m_pMCurve->x[m_Pos2])/4.0;
+				y = (m_pMCurve->y[m_Pos1] + 3.0*m_pMCurve->y[m_Pos2])/4.0;
 				m_Spline.InsertPoint(x,y);
+
+
+				if (m_bTangentSpline)
+				{
+					//Second point must remain on tangent to curve
+					ux = m_pMCurve->x[m_Pos1+1] - m_pMCurve->x[m_Pos1];
+					uy = m_pMCurve->y[m_Pos1+1] - m_pMCurve->y[m_Pos1];
+					norm = sqrt(ux*ux+uy*uy);
+					ux /= norm;
+					uy /= norm;
+					xpt = m_Spline.m_Input[1].x - m_Spline.m_Input[0].x;
+					ypt = m_Spline.m_Input[1].y - m_Spline.m_Input[0].y;
+				
+					m_Spline.m_Input[1].x = m_Spline.m_Input[0].x + (ux*xpt + uy*ypt) * ux;
+					m_Spline.m_Input[1].y = m_Spline.m_Input[0].y + (ux*xpt + uy*ypt) * uy;
+				
+
+					//penultimate point must remain on tangent to curve
+					ux = m_pMCurve->x[m_Pos2] - m_pMCurve->x[m_Pos2-1];
+					uy = m_pMCurve->y[m_Pos2] - m_pMCurve->y[m_Pos2-1];
+					norm = sqrt(ux*ux+uy*uy);
+					ux /= norm;
+					uy /= norm;
+
+					xpt = m_Spline.m_Input[m_Spline.m_iCtrlPoints-2].x - m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x;
+					ypt = m_Spline.m_Input[m_Spline.m_iCtrlPoints-2].y - m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].y;
+					
+					m_Spline.m_Input[m_Spline.m_iCtrlPoints-2].x = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x + (ux*xpt + uy*ypt) * ux;
+					m_Spline.m_Input[m_Spline.m_iCtrlPoints-2].y = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].y + (ux*xpt + uy*ypt) * uy;
+				}	
+
 				m_Spline.SplineKnots();
 				m_Spline.SplineCurve();
-				if(m_bFullInverse){
+				if(m_bFullInverse)
+				{
 					m_pFInvCtrlBar->m_ctrlNewSpline.SetCheck(0);
 					m_pFInvCtrlBar->m_ctrlNewSpline.Invalidate();
 					m_pFInvCtrlBar->m_ctrlOutput.SetWindowText(
 						"Drag points to modify splines, Apply, and Execute to generate new geometry");
 				}
-				else{
+				else
+				{
 					m_pMInvCtrlBar->m_ctrlNewSpline.SetCheck(0);
 					m_pMInvCtrlBar->m_ctrlNewSpline.Invalidate();
 					m_pMInvCtrlBar->m_ctrlOutput.SetWindowText(	
 						"Drag points to modify splines, Apply, and Execute to generate new geometry");
 				}
 			}
-			else if(m_bMark){
+			else if(m_bMark)
+			{
 				m_pMInvCtrlBar->m_ctrlOutput.SetWindowText(" ");
 				if (m_Pos1 == m_Pos2) return;
 				m_Mk1 = m_Pos1;
@@ -574,92 +649,209 @@ void CXInverse::OnLButtonUp(UINT nFlags, CPoint point)
 void CXInverse::OnMouseMove(UINT nFlags, CPoint point) 
 {
 	SHORT shZ  = GetKeyState(90);
+	double x1,y1, xmin, xmax, ymin,  ymax, xpt, ypt, scale, ux, uy, unorm, vx, vy, vnorm, scal;
+	double xx0,xx1,xx2,yy0,yy1,yy2;
+	int a, n, ipt;
 
-	if(m_bGetPos){
+	if(m_bGetPos)
+	{
 		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
-
 	}
-	else if(m_bZoomPlus && (nFlags & MK_LBUTTON )){
+	else if(m_bZoomPlus && (nFlags & MK_LBUTTON))
+	{
 		m_ZoomRect.right  = point.x;
 		m_ZoomRect.bottom = point.y;
 	}
-	else if(m_rCltRect.PtInRect(point) && (nFlags & MK_LBUTTON) && m_bTrans){
+	else if(m_rCltRect.PtInRect(point) && (nFlags & MK_LBUTTON) && m_bTrans)
+	{
 		CPoint pttmp(point.x, point.y);
-		if(m_bTransGraph){
+		if(m_bTransGraph)
+		{
 			// we're dragging the graph
-			double x1 =  m_QGraph.ClientTox(m_PointDown.x) ;
-			double y1 =  m_QGraph.ClientToy(m_PointDown.y) ;
+			x1 =  m_QGraph.ClientTox(m_PointDown.x) ;
+			y1 =  m_QGraph.ClientToy(m_PointDown.y) ;
 			
 			xu = m_QGraph.ClientTox(point.x);
 			yu = m_QGraph.ClientToy(point.y);
 
-			double xmin = m_QGraph.GetXMin() - xu+x1;
-			double xmax = m_QGraph.GetXMax() - xu+x1;
-			double ymin = m_QGraph.GetYMin() - yu+y1;
-			double ymax = m_QGraph.GetYMax() - yu+y1;
+			xmin = m_QGraph.GetXMin() - xu+x1;
+			xmax = m_QGraph.GetXMax() - xu+x1;
+			ymin = m_QGraph.GetYMin() - yu+y1;
+			ymax = m_QGraph.GetYMax() - yu+y1;
 
 			m_QGraph.SetWindow(xmin, xmax, ymin, ymax);
 		}
-		else {//we're dragging the foil
+		else 
+		{
+			//we're dragging the foil
 			m_ptOffset.x += point.x - m_PointDown.x;
 			m_ptOffset.y += point.y - m_PointDown.y;
 		}
 		m_PointDown = point;
 	}
-	else if ((nFlags & MK_LBUTTON)   && !m_bZoomPlus &&
-			  m_bSpline && m_Spline.m_iSelect>=0) {
+	else if ((nFlags & MK_LBUTTON) && !m_bZoomPlus && m_bSpline && m_Spline.m_iSelect>=0) 
+	{
 		// user is dragging the point
-		double x1 =  m_QGraph.ClientTox(point.x) ;
-		double y1 =  m_QGraph.ClientToy(point.y) ;
-		if(m_rGraphRect.PtInRect(point)){
-			int n = m_Spline.m_iSelect;
-			if (n>0 && n<m_Spline.m_iCtrlPoints) {
-				if(x1<m_Spline.m_Input[0].x) 
-					x1 = m_Spline.m_Input[0].x;
-				if(x1>m_Spline.m_Input[m_Spline.m_iCtrlPoints].x) 
-					x1 = m_Spline.m_Input[m_Spline.m_iCtrlPoints].x;
+		x1 =  m_QGraph.ClientTox(point.x) ;
+		y1 =  m_QGraph.ClientToy(point.y) ;
+		if(m_rGraphRect.PtInRect(point))
+		{
+			n = m_Spline.m_iSelect;
+			if(n==0)
+			{
+				// user is dragging end point
+				// find closest graph point
+				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
+				m_SplineLeftPos = ipt;
+				xpt = m_pMCurve->x[ipt];
+				ypt = m_pMCurve->y[ipt];
+				// check for inversion
+				if(xpt> m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x)
+				{
+					m_Spline.m_Input[n].x = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x;
+					m_Spline.m_Input[n].y = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].y;
+					m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x = xpt;
+					m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].y = ypt;
+				}
+				else
+				{
+					m_Spline.m_Input[n].x = xpt;
+					m_Spline.m_Input[n].y = ypt;
+				}
+				m_Spline.SplineCurve();
+			}
+			else if(n == m_Spline.m_iCtrlPoints-1)
+			{
+				// user is dragging end point
+				// find closest graph point
+				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
+				m_SplineRightPos = ipt;
+				xpt = m_pMCurve->x[ipt];
+				ypt = m_pMCurve->y[ipt];
+				// check for inversion
+				if(xpt< m_Spline.m_Input[0].x)
+				{
+					m_Spline.m_Input[n].x = m_Spline.m_Input[0].x;
+					m_Spline.m_Input[n].y = m_Spline.m_Input[0].y;
+					m_Spline.m_Input[0].x = xpt;
+					m_Spline.m_Input[0].y = ypt;
+				}
+				else
+				{
+					m_Spline.m_Input[n].x = xpt;
+					m_Spline.m_Input[n].y = ypt;
+				}
+				m_Spline.SplineCurve();
+			}
+			else if (n==1 && m_bTangentSpline)
+			{
+				// Second point must remain on tangent to curve
+				// difficulty is that we are working in non-normal coordinates
+
+				tanpt.SetPoint(point.x, point.y);
+				P0.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineLeftPos-1]), m_QGraph.yToClient(m_pMCurve->y[m_SplineLeftPos-1]));
+				P1.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineLeftPos]),   m_QGraph.yToClient(m_pMCurve->y[m_SplineLeftPos]));
+				P2.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineLeftPos+1]), m_QGraph.yToClient(m_pMCurve->y[m_SplineLeftPos+1]));
+				//v is the tangent to the curve in screen coordinates
+				vx = (double)((P0.x-P1.x)*(P0.x-P2.x)*(P1.x-P2.x)*(P2.x-P0.x));
+				vy = (double)( P0.y *(P1.x-P2.x)          * (P1.x-P2.x) * (P2.x-P0.x)         
+							 - P1.y *(2.0*P1.x-P0.x-P2.x) * (P0.x-P2.x) * (P2.x-P0.x)
+							 - P2.y *(P1.x-P0.x)          * (P0.x-P1.x) * (P0.x-P2.x));
+				vnorm = sqrt(vx*vx+vy*vy);
+				vx/=vnorm;
+				vy/=vnorm;
+				scal = (double)(point.x-P1.x)*vx + (double)(point.y-P1.y)*vy;
+				tanpt.x = P1.x + (int)(vx * scal);
+				tanpt.y = P1.y + (int)(vy * scal);
+
+				x1 =  m_QGraph.ClientTox(tanpt.x) ;
+				y1 =  m_QGraph.ClientToy(tanpt.y) ;
+
+				xx0 = m_pMCurve->x[m_SplineLeftPos-1];
+				xx1 = m_pMCurve->x[m_SplineLeftPos];
+				xx2 = m_pMCurve->x[m_SplineLeftPos+1];
+				yy0 = m_pMCurve->y[m_SplineLeftPos-1];
+				yy1 = m_pMCurve->y[m_SplineLeftPos];
+				yy2 = m_pMCurve->y[m_SplineLeftPos+1];
+
+				ux = (xx0-xx1)*(xx0-xx2)*(xx1-xx2)*(xx2-xx0);
+				uy =	  yy0 *(xx1-xx2)         * (xx1-xx2) * (xx2-xx0)         
+						- yy1 *(2.0*xx1-xx0-xx2) * (xx0-xx2) * (xx2-xx0)
+						- yy2 *(xx1-xx0)         * (xx0-xx1) * (xx0-xx2);
+			
+//				unorm = sqrt(ux*ux*scx*scx+uy*uy*scy*scy)/scx/scy;
+				unorm = sqrt(ux*ux+uy*uy);
+				ux /= unorm;
+				uy /= unorm;
+
+				vx = x1-m_Spline.m_Input[n-1].x;
+				vy = y1-m_Spline.m_Input[n-1].y;
+
+				scal =  (ux*vx + uy*vy);
+				m_Spline.m_Input[n].x = m_Spline.m_Input[0].x + scal * ux ;
+				m_Spline.m_Input[n].y = m_Spline.m_Input[0].y + scal * uy ;
+				m_Spline.SplineCurve();
+			}
+			else if (n==m_Spline.m_iCtrlPoints-2 && m_bTangentSpline)
+			{
+				//penultimate point must remain on tangent to curve
+				// difficulty is that we are working in non-normal coordinates
+				tanpt.SetPoint(point.x, point.y);
+				P0.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineRightPos-1]), m_QGraph.yToClient(m_pMCurve->y[m_SplineRightPos-1]));
+				P1.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineRightPos]),   m_QGraph.yToClient(m_pMCurve->y[m_SplineRightPos]));
+				P2.SetPoint(m_QGraph.xToClient(m_pMCurve->x[m_SplineRightPos+1]), m_QGraph.yToClient(m_pMCurve->y[m_SplineRightPos+1]));
+				//v is the tangent to the curve in screen coordinates
+				vx = (double)((P0.x-P1.x)*(P0.x-P2.x)*(P1.x-P2.x)*(P2.x-P0.x));
+				vy = (double)( P0.y *(P1.x-P2.x)          * (P1.x-P2.x) * (P2.x-P0.x)         
+							 - P1.y *(2.0*P1.x-P0.x-P2.x) * (P0.x-P2.x) * (P2.x-P0.x)
+							 - P2.y *(P1.x-P0.x)          * (P0.x-P1.x) * (P0.x-P2.x));
+				vnorm = sqrt(vx*vx+vy*vy);
+				vx/=vnorm;
+				vy/=vnorm;
+				scal = (double)(point.x-P1.x)*vx + (double)(point.y-P1.y)*vy;
+				tanpt.x = P1.x + (int)(vx * scal);
+				tanpt.y = P1.y + (int)(vy * scal);
+
+				x1 =  m_QGraph.ClientTox(tanpt.x) ;
+				y1 =  m_QGraph.ClientToy(tanpt.y) ;
+
+				xx0 = m_pMCurve->x[m_SplineRightPos-1];
+				xx1 = m_pMCurve->x[m_SplineRightPos];
+				xx2 = m_pMCurve->x[m_SplineRightPos+1];
+				yy0 = m_pMCurve->y[m_SplineRightPos-1];
+				yy1 = m_pMCurve->y[m_SplineRightPos];
+				yy2 = m_pMCurve->y[m_SplineRightPos+1];
+
+				ux = (xx0-xx1)*(xx0-xx2)*(xx1-xx2)*(xx2-xx0);
+				uy =	  yy0 *(xx1-xx2)         * (xx1-xx2) * (xx2-xx0)         
+						- yy1 *(2.0*xx1-xx0-xx2) * (xx0-xx2) * (xx2-xx0)
+						- yy2 *(xx1-xx0)         * (xx0-xx1) * (xx0-xx2);
+
+				unorm = sqrt(ux*ux+uy*uy);
+				ux /= unorm;
+				uy /= unorm;
+
+				vx = x1-m_Spline.m_Input[n+1].x;
+				vy = y1-m_Spline.m_Input[n+1].y;
+
+				scal =  (ux*vx + uy*vy);
+				m_Spline.m_Input[n].x = m_Spline.m_Input[n+1].x + scal * ux;
+				m_Spline.m_Input[n].y = m_Spline.m_Input[n+1].y + scal * uy;
+				m_Spline.SplineCurve();
+			}	
+			else if (n>0 && n<m_Spline.m_iCtrlPoints-1)
+			{
+//				if(x1<m_Spline.m_Input[0].x) 				        x1 = m_Spline.m_Input[0].x;
+//				if(x1>m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x) x1 = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x;
 
 				m_Spline.m_Input[n].x = x1;
 				m_Spline.m_Input[n].y = y1;
 				m_Spline.SplineCurve();
 			}
-			else if(n==0){// || n == m_Spline.m_iCtrlPoints) {
-				// user is dragging end point
-				// find closest graph point
-				int ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
-				double xpt = m_pMCurve->x[ipt];
-				double ypt = m_pMCurve->y[ipt];
-				// check for inversion
-				if(xpt> m_Spline.m_Input[m_Spline.m_iCtrlPoints].x){
-					m_Spline.m_Input[n].x = m_Spline.m_Input[m_Spline.m_iCtrlPoints].x;
-					m_Spline.m_Input[n].y = m_Spline.m_Input[m_Spline.m_iCtrlPoints].y;
-				}
-				else{
-					m_Spline.m_Input[n].x = xpt;
-					m_Spline.m_Input[n].y = ypt;
-				}
-				m_Spline.SplineCurve();
-			}
-			else if(n == m_Spline.m_iCtrlPoints) {
-				// user is dragging end point
-				// find closest graph point
-				int ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x));
-				double xpt = m_pMCurve->x[ipt];
-				double ypt = m_pMCurve->y[ipt];
-				// check for inversion
-				if(xpt< m_Spline.m_Input[0].x){
-					m_Spline.m_Input[n].x = m_Spline.m_Input[m_Spline.m_iCtrlPoints].x;
-					m_Spline.m_Input[n].y = m_Spline.m_Input[m_Spline.m_iCtrlPoints].y;
-				}
-				else{
-					m_Spline.m_Input[n].x = xpt;
-					m_Spline.m_Input[n].y = ypt;
-				}
-				m_Spline.SplineCurve();
-			}
 		}
 	}
-	else if((nFlags & MK_MBUTTON) ||  (shZ & 0x8000)){
+	else if((nFlags & MK_MBUTTON) ||  (shZ & 0x8000))
+	{
 		ReleaseZoom();
 		CPoint pttmp(point.x, point.y);
 		if(m_QGraph.IsInDrawRect(pttmp)){
@@ -688,21 +880,22 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 			}
 		}
 		else{
-			double scale = m_fScale;
+			scale = m_fScale;
 
 			if(point.y-m_PointDown.y>0) m_fScale *= 1.06;
 			else						m_fScale /= 1.06;
 
-			int a = (int)((m_rCltRect.right+m_rCltRect.left)/2);
+			a = (int)((m_rCltRect.right+m_rCltRect.left)/2);
 			m_ptOffset.x = a + (int)((m_ptOffset.x-a)*m_fScale/scale);
 		}
 		m_PointDown = point;
 	}
 	else{// highlight if mouse passe over a point
-		if(m_bSpline){
-			double x1 =  m_QGraph.ClientTox(point.x) ;
-			double y1 =  m_QGraph.ClientToy(point.y) ;
-			int n = m_Spline.IsControlPoint(x1,y1,
+		if(m_bSpline)
+		{
+			x1 =  m_QGraph.ClientTox(point.x) ;
+			y1 =  m_QGraph.ClientToy(point.y) ;
+			n = m_Spline.IsControlPoint(x1,y1,
 				m_QGraph.GetXScale(),
 				m_QGraph.GetYScale());
 			if (n>=0 && n<=m_Spline.m_iCtrlPoints) {
@@ -794,9 +987,8 @@ void CXInverse::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			else							pPopup->CheckMenuItem(IDM_QVISC,MF_BYCOMMAND | MF_UNCHECKED);
 			if (m_bShowPoints)				pPopup->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_CHECKED);
 			else							pPopup->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_UNCHECKED);
-//			if (m_bRefCurves)				pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
-//			else							pPopup->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
-			
+			if (m_bReflected)				pPopup->CheckMenuItem(IDM_SHOWREFLECTED,MF_BYCOMMAND | MF_CHECKED);
+			else							pPopup->CheckMenuItem(IDM_SHOWREFLECTED,MF_BYCOMMAND | MF_UNCHECKED);
 
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
 				ScreenPoint.x, ScreenPoint.y, m_pFrame); // use main window for cmds
@@ -862,7 +1054,7 @@ void CXInverse::OnAddPoint()
 	double yd = m_QGraph.ClientToy(m_ptPopUp.y);
 
 	if(xd < m_Spline.m_Input[0].x) return;
-	if(xd > m_Spline.m_Input[m_Spline.m_iCtrlPoints].x) return;
+	if(xd > m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x) return;
 
 
 	m_Spline.InsertPoint(xd,yd);
@@ -879,33 +1071,6 @@ void CXInverse::ResetQ()
 	CreateMCurve();
 }
 
-
-void CXInverse::ApplySpline()
-{
-	double xx;
-	for (int i=1; i<m_pMCurve->n-1; i++){
-		xx = m_pMCurve->x[i];
-		if (xx > m_Spline.m_Input[0].x &&
-			xx < m_Spline.m_Input[m_Spline.m_iCtrlPoints].x ){
-			//interpolate spline at xx
-			m_pMCurve->y[i] = m_Spline.GetY(xx);
-		}
-	}
-	m_bSplined = true;
-	CWaitCursor wait;
-
-	int isp;
-	double qscom;
-	for (i=1; i<= m_pXFoil->nsp; i++){
-		isp = m_pXFoil->nsp - i + 1;
-		qscom =  m_pXFoil->qinf*m_pMCurve->y[i-1];
-		m_pXFoil->qspec[1][i] = qincom(qscom,m_pXFoil->qinf,m_pXFoil->tklam);
-	}
-	
-	m_pXFoil->lqspec = false;
-
-	UpdateView();
-}
 
 /*
 double CXInverse::qcomp(double g)
@@ -924,7 +1089,7 @@ double CXInverse::qincom(double qc, double qinf, double tklam)
 //     karman-tsien compressible speed
 //-------------------------------------
 
-	if(tklam<1.0e-4 || fabs(qc)<1.0e-4) {
+	if(tklam<1.0e-4 || abs(qc)<1.0e-4) {
 //----- for nearly incompressible case or very small speed, use asymptotic
 //      expansion of singular quadratic formula to avoid numerical problems
 		return( qc/(1.0 - tklam));
@@ -1238,20 +1403,23 @@ void CXInverse::ExecMDES()
 {
 //----- put modified info back into global arrays
 	CWaitCursor wait;
-	int isp;
+	int i, isp;
 	double qscom;
-	for (int i=1; i<= m_pXFoil->nsp; i++){
+	for (i=1; i<= m_pXFoil->nsp; i++)
+	{
 		isp = m_pXFoil->nsp - i + 1;
 		qscom =  m_pXFoil->qinf*m_pMCurve->y[i-1];
 		m_pXFoil->qspec[1][i] = qincom(qscom,m_pXFoil->qinf,m_pXFoil->tklam);
 	}
 	m_pXFoil->ExecMDES();
 
-	for(i=1; i<=m_pXFoil->nsp; i++){
+	for(i=1; i<=m_pXFoil->nsp; i++)
+	{
 		m_pModFoil->x[i-1] = m_pXFoil->xb[i];
 		m_pModFoil->y[i-1] = m_pXFoil->yb[i];
 	}
-	for(i=1; i<=m_pXFoil->nsp; i++){
+	for(i=1; i<=m_pXFoil->nsp; i++)
+	{
 		m_pModFoil->xb[i-1] = m_pXFoil->xb[i];
 		m_pModFoil->yb[i-1] = m_pXFoil->yb[i];
 	}
@@ -1328,7 +1496,8 @@ void CXInverse::CreateQCurve()
 	if(m_bFullInverse) points = 257;
 	else points  = m_pXFoil->n;
 
-	for (int i=1; i<=points; i++){
+	for (int i=1; i<=points; i++)
+	{
 		x = 1.0 - m_pXFoil->sspec[i];
 		y = m_pXFoil->qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
 		m_pQCurve->AddPoint(x,y);
@@ -1338,20 +1507,58 @@ void CXInverse::CreateQCurve()
 
 void CXInverse::CreateMCurve()
 {
+	int i, points;
 	double x,y;
 	m_pMCurve->n = 0;
+	m_pReflectedCurve->n = 0;
 
-	int points;
 	if(m_bFullInverse) points = 257;
 	else               points = m_pXFoil->n;
 
-	for (int i=1; i<=points; i++){
+	for (i=1; i<=points; i++)
+	{
 		x = 1.0 - m_pXFoil->sspec[i];
 		y = m_pXFoil->qcomp(m_pXFoil->qspec[1][i])/m_pXFoil->qinf;
 		m_pMCurve->AddPoint(x,y);
+		m_pReflectedCurve->AddPoint(m_pXFoil->sspec[i],-y);
 	}
 }
 
+
+void CXInverse::ApplySpline()
+{
+	CWaitCursor wait;
+
+	int i, isp;
+	double qscom, xx;
+	for (i=1; i<m_pMCurve->n-1; i++)
+	{
+		xx = m_pMCurve->x[i];
+		if (xx > m_Spline.m_Input[0].x &&
+			xx < m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x )
+		{
+			//interpolate spline at xx
+			m_pMCurve->y[i] = m_Spline.GetY(xx);
+		}
+	}
+
+	for (i=1; i<m_pMCurve->n-1; i++)
+	{
+		m_pReflectedCurve->y[i] = -m_pMCurve->y[i];
+	}
+
+	m_bSplined = true;
+	for (i=1; i<= m_pXFoil->nsp; i++)
+	{
+		isp = m_pXFoil->nsp - i + 1;
+		qscom =  m_pXFoil->qinf*m_pMCurve->y[i-1];
+		m_pXFoil->qspec[1][i] = qincom(qscom,m_pXFoil->qinf,m_pXFoil->tklam);
+	}
+	
+	m_pXFoil->lqspec = false;
+
+	UpdateView();
+}
 
 void CXInverse::OnQInit() 
 {
@@ -1389,6 +1596,13 @@ void CXInverse::OnShowPoints()
 }
 
 
+void CXInverse::OnShowReflected()
+{
+	m_bReflected = !m_bReflected;
+	m_pReflectedCurve->SetVisible(m_bReflected);
+	CheckMenu();
+	UpdateView();
+}
 
 void CXInverse::OnExportFoil() 
 {
@@ -1452,7 +1666,8 @@ void CXInverse::UpdateView(CDC *pDC)
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
 
-	if(m_bRefFoil && m_bLoaded){
+	if(m_bRefFoil && m_bLoaded)
+	{
 		color = m_pRefFoil->m_FoilColor;
 		style = m_pRefFoil->m_nFoilStyle;
 		width = m_pRefFoil->m_nFoilWidth;
@@ -1467,7 +1682,8 @@ void CXInverse::UpdateView(CDC *pDC)
 		memdc.TextOut(90, m_rCltRect.bottom-186,m_pRefFoil->m_FoilName);
 	}
 
-	if(m_bModFoil && m_bLoaded) {
+	if(m_bModFoil && m_bLoaded) 
+	{
 		color = m_pModFoil->m_FoilColor;
 		style = m_pModFoil->m_nFoilStyle;
 		width = m_pModFoil->m_nFoilWidth;
@@ -1483,7 +1699,8 @@ void CXInverse::UpdateView(CDC *pDC)
 		memdc.SelectObject(pOld);
 	}
 
-	if (m_pRefFoil->m_bPoints){
+	if (m_pRefFoil->m_bPoints)
+	{
 		color = m_pRefFoil->m_FoilColor;
 		style = m_pRefFoil->m_nFoilStyle;
 		width = m_pRefFoil->m_nFoilWidth;
@@ -1496,7 +1713,8 @@ void CXInverse::UpdateView(CDC *pDC)
 
 
 //  draw  the graph	
-	if(m_rGraphRect.Width()>200 && m_rGraphRect.Height()>150){
+	if(m_rGraphRect.Width()>200 && m_rGraphRect.Height()>150)
+	{
 		m_QGraph.DrawGraph(&memdc, &m_rGraphRect, false);
 		CPoint Place((int)(m_rGraphRect.right-300), m_rGraphRect.top+12);
 		m_QGraph.DrawLegend(&memdc, false, Place);
@@ -1585,6 +1803,10 @@ void CXInverse::OnColorStyles()
 	dlg.m_SplineStyle = m_SplineStyle;
 	dlg.m_SplineWidth = m_SplineWidth;
 
+	dlg.m_ReflectedClr   = m_ReflectedClr;
+	dlg.m_ReflectedStyle = m_ReflectedStyle;
+	dlg.m_ReflectedWidth = m_ReflectedWidth;
+
 	dlg.m_ModFoilClr   = m_pModFoil->m_FoilColor;
 	dlg.m_ModFoilStyle = m_pModFoil->m_nFoilStyle;
 	dlg.m_ModFoilWidth = m_pModFoil->m_nFoilWidth;
@@ -1593,10 +1815,18 @@ void CXInverse::OnColorStyles()
 	dlg.m_RefFoilStyle = m_pRefFoil->m_nFoilStyle;
 	dlg.m_RefFoilWidth = m_pRefFoil->m_nFoilWidth;
 
-	if(IDOK == dlg.DoModal()) {
+	if(IDOK == dlg.DoModal()) 
+	{
 		m_SplineStyle = dlg.m_SplineStyle;
 		m_SplineWidth = dlg.m_SplineWidth;
 		m_SplineClr   = dlg.m_SplineClr;
+
+		m_ReflectedClr   = dlg.m_ReflectedClr;
+		m_ReflectedStyle = dlg.m_ReflectedStyle;
+		m_ReflectedWidth = dlg.m_ReflectedWidth;
+		m_pReflectedCurve->SetColor(m_ReflectedClr);
+		m_pReflectedCurve->SetStyle(m_ReflectedStyle);
+		m_pReflectedCurve->SetWidth(m_ReflectedWidth);
 
 		m_pModFoil->m_nFoilStyle = dlg.m_ModFoilStyle;
 		m_pModFoil->m_nFoilWidth = dlg.m_ModFoilWidth;
@@ -1628,7 +1858,7 @@ void CXInverse::ReleaseZoom()
 void CXInverse::ResetScale()
 {
 	m_ptOffset.x = m_rGraphRect.left +(int)(1.0*m_QGraph.GetMargin());
-	m_fRefScale  = m_rGraphRect.Width()-2.f*m_QGraph.GetMargin();
+	m_fRefScale  = m_rGraphRect.Width()-2.0*m_QGraph.GetMargin();
 
 	m_ptOffset.y = m_rCltRect.bottom-100;
 	m_fScale = m_fRefScale;
@@ -1742,6 +1972,29 @@ bool CXInverse::LoadSettings(CArchive &ar)
 			}
 			m_pModFoil->m_nFoilWidth = k;
 
+			ar >> cr;
+			if(cr <0 || cr> RGB(255,255,255)){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = str;
+				throw pfe;
+			}
+			m_ReflectedClr = cr;
+
+			ar >> k;
+			if(k <0 || k> 20){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = str;
+				throw pfe;
+			}
+			m_ReflectedStyle = k;
+			ar >> k;
+			if(k <0 || k> 5){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = str;
+				throw pfe;
+			}
+			m_ReflectedWidth= k;
+
 		return true;
 
 	}
@@ -1772,6 +2025,9 @@ void CXInverse::SaveSettings(CArchive &ar)
 	ar << m_pModFoil->m_nFoilStyle;
 	ar << m_pModFoil->m_nFoilWidth;
 
+	ar << m_ReflectedClr;
+	ar << m_ReflectedStyle;
+	ar << m_ReflectedWidth;
 }
 
 
@@ -2114,9 +2370,8 @@ void CXInverse::CheckMenu()
 	else                         pMenu->CheckMenuItem(IDM_QVISC,MF_BYCOMMAND | MF_UNCHECKED);
 	if (m_bShowPoints)           pMenu->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_CHECKED);
 	else                         pMenu->CheckMenuItem(IDM_SHOWQPOINTS,MF_BYCOMMAND | MF_UNCHECKED);
-//	if (m_bRefCurves)            pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_CHECKED);
-//	else                         pMenu->CheckMenuItem(IDM_SHOWREFCURVES,MF_BYCOMMAND | MF_UNCHECKED);
-
+	if (m_bReflected)            pMenu->CheckMenuItem(IDM_SHOWREFLECTED,MF_BYCOMMAND | MF_CHECKED);
+	else                         pMenu->CheckMenuItem(IDM_SHOWREFLECTED,MF_BYCOMMAND | MF_UNCHECKED);
 	
 	pMenu = m_pFrame->GetMenu()->GetSubMenu(3);
 
@@ -2258,3 +2513,4 @@ void CXInverse::OnStoreRefCurve()
 		pRefCurve->SetVisible(m_bRefCurves);
 	}
 }
+

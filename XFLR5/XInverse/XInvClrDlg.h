@@ -44,6 +44,7 @@ public:
 	CButton	m_ctrlModFoil;
 	CButton	m_ctrlSpline;
 	CButton	m_ctrlRefFoil;
+	CButton	m_ctrlReflected;
 	//}}AFX_DATA
 
 
@@ -67,6 +68,8 @@ protected:
 	COLORREF m_ModFoilClr;
 	int m_ModFoilStyle, m_ModFoilWidth;
 
+	COLORREF m_ReflectedClr;
+	int m_ReflectedStyle, m_ReflectedWidth;
 
 	// Generated message map functions
 	//{{AFX_MSG(CXInvClrDlg)
@@ -74,6 +77,7 @@ protected:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnModFoilStyle();
 	afx_msg void OnRefFoilStyle();
+	afx_msg void OnReflectedStyle();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

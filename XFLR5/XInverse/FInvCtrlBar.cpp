@@ -43,6 +43,7 @@ BEGIN_MESSAGE_MAP(CFInvCtrlBar, CDialogBar)
 	ON_BN_CLICKED(IDC_FILTER, OnFilter)
 	ON_BN_CLICKED(IDC_NEWSPLINE, OnNewSpline)
 	ON_BN_CLICKED(IDC_SHOWSPLINE, OnShowSpline)
+	ON_BN_CLICKED(IDC_TANGENTSPLINE, OnTangentSpline)
 	ON_BN_CLICKED(IDC_SPECAL, OnSpecal)
 	ON_EN_KILLFOCUS(IDC_SPECINV, OnKillFocusSpec)
 	ON_EN_KILLFOCUS(IDC_TGAPDY, OnKillFocusTGap)
@@ -59,6 +60,7 @@ CFInvCtrlBar::CFInvCtrlBar()
 	m_ctrlTAngle.SetPrecision(3);
 	m_ctrlTGapx.SetPrecision(3);
 	m_ctrlTGapy.SetPrecision(3);
+	m_pXInverse = NULL;
 }
 
 
@@ -92,6 +94,7 @@ void CFInvCtrlBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_NEWSPLINE, m_ctrlNewSpline);
 	DDX_Control(pDX, IDC_SMOOTH, m_ctrlSmooth);
 	DDX_Control(pDX, IDC_SHOWSPLINE, m_ctrlShowSpline);
+	DDX_Control(pDX, IDC_TANGENTSPLINE, m_ctrlTangentSpline);
 	DDX_Control(pDX, IDC_TGAPDY, m_ctrlTGapy);
 	DDX_Control(pDX, IDC_TGAPDX, m_ctrlTGapx);
 	DDX_Control(pDX, IDC_TANGLE, m_ctrlTAngle);
@@ -103,7 +106,7 @@ void CFInvCtrlBar::DoDataExchange(CDataExchange* pDX)
 void CFInvCtrlBar::OnQReset() 
 {
 	CancelSpline();
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->ResetQ();
 	pXInv->UpdateView();	
@@ -112,7 +115,7 @@ void CFInvCtrlBar::OnQReset()
 
 void CFInvCtrlBar::OnApplySpline() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if(!pXInv->m_bSplined)  pXInv->ApplySpline();
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 //	pXInv->m_bSpline = false;
@@ -129,7 +132,7 @@ void CFInvCtrlBar::OnApplySpline()
 
 void CFInvCtrlBar::OnExec() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->SetTAngle(m_ctrlTAngle.GetValue());
 	pXInv->SetTGap(m_ctrlTGapx.GetValue(),m_ctrlTGapy.GetValue());
@@ -141,7 +144,7 @@ void CFInvCtrlBar::OnExec()
 void CFInvCtrlBar::OnPerturb() 
 {
 	CancelSpline();
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->Pertubate();
 }
@@ -149,7 +152,7 @@ void CFInvCtrlBar::OnPerturb()
 void CFInvCtrlBar::OnFilter() 
 {
 	CancelSpline();
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 
 	double filt = m_ctrlFilterParam.GetValue();
@@ -159,9 +162,10 @@ void CFInvCtrlBar::OnFilter()
 
 void CFInvCtrlBar::OnNewSpline() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
-	if(m_ctrlNewSpline.GetCheck()){
+	if(m_ctrlNewSpline.GetCheck())
+	{
 		CancelSmooth();
 		m_ctrlOutput.SetWindowText("Mark spline endpoints");
 		pXInv->m_bSpline = true;
@@ -174,7 +178,8 @@ void CFInvCtrlBar::OnNewSpline()
 		pXInv->m_Pos1    = -1;
 		pXInv->m_Pos2    = -1;
 	}
-	else{
+	else
+	{
 		CancelSpline();
 	}
 	pXInv->UpdateView();
@@ -184,7 +189,7 @@ void CFInvCtrlBar::OnNewSpline()
 
 void CFInvCtrlBar::CancelSpline()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	m_ctrlOutput.SetWindowText(" ");
 //	pXInv->m_bSpline  = false;
 	pXInv->m_bSplined = false;
@@ -198,9 +203,16 @@ void CFInvCtrlBar::CancelSpline()
 	pXInv->m_Pos2    = -1;
 }
 
+void CFInvCtrlBar::OnTangentSpline() 
+{
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
+	if(m_ctrlTangentSpline.GetCheck())	pXInv->m_bTangentSpline = true;
+	else								pXInv->m_bTangentSpline = false;
+}
+
 void CFInvCtrlBar::OnShowSpline()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	
 	if(m_ctrlShowSpline.GetCheck())	pXInv->m_bSpline = true;
 	else							pXInv->m_bSpline = false;
@@ -212,7 +224,7 @@ void CFInvCtrlBar::OnShowSpline()
 void CFInvCtrlBar::OnKillFocusSpec() 
 {
 	if(!IsWindowVisible()) return;
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	int idc = GetCheckedRadioButton(IDC_SPECAL, IDC_SPECCL);
 	if(idc == IDC_SPECAL){
@@ -234,7 +246,7 @@ void CFInvCtrlBar::OnKillFocusSpec()
 BOOL CFInvCtrlBar::PreTranslateMessage(MSG* pMsg) 
 {
 	if (pMsg->message == WM_KEYDOWN){
-		CXInverse* pXInv = (CXInverse*)m_pParent;
+		CXInverse* pXInv = (CXInverse*)m_pXInverse;
 		if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 		if (pMsg->wParam == VK_ESCAPE){
 			CancelSmooth();
@@ -272,7 +284,7 @@ BOOL CFInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	else if(pMsg->message == WM_MOUSEWHEEL){
-		CXInverse* pXInv = (CXInverse*)m_pParent;
+		CXInverse* pXInv = (CXInverse*)m_pXInverse;
 
 		CPoint pt((short) LOWORD(pMsg->lParam),(short) HIWORD(pMsg->lParam));
 
@@ -287,7 +299,7 @@ BOOL CFInvCtrlBar::PreTranslateMessage(MSG* pMsg)
 void CFInvCtrlBar::OnKillFocusTAngle() 
 {
 	if(!IsWindowVisible()) return;
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->SetTAngle(m_ctrlTAngle.GetValue());
 }
@@ -296,7 +308,7 @@ void CFInvCtrlBar::OnKillFocusTAngle()
 void CFInvCtrlBar::OnKillFocusTGap() 
 {
 	if(!IsWindowVisible()) return;
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	pXInv->SetTGap(m_ctrlTGapx.GetValue(),m_ctrlTGapy.GetValue());
 }
@@ -304,7 +316,7 @@ void CFInvCtrlBar::OnKillFocusTGap()
 void CFInvCtrlBar::OnSymm() 
 {
 	CancelSpline();
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if (pXInv->m_bZoomPlus) pXInv->ReleaseZoom();
 	if(m_ctrlSymm.GetCheck()) pXInv->m_pXFoil->lqsym = true;
 	else pXInv->m_pXFoil->lqsym = false;
@@ -321,6 +333,8 @@ BOOL CFInvCtrlBar::OnInitDialogBar()
 	CInitDialogBar::OnInitDialogBar();
 
 	// Update any controls NOT supported by DDX
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
+	if(pXInv->m_bTangentSpline) m_ctrlTangentSpline.SetCheck(TRUE);
 	m_ctrlFilterParam.SetValue(0.2);
 
 	return TRUE;
@@ -328,7 +342,7 @@ BOOL CFInvCtrlBar::OnInitDialogBar()
 
 void CFInvCtrlBar::OnSpecal() 
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	int idc = GetCheckedRadioButton(IDC_SPECAL, IDC_SPECCL);
 	if(idc == IDC_SPECAL){
 		m_ctrlSpecif.SetWindowText("Alpha = ");
@@ -346,7 +360,7 @@ void CFInvCtrlBar::OnSpecal()
 void CFInvCtrlBar::OnSmooth() 
 {
 	CancelSpline();
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	if(m_ctrlSmooth.GetCheck()){
 		m_ctrlOutput.SetWindowText("Mark target segment for smoothing, or type 'Return' to smooth the entire distribution");
 
@@ -362,7 +376,7 @@ void CFInvCtrlBar::OnSmooth()
 
 void CFInvCtrlBar::CancelSmooth()
 {
-	CXInverse* pXInv = (CXInverse*)m_pParent;
+	CXInverse* pXInv = (CXInverse*)m_pXInverse;
 	pXInv->m_bSmooth = false;
 	pXInv->m_bGetPos = false;
 	m_ctrlSmooth.SetCheck(0);
