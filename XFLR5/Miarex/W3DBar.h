@@ -56,18 +56,15 @@ protected:
 	CButton m_ctrlLight;
 	CButton m_ctrlVortices;
 
-	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
-	bool m_bglLight;
 
 	GLfloat m_glXRotatef;
 	GLfloat m_glYRotatef;
 	GLfloat m_glZRotatef;
-	GLfloat m_glScalef;//zoom factor for wing
-	GLfloat m_glXTransf;//translation vector for wing
-	GLfloat m_glYTransf;
-	GLfloat m_glYOffset;
+//	GLfloat m_glScalef;//zoom factor for wing
+//	GLfloat m_glXTransf;//translation vector for wing
+//	GLfloat m_glYTransf;
 
-	CWnd* m_pParent;
+	CWnd* m_pFrame;
 	CWnd* m_pMiarex;
 
 	// Operations

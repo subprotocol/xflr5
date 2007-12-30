@@ -56,6 +56,7 @@ public:
 	CFloatEdit m_ctrlControlPos;
 	CStatic	m_ctrlAStat;
 	CStatic m_ctrlLength;
+	CStatic m_ctrlLength2;
 	BOOL	m_BLogFile;
 	//}}AFX_DATA
 

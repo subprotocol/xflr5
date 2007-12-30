@@ -24,6 +24,7 @@
 // 
 #include "afxwin.h"
 #include "Wing.h"
+#include "Body.h"
 #include "../misc/NumEdit.h"
 #include "../misc/ClrClasses.h"
 #include "../misc/floatedit.h"
@@ -39,7 +40,7 @@ class CPlane : public CDialog
 	friend class CPOperDlgBar;
 	friend class CVLMDlg;
 	friend class CUFOListDlg;
-
+	friend class CBody;
 // Construction
 public:
 	CPlane(CWnd* pParent, CWnd* pMiarex);   // standard constructor
@@ -80,6 +81,8 @@ public:
 	CFloatEdit	m_ctrlWingTilt2;
 	CNumEdit m_ctrlVLMTotalPanels;
 	CEdit	m_ctrlPlaneName;
+	CComboBox m_ctrlBodyList;
+	CButton m_ctrlBody;
 	CButton m_ctrlDoubleFin;
 	CButton	m_ctrlStabCheck;
 	CButton	m_ctrlFinCheck;
@@ -111,11 +114,16 @@ public:
 // Implementation
 protected:
 	static bool m_bCheckPanels;
+	static CObArray *s_poaWing;
+	static CObArray *s_poaBody;
+
 	CWnd * m_pMiarex;
 	CWnd * m_pFrame;
+	CBody *m_pBody;
 	CWing m_Wing, m_Wing2;
 	CWing m_Stab;
 	CWing m_Fin;
+	bool m_bBody;
 	bool m_bActive;
 	bool m_bChanged;
 	bool m_bFin, m_bStab, m_bCheckName;
@@ -127,8 +135,6 @@ protected:
 	double m_Volume;
 	double m_XCmRef;
 	double m_TailVolume;
-	CObArray *m_poaWing;
-	CObArray *m_poaPlane;
 
 	CVector m_LEStab, m_LEFin, m_LEWing2;
 	CString m_PlaneName;
@@ -169,5 +175,7 @@ private:
 
 
 public:
+	afx_msg void OnBodyCheck();
+	afx_msg void OnSelChangeBodyList();
 };
 

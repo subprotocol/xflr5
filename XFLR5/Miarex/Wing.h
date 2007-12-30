@@ -85,7 +85,8 @@ public:
 	CButton	m_ctrlCancel;
 	CButton	m_ctrlOK;
 	CNumEdit m_ctrlVLMPanels;
-	CNumEdit m_ctrlnFlaps;
+//	CNumEdit m_ctrlnFlaps;
+	CFloatEdit m_ctrlSineFactor;
 	CStatic	m_ctrlMeanChord;
 	CStatic	m_ctrlTaperRatio;
 	CStatic	m_ctrlSurface;
@@ -102,7 +103,7 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	//}}AFX_VIRTUAL
-
+ 
 // Implementation
 protected:
 	//define all we can as static, to save space
@@ -119,23 +120,28 @@ protected:
 	bool VLMSetAutoMesh(int total = 0);
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
-	void VLMTrefftz(double *Gamma, double & Lift, double & Drag, bool bWakeRollUp);
-	void VLMComputeWing(double *Gamma, double *Ai, double *Cp, double &Lift, double &IDrag,  double &VDrag, double &XCP, double &YCP,
+	void VLMTrefftz(double *Gamma, double & Lift, double & Drag);
+	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
 						double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
+
+	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
+							 double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
+	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, double &Lift, double &Drag, bool bTilted);
+	void PanelSetBending();
+
 	bool LLTInitialize();
 	bool LLTSetLinearSolution();
 	void LLTInitCl();
 	void LLTComputeWing();
 	int  LLTIterate();
 
-//	void PanelComputeWing(double *Ai, double *Cp, double &Lift, double &IDrag,  double &VDrag, double &XCP, double &YCP,
-//						double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
-
 	CString GetFormat(double f, int precision);
 
+	void CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
+		               double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void Convert(bool bSet);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
-	void Getjk(double y, int &j, int &k);
+	void Getjkp(double y, int &j, int &k, int &p);
 	void DrawWing(CDC* pDC, CPoint O);
 	void DrawVLMMesh(CDC* pDC, CPoint O);
 	void DrawFoils(CDC* pDC, CPoint O);
@@ -145,12 +151,9 @@ protected:
 	void ComputeDihedrals();
 	void ComputeGeometry();
 	void FillPanelList();
-	void GetxDist(int l, int NXPanels, int XDistType, double &xA1, double &xA2, double &xB1, double &xB2, CFoil* pFoilA,  CFoil* pFoilB);
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, CString Foil,int NChord, int NSpan, int SSpan);
-	void PanelComputeWing(double *Ai, double *Cp, double &Lift,  double &IDrag, double &VDrag, double &XCP, double &YCP,
-							 double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
 	void SetResults();
 	void SetParams();
 	void SetSectionData();
@@ -174,7 +177,6 @@ protected:
 	double GetAverageSweep();
 	double GetChord(double yob);
 	double GetC4(double yob, double xRef);
-	double GetLE(double yob);
 	double GetDihedral(double yob);
 	double GetOffset(double yob);
 	double GetTwist(double y);
@@ -208,13 +210,14 @@ protected:
 	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUpdateMeshFromTotal();
+	afx_msg void OnKillFocusSinefactor();
 
 //__________________________Variables_______________________
 
-	CWnd* m_pFrame;		//pointer to the Frame window
-	CWnd* m_pMiarex;	//pointer to the Miarex Application window
-	CWnd* m_pVLMDlg;	//pointer to the VLM analysis dialog class
-	CWnd* m_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
+	static CWnd* s_pFrame;		//pointer to the Frame window
+	static CWnd* s_pMiarex;	//pointer to the Miarex Application window
+	static CWnd* s_pVLMDlg;	//pointer to the VLM analysis dialog class
+	static CWnd* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 
 	CString m_WingName;	//the wing's name
 
@@ -275,6 +278,7 @@ protected:
 	double m_RelaxMax;	// relaxation factor for LLT convergence
 	double m_fWingScale;	// scale to display the wing in the dialog box
 	double m_XCmRef;	// the reference point position for moment calculations
+	double m_SineFactor;
 
 	int m_NXPanels[MAXPANELS]; 		// VLM Panels along chord, for each Wing Panel
 	int m_NYPanels[MAXPANELS]; 		// VLM Panels along span, for each Wing Panel
@@ -307,8 +311,11 @@ protected:
 	double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
 	double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations
 	double m_SpanPos[MAXSTATIONS+1];	//span positions of LLT stations
-//	double m_dy[MAXSTATIONS];	
-
+	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
+	double m_xPanel[MAXCHORDPANELS];	//chorwise position of VLM panels
+	int m_xDist[MAXCHORDPANELS];		//number of VLM panels between each flap hinge
+	int m_NHinges;				//number of different flap hinge positions across the wing
+ 
 	CVector m_GeomMoment[MAXSTATIONS+1];	//geometric pitching moment at stations
 	
 	CVector *m_pNode;			//pointer to the VLM node array

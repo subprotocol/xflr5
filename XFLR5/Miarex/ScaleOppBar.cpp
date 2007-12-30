@@ -34,6 +34,7 @@
 #include "../main/MainFrm.h"
 #include "Miarex.h"
 #include "ScaleOppBar.h"
+#include ".\scaleoppbar.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -45,13 +46,14 @@ BEGIN_MESSAGE_MAP(CScaleOppBar, CInitDialogBar)
 //{{AFX_MSG_MAP(CScaleOppBar)
 	ON_WM_HSCROLL()
 //}}AFX_MSG_MAP
+ON_NOTIFY(NM_RELEASEDCAPTURE, IDC_DOWNWASHSCALE, OnNMReleasedcaptureDownwashScale)
 END_MESSAGE_MAP()
 
 
 CScaleOppBar::CScaleOppBar(CWnd* pParent)
 {
 	//Set Initial conditions for controls
-	m_pParent    = pParent;
+	m_pFrame    = pParent;
 	m_bLiftChanged     = false;
 	m_bDragChanged     = false;
 	m_bDownwashChanged = false;
@@ -115,13 +117,13 @@ BOOL CScaleOppBar::PreTranslateMessage(MSG* pMsg)
 
 void CScaleOppBar::Apply()
 {
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	pFrame->m_LiftScale     = m_LiftScale;
 	pFrame->m_DragScale     = m_DragScale;
 	pFrame->m_DownwashScale = m_DownwashScale;
 	if(pFrame->m_iApp == MIAREX){
 		pFrame->Miarex.m_bResetglDownwash = m_bDownwashChanged;
-		pFrame->Miarex.m_bResetglFlow = m_bDownwashChanged;
+//		pFrame->Miarex.m_bResetglFlow     = m_bDownwashChanged;
 		pFrame->Miarex.m_bResetglLift     = m_bLiftChanged;
 		pFrame->Miarex.m_bResetglDrag     = m_bDragChanged;
 	}
@@ -129,6 +131,16 @@ void CScaleOppBar::Apply()
 	m_bLiftChanged     = false;
 	m_bDragChanged     = false;
 	m_bDownwashChanged = false;
+}
+
+
+void CScaleOppBar::OnNMReleasedcaptureDownwashScale(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	pFrame->Miarex.m_bResetglFlow     = true;
+	m_pChildView->Invalidate();
+	
+	*pResult = 0;
 }
 
 

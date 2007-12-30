@@ -31,7 +31,7 @@
 
 class CCpScaleDlg : public CDialog
 {
-	friend class CMainFrame;
+	friend class CMiarex;
 // Construction
 public:
 	CCpScaleDlg(CWnd* pParent = NULL);   // standard constructor

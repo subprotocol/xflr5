@@ -44,23 +44,24 @@ CGLLight::CGLLight(CWnd* pParent /*=NULL*/)
 	m_bDepthTest = true;
 	m_bColorMaterial = true;
 
-	m_Ambient      = 0.5f;
-	m_Diffuse      = 0.01f;
-	m_Specular     = 0.01f;
+	m_Red   = 1.0f;
+	m_Green = 1.0f;
+	m_Blue  = 1.0f;
+
+	m_Ambient      = 0.25f;
+	m_Diffuse      = 0.20f;
+	m_Specular     = 0.5f;
 
 	m_MatAmbient   = 0.1f;
 	m_MatDiffuse   = 0.23f;
 	m_MatSpecular  = 0.18f;
-	m_MatShininess = 0.43f;
 	m_MatEmission  = 0.0f;
 
-	m_XLight   =  0.88f;
+	m_iMatShininess = 0;
+
+	m_XLight   =  0.20f;
 	m_YLight   =  0.44f;
 	m_ZLight   =  0.24f;
-
-	m_Red   = 1.0f;
-	m_Green = 1.0f;
-	m_Blue  = 1.0f;
 }
 
 
@@ -114,8 +115,6 @@ BOOL CGLLight::OnInitDialog()
 	GetWindowRect(WndRect);
 	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 
-//	SetWindowPos(m_pMiarex,GetSystemMetrics(SM_CXSCREEN)-552,1,0,0,SWP_NOSIZE);	
-
 	m_ctrlRed.SetRange(0,100);
 	m_ctrlRed.SetTicFreq(5);
 	m_ctrlGreen.SetRange(0,100);
@@ -130,16 +129,16 @@ BOOL CGLLight::OnInitDialog()
 	m_ctrlSpecular.SetRange(0,100);
 	m_ctrlSpecular.SetTicFreq(5);
 
-	m_ctrlMatAmbient.SetRange(0,100);
-	m_ctrlMatAmbient.SetTicFreq(5);
-	m_ctrlMatDiffuse.SetRange(0,100);
-	m_ctrlMatDiffuse.SetTicFreq(5);
-	m_ctrlMatSpecular.SetRange(0,100);
-	m_ctrlMatSpecular.SetTicFreq(5);
-	m_ctrlMatShininess.SetRange(0,100);
-	m_ctrlMatShininess.SetTicFreq(5);
-	m_ctrlMatEmission.SetRange(0,100);
-	m_ctrlMatEmission.SetTicFreq(5);
+	m_ctrlMatAmbient.SetRange(-100,100);
+	m_ctrlMatAmbient.SetTicFreq(10);
+	m_ctrlMatDiffuse.SetRange(-100,100);
+	m_ctrlMatDiffuse.SetTicFreq(10);
+	m_ctrlMatSpecular.SetRange(-100,100);
+	m_ctrlMatSpecular.SetTicFreq(10);
+	m_ctrlMatEmission.SetRange(-100,100);
+	m_ctrlMatEmission.SetTicFreq(10);
+	m_ctrlMatShininess.SetRange(0,128);
+	m_ctrlMatShininess.SetTicFreq(12);
 
 	m_ctrlXLight.SetRange(0,100);
 	m_ctrlXLight.SetTicFreq(5);
@@ -172,12 +171,13 @@ bool CGLLight::LoadSettings(CArchive &ar)
 			pfe->m_strFileName = ar.m_strFileName;
 			throw pfe;
 			return false;
-		}		ar >> m_MatAmbient >> m_MatDiffuse >> m_MatSpecular >> m_MatShininess >> m_MatEmission;
-
+		}
+		ar >> m_MatAmbient >> m_MatDiffuse >> m_MatSpecular  >> m_MatEmission;
+		ar >> m_iMatShininess;
 		if (m_MatAmbient   <-100.0 || m_MatAmbient >100.0 ||
 			m_MatDiffuse   <-100.0 || m_MatDiffuse >100.0 ||
 			m_MatSpecular  <-100.0 || m_MatSpecular >100.0 ||
-			m_MatShininess <-100.0 || m_MatShininess >100.0 ||
+			m_iMatShininess <-100  || m_iMatShininess >200 ||
 			m_MatEmission  <-100.0 || m_MatEmission >100.0)
 		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
@@ -263,7 +263,8 @@ bool CGLLight::SaveSettings(CArchive &ar)
 	//  we're reading/loading
 
 	ar << m_Ambient << m_Diffuse << m_Specular;
-	ar << m_MatAmbient << m_MatDiffuse << m_MatSpecular << m_MatShininess << m_MatEmission;
+	ar << m_MatAmbient << m_MatDiffuse << m_MatSpecular << m_MatEmission;
+	ar << m_iMatShininess;
 	ar << m_XLight << m_YLight << m_ZLight;
 	ar << m_Red << m_Green << m_Blue;
 
@@ -296,20 +297,22 @@ void CGLLight::OnDefaults()
 	m_Green = 1.0f;
 	m_Blue  = 1.0f;
 
-	m_Ambient      = 0.5f;
-	m_Diffuse      = 0.01f;
-	m_Specular     = 0.01f;
+	m_Ambient      = 0.25f;
+	m_Diffuse      = 0.20f;
+	m_Specular     = 0.5f;
 
 	m_MatAmbient   = 0.1f;
 	m_MatDiffuse   = 0.23f;
 	m_MatSpecular  = 0.18f;
-	m_MatShininess = 0.43f;
 	m_MatEmission  = 0.0f;
+	m_iMatShininess = 0;
 
-	m_XLight   =  0.88f;
+	m_XLight   =  0.20f;
 	m_YLight   =  0.44f;
 	m_ZLight   =  0.24f;
+
 	SetParams();
+
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	pMiarex->UpdateView();
 }
@@ -326,14 +329,14 @@ void CGLLight::ReadParams(void)
 	m_Blue    = (float)m_ctrlBlue.GetPos()   /100.0f;
 
 	m_Ambient     = (float)m_ctrlAmbient.GetPos()    / 100.0f;
-	m_Diffuse     = (float)m_ctrlDiffuse.GetPos()    /4000.0f;
-	m_Specular    = (float)m_ctrlSpecular.GetPos()   / 500.0f;
+	m_Diffuse     = (float)m_ctrlDiffuse.GetPos()    / 100.0f;
+	m_Specular    = (float)m_ctrlSpecular.GetPos()   / 100.0f;
 
 	m_MatAmbient    = (float)m_ctrlMatAmbient.GetPos()    /100.0f;
 	m_MatSpecular   = (float)m_ctrlMatSpecular.GetPos()   /100.0f;
 	m_MatDiffuse    = (float)m_ctrlMatDiffuse.GetPos()    /100.0f;
-	m_MatShininess  = (float)m_ctrlMatShininess.GetPos()  /100.0f;
 	m_MatEmission   = (float)m_ctrlMatEmission.GetPos()   /100.0f;
+	m_iMatShininess = m_ctrlMatShininess.GetPos();
 
 	if(m_ctrlCullFaces.GetCheck())		m_bCullFaces = true;
 	else								m_bCullFaces = false;
@@ -367,14 +370,14 @@ void CGLLight::SetParams(void)
 	m_ctrlBlue.SetPos( (int)(m_Blue*100.0));
 
 	m_ctrlAmbient.SetPos(   (int)(m_Ambient*100.0));
-	m_ctrlDiffuse.SetPos(   (int)(m_Diffuse*4000.0));
-	m_ctrlSpecular.SetPos(  (int)(m_Specular*500.0));
+	m_ctrlDiffuse.SetPos(   (int)(m_Diffuse*100.0));
+	m_ctrlSpecular.SetPos(  (int)(m_Specular*100.0));
 
 	m_ctrlMatAmbient.SetPos(   (int)(m_MatAmbient*100.0));
 	m_ctrlMatDiffuse.SetPos(   (int)(m_MatDiffuse*100.0));
 	m_ctrlMatSpecular.SetPos(  (int)(m_MatSpecular*100.0));
-	m_ctrlMatShininess.SetPos( (int)(m_MatShininess*100.0));
 	m_ctrlMatEmission.SetPos(  (int)(m_MatEmission*100.0));
+	m_ctrlMatShininess.SetPos(m_iMatShininess);
 
 	if(m_bCullFaces) m_ctrlCullFaces.SetCheck(TRUE); else m_ctrlCullFaces.SetCheck(FALSE);
 	if(m_bSmooth)    m_ctrlSmooth.SetCheck(TRUE);    else m_ctrlSmooth.SetCheck(FALSE);
@@ -383,11 +386,11 @@ void CGLLight::SetParams(void)
 	if(m_bDepthTest) m_ctrlDepthTest.SetCheck(TRUE); else m_ctrlDepthTest.SetCheck(FALSE);
 
 	if(m_bColorMaterial) m_ctrlColorMaterial.SetCheck(TRUE); else m_ctrlColorMaterial.SetCheck(FALSE);
-	m_ctrlMatAmbient.EnableWindow(!m_bColorMaterial);
+/*	m_ctrlMatAmbient.EnableWindow(!m_bColorMaterial);
 	m_ctrlMatDiffuse.EnableWindow(!m_bColorMaterial);
 	m_ctrlMatSpecular.EnableWindow(!m_bColorMaterial);
 	m_ctrlMatShininess.EnableWindow(!m_bColorMaterial);
-	m_ctrlMatEmission.EnableWindow(!m_bColorMaterial);
+	m_ctrlMatEmission.EnableWindow(!m_bColorMaterial);*/
 }
 
 
@@ -400,10 +403,10 @@ void CGLLight::OnColorMaterial()
 {
 	if(m_ctrlColorMaterial.GetCheck())	m_bColorMaterial = true;
 	else								m_bColorMaterial = false;
-	m_ctrlMatAmbient.EnableWindow(!m_bColorMaterial);
-	m_ctrlMatDiffuse.EnableWindow(!m_bColorMaterial);
-	m_ctrlMatSpecular.EnableWindow(!m_bColorMaterial);
-	m_ctrlMatShininess.EnableWindow(!m_bColorMaterial);
-	m_ctrlMatEmission.EnableWindow(!m_bColorMaterial);
+//	m_ctrlMatAmbient.EnableWindow(!m_bColorMaterial);
+//	m_ctrlMatDiffuse.EnableWindow(!m_bColorMaterial);
+//	m_ctrlMatSpecular.EnableWindow(!m_bColorMaterial);
+//	m_ctrlMatShininess.EnableWindow(!m_bColorMaterial);
+//	m_ctrlMatEmission.EnableWindow(!m_bColorMaterial);
 	Apply();
 }

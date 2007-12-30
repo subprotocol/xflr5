@@ -57,6 +57,7 @@ protected:
 	CButton m_ctrlHalfWing;
 	CButton m_ctrlCl;
 	CButton m_ctrlStream;
+	CButton m_ctrlSurfSpeed;
 	CStatic	m_ctrlDeltaStat; 
 	CFloatEdit	m_ctrlDeltaAlpha;
 	CFloatEdit	m_ctrlAlphaMax;
@@ -119,6 +120,7 @@ protected:
 	afx_msg void OnStoreWOpp();
 	afx_msg void OnWSequence();
 	afx_msg void OnStream();
+	afx_msg void OnSurfSpeed();
 	afx_msg void OnHalfWing();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

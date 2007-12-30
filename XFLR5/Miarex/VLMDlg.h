@@ -83,6 +83,7 @@ public:
 	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
 	void ResetWakeNodes();
 	void RelaxWake();
+	bool Gauss(double *A, int n, double *B, int m);
 
 protected:
 	CWnd* m_pMiarex;
@@ -116,8 +117,8 @@ protected:
 	double m_OpAlpha;
 	double m_QInf, m_QInfMax, m_DeltaQInf;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
-	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
-	double m_ICd[MAXSTATIONS];
+//	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
+//	double m_ICd[MAXSTATIONS];
 	double m_CL, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
 	double m_TCm, m_GCm, m_VCm;
@@ -139,6 +140,7 @@ protected:
 	CPanel  *m_pWakePanel;
 	CPanel  *m_pRefWakePanel;
 
+	CVector R[5];
 	CVector *m_pNode;	// the working array of Nodes 
 	CVector *m_pMemNode;	// a copy of the reference node array for tilted calcs
 	CVector *m_pWakeNode;	// the current working wake node array
@@ -154,13 +156,12 @@ protected:
 	CWing *m_pFin;
 	CWPolar *m_pWPolar;
 
-
-//	CVector m_UInf;
 	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, VG;
 	CVector Far;
 	CVector r0, r1, r2;
-	CVector t;
+	CVector h,t;
 	CVector Psi;
+	double r1v, r2v;
 
 public:
 };

@@ -118,7 +118,7 @@ bool CVLMThread::AlphaLoop()
 	}
 	pVLMDlg->m_bTrace = true;
 	CWaitCursor Wait;
-	str.Format("   Solving the problem... \r\n");
+	str.Format("   Solving the problem... \r\n\r\n");
 	pVLMDlg->AddString(str);
 
 	if(!pVLMDlg->VLMCreateRHS(m_Alpha, m_DeltaAlpha, nrhs)) 

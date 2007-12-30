@@ -32,25 +32,33 @@ class CSurface : public CObject
 {
 	friend class CWing;
 	friend class CMiarex;
+	friend class CMainFrame;
 	friend class CVLMDlg;
 	friend class C3DPanelDlg;
  
 public:
 	void Copy(CSurface &surface);
+	void GetC4(int k, CVector &Pt);
 	void GetLeadingPt(CVector &C, int k);
+	void GetNormal(double yrel, CVector &N);
 	void GetTrailingPt(CVector &C, int k);
 	void GetPanel(int k, int l, CVector &dF, int pos=0);
+	void GetPanel(int k, int l, int pos);
 	void GetPoint(double xArel, double xBrel, double yrel, CVector &Point, int pos=0);
-	void GetxDist(int l, double &xA1, double &xA2, double &xB1, double &xB2);
 	void GetyDist(int k, double &y1, double &y2);
-	void Translate(CVector T);
+	void Getyz(int k, double &y, double &z);
+	void Init();
 	void RotateX(CVector O, double XTilt);
 	void RotateY(CVector O, double YTilt);
 	void RotateZ(CVector O, double ZTilt);
+	void SetNormal();
+	void SetFlap();
+	void SetSidePoints(int iAnalysisType);
 	void SetTwist();
-	int Getk(double y);
-	void Getyz(int k, double &y, double &z);
-	void GetNormal(double yrel, CVector &N);
+	void Translate(CVector T);
+
+	int Getk(double srel);
+
 	double Getyrel(double y);
 	double GetTwist(int k);
 	double GetStripArea(int k);
@@ -58,15 +66,15 @@ public:
 	double GetChord(int k);
 	double GetChord(double tau);
 	double GetOffset(double tau);
-	void GetC4(int k, CVector &Pt);
-	void Init();
-	void SetFlap();
 
 	CSurface();
 	virtual ~CSurface();
 
 private :
-	 
+	static CVector SideA[MAXCHORDPANELS];	 
+	static CVector SideB[MAXCHORDPANELS];	 
+	static CVector SideA_T[MAXCHORDPANELS];	 
+	static CVector SideB_T[MAXCHORDPANELS];	 
 	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
 	static CVector VTemp;
 
@@ -79,18 +87,20 @@ private :
 	CVector V1, V2, DL, DC, u, v;
 	CVector NA, NB;
 
+	double m_SineFactor;
 	double m_TwistA, m_TwistB;
 	double m_Dihedral;
 	double m_Length;// along span-y direction...
 	double y1, y2, xLA, xTA, xLB, xTB;
 	double chordA, chordB, zA, zB, Chord, Length;
 	double m_posATE, m_posBTE;//flap break positions at sides A and B
+	double m_xPointA[MAXCHORDPANELS], m_xPointB[MAXCHORDPANELS];	//chorwise position of VLM panels
 	double pi;
 
 	int m_XDistType;
 	int m_YDistType;
 	int m_NXPanels;
-	int m_NX1, m_NX2;//number of panels before and after the break
+	int m_NXLead, m_NXFlap;//number of panels before and after the break
 	int m_NYPanels;
 	int m_NElements;
 

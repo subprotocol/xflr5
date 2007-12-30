@@ -28,7 +28,7 @@
 // CGLLight dialog
 
 class CGLLight : public CDialog
-{
+{ 
 	friend class CMiarex;
 // Construction
 public:
@@ -73,9 +73,10 @@ protected:
 	CWnd* m_pMiarex;
 
 	float m_Ambient, m_Diffuse, m_Specular;
-	float m_MatAmbient, m_MatDiffuse, m_MatSpecular, m_MatShininess, m_MatEmission;
+	float m_MatAmbient, m_MatDiffuse, m_MatSpecular, m_MatEmission;
 	float m_Red, m_Green, m_Blue;
 	float m_XLight, m_YLight, m_ZLight;
+	int m_iMatShininess;
 	bool m_bCullFaces, m_bShade, m_bSmooth, m_bLocalView, m_bDepthTest;
 	bool m_bColorMaterial;
 

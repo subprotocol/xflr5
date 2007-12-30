@@ -62,23 +62,14 @@ END_MESSAGE_MAP()
 CW3DBar::CW3DBar(CWnd* pParent)
 {
 	//Set Initial conditions for controls
-	m_pParent    = pParent;
+	m_pFrame     = pParent;
 	m_pMiarex    = NULL;
-	m_bSurfaces  = true;
-	m_bOutline   = true;
-	m_bVLMPanels = false;
-	m_bAxes      = true;
-	m_bglLight   = true;
 	m_glXRotatef = 125.0;
 	m_glYRotatef = 180.0;
 	m_glZRotatef = -35.0;
 //	m_glXRotatef =    90.0;
 //	m_glYRotatef =   180.0;
 //	m_glZRotatef =   180.0;
-	m_glXTransf  =   0.0;
-	m_glYTransf  = 0.0;
-	m_glScalef   = 1.0;
-	m_glYOffset  = 0.0;
 }
 
 
@@ -104,7 +95,7 @@ void CW3DBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_3DSURFACES, m_ctrlSurfaces);
 	DDX_Control(pDX, IDC_3DVORTICES, m_ctrlVortices);
 	DDX_Control(pDX, IDC_3DOUTLINE, m_ctrlOutline);
-	DDX_Control(pDX, IDC_3DVLMPANELS, m_ctrlVLMPanels);
+	DDX_Control(pDX, IDC_3DPANELS, m_ctrlVLMPanels);
 	//}}AFX_DATA_MAP
 }
 
@@ -138,69 +129,70 @@ BOOL CW3DBar::PreTranslateMessage(MSG* pMsg)
 
 void CW3DBar::On3DAxes()
 {
-	if(m_ctrlAxes.GetCheck()) m_bAxes = true;
-	else					  m_bAxes = false;
-	
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlAxes.GetCheck()) pMiarex->m_bAxes = true;
+	else					  pMiarex->m_bAxes = false;
+	pMiarex->m_bResetglBody2D = true;
+	pMiarex->UpdateView();
 }
 
 void CW3DBar::On3DLight()
 {
-	if(m_ctrlLight.GetCheck()) m_bglLight = true;
-	else					   m_bglLight = false;
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlLight.GetCheck()) pMiarex->m_bglLight = true;
+	else					   pMiarex->m_bglLight = false;
 	
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+	pMiarex->UpdateView();
 }
 void CW3DBar::On3DSurfaces()
 {
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	if(m_ctrlSurfaces.GetCheck()) {
-		m_bSurfaces = true;
-		pFrame->m_b3DVLMCl    = false;
-	}
-	else m_bSurfaces = false;
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	
- 	pFrame->UpdateView();
+	if(m_ctrlSurfaces.GetCheck()) {
+		pMiarex->m_bSurfaces   = true;
+		pMiarex->m_b3DVLMCl    = false;
+	}
+	else pMiarex->m_bSurfaces = false;
+	
+ 	pMiarex->UpdateView();
 }
 
 void CW3DBar::On3DOutline()
 {
-	if(m_ctrlOutline.GetCheck()) m_bOutline = true;
-	else						 m_bOutline = false;
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlOutline.GetCheck()) pMiarex->m_bOutline = true;
+	else						 pMiarex->m_bOutline = false;
 	
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+	pMiarex->UpdateView();
 }
 
 void CW3DBar::On3DVortices()
 {
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	if(m_ctrlVortices.GetCheck()) pFrame->m_bVortices = true;
-	else						 pFrame->m_bVortices = false;
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(m_ctrlVortices.GetCheck()) pMiarex->m_bVortices = true;
+	else						  pMiarex->m_bVortices = false;
 	
-	pFrame->UpdateView();
+	pMiarex->UpdateView();
 }
 
 
 
 void CW3DBar::On3DPanels()
 {
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	if(m_ctrlVLMPanels.GetCheck())
-		m_bVLMPanels = true;
+		pMiarex->m_bVLMPanels = true;
 	else		
-		m_bVLMPanels = false;
+		pMiarex->m_bVLMPanels = false;
 	
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+	pMiarex->UpdateView();
 }
 
 void CW3DBar::On3DReset()
 {
-	m_glXTransf  =  0.0;
-	m_glYTransf  =  0.0;
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->m_glXTransf  =  0.0;
+	pMiarex->m_glYTransf  =  0.0;
 	pMiarex->m_bIs3DScaleSet  = false;
 	pMiarex->SetScale();
 	pMiarex->UpdateView();
@@ -211,8 +203,28 @@ void CW3DBar::On3DIso()
 	m_glXRotatef =  125.0;
 	m_glYRotatef =  180.0;
 	m_glZRotatef =  -35.0;
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+
+	pMiarex->m_ArcBall.ab_quat[0]	= -0.65987748f;
+	pMiarex->m_ArcBall.ab_quat[1]	=  0.38526487f;
+	pMiarex->m_ArcBall.ab_quat[2]	= -0.64508355f;
+	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[4]	= -0.75137258f;
+	pMiarex->m_ArcBall.ab_quat[5]	= -0.33720365f;
+	pMiarex->m_ArcBall.ab_quat[6]	=  0.56721509f;
+	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[8]	=  0.000f;
+	pMiarex->m_ArcBall.ab_quat[9]	=  0.85899049f;
+	pMiarex->m_ArcBall.ab_quat[10]	=  0.51199043f;
+	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
+
+
+	pMiarex->UpdateView();
 }
 
 void CW3DBar::On3DTop()
@@ -220,42 +232,109 @@ void CW3DBar::On3DTop()
 	m_glXRotatef =   0.0;
 	m_glYRotatef =   0.0;
 	m_glZRotatef = -90.0;
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->m_ArcBall.ab_quat[0]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[1]	= -1.0f;
+	pMiarex->m_ArcBall.ab_quat[2]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[4]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[6]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[9]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[10]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
+
+	pMiarex->UpdateView();
 }
 void CW3DBar::On3DLeft()
 {
 	m_glXRotatef =    90.0;
 	m_glYRotatef =   180.0;
 	m_glZRotatef =   180.0;
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->m_ArcBall.ab_quat[0]	= -1.0f;
+	pMiarex->m_ArcBall.ab_quat[1]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[2]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[4]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[6]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[9]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[10]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
+
+	pMiarex->UpdateView();
+
 }
+
+
 void CW3DBar::On3DFront()
 {
 	m_glXRotatef =  90.0;
 	m_glYRotatef = 180.0;
 	m_glZRotatef =  90.0;
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	pFrame->UpdateView();
+
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->m_ArcBall.ab_quat[0]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[1]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[2]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[4]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[6]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[9]	=  1.0f;
+	pMiarex->m_ArcBall.ab_quat[10]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
+
+	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
+	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
+
+	pMiarex->UpdateView();
 }
 
 
 
 void CW3DBar::SetChecks()
 {
-	CMainFrame *pFrame = (CMainFrame*)m_pParent;
-	if(m_bAxes)       m_ctrlAxes.SetCheck(TRUE);
-	else			  m_ctrlAxes.SetCheck(FALSE);
-	if(m_bglLight)    m_ctrlLight.SetCheck(TRUE);
-	else			  m_ctrlLight.SetCheck(FALSE);
-	if(m_bOutline)    m_ctrlOutline.SetCheck(TRUE);
-	else			  m_ctrlOutline.SetCheck(FALSE);
-	if(m_bVLMPanels)  m_ctrlVLMPanels.SetCheck(TRUE);
-	else			  m_ctrlVLMPanels.SetCheck(FALSE);
-	if(m_bSurfaces)   m_ctrlSurfaces.SetCheck(TRUE);
-	else			  m_ctrlSurfaces.SetCheck(FALSE);
-	if(pFrame->m_bVortices)		m_ctrlVortices.SetCheck(true);
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+
+	if(pMiarex->m_bAxes)		m_ctrlAxes.SetCheck(TRUE);
+	else						m_ctrlAxes.SetCheck(FALSE);
+	if(pMiarex->m_bglLight)		m_ctrlLight.SetCheck(TRUE);
+	else						m_ctrlLight.SetCheck(FALSE);
+	if(pMiarex->m_bOutline)		m_ctrlOutline.SetCheck(TRUE);
+	else						m_ctrlOutline.SetCheck(FALSE);
+	if(pMiarex->m_bVLMPanels)	m_ctrlVLMPanels.SetCheck(TRUE);
+	else						m_ctrlVLMPanels.SetCheck(FALSE);
+	if(pMiarex->m_bSurfaces)	m_ctrlSurfaces.SetCheck(TRUE);
+	else						m_ctrlSurfaces.SetCheck(FALSE);
+	if(pMiarex->m_bVortices)	m_ctrlVortices.SetCheck(true);
 	else						m_ctrlVortices.SetCheck(false);
 
 }

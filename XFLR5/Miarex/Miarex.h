@@ -29,6 +29,7 @@
 #include "WPolar.h"
 #include "../Graph/Graph.h"
 #include "../misc/UFOListDlg.h"
+#include "./BodyGridDlg.h"
 #include "WngAnalysis.h"
 #include "VLMDlg.h"
 #include "3DPanelDlg.h"
@@ -36,6 +37,10 @@
 #include "GLLight.h"
 #include "FlowLinesDlg.h"
 #include "LLTDlg.h"
+#include "Body.h"
+#include "BodyCtrlBar.h"
+#include "ArcBall.h"
+#include "gl\glu.h"
 
 
 // Custom palette structure
@@ -78,6 +83,8 @@ class CMiarex : public CWnd
 	friend class CLLTDlg;
 	friend class CListPlrDlg;
 	friend class CListWing;
+	friend class CBody;
+	friend class CBodyCtrlBar;
 	friend class CWingScaleDlg;
 	friend class CScaleOppBar;
 	friend class CSpanPosBar;
@@ -85,6 +92,7 @@ class CMiarex : public CWnd
 	friend class CUFOListDlg;
 	friend class CWAdvDlg;
 	friend class C3DPanelThread;
+	friend class CArcBall;
 
 // Construction
 public:
@@ -128,16 +136,29 @@ protected:
 	afx_msg void OnStreamOptions();
 	afx_msg void OnManageUFO();
 	afx_msg void OnCpView();
+	afx_msg void OnInsertBodyPoint();
+	afx_msg void OnDeleteBodyPoint();
+	afx_msg void OnNewBody();
+	afx_msg void OnRenameCurBody();
+	afx_msg void OnDeleteCurBody();
+	afx_msg void OnDuplicateCurBody();
+	afx_msg void OnScaleCurBody();
+	afx_msg void OnExportCurBody();
+	afx_msg void OnSaveCurBodyAsProject();
+	afx_msg void OnResetBodyScale();
+	afx_msg void OnBodyGrid();
+	afx_msg void OnCpLegend();
 
 	DECLARE_MESSAGE_MAP()
 
-
+ 
 private:
 
 	BOOL OnEraseBkgnd(CDC* pDC);
 	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
 	void OnExit();
 	void OnWingAnalysis();
+	void OnBodyDesign();
 	void OnShowWPolar();
 	void OnExportWing();
 	void OnLoadProject();
@@ -181,6 +202,8 @@ private:
 	void OnShowCurWOpp();
 	void OnShowAllWOpps();
 	void OnHideAllWOpps();
+	void OnUndo();
+	void OnRedo();
 	void OnDelAllPlrWOpps();
 	void OnShowXCmRef();
 	void OnHideAllWPlrs();
@@ -203,7 +226,16 @@ private:
 	void OnWAdvSettings();
 	void OnWPolarExport();
 
-	void GLCreateAxes();
+	void GLDrawBodyLegend();
+	void GLDrawAxes();
+	void GLCreateBodyBezier();
+//	void GLCreateBodyNurbs();
+	void GLCreateBodySurface();
+	void GLCreateBodyMesh();
+	void GLCreateBodyLines();
+	void GLCreateBodyAxialLines();
+	void GLCreateBodyFrame();
+	void GLCreateBodyGrid();
 	void GLCreateGeom(CWing *pWing, UINT List, COLORREF wingcolor);
 	void GLCreateMesh();
 	void GLCreateWakePanels(int LIST);
@@ -215,22 +247,26 @@ private:
 	void GLCreateMoments();
 	void GLCreateWingLegend();
 	void GLCreateWOppLegend();
-	void GLCreateSurfFlow();
+	void GLCreateSurfSpeeds();
 	void GLCreateStreamLines();
 	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0);
 	void GLCreateCpLegend();
-	void GLRenderView();
-	void GLRenderSphere(COLORREF cr, double radius);
+	void GLRenderBody(CDC *pDC);
+	void GLRenderView(CDC *pDC); 
+	void GLRenderSphere(COLORREF cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLDraw3D(CDC *pDC);
 	void GLSetupLight();
 	void GLCreateCtrlPts();
 	void GLCreateVortices();
+	void GLSetViewport();
+	void GLInverseMatrix(float mtxin[4][4],float mtxout[4][4]);
 
 	bool CreateWakeElems(int PanelIndex);
 	bool InitializePanels();
 	bool VLMIsSameSide(int p, int pp);
 	bool LoadSettings(CArchive &ar);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
+	bool SetModBody(CBody *pModBody);
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
@@ -238,6 +274,7 @@ private:
 	bool AVLImportFile(CString FileName);
 
 	int CreateElements(CSurface *pSurface, CPanel *pPanel);
+	int CreateBodyElements(CPanel *pPanel);
 	int IsNode(CVector Pt);
 	int IsWakeNode(CVector Pt);
 	int ReadFoilPoints(CStdioFile *pXFile, double *x, double *y);
@@ -253,12 +290,14 @@ private:
 	void CreateWOppCurves();
 	void CreateCpCurves();
 	void DeleteProject();
+	void DrawCpLegend(CDC* pDC, bool bIsPrinting, CPoint place, int bottom);
 	void DrawWOppLegend(CDC* pDC, bool bIsPrinting, CPoint place, int bottom);
 	void DrawWPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bottom);
 	void DuplicatePlane();
 	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve, int Var);
 	void FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar);
 	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
+	void JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr);
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void PaintWing(CDC *pDC, CPoint ORef, double scale, bool bIsPrinting);
@@ -278,11 +317,11 @@ private:
 	void PrintSingleWingGraph(CDC *pDC, CRect *pCltRect);
 	void PrintTwoWingGraph(CDC *pDC, CRect *pCltRect);
 	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
-	void ResetElements();
 	void RotateGeomY(double Angle, CVector P);
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
+	void SetBody(CString BodyName="");
 	void SetUFO(CString UFOName="");
 	void SetWPlr(bool bCurrent = true, CString WPlrName = "");
 	void SetWingLegendPos();
@@ -290,15 +329,17 @@ private:
 	void SetColors(Graph* pDefaultGraph) ;
 	void SetScale();
 	void SetScale(CRect CltRect);
+	void SetBodyScale();
 	void Set2DScale();
 	void Set3DScale();
 	void SetWGraphScale();
 	void UpdateView(CDC *pDC=NULL);
-	void UpdateWOpps();
-	void UpdateWPlrs();
-	void UpdateUFOs();
 	void UpdateUnits();
 	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
+
+	void CMiarex::ClientToGL(CPoint point, CVector &real);
+	void CMiarex::GLToClient(CVector real, CPoint &point);
+
 
 	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
 	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
@@ -317,13 +358,13 @@ private:
 	CWing* AddWing(CWing *pWing);
 	CWOpp* GetWOpp(double Alpha);
 	CPOpp* GetPOpp(double Alpha);
-
+	CBody* AddBody(CBody *pBody);
 
 	CPlane * CreatePlane();
 	CPlane * AddPlane(CPlane *pPlane);
 	CPlane * GetPlane(CString PlaneName);
 	CWing * GetWing(CString WingName);
-
+	CBody *GetBody(CString BodyName);
 
 //____________________Variables______________________________________
 //
@@ -342,16 +383,19 @@ private:
 	CSurface *m_pSurface[MAXVLMSURFACES];	// An array with the pointers to the diferrent wing's surfaces
 
 	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
+	CBodyGridDlg  m_BodyGridDlg;
 	
 	CWnd* m_pChildWnd;			// a pointer to the view class
 	CWnd* m_pFrame ;			// a pointer to the frame class
 	CWnd * m_pW3DBar;			// a pointer to the 3D view dialog bar
+	CBodyCtrlBar *m_pBodyCtrlBar;
 
 	CVLMDlg m_VLMDlg;			// the dialog class which manages the VLM calculations
 	C3DPanelDlg m_PanelDlg;			// the dialog class which manages the 3D panel calculations
 	CLLTDlg m_IDlg;			// the dialog class which manages the LLT calculations
 	CGLLight m_GLLightDlg;			// the dialog class for GL light options 
 	CFlowLinesDlg m_FlowLinesDlg;		// the dialog class for streamline options
+	CArcBall m_ArcBall;
 
 	CObArray *m_poaFoil;			// a pointer to the foil array
 	CObArray *m_poaPolar;			// a pointer to the foil polar array
@@ -360,6 +404,7 @@ private:
 	CObArray *m_poaWPolar;			// a pointer to the UFO polar array
 	CObArray *m_poaWOpp;			// a pointer to the UFO OpPoint array
 	CObArray *m_poaPOpp;			// a pointer to the Plane OpPoint array
+	CObArray *m_poaBody;			// a pointer to the Body array
 
 //	CString m_VersionName;
 
@@ -376,6 +421,10 @@ private:
 	bool m_bResetglWake;			// true if the wake OpenGL list needs to be refreshed
 	bool m_bResetglOpp, m_bResetglLift, m_bResetglDrag, m_bResetglDownwash;			// true if the OpenGL lists need to be refreshed
 	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be refreshed
+	bool m_bResetglLegend;          //needs to be reset is window has been resized
+	bool m_bResetglBody;
+	bool m_bResetglBodyMesh;
+	bool m_bResetglBody2D;
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
 	bool m_bAnimate;			// true if there is an animation going on, 
 	bool m_bAnimatePlus;		// true if the animation is going in aoa crescending order
@@ -395,6 +444,17 @@ private:
 	bool m_bDirichlet;			// true if Dirichlet BC are applied in 3D panel analysis, false if Neumann
 	bool m_bTrefftz;			// true if the induced drag should be calculated in the Trefftz plane, false if calculated by summation over panels
 	bool m_bWakePanels;
+	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
+	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
+
+	bool m_b3DVLMCl, m_b3DDownwash; 	// defines whether the corresponfing data should be displayed
+	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
+	bool m_bMoments;							// defines whether the corresponfing data should be displayed
+	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
+	bool m_bVortices;				// defines whether the corresponfing data should be displayed
+	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
+	bool m_bglLight;
+	bool m_bArcball;
 
 	int m_NSurfaces;
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
@@ -413,12 +473,13 @@ private:
 	int m_NWakeColumn;			// number of wake columns
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
+	int m_NCpCurves;			// Number of Cp curves stored for display
 
 //	double m_WakePanelFactor;	// incremental factor for wake lines
 //	double m_TotalWakeLength;	// wake lines first panel size
 //	int m_NXWakePanels;			// wake panel number
 
-
+	double m_LegendMin, m_LegendMax;
 	double m_CurSpanPos;		//Span position for Cp Grpah
 	double m_CoreSize;			// core size for VLM vortices
 	double m_MinPanelSize;			// wing minimum panel size ; panels of less length are ignored
@@ -426,11 +487,18 @@ private:
 	double m_CvPrec;			// LLT iteration precision required for convergence
 	double pi;				// ???
 	double m_WingScale;			// scale for 2D display
+	double m_BodyScale;			// scale for 2D display
+	double m_FrameScale;			// scale for 2D display
+	double m_BodyRefScale;			// scale for 2D display
+	double m_FrameRefScale;			// scale for 2D display
 	double m_LastWOpp;			// last WOPP selected, try to set the same if it exists, for the new polar
 	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
 	double m_aijRef[VLMMATSIZE*VLMMATSIZE]; // coefficient matrix
 	double m_RHS[VLMMATSIZE*100];			// RHS vector
 	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
+
+	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
+						// this is not the scale to display the model in the OpenGL view
 
 	CStdioFile* m_pXFile;			// a pointer to the output .log file
 	CUFOListDlg m_UFOdlg;			// the dialog class for UFO management
@@ -439,10 +507,28 @@ private:
 	CPoint m_ptOffset;			// client offset position for wing display
 	CPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
 	CPoint m_WingLegendOffset;		// client offset position for WOPP polar legend
+	CPoint m_ptPopUp;
+	CVector m_RealPopUp;
 
+	CVector m_UFOOffset;
+	CVector m_BodyOffset;
+	CVector m_FrameOffset;
+	double  m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
+
+	float m_glScalef;//zoom factor for wing
+	float m_glXTransf;//translation vector for wing
+	float m_glYTransf;
+
+
+	COLORREF m_CpColor;
+	int m_CpStyle, m_CpWidth;
+	bool m_bShowCp, m_bShowCpPoints;
 
 	CRect m_rCltRect, m_rDrawRect; // the client and drawing rectangles
-
+	CRect m_rSingleRect;
+	CRect m_BodyLineRect;
+	CRect m_FrameRect;
+	CRect m_BodyRect;
 
 	HCURSOR m_hcArrow;
 	HCURSOR m_hcCross;
@@ -471,6 +557,15 @@ private:
 	CWing * m_pCurStab;			// the currently selected Plane's elevator
 	CWing * m_pCurFin;			// the currently selected Plane's fin
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
+	CFrame *m_pCurFrame;
+	CBody *m_pCurBody;
 
 	COLORREF m_WingColor, m_StabColor, m_FinColor;
+
+//	CBody m_Body;
+
+public:
+
+
+
 };

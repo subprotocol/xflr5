@@ -49,6 +49,7 @@ CWAdvDlg::CWAdvDlg(CWnd* pParent /*=NULL*/)
 	m_CoreSize        = 0.0;
 	m_WakeInterNodes  = 6;
 	m_MinPanelSize    = 1.0;
+
 	m_bResetWake      = true;
 	m_bDirichlet      = true;
 	m_BLogFile        = true;
@@ -79,6 +80,7 @@ void CWAdvDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RESETWAKE, m_ctrlResetWake);
 	DDX_Control(pDX, IDC_MINPANELSIZE, m_ctrlMinPanelSize);
 	DDX_Control(pDX, IDC_LENGTH, m_ctrlLength);
+	DDX_Control(pDX, IDC_LENGTH2, m_ctrlLength2);
 	DDX_Control(pDX, IDC_VORTEXPOS, m_ctrlVortexPos);
 	DDX_Control(pDX, IDC_CTRLPOS, m_ctrlControlPos);
 	DDX_Check(pDX, IDC_LOGFILE, m_BLogFile);
@@ -139,6 +141,7 @@ BOOL CWAdvDlg::OnInitDialog()
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	GetLengthUnit(len,pFrame->m_LengthUnit);
 	m_ctrlLength.SetWindowText(len);
+	m_ctrlLength2.SetWindowText(len);
 
 	SetParams();
 	m_ctrlRelax.SetFocus();
@@ -148,36 +151,36 @@ BOOL CWAdvDlg::OnInitDialog()
 
 void CWAdvDlg::ReadParams()
 {
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+
 	m_Iter      = __max(m_ctrlIterMax.GetValue(),1);
 	m_Relax     = __max(m_ctrlRelax.GetValue(), 1.0);
 	m_AlphaPrec = __max(m_ctrlAlphaPrec.GetValue(),0.0001);
 	m_NStation  = __max(m_ctrlNStation.GetValue(),2);
-	if(!IsEven(m_NStation)){
-		m_NStation++;
-	}
+
+	if(!IsEven(m_NStation))	   m_NStation++;
 	if(m_NStation>MAXSTATIONS) m_NStation=MAXSTATIONS;
 
-	m_CoreSize        = m_ctrlCoreSize.GetValue();
+	m_CoreSize        = m_ctrlCoreSize.GetValue()/ pFrame->m_mtoUnit;
 	m_MaxWakeIter     = m_ctrlMaxWakeIter.GetValue();
 	m_WakeInterNodes  = m_ctrlInterNodes.GetValue();
 
-	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	m_MinPanelSize    = m_ctrlMinPanelSize.GetValue()/ pFrame->m_mtoUnit;
 
 	m_VortexPos  = m_ctrlVortexPos.GetValue()/100.0;
 	m_ControlPos = m_ctrlControlPos.GetValue()/100.0;
 }
 
+
 void CWAdvDlg::SetParams()
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	CMiarex * pMiarex = (CMiarex*)m_pMiarex;
 	m_ctrlIterMax.SetValue(m_Iter);
 	m_ctrlRelax.SetValue(m_Relax);
 	m_ctrlAlphaPrec.SetValue(m_AlphaPrec);
 	m_ctrlNStation.SetValue(m_NStation);
 
-	m_ctrlCoreSize.SetValue(m_CoreSize);
+	m_ctrlCoreSize.SetValue(m_CoreSize* pFrame->m_mtoUnit);
 	m_ctrlMaxWakeIter.SetValue(m_MaxWakeIter);
 	m_ctrlInterNodes.SetValue(m_WakeInterNodes);
 
@@ -269,9 +272,6 @@ void CWAdvDlg::OnRadio3()
 
 void CWAdvDlg::OnKeepOutOpps() 
 {
-	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	if(m_ctrlKeepOutOpps.GetCheck()){
-		pMiarex->m_bKeepOutOpps = true;
-	}
-	else pMiarex->m_bKeepOutOpps = false;
+	if(m_ctrlKeepOutOpps.GetCheck())	m_bKeepOutOpps = true;
+	else								m_bKeepOutOpps = false;
 }

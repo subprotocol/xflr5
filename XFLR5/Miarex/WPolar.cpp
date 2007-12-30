@@ -581,20 +581,14 @@ void CWPolar::CalculatePoint(int i)
 	m_Ym[i] = q * m_WArea * (m_GYm[i] + m_IYm[i]) * m_WSpan;// in N.m
 	m_Pm[i] = q * m_WArea * m_Cm[i] * m_WMAChord;// in N.m
 
-/*	double V = m_QInfinite[i];
-	double C = m_Cm[i];
-	double P = m_Pm[i];
-	TRACE("Alpha=%f      PM=%f\n", m_Alpha[i],P);*/
-
 	//power for horizontal flight
 	m_VertPower[i] = m_Weight * 9.81 * m_Vz[i];
 
 	double AR      = m_WSpan*m_WSpan/m_WArea;
-	if(m_ICd[i]==0.0) m_Oswald[i]=0.0;
-	else{
-		m_Oswald[i]    = m_Cl[i]*m_Cl[i]/pi/m_ICd[i]/AR;
-		if(abs(m_Oswald[i]>2.0)) m_Oswald[i] = 0.0;
-	}
+
+	if(m_ICd[i]==0.0)	m_Oswald[i] = 0.0;
+	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/pi/m_ICd[i]/AR;
+
 	m_SM[i]        = (m_XCP[i]-m_XCmRef)/m_WMAChord *100.00;
 }
 
