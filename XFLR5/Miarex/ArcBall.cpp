@@ -2,7 +2,7 @@
 
     CArcBall Class
 	Copyright (C)  Bradley Smith, March 24, 2006
-	Copyright (C) 2007-2008 André Deperrois xflr5@yahoo.com
+	Hideously modified in 2008 by André Deperrois xflr5@yahoo.com for miserable selfish purposes 
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include "Miarex.h"
 #include "stdafx.h"
 #include ".\arcball.h"
-//#include <GL\gl.h>
 #include <GL\glu.h>
 #include "math.h"
 
@@ -37,8 +36,12 @@ CArcBall::CArcBall(void)
 	m_pTransx = NULL;
 	m_pTransy = NULL;
 
+	pi = 3.141592654;
 	angle = 0.0;
-	cross.Set(0.0,0.0,1.0);
+	Quat.a  = 0.0;
+	Quat.qx = 0.0;
+	Quat.qy = 0.0;
+	Quat.qz = 0.0;
 
 	ax = 0.0; ay = 0.0; az = 0.0;
 
@@ -96,6 +99,8 @@ CArcBall::CArcBall(void)
 
 	sc.Set(0.0,0.0,1.0);
 	ec.Set(0.0,0.0,1.0);
+
+	memset(ab_crosspoint, 0, 16*sizeof(float));
 }
 
 // the distance from the origin to the eye
@@ -144,70 +149,41 @@ void CArcBall::Reset()
 	QuatIdentity(ab_last);
 }
 
+void CArcBall::SetQuat(Quaternion Qt)
+{
+	if(abs(Qt.a)<=1.0) angle = 2.0*acos(Qt.a) *  180.0/pi;
+	Quat.a  = Qt.a;
+
+	Quat.qx = Qt.qx;
+	Quat.qy = Qt.qy;
+	Quat.qz = Qt.qz;
+
+	QuattoMatrix(ab_quat, Quat);
+}
+
+void CArcBall::SetQuat(double r, double qx, double qy, double qz)
+{
+	if(abs(r)<=1.0) angle = 2.0*acos(r) *  180.0/pi;
+	Quat.a  = r;
+
+	Quat.qx = qx;
+	Quat.qy = qy;
+	Quat.qz = qz;
+
+	QuattoMatrix(ab_quat, Quat);
+}
 // begin arcball rotation
 void CArcBall::Start(int mx, int my)
 {
 	// saves a copy of the current rotation for comparison
 	QuatCopy(ab_last,ab_quat);
 	if(ab_planar)
-		ab_start = PlanarCoords((GLdouble)mx,(GLdouble)my);
+		PlanarCoords((GLdouble)mx,(GLdouble)my, ab_start);
 	else
-		ab_start = SphereCoords((GLdouble)mx,(GLdouble)my);
-
-//TRACE("%.3f    %.3f    %.3f \n", ab_start.x, ab_start.y, ab_start.z);
+		SphereCoords((GLdouble)mx,(GLdouble)my, ab_start);
+	ab_curr = ab_start;
 }
 
-// update current arcball rotation
-void CArcBall::Move(int mx, int my)
-{
-	if(ab_planar)
-	{
-		ab_curr = PlanarCoords((double)mx,(double)my);
-		if(ab_curr == ab_start) return;
-
-		// d is motion since the last position
-		d = ab_curr - ab_start;
-
-		angle = d.VAbs() * 0.5;
-		cosa = cos( angle );
-		sina = sin( angle );
-		// p is perpendicular to d
-		p = (ab_out*d.x)-(ab_up*d.y);
-		p.Normalize();
-		p *= sina;
-
-		Quaternion(ab_next,(float)p.x,(float)p.y,(float)p.z,(float)cosa);
-		QuatNext(ab_quat,ab_last,ab_next);
-		// planar style only ever relates to the last point
-		QuatCopy(ab_last,ab_quat);
-		ab_start = ab_curr;
-	} 
-	else
-	{
-		ab_curr = SphereCoords((GLdouble)mx,(GLdouble)my);
-		if(ab_curr == ab_start)
-		{ // avoid potential rare divide by tiny
-			QuatCopy(ab_quat,ab_last);
-			return;
-		}
-
-		// use a dot product to get the angle between them
-		// use a cross product to get the vector to rotate around
-
-		cos2a = ab_start.dot(ab_curr);
-		sina = sqrt((1.0 - cos2a)*0.5);
-		cosa = sqrt((1.0 + cos2a)*0.5);
-		angle = acos(cosa)*180.0/3.141592654;
-		cross = (ab_start*ab_curr);
-		cross.Normalize();
-
-		cross *=sina;
-		Quaternion(ab_next,(float)cross.x,(float)cross.y,(float)cross.z,(float)cosa);
-
-		// update the rotation matrix
-		QuatNext(ab_quat,ab_last,ab_next);
-	}
-}
 
 // reset the rotation matrix
 void CArcBall::QuatIdentity(float* q)
@@ -221,35 +197,35 @@ void CArcBall::QuatIdentity(float* q)
 // copy a rotation matrix
 void CArcBall::QuatCopy(float* dst, float* src)
 { 
-	dst[0]=src[0]; dst[1]=src[1]; dst[2]=src[2];
-	dst[4]=src[4]; dst[5]=src[5]; dst[6]=src[6];
+	dst[0]=src[0]; dst[1]=src[1]; dst[2] =src[2];
+	dst[4]=src[4]; dst[5]=src[5]; dst[6] =src[6];
 	dst[8]=src[8]; dst[9]=src[9]; dst[10]=src[10];
 }
 
 // convert the quaternion into a rotation matrix
-void CArcBall::Quaternion(float* q, float x, float y, float z, float w)
+void CArcBall::QuattoMatrix(float* q, Quaternion Qt)
 {
-	x2 = x*x;
-	y2 = y*y;
-	z2 = z*z;
-	xy = x*y;
-	xz = x*z;
-	yz = y*z;
-	wx = w*x;
-	wy = w*y;
-	wz = w*z;
+	x2 = Qt.qx*Qt.qx;
+	y2 = Qt.qy*Qt.qy;
+	z2 = Qt.qz*Qt.qz;
+	xy = Qt.qx*Qt.qy;
+	xz = Qt.qx*Qt.qz;
+	yz = Qt.qy*Qt.qz;
+	wx = Qt.a*Qt.qx;
+	wy = Qt.a*Qt.qy;
+	wz = Qt.a*Qt.qz;
 
-	q[0] = 1 - 2*y2 - 2*z2;
-	q[1] = 2*xy + 2*wz;
-	q[2] = 2*xz - 2*wy;
+	q[0] = (float)(1 - 2*y2 - 2*z2);
+	q[1] = (float)(2*xy + 2*wz);
+	q[2] = (float)(2*xz - 2*wy);
 
-	q[4] = 2*xy - 2*wz;
-	q[5] = 1 - 2*x2 - 2*z2;
-	q[6] = 2*yz + 2*wx;
+	q[4] = (float)(2*xy - 2*wz);
+	q[5] = (float)(1 - 2*x2 - 2*z2);
+	q[6] = (float)(2*yz + 2*wx);
 
-	q[8] = 2*xz + 2*wy;
-	q[9] = 2*yz - 2*wx;
-	q[10]= 1 - 2*x2 - 2*y2;
+	q[8] = (float)(2*xz + 2*wy);
+	q[9] = (float)(2*yz - 2*wx);
+	q[10]= (float)(1 - 2*x2 - 2*y2);
 }
 
 // multiply two rotation matrices
@@ -269,7 +245,7 @@ void CArcBall::QuatNext(float* dest, float* left, float* right)
 
 
 // get intersection with plane for "trackball" style rotation
-CVector CArcBall::PlanarCoords(GLdouble mx, GLdouble my)
+void CArcBall::PlanarCoords(double mx, double my, CVector &V)
 {
 	gluUnProject(mx,my,0,ab_glm,ab_glp,ab_glv,&ax,&ay,&az);
 	m.Set(ax- ab_eye.x, ay- ab_eye.y, az- ab_eye.z);
@@ -277,12 +253,12 @@ CVector CArcBall::PlanarCoords(GLdouble mx, GLdouble my)
 	t = (ab_planedist - ab_zoom)*1.0 / (ab_eyedir.dot(m));
 	d = ab_eye + m*t;
 
-	return CVector(d.dot(ab_up),d.dot(ab_out),0.0);
+	V.Set(d.dot(ab_up),d.dot(ab_out),0.0);
 }
 
 
 // find the intersection with the plane through the visible edge
-CVector CArcBall::EdgeCoords(CVector m)
+void CArcBall::EdgeCoords(CVector m, CVector &V)
 {
 	// find the intersection of the edge plane and the ray
 	t = (ab_edge - ab_zoom) / (ab_eyedir.dot(m));
@@ -296,26 +272,25 @@ CVector CArcBall::EdgeCoords(CVector m)
 	ac = aa.dot(c);
 	c2 = c.dot(c);
 	q = ( 0.0 - ac - sqrt( ac*ac - c2*(aa.dot(aa)-ab_sphere2 ))) / c2;
-	ec = aa+(c*q);
-	ec.Normalize();
-
-	return ec;
+	V = aa+(c*q);
+	V.Normalize();
 }
 
 
-CVector CArcBall::SphereCoords(GLdouble mx, GLdouble my)
+void CArcBall::SphereCoords(double mx, double my, CVector &V)
 {
 	// find the intersection with the sphere
-
 	gluUnProject(mx,my,0.0,
 		         ab_glm,ab_glp, ab_glv,
 				 &ax,&ay,&az);
 
-	ax -= *m_pOffx - *m_pTransx;
-	ay -= *m_pOffy + *m_pTransy;
+//	ax -= *m_pOffx - *m_pTransx;
+//	ay -= *m_pOffy + *m_pTransy;
+	ax -= *m_pOffx ;
+	ay -= *m_pOffy ;
 
-	m.Set(ax-ab_eye.x, ay-ab_eye.y, az-ab_eye.z);
-/*
+/*	m.Set(ax-ab_eye.x, ay-ab_eye.y, az-ab_eye.z);
+
 	// mouse position represents ray: eye + t*m
 	// intersecting with a sphere centered at the origin
 	a = m.x*m.x+m.y*m.y+m.z*m.z;
@@ -327,14 +302,99 @@ CVector CArcBall::SphereCoords(GLdouble mx, GLdouble my)
 
 	sc = ab_eye+(m*t);*/
 
-	//more intuitive with ray to z-axis in ortho frustrum
-	if(ab_sphere2>ax*ax+ay*ay) sc.Set(ax,ay,sqrt(ab_sphere2-ax*ax-ay*ay));
-	else                       sc.Set(ax,ay,0.0);
+	//more intuitive with ray parallel to z-axis in ortho frustrum
+	if(ab_sphere2>ax*ax+ay*ay) V.Set(ax,ay,sqrt(ab_sphere2-ax*ax-ay*ay));
+	else                       V.Set(ax,ay,0.0);
 //	else return EdgeCoords(ax, ay);
 
-	sc.Normalize();
-	return sc;
+	V.Normalize();
 }
+
+// update current arcball rotation
+void CArcBall::Move(int mx, int my)
+{
+	if(ab_planar)
+	{
+		PlanarCoords((double)mx,(double)my, ab_curr);
+		if(ab_curr == ab_start) return;
+
+		// d is motion since the last position
+		d = ab_curr - ab_start;
+
+		angle = d.VAbs();
+		cosa2 = cos(angle/2.0);
+		sina2 = sin(angle/2.0);
+		// p is perpendicular to d
+		p = (ab_out*d.x)-(ab_up*d.y);
+		p.Normalize();
+		p *= sina2;
+		Quat.Set(cosa2, p.x, p.y, p.z);
+
+		QuattoMatrix(ab_next, Quat);
+		QuatNext(ab_quat,ab_last,ab_next);
+		// planar style only ever relates to the last point
+		QuatCopy(ab_last,ab_quat);
+		ab_start = ab_curr;
+	} 
+	else
+	{
+		SphereCoords((double)mx,(double)my, ab_curr);
+		if(ab_curr == ab_start)
+		{ 
+			// avoid potential rare divide by tiny
+			QuatCopy(ab_quat,ab_last);
+			return;
+		}
+
+		// use a dot product to get the angle between them
+		// use a cross product to get the vector to rotate around
+
+		cosa   = ab_start.dot(ab_curr);
+		sina2  = sqrt((1.0 - cosa)*0.5);
+		cosa2  = sqrt((1.0 + cosa)*0.5);
+		angle = acos(cosa2)*180.0/3.141592654;
+
+		p = (ab_start*ab_curr);
+		p.Normalize();
+		p *=sina2;
+		Quat.Set(cosa2, p.x, p.y, p.z);
+
+		QuattoMatrix(ab_next, Quat);
+
+		// update the rotation matrix
+		QuatNext(ab_quat,ab_last,ab_next);
+	}
+}
+
+void CArcBall::RotateCrossPoint()
+{
+	aa.Set(1.0, 0.0, 0.0);
+
+	cosa   = aa.dot(ab_curr);
+	sina2  = sqrt((1.0 - cosa)*0.5);
+	cosa2  = sqrt((1.0 + cosa)*0.5);
+	angle = 2.0*acos(cosa2)*180.0/pi;
+	double angle1 = acos(cosa)*180.0/pi;
+	double angle2 = 2.0* asin(sina2)*180.0/pi;
+
+	p = aa * ab_curr;
+	p.Normalize();
+
+//	p *=sina2;
+//	Quat.Set(cosa2, p.x, p.y, p.z);
+
+//	QuattoMatrix(ab_crosspoint, Quat);
+//	glMultMatrixf(ab_crosspoint); 
+}
+
+
+
+
+
+
+
+
+
 
 
 

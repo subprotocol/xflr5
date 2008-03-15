@@ -66,18 +66,20 @@ END_MESSAGE_MAP()
 BOOL CUserVarDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	if(m_bWing){
+	if(m_bWing)
+	{
 		m_ctrlXSel.AddString("Alpha");						//0
 		m_ctrlXSel.AddString("Lift coef.");					//1
 		m_ctrlXSel.AddString("Viscous drag coef.");			//2
 		m_ctrlXSel.AddString("Induced drag coef.");			//3
 		m_ctrlXSel.AddString("Total drag coef.");			//4
-		m_ctrlXSel.AddString("Airf. pitching moment coef.");//5
-		m_ctrlXSel.AddString("Geom. pitching moment coef.");//6
-		m_ctrlXSel.AddString("Pitching moment coef.");		//7
-		m_ctrlXSel.AddString("Rolling moment coef.");		//8
-		m_ctrlXSel.AddString("Geom. yawing moment coef.");  //9
+
+		m_ctrlXSel.AddString("Total pitching moment coef.");//5
+		m_ctrlXSel.AddString("Total rolling moment coef.");		//6
+		m_ctrlXSel.AddString("Total yawing moment coef.");  //7
+		m_ctrlXSel.AddString("Viscous yawing moment coef.");//9
 		m_ctrlXSel.AddString("Induced yawing moment coef.");//10
+
 		m_ctrlXSel.AddString("Glide ratio Cl/Cd");			//11
 		m_ctrlXSel.AddString("Power factor Cl^(3/2)/Cd");	//12
 		m_ctrlXSel.AddString("1/Rt(Cl)");					//13
@@ -102,12 +104,13 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlYSel.AddString("Viscous drag coef.");			//2
 		m_ctrlYSel.AddString("Induced drag coef.");			//3
 		m_ctrlYSel.AddString("Total drag coef.");			//4
-		m_ctrlYSel.AddString("Airf. pitching moment coef.");//5
-		m_ctrlYSel.AddString("Geom. pitching moment coef.");//6
-		m_ctrlYSel.AddString("Pitching moment coef.");		//7
-		m_ctrlYSel.AddString("Rolling moment coef.");		//8
-		m_ctrlYSel.AddString("Geom. yawing moment coef.");  //9
+
+		m_ctrlYSel.AddString("Total pitching moment coef.");//5
+		m_ctrlYSel.AddString("Total rolling moment coef.");		//6
+		m_ctrlYSel.AddString("Total yawing moment coef.");  //7
+		m_ctrlYSel.AddString("Viscous yawing moment coef.");//9
 		m_ctrlYSel.AddString("Induced yawing moment coef.");//10
+
 		m_ctrlYSel.AddString("Glide ratio Cl/Cd");			//11
 		m_ctrlYSel.AddString("Power factor Cl^(3/2)/Cd");	//12
 		m_ctrlYSel.AddString("1/Rt(Cl)");					//13
@@ -127,7 +130,8 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlYSel.AddString("Oswald");						//27
 		m_ctrlYSel.AddString("(XCp-Xcg)/MAC");				//28
 	}
-	else {
+	else 
+	{
 		m_ctrlXSel.AddString("Alpha");
 		m_ctrlXSel.AddString("Cl");
 		m_ctrlXSel.AddString("Cd");

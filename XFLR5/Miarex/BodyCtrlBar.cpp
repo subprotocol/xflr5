@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	CBodyCtrlBar class
-	Copyright (C) 2004 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2008 André Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -40,25 +40,28 @@ IMPLEMENT_DYNAMIC(CBodyCtrlBar, CInitDialogBar)
 
 BEGIN_MESSAGE_MAP(CBodyCtrlBar, CInitDialogBar)
 	ON_WM_SIZE()
-	ON_BN_CLICKED(IDC_BODYCOLOR, OnBodyColor)
 	ON_WM_DRAWITEM()
 	ON_WM_CONTEXTMENU()
 	ON_WM_MOUSEWHEEL()
-	ON_NOTIFY(NM_CLICK, IDC_FRAMELIST, OnNMClickFrameList)
-	ON_NOTIFY(NM_CLICK, IDC_FRAMEPOINTS, OnNMClickFramePoint)
-	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FRAMELIST, OnLvnEndLabelEditFrameList)
-	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FRAMEPOINTS, OnLvnEndLabelEditFramePoints)
-	ON_CBN_SELCHANGE(IDC_BODYLIST, OnSelChangeBodyList)
 	ON_COMMAND(IDM_INSERTPOINT, OnInsertPoint)
 	ON_COMMAND(IDM_DELETEPOINT, OnDeletePoint)
 	ON_COMMAND(IDM_INSERTFRAME, OnInsertFrame)
 	ON_COMMAND(IDM_DELETEFRAME, OnDeleteFrame)
+	ON_BN_CLICKED(IDC_LOCKED, OnLocked)
+	ON_BN_CLICKED(IDC_BODYCOLOR, OnBodyColor)
 	ON_BN_CLICKED(IDC_RADIO1, OnRadio)
 	ON_BN_CLICKED(IDC_RADIO2, OnRadio)
-	ON_BN_CLICKED(IDC_CLOSEDSURFACE, OnClosedSurface)
-	ON_CBN_SELCHANGE(IDC_SPLINEDEGREE, OnSelChangeSplineDegree)
+	ON_CBN_SELCHANGE(IDC_BODYLIST, OnSelChangeBodyList)
+	ON_CBN_SELCHANGE(IDC_XDEGREE, OnSelChangeSplineDegree)
+	ON_CBN_SELCHANGE(IDC_HOOPDEGREE, OnSelChangeSplineDegree)
 	ON_EN_KILLFOCUS(IDC_NXPANELS, OnKillFocusPanels)
 	ON_EN_KILLFOCUS(IDC_NHPANELS, OnKillFocusPanels)
+//	ON_NOTIFY(NM_CLICK, IDC_FRAMELIST, OnNMClickFrameList)
+//	ON_NOTIFY(NM_CLICK, IDC_FRAMEPOINTS, OnNMClickFramePoint)
+	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FRAMELIST, OnLvnEndLabelEditFrameList)
+	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FRAMEPOINTS, OnLvnEndLabelEditFramePoints)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_FRAMELIST, OnLvnItemchangedFramelist)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_FRAMEPOINTS, OnLvnItemchangedFramepoints)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -74,8 +77,9 @@ CBodyCtrlBar::CBodyCtrlBar(CWnd* pParent)
 	m_poaBody  = NULL;
 	m_ppCurBody = NULL;
 	m_StackSize = 0; //the current stacksize
-	m_StackPos    = 0; //the current position of the stack
+	m_StackPos  = 0; //the current position of the stack
 }
+
 
 CBodyCtrlBar::~CBodyCtrlBar()
 {
@@ -97,18 +101,63 @@ void CBodyCtrlBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_FRAMEPOINTS, m_ctrlFramePoints);
 	DDX_Control(pDX, IDC_BODYCOLOR, m_ctrlBodyColor); 
 	DDX_Control(pDX, IDC_BODYLIST, m_ctrlBodyList); 
-	DDX_Control(pDX, IDC_CLOSEDSURFACE, m_ctrlClosedSurface);  
-	DDX_Control(pDX, IDC_SPLINEDEGREE, m_ctrlSplineDegree);  
+	DDX_Control(pDX, IDC_XDEGREE, m_ctrlXDegree);  
+	DDX_Control(pDX, IDC_HOOPDEGREE, m_ctrlHoopDegree);  
 	DDX_Control(pDX, IDC_NXPANELS, m_ctrlnxPanels);  
 	DDX_Control(pDX, IDC_NHPANELS, m_ctrlnhPanels);  
 	DDX_Control(pDX, IDC_RADIO1, m_ctrlRadio1);  
 	DDX_Control(pDX, IDC_RADIO2, m_ctrlRadio2);  
+	DDX_Control(pDX, IDC_LOCKED, m_ctrlLocked);  
 	//}}AFX_DATA_MAP
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // CBodyCtrlBar message handlers
 
+
+
+void CBodyCtrlBar::SetColumnTitle() 
+{
+	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
+	CString str, strong;
+
+	GetLengthUnit(str, pFrame->m_LengthUnit);
+	str = " ("+str+")";
+
+	LPTSTR ps;
+
+	LVCOLUMN lvColumn;
+
+	lvColumn.mask = LVCF_SUBITEM |LVCF_TEXT |LVCF_WIDTH ;
+	lvColumn.cx = 60;
+	lvColumn.iSubItem = 0;
+
+
+	strong = "x" + str;
+	ps = strong.GetBuffer(strong.GetLength());
+	strong.ReleaseBuffer();
+	lvColumn.pszText=ps;
+	m_ctrlFrameList.SetColumn(1,&lvColumn);
+
+	strong = "z" + str;
+	ps = strong.GetBuffer(strong.GetLength());
+	strong.ReleaseBuffer();
+	lvColumn.pszText=ps;
+	m_ctrlFrameList.SetColumn(2,&lvColumn);
+
+	strong = "y" + str;
+	ps = strong.GetBuffer(strong.GetLength());
+	strong.ReleaseBuffer();
+	lvColumn.pszText=ps;
+	m_ctrlFramePoints.SetColumn(1,&lvColumn);
+
+	strong = "z" + str;
+	ps = strong.GetBuffer(strong.GetLength());
+	strong.ReleaseBuffer();
+	lvColumn.pszText=ps;
+	m_ctrlFramePoints.SetColumn(2,&lvColumn);
+
+}
 
 BOOL CBodyCtrlBar::OnInitDialogBar() 
 {
@@ -122,7 +171,7 @@ BOOL CBodyCtrlBar::OnInitDialogBar()
 	GetLengthUnit(str, pFrame->m_LengthUnit);
 	str = " ("+str+")";
 
-	m_ctrlFrameList.InsertColumn(0,"Frame",LVCFMT_LEFT, 50);
+	m_ctrlFrameList.InsertColumn(0,"Frame",LVCFMT_LEFT, 30);
 	m_ctrlFrameList.InsertColumn(1,"x"+str,LVCFMT_RIGHT,60);
 	m_ctrlFrameList.InsertColumn(2,"z"+str,LVCFMT_RIGHT,60);
 	m_ctrlFrameList.InsertColumn(3,"N",LVCFMT_RIGHT,50);
@@ -132,7 +181,7 @@ BOOL CBodyCtrlBar::OnInitDialogBar()
 	m_ctrlFrameList.m_iPrecision[3] = 0;
 	m_ctrlFrameList.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
-	m_ctrlFramePoints.InsertColumn(0,"Point",LVCFMT_LEFT, 50);
+	m_ctrlFramePoints.InsertColumn(0,"Point",LVCFMT_LEFT, 30);
 	m_ctrlFramePoints.InsertColumn(1,"y"+str,LVCFMT_RIGHT,60);
 	m_ctrlFramePoints.InsertColumn(2,"z"+str,LVCFMT_RIGHT,60);
 	m_ctrlFramePoints.InsertColumn(3,"N",LVCFMT_RIGHT,50);
@@ -157,7 +206,8 @@ BOOL CBodyCtrlBar::OnInitDialogBar()
 
 	for (i=1; i<6; i++){
 		str.Format("%d", i);
-		m_ctrlSplineDegree.AddString(str);
+		m_ctrlXDegree.AddString(str);
+		m_ctrlHoopDegree.AddString(str);
 	}
 
 	if(*m_ppCurBody)
@@ -167,17 +217,28 @@ BOOL CBodyCtrlBar::OnInitDialogBar()
 		m_ctrlFramePoints.SetItemState((*m_ppCurBody)->m_Frame[l].m_iSelect,
 									LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 		m_ctrlFramePoints.SetFocus();
-		m_ctrlSplineDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
-		if((*m_ppCurBody)->m_LineType == 1) m_ctrlSplineDegree.EnableWindow(false);
+		m_ctrlHoopDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
+		m_ctrlXDegree.SetCurSel((*m_ppCurBody)->m_nxDegree-1);
+		if((*m_ppCurBody)->m_LineType == 1) 
+		{
+			m_ctrlXDegree.EnableWindow(false);
+			m_ctrlHoopDegree.EnableWindow(false);
+			m_ctrlnxPanels.EnableWindow(false);
+			m_ctrlnhPanels.EnableWindow(false);
+		}
 	}
 	else
 	{
-		m_ctrlSplineDegree.SetCurSel(1);
-		m_ctrlSplineDegree.EnableWindow(false);
+		m_ctrlXDegree.SetCurSel(1);
+		m_ctrlXDegree.EnableWindow(false);
+		m_ctrlHoopDegree.SetCurSel(1);
+		m_ctrlHoopDegree.EnableWindow(false);
+		m_ctrlnxPanels.EnableWindow(false);
+		m_ctrlnhPanels.EnableWindow(false);
 	}
 
 	FillFrameList();
-	FillFrameCoord();
+	FillPointList();
 
 	return TRUE;
 }
@@ -215,12 +276,13 @@ BOOL CBodyCtrlBar::PreTranslateMessage(MSG* pMsg)
 	} 
 	else if (pMsg->wParam == VK_RETURN)
 	{
-		TakePicture();
-		StorePicture();
+//		TakePicture();
+//		StorePicture();
 		(*m_ppCurBody)->m_nxPanels = m_ctrlnxPanels.GetValue();
 		(*m_ppCurBody)->m_nhPanels = m_ctrlnhPanels.GetValue();
 		if(pWnd==&m_ctrlnxPanels) m_ctrlnxPanels.SetSel(0,-1);
 		if(pWnd==&m_ctrlnhPanels) m_ctrlnhPanels.SetSel(0,-1);
+		(*m_ppCurBody)->SetPanelPos();
 		pMainFrame->SetSaveState(false);
 		pMiarex->m_bResetglMesh     = true;
 		pMiarex->m_bResetglBodyMesh = true;
@@ -351,20 +413,23 @@ void CBodyCtrlBar::FillFrameList()
 
 	if(!*m_ppCurBody) return;
 
-	for (int i=0; i<(*m_ppCurBody)->m_NStation; i++)
+	for (int i=0; i<(*m_ppCurBody)->m_NStations; i++)
 	{
 		strong.Format("%d", i+1);
 		m_ctrlFrameList.InsertItem(i, strong);
 		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].x*pFrame->m_mtoUnit);
 		m_ctrlFrameList.SetItemText(i,1,strong);
-		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].y*pFrame->m_mtoUnit);
+		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].z*pFrame->m_mtoUnit);
 		m_ctrlFrameList.SetItemText(i,2,strong);
-		strong.Format(" %2d", 1);
+		if((*m_ppCurBody)->m_LineType==2) strong = " ";
+		else                              strong.Format(" %2d", (*m_ppCurBody)->m_xPanels[i]);
 		m_ctrlFrameList.SetItemText(i,3,strong);
 	}
+	if((*m_ppCurBody)->m_LineType==1) m_ctrlFrameList.m_nColumns = 4;
+	else                              m_ctrlFrameList.m_nColumns = 3;
 }
 
-void CBodyCtrlBar::FillFrameCoord()
+void CBodyCtrlBar::FillPointList()
 {
 	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
 	CString strong;
@@ -373,17 +438,23 @@ void CBodyCtrlBar::FillFrameCoord()
 	if(!*m_ppCurBody) return;
 	int l = (*m_ppCurBody)->m_iActiveFrame;
 
-	for (int i=0; i<(*m_ppCurBody)->m_NSideLines; i++)
+	if(l>=0)
 	{
-		strong.Format("%d", i+1);
-		m_ctrlFramePoints.InsertItem(i, strong);
-		strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[i].y*pFrame->m_mtoUnit);
-		m_ctrlFramePoints.SetItemText(i,1,strong);
-		strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[i].z*pFrame->m_mtoUnit);
-		m_ctrlFramePoints.SetItemText(i,2,strong);
-		strong.Format(" %2d", 1);
-		m_ctrlFramePoints.SetItemText(i,3,strong);
+		for (int i=0; i<(*m_ppCurBody)->m_NSideLines; i++)
+		{
+			strong.Format("%d", i+1);
+			m_ctrlFramePoints.InsertItem(i, strong);
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[i].y*pFrame->m_mtoUnit);
+			m_ctrlFramePoints.SetItemText(i,1,strong);
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[i].z*pFrame->m_mtoUnit);
+			m_ctrlFramePoints.SetItemText(i,2,strong);
+			if((*m_ppCurBody)->m_LineType==2) strong = " ";
+			else                              strong.Format(" %2d", (*m_ppCurBody)->m_hPanels[i]);
+			m_ctrlFramePoints.SetItemText(i,3,strong);
+		}
 	}
+	if((*m_ppCurBody)->m_LineType==1) m_ctrlFramePoints.m_nColumns = 4;
+	else                              m_ctrlFramePoints.m_nColumns = 3;
 }
 
 
@@ -422,6 +493,37 @@ void CBodyCtrlBar::ReSizeCtrls()
 	}
 }
 
+void CBodyCtrlBar::OnLvnItemchangedFramelist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+//	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
+	{
+		*pResult =0;
+		return ;
+	}
+	SetFrame(pNMListView->iItem);
+	pMiarex->UpdateView();
+
+	*pResult = 0;
+}
+void CBodyCtrlBar::OnLvnItemchangedFramepoints(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
+	{
+		*pResult =0;
+		return ;
+	}
+	SetPoint(pNMListView->iItem);
+	pMiarex->UpdateView();
+	*pResult = 0;
+}
+
+/*
 void CBodyCtrlBar::OnNMClickFrameList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
@@ -437,7 +539,6 @@ void CBodyCtrlBar::OnNMClickFrameList(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-
 void CBodyCtrlBar::OnNMClickFramePoint(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
@@ -451,12 +552,12 @@ void CBodyCtrlBar::OnNMClickFramePoint(NMHDR *pNMHDR, LRESULT *pResult)
 	pMiarex->UpdateView();
 	*pResult = 0;
 }
+*/
 
-
-void CBodyCtrlBar::ReadFrameData(int sel, double &x, double &z)
+void CBodyCtrlBar::ReadFrameData(int sel, double &x, double &z, int &n)
 {
 	double d;
-	int res;
+	int res, nel;
 	CString strong;
 
 	strong = m_ctrlFrameList.GetItemText(sel,1);
@@ -467,13 +568,24 @@ void CBodyCtrlBar::ReadFrameData(int sel, double &x, double &z)
 	strong = m_ctrlFrameList.GetItemText(sel,2);
 	res = sscanf(strong, "%lf",&d);
 	if(res==1) z=d;
+
+
+	if((*m_ppCurBody)->m_LineType==1)
+	{
+		strong = m_ctrlFrameList.GetItemText(sel,3);
+		res = sscanf(strong, "%d",&nel);
+		if(res==1) n=nel;
+		else       n = (*m_ppCurBody)->m_xPanels[sel];
+	}
 }
 
 
 void CBodyCtrlBar::OnLvnEndLabelEditFramePoints(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	CMainFrame* pFrame = (CMainFrame*)m_pMainFrame;
+	CMainFrame* pMainFrame = (CMainFrame*)m_pMainFrame;
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	CFrame *pFrame;
+
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	*pResult = 0;
 	if(pDispInfo->item.iItem == -1 || pDispInfo->item.iSubItem == -1 )
@@ -487,14 +599,30 @@ void CBodyCtrlBar::OnLvnEndLabelEditFramePoints(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(iSelection>=0)
 	{
-		double y,z;
-		ReadPointData(iSelection, y, z);
-		(*m_ppCurBody)->m_Frame[(*m_ppCurBody)->m_iActiveFrame].m_Point[iSelection].y = y/pFrame->m_mtoUnit;
-		(*m_ppCurBody)->m_Frame[(*m_ppCurBody)->m_iActiveFrame].m_Point[iSelection].z = z/pFrame->m_mtoUnit;
-		pMiarex->m_bResetglBody   = true;
-		pMiarex->m_bResetglBody2D = true;
-		pFrame->SetSaveState(false);
-		pMiarex->UpdateView();
+		if(!(*m_ppCurBody)->m_bLocked)
+		{
+			int nel;
+			double y,z;
+			TakePicture();
+			StorePicture();
+			ReadPointData(iSelection, y, z, nel);
+			pFrame = (*m_ppCurBody)->m_Frame + (*m_ppCurBody)->m_iActiveFrame;
+			pFrame->m_Point[iSelection].y = y/pMainFrame->m_mtoUnit;
+			pFrame->m_Point[iSelection].z = z/pMainFrame->m_mtoUnit;
+			if((*m_ppCurBody)->m_LineType==1)	(*m_ppCurBody)->m_hPanels[iSelection] = nel;
+			(*m_ppCurBody)->m_FramePosition[(*m_ppCurBody)->m_iActiveFrame].z = (pFrame->m_Point[0].z+pFrame->m_Point[(*m_ppCurBody)->m_NSideLines-1].z)/2.0;
+
+			FillFrameList();
+			pMiarex->m_bResetglBody   = true;
+			pMiarex->m_bResetglBodyMesh = true;
+			pMiarex->m_bResetglBody2D = true;
+			pMainFrame->SetSaveState(false);
+			pMiarex->UpdateView();
+		}
+		else 
+		{
+			FillPointList();
+		}
 	}
 }
 
@@ -515,21 +643,31 @@ void CBodyCtrlBar::OnLvnEndLabelEditFrameList(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if(iSelection>=0)
 	{
-		double x,z;
-		ReadFrameData(iSelection, x, z);
-		(*m_ppCurBody)->m_FramePosition[iSelection].x = x/pFrame->m_mtoUnit;
-		(*m_ppCurBody)->m_FramePosition[iSelection].z = z/pFrame->m_mtoUnit;
-		pMiarex->m_bResetglBody   = true;
-		pMiarex->m_bResetglBody2D = true;
-		pMiarex->UpdateView();
-		pFrame->SetSaveState(false);
+		if(!(*m_ppCurBody)->m_bLocked)
+		{
+			int nel;
+			double x,z;
+			TakePicture();
+			StorePicture();
+			ReadFrameData(iSelection, x, z, nel);
+			(*m_ppCurBody)->m_FramePosition[iSelection].x = x/pFrame->m_mtoUnit;
+			(*m_ppCurBody)->m_FramePosition[iSelection].z = z/pFrame->m_mtoUnit;
+			if((*m_ppCurBody)->m_LineType==1)	(*m_ppCurBody)->m_xPanels[iSelection] = nel;
+			(*m_ppCurBody)->UpdateFramePos(iSelection);
+			pMiarex->m_bResetglBody   = true;
+			pMiarex->m_bResetglBody2D = true;
+			pMiarex->UpdateView();
+			pFrame->SetSaveState(false);
+		}
+		else FillFrameList();
+
 	}
 }
 
-void CBodyCtrlBar::ReadPointData(int sel, double &y, double &z)
+void CBodyCtrlBar::ReadPointData(int sel, double &y, double &z, int &n)
 {
 	double d;
-	int res;
+	int res, nel;
 	CString strong;
 
 	strong = m_ctrlFramePoints.GetItemText(sel,1);
@@ -540,6 +678,14 @@ void CBodyCtrlBar::ReadPointData(int sel, double &y, double &z)
 	strong = m_ctrlFramePoints.GetItemText(sel,2);
 	res = sscanf(strong, "%lf",&d);
 	if(res==1) z=d;
+
+	if((*m_ppCurBody)->m_LineType==1)
+	{
+		strong = m_ctrlFramePoints.GetItemText(sel,3);
+		res = sscanf(strong, "%d",&nel);
+		if(res==1) n=nel;
+	}
+	
 }
 
 
@@ -556,8 +702,9 @@ void CBodyCtrlBar::OnSelChangeBodyList()
 	int sel = m_ctrlBodyList.GetCurSel();
 	if (sel !=CB_ERR) m_ctrlBodyList.GetLBText(sel, strong);
 
-	pMiarex->m_bResetglBody2D = true;
 	pMiarex->SetBody(strong);
+	pMiarex->m_bIs3DScaleSet = true;
+	pMiarex->m_bResetglBody2D = true;
 	pMiarex->UpdateView();
 }
 
@@ -577,7 +724,7 @@ void CBodyCtrlBar::OnContextMenu(CWnd* pWnd, CPoint point)
 		{
 			POSITION pos = m_ctrlFrameList.GetFirstSelectedItemPosition();
 			FrameSel = m_ctrlFrameList.GetNextSelectedItem(pos);
-			if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStation)
+			if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStations)
 			{
 				SetFrame(FrameSel);
 
@@ -642,27 +789,37 @@ void CBodyCtrlBar::SetBody(CBody *pBody)
 	{
 		m_ctrlBodyList.SetCurSel(pos);
 	}
+
 	pBody->SetKnots();
+	pBody->SetPanelPos();
 	UpdateBodyCtrls();
+
+//	TakePicture();
+//	StorePicture();
 }
 
 
 void CBodyCtrlBar::UpdateBodyCtrls()
 {
+	int k;
+	CPlane *pPlane;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
+
 	if(!*m_ppCurBody) 
 	{
 		FillFrameList();
-		FillFrameCoord();
+		FillPointList();
 		m_ctrlRadio1.EnableWindow(false);
 		m_ctrlRadio2.EnableWindow(false);
 		m_ctrlBodyList.EnableWindow(false);
 		m_ctrlBodyColor.EnableWindow(false);
-		m_ctrlClosedSurface.EnableWindow(false);
 		m_ctrlFrameList.EnableWindow(false);
 		m_ctrlFramePoints.EnableWindow(false);
 		m_ctrlnhPanels.EnableWindow(false);
 		m_ctrlnxPanels.EnableWindow(false);
-		m_ctrlSplineDegree.EnableWindow(false);
+		m_ctrlXDegree.EnableWindow(false);
+		m_ctrlHoopDegree.EnableWindow(false);
+		m_ctrlLocked.EnableWindow(false);
 		return;
 	}
 	else
@@ -675,26 +832,66 @@ void CBodyCtrlBar::UpdateBodyCtrls()
 		if((*m_ppCurBody)->m_LineType==1) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
 		if((*m_ppCurBody)->m_LineType==2) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
 
-		if((*m_ppCurBody)->m_bClosedSurface) m_ctrlClosedSurface.SetCheck(TRUE);
-		else                             m_ctrlClosedSurface.SetCheck(FALSE);
-
-		m_ctrlSplineDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
-		if((*m_ppCurBody)->m_LineType==1) m_ctrlSplineDegree.EnableWindow(false);
-		else                          m_ctrlSplineDegree.EnableWindow(true);
+		m_ctrlHoopDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
+		m_ctrlXDegree.SetCurSel((*m_ppCurBody)->m_nxDegree-1);
+		if((*m_ppCurBody)->m_LineType==1)
+		{
+			m_ctrlXDegree.EnableWindow(false);
+			m_ctrlHoopDegree.EnableWindow(false);
+			m_ctrlnhPanels.EnableWindow(false);
+			m_ctrlnxPanels.EnableWindow(false);
+		}
+		else
+		{
+			m_ctrlXDegree.EnableWindow(true);
+			m_ctrlHoopDegree.EnableWindow(true);
+			m_ctrlnhPanels.EnableWindow(true);
+			m_ctrlnxPanels.EnableWindow(true);
+		}
 	
 		m_ctrlnxPanels.SetValue((*m_ppCurBody)->m_nxPanels);
 		m_ctrlnhPanels.SetValue((*m_ppCurBody)->m_nhPanels);
 
-		m_ctrlRadio1.EnableWindow(true);
-		m_ctrlRadio2.EnableWindow(true);
-		m_ctrlBodyList.EnableWindow(true);
-		m_ctrlBodyColor.EnableWindow(true);
-		m_ctrlClosedSurface.EnableWindow(true);
-		m_ctrlFrameList.EnableWindow(true);
-		m_ctrlFramePoints.EnableWindow(true);
-		m_ctrlnhPanels.EnableWindow(true);
-		m_ctrlnxPanels.EnableWindow(true);
-		m_ctrlSplineDegree.EnableWindow(true);
+
+		bool bIsInUse = false;
+		for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
+		{
+			pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
+			if(pPlane->m_bBody && pPlane->m_pBody==*m_ppCurBody)
+			{
+				if(pPlane->HasResults())
+				{
+					bIsInUse = true;
+					break;
+				}
+			}
+		}
+		if(bIsInUse) //same as bLocked
+		{
+			m_ctrlLocked.SetCheck(true); 
+			m_ctrlRadio1.EnableWindow(false);
+			m_ctrlRadio2.EnableWindow(false);
+			m_ctrlBodyList.EnableWindow(false);
+			m_ctrlBodyColor.EnableWindow(false);
+			m_ctrlFrameList.EnableWindow(false);
+			m_ctrlFramePoints.EnableWindow(false);
+			m_ctrlnhPanels.EnableWindow(false);
+			m_ctrlnxPanels.EnableWindow(false);
+			m_ctrlXDegree.EnableWindow(false);
+			m_ctrlHoopDegree.EnableWindow(false);
+			m_ctrlLocked.EnableWindow(true);
+		}
+		else       
+		{
+			m_ctrlLocked.SetCheck(false);
+			m_ctrlRadio1.EnableWindow(true);
+			m_ctrlRadio2.EnableWindow(true);
+			m_ctrlBodyList.EnableWindow(true);
+			m_ctrlBodyColor.EnableWindow(true);
+			m_ctrlFrameList.EnableWindow(true);
+			m_ctrlFramePoints.EnableWindow(true);
+			m_ctrlLocked.EnableWindow(false);
+		}
 	}
 }
 
@@ -704,7 +901,7 @@ void CBodyCtrlBar::SetFrame(int iFrame)
 	pMiarex->m_pCurFrame = &(*m_ppCurBody)->m_Frame[iFrame];
 	(*m_ppCurBody)->m_iActiveFrame = iFrame;
 
-	FillFrameCoord();
+	FillPointList();
 	SetPointSel(pMiarex->m_pCurFrame->m_iSelect);
 
 	pMiarex->m_bResetglBody2D = true;
@@ -750,7 +947,7 @@ void CBodyCtrlBar::OnInsertFrame()
 
 	POSITION pos = m_ctrlFrameList.GetFirstSelectedItemPosition();
 	int FrameSel = m_ctrlFrameList.GetNextSelectedItem(pos);
-	if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStation)
+	if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStations)
 	{
 		if(FrameSel==0) FrameSel++;
 		Real.x = ((*m_ppCurBody)->m_FramePosition[FrameSel].x + (*m_ppCurBody)->m_FramePosition[FrameSel-1].x)/2.0;
@@ -774,7 +971,7 @@ void CBodyCtrlBar::OnDeleteFrame()
 
 	POSITION pos = m_ctrlFrameList.GetFirstSelectedItemPosition();
 	int FrameSel = m_ctrlFrameList.GetNextSelectedItem(pos);
-	if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStation)
+	if(FrameSel>=0 && FrameSel<(*m_ppCurBody)->m_NStations)
 	{
 		(*m_ppCurBody)->RemoveFrame(FrameSel);
 	}
@@ -802,7 +999,7 @@ void CBodyCtrlBar::OnInsertPoint()
 		if(FramePoint==0)	FramePoint++;
 		(*m_ppCurBody)->InsertSideLine(FramePoint);
 	}
-	FillFrameCoord();
+	FillPointList();
 	SetPoint(FramePoint);
 	pMiarex->UpdateView();
 }
@@ -824,7 +1021,7 @@ void CBodyCtrlBar::OnDeletePoint()
 		if(FramePoint==0)	FramePoint++;
 		(*m_ppCurBody)->RemoveSideLine(FramePoint);
 	}
-	FillFrameCoord();
+	FillPointList();
 	SetPoint(FramePoint);
 	pMiarex->UpdateView();
 }
@@ -837,10 +1034,16 @@ void CBodyCtrlBar::OnRadio()
 	if(*m_ppCurBody)
 	{
 
+		if(!!(*m_ppCurBody)->m_bLocked)
+		{
+			if((*m_ppCurBody)->m_LineType==1) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
+			else                              CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
+			return;
+		}
 		TakePicture();
 		StorePicture();
 
-		if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO4)==IDC_RADIO1)
+		if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)==IDC_RADIO1)
 		{
 			(*m_ppCurBody)->m_LineType = 1;
 		}
@@ -848,10 +1051,25 @@ void CBodyCtrlBar::OnRadio()
 		{
 			(*m_ppCurBody)->m_LineType = 2;
 		}
-		m_ctrlSplineDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
-		if((*m_ppCurBody)->m_LineType==1) m_ctrlSplineDegree.EnableWindow(false);
-		else                          m_ctrlSplineDegree.EnableWindow(true);
+		m_ctrlXDegree.SetCurSel((*m_ppCurBody)->m_nxDegree-1);
+		m_ctrlHoopDegree.SetCurSel((*m_ppCurBody)->m_nhDegree-1);
+		if((*m_ppCurBody)->m_LineType==1)
+		{
+			m_ctrlXDegree.EnableWindow(false);
+			m_ctrlHoopDegree.EnableWindow(false);
+			m_ctrlnxPanels.EnableWindow(false);
+			m_ctrlnhPanels.EnableWindow(false);
+		}
+		else        
+		{
+			m_ctrlXDegree.EnableWindow(true);
+			m_ctrlHoopDegree.EnableWindow(true);
+			m_ctrlnxPanels.EnableWindow(true);
+			m_ctrlnhPanels.EnableWindow(true);
+		}
 	}
+	FillPointList();
+	FillFrameList();
 
 	pFrame->SetSaveState(false);
 
@@ -859,41 +1077,28 @@ void CBodyCtrlBar::OnRadio()
 	pMiarex->m_bResetglBody2D = true;
 	pMiarex->UpdateView();
 }
-
-void CBodyCtrlBar::OnClosedSurface()
-{
-	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
-	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	if(*m_ppCurBody)
-	{
-
-		TakePicture();
-		StorePicture();
-
-		if(m_ctrlClosedSurface.GetCheck()) (*m_ppCurBody)->m_bClosedSurface = true;
-		else                               (*m_ppCurBody)->m_bClosedSurface = false;
-	}
-	pFrame->SetSaveState(false);
-	pMiarex->m_bResetglBody   = true;
-	pMiarex->m_bResetglBody2D = true;
-	pMiarex->UpdateView();
-}
-
 
 void CBodyCtrlBar::OnSelChangeSplineDegree()
 {
-	CWaitCursor wait;
 	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
 	pMainFrame->SetSaveState(false);
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if(!!(*m_ppCurBody)->m_bLocked)
+	{
+		m_ctrlHoopDegree.SetCurSel((*m_ppCurBody)->m_nhDegree - 1);
+		m_ctrlXDegree.SetCurSel((*m_ppCurBody)->m_nxDegree - 1);
+		return;
+	}
+
+	CWaitCursor wait;
 	if(*m_ppCurBody) 
 	{
 
 		TakePicture();
 		StorePicture();
 
-		(*m_ppCurBody)->m_nhDegree = m_ctrlSplineDegree.GetCurSel()+1;
-		(*m_ppCurBody)->m_nxDegree = m_ctrlSplineDegree.GetCurSel()+1;
+		(*m_ppCurBody)->m_nhDegree = m_ctrlHoopDegree.GetCurSel()+1;
+		(*m_ppCurBody)->m_nxDegree = m_ctrlXDegree.GetCurSel()+1;
 		(*m_ppCurBody)->SetKnots();
 		pMiarex->m_bResetglBody   = true;
 		pMiarex->m_bResetglBody2D = true;
@@ -907,14 +1112,24 @@ void CBodyCtrlBar::OnKillFocusPanels()
 	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
 	if(*m_ppCurBody)
 	{
-		TakePicture();
-		StorePicture();
-		(*m_ppCurBody)->m_nxPanels = m_ctrlnxPanels.GetValue();
-		(*m_ppCurBody)->m_nhPanels = m_ctrlnhPanels.GetValue();
-		pMainFrame->SetSaveState(false);
-		pMiarex->m_bResetglBodyMesh = true;
-		pMiarex->m_bResetglMesh = true;
-		pMiarex->UpdateView();
+		if(!!(*m_ppCurBody)->m_bLocked)
+		{
+			m_ctrlnxPanels.SetValue((*m_ppCurBody)->m_nxPanels);
+			m_ctrlnhPanels.SetValue((*m_ppCurBody)->m_nhPanels);
+			return;
+		}
+		else
+		{
+			TakePicture();
+			StorePicture();
+			(*m_ppCurBody)->m_nxPanels = m_ctrlnxPanels.GetValue();
+			(*m_ppCurBody)->m_nhPanels = m_ctrlnhPanels.GetValue();
+			(*m_ppCurBody)->SetPanelPos();
+			pMainFrame->SetSaveState(false);
+			pMiarex->m_bResetglBodyMesh = true;
+			pMiarex->m_bResetglMesh = true;
+			pMiarex->UpdateView();
+		}
 	}
 }
 
@@ -964,7 +1179,8 @@ void CBodyCtrlBar::SetPicture()
 void CBodyCtrlBar::OnUndo() 
 {
 	CWaitCursor wait;
-	if(m_StackPos>0) {
+	if(m_StackPos>0) 
+	{
 		if(m_StackPos == m_StackSize)
 		{
 			//if we're at the first undo command, save current state
@@ -990,7 +1206,67 @@ void CBodyCtrlBar::OnRedo()
 		SetPicture();
 //		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
 //		pTB->EnableButton(IDT_UNDO, true);
-//		if(m_StackPos==m_StackSize-1) 	pTB->EnableButton(IDT_REDO, false);
-		
+//		if(m_StackPos==m_StackSize-1) 	pTB->EnableButton(IDT_REDO, false);		
 	}
 }
+
+void CBodyCtrlBar::OnLocked()
+{
+	int k; 
+	CString strong;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
+	CPlane *pPlane;
+	bool bIsInUse = false;
+	int resp = IDYES;
+	for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
+	{
+		pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
+		if(pPlane->m_bBody && pPlane->m_pBody==*m_ppCurBody)
+		{
+			if(pPlane->HasResults())
+			{
+				bIsInUse = true;
+				break;
+			}
+		}
+	}
+	if(bIsInUse)
+	{
+		strong = "The current body " + (*m_ppCurBody)->m_BodyName
+			     +" is used by one or more planes.\n The associated results will be deleted. Continue ?";
+		resp = AfxMessageBox(strong, MB_YESNOCANCEL);
+	}
+	if(resp==IDYES)
+	{
+		for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
+		{
+			pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
+			if(pPlane->m_bBody && pPlane->m_pBody==*m_ppCurBody)
+			{
+				pMainFrame->DeletePlane(pPlane, true);
+			}
+		}
+		(*m_ppCurBody)->m_bLocked = false;
+		UpdateBodyCtrls();
+	}
+	else 
+	{
+		m_ctrlLocked.SetCheck(true);
+		(*m_ppCurBody)->m_bLocked = true;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

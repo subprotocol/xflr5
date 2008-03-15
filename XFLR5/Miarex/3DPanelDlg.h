@@ -24,7 +24,7 @@
 #include "Wing.h"
 #include "WPolar.h"
 #include "3DPanelThread.h"
- 
+  
 #include "afxwin.h"
  
 // Boîte de dialogue C3DPanelDlg
@@ -52,32 +52,34 @@ protected:
 
 	CEdit m_ctrlOutput;
 
-	bool ComputeAerodynamics(double V0, double VDelta, int nrhs);
+	bool ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	bool ComputeOnBody(int q, double Alpha);
 	bool ComputePlane(double Alpha, int qrhs);
 	bool ComputeSurfSpeeds(double *Mu, double *Sigma);
 	bool CreateDoubletStrength(double V0, double VDelta, int nval);
 	bool CreateMatrix();
 	bool CreateRHS(double V0, double VDelta, int nval);
-	bool CreateWakeContribution(double V0, double VDelta, int nval);
+	bool CreateWakeContribution();
 	bool Gauss(double *A, int n, double *B, int m, int TaskSize);
 	bool StartPanelThread();
-	bool SolveMultiple(int nval);
-	bool Test();
+	bool SolveMultiple(double V0, double VDelta, int nval);
 
 	void AddString(CString strong);
 	void CheckSolution();
-	void DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
+	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void EndSequence();
-	void Qmn(CVector C, CPanel *pPanel, CVector &V);
+	void GetDoubletInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
+	void GetSourceInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi);
+	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT);
 	void RelaxWake();
 	void SetProgress(int TaskSize,double TaskProgress);
 	void SetFileHeader();
-	void SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi);
+	void SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
 	void SetDownwash(double *Mu, double *Sigma);
 	void SetAi(int qrhs);
+	void SumPanelForces(double *Cp, double Alpha, double Qinf, double &Lift, double &Drag);
+	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
 
-	CVector GetSpeedVector(CVector C, double *Mu, double *Sigma);
 
 	double *m_aij, *m_aijRef;
 	double *m_RHS;
@@ -99,11 +101,11 @@ protected:
 	bool m_bWarning;
 	bool m_bType4;
 	bool m_bXFile;
-	bool m_bPlaneAnalysis;
 	bool m_b3DSymetric;
 	bool m_bPointOut;
 	bool m_bConverged;
 	bool m_bDirichlet;// true if Dirichlet boundary conditions, false if Neumann
+	bool m_bTrefftz;
 
 	double pi;
 	double m_Alpha;//Angle of Attack in °
@@ -112,9 +114,9 @@ protected:
 	double m_DeltaAlpha;
 	double m_CL, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
-	double m_TCm, m_GCm, m_VCm;
-	double m_Rm;
-	double m_GYm, m_IYm;
+	double m_VCm,m_VYm; //Viscous moments
+	double m_IYm;		// Induced Yawing Moment
+	double m_GCm, m_GRm, m_GYm;		// Geometric Moments
 	double m_QInf, m_QInfMax, m_DeltaQInf;
 
 	double eps;
@@ -144,6 +146,7 @@ protected:
 	CString m_VersionName;
 
 	double m_row[VLMMATSIZE];
+	double m_cosRHS[VLMMATSIZE], m_sinRHS[VLMMATSIZE];
 
 	CPanel **m_ppPanel;//the sorted array of panel pointers
 	CPanel *m_pPanel; //the original array of panels
@@ -173,6 +176,10 @@ protected:
 
 	CPlane *m_pPlane;
 
+	//temp data
+	CVector VG, CG;
+	double phiG;
+	CPanel m_SymPanel;
 
 	DECLARE_MESSAGE_MAP()
 public:

@@ -51,7 +51,7 @@ C3DPanelThread::C3DPanelThread()
 //CreateWakeContribution :	1 x nrhs
 //SolveMultiple :			10
 //CreateDoubletStrength :	1 x nrhs
-//ComputeAerodynamics :		5 x nrhs
+//ComputeAeroCoefs :		5 x nrhs
 //RelaxWake :				20 x nrhs
 
 }
@@ -123,17 +123,17 @@ bool C3DPanelThread::UnitLoop()
 	else							MaxWakeIter = max(p3DDlg->m_MaxWakeIter, 1);
 
 //ESTIMATED UNIT TIMES FOR OPERATIONS
-//CreateMatrix :			15
+//CreateMatrix :			15 x nrhs
 //CreateRHS :				10 x nrhs
 //CreateWakeContribution :	 1 x nrhs x MaxWakeIter
-//SolveMultiple :			10 x nrhs x MaxWakeIter
+//SolveMultiple :			40 x nrhs x MaxWakeIter
 //CreateDoubletStrength : 	 1 x nrhs x MaxWakeIter
 //RelaxWake :				20 x nrhs x MaxWakeIter
-//ComputeAerodynamics :		 5 x nrhs
+//ComputeAeroCoefs :		 5 x nrhs
 	
-	TotalTime = 15+ (10+5) * nrhs + (1+10+1) * nrhs * MaxWakeIter;
+	TotalTime = 15 + (10+5) * nrhs + (1+40+1) * nrhs * MaxWakeIter;
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20 * nrhs * MaxWakeIter;
-	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+//	if(!p3DDlg->m_b3DSymetric) TotalTime+=30*nrhs;//Solve multiple is 4x longer
 
 	p3DDlg->m_ctrlProgress.SetRange(0,TotalTime);
 	p3DDlg->m_Progress = 0;
@@ -151,13 +151,7 @@ bool C3DPanelThread::UnitLoop()
 
 	for (n=0; n<nrhs; n++)
 	{
-		// The Wake roll-up is performed on the tilted geometry - Andre's choice
-		// Main reason is that since OpPoints need to be calculated one by one,
-		// the extra cost in computing time needed to tilt the geometry
-		// is negligeable compared to the benefit of working on the
-		// 'physical' configuration
-		// Other reason is that only one subroutine is enough for both analysis
-
+//TRACE("%d\n", p3DDlg->m_Progress);
 		Alpha = m_Alpha + n * m_DeltaAlpha;
 		str.Format("      \r\n    Processing Alpha= %7.2f\r\n",Alpha);
 		p3DDlg->AddString(str);
@@ -186,14 +180,15 @@ bool C3DPanelThread::UnitLoop()
 
 		for (nWakeIter = 0; nWakeIter<MaxWakeIter; nWakeIter++)
 		{
-			if(m_pWPolar->m_bWakeRollUp) {
+			if(m_pWPolar->m_bWakeRollUp) 
+			{
 				str.Format("      Wake iteration %3d\r\n",nWakeIter+1);
 				p3DDlg->AddString(str);
 			}
 
 			if (m_bCancel) return true;
 
-			if (!p3DDlg->CreateWakeContribution(Alpha, m_DeltaAlpha, 1)) 
+			if (!p3DDlg->CreateWakeContribution()) 
 			{
 				p3DDlg->AddString("\r\nFailed to add the wake contribution....\r\n");
 				p3DDlg->m_bWarning = true;
@@ -202,7 +197,7 @@ bool C3DPanelThread::UnitLoop()
 
 			if (m_bCancel) return true;
 
-			if (!p3DDlg->SolveMultiple(1))	
+			if (!p3DDlg->SolveMultiple(Alpha, m_DeltaAlpha, 1))	
 			{
 				p3DDlg->AddString("\r\n\r\nSingular matrix - aborting....\r\n");
 				p3DDlg->m_bWarning = true;
@@ -221,13 +216,13 @@ bool C3DPanelThread::UnitLoop()
 
 			if(MaxWakeIter>0 && m_pWPolar->m_bWakeRollUp) p3DDlg->RelaxWake();	
 
-			p3DDlg->AddString("      _______\r\n");
 		}
 
 		p3DDlg->AddString("\r\n");
 
 
-		if(!p3DDlg->ComputeAerodynamics(Alpha, m_DeltaAlpha, 1)) {
+		if(!p3DDlg->ComputeAeroCoefs(Alpha, m_DeltaAlpha, 1)) 
+		{
 				p3DDlg->AddString("\r\n\r\nFailed to compute aerodynamic coefficients....\r\n");
 				p3DDlg->m_bWarning = true;
 				return true;
@@ -260,16 +255,17 @@ bool C3DPanelThread::AlphaLoop(void)
 	
 //ESTIMATED UNIT TIMES FOR OPERATIONS
 //CreateMatrix :			15
-//CreateRHS :				10 x nrhs
-//CreateWakeContribution :	 1 x nrhs x MaxWakeIter
-//SolveMultiple :			10        x MaxWakeIter
+//CreateRHS :				10 x 2
+//CreateWakeContribution :	 1 x 2 x MaxWakeIter
+//SolveMultiple :			30        x MaxWakeIter
 //CreateDoubletStrength : 	 1 x nrhs x MaxWakeIter
 //RelaxWake :				20 x nrhs x MaxWakeIter
-//ComputeAerodynamics :		 5 x nrhs
+//ComputeAeroCoefs :		 5 x nrhs
 	
-	TotalTime = 15+ (10+5) * nrhs + 10 * MaxWakeIter + (1+1) * nrhs * MaxWakeIter;
+	TotalTime = 15 + 2*10 + 5 * nrhs + 30 * MaxWakeIter + 2*MaxWakeIter + 1 * nrhs * MaxWakeIter;
 
-	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*nrhs*MaxWakeIter;
+//	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
 
 	p3DDlg->m_ctrlProgress.SetRange(0,TotalTime);
 	p3DDlg->m_Progress = 0;
@@ -279,7 +275,8 @@ bool C3DPanelThread::AlphaLoop(void)
 	str.Format("   Solving the problem... \r\n");
 	p3DDlg->AddString(str);
 
-	if (!p3DDlg->CreateMatrix()) {
+	if (!p3DDlg->CreateMatrix()) 
+	{
 		p3DDlg->AddString("\r\nFailed to create the matrix....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -287,7 +284,8 @@ bool C3DPanelThread::AlphaLoop(void)
 
 	if (m_bCancel) return true;
 
-	if (!p3DDlg->CreateRHS(m_Alpha, m_DeltaAlpha, nrhs)) {
+	if (!p3DDlg->CreateRHS(m_Alpha, m_DeltaAlpha, nrhs)) 
+	{
 		p3DDlg->AddString("\r\nFailed to create RHS Vector....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -295,21 +293,24 @@ bool C3DPanelThread::AlphaLoop(void)
 
 	if (m_bCancel) return true;
 
-	if (!p3DDlg->CreateWakeContribution(m_Alpha, m_DeltaAlpha, nrhs)) {
+	if (!p3DDlg->CreateWakeContribution()) 
+	{
 		p3DDlg->AddString("\r\nFailed to add the wake contribution....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
 	}
 	if (m_bCancel) return true;
 
-	if (!p3DDlg->SolveMultiple(nrhs))	{
+	if (!p3DDlg->SolveMultiple(m_Alpha, m_DeltaAlpha, nrhs))	
+	{
 		p3DDlg->AddString("\r\n\r\nSingular matrix - aborting....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
 	}
 	if (m_bCancel) return true;
 
-	if(!p3DDlg->CreateDoubletStrength(m_Alpha, m_DeltaAlpha, nrhs)) {
+	if(!p3DDlg->CreateDoubletStrength(m_Alpha, m_DeltaAlpha, nrhs)) 
+	{
 		p3DDlg->AddString("\r\n\r\nFailed to create doublet strengths....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -317,7 +318,8 @@ bool C3DPanelThread::AlphaLoop(void)
 
 	if (m_bCancel) return true;
 
-	if(!p3DDlg->ComputeAerodynamics(m_Alpha, m_DeltaAlpha, nrhs)){
+	if(!p3DDlg->ComputeAeroCoefs(m_Alpha, m_DeltaAlpha, nrhs))
+	{
 		p3DDlg->AddString("\r\n\r\nFailed to compute aerodynamics....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -325,9 +327,6 @@ bool C3DPanelThread::AlphaLoop(void)
 
 	return true;
 }
-
-
-
 
 bool C3DPanelThread::ReLoop(void)
 {
@@ -355,12 +354,12 @@ bool C3DPanelThread::ReLoop(void)
 //CreateMatrix :			15
 //CreateRHS :				10 x nrhs
 //CreateWakeContribution :	 1 x nrhs x MaxWakeIter
-//SolveMultiple :			10        x MaxWakeIter
+//SolveMultiple :			30        x MaxWakeIter
 //CreateDoubletStrength : 	 1 x nrhs x MaxWakeIter
 //RelaxWake :				20 x nrhs x MaxWakeIter
-//ComputeAerodynamics :		 3 x nrhs
+//ComputeAeroCoefs :		 3 x nrhs
 	
-	TotalTime = 15+ (10+3) * nrhs + 10 * MaxWakeIter + (1+1) * nrhs * MaxWakeIter;
+	TotalTime = 15+ (10+3) * nrhs + 30 * MaxWakeIter + (1+1) * nrhs * MaxWakeIter;
 
 	if(!p3DDlg->m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
 
@@ -402,7 +401,7 @@ bool C3DPanelThread::ReLoop(void)
 
 	if (m_bCancel) return true;
 
-	if (!p3DDlg->CreateWakeContribution(Alpha, m_DeltaAlpha, 1)) {
+	if (!p3DDlg->CreateWakeContribution()) {
 		p3DDlg->AddString("\r\nFailed to add the wake contribution....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -410,7 +409,7 @@ bool C3DPanelThread::ReLoop(void)
 
 	if (m_bCancel) return true;
 
-	if (!p3DDlg->SolveMultiple(1))	{
+	if (!p3DDlg->SolveMultiple(Alpha, m_DeltaAlpha, 1))	{
 		p3DDlg->AddString("\r\n\r\nSingular matrix - aborting....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;
@@ -426,7 +425,7 @@ bool C3DPanelThread::ReLoop(void)
 
 	if (m_bCancel) return true;
 
-	if(!p3DDlg->ComputeAerodynamics(m_QInf, m_DeltaQInf, nrhs)){
+	if(!p3DDlg->ComputeAeroCoefs(m_QInf, m_DeltaQInf, nrhs)){
 		p3DDlg->AddString("\r\n\r\nFailed to compute aerodynamics....\r\n");
 		p3DDlg->m_bWarning = true;
 		return true;

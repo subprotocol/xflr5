@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "../misc/NoBeepListCtrl.h"
 #include "../misc/InitDialogBar.h"
 #include "../misc/NumEdit.h"
 #include "../misc/FloatEdit.h"
@@ -55,7 +56,7 @@ protected:
 	CButton m_ctrlDelete;
 	CButton m_ctrlDuplicate;
 
-	CListCtrl m_ctrlFoilList;
+	CNoBeepListCtrl m_ctrlFoilList;
 
 	// Operations
 public:
@@ -110,4 +111,5 @@ protected:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	DECLARE_MESSAGE_MAP()
 public:
+	afx_msg void OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult);
 };

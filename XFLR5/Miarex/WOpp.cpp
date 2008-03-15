@@ -36,9 +36,10 @@
 
 CWOpp::CWOpp()
 {
-	m_bOut        = false;
-	m_bVLM1       = true;
-//	m_bMiddle     = true;
+	m_bOut         = false;
+	m_bVLM1        = true;
+	m_bThinSurface = true;
+	m_bTiltedGeom  = false;
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -62,14 +63,14 @@ CWOpp::CWOpp()
 	m_CL                  = 0.0;
 	m_ViscousDrag         = 0.0;
 	m_InducedDrag         = 0.0;
-	m_RollingMoment       = 0.0;
-	m_PitchingMoment      = 0.0;
-	m_VCm                 = 0.0;
 	m_GCm                 = 0.0;
+	m_GRm                 = 0.0;
 	m_GYm                 = 0.0;
-	m_InducedYawingMoment = 0.0;
+	m_VYm                 = 0.0;
+	m_IYm                 = 0.0;
 	m_XCP                 = 0.0;
 	m_YCP                 = 0.0;
+
 	memset(m_Ai,0,sizeof(m_Ai));
 	memset(m_Twist,0,sizeof(m_Twist));
 	memset(m_Cl,0,sizeof(m_Cl));
@@ -77,11 +78,12 @@ CWOpp::CWOpp()
 	memset(m_ICd,0,sizeof(m_ICd));
 	memset(m_Cm,0,sizeof(m_Cm));
 	memset(m_CmAirf,0,sizeof(m_CmAirf));
-	memset(m_CmGeom,0,sizeof(m_CmGeom));
+	memset(m_CmXRef,0,sizeof(m_CmXRef));
 	memset(m_XCPSpanRel,0,sizeof(m_XCPSpanRel));
 	memset(m_XCPSpanAbs,0,sizeof(m_XCPSpanAbs));
 	memset(m_Chord,0,sizeof(m_Chord));
 	memset(m_SpanPos,0,sizeof(m_SpanPos));
+	memset(m_StripArea,0,sizeof(m_StripArea));
 	memset(m_Re,0,sizeof(m_Re));
 	memset(m_Twist,0,sizeof(m_Twist));
 	memset(m_XTrTop,0,sizeof(m_XTrTop));
@@ -104,11 +106,13 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 {
 	int ArchiveFormat;
 	int a,p,k;
-	float f;
-//	float x,y,z;
+	float f, f1, f2;
 
 	if(ar.IsStoring()){
-		ar << 1011;
+		ar << 1014;
+		//1014 : redefined moment coefficients
+		//1013 : added m_bTiltedGeom
+		//1012 : added m_StripArea
 		//1011 : added m_Sigma
 		//1010 : added flap moments, changed lengths to m
 		//1009 : added Vortex strengths
@@ -121,31 +125,36 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 		//1002 : added bending moment
 		//write variables
 		ar << m_WingName << m_PlrName;
-		if(m_bIsVisible)  ar << 1; else ar<<0;
-		if(m_bShowPoints) ar << 1; else ar<<0;
-		if(m_bOut)        ar << 1; else ar<<0;
+		if(m_bIsVisible)   ar << 1; else ar<<0;
+		if(m_bShowPoints)  ar << 1; else ar<<0;
+		if(m_bOut)         ar << 1; else ar<<0;
 		ar << m_AnalysisType;
-		if(m_bVLM1)       ar << 1; else ar<<0;
-		ar<<1;
+		if(m_bVLM1)        ar << 1; else ar<<0;
+		if(m_bThinSurface) ar << 1; else ar<<0;
+		if(m_bTiltedGeom)  ar << 1; else ar<<0;
+
 		ar << m_Style << m_Width << m_Color;
 		ar << m_Type << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight << (float)m_Span << (float)m_MAChord;
-		ar << (float)m_CL << (float)m_ViscousDrag << (float)m_InducedDrag << (float)m_PitchingMoment;
-		ar << (float)m_VCm << (float)m_GCm;
-		ar << (float)m_RollingMoment << (float)m_InducedYawingMoment << (float)m_GYm;
+		ar << (float)m_CL << (float)m_ViscousDrag << (float)m_InducedDrag ;
+
+		ar << (float)m_GCm << (float)m_GRm << (float)m_GYm;
+		ar << 0.0f << (float)m_VYm;
+		ar << (float)m_IYm;
+	
 		ar << (float)m_XCP << (float)m_YCP;
 
 		for (k=0; k<m_NStation; k++){
 			ar << (float)m_Re[k] << (float)m_Chord[k] << (float)m_Twist[k];
 			ar << (float)m_Ai[k] << (float)m_Cl[k] << (float)m_PCd[k] << (float)m_ICd[k];
-			ar << (float)m_Cm[k] << (float)m_CmAirf[k] << (float)m_CmGeom[k];
+			ar << (float)m_Cm[k] << (float)m_CmAirf[k] << (float)m_CmXRef[k];
 			ar << (float)m_XCPSpanRel[k]<< (float)m_XCPSpanAbs[k];
 			ar << (float)m_XTrTop[k] << (float)m_XTrBot[k];
 			ar << (float)m_BendingMoment[k];
 			ar << (float)m_Vd[k].x << (float)m_Vd[k].y << (float)m_Vd[k].z;
 			ar << (float)m_F[k].x << (float)m_F[k].y << (float)m_F[k].z;
 		}
-		for (k=0; k<=m_NStation; k++) ar << (float)m_SpanPos[k];
+		for (k=0; k<=m_NStation; k++) ar << (float)m_SpanPos[k] << (float)m_StripArea[k];
 		ar << m_NVLMPanels;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
@@ -199,7 +208,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			}
 			if(m_AnalysisType==0) m_AnalysisType=2;
 
-			if(ArchiveFormat>=1005){
+			if(ArchiveFormat>=1005)
+			{
 				ar >> a;
 				if (a!=0 && a!=1){
 					CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
@@ -214,7 +224,17 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 					pfe->m_strFileName = ar.m_strFileName;
 					throw pfe;
 				}
-//				if(a) m_bMiddle = true; else m_bMiddle = false;
+				if(a) m_bThinSurface = true; else m_bThinSurface = false;
+			}
+			if(ArchiveFormat>=1013)
+			{
+				ar >> a;
+				if (a!=0 && a!=1){
+					CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+					pfe->m_strFileName = ar.m_strFileName;
+					throw pfe;
+				}
+				if(a) m_bTiltedGeom = true; else m_bTiltedGeom = false;
 			}
 
 			ar >> m_Style >> m_Width >> m_Color;
@@ -227,12 +247,19 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			ar >> f; m_CL =f;
 			ar >> f; m_ViscousDrag =f;
 			ar >> f; m_InducedDrag =f;
-			ar >> f; m_PitchingMoment =f;
-			ar >> f; m_VCm =f;
+
 			ar >> f; m_GCm =f;
-			ar >> f; m_RollingMoment =f;
-			ar >> f; m_InducedYawingMoment =f;
+			ar >> f; m_GRm =f;
 			ar >> f; m_GYm =f;
+			ar >> f; //m_VCm =f;
+			ar >> f; m_VYm =f;
+			ar >> f; m_IYm =f;
+
+			if(ArchiveFormat<1014 && m_AnalysisType>1)
+			{
+				m_GCm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
+			}
+
 			ar >> f; m_XCP =f;
 			ar >> f; m_YCP =f;
 
@@ -246,7 +273,7 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				ar >> f; m_ICd[k] =f;
 				ar >> f; m_Cm[k] =f;
 				ar >> f; m_CmAirf[k] =f;
-				ar >> f; m_CmGeom[k] =f;
+				ar >> f; m_CmXRef[k] =f;
 				ar >> f; m_XCPSpanRel[k] =f;
 				if(ArchiveFormat>=1007){ar >> f; m_XCPSpanAbs[k] =f;}
 				ar >> f; m_XTrTop[k] =f;
@@ -278,10 +305,17 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			for (k=0; k<m_NStation; k++) {
 				m_MaxBending = max(m_MaxBending, m_BendingMoment[k]);
 			}
-			for (k=0; k<=m_NStation; k++) {
-				ar >> f; 
-				if(m_AnalysisType==1  && ArchiveFormat<=1004) m_SpanPos[k]=-f;
-				else  m_SpanPos[k]=f;
+			for (k=0; k<=m_NStation; k++) 
+			{
+				ar >> f1;
+				if(m_AnalysisType==1  && ArchiveFormat<=1004) m_SpanPos[k] = -f1;
+				else                                          m_SpanPos[k] =  f1;
+				if(ArchiveFormat>=1012) 
+				{
+					ar >> f2; 
+					m_StripArea[k] = f2;
+				}
+				else m_StripArea[k] = 0.0;
 
 			}
 			if(ArchiveFormat>=1003){
@@ -348,23 +382,21 @@ bool CWOpp::Export(	CStdioFile *pXFile)
 	CString Header, strong;
 	int k;
 
-	Header.Format(" y-span    Chord       Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
+	Header.Format("  y-span      Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
 	pXFile->WriteString(Header);
 
 	int nStart;
 	if(m_AnalysisType==1) nStart = 1;	
 	else nStart = 0;
 	for (k=nStart; k<m_NStation; k++){
-		strong.Format("%8.2f  %7.2f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
+		strong.Format("%10.4f  %7.2f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
 			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],
-			m_CmGeom[k],m_CmAirf[k],m_XTrTop[k],
+			m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],
 			m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
 		
 		pXFile->WriteString(strong);
 	}
 	pXFile->WriteString("\n\n");
-
-
 
 	return true;
 }

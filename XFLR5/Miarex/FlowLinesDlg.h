@@ -59,7 +59,7 @@ public:
 	CStatic m_ctrlLength3;
 	CStatic m_ctrlLength1;
 protected:
-	bool m_bLE;
+	int m_pos;
 	int m_NX;
 	double m_DeltaL;
 	double m_XFactor;

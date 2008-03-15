@@ -37,6 +37,7 @@ class CWPolar : public CObject
 {
 	friend class CMiarex;
 	friend class CWing;
+	friend class CPlane;
 	friend class CSurface;
 	friend class CMainFrame;
 	friend class CEditPlrDlg;
@@ -54,8 +55,10 @@ class CWPolar : public CObject
 	friend class CUFOListDlg;
 
 public:
-
 //	DECLARE_SERIAL (CWPolar);
+
+	CWPolar(CWnd* pParent=NULL);
+	virtual ~CWPolar();
 
 private:
 	int m_AnalysisType;
@@ -73,21 +76,20 @@ private:
 
 	CString m_UFOName;
 	CString m_PlrName;
-	double m_WArea;//for lift and drag calculations
-	double m_WMAChord;// for moment calculations
-	double m_WSpan;//for moment calculations
-	double m_Height;//for ground effect
 
 	// general aerodynamic data - specific to a polar
 	double m_Density  ;
 	double m_Viscosity;
 	double pi;
+	double m_WArea;//for lift and drag calculations
+	double m_WMAChord;// for moment calculations
+	double m_WSpan;//for moment calculations
+	double m_Height;//for ground effect
 
 	bool m_bIsVisible;
 	bool m_bShowPoints;
-//	bool m_bLLT;
 	bool m_bVLM1;
-//	bool m_bMiddle;
+	bool m_bThinSurfaces;
 	bool m_bGround;
 	bool m_bWakeRollUp;
 	bool m_bTiltedGeom;
@@ -98,15 +100,16 @@ private:
 	double m_TotalWakeLength;
 	double m_WakePanelFactor;
 
-	void CalculatePoint(int i);
-	void ResetWPlr();
-	void Copy(CWPolar *pWPolar);
-	void Export(CString FileName);
+	bool SerializeWPlr(CArchive &ar);
+
 	void AddPoint(CWOpp* pWOpp);
 	void AddPoint(CPOpp* pPOpp);
-	bool SerializeWPlr(CArchive &ar);
-	void Remove(int i);
+	void CalculatePoint(int i);
+	void Copy(CWPolar *pWPolar);
+	void Export(CString FileName);
 	void GetBWStyle(COLORREF &color, int &style, int &width);
+	void Remove(int i);
+	void ResetWPlr();
 
 	// the rest is litterature
 	CArray <double, double> m_Alpha; //angle of attack
@@ -114,12 +117,11 @@ private:
 	CArray <double, double> m_ICd;   //induced drag coef.
 	CArray <double, double> m_PCd;   //profile drag coef.
 	CArray <double, double> m_TCd;   //total drag coef.
-	CArray <double, double> m_Cm;    //Pitching Moment coefficient
-	CArray <double, double> m_VCm;   //Profile pitching Moment coefficient
-	CArray <double, double> m_GCm;   //Geometric Pitching Moment coefficient
+	CArray <double, double> m_GCm;   //Total Pitching Moment coefficient
+	CArray <double, double> m_GRm;   //Total rolling moment
+	CArray <double, double> m_GYm;   //Total yawing moment coefficient
+	CArray <double, double> m_VYm;   //Profile yawing Moment coefficient
 	CArray <double, double> m_IYm;   //induced yawing moment coefficient
-	CArray <double, double> m_GYm;   //Geometric yawing moment coefficient
-	CArray <double, double> m_CRm;   //rolling moment
 	CArray <double, double> m_ClCd;  //glide ratio
 	CArray <double, double> m_Cl32Cd;  //powerfactor
 	CArray <double, double> m_QInfinite;  //free stream speed - type2 Wpolars
@@ -142,8 +144,6 @@ private:
 
 	CWnd* m_pParent;
 		
-	CWPolar(CWnd* pParent=NULL);
-	virtual ~CWPolar();
 
 private:
 };

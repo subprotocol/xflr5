@@ -51,13 +51,12 @@ protected:
 	CButton m_ctrlLift;
 	CButton m_ctrlMoments;
 	CButton m_ctrlICd, m_ctrlVCd;
-	CButton m_ctrlTopTrans;
-	CButton m_ctrlBotTrans;
+	CButton m_ctrlTransitions;
+	CButton m_ctrlSurfVelocities;
 	CButton m_ctrlDownwash;
 	CButton m_ctrlHalfWing;
 	CButton m_ctrlCl;
 	CButton m_ctrlStream;
-	CButton m_ctrlSurfSpeed;
 	CStatic	m_ctrlDeltaStat; 
 	CFloatEdit	m_ctrlDeltaAlpha;
 	CFloatEdit	m_ctrlAlphaMax;
@@ -120,7 +119,7 @@ protected:
 	afx_msg void OnStoreWOpp();
 	afx_msg void OnWSequence();
 	afx_msg void OnStream();
-	afx_msg void OnSurfSpeed();
+	afx_msg void OnSurfVelocities();
 	afx_msg void OnHalfWing();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()

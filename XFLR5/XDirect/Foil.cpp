@@ -113,13 +113,17 @@ bool CFoil::InitFoil()
 
 	//first time is to calculate the base foil's thickness and camber
 
-	if(nb<=0)AfxMessageBox("FoilError");
-	while (k<nb){
-		if (xb[k+1] < xb[k]) {
+	if(nb<=0) AfxMessageBox("Foil Error : no points");
+	while (k<nb)
+	{
+		if (xb[k+1] < xb[k]) 
+		{
 			k++;
 		}
-		else {
-			if(bNotFound){
+		else 
+		{
+			if(bNotFound)
+			{
 				m_iBaseExt = k;
 				m_BaseExtrados[k].x = xb[k];
 				m_BaseExtrados[k].y = yb[k];
@@ -133,7 +137,8 @@ bool CFoil::InitFoil()
 	m_iBaseInt = nb-m_iBaseExt-1;
 	m_BaseIntrados[nb-m_iBaseExt-1].x = xb[nb-1];
 	m_BaseIntrados[nb-m_iBaseExt-1].y = yb[nb-1];
-	for (k=0; k<=m_iBaseExt;k++){
+	for (k=0; k<=m_iBaseExt;k++)
+	{
 		m_BaseExtrados[k].x = xb[m_iBaseExt-k];
 		m_BaseExtrados[k].y = yb[m_iBaseExt-k];
 	}
@@ -162,11 +167,13 @@ bool CFoil::InitFoil()
 	k=0;
 	bNotFound = true;
 	while (k<n){
-		if (x[k+1] < x[k]) {
+		if (x[k+1] < x[k]) 
+		{
 			k++;
 		}
 		else {
-			if(bNotFound){
+			if(bNotFound)
+			{
 				m_iExt = k;
 				m_rpExtrados[k].x = x[k];
 				m_rpExtrados[k].y = y[k];
@@ -180,7 +187,8 @@ bool CFoil::InitFoil()
 	m_iInt = n-m_iExt-1;
 	m_rpIntrados[n-m_iExt-1].x = x[n-1];
 	m_rpIntrados[n-m_iExt-1].y = y[n-1];
-	for (k=0; k<=m_iExt;k++){
+	for (k=0; k<=m_iExt;k++)
+	{
 		m_rpExtrados[k].x = x[m_iExt-k];
 		m_rpExtrados[k].y = y[m_iExt-k];
 	}
@@ -389,9 +397,11 @@ double CFoil::GetBaseUpperY(double x)
 	// Returns the y-coordinate on the base foil's upper surface at the x position
 //	x = x*(m_BaseExtrados[m_iExt].x-m_BaseExtrados[0].x);//in case there is a flap which reduces the length
 	double y;
-	for (int i=0; i<m_iBaseExt; i++){
+	for (int i=0; i<m_iBaseExt; i++)
+	{
 		if (m_BaseExtrados[i].x <m_BaseExtrados[i+1].x  && 
-			m_BaseExtrados[i].x <= x && x<=m_BaseExtrados[i+1].x ){
+			m_BaseExtrados[i].x <= x && x<=m_BaseExtrados[i+1].x )
+		{
 			y = (m_BaseExtrados[i].y 	+ (m_BaseExtrados[i+1].y-m_BaseExtrados[i].y)
 									 /(m_BaseExtrados[i+1].x-m_BaseExtrados[i].x)*(x-m_BaseExtrados[i].x));
 			return y;
@@ -405,9 +415,11 @@ double CFoil::GetBaseLowerY(double x)
 	// Returns the y-coordinate on the base foil's lower surface at the x position
 //	x = x*(m_BaseIntrados[m_iInt].x-m_BaseIntrados[0].x);//in case there is a flap which reduces the length
 	double y;
-	for (int i=0; i<m_iBaseInt; i++){
+	for (int i=0; i<m_iBaseInt; i++)
+	{
 		if (m_BaseIntrados[i].x <m_BaseIntrados[i+1].x  && 
-			m_BaseIntrados[i].x <= x && x<=m_BaseIntrados[i+1].x ){
+			m_BaseIntrados[i].x <= x && x<=m_BaseIntrados[i+1].x )
+		{
 			y = (m_BaseIntrados[i].y 	+ (m_BaseIntrados[i+1].y-m_BaseIntrados[i].y)
 							 /(m_BaseIntrados[i+1].x-m_BaseIntrados[i].x)*(x-m_BaseIntrados[i].x));
 			return y;
@@ -421,9 +433,11 @@ double CFoil::GetUpperY(double x)
 	// Returns the y-coordinate on the current foil's upper surface at the x position
 	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x);//in case there is a flap which reduces the length
 	double y;
-	for (int i=0; i<m_iExt; i++){
+	for (int i=0; i<m_iExt; i++)
+	{
 		if (m_rpExtrados[i].x <m_rpExtrados[i+1].x  && 
-			m_rpExtrados[i].x <= x && x<=m_rpExtrados[i+1].x ){
+			m_rpExtrados[i].x <= x && x<=m_rpExtrados[i+1].x )
+		{
 			y = (m_rpExtrados[i].y 	+ (m_rpExtrados[i+1].y-m_rpExtrados[i].y)
 									 /(m_rpExtrados[i+1].x-m_rpExtrados[i].x)*(x-m_rpExtrados[i].x));
 			return y;
@@ -438,9 +452,11 @@ double CFoil::GetLowerY(double x)
 	// Returns the y-coordinate on the current foil's lower surface at the x position
 	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
 	double y;
-	for (int i=0; i<m_iInt; i++){
+	for (int i=0; i<m_iInt; i++)
+	{
 		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  && 
-			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x ){
+			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
+		{
 			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
 									 /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
 			return y;

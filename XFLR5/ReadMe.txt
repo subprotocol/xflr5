@@ -51,15 +51,21 @@ Licence :
 TODO :
 	Use AVL DWWAKE formula for Far-field wake downwash at center of strip
 	Add Cyff to Oswald calculation
-	check if XFLR5 uses dy or dl, use normal rather than vs. z direction
 	Core implementation : investigate AVL formulation
+	Add BEND Command
+	Check All moments sign convention
 
-v4.00 December xxth,2007
+v4.00 March xxth, 2008
 	- Introduced 3D-Panel Method
+	- Redefined the moment coefficients - see the guidelines for details
+	- Corrected a sign error on geometric yawing moment in VLM analysis
 	- Changed the fin definition : all planes with fins will need to be redefined...
-	- Changed 3D view rotation woth arcball
+	- Changed 3D view rotation with arcball
+	- Corrected an error in Ground effect in VLM
 	- Added Reflected curve display in XInverse 
 	- Added Slope tangency constraint on spline in XInverse
+	- Inverted Cp signs in VLM 3D Delta_Cp display
+	- Added option to offset the main wing in a plane design
 	- Corrected the area of double fins or symetrical fins : factor 2 had been ommitted
 	- Corrected occasional crash bug when deleting all Opps associated to a Wing or Plane Polar
 	- Corrected chord calculations when there is a gap in the middle of the wing

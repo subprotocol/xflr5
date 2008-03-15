@@ -52,12 +52,12 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 
 	m_AnalysisType = 1;
 
-	m_bVLM1       = true;
-//	m_bMiddle     = true;
-	m_bTiltedGeom = false;
-	m_bWakeRollUp = false;
-	m_bViscous    = true;
-	m_bGround     = false;
+	m_bVLM1         = true;
+	m_bThinSurfaces = true;
+	m_bTiltedGeom   = false;
+	m_bWakeRollUp   = false;
+	m_bViscous      = true;
+	m_bGround       = false;
 
 	m_NXWakePanels    = 5;
 	m_TotalWakeLength = 10.0;//x mac
@@ -110,6 +110,7 @@ void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GROUNDEFFECT, m_ctrlGroundEffect);
 	DDX_Control(pDX, IDC_HEIGHT, m_ctrlHeight);
 	DDX_Control(pDX, IDC_WAKEPARAMS, m_ctrlWakeParams);
+	DDX_Control(pDX, IDC_THINSURFACES, m_ctrlThinSurfaces);
 }
 
 
@@ -138,6 +139,7 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 	ON_BN_CLICKED(IDC_TILTEDGEOM, OnTiltedGeom)
 	ON_BN_CLICKED(IDC_GROUNDEFFECT, OnGroundEffect)
 	ON_BN_CLICKED(IDC_WAKEPARAMS, OnWakeParams)
+	ON_BN_CLICKED(IDC_THINSURFACES, OnThinSurfaces)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -266,6 +268,10 @@ BOOL CWngAnalysis::OnInitDialog()
 	EnableControls();
 	OnMethod();
 
+//	m_ctrlThinSurfaces.EnableWindow(FALSE);
+	if(m_bThinSurfaces)	m_ctrlThinSurfaces.SetCheck(TRUE);
+	else                m_ctrlThinSurfaces.SetCheck(FALSE);
+
 	m_WakeParamsdlg.m_NXWakePanels    = m_NXWakePanels;
 	m_WakeParamsdlg.m_TotalWakeLength = m_TotalWakeLength;
 	m_WakeParamsdlg.m_WakePanelFactor = m_WakePanelFactor;
@@ -314,11 +320,13 @@ void CWngAnalysis::ReadParams()
 	m_Height = m_ctrlHeight.GetValue() /pFrame->m_mtoUnit;
 
 
-	if(IDC_UNIT1 == GetCheckedRadioButton(IDC_UNIT1,IDC_UNIT2)){
+	if(IDC_UNIT1 == GetCheckedRadioButton(IDC_UNIT1,IDC_UNIT2))
+	{
 		m_Density   = m_ctrlDensity.GetValue();
 		m_Viscosity = m_ctrlViscosity.GetValue(); 
 	}
-	else{
+	else
+	{
 		m_Density   = m_ctrlDensity.GetValue() / 0.00194122;
 		m_Viscosity = m_ctrlViscosity.GetValue() / 10.7182881;
 	}
@@ -338,28 +346,36 @@ void CWngAnalysis::SetWPolarName()
 	CString str, strong;
 
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
-	ReadParams();
 
-	if (m_Type==1){
+	if (m_Type==1)
+	{
 		GetSpeedUnit(str, pFrame->m_SpeedUnit);
 		m_WPolarName.Format("T1-%.1f ", m_QInf * pFrame->m_mstoUnit);
 		m_WPolarName += str;
 	}
-	else if(m_Type==2){
+	else if(m_Type==2)
+	{
 		GetWeightUnit(str, pFrame->m_WeightUnit);
 		m_WPolarName.Format("T2-%.3f ", m_Weight*pFrame->m_kgtoUnit);
 		m_WPolarName += str;
 	}
-	else if(m_Type==4)	{
+	else if(m_Type==4)	
+	{
 		m_WPolarName.Format("T4-%.3f°", m_Alpha);
 	}
 
 	if(m_AnalysisType==1) m_WPolarName += "-LLT";
-	else if(m_AnalysisType==2) {
+	else if(m_AnalysisType==2) 
+	{
 		if(m_bVLM1)	m_WPolarName += "-VLM1";
 		else		m_WPolarName += "-VLM2";
 	}
 	else if(m_AnalysisType==3) m_WPolarName += "-Panel";
+
+	if(m_bThinSurfaces && m_AnalysisType==3) 
+	{
+		m_WPolarName += "-Thin";
+	}
 	
 	GetLengthUnit(str, pFrame->m_LengthUnit);
 	strong.Format("-%6.2f", m_XCmRef*pFrame->m_mtoUnit);
@@ -501,45 +517,52 @@ void CWngAnalysis::CheckType()
 
 void CWngAnalysis::EnableControls()
 {
-	switch (m_Type){
-		case 1:{
+	switch (m_Type)
+	{
+		case 1:
+		{
 			m_ctrlQInf.EnableWindow(true);
 			m_ctrlAlpha.EnableWindow(false);
 			break;
 		}
-		case 2:{
+		case 2:
+		{
 			m_ctrlQInf.EnableWindow(false);
 			m_ctrlRRe.SetWindowText(" ");
 			m_ctrlSRe.SetWindowText(" ");
 			m_ctrlAlpha.EnableWindow(false);
 			break;
 		}
-		case 4:{
+		case 4:
+		{
 			m_ctrlQInf.EnableWindow(false);
 			m_ctrlRRe.SetWindowText(" ");
 			m_ctrlSRe.SetWindowText(" ");
 			m_ctrlAlpha.EnableWindow(true);
 			break;
 		}
-		default:{
+		default:
+		{
 			m_ctrlQInf.EnableWindow(true);
 			break;
 		}
 	}
 	if(!m_pPlane) m_ctrlMethod1.EnableWindow(TRUE);
 
-
-	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1){
+	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1)
+	{
 		m_ctrlVLM1.EnableWindow(false);
 		m_ctrlVLM2.EnableWindow(false);
 		m_ctrlViscous.EnableWindow(false);
 	}
-	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2){ 
+	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2)
+	{ 
 		m_ctrlVLM1.EnableWindow(true);
 		m_ctrlVLM2.EnableWindow(true);
 		m_ctrlViscous.EnableWindow(true);
 	}
-	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3){
+	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD3)
+	{
 		m_ctrlVLM1.EnableWindow(false);
 		m_ctrlVLM2.EnableWindow(false);
 		m_ctrlViscous.EnableWindow(true);
@@ -685,21 +708,29 @@ void CWngAnalysis::OnMethod()
 {
 	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1)
 	{
-		m_AnalysisType=1;
-		m_bViscous = true;
+		m_bViscous      = true;
+		m_bThinSurfaces = true;
+		m_bWakeRollUp   = false;
+		m_bTiltedGeom   = false;
+		m_AnalysisType  = 1;
 		m_ctrlViscous.SetCheck(TRUE);
-		m_bWakeRollUp = false;
 		m_ctrlWakeRollUp.SetCheck(FALSE);
+		m_ctrlTiltGeom.SetCheck(FALSE);
 		m_ctrlTiltGeom.EnableWindow(false);
-		OnTiltedGeom();
+		m_ctrlThinSurfaces.SetCheck(TRUE);
+		m_ctrlThinSurfaces.EnableWindow(false);
+
 //		m_ctrlWakeRollUp.EnableWindow(FALSE);
 //		m_ctrlWakeParams.EnableWindow(FALSE);
 	}
 	else if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD2)
 	{ 
+		m_bThinSurfaces = true;
 		m_AnalysisType=2;
 		m_ctrlTiltGeom.EnableWindow(true);
-		OnTiltedGeom();
+		m_ctrlThinSurfaces.SetCheck(TRUE);
+		m_ctrlThinSurfaces.EnableWindow(false);
+
 //		m_ctrlWakeRollUp.EnableWindow(TRUE);
 //		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
 //		else				m_ctrlWakeParams.EnableWindow(FALSE);
@@ -708,10 +739,14 @@ void CWngAnalysis::OnMethod()
 	{ 
 		m_AnalysisType=3;
 		m_ctrlTiltGeom.EnableWindow(true);
-		OnTiltedGeom();
+		m_bThinSurfaces = false;
+		m_ctrlThinSurfaces.SetCheck(false);
+		m_ctrlThinSurfaces.EnableWindow(true);
+
 //		m_ctrlWakeRollUp.EnableWindow(TRUE);
 //		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
-//		else				m_ctrlWakeParams.EnableWindow(FALSE);	
+//		else				m_ctrlWakeParams.EnableWindow(FALSE);
+
 	}
 	EnableControls();
 	SetWPolarName();
@@ -807,4 +842,12 @@ void CWngAnalysis::OnWakeParams()
 		m_NXWakePanels    = 1;
 		m_TotalWakeLength  = 100.0;
 	}
+}
+
+void CWngAnalysis::OnThinSurfaces()
+{
+	if(m_ctrlThinSurfaces.GetCheck()) m_bThinSurfaces = true;
+	else                              m_bThinSurfaces = false;
+
+	SetWPolarName();
 }

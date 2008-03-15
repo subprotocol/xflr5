@@ -28,8 +28,9 @@
 #include "Body.h"
 #include <math.h>
 
-double CBody::s_xKnots[MAXBODYFRAMES];
-double CBody::s_hKnots[30];
+double CBody::s_xKnots[MAXBODYFRAMES*2];
+double CBody::s_hKnots[MAXSIDELINES*2];
+double CBody::s_XPanelPos[300];
 CRect CBody::s_rViewRect;
 CWnd *CBody::s_pMainFrame;
 
@@ -37,6 +38,7 @@ CWnd *CBody::s_pMainFrame;
 
 CBody::CBody()
 {
+	pi = 3.141592654;
 	m_BodyName = "Body";
 
 	m_BodyColor = RGB(255,200,200);
@@ -51,7 +53,7 @@ CBody::CBody()
 	m_bLocked        = false;
 	m_bClosedSurface = false;
 
-	m_NStation   = 4;
+	m_NStations   = 4;
 	m_NSideLines = 5;
 
 	m_iActiveFrame =  1;
@@ -66,12 +68,14 @@ CBody::CBody()
 	m_nxPanels = 20;
 	m_nhPanels = 10;
 
-	m_pPanel = NULL;
+	m_pPanel = NULL; 
 	m_NElements = m_nxPanels * m_nhPanels * 2;
 
 	m_iRes = 30;
 
-	eps = 1.0e-10;
+	m_Bunch  = 0.0;
+
+	eps = 1.0e-06;
 
 	m_Frame[0].m_Point[0].Set(0.,0.0,0.0);
 	m_Frame[0].m_Point[1].Set(0.,0.0,0.0);
@@ -79,11 +83,14 @@ CBody::CBody()
 	m_Frame[0].m_Point[3].Set(0.,0.0,0.0);
 	m_Frame[0].m_Point[4].Set(0.,0.0,0.0);
 
-	m_Frame[m_NStation-1].m_Point[0].Set(0.,0.0,0.0);
-	m_Frame[m_NStation-1].m_Point[1].Set(0.,0.0,0.0);
-	m_Frame[m_NStation-1].m_Point[2].Set(0.,0.0,0.0);
-	m_Frame[m_NStation-1].m_Point[3].Set(0.,0.0,0.0);
-	m_Frame[m_NStation-1].m_Point[4].Set(0.,0.0,0.0);
+	m_Frame[m_NStations-1].m_Point[0].Set(0.,0.0,0.0);
+	m_Frame[m_NStations-1].m_Point[1].Set(0.,0.0,0.0);
+	m_Frame[m_NStations-1].m_Point[2].Set(0.,0.0,0.0);
+	m_Frame[m_NStations-1].m_Point[3].Set(0.,0.0,0.0);
+	m_Frame[m_NStations-1].m_Point[4].Set(0.,0.0,0.0);
+
+	for(int i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
+	for(i=0; i<MAXSIDELINES;i++)      m_hPanels[i] = 1;
 
 	SetKnots();
 }
@@ -94,26 +101,29 @@ CBody::~CBody()
 
 CFrame * CBody::GetFrame(int iSelect)
 {
-	if(iSelect>=0 && iSelect<m_NStation)
+	if(iSelect>=0 && iSelect<m_NStations)
 	{
 		return m_Frame + iSelect;
 	}
 	return NULL;
 }
 
-void CBody::Scale(double XFactor, double YFactor, double ZFactor)
+void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID)
 {
 	int i,j;
-	for (i=0; i<m_NStation; i++)
+	for (i=0; i<m_NStations; i++)
 	{
-		m_FramePosition[i].x *= XFactor;
-		m_FramePosition[i].y *= YFactor;
-		m_FramePosition[i].z *= ZFactor;
-
-		for(j=0; j<m_Frame[i].m_NPoints; j++)
+		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
 		{
-			m_Frame[i].m_Point[j].y *= YFactor;
-			m_Frame[i].m_Point[j].z *= ZFactor;
+			if(!bFrameOnly) m_FramePosition[i].x *= XFactor;
+			m_FramePosition[i].y *= YFactor;
+			m_FramePosition[i].z *= ZFactor;
+
+			for(j=0; j<m_Frame[i].m_NPoints; j++)
+			{
+				m_Frame[i].m_Point[j].y *= YFactor;
+				m_Frame[i].m_Point[j].z *= ZFactor;
+			}
 		}
 	}
 	ComputeCenterLine();
@@ -121,7 +131,7 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor)
 
 double CBody::GetLength()
 {
-	return abs(m_FramePosition[m_NStation-1].x - m_FramePosition[0].x);
+	return abs(m_FramePosition[m_NStations-1].x - m_FramePosition[0].x);
 }
 
 
@@ -133,26 +143,32 @@ bool CBody::SerializeBody(CArchive &ar)
 
 	if(ar.IsStoring())
 	{
-		ar << 1000;
+		ar << 1002;
 
+		//1002 : Added axial and hoop mesh panel numbers for linetype fuselage
+		//1001 : Added bunching parameter
 		//1000 : first format
 		ar << m_BodyName;
 		ar << m_BodyColor;
 		ar << m_LineType;
 		ar << m_NSideLines;
-		ar << m_NStation;
+		ar << m_NStations;
 		ar << m_iRes;
 		ar << m_nxDegree << m_nhDegree;
 		ar << m_nxPanels << m_nhPanels;
+		ar << (float)m_Bunch;
+
+		for(k=0; k<m_NStations; k++)	  ar << m_xPanels[k];
+		for(k=0; k<m_NSideLines; k++) ar << m_hPanels[k];
 
 		if(m_bClosedSurface) ar<<1; else ar <<0;
 
-		for(k=0; k<m_NStation; k++)
+		for(k=0; k<m_NStations; k++)
 		{
 			m_Frame[k].SerializeFrame(ar);
 		}
-		ar << m_NStation;
-		for (k=0; k<m_NStation;k++){
+		ar << m_NStations;
+		for (k=0; k<m_NStations;k++){
 			ar << (float)m_FramePosition[k].x << (float)m_FramePosition[k].z;
 		}
 
@@ -166,11 +182,22 @@ bool CBody::SerializeBody(CArchive &ar)
 			ar >> m_BodyColor;
 			ar >> m_LineType;
 			ar >> m_NSideLines;
-			ar >> m_NStation;
+			ar >> m_NStations;
 
 			ar >> m_iRes;
 			ar >> m_nxDegree >> m_nhDegree;
 			ar >> m_nxPanels >> m_nhPanels;
+
+			if(ArchiveFormat>=1001)
+			{
+				ar >> f; m_Bunch = f;
+			}
+
+			if(ArchiveFormat>=1002)
+			{
+				for(k=0; k<m_NStations; k++)	  ar >> m_xPanels[k];
+				for(k=0; k<m_NSideLines; k++) ar >> m_hPanels[k];
+			}
 
 			ar >> k;
 			if(k!=0 && k!=1){
@@ -180,13 +207,13 @@ bool CBody::SerializeBody(CArchive &ar)
 			}
 			if (k) m_bClosedSurface = true; else m_bClosedSurface = false;
 			
-			for(k=0; k<m_NStation; k++)
+			for(k=0; k<m_NStations; k++)
 			{
 				m_Frame[k].SerializeFrame(ar);
 			}
 			//Serialize Bodyline
-			ar >> m_NStation;
-			for (k=0; k<m_NStation;k++)
+			ar >> m_NStations;
+			for (k=0; k<m_NStations;k++)
 			{
 				ar >> f; m_FramePosition[k].x =f;
 				ar >> f; m_FramePosition[k].z =f;
@@ -209,7 +236,7 @@ bool CBody::SerializeBody(CArchive &ar)
 void CBody::ComputeCenterLine()
 {
 	int i;
-	for(i=0; i<m_NStation; i++)
+	for(i=0; i<m_NStations; i++)
 	{
 		m_FramePosition[i].z=(m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0;
 	}
@@ -231,7 +258,7 @@ void CBody::UpdateFramePos(int iFrame)
 void CBody::InsertSideLine(int SideLine)
 {
 	if(SideLine==0) SideLine++;
-	for (int i=0; i<m_NStation; i++)
+	for (int i=0; i<m_NStations; i++)
 	{
 		m_Frame[i].InsertPoint(SideLine);
 	}
@@ -241,7 +268,7 @@ void CBody::InsertSideLine(int SideLine)
 
 void CBody::RemoveSideLine(int SideLine)
 {
-	for (int i=0; i<m_NStation; i++)
+	for (int i=0; i<m_NStations; i++)
 	{
 		m_Frame[i].RemovePoint(SideLine);
 	}
@@ -249,49 +276,91 @@ void CBody::RemoveSideLine(int SideLine)
 	SetKnots();
 }
 
-void CBody::InsertPoint(CVector Real)
+int CBody::InsertPoint(CVector Real)
 {
 	//Real is to be inserted in the current frame
 	if(m_iActiveFrame<0)
 	{
 		AfxMessageBox("Please select a Frame before inserting a point", MB_OKCANCEL);
-		return;
+		return -1;
 	}
 	int i, n;
 	n = (m_Frame+m_iActiveFrame)->InsertPoint(Real);
-	for (i=0; i<m_NStation; i++)
+	for (i=0; i<m_NStations; i++)
 	{
 		if(i!=m_iActiveFrame)
 		{
 			(m_Frame+i)->InsertPoint(n);
 		}
 	}
+	m_NSideLines++;
 	SetKnots();
+	return n;
 }
 
 
-CFrame * CBody::InsertFrame(CVector Real)
+int CBody::InsertFrame(CVector Real)
 {
 	int k, n;
 
 	bool bFound = false;
-	for (n=0; n<m_NStation-1; n++)
+
+	if(Real.x<m_FramePosition[0].x)
 	{
-		if(m_FramePosition[n].x<=Real.x  && Real.x <m_FramePosition[n+1].x)
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if (bFound)
-	{
-		for(k=m_NStation; k>n; k--)	
+		for(k=m_NStations; k>0; k--)	
 		{
             m_Frame[k].CopyFrame(m_Frame+k-1);
 			m_FramePosition[k] = m_FramePosition[k-1];
 		}
+		n = -1;
+		for (k=0; k<m_NSideLines; k++)
+		{
+			m_Frame[n+1].m_Point[k].x = 0.0;
+			m_Frame[n+1].m_Point[k].y = 0.0;
+			m_Frame[n+1].m_Point[k].z = 0.0;
+		}
+		m_FramePosition[0] = Real;
 	}
-	m_FramePosition[n+1] = Real;
+	else if(Real.x>m_FramePosition[m_NStations-1].x)
+	{
+		n=m_NStations-1;
+        m_Frame[n+1].CopyFrame(m_Frame+n);
+		
+		for (k=0; k<m_NSideLines; k++)
+		{
+			m_Frame[n+1].m_Point[k].x = 0.0;
+			m_Frame[n+1].m_Point[k].y = 0.0;
+			m_Frame[n+1].m_Point[k].z = 0.0;
+		}
+		m_FramePosition[n+1] = Real;
+	}
+	else
+	{
+		for (n=0; n<m_NStations-1; n++)
+		{
+			if(m_FramePosition[n].x<=Real.x  && Real.x <m_FramePosition[n+1].x)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		if (bFound)
+		{
+			for(k=m_NStations; k>n; k--)	
+			{
+				m_Frame[k].CopyFrame(m_Frame+k-1);
+				m_FramePosition[k] = m_FramePosition[k-1];
+			}
+			m_FramePosition[n+1] = Real;
+
+			for (k=0; k<m_NSideLines; k++)
+			{
+				m_Frame[n+1].m_Point[k].x = (m_Frame[n].m_Point[k].x + m_Frame[n+2].m_Point[k].x)/2.0;
+				m_Frame[n+1].m_Point[k].y = (m_Frame[n].m_Point[k].y + m_Frame[n+2].m_Point[k].y)/2.0;
+				m_Frame[n+1].m_Point[k].z = (m_Frame[n].m_Point[k].z + m_Frame[n+2].m_Point[k].z)/2.0;
+			}
+		}
+	}
 
 	double trans = Real.z - (m_Frame[n+1].m_Point[0].z + m_Frame[n+1].m_Point[m_NSideLines-1].z)/2.0;
 		           
@@ -300,22 +369,21 @@ CFrame * CBody::InsertFrame(CVector Real)
 		m_Frame[n+1].m_Point[k].z += trans;
 	}
 
-
 	m_iActiveFrame = n+1;
-	m_NStation++;
-	if(n>=m_NStation)	m_iActiveFrame = m_NStation;
+	m_NStations++;
+	if(n>=m_NStations)	m_iActiveFrame = m_NStations;
 	if(n<=0)			m_iActiveFrame = 0;
 	m_iHighlight = -1;
 	SetKnots();
 
-	return m_Frame+n+1;
+	return n+1;
 }
 
 
 int CBody::IsFramePos(CVector Real, double ZoomFactor)
 { 
 	int k;
-	for (k=0; k<m_NStation; k++)
+	for (k=0; k<m_NStations; k++)
 	{
 		if (abs(Real.x-m_FramePosition[k].x)<0.006/ZoomFactor &&
 			abs(Real.y-m_FramePosition[k].z)<0.006/ZoomFactor) return k;
@@ -327,7 +395,7 @@ int CBody::IsFramePos(CVector Real, double ZoomFactor)
 void CBody::Duplicate(CBody *pBody)
 {
 	m_NSideLines     = pBody->m_NSideLines;
-	m_NStation       = pBody->m_NStation;
+	m_NStations      = pBody->m_NStations;
 	m_nxDegree       = pBody->m_nxDegree;
 	m_nhDegree       = pBody->m_nhDegree;
 	m_nxPanels       = pBody->m_nxPanels;
@@ -338,6 +406,9 @@ void CBody::Duplicate(CBody *pBody)
 	memcpy(m_Frame, pBody->m_Frame, sizeof(m_Frame));
 	memcpy(m_FramePosition, pBody->m_FramePosition, sizeof(m_FramePosition));
 
+	memcpy(m_xPanels, pBody->m_xPanels, sizeof(m_xPanels));
+	memcpy(m_hPanels, pBody->m_hPanels, sizeof(m_hPanels));
+
 	SetKnots();
 }
 
@@ -346,14 +417,14 @@ int CBody::RemoveFrame(int n)
 {
 	int k;
 //	m_BodyLine.RemovePoint(n);
-	for(k=n; k<m_NStation; k++)	
+	for(k=n; k<m_NStations; k++)	
 	{
 		m_FramePosition[k] = m_FramePosition[k+1];
 		m_Frame[k].CopyFrame(m_Frame+k+1);
 	}
-	m_NStation--;
+	m_NStations--;
 	m_iActiveFrame = n;
-	if(n>=m_NStation)	m_iActiveFrame = m_NStation;
+	if(n>=m_NStations)	m_iActiveFrame = m_NStations;
 	if(n<=0)			m_iActiveFrame = 0;
 	m_iHighlight = -1;
 	SetKnots();
@@ -365,24 +436,25 @@ void CBody::RemoveActiveFrame()
 {
 	int k;
 
-	for(k=m_iActiveFrame; k<m_NStation; k++)	
+	for(k=m_iActiveFrame; k<m_NStations; k++)	
 	{
 		m_FramePosition[k] = m_FramePosition[k+1];
 		m_Frame[k].CopyFrame(m_Frame+k+1);
 	}
-	m_NStation--;
+	m_NStations--;
 
 	m_iHighlight = -1;
 	SetKnots();
 }
 
-
 void CBody::SetKnots()
 {
 	int j;
-	double a,b;
-	m_nxDegree = min(m_nxDegree, m_NStation);
-	m_nxKnots  = m_nxDegree + m_NStation   + 1;
+	double b;
+	m_nxDegree = min(m_nxDegree, m_NStations);
+	m_nxKnots  = m_nxDegree + m_NStations   + 1;
+	b = (double)(m_nxKnots-2*m_nxDegree-1);
+
 
 	// x-dir knots
 	for (j=0; j<m_nxKnots; j++) 
@@ -390,21 +462,20 @@ void CBody::SetKnots()
 		if (j<m_nxDegree+1)  s_xKnots[j] = 0.0;
 		else 
 		{
-			if (j<m_NStation) 
+			if (j<m_NStations) 
 			{
-				a = (double)(j-m_nxDegree);
-				b = (double)(m_nxKnots-2*m_nxDegree-1);
-				if(abs(b)>0.0) s_xKnots[j] = (GLfloat)(a/b);
-				else           s_xKnots[j] = 1.0f; // added arcds
+				if(abs(b)>0.0) s_xKnots[j] = (double)(j-m_nxDegree)/b;
+				else           s_xKnots[j] = 1.0; 
 			}
-			else s_xKnots[j] = 1.0f;	
+			else s_xKnots[j] = 1.0;
 		}
 	}
 
 	//hoop knots
-	
+
 	m_nhDegree = min(m_nhDegree, m_NSideLines);
 	m_nhKnots  = m_nhDegree + m_NSideLines + 1;
+	b = (double)(m_nhKnots-2*m_nhDegree-1);
 	for (j=0; j<m_nhKnots; j++) 
 	{
 		if (j<m_nhDegree+1)  s_hKnots[j] = 0.0;
@@ -412,25 +483,23 @@ void CBody::SetKnots()
 		{
 			if (j<m_NSideLines) 
 			{
-				a = (double)(j-m_nhDegree);
-				b = (double)(m_nhKnots-2*m_nhDegree-1);
-				if(abs(b)>0.0) s_hKnots[j] = (GLfloat)(a/b);
-				else           s_hKnots[j] = 1.0f; // added arcds
+				if(abs(b)>0.0) s_hKnots[j] = (double)(j-m_nhDegree)/b;
+				else           s_hKnots[j] = 1.0;
 			}
-			else s_hKnots[j] = 1.0f;	
+			else s_hKnots[j] = 1.0;
 		}
 	}
 }
 
-double CBody::SplineBlend(int index,  int p, double t, double *knots)
+double CBody::SplineBlend(int const &index, int const &p, double const &t, double *knots)
 {
 //	Calculate the blending value, this is done recursively.
 //	If the numerator and denominator are 0 the expression is 0.
 //	If the denominator is 0 the expression is 0
 //
-//	   i   is the control point's index
-//	   p   is the spline's degree 	
-//	   t   is the spline parameter
+//	   index   is the control point's index
+//	   p       is the spline's degree 	
+//	   t       is the spline parameter
 //
 
 	if (p == 0) 
@@ -454,16 +523,16 @@ double CBody::SplineBlend(int index,  int p, double t, double *knots)
 	return value;
 }
 
-CVector CBody::GetPoint(double u, double v)
+void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 {
-	//returns the point corresponding to the parmatric values u and v
+	//returns the point corresponding to the parametric values u and v
 	//assumes that the knots have been set previously
 	CVector V, Vh;
 	int i,j;
 
 	if(u>=1.0) u=0.99999999999;
 	if(v>=1.0) v=0.99999999999;
-	for(i=0; i<m_NStation; i++)
+	for(i=0; i<m_NStations; i++)
 	{
 		Vh.Set(0.0,0.0,0.0);
 		for(j=0; j<m_NSideLines; j++)
@@ -474,55 +543,24 @@ CVector CBody::GetPoint(double u, double v)
 			Vh.z += m_Frame[i].m_Point[j].z * cs;
 		}
 		bs = SplineBlend(i, m_nxDegree, u, s_xKnots);
+
 		V.x += Vh.x * bs;
-		V.y += Vh.y * bs;
+		if(bRight) V.y += Vh.y * bs;
+		else       V.y -= Vh.y * bs;
 		V.z += Vh.z * bs;
 	}
-	return V;
+	Pt = V;
 }
 
 
-double CBody::Getu(double x)
-{
-	if(x<=m_FramePosition[0].x)            return 0.0;
-	if(x>=m_FramePosition[m_NStation-1].x) return 1.0;
-	if(abs(m_FramePosition[m_NStation-1].x-m_FramePosition[0].x)<0.0000001) return 0.0;
-
-	int i,j;
-	double eps, u2, u1, b, c, u, v, xx, xh;
-	eps = 0.00001;
-	u1 = 0.0; u2 = 1.0;
-
-	v = 0.0;//use top line, but doesn't matter 
-	while(abs(u2-u1)>eps)
-	{
-		u=(u1+u2)/2.0;
-		xx = 0.0;
-		for(i=0; i<m_NStation; i++) //browse all points
-		{
-			xh = 0.0;
-			for(j=0; j<m_NSideLines; j++)
-			{
-				c =  SplineBlend(j, m_nhDegree, v, s_hKnots);
-				xh += m_FramePosition[i].x * c;
-			}
-			b = SplineBlend(i, m_nxDegree, u, s_xKnots);
-			xx += xh * b;
-		}
-		if(xx>x) u2 = u;
-		else     u1 = u;
-	}
-
-	return (u1+u2)/2.0;
-}
-
-
-void CBody::Export()
+void CBody::Export(int nx, int nh)
 {
 	CStdioFile XFile;
 	CFileException fe;
 	CString Header, strong, FileName, OutString, LengthUnit;
-	int j,k;
+	int j,k,l;
+	double u, v;
+	CVector Point;
 
 	CMainFrame *pMainFrame = (CMainFrame*)s_pMainFrame;
 	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
@@ -539,11 +577,10 @@ void CBody::Export()
 			XFile.WriteString(m_BodyName);
 			XFile.WriteString("\n\n");
 	
-			strong.Format("%3d", m_LineType);
-			strong +="       // Surface type :   1=Lines   2=Splines\n";
+			if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
 			XFile.WriteString(strong);
 
-			strong.Format("%3d", m_NStation);
+			strong.Format("%3d", m_NStations);
 			strong +="       // Number of frame stations\n";
 			XFile.WriteString(strong);
 
@@ -560,10 +597,11 @@ void CBody::Export()
 			XFile.WriteString(strong);
 			XFile.WriteString("\n\n");
 
+			XFile.WriteString("Control Points\n");
 			XFile.WriteString("        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n");
-			for (j=0; j<m_NStation; j++)
+			for (j=0; j<m_NStations; j++)
 			{
-				strong.Format("Frame %3d\n", j+1);
+				strong.Format("  Frame %3d\n", j+1);
 				XFile.WriteString(strong);
 				for (k=0; k<m_NSideLines; k++)
 				{
@@ -573,14 +611,38 @@ void CBody::Export()
 						m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit);     
 					XFile.WriteString(strong);
 				}
-				XFile.WriteString("\n\n");
+				XFile.WriteString("\n");
+			}
+
+			XFile.WriteString("\n\n");
+			XFile.WriteString("Right Surface Points\n");
+			XFile.WriteString("        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n");
+			
+			for (k=0; k<nx; k++)
+			{
+				strong.Format("  Cross Section %3d\n", k+1);
+				XFile.WriteString(strong);
+
+				u = (double)k / (double)(nx-1); 
+
+				for (l=0; l<nh; l++)
+				{
+					v = (double)l / (double)(nh-1); 
+					GetPoint(u,  v, true, Point);
+
+					strong.Format("   %10.3f     %10.3f     %10.3f\n", 
+						Point.x * pMainFrame->m_mtoUnit,
+						Point.y * pMainFrame->m_mtoUnit,
+						Point.z * pMainFrame->m_mtoUnit);     
+					XFile.WriteString(strong);
+				}
+				XFile.WriteString("\n");
 			}
 
 			XFile.WriteString("\n\n");
 		}
 	}
 }
-
 
 bool CBody::SetModified()
 {
@@ -625,6 +687,528 @@ bool CBody::SetModified()
 	return false;
 }
 
+double CBody::Getu(double x)
+{
+	if(x<=m_FramePosition[0].x)            return 0.0;
+	if(x>=m_FramePosition[m_NStations-1].x) return 1.0;
+	if(abs(m_FramePosition[m_NStations-1].x-m_FramePosition[0].x)<0.0000001) return 0.0;
+
+	int i,j, iter=0;
+	double u2, u1, b, c, u, v, xx, xh;
+	u1 = 0.0; u2 = 1.0;
+
+	v = 0.0;//use top line, but doesn't matter 
+	while(abs(u2-u1)>1.0e-6 && iter<200)
+	{
+		u=(u1+u2)/2.0;
+		xx = 0.0;
+		for(i=0; i<m_NStations; i++) //browse all points
+		{
+			xh = 0.0;
+			for(j=0; j<m_NSideLines; j++)
+			{
+				c =  SplineBlend(j, m_nhDegree, v, s_hKnots);
+				xh += m_FramePosition[i].x * c;
+			}
+			b = SplineBlend(i, m_nxDegree, u, s_xKnots);
+			xx += xh * b;
+		}
+		if(xx>x) u2 = u;
+		else     u1 = u;
+		iter++;
+	}
+	return (u1+u2)/2.0;
+}
+
+
+double CBody::Getv(double u, CVector r, bool bRight)
+{
+	double sine = 10000.0;
+
+	if(u<=0.0)             return 0.0;
+	if(u>=1.0)             return 0.0;
+	if(r.VAbs()<1.0e-5) return 0.0;
+
+	int iter=0;
+	double v, v1, v2;
+
+	r.Normalize();
+	v1 = 0.0; v2 = 1.0;
+
+	while(abs(sine)>1.0e-4 && iter<200)
+	{
+		v=(v1+v2)/2.0;
+		GetPoint(u, v, bRight, t_R);
+		t_R.x = 0.0;
+		t_R.Normalize();//t_R is the unit radial vector for u,v
+		
+        sine = (r.y*t_R.z - r.z*t_R.y);
+
+		if(bRight)
+		{
+			if(sine>0.0) v1 = v;
+			else         v2 = v;
+		}
+		else
+		{
+			if(sine>0.0) v2 = v;
+			else         v1 = v;
+		}
+		iter++;
+	}
+
+	return (v1+v2)/2.0;
+}
+
+
+bool CBody::IsInNURBSBody(CVector Pt)
+{
+	double u, v;
+	bool bRight;
+
+	u = Getu(Pt.x);
+	t_r.Set(0.0, Pt.y, Pt.z);
+
+	if(Pt.y>=0.0) bRight = true;	else bRight = false;
+
+	v = Getv(u, t_r, bRight);
+	GetPoint(u, v, bRight, t_N);
+
+	t_N.x = 0.0;
+
+	if(t_r.VAbs()>t_N.VAbs()) return false;
+	return true;
+}
+
+void CBody::SetPanelPos()
+{
+	int i;
+	for(i=0; i<=m_nxPanels; i++) 	
+	{
+		s_XPanelPos[i] =(double)i/(double)m_nxPanels;
+	}
+	return;
+	double y, x;	
+	double a = (m_Bunch+1.0)*.48 ;
+	a = 1./(1.0-a);
+
+	double norm = 1/(1+exp(0.5*a));
+
+	for(i=0; i<=m_nxPanels; i++) 	
+	{
+		x = (double)(i)/(double)m_nxPanels;
+		y = 1.0/(1.0+exp((0.5-x)*a));
+		s_XPanelPos[i] =0.5-((0.5-y)/(0.5-norm))/2.0;
+	}
+}
+
+
+bool CBody::Gauss(double *A, int n, double *B, int m)
+{
+ 	int row, i, j, pivot_row, k;
+	double max, dum, *pa, *pA, *A_pivot_row;
+	// for each variable find pivot row and perform forward substitution
+	pa = A;
+	for (row = 0; row < (n - 1); row++, pa += n) 
+	{
+		//  find the pivot row
+		A_pivot_row = pa;
+		max = abs(*(pa + row));
+		pA = pa + n;
+		pivot_row = row;
+		for (i=row+1; i < n; pA+=n, i++)
+			if ((dum = abs(*(pA+row))) > max) 
+			{ 
+				max = dum; 
+				A_pivot_row = pA; 
+				pivot_row = i; 
+			}
+		if (max <= 0.0) 
+			return false;                // the matrix A is singular
+		
+			// and if it differs from the current row, interchange the two rows.
+			
+		if (pivot_row != row) {
+			for (i = row; i < n; i++) {
+				dum = *(pa + i);
+				*(pa + i) = *(A_pivot_row + i);
+				*(A_pivot_row + i) = dum;
+			}
+			for(k=0; k<=m; k++){
+				dum = B[row+k*n];
+				B[row+k*n] = B[pivot_row+k*n];
+				B[pivot_row+k*n] = dum;
+			}
+		}
+		
+		// Perform forward substitution
+		for (i = row+1; i<n; i++) {
+			pA = A + i * n;
+			dum = - *(pA + row) / *(pa + row);
+			*(pA + row) = 0.0;
+			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
+			for (k=0; k<=m; k++) 
+				B[i+k*n] += dum * B[row+k*n];
+		}
+	}
+
+	// Perform backward substitution
+	
+	pa = A + (n - 1) * n;
+	for (row = n - 1; row >= 0; pa -= n, row--) {
+		if ( *(pa + row) == 0.0 ) 
+			return false;           // matrix is singular
+		dum = 1.0 / *(pa + row);
+		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
+		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for ( i = 0, pA = A; i < row; pA += n, i++) {
+			dum = *(pA + row);
+			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
+			for(k=0; k<=m; k++) 
+				B[i+k*n] -= dum * B[row+k*n];
+		}
+	}
+	return true;
+}
+
+
+void CBody::InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size)
+{
+	int i,j;
+	double Nij[MAXBODYFRAMES* MAXBODYFRAMES];//MAXBODYFRAMES is greater than MAXSIDELINES
+	double RHS[3 * MAXBODYFRAMES];//x, y and z RHS
+
+	//create the matrix
+	for(i=0; i<Size; i++)
+	{
+		for(j=0; j<Size; j++)
+		{
+			*(Nij+i*Size + j) = SplineBlend(j, degree, v[i], knots);
+		}
+	}
+	//create the RHS
+	for(i=0; i<Size; i++)
+	{
+		RHS[i]        = D[i].x;
+		RHS[i+Size]   = D[i].y;
+		RHS[i+Size*2] = D[i].z;
+	}
+	//solve for the new control point coordinates
+	Gauss(Nij, Size, RHS, 3);
+	
+	//reconstruct the control points
+	for(i=0; i<Size; i++)
+	{
+		P[i].x = RHS[i];
+		P[i].y = RHS[i+Size];
+		P[i].z = RHS[i+Size*2];
+	}
+}
+
+
+void CBody::InterpolateSurface()
+{
+	int i,k;
+	double u[MAXBODYFRAMES];
+	double v[MAXSIDELINES];
+	CVector D[MAXSIDELINES];//are the existing control points
+	CVector Q[MAXBODYFRAMES * MAXSIDELINES];//are the intermediate control points after interpolation on each frame
+	CVector P[MAXBODYFRAMES * MAXSIDELINES];//are the new resulting control points
+
+	m_nxDegree = 3; m_nhDegree = 3;
+	SetKnots();//just to make sure
+
+	for(k=0; k<m_NStations; k++)
+	{
+		u[k] = Getu(m_FramePosition[k].x);
+	}
+	u[m_NStations-1] =  0.9999999999;
+
+	for(i=0; i<m_NSideLines; i++)
+	{
+		v[i] = (double)i/(double)(m_NSideLines-1);
+	}
+	v[m_NSideLines-1] = 0.9999999999;
+
+
+	//compute intermediate Control Points Q for Frame k
+	for(k=0; k<m_NStations; k++)
+	{
+		//first create the input points
+		for(i=0; i<m_NSideLines; i++)
+		{
+			D[i].x = m_FramePosition[k].x;
+			D[i].y = m_Frame[k].m_Point[i].y;
+			D[i].z = m_Frame[k].m_Point[i].z;
+		}
+
+		t_R.Set(0.0, 0.0, 1.0);
+		for(i=0; i<m_NSideLines-1; i++)
+		{
+			t_r.Set(0.0, m_Frame[k].m_Point[i].y, m_Frame[k].m_Point[i].z);
+			t_r.Normalize();
+			if(t_r.VAbs()<1.0e-10) v[i] = 0.0;
+			else                   v[i] = acos(t_r.dot(t_R))/pi;
+		}
+		v[m_NSideLines-1] = 0.9999999999;
+
+		InterpolateCurve(D, Q+k*m_NSideLines, v, s_hKnots, m_nhDegree, m_NSideLines);
+	}
+
+	//from the intermediate control points Q, interpolate the final control points P
+	for(i=0; i<m_NSideLines; i++)
+	{
+		for(k=0; k<m_NStations; k++)	//first create the input points
+		{
+			D[k] = Q[k*m_NSideLines+i];
+		}
+		InterpolateCurve(D, P+i*m_NStations, u, s_xKnots, m_nxDegree, m_NStations);
+
+		// Copy P array into control points
+		for(k=0; k<m_NStations; k++)
+		{
+			m_Frame[k].m_Point[i] = P[i*m_NStations+k];
+		}
+	}
+}
+
+
+
+bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
+{
+	if(m_LineType==1) return IntersectPanels(A,B,I, bRight);
+	else              return IntersectNURBS(A,B,I, bRight);
+}
+
+bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
+{
+	//intersect line AB with right or left body surface
+	//intersection point is I
+	CVector N, tmp, M0, M1;
+	double u, v, dist, t, tp;
+	int iter = 0;
+	int itermax = 50;
+	double dmax = 1.0e-6;
+	dist = 1000.0;//m
+
+	if(A.VAbs()<B.VAbs())
+	{
+		tmp = A;		A   = B;		B   = tmp;
+	}
+	//M0 is the outside Point, M1 is the inside point
+	M0 = A; M1 = B; 
+
+	//define which side to intersect with
+	if(M0.y>=0.0) bRight = true; else bRight = false;
+
+	if(!IsInNURBSBody(M1))
+	{
+		//consider no intersection (not quite true in special high dihedral cases)
+		I = M1;
+		return false;
+	}
+ 
+	I = (M0+M1)/2.0; t=0.5;
+
+	while(dist>dmax && iter<itermax)
+	{
+		//first we get the u parameter corresponding to point I
+		tp = t;
+		u = Getu(I.x);
+		t_Q.Set(I.x, 0.0, 0.0);
+		t_r = (I-t_Q);
+		v = Getv(u, t_r, bRight);
+		GetPoint(u, v, bRight, t_N);
+
+		//project t_N on M0M1 line
+		t = - ( (M0.x - t_N.x) * (M1.x-M0.x) + (M0.y - t_N.y) * (M1.y-M0.y) + (M0.z - t_N.z)*(M1.z-M0.z))
+			 /( (M1.x -  M0.x) * (M1.x-M0.x) + (M1.y -  M0.y) * (M1.y-M0.y) + (M1.z -  M0.z)*(M1.z-M0.z));
+
+		I.x = M0.x + t * (M1.x-M0.x);
+		I.y = M0.y + t * (M1.y-M0.y);
+		I.z = M0.z + t * (M1.z-M0.z);
+
+//		dist = sqrt((t_N.x-I.x)*(t_N.x-I.x) + (t_N.y-I.y)*(t_N.y-I.y) + (t_N.z-I.z)*(t_N.z-I.z));
+		dist = abs(t-tp);
+		iter++; 
+	}
+	return dist<dmax;
+}
+
+bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
+{
+	bool b1, b2, b3, b4, b5;
+	int i,k;
+	double r,s,t;
+	CVector LA, TA, LB, TB, U, V, W, H, D1, D2, N, C, P;
+	bool bIntersect = false;
+
+	U = B-A;
+	U.Normalize();
+
+	for (i=0; i<m_NStations-1; i++)
+	{
+		for (k=0; k<m_NSideLines-1; k++)
+		{
+			//build the four corner points of the Quad Panel
+			LB.x =  m_FramePosition[i].x     ;
+			LB.y =  m_Frame[i].m_Point[k].y  ;
+			LB.z =  m_Frame[i].m_Point[k].z  ;
+
+			TB.x =  m_FramePosition[i+1].x;
+			TB.y =  m_Frame[i+1].m_Point[k].y;
+			TB.z =  m_Frame[i+1].m_Point[k].z;
+
+			LA.x =  m_FramePosition[i].x     ;
+			LA.y =  m_Frame[i].m_Point[k+1].y;
+			LA.z =  m_Frame[i].m_Point[k+1].z;
+
+			TA.x =  m_FramePosition[i+1].x;
+			TA.y =  m_Frame[i+1].m_Point[k+1].y;
+			TA.z =  m_Frame[i+1].m_Point[k+1].z;
+
+			//does it intersect the right panel ?
+			C = (LA + LB + TA + TB)/4.0;
+
+			D1 = LA - TB;
+			D2 = LB - TA;
+
+			N = D2 * D1;
+			N.Normalize();
+			
+			r = (C.x-A.x)*N.x + (C.y-A.y)*N.y + (C.z-A.z)*N.z ;
+			s = (U.x*N.x + U.y*N.y + U.z*N.z);
+			if(abs(s)>0.0)
+			{
+				t = r/s;
+				P = A + U * t;
+
+				// P is inside panel if on left side of each panel side
+				W = P  - TA;
+				V = TB - TA;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b1 = true; else b1 = false;
+
+				W = P  - TB;
+				V = LB - TB;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b2 = true; else b2 = false;
+
+				W = P  - LB;
+				V = LA - LB;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b3 = true; else b3 = false;
+
+				W = P  - LA;
+				V = TA - LA;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b4 = true; else b4 = false;
+
+				W = A-P;
+				V = B-P;
+				if(W.dot(V)<=0.0)      b5 = true; else b5 = false;
+
+				if(b1 && b2 && b3 && b4 && b5)
+				{
+					bIntersect = true;
+					break;
+				}
+			}
+
+			//does it intersect the left panel ?
+
+			LB.y = -LB.y;
+			LA.y = -LA.y;
+			TB.y = -TB.y;
+			TA.y = -TA.y;
+
+			C = (LA + LB + TA + TB)/4.0;
+
+			D1 = LA - TB;
+			D2 = LB - TA;
+
+			N = D2 * D1;
+			N.Normalize();
+			
+			r = (C.x-A.x)*N.x + (C.y-A.y)*N.y + (C.z-A.z)*N.z ;
+			s = (U.x*N.x + U.y*N.y + U.z*N.z);
+			if(abs(s)>0.0)
+			{
+				t = r/s;
+				P = A + U * t;
+
+				// P is inside panel if on left side of each panel side
+				W = P  - TA;
+				V = TB - TA;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b1 = true; else b1 = false;
+
+				W = P  - TB;
+				V = LB - TB;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b2 = true; else b2 = false;
+
+				W = P  - LB;
+				V = LA - LB;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b3 = true; else b3 = false;
+
+				W = P  - LA;
+				V = TA - LA;
+				t_Prod = V*W;
+				if(t_Prod.VAbs() <1.0e-4 || t_Prod.dot(N)>=0.0) b4 = true; else b4 = false;
+
+				W = A-P;
+				V = B-P;
+				if(W.dot(V)<=0.0)       b5 = true; else b5 = false;
+
+				if(b1 && b2 && b3 && b4 && b5)
+				{
+					bIntersect = true;
+					break;
+				}
+			}
+//TRACE("Stat=%3d  Side=%3d    x=%10.5f    y=%10.5f    z=%10.5f\n",i,k,P.x, P.y, P.z);
+		}
+		if(bIntersect) break;
+	}
+	if(bIntersect) I = P;
+	return bIntersect;
+}
+
+
+void CBody::ComputeAero(double *Cp, double &Lift, double &XCP, double &YCP, 
+						double &GCm, double &GRm, double &GYm, double Alpha, double XCmRef,
+						bool bTilted)
+{
+	int p;
+	double cosa, sina, PanelLift;
+	CVector PanelForce, LeverArm, WindNormal, WindDirection;
+	CVector GeomMoment;
+
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
+
+	//   Define wind axis
+	WindNormal.Set(-sina, 0.0, cosa);
+	WindDirection.Set(cosa, 0.0, sina);
+
+	for (p=0; p<m_NElements; p++)
+	{
+		PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
+		PanelLift = PanelForce.dot(WindNormal);
+		Lift  += PanelLift;
+		XCP   += m_pPanel[p].CollPt.x * PanelLift;
+		YCP   += m_pPanel[p].CollPt.y * PanelLift;
+		LeverArm = m_pPanel[p].CollPt;
+		LeverArm.x -= XCmRef;
+		GeomMoment = LeverArm * PanelForce;
+
+		GCm  += GeomMoment.y;
+		GRm  += GeomMoment.dot(WindDirection);
+		GYm  += GeomMoment.dot(WindNormal);
+	}
+}
 
 
 

@@ -124,13 +124,15 @@ BOOL CBackPage::PreTranslateMessage(MSG* pMsg)
 
 
 
-void CBackPage::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
+void CBackPage::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) 
+{
 	// TODO: Add your message handler code here and/or call default
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 	if (!pDC) return;
 	int nSavedDC = pDC->SaveDC();
 
-	if(nIDCtl==IDC_BORDERSTYLE){
+	if(nIDCtl==IDC_BORDERSTYLE)
+	{
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = m_BorderClr;
@@ -141,7 +143,8 @@ void CBackPage::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) {
 		pDC->LineTo(145,8);
 		pDC->SelectObject(pOldPen);
 	}
-	else if(nIDCtl==IDC_GRAPHCLR){
+	else if(nIDCtl==IDC_GRAPHCLR)
+	{
 		// Store this for convenience
 		int top    = lpDrawItemStruct->rcItem.top;
 		int left   = lpDrawItemStruct->rcItem.left;

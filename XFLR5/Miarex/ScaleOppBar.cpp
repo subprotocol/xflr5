@@ -144,29 +144,6 @@ void CScaleOppBar::OnNMReleasedcaptureDownwashScale(NMHDR *pNMHDR, LRESULT *pRes
 }
 
 
-void CScaleOppBar::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
-{
-	if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_LIFTSCALE)->GetSafeHwnd())    {
-		double pos =  (double)m_ctrlLiftScale.GetPos();
-		m_LiftScale    = pos/100.0/sqrt(1.01-pos/100.0);
-		m_bLiftChanged = true;
-		Apply();
-	}
-	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_DRAGSCALE)->GetSafeHwnd())    {
-		double pos =  (double)m_ctrlDragScale.GetPos();
-		m_DragScale    = pos/100.0/sqrt(1.01-pos/100.0);
-		m_bDragChanged = true;
-		Apply();
-	}
-	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_DOWNWASHSCALE)->GetSafeHwnd())    {
-		double pos =  (double)m_ctrlDownWashScale.GetPos();
-		m_DownwashScale    = pos/100.0/sqrt(1.01-pos/100.0);
-		m_bDownwashChanged = true;
-		Apply();
-	}
-//	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
-}
-
 
 void CScaleOppBar::SetPos()
 {
@@ -182,4 +159,29 @@ void CScaleOppBar::SetPos()
 	pos = -m_DownwashScale*m_DownwashScale + m_DownwashScale*sqrt(m_DownwashScale*m_DownwashScale+4.0*1.01);
 	pos = pos/2.0/1.01;
 	m_ctrlDownWashScale.SetPos((int)(pos*100.0));
+}
+void CScaleOppBar::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
+{
+	if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_LIFTSCALE)->GetSafeHwnd())   
+	{
+		double pos =  (double)m_ctrlLiftScale.GetPos();
+		m_LiftScale    = pos/100.0/sqrt(1.01-pos/100.0);
+		m_bLiftChanged = true;
+		Apply();
+	}
+	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_DRAGSCALE)->GetSafeHwnd())   
+	{
+		double pos =  (double)m_ctrlDragScale.GetPos();
+		m_DragScale    = pos/100.0/sqrt(1.01-pos/100.0);
+		m_bDragChanged = true;
+		Apply();
+	}
+	else if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_DOWNWASHSCALE)->GetSafeHwnd())  
+	{
+		double pos =  (double)m_ctrlDownWashScale.GetPos();
+		m_DownwashScale    = pos/100.0/sqrt(1.01-pos/100.0);
+		m_bDownwashChanged = true;
+		Apply();
+	}
+//	CDialog::OnHScroll(nSBCode, nPos, pScrollBar);
 }

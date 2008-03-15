@@ -58,17 +58,12 @@ CVector CSurface::LB;
 CVector CSurface::TA;
 CVector CSurface::TB;
 CVector CSurface::VTemp;
-CVector CSurface::SideA[MAXCHORDPANELS];	 
-CVector CSurface::SideB[MAXCHORDPANELS];	 
-CVector CSurface::SideA_T[MAXCHORDPANELS];	 
-CVector CSurface::SideB_T[MAXCHORDPANELS];	 
 
 CSurface::CSurface()
 {
 	pi = 3.141592654;
 	m_bTEFlap = false;
 
-	m_SineFactor = 1.0;
 	m_Dihedral = 0.0;
 	m_Length   = 0.0;
 	m_TwistA   = 0.0;
@@ -86,25 +81,18 @@ CSurface::CSurface()
 	m_pFoilB   = NULL;
 	m_NElements = 0;
 
-	m_bIsTipLeft  = false;
-	m_bIsTipRight = false;
+	m_bIsInSymPlane = false;
+	m_bIsTipLeft    = false;
+	m_bIsTipRight   = false;
 
-	m_bIsLeftSurf  = false;
-	m_bIsRightSurf = false;
+	m_bIsLeftSurf   = false;
+	m_bIsRightSurf  = false;
 
-/*  3        equal         |   |   |   |   |   |   |   |   |
+	m_bIsCenterSurf = false;
+	m_bJoinRight    = true;
 
-    2        sine          || |  |   |    |    |     |     |
-
-    1        cosine        ||  |    |      |      |    |  ||
-
-    0        equal         |   |   |   |   |   |   |   |   |
-
-   -1        cosine        ||  |    |      |      |    |  ||
-
-   -2       -sine          |     |     |    |    |   |  | ||
-
-   -3        equal         |   |   |   |   |   |   |   |   |*/
+	memset(m_xPointA, 0, sizeof(m_xPointA));
+	memset(m_xPointB, 0, sizeof(m_xPointB));
 }
 
 CSurface::~CSurface()
@@ -112,64 +100,32 @@ CSurface::~CSurface()
 
 }
 
-
-void CSurface::GetLeadingPt(CVector &C, int k)
+void CSurface::GetC4(int k, CVector &Pt, double &tau)
 {
-	GetPanel(k,m_NXPanels-1,VTemp , 0);
-
-	C.x    = (LA.x+LB.x)/2.0;
-	C.y    = (LA.y+LB.y)/2.0;
-	C.z    = (LA.z+LB.z)/2.0;
-}
-
-void CSurface::GetTrailingPt(CVector &C, int k)
-{
-	GetPanel(k,0,VTemp,0);
-
-	C.x    = (TA.x+TB.x)/2.0;
-	C.y    = (TA.y+TB.y)/2.0;
-	C.z    = (TA.z+TB.z)/2.0;
-}
-
-void CSurface::GetC4(int k, CVector &Pt)
-{
-	GetPanel(k,m_NXPanels-1,VTemp,0);
+	GetPanel(k,m_NXPanels-1,0);
 	double xl = (LA.x+LB.x)/2.0;
 	double yl = (LA.y+LB.y)/2.0;
 	double zl = (LA.z+LB.z)/2.0;
-	GetPanel(k,0,VTemp,0);
+	GetPanel(k,0,0);
 	double xt = (TA.x+TB.x)/2.0;
 	double yt = (TA.y+TB.y)/2.0;
 	double zt = (TA.z+TB.z)/2.0;
 	Pt.x = xl*.75 + xt*.25;
 	Pt.y = yl*.75 + yt*.25;
 	Pt.z = zl*.75 + zt*.25;
+
+//	return relative span position;
+
+	tau = sqrt((Pt.y-m_LA.y)*(Pt.y-m_LA.y)+(Pt.z-m_LA.z)*(Pt.z-m_LA.z))/m_Length;
 }
 
-double CSurface::GetStripArea(int k)
+double CSurface::GetTwist(int k)
 {
-	return Getdl(k) * GetChord(k);
+	GetPanel(k, 0, 0);
+	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
+	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
 }
-
-
-int CSurface::Getk(double srel)
-{
-	//srel is relative length along DL
-	int k;
-	double s1, s2;
-	if(srel<=0.0) return 0;
-	if(srel>=1.0) return m_NYPanels-1;
-
-	for(k=0; k<m_NYPanels; k++)
-	{
-		GetyDist(k,s1,s2);
-//		s1 = m_LA.y + (m_LB.y-m_LA.y) * s1;
-//		s2 = m_LA.y + (m_LB.y-m_LA.y) * s2;
-		if(s1<=srel && srel<=s2) return k;
-	}
-	return -1;
-}
-
+/*
 void CSurface::Getyz(int k, double &y, double &z)
 {
 	double y1, y2;
@@ -179,28 +135,7 @@ void CSurface::Getyz(int k, double &y, double &z)
 
 	y = (LA.y+LB.y)/2.0;
 	z = (LA.z+LB.z)/2.0;
-}
-
-
-double CSurface::Getdl(int k)
-{
-	CVector L;
-	double y1, y2;
-	GetyDist(k,y1,y2);
-	GetPoint(0.0, 0.0, y1, LA);
-	GetPoint(0.0, 0.0, y2, LB);
-	L.x = 0.0;
-	L.y = LB.y - LA.y;
-	L.z = LB.z - LA.z;
-	return L.VAbs();
-}
-
-double CSurface::GetTwist(int k)
-{
-	double y,z;
-	Getyz(k,y,z);
-	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
-}
+}*/
 
 void CSurface::GetNormal(double yrel, CVector &N)
 {
@@ -297,195 +232,99 @@ void CSurface::GetPanel(int k, int l, int pos)
 	// Method used to generate the panels
 
 	GetyDist(k,y1,y2);
-	if(pos==0 || pos==-1)
+	if(pos==0)
 	{
-		LA = SideA[l+1] * (1.0-y1) + SideB[l+1]* y1;
-		TA = SideA[l]   * (1.0-y1) + SideB[l]  * y1;
-		LB = SideA[l+1] * (1.0-y2) + SideB[l+1]* y2;
-		TB = SideA[l]   * (1.0-y2) + SideB[l]  * y2;
+		LA.x = SideA[l+1].x * (1.0-y1) + SideB[l+1].x* y1;
+		LA.y = SideA[l+1].y * (1.0-y1) + SideB[l+1].y* y1;
+		LA.z = SideA[l+1].z * (1.0-y1) + SideB[l+1].z* y1;
+		TA.x = SideA[l].x   * (1.0-y1) + SideB[l].x  * y1;
+		TA.y = SideA[l].y   * (1.0-y1) + SideB[l].y  * y1;
+		TA.z = SideA[l].z   * (1.0-y1) + SideB[l].z  * y1;
+		LB.x = SideA[l+1].x * (1.0-y2) + SideB[l+1].x* y2;
+		LB.y = SideA[l+1].y * (1.0-y2) + SideB[l+1].y* y2;
+		LB.z = SideA[l+1].z * (1.0-y2) + SideB[l+1].z* y2;
+		TB.x = SideA[l].x   * (1.0-y2) + SideB[l].x  * y2;
+		TB.y = SideA[l].y   * (1.0-y2) + SideB[l].y  * y2;
+		TB.z = SideA[l].z   * (1.0-y2) + SideB[l].z  * y2;
 	}
-	else	
+	else if (pos==-1)
 	{
-		LA = SideA_T[l+1] * (1.0-y1) + SideB_T[l+1]* y1;
-		TA = SideA_T[l]   * (1.0-y1) + SideB_T[l]  * y1;
-		LB = SideA_T[l+1] * (1.0-y2) + SideB_T[l+1]* y2;
-		TB = SideA_T[l]   * (1.0-y2) + SideB_T[l]  * y2;
+		LA = SideA_B[l+1] * (1.0-y1) + SideB_B[l+1]* y1;
+		TA = SideA_B[l]   * (1.0-y1) + SideB_B[l]  * y1;
+		LB = SideA_B[l+1] * (1.0-y2) + SideB_B[l+1]* y2;
+		TB = SideA_B[l]   * (1.0-y2) + SideB_B[l]  * y2;
+
+		LA.x = SideA_B[l+1].x * (1.0-y1) + SideB_B[l+1].x* y1;
+		LA.y = SideA_B[l+1].y * (1.0-y1) + SideB_B[l+1].y* y1;
+		LA.z = SideA_B[l+1].z * (1.0-y1) + SideB_B[l+1].z* y1;
+		TA.x = SideA_B[l].x   * (1.0-y1) + SideB_B[l].x  * y1;
+		TA.y = SideA_B[l].y   * (1.0-y1) + SideB_B[l].y  * y1;
+		TA.z = SideA_B[l].z   * (1.0-y1) + SideB_B[l].z  * y1;
+		LB.x = SideA_B[l+1].x * (1.0-y2) + SideB_B[l+1].x* y2;
+		LB.y = SideA_B[l+1].y * (1.0-y2) + SideB_B[l+1].y* y2;
+		LB.z = SideA_B[l+1].z * (1.0-y2) + SideB_B[l+1].z* y2;
+		TB.x = SideA_B[l].x   * (1.0-y2) + SideB_B[l].x  * y2;
+		TB.y = SideA_B[l].y   * (1.0-y2) + SideB_B[l].y  * y2;
+		TB.z = SideA_B[l].z   * (1.0-y2) + SideB_B[l].z  * y2;
+	}
+	else if (pos==1)
+	{
+		LA.x = SideA_T[l+1].x * (1.0-y1) + SideB_T[l+1].x* y1;
+		LA.y = SideA_T[l+1].y * (1.0-y1) + SideB_T[l+1].y* y1;
+		LA.z = SideA_T[l+1].z * (1.0-y1) + SideB_T[l+1].z* y1;
+		TA.x = SideA_T[l].x   * (1.0-y1) + SideB_T[l].x  * y1;
+		TA.y = SideA_T[l].y   * (1.0-y1) + SideB_T[l].y  * y1;
+		TA.z = SideA_T[l].z   * (1.0-y1) + SideB_T[l].z  * y1;
+		LB.x = SideA_T[l+1].x * (1.0-y2) + SideB_T[l+1].x* y2;
+		LB.y = SideA_T[l+1].y * (1.0-y2) + SideB_T[l+1].y* y2;
+		LB.z = SideA_T[l+1].z * (1.0-y2) + SideB_T[l+1].z* y2;
+		TB.x = SideA_T[l].x   * (1.0-y2) + SideB_T[l].x  * y2;
+		TB.y = SideA_T[l].y   * (1.0-y2) + SideB_T[l].y  * y2;
+		TB.z = SideA_T[l].z   * (1.0-y2) + SideB_T[l].z  * y2;
 	}
 }
 
-
-void CSurface::GetPanel(int k, int l, CVector &dF, int pos)
-{
-	// Method used to get panel information for display
-	// pos =  0 : mid camber line
-	// pos =  1 : top
-	// pos = -1 : bottom
-	// loads the corner points of the panel k,l in TA, TB, LA, LB
-	CVector PNA, PNB;
-//	GetxDist(l, xLA, xTA, xLB, xTB);
-	xLA = m_xPointA[l+1];
-	xLB = m_xPointB[l+1];
-	xTA = m_xPointA[l];
-	xTB = m_xPointB[l];
-	GetyDist(k,y1,y2);
-
-	chordA  = GetChord(0.0);
-	chordB  = GetChord(1.0);
-	GetPoint(xLA, xLB, y1, LA); 
-	GetPoint(xLA, xLB, y2, LB);
-	GetPoint(xTA, xTB, y1, TA);
-	GetPoint(xTA, xTB, y2, TB);
-
-	GetNormal(y1, NA);
-	GetNormal(y2, NB);
-
-	if (m_pFoilA && m_pFoilB){
-		if(pos==1){
-			zA = m_pFoilA->GetUpperY(xLA)*chordA;
-			zB = m_pFoilB->GetUpperY(xLB)*chordB;
-		}
-		else if(pos==-1){
-			zA = m_pFoilA->GetLowerY(xLA)*chordA;
-			zB = m_pFoilB->GetLowerY(xLB)*chordB;
-		}
-		else{
-			zA = m_pFoilA->GetMidY(xLA)*chordA;
-			zB = m_pFoilB->GetMidY(xLB)*chordB;
-		}
-		LA += NA * (zA+ (zB-zA)*y1);
-		LB += NB * (zA+ (zB-zA)*y2);
-
-		if(pos==1){
-			zA = m_pFoilA->GetUpperY(xTA)*chordA;
-			zB = m_pFoilB->GetUpperY(xTB)*chordB;
-		}
-		else if(pos==-1){
-			zA = m_pFoilA->GetLowerY(xTA)*chordA;
-			zB = m_pFoilB->GetLowerY(xTB)*chordB;
-		}
-		else{
-			zA = m_pFoilA->GetMidY(xTA)*chordA;
-			zB = m_pFoilB->GetMidY(xTB)*chordB;
-		}
-		TA += NA * (zA+ (zB-zA)*y1);
-		TB += NB * (zA+ (zB-zA)*y2);
-	}
-
-/*	V1 = TB - LA;
-	V2 = LB - TA;
-	if(pos==1 || pos==0) dF = V1 * V2;
-	else                 dF = V2 * V1;*/
-
-	dF = (NA + NB) *0.5;
-	dF.Normalize();
-
-	if(pos==-1) dF.Set(-dF.x, -dF.y, -dF.z);
-}
 
 
 void CSurface::GetPoint(double xArel, double xBrel, double yrel, CVector &Point, int pos)
 {
 	CVector APt, BPt;
 
-	APt = m_LA * (1.0-xArel) + m_TA * xArel;
-	BPt = m_LB * (1.0-xBrel) + m_TB * xBrel;
+	APt.x = m_LA.x * (1.0-xArel) + m_TA.x * xArel;
+	APt.y = m_LA.y * (1.0-xArel) + m_TA.y * xArel;
+	APt.z = m_LA.z * (1.0-xArel) + m_TA.z * xArel;
+	BPt.x = m_LB.x * (1.0-xBrel) + m_TB.x * xBrel;
+	BPt.y = m_LB.y * (1.0-xBrel) + m_TB.y * xBrel;
+	BPt.z = m_LB.z * (1.0-xBrel) + m_TB.z * xBrel;
 
-	if(pos==1 && m_pFoilA && m_pFoilB){
+	if(pos==1 && m_pFoilA && m_pFoilB)
+	{
 		double TopA = m_pFoilA->GetUpperY(xArel)*GetChord(0.0);
 		double TopB = m_pFoilB->GetUpperY(xBrel)*GetChord(1.0);
-		APt +=  Normal * TopA;
-		BPt +=  Normal * TopB;
+		APt.x +=  Normal.x * TopA;
+		APt.y +=  Normal.y * TopA;
+		APt.z +=  Normal.z * TopA;
+		BPt.x +=  Normal.x * TopB;
+		BPt.y +=  Normal.y * TopB;
+		BPt.z +=  Normal.z * TopB;
 	}
-	else if(pos==-1 && m_pFoilA && m_pFoilB){
+	else if(pos==-1 && m_pFoilA && m_pFoilB)
+	{
 		double BotA = m_pFoilA->GetLowerY(xArel)*GetChord(0.0);
 		double BotB = m_pFoilB->GetLowerY(xBrel)*GetChord(1.0);
-		APt += Normal * BotA;
-		BPt += Normal * BotB;
+		APt.x +=  Normal.x * BotA;
+		APt.y +=  Normal.y * BotA;
+		APt.z +=  Normal.z * BotA;
+		BPt.x +=  Normal.x * BotB;
+		BPt.y +=  Normal.y * BotB;
+		BPt.z +=  Normal.z * BotB;
 	}
-	Point = APt * (1.0-yrel)+  BPt * yrel ;
+	Point.x = APt.x * (1.0-yrel)+  BPt.x * yrel ;
+	Point.y = APt.y * (1.0-yrel)+  BPt.y * yrel ;
+	Point.z = APt.z * (1.0-yrel)+  BPt.z * yrel ;
 }
 
 
-
-void CSurface::SetSidePoints(int iAnalysisType)
-{
-	//creates the left and right tip points between which the panels will be interpolated
-	int l;
-	double cosdA = Normal.dot(NormalA);
-	double cosdB = Normal.dot(NormalB);
-
-	//SideA, SideB are mid points (VLM) or bottom points (3DPanels)
-	//SideA_T, SideB_T, are top points (3DPanels);
-
-	for (l=0; l<m_NXPanels; l++)
-	{
-		xLA = m_xPointA[l+1];
-		xLB = m_xPointB[l+1];
-		xTA = m_xPointA[l];
-		xTB = m_xPointB[l];
-
-		chordA  = GetChord(0.0);//TODO : compare with |m_LA-m_TA|
-		chordB  = GetChord(1.0);
-
-		GetPoint(xLA, xLB, 0.0, LA, 0); 
-		GetPoint(xTA, xTB, 0.0, TA, 0);
-
-		GetPoint(xLA, xLB, 1.0, LB, 0);
-		GetPoint(xTA, xTB, 1.0, TB, 0);
-
-		if (m_pFoilA && m_pFoilB)
-		{
-			if(iAnalysisType==3)
-			{
-				//create bottom surface points
-				zA = m_pFoilA->GetLowerY(xLA)*chordA;
-				zB = m_pFoilB->GetLowerY(xLB)*chordB;
-				SideA[l+1]   = LA + NormalA * zA/cosdA;
-				SideB[l+1]   = LB + NormalB * zB/cosdB;
-
-				//create top surface points
-				zA = m_pFoilA->GetUpperY(xLA)*chordA;
-				zB = m_pFoilB->GetUpperY(xLB)*chordB;
-				SideA_T[l+1] = LA + NormalA * zA/cosdA;
-				SideB_T[l+1] = LB + NormalB * zB/cosdB;
-				if(l==0)
-				{
-					zA = m_pFoilA->GetLowerY(xTA)*chordA;
-					zB = m_pFoilB->GetLowerY(xTB)*chordB;
-					SideA[0]   = TA + NormalA * zA/cosdA;
-					SideB[0]   = TB + NormalB * zB/cosdB;
-
-					zA = m_pFoilA->GetUpperY(xTA)*chordA;
-					zB = m_pFoilB->GetUpperY(xTB)*chordB;
-					SideA_T[0] = TA + NormalA * zA/cosdA;
-					SideB_T[0] = TB + NormalB * zB/cosdB;
-				}
-			}
-			else //iAnalysisType==2, VLM get mid surface points
-			{ 
-				zA = m_pFoilA->GetMidY(xLA)*chordA;
-				zB = m_pFoilB->GetMidY(xLB)*chordB;
-				SideA[l+1]   = LA + NormalA * zA/cosdA;
-				SideB[l+1]   = LB + NormalB * zB/cosdB;
-
-				if(l==0)
-				{
-					zA = m_pFoilA->GetMidY(xTA)*chordA;
-					zB = m_pFoilB->GetMidY(xTB)*chordB;
-					SideA[0]   = TA + NormalA * zA/cosdA;
-					SideB[0]   = TB + NormalB * zB/cosdB;
-				}
-			}
-		}
-		else
-		{
-			SideA[l+1] = LA;
-			SideB[l+1] = LB;
-			SideA_T[l+1] = LA;
-			SideB_T[l+1] = LB;
-		}
-	}
-}
 
 
 void CSurface::Copy(CSurface &Surface)
@@ -498,7 +337,6 @@ void CSurface::Copy(CSurface &Surface)
 	m_XDistType = Surface.m_XDistType;
 	m_YDistType = Surface.m_YDistType;
 	m_NElements = Surface.m_NElements;
-	m_SineFactor = Surface.m_SineFactor;
 
 	m_Dihedral  = Surface.m_Dihedral;
 	m_Length    = Surface.m_Length;
@@ -513,11 +351,13 @@ void CSurface::Copy(CSurface &Surface)
 	NormalA = Surface.NormalA;
 	NormalB = Surface.NormalB;
 
-	m_bIsTipLeft  = Surface.m_bIsTipLeft;
-	m_bIsTipRight = Surface.m_bIsTipRight;
-	m_bIsLeftSurf = Surface.m_bIsLeftSurf;
-	m_bIsRightSurf = Surface.m_bIsRightSurf;
-	
+	m_bIsTipLeft    = Surface.m_bIsTipLeft;
+	m_bIsTipRight   = Surface.m_bIsTipRight;
+	m_bIsLeftSurf   = Surface.m_bIsLeftSurf;
+	m_bIsRightSurf  = Surface.m_bIsRightSurf;
+	m_bIsCenterSurf = Surface.m_bIsCenterSurf;
+	m_bJoinRight    = Surface.m_bJoinRight;
+
 	memcpy(m_xPointA, Surface.m_xPointA, sizeof(m_xPointA));
 	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
 }
@@ -570,43 +410,70 @@ void CSurface::RotateZ(CVector O, double ZTilt)
 	NormalB.RotateZ(Origin, ZTilt);
 }
 
-
+/*
 void CSurface::GetyDist(int k, double &y1, double &y2)
 {
-	double sf, snorm, cnorm, YPanels, dk;
+	double YPanels, dk;
 	YPanels = (double)m_NYPanels;
 	dk      = (double)k;
-	if(m_SineFactor>0.0)	sf = 1.0+1.0/m_SineFactor;
-	else                    sf = 1000000.0;
-	snorm   = 1.0/sin(pi/sf);
-	cnorm   = 1.0/cos( pi*(1/2.0-1.0/sf));
 
 	if(m_YDistType==1){
 		//cosine case
-		y1  = 1.0/2.0*(1.0-cnorm*cos( dk      * pi *(1.0-2.0*(1/2.0-1.0/sf))/YPanels + pi*(1/2.0-1.0/sf)));
-		y2  = 1.0/2.0*(1.0-cnorm*cos((dk+1.0) * pi *(1.0-2.0*(1/2.0-1.0/sf))/YPanels + pi*(1/2.0-1.0/sf)));
+		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
+		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
 	}
 	else if(m_YDistType==-2){
 		//sine case
-		y1  = snorm * (sin( dk      *pi/sf/YPanels));
-		y2  = snorm * (sin((dk+1.0) *pi/sf/YPanels));
+		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
 	}
 	else if(m_YDistType==2){
 		//-sine case
-		y1  = (1.0-snorm *sin((YPanels-dk)     *pi/sf/YPanels));
-		y2  = (1.0-snorm *sin((YPanels-dk-1.0) *pi/sf/YPanels));
+		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
 	}
 	else{
 		//equally spaced case
 		y1 =  dk     /YPanels;
 		y2 = (dk+1.0)/YPanels;
 	}
+}*/
+
+void CSurface::GetyDist(int k, double &y1, double &y2)
+{
+	//leading edge
+
+	double YPanels, dk;
+	YPanels = (double)m_NYPanels;
+	dk      = (double)k;
+
+	if(m_YDistType==1)
+	{
+		//cosine case
+		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
+		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
+	}
+	else if(m_YDistType==-2)
+	{
+		//sine case
+		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
+	}
+	else if(m_YDistType==2)
+	{
+		//-sine case
+		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
+	}
+	else
+	{
+		//equally spaced case
+		y1 =  dk     /YPanels;
+		y2 = (dk+1.0)/YPanels;
+	}
 }
 
-double CSurface::Getyrel(double y)
-{
-	return (y-m_LA.y)/(m_LB.y-m_LA.y);
-}
+
 
 void CSurface::SetFlap()
 {
@@ -626,4 +493,179 @@ void CSurface::SetFlap()
 
 	m_bTEFlap = m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap;
 }
+
+
+void CSurface::SetSidePoints(CBody * pBody)
+{
+	//creates the left and right tip points between which the panels will be interpolated
+	int l;
+	double cosdA = Normal.dot(NormalA);
+	double cosdB = Normal.dot(NormalB);
+	
+	//SideA, SideB are mid points (VLM) or bottom points (3DPanels)
+	//SideA_T, SideB_T, are top points (3DPanels);
+
+	for (l=0; l<m_NXPanels; l++)
+	{
+		xLA = m_xPointA[l+1];
+		xLB = m_xPointB[l+1];
+		xTA = m_xPointA[l];
+		xTB = m_xPointB[l];
+
+		chordA  = GetChord(0.0);//todo : compare with |m_LA-m_TA|
+		chordB  = GetChord(1.0);
+
+		GetPoint(xLA, xLB, 0.0, LA, 0); 
+		GetPoint(xTA, xTB, 0.0, TA, 0);
+
+		GetPoint(xLA, xLB, 1.0, LB, 0);
+		GetPoint(xTA, xTB, 1.0, TB, 0);
+
+		if (m_pFoilA && m_pFoilB)
+		{
+			//create bottom surface side points
+			zA = m_pFoilA->GetLowerY(xLA)*chordA;
+			zB = m_pFoilB->GetLowerY(xLB)*chordB;
+			SideA_B[l+1]   = LA + NormalA * zA/cosdA;
+			SideB_B[l+1]   = LB + NormalB * zB/cosdB;
+
+			//create top surface side points
+			zA = m_pFoilA->GetUpperY(xLA)*chordA;
+			zB = m_pFoilB->GetUpperY(xLB)*chordB;
+			SideA_T[l+1] = LA + NormalA * zA/cosdA;
+			SideB_T[l+1] = LB + NormalB * zB/cosdB;
+
+			//create middle surface side points
+
+			zA = m_pFoilA->GetMidY(xLA)*chordA;
+			zB = m_pFoilB->GetMidY(xLB)*chordB;
+			SideA[l+1]   = LA + NormalA * zA/cosdA;
+			SideB[l+1]   = LB + NormalB * zB/cosdB;
+
+
+			if(l==0)
+			{
+				zA = m_pFoilA->GetLowerY(xTA)*chordA;
+				zB = m_pFoilB->GetLowerY(xTB)*chordB;
+				SideA_B[0] = TA + NormalA * zA/cosdA;
+				SideB_B[0] = TB + NormalB * zB/cosdB;
+
+				zA = m_pFoilA->GetUpperY(xTA)*chordA;
+				zB = m_pFoilB->GetUpperY(xTB)*chordB;
+				SideA_T[0] = TA + NormalA * zA/cosdA;
+				SideB_T[0] = TB + NormalB * zB/cosdB;
+
+				zA = m_pFoilA->GetMidY(xTA)*chordA;
+				zB = m_pFoilB->GetMidY(xTB)*chordB;
+				SideA[0]   = TA + NormalA * zA/cosdA;
+				SideB[0]   = TB + NormalB * zB/cosdB;
+			}
+		}
+		else
+		{
+			SideA[l+1]   = LA;
+			SideB[l+1]   = LB;
+			SideA_T[l+1] = LA;
+			SideB_T[l+1] = LB;
+			SideA_B[l+1] = LA;
+			SideB_B[l+1] = LB;
+			if(l==0)
+			{
+				SideA[0]   = LA;
+				SideB[0]   = LB;
+				SideA_T[0] = LA;
+				SideB_T[0] = LB;
+				SideA_B[0] = LA;
+				SideB_B[0] = LB;
+			}
+		}
+
+		if(pBody && m_bIsCenterSurf && m_bIsLeftSurf)
+		{
+			if(pBody->Intersect(SideA_B[l+1], SideB_B[l+1], SideB_B[l+1], false)) m_bJoinRight = false;
+			if(pBody->Intersect(SideA_T[l+1], SideB_T[l+1], SideB_T[l+1], false)) m_bJoinRight = false;
+			if(pBody->Intersect(SideA[l+1],   SideB[l+1],   SideB[l+1],   false)) m_bJoinRight = false;
+		}
+
+		else if(pBody && m_bIsCenterSurf && m_bIsRightSurf)
+		{
+			pBody->Intersect(SideA_B[l+1], SideB_B[l+1], SideA_B[l+1], true);
+			pBody->Intersect(SideA_T[l+1], SideB_T[l+1], SideA_T[l+1], true);
+			pBody->Intersect(SideA[l+1],   SideB[l+1],     SideA[l+1], true);
+		}
+
+		if(l==0)
+		{
+			if(pBody && m_bIsCenterSurf && m_bIsLeftSurf)
+			{
+				if(pBody->Intersect(SideA_B[0], SideB_B[0], SideB_B[0], false)) m_bJoinRight = false;
+				if(pBody->Intersect(SideA_T[0], SideB_T[0], SideB_T[0], false)) m_bJoinRight = false;
+				if(pBody->Intersect(SideA[0],   SideB[0],   SideB[0],   false)) m_bJoinRight = false;;
+			}
+			else if(pBody && m_bIsCenterSurf && m_bIsRightSurf)
+			{
+				pBody->Intersect(SideA_B[0], SideB_B[0], SideA_B[0], true);
+				pBody->Intersect(SideA_T[0], SideB_T[0], SideA_T[0], true);
+				pBody->Intersect(SideA[0],   SideB[0],     SideA[0], true);
+			}
+		}
+	}
+}
+
+void CSurface::GetLeadingPt(int k, CVector &C)
+{
+	GetPanel(k,m_NXPanels-1, 0);
+
+	C.x    = (LA.x+LB.x)/2.0;
+	C.y    = (LA.y+LB.y)/2.0;
+	C.z    = (LA.z+LB.z)/2.0;
+}
+
+void CSurface::GetTrailingPt(int k, CVector &C)
+{
+	GetPanel(k,0,0);
+
+	C.x    = (TA.x+TB.x)/2.0;
+	C.y    = (TA.y+TB.y)/2.0;
+	C.z    = (TA.z+TB.z)/2.0;
+}
+
+
+double CSurface::GetStripSpanPos(int k)
+{
+	int  l;
+	double YPos = 0.0;
+	double ZPos = 0.0;
+	//get average span position of the strip
+	// necessary for strips 'distorted' by fuselage;
+
+	for(l=0; l<m_NXPanels; l++)
+	{
+		GetPanel(k,l, 0);
+		YPos += (LA.y+LB.y+TA.y+TB.y)/4.0;
+		ZPos += (LA.z+LB.z+TA.z+TB.z)/4.0;
+	}
+
+	YPos /= m_NXPanels;
+	ZPos /= m_NXPanels;
+	
+	YPos -= (m_LA.y + m_TA.y)/2.0;
+	ZPos -= (m_LA.z + m_TA.z)/2.0;
+
+	return sqrt(YPos*YPos+ZPos*ZPos);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

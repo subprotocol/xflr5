@@ -46,7 +46,7 @@ CEditListCtrl::~CEditListCtrl(void)
 {
 }
 BEGIN_MESSAGE_MAP(CEditListCtrl, CListCtrl)
-	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FOILLIST, OnEndLabelEdit)
+//	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FOILLIST, OnEndLabelEdit)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_RELIST2, OnEndLabelEdit)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_COORDLIST, OnEndLabelEdit)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_FRAMELIST, OnEndLabelEdit)
@@ -54,7 +54,7 @@ BEGIN_MESSAGE_MAP(CEditListCtrl, CListCtrl)
 	ON_WM_HSCROLL()
 	ON_WM_VSCROLL()
 	ON_WM_LBUTTONDOWN()
-	ON_WM_KEYDOWN()
+//	ON_WM_KEYDOWN()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_MOUSEWHEEL()
@@ -202,65 +202,7 @@ void CEditListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
-
-// ShowInPlaceList		- Creates an in-place drop down list for any 
-//				- cell in the list view control
-// Returns			- A temporary pointer to the combo-box control
-// nItem			- The row index of the cell
-// nCol				- The column index of the cell
-// lstItems			- A list of strings to populate the control with
-// nSel				- Index of the initial selection in the drop down list
-CComboBox* CEditListCtrl::ShowInPlaceList(int nItem, int nCol, 	CStringArray &strArray, int nSel)
-{
-	// The returned pointer should not be saved
-
-	// Make sure that the item is visible
-	if( !EnsureVisible( nItem, TRUE ) ) return NULL;
-
-	// Make sure that nCol is valid 
-	CHeaderCtrl* pHeader = (CHeaderCtrl*)GetDlgItem(0);
-	int nColumnCount = pHeader->GetItemCount();
-	if( nCol >= nColumnCount || GetColumnWidth(nCol) < 10 )
-		return NULL;
-
-	// Get the column offset
-	int offset = 0;
-	for( int i = 0; i < nCol; i++ )
-		offset += GetColumnWidth( i );
-
-	CRect rect;
-	GetItemRect( nItem, &rect, LVIR_BOUNDS );
-
-	// Now scroll if we need to expose the column
-	CRect rcClient;
-	GetClientRect( &rcClient );
-	if( offset + rect.left < 0 || offset + rect.left > rcClient.right )
-	{
-		CSize size;
-		size.cx = offset + rect.left;
-		size.cy = 0;
-		Scroll( size );
-		rect.left -= size.cx;
-	}
-
-	rect.left += offset+4;
-	rect.right = rect.left + GetColumnWidth( nCol ) - 3 ;
-	int height = rect.bottom-rect.top;
-	rect.bottom += 15*height;
-	if( rect.right > rcClient.right) rect.right = rcClient.right;
-
-	DWORD dwStyle = WS_BORDER|WS_CHILD|WS_VISIBLE|WS_VSCROLL
-					|CBS_DROPDOWNLIST|CBS_DISABLENOSCROLL;
-	CComboBox *pList = new CInPlaceList(this, nItem, nCol);
-	pList->Create( dwStyle, rect, this, IDC_IPEDIT );
-	pList->SetItemHeight( -1, height);
-	pList->SetHorizontalExtent( GetColumnWidth( nCol ));
-
-	return pList;
-}
-
-
-
+/*
 void CEditListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	SHORT sh1 = GetKeyState(VK_LCONTROL);
@@ -312,7 +254,7 @@ void CEditListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }
-
+*/
 BOOL CEditListCtrl::PreTranslateMessage(MSG* pMsg)
 {
 /*		if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
@@ -385,15 +327,12 @@ void CEditListCtrl::HighlightCell(int nItem, int nCol )
 
 	pDC->FillRect(rcHighlight, &CBrush(::GetSysColor(COLOR_HIGHLIGHT)));
 
-
-
 	// Draw hilghlighted item label - Column 0
 	rcLabel.left += offset/2;
 	rcLabel.right -= offset;
 
 	pDC->DrawText(sLabel,-1,rcLabel,DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP
 				| DT_VCENTER | DT_END_ELLIPSIS);
-
 
 	ReleaseDC(pDC);
 }
@@ -411,25 +350,25 @@ void CEditListCtrl::OnEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 
 	*pResult = FALSE;
 	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)plvDispInfo );
-
 }
+
 void CEditListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	int index;
 //	int CurSel = m_iItem;
 	CString strong;
-	CListCtrl::OnLButtonDown(nFlags, point);
+//	CListCtrl::OnLButtonDown(nFlags, point);
 
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)
 	{
-//		if(CurSel==index){
-			m_iSubItem = column;
+		m_iSubItem = column;
+		if(column>0){
 			UINT flag = LVIS_FOCUSED;
 			if( GetWindowLong(m_hWnd, GWL_STYLE) & LVS_EDITLABELS )
 				EditSubLabel(index, column);
-//		}
-//		else m_iItem = index;
+		}
+		else SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
 	}
 }
 
@@ -437,7 +376,6 @@ void CEditListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	int index;
 	CString strong;
-	CListCtrl::OnLButtonDown(nFlags, point);
 
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)

@@ -47,13 +47,14 @@ class CBodyCtrlBar : public CInitDialogBar
 protected:
 	CButton m_ctrlRadio1, m_ctrlRadio2;
 	CButton	m_ctrlBodyColor;
-	CButton	m_ctrlClosedSurface;
+	CButton m_ctrlLocked;
+	CStatic m_ctrlBodyArea;
 	CNumEdit m_ctrlnxPanels, m_ctrlnhPanels;
-	CComboBox m_ctrlSplineDegree;
+	CComboBox m_ctrlXDegree;
+	CComboBox m_ctrlHoopDegree;
 	CComboBox m_ctrlBodyList;
 	CEditListCtrl m_ctrlFrameList;
 	CEditListCtrl m_ctrlFramePoints;
-
 	// Operations
 public:
 
@@ -73,7 +74,7 @@ public:
 	public:
 private:
 	void FillFrameList();
-	void FillFrameCoord();
+	void FillPointList();
 	void UpdateBodies();
 	void UpdateBodyCtrls();
 	void ReSizeCtrls();
@@ -82,10 +83,11 @@ private:
 	void SetPointSel(int sel);
 	void SetFrame(int iFrame);
 	void SetPoint(int iPoint);
-	void ReadFrameData(int sel, double &x, double &z);
-	void ReadPointData(int sel, double &y, double &z);
+	void ReadFrameData(int sel, double &x, double &z, int &n);
+	void ReadPointData(int sel, double &y, double &z, int &n);
 	void OnUndo();
 	void OnRedo();
+	void SetColumnTitle();
 	void SetPicture();
 	void StorePicture();
 	void TakePicture();
@@ -109,8 +111,8 @@ protected:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnBodyColor();
-	afx_msg void OnNMClickFrameList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMClickFramePoint(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnNMClickFrameList(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnNMClickFramePoint(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnSelChangeBodyList();
 	afx_msg void OnLvnEndLabelEditFrameList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -120,11 +122,13 @@ protected:
 	afx_msg void OnInsertFrame();
 	afx_msg void OnDeleteFrame();
 	afx_msg void OnRadio();
-	afx_msg void OnClosedSurface();
 	afx_msg void OnSelChangeSplineDegree();
 	afx_msg void OnKillFocusPanels();
+	afx_msg void OnLocked();
 
 	DECLARE_MESSAGE_MAP()
 
 public:
+	afx_msg void OnLvnItemchangedFramelist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemchangedFramepoints(NMHDR *pNMHDR, LRESULT *pResult);
 };

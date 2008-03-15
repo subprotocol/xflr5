@@ -29,6 +29,7 @@
 #include "Surface.h"
 #include "Panel.h"
 #include "PanelListCtrl.h"
+#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CWing dialog
@@ -79,14 +80,13 @@ public:
 	CStatic	m_ctrlLength3;
 	CStatic	m_ctrlLength2;
 	CStatic	m_ctrlLength1;
+	CStatic m_ctrlTotal3DPanels;
 	CStatic	m_ctrlAeroChord;
 	CEdit	m_ctrlWingName;
 	CStatic	m_ctrlSpan;
 	CButton	m_ctrlCancel;
 	CButton	m_ctrlOK;
 	CNumEdit m_ctrlVLMPanels;
-//	CNumEdit m_ctrlnFlaps;
-	CFloatEdit m_ctrlSineFactor;
 	CStatic	m_ctrlMeanChord;
 	CStatic	m_ctrlTaperRatio;
 	CStatic	m_ctrlSurface;
@@ -115,18 +115,19 @@ protected:
 	CSurface m_Surface[MAXVLMSURFACES];//we can have three wings at a time, wing, elev, fin
 	double m_VLMQInf[100];
 
-	bool CreateSurfaces(CVector T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
+	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
 	bool VLMSetAutoMesh(int total = 0);
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
-	void VLMTrefftz(double *Gamma, double & Lift, double & Drag);
+	void VLMTrefftz(double *Gamma, int pos, double & Lift, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-						double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
+                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, 
+                        bool bViscous, bool bTilted);
 
 	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-							 double &Pm, double &Rm, double &IYm, double &GYm, bool bViscous);
-	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, double &Lift, double &Drag, bool bTilted);
+		                  double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
+	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, double &Lift, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelSetBending();
 
 	bool LLTInitialize();
@@ -141,7 +142,7 @@ protected:
 		               double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void Convert(bool bSet);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
-	void Getjkp(double y, int &j, int &k, int &p);
+//	void Getjkp(double y, int &j, int &k, int &p, bool b2Sides);
 	void DrawWing(CDC* pDC, CPoint O);
 	void DrawVLMMesh(CDC* pDC, CPoint O);
 	void DrawFoils(CDC* pDC, CPoint O);
@@ -182,9 +183,9 @@ protected:
 	double GetTwist(double y);
 	double GetZPos(double y);
 	double Getyrel(double SpanPos);
-	double GetViewZPos(double xrel, double y, int pos =0);
-	double GetTopz(double x, double y);
-	double GetBotz(double x, double y);
+//	double GetViewZPos(double xrel, double y, int pos =0);
+//	double GetTopz(double x, double y);
+//	double GetBotz(double x, double y);
 	double IntegralC2(double y1, double y2, double c1, double c2);
 	double IntegralCy(double y1, double y2, double c1, double c2);
 
@@ -210,7 +211,6 @@ protected:
 	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUpdateMeshFromTotal();
-	afx_msg void OnKillFocusSinefactor();
 
 //__________________________Variables_______________________
 
@@ -218,6 +218,8 @@ protected:
 	static CWnd* s_pMiarex;	//pointer to the Miarex Application window
 	static CWnd* s_pVLMDlg;	//pointer to the VLM analysis dialog class
 	static CWnd* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
+	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
+	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 	CString m_WingName;	//the wing's name
 
@@ -265,10 +267,6 @@ protected:
 	double m_CL;		//Lift
 	double m_InducedDrag, m_ViscousDrag;
 	double m_XCP, m_YCP;	// Centre of pressure's position
-	double m_PitchingMoment, m_VCm, m_GCm;// Total, Viscous, Geometric
-	double m_RollingMoment;
-	double m_IYm;		// Induced Yawing Moment
-	double m_GYm;		// Geometric Yawing Moment
 	double m_QInf;		// Freestream speed
 	double m_QInf0;		// Freestream speed for initial Type 2 analysis
 	double m_Weight;	// For type 2 analysis
@@ -278,12 +276,17 @@ protected:
 	double m_RelaxMax;	// relaxation factor for LLT convergence
 	double m_fWingScale;	// scale to display the wing in the dialog box
 	double m_XCmRef;	// the reference point position for moment calculations
-	double m_SineFactor;
 
-	int m_NXPanels[MAXPANELS]; 		// VLM Panels along chord, for each Wing Panel
-	int m_NYPanels[MAXPANELS]; 		// VLM Panels along span, for each Wing Panel
-	int m_XPanelDist[MAXPANELS];		// VLM Panel distribution type, for each Wing Panel
-	int m_YPanelDist[MAXPANELS];		// VLM Panel distribution type, for each Wing Panel
+
+	double m_VYm; 
+	double m_IYm;		// Induced Yawing Moment
+	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment
+
+
+	int m_NXPanels[MAXPANELS+1]; 		// VLM Panels along chord, for each Wing Panel
+	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
+	int m_XPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
+	int m_YPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
 	double m_TChord[MAXPANELS+1];		// Chord length at each panel side
 	double m_TLength[MAXPANELS+1];		// the length of each panel
 	double m_TPos[MAXPANELS+1];		// b-position of each panel end on developed surface
@@ -300,7 +303,7 @@ protected:
 	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
 	double m_Cm[MAXSTATIONS+1];		//Pitching moment coefficient at stations
 	double m_CmAirf[MAXSTATIONS+1];		//Airfoil part of Pitching moment coefficient at stations
-	double m_CmGeom[MAXSTATIONS+1];		//Geometric part of Pitching moment coefficient at stations
+	double m_CmXRef[MAXSTATIONS+1];		//Geometric part of Pitching moment coefficient at stations
 	double m_XCPSpanRel[MAXSTATIONS+1];	//Center of Pressure pos at stations
 	double m_XCPSpanAbs[MAXSTATIONS+1];	//Center of Pressure pos at stations
 	double m_Re[MAXSTATIONS+1];		//Reynolds number at stations
@@ -309,6 +312,7 @@ protected:
 	double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
 	double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
 	double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
+	double m_StripArea[MAXSTATIONS+1];		
 	double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations
 	double m_SpanPos[MAXSTATIONS+1];	//span positions of LLT stations
 	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
@@ -316,13 +320,10 @@ protected:
 	int m_xDist[MAXCHORDPANELS];		//number of VLM panels between each flap hinge
 	int m_NHinges;				//number of different flap hinge positions across the wing
  
-	CVector m_GeomMoment[MAXSTATIONS+1];	//geometric pitching moment at stations
+//	CVector m_GeomMoment[MAXSTATIONS+1];	//geometric pitching moment at stations
 	
-	CVector *m_pNode;			//pointer to the VLM node array
 	CPanel *m_pPanel;			//pointer to the VLM Panel array
 
-	CVector *m_pWakeNode;			//pointer to the VLM wake node array
-	CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 	CStringArray m_RFoil;			// name of the right foils
 	CStringArray m_LFoil;			// name of the left foils

@@ -44,24 +44,25 @@ CGLLight::CGLLight(CWnd* pParent /*=NULL*/)
 	m_bDepthTest = true;
 	m_bColorMaterial = true;
 
+
 	m_Red   = 1.0f;
 	m_Green = 1.0f;
 	m_Blue  = 1.0f;
 
 	m_Ambient      = 0.25f;
-	m_Diffuse      = 0.20f;
-	m_Specular     = 0.5f;
+	m_Diffuse      = 0.58f;
+	m_Specular     = 0.05f;
 
-	m_MatAmbient   = 0.1f;
-	m_MatDiffuse   = 0.23f;
-	m_MatSpecular  = 0.18f;
-	m_MatEmission  = 0.0f;
-
+	m_MatAmbient   = -0.51f;
+	m_MatDiffuse   = -0.43f;
+	m_MatSpecular  = -0.08f;
+	m_MatEmission  = -0.04f;
 	m_iMatShininess = 0;
 
-	m_XLight   =  0.20f;
-	m_YLight   =  0.44f;
-	m_ZLight   =  0.24f;
+	m_XLight   =  0.56f;
+	m_YLight   =  0.02f;
+	m_ZLight   =  0.68f;
+
 }
 
 
@@ -298,18 +299,18 @@ void CGLLight::OnDefaults()
 	m_Blue  = 1.0f;
 
 	m_Ambient      = 0.25f;
-	m_Diffuse      = 0.20f;
-	m_Specular     = 0.5f;
+	m_Diffuse      = 0.58f;
+	m_Specular     = 0.05f;
 
-	m_MatAmbient   = 0.1f;
-	m_MatDiffuse   = 0.23f;
-	m_MatSpecular  = 0.18f;
-	m_MatEmission  = 0.0f;
+	m_MatAmbient   = -0.51f;
+	m_MatDiffuse   = -0.43f;
+	m_MatSpecular  = -0.08f;
+	m_MatEmission  = -0.04f;
 	m_iMatShininess = 0;
 
-	m_XLight   =  0.20f;
-	m_YLight   =  0.44f;
-	m_ZLight   =  0.24f;
+	m_XLight   =  0.56f;
+	m_YLight   =  0.02f;
+	m_ZLight   =  0.68f;
 
 	SetParams();
 
@@ -351,7 +352,7 @@ void CGLLight::ReadParams(void)
 	if(m_ctrlDepthTest.GetCheck())		m_bDepthTest = true;
 	else								m_bDepthTest = false;
 
-	float factor = 50.0f;
+	float factor = 50.0f; 
 	m_XLight  = ((float)m_ctrlXLight.GetPos()-50.0f)/factor;
 	m_YLight  = ((float)m_ctrlYLight.GetPos()-50.0f)/factor;
 	m_ZLight  = ((float)m_ctrlZLight.GetPos()-50.0f)/factor;

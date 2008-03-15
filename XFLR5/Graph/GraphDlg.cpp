@@ -127,7 +127,7 @@ void CGraphDlg::OnApply()
 		m_pGraph->SetAutoX(false);
 		m_pGraph->SetXMin(m_XMin);
 		m_pGraph->SetXMax(m_XMax);
-		if(m_XUnit<=0.0001f) m_XUnit = (double)fabs((m_XMax-m_XMin)/2.f);
+		if(m_XUnit<=0.0001f) m_XUnit = abs((m_XMax-m_XMin)/2.0);
 		m_pGraph->SetXUnit(m_XUnit);
 		m_pGraph->SetX0(m_X0);
 	}
@@ -139,7 +139,7 @@ void CGraphDlg::OnApply()
 		m_pGraph->SetAutoY(false);
 		m_pGraph->SetYMin(m_YMin);
 		m_pGraph->SetYMax(m_YMax);
-		if(m_YUnit<=0.0001f) m_YUnit = (double)fabs((m_YMax-m_YMin)/2.f);
+		if(m_YUnit<=0.0001f) m_YUnit = abs((m_YMax-m_YMin)/2.0);
 		m_pGraph->SetYUnit(m_YUnit);
 		m_pGraph->SetY0(m_Y0);
 	}
@@ -173,7 +173,7 @@ BOOL CGraphDlg::OnInitDialog()
 	SetFontPage();
 
 	int page = GetGraphDlgPage();
-	if(page<m_pGraphSheet->GetPageCount())	m_pGraphSheet->SetActivePage(page);
+	if(page<m_GraphSheet.GetPageCount())	m_GraphSheet.SetActivePage(page);
 
 	Invalidate(true);
 	GetDlgItem(IDOK)->SetFocus();
@@ -208,38 +208,22 @@ int CGraphDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_LabelFontColor = m_pGraph->GetLabelColor();
 	m_LegendFontColor = m_pGraph->GetLegendColor();
 
-	m_pGraphSheet = new CPropertySheet;
-	m_pScalePage  = new CScalePage(this);
-	m_pGridPage   = new CGridPage(this);
-	m_pFontPage   = new CFontPage(this);
-	m_pBackPage   = new CBackPage(this);
-	if (!m_pGraphSheet ||
-		!m_pScalePage  ||
-		!m_pGridPage   ||
-		!m_pFontPage   || 
-		!m_pScalePage){
-		if(m_pGraphSheet) delete m_pGraphSheet;
-		if(m_pScalePage) delete m_pScalePage;
-		if(m_pBackPage)	delete m_pBackPage;
-		if(m_pFontPage) delete m_pFontPage;
-		if(m_pGridPage) delete m_pGridPage;
-		return -1;
-	}
 	
-	m_pGraphSheet->AddPage(m_pScalePage);
-	m_pGraphSheet->AddPage(m_pGridPage);
-	m_pGraphSheet->AddPage(m_pFontPage);
-	m_pGraphSheet->AddPage(m_pBackPage);
+	m_GraphSheet.AddPage(&m_ScalePage);
+	m_GraphSheet.AddPage(&m_GridPage);
+	m_GraphSheet.AddPage(&m_FontPage);
+	m_GraphSheet.AddPage(&m_BackPage);
 
+	m_ScalePage.m_pParent = this;
+	m_GridPage.m_pParent = this;
+	m_FontPage.m_pParent = this;
+	m_BackPage.m_pParent = this;
 
-	if(!m_pGraphSheet->Create(this, WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-							  WS_EX_CONTROLPARENT)){
-		delete m_pGraphSheet;
-		m_pGraphSheet = NULL;
-		return -1;
-	}
+	m_GraphSheet.Create(this, WS_CHILD | WS_VISIBLE, 0);
+	m_GraphSheet.ModifyStyleEx (0, WS_EX_CONTROLPARENT);
+	m_GraphSheet.ModifyStyle(0, WS_TABSTOP );
 
-	CTabCtrl *pTabCtrl = m_pGraphSheet->GetTabControl();
+	CTabCtrl *pTabCtrl = m_GraphSheet.GetTabControl();
 	TCITEM tc;
 	tc.mask = TCIF_TEXT;
 
@@ -253,11 +237,11 @@ int CGraphDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	pTabCtrl->SetItem(3, &tc);
 
 	CRect rectClient;
-	m_pGraphSheet->GetWindowRect(rectClient);
+	m_GraphSheet.GetWindowRect(rectClient);
 
-	m_pGraphSheet->SetWindowPos(NULL, 10, 10,
-		rectClient.Width(), rectClient.Height(),
-		SWP_NOZORDER | SWP_NOACTIVATE);
+	m_GraphSheet.SetWindowPos(NULL, 10, 10,
+                              rectClient.Width(), rectClient.Height(),
+							  SWP_NOZORDER | SWP_NOACTIVATE);
 
 	return 0;
 }
@@ -269,59 +253,59 @@ void CGraphDlg::SetBackPage()
 	m_crBorder = m_pGraph->GetBorderColor();
 	m_bBorder  = m_pGraph->GetBorder();
 	
-	m_pBackPage->m_bBorder     = m_bBorder;
-	m_pBackPage->m_BorderClr   = m_crBorder;
-	m_pBackPage->m_GraphClr    = m_crBack;
-	m_pBackPage->m_BorderStyle = m_pGraph->GetBorderStyle();
-	m_pBackPage->m_BorderWidth = m_pGraph->GetBorderWidth();
+	m_BackPage.m_bBorder     = m_bBorder;
+	m_BackPage.m_BorderClr   = m_crBorder;
+	m_BackPage.m_GraphClr    = m_crBack;
+	m_BackPage.m_BorderStyle = m_pGraph->GetBorderStyle();
+	m_BackPage.m_BorderWidth = m_pGraph->GetBorderWidth();
 }
 
 
 void CGraphDlg::SetGridPage()
 {
 
-	m_pGridPage->m_pGraph = m_pGraph;
+	m_GridPage.m_pGraph = m_pGraph;
 
 	m_crColor = m_pGraph->GetAxisColor();
 	m_nStyle  = m_pGraph->GetAxisStyle();
 	m_nWidth  = m_pGraph->GetAxisWidth();
-	m_pGridPage->SetAxisStyle(m_crColor, m_nStyle, m_nWidth);
+	m_GridPage.SetAxisStyle(m_crColor, m_nStyle, m_nWidth);
 
 	bool bstate;
 	m_pGraph->GetXMajGrid (&bstate, &m_XMClr, &m_XMStyle, &m_XMWidth);
-	m_pGridPage->SetXMajGrid(bstate,m_XMClr,m_XMStyle,m_XMWidth);
+	m_GridPage.SetXMajGrid(bstate,m_XMClr,m_XMStyle,m_XMWidth);
 	m_pGraph->GetYMajGrid (&bstate, &m_YMClr, &m_YMStyle, &m_YMWidth);
-	m_pGridPage->SetYMajGrid(bstate,m_YMClr,m_YMStyle,m_YMWidth);
+	m_GridPage.SetYMajGrid(bstate,m_YMClr,m_YMStyle,m_YMWidth);
 
 
 	m_pGraph->GetXMinGrid (&bstate, &m_bXAutoMin, &m_XMinClr, &m_XMinStyle, &m_XMinWidth, &m_XMinorUnit);
-	m_pGridPage->SetXMinGrid(bstate,m_bXAutoMin, m_XMinClr,m_XMinStyle,m_XMinWidth,m_XMinorUnit);
+	m_GridPage.SetXMinGrid(bstate,m_bXAutoMin, m_XMinClr,m_XMinStyle,m_XMinWidth,m_XMinorUnit);
 	m_pGraph->GetYMinGrid (&bstate, &m_bYAutoMin, &m_YMinClr, &m_YMinStyle, &m_YMinWidth, &m_YMinorUnit);
-	m_pGridPage->SetYMinGrid(bstate,m_bYAutoMin, m_YMinClr,m_YMinStyle,m_YMinWidth,m_YMinorUnit);
+	m_GridPage.SetYMinGrid(bstate,m_bYAutoMin, m_YMinClr,m_YMinStyle,m_YMinWidth,m_YMinorUnit);
 
 }
 
 void CGraphDlg::SetScalePage()
 {
-	m_pScalePage->m_pGraph = m_pGraph;
+	m_ScalePage.m_pGraph = m_pGraph;
 	m_bAutoX = m_pGraph->GetAutoX();
-	m_pScalePage->m_bAutoX = m_bAutoX;
+	m_ScalePage.m_bAutoX = m_bAutoX;
 	m_bAutoY = m_pGraph->GetAutoY();
-	m_pScalePage->m_bAutoY = m_bAutoY;
+	m_ScalePage.m_bAutoY = m_bAutoY;
 	m_bYInverted = m_pGraph->GetInverted();
-	m_pScalePage->m_bYInverted = m_bYInverted;
-	m_pScalePage->SetValues();
+	m_ScalePage.m_bYInverted = m_bYInverted;
+	m_ScalePage.SetValues();
 }
 
 
 void CGraphDlg::SetFontPage()
 {
-	memcpy(&m_pFontPage->m_TitleLogFont, &m_TitleLogFont, sizeof(LOGFONT));
-	memcpy(&m_pFontPage->m_LabelLogFont, &m_LabelLogFont, sizeof(LOGFONT));
-	memcpy(&m_pFontPage->m_LegendLogFont, &m_LegendLogFont, sizeof(LOGFONT));
-	m_pFontPage->m_TitleFontColor = m_TitleFontColor;
-	m_pFontPage->m_LabelFontColor = m_LabelFontColor;
-	m_pFontPage->m_LegendFontColor = m_LegendFontColor;
+	memcpy(&m_FontPage.m_TitleLogFont, &m_TitleLogFont, sizeof(LOGFONT));
+	memcpy(&m_FontPage.m_LabelLogFont, &m_LabelLogFont, sizeof(LOGFONT));
+	memcpy(&m_FontPage.m_LegendLogFont, &m_LegendLogFont, sizeof(LOGFONT));
+	m_FontPage.m_TitleFontColor = m_TitleFontColor;
+	m_FontPage.m_LabelFontColor = m_LabelFontColor;
+	m_FontPage.m_LegendFontColor = m_LegendFontColor;
 }
 
 
@@ -330,93 +314,88 @@ void CGraphDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 	
-	SetGraphDlgPage(m_pGraphSheet->GetActiveIndex());
- 	delete m_pGraphSheet;
-	delete m_pScalePage;
-	delete m_pFontPage;
-	delete m_pGridPage;
-	delete m_pBackPage;
+	SetGraphDlgPage(m_GraphSheet.GetActiveIndex());
 }
 
 
 void CGraphDlg::GetScalePage()
 {
-	m_XMin   = m_pScalePage->m_ctrlXMin.GetValue();
-	m_XMax   = m_pScalePage->m_ctrlXMax.GetValue();
-	m_XUnit  = m_pScalePage->m_ctrlXUnit.GetValue();
-	m_X0     = m_pScalePage->m_ctrlX0.GetValue();
-	m_YMin   = m_pScalePage->m_ctrlYMin.GetValue();
-	m_YMax   = m_pScalePage->m_ctrlYMax.GetValue();
-	m_YUnit  = m_pScalePage->m_ctrlYUnit.GetValue();
-	m_Y0     = m_pScalePage->m_ctrlY0.GetValue();
-	m_bAutoX = m_pScalePage->m_bAutoX;
-	m_bAutoY = m_pScalePage->m_bAutoY;
-	m_bYInverted = m_pScalePage->m_bYInverted;
+	m_XMin   = m_ScalePage.m_ctrlXMin.GetValue();
+	m_XMax   = m_ScalePage.m_ctrlXMax.GetValue();
+	m_XUnit  = m_ScalePage.m_ctrlXUnit.GetValue();
+	m_X0     = m_ScalePage.m_ctrlX0.GetValue();
+	m_YMin   = m_ScalePage.m_ctrlYMin.GetValue();
+	m_YMax   = m_ScalePage.m_ctrlYMax.GetValue();
+	m_YUnit  = m_ScalePage.m_ctrlYUnit.GetValue();
+	m_Y0     = m_ScalePage.m_ctrlY0.GetValue();
+	m_bAutoX = m_ScalePage.m_bAutoX;
+	m_bAutoY = m_ScalePage.m_bAutoY;
+	m_bYInverted = m_ScalePage.m_bYInverted;
 
-	double XRange = (double)fabs(m_XMax-m_XMin);
-	m_XUnit = (double) fabs(m_XUnit);
-	if(m_XUnit < XRange/50.f) m_XUnit = XRange/50.f;
+	double XRange = abs(m_XMax-m_XMin);
+	m_XUnit = abs(m_XUnit);
+	if(m_XUnit < XRange/50.0) m_XUnit = XRange/50.0;
 
-	double YRange = (double)fabs(m_YMax-m_YMin);
-	m_YUnit = (double) fabs(m_YUnit);
-	if(m_YUnit < YRange/50.f) m_YUnit = YRange/50.f;
+	double YRange = abs(m_YMax-m_YMin);
+	m_YUnit = abs(m_YUnit);
+	if(m_YUnit < YRange/50.0) m_YUnit = YRange/50.0;
 }
 
 void CGraphDlg::GetBackPage()
 {
 
-	m_crBack = m_pBackPage->m_GraphClr;
-	m_crBorder = m_pBackPage->m_BorderClr;
-	m_bBorder = m_pBackPage->m_bBorder;
-	m_BorderWidth = m_pBackPage->m_BorderWidth;
-	m_BorderStyle = m_pBackPage->m_BorderStyle;
+	m_crBack = m_BackPage.m_GraphClr;
+	m_crBorder = m_BackPage.m_BorderClr;
+	m_bBorder = m_BackPage.m_bBorder;
+	m_BorderWidth = m_BackPage.m_BorderWidth;
+	m_BorderStyle = m_BackPage.m_BorderStyle;
 }
 
 
 void CGraphDlg::GetGridPage()
 {
-	m_XMinorUnit = m_pGridPage->m_XMinorUnit;
-	m_YMinorUnit = m_pGridPage->m_YMinorUnit;
+	m_XMinorUnit = m_GridPage.m_XMinorUnit;
+	m_YMinorUnit = m_GridPage.m_YMinorUnit;
 
 	if(m_XMinorUnit>m_XUnit) m_XMinorUnit = m_XUnit/2.f;// why not ?
 	if(m_YMinorUnit>m_YUnit) m_YMinorUnit = m_YUnit/2.f;
 
-	m_crColor = m_pGridPage->m_crColor;
-	m_nStyle  = m_pGridPage->m_nStyle;
-	m_nWidth  = m_pGridPage->m_nWidth;
+	m_crColor = m_GridPage.m_crColor;
+	m_nStyle  = m_GridPage.m_nStyle;
+	m_nWidth  = m_GridPage.m_nWidth;
 	
-	m_XMClr   = m_pGridPage->m_XMClr;
-	m_XMStyle = m_pGridPage->m_XMStyle;
-	m_XMWidth = m_pGridPage->m_XMWidth;
-	if(m_pGridPage->m_bXM)m_bXMGrid=true; else m_bXMGrid=false;
-	m_bXAutoMin = m_pGridPage->m_bAutoXMinUnit;
+	m_XMClr   = m_GridPage.m_XMClr;
+	m_XMStyle = m_GridPage.m_XMStyle;
+	m_XMWidth = m_GridPage.m_XMWidth;
+	if(m_GridPage.m_bXM)m_bXMGrid=true; else m_bXMGrid=false;
+	m_bXAutoMin = m_GridPage.m_bAutoXMinUnit;
 
-	m_YMClr   = m_pGridPage->m_YMClr;
-	m_YMStyle = m_pGridPage->m_YMStyle;
-	m_YMWidth = m_pGridPage->m_YMWidth;
-	if(m_pGridPage->m_bYM)m_bYMGrid=true; else m_bYMGrid=false;
-	m_bYAutoMin = m_pGridPage->m_bAutoYMinUnit;
+	m_YMClr   = m_GridPage.m_YMClr;
+	m_YMStyle = m_GridPage.m_YMStyle;
+	m_YMWidth = m_GridPage.m_YMWidth;
+	if(m_GridPage.m_bYM)m_bYMGrid=true; else m_bYMGrid=false;
+	m_bYAutoMin = m_GridPage.m_bAutoYMinUnit;
 
-	m_XMinClr   = m_pGridPage->m_XMinClr;
-	m_XMinStyle = m_pGridPage->m_XMinStyle;
-	m_XMinWidth = m_pGridPage->m_XMinWidth;
-	m_XMinorUnit  = m_pGridPage->m_XMinorUnit;
-	if(m_pGridPage->m_bXMin)m_bXMinGrid=true; else m_bXMinGrid=false;
-	m_YMinClr   = m_pGridPage->m_YMinClr;
-	m_YMinStyle = m_pGridPage->m_YMinStyle;
-	m_YMinWidth = m_pGridPage->m_YMinWidth;
-	m_YMinorUnit  = m_pGridPage->m_YMinorUnit;
-	if(m_pGridPage->m_bYMin)m_bYMinGrid=true; else m_bYMinGrid=false;
+	m_XMinClr   = m_GridPage.m_XMinClr;
+	m_XMinStyle = m_GridPage.m_XMinStyle;
+	m_XMinWidth = m_GridPage.m_XMinWidth;
+	m_XMinorUnit  = m_GridPage.m_XMinorUnit;
+	if(m_GridPage.m_bXMin)m_bXMinGrid=true; else m_bXMinGrid=false;
+	m_YMinClr   = m_GridPage.m_YMinClr;
+	m_YMinStyle = m_GridPage.m_YMinStyle;
+	m_YMinWidth = m_GridPage.m_YMinWidth;
+	m_YMinorUnit  = m_GridPage.m_YMinorUnit;
+	if(m_GridPage.m_bYMin)m_bYMinGrid=true; else m_bYMinGrid=false;
 }
 
 void CGraphDlg::GetFontPage()
 {
-	memcpy(&m_TitleLogFont, &m_pFontPage->m_TitleLogFont, sizeof(LOGFONT));
-	memcpy(&m_LabelLogFont, &m_pFontPage->m_LabelLogFont, sizeof(LOGFONT));
-	memcpy(&m_LegendLogFont, &m_pFontPage->m_LegendLogFont, sizeof(LOGFONT));
-	m_TitleFontColor = m_pFontPage->m_TitleFontColor;
-	m_LabelFontColor = m_pFontPage->m_LabelFontColor;
-	m_LegendFontColor = m_pFontPage->m_LegendFontColor;	
+	memcpy(&m_TitleLogFont, &m_FontPage.m_TitleLogFont, sizeof(LOGFONT));
+	memcpy(&m_LabelLogFont, &m_FontPage.m_LabelLogFont, sizeof(LOGFONT));
+	memcpy(&m_LegendLogFont, &m_FontPage.m_LegendLogFont, sizeof(LOGFONT));
+	m_TitleFontColor = m_FontPage.m_TitleFontColor;
+	m_LabelFontColor = m_FontPage.m_LabelFontColor;
+	m_LegendFontColor = m_FontPage.m_LegendFontColor;	
 }
 
 
@@ -424,7 +403,8 @@ BOOL CGraphDlg::PreTranslateMessage(MSG* pMsg)
 {
 	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN)){
 		CWnd* ppp = GetFocus();
-		if (ppp == GetDlgItem(IDC_APPLY) )	{
+		if (ppp == GetDlgItem(IDC_APPLY) )	
+		{
 			OnApply();
 			m_ctrlOK.SetFocus();
 			return true;

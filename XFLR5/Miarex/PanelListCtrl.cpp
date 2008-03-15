@@ -51,7 +51,6 @@ CPanelListCtrl::~CPanelListCtrl(void)
 BEGIN_MESSAGE_MAP(CPanelListCtrl, CListCtrl)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PANELLIST, OnEndLabelEdit)
 	ON_WM_HSCROLL()
-	ON_WM_KEYDOWN()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDBLCLK()
@@ -298,7 +297,8 @@ void CPanelListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 {
 	// The returned pointer should not be saved
-	int i;
+	int i, sel;
+	sel = 0;
 
 	// Make sure that the item is visible
 	if( !EnsureVisible( nItem, TRUE ) ) return NULL;
@@ -344,7 +344,7 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 		pList->SetItemHeight( -1, height);
 		pList->SetHorizontalExtent( GetColumnWidth( nCol));
 		for (i=0; i<m_strList.GetSize();i++) pList->AddString(m_strList[i]);
-		int sel = 0;
+		sel = 0;
 		CString text = GetItemText(nItem, nCol);
 		for (i=0; i<m_strList.GetSize(); i++){
 			if(text==m_strList.GetAt(i)){
@@ -364,7 +364,6 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 
 			pList->AddString("Uniform");
 			pList->AddString("Cosine");
-			int sel;
 			CString text = GetItemText(nItem, nCol);
 			if (text=="Uniform")	sel = 0;
 			else if(text=="Cosine")	sel = 1;
@@ -382,7 +381,6 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 			pList->AddString("Cosine");
 			pList->AddString("Sine");
 			pList->AddString("-Sine");
-			int sel;
 			CString text = GetItemText(nItem, nCol);
 			if (text=="Uniform")	sel = 0;
 			else if(text=="Cosine")	sel = 1;
@@ -413,58 +411,6 @@ void CPanelListCtrl::OnEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 }
 
 
-void CPanelListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
-{
-	SHORT sh1 = GetKeyState(VK_LCONTROL);
-	SHORT sh2 = GetKeyState(VK_RCONTROL);
-	POSITION pos = GetFirstSelectedItemPosition();
-	int iItem = GetNextSelectedItem(pos);
-//	int iSubItem = GetSelectedColumn();
-	int iSubItem = m_iSubItem;
-
-	switch (nChar)
-	{
-	case VK_UP :
-		{
-			if (iItem > 0)
-				EditSubLabel (iItem - 1, iSubItem);
-			return;
-		}
-	case VK_DOWN :
-		{
-			EditSubLabel (iItem + 1, iSubItem);
-			return;
-		}
-	case VK_LEFT :
-		{
-			if (iSubItem > 0)
-				EditSubLabel (iItem, iSubItem-1);
-			return;
-		}
-	case VK_RIGHT :
-		{
-			if (iSubItem < m_nColumns)
-				EditSubLabel (iItem , iSubItem+ 1);
-			return;
-		}
-	case VK_HOME :
-		{
-			if ((sh1 & 0x8000)||(sh2 & 0x8000)){
-				EditSubLabel (0, iSubItem);
-				return;
-			}
-		}
-	case VK_END :
-		{
-			if ((sh1 & 0x8000)||(sh2 & 0x8000)){
-				int Count = GetItemCount() - 1;
-				EditSubLabel (Count, iSubItem);
-				return;
-			}
-		}
-	}
-	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
-}
 
 BOOL CPanelListCtrl::PreTranslateMessage(MSG* pMsg)
 {

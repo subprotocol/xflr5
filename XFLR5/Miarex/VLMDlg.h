@@ -71,16 +71,19 @@ public:
 	void AddString(CString strong);
 	void SetFileHeader();
 	void EndSequence();
-	void VLMRotateGeomY(double Angle, CVector P);
+
 	bool VLMCreateRHS(double V0, double VDelta, int nval);
 	bool VLMCreateMatrix();
 	bool VLMSolveMultiple(double V0, double VDelta, int nval);
-	void VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V, bool bAll, bool bGround = false, double Height = 0.0);
+
+	void VLMRotateGeomY(double Angle, CVector P);
+	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 	void VLMSetAi(double *Gamma);
+	void VLMSumForces(double *Gamma, double Alpha, double QInf, double &Lift, double &Drag);
 	void VLMComputePlane(double V0, double VDelta, int nrhs);
 	void VLMSetDownwash(double *Gamma);
-	void VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll=true);
-	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
+	void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool bAll=true);
+	void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V);
 	void ResetWakeNodes();
 	void RelaxWake();
 	bool Gauss(double *A, int n, double *B, int m);
@@ -98,7 +101,8 @@ protected:
 	bool m_bConverged;
 	bool m_bCancel;
 	bool m_bPointOut;
- 
+ 	bool m_bTrefftz;
+
 	int m_MatSize;
 	int m_nNodes;
 	int m_NSurfaces;
@@ -121,12 +125,13 @@ protected:
 //	double m_ICd[MAXSTATIONS];
 	double m_CL, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
-	double m_TCm, m_GCm, m_VCm;
-	double m_Rm;
-	double m_GYm, m_IYm;
 	double Omega;
 	double ftmp;
 	double *m_pCoreSize;
+
+	double m_VCm,m_VYm; //Viscous moments
+	double m_IYm;		// Induced Yawing Moment
+	double m_GCm, m_GRm, m_GYm;		// Geometric Moments
 
 	CString m_strOut;
 	CString m_VersionName;
@@ -156,7 +161,7 @@ protected:
 	CWing *m_pFin;
 	CWPolar *m_pWPolar;
 
-	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, VG;
+	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, CG, VG;
 	CVector Far;
 	CVector r0, r1, r2;
 	CVector h,t;

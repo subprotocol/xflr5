@@ -49,7 +49,8 @@ private:
 	bool m_bShowPoints;	// true if the curve' points should be displayed in the WOpp graphs
 	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
 	bool m_bVLM1;		// true if the WOpp is the result to a classic VLM calculation
-//	bool m_bMiddle;		// true if the WOpp is the results of a calculation on the middle surface
+	bool m_bThinSurface;// true if the WOpp is the results of a calculation on the middle surface
+	bool m_bTiltedGeom;	// true if the WOpp is the results of a calculation on the tilted geometry
 
 	int m_Style;		//WOpp display style
 	int m_Width;
@@ -74,6 +75,7 @@ private:
 	double m_MAChord;
 	double m_Chord[MAXSTATIONS+1];		// chord at stations
 	double m_SpanPos[MAXSTATIONS+1];	// station spanwise positions
+	double m_StripArea[MAXSTATIONS+1];	
 	double m_Twist[MAXSTATIONS+1];		// twist at span stations
 
 	//RESULTS
@@ -84,7 +86,7 @@ private:
 	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
 	double m_Cm[MAXSTATIONS+1];		//Pitching moment coefficient at stations
 	double m_CmAirf[MAXSTATIONS+1];		//Pitching moment coefficient at stations
-	double m_CmGeom[MAXSTATIONS+1];		//Pitching moment coefficient at stations
+	double m_CmXRef[MAXSTATIONS+1];		//Pitching moment coefficient at stations
 	double m_XCPSpanRel[MAXSTATIONS+1];	//Centre of pressure position at stations
 	double m_XCPSpanAbs[MAXSTATIONS+1];	//Centre of pressure position at stations
 	double m_XTrTop[MAXSTATIONS+1];		// Transition location - top
@@ -94,18 +96,21 @@ private:
 	double m_G[VLMMATSIZE];			// vortice or doublet strengths
 	double m_Sigma[VLMMATSIZE];		// source strengths
 	double m_FlapMoment[20]; 		// flap hinge moments
-	CVector m_F[MAXSTATIONS];		// Stripforce
-	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge
+
 	double m_CL;				// Wing lift coefficient
 	double m_ViscousDrag;			// wing viscous drag
 	double m_InducedDrag;			// wing induced drag
-	double m_PitchingMoment;		// wing pitching moment
-	double m_VCm, m_GCm;			// airfoil and geometric pitching moments
-	double m_RollingMoment;			// wing rolling moment
-	double m_InducedYawingMoment;		// wing induced yawing moment
+	double m_GCm;		// wing pitching moment
+	double m_GRm;			// wing rolling moment
 	double m_GYm;			// geometric yawing moment
+	double m_VYm;		// wing viscous yawing moment
+	double m_IYm;		// wing induced yawing moment
 	double m_MaxBending;		// max bending moment along the span
 	double m_XCP, m_YCP;		// centre of pressure position relative to the wing's XCref
+
+
+	CVector m_F[MAXSTATIONS];		// Stripforce
+	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge
 
 //________________METHODS____________________________________
 	bool SerializeWOpp(CArchive &ar);

@@ -1800,7 +1800,8 @@ void CAFoil::SetPicture()
 void CAFoil::OnUndo() 
 {
 	if(m_StackPos>0) {
-		if(m_StackPos == m_StackSize){
+		if(m_StackPos == m_StackSize)
+		{
 			//if we're at the first undo command, save current state
 			TakePicture();
 			StorePicture();//in case we redo
@@ -2300,8 +2301,8 @@ void CAFoil::DrawXMinGrid(CDC *pDC, double scalex, double scaley,
 	double xo = 0.0;
 	double xmin = 0.0;
 	double xmax = 1.0;
-	double ymin = -0.2f;
-	double ymax =  0.2f;
+	double ymin = -0.2;
+	double ymax =  0.2;
 
 	int YMin = max(int(ymin*scaley)+ Offset.y, dRect.top);
 	int YMax = min(int(ymax*scaley)+ Offset.y, dRect.bottom);

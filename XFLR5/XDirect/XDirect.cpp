@@ -47,6 +47,7 @@
 #include "EditFoilDlg.h"
 #include "NacaDlg.h"
 #include "XDirect.h"
+#include ".\xdirect.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -133,7 +134,6 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_NPLOT, OnNPlot)
 	ON_COMMAND(IDM_CTPLOT, OnCtPlot)
 	ON_COMMAND(IDM_RTPLOT, OnRtPlot)
-//	ON_COMMAND(IDC_FOILSTYLE, OnFoilStyle)
 	ON_COMMAND(IDM_LOAD, OnLoad)
 	ON_COMMAND(IDT_OPPS, OnOper)
 	ON_COMMAND(IDT_POLARS, OnPolars)
@@ -148,8 +148,8 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_HIDEFOILOPPS, OnHideFoilOpps)
 	ON_COMMAND(IDM_CPI, OnCpi)
 	ON_COMMAND(ID_CURRENTFOIL_MANAGEFOILS, OnManageFoils)
-//	ON_COMMAND(IDM_EXPORTXFOIL, OnExportResults)
 	ON_COMMAND(IDM_SHOWCPGRAPH, OnShowCpGraph)
+	ON_COMMAND(IDM_EXPORTCURRESULTS, OnExportCurrentResults)
 END_MESSAGE_MAP()
 
 
@@ -6980,8 +6980,7 @@ void CXDirect::OnDbPlot()
 	CheckMenu();
 	UpdateView();	
 }
-
-void CXDirect::OnExportResults()
+void CXDirect::OnExportCurrentResults()
 {
 	if(!m_pXFoil->lvconv) return;
 	if(!m_pCurFoil)		  return;
@@ -7583,3 +7582,4 @@ void CXDirect::OnShowCpGraph()
 	CheckMenu();
 	UpdateView();
 }
+

@@ -566,7 +566,20 @@ void CChildView::SetScale()
 
 BOOL CChildView::PreTranslateMessage(MSG* pMsg) 
 {
-	return CWnd ::PreTranslateMessage(pMsg);
+	CMainFrame * pFrame  = (CMainFrame*)m_pFrameWnd; 
+	if (pMsg->message == WM_KEYUP && pFrame->m_iApp==MIAREX)
+	{
+		if (pMsg->wParam == VK_CONTROL)
+		{
+			if(m_pMiarex->m_iView==3 || m_pMiarex->m_iView==5)
+			{
+				m_pMiarex->m_bArcball = false;
+				Invalidate();
+			}
+		}
+		return true;
+	}
+	else return CWnd ::PreTranslateMessage(pMsg);
 }
 
 
@@ -909,9 +922,9 @@ void CChildView::ApplyClrSettings(bool bBW, COLORREF WingPanels, COLORREF XCPCol
 
 	SetBlackAndWhite(bBW);
 
-	Invalidate();
-		
+	Invalidate();	
 }
+
 
 void CChildView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {

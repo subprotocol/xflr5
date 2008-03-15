@@ -38,7 +38,7 @@ CFlowLinesDlg::CFlowLinesDlg(CWnd* pParent /*=NULL*/)
 	m_pMiarex   = pParent;
 	m_pChildWnd = NULL;
 	m_pFrame    = NULL;
-	m_bLE       = false;
+	m_pos       = 0;
 	m_NX        =   30;
 	m_XFactor   = 1.10;
 	m_DeltaL    =  0.01;
@@ -81,6 +81,7 @@ END_MESSAGE_MAP()
 BOOL CFlowLinesDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+	
 	SetUnits();
 	if(m_pFrame) SetParams();
 	return TRUE;  
@@ -102,8 +103,9 @@ void CFlowLinesDlg::SetParams()
 	if(!m_pFrame) return;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
-	if(m_bLE)	CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
-	else		CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
+	if(m_pos==0)	    CheckRadioButton(IDC_RADIO1, IDC_RADIO3, IDC_RADIO1);
+	else if(m_pos==1)	CheckRadioButton(IDC_RADIO1, IDC_RADIO3, IDC_RADIO2);
+	else if(m_pos==2)	CheckRadioButton(IDC_RADIO1, IDC_RADIO3, IDC_RADIO3);
 
 	m_ctrlDeltaL.SetValue(m_DeltaL* pFrame->m_mtoUnit);
 	m_ctrlXOffset.SetValue(m_XOffset* pFrame->m_mtoUnit);
@@ -122,8 +124,9 @@ void CFlowLinesDlg::ReadParams()
 	m_ZOffset = m_ctrlZOffset.GetValue() / pFrame->m_mtoUnit;
 	m_DeltaL  = m_ctrlDeltaL.GetValue()  / pFrame->m_mtoUnit;
 	m_XFactor = m_ctrlXFactor.GetValue();
-	if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)==IDC_RADIO1)	m_bLE = true;
-	else															m_bLE = false;
+	if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3)==IDC_RADIO1)	    m_pos=0;
+	else if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3)==IDC_RADIO2)	m_pos=1;
+	else if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO3)==IDC_RADIO3)	m_pos=2;
 }
 
 

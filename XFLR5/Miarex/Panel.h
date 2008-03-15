@@ -35,6 +35,7 @@ class CPanel : public CObject
 	friend class CXFLR6;
 	friend class C3DPanelDlg;
 	friend class CVLMDlg;
+	friend class CBody;
 
 public:
 	CPanel();
@@ -42,15 +43,17 @@ public:
 
 protected:
 	void Reset();
-	void SetFrame(CVector LA, CVector LB, CVector TA, CVector TB);
-	CVector GlobalToLocal(CVector V);
-	CVector LocalToGlobal(CVector V);
+	void SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB);
+	bool Intersect(CVector const &A, CVector const &U, CVector &I, double &dist);
 	bool Invert33(double *l);
+	CVector GlobalToLocal(CVector const &V);
+	CVector LocalToGlobal(CVector const &V);
 
 	bool m_bIsLeading;
 	bool m_bIsTrailing;
 	bool m_bIsInSymPlane;
 	bool m_bIsWakePanel;
+//	bool m_bIsThinSurface;
 
 	int m_iElement; // panel identification number ; used when panel array is re-arranged in non sequential order
 	int m_iLA, m_iLB, m_iTA, m_iTB;//Corner Node numbers
@@ -74,8 +77,14 @@ protected:
 	double Size, SMP, SMQ;
 	double lij[9];
 
+	static CVector *s_pNode;
+	static CVector smp, smq, MidA, MidB;
+	static CVector LA, LB, TA, TB, T, V, W, P;
+
 	static double m_VortexPos;//between 0 and 1
 	static double m_CtrlPos;//between 0 and 1
+	static double det;
+	static double mat[9];
 
 public:
 };

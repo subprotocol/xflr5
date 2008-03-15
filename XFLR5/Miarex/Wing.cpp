@@ -39,6 +39,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CWing dialog
+CVector *CWing::m_pWakeNode;			//pointer to the VLM wake node array
+CPanel  *CWing::m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 double CWing::m_DTChord[MAXPANELS+1];	// Chords used for display, with converted units
 double CWing::m_DTOffset[MAXPANELS+1];	// Offset used for display, with converted units
@@ -64,7 +66,7 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 	memset(m_ICd, 0, sizeof(m_ICd));
 	memset(m_Cm, 0, sizeof(m_Cm));
 	memset(m_CmAirf, 0, sizeof(m_CmAirf));
-	memset(m_CmGeom, 0, sizeof(m_CmGeom));
+	memset(m_CmXRef, 0, sizeof(m_CmXRef));
 	memset(m_XCPSpanAbs, 0, sizeof(m_XCPSpanAbs));
 	memset(m_XCPSpanRel, 0, sizeof(m_XCPSpanRel));
 	memset(m_Re, 0, sizeof(m_Re));
@@ -90,13 +92,14 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 	memset(m_DTChord, 0, sizeof(m_DTChord));
 	memset(m_DTOffset, 0, sizeof(m_DTOffset));
 	memset(m_SpanPos, 0, sizeof(m_SpanPos));
+	memset(m_StripArea, 0, sizeof(m_StripArea));
 
 	memset(m_NXPanels, 0, sizeof(m_NXPanels));
 	memset(m_NYPanels, 0, sizeof(m_NYPanels));
 	memset(m_XPanelDist, 0, sizeof(m_XPanelDist));
 	memset(m_YPanelDist, 0, sizeof(m_YPanelDist));
 	memset(m_VLMQInf, 0, sizeof(m_VLMQInf));
-	memset(m_GeomMoment, 0, sizeof(m_GeomMoment));
+//	memset(m_GeomMoment, 0, sizeof(m_GeomMoment));
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -127,18 +130,16 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 
 	m_pXFile     = NULL;
 	m_pPanel     = NULL;
-	m_pNode      = NULL;
 	m_pWakeNode  = NULL; 
 	m_pWakePanel = NULL;
 
 	m_CL                = 0.0;
 	m_ViscousDrag       = 0.0;
 	m_InducedDrag       = 0.0;
-	m_RollingMoment     = 0.0;
-	m_PitchingMoment    = 0.0;
+//	m_RollingMoment     = 0.0;
+//	m_PitchingMoment    = 0.0;
 	m_GYm               = 0.0;
 	m_IYm               = 0.0;
-	m_VCm               = 0.0;
 	m_GCm               = 0.0;
 	m_XCP               = 0.0;
 	m_YCP               = 0.0;
@@ -177,14 +178,14 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 	m_yMac       = 0.0;
 	m_RelaxMax   = 10.0;
 	m_XCmRef     = 0.0;//=m_TChord[0]/4
-	m_SineFactor = 1.0;
 
 	m_NPanel        =  1;
 	m_nFlaps        =  0;
 	m_NYPanels[0]   = 12;
 	m_NXPanels[0]   =  8;
-	m_YPanelDist[0] = -1;
-	m_NHinges       =  0;
+	m_NXPanels[1]   =  8;
+	m_YPanelDist[0] = 0;
+	m_NHinges       = 0;
 
 	m_TChord[0]  =  .180;
 	m_TChord[1]  =  .120;
@@ -221,7 +222,6 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 void CWing::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_SINEFACTOR, m_ctrlSineFactor);
 	DDX_Control(pDX, IDC_SWEEP, m_ctrlSweep);
 	DDX_Control(pDX, IDC_VLMMESH, m_ctrlVLMMesh);
 	DDX_Control(pDX, IDC_LENGTH5, m_ctrlLength5);
@@ -246,6 +246,7 @@ void CWing::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_WINGCOLOR, m_ctrlWingColor);
 	DDX_Control(pDX, IDC_ASPECTRATIO, m_ctrlAspectRatio);
 	DDX_Control(pDX, IDC_VLMPANELS, m_ctrlVLMPanels);
+	DDX_Control(pDX, IDC_TOTAL3DPANELS, m_ctrlTotal3DPanels);
 }
 
 
@@ -269,7 +270,6 @@ BEGIN_MESSAGE_MAP(CWing, CDialog)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_CONTEXTMENU()
 	ON_COMMAND(IDM_RESETSCALE, OnResetscale)
-	ON_EN_KILLFOCUS(IDC_SINEFACTOR, OnKillFocusSinefactor)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -286,12 +286,7 @@ BOOL CWing::PreTranslateMessage(MSG* pMsg)
 			OnUpdateMeshFromTotal();
 			return true;
 		}
-		if(&m_ctrlSineFactor == pWnd)
-		{
-			m_ctrlOK.SetFocus();
-			return true;
-		}
-		else if(GetDlgItem(IDCANCEL) != pWnd && GetDlgItem(IDOK) != pWnd)
+		if(GetDlgItem(IDCANCEL) != pWnd && GetDlgItem(IDOK) != pWnd)
 		{
 			m_ctrlOK.SetFocus();
 			ReadParams();
@@ -323,8 +318,6 @@ BOOL CWing::PreTranslateMessage(MSG* pMsg)
 
 BOOL CWing::OnInitDialog() 
 {
-	//Initializes the dialog box with the stored data
-
 	CDialog::OnInitDialog();
 
 	CMainFrame *pFrame = (CMainFrame*)s_pFrame;
@@ -393,9 +386,6 @@ BOOL CWing::OnInitDialog()
 	m_ctrlPanelList.m_nColumns = 11;
 	m_ctrlPanelList.m_pWing = this;
 	
-	m_ctrlSineFactor.SetMin(0.0);
-	m_ctrlSineFactor.SetMax(1.0);
-	m_ctrlSineFactor.SetValue(m_SineFactor);
 
 	m_ctrlPanelList.m_strList.RemoveAll();
 
@@ -422,9 +412,8 @@ BOOL CWing::OnInitDialog()
 
 	SetScale();
 
-	if(m_bIsFin) {
-		m_ctrlSymetric.EnableWindow(false);
-	}
+//	if(m_bIsFin)	m_ctrlSymetric.EnableWindow(false);
+	
 
 	m_bChanged = false;
 
@@ -482,7 +471,13 @@ void CWing::SetResults()
 	str.Format("%5.2f", GetAverageSweep());
 	m_ctrlSweep.SetWindowText(str);
 
-	m_ctrlVLMPanels.SetValue(VLMGetPanelTotal());
+	int VLMTotal = VLMGetPanelTotal();
+	m_ctrlVLMPanels.SetValue(VLMTotal);
+
+	VLMTotal *= 2;
+	VLMTotal += 2*m_NXPanels[m_NPanel-1];
+	str.Format("Total 3D Panels = %4d   (Max is 2000)", VLMTotal);
+	m_ctrlTotal3DPanels.SetWindowText(str);
 }
 
 
@@ -817,7 +812,7 @@ bool CWing::SerializeWing(CArchive& ar)
 		for (i=0; i<=m_NPanel; i++) ar >> m_LFoil[i];
 		for (i=0; i<=m_NPanel; i++) {
 			ar >> f; m_TChord[i]=f;
-			if (m_TChord[i] <0.0) {
+			if (abs(m_TChord[i]) <0.0) {
 				m_WingName = "";
 				return false;
 			}
@@ -825,7 +820,7 @@ bool CWing::SerializeWing(CArchive& ar)
 
 		for (i=0; i<=m_NPanel; i++) {
 			ar >> f; m_TPos[i]=f;
-			if (m_TPos[i] <0.0) {
+			if (abs(m_TPos[i]) <0.0) {
 				m_WingName = "";
 				return false;
 			}
@@ -1092,13 +1087,16 @@ void CWing::ComputeChords(int NStation)
 	if(NStation !=0){//LLT based
 		m_NStation = NStation;
 
-		for (k=0; k<=NStation; k++){
+		for (k=0; k<=NStation; k++)
+		{
 			yob   = cos(k*pi/NStation);
 			y = abs(yob * m_Span/2);
-			for (l=0; l<=m_NPanel; l++){
-				if(m_TPos[l] < y && y <=m_TPos[l+1]){
+			for (l=0; l<=m_NPanel; l++)
+			{
+				if(m_TPos[l] < y && y <=m_TPos[l+1])
+				{
 					tau = (y-m_TPos[l])/(m_TPos[l+1]-m_TPos[l]);
-					m_Chord[k] = m_TChord[l]+(m_TChord[l+1]-m_TChord[l]) * tau;
+					m_Chord[k]  = m_TChord[l]+(m_TChord[l+1]-m_TChord[l]) * tau;
 					m_Offset[k] = m_TOffset[l]+(m_TOffset[l+1]-m_TOffset[l]) * tau;
 					break;
 				}
@@ -1106,7 +1104,8 @@ void CWing::ComputeChords(int NStation)
 		}
 	}
 	else
-	{//VLM Mesh based
+	{
+		//VLM Mesh based
 		m_NStation    = 0;
 		m = 0;
 
@@ -1137,9 +1136,10 @@ void CWing::ComputeChords(int NStation)
 			for (k=0; k<m_Surface[j].m_NYPanels; k++)
 			{
 				//calculate chords and offsets at each station
-				m_Chord[m]  = m_Surface[j].GetChord(k);
+				m_Chord[m]     = m_Surface[j].GetChord(k);
+//				m_StripArea[m] = m_Chord[m]* m_Surface[j].Getdl(k);
 
-				m_Surface[j].GetLeadingPt(C, k);
+				m_Surface[j].GetLeadingPt(k, C);
 				m_Offset[m] = C.x-x0;
 				
 				m_Twist[m]  = m_Surface[j].GetTwist(k);
@@ -1149,6 +1149,7 @@ void CWing::ComputeChords(int NStation)
 		m_NStation = m;
 	}
 }
+
 
 
 bool CWing::ExportAVLWing(CStdioFile *pXFile, double x, double z,
@@ -1584,23 +1585,18 @@ void CWing::DrawWing(CDC *pDC, CPoint O)
 void CWing::DrawVLMMesh(CDC *pDC, CPoint O)
 {
 	double chord, offset, yl;
-	double offset1, offset2, ch1, ch2, x1, x2;
+	double offset1, offset2, ch1, ch2, x1, x2, y;
 	double dT,dk,dNY;
-	double xPoint1[MAXCHORDPANELS],xPoint2[MAXCHORDPANELS]; 
-	double sf, snorm, cnorm;
+	double xPoint1[MAXCHORDPANELS+1],xPoint2[MAXCHORDPANELS+1]; 
 	int i,k,l;
 	int NXLead, NXFlap;
-
-	if(m_SineFactor>0.0) sf = 1.0+1.0/m_SineFactor;
-	else                 sf = 1000000.0;
-	snorm    = 1.0/sin(pi/sf);
-	cnorm    = 1.0/cos( pi*(1/2.0-1.0/sf));
 
 	CFoil *pFoil1, *pFoil2;
 	CMainFrame *pFrame = (CMainFrame*)s_pFrame;
 
 	CPen MeshPen(PS_SOLID, 1, RGB(80, 80, 255));
 	CPen *pOldPen = pDC->SelectObject(&MeshPen);
+
 
 	if(m_bRightSide){
 		for (i=0; i<m_NPanel;i++){
@@ -1613,19 +1609,20 @@ void CWing::DrawVLMMesh(CDC *pDC, CPoint O)
 				if(m_YPanelDist[i] == 1)
 				{
 					//cosine distribution
-					yl = (1.0 + cnorm * cos(dk * pi *(1.0-2.0*(1/2.0-1.0/sf))/dNY + pi*(1/2.0-1.0/sf)) ) * dT/2.0;
+					y = (m_TPos[i]+m_TPos[i+1])/2.0;
+					yl = y +cos(k*pi/m_NYPanels[i]) * (m_TPos[i+1]-m_TPos[i])/2.0;
 				}
 				else if(m_YPanelDist[i] ==  2){
 					//sine distribution
-					yl = m_TPos[i+1] - snorm*sin(dk*pi/sf/dNY) * dT;
+					yl = m_TPos[i+1] -(sin(k*pi/2.0/m_NYPanels[i])) * (m_TPos[i+1]-m_TPos[i]);
 				}
 				else if(m_YPanelDist[i] == -2){
 					//-sine distribution
-					yl = m_TPos[i]   + snorm*sin(dk*pi/sf/dNY) * dT;
+					yl = m_TPos[i] +(sin(k*pi/2.0/m_NYPanels[i])) * (m_TPos[i+1]-m_TPos[i]);
 				}
 				else {
 					//even spacing by default
-					yl = m_TPos[i] +(dk*dT/dNY);
+					yl = m_TPos[i] +(k*(m_TPos[i+1]-m_TPos[i])/m_NYPanels[i]);
 				}
 				offset = GetOffset(yl*2.0/m_Span);
 				chord  = GetChord(yl*2.0/m_Span);
@@ -1658,7 +1655,8 @@ void CWing::DrawVLMMesh(CDC *pDC, CPoint O)
 			}
 		}
 	}
-	else{
+	else
+	{
 		for (i=0; i<m_NPanel;i++)
 		{
 			//first draw lines parallel to chord,
@@ -1670,19 +1668,20 @@ void CWing::DrawVLMMesh(CDC *pDC, CPoint O)
 				if(m_YPanelDist[i] == 1)
 				{
 					//cosine distribution
-					yl = (1.0 + cnorm * cos(dk * pi *(1.0-2.0*(1/2.0-1.0/sf))/dNY + pi*(1/2.0-1.0/sf)) ) * dT/2.0;
+					y = (m_TPos[i]+m_TPos[i+1])/2.0;
+					yl = y +cos(k*pi/m_NYPanels[i]) * (m_TPos[i+1]-m_TPos[i])/2.0;
 				}
 				else if(m_YPanelDist[i] == -2){
 					//-sine distribution
-					yl = m_TPos[i]   + snorm*sin(dk*pi/sf/dNY) * dT;
+					yl = m_TPos[i]   +(sin(k*pi/2.0/m_NYPanels[i])) * (m_TPos[i+1]-m_TPos[i]);
 				}
 				else if(m_YPanelDist[i] == 2){
 					// sine distribution
-					yl = m_TPos[i+1] - snorm*sin(dk*pi/sf/dNY) * dT;
+					yl = m_TPos[i+1] -(sin(k*pi/2.0/m_NYPanels[i])) * (m_TPos[i+1]-m_TPos[i]);
 				}
 				else {
 					//even spacing by default
-					yl = m_TPos[i] +(dk*dT/dNY);
+					yl = m_TPos[i] +(k*(m_TPos[i+1]-m_TPos[i])/m_NYPanels[i]);
 				}
 				offset = GetOffset(yl*2.0/m_Span);
 				chord  = GetChord(yl*2.0/m_Span);
@@ -1921,23 +1920,6 @@ void CWing::DrawFoils(CDC *pDC, CPoint O)
 }
 
 
-void CWing::OnKillFocusSinefactor()
-{
-	m_SineFactor = m_ctrlSineFactor.GetValue();
-	if(m_SineFactor>1.0) 
-	{
-		m_SineFactor = 1.0;
-		m_ctrlSineFactor.SetValue(1.0);
-	}
-	else if(m_SineFactor<0.0) 
-	{
-		m_SineFactor = 0.0;
-		m_ctrlSineFactor.SetValue(0.0);
-	}
-	InvalidateRect(m_DrawRect);
-
-}
-
 
 void CWing::OnVLMMesh() 
 {
@@ -2089,8 +2071,10 @@ double CWing::GetOffset(double yob)
 double CWing::Getyrel(double SpanPos)
 {
 	double y = abs(SpanPos);
-	for(int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<=y && y <m_TPos[i+1]){
+	for(int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]<=y && y <m_TPos[i+1])
+		{
 			if(SpanPos>0) return  (y-m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
 			else          return  (y-m_TPos[i+1])/(m_TPos[i]-m_TPos[i+1]);
 		}
@@ -2105,9 +2089,12 @@ double CWing::GetZPos(double y)
 
 	y= abs(y);
 	if(y<=0.0) return 0.0;
-	for (int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]< y && y<=m_TPos[i+1]){
-			for (int k=0; k<i; k++){
+	for (int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]< y && y<=m_TPos[i+1])
+		{
+			for (int k=0; k<i; k++)
+			{
 				ZPos+=m_TLength[k+1] * sin(m_TDihedral[k]*pi/180.0);
 			}
 			tau = (y - m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
@@ -2116,49 +2103,6 @@ double CWing::GetZPos(double y)
 		}
 	}
 	return 0.0;
-}
-
-double CWing::GetViewZPos(double xrel, double y, int pos)
-{
-	double tau;
-	double twist, chord;
-	double ZPos =0.0;
-	double fy = abs(y);
-
-//	if(fy<=0.0) return 0.0;
-	for (int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]< fy && fy<=m_TPos[i+1]){
-			for (int k=0; k<i; k++){
-				ZPos += m_TLength[k+1] * sin(m_TDihedral[k]*pi/180.0);
-			}
-			tau = (fy - m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
-			ZPos += tau * m_TLength[i+1] * sin(m_TDihedral[i]*pi/180.0);
-
-			//	add washout calculated about chord quarter line :
-			twist = GetTwist(fy)*pi/180.;
-			chord = GetChord(fy*2./m_Span);
-			ZPos -= (xrel-0.25)*chord*sin(twist);
-
-			CFoil *pFoil0 = NULL;
-			CFoil *pFoil1 = NULL;
-			GetFoils(&pFoil0, &pFoil1, y,  tau);
-
-			if(!pFoil0 || !pFoil1) return ZPos;
-
-			if(pos==1){
-				double z0 = pFoil0->GetUpperY(xrel) * chord;
-				double z1 = pFoil1->GetUpperY(xrel) * chord;
-				ZPos += z0 + (z1-z0)*tau;
-			}
-			else if(pos==-1){
-				double z0 = pFoil0->GetLowerY(xrel) * chord;
-				double z1 = pFoil1->GetLowerY(xrel) * chord;
-				ZPos += z0 + (z1-z0)*tau;
-			}
-			return ZPos;
-		}
-	}
-	return -1.0;
 }
 
 void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
@@ -2173,9 +2117,12 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 	else sign = y/fy;
 
 //	if(fy<=0.0) return 0.0;
-	for (int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]< fy && fy<=m_TPos[i+1]){
-			for (int k=0; k<i; k++){
+	for (int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]< fy && fy<=m_TPos[i+1])
+		{
+			for (int k=0; k<i; k++)
+			{
 				yv += m_TLength[k+1] * cos(m_TDihedral[k]*pi/180.0);
 				zv += m_TLength[k+1] * sin(m_TDihedral[k]*pi/180.0);
 			}
@@ -2195,77 +2142,20 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 
 			if(!pFoil0 || !pFoil1) return;
 
-			if(pos==1){
+			if(pos==1)
+			{
 				double z0 = pFoil0->GetUpperY(xrel) * chord;
 				double z1 = pFoil1->GetUpperY(xrel) * chord;
 				zv += z0 + (z1-z0)*tau;
 			}
-			else if(pos==-1){
+			else if(pos==-1)
+			{
 				double z0 = pFoil0->GetLowerY(xrel) * chord;
 				double z1 = pFoil1->GetLowerY(xrel) * chord;
 				zv += z0 + (z1-z0)*tau;
 			}
 		}
 	}
-}
-
-double CWing::GetTopz(double x, double y)
-{
-	//x is the absolute chord position
-	//y is the absolute span position
-	double tau, chord, off, xoc, z0,z1;
-
-	CFoil *pFoil0 = NULL;
-	CFoil *pFoil1 = NULL;
-	//convert absolute x to relative x
-	chord = GetChord(2.0*y/m_Span);
-	off   = GetOffset(2.0*y/m_Span);
-	if(chord>0.0)	xoc = (x-off)/chord;
-	else			xoc = 0.5;
-
-	y= abs(y);
-
-	for (int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<= y && y<=m_TPos[i+1]){
-			GetFoils(&pFoil0, &pFoil1, y,  tau);
-			if(!pFoil0 || !pFoil1) 
-				return 0.0;
-			z0 = chord*pFoil0->GetUpperY(xoc);
-			z1 = chord*pFoil1->GetUpperY(xoc);
-			return GetZPos(y)+z0+tau*(z1-z0);
-		}
-	}
-	return -1.0;
-}
-
-
-double CWing::GetBotz(double x, double y)
-{
-	//x is the absolute chord position
-	//y is the absolute span position
-	double tau;
-	double chord;
-	double xoc;
-	double z0,z1;
-	CFoil *pFoil0 = NULL;
-	CFoil *pFoil1 = NULL;
-	//convert absolute x to relative x
-	chord = GetChord(2.0*y/m_Span);
-	if(chord>0.0)	xoc = (x-GetOffset(2.0*y/m_Span))/chord;
-	else			xoc = 0.5;
-
-	y= abs(y);
-//	if(y<=0.0) return 0.0;
-	for (int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<= y && y<=m_TPos[i+1]){
-			GetFoils(&pFoil0, &pFoil1, y,  tau);
-			if(!pFoil0 || !pFoil1) return 0.0;
-			z0 = chord*pFoil0->GetLowerY(xoc);
-			z1 = chord*pFoil1->GetLowerY(xoc);
-			return GetZPos(y)+z0+tau*(z1-z0);
-		}
-	}
-	return -1.0;
 }
 
 
@@ -2286,55 +2176,6 @@ double CWing::GetC4(double yob, double xRef)
 	}
 	
 	return C4;
-}
-
-void CWing::Getjkp(double y, int &j, int &k, int &p)
-{
-	// valid for 3D panel analysis only
-	//note : y is understood as the postion on the wing spread flat
-	int jj,kk,ks,pp,Size;
-	double absy, yrel, length = 0;
-	kk=0;
-	absy = abs(y);
-	pp = m_Surface[0].m_NXPanels; //Tip Patch
-
-	Size = m_Surface[0].m_NXPanels + m_Surface[m_NSurfaces-1].m_NXPanels; //Tip Patches
-	for(j=0; j<m_NSurfaces; j++) Size += 2*m_Surface[j].m_NXPanels*m_Surface[j].m_NYPanels;
-	//Size= m_MatSize...
-	pp=Size/2;
-
-	for(j=m_NSurfaces/2; j<m_NSurfaces; j++)
-	{
-		if(absy<length+m_Surface[j].Length)
-		{ //y-position is somewhere in this surface
-			yrel = (absy-length)/m_Surface[j].Length;
-			ks   = m_Surface[j].Getk(yrel);
-			pp  += ks*2*m_Surface[j].m_NXPanels;
-			kk  += ks;
-			break;
-		}
-		else
-		{
-			length  += m_Surface[j].Length;
-			pp      += m_Surface[j].m_NElements;//for a 3D panel analysis
-			kk      += m_Surface[j].m_NYPanels;
-		}
-	}
-	if(y>=0.0)
-	{
-		p = pp;
-		k = kk;
-	}
-	else
-	{
-		k = m_NStation/2-kk-1;
-		j = m_NSurfaces-1-j;
-
-		p = m_Surface[0].m_NXPanels; //Tip Patch
-		for(jj=0; jj<j; jj++)
-			p += 2*m_Surface[jj].m_NXPanels*m_Surface[jj].m_NYPanels;
-		p += 2*m_Surface[j].m_NXPanels*(m_Surface[j].m_NYPanels-ks-1);
-	}
 }
 
 double CWing::GetChord(double yob)
@@ -2411,24 +2252,28 @@ void CWing::SplitPanel(int i, double tau)
 
 bool CWing::CheckWing()
 {
-	if(!m_WingName.GetLength()){
+	if(!m_WingName.GetLength())
+	{
 		AfxMessageBox("Please enter a name for the wing");
 		m_ctrlWingName.SetFocus();
 		return false;
 	}
-	for (int k=1; k<=m_NPanel; k++){
+	for (int k=1; k<=m_NPanel; k++)
+	{
 		if(m_TPos[k]*1.00001 < m_TPos[k-1]){
 			AfxMessageBox("Warning : Panel sequence is inconsistent");
 			return false;
 		}
 	}
 
-	if(VLMGetPanelTotal()>VLMMATSIZE/2) {
+	if(VLMGetPanelTotal()>VLMMATSIZE/2) 
+	{
 		AfxMessageBox("Too many panels\nReduce the mesh size");
 		return false;
 	}
 
-	if(m_nFlaps>=20){
+	if(m_nFlaps>=20)
+	{
 		int res = AfxMessageBox("Only 10 flaps x 2 will be handled", MB_OKCANCEL);
 		if (res==IDCANCEL) return false;
 	}
@@ -2532,6 +2377,7 @@ void CWing::OnAppend()
 	int k,n,ny,total;
 
 	n  = m_iSection;
+	if(n<0) n=m_NPanel;
 	ny = m_NYPanels[n];
 	total = VLMGetPanelTotal();
 
@@ -2692,7 +2538,8 @@ void CWing::LLTComputeWing()
 	bool bPointOutRe, bPointOutAlpha;
 	m_bWingOut = false;
 
-	for (int m=1; m<m_NStation; m++){
+	for (int m=1; m<m_NStation; m++)
+	{
 		bPointOutRe    = false;
 		bPointOutAlpha = false;
 		yob   = cos((double)m*pi/(double)m_NStation);
@@ -2724,7 +2571,10 @@ void CWing::LLTComputeWing()
 		if(bError) bPointOutAlpha = true;
 
 		m_XCPSpanRel[m]  = pMiarex->GetXCp(pFoil0, pFoil1, m_Re[m], m_Alpha+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
-		if(abs(m_XCPSpanRel[m])<0.000001){//plr mesh was generated prior to v3.15, i.e., without XCp calculations
+
+		if(abs(m_XCPSpanRel[m])<0.000001)
+		{
+			//plr mesh was generated prior to v3.15, i.e., without XCp calculations
 			Cm0 = pFrame->GetCm0(pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
 			if(m_Cl[m]!=0.0) m_XCPSpanRel[m] = 0.25 - Cm0/m_Cl[m];
 			else             m_XCPSpanRel[m] = 0.25;
@@ -2735,13 +2585,27 @@ void CWing::LLTComputeWing()
 
 		arad = (m_Alpha+m_Ai[m]+m_Twist[m])*pi/180.0;
 //		arad = (m_Alpha-m_Ai[m])*pi/180.0;
-		c4 = GetC4(yob, m_XCmRef)/m_Chord[m];
+		c4   = GetC4(yob, m_XCmRef)/m_Chord[m];
 		zpos = GetZPos(yob*m_Span/2.0)/m_Chord[m];
-		m_CmGeom[m] = - c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad))
-					  - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
-		m_Cm[m] = m_CmAirf[m]+m_CmGeom[m];
 
-		if(bPointOutAlpha){
+		m_CmXRef[m] = - c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
+		m_Cm[m]     = m_CmAirf[m]+m_CmXRef[m];
+
+		eta = Eta(m);
+		sigma = Sigma(m);
+		Integral0           += eta   * m_Cl[m]  * m_Chord[m];
+		Integral1           += sigma * m_Cl[m]  * m_Chord[m];
+		Integral2           += eta   * m_Cl[m]  * m_Chord[m] * (m_Offset[m]+m_XCPSpanRel[m]*m_Chord[m]);
+		InducedDrag         += eta   * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
+		ViscousDrag         += eta   * m_PCd[m] * m_Chord[m];
+		InducedYawingMoment += sigma * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
+		ViscousYawingMoment += sigma * m_PCd[m] * m_Chord[m];
+		PitchingMoment      += eta   * m_Cm[m]     * m_Chord[m] * m_Chord[m];
+		PCm                 += eta   * m_CmAirf[m] * m_Chord[m] * m_Chord[m];
+		GCm                 += eta   * m_CmXRef[m] * m_Chord[m] * m_Chord[m];
+
+		if(bPointOutAlpha)
+		{
 			GetLengthUnit(string, pFrame->m_LengthUnit);
 			strong.Format("       Span pos = %9.2f ",	cos(m*pi/m_NStation)*m_Span*pFrame->m_mtoUnit);
 			strong += string;
@@ -2756,7 +2620,8 @@ void CWing::LLTComputeWing()
 			m_bWingOut = true;
 			m_bConverged = false;
 		}
-		else if(bPointOutRe){
+		else if(bPointOutRe)
+		{
 			GetLengthUnit(string, pFrame->m_LengthUnit);
 			strong.Format("       Span pos = %9.2f ",	cos(m*pi/m_NStation)*m_Span*pFrame->m_mtoUnit);
 			strong += string;
@@ -2770,30 +2635,18 @@ void CWing::LLTComputeWing()
 			if(m_bTrace) m_pXFile->WriteString(strong);
 			m_bWingOut = true;
 		}
-
-		eta = Eta(m);
-		sigma = Sigma(m);
-		Integral0           += eta   * m_Cl[m]  * m_Chord[m];
-		Integral1           += sigma * m_Cl[m]  * m_Chord[m];
-		Integral2           += eta   * m_Cl[m]  * m_Chord[m] * (m_Offset[m]+m_XCPSpanRel[m]*m_Chord[m]);
-		InducedDrag         += eta   * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
-		ViscousDrag         += eta   * m_PCd[m] * m_Chord[m];
-		InducedYawingMoment += sigma * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
-		ViscousYawingMoment += sigma * m_PCd[m] * m_Chord[m];
-		PitchingMoment      += eta   * m_Cm[m]     * m_Chord[m] * m_Chord[m];
-		PCm                 += eta   * m_CmAirf[m] * m_Chord[m] * m_Chord[m];
-		GCm                 += eta   * m_CmGeom[m] * m_Chord[m] * m_Chord[m];
 	}
 
 	m_CL            =  Integral0   * m_AR /m_Span;
 	m_InducedDrag   =  InducedDrag * m_AR /m_Span  * pi / 180.0;
 	m_ViscousDrag   =  ViscousDrag / m_GChord;
-	m_RollingMoment = -Integral1   * m_AR /m_Span;
+
+	m_VYm = ViscousYawingMoment /m_GChord;
 	m_IYm = InducedYawingMoment /m_Span * pi * m_AR /180.0;
-	m_GYm = ViscousYawingMoment /m_GChord;
-	m_PitchingMoment = PitchingMoment / m_GChord / m_MAChord;
-	m_VCm = PCm / m_GChord / m_MAChord;
-	m_GCm = GCm / m_GChord / m_MAChord;
+	m_GYm = m_VYm + m_IYm;
+	m_GCm = PitchingMoment / m_GChord / m_MAChord;
+	m_GRm = -Integral1   * m_AR /m_Span;
+//	m_GCm = GCm / m_GChord / m_MAChord;
 
 	if(m_CL !=0.0)	m_XCP = Integral2 * m_AR /m_Span/m_CL;
 	else            m_XCP = 0.0;
@@ -2802,8 +2655,6 @@ void CWing::LLTComputeWing()
 
 	//bending moment
 
-	double StripArea[MAXSTATIONS+1];
-	memset(StripArea, 0, sizeof(StripArea));
 	int j,jj;
 
 	double yj, yjm, yjp;
@@ -2811,14 +2662,15 @@ void CWing::LLTComputeWing()
 
 	for (j=0; j<=m_NStation; j++)		m_SpanPos[j] = m_Span/2.0 * cos(j*pi/m_NStation);
 
-	for (j=1; j<m_NStation; j++){
+	for (j=1; j<m_NStation; j++)
+	{
 		yjp = m_SpanPos[j-1];
 		yjm = m_SpanPos[j+1];
 		yj  = m_SpanPos[j];
 
 		dy = (yjp-yj)/2.0 + (yj-yjm)/2.0;
 
-		StripArea[j] = m_Chord[j]*dy;//mm²
+		m_StripArea[j] = m_Chord[j]*dy;//m²
 	}
 
 	//dynamic pressure, kg/m3
@@ -2827,19 +2679,23 @@ void CWing::LLTComputeWing()
 	double bm;
 	double y, yy;
 
-	for (j=1; j<m_NStation; j++){
+	for (j=1; j<m_NStation; j++)
+	{
 		y = m_SpanPos[j];
 		bm = 0.0;
-		if (y>=0){
-			for (jj=0; jj<j; jj++){
+		if (y>=0)
+		{
+			for (jj=0; jj<j; jj++)
+			{
 				yy =  m_SpanPos[jj];
-				bm += (yy-y) * m_Cl[jj] * StripArea[jj];
+				bm += (yy-y) * m_Cl[jj] * m_StripArea[jj];
 			}
 		}
 		else{
-			for (jj=j+1; jj<m_NStation; jj++){
+			for (jj=j+1; jj<m_NStation; jj++)
+			{
 				yy =  m_SpanPos[jj];
-				bm += (y-yy) * m_Cl[jj] * StripArea[jj];
+				bm += (y-yy) * m_Cl[jj] * m_StripArea[jj];
 			}
 		}
 		m_BendingMoment[j] = bm*q;
@@ -3087,7 +2943,8 @@ bool CWing::VLMSetAutoMesh(int total)
 //		m_YPanelDist[i] = 0;//uniformly distributed, except at the root and tip (see next)
 	}
 
-	if(VLMGetPanelTotal()>VLMMATSIZE/2){
+	if(VLMGetPanelTotal()>VLMMATSIZE/2)
+	{
 		AfxMessageBox("Too many panels\nReduce the mesh size", MB_OK);
 		return false;
 	}
@@ -3095,10 +2952,10 @@ bool CWing::VLMSetAutoMesh(int total)
 }
 
 
-bool CWing::CreateSurfaces(CVector T, double XTilt, double YTilt)
+bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
 	//generic surface, LLT, VLM or Panel
-	int j, Surf;
+	int j;
 	CFoil *pFoilA, *pFoilB;
 	CVector PLA, PTA, PLB, PTB, Offset, T1, NA, NB;
 	CVector Trans(T.x, 0.0, T.z);
@@ -3123,7 +2980,8 @@ bool CWing::CreateSurfaces(CVector T, double XTilt, double YTilt)
 	for (j=m_NPanel-1; j>=0; j--)
 	{
 		//do not create a surface if its length is less than the critical size
-		if (abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize){
+		if (abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
+		{
 			m_Surface[m_NSurfaces].m_pFoilA   = pFrame->GetFoil(m_LFoil[j+1]);
 			m_Surface[m_NSurfaces].m_pFoilB   = pFrame->GetFoil(m_LFoil[j]);
 
@@ -3183,36 +3041,25 @@ bool CWing::CreateSurfaces(CVector T, double XTilt, double YTilt)
 			pFoilA = m_Surface[m_NSurfaces].m_pFoilA;
 			pFoilB = m_Surface[m_NSurfaces].m_pFoilB;
 
-/*			if(j<m_NPanel-2 && !pFoilA->m_bTEFlap)
-			{
-				pFoil = pFrame->GetFoil(m_LFoil[j+2]);
-				if(pFoil->m_bTEFlap)
-					//use previous foil's hinge position to set panel positions
-					pFoilA = pFoil; 
-			}
-
-			if(j>0 && !pFoilB->m_bTEFlap && pFoil->m_bTEFlap)
-			{
-				pFoil = pFrame->GetFoil(m_LFoil[j-1]);
-				if(pFoil->m_bTEFlap)
-					//use next foil's hinge position to set panel positions
-					pFoilB = pFoil; 
-			}*/
-
 			CreateXPoints(m_NXPanels[j], m_XPanelDist[j], pFoilA,  pFoilB,
                           m_Surface[m_NSurfaces].m_xPointA, m_Surface[m_NSurfaces].m_xPointB,
                           m_Surface[m_NSurfaces].m_NXLead,  m_Surface[m_NSurfaces].m_NXFlap);
 			m_Surface[m_NSurfaces].SetFlap();
 			m_Surface[m_NSurfaces].Init();
-			m_Surface[m_NSurfaces].m_bIsLeftSurf = true;
-			m_Surface[m_NSurfaces].m_SineFactor = m_SineFactor;
+			m_Surface[m_NSurfaces].m_bIsLeftSurf   = true;
+			m_Surface[m_NSurfaces].m_bIsInSymPlane = false;
 			m_NSurfaces++;
 		}
 	}
-	
-	//next right wing
-	if(!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin && m_bDoubleSymFin))
-	{// do not include right surfaces for symetric fins
+	m_Surface[m_NSurfaces-1].m_bIsCenterSurf = true;//previous left center surface
+	m_Surface[m_NSurfaces].m_bIsCenterSurf   = true;//next right center surface
+
+	//we need a right wwing only in the follwing cases
+	// if its an 'ordinary wing'
+	// if its a fin, symetrical about the fuselage x-axis
+	// if its a symetrical double fin
+	if(!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin))
+	{
 		for (j=0; j<m_NPanel; j++)
 		{
 			if(abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize){
@@ -3235,7 +3082,6 @@ bool CWing::CreateSurfaces(CVector T, double XTilt, double YTilt)
 				m_Surface[m_NSurfaces].m_LB.Copy(PLB);
 				m_Surface[m_NSurfaces].m_TA.Copy(PTA);
 				m_Surface[m_NSurfaces].m_TB.Copy(PTB);
-
 
 				//Set surface normals
 				m_Surface[m_NSurfaces].SetNormal();
@@ -3270,177 +3116,145 @@ bool CWing::CreateSurfaces(CVector T, double XTilt, double YTilt)
 				pFoilA = m_Surface[m_NSurfaces].m_pFoilA;
 				pFoilB = m_Surface[m_NSurfaces].m_pFoilB;
 
-/*				if(j>0 && !pFoilA->m_bTEFlap)
-				{
-					pFoil = pFrame->GetFoil(m_RFoil[j-1]);
-					if(pFoil->m_bTEFlap) //use previous foil's hinge position to set panel positions
-						pFoilA = pFoil; 
-				}
-
-				if(j<m_NPanel-2 && !pFoilB->m_bTEFlap)
-				{
-					pFoil = pFrame->GetFoil(m_RFoil[j+2]);
-					if(pFoil->m_bTEFlap)	//use next foil's hinge position to set panel positions
-						pFoilB = pFoil; 
-				}*/
-
 				CreateXPoints(m_NXPanels[j], m_XPanelDist[j], pFoilA,  pFoilB,
                                               m_Surface[m_NSurfaces].m_xPointA,  m_Surface[m_NSurfaces].m_xPointB,
                                               m_Surface[m_NSurfaces].m_NXLead,   m_Surface[m_NSurfaces].m_NXFlap);
 				m_Surface[m_NSurfaces].SetFlap();
 				m_Surface[m_NSurfaces].Init();
-				m_Surface[m_NSurfaces].m_bIsRightSurf = true;
-				m_Surface[m_NSurfaces].m_SineFactor = m_SineFactor;
+				m_Surface[m_NSurfaces].m_bIsRightSurf  = true;
+				m_Surface[m_NSurfaces].m_bIsInSymPlane = false;
 				m_NSurfaces++;
 			}
 		}
 	}
 	CVector Or(0.0,0.0,0.0);
-	if(!m_bIsFin || (m_bIsFin && m_bSymFin)){
-		for (j=0; j<m_NSurfaces; j++){
+	if(!m_bIsFin || (m_bIsFin && m_bSymFin))
+	{
+		for (j=0; j<m_NSurfaces; j++)
+		{
 			m_Surface[j].RotateX(Or, XTilt);
 			m_Surface[j].RotateY(Or, YTilt);
 			m_Surface[j].Translate(Trans);
 		}
 	}
-	else {
-		if(m_bDoubleFin){
-			if(!m_bDoubleSymFin){
-			// duplicate surfaces
-				Surf = m_NSurfaces;
-				for(j=0; j<Surf; j++){
-					m_Surface[m_NSurfaces].Copy(m_Surface[j]);
-					m_Surface[m_NSurfaces].m_bIsRightSurf = true;
-					m_Surface[m_NSurfaces].m_SineFactor = m_SineFactor;
-					m_NSurfaces++;
-				}
-				m_Surface[Surf-1].m_bIsTipRight = true;
-				m_Surface[Surf-1].m_bIsTipLeft  = true;
-				m_Surface[0].m_bIsTipRight      = true;
-				m_Surface[0].m_bIsTipLeft       = true;
-
-				m_Surface[Surf].m_bIsTipRight = true;
-				m_Surface[Surf].m_bIsTipLeft  = true;
-				m_Surface[m_NSurfaces-1].m_bIsTipRight  = true;
-				m_Surface[m_NSurfaces-1].m_bIsTipLeft   = true;
-
-				Offset.Set(0.0, -T.y, 0.0);
-				for(j=0; j<m_NSurfaces/2; j++){
-					m_Surface[j].RotateX(Or, XTilt);
-					m_Surface[j].RotateX(Or, m_Surface[j].m_Dihedral);
-					m_Surface[j].RotateZ(Or, YTilt);
-					m_Surface[j].Translate(Trans);
-					m_Surface[j].Translate(Offset);
-				}
-				Offset.y = -Offset.y;
-				for(j=m_NSurfaces/2; j< m_NSurfaces; j++){
-					m_Surface[j].RotateX(Or, XTilt);
-					m_Surface[j].RotateX(Or, -2.0*m_Surface[j].m_Dihedral);
-					m_Surface[j].RotateZ(Or, -YTilt);
-					m_Surface[j].Translate(Trans);
-					m_Surface[j].Translate(Offset);
-				}
+	else 
+	{
+		if(m_bDoubleFin)
+		{
+			//rotate surfaces symetrically
+			int ns2 = (int)(m_NSurfaces/2);
+			Offset.Set(0.0, -T.y, 0.0);
+			for(j=0; j<ns2; j++)
+			{
+				m_Surface[j].RotateX(Or, +XTilt);
+				m_Surface[j].RotateZ(Or, YTilt);
+				m_Surface[j].Translate(Trans);
+				m_Surface[j].Translate(Offset);
+				m_Surface[j].m_bIsInSymPlane = false;
 			}
-			else{
-				//rotate surfaces symetrically
-				int ns2 = (int)(m_NSurfaces/2);
-				Offset.Set(0.0, -T.y, 0.0);
-				for(j=0; j<ns2; j++){
-					m_Surface[j].RotateX(Or, +XTilt);
-					m_Surface[j].RotateZ(Or, YTilt);
-					m_Surface[j].Translate(Trans);
-					m_Surface[j].Translate(Offset);
-				}
-				Offset.y = -Offset.y;
-				for(j=ns2; j< m_NSurfaces; j++){
-					m_Surface[j].RotateX(Or, -XTilt);
-					m_Surface[j].RotateZ(Or, -YTilt);
-					m_Surface[j].Translate(Trans);
-					m_Surface[j].Translate(Offset);
-				}
-				m_Surface[ns2].m_bIsTipRight = true;
-				m_Surface[ns2].m_bIsTipLeft  = true;
-				m_Surface[0].m_bIsTipRight   = true;
-				m_Surface[0].m_bIsTipLeft    = true;
-
-				m_Surface[ns2+1].m_bIsTipRight          = true;
-				m_Surface[ns2+1].m_bIsTipLeft           = true;
-				m_Surface[m_NSurfaces-1].m_bIsTipRight  = true;
-				m_Surface[m_NSurfaces-1].m_bIsTipLeft   = true;
-
+			Offset.y = -Offset.y;
+			for(j=ns2; j< m_NSurfaces; j++)
+			{
+				m_Surface[j].RotateX(Or, -XTilt);
+				m_Surface[j].RotateZ(Or, -YTilt);
+				m_Surface[j].Translate(Trans);
+				m_Surface[j].Translate(Offset);
+				m_Surface[j].m_bIsInSymPlane = false;
 			}
+			m_Surface[ns2].m_bIsTipRight = true;
+			m_Surface[ns2].m_bIsTipLeft  = true;
+			m_Surface[0].m_bIsTipRight   = true;
+			m_Surface[0].m_bIsTipLeft    = true;
+
+			m_Surface[ns2+1].m_bIsTipRight          = true;
+			m_Surface[ns2+1].m_bIsTipLeft           = true;
+			m_Surface[m_NSurfaces-1].m_bIsTipRight  = true;
+			m_Surface[m_NSurfaces-1].m_bIsTipLeft   = true;
 		}
-		else {//Not a double fin, so just a simple singel-side fin
+		else
+		{
+			//Not a double fin, so just a simple single-sided fin
 			for (j=0; j<m_NSurfaces; j++)
 			{
 				m_Surface[j].RotateX(Or, XTilt);
 				m_Surface[j].RotateZ(Or, YTilt);
 				m_Surface[j].Translate(Trans);
-				m_Surface[j].m_bIsLeftSurf  = true;
-				m_Surface[j].m_bIsRightSurf = true;
+				m_Surface[j].m_bIsLeftSurf   = true;
+				m_Surface[j].m_bIsRightSurf  = false;
+				m_Surface[j].m_bIsInSymPlane = true;
 			}
 			m_Surface[0].m_bIsTipLeft  = true;
-			m_Surface[j].m_bIsTipRight = true;//TODO check
+			m_Surface[j].m_bIsTipRight = false;
 		}
 	}
 
-	m_Surface[0].m_bIsTipLeft         = true;
-	m_Surface[m_NSurfaces-1].m_bIsTipRight =  true;
+	m_Surface[0].m_bIsTipLeft              = true;
+	if(m_NSurfaces>=1) m_Surface[m_NSurfaces-1].m_bIsTipRight = true;
+
+	if(m_NSurfaces>1) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = true;
+	//check for a center gap greater than 1/10mm
+	if(m_TPos[0]>0.0001) 	m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
+
+	if(m_bIsFin && m_bDoubleFin) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
 
 	m_bWingOut = false;
 	
-	ComputeChords();
+//	ComputeChords();
 
 	return true;
 }
 
 
-
-
-void CWing::VLMComputeWing(double *Gamma, double *Cp, 
-						   double &VDrag, double &XCP, double &YCP,
-					       double &Pm,    double &Rm,    double &IYm,   double &GYm, bool bViscous)
+void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XCP, double &YCP,
+		                   double &GCm,   double &VCm, double &GRm,   double &GYm, double &IYm, double &VYm, 
+						   bool bViscous, bool bTilted)
 {
+	//calculates :
+	// - the moments and the centre of pressure positions by summation over the apnels
+	// - the viscous characteristics by interpolation
+	// 
 	CMainFrame *pFrame = (CMainFrame*)s_pFrame;
 	CMiarex *pMiarex   = (CMiarex*)s_pMiarex;
 	CVLMDlg *pVLMDlg   = (CVLMDlg*)s_pVLMDlg;
-	// calculates the lift coefficients from the vortices strengths
-	int  j, k, l, p, m;
-//	int side, nSide;
+
+	int  j, k, l, p, m, nFlap;
+	bool bOutRe, bError, bPointOutRe, bPointOutCl;
+	double CPStrip, tau, NForce, q, Alpha, cosa, sina;
 	CString string, strong;
 	CFoil *pFoil0, *pFoil1;
-	CVector Force, Normal, LeverArm, LeverArmC4, PanelForce, StripForce,Moment0,Moment1;
+	CVector DragVector, VInf, WindNormal, WindDirection;
+	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PtC4, PtLE, PanelForce, StripForce, Moment0, Moment1;
+	CVector TotalMoment, DragMoment, GeomMoment;
 	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment;
-	double StripArea, CP, Cm4, y, z, dl, tau,NForce;
-	double WXCP = 0.0;//this wing's center of pressure
-	double WYCP = 0.0;
-	double WZCP = 0.0;
-	double PCm  = 0.0;
-	double GCm  = 0.0;
-	double InducedYawingMoment  = 0.0;
-	double WingForce = 0.0;
-	bool bOutRe      = false;
-	bool bError      = false;
-	bool bPointOutRe, bPointOutCl;
 
-	int nFlap = 0;
+	//dynamic pressure, kg/m3
+	q = 0.5 * m_Density * m_QInf * m_QInf;
 
-	m_ViscousDrag = 0.0;
-	p=0;
-	CVector PtC4(0.0,0.0,0.0);
-	CVector UInf(1.0, 0.0, 0.0);//is parallel to the horseshoe vortex trailing legs
+	if(!bTilted) Alpha = m_Alpha;
+	else         Alpha = 0.0; 
 
-	CVector DragVector(0.0, 0.0, 0.0);
-	Moment1.Set(0.0,0.0,0.0);
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
 
-	for (m=0; m< m_NStation; m++)
-		m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
+	//   Define wind axis
+	WindNormal.Set(   -sina, 0.0, cosa);
+	WindDirection.Set( cosa, 0.0, sina);
 
-	m=0;
+	VInf = WindDirection * m_QInf;
+
+	m_GRm = m_GCm = 0.0;
+	m_GYm = m_IYm = m_VYm = 0.0;
+
+	for (m=0; m< m_NStation; m++)	m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
+
+	bOutRe = bError = false;
+	m = p = nFlap = 0;
+
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		pFoil0 = m_Surface[j].m_pFoilA;
 		pFoil1 = m_Surface[j].m_pFoilB;
+
 		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
 		{
 			//create a hinge unit vector and initialize hinge moment
@@ -3451,93 +3265,80 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,
 			m_FlapMoment[nFlap] = 0.0;
 		}
 
-		Normal = m_Surface[j].Normal;
-		for (k=0; k<m_Surface[j].m_NYPanels; k++){
+		SurfaceNormal = m_Surface[j].Normal;
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
 
 			bPointOutRe = false;
 			bPointOutCl = false;
 			StripForce.Set(0.0,0.0,0.0);//sum lift of all panels along chord
-			StripArea    = 0.0;
-			CP        = 0.0;
-			m_CmAirf[m] = 0.0;
-			dl        = m_Surface[j].Getdl(k);
-			m_Surface[j].Getyz(k,y,z);
-			m_Surface[j].GetC4(k, PtC4);
-			tau = m_Surface[j].Getyrel(y);
-			Cm4       = 0.0;
+			CPStrip        = 0.0;
+			m_CmAirf[m]    = 0.0;
+
+			m_Surface[j].GetLeadingPt(k, PtLE);
+			m_Surface[j].GetC4(k, PtC4, tau);
 
 			LeverArm   = PtC4;
 			LeverArm.x -= m_XCmRef;
-			LeverArm.RotateY(m_Alpha);
 
-			StripArea = m_Chord[m]* dl;
+			m_StripArea[m] = 0.0;
 
-			for (l=0; l<m_Surface[j].m_NXPanels; l++){
+			for (l=0; l<m_Surface[j].m_NXPanels; l++)
+			{
+				m_StripArea[m] += m_pPanel[p].Area;
+
 				// for each panel along the chord, add the lift coef
 				if(m_bVLM1 || m_pPanel[p].m_bIsLeading)
 				{
-					PanelForce  = UInf * m_pPanel[p].Vortex;
-					PanelForce *= Gamma[p];
+					PanelForce  = VInf * m_pPanel[p].Vortex;
+					PanelForce *= Gamma[p] * m_Density;         //Newtons
 					LeverArmC4  = m_pPanel[p].VortexPos - PtC4;
-					LeverArmC4.RotateY(m_Alpha);
 					Moment0 = LeverArmC4 * PanelForce;
-					PCm          += Moment0.y;
-					m_CmAirf[m]  += Moment0.y;
+					m_CmAirf[m]  += Moment0.y; //N.m
 				}
 				else
 				{
-					PanelForce  = UInf * m_pPanel[p].Vortex;
-					PanelForce *= Gamma[p];
+					PanelForce  = VInf * m_pPanel[p].Vortex;
+					PanelForce *= Gamma[p] * m_Density;         //Newtons
 					LeverArmC4  = m_pPanel[p].VortexPos - PtC4;
-					LeverArmC4.RotateY(m_Alpha);
+//					LeverArmC4.RotateY(m_Alpha);
 					Moment0 = LeverArmC4 * PanelForce;
 
-					Force       = UInf* m_pPanel[p].Vortex;
-					Force      *= Gamma[p+1];
+					Force       = VInf* m_pPanel[p].Vortex;
+					Force      *= Gamma[p+1] * m_Density;       //Newtons
 					PanelForce -= Force;
-					LeverArmC4  = m_pPanel[p+1].VortexPos - PtC4;
-					LeverArmC4.RotateY(m_Alpha);
 					Moment1 = LeverArmC4 * Force;
-					PCm          += Moment0.y - Moment1.y;
-					m_CmAirf[m]  += Moment0.y - Moment1.y;
+					m_CmAirf[m]  += Moment0.y - Moment1.y; //N.m
 				}
 
-				Cm4        += (PtC4.x-m_pPanel[p].VortexPos.x) * PanelForce.z;
 				StripForce += PanelForce;
-				NForce = PanelForce.dot(Normal);
+				NForce = PanelForce.dot(SurfaceNormal);
 				
-				XCP       += m_pPanel[p].VortexPos.x * NForce; //global center of pressure
-				YCP       += m_pPanel[p].VortexPos.y * NForce; 
-				WXCP      += m_pPanel[p].VortexPos.x * NForce; //this wing's center of pressure
-				WYCP      += m_pPanel[p].VortexPos.y * NForce; 
-				WingForce += NForce;
-				CP        += m_pPanel[p].VortexPos.x * NForce;
+				XCP       += m_pPanel[p].VortexPos.x * PanelForce.dot(WindNormal); //global center of pressure (N.m)
+				YCP       += m_pPanel[p].VortexPos.y * PanelForce.dot(WindNormal); 
+				CPStrip   += m_pPanel[p].VortexPos.x * NForce;
 
-				Cp[p]  = 2.0 * PanelForce.dot(m_pPanel[p].Normal) /m_QInf/m_pPanel[p].Area;
+				Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /m_QInf/m_pPanel[p].Area/m_Density;
 
-				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap){
+				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+				{
 					//add hinge moment contribution
 					V1 = m_pPanel[p].VortexPos - HA;
 					HingeLeverArm = V1 - H * V1.dot(H);
-					if(HingeLeverArm.x>0.0){
-						HingeMoment = HingeLeverArm * PanelForce;
-						m_FlapMoment[nFlap] += HingeMoment.dot(H) * m_Density * m_QInf;
+					if(HingeLeverArm.x>0.0)
+					{
+						HingeMoment = HingeLeverArm * PanelForce;//N.m
+						m_FlapMoment[nFlap] += HingeMoment.dot(H);
 					}
 				}
 				p++;
 			}
 
-//			m_CmAirf[m]     = Cm4*2.0      /StripArea/m_QInf/100.0;//error up to v2.00, corrected in v2.01
-//			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/m_QInf;//up to v2.04
-//			Rm             += m_Cl[m] * chord * y * dl;
-			m_CmAirf[m]     *=   2.0/m_Chord[m]/StripArea/m_QInf;//vectorial formulation
-
-			NForce = StripForce.dot(Normal);
+			NForce = StripForce.dot(SurfaceNormal);
 			
-			m_XCPSpanRel[m]    = (CP/NForce - GetOffset(2.0*y/m_Span))/m_Chord[m];
-			m_XCPSpanAbs[m]    =  CP/NForce ;
+			m_XCPSpanRel[m]    = (CPStrip/NForce - PtLE.x)/m_Chord[m];
+			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
-//			IYm            += m_ICd[m] * chord * y * dl;
 
 			if(bViscous)
 			{
@@ -3552,31 +3353,44 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,
 				m_XTrBot[m] = pFrame->VLMGetVar(6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
-				m_ViscousDrag += m_PCd[m] * StripArea;
-				VDrag         += m_PCd[m] * StripArea;
-				GYm           += m_PCd[m] * StripArea * y;
-				DragVector.x = m_PCd[m]*StripArea*m_QInf/2.0;
+				m_ViscousDrag = m_PCd[m] * m_StripArea[m];
+				VDrag         += m_PCd[m] * m_StripArea[m];
+				DragVector.x   = m_PCd[m] * m_StripArea[m] * q;//Newtons
 			}
-			else{
+			else
+			{
 				m_PCd[m]     = 0.0;
 				m_XTrBot[m]  = 1.0;
 				m_XTrTop[m]  = 1.0;
 				DragVector.x = 0.0;
 			}
 
-			GYm           += m_F[m].y * StripArea * PtC4.x ;
+//			StripForce += DragVector;              // no : already partially included in the stripforce
 
-			StripForce += DragVector;
-			m_GeomMoment[m] = LeverArm * StripForce;
-			m_CmGeom[m] = m_GeomMoment[m].y/m_Chord[m]*2.0/StripArea/m_QInf;
-			m_Cm[m]     = m_CmAirf[m]+m_CmGeom[m];
-			GCm += m_CmGeom[m] * m_Chord[m] * StripArea;//TODO : check formula
-			Pm  +=m_GeomMoment[m].y * m_QInf;
-			Rm  +=m_GeomMoment[m].x * m_QInf;
-			GYm +=m_GeomMoment[m].z * m_QInf;
-			InducedYawingMoment += m_ICd[m] * StripArea * m_pPanel[p].VortexPos.y ;
+			//_______________Local Moment coefficients________________
+//			m_CmAirf[m]     = Cm4*2.0      /StripArea/m_QInf/100.0;//error up to v2.00, corrected in v2.01
+//			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/m_QInf;//up to v2.04
 
-			if(bPointOutCl){
+
+			// ______________Global moments, in N.m __________________
+			DragMoment = LeverArm * DragVector;
+			GeomMoment = LeverArm * StripForce;
+
+			m_GCm += GeomMoment.y;
+			m_GRm += GeomMoment.dot(WindDirection);
+			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
+
+			m_VYm += DragMoment.dot(WindNormal);
+			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y / 2.0 * m_Density *m_QInf*m_QInf; 
+//			m_GYm += m_VYm + m_IYm;
+
+			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m]/q;
+			m_CmXRef[m]     = GeomMoment.y/m_Chord[m]/m_StripArea[m]/q;
+			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
+
+
+			if(bPointOutCl)
+			{
 				GetLengthUnit(string, pFrame->m_LengthUnit);
 				strong.Format("       Span pos = %9.2f ",	m_SpanPos[m]*pFrame->m_mtoUnit);
 				strong += string;
@@ -3590,7 +3404,8 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,
 				m_bWingOut = true;
 
 			}
-			else if(bPointOutRe){
+			else if(bPointOutRe)
+			{
 				GetLengthUnit(string, pFrame->m_LengthUnit);
 				strong.Format("       Span pos = %9.2f ",	m_SpanPos[m]*pFrame->m_mtoUnit);
 				strong += string;
@@ -3608,14 +3423,27 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,
 		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
 	}
 
-	m_VCm  =  2.0*PCm                 /m_Area /m_MAChord /m_QInf;
-	m_IYm  =      InducedYawingMoment /m_Area /m_Span    /m_QInf/m_QInf;
+	//global plane dimensionless coefficients
+	GCm += m_GCm;
+	 //sign convention for rolling and yawing is opposite to algebric results
+	GRm -= m_GRm;
+	GYm -= m_GYm;
+	VYm -= m_VYm;
+	IYm -= m_IYm;
+
+	// wing dimensionless coefficients
+	m_GCm *=  1.0/ q / m_Area /m_MAChord;
+	 //sign convention for rolling and yawing is opposite to algebric results
+	m_GRm *= -1.0/ q / m_Area /m_Span;
+	m_GYm *= -1.0/ q / m_Area /m_Span;
+	m_VYm *= -1.0/ q / m_Area /m_Span;
+	m_IYm *= -1.0/ q / m_Area /m_Span;
+
 }
 
 
 void CWing::VLMSetBending()
 {
-//	double StripArea[MAXSTATIONS+1];
 	double ypos[MAXSTATIONS+1], zpos[MAXSTATIONS+1];
 	int j,k,jj;
 	double bm;
@@ -3623,9 +3451,6 @@ void CWing::VLMSetBending()
 	CVector Moment;
 	int m = 0;
 	int p = 0;
-
-	//dynamic pressure, kg/m3
-	double q = 0.5 * m_Density * m_QInf * m_QInf;
 
 	for (j=0; j<m_NSurfaces; j++){//All surfaces
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
@@ -3641,16 +3466,20 @@ void CWing::VLMSetBending()
 	for (j=0; j<m_NStation; j++)
 	{
 		bm = 0.0;
-		if (ypos[j]<=0){
-			for (jj=0; jj<j; jj++){
+		if (ypos[j]<=0)
+		{
+			for (jj=0; jj<j; jj++)
+			{
 				Dist.y =  -ypos[jj]+ypos[j];
 				Dist.z =  -zpos[jj]+zpos[j];
 				Moment = Dist * m_F[jj];
 				bm += Moment.x ;
 			}
 		}
-		else{
-			for (jj=j+1; jj<m_NStation; jj++){
+		else
+		{
+			for (jj=j+1; jj<m_NStation; jj++)
+			{
 				Dist.y =  ypos[jj]-ypos[j];
 				Dist.z =  zpos[jj]-zpos[j];
 				Moment = Dist * m_F[jj];
@@ -3659,76 +3488,6 @@ void CWing::VLMSetBending()
 		}
 		m_BendingMoment[j] = bm;
 	}
-}
-
-
-
-void CWing::VLMTrefftz(double *Gamma, double & Lift, double & Drag)
-{
-	// applicable only for the quad vortices
-	// calculates the lift and induced drag from the vortices strengths
-	// using a farfield method
-	// Downwash is evaluated at a distance 10 times the span downstream (i.e. infinite)
-	//
-	CVLMDlg *pVLMDlg = (CVLMDlg*)s_pVLMDlg;
-	int j , k, l,  p,  m;
-	double StripArea;
-	CVector  C, V, dF, StripForce;
-	CVector Wg (0.0,0.0,0.0);
-	CVector VInf;
-//	VInf.Set(m_QInf,0.0,0.0);
-	VInf.Set(m_QInf*cos(m_Alpha*pi/180.0),0.0,m_QInf*sin(m_Alpha*pi/180.0));
-
-	pVLMDlg->AddString("          Calculating induced drag...\r\n");
-
-	m_CL = 0.0;
-	m_InducedDrag = 0.0;
-
-	p=0;
-	m=0;
-	for (j=0; j<m_NSurfaces; j++)
-	{
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
-		{
-			StripArea  = m_Surface[j].GetStripArea(k);
-			StripForce.Set(0.0,0.0,0.0);
-			m_Cl[m] = 0.0;
-			m_ICd[m] = 0.0;
-
-			for(l=0; l<m_Surface[j].m_NXPanels; l++)
-			{
-				if(m_bVLM1 || m_pPanel[p].m_bIsTrailing)
-				{
-					C = m_pPanel[p].CtrlPt;
-					C.x = m_Span * 100.0;
-
-					//induced lift
-					dF  = VInf * m_pPanel[p].Vortex;
-					dF *= Gamma[p];
-					m_Cl[m]    += 2.0*dF.z/StripArea/m_QInf/m_QInf;
-					m_CL       += dF.z;
-					StripForce += dF;
-
-					//induced drag
-					Wg = pVLMDlg->GetSpeedVector(C, Gamma);
-					dF  = Wg * m_pPanel[p].Vortex;
-					dF *= Gamma[p];
-					m_ICd[m]       +=  dF.x;//*cos(m_Alpha*pi/180.0)-dF.z*sin(m_Alpha*pi/180.0);
-					m_InducedDrag  +=  dF.x;//*cos(m_Alpha*pi/180.0)-dF.z*sin(m_Alpha*pi/180.0);
-
-				}
-				p++;
-			}
-			m_ICd[m]  *= 1.0/StripArea/m_QInf/m_QInf;
-			m_F[m] = StripForce * m_Density; //F = rho * (V x Gamma) Kutta_Joukowski
-			m++;
-		}
-	}
-	Lift       += m_CL;
-	Drag       +=  m_InducedDrag;
-
-	m_InducedDrag *= -1.0       /m_Area/m_QInf;
-	m_CL          *=  1.0       /m_Area/m_QInf;
 }
 
 
@@ -3988,6 +3747,7 @@ void CWing::OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 	ReadSectionData(pDispInfo->item.iItem);
     m_bChanged = true;
 
+	FillPanelList();
 	ComputeGeometry();
 	SetResults();
 	InvalidateRect(&m_DrawRect);
@@ -4056,7 +3816,7 @@ void CWing::ReadSectionData(int sel)
 	strong = m_ctrlPanelList.GetItemText(sel,7);
 	strong.Replace(" ","");
 	res = sscanf(strong, "%d",&k);
-	if(res==1) m_NXPanels[sel] =k;
+	if(res==1) m_NXPanels[sel] =max(0,k);
 	m_NXPanels[sel] = min(m_NXPanels[sel], MAXCHORDPANELS);
 
 	strong = m_ctrlPanelList.GetItemText(sel,8);
@@ -4069,7 +3829,7 @@ void CWing::ReadSectionData(int sel)
 	strong = m_ctrlPanelList.GetItemText(sel,9);
 	strong.Replace(" ","");
 	res = sscanf(strong, "%d",&k);
-	if(res==1) m_NYPanels[sel] =k;
+	if(res==1) m_NYPanels[sel] = max(0,k);
 
 	strong = m_ctrlPanelList.GetItemText(sel,10);
 	strong.Replace(" ","");
@@ -4109,49 +3869,55 @@ void CWing::OnUpdateMeshFromTotal()
 
 void CWing::PanelComputeWing(double *Cp, 
 							 double &VDrag, double &XCP, double &YCP,
-							 double &Pm,    double &Rm,    double &IYm,   double &GYm, bool bViscous)
+							 double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm,
+							 bool bViscous, bool bThinSurface, bool bTilted)
 {
 	CMainFrame *pFrame    = (CMainFrame*)s_pFrame;
 	CMiarex *pMiarex      = (CMiarex*)s_pMiarex;
 	C3DPanelDlg *p3DDlg   = (C3DPanelDlg*)s_p3DPanelDlg;
 
 	// calculates the lift coefficients from the vortices strengths
-	int  j, k, l, p, m;
-	CString string, strong;
+	int  j, k, l, p, m, nFlap, coef;
+	
+	bool bPointOutRe, bPointOutCl, bOutRe, bError;	CString string, strong;
 	CFoil *pFoil0, *pFoil1;
-	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment;
-	CVector Force, Normal, LeverArm, LeverArmC4, PanelForce, StripForce, Moment0, Moment1;
-	double StripArea, CP, Cm4, chord, y, z, dl, tau,NForce;
-	double WXCP = 0.0;//this wing's center of pressure
-	double WYCP = 0.0;
-	double WZCP = 0.0;
-	double PCm  = 0.0;
-	double GCm  = 0.0;
-	double WingForce = 0.0;
-	bool bOutRe      = false;
-	bool bError      = false;
-	bool bPointOutRe, bPointOutCl;
-	int nFlap = 0;
+	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment, DragMoment, GeomMoment, PtC4, PtLE, DragVector;
+	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelForce, StripForce, Moment0, WindNormal, WindDirection;
+	double CPStrip, tau, NForce, Alpha, cosa, sina;
 
-	m_CL = 0.0;
-	m_InducedDrag = 0.0;
-	m_ViscousDrag = 0.0;
-	CVector PtC4(0.0,0.0,0.0);
-	CVector DragVector(0.0, 0.0, 0.0);
-	Moment1.Set(0.0,0.0,0.0);
+	bOutRe = bError = false;
 
-	for (m=0; m< m_NStation; m++)
-		m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
+	coef = 2;
+	if(bThinSurface) coef = 1;
 
-	m=0;
-	p = m_Surface[0].m_NXPanels;//do not consider left tip patch
+	if(!bTilted) Alpha = m_Alpha;
+	else         Alpha = 0.0;
+
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
+
+	//   Define wind axis
+	WindNormal.Set(-sina, 0.0, cosa);
+	WindDirection.Set(cosa, 0.0, sina);
+
+//	VInf = WindDirection * m_QInf;
+
+	m_GRm = m_GCm = 0.0;
+	m_GYm = m_IYm = m_VYm = 0.0;
+
+	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
+
+	m = p = nFlap = 0;
 
 	for (j=0; j<m_NSurfaces; j++)//All surfaces
 	{
+		if(!bThinSurface && m_Surface[j].m_bIsTipLeft) p += m_Surface[j].m_NXPanels;//do not consider left tip patch
+
 		pFoil0 = m_Surface[j].m_pFoilA;
 		pFoil1 = m_Surface[j].m_pFoilB;
 
-		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap){
+		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+		{
 			//create a hinge unit vector and initialize hinge moment
 			m_Surface[j].GetPoint(m_Surface[j].m_posATE, m_Surface[j].m_posBTE, 0.0, HA, 0);
 			m_Surface[j].GetPoint(m_Surface[j].m_posATE, m_Surface[j].m_posBTE, 1.0, HB, 0);
@@ -4160,88 +3926,65 @@ void CWing::PanelComputeWing(double *Cp,
 			m_FlapMoment[nFlap] = 0.0;
 		}
 
-//		nPanel = m_Surface[j].GetNPanels();
-		Normal = m_Surface[j].Normal;
+		SurfaceNormal = m_Surface[j].Normal;
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
 			bPointOutRe = false;
 			bPointOutCl = false;
 			StripForce.Set(0.0,0.0,0.0);//sum lift of all panels along chord
-			StripArea   = 0.0;
-			CP          = 0.0;
-			m_CmAirf[m] = 0.0;
+			m_StripArea[m] = 0.0;
+			CPStrip        = 0.0;
+			m_CmAirf[m]    = 0.0;
 
-			dl          = m_Surface[j].Getdl(k);
-			m_Surface[j].Getyz(k,y,z);
-			m_Surface[j].GetC4(k, PtC4);
-
-			tau       = m_Surface[j].Getyrel(y);
-			chord     = m_Surface[j].GetChord(k);
-			Cm4       = 0.0;
+			m_Surface[j].GetLeadingPt(k, PtLE);
+			m_Surface[j].GetC4(k, PtC4, tau);
 
 			LeverArm = PtC4;
 			LeverArm.x -= m_XCmRef;
-			LeverArm.RotateY(m_Alpha);
+//			LeverArm.RotateY(m_Alpha);
 
-			for (l=0; l<2*m_Surface[j].m_NXPanels; l++)
+			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
-				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
-				StripForce += PanelForce;
-				NForce = PanelForce.dot(Normal);
+				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;	// Newtons/q
+				StripForce += PanelForce;										// Newtons/q
+				NForce = PanelForce.dot(SurfaceNormal);							// Newtons/q
 
 				LeverArmC4 = m_pPanel[p].CollPt- PtC4;
-				LeverArmC4.RotateY(m_Alpha);
+//				LeverArmC4.RotateY(m_Alpha);
 
-				Moment0 = LeverArmC4 * PanelForce;
-				PCm          += Moment0.y;
-				m_CmAirf[m]  += Moment0.y;
+				Moment0 = LeverArmC4 * PanelForce;								// N.m/q
+				m_CmAirf[m]  += Moment0.y;										// N.m/q
 
-				StripArea    += m_pPanel[p].Area;
-
-				Cm4   += (PtC4.x-m_pPanel[p].CollPt.x) * PanelForce.z;
+				m_StripArea[m]    += m_pPanel[p].Area;
 				
-				XCP       += m_pPanel[p].CollPt.x * NForce; //global center of pressure
-				YCP       += m_pPanel[p].CollPt.y * NForce; 
-				WXCP      += m_pPanel[p].CollPt.x * NForce; //this wing's center of pressure
-				WYCP      += m_pPanel[p].CollPt.y * NForce; 
-				WingForce += NForce;
-				CP        += m_pPanel[p].CollPt.x * NForce;
+				XCP       += m_pPanel[p].CollPt.x * PanelForce.dot(WindNormal); //global center of pressure
+				YCP       += m_pPanel[p].CollPt.y * PanelForce.dot(WindNormal); 
+				CPStrip   += m_pPanel[p].CollPt.x * NForce;
 
-				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap){
+				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+				{
 					//add hinge moment contribution
 					V1 = m_pPanel[p].VortexPos - HA;
 					HingeLeverArm = V1 - H * V1.dot(H);
-					if(HingeLeverArm.x>0.0){
-						HingeMoment = HingeLeverArm * PanelForce;
-						m_FlapMoment[nFlap] += HingeMoment.dot(H) * m_Density * m_QInf * m_QInf/2.0;
+					if(HingeLeverArm.x>0.0)
+					{
+						HingeMoment = HingeLeverArm * PanelForce;				// N.m/q
+						m_FlapMoment[nFlap] += HingeMoment.dot(H) * m_Density * m_QInf * m_QInf/2.0;//N
 					}
 				}
 				p++;
 			}
 
-			StripArea /=2.0; //average over top and bottom
+			m_StripArea[m] /=(double)coef; //average over top and bottom
 
-//			m_Cl[m]  = StripForce.z/StripArea ;
-///			m_CL    +=     StripForce.z;
-
-
-			NForce = StripForce.dot(Normal);
+			NForce = StripForce.dot(SurfaceNormal);
 			
-			m_XCPSpanRel[m]    = (CP/NForce - GetOffset(2.0*y/m_Span))/chord;
-			m_XCPSpanAbs[m]    =  CP/NForce ;
+			m_XCPSpanRel[m]    = (CPStrip/NForce - PtLE.x)/m_Chord[m];
+			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
-//			if(pMiarex->m_bTrefftz)
-//				Ft = StripForce.z * sin(Ai[m]*pi/180.0);// + StripForce.x * cos(Ai[m]*pi/180.0);
-//			else 
-//				Ft = StripForce.x;
-
-//			m_ICd[m]        = -1.0 * Ft/StripArea ;
-
-//			m_InducedDrag  += Ft ;
-
-			if(bViscous){
+			if(bViscous)
+			{
 				m_PCd[m]    = pFrame->VLMGetVar(2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-//TRACE("m_Cl[%d]=%10.3f     m_PCd[%d]=%10.3f\n", m, m_Cl[m],m, m_PCd[m]);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 
@@ -4252,33 +3995,42 @@ void CWing::PanelComputeWing(double *Cp,
 				m_XTrBot[m] = pFrame->VLMGetVar(6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
-				m_ViscousDrag += m_PCd[m] * m_Chord[m] * dl;
-				VDrag         += m_PCd[m] * m_Chord[m] * dl;
-				GYm           += m_PCd[m] * m_Chord[m] * y* dl;
-				DragVector.x = m_PCd[m]*StripArea*m_QInf/2.0;
+				m_ViscousDrag = m_PCd[m] * m_StripArea[m];
+				VDrag         += m_PCd[m] * m_StripArea[m];
+				DragVector.x = m_PCd[m]*m_StripArea[m];
 			}
-			else{
+			else
+			{
 				m_PCd[m]     = 0.0;
 				m_XTrBot[m]  = 1.0;
 				m_XTrTop[m]  = 1.0;
 				DragVector.x = 0.0;
 			}
 
-			GYm           += m_F[m].y * m_Chord[m] * PtC4.x * dl;
 
-			StripForce += DragVector;
+			//global moments, in N.m/q
+			DragMoment = LeverArm * DragVector;
+			GeomMoment = LeverArm * StripForce ;
 
-			m_CmAirf[m]    *= 1.0/chord/StripArea;//vectorial formulation
-			m_GeomMoment[m] = LeverArm * StripForce;
-			m_CmGeom[m]     = m_GeomMoment[m].y/chord/StripArea;
-			m_Cm[m]         = m_CmAirf[m]+m_CmGeom[m];
 
-			GCm += m_CmGeom[m] * m_Chord[m] * m_Chord[m] * dl;
-			Pm  +=m_GeomMoment[m].y;
-			Rm  +=m_GeomMoment[m].x;
-			GYm +=m_GeomMoment[m].z;
+//	m_ICd[m] = StripForce.x/m_Striparea[m];
+//TRACE("%12.4e     %12.4e\n", StripForce.x, GeomMoment.x);
 
-			if(bPointOutCl){
+			m_GCm += GeomMoment.y;
+			m_GRm += GeomMoment.dot(WindDirection);
+			m_GYm += GeomMoment.dot(WindNormal);
+
+			m_VYm += DragMoment.dot(WindNormal);
+
+			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y ; 
+
+
+			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m];//vectorial formulation
+			m_CmXRef[m]     = GeomMoment.y/m_Chord[m]/m_StripArea[m];
+			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
+
+			if(bPointOutCl)
+			{
 				GetLengthUnit(string, pFrame->m_LengthUnit);
 				strong.Format("       Span pos = %9.2f ",	m_SpanPos[m]*pFrame->m_mtoUnit);
 				strong += string;
@@ -4292,7 +4044,8 @@ void CWing::PanelComputeWing(double *Cp,
 				m_bWingOut = true;
 
 			}
-			else if(bPointOutRe){
+			else if(bPointOutRe)
+			{
 				GetLengthUnit(string, pFrame->m_LengthUnit);
 				strong.Format("       Span pos = %9.2f ",	m_SpanPos[m]*pFrame->m_mtoUnit);
 				strong += string;
@@ -4306,92 +4059,228 @@ void CWing::PanelComputeWing(double *Cp,
 				m_bWingOut = true;
 			}
 			m++;
-//			p3DDlg->SetProgress((int)(10.0*(double)m_MatSize/(double)p3DDlg->m_MatSize),(double)m/(double)m_NStation);
 		}
+		if(!bThinSurface && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;//do not consider right tip patch
 		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
 	}
+	//global plane dimensionless coefficients
+	GCm += m_GCm;
+	//sign convention for rolling and yawing is opposite to algebric results
+	GRm -= m_GRm;
+	GYm -= m_GYm;
+	VYm -= m_VYm;
+	IYm -= m_IYm;
 
-//	Lift    += m_CL;
-//	IDrag   +=  m_InducedDrag;
-//	m_CL    /=  m_Area;
+	// wing dimensionless coefficients
+	m_GCm *=  1.0 / m_Area /m_MAChord;
+	//sign convention for rolling and yawing is opposite to algebric results
+	m_GRm *= -1.0 / m_Area /m_Span;
+	m_GYm *= -1.0 / m_Area /m_Span;
+	m_VYm *= -1.0 / m_Area /m_Span;
+	m_IYm *= -1.0 / m_Area /m_Span;
 
-	m_VCm    =  PCm  /m_Area/m_MAChord;
 }
 
 
-void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, double &Lift, double &Drag, bool bTilted)
+void CWing::VLMTrefftz(double *Gamma, int pos, double & Lift, double & Drag, bool bTilted)
 {
-	// calculates the induced lift and drag from the vortices or wake panels strength
+	// calculates the lift and induced drag from the vortices strengths
 	// using a farfield method
-	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
+	// Downwash is evaluated at a distance 10 times the span downstream (i.e. infinite)
 	//
-	C3DPanelDlg *p3DDlg = (C3DPanelDlg*)s_p3DPanelDlg;
 
+	CVLMDlg *pVLMDlg = (CVLMDlg*)s_pVLMDlg;
 	int j , k, l,  p,  m;
-	double StripArea;
-	double InducedAngle, Wgz;
-	double IYm;
-	CVector  C, V, Wg, StripForce;
+	double Alpha, cosa, sina;
+	CVector  C, V, dF, StripForce, WindDirection, WindNormal;
+	CVector Wg (0.0,0.0,0.0);
 	CVector VInf;
-	VInf.Set(m_QInf*cos(m_Alpha*pi/180.0),0.0,m_QInf*sin(m_Alpha*pi/180.0));
-//	VInf.set(1.0, 0.0, 0.0));
 
-	//dynamic pressure, kg/m3
-	double q = 0.5 * m_Density * m_QInf * m_QInf;
+	if(!bTilted) Alpha = m_Alpha;
+	else         Alpha = 0.0;
+	
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
 
-	p3DDlg->AddString( "       Calculating induced drag...\r\n");
+	//   Define wind axis
+	WindNormal.Set(-sina, 0.0, cosa);
+	WindDirection.Set(cosa, 0.0, sina);
 
-	m_CL          = 0.0;
+	VInf = WindDirection * m_QInf;
+
+	m_CL = 0.0;
 	m_InducedDrag = 0.0;
-	IYm           = 0.0;
 
 	p=0;
 	m=0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		if(m_Surface[j].m_bIsTipLeft) p+=m_Surface[j].m_NXPanels;//tip patch panels
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
-			m_Surface[j].GetTrailingPt(C, k);
-			C.x = p3DDlg->m_pWPolar->m_TotalWakeLength * m_MAChord;
-			StripArea  = m_Surface[j].GetStripArea(k);
-			m_Cl[m]    = 0.0;
-			m_ICd[m]   = 0.0;
-			StripForce.Set(0.0, 0.0, 0.0);
+//			StripArea  = m_Surface[j].GetStripArea(k);
+			m_StripArea[m] = 0.0;
+			StripForce.Set(0.0,0.0,0.0);
+			m_Cl[m] = 0.0;
+			m_ICd[m] = 0.0;
 
-			//induced lift
-			for(l=0; l<2*m_Surface[j].m_NXPanels; l++)
+			for(l=0; l<m_Surface[j].m_NXPanels; l++)
 			{
-				StripForce += m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
+				m_StripArea[m]+=m_pPanel[p].Area;
+				if(m_bVLM1 || m_pPanel[p].m_bIsTrailing)
+				{
+					C = m_pPanel[p].CtrlPt;
+					C.x = m_Span * 100.0;
+
+					//induced lift
+					dF  = VInf * m_pPanel[p].Vortex; 
+					dF *= Gamma[p+pos];			// N/rho
+
+					//project on wind axes
+					m_Cl[m]    += dF.dot(WindNormal);
+					m_CL       += dF.dot(WindNormal);
+					StripForce += dF;			// N/rho
+
+//...trefftz-plane drag is kinetic energy in crossflow
+//	dwwake(jc) = -(ny*vy + nz*vz)   //Far-field wake downwash at center of strip
+//	clff = clff + 2.0*gams(jc)*          dyt    /sref   //induced lift
+//	cyff = cyff - 2.0*gams(jc)* dzt             /sref   //induced side force
+//	cdff = cdff +     gams(jc)*(dzt*vy - dyt*vz)/sref   //induced drag 
+//spanef = (clff**2 + cyff**2)/ (pi * ar * cdff) //oswald
+
+					//induced drag
+					Wg  = pVLMDlg->GetSpeedVector(C, Gamma);
+					dF  = Wg * m_pPanel[p].Vortex;
+					dF *= Gamma[p+pos];			// N/rho
+
+					//project on wind axes
+					m_ICd[m]       +=  dF.dot(WindDirection);
+					m_InducedDrag  +=  dF.dot(WindDirection);
+				}
 				p++;
 			}
-			m_Cl[m]  = StripForce.z/StripArea ;
-			m_CL    += StripForce.z;
 
-			//the induced drag is calculated in wind axis, whether the geom is tilted or not
-			Wg = p3DDlg->GetSpeedVector(C, Mu, Sigma);
-			//convert Wg in wind axis
-			Wgz = -Wg.x*sin(m_Alpha*pi/180.0) + Wg.z * cos(m_Alpha*pi/180.0);
-			InducedAngle = atan2(Wg.z, m_QInf);// apparent induced angle, in rad
-			
-			m_ICd[m]       = -(StripForce.z * sin(InducedAngle))/StripArea;
-//			m_ICd[m]       = (StripForce.x * cos(InducedAngle) + StripForce.z * sin(InducedAngle))/StripArea;
-			m_InducedDrag +=  StripForce.z * sin(InducedAngle) ;//+ StripForce.x * cos(InducedAngle);
-			m_Ai[m]        = InducedAngle*180/pi;
-			IYm           += m_ICd[m] * StripArea * C.y;
-
-			m_F[m]   = StripForce * q; 
+			m_Cl[m]  *= 2.0/m_StripArea[m] /m_QInf/m_QInf;
+			m_ICd[m] *= 1.0/m_StripArea[m] /m_QInf/m_QInf;
+			m_F[m] = StripForce * m_Density;			 //Newtons : F = rho * (V x Gamma) Kutta_Joukowski 
+			if(bTilted) m_F[m].RotateY(-m_Alpha);
 
 			m++;
+		}
+	}
+	
+	Lift       += m_CL	;
+	Drag       +=  m_InducedDrag;
+
+	m_InducedDrag *= -1.0       /m_Area/m_QInf;
+	m_CL          *=  1.0       /m_Area/m_QInf;
+}
+
+
+void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, double &Lift, double &Drag, 
+						 bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode)
+{
+	// calculates the induced lift and drag from the vortices or wake panels strength
+	// using a farfield method
+	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
+
+	C3DPanelDlg *p3DDlg = (C3DPanelDlg*)s_p3DPanelDlg;
+
+	int nw, iTA, iTB;
+	int j, k, l,  p,  m;
+	double StripArea, InducedAngle, IYm, cosa, sina, GammaStrip;
+	CVector C, V, Wg, StripForce, dF, WindDirection, WindNormal;
+
+	if(bTilted)
+	{
+		cosa = 1.0;
+		sina = 0.0;
+	}
+	else
+	{
+        cosa = cos(m_Alpha*pi/180.0);
+		sina = sin(m_Alpha*pi/180.0);
+	}
+	//   Define wind axis
+	WindNormal.Set(-sina, 0.0, cosa);
+	WindDirection.Set(cosa, 0.0, sina);
+
+	//dynamic pressure, kg/m3
+	double q = 0.5 * m_Density * m_QInf * m_QInf;
+
+	m_CL          = 0.0;
+	m_InducedDrag = 0.0;
+	IYm           = 0.0;
+
+	int coef = 2;
+	if (bThinSurf) coef = 1;
+
+	p=0;
+	m=0;
+	for (j=0; j<m_NSurfaces; j++)
+	{
+		if(m_Surface[j].m_bIsTipLeft && !bThinSurf) p+=m_Surface[j].m_NXPanels;//tip patch panels
+
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+//			m_Surface[j].GetTrailingPt(k, CC);
+
+			nw  = m_pPanel[p].m_iWake;
+			iTA = pWakePanel[nw].m_iTA;
+			iTB = pWakePanel[nw].m_iTB;
+			C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
+
+			m_Cl[m]    = 0.0;
+			StripForce.Set(0.0, 0.0, 0.0);
+
+			GammaStrip = (Mu[pos+p+coef*m_Surface[j].m_NXPanels-1] - Mu[pos+p]) *4*pi;
+
+			//induced lift
+			StripArea = 0.0;
+			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
+			{
+				StripArea  += m_pPanel[p].Area;
+				StripForce += m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;  // N/q
+				p++;
+			}
+			StripArea/=(double)coef;
+
+			m_Cl[m]  = (StripForce.dot(WindNormal))/StripArea ;
+			m_CL    +=  StripForce.dot(WindNormal);
+
+			//the induced drag is calculated in wind axis, whether the geom is tilted or not
+			p3DDlg->GetSpeedVector(C, Mu, Sigma, Wg);
+
+			InducedAngle = atan2(Wg.dot(WindNormal), m_QInf);
+			m_Ai[m]      = InducedAngle*180/pi;
+
+			dF  = Wg * m_pPanel[p-1].Vortex;
+			dF *= GammaStrip;
+
+			//project on wind axes
+//			m_ICd[m]       =  -dF.dot(WindDirection)/StripArea/m_QInf/m_QInf;
+//			m_InducedDrag +=  -dF.dot(WindDirection)/m_QInf/m_QInf;
+
+			m_ICd[m]       = -(StripForce.dot(WindNormal) * sin(InducedAngle))/StripArea;
+			m_InducedDrag +=  -StripForce.dot(WindNormal) * sin(InducedAngle) ;
+
+			IYm           += m_ICd[m] * StripArea * C.y;
+
+			m_F[m]   = StripForce * q;						//Newtons
+			if(bTilted) m_F[m].RotateY(-m_Alpha);
+
+//TRACE("%12.6f\n", m_ICd[m]);
+			m++;
 		}		
+		if(m_Surface[j].m_bIsTipRight && !bThinSurf) p+=m_Surface[j].m_NXPanels;//tip patch panels
 	}
 
 	Lift      += m_CL;
 	Drag      += m_InducedDrag;
+//	Drag      += 2*m_InducedDrag/m_QInf/m_QInf;
 
 	m_CL          *=  1.0       /m_Area;
-	m_InducedDrag *= -1.0       /m_Area;
-	m_IYm = IYm/m_Area;
+	m_InducedDrag *= -2.0       /m_Area/m_QInf/m_QInf;
+	m_IYm          =  -IYm/m_Area;
 }
 
 
@@ -4406,28 +4295,35 @@ void CWing::PanelSetBending()
 	int m =0;
 	int p= m_Surface[0].m_NXPanels;
 
-	for (j=0; j<m_NSurfaces; j++){//All surfaces
-		for (k=0; k<m_Surface[j].m_NYPanels; k++){
+	for (j=0; j<m_NSurfaces; j++)
+	{	
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
 			ypos[m] = m_pPanel[p].CollPt.y;
 			zpos[m] = m_pPanel[p].CollPt.z;
 
-			p+=2*m_Surface[j].m_NXPanels;
+			p += 2*m_Surface[j].m_NXPanels;
 			m++;
 		}
 	}
 
-	for (j=0; j<m_NStation; j++){
+	for (j=0; j<m_NStation; j++)
+	{
 		bm = 0.0;
-		if (ypos[j]<=0){
-			for (jj=0; jj<j; jj++){
+		if (ypos[j]<=0)
+		{
+			for (jj=0; jj<j; jj++)
+			{
 				Dist.y =  -ypos[jj]+ypos[j];
 				Dist.z =  -zpos[jj]+zpos[j];
 				Moment = Dist * m_F[jj];
 				bm += Moment.x ;
 			}
 		}
-		else{
-			for (jj=j+1; jj<m_NStation; jj++){
+		else
+		{
+			for (jj=j+1; jj<m_NStation; jj++)
+			{
 				Dist.y =  ypos[jj]-ypos[j];
 				Dist.z =  zpos[jj]-zpos[j];
 				Moment = Dist * m_F[jj];

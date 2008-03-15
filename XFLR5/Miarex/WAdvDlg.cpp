@@ -128,15 +128,6 @@ BOOL CWAdvDlg::OnInitDialog()
 	m_ctrlCoreSize.SetMin(0.0);
 	m_ctrlCoreSize.SetMax(1000000.0);
 
-/*	m_ctrlInterNodes.EnableWindow(false);
-	m_ctrlPanelFactor.EnableWindow(false);
-	m_ctrlResetWake.EnableWindow(false);
-	m_ctrlWakePanels.EnableWindow(false);
-	m_ctrlMaxWakeIter.EnableWindow(false);
-	m_ctrlPanelFactor.EnableWindow(false);
-	m_ctrlCoreSize.EnableWindow(false);
-	m_ctrlTotalWakeLength.EnableWindow(false);*/
-
 	CString len;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	GetLengthUnit(len,pFrame->m_LengthUnit);
@@ -144,6 +135,17 @@ BOOL CWAdvDlg::OnInitDialog()
 	m_ctrlLength2.SetWindowText(len);
 
 	SetParams();
+
+	m_ctrlVortexPos.EnableWindow(false);
+	m_ctrlControlPos.EnableWindow(false);
+	m_ctrlMaxWakeIter.EnableWindow(false);
+	m_ctrlInterNodes.EnableWindow(false);
+	m_ctrlResetWake.EnableWindow(false);
+	GetDlgItem(IDC_RADIO1)->EnableWindow(false);
+	GetDlgItem(IDC_RADIO2)->EnableWindow(false);
+	GetDlgItem(IDC_RADIO3)->EnableWindow(false);
+	GetDlgItem(IDC_RADIO4)->EnableWindow(false);
+
 	m_ctrlRelax.SetFocus();
 
 	return FALSE;
@@ -228,6 +230,7 @@ void CWAdvDlg::OnResetDefaults()
 	m_bTrefftz        = true;
 	m_bKeepOutOpps    = false;
 	SetParams();
+	
 }
 
 void CWAdvDlg::OnClose() 

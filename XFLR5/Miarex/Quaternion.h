@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    CFrame Class
-	Copyright (C) 2007 André Deperrois xflr5@yahoo.com
+    Quaternion Class
+	Copyright (C) 2008-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,33 +18,28 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
- 
+
 #pragma once
-#include "../Design/Spline.h"
 
-// Cible de la commande CFrame
-
-class CFrame : public CObject
+class Quaternion
 {
 public:
-	CFrame();
-	virtual ~CFrame();
-	bool SerializeFrame(CArchive &ar);
-	int IsPoint(CVector Point, double ZoomFactor);
-	int InsertPoint(CVector Real);
-	void RemoveSelectedPoint();
-	void RemovePoint(int n);
-	void InsertPoint(int n);
-	void CopyFrame(CFrame *pFrame);
+	Quaternion(void);
+	Quaternion(double t, double x, double y, double z);
+	~Quaternion(void);
 
-	int m_iHighlight;
-	int m_iSelect;
-	int m_NPoints;			// the number of points defining the frame
-	CVector m_Point[MAXSIDELINES];	// the points' positions
-	CSpline m_Spline;
-	CBezier m_Bezier;
+	void Set(double angle, double x, double y, double z);
+	void Conjugate(CVector Vin, CVector &Vout);
+	void QuattoMat(double m[][4]);
+	void Normalize();
 
-	static CRect s_rViewRect;
+	void operator*=(Quaternion Q);
+	void operator ~();
+	void operator =(Quaternion Q);
+	Quaternion operator *(Quaternion Q);
+
+
+	double theta;
+	double a, qx, qy,qz;
+	static double pi, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t15, t19, t20, t24;
 };
-
-

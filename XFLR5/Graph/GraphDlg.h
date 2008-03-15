@@ -85,13 +85,12 @@ private:
 	void SetBackPage();
 	void SetFontPage();
 	void SetScalePage();
-	void EnableAxisCtrls(bool bEnable);
 
-	CPropertySheet* m_pGraphSheet;
-	CGridPage* m_pGridPage;
-	CFontPage * m_pFontPage;
-	CScalePage* m_pScalePage;
-	CBackPage* m_pBackPage;
+	CPropertySheet m_GraphSheet;
+	CGridPage m_GridPage;
+	CFontPage m_FontPage;
+	CScalePage m_ScalePage;
+	CBackPage m_BackPage;
 
 	LOGFONT m_TitleLogFont;
 	LOGFONT m_LabelLogFont;

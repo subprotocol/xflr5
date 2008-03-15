@@ -35,6 +35,7 @@
 #include "../main/MainFrm.h"
 #include "Miarex.h"
 #include "W3DBar.h"
+#include ".\w3dbar.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -55,7 +56,9 @@ BEGIN_MESSAGE_MAP(CW3DBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_3DLEFT, On3DLeft)
 	ON_BN_CLICKED(IDC_3DTOP, On3DTop)
 	ON_BN_CLICKED(IDC_3DFRONT, On3DFront)
+	ON_BN_CLICKED(IDC_PICKCENTER, OnPickCenter)
 //}}AFX_MSG_MAP
+ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
 
@@ -79,7 +82,6 @@ CW3DBar::~CW3DBar()
 }
 
 
-
 void CW3DBar::DoDataExchange(CDataExchange* pDX)
 {
 	ASSERT(pDX);
@@ -94,8 +96,10 @@ void CW3DBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_3DLIGHT, m_ctrlLight);
 	DDX_Control(pDX, IDC_3DSURFACES, m_ctrlSurfaces);
 	DDX_Control(pDX, IDC_3DVORTICES, m_ctrlVortices);
+	DDX_Control(pDX, IDC_CLIPPLANEPOS, m_ctrlClipPlanePos);
 	DDX_Control(pDX, IDC_3DOUTLINE, m_ctrlOutline);
 	DDX_Control(pDX, IDC_3DPANELS, m_ctrlVLMPanels);
+	DDX_Control(pDX, IDC_PICKCENTER, m_ctrlPickCenter);
 	//}}AFX_DATA_MAP
 }
 
@@ -105,6 +109,11 @@ BOOL CW3DBar::OnInitDialogBar()
 	// If you do not want DDX then
 	// do not call base class
 	CInitDialogBar::OnInitDialogBar();
+
+	m_ctrlClipPlanePos.SetRange(-300, 300, false);
+	m_ctrlClipPlanePos.SetTicFreq(30);
+
+//	GetDlgItem(IDC_PICKCENTER)->EnableWindow(false);
 
 	SetChecks();
 	return TRUE;
@@ -191,8 +200,7 @@ void CW3DBar::On3DPanels()
 void CW3DBar::On3DReset()
 {
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_glXTransf  =  0.0;
-	pMiarex->m_glYTransf  =  0.0;
+	pMiarex->m_glViewportTrans.Set(0.0, 0.0, 0.0);
 	pMiarex->m_bIs3DScaleSet  = false;
 	pMiarex->SetScale();
 	pMiarex->UpdateView();
@@ -223,7 +231,7 @@ void CW3DBar::On3DIso()
 	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
 	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
 
-
+	pMiarex->Set3DRotationCenter();
 	pMiarex->UpdateView();
 }
 
@@ -234,56 +242,21 @@ void CW3DBar::On3DTop()
 	m_glZRotatef = -90.0;
 
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_ArcBall.ab_quat[0]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[1]	= -1.0f;
-	pMiarex->m_ArcBall.ab_quat[2]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[4]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[6]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[9]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[10]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
-
+	pMiarex->m_ArcBall.SetQuat(sqrt(2.0)/2.0, 0.0, 0.0, -sqrt(2.0)/2.0);
+	pMiarex->Set3DRotationCenter();
 	pMiarex->UpdateView();
 }
+
 void CW3DBar::On3DLeft()
 {
 	m_glXRotatef =    90.0;
 	m_glYRotatef =   180.0;
 	m_glZRotatef =   180.0;
+
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_ArcBall.ab_quat[0]	= -1.0f;
-	pMiarex->m_ArcBall.ab_quat[1]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[2]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[4]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[6]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[9]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[10]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
-
+	pMiarex->m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90° around x
+	pMiarex->Set3DRotationCenter();
 	pMiarex->UpdateView();
-
 }
 
 
@@ -293,30 +266,14 @@ void CW3DBar::On3DFront()
 	m_glYRotatef = 180.0;
 	m_glZRotatef =  90.0;
 
+	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90° around y
+	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90° around x
+
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_ArcBall.ab_quat[0]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[1]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[2]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[3]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[4]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[5]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[6]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[7]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[8]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[9]	=  1.0f;
-	pMiarex->m_ArcBall.ab_quat[10]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[11]	=  0.0f;
-
-	pMiarex->m_ArcBall.ab_quat[12]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[13]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[14]	=  0.0f;
-	pMiarex->m_ArcBall.ab_quat[15]	=  1.0f;
-
+	pMiarex->m_ArcBall.SetQuat(Qt1 * Qt2);
+	pMiarex->Set3DRotationCenter();
 	pMiarex->UpdateView();
 }
-
 
 
 void CW3DBar::SetChecks()
@@ -337,4 +294,40 @@ void CW3DBar::SetChecks()
 	if(pMiarex->m_bVortices)	m_ctrlVortices.SetCheck(true);
 	else						m_ctrlVortices.SetCheck(false);
 
+	double pos;
+	double cl = pMiarex->m_ClipPlanePos/0.5;
+	pos = log(cl + sqrt(cl*cl+1.0));
+	m_ctrlClipPlanePos.SetPos((int)(pos*300.0));
 }
+
+
+void CW3DBar::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	if (pScrollBar->GetSafeHwnd() == GetDlgItem(IDC_CLIPPLANEPOS)->GetSafeHwnd())   
+	{
+		double pos =  (double)m_ctrlClipPlanePos.GetPos()/100.0;
+		pMiarex->m_ClipPlanePos = sinh(pos) * 0.5;
+		pMiarex->UpdateView();
+	}
+
+
+//	CInitDialogBar::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+
+
+void CW3DBar::OnPickCenter()
+{
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	pMiarex->m_bPickCenter = true;
+	m_ctrlPickCenter.SetCheck(1);
+}
+
+
+
+
+
+
+
+

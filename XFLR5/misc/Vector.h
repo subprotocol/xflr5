@@ -28,28 +28,29 @@
 
 class CVector  
 {
-public:
-	bool IsSame(CVector V);
-	void Set(double x0, double y0, double z0);
-	void Copy(CVector V);
+public: 
+	bool IsSame(CVector const &V);
+	void Set(CVector const &V);
+	void Set(double const &x0, double const &y0, double const &z0);
+	void Copy(CVector const &V);
 	void RotateX(CVector O, double XTilt);
 	void RotateY(CVector O, double YTilt);
 	void RotateZ(CVector O, double ZTilt);
 	void RotateY(double YTilt);
-	void Translate(CVector T);
-	bool operator ==(CVector V);
+	void Translate(CVector const &T);
+	bool operator ==(CVector const &V);
 	void operator =(CVector T);
-	void operator+=(CVector T);
-	void operator-=(CVector T);
+	void operator+=(CVector const &T);
+	void operator-=(CVector const &T);
 	void operator*=(double d);
 	CVector operator *(double d);
-	CVector operator *(CVector T);
+	CVector operator *(CVector const &T);
 	CVector operator /(double d);
-	CVector operator +(CVector V);
-	CVector operator -(CVector V);
+	CVector operator +(CVector const &V);
+	CVector operator -(CVector const &V);
 	void Normalize();
 	double VAbs();
-	double dot(CVector V);
+	double dot(CVector const &V);
 
 	CVector();
 	CVector(double xi, double yi, double zi);

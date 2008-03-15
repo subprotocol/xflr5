@@ -55,7 +55,9 @@ protected:
 	CButton	m_ctrlVLMPanels;
 	CButton m_ctrlLight;
 	CButton m_ctrlVortices;
+	CButton m_ctrlPickCenter;
 
+	CSliderCtrl	m_ctrlClipPlanePos;
 
 	GLfloat m_glXRotatef;
 	GLfloat m_glYRotatef;
@@ -100,8 +102,11 @@ protected:
 	afx_msg void On3DLeft();
 	afx_msg void On3DTop();
 	afx_msg void On3DFront();
+	afx_msg void OnPickCenter();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 };
 
 ////////////////////////////////////////////////////////////////////////////

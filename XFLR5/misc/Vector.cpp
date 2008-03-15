@@ -58,6 +58,7 @@ CVector::~CVector()
 void CVector::Normalize()
 {
 	double abs = VAbs();
+	if(abs< 1.e-10) return;
 	x/=abs;
 	y/=abs;
 	z/=abs;
@@ -69,25 +70,33 @@ double CVector::VAbs()
 	return sqrt(x*x+y*y+z*z);
 }
 
-void CVector::Copy(CVector V)
+void CVector::Copy(CVector const &V)
 {	
 	x = V.x;
 	y = V.y;
 	z = V.z;
 }
-void CVector::Set(double x0, double y0, double z0)
+
+void CVector::Set(double const &x0, double const &y0, double const &z0)
 {	
 	x = x0;
 	y = y0;
 	z = z0;
 }
 
-double CVector::dot(CVector V)
+void CVector::Set(CVector const &V)
+{	
+	x = V.x;
+	y = V.y;
+	z = V.z;
+}
+
+double CVector::dot(CVector const &V)
 {	
 	return x*V.x + y*V.y + z*V.z;
 }
 
-bool CVector::IsSame(CVector V)
+bool CVector::IsSame(CVector const &V)
 {
 	double d2 = (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z) ;
 /*	double L = VAbs();
@@ -105,21 +114,21 @@ bool CVector::IsSame(CVector V)
 
 }
 
-void CVector::Translate(CVector T)
+void CVector::Translate(CVector const &T)
 {
 	x += T.x;
 	y += T.y;
 	z += T.z;
 }
 
-void CVector::operator +=(CVector T)
+void CVector::operator +=(CVector const &T)
 {
 	x += T.x;
 	y += T.y;
 	z += T.z;
 }
 
-bool CVector::operator ==(CVector V)
+bool CVector::operator ==(CVector const &V)
 {
 	double d = sqrt((V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z));
 
@@ -135,7 +144,7 @@ void CVector::operator =(CVector T)
 	y = T.y;
 	z = T.z;
 }
-void CVector::operator -=(CVector T)
+void CVector::operator -=(CVector const &T)
 {
 	x -= T.x;
 	y -= T.y;
@@ -154,7 +163,7 @@ CVector CVector::operator *(double d)
 	return T;
 }
 
-CVector CVector::operator *(CVector T)
+CVector CVector::operator *(CVector const &T)
 {
 	CVector C;
 	C.x =  y*T.z - z*T.y;
@@ -168,13 +177,13 @@ CVector CVector::operator /(double d)
 	return T;
 }
 
-CVector CVector::operator +(CVector V)
+CVector CVector::operator +(CVector const &V)
 {
 	CVector T(x+V.x, y+V.y, z+V.z);
 	return T;
 }
 
-CVector CVector::operator -(CVector V)
+CVector CVector::operator -(CVector const &V)
 {
 	CVector T(x-V.x, y-V.y, z-V.z);
 	return T;

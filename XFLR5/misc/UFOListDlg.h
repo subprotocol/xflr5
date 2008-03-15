@@ -31,21 +31,20 @@ class CUFOListDlg : public CDialog
 	DECLARE_DYNAMIC(CUFOListDlg)
 
 public:
-	CUFOListDlg(CWnd* pParent = NULL);   // constructeur standard
+	CUFOListDlg(CWnd* pParent = NULL);   
 	virtual ~CUFOListDlg();
 	CButton m_ctrlDelete;
 	CButton m_ctrlSelect;
 	CButton m_ctrlRename;
+	CListCtrl m_ctrlUFOList;
 
-// Données de boîte de dialogue
 	enum { IDD = IDD_UFOLISTDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // Prise en charge DDX/DDV
+	virtual void DoDataExchange(CDataExchange* pDX);   
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CListCtrl m_ctrlUFOList;
 	CObArray *m_poaWing;
 	CObArray *m_poaPlane;
 	CObArray *m_poaWPolar;

@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    CInPlaceEdit Class
-	Copyright (C) 2006 André Deperrois xflr5@yahoo.com
+    CNoBeepListCtrl Class
+	Copyright (C) 2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,40 +22,22 @@
 #pragma once
 
 
-// CInPlaceEdit
+// CNoBeepListCtrl
 
-class CInPlaceEdit : public CEdit
+class CNoBeepListCtrl : public CListCtrl
 {
-	friend class CCtrlSetCtrl;
-
-	DECLARE_DYNAMIC(CInPlaceEdit)
+	DECLARE_DYNAMIC(CNoBeepListCtrl)
 
 public:
-	CInPlaceEdit(CListCtrl* pCtrl, int iItem, int iSubItem, CString sInitText);
-	virtual ~CInPlaceEdit();
+	CNoBeepListCtrl();
+	virtual ~CNoBeepListCtrl();
+
+	int HitTestEx(CPoint &point, int *col) const;
 
 protected:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-private:
-	CString m_iniStr;
-	CListCtrl *m_pListCtrl;
-	int m_iItem;
-	int m_iSubItem;
-	int m_nColumns, m_nRows;
-	BOOL    m_bESC;	 	// To indicate whether ESC key was pressed
-
-	void EditSubLabel(int iItem, int iSubItem);
-
-	//{{AFX_MSG(CNumEdit)
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnSetFocus();
-	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnNcDestroy();
-	afx_msg UINT OnGetDlgCode();
-	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
-	//}}AFX_MSG
-
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };
 
 

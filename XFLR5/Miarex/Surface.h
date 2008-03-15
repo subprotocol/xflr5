@@ -27,7 +27,8 @@
 
 #pragma once
 #include "../XDirect/Foil.h"
-
+#include "Body.h"
+ 
 class CSurface : public CObject  
 {
 	friend class CWing;
@@ -38,56 +39,60 @@ class CSurface : public CObject
  
 public:
 	void Copy(CSurface &surface);
-	void GetC4(int k, CVector &Pt);
-	void GetLeadingPt(CVector &C, int k);
+	void GetC4(int k, CVector &Pt, double &tau);
+	void GetLeadingPt(int k, CVector &C);
 	void GetNormal(double yrel, CVector &N);
-	void GetTrailingPt(CVector &C, int k);
-	void GetPanel(int k, int l, CVector &dF, int pos=0);
+	void GetTrailingPt(int k, CVector &C);
 	void GetPanel(int k, int l, int pos);
 	void GetPoint(double xArel, double xBrel, double yrel, CVector &Point, int pos=0);
 	void GetyDist(int k, double &y1, double &y2);
-	void Getyz(int k, double &y, double &z);
+//	void Getyz(int k, double &y, double &z);
+//	void GetStripCenterPoint(int k, CVector &Point);
 	void Init();
 	void RotateX(CVector O, double XTilt);
 	void RotateY(CVector O, double YTilt);
 	void RotateZ(CVector O, double ZTilt);
 	void SetNormal();
 	void SetFlap();
-	void SetSidePoints(int iAnalysisType);
+	void SetSidePoints(CBody *pBody=NULL);
 	void SetTwist();
 	void Translate(CVector T);
 
-	int Getk(double srel);
+//	int Getk(double srel);
 
-	double Getyrel(double y);
 	double GetTwist(int k);
-	double GetStripArea(int k);
-	double Getdl(int k);
+//	double GetStripArea(int k);
+//	double Getdl(int k);
 	double GetChord(int k);
 	double GetChord(double tau);
 	double GetOffset(double tau);
+	double GetStripSpanPos(int k);
 
 	CSurface();
 	virtual ~CSurface();
 
 private :
-	static CVector SideA[MAXCHORDPANELS];	 
-	static CVector SideB[MAXCHORDPANELS];	 
-	static CVector SideA_T[MAXCHORDPANELS];	 
-	static CVector SideB_T[MAXCHORDPANELS];	 
+	CVector SideA[MAXCHORDPANELS];	 
+	CVector SideB[MAXCHORDPANELS];	 
+	CVector SideA_T[MAXCHORDPANELS];	 
+	CVector SideB_T[MAXCHORDPANELS];	 
+	CVector SideA_B[MAXCHORDPANELS];	 
+	CVector SideB_B[MAXCHORDPANELS];	 
 	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
 	static CVector VTemp;
 
+	bool m_bIsInSymPlane;
 	bool m_bTEFlap;
 	bool m_bIsTipLeft, m_bIsTipRight;
 	bool m_bIsLeftSurf, m_bIsRightSurf;
+	bool m_bIsCenterSurf;//true if is either left or right center surface... need to connect to body
+	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only
 
 	CVector m_LA, m_LB, m_TA, m_TB;
 	CVector Normal, NormalA, NormalB;
 	CVector V1, V2, DL, DC, u, v;
 	CVector NA, NB;
 
-	double m_SineFactor;
 	double m_TwistA, m_TwistB;
 	double m_Dihedral;
 	double m_Length;// along span-y direction...

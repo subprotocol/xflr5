@@ -40,14 +40,14 @@ public:
 	CSliderCtrl m_ctrlRed;
 	CSliderCtrl m_ctrlGreen;
 	CSliderCtrl m_ctrlBlue;
-	CSliderCtrl	m_ctrlAmbient;
-	CSliderCtrl	m_ctrlDiffuse;
-	CSliderCtrl	m_ctrlSpecular;
-	CSliderCtrl	m_ctrlMatAmbient;
-	CSliderCtrl	m_ctrlMatDiffuse;
-	CSliderCtrl	m_ctrlMatSpecular;
-	CSliderCtrl	m_ctrlMatShininess;
-	CSliderCtrl	m_ctrlMatEmission;
+	CSliderCtrl m_ctrlAmbient;
+	CSliderCtrl m_ctrlDiffuse;
+	CSliderCtrl m_ctrlSpecular;
+	CSliderCtrl m_ctrlMatAmbient;
+	CSliderCtrl m_ctrlMatDiffuse;
+	CSliderCtrl m_ctrlMatSpecular;
+	CSliderCtrl m_ctrlMatShininess;
+	CSliderCtrl m_ctrlMatEmission;
 	CSliderCtrl m_ctrlXLight;
 	CSliderCtrl m_ctrlYLight;
 	CSliderCtrl m_ctrlZLight;
@@ -89,10 +89,10 @@ protected:
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
+	void Apply();
 	void ReadParams(void);
 	void SetParams(void);
 	bool LoadSettings(CArchive &ar);
 	bool SaveSettings(CArchive &ar);
-	void Apply();
 };
 

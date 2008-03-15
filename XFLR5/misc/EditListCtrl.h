@@ -36,7 +36,6 @@ public:
 	int HitTestEx(CPoint &point, int *col) const;
 	void HighlightCell(int nItem, int nCol );
 	CInPlaceFloatEdit* EditSubLabel( int nItem, int nCol );
-	CComboBox* ShowInPlaceList(int nItem, int nCol, CStringArray &strArray, int nSel);
 
 	int m_iPrecision[100];
 	int m_nColumns;
@@ -48,7 +47,7 @@ public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+//	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);

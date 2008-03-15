@@ -50,6 +50,7 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 	m_bConverged     = false;
 	m_bPointOut      = false;
 	m_bCancel        = false;
+	m_bTrefftz       = false;
 
 	m_MatSize        = 0;
 	m_nNodes         = 0;
@@ -75,7 +76,7 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 	m_XCP = 0.0;
 	m_YCP = 0.0;
 	m_VCm = 0.0;
-	m_TCm = 0.0;
+	m_GCm = 0.0;
 	m_GCm = 0.0;
 	m_CL  = 0.0;
 	m_ViscousDrag = 0.0;
@@ -135,8 +136,6 @@ BOOL CVLMDlg::OnInitDialog()
 	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	int n;
-	CFoil *pFoil;
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
@@ -188,27 +187,8 @@ BOOL CVLMDlg::OnInitDialog()
 
 	if(m_pFin)   
 	{
-		if(!m_pFin->m_bDoubleFin)
-		{
-			for (n=0; n<=m_pFin->m_NPanel; n++)
-			{
-				pFoil = pFrame->GetFoil(m_pFin->m_RFoil[n]);
-				if(pFoil->m_fCamber>0.0001) 
-				{
-					m_bVLMSymetric = false;
-					str += "     Fin is asymmetric\r\n";
-					break;
-				}
-			}
-		}
-		else
-		{
-			if(!m_pFin->m_bSymetric)
-			{
-				m_bVLMSymetric = false;
-				str += "     Double fin is asymmetric\r\n";
-			}
-		}
+		m_bVLMSymetric = false;
+		str += "     A fin is considered asymmetric\r\n";
 	}
 
 	if (m_bVLMSymetric) AddString("Perfoming symmetric calculation\r\n");
@@ -492,28 +472,33 @@ bool CVLMDlg::VLMCreateRHS(double V0, double VDelta, int nval)
 
 	//______________________________________________________________________________________
 	// Create RHS
-	if(m_pWPolar->m_Type!=4){
+	if(m_pWPolar->m_Type!=4)
+	{
 		p=0;
 
-		for (q=0; q<nval;q++){
+		for (q=0; q<nval;q++)
+		{
 			aoa    =  (V0+q*VDelta)*pi/180.0;
 			cosaoa = cos(aoa);
 			sinaoa = sin(aoa);
-			for (m=0; m<Size; m++){
+			for (m=0; m<Size; m++)
+			{
 				m_RHS[p] = -cosaoa*m_ppPanel[m]->Normal.x  - sinaoa*m_ppPanel[m]->Normal.z;
 				p++;
 			}
 		}
 	}
-	else {//type 4... solve only once with unit speed
+	else 
+	{
+		//type 4... solve only once with unit speed
 		aoa    = V0*pi/180.0;
 		cosaoa = cos(aoa);
 		sinaoa = sin(aoa);
-		for (p=0;p<Size; p++){
+		for (p=0;p<Size; p++)
+		{
 			m_RHS[p] = -cosaoa*m_ppPanel[p]->Normal.x  - sinaoa*m_ppPanel[p]->Normal.z;
 		}
 	}
-
 	return true;
 }
 
@@ -574,8 +559,8 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	CString strong, strange;
 	int p, q, pp, Size,  nrhs;
 	int n, o, o1, nel;
-	double Lift, aoa;
-	CVector N, Force;
+	double Lift, alpha;
+	CVector N, Force, WindNormal;
 	CVector VInf(1.0,0.0,0.0);
 	double row[VLMMATSIZE];
 	
@@ -614,23 +599,27 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 
 		for (q=0; q<nval;q++)
 		{
-			aoa    =  (V0+q*VDelta)*pi/180.0;
+			alpha = V0+q*VDelta;
+			WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
+
 			memcpy(row, m_RHS+q*Size, sizeof(row));
 			Lift = 0.0;
 			p=0;
 			for (p=0; p<Size; p++)
 			{
 				// for each panel along the chord, add the lift coef
-				if(m_pWPolar->m_bVLM1 || m_ppPanel[p]->m_bIsTrailing){//change v4.00 Leading-->Trailing
+				if(m_pWPolar->m_bVLM1 || m_ppPanel[p]->m_bIsTrailing)
+				{
+					//changed v4.00 Leading-->Trailing
 					Force = VInf * m_ppPanel[p]->Vortex;
-					Lift += Force.z * row[p];
+					Lift += Force.dot(WindNormal) * row[p];
 				}
 				else 
 				{
 					Force = VInf * m_ppPanel[p]->Vortex;
-					Lift += Force.z * row[p];
+					Lift += Force.dot(WindNormal) * row[p];
 					Force = VInf * m_ppPanel[p-1]->Vortex;
-					Lift -= Force.z * row[p];
+					Lift -= Force.dot(WindNormal) * row[p];
 				}
 			}
 			if(m_bVLMSymetric) Lift *=2.0;
@@ -708,10 +697,8 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 			nel = m_ppPanel[p]->m_iElement;
 			m_Gamma[o+nel]    = GammaRef[o+p];
 		}
-	}	
-
-//	AddString("\r\n");
-
+	}
+//memcpy(row, m_Gamma, m_MatSize*sizeof(double));
 	return  true;
 }
 
@@ -720,10 +707,10 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	// calculates the various wing coefficients by interpolating
 	// the adequate variable, from Cl, on the XFoil polar mesh
 	// at each span station
-	int i, pos, Station;
+	int q, pos, Station;
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	double Lift, IDrag, VDrag ,XCP, YCP, Rm, IYm, GYm, LinPm;
+	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
 	double WingLift, WingIDrag, Alpha;
 	CString str, strong;
 
@@ -733,23 +720,26 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	m_pWing->m_pWakeNode  = m_pWakeNode;
 	m_pWing->m_pWakePanel = m_pWakePanel;
 
-	if(m_pWing2) {
+	if(m_pWing2) 
+	{
 		m_pWing2->m_bTrace   = false;
 		m_pWing2->m_bVLM1    = m_pWPolar->m_bVLM1;
 		m_pWing2->m_bTrace   = true;
 	}
 
-	if(m_pStab) {
+	if(m_pStab) 
+	{
 		m_pStab->m_bTrace   = false;
 		m_pStab->m_bVLM1    = m_pWPolar->m_bVLM1;
 		m_pStab->m_bTrace   = true;
 	}
-	if(m_pFin){
+	if(m_pFin)
+	{
 		m_pFin->m_bTrace   = false;
 		m_pFin->m_bVLM1    = m_pWPolar->m_bVLM1;
 		m_pFin->m_bTrace   = true;
 	}
-	for(i=0; i<nrhs; i++)
+	for(q=0; q<nrhs; q++)
 	{
 		if(m_bCancel) break;
 		m_pWing->m_bWingOut = false;
@@ -762,7 +752,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		{
 			if(m_pWPolar->m_Type!=4)
 			{
-				Alpha = V0+i*VDelta;
+				Alpha = V0+q*VDelta;
 			}
 			else          
 			{
@@ -771,21 +761,25 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_OpAlpha = Alpha;
 		}
 
-		m_QInf = m_VLMQInf[i];
+		m_QInf = m_VLMQInf[q];
+		qdyn = 0.5 * m_pWPolar->m_Density * m_QInf * m_QInf;
 
-		if(m_QInf >0.0) {
+		if(m_QInf >0.0) 
+		{
 			if(m_pWPolar->m_Type!=4 && !m_pWPolar->m_bTiltedGeom)
 			{
 				str.Format("      ...Alpha=%.2f\r\n", m_OpAlpha);
 				AddString(str);
 			}
-			else if (m_pWPolar->m_Type==4) {
+			else if (m_pWPolar->m_Type==4) 
+			{
 				str.Format("   ...QInf = %6.2f ", m_QInf*pFrame->m_mstoUnit);
 				GetSpeedUnit(strong, pFrame->m_SpeedUnit);
 				str += strong + "\r\n";
 				AddString(str);
 			}
-			VLMSetAi(m_Gamma+i*m_MatSize);
+
+			VLMSetAi(m_Gamma+q*m_MatSize);
 
 			AddString("        Calculating aerodynamic coefficients...\r\n");
 			m_bPointOut          = false;
@@ -799,22 +793,24 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			VDrag  = 0.0;
 			XCP    = 0.0;
 			YCP    = 0.0;
-			Rm     = 0.0;
-			IYm    = 0.0;
-			GYm    = 0.0;
-			LinPm  = 0.0;
+
+			m_GRm                 = 0.0;
+			m_GCm = m_VCm         = 0.0;
+			m_GYm = m_VYm = m_IYm = 0.0;
 
 			AddString("         Calculating wing...\r\n");
-			m_pWing->VLMTrefftz(m_Gamma+i*m_MatSize, Lift, IDrag);
-			m_pWing->VLMComputeWing(m_Gamma+i*m_MatSize, m_Cp, 
-									VDrag, XCP, YCP, LinPm, Rm, IYm, GYm, m_pWPolar->m_bViscous);
+			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Lift, IDrag, m_pWPolar->m_bTiltedGeom);
+			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp, 
+						VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 
 			m_pWing->VLMSetBending();
 			if(m_pWing->m_bWingOut)  m_bPointOut = true;
+			pos = m_pWing->m_MatSize;
 
 			Station = m_pWing->m_NStation;
 			
-			if(m_pWing2) {
+			if(m_pWing2) 
+			{
 				AddString("       Calculating 2nd wing...\r\n");
 				WingLift  = 0.0;
 				WingIDrag = 0.0;
@@ -822,11 +818,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pWing2->m_QInf      = m_QInf;
 				m_pWing2->m_Viscosity = m_pWPolar->m_Viscosity;
 				m_pWing2->m_Density   = m_pWPolar->m_Density;
-				m_pWing2->VLMTrefftz(m_Gamma+i*m_MatSize+m_pWing->m_MatSize, WingLift, WingIDrag);
-				m_pWing2->VLMComputeWing(m_Gamma+i*m_MatSize+m_pWing->m_MatSize,
+				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
 										m_Cp+m_pWing->m_MatSize,
-										VDrag, XCP, YCP, LinPm, Rm, IYm, GYm,
-										m_pWPolar->m_bViscous);
+										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				Lift  += WingLift;
 				IDrag += WingIDrag;
 
@@ -834,9 +830,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				if(m_pWing2->m_bWingOut) m_bPointOut = true;
 
 				Station += m_pWing2->m_NStation;
+				pos += m_pWing2->m_MatSize;
 			}
 
-			if(m_pStab) {
+			if(m_pStab) 
+			{
 				AddString("         Calculating elevator...\r\n");
 				WingLift  = 0.0;
 				WingIDrag = 0.0;
@@ -845,14 +843,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->m_Viscosity = m_pWPolar->m_Viscosity;
 				m_pStab->m_Density   = m_pWPolar->m_Density;
 
-				pos = m_pWing->m_MatSize;
-				if(m_pWing2)	pos += m_pWing2->m_MatSize;
-
-				m_pStab->VLMTrefftz(m_Gamma+i*m_MatSize+pos, WingLift, WingIDrag);
-				m_pStab->VLMComputeWing(m_Gamma+i*m_MatSize+pos,
+				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
-										VDrag, XCP, YCP, LinPm, Rm, IYm, GYm,
-										m_pWPolar->m_bViscous);
+										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				Lift  += WingLift;
 				IDrag += WingIDrag;
 
@@ -860,6 +855,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				if(m_pStab->m_bWingOut) m_bPointOut = true;
 
 				Station += m_pStab->m_NStation;
+				pos += m_pStab->m_MatSize;
 			}
 
 			if(m_pFin)
@@ -871,16 +867,12 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->m_QInf       = m_QInf;
 				m_pFin->m_Viscosity  = m_pWPolar->m_Viscosity;
 				m_pFin->m_Density    = m_pWPolar->m_Density;
-
-				pos = m_pWing->m_MatSize;
-				if(m_pWing2)	pos += m_pWing2->m_MatSize;
-				if(m_pStab)		pos += m_pStab->m_MatSize;
 				
-				m_pStab->VLMTrefftz(m_Gamma+i*m_MatSize+pos, WingLift, WingIDrag);
-				m_pFin->VLMComputeWing( m_Gamma+i*m_MatSize+pos,
+				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
-										VDrag, XCP, YCP, LinPm, Rm, IYm, GYm,
-										m_pWPolar->m_bViscous);
+										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
 				Lift  += WingLift;
@@ -888,7 +880,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 				m_pFin->VLMSetBending();
 			}
-		
+
 			m_CL          =  2.0*Lift /m_QInf/m_QInf/m_pWing->m_Area;
 			m_InducedDrag =  1.0*IDrag/m_QInf/m_QInf/m_pWing->m_Area;
 			m_ViscousDrag =  1.0*VDrag              /m_pWing->m_Area;
@@ -896,30 +888,50 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_XCP         = XCP/Lift;
 			m_YCP         = YCP/Lift;
 
-			VLMSetDownwash(m_Gamma+i*m_MatSize);
+			m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
+			m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+			m_GYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 
-			m_IYm         =        IYm   / m_pWing->m_Area/m_pWing->m_Span;
-			m_GYm         =  2.0 * GYm   / m_pWing->m_Area/m_pWing->m_Span   /m_QInf/m_QInf;
-			m_Rm          = -2.0 * Rm    / m_pWing->m_Area/m_pWing->m_Span   /m_QInf/m_QInf;
-			m_GCm         =  2.0 * LinPm / m_pWing->m_Area/m_pWing->m_MAChord/m_QInf/m_QInf;
-			m_VCm         =        m_pWing->m_VCm;
-			m_TCm         =  m_GCm + m_pWing->m_VCm;
+			m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
+			m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 
-			if(m_pWing2)	m_TCm += m_pWing2->m_VCm;
-			if(m_pStab)		m_TCm += m_pStab->m_VCm;
-			if(m_pFin)		m_TCm += m_pFin->m_VCm;
+			m_IYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+
+			VLMSetDownwash(m_Gamma+q*m_MatSize);
 
 			if(m_bPointOut) m_bWarning = true;
-			if(m_bConverged){
+
+			if(m_bConverged)
+			{
 				if(m_pPlane)
-					pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Gamma+i*m_MatSize);
+					pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Gamma+q*m_MatSize);
 				else
-					pMiarex->AddWOpp(m_bPointOut, m_Gamma+i*m_MatSize);		
+					pMiarex->AddWOpp(m_bPointOut, m_Gamma+q*m_MatSize);
 			}
 			AddString("     \r\n");
 		}
 		else m_bPointOut = true;
 	}
+}
+
+
+void CVLMDlg::VLMSumForces(double *Gamma, double Alpha, double QInf, double &Lift, double &Drag)
+{
+	//We are working in Body Axes
+	int p;
+	CVector PanelForce, TotalForce;
+	CVector UInf(cos(m_Alpha*pi/180.0),0.0,sin(m_Alpha*pi/180.0));
+	
+	for(p=0; p<m_MatSize; p++)
+	{
+		if(m_pWPolar->m_bVLM1 || m_pPanel[p].m_bIsTrailing)
+			PanelForce  += m_pPanel[p].Vortex * Gamma[p];
+	}
+	
+	TotalForce = UInf * PanelForce;
+
+	Lift = TotalForce.z * cos(Alpha*pi/180.0) - TotalForce.x * sin(Alpha*pi/180.0);
+	Drag = TotalForce.x * cos(Alpha*pi/180.0) + TotalForce.z * sin(Alpha*pi/180.0);
 }
 
 
@@ -938,9 +950,7 @@ CVector CVLMDlg::GetSpeedVector(CVector C, double *Gamma)
 	return VTot;
 }
 
-
-void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
-									bool bAll, bool bGround, double Height)
+void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll)
 {
 	// calculates the the panel p's vortex influence at point C
 	// V is the resulting velocity
@@ -948,34 +958,41 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 	int p = pPanel->m_iElement;
 	V.Set(0.0,0.0,0.0);
 
-	if(m_pWPolar->m_bVLM1) {//just get the horseshoe vortex's influence
+	if(m_pWPolar->m_bVLM1)
+	{
+		//just get the horseshoe vortex's influence
 		VLMCmn(pPanel->A, pPanel->B, C, V, bAll);
-		if(m_pWPolar->m_bGround) {
+		if(m_pWPolar->m_bGround) 
+		{
 			AA = pPanel->A;
 			BB = pPanel->B;
-			AA.z -= 2.0*m_pWPolar->m_Height;
-			BB.z -= 2.0*m_pWPolar->m_Height;
+			AA.z = -AA.z - 2.0*m_pWPolar->m_Height;//correction in V4.0
+			BB.z = -BB.z - 2.0*m_pWPolar->m_Height;
 			VLMCmn(AA, BB, C, VG, bAll);
 			V.x += VG.x;
 			V.y += VG.y;
 			V.z -= VG.z;
 		}
 	}
-	else{
+	else
+	{
 		// we have quad vortices
 		// so we follow Katz and Plotkin's lead
-		if(!pPanel->m_bIsTrailing){
-			if(bAll) {
+		if(!pPanel->m_bIsTrailing)
+		{
+			if(bAll) 
+			{
 				VLMQmn(pPanel->A, pPanel->B, m_pPanel[p-1].A, m_pPanel[p-1].B, C, V);
-				if(m_pWPolar->m_bGround) {
+				if(m_pWPolar->m_bGround)
+				{
 					AA  = pPanel->A;
 					BB  = pPanel->B;
 					AA1 = m_pPanel[p-1].A;
 					BB1 = m_pPanel[p-1].B;
-					AA.z  -= 2.0*m_pWPolar->m_Height;
-					BB.z  -= 2.0*m_pWPolar->m_Height;
-					AA1.z -= 2.0*m_pWPolar->m_Height;
-					BB1.z -= 2.0*m_pWPolar->m_Height;
+					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
+					BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
+					AA1.z = -AA1.z - 2.0*m_pWPolar->m_Height;
+					BB1.z = -BB1.z - 2.0*m_pWPolar->m_Height;
 					VLMQmn(AA, BB, AA1, BB1, C, VG);
 					V.x += VG.x;
 					V.y += VG.y;
@@ -983,8 +1000,168 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 				}
 			}
 		}
-		else {// then panel p is trailing and shedding a wake
+		else
+		{
+			// then panel p is trailing and shedding a wake
+			if(!m_bWakeRollUp)
+			{
+				// since Panel p+1 does not exist... 
+				// we define the points AA=A+1 and BB=B+1
+				AA1.x = m_pNode[pPanel->m_iTA].x + (m_pNode[pPanel->m_iTA].x-pPanel->A.x)/3.0;
+				AA1.y = m_pNode[pPanel->m_iTA].y;
+				AA1.z = m_pNode[pPanel->m_iTA].z;
+				BB1.x = m_pNode[pPanel->m_iTB].x + (m_pNode[pPanel->m_iTB].x-pPanel->B.x)/3.0;
+				BB1.y = m_pNode[pPanel->m_iTB].y;
+				BB1.z = m_pNode[pPanel->m_iTB].z;
+				if(m_pWPolar->m_bGround)
+				{
+					AA  = pPanel->A;
+					BB  = pPanel->B;
+					AAG = AA1;
+					BBG = BB1;
+					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
+					BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
+					AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
+					BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
+				}
+				// first we get the quad vortex's influence
+				if (bAll) 
+				{
+					VLMQmn(pPanel->A, pPanel->B, AA1, BB1, C, V);
+					if(m_pWPolar->m_bGround)
+					{
+						VLMQmn(AA, BB, AAG, BBG, C, VG);
+						V.x += VG.x;
+						V.y += VG.y;
+						V.z -= VG.z;
+					}
+				}
 
+				//we just add a trailing horseshoe vortex's influence to simulate the wake
+				VLMCmn(AA1,BB1,C,VT,bAll);
+
+				if(m_pWPolar->m_bGround) 
+				{
+					VLMCmn(AAG, BBG, C, VG);
+					V.x += VG.x;
+					V.y += VG.y;
+					V.z -= VG.z;
+				}
+				V += VT;
+			}
+			else
+			{
+				// if there is a wake roll-up required
+				pw = pPanel->m_iWake;
+				// first close the wing's last vortex ring at T.E.
+				if (bAll) 
+				{
+					VLMQmn(pPanel->A, pPanel->B, m_pWakePanel[pw].A, m_pWakePanel[pw].B, C, V);
+					if(m_pWPolar->m_bGround) 
+					{
+						AA  = pPanel->A;
+						BB  = pPanel->B;
+						AAG = m_pWakePanel[pw].A;
+						BBG = m_pWakePanel[pw].B;
+						AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
+						BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
+						AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
+						BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
+
+						VLMQmn(AA, BB, AAG, BBG, C, VG);
+						V.x += VG.x;
+						V.y += VG.y;
+						V.z -= VG.z;
+					}
+				}
+
+				//each wake panel has the same vortex strength than the T.E. panel
+				//so we just cumulate their unit influences
+				if(bAll)
+				{
+					for (lw=0; lw<m_pWPolar->m_NXWakePanels-1; lw++)
+					{
+						VLMQmn(m_pWakePanel[pw  ].A, m_pWakePanel[pw  ].B,
+							   m_pWakePanel[pw+1].A, m_pWakePanel[pw+1].B, C, VT);
+						V += VT;
+						if(m_pWPolar->m_bGround) 
+						{
+							AA  = m_pWakePanel[pw].A;
+							BB  = m_pWakePanel[pw].B;
+							AAG = m_pWakePanel[pw+1].A;
+							BBG = m_pWakePanel[pw+1].B;
+							AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
+							BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
+							AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
+							BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
+
+							VLMQmn(AA, BB, AAG, BBG, C, VG);
+							V.x += VG.x;
+							V.y += VG.y;
+							V.z -= VG.z;
+						}
+						pw++;
+					}
+				}
+//				//for the very last wake panel downstream, just add a horseshoe vortex influence
+//				//TODO : check influence on results
+//				VLMCmn(m_pWakePanel[pw].A, m_pWakePanel[pw].B,C,VT,bAll);
+//				V += VT;
+//				if(m_pWPolar->m_bGround) {
+//					VLMCmn(AAG, BBG, C, VG);
+//					V.x += VG.x;
+//					V.y += VG.y;
+//					V.z -= VG.z;
+//				}
+				//simple really !
+			}
+			//so says Katz and Plotkin !
+		}
+	}
+}
+
+/*
+void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll)
+{
+	// calculates the the panel p's vortex influence at point C
+	// V is the resulting velocity
+	int lw, pw;
+	int p = pPanel->m_iElement;
+	V.Set(0.0,0.0,0.0);
+	if(m_pWPolar->m_bGround) 	CG.Set(C.x, C.y, -C.z - 2.0 * m_pWPolar->m_Height);
+	if(m_pWPolar->m_bVLM1)
+	{
+		//just get the horseshoe vortex's influence
+		VLMCmn(pPanel->A, pPanel->B, C, V, bAll);
+		if(m_pWPolar->m_bGround) 
+		{
+			VLMCmn(pPanel->A, pPanel->B, CG, VG, bAll);
+			V.x += VG.x;
+			V.y += VG.y;
+			V.z -= VG.z;
+		}
+	}
+	else
+	{
+		// we have quad vortices
+		// so we follow Katz and Plotkin's lead
+		if(!pPanel->m_bIsTrailing)
+		{
+			if(bAll) 
+			{
+				VLMQmn(pPanel->A, pPanel->B, m_pPanel[p-1].A, m_pPanel[p-1].B, C, V);
+				if(m_pWPolar->m_bGround)
+				{
+					VLMQmn(pPanel->A, pPanel->B, m_pPanel[p-1].A, m_pPanel[p-1].B, CG, VG);
+					V.x += VG.x;
+					V.y += VG.y;
+					V.z -= VG.z;
+				}
+			}
+		}
+		else
+		{
+			// then panel p is trailing and shedding a wake
 			if(!m_bWakeRollUp)
 			{
 				// since Panel p+1 does not exist... 
@@ -996,19 +1173,12 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 				BB1.y = m_pNode[pPanel->m_iTB].y;
 				BB1.z = m_pNode[pPanel->m_iTB].z;
 				// first we get the quad vortex's influence
-				if (bAll) {
+				if (bAll) 
+				{
 					VLMQmn(pPanel->A, pPanel->B, AA1, BB1, C, V);
-					if(m_pWPolar->m_bGround) {
-						AA  = pPanel->A;
-						BB  = pPanel->B;
-						AAG = AA1;
-						BBG = BB1;
-						AA.z  -= 2.0*m_pWPolar->m_Height;
-						BB.z  -= 2.0*m_pWPolar->m_Height;
-						AAG.z -= 2.0*m_pWPolar->m_Height;
-						BBG.z -= 2.0*m_pWPolar->m_Height;
-
-						VLMQmn(AA, BB, AAG, BBG, C, VG);
+					if(m_pWPolar->m_bGround)
+					{
+						VLMQmn(pPanel->A, pPanel->B, AA1, BB1, CG, VG);
 						V.x += VG.x;
 						V.y += VG.y;
 						V.z -= VG.z;
@@ -1018,30 +1188,26 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 				//we just add a trailing horseshoe vortex's influence to simulate the wake
 				VLMCmn(AA1,BB1,C,VT,bAll);
 
-				if(m_pWPolar->m_bGround) {
-					VLMCmn(AAG, BBG, C, VG);
-					V.x += VG.x;
-					V.y += VG.y;
-					V.z -= VG.z;
+				if(m_pWPolar->m_bGround) 
+				{
+					VLMCmn(AA1, BB1, CG, VG);
+					VT.x += VG.x;
+					VT.y += VG.y;
+					VT.z -= VG.z;
 				}
 				V += VT;
 			}
-			else{// if there is a wake roll-up required
+			else
+			{
+				// if there is a wake roll-up required
 				pw = pPanel->m_iWake;
 				// first close the wing's last vortex ring at T.E.
-				if (bAll) {
+				if (bAll) 
+				{
 					VLMQmn(pPanel->A, pPanel->B, m_pWakePanel[pw].A, m_pWakePanel[pw].B, C, V);
-					if(m_pWPolar->m_bGround) {
-						AA  = pPanel->A;
-						BB  = pPanel->B;
-						AAG = m_pWakePanel[pw].A;
-						BBG = m_pWakePanel[pw].B;
-						AA.z  -= 2.0*m_pWPolar->m_Height;
-						BB.z  -= 2.0*m_pWPolar->m_Height;
-						AAG.z -= 2.0*m_pWPolar->m_Height;
-						BBG.z -= 2.0*m_pWPolar->m_Height;
-
-						VLMQmn(AA, BB, AAG, BBG, C, VG);
+					if(m_pWPolar->m_bGround) 
+					{
+						VLMQmn(pPanel->A, pPanel->B, m_pWakePanel[pw].A, m_pWakePanel[pw].B, CG, VG);
 						V.x += VG.x;
 						V.y += VG.y;
 						V.z -= VG.z;
@@ -1050,23 +1216,17 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 
 				//each wake panel has the same vortex strength than the T.E. panel
 				//so we just cumulate their unit influences
-				if(bAll){
+				if(bAll)
+				{
 					for (lw=0; lw<m_pWPolar->m_NXWakePanels-1; lw++)
 					{
 						VLMQmn(m_pWakePanel[pw  ].A, m_pWakePanel[pw  ].B,
 							   m_pWakePanel[pw+1].A, m_pWakePanel[pw+1].B, C, VT);
 						V += VT;
-						if(m_pWPolar->m_bGround) {
-							AA  = m_pWakePanel[pw].A;
-							BB  = m_pWakePanel[pw].B;
-							AAG = m_pWakePanel[pw+1].A;
-							BBG = m_pWakePanel[pw+1].B;
-							AA.z  -= 2.0*m_pWPolar->m_Height;
-							BB.z  -= 2.0*m_pWPolar->m_Height;
-							AAG.z -= 2.0*m_pWPolar->m_Height;
-							BBG.z -= 2.0*m_pWPolar->m_Height;
-
-							VLMQmn(AA, BB, AAG, BBG, C, VG);
+						if(m_pWPolar->m_bGround) 
+						{
+							VLMQmn(m_pWakePanel[pw  ].A, m_pWakePanel[pw  ].B,
+								   m_pWakePanel[pw+1].A, m_pWakePanel[pw+1].B, CG, VG);
 							V.x += VG.x;
 							V.y += VG.y;
 							V.z -= VG.z;
@@ -1074,23 +1234,23 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector C, CVector &V,
 						pw++;
 					}
 				}
-/*				//for the very last wake panel downstream, just add a horseshoe vortex influence
-				//TODO : check influence on results
-				VLMCmn(m_pWakePanel[pw].A, m_pWakePanel[pw].B,C,VT,bAll);
-				V += VT;
-				if(m_pWPolar->m_bGround) {
-					VLMCmn(AAG, BBG, C, VG);
-					V.x += VG.x;
-					V.y += VG.y;
-					V.z -= VG.z;
-				}*/
+//				//for the very last wake panel downstream, just add a horseshoe vortex influence
+//				//TODO : check influence on results
+//				VLMCmn(m_pWakePanel[pw].A, m_pWakePanel[pw].B,C,VT,bAll);
+//				V += VT;
+//				if(m_pWPolar->m_bGround) {
+//					VLMCmn(AAG, BBG, C, VG);
+//					V.x += VG.x;
+//					V.y += VG.y;
+//					V.z -= VG.z;
+//				}
 				//simple really !
 			}
 			//so says Katz and Plotkin !
 		}
 	}
 }
-
+*/
 
 void CVLMDlg::VLMSetDownwash(double *Gamma)
 {
@@ -1210,12 +1370,6 @@ void CVLMDlg::VLMSetAi(double *Gamma)
 			{
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				Vt += V * Gamma[pp];
-				if(m_pWPolar->m_bGround)
-				{
-					VLMGetVortexInfluence(m_pPanel+pp, CG, V, true);
-					V.z =  -V.z;
-					Vt += V * Gamma[pp];
-				}
 			}
 //			m_Ai[m] = atan2(Vt.dot(K), m_QInf) * 180.0/pi;
 			Ai[m] = atan2(Vt.z, m_QInf) * 180.0/pi;
@@ -1695,7 +1849,7 @@ void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
 
 
 
-void CVLMDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V)
+void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
 {
 	//Quadrilateral VLM FORMULATION
 	// LA, LB, TA, TB are the vortex's four corners
@@ -1780,7 +1934,7 @@ void CVLMDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, 
 
 
 
-void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
+void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool bAll)
 {
 	// CLASSIC VLM FORMULATION
 	// Calculates the influence at point C of the vortex positioned at segment AB 

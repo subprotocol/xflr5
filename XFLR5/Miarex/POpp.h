@@ -62,7 +62,6 @@ private:
 	bool m_bBiplane; 		// if a biplane
 	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
-//	bool m_bMiddle;			// true if the POpp is the result of a calculation on the middle surface
 	bool m_bOut;			// true if the point is unconverged (interpolation outside the polar mesh)
 	bool m_bIsVisible;
 	bool m_bShowPoints;

@@ -51,13 +51,13 @@ BEGIN_MESSAGE_MAP(CAFoilCtrlBar, CInitDialogBar)
 	ON_WM_DRAWITEM()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_CONTEXTMENU()
-	ON_NOTIFY(NM_CLICK, IDC_FOILLIST, OnNMClickFoilList)
 	ON_WM_LBUTTONDBLCLK()
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_FOILLIST, OnLvnItemchangedFoillist)
+	ON_NOTIFY(NM_CLICK, IDC_FOILLIST, OnNMClickFoilList)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CAFoilCtrlBar dialog
-
 
 
 
@@ -691,18 +691,40 @@ void CAFoilCtrlBar::ReSizeCtrls()
 			m_ctrlFoilList.SetColumnWidth(9,w2);
 			m_ctrlFoilList.SetColumnWidth(10,w2);
 			m_ctrlFoilList.SetColumnWidth(11,w2);
-
-			
 		}
 	}
 }
 
 void CAFoilCtrlBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	//disable window handler to prevent wild resize
+	//override and disable window handler to prevent wild resize
 //	CInitDialogBar::OnLButtonDown(nFlags, point);
 }
 
+
+void CAFoilCtrlBar::OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
+	{
+		*pResult =0;
+		return ;
+	}
+	m_FoilSelection = pNMListView->iItem;
+	if(m_FoilSelection==0){
+		SetSplineData();
+	}
+	else {
+		CFoil *pFoil;
+		CString FoilName;
+		FoilName = m_ctrlFoilList.GetItemText(pNMListView->iItem, 0);
+		pFoil = pADlg->GetFoil(FoilName);
+		SetFoil(pFoil);
+	}
+
+	*pResult = 0;
+}
 
 void CAFoilCtrlBar::OnNMClickFoilList(NMHDR *pNMHDR, LRESULT *pResult)
 {

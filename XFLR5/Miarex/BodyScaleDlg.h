@@ -18,8 +18,11 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+
 #include "../misc/FloatEdit.h"
+#include "../misc/NumEdit.h"
 #include "afxwin.h"
+
 #pragma once
 
 
@@ -36,6 +39,8 @@ public:
 	CFloatEdit	m_ctrlXScaleFactor;
 	CFloatEdit	m_ctrlYScaleFactor;
 	CFloatEdit	m_ctrlZScaleFactor;
+	CNumEdit    m_ctrlFrameID;
+	CButton m_ctrlOK;
 
 	CBodyScaleDlg(CWnd* pParent = NULL);   // constructeur standard
 	virtual ~CBodyScaleDlg();
@@ -45,12 +50,17 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // Prise en charge DDX/DDV
+	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+	CWnd * m_pMiarex;
 
 	double m_XFactor, m_YFactor, m_ZFactor;
+	bool m_bFrameOnly;
+	int m_FrameID;
 
 	DECLARE_MESSAGE_MAP()
 public:
-	virtual BOOL OnInitDialog();
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CButton m_ctrlOK;
+	afx_msg void OnRadio1();
+	afx_msg void OnKillFocusFrameId();
 };

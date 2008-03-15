@@ -338,7 +338,7 @@ bool CInPlaceFloatEdit::GetValue(double &f)
 void CInPlaceFloatEdit::SetValue(double f)
 {
  	CString str, str1;
-	if ((f==0.0 || fabs(f)>pow(10.0, -m_iPrecision)) && f <1000.0){
+	if ((f==0.0 || abs(f)>=pow(10.0, -m_iPrecision)) && f <1000.0){
 		switch (m_iPrecision){
 			//there probably is a more elegant way to do this,
 			case 0:

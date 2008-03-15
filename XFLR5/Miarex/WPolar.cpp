@@ -42,13 +42,13 @@ CWPolar::CWPolar(CWnd* pParent)
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
 
-	m_bVLM1       = true;
-//	m_bMiddle     = true;
-	m_bWakeRollUp = false;
-	m_bTiltedGeom = false;
-	m_bViscous    = true;
-	m_bPolar      = true;
-	m_bGround     = false;
+	m_bVLM1         = true;
+	m_bThinSurfaces = true;
+	m_bWakeRollUp   = false;
+	m_bTiltedGeom   = false;
+	m_bViscous      = true;
+	m_bPolar        = true;
+	m_bGround       = false;
 
 	m_NXWakePanels = 1;
 	m_TotalWakeLength = 1.0;
@@ -77,15 +77,15 @@ CWPolar::CWPolar(CWnd* pParent)
 
 void CWPolar::Copy(CWPolar *pWPolar)
 {
-	m_bIsVisible  = pWPolar->m_bIsVisible;
-//	m_bMiddle     = pWPolar->m_bMiddle;
-	m_bPolar      = pWPolar->m_bPolar;
-	m_bShowPoints = pWPolar->m_bShowPoints;
-	m_bTiltedGeom = pWPolar->m_bTiltedGeom;
-	m_bViscous    = pWPolar->m_bViscous;
-	m_bVLM1       = pWPolar->m_bVLM1;
-	m_bWakeRollUp = pWPolar->m_bWakeRollUp;
-	m_AnalysisType = pWPolar->m_AnalysisType;
+	m_bIsVisible    = pWPolar->m_bIsVisible;
+	m_bPolar        = pWPolar->m_bPolar;
+	m_bShowPoints   = pWPolar->m_bShowPoints;
+	m_bTiltedGeom   = pWPolar->m_bTiltedGeom;
+	m_bViscous      = pWPolar->m_bViscous;
+	m_bVLM1         = pWPolar->m_bVLM1;
+	m_bWakeRollUp   = pWPolar->m_bWakeRollUp;
+	m_AnalysisType  = pWPolar->m_AnalysisType;
+	m_bThinSurfaces = pWPolar->m_bThinSurfaces;
 
 	int size  = (int)m_Alpha.GetSize();
 	for(int i=size-1; i>=0; i--)
@@ -99,13 +99,12 @@ void CWPolar::Copy(CWPolar *pWPolar)
 		m_PCd.InsertAt(i,        pWPolar-> m_PCd[i],        1);
 		m_TCd.InsertAt(i,        pWPolar-> m_TCd[i],        1);
 
-		m_Cm.InsertAt(i,         pWPolar-> m_Cm[i],         1);
-		m_VCm.InsertAt(i,        pWPolar-> m_VCm[i],        1);
 		m_GCm.InsertAt(i,        pWPolar-> m_GCm[i],        1);
-		m_IYm.InsertAt(i,        pWPolar-> m_IYm[i],        1);
+		m_GRm.InsertAt(i,        pWPolar-> m_GRm[i],        1);
 		m_GYm.InsertAt(i,        pWPolar-> m_GYm[i],        1);
+		m_VYm.InsertAt(i,        pWPolar-> m_VYm[i],        1);
+		m_IYm.InsertAt(i,        pWPolar-> m_IYm[i],        1);
 
-		m_CRm.InsertAt(i,        pWPolar-> m_CRm[i],        1);
 		m_ClCd.InsertAt(i,       pWPolar-> m_ClCd[i],       1);
 		m_1Cl.InsertAt(i,        pWPolar-> m_1Cl[i],        1);
 		m_Cl32Cd.InsertAt(i,     pWPolar-> m_Cl32Cd[i],     1);
@@ -136,6 +135,7 @@ CWPolar::~CWPolar()
 	ResetWPlr();
 }
 
+
 void CWPolar::Export(CString FileName)
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
@@ -143,13 +143,15 @@ void CWPolar::Export(CString FileName)
 	CFileException fe;
 	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
 	try{
-		if(!bOpen){
+		if(!bOpen)
+		{
 //			CFileException *pfe = new CFileException(CFileException::invalidFile);
 //			pfe->m_strFileName = FileName;
 			throw &fe;
 		}
 	}
-	catch (CFileException *ex){
+	catch (CFileException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -158,7 +160,8 @@ void CWPolar::Export(CString FileName)
 		AfxMessageBox(str);
 		return ;
 	}
-	if (bOpen){
+	if (bOpen)
+	{
 		CString strOut;
 		CString Header, strong;
 
@@ -179,16 +182,19 @@ void CWPolar::Export(CString FileName)
 		strong ="Wing polar name :  "+ m_PlrName + "\n";
 		XFile.WriteString(strong);
 
-		strong.Format("Freestream speed : %3.1 m/s\n\n",m_QInf);
+		GetSpeedUnit(str, pFrame->m_SpeedUnit);
+		str +="\n\n";
+		strong.Format("Freestream speed : %3.1f ",m_QInf*pFrame->m_mstoUnit);
+		strong +=str;
 		XFile.WriteString(strong);
 
-		Header.Format("   alpha      CL         ICd        PCd        TCd        Cm         IYm        GYm         Rm       QInf        XCP\n");
+		Header.Format("   alpha      CL         ICd        PCd        TCd       GCm         GRm        GYm        IYm       QInf        XCP\n");
 		XFile.WriteString(Header);
 		Header.Format(" _________ _________  _________  _________  _________  _________  _________  _________  _________ __________ __________\n");
 		XFile.WriteString(Header); 
 		for (int j=0; j<m_Alpha.GetSize(); j++){
 			strong.Format(" %8.3f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %8.4f    %9.4f\n",
-				m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_Cm[j], m_IYm[j], m_GYm[j], m_CRm[j], m_QInfinite[j], m_XCP[j]);
+				m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
 			
 			XFile.WriteString(strong);
 		
@@ -207,13 +213,12 @@ void CWPolar::ResetWPlr()
 	m_PCd.RemoveAll();
 	m_TCd.RemoveAll();
 
-	m_Cm.RemoveAll();
-	m_VCm.RemoveAll();
 	m_GCm.RemoveAll();
-	m_IYm.RemoveAll();
+	m_GRm.RemoveAll();
 	m_GYm.RemoveAll();
+	m_VYm.RemoveAll();
+	m_IYm.RemoveAll();
 
-	m_CRm.RemoveAll();
 	m_XCP.RemoveAll();
 	m_YCP.RemoveAll();
 	m_MaxBending.RemoveAll();
@@ -242,10 +247,12 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 {
 	int ArchiveFormat;// identifies the format of the file
 	//Call Base class function
-	if(ar.IsStoring()){
+	if(ar.IsStoring())
+	{
 		//write variables
 		
-		ar << 1011; // identifies the format of the file
+		ar << 1012; // identifies the format of the file
+					// 1012 : redefined the moment coefficients
 					// 1011 : added wake roll-up parameters
 					// 1010 : added ground effect variables langth changed length unit to m
 					// 1009 : added viscous flag
@@ -261,13 +268,12 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
 		ar << m_Style  << m_Width << m_Color;
 		ar << m_AnalysisType;
-		if (m_bVLM1)       ar << 1; else ar << 0;
-//		if (m_bMiddle)     ar << 1; else ar << 0;
-		ar<<1;
-		if (m_bTiltedGeom) ar << 1; else ar << 0;
-		if (m_bWakeRollUp) ar << 1; else ar << 0;
-		if (m_bViscous)    ar << 1; else ar << 0;
-		if (m_bGround)     ar << 1; else ar << 0;
+		if (m_bVLM1)         ar << 1; else ar << 0;
+		if (m_bThinSurfaces) ar << 1; else ar << 0;
+		if (m_bTiltedGeom)   ar << 1; else ar << 0;
+		if (m_bWakeRollUp)   ar << 1; else ar << 0;
+		if (m_bViscous)      ar << 1; else ar << 0;
+		if (m_bGround)       ar << 1; else ar << 0;
 		ar << (float)m_Height;
 
 		ar << m_NXWakePanels << (float)m_TotalWakeLength << (float)m_WakePanelFactor;
@@ -282,10 +288,14 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar <<(float)m_Density << (float)m_Viscosity;
 
 		ar <<(int)m_Alpha.GetSize();
-		for (int i=0; i< (int)m_Alpha.GetSize(); i++){
+		for (int i=0; i< (int)m_Alpha.GetSize(); i++)
+		{
 			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
-			ar << (float)m_Cm[i] << (float)m_VCm[i] << (float)m_GCm[i] << (float)m_IYm[i] << (float)m_GYm[i] ;
-			ar << (float)m_CRm[i] << (float)m_QInfinite[i];
+
+			ar << (float)m_GCm[i] << (float)m_GRm[i] << (float)m_GYm[i] << 0.0f << (float)m_VYm[i] << (float)m_IYm[i];
+
+			ar << (float)m_QInfinite[i];
+
 			ar << (float)m_XCP[i] << (float)m_YCP[i] << (float)m_MaxBending[i];
 		}
 
@@ -362,7 +372,7 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 				m_PlrName ="";
 				return false;
 			}
-//			if(n) m_bMiddle =true; else m_bMiddle = false;
+			if(n) m_bThinSurfaces =true; else m_bThinSurfaces = false;
 		}
 		if(ArchiveFormat>=1008){
 			ar >> n; 
@@ -461,12 +471,14 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			m_XCmRef   /=1000.0;
 		}
 	
-		float Alpha,  Cl, ICd, PCd, Cm, PCm, GCm, IYm, GYm, Rm, QInfinite, XCP, YCP;
+		float Alpha,  Cl, ICd, PCd, GCm, GRm, GYm, VCm, VYm, IYm, QInfinite, XCP, YCP;
 		float Cb = 0.0;
 		bool bExists;
 		for (int i=0; i< n; i++){
 			try{
-				ar >> Alpha >> Cl >> ICd >> PCd >> Cm >> PCm >> GCm >> IYm >> GYm >> Rm;
+				ar >> Alpha >> Cl >> ICd >> PCd;
+				ar >> GCm >> GRm >> GYm >> VCm >> VYm >> IYm;
+		        if(ArchiveFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0; 
 				ar >> QInfinite >> XCP >> YCP;
 				if(ArchiveFormat<1010){
 					XCP   /=1000.0;
@@ -492,7 +504,7 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			bExists = false;
 			if(m_Type!=4){
 				for (int j=0; j<m_Alpha.GetSize(); j++){
-					if(fabs(Alpha-m_Alpha[j])<0.001){
+					if(abs(Alpha-m_Alpha[j])<0.001){
 						bExists = true;
 						break;
 					}
@@ -500,24 +512,26 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			}
 			else {
 				for (int j=0; j<m_Alpha.GetSize(); j++){
-					if(fabs(QInfinite-m_QInfinite[j])<0.001){
+					if(abs(QInfinite-m_QInfinite[j])<0.001){
 						bExists = true;
 						break;
 					}
 				}
 			}
-			if(!bExists){
+			if(!bExists)
+			{
 				m_Alpha.Add(Alpha);
 				m_Cl.Add(Cl);
 				m_ICd.Add(ICd);
 				m_PCd.Add(PCd);
 				m_TCd.Add(ICd+PCd);
-				m_Cm.Add(Cm);
-				m_VCm.Add(PCm);
+
 				m_GCm.Add(GCm);
-				m_IYm.Add(IYm);
+				m_GRm.Add(GRm);
 				m_GYm.Add(GYm);
-				m_CRm.Add(Rm);
+				m_VYm.Add(VYm);
+				m_IYm.Add(IYm);
+
 				m_QInfinite.Add(QInfinite);
 
 				m_XCP.Add(XCP);
@@ -566,7 +580,7 @@ void CWPolar::CalculatePoint(int i)
 		m_Cl32Cd[i] =  -(double)pow(-m_Cl[i],1.5)/m_TCd[i];
 	}
 
-	if(fabs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/pi;
+	if(abs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/pi;
 	else m_Gamma[i] = 90.0;
 	m_Vz[i] = (double)sqrt(2*m_Weight*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*pi/180.0);
@@ -577,9 +591,9 @@ void CWPolar::CalculatePoint(int i)
 	m_L[i]  = q * m_Cl[i]*m_WArea;
 	m_D[i]  = q * m_TCd[i]*m_WArea;
 
-	m_Rm[i] = q * m_WArea * m_CRm[i] * m_WSpan;// in N.m
-	m_Ym[i] = q * m_WArea * (m_GYm[i] + m_IYm[i]) * m_WSpan;// in N.m
-	m_Pm[i] = q * m_WArea * m_Cm[i] * m_WMAChord;// in N.m
+	m_Rm[i] = q * m_WArea * m_GRm[i] * m_WSpan;// in N.m
+	m_Ym[i] = q * m_WArea * m_GYm[i] * m_WSpan;// in N.m
+	m_Pm[i] = q * m_WArea * m_GCm[i] * m_WMAChord;// in N.m
 
 	//power for horizontal flight
 	m_VertPower[i] = m_Weight * 9.81 * m_Vz[i];
@@ -606,13 +620,12 @@ void CWPolar::Remove(int i)
 	m_PCd.RemoveAt(i);
 	m_TCd.RemoveAt(i);
 
-	m_Cm.RemoveAt(i);
-	m_VCm.RemoveAt(i);
 	m_GCm.RemoveAt(i);
-	m_IYm.RemoveAt(i);
+	m_GRm.RemoveAt(i);
 	m_GYm.RemoveAt(i);
+	m_VYm.RemoveAt(i);
+	m_IYm.RemoveAt(i);
 
-	m_CRm.RemoveAt(i);
 	m_XCP.RemoveAt(i);
 	m_YCP.RemoveAt(i);
 	m_MaxBending.RemoveAt(i);
@@ -652,38 +665,45 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 
 	if(size){
 		for (i=0; i<size; i++){
-			if(m_Type !=4){
-				if (fabs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001){// then erase former result
-					m_Alpha[i]     =  pWOpp->m_Alpha;
-					m_Cl[i]        =  pWOpp->m_CL;
-					m_ICd[i]       =  pWOpp->m_InducedDrag;
-					m_PCd[i]       =  pWOpp->m_ViscousDrag;
-					m_TCd[i]       =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
-					m_Cm[i]        =  pWOpp->m_PitchingMoment;
-					m_VCm[i]       =  pWOpp->m_VCm;
-					m_GCm[i]       =  pWOpp->m_GCm;
-					m_IYm[i]      =  pWOpp->m_InducedYawingMoment;
-					m_GYm[i]      =  pWOpp->m_GYm;
-					m_CRm[i]       =  pWOpp->m_RollingMoment;
-					m_QInfinite[i] =  pWOpp->m_QInf;
-					m_XCP[i]       =  pWOpp->m_XCP;
-					m_YCP[i]       =  pWOpp->m_YCP;
+			if(m_Type !=4)
+			{
+				if (abs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001)
+				{
+					// then erase former result
+					m_Alpha[i]      =  pWOpp->m_Alpha;
+					m_Cl[i]         =  pWOpp->m_CL;
+					m_ICd[i]        =  pWOpp->m_InducedDrag;
+					m_PCd[i]        =  pWOpp->m_ViscousDrag;
+					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+
+					m_GCm[i]        =  pWOpp->m_GCm;
+					m_GRm[i]        =  pWOpp->m_GRm;
+					m_GYm[i]        =  pWOpp->m_GYm;
+					m_VYm[i]        =  pWOpp->m_VYm;
+					m_IYm[i]        =  pWOpp->m_IYm;
+
+					m_QInfinite[i]  =  pWOpp->m_QInf;
+					m_XCP[i]        =  pWOpp->m_XCP;
+					m_YCP[i]        =  pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;	
 					bInserted = true;
 					break;
 				}
-				else if (pWOpp->m_Alpha < m_Alpha[i]){// sort by crescending alphas
+				else if (pWOpp->m_Alpha < m_Alpha[i])
+				{
+					// sort by crescending alphas
 					m_Alpha.InsertAt(i, pWOpp->m_Alpha, 1);
-					m_Cl.InsertAt(i, pWOpp->m_CL);
+					m_Cl.InsertAt(i,  pWOpp->m_CL);
 					m_ICd.InsertAt(i, pWOpp->m_InducedDrag, 1);
 					m_PCd.InsertAt(i, pWOpp->m_ViscousDrag, 1);
 					m_TCd.InsertAt(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
-					m_Cm.InsertAt(i, pWOpp->m_PitchingMoment, 1);
-					m_VCm.InsertAt(i, pWOpp->m_VCm, 1);
+
 					m_GCm.InsertAt(i, pWOpp->m_GCm, 1);
-					m_IYm.InsertAt(i, pWOpp->m_InducedYawingMoment, 1);
+					m_GRm.InsertAt(i, pWOpp->m_GRm, 1);
 					m_GYm.InsertAt(i, pWOpp->m_GYm, 1);
-					m_CRm.InsertAt(i,  pWOpp->m_RollingMoment, 1);
+					m_VYm.InsertAt(i, pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i, pWOpp->m_IYm, 1);
+
 					m_QInfinite.InsertAt(i, pWOpp->m_QInf, 1);
 					m_XCP.InsertAt(i,  pWOpp->m_XCP, 1);
 					m_YCP.InsertAt(i,  pWOpp->m_YCP, 1);
@@ -708,19 +728,24 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else{// type 4, sort by speed
-				if (fabs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001){// then erase former result
+			else
+			{
+				// type 4, sort by speed
+				if (abs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
+				{
+					// then erase former result
 					m_Alpha[i]     =  pWOpp->m_Alpha;
 					m_Cl[i]        =  pWOpp->m_CL;
 					m_ICd[i]       =  pWOpp->m_InducedDrag;
 					m_PCd[i]       =  pWOpp->m_ViscousDrag;
 					m_TCd[i]       =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
-					m_Cm[i]        =  pWOpp->m_PitchingMoment;
-					m_VCm[i]       =  pWOpp->m_VCm;
+
 					m_GCm[i]       =  pWOpp->m_GCm;
-					m_IYm[i]       =  pWOpp->m_InducedYawingMoment;
+					m_GRm[i]       =  pWOpp->m_GRm;
 					m_GYm[i]       =  pWOpp->m_GYm;
-					m_CRm[i]       =  pWOpp->m_RollingMoment;
+					m_VYm[i]       =  pWOpp->m_VYm;
+					m_IYm[i]       =  pWOpp->m_IYm;
+
 					m_QInfinite[i] = pWOpp->m_QInf;
 					m_XCP[i]       = pWOpp->m_XCP;
 					m_YCP[i]       = pWOpp->m_YCP;
@@ -728,18 +753,21 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					bInserted = true;
 					break;
 				}
-				else if (pWOpp->m_QInf < m_QInfinite[i]){// sort by crescending alphas
+				else if (pWOpp->m_QInf < m_QInfinite[i])
+				{
+					// sort by crescending alphas
 					m_Alpha.InsertAt(i, pWOpp->m_Alpha, 1);
 					m_Cl.InsertAt(i, pWOpp->m_CL);
 					m_ICd.InsertAt(i, pWOpp->m_InducedDrag, 1);
 					m_PCd.InsertAt(i, pWOpp->m_ViscousDrag, 1);
 					m_TCd.InsertAt(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
-					m_Cm.InsertAt(i, pWOpp->m_PitchingMoment, 1);
-					m_VCm.InsertAt(i, pWOpp->m_VCm, 1);
+
 					m_GCm.InsertAt(i, pWOpp->m_GCm, 1);
-					m_IYm.InsertAt(i, pWOpp->m_InducedYawingMoment, 1);
+					m_GRm.InsertAt(i, pWOpp->m_GRm, 1);
 					m_GYm.InsertAt(i, pWOpp->m_GYm, 1);
-					m_CRm.InsertAt(i,  pWOpp->m_RollingMoment, 1);
+					m_VYm.InsertAt(i, pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i, pWOpp->m_IYm, 1);
+
 					m_QInfinite.InsertAt(i, pWOpp->m_QInf, 1);
 					m_XCP.InsertAt(i,  pWOpp->m_XCP, 1);
 					m_YCP.InsertAt(i,  pWOpp->m_YCP, 1);
@@ -768,18 +796,20 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	}
 	if(bInserted) CalculatePoint(i);
 	else
-	{// data is appended at the end
+	{
+		// data is appended at the end
 		m_Alpha.Add(pWOpp->m_Alpha);
 		m_ICd.Add(pWOpp->m_InducedDrag);
 		m_PCd.Add(pWOpp->m_ViscousDrag);
 		m_TCd.Add(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 		m_Cl.Add(pWOpp->m_CL);
-		m_Cm.Add(pWOpp->m_PitchingMoment);
-		m_VCm.Add(pWOpp->m_VCm);
+
 		m_GCm.Add(pWOpp->m_GCm);
-		m_IYm.Add(pWOpp->m_InducedYawingMoment);
+		m_GRm.Add(pWOpp->m_GRm);
 		m_GYm.Add(pWOpp->m_GYm);
-		m_CRm.Add(pWOpp->m_RollingMoment);
+		m_VYm.Add(pWOpp->m_VYm);
+		m_IYm.Add(pWOpp->m_IYm);
+
 		m_QInfinite.Add(pWOpp->m_QInf);
 		m_XCP.Add(pWOpp->m_XCP);
 		m_YCP.Add(pWOpp->m_YCP);
@@ -814,19 +844,20 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	if(size){
 		for (i=0; i<size; i++){
 			if(m_Type !=4){
-				if (fabs(pPOpp->m_Alpha - m_Alpha[i]) < 0.001){// then erase former result
+				if (abs(pPOpp->m_Alpha - m_Alpha[i]) < 0.001){// then erase former result
 					m_Alpha[i]     =  pWOpp->m_Alpha;
 					m_QInfinite[i] =  pWOpp->m_QInf;
 					m_Cl[i]        =  pWOpp->m_CL;
 					m_ICd[i]       =  pWOpp->m_InducedDrag;
 					m_PCd[i]       =  pWOpp->m_ViscousDrag;
 					m_TCd[i]       =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
-					m_Cm[i]        =  pWOpp->m_PitchingMoment;
-					m_VCm[i]       =  pWOpp->m_VCm;
+
 					m_GCm[i]       =  pWOpp->m_GCm;
-					m_IYm[i]       =  pWOpp->m_InducedYawingMoment;
+					m_GRm[i]       =  pWOpp->m_GRm;
 					m_GYm[i]       =  pWOpp->m_GYm;
-					m_CRm[i]       =  pWOpp->m_RollingMoment;
+					m_VYm[i]       =  pWOpp->m_VYm;
+					m_IYm[i]       =  pWOpp->m_IYm;
+
 					m_XCP[i]       =  pWOpp->m_XCP;
 					m_YCP[i]       =  pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;	
@@ -840,12 +871,13 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_ICd.InsertAt(i,  pWOpp->m_InducedDrag, 1);
 					m_PCd.InsertAt(i,  pWOpp->m_ViscousDrag, 1);
 					m_TCd.InsertAt(i,  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
-					m_Cm.InsertAt(i,   pWOpp->m_PitchingMoment, 1);
-					m_VCm.InsertAt(i,  pWOpp->m_VCm, 1);
+
 					m_GCm.InsertAt(i,  pWOpp->m_GCm, 1);
-					m_IYm.InsertAt(i,  pWOpp->m_InducedYawingMoment, 1);
+					m_GRm.InsertAt(i,  pWOpp->m_GRm, 1);
 					m_GYm.InsertAt(i,  pWOpp->m_GYm, 1);
-					m_CRm.InsertAt(i,  pWOpp->m_RollingMoment, 1);
+					m_VYm.InsertAt(i,  pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i,  pWOpp->m_IYm, 1);
+
 					m_XCP.InsertAt(i,  pWOpp->m_XCP, 1);
 					m_YCP.InsertAt(i,  pWOpp->m_YCP, 1);
 					m_MaxBending.InsertAt(i, pWOpp->m_MaxBending);
@@ -870,18 +902,21 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				}
 			}
 			else{// type 4, sort by speed
-				if (fabs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001){// then erase former result
+				if (abs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
+				{
+					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
 					m_Cl[i]         = pWOpp->m_CL;
 					m_ICd[i]        = pWOpp->m_InducedDrag;
 					m_PCd[i]        = pWOpp->m_ViscousDrag;
 					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
-					m_Cm[i]         = pWOpp->m_PitchingMoment;
-					m_VCm[i]        = pWOpp->m_VCm;
+
 					m_GCm[i]        = pWOpp->m_GCm;
-					m_IYm[i]        = pWOpp->m_InducedYawingMoment;
+					m_GRm[i]        = pWOpp->m_GRm;
 					m_GYm[i]        = pWOpp->m_GYm;
-					m_CRm[i]        = pWOpp->m_RollingMoment;
+					m_VYm[i]        = pWOpp->m_VYm;
+					m_IYm[i]        = pWOpp->m_IYm;
+
 					m_QInfinite[i]  = pWOpp->m_QInf;
 					m_XCP[i]        = pWOpp->m_XCP;
 					m_YCP[i]        = pWOpp->m_YCP;
@@ -895,12 +930,13 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_ICd.InsertAt(i,       pWOpp->m_InducedDrag, 1);
 					m_PCd.InsertAt(i,       pWOpp->m_ViscousDrag, 1);
 					m_TCd.InsertAt(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
-					m_Cm.InsertAt(i,        pWOpp->m_PitchingMoment, 1);
-					m_VCm.InsertAt(i,       pWOpp->m_VCm, 1);
+
 					m_GCm.InsertAt(i,       pWOpp->m_GCm, 1);
-					m_IYm.InsertAt(i,       pWOpp->m_InducedYawingMoment, 1);
+					m_GRm.InsertAt(i,       pWOpp->m_GRm, 1);
 					m_GYm.InsertAt(i,       pWOpp->m_GYm, 1);
-					m_CRm.InsertAt(i,       pWOpp->m_RollingMoment, 1);
+					m_VYm.InsertAt(i,       pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i,       pWOpp->m_IYm, 1);
+
 					m_QInfinite.InsertAt(i, pWOpp->m_QInf, 1);
 					m_XCP.InsertAt(i,       pWOpp->m_XCP, 1);
 					m_YCP.InsertAt(i,       pWOpp->m_YCP, 1);
@@ -935,12 +971,13 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_PCd.Add(pWOpp->m_ViscousDrag);
 		m_TCd.Add(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 		m_Cl.Add(pWOpp->m_CL);
-		m_Cm.Add(pWOpp->m_PitchingMoment);
-		m_VCm.Add(pWOpp->m_VCm);
+
 		m_GCm.Add(pWOpp->m_GCm);
-		m_IYm.Add(pWOpp->m_InducedYawingMoment);
+		m_GRm.Add(pWOpp->m_GRm);
 		m_GYm.Add(pWOpp->m_GYm);
-		m_CRm.Add(pWOpp->m_RollingMoment);
+		m_VYm.Add(pWOpp->m_VYm);
+		m_IYm.Add(pWOpp->m_IYm);
+
 		m_QInfinite.Add(pWOpp->m_QInf);
 		m_XCP.Add(pWOpp->m_XCP);
 		m_YCP.Add(pWOpp->m_YCP);

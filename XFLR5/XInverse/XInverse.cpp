@@ -2238,11 +2238,13 @@ void CXInverse::OnSelectFoil()
 	CSelectFoilDlg dlg;
 	dlg.m_pMainFrame = m_pFrame;
 
-	if(m_bLoaded){
+	if(m_bLoaded)
+	{
 		dlg.m_FoilName = m_pRefFoil->m_FoilName;
 	}
 
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		CWaitCursor Wait;
 		m_bMark = false;
 		m_bMarked = false;

@@ -32,54 +32,82 @@ public:
 	virtual ~CBody();
 
 	CFrame* GetFrame(int iSelect);
-	CFrame * InsertFrame(CVector Real);
+	
+	bool Gauss(double *A, int n, double *B, int m);
+	bool IsInNURBSBody(CVector Pt);
+	bool Intersect(CVector A, CVector B, CVector &I, bool bRight);
+	bool IntersectPanels(CVector A, CVector B, CVector &I, bool bRight);
+	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(CArchive &ar);
 	bool SetModified();
+
+	int InsertFrame(CVector Real);
+	int InsertPoint(CVector Real);
 	int IsFramePos(CVector Real, double ZoomFactor);
 	int RemoveFrame(int n);
-	void Export();
-	void RemoveActiveFrame();
-	void ComputeCenterLine();
-	void UpdateFramePos(int iFrame);
-	void InsertPoint(CVector Real);
-	void InsertSideLine(int SideLine);
-	void RemoveSideLine(int SideLine);
-	void Duplicate(CBody *pBody);
-	void Scale(double XFactor, double YFactor, double ZFactor);
-	void SetKnots();
+
 	double GetLength();
 	double Getu(double x);
-	double SplineBlend(int index,  int p, double t, double *knots);
-	CVector GetPoint(double u, double v);
+	double Getv(double u, CVector r, bool bRight);
+	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
+
+	void ComputeAero(double *Cp, double &Lift, double &XCP, double &YCP,
+		             double &GCm, double &GRm, double &GYm, double Alpha, double XCmRef, bool bTilted);
+	void ComputeCenterLine();
+	void Duplicate(CBody *pBody);
+	void Export(int nx, int nh);
+	void GetPoint(double u, double v, bool bRight, CVector &Pt);
+	void InsertSideLine(int SideLine);
+	void InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size);
+	void InterpolateSurface();
+	void RemoveActiveFrame();
+	void RemoveSideLine(int SideLine);
+	void Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID);
+	void SetKnots();
+	void SetPanelPos();
+	void UpdateFramePos(int iFrame);
+
+
+//____________________VARIABLES_____________________________________________
+
 
 	bool m_bLocked; //true is this body is used by a plane with results
 	bool m_bClosedSurface;
+
 	int m_NSideLines;
-	int m_NStation;			// the number of stations along x-axis where frames are defined
+	int m_NStations;			// the number of stations along x-axis where frames are defined
 	int m_iActiveFrame;		// the currently selected frame for display
 	int m_iHighlight;		// the currently selected frame for display
 	int m_LineType; //1=lines  2=B-Splines
 	int m_iRes; //for splines
-	int m_NElements;// = m_nxPanels * m_nhPanels
+	int m_NElements;// = m_nxPanels * m_nhPanels *2
 	int m_nxPanels, m_nhPanels;
+	int m_nxDegree, m_nhDegree, m_nxKnots, m_nhKnots;
+	int m_BodyStyle, m_BodyWidth;
+
+	double m_Bunch;
+	double pi;
 
 	CString m_BodyName;
 
 	COLORREF m_BodyColor;
-	int m_BodyStyle, m_BodyWidth;
 
 	CVector m_FramePosition[MAXBODYFRAMES];
 	CFrame m_Frame[MAXBODYFRAMES];	// the frames at the stations
 
+	int m_xPanels[MAXBODYFRAMES];
+	int m_hPanels[MAXSIDELINES];
+
 	CPanel *m_pPanel;
 
-	int m_nxDegree, m_nhDegree, m_nxKnots, m_nhKnots;
-
-	//avoid lengthy memory allocation times
-	double value, eps,bs, cs;
-
-	static double s_xKnots[MAXBODYFRAMES];
-	static double s_hKnots[30];
+	//allocate temporary variables to
+	//avoid lengthy memory allocation times on the stack
+	double value, eps, bs, cs;
+	CVector t_R, t_Prod, t_Q, t_r, t_N;
+//	CVector P0, P1, P2, PI;
+	static double s_xKnots[MAXBODYFRAMES*2];
+	static double s_hKnots[MAXSIDELINES*2];
+	static double s_XPanelPos[300];
 	static	CRect s_rViewRect;
 	static CWnd *s_pMainFrame;
 };

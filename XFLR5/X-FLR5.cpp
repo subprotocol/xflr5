@@ -2,7 +2,7 @@
 
 	X-FLR6 Application
 
-    Copyright (C) 2003-2007 André Deperrois XFLR5@yahoo.com
+    Copyright (C) 2003-2008 André Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,56 +50,14 @@ CXFLR5App theApp;
 
 
 // CXFLR5App initialization
-/*
-BOOL CXFLR5App::InitInstance()
-{
-	// InitCommonControls() is required on Windows XP if an application
-	// manifest specifies use of ComCtl32.dll version 6 or later to enable
-	// visual styles.  Otherwise, any window creation will fail.
-	InitCommonControls();
-
-	CWinApp::InitInstance();
-
-	// Initialize OLE libraries
-	if (!AfxOleInit())
-	{
-		AfxMessageBox("IDP_OLE_INIT_FAILED");
-		return FALSE;
-	}
-	AfxEnableControlContainer();
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	// of your final executable, you should remove from the following
-	// the specific initialization routines you do not need
-	// Change the registry key under which our settings are stored
-	// TODO: You should modify this string to be something appropriate
-	// such as the name of your company or organization
-	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
-	// To create the main window, this code creates a new frame window
-	// object and then sets it as the application's main window object
-	CMainFrame* pFrame = new CMainFrame;
-	if (!pFrame)
-		return FALSE;
-	m_pMainWnd = pFrame;
-	// create and load the frame with its resources
-	pFrame->LoadFrame(IDR_MAINFRAME,
-		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,
-		NULL);
-	// The one and only window has been initialized, so show and update it
-	pFrame->ShowWindow(SW_SHOW);
-	pFrame->UpdateWindow();
-	// call DragAcceptFiles only if there's a suffix
-	//  In an SDI app, this should occur after ProcessShellCommand
-	return TRUE;
-}
-*/
 
 BOOL CXFLR5App::InitInstance()
 {
 	//protection for beta versions
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-//	if (time.wYear >=2010) {
+//	if (time.wYear>=2009 || (time.wYear >=2008 && time.wMonth>=6)) 
+//	{
 //		AfxMessageBox("This version of XFLR5 has expired\nPlease download a new version", MB_OK);
 //		return FALSE;
 //	}
@@ -111,7 +69,8 @@ BOOL CXFLR5App::InitInstance()
 	CWinApp::InitInstance();
 
 	bTrace = false;
-	if(bTrace){
+	if(bTrace)
+	{
 		CString strAppDirectory;
 		char    szAppPath[MAX_PATH] = "";
 		::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
@@ -148,16 +107,16 @@ BOOL CXFLR5App::InitInstance()
 
 	//Trace("CX5App::InitInstance::Command Line Info processed");
 
-
-	//TODO : restore
-/*	if (!FirstInstance(CmdInfo)){
+/*
+	if (!FirstInstance(CmdInfo))
+	{
 		//Trace("CX5App::InitInstance::Redirected input to first instance");
 		//Trace("CX5App::InitInstance::Closing App");
 
 		return FALSE;
 
-	}*/
-
+	}
+*/
 
 	//Trace("CX5App::InitInstance::System time acquired");
 
@@ -193,11 +152,14 @@ BOOL CXFLR5App::InitInstance()
 	r = cx; b = cy;
 	showCmd = SW_SHOWMAXIMIZED;
 
-	try{
-		if(fp.Open(str,CFile::modeRead)){
+	try
+	{
+		if(fp.Open(str,CFile::modeRead))
+		{
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
-			if(k!=100320){
+			if(k!=100320)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -209,12 +171,15 @@ BOOL CXFLR5App::InitInstance()
 			fp.Close();
 		}
 	}
-	catch (CArchiveException *ex){
+	catch (CArchiveException *ex)
+	{
 		ex->Delete();
 	}
-	catch (CException *ex){
+	catch (CException *ex)
+	{
 		ex->Delete();
 	}
+
 	pFrame->m_wndpl.rcNormalPosition.left   = l;
 	pFrame->m_wndpl.rcNormalPosition.right  = r;
 	pFrame->m_wndpl.rcNormalPosition.top    = t;
@@ -231,7 +196,8 @@ BOOL CXFLR5App::InitInstance()
 	//Trace("CX5App::InitInstance::Window displayed" );
 	pFrame->UpdateWindow();
 
-	if(!CmdInfo.m_strFileName.IsEmpty()){
+	if(!CmdInfo.m_strFileName.IsEmpty())
+	{
 		int app = pFrame->LoadFile(CmdInfo.m_strFileName, CmdInfo.m_strFileName);
 		//Trace("CX5App::InitInstance::Loaded File " + CmdInfo.m_strFileName);
 
@@ -248,10 +214,12 @@ BOOL CXFLR5App::InitInstance()
 BOOL CXFLR5App::OnIdle(LONG lCount) 
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pMainWnd;
-	if(pFrame->m_iApp == XFOILANALYSIS){
+	if(pFrame->m_iApp == XFOILANALYSIS)
+	{
 		if(pFrame->XDirect.KickIdle()) return 1;
 	}
-	else if(pFrame->m_iApp == MIAREX){
+	else if(pFrame->m_iApp == MIAREX)
+	{
 		if(pFrame->Miarex.KickIdle()) return 1;
 	}
 //	//Trace("Idle ...bored...%d\n", lCount);
@@ -268,7 +236,8 @@ BOOL CXFLR5App::FirstInstance(CCommandLineInfo &CmdInfo)
 //	hWnd = FindWindow(_T("#32769"),"XFLR5 ");// see MSDN : #32769 The class for the desktop window. 
 	hWnd = FindWindow(NULL,"XFLR5 ");
 	
-	if (hWnd) {
+	if (hWnd) 
+	{
 		//Trace("Previous window ref : ", hWnd);
 
 		hWndChild = GetLastActivePopup(hWnd); // if so, does it have any popups?
@@ -282,7 +251,8 @@ BOOL CXFLR5App::FirstInstance(CCommandLineInfo &CmdInfo)
 		filename = new char[100];
 		strcpy(filename, CmdInfo.m_strFileName);
 			
-		if(!CmdInfo.m_strFileName.IsEmpty()){
+		if(!CmdInfo.m_strFileName.IsEmpty())
+		{
 			COPYDATASTRUCT cpd;
 			cpd.dwData = XFLR5_DATA; // Identification..
 			cpd.cbData = (DWORD)strlen(CmdInfo.m_strFileName);
@@ -306,9 +276,9 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 	//{{AFX_DATA_INIT(CAboutDlg)
 	//}}AFX_DATA_INIT
 	m_rectText.left   =   10;
-	m_rectText.top    =  235;
+	m_rectText.top    =  305;
 	m_rectText.right  =  150;
-	m_rectText.bottom =  255;
+	m_rectText.bottom =  325;
 }
 
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
@@ -334,22 +304,23 @@ END_MESSAGE_MAP()
 
 
 
-void CAboutDlg::OnLButtonDown(UINT nFlags, CPoint point) {
+void CAboutDlg::OnLButtonDown(UINT nFlags, CPoint point) 
+	{
 	// TODO: Add your message handler code here and/or call default
-	if (m_rectText.PtInRect(point)){
+	if (m_rectText.PtInRect(point))
+	{
 		if(GetFocus()!=this && (GetStyle() & WS_TABSTOP))
 			SetFocus();
 		SetCapture();
 	}
-	int nothing = nFlags;// to avoid level 4 warning at compile time
-	nothing++;
 	return;
 //	CDialog::OnLButtonDown(nFlags, point);
 }
 
 void CAboutDlg::OnLButtonUp(UINT nFlags, CPoint point) 
 {
-	if (GetCapture()==this){
+	if (GetCapture()==this)
+	{
 		ReleaseCapture();
 		if(m_rectText.PtInRect(point)){
 			ExecuteLink();
@@ -368,10 +339,12 @@ UINT CAboutDlg::OnNcHitTest(CPoint point)
 
 	GetClientRect(rectClient);
 	ScreenToClient(&ptClient);
-	if(rectClient.PtInRect(ptClient)){
+	if(rectClient.PtInRect(ptClient))
+	{
 		return (HTCLIENT);
 	}
-	else {
+	else 
+	{
 		return (CWnd::OnNcHitTest(point));
 	}
 //	return CDialog::OnNcHitTest(point);
@@ -440,9 +413,10 @@ BOOL CAboutDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	CPoint ptMouse;
 	GetCursorPos(&ptMouse);
 	ScreenToClient(&ptMouse);
-	if	(pWnd ==this && 
-		(m_rectText.PtInRect(ptMouse))){
-		if (m_hcHand==(HCURSOR)0){
+	if (pWnd ==this && (m_rectText.PtInRect(ptMouse)))
+	{
+		if (m_hcHand==(HCURSOR)0)
+		{
 			m_hcHand = AfxGetApp()->LoadStandardCursor(IDC_CROSS);
 			ASSERT (m_hcHand);
 		}
@@ -502,7 +476,8 @@ void GetPaperSize(DEVMODE *pDevMode, int &pw, int &ph)
 
 	int c = 254;//conversion factor from inches to tenths of millimeters
 
-	switch(pDevMode->dmPaperSize){
+	switch(pDevMode->dmPaperSize)
+	{
 		case (DMPAPER_LETTER):
 			pw = (int)(8.5*c);
 			ph = 11*c;

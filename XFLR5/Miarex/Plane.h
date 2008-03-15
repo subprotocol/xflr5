@@ -41,6 +41,10 @@ class CPlane : public CDialog
 	friend class CVLMDlg;
 	friend class CUFOListDlg;
 	friend class CBody;
+	friend class C3DPanelDlg;
+	friend class CBodyCtrlBar;
+
+
 // Construction
 public:
 	CPlane(CWnd* pParent, CWnd* pMiarex);   // standard constructor
@@ -62,32 +66,34 @@ public:
 	CStatic	m_ctrlLen7;
 	CStatic m_ctrlLen8;
 	CStatic m_ctrlLen9;
+	CStatic m_ctrlLen10;
+	CStatic m_ctrlLen11;
 	CStatic	m_ctrlWingSpan;
 	CStatic	m_ctrlWingSurface;
 	CStatic	m_ctrlStabVolume;
 	CStatic	m_ctrlFinSurface;
 	CStatic	m_ctrlStabLeverArm;
 	CStatic	m_ctrlStabSurface;
-	CFloatEdit	m_ctrlXLEFin;
-	CFloatEdit	m_ctrlYLEFin;
-	CFloatEdit	m_ctrlZLEFin;
-	CFloatEdit	m_ctrlZLEStab;
-	CFloatEdit	m_ctrlXLEStab;
-	CFloatEdit	m_ctrlXLEWing2;
-	CFloatEdit	m_ctrlZLEWing2;
-	CFloatEdit	m_ctrlStabTilt;
+	CFloatEdit m_ctrlXLEFin;
+	CFloatEdit m_ctrlYLEFin;
+	CFloatEdit m_ctrlZLEFin;
+	CFloatEdit m_ctrlZLEStab;
+	CFloatEdit m_ctrlXLEStab;
+	CFloatEdit m_ctrlXLEWing;
+	CFloatEdit m_ctrlZLEWing;
+	CFloatEdit m_ctrlXLEWing2;
+	CFloatEdit m_ctrlZLEWing2;
+	CFloatEdit m_ctrlStabTilt;
 	CFloatEdit m_ctrlFinTilt;
-	CFloatEdit	m_ctrlWingTilt;
-	CFloatEdit	m_ctrlWingTilt2;
+	CFloatEdit m_ctrlWingTilt;
+	CFloatEdit m_ctrlWingTilt2;
 	CNumEdit m_ctrlVLMTotalPanels;
-	CEdit	m_ctrlPlaneName;
+	CEdit m_ctrlPlaneName;
 	CComboBox m_ctrlBodyList;
 	CButton m_ctrlBody;
 	CButton m_ctrlDoubleFin;
 	CButton	m_ctrlStabCheck;
 	CButton	m_ctrlFinCheck;
-	CButton	m_ctrlRadio1;
-	CButton	m_ctrlRadio2;
 	CButton m_ctrlBiplane;
 	CButton m_ctrlDefineWing2;
 	CButton m_ctrlImportWing2;
@@ -113,7 +119,6 @@ public:
 
 // Implementation
 protected:
-	static bool m_bCheckPanels;
 	static CObArray *s_poaWing;
 	static CObArray *s_poaBody;
 
@@ -136,7 +141,7 @@ protected:
 	double m_XCmRef;
 	double m_TailVolume;
 
-	CVector m_LEStab, m_LEFin, m_LEWing2;
+	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2;
 	CString m_PlaneName;
 
 	// Generated message map functions
@@ -145,6 +150,7 @@ protected:
 	afx_msg void OnFin();
 	afx_msg void OnStab();
 	virtual void OnOK();
+	afx_msg void OnBodyCheck();
 	virtual void OnCancel();
 	afx_msg void OnDefineFin();
 	afx_msg void OnDefineStab();
@@ -152,15 +158,14 @@ protected:
 	afx_msg void OnDefineWing();
 	afx_msg void OnImportWing();
 	afx_msg void OnPlaneName();
-	afx_msg void OnDoubleSymFin();
 	afx_msg void OnSymFin();
-	afx_msg void OnCheckPanels();
 	afx_msg void OnDoubleFin();
 	afx_msg void OnExportWing();
 	afx_msg void OnBiplane();
 	afx_msg void OnDefineWing2();
 	afx_msg void OnImportWing2();
 	afx_msg void OnExportWing2();
+	afx_msg void OnSelChangeBodyList();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -172,10 +177,10 @@ private:
 	void ReadParams();
 	void SetParams();
 	bool SerializePlane(CArchive& ar) ;
+	bool HasResults();
 
 
 public:
-	afx_msg void OnBodyCheck();
-	afx_msg void OnSelChangeBodyList();
+
 };
 

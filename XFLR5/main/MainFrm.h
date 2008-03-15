@@ -74,6 +74,8 @@ class CMainFrame : public CFrameWnd
 	friend class CWngAnalysis;
 	friend class CCtrlAnalysis;
 	friend class CBodyGridDlg;
+	friend class CBodyNURBSDlg;
+
 
 public:
 	CMainFrame();
@@ -213,7 +215,6 @@ private:
 	void ExportWPlr(CWPolar * pWPolar);
 	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
 	void DeleteBody(CBody *pThisBody);
-	void SetWGraphTitles(Graph* pGraph, int iX, int iY);
 
 	void UpdateOpps();
 	void UpdateFoils();
@@ -229,7 +230,6 @@ private:
 	CFoil* ReadFoilFile(CString FileName, bool bKeepExistingFoil = false);
 	CFoil* SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil = false);
 
-	void * GetUFOPlrVariable(CWPolar *pWPolar, int iVar);
 	void * GetPlrVariable(CPolar *pPolar, int iVar);
 	double GetPlrPoint(CFoil *pFoil, double Re, double Alpha, 
 						   int PlrVar, bool &bOutRe, bool &bError);
@@ -299,8 +299,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSetFocus(CWnd *pOldWnd);
 	afx_msg void OnXDirect();
-	afx_msg void OnSelChangeWing();
 	afx_msg void OnSelChangeWPlr();
+	afx_msg void OnSelChangeWing();
 	afx_msg void OnSelChangeWOpp();
 	afx_msg void OnSelChangeFoil();
 	afx_msg void OnSelChangePlr();
@@ -328,6 +328,7 @@ protected:
 	afx_msg void OnWOpp(CCmdUI* pCmdUI);
 	afx_msg void On3D(CCmdUI* pCmdUI);
 	afx_msg void OnglLight(CCmdUI* pCmdUI);
+	afx_msg void OnMiarexBar(CCmdUI* pCmdUI);
 	afx_msg void On3DAxes(CCmdUI* pCmdUI);
 	afx_msg void On3DSurfaces(CCmdUI* pCmdUI);
 	afx_msg void On3DOutline(CCmdUI* pCmdUI);

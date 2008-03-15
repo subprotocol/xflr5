@@ -135,10 +135,10 @@ void CFrame::InsertPoint(int n)
 	m_iSelect = n;
 }
 
+
 int CFrame::InsertPoint(CVector Real)
 {
 	int k, l;
-
 	for (k=0; k<m_NPoints; k++)
 	{
 		if(Real.y>m_Point[k].z)
@@ -149,7 +149,7 @@ int CFrame::InsertPoint(CVector Real)
 			}
 			m_Point[k].y = Real.x;
 			m_Point[k].z = Real.y;
-			if(k==0 || k==m_NPoints-1) m_Point[k].y =0.0;
+			if(k==0 || k==m_NPoints) m_Point[k].y =0.0;
 			m_NPoints++;
 			m_iSelect = k;
 			return k;
@@ -162,6 +162,7 @@ int CFrame::InsertPoint(CVector Real)
 	m_NPoints++;
 	return m_iSelect;
 }
+
 
 void CFrame::CopyFrame(CFrame *pFrame)
 {

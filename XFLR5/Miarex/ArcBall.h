@@ -2,7 +2,7 @@
 
     CArcBall Class
 	Copyright (C)  Bradley Smith, March 24, 2006
-	Copyright (C) 2007-2008 André Deperrois xflr5@yahoo.com
+	Hideously modified in 2008 by André Deperrois xflr5@yahoo.com for miserable selfish purposes 
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 
 #pragma once
 #include "../misc/Vector.h"
+#include "Quaternion.h"
 
 class CArcBall
 {
@@ -65,25 +66,27 @@ public:
 	CArcBall(void);
 	~CArcBall(void);
 
-
+	void SetQuat(Quaternion Qt);
+	void SetQuat(double r, double qx, double qy, double qz);
 	void SetZoom(double radius, CVector eye, CVector up);
 	void Rotate();
 	void Reset();
 	void Start(int mx, int my);
 	void Move(int mx, int my);
 	void GetMatrix();
-	CVector SphereCoords(double mx, double my);// find the intersection with the sphere
-	CVector PlanarCoords(double mx, double my);// get intersection with plane for "trackball" style rotation
-	CVector EdgeCoords(CVector m);	// find the intersection with the plane through the visible edge
-
+	void SphereCoords(double mx, double my, CVector &V);// find the intersection with the sphere
+	void PlanarCoords(double mx, double my, CVector &V);// get intersection with plane for "trackball" style rotation
+	void EdgeCoords(CVector m, CVector &V);	// find the intersection with the plane through the visible edge
+	void RotateCrossPoint();
 	void QuatIdentity(float* q);	// reset the rotation matrix
 	void QuatCopy(float* dst, float* src);// copy a rotation matrix
-	void Quaternion(float* q, float x, float y, float z, float w);// convert the quaternion into a rotation matrix
+	void QuattoMatrix(float* q, Quaternion Qt);// convert the quaternion into a rotation matrix
 	void QuatNext(float* dest, float* left, float* right);// multiply two rotation matrices
 
 	float ab_quat[16];
 	float ab_last[16];
 	float ab_next[16];
+	float ab_crosspoint[16];
 
 	// the distance from the origin to the eye
 	double ab_zoom;
@@ -105,20 +108,24 @@ public:
 	CVector ab_up;
 	CVector ab_out;
 
+	Quaternion Quat;
+	double angle, cosa2, sina2, cosa;
+
 	double ab_glp[16];
 	double ab_glm[16];
 	int ab_glv[4];
 
 	//	object offset
 	double *m_pOffx, *m_pOffy;
-	float *m_pTransx, *m_pTransy;
+	double *m_pTransx, *m_pTransy;
 	double *m_pGLScale;
-	//avoid length recurring memory allocations
-	CVector aa, c, m, ec, sc, p, d, cross;
-	double angle, cosa, sina, cos2a, t, ac, c2, q, b, delta, a;
-	float x2, y2, z2, xy, xz, yz, wx, wy, wz;
+	//avoid lengthy recurring memory allocations
+	CVector aa, c, m, ec, sc, p, d;
+	double t, ac, c2, q, b, delta, a;
+	double x2, y2, z2, xy, xz, yz, wx, wy, wz;
 	double ax,ay,az;
 
+	double pi;
 };
 
  

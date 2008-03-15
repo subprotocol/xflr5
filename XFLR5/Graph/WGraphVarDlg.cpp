@@ -65,7 +65,7 @@ void CWGraphVarDlg::OnOK()
 	m_iWVar = m_ctrlWVar.GetCurSel();
 	CDialog::OnOK();
 }
-
+ 
 BOOL CWGraphVarDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();

@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-// WingListDlg.cpp : fichier d'implémentation
+// WingListDlg.cpp 
 //
 
 #include "stdafx.h"
@@ -30,8 +30,6 @@
 #include "../main/MainFrm.h"
 #include ".\ufolistdlg.h"
 
-
-// Boîte de dialogue CUFOListDlg
 
 IMPLEMENT_DYNAMIC(CUFOListDlg, CDialog)
 CUFOListDlg::CUFOListDlg(CWnd* pParent /*=NULL*/)
@@ -47,8 +45,8 @@ CUFOListDlg::CUFOListDlg(CWnd* pParent /*=NULL*/)
 	m_poaPlane = NULL;
 	memset(m_ColSize, 0 , sizeof(m_ColSize));
 
-	if(m_bWing){
-
+	if(m_bWing)
+	{
 		m_ColSize[0] = 130;
 		m_ColSize[1] = 70;
 		m_ColSize[2] = 70;
@@ -58,9 +56,9 @@ CUFOListDlg::CUFOListDlg(CWnd* pParent /*=NULL*/)
 		m_ColSize[6] = 60;
 		m_ColSize[7] = 70;
 		m_ColSize[8] = 70;
-
 	}
-	else{
+	else
+	{
 		m_ColSize[0] = 160;
 		m_ColSize[1] = 70;
 		m_ColSize[2] = 70;
@@ -74,8 +72,8 @@ CUFOListDlg::CUFOListDlg(CWnd* pParent /*=NULL*/)
 		m_ColSize[10] = 70;
 		m_ColSize[11] = 70;
 	}
-
 }
+
 
 CUFOListDlg::~CUFOListDlg()
 {
@@ -112,7 +110,8 @@ BOOL CUFOListDlg::OnInitDialog()
 	CString Name;
 
 	m_ctrlUFOList.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
-	if(m_bWing){
+	if(m_bWing)
+	{
 		SetWindowText("Wing Management");
 		m_ctrlUFOList.InsertColumn(0,"Name",LVCFMT_LEFT, m_ColSize[0]);
 		m_ctrlUFOList.InsertColumn(1,"Span",LVCFMT_RIGHT,m_ColSize[1]);
@@ -129,7 +128,8 @@ BOOL CUFOListDlg::OnInitDialog()
 		if(pMiarex->m_pCurPlane)     Name = pMiarex->m_pCurPlane->m_PlaneName;
 		else if(pMiarex->m_pCurWing) Name = pMiarex->m_pCurWing->m_WingName;
 	}
-	else{
+	else
+	{
 		SetWindowText("Foil Management");
 		m_ctrlUFOList.InsertColumn(0,"Foil Name",LVCFMT_LEFT, m_ColSize[0]);
 		m_ctrlUFOList.InsertColumn(1,"Thickness",LVCFMT_RIGHT,m_ColSize[1]);
@@ -505,20 +505,6 @@ BOOL CUFOListDlg::PreTranslateMessage(MSG* pMsg)
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
-
-
-/*
-if(m_bWing){
-		for (int i=0; i<9; i++){
-			m_ColSize[i] = m_ctrlUFOList.GetColumnWidth(i);
-		}
-	}
-	else{
-		for (int i=0; i<12; i++){
-			m_ColSize[i] = m_ctrlUFOList.GetColumnWidth(i);
-		}
-	}
-*/
 
 void CUFOListDlg::OnHdnItemchangedUfolist(NMHDR *pNMHDR, LRESULT *pResult)
 {

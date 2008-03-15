@@ -54,12 +54,11 @@ BEGIN_MESSAGE_MAP(CWOperDlgBar, CInitDialogBar)
 	ON_BN_CLICKED(IDC_SHOWMOMENTS, OnShowMoments)
 	ON_BN_CLICKED(IDC_SHOWICD, OnShowICd)
 	ON_BN_CLICKED(IDC_SHOWVCD, OnShowVCd)
-	ON_BN_CLICKED(IDC_TOPTRANS, OnShowTrans)
-	ON_BN_CLICKED(IDC_BOTTRANS, OnShowTrans)
+	ON_BN_CLICKED(IDC_TRANSITIONS, OnShowTrans)
 	ON_BN_CLICKED(IDC_DOWNWASH, OnShowDownwash)
 	ON_BN_CLICKED(IDC_CL, OnShowCl)
+	ON_BN_CLICKED(IDC_SURFVELOCITIES, OnSurfVelocities)
 	ON_BN_CLICKED(IDC_STREAM, OnStream)
-	ON_BN_CLICKED(IDC_SURFSPEED, OnSurfSpeed)
 	ON_EN_KILLFOCUS(IDC_AMIN, ReadParams)
 	ON_EN_KILLFOCUS(IDC_AMAX, ReadParams)
 	ON_EN_KILLFOCUS(IDC_DALPHA, ReadParams)
@@ -169,13 +168,12 @@ void CWOperDlgBar::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SHOWMOMENTS, m_ctrlMoments);
 	DDX_Control(pDX, IDC_SHOWICD, m_ctrlICd);
 	DDX_Control(pDX, IDC_SHOWVCD, m_ctrlVCd);
-	DDX_Control(pDX, IDC_TOPTRANS, m_ctrlTopTrans);
-	DDX_Control(pDX, IDC_BOTTRANS, m_ctrlBotTrans);
+	DDX_Control(pDX, IDC_TRANSITIONS, m_ctrlTransitions);
 	DDX_Control(pDX, IDC_DOWNWASH, m_ctrlDownwash);
 	DDX_Control(pDX, IDC_HALFWING, m_ctrlHalfWing);
 	DDX_Control(pDX, IDC_CL, m_ctrlCl);
 	DDX_Control(pDX, IDC_STREAM, m_ctrlStream);
-	DDX_Control(pDX, IDC_SURFSPEED, m_ctrlSurfSpeed);
+	DDX_Control(pDX, IDC_SURFVELOCITIES, m_ctrlSurfVelocities);
 	//}}AFX_DATA_MAP
 }
 
@@ -304,7 +302,7 @@ void CWOperDlgBar::OnAnimate()
 		pMiarex->m_bStream = false;
 		m_ctrlStream.SetCheck(false);
 		pMiarex->m_bSpeeds = false;
-		m_ctrlSurfSpeed.SetCheck(false);
+		m_ctrlSurfVelocities.SetCheck(false);
 		pMiarex->Animate(true);
 	}
 	else pMiarex->Animate(false);
@@ -349,10 +347,17 @@ void CWOperDlgBar::OnShowVCd()
 void CWOperDlgBar::OnShowTrans() 
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	if(m_ctrlTopTrans.GetCheck())	pMiarex->m_bXTop = true;
-	else							pMiarex->m_bXTop = false;
-	if(m_ctrlBotTrans.GetCheck())	pMiarex->m_bXBot = true;
-	else							pMiarex->m_bXBot = false;
+	if(m_ctrlTransitions.GetCheck())
+	{
+		pMiarex->m_bXBot = true;
+		pMiarex->m_bXTop = true;
+	}
+	else
+	{
+		pMiarex->m_bXBot = false;
+		pMiarex->m_bXTop = false;
+	}
+
 	if(!pMiarex->m_bAnimate) pMiarex->UpdateView();
 }
 
@@ -388,16 +393,14 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 	else						m_ctrlMoments.SetCheck(false);
 	if(pMiarex->m_bStream)		m_ctrlStream.SetCheck(true);
 	else						m_ctrlStream.SetCheck(false);
-	if(pMiarex->m_bSpeeds)		m_ctrlSurfSpeed.SetCheck(true);
-	else						m_ctrlSurfSpeed.SetCheck(false);
+	if(pMiarex->m_bSpeeds)		m_ctrlSurfVelocities.SetCheck(true);
+	else						m_ctrlSurfVelocities.SetCheck(false);
 	if(pMiarex->m_bICd)			m_ctrlICd.SetCheck(true);
 	else						m_ctrlICd.SetCheck(false);
 	if(pMiarex->m_bVCd)			m_ctrlVCd.SetCheck(true);
 	else						m_ctrlVCd.SetCheck(false);
-	if(pMiarex->m_bXTop)		m_ctrlTopTrans.SetCheck(true);
-	else						m_ctrlTopTrans.SetCheck(false);
-	if(pMiarex->m_bXBot)		m_ctrlBotTrans.SetCheck(true);
-	else						m_ctrlBotTrans.SetCheck(false);
+	if(pMiarex->m_bXTop)		m_ctrlTransitions.SetCheck(true);
+	else						m_ctrlTransitions.SetCheck(false);
 	if(pMiarex->m_b3DDownwash)	m_ctrlDownwash.SetCheck(true);
 	else						m_ctrlDownwash.SetCheck(false);
 	if(pMiarex->m_bHalfWing)	m_ctrlHalfWing.SetCheck(true);
@@ -435,10 +438,10 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 }
 
 
-void CWOperDlgBar::OnSurfSpeed() 
+void CWOperDlgBar::OnSurfVelocities() 
 {
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	if(m_ctrlSurfSpeed.GetCheck())
+	if(m_ctrlSurfVelocities.GetCheck())
 	{
 		pMiarex->m_bSpeeds = true;
 		pMiarex->UpdateView();

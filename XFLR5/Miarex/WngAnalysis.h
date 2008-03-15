@@ -117,7 +117,7 @@ private:
 	int m_AnalysisType; //0=LLT;1=VLM;2=Panel
 
 	bool m_bVLM1; //true if Classic, false if Quendez
-	bool m_bMiddle;//true if VLM calculation on middle surface, false if on top & bottom
+	bool m_bThinSurfaces;//true if Plane Panel calculation on middle surface, false if on top & bottom
 	bool m_bWakeRollUp;//true if wake roll up is to be taken into account in calculation
 	bool m_bTiltedGeom;//true if calculation is performed on the tilted geometry, at alpha=0.0
 	bool m_bViscous;
@@ -163,6 +163,8 @@ private:
 
 public:
 	afx_msg void OnWakeParams();
+	CButton m_ctrlThinSurfaces;
+	afx_msg void OnThinSurfaces();
 };
 
 //{{AFX_INSERT_LOCATION}}

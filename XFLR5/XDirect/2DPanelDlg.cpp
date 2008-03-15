@@ -25,6 +25,7 @@
 #include "../X-FLR5.h"
 #include "XDirect.h"
 #include "2DPanelDlg.h"
+#include ".\2dpaneldlg.h"
 
 
 
@@ -218,5 +219,4 @@ void C2DPanelDlg::ReadParams()
 	m_pXFoil->xpref2 = m_ctrlXpRef2.GetValue();
 
 }
-
 

@@ -93,8 +93,13 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_3DSURFACES, On3DSurfaces)
 	ON_UPDATE_COMMAND_UI(IDC_CL, OnMiarexW3DOppVLM)
 	ON_UPDATE_COMMAND_UI(IDC_STREAM, OnStreamLines)
-	ON_UPDATE_COMMAND_UI(IDC_SURFSPEED, OnStreamLines)
+	ON_UPDATE_COMMAND_UI(IDC_SURFVELOCITIES, OnStreamLines)
 	ON_UPDATE_COMMAND_UI(ID_INDPROJECT, OnIndicatorProject)
+	ON_UPDATE_COMMAND_UI(IDC_CBWING, OnMiarexBar)
+	ON_UPDATE_COMMAND_UI(IDC_CBWPLR, OnMiarexBar)
+	ON_UPDATE_COMMAND_UI(IDC_CBWOPP, OnMiarexBar)
+	ON_UPDATE_COMMAND_UI(IDT_UNDO, OnMiarexBar)
+	ON_UPDATE_COMMAND_UI(IDT_REDO, OnMiarexBar)
 	ON_UPDATE_COMMAND_UI(IDC_AMIN, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWLIFT, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_SHOWMOMENTS, OnWOpp)
@@ -127,9 +132,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_UPDATE_COMMAND_UI(IDC_3DLEFT, On3D)
 	ON_UPDATE_COMMAND_UI(IDC_3DTOP, On3D)
 	ON_UPDATE_COMMAND_UI(IDC_3DFRONT, On3D)
+	ON_UPDATE_COMMAND_UI(IDC_PICKCENTER, On3D)
 	ON_UPDATE_COMMAND_UI(IDC_DOWNWASH, OnWOpp)
-	ON_UPDATE_COMMAND_UI(IDC_TOPTRANS, OnWOpp)
-	ON_UPDATE_COMMAND_UI(IDC_BOTTRANS, OnWOpp)
+	ON_UPDATE_COMMAND_UI(IDC_TRANSITIONS, OnWOpp)
 	ON_UPDATE_COMMAND_UI(IDC_ALPHAPREC, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_SPEC, OnMiarexWPolar)
 	ON_UPDATE_COMMAND_UI(IDC_STOREWOPP, OnMiarexWPolar)
@@ -202,7 +207,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v4.00";
+	m_VersionName = "XFLR5_v4.00_beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -303,16 +308,16 @@ CMainFrame::CMainFrame()
 	m_TopMargin    = 15.0;//mm
 	m_BottomMargin = 15.0;//mm
 
-	m_LengthUnit  = 0;
-	m_AreaUnit = 2;
+	m_LengthUnit  = 3;
+	m_AreaUnit    = 3;
 	m_WeightUnit  = 1;
 	m_SpeedUnit   = 0;
 	m_ForceUnit   = 0;
 	m_MomentUnit  = 0;
 
-	m_mtoUnit  = 1.0;
 	m_mtoUnit   = 1.0;
-	m_m2toUnit = 1.0;
+	m_mtoUnit   = 1.0;
+	m_m2toUnit  = 1.0;
 	m_kgtoUnit  = 1.0;
 	m_mstoUnit  = 1.0;
 	m_NtoUnit   = 1.0;
@@ -482,7 +487,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 		// fail to create
 	}
-	m_PolarDlgBar.SetWindowText("Polar settings");
+	m_PolarDlgBar.SetWindowText("Curve settings");
 	m_PolarDlgBar.m_pParent = &XDirect;// just as a temporary necessity
 	m_PolarDlgBar.m_idApp   = XFOILANALYSIS;
 	m_PolarDlgBar.SetParams();
@@ -1626,6 +1631,7 @@ void CMainFrame::OnMixedInverse()
 
 
 
+
 void CMainFrame::OnSelChangeWing()
 {
 	// Gets the new selected wing name and notifies Miarex
@@ -1642,7 +1648,8 @@ void CMainFrame::OnSelChangeWing()
 
 	m_iApp = MIAREX;
 	UpdateWPlrs();
-//	Miarex.SetWPlr();
+	UpdateWOpps();
+//	Miarex.SetWPlr(false);
 	Miarex.UpdateView();
 }
 
@@ -1656,7 +1663,7 @@ void CMainFrame::OnSelChangeWPlr()
 	if (sel !=CB_ERR) m_ctrlWPlr.GetLBText(sel, strong);
 	m_iApp = MIAREX;
 	Miarex.SetWPlr(false, strong);
-
+//	Miarex.SetWOpp(true);
 	Miarex.UpdateView();
 }
 
@@ -1900,7 +1907,6 @@ void CMainFrame::UpdateWPlrs()
 		Miarex.m_pCurWOpp = NULL;
 //		Miarex.SetWPlr();
 	}
-	UpdateWOpps();
 }
 
 
@@ -3875,6 +3881,7 @@ void CMainFrame::On3D(CCmdUI* pCmdUI)
 	}
 }
 
+
 void CMainFrame::On3DAxes(CCmdUI* pCmdUI)
 {
 	if(Miarex.m_bAxes)   pCmdUI->SetCheck(true);
@@ -3885,6 +3892,43 @@ void CMainFrame::OnglLight(CCmdUI* pCmdUI)
 {
 	if(Miarex.m_bglLight)   pCmdUI->SetCheck(true);
 	else					pCmdUI->SetCheck(false);
+}
+
+void CMainFrame::OnMiarexBar(CCmdUI* pCmdUI)
+{
+	if(m_iApp==MIAREX)
+	{
+		if(Miarex.m_iView==5)
+		{
+			if(pCmdUI->m_nID==IDT_UNDO || pCmdUI->m_nID==IDT_REDO)
+			{
+				pCmdUI->Enable(true);
+			}			
+			else pCmdUI->Enable(false);
+		}
+		else  
+		{
+			if(pCmdUI->m_nID==IDC_CBWING)
+			{
+				if(m_ctrlUFO.GetCount()) pCmdUI->Enable(true);
+				else                   pCmdUI->Enable(false);
+			}
+			if(pCmdUI->m_nID==IDC_CBWPLR)
+			{
+				if(m_ctrlWPlr.GetCount()) pCmdUI->Enable(true);
+				else                     pCmdUI->Enable(false);
+			}
+			if(pCmdUI->m_nID==IDC_CBWOPP)
+			{
+				if(m_ctrlWOpp.GetCount()) pCmdUI->Enable(true);
+				else                                         pCmdUI->Enable(false);
+			}
+			if(pCmdUI->m_nID==IDT_UNDO || pCmdUI->m_nID==IDT_REDO)
+			{
+				pCmdUI->Enable(false);
+			}			
+		}
+	}
 }
 
 void CMainFrame::OnHalfWing(CCmdUI* pCmdUI)
@@ -4061,8 +4105,20 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	}
 	if (pMsg->message == WM_KEYDOWN)
 	{
+		if(pMsg->wParam != VK_LCONTROL && pMsg->wParam != VK_RCONTROL) Miarex.m_bArcball = false; 
+
 		SHORT sh1 = GetKeyState(VK_LCONTROL);
 		SHORT sh2 = GetKeyState(VK_RCONTROL);
+		if (pMsg->wParam == 'O' && 	((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
+			if(m_iApp==MIAREX && (Miarex.m_iView==3 || Miarex.m_iView==5))
+			{
+				Miarex.m_bArcball = false;
+				Miarex.UpdateView();
+			}
+			OnAppOpen();
+			return true;
+		} 
 		if (pMsg->wParam == 'W' && 
 			( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
 			OnCloseProject();
@@ -4364,7 +4420,8 @@ bool CMainFrame::SaveUFOProject()
 	}
 	else return false;
 }
-
+/*
+*/
 bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 {
 	CWaitCursor Wait;
@@ -4383,7 +4440,11 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 	int i,j;
 	CString strong;
 
-	ar << 100008;
+	// storing code
+	ar << 100011;
+	// 100011 : Added Body serialization
+	// 100010 : Converted to I.S. units
+	// 100009 : added serialization of opps in numbered format
 	// 100008 : Added m_WngAnalysis.m_bTiltedGeom, m_WngAnalysis.m_bWakeRollUp
 	// 100006 : version 2.99Beta001 format
 	// 100005 : version 2.00 format 
@@ -4404,17 +4465,17 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 	ar << (float)Miarex.m_WngAnalysis.m_Viscosity;
 	ar << (float)Miarex.m_WngAnalysis.m_Alpha;
 	ar << Miarex.m_WngAnalysis.m_AnalysisType;
-	
+
 	if (Miarex.m_WngAnalysis.m_bVLM1)   ar << 1;
-	else                         ar << 0;
-//	if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+	else								ar << 0;
+//		if (Miarex.m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
 	ar <<1;
 	if (Miarex.m_WngAnalysis.m_bTiltedGeom) ar << 1;
-	else                             ar << 0;
+	else									ar << 0;
 	if (Miarex.m_WngAnalysis.m_bWakeRollUp) ar << 1;
-	else                             ar << 0;
-	
-	// Store the wing
+	else									ar << 0;
+
+	// Store the wing, if any
 	if(!pPlane){
 		ar << 1;//just one wing
 		pWing->SerializeWing(ar);
@@ -4436,10 +4497,9 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar);
 	}
 
-	// keep it simple...don't store the WOpps
-	ar << 0;
+	ar << 0;//no WOpps
 
-	// then the foils and  polars 
+	// then the foils,  polars and Opps
 	//list the foils to be saved
 	CStringArray FoilList;
 	bool bFound = false;
@@ -4522,7 +4582,6 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 		}
 	}
 
-
 	//write the number of foils
 	ar << 100001;//unused 
 	ar << (int)FoilList.GetSize();
@@ -4552,22 +4611,32 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 			}
 		}
 	}
-	ar<<0;//no Opps... keep it simple
-	// last write the plane, if any
-	if(pPlane){
+
+	ar<<0;//no Opps
+
+	// next the bodies
+
+	if(pPlane && pPlane->m_bBody && pPlane->m_pBody)
+	{
 		ar << 1;
-		pPlane->m_pMiarex = &Miarex;
+		pPlane->m_pBody->SerializeBody(ar);
+	}
+	else ar <<0; //no plane
+
+	// last write the plane...
+
+	if(pPlane) 
+	{
+		ar <<1;
 		pPlane->SerializePlane(ar);
 	}
-	else 
-		ar <<0;
+	else ar <<0;
 
-//	ar<<0;//no PPolars any more
-	ar<<0;//no POpps... keep it simple
-	ar<<0;//No bodies : TODO change, need for a plane
-	
+	ar << 0;//no POpps
+
 	AFoil.m_pSF->Serialize(ar);
 	AFoil.m_pPF->Serialize(ar);
+
 	return true;
 }
 
@@ -4770,7 +4839,8 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 
 			//THEN WPOLARS
 			ar >> n;// number of WPolars to load
-			for (i=0;i<n; i++){
+			for (i=0;i<n; i++)
+			{
 				pWPolar = new CWPolar(this);
 				
 				if (!pWPolar->SerializeWPlr(ar)){
@@ -4811,7 +4881,7 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 					throw pfe;
 				}
 				if(pWOpp->m_AnalysisType==1 || ArchiveFormat >=100006)//former VLM version was flawed
-					Miarex.AddWOpp(pWOpp);
+					Miarex.InsertWOpp(pWOpp);
 				else delete pWOpp;
 			}
 
@@ -4888,8 +4958,16 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 				for (i=0; i<n;i++){
 					pPlane = Miarex.CreatePlane();
 					if(pPlane){
-						pPlane->SerializePlane(ar);
-						Miarex.AddPlane(pPlane);
+						if(pPlane->SerializePlane(ar))		Miarex.AddPlane(pPlane);
+						else
+						{
+							delete pPlane;
+							CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+							pfe->m_strFileName = ar.m_strFileName;
+							if(pWPolar) delete pWPolar;
+							throw pfe;
+
+						}
 					}
 				}
 				//and their pPolars
@@ -4922,7 +5000,20 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 					}
 					Miarex.AddPOpp(false, NULL, NULL, NULL, pPOpp);
 				}
+				//lock all bodies with results
+				for(i=0;i<m_oaWPolar.GetSize(); i++)
+				{
+					pWPolar = (CWPolar*)m_oaWPolar.GetAt(i);
+					pPlane  = Miarex.GetPlane(pWPolar->m_UFOName);
+					if(pPlane && pWPolar->m_Alpha.GetSize())
+					{
+						if(pPlane->m_bBody && pPlane->m_pBody) 
+							pPlane->m_pBody->m_bLocked = true;
+					}
+				}
 			}
+
+			Miarex.m_pCurPOpp = NULL;
 
 			AFoil.m_pSF->Serialize(ar);
 			AFoil.m_pPF->Serialize(ar);
@@ -4932,9 +5023,11 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 				pWing = (CWing*)m_oaWing[i];
 				pWing->ComputeGeometry();
 			}
+
 			return true;
 		}
-		catch (CArchiveException *ex){
+		catch (CArchiveException *ex)
+		{
 			TCHAR   szCause[255];
 			CString str;
 			ex->GetErrorMessage(szCause, 255);
@@ -5101,7 +5194,7 @@ void CMainFrame::OnUnits()
 	CUnitsDlg Dlg;
 
 	Dlg.m_Length    = m_LengthUnit;
-	Dlg.m_Area   = m_AreaUnit;
+	Dlg.m_Area      = m_AreaUnit;
 	Dlg.m_Speed     = m_SpeedUnit;
 	Dlg.m_Weight    = m_WeightUnit;
 	Dlg.m_Force     = m_ForceUnit;
@@ -5109,7 +5202,7 @@ void CMainFrame::OnUnits()
 
 	if(Dlg.DoModal()==IDOK){
 		m_LengthUnit  = Dlg.m_Length;
-		m_AreaUnit = Dlg.m_Area;
+		m_AreaUnit    = Dlg.m_Area;
 		m_SpeedUnit   = Dlg.m_Speed;
 		m_WeightUnit  = Dlg.m_Weight;
 		m_ForceUnit   = Dlg.m_Force;
@@ -5902,105 +5995,6 @@ double CMainFrame::GetCm(CFoil *pFoil0, CFoil *pFoil1,
 }
 
 
-void * CMainFrame::GetUFOPlrVariable(CWPolar *pWPolar, int iVar)
-{
-	// returns a pointer to the variable array defined by its index iVar
-	void * pVar;
-	switch (iVar){
-		case 0:
-			pVar = &pWPolar->m_Alpha;
-			break;
-		case 1:
-			pVar = &pWPolar->m_Cl;
-			break;
-		case 2:
-			pVar = &pWPolar->m_PCd;
-			break;
-		case 3:
-			pVar = &pWPolar->m_ICd;
-			break;
-		case 4:
-			pVar = &pWPolar->m_TCd;
-			break;
-		case 5:
-			pVar = &pWPolar->m_VCm;
-			break;
-		case 6:
-			pVar = &pWPolar->m_GCm;
-			break;
-		case 7:
-			pVar = &pWPolar->m_Cm;
-			break;
-		case 8:
-			pVar = &pWPolar->m_CRm;
-			break;
-		case 9:
-			pVar = &pWPolar->m_GYm;
-			break;
-		case 10:
-			pVar = &pWPolar->m_IYm;
-			break;
-		case 11:
-			pVar = &pWPolar->m_ClCd;
-			break;
-		case 12:
-			pVar = &pWPolar->m_Cl32Cd;
-			break;
-		case 13:
-			pVar = &pWPolar->m_Cl;
-			break;
-		case 14:
-			pVar = &pWPolar->m_L;
-			break;
-		case 15:
-			pVar = &pWPolar->m_D;
-			break;
-		case 16:
-			pVar = &pWPolar->m_Vx;
-			break;
-		case 17:
-			pVar = &pWPolar->m_Vz;
-			break;
-		case 18:
-			pVar = &pWPolar->m_QInfinite;
-			break;
-		case 19:
-			pVar = &pWPolar->m_Gamma;
-			break;
-		case 20:
-			pVar = &pWPolar->m_Pm;
-			break;
-		case 21:
-			pVar = &pWPolar->m_Rm;
-			break;
-		case 22:
-			pVar = &pWPolar->m_Ym;
-			break;
-		case 23:
-			pVar = &pWPolar->m_XCP;
-			break;
-		case 24:
-			pVar = &pWPolar->m_YCP;
-			break;
-		case 25:
-			pVar = &pWPolar->m_MaxBending;
-			break;
-		case 26:
-			pVar = &pWPolar->m_VertPower;
-			break;
-		case 27:
-			pVar = &pWPolar->m_Oswald;
-			break;
-		case 28:
-			pVar = &pWPolar->m_SM;
-			break;
-		default:
-			pVar = &pWPolar->m_Alpha;
-			break;
-	}
-	return pVar;
-}
-
 
 void CMainFrame::ExportWPlr(CWPolar * pWPolar)
 {
@@ -6092,206 +6086,6 @@ void CMainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 			if(pWing == Miarex.m_pCurWing)	Miarex.m_pCurWing = NULL;
 			break;
 		}
-	}
-}
-
-void CMainFrame::SetWGraphTitles(Graph* pGraph, int iX, int iY)
-{
-	CString StrLength;
-	CString StrSpeed;
-	CString StrMoment;
-	GetLengthUnit(StrLength, m_LengthUnit);
-	GetSpeedUnit(StrSpeed, m_SpeedUnit);
-	GetMomentUnit(StrMoment, m_MomentUnit);
-
-	switch (iX){
-		case 0:
-			pGraph->SetXTitle("Alpha°");
-			break;
-		case 1:
-			pGraph->SetXTitle("Cl");
-			break;
-		case 2:
-			pGraph->SetXTitle("VCd");
-			break;
-		case 3:
-			pGraph->SetXTitle("ICd");
-			break;
-		case 4:
-			pGraph->SetXTitle("Cd");
-			break;
-		case 5:
-			pGraph->SetXTitle("PCm");// Pitching moment coef.
-			break;
-		case 6:
-			pGraph->SetXTitle("GCm");// Pitching moment coef.
-			break;
-		case 7:
-			pGraph->SetXTitle("Cm");// Pitching moment coef.
-			break;
-		case 8:
-			pGraph->SetXTitle("Ct");// Rolling moment coef
-			break;
-		case 9:
-			pGraph->SetXTitle("PCn");// Profile yawing moment
-			break;
-		case 10:
-			pGraph->SetXTitle("ICn");// Induced yawing moment
-			break;
-		case 11:
-			pGraph->SetXTitle("Cl/Cd");
-			break;
-		case 12:
-			pGraph->SetXTitle("Cl^(3/2)/Cd");
-			break;
-		case 13:
-			pGraph->SetXTitle("1/Rt(Cl)");
-			break;
-		case 14:
-			if(m_ForceUnit==0)	pGraph->SetXTitle("Lift (N)");
-			else pGraph->SetXTitle("Lift (lbf)");
-			break;
-		case 15:
-			if(m_ForceUnit==0)	pGraph->SetXTitle("Drag (N)");
-			else pGraph->SetXTitle("Drag (lbf)");
-			break;
-		case 16:
-			pGraph->SetXTitle("Vx "+StrSpeed);	
-			break;
-		case 17:
-			pGraph->SetXTitle("Vz "+StrSpeed);	
-			break;
-		case 18:
-			pGraph->SetXTitle("V "+StrSpeed);	
-			break;
-		case 19:
-			pGraph->SetXTitle("Gamma°");	
-			break;
-		case 20:
-			pGraph->SetXTitle("PM");	
-			break;
-		case 21:
-			pGraph->SetXTitle("RM");	
-			break;
-		case 22:
-			pGraph->SetXTitle("YM");	
-			break;
-		case 23:
-			pGraph->SetXTitle("XCP "+ StrLength);	
-			break;
-		case 24:
-			pGraph->SetXTitle("YCP "+ StrLength);
-			break;
-		case 25:
-			pGraph->SetXTitle("BM "+ StrMoment);
-			break;
-		case 26:
-			pGraph->SetXTitle("m.g.Vz (W)");
-			break;
-		case 27:
-			pGraph->SetXTitle("Oswald");
-			break;
-		case 28:
-			pGraph->SetXTitle("(XCp-XCG)/MAC(%)");
-			break;
-		default:
-			pGraph->SetXTitle("Alpha°");
-			break;
-	}
-
-	switch (iY){
-		case 0:
-			pGraph->SetYTitle("Alpha°");
-			break;
-		case 1:
-			pGraph->SetYTitle("Cl");
-			break;
-		case 2:
-			pGraph->SetYTitle("VCd");
-			break;
-		case 3:
-			pGraph->SetYTitle("ICd");
-			break;
-		case 4:
-			pGraph->SetYTitle("Cd");
-			break;
-		case 5:
-			pGraph->SetYTitle("PCm");// Pitching moment coef.
-			break;
-		case 6:
-			pGraph->SetYTitle("GCm");// Pitching moment coef.
-			break;
-		case 7:
-			pGraph->SetYTitle("Cm");// Pitching moment coef.
-			break;
-		case 8:
-			pGraph->SetYTitle("Ct");// Rolling moment coef
-			break;
-		case 9:
-			pGraph->SetYTitle("PCn");// Airfoil yawing moment
-			break;
-		case 10:
-			pGraph->SetYTitle("ICn");// Induced yawing moment
-			break;
-		case 11:
-			pGraph->SetYTitle("Cl/Cd");
-			break;
-		case 12:
-			pGraph->SetYTitle("Cl^(3/2)/Cd");
-			break;
-		case 13:
-			pGraph->SetYTitle("1/Rt(Cl)");
-			break;
-		case 14:
-			if(m_ForceUnit==0)	pGraph->SetYTitle("Lift (N)");
-			else pGraph->SetYTitle("Lift (lbf)");
-			break;
-		case 15:
-			if(m_ForceUnit==0)	pGraph->SetYTitle("Drag (N)");
-			else pGraph->SetYTitle("Drag (lbf)");
-			break;
-		case 16:
-			pGraph->SetYTitle("Vx "+StrSpeed);	
-			break;
-		case 17:
-			pGraph->SetYTitle("Vz "+StrSpeed);	
-			break;
-		case 18:
-			pGraph->SetYTitle("V "+StrSpeed);	
-			break;
-		case 19:
-			pGraph->SetYTitle("Gamma°");	
-			break;
-		case 20:
-			pGraph->SetYTitle("PM");	
-			break;
-		case 21:
-			pGraph->SetYTitle("RM");	
-			break;
-		case 22:
-			pGraph->SetYTitle("YM");	
-			break;
-		case 23:
-			pGraph->SetYTitle("XCP "+ StrLength);	
-			break;
-		case 24:
-			pGraph->SetYTitle("YCP "+ StrLength);
-			break;
-		case 25:
-			pGraph->SetYTitle("BM "+ StrMoment);
-			break;
-		case 26:
-			pGraph->SetYTitle("m.g.Vz (W)");
-			break;
-		case 27:
-			pGraph->SetYTitle("Oswald");
-			break;
-		case 28:
-			pGraph->SetYTitle("(XCp-XCG)/MAC(%)");
-			break;
-		default:
-			pGraph->SetYTitle("Alpha°");
-			break;
 	}
 }
 
@@ -6420,7 +6214,8 @@ bool CMainFrame::LoadProject(CString PathName)
 	{
 		SetSaveState(true);
 		if( m_oaWing.GetSize() || m_oaPlane.GetSize() || m_oaBody.GetSize()){
-			if(m_iApp==0){
+			if(m_iApp==0)
+			{
 				OnMiarex();
 				return TRUE;
 			}
@@ -6429,7 +6224,12 @@ bool CMainFrame::LoadProject(CString PathName)
 				UpdateUFOs();
 				m_BodyCtrlBar.UpdateBodies();
 				Miarex.SetUFO();
-				if(Miarex.m_iView==5) Miarex.SetBody();
+				
+				if(Miarex.m_iView==5) 
+				{
+					Miarex.m_bIs3DScaleSet = false;
+					Miarex.SetBody();
+				}
 				Miarex.UpdateView();
 				return TRUE;
 			}

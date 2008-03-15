@@ -220,6 +220,9 @@
 				RelativePath=".\Miarex\BodyGridDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\BodyNURBSDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\Miarex\BodyScaleDlg.cpp">
 			</File>
 			<File
@@ -361,6 +364,9 @@
 				RelativePath=".\misc\NameDlg.cpp">
 			</File>
 			<File
+				RelativePath=".\misc\NoBeepListCtrl.cpp">
+			</File>
+			<File
 				RelativePath=".\misc\NumEdit.cpp">
 			</File>
 			<File
@@ -455,6 +461,9 @@
 			</File>
 			<File
 				RelativePath=".\misc\PrintOptionsDlg.cpp">
+			</File>
+			<File
+				RelativePath=".\Miarex\Quaternion.cpp">
 			</File>
 			<File
 				RelativePath=".\XDirect\ReListDlg.cpp">
@@ -565,7 +574,7 @@
 				RelativePath=".\Miarex\WakeParamsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WGraphVarDlg.cpp">
+				RelativePath=".\Graph\WGraphVarDlg.cpp">
 			</File>
 			<File
 				RelativePath=".\Miarex\Wing.cpp">
@@ -640,6 +649,9 @@
 			</File>
 			<File
 				RelativePath=".\Miarex\BodyGridDlg.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\BodyNURBSDlg.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\BodyScaleDlg.h">
@@ -717,9 +729,6 @@
 				RelativePath=".\misc\InitDialogBar.h">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceEdit.h">
-			</File>
-			<File
 				RelativePath=".\misc\InPlaceFloatEdit.h">
 			</File>
 			<File
@@ -774,6 +783,9 @@
 				RelativePath=".\misc\NameDlg.h">
 			</File>
 			<File
+				RelativePath=".\misc\NoBeepListCtrl.h">
+			</File>
+			<File
 				RelativePath=".\misc\NumEdit.h">
 			</File>
 			<File
@@ -804,10 +816,10 @@
 				RelativePath=".\XDirect\Polar.h">
 			</File>
 			<File
-				RelativePath=".\misc\PolarFilter.h">
+				RelativePath=".\PolarFilter.h">
 			</File>
 			<File
-				RelativePath=".\PolarFilter.h">
+				RelativePath=".\misc\PolarFilter.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\POpp.h">
@@ -817,6 +829,9 @@
 			</File>
 			<File
 				RelativePath=".\misc\PrintOptionsDlg.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\Quaternion.h">
 			</File>
 			<File
 				RelativePath=".\XDirect\ReListDlg.h">
@@ -894,7 +909,7 @@
 				RelativePath=".\Miarex\WakeParamsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WGraphVarDlg.h">
+				RelativePath=".\Graph\WGraphVarDlg.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\Wing.h">

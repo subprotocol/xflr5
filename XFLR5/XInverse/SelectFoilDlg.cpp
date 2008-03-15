@@ -52,7 +52,7 @@ void CSelectFoilDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CSelectFoilDlg, CDialog)
 	//{{AFX_MSG_MAP(CSelectFoilDlg)
-	ON_CBN_SELCHANGE(IDC_CBFOIL, OnSelChangeCBFoil)
+	ON_CBN_SELCHANGE(IDC_LBFOIL, OnSelChangeCBFoil)
 	ON_LBN_DBLCLK(IDC_LBFOIL, OnDblclkLBFoil)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -100,8 +100,6 @@ void CSelectFoilDlg::OnSelChangeCBFoil()
 	int pos = m_ctrlLBFoil.GetCurSel();
 	if(pos !=  CB_ERR) m_ctrlLBFoil.GetText(pos, m_FoilName);
 }
-
-
 
 
 

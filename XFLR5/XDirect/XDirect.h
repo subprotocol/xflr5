@@ -354,5 +354,6 @@ public:
 
 	afx_msg void OnExportResults();
 	afx_msg void OnShowCpGraph();
+	afx_msg void OnExportCurrentResults();
 };
 

@@ -738,7 +738,7 @@ bool CPF::Serialize(CArchive &ar)
 		int ArchiveFormat,k ;
 		ar >> ArchiveFormat;
 		if(ArchiveFormat<100000 || ArchiveFormat>100500 ) return false;
-		ar >> m_strFoilName; m_strFoilName = "Splined Points Foil";
+		ar >> m_strFoilName; //m_strFoilName = "Splined Points Foil";
 		ar >> m_FoilColor >> m_FoilStyle >> m_FoilWidth;
 
 		ar >> m_Extrados.m_iPoints;
@@ -790,6 +790,7 @@ bool CPF::Serialize(CArchive &ar)
 	}
 	else{
 		ar << 100306;
+		m_strFoilName="abcde nada";
 		ar << m_strFoilName;
 		ar << m_FoilColor << m_FoilStyle << m_FoilWidth;
 		ar << m_Extrados.m_iPoints;

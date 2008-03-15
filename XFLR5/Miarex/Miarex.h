@@ -93,6 +93,7 @@ class CMiarex : public CWnd
 	friend class CWAdvDlg;
 	friend class C3DPanelThread;
 	friend class CArcBall;
+	friend class CBodyScaleDlg;
 
 // Construction
 public:
@@ -148,6 +149,10 @@ protected:
 	afx_msg void OnResetBodyScale();
 	afx_msg void OnBodyGrid();
 	afx_msg void OnCpLegend();
+	afx_msg void OnBodyResolution();
+	afx_msg void OnInterpolateBodyPoints();
+	afx_msg void OnScaleFrame();
+	afx_msg void OnShowOnlyActiveFrame();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -159,7 +164,7 @@ private:
 	void OnExit();
 	void OnWingAnalysis();
 	void OnBodyDesign();
-	void OnShowWPolar();
+	void OnWPolar();
 	void OnExportWing();
 	void OnLoadProject();
 	void OnSaveProject();
@@ -233,6 +238,7 @@ private:
 	void GLCreateBodySurface();
 	void GLCreateBodyMesh();
 	void GLCreateBodyLines();
+	void GLCreateBodyPoints();
 	void GLCreateBodyAxialLines();
 	void GLCreateBodyFrame();
 	void GLCreateBodyGrid();
@@ -242,7 +248,7 @@ private:
 	void GLCreateCp();
 	void GLCreateTrans(CWing *pWing, CWOpp *pWOpp, UINT List);
 	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, UINT List);
-	void GLCreateLift(CWing *pWing, CWOpp *pWOpp, UINT List);
+	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, UINT List);
 	void GLCreateLiftForce();
 	void GLCreateMoments();
 	void GLCreateWingLegend();
@@ -253,16 +259,22 @@ private:
 	void GLCreateCpLegend();
 	void GLRenderBody(CDC *pDC);
 	void GLRenderView(CDC *pDC); 
+	void GLCallViewLists(); 
 	void GLRenderSphere(COLORREF cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLDraw3D(CDC *pDC);
 	void GLSetupLight();
 	void GLCreateCtrlPts();
 	void GLCreateVortices();
 	void GLSetViewport();
-	void GLInverseMatrix(float mtxin[4][4],float mtxout[4][4]);
+	void GLInverseMatrix();
 
+	void * GetUFOPlrVariable(CWPolar *pWPolar, int iVar);
+
+	bool AVLImportFile(CString FileName);
 	bool CreateWakeElems(int PanelIndex);
 	bool InitializePanels();
+	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal,
+                       CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool VLMIsSameSide(int p, int pp);
 	bool LoadSettings(CArchive &ar);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
@@ -271,16 +283,15 @@ private:
 	bool SetModPlane(CPlane *pModPlane);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
-	bool AVLImportFile(CString FileName);
+	bool UnlockCurBody();
 
 	int CreateElements(CSurface *pSurface, CPanel *pPanel);
 	int CreateBodyElements(CPanel *pPanel);
-	int IsNode(CVector Pt);
-	int IsWakeNode(CVector Pt);
+	int IsNode(CVector &Pt);
+	int IsWakeNode(CVector &Pt);
 	int ReadFoilPoints(CStdioFile *pXFile, double *x, double *y);
 
 	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
-	void AddWOpp(CWOpp *pNewPoint);
 	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
 	void Analyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void Animate(bool bAnimate);
@@ -297,6 +308,7 @@ private:
 	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve, int Var);
 	void FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar);
 	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
+	void InsertWOpp(CWOpp *pNewPoint);
 	void JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr);
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
@@ -332,14 +344,16 @@ private:
 	void SetBodyScale();
 	void Set2DScale();
 	void Set3DScale();
+	void SetWGraphTitles(Graph* pGraph, int iX, int iY);
+	void Set3DRotationCenter();
+	void Set3DRotationCenter(CPoint point);
 	void SetWGraphScale();
 	void UpdateView(CDC *pDC=NULL);
 	void UpdateUnits();
 	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 
-	void CMiarex::ClientToGL(CPoint point, CVector &real);
-	void CMiarex::GLToClient(CVector real, CPoint &point);
-
+	void CMiarex::ClientToGL(CPoint const &point, CVector &real);
+	void CMiarex::GLToClient(CVector const &real, CPoint &point);
 
 	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
 	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
@@ -380,6 +394,8 @@ private:
 	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
 	CVector m_TempWakeNode[2*VLMMATSIZE];	// the temporary wake node array during relaxation calc
 
+	CVector m_L[10000],m_T[10000];//temporary points to save calculation times for body NURBS surfaces
+
 	CSurface *m_pSurface[MAXVLMSURFACES];	// An array with the pointers to the diferrent wing's surfaces
 
 	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
@@ -410,11 +426,13 @@ private:
 
 	bool m_bIsPrinting;			// the view is being printed
 	bool m_bTrans;				// the view is being dragged
+	bool m_bDragPoint;				// a point is being dragged
 	bool m_bType1, m_bType2, m_bType4;	// polar types to be displayed
 	bool m_bShowElliptic;			// true if the elliptic loading should be displayed in the local lift graph
 	bool m_bStoreWOpp;			// true if the WOpp should be stored after a calculation
 	bool m_bKeepOutOpps;			// true if points out of hte polar mesh should be kept
 	bool m_bCurWOppOnly;			// true if only the current WOpp is to be displayed
+	bool m_bCurFrameOnly;			// true if only the currently selected body frame is to be displayed
 	bool m_bHalfWing;			// true if only a half-wing should be displayed in the OpPoint view
 	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
 	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed
@@ -425,6 +443,7 @@ private:
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
 	bool m_bResetglBody2D;
+	bool m_bResetglBodyPoints;
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
 	bool m_bAnimate;			// true if there is an animation going on, 
 	bool m_bAnimatePlus;		// true if the animation is going in aoa crescending order
@@ -435,7 +454,6 @@ private:
 	bool m_bIs2DScaleSet;		// true if the 2D scale has been set, false if needs to be reset 
 	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset 
 	bool m_bAutoScales;			// true if the scale is to be reset after each UFO selection
-	bool m_bCheckPlanePanels;	// true if the plane elevator panels should be aligned with the wing's panels
 	bool m_bLogFile;			// true if the log file warning is turned on
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bResetWake;
@@ -446,15 +464,16 @@ private:
 	bool m_bWakePanels;
 	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
-
 	bool m_b3DVLMCl, m_b3DDownwash; 	// defines whether the corresponfing data should be displayed
 	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
 	bool m_bMoments;							// defines whether the corresponfing data should be displayed
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
-	bool m_bglLight;
-	bool m_bArcball;
+	bool m_bglLight; 
+	bool m_bArcball;			//true if the arcball is to be displayed
+	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
+	bool m_bPickCenter;
 
 	int m_NSurfaces;
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
@@ -475,10 +494,14 @@ private:
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 	int m_NCpCurves;			// Number of Cp curves stored for display
 
+	int m_NHoopPoints;			//hoop resolution for NURBS bodies
+	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
+
 //	double m_WakePanelFactor;	// incremental factor for wake lines
 //	double m_TotalWakeLength;	// wake lines first panel size
 //	int m_NXWakePanels;			// wake panel number
 
+	double m_ClipPlanePos;
 	double m_LegendMin, m_LegendMax;
 	double m_CurSpanPos;		//Span position for Cp Grpah
 	double m_CoreSize;			// core size for VLM vortices
@@ -497,13 +520,16 @@ private:
 	double m_RHS[VLMMATSIZE*100];			// RHS vector
 	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
 
+	double MatIn[4][4], MatOut[4][4];
+
 	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
 						// this is not the scale to display the model in the OpenGL view
 
 	CStdioFile* m_pXFile;			// a pointer to the output .log file
 	CUFOListDlg m_UFOdlg;			// the dialog class for UFO management
 
-	CPoint m_PointDown;			// last client left-click point
+	CPoint m_LastPoint;			// last mouse position point
+	CPoint m_PointDown;			//last place where the user clicked
 	CPoint m_ptOffset;			// client offset position for wing display
 	CPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
 	CPoint m_WingLegendOffset;		// client offset position for WOPP polar legend
@@ -515,10 +541,10 @@ private:
 	CVector m_FrameOffset;
 	double  m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 
-	float m_glScalef;//zoom factor for wing
-	float m_glXTransf;//translation vector for wing
-	float m_glYTransf;
+	double m_glScaled;//zoom factor for wing
 
+	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
+	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector
 
 	COLORREF m_CpColor;
 	int m_CpStyle, m_CpWidth;
@@ -562,10 +588,11 @@ private:
 
 	COLORREF m_WingColor, m_StabColor, m_FinColor;
 
-//	CBody m_Body;
 
 public:
 
-
-
+	//temporary variables, save repeated allocation times
+	CVector P, T, V, W;
+	CVector RA, RB;
+	int m_iSel;
 };
