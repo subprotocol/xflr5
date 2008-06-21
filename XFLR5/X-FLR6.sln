@@ -9,8 +9,6 @@ Global
 		Release = Release
 		ReleaseXPPro = ReleaseXPPro
 	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{908C1FD4-78C9-4A85-A225-442BF5024E02}.Debug.ActiveCfg = Debug|Win32
 		{908C1FD4-78C9-4A85-A225-442BF5024E02}.Debug.Build.0 = Debug|Win32

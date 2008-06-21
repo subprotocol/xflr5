@@ -62,6 +62,12 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 	m_nWakeNodes = 0;
 	m_WakeSize   = 0;
 
+	m_Ctrl = 0.0;
+
+	m_Control       = 0.0;
+	m_ControlMax    = 0.0;
+	m_DeltaControl  = 0.0;
+
 	m_QInf       = 0.0;
 	m_QInfMax    = 0.0;
 	m_DeltaQInf  = 0.0;
@@ -109,6 +115,8 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 
 	memset(m_Cp,0,sizeof(m_Cp));
 	memset(m_VLMQInf,0,sizeof(m_VLMQInf));
+	memset(m_sinRHS, 0, sizeof(m_sinRHS));
+	memset(m_cosRHS, 0, sizeof(m_cosRHS));
 }
 
 
@@ -139,11 +147,10 @@ BOOL CVLMDlg::OnInitDialog()
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 	str =strAppDirectory + "XFLR5.log";
+
 	BOOL bOpen = m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	if(bOpen) m_bXFile = true;
 	else m_bXFile = false;
@@ -154,7 +161,7 @@ BOOL CVLMDlg::OnInitDialog()
 
 	m_ctrlOutput.SetLimitText(100000);
 
-	if(m_pWPolar && m_pWPolar->m_bTiltedGeom)
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
 		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
@@ -204,20 +211,25 @@ BOOL CVLMDlg::OnInitDialog()
 	if(m_pStab)   m_pStab->m_bVLMSymetric  = m_bVLMSymetric;
 	if(m_pFin)    m_pFin->m_bVLMSymetric   = m_bVLMSymetric;
 
-	if(m_pWPolar->m_AnalysisType==2){ //no way it could be anything else
+	if(m_pWPolar->m_AnalysisType==2)
+	{
+		//no way it could be anything else
 		m_pVLMThread = new CVLMThread();
-		m_pVLMThread->m_pParent = this;
-		m_pVLMThread->m_bAutoDelete = false;
-		m_pVLMThread->m_bType4      = (m_pWPolar->m_Type==4);
-		m_pVLMThread->m_MaxWakeIter = m_MaxWakeIter;
-		m_pVLMThread->m_bSequence   = m_bSequence;
-		m_pVLMThread->m_Alpha       = m_Alpha;
-		m_pVLMThread->m_AlphaMax    = m_AlphaMax;
-		m_pVLMThread->m_DeltaAlpha  = m_DeltaAlpha;
-		m_pVLMThread->m_QInf        = m_QInf;
-		m_pVLMThread->m_QInfMax     = m_QInfMax;
-		m_pVLMThread->m_DeltaQInf   = m_DeltaQInf;
-		m_pVLMThread->m_pMiarex     = m_pMiarex;
+		m_pVLMThread->m_pParent      = this;
+		m_pVLMThread->m_bAutoDelete  = false;
+		m_pVLMThread->m_pWPolar      = m_pWPolar;
+		m_pVLMThread->m_MaxWakeIter  = m_MaxWakeIter;
+		m_pVLMThread->m_bSequence    = m_bSequence;
+		m_pVLMThread->m_Alpha        = m_Alpha;
+		m_pVLMThread->m_AlphaMax     = m_AlphaMax;
+		m_pVLMThread->m_DeltaAlpha   = m_DeltaAlpha;
+		m_pVLMThread->m_QInf         = m_QInf;
+		m_pVLMThread->m_QInfMax      = m_QInfMax;
+		m_pVLMThread->m_DeltaQInf    = m_DeltaQInf;
+		m_pVLMThread->m_Control      = m_Control;
+		m_pVLMThread->m_ControlMax   = m_ControlMax;
+		m_pVLMThread->m_DeltaControl = m_DeltaControl;
+		m_pVLMThread->m_pMiarex      = m_pMiarex;
 				
 		m_pVLMThread->CreateThread(CREATE_SUSPENDED);
 		VERIFY(m_pVLMThread->SetThreadPriority(THREAD_PRIORITY_LOWEST));
@@ -439,10 +451,8 @@ void CVLMDlg::EndSequence()
 			CString str;
 			CString strAppDirectory;
 			char    szAppPath[MAX_PATH] = "";
-			::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-			// Extract directory
+			GetTempPath(MAX_PATH,szAppPath);
 			strAppDirectory = szAppPath;
-			strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 			str =strAppDirectory + "XFLR5.log";
 
 			if(lf.Open(str, CFile::modeRead)){// file exists (there should be a better way to do this)
@@ -462,9 +472,9 @@ void CVLMDlg::EndSequence()
 	EndDialog(0);
 }
 
-bool CVLMDlg::VLMCreateRHS(double V0, double VDelta, int nval)
+bool CVLMDlg::VLMCreateRHS(double V0)
 {
-	int p, q, m, Size;
+	int p, m, Size;
 	double aoa, cosaoa, sinaoa;
 
 	if(m_bVLMSymetric) Size = m_MatSize/2;
@@ -474,18 +484,12 @@ bool CVLMDlg::VLMCreateRHS(double V0, double VDelta, int nval)
 	// Create RHS
 	if(m_pWPolar->m_Type!=4)
 	{
-		p=0;
-
-		for (q=0; q<nval;q++)
+		//solve twice for sine and cos components
+		
+		for (m=0; m<Size; m++)
 		{
-			aoa    =  (V0+q*VDelta)*pi/180.0;
-			cosaoa = cos(aoa);
-			sinaoa = sin(aoa);
-			for (m=0; m<Size; m++)
-			{
-				m_RHS[p] = -cosaoa*m_ppPanel[m]->Normal.x  - sinaoa*m_ppPanel[m]->Normal.z;
-				p++;
-			}
+			m_cosRHS[m] = - m_ppPanel[m]->Normal.x;
+			m_sinRHS[m] = - m_ppPanel[m]->Normal.z;
 		}
 	}
 	else 
@@ -499,6 +503,8 @@ bool CVLMDlg::VLMCreateRHS(double V0, double VDelta, int nval)
 			m_RHS[p] = -cosaoa*m_ppPanel[p]->Normal.x  - sinaoa*m_ppPanel[p]->Normal.z;
 		}
 	}
+
+//double row[VLMMATSIZE]; memcpy(row, m_cosRHS, Size*sizeof(double));
 	return true;
 }
 
@@ -534,13 +540,53 @@ bool CVLMDlg::VLMCreateMatrix()
 					V.z += VS.z;
 				}
 			}
-
 			m_aij[p*Size+pp] = V.dot(m_ppPanel[p]->Normal);
 		}
 	}
+//double row[VLMMATSIZE]; memcpy(row, m_aij, Size*sizeof(double));
+	return true;
+}
+
+
+bool CVLMDlg::VLMSolveDouble()
+{	
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CString strong, strange;
+
+	int Size;
+	double row[VLMMATSIZE];
+
+	CVector N, Force, WindNormal;
+	CVector VInf(1.0,0.0,0.0);
+	
+	if(m_bVLMSymetric) Size = m_MatSize/2;
+	else               Size = m_MatSize;
+
+	memset(row,   0, sizeof(row));
+
+	//______________________________________________________________________________________
+	// Solve the system for unit vortex circulation
+
+	AddString("      Solving the linear system...\r\n");
+
+	memcpy(m_RHS,      m_cosRHS, Size * sizeof(double));
+	memcpy(m_RHS+Size, m_sinRHS, Size * sizeof(double));
+
+	if(!Gauss(m_aij,Size, m_RHS, 2))
+	{
+		AddString("      Singular Matrix.... Aborting calculation...\r\n");
+		m_bConverged = false;
+		return false;
+	}
+	else m_bConverged = true;
+
+	memcpy(m_cosRHS, m_RHS,      Size * sizeof(double));
+	memcpy(m_sinRHS, m_RHS+Size, Size * sizeof(double));
 
 	return true;
 }
+
+
 
 
 bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
@@ -557,34 +603,33 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CString strong, strange;
-	int p, q, pp, Size,  nrhs;
-	int n, o, o1, nel;
-	double Lift, alpha;
+
+	int p, q, pp, Size;
+	int n, o, o1, nel, m;
+
+
+	double Lift, alpha, cosa, sina;
+	double row[VLMMATSIZE];memset(row,   0, sizeof(row));
+
 	CVector N, Force, WindNormal;
 	CVector VInf(1.0,0.0,0.0);
-	double row[VLMMATSIZE];
 	
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
+	//reconstruct all results from cosine and sine unit vectors
 
-	memset(row,   0, sizeof(row));
-
-	//______________________________________________________________________________________
-	// Solve the system for unit vortex circulation
-
-	AddString("      Solving the linear system...\r\n");
-
-	if(m_pWPolar->m_Type!=4) nrhs = nval;
-	else                     nrhs = 0;
-
-	if(!Gauss(m_aij,Size, m_RHS, nrhs))
-//	if(!GaussSeidel(m_aij,Size, m_RHS, row, 0.0001, 500))
+	m=0;
+	for (q=0; q<nval;q++)
 	{
-		AddString("      Singular Matrix.... Aborting calculation...\r\n");
-		m_bConverged = false;
-		return false;
+		alpha = V0 + q * VDelta;
+		cosa = cos(alpha*pi/180.0);
+		sina = sin(alpha*pi/180.0);
+		for(p=0; p<Size; p++)
+		{
+			m_RHS[m] = cosa * m_cosRHS[p] + sina * m_sinRHS[p];
+			m++;
+		}
 	}
-	else m_bConverged = true;
 
 	//______________________________________________________________________________________
 	// Calculate speeds i.a.w. polar types
@@ -702,6 +747,39 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	return  true;
 }
 
+double CVLMDlg::VLMComputeCm(double alpha, bool bTrace) 
+{
+	CVector V(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
+	CVector Force, PanelLeverArm;
+	int p, Size;
+	double Cm = 0.0;
+	double cosa = cos(alpha*pi/180.0);
+	double sina = sin(alpha*pi/180.0);
+
+	if(m_bVLMSymetric) Size = m_MatSize/2;
+	else               Size = m_MatSize;
+
+	int pUpwards;
+
+	for(p=0; p<Size; p++)
+	{
+		PanelLeverArm.Set(m_ppPanel[p]->VortexPos.x - m_pWPolar->m_XCmRef, m_ppPanel[p]->VortexPos.y, m_ppPanel[p]->VortexPos.z);
+		Force = V * m_ppPanel[p]->Vortex * (m_cosRHS[p]*cosa + m_sinRHS[p]*sina);         //Newtons/rho
+		
+		if(!m_pWPolar->m_bVLM1 && !m_ppPanel[p]->m_bIsLeading)
+		{
+			pUpwards = m_ppPanel[p]->m_iPU;
+			Force  -= V  * m_ppPanel[p]->Vortex * (m_cosRHS[pUpwards]*cosa + m_sinRHS[pUpwards]*sina);       //Newtons/rho
+		}
+
+		Force*=m_pWPolar->m_Density;
+
+		Cm += -PanelLeverArm.x * Force.z + PanelLeverArm.z*Force.x; //N.m/rho;
+	}
+//TRACE("%10.4e    %10.4e    %10.4e\n", Cm_Wing, Cm_Stab, Cm_Fin);
+	return Cm;
+}
+
 void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 {
 	// calculates the various wing coefficients by interpolating
@@ -754,7 +832,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			{
 				Alpha = V0+q*VDelta;
 			}
-			else          
+			else if(m_pWPolar->m_Type==4)
 			{
 				Alpha = m_pWPolar->m_ASpec;
 			}
@@ -764,7 +842,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		m_QInf = m_VLMQInf[q];
 		qdyn = 0.5 * m_pWPolar->m_Density * m_QInf * m_QInf;
 
-		if(m_QInf >0.0) 
+		if(m_QInf >0.0 || m_pWPolar->m_Type==5) 
 		{
 			if(m_pWPolar->m_Type!=4 && !m_pWPolar->m_bTiltedGeom)
 			{
@@ -885,8 +963,8 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_InducedDrag =  1.0*IDrag/m_QInf/m_QInf/m_pWing->m_Area;
 			m_ViscousDrag =  1.0*VDrag              /m_pWing->m_Area;
 
-			m_XCP         = XCP/Lift;
-			m_YCP         = YCP/Lift;
+			m_XCP         = XCP/Lift/m_pWPolar->m_Density;
+			m_YCP         = YCP/Lift/m_pWPolar->m_Density;
 
 			m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
 			m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
@@ -1342,7 +1420,7 @@ void CVLMDlg::VLMSetAi(double *Gamma)
 	CVector C, CG;
 	CVector Vt;
 	int p, pp, m;
-	double Ai[MAXSTATIONS];
+	double Ai[4*MAXSTATIONS];
 	m=0;
 
 //	CVector K(   -sin(m_Alpha*pi/180.0), 0.0, cos(m_Alpha*pi/180.0));
@@ -1379,44 +1457,19 @@ void CVLMDlg::VLMSetAi(double *Gamma)
 	int pos = 0;
 	for (m=0; m<m_pWing->m_NStation; m++)	    m_pWing->m_Ai[m] = Ai[m];
 	pos += m_pWing->m_NStation;
-	if(m_pWing2) {
+	if(m_pWing2)
+	{
 		for (m=0; m<m_pWing2->m_NStation; m++)	m_pWing2->m_Ai[m] = Ai[m+pos];
 		pos += m_pWing2->m_NStation;
 	}
-	if(m_pStab) {
+	if(m_pStab) 
+	{
 		for (m=0; m<m_pStab->m_NStation; m++)	m_pStab->m_Ai[m] = Ai[m+pos];
 		pos += m_pStab->m_NStation;
 	}
-	if(m_pFin) {
-		for (m=0; m<m_pFin->m_NStation; m++)	m_pFin->m_Ai[m] = Ai[m+pos];
-	}
-}
-
-
-void CVLMDlg::VLMRotateGeomY(double Angle, CVector P)
-{
-	int n, p;
-	double cosa = cos(Angle*pi/180.0);
-	double sina = sin(Angle*pi/180.0);
-	int iLA, iLB, iTA, iTB;
-	CVector LATB, TALB;
-
-	for (n=0; n< m_nNodes; n++)
-		m_pNode[n].RotateY(P, Angle);
-	
-	for (p=0; p< m_MatSize; p++)
+	if(m_pFin) 
 	{
-		iLA = m_pPanel[p].m_iLA; iLB = m_pPanel[p].m_iLB;
-		iTA = m_pPanel[p].m_iTA; iTB = m_pPanel[p].m_iTB;
-
-		LATB = m_pNode[iLA] - m_pNode[iTB];
-		TALB = m_pNode[iTA] - m_pNode[iLB];
-
-		m_pPanel[p].Normal = LATB * TALB;
-
-//		m_pPanel[p].Area =  m_pPanel[p].Normal.VAbs()/2.0; //area is left unchanged by the rotation
-		m_pPanel[p].Normal.Normalize();
-		m_pPanel[p].SetFrame( m_pNode[iLA], m_pNode[iLB], m_pNode[iTA], m_pNode[iTB]);
+		for (m=0; m<m_pFin->m_NStation; m++)	m_pFin->m_Ai[m] = Ai[m+pos];
 	}
 }
 
@@ -1429,9 +1482,9 @@ void CVLMDlg::ResetWakeNodes()
 
 void CVLMDlg::RelaxWake()
 {
+	int mw=0;
 	int lw, kw, llw;
 	double t, dx;
-	int mw=0;
 	double *Gamma = m_Gamma;
 	CVector LATB, TALB, Trans, VL, VT;
 	CVector QInf(m_QInf*cos(m_Alpha*pi/180.0), 0.0, m_QInf*sin(m_Alpha*pi/180.0)) ;

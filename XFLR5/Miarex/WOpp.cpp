@@ -60,6 +60,7 @@ CWOpp::CWOpp()
 	m_AnalysisType = 0;
 
 	m_Alpha               = 0.0;
+	m_Ctrl                = 0.0;
 	m_CL                  = 0.0;
 	m_ViscousDrag         = 0.0;
 	m_InducedDrag         = 0.0;
@@ -70,6 +71,7 @@ CWOpp::CWOpp()
 	m_IYm                 = 0.0;
 	m_XCP                 = 0.0;
 	m_YCP                 = 0.0;
+	m_Ctrl                = 0.0;
 
 	memset(m_Ai,0,sizeof(m_Ai));
 	memset(m_Twist,0,sizeof(m_Twist));

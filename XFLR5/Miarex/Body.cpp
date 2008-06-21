@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CBody Class
-	Copyright (C) 2007 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2007-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ double CBody::s_XPanelPos[300];
 CRect CBody::s_rViewRect;
 CWnd *CBody::s_pMainFrame;
 
-	// CBody
 
 CBody::CBody()
 {
@@ -46,14 +45,14 @@ CBody::CBody()
 	m_BodyWidth = 1;
 
 	m_FramePosition[0].Set( -0.1,  0.0,  0.0);
-	m_FramePosition[1].Set( -0.07, 0.0,  0.015);
-	m_FramePosition[2].Set(  0.1,  0.0,  0.01);
+	m_FramePosition[1].Set( -0.07, 0.0,  0.0);
+	m_FramePosition[2].Set(  0.1,  0.0,  0.0);
 	m_FramePosition[3].Set(  0.6,  0.0,  0.0);
 
 	m_bLocked        = false;
 	m_bClosedSurface = false;
 
-	m_NStations   = 4;
+	m_NStations  = 4;
 	m_NSideLines = 5;
 
 	m_iActiveFrame =  1;

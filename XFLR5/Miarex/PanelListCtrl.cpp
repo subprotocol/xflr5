@@ -33,12 +33,12 @@
 #include "../misc/InPlaceFloatEdit.h"
 #include "../misc/InPlaceList.h"
 #include ".\Panellistctrl.h"
-#include "Wing.h"
+#include "WingDlg.h"
 
 CPanelListCtrl::CPanelListCtrl(void)
 {
 	m_nColumns   = 0;
-	m_pWing      = NULL;
+	m_pWingDlg      = NULL;
 	m_iItem      = 0;
 	m_iSubItem   = 0;
 	m_bIsEditing = false;
@@ -229,7 +229,7 @@ void CPanelListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 	{
 		if(column==0) column=1;
 		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
-		((CWing*)m_pWing)->m_iSection = index;
+		((CWingDlg*)m_pWingDlg)->m_iSection = index;
 	}
 //	CListCtrl::OnRButtonDown(nFlags, point);
 }
@@ -238,7 +238,7 @@ void CPanelListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 
 void CPanelListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
-//	int CurSection = ((CWing*)m_pWing)->m_iSection;
+//	int CurSection = ((CWingDlg*)m_pWingDlg)->m_iSection;
 	int index;
 	CString strong;
 	CListCtrl::OnLButtonDown(nFlags, point);
@@ -249,7 +249,7 @@ void CPanelListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
 //		if(index ==CurSection){
 			
-			((CWing*)m_pWing)->m_iSection = index;
+			((CWingDlg*)m_pWingDlg)->m_iSection = index;
 
 			UINT flag = LVIS_FOCUSED;
 			if( GetWindowLong(m_hWnd, GWL_STYLE) & LVS_EDITLABELS )
@@ -258,7 +258,7 @@ void CPanelListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 				}
 				else   EditSubLabel(index, column);
 //		}
-//		else ((CWing*)m_pWing)->m_iSection = index;
+//		else ((CWingDlg*)m_pWingDlg)->m_iSection = index;
 	}
 }
 
@@ -274,7 +274,7 @@ void CPanelListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	{
 		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
 					
-		((CWing*)m_pWing)->m_iSection = index;
+		((CWingDlg*)m_pWingDlg)->m_iSection = index;
 
 		UINT flag = LVIS_FOCUSED;
 		if( GetWindowLong(m_hWnd, GWL_STYLE) & LVS_EDITLABELS )
@@ -338,7 +338,8 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 	DWORD dwStyle = WS_BORDER|WS_CHILD|WS_VISIBLE|WS_VSCROLL
 					|CBS_DROPDOWNLIST|CBS_DISABLENOSCROLL;
 
-	if(nCol==6){
+	if(nCol==6)
+	{
 		CComboBox *pList = new CInPlaceList(this, nItem, nCol);
 		pList->Create( dwStyle, rect, this, IDC_IPEDIT );
 		pList->SetItemHeight( -1, height);

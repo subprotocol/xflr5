@@ -31,6 +31,7 @@
 #include "../misc/UFOListDlg.h"
 #include "./BodyGridDlg.h"
 #include "WngAnalysis.h"
+#include "ControlAnalysis.h"
 #include "VLMDlg.h"
 #include "3DPanelDlg.h"
 #include "Plane.h"
@@ -40,8 +41,6 @@
 #include "Body.h"
 #include "BodyCtrlBar.h"
 #include "ArcBall.h"
-#include "gl\glu.h"
-
 
 // Custom palette structure
 typedef struct tagLogicalPalette 
@@ -72,7 +71,9 @@ class CMiarex : public CWnd
 	friend class CFlowLinesDlg;
 	friend class CFlowDlg;
 	friend class CPlane;
+	friend class CPlaneDlg;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CWingPage;
 	friend class CFoilsPage;
 	friend class CGeomPage;
@@ -160,9 +161,11 @@ protected:
 private:
 
 	BOOL OnEraseBkgnd(CDC* pDC);
+	BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
 	void OnExit();
-	void OnWingAnalysis();
+	void OnControlAnalysis();
+	void OnDefineAnalysis();
 	void OnBodyDesign();
 	void OnWPolar();
 	void OnExportWing();
@@ -179,7 +182,6 @@ private:
 	void OnLButtonDown(UINT nFlags, CPoint point);
 	void OnLButtonDblClk(UINT nFlags, CPoint point);
 	void OnLButtonUp(UINT nFlags, CPoint point);
-	BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void OnDefineWing();
 	void OnDelCurWOpp();
 	void OnWOpp();
@@ -234,7 +236,6 @@ private:
 	void GLDrawBodyLegend();
 	void GLDrawAxes();
 	void GLCreateBodyBezier();
-//	void GLCreateBodyNurbs();
 	void GLCreateBodySurface();
 	void GLCreateBodyMesh();
 	void GLCreateBodyLines();
@@ -277,6 +278,7 @@ private:
                        CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool VLMIsSameSide(int p, int pp);
 	bool LoadSettings(CArchive &ar);
+	bool RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
 	bool SetModBody(CBody *pModBody);
 	bool SetModWing(CWing *pWing);
@@ -329,7 +331,7 @@ private:
 	void PrintSingleWingGraph(CDC *pDC, CRect *pCltRect);
 	void PrintTwoWingGraph(CDC *pDC, CRect *pCltRect);
 	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
-	void RotateGeomY(double Angle, CVector P);
+	void RotateGeomY(double const &Angle, CVector const &P);
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
@@ -394,11 +396,18 @@ private:
 	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
 	CVector m_TempWakeNode[2*VLMMATSIZE];	// the temporary wake node array during relaxation calc
 
-	CVector m_L[10000],m_T[10000];//temporary points to save calculation times for body NURBS surfaces
+	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
+	double m_aijRef[VLMMATSIZE*VLMMATSIZE]; // coefficient matrix
+	double m_RHS[VLMMATSIZE*100];			// RHS vector
+	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
+
+	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
+	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
 	CSurface *m_pSurface[MAXVLMSURFACES];	// An array with the pointers to the diferrent wing's surfaces
 
 	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
+	CControlAnalysis m_CtrlDlg;
 	CBodyGridDlg  m_BodyGridDlg;
 	
 	CWnd* m_pChildWnd;			// a pointer to the view class
@@ -421,8 +430,6 @@ private:
 	CObArray *m_poaWOpp;			// a pointer to the UFO OpPoint array
 	CObArray *m_poaPOpp;			// a pointer to the Plane OpPoint array
 	CObArray *m_poaBody;			// a pointer to the Body array
-
-//	CString m_VersionName;
 
 	bool m_bIsPrinting;			// the view is being printed
 	bool m_bTrans;				// the view is being dragged
@@ -497,10 +504,6 @@ private:
 	int m_NHoopPoints;			//hoop resolution for NURBS bodies
 	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
 
-//	double m_WakePanelFactor;	// incremental factor for wake lines
-//	double m_TotalWakeLength;	// wake lines first panel size
-//	int m_NXWakePanels;			// wake panel number
-
 	double m_ClipPlanePos;
 	double m_LegendMin, m_LegendMax;
 	double m_CurSpanPos;		//Span position for Cp Grpah
@@ -515,11 +518,6 @@ private:
 	double m_BodyRefScale;			// scale for 2D display
 	double m_FrameRefScale;			// scale for 2D display
 	double m_LastWOpp;			// last WOPP selected, try to set the same if it exists, for the new polar
-	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
-	double m_aijRef[VLMMATSIZE*VLMMATSIZE]; // coefficient matrix
-	double m_RHS[VLMMATSIZE*100];			// RHS vector
-	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
-
 	double MatIn[4][4], MatOut[4][4];
 
 	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
@@ -568,29 +566,25 @@ private:
 	Graph m_WPlrGraph2;
 	Graph m_WPlrGraph3;
 	Graph m_WPlrGraph4;
-	Graph m_CpGraph;			// provision for cross flow Cp Graph in 3D panel analysis
+	Graph m_CpGraph;			// cross flow Cp Graph in 3D panel analysis
 	Graph* m_pCurGraph;			// currently active graph
 	Graph* m_pCurWPlrGraph;			// currently active WPolar graph
 	Graph* m_pCurWingGraph;			// currently active WOpp graph
-//	CCurve *m_pWingCurve1,*m_pWingCurve2,*m_pWingCurve3,*m_pWingCurve4; 
-
 
 	CWing *m_pCurWing;			// the currently selected wing
-	CWPolar * m_pCurWPolar;			// the currently selected WPolar
-	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
-	CPlane * m_pCurPlane;			// the currently selected Plane
 	CWing * m_pCurWing2;			// the currently selected Plane's 2nd wing, if any
 	CWing * m_pCurStab;			// the currently selected Plane's elevator
 	CWing * m_pCurFin;			// the currently selected Plane's fin
+	CWPolar * m_pCurWPolar;			// the currently selected WPolar
+	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
+	CPlane * m_pCurPlane;			// the currently selected Plane
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
 	CFrame *m_pCurFrame;
 	CBody *m_pCurBody;
 
 	COLORREF m_WingColor, m_StabColor, m_FinColor;
 
-
 public:
-
 	//temporary variables, save repeated allocation times
 	CVector P, T, V, W;
 	CVector RA, RB;

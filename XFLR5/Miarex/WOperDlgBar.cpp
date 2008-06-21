@@ -79,6 +79,10 @@ CWOperDlgBar::CWOperDlgBar(CWnd* pParent)
 	m_QInf0        = 10.0;
 	m_QInfMax      = 15.0;
 	m_DeltaQInf    =  5.0;
+	
+	m_Control0     =  0.0;
+	m_ControlMax   =  1.0;
+	m_DeltaControl =  0.25;
 
 	m_bSequence  = false;
 	m_bInitCalc = true;
@@ -210,10 +214,12 @@ void CWOperDlgBar::OnAnalyze()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	ReadParams();
-	if(m_Type !=4)
+	if(m_Type <3)
 		pMiarex->Analyze(m_Alpha0, m_AlphaMax, m_DeltaAlpha, m_bSequence, m_bInitCalc);
-	else
+	else if(m_Type==4)
 		pMiarex->Analyze(m_QInf0, m_QInfMax, m_DeltaQInf, m_bSequence, m_bInitCalc);
+	else if(m_Type==5)
+		pMiarex->Analyze(m_Control0, m_ControlMax, m_DeltaControl, m_bSequence, m_bInitCalc);
 }
 
 
@@ -227,22 +233,35 @@ void CWOperDlgBar::ReadParams()
 	if(m_ctrlInitCalc.GetCheck()) m_bInitCalc = true;
 	else m_bInitCalc = false;
 
-	if(m_Type !=4){
+	if(m_Type <4)
+	{
 		m_Alpha0     = m_ctrlAlpha.GetValue();
 		m_AlphaMax   = m_ctrlAlphaMax.GetValue();
-		m_DeltaAlpha = fabs(m_ctrlDeltaAlpha.GetValue());
-		if(fabs(m_DeltaAlpha)<0.1) {
+		m_DeltaAlpha = abs(m_ctrlDeltaAlpha.GetValue());
+		if(abs(m_DeltaAlpha)<0.1) {
 			m_DeltaAlpha = 0.1;
 			m_ctrlDeltaAlpha.SetValue(0.1);
 		}
 	}
-	else{
+	else if(m_Type==4)
+	{
 		m_QInf0     = m_ctrlAlpha.GetValue()/pFrame->m_mstoUnit;
 		m_QInfMax   = m_ctrlAlphaMax.GetValue()/pFrame->m_mstoUnit;
 		m_DeltaQInf = abs(m_ctrlDeltaAlpha.GetValue())/pFrame->m_mstoUnit;
-		if(fabs(m_DeltaQInf)<0.1) {
+		if(abs(m_DeltaQInf)<0.1) {
 			m_DeltaQInf = 1.0;
 			m_ctrlDeltaAlpha.SetValue(1.0);
+		}
+	}
+	else if(m_Type==5)
+	{
+		m_Control0     = m_ctrlAlpha.GetValue()/pFrame->m_mstoUnit;
+		m_ControlMax   = m_ctrlAlphaMax.GetValue()/pFrame->m_mstoUnit;
+		m_DeltaControl = abs(m_ctrlDeltaAlpha.GetValue())/pFrame->m_mstoUnit;
+		if(abs(m_DeltaControl)<0.001)
+		{
+			m_DeltaControl = 0.01;
+			m_ctrlDeltaAlpha.SetValue(0.001);
 		}
 	}
 }
@@ -414,26 +433,29 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 	if(m_bInitCalc)             m_ctrlInitCalc.SetCheck(1);    else m_ctrlInitCalc.SetCheck(0);
 	if(pMiarex->m_bStoreWOpp)   m_ctrlStoreWOpp.SetCheck(1);   else m_ctrlStoreWOpp.SetCheck(0);
 
-	if(pWPolar  && !pWPolar->m_bPolar){//we have a control polar
-		m_ctrlSpec.SetWindowText("Ctrl");
-		m_ctrlSpec.SetFont(&m_StdFont);
-		m_ctrlAlpha.SetValue(0.0);
-		m_ctrlAlphaMax.SetValue(1.0);
-		m_ctrlDeltaAlpha.SetValue(0.1);
-	}
-	else if (!pWPolar || (pWPolar && pWPolar->m_Type !=4)){
+	if (!pWPolar || (pWPolar && pWPolar->m_Type <3))
+	{
 		m_ctrlSpec.SetWindowText("a");
 		m_ctrlSpec.SetFont(&m_SymbolFont);
 		m_ctrlAlpha.SetValue(m_Alpha0);
 		m_ctrlAlphaMax.SetValue(m_AlphaMax);
 		m_ctrlDeltaAlpha.SetValue(m_DeltaAlpha);
 	}
-	else if(pWPolar  && pWPolar->m_Type ==4){
+	else if(pWPolar  && pWPolar->m_Type ==4)
+	{
 		m_ctrlSpec.SetWindowText("VInf");
 		m_ctrlSpec.SetFont(&m_StdFont);
 		m_ctrlAlpha.SetValue(m_QInf0*pFrame->m_mstoUnit);
 		m_ctrlAlphaMax.SetValue(m_QInfMax*pFrame->m_mstoUnit);
 		m_ctrlDeltaAlpha.SetValue(m_DeltaQInf*pFrame->m_mstoUnit);
+	}
+	else if(pWPolar  && pWPolar->m_Type ==5)
+	{
+		m_ctrlSpec.SetWindowText("t");
+		m_ctrlSpec.SetFont(&m_StdFont);
+		m_ctrlAlpha.SetValue(m_Control0);
+		m_ctrlAlphaMax.SetValue(m_ControlMax);
+		m_ctrlDeltaAlpha.SetValue(m_DeltaControl);
 	}
 }
 

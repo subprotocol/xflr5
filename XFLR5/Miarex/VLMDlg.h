@@ -24,7 +24,6 @@
 //
 
 #include "VLMThread.h"
-#include "WPolar.h"
 #include "Plane.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -36,6 +35,7 @@ class CVLMDlg : public CDialog
 	friend class CMiarex;
 	friend class CWOperDlgBar;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CVLMThread;
 	friend class CPOperDlgBar;
 // Construction
@@ -72,11 +72,12 @@ public:
 	void SetFileHeader();
 	void EndSequence();
 
-	bool VLMCreateRHS(double V0, double VDelta, int nval);
+	bool VLMCreateRHS(double V0);
 	bool VLMCreateMatrix();
+	bool VLMSolveDouble();
 	bool VLMSolveMultiple(double V0, double VDelta, int nval);
 
-	void VLMRotateGeomY(double Angle, CVector P);
+	double VLMComputeCm(double alpha, bool bTrace=false);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 	void VLMSetAi(double *Gamma);
 	void VLMSumForces(double *Gamma, double Alpha, double QInf, double &Lift, double &Drag);
@@ -116,13 +117,13 @@ protected:
 	double *m_RHS;
 	double *m_aij;
 	double *m_Gamma;
+	double m_cosRHS[VLMMATSIZE], m_sinRHS[VLMMATSIZE];
 	double m_Cp[VLMMATSIZE];//lift coef per panel
 	double m_VLMQInf[100];
-	double m_OpAlpha;
+	double m_OpAlpha, m_Ctrl;
 	double m_QInf, m_QInfMax, m_DeltaQInf;
+	double m_Control, m_ControlMax, m_DeltaControl;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
-//	double m_Ai[MAXSTATIONS+1];//Induced angles, in degrees
-//	double m_ICd[MAXSTATIONS];
 	double m_CL, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
 	double Omega;

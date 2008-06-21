@@ -120,10 +120,8 @@ BOOL C3DPanelDlg::OnInitDialog()
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 	str = strAppDirectory + "XFLR5.log";
 	BOOL bOpen = m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	if(bOpen) m_bXFile = true;
@@ -134,6 +132,7 @@ BOOL C3DPanelDlg::OnInitDialog()
 	m_bWarning  = false;
 
 	SetFileHeader();
+
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
@@ -195,6 +194,8 @@ BOOL C3DPanelDlg::OnInitDialog()
 
 	if(m_pWPolar->m_AnalysisType==3) 
 		StartPanelThread();
+
+CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 
 	SetTimer(ID_THREADTIMER, 100, NULL);
 	return FALSE;
@@ -287,18 +288,19 @@ void C3DPanelDlg::EndSequence()
 	m_bXFile = false;
 	m_XFile.Close();
 	if(m_bWarning && pMiarex->m_bLogFile){
-		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL)){
+		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL))
+		{
 			CFile lf;
 			CString str;
 			CString strAppDirectory;
 			char    szAppPath[MAX_PATH] = "";
-			::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-			// Extract directory
+			GetTempPath(MAX_PATH,szAppPath);
 			strAppDirectory = szAppPath;
-			strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
-			str =strAppDirectory + "XFLR5.log";
+			str = strAppDirectory + "XFLR5.log";
 
-			if(lf.Open(str, CFile::modeRead)){// file exists (there should be a better way to do this)
+			if(lf.Open(str, CFile::modeRead))
+			{
+				// file exists (there should be a better way to do this)
 				lf.Close();
 				
 				ShellExecute(GetSafeHwnd(),
@@ -540,6 +542,7 @@ void C3DPanelDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CV
 	double phi, sign;
 	CVector Vw[MAXSTATIONS];
 	VT.Set(0.0,0.0,0.0);
+		CVector VR, VL;
 
 	for (pp=0; pp<m_MatSize;pp++)
 	{
@@ -562,9 +565,14 @@ void C3DPanelDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CV
 			pw = m_pPanel[pp].m_iWake;
 			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
 			{
+if(pp==35 || pp==43)
+double nada=0.0;
 				GetDoubletInfluence(C, m_pWakePanel+pw+lw, V, phi, true);
 				VT += V * Mu[pp] * sign;
 			}	
+//if(pp<36 && bTrace)  VL += V * Mu[pp] * sign;
+//else if (bTrace)     VR += V * Mu[pp] * sign;
+//if(bTrace) TRACE("%14.5e     %14.5e     %14.5e     \n",  V.x * Mu[pp] * sign,  V.y * Mu[pp] * sign,  V.z * Mu[pp] * sign);
 		}
 	}
 }
@@ -851,7 +859,6 @@ bool C3DPanelDlg::CreateWakeContribution()
 	}
 	m_Progress += 2;
 
-//double row[VLMMATSIZE]; memcpy(row, m_aij, sizeof(row));
 	return true;
 }
 
@@ -1315,8 +1322,8 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 				m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_XCmRef, m_pWPolar->m_bTiltedGeom);
 
 			//the body does not shed any wake--> no induced lift or drag
-//			Lift  += WingLift;
-//			IDrag += WingIDrag;
+			//			Lift  += WingLift;
+			//			IDrag += WingIDrag;
 		}
 	
 		if(!m_bTrefftz)
@@ -2066,7 +2073,11 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 						+ mu1 *(x2-x0)       /(x1-x0)/(x1-x2) 
 						+ mu2 *(2.0*x2-x0-x1)/(x2-x0)/(x2-x1);
 			}
-			else ASSERT(FALSE);
+			else 
+			{
+				//calculate the derivative on two panels only
+				DELQ = -(Mu[PL]-Mu[p])/(m_pPanel[p].SMQ  + m_pPanel[PL].SMQ);
+			}
 		}
 		else if(PL<0 && PR>=0)
 		{
@@ -2083,15 +2094,22 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 						+ mu1 *(x0-x2)       /(x1-x0)/(x1-x2) 
 						+ mu2 *(x0-x1)       /(x2-x0)/(x2-x1);
 			}
-			else ASSERT(FALSE);
+			else
+			{
+				//calculate the derivative on two panels only
+				DELQ = (Mu[PR]-Mu[p])/(m_pPanel[p].SMQ  + m_pPanel[PR].SMQ);
+			}
 		}
-		else {
+		else 
+		{
 			DELQ = 0.0;
-//			ASSERT(FALSE);
+			//Cannot calculate a derivative on one panel only
 		}
 
-		if(PU>=0 && PD>=0){
-			//we have two upstream and downstream neighbours
+
+		if(PU>=0 && PD>=0)
+		{
+			//we have one upstream and one downstream neighbour
 			x1  = 0.0;
 			x0  = x1 - m_pPanel[p].SMP - m_pPanel[PU].SMP;
 			x2  = x1 + m_pPanel[p].SMP + m_pPanel[PD].SMP;
@@ -2102,10 +2120,12 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 					+ mu1 *(2.0*x1-x0-x2)/(x1-x0)/(x1-x2) 
 					+ mu2 *(x1-x0)       /(x2-x0)/(x2-x1);
 		}
-		else if(PU>=0 && PD<0){
+		else if(PU>=0 && PD<0)
+		{
 			// no downstream neighbour
 			// do we have two upstream neighbours ?
-			if(m_pPanel[PU].m_iPU>=0){
+			if(m_pPanel[PU].m_iPU>=0)
+			{
 				x2  = 0.0;
 				x1  = x2 - m_pPanel[p ].SMP  - m_pPanel[PU].SMP;
 				x0  = x1 - m_pPanel[PU].SMP  - m_pPanel[m_pPanel[PU].m_iPU].SMP;
@@ -2116,12 +2136,18 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 						+ mu1 *(x2-x0)       /(x1-x0)/(x1-x2) 
 						+ mu2 *(2.0*x2-x0-x1)/(x2-x0)/(x2-x1);
 			}
-			else ASSERT(FALSE);
+			else
+			{
+				//calculate the derivative on two panels only
+				DELP = -(Mu[PU]-Mu[p])/(m_pPanel[p].SMP  + m_pPanel[PU].SMP);
+			}
 		}
-		else if(PU<0 && PD>=0){
+		else if(PU<0 && PD>=0)
+		{
 			// no upstream neighbour
 			// do we have two downstream neighbours ?
-			if(m_pPanel[PD].m_iPD>=0){
+			if(m_pPanel[PD].m_iPD>=0)
+			{
 				x0  = 0.0;
 				x1  = x0 + m_pPanel[p].SMP  + m_pPanel[PD].SMP;
 				x2  = x1 + m_pPanel[PD].SMP + m_pPanel[m_pPanel[PD].m_iPD].SMP;
@@ -2132,7 +2158,11 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 						+ mu1 *(x0-x2)       /(x1-x0)/(x1-x2) 
 						+ mu2 *(x0-x1)       /(x2-x0)/(x2-x1);
 			}
-			else ASSERT(FALSE);
+			else
+			{
+				//calculate the derivative on two panels only
+				DELP = (Mu[PD]-Mu[p])/(m_pPanel[p].SMP  + m_pPanel[PD].SMP);
+			}
 		}
 		else {
 			DELP = 0.0;
@@ -2159,6 +2189,7 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 	}
 	return true;
 }
+
 
 
 bool C3DPanelDlg::ComputeSurfSpeeds(double *Mu, double *Sigma)

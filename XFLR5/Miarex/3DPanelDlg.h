@@ -33,6 +33,7 @@ class C3DPanelDlg : public CDialog
 {
 	friend class CMiarex;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class C3DPanelThread;
 
 public:

@@ -25,23 +25,28 @@
 
 #pragma once
 
-
+#include "Quaternion.h"
 #include "../misc/Vector.h"
 
 class CPanel : public CObject  
 {
+	friend class CSurface;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CMiarex;
 	friend class CXFLR6;
 	friend class C3DPanelDlg;
 	friend class CVLMDlg;
 	friend class CBody;
+	friend class CVLMThread;
 
 public:
 	CPanel();
 	virtual ~CPanel();
 
 protected:
+	void Rotate(CVector const &HA, CVector const &H, double const&Angle);
+	void Rotate(CVector const &HA, Quaternion & Qt, double const&Angle);
 	void Reset();
 	void SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB);
 	bool Intersect(CVector const &A, CVector const &U, CVector &I, double &dist);
@@ -79,7 +84,7 @@ protected:
 
 	static CVector *s_pNode;
 	static CVector smp, smq, MidA, MidB;
-	static CVector LA, LB, TA, TB, T, V, W, P;
+	static CVector ILA, ILB, ITA, ITB, T, V, W, P, LATB, TALB;
 
 	static double m_VortexPos;//between 0 and 1
 	static double m_CtrlPos;//between 0 and 1

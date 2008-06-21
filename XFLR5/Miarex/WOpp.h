@@ -70,6 +70,7 @@ private:
 	double m_WakeFactor;
 	double m_Alpha;
 	double m_QInf;
+	double m_Ctrl;		//control variable - converged value
 	double m_Weight;
 	double m_Span;
 	double m_MAChord;
@@ -107,7 +108,6 @@ private:
 	double m_IYm;		// wing induced yawing moment
 	double m_MaxBending;		// max bending moment along the span
 	double m_XCP, m_YCP;		// centre of pressure position relative to the wing's XCref
-
 
 	CVector m_F[MAXSTATIONS];		// Stripforce
 	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge

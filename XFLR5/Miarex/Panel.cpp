@@ -34,9 +34,9 @@ double CPanel::mat[9];
 double CPanel::det;
 CVector CPanel::smp, CPanel::smq, CPanel::MidA, CPanel::MidB;
 CVector *CPanel::s_pNode;
-CVector CPanel::LA, CPanel::LB, CPanel::TA, CPanel::TB, CPanel::T, CPanel::V, CPanel::W;
+CVector CPanel::ILA, CPanel::ILB, CPanel::ITA, CPanel::ITB, CPanel::T, CPanel::V, CPanel::W;
 CVector CPanel::P;
-
+CVector CPanel::LATB, CPanel::TALB;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -86,7 +86,16 @@ CPanel::~CPanel()
 
 void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
-	//assumes the normal vector has already been set
+	LATB.x = TB.x - LA.x;
+	LATB.y = TB.y - LA.y;
+	LATB.z = TB.z - LA.z;
+	TALB.x = LB.x - TA.x;
+	TALB.y = LB.y - TA.y;
+	TALB.z = LB.z - TA.z;
+
+	Normal = LATB * TALB;
+	Area = Normal.VAbs()/2.0;
+	Normal.Normalize();
 
 	A.x = LA.x*(1.0-m_VortexPos)+TA.x*m_VortexPos;
 	A.y = LA.y*(1.0-m_VortexPos)+TA.y*m_VortexPos;
@@ -257,10 +266,10 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 	bool b1, b2, b3, b4;
 	double r,s;
 
-	LA.Copy(s_pNode[m_iLA]);
-	TA.Copy(s_pNode[m_iTA]);
-	LB.Copy(s_pNode[m_iLB]);
-	TB.Copy(s_pNode[m_iTB]);
+	ILA.Copy(s_pNode[m_iLA]);
+	ITA.Copy(s_pNode[m_iTA]);
+	ILB.Copy(s_pNode[m_iLB]);
+	ITB.Copy(s_pNode[m_iTB]);
 		
 	r = (CollPt.x-A.x)*Normal.x + (CollPt.y-A.y)*Normal.y + (CollPt.z-A.z)*Normal.z ;
 	s = U.x*Normal.x + U.y*Normal.y + U.z*Normal.z;
@@ -277,45 +286,45 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 		P.z = A.z + U.z * dist;
 
 		// P is inside the panel if on left side of each panel side
-		W.x = P.x  - TA.x;
-		W.y = P.y  - TA.y;
-		W.z = P.z  - TA.z;
-		V.x = TB.x - TA.x;
-		V.y = TB.y - TA.y;
-		V.z = TB.z - TA.z;
+		W.x = P.x  - ITA.x;
+		W.y = P.y  - ITA.y;
+		W.z = P.z  - ITA.z;
+		V.x = ITB.x - ITA.x;
+		V.y = ITB.y - ITA.y;
+		V.z = ITB.z - ITA.z;
 		T.x =  V.y * W.z - V.z * W.y;
 		T.y = -V.x * W.z + V.z * W.x;
 		T.z =  V.x * W.y - V.y * W.x;
 		if(T.x*T.x+T.y*T.y+T.z*T.z <1.0e-10 || T.x*Normal.x+T.y*Normal.y+T.z*Normal.z>=0.0) b1 = true; else b1 = false;
 
-		W.x = P.x  - TB.x;
-		W.y = P.y  - TB.y;
-		W.z = P.z  - TB.z;
-		V.x = LB.x - TB.x;
-		V.y = LB.y - TB.y;
-		V.z = LB.z - TB.z;
+		W.x = P.x  - ITB.x;
+		W.y = P.y  - ITB.y;
+		W.z = P.z  - ITB.z;
+		V.x = ILB.x - ITB.x;
+		V.y = ILB.y - ITB.y;
+		V.z = ILB.z - ITB.z;
 		T.x =  V.y * W.z - V.z * W.y;
 		T.y = -V.x * W.z + V.z * W.x;
 		T.z =  V.x * W.y - V.y * W.x;
 		if(T.x*T.x+T.y*T.y+T.z*T.z <1.0e-10 || T.x*Normal.x+T.y*Normal.y+T.z*Normal.z>=0.0) b2 = true; else b2 = false;
 
-		W.x = P.x  - LB.x;
-		W.y = P.y  - LB.y;
-		W.z = P.z  - LB.z;
-		V.x = LA.x - LB.x;
-		V.y = LA.y - LB.y;
-		V.z = LA.z - LB.z;
+		W.x = P.x  - ILB.x;
+		W.y = P.y  - ILB.y;
+		W.z = P.z  - ILB.z;
+		V.x = ILA.x - ILB.x;
+		V.y = ILA.y - ILB.y;
+		V.z = ILA.z - ILB.z;
 		T.x =  V.y * W.z - V.z * W.y;
 		T.y = -V.x * W.z + V.z * W.x;
 		T.z =  V.x * W.y - V.y * W.x;
 		if(T.x*T.x+T.y*T.y+T.z*T.z <1.0e-10 || T.x*Normal.x+T.y*Normal.y+T.z*Normal.z>=0.0) b3 = true; else b3 = false;
 
-		W.x = P.x  - LA.x;
-		W.y = P.y  - LA.y;
-		W.z = P.z  - LA.z;
-		V.x = TA.x - LA.x;
-		V.y = TA.y - LA.y;
-		V.z = TA.z - LA.z;
+		W.x = P.x  - ILA.x;
+		W.y = P.y  - ILA.y;
+		W.z = P.z  - ILA.z;
+		V.x = ITA.x - ILA.x;
+		V.y = ITA.y - ILA.y;
+		V.z = ITA.z - ILA.z;
 		T.x =  V.y * W.z - V.z * W.y;
 		T.y = -V.x * W.z + V.z * W.x;
 		T.z =  V.x * W.y - V.y * W.x;
@@ -329,6 +338,71 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 	}
 	return false;
 }
+
+void CPanel::Rotate(CVector const &HA, CVector const &H, double const &Angle)
+{
+	// HA is a point on the rotating axis
+	// H is a unit vector in the direction of the axis
+	// Alpha is the rotation angle in degrees
+
+}
+
+
+
+void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
+{
+	// HA is a point on the rotation axis
+	// for a VLM analysis, we need to rotate :
+	//     - the control point
+	//     - the vortice vector
+	//     - the vortice's end points
+
+	W.x = VortexPos.x - HA.x;
+	W.y = VortexPos.y - HA.y;
+	W.z = VortexPos.z - HA.z;
+	Qt.Conjugate(W);
+	VortexPos.x = W.x + HA.x;
+	VortexPos.y = W.y + HA.y;
+	VortexPos.z = W.z + HA.z;
+
+	W.x = CtrlPt.x - HA.x;
+	W.y = CtrlPt.y - HA.y;
+	W.z = CtrlPt.z - HA.z;
+	Qt.Conjugate(W);
+	CtrlPt.x = W.x + HA.x;
+	CtrlPt.y = W.y + HA.y;
+	CtrlPt.z = W.z + HA.z;
+
+	Qt.Conjugate(Vortex);
+
+	Normal.RotateY(angle);
+
+	//TODO ; remove ? 
+	// What's the point of A and B anyway?
+	// are they used anywhere
+
+	W.x = A.x - HA.x;
+	W.y = A.y - HA.y;
+	W.z = A.z - HA.z;
+	Qt.Conjugate(W);
+	A.x = W.x + HA.x;
+	A.y = W.y + HA.y;
+	A.z = W.z + HA.z;
+
+
+	W.x = B.x - HA.x;
+	W.y = B.y - HA.y;
+	W.z = B.z - HA.z;
+	Qt.Conjugate(W);
+	B.x = W.x + HA.x;
+	B.y = W.y + HA.y;
+	B.z = W.z + HA.z;
+
+
+}
+
+
+
 
 
 

@@ -134,7 +134,6 @@ private:
 
 	CWing* m_pWing;
 	CPlane * m_pPlane;
-	CWPolar *m_pWPolar;
 
 	CString m_WPolarName;
 	CString m_UFOName;

@@ -91,8 +91,13 @@ CSurface::CSurface()
 	m_bIsCenterSurf = false;
 	m_bJoinRight    = true;
 
+	m_nFlapNodes  = 0;
+	m_nFlapPanels = 0;
+
 	memset(m_xPointA, 0, sizeof(m_xPointA));
 	memset(m_xPointB, 0, sizeof(m_xPointB));
+	memset(m_FlapNode, 0, sizeof(m_FlapNode));
+	memset(m_FlapPanel, 0, sizeof(m_FlapPanel));
 }
 
 CSurface::~CSurface()
@@ -119,23 +124,14 @@ void CSurface::GetC4(int k, CVector &Pt, double &tau)
 	tau = sqrt((Pt.y-m_LA.y)*(Pt.y-m_LA.y)+(Pt.z-m_LA.z)*(Pt.z-m_LA.z))/m_Length;
 }
 
-double CSurface::GetTwist(int k)
+double CSurface::GetTwist(int const &k)
 {
 	GetPanel(k, 0, 0);
 	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
 	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
 }
-/*
-void CSurface::Getyz(int k, double &y, double &z)
-{
-	double y1, y2;
-	GetyDist(k,y1,y2);
-	GetPoint(0.0, 0.0, y1, LA);
-	GetPoint(0.0, 0.0, y2, LB);
 
-	y = (LA.y+LB.y)/2.0;
-	z = (LA.z+LB.z)/2.0;
-}*/
+
 
 void CSurface::GetNormal(double yrel, CVector &N)
 {
@@ -168,14 +164,14 @@ void CSurface::SetTwist()
 	NormalB.RotateY(O, m_TwistB);
 }
 
-double CSurface::GetChord(int k)
+double CSurface::GetChord(int const &k)
 {
 	double y1, y2;
 	GetyDist(k, y1, y2);
 	return GetChord((y1+y2)/2.0);
 }
 
-double CSurface::GetChord(double tau)
+double CSurface::GetChord(double const &tau)
 {
 	//assumes LA-TB have already been loaded
 	CVector V1, V2;
@@ -188,7 +184,7 @@ double CSurface::GetChord(double tau)
 	return ChordA + (ChordB-ChordA) * abs(tau);
 }
 
-double CSurface::GetOffset(double tau)
+double CSurface::GetOffset(double const &tau)
 {
 	//chord spacing
 	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
@@ -225,7 +221,7 @@ void CSurface::Init()
 	Normal.Normalize();
 }
 
-void CSurface::GetPanel(int k, int l, int pos)
+void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 {
 	// Assumption : side points have been set for this surface
 	// Loads the corner points of the panel k,l in PTA, PTB, PLA, PLB
@@ -286,7 +282,7 @@ void CSurface::GetPanel(int k, int l, int pos)
 
 
 
-void CSurface::GetPoint(double xArel, double xBrel, double yrel, CVector &Point, int pos)
+void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos)
 {
 	CVector APt, BPt;
 
@@ -327,7 +323,7 @@ void CSurface::GetPoint(double xArel, double xBrel, double yrel, CVector &Point,
 
 
 
-void CSurface::Copy(CSurface &Surface)
+void CSurface::Copy(CSurface const &Surface)
 {
 	m_LA.Copy(Surface.m_LA);
 	m_LB.Copy(Surface.m_LB);
@@ -358,11 +354,16 @@ void CSurface::Copy(CSurface &Surface)
 	m_bIsCenterSurf = Surface.m_bIsCenterSurf;
 	m_bJoinRight    = Surface.m_bJoinRight;
 
+	m_nFlapNodes = Surface.m_nFlapNodes;
+	m_nFlapPanels = Surface.m_nFlapPanels;
+
+	memcpy(m_FlapNode, Surface.m_FlapNode, sizeof(m_FlapNode));
+	memcpy(m_FlapPanel, Surface.m_FlapPanel, sizeof(m_FlapPanel));
 	memcpy(m_xPointA, Surface.m_xPointA, sizeof(m_xPointA));
 	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
 }
 
-void CSurface::Translate(CVector T)
+void CSurface::Translate(CVector const &T)
 {
 	m_LA.Translate(T);
 	m_LB.Translate(T);
@@ -370,7 +371,7 @@ void CSurface::Translate(CVector T)
 	m_TB.Translate(T);
 }
 
-void CSurface::RotateX(CVector O, double XTilt)
+void CSurface::RotateX(CVector const&O, double XTilt)
 {
 	m_LA.RotateX(O, XTilt);
 	m_LB.RotateX(O, XTilt);
@@ -383,7 +384,7 @@ void CSurface::RotateX(CVector O, double XTilt)
 	NormalB.RotateX(Origin, XTilt);
 }
 
-void CSurface::RotateY(CVector O, double YTilt)
+void CSurface::RotateY(CVector const &O, double YTilt)
 {
 	m_LA.RotateY(O, YTilt);
 	m_LB.RotateY(O, YTilt);
@@ -397,7 +398,7 @@ void CSurface::RotateY(CVector O, double YTilt)
 }
 
 
-void CSurface::RotateZ(CVector O, double ZTilt)
+void CSurface::RotateZ(CVector const &O, double ZTilt)
 {
 	m_LA.RotateZ(O, ZTilt);
 	m_LB.RotateZ(O, ZTilt);
@@ -410,36 +411,8 @@ void CSurface::RotateZ(CVector O, double ZTilt)
 	NormalB.RotateZ(Origin, ZTilt);
 }
 
-/*
-void CSurface::GetyDist(int k, double &y1, double &y2)
-{
-	double YPanels, dk;
-	YPanels = (double)m_NYPanels;
-	dk      = (double)k;
 
-	if(m_YDistType==1){
-		//cosine case
-		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
-		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
-	}
-	else if(m_YDistType==-2){
-		//sine case
-		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
-	}
-	else if(m_YDistType==2){
-		//-sine case
-		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
-	}
-	else{
-		//equally spaced case
-		y1 =  dk     /YPanels;
-		y2 = (dk+1.0)/YPanels;
-	}
-}*/
-
-void CSurface::GetyDist(int k, double &y1, double &y2)
+void CSurface::GetyDist(int const &k, double &y1, double &y2)
 {
 	//leading edge
 
@@ -631,7 +604,7 @@ void CSurface::GetTrailingPt(int k, CVector &C)
 }
 
 
-double CSurface::GetStripSpanPos(int k)
+double CSurface::GetStripSpanPos(int const &k)
 {
 	int  l;
 	double YPos = 0.0;
@@ -654,6 +627,105 @@ double CSurface::GetStripSpanPos(int k)
 
 	return sqrt(YPos*YPos+ZPos*ZPos);
 }
+
+void CSurface::AddFlapPanel(CPanel *pPanel)
+{
+	bool bFound = false;
+	int i;
+
+	//Add Nodes
+
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		bFound = bFound && pPanel->m_iLA==m_FlapNode[i];
+		if(pPanel->m_iLA== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iLA;
+		m_nFlapNodes++;
+	}
+
+	bFound = false;
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iLB== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iLB;
+		m_nFlapNodes++;
+	}
+
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iTA== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iTA;
+		m_nFlapNodes++;
+	}
+
+	bFound = false;
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iTB== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iTB;
+		m_nFlapNodes++;
+	}
+
+	//Add panel;
+	bFound=false;
+	for(i=0; i<m_nFlapPanels; i++)
+	{
+		if(pPanel->m_iElement==m_FlapPanel[i])
+		{
+			bFound =true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapPanel[m_nFlapPanels] = pPanel->m_iElement;
+		m_nFlapPanels++;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

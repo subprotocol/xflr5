@@ -107,16 +107,13 @@ BOOL CXFLR5App::InitInstance()
 
 	//Trace("CX5App::InitInstance::Command Line Info processed");
 
-/*
-	if (!FirstInstance(CmdInfo))
+/*	if (!FirstInstance(CmdInfo))
 	{
 		//Trace("CX5App::InitInstance::Redirected input to first instance");
 		//Trace("CX5App::InitInstance::Closing App");
 
 		return FALSE;
-
-	}
-*/
+	}*/
 
 	//Trace("CX5App::InitInstance::System time acquired");
 

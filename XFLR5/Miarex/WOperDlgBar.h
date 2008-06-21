@@ -80,6 +80,9 @@ protected:
 	double m_QInf0;
 	double m_QInfMax;
 	double m_DeltaQInf;
+	double m_Control0;
+	double m_ControlMax;
+	double m_DeltaControl;
 
 	CFont m_SymbolFont;
 	CFont m_StdFont;

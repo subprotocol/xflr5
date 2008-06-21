@@ -46,6 +46,7 @@ class CFoil  : public CObject
 	friend class CMiarex;
 	friend class CPolar;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CListPlrDlg;
 	friend class CNameDlg;
 	friend class CSF;

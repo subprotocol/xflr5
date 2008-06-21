@@ -41,7 +41,7 @@ double Quaternion::t15;
 double Quaternion::t19;
 double Quaternion::t20;
 double Quaternion::t24;
-	
+CVector Quaternion::R;	
 
 Quaternion::Quaternion(void)
 {
@@ -49,7 +49,7 @@ Quaternion::Quaternion(void)
 	theta = 0.0;
 }
 
-Quaternion::Quaternion(double t, double x, double y, double z)
+Quaternion::Quaternion(double const &t, double const &x, double const &y, double const &z)
 {
 	a=t; qx= x; qy=y; qz = z;
 	theta = 2.0*acos(t);
@@ -60,7 +60,7 @@ Quaternion::~Quaternion(void)
 }
 
 
-void Quaternion::Set(double real, double x, double y, double z)
+void Quaternion::Set(double const &real, double const &x, double const &y, double const &z)
 {	
 	a = real;
 	qx = x;
@@ -68,16 +68,30 @@ void Quaternion::Set(double real, double x, double y, double z)
 	qz = z;
 }
 
-void Quaternion::Conjugate(CVector Vin, CVector &Vout)
-{
-	//Pseudo-code for rotating using a quaternion: 
-	//given a quaternion z = a + bi + cj + dk (with |z| = 1) 
-	//and a vector v with elements v1, v2, and v3, the following code performs a rotation. 
-	//Note the use of temporary variables txx.
-	//Also note one optimization of the diagonal entries of the R matrix:
-	//since a2 + b2 + c2 + d2 = 1, rewrite the top-left entry as a2 + b2 + c2 + d2 - 2c2 - 2d2 = 1 - 2c2 - 2d2;
-	//the other two diagonal entries can be similarly rewritten.
+void Quaternion::Set(double const &Angle, CVector const &R)
+{	
+	theta = Angle*pi/180.0;
 
+	a = cos(theta/2.0);
+	double sina = sin(theta/2.0);
+
+	if(Angle>=0.0)
+	{
+	}
+	else
+	{
+		qx = -R.x*sina;
+		qy = -R.y*sina;
+		qz = -R.z*sina;
+	}
+		qx = R.x*sina;
+		qy = R.y*sina;
+		qz = R.z*sina;
+}
+
+void Quaternion::Conjugate(CVector const &Vin, CVector &Vout)
+{
+	//todo : set txx variables only at each quaternion update
 	t2 =   a*qx;
 	t3 =   a*qy;
 	t4 =   a*qz;
@@ -87,11 +101,53 @@ void Quaternion::Conjugate(CVector Vin, CVector &Vout)
 	t8 =  -qy*qy;
 	t9 =   qy*qz;
 	t10 = -qz*qz;
-	Vout.x = 2*( (t8 + t10)*Vin.x + (t6 -  t4)*Vin.y + (t3 + t7)*Vin.z ) + Vin.x;
-	Vout.y = 2*( (t4 +  t6)*Vin.x + (t5 + t10)*Vin.y + (t9 - t2)*Vin.z ) + Vin.y;
-	Vout.z = 2*( (t7 -  t3)*Vin.x + (t2 +  t9)*Vin.y + (t5 + t8)*Vin.z ) + Vin.z;
-
+	Vout.x = 2.0*( (t8 + t10)*Vin.x + (t6 -  t4)*Vin.y + (t3 + t7)*Vin.z ) + Vin.x;
+	Vout.y = 2.0*( (t4 +  t6)*Vin.x + (t5 + t10)*Vin.y + (t9 - t2)*Vin.z ) + Vin.y;
+	Vout.z = 2.0*( (t7 -  t3)*Vin.x + (t2 +  t9)*Vin.y + (t5 + t8)*Vin.z ) + Vin.z;
 }
+
+void Quaternion::Conjugate(double &x, double &y, double &z)
+{
+	R.x = x;
+	R.y = y;
+	R.z = z;
+	//todo : set txx variables only at each quaternion update
+	t2 =   a*qx;
+	t3 =   a*qy;
+	t4 =   a*qz;
+	t5 =  -qx*qx;
+	t6 =   qx*qy;
+	t7 =   qx*qz;
+	t8 =  -qy*qy;
+	t9 =   qy*qz;
+	t10 = -qz*qz;
+	x = 2.0*( (t8 + t10)*R.x + (t6 -  t4)*R.y + (t3 + t7)*R.z ) + R.x;
+	y = 2.0*( (t4 +  t6)*R.x + (t5 + t10)*R.y + (t9 - t2)*R.z ) + R.y;
+	z = 2.0*( (t7 -  t3)*R.x + (t2 +  t9)*R.y + (t5 + t8)*R.z ) + R.z;
+}
+
+
+
+void Quaternion::Conjugate(CVector &V)
+{
+	R.x = V.x;
+	R.y = V.y;
+	R.z = V.z;
+	//todo : set txx variables only at each quaternion update
+	t2 =   a*qx;
+	t3 =   a*qy;
+	t4 =   a*qz;
+	t5 =  -qx*qx;
+	t6 =   qx*qy;
+	t7 =   qx*qz;
+	t8 =  -qy*qy;
+	t9 =   qy*qz;
+	t10 = -qz*qz;
+	V.x = 2.0*( (t8 + t10)*R.x + (t6 -  t4)*R.y + (t3 + t7)*R.z ) + R.x;
+	V.y = 2.0*( (t4 +  t6)*R.x + (t5 + t10)*R.y + (t9 - t2)*R.z ) + R.y;
+	V.z = 2.0*( (t7 -  t3)*R.x + (t2 +  t9)*R.y + (t5 + t8)*R.z ) + R.z;
+}
+
 
 void Quaternion::QuattoMat(double m[][4])
 {

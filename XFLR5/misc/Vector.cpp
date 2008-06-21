@@ -189,7 +189,7 @@ CVector CVector::operator -(CVector const &V)
 	return T;
 }
 
-void CVector::RotateX(CVector O, double XTilt)
+void CVector::RotateX(CVector const &O, double XTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;
@@ -201,7 +201,7 @@ void CVector::RotateX(CVector O, double XTilt)
 	z = O.z + OP.y * sin(XTilt) + OP.z * cos(XTilt);
 }
 
-void CVector::RotateY(CVector O, double YTilt)
+void CVector::RotateY(CVector const &O, double YTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;
@@ -215,7 +215,7 @@ void CVector::RotateY(CVector O, double YTilt)
 }
 
 
-void CVector::RotateZ(CVector O, double ZTilt)
+void CVector::RotateZ(CVector const &O, double ZTilt)
 {
 	CVector OP;
 	OP.x = x-O.x;
@@ -229,7 +229,7 @@ void CVector::RotateZ(CVector O, double ZTilt)
 }
 
 void  CVector::RotateY(double YTilt)
-{		
+{
 	YTilt *=3.141592654/180.0;
 
 	double xo = x;

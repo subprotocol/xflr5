@@ -33,9 +33,9 @@ public:
 	void Set(CVector const &V);
 	void Set(double const &x0, double const &y0, double const &z0);
 	void Copy(CVector const &V);
-	void RotateX(CVector O, double XTilt);
-	void RotateY(CVector O, double YTilt);
-	void RotateZ(CVector O, double ZTilt);
+	void RotateX(CVector const &O, double XTilt);
+	void RotateY(CVector const &O, double YTilt);
+	void RotateZ(CVector const &O, double ZTilt);
 	void RotateY(double YTilt);
 	void Translate(CVector const &T);
 	bool operator ==(CVector const &V);

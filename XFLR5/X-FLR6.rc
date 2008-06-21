@@ -131,6 +131,11 @@ BEGIN
                     10
     CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,21,230,47,8
+    CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,21,242,57,10
+    CONTROL         "Plane's wings as thin surfaces",IDC_THINSURFACES,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,21,255,107,8
+    PUSHBUTTON      "Wake...",IDC_WAKEPARAMS,91,226,30,14
     CONTROL         "Wake Roll-Up",IDC_WAKEROLLUP,"Button",BS_AUTOCHECKBOX | 
                     WS_TABSTOP,92,244,57,8
     CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
@@ -176,11 +181,6 @@ BEGIN
     RTEXT           "Height =",IDC_STATIC,180,249,28,8
     LTEXT           "mm",IDC_LENGTHUNIT2,262,249,25,8
     GROUPBOX        "Options",IDC_STATIC,6,219,151,52
-    PUSHBUTTON      "Wake...",IDC_WAKEPARAMS,91,226,30,14
-    CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,21,242,57,10
-    CONTROL         "Plane's wings as thin surfaces",IDC_THINSURFACES,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,21,255,107,8
 END
 
 IDD_WINGSCALEDLG DIALOG  0, 0, 331, 193
@@ -225,7 +225,7 @@ BEGIN
     LTEXT           "mm",IDC_LUNIT2,286,77,12,8
 END
 
-IDD_WING DIALOGEX 0, 0, 552, 342
+IDD_WINGDLG DIALOGEX 0, 0, 552, 342
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
@@ -607,9 +607,9 @@ BEGIN
     LTEXT           "Drag scale",IDC_STATIC,7,29,35,8
 END
 
-IDD_SCALEDLG DIALOG  0, 0, 230, 118
+IDD_SCALEDLG DIALOGEX 0, 0, 230, 118
 STYLE DS_SETFONT | WS_CHILD
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Auto",IDC_AUTOX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
                     83,28,32,8
@@ -617,6 +617,10 @@ BEGIN
     EDITTEXT        IDC_XMAX,83,56,39,12,ES_RIGHT
     EDITTEXT        IDC_XO,83,72,39,12,ES_RIGHT
     EDITTEXT        IDC_XUNIT,83,88,39,12,ES_RIGHT
+    CONTROL         "Inverted",IDC_YINVERTED,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,155,15,47,8
+    CONTROL         "Auto",IDC_AUTOY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    155,28,32,8
     EDITTEXT        IDC_YMIN,155,39,39,12,ES_RIGHT
     EDITTEXT        IDC_YMAX,155,55,39,12,ES_RIGHT
     EDITTEXT        IDC_YO,155,71,39,12,ES_RIGHT
@@ -627,10 +631,6 @@ BEGIN
     LTEXT           "Unit",IDC_STATIC,15,90,18,8
     GROUPBOX        "X",IDC_STATIC,69,7,65,101
     GROUPBOX        "Y",IDC_STATIC,142,7,65,101
-    CONTROL         "Auto",IDC_AUTOY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    155,28,32,8
-    CONTROL         "Inverted",IDC_YINVERTED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,155,15,47,8
 END
 
 IDD_SAVEOPTIONSDLG DIALOGEX 0, 0, 186, 105
@@ -770,7 +770,6 @@ BEGIN
                     WS_TABSTOP,21,24,32,10
     COMBOBOX        IDC_BODYLIST,73,22,240,85,CBS_DROPDOWNLIST | CBS_SORT | 
                     WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Define",IDC_DEFINEWING,21,49,31,12
     PUSHBUTTON      "Import",IDC_IMPORTWING,21,64,31,12
     PUSHBUTTON      "Export",IDC_EXPORTWING,21,80,31,12
     EDITTEXT        IDC_WINGTILT,92,78,31,12,ES_RIGHT
@@ -858,6 +857,7 @@ BEGIN
     RTEXT           "z",IDC_STATIC,76,65,8,8
     LTEXT           "mm",IDC_LEN10,126,50,15,8
     LTEXT           "mm",IDC_LEN11,126,65,15,8
+    PUSHBUTTON      "Define",IDC_DEFINEWING,21,48,31,12
 END
 
 IDD_PERTDLG DIALOGEX 0, 0, 240, 239
@@ -1878,7 +1878,7 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5 v4.00 beta",IDC_STATIC,41,14,75,8,SS_NOPREFIX
+    LTEXT           "XFLR5_v405_Alpha",IDC_STATIC,41,14,175,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,219,50,14,WS_GROUP
     LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
                     IDC_STATIC,10,42,185,8
@@ -1889,7 +1889,7 @@ BEGIN
     LTEXT           "http://xflr5.sourceforge.net",IDC_SLINK,10,189,98,9
     LTEXT           "This program is distributed in the hope that it will be useful,",
                     IDC_STATIC,10,86,230,8
-    LTEXT           "Copyright (C) André Deperrois 2003-2007",IDC_STATIC,10,
+    LTEXT           "Copyright (C) André Deperrois 2003-2008",IDC_STATIC,10,
                     64,130,8
     LTEXT           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
                     IDC_STATIC,10,107,234,8
@@ -2130,6 +2130,36 @@ BEGIN
                     IDC_STATIC,7,86,172,20
 END
 
+IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 322
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Polar Analysis"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_WPOLARNAME,106,22,208,13,ES_AUTOHSCROLL
+    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,196,62,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,62,
+                    39,8
+    EDITTEXT        IDC_DENSITY,208,77,41,12,ES_RIGHT
+    EDITTEXT        IDC_VISCOSITY,208,94,41,12,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,80,300,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,194,300,50,14
+    LTEXT           "Wing Name",IDC_WINGNAME,9,11,247,8
+    RTEXT           "r =",IDC_RHO,182,78,15,13
+    LTEXT           "kg/m3",IDC_SDENSITY,258,78,41,8
+    RTEXT           "n =",IDC_NU,180,96,17,12
+    LTEXT           "m²/s",IDC_SVISCOSITY,258,96,41,8
+    GROUPBOX        "Aerodynamic Data",-1,164,48,151,63
+    LTEXT           "Unit",-1,174,62,14,8
+    LTEXT           "Polar Name",-1,9,23,72,11
+    LTEXT           "Polar Type = 5",-1,9,36,72,11
+    LTEXT           "Analysis Type is inviscid VLM2  ",-1,9,50,136,11
+    CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
+                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
+                    WS_TABSTOP,7,121,308,142,WS_EX_RIGHT
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2202,7 +2232,7 @@ BEGIN
         BOTTOMMARGIN, 186
     END
 
-    IDD_WING, DIALOG
+    IDD_WINGDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 545
@@ -2754,6 +2784,14 @@ BEGIN
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 135
+    END
+
+    IDD_CONTROLANALYSIS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 315
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 314
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -3977,11 +4015,15 @@ BEGIN
     IDS_MAC                 "M.A.C.       = %7.2f "
     IDS_TWISTTIP            "Twist at tip = %7.1f °"
     IDS_AR                  "Aspect Ratio = %7.1f"
-    IDS_TR                  "Taper Ratio  = %7.1f"
     IDS_RTTIPSWEEP          "Rt-Tip sweep = %7.1f °"
-    IDS_POINTOUT            "Point is out of the flight envelope"
     IDS_LIFTCOEF            "Lift coef. = %9.4f "
     IDS_DRAGCOEF            "Drag coef. = %9.4f "
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TR                  "Taper Ratio  = %7.1f"
+    IDS_POINTOUT            "Point is out of the flight envelope"
 END
 
 STRINGTABLE 
@@ -4330,13 +4372,17 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDS_MAXCAMBER           "Camber          = %6.2f"
+    IDS_UPPERTRANS          "Upper trans. = %9.3f"
     IDS_ROLLINGMOMENT       "Rolling Moment coef. = %9.4f "
+END
+
+STRINGTABLE 
+BEGIN
     IDS_INDUCEDMOMENT       "Induced yawing moment coef. = %9.4f "
     IDS_THICKNESS           "Thickness       = %6.2f"
     IDS_MAXTHICKNESSPOS     "Max thick. pos. = %6.2f"
-    IDS_MAXCAMBER           "Camber          = %6.2f"
     IDS_MAXCAMBERPOS        "Max camber pos. = %6.2f"
-    IDS_UPPERTRANS          "Upper trans. = %9.3f"
     IDS_LOWERTRANS          "Lower trans. = %9.3f"
     IDS_TEHINGEMOMENT       "TE Hinge Moment/span = %9.2e"
     IDS_LEHINGEMOMENT       "LE Hinge Moment/span = %9.2e"

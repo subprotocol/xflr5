@@ -31,6 +31,8 @@
 #include "stdafx.h"
 #include "../X-FLR5.h"
 #include "../misc/SettingsDlg.h"
+#include "../Miarex/WingDlg.h"
+#include "../Miarex/PlaneDlg.h"
 #include "../misc/NameDlg.h"
 #include "../misc/ToolBarDlg.h"
 #include "../misc/EditPlrDlg.h"
@@ -207,7 +209,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v4.00_beta";
+	m_VersionName = "XFLR5_v405_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -235,17 +237,23 @@ CMainFrame::CMainFrame()
 	AFoil.m_pFrame = this;
 	AFoil.m_pChildWnd = &m_wndView;
 	AFoil.m_poaFoil = &m_oaFoil;
-	AFoil.m_pXFoil  = &m_XFoil;
+	AFoil.m_pXFoil  = &m_XFoil; 
 
 	XInverse.m_pFrame =this;
 	m_FInvCtrlBar.m_pXInverse = &XInverse;
 	m_MInvCtrlBar.m_pXInverse = &XInverse;
 
-	CPlane::s_poaWing = &m_oaWing;
-	CPlane::s_poaBody  = &m_oaBody;
+	CPlaneDlg::s_poaWing = &m_oaWing;
+	CPlaneDlg::s_poaBody  = &m_oaBody;
+	CPlaneDlg::s_pMainFrame = this;
+	CPlaneDlg::s_pMiarex = &Miarex;
 
+	CPlane::s_pFrame = this;
+	CPlane::s_pMiarex = &Miarex;
 	CBody::s_pMainFrame = this;
 
+	CWingDlg::s_pFrame   = this;
+	CWingDlg::s_pMiarex  = &Miarex;
 	CWing::s_pFrame      =  this;		//pointer to the Frame window
 	CWing::s_pMiarex     = &Miarex;	//pointer to the Miarex Application window
 
@@ -3201,19 +3209,20 @@ CPolar* CMainFrame::AddPolar(CPolar *pPolar)
 void CMainFrame::SaveSettings()
 {
 	CFile fp;
-	CString str;
 
 	WINDOWPLACEMENT wndpl;
 	GetWindowPlacement(&wndpl);
 
+	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath)-1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 	str =strAppDirectory + "XFLR5.set";
-	if(fp.Open(str ,CFile::modeCreate | CFile::modeWrite)){
+
+
+	if(fp.Open(str ,CFile::modeCreate | CFile::modeWrite))
+	{
 		CArchive ar(&fp, CArchive::store);
 		ar << 100320;
 			//100320 : added window placement data
@@ -3259,22 +3268,22 @@ void CMainFrame::SaveSettings()
 		fp.Close();
 	}
 }
-
+ 
 void CMainFrame::LoadSettings()
 {
 	CFile fp;
 	WINDOWPLACEMENT wndpl;
 	int k;
+
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
- 	str =strAppDirectory + "XFLR5.set";
+	str =strAppDirectory + "XFLR5.set";
 
-	try{
+	try
+	{
 		if(fp.Open(str,CFile::modeRead)){
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
@@ -4730,9 +4739,9 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 
 		// last write the planes...
 		ar << (int)m_oaPlane.GetSize();
-		for (i=0; i<m_oaPlane.GetSize();i++){
+		for (i=0; i<m_oaPlane.GetSize();i++)
+		{
 			pPlane = (CPlane*)m_oaPlane.GetAt(i);
-			pPlane->m_pMiarex = &Miarex;
 			pPlane->SerializePlane(ar);
 		}
 
@@ -5557,6 +5566,7 @@ void CMainFrame::OnGuidelines()
 	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 
 	CString strText(strAppDirectory + "Guidelines.pdf");
+
 	hInstReturn = ShellExecute(GetSafeHwnd(),
 		_T("open"),
 		strText,
@@ -5579,11 +5589,11 @@ void CMainFrame::OnLogFile()
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
-	str =strAppDirectory + "XFLR5.log";
+	str = strAppDirectory + "XFLR5.log";
+
 
 	if(lf.Open(str, CFile::modeRead)){// file exists (there should be a better way to do this)
 		lf.Close();
@@ -5635,6 +5645,8 @@ double CMainFrame::VLMGetPlrPoint(CFoil *pFoil, double Re,
 {
 
 /*	Var 
+
+
 	0 =	m_Alpha;
 	1 = m_Cl;
 	2 = m_Cd;

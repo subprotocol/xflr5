@@ -24,21 +24,19 @@
 #include "../misc/NumEdit.h"
 
 
-// Boîte de dialogue CBodyNURBSDlg
 
 class CBodyNURBSDlg : public CDialog
 {
 	DECLARE_DYNAMIC(CBodyNURBSDlg)
 
 public:
-	CBodyNURBSDlg(CWnd* pParent = NULL);   // constructeur standard
+	CBodyNURBSDlg(CWnd* pParent = NULL);   
 	virtual ~CBodyNURBSDlg();
 
-// Données de boîte de dialogue
 	enum { IDD = IDD_BODYNURBSDLG };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // Prise en charge DDX/DDV
+	virtual void DoDataExchange(CDataExchange* pDX);   
 
 	DECLARE_MESSAGE_MAP()
 public:

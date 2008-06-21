@@ -53,16 +53,38 @@ TODO :
 	Add Cyff to Oswald calculation
 	Core implementation : investigate AVL formulation
 	Add BEND Command
-	Check All moments sign convention
 
-v4.00 March xxth, 2008
-	- Introduced 3D-Panel Method
+
+v4.05 June xxxth, 2008
+	- Improved the control analysis polar
+	
+v4.04 June 9th, 2008
+	- Corrected the inoperative animation in 3D view
+
+v4.03 June 5th, 2008
+	- Corrected the crash bug for a  number of cumulated span stations greater than 100
+	- Corrected the geometrical bug when setting a flap on a foil
+	- Changed the De-rotation for the airfoil, to take into account the flap
+
+v4.02 April 6th, 2008
+	- Corrected a 1/1.1225 factor missing in XCP calculation in VLM analysis
+	- Modified the interpolation method for on-body analysis in 3D panel, to account for special cases with panel numbers less than three in one direction
+	- Made a few cosmetic changes to body view
+	- Changed the scaling center in body view
+
+v4.01 March 24th, 2008
+	- Corrected the omission of the airfoil's contribution to the pitching moment in VLM and 3D-Panel
+	- Corrected wing surface normal calculation in case of a zero-length panel
+	- Changed the scaling center in 3D view
+
+v4.00 March 16th, 2008
+	- Introduced the 3D-Panel Method
 	- Redefined the moment coefficients - see the guidelines for details
-	- Corrected a sign error on geometric yawing moment in VLM analysis
+	- Corrected a sign error in geometric yawing moment in VLM analysis
 	- Changed the fin definition : all planes with fins will need to be redefined...
 	- Changed 3D view rotation with arcball
 	- Corrected an error in Ground effect in VLM
-	- Added Reflected curve display in XInverse 
+	- Added Reflected curve display in XInverse
 	- Added Slope tangency constraint on spline in XInverse
 	- Inverted Cp signs in VLM 3D Delta_Cp display
 	- Added option to offset the main wing in a plane design

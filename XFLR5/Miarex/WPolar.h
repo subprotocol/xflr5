@@ -37,6 +37,7 @@ class CWPolar : public CObject
 {
 	friend class CMiarex;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CPlane;
 	friend class CSurface;
 	friend class CMainFrame;
@@ -53,7 +54,7 @@ class CWPolar : public CObject
 	friend class C3DPanelDlg;
 	friend class C3DPanelThread;
 	friend class CUFOListDlg;
-
+	friend class CControlAnalysis;
 public:
 //	DECLARE_SERIAL (CWPolar);
 
@@ -139,8 +140,13 @@ private:
 	CArray <double, double> m_MaxBending;
 	CArray <double, double> m_VertPower;
 	CArray <double, double> m_Oswald;
-	CArray <double, double> m_SM;//Static Margin = (XCP-XCmRef)/m.a.c;
+	CArray <double, double> m_SM;//pseudo Static Margin = (XCP-XCmRef)/m.a.c;
+	CArray <double, double> m_Ctrl;//Ctrl variable
 
+	//control data - Type 5 polars
+	int m_nControls;
+	double m_MinControl[100], m_MaxControl[100];
+	bool   m_bActiveControl[100];
 
 	CWnd* m_pParent;
 		

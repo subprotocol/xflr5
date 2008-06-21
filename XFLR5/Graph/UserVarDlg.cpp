@@ -77,28 +77,29 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlXSel.AddString("Total pitching moment coef.");//5
 		m_ctrlXSel.AddString("Total rolling moment coef.");		//6
 		m_ctrlXSel.AddString("Total yawing moment coef.");  //7
-		m_ctrlXSel.AddString("Viscous yawing moment coef.");//9
-		m_ctrlXSel.AddString("Induced yawing moment coef.");//10
+		m_ctrlXSel.AddString("Viscous yawing moment coef.");//8
+		m_ctrlXSel.AddString("Induced yawing moment coef.");//9
 
-		m_ctrlXSel.AddString("Glide ratio Cl/Cd");			//11
-		m_ctrlXSel.AddString("Power factor Cl^(3/2)/Cd");	//12
-		m_ctrlXSel.AddString("1/Rt(Cl)");					//13
-		m_ctrlXSel.AddString("Lift");						//14
-		m_ctrlXSel.AddString("Drag");						//15
-		m_ctrlXSel.AddString("Vx");							//16
-		m_ctrlXSel.AddString("Vz");							//17
-		m_ctrlXSel.AddString("VInf");						//18
-		m_ctrlXSel.AddString("Descent angle atan(Cd/Cl)");	//19
-		m_ctrlXSel.AddString("Pitching Moment");			//20
-		m_ctrlXSel.AddString("Rolling Moment");				//21
-		m_ctrlXSel.AddString("Yawing Moment");				//22
-		m_ctrlXSel.AddString("Centre of pressure X-Pos");	//23
-		m_ctrlXSel.AddString("Centre of pressure Y-Pos");	//24
-		m_ctrlXSel.AddString("Bending moment");				//25
-		m_ctrlXSel.AddString("m.g.Vz");						//26
-		m_ctrlXSel.AddString("Oswald");						//27
-		m_ctrlXSel.AddString("(XCp-Xcg)/MAC");				//28
-
+		m_ctrlXSel.AddString("Glide ratio Cl/Cd");			//10
+		m_ctrlXSel.AddString("Power factor Cl^(3/2)/Cd");	//11
+		m_ctrlXSel.AddString("1/Rt(Cl)");					//12
+		m_ctrlXSel.AddString("Lift");						//13
+		m_ctrlXSel.AddString("Drag");						//14
+		m_ctrlXSel.AddString("Vx");							//15
+		m_ctrlXSel.AddString("Vz");							//16
+		m_ctrlXSel.AddString("VInf");						//17
+		m_ctrlXSel.AddString("Descent angle atan(Cd/Cl)");	//18
+		m_ctrlXSel.AddString("Pitching Moment");			//19
+		m_ctrlXSel.AddString("Rolling Moment");				//20
+		m_ctrlXSel.AddString("Yawing Moment");				//21
+		m_ctrlXSel.AddString("Centre of pressure X-Pos");	//22
+		m_ctrlXSel.AddString("Centre of pressure Y-Pos");	//23
+		m_ctrlXSel.AddString("Bending moment");				//24
+		m_ctrlXSel.AddString("m.g.Vz");						//25
+		m_ctrlXSel.AddString("Oswald");						//26
+		m_ctrlXSel.AddString("(XCp-Xcg)/MAC");				//27
+		m_ctrlXSel.AddString("Control Variable");			//28
+		
 		m_ctrlYSel.AddString("Alpha");						//0
 		m_ctrlYSel.AddString("Lift coef.");					//1
 		m_ctrlYSel.AddString("Viscous drag coef.");			//2
@@ -108,27 +109,29 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlYSel.AddString("Total pitching moment coef.");//5
 		m_ctrlYSel.AddString("Total rolling moment coef.");		//6
 		m_ctrlYSel.AddString("Total yawing moment coef.");  //7
-		m_ctrlYSel.AddString("Viscous yawing moment coef.");//9
-		m_ctrlYSel.AddString("Induced yawing moment coef.");//10
+		m_ctrlYSel.AddString("Viscous yawing moment coef.");//8
+		m_ctrlYSel.AddString("Induced yawing moment coef.");//9
 
-		m_ctrlYSel.AddString("Glide ratio Cl/Cd");			//11
-		m_ctrlYSel.AddString("Power factor Cl^(3/2)/Cd");	//12
-		m_ctrlYSel.AddString("1/Rt(Cl)");					//13
-		m_ctrlYSel.AddString("Lift");						//14
-		m_ctrlYSel.AddString("Drag");						//15
-		m_ctrlYSel.AddString("Vx");							//16
-		m_ctrlYSel.AddString("Vz");							//17
-		m_ctrlYSel.AddString("VInf");						//18
-		m_ctrlYSel.AddString("Descent angle atan(Cd/Cl)");	//19
-		m_ctrlYSel.AddString("Pitching Moment");			//20
-		m_ctrlYSel.AddString("Rolling Moment");				//21
-		m_ctrlYSel.AddString("Yawing Moment");				//22
-		m_ctrlYSel.AddString("Centre of pressure X-Pos");	//23
-		m_ctrlYSel.AddString("Centre of pressure Y-Pos");	//24
-		m_ctrlYSel.AddString("Bending moment");				//25
-		m_ctrlYSel.AddString("m.g.Vz");						//26
-		m_ctrlYSel.AddString("Oswald");						//27
-		m_ctrlYSel.AddString("(XCp-Xcg)/MAC");				//28
+		m_ctrlYSel.AddString("Glide ratio Cl/Cd");			//10
+		m_ctrlYSel.AddString("Power factor Cl^(3/2)/Cd");	//11
+		m_ctrlYSel.AddString("1/Rt(Cl)");					//12
+		m_ctrlYSel.AddString("Lift");						//13
+		m_ctrlYSel.AddString("Drag");						//14
+		m_ctrlYSel.AddString("Vx");							//15
+		m_ctrlYSel.AddString("Vz");							//16
+		m_ctrlYSel.AddString("VInf");						//17
+		m_ctrlYSel.AddString("Descent angle atan(Cd/Cl)");	//18
+		m_ctrlYSel.AddString("Pitching Moment");			//19
+		m_ctrlYSel.AddString("Rolling Moment");				//20
+		m_ctrlYSel.AddString("Yawing Moment");				//21
+		m_ctrlYSel.AddString("Centre of pressure X-Pos");	//22
+		m_ctrlYSel.AddString("Centre of pressure Y-Pos");	//23
+		m_ctrlYSel.AddString("Bending moment");				//24
+		m_ctrlYSel.AddString("m.g.Vz");						//25
+		m_ctrlYSel.AddString("Oswald");						//26
+		m_ctrlYSel.AddString("(XCp-Xcg)/MAC");				//27
+		m_ctrlYSel.AddString("Control Variable");			//28
+		
 	}
 	else 
 	{

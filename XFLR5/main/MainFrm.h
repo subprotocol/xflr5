@@ -55,7 +55,9 @@ class CMainFrame : public CFrameWnd
 	friend class CSelectFoilDlg;
 	friend class CWPolar;
 	friend class CWing;
+	friend class CWingDlg;
 	friend class CPlane;
+	friend class CPlaneDlg;
 	friend class CWOperDlgBar;
 	friend class CPOperDlgBar;
 	friend class CW3DBar;
@@ -75,7 +77,7 @@ class CMainFrame : public CFrameWnd
 	friend class CCtrlAnalysis;
 	friend class CBodyGridDlg;
 	friend class CBodyNURBSDlg;
-
+	friend class CControlAnalysis;
 
 public:
 	CMainFrame();

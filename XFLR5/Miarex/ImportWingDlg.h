@@ -28,7 +28,7 @@
 
 class CImportWingDlg : public CDialog
 {
-	friend class CPlane;
+	friend class CPlaneDlg;
 // Construction
 public:
 	CImportWingDlg(CWnd* pParent = NULL);   // standard constructor

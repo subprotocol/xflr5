@@ -19,6 +19,7 @@
 
 *****************************************************************************/
 
+#include "WPolar.h"
 #pragma once
 
 /////////////////////////////////////////////////////////////////////////////
@@ -50,18 +51,21 @@ public:
 protected:
 	bool AlphaLoop();
 	bool UnitLoop();
+	bool ControlLoop();
 	bool ReLoop();
 	virtual ~CVLMThread();
 
 	bool m_bFinished;
 	bool m_bCancel;
 	bool m_bSequence;
-	bool m_bType4;
 	int m_MaxWakeIter;
 	CWnd* m_pParent;
 	CWnd* m_pMiarex;
+	CWPolar *m_pWPolar;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
+	double m_Control, m_ControlMax, m_DeltaControl;
 	double m_QInf, m_QInfMax, m_DeltaQInf;
+	double pi;
 	//{{AFX_MSG(CVLMThread)
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG

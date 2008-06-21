@@ -235,6 +235,9 @@
 				RelativePath=".\misc\ClrClasses.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\ControlAnalysis.cpp">
+			</File>
+			<File
 				RelativePath=".\Miarex\CpScaleDlg.cpp">
 			</File>
 			<File
@@ -430,6 +433,9 @@
 				RelativePath=".\Miarex\Plane.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\PlaneDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\XDirect\Polar.cpp">
 			</File>
 			<File
@@ -580,6 +586,9 @@
 				RelativePath=".\Miarex\Wing.cpp">
 			</File>
 			<File
+				RelativePath=".\Miarex\WingDlg.cpp">
+			</File>
+			<File
 				RelativePath=".\Miarex\WingScaleDlg.cpp">
 			</File>
 			<File
@@ -664,6 +673,9 @@
 			</File>
 			<File
 				RelativePath=".\misc\ClrClasses.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\ControlAnalysis.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\CpScaleDlg.h">
@@ -813,6 +825,9 @@
 				RelativePath=".\Miarex\Plane.h">
 			</File>
 			<File
+				RelativePath=".\Miarex\PlaneDlg.h">
+			</File>
+			<File
 				RelativePath=".\XDirect\Polar.h">
 			</File>
 			<File
@@ -913,6 +928,9 @@
 			</File>
 			<File
 				RelativePath=".\Miarex\Wing.h">
+			</File>
+			<File
+				RelativePath=".\Miarex\WingDlg.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\WingScaleDlg.h">

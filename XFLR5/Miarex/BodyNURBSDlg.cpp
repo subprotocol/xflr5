@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 //
-// BodyNURBSDlg.cpp : fichier d'implémentation
 //
 
 #include "stdafx.h"
@@ -28,8 +27,6 @@
 #include "BodyNURBSDlg.h"
 #include ".\bodynurbsdlg.h"
 
-
-// Boîte de dialogue CBodyNURBSDlg
 
 IMPLEMENT_DYNAMIC(CBodyNURBSDlg, CDialog)
 CBodyNURBSDlg::CBodyNURBSDlg(CWnd* pParent /*=NULL*/)
@@ -56,7 +53,6 @@ BEGIN_MESSAGE_MAP(CBodyNURBSDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Gestionnaires de messages CBodyNURBSDlg
 
 BOOL CBodyNURBSDlg::OnInitDialog()
 {

@@ -25,11 +25,14 @@ class Quaternion
 {
 public:
 	Quaternion(void);
-	Quaternion(double t, double x, double y, double z);
+	Quaternion(double const &t, double const &x, double const &y, double const &z);
 	~Quaternion(void);
 
-	void Set(double angle, double x, double y, double z);
-	void Conjugate(CVector Vin, CVector &Vout);
+	void Set(double const &real, double const &x, double const &y, double const &z);
+	void Set(double const &Angle, CVector const &R);
+	void Conjugate(CVector const &Vin, CVector &Vout);
+	void Conjugate(CVector &V);
+	void Conjugate(double &x, double &y, double &z);
 	void QuattoMat(double m[][4]);
 	void Normalize();
 
@@ -42,4 +45,21 @@ public:
 	double theta;
 	double a, qx, qy,qz;
 	static double pi, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t15, t19, t20, t24;
+	static CVector R
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		;
 };

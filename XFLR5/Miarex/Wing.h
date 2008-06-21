@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Wing Class
-    Copyright (C) 2005 André Deperrois xflr5@yahoo.com
+    Copyright (C) 2005-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,19 +23,14 @@
 
 // Wing.h : header file
 //
-#include "../misc/FloatEdit.h"
-#include "../misc/NumEdit.h"
-#include "../misc/ClrClasses.h"
 #include "Surface.h"
 #include "Panel.h"
-#include "PanelListCtrl.h"
-#include "afxwin.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CWing dialog
 
 
-class CWing : public CDialog
+class CWing : public CObject
 { 
 	friend class CImportWingDlg;
 	friend class CMainFrame;
@@ -53,66 +48,23 @@ class CWing : public CDialog
 	friend class CFoilsPage;
 	friend class CVLMMeshDlg;
 	friend class CPlane;
+	friend class CPlaneDlg;
+	friend class CWingDlg;
 	friend class CNameDlg;
 	friend class CManageDlg;
 	friend class CPOperDlgBar;
 	friend class C3DPanelDlg;
 	friend class CPanelListCtrl;
 	friend class CUFOListDlg;
+	friend class CControlAnalysis;
 	// Construction
 public:
 
 	CWing(CWnd* pParent = NULL);   // standard constructor
 
-// Dialog Data
-	//{{AFX_DATA(CWing)
-	enum { IDD = IDD_WING };
-	CStatic	m_ctrlSweep;
-	CButton	m_ctrlVLMMesh;
-	CStatic	m_ctrlLength5;
-	CStatic	m_ctrlYMac;
-	CButton	m_ctrlLeftWing;
-	CButton	m_ctrlSymetric;
-	CClrBtn m_ctrlWingColor;
-	CStatic	m_ctrlArea;
-	CStatic	m_ctrlVolumeUnit;
-	CStatic	m_ctrlVolume;
-	CStatic	m_ctrlLength3;
-	CStatic	m_ctrlLength2;
-	CStatic	m_ctrlLength1;
-	CStatic m_ctrlTotal3DPanels;
-	CStatic	m_ctrlAeroChord;
-	CEdit	m_ctrlWingName;
-	CStatic	m_ctrlSpan;
-	CButton	m_ctrlCancel;
-	CButton	m_ctrlOK;
-	CNumEdit m_ctrlVLMPanels;
-	CStatic	m_ctrlMeanChord;
-	CStatic	m_ctrlTaperRatio;
-	CStatic	m_ctrlSurface;
-	CStatic	m_ctrlAspectRatio;
-	CPanelListCtrl m_ctrlPanelList;
-	//}}AFX_DATA
-
-
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CWing)
-	public:
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
- 
 // Implementation
 protected:
-	//define all we can as static, to save space
-	//static variables will be common to all wings...  
-	//... but are generated at each call to CWing::DoModal();
-	static double m_DTChord[MAXPANELS+1];// Same for display, with converted units
-	static double m_DTPos[MAXPANELS+1];
-	static double m_DTOffset[MAXPANELS+1];// b-position of each panel end
-	CSurface m_Surface[MAXVLMSURFACES];//we can have three wings at a time, wing, elev, fin
+	CSurface m_Surface[MAXVLMSURFACES];
 	double m_VLMQInf[100];
 
 	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
@@ -136,41 +88,22 @@ protected:
 	void LLTComputeWing();
 	int  LLTIterate();
 
-	CString GetFormat(double f, int precision);
-
 	void CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
 		               double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
-	void Convert(bool bSet);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
-//	void Getjkp(double y, int &j, int &k, int &p, bool b2Sides);
-	void DrawWing(CDC* pDC, CPoint O);
-	void DrawVLMMesh(CDC* pDC, CPoint O);
-	void DrawFoils(CDC* pDC, CPoint O);
-	void DrawDihedral(CDC* pDC, CPoint O);
 	void Duplicate(CWing *pWing);
 	void ComputeChords(int NStation=0);
 	void ComputeDihedrals();
 	void ComputeGeometry();
-	void FillPanelList();
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
-	void InsertSection(double TPos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, CString Foil,int NChord, int NSpan, int SSpan);
-	void SetResults();
-	void SetParams();
-	void SetSectionData();
-	void SetScale();
-	void SplitPanel(int i, double tau);
 	void SetSweep(double Sweep);
 	void SetTwist(double Twist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
-	void ReadParams();
-	void ReadSectionData(int sel);
 	bool Gauss(double *A, int n, double *B, int m);
-	bool CheckWing();
 	bool SerializeWing(CArchive& ar);
 	bool ExportAVLWing(CStdioFile *pXFile, double x, double z, double Thetax, double Thetay, double bFin);
-	int IsFoil(CPoint point);
 	double Beta(int m, int k);
 	double Eta(int m);
 	double Sigma(int m);
@@ -183,34 +116,10 @@ protected:
 	double GetTwist(double y);
 	double GetZPos(double y);
 	double Getyrel(double SpanPos);
-//	double GetViewZPos(double xrel, double y, int pos =0);
-//	double GetTopz(double x, double y);
-//	double GetBotz(double x, double y);
 	double IntegralC2(double y1, double y2, double c1, double c2);
 	double IntegralCy(double y1, double y2, double c1, double c2);
 
 
-	virtual BOOL OnInitDialog();
-	virtual void OnOK();
-	afx_msg void OnSetFocus(CWnd* pOldWnd);
-	afx_msg void OnPaint();
-	afx_msg void OnInsertBefore();
-	afx_msg void OnDeleteInput();
-	afx_msg void OnSymetric();
-	afx_msg void OnSide();
-	afx_msg void OnVLMMesh();
-	afx_msg void OnResetscale();
-	afx_msg void OnWingColor();
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	afx_msg void OnContextMenu(CWnd* pWnd , CPoint point);
-	afx_msg void OnAppend();
-	afx_msg void OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnUpdateMeshFromTotal();
 
 //__________________________Variables_______________________
 
@@ -223,8 +132,7 @@ protected:
 
 	CString m_WingName;	//the wing's name
 
-	CStdioFile * m_pXFile;	// a pointer to the output .log file
-	CFont m_FixedFont;	
+	CStdioFile * m_pXFile;	// a pointer to the output .log file	
 	
 	bool m_bInitCalc;	//
 	bool m_bVLMAutoMesh; 	// true if the mesh should be set automatically
@@ -233,8 +141,6 @@ protected:
 	bool m_bTrace;		// true if the messages need to be traces
 	bool m_bSymetric;	// true if the wing's geometry is symmetric
 	bool m_bVLMSymetric;	// true if the vlm calculation is symmetric
-	bool m_bRightSide;	// true if the wing's right side is selected for display
-	bool m_bCheckName;	// true if the wing's name should be checked 
 	bool m_bLLT;		// true if performing an LLT calculation, false if VLM
 	bool m_bTrans;		// true if the wing is being dragged 
 	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
@@ -274,14 +180,10 @@ protected:
 	double m_Maxa; 		// Used in LLT
 	double m_CvPrec;	// Precision required for LLT convergence
 	double m_RelaxMax;	// relaxation factor for LLT convergence
-	double m_fWingScale;	// scale to display the wing in the dialog box
-	double m_XCmRef;	// the reference point position for moment calculations
-
 
 	double m_VYm; 
 	double m_IYm;		// Induced Yawing Moment
 	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment
-
 
 	int m_NXPanels[MAXPANELS+1]; 		// VLM Panels along chord, for each Wing Panel
 	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
@@ -317,13 +219,9 @@ protected:
 	double m_SpanPos[MAXSTATIONS+1];	//span positions of LLT stations
 	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
 	double m_xPanel[MAXCHORDPANELS];	//chorwise position of VLM panels
-	int m_xDist[MAXCHORDPANELS];		//number of VLM panels between each flap hinge
-	int m_NHinges;				//number of different flap hinge positions across the wing
- 
-//	CVector m_GeomMoment[MAXSTATIONS+1];	//geometric pitching moment at stations
-	
-	CPanel *m_pPanel;			//pointer to the VLM Panel array
 
+
+ 	CPanel *m_pPanel;			//pointer to the VLM Panel array
 
 	CStringArray m_RFoil;			// name of the right foils
 	CStringArray m_LFoil;			// name of the left foils
@@ -331,15 +229,5 @@ protected:
 	CVector m_Vd[MAXSTATIONS];		// downwash vector at span stations
 	CVector m_F[MAXSTATIONS];		// lift vector at span stations
 
-	CRect m_DrawRect;			// the drawing rectangle in the dialog box
-
-	CPoint m_PointDown;			// the last client point wherer the user has left-clicked
-	CPoint m_ptOffset;			// the offset point to display the wing
-
 	COLORREF m_WingColor;
-
-
-	DECLARE_MESSAGE_MAP()
-
-public:
 };

@@ -40,7 +40,7 @@ public:
 	int m_nColumns;
 	int m_iItem, m_iSubItem;
 	bool m_bIsEditing;
-	CWnd *m_pWing;
+	CWnd *m_pWingDlg;
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnEndLabelEdit(NMHDR *pNMHDR, LRESULT *pResult);

@@ -95,10 +95,8 @@ BOOL CLLTDlg::OnInitDialog()
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 	str =strAppDirectory + "XFLR5.log";
 	m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	m_pWing->m_pXFile = &m_XFile;

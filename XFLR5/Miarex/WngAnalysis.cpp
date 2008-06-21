@@ -48,7 +48,6 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 	m_Height     = 0.0;
 	m_pWing	     = NULL;
 	m_pPlane     = NULL;
-	m_pWPolar    = NULL;
 
 	m_AnalysisType = 1;
 
@@ -122,7 +121,6 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 	ON_EN_KILLFOCUS(IDC_HEIGHT, OnKillFocusHeight)
 	ON_EN_KILLFOCUS(IDC_VISCOSITY, OnKillFocusViscosity)
 	ON_EN_KILLFOCUS(IDC_DENSITY, OnKillFocusDensity)
-	ON_BN_CLICKED(IDC_UNIT1, OnUnit)
 	ON_BN_CLICKED(IDC_AUTONAME, OnAutoName)
 	ON_EN_SETFOCUS(IDC_WPOLARNAME, OnSetFocusWPolarName)
 	ON_BN_CLICKED(IDC_METHOD1, OnMethod)
@@ -132,6 +130,7 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 	ON_BN_CLICKED(IDC_VLM1, OnVLMMethod)
 	ON_BN_CLICKED(IDC_WTYPE2, OnType)
 	ON_BN_CLICKED(IDC_WTYPE4, OnType)
+	ON_BN_CLICKED(IDC_UNIT1, OnUnit)
 	ON_BN_CLICKED(IDC_UNIT2, OnUnit)
 	ON_BN_CLICKED(IDC_VLM2, OnVLMMethod)
 	ON_BN_CLICKED(IDC_WAKEROLLUP, OnWakeRollUp)
@@ -268,9 +267,9 @@ BOOL CWngAnalysis::OnInitDialog()
 	EnableControls();
 	OnMethod();
 
-//	m_ctrlThinSurfaces.EnableWindow(FALSE);
-	if(m_bThinSurfaces)	m_ctrlThinSurfaces.SetCheck(TRUE);
-	else                m_ctrlThinSurfaces.SetCheck(FALSE);
+	m_ctrlThinSurfaces.EnableWindow(FALSE);
+//	if(m_bThinSurfaces)	m_ctrlThinSurfaces.SetCheck(TRUE);
+//	else                m_ctrlThinSurfaces.SetCheck(FALSE);
 
 	m_WakeParamsdlg.m_NXWakePanels    = m_NXWakePanels;
 	m_WakeParamsdlg.m_TotalWakeLength = m_TotalWakeLength;
@@ -717,8 +716,8 @@ void CWngAnalysis::OnMethod()
 		m_ctrlWakeRollUp.SetCheck(FALSE);
 		m_ctrlTiltGeom.SetCheck(FALSE);
 		m_ctrlTiltGeom.EnableWindow(false);
-		m_ctrlThinSurfaces.SetCheck(TRUE);
-		m_ctrlThinSurfaces.EnableWindow(false);
+//		m_ctrlThinSurfaces.SetCheck(TRUE);
+//		m_ctrlThinSurfaces.EnableWindow(false);
 
 //		m_ctrlWakeRollUp.EnableWindow(FALSE);
 //		m_ctrlWakeParams.EnableWindow(FALSE);
@@ -728,8 +727,8 @@ void CWngAnalysis::OnMethod()
 		m_bThinSurfaces = true;
 		m_AnalysisType=2;
 		m_ctrlTiltGeom.EnableWindow(true);
-		m_ctrlThinSurfaces.SetCheck(TRUE);
-		m_ctrlThinSurfaces.EnableWindow(false);
+//		m_ctrlThinSurfaces.SetCheck(TRUE);
+//		m_ctrlThinSurfaces.EnableWindow(false);
 
 //		m_ctrlWakeRollUp.EnableWindow(TRUE);
 //		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);
@@ -740,8 +739,8 @@ void CWngAnalysis::OnMethod()
 		m_AnalysisType=3;
 		m_ctrlTiltGeom.EnableWindow(true);
 		m_bThinSurfaces = false;
-		m_ctrlThinSurfaces.SetCheck(false);
-		m_ctrlThinSurfaces.EnableWindow(true);
+//		m_ctrlThinSurfaces.SetCheck(false);
+//		m_ctrlThinSurfaces.EnableWindow(true);
 
 //		m_ctrlWakeRollUp.EnableWindow(TRUE);
 //		if(m_bWakeRollUp)	m_ctrlWakeParams.EnableWindow(TRUE);

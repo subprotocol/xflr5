@@ -51,11 +51,12 @@ CPOpp::CPOpp()
 	m_bFin        = false;
 	m_bOut        = false;
 	m_bVLM1       = true;
-//	m_bMiddle     = true;
 
 	m_Weight              = 0.0;
 	m_Alpha               = 0.0;
 	m_QInf                = 0.0;
+	m_Ctrl                = 0.0;
+
 	memset(m_Cp, 0, sizeof(m_Cp));
 	memset(m_G,  0, sizeof(m_G));
 }

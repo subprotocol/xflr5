@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CSurface Class
-    Copyright (C) 2005 André Deperrois XFLR5@yahoo.com
+    Copyright (C) 2005-2008 André Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,37 +36,33 @@ class CSurface : public CObject
 	friend class CMainFrame;
 	friend class CVLMDlg;
 	friend class C3DPanelDlg;
+	friend class CWingDlg;
  
 public:
-	void Copy(CSurface &surface);
+	void AddFlapPanel(CPanel *pPanel);
+	void Copy(CSurface const &Surface);
 	void GetC4(int k, CVector &Pt, double &tau);
 	void GetLeadingPt(int k, CVector &C);
 	void GetNormal(double yrel, CVector &N);
 	void GetTrailingPt(int k, CVector &C);
-	void GetPanel(int k, int l, int pos);
-	void GetPoint(double xArel, double xBrel, double yrel, CVector &Point, int pos=0);
-	void GetyDist(int k, double &y1, double &y2);
-//	void Getyz(int k, double &y, double &z);
-//	void GetStripCenterPoint(int k, CVector &Point);
+	void GetPanel(int const &k, int const &l, int const &pos);
+	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos=0);
+	void GetyDist(int const &k, double &y1, double &y2);
 	void Init();
-	void RotateX(CVector O, double XTilt);
-	void RotateY(CVector O, double YTilt);
-	void RotateZ(CVector O, double ZTilt);
+	void RotateX(CVector const &O, double XTilt);
+	void RotateY(CVector const &O, double YTilt);
+	void RotateZ(CVector const &O, double ZTilt);
 	void SetNormal();
 	void SetFlap();
 	void SetSidePoints(CBody *pBody=NULL);
 	void SetTwist();
-	void Translate(CVector T);
+	void Translate(CVector const &T);
 
-//	int Getk(double srel);
-
-	double GetTwist(int k);
-//	double GetStripArea(int k);
-//	double Getdl(int k);
-	double GetChord(int k);
-	double GetChord(double tau);
-	double GetOffset(double tau);
-	double GetStripSpanPos(int k);
+	double GetTwist(int const &k);
+	double GetChord(int const &k);
+	double GetChord(double const &tau);
+	double GetOffset(double const &tau);
+	double GetStripSpanPos(int const &k);
 
 	CSurface();
 	virtual ~CSurface();
@@ -109,6 +105,10 @@ private :
 	int m_NYPanels;
 	int m_NElements;
 
-	CFoil *m_pFoilA, *m_pFoilB;
+	int m_nFlapNodes, m_nFlapPanels;
+	int m_FlapNode[100];
+	int m_FlapPanel[100];
+
+	CFoil *m_pFoilA, *m_pFoilB; //Left and right foils
 };
 

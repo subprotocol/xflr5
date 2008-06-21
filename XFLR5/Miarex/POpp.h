@@ -50,6 +50,7 @@ private:
 	CString m_PlrName;		// the polar's name to which the POpp belongs
 	
 	double m_Alpha, m_QInf; 	// angle of attack and speed 
+	double  m_Ctrl;			//Control Variable
 	double m_Weight;		// the plane's wieght
 	double m_Cp[VLMMATSIZE];	// the Cp array
 	double m_G[VLMMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
