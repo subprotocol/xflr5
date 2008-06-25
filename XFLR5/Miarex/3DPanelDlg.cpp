@@ -2168,12 +2168,12 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 			DELP = 0.0;
 //			ASSERT(FALSE);
 		}
-
 		//find middle of side 2
 		S2 = (m_pNode[m_pPanel[p].m_iTA] + m_pNode[m_pPanel[p].m_iTB])/2.0 - m_pPanel[p].CollPt;
 		//convert to local coordinates
 		Sl2   = m_pPanel[p].GlobalToLocal(S2);
 		QInfl = m_pPanel[p].GlobalToLocal(Qp);
+
 		//in panel referential
 		Vl.x = -4.0*pi*(m_pPanel[p].SMP*DELP - Sl2.y*DELQ)/Sl2.x;
 		Vl.y = -4.0*pi*DELQ;
@@ -2184,7 +2184,6 @@ bool C3DPanelDlg::ComputeOnBody(int qrhs, double Alpha)
 		Speed2 = QInfl.x*QInfl.x + QInfl.y*QInfl.y + QInfl.z*QInfl.z;
 
 		Cp[p]  = 1.0-Speed2;
-//		Cp[p]  = m_Mu[p];
 		m_Speed[p] = m_pPanel[p].LocalToGlobal(QInfl) * m_pWPolar->m_QInf;
 	}
 	return true;

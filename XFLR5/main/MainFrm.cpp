@@ -209,7 +209,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v405_Beta";
+	m_VersionName = "XFLR5_v406_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;

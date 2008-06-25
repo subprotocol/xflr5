@@ -9589,6 +9589,7 @@ LRESULT CMiarex::KickIdle()
 
 			CDC *pDC = pChildView->GetDC();
 			if(!pDC) return 0;
+
 			if(m_iView==3)
 			{
 				m_bResetglOpp      = true;
@@ -9596,6 +9597,7 @@ LRESULT CMiarex::KickIdle()
 				m_bResetglLift     = true;
 				m_bResetglDrag     = true;
 				m_bResetglWake     = true;
+				m_bResetglLegend   = true;
 				GLDraw3D(pDC);
 				GLRenderView(pDC);
 			}
@@ -15579,7 +15581,6 @@ bool CMiarex::InitializePanels()
 			}
 		}
 	}
-
 	return true;
 }
 

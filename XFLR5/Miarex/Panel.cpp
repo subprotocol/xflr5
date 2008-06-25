@@ -135,18 +135,18 @@ void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, C
 	CollPt.z = (LA.z + LB.z + TA.z + TB.z)/4.0;
 
 	//Use VSAERO figure 8. p23
-	if(m_iPos==0 || m_iPos==1 || m_iPos==100)
-	{
+//	if(m_iPos==0 || m_iPos==1 || m_iPos==100)
+//	{
 		m.x = (LB.x + TB.x) *0.5 - CollPt.x;
 		m.y = (LB.y + TB.y) *0.5 - CollPt.y;
 		m.z = (LB.z + TB.z) *0.5 - CollPt.z;
-	}
+/*	}
 	else						
 	{
 		m.x = (LA.x + TA.x) *0.5 - CollPt.x;
 		m.y = (LA.y + TA.y) *0.5 - CollPt.y;
 		m.z = (LA.z + TA.z) *0.5 - CollPt.z;
-	}
+	}*/
 	m.Normalize();
 
 	l.x =  m.y * Normal.z - m.z * Normal.y;

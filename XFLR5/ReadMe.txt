@@ -54,9 +54,12 @@ TODO :
 	Core implementation : investigate AVL formulation
 	Add BEND Command
 
-
-v4.05 June xxxth, 2008
+v4.06 June xxx, 2008
+	- Corrected display of OpPoint results in animated 3D view	
+	
+v4.05 June 23rd, 2008
 	- Improved the control analysis polar
+	- Corrected incorrect orientation of local panel vector in 3D analysis - snesitive only for very high thickness airfoils
 	
 v4.04 June 9th, 2008
 	- Corrected the inoperative animation in 3D view
