@@ -175,7 +175,8 @@ CInPlaceFloatEdit* CEditListCtrl::EditSubLabel( int nItem, int nCol )
 	dwStyle |= WS_BORDER|WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL;
 
 	CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
-	if(pEdit){
+	if(pEdit)
+	{
 		pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
 		pEdit->m_ParentList = 1;
 		pEdit->m_nColumns = m_nColumns;
@@ -348,6 +349,7 @@ void CEditListCtrl::OnEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 	}
 
 	*pResult = FALSE;
+	CWnd * pParent = GetParent();
 	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)plvDispInfo );
 }
 

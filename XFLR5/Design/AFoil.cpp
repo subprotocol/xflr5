@@ -815,6 +815,8 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 	SHORT shX = GetKeyState('X');
 	SHORT shY = GetKeyState('Y');
 
+	if(GetFocus()!=m_pChildWnd) m_pChildWnd->SetFocus();
+
 	if ((sh1 & 0x8000)||(sh2 & 0x8000)) bCtrl =true;
 
 	if(m_bZoomPlus && (nFlags & MK_LBUTTON )){
@@ -1750,15 +1752,18 @@ void CAFoil::SetPicture()
 {
 	double gap;
 
-	if(m_bSF){
+	if(m_bSF)
+	{
 		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
 		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
 
-		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++){
+		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
+		{
 			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
 			m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_StackPos].yExt[i];
 		}
-		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++){
+		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++)
+		{
 			m_pSF->m_Intrados.m_Input[i].x = m_UndoPic[m_StackPos].xInt[i];
 			m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_StackPos].yInt[i];
 		}
@@ -1766,6 +1771,7 @@ void CAFoil::SetPicture()
 		gap =   m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
 			  - m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y;
 
+		m_pSF->UpdateKnots();
 		m_pSF->Update(true);
 		m_pSF->Update(false);
 	}

@@ -278,7 +278,7 @@ private:
                        CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool VLMIsSameSide(int p, int pp);
 	bool LoadSettings(CArchive &ar);
-	bool RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode);
+//	bool RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
 	bool SetModBody(CBody *pModBody);
 	bool SetModWing(CWing *pWing);
@@ -404,7 +404,7 @@ private:
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
-	CSurface *m_pSurface[MAXVLMSURFACES];	// An array with the pointers to the diferrent wing's surfaces
+	CSurface *m_pSurface[2*MAXPANELS];	// An array with the pointers to the diferrent wing's surfaces
 
 	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
 	CControlAnalysis m_CtrlDlg;
@@ -434,7 +434,7 @@ private:
 	bool m_bIsPrinting;			// the view is being printed
 	bool m_bTrans;				// the view is being dragged
 	bool m_bDragPoint;				// a point is being dragged
-	bool m_bType1, m_bType2, m_bType4;	// polar types to be displayed
+	bool m_bType1, m_bType2, m_bType4, m_bType5, m_bType6;	// polar types to be displayed
 	bool m_bShowElliptic;			// true if the elliptic loading should be displayed in the local lift graph
 	bool m_bStoreWOpp;			// true if the WOpp should be stored after a calculation
 	bool m_bKeepOutOpps;			// true if points out of hte polar mesh should be kept

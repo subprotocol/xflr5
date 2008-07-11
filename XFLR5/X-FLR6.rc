@@ -721,19 +721,23 @@ BEGIN
     GROUPBOX        "General",IDC_STATIC,22,7,159,57
 END
 
-IDD_POLARFILTER DIALOG  0, 0, 153, 122
+IDD_POLARFILTER DIALOGEX 0, 0, 153, 122
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Polar Filter"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     CONTROL         "Type1",IDC_TYPE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    52,28,53,8
+                    21,28,53,8
     CONTROL         "Type 2",IDC_TYPE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    52,43,53,8
+                    21,43,53,8
     CONTROL         "Type 3",IDC_TYPE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    52,58,53,8
+                    21,58,53,8
     CONTROL         "Type 4",IDC_TYPE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    52,73,53,8
+                    93,28,45,8
+    CONTROL         "Type 5",IDC_TYPE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    93,43,45,8
+    CONTROL         "Type 6",IDC_TYPE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    93,58,45,8
     DEFPUSHBUTTON   "OK",IDOK,13,101,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,90,101,50,14
     LTEXT           "Show :",IDC_STATIC,15,13,32,8
@@ -780,7 +784,7 @@ BEGIN
     EDITTEXT        IDC_STABTILT,43,182,31,12,ES_RIGHT
     CONTROL         "Fin",IDC_FIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,
                     111,25,10
-    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,110,31,12
+    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,109,35,11
     EDITTEXT        IDC_XLEFIN,197,139,31,12,ES_RIGHT
     EDITTEXT        IDC_YLEFIN,197,153,31,12,ES_RIGHT
     EDITTEXT        IDC_ZLEFIN,197,167,31,12,ES_RIGHT
@@ -832,7 +836,6 @@ BEGIN
     LTEXT           "mm",IDC_LEN7,79,169,15,8
     RTEXT           "Tilt Angle",IDC_STATIC,162,184,30,8
     LTEXT           "°",IDC_SURF6,236,184,8,8
-    PUSHBUTTON      "Define",IDC_DEFINEELEV,72,110,31,12
     PUSHBUTTON      "Define",IDC_DEFINEWING2,203,50,31,12
     PUSHBUTTON      "Import",IDC_IMPORTWING2,203,65,31,12
     PUSHBUTTON      "Export",IDC_EXPORTWING2,203,79,31,12
@@ -858,6 +861,7 @@ BEGIN
     LTEXT           "mm",IDC_LEN10,126,50,15,8
     LTEXT           "mm",IDC_LEN11,126,65,15,8
     PUSHBUTTON      "Define",IDC_DEFINEWING,21,48,31,12
+    PUSHBUTTON      "Define",IDC_DEFINESTAB,83,110,35,11
 END
 
 IDD_PERTDLG DIALOGEX 0, 0, 240, 239
@@ -1878,7 +1882,7 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5_v4.06_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
+    LTEXT           "XFLR5_v4.07_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,219,50,14,WS_GROUP
     LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
                     IDC_STATIC,10,42,185,8
@@ -1912,75 +1916,6 @@ BEGIN
                     ES_READONLY | WS_VSCROLL
     CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,12,170,291,
                     9
-END
-
-IDD_CTRLANALYSIS DIALOGEX 0, 0, 316, 289
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Control Analysis"
-FONT 8, "MS Sans Serif", 0, 0, 0x0
-BEGIN
-    CONTROL         "Auto Analysis Name",IDC_AUTONAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,15,25,76,8
-    EDITTEXT        IDC_WPOLARNAME,100,23,208,13,ES_AUTOHSCROLL
-    CONTROL         "Type 1 (Fixed Speed)",IDC_WTYPE1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,18,58,83,10
-    CONTROL         "Type 2 (Fixed Lift)",IDC_WTYPE2,"Button",
-                    BS_AUTORADIOBUTTON,18,72,72,10
-    CONTROL         "Type 4 (Fixed Alpha)",IDC_WTYPE4,"Button",
-                    BS_AUTORADIOBUTTON,18,86,81,10
-    EDITTEXT        IDC_QINF,79,120,40,12,ES_RIGHT
-    EDITTEXT        IDC_WEIGHT,79,134,40,12,ES_RIGHT
-    EDITTEXT        IDC_ALPHA,79,149,40,12,ES_RIGHT
-    EDITTEXT        IDC_XCMREF,79,163,40,12,ES_RIGHT
-    CONTROL         "Classic ",IDC_VLM1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,27,198,40,10
-    CONTROL         "Quads",IDC_VLM2,"Button",BS_AUTORADIOBUTTON,27,210,37,
-                    10
-    CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,80,200,57,8
-    CONTROL         "Wake Roll-Up",IDC_WAKEROLLUP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,80,210,57,8
-    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,190,200,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,248,200,
-                    39,8
-    EDITTEXT        IDC_DENSITY,202,218,41,12,ES_RIGHT
-    EDITTEXT        IDC_VISCOSITY,202,235,41,12,ES_RIGHT
-    CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,158,50,150,54,WS_EX_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,85,267,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,188,267,50,14
-    GROUPBOX        "Polar Type",-1,7,46,144,59
-    LTEXT           "Free Stream Speed",-1,11,122,61,8
-    RTEXT           "Plane Weight",-1,17,136,55,8
-    LTEXT           "m/s",IDC_SPEEDUNIT,123,122,20,8
-    LTEXT           "kg",IDC_WEIGHTUNIT,122,136,20,8
-    RTEXT           "Root Re =",IDC_REROOT,168,136,58,8
-    RTEXT           "Tip Re =",IDC_RETIP,168,149,58,8
-    RTEXT           "Static",IDC_RRE,247,136,50,8
-    RTEXT           "Static",IDC_SRE,247,149,50,8
-    LTEXT           "Wing Name",IDC_WINGNAME,18,9,247,8
-    RTEXT           "Angle of Attack",-1,17,151,55,8
-    LTEXT           "°",-1,122,151,8,8
-    RTEXT           "Wing Loading",-1,181,122,45,8
-    RTEXT           "Static",IDC_WINGLOAD,229,122,34,8
-    LTEXT           "kg/dm²",IDC_WLUNIT,272,122,25,8
-    RTEXT           "r =",IDC_RHO,176,220,15,13
-    LTEXT           "kg/m3",IDC_SDENSITY,252,220,41,8
-    RTEXT           "n =",IDC_NU,174,237,17,12
-    LTEXT           "m²/s",IDC_SVISCOSITY,252,237,41,8
-    GROUPBOX        "Airplane and Flight Data",-1,7,107,144,77
-    GROUPBOX        "Aerodynamic Data",-1,158,186,151,69
-    LTEXT           "Unit",-1,168,200,14,8
-    GROUPBOX        "Flight Characteristics",-1,158,107,151,77
-    RTEXT           "QInf =",IDC_QINFSTAT,168,163,58,8
-    RTEXT           "Static",IDC_QINFCL,247,163,50,8
-    GROUPBOX        "VLM Solution Method",-1,7,186,144,69
-    RTEXT           "Mom. ref. location",-1,12,166,60,8
-    LTEXT           "mm",IDC_LENGTHUNIT,121,166,20,8
-    LTEXT           "Wing Controls",-1,159,38,51,8
 END
 
 IDD_WAKEPARAMSDLG DIALOGEX 0, 0, 215, 93
@@ -2130,34 +2065,49 @@ BEGIN
                     IDC_STATIC,7,86,172,20
 END
 
-IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 322
+IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 324
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Polar Analysis"
+CAPTION "Control Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_WPOLARNAME,106,22,208,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WPOLARNAME,76,22,238,13,ES_AUTOHSCROLL
+    CONTROL         "Type 5 (Fixed Speed)",IDC_WTYPE5,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,16,66,83,10
+    CONTROL         "Type 6 (Fixed Lift)",IDC_WTYPE6,"Button",
+                    BS_AUTORADIOBUTTON,106,66,72,10
+    CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,18,81,47,8
+    EDITTEXT        IDC_QINF,81,95,40,12,ES_RIGHT
+    EDITTEXT        IDC_WEIGHT,80,110,40,12,ES_RIGHT
     CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,196,62,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,62,
+                    WS_GROUP,202,62,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,260,62,
                     39,8
-    EDITTEXT        IDC_DENSITY,208,77,41,12,ES_RIGHT
-    EDITTEXT        IDC_VISCOSITY,208,94,41,12,ES_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,80,300,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,194,300,50,14
-    LTEXT           "Wing Name",IDC_WINGNAME,9,11,247,8
-    RTEXT           "r =",IDC_RHO,182,78,15,13
-    LTEXT           "kg/m3",IDC_SDENSITY,258,78,41,8
-    RTEXT           "n =",IDC_NU,180,96,17,12
-    LTEXT           "m²/s",IDC_SVISCOSITY,258,96,41,8
-    GROUPBOX        "Aerodynamic Data",-1,164,48,151,63
-    LTEXT           "Unit",-1,174,62,14,8
-    LTEXT           "Polar Name",-1,9,23,72,11
-    LTEXT           "Polar Type = 5",-1,9,36,72,11
-    LTEXT           "Analysis Type is inviscid VLM2  ",-1,9,50,136,11
+    EDITTEXT        IDC_DENSITY,225,77,41,12,ES_RIGHT
+    EDITTEXT        IDC_VISCOSITY,225,94,41,12,ES_RIGHT
     CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
                     WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,121,308,142,WS_EX_RIGHT
+                    WS_TABSTOP,7,126,308,140,WS_EX_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,80,302,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,194,302,50,14
+    LTEXT           "Wing Name",IDC_WINGNAME,9,11,247,8
+    RTEXT           "r =",IDC_RHO,197,78,15,13
+    LTEXT           "kg/m3",IDC_SDENSITY,275,78,32,8
+    RTEXT           "n =",IDC_NU,195,96,17,12
+    LTEXT           "m²/s",IDC_SVISCOSITY,275,96,31,8
+    GROUPBOX        "Aerodynamic Data",IDC_STATIC,189,48,126,63
+    LTEXT           "Polar Name",IDC_STATIC,9,23,61,11
+    LTEXT           "Polar Type = 5",IDC_STATIC,9,36,72,11
+    LTEXT           "Analysis is VLM1",IDC_STATIC,9,50,54,8
+    LTEXT           "Note 1 : if the control for XCmRef is inactive, then the minimum value will be used for the analysis",
+                    IDC_STATIC,7,270,304,8
+    LTEXT           "Note 2 : the analysis may be of the viscous type only if all flap controls are inactive",
+                    IDC_STATIC,7,281,304,8
+    LTEXT           "Free Stream Speed",IDC_STATIC,13,96,61,8
+    LTEXT           "m/s",IDC_SPEEDUNIT,129,96,20,8
+    RTEXT           "Plane Weight",IDC_STATIC,18,112,55,8
+    LTEXT           "kg",IDC_WEIGHTUNIT,128,112,20,8
 END
 
 
@@ -2733,14 +2683,6 @@ BEGIN
         BOTTOMMARGIN, 203
     END
 
-    IDD_CTRLANALYSIS, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 308
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 281
-    END
-
     IDD_WAKEPARAMSDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
@@ -2791,7 +2733,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 315
         TOPMARGIN, 7
-        BOTTOMMARGIN, 314
+        BOTTOMMARGIN, 316
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -3668,6 +3610,7 @@ BEGIN
     POPUP "&Polars"
     BEGIN
         MENUITEM "Define a Polar Analysis\t(F6)", 32779
+        MENUITEM "Define a Control Polar\t(Ctrl+F6)", IDM_CONTROLPOLAR
         POPUP "Current Polar"
         BEGIN
             MENUITEM "Edit...",                     IDM_EDITWPLR
@@ -4385,13 +4328,22 @@ BEGIN
     IDS_MAXCAMBERPOS        "Max camber pos. = %6.2f"
     IDS_LOWERTRANS          "Lower trans. = %9.3f"
     IDS_TEHINGEMOMENT       "TE Hinge Moment/span = %9.2e"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FORCEDLOWERTRANS    "Forced lower trans. = %9.3f"
+END
+
+STRINGTABLE 
+BEGIN
     IDS_LEHINGEMOMENT       "LE Hinge Moment/span = %9.2e"
 END
 
 STRINGTABLE 
 BEGIN
     IDS_AIRFOILYAWING       "Airfoil yawing moment coef. = %9.4f "
-    IDS_FLAPMOMENT          "Flap %d Moment = %6.3f "
+    IDS_FLAPMOMENT          "Wing Flap %d Moment = %6.3f "
     IDS_TOTALPANELS         "Total panels    =    %3d"
     IDS_FLAPANGLE           "Flap Angle      = %6.1f°"
     IDS_XHINGE              "XHinge          = %6.1f"
@@ -4399,11 +4351,6 @@ BEGIN
     IDS_POLARTYPE           "Polar Type = %9d"
     IDS_FOILNORMALIZATION   "The foil has been normalized from %7.3f  to 1.000"
     IDS_FORCEDUPPERTRANS    "Forced upper trans. = %9.3f"
-END
-
-STRINGTABLE 
-BEGIN
-    IDS_FORCEDLOWERTRANS    "Forced lower trans. = %9.3f"
 END
 
 STRINGTABLE 

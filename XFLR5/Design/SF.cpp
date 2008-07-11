@@ -142,14 +142,20 @@ void CSF::DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, boo
 }
 
 
+void CSF::UpdateKnots()
+{
+	m_Extrados.SplineKnots();
+	m_Intrados.SplineKnots();
+}
+
 void CSF::Update(bool bExtrados)
 {
-	if(bExtrados){
-//		m_Extrados.SplineKnots();
+	if(bExtrados)
+	{
 		m_Extrados.SplineCurve();
 	}
-	else{
-//		m_Intrados.SplineKnots();
+	else
+	{
 		m_Intrados.SplineCurve();
 	}
 	CompMidLine();

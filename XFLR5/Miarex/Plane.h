@@ -32,7 +32,7 @@ class CPlane : public CObject
 {
 	friend class CMiarex;
 	friend class CMainFrame;
-	friend class CNameDlg;
+//	friend class CNameDlg;
 	friend class CPlaneDlg;
 	friend class CPOperDlgBar;
 	friend class CVLMDlg;

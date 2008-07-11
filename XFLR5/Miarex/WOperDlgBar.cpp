@@ -218,7 +218,7 @@ void CWOperDlgBar::OnAnalyze()
 		pMiarex->Analyze(m_Alpha0, m_AlphaMax, m_DeltaAlpha, m_bSequence, m_bInitCalc);
 	else if(m_Type==4)
 		pMiarex->Analyze(m_QInf0, m_QInfMax, m_DeltaQInf, m_bSequence, m_bInitCalc);
-	else if(m_Type==5)
+	else if(m_Type==5 || m_Type==6)
 		pMiarex->Analyze(m_Control0, m_ControlMax, m_DeltaControl, m_bSequence, m_bInitCalc);
 }
 
@@ -253,7 +253,7 @@ void CWOperDlgBar::ReadParams()
 			m_ctrlDeltaAlpha.SetValue(1.0);
 		}
 	}
-	else if(m_Type==5)
+	else if(m_Type==5 || m_Type==6)
 	{
 		m_Control0     = m_ctrlAlpha.GetValue()/pFrame->m_mstoUnit;
 		m_ControlMax   = m_ctrlAlphaMax.GetValue()/pFrame->m_mstoUnit;
@@ -449,7 +449,7 @@ void CWOperDlgBar::SetParams(CWPolar *pWPolar)
 		m_ctrlAlphaMax.SetValue(m_QInfMax*pFrame->m_mstoUnit);
 		m_ctrlDeltaAlpha.SetValue(m_DeltaQInf*pFrame->m_mstoUnit);
 	}
-	else if(pWPolar  && pWPolar->m_Type ==5)
+	else if(pWPolar && (pWPolar->m_Type==5 || pWPolar->m_Type==6))
 	{
 		m_ctrlSpec.SetWindowText("t");
 		m_ctrlSpec.SetFont(&m_StdFont);

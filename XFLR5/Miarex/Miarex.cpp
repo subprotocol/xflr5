@@ -226,6 +226,9 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	CWing::m_pWakePanel = m_WakePanel;
 	CWing::m_pWakeNode = m_WakeNode;
 
+	CSurface::s_pPanel = m_Panel;
+	CSurface::s_pNode  = m_Node;
+
 	m_ArcBall.m_pGLScale = &m_GLScale;
 	m_ArcBall.m_pOffx    = &m_UFOOffset.x;
 	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
@@ -285,6 +288,8 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_bType1             = true;
 	m_bType2             = true;
 	m_bType4             = true;
+	m_bType5             = true;
+	m_bType6             = true;
 	m_bShowElliptic      = false;
 	m_bShowWing2         = true;
 	m_bShowStab          = true;
@@ -668,6 +673,7 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_WINGGRAPH1, OnWingGraph1)
 	ON_COMMAND(IDM_CPLEGEND, OnCpLegend)
 	ON_COMMAND(IDM_WANALYSIS, OnDefineAnalysis)
+	ON_COMMAND(IDM_CONTROLPOLAR, OnControlAnalysis)
 	ON_COMMAND(IDM_SHOWPOLAR, OnWPolar)
 	ON_COMMAND(IDM_EXPORTWING, OnExportWing)
 	ON_COMMAND(IDM_LOADWPLRS, OnLoadProject)
@@ -1418,8 +1424,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_XCP                 = m_VLMDlg.m_XCP;
 			pNewPoint->m_YCP                 = m_VLMDlg.m_YCP;
 
-			if(m_pCurWPolar->m_Type==5) pNewPoint->m_Ctrl = m_VLMDlg.m_Ctrl;
-			else                        pNewPoint->m_Ctrl = 0.0;
+			if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6) pNewPoint->m_Ctrl = m_VLMDlg.m_Ctrl;
+			else                                                   pNewPoint->m_Ctrl = 0.0;
 
 			for (l=0; l<m_pCurWing->m_NStation; l++)
 			{
@@ -1686,9 +1692,10 @@ CWOpp* CMiarex::GetWOpp(double Alpha)
 		pWOpp = (CWOpp*)m_poaWOpp->GetAt(i);
 		if ((pWOpp->m_WingName == m_pCurWing->m_WingName) &&(pWOpp->m_PlrName == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type<3 && abs(pWOpp->m_Alpha -Alpha)<0.001)       return pWOpp;
-			else if(m_pCurWPolar->m_Type==4 && abs(pWOpp->m_QInf - Alpha)<0.001) return pWOpp;
-			else if(m_pCurWPolar->m_Type==5 && abs(pWOpp->m_Ctrl - Alpha)<0.0001) return pWOpp;
+			if(m_pCurWPolar->m_Type<3 && abs(pWOpp->m_Alpha -Alpha)<0.01)        return pWOpp;
+			else if(m_pCurWPolar->m_Type==4 && abs(pWOpp->m_QInf - Alpha)<0.01)  return pWOpp;
+			else if(m_pCurWPolar->m_Type==5 && abs(pWOpp->m_Alpha - Alpha)<0.01) return pWOpp;
+			else if(m_pCurWPolar->m_Type==6 && abs(pWOpp->m_Alpha - Alpha)<0.01) return pWOpp;
 		}
 	}
 	return NULL;
@@ -1710,10 +1717,10 @@ CPOpp* CMiarex::GetPOpp(double Alpha)
 		pPOpp = (CPOpp*)m_poaPOpp->GetAt(i);
 		if ((pPOpp->m_PlaneName == m_pCurPlane->m_PlaneName) &&	(pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type<=3 && abs(pPOpp->m_Alpha -Alpha)<0.001)         return pPOpp;
-			else if(m_pCurWPolar->m_Type==4 && abs(pPOpp->m_QInf - Alpha)<0.001)	return pPOpp;
-			else if(m_pCurWPolar->m_Type==5 && abs(pPOpp->m_Ctrl - Alpha)<0.001)	return pPOpp;
-
+			if(m_pCurWPolar->m_Type<=3 && abs(pPOpp->m_Alpha -Alpha)<0.01)			return pPOpp;
+			else if(m_pCurWPolar->m_Type==4 && abs(pPOpp->m_QInf - Alpha)<0.01)		return pPOpp;
+			else if(m_pCurWPolar->m_Type==5 && abs(pPOpp->m_Alpha - Alpha)<0.01)	return pPOpp;
+			else if(m_pCurWPolar->m_Type==6 && abs(pPOpp->m_Alpha - Alpha)<0.01)	return pPOpp;
 		}
 	}
 	return NULL;
@@ -2370,7 +2377,8 @@ void CMiarex::DrawWPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bot
 				(pWPolar->m_Type == 1 && m_bType1 ||
 				 pWPolar->m_Type == 2 && m_bType2 ||
 				 pWPolar->m_Type == 4 && m_bType4 ||
-				 pWPolar->m_Type == 5))
+				 pWPolar->m_Type == 5 && m_bType5 ||
+				 pWPolar->m_Type == 6 && m_bType6))
 
 					UFOPlrs++;
 		}
@@ -2398,7 +2406,8 @@ void CMiarex::DrawWPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bot
 						(pWPolar->m_Type == 1 && m_bType1 ||
 						 pWPolar->m_Type == 2 && m_bType2 ||
 						 pWPolar->m_Type == 4 && m_bType4 ||
-						 pWPolar->m_Type == 5)){//is there anything to draw ?
+						 pWPolar->m_Type == 5 && m_bType5 ||
+						 pWPolar->m_Type == 6 && m_bType6)){//is there anything to draw ?
 
 						ny++ ;
 
@@ -2785,6 +2794,8 @@ void CMiarex::SaveSettings(CArchive &ar)
 	if(m_bType1)            ar << 1; else ar<<0;
 	if(m_bType2)            ar << 1; else ar<<0;
 	if(m_bType4)            ar << 1; else ar<<0;
+	if(m_bType5)            ar << 1; else ar<<0;
+	if(m_bType6)            ar << 1; else ar<<0;
 
 	if(m_bShowWing2)        ar << 1; else ar<<0;
 	if(m_bShowStab)         ar << 1; else ar<<0;
@@ -2886,7 +2897,8 @@ bool CMiarex::LoadSettings(CArchive &ar)
 	COLORREF c;
 	CString str;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	try{
+	try
+	{
 		//  we're reading/loading
 
 		if(!m_WingGraph1.Serialize(ar)) return false;
@@ -3067,6 +3079,22 @@ bool CMiarex::LoadSettings(CArchive &ar)
 			throw pfe;
 		}
 		if (k) m_bType4 = true; else m_bType4 = false;
+
+		ar >> k;
+		if(k!=0 && k!=1){
+			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+			pfe->m_strFileName = ar.m_strFileName;
+			throw pfe;
+		}
+		if (k) m_bType5 = true; else m_bType5 = false;
+
+		ar >> k;
+		if(k!=0 && k!=1){
+			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+			pfe->m_strFileName = ar.m_strFileName;
+			throw pfe;
+		}
+		if (k) m_bType6 = true; else m_bType6 = false;
 
 		ar >> k;
 		if(k!=0 && k!=1){
@@ -3713,7 +3741,8 @@ void CMiarex::CreateWPolarCurves()
 			(m_bType1 && pWPolar->m_Type == 1 ||
 			 m_bType2 && pWPolar->m_Type == 2 ||
 			 m_bType4 && pWPolar->m_Type == 4 ||
-			 pWPolar->m_Type==5 )){
+			 m_bType5 && pWPolar->m_Type==5 ||
+			 m_bType6 && pWPolar->m_Type==6)){
 
 			CCurve* pWPolarCurve = m_WPlrGraph1.AddCurve();
 			CCurve* pWCzCurve    = m_WPlrGraph2.AddCurve();
@@ -4004,12 +4033,14 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 			// we translate the legend
 			if(m_iWPlrView==1 || m_iWPlrView==4)
 			{
+				m_WPlrLegendOffset.x += Delta.x;
 				m_WPlrLegendOffset.y += Delta.y;
 				UpdateView();
 			}
 			else if(m_iWPlrView==2)
 			{
 				m_WPlrLegendOffset.x += Delta.x;
+				m_WPlrLegendOffset.y += Delta.y;
 				UpdateView();
 			}
 		}
@@ -5442,7 +5473,7 @@ void CMiarex::OnEditWing()
 		SetWPlr();
 		SetScale();
 		SetWGraphScale();
-		OnAdjustToWing();
+		OnAdjustToWing() ;
 	}
 	else 
 	{
@@ -5788,14 +5819,18 @@ void CMiarex::OnPolarFilter()
 	if (m_bType1) dlg.m_bType1 = TRUE;
 	if (m_bType2) dlg.m_bType2 = TRUE;
 	if (m_bType4) dlg.m_bType4 = TRUE;
+	if (m_bType5) dlg.m_bType5 = TRUE;
+	if (m_bType6) dlg.m_bType6 = TRUE;
 
-	if(dlg.DoModal() == IDOK){
+	if(dlg.DoModal() == IDOK)
+	{
 		if (dlg.m_bType1) m_bType1 = true;
 		else m_bType1  = false;
 		if (dlg.m_bType2) m_bType2 = true;
 		else m_bType2  = false;
-		if (dlg.m_bType4) m_bType4 = true;
-		else m_bType4  = false;
+		if (dlg.m_bType4) m_bType4 = true; else m_bType4  = false;
+		if (dlg.m_bType5) m_bType5 = true; else m_bType5  = false;
+		if (dlg.m_bType6) m_bType6 = true; else m_bType6  = false;
 		CreateWPolarCurves();
 		UpdateView();
 	}
@@ -9517,6 +9552,13 @@ void CMiarex::StopAnimate()
 
 LRESULT CMiarex::KickIdle()
 {	
+	SHORT sh1  = GetKeyState(VK_LCONTROL);
+	SHORT sh2  = GetKeyState(VK_RCONTROL);
+	if (!(sh1 & 0x8000)&& !(sh2 & 0x8000)) 
+	{
+		m_bArcball = false;
+	}
+
 	if(m_bAnimate)
 	{
 		CChildView * pChildView = (CChildView*)m_pChildWnd;
@@ -10763,7 +10805,8 @@ void CMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0)
 				i = 0;
 				for (j=0; j<pWing->m_NSurfaces; j++){//All surfaces
 					for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++){
-						m_pSurface[j+surf0]->GetTrailingPt(k, C);
+//						m_pSurface[j+surf0]->GetTrailingPt(k, C);
+						pWing->m_Surface[j].GetTrailingPt(k, C);
 						if (pWOpp->m_Vd[i].z>0) sign = 1.0; else sign = -1.0;
 						glBegin(GL_LINES);
 						{
@@ -15348,6 +15391,8 @@ bool CMiarex::InitializePanels()
 	CPanel *ptr = m_Panel;
 	for (j=0; j<m_NSurfaces; j++)
 	{
+		m_pSurface[j]->ResetFlap();
+
 		Nel = CreateElements(*(m_pSurface+j), ptr);
 
 		//reference in pPanel array the left side panels for all surfaces
@@ -15581,6 +15626,7 @@ bool CMiarex::InitializePanels()
 			}
 		}
 	}
+//	m_pSurface[1]->RotateFlap(-45);
 	return true;
 }
 
@@ -16110,7 +16156,7 @@ int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
 
 			//do not link to next surfaces... will be done in JoinSurfaces() if surfaces are continuous
 			if(k==0)                      m_Panel[m_MatSize].m_iPR = -1;
-			if(k==pSurface->m_NYPanels-1) m_Panel[m_MatSize].m_iPL =-1;
+			if(k==pSurface->m_NYPanels-1) m_Panel[m_MatSize].m_iPL = -1;
 
 			if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisType>=2)
 			{
@@ -17145,11 +17191,19 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_NPanels             = m_VLMDlg.m_MatSize;
 			pPOpp->m_Alpha               = m_VLMDlg.m_OpAlpha;
 			pPOpp->m_QInf                = m_VLMDlg.m_QInf;
-			pPOpp->m_Ctrl                = m_VLMDlg.m_Ctrl;
+			if(m_pCurWPolar->m_Type>=5)  
+			{
+				pPOpp->m_Ctrl = m_VLMDlg.m_Ctrl;
+				pWOpp->m_Ctrl = m_VLMDlg.m_Ctrl;
+			}
+			else 
+			{
+				pPOpp->m_Ctrl = 0.0;
+				pWOpp->m_Ctrl = 0.0;
+			}
 
 			pWOpp->m_Alpha               = m_VLMDlg.m_OpAlpha;
 			pWOpp->m_QInf                = m_VLMDlg.m_QInf;
-			pWOpp->m_Ctrl                = m_VLMDlg.m_Ctrl;
 			pWOpp->m_CL                  = m_VLMDlg.m_CL;
 			pWOpp->m_InducedDrag         = m_VLMDlg.m_InducedDrag;
 			pWOpp->m_ViscousDrag         = m_VLMDlg.m_ViscousDrag;
@@ -17244,9 +17298,9 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			{
 				if (pPOpp->m_PlrName == pOldPOpp->m_PlrName)
 				{
-					if(pPOpp->m_Type <3)
+					if(pPOpp->m_Type <3 || pPOpp->m_Type==5 || pPOpp->m_Type==6)
 					{
-						if(abs(pPOpp->m_Alpha - pOldPOpp->m_Alpha)<0.001)
+						if(abs(pPOpp->m_Alpha - pOldPOpp->m_Alpha)<0.01)
 						{
 							//replace existing point
 							pPOpp->m_Color = pOldPOpp->m_Color;
@@ -17316,7 +17370,8 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		pPOpp->m_Wing2WOpp.m_Width   = pPOpp->m_Width;
 		pPOpp->m_StabWOpp.m_Width    = pPOpp->m_Width;
 		pPOpp->m_FinWOpp.m_Width     = pPOpp->m_Width;
-
+		m_pCurPOpp = pPOpp;
+		m_pCurWOpp = &m_pCurPOpp->m_WingWOpp;
 	}
 	else {
 		delete pPOpp;
@@ -17728,9 +17783,10 @@ void CMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 		m_VLMDlg.m_QInfMax    = VMax;
 		m_VLMDlg.m_DeltaQInf  = VDelta;
 	}
-	else if(m_pCurWPolar->m_Type==5)
+	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
 	{
 		m_VLMDlg.m_Alpha      = m_pCurWPolar->m_ASpec;
+		m_VLMDlg.m_QInf       = m_pCurWPolar->m_QInf;
 		m_VLMDlg.m_Control       = V0;
 		m_VLMDlg.m_ControlMax    = VMax;
 		m_VLMDlg.m_DeltaControl  = VDelta;
@@ -17770,6 +17826,11 @@ void CMiarex::OnDefineAnalysis()
 
 	if (m_WngAnalysis.DoModal() == IDOK)
 	{
+		m_CtrlDlg.m_QInf      = m_WngAnalysis.m_QInf;
+		m_CtrlDlg.m_Weight    = m_WngAnalysis.m_Weight;
+		m_CtrlDlg.m_Viscosity = m_WngAnalysis.m_Viscosity;
+		m_CtrlDlg.m_Density   = m_WngAnalysis.m_Density;
+
 		//Then add WPolar to array
 		pCurWPolar->m_Type            = m_WngAnalysis.m_Type;
 		pCurWPolar->m_QInf            = m_WngAnalysis.m_QInf;
@@ -19666,10 +19727,15 @@ void CMiarex::OnControlAnalysis()
 
 	if (m_CtrlDlg.DoModal() == IDOK)
 	{
+		m_WngAnalysis.m_QInf      = m_CtrlDlg.m_QInf;
+		m_WngAnalysis.m_Weight    = m_CtrlDlg.m_Weight;
+		m_WngAnalysis.m_Viscosity = m_CtrlDlg.m_Viscosity;
+		m_WngAnalysis.m_Density   = m_CtrlDlg.m_Density;
+
 		//Then add WPolar to array
-		pCurWPolar->m_Type            = 5;
-		pCurWPolar->m_QInf            = 0.0;
-		pCurWPolar->m_Weight          = 0.0;
+		pCurWPolar->m_Type = m_CtrlDlg.m_Type;
+		pCurWPolar->m_QInf            = m_CtrlDlg.m_QInf;
+		pCurWPolar->m_Weight          = m_CtrlDlg.m_Weight;
 		pCurWPolar->m_XCmRef          = 0.0;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_PlrName         = m_CtrlDlg.m_WPolarName;
@@ -19678,7 +19744,7 @@ void CMiarex::OnControlAnalysis()
 		pCurWPolar->m_bVLM1           = true;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
-		pCurWPolar->m_bViscous        = false;
+		pCurWPolar->m_bViscous        = m_CtrlDlg.m_bViscous;
 		pCurWPolar->m_AnalysisType    = 2; //vlm2
 		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
@@ -19810,7 +19876,7 @@ void CMiarex::RotateGeomY(double const &Angle, CVector const &P)
 	}
 }
 
-
+/*
 bool CMiarex::RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode)
 {
 	//nFlap is the identification number of the flap to rotate (wing index)
@@ -19874,7 +19940,7 @@ bool CMiarex::RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CP
 	return true;
 }
 
-
+*/
 
 
 

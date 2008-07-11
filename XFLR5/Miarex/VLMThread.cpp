@@ -78,7 +78,7 @@ BOOL CVLMThread::InitInstance()
 		else                                  AlphaLoop();
 	}
 	else 	if(m_pWPolar->m_Type==4) ReLoop();
-	else 	if(m_pWPolar->m_Type==5) ControlLoop();
+	else 	if(m_pWPolar->m_Type==5 || m_pWPolar->m_Type==6) ControlLoop();
 
 	if (!m_bCancel && !pVLMDlg->m_bWarning) pVLMDlg->AddString("\r\nVLM Analysis completed successfully\r\n");
 	else if (pVLMDlg->m_bWarning)           pVLMDlg->AddString("\r\nVLM Analysis completed ... Errors encountered\r\n");
@@ -307,17 +307,21 @@ bool CVLMThread::ReLoop()
 
 bool CVLMThread::ControlLoop()
 {
-	int i, j, nrhs, iter;
+	int i, j, nrhs, iter, nCtrl;
 	CString str;
 	double t, Cm, angle;
 	double a, a0, a1, Cm0, Cm1, tmp;
 	Quaternion Quat;
+	CWing *pWing, *pStab;
 
 	CVLMDlg * pVLMDlg = (CVLMDlg*)m_pParent;
 	CMiarex * pMiarex = (CMiarex*)m_pMiarex;
 
 	CVector H(0.0, 1.0, 0.0);
 	CVector O(0.0, 0.0, 0.0);
+
+	pWing = pVLMDlg->m_pWing;
+	pStab = pVLMDlg->m_pStab;
 
 	if(m_ControlMax<m_Control) m_DeltaControl = -abs(m_DeltaControl);
 
@@ -369,10 +373,12 @@ bool CVLMThread::ControlLoop()
 
 		if(pVLMDlg->m_pPlane)
 		{
+			//wing incidence
 			if(m_pWPolar->m_bActiveControl[1])
 			{
 				//wing tilt 
 				angle = m_pWPolar->m_MinControl[1] + t * (m_pWPolar->m_MaxControl[1] - m_pWPolar->m_MinControl[1]);
+				angle -= pVLMDlg->m_pPlane->m_WingTilt;
 				Quat.Set(angle, H);
 
 				for(j=0; j<pVLMDlg->m_pWing->m_MatSize; j++)
@@ -381,10 +387,12 @@ bool CVLMThread::ControlLoop()
 				}
 			}
 
+			//elevator incidence
 			if(m_pWPolar->m_bActiveControl[2] && pVLMDlg->m_pStab)
 			{
 				//Elevator tilt 
 				angle = m_pWPolar->m_MinControl[2] + t * (m_pWPolar->m_MaxControl[2] - m_pWPolar->m_MinControl[2]);
+				angle -= pVLMDlg->m_pPlane->m_StabTilt;
 
 				Quat.Set(angle, H);
 
@@ -392,6 +400,35 @@ bool CVLMThread::ControlLoop()
 				{
 					(pVLMDlg->m_pStab->m_pPanel+j)->Rotate(pVLMDlg->m_pPlane->m_LEStab, Quat, angle);
 				}
+			}
+		}
+
+		// flap controls
+		nCtrl = 3;
+		//wing first
+		for (j=0; j<pWing->m_NSurfaces; j++)
+		{
+			if(m_pWPolar->m_bActiveControl[nCtrl])
+			{
+				angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
+
+				pWing->m_Surface[j].RotateFlap(angle);
+			}
+			nCtrl++;
+		}
+
+		//elevator next and last
+		if(pStab)
+		{
+			for (j=0; j<pStab->m_NSurfaces; j++)
+			{
+				if(m_pWPolar->m_bActiveControl[nCtrl])
+				{
+					angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
+
+					pStab->m_Surface[j].RotateFlap(angle);
+				}
+				nCtrl++;
 			}
 		}
 
@@ -435,10 +472,22 @@ bool CVLMThread::ControlLoop()
 		Cm0 = pVLMDlg->VLMComputeCm(a0*180.0/pi);
 		Cm1 = pVLMDlg->VLMComputeCm(a1*180.0/pi);
 
-		if(Cm0*Cm1>0.0) 
+		Cm = 1.0;
+
+		//are there two intial values of opposite signs ?
+		while(Cm0*Cm1>0.0 && iter <100) 
+		{
+			a0 *=0.9;
+			a1 *=0.9;
+			Cm0 = pVLMDlg->VLMComputeCm(a0*180.0/pi);
+			Cm1 = pVLMDlg->VLMComputeCm(a1*180.0/pi);
+			iter++;
+		}
+
+		if(iter>=100)
 		{
 			//no zero moment alpha
-			str.Format("\r\n\r\n No interpolation for t=%10.3f - skipping.\r\n", t);
+			str.Format("\r\n\r\n Interpolation unsuccessful for t=%10.3f - skipping.\r\n", t);
 			pVLMDlg->AddString(str);
 			pVLMDlg->m_bWarning = true;
 		}
@@ -454,7 +503,7 @@ bool CVLMThread::ControlLoop()
 				a1  = -pi/4.0; 
 			}
 
-			while (abs(Cm0-Cm1)>.0000001 && iter <100)
+			while (abs(Cm)>.0000001 && iter <100)
 			{
 				a = (a0+a1)/2.0;
 				Cm = pVLMDlg->VLMComputeCm(a*180.0/pi);
@@ -489,7 +538,6 @@ bool CVLMThread::ControlLoop()
 				pVLMDlg->AddString(str);
 				pVLMDlg->m_bWarning = true;
 			}
-
 		}
 	}
 

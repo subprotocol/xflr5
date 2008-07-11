@@ -29,7 +29,8 @@
 #include "Spline.h"
 
 
-class CSF  {
+class CSF  
+{
 	friend class CAFoil;
 	friend class CSplinesCtrlDlg;
 	friend class CAFoilCtrlBar;
@@ -57,7 +58,7 @@ private:
 	void SetViewRect(CRect rc);
 	void Update(bool bExtrados);
 	void UpdateSelected(double x, double y);
-
+	void UpdateKnots();
 
 	bool m_bModified;
 	bool m_bVisible, m_bOutPoints, m_bCenterLine;

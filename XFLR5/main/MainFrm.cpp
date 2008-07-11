@@ -209,7 +209,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v406_Beta";
+	m_VersionName = "XFLR5_v407_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -825,6 +825,8 @@ void CMainFrame::OnMiarex()
 	Miarex.SetUFO();
 
 	m_wndView.SetScale();
+
+	if(Miarex.m_iView==3 || Miarex.m_iView==5) Miarex.GLSetViewport();
 
 	if(Miarex.m_pCurWing && Miarex.m_iView==1) Miarex.OnAdjustToWing();
 	else if (Miarex.m_iView==2)                Miarex.CreateWPolarCurves();
@@ -1916,7 +1918,6 @@ void CMainFrame::UpdateWPlrs()
 //		Miarex.SetWPlr();
 	}
 }
-
 
 
 void CMainFrame::UpdateWOpps()
@@ -4472,6 +4473,12 @@ bool CMainFrame::SerializeUFOProject(CArchive &ar, CString UFOName)
 	ar << (float)Miarex.m_WngAnalysis.m_XCmRef;
 	ar << (float)Miarex.m_WngAnalysis.m_Density;
 	ar << (float)Miarex.m_WngAnalysis.m_Viscosity;
+
+	Miarex.m_CtrlDlg.m_QInf      = Miarex.m_WngAnalysis.m_QInf;
+	Miarex.m_CtrlDlg.m_Weight    = Miarex.m_WngAnalysis.m_Weight;
+	Miarex.m_CtrlDlg.m_Viscosity = Miarex.m_WngAnalysis.m_Viscosity;
+	Miarex.m_CtrlDlg.m_Density   = Miarex.m_WngAnalysis.m_Density;
+
 	ar << (float)Miarex.m_WngAnalysis.m_Alpha;
 	ar << Miarex.m_WngAnalysis.m_AnalysisType;
 

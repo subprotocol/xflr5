@@ -40,8 +40,11 @@ CPolarFilter::CPolarFilter(CWnd* pParent /*=NULL*/)
 	m_bType2 = FALSE;
 	m_bType3 = FALSE;
 	m_bType4 = FALSE;
+	m_bType5 = FALSE;
+	m_bType6 = FALSE;
 	//}}AFX_DATA_INIT
 	m_bWing  = false;
+	m_bFoil  = false;
 }
 
 
@@ -51,10 +54,14 @@ void CPolarFilter::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CPolarFilter)
 	DDX_Control(pDX, IDC_TYPE1, m_ctrlType1);
 	DDX_Control(pDX, IDC_TYPE3, m_ctrlType3);
+	DDX_Control(pDX, IDC_TYPE5, m_ctrlType5);
+	DDX_Control(pDX, IDC_TYPE6, m_ctrlType6);
 	DDX_Check(pDX, IDC_TYPE1, m_bType1);
 	DDX_Check(pDX, IDC_TYPE2, m_bType2);
 	DDX_Check(pDX, IDC_TYPE3, m_bType3);
 	DDX_Check(pDX, IDC_TYPE4, m_bType4);
+	DDX_Check(pDX, IDC_TYPE5, m_bType5);
+	DDX_Check(pDX, IDC_TYPE6, m_bType6);
 	//}}AFX_DATA_MAP
 }
 
@@ -76,5 +83,12 @@ BOOL CPolarFilter::OnInitDialog()
 
 	if(m_bWing) m_ctrlType3.EnableWindow(false);
 
+	if(m_bFoil)
+	{
+		m_ctrlType5.EnableWindow(false);
+		m_ctrlType6.EnableWindow(false);
+	}
+
 	return FALSE;  
 }
+

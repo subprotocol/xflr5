@@ -1,7 +1,7 @@
 /****************************************************************************
 
     WPolar Class
-    Copyright (C) 2005 André Deperrois XFLR5@yahoo.com
+    Copyright (C) 2005-2008 André Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -576,7 +576,7 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 				m_Oswald.Add(0.0);
 				m_SM.Add(0.0);
 
-				CalculatePoint(i);
+				CalculatePoint((int)m_Alpha.GetSize()-1);
 			}
 		}
 		if(ArchiveFormat>1012)
@@ -708,9 +708,11 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	int i;
 	int size = (int)m_Alpha.GetSize();
 
-	if(size){
-		for (i=0; i<size; i++){
-			if(m_Type !=4)
+	if(size)
+	{
+		for (i=0; i<size; i++)
+		{
+			if(m_Type <4)
 			{
 				if (abs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001)
 				{
@@ -775,7 +777,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else
+			else if (m_Type==4)
 			{
 				// type 4, sort by speed
 				if (abs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -805,6 +807,73 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				else if (pWOpp->m_QInf < m_QInfinite[i])
 				{
 					// sort by crescending alphas
+					m_Alpha.InsertAt(i, pWOpp->m_Alpha, 1);
+					m_Cl.InsertAt(i, pWOpp->m_CL);
+					m_ICd.InsertAt(i, pWOpp->m_InducedDrag, 1);
+					m_PCd.InsertAt(i, pWOpp->m_ViscousDrag, 1);
+					m_TCd.InsertAt(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
+
+					m_GCm.InsertAt(i, pWOpp->m_GCm, 1);
+					m_GRm.InsertAt(i, pWOpp->m_GRm, 1);
+					m_GYm.InsertAt(i, pWOpp->m_GYm, 1);
+					m_VYm.InsertAt(i, pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i, pWOpp->m_IYm, 1);
+
+					m_QInfinite.InsertAt(i, pWOpp->m_QInf, 1);
+					m_XCP.InsertAt(i,  pWOpp->m_XCP, 1);
+					m_YCP.InsertAt(i,  pWOpp->m_YCP, 1);
+					m_MaxBending.InsertAt(i, pWOpp->m_MaxBending);
+					m_Ctrl.InsertAt(i, pWOpp->m_Ctrl);
+
+					m_1Cl.InsertAt(i,0.0);//make room for computed values
+					m_ClCd.InsertAt(i,0.0);
+					m_Cl32Cd.InsertAt(i,0.0);
+					m_Vx.InsertAt(i,0.0);
+					m_Vz.InsertAt(i,0.0);
+					m_L.InsertAt(i,0.0);
+					m_D.InsertAt(i,0.0);
+					m_Gamma.InsertAt(i,0.0);
+					m_Rm.InsertAt(i, 0.0);
+					m_Pm.InsertAt(i, 0.0);
+					m_Ym.InsertAt(i, 0.0);
+					m_VertPower.InsertAt(i, 0.0);
+					m_Oswald.InsertAt(i, 0.0);
+					m_SM.InsertAt(i, 0.0);
+					
+					bInserted = true;
+					break;
+				}
+			}
+			else if (m_Type==5 || m_Type==6)
+			{
+				// type 5 or 6, sort by crescending ctrl value
+				if (abs(pWOpp->m_Ctrl - m_Ctrl[i]) < 0.001)
+				{
+					// then erase former result
+					m_Alpha[i]      =  pWOpp->m_Alpha;
+					m_Cl[i]         =  pWOpp->m_CL;
+					m_ICd[i]        =  pWOpp->m_InducedDrag;
+					m_PCd[i]        =  pWOpp->m_ViscousDrag;
+					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+
+					m_GCm[i]        =  pWOpp->m_GCm;
+					m_GRm[i]        =  pWOpp->m_GRm;
+					m_GYm[i]        =  pWOpp->m_GYm;
+					m_VYm[i]        =  pWOpp->m_VYm;
+					m_IYm[i]        =  pWOpp->m_IYm;
+
+					m_QInfinite[i]  = pWOpp->m_QInf;
+					m_XCP[i]        = pWOpp->m_XCP;
+					m_YCP[i]        = pWOpp->m_YCP;
+					m_MaxBending[i] = pWOpp->m_MaxBending;	
+					m_Ctrl[i]       = pWOpp->m_Ctrl;
+
+					bInserted = true;
+					break;
+				}
+				else if (pWOpp->m_Ctrl < m_Ctrl[i])
+				{
+					// sort by crescending control values
 					m_Alpha.InsertAt(i, pWOpp->m_Alpha, 1);
 					m_Cl.InsertAt(i, pWOpp->m_CL);
 					m_ICd.InsertAt(i, pWOpp->m_InducedDrag, 1);
@@ -896,7 +965,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	{
 		for (i=0; i<size; i++)
 		{
-			if(m_Type !=4)
+			if(m_Type <4)
 			{
 				if (abs(pPOpp->m_Alpha - m_Alpha[i]) < 0.001)
 				{
@@ -961,7 +1030,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					break;
 				}
 			}
-			else
+			else if(m_Type==4)
 			{
 				// type 4, sort by speed
 				if (abs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -989,7 +1058,73 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				}
 				else if (pPOpp->m_QInf < m_QInfinite[i])
 				{
-					// sort by crescending alphas
+					// sort by crescending speed
+					m_Alpha.InsertAt(i,     pWOpp->m_Alpha, 1);
+					m_Cl.InsertAt(i,        pWOpp->m_CL);
+					m_ICd.InsertAt(i,       pWOpp->m_InducedDrag, 1);
+					m_PCd.InsertAt(i,       pWOpp->m_ViscousDrag, 1);
+					m_TCd.InsertAt(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag, 1);
+
+					m_GCm.InsertAt(i,       pWOpp->m_GCm, 1);
+					m_GRm.InsertAt(i,       pWOpp->m_GRm, 1);
+					m_GYm.InsertAt(i,       pWOpp->m_GYm, 1);
+					m_VYm.InsertAt(i,       pWOpp->m_VYm, 1);
+					m_IYm.InsertAt(i,       pWOpp->m_IYm, 1);
+
+					m_QInfinite.InsertAt(i, pWOpp->m_QInf, 1);
+					m_XCP.InsertAt(i,       pWOpp->m_XCP, 1);
+					m_YCP.InsertAt(i,       pWOpp->m_YCP, 1);
+					m_MaxBending.InsertAt(i, pWOpp->m_MaxBending);
+					m_Ctrl.InsertAt(i,       pWOpp->m_Ctrl, 1);
+
+					m_1Cl.InsertAt(i,0.0);//make room for computed values
+					m_ClCd.InsertAt(i,0.0);
+					m_Cl32Cd.InsertAt(i,0.0);
+					m_Vx.InsertAt(i,0.0);
+					m_Vz.InsertAt(i,0.0);
+					m_L.InsertAt(i,0.0);
+					m_D.InsertAt(i,0.0);
+					m_Gamma.InsertAt(i,0.0);
+					m_Rm.InsertAt(i, 0.0);
+					m_Pm.InsertAt(i, 0.0);
+					m_Ym.InsertAt(i, 0.0);
+					m_VertPower.InsertAt(i, 0.0);
+					m_Oswald.InsertAt(i, 0.0);
+					m_SM.InsertAt(i, 0.0);
+
+					bInserted = true;
+					break;
+				}
+			}
+			else if(m_Type==5 || m_Type==6)
+			{
+				// type 5 or 6, sort by control value
+				if (abs(pPOpp->m_Ctrl - m_Ctrl[i]) < 0.001)
+				{
+					// then erase former result
+					m_Alpha[i]      = pWOpp->m_Alpha;
+					m_Cl[i]         = pWOpp->m_CL;
+					m_ICd[i]        = pWOpp->m_InducedDrag;
+					m_PCd[i]        = pWOpp->m_ViscousDrag;
+					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+
+					m_GCm[i]        = pWOpp->m_GCm;
+					m_GRm[i]        = pWOpp->m_GRm;
+					m_GYm[i]        = pWOpp->m_GYm;
+					m_VYm[i]        = pWOpp->m_VYm;
+					m_IYm[i]        = pWOpp->m_IYm;
+
+					m_QInfinite[i]  = pWOpp->m_QInf;
+					m_XCP[i]        = pWOpp->m_XCP;
+					m_YCP[i]        = pWOpp->m_YCP;
+					m_MaxBending[i] = pWOpp->m_MaxBending;	
+					m_Ctrl[i]       = pWOpp->m_Ctrl;
+					bInserted = true;
+					break;
+				}
+				else if (pPOpp->m_Ctrl < m_Ctrl[i])
+				{
+					// sort by crescending control values
 					m_Alpha.InsertAt(i,     pWOpp->m_Alpha, 1);
 					m_Cl.InsertAt(i,        pWOpp->m_CL);
 					m_ICd.InsertAt(i,       pWOpp->m_InducedDrag, 1);

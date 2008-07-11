@@ -64,6 +64,7 @@ class CFoil  : public CObject
 	friend class CUFOListDlg;
 	friend class OpPoint;
 	friend class CVLMDlg;
+	friend class CVLMThread;
 	friend class C3DPanelDlg;
 
 public:

@@ -58,6 +58,8 @@ CVector CSurface::LB;
 CVector CSurface::TA;
 CVector CSurface::TB;
 CVector CSurface::VTemp;
+CVector *CSurface::s_pNode;
+CPanel *CSurface::s_pPanel;
 
 CSurface::CSurface()
 {
@@ -465,6 +467,16 @@ void CSurface::SetFlap()
 	else m_posBTE = 1.0;
 
 	m_bTEFlap = m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap;
+
+	if(m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap)
+	{
+		CVector HB;
+		//create a hinge unit vector and initialize hinge moment
+		GetPoint(m_posATE, m_posBTE, 0.0, m_HingePoint, 0);
+		GetPoint(m_posATE, m_posBTE, 1.0, HB, 0);
+		m_HingeVector = HB-m_HingePoint;
+		m_HingeVector.Normalize();
+	}
 }
 
 
@@ -627,6 +639,26 @@ double CSurface::GetStripSpanPos(int const &k)
 
 	return sqrt(YPos*YPos+ZPos*ZPos);
 }
+void CSurface::ResetFlap()
+{
+	int i;
+	for(i=0; i<200; i++)
+	{
+		m_FlapPanel[i] = 30000;
+		m_FlapNode[i]  = 30000;
+	}
+	m_nFlapPanels = 0;
+	m_nFlapNodes = 0;
+}
+
+bool CSurface::IsFlapPanel(int const &p)
+{
+	for(int pp=0; pp<m_nFlapPanels; pp++)
+	{
+		if (p==m_FlapPanel[pp]) return true;
+	}
+	return false;
+}
 
 void CSurface::AddFlapPanel(CPanel *pPanel)
 {
@@ -711,6 +743,59 @@ void CSurface::AddFlapPanel(CPanel *pPanel)
 	}
 }
 
+bool CSurface::RotateFlap(double const &Angle)
+{
+	//The average angle between the two tip foil is cancelled
+	//Instead, the Panels are rotated by Angle
+
+	int k,l,p, iFlap;
+	double alpha0;
+	Quaternion Quat;
+	CVector H, HA, HB, R, S;
+	iFlap = 0;
+	p     = 0;
+
+	if(m_pFoilA && m_pFoilB)
+	{
+		//get the approximate initial angle
+		if(abs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1) return false;
+		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
+		//create a hinge unit vector
+		GetPoint(m_posATE, m_posBTE, 0.0, HA, 0);
+		GetPoint(m_posATE, m_posBTE, 1.0, HB, 0);
+		H = HB-HA;
+		H.Normalize();
+
+		Quat.Set(Angle-alpha0, H);
+
+		for (k=0; k<m_nFlapNodes; k++)
+		{
+			R.x = s_pNode[m_FlapNode[k]].x - HA.x;
+			R.y = s_pNode[m_FlapNode[k]].y - HA.y;
+			R.z = s_pNode[m_FlapNode[k]].z - HA.z;
+			Quat.Conjugate(R,S);
+
+			s_pNode[m_FlapNode[k]].x = S.x + HA.x;
+			s_pNode[m_FlapNode[k]].y = S.y + HA.y;
+			s_pNode[m_FlapNode[k]].z = S.z + HA.z;
+		}
+
+		for(l=0; l<m_nFlapPanels; l++)
+		{
+			s_pPanel[m_FlapPanel[l]].SetFrame(
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLA],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLB],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTA],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTB]);
+		}
+
+
+		++iFlap;
+	}
+	else p+= m_NYPanels * m_NXPanels;
+
+	return true;
+}
 
 
 
@@ -722,6 +807,11 @@ void CSurface::AddFlapPanel(CPanel *pPanel)
 
 
 
+
+
+
+
+	
 
 
 

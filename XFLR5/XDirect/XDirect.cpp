@@ -77,7 +77,6 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_XFLR5_EXPORTPLR, OnExportPlr)
 	ON_COMMAND(IDM_DEFINEGRAPH, OnDefineGraph)
 	ON_COMMAND(IDM_XFLR5_COUPLEGRAPH, OnCoupleGraph)
-//	ON_COMMAND(IDM_XFLR5DEFINEUSERGRAPH, OnDefineUserGraph)
 	ON_COMMAND(IDM_XFLR5_GRAPHOPTIONS, OnAllGraphOptions)
 	ON_COMMAND(IDM_DELFOILPOLARS, OnDelFoilPolars)
 	ON_COMMAND(IDM_DELCUROPP, OnDelCurOpp)
@@ -90,7 +89,6 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(IDM_XFLR5_RESTOREDEF, OnRestoreDef)
 	ON_COMMAND(IDM_XFLR5_READDEF, OnReadDef)
 	ON_COMMAND(IDM_XFLR5_SAVEDEF, OnWriteDef)
-//	ON_COMMAND(IDM_XFLR5_SAVEPOLAR, OnSavePolars)
 	ON_COMMAND(IDM_XFLR5_POLARFILTER, OnPolarFilter)
 	ON_COMMAND(IDT_SHOWBL, OnShowBL)
 	ON_COMMAND(IDT_SHOWPRESSURE, OnShowPressure)
@@ -1291,8 +1289,8 @@ LRESULT CXDirect::KickIdle()
 				DrawBL(&dcMem, pOpPoint, m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
 			if(m_bPressure)
 				DrawCpv(&dcMem, pOpPoint, m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
-			
-			m_pCpGraph->DrawGraph(&dcMem, &m_rDrawRect, false);
+			if(m_bCpGraph)
+				m_pCpGraph->DrawGraph(&dcMem, &m_rDrawRect, false);
 
 			pDC->BitBlt(m_rCltRect.left, m_rCltRect.top/*+m_dz*/, m_rCltRect.Width(), m_rCltRect.Height(),
 				&dcMem,0, 0, SRCCOPY);
@@ -4010,7 +4008,9 @@ void CXDirect::OnPolarFilter()
 	dlg.m_bType2 = m_bType2;
 	dlg.m_bType3 = m_bType3;
 	dlg.m_bType4 = m_bType4;
-	if(IDOK == dlg.DoModal()){
+	dlg.m_bFoil=true;
+	if(IDOK == dlg.DoModal())
+	{
 		if(dlg.m_bType1) m_bType1 = true; else m_bType1 = false;
 		if(dlg.m_bType2) m_bType2 = true; else m_bType2 = false;
 		if(dlg.m_bType3) m_bType3 = true; else m_bType3 = false;
@@ -5568,7 +5568,8 @@ BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 			OnPrint();
 			return true;
 		} 
-		if (pMsg->wParam == 'G' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'G' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			CPoint pt;
 			GetCursorPos(&pt);
 			m_pChildWnd->ScreenToClient( &pt);
@@ -5576,7 +5577,8 @@ BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 			if(m_pCurGraph) OnGraphOptions();
 			return true;
 		} 
-		if (pMsg->wParam == 'V' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'V' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			CPoint pt;
 			GetCursorPos(&pt);
 			m_pChildWnd->ScreenToClient( &pt);
@@ -5585,10 +5587,12 @@ BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 			return true;
 		} 
 
-		if (pMsg->wParam == 'Z') { 
+		if (pMsg->wParam == 'Z')
+		{ 
 			return true;//User is zooming with 'Z' key instead of mouse midle button
 		} 
-		if (pMsg->wParam == 'T' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'T' && pWnd==m_pChildWnd && !((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			if(m_bPolar) {
 				m_iPlrView = 2;
 				UpdateView();

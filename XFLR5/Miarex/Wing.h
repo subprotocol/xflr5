@@ -64,7 +64,7 @@ public:
 
 // Implementation
 protected:
-	CSurface m_Surface[MAXVLMSURFACES];
+	CSurface m_Surface[2*MAXPANELS];
 	double m_VLMQInf[100];
 
 	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
@@ -158,7 +158,7 @@ protected:
 	int m_AVLIndex;		// need to export to AVL
 
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
-	double m_FlapMoment[20];//max 10 flaps x 2
+	double m_FlapMoment[2*MAXPANELS];
 
 	double pi;		//
 	double m_Span;		// wing span

@@ -24,7 +24,6 @@
 //      are changed infrequently
 //
 
-
 #pragma once
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
@@ -48,11 +47,12 @@
 
 #define GLF_START_LIST 5000
 
-#define MAXPANELS          30
+#define MAXPANELS          25
 #define MAXSTATIONS	      100 //max number of stations for LLT or VLM analysis
 #define MAXCHORDPANELS	   30
-#define MAXVLMSURFACES     80 
+//#define MAXVLMSURFACES     50 //2 * MAXPANELS
 #define VLMMATSIZE       2000
+#define VLMHALF          1000
 #define MAXCONTROLS        10 //max controls per wing section
 #define SPLINECONTROLSIZE  50 //maximum number of control points
 #define MAXBODYFRAMES      30

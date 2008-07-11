@@ -2001,8 +2001,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 				PanelForce  = VInf * m_pPanel[p].Vortex;
 				PanelForce *= Gamma[p] * m_Density;         //Newtons
 
-//TRACE("%12.6e            %12.6e\n",m_pPanel[p].VortexPos.x, Gamma[p]);
-
 				if(!m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 				{
 					Force       = VInf* m_pPanel[p].Vortex;
@@ -2012,7 +2010,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 				Moment0 = LeverArmC4 * PanelForce;
 				m_CmAirf[m]  += Moment0.y;						//N.m
 				GeomMoment   += PanelLeverArm * PanelForce;		//N.m
-//TRACE("%12.6e \n", -PanelLeverArm.x*PanelForce.z + PanelLeverArm.z*PanelForce.x);
 
 				StripForce += PanelForce;
 				NForce = PanelForce.dot(SurfaceNormal);
@@ -2023,15 +2020,24 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 				Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /m_QInf/m_pPanel[p].Area/m_Density;
 
-				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+//				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+				if(m_Surface[j].m_bTEFlap)
 				{
-					//add hinge moment contribution
+/*					//add hinge moment contribution
 					V1 = m_pPanel[p].VortexPos - HA;
 					HingeLeverArm = V1 - H * V1.dot(H);
 					if(HingeLeverArm.x>0.0)
 					{
 						HingeMoment = HingeLeverArm * PanelForce;//N.m
 						m_FlapMoment[nFlap] += HingeMoment.dot(H);
+					}*/
+					if(m_Surface[j].IsFlapPanel(p))
+					{
+						//then p is on the flap, so add its contribution
+						
+						HingeLeverArm = m_pPanel[p].VortexPos - m_Surface[j].m_HingePoint;
+						HingeMoment = HingeLeverArm * PanelForce;//N.m
+						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector);
 					}
 				}
 				p++;
@@ -2281,7 +2287,7 @@ void CWing::PanelComputeWing(double *Cp,
 				YCP       += m_pPanel[p].CollPt.y * PanelForce.dot(WindNormal); 
 				CPStrip   += m_pPanel[p].CollPt.x * NForce;
 
-				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
+/*				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
 				{
 					//add hinge moment contribution
 					V1 = m_pPanel[p].VortexPos - HA;
@@ -2290,6 +2296,17 @@ void CWing::PanelComputeWing(double *Cp,
 					{
 						HingeMoment = HingeLeverArm * PanelForce;				// N.m/q
 						m_FlapMoment[nFlap] += HingeMoment.dot(H) * m_Density * m_QInf * m_QInf/2.0;//N
+					}
+				}*/
+				if(m_Surface[j].m_bTEFlap)
+				{
+					if(m_Surface[j].IsFlapPanel(p))
+					{
+						//then p is on the flap, so add its contribution
+						
+						HingeLeverArm = m_pPanel[p].CollPt - m_Surface[j].m_HingePoint;
+						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
+						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* m_Density * m_QInf * m_QInf/2.0;//N
 					}
 				}
 				p++;

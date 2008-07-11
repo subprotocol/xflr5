@@ -831,10 +831,10 @@
 				RelativePath=".\XDirect\Polar.h">
 			</File>
 			<File
-				RelativePath=".\PolarFilter.h">
+				RelativePath=".\misc\PolarFilter.h">
 			</File>
 			<File
-				RelativePath=".\misc\PolarFilter.h">
+				RelativePath=".\PolarFilter.h">
 			</File>
 			<File
 				RelativePath=".\Miarex\POpp.h">

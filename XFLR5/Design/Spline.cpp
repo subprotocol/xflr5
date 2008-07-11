@@ -332,19 +332,22 @@ bool CSpline::InsertPoint(double x, double y)
 							m_Input[k+1].x = x;
 							m_Input[k+1].y = y;
 							m_iCtrlPoints++;
+							break;
 						}
 					}
 				}
 			}
 		}
 	}
+	SplineKnots();
 	return true;
 }
 
 
 int CSpline::IsControlPoint(CVector Real)
 {
-	for (int k=0; k<m_iCtrlPoints; k++){
+	for (int k=0; k<m_iCtrlPoints; k++)
+	{
 		if(abs(Real.x-m_Input[k].x)<0.005 && abs(Real.y-m_Input[k].y)<0.005) return k;
 	}
 	return -10;
@@ -352,7 +355,8 @@ int CSpline::IsControlPoint(CVector Real)
 
 int CSpline::IsControlPoint(CVector Real, double ZoomFactor)
 {
-	for (int k=0; k<m_iCtrlPoints; k++){
+	for (int k=0; k<m_iCtrlPoints; k++)
+	{
 		if (abs(Real.x-m_Input[k].x)<0.006/ZoomFactor && abs(Real.y-m_Input[k].y)<0.006/ZoomFactor) return k;
 	}
 	return -10;
@@ -361,8 +365,9 @@ int CSpline::IsControlPoint(CVector Real, double ZoomFactor)
 
 int CSpline::IsControlPoint(double x, double y, double zx, double zy)
 {
-	for (int k=0; k<m_iCtrlPoints; k++){
-		if(abs((x-m_Input[k].x)/zx)<4.f && abs((y-m_Input[k].y)/zy)<4.f) return k;
+	for (int k=0; k<m_iCtrlPoints; k++)
+	{
+		if(abs((x-m_Input[k].x)/zx)<4.0 && abs((y-m_Input[k].y)/zy)<4.0) return k;
 	}
 	return -10;
 }

@@ -48,23 +48,22 @@ Licence :
 
                        **************************
 
-TODO :
-	Use AVL DWWAKE formula for Far-field wake downwash at center of strip
-	Add Cyff to Oswald calculation
-	Core implementation : investigate AVL formulation
-	Add BEND Command
 
-v4.06 June xxx, 2008
+v4.07 July 11th, 2008
+	- First release of Type 5 and Type 6 Control Polars for planes
+	- Corrected spline foil bug
+
+v4.06 June 25th, 2008
 	- Corrected display of OpPoint results in animated 3D view	
 	
-v4.05 June 23rd, 2008
-	- Improved the control analysis polar
+v4.05 June 23rd, 2008 (limited release only)
+	- Improved the Type 5 control analysis polar
 	- Corrected incorrect orientation of local panel vector in 3D analysis - snesitive only for very high thickness airfoils
 	
-v4.04 June 9th, 2008
+v4.04 June 9th, 2008 (limited release only)
 	- Corrected the inoperative animation in 3D view
 
-v4.03 June 5th, 2008
+v4.03 June 5th, 2008 (limited release only)
 	- Corrected the crash bug for a  number of cumulated span stations greater than 100
 	- Corrected the geometrical bug when setting a flap on a foil
 	- Changed the De-rotation for the airfoil, to take into account the flap

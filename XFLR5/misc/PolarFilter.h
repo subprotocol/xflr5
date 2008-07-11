@@ -44,10 +44,14 @@ public:
 	enum { IDD = IDD_POLARFILTER };
 	CButton	m_ctrlType1;
 	CButton	m_ctrlType3;
+	CButton	m_ctrlType5;
+	CButton	m_ctrlType6;
 	BOOL	m_bType1;
 	BOOL	m_bType2;
 	BOOL	m_bType3;
 	BOOL	m_bType4;
+	BOOL	m_bType5;
+	BOOL	m_bType6;
 	//}}AFX_DATA
 
 
@@ -61,6 +65,7 @@ public:
 // Implementation
 protected:
 	bool m_bWing;
+	bool m_bFoil;
 	// Generated message map functions
 	//{{AFX_MSG(CPolarFilter)
 	virtual BOOL OnInitDialog();

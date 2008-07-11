@@ -28,13 +28,14 @@
 #pragma once
 #include "../XDirect/Foil.h"
 #include "Body.h"
- 
+
 class CSurface : public CObject  
 {
 	friend class CWing;
 	friend class CMiarex;
 	friend class CMainFrame;
 	friend class CVLMDlg;
+	friend class CVLMThread;
 	friend class C3DPanelDlg;
 	friend class CWingDlg;
  
@@ -49,6 +50,7 @@ public:
 	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos=0);
 	void GetyDist(int const &k, double &y1, double &y2);
 	void Init();
+	void ResetFlap();
 	void RotateX(CVector const &O, double XTilt);
 	void RotateY(CVector const &O, double YTilt);
 	void RotateZ(CVector const &O, double ZTilt);
@@ -58,6 +60,9 @@ public:
 	void SetTwist();
 	void Translate(CVector const &T);
 
+	bool IsFlapPanel(int const &p);
+	bool RotateFlap(double const &Angle);
+//	bool RotateFlap(double const &Angle, CPanel *pPanel, CVector *pNode);
 	double GetTwist(int const &k);
 	double GetChord(int const &k);
 	double GetChord(double const &tau);
@@ -76,6 +81,8 @@ private :
 	CVector SideB_B[MAXCHORDPANELS];	 
 	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
 	static CVector VTemp;
+	static CPanel *s_pPanel;
+	static CVector *s_pNode;
 
 	bool m_bIsInSymPlane;
 	bool m_bTEFlap;
@@ -106,9 +113,13 @@ private :
 	int m_NElements;
 
 	int m_nFlapNodes, m_nFlapPanels;
-	int m_FlapNode[100];
-	int m_FlapPanel[100];
+	int m_FlapNode[VLMHALF];
+	int m_FlapPanel[VLMHALF];
+
+	CVector m_HingePoint;
+	CVector m_HingeVector;
 
 	CFoil *m_pFoilA, *m_pFoilB; //Left and right foils
-};
 
+public:
+};

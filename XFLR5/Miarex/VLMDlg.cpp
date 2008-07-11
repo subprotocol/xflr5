@@ -161,7 +161,7 @@ BOOL CVLMDlg::OnInitDialog()
 
 	m_ctrlOutput.SetLimitText(100000);
 
-	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5))
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
 		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
@@ -694,6 +694,45 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	else if (m_pWPolar->m_Type==4)
 		for (q=0; q<nval;q++) m_VLMQInf[q] = V0 + q*VDelta;
 
+	else if (m_pWPolar->m_Type==5)
+		m_VLMQInf[0] = m_pWPolar->m_QInf;
+
+	else if(m_pWPolar->m_Type==6)
+	{
+		//type 2; find the speeds which will create a lift equal to the weight
+		AddString("      Calculating speeds to balance the weight\r\n\r\n");
+
+		WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
+
+		memcpy(row, m_RHS, sizeof(row));
+		Lift = 0.0;
+		
+		for (p=0; p<Size; p++)
+		{
+			// for each panel along the chord, add the lift coef
+			Force = VInf * m_ppPanel[p]->Vortex;
+			Lift += Force.dot(WindNormal) * row[p];
+		}
+		if(m_bVLMSymetric) Lift *=2.0;
+
+		if(Lift<=0.0)
+		{
+			strong.Format("      Found a negative lift for Alpha=%.2f.... skipping the angle...\r\n", V0+q*VDelta);
+			if(m_bTrace) AddString(strong);
+			m_bPointOut = true;
+			m_bWarning = true;
+			m_VLMQInf[0] = -100.0;
+		}
+		else 
+		{
+			m_VLMQInf[0] =  sqrt( 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density / Lift);
+			strong.Format("      Alpha=%5.2f   QInf = %5.2f", V0, m_VLMQInf[0]*pFrame->m_mstoUnit);
+			GetSpeedUnit(strange, pFrame->m_SpeedUnit);
+			strong+= strange + "\r\n";
+			if(m_bTrace) AddString(strong);
+		}
+	}
+
 	//______________________________________________________________________________________
 	// Scale circulations to speeds
 
@@ -842,7 +881,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		m_QInf = m_VLMQInf[q];
 		qdyn = 0.5 * m_pWPolar->m_Density * m_QInf * m_QInf;
 
-		if(m_QInf >0.0 || m_pWPolar->m_Type==5) 
+		if(m_QInf >0.0 || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6) 
 		{
 			if(m_pWPolar->m_Type!=4 && !m_pWPolar->m_bTiltedGeom)
 			{
