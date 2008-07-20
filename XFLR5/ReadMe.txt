@@ -48,6 +48,15 @@ Licence :
 
                        **************************
 
+TODO :
+	Body : option for translation
+
+	
+v4.08 July 20th, 2008
+	- Corrected the bug which caused to ignore weight and speed parameters in control polars
+	- Forced Dirichlet Boudary Conditions for 3D analysis
+	- Corrected a crash bug when loading some project files
+	- Added an option to change axis color & style in 3D view
 
 v4.07 July 11th, 2008
 	- First release of Type 5 and Type 6 Control Polars for planes

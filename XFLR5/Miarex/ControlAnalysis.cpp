@@ -116,6 +116,7 @@ BEGIN_MESSAGE_MAP(CControlAnalysis, CDialog)
 	ON_BN_CLICKED(IDC_VISCOUS, OnViscous)
 	ON_EN_KILLFOCUS(IDC_VISCOSITY, ReadParams)
 	ON_EN_KILLFOCUS(IDC_DENSITY, ReadParams)
+	ON_EN_KILLFOCUS(IDC_CONTROLLIST, OnKillFocus)
 	ON_EN_KILLFOCUS(IDC_WTYPE5, OnKillFocus)
 	ON_EN_KILLFOCUS(IDC_WTYPE6, OnKillFocus)
 	ON_EN_KILLFOCUS(IDC_WEIGHT, OnKillFocus)
@@ -342,6 +343,20 @@ void CControlAnalysis::OnOK()
 {
 	if(!ReadData()) return;
 
+	ReadParams();
+
+	bool bActive = false;
+
+	for(int i=0; i<m_nControls; i++)
+	{
+		bActive = bActive || m_bActiveControl[i];
+		if(bActive) break;
+	}
+	if(!bActive)
+	{
+		if(IDYES!=AfxMessageBox("No Active Control. Continue ?", MB_YESNOCANCEL)) return;
+	}
+
 	CWPolar * pWPolarNew;
 	m_ctrlWPolarName.GetWindowText(m_WPolarName);
 
@@ -430,15 +445,18 @@ void CControlAnalysis::FillControlList()
 		m_ctrlControlList.SetItemText(1,4,strong);
 		++m_nControls;
 
-		m_ctrlControlList.InsertItem(2, "3");
-		m_ctrlControlList.SetItemText(2,1,"Elevator Tilt (°)");
-		if(m_bActiveControl[2])	m_ctrlControlList.SetItemText(2,2,"1");
-		else                    m_ctrlControlList.SetItemText(2,2,"0");
-		strong.Format("%6.1f", m_MinControl[2]);
-		m_ctrlControlList.SetItemText(2,3,strong);
-		strong.Format("%6.1f", m_MaxControl[2]);
-		m_ctrlControlList.SetItemText(2,4,strong);
-		++m_nControls;
+		if(m_pStab)
+		{
+			m_ctrlControlList.InsertItem(2, "3");
+			m_ctrlControlList.SetItemText(2,1,"Elevator Tilt (°)");
+			if(m_bActiveControl[2])	m_ctrlControlList.SetItemText(2,2,"1");
+			else                    m_ctrlControlList.SetItemText(2,2,"0");
+			strong.Format("%6.1f", m_MinControl[2]);
+			m_ctrlControlList.SetItemText(2,3,strong);
+			strong.Format("%6.1f", m_MaxControl[2]);
+			m_ctrlControlList.SetItemText(2,4,strong);
+			++m_nControls;
+		}
 	}
 
 	for(i=0; i<m_pWing->m_nFlaps; i++)
@@ -592,6 +610,7 @@ BOOL CControlAnalysis::PreTranslateMessage(MSG* pMsg)
 			if(GetDlgItem(IDCANCEL) != pWnd && GetDlgItem(IDOK) != pWnd)
 			{
 				// we don't want to exit on OK on CEdit
+				ReadData();
 				ReadParams();
 				SetWPolarName();
 				GetDlgItem(IDOK)->SetFocus();
@@ -609,5 +628,6 @@ BOOL CControlAnalysis::PreTranslateMessage(MSG* pMsg)
 void CControlAnalysis::OnKillFocus()
 {
 	ReadParams();
+	ReadData();
 	SetWPolarName();
 }

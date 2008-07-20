@@ -51,6 +51,7 @@ public:
 	CButton	m_ctrlMoments;
 	CButton	m_ctrlIDrag, m_ctrlVDrag;
 	CButton	m_ctrlBotTrans;
+	CButton m_ctrl3DAxis;
 	CButton	m_ctrlTopTrans;
 	CButton	m_ctrlWingPanels;
 	CButton m_ctrlWakePanels;
@@ -71,6 +72,8 @@ private:
 
 //	COLORREF m_WingSurfaces;
 
+	int m_3DAxisStyle, m_3DAxisWidth;
+	COLORREF m_3DAxisColor;
 	int m_VLMStyle, m_VLMWidth;
 	COLORREF m_VLMColor;
 	int m_OutlineStyle, m_OutlineWidth;
@@ -96,6 +99,7 @@ private:
 
 	// Generated message map functions
 	//{{AFX_MSG(C3DColorDlg)
+	afx_msg void On3DAxis();
 	afx_msg void OnWingColor();
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnTopTrans();

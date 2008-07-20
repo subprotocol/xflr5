@@ -540,45 +540,48 @@ BEGIN
     CTEXT           "Lower Surf.",IDC_STATIC,93,8,44,8
 END
 
-IDD_3DCOLORDLG DIALOGEX 0, 0, 212, 250
+IDD_3DCOLORDLG DIALOGEX 0, 0, 212, 261
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Preferences"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
+    CONTROL         "3D Axis",IDC_3DAXIS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,116,14,72,11
     CONTROL         "Outline",IDC_WINGOUTLINE,"Button",BS_OWNERDRAW | 
-                    BS_NOTIFY | WS_TABSTOP,115,11,72,11
+                    BS_NOTIFY | WS_TABSTOP,115,32,72,11
     CONTROL         "VLMMesh",IDC_VLMMESH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,29,72,11
+                    WS_TABSTOP,115,50,72,11
     CONTROL         "Button2",IDC_TOPTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,47,72,11
+                    WS_TABSTOP,115,68,72,11
     CONTROL         "Button3",IDC_BOTTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,65,72,11
+                    WS_TABSTOP,115,86,72,11
     CONTROL         "Button4",IDC_XCP,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,83,72,11
-    CONTROL         "Button5",IDC_DOWNWASH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,155,72,11
-    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,173,72,11
-    DEFPUSHBUTTON   "OK",IDOK,35,225,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,124,225,50,14
-    LTEXT           "Wing Outline",IDC_STATIC,23,12,76,8
-    LTEXT           "Top Transition",IDC_STATIC,23,48,76,8
-    LTEXT           "Bottom Transition",IDC_STATIC,23,66,76,8
-    LTEXT           "Lift",IDC_STATIC,23,84,51,8
-    LTEXT           "Downwash",IDC_STATIC,23,156,76,8
-    LTEXT           "VLM Mesh",IDC_STATIC,24,30,76,8
-    LTEXT           "Wake panels",IDC_STATIC,23,174,76,8
-    CONTROL         "DragStyle",IDC_IDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,119,72,11
-    LTEXT           "Induced Drag",IDC_STATIC,23,120,76,8
-    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,137,72,11
-    LTEXT           "Viscous Drag",IDC_STATIC,23,138,76,8
+                    WS_TABSTOP,115,104,72,11
     CONTROL         "Button5",IDC_MOMENTS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,101,72,11
-    LTEXT           "Moments",IDC_STATIC,23,102,51,8
+                    WS_TABSTOP,115,122,72,11
+    CONTROL         "DragStyle",IDC_IDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,140,72,11
+    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,158,72,11
+    CONTROL         "Button5",IDC_DOWNWASH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,176,72,11
+    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | 
+                    WS_TABSTOP,115,194,72,11
     CONTROL         "Show Wake Panels",IDC_WAKEDISPLAY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,118,192,79,10
+                    BS_AUTOCHECKBOX | WS_TABSTOP,118,213,79,10
+    DEFPUSHBUTTON   "OK",IDOK,35,236,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,124,236,50,14
+    LTEXT           "Wing Outline",IDC_STATIC,23,33,76,8
+    LTEXT           "Top Transition",IDC_STATIC,23,69,76,8
+    LTEXT           "Bottom Transition",IDC_STATIC,23,87,76,8
+    LTEXT           "Lift",IDC_STATIC,23,105,51,8
+    LTEXT           "Downwash",IDC_STATIC,23,177,76,8
+    LTEXT           "VLM Mesh",IDC_STATIC,24,51,76,8
+    LTEXT           "Wake panels",IDC_STATIC,23,195,76,8
+    LTEXT           "Induced Drag",IDC_STATIC,23,141,76,8
+    LTEXT           "Viscous Drag",IDC_STATIC,23,159,76,8
+    LTEXT           "Moments",IDC_STATIC,23,123,51,8
+    LTEXT           "Axis",IDC_STATIC,24,15,76,8
 END
 
 IDD_SELECTFOILDLG DIALOG  0, 0, 300, 226
@@ -1882,7 +1885,7 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5_v4.07_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
+    LTEXT           "XFLR5_v4.08_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,219,50,14,WS_GROUP
     LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
                     IDC_STATIC,10,42,185,8
@@ -2283,7 +2286,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 205
         TOPMARGIN, 7
-        BOTTOMMARGIN, 239
+        BOTTOMMARGIN, 250
     END
 
     IDD_SELECTFOILDLG, DIALOG
@@ -3549,9 +3552,9 @@ BEGIN
         MENUITEM "Body Design\t(F10)",          IDM_BODYDESIGN
         MENUITEM SEPARATOR
         MENUITEM "3D Light Options",            33184
+        MENUITEM "3D Color Prefs",              IDM_3DCOLORPREFS
         MENUITEM "Cp Legend Options",           IDM_CPLEGEND
         MENUITEM "Streamlines Options",         33186
-        MENUITEM "Plane/Wing prefs",            IDM_PLANEPREFS
         MENUITEM "Auto Wing Scales",            IDM_AUTOWINGSCALES
         MENUITEM SEPARATOR
         MENUITEM "&Preferences...",             IDM_CLRSETTINGS

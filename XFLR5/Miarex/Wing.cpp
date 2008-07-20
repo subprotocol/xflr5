@@ -1596,15 +1596,16 @@ void CWing::InsertSection(double TPos, double TChord, double TOffset,
 			break;
 		}
 	}
-	if(!bIsInserted){
-		if(TPos > m_TPos[m_NPanel]){
+	if(!bIsInserted)
+	{
+		if(TPos > m_TPos[m_NPanel])
+		{
 			n = m_NPanel +1;
 			m_TPos[n]    = TPos;
 			m_TChord[n]  = TChord;
 			m_TOffset[n] = TOffset;
 			m_TZPos[n]   = TZPos;
-			m_TDihedral[n-1] = 180.0/pi *
-							   atan2(m_TZPos[n]-m_TZPos[n-1], m_TPos[n]-m_TPos[n-1]);
+			m_TDihedral[n-1] = 180.0/pi *  atan2(m_TZPos[n]-m_TZPos[n-1], m_TPos[n]-m_TPos[n-1]);
 			m_TTwist[n]  = Twist;
 			m_RFoil[n]   = Foil;
 			m_LFoil[n]   = Foil;
@@ -1613,7 +1614,8 @@ void CWing::InsertSection(double TPos, double TChord, double TOffset,
 			m_YPanelDist[n] = SSpan;
 			m_NPanel++;
 		}
-		else {//no need to overwrite
+		else 
+		{//no need to overwrite
 		}
 	}
 }
@@ -1628,7 +1630,8 @@ bool CWing::VLMSetAutoMesh(int total)
 	//Set VLMMATSIZE/NYTotal panels along chord
 	int NYTotal, size;
 	
-	if(!total){
+	if(!total)
+	{
 		size = (int)(VLMMATSIZE/4);//why not ? Too much refinement isn't worthwile
 		NYTotal = 22;
 	}
@@ -1662,9 +1665,10 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	//generic surface, LLT, VLM or Panel
 	int j;
 	CFoil *pFoilA, *pFoilB;
-	CVector PLA, PTA, PLB, PTB, Offset, T1, NA, NB;
+	CVector PLA, PTA, PLB, PTB, Offset, T1;
 	CVector Trans(T.x, 0.0, T.z);
 	CVector O(0.0,0.0,0.0);
+	CVector VNormal[MAXPANELS+1], VNSide[MAXPANELS+1], VN, VNP1;
 	double MinPanelSize;
 
 	CMainFrame *pFrame  = (CMainFrame*)s_pFrame;
@@ -1678,9 +1682,25 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	m_NSurfaces = 0;
 	m_MatSize = 0;
 
-	NA.Set(0.0, 0.0, 1.0);
-	NA.RotateX(O, -m_TDihedral[m_NPanel-1]);
-	NB = NA;
+	VNormal[0].Set(0.0, 0.0, 1.0);
+	VNSide[0].Set(0.0, 0.0, 1.0);
+
+	int nSurf=0;
+	for(j=0; j<m_NPanel;j++)
+	{
+		if (abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
+		{
+			VNormal[nSurf].Set(0.0, 0.0, 1.0);
+			VNormal[nSurf].RotateX(O, m_TDihedral[j]);
+			nSurf++;
+		}
+	}
+
+	for(j=0; j<nSurf;j++)
+	{
+		VNSide[j+1] = VNormal[j]+VNormal[j+1];
+		VNSide[j+1].Normalize();
+	}
 
 	for (j=m_NPanel-1; j>=0; j--)
 	{
@@ -1712,18 +1732,11 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_Surface[m_NSurfaces].SetNormal();
 			m_Surface[m_NSurfaces].RotateX(PLB, -m_TDihedral[j]);		
 
-			//Set surface normals
-			if(j>0)
-			{
-				NB.Set(0.0, 0.0, 1.0);
-				NB.RotateX(O, -m_TDihedral[j-1]);	//is normal of next right surface
-				NB += m_Surface[m_NSurfaces].Normal;	//average both normals
-				NB.Normalize();							//and normalize
-			}
-			else NB.Set(0.0, 0.0, 1.0);	//center normal is necessarily vertical
-			m_Surface[m_NSurfaces].NormalA = NA;
-			m_Surface[m_NSurfaces].NormalB = NB;
-			NA = NB; // this panel's right normal is next panel's left
+			m_Surface[m_NSurfaces].NormalA.Set(VNSide[nSurf].x,   -VNSide[nSurf].y,   VNSide[nSurf].z);
+			m_Surface[m_NSurfaces].NormalB.Set(VNSide[nSurf-1].x, -VNSide[nSurf-1].y, VNSide[nSurf-1].z);
+			
+			nSurf--;
+
 			m_Surface[m_NSurfaces].SetTwist();
 
 			T1.x = 0.0;
@@ -1767,7 +1780,8 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	{
 		for (j=0; j<m_NPanel; j++)
 		{
-			if(abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize){
+			if(abs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
+			{
 				m_Surface[m_NSurfaces].m_Dihedral = m_TDihedral[j];
 				m_Surface[m_NSurfaces].m_Length   = m_TPos[j+1] - m_TPos[j];
 				m_Surface[m_NSurfaces].m_TwistA   = m_TTwist[j];
@@ -1792,17 +1806,10 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 				m_Surface[m_NSurfaces].SetNormal();
 				m_Surface[m_NSurfaces].RotateX(PLA, m_TDihedral[j]);
 
-				if(j<m_NPanel-1)  	
-				{
-					NB.Set(0.0, 0.0, 1.0);
-					NB.RotateX(O, +m_TDihedral[j+1]);		//is normal of next right surface
-					NB += m_Surface[m_NSurfaces].Normal;	//average both normals
-					NB.Normalize();							//and normalize
-				}
-				else NB = m_Surface[m_NSurfaces].Normal;	//no next right surface for average
-				m_Surface[m_NSurfaces].NormalA = NA;
-				m_Surface[m_NSurfaces].NormalB = NB;
-				NA = NB; // this panel's right normal is next panel's left
+				m_Surface[m_NSurfaces].NormalA.Set(VNSide[nSurf].x,   VNSide[nSurf].y,   VNSide[nSurf].z);
+				m_Surface[m_NSurfaces].NormalB.Set(VNSide[nSurf+1].x, VNSide[nSurf+1].y, VNSide[nSurf+1].z);
+				
+				nSurf++;
 
 				m_Surface[m_NSurfaces].SetTwist();
 

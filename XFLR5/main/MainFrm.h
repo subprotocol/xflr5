@@ -265,6 +265,9 @@ private:
 	double m_DragScale;
 	double m_DownwashScale;
 
+	int m_3DAxisStyle, m_3DAxisWidth;
+	COLORREF m_3DAxisColor;
+
 	int m_VLMStyle, m_VLMWidth;
 	COLORREF m_VLMColor;
 
@@ -355,7 +358,7 @@ protected:
 	afx_msg void OnGuidelines();
 	afx_msg void OnLogFile();
 	afx_msg void OnSaveOptions();
-	afx_msg void OnPlanePrefs();
+	afx_msg void On3DColorPrefs();
 	afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 	afx_msg void OnFoilDirectDesign();
 	afx_msg void OnRecentFile1();

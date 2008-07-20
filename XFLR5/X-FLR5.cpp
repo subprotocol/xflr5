@@ -107,13 +107,13 @@ BOOL CXFLR5App::InitInstance()
 
 	//Trace("CX5App::InitInstance::Command Line Info processed");
 
-/*	if (!FirstInstance(CmdInfo))
+	if (!FirstInstance(CmdInfo))
 	{
 		//Trace("CX5App::InitInstance::Redirected input to first instance");
 		//Trace("CX5App::InitInstance::Closing App");
 
 		return FALSE;
-	}*/
+	}
 
 	//Trace("CX5App::InitInstance::System time acquired");
 
@@ -1348,7 +1348,6 @@ bool IsBetween(int f, int f1, int f2)
 	else if(f>f2) return false;
 	return true;
 }
-
 bool IsBetween(int f, double f1, double f2)
 {
 	double ff = f;
@@ -1361,6 +1360,18 @@ bool IsBetween(int f, double f1, double f2)
 	else if(ff>f2) return false;
 	return true;
 }
+/*
+bool IsBetween(int f, int f1, int f2) 
+{
+	return ((f1 >= f && f <= f2)  || (f1 <= f && f >= f2));
+}
+
+bool IsBetween(int f, double f1, double f2) 
+{
+	double ff = (double)f;
+	return ((f1 >= ff && ff <= f2)  || (f1 <= ff && ff >= f2));
+}
+*/
 
 bool Intersect(int &x, int &y, CRect &DRect, CPoint &Pt1, CPoint &Pt2)
 {

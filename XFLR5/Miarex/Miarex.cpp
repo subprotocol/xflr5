@@ -1277,7 +1277,8 @@ void CMiarex::SetWPlr(bool bCurrent, CString WPlrName)
 		pFrame->m_WOperDlgBar.EnableAnalysis(false);
 	}
 
-	if(m_pCurWing){
+	if(m_pCurWing)
+	{
 		m_pCurWing->m_CvPrec    = m_CvPrec;
 		m_pCurWing->m_RelaxMax  = m_Relax;
 	}
@@ -1747,7 +1748,8 @@ bool CMiarex::SetPOpp(bool bCurrent, double Alpha)
 	m_bResetglFlow   = true;
 	m_bResetglLegend = true;
 
-	if(!pPOpp) {
+	if(!pPOpp) 
+	{
 		if(m_pCurWPolar)
 			pPOpp = GetPOpp(m_pCurWPolar->m_AMem);
 		else 
@@ -1811,8 +1813,12 @@ bool CMiarex::SetWOpp(bool bCurrent, double Alpha)
 	CWaitCursor wait;
 	CString strong;
 
-	if(!m_pCurWing)   return false;
-	if(!m_pCurWPolar) return false;
+	if(!m_pCurWing || !m_pCurWPolar) 
+	{
+		m_pCurWOpp = NULL;
+		m_pCurPOpp = NULL;
+		return false;
+	}
 	if(m_pCurPlane)	  return SetPOpp(bCurrent, Alpha);
 
 	CWOpp *pWOpp = NULL;
@@ -2635,14 +2641,24 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	if(m_iView==5)
 	{
 		ClientToGL(m_ptPopUp, m_RealPopUp);
-		if(m_BodyRect.PtInRect(ClientPoint))            BMenu = menu.LoadMenu(IDR_CTXBODYCTRLMENU);
-		else if(m_BodyLineRect.PtInRect(ClientPoint))   BMenu = menu.LoadMenu(IDR_CTXBODYFRAMECTRLMENU);
+		if(m_BodyRect.PtInRect(ClientPoint))       
+		{
+			BMenu = menu.LoadMenu(IDR_CTXBODYCTRLMENU);			
+		}
+		else if(m_BodyLineRect.PtInRect(ClientPoint))  
+		{
+			BMenu = menu.LoadMenu(IDR_CTXBODYFRAMECTRLMENU);
+		}
 		else if(m_FrameRect.PtInRect(ClientPoint))      BMenu = menu.LoadMenu(IDR_CTXBODYPOINTCTRLMENU);
 		else BMenu = FALSE;
 		if (BMenu)
 		{
 			CMenu* pPopup = menu.GetSubMenu(0);
-			ASSERT(pPopup != NULL);
+//			if(m_pCurBody->m_bLocked)
+//			{
+//				pPopup->EnableMenuItem(0,  MF_BYPOSITION | MF_GRAYED);
+//				menu.EnableMenuItem(1,  MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
+//			}
 
 			if(m_FrameRect.PtInRect(ClientPoint) && m_bCurFrameOnly)
 				pPopup->CheckMenuItem(IDM_SHOWONLYACTIVEFRAME,     MF_BYCOMMAND | MF_CHECKED);
@@ -2657,7 +2673,7 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
-			pPopup->CheckMenuItem(IDM_3DVIEW,     MF_BYCOMMAND | MF_CHECKED);
+			pPopup->CheckMenuItem(IDM_3DVIEW, MF_BYCOMMAND | MF_CHECKED);
 			if (m_bXCmRef) pPopup->CheckMenuItem(IDM_SHOWXCMREF, MF_BYCOMMAND | MF_CHECKED);
 
 			
@@ -3135,6 +3151,8 @@ bool CMiarex::LoadSettings(CArchive &ar)
 			throw pfe;
 		}
 		if (k) m_bDirichlet = true; else m_bDirichlet = false;
+
+		m_bDirichlet = true;
 
 		ar >> k;
 		if(k!=0 && k!=1){
@@ -3734,7 +3752,8 @@ void CMiarex::CreateWPolarCurves()
 	m_WPlrGraph3.DeleteCurves();
 	m_WPlrGraph4.DeleteCurves();
 
-	for (int k=0; k<m_poaWPolar->GetSize(); k++){
+	for (int k=0; k<m_poaWPolar->GetSize(); k++)
+	{
 		pWPolar = (CWPolar*)m_poaWPolar->GetAt(k);
 
 		if (pWPolar->m_bIsVisible && pWPolar->m_Alpha.GetSize()>0 &&
@@ -5655,13 +5674,18 @@ void CMiarex::SetUFO(CString UFOName)
 				pFrame->m_ctrlUFO.SetCurSel(0);
 				pFrame->m_ctrlUFO.GetLBText(0, UFOName);
 			}
-			else {
+			else
+			{
 				m_pCurPlane = NULL;
 				m_pCurBody  = NULL;
 				m_pCurWing  = NULL;
 				m_pCurWing2 = NULL;
 				m_pCurStab  = NULL;
 				m_pCurFin   = NULL;
+				m_pCurWOpp  = NULL;
+				m_pCurPOpp  = NULL;
+				if(m_iView==2) CreateWPolarCurves();
+				else if(m_iView==1) CreateWOppCurves();
 				return;
 			}
 		}
@@ -5675,7 +5699,16 @@ void CMiarex::SetUFO(CString UFOName)
 	}
 
 	pFrame->UpdateWPlrs();
-	if(!m_pCurWing && !m_pCurPlane) return;
+	if(!m_pCurWing && !m_pCurPlane)
+	{
+		m_pCurBody  = NULL;
+		m_pCurWing2 = NULL;
+		m_pCurStab  = NULL;
+		m_pCurFin   = NULL;
+		m_pCurWOpp  = NULL;
+		m_pCurPOpp  = NULL;
+		return;
+	}
 
 
 	if(m_pCurPlane)
@@ -5808,6 +5841,7 @@ void CMiarex::OnDeleteWing()
 	else            pFrame->DeleteWing(m_pCurWing, false);
 	pFrame->UpdateUFOs();
 	SetUFO();
+//	CreateWPolarCurves();
 	UpdateView();
 }
 
@@ -14052,21 +14086,26 @@ void CMiarex::GLCreateBodyGrid()
 		if(m_bAxes)
 		{
 			// Frame axis____________
-			color = pChildView->m_WndTextColor;
-			width = 1;
+			color = pMainFrame->m_3DAxisColor;
+			width = pMainFrame->m_3DAxisWidth;
 			GetBWColor(color, style, width);
 			DecompRGB(color,r,g,b);
 			glColor3d(r,g,b);
 			glLineWidth((GLfloat)GetPenWidth(width, false));
-			glLineStipple (1, 0x1C47);
+			if     (pMainFrame->m_3DAxisStyle == PS_DOT)     glLineStipple (1, 0x1111);
+			else if(pMainFrame->m_3DAxisStyle == PS_DASH)    glLineStipple (1, 0x0F0F);
+			else if(pMainFrame->m_3DAxisStyle == PS_DASHDOT) glLineStipple (1, 0x1C47);
+			else										     glLineStipple (1, 0xFFFF);
 
 			glBegin(GL_LINES);
+			{
 				//vertical line
 				glVertex2d(0.0, (-1.0-m_FrameOffset.y)/m_FrameScale);
 				glVertex2d(0.0,	(glTop-m_FrameOffset.y)     /m_FrameScale);
 				//horizontal Line
 				glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale, 0.0);
 				glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale, 0.0);
+			}
 			glEnd();
 		}
 
@@ -14190,25 +14229,29 @@ void CMiarex::GLCreateBodyGrid()
 
 		if(m_bAxes)
 		{
-			color = pChildView->m_WndTextColor;
-			width = 1;
+			// Frame axis____________
+			color = pMainFrame->m_3DAxisColor;
+			width = pMainFrame->m_3DAxisWidth;
 			GetBWColor(color, style, width);
-			glLineWidth((GLfloat)GetPenWidth(width, false));
-
-			glLineStipple (1, 0x1C47);
-
 			DecompRGB(color,r,g,b);
 			glColor3d(r,g,b);
+			glLineWidth((GLfloat)GetPenWidth(width, false));
+			if     (pMainFrame->m_3DAxisStyle == PS_DOT)     glLineStipple (1, 0x1111);
+			else if(pMainFrame->m_3DAxisStyle == PS_DASH)    glLineStipple (1, 0x0F0F);
+			else if(pMainFrame->m_3DAxisStyle == PS_DASHDOT) glLineStipple (1, 0x1C47);
+			else										     glLineStipple (1, 0xFFFF);
 
 			// BodyLine axis____________
 
 			glBegin(GL_LINES);
+			{
 				//horizontal Line
 				glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale, 0.0);
 				glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale, 0.0);
 				//vertical Line
 				glVertex2d(0.0,	(m_HorizontalSplit-m_BodyOffset.y)/m_BodyScale);
 				glVertex2d(0.0,	(-1.0+2.0*h/w-m_BodyOffset.y)     /m_BodyScale);
+			}
 			glEnd();
 		}
 
@@ -14954,15 +14997,19 @@ void CMiarex::GLDrawAxes()
 	double l = .8;
 //	if(m_pCurWing) l=1.1*m_pCurWing->m_Span/2.0;
 	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pFrame;
 
 	glPolygonMode(GL_FRONT,GL_LINE);
-	glLineWidth(1.0);
-	DecompRGB(pChildView->m_WndTextColor,r,g,b);
+	glLineWidth((GLfloat)GetPenWidth(pMainFrame->m_3DAxisWidth, false));
+	DecompRGB(pMainFrame->m_3DAxisColor,r,g,b);
 	glColor3d(r,g,b);
 
 // X axis____________
 	glEnable (GL_LINE_STIPPLE);
-	glLineStipple (1, 0x1C47);// Dash-Dot
+	if(pMainFrame->m_3DAxisStyle == PS_DOT) 			glLineStipple (1, 0x1111);
+	else if(pMainFrame->m_3DAxisStyle== PS_DASH) 		glLineStipple (1, 0x0F0F);
+	else if(pMainFrame->m_3DAxisStyle== PS_DASHDOT) 	glLineStipple (1, 0x1C47);
+	else												glLineStipple (1, 0xFFFF);// Solid
 
 //	glBegin(GL_LINE_STRIP);
 //		for(i=-9; i<=10; i++){
@@ -18167,7 +18214,11 @@ void CMiarex::OnUndo()
 void CMiarex::OnInsertBodyPoint()
 {
 	CVector Real;
+
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+
+	if(m_pCurBody->m_bLocked) return;
+
 
 	if(m_BodyLineRect.PtInRect(m_ptPopUp))
 	{
@@ -18210,6 +18261,7 @@ void CMiarex::OnInsertBodyPoint()
 
 void CMiarex::OnDeleteBodyPoint()
 {
+	if(m_pCurBody->m_bLocked) return;
 	int i,n;
 	CVector Real;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -18346,6 +18398,7 @@ void CMiarex::OnDuplicateCurBody()
 void CMiarex::OnScaleFrame()
 {
 	if(!m_pCurBody || !m_pCurFrame) return;
+	if(m_pCurBody->m_bLocked) return;
 
 	CBodyScaleDlg dlg(this);
 	dlg.m_FrameID = m_pCurBody->m_iActiveFrame;
@@ -19712,6 +19765,10 @@ void CMiarex::OnControlAnalysis()
 	m_CtrlDlg.m_pFin       = m_pCurFin;
 	m_CtrlDlg.m_pMainFrame = m_pFrame;
 	m_CtrlDlg.m_poaXPolar  = &pFrame->m_oaWPolar;
+	m_CtrlDlg.m_QInf      = m_WngAnalysis.m_QInf;
+	m_CtrlDlg.m_Weight    = m_WngAnalysis.m_Weight;
+	m_CtrlDlg.m_Viscosity = m_WngAnalysis.m_Viscosity;
+	m_CtrlDlg.m_Density  = m_WngAnalysis.m_Density;
 
 	if(m_pCurPlane) 
 		m_CtrlDlg.m_UFOName   = m_pCurPlane->m_PlaneName;

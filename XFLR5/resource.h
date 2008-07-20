@@ -585,6 +585,8 @@
 #define IDC_PANELS                      1564
 #define IDC_WINGOUTLINE                 1565
 #define IDC_DOUBLEFIN                   1566
+#define IDC_WINGOUTLINE2                1566
+#define IDC_3DAXIS                      1566
 #define IDC_DEFINEFIN                   1567
 #define IDC_DEFINEWING                  1569
 #define IDC_DEFINEWING2                 1570
@@ -1023,6 +1025,7 @@
 #define IDM_SHOWONLYACTIVEFRAME         33317
 #define IDM_EXPORTCURRESULTS            33319
 #define IDM_CONTROLPOLAR                33321
+#define IDM_3DCOLORPREFS                33322
 #define ID_APP_EXIT2                    57666
 #define ID_VIEW_STATUS_BAR2             59394
 
@@ -1032,7 +1035,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        357
-#define _APS_NEXT_COMMAND_VALUE         33322
+#define _APS_NEXT_COMMAND_VALUE         33323
 #define _APS_NEXT_CONTROL_VALUE         5236
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

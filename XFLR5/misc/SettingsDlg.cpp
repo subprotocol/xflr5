@@ -48,6 +48,7 @@ void C3DColorDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	//{{AFX_DATA_MAP(C3DColorDlg)
+	DDX_Control(pDX, IDC_3DAXIS, m_ctrl3DAxis);
 	DDX_Control(pDX, IDC_VLMMESH, m_ctrlVLMMesh);
 	DDX_Control(pDX, IDC_DOWNWASH, m_ctrlDownwash);
 	DDX_Control(pDX, IDC_WAKE, m_ctrlWake);
@@ -66,6 +67,7 @@ void C3DColorDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(C3DColorDlg, CDialog)
 	//{{AFX_MSG_MAP(C3DColorDlg)
 	ON_WM_DRAWITEM()
+	ON_BN_CLICKED(IDC_3DAXIS, On3DAxis)
 	ON_BN_CLICKED(IDC_WINGOUTLINE, OnWingColor)
 	ON_BN_CLICKED(IDC_TOPTRANS, OnTopTrans)
 	ON_BN_CLICKED(IDC_BOTTRANS, OnBotTrans)
@@ -106,7 +108,39 @@ void C3DColorDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
-	if(nIDCtl==IDC_WINGOUTLINE ){
+	if(nIDCtl==IDC_3DAXIS)
+	{
+		LOGBRUSH lb;
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor = RGB(100,100,100);
+		CPen DotPen(PS_GEOMETRIC | PS_DOT, 1, &lb);
+		CPen *pOldPen =  pDC->SelectObject(&DotPen);
+		CBrush FillBrush(GetSysColor(COLOR_3DFACE));
+		CBrush* pOldBrush = pDC->SelectObject(&FillBrush);
+		CRect SRect ;
+		GetDlgItem(IDC_WINGOUTLINE)->GetClientRect(&SRect);
+		SRect.DeflateRect(2,2,2,2);
+		pDC->Rectangle(&SRect);
+
+		lb.lbStyle = BS_SOLID;
+		lb.lbColor =m_3DAxisColor;
+		CPen WingPen(PS_GEOMETRIC | m_3DAxisStyle, GetPenWidth(m_3DAxisWidth,false), &lb);
+
+		pDC->SelectObject(&WingPen);
+
+		pDC->MoveTo(5,8);
+		pDC->LineTo(SRect.right-5,8);
+
+		pDC->SelectObject(pOldPen);
+		WingPen.DeleteObject();
+
+		pDC->SelectObject(pOldBrush);
+//		FillBrush.DeleteObject();
+//		pDC->Detach();
+
+	}
+	else if(nIDCtl==IDC_WINGOUTLINE )
+	{
 		LOGBRUSH lb;
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = RGB(100,100,100);
@@ -403,6 +437,21 @@ void C3DColorDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	else {
 		CDialog::OnDrawItem(nIDCtl, lpDrawItemStruct);
 	}
+}
+
+void C3DColorDlg::On3DAxis() 
+{
+	CLinePickerDlg LPdlg;
+	LPdlg.SetColor(m_3DAxisColor);
+	LPdlg.SetStyle(m_3DAxisStyle);
+	LPdlg.SetWidth(m_3DAxisWidth);
+
+	if (IDOK==LPdlg.DoModal()){
+		m_3DAxisColor = LPdlg.GetColor();
+		m_3DAxisStyle = LPdlg.GetStyle();
+		m_3DAxisWidth = LPdlg.GetWidth();
+	}
+	m_ctrl3DAxis.Invalidate(true);	
 }
 
 void C3DColorDlg::OnTopTrans() 

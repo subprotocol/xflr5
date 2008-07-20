@@ -57,7 +57,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(IDM_XFLR5, OnXDirect)
 	ON_COMMAND(IDM_TOOLBARS, OnToolbars)
 	ON_COMMAND(IDM_FULLINVERSE, OnFullInverse)
-	ON_COMMAND(IDM_PLANEPREFS, OnPlanePrefs)
+	ON_COMMAND(IDM_3DCOLORPREFS, On3DColorPrefs)
 	ON_COMMAND(IDM_MIXEDINVERSE, OnMixedInverse)
 	ON_COMMAND(IDM_MIAREX, OnMiarex)
 	ON_COMMAND(IDM_LOADFILE, OnAppOpen)
@@ -209,7 +209,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v407_Beta";
+	m_VersionName = "XFLR5_v408_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -337,6 +337,9 @@ CMainFrame::CMainFrame()
 	m_VLMWidth    = 1;
 	m_VLMColor    = RGB(100,100,100);
 
+	m_3DAxisStyle    = PS_DASHDOT;
+	m_3DAxisWidth    = 1;
+	m_3DAxisColor    = RGB(150,150,150);
 	m_OutlineStyle   = PS_SOLID;
 	m_OutlineWidth   = 1;
 	m_OutlineColor   = RGB(120,120,120);
@@ -3240,6 +3243,7 @@ void CMainFrame::SaveSettings()
 		ar << m_ForceUnit;
 		ar << m_MomentUnit;
 
+		ar << m_3DAxisColor << m_3DAxisStyle << m_3DAxisWidth;
 		ar << m_VLMColor << m_VLMStyle << m_VLMWidth;
 		ar << m_OutlineColor << m_OutlineStyle << m_OutlineWidth;
 		ar << m_XTopStyle << m_XTopWidth << m_XTopColor;
@@ -3313,6 +3317,30 @@ void CMainFrame::LoadSettings()
 
 			SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 					 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+
+			ar >> k;
+			if(k<0 || k>RGB(255,255,255)){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}
+			m_3DAxisColor = k;
+
+			ar >> k;
+			if(k<0 || k>10){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}			
+			m_3DAxisStyle  = k;
+
+			ar >> k;
+			if(k<0 || k>10){
+				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
+				pfe->m_strFileName = ar.m_strFileName;
+				throw pfe;
+			}			
+			m_3DAxisWidth  = k;
 
 			ar >> k;
 			if(k<0 || k>RGB(255,255,255)){
@@ -6108,10 +6136,13 @@ void CMainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 	}
 }
 
-void CMainFrame::OnPlanePrefs() 
+void CMainFrame::On3DColorPrefs() 
 {
 	C3DColorDlg SDlg(this);
 	SDlg.m_bWakePanels    = Miarex.m_bWakePanels;
+	SDlg.m_3DAxisColor    = m_3DAxisColor;
+	SDlg.m_3DAxisStyle    = m_3DAxisStyle;
+	SDlg.m_3DAxisWidth    = m_3DAxisWidth;
 	SDlg.m_VLMColor       = m_VLMColor;
 	SDlg.m_VLMStyle       = m_VLMStyle;
 	SDlg.m_VLMWidth       = m_VLMWidth;
@@ -6143,8 +6174,12 @@ void CMainFrame::OnPlanePrefs()
 	SDlg.m_WakeStyle      = m_WakeStyle;
 	SDlg.m_WakeWidth      = m_WakeWidth;
 
-	if(SDlg.DoModal() == IDOK){
+	if(SDlg.DoModal() == IDOK)
+	{
 		Miarex.m_bWakePanels    = SDlg.m_bWakePanels;
+		m_3DAxisColor    = SDlg.m_3DAxisColor;
+		m_3DAxisStyle    = SDlg.m_3DAxisStyle;
+		m_3DAxisWidth    = SDlg.m_3DAxisWidth;
 		m_VLMColor     = SDlg.m_VLMColor;
 		m_VLMStyle     = SDlg.m_VLMStyle;
 		m_VLMWidth     = SDlg.m_VLMWidth;
@@ -6177,6 +6212,7 @@ void CMainFrame::OnPlanePrefs()
 		m_WakeWidth      = SDlg.m_WakeWidth;
 		Miarex.m_bResetglWake = true;
 		Miarex.m_bResetglBody = true;
+		Miarex.m_bResetglBody2D = true;
 		Miarex.m_bResetglGeom = true;
 		Miarex.m_bResetglMesh = true;
 		Miarex.m_bResetglOpp  = true;
