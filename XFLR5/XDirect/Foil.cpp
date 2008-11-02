@@ -288,12 +288,13 @@ void CFoil::DrawFoil(CDC *pDC, double alpha, double scalex, double scaley,
 {
 	double xa,ya,sina,cosa;
 	CPoint pt, From, To;
-	int xp, yp;
+	int xp, yp, k;
 
 	cosa = cos(alpha);
 	sina = sin(alpha);
 
-	if (IsPrinting){
+	if (IsPrinting)
+	{
 		scalex =  scalex;
 		scaley = -scaley;
 	}
@@ -305,26 +306,32 @@ void CFoil::DrawFoil(CDC *pDC, double alpha, double scalex, double scaley,
 
 	if(DrawRect.PtInRect(From)) pDC->MoveTo(From);
 
-	for (int k=1; k<n; k++){
+	for (k=1; k<n; k++)
+	{
 		xa = (x[k]-0.5)*cosa - y[k]*sina+ 0.5;
 		ya = (x[k]-0.5)*sina + y[k]*cosa;
 		To.x = (int)( xa*scalex+Offset.x);
 		To.y = (int)(-ya*scaley+Offset.y);
 
-		if(DrawRect.PtInRect(From) && DrawRect.PtInRect(To)){
+		if(DrawRect.PtInRect(From) && DrawRect.PtInRect(To))
+		{
 			pDC->LineTo(To);
 		}
-		else if(DrawRect.PtInRect(From) && !DrawRect.PtInRect(To)){
+		else if(DrawRect.PtInRect(From) && !DrawRect.PtInRect(To))
+		{
 			xp = From.x;
 			yp = From.y;
-			if(Intersect(xp,yp, DrawRect, From, To)){
+			if(Intersect(xp,yp, DrawRect, From, To))
+			{
 				pDC->LineTo(xp,yp);				
 			}
 		}
-		else if(!DrawRect.PtInRect(From) && DrawRect.PtInRect(To)){
+		else if(!DrawRect.PtInRect(From) && DrawRect.PtInRect(To))
+		{
 			xp = From.x;
 			yp = From.y;
-			if(Intersect(xp,yp, DrawRect, From, To)){
+			if(Intersect(xp,yp, DrawRect, From, To))
+			{
 				pDC->MoveTo(xp,yp);
 				pDC->LineTo(To);
 			}
@@ -366,24 +373,20 @@ bool CFoil::ExportFoil(CString FileName)
 {
 	CStdioFile XFile;
 	CFileException fe;
+	int i;
 
 	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
-	if (bOpen){
+
+	if (bOpen)
+	{
 		CString strOut;
 
 		XFile.WriteString(m_FoilName+"\n");
-		for (int i=0; i< n; i++){
+		for (i=0; i< n; i++)
+		{
 			strOut.Format("%8.5f   %8.5f\n",x[i],y[i]);
 			XFile.WriteString(strOut);
 		}
-/*		for (int i=50; i>=0; i--){
-			strOut.Format("%8.5f   %8.5f\n",m_rpMid[i*20].x,m_rpMid[i*20].y);
-			XFile.WriteString(strOut);
-		}
-		for (int i=0; i<= 50; i++){
-			strOut.Format("%8.5f   %8.5f\n",m_rpMid[i*20].x,-m_rpMid[i*20].y);
-			XFile.WriteString(strOut);
-		}*/
 		
 		m_bSaved = true;
 
@@ -622,6 +625,8 @@ void CFoil::Serialize(CArchive &ar)
 	// 1002 : added color and style save
 	// 1001 : initial format
 	int p;
+	int j;
+	float f,g;
 
 	if(ar.IsStoring()){
 		ar << ArchiveFormat;
@@ -636,7 +641,7 @@ void CFoil::Serialize(CArchive &ar)
 		ar << (float)m_TEFlapAngle << (float)m_TEXHinge << (float)m_TEYHinge;
 		ar << 1.f << 1.f << 9.f;//formerly transition parameters
 		ar << nb;
-		for (int j=0; j<nb; j++){
+		for (j=0; j<nb; j++){
 			ar << (float)xb[j] << (float)yb[j];
 		}
 		ar << n;
@@ -644,8 +649,8 @@ void CFoil::Serialize(CArchive &ar)
 			ar << (float)x[j] << (float)y[j];
 		}
 	}
-	else {
-		float f,g;
+	else 
+	{
 		ar >> ArchiveFormat;
 		//Archive Format 1001 : adds the modified foil to the file
 		ar >> m_FoilName;
@@ -682,7 +687,7 @@ void CFoil::Serialize(CArchive &ar)
 			m_FoilName = "";
 			return;
 		}
-		for (int j=0; j<nb; j++){
+		for (j=0; j<nb; j++){
 			ar >> f >> g;
 			xb[j]  = f;  yb[j]=g;
 		}
@@ -870,8 +875,7 @@ int CFoil::IsPoint(CVector Real)
 }
 
 
-
-void  CFoil::SetTEFlap(bool bFlap, double xhinge, double yhinge, double angle)
+void  CFoil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
 	// Sets a trailing edge flap properties
 	// x and y hinge are in relative % coordinates
@@ -883,7 +887,8 @@ void  CFoil::SetTEFlap(bool bFlap, double xhinge, double yhinge, double angle)
 	m_TEFlapAngle = angle;
 }
 
-void  CFoil::SetLEFlap(bool bFlap, double xhinge, double yhinge, double angle)
+
+void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle)
 {
 	// Sets a leading edge flap properties
 	// x and y hinge are in relative % coordinates
@@ -893,8 +898,6 @@ void  CFoil::SetLEFlap(bool bFlap, double xhinge, double yhinge, double angle)
 	m_LEYHinge    = yhinge;
 	m_LEFlapAngle = angle;
 }
-
-
 void CFoil::SetFlap()
 {
 	// modifies the current airfoil's geometry 
@@ -915,7 +918,7 @@ void CFoil::SetFlap()
 	m_iExt = m_iBaseExt;
 	m_iInt = m_iBaseInt;
 
-// First Leading Edge Flap
+
 	if(m_bLEFlap)
 	{
 		cosa = cos(m_LEFlapAngle*pi/180.0);
@@ -1040,6 +1043,10 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpIntrados[iLowerh-2], m_rpIntrados[iLowerh-1],
 					  m_rpIntrados[iLowerh],   m_rpIntrados[iLowerh+1], &M);
+			//sanity check
+			if(M.x <= m_rpIntrados[iLowerh-1].x || M.x >= m_rpIntrados[iLowerh].x)
+				M = (m_rpIntrados[iLowerh-1] + m_rpIntrados[iLowerh])/2.0;
+
 			LinkSpline.InsertPoint(m_rpIntrados[iLowerh-1].x,m_rpIntrados[iLowerh-1].y);
 			LinkSpline.InsertPoint(M.x, M.y);
 			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
@@ -1065,6 +1072,11 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpExtrados[iUpperh-2], m_rpExtrados[iUpperh-1],
 					  m_rpExtrados[iUpperh],   m_rpExtrados[iUpperh+1], &M);
+
+			//sanity check
+			if(M.x <= m_rpExtrados[iUpperh-1].x || M.x >= m_rpExtrados[iUpperh].x)
+				M = (m_rpExtrados[iUpperh-1] + m_rpExtrados[iUpperh])/2.0;
+
 			LinkSpline.InsertPoint(m_rpExtrados[iUpperh-1].x,m_rpExtrados[iUpperh-1].y);
 			LinkSpline.InsertPoint(M.x, M.y);
 			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
@@ -1148,7 +1160,7 @@ void CFoil::SetFlap()
 		}
 	}
 
-// Next Trailing Edge Flap
+// Trailing Edge Flap
 	if(m_bTEFlap)
 	{
 		cosa = cos(m_TEFlapAngle*pi/180.0);
@@ -1264,6 +1276,11 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
 			Intersect(m_rpIntrados[iLowerh-1], m_rpIntrados[iLowerh],
 					  m_rpIntrados[iLowerh+1], m_rpIntrados[iLowerh+2], &M);
+
+			//sanity check
+			if(M.x <= m_rpIntrados[iLowerh].x || M.x >= m_rpIntrados[iLowerh+1].x)
+				M = (m_rpIntrados[iLowerh] + m_rpIntrados[iLowerh+1])/2.0;
+
 			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
 			LinkSpline.InsertPoint(M.x, M.y);
 			LinkSpline.InsertPoint(m_rpIntrados[iLowerh+1].x,m_rpIntrados[iLowerh+1].y);
@@ -1288,6 +1305,11 @@ void CFoil::SetFlap()
 			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on top side
 			Intersect(m_rpExtrados[iUpperh-1], m_rpExtrados[iUpperh],
 					  m_rpExtrados[iUpperh+1], m_rpExtrados[iUpperh+2], &M);
+
+			//sanity check
+			if(M.x <= m_rpExtrados[iUpperh].x || M.x >= m_rpExtrados[iUpperh+1].x)
+				M = (m_rpExtrados[iUpperh] + m_rpExtrados[iUpperh+1])/2.0;
+
 			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
 			LinkSpline.InsertPoint(M.x, M.y);
 			LinkSpline.InsertPoint(m_rpExtrados[iUpperh+1].x,m_rpExtrados[iUpperh+1].y);

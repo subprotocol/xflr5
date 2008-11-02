@@ -252,9 +252,10 @@ void CCurveDlgBar::OnShowPoints()
 
 void CCurveDlgBar::OnColorBtn() 
 {
+	int i;
 	m_crColor = m_ctrlColor.GetColor();
 
-	for (int i=0; i<5;i++){
+	for (i=0; i<5;i++){
 		m_ctrlWidth.m_Lines[i].crColor = m_crColor;
 	}
 

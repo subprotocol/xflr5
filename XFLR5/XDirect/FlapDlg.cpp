@@ -139,8 +139,8 @@ void CFlapDlg::OnApply()
 
 	ReadParams();
 
-	m_pBufferFoil->SetTEFlap(m_bTEFlap, m_TEXHinge, m_TEYHinge, m_TEFlapAngle);
-	m_pBufferFoil->SetLEFlap(m_bLEFlap, m_LEXHinge, m_LEYHinge, m_LEFlapAngle);
+	m_pBufferFoil->SetTEFlapData(m_bTEFlap, m_TEXHinge, m_TEYHinge, m_TEFlapAngle);
+	m_pBufferFoil->SetLEFlapData(m_bLEFlap, m_LEXHinge, m_LEYHinge, m_LEFlapAngle);
 	m_pBufferFoil->SetFlap();
 	
 	m_bApplied = true;
@@ -150,14 +150,17 @@ void CFlapDlg::OnApply()
 
 BOOL CFlapDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	if (pMsg->message == WM_KEYDOWN){
-		if(pMsg->wParam == VK_RETURN){
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		if(pMsg->wParam == VK_RETURN)
+		{
 			CWnd* pWnd = GetFocus();
 			if(pWnd==GetDlgItem(IDOK))
 				OnOK();
 			else if(pWnd==GetDlgItem(IDCANCEL))
 				OnCancel();
-			else{
+			else
+			{
 				OnApply();
 				m_ctrlOK.SetFocus();
 				return TRUE ;
@@ -184,7 +187,8 @@ void CFlapDlg::EnableTEFlap(bool bEnable)
 
 void CFlapDlg::OnTEFlapCheck() 
 {
-	if(m_ctrlTEFlapCheck.GetCheck()) {
+	if(m_ctrlTEFlapCheck.GetCheck()) 
+	{
 		EnableTEFlap(true);
 		m_ctrlTEFlapAngle.SetFocus();
 	}
@@ -196,7 +200,8 @@ void CFlapDlg::OnTEFlapCheck()
 
 void CFlapDlg::OnLEFlapCheck() 
 {
-	if(m_ctrlLEFlapCheck.GetCheck()) {
+	if(m_ctrlLEFlapCheck.GetCheck()) 
+	{
 		EnableLEFlap(true);
 		m_ctrlLEFlapAngle.SetFocus();
 	}

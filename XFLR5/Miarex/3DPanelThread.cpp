@@ -109,11 +109,13 @@ bool C3DPanelThread::UnitLoop()
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	int n, nrhs, nWakeIter, MaxWakeIter, TotalTime;
 	double Alpha;
+
 	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -abs(m_DeltaAlpha);
 	nrhs  = (int)abs((m_AlphaMax-m_Alpha)*1.0001/m_DeltaAlpha) + 1;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100){
+	else if(nrhs>=100)
+	{
 		int res = AfxMessageBox("The number of points to be calculated will be limited to 100", MB_OKCANCEL);
 		if(res ==IDCANCEL) return false;
 		nrhs = 100;
@@ -142,12 +144,6 @@ bool C3DPanelThread::UnitLoop()
 	str.Format("   Solving the problem... \r\n");
 	p3DDlg->AddString(str);
 
-	if (!p3DDlg->CreateMatrix())
-	{
-		p3DDlg->AddString("\r\nFailed to create the matrix....\r\n");
-		p3DDlg->m_bWarning = true;
-		return true;
-	}
 
 	for (n=0; n<nrhs; n++)
 	{
@@ -164,9 +160,16 @@ bool C3DPanelThread::UnitLoop()
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
 		pMiarex->RotateGeomY(m_Alpha+n*m_DeltaAlpha, O);
+		if (!p3DDlg->CreateMatrix())
+		{
+			p3DDlg->AddString("\r\nFailed to create the matrix....\r\n");
+			p3DDlg->m_bWarning = true;
+			return true;
+		}
 
 		// The calculation will be performed at AOA=0.0 because the geometry is tilted...
 		Alpha = 0.0;
+		p3DDlg->m_Alpha = 0.0;
 		// ... but the operatinging angle is different :
 		p3DDlg->m_OpAlpha = m_Alpha+n*m_DeltaAlpha;
 

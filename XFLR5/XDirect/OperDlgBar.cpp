@@ -39,13 +39,17 @@ COperDlgBar::COperDlgBar(CWnd* pParent /*=NULL*/)
 {
 	m_IterLim   = 50;
 
-	m_Alpha = 0.0;
-	m_AlphaMax = 1.0;
+	m_Alpha      = 0.0;
+	m_AlphaMax   = 1.0;
 	m_DeltaAlpha = 0.5;
 
-	m_Re = 100000.0;
-	m_ReMax = 300000.0;
-	m_DeltaRe = 50000.0;
+	m_Cl         = 0.0;
+	m_ClMax      = 0.5;
+	m_DeltaCl    = 0.05;
+
+	m_Re         = 100000.0;
+	m_ReMax      = 300000.0;
+	m_DeltaRe    = 50000.0;
 
 	m_bSequence = false;
 	m_pXDirect = NULL;
@@ -159,24 +163,42 @@ void COperDlgBar::SetOpPointSequence()
 	CXDirect* pXDirect = (CXDirect*)m_pXDirect;
 	if(m_bSequence) m_ctrlSequence.SetCheck(1); else m_ctrlSequence.SetCheck(0);
 
-	if(pXDirect->m_pCurPolar->m_Type != 4){
-		if(GetCheckedRadioButton(IDC_PARAM1, IDC_PARAM3) == IDC_PARAM3){
+	if(pXDirect->m_pCurPolar->m_Type != 4)
+	{
+		if(GetCheckedRadioButton(IDC_PARAM1, IDC_PARAM3) == IDC_PARAM3)
+		{
 			CheckRadioButton(IDC_PARAM1, IDC_PARAM3, IDC_PARAM1);
 			pXDirect->m_bAlpha = true;
 		}
-		m_ctrlAlpha.SetPrecision(2);
-		m_ctrlAlphaMax.SetPrecision(2);
-		m_ctrlDeltaAlpha.SetPrecision(2);
-		m_ctrlAlpha.SetValue(m_Alpha);
-		m_ctrlAlphaMax.SetValue(m_AlphaMax);
-		m_ctrlDeltaAlpha.SetValue(m_DeltaAlpha);
-		m_ctrlAlpha.SetMax(90.0);
-		m_ctrlAlpha.SetMin(-90.0);
-		m_ctrlDeltaAlpha.SetMax(50.0);
-		m_ctrlDeltaAlpha.SetMin(-50.0);
-
+		if(GetCheckedRadioButton(IDC_PARAM1, IDC_PARAM3) == IDC_PARAM1)
+		{
+			m_ctrlAlpha.SetPrecision(2);
+			m_ctrlAlphaMax.SetPrecision(2);
+			m_ctrlDeltaAlpha.SetPrecision(2);
+			m_ctrlAlpha.SetValue(m_Alpha);
+			m_ctrlAlphaMax.SetValue(m_AlphaMax);
+			m_ctrlDeltaAlpha.SetValue(m_DeltaAlpha);
+			m_ctrlAlpha.SetMax(90.0);
+			m_ctrlAlpha.SetMin(-90.0);
+			m_ctrlDeltaAlpha.SetMax(50.0);
+			m_ctrlDeltaAlpha.SetMin(-50.0);
+		}
+		else if(GetCheckedRadioButton(IDC_PARAM1, IDC_PARAM3) == IDC_PARAM2)
+		{
+			m_ctrlAlpha.SetPrecision(2);
+			m_ctrlAlphaMax.SetPrecision(2);
+			m_ctrlDeltaAlpha.SetPrecision(2);
+			m_ctrlAlpha.SetValue(m_Cl);
+			m_ctrlAlphaMax.SetValue(m_ClMax);
+			m_ctrlDeltaAlpha.SetValue(m_DeltaCl);
+			m_ctrlAlpha.SetMax(5.0);
+			m_ctrlAlpha.SetMin(-5.0);
+			m_ctrlDeltaAlpha.SetMax(2.0);
+			m_ctrlDeltaAlpha.SetMin(-2.0);
+		}
 	}
-	else{
+	else
+	{
 		CheckRadioButton(IDC_PARAM1, IDC_PARAM3, IDC_PARAM3);
 		pXDirect->m_bAlpha = true;// no choice with type 4 polars
 		m_ctrlAlpha.SetPrecision(0);
@@ -189,7 +211,6 @@ void COperDlgBar::SetOpPointSequence()
 		m_ctrlAlpha.SetMin(0.0);
 		m_ctrlDeltaAlpha.SetMax(1e11);
 		m_ctrlDeltaAlpha.SetMin(0.0);
-
 	}
 }
 
@@ -348,13 +369,13 @@ void COperDlgBar::SetParams()
 	if(pXDirect->m_pCurPolar){
 		if(pXDirect->m_pCurPolar->m_Type != 4){
 			if(pXDirect->m_bAlpha) CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM1);
-			else                 CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM2);
+			else                   CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM2);
 		}
 		else CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM3);
 	}
 	else {
 		if(pXDirect->m_bAlpha) CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM1);
-		else                 CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM2);
+		else                   CheckRadioButton(IDC_PARAM1,IDC_PARAM3,IDC_PARAM2);
 	}
 }
 
@@ -363,12 +384,23 @@ void COperDlgBar::ReadParams()
 {
 	CXDirect* pXDirect = (CXDirect*)m_pXDirect;
 	if(!pXDirect->m_pCurPolar) return;
-	if(pXDirect->m_pCurPolar->m_Type !=4){
-		m_Alpha      = m_ctrlAlpha.GetValue();
-		m_AlphaMax   = m_ctrlAlphaMax.GetValue();
-		m_DeltaAlpha = m_ctrlDeltaAlpha.GetValue();
+	if(pXDirect->m_pCurPolar->m_Type !=4)
+	{
+		if(pXDirect->m_bAlpha)
+		{
+			m_Alpha      = m_ctrlAlpha.GetValue();
+			m_AlphaMax   = m_ctrlAlphaMax.GetValue();
+			m_DeltaAlpha = m_ctrlDeltaAlpha.GetValue();
+		}
+		else
+		{
+			m_Cl      = m_ctrlAlpha.GetValue();
+			m_ClMax   = m_ctrlAlphaMax.GetValue();
+			m_DeltaCl = m_ctrlDeltaAlpha.GetValue();
+		}
 	}
-	else{
+	else
+	{
 		m_Re      = m_ctrlAlpha.GetValue();
 		m_ReMax   = m_ctrlAlphaMax.GetValue();
 		m_DeltaRe = m_ctrlDeltaAlpha.GetValue();

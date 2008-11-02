@@ -78,6 +78,7 @@ public:
 	bool VLMSolveMultiple(double V0, double VDelta, int nval);
 
 	double VLMComputeCm(double alpha, bool bTrace=false);
+	void CVLMDlg::pgmat(double const &mach, double const &alfa, double const &beta, double pg[3][3]);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 	void VLMSetAi(double *Gamma);
 	void VLMSumForces(double *Gamma, double Alpha, double QInf, double &Lift, double &Drag);
@@ -89,6 +90,7 @@ public:
 	void RelaxWake();
 	bool Gauss(double *A, int n, double *B, int m);
 
+	void Plot();
 protected:
 	CWnd* m_pMiarex;
 	CWnd *m_pFrame;
@@ -117,7 +119,7 @@ protected:
 	double *m_RHS;
 	double *m_aij;
 	double *m_Gamma;
-	double m_cosRHS[VLMMATSIZE], m_sinRHS[VLMMATSIZE];
+	double m_xRHS[VLMMATSIZE], m_yRHS[VLMMATSIZE], m_zRHS[VLMMATSIZE];
 	double m_Cp[VLMMATSIZE];//lift coef per panel
 	double m_VLMQInf[100];
 	double m_OpAlpha, m_Ctrl;
@@ -125,6 +127,7 @@ protected:
 	double m_Control, m_ControlMax, m_DeltaControl;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
 	double m_CL, m_ViscousDrag, m_InducedDrag;
+	double m_CX, m_CY; //Force summation
 	double m_XCP, m_YCP;
 	double Omega;
 	double ftmp;
@@ -162,7 +165,7 @@ protected:
 	CWing *m_pFin;
 	CWPolar *m_pWPolar;
 
-	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, CG, VG;
+	CVector AA, BB, AA1, BB1, AAG, BBG, V, VT, VS, CG, VG, D;
 	CVector Far;
 	CVector r0, r1, r2;
 	CVector h,t;

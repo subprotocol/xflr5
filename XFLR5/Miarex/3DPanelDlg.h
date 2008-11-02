@@ -81,6 +81,7 @@ protected:
 	void SumPanelForces(double *Cp, double Alpha, double Qinf, double &Lift, double &Drag);
 	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
 
+	void Plot();
 
 	double *m_aij, *m_aijRef;
 	double *m_RHS;
@@ -113,7 +114,7 @@ protected:
 	double m_OpAlpha;
 	double m_AlphaMax;
 	double m_DeltaAlpha;
-	double m_CL, m_ViscousDrag, m_InducedDrag;
+	double m_CL, m_CX, m_CY, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
 	double m_VCm,m_VYm; //Viscous moments
 	double m_IYm;		// Induced Yawing Moment

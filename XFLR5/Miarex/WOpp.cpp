@@ -60,8 +60,11 @@ CWOpp::CWOpp()
 	m_AnalysisType = 0;
 
 	m_Alpha               = 0.0;
+	m_Beta                = 0.0;
 	m_Ctrl                = 0.0;
 	m_CL                  = 0.0;
+	m_CY                  = 0.0;
+	m_CX                  = 0.0;
 	m_ViscousDrag         = 0.0;
 	m_InducedDrag         = 0.0;
 	m_GCm                 = 0.0;
@@ -111,7 +114,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 	float f, f1, f2;
 
 	if(ar.IsStoring()){
-		ar << 1014;
+		ar << 1015;
+		//1015 : added M_CX and m_CY values
 		//1014 : redefined moment coefficients
 		//1013 : added m_bTiltedGeom
 		//1012 : added m_StripArea
@@ -139,6 +143,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 		ar << m_Type << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight << (float)m_Span << (float)m_MAChord;
 		ar << (float)m_CL << (float)m_ViscousDrag << (float)m_InducedDrag ;
+		ar << (float)m_Beta;
+		ar << (float)m_CX << (float)m_CY;
 
 		ar << (float)m_GCm << (float)m_GRm << (float)m_GYm;
 		ar << 0.0f << (float)m_VYm;
@@ -146,7 +152,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 	
 		ar << (float)m_XCP << (float)m_YCP;
 
-		for (k=0; k<m_NStation; k++){
+		for (k=0; k<m_NStation; k++)
+		{
 			ar << (float)m_Re[k] << (float)m_Chord[k] << (float)m_Twist[k];
 			ar << (float)m_Ai[k] << (float)m_Cl[k] << (float)m_PCd[k] << (float)m_ICd[k];
 			ar << (float)m_Cm[k] << (float)m_CmAirf[k] << (float)m_CmXRef[k];
@@ -249,7 +256,12 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			ar >> f; m_CL =f;
 			ar >> f; m_ViscousDrag =f;
 			ar >> f; m_InducedDrag =f;
-
+			if(ArchiveFormat>=1015)
+			{
+				ar >> f; m_Beta=f;
+				ar >> f; m_CX =f;
+				ar >> f; m_CY =f;
+			}
 			ar >> f; m_GCm =f;
 			ar >> f; m_GRm =f;
 			ar >> f; m_GYm =f;
@@ -364,7 +376,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				m_YCP     /=1000.0;
 			}
 		}
-		catch (CArchiveException *ex){
+		catch (CArchiveException *ex)
+		{
 /*			TCHAR   szCause[255];
 			CString str;
 			ex->GetErrorMessage(szCause, 255);
@@ -384,14 +397,14 @@ bool CWOpp::Export(	CStdioFile *pXFile)
 	CString Header, strong;
 	int k;
 
-	Header.Format("  y-span      Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
+	Header.Format("  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
 	pXFile->WriteString(Header);
 
 	int nStart;
 	if(m_AnalysisType==1) nStart = 1;	
 	else nStart = 0;
 	for (k=nStart; k<m_NStation; k++){
-		strong.Format("%10.4f  %7.2f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
+		strong.Format("%10.4f  %9.4f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
 			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],
 			m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],
 			m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);

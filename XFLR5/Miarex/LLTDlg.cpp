@@ -59,10 +59,14 @@ CLLTDlg::CLLTDlg(CWnd* pParent /*=NULL*/)
 
 	m_pWThread   = NULL;
 	m_pWing      = NULL;
+	m_strOut = "";
 
+	m_bCancel   = false;
+	m_bTrace    = true;
 	m_bSequence = false;
 	m_bType4    = false;
 	m_bWarning  = false;
+	m_bXFile    = true;
 }
 
 
@@ -72,14 +76,13 @@ void CLLTDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CLLTDlg)
 	DDX_Control(pDX, IDCANCEL, m_ctrlCancel);
 	DDX_Control(pDX, IDC_SKIP, m_ctrlSkip);
+	DDX_Control(pDX, IDC_OUTPUT, m_ctrlOutput);
 	//}}AFX_DATA_MAP
 }
 
 
 BEGIN_MESSAGE_MAP(CLLTDlg, CDialog)
-	//{{AFX_MSG_MAP(CLLTDlg)
 	ON_BN_CLICKED(IDC_SKIP, OnSkip)
-	//}}AFX_MSG_MAP
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -89,8 +92,9 @@ END_MESSAGE_MAP()
 BOOL CLLTDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	if(m_DlgPos.x==0 && m_DlgPos.y==0)
-		SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-600,30,0,0,SWP_NOSIZE);	
+	CRect WndRect;
+	GetWindowRect(WndRect);
+	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 
 	CString str;
 	CString strAppDirectory;
@@ -98,16 +102,22 @@ BOOL CLLTDlg::OnInitDialog()
 	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
 	str =strAppDirectory + "XFLR5.log";
-	m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
+
+	BOOL bOpen = m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
+	if(bOpen) m_bXFile = true;
+	else      m_bXFile = false;
 	m_pWing->m_pXFile = &m_XFile;
 
+
 	SetFileHeader();
+	m_ctrlOutput.SetLimitText(100000);
 
 	m_IterRect.SetRect(20,20,460,320);
 	m_IterGraph.DeleteCurves();
 	m_pIterCurve = m_IterGraph.AddCurve();
 
-	if (IsBlackAndWhite()) {
+	if (IsBlackAndWhite()) 
+	{
 		m_IterGraph.SetAxisColor(RGB(0,0,0));
 		m_IterGraph.SetBkColor(RGB(255,255,255));
 		m_IterGraph.SetLabelColor(RGB(0,0,0));
@@ -125,7 +135,8 @@ BOOL CLLTDlg::OnInitDialog()
 	LgFt.lfHeight = - MulDiv(8, dc.GetDeviceCaps(LOGPIXELSY), 72);
 	m_IterGraph.SetLabelLogFont(&LgFt);
 
-	if(m_pWing->m_bLLT){ 
+	if(m_pWing->m_bLLT)
+	{ 
 		m_pWThread = new CLLTThread(this);
 		m_pWThread->m_pParent = this;
 //		m_pWThread->m_bAutoDelete = true;
@@ -151,14 +162,26 @@ BOOL CLLTDlg::OnInitDialog()
 }
 
 
+void CLLTDlg::AddString(CString strong)
+{
+	if(!m_bTrace) return;
+
+	if(m_bXFile)
+		m_XFile.WriteString(strong);
+
+	int length = m_ctrlOutput.GetWindowTextLength();
+	m_ctrlOutput.SetSel(length,length,true);
+	m_ctrlOutput.ReplaceSel(strong);
+	
+}
+      
 void CLLTDlg::OnTimer(UINT nIDEvent)
 {
-	if(m_pWThread && m_pWThread->m_bFinished){
+	if(m_pWThread && m_pWThread->m_bFinished)
+	{
 		HANDLE hThread = m_pWThread->m_hThread;
 		WaitForSingleObject(hThread, INFINITE);
-		delete m_pWThread;
-		m_XFile.Close();
-		EndDialog(0);
+		EndSequence();
 	}
 	CDialog::OnTimer(nIDEvent);
 }
@@ -247,17 +270,26 @@ void CLLTDlg::UpdateView(double Alpha)
 
 void CLLTDlg::OnCancel() 
 {
-	if (m_pWThread && !m_pWThread->m_bFinished)
-		 m_pWThread->Cancel();
-	
-//	CDialog::OnCancel();
+	if(!m_pWThread)
+	{
+		EndSequence();
+//		CDialog::OnCancel();
+		return;
+	}
+	else if (m_pWThread && !m_pWThread->m_bFinished)
+	{
+		m_bCancel = true;
+		m_pWThread->Cancel();
+	}
+	else
+		EndDialog(0);
 }
 
 
 
 void CLLTDlg::OnSkip() 
 {
-	m_pWThread->m_bSkip = true;
+	if(m_pWThread)	m_pWThread->m_bSkip = true;
 }
 /*
 void CLLTDlg::OnDestroy()
@@ -352,11 +384,13 @@ void CLLTDlg::SetFileHeader()
 bool CLLTDlg::EndSequence()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	if(!m_pWThread) return false;
 
 	m_XFile.Close();
-	if(m_bWarning && pMiarex->m_bLogFile){
-		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL)){
+
+	if(m_bWarning && pMiarex->m_bLogFile)
+	{
+		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL))
+		{
 			CFile lf;
 			CString str;
 			CString strAppDirectory;
@@ -367,7 +401,9 @@ bool CLLTDlg::EndSequence()
 			strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 			str =strAppDirectory + "XFLR5.log";
 
-			if(lf.Open(str, CFile::modeRead)){// file exists (there should be a better way to do this)
+			if(lf.Open(str, CFile::modeRead))
+			{
+				// file exists (there should be a better way to do this)
 				lf.Close();
 				
 				ShellExecute(GetSafeHwnd(),
@@ -379,6 +415,7 @@ bool CLLTDlg::EndSequence()
 			}
 		}
 	}
+
 	delete m_pWThread;
 	m_pWThread = NULL;
 	EndDialog(0);

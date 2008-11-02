@@ -50,12 +50,14 @@ CWAdvDlg::CWAdvDlg(CWnd* pParent /*=NULL*/)
 	m_WakeInterNodes  = 6;
 	m_MinPanelSize    = 1.0;
 
+	m_InducedDragPoint = 0;
+
 	m_bResetWake      = true;
 	m_bDirichlet      = true;
 	m_BLogFile        = true;
 	m_bKeepOutOpps    = true;
 
-	m_pMiarex = NULL;
+
 	m_pFrame  = NULL;
 	m_ControlPos = 0.75;
 	m_VortexPos  = 0.25;
@@ -90,7 +92,6 @@ void CWAdvDlg::DoDataExchange(CDataExchange* pDX)
  
 
 BEGIN_MESSAGE_MAP(CWAdvDlg, CDialog)
-	//{{AFX_MSG_MAP(CWAdvDlg)
 	ON_WM_CLOSE()
 	ON_BN_CLICKED(IDC_KEEPOUTOPPS, OnKeepOutOpps)
 	ON_BN_CLICKED(IDC_RESETWAKE, OnResetWake)
@@ -99,7 +100,8 @@ BEGIN_MESSAGE_MAP(CWAdvDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO2, OnRadio1)
 	ON_BN_CLICKED(IDC_RADIO3, OnRadio3)
 	ON_BN_CLICKED(IDC_RADIO4, OnRadio3)
-	//}}AFX_MSG_MAP
+	ON_BN_CLICKED(IDC_RADIO5, OnInducedDragPoint)
+	ON_BN_CLICKED(IDC_RADIO6, OnInducedDragPoint)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,7 +128,8 @@ BOOL CWAdvDlg::OnInitDialog()
 	m_ctrlMaxWakeIter.SetMax(100000);
 
 	m_ctrlCoreSize.SetMin(0.0);
-	m_ctrlCoreSize.SetMax(1000000.0);
+	m_ctrlCoreSize.SetMax(1.0);
+	m_ctrlCoreSize.SetPrecision(3);
 
 	CString len;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -145,6 +148,9 @@ BOOL CWAdvDlg::OnInitDialog()
 	GetDlgItem(IDC_RADIO2)->EnableWindow(false);
 	GetDlgItem(IDC_RADIO3)->EnableWindow(false);
 	GetDlgItem(IDC_RADIO4)->EnableWindow(false);
+
+	GetDlgItem(IDC_RADIO5)->EnableWindow(false);
+	GetDlgItem(IDC_RADIO6)->EnableWindow(false);
 
 	m_ctrlRelax.SetFocus();
 
@@ -199,8 +205,13 @@ void CWAdvDlg::SetParams()
 
 	if(m_bDirichlet) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
 	else			 CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
+
 	if(m_bTrefftz)   CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO3);
 	else			 CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO4);
+
+	if(m_InducedDragPoint==0)
+					CheckRadioButton(IDC_RADIO5, IDC_RADIO6, IDC_RADIO5);
+	else			CheckRadioButton(IDC_RADIO5, IDC_RADIO6, IDC_RADIO6);
 
 	m_ctrlControlPos.SetValue(m_ControlPos*100.0);
 	m_ctrlVortexPos.SetValue(m_VortexPos*100.0);
@@ -277,4 +288,11 @@ void CWAdvDlg::OnKeepOutOpps()
 {
 	if(m_ctrlKeepOutOpps.GetCheck())	m_bKeepOutOpps = true;
 	else								m_bKeepOutOpps = false;
+}
+
+void CWAdvDlg::OnInducedDragPoint()
+{
+	if(GetCheckedRadioButton(IDC_RADIO5, IDC_RADIO6)==IDC_RADIO5)	m_InducedDragPoint = 0;
+	else															m_InducedDragPoint = 1;
+
 }

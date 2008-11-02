@@ -392,10 +392,10 @@ void CWOperDlgBar::OnShowCl()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	if(m_ctrlCl.GetCheck())	{
-		if(!pMiarex->m_b3DVLMCl)		pMiarex->m_b3DVLMCl = true;
+		if(!pMiarex->m_b3DCp)		pMiarex->m_b3DCp = true;
 		pMiarex->m_bSurfaces = false;
 	}
-	else pMiarex->m_b3DVLMCl = false;
+	else pMiarex->m_b3DCp = false;
 
 	if(!pMiarex->m_bAnimate) pMiarex->UpdateView();
 }

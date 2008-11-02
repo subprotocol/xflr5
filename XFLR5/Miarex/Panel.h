@@ -92,5 +92,6 @@ protected:
 	static double mat[9];
 
 public:
+	bool IsInPanel(CVector & Pt);
 };
 

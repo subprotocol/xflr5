@@ -27,6 +27,7 @@
 class CBodyGridDlg : public CDialog
 {
 	friend class CMiarex;
+	friend class CXBody;
 	DECLARE_DYNAMIC(CBodyGridDlg)
 
 public:

@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <math.h>
+//#include <math.h>
 #include "stdafx.h"
 #include "../X-FLR5.h"
 #include "../main/MainFrm.h"

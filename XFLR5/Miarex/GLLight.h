@@ -30,6 +30,7 @@
 class CGLLight : public CDialog
 { 
 	friend class CMiarex;
+	friend class CXBody;
 // Construction
 public:
 	CGLLight(CWnd* pParent = NULL);   // standard constructor

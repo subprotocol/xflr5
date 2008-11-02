@@ -492,16 +492,21 @@ OpPoint* CXDirect::GetOpPoint(double Alpha)
 OpPoint* CXDirect::AddOpPoint(OpPoint *pNewPoint)
 {
 	// adds an Operating Point to the array from XFoil results
-		CMainFrame*pFrame = (CMainFrame*)m_pFrame;
+	CMainFrame*pFrame = (CMainFrame*)m_pFrame;
+	int i;
 
-	if(!pNewPoint) {
+	if(!pNewPoint) 
+	{
 		pNewPoint = new OpPoint();
-		if(pNewPoint ==NULL) {
+		if(pNewPoint ==NULL) 
+		{
 			AfxMessageBox("Not enough memory to store the OpPoint\nOnly the polar point will be saved", MB_OK);
 			return NULL;
 		}
-		else{
-			if(!m_pXFoil->lvconv){
+		else
+		{
+			if(!m_pXFoil->lvconv)
+			{
 				delete pNewPoint;
 				return NULL;
 			}
@@ -513,43 +518,52 @@ OpPoint* CXDirect::AddOpPoint(OpPoint *pNewPoint)
 		}
 	}
 
-	if(m_bStoreOpp){
+	if(m_bStoreOpp)
+	{
 		bool bIsInserted = false;
 		OpPoint* pOpPoint;
 		CPolar *pPolar = GetPolar(pNewPoint->m_strPlrName);
 		m_pCurPolar = pPolar;
-		if(!pPolar) {
+		if(!pPolar) 
+		{
 			delete pNewPoint;
 			return NULL;
 		}
 
 		// first add the OpPoint to the OpPoint Array for the current FoilName
-		for (int i=0; i<m_poaOpp->GetSize(); i++){
+		for (i=0; i<m_poaOpp->GetSize(); i++)
+		{
 			pOpPoint = (OpPoint*)m_poaOpp->GetAt(i);
-			if (pNewPoint->m_strFoilName.CompareNoCase(pOpPoint->m_strFoilName)<0){
+			if (pNewPoint->m_strFoilName.CompareNoCase(pOpPoint->m_strFoilName)<0)
+			{
 				//insert point
 				m_poaOpp->InsertAt(i, pNewPoint);
 				bIsInserted = true;
 				i = (int)m_poaOpp->GetSize();// to break
 			}
-			else if (pNewPoint->m_strFoilName == pOpPoint->m_strFoilName){
-				if (pNewPoint->Reynolds < pOpPoint->Reynolds){
+			else if (pNewPoint->m_strFoilName == pOpPoint->m_strFoilName)
+			{
+				if (pNewPoint->Reynolds < pOpPoint->Reynolds)
+				{
 					//insert point
 					m_poaOpp->InsertAt(i, pNewPoint);
 					bIsInserted = true;
 					i = (int)m_poaOpp->GetSize();// to break
 				}
-				else if (abs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0){
-					if (pNewPoint->Alpha < pOpPoint->Alpha){
-						//insert point
+				else if (abs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0)
+				{
+					if(abs(pNewPoint->Alpha - pOpPoint->Alpha)<0.005)
+					{
+						//replace existing point
+						m_poaOpp->RemoveAt(i);
+						delete pOpPoint;
 						m_poaOpp->InsertAt(i, pNewPoint);
 						bIsInserted = true;
 						i = (int)m_poaOpp->GetSize();// to break
 					}
-					else if(abs(pNewPoint->Alpha - pOpPoint->Alpha)<0.001){
-						//replace existing point
-						m_poaOpp->RemoveAt(i);
-						delete pOpPoint;
+					else if (pNewPoint->Alpha < pOpPoint->Alpha)
+					{
+						//insert point
 						m_poaOpp->InsertAt(i, pNewPoint);
 						bIsInserted = true;
 						i = (int)m_poaOpp->GetSize();// to break
@@ -562,28 +576,30 @@ OpPoint* CXDirect::AddOpPoint(OpPoint *pNewPoint)
 
 	// Now insert OpPoint in the current CPolar object
 
-	if(m_pXFoil->lvconv && m_pCurPolar) {
-		if(m_pCurPolar->m_Type ==2 || m_pCurPolar->m_Type ==3){
-			if(pNewPoint && pNewPoint->Reynolds<1.00e7){
-//				m_pCurPolar->AddData(m_pXFoil);
+	if(m_pXFoil->lvconv && m_pCurPolar) 
+	{
+		if(m_pCurPolar->m_Type ==2 || m_pCurPolar->m_Type ==3)
+		{
+			if(pNewPoint && pNewPoint->Reynolds<1.00e7)
+			{
 				m_pCurPolar->AddData(pNewPoint);
 			}
 		}
-		else{
-//			m_pCurPolar->AddData(m_pXFoil);
+		else
+		{
 			m_pCurPolar->AddData(pNewPoint);
 		}
 	}
 
-	if(!m_bStoreOpp) {
+	if(!m_bStoreOpp)
+	{
 		delete pNewPoint;
 		pNewPoint = NULL;
 	}
 	m_pCurOpp = pNewPoint;
-		
 
-
-	if(m_bPolar) {
+	if(m_bPolar)
+	{
 		CreatePolarCurves();
 		UpdateView();
 	}
@@ -690,7 +706,8 @@ void CXDirect::SetHingeMoments(OpPoint *pOpPoint)
 void CXDirect::AddOpData(OpPoint *pOpPoint)
 {
 	// Adds result of the XFoil Calculation to the OpPoint object
-	
+	int i, ibl, is, k;
+
 	pOpPoint->m_strFoilName = m_pCurFoil->m_FoilName;
 	pOpPoint->m_strPlrName = m_pCurPolar->m_PlrName;
 
@@ -708,7 +725,7 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 
 	pOpPoint->Cpmn   = m_pXFoil->cpmn;
 
-	for (int k=0; k<m_pXFoil->n; k++){
+	for (k=0; k<m_pXFoil->n; k++){
 		pOpPoint->x[k]   = m_pXFoil->x[k+1];
 		pOpPoint->y[k]   = m_pXFoil->y[k+1];
 //		pOpPoint->s[k]   = m_pXFoil->s[k+1];
@@ -740,11 +757,10 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	if(!m_pXFoil->lvisc || !m_pXFoil->lvconv)	return;
 
 //---- add boundary layer on both sides of airfoil 
-	int i;
 	int nd1=0;
 	int nd2=0;
 	int nd3=0;
-	for (int is=1; is<=2; is++){
+	for (is=1; is<=2; is++){
 		for (int ibl=2; ibl<=m_pXFoil->iblte[is];ibl++){
 			i = m_pXFoil->ipan[ibl][is];
 			pOpPoint->xd1[i] = m_pXFoil->x[i] + m_pXFoil->nx[i]*m_pXFoil->dstr[ibl][is];
@@ -767,7 +783,7 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	}
 
 //---- plot upper wake displacement surface
-	int ibl = m_pXFoil->iblte[1];
+	ibl = m_pXFoil->iblte[1];
 	i = m_pXFoil->ipan[ibl][1];
 	pOpPoint->xd2[0] = m_pXFoil->x[i] + m_pXFoil->nx[i]*m_pXFoil->dstr[ibl][1];
 	pOpPoint->yd2[0] = m_pXFoil->y[i] + m_pXFoil->ny[i]*m_pXFoil->dstr[ibl][1];
@@ -1628,7 +1644,8 @@ bool CXDirect::LoadSettings(CArchive &ar)
 	COLORREF cr;
 	int k, l;
 
-	try{
+	try
+	{
 	//  we're reading/loading
 
 		ar >> m_crFoilColor >> m_iFoilStyle >> m_iFoilWidth;
@@ -1646,7 +1663,8 @@ bool CXDirect::LoadSettings(CArchive &ar)
 		}
 
 		ar >> m_crBLColor >> m_iBLStyle >> m_iBLWidth;
-		if(m_crBLColor <0 || m_crBLColor> RGB(255,255,255)){
+		if(m_crBLColor <0 || m_crBLColor> RGB(255,255,255))
+		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 			throw pfe;
 		}
@@ -1938,6 +1956,9 @@ bool CXDirect::LoadSettings(CArchive &ar)
 		for (int i=0; i<20; i++){
 			ar >> m_UFOdlg.m_ColSize[i];
 		}
+		ar >> pFrame->m_OperDlgBar.m_Alpha >> pFrame->m_OperDlgBar.m_AlphaMax >> pFrame->m_OperDlgBar.m_DeltaAlpha;
+		ar >> pFrame->m_OperDlgBar.m_Cl >> pFrame->m_OperDlgBar.m_ClMax >> pFrame->m_OperDlgBar.m_DeltaCl;
+		ar >> pFrame->m_OperDlgBar.m_Re >> pFrame->m_OperDlgBar.m_ReMax >> pFrame->m_OperDlgBar.m_DeltaRe;
 
 		pFrame->m_OperDlgBar.SetParams();
 		CheckMenu();
@@ -1964,6 +1985,8 @@ bool CXDirect::LoadSettings(CArchive &ar)
 void CXDirect::SaveSettings(CArchive &ar) 
 {
 	CMainFrame *pFrame = (CMainFrame*) m_pFrame;
+
+	int l;
 
 	//  we're saving/storing
 	ar << m_crFoilColor << m_iFoilStyle << m_iFoilWidth;
@@ -1992,7 +2015,8 @@ void CXDirect::SaveSettings(CArchive &ar)
 
 
 	ar << m_NRe;
-	for (int l=0; l< m_NRe; l++){
+	for (l=0; l< m_NRe; l++)
+	{
 		ar << m_ReList[l] << m_MachList[l] << m_NCritList[l];
 	}
 
@@ -2021,9 +2045,14 @@ void CXDirect::SaveSettings(CArchive &ar)
 	if(m_bType3)  ar << 1; else ar <<0;
 	if(m_bType4)  ar << 1; else ar <<0;
 
-	for (int i=0; i<20; i++){
-		ar << m_UFOdlg.m_ColSize[i];
+	for (l=0; l<20; l++)
+	{
+		ar << m_UFOdlg.m_ColSize[l];
 	}
+	ar << pFrame->m_OperDlgBar.m_Alpha << pFrame->m_OperDlgBar.m_AlphaMax << pFrame->m_OperDlgBar.m_DeltaAlpha;
+	ar << pFrame->m_OperDlgBar.m_Cl << pFrame->m_OperDlgBar.m_ClMax << pFrame->m_OperDlgBar.m_DeltaCl;
+	ar << pFrame->m_OperDlgBar.m_Re << pFrame->m_OperDlgBar.m_ReMax << pFrame->m_OperDlgBar.m_DeltaRe;
+
 }
 
 void CXDirect::SetColors(Graph *pDefaultGraph)
@@ -2217,24 +2246,33 @@ void CXDirect::DrawPolarLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bot
 
 void CXDirect::RemoveOpPoint(bool bCurrent)
 {
-	if(bCurrent){// we remove only the current OpPoint
+	int i;
+	if(bCurrent)
+	{
+		// we remove only the current OpPoint
 		OpPoint* pOpPoint = GetCurOpPoint();
 		OpPoint* opt;
-		for (int i=0; i<m_poaOpp->GetSize(); i++){
+		for (i=0; i<m_poaOpp->GetSize(); i++)
+		{
 			opt =(OpPoint*)m_poaOpp->GetAt(i);
-			if (pOpPoint == opt){
+			if (pOpPoint == opt)
+			{
 				m_poaOpp->RemoveAt(i);
 				delete pOpPoint;
 				break;
 			}
 		}
 	}
-	else {// kill'em all
+	else
+	{
+		// kill'em all
 		OpPoint* pOpPoint;
-		for (int i=(int)m_poaOpp->GetSize()-1; i>=0;i--){
+		for (i=(int)m_poaOpp->GetSize()-1; i>=0;i--)
+		{
 			pOpPoint =(OpPoint*)m_poaOpp->GetAt(i);
 			if (pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName &&
-				pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName){
+				pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName)
+			{
 				m_poaOpp->RemoveAt(i);
 				delete pOpPoint;
 			}
@@ -2268,7 +2306,6 @@ void CXDirect::OnPanel()
 	bool bState = m_bShowPanels;//save current view setting
 
 	void* ptr = m_pCurOpp;
-	OnOper();
 	m_pCurOpp = NULL;
 	CreateOppCurves();
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -2277,6 +2314,7 @@ void CXDirect::OnPanel()
 	bool bBL       = m_bBL;
 	m_bPressure = false;
 	m_bBL       = false;
+	OnOper();
 
 	C2DPanelDlg Pdlg;
 	Pdlg.m_pChildView  = m_pChildWnd;
@@ -2287,16 +2325,22 @@ void CXDirect::OnPanel()
 
 	m_bShowPanels = true;
 	UpdateView();
-	
-	CString OldFoilName = m_pCurFoil->m_FoilName;
 
-	if(IDOK == Pdlg.DoModal()){
+
+	if(IDOK == Pdlg.DoModal())
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(OldFoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-
-	else{
+	else
+	{
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
@@ -2316,7 +2360,6 @@ void CXDirect::OnEditCoord()
 	bool bState = m_bShowPanels;//save current view setting
 
 	void* ptr = m_pCurOpp;
-	OnOper();
 	m_pCurOpp = NULL;
 	CreateOppCurves();
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -2325,8 +2368,9 @@ void CXDirect::OnEditCoord()
 	bool bBL       = m_bBL;
 	m_bPressure = false;
 	m_bBL       = false;
+	OnOper();
 
-	bool bFlap      = m_BufferFoil.m_bTEFlap;
+	bool bFlap       = m_BufferFoil.m_bTEFlap;
 	double FlapAngle = m_BufferFoil.m_TEFlapAngle;
 	double Xh        = m_BufferFoil.m_TEXHinge;
 	double Yh        = m_BufferFoil.m_TEXHinge;
@@ -2344,19 +2388,26 @@ void CXDirect::OnEditCoord()
 	
 	CString OldFoilName = m_pCurFoil->m_FoilName;
 
-	if(IDOK == Fdlg.DoModal()){
+	if(IDOK == Fdlg.DoModal())
+	{
 		m_BufferFoil.m_bTEFlap = bFlap;
 		m_BufferFoil.m_TEFlapAngle = FlapAngle;
 		m_BufferFoil.m_TEXHinge = Xh;
 		m_BufferFoil.m_TEYHinge = Yh;
-//		SetFoilFlap(&m_BufferFoil);
 
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(OldFoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
 
-	else{
+	else
+	{
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		m_BufferFoil.m_bTEFlap = bFlap;
@@ -2381,7 +2432,6 @@ void CXDirect::OnTEGap()
 	if(!m_pCurFoil)	return;
 
 	void* ptr = m_pCurOpp;
-	OnOper();
 	m_pCurOpp = NULL;
 	CreateOppCurves();
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -2391,7 +2441,7 @@ void CXDirect::OnTEGap()
 	bool bState = m_bShowPanels;
 	m_bPressure = false;
 	m_bBL       = false;
-	UpdateView();
+	OnOper();
 
 	CTEGapDlg Gdlg;
 	Gdlg.m_pChildView   = m_pChildWnd;
@@ -2400,15 +2450,22 @@ void CXDirect::OnTEGap()
 	Gdlg.m_pXFoil      = m_pXFoil;
 	Gdlg.m_Gap         = m_pCurFoil->m_Gap;
 	
-	CString OldFoilName = m_pCurFoil->m_FoilName;
 
-	if(IDOK == Gdlg.DoModal()){
+	if(IDOK == Gdlg.DoModal())
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(OldFoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
 
-	else{
+	else
+	{
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
@@ -2427,7 +2484,6 @@ void CXDirect::OnLERad()
 	if(!m_pCurFoil)	return;
 
 	void* ptr = m_pCurOpp;
-	OnOper();
 	m_pCurOpp = NULL;
 	CreateOppCurves();
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -2437,7 +2493,7 @@ void CXDirect::OnLERad()
 	bool bState = m_bShowPanels;
 	m_bPressure = false;
 	m_bBL       = false;
-	UpdateView();
+	OnOper();
 
 	CLEDlg Ldlg(this);
 	Ldlg.m_pBufferFoil = &m_BufferFoil;
@@ -2445,15 +2501,21 @@ void CXDirect::OnLERad()
 	Ldlg.m_pXFoil      = m_pXFoil;
 	Ldlg.m_pChildView  = m_pChildWnd;
 	
-	CString OldFoilName = m_pCurFoil->m_FoilName;
-
-	if(IDOK == Ldlg.DoModal()){
+	if(IDOK == Ldlg.DoModal())
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(OldFoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
 
-	else{
+	else
+	{
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
@@ -2470,7 +2532,8 @@ void CXDirect::OnLERad()
 
 void CXDirect::OnInterpolate() 
 {
-	if(m_poaFoil->GetSize()<2){
+	if(m_poaFoil->GetSize()<2)
+	{
 		AfxMessageBox("At least two foils are required", MB_OK);
 		return;
 	}
@@ -2480,19 +2543,28 @@ void CXDirect::OnInterpolate()
 	bool bBL       = m_bBL;
 	m_bPressure = false;
 	m_bBL       = false;
-	UpdateView();
+	OnOper();
 
 	CInterpolateDlg dlg(this);
-	dlg.m_pChildView = m_pChildWnd;
-	dlg.m_poaFoil = m_poaFoil;
-	dlg.m_pXFoil = m_pXFoil;
+	dlg.m_pChildView  = m_pChildWnd;
+	dlg.m_poaFoil     = m_poaFoil;
+	dlg.m_pXFoil      = m_pXFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
 
-	if(dlg.DoModal() ==IDOK){
-		SetModFoil(dlg.m_FoilName);
+	if(dlg.DoModal() ==IDOK)
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilName = dlg.m_NewFoilName;
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-	else{
+	else
+	{
 		SetBufferFoil();// restore buffer foil.. from current foil
 		InitXFoil();
 	}
@@ -2502,13 +2574,11 @@ void CXDirect::OnInterpolate()
 }
 
 
-
 void CXDirect::OnSetFlap() 
 {
 	if(!m_pCurFoil) return;
 
 	void* ptr = m_pCurOpp;
-	OnOper();
 	m_pCurOpp = NULL;
 	CreateOppCurves();
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
@@ -2517,7 +2587,7 @@ void CXDirect::OnSetFlap()
 	bool bBL       = m_bBL;
 	m_bPressure = false;
 	m_bBL       = false;
-	UpdateView();
+	OnOper();
 
 	CFlapDlg dlg;
 	dlg.m_pBufferFoil  = &m_BufferFoil;
@@ -2525,13 +2595,20 @@ void CXDirect::OnSetFlap()
 	dlg.m_pXFoil       = m_pXFoil;
 	dlg.m_pChildView   = m_pChildWnd;
 
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(m_pCurFoil->m_FoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-
-	else{
+	else
+	{
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
@@ -2555,7 +2632,6 @@ void CXDirect::OnCadd()
 	void* ptr = m_pCurOpp;
 	m_pCurOpp = NULL;
 	CreateOppCurves();
-	OnOper();
 
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	pFrame->m_OperDlgBar.SetAnimate(false);
@@ -2564,8 +2640,7 @@ void CXDirect::OnCadd()
 	bool bState = m_bShowPanels;
 	m_bPressure = false;
 	m_bBL       = false;
-	UpdateView();
-
+	OnOper();
 	
 	CCAddDlg Adlg;
 	Adlg.m_pChildView     = m_pChildWnd;
@@ -2577,14 +2652,20 @@ void CXDirect::OnCadd()
 	m_bShowPanels = true;
 	UpdateView();
 
-	CString OldFoilName = m_pCurFoil->m_FoilName;
-
-	if(IDOK == Adlg.DoModal()){
+	if(IDOK == Adlg.DoModal())
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(OldFoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-	else{
+	else
+	{
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
 		InitXFoil();
@@ -2626,7 +2707,7 @@ void CXDirect::OnExportFoil()
 	CFileDialog XFileDlg(false, "dat", FileName, OFN_OVERWRITEPROMPT,
 		_T("Labeled Format (.dat)|*.dat|VisuAero Format (.dat)|*.dat|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		DestFileName = XFileDlg.GetFileName();
+		DestFileName = XFileDlg.GetPathName();
 		int FilterIndex = XFileDlg.m_ofn.nFilterIndex;
 		CFoil *pFoil = GetFoil(m_pCurFoil->m_FoilName);
 		if(pFoil) {
@@ -3085,24 +3166,28 @@ Graph* CXDirect::GetGraph(CPoint &pt){
 
 void CXDirect::OnResetGraph() 
 {
-	if(m_pCurGraph == m_pCpGraph){
+	if(m_pCurGraph == m_pCpGraph)
+	{
 		m_pCurGraph->SetAuto(true);
 		m_pCpGraph->SetXTitle("X");
-		m_pCpGraph->SetXMin(0.f);
-		m_pCpGraph->SetXMax(1.f);
+		m_pCpGraph->SetXMin(0.0);
+		m_pCpGraph->SetXMax(1.0);
 		m_pCpGraph->SetYMin(-0.1);
 		m_pCpGraph->SetYMax(0.1);
-		if(m_OppVar==0){
+		if(m_OppVar==0)
+		{
 			m_pCpGraph->SetYTitle("Cp");
 			m_pCpGraph->SetInverted(true);
 		}
-		else{
+		else
+		{
 			m_pCpGraph->SetInverted(false);
 		}
 		m_pCurGraph->Init();
 		UpdateView();
 	}
-	else if(m_pCurGraph){
+	else if(m_pCurGraph)
+	{
 		m_pCurGraph->SetAuto(true);
 		m_pCurGraph->ResetXLimits();
 		m_pCurGraph->ResetYLimits();
@@ -3128,119 +3213,9 @@ void CXDirect::OnResetAllScales()
 	m_pUserGraph->SetAuto(true);
 	m_pUserGraph->ResetXLimits();
 	m_pUserGraph->ResetYLimits();
-	UpdateView();
-		
+	UpdateView();		
 }
 
-
-
-bool CXDirect::SetModFoil(CString FoilName)
-{
-	// Adds the buffer foil to the ObjectArray,
-	// gives it a proper name, FoilName or another,
-	// selects it ,
-	// and initializes XFoil, comboboxes and everything.
-
-	bool bExists = false;
-	bool bNotFound = true;
-	CFoil*pOldFoil;
-	CFoil*pFoil;
-	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-
-	if(GetFoil(FoilName))bExists = true;
-
-	if(bExists){
-		while(bNotFound){
-			CStringArray NameList;
-			for(int k=0; k<m_poaFoil->GetSize(); k++){
-				pFoil = (CFoil*)m_poaFoil->GetAt(k);
-				NameList.Add(pFoil->m_FoilName);
-			}
-			CNameDlg dlg(this);
-			dlg.m_pStrArray = & NameList;
-			dlg.m_strQuestion = "A foil of that name already exists\r\nEnter a new name";
-			dlg.m_strName = m_pCurFoil->m_FoilName;
-//			dlg.m_pObArray = m_poaFoil;
-//			dlg.m_Type = 1;
-			bool exists = false;
-			CString strong;
-			int resp = (int)dlg.DoModal();
-			strong = dlg.m_strName;
-			if(IDOK == resp){
-				for (int l=0; l<m_poaFoil->GetSize(); l++){
-					pOldFoil = (CFoil*)m_poaFoil->GetAt(l);
-					if(pOldFoil->m_FoilName == strong) exists = true;
-				}
-				if (!exists){
-					bNotFound = false;// at last (users !...)
-					// so create and add foil to array
-					m_BufferFoil.m_FoilName = strong;
-					pFoil = AddBufferFoil();
-					pFoil->m_bSaved = false;
-					// set as current and initialize
-					m_pCurFoil = pFoil;
-					m_pCurPolar = NULL;
-					m_pCurOpp = NULL;
-					InitXFoil();
-					pFrame->SetSaveState(false);
-				}
-			}
-			else if(resp==10){// user wants to overwrite existing airfoil
-				//So delete any foil with that name
-				for (int l=(int)m_poaFoil->GetSize()-1;l>=0; l--){
-					pOldFoil = (CFoil*)m_poaFoil->GetAt(l);
-					if(pOldFoil->m_FoilName == strong){
-						m_poaFoil->RemoveAt(l);
-						delete pOldFoil;
-					}
-				}
-				m_pCurFoil = NULL;
-				// delete all associated OpPoints
-				OpPoint * pOpPoint;
-				for (l=(int)m_poaOpp->GetSize()-1;l>=0;l--){
-					pOpPoint = (OpPoint*)m_poaOpp->GetAt(l);
-					if (pOpPoint->m_strFoilName == strong){
-						m_poaOpp->RemoveAt(l);
-						delete pOpPoint;
-					}
-				}
-				m_pCurOpp = NULL;
-				// delete all Polar results for that airfoil, but keep polar for analysis
-				CPolar * pPolar;
-				for (l=0; l <m_poaPolar->GetSize();l++){
-					pPolar = (CPolar*) m_poaPolar->GetAt(l);
-					if (pPolar->m_FoilName == strong){
-						pPolar->ResetPolar();
-					}
-				}
-				m_pCurPolar = NULL;
-
-				// finally add to array
-				m_BufferFoil.m_FoilName = strong;
-				pFoil = AddBufferFoil();
-				pFoil->m_bSaved = false;
-				// set as current and initialize
-				m_pCurFoil = pFoil;
-				InitXFoil();
-					pFrame->SetSaveState(false);
-				bNotFound = false;//exit loop
-			}
-			else {// Cancel so restore original foil
-				SetBufferFoil(); // from current to buffer
-				InitXFoil();
-				bNotFound = false;//exit loop
-			}
-		}
-	}
-	else{
-		m_BufferFoil.m_FoilName = FoilName;
-		m_pCurFoil = AddBufferFoil();
-		pFrame->SetSaveState(false);
-		InitXFoil();
-	}
-	UpdateFoils();
-	return true;
-}
 
 void CXDirect::OnPolars() 
 {
@@ -3484,7 +3459,7 @@ void CXDirect::OnSave()
 	else if (m_pCurOpp) XFileDlg.m_ofn.nFilterIndex = 2;
 
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 
 		if (FileName.Find(".dat",0)>0){
 			if(!m_pCurFoil) {
@@ -3512,7 +3487,7 @@ void CXDirect::OnExportPlr()
 	CFileDialog XFileDlg(false, ".txt", FileName, OFN_OVERWRITEPROMPT,
 		_T("Text Format (.txt)|*.txt|"));
 	if(IDOK == XFileDlg.DoModal()){
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		m_pCurPolar->Export(FileName);
 	}
 }
@@ -3913,7 +3888,7 @@ void CXDirect::OnDeletePlr()
 {
 	if(!m_pCurPolar) return;
 	OpPoint *pOpPoint;
-
+	int l;
 	CString str;
 
 	str = "Are you sure you want to delete polar :\n  "+m_pCurPolar->m_PlrName;
@@ -3921,7 +3896,7 @@ void CXDirect::OnDeletePlr()
 
 	if (IDYES == AfxMessageBox(str, MB_YESNOCANCEL)){
 		// start by removing all OpPoints
-		for (int l=(int)m_poaOpp->GetSize()-1; l>=0; l--){
+		for (l=(int)m_poaOpp->GetSize()-1; l>=0; l--){
 			pOpPoint = (OpPoint*)m_poaOpp->GetAt(l);
 			if (pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName &&
 				pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName){
@@ -3953,7 +3928,7 @@ void CXDirect::OnDelFoilPolars() {
 	if(!m_pCurFoil) {
 		return;
 	}
-
+	int l;
 	OpPoint *pOpPoint;
 
 	CString str;
@@ -3963,7 +3938,7 @@ void CXDirect::OnDelFoilPolars() {
 
 	if (IDYES == AfxMessageBox(str, MB_YESNOCANCEL)){
 		// start by removing all OpPoints
-		for (int l=(int)m_poaOpp->GetSize()-1; l>=0; l--){
+		for (l=(int)m_poaOpp->GetSize()-1; l>=0; l--){
 			pOpPoint = (OpPoint*)m_poaOpp->GetAt(l);
 			if (pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName){
 				m_poaOpp->RemoveAt(l);
@@ -4158,26 +4133,35 @@ void CXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 	double fy = 1.0;
 	if(XVar == 3) fx = 10000.0; 
 	if(YVar == 3) fy = 10000.0; 
-	for (i=0; i<pPolar->m_Alpha.GetSize(); i++){
-		if (XVar==12){
-			if((*pX)[i]>0.0){
-				if (YVar==12){
-					if((*pY)[i]>0.f){
+	for (i=0; i<pPolar->m_Alpha.GetSize(); i++)
+	{
+		if (XVar==12)
+		{
+			if((*pX)[i]>0.0)
+			{
+				if (YVar==12)
+				{
+					if((*pY)[i]>0.0)
+					{
 						pCurve->AddPoint(1.0/sqrt((*pX)[i]), 1.0/sqrt((*pY)[i]));
 					}
 				}
-				else{
+				else
+				{
 					pCurve->AddPoint(1.0/sqrt((*pX)[i]), (*pY)[i]*fy);
 				}
 			}
 		}
 		else{
-			if (YVar==12){
-				if((*pY)[i]>0.0){
+			if (YVar==12)
+			{
+				if((*pY)[i]>0.0)
+				{
 					pCurve->AddPoint((*pX)[i]*fx, 1.0/sqrt((*pY)[i]));
 				}
 			}
-			else{
+			else
+			{
 				pCurve->AddPoint((*pX)[i]*fx, (*pY)[i]*fy);
 			}
 		}
@@ -4186,27 +4170,30 @@ void CXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 
 
 
-
-
 CFoil* CXDirect::SetFoil(CFoil* pFoil)
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	if(pFoil) m_pCurFoil = pFoil;
 	SetBufferFoil();
-	if(!InitXFoil()) {
+	if(!InitXFoil()) 
+	{
 		DeleteFoil(false);
 		pFrame->m_pCurFoil = NULL;
 	}
-	else{
-		if(!m_pCurFoil){
+	else
+	{
+		if(!m_pCurFoil)
+		{
 			m_pCurPolar = NULL;
 			m_pCurOpp = NULL;
 		}
-		else if (m_pCurPolar && m_pCurPolar->m_FoilName !=m_pCurFoil->m_FoilName){
+		else if (m_pCurPolar && m_pCurPolar->m_FoilName !=m_pCurFoil->m_FoilName)
+		{
 //			m_pCurPolar = NULL;
 //			m_pCurOpp = NULL;	
 		}
-		else if (m_pCurOpp && m_pCurOpp->m_strFoilName  !=m_pCurFoil->m_FoilName){
+		else if (m_pCurOpp && m_pCurOpp->m_strFoilName  !=m_pCurFoil->m_FoilName)
+		{
 //			m_pCurOpp = NULL;	
 		}
 		pFrame->m_pCurFoil = m_pCurFoil;
@@ -4222,12 +4209,16 @@ CFoil* CXDirect::SetFoil(CFoil* pFoil)
 CFoil* CXDirect::SetFoil(CString FoilName)
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-	if(FoilName.GetLength()){
+	int j;
+	if(FoilName.GetLength())
+	{
 		CFoil *pFoil;
 		m_pCurFoil = NULL;
-		for (int j=0; j< m_poaFoil->GetSize(); j++){
+		for (j=0; j< m_poaFoil->GetSize(); j++)
+		{
 			pFoil = (CFoil*)m_poaFoil->GetAt(j);
-			if(pFoil->m_FoilName == FoilName){
+			if(pFoil->m_FoilName == FoilName)
+			{
 				m_pCurFoil = pFoil;
 				break;
 			}
@@ -4235,24 +4226,29 @@ CFoil* CXDirect::SetFoil(CString FoilName)
 	}
 	else m_pCurFoil = NULL;
 
-	if(m_pCurFoil){
+	if(m_pCurFoil)
+	{
 		SetBufferFoil();
-		if(!InitXFoil()) {
+		if(!InitXFoil()) 
+		{
 			pFrame->m_pCurFoil=NULL;
 			DeleteFoil(false);
 			SetPolar();
 			return NULL;
 		}
 	}
-	if(!m_pCurFoil){
+	if(!m_pCurFoil)
+	{
 		m_pCurPolar = NULL;
 		m_pCurOpp = NULL;
 	}
-	else if(m_pCurPolar && m_pCurPolar->m_FoilName !=m_pCurFoil->m_FoilName){
+	else if(m_pCurPolar && m_pCurPolar->m_FoilName !=m_pCurFoil->m_FoilName)
+	{
 //		m_pCurPolar = NULL;
 //		m_pCurOpp = NULL;	
 	}
-	else if(m_pCurOpp && m_pCurOpp->m_strFoilName  !=m_pCurFoil->m_FoilName){
+	else if(m_pCurOpp && m_pCurOpp->m_strFoilName  !=m_pCurFoil->m_FoilName)
+	{
 //		m_pCurOpp = NULL;	
 	}
 
@@ -4260,13 +4256,15 @@ CFoil* CXDirect::SetFoil(CString FoilName)
 	int count = 0;
 
 	OpPoint *pOpp;
-	for (int i=0; i< m_poaOpp->GetSize(); i++){
+	for (int i=0; i< m_poaOpp->GetSize(); i++)
+	{
 		pOpp = (OpPoint*)m_poaOpp->GetAt(i);
 		if(pOpp->m_strFoilName == FoilName) count++;
 		if(count>=2) break;
 	}
 
-	if (count<2) {
+	if (count<2) 
+	{
 		pFrame->m_OperDlgBar.SetAnimate(false);	
 	}
 
@@ -4393,7 +4391,8 @@ void CXDirect::SetOpp(double Alpha)
 {
 	CString strong;
 
-	if(!m_pCurPolar) {
+	if(!m_pCurPolar) 
+	{
 		m_pCurOpp = NULL;
 		if(!m_bPolar) CreateOppCurves();
 		return;
@@ -4403,11 +4402,13 @@ void CXDirect::SetOpp(double Alpha)
 
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	int pos = pFrame->m_ctrlOpp.FindStringExact(-1, strong);
-	if(pos !=CB_ERR) {
+	if(pos !=CB_ERR) 
+	{
 		pFrame->m_ctrlOpp.SetCurSel(pos);
 		m_pCurOpp = GetOpPoint(Alpha);
 	}
-	else {
+	else 
+	{
 		pFrame->m_ctrlOpp.SetCurSel(0);
 		m_pCurOpp = GetCurOpPoint();
 	}
@@ -4428,28 +4429,36 @@ void CXDirect::SetOpp(OpPoint *pOpp)
 
 	if(!pOpp) pOpp = m_pCurOpp;
 
-	if(!pOpp){//try to read it
-		if(pFrame->m_ctrlOpp.GetCount()){
+	if(!pOpp)
+	{
+		//try to read it
+		if(pFrame->m_ctrlOpp.GetCount())
+		{
 			double x;
 			pFrame->m_ctrlOpp.SetCurSel(0);
 			pFrame->m_ctrlOpp.GetLBText(0, strong);
 			int res = sscanf(strong, "%lf", &x);
-			if(res==1) {
+			if(res==1) 
+			{
 				pOpp = GetOpPoint(x);
 			}
 			else pOpp = NULL;
 		}
-		else{
+		else
+		{
 			pOpp = NULL;
 		}
 	}
-	else {//set it
+	else 
+	{//set it
 		strong.Format("%8.2f", m_pCurOpp->Alpha);
 		int pos = pFrame->m_ctrlOpp.FindStringExact(-1, strong);
-		if(pos!=CB_ERR){
+		if(pos!=CB_ERR)
+		{
 			pFrame->m_ctrlOpp.SetCurSel(pos);
 		}
-		else {
+		else 
+		{
 			pFrame->m_ctrlOpp.SetCurSel(0);
 		}
 	}
@@ -4584,7 +4593,7 @@ void CXDirect::OnReadDef()
 	CString FileName, strong;
 	CFileDialog XFileDlg(true, "def", NULL, OFN_HIDEREADONLY, 
 		_T("Xflr5 defaults (.def)|*.def|"));
-	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetFileName();
+	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
 	
 	BOOL bOpen = XFile.Open(FileName, CFile::modeRead, &fe);
 	if (bOpen){
@@ -4758,7 +4767,7 @@ void CXDirect::OnWriteDef()
 	CString FileName, strong;
 	CFileDialog XFileDlg(false, "def", NULL, OFN_OVERWRITEPROMPT, 
 					 _T("Xflr5 defaults (.def)|*.def|"));
-	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetFileName();
+	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
 
 	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate |CFile::modeWrite, &fe);
 	if (bOpen){
@@ -4880,7 +4889,7 @@ void CXDirect::OnSavePolars()
 	CString FileName;
 	CFileDialog PolarDlg(false, "plr", NULL, OFN_OVERWRITEPROMPT, _T("Polar files (.plr)|*.plr|"));
 	if(IDOK==PolarDlg.DoModal()){
-		FileName = PolarDlg.GetFileName();
+		FileName = PolarDlg.GetPathName();
 		CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 		pFrame->SavePolars(FileName);
 	}
@@ -4900,7 +4909,7 @@ void CXDirect::OnSavePlrFile()
 	CFileDialog PolarDlg(false, "plr", FileName, OFN_OVERWRITEPROMPT,
 					     _T("Polar files (.plr)|*.plr|"));
 	if(IDOK==PolarDlg.DoModal()){
-		FileName = PolarDlg.GetFileName();
+		FileName = PolarDlg.GetPathName();
 		CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 		pFrame->SavePolars(FileName, m_pCurFoil);
 	}	
@@ -5107,40 +5116,72 @@ void CXDirect::OnAnalyze()
 
 	bool bSequence;
 	double Alpha, AlphaMax, DeltaAlpha;
+	double Cl, ClMax, DeltaCl;
 	double Re, ReMax, DeltaRe;
 
 //first read parameters
 	CString str;
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
+
+	bSequence  = pFrame->m_OperDlgBar.m_bSequence;
+
 	Alpha      = pFrame->m_OperDlgBar.m_Alpha;
 	AlphaMax   = pFrame->m_OperDlgBar.m_AlphaMax;
 	DeltaAlpha = pFrame->m_OperDlgBar.m_DeltaAlpha;
-	bSequence  = pFrame->m_OperDlgBar.m_bSequence;
+
+	Cl      = pFrame->m_OperDlgBar.m_Cl;
+	ClMax   = pFrame->m_OperDlgBar.m_ClMax;
+	DeltaCl = pFrame->m_OperDlgBar.m_DeltaCl;
 
 	Re      = pFrame->m_OperDlgBar.m_Re;
 	ReMax   = pFrame->m_OperDlgBar.m_ReMax;
 	DeltaRe = pFrame->m_OperDlgBar.m_DeltaRe;
 
-	if(m_pCurFoil){
+	if(m_pCurFoil)
+	{
 		m_pXFoil->m_bTrace = true;
-		if(m_bViscous) {
+		if(m_bViscous) 
+		{
 			m_pXFoil->lvisc = true;
-			if(m_pCurPolar->m_Type!=4){
-				if (bSequence){
-					if (abs(DeltaAlpha)<0.001){
-						AfxMessageBox("Increase Delta_Alpha", MB_OK);
-						return;
+			if(m_pCurPolar->m_Type!=4)
+			{
+				if(m_bAlpha)
+				{
+					if (bSequence)
+					{
+						if (abs(DeltaAlpha)<0.001)
+						{
+							AfxMessageBox("Increase Delta_Alpha", MB_OK);
+							return;
+						}
+						else if(AlphaMax < Alpha)	DeltaAlpha = -abs(DeltaAlpha);
+						else if(AlphaMax > Alpha)	DeltaAlpha =  abs(DeltaAlpha);
 					}
-					else if(AlphaMax < Alpha )
-						DeltaAlpha = -abs(DeltaAlpha);
-					else if(AlphaMax > Alpha)
-						DeltaAlpha = abs(DeltaAlpha);
+					else AlphaMax = Alpha;
+					AnalysisAlpha(Alpha, AlphaMax, DeltaAlpha, bSequence);
 				}
-				Analysis2(Alpha, AlphaMax, DeltaAlpha, bSequence);
+				else
+				{
+					if (bSequence)
+					{
+						if (abs(DeltaCl)<0.001)
+						{
+							AfxMessageBox("Increase Delta_Cl", MB_OK);
+							return;
+						}
+						else if(ClMax < Cl)	DeltaCl = -abs(DeltaCl);
+						else if(ClMax > Cl)	DeltaCl =  abs(DeltaCl);
+					}
+					else ClMax = Cl;
+					AnalysisCl(Cl, ClMax, DeltaCl, bSequence);
+				}
 			}
-			else {
-				if (bSequence){
-					if (abs(DeltaRe) < 10.0){
+			else 
+			{
+				if (bSequence)
+				{
+					if (abs(DeltaRe) < 10.0)
+					{
 						AfxMessageBox("Increase Delta_Re", MB_OK);
 						return;
 					}
@@ -5149,10 +5190,12 @@ void CXDirect::OnAnalyze()
 					else if(ReMax > Re)
 						DeltaRe = abs(DeltaRe);
 				}
-				Analysis3(Re, ReMax, DeltaRe, bSequence);
+				else ReMax = Re;
+				AnalysisRe(Re, ReMax, DeltaRe, bSequence);
 			}
 		}
-		else {
+		else 
+		{
 			m_pXFoil->lvisc = false;
 			Analysis1(Alpha, AlphaMax, DeltaAlpha, bSequence);
 		}
@@ -5180,8 +5223,9 @@ void CXDirect::OnAnalyze()
 
 void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence)
 {
-
 	// Inviscid analysis 
+	int ia;
+	double alfa;
 
 	CString str;
 	CString strAppDirectory;
@@ -5196,33 +5240,39 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 
 	SetFileHeader();
 
-	double alfa;
-	if (bSequence){ //sequential analysis 
-		for (int ia=0; ia<=int((AlphaMax-Alpha)/DeltaAlpha); ia++){
-			if(m_bAlpha){
+	if (bSequence)
+	{ //sequential analysis 
+		for (ia=0; ia<=int((AlphaMax-Alpha)/DeltaAlpha); ia++)
+		{
+			if(m_bAlpha)
+			{
 				alfa = Alpha+ia*DeltaAlpha;
 
 				str.Format("Alpha = %.3f",alfa);
 				m_XFile.WriteString(str);
 
 				m_pXFoil->alfa = alfa*pi/180.0;
-				if (m_pXFoil->specal()) {
+				if (m_pXFoil->specal()) 
+				{
 					str = "... Converged\n\n";
 					m_XFile.WriteString(str);
 					m_pCurOpp = AddOpPoint();
 				}
-				else{
+				else
+				{
 					OnCpCalcError();
 				}
 			}
-			else{
+			else
+			{
 				m_pXFoil->lalfa = true;
 				m_pXFoil->alfa = 0.0f;
 				m_pXFoil->qinf = 1.0f;
 				double cl = Alpha+ia*DeltaAlpha;
 				m_pXFoil->clspec = cl;
-				if(m_pXFoil->speccl()) {
-					alfa = 	m_pXFoil->alfa*180/3.14159264f;
+				if(m_pXFoil->speccl()) 
+				{
+					alfa = 	m_pXFoil->alfa*180/pi;
 					str.Format("Cl = %.3f,     Alpha = %.3f\n\n", cl, alfa);
 					m_XFile.WriteString(str);
 					m_pCurOpp = AddOpPoint();
@@ -5233,34 +5283,41 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 			}
 		}	
 	}
-	else { //single point analysis
-		if(m_bAlpha){
+	else 
+	{ //single point analysis
+		if(m_bAlpha)
+		{
 			alfa = Alpha*pi/180.0;
 			m_pXFoil->alfa = alfa;
 			str.Format("Alpha = %.3f  ",alfa);
 			m_XFile.WriteString(str);
 
-			if (m_pXFoil->specal()) {
+			if (m_pXFoil->specal()) 
+			{
 				str = "... Converged\n\n";
 				m_XFile.WriteString(str);
 				m_pCurOpp = AddOpPoint();
 			}
-			else{
+			else
+			{
 				OnCpCalcError();
 			}
 		}
-		else{
+		else
+		{
 			double cl = Alpha;
 			m_pXFoil->lalfa = true;
-			m_pXFoil->alfa = 0.0f;
-			m_pXFoil->qinf = 1.0f;
+			m_pXFoil->alfa = 0.0;
+			m_pXFoil->qinf = 1.0;
 			m_pXFoil->clspec = cl;
-			if(m_pXFoil->speccl()) {
+			if(m_pXFoil->speccl()) 
+			{
 				alfa = 	m_pXFoil->alfa*180/pi;
 				Alpha = alfa;
 				m_pCurOpp = AddOpPoint();
 			}
-			else{
+			else
+			{
 				OnCpCalcError();
 			}
 		}
@@ -5269,7 +5326,7 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 }
 
 
-void CXDirect::Analysis2(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence)
+void CXDirect::AnalysisAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha, bool bSequence)
 {
 	//viscous analysis / Type 1-2-3
 
@@ -5277,42 +5334,36 @@ void CXDirect::Analysis2(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 	m_ViscDlg.m_pXFoil = m_pXFoil;
 	m_ViscDlg.m_pFrame = m_pFrame;
 
-	m_ViscDlg.m_bAlpha       = m_bAlpha;
+	m_ViscDlg.m_bAlpha       = true;
 	m_ViscDlg.m_IterLim      = m_IterLim;
 	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
-	
-	if (m_bAlpha){// alpha is specified
-			if (bSequence){ //sequential analysis 
-			m_ViscDlg.SetAlphaMin(Alpha/180.0*pi);
-			m_ViscDlg.SetAlphaMax(AlphaMax/180.0*pi);
-			m_ViscDlg.SetDAlpha(DeltaAlpha/180.0*pi);
-		}
-		else { //single point analysis
-			m_ViscDlg.SetAlphaMin(Alpha/180.0*pi);
-			m_ViscDlg.SetAlphaMax(Alpha/180.0*pi);
-			m_ViscDlg.SetDAlpha(100.0/180.0*pi);
-		}
-	}
-	else{// lift coefficient is specified
-		if (bSequence){ //sequential analysis 
-			m_ViscDlg.SetAlphaMin(Alpha);
-			m_ViscDlg.SetAlphaMax(AlphaMax);
-			m_ViscDlg.SetDAlpha(DeltaAlpha);
-		}
-		else { //single point analysis
-			m_ViscDlg.SetAlphaMin(Alpha);
-			m_ViscDlg.SetAlphaMax(Alpha);
-			m_ViscDlg.SetDAlpha(100.0);
-		}
-	}
-	Trace("Launching Viscous Analysis2");
-	m_ViscDlg.DoModal();
 
-	Trace("Finished Viscous Analysis2");
+	m_ViscDlg.SetAlpha(AlphaMin,AlphaMax,DeltaAlpha);
+
+	m_ViscDlg.DoModal();
 }
 
 
-void CXDirect::Analysis3(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence)
+
+void CXDirect::AnalysisCl(double ClMin, double ClMax, double DeltaCl, bool bSequence)
+{
+	//viscous analysis / Type 1-2-3
+
+	m_ViscDlg.m_pXDirect = this;
+	m_ViscDlg.m_pXFoil = m_pXFoil;
+	m_ViscDlg.m_pFrame = m_pFrame;
+
+	m_ViscDlg.m_bAlpha       = false;
+	m_ViscDlg.m_IterLim      = m_IterLim;
+	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
+
+	m_ViscDlg.SetCl(ClMin, ClMax, DeltaCl);
+	
+	m_ViscDlg.DoModal();
+}
+
+
+void CXDirect::AnalysisRe(double ReMin, double ReMax, double DeltaRe, bool bSequence)
 {
 	//Type 4 viscous analysis
 	m_pXFoil->alfa = m_pCurPolar->m_ASpec * pi/180.0;
@@ -5325,18 +5376,9 @@ void CXDirect::Analysis3(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 	m_ViscDlg.m_IterLim      = m_IterLim;
 	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
 	if(m_pCurPolar->m_Type == 4) m_ViscDlg.m_bType4 = true;
-	
-	if (bSequence){ //sequential analysis 
-		m_ViscDlg.SetAlphaMin(Alpha);
-		m_ViscDlg.SetAlphaMax(AlphaMax);
-		m_ViscDlg.SetDAlpha(DeltaAlpha);
-	}
-	else { //single point analysis
-		m_ViscDlg.SetAlphaMin(Alpha);
-		m_ViscDlg.SetAlphaMax(Alpha);
-		m_ViscDlg.SetDAlpha(100000.f);
-	}
 
+	m_ViscDlg.SetRe(ReMin,ReMax,DeltaRe);
+	
 	m_ViscDlg.DoModal();
 
 }
@@ -5443,23 +5485,30 @@ void CXDirect::Animate(bool bAnimate)
 	}
 
 	OpPoint* pOpPoint;
+	int l;
 
-	if(bAnimate) {
-		for (int l=0; l< m_poaOpp->GetSize(); l++){
+	if(bAnimate) 
+	{
+		for (l=0; l< m_poaOpp->GetSize(); l++)
+		{
 			pOpPoint = (OpPoint*)m_poaOpp->GetAt(l);
-			if (pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
-				pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName) {
+
+			if (pOpPoint &&
+				pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
+				pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName) 
+			{
 					if(m_pCurOpp->Alpha - pOpPoint->Alpha<0.0001) 
 						m_posAnimate = l-1;
 			}
 		}
 		m_bAnimate  = true;
 	}
-	else  {
+	else  
+	{
 		m_bAnimate = false;
 		if(m_posAnimate<0 || m_posAnimate>=m_poaOpp->GetSize()) return;
 		OpPoint* pOpPoint = (OpPoint*)m_poaOpp->GetAt(m_posAnimate);
-		SetOpp(pOpPoint->Alpha);
+		if(pOpPoint) SetOpp(pOpPoint->Alpha);
 		UpdateView();
 	}
 }
@@ -5471,7 +5520,8 @@ void CXDirect::OnLoad()
 	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, 
 		_T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
 
-	if(IDOK==XFileDlg.DoModal()) {
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 		CMainFrame*pFrame = (CMainFrame*)m_pFrame;
 		pFrame->LoadFile(XFileDlg.GetFileName(), XFileDlg.GetPathName());
 		SetFoil();
@@ -5493,18 +5543,23 @@ void CXDirect::SetLogPixels(int LPY)
 BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	if (pMsg->message == WM_KEYDOWN){
+	if (pMsg->message == WM_KEYDOWN)
+	{
 		CWnd* pWnd = GetFocus();
-		if (pMsg->wParam == VK_RETURN){
+		if (pMsg->wParam == VK_RETURN)
+		{
 			if (pWnd != &pFrame->m_ctrlFoil &&
 				pWnd != &pFrame->m_ctrlPlr &&
-				pWnd != &pFrame->m_ctrlOpp) {
+				pWnd != &pFrame->m_ctrlOpp) 
+			{
 				if(pFrame->m_OperDlgBar.IsWindowVisible()) pFrame->m_OperDlgBar.m_ctrlAnalyze.SetFocus();
 				return true;
 			}
 		}
-		if (pMsg->wParam == VK_ESCAPE){
-			if (m_bAnimate) {
+		if (pMsg->wParam == VK_ESCAPE)
+		{
+			if (m_bAnimate) 
+			{
 				m_bAnimate = false;
 				if(pFrame->m_OperDlgBar.IsWindowVisible()) 
 					pFrame->m_OperDlgBar.m_ctrlAnimate.SetCheck(false);
@@ -5515,56 +5570,69 @@ BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 				return true;
 			}
 		}
-		if (pMsg->wParam == VK_TAB){
-			if (pWnd == &pFrame->m_ctrlFoil) {
+		if (pMsg->wParam == VK_TAB)
+		{
+			if (pWnd == &pFrame->m_ctrlFoil) 
+			{
 				pFrame->m_ctrlPlr.SetFocus();
 				return true;
 			}
-			else if (pWnd == &pFrame->m_ctrlPlr) {
+			else if (pWnd == &pFrame->m_ctrlPlr) 
+			{
 				pFrame->m_ctrlOpp.SetFocus();
 				return true;
 			}
-			else if (pWnd == &pFrame->m_ctrlOpp) {
+			else if (pWnd == &pFrame->m_ctrlOpp) 
+			{
 				pFrame->m_ctrlFoil.SetFocus();
 				return true;
 			}
 		}
-		if (pMsg->wParam == VK_F2){
+		if (pMsg->wParam == VK_F2)
+		{
 			OnRenameFoil();
 			return true;
 		}
-		if (pMsg->wParam == VK_F5){
+		if (pMsg->wParam == VK_F5)
+		{
 			OnOper();
 			return true;
 		}
-		if (pMsg->wParam == VK_F7){
+		if (pMsg->wParam == VK_F7)
+		{
 			OnManageFoils();
 			return true;
 		}
 		SHORT sh = GetKeyState(VK_SHIFT);
-		if (pMsg->wParam == VK_F6 && (sh & 0x8000)){
+		if (pMsg->wParam == VK_F6 && (sh & 0x8000))
+		{
 			OnBatchAnalysis();
 			return true;
 		}
-		if (pMsg->wParam == VK_F6){
+		if (pMsg->wParam == VK_F6)
+		{
 			OnSingleAnalysis();
 			return true;
 		}
-		if (pMsg->wParam == VK_F8){
+		if (pMsg->wParam == VK_F8)
+		{
 			OnPolars();
 			return true;
 		}
 		SHORT sh1 = GetKeyState(VK_LCONTROL);
 		SHORT sh2 = GetKeyState(VK_RCONTROL);
-		if (pMsg->wParam == 'O' && ((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'O' && ((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			OnLoad();
 			return true;
 		} 
-		if (pMsg->wParam == 'E' && ((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'E' && ((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			OnSavePolars();
 			return true;
 		} 
-		if (pMsg->wParam == 'P' && ((sh1 & 0x8000)||(sh2 & 0x8000))) { 
+		if (pMsg->wParam == 'P' && ((sh1 & 0x8000)||(sh2 & 0x8000))) 
+		{ 
 			OnPrint();
 			return true;
 		} 
@@ -5668,7 +5736,7 @@ void CXDirect::OnExportOpps()
 				
 		CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
 		if(IDOK == XFileDlg.DoModal()){
-			FileName = XFileDlg.GetFileName();
+			FileName = XFileDlg.GetPathName();
 			CStdioFile XFile;
 			OpPoint* pOpPoint;
 			CFileException fe;
@@ -6045,13 +6113,14 @@ CFoil* CXDirect::AddFoil(CString strFoilName, double x[], double y[],
 {
 	// Adds a foil in the array for further use should the user
 	// want to visualize graphs for this foil
+	int i;
 	CFoil *pOldFoil;
 	CFoil *pFoil;
 	pFoil = NULL;
 	if(!GetFoil(strFoilName)){
 		pFoil = new CFoil();
 		pFoil->n = nf;
-		for (int i=0; i<nf; i++){
+		for (i=0; i<nf; i++){
 			pFoil->x[i] = x[i];
 			pFoil->y[i] = y[i];
 		}
@@ -6106,27 +6175,30 @@ void CXDirect::OnEditPolar()
 	CreatePolarCurves();
 	UpdateView();
 
-	if(dlg.DoModal() == IDOK){
+	if(dlg.DoModal() == IDOK)
+	{
 		pFrame->SetSaveState(false);
 	}
-	else{
+	else
+	{
 		m_pCurPolar->Copy(&MemPolar);
 	}
 	m_pCurPolar->m_bShowPoints = bPoints;
 	CreatePolarCurves();
-	UpdateOpps();
 	UpdateView();
 }
 
 void CXDirect::OnDuplicateFoil() 
 {
 	if(!m_pCurFoil) return;
+	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	CFoil *pNewFoil = new CFoil();
 	pNewFoil->CopyFoil(m_pCurFoil);
 	pNewFoil->InitFoil();
-//	SetFoilFlap(pNewFoil);
+
 	m_BufferFoil.CopyFoil(pNewFoil);
-	if(SetModFoil(pNewFoil->m_FoilName)){
+	if(pFrame->SetModFoil(pNewFoil))
+	{
 		SetFoil();
 		UpdateFoils();
 		UpdateView();
@@ -6516,7 +6588,7 @@ void CXDirect::OnExportCurOpp()
 	CString FileName;
 	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
 	if(IDOK == XFileDlg.DoModal()){
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		m_pCurOpp->Export(FileName, pFrame->m_VersionName);
 	}
 }
@@ -6541,12 +6613,20 @@ void CXDirect::OnGeom()
 	dlg.m_pChildView  = m_pChildWnd;
 	
 
-	if(dlg.DoModal() == IDOK){
+	if(dlg.DoModal() == IDOK)
+	{
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		SetModFoil(m_pCurFoil->m_FoilName);
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-	else{
+	else
+	{
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
 		InitXFoil();
@@ -6571,22 +6651,29 @@ void CXDirect::OnNacaFoils()
 	CNacaDlg dlg(this);
 
 	dlg.m_pXFoil      = m_pXFoil;
-
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pChildView  = m_pChildWnd;
 
-	if(dlg.DoModal() == IDOK){
-
+	if(dlg.DoModal() == IDOK)
+	{
 		CString str;
-		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)
-			str.Format("%04d", dlg.m_Digits);
-		else 
-			str.Format("%d", dlg.m_Digits);
+		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)	str.Format("%04d", dlg.m_Digits);
+		else												str.Format("%d", dlg.m_Digits);
 		str = "NACA "+ str;
-		SetModFoil(str);
+
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(&m_BufferFoil);
+		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = PS_SOLID;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilName = str;
+		m_pCurOpp = (OpPoint*)ptr;
+		pFrame->SetModFoil(pNewFoil);
 		UpdateFoils();
 	}
-	else{
+	else
+	{
 		m_pCurFoil = (CFoil*)ptr0;
 		m_pCurOpp  = (OpPoint*)ptr;
 		SetBufferFoil();
@@ -6676,6 +6763,9 @@ void CXDirect::OnUePlot()
 {
 	if(!m_pXFoil->lvconv) return;
 	int i;
+	double x[IVX][3],y[IVX][3];
+	double uei;
+	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
 	m_pCpGraph->DeleteCurves();
@@ -6688,13 +6778,10 @@ void CXDirect::OnUePlot()
 	pTopCurve->SetTitle("Top");
 	pBotCurve->SetTitle("Bot");	
 
-	double x[IVX][3],y[IVX][3];
-	double uei;
-	int nside1, nside2;
 
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	//---- fill compressible ue arrays
-	for (int ibl=2; ibl<= nside1;ibl++){
+	for (ibl=2; ibl<= nside1;ibl++){
 		uei = m_pXFoil->uedg[ibl][1];
 		y[ibl][1] = uei * (1.0-m_pXFoil->tklam) 
 						/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
@@ -6722,6 +6809,8 @@ void CXDirect::OnCfPlot()
 {
 	if(!m_pXFoil->lvconv) return;
 	int i;
+	double x[IVX][3],y[IVX][3];
+	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
 	m_pCpGraph->DeleteCurves();
@@ -6734,13 +6823,11 @@ void CXDirect::OnCfPlot()
 	pTopCurve->SetTitle("Top");
 	pBotCurve->SetTitle("Bot");	
 
-	double x[IVX][3],y[IVX][3];
 	double que = 0.5*m_pXFoil->qinf*m_pXFoil->qinf;
-	int nside1, nside2;
 
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	//---- fill compressible ue arrays
-	for (int ibl=2; ibl<= nside1;ibl++){
+	for (ibl=2; ibl<= nside1;ibl++){
 		y[ibl][1] = m_pXFoil->tau[ibl][1] / que;
 	}
 	for ( ibl=2; ibl<= nside2;ibl++){
@@ -6765,6 +6852,8 @@ void CXDirect::OnCfPlot()
 void CXDirect::OnCdPlot() 
 {
 	if(!m_pXFoil->lvconv) return;
+	double x[IVX][3],y[IVX][3];
+	int nside1, nside2, ibl;
 	int i;
 
 	m_OppVar = 2;
@@ -6778,13 +6867,11 @@ void CXDirect::OnCdPlot()
 	pTopCurve->SetTitle("Top");
 	pBotCurve->SetTitle("Bot");	
 
-	double x[IVX][3],y[IVX][3];
-	int nside1, nside2;
 	double qrf = m_pXFoil->qinf;
 
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	//---- fill compressible ue arrays
-	for (int ibl=2; ibl<= nside1;ibl++){
+	for (ibl=2; ibl<= nside1;ibl++){
 		y[ibl][1] = m_pXFoil->dis[ibl][1] / qrf/ qrf/ qrf;
 	}
 	for ( ibl=2; ibl<= nside2;ibl++){
@@ -6809,6 +6896,7 @@ void CXDirect::OnNPlot()
 {
 	if(!m_pXFoil->lvconv) return;
 	int i;
+	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
 	m_pCpGraph->DeleteCurves();
@@ -6822,11 +6910,10 @@ void CXDirect::OnNPlot()
 	pBotCurve->SetTitle("Bot");	
 
 	double x[IVX][3],y[IVX][3];
-	int nside1, nside2;
 
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 
-	for (int ibl=2; ibl< nside1;ibl++){
+	for (ibl=2; ibl< nside1;ibl++){
 		y[ibl][1] = m_pXFoil->ctau[ibl][1];
 	}
 	for ( ibl=2; ibl< nside2;ibl++){
@@ -7005,7 +7092,7 @@ void CXDirect::OnExportCurrentResults()
 	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT,
 		_T("Text File (.txt)|*.txt|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		DestFileName = XFileDlg.GetFileName();
+		DestFileName = XFileDlg.GetPathName();
 		BOOL bOpen = DestFile.Open(DestFileName, CFile::modeCreate | CFile::modeWrite, &fe);
 		if(bOpen){
 			DestFile.WriteString(pFrame->m_VersionName);
@@ -7150,7 +7237,7 @@ void CXDirect::OnImportXFoilPolar()
 	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY,  
 					 _T("XFoil Polar Format |*.*|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 //	need to select the foil to which the polars will be associated		
 		BOOL bOpen = XFile.Open(FileName, CFile::modeRead, &fe);
 		if (bOpen){
@@ -7303,7 +7390,7 @@ void CXDirect::OnImportJavaFoilPolar()
 	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY,  
 					 _T("JavaFoil Polar Format |*.*|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 //	need to select the foil to which the polars will be associated		
 
 		try{

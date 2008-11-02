@@ -209,7 +209,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v408_Beta";
+	m_VersionName = "XFLR5_v4.10_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -376,9 +376,10 @@ CMainFrame::~CMainFrame()
 	m_AFoilMenu.DestroyMenu();
 	m_XInverseMenu.DestroyMenu();
 
+	int i;
 	CPlane* pPlane;
 	int nIndex = (int)m_oaPlane.GetSize();
-	for (int i=nIndex-1; i>=0;i--){
+	for ( i=nIndex-1; i>=0;i--){
 		pPlane = (CPlane*)m_oaPlane.GetAt(i);
 		m_oaPlane.RemoveAt(i);//removes the pointer
 		delete pPlane;// deletes the object
@@ -833,6 +834,11 @@ void CMainFrame::OnMiarex()
 
 	if(Miarex.m_pCurWing && Miarex.m_iView==1) Miarex.OnAdjustToWing();
 	else if (Miarex.m_iView==2)                Miarex.CreateWPolarCurves();
+	else if (Miarex.m_iView==3)
+	{
+		Miarex.m_bIs3DScaleSet = false;
+		Miarex.SetScale();
+	}
 	else if (Miarex.m_iView==5)
 	{
 		m_BodyCtrlBar.UpdateBodies();
@@ -1277,6 +1283,7 @@ void CMainFrame::LoadOldPolarFile(CArchive &ar, int n)
 
 void CMainFrame::WritePolars(CArchive &ar, CFoil *pFoil)
 {
+	int i;
 	try{
 		if(!pFoil){
 			ar << 100002;
@@ -1285,7 +1292,7 @@ void CMainFrame::WritePolars(CArchive &ar, CFoil *pFoil)
 			//first write foils
 			ar << (int)m_oaFoil.GetSize();
 
-			for (int i=0; i<m_oaFoil.GetSize(); i++){
+			for (i=0; i<m_oaFoil.GetSize(); i++){
 				pFoil = (CFoil*)m_oaFoil.GetAt(i);
 				pFoil->Serialize(ar);
 			}
@@ -1319,7 +1326,7 @@ void CMainFrame::WritePolars(CArchive &ar, CFoil *pFoil)
 			//count polars associated to the foil
 			CPolar * pPolar ;
 			int n=0;
-			for (int i=0; i<m_oaPolar.GetSize();i++){
+			for (i=0; i<m_oaPolar.GetSize();i++){
 				pPolar = (CPolar*)m_oaPolar.GetAt(i);
 				if (pPolar->m_FoilName == pFoil->m_FoilName) n++;
 			}
@@ -1351,12 +1358,12 @@ bool CMainFrame::LoadPolarFile(CArchive &ar)
 	CPolar *pPolar = NULL;
 	CPolar *pOldPlr;
 	CString strong;
+	int i, n;
 
 	try{
 		//first read all available foils
-		int n;
 		ar>>n;
-		for (int i=0;i<n; i++){
+		for (i=0;i<n; i++){
 			pFoil = new CFoil();
 			
 			pFoil->Serialize(ar);
@@ -1418,9 +1425,9 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 
 		
 	//first read all available foils
-	int n;
+	int i,l,n;
 	ar>>n;
-	for (int i=0;i<n; i++){
+	for (i=0;i<n; i++){
 		pFoil = new CFoil();
 		
 		pFoil->Serialize(ar);
@@ -1450,7 +1457,7 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 			delete pPolar;
 			return false;
 		}
-		for (int l=0; l<m_oaPolar.GetSize(); l++){
+		for (l=0; l<m_oaPolar.GetSize(); l++){
 			pOldPlr = (CPolar*)m_oaPolar[l];
 			if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
 				pOldPlr->m_PlrName  == pPolar->m_PlrName){
@@ -2500,302 +2507,6 @@ COLORREF CMainFrame::GetColor(int type)
 	return color;	
 }
 
-double CMainFrame::GetCl(CFoil *pFoil0, CFoil *pFoil1, 
-					 double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
-{
-
-	double Cl0, Cl1;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil0) 
-		Cl0 = 2.0*pi*(Alpha*pi/180.0);
-	else 
-		Cl0 = GetPlrPoint(pFoil0, Re, Alpha, 1, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	if(!pFoil1) 
-		Cl1 = 2.0*pi*(Alpha*pi/180.0);
-	else 
-		Cl1 = GetPlrPoint(pFoil1, Re, Alpha, 1, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	return ((1-Tau) * Cl0 + Tau * Cl1);
-}
-
-void * CMainFrame::GetPlrVariable(CPolar *pPolar, int iVar)
-{
-	// returns a pointer to the variable array defined by its index iVar
-	
-	void * pVar;
-	switch (iVar){
-		case 0:
-			pVar = &pPolar->m_Alpha;
-			break;
-		case 1:
-			pVar = &pPolar->m_Cl;
-			break;
-		case 2:
-			pVar = &pPolar->m_Cd;
-			break;
-		case 3:
-			pVar = &pPolar->m_Cdp;
-			break;
-		case 4:
-			pVar = &pPolar->m_Cm;
-			break;
-		case 5:
-			pVar = &pPolar->m_XTr1;
-			break;
-		case 6:
-			pVar = &pPolar->m_XTr2;
-			break;
-		case 7:
-			pVar = &pPolar->m_HMom;
-			break;
-		case 8:
-			pVar = &pPolar->m_Cpmn;
-			break;
-		case 9:
-			pVar = &pPolar->m_ClCd;
-			break;
-		case 10:
-			pVar = &pPolar->m_Cl32Cd;
-			break;
-		case 11:
-			pVar = &pPolar->m_XCp;
-			break;
-		default:
-			pVar = &pPolar->m_Alpha;
-			break;
-	}
-	return pVar;
-}
-
-double CMainFrame::GetPlrPoint(CFoil *pFoil, double Re, double Alpha, 
-						       int PlrVar, bool &bOutRe, bool &bError)
-{
-/*	Var 
-	0 =	m_Alpha;
-	1 = m_Cl;
-	2 = m_Cd;
-	3 = m_Cdp;
-	4 = m_Cm;
-	5, 6 = m_XTr1, m_XTr2;
-	7, 8 = m_HMom, m_Cpmn;
-	9,10 = m_ClCd, m_Cl32Cd;
-	11 = m_XCp
-*/
-
-	CArray <double, double> *pX;	
-	double amin, amax;
-	CPolar *pPolar;
-
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil) {
-		bOutRe = true;
-		bError = true;
-		return 0.000;
-	}
-
-
-	int size;
-	int n = 0;
-
-	// Are there any Type 1 polars available for this foil ?
-	for (int i = 0; i< m_oaPolar.GetSize(); i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			n++;
-			if(n>=2) break;
-		}
-	}
-
-//more than one polar - interpolate between  - tough job
-
-	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
-	int nPolars = (int)m_oaPolar.GetSize();
-	//Type 1 Polars are sorted by crescending Re Number
-
-	//if Re is less than that of the first polar, use this one
-	for (i=0; i< nPolars; i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			// we have found the first type 1 polar for this foil
-			if (Re < pPolar->m_Reynolds) {
-				bOutRe = true;
-				//interpolate Alpha on this polar
-				pX = (CArray <double, double> *) GetPlrVariable(pPolar, PlrVar);
-				size = (int)pPolar->m_Alpha.GetSize();
-				if(Alpha < pPolar->m_Alpha[0])      {
-					return (*pX)[0];
-				}
-				if(Alpha > pPolar->m_Alpha[size-1])	{
-					return (*pX)[size-1];
-				}
-				for (i=0; i<size-1; i++){
-					if(pPolar->m_Alpha[i] <= Alpha && Alpha < pPolar->m_Alpha[i+1]){
-						//interpolate
-						if(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i] < 0.00001)//do not divide by zero
-							return (*pX)[i];
-						else {
-							double u = (Alpha - pPolar->m_Alpha[i])
-									 /(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i]);
-							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-						}						
-					}
-				}
-				break;
-			}
-			break;
-		}
-	}
-
-	// if not Find the two polars
-	for (i=0; i< nPolars; i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			// we have found the first type 1 polar for this foil
-			pPolar->GetAlphaLimits(amin, amax);
-			if (pPolar->m_Reynolds <= Re) {
-				if(amin <= Alpha && Alpha <= amax) {	
-					pPolar1 = pPolar;
-				}
-			}
-			else {
-				if(amin <= Alpha && Alpha <= amax){	
-					pPolar2 = pPolar;
-					break;
-				}
-			}
-		}
-	}
-
-	if (!pPolar2) {
-		//then Re is greater than that of any polar
-		// so use last polar and interpolate alphas on this polar
-		bOutRe = true;
-		if(!pPolar1){
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Alpha.GetSize();
-		if(!size) {
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Alpha < pPolar1->m_Alpha[0])	     return (*pX)[0];
-		if(Alpha > pPolar1->m_Alpha[size-1]) return (*pX)[size-1];
-		for (i=0; i<size-1; i++){
-			if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1]){
-				//interpolate
-				if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001){//do not divide by zero
-					return (*pX)[i];
-				}
-				else{
-					double u = (Alpha - pPolar1->m_Alpha[i])
-							 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
-					return (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-				}
-			}
-		}
-		//Out in Re, out in alpha...
-		return (*pX)[size-1] ;
-
-	}
-	else {
-		// Re is between that of polars 1 and 2
-		// so interpolate alphas for each
-		double Var1, Var2;
-
-		if(!pPolar1) {
-			bOutRe = true; 
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Alpha.GetSize();
-		if(!size) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Alpha < pPolar1->m_Alpha[0])	          Var1 = (*pX)[0];
-		else if(Alpha > pPolar1->m_Alpha[size-1]) Var1 = (*pX)[size-1];
-		else{
-			for (i=0; i<size-1; i++){
-				if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1]){
-					//interpolate
-					if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001)//do not divide by zero
-						Var1 = (*pX)[i];
-					else{
-						double u = (Alpha - pPolar1->m_Alpha[i])
-								 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
-						Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-					}
-				}
-			}
-		}
-
-		size = (int)pPolar2->m_Alpha.GetSize();
-		if(!size) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
-		if(Alpha < pPolar2->m_Alpha[0]){
-			bOutRe = true;
-			bError = true;
-			Var2 = (*pX)[0];
-		}
-		else if(Alpha > pPolar2->m_Alpha[size-1]) {
-			bOutRe = true;
-			bError = true;
-			Var2 = (*pX)[size-1];
-		}
-		else{
-			for (i=0; i<size-1; i++){
-				if(pPolar2->m_Alpha[i] <= Alpha && Alpha < pPolar2->m_Alpha[i+1]){
-					//interpolate
-					pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
-					if(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i] < 0.00001)//do not divide by zero
-						Var2 = (*pX)[i];
-					else{
-						double u = (Alpha - pPolar2->m_Alpha[i])
-								 /(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i]);
-						Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-					}
-				}
-			}
-		}
-		// then interpolate Variable
-
-		double v =   (Re - pPolar1->m_Reynolds) 
-				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
-		double Var = Var1 + v * (Var2-Var1);
-		return Var;
-	} 
-		
-//	AfxMessageBox("Error interpolating", MB_OK);
-//	bOutRe = true;
-//	bError = true;
-//	return 0.000;// we missed something somewhere...
-}
-
-
 
 CFoil* CMainFrame::GetFoil(CString strFoilName)
 {
@@ -2814,11 +2525,12 @@ CFoil* CMainFrame::GetFoil(CString strFoilName)
 
 CFoil* CMainFrame::AddFoil(CString strFoilName, double x[], double y[], int nf)
 {
+	int i;
 	CFoil *pOldFoil = GetFoil(strFoilName);
 	if(!pOldFoil){
 		CFoil *pFoil = new CFoil();
 		pFoil->n = nf;
-		for (int i=0; i<nf; i++){
+		for (i=0; i<nf; i++){
 			pFoil->x[i] = x[i];
 			pFoil->y[i] = y[i];
 		}
@@ -2873,7 +2585,7 @@ CFoil* CMainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 	// gives it a proper name, FoilName or another,
 	// selects it ,
 	// and initializes XFoil, comboboxes and everything.
-
+	int j,l;
 	bool bExists = false;
 	bool bNotFound = true;
 	pNewFoil->m_bSaved = false;
@@ -2883,7 +2595,7 @@ CFoil* CMainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 		bExists = true;
 	}
 	else {
-		for (int j=0; j<m_oaFoil.GetSize(); j++){
+		for (j=0; j<m_oaFoil.GetSize(); j++){
 			pOldFoil = (CFoil*)m_oaFoil.GetAt(j);
 			if (pOldFoil->m_FoilName == pNewFoil->m_FoilName) {
 				bExists = true;
@@ -2916,7 +2628,7 @@ CFoil* CMainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 			int resp = (int)dlg.DoModal();
 			strong = dlg.m_strName;
 			if(IDOK == resp){
-				for (int l=0; l<m_oaFoil.GetSize(); l++){
+				for (l=0; l<m_oaFoil.GetSize(); l++){
 					pOldFoil = (CFoil*)m_oaFoil.GetAt(l);
 					if(pOldFoil->m_FoilName == strong) exists = true;
 				}
@@ -2930,7 +2642,7 @@ CFoil* CMainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 			}
 			else if(resp==10){// user wants to overwrite existing airfoil
 				//So delete any foil with that name
-				for (int l=(int)m_oaFoil.GetSize()-1;l>=0; l--){
+				for (l=(int)m_oaFoil.GetSize()-1;l>=0; l--){
 					pOldFoil = (CFoil*)m_oaFoil.GetAt(l);
 					if(pOldFoil->m_FoilName == strong){
 						m_oaFoil.RemoveAt(l);
@@ -3213,6 +2925,7 @@ CPolar* CMainFrame::AddPolar(CPolar *pPolar)
 void CMainFrame::SaveSettings()
 {
 	CFile fp;
+	CFileException fe;
 
 	WINDOWPLACEMENT wndpl;
 	GetWindowPlacement(&wndpl);
@@ -3221,14 +2934,33 @@ void CMainFrame::SaveSettings()
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
 	GetTempPath(MAX_PATH,szAppPath);
+	GetLongPathName(szAppPath,szAppPath,MAX_PATH);
 	strAppDirectory = szAppPath;
 	str =strAppDirectory + "XFLR5.set";
 
 
-	if(fp.Open(str ,CFile::modeCreate | CFile::modeWrite))
+	if(!fp.Open(str ,CFile::modeCreate | CFile::modeWrite))
+	{
+		if(fe.m_cause == CFileException::none)				AfxMessageBox("Loading Settings : Unknown error");
+		if(fe.m_cause == CFileException::fileNotFound)		AfxMessageBox("Loading Settings : File Not found " + str);
+		if(fe.m_cause == CFileException::genericException)	AfxMessageBox("Loading Settings : genericException");
+		if(fe.m_cause == CFileException::badPath)			AfxMessageBox("Loading Settings : badPath");
+		if(fe.m_cause == CFileException::tooManyOpenFiles)	AfxMessageBox("Loading Settings : tooManyOpenFiles");
+		if(fe.m_cause == CFileException::accessDenied)		AfxMessageBox("Loading Settings : accessDenied");
+		if(fe.m_cause == CFileException::invalidFile)		AfxMessageBox("Loading Settings : invalidFile");
+		if(fe.m_cause == CFileException::removeCurrentDir)	AfxMessageBox("Loading Settings : removeCurrentDir");
+		if(fe.m_cause == CFileException::directoryFull)		AfxMessageBox("Loading Settings : directoryFull");
+		if(fe.m_cause == CFileException::badSeek)			AfxMessageBox("Loading Settings : badSeek");
+		if(fe.m_cause == CFileException::hardIO)			AfxMessageBox("Loading Settings : hardIO");
+		if(fe.m_cause == CFileException::sharingViolation)	AfxMessageBox("Loading Settings : sharingViolation");
+		if(fe.m_cause == CFileException::lockViolation)		AfxMessageBox("Loading Settings : lockViolation");
+		if(fe.m_cause == CFileException::diskFull)			AfxMessageBox("Loading Settings : diskFull");
+		if(fe.m_cause == CFileException::endOfFile)			AfxMessageBox("Loading Settings : endOfFile");
+	}
+	else
 	{
 		CArchive ar(&fp, CArchive::store);
-		ar << 100320;
+		ar << 100321;
 			//100320 : added window placement data
 			//100304 at version 3.04
 
@@ -3277,6 +3009,8 @@ void CMainFrame::SaveSettings()
 void CMainFrame::LoadSettings()
 {
 	CFile fp;
+
+	CFileException fe;
 	WINDOWPLACEMENT wndpl;
 	int k;
 
@@ -3284,15 +3018,37 @@ void CMainFrame::LoadSettings()
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
 	GetTempPath(MAX_PATH,szAppPath);
+	GetLongPathName(szAppPath,szAppPath,MAX_PATH);
 	strAppDirectory = szAppPath;
 	str =strAppDirectory + "XFLR5.set";
-
+ 
 	try
 	{
-		if(fp.Open(str,CFile::modeRead)){
+		if(!fp.Open(str, CFile::modeRead, &fe))
+		{
+			if(fe.m_cause == CFileException::none)				AfxMessageBox("Loading Settings : Unknown error");
+			if(fe.m_cause == CFileException::fileNotFound)		AfxMessageBox("Loading Settings : File Not found " + str);
+			if(fe.m_cause == CFileException::genericException)	AfxMessageBox("Loading Settings : genericException");
+			if(fe.m_cause == CFileException::badPath)			AfxMessageBox("Loading Settings : badPath");
+			if(fe.m_cause == CFileException::tooManyOpenFiles)	AfxMessageBox("Loading Settings : tooManyOpenFiles");
+			if(fe.m_cause == CFileException::accessDenied)		AfxMessageBox("Loading Settings : accessDenied");
+			if(fe.m_cause == CFileException::invalidFile)		AfxMessageBox("Loading Settings : invalidFile");
+			if(fe.m_cause == CFileException::removeCurrentDir)	AfxMessageBox("Loading Settings : removeCurrentDir");
+			if(fe.m_cause == CFileException::directoryFull)		AfxMessageBox("Loading Settings : directoryFull");
+			if(fe.m_cause == CFileException::badSeek)			AfxMessageBox("Loading Settings : badSeek");
+			if(fe.m_cause == CFileException::hardIO)			AfxMessageBox("Loading Settings : hardIO");
+			if(fe.m_cause == CFileException::sharingViolation)	AfxMessageBox("Loading Settings : sharingViolation");
+			if(fe.m_cause == CFileException::lockViolation)		AfxMessageBox("Loading Settings : lockViolation");
+			if(fe.m_cause == CFileException::diskFull)			AfxMessageBox("Loading Settings : diskFull");
+			if(fe.m_cause == CFileException::endOfFile)			AfxMessageBox("Loading Settings : endOfFile");
+		}
+		else
+		{
 			CArchive ar(&fp, CArchive::load);
+
 			ar >> k;
-			if(k!=100320){
+			if(k!=100321)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3307,9 +3063,9 @@ void CMainFrame::LoadSettings()
 			ar >> m_WeightUnit;
 			ar >> m_ForceUnit;
 			ar >> m_MomentUnit;
-			if(m_MomentUnit<0 || m_MomentUnit>10){
+			if(m_MomentUnit<0 || m_MomentUnit>10)
+			{
 				m_MomentUnit = 0;
-
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3319,7 +3075,8 @@ void CMainFrame::LoadSettings()
 					 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3327,7 +3084,8 @@ void CMainFrame::LoadSettings()
 			m_3DAxisColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3335,7 +3093,8 @@ void CMainFrame::LoadSettings()
 			m_3DAxisStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3343,7 +3102,8 @@ void CMainFrame::LoadSettings()
 			m_3DAxisWidth  = k;
 
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3351,7 +3111,8 @@ void CMainFrame::LoadSettings()
 			m_VLMColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3359,7 +3120,8 @@ void CMainFrame::LoadSettings()
 			m_VLMStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3367,7 +3129,8 @@ void CMainFrame::LoadSettings()
 			m_VLMWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3375,7 +3138,8 @@ void CMainFrame::LoadSettings()
 			m_OutlineColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3383,7 +3147,8 @@ void CMainFrame::LoadSettings()
 			m_OutlineStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3391,7 +3156,8 @@ void CMainFrame::LoadSettings()
 			m_OutlineWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3399,7 +3165,8 @@ void CMainFrame::LoadSettings()
 			m_XTopStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3407,7 +3174,8 @@ void CMainFrame::LoadSettings()
 			m_XTopWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3415,7 +3183,8 @@ void CMainFrame::LoadSettings()
 			m_XTopColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3447,7 +3216,8 @@ void CMainFrame::LoadSettings()
 			m_XCPStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3455,7 +3225,8 @@ void CMainFrame::LoadSettings()
 			m_XCPWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3463,7 +3234,8 @@ void CMainFrame::LoadSettings()
 			m_XCPColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3471,7 +3243,8 @@ void CMainFrame::LoadSettings()
 			m_MomentStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3479,7 +3252,8 @@ void CMainFrame::LoadSettings()
 			m_MomentWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3487,7 +3261,8 @@ void CMainFrame::LoadSettings()
 			m_MomentColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3503,7 +3278,8 @@ void CMainFrame::LoadSettings()
 			m_IDragWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3511,7 +3287,8 @@ void CMainFrame::LoadSettings()
 			m_IDragColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3519,7 +3296,8 @@ void CMainFrame::LoadSettings()
 			m_VDragStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3527,7 +3305,8 @@ void CMainFrame::LoadSettings()
 			m_VDragWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3535,7 +3314,8 @@ void CMainFrame::LoadSettings()
 			m_VDragColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3543,7 +3323,8 @@ void CMainFrame::LoadSettings()
 			m_DownwashStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3551,7 +3332,8 @@ void CMainFrame::LoadSettings()
 			m_DownwashWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3559,7 +3341,8 @@ void CMainFrame::LoadSettings()
 			m_DownwashColor = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3567,7 +3350,8 @@ void CMainFrame::LoadSettings()
 			m_WakeStyle  = k;
 
 			ar >> k;
-			if(k<0 || k>10){
+			if(k<0 || k>10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3575,7 +3359,8 @@ void CMainFrame::LoadSettings()
 			m_WakeWidth  = k;
 			
 			ar >> k;
-			if(k<0 || k>RGB(255,255,255)){
+			if(k<0 || k>RGB(255,255,255))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3595,7 +3380,8 @@ void CMainFrame::LoadSettings()
 
 		
 			ar >> k;
-			if(k<0 || k>1){
+			if(k<0 || k>1)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -3603,20 +3389,23 @@ void CMainFrame::LoadSettings()
 			if(k) m_bSaveOpps = true; else m_bSaveOpps = false;
 
 			ar >> k;
-			if(k<0 || k>1){
+			if(k<0 || k>1)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
 			if(k) m_bSaveWOpps = true; else m_bSaveWOpps = false;
 
-			if(!m_wndView.LoadSettings(ar)){
+			if(!m_wndView.LoadSettings(ar))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = str;
 				throw pfe;
 			}
 
-			if(!XDirect.LoadSettings(ar)){
+			if(!XDirect.LoadSettings(ar))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = str;
 				throw pfe;
@@ -3626,12 +3415,14 @@ void CMainFrame::LoadSettings()
 				pfe->m_strFileName = str;
 				throw pfe;
 			}
-			if(!AFoil.LoadSettings(ar)){
+			if(!AFoil.LoadSettings(ar))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = str;
 				throw pfe;
 			}
-			if(!XInverse.LoadSettings(ar)){
+			if(!XInverse.LoadSettings(ar))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = str;
 				throw pfe;
@@ -3641,11 +3432,15 @@ void CMainFrame::LoadSettings()
 			fp.Close();
 		}
 	}
-	catch (CArchiveException *ex){
+	catch (CArchiveException *ex)
+	{
 		ex->Delete();
+		fp.Close();
 	}
-	catch (CException *ex){
+	catch (CException *ex)
+	{
 		ex->Delete();
+		fp.Close();
 	}
 }
 
@@ -4029,7 +3824,7 @@ void CMainFrame::OnMiarexW3DOppVLM(CCmdUI* pCmdUI)
 		else  									  pCmdUI->Enable(false);
 
 		if (Miarex.m_iView==3 && Miarex.m_bSurfaces)		pCmdUI->SetCheck(false);
-		else if (Miarex.m_iView==3 && Miarex.m_b3DVLMCl)    pCmdUI->SetCheck(true);
+		else if (Miarex.m_iView==3 && Miarex.m_b3DCp)    pCmdUI->SetCheck(true);
 	}
 	else pCmdUI->Enable(false);
 } 
@@ -4702,7 +4497,8 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 	if (ar.IsStoring())
 	{	
 		// storing code
-		ar << 100011;
+		ar << 100012;
+		// 100012 : Added sideslip
 		// 100011 : Added Body serialization
 		// 100010 : Converted to I.S. units
 		// 100009 : added serialization of opps in numbered format
@@ -4725,6 +4521,7 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 		ar << (float)Miarex.m_WngAnalysis.m_Density;
 		ar << (float)Miarex.m_WngAnalysis.m_Viscosity;
 		ar << (float)Miarex.m_WngAnalysis.m_Alpha;
+		ar << (float)Miarex.m_WngAnalysis.m_Beta;
 		ar << Miarex.m_WngAnalysis.m_AnalysisType;
 
 		if (Miarex.m_WngAnalysis.m_bVLM1)   ar << 1;
@@ -4738,23 +4535,27 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 
 		ar << (int)m_oaWing.GetSize() ;//number of wings
 		// Store the wings
-		for (i=0; i<m_oaWing.GetSize();i++){
+		for (i=0; i<m_oaWing.GetSize();i++)
+		{
 			pWing = (CWing*)m_oaWing.GetAt(i);
 			pWing->SerializeWing(ar);
 		}
 
 		// now store all the WPolars
 		ar << (int)m_oaWPolar.GetSize();
-		for (i=0; i<m_oaWPolar.GetSize();i++){
+		for (i=0; i<m_oaWPolar.GetSize();i++)
+		{
 			pWPolar = (CWPolar*)m_oaWPolar.GetAt(i);
 			pWPolar->m_pParent = this;
 			pWPolar->SerializeWPlr(ar);
 		}
 
 		// next store all the WOpps
-		if(m_bSaveWOpps){
+		if(m_bSaveWOpps)
+		{
 			ar << (int)m_oaWOpp.GetSize();
-			for (i=0; i<m_oaWOpp.GetSize();i++){
+			for (i=0; i<m_oaWOpp.GetSize();i++)
+			{
 				pWOpp = (CWOpp*)m_oaWOpp.GetAt(i);
 				pWOpp->SerializeWOpp(ar);
 			}
@@ -4780,10 +4581,12 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 			pPlane->SerializePlane(ar);
 		}
 
-		if(m_bSaveWOpps){
+		if(m_bSaveWOpps)
+		{
 			// not forgetting their POpps
 			ar << (int)m_oaPOpp.GetSize();
-			for (i=0; i<m_oaPOpp.GetSize();i++){
+			for (i=0; i<m_oaPOpp.GetSize();i++)
+			{
 				pPOpp = (CPOpp*)m_oaPOpp.GetAt(i);
 				pPOpp->SerializePOpp(ar);
 			}
@@ -4814,13 +4617,15 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 				ar >> m_WeightUnit;
 				ar >> m_SpeedUnit;
 				ar >> m_ForceUnit;
-				if(ArchiveFormat>=100005){
+				if(ArchiveFormat>=100005)
+				{
 					ar >> m_MomentUnit;
 				}
 				SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 						 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
-				if(ArchiveFormat>=100004){
+				if(ArchiveFormat>=100004)
+				{
 					ar >> Miarex.m_WngAnalysis.m_Type;
 					ar >> f; Miarex.m_WngAnalysis.m_Weight=f;
 					ar >> f; Miarex.m_WngAnalysis.m_QInf=f;
@@ -4829,11 +4634,16 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 					ar >> f; Miarex.m_WngAnalysis.m_Density=f;
 					ar >> f; Miarex.m_WngAnalysis.m_Viscosity=f;
 					ar >> f; Miarex.m_WngAnalysis.m_Alpha=f;
+					if(ArchiveFormat>=100012)
+					{
+						ar >>f;Miarex.m_WngAnalysis.m_Beta=f;
+					}
 
 					ar >> Miarex.m_WngAnalysis.m_AnalysisType;
 
 				}
-				if(ArchiveFormat>=100006){
+				if(ArchiveFormat>=100006)
+				{
 					ar >> k;
 					if (k) Miarex.m_WngAnalysis.m_bVLM1 = true;
 					else   Miarex.m_WngAnalysis.m_bVLM1 = false;
@@ -5645,401 +5455,6 @@ void CMainFrame::OnLogFile()
 	
 }
 
-double CMainFrame::VLMGetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1,
-						 double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
-{
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	double Var0, Var1;
-	if(!pFoil0) {
-		Cl = 0.0;
-		Var0 = 0.0;
-	}
-	else Var0 = VLMGetPlrPoint(pFoil0, Re, Cl,nVar, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	if(!pFoil1) {
-		Cl = 0.0;
-		Var1 = 0.0;
-	}
-	else Var1 = VLMGetPlrPoint(pFoil1, Re, Cl,nVar, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-	return ((1-Tau) * Var0 + Tau * Var1);
-}
-
-
-double CMainFrame::VLMGetPlrPoint(CFoil *pFoil, double Re,
-							  double Cl, int PlrVar, bool &bOutRe, bool &bError)
-{
-
-/*	Var 
-
-
-	0 =	m_Alpha;
-	1 = m_Cl;
-	2 = m_Cd;
-	3 = m_Cdp;
-	4 = m_Cm;
-	5, 6 = m_XTr1, m_XTr2;
-	7, 8 = m_HMom, m_Cpmn;
-	9,10 = m_ClCd, m_Cl32Cd;
-*/
-
-	CArray <double, double> *pX;	
-	double Clmin, Clmax;
-	CPolar *pPolar;
-
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil) {
-		bOutRe = true;
-		bError = true;
-		return 0.000;
-	}
-
-
-	int size;
-	int n = 0;
-
-	// Are there any Type 1 polars available for this foil ?
-	for (int i = 0; i< m_oaPolar.GetSize(); i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			n++;
-			if(n>=2) break;
-		}
-	}
-
-//more than one polar - interpolate between  - tough job
-
-	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
-	int nPolars = (int)m_oaPolar.GetSize();
-	//Type 1 Polars are sorted by crescending Re Number
-
-	//if Re is less than that of the first polar, use this one
-	for (i=0; i< nPolars; i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			// we have found the first type 1 polar for this foil
-			if (Re < pPolar->m_Reynolds) {
-				bOutRe = true;
-				//interpolate Cl on this polar
-				pX = (CArray <double, double> *) GetPlrVariable(pPolar, PlrVar);
-				size = (int)pPolar->m_Cl.GetSize();
-				if(Cl < pPolar->m_Cl[0])      {
-					return (*pX)[0];
-				}
-				if(Cl > pPolar->m_Cl[size-1])	{
-					return (*pX)[size-1];
-				}
-				for (i=0; i<size-1; i++){
-					if(pPolar->m_Cl[i] <= Cl && Cl < pPolar->m_Cl[i+1]){
-						//interpolate
-						if(pPolar->m_Cl[i+1]-pPolar->m_Cl[i] < 0.00001)//do not divide by zero
-							return (*pX)[i];
-						else {
-							double u = (Cl - pPolar->m_Cl[i])
-									 /(pPolar->m_Cl[i+1]-pPolar->m_Cl[i]);
-							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-						}
-					}
-				}
-				break;
-			}
-			break;
-		}
-	}
-
-	// if not Find the two polars
-	for (i=0; i< nPolars; i++){
-		pPolar = (CPolar*)m_oaPolar.GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
-			// we have found the first type 1 polar for this foil
-			pPolar->GetClLimits(Clmin, Clmax);
-			if (pPolar->m_Reynolds <= Re) {
-				if(Clmin <= Cl && Cl <= Clmax) {	
-					pPolar1 = pPolar;
-				}
-			}
-			else {
-				if(Clmin <= Cl && Cl <= Clmax){	
-					pPolar2 = pPolar;
-					break;
-				}
-			}
-		}
-	}
-
-
-	if (!pPolar2) {
-		//then Re is greater than that of any polar
-		// so use last polar and interpolate Cls on this polar
-		bOutRe = true;
-		if(!pPolar1){
-			bOutRe = true; 
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Cl.GetSize();
-		if(!size) {
-			bOutRe = true; 
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Cl < pPolar1->m_Cl[0])	   return (*pX)[0];
-		if(Cl > pPolar1->m_Cl[size-1]) return (*pX)[size-1];
-		for (i=0; i<size-1; i++){
-			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1]){
-				//interpolate
-				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001){//do not divide by zero
-					return (*pX)[i];
-				}
-				else {
-					double u = (Cl - pPolar1->m_Cl[i])
-							 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
-					return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-				}
-			}
-		}
-		//Out in Re, out in Cl...
-		return (*pX)[size-1];
-	}
-	else {
-		// Re is between that of polars 1 and 2
-		// so interpolate Cls for each
-		double Var1, Var2;
-
-		if(!pPolar1) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Cl.GetSize();
-		if(!size) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
-		pPolar1->GetClLimits(Clmin, Clmax);
-
-		if(Cl < Clmin){	         
-			Var1 = (*pX)[0];
-			bOutRe = true;
-		}
-		else if(Cl > Clmax) {
-			Var1 = (*pX)[size-1];
-			bOutRe = true;
-		}
-		else{
-			//first Find the point closest to Cl=0
-			int pt = 0;
-			double dist = fabs(pPolar1->m_Cl[0]);
-			for (i=1; i<size;i++){
-				if (fabs(pPolar1->m_Cl[i])< dist){
-					dist = fabs(pPolar1->m_Cl[i]);
-					pt = i;
-				}
-			}
-			if(Cl<pPolar1->m_Cl[pt]){
-				for (i=pt; i>0; i--){
-					if(Cl<= pPolar1->m_Cl[i] && Cl > pPolar1->m_Cl[i-1]){
-						//interpolate
-						if(fabs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001){//do not divide by zero
-							Var1 = (*pX)[i];
-							break;
-						}
-						else{
-							double u = (Cl - pPolar1->m_Cl[i-1])
-									 /(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]);
-							Var1 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
-							break;
-						}
-					}
-				}
-			}
-			else {
-				for (i=pt; i<size-1; i++){
-					if(pPolar1->m_Cl[i] <=Cl && Cl < pPolar1->m_Cl[i+1]){
-						//interpolate
-						if(fabs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
-							Var1 = (*pX)[i];
-							break;
-						}
-						else{
-							double u = (Cl - pPolar1->m_Cl[i])
-									 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
-							Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-							break;
-						}
-					}
-				}
-			}
-		} 
-
-		size = (int)pPolar2->m_Cl.GetSize();
-		if(!size) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
-		pPolar2->GetClLimits(Clmin, Clmax);
-
-		if(Cl < Clmin){	         
-			Var2 = (*pX)[0];
-			bOutRe = true;
-		}
-		else if(Cl > Clmax) {
-			Var2 = (*pX)[size-1];
-			bOutRe = true;
-		}
-		else{
-			//first Find the point closest to Cl=0
-			int pt = 0;
-			double dist = fabs(pPolar2->m_Cl[0]);
-			for (i=1; i<size;i++){
-				if (fabs(pPolar2->m_Cl[i])< dist){
-					dist = fabs(pPolar2->m_Cl[i]);
-					pt = i;
-				}
-			}
-			if(Cl<pPolar2->m_Cl[pt]){
-				for (i=pt; i>0; i--){
-					if(Cl<= pPolar2->m_Cl[i] && Cl > pPolar2->m_Cl[i-1]){
-						//interpolate
-						if(fabs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001){//do not divide by zero
-							Var2 = (*pX)[i];
-							break;
-						}
-						else{
-							double u = (Cl - pPolar2->m_Cl[i-1])
-									 /(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]);
-							Var2 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
-							break;
-						}
-					}
-				}
-			}
-			else {
-				for (i=pt; i<size-1; i++){
-					if(pPolar2->m_Cl[i] <=Cl && Cl < pPolar2->m_Cl[i+1]){
-						//interpolate
-						if(fabs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001){//do not divide by zero
-							Var2 = (*pX)[i];
-							break;
-						}
-						else{
-							double u = (Cl - pPolar2->m_Cl[i])
-									 /(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]);
-							Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-							break;
-						}
-					}
-				}
-			}
-		} 
-
-		// then interpolate Variable
-
-		double v =   (Re - pPolar1->m_Reynolds) 
-				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
-		double Var = Var1 + v * (Var2-Var1);
-		return Var;
-	} 
-		
-//	AfxMessageBox("Error interpolating", MB_OK);
-//	bOutRe = true;
-//	bError = true;
-//	return 0.000;// we missed something somewhere...
-}
-
-
-double CMainFrame::GetCm0(CFoil *pFoil0, CFoil *pFoil1,
-					  double Re, double Tau, bool &bOutRe, bool &bError)
-{
-	//Find 0-lift angle for local foil
-	double Alpha;
-	double Cm0, Cm1;
-	double Cl0 = 1.0;
-	double Cl1;
-	bOutRe = false;
-	bError = false;
-	bool IsOutRe;
-	bool IsError;
-	
-	bOutRe = false;
-	for (int i=-10; i<10; i++){
-		Alpha = (double)i;
-		Cl1 = GetCl(pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
-		if(Cl1>0.0) {
-			if(IsOutRe) bOutRe = true;
-			if(IsError) bError = true;
-			break;
-		}
-		Cl0 = Cl1;
-	}
-	if(Cl0>0.0) {
-		return 0.0;
-	}
-	Cm0 = GetCm(pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	Cm1 = GetCm(pFoil0, pFoil1, Re, Alpha,     Tau, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	double Res = Cm0 + (Cm1-Cm0)*(0.0-Cl0)/(Cl1-Cl0);
-
-	return Res;
-}
-
- 
-
-double CMainFrame::GetCm(CFoil *pFoil0, CFoil *pFoil1,
-					 double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
-{
-	double Cm0, Cm1;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil0) 
-		Cm0 = 0.0;
-	else 
-		Cm0 = GetPlrPoint(pFoil0, Re, Alpha, 4, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if(!pFoil1) 
-		Cm1 = 0.0;
-	else 
-		Cm1 = GetPlrPoint(pFoil1, Re, Alpha, 4, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-	return ((1-Tau) * Cm0 + Tau * Cm1);
-}
 
 
 
@@ -6267,6 +5682,7 @@ bool CMainFrame::LoadProject(CString PathName)
 
 	if(ReadProject(m_FileName))
 	{
+		dlg.CloseWindow();
 		SetSaveState(true);
 		if( m_oaWing.GetSize() || m_oaPlane.GetSize() || m_oaBody.GetSize()){
 			if(m_iApp==0)
@@ -6389,7 +5805,8 @@ void CMainFrame::SetRecentFileMenu()
 		pMenu->RemoveMenu(IDM_RECENTFILE7, MF_BYCOMMAND);
 		pMenu->RemoveMenu(IDM_RECENTFILE8, MF_BYCOMMAND);
 
-		if(m_RecentFile[7].GetLength()) {
+		if(m_RecentFile[7].GetLength()) 
+		{
 			strong = m_RecentFile[7];
 			ShortenFileName(strong);
 			pMenu->InsertMenu(10,MF_BYPOSITION,IDM_RECENTFILE8,"8 "+strong);
@@ -6436,7 +5853,7 @@ void CMainFrame::SetRecentFileMenu()
 void CMainFrame::ShortenFileName(CString &PathName)
 {
 	CString strong, strange;
-	if(PathName.GetLength()>40){
+	if(PathName.GetLength()>60){
 		int pos = PathName.ReverseFind(92);
 		if (pos>0) {
 			strong = char(92)+PathName.Right(PathName.GetLength()-pos-1);

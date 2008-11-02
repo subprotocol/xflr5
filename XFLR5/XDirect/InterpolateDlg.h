@@ -26,6 +26,7 @@
 #include "../misc/FloatEdit.h"
 #include "Foil.h"
 #include "XFoil.h"
+#include "afxwin.h"
 /////////////////////////////////////////////////////////////////////////////
 // CInterpolateDlg dialog
 
@@ -37,7 +38,6 @@ class CInterpolateDlg : public CDialog
 // Construction
 public:
 	CInterpolateDlg(CWnd* pParent = NULL);   // standard constructor
-	CString m_FoilName;
 
 // Dialog Data
 	//{{AFX_DATA(CInterpolateDlg)
@@ -47,10 +47,10 @@ public:
 	CStatic	m_ctrlThickness1;
 	CStatic	m_ctrlCamber2;
 	CStatic	m_ctrlCamber1;
-	CEdit	m_ctrlFoilName;
 	CStatic	m_ctrlThickness0;
 	CStatic	m_ctrlCamber0;
 	CFloatEdit	m_ctrlFrac;
+	CEdit m_ctrlNewFoilName;
 	CComboBox	m_ctrlFoil2;
 	CComboBox	m_ctrlFoil1;
 	CSliderCtrl	m_ctrlMixt;
@@ -75,6 +75,7 @@ private:
 
 	CWnd* m_pChildView;
 	double m_Frac;
+	CString m_NewFoilName;
 
 protected:
 
@@ -90,4 +91,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	CFoil* GetFoil(CString strong);
+public:
 };

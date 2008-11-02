@@ -69,6 +69,7 @@ public:
 	CStatic	m_ctrlSpeedUnit;
 	CStatic	m_ctrlWeightUnit;
 	CFloatEdit	m_ctrlAlpha;
+	CFloatEdit	m_ctrlBeta;
 	CFloatEdit	m_ctrlWeight;
 	CButton m_ctrlGroundEffect;
 	CFloatEdit m_ctrlHeight;
@@ -124,6 +125,7 @@ private:
 	bool m_bGround;
 
 	double m_QInf, m_Weight, m_Alpha, m_XCmRef;
+	double m_Beta;
 	double m_Density, m_Viscosity;
 	double m_WingLoad;
 	double m_Height;
@@ -146,6 +148,7 @@ private:
 	afx_msg void OnKillFocusHeight();
 	afx_msg void OnKillFocusWeight();
 	afx_msg void OnKillFocusAlpha();
+	afx_msg void OnKillFocusBeta();
 	afx_msg void OnKillFocusDensity();
 	afx_msg void OnKillFocusViscosity();
 	afx_msg void OnUnit();

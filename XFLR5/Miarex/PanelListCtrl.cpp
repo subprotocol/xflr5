@@ -177,9 +177,12 @@ CEdit* CPanelListCtrl::EditSubLabel( int nItem, int nCol )
 
 	dwStyle |= WS_BORDER|WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL;
 
-	if(nCol!=7 && nCol !=9) {
-		if(nItem<GetItemCount()-1 || (nItem==GetItemCount()-1 && nCol!=4)) {
+	if(nCol!=7 && nCol !=9)
+	{
+		if(nItem<GetItemCount()-1 || (nItem==GetItemCount()-1 && nCol!=4))
+		{
 			CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
+			if(nCol>0 && nCol<4) pEdit->m_iPrecision = 3;
 			pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
 			pEdit->m_ParentList = 0;
 			pEdit->m_nColumns = m_nColumns;
@@ -190,8 +193,10 @@ CEdit* CPanelListCtrl::EditSubLabel( int nItem, int nCol )
 			return pEdit;
 		}
 	}
-	else if(nCol==7 || nCol==9){
-		if(nItem<GetItemCount()-1) {
+	else if(nCol==7 || nCol==9)
+	{
+		if(nItem<GetItemCount()-1)
+		{
 			CInPlaceNumEdit *pEdit = new CInPlaceNumEdit(this, nItem, nCol, GetItemText(nItem, nCol));
 			pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
 			pEdit->m_nColumns = m_nColumns;

@@ -51,8 +51,8 @@ public:
 	double Getv(double u, CVector r, bool bRight);
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 
-	void ComputeAero(double *Cp, double &Lift, double &XCP, double &YCP,
-		             double &GCm, double &GRm, double &GYm, double Alpha, double XCmRef, bool bTilted);
+	void ComputeAero(double *Cp, double &XCP, double &YCP,
+		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
 	void ComputeCenterLine();
 	void Duplicate(CBody *pBody);
 	void Export(int nx, int nh);

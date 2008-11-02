@@ -402,7 +402,10 @@ void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
 }
 
 
-
+bool CPanel::IsInPanel(CVector & Pt)
+{
+	return false;
+}
 
 
 

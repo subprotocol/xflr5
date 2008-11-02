@@ -48,8 +48,9 @@ public:
 	void SetOpPointSequence();
 
 	bool m_bSequence;
-	double m_AlphaDisp;
+//	double m_AlphaDisp;
 	double m_Alpha, m_AlphaMax, m_DeltaAlpha;
+	double m_Cl, m_ClMax, m_DeltaCl;
 	double m_Re, m_ReMax, m_DeltaRe;
 	int m_IterLim;
 

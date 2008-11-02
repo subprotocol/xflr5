@@ -77,7 +77,6 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 	m_DeltaAlpha = 0.0;
 
 	m_OpAlpha  = 0.0;//calculation on a tilted geometry
-//	*m_pCoreSize   = 0.0;
 
 	m_XCP = 0.0;
 	m_YCP = 0.0;
@@ -115,8 +114,8 @@ CVLMDlg::CVLMDlg(CWnd* pParent /*=NULL*/)
 
 	memset(m_Cp,0,sizeof(m_Cp));
 	memset(m_VLMQInf,0,sizeof(m_VLMQInf));
-	memset(m_sinRHS, 0, sizeof(m_sinRHS));
-	memset(m_cosRHS, 0, sizeof(m_cosRHS));
+	memset(m_zRHS, 0, sizeof(m_zRHS));
+	memset(m_xRHS, 0, sizeof(m_xRHS));
 }
 
 
@@ -144,6 +143,7 @@ BOOL CVLMDlg::OnInitDialog()
 	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
@@ -153,7 +153,7 @@ BOOL CVLMDlg::OnInitDialog()
 
 	BOOL bOpen = m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	if(bOpen) m_bXFile = true;
-	else m_bXFile = false;
+	else      m_bXFile = false;
 
 	m_bPointOut = false;
 	m_bCancel   = false;
@@ -163,7 +163,7 @@ BOOL CVLMDlg::OnInitDialog()
 
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
 	{
-		//back-up the current geometry if the analysis is to be performed on the tilted geometry
+		//back-up the current geometry
 		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
 		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
 	}
@@ -172,7 +172,15 @@ BOOL CVLMDlg::OnInitDialog()
 	SetFileHeader();
 
 	str = "";
+
 	m_bVLMSymetric = m_pWing->m_bSymetric;
+
+	if(abs(m_pWPolar->m_Beta)>0.001) 
+	{
+		str += "     Sideslip is asymmetric\r\n";
+		m_bVLMSymetric = false;
+	}
+
 	if(!m_pWing->m_bSymetric) str += "     Main wing is asymmetric\r\n";
 
 	if(m_pWing2)
@@ -213,7 +221,6 @@ BOOL CVLMDlg::OnInitDialog()
 
 	if(m_pWPolar->m_AnalysisType==2)
 	{
-		//no way it could be anything else
 		m_pVLMThread = new CVLMThread();
 		m_pVLMThread->m_pParent      = this;
 		m_pVLMThread->m_bAutoDelete  = false;
@@ -415,7 +422,8 @@ bool CVLMDlg::Gauss(double *A, int n, double *B, int m)
 
 void CVLMDlg::OnCancel() 
 {
-	if(!m_pVLMThread) {
+	if(!m_pVLMThread)
+	{
 		EndSequence();
 		CDialog::OnCancel();
 		return;
@@ -429,7 +437,7 @@ void CVLMDlg::OnCancel()
 
 void CVLMDlg::EndSequence()
 {
-	if(m_pWPolar && m_pWPolar->m_bTiltedGeom)
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
 	{
 		//restore initial gemoetry
 		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
@@ -445,8 +453,10 @@ void CVLMDlg::EndSequence()
 	pMiarex->m_bVLMFinished = true;
 	m_bXFile = false;
 	m_XFile.Close();
-	if(m_bWarning && pMiarex->m_bLogFile && !m_bCancel){
-		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL)){
+	if(m_bWarning && pMiarex->m_bLogFile && !m_bCancel)
+	{
+		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL))
+		{
 			CFile lf;
 			CString str;
 			CString strAppDirectory;
@@ -474,37 +484,23 @@ void CVLMDlg::EndSequence()
 
 bool CVLMDlg::VLMCreateRHS(double V0)
 {
-	int p, m, Size;
-	double aoa, cosaoa, sinaoa;
+	int m, Size;
 
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
 
 	//______________________________________________________________________________________
 	// Create RHS
-	if(m_pWPolar->m_Type!=4)
+	//solve twice for sine and cos components
+	
+	for (m=0; m<Size; m++)
 	{
-		//solve twice for sine and cos components
-		
-		for (m=0; m<Size; m++)
-		{
-			m_cosRHS[m] = - m_ppPanel[m]->Normal.x;
-			m_sinRHS[m] = - m_ppPanel[m]->Normal.z;
-		}
-	}
-	else 
-	{
-		//type 4... solve only once with unit speed
-		aoa    = V0*pi/180.0;
-		cosaoa = cos(aoa);
-		sinaoa = sin(aoa);
-		for (p=0;p<Size; p++)
-		{
-			m_RHS[p] = -cosaoa*m_ppPanel[p]->Normal.x  - sinaoa*m_ppPanel[p]->Normal.z;
-		}
+		m_xRHS[m] = - m_ppPanel[m]->Normal.x;
+		m_yRHS[m] = - m_ppPanel[m]->Normal.y;
+		m_zRHS[m] = - m_ppPanel[m]->Normal.z;
 	}
 
-//double row[VLMMATSIZE]; memcpy(row, m_cosRHS, Size*sizeof(double));
+//double row[VLMMATSIZE]; memcpy(row, m_xRHS, Size*sizeof(double));
 	return true;
 }
 
@@ -554,23 +550,18 @@ bool CVLMDlg::VLMSolveDouble()
 	CString strong, strange;
 
 	int Size;
-	double row[VLMMATSIZE];
-
-	CVector N, Force, WindNormal;
-	CVector VInf(1.0,0.0,0.0);
 	
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
 
-	memset(row,   0, sizeof(row));
 
 	//______________________________________________________________________________________
 	// Solve the system for unit vortex circulation
 
 	AddString("      Solving the linear system...\r\n");
 
-	memcpy(m_RHS,      m_cosRHS, Size * sizeof(double));
-	memcpy(m_RHS+Size, m_sinRHS, Size * sizeof(double));
+	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
+	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
 
 	if(!Gauss(m_aij,Size, m_RHS, 2))
 	{
@@ -580,12 +571,11 @@ bool CVLMDlg::VLMSolveDouble()
 	}
 	else m_bConverged = true;
 
-	memcpy(m_cosRHS, m_RHS,      Size * sizeof(double));
-	memcpy(m_sinRHS, m_RHS+Size, Size * sizeof(double));
+	memcpy(m_xRHS, m_RHS,      Size * sizeof(double));
+	memcpy(m_zRHS, m_RHS+Size, Size * sizeof(double));
 
 	return true;
 }
-
 
 
 
@@ -607,26 +597,38 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	int p, q, pp, Size;
 	int n, o, o1, nel, m;
 
-
 	double Lift, alpha, cosa, sina;
-	double row[VLMMATSIZE];memset(row,   0, sizeof(row));
+	double row[VLMMATSIZE];memset(row, 0, sizeof(row));
 
 	CVector N, Force, WindNormal;
-	CVector VInf(1.0,0.0,0.0);
+	CVector VInf;
 	
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
 	//reconstruct all results from cosine and sine unit vectors
 
 	m=0;
-	for (q=0; q<nval;q++)
+	if(m_pWPolar->m_Type !=4)
 	{
-		alpha = V0 + q * VDelta;
-		cosa = cos(alpha*pi/180.0);
-		sina = sin(alpha*pi/180.0);
+		for (q=0; q<nval;q++)
+		{
+			alpha = V0 + q * VDelta;
+			cosa = cos(alpha*pi/180.0);
+			sina = sin(alpha*pi/180.0);
+			for(p=0; p<Size; p++)
+			{
+				m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
+				m++;
+			}
+		}
+	}
+	else
+	{
+		cosa = cos(m_Alpha*pi/180.0);
+		sina = sin(m_Alpha*pi/180.0);
 		for(p=0; p<Size; p++)
 		{
-			m_RHS[m] = cosa * m_cosRHS[p] + sina * m_sinRHS[p];
+			m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
 			m++;
 		}
 	}
@@ -645,8 +647,8 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		for (q=0; q<nval;q++)
 		{
 			alpha = V0+q*VDelta;
-			WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
-
+			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
+			VInf.Set(cos(alpha*pi/180.0),  0.0, sin(alpha*pi/180.0));
 			memcpy(row, m_RHS+q*Size, sizeof(row));
 			Lift = 0.0;
 			p=0;
@@ -702,6 +704,7 @@ bool CVLMDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		//type 2; find the speeds which will create a lift equal to the weight
 		AddString("      Calculating speeds to balance the weight\r\n\r\n");
 
+		VInf.Set(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
 		WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
 
 		memcpy(row, m_RHS, sizeof(row));
@@ -803,19 +806,19 @@ double CVLMDlg::VLMComputeCm(double alpha, bool bTrace)
 	for(p=0; p<Size; p++)
 	{
 		PanelLeverArm.Set(m_ppPanel[p]->VortexPos.x - m_pWPolar->m_XCmRef, m_ppPanel[p]->VortexPos.y, m_ppPanel[p]->VortexPos.z);
-		Force = V * m_ppPanel[p]->Vortex * (m_cosRHS[p]*cosa + m_sinRHS[p]*sina);         //Newtons/rho
+		Force = V * m_ppPanel[p]->Vortex * (m_xRHS[p]*cosa + m_zRHS[p]*sina);         //Newtons/rho
 		
 		if(!m_pWPolar->m_bVLM1 && !m_ppPanel[p]->m_bIsLeading)
 		{
 			pUpwards = m_ppPanel[p]->m_iPU;
-			Force  -= V  * m_ppPanel[p]->Vortex * (m_cosRHS[pUpwards]*cosa + m_sinRHS[pUpwards]*sina);       //Newtons/rho
+			Force  -= V  * m_ppPanel[p]->Vortex * (m_xRHS[pUpwards]*cosa + m_zRHS[pUpwards]*sina);       //Newtons/rho
 		}
 
 		Force*=m_pWPolar->m_Density;
 
 		Cm += -PanelLeverArm.x * Force.z + PanelLeverArm.z*Force.x; //N.m/rho;
 	}
-//TRACE("%10.4e    %10.4e    %10.4e\n", Cm_Wing, Cm_Stab, Cm_Fin);
+
 	return Cm;
 }
 
@@ -829,8 +832,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
 	double WingLift, WingIDrag, Alpha;
+	double cosa, sina, beta;
 	CString str, strong;
+	CVector Force, WindNormal, WindDirection, WindSide;
 
+	beta = 0.0;
 	m_pWing->m_bTrace   = false;
 	m_pWing->m_bVLM1    = m_pWPolar->m_bVLM1;
 	m_pWing->m_bTrace   = true;
@@ -850,21 +856,32 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		m_pStab->m_bVLM1    = m_pWPolar->m_bVLM1;
 		m_pStab->m_bTrace   = true;
 	}
+
 	if(m_pFin)
 	{
 		m_pFin->m_bTrace   = false;
 		m_pFin->m_bVLM1    = m_pWPolar->m_bVLM1;
 		m_pFin->m_bTrace   = true;
 	}
+
 	for(q=0; q<nrhs; q++)
 	{
 		if(m_bCancel) break;
+
+		Force.Set(0.0, 0.0, 0.0);
+
 		m_pWing->m_bWingOut = false;
 		if(m_pWing2)	m_pWing2->m_bWingOut = false;
-		if(m_pStab)		m_pStab->m_bWingOut = false;
-		if(m_pFin)		m_pFin->m_bWingOut  = false;
+		if(m_pStab)		m_pStab->m_bWingOut  = false;
+		if(m_pFin)		m_pFin->m_bWingOut   = false;
 
-		if(m_pWPolar->m_bTiltedGeom)	Alpha = m_OpAlpha;
+		if(m_pWPolar->m_bTiltedGeom)
+		{
+			Alpha = m_OpAlpha;
+			//   Define wind axis
+			WindNormal.Set(0, 0.0, 1.0);
+			WindDirection.Set(1.0, 0.0, 0.0);
+		}
 		else
 		{
 			if(m_pWPolar->m_Type!=4)
@@ -876,7 +893,14 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				Alpha = m_pWPolar->m_ASpec;
 			}
 			m_OpAlpha = Alpha;
+			//   Define wind axis
+			cosa = cos(Alpha*pi/180.0);
+			sina = sin(Alpha*pi/180.0);
+			WindNormal.Set(-sina, 0.0, cosa);
+			WindDirection.Set(cosa, 0.0, sina);
 		}
+
+		WindSide = WindNormal * WindDirection;
 
 		m_QInf = m_VLMQInf[q];
 		qdyn = 0.5 * m_pWPolar->m_Density * m_QInf * m_QInf;
@@ -896,7 +920,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				AddString(str);
 			}
 
-			VLMSetAi(m_Gamma+q*m_MatSize);
+//			VLMSetAi(m_Gamma+q*m_MatSize);
 
 			AddString("        Calculating aerodynamic coefficients...\r\n");
 			m_bPointOut          = false;
@@ -916,7 +940,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GYm = m_VYm = m_IYm = 0.0;
 
 			AddString("         Calculating wing...\r\n");
-			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Lift, IDrag, m_pWPolar->m_bTiltedGeom);
+			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp, 
 						VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 
@@ -935,12 +959,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pWing2->m_QInf      = m_QInf;
 				m_pWing2->m_Viscosity = m_pWPolar->m_Viscosity;
 				m_pWing2->m_Density   = m_pWPolar->m_Density;
-				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
 				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
 										m_Cp+m_pWing->m_MatSize,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
 										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-				Lift  += WingLift;
 				IDrag += WingIDrag;
 
 				m_pWing2->VLMSetBending();
@@ -960,12 +983,11 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->m_Viscosity = m_pWPolar->m_Viscosity;
 				m_pStab->m_Density   = m_pWPolar->m_Density;
 
-				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
 				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
 										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-				Lift  += WingLift;
 				IDrag += WingIDrag;
 
 				m_pStab->VLMSetBending();
@@ -985,29 +1007,32 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->m_Viscosity  = m_pWPolar->m_Viscosity;
 				m_pFin->m_Density    = m_pWPolar->m_Density;
 				
-				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, pos, WingLift, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
 				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
 										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
-				Lift  += WingLift;
 				IDrag += WingIDrag;
 
 				m_pFin->VLMSetBending();
 			}
 
-			m_CL          =  2.0*Lift /m_QInf/m_QInf/m_pWing->m_Area;
+//			m_CL          =  2.0*Lift /m_QInf/m_QInf/m_pWing->m_Area;
+			m_CL          =  2.0*Force.dot(WindNormal)    /m_QInf/m_QInf/m_pWing->m_Area;
+			m_CX          =  2.0*Force.dot(WindDirection) /m_QInf/m_QInf/m_pWing->m_Area;
+			m_CY          =  2.0*Force.dot(WindSide)      /m_QInf/m_QInf/m_pWing->m_Area;
+
 			m_InducedDrag =  1.0*IDrag/m_QInf/m_QInf/m_pWing->m_Area;
 			m_ViscousDrag =  1.0*VDrag              /m_pWing->m_Area;
 
-			m_XCP         = XCP/Lift/m_pWPolar->m_Density;
-			m_YCP         = YCP/Lift/m_pWPolar->m_Density;
+			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
+			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 
-			m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
-			m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
-			m_GYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+			m_GCm *=  1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
+			m_GRm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+			m_GYm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 
 			m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
 			m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
@@ -1391,6 +1416,7 @@ void CVLMDlg::VLMSetDownwash(double *Gamma)
 				VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 				m_pWing->m_Vd[m] += V * Gamma[pp];
 			}
+			m_pWing->m_Ai[m] = atan2(m_pWing->m_Vd[m].z, m_QInf) * 180.0/pi;
 			m++;
 		}
 	}
@@ -1409,6 +1435,7 @@ void CVLMDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pWing2->m_Vd[m] += V * Gamma[pp];
 				}
+				m_pWing2->m_Ai[m] = atan2(m_pWing2->m_Vd[m].z, m_QInf) * 180.0/pi;
 				m++;
 			}
 		}
@@ -1427,6 +1454,7 @@ void CVLMDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pStab->m_Vd[m] += V * Gamma[pp];
 				}
+				m_pStab->m_Ai[m] = atan2(m_pStab->m_Vd[m].z, m_QInf) * 180.0/pi;
 				m++;
 			}
 		}
@@ -1445,6 +1473,7 @@ void CVLMDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pFin->m_Vd[m] += V * Gamma[pp];
 				}
+				m_pFin->m_Ai[m] = atan2(m_pFin->m_Vd[m].z, m_QInf) * 180.0/pi;
 				m++;
 			}
 		}
@@ -1488,8 +1517,7 @@ void CVLMDlg::VLMSetAi(double *Gamma)
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				Vt += V * Gamma[pp];
 			}
-//			m_Ai[m] = atan2(Vt.dot(K), m_QInf) * 180.0/pi;
-			Ai[m] = atan2(Vt.z, m_QInf) * 180.0/pi;
+			Ai[m] = atan2(Vt.z, m_QInf) * 180.0/pi; // TODO : factor 2 in excess when calculating in the Trefftz plane
 			m++;
 		}
 	}
@@ -1857,88 +1885,61 @@ void CVLMDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, 
 	}
 }
 
-
-
-void CVLMDlg::VLMCmn(CVector A, CVector B, CVector C, CVector &V, bool bAll)
-{
-	// CLASSIC VLM FORMULATION
-	// Calculates the influence at point C of the vortex positioned at segment AB 
-	//
-	//    A___________B                |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    \/         \/
-	//
-	// V is the resulting speed
-	//
-
-	V.Set(0.0,0.0,0.0);
-
-	if(bAll)
-	{
-		r0 = B - A;
-		r1 = C - A;
-		r2 = C - B;
-
-		Psi = r1 * r2;
-		ftmp = Psi.VAbs();
-
-		t = r1 * r0;
-
-		if(t.VAbs()/r0.VAbs() > *m_pCoreSize){
-			Psi = Psi/ftmp/ftmp;
-			Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-			V = Psi * Omega/4.0/pi;
-		}
-	}
-
-	// We create Far points to align the trailing vortices with the reference axis
-	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
-	// If this approximation is not valid, then the geometry should be tilted in the polar definition
-
-	// calculate left contribution
-	Far.x = m_pWing->m_Span * 100.0;
-	Far.y = A.y;
-	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*pi/180.0);
-
-	r0 = A - Far;
-	r1 = C - A;
-	r2 = C - Far;
-	Psi = r1 * r2;
-	ftmp = Psi.VAbs();
-
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize){
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
-	}
-
-	// calculate right vortex contribution
-	Far.x = m_pWing->m_Span * 100.0;
-	Far.y = B.y;
-	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*pi/180.0);
-
-	r0 = Far - B;
-	r1 = C - Far;
-	r2 = C - B;
-	Psi = r1 * r2;
-	ftmp = Psi.VAbs();
-
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize){
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
-	}
-}
-
-
 */
 
+void CVLMDlg::Plot()
+{
+	CStdioFile XFile;
+	CFileException fe;
+
+	int i;
+	double h;
+	int N=100; //number of points
+
+	CString FileName;
+	FileName = "c:/Users/My_User/Desktop/Test.txt";
+
+	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+
+	if (bOpen)
+	{
+		CString strOut;
+		CPanel Panel;
+
+		m_pNode[2*VLMMATSIZE-10].Set( 1.0,  1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 9].Set( -1.0,  1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 8].Set( -1.0, -1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 7].Set(  1.0, -1.0, 0.0);
+
+		Panel.SetFrame(m_pNode[2*VLMMATSIZE-10], m_pNode[2*VLMMATSIZE-9], m_pNode[2*VLMMATSIZE-8], m_pNode[2*VLMMATSIZE-7]);
+		Panel.m_iLA = 2*VLMMATSIZE-10;
+		Panel.m_iTA = 2*VLMMATSIZE- 9;
+		Panel.m_iTB = 2*VLMMATSIZE- 8;
+		Panel.m_iLB = 2*VLMMATSIZE- 7;
+		Panel.m_iPos = 1;
+		Panel.m_bIsLeading     = false;
+		Panel.m_bIsTrailing    = false;
+		Panel.m_bIsWakePanel   = false;
+		Panel.m_bIsInSymPlane  = false;
+		
+		h = 0.1; //mm, increment
+
+		CVector Ref, Point, Inc, V;
+		Ref.Set(0.7, 0.0, 0.0);
+		Inc.Set(0.0, 0.0, h);
+		Point = Ref - Inc * (double)N/2.0;
+		for (i=0; i<=N; i++)
+		{
+			//VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
+			VLMQmn(m_pNode[2*VLMMATSIZE- 9], m_pNode[2*VLMMATSIZE-10], m_pNode[2*VLMMATSIZE-8], m_pNode[2*VLMMATSIZE-7], Point, V);
+			strOut.Format("%12.7f       %12.7f       %12.7f       %12.7f\n", Point.z, V.x, V.y, V.z);
+			XFile.WriteString(strOut);
+			Point += Inc;
+		}
+
+		XFile.Close();
+	}
+}
 
 
 void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
@@ -1964,6 +1965,8 @@ void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CV
 	// Vectorial operations are written explicitly to save computing times (4x more efficient)
 	//
 
+	int i;
+
 	V.x = 0.0;
 	V.y = 0.0;
 	V.z = 0.0;
@@ -1984,7 +1987,7 @@ void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CV
 	R[4].y = LB.y;	
 	R[4].z = LB.z;	
 	
-	for (int i=0; i<4; i++)
+	for (i=0; i<4; i++)
 	{
 		r0.x = R[i+1].x - R[i].x;
 		r0.y = R[i+1].y - R[i].y;
@@ -2025,44 +2028,43 @@ void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CV
 }
 
 
-
 void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool bAll)
 {
-	// CLASSIC VLM FORMULATION
-	// Calculates the influence at point C of the vortex positioned at segment AB 
+	// CLASSIC VLM FORMULATION/
 	//
-	//    A___________B                |
+	//    LA__________LB               |
 	//    |           |                |
 	//    |           |                | freestream speed
 	//    |           |                |
 	//    |           |                \/
 	//    |           |
-	//    \/         \/
+	//    \/          \/
+	//
+	// Note : the geometry has been rotated by sideslip, hence, there is no need to align the trailing vortices with sideslip
 	//
 	// V is the resulting speed at point C
 	//
 	// Vectorial operations are written inline to save computing times
 	// -->longer code, but 4x more efficient....
 
-	V.x = 0.0;
-	V.y = 0.0;
-	V.z = 0.0;
+	if(!m_pWing) return;
 
-	r0.x = B.x - A.x;
-	r0.y = B.y - A.y;
-	r0.z = B.z - A.z;
-
-	//First calculate finite vortex contribution
-	r1.x = C.x - A.x;
-	r1.y = C.y - A.y;
-	r1.z = C.z - A.z;
-
-	r2.x = C.x - B.x;
-	r2.y = C.y - B.y;
-	r2.z = C.z - B.z;
+	V.Set(0.0,0.0,0.0);
 
 	if(bAll)
-	{		
+	{
+		r0.x = B.x - A.x;
+		r0.y = B.y - A.y;
+		r0.z = B.z - A.z;
+
+		r1.x = C.x - A.x;
+		r1.y = C.y - A.y;
+		r1.z = C.z - A.z;
+
+		r2.x = C.x - B.x;
+		r2.y = C.y - B.y;
+		r2.z = C.z - B.z;
+
 		Psi.x = r1.y*r2.z - r1.z*r2.y;
 		Psi.y =-r1.x*r2.z + r1.z*r2.x;
 		Psi.z = r1.x*r2.y - r1.y*r2.x;
@@ -2088,26 +2090,79 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 			V.z = Psi.z * Omega/4.0/pi;
 		}
 	}
+
+	// We create Far points to align the trailing vortices with the reference axis
+	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
+	// If this approximation is not valid, then the geometry should be tilted in the polar definition
+
+	// calculate left contribution
+	Far.x = A.x + m_pWing->m_Span * 10000.0;
+	Far.y = A.y;
+	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*pi/180.0);
+
+	r0.x = A.x - Far.x;
+	r0.y = A.y - Far.y;
+	r0.z = A.z - Far.z;
+
+	r1.x = C.x - A.x;
+	r1.y = C.y - A.y;
+	r1.z = C.z - A.z;
+
+	r2.x = C.x - Far.x;
+	r2.y = C.y - Far.y;
+	r2.z = C.z - Far.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
 	t.x=1.0; t.y=0.0; t.z=0.0;
 
 	h.x =  r1.y*t.z - r1.z*t.y;
 	h.y = -r1.x*t.z + r1.z*t.x;
 	h.z =  r1.x*t.y - r1.y*t.x;
 
-	//Next add 'left'  semi-infinite contribution
+	//Next add 'left' semi-infinite contribution
 	//eq.6-56
 
 	if ((h.x*h.x+h.y*h.y+h.z*h.z) > *m_pCoreSize * *m_pCoreSize)
 	{
-		ftmp = r1.z*r1.z + r1.y*r1.y;
-		Psi.y =  r1.z/ftmp;
-		Psi.z = -r1.y/ftmp;
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
 
-		ftmp = sqrt(r1.x*r1.x + r1.y*r1.y + r1.z*r1.z);
-		Omega = 1.0 + (C.x-A.x)/ftmp;
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z)) 
+			    -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		V.x += Psi.x * Omega/4.0/pi;
 		V.y += Psi.y * Omega/4.0/pi;
 		V.z += Psi.z * Omega/4.0/pi;
 	}
+
+	// calculate right vortex contribution
+	Far.x = B.x + m_pWing->m_Span * 10000.0;
+	Far.y = B.y ;
+	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*pi/180.0);
+
+	r0.x = Far.x - B.x;
+	r0.y = Far.y - B.y;
+	r0.z = Far.z - B.z;
+
+	r1.x = C.x - Far.x;
+	r1.y = C.y - Far.y;
+	r1.z = C.z - Far.z;
+
+	r2.x = C.x - B.x;
+	r2.y = C.y - B.y;
+	r2.z = C.z - B.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
 
 	//Last add 'right' semi-infinite contribution
 	//eq.6-57
@@ -2117,14 +2172,53 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 
 	if ((h.x*h.x+h.y*h.y+h.z*h.z) > *m_pCoreSize * *m_pCoreSize)
 	{
-		ftmp = r2.z*r2.z + r2.y*r2.y;
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
 
-		Psi.y =  r2.z/ftmp;
-		Psi.z = -r2.y/ftmp;
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z)) 
+			    -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
-		ftmp = sqrt(r2.x*r2.x + r2.y*r2.y + r2.z*r2.z);
-		Omega = 1.0 + (C.x-B.x)/ftmp;
-		V.y -= Psi.y * Omega/4.0/pi;
-		V.z -= Psi.z * Omega/4.0/pi;
+		V.x += Psi.x * Omega/4.0/pi;
+		V.y += Psi.y * Omega/4.0/pi;
+		V.z += Psi.z * Omega/4.0/pi;
 	}
+}
+
+
+
+void CVLMDlg::pgmat(double const &mach, double const &alfa, double const &beta, double pg[3][3])
+{
+//-------------------------------------------------------
+//     Calculates the Prandtl-Glauert transformation matrix.
+//      
+//      xi      [       ] x
+//              [       ]  
+//      eta  =  [   P   ] y
+//              [       ]
+//      zeta    [       ] z
+//
+//-------------------------------------------------------
+//
+	double binv, bi_m, sina, sinb, cosa, cosb;
+	binv = 1.0 / sqrt(1.0 - mach*mach);
+	bi_m = mach * binv*binv*binv;
+
+	sina = sin(alfa);
+	cosa = cos(alfa);
+
+	sinb = sin(beta);
+	cosb = cos(beta);
+
+	pg[1][1] =  cosa*cosb*binv;
+	pg[1][2] =      -sinb*binv;
+	pg[1][3] =  sina*cosb*binv;
+
+	pg[2][1] =  cosa*sinb;
+	pg[2][2] =       cosb;
+	pg[2][3] =  sina*sinb;
+
+	pg[3][1] = -sina;
+	pg[3][2] =   0.0;
+	pg[3][3] =  cosa;
 }

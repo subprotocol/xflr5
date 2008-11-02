@@ -20,8 +20,6 @@
 
 *****************************************************************************/
 
-#include "../X-FLR5.h"
-#include "Miarex.h"
 #include "stdafx.h"
 #include ".\arcball.h"
 #include <GL\glu.h>

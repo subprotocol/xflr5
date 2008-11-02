@@ -120,8 +120,12 @@ bool CFloatEdit::GetValue(double &f)
 void CFloatEdit::SetValue(double f)
 {
  	CString str, str1;
-	if ((f==0.0 || fabs(f)>pow(10.0, -m_iPrecision)) && f <1000.0){
-		switch (m_iPrecision){
+	int q, r, exp, i, pos, l;
+
+	if ((f==0.0 || abs(f)>pow(10.0, -m_iPrecision)) && f <1000.0)
+	{
+		switch (m_iPrecision)
+		{
 			//there probably is a more elegant way to do this,
 			case 0:
 				str.Format("%.0f", f);
@@ -157,8 +161,8 @@ void CFloatEdit::SetValue(double f)
 				str.Format("%.2f", f);
 		}
 	}
-	else if(f>=1000.0){
-		int q, r, exp;
+	else if(f>=1000.0)
+	{
 		exp = (int)log10(f);
 		r = exp%3;
 		q = (exp-r)/3;
@@ -166,7 +170,9 @@ void CFloatEdit::SetValue(double f)
 		CString strong;
 		strong.Format("%.0f", f);
 
-		switch (m_iPrecision){
+		switch (m_iPrecision)
+		{
+
 			//there probably is a more elegant way to do this,
 			case 0:
 				strong.Format("%.0f", f);
@@ -202,24 +208,27 @@ void CFloatEdit::SetValue(double f)
 				strong.Format("%.2f", f);
 		}
 
-		int l = strong.GetLength();
-		int pos = strong.Find(".");
+		l = strong.GetLength();
+		pos = strong.Find(".");
 		if(pos<0) pos = l;
 		pos = l-pos;
 
-		for (int i=0; i<q; i++){
+		for (i=0; i<q; i++)
+		{
 			strong.Insert(l-3*(i+1)-i-pos," ");
 			l++;
 		}
 
 		str = strong;
 	}
-	else {
-		int exp  = (int)log10(f)-1;
+	else 
+	{
+		exp  = (int)log10(f)-1;
 		str1.Format("e%d", exp);
 
-		float main = (float)(f/pow(10.0, exp)*1.000001);
-		switch (m_iPrecision){
+		double main = (float)(f/pow(10.0, exp)*1.000001);
+		switch (m_iPrecision)
+		{
 			case 0:
 				str.Format("%.0f", main);
 				break;

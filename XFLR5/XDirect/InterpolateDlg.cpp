@@ -50,7 +50,6 @@ void CInterpolateDlg::DoDataExchange(CDataExchange* pDX){
 	DDX_Control(pDX, IDC_THICKNESS1, m_ctrlThickness1);
 	DDX_Control(pDX, IDC_CAMBER2, m_ctrlCamber2);
 	DDX_Control(pDX, IDC_CAMBER1, m_ctrlCamber1);
-	DDX_Control(pDX, IDC_FOILNAME, m_ctrlFoilName);
 	DDX_Control(pDX, IDC_THICKNESS0, m_ctrlThickness0);
 	DDX_Control(pDX, IDC_CAMBER0, m_ctrlCamber0);
 	DDX_Control(pDX, IDC_FRAC, m_ctrlFrac);
@@ -58,6 +57,7 @@ void CInterpolateDlg::DoDataExchange(CDataExchange* pDX){
 	DDX_Control(pDX, IDC_FOIL1, m_ctrlFoil1);
 	DDX_Control(pDX, IDC_MIXT, m_ctrlMixt);
 	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_NEWFOILNAME, m_ctrlNewFoilName);
 }
 
 
@@ -77,16 +77,17 @@ BOOL CInterpolateDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	int i;
 	CFoil* pFoil;
-	for (int i=0; i<m_poaFoil->GetSize(); i++){
+	for (i=0; i<m_poaFoil->GetSize(); i++)
+	{
 		pFoil = (CFoil*)m_poaFoil->GetAt(i);
 		m_ctrlFoil1.AddString(pFoil->m_FoilName);
 		m_ctrlFoil2.AddString(pFoil->m_FoilName);
 	}
 	m_ctrlFoil1.SetCurSel(0);
 	m_ctrlFoil2.SetCurSel(1);
-	m_Frac = 0.f;
-
+	m_Frac = 0.0;
 
 	m_ctrlMixt.SetRange(0,100,false);
 	m_ctrlMixt.SetPos(0);
@@ -95,9 +96,10 @@ BOOL CInterpolateDlg::OnInitDialog()
 	OnSelChangeFoil1();
 	OnSelChangeFoil2();
 
-	m_ctrlFoilName.SetWindowText("New Foil Name");
-	m_ctrlFoilName.SetFocus();
-	m_ctrlFoilName.SetSel(0,-1);
+	m_ctrlNewFoilName.SetWindowText("New Foil Name");
+	m_ctrlNewFoilName.SetSel(0, -1);
+	m_ctrlNewFoilName.SetFocus();
+
 	return FALSE;
 }
 
@@ -243,7 +245,7 @@ BOOL CInterpolateDlg::PreTranslateMessage(MSG* pMsg)
 
 void CInterpolateDlg::OnOK() 
 {
-	m_ctrlFoilName.GetWindowText(m_FoilName);
+	m_ctrlNewFoilName.GetWindowText(m_NewFoilName);
 	CDialog::OnOK();
 }
 

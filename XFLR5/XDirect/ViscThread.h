@@ -39,7 +39,9 @@ protected:
 // Attributes
 public:
 	XFoil *m_pXFoil;
-	double m_fAlphaMin, m_fAlphaMax, m_fDAlpha;
+	double m_AlphaMin, m_AlphaMax, m_DeltaAlpha;
+	double m_ClMin, m_ClMax, m_DeltaCl;
+	double m_ReMin, m_ReMax, m_DeltaRe;
 	int m_Iterations, m_IterLim;
 
 	bool m_bFinished;
@@ -48,9 +50,9 @@ public:
 
 	CWnd* m_pParent;
 
-	void SetAlphaMin(double alpha);
-	void SetAlphaMax(double alpha);
-	void SetDAlpha(double alpha);
+	void SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha);
+	void SetCl(double ClMin, double ClMax, double DeltaCl);
+	void SetRe(double ReMin, double ReMax, double DeltaRe);
 
 // Operations
 public:

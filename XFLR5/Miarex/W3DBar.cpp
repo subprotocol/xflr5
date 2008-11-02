@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <math.h>
+//#include <math.h>
 #include "stdafx.h"
 
 #include "../X-FLR5.h"
@@ -159,7 +159,7 @@ void CW3DBar::On3DSurfaces()
 	
 	if(m_ctrlSurfaces.GetCheck()) {
 		pMiarex->m_bSurfaces   = true;
-		pMiarex->m_b3DVLMCl    = false;
+		pMiarex->m_b3DCp    = false;
 	}
 	else pMiarex->m_bSurfaces = false;
 	

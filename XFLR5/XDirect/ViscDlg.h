@@ -56,51 +56,44 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+	virtual BOOL OnInitDialog();
+	virtual void OnCancel();
+	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnSkip();	//}}AFX_VIRTUAL
 
 // Implementation
 
 private:
 
-	double m_fAlphaMin, m_fAlphaMax, m_fDAlpha;
-	CStdioFile m_XFile;
 	bool m_bAlpha;
 	bool m_bType4;
+	int m_Iterations, m_IterLim;
+	double m_AlphaMin, m_AlphaMax, m_DeltaAlpha;
+	double m_ClMin, m_ClMax, m_DeltaCl;
+	double m_ReMin, m_ReMax, m_DeltaRe;
 
+	CWnd * m_pXDirect;
+	CWnd *m_pFrame;
+	CStdioFile m_XFile;
 	CPoint m_LegendPlace;
 	CRect m_ViscRect;
 	CString m_FoilName;
-	CWnd * m_pXDirect;
-	CWnd *m_pFrame;
 	Graph m_RmsGraph;
 	CViscThread *m_pIterThread;
-	int m_Iterations, m_IterLim;
 
 	XFoil* m_pXFoil;
 	
 	void AddOpPoint();
-//	void EndSequence();
-	void SetAlphaMin(double alpha);
-	void SetAlphaMax(double alpha);
-	void SetDAlpha(double alpha);
+	void SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha);
+	void SetCl(double ClMin, double ClMax, double DeltaCl);
+	void SetRe(double ReMin, double ReMax, double DeltaRe);
 	void SetFileHeader();
 	void ResetCurves();
 	void UpdateView();
 
-protected:
 
-
-	// Generated message map functions
-	//{{AFX_MSG(CViscDlg)
-	virtual BOOL OnInitDialog();
-	virtual void OnCancel();
-//	afx_msg void OnDestroy();
-//	afx_msg void OnTimer();
-	afx_msg void OnSkip();
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
 
-	afx_msg void OnTimer(UINT nIDEvent);
 };
 

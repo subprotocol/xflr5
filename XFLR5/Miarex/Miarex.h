@@ -115,45 +115,45 @@ public:
 // Implementation
 protected:
 
-	afx_msg void OnReset3DView();
-	afx_msg void OnSingleGraph1();
-	afx_msg void OnSingleGraph2();
-	afx_msg void OnSingleGraph3();
-	afx_msg void OnSingleGraph4();
-	afx_msg void OnDefinePlane();
-	afx_msg void OnEditPlane();
-	afx_msg void OnSaveUFO();
-	afx_msg void OnShowWing2();
-	afx_msg void OnShowElevator();
-	afx_msg void OnShowFin();
-	afx_msg void OnAutoWingScales();
-	afx_msg void OnDeleteAll();
-	afx_msg void OnExportPanels();
-	afx_msg void OnWingGraph4();
-	afx_msg void OnWingGraph3();
-	afx_msg void OnWingGraph2();
-	afx_msg void OnWingGraph1();
-	afx_msg void OnStreamLines();
-	afx_msg void OnGLLight();
-	afx_msg void OnStreamOptions();
-	afx_msg void OnManageUFO();
-	afx_msg void OnCpView();
-	afx_msg void OnInsertBodyPoint();
-	afx_msg void OnDeleteBodyPoint();
-	afx_msg void OnNewBody();
-	afx_msg void OnRenameCurBody();
-	afx_msg void OnDeleteCurBody();
-	afx_msg void OnDuplicateCurBody();
-	afx_msg void OnScaleCurBody();
-	afx_msg void OnExportCurBody();
-	afx_msg void OnSaveCurBodyAsProject();
-	afx_msg void OnResetBodyScale();
-	afx_msg void OnBodyGrid();
-	afx_msg void OnCpLegend();
-	afx_msg void OnBodyResolution();
-	afx_msg void OnInterpolateBodyPoints();
-	afx_msg void OnScaleFrame();
-	afx_msg void OnShowOnlyActiveFrame();
+	void OnReset3DView();
+	void OnSingleGraph1();
+	void OnSingleGraph2();
+	void OnSingleGraph3();
+	void OnSingleGraph4();
+	void OnDefinePlane();
+	void OnEditPlane();
+	void OnSaveUFO();
+	void OnShowWing2();
+	void OnShowElevator();
+	void OnShowFin();
+	void OnAutoWingScales();
+	void OnDeleteAll();
+	void OnExportPanels();
+	void OnWingGraph4();
+	void OnWingGraph3();
+	void OnWingGraph2();
+	void OnWingGraph1();
+	void OnStreamLines();
+	void OnGLLight();
+	void OnStreamOptions();
+	void OnManageUFO();
+	void OnCpView();
+	void OnInsertBodyPoint();
+	void OnDeleteBodyPoint();
+	void OnNewBody();
+	void OnRenameCurBody();
+	void OnDeleteCurBody();
+	void OnDuplicateCurBody();
+	void OnScaleCurBody();
+	void OnExportCurBody();
+	void OnSaveCurBodyAsProject();
+	void OnResetBodyScale();
+	void OnBodyGrid();
+	void OnCpLegend();
+	void OnBodyResolution();
+	void OnInterpolateBodyPoints();
+	void OnScaleFrame();
+	void OnShowOnlyActiveFrame();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -163,7 +163,6 @@ private:
 	BOOL OnEraseBkgnd(CDC* pDC);
 	BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
-	void OnExit();
 	void OnControlAnalysis();
 	void OnDefineAnalysis();
 	void OnBodyDesign();
@@ -263,6 +262,7 @@ private:
 	void GLCallViewLists(); 
 	void GLRenderSphere(COLORREF cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLDraw3D(CDC *pDC);
+	void GLDestroyLists();
 	void GLSetupLight();
 	void GLCreateCtrlPts();
 	void GLCreateVortices();
@@ -287,7 +287,7 @@ private:
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 	bool UnlockCurBody();
 
-	int CreateElements(CSurface *pSurface, CPanel *pPanel);
+	int CreateElements(CSurface *pSurface);
 	int CreateBodyElements(CPanel *pPanel);
 	int IsNode(CVector &Pt);
 	int IsWakeNode(CVector &Pt);
@@ -332,6 +332,7 @@ private:
 	void PrintTwoWingGraph(CDC *pDC, CRect *pCltRect);
 	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
 	void RotateGeomY(double const &Angle, CVector const &P);
+	void RotateGeomZ(double const &Beta, CVector const &P);
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
@@ -354,13 +355,21 @@ private:
 	void UpdateUnits();
 	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 
-	void CMiarex::ClientToGL(CPoint const &point, CVector &real);
-	void CMiarex::GLToClient(CVector const &real, CPoint &point);
+	void ClientToGL(CPoint const &point, CVector &real);
+	void GLToClient(CVector const &real, CPoint &point);
 
+
+	double GetCl(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+	double GetCm(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+	double GetCm0(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
 	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
 	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
 	double GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
 	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
+	double GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
+	double GetPlrPointFromAlpha(CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
+	double GetPlrPointFromCl(   CFoil *pFoil, double Re, double Cl,    int PlrVar, bool &bOutRe, bool &bError);
+	void * GetPlrVariable(CPolar *pPolar, int iVar);
 
 	BOOL AVLReadSurface(CStdioFile *pXFile, int &Line, CWing *pWing, int &NSpan, int &NChord, double &Sspace);
 	BOOL AVLReadSection(CStdioFile *pXFile, int &Line, CWing *pWing, int PanelPos);
@@ -417,7 +426,7 @@ private:
 
 	CVLMDlg m_VLMDlg;			// the dialog class which manages the VLM calculations
 	C3DPanelDlg m_PanelDlg;			// the dialog class which manages the 3D panel calculations
-	CLLTDlg m_IDlg;			// the dialog class which manages the LLT calculations
+	CLLTDlg m_LLTDlg;			// the dialog class which manages the LLT calculations
 	CGLLight m_GLLightDlg;			// the dialog class for GL light options 
 	CFlowLinesDlg m_FlowLinesDlg;		// the dialog class for streamline options
 	CArcBall m_ArcBall;
@@ -471,7 +480,7 @@ private:
 	bool m_bWakePanels;
 	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
-	bool m_b3DVLMCl, m_b3DDownwash; 	// defines whether the corresponfing data should be displayed
+	bool m_b3DCp, m_b3DDownwash; 	// defines whether the corresponfing data should be displayed
 	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
 	bool m_bMoments;							// defines whether the corresponfing data should be displayed
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
@@ -500,6 +509,7 @@ private:
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 	int m_NCpCurves;			// Number of Cp curves stored for display
+	int m_InducedDragPoint;		// 0 if dwonwash is at panel's centroid, 1 if averaged over panel length //used in CWing::VLMTrefftz
 
 	int m_NHoopPoints;			//hoop resolution for NURBS bodies
 	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
@@ -537,9 +547,13 @@ private:
 	CVector m_UFOOffset;
 	CVector m_BodyOffset;
 	CVector m_FrameOffset;
-	double  m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 
-	double m_glScaled;//zoom factor for wing
+	CVector m_BodyScalingCenter, m_BodyScaledOffset;
+	CVector m_FrameScalingCenter, m_FrameScaledOffset;
+	
+	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
+
+	double m_glScaled;//zoom factor for UFO
 
 	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
 	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector

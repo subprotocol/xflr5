@@ -99,6 +99,7 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlXSel.AddString("Oswald");						//26
 		m_ctrlXSel.AddString("(XCp-Xcg)/MAC");				//27
 		m_ctrlXSel.AddString("Control Variable");			//28
+		m_ctrlXSel.AddString("Cy - Lateral force coef.");	//29	
 		
 		m_ctrlYSel.AddString("Alpha");						//0
 		m_ctrlYSel.AddString("Lift coef.");					//1
@@ -131,7 +132,7 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlYSel.AddString("Oswald");						//26
 		m_ctrlYSel.AddString("(XCp-Xcg)/MAC");				//27
 		m_ctrlYSel.AddString("Control Variable");			//28
-		
+		m_ctrlYSel.AddString("Cy - Lateral force coef.");	//29	
 	}
 	else 
 	{

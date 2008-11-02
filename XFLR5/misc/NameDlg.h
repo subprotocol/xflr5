@@ -39,6 +39,7 @@ class CNameDlg : public CDialog
 	friend class CAFoil;
 	friend class CXDirect;
 	friend class CMiarex;
+	friend class CXBody;
 	friend class CXInverse;
 	friend class CMainFrame;
 

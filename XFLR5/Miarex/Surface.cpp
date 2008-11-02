@@ -143,8 +143,49 @@ void CSurface::GetNormal(double yrel, CVector &N)
 
 void CSurface::SetTwist()
 {
+	CVector A4, B4, L, U, T;
+	CVector O(0.0,0.0,0.0);
+
+	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
+	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
+	L = B4 - A4;
+	L.Normalize();
+
+
+	// create a vector perpendicular to NormalA and x-axis
+	T.x = 0.0;
+	T.y = +NormalA.z;
+	T.z = -NormalA.y;
+	//rotate around this axis
+	U = m_LA-A4;
+	U.Rotate(T, m_TwistA);
+	m_LA = A4+ U; 
+
+	U = m_TA-A4;
+	U.Rotate(T, m_TwistA);
+	m_TA = A4 + U;
+
+	NormalA.Rotate(T, m_TwistA);
+
+	// create a vector perpendicular to NormalB and x-axis
+	T.x = 0.0;
+	T.y = +NormalB.z;
+	T.z = -NormalB.y;
+
+	U = m_LB-B4;
+	U.Rotate(T, m_TwistB);
+	m_LB = B4+ U;
+
+	U = m_TB-B4;
+	U.Rotate(T, m_TwistB);
+	m_TB = B4 + U;
+
+	NormalB.Rotate(T, m_TwistB);
+}
+
+void CSurface::SetTwist_Old()
+{
 	double xc4,zc4;
-	CVector LATB, TALB;
 	CVector O(0.0,0.0,0.0);
 
 	//"A" section first
@@ -480,7 +521,7 @@ void CSurface::SetFlap()
 }
 
 
-void CSurface::SetSidePoints(CBody * pBody)
+void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 {
 	//creates the left and right tip points between which the panels will be interpolated
 	int l;
@@ -565,11 +606,27 @@ void CSurface::SetSidePoints(CBody * pBody)
 			}
 		}
 
+		SideA_B[l+1].x -=dx;    
+		SideA_B[l+1].z -=dz;    
+		SideB_B[l+1].x -=dx;    
+		SideB_B[l+1].z -=dz;    
+		SideA_T[l+1].x -=dx;    
+		SideA_T[l+1].z -=dz;    
+		SideB_T[l+1].x -=dx;    
+		SideB_T[l+1].z -=dz;    
+		SideA[l+1].x -=dx;    
+		SideA[l+1].z -=dz;    
+		SideB[l+1].x -=dx;    
+		SideB[l+1].z -=dz;    
+
+
 		if(pBody && m_bIsCenterSurf && m_bIsLeftSurf)
 		{
+
 			if(pBody->Intersect(SideA_B[l+1], SideB_B[l+1], SideB_B[l+1], false)) m_bJoinRight = false;
 			if(pBody->Intersect(SideA_T[l+1], SideB_T[l+1], SideB_T[l+1], false)) m_bJoinRight = false;
 			if(pBody->Intersect(SideA[l+1],   SideB[l+1],   SideB[l+1],   false)) m_bJoinRight = false;
+
 		}
 
 		else if(pBody && m_bIsCenterSurf && m_bIsRightSurf)
@@ -581,6 +638,19 @@ void CSurface::SetSidePoints(CBody * pBody)
 
 		if(l==0)
 		{
+			SideA_B[0].x -=dx;    
+			SideA_B[0].z -=dz;    
+			SideB_B[0].x -=dx;    
+			SideB_B[0].z -=dz;    
+			SideA_T[0].x -=dx;    
+			SideA_T[0].z -=dz;    
+			SideB_T[0].x -=dx;    
+			SideB_T[0].z -=dz;    
+			SideA[0].x -=dx;    
+			SideA[0].z -=dz;    
+			SideB[0].x -=dx;    
+			SideB[0].z -=dz;    
+
 			if(pBody && m_bIsCenterSurf && m_bIsLeftSurf)
 			{
 				if(pBody->Intersect(SideA_B[0], SideB_B[0], SideB_B[0], false)) m_bJoinRight = false;
@@ -593,8 +663,45 @@ void CSurface::SetSidePoints(CBody * pBody)
 				pBody->Intersect(SideA_T[0], SideB_T[0], SideA_T[0], true);
 				pBody->Intersect(SideA[0],   SideB[0],     SideA[0], true);
 			}
+			SideA_B[0].x += dx;    
+			SideA_B[0].z += dz;    
+			SideB_B[0].x += dx;    
+			SideB_B[0].z += dz;    
+			SideA_T[0].x += dx;    
+			SideA_T[0].z += dz;    
+			SideB_T[0].x += dx;    
+			SideB_T[0].z += dz;    
+			SideA[0].x += dx;    
+			SideA[0].z += dz;    
+			SideB[0].x += dx;    
+			SideB[0].z += dz;    
 		}
+
+		SideA_B[l+1].x +=dx;    
+		SideA_B[l+1].z +=dz;    
+		SideB_B[l+1].x +=dx;    
+		SideB_B[l+1].z +=dz;    
+		SideA_T[l+1].x +=dx;    
+		SideA_T[l+1].z +=dz;    
+		SideB_T[l+1].x +=dx;    
+		SideB_T[l+1].z +=dz;    
+		SideA[l+1].x +=dx;    
+		SideA[l+1].z +=dz;    
+		SideB[l+1].x +=dx;    
+		SideB[l+1].z +=dz;    
 	}
+
+	//merge trailing edge points in case the foil has a T.E. gap
+	
+	CVector Node;
+
+	Node = (SideA_B[0] + SideA_T[0])/2.0;
+	SideA_B[0].Set(Node);
+	SideA_T[0].Set(Node);
+
+	Node = (SideB_B[0] + SideB_T[0])/2.0;
+	SideB_B[0].Set(Node);
+	SideB_T[0].Set(Node);
 }
 
 void CSurface::GetLeadingPt(int k, CVector &C)
@@ -605,7 +712,6 @@ void CSurface::GetLeadingPt(int k, CVector &C)
 	C.y    = (LA.y+LB.y)/2.0;
 	C.z    = (LA.z+LB.z)/2.0;
 }
-
 void CSurface::GetTrailingPt(int k, CVector &C)
 {
 	GetPanel(k,0,0);
@@ -653,7 +759,8 @@ void CSurface::ResetFlap()
 
 bool CSurface::IsFlapPanel(int const &p)
 {
-	for(int pp=0; pp<m_nFlapPanels; pp++)
+	int pp;
+	for(pp=0; pp<m_nFlapPanels; pp++)
 	{
 		if (p==m_FlapPanel[pp]) return true;
 	}
@@ -758,7 +865,11 @@ bool CSurface::RotateFlap(double const &Angle)
 	if(m_pFoilA && m_pFoilB)
 	{
 		//get the approximate initial angle
-		if(abs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1) return false;
+		if(abs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1) 
+		{
+			AfxMessageBox("Continous foils for surface do not have the same initial flap angle... aborting\n");
+			return false;
+		}
 		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
 		//create a hinge unit vector
 		GetPoint(m_posATE, m_posBTE, 0.0, HA, 0);

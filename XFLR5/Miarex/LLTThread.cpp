@@ -59,7 +59,7 @@ CLLTThread::~CLLTThread()
 BOOL CLLTThread::InitInstance()
 {
 	CString str;
-//	CLLTDlg *pIDlg = (CLLTDlg*)m_pParent;
+	CLLTDlg *pIDlg = (CLLTDlg*)m_pParent;
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	m_IterLim  = pMiarex->m_Iter;
 
@@ -68,7 +68,7 @@ BOOL CLLTThread::InitInstance()
 	else 
 		ReLoop();
 
-	if (!m_bCancel) if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString("\r\nAnalysis completed successfully\r\n");
+	if (!m_bCancel) pIDlg->AddString("\r\nAnalysis completed successfully\r\n");
 
 //	Sleep(100);
 	return FALSE;
@@ -101,11 +101,13 @@ int CLLTThread::Iterate()
 	int   iter = 0;
 	bool  bConverged = false;
 
-	while(iter<m_IterLim && !m_bSkip){
+	while(iter<m_IterLim && !m_bSkip)
+	{
 		if(m_bCancel) break;
 		iter++;
 		resp = m_pWing->LLTIterate();
-		if(resp == 1) {
+		if(resp == 1) 
+		{
 			bConverged = true;
 			pIDlg->m_State=1;
 			pIDlg->m_pIterCurve->AddPoint((double)iter, m_pWing->m_Maxa);
@@ -113,7 +115,8 @@ int CLLTThread::Iterate()
 			else pIDlg->UpdateView(m_pWing->m_QInf);
 			return iter;
 		}
-		else if (resp==-1) {
+		else if (resp==-1) 
+		{
 			bConverged = false;
 			break;// Type 2, lift <0
 		}
@@ -124,25 +127,28 @@ int CLLTThread::Iterate()
 		else pIDlg->UpdateView(m_pWing->m_QInf);
 		
 	}
-	if(m_bSkip){
+	if(m_bSkip)
+	{
 		if(!m_bType4)	str.Format("Alpha = %6.2f, skipped after %d iterations \r\n",m_pWing->m_Alpha,iter);
 		else str.Format("QInf = %8.2f skipped after %d iterations \r\n",m_pWing->m_QInf,iter);
-		if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
-		m_bSkip = false;
+		pIDlg->AddString(str);
 	}
-	else if (resp<0){//negative lift
+	else if (resp<0)
+	{ 
+		//negative lift
 		pIDlg->m_State=2;
 		if(!m_bType4) pIDlg->UpdateView(m_pWing->m_Alpha);
 		else pIDlg->UpdateView(m_pWing->m_QInf);
 		m_pWing->m_bInitCalc = true;
 		return -1;
 	}
-	else if(!bConverged && !m_bCancel){
+	else if(!bConverged && !m_bCancel)
+	{
 		pIDlg->m_State=2;
 		if(!m_bType4) pIDlg->UpdateView(m_pWing->m_Alpha);
 		else pIDlg->UpdateView(m_pWing->m_QInf);
 		m_pWing->m_bInitCalc = true;
-		return -2;
+		return m_IterLim;
 	}
 	return iter;
 }
@@ -159,22 +165,22 @@ bool CLLTThread::AlphaLoop()
 	CString str;
 	CLLTDlg * pIDlg = (CLLTDlg*)m_pParent;
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	int iter;
+	int i,iter;
 
 	m_pWing->m_CvPrec = pMiarex->m_CvPrec;
 	m_pWing->m_Alpha = m_Alpha;
 
-	if(m_pWing->m_bTrace) {
-		m_pWing->m_pXFile->WriteString("Launching analysis....\r\n\r\n");
-		str.Format("Max iterations     = %d\r\n", m_IterLim);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
-		m_pWing->m_pXFile->WriteString(str);
-	}
+
+	pIDlg->AddString("Launching analysis....\r\n\r\n");
+	str.Format("Max iterations     = %d\r\n", m_IterLim);
+	pIDlg->AddString(str);
+	str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
+	pIDlg->AddString(str);
+	str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
+	pIDlg->AddString(str);
+	str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
+	pIDlg->AddString(str);
+	
 
 	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)fabs(m_DeltaAlpha);
 	int ia  = (int)fabs((m_AlphaMax-m_Alpha)*1.001f/m_DeltaAlpha);
@@ -185,9 +191,11 @@ bool CLLTThread::AlphaLoop()
 	pIDlg->m_IterGraph.ResetLimits();
 	pIDlg->m_IterGraph.SetXMax((double)m_IterLim);
 	pIDlg->m_IterGraph.SetYMinGrid(true, true, RGB(100,100,100), 2, 1, 4);
-	for (int i=0; i<=ia; i++){
-		if(m_bCancel) {
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString("Analysis cancelled on user request....\r\n");
+	for (i=0; i<=ia; i++)
+	{
+		if(m_bCancel) 
+		{
+			pIDlg->AddString("Analysis cancelled on user request....\r\n");
 			break;
 		}
 		pIDlg->m_IterGraph.SetYMin(0.0);
@@ -197,30 +205,40 @@ bool CLLTThread::AlphaLoop()
 		if(m_pWing->m_bInitCalc) m_pWing->LLTSetLinearSolution();
 		
 		m_pWing->LLTInitCl();//with new angle...
-		str.Format("Calculating Alpha = %5.2f... \r\n", m_pWing->m_Alpha);
-		if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+		str.Format("Calculating Alpha = %5.2f... ", m_pWing->m_Alpha);
+		pIDlg->AddString(str);
 		iter = Iterate();
-		if(iter<0){
-			//unconverged
-			pIDlg->m_bWarning = true;
-			str.Format("\r\n");
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+		if (m_bSkip)
+		{
+			m_bSkip = false;
 			m_pWing->m_bInitCalc = true;
 		}
-		else if (iter<m_IterLim && !m_bCancel){//converged, 
-			str.Format("    ...converged after %d iterations \r\n",iter);
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+		else if (iter==-1 && !m_bCancel)
+		{
+			str.Format("    ...negative Lift... Aborting\r\n", iter);
+			pIDlg->AddString(str);
+			m_pWing->m_bInitCalc = true;
+		}
+		else if (iter<m_IterLim && !m_bCancel)
+		{
+			//converged, 
+			str.Format("    ...converged after %d iterations\r\n",iter);
+			pIDlg->AddString(str);
 			m_pWing->LLTComputeWing();// generates wing results, 
 			if (m_pWing->m_bWingOut) pIDlg->m_bWarning = true;
 			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-			str.Format("\r\n");
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+			if(m_pWing->m_bWingOut)
+			{
+				str.Format("\r\n");
+				pIDlg->AddString(str);
+			}
 			m_pWing->m_bInitCalc = false;
 		}
-		else {
+		else 
+		{
 			if (m_pWing->m_bWingOut) pIDlg->m_bWarning = true;
-			str.Format("    ...unconverged after %2d iterations\r\n\r\n", iter);
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+			str.Format("    ...unconverged after %2d iterations\r\n", iter);
+			pIDlg->AddString(str);
 			m_pWing->m_bInitCalc = true;
 		}
 		m_pWing->m_Alpha+=m_DeltaAlpha;
@@ -229,10 +247,12 @@ bool CLLTThread::AlphaLoop()
 	return true;
 }
 
+
 bool CLLTThread::ReLoop()
 {
 	//Alpha stands for QInf...
 
+	int i;
 	CString str;
 	CLLTDlg * pIDlg = (CLLTDlg*)m_pParent;
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
@@ -242,22 +262,18 @@ bool CLLTThread::ReLoop()
 	m_pWing->m_QInf = m_Alpha;
 	//Alpha has been set at CMiarex::SetWPlr
 
-
-	if(m_pWing->m_bTrace) {
-		m_pWing->m_pXFile->WriteString("Launching analysis....\r\n\r\n");
-		str.Format("Max iterations     = %d\r\n", m_IterLim);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
-		m_pWing->m_pXFile->WriteString(str);
-		str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
-		m_pWing->m_pXFile->WriteString(str);
-	}
-
+	pIDlg->AddString("Launching analysis....\r\n\r\n");
+	str.Format("Max iterations     = %d\r\n", m_IterLim);
+	pIDlg->AddString(str);
+	str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
+	pIDlg->AddString(str);
+	str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
+	pIDlg->AddString(str);
+	str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
+	pIDlg->AddString(str);
 	
-	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)fabs(m_DeltaAlpha);
-	int ia  = (int)fabs((m_AlphaMax-m_Alpha)*1.001/m_DeltaAlpha);
+	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)abs(m_DeltaAlpha);
+	int ia  = (int)abs((m_AlphaMax-m_Alpha)*1.001/m_DeltaAlpha);
 
 	if(!m_bSequence) ia = 0;
 
@@ -265,9 +281,12 @@ bool CLLTThread::ReLoop()
 	pIDlg->m_IterGraph.ResetLimits();
 	pIDlg->m_IterGraph.SetXMax((double)m_IterLim);
 	pIDlg->m_IterGraph.SetYMinGrid(true, true, RGB(100,100,100), 2, 1, 4);
-	for (int i=0; i<=ia; i++){
-		if(m_bCancel) {
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString("Analysis cancelled on user request....\r\n");
+
+	for (i=0; i<=ia; i++)
+	{
+		if(m_bCancel) 
+		{
+			pIDlg->AddString("Analysis cancelled on user request....\r\n");
 			break;
 		}
 		pIDlg->m_IterGraph.SetYMin(0.0);
@@ -277,31 +296,44 @@ bool CLLTThread::ReLoop()
 		if(m_pWing->m_bInitCalc)m_pWing->LLTSetLinearSolution();
 		m_pWing->LLTInitCl();//with new angle...
 		
-		str.Format("Calculating QInf = %6.2f... \r\n", m_pWing->m_QInf);
-		if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+		str.Format("Calculating QInf = %6.2f... ", m_pWing->m_QInf);
+		pIDlg->AddString(str);
 		iter = Iterate();
-		if(iter<0){
+
+		if(iter<0)
+		{
 			//unconverged
 			pIDlg->m_bWarning = true;
 			str.Format("\r\n");
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+			pIDlg->AddString(str);
 			m_pWing->m_bInitCalc = true;
 		}
-		else if (iter<m_IterLim  && !m_bCancel){//converged, 
-			str.Format("    ...converged after %d iterations \r\n",iter);
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+		else if (m_bSkip)
+		{
+			m_bSkip = false;
+			m_pWing->m_bInitCalc = true;
+		}
+		else if (iter<m_IterLim  && !m_bCancel)
+		{
+			//converged, 
+			str.Format("    ...converged after %d iterations\r\n",iter);
+			pIDlg->AddString(str);
 			m_pWing->LLTComputeWing();// generates wing results, 
 			if (m_pWing->m_bWingOut)pIDlg->m_bWarning = true;
 			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-			str.Format("\r\n");
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+			if(m_pWing->m_bWingOut)
+			{
+				str.Format("\r\n");
+				pIDlg->AddString(str);
+			}
 			m_pWing->m_bInitCalc = false;
 		}
-		else {
+		else
+		{
 //			m_pWing->LLTComputeWing();// generates wing results, 
 			if (m_pWing->m_bWingOut) pIDlg->m_bWarning = true;
-			str.Format("    ...unconverged after %2d iterations\r\n\r\n", iter);
-			if(m_pWing->m_bTrace) m_pWing->m_pXFile->WriteString(str);
+			str.Format("    ...unconverged after %2d iterations\r\n", iter);
+			pIDlg->AddString(str);
 			m_pWing->m_bInitCalc = true;
 		}
 		m_pWing->m_QInf+=m_DeltaAlpha;

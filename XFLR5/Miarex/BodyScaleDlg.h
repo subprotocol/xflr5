@@ -31,6 +31,7 @@
 class CBodyScaleDlg : public CDialog
 {
 	friend class CMiarex;
+	friend class CXBody;
 	DECLARE_DYNAMIC(CBodyScaleDlg)
 
 public:

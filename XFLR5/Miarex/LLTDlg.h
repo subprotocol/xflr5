@@ -34,37 +34,42 @@ class CLLTDlg : public CDialog
 	friend class CLLTThread;
 	friend class CMiarex;
 	friend class CWOper;
+	friend class CWing;
 // Construction
 public:
 	CLLTDlg(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CLLTDlg)
-	enum { IDD = IDD_ITERDLG };
+	enum { IDD = IDD_LLTDLG };
 	CButton	m_ctrlCancel;
 	CButton	m_ctrlSkip;
+	CEdit	m_ctrlOutput;
 	//}}AFX_DATA
  
 
 // Overrides
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CLLTDlg)
-	public:
-	protected:
+
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
+	afx_msg void OnTimer(UINT nIDEvent);
+
 
 // Implementation
-protected:
 private :
 	bool EndSequence();
-	bool m_bWarning;
-	CStdioFile m_XFile;
 	void SetFileHeader();
 	void UpdateView(double Alpha);
+	void AddString(CString strong);
 
+	bool m_bWarning;
 	bool m_bSequence;
 	bool m_bType4;
+	bool m_bTrace;
+	bool m_bCancel;
+	bool m_bXFile;
+
 	int m_State;
 	double m_Alpha;//Angle of Attack in °
 	double m_AlphaMax;
@@ -72,7 +77,8 @@ private :
 	Graph m_IterGraph;
 	CRect m_IterRect;
 	CCurve* m_pIterCurve;
-
+	CStdioFile m_XFile;
+	CString m_strOut;
 	CPoint m_DlgPos;
 
 	CWing *m_pWing;//pointer to the geometry class of the wing 
@@ -89,6 +95,5 @@ private :
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnTimer(UINT nIDEvent);
 };
 

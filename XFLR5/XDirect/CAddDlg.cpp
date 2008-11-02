@@ -75,7 +75,9 @@ END_MESSAGE_MAP()
 
 void CCAddDlg::OnApply() 
 {
-	for (int i=0; i< m_pMemFoil->nb; i++){
+	int i;
+	for (i=0; i< m_pMemFoil->nb; i++)
+	{
 		m_pXFoil->xb[i+1] = m_pMemFoil->xb[i] ;
 		m_pXFoil->yb[i+1] = m_pMemFoil->yb[i];
 	}
@@ -84,7 +86,8 @@ void CCAddDlg::OnApply()
 	m_pXFoil->lflap = false;
 	m_pXFoil->lbflap = false;
 
-	if(m_pXFoil->Preprocess()){
+	if(m_pXFoil->Preprocess())
+	{
 		m_pXFoil->CheckAngles();
 /*		for (int k=0; k<m_pXFoil->n;k++){
 			m_pMemFoil->nx[k] = m_pXFoil->nx[k+1];

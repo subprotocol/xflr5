@@ -131,9 +131,11 @@ private:
 	void DrawMidLine(CDC *pDC, double scalex, double scaley, CPoint Offset, CRect DrawRect, bool IsPrinting);
 	void Serialize(CArchive &ar);
 	void SetFlap();
+	void SetTEFlap();
+	void SetLEFlap();
 	void SetNaca009();
-	void SetLEFlap(bool bFlap, double xhinge, double yhinge, double angle);
-	void SetTEFlap(bool bFlap, double xhinge, double yhinge, double angle);
+	void SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
+	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
 	
 	double DeRotate();
 	double GetBaseUpperY(double x);

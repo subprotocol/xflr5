@@ -1436,6 +1436,7 @@ void CXInverse::ExecMDES()
 
 bool CXInverse::ExecQDES()
 {
+	int i;
 	CWaitCursor wait;
 
 	if(!m_bMarked) { // || !m_pXFoil->liqset 
@@ -1446,7 +1447,7 @@ bool CXInverse::ExecQDES()
 //----- put modified info back into global arrays
 	int isp;
 	double qscom;
-	for (int i=1; i<= m_pXFoil->nsp; i++){
+	for (i=1; i<= m_pXFoil->nsp; i++){
 		isp = m_pXFoil->nsp - i + 1;
 		qscom =  m_pXFoil->qinf*m_pMCurve->y[i-1];
 		m_pXFoil->qspec[1][i] = qincom(qscom,m_pXFoil->qinf,m_pXFoil->tklam);
@@ -1617,7 +1618,7 @@ void CXInverse::OnExportFoil()
 	CFileDialog XFileDlg(false, "dat", FileName,  OFN_OVERWRITEPROMPT,
 		_T("Labeled Format (.dat)|*.dat|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		m_pModFoil->ExportFoil(FileName);	
 	}
 }
@@ -2044,7 +2045,7 @@ void CXInverse::OnLoadFoil()
 		m_bMarked = false;
 		m_bSpline = false;
 		m_bSplined  = true;
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		pFoil = pFrame->ReadFoilFile(FileName);
 		pFrame->SetCurrentFoil(pFoil);
 		if(!pFoil) return;//
@@ -2103,9 +2104,10 @@ bool CXInverse::InitXFoil(CFoil * pFoil)
 
 void CXInverse::OnRestore() 
 {
+	int i;
 	if (m_bZoomPlus) ReleaseZoom();
 
-	for (int i=0; i<m_pRefFoil->n; i++){
+	for (i=0; i<m_pRefFoil->n; i++){
 		m_pXFoil->x[i+1] = m_pRefFoil->x[i];
 		m_pXFoil->y[i+1] = m_pRefFoil->y[i];
 	}
@@ -2393,7 +2395,7 @@ void CXInverse::OnLoad()
 
 	if(IDOK==XFileDlg.DoModal()) {
 		CWaitCursor Wait;
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		CMainFrame*pFrame = (CMainFrame*)m_pFrame;
 		int pos1 = FileName.Find(".plr");
 		int pos2 = FileName.Find(".PLR");

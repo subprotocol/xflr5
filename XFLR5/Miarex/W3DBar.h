@@ -35,6 +35,7 @@
 class CW3DBar : public CInitDialogBar
 {
  	friend class CMainFrame;
+ 	friend class CXBody;
  	friend class CMiarex;
 	friend class CWOperDlgBar;
 	friend class CPOperDlgBar;

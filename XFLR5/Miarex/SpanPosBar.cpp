@@ -28,7 +28,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <math.h>
 #include "stdafx.h"
 #include "../main/MainFrm.h"
 #include "Miarex.h"

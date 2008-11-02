@@ -51,6 +51,9 @@ C3DPanelDlg::C3DPanelDlg(CWnd* pParent /*=NULL*/)
 	m_AlphaMax   = 0.0;
 	m_DeltaAlpha = 0.0;
 
+	m_CL = m_CX = m_CY = 0.0;
+	m_GCm = m_GRm = m_GYm = m_VCm = m_VYm = m_IYm = 0.0;
+
 	m_MatSize        = 0;
 	m_nNodes         = 0;
 	m_NSurfaces      = 0;
@@ -62,8 +65,6 @@ C3DPanelDlg::C3DPanelDlg(CWnd* pParent /*=NULL*/)
 	m_WakeSize   = 0;
 
 	m_strOut = "";
-
-	m_GCm = m_GRm = m_GYm = m_VCm = m_VYm = m_IYm = 0.0;
 
 	m_ppBody  = NULL;
 	m_pWing   = NULL;//pointer to the geometry class of the wing 
@@ -115,8 +116,14 @@ END_MESSAGE_MAP()
 BOOL C3DPanelDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	CRect WndRect;
+	GetWindowRect(WndRect);
+	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 	
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+	CMiarex * pMiarex = (CMiarex*)m_pMiarex;
+
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
@@ -145,6 +152,13 @@ BOOL C3DPanelDlg::OnInitDialog()
 	str = "";
 	m_b3DSymetric = m_pWing->m_bSymetric;
 	if(!m_pWing->m_bSymetric) str += "     Main wing is asymmetric\r\n";
+
+	if(abs(m_pWPolar->m_Beta)>0.001) 
+	{
+		str += "     Sideslip is asymmetric\r\n";
+		m_b3DSymetric = false;
+	}
+
 
 	if(m_pWing2)
 	{
@@ -195,10 +209,61 @@ BOOL C3DPanelDlg::OnInitDialog()
 	if(m_pWPolar->m_AnalysisType==3) 
 		StartPanelThread();
 
-CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-
 	SetTimer(ID_THREADTIMER, 100, NULL);
+
 	return FALSE;
+}
+
+void C3DPanelDlg::Plot()
+{
+	CStdioFile XFile;
+	CFileException fe;
+
+	int i;double h, phi;
+	int N=100; //number of points
+
+	CString FileName;
+	FileName = "c:/Users/My_User/Desktop/Test.txt";
+
+	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+
+	if (bOpen)
+	{
+		CString strOut;
+		CPanel Panel;
+
+		m_pNode[2*VLMMATSIZE-10].Set(  1.0,  1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 9].Set( -1.0,  1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 8].Set( -1.0, -1.0, 0.0);
+		m_pNode[2*VLMMATSIZE- 7].Set(  1.0, -1.0, 0.0);
+
+		Panel.SetFrame(m_pNode[2*VLMMATSIZE-10], m_pNode[2*VLMMATSIZE-9], m_pNode[2*VLMMATSIZE-8], m_pNode[2*VLMMATSIZE-7]);
+		Panel.m_iLA = 2*VLMMATSIZE-10;
+		Panel.m_iTA = 2*VLMMATSIZE- 9;
+		Panel.m_iTB = 2*VLMMATSIZE- 8;
+		Panel.m_iLB = 2*VLMMATSIZE- 7;
+		Panel.m_iPos = 1;
+		Panel.m_bIsLeading     = false;
+		Panel.m_bIsTrailing    = false;
+		Panel.m_bIsWakePanel   = false;
+		Panel.m_bIsInSymPlane  = false;
+		
+		h = 0.1; //mm, increment
+
+		CVector Ref, Point, Inc, V;
+		Ref.Set(0.7, 0.0, 0.0);
+		Inc.Set(0.0, 0.0, h);
+		Point = Ref - Inc * (double)N/2.0;
+		for (i=0; i<=N; i++)
+		{
+			DoubletNASA4023(Point, &Panel, V, phi, false);
+			strOut.Format("%12.7f       %12.7f       %12.7f       %12.7f\n", Point.z, V.x, V.y, V.z);
+			XFile.WriteString(strOut);
+			Point += Inc;
+		}
+
+		XFile.Close();
+	}
 }
 
 
@@ -270,7 +335,7 @@ void C3DPanelDlg::EndSequence()
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 
-	if(m_pWPolar && m_pWPolar->m_bTiltedGeom)
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//restore the initial geometry
 		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
@@ -287,7 +352,8 @@ void C3DPanelDlg::EndSequence()
 	pMiarex->m_bVLMFinished = true;
 	m_bXFile = false;
 	m_XFile.Close();
-	if(m_bWarning && pMiarex->m_bLogFile){
+	if(m_bWarning && pMiarex->m_bLogFile)
+	{
 		if(IDYES == AfxMessageBox("Some points were found outside the available flight envelope\r\nView the Log file for details ?", MB_YESNOCANCEL))
 		{
 			CFile lf;
@@ -529,7 +595,6 @@ void C3DPanelDlg::CheckSolution()
 					}	
 				}
 			}
-//			TRACE("%3d    %12.6f    %12.6f\n", p, VS.dot(m_pPanel[p].Normal),-QInf.dot(m_pPanel[p].Normal));
 		}
 	}
 }
@@ -542,7 +607,7 @@ void C3DPanelDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CV
 	double phi, sign;
 	CVector Vw[MAXSTATIONS];
 	VT.Set(0.0,0.0,0.0);
-		CVector VR, VL;
+
 
 	for (pp=0; pp<m_MatSize;pp++)
 	{
@@ -565,15 +630,11 @@ void C3DPanelDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CV
 			pw = m_pPanel[pp].m_iWake;
 			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
 			{
-if(pp==35 || pp==43)
-double nada=0.0;
 				GetDoubletInfluence(C, m_pWakePanel+pw+lw, V, phi, true);
-				VT += V * Mu[pp] * sign;
+				VT += V * Mu[pp]*sign;
 			}	
-//if(pp<36 && bTrace)  VL += V * Mu[pp] * sign;
-//else if (bTrace)     VR += V * Mu[pp] * sign;
-//if(bTrace) TRACE("%14.5e     %14.5e     %14.5e     \n",  V.x * Mu[pp] * sign,  V.y * Mu[pp] * sign,  V.z * Mu[pp] * sign);
 		}
+//if(bTrace) 	TRACE("%3d    %14.7f\n", pp, VT.x);
 	}
 }
 
@@ -620,6 +681,7 @@ bool C3DPanelDlg::CreateMatrix()
 	}
 
 	m_Progress += 15;
+
 	return true;
 }
 
@@ -637,8 +699,8 @@ bool C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 
 	//compute with a unit speed
 	AddString("      Creating RHS vector...\r\n");
-
 	p=0;
+
 	for (q=0; q<nval;q++)
 	{
 		alpha = V0+q*VDelta;
@@ -677,7 +739,6 @@ bool C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 		CC.x   =  m_ppPanel[p]->CollPt.x; //symetric point, just in case
 		CC.y   = -m_ppPanel[p]->CollPt.y; 
 		CC.z   =  m_ppPanel[p]->CollPt.z; 
-
 		for (pp=0; pp<Size; pp++)
 		{
 			if(m_ppPanel[pp]->m_iPos!=0) GetSourceInfluence(C, *(m_ppPanel+pp), V, phi);
@@ -689,6 +750,7 @@ bool C3DPanelDlg::CreateRHS(double V0, double VDelta, int nval)
 			}
 
 			if(!m_bDirichlet || m_ppPanel[p]->m_iPos==0) 
+
 			{
 				m_cosRHS[m] -= V.dot(m_ppPanel[p]->Normal) * m_ppPanel[pp]->Normal.x * -1.0/4.0/pi;
 				m_sinRHS[m] -= V.dot(m_ppPanel[p]->Normal) * m_ppPanel[pp]->Normal.z * -1.0/4.0/pi;
@@ -752,7 +814,6 @@ bool C3DPanelDlg::CreateWakeContribution()
 	if(m_b3DSymetric)	Size = m_MatSize/2;
 	else				Size = m_MatSize;
 
-//	memcpy(m_RHS, m_RHSRef, nval      * m_MatSize * sizeof(double));
 	memcpy(m_aij, m_aijRef, m_MatSize * m_MatSize * sizeof(double));
 
 	for(p=0; p<Size; p++)//for each matrix row 
@@ -893,6 +954,7 @@ bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 	memcpy(m_RHS,      m_cosRHS, Size * sizeof(double));
 	memcpy(m_RHS+Size, m_sinRHS, Size * sizeof(double));
 
+//double row[VLMMATSIZE]; memcpy(row, m_aij, sizeof(row));
 
 	if(!Gauss(m_aij, Size, m_RHS, 2, 30))
 	{
@@ -909,10 +971,11 @@ bool C3DPanelDlg::SolveMultiple(double V0, double VDelta, int nval)
 	//Reconstruct right side results if calculation was symetric
 	double *SigmaRef = m_aij;//use existing reserved memory, do not re-allocate
 
+
 	if(m_b3DSymetric)
 	{
-		memcpy(m_RHSRef, m_RHS,   nval*Size*sizeof(double));
-		memcpy(SigmaRef, m_Sigma, nval*Size*sizeof(double));
+		memcpy(m_RHSRef, m_RHS,   2*Size*sizeof(double));
+		memcpy(SigmaRef, m_Sigma, 2*Size*sizeof(double));
 
 //		n  =  q    * Size;
 //		o  =  q    * m_MatSize;
@@ -1031,14 +1094,14 @@ bool C3DPanelDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 		{
 
 			alpha = V0+q*VDelta;
-			WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
+			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
 			Lift = 0.0;
 			p=0;
 			for (p=0; p<m_MatSize; p++)
 			{
 				// for each panel, add the lift coef
 				PanelForce = m_pPanel[p].Normal * (-m_Cp[p+q*m_MatSize]) * m_pPanel[p].Area;
-				Lift += PanelForce.dot(WindNormal);
+				Lift += PanelForce.dot(WindNormal)*cos(alpha*pi/180.0);
 			}
 
 			if(Lift<=0.0)
@@ -1172,11 +1235,21 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 	// at each span station
 	int pos, Station;
 	double *Mu, *Sigma;
-	double Lift, IDrag, VDrag ,XCP, YCP, QInf, WingLift, WingIDrag;;
-//	double GRm, GYm, GCm, VCm, VYm, IYm; 
+	double cosa, sina;
+	double Lift, IDrag, VDrag ,XCP, YCP, QInf;
+	CVector WindNormal, WindDirection, WindSide;
+	CVector Force;
 	CString str;
 
 	bool bThinSurf = m_pWPolar->m_bThinSurfaces;
+
+	//   Define wind (stability) axis
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
+
+	WindNormal.Set(-sina, 0.0, cosa);
+	WindDirection.Set(cosa, 0.0, sina);
+	WindSide = WindNormal * WindDirection;
 
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	
@@ -1221,15 +1294,15 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		IDrag  = 0.0;
 		VDrag  = 0.0;
 		XCP = YCP = 0.0;
+		Force.Set(0.0, 0.0, 0.0);
 
 		m_GCm = m_GRm = m_GYm  = 0.0;
 		m_VCm = m_VYm = m_IYm  = 0.0;
 
 		AddString("       Calculating wing...\r\n");
-		m_pWing->PanelTrefftz(m_Cp+qrhs*m_MatSize, Mu, Sigma, 0, Lift, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
-		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize,
-								  VDrag, XCP, YCP, 
-								  m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+		m_pWing->PanelTrefftz(m_Cp+qrhs*m_MatSize, Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
+		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
+			                      m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
 		m_pWing->PanelSetBending();
 
 		pos = m_pWing->m_MatSize;
@@ -1241,20 +1314,15 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pWing2) 
 		{
 			AddString("       Calculating elevator...\r\n");
-			WingLift  = 0.0;
-			WingIDrag = 0.0;
 			m_pWing2->m_Alpha     = Alpha;
 			m_pWing2->m_QInf      = QInf;
 			m_pWing2->m_Viscosity = m_pWPolar->m_Viscosity;
 			m_pWing2->m_Density   = m_pWPolar->m_Density;
-			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Lift, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
-			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos,
-									  VDrag, XCP, YCP, 
-									  m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
+			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
+									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
-			Lift  += WingLift;
-			IDrag += WingIDrag;
 
 			m_pStab->VLMSetBending();
 			if(m_pStab->m_bWingOut) m_bPointOut = true;
@@ -1265,21 +1333,17 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pStab) 
 		{
 			AddString("       Calculating elevator...\r\n");
-			WingLift  = 0.0;
-			WingIDrag = 0.0;
 			m_pStab->m_Alpha     = Alpha;
 			m_pStab->m_QInf      = QInf;
 			m_pStab->m_Viscosity = m_pWPolar->m_Viscosity;
 			m_pStab->m_Density   = m_pWPolar->m_Density;
-			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Lift, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
+			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos,
-									  VDrag, XCP, YCP, 
-									  m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									  VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
+									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
 			m_pStab->PanelSetBending();
 
 			pos += m_pStab->m_MatSize;
-			Lift  += WingLift;
-			IDrag += WingIDrag;
 
 			m_pStab->VLMSetBending();
 			if(m_pStab->m_bWingOut) m_bPointOut = true;
@@ -1290,24 +1354,19 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pFin)
 		{
 			AddString("       Calculating fin...\r\n");
-			WingLift  = 0.0;
-			WingIDrag = 0.0;
 			m_pFin->m_Alpha      = Alpha;
 			m_pFin->m_QInf       = QInf;
 			m_pFin->m_Viscosity  = m_pWPolar->m_Viscosity;
 			m_pFin->m_Density    = m_pWPolar->m_Density;
 			
-			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Lift, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
-			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos,
-									  VDrag, XCP, YCP, 
-									  m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
+			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
+								     m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
 			m_pFin->PanelSetBending();
 			pos += m_pFin->m_MatSize;
 
 			if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
-			Lift  += WingLift;
-			IDrag += WingIDrag;
 
 			m_pFin->VLMSetBending();
 		}
@@ -1315,15 +1374,11 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		if(*m_ppBody)
 		{
 			AddString("       Calculating body...\r\n");
-			WingLift  = 0.0;
-			WingIDrag = 0.0;
 
-			(*m_ppBody)->ComputeAero(m_Cp+qrhs*m_MatSize+pos, WingLift, XCP, YCP,
-				m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_XCmRef, m_pWPolar->m_bTiltedGeom);
+			(*m_ppBody)->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_XCmRef, m_pWPolar->m_bTiltedGeom);
 
 			//the body does not shed any wake--> no induced lift or drag
-			//			Lift  += WingLift;
-			//			IDrag += WingIDrag;
+
 		}
 	
 		if(!m_bTrefftz)
@@ -1331,12 +1386,17 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, QInf, Lift, IDrag);
 		}
 
-		m_CL          =       Lift/m_pWing->m_Area;
+//		SetDownwash(Mu, Sigma);
+
+		m_CL          =       Force.dot(WindNormal)    /m_pWing->m_Area;
+		m_CX          =       Force.dot(WindDirection) /m_pWing->m_Area;
+		m_CY          =       Force.dot(WindSide)      /m_pWing->m_Area;
+
 		m_InducedDrag =  1.0*IDrag/m_pWing->m_Area;
 		m_ViscousDrag =  1.0*VDrag/m_pWing->m_Area;
 
-		m_XCP         = XCP/Lift;
-		m_YCP         = YCP/Lift;
+		m_XCP         = XCP/Force.dot(WindNormal);
+		m_YCP         = YCP/Force.dot(WindNormal);
 
 		m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord;
 		m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
@@ -1362,6 +1422,8 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 	}
 	else m_bPointOut = true;
 
+//TRACE("%10.4e    %10.4e    %10.4e    %10.4e    %10.4e    %10.4e\n", Alpha, m_pWPolar->m_Beta, m_CL, m_CY, m_GYm, m_GRm);
+//
 	return true;
 }
 
@@ -1611,11 +1673,11 @@ void C3DPanelDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, 
 			CJKi = 0.0;
 			//no contribution to speed either
 		}
-		else if ((h.x*h.x+h.y*h.y+h.z*h.z)/(s.x*s.x+s.y*s.y+s.z*s.z) <= CoreSize*CoreSize
-				  && a.x*s.x+a.y*s.y+a.z*s.z>=0.0
-				  && b.x*s.x+b.y*s.y+b.z*s.z<=0.0) 
+		else if (
+			      (((h.x*h.x+h.y*h.y+h.z*h.z)/(s.x*s.x+s.y*s.y+s.z*s.z) <= CoreSize*CoreSize) && a.x*s.x+a.y*s.y+a.z*s.z>=0.0  && b.x*s.x+b.y*s.y+b.z*s.z<=0.0) ||
+			         A < CoreSize || B < CoreSize)
 		{
-			CJKi = 0.0;//speed is singular on panel edge, value of potential is unknown
+			CJKi = 0.0;//speed is singular at panel edge, the value of the potential is unknown
 		}
 		else
 		{
@@ -1627,11 +1689,13 @@ void C3DPanelDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, 
 				side = pPanel->Normal.x*h.x +pPanel->Normal.y*h.y +pPanel->Normal.z*h.z;
 					   
 				if(side >=0.0) sign = 1.0; else sign = -1.0;
-				if(DNOM<0.0){
+				if(DNOM<0.0)
+				{
 					if(PN>0.0)	CJKi =  pi * sign;
 					else		CJKi = -pi * sign;
 				}
-				else if(DNOM == 0.0){
+				else if(DNOM == 0.0)
+				{
 					if(PN>0.0)	CJKi =  pi/2.0 * sign;
 					else		CJKi = -pi/2.0 * sign;
 				}
@@ -1672,7 +1736,9 @@ void C3DPanelDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, d
 	//vectorial operations are written inline to save computing times
 	//-->longer code, but 4x more efficient....
 	int i;
-	
+	double CoreSize = 0.000001;
+	if(abs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
 	phi = 0.0;
 	V.x=0.0; V.y=0.0; V.z=0.0;
 
@@ -1760,8 +1826,16 @@ void C3DPanelDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, d
 		h.y = -a.x*s.z + a.z*s.x;
 		h.z =  a.x*s.y - a.y*s.x;
 	
-		if(R[i].IsSame(R[i+1])){
+		if(R[i].IsSame(R[i+1]))
+		{
 			//no contribution from this side
+			CJKi = 0.0;
+		}
+		else if ((((h.x*h.x+h.y*h.y+h.z*h.z)/(s.x*s.x+s.y*s.y+s.z*s.z) <= CoreSize*CoreSize) && a.x*s.x+a.y*s.y+a.z*s.z>=0.0 && b.x*s.x+b.y*s.y+b.z*s.z<=0.0) ||
+			         A < CoreSize || B < CoreSize)
+
+		{
+			//if lying on the panel's side... no contribution
 			CJKi = 0.0;
 		}
 		else
@@ -1772,8 +1846,9 @@ void C3DPanelDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, d
 			RNUM = SM*PN * (B*PA-A*PB);
 			DNOM = PA*PB + PN*PN*A*B*SM*SM;
 
-			if(abs(PN)<eps){
-				// side is >0 if on the panel's right side
+			if(abs(PN)<eps)
+			{
+				// side is >0 if the point is on the panel's right side
 				side = pPanel->Normal.x*h.x + pPanel->Normal.y*h.y + pPanel->Normal.z*h.z;
 				if(side >=0.0) sign = 1.0; else sign = -1.0;
 				if(DNOM<0.0){
@@ -2219,7 +2294,7 @@ void C3DPanelDlg::SetDownwash(double *Mu, double *Sigma)
 	CVector X(0.001, 0.0, 0.0);
 
 	//wing first
-	memset(m_pWing->m_Vd, 0, sizeof(m_pWing->m_Vd));
+	memset(m_pWing->m_Vd,  0, sizeof(m_pWing->m_Vd));
 
 	m=0;
 	for (p=0; p< m_pWing->m_MatSize; p++)
@@ -2232,36 +2307,48 @@ void C3DPanelDlg::SetDownwash(double *Mu, double *Sigma)
 		}
 	}
 
-	m=0;
-	for (p=0; p< m_pWing2->m_MatSize; p++)
+	if(m_pWing2)
 	{
-		if(m_pWing2->m_pPanel[p].m_bIsTrailing)
+		memset(m_pWing2->m_Vd, 0, sizeof(m_pWing2->m_Vd));
+		m=0;
+		for (p=0; p< m_pWing2->m_MatSize; p++)
 		{
-			C = (m_pNode[m_pWing2->m_pPanel[p].m_iTA] + m_pNode[m_pWing2->m_pPanel[p].m_iTB])/2.0;
-			GetSpeedVector(C, Mu, Sigma, m_pWing2->m_Vd[m]);
-			m++;
+			if(m_pWing2->m_pPanel[p].m_bIsTrailing)
+			{
+				C = (m_pNode[m_pWing2->m_pPanel[p].m_iTA] + m_pNode[m_pWing2->m_pPanel[p].m_iTB])/2.0;
+				GetSpeedVector(C, Mu, Sigma, m_pWing2->m_Vd[m]);
+				m++;
+			}
 		}
 	}
 
-	m=0;
-	for (p=0; p< m_pStab->m_MatSize; p++)
+	if(m_pStab)
 	{
-		if(m_pStab->m_pPanel[p].m_bIsTrailing)
+		memset(m_pStab->m_Vd,  0, sizeof(m_pStab->m_Vd));
+		m=0;
+		for (p=0; p< m_pStab->m_MatSize; p++)
 		{
-			C = (m_pNode[m_pStab->m_pPanel[p].m_iTA] + m_pNode[m_pStab->m_pPanel[p].m_iTB])/2.0;
-			GetSpeedVector(C, Mu, Sigma, m_pStab->m_Vd[m]);
-			m++;
+			if(m_pStab->m_pPanel[p].m_bIsTrailing)
+			{
+				C = (m_pNode[m_pStab->m_pPanel[p].m_iTA] + m_pNode[m_pStab->m_pPanel[p].m_iTB])/2.0;
+				GetSpeedVector(C, Mu, Sigma, m_pStab->m_Vd[m]);
+				m++;
+			}
 		}
 	}
 
-	m=0;
-	for (p=0; p< m_pFin->m_MatSize; p++)
+	if(m_pFin)
 	{
-		if(m_pFin->m_pPanel[p].m_bIsTrailing)
+		memset(m_pFin->m_Vd,   0, sizeof(m_pFin->m_Vd));
+		m=0;
+		for (p=0; p< m_pFin->m_MatSize; p++)
 		{
-			C = (m_pNode[m_pFin->m_pPanel[p].m_iTA] + m_pNode[m_pFin->m_pPanel[p].m_iTB])/2.0;
-			GetSpeedVector(C, Mu, Sigma, m_pFin->m_Vd[m]);
-			m++;
+			if(m_pFin->m_pPanel[p].m_bIsTrailing)
+			{
+				C = (m_pNode[m_pFin->m_pPanel[p].m_iTA] + m_pNode[m_pFin->m_pPanel[p].m_iTB])/2.0;
+				GetSpeedVector(C, Mu, Sigma, m_pFin->m_Vd[m]);
+				m++;
+			}
 		}
 	}
 }
@@ -2272,6 +2359,91 @@ void C3DPanelDlg::SetAi(int qrhs)
 	// calculates the induced angles from the doublet and source strengths
 	CVector C, V, TA, TB;
 	int kw, m, mw;
+	double *Mu, *Sigma;
+//	double Ai[MAXSTATIONS];
+
+	Mu    = m_Mu    + qrhs * m_MatSize;
+	Sigma = m_Sigma + qrhs * m_MatSize;
+
+	AddString("       Calculating induced angles...\r\n");
+	mw = 0;
+
+	m=0;
+	for (kw=0; kw<m_pWing->m_NStation; kw++)
+	{
+		TA = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTA];
+		TB = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTB];
+		C = (TA+TB)/2.0;
+
+		GetSpeedVector(C, Mu, Sigma, V);
+		m_pWing->m_Ai[m] = atan2(V.z, m_3DQInf[qrhs]) * 180.0/pi;
+		m_pWing->m_Vd[m] = V;
+
+		mw += m_pWPolar->m_NXWakePanels;
+		m++;
+	}
+
+
+	if(m_pWing2) 
+	{
+		m=0;
+		for (kw=0; kw<m_pWing2->m_NStation; kw++)
+		{
+			TA = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTA];
+			TB = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTB];
+			C = (TA+TB)/2.0;
+
+			GetSpeedVector(C, Mu, Sigma, V);
+			m_pWing2->m_Ai[m] = atan2(V.z, m_3DQInf[qrhs]) * 180.0/pi;
+			m_pWing2->m_Vd[m] = V;
+
+			mw += m_pWPolar->m_NXWakePanels;
+			m++;
+		}
+	}
+
+	if(m_pStab) 
+	{
+		m=0;
+		for (kw=0; kw<m_pStab->m_NStation; kw++)
+		{
+			TA = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTA];
+			TB = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTB];
+			C = (TA+TB)/2.0;
+
+			GetSpeedVector(C, Mu, Sigma, V);
+			m_pStab->m_Ai[m] = atan2(V.z, m_3DQInf[qrhs]) * 180.0/pi;
+			m_pStab->m_Vd[m] = V;
+
+			mw += m_pWPolar->m_NXWakePanels;
+			m++;
+		}
+	}
+
+	if(m_pFin) 
+	{
+		m=0;
+		for (kw=0; kw<m_pFin->m_NStation; kw++)
+		{
+			TA = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTA];
+			TB = m_pWakeNode[m_pWakePanel[mw + m_pWPolar->m_NXWakePanels-1].m_iTB];
+			C = (TA+TB)/2.0;
+
+			GetSpeedVector(C, Mu, Sigma, V);
+			m_pFin->m_Ai[m] = atan2(V.z, m_3DQInf[qrhs]) * 180.0/pi;
+			m_pFin->m_Vd[m] = V;
+
+			mw += m_pWPolar->m_NXWakePanels;
+			m++;
+		}
+	}
+}
+/*
+void C3DPanelDlg::SetAi(int qrhs)
+{
+	// calculates the induced angles from the doublet and source strengths
+	CVector C, V, TA, TB;
+	int kw, m, mw, pos;
 	double *Mu, *Sigma;
 	double Ai[MAXSTATIONS];
 
@@ -2295,23 +2467,29 @@ void C3DPanelDlg::SetAi(int qrhs)
 		mw += m_pWPolar->m_NXWakePanels;
 		m++;
 	}
-	int pos = 0;
+
 	for (m=0; m<m_pWing->m_NStation; m++)	    m_pWing->m_Ai[m] = Ai[m];
-	pos += m_pWing->m_NStation;
-	if(m_pWing2) {
+	pos = m_pWing->m_NStation;
+
+	if(m_pWing2) 
+	{
 		for (m=0; m<m_pWing2->m_NStation; m++)	m_pWing2->m_Ai[m] = Ai[m+pos];
 		pos += m_pWing2->m_NStation;
 	}
-	if(m_pStab) {
+
+	if(m_pStab) 
+	{
 		for (m=0; m<m_pStab->m_NStation; m++)	m_pStab->m_Ai[m] = Ai[m+pos];
 		pos += m_pStab->m_NStation;
 	}
-	if(m_pFin) {
+
+	if(m_pFin) 
+	{
 		for (m=0; m<m_pFin->m_NStation; m++)	m_pFin->m_Ai[m] = Ai[m+pos];
 	}
 }
 
-
+*/
 /*
 void C3DPanelDlg::RelaxWake()
 {
@@ -2450,68 +2628,66 @@ void C3DPanelDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector
 	// V is the resulting speed
 	//
 
-	V.Set(0.0, 0.0, 0.0);
 
-	//Leading finite vortex contribution
-	r0 = LB - LA;
-	r1 = C  - LA;
-	r2 = C  - LB;
-	Psi = r1*r2;
-	ftmp = Psi.VAbs();
+	int i;
 
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize)
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	R[0].x = LB.x;
+	R[0].y = LB.y;
+	R[0].z = LB.z;
+	R[1].x = TB.x;
+	R[1].y = TB.y;
+	R[1].z = TB.z;
+	R[2].x = TA.x;
+	R[2].y = TA.y;
+	R[2].z = TA.z;
+	R[3].x = LA.x;
+	R[3].y = LA.y;
+	R[3].z = LA.z;
+	R[4].x = LB.x;	
+	R[4].y = LB.y;	
+	R[4].z = LB.z;	
+	
+	for (i=0; i<4; i++)
 	{
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
-	}
+		r0.x = R[i+1].x - R[i].x;
+		r0.y = R[i+1].y - R[i].y;
+		r0.z = R[i+1].z - R[i].z;
+		r1.x = C.x - R[i].x;
+		r1.y = C.y - R[i].y;
+		r1.z = C.z - R[i].z;
+		r2.x = C.x - R[i+1].x;
+		r2.y = C.y - R[i+1].y;
+		r2.z = C.z - R[i+1].z;
+
+		Psi.x = r1.y*r2.z - r1.z*r2.y;
+		Psi.y =-r1.x*r2.z + r1.z*r2.x;
+		Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+		r1v = sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z));
+		r2v = sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		//get the distance of the TestPoint to the panel's side
+		t.x =  r1.y*r0.z - r1.z*r0.y;
+		t.y = -r1.x*r0.z + r1.z*r0.x;
+		t.z =  r1.x*r0.y - r1.y*r0.x;
+
+		if ((r0.x*r0.x+r0.y*r0.y+r0.z*r0.z)>0 && (t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > *m_pCoreSize * *m_pCoreSize)
+		{
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
 		
-	//Trailing finite vortex contribution
-	r0 = TA - TB;
-	r1 = C  - TB;
-	r2 = C  - TA;
-	Psi = r1*r2;
-	ftmp = Psi.VAbs();
-
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize)
-	{
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
-	}
-
-	//Next add 'right' finite contribution
-	r0 = TB - LB;
-	r1 = C  - LB;
-	r2 = C  - TB;
-
-	Psi = r1*r2;
-	ftmp = Psi.VAbs();
-
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize)
-	{
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
-	}
-
-	//Last add 'left' finite contribution
-	r0 = LA - TA;
-	r1 = C  - TA;
-	r2 = C  - LA;
-
-	Psi = r1*r2;
-	ftmp = Psi.VAbs();
-
-	t = r1 * r0;
-	if(t.VAbs()/r0.VAbs() > *m_pCoreSize)
-	{
-		Psi = Psi/ftmp/ftmp;
-		Omega = r0.dot(r1)/r1.VAbs() - r0.dot(r2)/r2.VAbs();
-		V += Psi * Omega/4.0/pi;
+			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/r1v - (r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/r2v;	
+			V.x += Psi.x * Omega/4.0/pi;
+			V.y += Psi.y * Omega/4.0/pi;
+			V.z += Psi.z * Omega/4.0/pi;
+		}
 	}
 }
 

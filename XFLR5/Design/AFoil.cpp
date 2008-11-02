@@ -479,10 +479,12 @@ int CAFoil::ReadData(CStdioFile *pXFile, CFoil *pFoil)
 	
 	int res;
 
-	while (bRead) {
+	while (bRead) 
+	{
 		bRead = pXFile->ReadString(Strong);
 		pos = Strong.Find("#",0);
-		if (bRead && pos<0) {
+		if (bRead && pos<0) 
+		{
 			res = sscanf(Strong, "%lf%lf", &x,&y);
 			if(res ==2){
 				pFoil->x[PointCount] = x;
@@ -538,14 +540,17 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if(m_rDrawRect.PtInRect(point)) m_pChildWnd->SetFocus();
 
-	if(m_bZoomPlus && m_rDrawRect.PtInRect(point)){
+	if(m_bZoomPlus && m_rDrawRect.PtInRect(point))
+	{
 		m_ZoomRect.left   = point.x;
 		m_ZoomRect.top    = point.y;
 		m_ZoomRect.right  = point.x;
 		m_ZoomRect.bottom = point.y;
 	}
-	else if(!m_bZoomPlus){
-		if(m_bSF){
+	else if(!m_bZoomPlus)
+	{
+		if(m_bSF)
+		{
 			if (nFlags & MK_SHIFT) { //shift --> removes the point
 				TakePicture();
 				StorePicture();
@@ -815,7 +820,8 @@ void CAFoil::OnMouseMove(UINT nFlags, CPoint point)
 	SHORT shX = GetKeyState('X');
 	SHORT shY = GetKeyState('Y');
 
-	if(GetFocus()!=m_pChildWnd) m_pChildWnd->SetFocus();
+	if(GetFocus()!=m_pChildWnd) 
+		m_pChildWnd->SetFocus();
 
 	if ((sh1 & 0x8000)||(sh2 & 0x8000)) bCtrl =true;
 
@@ -1077,7 +1083,7 @@ void CAFoil::OnExportSplines()
 		FoilName.Replace("/", " ");
 		CFileDialog XFileDlg(false, "dat", FoilName, NULL,
 			_T("Labeled Format (.dat)|*.dat|"));
-		if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetFileName();
+		if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
 
 		CFileFind FileFinder; 
 		
@@ -1698,10 +1704,11 @@ void CAFoil::OnAddPoint()
 
 void CAFoil::TakePicture()
 {
+	int i;
 	m_bStored = false;
 	if(m_bSF){
 		m_TmpPic.m_iExt = m_pSF->m_Extrados.m_iCtrlPoints;
-		for (int i=0; i<=m_TmpPic.m_iExt; i++){
+		for (i=0; i<=m_TmpPic.m_iExt; i++){
 			m_TmpPic.xExt[i] = m_pSF->m_Extrados.m_Input[i].x;
 			m_TmpPic.yExt[i] = m_pSF->m_Extrados.m_Input[i].y;
 		}
@@ -1713,7 +1720,7 @@ void CAFoil::TakePicture()
 	}
 	else{
 		m_TmpPic.m_iExt = m_pPF->m_Extrados.m_iPoints;
-		for (int i=0; i<=m_TmpPic.m_iExt; i++){
+		for (i=0; i<=m_TmpPic.m_iExt; i++){
 			m_TmpPic.xExt[i] = m_pPF->m_Extrados.m_ctrlPoint[i].x;
 			m_TmpPic.yExt[i] = m_pPF->m_Extrados.m_ctrlPoint[i].y;
 		}
@@ -1751,13 +1758,14 @@ void CAFoil::StorePicture()
 void CAFoil::SetPicture()
 {
 	double gap;
+	int i;
 
 	if(m_bSF)
 	{
 		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
 		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
 
-		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
+		for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
 		{
 			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
 			m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_StackPos].yExt[i];
@@ -1784,7 +1792,7 @@ void CAFoil::SetPicture()
 		 m_pPF->m_Intrados.m_RearPoint.x = m_UndoPic[m_StackPos].IntRearPt.x;
 		 m_pPF->m_Intrados.m_RearPoint.y = m_UndoPic[m_StackPos].IntRearPt.y;
 
-		for (int i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++){
+		for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++){
 			m_pPF->m_Extrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xExt[i];
 			m_pPF->m_Extrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yExt[i];
 		}
@@ -1954,7 +1962,7 @@ void CAFoil::OnExportFoil()
 	CFileDialog XFileDlg(false, "dat", FileName, OFN_OVERWRITEPROMPT,
 		_T("Labeled Format (.dat)|*.dat|VisuAero Format (.dat)|*.dat|"));
 	if(IDOK==XFileDlg.DoModal()) {
-		DestFileName = XFileDlg.GetFileName();
+		DestFileName = XFileDlg.GetPathName();
 		int FilterIndex = XFileDlg.m_ofn.nFilterIndex;
 		CFoil *pFoil = GetFoil(pCurFoil->m_FoilName);
 		if(pFoil) {
@@ -2028,7 +2036,7 @@ void CAFoil::PFSave()
 		CFileDialog XFileDlg(false, "cfl", NULL, NULL,
 			_T("Curve file (.cfl)|*.cfl|"));
 		if(IDOK==XFileDlg.DoModal()){
-			SFLName = XFileDlg.GetFileName();
+			SFLName = XFileDlg.GetPathName();
 
 			CFileFind FileFinder; 
 			if(!FileFinder.FindFile(SFLName)) {// file does not exist : OK to create and export
@@ -2073,7 +2081,7 @@ void CAFoil::SFSave()
 		CFileDialog XFileDlg(false, "sfl", NULL, NULL,
 			_T("Spline file (.sfl)|*.sfl|"));
 		if(IDOK==XFileDlg.DoModal()){
-			SFLName = XFileDlg.GetFileName();
+			SFLName = XFileDlg.GetPathName();
 
 			CFileFind FileFinder; 
 			if(!FileFinder.FindFile(SFLName)) {// file does not exist : OK to create and export
@@ -2611,7 +2619,8 @@ bool CAFoil::LoadSettings(CArchive& ar)
 
 
 	}
-	catch (CArchiveException *ex){
+	catch (CArchiveException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -3174,7 +3183,8 @@ void CAFoil::OnInterpolate()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 
 
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
@@ -3182,20 +3192,24 @@ void CAFoil::OnInterpolate()
 		pNewFoil->m_nFoilStyle = PS_SOLID;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = dlg.m_FoilName;
-		if(pFrame->SetModFoil(pNewFoil)){
+		pNewFoil->m_FoilName = dlg.m_NewFoilName;
+
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
 		}
 	}
 
-	else{
+	else
+	{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pCurFoil);
 		m_pXFoil->m_FoilName ="";
@@ -3258,7 +3272,8 @@ void CAFoil::OnEditCoord()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pChildView  = m_pChildWnd;
 	
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
@@ -3267,18 +3282,21 @@ void CAFoil::OnEditCoord()
 		pNewFoil->m_nFoilStyle = PS_SOLID;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_iHighLight = -1;
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
 		}
 	}
-	else{
+	else
+	{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pCurFoil);
 		m_pXFoil->m_FoilName ="";
@@ -3287,7 +3305,6 @@ void CAFoil::OnEditCoord()
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
-
 
 
 void CAFoil::OnGeom() 
@@ -3313,7 +3330,8 @@ void CAFoil::OnGeom()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pChildView  = m_pChildWnd;
 	
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
@@ -3321,19 +3339,22 @@ void CAFoil::OnGeom()
 		pNewFoil->m_nFoilStyle = PS_SOLID;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
 		}
 	}
 
-	else{
+	else
+	{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pCurFoil);
 		m_pXFoil->m_FoilName ="";
@@ -3362,7 +3383,8 @@ void CAFoil::OnNacaFoils()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pChildView  = m_pChildWnd;
 	
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		//then duplicate the buffer foil and add it
 		CString str;
 
@@ -3379,12 +3401,14 @@ void CAFoil::OnNacaFoils()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 		pNewFoil->m_FoilName   = str;
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
@@ -3690,14 +3714,16 @@ void CAFoil::OnSetFlap()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pChildView  = m_pChildWnd;
 		
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pFrame->GetColor(0);
 		pNewFoil->m_nFoilStyle = PS_SOLID;
 		pNewFoil->m_nFoilWidth = 1;
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
@@ -3707,9 +3733,11 @@ void CAFoil::OnSetFlap()
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
 		}
+		SetCurFoil(pNewFoil);
 	}
 
-	else{
+	else
+	{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pCurFoil);
 		m_pXFoil->m_FoilName ="";

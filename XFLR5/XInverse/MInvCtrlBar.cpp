@@ -108,8 +108,8 @@ void CMInvCtrlBar::OnMarkSegment()
 	pXInv->m_tmpPos  = -1;
 	pXInv->m_bMark   = true;
 	pXInv->m_bMarked = false;
-	pXInv->m_bGetPos = true;
 	pXInv->m_bSpline = false;
+	pXInv->m_bGetPos = true;
 	pXInv->m_nPos    = 0;
 
 	m_ctrlNewSpline.SetCheck(0);

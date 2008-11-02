@@ -39,6 +39,7 @@
 
 class CMainFrame : public CFrameWnd
 {
+	friend class CXBody;
 	friend class CXFLR5App;
 	friend class CLLTDlg;
 	friend class CBatchDlg;
@@ -231,20 +232,6 @@ private:
 	CFoil* GetFoil(CString strFoilName);
 	CFoil* ReadFoilFile(CString FileName, bool bKeepExistingFoil = false);
 	CFoil* SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil = false);
-
-	void * GetPlrVariable(CPolar *pPolar, int iVar);
-	double GetPlrPoint(CFoil *pFoil, double Re, double Alpha, 
-						   int PlrVar, bool &bOutRe, bool &bError);
-	double GetCl(CFoil *pFoil0, CFoil *pFoil1, 
-					 double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-	double GetCm(CFoil *pFoil0, CFoil *pFoil1,
-					 double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-	double GetCm0(CFoil *pFoil0, CFoil *pFoil1,
-					  double Re, double Tau, bool &bOutRe, bool &bError);
-	double VLMGetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1,
-						 double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
-	double VLMGetPlrPoint(CFoil *pFoil, double Re,
-						  double Cl, int PlrVar, bool &bOutRe, bool &bError);
 
 	double pi;
 	double m_mtoUnit;

@@ -285,6 +285,12 @@ bool CControlAnalysis::ReadData()
 			return false;
 		}
 	}
+
+	for(i=m_nControls; i<4*MAXCONTROLS; i++)
+	{
+		m_bActiveControl[i]=false;
+	}
+
 	m_MinControl[0] /= pFrame->m_mtoUnit;
 	m_MaxControl[0] /= pFrame->m_mtoUnit;
 	return true;
@@ -500,6 +506,7 @@ void CControlAnalysis::FillControlList()
 	{
 		m_ctrlViscous.SetCheck(false);
 		m_ctrlViscous.EnableWindow(false);
+		m_bViscous = false;
 	}
 	else
 	{
@@ -534,8 +541,6 @@ void CControlAnalysis::SetWPolarName()
 		m_WPolarName += str;
 	}
 
-	nCtrl =0;
-
 	if(m_bActiveControl[0])
 	{
 		GetLengthUnit(str, pFrame->m_LengthUnit);
@@ -549,12 +554,17 @@ void CControlAnalysis::SetWPolarName()
 		m_WPolarName += strong + str;
 	}
 
-	if(m_bActiveControl[1] && m_pPlane)
+	nCtrl = 1;//CG control is always present
+
+	if(m_pPlane)
 	{
-		strong.Format("-W(%.1f°/%.1f°)", m_MinControl[1], m_MaxControl[1]);
-		m_WPolarName += strong;
+		if(m_bActiveControl[1] && m_pPlane)
+		{
+			strong.Format("-W(%.1f°/%.1f°)", m_MinControl[1], m_MaxControl[1]);
+			m_WPolarName += strong;
+		}
+		nCtrl++;
 	}
-	nCtrl = 2;
 
 	if(m_pPlane && m_pStab)
 	{

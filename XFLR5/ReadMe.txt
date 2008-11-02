@@ -7,7 +7,7 @@
                      A tool for the design of Airfoils, Wings and Planes
                           operating at low Reynolds numbers
 
-                                Copyright (C) 2003-2007 
+                                Copyright (C) 2003-2008
 
                                      André Deperrois
 
@@ -49,8 +49,36 @@ Licence :
                        **************************
 
 TODO :
-	Body : option for translation
+	Rotate 3D wake panels by -a.o.a ?
+	Set Gauss as global
 
+
+v4.11 November 2nd, 2008
+	- Changed the twist/washout application method ; used to be set around y-axis irrespective of dihedral;
+	  is now set around the panel's quarter chord, once the panel has been rotated by the dihedral angle
+	- Improved the foil flap setting algorithm, which generated incorrect geometries in some special cases
+	- Corrected a 1/2 missing factor in the output of non converged LLT oppoints - no effect on results
+	- 3D panel with tilted geometry : corrected wake tilting
+	- Improved streamline display to reduce singularity effects, essentially by enforcing Kutta's condition
+	- Changed the algorithm for induced drag calculation in 3D panel analysis - slight difference in results from v4.10
+	- Solved the multiple storing issue of identical Opps
+	- Corrected a bug which could occasionnaly prevent from reading the saved settings
+	- Cleaned up the code
+	- Compiled with MSVC 2008 instead of .net
+
+	
+v4.10 September 6th, 2008
+	- Corrected a minor bug in Control Polars - no influence on results
+
+v4.09 September3rd, 2008 (limited release only)
+	- Corrected factor 2.0 in excess in induced angle in VLM analysis
+	- Corrected mix up in plane controls when performing a control analysis with multiple flaps
+	- Added extra decimals in AVL geometry export
+	- Corrected downwash display for planes
+	- Corrected factor 2.0 missing in MAC span position
+	- Corrected bug when running a single point calculation for 3D panel method - error on results for symetric calculations
+	- Refined the Lift calculation in Type 2 Polars; was missing a cos(a.o.a)
+	- Made a few cosmetic improvements
 	
 v4.08 July 20th, 2008
 	- Corrected the bug which caused to ignore weight and speed parameters in control polars

@@ -53,7 +53,8 @@ BEGIN_MESSAGE_MAP(CAFoilCtrlBar, CInitDialogBar)
 	ON_WM_CONTEXTMENU()
 	ON_WM_LBUTTONDBLCLK()
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_FOILLIST, OnLvnItemchangedFoillist)
-	ON_NOTIFY(NM_CLICK, IDC_FOILLIST, OnNMClickFoilList)
+
+
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -197,6 +198,7 @@ BOOL CAFoilCtrlBar::OnInitDialogBar()
 	m_ctrlFoilList.InsertColumn(11,"LE YHinge",LVCFMT_RIGHT,60);
 
 	m_ctrlFoilList.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
+	m_ctrlFoilList.ModifyStyle(NULL, (LVS_REPORT | LVS_SHOWSELALWAYS), 0);
 	m_ctrlFoilList.SetFocus();
 
 	return TRUE; 
@@ -218,16 +220,19 @@ BOOL CAFoilCtrlBar::PreTranslateMessage(MSG* pMsg)
 	CWnd* pWnd = GetFocus();
 
 
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE){
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
 		CWnd* pWnd = GetFocus();
 		if (pWnd == this)	ShowWindow(SW_HIDE);
 		else SetFocus();
 	}
-	else if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F4){
+	else if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F4)
+	{
 		pADlg->OnStoreFoil();
 		return true;
 	}
-	else if(pMsg->message == WM_MOUSEWHEEL && pWnd==pADlg->m_pChildWnd){
+	else if(pMsg->message == WM_MOUSEWHEEL && pWnd==pADlg->m_pChildWnd)
+	{
 
 		CPoint pt((short) LOWORD(pMsg->lParam),(short) HIWORD(pMsg->lParam));
 
@@ -240,7 +245,8 @@ BOOL CAFoilCtrlBar::PreTranslateMessage(MSG* pMsg)
 	SHORT sh2 = GetKeyState(VK_RCONTROL);
 
 	if (pMsg->wParam == 'Z' && 
-			( (sh1 & 0x8000)||(sh2 & 0x8000) )) { 
+			( (sh1 & 0x8000)||(sh2 & 0x8000) )) 
+	{ 
 		pADlg->OnUndo();
 		return true;
 	} 
@@ -291,12 +297,15 @@ void CAFoilCtrlBar::SetSplineData()
 void CAFoilCtrlBar::SelectFoil(CFoil* pFoil)
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	int i;
 	if(!pFoil) pFoil = m_pRefFoil;
 
-	if(pFoil){
+	if(pFoil)
+	{
 		m_pRefFoil = pFoil;
 		SetFoil();
-		for(int i=0; i<pADlg->m_poaFoil->GetSize();i++){
+		for(i=0; i<pADlg->m_poaFoil->GetSize();i++)
+		{
 			if (pFoil == pADlg->m_poaFoil->GetAt(i)){
 				m_ctrlFoilList.EnsureVisible(i+1,FALSE);
 				m_ctrlFoilList.SetItemState(i+1, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
@@ -304,13 +313,16 @@ void CAFoilCtrlBar::SelectFoil(CFoil* pFoil)
 			}
 		}
 	}
-	else{
-		if(pADlg->m_poaFoil->GetSize()){
+	else
+	{
+		if(pADlg->m_poaFoil->GetSize())
+		{
 			m_pRefFoil = (CFoil*)pADlg->m_poaFoil->GetAt(0);
 			SetFoil(m_pRefFoil);
 			m_ctrlFoilList.SetItemState(1, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 		}
-		else{
+		else
+		{
 			SetFoil();
 			m_ctrlFoilList.SetItemState(0, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 
@@ -430,11 +442,13 @@ void CAFoilCtrlBar::SetParams(CFoil *pFoil)
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
 
 //	ReSize();
-	if(pFoil) {
+	if(pFoil) 
+	{
 		m_pRefFoil=pFoil;
 		SetFoil(m_pRefFoil);
 	}
-	else {
+	else 
+	{
 //		m_ctrlFoilList.SetCurSel(0);
 		SetSplineData();
 	}
@@ -450,7 +464,8 @@ BOOL CAFoilCtrlBar::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 CFoil* CAFoilCtrlBar::GetFoil()
 {
-	if(m_FoilSelection!=0){
+	if(m_FoilSelection!=0)
+	{
 		return m_pRefFoil;
 	}
 	return NULL;
@@ -462,8 +477,10 @@ void CAFoilCtrlBar::OnFoilColor()
 
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
 
-	if(m_FoilSelection==0){
-		if(pADlg->m_bSF){
+	if(m_FoilSelection==0)
+	{
+		if(pADlg->m_bSF)
+		{
 			COLORREF color = m_pSF->m_FoilColor;
 			int style      = m_pSF->m_FoilStyle;
 			int width      = m_pSF->m_FoilWidth;
@@ -695,61 +712,6 @@ void CAFoilCtrlBar::ReSizeCtrls()
 	}
 }
 
-void CAFoilCtrlBar::OnLButtonDown(UINT nFlags, CPoint point)
-{
-	//override and disable window handler to prevent wild resize
-//	CInitDialogBar::OnLButtonDown(nFlags, point);
-}
-
-
-void CAFoilCtrlBar::OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
-	{
-		*pResult =0;
-		return ;
-	}
-	m_FoilSelection = pNMListView->iItem;
-	if(m_FoilSelection==0){
-		SetSplineData();
-	}
-	else {
-		CFoil *pFoil;
-		CString FoilName;
-		FoilName = m_ctrlFoilList.GetItemText(pNMListView->iItem, 0);
-		pFoil = pADlg->GetFoil(FoilName);
-		SetFoil(pFoil);
-	}
-
-	*pResult = 0;
-}
-
-void CAFoilCtrlBar::OnNMClickFoilList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
-	{
-		*pResult =0;
-		return ;
-	}
-	m_FoilSelection = pNMListView->iItem;
-	if(m_FoilSelection==0){
-		SetSplineData();
-	}
-	else {
-		CFoil *pFoil;
-		CString FoilName;
-		FoilName = m_ctrlFoilList.GetItemText(pNMListView->iItem, 0);
-		pFoil = pADlg->GetFoil(FoilName);
-		SetFoil(pFoil);
-	}
-
-	*pResult = 0;
-}
-
 
 
 void CAFoilCtrlBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
@@ -758,10 +720,12 @@ void CAFoilCtrlBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
 	CPoint pt;
 	GetCursorPos(&pt);
 	CMenu menu;
-	if (menu.LoadMenu(IDR_CTXAFOILCTRLMENU)){
+	if (menu.LoadMenu(IDR_CTXAFOILCTRLMENU))
+	{
 		POSITION pos = m_ctrlFoilList.GetFirstSelectedItemPosition();
 		m_FoilSelection = m_ctrlFoilList.GetNextSelectedItem(pos);
-		if(m_FoilSelection>0 && m_FoilSelection<=pADlg->m_poaFoil->GetSize()){
+		if(m_FoilSelection>0 && m_FoilSelection<=pADlg->m_poaFoil->GetSize())
+		{
 			m_pRefFoil = (CFoil*)pADlg->m_poaFoil->GetAt(m_FoilSelection-1);
 			SetFoil();
 
@@ -796,4 +760,40 @@ void CAFoilCtrlBar::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	//override
 //	CInitDialogBar::OnLButtonDblClk(nFlags, point);
+}
+
+
+void CAFoilCtrlBar::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	//override and disable window handler to prevent wild resize
+//	CInitDialogBar::OnLButtonDown(nFlags, point);
+}
+
+
+void CAFoilCtrlBar::OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	m_ctrlFoilList.SetFocus();
+
+	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
+	{
+		*pResult =0;
+		return ;
+	}
+	m_FoilSelection = pNMListView->iItem;
+	if(m_FoilSelection==0)
+	{
+		SetSplineData();
+	}
+	else 
+	{
+		CFoil *pFoil;
+		CString FoilName;
+		FoilName = m_ctrlFoilList.GetItemText(pNMListView->iItem, 0);
+		pFoil = pADlg->GetFoil(FoilName);
+		SetFoil(pFoil);
+	}
+
+	*pResult = 0;
 }

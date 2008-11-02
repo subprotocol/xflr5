@@ -107,8 +107,8 @@ public:
 	int m_nControls;
 	int m_Type;
 
-	double m_MinControl[100], m_MaxControl[100];
-	bool m_bActiveControl[100];
+	double m_MinControl[4*MAXCONTROLS], m_MaxControl[4*MAXCONTROLS];//4 wings altogether, MAXCONTROLS on each
+	bool m_bActiveControl[4*MAXCONTROLS];
 	bool m_bViscous;
 	double m_QInf;
 	double m_Weight;

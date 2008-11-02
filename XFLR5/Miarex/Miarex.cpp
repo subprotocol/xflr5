@@ -41,7 +41,6 @@
 #include "../main/MainFrm.h"
 #include "ListPlrDlg.h"
 #include "CpScaleDlg.h"
-#include "Quaternion.h"
 #include "WAdvDlg.h"
 #include "WingDlg.h"
 #include "PlaneDlg.h"
@@ -50,8 +49,6 @@
 #include "WingScaleDlg.h"
 #include "LLTThread.h"
 #include "W3DBar.h"
-#include <math.h>
-#include <gl\glaux.h>
 #include ".\miarex.h"
 
 
@@ -98,10 +95,10 @@
 #define MESHPANELS			1272
 #define MESHBACK			1273
 
-
 #define WINGLEGEND			1276
 #define WOPPLEGEND			1277
-#define WOPPCPLEGEND		1278
+#define WOPPCPLEGENDCLR		1278
+#define WOPPCPLEGENDTXT		1279
 
 #define WINGWAKEPANELS		1283
 
@@ -219,7 +216,10 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_ptOffset.x = 0;
 	m_ptOffset.y = 0;
 
+	m_InducedDragPoint = 0;
+
 	CPanel::s_pNode = m_Node;
+	CWing::s_pLLTDlg     = &m_LLTDlg;    //pointer to the VLM analysis dialog class
 	CWing::s_pVLMDlg     = &m_VLMDlg;    //pointer to the VLM analysis dialog class
 	CWing::s_p3DPanelDlg = &m_PanelDlg;  //pointer to the 3DPanel analysis dialog class
 
@@ -260,7 +260,7 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_bVLMPanels         = false;
 	m_bAxes              = true;
 	m_bglLight           = true;
-	m_b3DVLMCl           = false;
+	m_b3DCp           = false;
 	m_b3DDownwash        = true;
 	m_bXTop              = true;
 	m_bXBot              = true;
@@ -516,8 +516,20 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 
 CMiarex::~CMiarex()
 {
-	//destroy evrything
-	if(glIsList(PANELCP)) {
+}
+
+void CMiarex::GLDestroyLists()
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	CDC *pDC = NULL;
+	pDC = pChildView->GetDC();
+
+	if(!pDC) 		return;
+
+    wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
+
+
+	if(glIsList(PANELCP)==GL_TRUE) {
 		glDeleteLists(PANELCP,1);
 		m_GLList-=1;
 	}	
@@ -554,22 +566,6 @@ CMiarex::~CMiarex()
 		m_GLList -=1;
 	}
 
-	if(glIsList(VLMWINGTOPTRANS)) {
-		glDeleteLists(VLMWINGTOPTRANS,2);
-		m_GLList-=2;
-	}	
-	if(glIsList(VLMWING2TOPTRANS)) {
-		glDeleteLists(VLMWING2TOPTRANS,2);
-		m_GLList-=2;
-	}	
-	if(glIsList(VLMSTABTOPTRANS)) {
-		glDeleteLists(VLMSTABTOPTRANS,2);
-		m_GLList-=2;
-	}	
-	if(glIsList(VLMFINTOPTRANS)) {
-		glDeleteLists(VLMFINTOPTRANS,2);
-		m_GLList-=2;
-	}	
 	if(glIsList(VLMWINGWASH)) {
 		glDeleteLists(VLMWINGWASH,1);
 		m_GLList--;
@@ -594,6 +590,18 @@ CMiarex::~CMiarex()
 		glDeleteLists(VLMVORTICES,1);
 		m_GLList-=1;
 	}	
+
+
+	if(glIsList(VLMSTREAMLINES)) {
+		glDeleteLists(VLMSTREAMLINES,1);
+		m_GLList-=1;
+	}
+	if(glIsList(SURFACESPEEDS)) {
+		glDeleteLists(SURFACESPEEDS,1);
+		m_GLList-=1;
+	}
+
+
 	if(glIsList(WINGSURFACES)) {
 		glDeleteLists(WINGSURFACES,2);
 		m_GLList-=2;
@@ -614,37 +622,66 @@ CMiarex::~CMiarex()
 		glDeleteLists(MESHPANELS,2);
 		m_GLList-=2;
 	}
+
+
+	if(glIsList(WINGLEGEND)) {
+		glDeleteLists(WINGLEGEND,1);
+		m_GLList-=1;
+	}
+	if(glIsList(WOPPLEGEND)) {
+		glDeleteLists(WOPPLEGEND,3);
+		m_GLList-=3;
+	}
+
 	if(glIsList(WINGWAKEPANELS)) {
 		glDeleteLists(WINGWAKEPANELS,1);
 		m_GLList-=1;
 	}
-	if(glIsList(VLMSTREAMLINES)) {
-		glDeleteLists(VLMSTREAMLINES,1);
-		m_GLList-=1;
-	}
-	if(glIsList(SURFACESPEEDS)) {
-		glDeleteLists(SURFACESPEEDS,1);
-		m_GLList-=1;
-	}
-	if(glIsList(WINGLEGEND)) {
-		glDeleteLists(WINGLEGEND,3);
-		m_GLList-=3;
-	}
+
+
+	if(glIsList(VLMWINGTOPTRANS)) {
+		glDeleteLists(VLMWINGTOPTRANS,2);
+		m_GLList-=2;
+	}	
+	if(glIsList(VLMWING2TOPTRANS)) {
+		glDeleteLists(VLMWING2TOPTRANS,2);
+		m_GLList-=2;
+	}	
+	if(glIsList(VLMSTABTOPTRANS)) {
+		glDeleteLists(VLMSTABTOPTRANS,2);
+		m_GLList-=2;
+	}	
+	if(glIsList(VLMFINTOPTRANS)) {
+		glDeleteLists(VLMFINTOPTRANS,2);
+		m_GLList-=2;
+	}	
+
 	if(glIsList(BODYGEOM)) {
-		glDeleteLists(BODYGEOM,9);
-		m_GLList-=9;
+		glDeleteLists(BODYGEOM,2);
+		m_GLList-=2;
 	}
+	if(glIsList(BODYAXIALLINES)) {
+		glDeleteLists(BODYAXIALLINES,7);
+		m_GLList-=7;
+	}
+
 	if(glIsList(BODYMESHPANELS)) 
 	{
 		glDeleteLists(BODYMESHPANELS,2);
 		m_GLList -=2;
 	}
-	if(glIsList(ARCBALL)) {
-		glDeleteLists(ARCBALL,2);
-		m_GLList-=2;
-	}
-}
 
+
+	if(glIsList(ARCBALL)) {
+		glDeleteLists(ARCBALL,1);
+		m_GLList-=1;
+	}
+	if(glIsList(ARCPOINT)) {
+		glDeleteLists(ARCPOINT,1);
+		m_GLList-=1;
+	}
+    wglMakeCurrent(pDC->m_hDC, NULL);
+}
 
 
 BEGIN_MESSAGE_MAP(CMiarex, CWnd)
@@ -767,12 +804,6 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 /////////////////////////////////////////////////////////////////////////////
 // CMiarex message handlers
 
-
-
-void CMiarex::OnExit() 
-{
-	PostMessage(WM_QUIT);	
-}
 
 
 BOOL CMiarex::OnEraseBkgnd(CDC* pDC) 
@@ -1000,7 +1031,8 @@ CWPolar* CMiarex::GetWPolar(CString WPolarName)
 	if(m_pCurPlane) UFOName = m_pCurPlane->m_PlaneName;
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 	else return NULL;
-  	for (i=0; i<m_poaWPolar->GetSize(); i++){
+  	for (i=0; i<m_poaWPolar->GetSize(); i++)
+	{
  		pWPolar = (CWPolar*) m_poaWPolar->GetAt(i);
  		if (pWPolar->m_UFOName == UFOName &&
 			pWPolar->m_PlrName == WPolarName) return pWPolar;
@@ -1082,36 +1114,12 @@ void CMiarex::SetWPlr(bool bCurrent, CString WPlrName)
 	
 	InitializePanels();
 
-/*	CVector H(0.0, 1.0, 0.0);
-	Quaternion Quat;
-	Quat.Set(45.0, H);
-
-	if(m_pCurPlane && m_pCurWPolar)
+	//set sideslip
+	CVector RefPoint(0.0, 0.0, 0.0);
+	if(m_pCurWPolar && abs(m_pCurWPolar->m_Beta)>0.001)
 	{
-		//wing tilt 
-		for(j=0; j<m_pCurWing->m_MatSize; j++)
-		{
-			(m_pCurWing->m_pPanel+j)->Rotate(m_pCurPlane->m_LEWing, Quat);
-		}
-		//Stab tilt 
-		for(j=0; j<m_pCurStab->m_MatSize; j++)
-		{
-			(m_pCurStab->m_pPanel+j)->Rotate(m_pCurPlane->m_LEStab, Quat);
-		}
+		RotateGeomZ(m_pCurWPolar->m_Beta, RefPoint);
 	}
-
-
-	if(m_pCurWing && m_pCurWing->m_nFlaps>0)
-	{
-		RotateFlap(m_pCurWing, 0, -45.0, m_Panel, m_Node);
-		RotateFlap(m_pCurWing, 1, -45.0, m_Panel, m_Node);
-		if(m_pCurStab)
-		{
-			RotateFlap(m_pCurStab, 0, 45, m_Panel, m_Node);
-			RotateFlap(m_pCurStab, 1, 45, m_Panel, m_Node);
-		}
-	}*/
-
 
 	if(m_pCurWPolar && m_pCurWPolar->m_UFOName==UFOName)
 	{
@@ -1132,7 +1140,7 @@ void CMiarex::SetWPlr(bool bCurrent, CString WPlrName)
 			SpanPos = 0;
 			for (j=0; j<m_pCurWing->m_NSurfaces; j++)	NStation += m_pCurWing->m_Surface[j].m_NYPanels; 
 
-			for (j=(int)m_pCurWing->m_NSurfaces/2; j<m_pCurWing->m_NSurfaces; j++)
+			for (j=(int)(m_pCurWing->m_NSurfaces/2); j<m_pCurWing->m_NSurfaces; j++)
 			{
 				for(k=0; k<m_pCurWing->m_Surface[j].m_NYPanels; k++)
 				{
@@ -1361,7 +1369,6 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 		pNewPoint->m_Type                = m_pCurWPolar->m_Type;
 		pNewPoint->m_Weight              = m_pCurWPolar->m_Weight;
 
-
 		double Cb =0.0;
 
 		if(m_pCurWPolar->m_AnalysisType==1)
@@ -1371,6 +1378,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_NVLMPanels          = m_pCurWing->m_MatSize;
 			pNewPoint->m_bOut                = m_pCurWing->m_bWingOut;
 			pNewPoint->m_CL                  = m_pCurWing->m_CL;
+//			pNewPoint->m_CY                  = m_pCurWing->m_CY;
+//			pNewPoint->m_CX                  = m_pCurWing->m_CX;
 			pNewPoint->m_InducedDrag         = m_pCurWing->m_InducedDrag;
 
 			pNewPoint->m_GCm                 = m_pCurWing->m_GCm;
@@ -1413,6 +1422,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_NVLMPanels          = m_VLMDlg.m_MatSize;
 			pNewPoint->m_bOut                = m_VLMDlg.m_bPointOut;
 			pNewPoint->m_CL                  = m_VLMDlg.m_CL;
+			pNewPoint->m_CY                  = m_VLMDlg.m_CY;
+			pNewPoint->m_CX                  = m_VLMDlg.m_CX;
 			pNewPoint->m_InducedDrag         = m_VLMDlg.m_InducedDrag;
 			pNewPoint->m_ViscousDrag         = m_VLMDlg.m_ViscousDrag;
 
@@ -1424,6 +1435,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_XCP                 = m_VLMDlg.m_XCP;
 			pNewPoint->m_YCP                 = m_VLMDlg.m_YCP;
+
+			pNewPoint->m_Beta                = m_pCurWPolar->m_Beta;
 
 			if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6) pNewPoint->m_Ctrl = m_VLMDlg.m_Ctrl;
 			else                                                   pNewPoint->m_Ctrl = 0.0;
@@ -1475,6 +1488,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_NVLMPanels          = m_PanelDlg.m_MatSize;
 			pNewPoint->m_bOut                = m_PanelDlg.m_bPointOut;
 			pNewPoint->m_CL                  = m_PanelDlg.m_CL;
+			pNewPoint->m_CY                  = m_PanelDlg.m_CY;
+			pNewPoint->m_CX                  = m_PanelDlg.m_CX;
 			pNewPoint->m_InducedDrag         = m_PanelDlg.m_InducedDrag;
 			pNewPoint->m_ViscousDrag         = m_PanelDlg.m_ViscousDrag;
 
@@ -1486,6 +1501,9 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_XCP                 = m_PanelDlg.m_XCP;
 			pNewPoint->m_YCP                 = m_PanelDlg.m_YCP;
+
+			pNewPoint->m_Beta                = m_pCurWPolar->m_Beta;
+
 			for (l=0; l<m_pCurWing->m_NStation; l++)
 			{
 				pNewPoint->m_SpanPos[l]   = m_pCurWing->m_SpanPos[l];
@@ -1548,8 +1566,10 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 	bool bIsInserted = false;
 
 	// add the WOpPoint to the WOpPoint Array for the current WingName
-	if(m_bStoreWOpp){
-		for (i=0; i<m_poaWOpp->GetSize(); i++){
+	if(m_bStoreWOpp)
+	{
+		for (i=0; i<m_poaWOpp->GetSize(); i++)
+		{
 			pWOpp = (CWOpp*)m_poaWOpp->GetAt(i);
 			if (pNewPoint->m_WingName == pWOpp->m_WingName)
 			{
@@ -1572,7 +1592,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 							bIsInserted = true;
 							i = (int)m_poaWOpp->GetSize();// to break
 						}
-						else if (pNewPoint->m_Alpha > pWOpp->m_Alpha){
+						else if (pNewPoint->m_Alpha > pWOpp->m_Alpha)
+						{
 							//insert point
 							m_poaWOpp->InsertAt(i, pNewPoint);
 							bIsInserted = true;
@@ -1596,7 +1617,8 @@ void CMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 							bIsInserted = true;
 							i = (int)m_poaWOpp->GetSize();// to break
 						}
-						else if (pNewPoint->m_QInf > pWOpp->m_QInf){
+						else if (pNewPoint->m_QInf > pWOpp->m_QInf)
+						{
 							//insert point
 							m_poaWOpp->InsertAt(i, pNewPoint);
 							bIsInserted = true;
@@ -1911,7 +1933,8 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 	LOGFONT TempFont;
 	memcpy(&TempFont, &pChildView->m_WndLogFont,sizeof(LOGFONT));
 
-	if(bIsPrinting) {
+	if(bIsPrinting) 
+	{
 		TempFont.lfHeight = TempFont.lfHeight*30;
 		LegendSize = 1500;
 		LegendWidth = 9000;
@@ -1931,7 +1954,8 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 	CWOpp * pWOpp = NULL;
 	CPOpp *pPOpp = NULL;
 
-	for (i=0; i<m_poaWOpp->GetSize(); i++){
+	for (i=0; i<m_poaWOpp->GetSize(); i++)
+	{
 		bFound = false;
 		pWOpp = (CWOpp*)m_poaWOpp->GetAt(i);
 		for (j=0; j<str.GetSize(); j++){
@@ -1944,10 +1968,12 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 	}
 	int nWings= (int)str.GetSize();
 
-	for (i=0; i<m_poaPOpp->GetSize(); i++){
+	for (i=0; i<m_poaPOpp->GetSize(); i++)
+	{
 		bFound = false;
 		pPOpp = (CPOpp*)m_poaPOpp->GetAt(i);
-		for (j=0; j<str.GetSize(); j++){
+		for (j=0; j<str.GetSize(); j++)
+		{
 			if (pPOpp->m_PlaneName == str.GetAt(j))
 					bFound = true;
 		}
@@ -1960,7 +1986,8 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 	pDC->SetTextAlign(TA_LEFT);
 	pDC->SetBkMode(TRANSPARENT);
 
-	if(IsBlackAndWhite()){
+	if(IsBlackAndWhite())
+	{
 		pDC->SetTextColor(0);
 	}
 	else{
@@ -1997,17 +2024,21 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 					place.y + (int)(1.*ypos*ny));
 		pDC->LineTo(place.x + (int)(2.5*LegendSize),
 					place.y + (int)(1.*ypos*ny));
-		if(m_pCurWOpp->m_bShowPoints){
+		if(m_pCurWOpp->m_bShowPoints)
+		{
 			x1 = place.x + (int)(2.0*LegendSize);
 			if(!bIsPrinting)
 				pDC->Rectangle(x1-2, place.y + (int)(1.*ypos*ny)-2,
 							   x1+2, place.y + (int)(1.*ypos*ny)+2);
-			else{
+			else
+			{
 				CBrush PrintBrush;
-				if(IsBlackAndWhite()){
+				if(IsBlackAndWhite())
+				{
 					PrintBrush.CreateSolidBrush(RGB(255,255,255));
 				}
-				else{
+				else
+				{
 					if(GetWindowBk()) PrintBrush.CreateSolidBrush(pChildView->m_crBackColor);
 					else PrintBrush.CreateSolidBrush(RGB(255,255,255));
 				}
@@ -2048,24 +2079,29 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 		bool bStarted = false;
 		for (k = 0; k<str.GetSize(); k++){
 			int UFOPts = 0;
-			for (l=0; l < m_poaWOpp->GetSize(); l++){
+			for (l=0; l < m_poaWOpp->GetSize(); l++)
+			{
 				pWOpp = (CWOpp*)m_poaWOpp->GetAt(l);
 				if (pWOpp->m_bIsVisible &&	pWOpp->m_WingName == str.GetAt(k) )
 						UFOPts++;
 			}
-			for (l=0; l < m_poaPOpp->GetSize(); l++){
+			for (l=0; l < m_poaPOpp->GetSize(); l++)
+			{
 				pPOpp = (CPOpp*)m_poaPOpp->GetAt(l);
 				if (pPOpp->m_bIsVisible &&	pPOpp->m_PlaneName == str.GetAt(k) )
 						UFOPts++;
 			}
-			if (UFOPts) {
+			if (UFOPts) 
+			{
 				int YPos = place.y+ (ny+UFOPts+2) * ypos;// bottom line of this foil's legend
-				if (!bStarted || (abs(bottom) > abs(YPos))){
+				if (!bStarted || (abs(bottom) > abs(YPos)))
+				{
 					ny++;
 					pDC->TextOut(place.x + (int)(1*LegendSize), place.y + ypos*ny-(int)(ypos/2),
 								 str.GetAt(k));
 				}
-				else{
+				else
+				{
 				// move rigth if outside screen
 					place.x += LegendWidth;
 					ny=1;
@@ -2074,11 +2110,14 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 				}
 
 				bStarted = true;
-				for (nc=0; nc < m_poaWOpp->GetSize(); nc++){
+				for (nc=0; nc < m_poaWOpp->GetSize(); nc++)
+				{
 					pWOpp = (CWOpp*)m_poaWOpp->GetAt(nc);
-					if(str.GetAt(k) == pWOpp->m_WingName && pWOpp->m_bIsVisible){
+					if(str.GetAt(k) == pWOpp->m_WingName && pWOpp->m_bIsVisible)
+					{
 						ny++ ;
-						if(abs(bottom)<abs(place.y + (int)(1.*ypos*ny+ypos))){
+						if(abs(bottom)<abs(place.y + (int)(1.*ypos*ny+ypos)))
+						{
 							//move right
 							place.x += LegendWidth;
 							ny=2;
@@ -2095,7 +2134,8 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 						pDC->LineTo(place.x + (int)(2.5*LegendSize),
 									place.y + (int)(1.*ypos*ny));
 
-						if(pWOpp->m_bShowPoints && !bIsPrinting){
+						if(pWOpp->m_bShowPoints && !bIsPrinting)
+						{
 							x1 = place.x + (int)(2.0*LegendSize);
 							pDC->Rectangle(x1-2, place.y + (int)(1.*ypos*ny)-2,
 										   x1+2, place.y + (int)(1.*ypos*ny)+2);
@@ -2131,11 +2171,14 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 						pDC->SelectObject(pOldPen);	
 					}
 				}
-				for (nc=0; nc < m_poaPOpp->GetSize(); nc++){
+				for (nc=0; nc < m_poaPOpp->GetSize(); nc++)
+				{
 					pPOpp = (CPOpp*)m_poaPOpp->GetAt(nc);
-					if(str.GetAt(k) == pPOpp->m_PlaneName && pPOpp->m_bIsVisible){
+					if(str.GetAt(k) == pPOpp->m_PlaneName && pPOpp->m_bIsVisible)
+					{
 						ny++ ;
-						if(abs(bottom)<abs(place.y + (int)(1.*ypos*ny+ypos))){
+						if(abs(bottom)<abs(place.y + (int)(1.*ypos*ny+ypos)))
+						{
 							//move right
 							place.x += LegendWidth;
 							ny=2;
@@ -2152,7 +2195,8 @@ void CMiarex::DrawWOppLegend(CDC *pDC, bool bIsPrinting, CPoint place, int botto
 						pDC->LineTo(place.x + (int)(2.5*LegendSize),
 									place.y + (int)(1.*ypos*ny));
 
-						if(pPOpp->m_bShowPoints && !bIsPrinting){
+						if(pPOpp->m_bShowPoints && !bIsPrinting)
+						{
 							x1 = place.x + (int)(2.0*LegendSize);
 							pDC->Rectangle(x1-2, place.y + (int)(1.*ypos*ny)-2,
 										   x1+2, place.y + (int)(1.*ypos*ny)+2);
@@ -2241,7 +2285,7 @@ void CMiarex::DrawCpLegend(CDC *pDC, bool bIsPrinting, CPoint place, int bottom)
 	lb.lbStyle = BS_SOLID;
 
 	ny=-1;
-	int nada = m_CpGraph.GetCurveCount();
+
 	for (i=0; i<m_CpGraph.GetCurveCount(); i++)
 	{
 		pCurve = m_CpGraph.GetCurve(i);
@@ -2485,14 +2529,14 @@ double CMiarex::GetCd(CFoil *pFoil0, CFoil *pFoil1,
 		Cl = 2.0*pi*(Alpha*pi/180.0);
 		Cd0 = Cl*Cl/pi/AR;
 	}
-	else Cd0 = pFrame->GetPlrPoint(pFoil0, Re, Alpha,2, IsOutRe, IsError);
+	else Cd0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 	if(!pFoil1) {
 		Cl = 2.0*pi*(Alpha*pi/180.0);
 		Cd1 = Cl*Cl/pi/AR;
 	}
-	else Cd1 = pFrame->GetPlrPoint(pFoil1, Re, Alpha,2, IsOutRe, IsError);
+	else Cd1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2517,12 +2561,12 @@ double CMiarex::GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, do
 	double XCp0, XCp1;
 
 	if(!pFoil0) return 0.0;
-	else XCp0 = pFrame->GetPlrPoint(pFoil0, Re, Alpha, 11, IsOutRe, IsError);
+	else XCp0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 11, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
 	if(!pFoil1) return 0.0;
-	else XCp1 = pFrame->GetPlrPoint(pFoil1, Re, Alpha, 11, IsOutRe, IsError);
+	else XCp1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 11, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 
@@ -2550,8 +2594,8 @@ double CMiarex::GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re,
 		Tr0 = 1.0;
 	}
 	else {
-		if(bTop) Tr0 = pFrame->GetPlrPoint(pFoil0, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr0 = pFrame->GetPlrPoint(pFoil0, Re, Alpha, 6, IsOutRe, IsError);
+		if(bTop) Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 6, IsOutRe, IsError);
 	}
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
@@ -2559,8 +2603,8 @@ double CMiarex::GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re,
 		Tr1 = 1.0;
 	}
 	else {
-		if(bTop) Tr1 = pFrame->GetPlrPoint(pFoil1, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr1 = pFrame->GetPlrPoint(pFoil1, Re, Alpha, 6, IsOutRe, IsError);
+		if(bTop) Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 6, IsOutRe, IsError);
 	}
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
@@ -2774,7 +2818,7 @@ void CMiarex::SaveSettings(CArchive &ar)
 	m_WPlrGraph2.Serialize(ar);
 	m_WPlrGraph3.Serialize(ar);
 	m_WPlrGraph4.Serialize(ar);
-	m_IDlg.m_IterGraph.Serialize(ar);
+	m_LLTDlg.m_IterGraph.Serialize(ar);
 
 	ar << m_XW1 << m_YW1 << m_XW2 << m_YW2;
 	ar << m_XW3 << m_YW3 << m_XW4 << m_YW4;
@@ -2835,7 +2879,7 @@ void CMiarex::SaveSettings(CArchive &ar)
 	if(m_bICd)                ar << 1; else ar<<0;
 	if(m_bVCd)                ar << 1; else ar<<0;
 	if(m_bXCmRef)             ar << 1; else ar<<0;
-	if(m_b3DVLMCl)            ar << 1; else ar<<0;
+	if(m_b3DCp)               ar << 1; else ar<<0;
 	if(m_b3DDownwash)         ar << 1; else ar<<0;
 	if(m_bShowCpPoints)       ar << 1; else ar<<0;
 	if(m_bAutoCpScale)        ar << 1; else ar<<0;
@@ -2925,7 +2969,7 @@ bool CMiarex::LoadSettings(CArchive &ar)
 		if(!m_WPlrGraph2.Serialize(ar)) return false;
 		if(!m_WPlrGraph3.Serialize(ar)) return false;
 		if(!m_WPlrGraph4.Serialize(ar)) return false;
-		if(!m_IDlg.m_IterGraph.Serialize(ar)) return false;
+		if(!m_LLTDlg.m_IterGraph.Serialize(ar)) return false;
 
 		ar >> m_XW1 >> m_YW1 >> m_XW2 >> m_YW2;
 		ar >> m_XW3 >> m_YW3 >> m_XW4 >> m_YW4;
@@ -3290,7 +3334,7 @@ bool CMiarex::LoadSettings(CArchive &ar)
 			pfe->m_strFileName = ar.m_strFileName;
 			throw pfe;
 		}
-		if(k) m_b3DVLMCl = true; else m_b3DVLMCl = false;
+		if(k) m_b3DCp = true; else m_b3DCp = false;
 
 		ar >> k;
 		if(k<0 || k>1){
@@ -3306,7 +3350,7 @@ bool CMiarex::LoadSettings(CArchive &ar)
 			pfe->m_strFileName = ar.m_strFileName;
 			throw pfe;
 		}
-		if(k) m_bShowCpPoints = true; else m_b3DDownwash = false;
+		if(k) m_bShowCpPoints = true; else m_bShowCpPoints = false;
 
 		ar >> k;
 		if(k<0 || k>1){
@@ -3924,8 +3968,8 @@ void CMiarex::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 			if(m_pCurBody && m_BodyLineRect.PtInRect(point))
 			{
-				Real.x =  (Real.x - m_BodyOffset.x)/m_BodyScale;
-				Real.y =  (Real.y - m_BodyOffset.y)/m_BodyScale;
+				Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
+				Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 				Real.z = 0.0;
 				iF = m_pCurBody->IsFramePos(Real, m_BodyScale);
 				if(iF >=0) 
@@ -3943,8 +3987,8 @@ void CMiarex::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 			else if(m_pCurFrame && m_FrameRect.PtInRect(point))
 			{
-				Real.x =  (Real.x - m_FrameOffset.x)/m_FrameScale;
-				Real.y =  (Real.y - m_FrameOffset.y)/m_FrameScale;
+				Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
+				Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 				Real.z = 0.0;
 				m_pCurFrame->m_iSelect = m_pCurFrame->IsPoint(Real, m_FrameScale);
 				if(m_pCurFrame->m_iSelect >=0) 
@@ -4128,21 +4172,28 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 			}
 			else if (m_BodyLineRect.PtInRect(point) && m_pCurBody)
 			{
-				m_BodyOffset.x  +=  (double)Delta.x*2.0/(double)m_rCltRect.Width() * m_GLScale;
-				m_BodyOffset.y  += -(double)Delta.y*2.0/(double)m_rCltRect.Width() * m_GLScale;
+				m_BodyOffset.x  +=  (double)Delta.x*2.0/(double)m_rCltRect.Width()/m_BodyScale* m_GLScale;
+				m_BodyOffset.y  += -(double)Delta.y*2.0/(double)m_rCltRect.Width()/m_BodyScale* m_GLScale;
+				m_BodyScaledOffset.Set((1.0-m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
+									   (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+									    0.0);
 				UpdateView();
 			}
 			else if(m_FrameRect.PtInRect(point) && m_pCurFrame)
 			{
-				m_FrameOffset.x +=  (double)Delta.x*2.0/(double)m_rCltRect.Width() * m_GLScale;
-				m_FrameOffset.y += -(double)Delta.y*2.0/(double)m_rCltRect.Width() * m_GLScale;
+				m_FrameOffset.x +=  (double)Delta.x*2.0/(double)m_rCltRect.Width()/m_FrameScale * m_GLScale;
+				m_FrameOffset.y += -(double)Delta.y*2.0/(double)m_rCltRect.Width()/m_FrameScale * m_GLScale;
+				m_FrameScaledOffset.Set((1.0-m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
+ 									    (1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+ 									     0.0);
 				UpdateView();
 			}
 		}
 		else if (m_BodyLineRect.PtInRect(point) && m_pCurBody)
 		{
-			Real.x =  (Real.x - m_BodyOffset.x)/m_BodyScale;
-			Real.y =  (Real.y - m_BodyOffset.y)/m_BodyScale;
+
+			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
+			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
 
 			int n = m_pCurBody->m_iActiveFrame;
@@ -4165,8 +4216,8 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		else if(m_FrameRect.PtInRect(point) && m_pCurFrame)
 		{
-			Real.x =  (Real.x - m_FrameOffset.x)/m_FrameScale;
-			Real.y =  (Real.y - m_FrameOffset.y)/m_FrameScale;
+			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
+			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z =   0.0;
 
 			if(m_pCurFrame)	n = m_pCurFrame->m_iSelect;
@@ -4203,6 +4254,7 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 	else if (((nFlags & MK_MBUTTON) || (shZ & 0x8000)) && !bCtrl) 
+	//scaling
 	{
 		// we zoom the graph or the wing	
 		if(m_iView ==1 ||m_iView==2 || m_iView==4)
@@ -4244,18 +4296,25 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		else if (m_iView==5)
 		{
+			//scaling
 			if(m_BodyLineRect.PtInRect(point))
 			{
 				if(point.y-m_LastPoint.y<0) m_BodyScale /= 1.04;
 				else                        m_BodyScale *= 1.04;
 				m_bResetglBody2D = true;
-				UpdateView();
+				m_BodyScaledOffset.Set((1.0-m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
+                                       (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+										0.0);
+				UpdateView(); 
 			}
 			else if(m_FrameRect.PtInRect(point))
 			{
 				if(point.y-m_LastPoint.y<0) m_FrameScale /= 1.04;
 				else                        m_FrameScale *= 1.04;
 				m_bResetglBody2D = true;
+				m_FrameScaledOffset.Set((1.0-m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
+                                       (1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+										0.0);
 				UpdateView();
 			}
 			else if(m_pCurBody && m_BodyRect.PtInRect(point))
@@ -4283,10 +4342,11 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	else if(m_iView==5)
 	{	
+		//Highlight points
 		if (m_BodyLineRect.PtInRect(point) && m_pCurBody)
 		{
-			Real.x =  (Real.x - m_BodyOffset.x)/m_BodyScale;
-			Real.y =  (Real.y - m_BodyOffset.y)/m_BodyScale;
+			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
+			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
 			int n = m_pCurBody->IsFramePos(Real, m_BodyScale);
 			m_pCurBody->m_iHighlight = -10;
@@ -4299,8 +4359,8 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 		}
 		else if (m_pCurFrame && m_FrameRect.PtInRect(point))
 		{
-			Real.x =  (Real.x - m_FrameOffset.x)/m_FrameScale;
-			Real.y =  (Real.y - m_FrameOffset.y)/m_FrameScale;
+			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
+			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
 			int n = m_pCurFrame->IsPoint(Real, m_FrameScale);
 			m_pCurFrame->m_iHighlight = -10;
@@ -4852,9 +4912,7 @@ void CMiarex::OnDefineWing()
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CWing *pOldWing;
 	CWing* pWing = new CWing(m_pFrame);
-	CWingDlg WingDlg;
-	WingDlg.m_pWing = pWing;
-	WingDlg.CopyDataFrom(pWing);
+	CWingDlg WingDlg(this, pWing);
 	WingDlg.m_bCheckName= true;
 
 	if(IDOK == WingDlg.DoModal())
@@ -5283,7 +5341,7 @@ void CMiarex::OnExportPanels()
 		_T("Text Format (.txt)|*.txt|"));
 
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
 
 		if(bOpen){
@@ -5330,7 +5388,7 @@ void CMiarex::OnExportWing()
 		_T("Text Format (.avl)|*.avl|"));
 
 	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
 
 		if(bOpen){
@@ -5402,8 +5460,7 @@ void CMiarex::OnEditWing()
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CWPolar *pWPolar;
 	CWOpp* pWOpp;
-	CWingDlg WingDlg;
-	WingDlg.CopyDataFrom(m_pCurWing);
+	CWingDlg WingDlg(this, m_pCurWing);
 
 	bool bHasResults = false;
 	for (i=0; i< m_poaWPolar->GetSize(); i++)
@@ -5657,12 +5714,18 @@ void CMiarex::SetBody(CString BodyName)
 	m_pBodyCtrlBar->SetBody(m_pCurBody);
 }
 
+
 void CMiarex::SetUFO(CString UFOName)
 {
 	CWaitCursor wait;
 	int i;
 	//Set the UFO specified by UFOName as the current UFO
-
+	CMessageDlg dlg;
+	dlg.Create(IDD_MESSAGEDLG,this);
+	dlg.m_bCancel = false;
+	dlg.ShowWindow(SW_SHOW);
+	dlg.SetMessage("Setting UFO...");
+	dlg.SetProgress(0);
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	if(!UFOName.GetLength()) 
 	{
@@ -5710,7 +5773,6 @@ void CMiarex::SetUFO(CString UFOName)
 		return;
 	}
 
-
 	if(m_pCurPlane)
 	{
 		m_pCurWing = &m_pCurPlane->m_Wing;
@@ -5756,15 +5818,25 @@ void CMiarex::SetUFO(CString UFOName)
 	CVector T(0.0,0.0,0.0);
 	m_NSurfaces = 0;
 
+	double dx, dz;
+	dx=dz=0.0;
+
 	if(m_pCurPlane)
 	{
 		WingTilt  = m_pCurPlane->m_WingTilt;
 		WingColor = m_pCurWing->m_WingColor;
+		if(m_pCurPlane->m_bBody)
+		{
+			dx = m_pCurPlane->m_BodyPos.x;
+			dz = m_pCurPlane->m_BodyPos.z;
+		}
 	}
+
 	if(m_pCurBody)
 	{
 		m_pCurBody->SetKnots();
 		m_pCurBody->SetPanelPos();
+		dlg.SetMessage("Intersecting main wing with body...");
 	}
 	if(m_pCurWing) 
 	{
@@ -5772,7 +5844,7 @@ void CMiarex::SetUFO(CString UFOName)
 		else            m_pCurWing->CreateSurfaces(T, 0.0, WingTilt);
 		for (i=0; i<m_pCurWing->m_NSurfaces; i++)
 		{
-			m_pCurWing->m_Surface[i].SetSidePoints(m_pCurBody);
+			m_pCurWing->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
 			m_pSurface[m_NSurfaces] = &m_pCurWing->m_Surface[i];
 			m_NSurfaces++;
 		}
@@ -5783,19 +5855,18 @@ void CMiarex::SetUFO(CString UFOName)
 		m_pCurWing2->CreateSurfaces(m_pCurPlane->m_LEWing2, 0.0, m_pCurPlane->m_WingTilt2);
 		for (i=0; i<m_pCurWing2->m_NSurfaces; i++)
 		{
-			m_pCurWing2->m_Surface[i].SetSidePoints(m_pCurBody);
+			m_pCurWing2->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
 			m_pSurface[m_NSurfaces] = &m_pCurWing2->m_Surface[i];
 			m_NSurfaces++;
 		}
 	}
-
 
 	if(m_pCurStab) 
 	{
 		m_pCurStab->CreateSurfaces(m_pCurPlane->m_LEStab, 0.0, m_pCurPlane->m_StabTilt);
 		for (i=0; i<m_pCurStab->m_NSurfaces; i++)
 		{
-			m_pCurStab->m_Surface[i].SetSidePoints(m_pCurBody);
+			m_pCurStab->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
 			m_pSurface[m_NSurfaces] = &m_pCurStab->m_Surface[i];
 			m_NSurfaces++;
 		}
@@ -5807,12 +5878,11 @@ void CMiarex::SetUFO(CString UFOName)
 
 		for (i=0; i<m_pCurFin->m_NSurfaces; i++)
 		{
-			m_pCurFin->m_Surface[i].SetSidePoints(m_pCurBody);
+			m_pCurFin->m_Surface[i].SetSidePoints(m_pCurBody, dx, dz);
 			m_pSurface[m_NSurfaces] = &m_pCurFin->m_Surface[i];
 			m_NSurfaces++;
 		}
 	}
-
 
 	if (m_pCurWPolar)
 		// try to set the same as the existing polar... Special for Marc
@@ -5951,7 +6021,6 @@ void CMiarex::UpdateView(CDC *pDC)
 					&memdc,0,0,SRCCOPY);
 		}
 
-
 		memdc.SelectObject(pOldBmp);
 		memdc.DeleteDC();
 		bmp.DeleteObject();
@@ -5972,7 +6041,8 @@ void CMiarex::SetColors(Graph *pDefaultGraph)
 	m_WPlrGraph2.CopySettings(pDefaultGraph);
 	m_WPlrGraph3.CopySettings(pDefaultGraph);
 	m_WPlrGraph4.CopySettings(pDefaultGraph);
-	m_IDlg.m_IterGraph.CopySettings(pDefaultGraph);
+	m_LLTDlg.m_IterGraph.CopySettings(pDefaultGraph);
+	m_CpGraph.CopySettings(pDefaultGraph);
 }
 
 
@@ -5994,16 +6064,20 @@ BOOL CMiarex::PreTranslateMessage(MSG* pMsg)
 	else if (pMsg->message == WM_KEYDOWN)
 	{
 		CWnd* pWnd = GetFocus();
-		if (pMsg->wParam == VK_TAB){
-			if (pWnd == &pFrame->m_ctrlUFO) {
+		if (pMsg->wParam == VK_TAB)
+		{
+			if (pWnd == &pFrame->m_ctrlUFO) 
+			{
 				pFrame->m_ctrlWPlr.SetFocus();
 				return true;
 			}
-			else if (pWnd == &pFrame->m_ctrlWPlr) {
+			else if (pWnd == &pFrame->m_ctrlWPlr) 
+			{
 				pFrame->m_ctrlWOpp.SetFocus();
 				return true;
 			}
-			else if (pWnd == &pFrame->m_ctrlWOpp) {
+			else if (pWnd == &pFrame->m_ctrlWOpp) 
+			{
 				pFrame->m_ctrlUFO.SetFocus();
 				return true;
 			}
@@ -6031,8 +6105,11 @@ BOOL CMiarex::PreTranslateMessage(MSG* pMsg)
 				}
 			}
 		}
-		if (pMsg->wParam == VK_ESCAPE){
-			if (m_bAnimate) {
+		if (pMsg->wParam == VK_ESCAPE)
+		{
+			if(m_FlowLinesDlg.IsWindowVisible()) m_FlowLinesDlg.ShowWindow(SW_HIDE);
+			if (m_bAnimate) 
+			{
 				StopAnimate();
 				UpdateView();
 				return true;
@@ -6042,8 +6119,10 @@ BOOL CMiarex::PreTranslateMessage(MSG* pMsg)
 		SHORT sh1 = GetKeyState(VK_LCONTROL);
 		SHORT sh2 = GetKeyState(VK_RCONTROL);
 
-		if (pMsg->wParam == VK_F2 ){
-			OnRenameUFO();
+		if (pMsg->wParam == VK_F2 )
+		{
+			if(m_iView<5) OnRenameUFO();
+			else          OnRenameCurBody();
 			return true;
 		}
 		if (pMsg->wParam == VK_F7 )
@@ -6368,7 +6447,7 @@ void CMiarex::SetParams()
 	m_FlowLinesDlg.m_pChildWnd = m_pChildWnd;
 	m_FlowLinesDlg.SetParams();
 
-	StopAnimate();
+	StopAnimate();	
 }
 
 
@@ -6537,35 +6616,50 @@ CString CMiarex::RenameUFO(CString UFOName)
 	CWPolar *pWPolar;
 	CPlane *pPlane = GetPlane(UFOName);
 	CWing *pWing   = GetWing(UFOName);
-	if(pPlane) {
+	if(pPlane) 
+	{
 		OldName = pPlane->m_PlaneName;
 		SetModPlane(pPlane);
-		for (l=(int)m_poaWPolar->GetSize()-1;l>=0; l--){
+
+		pPlane->m_Wing.m_WingName = pPlane->m_PlaneName+"_Wing";
+		pPlane->m_Wing2.m_WingName = pPlane->m_PlaneName+"_Wing2";
+		pPlane->m_Stab.m_WingName = pPlane->m_PlaneName+"_Elev";
+		pPlane->m_Fin.m_WingName = pPlane->m_PlaneName+"_Fin";
+
+		for (l=(int)m_poaWPolar->GetSize()-1;l>=0; l--)
+		{
 			pWPolar = (CWPolar*)m_poaWPolar->GetAt(l);
-			if (pWPolar->m_UFOName == OldName){
+			if (pWPolar->m_UFOName == OldName)
+			{
 				pWPolar->m_UFOName = pPlane->m_PlaneName;
 			}
 		}
-		for (l=(int)m_poaPOpp->GetSize()-1;l>=0; l--){
+		for (l=(int)m_poaPOpp->GetSize()-1;l>=0; l--)
+		{
 			pPOpp = (CPOpp*)m_poaPOpp->GetAt(l);
-			if (pPOpp->m_PlaneName == OldName){
+			if (pPOpp->m_PlaneName == OldName)
+			{
 				pPOpp->m_PlaneName = pPlane->m_PlaneName;
 			}
 		}
 		return pPlane->m_PlaneName;
 	}
-	else if(pWing) {
+	else if(pWing) 
+	{
 		OldName = pWing->m_WingName;
 		SetModWing(pWing);
-		for (l=(int)m_poaWPolar->GetSize()-1;l>=0; l--){
+		for (l=(int)m_poaWPolar->GetSize()-1;l>=0; l--)
+		{
 			pWPolar = (CWPolar*)m_poaWPolar->GetAt(l);
 			if (pWPolar->m_UFOName == OldName){
 				pWPolar->m_UFOName = pWing->m_WingName;
 			}
 		}
-		for (l=(int)m_poaWOpp->GetSize()-1;l>=0; l--){
+		for (l=(int)m_poaWOpp->GetSize()-1;l>=0; l--)
+		{
 			pWOpp = (CWOpp*)m_poaWOpp->GetAt(l);
-			if (pWOpp->m_WingName == OldName){
+			if (pWOpp->m_WingName == OldName)
+			{
 				pWOpp->m_WingName = pWing->m_WingName;
 			}
 		}
@@ -6996,8 +7090,9 @@ void CMiarex::OnExportWOpp()
 	CStdioFile XFile;
 	CFileException fe;
 	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
-	if(IDOK == XFileDlg.DoModal()){
-		FileName = XFileDlg.GetFileName();
+	if(IDOK == XFileDlg.DoModal())
+	{
+		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
 		if(!bOpen) return;
 		
@@ -7022,6 +7117,9 @@ void CMiarex::OnExportWOpp()
 		strong.Format("Cl    = %9.4f\n",	m_pCurWOpp->m_CL);
 		XFile.WriteString(strong);
 
+		strong.Format("Cy    = %9.4f\n",	m_pCurWOpp->m_CY);
+		XFile.WriteString(strong);
+
 		strong.Format("Cd    = %9.4f     ICd   = %9.4f     PCd   = %9.4f\n",
 			m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag, m_pCurWOpp->m_InducedDrag,	m_pCurWOpp->m_ViscousDrag);
 		XFile.WriteString(strong);
@@ -7044,7 +7142,8 @@ void CMiarex::OnExportWOpp()
 		XFile.WriteString(strong);
 		
 		XFile.WriteString("Main Wing Data\n");
-		for (l=0; l<m_pCurWOpp->m_nFlaps; l++){
+		for (l=0; l<m_pCurWOpp->m_nFlaps; l++)
+		{
 	 		strong.Format("Flap %d moment = %9.4f",l+1, m_pCurWOpp->m_FlapMoment[l]*pFrame->m_NmtoUnit);
 			GetMomentUnit(str, pFrame->m_MomentUnit);
 			strong += str +"\n";
@@ -7053,9 +7152,11 @@ void CMiarex::OnExportWOpp()
 		XFile.WriteString("\n");
 		m_pCurWOpp->Export(&XFile);
 
-		if(m_pCurWing2) {
+		if(m_pCurWing2) 
+		{
 			XFile.WriteString("Secondary Wing Data\n");
-			for (l=0; l<m_pCurPOpp->m_Wing2WOpp.m_nFlaps; l++){
+			for (l=0; l<m_pCurPOpp->m_Wing2WOpp.m_nFlaps; l++)
+			{
 	 			strong.Format("Flap %d moment = %9.4f ",l+1, m_pCurPOpp->m_Wing2WOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
@@ -7065,9 +7166,11 @@ void CMiarex::OnExportWOpp()
 			m_pCurPOpp->m_Wing2WOpp.Export(&XFile);
 		}
 
-		if(m_pCurStab) {
+		if(m_pCurStab) 
+		{
 			XFile.WriteString("Elevator Data\n");
-			for (l=0; l<m_pCurPOpp->m_StabWOpp.m_nFlaps; l++){
+			for (l=0; l<m_pCurPOpp->m_StabWOpp.m_nFlaps; l++)
+			{
 	 			strong.Format("Flap %d moment = %9.4f ",l+1, m_pCurPOpp->m_StabWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
@@ -7077,9 +7180,11 @@ void CMiarex::OnExportWOpp()
 			m_pCurPOpp->m_StabWOpp.Export(&XFile);
 		}
 
-		if(m_pCurFin) {
+		if(m_pCurFin)
+		{
 			XFile.WriteString("Fin Data\n");
-			for (l=0; l<m_pCurPOpp->m_FinWOpp.m_nFlaps; l++){
+			for (l=0; l<m_pCurPOpp->m_FinWOpp.m_nFlaps; l++)
+			{
 	 			strong.Format("Flap %d moment = %9.4f",l+1, m_pCurPOpp->m_FinWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
@@ -8533,7 +8638,7 @@ void CMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve, int Var
 		}
 		case 14:{
 			for (i=nStart; i<pWOpp->m_NStation; i++){
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pFrame->m_mtoUnit, pWOpp->m_XCPSpanRel[i]);
+				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pFrame->m_mtoUnit, pWOpp->m_XCPSpanRel[i]*100.0);
 			}
 			pGraph->SetYTitle("CP x-Pos %");
 			break;
@@ -8801,7 +8906,6 @@ void CMiarex::OnWAdvSettings()
 	dlg.m_VortexPos       = CPanel::m_VortexPos;
 	dlg.m_WakeInterNodes  = m_WakeInterNodes;
 	dlg.m_pFrame          = m_pFrame;
-	dlg.m_pMiarex         = this;
 
 	if(dlg.DoModal() == IDOK)
 	{
@@ -8817,6 +8921,9 @@ void CMiarex::OnWAdvSettings()
 		m_bKeepOutOpps         = dlg.m_bKeepOutOpps;
 		m_WakeInterNodes       = dlg.m_WakeInterNodes;
 		m_MinPanelSize         = dlg.m_MinPanelSize;
+
+		m_InducedDragPoint     = dlg.m_InducedDragPoint;
+
 		CPanel::m_CtrlPos      = dlg.m_ControlPos;
 		CPanel::m_VortexPos    = dlg.m_VortexPos;
 
@@ -8996,6 +9103,84 @@ void CMiarex::Set3DScale()
 	Set3DRotationCenter();
 }
 
+void CMiarex::SetBodyScale()
+{
+	int k;
+	double length, height;
+	double h = (double)m_rCltRect.Height();
+	double w = (double)m_rCltRect.Width();
+
+	if(m_bIs3DScaleSet && !m_bAutoScales) return;
+	
+	m_UFOOffset.x = (GLfloat)(-1.0+m_VerticalSplit)*m_GLScale/2.0;
+	m_UFOOffset.y = (GLfloat)(-.6)*m_GLScale;
+
+	m_VerticalSplit     =  0.35;
+	m_HorizontalSplit   = -0.45;
+
+	m_glTop = -1.0+2.0*h/w;
+
+	m_BodyScalingCenter.x = (m_VerticalSplit-1.0)/2.0;
+	m_BodyScalingCenter.y = (m_glTop+m_HorizontalSplit)/2.0;
+	m_FrameScalingCenter.x = (m_VerticalSplit+1.0)/2.0;
+	m_FrameScalingCenter.y = (m_glTop+ -1.0)/2.0;
+
+	CPoint P1, P2;
+	CVector V1, V2;
+	V1.Set(-1.0*m_GLScale,0.0,0.0);
+	V2.Set(m_VerticalSplit*m_GLScale, m_HorizontalSplit*m_GLScale,0.0);
+	GLToClient(V1, P1);
+	GLToClient(V2, P2);
+	m_BodyLineRect.SetRect(P1, P2);
+
+	V1.Set(m_VerticalSplit * m_GLScale,  0.0,             0.0);
+	V2.Set(1.0             * m_GLScale, -1.0 * m_GLScale, 0.0);
+	GLToClient(V1, P1);
+	GLToClient(V2, P2);
+	m_FrameRect.SetRect(P1, P2);
+
+	V1.Set(-1.0*m_GLScale,             m_HorizontalSplit*m_GLScale, 0.0);
+	V2.Set(m_VerticalSplit*m_GLScale, -1.0              *m_GLScale, 0.0);
+	GLToClient(V1, P1);
+	GLToClient(V2, P2);
+	m_BodyRect.SetRect(P1, P2);
+
+	if(m_pCurBody)
+	{
+		length =   m_pCurBody->m_FramePosition[m_pCurBody->m_NStations-1].x  - m_pCurBody->m_FramePosition[0].x;
+		m_BodyScale = (m_VerticalSplit-(-1.0) - 0.3)/length*m_GLScale;
+
+		height = 0.0;
+		for(k=0; k<m_pCurBody->m_NStations; k++)
+		{
+			height = max(height,abs( m_pCurBody->m_Frame[k].m_Point[0].z - m_pCurBody->m_Frame[k].m_Point[m_pCurBody->m_Frame[k].m_NPoints-1].z)); 
+		}
+		m_FrameScale = (1.0-0.5)/height*m_GLScale;
+	}
+	else
+	{
+		m_BodyScale  = 1.0;
+		m_FrameScale = 1.0;
+	}
+
+	m_FrameOffset.Set((1.0+m_VerticalSplit)/2.0 * m_GLScale,  (m_glTop-1.0)              /2.0 * m_GLScale,   0.0);
+	m_BodyOffset.Set(  -0.5* m_GLScale,  (m_glTop+m_HorizontalSplit)/2.0 * m_GLScale,   0.0);
+
+	m_FrameScaledOffset.Set((1.0-m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
+                            (1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+                             0.0);
+
+	m_BodyScaledOffset.Set((1.0-m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
+                           (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+                            0.0);
+
+	CFrame::s_rViewRect.CopyRect(m_FrameRect);
+	CBody::s_rViewRect.CopyRect(m_BodyLineRect);
+	m_BodyRefScale  = m_BodyScale;
+	m_FrameRefScale = m_FrameScale;
+}
+
+
 void CMiarex::OnResetWingScale() 
 {
 	if(m_pCurWing)	{
@@ -9015,9 +9200,10 @@ void CMiarex::OnImportWing()
 	CString FileName;
 	CFileDialog XFileDlg(TRUE, "avl", NULL, OFN_HIDEREADONLY, _T("Athena VLM (.avl)|*.avl|"));
 	
-	if(IDOK==XFileDlg.DoModal()) {
+	if(IDOK==XFileDlg.DoModal())
+	{
 		
-		FileName = XFileDlg.GetFileName();
+		FileName = XFileDlg.GetPathName();
 		if(AVLImportFile(FileName)){
 		}
 	}
@@ -9328,8 +9514,8 @@ BOOL CMiarex::AVLReadSection(CStdioFile *pXFile, int &Line, CWing *pWing, int Pa
 
 	//Section keyword is followed by VLM Mesh data
 	if(!ReadAVLString(pXFile, Line,  strong)) return false;//Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]
-	res = sscanf(strong, "%lf%lf%lf%lf%lf%d%lf", 
-				&Xle, &Yle, &Zle, &Chord, &Ainc, &NSpan, &Sspace);
+	res = sscanf(strong, "%lf%lf%lf%lf%lf%d%lf", &Xle, &Yle, &Zle, &Chord, &Ainc, &NSpan, &Sspace);
+
 	pWing->m_TOffset[PanelPos] = Xle;
 	pWing->m_TPos[PanelPos]    = Yle;
 	pWing->m_TZPos[PanelPos]   = Zle;
@@ -10393,6 +10579,7 @@ void CMiarex::GLCreateSurfSpeeds()
 	if(!m_pCurWOpp || m_pCurWOpp->m_AnalysisType==1) 
 	{
 		glNewList(SURFACESPEEDS, GL_COMPILE);
+		m_GLList++;
 		glEndList();
 		return;
 	}
@@ -10468,6 +10655,8 @@ void CMiarex::GLCreateSurfSpeeds()
 					VT *= pFrame->m_DownwashScale/100.0;
 //					if(!m_pCurWPolar->m_bTiltedGeom)
 						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
+						//Tilt the geometry w.r.t. sideslip
+//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
 				}
 				else if(m_pCurWPolar->m_AnalysisType==3)
 				{
@@ -10477,6 +10666,8 @@ void CMiarex::GLCreateSurfSpeeds()
 					VT *= pFrame->m_DownwashScale/100.0;
 //					if(!m_pCurWPolar->m_bTiltedGeom)
 						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
+						//Tilt the geometry w.r.t. sideslip
+//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
 				}
 
 				length = VT.VAbs()*factor;
@@ -10507,18 +10698,24 @@ void CMiarex::GLCreateSurfSpeeds()
 				z2 = ze -dlx*sinT - dlz*cosT;
 				
 				glBegin(GL_LINES);
+				{
 					glVertex3d(C.x, C.y, C.z);
 					glVertex3d(xe,ye,ze);
+				}
 				glEnd();
 
 				glBegin(GL_LINES);
+				{
 					glVertex3d(xe, ye, ze);
 					glVertex3d(x1, y1, z1);		
+				}
 				glEnd();
 
 				glBegin(GL_LINES);
+				{
 					glVertex3d(xe, ye, ze);
 					glVertex3d(x2, y2, z2);
+				}
 				glEnd();
 
 				dlg.SetProgress((int)(100.0*((double)p/(double)m_MatSize)));
@@ -10534,9 +10731,10 @@ void CMiarex::GLCreateSurfSpeeds()
 void CMiarex::GLCreateStreamLines()
 {
 	CWaitCursor wait;
-	if(!m_pCurWOpp || !m_pCurWPolar || m_pCurWPolar->m_AnalysisType==1) 
+	if(!m_pCurWing || !m_pCurWOpp || !m_pCurWPolar || m_pCurWPolar->m_AnalysisType==1) 
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
+		m_GLList++;
 		return;
 	}
 	CMessageDlg dlg;
@@ -10553,7 +10751,8 @@ void CMiarex::GLCreateStreamLines()
 	double r,g,b, ds, *Gamma, *Mu, *Sigma;
 	COLORREF color;
 
-	CVector C, D, D1, V, VT, VInf, V1, V2;
+	CVector C, D, D1, V, V1, V2, VT, VInf;
+//	CVector V1, V2;
 	CVector RefPoint(0.0,0.0,0.0);
 	CVector t;
 
@@ -10586,6 +10785,8 @@ void CMiarex::GLCreateStreamLines()
 
 	m_PanelDlg.m_bCancel = false;
 	m_VLMDlg.m_bCancel   = false;
+	m_VLMDlg.m_pWing     = m_pCurWing;
+	m_PanelDlg.m_pWing   = m_pCurWing;
 
 	//back-up the current geometry, before it is tilted for streamlines calculation
 	memcpy(m_MemPanel, m_Panel, m_MatSize * sizeof(CPanel));
@@ -10647,12 +10848,11 @@ void CMiarex::GLCreateStreamLines()
 						bFound = true;
 					}
 
-
 					if(bFound)
 					{
 						if(!C.IsSame(D1))
 						{
-							C *= 1.0001;// to avoid alignment with the panel's edge, which creates a singularity
+//							C *= 1.0001;// to avoid alignment with the panel's edge, which creates a singularity
 							C.x += m_FlowLinesDlg.m_XOffset;
 							C.z += m_FlowLinesDlg.m_ZOffset;
 							ds = m_FlowLinesDlg.m_DeltaL;
@@ -10675,13 +10875,15 @@ void CMiarex::GLCreateStreamLines()
 							glBegin(GL_LINE_STRIP);
 							{
 								glVertex3d(C.x, C.y, C.z);
-								for (i=0; i< m_FlowLinesDlg.m_NX ;i++)
-								{
-									if(m_pCurWPolar->m_AnalysisType==2)
-										VT = m_VLMDlg.GetSpeedVector(C, Gamma);
-									else if(m_pCurWPolar->m_AnalysisType==3)
-										m_PanelDlg.GetSpeedVector(C, Mu, Sigma, VT);
+								C   += V1* ds;
+								glVertex3d(C.x, C.y, C.z);
+								ds *= m_FlowLinesDlg.m_XFactor;
 
+								for (i=1; i< m_FlowLinesDlg.m_NX ;i++)
+								{
+									if(m_pCurWPolar->m_AnalysisType==2)      VT = m_VLMDlg.GetSpeedVector(C, Gamma);
+									else if(m_pCurWPolar->m_AnalysisType==3) m_PanelDlg.GetSpeedVector(C, Mu, Sigma, VT);
+								
 									VT += VInf;
 									VT.Normalize();
 									C   += VT* ds;
@@ -10693,7 +10895,7 @@ void CMiarex::GLCreateStreamLines()
 						}
 
 						D1 = D;
-						D *= 1.0001;// to avoid alignment with the panel's edge, which creates a singularity
+//						D *= 1.0001;// to avoid alignment with the panel's edge, which creates a singularity
 						D.x += m_FlowLinesDlg.m_XOffset;
 						D.z += m_FlowLinesDlg.m_ZOffset;
 						ds = m_FlowLinesDlg.m_DeltaL;
@@ -10713,12 +10915,18 @@ void CMiarex::GLCreateStreamLines()
 						glBegin(GL_LINE_STRIP);
 						{
 							glVertex3d(D.x, D.y, D.z);
-							for (i=0; i< m_FlowLinesDlg.m_NX ;i++)
+							D   += V1* ds;
+							glVertex3d(D.x, D.y, D.z);
+							ds *= m_FlowLinesDlg.m_XFactor;
+
+							for (i=1; i< m_FlowLinesDlg.m_NX ;i++)
 							{
-								if(m_pCurWPolar->m_AnalysisType==2)
-									VT = m_VLMDlg.GetSpeedVector(D, Gamma);
-								else if(m_pCurWPolar->m_AnalysisType==3)
+								if(m_pCurWPolar->m_AnalysisType==2)			VT = m_VLMDlg.GetSpeedVector(D, Gamma);
+								else if(m_pCurWPolar->m_AnalysisType==3)  
+								{
 									m_PanelDlg.GetSpeedVector(D, Mu, Sigma, VT);
+								}
+
 								VT += VInf;
 								VT.Normalize();
 								D   += VT* ds;
@@ -10795,10 +11003,13 @@ void CMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0)
 		DecompRGB(color,r,g,b);
 		glColor3f((GLfloat)r,(GLfloat)g,(GLfloat)b);
 
-		if(pWOpp){
-			if(pWOpp->m_AnalysisType==1){
+		if(pWOpp)
+		{
+			if(pWOpp->m_AnalysisType==1)
+			{
 
-				for (i=1; i<pWOpp->m_NStation; i++){
+				for (i=1; i<pWOpp->m_NStation; i++)
+				{
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 					xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
 					pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
@@ -10815,7 +11026,8 @@ void CMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0)
 				}
 				glBegin(GL_LINE_STRIP);
 				{
-					for (i=1; i<pWOpp->m_NStation; i++){
+					for (i=1; i<pWOpp->m_NStation; i++)
+					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 						xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
 						pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
@@ -10833,7 +11045,7 @@ void CMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, UINT List, int surf0)
 			}
 			else
 			{
-				factor = pFrame->m_DownwashScale*pWOpp->m_QInf/100.0;
+				factor = pFrame->m_DownwashScale/2.0;
 
 				p = 0;
 				i = 0;
@@ -10925,15 +11137,18 @@ void CMiarex::GLCreateCp()
 						m_Node[m_Panel[pp].m_iTB].IsSame(m_Node[n]) ||
 						m_Node[m_Panel[pp].m_iLB].IsSame(m_Node[n]) )
 					{
-						if(m_Panel[pp].m_iPos==1){
+						if(m_Panel[pp].m_iPos==1)
+						{
 							CpSup[n] +=tab[pp];
 							averageSup++;
 						}
-						else if(m_Panel[pp].m_iPos<=0){
+						else if(m_Panel[pp].m_iPos<=0)
+						{
 							CpInf[n] +=tab[pp];
 							averageInf++;
 						}
-						else if(m_Panel[pp].m_iPos==100){
+						else if(m_Panel[pp].m_iPos==100)
+						{
 							Cp100[n] +=tab[pp];
 							average100++;
 						}
@@ -11017,6 +11232,7 @@ void CMiarex::GLCreateCp()
 		}
 	}
 	glEndList();
+
 }
 
 
@@ -11188,13 +11404,13 @@ void CMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, UINT List)
 
 void CMiarex::GLDraw3D(CDC* pDC)
 {
-	if (!m_pCurWing) {
+	if (!m_pCurWing) 
+	{
 		m_bResetglGeom = true;
 		m_bResetglMesh = true;
 		m_bResetglOpp  = true;
 	}
-	int row, col, NumAngles, NumCircles;
-	double R, lat_incr, lon_incr, phi, theta;
+
 
 	CChildView * pChildView = (CChildView*)m_pChildWnd;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -11269,6 +11485,9 @@ void CMiarex::GLDraw3D(CDC* pDC)
 
 	if(m_bResetglBody || m_bResetglGeom)
 	{
+
+		int row, col, NumAngles, NumCircles;
+		double R, lat_incr, lon_incr, phi, theta;
 		m_ArcBall.GetMatrix();
 		CVector eye(0.0,0.0,1.0);
 		CVector up(0.0,1.0,0.0);
@@ -11343,6 +11562,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 			glEnd();
 		}
 		glEndList();
+
 		glNewList(ARCPOINT,GL_COMPILE);
 		{
 			m_GLList++;
@@ -11382,7 +11602,6 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		glEndList();
 	}
 
-
 	if(m_bResetglGeom  && m_iView==3) 
 	{
 
@@ -11420,6 +11639,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 
 		m_bResetglGeom = false;
 	}
+
 	if(m_bResetglMesh && m_bVLMPanels && m_iView==3)
 	{
 		if(glIsList(MESHPANELS)) 
@@ -11442,6 +11662,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		GLCreateVortices();
 		m_bResetglMesh = false;
 	}
+
 	if(m_bResetglWake && m_iView==3)
 	{
 		if(glIsList(WINGWAKEPANELS)) {
@@ -11522,6 +11743,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		}
 		m_bResetglLift = false;
 	}
+
 	if((m_bResetglDrag || m_bResetglOpp) && m_iView==3)
 	{
 		if(glIsList(VLMWINGDRAG)) {
@@ -11560,6 +11782,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		}
 		m_bResetglDrag = false;
 	}
+
 	if((m_bResetglDownwash || m_bResetglOpp) && m_iView==3) {
 		if(glIsList(VLMWINGWASH)) {
 			glDeleteLists(VLMWINGWASH,1);
@@ -11595,6 +11818,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		}
 		m_bResetglDownwash = false;
 	}
+
 	if(m_bResetglOpp && m_iView==3)
 	{
 		if (m_pCurWing && m_pCurWOpp)
@@ -11615,12 +11839,17 @@ void CMiarex::GLDraw3D(CDC* pDC)
 	{
 		if(glIsList(WINGLEGEND)) 
 		{
-			glDeleteLists(WINGLEGEND,3);
-			m_GLList -= 3;
+			glDeleteLists(WINGLEGEND,1);
+			m_GLList -= 1;
 		}
 		GLCreateWingLegend();
-		GLCreateWOppLegend();
-		GLCreateCpLegend();
+		if(m_pCurWOpp) 
+		{
+			glDeleteLists(WOPPLEGEND,3);
+			m_GLList -= 3;
+			GLCreateWOppLegend();
+			GLCreateCpLegend();
+		}
 		m_bResetglLegend = false;
 	}
  
@@ -11642,6 +11871,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 			}
 		}
 	}
+
 	if((m_bResetglFlow || m_bResetglOpp) && m_iView==3) 
 	{
 		if(m_bSpeeds)
@@ -11663,6 +11893,7 @@ void CMiarex::GLDraw3D(CDC* pDC)
 	}
 
 	wglMakeCurrent(pDC->m_hDC, NULL);
+
 }
 
 
@@ -11757,8 +11988,6 @@ void CMiarex::GLSetupLight()
 }
 
 
-
-
 void CMiarex::GLRenderBody(CDC *pDC)
 {
 	int width;
@@ -11771,22 +12000,23 @@ void CMiarex::GLRenderBody(CDC *pDC)
 
 	GLdouble pts[4];
 
-	pts[0]= 1.0; pts[1]=0.0; pts[2]=0.0; pts[3]=-m_VerticalSplit*m_GLScale;  //x=m_VerticalSplit
+	pts[0]= 1.0; pts[1]=0.0; pts[2]=0.0; pts[3]=-m_VerticalSplit*m_GLScale;		//x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
 
-	pts[0]=0.0; pts[1]= 1.0; pts[2]=0.0; pts[3]=-m_HorizontalSplit*m_GLScale;//y=m_HorizontalSplit
+	pts[0]=0.0; pts[1]= 1.0; pts[2]=0.0; pts[3]=-m_HorizontalSplit*m_GLScale;	//y=m_HorizontalSplit
 	glClipPlane(GL_CLIP_PLANE2, pts);	
 
-	pts[0]=-1.0; pts[1]=0.0; pts[2]=0.0; pts[3]=m_VerticalSplit*m_GLScale;   //x=m_VerticalSplit
+	pts[0]=-1.0; pts[1]=0.0; pts[2]=0.0; pts[3]=m_VerticalSplit*m_GLScale;		//x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE3, pts);
 
-	pts[0]=0.0; pts[1]=-1.0; pts[2]=0.0; pts[3]=m_HorizontalSplit*m_GLScale; //y=m_HorizontalSplit
+	pts[0]=0.0; pts[1]=-1.0; pts[2]=0.0; pts[3]=m_HorizontalSplit*m_GLScale;	//y=m_HorizontalSplit
 	glClipPlane(GL_CLIP_PLANE4, pts);	
 
-	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
+	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;				//x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE5, pts);
 	if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE5);
 	else						glEnable(GL_CLIP_PLANE5);
+
 
 	width = m_rCltRect.Width();
 
@@ -11806,6 +12036,53 @@ void CMiarex::GLRenderBody(CDC *pDC)
 		glDisable(GL_CLIP_PLANE2);
 		glDisable(GL_CLIP_PLANE3);
 		glDisable(GL_CLIP_PLANE4);
+/*
+Soit O l’origine OGL
+Soit C le centre du modèle C(xc, yc) avant scaling
+Soit C’ le centre du modèle après scaling C’(xc’, yc’)
+Soit S le centre de scaling S(xs, ys) en repère OGL
+Soit s le facteur de scaling
+
+OC = m_BodyOffset
+
+Le centre C du modèle se translate sous l’effet du scaling non centré
+
+SC’ = (xc’-xs, yc’-ys) = s SC = s(xc-xs, yc-ys)
+
+xc' = xs + s (xc-xs) = (1-s) xs + s xc
+yc' = ys + s (yc-ys) = (1-s) ys + s yc
+
+tout se passe comme si l’on avait un modèle OGL de centre (xc’, yc’) à un facteur d’échelle s
+
+Transformation local to global : useless ??? Let OGL take care of that
+Soit M(X,Y) défini dans le repère local d’origine C’
+C’M = XI + YJ
+I = s i
+J = s j
+M = (xc’ + sX) i + (yc’ + sY) j
+
+Transformation global to local
+Soit P(x,y) défini dans le repère OGL d’origine O
+OP = xi + yj = OC’ + C’P = xc’ i + yc’  j + C’P
+i = 1/s I
+j = 1/s J
+Note : suivant la position relative des opérations OGL de translation et de scaling on peut aussi avoir i = I et j = J
+
+C’P = (x-xc’) i + (y-yc’) j = (x-xc’)/s I + (y-yc’) /sJ
+Soit : 
+X = (x-xc’)/s
+Y = (y-yc’)/s
+
+1er problème : définir les limites des bords dans le repère OGL
+-	Les grilles doivent être définies dans le repère local C’ mis à l’échelle car sont associées au modèle à la fois en position et en échelle
+-	Le problème revient donc à convertir les coordonnées des bords du repère global vers le repère local
+
+
+
+2nd problème : définir la transformation inverse pour convertir de coordonnées écran en coordonnées modèle, pour la sélection dynamique des points.
+-	Convertir les coordonnées écran en coordonnées OGL : Screen to GL ?
+-	Convertir les coordonnées GL en coordonnées modèle
+*/
 		if(m_pCurBody)	
 		{
 			glEnable(GL_CLIP_PLANE3);
@@ -11813,10 +12090,14 @@ void CMiarex::GLRenderBody(CDC *pDC)
 			glPushMatrix();
 			{
 				glTranslated(m_BodyOffset.x, m_BodyOffset.y, 0.0);
-				glScaled(m_BodyScale,m_BodyScale,m_BodyScale);
+
+				glTranslated(-m_BodyOffset.x + m_BodyScalingCenter.x, -m_BodyOffset.y + m_BodyScalingCenter.y, 0.0);
+				glScaled(m_BodyScale, m_BodyScale,0.0);
+				glTranslated(+m_BodyOffset.x + -m_BodyScalingCenter.x, +m_BodyOffset.y + -m_BodyScalingCenter.y, 0.0);
+
+				glCallList(BODYLINEGRID);
 				glCallList(BODYPOINTS);
 				glCallList(BODYAXIALLINES);
-				glCallList(BODYLINEGRID);
 			}
 			glPopMatrix();
 		}
@@ -11831,7 +12112,11 @@ void CMiarex::GLRenderBody(CDC *pDC)
 			glPushMatrix();
 			{
 				glTranslated(m_FrameOffset.x, m_FrameOffset.y, 0.0);
-				glScaled(m_FrameScale,m_FrameScale,m_FrameScale);
+
+				glTranslated(-m_FrameOffset.x + m_FrameScalingCenter.x, -m_FrameOffset.y + m_FrameScalingCenter.y, 0.0);
+				glScaled(m_FrameScale, m_FrameScale,0.0);
+				glTranslated(+m_FrameOffset.x + -m_FrameScalingCenter.x, +m_FrameOffset.y + -m_FrameScalingCenter.y, 0.0);
+
 				glCallList(FRAMEPOINTS);
 				glCallList(BODYFRAME);
 				glCallList(BODYFRAMEGRID);
@@ -12041,6 +12326,7 @@ void CMiarex::GLCreateWingLegend()
 	double LeftPos = -0.98*m_GLScale;
 	double ZPos = -m_GLScale + 8.0*dD +0.02*m_GLScale;
 
+
 	glNewList(WINGLEGEND,GL_COMPILE);
 	{
 		m_GLList++;
@@ -12050,7 +12336,8 @@ void CMiarex::GLCreateWingLegend()
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		if(m_pCurWing){
+		if(m_pCurWing)
+		{
 			double area = m_pCurWing->m_Area;
 			if(m_pCurWing2) area += m_pCurWing2->m_Area;
 			if(m_pCurPlane && m_pCurStab) ZPos+=dD;
@@ -12061,6 +12348,7 @@ void CMiarex::GLCreateWingLegend()
 			CString UFOName;
 			if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 			else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
+
 			glRasterPos2d(LeftPos,ZPos);
 			glCallLists(UFOName.GetLength(), GL_UNSIGNED_BYTE, UFOName);
 
@@ -12075,9 +12363,11 @@ void CMiarex::GLCreateWingLegend()
 			str1.LoadString(IDS_WINGAREA);
 			Result.Format(str1+surface, area * pFrame->m_m2toUnit);
 			glRasterPos2d(LeftPos,ZPos);
+
 			glCallLists(Result.GetLength(), GL_UNSIGNED_BYTE, Result);
 			ZPos -=dD;
-			if(m_pCurWPolar){
+			if(m_pCurWPolar)
+			{
 				GetWeightUnit(str, pFrame->m_WeightUnit);
 				str1.LoadString(IDS_PLANEWEIGHT);
 				Result.Format(str1,  m_pCurWing->m_Weight*pFrame->m_kgtoUnit);
@@ -12096,7 +12386,8 @@ void CMiarex::GLCreateWingLegend()
 				ZPos -=dD;
 			}
 
-			if(m_pCurPlane && m_pCurStab) {
+			if(m_pCurPlane && m_pCurStab) 
+			{
 				str1.LoadString(IDS_TAILVOLUME);
 				Result.Format(str1, m_pCurPlane->m_TailVolume);
 				glRasterPos2d(LeftPos,ZPos);
@@ -12138,8 +12429,8 @@ void CMiarex::GLCreateWingLegend()
 		//END Write wing data
 	}
 	glEndList();
-
-	if(m_bglLight){
+	if(m_bglLight)
+	{
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 	}
@@ -12214,7 +12505,6 @@ void CMiarex::GLDrawBodyLegend()
 			GetCursorPos(&point);
 			m_pChildWnd->ScreenToClient(&point);
 			ClientToGL(point, real);
-
 
 			glRasterPos2d(XFrameLegendPos, YFrameLegendPos);
 			strong.Format("Frame %2d", m_pCurBody->m_iActiveFrame+1);
@@ -12292,8 +12582,8 @@ void CMiarex::GLToClient(CVector const &real, CPoint &point)
 
 	point.x = (int)(          m_rCltRect.Width()/2.0) + x;
 	point.y = -(int)((real.y/m_GLScale+1.0)*w/2.0 - h);
-
 }
+
 
 void CMiarex::GLCreateCpLegend()
 {
@@ -12306,30 +12596,32 @@ void CMiarex::GLCreateCpLegend()
 	double r,g,b, f, fi,gh, dD, ZPos,dz,Right1, Right2, RightLetter, width, height;
 	double color = 0.0;
 	double range, delta;
-	glNewList(WOPPCPLEGEND,GL_COMPILE);
+	glListBase(GLF_START_LIST); 
+
+	width  = (double)pChildView->m_rCltRect.Width();
+	height = (double)pChildView->m_rCltRect.Height();
+	maxlength = 7;
+	gh = height/width;
+	dD      = 12.0/width*2.0     *m_GLScale;
+	ZPos    = (-1.0 + gh/2.0)    *m_GLScale;
+	dz      = gh*1.2/20.0        *m_GLScale;
+	Right1  = .94                *m_GLScale;
+	Right2  = .98                *m_GLScale;
+	RightLetter = m_GLScale * (1.0- (double)(maxlength*pChildView->m_LetterWidth) *2.0/(double)width - 0.07) *m_GLScale;
+	range = (m_LegendMax - m_LegendMin);
+	delta = range / 20;
+
+	glNewList(WOPPCPLEGENDTXT,GL_COMPILE);
+	{
 		m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		glPolygonMode(GL_FRONT,GL_FILL);
+		glPolygonMode(GL_FRONT,GL_LINE);
 		if(IsBlackAndWhite())	DecompRGB(0, r, g, b);
 		else					DecompRGB(pChildView->m_WndTextColor, r,g,b);
 		glColor3d(r,g,b);
-		glListBase(GLF_START_LIST); 
 		// Draw the labels
-		width  = (double)pChildView->m_rCltRect.Width();
-		height = (double)pChildView->m_rCltRect.Height();
-		maxlength = 7;
-		gh = height/width;
-		dD      = 12.0/width*2.0     *m_GLScale;
-		ZPos    = (-1.0 + gh/2.0)    *m_GLScale;
-		dz      = gh*1.2/20.0        *m_GLScale;
-		Right1  = .94                *m_GLScale;
-		Right2  = .98                *m_GLScale;
-		RightLetter = m_GLScale * (1.0- (double)(maxlength*pChildView->m_LetterWidth) *2.0/(double)width - 0.07) *m_GLScale;
-
-		range = (m_LegendMax - m_LegendMin);
-		delta = range / 20;
 		for (i=0; i<=20; i ++)
 		{
 			f = m_LegendMin + (double)i * delta;
@@ -12340,18 +12632,35 @@ void CMiarex::GLCreateCpLegend()
 		}
 		glRasterPos2d(Right1,ZPos+21.0*dz);
 		glCallLists(2, GL_UNSIGNED_BYTE, "Cp");
+	}
+	glEndList();
+
+	glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
+	{
+		m_GLList++;
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+
+		glPolygonMode(GL_FRONT,GL_FILL);
+		if(IsBlackAndWhite())	DecompRGB(0, r, g, b);
+		else					DecompRGB(pChildView->m_WndTextColor, r,g,b);
+		glColor3d(r,g,b);
 
 		glBegin(GL_QUAD_STRIP);
+		{
 			for (i=0; i<=20; i++)
 			{
 				fi = (double)i*dz;
 				color += 0.05;
+
 				if(IsBlackAndWhite())	glColor3d(color,color,color);
 				else					glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(Right1, ZPos+fi, 0.0);
 				glVertex3d(Right2, ZPos+fi, 0.0);
 			}
+		}
 		glEnd();
+	}
 	glEndList();
 }
 			
@@ -12701,6 +13010,7 @@ void CMiarex::GLCreateBodyBezier()
 	}
 
 	glNewList(BODYSURFACES,GL_COMPILE);
+	{
 		m_GLList++;
 //		glShadeModel(GL_FLAT);
 		color = m_pCurBody->m_BodyColor;
@@ -12754,9 +13064,11 @@ void CMiarex::GLCreateBodyBezier()
 //		glPopMatrix();
 
 //		glFlush();
+	}
 	glEndList();
 
 	glNewList(BODYGEOM,GL_COMPILE);
+	{
 		m_GLList++;
 
 		glLineWidth((GLfloat)GetPenWidth(pMainFrame->m_OutlineWidth, false));
@@ -12791,6 +13103,7 @@ void CMiarex::GLCreateBodyBezier()
 				leftpts);
 
 		glEvalMesh2(GL_LINE, 0, 8, 0, 8);
+	}
 	glEndList();
 }
 
@@ -13009,8 +13322,10 @@ void CMiarex::GLCreateBodyMesh()
 	if(!m_pCurBody)
 	{
 		glNewList(BODYMESHPANELS,GL_COMPILE);
+		{
 			m_GLList++;
-		glEndList();
+			glEndList();
+		}
 		return;
 	}
 
@@ -13645,7 +13960,9 @@ void CMiarex::GLCreateBodyAxialLines()
 
 	if(!m_pCurBody) 
 	{
-		glNewList(BODYAXIALLINES,GL_COMPILE); glEndList();
+		glNewList(BODYAXIALLINES,GL_COMPILE); 
+		m_GLList++;
+		glEndList();
 		return;
 	}
 
@@ -13748,10 +14065,12 @@ void CMiarex::GLCreateBodyPoints()
 	{
 		glNewList(BODYPOINTS,GL_COMPILE); glEndList();
 		glNewList(FRAMEPOINTS,GL_COMPILE); glEndList();
+		m_GLList+=2;
 		return;
 	}
 
 	glNewList(BODYPOINTS,GL_COMPILE);
+	{
 		m_GLList++;
 
 		glEnable(GL_DEPTH_TEST);
@@ -13789,7 +14108,7 @@ void CMiarex::GLCreateBodyPoints()
 			        m_pCurBody->m_FramePosition[k].x+0.006/m_BodyScale*m_GLScale,
 					m_pCurBody->m_FramePosition[k].z+0.006/m_BodyScale*m_GLScale);
 		}
-
+	}
 	glEndList();
 
 	if(!m_pCurFrame) return;
@@ -13852,7 +14171,9 @@ void CMiarex::GLCreateBodyFrame()
 
 	if(!m_pCurBody || ! m_pCurFrame || (m_pCurBody && m_pCurBody->m_iActiveFrame<0)) 
 	{
-		glNewList(BODYFRAME,GL_COMPILE); glEndList();
+		glNewList(BODYFRAME,GL_COMPILE); 
+		m_GLList++;
+		glEndList();
 		return;
 	}
 
@@ -14069,9 +14390,9 @@ void CMiarex::GLCreateBodyGrid()
 	COLORREF color;
 	CMainFrame *pMainFrame = (CMainFrame*)m_pFrame;
 	CChildView *pChildView = (CChildView*)m_pChildWnd;
-	double h = (double)m_rCltRect.Height();
-	double w = (double)m_rCltRect.Width();
-	double glTop = -1.0+2.0*h/w;
+//	double h = (double)m_rCltRect.Height();
+//	double w = (double)m_rCltRect.Width();
+	
 	int start = 0;
 	if(m_bAxes) start = 1;
 
@@ -14100,11 +14421,11 @@ void CMiarex::GLCreateBodyGrid()
 			glBegin(GL_LINES);
 			{
 				//vertical line
-				glVertex2d(0.0, (-1.0-m_FrameOffset.y)/m_FrameScale);
-				glVertex2d(0.0,	(glTop-m_FrameOffset.y)     /m_FrameScale);
+				glVertex2d(0.0, (-1.0-m_FrameScaledOffset.y)/m_FrameScale);
+				glVertex2d(0.0,	(m_glTop-m_FrameScaledOffset.y)     /m_FrameScale);
 				//horizontal Line
-				glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale, 0.0);
-				glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale, 0.0);
+				glVertex2d((m_VerticalSplit-m_FrameScaledOffset.x)/m_FrameScale, 0.0);
+				glVertex2d(( 1.0 -m_FrameScaledOffset.x)          /m_FrameScale, 0.0);
 			}
 			glEnd();
 		}
@@ -14128,35 +14449,35 @@ void CMiarex::GLCreateBodyGrid()
 			if(m_BodyGridDlg.m_bGrid2)
 			{
 				//Main X Grid
-				for(i=start; i<abs(1.0-m_FrameOffset.x)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
+				for(i=start; i<abs(1.0-m_FrameScaledOffset.x)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
 				{
 					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit2,
-						       (-1.0-m_FrameOffset.y)/m_FrameScale);
+						       (-1.0-m_FrameScaledOffset.y)/m_FrameScale);
 					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit2,
-						       (glTop-m_FrameOffset.y)     /m_FrameScale);
+						       (m_glTop-m_FrameScaledOffset.y)     /m_FrameScale);
 				}
-				for(i=start; i<abs(m_FrameOffset.x-(m_VerticalSplit))/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
+				for(i=start; i<abs(m_FrameScaledOffset.x-(m_VerticalSplit))/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
 				{
 					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit2),
-						       (-1.0-m_FrameOffset.y)  /m_FrameScale);
+						       (-1.0-m_FrameScaledOffset.y)  /m_FrameScale);
 					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit2),
-						       (glTop-m_FrameOffset.y) /m_FrameScale);
+						       (m_glTop-m_FrameScaledOffset.y) /m_FrameScale);
 				}
 				//Main Y Grid
 
-				for(i=start; i<abs(glTop-m_FrameOffset.y)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
+				for(i=start; i<abs(m_glTop-m_FrameScaledOffset.y)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale,
+					glVertex2d((m_VerticalSplit-m_FrameScaledOffset.x)/m_FrameScale,
 						       +(double)i*m_BodyGridDlg.m_Unit2);
-					glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale,
+					glVertex2d(( 1.0 -m_FrameScaledOffset.x)          /m_FrameScale,
 						       +(double)i*m_BodyGridDlg.m_Unit2);
 				}
 
-				for(i=start; i<abs(-1.0-m_FrameOffset.y)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
+				for(i=start; i<abs(-1.0-m_FrameScaledOffset.y)/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale,
+					glVertex2d((m_VerticalSplit-m_FrameScaledOffset.x)/m_FrameScale,
 						       -(double)i*m_BodyGridDlg.m_Unit2);
-					glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale,
+					glVertex2d(( 1.0 -m_FrameScaledOffset.x)          /m_FrameScale,
 						       -(double)i*m_BodyGridDlg.m_Unit2);
 				}
 			}
@@ -14180,35 +14501,35 @@ void CMiarex::GLCreateBodyGrid()
 			if(m_BodyGridDlg.m_bMinGrid2)
 			{
 				//Minor X Grid
-				for(i=start; i<abs(1.0-m_FrameOffset.x)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
+				for(i=start; i<abs(1.0-m_FrameScaledOffset.x)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
 				{
 					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit2,
-						       (-1.0-m_FrameOffset.y)/m_FrameScale);
+						       (-1.0-m_FrameScaledOffset.y)/m_FrameScale);
 					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit2,
-						       (glTop-m_FrameOffset.y)     /m_FrameScale);
+						       (m_glTop-m_FrameScaledOffset.y)     /m_FrameScale);
 				}
-				for(i=start; i<abs(m_FrameOffset.x-(m_VerticalSplit))/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
+				for(i=start; i<abs(m_FrameScaledOffset.x-(m_VerticalSplit))/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
 				{
 					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit2),
-						       (-1.0-m_FrameOffset.y)  /m_FrameScale);
+						       (-1.0-m_FrameScaledOffset.y)  /m_FrameScale);
 					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit2),
-						       (glTop-m_FrameOffset.y) /m_FrameScale);
+						       (m_glTop-m_FrameScaledOffset.y) /m_FrameScale);
 				}
 				//Minor Y Grid
 
-				for(i=start; i<abs(glTop-m_FrameOffset.y)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
+				for(i=start; i<abs(m_glTop-m_FrameScaledOffset.y)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale,
+					glVertex2d((m_VerticalSplit-m_FrameScaledOffset.x)/m_FrameScale,
 						       +(double)i*m_BodyGridDlg.m_MinorUnit2);
-					glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale,
+					glVertex2d(( 1.0 -m_FrameScaledOffset.x)          /m_FrameScale,
 						       +(double)i*m_BodyGridDlg.m_MinorUnit2);
 				}
 
-				for(i=start; i<abs(-1.0-m_FrameOffset.y)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
+				for(i=start; i<abs(-1.0-m_FrameScaledOffset.y)/m_BodyGridDlg.m_MinorUnit2/m_FrameScale; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_FrameOffset.x)/m_FrameScale,
+					glVertex2d((m_VerticalSplit-m_FrameScaledOffset.x)/m_FrameScale,
 						       -(double)i*m_BodyGridDlg.m_MinorUnit2);
-					glVertex2d(( 1.0 -m_FrameOffset.x)          /m_FrameScale,
+					glVertex2d(( 1.0 -m_FrameScaledOffset.x)          /m_FrameScale,
 						       -(double)i*m_BodyGridDlg.m_MinorUnit2);
 				}
 			}
@@ -14242,15 +14563,15 @@ void CMiarex::GLCreateBodyGrid()
 			else										     glLineStipple (1, 0xFFFF);
 
 			// BodyLine axis____________
-
+	
 			glBegin(GL_LINES);
 			{
 				//horizontal Line
-				glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale, 0.0);
-				glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale, 0.0);
+				glVertex2d((m_VerticalSplit- m_BodyScaledOffset.x)/m_BodyScale, 0.0);
+				glVertex2d((-1.0           - m_BodyScaledOffset.x)/m_BodyScale, 0.0);
 				//vertical Line
-				glVertex2d(0.0,	(m_HorizontalSplit-m_BodyOffset.y)/m_BodyScale);
-				glVertex2d(0.0,	(-1.0+2.0*h/w-m_BodyOffset.y)     /m_BodyScale);
+				glVertex2d(0.0,	(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale);
+				glVertex2d(0.0,	(m_glTop          -m_BodyScaledOffset.y)/m_BodyScale);
 			}
 			glEnd();
 		}
@@ -14270,44 +14591,36 @@ void CMiarex::GLCreateBodyGrid()
 		else									     glLineStipple (1, 0xFFFF);
 
 		glBegin(GL_LINES);
-
+		{
 			if(m_BodyGridDlg.m_bGrid)
 			{
 				//Main X Grid
-				for(i=start; i<abs(m_VerticalSplit-m_BodyOffset.x)/m_BodyGridDlg.m_Unit/m_BodyScale; i++)
+				for(i=start; i<abs(m_VerticalSplit-m_BodyScaledOffset.x)/m_BodyScale/m_BodyGridDlg.m_Unit; i++)
 				{
-					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit,
-						       (m_HorizontalSplit-m_BodyOffset.y)/m_BodyScale);
-					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit,
-						       (glTop-m_BodyOffset.y)            /m_BodyScale);
+					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit, (m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale);
+					glVertex2d(+(double)i*m_BodyGridDlg.m_Unit, (m_glTop-m_BodyScaledOffset.y)          /m_BodyScale);
 				}
-				for(i=start; i<abs(m_BodyOffset.x-(-1.0))/m_BodyGridDlg.m_Unit/m_BodyScale; i++)
+				for(i=start; i<abs(m_BodyScaledOffset.x-(-1.0))/m_BodyScale/m_BodyGridDlg.m_Unit; i++)
 				{
-					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit),
-						       (m_HorizontalSplit-m_BodyOffset.y)    /m_BodyScale);
-					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit),
-						       (glTop-m_BodyOffset.y)                /m_BodyScale);
+					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit),(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale);
+					glVertex2d((-(double)i*m_BodyGridDlg.m_Unit),(m_glTop-m_BodyScaledOffset.y)          /m_BodyScale);
 				}
 
 				//Main Y Grid
 
-				for(i=start; i<abs(glTop-m_BodyOffset.y)/m_BodyGridDlg.m_Unit/m_BodyScale; i++)
+				for(i=start; i<abs(m_glTop-m_BodyScaledOffset.y)/m_BodyScale/m_BodyGridDlg.m_Unit; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale,
-						       +(double)i*m_BodyGridDlg.m_Unit);
-					glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale,
-						       +(double)i*m_BodyGridDlg.m_Unit);
+					glVertex2d((m_VerticalSplit-m_BodyScaledOffset.x)/m_BodyScale, +(double)i*m_BodyGridDlg.m_Unit);
+					glVertex2d((-1.0 -m_BodyScaledOffset.x)          /m_BodyScale, +(double)i*m_BodyGridDlg.m_Unit);
 				}
 
-				for(i=start; i<abs(m_HorizontalSplit-m_BodyOffset.y)/m_BodyGridDlg.m_Unit/m_BodyScale; i++)
+				for(i=start; i<abs(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale/m_BodyGridDlg.m_Unit; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale,
-						       -(double)i*m_BodyGridDlg.m_Unit);
-					glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale,
-						       -(double)i*m_BodyGridDlg.m_Unit);
+					glVertex2d((m_VerticalSplit-m_BodyScaledOffset.x)/m_BodyScale, -(double)i*m_BodyGridDlg.m_Unit);
+					glVertex2d((-1.0 -m_BodyScaledOffset.x)          /m_BodyScale, -(double)i*m_BodyGridDlg.m_Unit);
 				}
 			}
-			
+		}	
 		glEnd();
 
 		//Minor Grid
@@ -14327,37 +14640,29 @@ void CMiarex::GLCreateBodyGrid()
 			if(m_BodyGridDlg.m_bMinGrid)
 			{
 				//Minor X Grid
-				for(i=start; i<abs(m_VerticalSplit-m_BodyOffset.x)/m_BodyGridDlg.m_MinorUnit/m_BodyScale; i++)
+				for(i=start; i<abs(m_VerticalSplit-m_BodyScaledOffset.x)/m_BodyScale/m_BodyGridDlg.m_MinorUnit; i++)
 				{
-					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit,
-						       (m_HorizontalSplit-m_BodyOffset.y)/m_BodyScale);
-					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit,
-						       (glTop-m_BodyOffset.y)            /m_BodyScale);
+					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit,(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale);
+					glVertex2d(+(double)i*m_BodyGridDlg.m_MinorUnit,(m_glTop          -m_BodyScaledOffset.y)/m_BodyScale);
 				}
-				for(i=start; i<abs(m_BodyOffset.x-(-1.0))/m_BodyGridDlg.m_MinorUnit/m_BodyScale; i++)
+				for(i=start; i<abs(m_BodyScaledOffset.x-(-1.0))/m_BodyScale/m_BodyGridDlg.m_MinorUnit; i++)
 				{
-					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit),
-						       (m_HorizontalSplit-m_BodyOffset.y)    /m_BodyScale);
-					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit),
-						       (glTop-m_BodyOffset.y)                /m_BodyScale);
+					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit),(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale);
+					glVertex2d((-(double)i*m_BodyGridDlg.m_MinorUnit),(m_glTop          -m_BodyScaledOffset.y)/m_BodyScale);
 				}
 
 				//Minor Y Grid
 
-				for(i=start; i<abs(glTop-m_BodyOffset.y)/m_BodyGridDlg.m_MinorUnit/m_BodyScale; i++)
+				for(i=start; i<abs(m_glTop-m_BodyScaledOffset.y)/m_BodyScale/m_BodyGridDlg.m_MinorUnit; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale,
-						       +(double)i*m_BodyGridDlg.m_MinorUnit);
-					glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale,
-						       +(double)i*m_BodyGridDlg.m_MinorUnit);
+					glVertex2d((m_VerticalSplit -m_BodyScaledOffset.x)/m_BodyScale, +(double)i*m_BodyGridDlg.m_MinorUnit);
+					glVertex2d((-1.0            -m_BodyScaledOffset.x)/m_BodyScale, +(double)i*m_BodyGridDlg.m_MinorUnit);
 				}
 
-				for(i=start; i<abs(m_HorizontalSplit-m_BodyOffset.y)/m_BodyGridDlg.m_MinorUnit/m_BodyScale; i++)
+				for(i=start; i<abs(m_HorizontalSplit-m_BodyScaledOffset.y)/m_BodyScale/m_BodyGridDlg.m_MinorUnit; i++)
 				{
-					glVertex2d((m_VerticalSplit-m_BodyOffset.x)/m_BodyScale,
-						       -(double)i*m_BodyGridDlg.m_MinorUnit);
-					glVertex2d((-1.0 -m_BodyOffset.x)          /m_BodyScale,
-						       -(double)i*m_BodyGridDlg.m_MinorUnit);
+					glVertex2d((m_VerticalSplit -m_BodyScaledOffset.x)/m_BodyScale,  -(double)i*m_BodyGridDlg.m_MinorUnit);
+					glVertex2d((-1.0            -m_BodyScaledOffset.x)/m_BodyScale, -(double)i*m_BodyGridDlg.m_MinorUnit);
 				}
 			}
 			
@@ -14365,71 +14670,6 @@ void CMiarex::GLCreateBodyGrid()
 		glDisable(GL_LINE_STIPPLE);
 	}
 	glEndList();
-}
-
-
-void CMiarex::SetBodyScale()
-{
-	int k;
-	double length, height;
-	double h = (double)m_rCltRect.Height();
-	double w = (double)m_rCltRect.Width();
-	double glTop = -1.0+2.0*h/w;
-
-	if(m_bIs3DScaleSet && !m_bAutoScales) return;
-	
-	m_UFOOffset.x = (GLfloat)(-1.0+m_VerticalSplit)*m_GLScale/2.0;
-	m_UFOOffset.y = (GLfloat)(-.6)*m_GLScale;
-
-	m_VerticalSplit     =  0.35;
-	m_HorizontalSplit   = -0.45;
-
-	CPoint P1, P2;
-	CVector V1, V2;
-	V1.Set(-1.0*m_GLScale,0.0,0.0);
-	V2.Set(m_VerticalSplit*m_GLScale, m_HorizontalSplit*m_GLScale,0.0);
-	GLToClient(V1, P1);
-	GLToClient(V2, P2);
-	m_BodyLineRect.SetRect(P1, P2);
-
-	V1.Set(m_VerticalSplit * m_GLScale,  0.0,             0.0);
-	V2.Set(1.0             * m_GLScale, -1.0 * m_GLScale, 0.0);
-	GLToClient(V1, P1);
-	GLToClient(V2, P2);
-	m_FrameRect.SetRect(P1, P2);
-
-	V1.Set(-1.0*m_GLScale,             m_HorizontalSplit*m_GLScale, 0.0);
-	V2.Set(m_VerticalSplit*m_GLScale, -1.0              *m_GLScale, 0.0);
-	GLToClient(V1, P1);
-	GLToClient(V2, P2);
-	m_BodyRect.SetRect(P1, P2);
-
-
-	m_FrameOffset.Set((1.0+m_VerticalSplit)/2.0 * m_GLScale,  (glTop-1.0)              /2.0 * m_GLScale,   0.0);
-	m_BodyOffset.Set(  -0.7                     * m_GLScale,  (glTop+m_HorizontalSplit)/2.0 * m_GLScale,   0.0);
-
-	if(m_pCurBody)
-	{
-		length =   m_pCurBody->m_FramePosition[m_pCurBody->m_NStations-1].x  - m_pCurBody->m_FramePosition[0].x;
-		m_BodyScale = (m_VerticalSplit-(-1.0) - 0.3)/length*m_GLScale;
-
-		height = 0.0;
-		for(k=0; k<m_pCurBody->m_NStations; k++)
-		{
-			height = max(height,abs( m_pCurBody->m_Frame[k].m_Point[0].z - m_pCurBody->m_Frame[k].m_Point[m_pCurBody->m_Frame[k].m_NPoints-1].z)); 
-		}
-		m_FrameScale = (1.0-0.5)/height*m_GLScale;
-	}
-	else
-	{
-		m_BodyScale  = 1.0;
-		m_FrameScale = 1.0;
-	}
-
-	CFrame::s_rViewRect.CopyRect(m_FrameRect);
-	CBody::s_rViewRect.CopyRect(m_BodyLineRect);
-	m_BodyRefScale  = m_BodyScale;
-	m_FrameRefScale = m_FrameScale;
 }
 
 
@@ -14468,7 +14708,7 @@ void CMiarex::GLCreateGeom(CWing *pWing, UINT List, COLORREF wingcolor)
 			{
 				glBegin(GL_QUADS);
 				{
-					pWing->m_Surface[j].GetPanel(0,l, 1);
+					pWing->m_Surface[j].GetPanel(0,l,1);
 
 					LATB = pWing->m_Surface[j].TB - pWing->m_Surface[j].LA;
 					TALB = pWing->m_Surface[j].LB - pWing->m_Surface[j].TA;
@@ -15335,17 +15575,21 @@ void CMiarex::OnSingleGraph4()
 void CMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc)
 {
 	if(!m_pCurWing || !m_pCurWPolar) return;
+	int l;
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 // check if all the foils are there...
 // ...could have been deleted or renamed or not imported with AVL wing or whatever
-	for (int l=0; l<=m_pCurWing->m_NPanel; l++){
-		if (!pFrame->GetFoil(m_pCurWing->m_RFoil[l])){
+	for (l=0; l<=m_pCurWing->m_NPanel; l++)
+	{
+		if (!pFrame->GetFoil(m_pCurWing->m_RFoil[l]))
+		{
 			CString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_RFoil[l] +"...\nAborting Calculation";
 			AfxMessageBox(strong);
 			return;
 		}
-		if (!pFrame->GetFoil(m_pCurWing->m_LFoil[l])){
+		if (!pFrame->GetFoil(m_pCurWing->m_LFoil[l]))
+		{
 			CString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_LFoil[l] +"...\nAborting Calculation";
 			AfxMessageBox(strong);
@@ -15355,20 +15599,20 @@ void CMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 
 	m_pCurWing->m_bInitCalc = bInitCalc;
 
-	m_IDlg.m_pMiarex   = this;
-	m_IDlg.m_pFrame    = m_pFrame;
+	m_LLTDlg.m_pMiarex   = this;
+	m_LLTDlg.m_pFrame    = m_pFrame;
 	
-	m_IDlg.m_pWing     = m_pCurWing;
-	m_IDlg.m_bSequence = bSequence;
+	m_LLTDlg.m_pWing     = m_pCurWing;
+	m_LLTDlg.m_bSequence = bSequence;
 
-	m_IDlg.m_Alpha      = V0;
-	m_IDlg.m_AlphaMax   = VMax;
-	m_IDlg.m_DeltaAlpha = VDelta;
+	m_LLTDlg.m_Alpha      = V0;
+	m_LLTDlg.m_AlphaMax   = VMax;
+	m_LLTDlg.m_DeltaAlpha = VDelta;
 
-	if(m_pCurWPolar->m_Type != 4) m_IDlg.m_bType4 = false;
-	else                          m_IDlg.m_bType4 = true;
+	if(m_pCurWPolar->m_Type != 4) m_LLTDlg.m_bType4 = false;
+	else                          m_LLTDlg.m_bType4 = true;
 	
-	m_IDlg.DoModal();
+	m_LLTDlg.DoModal();
 
 	if(m_iView!=2) SetWOpp(false, V0);
 	
@@ -15383,6 +15627,13 @@ bool CMiarex::InitializePanels()
 {
 	if(!m_pCurWing) return false;
 	int j,k,l;
+
+	CMessageDlg dlg;
+	dlg.Create(IDD_MESSAGEDLG,this);
+	dlg.m_bCancel = false;
+	dlg.ShowWindow(SW_SHOW);
+	dlg.SetMessage("Creating elements...");
+	dlg.SetProgress(0);
 
 	CWaitCursor wait;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -15436,12 +15687,13 @@ bool CMiarex::InitializePanels()
 
 	p = 0;
 	CPanel *ptr = m_Panel;
+
+
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		m_pSurface[j]->ResetFlap();
 
-		Nel = CreateElements(*(m_pSurface+j), ptr);
-
+		Nel = CreateElements(*(m_pSurface+j));
 		//reference in pPanel array the left side panels for all surfaces
 		if((*(m_pSurface+j))->m_bIsLeftSurf)
 		{
@@ -15453,6 +15705,58 @@ bool CMiarex::InitializePanels()
 		}
 		ptr += Nel;
 	}
+
+
+	//merge trailing edge nodes if panel analysis
+/*	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3)
+	{
+		CVector Tl, Tu, Tm;
+		int q, pq;
+		pq=0;
+		for (j=0; j<m_NSurfaces; j++)
+		{
+			pp=0;
+
+			//skip left tip patch
+			if(m_pSurface[j]->m_bIsTipLeft) pq+=m_pSurface[j]->m_NXPanels;
+
+			for (k=0; k<m_pSurface[j]->m_NYPanels; k++)
+			{
+				Tl = m_Node[m_Panel[pq+pp].m_iTA];	
+				Tu = m_Node[m_Panel[pq+pp +2*m_pSurface[j]->m_NXPanels-1].m_iTA];	
+				Tm = (Tl+Tu)/2.0;
+				m_Node[m_Panel[pq+pp].m_iTA]                                = Tm;
+				m_Node[m_Panel[pq+pp +2*m_pSurface[j]->m_NXPanels-1].m_iTA] = Tm;
+
+				pp += m_pSurface[j]->m_NXPanels * 2;
+			}
+			q  = pp - m_pSurface[j]->m_NXPanels * 2;
+			Tl = m_Node[m_Panel[pq+q].m_iTB];	
+			Tu = m_Node[m_Panel[pq+q +2*m_pSurface[j]->m_NXPanels-1].m_iTB];	
+			Tm = (Tl+Tu)/2.0;
+			m_Node[m_Panel[pq+q].m_iTB]                                = Tm;
+			m_Node[m_Panel[pq+q +2*m_pSurface[j]->m_NXPanels-1].m_iTB] = Tm;
+
+			pq+=pp;
+			if(m_pSurface[j]->m_bIsTipRight) pq+=m_pSurface[j]->m_NXPanels;
+		}
+		for (j=0; j<m_NSurfaces; j++)
+		{
+			pp=0;
+			for(k=0; k<m_pSurface[j]->m_NYPanels; k++)
+			{
+				for(l=0; l<m_pSurface[j]->m_NXPanels; l++)
+				{
+					if(m_Panel[pp].m_bIsTrailing)
+						m_Panel[pp].SetFrame(m_Node[m_Panel[pp].m_iLA],m_Node[m_Panel[pp].m_iLB],
+						                     m_Node[m_Panel[pp].m_iTA],m_Node[m_Panel[pp].m_iTB]);
+					pp++;
+				}
+			}
+		}
+	}*/
+
+
 
 	if(bBodyEl)
 	{
@@ -15673,15 +15977,16 @@ bool CMiarex::InitializePanels()
 			}
 		}
 	}
-//	m_pSurface[1]->RotateFlap(-45);
 	return true;
 }
+
 
 int CMiarex::CreateBodyElements(CPanel *pPanel)
 {
 	if(!m_pCurBody) return 0;
 	int i,j,k,l;
 	double uk, uk1, v, dj, dj1, dl1;
+	double dpx, dpz;
 	CVector LATB, TALB;
 	CVector LA, LB, TA, TB;
 	CVector PLA, PTA, PLB, PTB;
@@ -15695,6 +16000,13 @@ int CMiarex::CreateBodyElements(CPanel *pPanel)
 	int FullSize;
 
 	lnx = 0; 
+
+	if(m_iView!=5 && m_pCurPlane && m_pCurPlane->m_pBody)
+	{
+		dpx = m_pCurPlane->m_BodyPos.x;
+		dpz = m_pCurPlane->m_BodyPos.z;
+	}
+	else dpx=dpz=0.0;
 
 	if(m_pCurBody->m_LineType==1)
 	{
@@ -15718,21 +16030,21 @@ int CMiarex::CreateBodyElements(CPanel *pPanel)
 				for (k=0; k<m_pCurBody->m_NSideLines-1; k++)
 				{
 					//build the four corner points of the strips 
-					PLB.x =  (1.0- dj) * m_pCurBody->m_FramePosition[i].x      +  dj * m_pCurBody->m_FramePosition[i+1].x;
+					PLB.x =  (1.0- dj) * m_pCurBody->m_FramePosition[i].x      +  dj * m_pCurBody->m_FramePosition[i+1].x       +dpx;
 					PLB.y = -(1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k].y   -  dj * m_pCurBody->m_Frame[i+1].m_Point[k].y;
-					PLB.z =  (1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k].z   +  dj * m_pCurBody->m_Frame[i+1].m_Point[k].z;
+					PLB.z =  (1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k].z   +  dj * m_pCurBody->m_Frame[i+1].m_Point[k].z    +dpz;
 
-					PTB.x =  (1.0-dj1) * m_pCurBody->m_FramePosition[i].x      + dj1 * m_pCurBody->m_FramePosition[i+1].x;
+					PTB.x =  (1.0-dj1) * m_pCurBody->m_FramePosition[i].x      + dj1 * m_pCurBody->m_FramePosition[i+1].x       +dpx;
 					PTB.y = -(1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k].y   - dj1 * m_pCurBody->m_Frame[i+1].m_Point[k].y;
-					PTB.z =  (1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k].z   + dj1 * m_pCurBody->m_Frame[i+1].m_Point[k].z;
+					PTB.z =  (1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k].z   + dj1 * m_pCurBody->m_Frame[i+1].m_Point[k].z    +dpz;
 
-					PLA.x =  (1.0- dj) * m_pCurBody->m_FramePosition[i].x      +  dj * m_pCurBody->m_FramePosition[i+1].x;
+					PLA.x =  (1.0- dj) * m_pCurBody->m_FramePosition[i].x      +  dj * m_pCurBody->m_FramePosition[i+1].x       +dpx;
 					PLA.y = -(1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k+1].y -  dj * m_pCurBody->m_Frame[i+1].m_Point[k+1].y;
-					PLA.z =  (1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k+1].z +  dj * m_pCurBody->m_Frame[i+1].m_Point[k+1].z;
+					PLA.z =  (1.0- dj) * m_pCurBody->m_Frame[i].m_Point[k+1].z +  dj * m_pCurBody->m_Frame[i+1].m_Point[k+1].z  +dpz;
 
-					PTA.x =  (1.0-dj1) * m_pCurBody->m_FramePosition[i].x      + dj1 * m_pCurBody->m_FramePosition[i+1].x;
+					PTA.x =  (1.0-dj1) * m_pCurBody->m_FramePosition[i].x      + dj1 * m_pCurBody->m_FramePosition[i+1].x       +dpx;
 					PTA.y = -(1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k+1].y - dj1 * m_pCurBody->m_Frame[i+1].m_Point[k+1].y;
-					PTA.z =  (1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pCurBody->m_Frame[i+1].m_Point[k+1].z;
+					PTA.z =  (1.0-dj1) * m_pCurBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pCurBody->m_Frame[i+1].m_Point[k+1].z  +dpz;
 
 					LB = PLB; 
 					TB = PTB;
@@ -15834,13 +16146,23 @@ int CMiarex::CreateBodyElements(CPanel *pPanel)
 			m_pCurBody->GetPoint(uk,  0, false, LB);
 			m_pCurBody->GetPoint(uk1, 0, false, TB);
 
+			LB.x += dpx;
+			LB.z += dpz;
+			TB.x += dpx;
+			TB.z += dpz;
+
 			for (l=0; l<nh; l++)
 			{
 				//start with left side... same as for wings
 				v = (double)(l+1) / (double)(nh); 
 				m_pCurBody->GetPoint(uk,  v, false, LA);
 				m_pCurBody->GetPoint(uk1, v, false, TA);
-			
+
+				LA.x += dpx;
+				LA.z += dpz;
+				TA.x += dpx;
+				TA.z += dpz;
+
 				n0 = IsNode(LA);
 				n1 = IsNode(TA);
 				n2 = IsNode(LB);
@@ -16015,7 +16337,7 @@ int CMiarex::CreateBodyElements(CPanel *pPanel)
 }
 
 
-int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
+int CMiarex::CreateElements(CSurface *pSurface)
 {
 	//TODO : for  a gap at the wing's center, need to separate m_iPL and m_iPR at the tips;
 	bool bNoJoinFlap ;
@@ -16099,7 +16421,7 @@ int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
 	{
 		//add "horizontal" panels, mid side, or following a strip from bot to top if 3D Panel
 		if(!m_pCurWPolar)                        side = -1;
-		else if(m_pCurWPolar->m_AnalysisType==1) side =0;
+		else if(m_pCurWPolar->m_AnalysisType==1) side =  0;
 		else 
 		{
 			if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces)    
@@ -16169,11 +16491,8 @@ int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
 			m_Panel[m_MatSize].m_iPos = side;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 
-			if(side==0)     
-			{
-				m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
-			}
-			else if (side==-1)   m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
+			if(side==0)			m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
+			else if (side==-1)  m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
 
 			// set neighbour panels
 			// valid only for Panel 2-sided Analysis
@@ -16296,7 +16615,8 @@ int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
 				if(k==pSurface->m_NYPanels-1) m_Panel[m_MatSize].m_iPR = -1;
 
 
-				if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisType==3){
+				if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisType==3)
+				{
 					m_Panel[m_MatSize].m_iWake = m_WakeSize;//next wake element
 					m_Panel[m_MatSize].m_iWakeColumn = m_NWakeColumn;
 					CreateWakeElems(m_MatSize);
@@ -16377,6 +16697,7 @@ int CMiarex::CreateElements(CSurface *pSurface, CPanel *pPanel)
 	return pSurface->m_NElements;
 }
 
+
 bool CMiarex::CreateWakeElems(int PanelIndex)
 {
 	if(!m_pCurWPolar) return false;
@@ -16395,6 +16716,7 @@ bool CMiarex::CreateWakeElems(int PanelIndex)
 //	double slope = m_pSurface[0]->m_pFoilA->GetCamberSlope(1.0);
 //	CVector TE(1.0,0.0,slope);
 //	TE.Normalize();
+
 
 	NXWakePanels    = m_pCurWPolar->m_NXWakePanels;
 	WakePanelFactor = m_pCurWPolar->m_WakePanelFactor;
@@ -16509,7 +16831,7 @@ bool CMiarex::VLMIsSameSide(int p, int pp)
 	return false;
 }
 
-int CMiarex::IsNode(CVector  &Pt)
+int CMiarex::IsNode(CVector &Pt)
 {
 	int in;
 	for (in=0; in<m_nNodes; in++)
@@ -16521,19 +16843,27 @@ int CMiarex::IsNode(CVector  &Pt)
 
 void CMiarex::Analyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc)
 {
+
+//	m_VLMDlg.Plot();
+//	m_PanelDlg.Plot();
+//	return;
+
 	int l;
 	if(!m_pCurWing || !m_pCurWPolar) return;
 	CMainFrame *pFrame =(CMainFrame*)m_pFrame;
 // check if all the foils are there...
 // ...could have been deleted or renamed or not imported with AVL wing or whatever
-	for (l=0; l<=m_pCurWing->m_NPanel; l++){
-		if (!pFrame->GetFoil(m_pCurWing->m_RFoil[l])){
+	for (l=0; l<=m_pCurWing->m_NPanel; l++)
+	{
+		if (!pFrame->GetFoil(m_pCurWing->m_RFoil[l]))
+		{
 			CString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_RFoil[l] +"...\nAborting Calculation";
 			AfxMessageBox(strong);
 			return;
 		}
-		if (!pFrame->GetFoil(m_pCurWing->m_LFoil[l])){
+		if (!pFrame->GetFoil(m_pCurWing->m_LFoil[l]))
+		{
 			CString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_LFoil[l] +"...\nAborting Calculation";
 			AfxMessageBox(strong);
@@ -16559,7 +16889,8 @@ void CMiarex::Analyze(double V0, double VMax, double VDelta, bool bSequence, boo
 		}
 	}
 
-	if(m_pCurFin){
+	if(m_pCurFin)
+	{
 		for (l=0; l<=m_pCurFin->m_NPanel; l++){
 			if (!pFrame->GetFoil(m_pCurFin->m_RFoil[l])){
 				CString strong;
@@ -17252,6 +17583,8 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_Alpha               = m_VLMDlg.m_OpAlpha;
 			pWOpp->m_QInf                = m_VLMDlg.m_QInf;
 			pWOpp->m_CL                  = m_VLMDlg.m_CL;
+			pWOpp->m_CX                  = m_VLMDlg.m_CX;
+			pWOpp->m_CY                  = m_VLMDlg.m_CY;
 			pWOpp->m_InducedDrag         = m_VLMDlg.m_InducedDrag;
 			pWOpp->m_ViscousDrag         = m_VLMDlg.m_ViscousDrag;
 
@@ -17264,8 +17597,7 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_XCP                 = m_VLMDlg.m_XCP;
 			pWOpp->m_YCP                 = m_VLMDlg.m_YCP;
 
-//			memcpy(pPOpp->m_WingWOpp.m_ICd, m_VLMDlg.m_ICd, sizeof(pPOpp->m_WingWOpp.m_ICd));
-//			memcpy(pPOpp->m_WingWOpp.m_Ai,  m_VLMDlg.m_Ai,  sizeof(pPOpp->m_WingWOpp.m_Ai));
+			pWOpp->m_Beta	             = m_pCurWPolar->m_Beta;
 		}
 		else if(m_pCurWPolar->m_AnalysisType==3)
 		{
@@ -17276,6 +17608,8 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_Alpha               = m_PanelDlg.m_OpAlpha;
 			pWOpp->m_QInf                = m_PanelDlg.m_QInf;
 			pWOpp->m_CL                  = m_PanelDlg.m_CL;
+			pWOpp->m_CX                  = m_PanelDlg.m_CX;
+			pWOpp->m_CY                  = m_PanelDlg.m_CY;
 			pWOpp->m_InducedDrag         = m_PanelDlg.m_InducedDrag;
 			pWOpp->m_ViscousDrag         = m_PanelDlg.m_ViscousDrag;
 
@@ -17288,8 +17622,7 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_XCP                 = m_PanelDlg.m_XCP;
 			pWOpp->m_YCP                 = m_PanelDlg.m_YCP;
 
-//			memcpy(pPOpp->m_WingWOpp.m_ICd, m_PanelDlg.m_ICd, sizeof(pPOpp->m_WingWOpp.m_ICd));
-//			memcpy(pPOpp->m_WingWOpp.m_Ai,  m_PanelDlg.m_Ai,  sizeof(pPOpp->m_WingWOpp.m_Ai));
+			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
 		}
 
 		if(Cp) memcpy(pPOpp->m_Cp, Cp,  sizeof(pPOpp->m_Cp));
@@ -17308,20 +17641,24 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 				pPOpp->m_Wing2WOpp.m_Cp[i] = pPOpp->m_Cp[p];
 				p++;
 			}
+			memcpy(pPOpp->m_Wing2WOpp.m_Vd,       m_pCurWing2->m_Vd,  sizeof(pPOpp->m_Wing2WOpp.m_Vd));
 		}
 		if(m_pCurStab){
 			for(i=0; i<m_pCurStab->m_MatSize; i++){
 				pPOpp->m_StabWOpp.m_Cp[i] = pPOpp->m_Cp[p];
 				p++;
 			}
+			memcpy(pPOpp->m_StabWOpp.m_Vd,        m_pCurStab->m_Vd,  sizeof(pPOpp->m_StabWOpp.m_Vd));
 		}
 		if(m_pCurFin){
-			for(i=0; i<m_pCurFin->m_MatSize; i++){
+			for(i=0; i<m_pCurFin->m_MatSize; i++)
+			{
 				pPOpp->m_FinWOpp.m_Cp[i] = pPOpp->m_Cp[p];
 				p++;
 			}
+			memcpy(pPOpp->m_FinWOpp.m_Vd,         m_pCurFin->m_Vd,  sizeof(pPOpp->m_FinWOpp.m_Vd));
 		}
-
+		
 		m_pCurWPolar->AddPoint(pPOpp);
 
 		m_pCurWOpp = &pPOpp->m_WingWOpp;
@@ -17347,7 +17684,7 @@ void CMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 				{
 					if(pPOpp->m_Type <3 || pPOpp->m_Type==5 || pPOpp->m_Type==6)
 					{
-						if(abs(pPOpp->m_Alpha - pOldPOpp->m_Alpha)<0.01)
+						if(abs(pPOpp->m_Alpha - pOldPOpp->m_Alpha)<0.005)
 						{
 							//replace existing point
 							pPOpp->m_Color = pOldPOpp->m_Color;
@@ -17883,6 +18220,7 @@ void CMiarex::OnDefineAnalysis()
 		pCurWPolar->m_QInf            = m_WngAnalysis.m_QInf;
 		pCurWPolar->m_Weight          = m_WngAnalysis.m_Weight;
 		pCurWPolar->m_XCmRef          = m_WngAnalysis.m_XCmRef;
+		pCurWPolar->m_Beta            = m_WngAnalysis.m_Beta;
 		pCurWPolar->m_ASpec           = m_WngAnalysis.m_Alpha;
 		pCurWPolar->m_PlrName         = m_WngAnalysis.m_WPolarName;
 		pCurWPolar->m_Density         = m_WngAnalysis.m_Density;
@@ -18682,6 +19020,7 @@ void CMiarex::OnResetBodyScale()
 	m_pChildWnd->ScreenToClient( &pt);
 
 	m_bIs3DScaleSet = false;
+	m_bResetglBody2D = true;
 	SetBodyScale();
 	Set3DScale();
 //	UpdateBody();
@@ -18728,12 +19067,11 @@ void CMiarex::GLCallViewLists()
 	glDisable(GL_LIGHT0);
 
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && m_pCurWPolar->m_bTiltedGeom 
-		&& m_bWakePanels) 
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)  
 		glCallList(WINGWAKEPANELS);
 
-	if(m_bMoments && m_pCurWOpp)	
-		glCallList(VLMMOMENTS);
+
+	if(m_bMoments && m_pCurWOpp)			glCallList(VLMMOMENTS);
 
 	if (m_pCurWOpp
 		&& m_bStream
@@ -18744,16 +19082,8 @@ void CMiarex::GLCallViewLists()
 	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisType>=2 && !m_bResetglFlow) 
 		glCallList(SURFACESPEEDS);
 
-	if(m_bglLight)	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}
-	else {
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-	}
 
-	if (m_pCurWOpp) glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
+	if (m_pCurWOpp)                                      glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
 /*	glColor3d(1.0, 0.0, 0.5);
 	glLineWidth(2.0);
@@ -18763,7 +19093,55 @@ void CMiarex::GLCallViewLists()
 		glVertex3d(RB.x, RB.y, RB.z);
 	}*/
 
-	if(m_bSurfaces && m_pCurBody)		glCallList(BODYSURFACES);
+
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels) 
+		glCallList(WINGWAKEPANELS);
+
+	if(m_bVLMPanels && m_pCurWing)
+	{
+		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
+		glCallList(MESHPANELS);
+	}
+
+	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2) glCallList(PANELCP);
+
+	if(m_bglLight)	
+	{
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+	}
+	else 
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+	}
+
+	if (m_pCurWPolar && abs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+
+	if(m_bOutline)	
+	{
+		if(m_pCurWing)  glCallList(WINGOUTLINE);
+		if(m_pCurWing2) glCallList(WING2OUTLINE);
+		if(m_pCurStab)  glCallList(STABOUTLINE);
+		if(m_pCurFin)   glCallList(FINOUTLINE);
+		if(m_pCurPlane)	glTranslated(m_pCurPlane->m_BodyPos.x, 0.0, m_pCurPlane->m_BodyPos.z);
+		if(m_pCurBody)	glCallList(BODYGEOM);
+		if(m_pCurPlane)	glTranslated(-m_pCurPlane->m_BodyPos.x, 0.0, -m_pCurPlane->m_BodyPos.z);
+	}
+
+	if(m_bglLight)	
+	{
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+	}
+	else 
+	{
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+	}
 
 	if(m_bSurfaces)	
 	{
@@ -18771,29 +19149,22 @@ void CMiarex::GLCallViewLists()
 		if(m_pCurWing2) glCallList(WING2SURFACES);
 		if(m_pCurStab)  glCallList(STABSURFACES);
 		if(m_pCurFin)   glCallList(FINSURFACES);
+		if(m_pCurBody)
+		{
+			if(m_pCurPlane)	glTranslated(m_pCurPlane->m_BodyPos.x, 0.0, m_pCurPlane->m_BodyPos.z);
+			glCallList(BODYSURFACES);
+			if(m_pCurPlane)	glTranslated(-m_pCurPlane->m_BodyPos.x, 0.0, -m_pCurPlane->m_BodyPos.z);
+		}
 	}
-
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
-
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && !m_pCurWPolar->m_bTiltedGeom 
-		&& m_bWakePanels) 
-		glCallList(WINGWAKEPANELS);
-
-	if(m_bVLMPanels && m_pCurWing)
-	{
-		if(!(m_b3DVLMCl&&m_pCurWOpp) && !m_bSurfaces)//else panels will be filled by Cp color
-			glCallList(MESHBACK);
-		glCallList(MESHPANELS);
-	}
 
 	if(m_bVortices && m_pCurWing)
 	{
 		glCallList(VLMCTRLPTS);
 		glCallList(VLMVORTICES);
 	}
-	if(m_b3DVLMCl && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
-		glCallList(PANELCP);
+
 
 	if(m_bXCP && m_pCurWOpp)
 	{
@@ -18817,6 +19188,7 @@ void CMiarex::GLCallViewLists()
 			if(m_pCurFin)   glCallList(VLMFINDRAG);
 		}
 	}
+
 	if(m_b3DDownwash && m_pCurWOpp)
 	{
 		if(m_pCurWing) glCallList(VLMWINGWASH);
@@ -18827,6 +19199,7 @@ void CMiarex::GLCallViewLists()
 			if(m_pCurFin) 	glCallList(VLMFINWASH);
 		}
 	}
+
 	if(m_bXTop && m_pCurWOpp)
 	{
 		if(m_pCurWing) glCallList(VLMWINGTOPTRANS);
@@ -18845,14 +19218,6 @@ void CMiarex::GLCallViewLists()
 			if(m_pCurStab) 		glCallList(VLMSTABBOTTRANS);
 			if(m_pCurFin) 		glCallList(VLMFINBOTTRANS);
 		}
-	}
-	if(m_bOutline)	
-	{
-		if(m_pCurWing)  glCallList(WINGOUTLINE);
-		if(m_pCurWing2) glCallList(WING2OUTLINE);
-		if(m_pCurStab)  glCallList(STABOUTLINE);
-		if(m_pCurFin)   glCallList(FINOUTLINE);
-		if(m_pCurBody)	glCallList(BODYGEOM);
 	}
 }
 
@@ -18873,17 +19238,23 @@ void CMiarex::GLRenderView(CDC *pDC)
 	glFlush();
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
  	glPushMatrix();
 	{
 		if(m_iView==3)
 		{
-			if (m_b3DVLMCl && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 && m_bShowCpScale)
-				glCallList(WOPPCPLEGEND);
+			if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 && m_bShowCpScale)
+			{
+				glCallList(WOPPCPLEGENDTXT);
+				glCallList(WOPPCPLEGENDCLR);
+			}
 			if(m_pCurWing) 
 				glCallList(WINGLEGEND);
 			if(m_pCurWOpp) 
+			{
 				glCallList(WOPPLEGEND);
+				glCallList(WOPPLEGEND);
+			}
 		}
 
 		GLSetupLight();
@@ -19210,6 +19581,9 @@ void * CMiarex::GetUFOPlrVariable(CWPolar *pWPolar, int iVar)
 		case 28:
 			pVar = &pWPolar->m_Ctrl;
 			break;
+		case 29:
+			pVar = &pWPolar->m_CY;
+			break;
 		default:
 			pVar = &pWPolar->m_Alpha;
 			break;
@@ -19319,6 +19693,9 @@ void CMiarex::SetWGraphTitles(Graph* pGraph, int iX, int iY)
 		case 28:
 			pGraph->SetXTitle("ctrl");
 			break;
+		case 29:
+			pGraph->SetXTitle("CY");
+			break;
 		default:
 			pGraph->SetXTitle("Alpha°");
 			break;
@@ -19414,6 +19791,9 @@ void CMiarex::SetWGraphTitles(Graph* pGraph, int iX, int iY)
 			break;
 		case 28:
 			pGraph->SetYTitle("ctrl var");
+			break;
+		case 29:
+			pGraph->SetYTitle("CY");
 			break;
 		default:
 			pGraph->SetYTitle("Alpha°");
@@ -19793,8 +20173,6 @@ void CMiarex::OnControlAnalysis()
 		pCurWPolar->m_Type = m_CtrlDlg.m_Type;
 		pCurWPolar->m_QInf            = m_CtrlDlg.m_QInf;
 		pCurWPolar->m_Weight          = m_CtrlDlg.m_Weight;
-		pCurWPolar->m_XCmRef          = 0.0;
-		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_PlrName         = m_CtrlDlg.m_WPolarName;
 		pCurWPolar->m_Density         = m_CtrlDlg.m_Density;
 		pCurWPolar->m_Viscosity       = m_CtrlDlg.m_Viscosity;
@@ -19805,6 +20183,9 @@ void CMiarex::OnControlAnalysis()
 		pCurWPolar->m_AnalysisType    = 2; //vlm2
 		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
+		pCurWPolar->m_XCmRef          = 0.0;
+		pCurWPolar->m_ASpec           = 0.0;
+		pCurWPolar->m_Beta            = 0.0;
 		pCurWPolar->m_Height          = 0.0;
 		pCurWPolar->m_TotalWakeLength = 10.0;
 		pCurWPolar->m_WakePanelFactor = 1.1;
@@ -19816,6 +20197,11 @@ void CMiarex::OnControlAnalysis()
 			pCurWPolar->m_bActiveControl[i] = m_CtrlDlg.m_bActiveControl[i];
 			pCurWPolar->m_MinControl[i] = m_CtrlDlg.m_MinControl[i];
 			pCurWPolar->m_MaxControl[i] = m_CtrlDlg.m_MaxControl[i];
+		}
+
+		for(i=m_CtrlDlg.m_nControls; i<MAXCONTROLS; i++)
+		{
+			pCurWPolar->m_bActiveControl[i] = false;
 		}
 
 		pCurWPolar->m_bPolar = true;
@@ -19872,7 +20258,7 @@ void CMiarex::OnControlAnalysis()
 
 void CMiarex::RotateGeomY(double const &Angle, CVector const &P)
 {
-	int n, p, pw, nw;
+	int n, p, pw, kw, lw;
 	double cosa = cos(Angle*pi/180.0);
 	double sina = sin(Angle*pi/180.0);
 	int iLA, iLB, iTA, iTB;
@@ -19889,40 +20275,45 @@ void CMiarex::RotateGeomY(double const &Angle, CVector const &P)
 		LATB = m_Node[iLA] - m_Node[iTB];
 		TALB = m_Node[iTA] - m_Node[iLB];
 
-		if(m_Panel[p].m_iPos==-1)	m_Panel[p].Normal = TALB * LATB;
-		else						m_Panel[p].Normal = LATB * TALB;
-
-		m_Panel[p].Normal.Normalize();
-		m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
+		if(m_Panel[p].m_iPos==0 || m_Panel[p].m_iPos==1)	m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
+		else if (m_Panel[p].m_iPos==-1)						m_Panel[p].SetFrame(m_Node[iLB], m_Node[iLA], m_Node[iTB], m_Node[iTA]);
 	}
 
 	// the wake array is not rotated but translated to remain at the wing's trailing edge
-	for (p=0; p< m_MatSize; p++)
+	pw=0;
+	
+	if(!m_pCurWPolar) return;
+	for (kw=0; kw<m_NWakeColumn; kw++)
 	{
-		if(m_Panel[p].m_bIsTrailing && (m_Panel[p].m_iPos ==-1 ||m_Panel[p].m_iPos==0))
-		{
-			Pt = m_Node[m_Panel[p].m_iTA];
-			Pt.RotateY(P, Angle);
-			//define the translation to be applied to the column's left points
-			Trans = m_Node[m_Panel[p].m_iTA] - Pt;
-			for(nw=0; nw<m_nWakeNodes; nw++)
-			{
-				if(abs(m_WakeNode[nw].y-m_Node[m_Panel[p].m_iTA].y)<0.0001 && abs(m_WakeNode[nw].z-m_Node[m_Panel[p].m_iTA].z)<0.0001) 
-					m_WakeNode[nw] += Trans;
-			}
+		//consider the first panel of the column;
+		Pt = m_WakeNode[m_WakePanel[pw].m_iLA];
+		Pt.RotateY(P, Angle);
+		//define the translation to be applied to the column's left points
+		Trans = Pt - m_WakeNode[m_WakePanel[pw].m_iLA];
 
-			Pt = m_Node[m_Panel[p].m_iTB];
-			Pt.RotateY(P, Angle);
-			//define the translation to be applied to the column's left points
-			Trans = m_Node[m_Panel[p].m_iTB] - Pt;
-			for(nw=0; nw<m_nWakeNodes; nw++)
-			{
-				if(abs(m_WakeNode[nw].y-m_Node[m_Panel[p].m_iTB].y)<0.0001 && abs(m_WakeNode[nw].z-m_Node[m_Panel[p].m_iTB].z)<0.0001) 
-					m_WakeNode[nw] += Trans;
-			}
+		//each wake column has m_NXWakePanels ... translate all left A nodes
+		for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
+		{
+			if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLA] += Trans;
+			m_WakeNode[m_WakePanel[pw].m_iTA] += Trans;
+			pw++;
 		}
 	}
 
+	//do the same for the very last right wake node column
+	pw -= m_pCurWPolar->m_NXWakePanels;
+	Pt = m_WakeNode[m_WakePanel[pw].m_iLB];
+	Pt.RotateY(P, Angle);
+	//define the translation to be applied to the column's left points
+	Trans = Pt-m_WakeNode[m_WakePanel[pw].m_iLB];
+
+	//each wake column has m_NXWakePanels ... translate all right B nodes
+	for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
+	{
+		if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLB] += Trans;
+		m_WakeNode[m_WakePanel[pw].m_iTB] += Trans;
+		pw++;
+	}
 
 	//Reset panel frame : CollPt has been translated
 	for (pw=0; pw< m_WakeSize; pw++)
@@ -19933,83 +20324,836 @@ void CMiarex::RotateGeomY(double const &Angle, CVector const &P)
 	}
 }
 
-/*
-bool CMiarex::RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode)
+void CMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 {
-	//nFlap is the identification number of the flap to rotate (wing index)
+	int n, p, pw, kw, lw;
+	double cosb = cos(Beta*pi/180.0);
+	double sinb = sin(Beta*pi/180.0);
+	int iLA, iLB, iTA, iTB;
+	CVector LATB, TALB, Pt, Ptr, Trans;
 
-	if(!pWing) return false;
-
-	int j,k,l,p, iFlap;
-	double alpha0;
-	Quaternion Quat;
-	CVector H, HA, HB, R, S;
-	CSurface *pSurf;
-	iFlap = 0;
-	p     = 0;
-
-
-	for (j=0; j<pWing->m_NSurfaces; j++)
+	for (n=0; n< m_nNodes; n++)	m_Node[n].RotateZ(P, Beta);
+	
+	for (p=0; p< m_MatSize; p++)
 	{
-		pSurf = pWing->m_Surface+j;
-		if(pSurf->m_pFoilA && pSurf->m_pFoilB)
-		{
-			if(iFlap==nFlap)
-			{
-				//get the approximate initial angle
-				if(abs(pSurf->m_pFoilA->m_TEFlapAngle - pSurf->m_pFoilB->m_TEFlapAngle)>0.1) return false;
-				alpha0 = (pSurf->m_pFoilA->m_TEFlapAngle + pSurf->m_pFoilB->m_TEFlapAngle)/2.0;
-				//create a hinge unit vector
-				pSurf->GetPoint(pSurf->m_posATE, pSurf->m_posBTE, 0.0, HA, 0);
-				pSurf->GetPoint(pSurf->m_posATE, pSurf->m_posBTE, 1.0, HB, 0);
-				H = HB-HA;
-				H.Normalize();
+		iLA = m_Panel[p].m_iLA; iLB = m_Panel[p].m_iLB;
+		iTA = m_Panel[p].m_iTA; iTB = m_Panel[p].m_iTB;
 
-				Quat.Set(Angle-alpha0, H);
+		LATB = m_Node[iLA] - m_Node[iTB];
+		TALB = m_Node[iTA] - m_Node[iLB];
 
-				for (k=0; k<pSurf->m_nFlapNodes; k++)
-				{
-					R.x = pNode[pSurf->m_FlapNode[k]].x - HA.x;
-					R.y = pNode[pSurf->m_FlapNode[k]].y - HA.y;
-					R.z = pNode[pSurf->m_FlapNode[k]].z - HA.z;
-					Quat.Conjugate(R,S);
-
-					pNode[pSurf->m_FlapNode[k]].x = S.x + HA.x;
-					pNode[pSurf->m_FlapNode[k]].y = S.y + HA.y;
-					pNode[pSurf->m_FlapNode[k]].z = S.z + HA.z;
-				}
-
-				for(l=0; l<pSurf->m_nFlapPanels; l++)
-				{
-					m_Panel[pSurf->m_FlapPanel[l]].SetFrame(
-						pNode[pPanel[pSurf->m_FlapPanel[l]].m_iLA],
-						pNode[pPanel[pSurf->m_FlapPanel[l]].m_iLB],
-						pNode[pPanel[pSurf->m_FlapPanel[l]].m_iTA],
-						pNode[pPanel[pSurf->m_FlapPanel[l]].m_iTB]);
-				}
-			}
-			else p+= pSurf->m_NYPanels * pSurf->m_NXPanels;
-
-			++iFlap;
-		}
-		else p+= pSurf->m_NYPanels * pSurf->m_NXPanels;
+		if(m_Panel[p].m_iPos>=0)		m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
+		else if (m_Panel[p].m_iPos==-1)	m_Panel[p].SetFrame(m_Node[iLB], m_Node[iLA], m_Node[iTB], m_Node[iTA]);
 	}
-	return true;
+
+	// the wake array is not rotated but translated to remain at the wing's trailing edge
+	pw=0;
+	
+	if(!m_pCurWPolar) return;
+	for (kw=0; kw<m_NWakeColumn; kw++)
+	{
+		//consider the first panel of the column;
+		Pt = m_WakeNode[m_WakePanel[pw].m_iLA];
+		Pt.RotateZ(P, Beta);
+		//define the translation to be applied to the column's left points
+		Trans = Pt-m_WakeNode[m_WakePanel[pw].m_iLA] ;
+
+		//each wake column has m_NXWakePanels ... translate all left A nodes
+		for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
+		{
+			if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLA] += Trans;
+			m_WakeNode[m_WakePanel[pw].m_iTA] += Trans;
+			pw++;
+		}
+	}
+	pw -= m_pCurWPolar->m_NXWakePanels;
+	//consider the first panel of the column;
+	Pt = m_WakeNode[m_WakePanel[pw].m_iLB];
+	Pt.RotateZ(P, Beta);
+	//define the translation to be applied to the column's left points
+	Trans = Pt - m_WakeNode[m_WakePanel[pw].m_iLB];
+
+	//each wake column has m_NXWakePanels ... translate all left A nodes
+	for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
+	{
+		if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLB] += Trans;
+		m_WakeNode[m_WakePanel[pw].m_iTB] += Trans;
+		pw++;
+	}
+
+	//Reset panel frame : CollPt has been translated
+	for (pw=0; pw< m_WakeSize; pw++)
+	{
+		iLA = m_WakePanel[pw].m_iLA; iLB = m_WakePanel[pw].m_iLB;
+		iTA = m_WakePanel[pw].m_iTA; iTB = m_WakePanel[pw].m_iTB;
+		m_WakePanel[pw].SetFrame(m_WakeNode[iLA], m_WakeNode[iLB], m_WakeNode[iTA], m_WakeNode[iTB]);
+	}
 }
 
+
+
+double CMiarex::GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
+{
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	double Var0, Var1;
+	if(!pFoil0)
+	{
+		Cl = 0.0;
+		Var0 = 0.0;
+	}
+	else Var0 = GetPlrPointFromCl(pFoil0, Re, Cl,nVar, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	if(!pFoil1) 
+	{
+		Cl = 0.0;
+		Var1 = 0.0;
+	}
+	else Var1 = GetPlrPointFromCl(pFoil1, Re, Cl,nVar, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+	return ((1-Tau) * Var0 + Tau * Var1);
+}
+
+
+double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
+{
+	//TODO : check this GetPlrPoint duplicate with CMAinFrame
+/*	Var 
+
+
+	0 =	m_Alpha;
+	1 = m_Cl;
+	2 = m_Cd;
+	3 = m_Cdp;
+	4 = m_Cm;
+	5, 6 = m_XTr1, m_XTr2;
+	7, 8 = m_HMom, m_Cpmn;
+	9,10 = m_ClCd, m_Cl32Cd;
 */
 
+	CArray <double, double> *pX;	
+	double Clmin, Clmax;
+	CPolar *pPolar;
+	double Var1, Var2, u, dist;
+	int pt;
+	int size;
+	int n, i;
+
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil) {
+		bOutRe = true;
+		bError = true;
+		return 0.000;
+	}
+
+
+	n=0;
+	// Are there any Type 1 polars available for this foil ?
+	for (i = 0; i< m_poaPolar->GetSize(); i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			n++;
+			if(n>=2) break;
+		}
+	}
+
+//more than one polar - interpolate between  - tough job
+
+	//First Find the two polars with Reynolds number surrounding wanted Re
+	CPolar * pPolar1 = NULL;
+	CPolar * pPolar2 = NULL;
+	int nPolars = (int)m_poaPolar->GetSize();
+	//Type 1 Polars are sorted by crescending Re Number
+
+	//if Re is less than that of the first polar, use this one
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			// we have found the first type 1 polar for this foil
+			if (Re < pPolar->m_Reynolds) 
+			{
+				bOutRe = true;
+				//interpolate Cl on this polar
+				pX = (CArray <double, double> *) GetPlrVariable(pPolar, PlrVar);
+				size = (int)pPolar->m_Cl.GetSize();
+				if(Cl < pPolar->m_Cl[0])    
+				{
+					return (*pX)[0];
+				}
+				if(Cl > pPolar->m_Cl[size-1])
+				{
+					return (*pX)[size-1];
+				}
+				for (i=0; i<size-1; i++)
+				{
+					if(pPolar->m_Cl[i] <= Cl && Cl < pPolar->m_Cl[i+1]){
+						//interpolate
+						if(pPolar->m_Cl[i+1]-pPolar->m_Cl[i] < 0.00001)//do not divide by zero
+							return (*pX)[i];
+						else {
+							u = (Cl - pPolar->m_Cl[i])
+									 /(pPolar->m_Cl[i+1]-pPolar->m_Cl[i]);
+							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+						}
+					}
+				}
+				break;
+			}
+			break;
+		}
+	}
+
+	// if not Find the two polars
+	for (i=0; i< nPolars; i++){
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
+			// we have found the first type 1 polar for this foil
+			pPolar->GetClLimits(Clmin, Clmax);
+			if (pPolar->m_Reynolds <= Re) {
+				if(Clmin <= Cl && Cl <= Clmax) {	
+					pPolar1 = pPolar;
+				}
+			}
+			else {
+				if(Clmin <= Cl && Cl <= Clmax){	
+					pPolar2 = pPolar;
+					break;
+				}
+			}
+		}
+	}
+
+
+	if (!pPolar2) {
+		//then Re is greater than that of any polar
+		// so use last polar and interpolate Cls on this polar
+		bOutRe = true;
+		if(!pPolar1){
+			bOutRe = true; 
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Cl.GetSize();
+		if(!size) {
+			bOutRe = true; 
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Cl < pPolar1->m_Cl[0])	   return (*pX)[0];
+		if(Cl > pPolar1->m_Cl[size-1]) return (*pX)[size-1];
+		for (i=0; i<size-1; i++){
+			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1]){
+				//interpolate
+				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001){//do not divide by zero
+					return (*pX)[i];
+				}
+				else {
+					u = (Cl - pPolar1->m_Cl[i])
+							 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
+					return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+				}
+			}
+		}
+		//Out in Re, out in Cl...
+		return (*pX)[size-1];
+	}
+	else 
+	{
+		// Re is between that of polars 1 and 2
+		// so interpolate Cls for each
+		if(!pPolar1) 
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Cl.GetSize();
+		if(!size) 
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
+		pPolar1->GetClLimits(Clmin, Clmax);
+
+		if(Cl < Clmin)
+		{	         
+			Var1 = (*pX)[0];
+			bOutRe = true;
+		}
+		else if(Cl > Clmax)
+		{
+			Var1 = (*pX)[size-1];
+			bOutRe = true;
+		}
+		else{
+			//first Find the point closest to Cl=0
+			pt = 0;
+			dist = abs(pPolar1->m_Cl[0]);
+			for (i=1; i<size;i++)
+			{
+				if (fabs(pPolar1->m_Cl[i])< dist)
+				{
+					dist = fabs(pPolar1->m_Cl[i]);
+					pt = i;
+				}
+			}
+			if(Cl<pPolar1->m_Cl[pt])
+			{
+				for (i=pt; i>0; i--)
+				{
+					if(Cl<= pPolar1->m_Cl[i] && Cl > pPolar1->m_Cl[i-1])
+					{
+						//interpolate
+						if(abs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001)
+						{
+							//do not divide by zero
+							Var1 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar1->m_Cl[i-1])
+									 /(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]);
+							Var1 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
+							break;
+						}
+					}
+				}
+			}
+			else 
+			{
+				for (i=pt; i<size-1; i++)
+				{
+					if(pPolar1->m_Cl[i] <=Cl && Cl < pPolar1->m_Cl[i+1])
+					{
+						//interpolate
+						if(abs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
+							Var1 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar1->m_Cl[i])
+									 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
+							Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+							break;
+						}
+					}
+				}
+			}
+		} 
+
+		size = (int)pPolar2->m_Cl.GetSize();
+		if(!size) 
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
+		pPolar2->GetClLimits(Clmin, Clmax);
+
+		if(Cl < Clmin)
+		{	         
+			Var2 = (*pX)[0];
+			bOutRe = true;
+		}
+		else if(Cl > Clmax) 
+		{
+			Var2 = (*pX)[size-1];
+			bOutRe = true;
+		}
+		else
+		{
+			//first Find the point closest to Cl=0
+			pt = 0;
+			dist = fabs(pPolar2->m_Cl[0]);
+			for (i=1; i<size;i++)
+			{
+				if (abs(pPolar2->m_Cl[i])< dist)
+				{
+					dist = fabs(pPolar2->m_Cl[i]);
+					pt = i;
+				}
+			}
+			if(Cl<pPolar2->m_Cl[pt])
+			{
+				for (i=pt; i>0; i--)
+				{
+					if(Cl<= pPolar2->m_Cl[i] && Cl > pPolar2->m_Cl[i-1])
+					{
+						//interpolate
+						if(abs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001)
+						{//do not divide by zero
+							Var2 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar2->m_Cl[i-1])
+									 /(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]);
+							Var2 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
+							break;
+						}
+					}
+				}
+			}
+			else 
+			{
+				for (i=pt; i<size-1; i++)
+				{
+					if(pPolar2->m_Cl[i] <=Cl && Cl < pPolar2->m_Cl[i+1])
+					{
+						//interpolate
+						if(abs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001)
+						{
+							//do not divide by zero
+							Var2 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar2->m_Cl[i])
+									 /(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]);
+							Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+							break;
+						}
+					}
+				}
+			}
+		} 
+
+		// then interpolate Variable
+
+		double v =   (Re - pPolar1->m_Reynolds) / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
+		double Var = Var1 + v * (Var2-Var1);
+		return Var;
+	} 
+		
+//	AfxMessageBox("Error interpolating", MB_OK);
+//	bOutRe = true;
+//	bError = true;
+//	return 0.000;// we missed something somewhere...
+}
+
+void * CMiarex::GetPlrVariable(CPolar *pPolar, int iVar)
+{
+	// returns a pointer to the variable array defined by its index iVar
+	
+	void * pVar;
+	switch (iVar)
+	{
+		case 0:
+			pVar = &pPolar->m_Alpha;
+			break;
+		case 1:
+			pVar = &pPolar->m_Cl;
+			break;
+		case 2:
+			pVar = &pPolar->m_Cd;
+			break;
+		case 3:
+			pVar = &pPolar->m_Cdp;
+			break;
+		case 4:
+			pVar = &pPolar->m_Cm;
+			break;
+		case 5:
+			pVar = &pPolar->m_XTr1;
+			break;
+		case 6:
+			pVar = &pPolar->m_XTr2;
+			break;
+		case 7:
+			pVar = &pPolar->m_HMom;
+			break;
+		case 8:
+			pVar = &pPolar->m_Cpmn;
+			break;
+		case 9:
+			pVar = &pPolar->m_ClCd;
+			break;
+		case 10:
+			pVar = &pPolar->m_Cl32Cd;
+			break;
+		case 11:
+			pVar = &pPolar->m_XCp;
+			break;
+		default:
+			pVar = &pPolar->m_Alpha;
+			break;
+	}
+	return pVar;
+}
+
+
+double CMiarex::GetPlrPointFromAlpha(CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
+{
+/*	Var 
+	0 =	m_Alpha;
+	1 = m_Cl;
+	2 = m_Cd;
+	3 = m_Cdp;
+	4 = m_Cm;
+	5, 6 = m_XTr1, m_XTr2;
+	7, 8 = m_HMom, m_Cpmn;
+	9,10 = m_ClCd, m_Cl32Cd;
+	11 = m_XCp
+*/
+
+	CArray <double, double> *pX;	
+	double amin, amax;
+	double Var1, Var2, u;
+	int i;
+	CPolar *pPolar;
+
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil) 
+	{
+		bOutRe = true;
+		bError = true;
+		return 0.000;
+	}
+
+
+	int size;
+	int n = 0;
+
+	// Are there any Type 1 polars available for this foil ?
+	for (i = 0; i< m_poaPolar->GetSize(); i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			n++;
+			if(n>=2) break;
+		}
+	}
+
+//more than one polar - interpolate between  - tough job
+
+	//First Find the two polars with Reynolds number surrounding wanted Re
+	CPolar * pPolar1 = NULL;
+	CPolar * pPolar2 = NULL;
+	int nPolars = (int)m_poaPolar->GetSize();
+	//Type 1 Polars are sorted by crescending Re Number
+
+	//if Re is less than that of the first polar, use this one
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			// we have found the first type 1 polar for this foil
+			if (Re < pPolar->m_Reynolds) {
+				bOutRe = true;
+				//interpolate Alpha on this polar
+				pX = (CArray <double, double> *) GetPlrVariable(pPolar, PlrVar);
+				size = (int)pPolar->m_Alpha.GetSize();
+				if(Alpha < pPolar->m_Alpha[0])      
+				{
+					return (*pX)[0];
+				}
+				if(Alpha > pPolar->m_Alpha[size-1])
+				{
+					return (*pX)[size-1];
+				}
+				for (i=0; i<size-1; i++)
+				{
+					if(pPolar->m_Alpha[i] <= Alpha && Alpha < pPolar->m_Alpha[i+1])
+					{
+						//interpolate
+						if(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i] < 0.00001)//do not divide by zero
+							return (*pX)[i];
+						else 
+						{
+							u = (Alpha - pPolar->m_Alpha[i])
+									 /(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i]);
+							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+						}						
+					}
+				}
+				break;
+			}
+			break;
+		}
+	}
+
+	// if not Find the two polars
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->GetAt(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			// we have found the first type 1 polar for this foil
+			pPolar->GetAlphaLimits(amin, amax);
+			if (pPolar->m_Reynolds <= Re) 
+			{
+				if(amin <= Alpha && Alpha <= amax) 
+				{	
+					pPolar1 = pPolar;
+				}
+			}
+			else {
+				if(amin <= Alpha && Alpha <= amax)
+				{	
+					pPolar2 = pPolar;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!pPolar2) 
+	{
+		//then Re is greater than that of any polar
+		// so use last polar and interpolate alphas on this polar
+		bOutRe = true;
+		if(!pPolar1)
+		{
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Alpha.GetSize();
+		if(!size) 
+		{
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Alpha < pPolar1->m_Alpha[0])	     return (*pX)[0];
+		if(Alpha > pPolar1->m_Alpha[size-1]) return (*pX)[size-1];
+		for (i=0; i<size-1; i++)
+		{
+			if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1])
+			{
+				//interpolate
+				if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001){//do not divide by zero
+					return (*pX)[i];
+				}
+				else
+				{
+					u = (Alpha - pPolar1->m_Alpha[i])
+							 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
+					return (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+				}
+			}
+		}
+		//Out in Re, out in alpha...
+		return (*pX)[size-1] ;
+
+	}
+	else 
+	{
+		// Re is between that of polars 1 and 2
+		// so interpolate alphas for each
+
+		if(!pPolar1)
+		{
+			bOutRe = true; 
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Alpha.GetSize();
+		if(!size) {
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Alpha < pPolar1->m_Alpha[0])	          Var1 = (*pX)[0];
+		else if(Alpha > pPolar1->m_Alpha[size-1]) Var1 = (*pX)[size-1];
+		else
+		{
+			for (i=0; i<size-1; i++)
+			{
+				if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1]){
+					//interpolate
+					if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001)//do not divide by zero
+						Var1 = (*pX)[i];
+					else
+					{
+						u = (Alpha - pPolar1->m_Alpha[i])
+								 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
+						Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+					}
+				}
+			}
+		}
+
+		size = (int)pPolar2->m_Alpha.GetSize();
+		if(!size) 
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
+		if(Alpha < pPolar2->m_Alpha[0])
+		{
+			bOutRe = true;
+			bError = true;
+			Var2 = (*pX)[0];
+		}
+		else if(Alpha > pPolar2->m_Alpha[size-1]) 
+		{
+			bOutRe = true;
+			bError = true;
+			Var2 = (*pX)[size-1];
+		}
+		else{
+			for (i=0; i<size-1; i++)
+			{
+				if(pPolar2->m_Alpha[i] <= Alpha && Alpha < pPolar2->m_Alpha[i+1])
+				{
+					//interpolate
+					pX = (CArray <double, double> *) GetPlrVariable(pPolar2, PlrVar);
+					if(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i] < 0.00001)//do not divide by zero
+						Var2 = (*pX)[i];
+					else{
+						u = (Alpha - pPolar2->m_Alpha[i])
+								 /(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i]);
+						Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+					}
+				}
+			}
+		}
+		// then interpolate Variable
+
+		double v =   (Re - pPolar1->m_Reynolds) 
+				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
+		double Var = Var1 + v * (Var2-Var1);
+		return Var;
+	} 
+		
+//	AfxMessageBox("Error interpolating", MB_OK);
+//	bOutRe = true;
+//	bError = true;
+//	return 0.000;// we missed something somewhere...
+}
+
+
+double CMiarex::GetCl(CFoil *pFoil0, CFoil *pFoil1, 
+					 double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+{
+
+	double Cl0, Cl1;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil0) 
+		Cl0 = 2.0*pi*(Alpha*pi/180.0);
+	else 
+		Cl0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 1, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	if(!pFoil1) 
+		Cl1 = 2.0*pi*(Alpha*pi/180.0);
+	else 
+		Cl1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 1, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	return ((1-Tau) * Cl0 + Tau * Cl1);
+}
 
 
 
+double CMiarex::GetCm0(CFoil *pFoil0, CFoil *pFoil1,
+					  double Re, double Tau, bool &bOutRe, bool &bError)
+{
+	//Find 0-lift angle for local foil
+	double Alpha;
+	double Cm0, Cm1;
+	double Cl0 = 1.0;
+	double Cl1;
+	bOutRe = false;
+	bError = false;
+	bool IsOutRe;
+	bool IsError;
+	
+	bOutRe = false;
+	for (int i=-10; i<10; i++){
+		Alpha = (double)i;
+		Cl1 = GetCl(pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
+		if(Cl1>0.0) {
+			if(IsOutRe) bOutRe = true;
+			if(IsError) bError = true;
+			break;
+		}
+		Cl0 = Cl1;
+	}
+	if(Cl0>0.0) {
+		return 0.0;
+	}
+	Cm0 = GetCm(pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	Cm1 = GetCm(pFoil0, pFoil1, Re, Alpha,     Tau, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	double Res = Cm0 + (Cm1-Cm0)*(0.0-Cl0)/(Cl1-Cl0);
+
+	return Res;
+}
 
 
+double CMiarex::GetCm(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+{
+	double Cm0, Cm1;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
 
+	if(!pFoil0) 
+		Cm0 = 0.0;
+	else 
+		Cm0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 4, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
 
+	if(!pFoil1) 
+		Cm1 = 0.0;
+	else 
+		Cm1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 4, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
 
-
-
-
-
-
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+	return ((1-Tau) * Cm0 + Tau * Cm1);
+}
 

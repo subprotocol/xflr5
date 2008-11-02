@@ -173,9 +173,10 @@ bool CSF::Export(CStdioFile *pFile)
 
 void CSF::ExportToBuffer(CFoil *pFoil)
 {
+	int i;
 	int j = m_Extrados.m_iRes;
 	int k = m_Intrados.m_iRes;
-	for (int i=0; i<m_Extrados.m_iRes; i++) {
+	for (i=0; i<m_Extrados.m_iRes; i++) {
 		pFoil->x[j-i-1] = m_Extrados.m_Output[i].x;
 		pFoil->y[j-i-1] = m_Extrados.m_Output[i].y;
 	}
@@ -206,7 +207,8 @@ void CSF::Copy(CSF* pSF)
 
 bool CSF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	for (int i=0; i<m_Extrados.m_iCtrlPoints;i++)
+	int i;
+	for (i=0; i<m_Extrados.m_iCtrlPoints;i++)
 	{
 		m_Extrados.DrawControlPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
@@ -221,7 +223,8 @@ bool CSF::DrawCtrlPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, 
 
 void CSF::UpdateSelected(double x, double y)
 {
-	for (int i=0; i<m_Extrados.m_iCtrlPoints;i++)
+	int i;
+	for (i=0; i<m_Extrados.m_iCtrlPoints;i++)
 	{
 		if (m_Extrados.m_iSelect == i)
 		{
@@ -245,7 +248,8 @@ void CSF::UpdateSelected(double x, double y)
 
 void CSF::DrawOutPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, bool IsPrinting)
 {
-	for (int i=0; i<m_Extrados.m_iRes;i++)
+	int i;
+	for (i=0; i<m_Extrados.m_iRes;i++)
 	{
 		m_Extrados.DrawOutputPoint(pDC, i, scalex, scaley, Offset, IsPrinting);
 	}
@@ -261,6 +265,7 @@ void CSF::DrawOutPoints(CDC *pDC, double scalex, double scaley, CPoint Offset, b
 bool CSF::LoadFile(CStdioFile *pFile)
 {
 	CString strIn;
+	int k;
 
 	m_bModified = false;
 
@@ -279,7 +284,7 @@ bool CSF::LoadFile(CStdioFile *pFile)
 	pFile->ReadString(strIn);
 	sscanf(strIn, "%d", &m_Extrados.m_iDegree);
 	// then extrados coords
-	for (int k=0; k<m_Extrados.m_iCtrlPoints;k++)
+	for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
 	{
 		pFile->ReadString(strIn);
 		sscanf(strIn,"%lf%lf", &m_Extrados.m_Input[k].x, &m_Extrados.m_Input[k].y);
@@ -319,6 +324,8 @@ bool CSF::LoadFile(CStdioFile *pFile)
 bool CSF::SaveFile(CStdioFile *pFile)
 {
 	CString strong;
+	int k;
+
 	// FoilName
 	strong = m_strFoilName + "\n";
 	pFile->WriteString(strong);
@@ -334,7 +341,7 @@ bool CSF::SaveFile(CStdioFile *pFile)
 	strong.Format("%d\n", m_Extrados.m_iDegree);
 	pFile->Write(strong, strong.GetLength());
 	// then extrados coords
-	for (int k=0; k<m_Extrados.m_iCtrlPoints;k++)
+	for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
 	{
 		strong.Format(" %f  %f\n", 
 			m_Extrados.m_Input[k].x, m_Extrados.m_Input[k].y);

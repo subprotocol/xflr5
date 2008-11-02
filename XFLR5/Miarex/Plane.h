@@ -32,7 +32,7 @@ class CPlane : public CObject
 {
 	friend class CMiarex;
 	friend class CMainFrame;
-//	friend class CNameDlg;
+	friend class CXBody;
 	friend class CPlaneDlg;
 	friend class CPOperDlgBar;
 	friend class CVLMDlg;
@@ -73,7 +73,7 @@ protected:
 	double m_XCmRef;
 	double m_TailVolume;
 
-	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2;
+	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	CString m_PlaneName;
 
 

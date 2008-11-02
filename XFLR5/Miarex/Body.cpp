@@ -37,6 +37,7 @@ CWnd *CBody::s_pMainFrame;
 
 CBody::CBody()
 {
+	int i;
 	pi = 3.141592654;
 	m_BodyName = "Body";
 
@@ -88,7 +89,7 @@ CBody::CBody()
 	m_Frame[m_NStations-1].m_Point[3].Set(0.,0.0,0.0);
 	m_Frame[m_NStations-1].m_Point[4].Set(0.,0.0,0.0);
 
-	for(int i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
+	for(i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
 	for(i=0; i<MAXSIDELINES;i++)      m_hPanels[i] = 1;
 
 	SetKnots();
@@ -570,7 +571,7 @@ void CBody::Export(int nx, int nh)
 
 	if(IDOK==XFileDlg.DoModal()) 
 	{
-		BOOL bOpen = XFile.Open(XFileDlg.GetFileName(), CFile::modeCreate | CFile::modeWrite, &fe);
+		BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeCreate | CFile::modeWrite, &fe);
 		if (bOpen)
 		{
 			XFile.WriteString(m_BodyName);
@@ -972,12 +973,12 @@ void CBody::InterpolateSurface()
 }
 
 
-
 bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 {
 	if(m_LineType==1) return IntersectPanels(A,B,I, bRight);
 	else              return IntersectNURBS(A,B,I, bRight);
 }
+
 
 bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 {
@@ -1176,9 +1177,8 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
-void CBody::ComputeAero(double *Cp, double &Lift, double &XCP, double &YCP, 
-						double &GCm, double &GRm, double &GYm, double Alpha, double XCmRef,
-						bool bTilted)
+void CBody::ComputeAero(double *Cp, double &XCP, double &YCP, 
+						double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted)
 {
 	int p;
 	double cosa, sina, PanelLift;
@@ -1188,15 +1188,15 @@ void CBody::ComputeAero(double *Cp, double &Lift, double &XCP, double &YCP,
 	cosa = cos(Alpha*pi/180.0);
 	sina = sin(Alpha*pi/180.0);
 
+
 	//   Define wind axis
-	WindNormal.Set(-sina, 0.0, cosa);
-	WindDirection.Set(cosa, 0.0, sina);
+	WindNormal.Set(   -sina, 0.0, cosa);
+	WindDirection.Set( cosa, 0.0, sina);
 
 	for (p=0; p<m_NElements; p++)
 	{
 		PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
 		PanelLift = PanelForce.dot(WindNormal);
-		Lift  += PanelLift;
 		XCP   += m_pPanel[p].CollPt.x * PanelLift;
 		YCP   += m_pPanel[p].CollPt.y * PanelLift;
 		LeverArm = m_pPanel[p].CollPt;

@@ -88,6 +88,9 @@ CPlane::CPlane()
 	m_LEFin.x       = 0.650;
 	m_LEFin.y       =   0.0;
 	m_LEFin.z       =   0.0;
+	
+	m_BodyPos.Set(0.0, 0.0, 0.0);
+
 	m_Volume        =   0.0;
 
 	m_bActive       = false;
@@ -112,7 +115,8 @@ bool CPlane::SerializePlane(CArchive& ar)
 	int ArchiveFormat;// identifies the format of the file
 	if (ar.IsStoring())
 	{	// storing code
-		ar << 1009;
+		ar << 1010;
+		//1010 : added body LE x and z position
 		//1009 : added Main wing LE x and z position
 		//1008 : added body data
 		//1007 : added second wing data, CheckPanel
@@ -139,6 +143,7 @@ bool CPlane::SerializePlane(CArchive& ar)
 		ar << m_LEStab.x << m_LEStab.y << m_LEStab.z; 
 		ar << m_WingTilt << m_StabTilt << m_FinTilt;
 		ar << m_LEFin.x << m_LEFin.y << m_LEFin.z; 
+		ar << m_BodyPos.x << m_BodyPos.z; 
 
 		ar << m_LEWing.x << m_LEWing.z;
 
@@ -203,6 +208,10 @@ bool CPlane::SerializePlane(CArchive& ar)
 		}
 		ar >> m_LEFin.x >> m_LEFin.y >> m_LEFin.z; 
 
+		if(ArchiveFormat>=1010)
+		{
+			ar >> m_BodyPos.x >> m_BodyPos.z; 
+		}
 		if(ArchiveFormat>=1009)
 		{
 			ar>> m_LEWing.x >> m_LEWing.z;
@@ -291,6 +300,7 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_LEWing2.Copy(pPlane->m_LEWing2);
 	m_LEFin.Copy(pPlane->m_LEFin);
 	m_LEStab.Copy(pPlane->m_LEStab);
+	m_BodyPos.Copy(pPlane->m_BodyPos);
 
 	m_Wing.Duplicate(&pPlane->m_Wing);
 	m_Wing2.Duplicate(&pPlane->m_Wing2);

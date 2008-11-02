@@ -72,14 +72,12 @@ protected:
 	bool VLMSetAutoMesh(int total = 0);
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
-	void VLMTrefftz(double *Gamma, int pos, double & Lift, double & Drag, bool bTilted);
+	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, 
-                        bool bViscous, bool bTilted);
+                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted);
 
-	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-		                  double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
-	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, double &Lift, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
+	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP, double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
+	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelSetBending();
 
 	bool LLTInitialize();
@@ -126,6 +124,7 @@ protected:
 	static CWnd* s_pFrame;		//pointer to the Frame window
 	static CWnd* s_pMiarex;	//pointer to the Miarex Application window
 	static CWnd* s_pVLMDlg;	//pointer to the VLM analysis dialog class
+	static CWnd* s_pLLTDlg;	//pointer to the VLM analysis dialog class
 	static CWnd* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
 	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array

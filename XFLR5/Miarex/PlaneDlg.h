@@ -69,12 +69,16 @@ public:
 	CStatic m_ctrlLen9;
 	CStatic m_ctrlLen10;
 	CStatic m_ctrlLen11;
+	CStatic m_ctrlLen12;
+	CStatic m_ctrlLen13;
 	CStatic	m_ctrlWingSpan;
 	CStatic	m_ctrlWingSurface;
 	CStatic	m_ctrlStabVolume;
 	CStatic	m_ctrlFinSurface;
 	CStatic	m_ctrlStabLeverArm;
 	CStatic	m_ctrlStabSurface;
+	CFloatEdit m_ctrlXBody;
+	CFloatEdit m_ctrlZBody;
 	CFloatEdit m_ctrlXLEFin;
 	CFloatEdit m_ctrlYLEFin;
 	CFloatEdit m_ctrlZLEFin;
@@ -140,7 +144,6 @@ protected:
 	afx_msg void OnDefineFin();
 	afx_msg void OnDefineStab();
 	afx_msg void OnChanged();
-	afx_msg void OnWingDefine();
 	afx_msg void OnImportWing();
 	afx_msg void OnPlaneName();
 	afx_msg void OnSymFin();

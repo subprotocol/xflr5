@@ -78,7 +78,8 @@ bool CBatchThread::Iterate()
 	CBatchDlg* pBDlg = (CBatchDlg*) m_pParent;
 	CString StrTmp;
 
-	if(!m_pXFoil->viscal()){
+	if(!m_pXFoil->viscal())
+	{
 		m_pXFoil->lvconv = false;//point is unconverged
 		CString str;
 		str.Format("CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
@@ -87,25 +88,30 @@ bool CBatchThread::Iterate()
 		return true;
 	}
 
-	while(m_Iterations<m_IterLim  && !m_pXFoil->lvconv && !m_bCancel && !m_bSkipPoint && !m_bSkipPolar){
-		if(m_pXFoil->ViscousIter()){
+	while(m_Iterations<m_IterLim && !m_pXFoil->lvconv && !m_bCancel && !m_bSkipPoint && !m_bSkipPolar)
+	{
+		if(m_pXFoil->ViscousIter())
+		{
 			m_Iterations++;	
 			pBDlg->OutputIter(m_Iterations, m_pXFoil->reinf1, m_pXFoil->alfa);
 		}
-		else {
+		else 
+		{
 			m_Iterations = m_IterLim;
 		}
 	}
 	pBDlg->OutputIter(0, 0.0, 0.0);
 	if(m_bCancel) return true;
 
-	if(m_bSkipPoint || m_bSkipPolar) {
+	if(m_bSkipPoint || m_bSkipPolar)
+	{
 		m_pXFoil->lblini = false;
 		m_pXFoil->lipan = false;
 		return true;
 	}
 	
-	if(!m_pXFoil->ViscalEnd()){
+	if(!m_pXFoil->ViscalEnd())
+	{
 		m_pXFoil->lvconv = false;//point is unconverged
 		CString str;
 		str.Format("CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
@@ -117,7 +123,8 @@ bool CBatchThread::Iterate()
 	}
 	m_bCalc = true;
 	
-	if(m_Iterations>=m_IterLim && !m_pXFoil->lvconv){
+	if(m_Iterations>=m_IterLim && !m_pXFoil->lvconv)
+	{
 		if(m_pXDirect->m_bAutoInitBL) {
 			m_pXFoil->lblini = false;
 			m_pXFoil->lipan = false;
@@ -178,14 +185,18 @@ bool CBatchThread::ReLoop()
 	CString str;
 	CString strong = "";
 	CString StrTmp;
-	double alphadeg;
-	int nRe, MaxSeries;
+	double alphadeg, alfa;
+	int ia, iRe, nRe, series, total, MaxSeries;
 	double SpMin, SpMax, SpInc;
-	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
+
+	if(!m_bFromList) nRe = (int)abs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = m_NRe-1;
-	for (int iRe=0; iRe<=nRe; iRe++){
+
+	for (iRe=0; iRe<=nRe; iRe++)
+	{
 		if(!m_bFromList) m_pXFoil->reinf1 = m_ReMin + iRe *m_ReInc;
-		else             {
+		else
+		{
 			m_pXFoil->reinf1 = m_ReList[iRe];
 			m_pXFoil->minf1  = m_MachList[iRe];
 			m_pXFoil->acrit  = m_NCritList[iRe];
@@ -193,32 +204,42 @@ bool CBatchThread::ReLoop()
 		str.Format("Re = %8.0f\r\n", m_pXFoil->reinf1);
 		strong+= str;
 		if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
-		if (m_bFromZero && m_SpMin*m_SpMax<0) {
+
+		if (m_bFromZero && m_SpMin*m_SpMax<0) 
+		{
 			MaxSeries = 2;
 			SpMin = 0.0;
 			SpMax = m_SpMax;
 			SpInc = m_SpInc;
 		}
-		else  {
+		else  
+		{
 			MaxSeries = 1;
 			SpMin = m_SpMin;
 			SpMax = m_SpMax;
 			SpInc = m_SpInc;
 		}
 
-		for (int series=0; series<MaxSeries;series++){
-			int total = int((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
+		m_bSkipPolar = false;
+
+		for (series=0; series<MaxSeries;series++)
+		{
+			total = int((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 			CreatePolar(m_pXFoil->reinf1, m_pXFoil->minf1, m_pXFoil->acrit);
-			if (m_bInitBL){
+			if (m_bInitBL)
+			{
 				m_pXFoil->lblini = false;
 				m_pXFoil->lipan = false;
 			}
-			m_bSkipPolar = false;
-			for (int ia=0; ia<=total; ia++){
+
+			for (ia=0; ia<=total; ia++)
+			{
 				pBDlg->ResetCurves();
-				if(!m_bCancel && !m_bSkipPolar){
-					if(m_bAlpha){
-						double alfa = SpMin+ia*SpInc;
+				if(!m_bCancel && !m_bSkipPolar)
+				{
+					if(m_bAlpha)
+					{
+						alfa = SpMin+ia*SpInc;
 						m_pXFoil->alfa = alfa;
 						m_pXFoil->lalfa = true;
 						m_pXFoil->qinf = 1.0;
@@ -228,7 +249,8 @@ bool CBatchThread::ReLoop()
 						if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
 
 						// here we go !
-						if (!m_pXFoil->specal()) {
+						if (!m_pXFoil->specal())
+						{
 							CString str;
 							str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							AfxMessageBox(str, MB_OK);
@@ -237,7 +259,8 @@ bool CBatchThread::ReLoop()
 							return FALSE;
 						}
 					}
-					else{
+					else
+					{
 						m_pXFoil->lalfa = false;
 						m_pXFoil->alfa = 0.0;
 						m_pXFoil->qinf = 1.0;
@@ -245,7 +268,8 @@ bool CBatchThread::ReLoop()
 						str.Format("Cl = %9.3f", m_pXFoil->clspec);
 						strong+=str;
 						if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
-						if(!m_pXFoil->speccl()){
+						if(!m_pXFoil->speccl())
+						{
 							CString str;
 							str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							AfxMessageBox(str, MB_OK);
@@ -261,21 +285,25 @@ bool CBatchThread::ReLoop()
 					m_Iterations = 0;
 
 					m_bSkipPoint = false;
+
 					while(!Iterate()){}
 
-					if(m_pXFoil->lvconv){
+					if(m_pXFoil->lvconv)
+					{
 						str.Format("   ...converged after %3d iterations\r\n", m_Iterations);
 						strong+= str;
 						if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
 						m_pCurPolar->AddData(m_pXFoil);
 					}
-					else if(m_bSkipPoint || m_bSkipPolar){
+					else if(m_bSkipPoint || m_bSkipPolar)
+					{
 						str.Format("   ...skipped after %3d iterations\r\n", m_Iterations);
 						strong+= str;
 						if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
 
 					}
-					else{
+					else
+					{
 						str.Format("   ...unconverged after %3d iterations\r\n", m_Iterations);
 						strong+= str;
 						if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
@@ -287,7 +315,8 @@ bool CBatchThread::ReLoop()
 						pXDirect->UpdateView();
 					}
 				}
-				else {
+				else
+				{
 					break;
 				}
 			}// end Alpha or Cl loop
@@ -296,7 +325,8 @@ bool CBatchThread::ReLoop()
 			SpInc = -m_SpInc;
 		}
 		strong+="\r\n";
-		if(m_bCancel){
+		if(m_bCancel)
+		{
 			strong+="Analysis interrupted\r\n";
 			break;
 		}
@@ -311,25 +341,34 @@ bool CBatchThread::AlphaLoop()
 	CString str;
 	CString strong = "";
 	CString StrTmp;
+	int iRe, iAlpha, nAlpha;
 	double alphadeg;
-	int nAlpha = (int)(fabs((m_SpMax-m_SpMin)*1.000f/m_SpInc));//*1.0001 to make sure upper limit is included
-	for (int iAlpha=0; iAlpha<=nAlpha; iAlpha++){
+	nAlpha = (int)(abs((m_SpMax-m_SpMin)*1.000f/m_SpInc));//*1.0001 to make sure upper limit is included
+	
+	for (iAlpha=0; iAlpha<=nAlpha; iAlpha++)
+	{
 		alphadeg = m_SpMin + iAlpha*m_SpInc;
-		m_pXFoil->alfa = alphadeg*3.141592654/180.f;
+		m_pXFoil->alfa = alphadeg*3.141592654/180.0;
 		str.Format("Alpha = %.2f\r\n", alphadeg);
 		strong+= str;
 		if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
 
-		int total = (int)(fabs((m_ReMax-m_ReMin)*1.0001/m_ReInc));
+		int total = (int)(abs((m_ReMax-m_ReMin)*1.0001/m_ReInc));
 		CreatePolar(alphadeg, m_pXFoil->minf1, m_pXFoil->acrit);// Do something
-		if (m_bInitBL){
+
+		if (m_bInitBL)
+		{
 			m_pXFoil->lblini = false;
 			m_pXFoil->lipan = false;
 		}
+
 		m_bSkipPolar = false;
-		for (int iRe=0; iRe<=total; iRe++){
+
+		for (iRe=0; iRe<=total; iRe++)
+		{
 			pBDlg->ResetCurves();
-			if(!m_bCancel && !m_bSkipPolar){
+			if(!m_bCancel && !m_bSkipPolar)
+			{
 				m_pXFoil->reinf1 = m_ReMin + iRe *m_ReInc;
 				m_pXFoil->lalfa  = true;
 				m_pXFoil->qinf   = 1.0;
@@ -338,7 +377,8 @@ bool CBatchThread::AlphaLoop()
 				if(m_bShowTextOutput) pBDlg->UpdateOutput(str);
 
 				// here we go !
-				if (!m_pXFoil->specal()) {
+				if (!m_pXFoil->specal()) 
+				{
 					CString str;
 					str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 					AfxMessageBox(str, MB_OK);
@@ -347,9 +387,9 @@ bool CBatchThread::AlphaLoop()
 					return FALSE;
 				}
 
-				if (fabs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001) m_pXFoil->lwake  = false;
-				if (fabs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001) m_pXFoil->lvconv = false;
-				if (fabs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001) m_pXFoil->lvconv = false;
+				if (abs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001) m_pXFoil->lwake  = false;
+				if (abs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001) m_pXFoil->lvconv = false;
+				if (abs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001) m_pXFoil->lvconv = false;
 
 				m_pXFoil->lwake  = false;
 				m_pXFoil->lvconv = false;
@@ -357,6 +397,7 @@ bool CBatchThread::AlphaLoop()
 				m_Iterations = 0;
 
 				m_bSkipPoint = false;
+
 				while(!Iterate()){}
 
 				if(m_pXFoil->lvconv){

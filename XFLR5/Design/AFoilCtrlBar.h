@@ -102,7 +102,7 @@ protected:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnFoilColor();
-	afx_msg void OnNMClickFoilList(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
 	afx_msg void OnRename();
@@ -111,5 +111,4 @@ protected:
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult);
 };

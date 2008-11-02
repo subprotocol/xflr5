@@ -85,7 +85,8 @@ bool GetWindowBk();
 bool GetPrintColor();
 bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
 bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax);
-
+bool Gauss(double *A, int n, double *B, int m);
+bool SplineInterpolation(int n, double *x, double *y, double a[4], double b[4], double c[4], double d[4]);
 
 // CXFLR5App:
 // See X-FLR6.cpp for the implementation of this class
@@ -119,6 +120,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 };
 
+
 /////////////////////////////////////////////////////////////////////////////
 // CAboutDlg dialog used for App About
 
@@ -151,7 +153,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg UINT OnNcHitTest(CPoint point);
+	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	//}}AFX_MSG

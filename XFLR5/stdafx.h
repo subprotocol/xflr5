@@ -43,6 +43,7 @@
 #define DIRECTDESIGN   2
 #define INVERSEDESIGN  3
 #define MIAREX         4
+#define XBODY          5
 
 
 #define GLF_START_LIST 5000

@@ -150,7 +150,6 @@ private:
 
 	CStdioFile m_XFile;		//output file for the analysis
 
-
 	HCURSOR m_hcMove;
 	HCURSOR m_hcCross;
 	HCURSOR m_hcArrow;
@@ -182,15 +181,15 @@ private:
 
 //_____________________________METHODS____________________
 	bool LoadSettings(CArchive &ar);
-	bool SetModFoil(CString FoilName);
 	bool SetXFLR5Cursor(CWnd* pWnd, CPoint ptMouse, UINT message) ;
 	bool InitXFoil(CFoil * pFoil = NULL);
 	CFoil* SetFoil(CFoil* pFoil = NULL);
 	CFoil* SetFoil(CString FoilName);
 
 	void Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence);
-	void Analysis2(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence);
-	void Analysis3(double Alpha, double AlphaMax, double DeltaAlpha, bool bSequence);
+	void AnalysisAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha, bool bSequence);
+	void AnalysisCl(double ClMin, double ClMax, double DeltaCl, bool bSequence);
+	void AnalysisRe(double ReMin, double ReMax, double DeltaRe, bool bSequence);
 	void Animate(bool bAnimate);
 
 	void CheckMenu();
@@ -338,7 +337,7 @@ private:
 	
 	// Generated message map functions
 protected:
-	//{{AFX_MSG(CXDirect)
+	
 	afx_msg void OnImportXFoilPolar();
 	afx_msg void OnImportJavaFoilPolar();
 	afx_msg void OnShowCurOpp();
@@ -348,12 +347,10 @@ protected:
 	afx_msg void OnHideFoilOpps();
 	afx_msg void OnCpi();
 	afx_msg void OnManageFoils();
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
-
 	afx_msg void OnExportResults();
 	afx_msg void OnShowCpGraph();
 	afx_msg void OnExportCurrentResults();
+	
+	DECLARE_MESSAGE_MAP()
 };
 

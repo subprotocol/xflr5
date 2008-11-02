@@ -73,15 +73,18 @@ BOOL CLinePickerDlg::OnInitDialog()
 	
 	// TODO: Add extra initialization here
 
+	int i,j;
 	m_ctrlColorBtn.SetColor(m_crColor);
 
-	for (int i=0; i<5;i++){
+	for (i=0; i<5;i++)
+	{
 		m_ctrlWidth.m_Lines[i].nWidth = i;
 		m_ctrlWidth.m_Lines[i].crColor = m_crColor;
 		m_ctrlWidth.m_Lines[i].nPenStyle = m_nStyle;
 	}
 
-	for (i=0; i<5;i++){
+	for (i=0; i<5;i++)
+	{
 		m_ctrlStyle.m_Lines[i].nWidth = m_nWidth;
 		m_ctrlStyle.m_Lines[i].crColor = m_crColor;
 	}
@@ -109,13 +112,15 @@ BOOL CLinePickerDlg::OnInitDialog()
 	m_ctrlWidth.SetCurSel(0);
 
 	LineData* pLineData;
-	for (int j=0; j<m_ctrlStyle.GetCount(); j++){
+	for (j=0; j<m_ctrlStyle.GetCount(); j++)
+	{
 		pLineData = (LineData*)m_ctrlStyle.GetItemDataPtr(j);
 		if(pLineData->nPenStyle == m_nStyle){
 			m_ctrlStyle.SetCurSel(j);
 		}
 	}
-	for (j=0; j<m_ctrlWidth.GetCount(); j++){
+	for (j=0; j<m_ctrlWidth.GetCount(); j++)
+	{
 		pLineData = (LineData*)m_ctrlWidth.GetItemDataPtr(j);
 		if(pLineData->nWidth == m_nWidth){
 			m_ctrlWidth.SetCurSel(j);
@@ -129,9 +134,10 @@ BOOL CLinePickerDlg::OnInitDialog()
 
 void CLinePickerDlg::OnColorBtn() 
 {
+	int i;
 	m_crColor = m_ctrlColorBtn.GetColor();
 
-	for (int i=0; i<5;i++){
+	for (i=0; i<5;i++){
 		m_ctrlWidth.m_Lines[i].crColor = m_crColor;
 	}
 

@@ -68,7 +68,7 @@ private:
 	double m_Weight;
 	double m_ASpec;
 	double m_XCmRef;
-
+	double m_Beta;
 	double m_AMem;
 
 	int m_Style;
@@ -115,6 +115,7 @@ private:
 	// the rest is litterature
 	CArray <double, double> m_Alpha; //angle of attack
 	CArray <double, double> m_Cl;    //lift coef.
+	CArray <double, double> m_CY;    //Side Force
 	CArray <double, double> m_ICd;   //induced drag coef.
 	CArray <double, double> m_PCd;   //profile drag coef.
 	CArray <double, double> m_TCd;   //total drag coef.

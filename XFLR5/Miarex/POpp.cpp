@@ -54,6 +54,7 @@ CPOpp::CPOpp()
 
 	m_Weight              = 0.0;
 	m_Alpha               = 0.0;
+	m_Beta                = 0.0;
 	m_QInf                = 0.0;
 	m_Ctrl                = 0.0;
 
@@ -83,7 +84,8 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 	float f;
 
 	if(ar.IsStoring()){
-		ar << 1006;
+		ar << 1007;
+		//1007 : added Sideslip Beta
 		//1006 : added Panel's source strengths Sigma
 		//1005 : added second wing results for a biplane
 		//1004 : converted units to SI
@@ -105,6 +107,7 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 		ar << m_Style << m_Width << m_Color;
 		ar << m_Type << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight;
+		ar << (float)m_Beta;
 
 		ar << m_NPanels;
 		for (k=0; k<=m_NPanels; k++) ar << (float)m_Cp[k];
@@ -194,7 +197,12 @@ bool CPOpp::SerializePOpp(CArchive &ar)
 			ar >> f;		m_Alpha = f;
 			ar >> f;        m_QInf  = f;
 			ar >> f;        m_Weight = f;
-			if(ArchiveFormat<1002){
+			if(ArchiveFormat>=1007) 
+			{
+				ar>>f; m_Beta = f;
+			}
+			if(ArchiveFormat<1002)
+			{
 				ar >> f;    
 				ar >> f;	
 				ar >> f;	

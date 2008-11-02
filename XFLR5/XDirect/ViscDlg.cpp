@@ -63,6 +63,16 @@ CViscDlg::CViscDlg(CWnd* pParent /*=NULL*/)
 
 	m_pFrame = NULL;
 	m_pXDirect = NULL;
+
+	m_AlphaMin = 0.0;
+	m_AlphaMax = 1.0;
+	m_DeltaAlpha = 0.5;
+	m_ClMin = 0.0;
+	m_ClMax = 1.0;
+	m_DeltaCl = 0.1;
+	m_ReMin = 10000.0;
+	m_ReMax = 100000.0;
+	m_DeltaRe = 10000.0;
 }
 
 
@@ -91,6 +101,10 @@ END_MESSAGE_MAP()
 BOOL CViscDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	CRect WndRect;
+	GetWindowRect(WndRect);
+	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 	
 	CString str;
 	CString strAppDirectory;
@@ -117,7 +131,8 @@ BOOL CViscDlg::OnInitDialog()
 	m_RmsGraph.SetLabelLogFont(&LgFt);
 	m_Iterations = 0;
 	ResetCurves();
-	if (IsBlackAndWhite()) {
+	if (IsBlackAndWhite()) 
+	{
 		m_RmsGraph.SetAxisColor(RGB(0,0,0));
 		m_RmsGraph.SetBkColor(RGB(255,255,255));
 		m_RmsGraph.SetLabelColor(RGB(0,0,0));
@@ -132,10 +147,13 @@ BOOL CViscDlg::OnInitDialog()
 	m_pIterThread->m_pXFoil = m_pXFoil;
 	m_pIterThread->m_bType4 = m_bType4;
 
-	m_pIterThread->SetAlphaMin(m_fAlphaMin);
-	m_pIterThread->SetAlphaMax(m_fAlphaMax);
-	m_pIterThread->SetDAlpha(m_fDAlpha);
-//	m_pIterThread->m_bAutoDelete = true;
+	if(!m_bType4)
+	{
+		if(m_bAlpha) m_pIterThread->SetAlpha(m_AlphaMin,m_AlphaMax,m_DeltaAlpha);
+		else         m_pIterThread->SetCl(m_ClMin,m_ClMax,m_DeltaCl);
+	}
+	else m_pIterThread->SetRe(m_ReMin,m_ReMax,m_DeltaRe);
+	
 	m_pIterThread->m_bAutoDelete = false;
 	m_pIterThread->m_bAutoInitBL = pXDirect->m_bAutoInitBL;
 
@@ -171,15 +189,15 @@ void CViscDlg::OnDestroy()
 	DWORD response = WaitForSingleObject(m_pIterThread->m_hThread, INFINITE);
 	if(response == WAIT_ABANDONED){
 		Trace("Abandoned thread");
-		TRACE("Abandoned thread\n");
+//		TRACE("Abandoned thread\n");
 	}
 	else if(response == WAIT_TIMEOUT){
-		Trace("Thread time out");
+//		Trace("Thread time out");
 		TRACE("Thread time out\n");
 	}
 	else if(response == WAIT_OBJECT_0){
 		Trace("Thread returned correctly");
-		TRACE("Thread returned correctly\n");
+//		TRACE("Thread returned correctly\n");
 	}
 	delete m_pIterThread;
 	m_XFile.Close();
@@ -223,27 +241,26 @@ void CViscDlg::OnCancel()
 //	CDialog::OnCancel();
 }
 
-
-void CViscDlg::SetAlphaMin(double alpha)
+void CViscDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha)
 {
-	// in radians
-	m_fAlphaMin = alpha;
+	m_AlphaMin = AlphaMin;
+	m_AlphaMax = AlphaMax;
+	m_DeltaAlpha = DeltaAlpha;
 }
 
-
-void CViscDlg::SetAlphaMax(double alpha)
+void CViscDlg::SetCl(double ClMin, double ClMax, double DeltaCl)
 {
-	// in radians
-	m_fAlphaMax = alpha;
+	m_ClMin = ClMin;
+	m_ClMax = ClMax;
+	m_DeltaCl = DeltaCl;
 }
 
-
-void CViscDlg::SetDAlpha(double alpha)
+void CViscDlg::SetRe(double ReMin, double ReMax, double DeltaRe)
 {
-	// in radians
-	m_fDAlpha = alpha;
+	m_ReMin = ReMin;
+	m_ReMax = ReMax;
+	m_DeltaRe = DeltaRe;
 }
-
 
 void CViscDlg::OnSkip() 
 {

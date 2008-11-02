@@ -116,7 +116,8 @@ bool CVLMThread::AlphaLoop()
 	nrhs  = (int)abs((m_AlphaMax-m_Alpha)*1.0001/m_DeltaAlpha) + 1;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100){
+	else if(nrhs>=100)
+	{
 		int res = AfxMessageBox("The number of points to be calculated will be limited to 100", MB_OKCANCEL);
 		if(res ==IDCANCEL) return false;
 		nrhs = 100;
@@ -237,8 +238,6 @@ bool CVLMThread::UnitLoop()
 }
 
 
-
-
 bool CVLMThread::ReLoop()
 {
 	CWaitCursor Wait;
@@ -254,7 +253,8 @@ bool CVLMThread::ReLoop()
 	nrhs  = (int)abs((m_QInfMax-m_QInf)*1.0001/m_DeltaQInf) + 1;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100){
+	else if(nrhs>=100)
+	{
 		int res = AfxMessageBox("The number of points to be calculated will be limited to 100", MB_OKCANCEL);
 		if(res ==IDCANCEL) return false;
 		nrhs = 100;
@@ -273,8 +273,10 @@ bool CVLMThread::ReLoop()
 		pVLMDlg->m_OpAlpha = m_pWPolar->m_ASpec;
 		Alpha = 0.0;
 	}
-	else Alpha = m_Alpha;
-
+	else 
+	{
+		Alpha = m_Alpha;
+	}
 
 	if(!pVLMDlg->VLMCreateRHS(Alpha)) 
 	{
@@ -361,7 +363,7 @@ bool CVLMThread::ControlLoop()
 		pVLMDlg->m_Ctrl = t;
 
 		//update the variables & geometry
-		// XcmRef, 
+		// XcmRef, T5-10.0 m/s-CG(0.00)mm-W(0.0°/5.0°)-E(1.0°/4.0°)-WF2(3.0°/2.0°)-EF1(4.0°/1.0°)
 		// if plane : WingTilt, elevator Tilt
 		// if flaps : wing flaps, elevator flaps
 		if(m_pWPolar->m_bActiveControl[0])
@@ -370,6 +372,8 @@ bool CVLMThread::ControlLoop()
 			m_pWPolar->m_XCmRef = m_pWPolar->m_MinControl[0] + t * (m_pWPolar->m_MaxControl[0] - m_pWPolar->m_MinControl[0]);
 		}
 		else m_pWPolar->m_XCmRef = m_pWPolar->m_MinControl[0];
+
+		nCtrl = 1;
 
 		if(pVLMDlg->m_pPlane)
 		{
@@ -386,25 +390,29 @@ bool CVLMThread::ControlLoop()
 					(pVLMDlg->m_pWing->m_pPanel+j)->Rotate(pVLMDlg->m_pPlane->m_LEWing, Quat, angle);
 				}
 			}
+			nCtrl=2;
 
-			//elevator incidence
-			if(m_pWPolar->m_bActiveControl[2] && pVLMDlg->m_pStab)
+			if(pVLMDlg->m_pStab)
 			{
-				//Elevator tilt 
-				angle = m_pWPolar->m_MinControl[2] + t * (m_pWPolar->m_MaxControl[2] - m_pWPolar->m_MinControl[2]);
-				angle -= pVLMDlg->m_pPlane->m_StabTilt;
-
-				Quat.Set(angle, H);
-
-				for(j=0; j<pVLMDlg->m_pStab->m_MatSize; j++)
+				//elevator incidence
+				if(m_pWPolar->m_bActiveControl[2] )
 				{
-					(pVLMDlg->m_pStab->m_pPanel+j)->Rotate(pVLMDlg->m_pPlane->m_LEStab, Quat, angle);
+					//Elevator tilt 
+					angle = m_pWPolar->m_MinControl[2] + t * (m_pWPolar->m_MaxControl[2] - m_pWPolar->m_MinControl[2]);
+					angle -= pVLMDlg->m_pPlane->m_StabTilt;
+
+					Quat.Set(angle, H);
+
+					for(j=0; j<pVLMDlg->m_pStab->m_MatSize; j++)
+					{
+						(pVLMDlg->m_pStab->m_pPanel+j)->Rotate(pVLMDlg->m_pPlane->m_LEStab, Quat, angle);
+					}
 				}
+				nCtrl = 3;
 			}
 		}
 
 		// flap controls
-		nCtrl = 3;
 		//wing first
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
@@ -412,7 +420,7 @@ bool CVLMThread::ControlLoop()
 			{
 				angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
 
-				pWing->m_Surface[j].RotateFlap(angle);
+				if(!pWing->m_Surface[j].RotateFlap(angle))  return false;
 			}
 			nCtrl++;
 		}
@@ -426,7 +434,7 @@ bool CVLMThread::ControlLoop()
 				{
 					angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
 
-					pStab->m_Surface[j].RotateFlap(angle);
+					if(!pStab->m_Surface[j].RotateFlap(angle)) return false;
 				}
 				nCtrl++;
 			}
@@ -487,7 +495,7 @@ bool CVLMThread::ControlLoop()
 		if(iter>=100)
 		{
 			//no zero moment alpha
-			str.Format("\r\n\r\n Interpolation unsuccessful for t=%10.3f - skipping.\r\n", t);
+			str.Format("      Interpolation unsuccessful for Control=%10.3f - skipping.\r\n\r\n\r\n", t);
 			pVLMDlg->AddString(str);
 			pVLMDlg->m_bWarning = true;
 		}
@@ -534,7 +542,7 @@ bool CVLMThread::ControlLoop()
 			else
 			{
 				//no zero moment alpha
-				str.Format("\r\n\r\n Interpolation unsuccessful for t=%10.3f - skipping.\r\n", t);
+				str.Format("      Interpolation unsuccessful for Control=%10.3f - skipping.\r\n\r\n\r\n", t);
 				pVLMDlg->AddString(str);
 				pVLMDlg->m_bWarning = true;
 			}

@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #pragma once
+#include "../misc/Vector.h"
 
 class Quaternion
 {
@@ -45,21 +46,6 @@ public:
 	double theta;
 	double a, qx, qy,qz;
 	static double pi, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t15, t19, t20, t24;
-	static CVector R
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		;
+	static CVector R;
+	
 };

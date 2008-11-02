@@ -81,6 +81,7 @@ protected:
 	int m_NStation;
 	int m_WakeInterNodes;
 	int m_MaxWakeIter;
+	int m_InducedDragPoint;
 
 	double m_ControlPos, m_VortexPos;
 	double m_Relax, m_AlphaPrec;
@@ -91,10 +92,10 @@ protected:
 	void ReadParams();
 	void SetParams();
 
-	CWnd * m_pMiarex;
 	CWnd* m_pFrame;
+
 	// Generated message map functions
-	//{{AFX_MSG(CWAdvDlg)
+
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	afx_msg void OnClose();
@@ -103,7 +104,8 @@ protected:
 	afx_msg void OnRadio1();
 	afx_msg void OnRadio3();
 	afx_msg void OnResetDefaults();
-	//}}AFX_MSG
+	afx_msg void OnInducedDragPoint();
+
 	DECLARE_MESSAGE_MAP()
 public:
 };

@@ -146,6 +146,10 @@ END_MESSAGE_MAP()
 BOOL CBatchDlg::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
+
+	CRect WndRect;
+	GetWindowRect(WndRect);
+	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 	
 	CXDirect* pXDirect = (CXDirect*)m_pXDirect;
 

@@ -50,12 +50,14 @@ CChildView::CChildView()
 	m_iBorderStyle = 0;
 	m_iBorderWidth = 1;
 	m_bBorder      = true;
-	m_dz = 28;
+	m_dz           = 28;
+	m_LetterWidth  = 7;
+
 	m_rCltRect.SetRect(0,0, 100,100);
-	m_LetterWidth = 7;
 
 	glDeleteLists(GLF_START_LIST, 256);
 }
+
 
 CChildView::~CChildView()
 {
@@ -83,8 +85,8 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_WM_CREATE()
 	ON_WM_LBUTTONDBLCLK()
 	ON_COMMAND(IDM_CLRSETTINGS, OnClrSettings)
-	//}}AFX_MSG_MAP
 	ON_WM_KEYUP()
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 
@@ -193,7 +195,7 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 }
 
 
-UINT CChildView::OnNcHitTest(CPoint point) 
+LRESULT CChildView::OnNcHitTest(CPoint point) 
 {
 	CRect rectClient;
 	CPoint ptClient(point);
@@ -774,15 +776,14 @@ void CChildView::GLSetupPalette()
 	BYTE baRed[] = {0, 36, 72, 109, 145, 182, 218, 255};
 	BYTE baGreen[] = {0, 36, 72, 109, 145, 182, 218, 255};
 	BYTE baBlue[] = {0, 85, 170, 255};
+	int iColor;
 
 	// Fill our logical palette structure with color data
-	for ( int iColor = 0; iColor < 256; ++iColor ) {
-		pal.peaEntries[iColor].peRed =
-								baRed[iColor & 0x07];
-		pal.peaEntries[iColor].peGreen =
-								baGreen[(iColor >> 0x03) & 0x07];
-		pal.peaEntries[iColor].peBlue =
-								baBlue[(iColor >> 0x06) & 0x03];
+	for (iColor = 0; iColor < 256; ++iColor ) 
+	{
+		pal.peaEntries[iColor].peRed   = baRed[iColor & 0x07];
+		pal.peaEntries[iColor].peGreen = baGreen[(iColor >> 0x03) & 0x07];
+		pal.peaEntries[iColor].peBlue  = baBlue[(iColor >> 0x06) & 0x03];
 		pal.peaEntries[iColor].peFlags = 0;
 	} // for
 
@@ -796,27 +797,68 @@ bool CChildView::GLLoadFont()
 	CFont    ThisFont;
 	CFont*   pOldFont;
 
+	int l;
+
 	CPaintDC dc(this); // device context for painting
 	HDC hDC = dc.m_hDC;
 	wglMakeCurrent(dc.m_hDC,m_hRC);
 
 	CFont TempFont;
 	LOGFONT lf;
-	TempFont.CreatePointFont(85, "Courier New");
+ 
+	if(!TempFont.CreatePointFont(85, "Courier New"))
+	{
+//		AfxMessageBox("Font Courrier New is not present\n switching to Courier Font");
+		if(!TempFont.CreatePointFont(85, "Courier"))
+		{
+//			AfxMessageBox("Couldn't find Courier font either. Exiting...");
+		TempFont.CreateFont(
+			12,                        // nHeight
+			8,                         // nWidth
+			0,                         // nEscapement
+			0,                         // nOrientation
+			FW_NORMAL,                 // nWeight
+			FALSE,                     // bItalic
+			FALSE,                     // bUnderline
+			0,                         // cStrikeOut
+			ANSI_CHARSET,              // nCharSet
+			OUT_DEFAULT_PRECIS,        // nOutPrecision
+			CLIP_DEFAULT_PRECIS,       // nClipPrecision
+			DEFAULT_QUALITY,           // nQuality
+			FIXED_PITCH | FF_MODERN,  // nPitchAndFamily
+			"DefaultFont");                 // lpszFacename
+		}
+	}
+
 	TempFont.GetLogFont(&lf);
 	lf.lfHeight = m_WndLogFont.lfHeight;
-	ThisFont.CreateFontIndirect(&lf);
+	if(!ThisFont.CreateFontIndirect(&lf))
+	{
+		AfxMessageBox("Couldn't create indirect Font. Exiting...");
+		return false;
+	}
 	pOldFont = dc.SelectObject(&ThisFont);
 
-	wglUseFontBitmaps(hDC, 0,255, GLF_START_LIST);
+
+	if(!wglUseFontBitmaps(hDC, 0,255, GLF_START_LIST))
+	{
+		AfxMessageBox("Couldn't create GL Font Bitmaps. Exiting...");
+		return false;
+	}
 
 	MAT2 m2 = {{0, 1}, {0, 0}, {0, 0}, {0, 1}}; 
 	GLYPHMETRICS gm;
 
 	m_LetterWidth = 0;
 	DWORD res;
-	for (int l=42; l<122; l++){
+	for (l=42; l<122; l++)
+	{
 		res = dc.GetGlyphOutline(l, 0, &gm, 0, NULL, &m2);
+		if(res==-1)
+		{
+			AfxMessageBox("Couldn't create GL Glyph Outline. Exiting...");
+			return false;
+		}
 		m_LetterWidth = max (m_LetterWidth,(int)(gm.gmBlackBoxX));
 	}
 
@@ -863,7 +905,8 @@ void CChildView::OnClrSettings()
 	dlg.m_pGraph = &m_DefaultGraph;
 	dlg.m_bBlackAndWhite = IsBlackAndWhite();
 
-	if(IDOK == dlg.DoModal()){
+	if(IDOK == dlg.DoModal())
+	{
 		SetBlackAndWhite(dlg.m_bBlackAndWhite);
 		m_crBackColor  = dlg.m_crWnd;
 		memcpy(&m_WndLogFont, &dlg.m_WndLogFont, sizeof(dlg.m_WndLogFont));
@@ -879,6 +922,7 @@ void CChildView::OnClrSettings()
 		m_pMiarex->m_bResetglLift     = true;
 		m_pMiarex->m_bResetglOpp      = true;
 		m_pMiarex->m_bResetglWake     = true;
+		m_pMiarex->m_bResetglLegend   = true;
 
 
 		CMainFrame * pFrame  = (CMainFrame*)m_pFrameWnd; 

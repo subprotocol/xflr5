@@ -28,8 +28,6 @@
 #include "./main/MainFrm.h"
 
 
-
-
 // CXFLR5App
 
 BEGIN_MESSAGE_MAP(CXFLR5App, CWinApp)
@@ -81,8 +79,10 @@ BOOL CXFLR5App::InitInstance()
 		CStdioFile tf;
 		tf.Open(TraceFileName, CFile::modeCreate | CFile::modeWrite | CFile::typeText);
 		tf.Close();
+		Trace("CXFLR5App::Trace file open");
+
 	}
-	//Trace("CX5App::InitInstance::Launching app");
+	Trace("CX5App::InitInstance::Launching app");
 
 
 //	AfxEnableControlContainer();
@@ -112,8 +112,10 @@ BOOL CXFLR5App::InitInstance()
 		//Trace("CX5App::InitInstance::Redirected input to first instance");
 		//Trace("CX5App::InitInstance::Closing App");
 
+		Trace("CXFLR5App::Not the first instance");
 		return FALSE;
 	}
+
 
 	//Trace("CX5App::InitInstance::System time acquired");
 
@@ -138,12 +140,17 @@ BOOL CXFLR5App::InitInstance()
 	UINT showCmd;
 
 	//load previously saved size and position
-	CString str, strAppDirectory;
+
+	CString str;
+	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
- 	str =strAppDirectory + "XFLR5.set";
+	str =strAppDirectory + "XFLR5.set";
+
+	Trace("CXFLR5App::Default settings open");
+
+
 	x=0; y=0; cx = GetSystemMetrics(SM_CXSCREEN); cy = GetSystemMetrics(SM_CYSCREEN);
 	l=x; t = y;
 	r = cx; b = cy;
@@ -155,7 +162,7 @@ BOOL CXFLR5App::InitInstance()
 		{
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
-			if(k!=100320)
+			if(k!=100321)
 			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
@@ -171,10 +178,12 @@ BOOL CXFLR5App::InitInstance()
 	catch (CArchiveException *ex)
 	{
 		ex->Delete();
+		fp.Close();
 	}
 	catch (CException *ex)
 	{
 		ex->Delete();
+		fp.Close();
 	}
 
 	pFrame->m_wndpl.rcNormalPosition.left   = l;
@@ -189,8 +198,7 @@ BOOL CXFLR5App::InitInstance()
 	//set previously saved size and position
 	pFrame->SetWindowPos(&CWnd::wndTop, x, y, cx, cy,SWP_NOREDRAW);
 	pFrame->ShowWindow(showCmd);
-	
-	//Trace("CX5App::InitInstance::Window displayed" );
+
 	pFrame->UpdateWindow();
 
 	if(!CmdInfo.m_strFileName.IsEmpty())
@@ -202,8 +210,6 @@ BOOL CXFLR5App::InitInstance()
 		if (app == XFOILANALYSIS)	pFrame->OnXDirect();
 	}
 	
-	//Trace("CX5App::InitInstance::App launched successfully");
-
 	return TRUE;
 }
 
@@ -219,31 +225,32 @@ BOOL CXFLR5App::OnIdle(LONG lCount)
 	{
 		if(pFrame->Miarex.KickIdle()) return 1;
 	}
-//	//Trace("Idle ...bored...%d\n", lCount);
 	return CWinApp::OnIdle(lCount);
 }
 
 
 BOOL CXFLR5App::FirstInstance(CCommandLineInfo &CmdInfo)
 {
-	HWND hWnd, hWndChild;
+	CWnd *pWndPrev, *pWndChild;
 	
 	// Determine if another window with our class name and Window title exists...
 	// The title "Instance " is set up later, in the InitDialog function.
-//	hWnd = FindWindow(_T("#32769"),"XFLR5 ");// see MSDN : #32769 The class for the desktop window. 
-	hWnd = FindWindow(NULL,"XFLR5 ");
-	
-	if (hWnd) 
+
+	pWndPrev = CWnd::FindWindow(NULL,"XFLR5 ");
+//	pWndPrev = CWnd::FindWindow(_T("MyNewClass"), NULL);
+
+	if (pWndPrev) 
 	{
 		//Trace("Previous window ref : ", hWnd);
 
-		hWndChild = GetLastActivePopup(hWnd); // if so, does it have any popups?
-	
-		if (IsIconic(hWnd)) 
-			ShowWindow(hWnd, SW_RESTORE);		// If iconic, restore the main window
-		SetForegroundWindow(hWndChild);			// Bring the main window or it's popup to
+		pWndChild = pWndPrev->GetLastActivePopup(); // if so, does it have any popups?
+
+		if (pWndPrev->IsIconic()) 
+			pWndPrev->ShowWindow(SW_RESTORE);		// If iconic, restore the main window
+
+		pWndPrev->SetForegroundWindow();			// Bring the main window or it's popup to
 												// the foreground
-// post the command line info to the other app
+		// post the command line info to the other app
 		char* filename = NULL;
 		filename = new char[100];
 		strcpy(filename, CmdInfo.m_strFileName);
@@ -255,7 +262,7 @@ BOOL CXFLR5App::FirstInstance(CCommandLineInfo &CmdInfo)
 			cpd.cbData = (DWORD)strlen(CmdInfo.m_strFileName);
 			cpd.lpData = &CmdInfo.m_strFileName;
 			cpd.lpData = filename;
-			SendMessage(hWnd,WM_COPYDATA, NULL, (LPARAM)&cpd);
+			pWndPrev->SendMessage(WM_COPYDATA, NULL, (LPARAM)&cpd);
 			//Trace("Copying data to ", hWnd);
 		} 
 		delete filename;
@@ -329,7 +336,7 @@ void CAboutDlg::OnLButtonUp(UINT nFlags, CPoint point)
 }
 
 
-UINT CAboutDlg::OnNcHitTest(CPoint point) 
+LRESULT CAboutDlg::OnNcHitTest(CPoint point) 
 {
 	CRect rectClient;
 	CPoint ptClient(point);
@@ -346,6 +353,7 @@ UINT CAboutDlg::OnNcHitTest(CPoint point)
 	}
 //	return CDialog::OnNcHitTest(point);
 }
+
 
 BOOL CAboutDlg::OnInitDialog() 
 {
@@ -728,7 +736,7 @@ double pow(int a, int b){
 
 void ReynoldsFormat(CString &str, double f)
 {
-	int q, r, exp;
+	int i, q, r, exp;
 	exp = (int)log10(f);
 	r = exp%3;
 	q = (exp-r)/3;
@@ -738,7 +746,7 @@ void ReynoldsFormat(CString &str, double f)
 
 	int l = strong.GetLength();
 
-	for (int i=0; i<q; i++){
+	for (i=0; i<q; i++){
 		strong.Insert(l-3*(i+1)-i," ");
 		l++;
 	}
@@ -1432,7 +1440,9 @@ bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M)
 	//Cramer's rule
 
 	double Det  = -AB.x * CD.y + CD.x * AB.y;
-	if(Det==0.0) {//vectors are parallel, no intersection
+	if(Det==0.0) 
+	{
+		//vectors are parallel, no intersection
 		return false;
 	}
 	double Det1 = -(C.x-A.x)*CD.y + (C.y-A.y)*CD.x;
@@ -1447,8 +1457,6 @@ bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M)
 	if (0.0<=t && t<=1.0 && 0.0<=u && u<=1.0)	return true;//M is between A and B
 	else										return false;//M is outside
 }
-
-
 
 
 bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax)
@@ -1498,6 +1506,204 @@ bool CDoubleRect::PtInRect(CVector Real)
 	if(Real.x>=left && Real.x<=right && Real.y<=top && Real.y>=bottom) return true;
 	else return false;
 }
+
+
+bool Gauss(double *A, int n, double *B, int m)
+{
+ 	int row, i, j, pivot_row, k;
+	double max, dum, *pa, *pA, *A_pivot_row;
+	// for each variable find pivot row and perform forward substitution
+	pa = A;
+	for (row = 0; row < (n - 1); row++, pa += n) 
+	{
+		//  find the pivot row
+		A_pivot_row = pa;
+		max = abs(*(pa + row));
+		pA = pa + n;
+		pivot_row = row;
+		for (i=row+1; i < n; pA+=n, i++)
+		{
+			if ((dum = abs(*(pA+row))) > max) 
+			{ 
+				max = dum; 
+				A_pivot_row = pA; 
+				pivot_row = i; 
+			}
+		}
+		if (max <= 0.0) 
+			return false;                // the matrix A is singular
+		
+			// and if it differs from the current row, interchange the two rows.
+			
+		if (pivot_row != row) 
+		{
+			for (i = row; i < n; i++) 
+			{
+				dum = *(pa + i);
+				*(pa + i) = *(A_pivot_row + i);
+				*(A_pivot_row + i) = dum;
+			}
+			for(k=0; k<=m; k++)
+			{
+				dum = B[row+k*n];
+				B[row+k*n] = B[pivot_row+k*n];
+				B[pivot_row+k*n] = dum;
+			}
+		}
+		
+		// Perform forward substitution
+		for (i = row+1; i<n; i++) 
+		{
+			pA = A + i * n;
+			dum = - *(pA + row) / *(pa + row);
+			*(pA + row) = 0.0;
+			for (j=row+1; j<n; j++)  *(pA+j) += dum * *(pa + j);
+			for (k=0; k<=m; k++)    B[i+k*n] += dum * B[row+k*n];
+		}
+	}
+
+	// Perform backward substitution
+	
+	pa = A + (n - 1) * n;
+	for (row = n - 1; row >= 0; pa -= n, row--) 
+	{
+		if ( *(pa + row) == 0.0 ) 
+			return false;           // matrix is singular
+		dum = 1.0 / *(pa + row);
+		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
+		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for ( i = 0, pA = A; i < row; pA += n, i++) 
+		{
+			dum = *(pA + row);
+			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
+			for(k=0; k<=m; k++)             B[i+k*n] -= dum * B[row+k*n];
+		}
+	}
+	return true;
+}
+
+bool SplineInterpolation(int n, double *x, double *y, double a[4], double b[4], double c[4], double d[4])
+{
+//
+// Given an array of n+1 pairs (x[i], y[i]), with i ranging from 0 to n, 
+// this function calculates the 3rd order cubic spline which interpolate the pairs.
+//
+// The spline is defined for each interval [x[j], x[j+1]) by n third order polynomial functions
+//
+// The equations to determine the coefficients a,b,c,d are
+//
+// Interpolation : 2n conditions
+//    p_j(x[j])   = y[j];
+//    p_j(x[j+1]) = y[j+1];
+//
+// Continuity of 1st and 2nd order derivatives at internal points: 2(n-1) conditions
+//    p_j'(x[j]) = p_j+1'(x[j])
+//    p_j"(x[j]) = p_j+1"(x[j])
+//
+// Second order derivative is zero at the end points : 2 conditions
+//    p_j"(x[0]) =  p_j"(x[n]) =0
+//
+//
+// This sets a linear system of size 4n which is solved by the Gauss algorithm for coefs a,b,c and d
+// The RHS vector is 
+//	  a[0]
+//	  b[0]
+//	  c[0]
+//	  d[0]
+//	  a[1]
+//    ...
+//	  d[n-1]
+//
+
+	if(n>MAXSTATIONS) return false;
+	int i,size;
+
+	double M[MAXSTATIONS*MAXSTATIONS*4*4];
+	double RHS[MAXSTATIONS*4];
+	memset(M,   0, sizeof(M));
+	memset(RHS, 0, sizeof(RHS));
+
+	size = 4*n;
+//	Interpolation conditions
+	for (i=0; i<n; i++)
+	{	
+		//pj(x[i]) = y[i] 
+        // row      col
+		M[2*i*size +4*i]     = x[i]*x[i]*x[i];
+		M[2*i*size +4*i + 1] = x[i]*x[i];
+		M[2*i*size +4*i + 2] = x[i];
+		M[2*i*size +4*i + 3] = 1.0;
+
+		//pj(x[i+1]) = y[i+1] 
+		M[(2*i+1)*size +4*i]     = x[i+1]*x[i+1]*x[i+1];
+		M[(2*i+1)*size +4*i + 1] = x[i+1]*x[i+1];
+		M[(2*i+1)*size +4*i + 2] = x[i+1];
+		M[(2*i+1)*size +4*i + 3] = 1.0;
+		
+		RHS[2*i]   = y[i];
+		RHS[2*i+1] = y[i+1];
+	}
+
+//  Derivation conditions
+	for (i=1; i<n; i++)
+	{
+		//continuity of 1st order derivatives
+		
+		M[(2*n+i)*size + 4*(i-1)]     =  3.0*x[i]*x[i];
+		M[(2*n+i)*size + 4*(i-1)+1]   =  2.0     *x[i];
+		M[(2*n+i)*size + 4*(i-1)+2]   =  1.0;
+
+		M[(2*n+i)*size + 4*i]   = -3.0*x[i]*x[i];
+		M[(2*n+i)*size + 4*i+1] = -2.0     *x[i];
+		M[(2*n+i)*size + 4*i+2] = -1.0;
+		
+		RHS[2*n+i]   = 0.0;
+
+		//continuity of 2nd order derivatives
+		M[(3*n+i)*size + 4*(i-1)]     =  6.0*x[i];
+		M[(3*n+i)*size + 4*(i-1)+1]   =  2.0     ;
+
+		M[(3*n+i)*size + 4*i]   = -6.0*x[i];
+		M[(3*n+i)*size + 4*i+1] = -2.0     ;
+		
+		RHS[3*n+i]   = 0.0;
+	}
+
+//	second order derivative is zero at end points = "natural spline"
+	M[2*n*size]     = 6.0*x[0];
+	M[2*n*size+1]   =  2.0;
+	RHS[2*n]        = 0.0;
+
+	M[3*n*size + size-4]   = 6.0*x[n];
+	M[3*n*size + size-3]   = 2.0;
+	RHS[3*n+1]             = 0.0;
+
+	if(!Gauss(M, 4*n, RHS, 1)) 
+		return false;
+
+	for(i=0; i<n; i++)
+	{
+			a[i] = RHS[4*i];
+			b[i] = RHS[4*i+1];
+			c[i] = RHS[4*i+2];
+			d[i] = RHS[4*i+3];
+	}
+
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

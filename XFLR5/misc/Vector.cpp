@@ -28,7 +28,7 @@
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
-#include "Vector.h"
+#include "../Miarex/Quaternion.h"
 #include <math.h>
 #include ".\vector.h"
 
@@ -187,6 +187,14 @@ CVector CVector::operator -(CVector const &V)
 {
 	CVector T(x-V.x, y-V.y, z-V.z);
 	return T;
+}
+
+void CVector::Rotate(CVector const &R, double Angle)
+{
+	Quaternion Qt;
+	Qt.Set(Angle, R);
+	Qt.Conjugate(x,y,z);
+
 }
 
 void CVector::RotateX(CVector const &O, double XTilt)

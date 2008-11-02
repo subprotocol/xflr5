@@ -56,8 +56,9 @@ public:
 	void RotateZ(CVector const &O, double ZTilt);
 	void SetNormal();
 	void SetFlap();
-	void SetSidePoints(CBody *pBody=NULL);
+	void SetSidePoints(CBody *pBody, double dx, double dz);
 	void SetTwist();
+	void SetTwist_Old();
 	void Translate(CVector const &T);
 
 	bool IsFlapPanel(int const &p);

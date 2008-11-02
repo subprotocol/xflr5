@@ -41,6 +41,7 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 	m_Weight     = 1.0;
 	m_XCmRef     = 0.0;
 	m_Alpha      = 0.0;
+	m_Beta       = 0.0;
 	m_Type       = 1;
 	m_WingLoad   = 1.0;
 	m_Density    = 1.225;
@@ -95,6 +96,7 @@ void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SPEEDUNIT, m_ctrlSpeedUnit);
 	DDX_Control(pDX, IDC_WEIGHTUNIT, m_ctrlWeightUnit);
 	DDX_Control(pDX, IDC_ALPHA, m_ctrlAlpha);
+	DDX_Control(pDX, IDC_BETA, m_ctrlBeta);
 	DDX_Control(pDX, IDC_WEIGHT, m_ctrlWeight);
 	DDX_Control(pDX, IDC_WTYPE1, m_ctrlType1);
 	DDX_Control(pDX, IDOK, m_ctrlOK);
@@ -118,6 +120,7 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 	ON_BN_CLICKED(IDC_WTYPE1, OnType)
 	ON_EN_KILLFOCUS(IDC_WEIGHT, OnKillFocusWeight)
 	ON_EN_KILLFOCUS(IDC_ALPHA, OnKillFocusAlpha)
+	ON_EN_KILLFOCUS(IDC_BETA, OnKillFocusBeta)
 	ON_EN_KILLFOCUS(IDC_HEIGHT, OnKillFocusHeight)
 	ON_EN_KILLFOCUS(IDC_VISCOSITY, OnKillFocusViscosity)
 	ON_EN_KILLFOCUS(IDC_DENSITY, OnKillFocusDensity)
@@ -153,7 +156,8 @@ BOOL CWngAnalysis::OnInitDialog()
 	CString str;
 	int i;
 
-	if(m_pPlane) {
+	if(m_pPlane) 
+	{
 		if(m_AnalysisType==0 || m_AnalysisType==1) m_AnalysisType=2;
 		m_ctrlMethod1.EnableWindow(false);
 	}
@@ -188,11 +192,13 @@ BOOL CWngAnalysis::OnInitDialog()
 	OnUnit();
 
 	m_ctrlHeight.SetValue(m_Height*pFrame->m_mtoUnit);
-	if(m_bGround){
+	if(m_bGround)
+	{
 		m_ctrlHeight.EnableWindow(true);
 		m_ctrlGroundEffect.SetCheck(TRUE);
 	}
-	else {
+	else 
+	{
 		m_ctrlHeight.EnableWindow(false);
 		m_ctrlGroundEffect.SetCheck(FALSE);
 	}
@@ -214,6 +220,9 @@ BOOL CWngAnalysis::OnInitDialog()
 	m_ctrlQInf.SetValue(m_QInf*pFrame->m_mstoUnit);
 	m_ctrlWeight.SetValue(m_Weight*pFrame->m_kgtoUnit);
 
+	m_ctrlBeta.SetPrecision(2);
+	m_ctrlBeta.SetValue(m_Beta);
+
 	m_ctrlAlpha.SetValue(m_Alpha);
 	SetWingLoad();
 	SetReynolds();
@@ -229,7 +238,7 @@ BOOL CWngAnalysis::OnInitDialog()
 	if(m_bWakeRollUp) 	m_ctrlWakeRollUp.SetCheck(TRUE);
 
 	m_ctrlWakeRollUp.EnableWindow(FALSE);
-	m_ctrlWakeParams.EnableWindow(FALSE);
+//	m_ctrlWakeParams.EnableWindow(FALSE);
 
 	OnTiltedGeom();
 
@@ -313,6 +322,7 @@ void CWngAnalysis::ReadParams()
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_Alpha  = m_ctrlAlpha.GetValue();
+	m_Beta   = m_ctrlBeta.GetValue();
 	m_QInf   = abs(m_ctrlQInf.GetValue()) / pFrame->m_mstoUnit;
 	m_Weight = abs(m_ctrlWeight.GetValue()) /pFrame->m_kgtoUnit;
 	m_XCmRef = m_ctrlXCmRef.GetValue() /pFrame->m_mtoUnit;
@@ -380,6 +390,12 @@ void CWngAnalysis::SetWPolarName()
 	strong.Format("-%6.2f", m_XCmRef*pFrame->m_mtoUnit);
 	m_WPolarName += strong + str;
 
+	if(abs(m_Beta) > .001)
+	{
+		strong.Format("-b%.2f°", m_Beta);
+		m_WPolarName += strong;
+	}
+
 	if(m_bTiltedGeom) 
 	{
 		m_WPolarName += "-TG";
@@ -405,14 +421,17 @@ void CWngAnalysis::OnOK()
 	m_ctrlWPolarName.GetWindowText(m_WPolarName);
 
 	int LineLength = m_WPolarName.GetLength();
-	if(!LineLength) {
+	if(!LineLength) 
+	{
 		AfxMessageBox("Must enter a name", MB_OK);
 		GetDlgItem(IDC_WPOLARNAME)->SetFocus();
 		return;
 	}
-	else{
+	else
+	{
 		int size = (int)m_poaXPolar->GetSize();
-		for (int j=0; j<size; j++){
+		for (int j=0; j<size; j++)
+		{
 			pWPolarNew = (CWPolar*)m_poaXPolar->GetAt(j);
 			if (pWPolarNew->m_PlrName == m_WPolarName &&
 				pWPolarNew->m_UFOName  == m_UFOName){
@@ -423,11 +442,12 @@ void CWngAnalysis::OnOK()
 			}
 		}
 	}
-
-	if(!m_bWakeRollUp && m_AnalysisType==3){
+/* TODO : restore
+	if(!m_bWakeRollUp && m_AnalysisType==3)
+	{
 		m_TotalWakeLength = 100.0;
 		m_NXWakePanels    = 1;
-	}
+	}*/
 	CDialog::OnOK();
 }
 
@@ -465,6 +485,12 @@ void CWngAnalysis::OnKillFocusAlpha()
 	SetWPolarName();
 }
 
+void CWngAnalysis::OnKillFocusBeta() 
+{
+	m_Beta = m_ctrlBeta.GetValue();
+	SetWPolarName();
+}
+
 
 void CWngAnalysis::OnKillFocusHeight()
 {
@@ -476,13 +502,16 @@ void CWngAnalysis::OnKillFocusHeight()
 void CWngAnalysis::OnType() 
 {	
 	int sel = GetCheckedRadioButton(IDC_WTYPE1, IDC_WTYPE4);
-	if (sel == IDC_WTYPE1) {
+	if (sel == IDC_WTYPE1) 
+	{
 		m_Type = 1;
 	}
-	else if(sel == IDC_WTYPE2) {
+	else if(sel == IDC_WTYPE2) 
+	{
 		m_Type = 2;
 	}
-	else if(sel == IDC_WTYPE4) {
+	else if(sel == IDC_WTYPE4) 
+	{
 		m_Type = 4;
 	}
 	EnableControls();
@@ -716,6 +745,7 @@ void CWngAnalysis::OnMethod()
 		m_ctrlWakeRollUp.SetCheck(FALSE);
 		m_ctrlTiltGeom.SetCheck(FALSE);
 		m_ctrlTiltGeom.EnableWindow(false);
+		m_ctrlBeta.EnableWindow(false);
 //		m_ctrlThinSurfaces.SetCheck(TRUE);
 //		m_ctrlThinSurfaces.EnableWindow(false);
 
@@ -727,6 +757,7 @@ void CWngAnalysis::OnMethod()
 		m_bThinSurfaces = true;
 		m_AnalysisType=2;
 		m_ctrlTiltGeom.EnableWindow(true);
+		m_ctrlBeta.EnableWindow(true);
 //		m_ctrlThinSurfaces.SetCheck(TRUE);
 //		m_ctrlThinSurfaces.EnableWindow(false);
 
@@ -739,6 +770,7 @@ void CWngAnalysis::OnMethod()
 		m_AnalysisType=3;
 		m_ctrlTiltGeom.EnableWindow(true);
 		m_bThinSurfaces = false;
+		m_ctrlBeta.EnableWindow(true);
 //		m_ctrlThinSurfaces.SetCheck(false);
 //		m_ctrlThinSurfaces.EnableWindow(true);
 
@@ -814,11 +846,13 @@ void CWngAnalysis::OnViscous()
 
 void CWngAnalysis::OnGroundEffect()
 {
-	if(m_ctrlGroundEffect.GetCheck()){
+	if(m_ctrlGroundEffect.GetCheck())
+	{
 		m_bGround = true;
 		m_ctrlHeight.EnableWindow(TRUE);
 	}
-	else {
+	else 
+	{
 		m_bGround = false;
 		m_ctrlHeight.EnableWindow(FALSE);
 	}
@@ -832,15 +866,7 @@ void CWngAnalysis::OnWakeParams()
 
 	m_WakePanelFactor = m_WakeParamsdlg.m_WakePanelFactor;
 	m_TotalWakeLength = m_WakeParamsdlg.m_TotalWakeLength;
-	if(m_bWakeRollUp)
-	{
-		m_NXWakePanels = m_WakeParamsdlg.m_NXWakePanels;
-	}
-	else
-	{
-		m_NXWakePanels    = 1;
-		m_TotalWakeLength  = 100.0;
-	}
+	m_NXWakePanels = m_WakeParamsdlg.m_NXWakePanels;
 }
 
 void CWngAnalysis::OnThinSurfaces()

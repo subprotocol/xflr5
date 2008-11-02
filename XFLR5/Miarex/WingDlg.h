@@ -23,7 +23,7 @@
 #include "Wing.h"
 #include "../misc/FloatEdit.h"
 #include "../misc/NumEdit.h"
-#include "../misc/ClrClasses.h"
+#include "../misc/ClrClasses.h" 
 #include "PanelListCtrl.h"
 
 
@@ -57,7 +57,7 @@ class CWingDlg : public CDialog
 public:
 
 	CWingDlg(CWnd* pParent = NULL);   
-	CWingDlg(CWing *pWing);   
+	CWingDlg(CWnd* pParent, CWing *pWing);   
 	virtual ~CWingDlg();
 
 	enum { IDD = IDD_WINGDLG };
@@ -134,9 +134,6 @@ protected:
 	double GetTwist(double y);
 	double GetZPos(double y);
 
-	void CopyDataTo(CWing *pWing);
-	void CopyDataFrom(CWing *pWing);
-
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
@@ -153,6 +150,7 @@ protected:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnContextMenu(CWnd* pWnd , CPoint point);
 	afx_msg void OnAppend();
+	afx_msg void OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -164,38 +162,39 @@ protected:
 	static CWnd* s_pFrame;		//pointer to the Frame window
 	static CWnd* s_pMiarex;	//pointer to the Miarex Application window
 
-	CWing *m_pWing;
-
-	CString m_WingName;	//the wing's name
-
 	CStdioFile * m_pXFile;	// a pointer to the output .log file
 	CFont m_FixedFont;	
 	
-	bool m_bVLMAutoMesh; 	// true if the mesh should be set automatically
 	bool m_bTrace;		// true if the messages need to be traces
-	bool m_bSymetric;	// true if the wing's geometry is symmetric
 	bool m_bRightSide;	// true if the wing's right side is selected for display
 	bool m_bCheckName;	// true if the wing's name should be checked 
 	bool m_bTrans;		// true if the wing is being dragged 
 	bool m_bChanged;	// true if the user has made changes to the wing's definition
+	double pi;		//
+	CRect m_DrawRect;			// the drawing rectangle in the dialog box
+
+	CPoint m_PointDown;			// the last client point wherer the user has left-clicked
+	CPoint m_ptOffset;			// the offset point to display the wing
+
+	int m_iSection;		// the currently selected section
+	double m_fWingScale;	// scale to display the wing in the dialog box
+	double m_yMac;		// mean aerodynamic chord span position
+
+	CWing *m_pWing;
+/*	bool m_bSymetric;	// true if the wing's geometry is symmetric
 	bool m_bIsFin, m_bSymFin, m_bDoubleFin;
 
 	int m_NPanel;		// number of span panels in wing definition
 	int m_NStation;		// number of stations for wing calculation
-	int m_iSection;		// the currently selected section
-
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
 
-	double pi;		//
 	double m_Span;		// wing span
 	double m_GChord;	// mean geometric chord
 	double m_MAChord;	// mean aerodynamic chord
-	double m_yMac;		// mean aerodynamic chord span position
 	double m_Area;		// wing surface
 	double m_Volume;	// for tentative wieght calculations
 	double m_AR;		// Aspect ratio
 	double m_TR;		// Taper ratio
-	double m_fWingScale;	// scale to display the wing in the dialog box
 
 	int m_NXPanels[MAXPANELS+1]; 		// VLM Panels along chord, for each Wing Panel
 	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
@@ -220,14 +219,8 @@ protected:
 	CStringArray m_RFoil;			// name of the right foils
 	CStringArray m_LFoil;			// name of the left foils
 
-	CRect m_DrawRect;			// the drawing rectangle in the dialog box
-
-	CPoint m_PointDown;			// the last client point wherer the user has left-clicked
-	CPoint m_ptOffset;			// the offset point to display the wing
-
-	COLORREF m_WingColor;
+	COLORREF m_WingColor;*/
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult);
 };

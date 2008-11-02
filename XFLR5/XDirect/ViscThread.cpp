@@ -46,6 +46,15 @@ CViscThread::CViscThread(CWnd *pParent)
 	m_pParent     = pParent;
 	m_bType4      = false;
 	m_bAutoInitBL = true;
+	m_AlphaMin = 0.0;
+	m_AlphaMax = 1.0;
+	m_DeltaAlpha = 0.5;
+	m_ClMin = 0.0;
+	m_ClMax = 1.0;
+	m_DeltaCl = 0.1;
+	m_ReMin = 10000.0;
+	m_ReMax = 100000.0;
+	m_DeltaRe = 10000.0;
 }
 
 
@@ -85,47 +94,59 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CViscThread message handlers
 
-void CViscThread::SetAlphaMin(double alpha)
+
+
+void CViscThread::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha)
 {
-	// in radians
-	m_fAlphaMin = alpha;
+	m_AlphaMin   = AlphaMin;
+	m_AlphaMax   = AlphaMax;
+	m_DeltaAlpha = DeltaAlpha;
 }
 
-
-void CViscThread::SetAlphaMax(double alpha)
+void CViscThread::SetCl(double ClMin, double ClMax, double DeltaCl)
 {
-	// in radians
-	m_fAlphaMax = alpha;
+	m_ClMin   = ClMin;
+	m_ClMax   = ClMax;
+	m_DeltaCl = DeltaCl;
 }
 
-
-void CViscThread::SetDAlpha(double alpha)
+void CViscThread::SetRe(double ReMin, double ReMax, double DeltaRe)
 {
-	// in radians
-	m_fDAlpha = alpha;
+	m_ReMin   = ReMin;
+	m_ReMax   = ReMax;
+	m_DeltaRe = DeltaRe;
 }
+
 
 
 bool CViscThread::AlphaLoop()
 {
-	double alphadeg;
+	double alfa;
+	double pi = 3.141592654;
+
 	CViscDlg* pVDlg = (CViscDlg*) m_pParent;
 	CString str;
+	int ia, total;
 
-	int total=int((m_fAlphaMax-m_fAlphaMin)*1.0001/m_fDAlpha);//*1.0001 to make sure upper limit is included
-	for (int ia=0; ia<=total; ia++){
-		if(!m_bExit){
-			if(pVDlg->m_bAlpha){
-				double alfa = m_fAlphaMin+ia*m_fDAlpha;
-				alphadeg = alfa*180.0/3.141592654;
-				m_pXFoil->alfa = alfa;
+	if(pVDlg->m_bAlpha) total=int((m_AlphaMax-m_AlphaMin)*1.0001/m_DeltaAlpha);//*1.0001 to make sure upper limit is included
+	else                total=int((m_ClMax-m_ClMin)*1.0001/m_DeltaCl);//*1.0001 to make sure upper limit is included
+
+	for (ia=0; ia<=total; ia++)
+	{
+		if(!m_bExit)
+		{
+			if(pVDlg->m_bAlpha)
+			{
+				alfa = m_AlphaMin+ia*m_DeltaAlpha;
+				m_pXFoil->alfa = alfa*pi/180.0;
 				m_pXFoil->lalfa = true;
 				m_pXFoil->qinf = 1.0;
-				str.Format("\r\n\r\nAlpha = %.3f\r\n\r\n", alphadeg);
+				str.Format("\r\n\r\nAlpha = %.3f\r\n\r\n", alfa);
 				m_pXFoil->pXFile->WriteString(str);
 
 				// here we go !
-				if (!m_pXFoil->specal()) {
+				if (!m_pXFoil->specal()) 
+				{
 					CString str;
 					str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 					AfxMessageBox(str, MB_OK);
@@ -133,14 +154,16 @@ bool CViscThread::AlphaLoop()
 					return FALSE;
 				}
 			}
-			else{
+			else
+			{
 				m_pXFoil->lalfa = false;
 				m_pXFoil->alfa = 0.0;
 				m_pXFoil->qinf = 1.0;
-				m_pXFoil->clspec = m_fAlphaMin+ia*m_fDAlpha;
+				m_pXFoil->clspec = m_ClMin+ia*m_DeltaCl;
 				str.Format("\r\n\r\nCl = %.3f\r\n\r\n", m_pXFoil->clspec);
 				m_pXFoil->pXFile->WriteString(str);
-				if(!m_pXFoil->speccl()){
+				if(!m_pXFoil->speccl())
+				{
 					CString str;
 					str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 					AfxMessageBox(str, MB_OK);
@@ -148,11 +171,11 @@ bool CViscThread::AlphaLoop()
 					return FALSE;
 				}
 			}
-			if ((double)fabs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001) 
+			if ((double)abs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001) 
 				m_pXFoil->lwake  = false;
-			if ((double)fabs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001) 
+			if ((double)abs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001) 
 				m_pXFoil->lvconv = false;
-			if ((double)fabs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001) 
+			if ((double)abs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001) 
 				m_pXFoil->lvconv = false;
 
 			m_pXFoil->lwake = false;
@@ -164,10 +187,11 @@ bool CViscThread::AlphaLoop()
 			
 			pVDlg->ResetCurves();
 			m_Iterations = 0;
-			alphadeg = m_pXFoil->alfa*180.0/3.141592654;
+
 			pVDlg->AddOpPoint();// only if converged ???
 		}
-		else {
+		else
+		{
 			break;
 		}
 	}
@@ -181,14 +205,16 @@ bool CViscThread::ReLoop()
 //	double alphadeg;
 	CViscDlg* pVDlg = (CViscDlg*) m_pParent;
 	CString str;
-	
-	// Alpha values are interpreted as Reynolds numbers
+	int ia;
+	double Re;
 
-	int total=int((m_fAlphaMax*1.0001-m_fAlphaMin)/m_fDAlpha);//*1.0001 to make sure upper limit is included
-	for (int ia=0; ia<=total; ia++){
-		if(!m_bExit){
+	int total=int((m_ReMax*1.0001-m_ReMin)/m_DeltaRe);//*1.0001 to make sure upper limit is included
 
-			double Re = m_fAlphaMin+ia*m_fDAlpha;
+	for (ia=0; ia<=total; ia++)
+	{
+		if(!m_bExit)
+		{
+			Re = m_ReMin+ia*m_DeltaRe;
 			m_pXFoil->reinf1 = Re;
 			m_pXFoil->lalfa = true;
 			m_pXFoil->qinf = 1.0;
@@ -196,7 +222,8 @@ bool CViscThread::ReLoop()
 			m_pXFoil->pXFile->WriteString(str);
 
 			// here we go !
-			if (!m_pXFoil->specal()) {
+			if (!m_pXFoil->specal()) 
+			{
 				CString str;
 				str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 				AfxMessageBox(str, MB_OK);
@@ -223,7 +250,8 @@ bool CViscThread::ReLoop()
 
 			pVDlg->AddOpPoint();// only if converged ???
 		}
-		else {
+		else 
+		{
 			break;
 		}
 	}

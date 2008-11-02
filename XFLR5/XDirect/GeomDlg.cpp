@@ -86,7 +86,8 @@ BOOL CGeomDlg::OnInitDialog()
 	m_fXCamber    = m_pMemFoil->m_fXCamber;
 	m_fXThickness = m_pMemFoil->m_fXThickness;
 
-	if(fabs(m_fCamber) <0.0001) {
+	if(abs(m_fCamber) <0.0001)
+	{
 		m_ctrlCamb.SetWindowText("The foil's camber is too small to be scaled");
 		m_ctrlCamberSlide.EnableWindow(false);
 		m_ctrlCamber.EnableWindow(false);
@@ -223,8 +224,10 @@ void CGeomDlg::OnChangedX()
 void CGeomDlg::Apply() 
 {
 	//reset everything and retry
+	int i,j;
 
-	for (int i=0; i< m_pMemFoil->nb; i++){
+	for (i=0; i< m_pMemFoil->nb; i++)
+	{
 		m_pXFoil->xb[i+1] = m_pMemFoil->xb[i] ;
 		m_pXFoil->yb[i+1] = m_pMemFoil->yb[i];
 	}
@@ -232,7 +235,8 @@ void CGeomDlg::Apply()
 	m_pXFoil->lflap = false;
 	m_pXFoil->lbflap = false;
 
-	if(m_pXFoil->Preprocess()){
+	if(m_pXFoil->Preprocess())
+	{
 		m_pXFoil->CheckAngles();
 /*		for (int k=0; k<m_pXFoil->n;k++){
 			m_pMemFoil->nx[k] = m_pXFoil->nx[k+1];
@@ -240,12 +244,14 @@ void CGeomDlg::Apply()
 		}
 		m_pMemFoil->n = m_pXFoil->n;*/
 	}
-	else {
+	else 
+	{
 		AfxMessageBox("Unrecognized foil format", MB_OK);
 		return;
 	}
 
-	if(!m_bApplied){
+	if(!m_bApplied)
+	{
 		double thickness = m_ctrlThickness.GetValue()/100.0;
 		double camber    = m_ctrlCamber.GetValue()/100.0;
 		m_pXFoil->tcset(camber, thickness);
@@ -254,7 +260,8 @@ void CGeomDlg::Apply()
 		m_bApplied = true;
 	}
 
-	if(!m_bAppliedX){
+	if(!m_bAppliedX)
+	{
 		double Xthickness = m_ctrlXThickness.GetValue()/100.0;
 		double Xcamber    = m_ctrlXCamber.GetValue()/100.0;
 		m_pXFoil->hipnt(Xcamber, Xthickness);
@@ -263,17 +270,20 @@ void CGeomDlg::Apply()
 		m_bAppliedX = true;
 	}
 
-	if(m_pXFoil->nb>350) {
+	if(m_pXFoil->nb>350) 
+	{
 		AfxMessageBox("Panel number cannot exceed 350", MB_OK);
 		//reset everything and retry
-		for (int i=0; i< m_pMemFoil->nb; i++){
+		for (i=0; i< m_pMemFoil->nb; i++){
 			m_pXFoil->x[i+1] = m_pMemFoil->xb[i];
 			m_pXFoil->y[i+1] = m_pMemFoil->yb[i];
 		}
 		m_pXFoil->n = m_pMemFoil->nb;
 	}
-	else{
-		for (int j=0; j< m_pXFoil->nb; j++){
+	else
+	{
+		for (j=0; j< m_pXFoil->nb; j++)
+		{
 			m_pBufferFoil->xb[j] = m_pXFoil->xb[j+1];
 			m_pBufferFoil->yb[j] = m_pXFoil->yb[j+1];
 		}

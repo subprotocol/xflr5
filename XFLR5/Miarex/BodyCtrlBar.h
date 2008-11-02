@@ -36,6 +36,7 @@ class CBodyCtrlBar : public CInitDialogBar
 	DECLARE_DYNAMIC(CBodyCtrlBar)
 	friend class CMainFrame;
 	friend class CChildView;
+	friend class CXBody;
 	friend class CMiarex;
  
 	// Construction

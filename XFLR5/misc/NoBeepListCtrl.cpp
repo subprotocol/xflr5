@@ -44,9 +44,6 @@ END_MESSAGE_MAP()
 
 
 
-// Gestionnaires de messages CNoBeepListCtrl
-
-
 void CNoBeepListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	int index;

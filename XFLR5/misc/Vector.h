@@ -33,6 +33,7 @@ public:
 	void Set(CVector const &V);
 	void Set(double const &x0, double const &y0, double const &z0);
 	void Copy(CVector const &V);
+	void Rotate(CVector const &R, double Angle);
 	void RotateX(CVector const &O, double XTilt);
 	void RotateY(CVector const &O, double YTilt);
 	void RotateZ(CVector const &O, double ZTilt);

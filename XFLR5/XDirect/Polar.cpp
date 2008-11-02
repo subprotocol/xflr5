@@ -82,8 +82,9 @@ CPolar::~CPolar()
 
 void CPolar::Copy(CPolar *pPolar)
 {
+	int i;
 	int size  = (int)m_Alpha.GetSize();
-	for(int i=size-1; i>=0; i--)
+	for(i=size-1; i>=0; i--)
 		Remove(i);
 	
 	size  = (int)pPolar->m_Alpha.GetSize();

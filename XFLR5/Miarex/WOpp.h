@@ -68,7 +68,7 @@ private:
 
 	double m_FirstWakePanel;
 	double m_WakeFactor;
-	double m_Alpha;
+	double m_Alpha, m_Beta;
 	double m_QInf;
 	double m_Ctrl;		//control variable - converged value
 	double m_Weight;
@@ -99,6 +99,7 @@ private:
 	double m_FlapMoment[20]; 		// flap hinge moments
 
 	double m_CL;				// Wing lift coefficient
+	double m_CY, m_CX;			//Side force, drag coefficients
 	double m_ViscousDrag;			// wing viscous drag
 	double m_InducedDrag;			// wing induced drag
 	double m_GCm;		// wing pitching moment

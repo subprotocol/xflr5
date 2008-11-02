@@ -732,10 +732,11 @@ bool CPF::SaveFile(CStdioFile *pFile)
 
 bool CPF::Serialize(CArchive &ar)
 {
+	int ArchiveFormat,k ;
 	//starting with v3.05
-	if(ar.IsLoading()){
+	if(ar.IsLoading())
+	{
 		float f;
-		int ArchiveFormat,k ;
 		ar >> ArchiveFormat;
 		if(ArchiveFormat<100000 || ArchiveFormat>100500 ) return false;
 		ar >> m_strFoilName; //m_strFoilName = "Splined Points Foil";
@@ -788,13 +789,14 @@ bool CPF::Serialize(CArchive &ar)
 		m_bModified = false;
 		return true;
 	}
-	else{
+	else
+	{
 		ar << 100306;
-		m_strFoilName="abcde nada";
+		m_strFoilName="abcde";
 		ar << m_strFoilName;
 		ar << m_FoilColor << m_FoilStyle << m_FoilWidth;
 		ar << m_Extrados.m_iPoints;
-		for (int k=0; k<m_Extrados.m_iPoints;k++){
+		for (k=0; k<m_Extrados.m_iPoints;k++){
 			ar << (float)m_Extrados.m_ctrlPoint[k].x << (float)m_Extrados.m_ctrlPoint[k].y;
 		}
 

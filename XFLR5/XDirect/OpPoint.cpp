@@ -91,7 +91,7 @@ OpPoint::~OpPoint()
 bool OpPoint::SerializeOpp(CArchive &ar, int ArchiveFormat)
 {
 
-	int a, b, Format;
+	int a, b, k, Format;
 	float f,g;
 
 	if(ar.IsStoring()){
@@ -108,7 +108,7 @@ bool OpPoint::SerializeOpp(CArchive &ar, int ArchiveFormat)
 		ar << a << b;
 		ar << (float)Cl << (float)Cm << (float)Cd << (float)Cdp;
 		ar << (float)Xtr1 << (float)Xtr2 << (float)ACrit << (float)m_TEHMom << (float)Cpmn;
-		for (int k=0; k<n; k++)	ar << (float)Cpv[k] << (float)Cpi[k];
+		for (k=0; k<n; k++)	ar << (float)Cpv[k] << (float)Cpi[k];
 //		for (k=0; k<n; k++)	    ar << (float)s[k] << (float)Qv[k] << (float)Qi[k];
 		for (k=0; k<n; k++)	    ar << (float)Qv[k] << (float)Qi[k];
 		for (k=0; k<=nd1; k++)  ar << (float)xd1[k] << (float)yd1[k];
@@ -154,7 +154,7 @@ bool OpPoint::SerializeOpp(CArchive &ar, int ArchiveFormat)
 			ar >> f; ACrit =f;
 			ar >> f; m_TEHMom = f;
 			ar >> f; Cpmn = f;
-			for (int k=0; k<n; k++)	{
+			for (k=0; k<n; k++)	{
 				ar >> f; Cpv[k] = f;
 				ar >> f; Cpi[k] = f;
 			}
