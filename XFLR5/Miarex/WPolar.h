@@ -107,7 +107,7 @@ private:
 	void AddPoint(CPOpp* pPOpp);
 	void CalculatePoint(int i);
 	void Copy(CWPolar *pWPolar);
-	void Export(CString FileName);
+	void Export(CString FileName, int FileType);
 	void GetBWStyle(COLORREF &color, int &style, int &width);
 	void Remove(int i);
 	void ResetWPlr();

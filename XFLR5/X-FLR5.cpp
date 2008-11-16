@@ -62,7 +62,7 @@ BOOL CXFLR5App::InitInstance()
 	// InitCommonControls() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
-	InitCommonControls();
+//	InitCommonControls();
 
 	CWinApp::InitInstance();
 
@@ -162,7 +162,7 @@ BOOL CXFLR5App::InitInstance()
 		{
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
-			if(k!=100321)
+			if(k!=100322)
 			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
@@ -239,7 +239,21 @@ BOOL CXFLR5App::FirstInstance(CCommandLineInfo &CmdInfo)
 	pWndPrev = CWnd::FindWindow(NULL,"XFLR5 ");
 //	pWndPrev = CWnd::FindWindow(_T("MyNewClass"), NULL);
 
-	if (pWndPrev) 
+	char* oldclassname = NULL;
+	oldclassname = new char[100];
+
+	CString strong;
+	CString str("ThumbnailClass");
+
+	HWND hWnd;
+	hWnd = pWndPrev->GetSafeHwnd();
+	GetClassName(hWnd, oldclassname, 100);
+
+	strong = oldclassname;//easiest way to compare
+
+	delete oldclassname;
+
+	if (pWndPrev && strong != str) 
 	{
 		//Trace("Previous window ref : ", hWnd);
 
@@ -1024,8 +1038,8 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			  double &mtoUnit, double &m2toUnit, double &mstoUnit, 
 			  double &kgtoUnit, double &NtoUnit, double &NmtoUnit) 
 {
-
-	switch(LUnit){
+	switch(LUnit)
+	{
 		case 0:{//mdm
 			mtoUnit  = 1000.0;
 			break;
@@ -1183,16 +1197,24 @@ BOOL ReadAVLString(CStdioFile *pXFile, int &Line, CString &strong)
 	BOOL bRead = TRUE;
 	bool bComment = true;
 	int pos;
-	while(bComment && bRead){
+	CString str;
+
+	while(bComment && bRead)
+	{
 		bComment = false;
 
 		bRead = pXFile->ReadString(strong);
 
 		pos = strong.Find("#",0);
-		if(pos==0) bComment = true;
+		if(pos==0)		bComment = true;
+
 		pos = strong.Find("!",0);
-		if(pos==0) bComment = true;
-	
+		if(pos==0)		bComment = true;
+
+		str = strong;
+		str.Replace(" ", "");
+		if(str.IsEmpty())	bComment = true;
+
 		Line++;
 	}
 	
@@ -1581,118 +1603,6 @@ bool Gauss(double *A, int n, double *B, int m)
 	}
 	return true;
 }
-
-bool SplineInterpolation(int n, double *x, double *y, double a[4], double b[4], double c[4], double d[4])
-{
-//
-// Given an array of n+1 pairs (x[i], y[i]), with i ranging from 0 to n, 
-// this function calculates the 3rd order cubic spline which interpolate the pairs.
-//
-// The spline is defined for each interval [x[j], x[j+1]) by n third order polynomial functions
-//
-// The equations to determine the coefficients a,b,c,d are
-//
-// Interpolation : 2n conditions
-//    p_j(x[j])   = y[j];
-//    p_j(x[j+1]) = y[j+1];
-//
-// Continuity of 1st and 2nd order derivatives at internal points: 2(n-1) conditions
-//    p_j'(x[j]) = p_j+1'(x[j])
-//    p_j"(x[j]) = p_j+1"(x[j])
-//
-// Second order derivative is zero at the end points : 2 conditions
-//    p_j"(x[0]) =  p_j"(x[n]) =0
-//
-//
-// This sets a linear system of size 4n which is solved by the Gauss algorithm for coefs a,b,c and d
-// The RHS vector is 
-//	  a[0]
-//	  b[0]
-//	  c[0]
-//	  d[0]
-//	  a[1]
-//    ...
-//	  d[n-1]
-//
-
-	if(n>MAXSTATIONS) return false;
-	int i,size;
-
-	double M[MAXSTATIONS*MAXSTATIONS*4*4];
-	double RHS[MAXSTATIONS*4];
-	memset(M,   0, sizeof(M));
-	memset(RHS, 0, sizeof(RHS));
-
-	size = 4*n;
-//	Interpolation conditions
-	for (i=0; i<n; i++)
-	{	
-		//pj(x[i]) = y[i] 
-        // row      col
-		M[2*i*size +4*i]     = x[i]*x[i]*x[i];
-		M[2*i*size +4*i + 1] = x[i]*x[i];
-		M[2*i*size +4*i + 2] = x[i];
-		M[2*i*size +4*i + 3] = 1.0;
-
-		//pj(x[i+1]) = y[i+1] 
-		M[(2*i+1)*size +4*i]     = x[i+1]*x[i+1]*x[i+1];
-		M[(2*i+1)*size +4*i + 1] = x[i+1]*x[i+1];
-		M[(2*i+1)*size +4*i + 2] = x[i+1];
-		M[(2*i+1)*size +4*i + 3] = 1.0;
-		
-		RHS[2*i]   = y[i];
-		RHS[2*i+1] = y[i+1];
-	}
-
-//  Derivation conditions
-	for (i=1; i<n; i++)
-	{
-		//continuity of 1st order derivatives
-		
-		M[(2*n+i)*size + 4*(i-1)]     =  3.0*x[i]*x[i];
-		M[(2*n+i)*size + 4*(i-1)+1]   =  2.0     *x[i];
-		M[(2*n+i)*size + 4*(i-1)+2]   =  1.0;
-
-		M[(2*n+i)*size + 4*i]   = -3.0*x[i]*x[i];
-		M[(2*n+i)*size + 4*i+1] = -2.0     *x[i];
-		M[(2*n+i)*size + 4*i+2] = -1.0;
-		
-		RHS[2*n+i]   = 0.0;
-
-		//continuity of 2nd order derivatives
-		M[(3*n+i)*size + 4*(i-1)]     =  6.0*x[i];
-		M[(3*n+i)*size + 4*(i-1)+1]   =  2.0     ;
-
-		M[(3*n+i)*size + 4*i]   = -6.0*x[i];
-		M[(3*n+i)*size + 4*i+1] = -2.0     ;
-		
-		RHS[3*n+i]   = 0.0;
-	}
-
-//	second order derivative is zero at end points = "natural spline"
-	M[2*n*size]     = 6.0*x[0];
-	M[2*n*size+1]   =  2.0;
-	RHS[2*n]        = 0.0;
-
-	M[3*n*size + size-4]   = 6.0*x[n];
-	M[3*n*size + size-3]   = 2.0;
-	RHS[3*n+1]             = 0.0;
-
-	if(!Gauss(M, 4*n, RHS, 1)) 
-		return false;
-
-	for(i=0; i<n; i++)
-	{
-			a[i] = RHS[4*i];
-			b[i] = RHS[4*i+1];
-			c[i] = RHS[4*i+2];
-			d[i] = RHS[4*i+3];
-	}
-
-	return true;
-}
-
-
 
 
 

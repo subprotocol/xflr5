@@ -26,6 +26,7 @@
 #include "../X-FLR5.h"
 #include "../main/MainFrm.h"
 #include "Body.h"
+#include "../misc/UnitsDlg.h"
 #include <math.h>
 
 double CBody::s_xKnots[MAXBODYFRAMES*2];
@@ -92,6 +93,10 @@ CBody::CBody()
 	for(i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
 	for(i=0; i<MAXSIDELINES;i++)      m_hPanels[i] = 1;
 
+	memset(m_x, 0, sizeof(m_x));
+	memset(m_y, 0, sizeof(m_y));
+	m_np = 0;
+
 	SetKnots();
 }
 
@@ -123,6 +128,27 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnl
 			{
 				m_Frame[i].m_Point[j].y *= YFactor;
 				m_Frame[i].m_Point[j].z *= ZFactor;
+			}
+		}
+	}
+	ComputeCenterLine();
+}
+
+void CBody::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID)
+{
+	int i,j;
+	for (i=0; i<m_NStations; i++)
+	{
+		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
+		{
+			m_FramePosition[i].x += XTrans;
+//			m_FramePosition[i].y += YTrans;
+			m_FramePosition[i].z += ZTrans;
+
+			for(j=0; j<m_Frame[i].m_NPoints; j++)
+			{
+//				m_Frame[i].m_Point[j].x += XTrans;
+				m_Frame[i].m_Point[j].z += ZTrans;
 			}
 		}
 	}
@@ -557,7 +583,7 @@ void CBody::Export(int nx, int nh)
 {
 	CStdioFile XFile;
 	CFileException fe;
-	CString Header, strong, FileName, OutString, LengthUnit;
+	CString Header, strong, FileName, OutString, LengthUnit,str;
 	int j,k,l;
 	double u, v;
 	CVector Point;
@@ -567,10 +593,14 @@ void CBody::Export(int nx, int nh)
 
 	FileName = m_BodyName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT,_T("Text Format (.txt)|*.txt"));
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
 
 	if(IDOK==XFileDlg.DoModal()) 
 	{
+		if(XFileDlg.m_ofn.nFilterIndex==1)		str="";
+		else		str=", ";
 		BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeCreate | CFile::modeWrite, &fe);
 		if (bOpen)
 		{
@@ -580,32 +610,35 @@ void CBody::Export(int nx, int nh)
 			if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
 			XFile.WriteString(strong);
 
-			strong.Format("%3d", m_NStations);
+			strong.Format("%3d"+str, m_NStations);
 			strong +="       // Number of frame stations\n";
 			XFile.WriteString(strong);
 
-			strong.Format("%3d", m_NSideLines);
+			strong.Format("%3d"+str, m_NSideLines);
 			strong +="       // Number of sidelines\n";
 			XFile.WriteString(strong);
 
-			strong.Format("%3d", m_nxDegree);
+			strong.Format("%3d"+str, m_nxDegree);	
 			strong +="       // Spline degree - axial direction\n";
 			XFile.WriteString(strong);
 
-			strong.Format("%3d", m_nhDegree);
+			strong.Format("%3d"+str, m_nhDegree);
 			strong +="       // Spline degree - hoop direction\n";
 			XFile.WriteString(strong);
 			XFile.WriteString("\n\n");
 
 			XFile.WriteString("Control Points\n");
-			XFile.WriteString("        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n");
+			if(XFileDlg.m_ofn.nFilterIndex==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+			else                               strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+			XFile.WriteString(strong);
+			
 			for (j=0; j<m_NStations; j++)
 			{
-				strong.Format("  Frame %3d\n", j+1);
+				strong.Format("  Frame "+str+"%3d\n", j+1);
 				XFile.WriteString(strong);
 				for (k=0; k<m_NSideLines; k++)
 				{
-					strong.Format("   %10.3f     %10.3f     %10.3f\n", 
+					strong.Format("   %10.3f"+str+"     %10.3f"+str+"     %10.3f\n", 
 						m_FramePosition[j].x * pMainFrame->m_mtoUnit,
 						m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,
 						m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit);     
@@ -616,11 +649,13 @@ void CBody::Export(int nx, int nh)
 
 			XFile.WriteString("\n\n");
 			XFile.WriteString("Right Surface Points\n");
-			XFile.WriteString("        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n");
+			if(XFileDlg.m_ofn.nFilterIndex==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+			else                               strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+			XFile.WriteString(strong);
 			
 			for (k=0; k<nx; k++)
 			{
-				strong.Format("  Cross Section %3d\n", k+1);
+				strong.Format("  Cross Section "+str+"%3d\n", k+1);
 				XFile.WriteString(strong);
 
 				u = (double)k / (double)(nx-1); 
@@ -630,7 +665,7 @@ void CBody::Export(int nx, int nh)
 					v = (double)l / (double)(nh-1); 
 					GetPoint(u,  v, true, Point);
 
-					strong.Format("   %10.3f     %10.3f     %10.3f\n", 
+					strong.Format("   %10.3f"+str+"     %10.3f"+str+"     %10.3f\n", 
 						Point.x * pMainFrame->m_mtoUnit,
 						Point.y * pMainFrame->m_mtoUnit,
 						Point.z * pMainFrame->m_mtoUnit);     
@@ -987,11 +1022,14 @@ bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 	CVector N, tmp, M0, M1;
 	double u, v, dist, t, tp;
 	int iter = 0;
-	int itermax = 50;
+	int itermax = 20;
 	double dmax = 1.0e-6;
 	dist = 1000.0;//m
 
-	if(A.VAbs()<B.VAbs())
+	M0.Set(0.0, A.y, A.z);
+	M1.Set(0.0, B.y, B.z);
+
+	if(M0.VAbs()<M1.VAbs())
 	{
 		tmp = A;		A   = B;		B   = tmp;
 	}
@@ -1210,11 +1248,281 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
 }
 
 
+bool CBody::ExportDefinition()
+{
+	CWaitCursor Wait;
+	CMainFrame* pMainFrame = (CMainFrame*)s_pMainFrame;
+
+	CStdioFile XFile;
+	CFileException fe;
+	int i, j;
+	CString strong, FileName;
 
 
+	FileName = m_BodyName;
+	FileName.Replace("/", " ");
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
+		FileName = XFileDlg.GetPathName();
+	
+		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+
+		if (bOpen)
+		{
+			XFile.WriteString(m_BodyName+"\n\n");
+			XFile.WriteString("BODYTYPE\n");
+			if(m_LineType==1) XFile.WriteString("1        # Flat Panels\n\n");
+			if(m_LineType==2) XFile.WriteString("2        # B-Splines\n\n");
+
+			XFile.WriteString("OFFSET\n");
+			XFile.WriteString("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
+
+			for(i=0; i<m_NStations; i++)
+			{
+				XFile.WriteString("FRAME\n");
+				for(j=0;j<m_NSideLines; j++)
+				{
+					strong.Format("%14.7f     %14.7f     %14.7f\n",
+						m_FramePosition[i].x    * pMainFrame->m_mtoUnit,
+						m_Frame[i].m_Point[j].y * pMainFrame->m_mtoUnit,
+						m_Frame[i].m_Point[j].z * pMainFrame->m_mtoUnit);
+					XFile.WriteString(strong);
+				}
+				XFile.WriteString("\n");				
+			}
+			XFile.Close();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else return false;
+
+}
 
 
+bool CBody::ImportDefinition() 
+{
+	CWaitCursor Wait;
+	CFrame NewFrame;
+	CMainFrame* pMainFrame = (CMainFrame*)s_pMainFrame;
 
+	CStdioFile XFile;
+	CFileException fe;
+	int res, i, j, Line, NSideLines;
+	CString strong, FileName;
+	BOOL bRead;
+
+	double mtoUnit;
+	double xo,yo,zo;
+	xo = yo = zo = 0.0;
+
+	m_NStations = 0;
+
+	CUnitsDlg Dlg;
+
+	Dlg.m_bLengthOnly = true;
+	Dlg.m_Length    = pMainFrame->m_LengthUnit;
+	Dlg.m_Area      = pMainFrame->m_AreaUnit;
+	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
+	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
+	Dlg.m_Force     = pMainFrame->m_ForceUnit;
+	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
+	Dlg.m_strQuestion = "Choose the length unit to read this file :";
+
+
+	CFileDialog XFileDlg(TRUE, "txt", NULL, OFN_HIDEREADONLY, _T("Body data (.txt)|*.txt|"));
+
+	try
+	{
+		if(XFileDlg.DoModal()==IDOK)
+		{
+			BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeRead, &fe);
+
+			if(Dlg.DoModal() == IDOK)	
+			{
+				switch(Dlg.m_Length)
+				{
+					case 0:{//mdm
+						mtoUnit  = 1000.0;
+						break;
+					}
+					case 1:{//cm
+						mtoUnit  = 100.0;
+						break;
+					}
+					case 2:{//dm
+						mtoUnit  = 10.0;
+						break;
+					}
+					case 3:{//m
+						mtoUnit  = 1.0;
+						break;
+					}
+					case 4:{//in
+						mtoUnit  = 1000.0/25.4;
+						break;
+					}
+					case 5:{///ft
+						mtoUnit  = 1000.0/25.4/12.0;
+						break;
+					}
+					default:{//m
+						mtoUnit  = 1.0;
+						break;
+					}
+				}
+
+			}
+			else return false;
+
+	
+			if (bOpen)
+			{	
+				Line = 0;
+			
+				//Header data
+				ReadAVLString(&XFile, Line,  strong);//Body Name
+				m_BodyName = strong;
+
+				bRead = TRUE;
+
+				while (bRead)
+				{
+					bRead  = ReadAVLString(&XFile, Line, strong);
+					if(!bRead) break;
+
+					if (strong.Find("BODYTYPE", 0) >=0)
+					{
+						bRead  = ReadAVLString(&XFile, Line, strong);
+						if(!bRead) break;
+							res = sscanf(strong, "%d", &m_LineType);
+						if(res==1)
+						{
+							if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
+						}
+					}
+					else if (strong.Find("OFFSET", 0) >=0)
+					{
+						bRead  = ReadAVLString(&XFile, Line, strong);
+						if(!bRead) break;
+						res = sscanf(strong, "%lf  %lf  %lf", &xo, &yo, &zo);
+						if(res==3)
+						{
+							xo /= mtoUnit;
+							zo /= mtoUnit;
+						}
+						//y0 is ignored, body is assumed centered along x-z plane
+					}
+					else if (strong.Find("FRAME", 0)  >=0)
+					{
+						NSideLines = ReadFrame(&XFile, Line, &NewFrame, mtoUnit);
+						
+						if (NSideLines) 
+						{
+							//we need to insert this frame at the proper place in the body
+							for(i=0; i<m_NStations; i++)
+							{
+								if(NewFrame.m_Point[0].x < m_Frame[i].m_Point[0].x)
+								{
+									for(j=m_NStations; j>i; j--)
+									{
+										m_Frame[j].CopyFrame(m_Frame+j-1);
+									}
+									break;
+								}
+							}
+							m_Frame[i].CopyFrame(&NewFrame);
+							m_NSideLines = NSideLines;
+							m_NStations++;
+						}
+					}
+				}
+
+				XFile.Close();
+				
+				for(i=1; i<m_NStations; i++)
+				{
+					if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
+					{
+						AfxMessageBox("Error reading "+m_BodyName+"\nFrames have different number of side points", MB_OK);
+						return false;
+					}
+				}
+				for(i=0; i<m_NStations; i++)
+				{
+					for(j=0; j<m_NSideLines; j++)
+					{
+						m_Frame[i].m_Point[j].x += xo;
+						m_Frame[i].m_Point[j].z += zo;
+					}
+					m_FramePosition[i].x =  m_Frame[i].m_Point[0].x;
+					m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0;
+				}				
+				
+				return true;
+			}
+			else
+			{
+				CFileException *pEx = new CFileException(CFileException::invalidFile);
+				pEx->m_strFileName = FileName;
+				throw(pEx);
+			}
+		}
+		else return false;
+	}
+	catch (CFileException *ex)
+	{
+		TCHAR   szCause[255];
+		CString str;
+		ex->GetErrorMessage(szCause, 255);
+		str = _T("Error reading body: ");
+		str += szCause;
+		AfxMessageBox(str);
+		ex->Delete();
+		return false;
+	}
+	return true;
+}
+ 
+int CBody::ReadFrame(CStdioFile *pXFile, int &Line, CFrame *pFrame, double const &Unit)
+{
+	CString strong;
+	double x,y,z;
+	int i, res;
+	i = 0;
+
+	bool bRead =true;
+	while (bRead)
+	{
+		if(!ReadAVLString(pXFile, Line,  strong)) bRead = false;
+
+		res = sscanf(strong, "%lf  %lf  %lf", &x, &y, &z);
+		if(res!=3) 
+		{
+			bRead = false;
+			Rewind1Line(pXFile, Line, strong);
+		}
+		else 
+		{
+			pFrame->m_Point[i].x = x / Unit;
+			pFrame->m_Point[i].y = y / Unit;
+			pFrame->m_Point[i].z = z / Unit;
+			i++;
+		}
+		if(i>=MAXSIDELINES)
+		{
+			bRead = false;
+		}
+	}
+
+	pFrame->m_NPoints = i;
+	return i;
+}
 
 
 

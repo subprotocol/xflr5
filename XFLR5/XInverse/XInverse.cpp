@@ -1615,57 +1615,38 @@ void CXInverse::OnExportFoil()
 //	bool bWrite = false;
 	FileName = m_pModFoil->m_FoilName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "dat", FileName,  OFN_OVERWRITEPROMPT,
-		_T("Labeled Format (.dat)|*.dat|"));
-	if(IDOK==XFileDlg.DoModal()) {
+
+	static TCHAR BASED_CODE szFilter[] = _T("Labeled Format (*.dat)|*.dat|") ;
+	CFileDialog XFileDlg(false, "dat", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 		FileName = XFileDlg.GetPathName();
 		m_pModFoil->ExportFoil(FileName);	
 	}
 }
 
-
-void CXInverse::UpdateView(CDC *pDC)
+void CXInverse::PaintFoil(CDC *pDC)
 {
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
 	COLORREF color;
 	int style, width;
-
-	CChildView * pChildView = (CChildView*)m_pChildWnd;
-
-	if(!pDC) pDC = pChildView->GetDC();
-	if(!pDC) return;
-	
-	CPen *pOldPen;
-
-	CDC memdc; 
-	memdc.CreateCompatibleDC (pDC);
-
-	CBitmap  bmp;
-	bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
-	CBitmap * pOldBmp = memdc.SelectObject (&bmp);
-
-	memdc.SetBkColor(pChildView->m_crBackColor);
-	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
-
-	memdc.SetTextColor(pChildView->m_WndTextColor);
-
-	CPen AnyPen(PS_SOLID, 1, RGB(0,0,0));
-	pOldPen   = memdc.SelectObject(&AnyPen);
-	memdc.SelectStockObject(NULL_BRUSH);
-
-	CFont RFont;
-	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
-
-	CFont *pOldFont = memdc.SelectObject(&RFont);
+	LOGBRUSH lb;
+	lb.lbStyle = BS_SOLID;
 
 //	draw the scale/grid
-	if(m_bModFoil || m_bRefFoil){
-		DrawGrid(&memdc, &m_rCltRect, m_fScale, m_ptOffset, false);
+	if(m_bModFoil || m_bRefFoil)
+	{
+		DrawGrid(pDC, &m_rCltRect, m_fScale, m_ptOffset, false);
 	}
 
 //draw the reference and modified foils  
+	LOGFONT TempFont;
+	memcpy(&TempFont, &pChildView->m_WndLogFont, sizeof(LOGFONT));
+	CFont ThisFont;
+	ThisFont.CreateFontIndirect(&TempFont);
+	CFont* pOldFont = pDC->SelectObject(&ThisFont);
 	double alpha = m_pXFoil->alqsp[1];
-	LOGBRUSH lb;
-	lb.lbStyle = BS_SOLID;
 
 	if(m_bRefFoil && m_bLoaded)
 	{
@@ -1676,11 +1657,11 @@ void CXInverse::UpdateView(CDC *pDC)
 		
 		lb.lbColor = color;
 		CPen FoilPen(PS_GEOMETRIC | style,	GetPenWidth(width, false), &lb);
-		memdc.SelectObject(&FoilPen);		
-		m_pRefFoil->DrawFoil(&memdc, -alpha, m_fScale, m_fScale, m_ptOffset, m_rCltRect, false);
-		memdc.MoveTo(50, m_rCltRect.bottom-180);
-		memdc.LineTo(80, m_rCltRect.bottom-180);
-		memdc.TextOut(90, m_rCltRect.bottom-186,m_pRefFoil->m_FoilName);
+		pDC->SelectObject(&FoilPen);		
+		m_pRefFoil->DrawFoil(pDC, -alpha, m_fScale, m_fScale, m_ptOffset, m_rCltRect, false);
+		pDC->MoveTo(50, m_rCltRect.bottom-180);
+		pDC->LineTo(80, m_rCltRect.bottom-180);
+		pDC->TextOut(90, m_rCltRect.bottom-186,m_pRefFoil->m_FoilName);
 	}
 
 	if(m_bModFoil && m_bLoaded) 
@@ -1692,12 +1673,12 @@ void CXInverse::UpdateView(CDC *pDC)
 		
 		lb.lbColor = color;
 		CPen ModPen(PS_GEOMETRIC | style,	GetPenWidth(width, false), &lb);
-		CPen *pOld = memdc.SelectObject(&ModPen);		
-		m_pModFoil->DrawFoil(&memdc, -alpha, m_fScale, m_fScale, m_ptOffset, m_rCltRect, false);
-		memdc.MoveTo(50, m_rCltRect.bottom-165);
-		memdc.LineTo(80, m_rCltRect.bottom-165);
-		memdc.TextOut(90, m_rCltRect.bottom-171,m_pModFoil->m_FoilName);
-		memdc.SelectObject(pOld);
+		CPen *pOld = pDC->SelectObject(&ModPen);		
+		m_pModFoil->DrawFoil(pDC, -alpha, m_fScale, m_fScale, m_ptOffset, m_rCltRect, false);
+		pDC->MoveTo(50, m_rCltRect.bottom-165);
+		pDC->LineTo(80, m_rCltRect.bottom-165);
+		pDC->TextOut(90, m_rCltRect.bottom-171,m_pModFoil->m_FoilName);
+		pDC->SelectObject(pOld);
 	}
 
 	if (m_pRefFoil->m_bPoints)
@@ -1707,63 +1688,85 @@ void CXInverse::UpdateView(CDC *pDC)
 		width = m_pRefFoil->m_nFoilWidth;
 		if(IsBlackAndWhite()) GetBWColor(color, style, width);
 		CPen CtrlPen(PS_SOLID,  1, color);
-		CPen *pOld = memdc.SelectObject(&CtrlPen);
-		m_pRefFoil->DrawPoints(&memdc, 1.0,  1.0, m_ptOffset, m_rCltRect, false);
-		memdc.SelectObject(pOld);
+		CPen *pOld = pDC->SelectObject(&CtrlPen);
+		m_pRefFoil->DrawPoints(pDC, 1.0,  1.0, m_ptOffset, m_rCltRect, false);
+		pDC->SelectObject(pOld);
 	}
+	pDC->SelectObject(pOldFont);
 
+}
+
+void CXInverse::PaintGraph(CDC *pDC)
+{
+	LOGBRUSH lb;
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+
+	CPen *pOldPen;
+
+	CPen AnyPen(PS_SOLID, 1, RGB(0,0,0));
+	pOldPen   = pDC->SelectObject(&AnyPen);
+	pDC->SelectStockObject(NULL_BRUSH);
+
+	CFont RFont;
+	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
+
+	CFont *pOldFont = pDC->SelectObject(&RFont);
 
 //  draw  the graph	
 	if(m_rGraphRect.Width()>200 && m_rGraphRect.Height()>150)
 	{
-		m_QGraph.DrawGraph(&memdc, &m_rGraphRect, false);
+		m_QGraph.DrawGraph(pDC, &m_rGraphRect, false);
 		CPoint Place((int)(m_rGraphRect.right-300), m_rGraphRect.top+12);
-		m_QGraph.DrawLegend(&memdc, false, Place);
+		m_QGraph.DrawLegend(pDC, false, Place);
 	}
 
 // draw the zoom rectangle, if relevant
 	CRect ZRect(&m_ZoomRect);
 	ZRect.NormalizeRect();
-	if(m_bZoomPlus && !ZRect.IsRectEmpty()) {
+	if(m_bZoomPlus && !ZRect.IsRectEmpty()) 
+	{
 		CRect ZRect(m_ZoomRect.left   - m_rCltRect.left,
 					m_ZoomRect.top    - m_rCltRect.top,
 					m_ZoomRect.right  - m_rCltRect.left,
 					m_ZoomRect.bottom - m_rCltRect.top);
 		ZRect.NormalizeRect();
 		CPen ZoomPen(PS_DASH,1, RGB(100,100,100));
-		CPen *pOld = memdc.SelectObject(&ZoomPen);
-		memdc.SetBkMode(TRANSPARENT);
-		memdc.Rectangle(ZRect);
-		memdc.SelectObject(pOld);
+		CPen *pOld = pDC->SelectObject(&ZoomPen);
+		pDC->SetBkMode(TRANSPARENT);
+		pDC->Rectangle(ZRect);
+		pDC->SelectObject(pOld);
 	}
 
 
 //Draw spline, if any
-	if(m_bSpline && !m_bGetPos){
+	if(m_bSpline && !m_bGetPos)
+	{
 		lb.lbStyle = BS_SOLID;
 		lb.lbColor = m_SplineClr;
 		CPen SplinePen(PS_GEOMETRIC | m_SplineStyle,m_SplineWidth, &lb);
 		
-		CPen *pOld = memdc.SelectObject(&SplinePen);
-		m_Spline.DrawSpline(&memdc, 
+		CPen *pOld = pDC->SelectObject(&SplinePen);
+		m_Spline.DrawSpline(pDC, 
 							1.0/m_QGraph.GetXScale(),	-1.0/m_QGraph.GetYScale(),
 							m_QGraph.GetOffset(), false);
-		m_Spline.DrawCtrlPoints(&memdc, 
+		m_Spline.DrawCtrlPoints(pDC, 
 							1.0/m_QGraph.GetXScale(),	-1.0/m_QGraph.GetYScale(),
 							m_QGraph.GetOffset(), false);
-		memdc.SelectObject(pOld);
+		pDC->SelectObject(pOld);
 	}
 // Highlight selected points, if any
-	if(m_bGetPos){
+	if(m_bGetPos)
+	{
 		CPoint pt;
 		CRect r;
-		m_QGraph.Highlight(&memdc, m_pMCurve,m_tmpPos);
-		if(m_nPos>=1) m_QGraph.Highlight(&memdc, m_pMCurve,m_Pos1);
-		if(m_nPos>=2) m_QGraph.Highlight(&memdc, m_pMCurve,m_Pos2);
+		m_QGraph.Highlight(pDC, m_pMCurve,m_tmpPos);
+		if(m_nPos>=1) m_QGraph.Highlight(pDC, m_pMCurve,m_Pos1);
+		if(m_nPos>=2) m_QGraph.Highlight(pDC, m_pMCurve,m_Pos2);
 		
 	}
 // Show marked segment if mixed-inverse design
-	if(m_bMarked){
+	if(m_bMarked)
+	{
 		CPoint ptl, ptr;
 		ptl.x = m_QGraph.xToClient(m_pMCurve->x[m_Mk1]);
 		ptr.x = m_QGraph.xToClient(m_pMCurve->x[m_Mk2]);		
@@ -1771,28 +1774,50 @@ void CXInverse::UpdateView(CDC *pDC)
 		ptr.y = m_QGraph.yToClient(m_pMCurve->y[m_Mk2]);
 
 		CPen MarkPen(PS_SOLID, 2, RGB(175,30,30));
-		CPen *pOld = memdc.SelectObject(&MarkPen);
+		CPen *pOld = pDC->SelectObject(&MarkPen);
 
 		if(m_rGraphRect.PtInRect(ptl)){
-			memdc.MoveTo(ptl.x, ptl.y-20);
-			memdc.LineTo(ptl.x, ptl.y+20);
+			pDC->MoveTo(ptl.x, ptl.y-20);
+			pDC->LineTo(ptl.x, ptl.y+20);
 		}
 		if(m_rGraphRect.PtInRect(ptr)){
-			memdc.MoveTo(ptr.x, ptr.y-20);
-			memdc.LineTo(ptr.x, ptr.y+20);
+			pDC->MoveTo(ptr.x, ptr.y-20);
+			pDC->LineTo(ptr.x, ptr.y+20);
 		}
-		memdc.SelectObject(pOld);
+		pDC->SelectObject(pOld);
 	}
-// Blit back
-	pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rCltRect.Width(),m_rCltRect.Height(),
-			 &memdc,0,0,SRCCOPY);
+	pDC->SelectObject(pOldPen);
+	pDC->SelectObject(pOldFont);
+	RFont.DeleteObject();
+}
+
+void CXInverse::UpdateView(CDC *pDC)
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+
+	if(!pDC) pDC = pChildView->GetDC();
+	if(!pDC) return;
+
+	CDC memdc; 
+	memdc.CreateCompatibleDC (pDC);
+
+	CBitmap  bmp;
+	bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
+	CBitmap * pOldBmp = memdc.SelectObject (&bmp);
+
+	memdc.SetBkColor(pChildView->m_crBackColor);
+	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
+	memdc.SetTextColor(pChildView->m_WndTextColor);
+
+	PaintGraph(&memdc);
+	PaintFoil(&memdc);
+
+	pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rCltRect.Width(),m_rCltRect.Height(), &memdc,0,0,SRCCOPY);
 
 	pChildView->ReleaseDC(pDC);
 
 	memdc.SelectObject(pOldBmp);
-	memdc.SelectObject(pOldPen);
-	memdc.SelectObject(pOldFont);
-	RFont.DeleteObject();
+
 	bmp.DeleteObject();
 	memdc.DeleteDC();
 }
@@ -2271,20 +2296,22 @@ void CXInverse::DrawGrid(CDC *pDC, CRect* pCltRect, double scale, CPoint ptOffse
 
 	double scalex,scaley;
 	int TickSize, xTextOff, offy;
-	LOGFONT TempFont;
-	memcpy(&TempFont, &pChildView->m_WndLogFont, sizeof(LOGFONT));
+//	LOGFONT TempFont;
+//	memcpy(&TempFont, &pChildView->m_WndLogFont, sizeof(LOGFONT));
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
 
-	if (bIsPrinting){
-		TempFont.lfHeight = TempFont.lfHeight*30;
+	if (bIsPrinting)
+	{
+//		TempFont.lfHeight = TempFont.lfHeight*30;
 		TickSize = -150;
 		scalex= scale;
 		scaley=-scale;
 		xTextOff = 700;
 		offy = ptOffset.y;
 	}
-	else{
+	else
+	{
 		TickSize = 5;
 		scalex= scale;
 		scaley= scale;
@@ -2292,7 +2319,8 @@ void CXInverse::DrawGrid(CDC *pDC, CRect* pCltRect, double scale, CPoint ptOffse
 		offy = ptOffset.y;
 //		offy = pCltRect->bottom-100;
 	}
-	if(IsBlackAndWhite()){
+	if(IsBlackAndWhite())
+	{
 		lb.lbColor = RGB(0,0,0);
 		pDC->SetTextColor(RGB(0,0,0));
 	}
@@ -2518,3 +2546,53 @@ void CXInverse::OnStoreRefCurve()
 	}
 }
 
+
+
+void CXInverse::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
+{
+	//Refresh the active view
+
+	HRESULT hResult;
+	CDC *pDC;
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	
+	pDC = pChildView->GetDC();
+	if(!pDC) return;
+
+	
+	CDC memdc; 
+	memdc.CreateCompatibleDC(pDC);
+
+	CBitmap  bmp;
+	bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
+	CBitmap * pOldBmp = memdc.SelectObject(&bmp);
+
+	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
+	memdc.SetBkMode(TRANSPARENT);
+
+	PaintGraph(&memdc);
+	PaintFoil(&memdc);
+
+	memdc.SelectObject(pOldBmp);
+	memdc.DeleteDC();
+
+	HBITMAP hBmp = (HBITMAP)bmp;
+	pImage->Attach(hBmp);
+
+	if(FileType==1)      hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatBMP);
+	else if(FileType==2) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatJPEG);
+	else if(FileType==3) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatGIF);
+	else if(FileType==4) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatPNG);
+
+	if (FAILED(hResult)) 
+	{
+		CString fmt;
+		fmt.Format("Save image failed:\n%x ", hResult);
+		AfxMessageBox(fmt);
+		return;
+	}
+
+	bmp.DeleteObject();
+	
+	pChildView->ReleaseDC(pDC);
+}

@@ -42,6 +42,7 @@
 #include ".\MainFrm.h"
 #include "../misc/MessageDlg.h"
 
+
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame
 
@@ -209,7 +210,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v4.10_Beta";
+	m_VersionName = "XFLR5_v4.12_Beta";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -323,7 +324,6 @@ CMainFrame::CMainFrame()
 	m_ForceUnit   = 0;
 	m_MomentUnit  = 0;
 
-	m_mtoUnit   = 1.0;
 	m_mtoUnit   = 1.0;
 	m_m2toUnit  = 1.0;
 	m_kgtoUnit  = 1.0;
@@ -1223,14 +1223,15 @@ void CMainFrame::OnToolbars()
 void CMainFrame::LoadOldPolarFile(CArchive &ar, int n)
 {
 	//XFLR5 version < 2.00
-	
+	int l, p;
 	CPolar *pPolar = NULL;
 	CPolar *pOldPlr;
 	CPolar *pOld2Plr;
 	CString strong;
 	
 	try{
-		for (int i=0;i<n; i++){
+		for (int i=0;i<n; i++)
+		{
 			pPolar = new CPolar(this);
 			
 			pPolar->m_Color = GetColor(1);
@@ -1242,20 +1243,25 @@ void CMainFrame::LoadOldPolarFile(CArchive &ar, int n)
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
-			for (int l=0; l<m_oaPolar.GetSize(); l++){
+			for (l=0; l<m_oaPolar.GetSize(); l++)
+			{
 				pOldPlr = (CPolar*)m_oaPolar[l];
 				if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
-					pOldPlr->m_PlrName  == pPolar->m_PlrName){
-					int p = 2;
+					pOldPlr->m_PlrName  == pPolar->m_PlrName)
+				{
+					p = 2;
 					bool bFound = true;
-					while(bFound){
+					while(bFound)
+					{
 						strong.Format(" (%d)", p);
 						strong = pPolar->m_PlrName + strong;
-						for (int k=0; k<m_oaPolar.GetSize(); k++){
+						for (int k=0; k<m_oaPolar.GetSize(); k++)
+						{
 							bFound = false;
 							pOld2Plr = (CPolar*)m_oaPolar[k];
 							if (pOld2Plr->m_FoilName == pPolar->m_FoilName &&
-								pOld2Plr->m_PlrName  == strong){
+								pOld2Plr->m_PlrName  == strong)
+							{
 								p++;
 								bFound = true;
 								break;
@@ -1268,7 +1274,8 @@ void CMainFrame::LoadOldPolarFile(CArchive &ar, int n)
 			pPolar = AddPolar(pPolar);
 		}
 	}
-	catch (CArchiveException *ex){
+	catch (CArchiveException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -1358,16 +1365,19 @@ bool CMainFrame::LoadPolarFile(CArchive &ar)
 	CPolar *pPolar = NULL;
 	CPolar *pOldPlr;
 	CString strong;
-	int i, n;
+	int i, n, l;
 
-	try{
+	try
+	{
 		//first read all available foils
 		ar>>n;
-		for (i=0;i<n; i++){
+		for (i=0;i<n; i++)
+		{
 			pFoil = new CFoil();
 			
 			pFoil->Serialize(ar);
-			if (!pFoil->m_FoilName.GetLength()){
+			if (!pFoil->m_FoilName.GetLength())
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -1378,20 +1388,24 @@ bool CMainFrame::LoadPolarFile(CArchive &ar)
 		//next read all available polars
 		
 		ar>>n;
-		for (i=0;i<n; i++){
+		for (i=0;i<n; i++)
+		{
 			pPolar = new CPolar(this);
 			
 			pPolar->m_Color = GetColor(1);
 			pPolar->Serialize(ar);
-			if (!pPolar->m_FoilName.GetLength()){
+			if (!pPolar->m_FoilName.GetLength())
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
-			for (int l=0; l<m_oaPolar.GetSize(); l++){
+			for (l=0; l<m_oaPolar.GetSize(); l++)
+			{
 				pOldPlr = (CPolar*)m_oaPolar[l];
 				if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
-					pOldPlr->m_PlrName  == pPolar->m_PlrName){
+					pOldPlr->m_PlrName  == pPolar->m_PlrName)
+				{
 					//just overwrite...
 					m_oaPolar.RemoveAt(l);
 					delete pOldPlr;
@@ -1401,7 +1415,8 @@ bool CMainFrame::LoadPolarFile(CArchive &ar)
 			pPolar = AddPolar(pPolar);
 		}
 	}
-	catch (CArchiveException *ex){
+	catch (CArchiveException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -1427,17 +1442,20 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 	//first read all available foils
 	int i,l,n;
 	ar>>n;
-	for (i=0;i<n; i++){
+	for (i=0;i<n; i++)
+	{
 		pFoil = new CFoil();
 		
 		pFoil->Serialize(ar);
-		if (!pFoil->m_FoilName.GetLength()){
+		if (!pFoil->m_FoilName.GetLength())
+		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 			pfe->m_strFileName = ar.m_strFileName;
 			delete pFoil;
 			throw pfe;
 		}
-		if(pFoil->m_FoilColor==0){
+		if(pFoil->m_FoilColor==0)
+		{
 			pFoil->m_FoilColor=GetColor(0);
 		}
 		AddFoil(pFoil);
@@ -1446,18 +1464,21 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 	//next read all available polars
 	
 	ar>>n;
-	for (i=0;i<n; i++){
+	for (i=0;i<n; i++)
+	{
 		pPolar = new CPolar(this);
 		
 		pPolar->m_Color = GetColor(1);
 		pPolar->Serialize(ar);
-		if (!pPolar->m_FoilName.GetLength()){
+		if (!pPolar->m_FoilName.GetLength())
+		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 			pfe->m_strFileName = ar.m_strFileName;
 			delete pPolar;
 			return false;
 		}
-		for (l=0; l<m_oaPolar.GetSize(); l++){
+		for (l=0; l<m_oaPolar.GetSize(); l++)
+		{
 			pOldPlr = (CPolar*)m_oaPolar[l];
 			if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
 				pOldPlr->m_PlrName  == pPolar->m_PlrName){
@@ -1472,9 +1493,11 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 	//Last read all available operating points
 	
 	ar>>n;
-	for (i=0;i<n; i++){
+	for (i=0;i<n; i++)
+	{
 		pOpp = new OpPoint();
-		if(!pOpp){
+		if(!pOpp)
+		{
 			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 			pfe->m_strFileName = ar.m_strFileName;
 			delete pOpp;
@@ -1482,48 +1505,60 @@ bool CMainFrame::LoadPolarFileV3(CArchive &ar, int ArchiveFormat)
 		}
 		pOpp->m_pXDirect = &XDirect;
 		pOpp->m_Color = m_crColors[m_oaOpp.GetSize()%24];
-		if(ArchiveFormat>=100002){
-			if (!pOpp->SerializeOpp(ar,100002)){
+		if(ArchiveFormat>=100002)
+		{
+			if (!pOpp->SerializeOpp(ar,100002))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				delete pOpp;
 				return false;
 			}
-			else{
+			else
+			{
 				pFoil = GetFoil(pOpp->m_strFoilName);
-				if(pFoil){
+				if(pFoil)
+				{
 					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
 					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
 				}
-				else {
+				else 
+				{
 					delete pOpp;
 				}
 			}
 		}
 		else{
-			if (!pOpp->SerializeOpp(ar)){
+			if (!pOpp->SerializeOpp(ar))
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				delete pOpp;
 				return false;
 			}
-			else{
+			else
+			{
 				pFoil = GetFoil(pOpp->m_strFoilName);
-				if(pFoil){
+				if(pFoil)
+				{
 					memcpy(pOpp->x, pFoil->x, sizeof(pOpp->x));
 					memcpy(pOpp->y, pFoil->y, sizeof(pOpp->y));
 				}
-				else {
+				else
+				{
 					delete pOpp;
 				}
 			}
 		}
-		if(pOpp){
-			for (int l=0; l<m_oaOpp.GetSize(); l++){
+		if(pOpp)
+		{
+			for (int l=0; l<m_oaOpp.GetSize(); l++)
+			{
 				pOldOpp = (OpPoint*)m_oaOpp.GetAt(l);
 				if (pOldOpp->m_strFoilName == pOpp->m_strFoilName &&
 					pOldOpp->m_strPlrName  == pOpp->m_strPlrName &&
-					fabs(pOldOpp->Alpha-pOpp->Alpha)<0.001){
+					fabs(pOldOpp->Alpha-pOpp->Alpha)<0.001)
+				{
 					//just overwrite...
 					m_oaOpp.RemoveAt(l);
 					delete pOldOpp;
@@ -1543,29 +1578,39 @@ bool CMainFrame::ReadPolarFile(CString FileName)
 {
 	CFile fp;
 
-	try{
-		if (fp.Open(FileName, CFile::modeRead)) {
+	int j,k,n,pos;
+	try
+	{
+		if (fp.Open(FileName, CFile::modeRead)) 
+		{
 			CArchive ar(&fp, CArchive::load);
-			int n;
+
 			ar >> n;
-			if(n<100000) {//old format
+			if(n<100000) 
+			{//old format
 				LoadOldPolarFile(ar,n);
 			}
-			else if (n >=100000) {//new format XFLR5 v1.99+
+			else if (n >=100000)
+			{//new format XFLR5 v1.99+
 				if(!LoadPolarFile(ar)) return false;
 			}
 
-			if(n>=100000){
+			if(n>=100000)
+			{
 				CPolar * pPolar;
 				CFoil *pFoil;
 				CString str;
-				for (int j=0; j<m_oaPolar.GetSize(); j++){
+				for (j=0; j<m_oaPolar.GetSize(); j++)
+				{
 					pPolar = (CPolar*)m_oaPolar.GetAt(j);
-					for (int k=0; k<m_oaFoil.GetSize(); k++){
+					for (k=0; k<m_oaFoil.GetSize(); k++)
+					{
 						pFoil = (CFoil*)m_oaFoil.GetAt(k);
-						if (pFoil->m_FoilName==pPolar->m_FoilName){
-							int pos = pPolar->m_PlrName.Find("_N",0);
-							if(pos <= 0){
+						if (pFoil->m_FoilName==pPolar->m_FoilName)
+						{
+							pos = pPolar->m_PlrName.Find("_N",0);
+							if(pos <= 0)
+							{
 								pPolar->m_ACrit    = 9.0;
 								pPolar->m_XTop     = 1.0;
 								pPolar->m_XBot     = 1.0;
@@ -1582,7 +1627,8 @@ bool CMainFrame::ReadPolarFile(CString FileName)
 			fp.Close();
 		}
 	}
-	catch (CException *ex){
+	catch (CException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -2241,11 +2287,14 @@ void CMainFrame::OnClose()
 {
 	if(!m_bSaved){
 		int resp = AfxMessageBox("Save project before exit ?", MB_YESNOCANCEL);
-		if(resp == IDYES) {
-			if (!m_ProjectName.GetLength() || m_ProjectName=="*") {
+		if(resp == IDYES) 
+		{
+			if (!m_ProjectName.GetLength() || m_ProjectName=="*")
+			{
 				if(!SaveProjectAs()) return; 
 			}
-			if(SaveProject(m_FileName)){
+			if(SaveProject(m_FileName))
+			{
 				SetSaveState(true);	
 				m_wndStatusBar.SetWindowText("Project " + m_ProjectName + " has been saved");
 			}
@@ -2275,30 +2324,36 @@ CFoil* CMainFrame::ReadFoilFile(CString FileName, bool bKeepExistingFoil)
 	line = 0;
 	double x,y, area;
 
-	try{
+	try
+	{
 		BOOL bOpen = XFile.Open(FileName, CFile::modeRead, &fe);
 
-		if (bOpen){
+		if (bOpen)
+		{
 			CString Strong, StrTemp;
 			pFoil = new CFoil();
 
 			BOOL bRead = TRUE;
 			
-			while(pos>=0 && bRead){
+			while(pos>=0 && bRead)
+			{
 				bRead = XFile.ReadString(Strong);
 				pos = Strong.Find("#",0);
 			}
 			
-			if(bRead) {
+			if(bRead)
+			{
 				res = sscanf(Strong, "%lf%lf", &x,&y);
-				if(res==2){
+				if(res==2)
+				{
 					//there isn't a name on the first line
 					FoilName = "New Foil";
 					Rewind1Line(&XFile,line, Strong);
 				}
 				else FoilName = Strong;
 
-				if(!bRead){
+				if(!bRead)
+				{
 					CFileException *pEx = new CFileException(CFileException::invalidFile);
 					pEx->m_strFileName = FileName;
 					throw(pEx);
@@ -2309,17 +2364,20 @@ CFoil* CMainFrame::ReadFoilFile(CString FileName, bool bKeepExistingFoil)
 			}
 
 			pFoil->n=0;
-			while (bRead) {
+			while (bRead) 
+			{
 				bRead = XFile.ReadString(Strong);
 				pos = Strong.Find("#",0);
 
-				if (bRead && pos<0) {
+				if (bRead && pos<0) 
+				{
 					res = sscanf(Strong, "%lf%lf", &x,&y);
 					if(res==2){
 						pFoil->xb[pFoil->nb] = x;
 						pFoil->yb[pFoil->nb] = y;
 						pFoil->nb++;
-						if(pFoil->nb>IQX){
+						if(pFoil->nb>IQX)
+						{
 							CFileException *pEx = new CFileException(CFileException::invalidFile);
 							pEx->m_strFileName = FileName;
 							AfxMessageBox("Max number of nodes is exceeded", MB_OK);
@@ -2960,7 +3018,9 @@ void CMainFrame::SaveSettings()
 	else
 	{
 		CArchive ar(&fp, CArchive::store);
-		ar << 100321;
+		ar << 100322;
+			//100322 : corrected wake params
+			//100321 : added woperdlgbar properties
 			//100320 : added window placement data
 			//100304 at version 3.04
 
@@ -3047,7 +3107,7 @@ void CMainFrame::LoadSettings()
 			CArchive ar(&fp, CArchive::load);
 
 			ar >> k;
-			if(k!=100321)
+			if(k!=100322)
 			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
@@ -3942,6 +4002,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 		SHORT sh1 = GetKeyState(VK_LCONTROL);
 		SHORT sh2 = GetKeyState(VK_RCONTROL);
+
 		if (pMsg->wParam == 'O' && 	((sh1 & 0x8000)||(sh2 & 0x8000))) 
 		{ 
 			if(m_iApp==MIAREX && (Miarex.m_iView==3 || Miarex.m_iView==5))
@@ -3972,25 +4033,21 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 			OnLoadProject();
 			return true;
 		} 
-		if (pMsg->wParam == 'I' && 
-			((sh1 & 0x8000)||(sh2 & 0x8000) )) { 
-			OnInsertProject();
-			return true;
-		} 
+	
 		if (pMsg->wParam == '1' && 
-			((sh1 & 0x8000)||(sh2 & 0x8000) )) {
+			((sh1 & 0x8000)||(sh2 & 0x8000) ))
+		{
 			if(m_iApp==DIRECTDESIGN && AFoil.m_bSF) return true;
 			AFoil.m_bSF = true;
-//			AFoil.SetParams(NULL);
 			OnFoilDirectDesign();
 			return true;
 		} 
 
 		if (pMsg->wParam == '2' && 
-			((sh1 & 0x8000)||(sh2 & 0x8000) )) { 
+			((sh1 & 0x8000)||(sh2 & 0x8000) )) 
+		{ 
 			if(m_iApp==DIRECTDESIGN && !AFoil.m_bSF) return true;
 			AFoil.m_bSF = false;
-//			AFoil.SetParams(NULL);
 			OnFoilDirectDesign();
 			return true;
 		} 
@@ -4072,10 +4129,12 @@ bool CMainFrame::SaveProjectAs()
 	FileName.Replace("/", " ");
 
 	CFileDialog WProjectDlg(false, "wpa", FileName, OFN_OVERWRITEPROMPT, _T("XFLR5 Project (.wpa)|*.wpa|"));
-	if(IDOK==WProjectDlg.DoModal()){
-		FileName = WProjectDlg.GetFileName();
+	if(IDOK==WProjectDlg.DoModal())
+	{
+		FileName = WProjectDlg.GetPathName();
 
-		if(SaveProject(FileName)){
+		if(SaveProject(FileName))
+		{
 			m_FileName    = WProjectDlg.GetPathName();
 			SetProjectName(m_FileName);
 			AddRecentFile(m_FileName);
@@ -4096,20 +4155,24 @@ bool CMainFrame::SaveProject(CString FileName)
 	CString strong;
 	CFile fp;
 	BOOL bOpen = fp.Open(FileName,  CFile::modeCreate | CFile::modeWrite, &fe);
-	try{
-		if (bOpen) {
+	try
+	{
+		if (bOpen)
+		{
 			CArchive ar(&fp, CArchive::store);
 			SerializeProject(ar);
 			ar.Close();
 			fp.Close();
 			return true;
 		}
-		else{
+		else
+		{
 //			pfe->m_strFileName = FileName;
 			throw &fe;
 		}
 	}
-	catch (CFileException *ex){
+	catch (CFileException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -4128,17 +4191,21 @@ bool CMainFrame::SaveBodyProject(CBody *pBody)
 	CFile fp;
 	CFileDialog XFileDlg(false, "wpa", strong, OFN_OVERWRITEPROMPT, _T("XFLR5 file (.wpa)|*.wpa|"));
 
-	if(IDOK==XFileDlg.DoModal()) {
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 
 		BOOL bOpen = fp.Open(XFileDlg.GetFileName(),  CFile::modeCreate | CFile::modeWrite, &fe);
-		try{
-			if (bOpen) {
+		try
+		{
+			if (bOpen) 
+			{
 				CArchive ar(&fp, CArchive::store);
 				CWaitCursor Wait;
 
 				CString strong;
 				if (ar.IsStoring())
-				{	// storing code
+				{
+					// storing code
 					ar << 100011;					// 100011 : Added Body serialization
 					ar << m_LengthUnit;
 					ar << m_AreaUnit;
@@ -4183,21 +4250,21 @@ bool CMainFrame::SaveBodyProject(CBody *pBody)
 					ar << 0; // last write the planes...
 					ar << 0; // not forgetting their POpps
 
-
 					AFoil.m_pSF->Serialize(ar);
 					AFoil.m_pPF->Serialize(ar);
-
 				}
 				ar.Close();
 				fp.Close();
 
 				return true;
 			}
-			else{
+			else
+			{
 				throw &fe;
 			}
 		}
-		catch (CFileException *ex){
+		catch (CFileException *ex)
+		{
 			TCHAR   szCause[255];
 			CString str;
 			ex->GetErrorMessage(szCause, 255);
@@ -4215,7 +4282,8 @@ bool CMainFrame::SaveUFOProject()
 	CString strong;
 	if(Miarex.m_pCurPlane) strong = Miarex.m_pCurPlane->m_PlaneName;
 	else if(Miarex.m_pCurWing) strong = Miarex.m_pCurWing->m_WingName;
-	else {
+	else
+	{
 		AfxMessageBox("Nothing to save", MB_OK);
 		return false;
 	}
@@ -4598,17 +4666,22 @@ bool CMainFrame::SerializeProject(CArchive &ar)
 
 		return true;
 	}
-	else {	// LOADING CODE
+	else 
+	{
+		// LOADING CODE
 		int n, k;
-		try{
+		try
+		{
 			int ArchiveFormat;
 			ar >> n;
-			if(n<100000){
+			if(n<100000)
+			{
 			// then n is the number of wings to load
 			// up to v1.99beta15
 				ArchiveFormat = 100000;
 			}
-			else{
+			else
+			{
 				float f;
 			// then n is the ArchiveFormat number
 				ArchiveFormat = n;
@@ -4904,20 +4977,23 @@ int CMainFrame::LoadFile(CString FileName, CString PathName)
 	end = PathName.Right(4);
 	end.MakeLower();
 
-	if(end==".plr"){
+	if(end==".plr")
+	{
 		ReadPolarFile(PathName);
 		XDirect.m_pCurPolar = NULL;
 		XDirect.m_pCurOpp   = NULL;
-		if(m_oaPolar.GetSize()){
+		if(m_oaPolar.GetSize())
+		{
 			XDirect.m_bPolar = true;
 			XDirect.CreatePolarCurves();
 		}
 		SetSaveState(false);
 		return XFOILANALYSIS;
 	}
-	else {
-
-		if(end==".dat"){
+	else 
+	{
+		if(end==".dat")
+		{
 			CFoil *pFoil = ReadFoilFile(PathName);
 			if(pFoil){
 				m_pCurFoil = pFoil;
@@ -4929,9 +5005,10 @@ int CMainFrame::LoadFile(CString FileName, CString PathName)
 				return XFOILANALYSIS;
 			}
 		}
-		else{
-
-			if(end==".wpa"){
+		else
+		{
+			if(end==".wpa")
+			{
 				if(!m_bSaved){
 					int resp = AfxMessageBox("Save the current project ?", MB_YESNOCANCEL);
 					if (IDCANCEL == resp) return -1;
@@ -5105,9 +5182,11 @@ void CMainFrame::OnInsertProject()
 
 	//load new project
 	CFileDialog WPlrDlg(true, "wpa", NULL, OFN_HIDEREADONLY, _T("XFLR5 Project (.wpa)|*.wpa|"));
-	if(IDOK==WPlrDlg.DoModal()){
-		CString FileName = WPlrDlg.GetFileName();
-		ReadProject(FileName);
+
+	if(IDOK==WPlrDlg.DoModal())
+	{
+//		CString FileName = ;
+		ReadProject(WPlrDlg.GetPathName());
 		if(m_iApp == MIAREX)
 		{
 			UpdateUFOs();
@@ -5122,7 +5201,8 @@ void CMainFrame::OnInsertProject()
 				Miarex.SetBody();
 			}
 		}
-		else if(m_iApp == XFOILANALYSIS){
+		else if(m_iApp == XFOILANALYSIS)
+		{
 			if(XDirect.m_bPolar) XDirect.CreatePolarCurves();
 			else			   XDirect.CreateOppCurves();
 			UpdateFoils();
@@ -5141,7 +5221,8 @@ void CMainFrame::OnSaveProject()
 		OnSaveProjectAs();
 		return; 
 	}
-	if(SaveProject(m_FileName)){
+	if(SaveProject(m_FileName))
+	{
 		SetSaveState(true);	
 		m_wndStatusBar.SetWindowText("The project " + m_ProjectName + " has been saved");
 	}
@@ -5243,7 +5324,8 @@ void CMainFrame::SetProjectName(CString PathName)
 	int pos = PathName.ReverseFind(92);
 	if (pos>0) m_ProjectName = PathName.Right(PathName.GetLength()-pos-1);
 	else m_ProjectName = PathName;
-	if(m_ProjectName.GetLength()>4){
+	if(m_ProjectName.GetLength()>4)
+	{
 		m_ProjectName = m_ProjectName.Left(m_ProjectName.GetLength()-4);
 	}
 }
@@ -5270,31 +5352,39 @@ bool CMainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 	bool bDelete = true;
 
-	if(bAsk){
+	if(bAsk)
+	{
 		strong = "Are you sure you want to delete \n" + pFoil->m_FoilName ;
 		strong+= "\nand all associated OpPoints and Polars ?";
 		if(IDYES == AfxMessageBox(strong, MB_YESNOCANCEL)) bDelete = true;
 		else return false;
 	}
 
-	if (bDelete){
-		for ( j= (int)m_oaOpp.GetSize()-1; j>=0; j--){
+	if (bDelete)
+	{
+		for (j= (int)m_oaOpp.GetSize()-1; j>=0; j--)
+		{
 			pOpPoint = (OpPoint*)m_oaOpp[j];
-			if(pOpPoint->m_strFoilName == pFoil->m_FoilName) {
+			if(pOpPoint->m_strFoilName == pFoil->m_FoilName) 
+			{
 				m_oaOpp.RemoveAt(j);
 				delete pOpPoint;
 			}
 		}
-		for ( j= (int)m_oaPolar.GetSize()-1;j>=0; j--){
+		for (j= (int)m_oaPolar.GetSize()-1;j>=0; j--)
+		{
 			pPolar = (CPolar*)m_oaPolar.GetAt(j);
-			if(pPolar->m_FoilName == pFoil->m_FoilName) {
+			if(pPolar->m_FoilName == pFoil->m_FoilName) 
+			{
 				m_oaPolar.RemoveAt(j);
 				delete pPolar;
 			}
 		}
-		for (j=0; j< m_oaFoil.GetSize(); j++){
+		for (j=0; j< m_oaFoil.GetSize(); j++)
+		{
 			pOldFoil = (CFoil*)m_oaFoil.GetAt(j);
-			if (pOldFoil == pFoil) {
+			if (pOldFoil == pFoil) 
+			{
 				m_oaFoil.RemoveAt(j);
 				delete pOldFoil;
 				if(m_pCurFoil == pOldFoil) m_pCurFoil = NULL;
@@ -5455,26 +5545,24 @@ void CMainFrame::OnLogFile()
 	
 }
 
-
-
-
 void CMainFrame::ExportWPlr(CWPolar * pWPolar)
 {
 	if (!pWPolar) return;
 	CStdioFile XFile;
-	CString FileName;
+	CString PathName;
 	CString strong;
 	if(pWPolar->m_PlrName.Find(".",0) >=0) strong ="";
 	else strong = pWPolar->m_PlrName;
 	
 	strong.Replace("/", " ");
-	CFileDialog XFileDlg(false, "txt", strong,
-		OFN_OVERWRITEPROMPT,
-		_T("Text Format (.txt)|*.txt|"));
 
-	if(IDOK == XFileDlg.DoModal()){
-		FileName = XFileDlg.GetFileName();
-		pWPolar->Export(FileName);
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", PathName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK == XFileDlg.DoModal())
+	{
+		PathName = XFileDlg.GetPathName();
+		pWPolar->Export(PathName, XFileDlg.m_ofn.nFilterIndex);
 	}
 	UpdateView();
 }
@@ -5650,9 +5738,9 @@ void CMainFrame::OnLoadProject()
 
 	//load new project
 	CFileDialog XFileDlg(true, "wpa", NULL, OFN_HIDEREADONLY, _T("XFLR5 Project (.wpa)|*.wpa|"));
-	if(IDOK==XFileDlg.DoModal()){
-		if(LoadProject(XFileDlg.GetPathName()))
-			AddRecentFile(XFileDlg.GetPathName());
+	if(IDOK==XFileDlg.DoModal())
+	{
+		if(LoadProject(XFileDlg.GetPathName()))		AddRecentFile(XFileDlg.GetPathName());
 	}	
 }
 
@@ -5733,6 +5821,7 @@ bool CMainFrame::LoadProject(CString PathName)
 
 void CMainFrame::OnAppOpen() 
 {
+	CWaitCursor wait;
 //	CString FileName, PathName;
 	CFileDialog XFileDlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, _T("XFLR5 file (.dat; .plr; .wpa)|*.dat; *.plr; *.wpa|"));
 
@@ -5771,9 +5860,12 @@ void CMainFrame::OnAppOpen()
 
 void CMainFrame::AddRecentFile(CString FileName)
 {
-	for(int j=0; j<8;j++){
-		if(m_RecentFile[j]==FileName){
-			for (int l=j; l<7; l++){
+	for(int j=0; j<8;j++)
+	{
+		if(m_RecentFile[j]==FileName)
+		{
+			for (int l=j; l<7; l++)
+			{
 				m_RecentFile[l]=m_RecentFile[l+1];
 			}
 			break;

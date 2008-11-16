@@ -22,6 +22,9 @@
 
 #pragma once
 #include "afxcmn.h"
+#include "../misc/InPlaceNumEdit.h"
+#include "../misc/InPlaceFloatEdit.h"
+#include "../misc/InPlaceList.h"
 
 //  	 Zafir Anjum @ CODEGURU
 
@@ -42,10 +45,13 @@ public:
 	bool m_bIsEditing;
 	CWnd *m_pWingDlg;
 
+	CInPlaceFloatEdit m_IPFloatEdit;
+	CInPlaceNumEdit m_IPNumEdit;
+	CInPlaceList m_IPList;
+
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnEndLabelEdit(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-//	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);

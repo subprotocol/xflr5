@@ -40,11 +40,15 @@ public:
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(CArchive &ar);
 	bool SetModified();
+	bool ImportDefinition() ;
+	bool ExportDefinition() ;
+
 
 	int InsertFrame(CVector Real);
 	int InsertPoint(CVector Real);
 	int IsFramePos(CVector Real, double ZoomFactor);
 	int RemoveFrame(int n);
+	int ReadFrame(CStdioFile *pXFile, int &Line, CFrame *pFrame, double const &Unit);
 
 	double GetLength();
 	double Getu(double x);
@@ -63,6 +67,7 @@ public:
 	void RemoveActiveFrame();
 	void RemoveSideLine(int SideLine);
 	void Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID);
+	void Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID);
 	void SetKnots();
 	void SetPanelPos();
 	void UpdateFramePos(int iFrame);
@@ -87,6 +92,9 @@ public:
 
 	double m_Bunch;
 	double pi;
+
+	int m_np;
+	double  m_x[IBX], m_y[IBX];	// the point coordinates of the overlayed body
 
 	CString m_BodyName;
 

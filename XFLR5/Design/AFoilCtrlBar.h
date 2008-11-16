@@ -39,6 +39,7 @@ class CAFoilCtrlBar : public CInitDialogBar
 	friend class CMainFrame;
 	friend class CChildView;
 	friend class CAFoil;
+	friend class CNoBeepListCtrl;
 
 	// Construction
 	public:
@@ -83,8 +84,9 @@ private:
 	void SetSaveState(bool bState);
 	void SetFoil(CFoil* pFoil = NULL);
 	void SelectFoil(CFoil* pFoil = NULL);
-
+	void UpdateFoil(int iFoil = -1);
 	void UpdateBlt();
+
 	CFoil* GetFoil();
 	CFont m_FixedFont;
 	CWnd* m_pADlg;
@@ -100,7 +102,6 @@ protected:
 	afx_msg void OnVisible();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnFoilColor();
 	afx_msg void OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
@@ -109,6 +110,7 @@ protected:
 	afx_msg void OnDelete();
 	afx_msg void OnDuplicate();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	DECLARE_MESSAGE_MAP()
 public:
 };

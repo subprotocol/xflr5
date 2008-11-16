@@ -32,7 +32,7 @@
 #include "MainFrm.h"
 #include "../misc/PrefsDlg.h"
 #include ".\childview.h"
-
+#include "atlimage.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CChildView
@@ -43,15 +43,16 @@ CChildView::CChildView()
 	TempFont.CreatePointFont(85, "Courier New");
 	TempFont.GetLogFont(&m_WndLogFont);
 
-	m_WndTextColor = RGB(255,255,255);
-	m_crBackColor  = RGB(0, 20, 40);
-	m_crGraphBkClr = RGB(0, 30, 50);
-	m_crBorderClr  = RGB(200,200,200);
-	m_iBorderStyle = 0;
-	m_iBorderWidth = 1;
-	m_bBorder      = true;
-	m_dz           = 28;
-	m_LetterWidth  = 7;
+	m_WndTextColor  = RGB(255,255,255);
+	m_crBackColor   = RGB(0, 20, 40);
+	m_crGraphBkClr  = RGB(0, 30, 50);
+	m_crBorderClr   = RGB(200,200,200);
+	m_iBorderStyle  = 0;
+	m_iBorderWidth  = 1;
+	m_bBorder       = true;
+	m_dz            = 28;
+	m_LetterWidth   = 7;
+	m_ImageFileType = 4;
 
 	m_rCltRect.SetRect(0,0, 100,100);
 
@@ -84,8 +85,9 @@ BEGIN_MESSAGE_MAP(CChildView,CWnd )
 	ON_WM_SETCURSOR()
 	ON_WM_CREATE()
 	ON_WM_LBUTTONDBLCLK()
-	ON_COMMAND(IDM_CLRSETTINGS, OnClrSettings)
 	ON_WM_KEYUP()
+	ON_COMMAND(IDM_CLRSETTINGS, OnClrSettings)
+	ON_COMMAND(IDM_SAVEIMAGE, OnSaveImage)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -115,13 +117,13 @@ void CChildView::OnPaint()
 	//Trace("CChildView::Painting");
 	CPaintDC dc(this); // device context for painting
 	
-	CMainFrame * pFrame  = (CMainFrame*)m_pFrameWnd; 
+	CMainFrame * pMainFrame  = (CMainFrame*)m_pFrameWnd; 
 
 	int LPY = dc.GetDeviceCaps(LOGPIXELSY);
 	m_pXDirect->SetLogPixels(LPY);
 	m_pXInverse->SetLogPixels(LPY);
 
-	switch (pFrame->m_iApp){
+	switch (pMainFrame->m_iApp){
 		case XFOILANALYSIS:{
 			m_pXDirect->UpdateView(&dc);
 			break;
@@ -162,6 +164,108 @@ void CChildView::OnPaint()
 }
 
 
+void CChildView::OnSaveImage() 
+{
+	//Trace("CChildView::Painting");
+	CPaintDC dc(this); // device context for painting
+	
+//	CMainFrame * pFrame  = (CMainFrame*)m_pFrameWnd; 
+//	int LPY = dc.GetDeviceCaps(LOGPIXELSY);
+//	m_pXDirect->SetLogPixels(LPY);
+//	m_pXInverse->SetLogPixels(LPY);
+
+	CMainFrame * pMainFrame  = (CMainFrame*)m_pFrameWnd; 
+	CImage Image;
+
+	CString strFilter;
+	CSimpleArray<GUID> aguidFileTypes;
+	HRESULT hResult;
+
+	strFilter = "Bitmap image|*.bmp|JPEG image|*.jpg|GIF image|*.gif|PNG image|*.png||";
+
+	CFileDialog dlg(FALSE,NULL,NULL,OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_EXPLORER,strFilter);
+	dlg.m_ofn.nFilterIndex = m_ImageFileType;
+	hResult = (int)dlg.DoModal();
+
+	if (hResult != IDOK) 
+	{
+		return;
+	}
+
+    // Add the appropriate extension if the user didn't type one
+
+	CString strFileName;
+	CString strExtension;
+
+
+	strFileName = dlg.m_ofn.lpstrFile;
+	strExtension = strFileName.Right(4);
+	strExtension.MakeLower();
+	if(strExtension == ".bmp" || strExtension == ".jpg" || strExtension == ".gif" || strExtension == ".png")
+		strFileName = strFileName.Left(strFileName.GetLength()-4);
+
+	m_ImageFileType = dlg.m_ofn.nFilterIndex;
+
+	switch (m_ImageFileType)
+	{
+		case 1:
+			strExtension = "bmp";
+			break;
+		case 2:
+			strExtension = "jpg";
+			break;
+		case 3:
+			strExtension = "gif";
+			break;
+		case 4:
+			strExtension = "png";
+			break;
+		default:
+			break;
+	}
+
+	strFileName = strFileName + '.' + strExtension;
+
+	switch (pMainFrame->m_iApp)
+	{
+		case XFOILANALYSIS:
+		{
+			m_pXDirect->PaintImage(&Image, strFileName,m_ImageFileType);
+			break;
+		}
+		case DIRECTDESIGN:
+		{
+			m_pAFoil->PaintImage(&Image, strFileName,m_ImageFileType);
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			m_pXInverse->PaintImage(&Image, strFileName,m_ImageFileType);
+			break;
+		}
+		case MIAREX:
+		{
+			m_pMiarex->m_bArcball = false;
+			m_pMiarex->m_bCrossPoint = false;
+			m_pMiarex->UpdateView();
+			m_pMiarex->PaintImage(&Image, strFileName,m_ImageFileType);
+			break;
+		}
+		default:
+		{//blank screen
+			return;
+		}
+	}
+/*	// the extension on the file name will determine the file type that is saved
+	hResult = Image.Save(strFileName);
+	if (FAILED(hResult)) 
+	{
+		CString fmt;
+		fmt.Format("Save image failed:\n%x ", hResult);
+		AfxMessageBox(fmt);
+		return;
+	}*/
+}
 
 void CChildView::OnSize(UINT nType, int cx, int cy) 
 {
@@ -197,15 +301,16 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 
 LRESULT CChildView::OnNcHitTest(CPoint point) 
 {
-	CRect rectClient;
 	CPoint ptClient(point);
 
 	ScreenToClient(&ptClient);
 	ptClient.y -= m_dz;
-	if(m_rCltRect.PtInRect(ptClient)){
+	if(m_rCltRect.PtInRect(ptClient))
+	{
 		return (HTCLIENT);
 	}
-	else {
+	else 
+	{
 		return (CWnd::OnNcHitTest(point));
 	}
 
@@ -991,3 +1096,5 @@ void CChildView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	CWnd::OnKeyUp(nChar, nRepCnt, nFlags);
 }
+
+

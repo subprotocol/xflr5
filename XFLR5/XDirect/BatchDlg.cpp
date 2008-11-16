@@ -674,7 +674,8 @@ void CBatchDlg::OutputIter(int iter, double Re, double Alpha)
 
 void CBatchDlg::OnAnalysis() 
 {
-	if(!m_pBatchThread){
+	if(!m_pBatchThread)
+	{
 		m_ctrlOutput.SetWindowText("");
 		m_ctrlClose.EnableWindow(false);
 		CString str;
@@ -704,10 +705,12 @@ void CBatchDlg::OnAnalysis()
 		m_pBatchThread->m_bShowTextOutput = m_bShowTextOutput;
 
 
-		if (m_ctrlInitBL.GetCheck()) {
+		if (m_ctrlInitBL.GetCheck()) 
+		{
 			m_pBatchThread->m_bInitBL = true;
 		}
-		else {
+		else 
+		{
 			m_pBatchThread->m_bInitBL = false;
 		}
 		if(m_Type!=4) 
@@ -727,9 +730,9 @@ void CBatchDlg::OnAnalysis()
 		m_pBatchThread->ResumeThread();
 		m_ctrlClose.SetFocus();
 	}
-	else{
+	else
+	{
 		m_pBatchThread->Cancel();
-
 	}
 	SetFocus();
 }

@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Anglais (États-Unis) resources
+// English (U.S.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -45,6 +45,7 @@ BEGIN
     "4",            IDM_MIXEDINVERSE,       VIRTKEY, CONTROL, NOINVERT
     "2",            IDM_SPLINEDPOINTS,      VIRTKEY, CONTROL, NOINVERT
     "5",            IDM_XFLR5,              VIRTKEY, CONTROL, NOINVERT
+    "I",            IDM_SAVEIMAGE,          VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -57,38 +58,24 @@ IDD_WOPERDLGBAR DIALOGEX 0, 0, 94, 228
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "Sequence",IDC_WSEQUENCE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,9,17,53,8
+    CONTROL         "Sequence",IDC_WSEQUENCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,17,53,8
     EDITTEXT        IDC_AMIN,50,36,28,12,ES_RIGHT
     EDITTEXT        IDC_AMAX,50,51,28,12,ES_RIGHT
     EDITTEXT        IDC_DALPHA,50,66,28,12,ES_RIGHT
-    CONTROL         "Store OpPoints",IDC_STOREWOPP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,9,82,74,8
-    CONTROL         "Init LLT Calc",IDC_INITCALC,"Button",BS_AUTOCHECKBOX | 
-                    BS_MULTILINE | WS_TABSTOP,9,93,56,10
+    CONTROL         "Store OpPoints",IDC_STOREWOPP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,82,74,8
+    CONTROL         "Init LLT Calc",IDC_INITCALC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,9,93,56,10
     DEFPUSHBUTTON   "A&nalyze",IDC_WANALYSIS,24,107,46,13
-    CONTROL         "Half Wing",IDC_HALFWING,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,134,47,10
-    CONTROL         "Lift",IDC_SHOWLIFT,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,145,27,8
-    CONTROL         "Downw.",IDC_DOWNWASH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,164,42,10
-    CONTROL         "IDrag",IDC_SHOWICD,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,154,33,10
-    CONTROL         "VDrag",IDC_SHOWVCD,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,154,36,10
-    CONTROL         "Trans.",IDC_TRANSITIONS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,164,36,10
-    CONTROL         "Surf.vel",IDC_SURFVELOCITIES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,175,40,10
-    CONTROL         "Cp",IDC_CL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,175,
-                    30,8
-    CONTROL         "Stream",IDC_STREAM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,185,38,10
-    CONTROL         "Anim.",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,185,33,10
-    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,9,198,72,11
+    CONTROL         "Half Wing",IDC_HALFWING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,134,47,10
+    CONTROL         "Lift",IDC_SHOWLIFT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,145,27,8
+    CONTROL         "Downw.",IDC_DOWNWASH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,164,42,10
+    CONTROL         "IDrag",IDC_SHOWICD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,154,33,10
+    CONTROL         "VDrag",IDC_SHOWVCD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,154,36,10
+    CONTROL         "Trans.",IDC_TRANSITIONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,164,36,10
+    CONTROL         "Surf.vel",IDC_SURFVELOCITIES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,175,40,10
+    CONTROL         "Cp",IDC_CL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,175,30,8
+    CONTROL         "Stream",IDC_STREAM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,185,38,10
+    CONTROL         "Anim.",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,185,33,10
+    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,9,198,72,11
     RTEXT           "End =",IDC_STATIC,20,54,27,8
     RTEXT           "D =",IDC_DASTAT,20,68,27,8
     RTEXT           "Start =",IDC_STATIC,20,38,27,8
@@ -97,8 +84,7 @@ BEGIN
     GROUPBOX        "Display",IDC_STATIC,4,124,85,100
     LTEXT           "Slow",IDC_STATIC,9,209,20,8
     RTEXT           "Fast",IDC_STATIC,64,209,20,8
-    CONTROL         "Mom.",IDC_SHOWMOMENTS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,46,145,33,8
+    CONTROL         "Mom.",IDC_SHOWMOMENTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,46,145,33,8
 END
 
 IDD_WNGANALYSIS DIALOGEX 0, 0, 323, 322
@@ -106,81 +92,68 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Polar Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Auto Analysis Name",IDC_AUTONAME,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,22,24,76,8
+    CONTROL         "Auto Analysis Name",IDC_AUTONAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,24,76,8
     EDITTEXT        IDC_WPOLARNAME,106,22,208,13,ES_AUTOHSCROLL
-    CONTROL         "Type 1 (Fixed Speed)",IDC_WTYPE1,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,20,52,83,10
-    CONTROL         "Type 2 (Fixed Lift)",IDC_WTYPE2,"Button",
-                    BS_AUTORADIOBUTTON,122,52,72,10
-    CONTROL         "Type 4 (Fixed Alpha)",IDC_WTYPE4,"Button",
-                    BS_AUTORADIOBUTTON,214,52,81,10
+    CONTROL         "Type 1 (Fixed Speed)",IDC_WTYPE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,52,83,10
+    CONTROL         "Type 2 (Fixed Lift)",IDC_WTYPE2,"Button",BS_AUTORADIOBUTTON,122,52,72,10
+    CONTROL         "Type 4 (Fixed Alpha)",IDC_WTYPE4,"Button",BS_AUTORADIOBUTTON,214,52,81,10
     EDITTEXT        IDC_QINF,86,84,40,12,ES_RIGHT
-    EDITTEXT        IDC_WEIGHT,86,98,40,12,ES_RIGHT
-    EDITTEXT        IDC_ALPHA,86,113,40,12,ES_RIGHT
-    EDITTEXT        IDC_XCMREF,86,127,40,12,ES_RIGHT
-    CONTROL         "LLT",IDC_METHOD1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    20,163,29,10
-    CONTROL         "VLM",IDC_METHOD2,"Button",BS_AUTORADIOBUTTON,20,175,31,
-                    10
-    CONTROL         "3D Panels",IDC_METHOD3,"Button",BS_AUTORADIOBUTTON,20,
-                    200,49,10
-    CONTROL         "Classic ",IDC_VLM1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,62,175,40,10
-    CONTROL         "Quads",IDC_VLM2,"Button",BS_AUTORADIOBUTTON,62,187,37,
-                    10
-    CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,21,230,47,8
-    CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,21,242,57,10
-    CONTROL         "Plane's wings as thin surfaces",IDC_THINSURFACES,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,21,255,107,8
-    PUSHBUTTON      "Wake...",IDC_WAKEPARAMS,91,226,30,14
-    CONTROL         "Wake Roll-Up",IDC_WAKEROLLUP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,92,244,57,8
-    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,196,166,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,166,
-                    39,8
-    EDITTEXT        IDC_DENSITY,208,181,41,12,ES_RIGHT
-    EDITTEXT        IDC_VISCOSITY,208,198,41,12,ES_RIGHT
-    CONTROL         "Ground Effect",IDC_GROUNDEFFECT,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,181,233,67,8
-    EDITTEXT        IDC_HEIGHT,216,247,41,12,ES_RIGHT
+    EDITTEXT        IDC_WEIGHT,86,99,40,12,ES_RIGHT
+    EDITTEXT        IDC_XCMREF,86,113,40,12,ES_RIGHT
+    EDITTEXT        IDC_ALPHA,86,129,40,12,ES_RIGHT
+    EDITTEXT        IDC_BETA,85,144,40,12,ES_RIGHT
+    CONTROL         "LLT",IDC_METHOD1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,20,175,29,10
+    CONTROL         "VLM",IDC_METHOD2,"Button",BS_AUTORADIOBUTTON,20,187,31,10
+    CONTROL         "3D Panels",IDC_METHOD3,"Button",BS_AUTORADIOBUTTON,20,212,49,10
+    CONTROL         "Classic ",IDC_VLM1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,62,187,40,10
+    CONTROL         "Quads",IDC_VLM2,"Button",BS_AUTORADIOBUTTON,62,199,37,10
+    CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,242,47,8
+    CONTROL         "Tilt Geometry",IDC_TILTEDGEOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,254,57,10
+    CONTROL         "Plane's wings as thin surfaces",IDC_THINSURFACES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,267,107,8
+    PUSHBUTTON      "Wake...",IDC_WAKEPARAMS,91,238,30,14
+    CONTROL         "Wake Roll-Up",IDC_WAKEROLLUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,92,256,57,8
+    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,196,178,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,254,178,39,8
+    EDITTEXT        IDC_DENSITY,208,193,41,12,ES_RIGHT
+    EDITTEXT        IDC_VISCOSITY,208,210,41,12,ES_RIGHT
+    CONTROL         "Ground Effect",IDC_GROUNDEFFECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,181,245,67,8
+    EDITTEXT        IDC_HEIGHT,216,259,41,12,ES_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,80,300,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,194,300,50,14
     GROUPBOX        "Polar Type",IDC_STATIC,6,41,309,26
     LTEXT           "Free Stream Speed",IDC_STATIC,18,85,61,8
-    RTEXT           "Plane Weight",IDC_STATIC,24,100,55,8
+    RTEXT           "Plane Weight",IDC_STATIC,24,101,55,8
     LTEXT           "m/s",IDC_SPEEDUNIT,130,85,20,8
-    LTEXT           "kg",IDC_WEIGHTUNIT,128,100,20,8
+    LTEXT           "kg",IDC_WEIGHTUNIT,128,101,20,8
     RTEXT           "Root Re =",IDC_REROOT,170,100,58,8
     RTEXT           "Tip Re =",IDC_RETIP,170,113,58,8
     RTEXT           "Static",IDC_RRE,254,100,50,8
     RTEXT           "Static",IDC_SRE,254,113,50,8
     LTEXT           "Wing Name",IDC_WINGNAME,11,11,247,8
-    RTEXT           "Angle of Attack",IDC_STATIC,24,114,55,8
-    LTEXT           "°",IDC_STATIC,128,114,8,8
+    RTEXT           "Angle of Attack",IDC_STATIC,24,130,55,8
+    LTEXT           "°",IDC_STATIC,128,130,8,8
     RTEXT           "Wing Loading",IDC_STATIC,183,85,45,8
     RTEXT           "Static",IDC_WINGLOAD,236,85,34,8
     LTEXT           "kg/dm²",IDC_WLUNIT,278,85,25,8
-    RTEXT           "r =",IDC_RHO,182,182,15,13
-    LTEXT           "kg/m3",IDC_SDENSITY,258,182,41,8
-    RTEXT           "n =",IDC_NU,180,200,17,12
-    LTEXT           "m²/s",IDC_SVISCOSITY,258,200,41,8
-    GROUPBOX        "Airplane and Flight Data",IDC_STATIC,6,71,151,77
-    GROUPBOX        "Aerodynamic Data",IDC_STATIC,164,152,151,63
-    LTEXT           "Unit",IDC_STATIC,174,166,14,8
-    GROUPBOX        "Flight Characteristics",IDC_STATIC,164,71,151,77
+    RTEXT           "r =",IDC_RHO,182,194,15,13
+    LTEXT           "kg/m3",IDC_SDENSITY,258,194,41,8
+    RTEXT           "n =",IDC_NU,180,212,17,12
+    LTEXT           "m²/s",IDC_SVISCOSITY,258,212,41,8
+    GROUPBOX        "Airplane and Flight Data",IDC_STATIC,6,71,151,90
+    GROUPBOX        "Aerodynamic Data",IDC_STATIC,164,164,151,63
+    LTEXT           "Unit",IDC_STATIC,174,178,14,8
+    GROUPBOX        "Flight Characteristics",IDC_STATIC,164,71,151,90
     RTEXT           "QInf =",IDC_QINFSTAT,170,127,58,8
     RTEXT           "Static",IDC_QINFCL,254,127,50,8
-    GROUPBOX        "Solution method",IDC_STATIC,6,152,151,63
-    RTEXT           "Mom. ref. location",IDC_STATIC,18,129,60,8
-    LTEXT           "mm",IDC_LENGTHUNIT,128,129,20,8
-    GROUPBOX        "Ground effect",IDC_STATIC,164,219,151,52
-    RTEXT           "Height =",IDC_STATIC,180,249,28,8
-    LTEXT           "mm",IDC_LENGTHUNIT2,262,249,25,8
-    GROUPBOX        "Options",IDC_STATIC,6,219,151,52
+    GROUPBOX        "Solution method",IDC_STATIC,6,164,151,63
+    RTEXT           "Mom. ref. location",IDC_STATIC,18,115,60,8
+    LTEXT           "mm",IDC_LENGTHUNIT,128,115,20,8
+    GROUPBOX        "Ground effect",IDC_STATIC,164,231,151,52
+    RTEXT           "Height =",IDC_STATIC,180,261,28,8
+    LTEXT           "mm",IDC_LENGTHUNIT2,262,261,25,8
+    GROUPBOX        "Options",IDC_STATIC,6,231,151,52
+    RTEXT           "SideSlip",IDC_STATIC,23,144,55,8
+    LTEXT           "°",IDC_STATIC,127,144,8,8
 END
 
 IDD_WINGSCALEDLG DIALOG  0, 0, 331, 193
@@ -188,29 +161,23 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing Scale Dialog"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "SpanWise scaling",IDC_SPANSCALE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,22,18,73,10
+    CONTROL         "SpanWise scaling",IDC_SPANSCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,18,73,10
     EDITTEXT        IDC_SPANFACTOR,85,56,40,13,ES_RIGHT
     EDITTEXT        IDC_NEWSPAN,85,75,40,13,ES_RIGHT
-    CONTROL         "ChordWise scaling",IDC_CHORDSCALE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,174,18,75,10
+    CONTROL         "ChordWise scaling",IDC_CHORDSCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,174,18,75,10
     EDITTEXT        IDC_CHORDFACTOR,239,56,40,13,ES_RIGHT
     EDITTEXT        IDC_NEWCHORD,239,75,40,13,ES_RIGHT
-    CONTROL         "Sweep scaling",IDC_SWEEPSCALE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,22,119,73,10
+    CONTROL         "Sweep scaling",IDC_SWEEPSCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,119,73,10
     EDITTEXT        IDC_SWEEP,85,134,40,13,ES_RIGHT
-    CONTROL         "Twist scaling",IDC_TWISTSCALE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,174,119,75,10
+    CONTROL         "Twist scaling",IDC_TWISTSCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,174,119,75,10
     EDITTEXT        IDC_TWIST,239,134,40,13,ES_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,89,172,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,196,172,50,14
     RTEXT           "Scale Factor",IDC_STATIC,18,57,61,8
     RTEXT           "New Wing Span",IDC_STATIC,18,77,61,8
-    LTEXT           "Enter either the scale factor or the new wing span:",
-                    IDC_STATIC,30,31,101,19
+    LTEXT           "Enter either the scale factor or the new wing span:",IDC_STATIC,30,31,101,19
     GROUPBOX        "Span Scaling",IDC_STATIC,11,6,145,93
-    GROUPBOX        "Root to Tip Sweep at Quarter Chord",IDC_STATIC,11,107,
-                    145,47
+    GROUPBOX        "Root to Tip Sweep at Quarter Chord",IDC_STATIC,11,107,145,47
     RTEXT           "Sweep",IDC_STATIC,18,136,61,8
     LTEXT           "°",IDC_STATIC,133,135,9,11
     LTEXT           "mm",IDC_LUNIT,132,77,12,8
@@ -219,8 +186,7 @@ BEGIN
     LTEXT           "°",IDC_STATIC,286,135,9,11
     RTEXT           "Scale Factor",IDC_STATIC,172,57,61,8
     RTEXT           "New Root Chord",IDC_STATIC,172,77,61,8
-    LTEXT           "Enter either the scale factor or the new root chord:",
-                    IDC_STATIC,184,31,101,19
+    LTEXT           "Enter either the scale factor or the new root chord:",IDC_STATIC,184,31,101,19
     GROUPBOX        "Chord Scaling",IDC_STATIC,165,6,145,93
     LTEXT           "mm",IDC_LUNIT2,286,77,12,8
 END
@@ -231,21 +197,13 @@ CAPTION "Wing"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_WINGNAME,60,16,116,12,ES_AUTOHSCROLL
-    CONTROL         "Symetric",IDC_SYMETRIC,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,19,37,41,8
-    CONTROL         "Right Wing",IDC_SIDE2,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,72,37,52,8
-    CONTROL         "Left Wing",IDC_SIDE1,"Button",BS_AUTORADIOBUTTON,72,49,
-                    50,8
-    CONTROL         "Color",IDC_WINGCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    23,69,59,11
+    CONTROL         "Symetric",IDC_SYMETRIC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,37,41,8
+    CONTROL         "Right Wing",IDC_SIDE2,"Button",BS_AUTORADIOBUTTON | WS_GROUP,72,37,52,8
+    CONTROL         "Left Wing",IDC_SIDE1,"Button",BS_AUTORADIOBUTTON,72,49,50,8
+    CONTROL         "Color",IDC_WINGCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,23,69,59,11
     PUSHBUTTON      "Reset VLM Mesh",IDC_VLMMESH,94,68,59,11
-    EDITTEXT        IDC_VLMPANELS,275,69,45,12,ES_RIGHT | ES_AUTOHSCROLL | 
-                    ES_NUMBER
-    CONTROL         "",IDC_PANELLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,88,538,86,WS_EX_RIGHT
+    EDITTEXT        IDC_VLMPANELS,275,69,45,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_PANELLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,7,88,538,86,WS_EX_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,164,322,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,322,322,50,14
     LTEXT           "Wing Name",IDC_STATIC,16,18,38,8
@@ -287,13 +245,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing Graph Variable"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LISTBOX         IDC_WVAR,21,17,140,144,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
-                    WS_TABSTOP
+    LISTBOX         IDC_WVAR,21,17,140,144,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,33,181,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,99,181,50,14
 END
 
-IDD_WADVDLG DIALOGEX 0, 0, 350, 242
+IDD_WADVDLG DIALOGEX 0, 0, 350, 270
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing Analysis Advanced Settings"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
@@ -305,27 +262,20 @@ BEGIN
     EDITTEXT        IDC_MINPANELSIZE,120,97,28,12,ES_RIGHT
     EDITTEXT        IDC_VORTEXPOS,120,114,28,12,ES_RIGHT
     EDITTEXT        IDC_CTRLPOS,120,131,28,12,ES_RIGHT
-    EDITTEXT        IDC_CORESIZE,119,171,28,12,ES_RIGHT
+    EDITTEXT        IDC_CORESIZE,100,171,47,12,ES_RIGHT
     EDITTEXT        IDC_MAXWAKEITER,283,13,34,12,ES_RIGHT
     EDITTEXT        IDC_INTERNODES,283,29,34,12,ES_RIGHT
-    CONTROL         "Reset wake between each angle",IDC_RESETWAKE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,198,47,121,10
-    CONTROL         "Trefftz Plane",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,215,91,56,10
-    CONTROL         "ForceSum",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,279,91,
-                    48,10
-    CONTROL         "Dirichlet",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON,215,
-                    118,41,10
-    CONTROL         "Neumann",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,279,120,
-                    46,10
-    CONTROL         "View log file after errors",IDC_LOGFILE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,204,155,89,10
+    CONTROL         "Reset wake between each angle",IDC_RESETWAKE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,47,121,10
+    CONTROL         "Trefftz Plane",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,215,91,56,10
+    CONTROL         "ForceSum",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,279,91,48,10
+    CONTROL         "Dirichlet",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON,215,118,41,10
+    CONTROL         "Neumann",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,279,120,46,10
+    CONTROL         "View log file after errors",IDC_LOGFILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,204,155,89,10
     CONTROL         "Store points outside the polar mesh",IDC_KEEPOUTOPPS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,204,
-                    168,126,10
-    DEFPUSHBUTTON   "OK",IDOK,60,221,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,158,221,50,14
-    PUSHBUTTON      "Reset defaults",IDC_RESET,251,221,50,14
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,204,168,126,10
+    DEFPUSHBUTTON   "OK",IDOK,60,249,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,158,249,50,14
+    PUSHBUTTON      "Reset defaults",IDC_RESET,251,249,50,14
     RTEXT           "Relax. Factor",IDC_STATIC,57,17,43,8
     RTEXT           "Max Iterations",IDC_STATIC,53,48,47,8
     RTEXT           "Precision",IDC_STATIC,71,32,29,8
@@ -334,7 +284,7 @@ BEGIN
     GROUPBOX        "Lfiting Line Method",IDC_STATIC,8,3,170,80
     RTEXT           "Max Wake Iterations",IDC_STATIC,209,15,66,8
     GROUPBOX        "Wake Roll-Up",IDC_STATIC,186,3,157,62
-    RTEXT           "Core Size",IDC_STATIC,79,173,31,8
+    RTEXT           "Core Size",IDC_STATIC,59,172,31,8
     RTEXT           "Points between nodes",IDC_STATIC,204,31,71,8
     RTEXT           "Ignore wing panels with span <",IDC_STATIC,13,99,98,8
     LTEXT           "mm",IDC_LENGTH,154,99,21,8
@@ -344,49 +294,43 @@ BEGIN
     LTEXT           "%",IDC_LENGTH7,152,132,8,8
     GROUPBOX        "VLM Method",IDC_STATIC,7,84,170,67
     LTEXT           "m",IDC_LENGTH2,157,173,17,8
-    GROUPBOX        "VLM and Panel Method",IDC_STATIC,7,155,170,42
+    GROUPBOX        "VLM and Panel Method",IDC_STATIC,7,155,170,74
     GROUPBOX        "Panel Method",IDC_STATIC,186,69,157,72
     GROUPBOX        "All Analysis",IDC_STATIC,186,144,157,53
     LTEXT           "Induced Drag",IDC_STATIC,198,81,58,8
     LTEXT           "Boundary Conditions",IDC_STATIC,197,104,74,8
+    LTEXT           "Induced Drag",IDC_STATIC,16,189,58,8
+    CONTROL         "Panel Centroid",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,23,204,62,10
+    CONTROL         "Average over Panel Length",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_MULTILINE,103,198,65,22
 END
 
 IDD_W3DBAR DIALOGEX 0, 0, 94, 103
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Axes",IDC_3DAXES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    7,7,31,10
-    CONTROL         "Surfaces",IDC_3DSURFACES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,18,44,10
-    CONTROL         "Outline",IDC_3DOUTLINE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,51,18,38,10
+    CONTROL         "Axes",IDC_3DAXES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,31,10
+    CONTROL         "Surfaces",IDC_3DSURFACES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,18,44,10
+    CONTROL         "Outline",IDC_3DOUTLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,18,38,10
     PUSHBUTTON      "X",IDC_3DFRONT,8,43,16,13
     PUSHBUTTON      "Y",IDC_3DLEFT,24,43,16,13
     PUSHBUTTON      "Z",IDC_3DTOP,40,43,16,13
     PUSHBUTTON      "Iso",IDC_3DISO,8,56,16,13
     PUSHBUTTON      "Reset",IDC_3DRESET,24,56,32,13
-    CONTROL         "Panels",IDC_3DPANELS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,7,29,37,10
-    CONTROL         "Light",IDC_3DLIGHT,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,51,7,31,10
-    CONTROL         "Vort.",IDC_3DVORTICES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,51,29,31,10
-    CONTROL         "",IDC_CLIPPLANEPOS,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,7,82,80,12
+    CONTROL         "Panels",IDC_3DPANELS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,29,37,10
+    CONTROL         "Light",IDC_3DLIGHT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,7,31,10
+    CONTROL         "Vort.",IDC_3DVORTICES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,51,29,31,10
+    CONTROL         "",IDC_CLIPPLANEPOS,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,7,82,80,12
     LTEXT           "ClipPlane Position",IDC_STATIC,18,74,57,8
-    CONTROL         "Pick Center",IDC_PICKCENTER,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | BS_MULTILINE | WS_TABSTOP,56,42,33,27
+    CONTROL         "Pick Center",IDC_PICKCENTER,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_MULTILINE | WS_TABSTOP,56,42,33,27
 END
 
-IDD_VLMDLG DIALOG  0, 0, 300, 274
+IDD_VLMDLG DIALOGEX 0, 0, 300, 274
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Vortex Lattice Method Analysis"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     PUSHBUTTON      "&Cancel Analysis",IDC_CANCEL,101,253,60,14
-    EDITTEXT        IDC_OUTPUT,7,7,286,230,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_READONLY | WS_VSCROLL
+    EDITTEXT        IDC_OUTPUT,7,7,286,230,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
 END
 
 IDD_VISCDLG DIALOGEX 0, 0, 296, 206
@@ -398,17 +342,15 @@ BEGIN
     PUSHBUTTON      "Skip OpPoint",IDC_SKIP,55,185,64,14
 END
 
-IDD_USERVARDLG DIALOG  0, 0, 274, 305
+IDD_USERVARDLG DIALOGEX 0, 0, 274, 316
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "User Defined Graph"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LISTBOX         IDC_YSEL,19,25,104,242,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | 
-                    WS_TABSTOP
-    LISTBOX         IDC_XSEL,156,25,104,242,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,60,284,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,174,284,50,14
+    LISTBOX         IDC_YSEL,19,25,104,250,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_XSEL,156,25,104,250,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,60,295,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,174,295,50,14
     LTEXT           "X-axis",IDC_STATIC,197,13,26,8
     LTEXT           "Y-axis",IDC_STATIC,57,13,26,8
     LTEXT           "vs.",IDC_STATIC,133,112,11,8
@@ -419,16 +361,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Units"
 FONT 8, "MS Sans Serif"
 BEGIN
-    COMBOBOX        IDC_LENGTH,66,41,60,83,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_SURFACE,66,59,60,83,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_SPEED,66,77,60,57,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_WEIGHT,66,94,60,49,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_FORCE,66,112,60,59,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
+    COMBOBOX        IDC_LENGTH,66,41,60,83,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SURFACE,66,59,60,83,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SPEED,66,77,60,57,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WEIGHT,66,94,60,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FORCE,66,112,60,59,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,50,162,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,140,162,50,14
     LTEXT           "Length",IDC_STATIC,33,43,23,8
@@ -441,24 +378,18 @@ BEGIN
     LTEXT           "1 m/s =",IDC_SSPEED,140,79,79,8
     LTEXT           "1 kg =",IDC_SWEIGHT,140,97,79,8
     LTEXT           "1 N =",IDC_SFORCE,140,115,79,8
-    LTEXT           "Select units for this project :",IDC_QUESTION,27,13,189,
-                    17
-    COMBOBOX        IDC_MOMENT,66,130,60,59,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
+    LTEXT           "Select units for this project :",IDC_QUESTION,27,13,189,17
+    COMBOBOX        IDC_MOMENT,66,130,60,59,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Moment",IDC_STATIC,30,132,26,8
     LTEXT           "1 N.m =",IDC_SMOMENT,140,133,79,8
 END
 
 IDD_UFOLISTDLG DIALOGEX 0, 0, 526, 187
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing Management"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_UFOLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,7,450,173,WS_EX_RIGHT
+    CONTROL         "",IDC_UFOLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,7,7,450,173,WS_EX_RIGHT
     PUSHBUTTON      "Rename",IDC_RENAME,469,7,50,14
     PUSHBUTTON      "Delete",IDC_DELETE,469,29,50,14
     PUSHBUTTON      "Select",IDC_SELECT,469,52,50,14
@@ -472,30 +403,18 @@ CAPTION "Toolbar settings"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,45,167,50,14
-    CONTROL         "Foil Selection",IDC_XDIRECTFOILBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,18,102,8
-    CONTROL         "Wing Selection",IDC_MIAREXWINGBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,40,102,8
-    CONTROL         "Wing Analysis",IDC_MIAREXWANABAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,51,102,8
-    CONTROL         "Foil Analysis",IDC_XDIRECTANABAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,29,102,8
-    CONTROL         "Polar Style",IDC_POLARBAR,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,84,102,8
-    CONTROL         "Direct Design Controls",IDC_ACTRLBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,106,102,8
-    CONTROL         "Direct Design Toolbar",IDC_AFOILBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,95,102,8
-    CONTROL         "Mixed Design Controls",IDC_MINVCTRLBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,139,102,8
-    CONTROL         "Full Inverse Design Controls",IDC_FINVCTRLBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,128,102,8
-    CONTROL         "Inverse Design",IDC_XINVERSEBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,117,102,8
-    CONTROL         "Wing 3D Controls",IDC_MIAREXW3DBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,62,102,8
-    CONTROL         "Lift and Downwash scales",IDC_SCALEOPPBAR,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,73,102,8
+    CONTROL         "Foil Selection",IDC_XDIRECTFOILBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,18,102,8
+    CONTROL         "Wing Selection",IDC_MIAREXWINGBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,40,102,8
+    CONTROL         "Wing Analysis",IDC_MIAREXWANABAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,51,102,8
+    CONTROL         "Foil Analysis",IDC_XDIRECTANABAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,29,102,8
+    CONTROL         "Polar Style",IDC_POLARBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,84,102,8
+    CONTROL         "Direct Design Controls",IDC_ACTRLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,106,102,8
+    CONTROL         "Direct Design Toolbar",IDC_AFOILBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,95,102,8
+    CONTROL         "Mixed Design Controls",IDC_MINVCTRLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,139,102,8
+    CONTROL         "Full Inverse Design Controls",IDC_FINVCTRLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,128,102,8
+    CONTROL         "Inverse Design",IDC_XINVERSEBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,117,102,8
+    CONTROL         "Wing 3D Controls",IDC_MIAREXW3DBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,62,102,8
+    CONTROL         "Lift and Downwash scales",IDC_SCALEOPPBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,73,102,8
 END
 
 IDD_TEGAPDLG DIALOG  0, 0, 225, 101
@@ -515,25 +434,18 @@ BEGIN
 END
 
 IDD_SPLINECONTROLSDLG DIALOGEX 0, 0, 162, 93
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Spline controls"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,27,72,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,95,72,50,14
-    COMBOBOX        IDC_DEGEXTRADOS,46,20,29,56,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
+    COMBOBOX        IDC_DEGEXTRADOS,46,20,29,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
     EDITTEXT        IDC_OUTEXTRADOS,46,35,29,12,ES_RIGHT | ES_NUMBER
-    CONTROL         "",IDC_SPINOUT,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,77,34,11,
-                    13
-    COMBOBOX        IDC_DEGINTRADOS,101,19,29,56,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
+    CONTROL         "",IDC_SPINOUT,"msctls_updown32",UDS_SETBUDDYINT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,77,34,11,13
+    COMBOBOX        IDC_DEGINTRADOS,101,19,29,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
     EDITTEXT        IDC_OUTINTRADOS,101,35,29,13,ES_RIGHT | ES_NUMBER
-    CONTROL         "",IDC_SPININ,"msctls_updown32",UDS_SETBUDDYINT | 
-                    UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,132,35,
-                    11,13
+    CONTROL         "",IDC_SPININ,"msctls_updown32",UDS_SETBUDDYINT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,132,35,11,13
     RTEXT           "Spline d°",IDC_STATIC,13,24,29,8
     RTEXT           "Output Pts",IDC_OUTTEXT,8,37,34,8
     CTEXT           "Upper Surf.",IDC_STATIC,39,8,42,8
@@ -545,30 +457,18 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Preferences"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "3D Axis",IDC_3DAXIS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,116,14,72,11
-    CONTROL         "Outline",IDC_WINGOUTLINE,"Button",BS_OWNERDRAW | 
-                    BS_NOTIFY | WS_TABSTOP,115,32,72,11
-    CONTROL         "VLMMesh",IDC_VLMMESH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,50,72,11
-    CONTROL         "Button2",IDC_TOPTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,68,72,11
-    CONTROL         "Button3",IDC_BOTTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,86,72,11
-    CONTROL         "Button4",IDC_XCP,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,104,72,11
-    CONTROL         "Button5",IDC_MOMENTS,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,122,72,11
-    CONTROL         "DragStyle",IDC_IDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,140,72,11
-    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,158,72,11
-    CONTROL         "Button5",IDC_DOWNWASH,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,176,72,11
-    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | 
-                    WS_TABSTOP,115,194,72,11
-    CONTROL         "Show Wake Panels",IDC_WAKEDISPLAY,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,118,213,79,10
+    CONTROL         "3D Axis",IDC_3DAXIS,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,116,14,72,11
+    CONTROL         "Outline",IDC_WINGOUTLINE,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,32,72,11
+    CONTROL         "VLMMesh",IDC_VLMMESH,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,50,72,11
+    CONTROL         "Button2",IDC_TOPTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,68,72,11
+    CONTROL         "Button3",IDC_BOTTRANS,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,86,72,11
+    CONTROL         "Button4",IDC_XCP,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,104,72,11
+    CONTROL         "Button5",IDC_MOMENTS,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,122,72,11
+    CONTROL         "DragStyle",IDC_IDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,140,72,11
+    CONTROL         "DragStyle",IDC_VDRAG,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,158,72,11
+    CONTROL         "Button5",IDC_DOWNWASH,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,176,72,11
+    CONTROL         "Wake Color",IDC_WAKE,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,115,194,72,11
+    CONTROL         "Show Wake Panels",IDC_WAKEDISPLAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,118,213,79,10
     DEFPUSHBUTTON   "OK",IDOK,35,236,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,124,236,50,14
     LTEXT           "Wing Outline",IDC_STATIC,23,33,76,8
@@ -591,22 +491,18 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,65,205,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,183,205,50,14
-    LISTBOX         IDC_LBFOIL,7,7,286,179,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_LBFOIL,7,7,286,179,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_SCALEOPPBAR DIALOGEX 0, 0, 93, 78
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_DOWNWASHSCALE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,7,58,80,12
+    CONTROL         "",IDC_DOWNWASHSCALE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,7,58,80,12
     LTEXT           "Downwash scale",IDC_STATIC,7,50,55,8
-    CONTROL         "",IDC_LIFTSCALE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,7,16,80,12
+    CONTROL         "",IDC_LIFTSCALE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,7,16,80,12
     LTEXT           "Lift and Moment Scale",IDC_STATIC,7,8,72,8
-    CONTROL         "",IDC_DRAGSCALE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,7,37,80,12
+    CONTROL         "",IDC_DRAGSCALE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,7,37,80,12
     LTEXT           "Drag scale",IDC_STATIC,7,29,35,8
 END
 
@@ -614,16 +510,13 @@ IDD_SCALEDLG DIALOGEX 0, 0, 230, 118
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Auto",IDC_AUTOX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    83,28,32,8
+    CONTROL         "Auto",IDC_AUTOX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,28,32,8
     EDITTEXT        IDC_XMIN,83,40,39,12,ES_RIGHT
     EDITTEXT        IDC_XMAX,83,56,39,12,ES_RIGHT
     EDITTEXT        IDC_XO,83,72,39,12,ES_RIGHT
     EDITTEXT        IDC_XUNIT,83,88,39,12,ES_RIGHT
-    CONTROL         "Inverted",IDC_YINVERTED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,155,15,47,8
-    CONTROL         "Auto",IDC_AUTOY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    155,28,32,8
+    CONTROL         "Inverted",IDC_YINVERTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,15,47,8
+    CONTROL         "Auto",IDC_AUTOY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,28,32,8
     EDITTEXT        IDC_YMIN,155,39,39,12,ES_RIGHT
     EDITTEXT        IDC_YMAX,155,55,39,12,ES_RIGHT
     EDITTEXT        IDC_YO,155,71,39,12,ES_RIGHT
@@ -641,10 +534,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Project Save Options"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "Save Foil Operating Points",IDC_SAVEOPPS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,18,109,10
-    CONTROL         "Save Wing/Plane Operating Points",IDC_SAVEWOPPS,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,26,35,134,10
+    CONTROL         "Save Foil Operating Points",IDC_SAVEOPPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,18,109,10
+    CONTROL         "Save Wing/Plane Operating Points",IDC_SAVEWOPPS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,35,134,10
     DEFPUSHBUTTON   "OK",IDOK,31,84,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,108,84,50,14
 END
@@ -656,10 +547,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,15,232,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,74,232,50,14
-    CONTROL         "",IDC_RELIST2,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,31,24,200,189,WS_EX_RIGHT
+    CONTROL         "",IDC_RELIST2,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,31,24,200,189,WS_EX_RIGHT
     PUSHBUTTON      "Insert",IDC_INSERT,133,232,50,14
     PUSHBUTTON      "Delete",IDC_DELETE,192,232,50,14
 END
@@ -669,15 +557,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Printing Options"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "B&W",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    29,55,28,10
-    CONTROL         "Color",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,70,55,40,
-                    10
+    CONTROL         "B&W",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,29,55,28,10
+    CONTROL         "Color",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,70,55,40,10
     EDITTEXT        IDC_PENWIDTH,57,79,32,12,ES_RIGHT
-    CONTROL         "Window background",IDC_WINDOWBK,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,27,112,82,8
-    CONTROL         "Graph backgrounds",IDC_GRAPHBK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,27,126,82,8
+    CONTROL         "Window background",IDC_WINDOWBK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,112,82,8
+    CONTROL         "Graph backgrounds",IDC_GRAPHBK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,126,82,8
     EDITTEXT        IDC_LEFT,200,57,41,12,ES_RIGHT
     EDITTEXT        IDC_RIGHT,200,78,41,12,ES_RIGHT
     EDITTEXT        IDC_TOP,200,99,41,12,ES_RIGHT
@@ -706,12 +590,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Preferences"
 FONT 8, "MS Sans Serif"
 BEGIN
-    COMBOBOX        IDC_STDSETTINGS,31,37,124,87,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Button1",IDC_WNDCLR,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    117,81,50,14
-    CONTROL         "Font",IDC_WNDTXTFONT,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    117,101,50,14
+    COMBOBOX        IDC_STDSETTINGS,31,37,124,87,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Button1",IDC_WNDCLR,"Button",BS_OWNERDRAW | WS_TABSTOP,117,81,50,14
+    CONTROL         "Font",IDC_WNDTXTFONT,"Button",BS_OWNERDRAW | WS_TABSTOP,117,101,50,14
     PUSHBUTTON      "Graphs...",IDC_GRAPHPREFS,117,122,50,14
     PUSHBUTTON      "Apply",IDC_APPLY,13,161,50,14
     DEFPUSHBUTTON   "OK",IDOK,75,161,50,14
@@ -729,18 +610,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Polar Filter"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Type1",IDC_TYPE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    21,28,53,8
-    CONTROL         "Type 2",IDC_TYPE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    21,43,53,8
-    CONTROL         "Type 3",IDC_TYPE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    21,58,53,8
-    CONTROL         "Type 4",IDC_TYPE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    93,28,45,8
-    CONTROL         "Type 5",IDC_TYPE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    93,43,45,8
-    CONTROL         "Type 6",IDC_TYPE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
-                    93,58,45,8
+    CONTROL         "Type1",IDC_TYPE1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,28,53,8
+    CONTROL         "Type 2",IDC_TYPE2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,43,53,8
+    CONTROL         "Type 3",IDC_TYPE3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,58,53,8
+    CONTROL         "Type 4",IDC_TYPE4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,93,28,45,8
+    CONTROL         "Type 5",IDC_TYPE5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,93,43,45,8
+    CONTROL         "Type 6",IDC_TYPE6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,93,58,45,8
     DEFPUSHBUTTON   "OK",IDOK,13,101,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,90,101,50,14
     LTEXT           "Show :",IDC_STATIC,15,13,32,8
@@ -750,121 +625,114 @@ IDD_POLARBAR DIALOGEX 600, 65506, 94, 87
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Show &Curve",IDC_SHOW,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,7,55,10
-    CONTROL         "Show &Points",IDC_SHOWPOINTS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,18,55,9
-    COMBOBOX        IDC_STYLE,35,34,52,95,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_WIDTH,35,52,52,66,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
-    CONTROL         "colorBtn",IDC_COLORBTN,"Button",BS_OWNERDRAW | 
-                    BS_NOTIFY | WS_TABSTOP,35,70,52,12
+    CONTROL         "Show &Curve",IDC_SHOW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,7,55,10
+    CONTROL         "Show &Points",IDC_SHOWPOINTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,18,55,9
+    COMBOBOX        IDC_STYLE,35,34,52,95,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WIDTH,35,52,52,66,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "colorBtn",IDC_COLORBTN,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,35,70,52,12
     LTEXT           "Style",IDC_STATIC,9,36,22,10
     LTEXT           "Width",IDC_STATIC,9,54,22,10
     LTEXT           "Color",IDC_STATIC,9,72,22,10
 END
 
-IDD_PLANEDLG DIALOGEX 0, 0, 342, 294
+IDD_PLANEDLG DIALOGEX 0, 0, 342, 337
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Plane Geometry"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_PLANENAME,50,7,264,12,ES_AUTOHSCROLL
-    CONTROL         "Body",IDC_BODY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | 
-                    WS_TABSTOP,21,24,32,10
-    COMBOBOX        IDC_BODYLIST,73,22,240,85,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Import",IDC_IMPORTWING,21,64,31,12
-    PUSHBUTTON      "Export",IDC_EXPORTWING,21,80,31,12
-    EDITTEXT        IDC_WINGTILT,92,78,31,12,ES_RIGHT
-    CONTROL         "Elevator",IDC_STAB,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,111,42,10
-    EDITTEXT        IDC_XLESTAB,43,139,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLESTAB,43,167,31,12,ES_RIGHT
-    EDITTEXT        IDC_STABTILT,43,182,31,12,ES_RIGHT
-    CONTROL         "Fin",IDC_FIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,
-                    111,25,10
-    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,109,35,11
-    EDITTEXT        IDC_XLEFIN,197,139,31,12,ES_RIGHT
-    EDITTEXT        IDC_YLEFIN,197,153,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLEFIN,197,167,31,12,ES_RIGHT
-    EDITTEXT        IDC_FINTILT,197,182,31,12,ES_RIGHT
-    CONTROL         "Symetric Fin",IDC_SYMFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,270,140,54,10
-    CONTROL         "Double Fin",IDC_DOUBLEFIN,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,270,153,50,10
-    DEFPUSHBUTTON   "OK",IDOK,93,273,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,191,273,50,14
-    RTEXT           "Stab Volume",IDC_STABVOLUME,246,234,35,8
-    GROUPBOX        "Elevator",IDC_STATIC,6,100,139,102
-    LTEXT           "LE Position",IDC_STATIC,37,128,36,8
-    RTEXT           "x",IDC_STATIC,27,141,8,8
-    RTEXT           "z",IDC_STATIC,27,169,8,8
-    LTEXT           "LE Position",IDC_STATIC,189,127,36,8
-    RTEXT           "x",IDC_STATIC,168,141,8,8
-    RTEXT           "z",IDC_STATIC,168,169,8,8
-    GROUPBOX        "Fin",IDC_STATIC,152,100,183,102
-    RTEXT           "Elev. Area",IDC_STABSURFACE,83,222,43,8
-    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,222,35,8
-    RTEXT           "Fin Area",IDC_FINSURFACE,83,234,43,8
-    RTEXT           "Tilt Angle",IDC_STATIC,9,184,30,8
-    LTEXT           "Name",IDC_STATIC,7,9,20,8
-    RTEXT           "Tilt Angle",IDC_STATIC,58,80,30,8
-    RTEXT           "Wing Span",IDC_WINGSPAN,246,210,35,8
-    RTEXT           "Wing Area",IDC_WINGSURFACE,83,210,43,8
-    LTEXT           "dm²",IDC_SURF1,133,210,21,8
-    LTEXT           "dm²",IDC_SURF2,133,222,21,8
-    LTEXT           "dm²",IDC_SURF3,133,234,21,8
-    LTEXT           "mm",IDC_LEN1,290,210,15,8
-    LTEXT           "mm",IDC_LEN2,290,222,15,8
-    RTEXT           "Wing Area =",IDC_STATIC,11,210,66,8
-    RTEXT           "Elevator Area =",IDC_STATIC,11,222,66,8
-    RTEXT           "Fin Area =",IDC_STATIC,11,234,66,8
-    RTEXT           "Wing Span =",IDC_STATIC,172,210,66,8
-    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,222,66,8
-    RTEXT           "Tail Volume =",IDC_STATIC,172,234,66,8
-    GROUPBOX        "Main Wing",IDC_STATIC,6,37,139,61
-    RTEXT           "y",IDC_STATIC,168,155,8,8
-    LTEXT           "°",IDC_SURF4,130,79,8,8
-    LTEXT           "°",IDC_SURF5,80,184,8,8
-    RTEXT           "total",IDC_VLMTOTALPANELS,246,246,35,8
-    RTEXT           "Total Panels =",IDC_STATIC,172,246,66,8
-    LTEXT           "mm",IDC_LEN3,231,141,15,8
-    LTEXT           "mm",IDC_LEN4,231,155,15,8
-    LTEXT           "mm",IDC_LEN5,231,169,15,8
-    LTEXT           "mm",IDC_LEN6,79,141,15,8
-    LTEXT           "mm",IDC_LEN7,79,169,15,8
-    RTEXT           "Tilt Angle",IDC_STATIC,162,184,30,8
-    LTEXT           "°",IDC_SURF6,236,184,8,8
-    PUSHBUTTON      "Define",IDC_DEFINEWING2,203,50,31,12
-    PUSHBUTTON      "Import",IDC_IMPORTWING2,203,65,31,12
-    PUSHBUTTON      "Export",IDC_EXPORTWING2,203,79,31,12
-    CONTROL         "Biplane",IDC_BIPLANE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,161,50,39,10
-    EDITTEXT        IDC_WINGTILT2,273,79,31,12,ES_RIGHT
-    RTEXT           "Tilt Angle",IDC_STATIC,241,81,30,8
-    LTEXT           "°",IDC_SURF7,313,81,11,8
-    EDITTEXT        IDC_XLEWING2,273,50,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLEWING2,273,65,31,12,ES_RIGHT
-    RTEXT           "x",IDC_STATIC,258,52,8,8
-    RTEXT           "z",IDC_STATIC,258,67,8,8
-    LTEXT           "mm",IDC_LEN8,309,52,15,8
-    LTEXT           "mm",IDC_LEN9,309,67,15,8
-    GROUPBOX        "Biplane",IDC_STATIC,152,37,183,61
-    RTEXT           "Volume",IDC_VOLUME,83,246,43,8
-    LTEXT           "m3",IDC_VOLUMEUNIT,133,246,21,8
-    RTEXT           "Plane Volume =",IDC_STATIC,11,246,66,8
-    EDITTEXT        IDC_XLEWING,92,47,31,12,ES_RIGHT
-    EDITTEXT        IDC_ZLEWING,92,63,31,12,ES_RIGHT
-    RTEXT           "x",IDC_STATIC,76,50,8,8
-    RTEXT           "z",IDC_STATIC,76,65,8,8
-    LTEXT           "mm",IDC_LEN10,126,50,15,8
-    LTEXT           "mm",IDC_LEN11,126,65,15,8
-    PUSHBUTTON      "Define",IDC_DEFINEWING,21,48,31,12
-    PUSHBUTTON      "Define",IDC_DEFINESTAB,83,110,35,11
+    PUSHBUTTON      "Define",IDC_DEFINEWING,21,39,31,12
+    PUSHBUTTON      "Import",IDC_IMPORTWING,21,55,31,12
+    PUSHBUTTON      "Export",IDC_EXPORTWING,21,71,31,12
+    EDITTEXT        IDC_XLEWING,92,38,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEWING,92,54,31,12,ES_RIGHT
+    EDITTEXT        IDC_WINGTILT,92,69,31,12,ES_RIGHT
+    CONTROL         "Elevator",IDC_STAB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,102,42,10
+    PUSHBUTTON      "Define",IDC_DEFINESTAB,83,101,35,11
+    EDITTEXT        IDC_XLESTAB,43,130,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLESTAB,43,158,31,12,ES_RIGHT
+    EDITTEXT        IDC_STABTILT,43,173,31,12,ES_RIGHT
+    CONTROL         "Biplane",IDC_BIPLANE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,161,41,39,10
+    PUSHBUTTON      "Define",IDC_DEFINEWING2,203,41,31,12
+    PUSHBUTTON      "Import",IDC_IMPORTWING2,203,56,31,12
+    PUSHBUTTON      "Export",IDC_EXPORTWING2,203,70,31,12
+    EDITTEXT        IDC_XLEWING2,273,41,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEWING2,273,56,31,12,ES_RIGHT
+    EDITTEXT        IDC_WINGTILT2,273,70,31,12,ES_RIGHT
+    CONTROL         "Fin",IDC_FIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,102,25,10
+    PUSHBUTTON      "Define",IDC_DEFINEFIN,222,100,35,11
+    EDITTEXT        IDC_XLEFIN,197,130,31,12,ES_RIGHT
+    EDITTEXT        IDC_YLEFIN,197,144,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZLEFIN,197,158,31,12,ES_RIGHT
+    EDITTEXT        IDC_FINTILT,197,173,31,12,ES_RIGHT
+    CONTROL         "Symetric Fin",IDC_SYMFIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,270,131,54,10
+    CONTROL         "Double Fin",IDC_DOUBLEFIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,270,144,50,10
+    CONTROL         "Body",IDC_BODY,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,22,206,32,10
+    COMBOBOX        IDC_BODYLIST,74,205,240,85,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_XBODY,36,225,31,12,ES_RIGHT
+    EDITTEXT        IDC_ZBODY,111,225,31,12,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,93,316,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,191,316,50,14
+    RTEXT           "Stab Volume",IDC_STABVOLUME,246,278,35,8
+    GROUPBOX        "Elevator",IDC_STATIC,6,91,139,102
+    LTEXT           "LE Position",IDC_STATIC,37,119,36,8
+    RTEXT           "x",IDC_STATIC,27,132,8,8
+    RTEXT           "z",IDC_STATIC,27,160,8,8
+    LTEXT           "LE Position",IDC_STATIC,189,118,36,8
+    RTEXT           "x",IDC_STATIC,168,132,8,8
+    RTEXT           "z",IDC_STATIC,168,160,8,8
+    GROUPBOX        "Fin",IDC_STATIC,152,91,183,102
+    RTEXT           "Elev. Area",IDC_STABSURFACE,83,266,43,8
+    RTEXT           "Elev. Lever Arm",IDC_STABLEVERARM,246,266,35,8
+    RTEXT           "Fin Area",IDC_FINSURFACE,83,278,43,8
+    RTEXT           "Tilt Angle",IDC_STATIC,9,175,30,8
+    LTEXT           "Name",IDC_STATIC,6,9,20,8
+    RTEXT           "Tilt Angle",IDC_STATIC,58,71,30,8
+    RTEXT           "Wing Span",IDC_WINGSPAN,246,254,35,8
+    RTEXT           "Wing Area",IDC_WINGSURFACE,83,254,43,8
+    LTEXT           "dm²",IDC_SURF1,133,254,21,8
+    LTEXT           "dm²",IDC_SURF2,133,266,21,8
+    LTEXT           "dm²",IDC_SURF3,133,278,21,8
+    LTEXT           "mm",IDC_LEN1,290,254,15,8
+    LTEXT           "mm",IDC_LEN2,290,266,15,8
+    RTEXT           "Wing Area =",IDC_STATIC,11,254,66,8
+    RTEXT           "Elevator Area =",IDC_STATIC,11,266,66,8
+    RTEXT           "Fin Area =",IDC_STATIC,11,278,66,8
+    RTEXT           "Wing Span =",IDC_STATIC,172,254,66,8
+    RTEXT           "Elev. Lever Arm =",IDC_STATIC,172,266,66,8
+    RTEXT           "Tail Volume =",IDC_STATIC,172,278,66,8
+    GROUPBOX        "Main Wing",IDC_STATIC,6,28,139,61
+    RTEXT           "y",IDC_STATIC,168,146,8,8
+    LTEXT           "°",IDC_SURF4,130,70,8,8
+    LTEXT           "°",IDC_SURF5,80,175,8,8
+    RTEXT           "total",IDC_VLMTOTALPANELS,246,290,35,8
+    RTEXT           "Total Panels =",IDC_STATIC,172,290,66,8
+    LTEXT           "mm",IDC_LEN3,231,132,15,8
+    LTEXT           "mm",IDC_LEN4,231,146,15,8
+    LTEXT           "mm",IDC_LEN5,231,160,15,8
+    LTEXT           "mm",IDC_LEN6,79,132,15,8
+    LTEXT           "mm",IDC_LEN7,79,160,15,8
+    RTEXT           "Tilt Angle",IDC_STATIC,162,175,30,8
+    LTEXT           "°",IDC_SURF6,236,175,8,8
+    RTEXT           "Tilt Angle",IDC_STATIC,241,72,30,8
+    LTEXT           "°",IDC_SURF7,313,72,11,8
+    RTEXT           "x",IDC_STATIC,258,43,8,8
+    RTEXT           "z",IDC_STATIC,258,58,8,8
+    LTEXT           "mm",IDC_LEN8,309,43,15,8
+    LTEXT           "mm",IDC_LEN9,309,58,15,8
+    GROUPBOX        "Biplane",IDC_STATIC,152,28,183,61
+    RTEXT           "Volume",IDC_VOLUME,83,290,43,8
+    LTEXT           "m3",IDC_VOLUMEUNIT,133,290,21,8
+    RTEXT           "Plane Volume =",IDC_STATIC,11,290,66,8
+    RTEXT           "x",IDC_STATIC,76,41,8,8
+    RTEXT           "z",IDC_STATIC,76,56,8,8
+    LTEXT           "mm",IDC_LEN10,126,41,15,8
+    LTEXT           "mm",IDC_LEN11,126,56,15,8
+    RTEXT           "x",IDC_STATIC,20,227,8,8
+    LTEXT           "mm",IDC_LEN12,70,227,15,8
+    RTEXT           "z",IDC_STATIC,95,227,8,8
+    LTEXT           "mm",IDC_LEN13,145,227,15,8
+    GROUPBOX        "Body",IDC_STATIC,6,195,329,50
 END
 
 IDD_PERTDLG DIALOGEX 0, 0, 240, 239
@@ -874,8 +742,7 @@ FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,183,74,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,183,94,50,14
-    LISTBOX         IDC_CNLIST,16,22,153,186,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
+    LISTBOX         IDC_CNLIST,16,22,153,186,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
     EDITTEXT        IDC_CNR,43,215,52,14,ES_RIGHT
     EDITTEXT        IDC_CNI,108,215,52,14,ES_RIGHT
     LTEXT           "Fourier Coefficients",IDC_STATIC,16,7,61,8
@@ -898,16 +765,11 @@ BEGIN
     EDITTEXT        IDC_XPREF2,224,99,39,12,ES_RIGHT,WS_EX_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,107,138,50,14
     LTEXT           "Number of Panels (NPane)",IDC_STATIC,11,17,155,9
-    LTEXT           "Panel Bunching Parameter (PPanel)",IDC_STATIC,11,31,155,
-                    9
-    LTEXT           "TE/LE Panel Density Ratio (TErat)",IDC_STATIC,11,46,155,
-                    9
-    LTEXT           "Refined Area/LE Panel Density Ratio (REFrat) :",
-                    IDC_STATIC,11,61,155,9
-    LTEXT           "Top       Side Refined Area x/c limits (XsRef)",
-                    IDC_STATIC,11,87,155,9
-    LTEXT           "Bottom  Side Refined Area x/c limits (XpRef) ",
-                    IDC_STATIC,11,101,155,9
+    LTEXT           "Panel Bunching Parameter (PPanel)",IDC_STATIC,11,31,155,9
+    LTEXT           "TE/LE Panel Density Ratio (TErat)",IDC_STATIC,11,46,155,9
+    LTEXT           "Refined Area/LE Panel Density Ratio (REFrat) :",IDC_STATIC,11,61,155,9
+    LTEXT           "Top       Side Refined Area x/c limits (XsRef)",IDC_STATIC,11,87,155,9
+    LTEXT           "Bottom  Side Refined Area x/c limits (XpRef) ",IDC_STATIC,11,101,155,9
     PUSHBUTTON      "Cancel",IDCANCEL,192,138,50,14
     DEFPUSHBUTTON   "Apply",IDC_APPLY,22,138,50,14
 END
@@ -916,17 +778,13 @@ IDD_OPERDLGBAR DIALOGEX 0, 0, 94, 250
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "Sequence",IDC_SEQUENCE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,49,54,8
+    CONTROL         "Sequence",IDC_SEQUENCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,49,54,8
     EDITTEXT        IDC_ALPHA,46,61,37,12,ES_RIGHT,WS_EX_RIGHT
     EDITTEXT        IDC_ALPHAMAX,46,75,37,12,ES_RIGHT,WS_EX_RIGHT
     EDITTEXT        IDC_DELTAALPHA,46,89,37,12,ES_RIGHT,WS_EX_RIGHT
-    CONTROL         "&Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,17,109,67,8
-    CONTROL         "&Init BLs",IDC_INITBL,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,17,121,67,8
-    CONTROL         "&Store OpPoints",IDC_STOREOPP,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,17,133,67,8
+    CONTROL         "&Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,109,67,8
+    CONTROL         "&Init BLs",IDC_INITBL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,121,67,8
+    CONTROL         "&Store OpPoints",IDC_STOREOPP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,133,67,8
     DEFPUSHBUTTON   "A&nalyze",IDC_ANALYZE,21,149,53,13
     RTEXT           "D =",IDC_DALPHASTAT,21,91,21,8
     LTEXT           "Specify",IDC_STATIC,15,18,26,8
@@ -934,18 +792,13 @@ BEGIN
     RTEXT           "Start =",IDC_ALPHASTAT,21,63,21,8
     RTEXT           "End =",IDC_AMAXSTAT,21,77,21,8
     GROUPBOX        "Display",IDC_STATIC,7,169,80,74
-    CONTROL         "Show BL",IDC_SHOWBL,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,19,180,61,8
-    CONTROL         "Show Pressure",IDC_SHOWPRESSURE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,19,191,61,8
-    CONTROL         "Animate",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,19,201,61,8
-    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,9,216,76,11
+    CONTROL         "Show BL",IDC_SHOWBL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,180,61,8
+    CONTROL         "Show Pressure",IDC_SHOWPRESSURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,191,61,8
+    CONTROL         "Animate",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,201,61,8
+    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,9,216,76,11
     LTEXT           "Slow",IDC_STATIC,9,230,20,8
     RTEXT           "Fast",IDC_STATIC,64,230,20,8
-    CONTROL         "a",IDC_PARAM1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,50,
-                    17,33,8
+    CONTROL         "a",IDC_PARAM1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,50,17,33,8
     CONTROL         "Cl",IDC_PARAM2,"Button",BS_AUTORADIOBUTTON,50,27,33,8
     CONTROL         "Re",IDC_PARAM3,"Button",BS_AUTORADIOBUTTON,50,37,33,8
 END
@@ -959,13 +812,9 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,23,245,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,91,245,50,14
     PUSHBUTTON      "Overwrite",IDC_OVERWRITE,159,245,50,14
-    EDITTEXT        IDC_QUESTION,7,7,223,22,ES_MULTILINE | ES_AUTOHSCROLL | 
-                    ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
-    LTEXT           "Note : Overwrite will delete all associated results",
-                    IDC_NOTE,23,220,196,16
-    LISTBOX         IDC_LIST,7,75,223,135,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
-                    NOT WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE | 
-                    WS_EX_STATICEDGE
+    EDITTEXT        IDC_QUESTION,7,7,223,22,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Note : Overwrite will delete all associated results",IDC_NOTE,23,220,196,16
+    LISTBOX         IDC_LIST,7,75,223,135,LBS_SORT | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | WS_VSCROLL | WS_TABSTOP,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
     LTEXT           "Existing names",IDC_STATIC,7,62,111,11
 END
 
@@ -999,40 +848,29 @@ IDD_MINVCTRLBAR DIALOGEX 0, 0, 118, 294
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Mark for modification",IDC_MARK,"Button",
-                    BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,20,86,81,11
-    CONTROL         "Show Spline",IDC_SHOWSPLINE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,40,59,8
-    CONTROL         "New Spline",IDC_NEWSPLINE,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | WS_TABSTOP,20,64,81,11
+    CONTROL         "Mark for modification",IDC_MARK,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,20,86,81,11
+    CONTROL         "Show Spline",IDC_SHOWSPLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,40,59,8
+    CONTROL         "New Spline",IDC_NEWSPLINE,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,20,64,81,11
     PUSHBUTTON      "Apply Spline",IDC_APPLYSPLINE,20,75,81,11
     PUSHBUTTON      "Reset QSpec",IDC_QRESET,20,108,81,11
-    CONTROL         "EndPoint Constraint",IDC_CPXX,"Button",BS_AUTOCHECKBOX | 
-                    BS_MULTILINE | WS_TABSTOP,19,144,77,8
+    CONTROL         "EndPoint Constraint",IDC_CPXX,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,19,144,77,8
     PUSHBUTTON      "Execute",IDC_EXEC,18,158,81,11
-    EDITTEXT        IDC_INVITER,73,173,24,12,ES_RIGHT | ES_AUTOHSCROLL | 
-                    ES_NUMBER
+    EDITTEXT        IDC_INVITER,73,173,24,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     GROUPBOX        "Surface Speed Specification",IDC_STATIC,9,29,101,100
     LTEXT           "Max Iterations",IDC_STATIC,19,175,49,8
     GROUPBOX        "Foil",IDC_STATIC,9,130,102,61
-    EDITTEXT        IDC_OUTPUT,9,196,102,91,ES_MULTILINE | ES_READONLY | 
-                    WS_VSCROLL
-    EDITTEXT        IDC_SPECINV,9,9,102,21,ES_MULTILINE | ES_AUTOHSCROLL | 
-                    ES_READONLY | NOT WS_BORDER
-    CONTROL         "Smooth QSpec",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | WS_TABSTOP,20,97,81,11
-    CONTROL         "Spline tangent to curve",IDC_TANGENTSPLINE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,16,50,89,10
+    EDITTEXT        IDC_OUTPUT,9,196,102,91,ES_MULTILINE | ES_READONLY | WS_VSCROLL
+    EDITTEXT        IDC_SPECINV,9,9,102,21,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    CONTROL         "Smooth QSpec",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,20,97,81,11
+    CONTROL         "Spline tangent to curve",IDC_TANGENTSPLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,50,89,10
 END
 
 IDD_MESSAGEDLG DIALOGEX 0, 0, 134, 62
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_BORDER | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Calculating Streamlines...\nPlease wait",IDC_MESSAGE,7,
-                    7,120,27
-    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,12,44,115,
-                    9
+    LTEXT           "Calculating Streamlines...\nPlease wait",IDC_MESSAGE,7,7,120,27
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,12,44,115,9
 END
 
 IDD_LISTPLRDLG DIALOG  0, 0, 222, 197
@@ -1042,12 +880,10 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,176,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,127,176,50,14
-    COMBOBOX        IDC_FOILSEL,40,7,175,73,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FOILSEL,40,7,175,73,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Foil :",IDC_STATIC,7,9,20,8
     LTEXT           "Available Polars :",IDC_STATIC,7,32,59,8
-    EDITTEXT        IDC_PLRLIST,27,44,188,107,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    EDITTEXT        IDC_PLRLIST,27,44,188,107,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
 END
 
 IDD_LINEPICKERDLG DIALOG  0, 0, 186, 125
@@ -1057,14 +893,9 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,45,104,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,109,104,50,14
-    COMBOBOX        IDC_STYLE,71,21,77,95,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
-    COMBOBOX        IDC_WIDTH,71,44,77,66,CBS_DROPDOWNLIST | 
-                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | 
-                    WS_TABSTOP
-    CONTROL         "ColorBtn",IDC_COLORBTN,"Button",BS_OWNERDRAW | 
-                    BS_NOTIFY | WS_TABSTOP,71,70,77,12
+    COMBOBOX        IDC_STYLE,71,21,77,95,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_WIDTH,71,44,77,66,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "ColorBtn",IDC_COLORBTN,"Button",BS_OWNERDRAW | BS_NOTIFY | WS_TABSTOP,71,70,77,12
     LTEXT           "Style",IDC_STATIC,28,23,32,10
     LTEXT           "Width",IDC_STATIC,28,47,32,10
     LTEXT           "Color",IDC_STATIC,28,72,32,10
@@ -1080,20 +911,17 @@ BEGIN
     DEFPUSHBUTTON   "Apply",IDC_APPLY,7,80,50,14
     DEFPUSHBUTTON   "OK",IDOK,87,80,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,168,80,50,14
-    RTEXT           "Approximate new/old LE radius scaling ratio",IDC_STATIC,
-                    40,16,82,18
+    RTEXT           "Approximate new/old LE radius scaling ratio",IDC_STATIC,40,16,82,18
     RTEXT           "Blending distance from L.E.",IDC_STATIC,18,41,107,8
     LTEXT           "% chord",IDC_STATIC,182,43,26,8
 END
 
 IDD_LECIRCLEDLG DIALOGEX 0, 0, 162, 76
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "LE Circle Display"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Show",IDC_LERADCHECK,"Button",BS_AUTOCHECKBOX | 
-                    BS_MULTILINE | WS_TABSTOP,17,20,33,10
+    CONTROL         "Show",IDC_LERADCHECK,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,17,20,33,10
     EDITTEXT        IDC_LERAD,78,19,30,12,ES_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,17,55,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,87,55,50,14
@@ -1101,13 +929,14 @@ BEGIN
     RTEXT           "r=",IDC_STATIC,61,21,12,8
 END
 
-IDD_ITERDLG DIALOG  0, 0, 322, 231
+IDD_LLTDLG DIALOGEX 0, 0, 322, 330
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Lifting Line Method - Iterations"
-FONT 8, "MS Sans Serif"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "Cancel Analysis",IDCANCEL,191,208,64,14
-    PUSHBUTTON      "Skip Point",IDC_SKIP,67,208,64,14
+    DEFPUSHBUTTON   "Cancel Analysis",IDCANCEL,191,307,64,14
+    PUSHBUTTON      "Skip Point",IDC_SKIP,67,307,64,14
+    EDITTEXT        IDC_OUTPUT,7,208,308,90,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
 END
 
 IDD_INVCOLORDLG DIALOGEX 0, 0, 174, 130
@@ -1120,40 +949,33 @@ BEGIN
     LTEXT           "Spline",IDC_STATIC,20,61,51,8
     LTEXT           "Reference Foil",IDC_STATIC,20,23,51,8
     LTEXT           "Modified Foil",IDC_STATIC,20,42,51,8
-    CONTROL         "RefFoil",IDC_REFFOIL,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    82,21,74,12
-    CONTROL         "RefFoil",IDC_MODFOIL,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    82,40,74,12
-    CONTROL         "RefFoil",IDC_SPLINESTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,82,59,74,12
+    CONTROL         "RefFoil",IDC_REFFOIL,"Button",BS_OWNERDRAW | WS_TABSTOP,82,21,74,12
+    CONTROL         "RefFoil",IDC_MODFOIL,"Button",BS_OWNERDRAW | WS_TABSTOP,82,40,74,12
+    CONTROL         "RefFoil",IDC_SPLINESTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,82,59,74,12
     LTEXT           "Reflected",IDC_STATIC,20,81,51,8
-    CONTROL         "RefFoil",IDC_REFLECTEDSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,82,79,74,12
+    CONTROL         "RefFoil",IDC_REFLECTEDSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,82,79,74,12
 END
 
-IDD_INTERDLG DIALOGEX 0, 0, 328, 207
+IDD_INTERDLG DIALOGEX 0, 0, 328, 226
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Interpolation"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    COMBOBOX        IDC_FOIL1,15,23,211,165,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_FOIL2,15,90,211,170,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Slider1",IDC_MIXT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    TBS_VERT | TBS_TOP | WS_TABSTOP,249,14,23,123
+    COMBOBOX        IDC_FOIL1,15,23,211,165,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_FOIL2,15,90,211,170,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Slider1",IDC_MIXT,"msctls_trackbar32",TBS_AUTOTICKS | TBS_VERT | TBS_TOP | WS_TABSTOP,249,14,23,155
     EDITTEXT        IDC_FRAC,275,24,31,12,ES_RIGHT
-    EDITTEXT        IDC_FOILNAME,15,150,211,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,255,150,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,255,173,50,14
+    DEFPUSHBUTTON   "OK",IDOK,95,204,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,191,204,50,14
     LTEXT           "Camber",IDC_CAMBER1,21,42,132,8
     LTEXT           "Thickness",IDC_THICKNESS1,20,54,132,8
     LTEXT           "Camber",IDC_CAMBER2,21,107,132,8
     LTEXT           "Thickness",IDC_THICKNESS2,20,119,132,8
-    GROUPBOX        "New Foil",IDC_STATIC,7,137,233,55
-    LTEXT           "C0",IDC_CAMBER0,20,166,132,8
-    LTEXT           "T0",IDC_THICKNESS0,20,177,132,8
+    LTEXT           "C0",IDC_CAMBER0,20,169,132,8
+    LTEXT           "T0",IDC_THICKNESS0,20,180,132,8
     LTEXT           "%",IDC_STATIC,309,26,10,9
+    GROUPBOX        "Interpolated Foil",IDC_STATIC,7,136,205,57
+    EDITTEXT        IDC_NEWFOILNAME,25,152,175,13,ES_AUTOHSCROLL
 END
 
 IDD_IMPORTWINGDLG DIALOG  0, 0, 186, 239
@@ -1164,33 +986,23 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,32,218,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,105,218,50,14
     LTEXT           "Select the wing to import",IDC_STATIC,15,16,78,8
-    LISTBOX         IDC_WINGSEL,7,35,172,165,LBS_SORT | LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_WINGSEL,7,35,172,165,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_GRIDDLG DIALOG  0, 0, 214, 113
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Axis Style",IDC_AXISSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,12,74,10
-    CONTROL         "X Major Grid",IDC_XMAJCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,8,35,58,8
-    CONTROL         "X Main Grid",IDC_XMAJSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,35,74,10
-    CONTROL         "Y Major Grid",IDC_YMAJCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,8,50,58,8
-    CONTROL         "Y Main Grid",IDC_YMAJSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,50,74,10
-    CONTROL         "X Minor Grid",IDC_XMINCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,8,77,58,8
-    CONTROL         "X Min Grid",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,77,74,10
+    CONTROL         "Axis Style",IDC_AXISSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,12,74,10
+    CONTROL         "X Major Grid",IDC_XMAJCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,35,58,8
+    CONTROL         "X Main Grid",IDC_XMAJSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,35,74,10
+    CONTROL         "Y Major Grid",IDC_YMAJCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,50,58,8
+    CONTROL         "Y Main Grid",IDC_YMAJSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,50,74,10
+    CONTROL         "X Minor Grid",IDC_XMINCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,77,58,8
+    CONTROL         "X Min Grid",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,77,74,10
     EDITTEXT        IDC_XMINORUNIT,162,75,43,12,ES_RIGHT
-    CONTROL         "Y Minor Grid",IDC_YMINCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,8,92,58,8
-    CONTROL         "Y Min Grid",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,92,74,10
+    CONTROL         "Y Minor Grid",IDC_YMINCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,92,58,8
+    CONTROL         "Y Min Grid",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,92,74,10
     EDITTEXT        IDC_YMINORUNIT,162,91,43,12,ES_RIGHT
     LTEXT           "Axis Style",IDC_STATIC,26,11,34,10
 END
@@ -1200,8 +1012,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Graph Options"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Auto",IDC_AUTOGRAPH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,27,21,33,8
+    CONTROL         "Auto",IDC_AUTOGRAPH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,21,33,8
     EDITTEXT        IDC_LMIN,88,40,39,12,ES_RIGHT
     EDITTEXT        IDC_LMAX,88,55,39,12,ES_RIGHT
     EDITTEXT        IDC_LORIGIN,88,70,39,12,ES_RIGHT
@@ -1218,24 +1029,15 @@ BEGIN
     EDITTEXT        IDC_AMAX,282,55,39,12,ES_RIGHT
     EDITTEXT        IDC_AORIGIN,282,70,39,12,ES_RIGHT
     EDITTEXT        IDC_AUNIT,282,85,39,12,ES_RIGHT
-    CONTROL         "Axis Style",IDC_AXISSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,130,93,10
-    CONTROL         "X Main Grid",IDC_XMAJCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,146,58,8
-    CONTROL         "X Main Grid",IDC_XMAINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,146,93,10
-    CONTROL         "Y Main Grid",IDC_YMAJCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,162,58,8
-    CONTROL         "Y Main Grid",IDC_YMAINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,162,93,10
-    CONTROL         "X Minor Grid",IDC_XMINCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,184,58,8
-    CONTROL         "X Min Grid",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,184,93,10
-    CONTROL         "Y Minor Grid",IDC_YMINCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,199,58,8
-    CONTROL         "Y Min grid",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,199,93,10
+    CONTROL         "Axis Style",IDC_AXISSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,130,93,10
+    CONTROL         "X Main Grid",IDC_XMAJCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,146,58,8
+    CONTROL         "X Main Grid",IDC_XMAINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,146,93,10
+    CONTROL         "Y Main Grid",IDC_YMAJCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,162,58,8
+    CONTROL         "Y Main Grid",IDC_YMAINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,162,93,10
+    CONTROL         "X Minor Grid",IDC_XMINCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,184,58,8
+    CONTROL         "X Min Grid",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,184,93,10
+    CONTROL         "Y Minor Grid",IDC_YMINCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,199,58,8
+    CONTROL         "Y Min grid",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,199,93,10
     PUSHBUTTON      "Titles and Legends...",IDC_TITLEFONT,253,136,81,13
     PUSHBUTTON      "Labels...",IDC_LABELFONT,253,162,81,13
     DEFPUSHBUTTON   "Apply",IDC_APPLY,61,231,50,14
@@ -1272,46 +1074,26 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "3D Light Options"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Slider1",IDC_DIFFUSE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,48,19,83,12
-    CONTROL         "Slider1",IDC_AMBIENT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,48,36,83,12
-    CONTROL         "Slider1",IDC_SPECULAR,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,48,52,83,12
-    CONTROL         "",IDC_RED,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,91,83,12
-    CONTROL         "",IDC_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,107,83,12
-    CONTROL         "",IDC_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,123,83,12
-    CONTROL         "",IDC_XLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,171,83,12
-    CONTROL         "",IDC_YLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,185,83,12
-    CONTROL         "",IDC_ZLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,46,200,83,12
-    CONTROL         "",IDC_MATDIFFUSE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,196,27,83,12
-    CONTROL         "",IDC_MATAMBIENT,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,196,40,83,12
-    CONTROL         "",IDC_MATSPECULAR,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,196,55,83,12
-    CONTROL         "",IDC_MATEMISSION,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,196,71,83,12
-    CONTROL         "",IDC_MATSHININESS,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,196,103,83,12
-    CONTROL         "Color &Material",IDC_COLORMATERIAL,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,177,134,59,9
-    CONTROL         "&Cull faces",IDC_CULLFACES,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,177,145,46,9
-    CONTROL         "&Smooth quads",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,177,155,61,10
-    CONTROL         "&Depth test",IDC_DEPTHTEST,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,177,165,46,9
-    CONTROL         "Smooth S&hading",IDC_SHADE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,177,175,68,10
-    CONTROL         "&Local view",IDC_LOCALVIEW,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,177,185,59,9
+    CONTROL         "Slider1",IDC_DIFFUSE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,48,19,83,12
+    CONTROL         "Slider1",IDC_AMBIENT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,48,36,83,12
+    CONTROL         "Slider1",IDC_SPECULAR,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,48,52,83,12
+    CONTROL         "",IDC_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,91,83,12
+    CONTROL         "",IDC_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,107,83,12
+    CONTROL         "",IDC_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,123,83,12
+    CONTROL         "",IDC_XLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,171,83,12
+    CONTROL         "",IDC_YLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,185,83,12
+    CONTROL         "",IDC_ZLIGHT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,46,200,83,12
+    CONTROL         "",IDC_MATDIFFUSE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,196,27,83,12
+    CONTROL         "",IDC_MATAMBIENT,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,196,40,83,12
+    CONTROL         "",IDC_MATSPECULAR,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,196,55,83,12
+    CONTROL         "",IDC_MATEMISSION,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,196,71,83,12
+    CONTROL         "",IDC_MATSHININESS,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,196,103,83,12
+    CONTROL         "Color &Material",IDC_COLORMATERIAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,134,59,9
+    CONTROL         "&Cull faces",IDC_CULLFACES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,145,46,9
+    CONTROL         "&Smooth quads",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,155,61,10
+    CONTROL         "&Depth test",IDC_DEPTHTEST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,165,46,9
+    CONTROL         "Smooth S&hading",IDC_SHADE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,175,68,10
+    CONTROL         "&Local view",IDC_LOCALVIEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,177,185,59,9
     PUSHBUTTON      "&Reset Defaults",IDC_DEFAULTS,157,205,55,14
     DEFPUSHBUTTON   "Cl&ose",IDOK,224,205,55,14
     GROUPBOX        "Light Intensity",IDC_STATIC,7,3,131,67
@@ -1320,8 +1102,7 @@ BEGIN
     LTEXT           "1",IDC_STATIC,120,12,8,8
     RTEXT           "Diffuse",IDC_STATIC,19,20,22,10
     RTEXT           "Specular",IDC_STATIC,12,53,29,8
-    GROUPBOX        "Light Position (Screen Coordinates)",IDC_STATIC,7,147,
-                    131,72
+    GROUPBOX        "Light Position (Screen Coordinates)",IDC_STATIC,7,147,131,72
     RTEXT           "x",IDC_STATIC,17,172,22,10
     RTEXT           "y",IDC_STATIC,17,185,22,10
     RTEXT           "z",IDC_STATIC,17,201,22,10
@@ -1350,17 +1131,13 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Geometry"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Slider1",IDC_CAMBERSLIDE,"msctls_trackbar32",
-                    TBS_AUTOTICKS | WS_TABSTOP,39,31,109,12
+    CONTROL         "Slider1",IDC_CAMBERSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,39,31,109,12
     EDITTEXT        IDC_CAMBER,56,52,35,12,ES_RIGHT
-    CONTROL         "Slider1",IDC_THICKSLIDE,"msctls_trackbar32",
-                    TBS_AUTOTICKS | WS_TABSTOP,230,32,109,12
+    CONTROL         "Slider1",IDC_THICKSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,230,32,109,12
     EDITTEXT        IDC_THICKNESS,247,52,35,12,ES_RIGHT
-    CONTROL         "Slider1",IDC_XCAMBERSLIDE,"msctls_trackbar32",
-                    TBS_AUTOTICKS | WS_TABSTOP,39,81,109,12
+    CONTROL         "Slider1",IDC_XCAMBERSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,39,81,109,12
     EDITTEXT        IDC_XCAMBER,56,100,35,12,ES_RIGHT
-    CONTROL         "Slider1",IDC_XTHICKSLIDE,"msctls_trackbar32",
-                    TBS_AUTOTICKS | WS_TABSTOP,230,81,109,12
+    CONTROL         "Slider1",IDC_XTHICKSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,230,81,109,12
     EDITTEXT        IDC_XTHICKNESS,247,100,35,12,ES_RIGHT
     PUSHBUTTON      "Restore",IDC_RESTORE,103,146,43,14
     PUSHBUTTON      "OK",IDOK,167,146,43,14
@@ -1401,19 +1178,14 @@ FONT 8, "MS Sans Serif"
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,28,106,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,101,106,50,14
-    CONTROL         "Foil Setting",IDC_FOIL,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,97,16,76,10
-    CONTROL         "Foil Setting",IDC_BL,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    97,30,76,10
-    CONTROL         "Foil Setting",IDC_PRESSURE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,97,44,76,10
+    CONTROL         "Foil Setting",IDC_FOIL,"Button",BS_OWNERDRAW | WS_TABSTOP,97,16,76,10
+    CONTROL         "Foil Setting",IDC_BL,"Button",BS_OWNERDRAW | WS_TABSTOP,97,30,76,10
+    CONTROL         "Foil Setting",IDC_PRESSURE,"Button",BS_OWNERDRAW | WS_TABSTOP,97,44,76,10
     LTEXT           "Foil Style",IDC_STATIC,15,17,60,8
     LTEXT           "Pressure Distribution",IDC_STATIC,15,45,69,8
     LTEXT           "Boundary Layer",IDC_STATIC,15,31,60,8
-    CONTROL         "Neutral Line",IDC_NEUTRAL,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,15,72,60,8
-    CONTROL         "Neutral",IDC_NEUTRALSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,97,71,76,10
+    CONTROL         "Neutral Line",IDC_NEUTRAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,72,60,8
+    CONTROL         "Neutral",IDC_NEUTRALSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,97,71,76,10
 END
 
 IDD_FOILANALYSISDLG DIALOG  0, 0, 261, 254
@@ -1421,20 +1193,13 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Analysis"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Automatic",IDC_NAME1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,18,19,61,8
-    CONTROL         "User Defined",IDC_NAME2,"Button",BS_AUTORADIOBUTTON,147,
-                    19,61,8
-    EDITTEXT        IDC_NEWPLRNAME,19,36,225,12,ES_AUTOHSCROLL | 
-                    ES_WANTRETURN
-    CONTROL         "Type &1",IDC_TYPE1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,27,81,38,8
-    CONTROL         "Type &2",IDC_TYPE2,"Button",BS_AUTORADIOBUTTON,83,81,38,
-                    8
-    CONTROL         "Type &3",IDC_TYPE3,"Button",BS_AUTORADIOBUTTON,139,81,
-                    38,8
-    CONTROL         "Type &4",IDC_TYPE4,"Button",BS_AUTORADIOBUTTON,195,81,
-                    38,8
+    CONTROL         "Automatic",IDC_NAME1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,18,19,61,8
+    CONTROL         "User Defined",IDC_NAME2,"Button",BS_AUTORADIOBUTTON,147,19,61,8
+    EDITTEXT        IDC_NEWPLRNAME,19,36,225,12,ES_AUTOHSCROLL | ES_WANTRETURN
+    CONTROL         "Type &1",IDC_TYPE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,27,81,38,8
+    CONTROL         "Type &2",IDC_TYPE2,"Button",BS_AUTORADIOBUTTON,83,81,38,8
+    CONTROL         "Type &3",IDC_TYPE3,"Button",BS_AUTORADIOBUTTON,139,81,38,8
+    CONTROL         "Type &4",IDC_TYPE4,"Button",BS_AUTORADIOBUTTON,195,81,38,8
     EDITTEXT        IDC_REYNOLDS,79,116,46,12,ES_RIGHT
     EDITTEXT        IDC_MACH,204,116,35,12,ES_RIGHT
     EDITTEXT        IDC_NCRIT,204,164,35,12,ES_RIGHT
@@ -1456,8 +1221,7 @@ BEGIN
 END
 
 IDD_FLOWLINESDLG DIALOGEX 0, 0, 157, 166
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_TOOLWINDOW
 CAPTION "Stream Lines"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1465,12 +1229,9 @@ BEGIN
     EDITTEXT        IDC_NX,87,18,36,12,ES_RIGHT | ES_NUMBER
     EDITTEXT        IDC_DELTAL,87,34,36,12,ES_RIGHT
     EDITTEXT        IDC_XFACTOR,87,49,36,12,ES_RIGHT
-    CONTROL         "L.E.",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    12,82,29,10
-    CONTROL         "T.E.",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,50,82,29,
-                    10
-    CONTROL         "Spanwise line",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,
-                    88,82,59,10
+    CONTROL         "L.E.",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,82,29,10
+    CONTROL         "T.E.",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,50,82,29,10
+    CONTROL         "Spanwise line",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,88,82,59,10
     EDITTEXT        IDC_XOFFSET,77,97,36,12,ES_RIGHT
     EDITTEXT        IDC_ZOFFSET,77,113,36,12,ES_RIGHT
     DEFPUSHBUTTON   "Apply",IDC_APPLY,39,144,50,14
@@ -1491,13 +1252,11 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Flap Settings"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "L.E. Flap",IDC_LEFLAPCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,82,17,44,10
+    CONTROL         "L.E. Flap",IDC_LEFLAPCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,82,17,44,10
     EDITTEXT        IDC_LEFLAPANGLE,90,28,31,12,ES_RIGHT
     EDITTEXT        IDC_LEXHINGE,90,42,31,12,ES_RIGHT
     EDITTEXT        IDC_LEYHINGE,90,57,31,12,ES_RIGHT
-    CONTROL         "T.E. Flap",IDC_TEFLAPCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,137,18,45,10
+    CONTROL         "T.E. Flap",IDC_TEFLAPCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,18,45,10
     EDITTEXT        IDC_TEFLAPANGLE,143,29,31,12,ES_RIGHT
     EDITTEXT        IDC_TEXHINGE,143,43,31,12,ES_RIGHT
     EDITTEXT        IDC_TEYHINGE,143,58,31,12,ES_RIGHT
@@ -1516,14 +1275,11 @@ IDD_FINVCTRLBAR DIALOGEX 0, 0, 118, 341
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "Alfa",IDC_SPECAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    17,17,33,8
+    CONTROL         "Alfa",IDC_SPECAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,17,17,33,8
     CONTROL         "Cl",IDC_SPECCL,"Button",BS_AUTORADIOBUTTON,65,17,33,8
     EDITTEXT        IDC_SPECINV,68,29,33,12,ES_RIGHT
-    CONTROL         "Show Spline",IDC_SHOWSPLINE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,13,60,59,11
-    CONTROL         "New Spline",IDC_NEWSPLINE,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | WS_TABSTOP,18,83,81,11
+    CONTROL         "Show Spline",IDC_SHOWSPLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,60,59,11
+    CONTROL         "New Spline",IDC_NEWSPLINE,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,18,83,81,11
     PUSHBUTTON      "Apply Spline",IDC_APPLYSPLINE,18,94,81,11
     PUSHBUTTON      "Reset QSpec",IDC_QRESET,18,105,81,11
     PUSHBUTTON      "Perturb Cn",IDC_PERT,18,116,81,11
@@ -1532,8 +1288,7 @@ BEGIN
     EDITTEXT        IDC_TANGLE,68,202,33,12,ES_RIGHT
     EDITTEXT        IDC_TGAPDX,68,217,33,12,ES_RIGHT
     EDITTEXT        IDC_TGAPDY,68,232,33,12,ES_RIGHT
-    CONTROL         "Symmetric Foil",IDC_SYMM,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,26,249,63,8
+    CONTROL         "Symmetric Foil",IDC_SYMM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,26,249,63,8
     LTEXT           "T.E. Gap dx/c",IDC_STATIC,17,219,46,8
     LTEXT           "T.E. Angle",IDC_STATIC,17,204,46,8
     LTEXT           "T.E. Gap dy/c",IDC_STATIC,17,234,46,8
@@ -1544,11 +1299,9 @@ BEGIN
     LTEXT           "Output",IDC_OUTPUT,7,283,104,51,0,WS_EX_CLIENTEDGE
     EDITTEXT        IDC_FILTERPARAM,68,172,33,12,ES_RIGHT
     RTEXT           "Filter parameter",IDC_STATIC,13,174,49,8
-    CONTROL         "Smooth QSpec",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | 
-                    BS_PUSHLIKE | WS_TABSTOP,18,146,81,11
+    CONTROL         "Smooth QSpec",IDC_SMOOTH,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,18,146,81,11
     GROUPBOX        "Constraints",IDC_STATIC,7,192,104,71
-    CONTROL         "Spline tangent to curve",IDC_TANGENTSPLINE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,13,71,89,10
+    CONTROL         "Spline tangent to curve",IDC_TANGENTSPLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,89,10
 END
 
 IDD_EDITPLRDLG DIALOGEX 0, 0, 152, 233
@@ -1556,9 +1309,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Polar Modification"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LISTBOX         IDC_POINTLIST,7,23,59,202,LBS_NOINTEGRALHEIGHT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT | 
-                    WS_EX_LEFTSCROLLBAR
+    LISTBOX         IDC_POINTLIST,7,23,59,202,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT | WS_EX_LEFTSCROLLBAR
     PUSHBUTTON      "Delete Point",IDC_DELETEPT,95,18,50,14
     PUSHBUTTON      "Delete All",IDC_DELETEALL,95,47,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,94,76,50,14
@@ -1577,24 +1328,17 @@ BEGIN
     PUSHBUTTON      "Apply",IDC_APPLY,181,88,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,181,110,50,14
     DEFPUSHBUTTON   "OK",IDOK,181,132,50,14
-    CONTROL         "",IDC_COORDLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,7,158,216,WS_EX_RIGHT
+    CONTROL         "",IDC_COORDLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,7,7,158,216,WS_EX_RIGHT
 END
 
 IDD_DISPLAYBAR DIALOG  0, 0, 95, 97
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
-    CONTROL         "Show Pressure",IDC_SHOWPRESSURE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,11,13,67,8
-    CONTROL         "Show BL",IDC_SHOWBL,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,26,67,8
-    CONTROL         "Animate",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,11,38,67,8
-    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,9,56,79,16
+    CONTROL         "Show Pressure",IDC_SHOWPRESSURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,13,67,8
+    CONTROL         "Show BL",IDC_SHOWBL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,26,67,8
+    CONTROL         "Animate",IDC_ANIMATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,38,67,8
+    CONTROL         "Slider1",IDC_SPEED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,9,56,79,16
     LTEXT           "Slow",IDC_STATIC,7,81,20,9
     LTEXT           "Fast",IDC_STATIC,68,81,20,9
 END
@@ -1604,18 +1348,15 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Cp Scale"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Auto Adjust",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,30,31,52,10
-    CONTROL         "Fixed Range",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,30,
-                    46,52,10
+    CONTROL         "Auto Adjust",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,30,31,52,10
+    CONTROL         "Fixed Range",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,30,46,52,10
     EDITTEXT        IDC_MAX,76,61,40,12,ES_RIGHT
     EDITTEXT        IDC_MIN,76,79,40,12,ES_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,24,106,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,95,106,50,14
     LTEXT           "Min",IDC_STATIC,45,81,12,8
     LTEXT           "Max",IDC_STATIC,45,63,14,8
-    CONTROL         "Show Cp Scale",IDC_SHOWCPSCALE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,33,16,70,8
+    CONTROL         "Show Cp Scale",IDC_SHOWCPSCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,16,70,8
 END
 
 IDD_CLRDLG DIALOGEX 0, 0, 122, 113
@@ -1623,79 +1364,43 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     PUSHBUTTON      "Other...",IDC_OTHERCLR,7,96,108,10
-    CONTROL         "btn",IDC_CLR1,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR2,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR3,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR4,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR5,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR6,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,
-                    7,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR7,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR8,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,
-                    18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR9,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,
-                    18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR10,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    62,18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR11,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    80,18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR12,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    98,18,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR13,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR14,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    26,29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR15,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    44,29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR16,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    62,29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR17,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    80,29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR18,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    98,29,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR19,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR20,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    26,40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR21,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    44,40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR22,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    62,40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR23,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    80,40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR24,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    98,40,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR25,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    51,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR26,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    26,51,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR27,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    44,51,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR28,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    62,51,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR29,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    80,51,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR30,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    98,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR1,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR2,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR3,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR4,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR5,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR6,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,7,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR7,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR8,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR9,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR10,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR11,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR12,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,18,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR13,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR14,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR15,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR16,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR17,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR18,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,29,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR19,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR20,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR21,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR22,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR23,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR24,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,40,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR25,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR26,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR27,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR28,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR29,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,51,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR30,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,51,17,10,WS_EX_STATICEDGE
     LTEXT           "User Defined Colors :",IDC_STATIC,7,67,71,8
-    CONTROL         "btn",IDC_CLR31,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,
-                    77,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR32,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    26,77,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR33,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    44,77,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR34,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    62,77,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR35,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    80,77,17,10,WS_EX_STATICEDGE
-    CONTROL         "btn",IDC_CLR36,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,
-                    98,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR31,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,7,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR32,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,26,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR33,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,44,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR34,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,62,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR35,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,80,77,17,10,WS_EX_STATICEDGE
+    CONTROL         "btn",IDC_CLR36,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE,98,77,17,10,WS_EX_STATICEDGE
 END
 
 IDD_CADDDLG DIALOGEX 0, 0, 219, 215
@@ -1706,10 +1411,8 @@ BEGIN
     EDITTEXT        IDC_ANGTOL,75,28,40,12,ES_RIGHT,WS_EX_RIGHT
     EDITTEXT        IDC_FROM,75,68,40,12,ES_RIGHT,WS_EX_RIGHT
     EDITTEXT        IDC_TO,75,83,40,12,ES_RIGHT,WS_EX_RIGHT
-    CONTROL         "Uniform",IDC_UNIFORM,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,150,72,51,8
-    CONTROL         "ArcLength",IDC_UNIFORM2,"Button",BS_AUTORADIOBUTTON,150,
-                    83,51,8
+    CONTROL         "Uniform",IDC_UNIFORM,"Button",BS_AUTORADIOBUTTON | WS_GROUP,150,72,51,8
+    CONTROL         "ArcLength",IDC_UNIFORM2,"Button",BS_AUTORADIOBUTTON,150,83,51,8
     DEFPUSHBUTTON   "Apply Params",IDC_APPLY,21,129,50,14
     PUSHBUTTON      "Accept",IDOK,35,194,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,129,194,50,14
@@ -1731,42 +1434,32 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Batch Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Type &1",IDC_TYPE1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,13,18,39,8
-    CONTROL         "Type &2",IDC_TYPE2,"Button",BS_AUTORADIOBUTTON,63,18,39,
-                    8
-    CONTROL         "Type &3",IDC_TYPE3,"Button",BS_AUTORADIOBUTTON,113,18,
-                    39,8
-    CONTROL         "Type &4",IDC_TYPE4,"Button",BS_AUTORADIOBUTTON,163,18,
-                    39,8
-    CONTROL         "Range",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,28,61,37,10
-    CONTROL         "List",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,91,61,27,
-                    10
+    CONTROL         "Type &1",IDC_TYPE1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,18,39,8
+    CONTROL         "Type &2",IDC_TYPE2,"Button",BS_AUTORADIOBUTTON,63,18,39,8
+    CONTROL         "Type &3",IDC_TYPE3,"Button",BS_AUTORADIOBUTTON,113,18,39,8
+    CONTROL         "Type &4",IDC_TYPE4,"Button",BS_AUTORADIOBUTTON,163,18,39,8
+    CONTROL         "Range",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,28,61,37,10
+    CONTROL         "List",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,91,61,27,10
     PUSHBUTTON      "Edit List...",IDC_CREATELIST,141,59,60,14
     EDITTEXT        IDC_REMIN,64,91,42,12,ES_RIGHT
     EDITTEXT        IDC_REMAX,114,91,42,12,ES_RIGHT
     EDITTEXT        IDC_REINC,162,91,42,12,ES_RIGHT
     EDITTEXT        IDC_MACH,64,109,42,12,ES_RIGHT
-    CONTROL         "Alpha",IDC_ACL1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,
-                    50,145,34,8
+    CONTROL         "Alpha",IDC_ACL1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,50,145,34,8
     CONTROL         "Cl",IDC_ACL2,"Button",BS_AUTORADIOBUTTON,90,145,22,8
-    CONTROL         "From Zero",IDC_FROMZERO,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,150,144,48,10
+    CONTROL         "From Zero",IDC_FROMZERO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,150,144,48,10
     EDITTEXT        IDC_SPMIN,58,174,36,12,ES_RIGHT
     EDITTEXT        IDC_SPMAX,103,174,36,12,ES_RIGHT
     EDITTEXT        IDC_SPINC,148,174,36,12,ES_RIGHT
     EDITTEXT        IDC_NCRIT,162,215,35,12,ES_RIGHT
     EDITTEXT        IDC_XTRIP1,162,229,35,12,ES_RIGHT
     EDITTEXT        IDC_XTRIP2,162,243,35,12,ES_RIGHT
-    CONTROL         "Initialize BL between polars",IDC_INITBL,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,306,9,103,9
+    CONTROL         "Initialize BL between polars",IDC_INITBL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,306,9,103,9
     PUSHBUTTON      "Skip &OpPoint",IDC_SKIPPOINT,290,251,50,14
     PUSHBUTTON      "Skip &Polar",IDC_SKIPPOLAR,356,251,50,14
     DEFPUSHBUTTON   "Analy&ze",IDC_ANALYSIS,226,251,50,14
     PUSHBUTTON      "&Close",IDC_CLOSE,191,276,50,14
-    EDITTEXT        IDC_OUTPUT,220,24,192,68,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_READONLY | WS_VSCROLL
+    EDITTEXT        IDC_OUTPUT,220,24,192,68,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
     RTEXT           "&Mach",IDC_MATYP,13,111,42,8
     GROUPBOX        "Analysis Type",IDC_STATIC,7,4,203,34
     GROUPBOX        "Batch Variables",IDC_STATIC,7,47,203,81
@@ -1786,10 +1479,8 @@ BEGIN
     RTEXT           "Trip Location (&Top) =",IDC_STATIC,82,231,74,8
     RTEXT           "Trip Location (&Bottom) =",IDC_STATIC,82,245,74,8
     GROUPBOX        "Transitions",IDC_STATIC,7,203,203,62
-    CONTROL         "IterGraph",IDC_ITERGRAPH,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,220,98,192,145
-    CONTROL         "Show text output",IDC_SHOWTEXTOUTPUT,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,224,9,69,10
+    CONTROL         "IterGraph",IDC_ITERGRAPH,"Button",BS_OWNERDRAW | WS_TABSTOP,220,98,192,145
+    CONTROL         "Show text output",IDC_SHOWTEXTOUTPUT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,224,9,69,10
 END
 
 IDD_BACKDLG DIALOG  0, 0, 222, 117
@@ -1797,12 +1488,9 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
     LTEXT           "Graph Background",IDC_STATIC,38,27,73,8
-    CONTROL         "Button1",IDC_GRAPHCLR,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,118,24,77,14
-    CONTROL         "Graph Border :",IDC_GRAPHBORDER,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,38,51,70,12
-    CONTROL         "Graph Border",IDC_BORDERSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,116,53,81,10
+    CONTROL         "Button1",IDC_GRAPHCLR,"Button",BS_OWNERDRAW | WS_TABSTOP,118,24,77,14
+    CONTROL         "Graph Border :",IDC_GRAPHBORDER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,38,51,70,12
+    CONTROL         "Graph Border",IDC_BORDERSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,116,53,81,10
 END
 
 IDD_AGRIDDLG DIALOGEX 0, 0, 214, 175
@@ -1812,52 +1500,34 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,39,154,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,128,154,50,14
-    CONTROL         "Show Axis",IDC_NEUTRALCHECK,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,27,56,8
-    CONTROL         "Button2",IDC_NEUTRALLINE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,98,26,61,11
+    CONTROL         "Show Axis",IDC_NEUTRALCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,27,56,8
+    CONTROL         "Button2",IDC_NEUTRALLINE,"Button",BS_OWNERDRAW | WS_TABSTOP,98,26,61,11
     GROUPBOX        "Grid",IDC_STATIC,6,41,201,98
-    CONTROL         "X Main Grid",IDC_XMAINGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,61,58,8
-    CONTROL         "Y Main Grid",IDC_YMAINGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,76,58,8
-    CONTROL         "X Minor grid",IDC_XMINORGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,103,58,8
-    CONTROL         "Y Minor Grid",IDC_YMINORGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,119,58,8
-    CONTROL         "Button3",IDC_XGRIDSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,95,59,56,11
-    CONTROL         "Button3",IDC_YGRIDSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,95,76,56,11
-    CONTROL         "Button3",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,102,56,11
-    CONTROL         "Button3",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,94,118,56,11
+    CONTROL         "X Main Grid",IDC_XMAINGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,61,58,8
+    CONTROL         "Y Main Grid",IDC_YMAINGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,76,58,8
+    CONTROL         "X Minor grid",IDC_XMINORGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,103,58,8
+    CONTROL         "Y Minor Grid",IDC_YMINORGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,119,58,8
+    CONTROL         "Button3",IDC_XGRIDSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,95,59,56,11
+    CONTROL         "Button3",IDC_YGRIDSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,95,76,56,11
+    CONTROL         "Button3",IDC_XMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,102,56,11
+    CONTROL         "Button3",IDC_YMINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,94,118,56,11
     LTEXT           "Unit",IDC_STATIC,168,49,21,8
     EDITTEXT        IDC_XUNIT,166,59,31,12,ES_RIGHT
     EDITTEXT        IDC_YUNIT,166,75,31,12,ES_RIGHT
     EDITTEXT        IDC_XMINORUNIT,166,101,31,12,ES_RIGHT
     EDITTEXT        IDC_YMINORUNIT,166,117,31,12,ES_RIGHT
-    CONTROL         "Show scale",IDC_SCALE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,14,70,8
+    CONTROL         "Show scale",IDC_SCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,14,70,8
 END
 
 IDD_AFOILCTRLBAR DIALOGEX 0, 0, 432, 124
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_FOILLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_CLIPSIBLINGS | 
-                    WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,0,0,312,124,
-                    WS_EX_RIGHT
-    CONTROL         "Foil Color",IDC_FOILCOLOR,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,350,61,66,10
-    CONTROL         "Show Foil",IDC_VISIBLE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,349,26,67,8
-    CONTROL         "Show Points",IDC_MODELPOINTS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,349,37,67,8
-    CONTROL         "Show Centerline",IDC_CENTERLINE,"Button",
-                    BS_AUTOCHECKBOX | WS_TABSTOP,349,48,67,10
+    CONTROL         "",IDC_FOILLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,0,0,312,124,WS_EX_RIGHT
+    CONTROL         "Show Foil",IDC_VISIBLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,349,26,67,8
+    CONTROL         "Show Points",IDC_MODELPOINTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,349,37,67,8
+    CONTROL         "Show Centerline",IDC_CENTERLINE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,349,48,67,10
+    CONTROL         "Foil Color",IDC_FOILCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,350,61,66,10
     PUSHBUTTON      "Rename",IDC_RENAME,349,73,52,14
     PUSHBUTTON      "Delete",IDC_DELETE,349,89,52,14
     PUSHBUTTON      "Duplicate",IDC_DUPLICATE,349,105,52,14
@@ -1870,9 +1540,8 @@ FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_VACCEL,145,13,32,12,ES_RIGHT
     EDITTEXT        IDC_ITERLIM,145,34,32,12,ES_RIGHT | ES_NUMBER
-    CONTROL         "Re-Initialize BLs after an unconverged iteration",
-                    IDC_INITBL,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | 
-                    BS_RIGHT | WS_TABSTOP,14,55,163,10
+    CONTROL         "Re-Initialize BLs after an unconverged iteration",IDC_INITBL,
+                    "Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | WS_TABSTOP,14,55,163,10
     DEFPUSHBUTTON   "OK",IDOK,29,88,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,115,88,50,14
     RTEXT           "VAccel :",IDC_STATIC,89,15,51,8
@@ -1885,45 +1554,32 @@ CAPTION "About XFLR5"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,10,20,20
-    LTEXT           "XFLR5_v4.08_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
+    LTEXT           "XFLR5_v4.12_Beta",IDC_STATIC,41,14,175,8,SS_NOPREFIX
     DEFPUSHBUTTON   "OK",IDOK,105,219,50,14,WS_GROUP
-    LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",
-                    IDC_STATIC,10,42,185,8
-    LTEXT           "Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00",
-                    IDC_STATIC,10,53,164,8
-    LTEXT           "but WITHOUT ANY WARRANTY; without even the implied warranty of",
-                    IDC_STATIC,10,96,232,8
+    LTEXT           "Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94",IDC_STATIC,10,42,185,8
+    LTEXT           "Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00",IDC_STATIC,10,53,164,8
+    LTEXT           "but WITHOUT ANY WARRANTY; without even the implied warranty of",IDC_STATIC,10,96,232,8
     LTEXT           "http://xflr5.sourceforge.net",IDC_SLINK,10,189,98,9
-    LTEXT           "This program is distributed in the hope that it will be useful,",
-                    IDC_STATIC,10,86,230,8
-    LTEXT           "Copyright (C) André Deperrois 2003-2008",IDC_STATIC,10,
-                    64,130,8
-    LTEXT           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
-                    IDC_STATIC,10,107,234,8
-    LTEXT           "Program distributed  under the terms of the GNU General Public License",
-                    IDC_STATIC,10,170,232,8
-    LTEXT           "This program has been developped exclusively for the analysis of model aircraft",
-                    IDC_STATIC,8,129,248,8
-    LTEXT           "Any other usage is strongly disapproved",IDC_STATIC,8,
-                    138,230,8
+    LTEXT           "This program is distributed in the hope that it will be useful,",IDC_STATIC,10,86,230,8
+    LTEXT           "Copyright (C) André Deperrois 2003-2008",IDC_STATIC,10,64,130,8
+    LTEXT           "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",IDC_STATIC,10,107,234,8
+    LTEXT           "Program distributed  under the terms of the GNU General Public License",IDC_STATIC,10,170,232,8
+    LTEXT           "This program has been developped exclusively for the analysis of model aircraft",IDC_STATIC,8,129,248,8
+    LTEXT           "Any other usage is strongly disapproved",IDC_STATIC,8,138,230,8
 END
 
 IDD_3DPANELDLG DIALOGEX 0, 0, 310, 210
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Panel Method Analysis"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     PUSHBUTTON      "&Cancel Analysis",IDC_CANCEL,111,189,60,14
-    EDITTEXT        IDC_OUTPUT,7,7,296,154,ES_MULTILINE | ES_AUTOVSCROLL | 
-                    ES_READONLY | WS_VSCROLL
-    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,12,170,291,
-                    9
+    EDITTEXT        IDC_OUTPUT,7,7,296,154,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,12,170,291,9
 END
 
 IDD_WAKEPARAMSDLG DIALOGEX 0, 0, 215, 93
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wake Parameters"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -1932,8 +1588,7 @@ BEGIN
     EDITTEXT        IDC_WAKEPANELFACTOR,129,40,34,12,ES_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,44,72,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,118,72,50,14
-    RTEXT           "Number of panels in a wake column",IDC_STATIC,7,10,114,
-                    8
+    RTEXT           "Number of panels in a wake column",IDC_STATIC,7,10,114,8
     RTEXT           "Total Wake Length",IDC_STATIC,49,26,61,8
     LTEXT           "x M.A.C.",IDC_STATIC,165,26,30,8
     RTEXT           "Geom. progression factor",IDC_STATIC,24,42,97,8
@@ -1943,8 +1598,7 @@ IDD_SPANPOSBAR DIALOGEX 0, 0, 90, 70
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CHILD
 FONT 8, "MS Sans Serif", 400, 0, 0x0
 BEGIN
-    CONTROL         "",IDC_SPANSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | 
-                    WS_TABSTOP,7,7,75,12
+    CONTROL         "",IDC_SPANSLIDE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,7,7,75,12
     EDITTEXT        IDC_SPANPOS,22,30,27,13,ES_RIGHT
     LTEXT           "-b",IDC_STATIC,7,21,8,8
     LTEXT           "+b",IDC_STATIC,73,21,9,8
@@ -1957,56 +1611,40 @@ IDD_BODYCTRLBAR DIALOGEX 0, 0, 520, 102
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    COMBOBOX        IDC_BODYLIST,6,4,170,85,CBS_DROPDOWNLIST | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP
-    CONTROL         "BodyColor",IDC_BODYCOLOR,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,116,22,60,10
-    CONTROL         "Flat Panels",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,7,26,53,11
-    CONTROL         "B-Splines",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,7,39,
-                    49,11
-    COMBOBOX        IDC_XDEGREE,32,67,29,56,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
+    COMBOBOX        IDC_BODYLIST,6,4,170,85,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "BodyColor",IDC_BODYCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,116,22,60,10
+    CONTROL         "Flat Panels",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,26,53,11
+    CONTROL         "B-Splines",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,7,39,49,11
+    COMBOBOX        IDC_XDEGREE,32,67,29,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
     EDITTEXT        IDC_NXPANELS,32,81,28,12,ES_RIGHT,WS_EX_RIGHT
     EDITTEXT        IDC_NHPANELS,68,81,28,12,ES_RIGHT,WS_EX_RIGHT
-    CONTROL         "",IDC_FRAMELIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,190,0,156,97,WS_EX_RIGHT
-    CONTROL         "",IDC_FRAMEPOINTS,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,357,0,156,97,WS_EX_RIGHT
+    CONTROL         "",IDC_FRAMELIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,190,0,156,97,WS_EX_RIGHT
+    CONTROL         "",IDC_FRAMEPOINTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,357,0,156,97,WS_EX_RIGHT
     LTEXT           "Panels",IDC_STATIC,5,83,22,8
     LTEXT           "x",IDC_STATIC,43,55,8,8
     LTEXT           "hoop",IDC_STATIC,72,55,17,8
-    COMBOBOX        IDC_HOOPDEGREE,68,67,29,56,CBS_DROPDOWN | CBS_SORT | 
-                    WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
+    COMBOBOX        IDC_HOOPDEGREE,68,67,29,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,WS_EX_RIGHT
     LTEXT           "Degree",IDC_STATIC,4,69,23,8
-    CONTROL         "Locked by results",IDC_LOCKED,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,108,38,71,10
+    CONTROL         "Locked by results",IDC_LOCKED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,108,38,71,10
 END
 
-IDD_BODYSCALEDLG DIALOGEX 0, 0, 176, 162
+IDD_BODYSCALEDLG DIALOGEX 0, 0, 209, 162
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Body Scale"
+CAPTION "Scale Body"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    CONTROL         "Whole Body",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,9,19,66,11
-    CONTROL         "Frame Only",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,9,30,
-                    66,11
-    EDITTEXT        IDC_FRAMEID,86,29,38,13,ES_AUTOHSCROLL | ES_NUMBER,
-                    WS_EX_RIGHT
-    EDITTEXT        IDC_XFACTOR,84,70,40,13,ES_RIGHT
-    EDITTEXT        IDC_YFACTOR,84,88,40,13,ES_RIGHT
-    EDITTEXT        IDC_ZFACTOR,84,105,40,13,ES_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,23,140,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,95,140,50,14
-    RTEXT           "Scale Factor",IDC_STATIC,82,53,43,8
-    LTEXT           "x scale",IDC_STATIC,38,71,30,11
-    LTEXT           "y scale",IDC_STATIC,38,89,30,11
-    LTEXT           "z scale",IDC_STATIC,39,106,30,11
+    CONTROL         "Whole Body",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,9,19,66,11
+    CONTROL         "Frame Only",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,9,30,66,11
+    EDITTEXT        IDC_FRAMEID,80,29,38,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_XFACTOR,120,69,40,13,ES_RIGHT
+    EDITTEXT        IDC_YFACTOR,120,87,40,13,ES_RIGHT
+    EDITTEXT        IDC_ZFACTOR,120,104,40,13,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,42,140,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,114,140,50,14
+    RTEXT           "Scale Factor",IDC_STATIC,116,51,43,8
+    LTEXT           "x scale",IDC_STATIC,54,71,30,11
+    LTEXT           "y scale",IDC_STATIC,54,89,30,11
+    LTEXT           "z scale",IDC_STATIC,54,106,30,11
 END
 
 IDD_BGRIDDLG DIALOGEX 0, 0, 197, 222
@@ -2017,55 +1655,41 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,32,201,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,119,201,50,14
     GROUPBOX        "Body",IDC_STATIC,9,34,181,62
-    CONTROL         "Main Grid",IDC_MAINGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,55,54,8
-    CONTROL         "Minor Grid",IDC_MINORGRID,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,77,54,8
-    CONTROL         "Button3",IDC_MINSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,76,41,11
+    CONTROL         "Main Grid",IDC_MAINGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,55,54,8
+    CONTROL         "Minor Grid",IDC_MINORGRID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,77,54,8
+    CONTROL         "Button3",IDC_MINSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,76,41,11
     LTEXT           "Unit",IDC_STATIC,131,43,21,8
     EDITTEXT        IDC_UNIT,125,53,31,12,ES_RIGHT
     EDITTEXT        IDC_MINORUNIT,125,75,31,12,ES_RIGHT
-    CONTROL         "Show scales",IDC_SCALE,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,14,14,70,8
+    CONTROL         "Show scales",IDC_SCALE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,14,70,8
     LTEXT           "Static",IDC_LENGTH1,163,55,23,9
     LTEXT           "Static",IDC_LENGTH2,163,77,23,9
     GROUPBOX        "Frame",IDC_STATIC,9,118,181,60
-    CONTROL         "MainGrid",IDC_MAINGRID2,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,139,54,8
-    CONTROL         "Minor Grid",IDC_MINORGRID2,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,16,158,54,8
-    CONTROL         "Button3",IDC_GRIDSTYLE2,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,137,41,11
-    CONTROL         "Button3",IDC_MINSTYLE2,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,157,41,11
+    CONTROL         "MainGrid",IDC_MAINGRID2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,139,54,8
+    CONTROL         "Minor Grid",IDC_MINORGRID2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,158,54,8
+    CONTROL         "Button3",IDC_GRIDSTYLE2,"Button",BS_OWNERDRAW | WS_TABSTOP,75,137,41,11
+    CONTROL         "Button3",IDC_MINSTYLE2,"Button",BS_OWNERDRAW | WS_TABSTOP,75,157,41,11
     LTEXT           "Unit",IDC_STATIC,131,126,21,8
     EDITTEXT        IDC_UNIT2,125,137,31,12,ES_RIGHT
     EDITTEXT        IDC_MINORUNIT2,125,155,31,12,ES_RIGHT
     LTEXT           "Static",IDC_LENGTH3,161,138,23,9
     LTEXT           "Static",IDC_LENGTH4,161,157,23,9
-    CONTROL         "Button3",IDC_GRIDSTYLE,"Button",BS_OWNERDRAW | 
-                    WS_TABSTOP,75,54,41,11
+    CONTROL         "Button3",IDC_GRIDSTYLE,"Button",BS_OWNERDRAW | WS_TABSTOP,75,54,41,11
 END
 
 IDD_BODYNURBSDLG DIALOGEX 0, 0, 186, 142
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Body NURBS"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    EDITTEXT        IDC_XINTERVAL,121,38,36,13,ES_AUTOHSCROLL | ES_NUMBER,
-                    WS_EX_RIGHT
-    EDITTEXT        IDC_HOOPRESOLUTION,121,58,36,13,ES_AUTOHSCROLL | 
-                    ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_XINTERVAL,121,38,36,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_HOOPRESOLUTION,121,58,36,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,34,121,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,103,121,50,14
-    LTEXT           "The following parameters will be used for the display and for the export of the NURBS body surface",
-                    IDC_STATIC,7,7,172,27
+    LTEXT           "The following parameters will be used for the display and for the export of the NURBS body surface",IDC_STATIC,7,7,172,27
     LTEXT           "Points in the x directions",IDC_STATIC,25,41,79,8
     LTEXT           "Points in the hoop direction",IDC_STATIC,16,59,88,8
-    LTEXT           "Note : A high number of points will lead to a slow display and a large export file",
-                    IDC_STATIC,7,86,172,20
+    LTEXT           "Note : A high number of points will lead to a slow display and a large export file",IDC_STATIC,7,86,172,20
 END
 
 IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 324
@@ -2074,24 +1698,16 @@ CAPTION "Control Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_WPOLARNAME,76,22,238,13,ES_AUTOHSCROLL
-    CONTROL         "Type 5 (Fixed Speed)",IDC_WTYPE5,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,16,66,83,10
-    CONTROL         "Type 6 (Fixed Lift)",IDC_WTYPE6,"Button",
-                    BS_AUTORADIOBUTTON,106,66,72,10
-    CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,81,47,8
+    CONTROL         "Type 5 (Fixed Speed)",IDC_WTYPE5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,16,66,83,10
+    CONTROL         "Type 6 (Fixed Lift)",IDC_WTYPE6,"Button",BS_AUTORADIOBUTTON,106,66,72,10
+    CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,81,47,8
     EDITTEXT        IDC_QINF,81,95,40,12,ES_RIGHT
     EDITTEXT        IDC_WEIGHT,80,110,40,12,ES_RIGHT
-    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,202,62,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,260,62,
-                    39,8
+    CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,202,62,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,260,62,39,8
     EDITTEXT        IDC_DENSITY,225,77,41,12,ES_RIGHT
     EDITTEXT        IDC_VISCOSITY,225,94,41,12,ES_RIGHT
-    CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | 
-                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
-                    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,126,308,140,WS_EX_RIGHT
+    CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_TABSTOP,7,126,308,140,WS_EX_RIGHT
     DEFPUSHBUTTON   "OK",IDOK,80,302,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,194,302,50,14
     LTEXT           "Wing Name",IDC_WINGNAME,9,11,247,8
@@ -2103,14 +1719,43 @@ BEGIN
     LTEXT           "Polar Name",IDC_STATIC,9,23,61,11
     LTEXT           "Polar Type = 5",IDC_STATIC,9,36,72,11
     LTEXT           "Analysis is VLM1",IDC_STATIC,9,50,54,8
-    LTEXT           "Note 1 : if the control for XCmRef is inactive, then the minimum value will be used for the analysis",
-                    IDC_STATIC,7,270,304,8
-    LTEXT           "Note 2 : the analysis may be of the viscous type only if all flap controls are inactive",
-                    IDC_STATIC,7,281,304,8
+    LTEXT           "Note 1 : if the control for XCmRef is inactive, then the minimum value will be used for the analysis",IDC_STATIC,7,270,304,8
+    LTEXT           "Note 2 : the analysis may be of the viscous type only if all flap controls are inactive",IDC_STATIC,7,281,304,8
     LTEXT           "Free Stream Speed",IDC_STATIC,13,96,61,8
     LTEXT           "m/s",IDC_SPEEDUNIT,129,96,20,8
     RTEXT           "Plane Weight",IDC_STATIC,18,112,55,8
     LTEXT           "kg",IDC_WEIGHTUNIT,128,112,20,8
+END
+
+IDD_BODYTRANSDLG DIALOGEX 0, 0, 201, 162
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Translate Body"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    CONTROL         "Whole Body",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,9,19,66,11
+    CONTROL         "Frame Only",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,9,30,66,11
+    EDITTEXT        IDC_FRAMEID,80,29,38,13,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    EDITTEXT        IDC_XTRANS,76,69,40,13,ES_RIGHT
+    EDITTEXT        IDC_YTRANS,76,86,40,13,ES_RIGHT
+    EDITTEXT        IDC_ZTRANS,76,104,40,13,ES_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,42,140,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,114,140,50,14
+    LTEXT           "x scale",-1,37,71,30,11
+    LTEXT           "y scale",-1,37,89,30,11
+    LTEXT           "z scale",-1,37,106,30,11
+    RTEXT           "Translation",-1,72,51,43,8
+    LTEXT           "Static",IDC_LENGTH1,123,70,30,10
+    LTEXT           "Static",IDC_LENGTH2,123,87,30,10
+    LTEXT           "Static",IDC_LENGTH3,123,105,30,10
+END
+
+IDD_VIEWBITMAP DIALOGEX 0, 0, 471, 330
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "View Bitmap"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,414,309,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,414,309,50,14
 END
 
 
@@ -2206,7 +1851,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 343
         TOPMARGIN, 7
-        BOTTOMMARGIN, 235
+        BOTTOMMARGIN, 263
     END
 
     IDD_W3DBAR, DIALOG
@@ -2238,7 +1883,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 267
         TOPMARGIN, 6
-        BOTTOMMARGIN, 298
+        BOTTOMMARGIN, 309
     END
 
     IDD_UNITSDLG, DIALOG
@@ -2363,10 +2008,10 @@ BEGIN
 
     IDD_PLANEDLG, DIALOG
     BEGIN
-        LEFTMARGIN, 7
+        LEFTMARGIN, 6
         RIGHTMARGIN, 335
         TOPMARGIN, 7
-        BOTTOMMARGIN, 287
+        BOTTOMMARGIN, 330
     END
 
     IDD_PERTDLG, DIALOG
@@ -2465,12 +2110,12 @@ BEGIN
         BOTTOMMARGIN, 69
     END
 
-    IDD_ITERDLG, DIALOG
+    IDD_LLTDLG, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 315
         TOPMARGIN, 7
-        BOTTOMMARGIN, 222
+        BOTTOMMARGIN, 321
     END
 
     IDD_INVCOLORDLG, DIALOG
@@ -2486,7 +2131,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 321
         TOPMARGIN, 7
-        BOTTOMMARGIN, 199
+        BOTTOMMARGIN, 218
     END
 
     IDD_IMPORTWINGDLG, DIALOG
@@ -2710,7 +2355,7 @@ BEGIN
 
     IDD_BODYSCALEDLG, DIALOG
     BEGIN
-        RIGHTMARGIN, 169
+        RIGHTMARGIN, 202
         TOPMARGIN, 7
         BOTTOMMARGIN, 154
     END
@@ -2737,6 +2382,21 @@ BEGIN
         RIGHTMARGIN, 315
         TOPMARGIN, 7
         BOTTOMMARGIN, 316
+    END
+
+    IDD_BODYTRANSDLG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 194
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 154
+    END
+
+    IDD_VIEWBITMAP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 464
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 323
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -2858,12 +2518,10 @@ BEGIN
                 MENUITEM "Refine &Locally (CADD)",      32870
                 MENUITEM "Refine &Globally (PANEL)",    32869
                 MENUITEM "Edit Coordinates",            33056
-                MENUITEM "&Interpolate Foils (INTE)",   32915
                 MENUITEM "&Scale Camber and Thickness", 32914
                 MENUITEM "Set T.E. Gap (TGAP)",         33049
                 MENUITEM "Scale L.E. Radius (LERAD)",   33050
                 MENUITEM "Set Flap",                    33057
-                MENUITEM "Naca Foils",                  33070
             END
             MENUITEM SEPARATOR
             MENUITEM "Show Associated Polars",      IDM_SHOWPOLARS
@@ -2877,10 +2535,14 @@ BEGIN
             MENUITEM "Edit...",                     IDM_EDITPLR
             MENUITEM "&Rename...",                  IDM_XFLR5_RENAMEPLR
             MENUITEM "&Export...",                  IDM_XFLR5_EXPORTPLR
+            MENUITEM "&Export OpPoints",            IDM_XFLR5_EXPORTOPPOINTS
             MENUITEM "&Delete...",                  IDM_XFLR5_DELETEPLR
             MENUITEM "Delete Associated &OpPoints", IDM_XFLR5_DELETEOPP
             MENUITEM "Reset...",                    IDM_PRESET
         END
+        MENUITEM SEPARATOR
+        MENUITEM "&Interpolate Foils (INTE)",   32915
+        MENUITEM "Naca Foils",                  33070
         MENUITEM SEPARATOR
         MENUITEM "Polar Filter",                IDM_XFLR5_POLARFILTER
         MENUITEM "Show All Polars",             IDM_SHOWALLPOLARS
@@ -2898,20 +2560,16 @@ BEGIN
             MENUITEM "Duplicate...",                IDM_DUPLICATEFOIL
             MENUITEM "&Delete...",                  IDM_REMOVEFOIL
             MENUITEM "&Export foil...",             IDM_EXPORTFOIL
-            POPUP "&Design"
-            BEGIN
-                MENUITEM "Normalize",                   32996
-                MENUITEM "De-rotate (DERO)",            32999
-                MENUITEM "Refine &Locally (CADD)",      32870
-                MENUITEM "Refine &Globally (PANEL)",    32869
-                MENUITEM "Edit Coordinates",            33056
-                MENUITEM "&Interpolate Foils (INTE)",   32915
-                MENUITEM "&Scale Camber and Thickness", 32914
-                MENUITEM "Set T.E. Gap (TGAP)",         33049
-                MENUITEM "Scale L.E. Radius (LERAD)",   33050
-                MENUITEM "Set Flap",                    33057
-                MENUITEM "Naca Foils",                  33070
-            END
+            MENUITEM SEPARATOR
+            MENUITEM "Normalize",                   32996
+            MENUITEM "De-rotate (DERO)",            32999
+            MENUITEM "Refine &Locally (CADD)",      32870
+            MENUITEM "Refine &Globally (PANEL)",    32869
+            MENUITEM "Edit Coordinates",            33056
+            MENUITEM "&Scale Camber and Thickness", 32914
+            MENUITEM "Set T.E. Gap (TGAP)",         33049
+            MENUITEM "Scale L.E. Radius (LERAD)",   33050
+            MENUITEM "Set Flap",                    33057
             MENUITEM SEPARATOR
             MENUITEM "Show Associated OpPoints",    IDM_SHOWFOILOPPS
             MENUITEM "Hide Associated OpPoints",    IDM_HIDEFOILOPPS
@@ -2937,6 +2595,9 @@ BEGIN
             MENUITEM "Export...",                   IDM_EXPORTCUROPP
             MENUITEM "&Delete...",                  IDM_DELCUROPP
         END
+        MENUITEM SEPARATOR
+        MENUITEM "&Interpolate Foils (INTE)",   32915
+        MENUITEM "Naca Foils",                  33070
         MENUITEM SEPARATOR
         MENUITEM "Show Current Opp Only",       IDM_SHOWCUROPP
         MENUITEM "Show All Operating Points",   33190
@@ -3021,9 +2682,9 @@ BEGIN
             MENUITEM "Save as project...",          IDM_SAVEWING
             MENUITEM "Export to AVL...",            IDM_EXPORTWING
             MENUITEM SEPARATOR
-            MENUITEM "Define Analysis\t(F6)",       IDM_WANALYSIS
+            MENUITEM "Define an Analysis\t(F6)",    IDM_WANALYSIS
             MENUITEM "Delete...",                   IDM_DELETEWING
-            MENUITEM "Delete Polars...",            IDM_DELETEWPOLARS
+            MENUITEM "Delete All Polars...",        IDM_DELETEWPOLARS
             MENUITEM "Delete All OpPoints",         IDM_DELALLWOPPS
             MENUITEM SEPARATOR
             MENUITEM "Hide All Polars",             IDM_WNGHIDEALL
@@ -3086,9 +2747,10 @@ BEGIN
             MENUITEM "Export to AVL...",            IDM_EXPORTWING
             MENUITEM "Export VLM Panels...",        33251
             MENUITEM SEPARATOR
-            MENUITEM "Define Analysis\t(F6)",       IDM_WANALYSIS
+            MENUITEM "Define an Analysis\t(F6)",    IDM_WANALYSIS
+            MENUITEM "Define a Control Analysis\t(Ctrl+F6)", 33321
             MENUITEM "Delete...",                   IDM_DELETEWING
-            MENUITEM "Delete Polars...",            IDM_DELETEWPOLARS
+            MENUITEM "Delete All Polars...",        IDM_DELETEWPOLARS
             MENUITEM "Delete All OpPoints",         IDM_DELALLWOPPS
             MENUITEM SEPARATOR
             MENUITEM "Hide All Polars",             IDM_WNGHIDEALL
@@ -3144,8 +2806,9 @@ BEGIN
             MENUITEM "Export to AVL...",            IDM_EXPORTWING
             MENUITEM "Export VLM Panels...",        33251
             MENUITEM SEPARATOR
-            MENUITEM "Define Analysis\t(F6)",       IDM_WANALYSIS
-            MENUITEM "Delete Polars...",            IDM_DELETEWPOLARS
+            MENUITEM "Define an Analysis\t(F6)",    IDM_WANALYSIS
+            MENUITEM "Define a Control Analysis\t(Ctrl+F6)", 33321
+            MENUITEM "Delete All Polars...",        IDM_DELETEWPOLARS
             MENUITEM "Hide All Polars",             IDM_WNGHIDEALL
             MENUITEM "Show All Polars",             IDM_WNGSHOWALL
         END
@@ -3219,9 +2882,19 @@ IDR_CTXDESIGNMENU MENU
 BEGIN
     POPUP "Design"
     BEGIN
-        MENUITEM "Edit Ctrl Points",            33263
-        MENUITEM "Delete Ctrl Point \t(Shift + LeftClick)", IDM_DELETEPOINT
-        MENUITEM "Insert Ctrl Point \t(Ctrl + Left Click)", IDM_ADDPOINT
+        POPUP "Splines"
+        BEGIN
+            MENUITEM "&New Splines",                IDM_AFOIL_NEWSPLINES
+            MENUITEM "Spline Controls \t(F6)",      33195
+            MENUITEM "Edit Ctrl Points",            33263
+            MENUITEM SEPARATOR
+            MENUITEM "Insert Ctrl Point \t(Ctrl + Left Click)", IDM_ADDPOINT
+            MENUITEM "Delete Ctrl Point \t(Shift + LeftClick)", IDM_DELETEPOINT
+            MENUITEM SEPARATOR
+            MENUITEM "&Export to Foil File",        IDM_AFOIL_EXPORTSPLINES
+            MENUITEM "Export Splines to Foil Database", IDM_EXPORTTOAPP
+            MENUITEM "&Save Splines\t(Ctrl+E)",     IDM_AFOIL_SFSAVE
+        END
         MENUITEM SEPARATOR
         POPUP "Current Foil"
         BEGIN
@@ -3238,17 +2911,18 @@ BEGIN
             MENUITEM "Refine &Locally (CADD)",      IDM_CADD
             MENUITEM "Refine &Globally (PANEL)",    IDM_PANEL
             MENUITEM "Edit Coordinates",            IDM_EDITCOORD
-            MENUITEM "&Interpolate Foils (INTE)",   IDM_INTERPOLATE
             MENUITEM "&Scale Camber and Thickness", IDM_GEOM
             MENUITEM "Set T.E. Gap (TGAP)",         IDM_TEGAP
             MENUITEM "Scale L.E. Radius (LERAD)",   IDM_LERAD
             MENUITEM "Set Flap",                    IDM_SETFLAP
         END
         MENUITEM SEPARATOR
+        MENUITEM "&Interpolate Foils (INTE)",   IDM_INTERPOLATE
+        MENUITEM "Naca Foils",                  IDM_NACAFOILS
+        MENUITEM SEPARATOR
         MENUITEM "Show All Foils",              IDM_SHOWALLFOILS
         MENUITEM "Hide All Foils",              IDM_HIDEALLFOILS
         MENUITEM SEPARATOR
-        MENUITEM "Spline Controls \t(F6)",      33195
         MENUITEM "Reset Scales",                IDM_RESETVIEW
         MENUITEM "Reset Y/X ratio",             IDM_RESETYSCALE
         MENUITEM "Grid Options",                IDM_AFOIL_GRID
@@ -3260,24 +2934,23 @@ IDR_CTXAFOILCTRLMENU MENU
 BEGIN
     POPUP "Current Foil"
     BEGIN
-        MENUITEM "Show",                        33031
-        MENUITEM "Hide",                        33030
+        MENUITEM "Show",                        IDM_SHOWFOIL
+        MENUITEM "Hide",                        IDM_HIDEFOIL
         MENUITEM SEPARATOR
-        MENUITEM "&Export...",                  32871
-        MENUITEM "Duplicate...",                32986
-        MENUITEM "Rename...\t(F2)",             32872
-        MENUITEM "Delete...",                   33029
+        MENUITEM "&Export...",                  IDM_EXPORTFOIL
+        MENUITEM "Duplicate...",                IDM_DUPLICATEFOIL
+        MENUITEM "Rename...\t(F2)",             IDM_RENAMEFOIL
+        MENUITEM "Delete...",                   IDM_DELETEFOIL
         MENUITEM SEPARATOR
-        MENUITEM "Normalize",                   32996
-        MENUITEM "De-rotate (DERO)",            32999
-        MENUITEM "Refine &Locally (CADD)",      33053
-        MENUITEM "Refine &Globally (PANEL)",    33052
-        MENUITEM "Edit Coordinates",            33056
-        MENUITEM "&Interpolate Foils (INTE)",   33054
-        MENUITEM "&Scale Camber and Thickness", 33051
-        MENUITEM "Set T.E. Gap (TGAP)",         33049
-        MENUITEM "Scale L.E. Radius (LERAD)",   33050
-        MENUITEM "Set Flap",                    33057
+        MENUITEM "Normalize",                   IDM_NORMALIZE
+        MENUITEM "De-rotate (DERO)",            IDM_ROTATEFOIL
+        MENUITEM "Refine &Locally (CADD)",      IDM_CADD
+        MENUITEM "Refine &Globally (PANEL)",    IDM_PANEL
+        MENUITEM "Edit Coordinates",            IDM_EDITCOORD
+        MENUITEM "&Scale Camber and Thickness", IDM_GEOM
+        MENUITEM "Set T.E. Gap (TGAP)",         IDM_TEGAP
+        MENUITEM "Scale L.E. Radius (LERAD)",   IDM_LERAD
+        MENUITEM "Set Flap",                    IDM_SETFLAP
     END
 END
 
@@ -3313,6 +2986,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "Save to Image File\t(Ctrl+I)", IDM_SAVEIMAGE
+        MENUITEM SEPARATOR
         MENUITEM "&Colors and Styles...",       IDM_COLORSTYLES
         MENUITEM SEPARATOR
         MENUITEM "&Preferences...",             IDM_CLRSETTINGS
@@ -3380,6 +3055,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "Save to Image File\t(Ctrl+I)", IDM_SAVEIMAGE
+        MENUITEM SEPARATOR
         MENUITEM "&Operating Point\t(F5)",      IDM_XFLR5_OPER
         MENUITEM "&Polars \t(F8)",              IDM_XFLR5_POLARS
         MENUITEM SEPARATOR
@@ -3415,11 +3092,12 @@ BEGIN
         MENUITEM "Refine &Locally (CADD)",      IDM_XFLR5_CADD
         MENUITEM "Refine &Globally (PANEL)",    IDM_XFLR5_PANEL
         MENUITEM "Edit Coordinates",            IDM_EDITCOORD
-        MENUITEM "&Interpolate Foils (INTE)",   IDM_XFLR5_INTER
         MENUITEM "&Scale Camber and Thickness", IDM_XFLR5_GEOM
         MENUITEM "Set T.E. Gap (TGAP)",         IDM_TEGAP
         MENUITEM "Scale L.E. Radius (LERAD)",   IDM_LERAD
         MENUITEM "Set Flap",                    IDM_SETFLAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Interpolate Foils (INTE)",   IDM_XFLR5_INTER
         MENUITEM "Naca Foils",                  IDM_NACAFOILS
     END
     POPUP "&Polars"
@@ -3432,6 +3110,7 @@ BEGIN
             MENUITEM "Edit...",                     IDM_EDITPLR
             MENUITEM "&Rename...",                  IDM_XFLR5_RENAMEPLR
             MENUITEM "&Export...",                  IDM_XFLR5_EXPORTPLR
+            MENUITEM "&Export OpPoints",            IDM_XFLR5_EXPORTOPPOINTS
             MENUITEM "&Delete...",                  IDM_XFLR5_DELETEPLR
             MENUITEM "Delete associated &OpPoints", IDM_XFLR5_DELETEOPP
             MENUITEM "Reset...",                    IDM_PRESET
@@ -3439,9 +3118,7 @@ BEGIN
         POPUP "&Import Polar"
         BEGIN
             MENUITEM "XFoil Polar",                 ID_IMPORTPOLAR_XFOILPOLAR
-
             MENUITEM "JavaFoil Polar",              ID_IMPORTPOLAR_JAVAFOILPOLAR
-
         END
         MENUITEM SEPARATOR
         MENUITEM "Polar Filter",                IDM_XFLR5_POLARFILTER
@@ -3545,6 +3222,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "Save to Image File\t(Ctrl+I)", IDM_SAVEIMAGE
+        MENUITEM SEPARATOR
         MENUITEM "3D\t(F4)",                    IDM_3DVIEW
         MENUITEM "Operating Point\t(F5)",       IDM_WOPP
         MENUITEM "Polars\t(F8)",                IDM_SHOWPOLAR
@@ -3565,20 +3244,27 @@ BEGIN
     POPUP "Body Design"
     BEGIN
         MENUITEM "New Body\t(F11)",             IDM_NEWBODY
+        MENUITEM "Import Body Definition",      IDM_IMPORTBODYDEFINITION
         POPUP "Current Body"
         BEGIN
             MENUITEM "Rename",                      IDM_RENAMECURBODY
             MENUITEM "Delete",                      IDM_DELETECURBODY
             MENUITEM "Duplicate",                   IDM_DUPLICATECURBODY
             MENUITEM "Scale",                       IDM_SCALECURBODY
-            MENUITEM "Export",                      IDM_EXPORTCURBODY
+            MENUITEM "Translate",                   IDM_TRANSLATECURBODY
             MENUITEM "Save as Project",             IDM_SAVECURBODYASPROJECT
+            MENUITEM SEPARATOR
+            MENUITEM "Export Definition",           IDM_EXPORTBODYDEFINITION
+            MENUITEM "Export geometry",             IDM_EXPORTCURBODY
         END
         MENUITEM SEPARATOR
-        MENUITEM "Show Only ActiveFrame",       IDM_SHOWONLYACTIVEFRAME
+        MENUITEM "ShowOnly Active Frame",       IDM_SHOWONLYACTIVEFRAME
         MENUITEM "Reset Scales",                33302
         MENUITEM "Grid Options",                IDM_BODYGRIDOPTIONS
         MENUITEM "NURBS Resolution",            IDM_BODYRESOLUTION
+        MENUITEM SEPARATOR
+        MENUITEM "Select Overlay Section",      IDM_SELECTBODYOVERLAY
+        MENUITEM "Overlay Section",             IDM_OVERLAYSECTION
     END
     POPUP "&Wing/Plane"
     BEGIN
@@ -3713,6 +3399,8 @@ BEGIN
     END
     POPUP "&View"
     BEGIN
+        MENUITEM "Save to Image File\t(Ctrl+I)", IDM_SAVEIMAGE
+        MENUITEM SEPARATOR
         MENUITEM "Hide All Foils",              IDM_HIDEALLFOILS
         MENUITEM "Show All Foils",              IDM_SHOWALLFOILS
         MENUITEM SEPARATOR
@@ -3744,11 +3432,12 @@ BEGIN
         MENUITEM "Refine &Locally (CADD)",      IDM_CADD
         MENUITEM "Refine &Globally (PANEL)",    IDM_PANEL
         MENUITEM "Edit Coordinates",            IDM_EDITCOORD
-        MENUITEM "&Interpolate Foils (INTE)",   IDM_INTERPOLATE
         MENUITEM "&Scale Camber and Thickness", IDM_GEOM
         MENUITEM "Set T.E. Gap (TGAP)",         IDM_TEGAP
         MENUITEM "Scale L.E. Radius (LERAD)",   IDM_LERAD
         MENUITEM "Set Flap",                    IDM_SETFLAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Interpolate Foils (INTE)",   IDM_INTERPOLATE
         MENUITEM "Naca Foils",                  IDM_NACAFOILS
     END
     POPUP "Splines"
@@ -3762,7 +3451,6 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Export to Foil File",        IDM_AFOIL_EXPORTSPLINES
         MENUITEM "Export Splines to Foil Database", IDM_EXPORTTOAPP
-        MENUITEM SEPARATOR
         MENUITEM "&Save Splines\t(Ctrl+E)",     IDM_AFOIL_SFSAVE
     END
     POPUP "&?"
@@ -3784,10 +3472,15 @@ BEGIN
             MENUITEM "Rename",                      33293
             MENUITEM "Delete",                      33292
             MENUITEM "Duplicate",                   33294
-            MENUITEM "Scale",                       33295
-            MENUITEM "Export",                      33296
+            MENUITEM "Scale",                       IDM_SCALECURBODY
+            MENUITEM "Translate",                   IDM_TRANSLATECURBODY
+            MENUITEM "Export Definition",           IDM_EXPORTBODYDEFINITION
+            MENUITEM "Export geometry",             IDM_EXPORTCURBODY
             MENUITEM "Save as Project",             33297
         END
+        MENUITEM SEPARATOR
+        MENUITEM "Select Overlay Section",      IDM_SELECTBODYOVERLAY
+        MENUITEM "Overlay Section",             IDM_OVERLAYSECTION
         MENUITEM SEPARATOR
         MENUITEM "Reset Scales",                IDM_RESETBODYSCALE
         MENUITEM "Grid Options",                IDM_BODYGRIDOPTIONS
@@ -3801,14 +3494,15 @@ BEGIN
         MENUITEM "Insert Point",                IDM_INSERTPOINT
         MENUITEM "Delete Point",                IDM_DELETEPOINT
         MENUITEM SEPARATOR
-        MENUITEM "Scale Frame",                 IDM_SCALEFRAME
         POPUP "Current Body"
         BEGIN
             MENUITEM "Rename",                      33293
             MENUITEM "Delete",                      33292
             MENUITEM "Duplicate",                   33294
-            MENUITEM "Scale",                       33295
-            MENUITEM "Export",                      33296
+            MENUITEM "Scale",                       IDM_SCALECURBODY
+            MENUITEM "Translate",                   IDM_TRANSLATECURBODY
+            MENUITEM "Export Definition",           IDM_EXPORTBODYDEFINITION
+            MENUITEM "Export geometry",             IDM_EXPORTCURBODY
             MENUITEM "Save as Project",             33297
         END
         MENUITEM SEPARATOR
@@ -3827,10 +3521,15 @@ BEGIN
             MENUITEM "Rename",                      33293
             MENUITEM "Delete",                      33292
             MENUITEM "Duplicate",                   33294
-            MENUITEM "Scale",                       33295
-            MENUITEM "Export",                      33296
+            MENUITEM "Scale",                       IDM_SCALECURBODY
+            MENUITEM "Translate",                   IDM_TRANSLATECURBODY
+            MENUITEM "Export Definition",           IDM_EXPORTBODYDEFINITION
+            MENUITEM "Export geometry",             IDM_EXPORTCURBODY
             MENUITEM "Save as Project",             33297
         END
+        MENUITEM SEPARATOR
+        MENUITEM "Select Overlay Section",      IDM_SELECTBODYOVERLAY
+        MENUITEM "Overlay Section",             IDM_OVERLAYSECTION
         MENUITEM SEPARATOR
         MENUITEM "Reset Scales",                IDM_RESETBODYSCALE
     END
@@ -4361,12 +4060,12 @@ BEGIN
     IDM_BODYDESIGN          "Switch to the body deisgn view"
 END
 
-#endif    // Anglais (États-Unis) resources
+#endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Français (France) resources
+// French (France) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FRA)
 #ifdef _WIN32
@@ -4409,7 +4108,7 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-#endif    // Français (France) resources
+#endif    // French (France) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

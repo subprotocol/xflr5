@@ -147,7 +147,7 @@ CWPolar::~CWPolar()
 }
 
 
-void CWPolar::Export(CString FileName)
+void CWPolar::Export(CString FileName, int FileType)
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	int j;
@@ -155,13 +155,99 @@ void CWPolar::Export(CString FileName)
 	CFileException fe;
 	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
 
-	try{
-		if(!bOpen)
+	try
+	{
+		if (!bOpen)
 		{
 //			CFileException *pfe = new CFileException(CFileException::invalidFile);
 //			pfe->m_strFileName = FileName;
 			throw &fe;
 		}
+		if (FileType==1)
+		{
+			CString strOut;
+			CString Header, strong;
+
+			strong=  pFrame->m_VersionName +"\n";
+			XFile.WriteString(strong);
+
+			SYSTEMTIME tm;
+			GetLocalTime(&tm);
+			CString str;
+			str.Format("%02d/%02d/%d  at  %02d:%02d:%02d \n", tm.wMonth, tm.wDay, tm.wYear,tm.wHour, tm.wMinute, tm.wSecond);
+			XFile.WriteString(str);
+
+
+			strong ="Wing name :        "+ m_UFOName + "\n";
+			XFile.WriteString(strong);
+
+			strong ="Wing polar name :  "+ m_PlrName + "\n";
+			XFile.WriteString(strong);
+
+			GetSpeedUnit(str, pFrame->m_SpeedUnit);
+			str +="\n\n";
+			strong.Format("Freestream speed : %3.1f ",m_QInf*pFrame->m_mstoUnit);
+			strong +=str;
+			XFile.WriteString(strong);
+
+			Header.Format("   alpha      CL           ICd        PCd        TCd        CY        GCm         GRm        GYm       IYm       QInf        XCP\n");
+			XFile.WriteString(Header);
+	//		Header.Format(" _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n");
+	//		XFile.WriteString(Header); 
+			for (j=0; j<m_Alpha.GetSize(); j++)
+			{
+				strong.Format(" %8.3f  %9.6f    %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %8.4f    %9.4f\n",
+					m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_CY[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
+				
+				XFile.WriteString(strong);
+			
+			}
+		}	
+		else if (FileType==2)
+		{
+			CString strOut;
+			CString Header, strong;
+
+			strong=  pFrame->m_VersionName +"\n";
+			XFile.WriteString(strong);
+
+			SYSTEMTIME tm;
+			GetLocalTime(&tm);
+			CString str;
+			str.Format("%02d/%02d/%d  at  %02d:%02d:%02d \n", tm.wMonth, tm.wDay, tm.wYear,tm.wHour, tm.wMinute, tm.wSecond);
+			XFile.WriteString(str);
+
+
+			strong ="Wing name :, "+ m_UFOName + "\n";
+			XFile.WriteString(strong);
+
+			strong ="Wing polar name :, "+ m_PlrName + "\n";
+			XFile.WriteString(strong);
+
+			GetSpeedUnit(str, pFrame->m_SpeedUnit);
+			str +="\n\n";
+			strong.Format("Freestream speed :, %3.1f ",m_QInf*pFrame->m_mstoUnit);
+			strong +=str;
+			XFile.WriteString(strong);
+
+			Header.Format("alpha, CL, ICd, PCd, TCd, CY, GCm, GRm,GYm, IYm, QInf, XCP\n");
+			XFile.WriteString(Header);
+	//		Header.Format(" _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n");
+	//		XFile.WriteString(Header); 
+			for (j=0; j<m_Alpha.GetSize(); j++)
+			{
+				strong.Format(" %8.3f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %8.4f,  %9.4f\n",
+					m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_CY[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
+				
+				XFile.WriteString(strong);
+			
+			}
+		}	
+		XFile.WriteString("\n\n");
+		XFile.Close();
+		return ;
+		
+
 	}
 	catch (CFileException *ex)
 	{
@@ -173,50 +259,7 @@ void CWPolar::Export(CString FileName)
 		AfxMessageBox(str);
 		return ;
 	}
-	if (bOpen)
-	{
-		CString strOut;
-		CString Header, strong;
 
-		strong=  pFrame->m_VersionName +"\n";
-		XFile.WriteString(strong);
-
-		SYSTEMTIME tm;
-		GetLocalTime(&tm);
-		CString str;
-		str.Format("%02d/%02d/%d  at  %02d:%02d:%02d \n",
-			tm.wMonth, tm.wDay, tm.wYear,tm.wHour, tm.wMinute, tm.wSecond);
-		XFile.WriteString(str);
-
-
-		strong ="Wing name :        "+ m_UFOName + "\n";
-		XFile.WriteString(strong);
-
-		strong ="Wing polar name :  "+ m_PlrName + "\n";
-		XFile.WriteString(strong);
-
-		GetSpeedUnit(str, pFrame->m_SpeedUnit);
-		str +="\n\n";
-		strong.Format("Freestream speed : %3.1f ",m_QInf*pFrame->m_mstoUnit);
-		strong +=str;
-		XFile.WriteString(strong);
-
-		Header.Format("   alpha      CL           ICd        PCd        TCd        CY        GCm         GRm        GYm       IYm       QInf        XCP\n");
-		XFile.WriteString(Header);
-//		Header.Format(" _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n");
-//		XFile.WriteString(Header); 
-		for (j=0; j<m_Alpha.GetSize(); j++)
-		{
-			strong.Format(" %8.3f  %9.6f    %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %8.4f    %9.4f\n",
-				m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_CY[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
-			
-			XFile.WriteString(strong);
-		
-		}
-		XFile.WriteString("\n\n");
-		XFile.Close();
-		return ;
-	}
 }
 
 void CWPolar::ResetWPlr()
@@ -516,7 +559,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 				ar >> GCm >> GRm >> GYm >> VCm >> VYm >> IYm;
 		        if(ArchiveFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0; 
 				ar >> QInfinite >> XCP >> YCP;
-				if(ArchiveFormat<1010){
+				if(ArchiveFormat<1010)
+				{
 					XCP   /=1000.0;
 					YCP   /=1000.0;
 				}

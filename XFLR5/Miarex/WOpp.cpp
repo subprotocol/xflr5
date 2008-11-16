@@ -392,23 +392,25 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 }
 
 
-bool CWOpp::Export(	CStdioFile *pXFile)
+bool CWOpp::Export(	CStdioFile *pXFile, int FileType)
 {
 	CString Header, strong;
 	int k;
 
-	Header.Format("  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
+	if(FileType==1) Header.Format("  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n");
+	else            Header.Format("  y-span,Chord,Ai,Cl,PCd,ICd,CmGeom,CmAirf,XTrtop,XTrBot,XCP,BM\n");
 	pXFile->WriteString(Header);
 
 	int nStart;
 	if(m_AnalysisType==1) nStart = 1;	
 	else nStart = 0;
-	for (k=nStart; k<m_NStation; k++){
-		strong.Format("%10.4f  %9.4f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
-			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],
-			m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],
-			m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
-		
+	for (k=nStart; k<m_NStation; k++)
+	{
+		if(FileType==1) strong.Format("%10.4f  %9.4f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
+			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],	m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
+		else            strong.Format("%10.4f,%9.4f,%7.3f,%9.6f,%9.6f,%9.6f,%9.6f,%9.6f,%7.4f,%7.4f,%7.4f,%7.4f\n",
+			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],	m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
+
 		pXFile->WriteString(strong);
 	}
 	pXFile->WriteString("\n\n");
@@ -418,12 +420,14 @@ bool CWOpp::Export(	CStdioFile *pXFile)
 
 double CWOpp::GetMaxLift()
 {
-	int nStart;
+	int i,nStart;
 	if(m_AnalysisType==1) nStart = 1;	
 	else nStart = 0;
-	double maxlift = 0.f;
-	for (int i=nStart; i<m_NStation; i++){
-		if(m_Cl[i] * m_Chord[i]/m_MAChord>maxlift){
+	double maxlift = 0.0;
+	for (i=nStart; i<m_NStation; i++)
+	{
+		if(m_Cl[i] * m_Chord[i]/m_MAChord>maxlift)
+		{
 			maxlift = m_Cl[i] * m_Chord[i]/m_MAChord;
 		}
 	}

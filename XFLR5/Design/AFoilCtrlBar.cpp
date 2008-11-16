@@ -73,6 +73,7 @@ CAFoilCtrlBar::CAFoilCtrlBar(CWnd* pParent)
 	m_pSF = NULL;
 	m_pPF = NULL;
 	m_FoilSelection = 0;
+	m_ctrlFoilList.m_pParent = this;
 }
 
 CAFoilCtrlBar::~CAFoilCtrlBar()
@@ -110,17 +111,21 @@ void CAFoilCtrlBar::DoDataExchange(CDataExchange* pDX)
 void CAFoilCtrlBar::OnCenterLine()
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	if(m_FoilSelection==0){
-		if(pADlg->m_bSF){
+	if(m_FoilSelection==0)
+	{
+		if(pADlg->m_bSF)
+		{
 			if(m_ctrlCenterLine.GetCheck()) m_pSF->m_bCenterLine = true;
 			else							m_pSF->m_bCenterLine = false;
 		}
-		else {
+		else 
+		{
 			if(m_ctrlCenterLine.GetCheck()) m_pPF->m_bCenterLine = true;
 			else							m_pPF->m_bCenterLine = false;
 		}
 	}
-	else if(m_pRefFoil){
+	else if(m_pRefFoil)
+	{
 		if(m_ctrlCenterLine.GetCheck()) m_pRefFoil->m_bCenterLine = true;
 		else							m_pRefFoil->m_bCenterLine = false;
 	}
@@ -133,18 +138,22 @@ void CAFoilCtrlBar::OnCenterLine()
 void CAFoilCtrlBar::OnModelPoints() 
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	if(m_FoilSelection==0){
-		if(pADlg->m_bSF){
+	if(m_FoilSelection==0)
+	{
+		if(pADlg->m_bSF)
+		{
 			if(m_ctrlModelPoints.GetCheck()) m_pSF->m_bOutPoints = true;
 			else							 m_pSF->m_bOutPoints = false;
 		}
-		else {
+		else 
+		{
 			if(m_ctrlModelPoints.GetCheck()) m_pPF->m_bOutPoints = true;
 			else							 m_pPF->m_bOutPoints = false;
 			m_pPF->SetOutPoints(m_pPF->m_bOutPoints);
 		}
 	}
-	else if(m_pRefFoil){
+	else if(m_pRefFoil)
+	{
 		if (m_ctrlModelPoints.GetCheck()) m_pRefFoil->m_bPoints = true;
 		else m_pRefFoil->m_bPoints = false;
 	}
@@ -156,7 +165,8 @@ void CAFoilCtrlBar::OnModelPoints()
 void CAFoilCtrlBar::OnVisible()
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	if(m_FoilSelection==0){
+	if(m_FoilSelection==0)
+	{
 		if(pADlg->m_bSF){
 			if(m_ctrlVisible.GetCheck()) m_pSF->m_bVisible = true;
 			else						 m_pSF->m_bVisible = false;
@@ -179,7 +189,6 @@ void CAFoilCtrlBar::OnVisible()
 BOOL CAFoilCtrlBar::OnInitDialogBar() 
 {
 	CInitDialogBar::OnInitDialogBar();
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
 
 	m_pRefFoil = NULL;
 	SetParams();
@@ -279,14 +288,17 @@ BOOL CAFoilCtrlBar::PreTranslateMessage(MSG* pMsg)
 void CAFoilCtrlBar::SetSplineData()
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	if(pADlg->m_bSF){
-		if(m_pSF){
+	if(pADlg->m_bSF)
+	{
+		if(m_pSF)
+		{
 			m_ctrlVisible.SetCheck(m_pSF->m_bVisible);
 			m_ctrlCenterLine.SetCheck(m_pSF->m_bCenterLine);
 			m_ctrlModelPoints.SetCheck(m_pSF->m_bOutPoints);
 		}
 	}
-	else if(m_pPF) {
+	else if(m_pPF) 
+	{
 		m_ctrlVisible.SetCheck(m_pPF->m_bVisible);
 		m_ctrlCenterLine.SetCheck(m_pPF->m_bCenterLine);
 		m_ctrlModelPoints.SetCheck(m_pPF->m_bOutPoints);
@@ -306,7 +318,8 @@ void CAFoilCtrlBar::SelectFoil(CFoil* pFoil)
 		SetFoil();
 		for(i=0; i<pADlg->m_poaFoil->GetSize();i++)
 		{
-			if (pFoil == pADlg->m_poaFoil->GetAt(i)){
+			if (pFoil == pADlg->m_poaFoil->GetAt(i))
+			{
 				m_ctrlFoilList.EnsureVisible(i+1,FALSE);
 				m_ctrlFoilList.SetItemState(i+1, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 				break;
@@ -335,32 +348,40 @@ void CAFoilCtrlBar::SetFoil(CFoil* pFoil)
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
 	CFoil * pOldFoil = NULL;
 	CMainFrame *pFrame = (CMainFrame*)(pADlg->m_pFrame);
+	int i;
+
 	if(!pFoil) pFoil = m_pRefFoil;
-	if(!pFoil){
+	if(!pFoil)
+	{
 		//nothing more to try
 		m_pRefFoil = NULL;
 		m_FoilSelection = 0;
-		if(pADlg->m_bSF){
+		if(pADlg->m_bSF)
+		{
 			m_ctrlVisible.SetCheck(m_pSF->m_bVisible);
 			m_ctrlCenterLine.SetCheck(m_pSF->m_bCenterLine);
 			m_ctrlModelPoints.SetCheck(m_pSF->m_bOutPoints);	
 		}
-		else{
+		else
+		{
 			m_ctrlVisible.SetCheck(m_pPF->m_bVisible);
 			m_ctrlCenterLine.SetCheck(m_pPF->m_bCenterLine);
 			m_ctrlModelPoints.SetCheck(m_pPF->m_bOutPoints);	
 		}
 	}
-	else{
+	else
+	{
 		pFrame->m_pCurFoil = pFoil;
 		m_pRefFoil = pFoil;
 		m_ctrlVisible.SetCheck(pFoil->m_bVisible);
 		m_ctrlCenterLine.SetCheck(pFoil->m_bCenterLine);
 		m_ctrlModelPoints.SetCheck(pFoil->m_bPoints);
 
-		for(int i=0; i<pADlg->m_poaFoil->GetSize();i++){
+		for(i=0; i<pADlg->m_poaFoil->GetSize();i++)
+		{
 			pOldFoil = (CFoil*)pADlg->m_poaFoil->GetAt(i);
-			if (pFoil == pOldFoil){
+			if (pFoil == pOldFoil)
+			{
 				m_FoilSelection = i+1;
 				break;
 			}
@@ -538,117 +559,6 @@ void CAFoilCtrlBar::OnFoilColor()
 
 
 
-void CAFoilCtrlBar::FillFoilList()
-{
-	CAFoil* pADlg = (CAFoil*)m_pADlg;
-	CFoil *pFoil;
-	CString strong;
-	CString percent = "%";
-	double Thickness, xThickness, Camber, xCamber;
-	int points;
-	m_ctrlFoilList.DeleteAllItems();
-
-	if(pADlg->m_bSF){
-		if(!m_pSF) return;
-		Thickness  = m_pSF->m_fThickness*100.0;
-		xThickness = m_pSF->m_fxThickMax*100.0;
-		Camber     = m_pSF->m_fCamber*100.0;
-		xCamber    = m_pSF->m_fxCambMax*100.0;
-		points     = m_pSF->m_OutPoints;
-		m_ctrlFoilList.InsertItem(0, "Spline Foil");
-	}
-	else {
-		if(!m_pPF) return;
-		Thickness  = m_pPF->m_fThickness*100.0;
-		xThickness = m_pPF->m_fxThickMax*100.0;
-		Camber     = m_pPF->m_fCamber*100.0;
-		xCamber    = m_pPF->m_fxCambMax*100.0;
-		points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
-			         +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
-
-		m_ctrlFoilList.InsertItem(0, "Spline Points Foil");
-	}
-
-	strong.Format("%.2f", Thickness);
-	strong+= percent;
-	m_ctrlFoilList.SetItemText(0,1,strong);
-
-	strong.Format("%.1f", xThickness);
-	strong+= percent;
-	m_ctrlFoilList.SetItemText(0,2,strong);
-
-	strong.Format("%.2f", Camber);
-	strong+= percent;
-	m_ctrlFoilList.SetItemText(0,3,strong);
-
-	strong.Format("%.1f", xCamber);
-	strong+= percent;
-	m_ctrlFoilList.SetItemText(0,4,strong);
-
-	strong.Format("%d", points);
-	m_ctrlFoilList.SetItemText(0,5,strong);
-
-	for(int i=0;i<pADlg->m_poaFoil->GetSize();i++)
-	{
-		pFoil = (CFoil*)pADlg->m_poaFoil->GetAt(i);
-		m_ctrlFoilList.InsertItem(i+1,pFoil->m_FoilName);
-		strong.Format("%.2f", pFoil->m_fThickness*100.0);
-		strong+= percent;
-		m_ctrlFoilList.SetItemText(i+1,1,strong);
-
-		strong.Format("%.1f", pFoil->m_fXThickness*100.0);
-		strong+= percent;
-		m_ctrlFoilList.SetItemText(i+1,2,strong);
-
-		strong.Format("%.2f", pFoil->m_fCamber*100.0);
-		strong+= percent;
-		m_ctrlFoilList.SetItemText(i+1,3,strong);
-
-		strong.Format("%.1f", pFoil->m_fXCamber*100.0);
-		strong+= percent;
-		m_ctrlFoilList.SetItemText(i+1,4,strong);
-
-		strong.Format("%d", pFoil->n);
-		m_ctrlFoilList.SetItemText(i+1,5,strong);
-
-		if(pFoil->m_bTEFlap){
-			strong.Format("%.1f°", pFoil->m_TEFlapAngle);
-			m_ctrlFoilList.SetItemText(i+1,6,strong);
-
-			strong.Format("%.1f", pFoil->m_TEXHinge);
-			strong+= percent;
-			m_ctrlFoilList.SetItemText(i+1,7,strong);
-
-			strong.Format("%.1f", pFoil->m_TEYHinge);
-			strong+= percent;
-			m_ctrlFoilList.SetItemText(i+1,8,strong);
-		}
-		if(pFoil->m_bLEFlap){
-			strong.Format("%.1f°", pFoil->m_LEFlapAngle);
-			m_ctrlFoilList.SetItemText(i+1,9,strong);
-
-			strong.Format("%.1f", pFoil->m_LEXHinge);
-			strong+= percent;
-			m_ctrlFoilList.SetItemText(i+1,10,strong);
-
-			strong.Format("%.1f", pFoil->m_LEYHinge);
-			strong+= percent;
-			m_ctrlFoilList.SetItemText(i+1,11,strong);
-		}
-	}
-	if(pADlg->m_poaFoil->GetSize()){
-		m_ctrlDelete.EnableWindow(true);
-		m_ctrlRename.EnableWindow(true);
-		m_ctrlDuplicate.EnableWindow(true);
-	}
-	else{
-		m_ctrlDelete.EnableWindow(false);
-		m_ctrlRename.EnableWindow(false);
-		m_ctrlDuplicate.EnableWindow(false);
-	}
-}
-
-
 void CAFoilCtrlBar::SetSaveState(bool bState) 
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
@@ -682,16 +592,25 @@ void CAFoilCtrlBar::ReSizeCtrls()
 	GetClientRect(&CltRect);
 	GetWindowRect(&wndRect);
 	int w = CltRect.Width();
-	if(w){
+	if(w)
+	{
 		HWND hwnd = m_ctrlFoilList.GetSafeHwnd();
-		if(hwnd){
-			m_ctrlVisible.SetWindowPos(NULL,CltRect.right-130,15,0,0,SWP_NOSIZE);
+		if(hwnd)
+		{
+			m_ctrlDuplicate.SetWindowPos(NULL,CltRect.right-130,145,0,0,SWP_NOSIZE);
+			m_ctrlDelete.SetWindowPos(NULL,CltRect.right-130,120,0,0,SWP_NOSIZE);
+			m_ctrlRename.SetWindowPos(NULL,CltRect.right-130,95,0,0,SWP_NOSIZE);
+			m_ctrlFoilColor.SetWindowPos(NULL,CltRect.right-130,65,0,0,SWP_NOSIZE);
+			m_ctrlCenterLine.SetWindowPos(NULL,CltRect.right-130,45,0,0,SWP_NOSIZE);
 			m_ctrlModelPoints.SetWindowPos(NULL,CltRect.right-130,30,0,0,SWP_NOSIZE);
+			m_ctrlVisible.SetWindowPos(NULL,CltRect.right-130,15,0,0,SWP_NOSIZE);
+
+/*			m_ctrlModelPoints.SetWindowPos(NULL,CltRect.right-130,30,0,0,SWP_NOSIZE);
 			m_ctrlCenterLine.SetWindowPos(NULL,CltRect.right-130,45,0,0,SWP_NOSIZE);
 			m_ctrlFoilColor.SetWindowPos(NULL,CltRect.right-130,65,0,0,SWP_NOSIZE);
 			m_ctrlRename.SetWindowPos(NULL,CltRect.right-130,95,0,0,SWP_NOSIZE);
 			m_ctrlDelete.SetWindowPos(NULL,CltRect.right-130,120,0,0,SWP_NOSIZE);
-			m_ctrlDuplicate.SetWindowPos(NULL,CltRect.right-130,145,0,0,SWP_NOSIZE);
+			m_ctrlDuplicate.SetWindowPos(NULL,CltRect.right-130,145,0,0,SWP_NOSIZE);*/
 			CltRect.DeflateRect(10,10,150,0);
 			w = CltRect.Width();
 			int w2 = (int)(w*2/24);
@@ -722,8 +641,8 @@ void CAFoilCtrlBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
 	CMenu menu;
 	if (menu.LoadMenu(IDR_CTXAFOILCTRLMENU))
 	{
-		POSITION pos = m_ctrlFoilList.GetFirstSelectedItemPosition();
-		m_FoilSelection = m_ctrlFoilList.GetNextSelectedItem(pos);
+//		POSITION pos = m_ctrlFoilList.GetFirstSelectedItemPosition();
+//		m_FoilSelection = m_ctrlFoilList.GetNextSelectedItem(pos);
 		if(m_FoilSelection>0 && m_FoilSelection<=pADlg->m_poaFoil->GetSize())
 		{
 			m_pRefFoil = (CFoil*)pADlg->m_poaFoil->GetAt(m_FoilSelection-1);
@@ -796,4 +715,139 @@ void CAFoilCtrlBar::OnLvnItemchangedFoillist(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+
+void CAFoilCtrlBar::FillFoilList()
+{
+	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	CFoil *pFoil;
+	int i;
+	m_ctrlFoilList.DeleteAllItems();
+
+	if(pADlg->m_bSF)
+	{
+		m_ctrlFoilList.InsertItem(0, "Spline Foil");
+	}
+	else 
+	{
+		m_ctrlFoilList.InsertItem(0, "Spline Points Foil");
+	}
+
+	UpdateFoil(-1);
+
+	for(i=0;i<pADlg->m_poaFoil->GetSize();i++)
+	{
+		pFoil = (CFoil*)pADlg->m_poaFoil->GetAt(i);
+		m_ctrlFoilList.InsertItem(i+1,pFoil->m_FoilName);
+		UpdateFoil(i);
+	}
+
+	if(pADlg->m_poaFoil->GetSize())
+	{
+		m_ctrlDelete.EnableWindow(true);
+		m_ctrlRename.EnableWindow(true);
+		m_ctrlDuplicate.EnableWindow(true);
+	}
+	else
+	{
+		m_ctrlDelete.EnableWindow(false);
+		m_ctrlRename.EnableWindow(false);
+		m_ctrlDuplicate.EnableWindow(false);
+	}
+}
+
+
+void CAFoilCtrlBar::UpdateFoil(int iFoil)
+{
+	if(iFoil==-10) iFoil = m_FoilSelection;
+
+	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	CFoil *pFoil = NULL;
+	CString strong;
+	CString percent = "%";
+	double Thickness, xThickness, Camber, xCamber;
+	Thickness = xThickness = Camber = xCamber = 0;
+	int points = 0;
+
+	if(pADlg->m_bSF && iFoil==-1)
+	{
+		if(!m_pSF) return;
+		Thickness  = m_pSF->m_fThickness*100.0;
+		xThickness = m_pSF->m_fxThickMax*100.0;
+		Camber     = m_pSF->m_fCamber*100.0;
+		xCamber    = m_pSF->m_fxCambMax*100.0;
+		points     = m_pSF->m_OutPoints;
+		iFoil = 0;
+	}
+	else if(!pADlg->m_bSF && iFoil==-1)
+	{
+		if(!m_pPF) return;
+		Thickness  = m_pPF->m_fThickness*100.0;
+		xThickness = m_pPF->m_fxThickMax*100.0;
+		Camber     = m_pPF->m_fCamber*100.0;
+		xCamber    = m_pPF->m_fxCambMax*100.0;
+		points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
+			         +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
+		iFoil = 0;
+	}
+	else if(iFoil>=0)
+	{
+		if(iFoil>=pADlg->m_poaFoil->GetSize()) return;
+
+		pFoil = (CFoil*)pADlg->m_poaFoil->GetAt(iFoil);
+
+		Thickness  = pFoil->m_fThickness*100.0;
+		xThickness = pFoil->m_fXThickness*100.0;
+		Camber     = pFoil->m_fCamber*100.0;
+		xCamber    = pFoil->m_fXCamber*100.0;
+		points     = pFoil->n;
+		iFoil++;
+	}
+
+	strong.Format("%.2f", Thickness);
+	strong+= percent;
+	m_ctrlFoilList.SetItemText(iFoil,1,strong);
+
+	strong.Format("%.1f", xThickness);
+	strong+= percent;
+	m_ctrlFoilList.SetItemText(iFoil,2,strong);
+
+	strong.Format("%.2f", Camber);
+	strong+= percent;
+	m_ctrlFoilList.SetItemText(iFoil,3,strong);
+
+	strong.Format("%.1f", xCamber);
+	strong+= percent;
+	m_ctrlFoilList.SetItemText(iFoil,4,strong);
+
+	strong.Format("%d", points);
+	m_ctrlFoilList.SetItemText(iFoil,5,strong);
+
+	if(pFoil && pFoil->m_bTEFlap)
+	{
+		strong.Format("%.1f°", pFoil->m_TEFlapAngle);
+		m_ctrlFoilList.SetItemText(iFoil,6,strong);
+
+		strong.Format("%.1f", pFoil->m_TEXHinge);
+		strong+= percent;
+		m_ctrlFoilList.SetItemText(iFoil,7,strong);
+
+		strong.Format("%.1f", pFoil->m_TEYHinge);
+		strong+= percent;
+		m_ctrlFoilList.SetItemText(iFoil,8,strong);
+	}
+	if(pFoil && pFoil->m_bLEFlap)
+	{
+		strong.Format("%.1f°", pFoil->m_LEFlapAngle);
+		m_ctrlFoilList.SetItemText(iFoil,9,strong);
+
+		strong.Format("%.1f", pFoil->m_LEXHinge);
+		strong+= percent;
+		m_ctrlFoilList.SetItemText(iFoil,10,strong);
+
+		strong.Format("%.1f", pFoil->m_LEYHinge);
+		strong+= percent;
+		m_ctrlFoilList.SetItemText(iFoil,11,strong);
+	}
 }

@@ -42,6 +42,8 @@ class CMainFrame : public CFrameWnd
 	friend class CXBody;
 	friend class CXFLR5App;
 	friend class CLLTDlg;
+	friend class CBodyScaleDlg;
+	friend class CBodyTransDlg;
 	friend class CBatchDlg;
 	friend class CBody;
 	friend class CPolar;

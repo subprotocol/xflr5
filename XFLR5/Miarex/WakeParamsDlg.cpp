@@ -14,7 +14,7 @@ CWakeParamsDlg::CWakeParamsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CWakeParamsDlg::IDD, pParent)
 {
 	m_NXWakePanels = 1;
-	m_TotalWakeLength  = 1.0;//% mac
+	m_TotalWakeLength  = 100.0;//% mac
 	m_WakePanelFactor = 1.1;
 }
 
@@ -42,7 +42,7 @@ END_MESSAGE_MAP()
 void CWakeParamsDlg::OnOK()
 {
 	m_NXWakePanels    = m_ctrlNXWakePanels.GetValue();
-	m_TotalWakeLength  = m_ctrlTotalWakeLength.GetValue();
+	m_TotalWakeLength = m_ctrlTotalWakeLength.GetValue();
 	m_WakePanelFactor = m_ctrlWakePanelFactor.GetValue();
 	CDialog::OnOK();
 }

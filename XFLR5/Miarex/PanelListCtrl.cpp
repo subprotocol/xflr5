@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CPanelListCtrl Class
-	Copyright (C) 2006 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2006-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,9 +29,6 @@
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
-#include "../misc/InPlaceNumEdit.h"
-#include "../misc/InPlaceFloatEdit.h"
-#include "../misc/InPlaceList.h"
 #include ".\Panellistctrl.h"
 #include "WingDlg.h"
 
@@ -42,6 +39,9 @@ CPanelListCtrl::CPanelListCtrl(void)
 	m_iItem      = 0;
 	m_iSubItem   = 0;
 	m_bIsEditing = false;
+	m_IPFloatEdit.m_pListCtrl = this;
+	m_IPNumEdit.m_pListCtrl   = this;
+	m_IPList.m_pListCtrl      = this;
 }
 
 CPanelListCtrl::~CPanelListCtrl(void)
@@ -50,7 +50,7 @@ CPanelListCtrl::~CPanelListCtrl(void)
 
 BEGIN_MESSAGE_MAP(CPanelListCtrl, CListCtrl)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PANELLIST, OnEndLabelEdit)
-	ON_WM_HSCROLL()
+	ON_WM_VSCROLL()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_LBUTTONDBLCLK()
@@ -110,14 +110,16 @@ int CPanelListCtrl::HitTestEx(CPoint &point, int *col) const
 }
 
 
+CEdit* CPanelListCtrl::EditSubLabel(int nItem, int nCol)
+{
+
+	// The returned pointer should not be saved
+
 // EditSubLabel		- Start edit of a sub item label
 // Returns		- Temporary pointer to the new edit control
 // nItem		- The row index of the item to edit
 // nCol			- The column of the sub item.
-CEdit* CPanelListCtrl::EditSubLabel( int nItem, int nCol )
-{
 	int i;
-	// The returned pointer should not be saved
 
 	m_iItem = nItem;
 	m_iSubItem = nCol;
@@ -126,7 +128,8 @@ CEdit* CPanelListCtrl::EditSubLabel( int nItem, int nCol )
 
 	if(nItem==-1) nItem =GetItemCount()-1;
 	if(nItem==GetItemCount()) nItem =0;
-	if(nCol==6 || nCol==8 || nCol==10){
+	if(nCol==6 || nCol==8 || nCol==10)
+	{
 		ShowInPlaceList(nItem, nCol);
 		return NULL;
 	}
@@ -181,55 +184,56 @@ CEdit* CPanelListCtrl::EditSubLabel( int nItem, int nCol )
 	{
 		if(nItem<GetItemCount()-1 || (nItem==GetItemCount()-1 && nCol!=4))
 		{
-			CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
-			if(nCol>0 && nCol<4) pEdit->m_iPrecision = 3;
-			pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
-			pEdit->m_ParentList = 0;
-			pEdit->m_nColumns = m_nColumns;
-			pEdit->m_nRows    = GetItemCount();
+//			CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
+			m_IPFloatEdit.Set(nItem, nCol, GetItemText(nItem, nCol));
+			if(nCol>0 && nCol<4) m_IPFloatEdit.m_iPrecision = 3;
+			else				 m_IPFloatEdit.m_iPrecision = 2;
+			m_IPFloatEdit.Create( dwStyle, rect, this, IDC_PEDIT);
+			m_IPFloatEdit.m_ParentList = 0;
+			m_IPFloatEdit.m_nColumns = m_nColumns;
+			m_IPFloatEdit.m_nRows    = GetItemCount();
 
 			SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
 			m_bIsEditing = true;
-			return pEdit;
+			return NULL;
 		}
 	}
 	else if(nCol==7 || nCol==9)
 	{
 		if(nItem<GetItemCount()-1)
 		{
-			CInPlaceNumEdit *pEdit = new CInPlaceNumEdit(this, nItem, nCol, GetItemText(nItem, nCol));
-			pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
-			pEdit->m_nColumns = m_nColumns;
-			pEdit->m_nRows    = GetItemCount();
+			m_IPNumEdit.Set(nItem, nCol, GetItemText(nItem, nCol));
+			m_IPNumEdit.Create( dwStyle, rect, this, IDC_PEDIT);
+			m_IPNumEdit.m_nColumns = m_nColumns;
+			m_IPNumEdit.m_nRows    = GetItemCount();
 
 			SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
 			m_bIsEditing = true;
-			return pEdit;
+			return NULL;
 		}
 	}
 	return NULL;
 }
 
 
-void CPanelListCtrl::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CPanelListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if (GetFocus() != this) SetFocus();
-	CListCtrl::OnHScroll(nSBCode, nPos, pScrollBar);
-}
-
-/*void CPanelListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
-{
-	if (GetFocus() != this) SetFocus();
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
-*/
+
 void CPanelListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 {
-	int index;
-	CString strong;
-	CListCtrl::OnLButtonDown(nFlags, point);
+	int index, column;
 
-	int column;
+//	CListCtrl::OnLButtonDown(nFlags, point);
+
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+
 	if((index = HitTestEx(point, &column)) != -1)
 	{
 		if(column==0) column=1;
@@ -246,22 +250,32 @@ void CPanelListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 //	int CurSection = ((CWingDlg*)m_pWingDlg)->m_iSection;
 	int index;
 	CString strong;
-	CListCtrl::OnLButtonDown(nFlags, point);
+//	CListCtrl::OnLButtonDown(nFlags, point);// no annoying Vista beep, thank you
 
 	int column;
+
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+
 	if((index = HitTestEx(point, &column)) != -1)
 	{
 		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
 //		if(index ==CurSection){
 			
 			((CWingDlg*)m_pWingDlg)->m_iSection = index;
+			m_iItem = index;
+			m_iSubItem = column;
 
 			UINT flag = LVIS_FOCUSED;
 			if( GetWindowLong(m_hWnd, GWL_STYLE) & LVS_EDITLABELS )
-				if(column==6 || column==8 ||column==10)	{
+			{
+				if(column==6 || column==8 ||column==10)	
+				{
 					ShowInPlaceList(index, column);
 				}
 				else   EditSubLabel(index, column);
+			}
 //		}
 //		else ((CWingDlg*)m_pWingDlg)->m_iSection = index;
 	}
@@ -291,6 +305,8 @@ void CPanelListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	}
 }
 
+CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
+{
 
 // ShowInPlaceList	- Creates an in-place drop down list for any 
 //					- cell in the list view control
@@ -299,8 +315,6 @@ void CPanelListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 // nCol				- The column index of the cell
 // lstItems			- A list of strings to populate the control with
 // nSel				- Index of the initial selection in the drop down list
-CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
-{
 	// The returned pointer should not be saved
 	int i, sel;
 	sel = 0;
@@ -345,55 +359,62 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 
 	if(nCol==6)
 	{
-		CComboBox *pList = new CInPlaceList(this, nItem, nCol);
-		pList->Create( dwStyle, rect, this, IDC_IPEDIT );
-		pList->SetItemHeight( -1, height);
-		pList->SetHorizontalExtent( GetColumnWidth( nCol));
-		for (i=0; i<m_strList.GetSize();i++) pList->AddString(m_strList[i]);
+		m_IPList.Create( dwStyle, rect, this, IDC_IPEDIT );
+		m_IPList.Set(nItem, nCol);
+		m_IPList.SetItemHeight( -1, height);
+		m_IPList.SetHorizontalExtent( GetColumnWidth( nCol));
+		for (i=0; i<m_strList.GetSize();i++) m_IPList.AddString(m_strList[i]);
 		sel = 0;
 		CString text = GetItemText(nItem, nCol);
-		for (i=0; i<m_strList.GetSize(); i++){
-			if(text==m_strList.GetAt(i)){
+
+		for (i=0; i<m_strList.GetSize(); i++)
+		{
+			if(text==m_strList.GetAt(i))
+			{
 				sel = i;
 				break;
 			}
 		}
-		pList->SetCurSel(sel);
-		return pList;
+		m_IPList.SetCurSel(sel);
+		return NULL;
 	}
-	else if(nCol==8 ){
-		if(nItem<GetItemCount()-1) {
-			CComboBox *pList = new CInPlaceList(this, nItem, nCol);
-			pList->Create( dwStyle, rect, this, IDC_IPEDIT );
-			pList->SetItemHeight( -1, height);
-			pList->SetHorizontalExtent( GetColumnWidth( nCol));
+	else if(nCol==8 )
+	{
+		if(nItem<GetItemCount()-1) 
+		{
+			m_IPList.Create( dwStyle, rect, this, IDC_IPEDIT );
+			m_IPList.Set(nItem, nCol);
+			m_IPList.SetItemHeight( -1, height);
+			m_IPList.SetHorizontalExtent( GetColumnWidth( nCol));
 
-			pList->AddString("Uniform");
-			pList->AddString("Cosine");
+			m_IPList.AddString("Uniform");
+			m_IPList.AddString("Cosine");
 			CString text = GetItemText(nItem, nCol);
 			if (text=="Uniform")	sel = 0;
 			else if(text=="Cosine")	sel = 1;
-			pList->SetCurSel(sel);
-			return pList;
+			m_IPList.SetCurSel(sel);
+			return NULL;
 		}
 	}
-	else if(nCol ==10){
-		if(nItem<GetItemCount()-1) {
-			CComboBox *pList = new CInPlaceList(this, nItem, nCol);
-			pList->Create( dwStyle, rect, this, IDC_IPEDIT );
-			pList->SetItemHeight( -1, height);
-			pList->SetHorizontalExtent( GetColumnWidth( nCol));
-			pList->AddString("Uniform");
-			pList->AddString("Cosine");
-			pList->AddString("Sine");
-			pList->AddString("-Sine");
+	else if(nCol ==10)
+	{
+		if(nItem<GetItemCount()-1) 
+		{
+			m_IPList.Create( dwStyle, rect, this, IDC_IPEDIT );
+			m_IPList.Set(nItem, nCol);
+			m_IPList.SetItemHeight( -1, height);
+			m_IPList.SetHorizontalExtent( GetColumnWidth( nCol));
+			m_IPList.AddString("Uniform");
+			m_IPList.AddString("Cosine");
+			m_IPList.AddString("Sine");
+			m_IPList.AddString("-Sine");
 			CString text = GetItemText(nItem, nCol);
 			if (text=="Uniform")	sel = 0;
 			else if(text=="Cosine")	sel = 1;
 			else if(text=="Sine")	sel = 2;
 			else if(text=="-Sine")	sel = 3;
-			pList->SetCurSel(sel);
-			return pList;
+			m_IPList.SetCurSel(sel);
+			return NULL;
 		}
 	}
 	return NULL;
@@ -420,41 +441,92 @@ void CPanelListCtrl::OnEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 
 BOOL CPanelListCtrl::PreTranslateMessage(MSG* pMsg)
 {
-/*		if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
-		{
-			return TRUE;				// DO NOT process further
-		}*/
-	
 	if( pMsg->message == WM_KEYDOWN )
 	{
 		if(pMsg->wParam == VK_TAB)
 		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+			if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+			if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+
 			POSITION pos = GetFirstSelectedItemPosition();
 			int iItem = GetNextSelectedItem(pos);
-//			int iSubItem = GetSelectedColumn();
 			int iSubItem = m_iSubItem;
 			SHORT sh   = GetKeyState(VK_SHIFT);
-			if ((sh & 0x8000))	{
+			EnsureVisible(m_iItem, true);
+			if ((sh & 0x8000))	
+			{
 				if (iSubItem > 1) EditSubLabel(iItem, iSubItem - 1);
 				else			  EditSubLabel(iItem, m_nColumns - 1);
-				
 			}
-			else{
+			else
+			{
 				if (iSubItem < m_nColumns-1)	EditSubLabel(iItem, iSubItem + 1);
 				else							EditSubLabel(iItem , 1);
 			}
 			return TRUE;
 		}
-	}
-	else if(pMsg->message == WM_VSCROLL){
-		return TRUE;
-	}
-/*	else if(pMsg->message == 9999){
-		LV_DISPINFO *plvDispInfo = (LV_DISPINFO *)pMsg->lParam;
+		if(pMsg->wParam == VK_F2)
+		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+			if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+			if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+			EnsureVisible(m_iItem, true);
+
+			POSITION pos = GetFirstSelectedItemPosition();
+			m_iItem = GetNextSelectedItem(pos);
+			int iSubItem = m_iSubItem;
+
+
+			if (iSubItem < m_nColumns-1)	EditSubLabel(m_iItem, iSubItem);
+			else							EditSubLabel(m_iItem , 1);
+			return TRUE;
+		}
+		if(pMsg->wParam == VK_DOWN)
+		{
+			if(m_IPList.GetSafeHwnd())
+			{
+				//Let the combobox handle the message
+			}
+			else
+			{
+				if(m_IPFloatEdit.GetSafeHwnd()) m_IPFloatEdit.SendMessage(WM_CLOSE);
+				if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+
+				if(m_iItem<GetItemCount()-1) m_iItem ++;
+
+				EnsureVisible(m_iItem, true);
+				EditSubLabel(m_iItem, m_iSubItem);
+
+				SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+				((CWingDlg*)m_pWingDlg)->m_iSection = m_iItem;
 		
-		EditSubLabel(plvDispInfo->item.iItem, plvDispInfo->item.iSubItem);
-		return TRUE;
-	}*/
+				return TRUE;
+			}
+		}
+		if(pMsg->wParam == VK_UP)
+		{
+			if(m_IPList.GetSafeHwnd())	
+			{ 
+				//Let the combobox handle the message
+			}
+			else 
+			{
+				if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+				if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+
+				if(m_iItem>0) m_iItem--;
+
+				EnsureVisible(m_iItem, true);
+				EditSubLabel(m_iItem, m_iSubItem);
+
+				SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+				((CWingDlg*)m_pWingDlg)->m_iSection = m_iItem;
+		
+				return TRUE;
+			}
+		}
+	}
 	
 	return CListCtrl::PreTranslateMessage(pMsg);
 }
@@ -476,14 +548,12 @@ void CPanelListCtrl::HighlightCell(int nItem, int nCol )
 					|| ((lvi.state & LVIS_SELECTED) && ((GetFocus() == this)
 					|| (GetStyle() & LVS_SHOWSELALWAYS))));
 
-
 	// Get rectangles for drawing
 	CRect rcBounds, rcLabel, rcIcon;
 	GetItemRect(nItem, rcBounds, LVIR_BOUNDS);
 	GetItemRect(nItem, rcLabel, LVIR_LABEL);
 	GetItemRect(nItem, rcIcon, LVIR_ICON);
 	CRect rcCol( rcBounds );
-
 
 	CString sLabel = GetItemText( nItem, 0 );
 
@@ -496,24 +566,24 @@ void CPanelListCtrl::HighlightCell(int nItem, int nCol )
 	int nExt;
 	switch( 1 )
 	{
-	case 0:
-		nExt = pDC->GetOutputTextExtent(sLabel).cx + offset;
-		rcHighlight = rcLabel;
-		if( rcLabel.left + nExt < rcLabel.right )
-			rcHighlight.right = rcLabel.left + nExt;
-		break;
-	case 1:
-		rcHighlight = rcBounds;
-		rcHighlight.left = rcLabel.left;
-		break;
-	case 2:
-		GetClientRect(&rcWnd);
-		rcHighlight = rcBounds;
-		rcHighlight.left = rcLabel.left;
-		rcHighlight.right = rcWnd.right;
-		break;
-	default:
-		rcHighlight = rcLabel;
+		case 0:
+			nExt = pDC->GetOutputTextExtent(sLabel).cx + offset;
+			rcHighlight = rcLabel;
+			if( rcLabel.left + nExt < rcLabel.right )
+				rcHighlight.right = rcLabel.left + nExt;
+			break;
+		case 1:
+			rcHighlight = rcBounds;
+			rcHighlight.left = rcLabel.left;
+			break;
+		case 2:
+			GetClientRect(&rcWnd);
+			rcHighlight = rcBounds;
+			rcHighlight.left = rcLabel.left;
+			rcHighlight.right = rcWnd.right;
+			break;
+		default:
+			rcHighlight = rcLabel;
 	}
 
 	// Draw the highlighted background color

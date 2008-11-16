@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Graph Classes
-    Copyright (C) 2003 André Deperrois xflr5@yahoo.com
+    Copyright (C) 2003-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -157,7 +157,8 @@ void Graph::DrawAxes(CDC *pDC)
 
 void Graph::DrawXTicks(CDC *pDC)
 {
-	if(fabs(xmax-xmin)/xunit>30.0) return;
+	if(abs(xunit)<0.00000001) return;
+	if(abs(xmax-xmin)/xunit>30.0) return;
 
 	CString strLabel;
 	int exp;
@@ -168,7 +169,8 @@ void Graph::DrawXTicks(CDC *pDC)
 	LOGFONT TempFont;
 	memcpy(&TempFont, &m_LabelLogFont, sizeof(LOGFONT));
 
-	if(m_bIsPrinting) {
+	if(m_bIsPrinting) 
+	{
 		TickSize = -300;
 		TempFont.lfHeight = TempFont.lfHeight*30;
 		xExpOff  = 900;
@@ -220,7 +222,8 @@ void Graph::DrawXTicks(CDC *pDC)
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
 
-	while(xt<=xmax*1.0001){
+	while(xt<=xmax*1.0001)
+	{
 		//Draw ticks
 		if(xt>=xmin){
 			pDC->MoveTo(int(xt/m_scalex)           + m_offset.x,
@@ -228,7 +231,8 @@ void Graph::DrawXTicks(CDC *pDC)
 			pDC->LineTo(int(xt/m_scalex)           + m_offset.x, 
 						int(yp/m_scaley)           + m_offset.y);
 
-			if(exp_x>=4 || exp_x<=-4) {
+			if(exp_x>=4 || exp_x<=-4) 
+			{
 				pDC->SetTextAlign(TA_RIGHT);
 				main = xt;
 				ExpFormat(main, exp);
@@ -244,7 +248,8 @@ void Graph::DrawXTicks(CDC *pDC)
 							 strLabel);
 				pDC->SelectObject(&LabelFont);
 			}
-			else {
+			else 
+			{
 				pDC->SetTextAlign(TA_CENTER);
 				if(exp_x>=0) strLabel.Format("%.f",xt);
 				else if (exp_x>=-1) strLabel.Format("%.1f",xt);
@@ -270,7 +275,8 @@ void Graph::DrawXTicks(CDC *pDC)
 
 void Graph::DrawYTicks(CDC *pDC)
 {
-	if(fabs(ymax-ymin)/yunit>30.0) return;
+	if(abs(xunit)<0.00000001) return;
+	if(abs(ymax-ymin)/yunit>30.0) return;
 
 	CString strLabel, strLabelExp;
 	int exp;
@@ -280,13 +286,15 @@ void Graph::DrawYTicks(CDC *pDC)
 	LOGFONT TempFont;
 	memcpy(&TempFont, &m_LabelLogFont, sizeof(LOGFONT));
 
-	if(m_bIsPrinting) {
+	if(m_bIsPrinting) 
+	{
 		TickSize = 300;
 		TempFont.lfHeight = TempFont.lfHeight*30;
 		xExpOff  = 100;
 		yExpOff  = -100;
 	}
-	else {
+	else 
+	{
 		TickSize = 5;
 		xExpOff  = 7;
 		yExpOff  = 2;
@@ -328,21 +336,25 @@ void Graph::DrawYTicks(CDC *pDC)
 	else if(xo>xmax)         xp = xmax;
 	else                     xp = xmin;
 
-	while(yt<=ymax*1.0001){
+	while(yt<=ymax*1.0001)
+	{
 		//Draw ticks
-		if(yt>=ymin){
+		if(yt>=ymin)
+		{
 			pDC->MoveTo((int)(xp/m_scalex)          +m_offset.x,
 						(int)(yt/m_scaley)          +m_offset.y);
 			pDC->LineTo((int)(xp/m_scalex)-TickSize +m_offset.x,
 						(int)(yt/m_scaley)          +m_offset.y);
 
-			if(exp_y>=3 || exp_y<=-3) {
+			if(exp_y>=3 || exp_y<=-3) 
+			{
 				pDC->SetTextAlign(TA_RIGHT);
 
 				main = yt;
 				ExpFormat(main, exp);
 
-				if(fabs(yt)<1.e-7) {
+				if(fabs(yt)<1.e-7) 
+				{
 					main = 0.0;
 					exp  = 0;
 				}
@@ -351,23 +363,27 @@ void Graph::DrawYTicks(CDC *pDC)
 				strLabelExp.Format("%d", exp);
 
 
-				if (!m_bIsPrinting){
+				if (!m_bIsPrinting)
+				{
 					pDC->TextOut((int)(xp/m_scalex)-int(TickSize*2.0) +m_offset.x,
 								 (int)(yt/m_scaley)-int(TickSize*1.5) +m_offset.y,
 								 strLabel);
 					pDC->SelectObject(&ExponentFont);
-					if(exp_y>=3){
+					if(exp_y>=3)
+					{
 						pDC->TextOut(int(xp/m_scalex) -int(TickSize*2.0) + xExpOff +m_offset.x,
 									 int(yt/m_scaley) -int(TickSize*2.0) - yExpOff +m_offset.y,
 									 strLabelExp);
 					}
-					else{
+					else
+					{
 						pDC->TextOut(int(xp/m_scalex) -int(TickSize*2.0) + xExpOff +2 +m_offset.x,
 									 int(yt/m_scaley) -int(TickSize*2.0) - yExpOff +m_offset.y,
 									 strLabelExp);
 					}
 				}
-				else{
+				else
+				{
 					pDC->TextOut((int)(xp/m_scalex)-int(TickSize*2.) +m_offset.x,
 								 (int)(yt/m_scaley)+int(TickSize)    +m_offset.y,
 								 strLabel);
@@ -379,7 +395,8 @@ void Graph::DrawYTicks(CDC *pDC)
 
 				pDC->SelectObject(&LabelFont);
 			}
-			else {
+			else 
+			{
 				pDC->SetTextAlign(TA_RIGHT);
 				if(exp_y>=0) strLabel.Format("%.f",yt);
 				else if (exp_y>=-1) strLabel.Format("%.1f",yt);
@@ -410,7 +427,8 @@ void Graph::DrawYTicks(CDC *pDC)
 
 void Graph::DrawXMajGrid(CDC *pDC)
 {
-	if(fabs(xmax-xmin)/xunit>30.0) return;
+	if(abs(xunit)<0.00000001) return;
+	if(abs(xmax-xmin)/xunit>30.0) return;
 	int YMin, YMax;
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
@@ -457,7 +475,8 @@ void Graph::DrawXMajGrid(CDC *pDC)
 
 void Graph::DrawYMajGrid(CDC *pDC)
 {
-	if(fabs(ymax-ymin)/yunit>30.0) return;
+	if(abs(yunit)<0.00000001) return;
+	if(abs(ymax-ymin)/yunit>30.0) return;
 
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
@@ -498,8 +517,10 @@ void Graph::DrawYMajGrid(CDC *pDC)
 
 void Graph::DrawXMinGrid(CDC *pDC)
 {
-	if(fabs(xmax-xmin)/xunit>30.0) return;
-	if(fabs(xmax-xmin)/m_XMinorUnit>100.0) return;
+	if(abs(xunit)<0.00000001) return;
+	if(abs(m_XMinorUnit)<0.00000001) return;
+	if(abs(xmax-xmin)/xunit>30.0) return;
+	if(abs(xmax-xmin)/m_XMinorUnit>100.0) return;
 	int YMin, YMax;
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
@@ -543,8 +564,10 @@ void Graph::DrawXMinGrid(CDC *pDC)
 
 void Graph::DrawYMinGrid(CDC *pDC)
 {
-	if(fabs(ymax-ymin)/yunit>30.0) return;
-	if(fabs(ymax-ymin)/m_YMinorUnit>100.0) return;
+	if(abs(yunit)<0.00000001) return;
+	if(abs(m_YMinorUnit)<0.00000001) return;
+	if(abs(ymax-ymin)/yunit>30.0) return;
+	if(abs(ymax-ymin)/m_YMinorUnit>100.0) return;
 
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
@@ -1097,7 +1120,7 @@ void Graph::SetDefaults()
 /****************************************************************************
 
     Curve Class
-    Copyright (C) 2003 André Deperrois XFLR5@yahoo.com
+    Copyright (C) 2003-2008 André Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1121,7 +1144,8 @@ void Graph::SetDefaults()
 //////////////////////////////////////////////////////////////////////
 
 
-CCurve::CCurve(){
+CCurve::CCurve()
+{
 	CurveColor = RGB(255,0,0);
 	memset(x,0,sizeof(x));
 	memset(y,0,sizeof(y));
@@ -1133,11 +1157,12 @@ CCurve::CCurve(){
 	CurveStyle = PS_SOLID;
 }
 
-CCurve::~CCurve(){
-
+CCurve::~CCurve()
+{
 }
 
-double CCurve::GetxMin(){
+double CCurve::GetxMin()
+{
 	double xMin = 99999999.0;
 //	if(n==0) xmin = .0; 
 //	else
@@ -1147,7 +1172,8 @@ double CCurve::GetxMin(){
 }
 
 
-double CCurve::GetxMax(){
+double CCurve::GetxMax()
+{
 	double xMax = -99999999.0;
 //	if(n==0) xmax = 1.0; 
 //	else
@@ -1156,7 +1182,8 @@ double CCurve::GetxMax(){
 	return xMax;
 }
 
-double CCurve::GetyMin(){
+double CCurve::GetyMin()
+{
 	double yMin = 99999999.0;
 //	if(n==0) ymin = .0; 
 //	else
@@ -1166,7 +1193,8 @@ double CCurve::GetyMin(){
 }
 
 
-double CCurve::GetyMax(){
+double CCurve::GetyMax()
+{
 	double yMax = -99999999.0;
 //	if(n==0) ymax = 1.0; 
 //	else
@@ -1176,24 +1204,29 @@ double CCurve::GetyMax(){
 }
 
 
-int CCurve::AddPoint(double xn, double yn){
+int CCurve::AddPoint(double xn, double yn)
+{
 	x[n] = xn;
 	y[n] = yn;
 	n++;
 	return n;
 }
 
-void CCurve::ResetCurve(){
+void CCurve::ResetCurve()
+{
 	n = 0;
 }
 
-bool Graph::GetAutoX(){
+bool Graph::GetAutoX()
+{
 	return m_bAutoX;
 }
-bool Graph::GetAutoY(){
+bool Graph::GetAutoY()
+{
 	return m_bAutoY;
 }
-bool Graph::GetBorder(){
+bool Graph::GetBorder()
+{
 	return m_bBorder;
 }
 
@@ -2040,13 +2073,17 @@ void Graph::SetType(int type)
 bool Graph::SetXScale()
 {
 	CCurve *pCurve;
+	int nc;
 
-	if(m_bAutoX){
-		
+	if(m_bAutoX)
+	{	
 		bool bCurve = false;
 
-		if (m_oaCurves.GetSize()){//init only if we have a curve
-			for (int nc=0; nc < m_oaCurves.GetSize(); nc++){
+		if (m_oaCurves.GetSize())
+		{
+			//init only if we have a curve
+			for (nc=0; nc < m_oaCurves.GetSize(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if (pCurve->IsVisible() && pCurve->n>1){
 					bCurve = true;
@@ -2054,10 +2091,11 @@ bool Graph::SetXScale()
 				}
 			}
 		}
-		if (bCurve){//init only if we have a curve
+		if (bCurve)
+		{
 			Cxmin =  9999999.0;
 			Cxmax = -9999999.0;
-			for (int nc=0; nc < m_oaCurves.GetSize(); nc++){
+			for (nc=0; nc < m_oaCurves.GetSize(); nc++){
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if (pCurve->IsVisible() && pCurve->n>0){
 					Cxmin = __min(Cxmin, pCurve->GetxMin());
@@ -2065,15 +2103,16 @@ bool Graph::SetXScale()
 				}
 			}
 
-			if(Cxmax<=Cxmin){
+			if(Cxmax<=Cxmin)
 				Cxmax = (Cxmin+1.0)*2.0;
-			}
 			
-			if(m_Type == 1){
+			if(m_Type == 1)
+			{
 				xmin = __min(xmin, Cxmin);
 				xmax = __max(xmax, Cxmax);
 			}
-			else{
+			else
+			{
 				xmin = Cxmin;
 				xmax = Cxmax;
 			}
@@ -2081,10 +2120,13 @@ bool Graph::SetXScale()
 			if(Cxmax<=0.0) xmax = 0.0;
 			
 		}
-		else{// until things are made clear
-			for (int nc=0; nc < m_oaCurves.GetSize(); nc++){
+		else
+		{// until things are made clear
+			for (nc=0; nc < m_oaCurves.GetSize(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
-				if (pCurve->IsVisible() && pCurve->n>0){
+				if (pCurve->IsVisible() && pCurve->n>0)
+				{
 					xmin = __min(xmin, pCurve->x[0]);
 					xmax = __max(xmax, pCurve->x[0]);
 				}
@@ -2092,11 +2134,14 @@ bool Graph::SetXScale()
 		}
 		xo=0.0;
 
-		if(fabs((xmin-xmax)/xmin)<0.001){
+		if(abs((xmin-xmax)/xmin)<0.001)
+		{
 			if(fabs(xmin)<0.00001) xmax = 1.0;
-			else {
+			else 
+			{
 				xmax = 2.0 * xmin;
-				if(xmax < xmin){
+				if(xmax < xmin)
+				{
 					double tmp = xmax;
 					xmax = xmin;
 					xmin = tmp;
@@ -2114,12 +2159,15 @@ bool Graph::SetXScale()
 		SetAutoXUnit();		
 
 	}
-	else{ //scales are set manually
+	else
+	{ 
+		//scales are set manually
 		if(m_w<=0) return false;
 	
 		m_scalex   =  (xmax-xmin)/(double)m_w;
 
-		if (xunit<1.0) {
+		if (xunit<1.0)
+		{
 			exp_x = (int)log10(xunit)-1;
 			exp_x=__max(-4, exp_x);
 		}
@@ -2134,7 +2182,8 @@ bool Graph::SetXScale()
 	// center graph in drawing rectangle
 	m_offset.x = Xg-Xc;
 
-	if(m_bIsPrinting){
+	if(m_bIsPrinting)
+	{
 		m_scalex   = m_scalex ;
 		m_offset.x = m_offset.x;
 	}

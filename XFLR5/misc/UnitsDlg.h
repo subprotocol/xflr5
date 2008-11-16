@@ -33,6 +33,8 @@ class CUnitsDlg : public CDialog
 	friend class CMainFrame;
 	friend class CWing;
 	friend class CMiarex;
+	friend class CBody;
+
 // Construction
 public:
 	CUnitsDlg(CWnd* pParent = NULL);   // standard constructor

@@ -32,6 +32,7 @@
 #include "../Design/AFoil.h"
 #include "../XInverse/XInverse.h"
 
+
 /////////////////////////////////////////////////////////////////////////////
 // CChildView window
 
@@ -87,6 +88,7 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnClrSettings();
+	afx_msg void OnSaveImage();
 	afx_msg void OnPaletteChanged(CWnd* pFocusWnd);
 	afx_msg BOOL OnQueryNewPalette();
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -122,6 +124,8 @@ private:
 	COLORREF m_WndTextColor;
 	// end color settings
 
+	int	m_nFilterLoad;
+	int m_ImageFileType;
 	
 	CRect m_rCltRect;
 	CXDirect *m_pXDirect;

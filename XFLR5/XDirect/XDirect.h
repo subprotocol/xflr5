@@ -33,6 +33,7 @@
 #include "./FoilAnalysisDlg.h"
 #include "./ViscDlg.h"
 #include "./Foil.h"
+#include "atlimage.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CXDirect window
@@ -212,6 +213,7 @@ private:
 	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
 	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint) ;
 	void OnCpCalcError();
+	void PaintImage(ATL::CImage *pImage, CString &FileName, int FileType);
 	void PaintCoupleGraph(CDC *pDC, CRect *pDrawRect);
 	void PaintOpPoint(CDC *pDC, CRect* pCltRect, CRect* pDrawRect);
 	void PaintPolarGraphs(CDC *pDC, CRect *pCltRect);
@@ -267,7 +269,6 @@ private:
 	void OnResetGraph();
 	void OnSingleAnalysis();
 	void OnBatchAnalysis();
-	void OnSave();
 
 	void OnRenamePlr();
 	void OnDeletePlr();

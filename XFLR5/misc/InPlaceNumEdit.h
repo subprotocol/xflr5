@@ -28,6 +28,7 @@ class CInPlaceNumEdit :
 	friend class CPanelListCtrl;
 	friend class CControlListCtrl;
 public:
+	CInPlaceNumEdit();
 	CInPlaceNumEdit(CListCtrl* pCtrl, int iItem, int iSubItem, CString sInitText);
 	~CInPlaceNumEdit(void);
 
@@ -49,6 +50,7 @@ public:
 	void SetValue(int i);
 	bool IsValid();
 	int GetValue();
+	void Set(int iItem, int iSubItem, CString sInitText);
 
 	CListCtrl *m_pListCtrl;
 

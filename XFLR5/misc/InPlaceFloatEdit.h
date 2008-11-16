@@ -29,6 +29,7 @@ class CInPlaceFloatEdit :
 	friend class CEditListCtrl;
 
 public:
+	CInPlaceFloatEdit();
 	CInPlaceFloatEdit(CListCtrl* pCtrl, int iItem, int iSubItem, CString sInitText);
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -50,6 +51,7 @@ public:
 	bool CheckBeforeExit();
 	bool IsValid();
 	void Clear();
+	void Set(int iItem, int iSubItem, CString sInitText);
 //	void SetMin(double f);
 //	void SetMax(double f);
 	void SetValue(double f);
@@ -62,13 +64,10 @@ public:
 
 	CListCtrl *m_pListCtrl;
 
-	void EditParentSubLabel(int iItem, int iSubItem);
-
 	// Generated message map functions
 protected:
 	//{{AFX_MSG(CInPlaceEdit)
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
-	afx_msg void OnNcDestroy();
 	afx_msg void OnSetFocus();
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

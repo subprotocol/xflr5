@@ -2,7 +2,7 @@
 
 	
 	CEditListCtrl	class
-	Copyright (C) 2007 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2007-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
-#include "InPlaceFloatEdit.h"
-#include "InPlaceList.h"
 #include ".\Editlistctrl.h"
 
 
@@ -121,6 +119,9 @@ CInPlaceFloatEdit* CEditListCtrl::EditSubLabel( int nItem, int nCol )
 {
 	int i;
 
+	m_iItem = nItem;
+	m_iSubItem = nCol;
+
 	if(m_iSubItem==0) return NULL;
 
 	if(nItem==-1) nItem =GetItemCount()-1;
@@ -174,19 +175,18 @@ CInPlaceFloatEdit* CEditListCtrl::EditSubLabel( int nItem, int nCol )
 
 	dwStyle |= WS_BORDER|WS_CHILD|WS_VISIBLE|ES_AUTOHSCROLL;
 
-	CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
-	if(pEdit)
-	{
-		pEdit->Create( dwStyle, rect, this, IDC_PEDIT);
-		pEdit->m_ParentList = 1;
-		pEdit->m_nColumns = m_nColumns;
-		pEdit->m_nRows    = GetItemCount();
-		pEdit->m_iPrecision = m_iPrecision[nCol];
-		m_bIsEditing = true;
-	}
+//	CInPlaceFloatEdit *pEdit = new CInPlaceFloatEdit(this, nItem, nCol, GetItemText(nItem, nCol));
+	m_IPFloatEdit.Set(nItem, nCol, GetItemText(nItem, nCol));
+	m_IPFloatEdit.m_ParentList = 1;
+	m_IPFloatEdit.m_nColumns = m_nColumns;
+	m_IPFloatEdit.m_nRows    = GetItemCount();
+	m_IPFloatEdit.m_iPrecision = m_iPrecision[nCol];
+	m_IPFloatEdit.Create( dwStyle, rect, this, IDC_PEDIT);
+	m_bIsEditing = true;
+
 	SetItemState(nItem, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
 
-	return pEdit;
+	return NULL;
 }
 
 
@@ -198,7 +198,7 @@ void CEditListCtrl::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CEditListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if( GetFocus() != this ) SetFocus();
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -255,12 +255,84 @@ void CEditListCtrl::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CListCtrl::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 */
+
 BOOL CEditListCtrl::PreTranslateMessage(MSG* pMsg)
 {
-/*		if(pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)
+	if( pMsg->message == WM_KEYDOWN )
+	{
+		if(pMsg->wParam == VK_ESCAPE)
 		{
-			return TRUE;				// DO NOT process further
-		}*/
+			CloseEdit();
+			return TRUE;
+		}
+		if(pMsg->wParam == VK_TAB)
+		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+
+//			POSITION pos = GetFirstSelectedItemPosition();
+//			int iItem = GetNextSelectedItem(pos);
+//			int iSubItem = m_iSubItem;
+
+			EnsureVisible(m_iItem, true);
+
+			SHORT sh   = GetKeyState(VK_SHIFT);
+			if ((sh & 0x8000))	
+			{
+				if (m_iSubItem > 1) EditSubLabel(m_iItem, m_iSubItem - 1);
+				else			    EditSubLabel(m_iItem, m_nColumns - 1);
+			}
+			else
+			{
+				if (m_iSubItem < m_nColumns-1)	EditSubLabel(m_iItem, m_iSubItem + 1);
+				else							EditSubLabel(m_iItem , 1);
+			}
+			return TRUE;
+		}
+		if(pMsg->wParam == VK_F2)
+		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+
+//			POSITION pos = GetFirstSelectedItemPosition();
+//			int iItem = GetNextSelectedItem(pos);
+//			int iSubItem = m_iSubItem;
+
+			EnsureVisible(m_iItem, true);
+
+			if (m_iSubItem < m_nColumns)	EditSubLabel(m_iItem, m_iSubItem);
+			else							EditSubLabel(m_iItem , 1);
+			return TRUE;
+		}
+		if(pMsg->wParam == VK_DOWN)
+		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+
+//			POSITION pos = GetFirstSelectedItemPosition();
+//			int iItem = GetNextSelectedItem(pos);
+//			int iSubItem = m_iSubItem;
+
+			if (m_iItem < GetItemCount()-1) m_iItem ++;
+
+			EnsureVisible(m_iItem, true);
+			EditSubLabel(m_iItem, m_iSubItem);
+//			SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+			return TRUE;
+		}
+		if(pMsg->wParam == VK_UP)
+		{
+			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+
+//			POSITION pos = GetFirstSelectedItemPosition();
+//			int iItem = GetNextSelectedItem(pos);
+//			int iSubItem = m_iSubItem;
+
+			if(m_iItem>0) m_iItem--;
+			EnsureVisible(m_iItem, true);
+			EditSubLabel(m_iItem, m_iSubItem);
+//			SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+	
+			return TRUE;
+		}
+	}
 	return CListCtrl::PreTranslateMessage(pMsg);
 }
 
@@ -358,13 +430,18 @@ void CEditListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 	int index;
 //	int CurSel = m_iItem;
 	CString strong;
-//	CListCtrl::OnLButtonDown(nFlags, point);
+//	CListCtrl::OnLButtonDown(nFlags, point);// no annoying vista beep, thank you
 
+	CloseEdit();
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)
 	{
+		if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+
+		m_iItem = index;
 		m_iSubItem = column;
-		if(column>0){
+		if(column>0)
+		{
 			UINT flag = LVIS_FOCUSED;
 			if( GetWindowLong(m_hWnd, GWL_STYLE) & LVS_EDITLABELS )
 				EditSubLabel(index, column);
@@ -381,6 +458,7 @@ void CEditListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)
 	{
+		if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
 		m_iItem = index;
 		m_iSubItem = column;
 		if(column==0) column=1;
@@ -399,6 +477,7 @@ void CEditListCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)
 	{
+		if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
 		m_iItem = index;
 		m_iSubItem = column;
 		UINT flag = LVIS_FOCUSED;
@@ -412,4 +491,11 @@ BOOL CEditListCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if(m_bIsEditing) return TRUE;
 	return CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+}
+
+
+
+void CEditListCtrl::CloseEdit()
+{
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
 }

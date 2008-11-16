@@ -41,6 +41,7 @@
 #include "Body.h"
 #include "BodyCtrlBar.h"
 #include "ArcBall.h"
+#include "atlimage.h"
 
 // Custom palette structure
 typedef struct tagLogicalPalette 
@@ -95,6 +96,7 @@ class CMiarex : public CWnd
 	friend class C3DPanelThread;
 	friend class CArcBall;
 	friend class CBodyScaleDlg;
+	friend class CBodyTransDlg;
 
 // Construction
 public:
@@ -144,7 +146,6 @@ protected:
 	void OnRenameCurBody();
 	void OnDeleteCurBody();
 	void OnDuplicateCurBody();
-	void OnScaleCurBody();
 	void OnExportCurBody();
 	void OnSaveCurBodyAsProject();
 	void OnResetBodyScale();
@@ -152,8 +153,13 @@ protected:
 	void OnCpLegend();
 	void OnBodyResolution();
 	void OnInterpolateBodyPoints();
-	void OnScaleFrame();
+	void OnScaleCurBody();
+	void OnTranslateCurBody();
 	void OnShowOnlyActiveFrame();
+	void OnSelectBodyOverlay();
+	void OnOverlaySection();
+	void OnImportBodyDefinition();
+	void OnExportBodyDefinition();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -235,13 +241,14 @@ private:
 	void GLDrawBodyLegend();
 	void GLDrawAxes();
 	void GLCreateBodyBezier();
-	void GLCreateBodySurface();
+	void GLCreateBody2DBodySection();
+	void GLCreateBody3DSplines();
+	void GLCreateBody3DFlatPanels();
 	void GLCreateBodyMesh();
-	void GLCreateBodyLines();
 	void GLCreateBodyPoints();
-	void GLCreateBodyAxialLines();
-	void GLCreateBodyFrame();
+	void GLCreateBodyFrames();
 	void GLCreateBodyGrid();
+	void GLCreateBodyOverlay();
 	void GLCreateGeom(CWing *pWing, UINT List, COLORREF wingcolor);
 	void GLCreateMesh();
 	void GLCreateWakePanels(int LIST);
@@ -278,7 +285,6 @@ private:
                        CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool VLMIsSameSide(int p, int pp);
 	bool LoadSettings(CArchive &ar);
-//	bool RotateFlap(CWing *pWing, int const &nFlap, double const &Angle, CPanel *pPanel, CVector *pNode);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
 	bool SetModBody(CBody *pModBody);
 	bool SetModWing(CWing *pWing);
@@ -333,6 +339,7 @@ private:
 	void PrintFourWingGraph(CDC *pDC, CRect *pCltRect);
 	void RotateGeomY(double const &Angle, CVector const &P);
 	void RotateGeomZ(double const &Beta, CVector const &P);
+	void PaintImage(ATL::CImage *pImage, CString &FileName, int FileType);
 	void SaveSettings(CArchive &ar);
 	void StopAnimate();
 	void SetParams();
@@ -357,7 +364,7 @@ private:
 
 	void ClientToGL(CPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, CPoint &point);
-
+	void SnapClient(CDC *pDC, CImage *pImage, CString FileName, int FileType);
 
 	double GetCl(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
 	double GetCm(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
@@ -459,6 +466,7 @@ private:
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
 	bool m_bResetglBody2D;
+	bool m_bResetglBodyOverlay;
 	bool m_bResetglBodyPoints;
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
 	bool m_bAnimate;			// true if there is an animation going on, 
@@ -489,7 +497,8 @@ private:
 	bool m_bglLight; 
 	bool m_bArcball;			//true if the arcball is to be displayed
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
-	bool m_bPickCenter;
+	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
+	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
 
 	int m_NSurfaces;
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
@@ -597,6 +606,7 @@ private:
 	CBody *m_pCurBody;
 
 	COLORREF m_WingColor, m_StabColor, m_FinColor;
+
 
 public:
 	//temporary variables, save repeated allocation times

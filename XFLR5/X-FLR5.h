@@ -86,7 +86,6 @@ bool GetPrintColor();
 bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
 bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax);
 bool Gauss(double *A, int n, double *B, int m);
-bool SplineInterpolation(int n, double *x, double *y, double a[4], double b[4], double c[4], double d[4]);
 
 // CXFLR5App:
 // See X-FLR6.cpp for the implementation of this class

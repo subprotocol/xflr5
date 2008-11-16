@@ -60,7 +60,7 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 	m_bGround       = false;
 
 	m_NXWakePanels    = 5;
-	m_TotalWakeLength = 10.0;//x mac
+	m_TotalWakeLength = 100.0;//x mac
 	m_WakePanelFactor = 1.1;
 
 	m_SymbolFont.CreatePointFont(100, "Symbol");
@@ -238,7 +238,7 @@ BOOL CWngAnalysis::OnInitDialog()
 	if(m_bWakeRollUp) 	m_ctrlWakeRollUp.SetCheck(TRUE);
 
 	m_ctrlWakeRollUp.EnableWindow(FALSE);
-//	m_ctrlWakeParams.EnableWindow(FALSE);
+	m_ctrlWakeParams.EnableWindow(FALSE);
 
 	OnTiltedGeom();
 

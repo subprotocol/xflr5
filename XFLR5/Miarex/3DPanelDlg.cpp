@@ -269,7 +269,8 @@ void C3DPanelDlg::Plot()
 
 void C3DPanelDlg::OnTimer(UINT nIDEvent)
 {
-	if(m_pPanelThread && m_pPanelThread->m_bFinished){
+	if(m_pPanelThread && m_pPanelThread->m_bFinished)
+	{
 		HANDLE hThread = m_pPanelThread->m_hThread;
 		WaitForSingleObject(hThread, INFINITE);
 		delete m_pPanelThread;
@@ -1227,7 +1228,7 @@ void C3DPanelDlg::SumPanelForces(double *Cp, double Alpha, double Qinf, double &
 	Drag = PanelForce.x * cos(Alpha*pi/180.0) + PanelForce.z * sin(Alpha*pi/180.0);
 }
 
-
+ 
 bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 {
 	// calculates the various wing coefficients by interpolating

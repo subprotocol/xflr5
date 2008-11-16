@@ -24,42 +24,46 @@
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
-#include "BodyScaleDlg.h"
-#include ".\bodyscaledlg.h"
+#include "BodyTransDlg.h"
+#include ".\bodytransdlg.h"
 #include "Miarex.h"
 #include "../main/MainFrm.h"
-// Boîte de dialogue CBodyScaleDlg
+// Boîte de dialogue CBodyTransDlg
 
-IMPLEMENT_DYNAMIC(CBodyScaleDlg, CDialog)
-CBodyScaleDlg::CBodyScaleDlg(CWnd* pParent /*=NULL*/)
-	: CDialog(CBodyScaleDlg::IDD, pParent)
+IMPLEMENT_DYNAMIC(CBodyTransDlg, CDialog)
+
+CBodyTransDlg::CBodyTransDlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CBodyTransDlg::IDD, pParent)
 {
 	m_pMiarex = pParent;
-	m_XFactor = 1.0;
-	m_YFactor = 1.0;
-	m_ZFactor = 1.0;
+	m_XTrans = 0.0;
+	m_YTrans = 0.0;
+	m_ZTrans = 0.0;
 	m_bFrameOnly = false;
 	m_FrameID = 0;
 	m_pMainFrame = NULL;
 }
 
-CBodyScaleDlg::~CBodyScaleDlg()
+CBodyTransDlg::~CBodyTransDlg()
 {
 }
 
-void CBodyScaleDlg::DoDataExchange(CDataExchange* pDX)
+void CBodyTransDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
+	DDX_Control(pDX, IDC_LENGTH1, m_ctrlLength1);
+	DDX_Control(pDX, IDC_LENGTH2, m_ctrlLength2);
+	DDX_Control(pDX, IDC_LENGTH3, m_ctrlLength3);
 	DDX_Control(pDX, IDC_FRAMEID, m_ctrlFrameID);
-	DDX_Control(pDX, IDC_XFACTOR, m_ctrlXScaleFactor);
-	DDX_Control(pDX, IDC_YFACTOR, m_ctrlYScaleFactor);
-	DDX_Control(pDX, IDC_ZFACTOR, m_ctrlZScaleFactor);
+	DDX_Control(pDX, IDC_XTRANS, m_ctrlXTransFactor);
+	DDX_Control(pDX, IDC_YTRANS, m_ctrlYTransFactor);
+	DDX_Control(pDX, IDC_ZTRANS, m_ctrlZTransFactor);
 	DDX_Control(pDX, IDOK, m_ctrlOK);
 }
 
 
-BEGIN_MESSAGE_MAP(CBodyScaleDlg, CDialog)
+BEGIN_MESSAGE_MAP(CBodyTransDlg, CDialog)
 	ON_BN_CLICKED(IDOK, OnOK)
 	ON_BN_CLICKED(IDC_RADIO1, OnRadio1)
 	ON_BN_CLICKED(IDC_RADIO2, OnRadio1)
@@ -67,17 +71,27 @@ BEGIN_MESSAGE_MAP(CBodyScaleDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Gestionnaires de messages CBodyScaleDlg
+// Gestionnaires de messages CBodyTransDlg
 
-BOOL CBodyScaleDlg::OnInitDialog()
+BOOL CBodyTransDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	m_ctrlXScaleFactor.SetValue(m_XFactor);
-	m_ctrlYScaleFactor.SetValue(m_YFactor);
-	m_ctrlZScaleFactor.SetValue(m_ZFactor);
+	CMainFrame * pMainFrame = (CMainFrame*)m_pMainFrame;
 
-	m_ctrlXScaleFactor.SetFocus();
+	CString str;
+	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	m_ctrlLength1.SetWindowText(str);
+	m_ctrlLength2.SetWindowText(str);
+	m_ctrlLength3.SetWindowText(str);
+
+	m_ctrlXTransFactor.SetValue(m_XTrans * pMainFrame->m_mtoUnit);
+	m_ctrlYTransFactor.SetValue(m_YTrans * pMainFrame->m_mtoUnit);
+	m_ctrlZTransFactor.SetValue(m_ZTrans * pMainFrame->m_mtoUnit);
+
+	m_ctrlXTransFactor.SetFocus();
+	m_ctrlYTransFactor.EnableWindow(FALSE);
+
 
 	CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
 	m_ctrlFrameID.EnableWindow(false);
@@ -88,13 +102,12 @@ BOOL CBodyScaleDlg::OnInitDialog()
 		CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
 		GetDlgItem(IDC_RADIO1)->EnableWindow(false);
 		GetDlgItem(IDC_RADIO2)->EnableWindow(false);
-		m_ctrlXScaleFactor.EnableWindow(false);
 	}
 
 	return FALSE;
 }
 
-BOOL CBodyScaleDlg::PreTranslateMessage(MSG* pMsg)
+BOOL CBodyTransDlg::PreTranslateMessage(MSG* pMsg)
 {
 	CWnd* pWnd = GetFocus();
 
@@ -111,36 +124,34 @@ BOOL CBodyScaleDlg::PreTranslateMessage(MSG* pMsg)
 
 
 
-void CBodyScaleDlg::OnOK()
+void CBodyTransDlg::OnOK()
 {
 	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
 
 	m_FrameID = m_ctrlFrameID.GetValue()-1;
 	
-	m_XFactor = m_ctrlXScaleFactor.GetValue();
-	m_YFactor = m_ctrlYScaleFactor.GetValue();
-	m_ZFactor = m_ctrlZScaleFactor.GetValue();
+	m_XTrans = m_ctrlXTransFactor.GetValue()/ pMainFrame->m_mtoUnit;
+	m_YTrans = m_ctrlYTransFactor.GetValue()/ pMainFrame->m_mtoUnit;
+	m_ZTrans = m_ctrlZTransFactor.GetValue()/ pMainFrame->m_mtoUnit;
 	
 	CDialog::OnOK();
 }
 
-void CBodyScaleDlg::OnRadio1()
+void CBodyTransDlg::OnRadio1()
 {
 	if(GetCheckedRadioButton(IDC_RADIO1, IDC_RADIO2)==IDC_RADIO1)
 	{
 		m_ctrlFrameID.EnableWindow(false);
-		m_ctrlXScaleFactor.EnableWindow(true);
 		m_bFrameOnly = false;
 	}
 	else
 	{
 		m_ctrlFrameID.EnableWindow(true);
-		m_ctrlXScaleFactor.EnableWindow(false);
 		m_bFrameOnly = true;
 	}
 }
 
-void CBodyScaleDlg::OnKillFocusFrameId()
+void CBodyTransDlg::OnKillFocusFrameId()
 {
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	m_FrameID = m_ctrlFrameID.GetValue()-1;

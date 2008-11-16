@@ -64,6 +64,7 @@ protected:
 	void ReadSectionData(int sel, double &Re, double &Mach, double &NCrit);
 	void SetSelection(int sel);
 	void FillReList();
+	void FillCell(int iItem, int iSubItem);
 
 	// Generated message map functions
 	//{{AFX_MSG(CReListDlg)
@@ -71,8 +72,6 @@ protected:
 	afx_msg void OnNMRClickReList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditReList2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnInsertBefore();
-	afx_msg void OnInsert();
-	afx_msg void OnAppend();
 	afx_msg void OnDelete();
 	virtual BOOL OnInitDialog();
 	//}}AFX_MSG

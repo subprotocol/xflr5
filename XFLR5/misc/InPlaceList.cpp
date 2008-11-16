@@ -32,6 +32,14 @@
 /////////////////////////////////////////////////////////////////////////////
 // CInPlaceList
 
+CInPlaceList::CInPlaceList()
+{
+	m_nSel = 0;
+	m_bWingCtrl = false;
+	m_bESC = FALSE;
+}
+
+
 CInPlaceList::CInPlaceList(CListCtrl *pCtrl, int iItem, int iSubItem)
 {
 	m_pListCtrl = pCtrl;
@@ -39,9 +47,6 @@ CInPlaceList::CInPlaceList(CListCtrl *pCtrl, int iItem, int iSubItem)
 	m_iItem = iItem;
 	m_iSubItem = iSubItem;
 
-//	for(int i=0; i<pstrArray->GetSize(); i++){
-//		m_strArray.Add(pstrArray->GetAt(i));
-//	}
 	m_nSel = 0;
 	m_bWingCtrl = false;
 	m_bESC = FALSE;
@@ -57,7 +62,6 @@ BEGIN_MESSAGE_MAP(CInPlaceList, CComboBox)
 	ON_WM_CREATE()
 	ON_WM_KILLFOCUS()
 	ON_WM_CHAR()
-	ON_WM_NCDESTROY()
 	ON_CONTROL_REFLECT(CBN_CLOSEUP, OnCloseup)
 	//}}AFX_MSG_MAP
 	ON_CONTROL_REFLECT(CBN_SELCHANGE, OnCbnSelchange)
@@ -95,7 +99,7 @@ BOOL CInPlaceList::PreTranslateMessage(MSG* pMsg)
 			PostMessage( WM_CLOSE );
 			return TRUE;				// DO NOT process further
 		}
-		if(pMsg->wParam == VK_LEFT)
+/*		if(pMsg->wParam == VK_LEFT)
 		{
 			if (m_iSubItem > 0)
 				pListCtrl->EditSubLabel (m_iItem, m_iSubItem-1);
@@ -125,7 +129,7 @@ BOOL CInPlaceList::PreTranslateMessage(MSG* pMsg)
 				else                                        pListCtrl->EditSubLabel(m_iItem, m_iSubItem+1);
 			}
 			return TRUE;
-		}
+		}*/
 	}
 
 	return CComboBox::PreTranslateMessage(pMsg);
@@ -205,15 +209,16 @@ void CInPlaceList::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CComboBox::OnChar(nChar, nRepCnt, nFlags);
 }
 
-void CInPlaceList::OnNcDestroy()
-{
-	CComboBox::OnNcDestroy();
-
-	delete this;
-}
 
 void CInPlaceList::OnCloseup()
 {
 //	GetParent()->SetFocus();
 }
+
+void CInPlaceList::Set(int iItem, int iSubItem)
+{
+	m_iItem = iItem;
+	m_iSubItem = iSubItem;
+}
+
 

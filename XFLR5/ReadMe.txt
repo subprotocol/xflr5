@@ -53,6 +53,17 @@ TODO :
 	Set Gauss as global
 
 
+v4.12 November xxx, 2008
+	- Added an option to export the client area to an image file
+	- Fixed issues with file paths while saving
+	- Fixed the bug which prevented XFLR5 to launch after a selection of the thumbnail window
+	- Set the default parameter for 3D panel wake length to 100 x MAC instead of 1 x MAC
+	- Added the x-coordinate to export of current XFoil results
+	- Added option for .csv format option for all txt file exports
+	- Fixed a rare crash bug when using foil polars with zero content
+	- Corrected the bug which prevented to insert a projet in the one currently opened
+	- Improved the MMI of the panel list in the wing design dialog
+
 v4.11 November 2nd, 2008
 	- Changed the twist/washout application method ; used to be set around y-axis irrespective of dihedral;
 	  is now set around the panel's quarter chord, once the panel has been rotated by the dihedral angle

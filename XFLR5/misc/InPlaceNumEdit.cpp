@@ -24,6 +24,18 @@
 #include ".\inplacenumedit.h"
 #include "../Miarex/PanelListCtrl.h"
 
+
+CInPlaceNumEdit::CInPlaceNumEdit()
+{
+	m_nColumns = 0;
+	m_nRows = 0;
+	m_bESC = FALSE;
+	//until we know better
+	m_iMin = -10000000;
+	m_iMax =  10000000;
+}
+
+
 CInPlaceNumEdit::CInPlaceNumEdit(CListCtrl* pCtrl, int iItem, int iSubItem, CString sInitText)
 {
 	m_iItem = iItem;
@@ -56,7 +68,6 @@ BEGIN_MESSAGE_MAP(CInPlaceNumEdit, CEdit)
 	ON_WM_KILLFOCUS()
 	ON_CONTROL_REFLECT(EN_SETFOCUS, OnSetFocus)
 	ON_WM_GETDLGCODE()
-	ON_WM_NCDESTROY()
 	ON_WM_KEYDOWN()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -167,7 +178,7 @@ void CInPlaceNumEdit::OnKillFocus(CWnd* pNewWnd)
 	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 //	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
-	DestroyWindow();
+//	DestroyWindow();
 }
 
 
@@ -197,6 +208,13 @@ void CInPlaceNumEdit::SetMin(int k)
 void CInPlaceNumEdit::SetMax(int k)
 {
 	m_iMax = k;
+}
+
+void CInPlaceNumEdit::Set(int iItem, int iSubItem, CString sInitText)
+{
+	m_iItem = iItem;
+	m_iSubItem = iSubItem;
+	m_iniStr = sInitText;
 }
 
 void CInPlaceNumEdit::EditSubLabel(int iItem, int iSubItem)
@@ -264,12 +282,6 @@ void CInPlaceNumEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 }
 
 
-void CInPlaceNumEdit::OnNcDestroy()
-{
-	CEdit::OnNcDestroy();
-
-	delete this;
-}
 
 int CInPlaceNumEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {

@@ -115,7 +115,7 @@ private:
 
 //________________METHODS____________________________________
 	bool SerializeWOpp(CArchive &ar);
-	bool Export(CStdioFile *pXFile);
+	bool Export(CStdioFile *pXFile, int FileType);
 	void GetBWStyle(COLORREF &color, int &style, int &width);
 	double GetMaxLift();
 };

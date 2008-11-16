@@ -360,12 +360,14 @@ void CXDirect::UpdateView(CDC *pDC)
 	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
 
 	// user has requested a polar plot
-	if(m_bPolar){
+	if(m_bPolar)
+	{
 		if     (m_iPlrView == 0) PaintPolarGraphs(&memdc, &m_rCltRect);
 		else if(m_iPlrView == 1) PaintSingleGraph(&memdc, &m_rSingleRect);
 		else if(m_iPlrView == 2) PaintCoupleGraph(&memdc, &m_rCltRect);
 	} 
-	else{
+	else
+	{
 		PaintOpPoint(&memdc, &m_rCltRect, &m_rDrawRect);
 	}
 	// Blit back
@@ -706,7 +708,7 @@ void CXDirect::SetHingeMoments(OpPoint *pOpPoint)
 void CXDirect::AddOpData(OpPoint *pOpPoint)
 {
 	// Adds result of the XFoil Calculation to the OpPoint object
-	int i, ibl, is, k;
+	int i, j, ibl, is, k;
 
 	pOpPoint->m_strFoilName = m_pCurFoil->m_FoilName;
 	pOpPoint->m_strPlrName = m_pCurPolar->m_PlrName;
@@ -725,7 +727,8 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 
 	pOpPoint->Cpmn   = m_pXFoil->cpmn;
 
-	for (k=0; k<m_pXFoil->n; k++){
+	for (k=0; k<m_pXFoil->n; k++)
+	{
 		pOpPoint->x[k]   = m_pXFoil->x[k+1];
 		pOpPoint->y[k]   = m_pXFoil->y[k+1];
 //		pOpPoint->s[k]   = m_pXFoil->s[k+1];
@@ -733,21 +736,25 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 		pOpPoint->Qi[k]  = m_pXFoil->qgamm[k+1];
 	}
 
-	if(m_pXFoil->lvisc && m_pXFoil->lvconv){
+	if(m_pXFoil->lvisc && m_pXFoil->lvconv)
+	{
 		pOpPoint->Xtr1 =m_pXFoil->xoctr[1];
 		pOpPoint->Xtr2 =m_pXFoil->xoctr[2];
 		pOpPoint->m_bVisc = true; 
 		pOpPoint->m_bDispSurf = true;
-		for (int k=0; k<m_pXFoil->n; k++) {
+		for (k=0; k<m_pXFoil->n; k++) 
+		{
 			pOpPoint->Cpv[k] = m_pXFoil->cpv[k+1];
 			pOpPoint->Qv[k] = m_pXFoil->qvis[k+1];
 		}
 	}
-	else {
+	else
+	{
 		pOpPoint->m_bVisc = false;
 	}
 
-	if(pOpPoint->m_bTEFlap || pOpPoint->m_bLEFlap){
+	if(pOpPoint->m_bTEFlap || pOpPoint->m_bLEFlap)
+	{
 		SetHingeMoments(pOpPoint);
 //		pOpPoint->HMom = m_pXFoil->hmom;
 //		pOpPoint->XForce = m_pXFoil->hfx;
@@ -760,8 +767,10 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	int nd1=0;
 	int nd2=0;
 	int nd3=0;
-	for (is=1; is<=2; is++){
-		for (int ibl=2; ibl<=m_pXFoil->iblte[is];ibl++){
+	for (is=1; is<=2; is++)
+	{
+		for ( ibl=2; ibl<=m_pXFoil->iblte[is];ibl++)
+		{
 			i = m_pXFoil->ipan[ibl][is];
 			pOpPoint->xd1[i] = m_pXFoil->x[i] + m_pXFoil->nx[i]*m_pXFoil->dstr[ibl][is];
 			pOpPoint->yd1[i] = m_pXFoil->y[i] + m_pXFoil->ny[i]*m_pXFoil->dstr[ibl][is];
@@ -773,11 +782,13 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	is=2;
 	double dstrte = m_pXFoil->dstr[m_pXFoil->iblte[is]+1][is];
 	double dsf1, dsf2;
-	if(dstrte!=0.0f) {
+	if(dstrte!=0.0) 
+	{
 		dsf1 = (m_pXFoil->dstr[m_pXFoil->iblte[1]][1] + 0.5*m_pXFoil->ante) / dstrte;
 		dsf2 = (m_pXFoil->dstr[m_pXFoil->iblte[2]][2] + 0.5*m_pXFoil->ante) / dstrte;
 	}
-	else{
+	else
+	{
 		dsf1 = 0.5;
 		dsf2 = 0.5;
 	}
@@ -789,8 +800,9 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	pOpPoint->yd2[0] = m_pXFoil->y[i] + m_pXFoil->ny[i]*m_pXFoil->dstr[ibl][1];
 	nd2++;
 
-	int j= m_pXFoil->ipan[m_pXFoil->iblte[is]+1][is]  -1;
-	for (ibl=m_pXFoil->iblte[is]+1; ibl<=m_pXFoil->nbl[is]; ibl++){
+	j= m_pXFoil->ipan[m_pXFoil->iblte[is]+1][is]  -1;
+	for (ibl=m_pXFoil->iblte[is]+1; ibl<=m_pXFoil->nbl[is]; ibl++)
+	{
 		i = m_pXFoil->ipan[ibl][is];
 		pOpPoint->xd2[i-j] = m_pXFoil->x[i] - m_pXFoil->nx[i]*m_pXFoil->dstr[ibl][is]*dsf1;
 		pOpPoint->yd2[i-j] = m_pXFoil->y[i] - m_pXFoil->ny[i]*m_pXFoil->dstr[ibl][is]*dsf1;
@@ -805,7 +817,8 @@ void CXDirect::AddOpData(OpPoint *pOpPoint)
 	nd3++;
 
 	j = m_pXFoil->ipan[m_pXFoil->iblte[is]+1][is]  -1;
-	for (ibl=m_pXFoil->iblte[is]+1; ibl<=m_pXFoil->nbl[is]; ibl++){
+	for (ibl=m_pXFoil->iblte[is]+1; ibl<=m_pXFoil->nbl[is]; ibl++)
+	{
 		i = m_pXFoil->ipan[ibl][is];
 		pOpPoint->xd3[i-j] = m_pXFoil->x[i] + m_pXFoil->nx[i]*m_pXFoil->dstr[ibl][is]*dsf2;
 		pOpPoint->yd3[i-j] = m_pXFoil->y[i] + m_pXFoil->ny[i]*m_pXFoil->dstr[ibl][is]*dsf2;
@@ -2704,16 +2717,21 @@ void CXDirect::OnExportFoil()
 
 	FileName = m_pCurFoil->m_FoilName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "dat", FileName, OFN_OVERWRITEPROMPT,
-		_T("Labeled Format (.dat)|*.dat|VisuAero Format (.dat)|*.dat|"));
-	if(IDOK==XFileDlg.DoModal()) {
+	static TCHAR BASED_CODE szFilter[] = _T("Labeled Format (*.dat)|*.dat|") _T("VisuAero format (*.dat)|*.dat|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 		DestFileName = XFileDlg.GetPathName();
 		int FilterIndex = XFileDlg.m_ofn.nFilterIndex;
 		CFoil *pFoil = GetFoil(m_pCurFoil->m_FoilName);
-		if(pFoil) {
+		if(pFoil) 
+		{
 			if(FilterIndex==1)	
 				pFoil->ExportFoil(DestFileName);
-			else {//writing ViSuAero Format, special for... me
+			else 
+			{
+				//writing ViSuAero Format, special for... me
 				BOOL bOpen2 = DestFile.Open(DestFileName, CFile::modeCreate | CFile::modeWrite, &fe);
 				OutString ='"' ;
 				OutString +=m_pCurFoil->m_FoilName;
@@ -3448,33 +3466,6 @@ void CXDirect::DeleteFoil(bool bAsk)
 }
 
 
-void CXDirect::OnSave() 
-{
-	CString FileName;
-
-	CFileDialog XFileDlg(false, "dat", NULL, OFN_OVERWRITEPROMPT, 
-		_T("Foil file (.dat)|*.dat|Polar file (.plr)|*.plr|"));
-
-	if (m_bPolar) XFileDlg.m_ofn.nFilterIndex = 3;
-	else if (m_pCurOpp) XFileDlg.m_ofn.nFilterIndex = 2;
-
-	if(IDOK==XFileDlg.DoModal()) {
-		FileName = XFileDlg.GetPathName();
-
-		if (FileName.Find(".dat",0)>0){
-			if(!m_pCurFoil) {
-				return;
-			}
-			if(m_pCurFoil) m_pCurFoil->ExportFoil(FileName);
-		}
-		else if (FileName.Find(".plr",0)>0) {
-			CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-			pFrame->SavePolars(FileName);
-		}
-	}
-}
-
-
 void CXDirect::OnExportPlr() 
 {
 	if(!m_pCurPolar) return;
@@ -3484,11 +3475,14 @@ void CXDirect::OnExportPlr()
 	
 	FileName = m_pCurPolar->m_PlrName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, ".txt", FileName, OFN_OVERWRITEPROMPT,
-		_T("Text Format (.txt)|*.txt|"));
-	if(IDOK == XFileDlg.DoModal()){
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK == XFileDlg.DoModal())
+	{
 		FileName = XFileDlg.GetPathName();
-		m_pCurPolar->Export(FileName);
+		m_pCurPolar->Export(FileName , XFileDlg.m_ofn.nFilterIndex);
 	}
 }
 
@@ -5731,75 +5725,106 @@ BOOL CXDirect::PreTranslateMessage(MSG* pMsg)
 
 void CXDirect::OnExportOpps() 
 {
-	if(m_poaPolar->GetSize()){// is there anything to export ?
-		CString FileName;
-				
-		CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
-		if(IDOK == XFileDlg.DoModal()){
-			FileName = XFileDlg.GetPathName();
-			CStdioFile XFile;
-			OpPoint* pOpPoint;
-			CFileException fe;
-			BOOL bOpen = XFile.Open(FileName, 
-				CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
+	if(!m_poaPolar->GetSize()) 
+	{
+		AfxMessageBox("No Operating Points to export to file", MB_OK);	
+		return;
+	}
 
-			try{
-				if(!bOpen){
-					fe.m_strFileName = FileName;
-					throw &fe;
-				}
-				else{
-					CString strOut;
-					CString Header, strong;
-					CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-					XFile.WriteString(pFrame->m_VersionName);
-					XFile.WriteString("\n\n");
-					strong = m_pCurFoil->m_FoilName + "\n";
-					XFile.WriteString(strong);
-					for (int i=0; i<m_poaOpp->GetSize(); i++){
-						pOpPoint = (OpPoint*)m_poaOpp->GetAt(i);
-						if(pOpPoint->m_strFoilName == m_pCurPolar->m_FoilName &&
-							pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName ){
-							strong.Format("Reynolds = %.0f   Mach = %.4f  NCrit = %.2f\n",
-								pOpPoint->Reynolds, pOpPoint->Mach, pOpPoint->ACrit);
-							XFile.WriteString(strong);
-							Header.Format("  Alpha        Cd        Cl        Cm        XTr1      XTr2   TEHMom    Cpmn\n");
-							XFile.WriteString(Header);
+	int i,j, type;
+
+	CString FileName;
+			
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK == XFileDlg.DoModal())
+	{
+		type = XFileDlg.m_ofn.nFilterIndex;
+		FileName = XFileDlg.GetPathName();
+		CStdioFile XFile;
+		OpPoint* pOpPoint;
+		CFileException fe;
+		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
+
+		try
+		{
+			if(!bOpen)
+			{
+				fe.m_strFileName = FileName;
+				throw &fe;
+			}
+			else
+			{
+				CString strOut;
+				CString Header, strong;
+				CMainFrame* pFrame = (CMainFrame*)m_pFrame;
+				XFile.WriteString(pFrame->m_VersionName);
+				XFile.WriteString("\n\n");
+				strong = m_pCurFoil->m_FoilName + "\n";
+				XFile.WriteString(strong);
+				for (i=0; i<m_poaOpp->GetSize(); i++)
+				{
+					pOpPoint = (OpPoint*)m_poaOpp->GetAt(i);
+					if(pOpPoint->m_strFoilName == m_pCurPolar->m_FoilName && pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName )
+					{
+						if(type==1)
+							strong.Format("Reynolds = %.0f   Mach = %.4f  NCrit = %.2f\n",	pOpPoint->Reynolds, pOpPoint->Mach, pOpPoint->ACrit);
+						else
+							strong.Format("Reynolds =, %.0f,Mach =, %.4f,NCrit =, %.2f\n",	pOpPoint->Reynolds, pOpPoint->Mach, pOpPoint->ACrit);
+
+						XFile.WriteString(strong);
+						if(type==1) Header.Format("  Alpha        Cd        Cl        Cm        XTr1      XTr2   TEHMom    Cpmn\n");
+						else        Header.Format("Alpha,Cd,Cl,Cm,XTr1,XTr2,TEHMom,Cpmn\n");
+						XFile.WriteString(Header);
+
+						if(type==1)
 							strong.Format("%7.3f   %9.3f   %7.3f   %7.3f   %7.3f   %7.3f   %7.4f  %7.4f\n",
 								pOpPoint->Alpha, pOpPoint->Cd,
 								pOpPoint->Cl,    pOpPoint->Cm,
 								pOpPoint->Xtr1,  pOpPoint->Xtr2,
 								pOpPoint->m_TEHMom,  pOpPoint->Cpmn);
+						else
+							strong.Format("%7.3f,%9.3f,%7.3f,%7.3f,%7.3f,%7.3f,%7.4f,%7.4f\n",
+								pOpPoint->Alpha, pOpPoint->Cd,
+								pOpPoint->Cl,    pOpPoint->Cm,
+								pOpPoint->Xtr1,  pOpPoint->Xtr2,
+								pOpPoint->m_TEHMom,  pOpPoint->Cpmn);
+
+						XFile.WriteString(strong);
+						if(type==1) XFile.WriteString(" Cpi          Cpv\n-----------------\n");
+						else        XFile.WriteString("Cpi,Cpv\n");
+						
+						for (j=0; j<pOpPoint->n; j++)
+						{
+							if(pOpPoint->m_bVisc)
+							{
+								if(type==1) strong.Format("%7.4f   %7.4f\n",pOpPoint->Cpi[j], pOpPoint->Cpv[j]);
+								else        strong.Format("%7.4f,%7.4f\n",pOpPoint->Cpi[j], pOpPoint->Cpv[j]);
+							}
+							else
+							{
+								strong.Format("% 7.4f\n", pOpPoint->Cpi[j]);
+							}
 							
 							XFile.WriteString(strong);
-							XFile.WriteString(" Cpi          Cpv\n");
-							XFile.WriteString("-----------------\n");
-							for (int j=0; j<pOpPoint->n; j++){
-								if(pOpPoint->m_bVisc)
-									strong.Format("% 7.4f   % 7.4f\n",
-									pOpPoint->Cpi[j], pOpPoint->Cpv[j]);
-								else
-									strong.Format("% 7.4f\n", pOpPoint->Cpi[j]);
-								
-								XFile.WriteString(strong);
-							}
-							XFile.WriteString("\n\n");
 						}
+						XFile.WriteString("\n\n");
 					}
-					XFile.Close();
 				}
-			}
-			catch (CFileException *ex){
-				TCHAR   szCause[255];
-				CString str;
-				ex->GetErrorMessage(szCause, 255);
-				str = _T("Error writing analysis : ");
-				str += szCause;
-				AfxMessageBox(str);
+				XFile.Close();
 			}
 		}
+		catch (CFileException *ex)
+		{
+			TCHAR   szCause[255];
+			CString str;
+			ex->GetErrorMessage(szCause, 255);
+			str = _T("Error writing analysis : ");
+			str += szCause;
+			AfxMessageBox(str);
+		}
 	}
-	else AfxMessageBox("No Operating Points to export to file", MB_OK);	
 	
 }
 
@@ -6223,7 +6248,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 
 	if (pDrawRect->Width()<100 || pDrawRect->Height()<100) return;
 
-	if (m_bNeutralLine && m_pCurFoil) {
+	if (m_bNeutralLine && m_pCurFoil) 
+	{
 		color = m_crNeutralColor;
 		style = m_iNeutralStyle;
 		width = m_iNeutralWidth;
@@ -6240,19 +6266,20 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 	if (!m_pCurFoil || !m_pCurFoil->m_FoilName.GetLength()) 
 		return;
 
-	if(m_pCurOpp){
+	if(m_pCurOpp)
+	{
 		DrawFoil(pDC, -m_pCurOpp->Alpha*pi/180.0,
 			m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
 		if(m_pCurOpp->m_bDispSurf && m_bBL)
 			DrawBL(pDC, m_pCurOpp, m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
 		else if(m_bPressure)
 			DrawCpv(pDC, m_pCurOpp, m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
-
 	}
 	else 
 		DrawFoil(pDC, 0.0, m_fFoilScale, m_ptOffset.x, m_ptOffset.y, false);
 
-	if(m_bCpGraph){
+	if(m_bCpGraph)
+	{
 		//Draw Cp Graph
 		m_pCpGraph->DrawGraph(pDC, pDrawRect, false);
 		CPoint Place(pCltRect->right-330, pCltRect->top + 20);
@@ -6309,7 +6336,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 	pDC->TextOut(LeftPos,ZPos+D, Result);
 	D+=12;
 
-	if(m_BufferFoil.m_bTEFlap){
+	if(m_BufferFoil.m_bTEFlap)
+	{
 		str1.LoadString(IDS_FLAPANGLE);
 		strong.Format(str1, m_BufferFoil.m_TEFlapAngle);
 		pDC->TextOut(LeftPos,ZPos+D, strong);
@@ -6340,12 +6368,14 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 	XPos = m_rCltRect.right-10;
 	D=0;
 
-	if(m_pCurPolar){
+	if(m_pCurPolar)
+	{
 		str1.LoadString(IDS_POLARTYPE);
 		strong.Format(str1, m_pCurPolar->m_Type);
 		pDC->TextOut(XPos,ZPos, strong);
 		D+=12;
-		if(m_pCurPolar->m_Type ==1){
+		if(m_pCurPolar->m_Type ==1)
+		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong ="Reynolds = " + strong;
 			pDC->TextOut(XPos,ZPos+D, strong);
@@ -6354,7 +6384,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 			pDC->TextOut(XPos,ZPos+D, strong);
 			D+=12;
 		}
-		if(m_pCurPolar->m_Type ==2){
+		if(m_pCurPolar->m_Type ==2)
+		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong ="Re.sqrt(Cl) = " + strong;
 			pDC->TextOut(XPos,ZPos+D, strong);
@@ -6363,7 +6394,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 			pDC->TextOut(XPos,ZPos+D, strong);
 			D+=12;
 		}
-		if(m_pCurPolar->m_Type ==3){
+		if(m_pCurPolar->m_Type ==3)
+		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong ="Re.sqrt(Cl) = " + strong;
 			pDC->TextOut(XPos,ZPos+D, strong);
@@ -6373,7 +6405,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 			pDC->TextOut(XPos,ZPos+D, strong);
 			D+=12;
 		}
-		if(m_pCurPolar->m_Type ==4){
+		if(m_pCurPolar->m_Type ==4)
+		{
 			strong.Format("Alpha = %8.2f°", m_pCurPolar->m_Alpha);
 			pDC->TextOut(XPos,ZPos+D, strong);
 			D+=12;
@@ -6396,7 +6429,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		D+=12;
 	}
 
-	if(m_pCurOpp)  {
+	if(m_pCurOpp)  
+	{
 		Back =6;
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
@@ -6408,18 +6442,21 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		XPos = (int)((m_rCltRect.right+m_rCltRect.left)/2.0)+75;
 		D=0;
 
-		if(m_pCurPolar->m_Type!=1){
+		if(m_pCurPolar->m_Type!=1)
+		{
 			ReynoldsFormat(Result, m_pCurOpp->Reynolds);
 			Result = "Re = "+ Result;
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;
 		}
-		if(m_pCurPolar->m_Type==2){
+		if(m_pCurPolar->m_Type==2)
+		{
 			Result.Format("Ma = %9.4f", m_pCurOpp->Mach);
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;
 		}
-		if(m_pCurPolar->m_Type!=4){
+		if(m_pCurPolar->m_Type!=4)
+		{
 			Result.Format("Alpha = %8.2f°", m_pCurOpp->Alpha);
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;
@@ -6436,7 +6473,8 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		pDC->TextOut(XPos,ZPos+D, Result);
 		D+=12;
 
-		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0){
+		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0)
+		{
 			Result.Format("L/D = %9.2f", m_pCurOpp->Cl/m_pCurOpp->Cd);
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;
@@ -6452,14 +6490,16 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		pDC->TextOut(XPos,ZPos+D, Result);
 		D+=12;
 
-		if(m_pCurOpp->m_bTEFlap){
+		if(m_pCurOpp->m_bTEFlap)
+		{
 			str1.LoadString(IDS_TEHINGEMOMENT);
 			Result.Format(str1, m_pCurOpp->m_TEHMom);
 			pDC->TextOut(XPos,ZPos+D, Result);
 			D+=12;
 		}
 
-		if(m_pCurOpp->m_bLEFlap){
+		if(m_pCurOpp->m_bLEFlap)
+		{
 			str1.LoadString(IDS_LEHINGEMOMENT);
 			Result.Format(str1, m_pCurOpp->m_LEHMom);
 			pDC->TextOut(XPos,ZPos+D, Result);
@@ -6486,6 +6526,7 @@ void CXDirect::OnNormalize()
 	UpdateView();
 }
 
+
 void CXDirect::OnHidePolars() 
 {
 	if(!m_pCurFoil) return;
@@ -6502,14 +6543,18 @@ void CXDirect::OnHidePolars()
 	UpdateView();
 }
 
+
 void CXDirect::OnShowPolars() 
 {
 	if(!m_pCurFoil) return;
+	int i;
 	CMainFrame * pFrame = (CMainFrame*) m_pFrame;
 	CPolar *pPolar;
-	for (int i=0; i<m_poaPolar->GetSize(); i++){
+	for (i=0; i<m_poaPolar->GetSize(); i++)
+	{
 		pPolar = (CPolar*)m_poaPolar->GetAt(i);
-		if(pPolar->m_FoilName == m_pCurFoil->m_FoilName){
+		if(pPolar->m_FoilName == m_pCurFoil->m_FoilName)
+		{
 			pPolar->m_bIsVisible = true;
 		}
 	}
@@ -6586,10 +6631,14 @@ void CXDirect::OnExportCurOpp()
 
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CString FileName;
-	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
-	if(IDOK == XFileDlg.DoModal()){
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK == XFileDlg.DoModal())
+	{
 		FileName = XFileDlg.GetPathName();
-		m_pCurOpp->Export(FileName, pFrame->m_VersionName);
+		m_pCurOpp->Export(FileName, pFrame->m_VersionName,  XFileDlg.m_ofn.nFilterIndex);
 	}
 }
 
@@ -6744,10 +6793,12 @@ void CXDirect::OnHPlot()
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	m_pXFoil->FillHk(y, nside1, nside2);
 
-	for (i=2; i<=nside1-1; i++){
+	for (i=2; i<=nside1-1; i++)
+	{
 		pTopCurve->AddPoint(x[i][1], y[i][1]);
 	}
-	for (i=2; i<=nside2-1; i++){
+	for (i=2; i<=nside2-1; i++)
+	{
 		pBotCurve->AddPoint(x[i][2], y[i][2]);
 	}
 
@@ -7061,7 +7112,8 @@ void CXDirect::OnDbPlot()
 	pCurve2->SetTitle("Theta");
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 
-	for (i=2; i<nside2; i++){
+	for (i=2; i<nside2; i++)
+	{
 		pCurve1->AddPoint(x[i][2], m_pXFoil->dstr[i][2]);
 		pCurve2->AddPoint(x[i][2], m_pXFoil->thet[i][2]);
 	}
@@ -7071,6 +7123,8 @@ void CXDirect::OnDbPlot()
 	CheckMenu();
 	UpdateView();	
 }
+
+
 void CXDirect::OnExportCurrentResults()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -7080,39 +7134,47 @@ void CXDirect::OnExportCurrentResults()
 	CString FileName, DestFileName, OutString, strong;
 	CStdioFile DestFile;
 	CFileException fe;
+
 	double x[IVX][3],Hk[IVX][3],UeVinf[IVX][3], Cf[IVX][3], Cd[IVX][3], AA0[IVX][3];
 	double RTheta[IVX][3], DStar[IVX][3], Theta[IVX][3];
 	double uei;
 	double que = 0.5*m_pXFoil->qinf*m_pXFoil->qinf;
 	double qrf = m_pXFoil->qinf;
-	int nside1, nside2, ibl, i;
+	int nside1, nside2, ibl, type;
 
 	FileName = m_pCurFoil->m_FoilName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT,
-		_T("Text File (.txt)|*.txt|"));
-	if(IDOK==XFileDlg.DoModal()) {
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
 		DestFileName = XFileDlg.GetPathName();
 		BOOL bOpen = DestFile.Open(DestFileName, CFile::modeCreate | CFile::modeWrite, &fe);
-		if(bOpen){
+		if(bOpen)
+		{
+			type = XFileDlg.m_ofn.nFilterIndex;
 			DestFile.WriteString(pFrame->m_VersionName);
 			DestFile.WriteString("\n");
 			strong = m_pXFoil->m_FoilName+ "\n";
 			DestFile.WriteString(strong);
 
-			strong.Format("Alpha = %5.1f,  Re = %5.1f,  Ma= %6.4f,  ACrit=%4.1f \n\n",
-				m_pXFoil->alfa*180./pi, m_pXFoil->reinf1, m_pXFoil->minf1, m_pXFoil->acrit);
+			if(type==1) strong.Format("Alpha = %5.1f,  Re = %5.1f,  Ma= %6.4f,  ACrit=%4.1f \n\n",	m_pXFoil->alfa*180./pi, m_pXFoil->reinf1, m_pXFoil->minf1, m_pXFoil->acrit);
+			else        strong.Format("Alpha =, %5.1f,Re =, %5.1f,Ma=, %6.4f,ACrit =,%4.1f \n\n",	m_pXFoil->alfa*180./pi, m_pXFoil->reinf1, m_pXFoil->minf1, m_pXFoil->acrit);
 			DestFile.WriteString(strong);
 
 			m_pXFoil->CreateXBL(x, nside1, nside2);
 			//write top first
 			m_pXFoil->FillHk(Hk, nside1, nside2);
-			for (ibl=2; ibl<= nside1;ibl++){
+			for (ibl=2; ibl<= nside1;ibl++)
+			{
 				uei = m_pXFoil->uedg[ibl][1];
 				UeVinf[ibl][1] = uei * (1.0-m_pXFoil->tklam) 
 								/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
 			}
-			for (ibl=2; ibl<= nside2;ibl++){
+			for (ibl=2; ibl<= nside2;ibl++)
+			{
 				uei = m_pXFoil->uedg[ibl][2];
 				UeVinf[ibl][2] = uei * (1.0-m_pXFoil->tklam) 
 								/ (1.0-m_pXFoil->tklam*(uei/m_pXFoil->qinf)*(uei/m_pXFoil->qinf));
@@ -7129,53 +7191,45 @@ void CXDirect::OnExportCurrentResults()
 			for (ibl=2; ibl< nside2;ibl++)	AA0[ibl][2] = m_pXFoil->ctau[ibl][2];
 
 			m_pXFoil->FillRTheta(RTheta, nside1, nside2);
-			for (ibl=2; ibl<= nside1; ibl++){
+			for (ibl=2; ibl<= nside1; ibl++)
+			{
 				DStar[ibl][1] = m_pXFoil->dstr[ibl][1];
 				Theta[ibl][1] = m_pXFoil->thet[ibl][1];
 			}
-			for (ibl=2; ibl<= nside2; ibl++){
+			for (ibl=2; ibl<= nside2; ibl++)
+			{
 				DStar[ibl][2] = m_pXFoil->dstr[ibl][2];
 				Theta[ibl][2] = m_pXFoil->thet[ibl][2];
 			}
 
 			DestFile.WriteString("\nTop Side\n");
-			OutString.Format("  Hk       Ue/Vinf      Cf        Cd     A/A0       D*      Theta      CTq\n");
+			if(type==1) OutString.Format("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n");
+			else        OutString.Format("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n");
 			DestFile.WriteString(OutString);
-			for (ibl=2; ibl<nside1; ibl++){
-				OutString.Format("%8.5f  %8.5f  %8.5f  %8.5f %8.5f  %8.5f  %8.5f  %8.5f\n",
-					Hk[ibl][1],  UeVinf[ibl][1], Cf[ibl][1], Cd[ibl][1], 
-					AA0[ibl][1], DStar[ibl][1],  Theta[ibl][1],  m_pXFoil->ctq[ibl][1]);
+			for (ibl=2; ibl<nside1; ibl++)
+			{
+				if(type==1) 
+					OutString.Format("%8.5f  %8.5f  %8.5f  %8.5f  %8.5f %8.5f  %8.5f  %8.5f  %8.5f\n",
+					x[ibl][1], Hk[ibl][1],  UeVinf[ibl][1], Cf[ibl][1], Cd[ibl][1], AA0[ibl][1], DStar[ibl][1],  Theta[ibl][1],  m_pXFoil->ctq[ibl][1]);
+				else 
+					OutString.Format("%8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f\n",
+					x[ibl][1], Hk[ibl][1],  UeVinf[ibl][1], Cf[ibl][1], Cd[ibl][1], AA0[ibl][1], DStar[ibl][1],  Theta[ibl][1],  m_pXFoil->ctq[ibl][1]);
 				DestFile.WriteString(OutString);
 			}
 			DestFile.WriteString("\n\nBottom Side\n");
-			OutString.Format("  Hk       Ue/Vinf      Cf        Cd     A/A0       D*      Theta      CTq\n");
+			if(type==1) OutString.Format("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n");
+			else        OutString.Format("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n");
 			DestFile.WriteString(OutString);
-			for (ibl=2; ibl<nside2; ibl++){
-				OutString.Format("%8.5f  %8.5f  %8.5f  %8.5f %8.5f  %8.5f  %8.5f  %8.5f\n",
-					Hk[ibl][2],  UeVinf[ibl][2], Cf[ibl][2], Cd[ibl][2], 
-					AA0[ibl][2], DStar[ibl][2],  Theta[ibl][2],  m_pXFoil->ctq[ibl][2]);
+			for (ibl=2; ibl<nside2; ibl++)
+			{
+				if(type==1) 
+					OutString.Format("%8.5f  %8.5f  %8.5f  %8.5f  %8.5f %8.5f  %8.5f  %8.5f  %8.5f\n",
+					x[ibl][2], Hk[ibl][2],  UeVinf[ibl][2], Cf[ibl][2], Cd[ibl][2], AA0[ibl][2], DStar[ibl][2],  Theta[ibl][2],  m_pXFoil->ctq[ibl][2]);
+				else 
+					OutString.Format("%8.5f,%8.5f, %8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f,%8.5f\n",
+					x[ibl][2], Hk[ibl][2],  UeVinf[ibl][2], Cf[ibl][2], Cd[ibl][2], AA0[ibl][2], DStar[ibl][2],  Theta[ibl][2],  m_pXFoil->ctq[ibl][2]);
 				DestFile.WriteString(OutString);
 			}
-
-			int it1 = m_pXFoil->itran[1];
-			int it2 = m_pXFoil->itran[2];
-
-			DestFile.WriteString("\nTop Side\n");
-			OutString.Format("  CTau\n");
-			DestFile.WriteString(OutString);
-			for (i=it1; i<=nside1-1; i++){
-				OutString.Format("%8.5f \n", m_pXFoil->ctau[i][1]);
-				DestFile.WriteString(OutString);
-			}
-
-			DestFile.WriteString("\nBottom Side\n");
-			OutString.Format("  CTau\n");
-			DestFile.WriteString(OutString);
-			for (i=it2; i<=nside2-1; i++){
-				OutString.Format("%8.5f \n", m_pXFoil->ctau[i][2]);
-				DestFile.WriteString(OutString);
-			}
-
 		}
 		DestFile.Close();
 	}
@@ -7674,3 +7728,61 @@ void CXDirect::OnShowCpGraph()
 	UpdateView();
 }
 
+
+
+void CXDirect::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
+{
+	//Refresh the active view
+	if(m_bAnimate) return;// painting is performed elsewhere
+
+	HRESULT hResult;
+
+	CDC *pDC;
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	pDC = m_pChildWnd->GetDC();
+	if(!pDC) return;
+
+	CDC memdc; 
+	memdc.CreateCompatibleDC(pDC);
+
+	CBitmap  bmp;
+	bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
+	CBitmap * pOldBmp = memdc.SelectObject(&bmp);
+
+	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
+	memdc.SetBkMode(TRANSPARENT);
+
+	if(m_bPolar)
+	{
+		if     (m_iPlrView == 0) PaintPolarGraphs(&memdc, &m_rCltRect);
+		else if(m_iPlrView == 1) PaintSingleGraph(&memdc, &m_rSingleRect);
+		else if(m_iPlrView == 2) PaintCoupleGraph(&memdc, &m_rCltRect);
+	} 
+	else
+	{
+		PaintOpPoint(&memdc, &m_rCltRect, &m_rDrawRect);
+	}
+
+	memdc.SelectObject(pOldBmp);
+	memdc.DeleteDC();
+
+	HBITMAP hBmp = (HBITMAP)bmp;
+	pImage->Attach(hBmp);
+
+	if(FileType==1)      hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatBMP);
+	else if(FileType==2) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatJPEG);
+	else if(FileType==3) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatGIF);
+	else if(FileType==4) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatPNG);
+
+	if (FAILED(hResult)) 
+	{
+		CString fmt;
+		fmt.Format("Save image failed:\n%x ", hResult);
+		AfxMessageBox(fmt);
+		return;
+	}
+
+	bmp.DeleteObject();
+	
+	pChildView->ReleaseDC(pDC);
+}

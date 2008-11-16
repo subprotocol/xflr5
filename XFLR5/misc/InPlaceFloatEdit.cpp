@@ -28,6 +28,19 @@
 #include <math.h>
 
 
+CInPlaceFloatEdit::CInPlaceFloatEdit()
+{
+	m_fMin = -1.e10;
+	m_fMax =  1.e10;
+	m_iPrecision = 2;
+	m_iItem = 0;
+	m_iSubItem = 0;
+	m_nColumns = 0;
+	m_nRows = 0;
+	m_bESC = FALSE;
+	m_ParentList = -1;
+}
+
 CInPlaceFloatEdit::CInPlaceFloatEdit(CListCtrl* pCtrl, int iItem, int iSubItem, CString sInitText)
 {
 	m_fMin = -1.e10;
@@ -50,7 +63,6 @@ CInPlaceFloatEdit::~CInPlaceFloatEdit(void)
 BEGIN_MESSAGE_MAP(CInPlaceFloatEdit, CEdit)
 	//{{AFX_MSG_MAP(CInPlaceFloatEdit)
 	ON_WM_KILLFOCUS()
-	ON_WM_NCDESTROY()
 	ON_WM_CHAR()
 	ON_WM_CREATE()
 	ON_WM_CHAR()
@@ -88,6 +100,14 @@ BOOL CInPlaceFloatEdit::PreTranslateMessage(MSG* pMsg)
 		return TRUE;
 	}
 	return CEdit::PreTranslateMessage(pMsg);
+}
+
+
+void CInPlaceFloatEdit::Set(int iItem, int iSubItem, CString sInitText)
+{
+	m_iItem = iItem;
+	m_iSubItem = iSubItem;
+	m_iniStr = sInitText;
 }
 
 void CInPlaceFloatEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -137,7 +157,7 @@ void CInPlaceFloatEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     // Up and down are in the OnKeyDown so that the user can hold down the arrow
     // keys to scroll through the entries.
-	SHORT sh1 = GetKeyState(VK_LCONTROL);
+/*	SHORT sh1 = GetKeyState(VK_LCONTROL);
 	SHORT sh2 = GetKeyState(VK_RCONTROL);
 	switch (nChar)
     {
@@ -180,7 +200,8 @@ void CInPlaceFloatEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				return;
 			}
 		}
-    }
+		
+    }*/
 	CEdit::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
@@ -207,7 +228,8 @@ void CInPlaceFloatEdit::OnKillFocus(CWnd* pNewWnd)
 
 	if(!CheckBeforeExit()) 
 		SetWindowText(m_iniStr);//user blundered
-	else {
+	else 
+	{
 		double fValue = GetValue();
 		SetValue(fValue);
 	}
@@ -231,53 +253,10 @@ void CInPlaceFloatEdit::OnKillFocus(CWnd* pNewWnd)
 	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 //	GetParent()->GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);
 
-	DestroyWindow();
+//	DestroyWindow();
+	PostMessage( WM_CLOSE );
+
 } 
-
-void CInPlaceFloatEdit::OnNcDestroy()
-{
-	CEdit::OnNcDestroy();
-
-	delete this;
-}
-
-void CInPlaceFloatEdit::EditParentSubLabel(int iItem, int iSubItem)
-{
-	if(m_ParentList==0){
-        CPanelListCtrl *pListCtrl = (CPanelListCtrl*)m_pListCtrl;
-		pListCtrl->EditSubLabel(iItem, iSubItem);
-	}
-	else if(m_ParentList==1){
-        CEditListCtrl *pListCtrl = (CEditListCtrl*)m_pListCtrl;
-		pListCtrl->EditSubLabel(iItem, iSubItem);
-	}
-	else if(m_ParentList==2){
-//        CControlListCtrl *pListCtrl = (CControlListCtrl*)m_pListCtrl;
-//		pListCtrl->EditSubLabel(iItem, iSubItem);
-	}
-	else if(m_ParentList==3){
-//      CCtrlSetCtrl *pListCtrl = (CCtrlSetCtrl*)m_pListCtrl;
-//		pListCtrl->EditSubLabel(iItem, iSubItem);
-	}
-	
-/*	CString strong="12345678901234567890";
-	LPTSTR k=strong.GetBuffer(100);
-	GetClassName(m_pListCtrl->m_hWnd, k,100);*/
-/*	CString str;
-	GetWindowText(str);
-	LV_DISPINFO dispinfo;
-	dispinfo.hdr.hwndFrom = GetParent()->m_hWnd;
-	dispinfo.hdr.idFrom = GetDlgCtrlID();
-	dispinfo.hdr.code = LVN_ENDLABELEDIT;
-
-	dispinfo.item.mask = LVIF_TEXT;
-	dispinfo.item.iItem = m_iItem;
-	dispinfo.item.iSubItem = m_iSubItem;
-	dispinfo.item.pszText = m_bESC ? NULL : LPTSTR((LPCTSTR)str);
-	dispinfo.item.cchTextMax = str.GetLength();
-	m_pListCtrl->PostMessage(9999,  GetParent()->GetDlgCtrlID(), (LPARAM)&dispinfo);*/
-}
-
 
 int CInPlaceFloatEdit::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
@@ -432,11 +411,12 @@ void CInPlaceFloatEdit::SetValue(double f)
 
 		str = strong;
 	}
-	else {
+	else
+	{
 		int exp  = (int)log10(f)-1;
 		str1.Format("e%d", exp);
 
-		float main = (float)(f/pow(10.0, exp)*1.000001);
+		double main = f/pow(10.0, exp)*1.000001;
 		switch (m_iPrecision){
 			case 0:
 				str.Format("%.0f", main);

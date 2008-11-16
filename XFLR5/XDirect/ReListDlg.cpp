@@ -64,10 +64,9 @@ BEGIN_MESSAGE_MAP(CReListDlg, CDialog)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_RELIST2, OnLvnEndLabelEditReList2)
 	ON_WM_CONTEXTMENU()
 	ON_COMMAND(IDM_INSERTBEFORE, OnInsertBefore)
-	ON_COMMAND(IDM_APPEND, OnAppend)
 	ON_COMMAND(IDM_DELETEINPUT, OnDelete)
 	ON_BN_CLICKED(IDC_DELETE, OnDelete)
-	ON_BN_CLICKED(IDC_INSERT, OnInsert)
+	ON_BN_CLICKED(IDC_INSERT, OnInsertBefore)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -78,23 +77,28 @@ END_MESSAGE_MAP()
 BOOL CReListDlg::PreTranslateMessage(MSG* pMsg) 
 {
 	// Prevent Return Key from closing App
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){
-		if(GetDlgItem(IDOK) != GetFocus()){
-
-			GetDlgItem(IDOK)->SetFocus();
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		if(pMsg->wParam == VK_RETURN)
+		{
+			if(GetDlgItem(IDOK) != GetFocus())
+			{
+				GetDlgItem(IDOK)->SetFocus();
+			}
+			else OnOK();
+			return TRUE ;
 		}
-		else OnOK();
-		return TRUE ;
+		if (pMsg->wParam == VK_DELETE)
+		{
+			OnDelete();
+			return TRUE ;
+		}
+		if (pMsg->wParam == VK_INSERT)
+		{
+			OnInsertBefore();
+			return TRUE ;
+		}
 	}
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_DELETE){
-		OnDelete();
-		return TRUE ;
-	}
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_INSERT){
-		OnInsertBefore();
-		return TRUE ;
-	}
-	
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
@@ -121,7 +125,8 @@ BOOL CReListDlg::OnInitDialog()
 
 	FillReList();
 
-	if(m_ctrlReList.GetItemCount()){
+	if(m_ctrlReList.GetItemCount())
+	{
 		m_ctrlReList.SetItemState(0, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	}
 	return FALSE; 
@@ -146,16 +151,20 @@ void CReListDlg::OnLvnEndLabelEditReList2(NMHDR *pNMHDR, LRESULT *pResult)
 	ReadSectionData(m_iSelection, Re, Mach, NCrit);
 
 	//then remove the section from the list
-	for (i=m_iSelection; i<m_NRe; i++){
+	for (i=m_iSelection; i<m_NRe; i++)
+	{
 		m_ReList[i]    = m_ReList[i+1];
 		m_MachList[i]  = m_MachList[i+1];
 		m_NCritList[i] = m_NCritList[i+1];
 	}
 	//and re-insert it at the proper place
 	bool bInserted = false;
-	for (i=0; i<m_NRe; i++){
-		if(Re<m_ReList[i]){
-			for(j=m_NRe-1;j>i;j--){
+	for (i=0; i<m_NRe; i++)
+	{
+		if(Re<m_ReList[i])
+		{
+			for(j=m_NRe-1;j>i;j--)
+			{
 				m_ReList[j]    = m_ReList[j-1];
 				m_MachList[j]  = m_MachList[j-1];
 				m_NCritList[j] = m_NCritList[j-1];
@@ -167,7 +176,8 @@ void CReListDlg::OnLvnEndLabelEditReList2(NMHDR *pNMHDR, LRESULT *pResult)
 			break;
 		}
 	}
-	if(!bInserted){//append at the end
+	if(!bInserted)
+	{//append at the end
 			m_ReList[m_NRe-1]    = Re;
 			m_MachList[m_NRe-1]  = Mach;
 			m_NCritList[m_NRe-1] = NCrit;
@@ -177,13 +187,51 @@ void CReListDlg::OnLvnEndLabelEditReList2(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 
+void CReListDlg::FillCell(int iItem, int iSubItem)
+{
+	CString strong;
+
+	switch (iSubItem)
+	{
+		case 0:
+		{
+			strong.Format("%d", iItem);
+			m_ctrlReList.SetItemText(iItem, 0, strong);
+			break;
+		}
+		case 1:
+		{
+			ReynoldsFormat(strong, m_ReList[iItem]);
+			m_ctrlReList.SetItemText(iItem, 1, strong);
+			break;
+		}
+		case 2:
+		{
+			strong.Format(" %7.2f", m_MachList[iItem]);
+			m_ctrlReList.SetItemText(iItem,2,strong);
+			break;
+		}
+		case 3:
+		{
+			strong.Format(" %7.2f", m_NCritList[iItem]);
+			m_ctrlReList.SetItemText(iItem,3,strong);
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
 void CReListDlg::FillReList()
 {
 
 	CString strong;
 	m_ctrlReList.DeleteAllItems();
-	for (int i=0; i<m_NRe; i++){
-	
+	for (int i=0; i<m_NRe; i++)
+	{
 		strong.Format("%d", i+1);
 		m_ctrlReList.InsertItem(i, strong);
 
@@ -246,7 +294,8 @@ void CReListDlg::OnNMRClickReList(NMHDR *pNMHDR, LRESULT *pResult)
 	CPoint pt;
 	GetCursorPos(&pt);
 	CMenu menu;
-	if (menu.LoadMenu(IDR_CTXWNGMENU)){
+	if (menu.LoadMenu(IDR_CTXWNGMENU))
+	{
 		CMenu* pPopup = menu.GetSubMenu(0);
 		ASSERT(pPopup != NULL);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,	pt.x, pt.y, this); 
@@ -257,10 +306,15 @@ void CReListDlg::OnNMRClickReList(NMHDR *pNMHDR, LRESULT *pResult)
 void CReListDlg::OnDelete() 
 {
 	if(m_NRe<=0) return;
+	int i;
+
+	m_ctrlReList.CloseEdit();
+
 	POSITION pos = m_ctrlReList.GetFirstSelectedItemPosition();
 	m_iSelection = m_ctrlReList.GetNextSelectedItem(pos);
 	
-	for(int i=m_iSelection; i<m_NRe; i++){
+	for(i=m_iSelection; i<m_NRe; i++)
+	{
 		m_ReList[i]    = m_ReList[i+1];
 		m_MachList[i]  = m_MachList[i+1];
 		m_NCritList[i] = m_NCritList[i+1];
@@ -276,33 +330,41 @@ void CReListDlg::OnDelete()
 
 void CReListDlg::OnInsertBefore()
 {
-	if(m_NRe>=30) {
+	if(m_NRe>=30) 
+	{
 		AfxMessageBox("The maximum number of polars has been reached", MB_OK);
 		return;
 	}
+
+	m_ctrlReList.CloseEdit();
 
 	POSITION pos = m_ctrlReList.GetFirstSelectedItemPosition();
 	m_iSelection = m_ctrlReList.GetNextSelectedItem(pos);
 
 	int n = m_iSelection;
 
-	for (int k=m_NRe; k>=n; k--){
+	for (int k=m_NRe; k>=n; k--)
+	{
 		m_ReList[k+1]      = m_ReList[k];
 		m_MachList[k+1]    = m_MachList[k];
 		m_NCritList[k+1]   = m_NCritList[k];
 	}
-	if(m_NRe==0){
+	if(m_NRe==0)
+	{
 		m_ReList[0]    = 100000.0;
 		m_MachList[0]  = 0.0;
 		m_NCritList[0] = 9.0;	
 	}
-	else{
-		if(n==0) {
+	else
+	{
+		if(n==0) 
+		{
 			m_ReList[n]    = m_ReList[1] /2.0;
 			m_MachList[n]  = m_MachList[1];
 			m_NCritList[n] = m_NCritList[1];	
 		}
-		else{
+		else
+		{
 			m_ReList[n]    = (m_ReList[n+1] + m_ReList[n-1]) /2.0;
 			m_MachList[n]  = m_MachList[n-1];
 			m_NCritList[n] = m_NCritList[n-1];
@@ -311,70 +373,17 @@ void CReListDlg::OnInsertBefore()
 	m_NRe++;
 	FillReList();
 	SetSelection(m_iSelection);
-	m_ctrlReList.EditSubLabel(m_iSelection, 1);
+//	m_ctrlReList.EditSubLabel(m_iSelection, 1);
 }
 
-
-
-void CReListDlg::OnAppend()
-{
-	if(m_NRe>=30) {
-		AfxMessageBox("The maximum number of polars has been reached", MB_OK);
-		return;
-	}
-
-	POSITION pos = m_ctrlReList.GetFirstSelectedItemPosition();
-	m_iSelection = m_ctrlReList.GetNextSelectedItem(pos);
-	int n = m_iSelection;
-
-	for (int k=m_NRe; k>n; k--){
-		m_ReList[k+1]      = m_ReList[k];
-		m_MachList[k+1]    = m_MachList[k];
-		m_NCritList[k+1]   = m_NCritList[k];
-	}
-
-	if(n+1<m_NRe){
-		m_ReList[n+1]    = (m_ReList[n]    + m_ReList[n+2])   /2.0;
-		m_MachList[n+1]  = (m_MachList[n]  + m_MachList[n+2]) /2.0;
-		m_NCritList[n+1] =  m_NCritList[n] ;
-	}
-	else{
-		m_ReList[n+1]     = m_ReList[n]*1.1;
-		m_MachList[n+1]   = m_MachList[n]; 
-		m_NCritList[n+1]  = m_NCritList[n] ;
-	}
-
-	m_NRe++;
-	FillReList();
-	SetSelection(m_iSelection);
-	m_ctrlReList.EditSubLabel(m_iSelection+1, 1);
-}
 
 void CReListDlg::SetSelection(int sel)
 {
-	if(sel>=0){
+	if(sel>=0)
+	{
 		m_ctrlReList.EnsureVisible(sel,FALSE);
 		m_ctrlReList.SetItemState(sel, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 		m_ctrlReList.m_iItem = sel;
 	}
-}
-
-void CReListDlg::OnInsert()
-{
-	if(m_NRe>0){
-		m_ReList[m_NRe]      = m_ReList[m_NRe-1]*1.2;
-		m_MachList[m_NRe]    = m_MachList[m_NRe-1];
-		m_NCritList[m_NRe]   = m_NCritList[m_NRe-1];
-	}
-	else {
-		m_ReList[0]      = 100000.0;
-		m_MachList[0]    = 0.0;
-		m_NCritList[0]   = 9.0;
-	}
-	m_NRe++;
-	FillReList();
-	SetSelection(m_NRe-1);
-	m_ctrlReList.EditSubLabel(m_NRe-1, 1);
-
 }
 	

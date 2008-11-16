@@ -40,6 +40,7 @@ IMPLEMENT_DYNAMIC(CBodyCtrlBar, CInitDialogBar)
 
 BEGIN_MESSAGE_MAP(CBodyCtrlBar, CInitDialogBar)
 	ON_WM_SIZE()
+	ON_WM_TIMER()
 	ON_WM_DRAWITEM()
 	ON_WM_CONTEXTMENU()
 	ON_WM_MOUSEWHEEL()
@@ -54,6 +55,8 @@ BEGIN_MESSAGE_MAP(CBodyCtrlBar, CInitDialogBar)
 	ON_CBN_SELCHANGE(IDC_BODYLIST, OnSelChangeBodyList)
 	ON_CBN_SELCHANGE(IDC_XDEGREE, OnSelChangeSplineDegree)
 	ON_CBN_SELCHANGE(IDC_HOOPDEGREE, OnSelChangeSplineDegree)
+	ON_EN_KILLFOCUS(IDC_FRAMELIST, OnKillFocusFrameList)
+	ON_EN_KILLFOCUS(IDC_FRAMEPOINTS, OnKillFocusPointList)
 	ON_EN_KILLFOCUS(IDC_NXPANELS, OnKillFocusPanels)
 	ON_EN_KILLFOCUS(IDC_NHPANELS, OnKillFocusPanels)
 //	ON_NOTIFY(NM_CLICK, IDC_FRAMELIST, OnNMClickFrameList)
@@ -78,6 +81,7 @@ CBodyCtrlBar::CBodyCtrlBar(CWnd* pParent)
 	m_ppCurBody = NULL;
 	m_StackSize = 0; //the current stacksize
 	m_StackPos  = 0; //the current position of the stack
+	m_bResetFrame = true;
 }
 
 
@@ -239,6 +243,8 @@ BOOL CBodyCtrlBar::OnInitDialogBar()
 
 	FillFrameList();
 	FillPointList();
+
+	SetTimer(ID_BODYUPDATETIMER, 1000, NULL);
 
 	return TRUE;
 }
@@ -405,21 +411,62 @@ void CBodyCtrlBar::OnBodyColor()
 }
 
 
+void CBodyCtrlBar::FillFrameCell(int iItem, int iSubItem)
+{
+	CMainFrame *pMainFrame = (CMainFrame*)(m_pMainFrame);
+	CString strong;
+	switch (iSubItem)
+	{
+		case 0:
+		{
+			strong.Format("%d", iItem);
+			m_ctrlFrameList.SetItemText(iItem, 0, strong);
+			break;
+		}
+		case 1:
+		{
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[iItem].x*pMainFrame->m_mtoUnit);
+			m_ctrlFrameList.SetItemText(iItem,1,strong);
+			break;
+		}
+		case 2:
+		{
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[iItem].z*pMainFrame->m_mtoUnit);
+			m_ctrlFrameList.SetItemText(iItem,2,strong);
+			break;
+		}
+		case 3:
+		{
+			if((*m_ppCurBody)->m_LineType==2) strong = " ";
+			else                              strong.Format(" %2d", (*m_ppCurBody)->m_xPanels[iItem]);
+			m_ctrlFrameList.SetItemText(iItem,3,strong);
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
 void CBodyCtrlBar::FillFrameList()
 {
-	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
+	CMainFrame *pMainFrame = (CMainFrame*)(m_pMainFrame);
 	CString strong;
+	int i;
+
 	m_ctrlFrameList.DeleteAllItems();
 
 	if(!*m_ppCurBody) return;
 
-	for (int i=0; i<(*m_ppCurBody)->m_NStations; i++)
+	for (i=0; i<(*m_ppCurBody)->m_NStations; i++)
 	{
 		strong.Format("%d", i+1);
 		m_ctrlFrameList.InsertItem(i, strong);
-		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].x*pFrame->m_mtoUnit);
+		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].x*pMainFrame->m_mtoUnit);
 		m_ctrlFrameList.SetItemText(i,1,strong);
-		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].z*pFrame->m_mtoUnit);
+		strong.Format(" %8.2f", (*m_ppCurBody)->m_FramePosition[i].z*pMainFrame->m_mtoUnit);
 		m_ctrlFrameList.SetItemText(i,2,strong);
 		if((*m_ppCurBody)->m_LineType==2) strong = " ";
 		else                              strong.Format(" %2d", (*m_ppCurBody)->m_xPanels[i]);
@@ -429,18 +476,66 @@ void CBodyCtrlBar::FillFrameList()
 	else                              m_ctrlFrameList.m_nColumns = 3;
 }
 
-void CBodyCtrlBar::FillPointList()
+
+
+
+void CBodyCtrlBar::FillPointCell(int iItem, int iSubItem)
 {
-	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
+	CMainFrame *pMainFrame = (CMainFrame*)(m_pMainFrame);
 	CString strong;
-	m_ctrlFramePoints.DeleteAllItems();
 
 	if(!*m_ppCurBody) return;
 	int l = (*m_ppCurBody)->m_iActiveFrame;
 
+	switch (iSubItem)
+	{
+		case 0:
+		{
+			strong.Format("%d", iItem);
+			m_ctrlFramePoints.SetItemText(iItem, 0, strong);
+			break;
+		}
+		case 1:
+		{
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[iItem].y*pMainFrame->m_mtoUnit);
+			m_ctrlFramePoints.SetItemText(iItem,1,strong);
+			break;
+		}
+		case 2:
+		{
+			strong.Format(" %8.2f", (*m_ppCurBody)->m_Frame[l].m_Point[iItem].z*pMainFrame->m_mtoUnit);
+			m_ctrlFramePoints.SetItemText(iItem,2,strong);
+
+			break;
+		}
+		case 3:
+		{
+			if((*m_ppCurBody)->m_LineType==2) strong = " ";
+			else                              strong.Format(" %2d", (*m_ppCurBody)->m_hPanels[iItem]);
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+void CBodyCtrlBar::FillPointList()
+{
+	CMainFrame *pFrame = (CMainFrame*)(m_pMainFrame);
+	CString strong;
+	int i,l;
+	m_ctrlFramePoints.DeleteAllItems();
+
+	if(!*m_ppCurBody) return;
+	l = (*m_ppCurBody)->m_iActiveFrame;
+
 	if(l>=0)
 	{
-		for (int i=0; i<(*m_ppCurBody)->m_NSideLines; i++)
+		for (i=0; i<(*m_ppCurBody)->m_NSideLines; i++)
 		{
 			strong.Format("%d", i+1);
 			m_ctrlFramePoints.InsertItem(i, strong);
@@ -483,7 +578,8 @@ void CBodyCtrlBar::ReSizeCtrls()
 
 	int w = CltRect.Width();
 
-	if(w){
+	if(w)
+	{
 		HWND hwnd = m_ctrlFrameList.GetSafeHwnd();
 		if(hwnd)
 		{
@@ -504,11 +600,53 @@ void CBodyCtrlBar::OnLvnItemchangedFramelist(NMHDR *pNMHDR, LRESULT *pResult)
 		*pResult =0;
 		return ;
 	}
-	SetFrame(pNMListView->iItem);
-	pMiarex->UpdateView();
+
+//	SetFrame(pNMListView->iItem);
+//	pMiarex->UpdateView();
+	m_bResetFrame = true;
 
 	*pResult = 0;
 }
+
+
+
+void CBodyCtrlBar::OnTimer(UINT nIDEvent)
+{
+	CInitDialogBar::OnTimer(nIDEvent);
+
+	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp!=MIAREX) return;
+	if(pMiarex->m_iView!=5) return;
+/*
+#ifdef _DEBUG
+	SYSTEMTIME tm;	GetLocalTime(&tm);
+	CString str;
+	str.Format("time = %2d:%2d:%2d.%03d \n", tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds);
+	TRACE(str);
+#endif*/
+
+	if(nIDEvent == ID_BODYUPDATETIMER)
+	{
+		if(m_bResetFrame)
+		{
+			m_bResetFrame = false; 
+			SetFrame(m_ctrlFrameList.m_iItem);
+			pMiarex->UpdateView();
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 void CBodyCtrlBar::OnLvnItemchangedFramepoints(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
@@ -610,9 +748,11 @@ void CBodyCtrlBar::OnLvnEndLabelEditFramePoints(NMHDR *pNMHDR, LRESULT *pResult)
 			pFrame->m_Point[iSelection].y = y/pMainFrame->m_mtoUnit;
 			pFrame->m_Point[iSelection].z = z/pMainFrame->m_mtoUnit;
 			if((*m_ppCurBody)->m_LineType==1)	(*m_ppCurBody)->m_hPanels[iSelection] = nel;
+
 			(*m_ppCurBody)->m_FramePosition[(*m_ppCurBody)->m_iActiveFrame].z = (pFrame->m_Point[0].z+pFrame->m_Point[(*m_ppCurBody)->m_NSideLines-1].z)/2.0;
 
-			FillFrameList();
+			FillFrameCell((*m_ppCurBody)->m_iActiveFrame, 2);
+//			FillFrameList();
 			pMiarex->m_bResetglBody   = true;
 			pMiarex->m_bResetglBodyMesh = true;
 			pMiarex->m_bResetglBody2D = true;
@@ -621,7 +761,8 @@ void CBodyCtrlBar::OnLvnEndLabelEditFramePoints(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		else 
 		{
-			FillPointList();
+			FillPointCell(pDispInfo->item.iItem, pDispInfo->item.iSubItem);
+//			FillPointList();
 		}
 	}
 }
@@ -659,8 +800,9 @@ void CBodyCtrlBar::OnLvnEndLabelEditFrameList(NMHDR *pNMHDR, LRESULT *pResult)
 			pMiarex->UpdateView();
 			pFrame->SetSaveState(false);
 		}
-		else FillFrameList();
-
+		else
+			FillFrameCell(pDispInfo->item.iItem, pDispInfo->item.iSubItem);
+//			FillPanelList();
 	}
 }
 
@@ -685,7 +827,6 @@ void CBodyCtrlBar::ReadPointData(int sel, double &y, double &z, int &n)
 		res = sscanf(strong, "%d",&nel);
 		if(res==1) n=nel;
 	}
-	
 }
 
 
@@ -897,10 +1038,13 @@ void CBodyCtrlBar::UpdateBodyCtrls()
 
 void CBodyCtrlBar::SetFrame(int iFrame)
 {
+	if(!*m_ppCurBody) return;
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_pCurFrame = &(*m_ppCurBody)->m_Frame[iFrame];
+	if(iFrame<0 || iFrame>=(*m_ppCurBody)->m_NStations) pMiarex->m_pCurFrame = NULL;
+	else                                                pMiarex->m_pCurFrame = &(*m_ppCurBody)->m_Frame[iFrame];
 	(*m_ppCurBody)->m_iActiveFrame = iFrame;
 
+	SetFrameSel(iFrame);
 	FillPointList();
 	SetPointSel(pMiarex->m_pCurFrame->m_iSelect);
 
@@ -917,7 +1061,8 @@ void CBodyCtrlBar::SetPoint(int iPoint)
 
 void CBodyCtrlBar::SetFrameSel(int sel)
 {
-	if(sel>=0){
+	if(sel>=0)
+	{
 		m_ctrlFrameList.EnsureVisible(sel,FALSE);
 		m_ctrlFrameList.SetItemState(sel, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 		m_ctrlFrameList.m_iItem = sel;
@@ -1257,7 +1402,16 @@ void CBodyCtrlBar::OnLocked()
 }
 
 
+void CBodyCtrlBar::OnKillFocusFrameList()
+{
+	m_ctrlFrameList.CloseEdit();
+}
 
+
+void CBodyCtrlBar::OnKillFocusPointList()
+{
+	m_ctrlFramePoints.CloseEdit();
+}
 
 
 

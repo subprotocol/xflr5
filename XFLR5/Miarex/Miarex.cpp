@@ -39,18 +39,20 @@
 #include "../Graph/WGraphVarDlg.h"
 #include "../main/ChildView.h"
 #include "../main/MainFrm.h"
+#include "..\XInverse\SelectFoilDlg.h"
 #include "ListPlrDlg.h"
 #include "CpScaleDlg.h"
 #include "WAdvDlg.h"
 #include "WingDlg.h"
 #include "PlaneDlg.h"
 #include "BodyNURBSDlg.h"
+#include "BodyTransDlg.h"
 #include "BodyScaleDlg.h"
 #include "WingScaleDlg.h"
 #include "LLTThread.h"
 #include "W3DBar.h"
 #include ".\miarex.h"
-
+#include <comdef.h>
 
 //Define the references for the OpenGL lists
 
@@ -122,12 +124,13 @@
 #define BODYLINEGRID		1308
 #define BODYPOINTS			1309
 #define FRAMEPOINTS			1310
+#define BODYOVERLAY			1311
 
-#define BODYMESHPANELS		1311
-#define BODYMESHBACK		1312
+#define BODYMESHPANELS		1312
+#define BODYMESHBACK		1313
 
-#define ARCBALL             1313
-#define ARCPOINT            1314
+#define ARCBALL             1314
+#define ARCPOINT            1315
 
 /////////////////////////////////////////////////////////////////////////////
 // CMiarex dialog
@@ -164,7 +167,7 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_Panel[0].m_CtrlPos   = 0.75;
 
 	m_WngAnalysis.m_WakePanelFactor = 1.10;
-	m_WngAnalysis.m_TotalWakeLength  = 1.00;
+	m_WngAnalysis.m_TotalWakeLength = 100.00;
 	m_WngAnalysis.m_NXWakePanels    = 1;
 
 	m_CoreSize        = 0.0;
@@ -236,10 +239,14 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
 
 	m_GLList = 0;
-	m_bResetglBody       = false;//otherwise endless repaint if no body present
-	m_bResetglBody2D     = false;//
-	m_bResetglBodyPoints = false;
-	m_bResetglBodyMesh   = true;
+	m_bBodyOverlay        = false;
+	m_bResetglBody        = false;//otherwise endless repaint if no body present
+	m_bResetglBody2D      = false;//
+	m_bResetglBodyPoints  = false;
+	m_bResetglBody2D      = false;
+	m_bResetglBodyOverlay = true;
+	m_bResetglBodyMesh    = true;
+
 	m_bResetglGeom       = true;
 	m_bResetglOpp        = true;
 	m_bResetglLift       = true;
@@ -250,6 +257,7 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_bResetglWake       = true;
 	m_bResetglLegend     = true;
 	m_bResetglFlow       = true;
+
 	m_bDirichlet         = true;
 	m_bTrefftz           = true;
 	m_bWakePanels        = false;
@@ -260,7 +268,7 @@ CMiarex::CMiarex(CWnd* pParent /*=NULL*/)
 	m_bVLMPanels         = false;
 	m_bAxes              = true;
 	m_bglLight           = true;
-	m_b3DCp           = false;
+	m_b3DCp              = false;
 	m_b3DDownwash        = true;
 	m_bXTop              = true;
 	m_bXBot              = true;
@@ -528,7 +536,6 @@ void CMiarex::GLDestroyLists()
 
     wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
 
-
 	if(glIsList(PANELCP)==GL_TRUE) {
 		glDeleteLists(PANELCP,1);
 		m_GLList-=1;
@@ -647,22 +654,32 @@ void CMiarex::GLDestroyLists()
 		glDeleteLists(VLMWING2TOPTRANS,2);
 		m_GLList-=2;
 	}	
-	if(glIsList(VLMSTABTOPTRANS)) {
+	if(glIsList(VLMSTABTOPTRANS)) 
+	{
 		glDeleteLists(VLMSTABTOPTRANS,2);
 		m_GLList-=2;
 	}	
-	if(glIsList(VLMFINTOPTRANS)) {
+	if(glIsList(VLMFINTOPTRANS)) 
+	{
 		glDeleteLists(VLMFINTOPTRANS,2);
 		m_GLList-=2;
 	}	
 
-	if(glIsList(BODYGEOM)) {
+	if(glIsList(BODYGEOM)) 
+	{
 		glDeleteLists(BODYGEOM,2);
 		m_GLList-=2;
 	}
-	if(glIsList(BODYAXIALLINES)) {
+	if(glIsList(BODYAXIALLINES)) 
+	{
 		glDeleteLists(BODYAXIALLINES,7);
 		m_GLList-=7;
+	}
+
+	if(glIsList(BODYOVERLAY)) 
+	{
+		glDeleteLists(BODYOVERLAY,1);
+		m_GLList -=1;
 	}
 
 	if(glIsList(BODYMESHPANELS)) 
@@ -692,6 +709,8 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_WM_CREATE()
 	ON_WM_MOUSEWHEEL()
+	ON_COMMAND(IDM_OVERLAYSECTION, OnOverlaySection)
+	ON_COMMAND(IDM_SELECTBODYOVERLAY, OnSelectBodyOverlay)
 	ON_COMMAND(IDM_RESET3DVIEW, OnReset3DView)
 	ON_COMMAND(IDM_SINGLEGRAPH1, OnSingleGraph1)
 	ON_COMMAND(IDM_SINGLEGRAPH2, OnSingleGraph2)
@@ -784,20 +803,22 @@ BEGIN_MESSAGE_MAP(CMiarex, CWnd)
 	ON_COMMAND(IDM_NEWBODY, OnNewBody)
 	ON_COMMAND(IDM_RENAMECURBODY, OnRenameCurBody)
 	ON_COMMAND(IDM_DELETECURBODY, OnDeleteCurBody)
-	ON_COMMAND(IDM_SCALECURBODY, OnScaleCurBody)
 	ON_COMMAND(IDM_DUPLICATECURBODY, OnDuplicateCurBody)
 	ON_COMMAND(IDM_EXPORTCURBODY, OnExportCurBody)
 	ON_COMMAND(IDM_SAVECURBODYASPROJECT, OnSaveCurBodyAsProject)
 	ON_COMMAND(IDM_RESETBODYSCALE, OnResetBodyScale)
 	ON_COMMAND(IDM_RESETFRAMESCALE, OnResetBodyScale)
 	ON_COMMAND(IDM_BODYGRIDOPTIONS, OnBodyGrid)
+	ON_COMMAND(IDM_IMPORTBODYDEFINITION, OnImportBodyDefinition)
+	ON_COMMAND(IDM_EXPORTBODYDEFINITION, OnExportBodyDefinition)
 	ON_COMMAND(IDT_WOPP, OnWOpp)
 	ON_COMMAND(IDT_WPOLARS, OnWPolar)
 	ON_COMMAND(IDT_UNDO, OnUndo	)
 	ON_COMMAND(IDT_REDO, OnRedo)
 	ON_COMMAND(IDM_BODYRESOLUTION, OnBodyResolution)
 	ON_COMMAND(IDM_INTERPOLATE, OnInterpolateBodyPoints)
-	ON_COMMAND(IDM_SCALEFRAME, OnScaleFrame)
+	ON_COMMAND(IDM_SCALECURBODY, OnScaleCurBody)
+	ON_COMMAND(IDM_TRANSLATECURBODY, OnTranslateCurBody)
 	ON_COMMAND(IDM_SHOWONLYACTIVEFRAME, OnShowOnlyActiveFrame)
 	END_MESSAGE_MAP()
 
@@ -949,62 +970,76 @@ CWPolar* CMiarex::AddWPolar(CWPolar *pWPolar)
 {
 	//Add a WPolar to the m_oaWPolar array
 	//Insert the WPolar in alphabetical order
-	int i,j;
+	int i,j,k,l,p;
  	bool bExists   = false;
  	bool bInserted = false;
  	CWPolar *pOldWPlr;
  	CWPolar *pOld2WPlr;
  	CString strong;
 
- 	for (i=0; i<m_poaWPolar->GetSize(); i++){
+ 	for (i=0; i<m_poaWPolar->GetSize(); i++)
+	{
  		pOldWPlr = (CWPolar*)m_poaWPolar->GetAt(i);
  		if (pOldWPlr->m_PlrName == pWPolar->m_PlrName &&
-			pOldWPlr->m_UFOName == pWPolar->m_UFOName) {
+			pOldWPlr->m_UFOName == pWPolar->m_UFOName)
+		{
 			bExists = true;
 			break;
 		}
  	}
 
- 	while(!bInserted){
- 		if(!bExists){ 
- 			for (j=0; j<m_poaWPolar->GetSize(); j++){
+ 	while(!bInserted)
+	{
+ 		if(!bExists)
+		{ 
+ 			for (j=0; j<m_poaWPolar->GetSize(); j++)
+			{
  				pOldWPlr = (CWPolar*)m_poaWPolar->GetAt(j);
-				if(pWPolar->m_UFOName.CompareNoCase(pOldWPlr->m_UFOName)<0){
+				if(pWPolar->m_UFOName.CompareNoCase(pOldWPlr->m_UFOName)<0)
+				{
  					m_poaWPolar->InsertAt(j, pWPolar);
  					bInserted = true;
  					break;
  				}
- 				else if (pWPolar->m_UFOName == pOldWPlr->m_UFOName){
+ 				else if (pWPolar->m_UFOName == pOldWPlr->m_UFOName)
+				{
 					//first sort by Type
-					if(pWPolar->m_PlrName.CompareNoCase(pOldWPlr->m_PlrName)<0){
+					if(pWPolar->m_PlrName.CompareNoCase(pOldWPlr->m_PlrName)<0)
+					{
  						m_poaWPolar->InsertAt(j, pWPolar);
 						bInserted = true;
  						break;
 					}
  				}
  			}	
- 			if(!bInserted)	{
+ 			if(!bInserted)	
+			{
 				m_poaWPolar->Add(pWPolar);
 				bInserted = true;
  			}
  			return pWPolar;
  		}
- 		else {
- 			for (int l=0; l<m_poaWPolar->GetSize(); l++){
+ 		else 
+		{
+ 			for (l=0; l<m_poaWPolar->GetSize(); l++)
+			{
  				pOldWPlr = (CWPolar*)m_poaWPolar->GetAt(l);
  				if (pOldWPlr->m_UFOName == pWPolar->m_UFOName &&
  					pOldWPlr->m_PlrName == pWPolar->m_PlrName){
 
- 					int p = 2;
+ 					p = 2;
  					bool bFound = true;
- 					while(bFound){
+ 					while(bFound)
+					{
  						strong.Format(" (%d)", p);
  						strong = pWPolar->m_PlrName + strong;
- 						for (int k=0; k<m_poaWPolar->GetSize(); k++){
+ 						for (k=0; k<m_poaWPolar->GetSize(); k++)
+						{
  							bFound = false;
  							pOld2WPlr = (CWPolar*)m_poaWPolar->GetAt(k);
  							if (pOld2WPlr->m_UFOName == pWPolar->m_UFOName &&
- 								pOld2WPlr->m_PlrName == strong){
+ 								pOld2WPlr->m_PlrName == strong)
+							{
  								p++;
  								bFound = true;
  								break;
@@ -1781,13 +1816,17 @@ bool CMiarex::SetPOpp(bool bCurrent, double Alpha)
 //	if(!pPOpp) pPOpp = m_pCurPOpp;
 	
 
-	if(!pPOpp){//try to select the first in the ListBox
-		if(pFrame->m_ctrlWOpp.GetCount()){
+	if(!pPOpp)
+	{
+		//try to select the first in the ListBox
+		if(pFrame->m_ctrlWOpp.GetCount())
+		{
 			double x;
 			pFrame->m_ctrlWOpp.SetCurSel(0);
 			pFrame->m_ctrlWOpp.GetLBText(0, strong);
 			int res = sscanf(strong, "%lf", &x);
-			if(res==1) {
+			if(res==1) 
+			{
 				pPOpp = GetPOpp(x);
 			}
 			else pPOpp = NULL;
@@ -1798,7 +1837,8 @@ bool CMiarex::SetPOpp(bool bCurrent, double Alpha)
 	}
 	m_pCurPOpp = pPOpp;
 	pFrame->m_PolarDlgBar.SetParams();
-	if(m_pCurPOpp) {
+	if(m_pCurPOpp) 
+	{
 		m_LastWOpp = m_pCurPOpp->m_Alpha;
 		m_pCurWOpp = &m_pCurPOpp->m_WingWOpp;
 		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
@@ -1808,10 +1848,12 @@ bool CMiarex::SetPOpp(bool bCurrent, double Alpha)
 		else                          strong.Format("%8.2f", m_pCurPOpp->m_QInf);
 
 		int pos = pFrame->m_ctrlWOpp.FindStringExact(-1,strong);
-		if(pos != CB_ERR) {
+		if(pos != CB_ERR) 
+		{
 			pFrame->m_ctrlWOpp.SetCurSel(pos);
 		}
-		else {
+		else 
+		{
 			pFrame->m_ctrlWOpp.SetCurSel(0);
 		}
 	}
@@ -2685,35 +2727,28 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	if(m_iView==5)
 	{
 		ClientToGL(m_ptPopUp, m_RealPopUp);
-		if(m_BodyRect.PtInRect(ClientPoint))       
-		{
-			BMenu = menu.LoadMenu(IDR_CTXBODYCTRLMENU);			
-		}
-		else if(m_BodyLineRect.PtInRect(ClientPoint))  
-		{
-			BMenu = menu.LoadMenu(IDR_CTXBODYFRAMECTRLMENU);
-		}
+
+		if(m_BodyRect.PtInRect(ClientPoint))       		BMenu = menu.LoadMenu(IDR_CTXBODYCTRLMENU);	
+		else if(m_BodyLineRect.PtInRect(ClientPoint))  	BMenu = menu.LoadMenu(IDR_CTXBODYFRAMECTRLMENU);
 		else if(m_FrameRect.PtInRect(ClientPoint))      BMenu = menu.LoadMenu(IDR_CTXBODYPOINTCTRLMENU);
 		else BMenu = FALSE;
+
 		if (BMenu)
 		{
 			CMenu* pPopup = menu.GetSubMenu(0);
-//			if(m_pCurBody->m_bLocked)
-//			{
-//				pPopup->EnableMenuItem(0,  MF_BYPOSITION | MF_GRAYED);
-//				menu.EnableMenuItem(1,  MF_BYPOSITION | MF_DISABLED | MF_GRAYED);
-//			}
+			if(m_bBodyOverlay)
+				pPopup->CheckMenuItem(IDM_OVERLAYSECTION,  MF_BYCOMMAND | MF_CHECKED);
 
 			if(m_FrameRect.PtInRect(ClientPoint) && m_bCurFrameOnly)
 				pPopup->CheckMenuItem(IDM_SHOWONLYACTIVEFRAME,     MF_BYCOMMAND | MF_CHECKED);
 
-			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-				ScreenPoint.x, ScreenPoint.y, m_pFrame); // use main window for cmds
+			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, ScreenPoint.x, ScreenPoint.y, m_pFrame); // use main window for cmds
 		}
 	}
 	else if(m_iView==3)
 	{
-		if (menu.LoadMenu(IDR_CTXWING3DMENU)){
+		if (menu.LoadMenu(IDR_CTXWING3DMENU))
+		{
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
@@ -2727,7 +2762,8 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	}
 	else if(m_iView==1 || m_iView==4)
 	{
-		if (menu.LoadMenu(IDR_CTXWINGOPPMENU)){
+		if (menu.LoadMenu(IDR_CTXWINGOPPMENU))
+		{
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
@@ -2742,7 +2778,8 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 			if(m_bShowElliptic)
 				  pPopup->CheckMenuItem(IDM_SHOWELLIPTIC,MF_BYCOMMAND | MF_CHECKED);
 
-			if(m_iWingView ==1){
+			if(m_iWingView ==1)
+			{
 				if(m_pCurGraph==&m_WingGraph1)
 					pPopup->CheckMenuItem(IDM_SINGLEGRAPH1, MF_BYCOMMAND | MF_CHECKED);
 				if(m_pCurGraph==&m_WingGraph2) 
@@ -2763,11 +2800,13 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	}
 	else if(m_iView==2)
 	{
-		if (menu.LoadMenu(IDR_CTXWINGPLRMENU)){
+		if (menu.LoadMenu(IDR_CTXWINGPLRMENU))
+		{
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
-			if (m_iWPlrView == 1) {
+			if (m_iWPlrView == 1) 
+			{
 				if(m_pCurGraph==&m_WPlrGraph1)
 					pPopup->CheckMenuItem(IDM_SINGLEGRAPH1, MF_BYCOMMAND | MF_CHECKED);
 				if(m_pCurGraph==&m_WPlrGraph2) 
@@ -2790,12 +2829,14 @@ void CMiarex::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 void CMiarex::OnGraphDlg() 
 {
 	//displays the graph options dialog box
-	if(m_pCurGraph){
+	if(m_pCurGraph)
+	{
 		CGraphDlg dlg(m_pChildWnd);
 
 		dlg.m_pGraph = m_pCurGraph;
 
-		if(IDOK == dlg.DoModal()){
+		if(IDOK == dlg.DoModal())
+		{
 			UpdateView();
 		}
 	}	
@@ -3685,6 +3726,8 @@ void CMiarex::CheckMenus()
 		pMenu = m_pFrame->GetMenu()->GetSubMenu(3);
 		if(m_bCurFrameOnly) pMenu->CheckMenuItem(IDM_SHOWONLYACTIVEFRAME,  MF_BYCOMMAND | MF_CHECKED);
 		else                pMenu->CheckMenuItem(IDM_SHOWONLYACTIVEFRAME,  MF_BYCOMMAND | MF_UNCHECKED);
+		if(m_bBodyOverlay)  pMenu->CheckMenuItem(IDM_OVERLAYSECTION,  MF_BYCOMMAND | MF_CHECKED);
+		else                pMenu->CheckMenuItem(IDM_OVERLAYSECTION,  MF_BYCOMMAND | MF_UNCHECKED);
 	}
 }
 
@@ -4226,7 +4269,6 @@ void CMiarex::OnMouseMove(UINT nFlags, CPoint point)
 			{	//dragging a point
 				if(!m_pCurBody->m_bLocked)
 				{
-					
 					if(Real.x<0.0) 	m_pCurFrame->m_Point[n].y = 0.0;
 					else            m_pCurFrame->m_Point[n].y = Real.x;
 					m_pCurFrame->m_Point[n].z = Real.y;
@@ -5328,8 +5370,9 @@ void CMiarex::OnExportPanels()
 {
 	//Export the VLM panels to a text file
 	if(!m_pCurWing)	return;
-	CString FileName;
+	CString FileName,str;
 	CStdioFile XFile;
+	int n, p;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
 	CFileException fe;
@@ -5337,31 +5380,42 @@ void CMiarex::OnExportPanels()
 
 	FileName = m_pCurWing->m_WingName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT,
-		_T("Text Format (.txt)|*.txt|"));
 
-	if(IDOK==XFileDlg.DoModal()) {
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
+		if(XFileDlg.m_ofn.nFilterIndex==1)	str="";
+		else	                            str=", ";
+
 		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
 
-		if(bOpen){
+		if(bOpen)
+		{
 			strong = pFrame->m_ProjectName;
 			int len = strong.GetLength();
 			if (strong.Right(1) == "*") strong = strong.Left(len-1);
 			if(!strong.GetLength()) XFile.WriteString("Project");
 			else XFile.WriteString(strong);
 			XFile.WriteString("\n");
-			XFile.WriteString("Node          x            y            z\n");
-			for (int n=0; n<m_nNodes; n++){
-				strong.Format("%4d   %10.4f   %10.4f   %10.4f\n",n,m_Node[n].x,m_Node[n].y,m_Node[n].z);
+			if(XFileDlg.m_ofn.nFilterIndex==1)	XFile.WriteString("Node          x            y            z\n");
+			else                                XFile.WriteString("Node, x, y, z\n");
+			for (n=0; n<m_nNodes; n++)
+			{
+				strong.Format("%4d"+str+"   %10.4f"+str+"   %10.4f"+str+"   %10.4f\n",n,m_Node[n].x,m_Node[n].y,m_Node[n].z);
 				XFile.WriteString(strong);
 			}
 			XFile.WriteString("\n\n");
 			XFile.WriteString("\n");
-			XFile.WriteString("Panel     Trailing.Left    Leading.Left    Trailing.Right   Leading.Right    \n");
-			for (int p=0; p<m_MatSize; p++){
-				strong.Format("%4d         %4d             %4d             %4d             %4d\n",p,
+			if(XFileDlg.m_ofn.nFilterIndex==1) XFile.WriteString("Panel     Trailing.Left    Leading.Left    Trailing.Right   Leading.Right    \n");
+			else                               XFile.WriteString("Panel,Trailing.Left,Leading.Left,Trailing.Right,Leading.Right\n");
+			for (p=0; p<m_MatSize; p++)
+			{
+				if(XFileDlg.m_ofn.nFilterIndex==1) strong.Format("%4d         %4d             %4d             %4d             %4d\n",p,
 					m_Panel[p].m_iTA, m_Panel[p].m_iLA, m_Panel[p].m_iTB, m_Panel[p].m_iLB);
+				else strong.Format("%4d, %4d, %4d, %4d, %4d\n",p,m_Panel[p].m_iTA, m_Panel[p].m_iLA, m_Panel[p].m_iTB, m_Panel[p].m_iLB);
 				XFile.WriteString(strong);
 			}
 			XFile.WriteString("\n\n");
@@ -5384,14 +5438,17 @@ void CMiarex::OnExportWing()
 
 	FileName = m_pCurWing->m_WingName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "avl", FileName, OFN_OVERWRITEPROMPT,
-		_T("Text Format (.avl)|*.avl|"));
 
-	if(IDOK==XFileDlg.DoModal()) {
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.avl)|*.avl|")  ;
+	CFileDialog XFileDlg(false, "avl", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+	if(IDOK==XFileDlg.DoModal())
+	{
 		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
 
-		if(bOpen){
+		if(bOpen)
+		{
 			strong = pFrame->m_ProjectName;
 			int len = strong.GetLength();
 			if (strong.Right(1) == "*") strong = strong.Left(len-1);
@@ -5651,7 +5708,8 @@ void CMiarex::OnScaleWing()
 			if(dlg.m_bScaleChord) pNewWing->ScaleChord(dlg.m_NewChord);
 			if(dlg.m_bScaleSweep) pNewWing->SetSweep(dlg.m_NewSweep);
 			if(dlg.m_bScaleTwist) pNewWing->SetTwist(dlg.m_Twist);
-			if(SetModWing(pNewWing)){
+			if(SetModWing(pNewWing))
+			{
 				m_pCurWing = AddWing(pNewWing);
 				m_pCurWPolar = NULL;
 				pFrame->m_WOperDlgBar.EnableAnalysis(false);
@@ -5675,7 +5733,8 @@ void CMiarex::SetBody(CString BodyName)
 	if(!BodyName.GetLength()) 
 	{
 		if(m_pCurBody) BodyName = m_pCurBody->m_BodyName;
-		else {
+		else 
+		{
 			if(m_pBodyCtrlBar->m_ctrlBodyList.GetCount())
 			{
 				m_pBodyCtrlBar->m_ctrlBodyList.SetCurSel(0);
@@ -6173,6 +6232,7 @@ BOOL CMiarex::PreTranslateMessage(MSG* pMsg)
 			OnNewBody();
 			return true;
 		}
+
 
 		if (pMsg->wParam == 'F' && ((sh1 & 0x8000)||(sh2 & 0x8000))) { 
 			m_bSpeeds = !m_bSpeeds;
@@ -7086,12 +7146,17 @@ void CMiarex::OnExportWOpp()
 
 	int l,p;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	CString FileName,str;
+	CString FileName,str,sep;
 	CStdioFile XFile;
 	CFileException fe;
-	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, szFilter);
+
 	if(IDOK == XFileDlg.DoModal())
 	{
+		if(XFileDlg.m_ofn.nFilterIndex==1) sep = ""; else sep=",";
+
 		FileName = XFileDlg.GetPathName();
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
 		if(!bOpen) return;
@@ -7106,64 +7171,66 @@ void CMiarex::OnExportWOpp()
 		
 		strong = m_pCurWOpp->m_PlrName + "\n";
 		XFile.WriteString(strong);
-		strong.Format("QInf  = %9.4f ",	m_pCurWOpp->m_QInf*pFrame->m_mstoUnit);
+		strong.Format("QInf  ="+sep+" %9.4f "+sep,	m_pCurWOpp->m_QInf*pFrame->m_mstoUnit);
 		GetSpeedUnit(str, pFrame->m_SpeedUnit);
 		strong+=str+"\n";
 
 		XFile.WriteString(strong);
-		strong.Format("Alpha = %9.4f\n",	m_pCurWOpp->m_Alpha);
+		strong.Format("Alpha = "+sep+"%9.4f\n",	m_pCurWOpp->m_Alpha);
 		XFile.WriteString(strong);
 
-		strong.Format("Cl    = %9.4f\n",	m_pCurWOpp->m_CL);
+		strong.Format("Cl    = "+sep+"%9.4f\n",	m_pCurWOpp->m_CL);
 		XFile.WriteString(strong);
 
-		strong.Format("Cy    = %9.4f\n",	m_pCurWOpp->m_CY);
+		strong.Format("Cy    = "+sep+"%9.4f\n",	m_pCurWOpp->m_CY);
 		XFile.WriteString(strong);
 
-		strong.Format("Cd    = %9.4f     ICd   = %9.4f     PCd   = %9.4f\n",
+		if(XFileDlg.m_ofn.nFilterIndex==1) strong.Format("Cd    = %9.4f     ICd   = %9.4f     PCd   = %9.4f\n",
+			m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag, m_pCurWOpp->m_InducedDrag,	m_pCurWOpp->m_ViscousDrag);
+		else                               strong.Format("Cd=,%9.4f,ICd=, %9.4f,PCd=, %9.4f\n",
 			m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag, m_pCurWOpp->m_InducedDrag,	m_pCurWOpp->m_ViscousDrag);
 		XFile.WriteString(strong);
 
-		strong.Format("GCm    = %9.4f\n", m_pCurWOpp->m_GCm);
+		strong.Format("GCm   ="+sep+" %9.4f\n", m_pCurWOpp->m_GCm);
 		XFile.WriteString(strong);
 
-		strong.Format("GRm    = %9.4f\n", m_pCurWOpp->m_GRm);
+		strong.Format("GRm   = "+sep+"%9.4f\n", m_pCurWOpp->m_GRm);
 		XFile.WriteString(strong);
 
-		strong.Format("IYm   = %9.4f     PYm   = %9.4f \n",
-			m_pCurWOpp->m_IYm, m_pCurWOpp->m_GYm);
+		if(XFileDlg.m_ofn.nFilterIndex==1) strong.Format("IYm   = %9.4f     PYm   = %9.4f \n", m_pCurWOpp->m_IYm, m_pCurWOpp->m_GYm);
+		else                               strong.Format("IYm=, %9.4f,PYm=, %9.4f\n", m_pCurWOpp->m_IYm, m_pCurWOpp->m_GYm);
 		XFile.WriteString(strong);
 
-		strong.Format("XCP   = %9.4f     YCP   = %9.4f \n",
-			m_pCurWOpp->m_XCP, m_pCurWOpp->m_YCP);
+		if(XFileDlg.m_ofn.nFilterIndex==1) strong.Format("XCP   = %9.4f     YCP   = %9.4f \n", m_pCurWOpp->m_XCP, m_pCurWOpp->m_YCP);
+		else                               strong.Format("XCP=, %9.4f, YCP=, %9.4f \n", m_pCurWOpp->m_XCP, m_pCurWOpp->m_YCP);
 		XFile.WriteString(strong);
 
-		strong.Format("Bend. = %9.4f\n\n",m_pCurWOpp->m_MaxBending);
+		strong.Format("Bend. ="+sep+" %9.4f\n\n",m_pCurWOpp->m_MaxBending);
 		XFile.WriteString(strong);
 		
 		XFile.WriteString("Main Wing Data\n");
 		for (l=0; l<m_pCurWOpp->m_nFlaps; l++)
 		{
-	 		strong.Format("Flap %d moment = %9.4f",l+1, m_pCurWOpp->m_FlapMoment[l]*pFrame->m_NmtoUnit);
+	 		strong.Format("Flap "+sep+"%d"+sep+" moment = "+sep+"%9.4f",l+1, m_pCurWOpp->m_FlapMoment[l]*pFrame->m_NmtoUnit);
 			GetMomentUnit(str, pFrame->m_MomentUnit);
 			strong += str +"\n";
 			XFile.WriteString(strong);      
 		}
 		XFile.WriteString("\n");
-		m_pCurWOpp->Export(&XFile);
+		m_pCurWOpp->Export(&XFile, XFileDlg.m_ofn.nFilterIndex);
 
 		if(m_pCurWing2) 
 		{
 			XFile.WriteString("Secondary Wing Data\n");
 			for (l=0; l<m_pCurPOpp->m_Wing2WOpp.m_nFlaps; l++)
 			{
-	 			strong.Format("Flap %d moment = %9.4f ",l+1, m_pCurPOpp->m_Wing2WOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
+	 			strong.Format("Flap "+sep+"%d"+sep+" moment = "+sep+"%9.4f ",l+1, m_pCurPOpp->m_Wing2WOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
 				XFile.WriteString(strong);      
 			}
 			XFile.WriteString("\n");
-			m_pCurPOpp->m_Wing2WOpp.Export(&XFile);
+			m_pCurPOpp->m_Wing2WOpp.Export(&XFile, XFileDlg.m_ofn.nFilterIndex);
 		}
 
 		if(m_pCurStab) 
@@ -7171,13 +7238,13 @@ void CMiarex::OnExportWOpp()
 			XFile.WriteString("Elevator Data\n");
 			for (l=0; l<m_pCurPOpp->m_StabWOpp.m_nFlaps; l++)
 			{
-	 			strong.Format("Flap %d moment = %9.4f ",l+1, m_pCurPOpp->m_StabWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
+	 			strong.Format("Flap "+sep+"%d"+sep+" moment = "+sep+"%9.4f ",l+1, m_pCurPOpp->m_StabWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
 				XFile.WriteString(strong);      
 			}
 			XFile.WriteString("\n");
-			m_pCurPOpp->m_StabWOpp.Export(&XFile);
+			m_pCurPOpp->m_StabWOpp.Export(&XFile, XFileDlg.m_ofn.nFilterIndex);
 		}
 
 		if(m_pCurFin)
@@ -7185,13 +7252,13 @@ void CMiarex::OnExportWOpp()
 			XFile.WriteString("Fin Data\n");
 			for (l=0; l<m_pCurPOpp->m_FinWOpp.m_nFlaps; l++)
 			{
-	 			strong.Format("Flap %d moment = %9.4f",l+1, m_pCurPOpp->m_FinWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
+	 			strong.Format("Flap "+sep+"%d"+sep+" moment ="+sep+" %9.4f",l+1, m_pCurPOpp->m_FinWOpp.m_FlapMoment[l]*pFrame->m_NmtoUnit);
 				GetMomentUnit(str, pFrame->m_MomentUnit);
 				strong += str +"\n";
 				XFile.WriteString(strong);      
 			}
 			XFile.WriteString("\n");
-			m_pCurPOpp->m_FinWOpp.Export(&XFile);
+			m_pCurPOpp->m_FinWOpp.Export(&XFile, XFileDlg.m_ofn.nFilterIndex);
 		}
 
 
@@ -7201,40 +7268,81 @@ void CMiarex::OnExportWOpp()
 			{
 				XFile.WriteString("Main Wing Cp Coefficients\n");
 
-				if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-				else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-
-				for(p=0; p<m_pCurWing->m_MatSize; p++)
+				if(XFileDlg.m_ofn.nFilterIndex==1)
 				{
-					if(m_pCurWOpp->m_AnalysisType==2)
-						strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-							m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, 
-							m_pCurWOpp->m_Cp[p]);
-					else if(m_pCurWOpp->m_AnalysisType==3)
-						strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-							m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, 
-							m_pCurWOpp->m_Cp[p]);
-					XFile.WriteString(strong);
+					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+					for(p=0; p<m_pCurWing->m_MatSize; p++)
+					{
+						
+						if(m_pCurWOpp->m_AnalysisType==2)
+							strong.Format("%4d""     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z,  m_pCurWOpp->m_Cp[p]);
+						else if(m_pCurWOpp->m_AnalysisType==3)
+							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z,  m_pCurWOpp->m_Cp[p]);
+							
+						XFile.WriteString(strong);
+					}
+				}
+				else
+				{
+					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
+					for(p=0; p<m_pCurWing->m_MatSize; p++)
+					{
+			
+						if(m_pCurWOpp->m_AnalysisType==2)
+							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z,  m_pCurWOpp->m_Cp[p]);
+						else if(m_pCurWOpp->m_AnalysisType==3)
+							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z,  m_pCurWOpp->m_Cp[p]);
+				
+						XFile.WriteString(strong);
+					}
 				}
 				XFile.WriteString("\n");
+
 
 				if(m_pCurWing2)
 				{
 					XFile.WriteString("Secondary Wing Cp Coefficients\n");
 
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-					for(p=0; p<m_pCurWing2->m_MatSize; p++)
+					if(XFileDlg.m_ofn.nFilterIndex==1)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z, 
-								m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z, 
-								m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-						XFile.WriteString(strong);
+
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+						for(p=0; p<m_pCurWing2->m_MatSize; p++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z, 
+									m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z, 
+									m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+							XFile.WriteString(strong);
+						}
+					}
+					else
+					{
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
+						for(p=0; p<m_pCurWing2->m_MatSize; p++)
+						{
+				
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+					
+							XFile.WriteString(strong);
+						}
 					}
 				}
 				XFile.WriteString("\n");
@@ -7243,19 +7351,40 @@ void CMiarex::OnExportWOpp()
 				{
 					XFile.WriteString("Elevator Cp Coefficients\n");
 
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-					for(p=0; p<m_pCurStab->m_MatSize; p++)
+					if(XFileDlg.m_ofn.nFilterIndex==1)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z, 
-								m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z, 
-								m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-						XFile.WriteString(strong);
+
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+						for(p=0; p<m_pCurStab->m_MatSize; p++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z, 
+									m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z, 
+									m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+							XFile.WriteString(strong);
+						}
+					}
+					else
+					{
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
+						for(p=0; p<m_pCurStab->m_MatSize; p++)
+						{
+				
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+					
+							XFile.WriteString(strong);
+						}
 					}
 				}
 				XFile.WriteString("\n");
@@ -7263,20 +7392,40 @@ void CMiarex::OnExportWOpp()
 				if(m_pCurFin)
 				{
 					XFile.WriteString("Fin Cp Coefficients\n");
-
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-					for(p=0; p<m_pCurFin->m_MatSize; p++)
+					if(XFileDlg.m_ofn.nFilterIndex==1)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z, 
-								m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z, 
-								m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-						XFile.WriteString(strong);
+
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+						for(p=0; p<m_pCurFin->m_MatSize; p++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z, 
+									m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+									m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z, 
+									m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+							XFile.WriteString(strong);
+						}
+					}
+					else
+					{
+						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
+						for(p=0; p<m_pCurFin->m_MatSize; p++)
+						{
+				
+							if(m_pCurWOpp->m_AnalysisType==2)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+							else if(m_pCurWOpp->m_AnalysisType==3)
+								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
+									m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+					
+							XFile.WriteString(strong);
+						}
 					}
 				}
 				XFile.WriteString("\n");
@@ -7284,19 +7433,33 @@ void CMiarex::OnExportWOpp()
 			}
 			else if(m_pCurWOpp)
 			{
-				if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-				else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-				for(p=0; p<m_MatSize; p++)
+				if(XFileDlg.m_ofn.nFilterIndex==1)
 				{
-					if(m_pCurWOpp->m_AnalysisType==2)
-						strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-							m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, 
-							m_pCurWOpp->m_Cp[p]);
-					else if(m_pCurWOpp->m_AnalysisType==3)
-						strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-							m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, 
-							m_pCurWOpp->m_Cp[p]);
-					XFile.WriteString(strong);
+					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+					for(p=0; p<m_MatSize; p++)
+					{
+						if(m_pCurWOpp->m_AnalysisType==2)
+							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, m_pCurWOpp->m_Cp[p]);
+						else if(m_pCurWOpp->m_AnalysisType==3)
+							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
+								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, m_pCurWOpp->m_Cp[p]);
+						XFile.WriteString(strong);
+					}
+				}
+				else
+				{
+					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
+					for(p=0; p<m_MatSize; p++)
+					{
+						if(m_pCurWOpp->m_AnalysisType==2)
+							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, m_pCurWOpp->m_Cp[p]);
+						else if(m_pCurWOpp->m_AnalysisType==3)
+							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, m_pCurWOpp->m_Cp[p]);
+						XFile.WriteString(strong);
+					}
 				}
 			}
 		}
@@ -7310,7 +7473,8 @@ void CMiarex::OnExportWOpp()
 void CMiarex::OnWPolarReset() 
 {
 	//Reset the current WPolar's data
-	if(m_pCurWPolar) {
+	if(m_pCurWPolar) 
+	{
 		if(IDYES==AfxMessageBox("Reset the polar's content ?", MB_YESNOCANCEL)){
 			m_pCurWPolar->ResetWPlr();
 			CreateWPolarCurves();
@@ -9234,9 +9398,10 @@ bool CMiarex::AVLImportFile(CString FileName)
 	Dlg.m_Weight    = pFrame->m_WeightUnit;
 	Dlg.m_Force     = pFrame->m_ForceUnit;
 	Dlg.m_Moment    = pFrame->m_MomentUnit;
-	Dlg.m_strQuestion = "Choose length unit to read this file :";
+	Dlg.m_strQuestion = "Choose the length unit to read this file :";
 
-	if(Dlg.DoModal() == IDOK){
+	if(Dlg.DoModal() == IDOK)
+	{
 		LengthUnit  = Dlg.m_Length;
 		SurfaceUnit = Dlg.m_Area;
 		SpeedUnit   = Dlg.m_Speed;
@@ -9248,12 +9413,15 @@ bool CMiarex::AVLImportFile(CString FileName)
 	}
 	else return false;
 
-	try{
+	try
+	{
 		BOOL bOpen = XFile.Open(FileName, CFile::modeRead, &fe);
 
-		if (bOpen){
+		if (bOpen)
+		{
 			CWing* pOldWing;
-			for (l=0; l<m_poaWing->GetSize(); l++){
+			for (l=0; l<m_poaWing->GetSize(); l++)
+			{
 				pOldWing = (CWing*)m_poaWing->GetAt(l);
 				pOldWing->m_AVLIndex = -987654;//improbable value
 			}
@@ -9267,10 +9435,12 @@ bool CMiarex::AVLImportFile(CString FileName)
 			ReadAVLString(&XFile, Line,  Strong);//Mach Number, unused
 			ReadAVLString(&XFile, Line,  Strong);//iYsym  iZsym  Zsym
 			res = sscanf(Strong, "%d%d%lf", &i, &j, &a);
-			if(res==3){
+			if(res==3)
+			{
 				if (i) bSymetric = true; else bSymetric = false;
 			}
-			else{
+			else
+			{
 				
 				return false;
 			}
@@ -9280,16 +9450,20 @@ bool CMiarex::AVLImportFile(CString FileName)
 			//Surface and Body data
 			//Find the SURFACE or BODY keywords
 			BOOL bRead = TRUE;
-			while (bRead){
+			while (bRead)
+			{
 				bRead  = ReadAVLString(&XFile, Line,  Strong);
 
-				if (Strong.Find("SURF", 0) >=0 || Strong.Find("surf", 0) >=0 ) {
+				if (Strong.Find("SURF", 0) >=0 || Strong.Find("surf", 0) >=0 )
+				{
 					CWing* pWing= new CWing(m_pFrame);
 					pWing->s_pMiarex = this;
 					pWing->m_bSymetric = bSymetric;
 					bRead = AVLReadSurface(&XFile, Line, pWing, NSpan, NChord, Sspace);
-					if (bRead) {
-						for(i=0; i<=pWing->m_NPanel;i++){
+					if (bRead) 
+					{
+						for(i=0; i<=pWing->m_NPanel;i++)
+						{
 							//set scale
 							pWing->m_TPos[i]    /= mtoUnit;
 							pWing->m_TChord[i]  /= mtoUnit;
@@ -9692,7 +9866,7 @@ void CMiarex::OnResetLegend()
 	UpdateView();
 }
 
-
+ 
 void CMiarex::OnResetWingLegend() 
 {
 	SetWingLegendPos();
@@ -9879,9 +10053,7 @@ LRESULT CMiarex::KickIdle()
 				PaintWOpp(&memdc, &m_rCltRect, &m_rDrawRect);
 
 				// Blit back
-				pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rCltRect.Width(),m_rCltRect.Height(),
-						 &memdc,0,0,SRCCOPY);
-
+				pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rCltRect.Width(),m_rCltRect.Height(), &memdc,0,0,SRCCOPY);
 
 				memdc.SelectObject(pOldBmp);
 				memdc.DeleteDC();
@@ -11411,11 +11583,10 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		m_bResetglOpp  = true;
 	}
 
-
 	CChildView * pChildView = (CChildView*)m_pChildWnd;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
-    wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
+	wglMakeCurrent(pDC->m_hDC,pChildView->m_hRC);
 	double r,g,b;
 	DecompRGB(pChildView->m_crBackColor,r,g,b);
 	glClearColor((GLfloat)r,(GLfloat)g,(GLfloat)b,0.0);
@@ -11432,6 +11603,18 @@ void CMiarex::GLDraw3D(CDC* pDC)
 		m_bResetglBodyPoints = false;
 	}
 
+	if(m_bResetglBodyOverlay && m_pCurBody)
+	{
+		if(glIsList(BODYOVERLAY)) 
+		{
+			glDeleteLists(BODYOVERLAY,1);
+			m_GLList -=1;
+		}
+
+		GLCreateBodyOverlay();
+		m_bResetglBodyOverlay = false;
+	}
+
 	if(m_bResetglBody2D && m_pCurBody)
 	{
 		if(glIsList(BODYAXIALLINES)) 
@@ -11440,8 +11623,8 @@ void CMiarex::GLDraw3D(CDC* pDC)
 			m_GLList -=5;
 		}
 
-		GLCreateBodyAxialLines();
-		GLCreateBodyFrame();
+		GLCreateBody2DBodySection();
+		GLCreateBodyFrames();
 		GLCreateBodyGrid();
 		m_bResetglBody2D = false;
 	}
@@ -11458,11 +11641,9 @@ void CMiarex::GLDraw3D(CDC* pDC)
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pCurBody->m_LineType==1)	    GLCreateBodyLines();
-		else if(m_pCurBody->m_LineType==2)	
-		{
-			GLCreateBodySurface();
-		}
+		if(m_pCurBody->m_LineType==1)	    GLCreateBody3DFlatPanels();
+		else if(m_pCurBody->m_LineType==2)	GLCreateBody3DSplines();
+		
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHPANELS)) 
 		{
@@ -12098,6 +12279,7 @@ Y = (y-yc’)/s
 				glCallList(BODYLINEGRID);
 				glCallList(BODYPOINTS);
 				glCallList(BODYAXIALLINES);
+				if(m_bBodyOverlay) glCallList(BODYOVERLAY);
 			}
 			glPopMatrix();
 		}
@@ -13108,7 +13290,7 @@ void CMiarex::GLCreateBodyBezier()
 }
 
 
-void CMiarex::GLCreateBodySurface()
+void CMiarex::GLCreateBody3DSplines()
 {
 	int i,j,k,l;
 	int p, style, width, nx, nh;
@@ -13767,7 +13949,7 @@ void CMiarex::GLCreateBodyMesh()
 	}
 }
 
-void CMiarex::GLCreateBodyLines()
+void CMiarex::GLCreateBody3DFlatPanels()
 {
 	int j,k;
 	double r,g,b;
@@ -13912,6 +14094,61 @@ void CMiarex::GLCreateBodyLines()
 }
 
 
+void CMiarex::GLCreateBodyOverlay()
+{
+	int k,style, width;
+	double r,g,b;
+	COLORREF color;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pFrame;
+	CChildView *pChildView = (CChildView*)m_pChildWnd;
+
+	if(!m_pCurBody) 
+	{
+		glNewList(BODYOVERLAY,GL_COMPILE); 
+		m_GLList++;
+		glEndList();
+		return;
+	}
+
+	glNewList(BODYOVERLAY,GL_COMPILE);
+	{
+		m_GLList++;
+
+		glEnable(GL_DEPTH_TEST);
+		glEnable (GL_LINE_STIPPLE);
+		glPolygonMode(GL_FRONT,GL_LINE);
+
+//		color = m_pCurBody->m_BodyColor;
+		color = RGB(0,255,0);
+		style = 0;
+		width = 1;
+		GetBWColor(color, style, width);
+		glLineWidth((GLfloat)GetPenWidth(width, false));
+
+		style = PS_SOLID;
+		if(style == PS_DOT)          glLineStipple (1, 0x1111);
+		else if(style == PS_DASH)    glLineStipple (1, 0x0F0F);
+		else if(style == PS_DASHDOT) glLineStipple (1, 0x1C47);
+		else						 glLineStipple (1, 0xFFFF);// Solid
+
+		DecompRGB(color,r,g,b);
+		glColor3d(r,g,b);
+
+		//Middle Line
+		glBegin(GL_LINE_STRIP);
+		{
+			double BodyLength = m_pCurBody->m_FramePosition[m_pCurBody->m_NStations-1].x -m_pCurBody->m_FramePosition[0].x;
+			for (k=0; k<m_pCurBody->m_np;k++)
+				glVertex3d(m_pCurBody->m_x[k] * BodyLength + m_pCurBody->m_FramePosition[0].x,
+						   m_pCurBody->m_y[k] * BodyLength, 0.0);
+		}
+		glEnd();
+
+		glDisable (GL_LINE_STIPPLE);
+	}
+	glEndList();
+}
+
 void CMiarex::GLSetViewport()
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
@@ -13950,7 +14187,7 @@ void CMiarex::GLSetViewport()
 
 }
 
-void CMiarex::GLCreateBodyAxialLines()
+void CMiarex::GLCreateBody2DBodySection()
 {
 	int i,k,style, width;
 	double r,g,b;
@@ -14019,7 +14256,7 @@ void CMiarex::GLCreateBodyAxialLines()
 			CVector Point;
 			double xinc, u, v;
 			
-			int nh = 20;
+			int nh = 50;
 			xinc = 1./(double)(nh-1);
 			u=0.0; v = 0.0;
 
@@ -14158,7 +14395,7 @@ void CMiarex::GLCreateBodyPoints()
 }
 
 
-void CMiarex::GLCreateBodyFrame()
+void CMiarex::GLCreateBodyFrames()
 {
 	int j,k;
 	CVector Point;
@@ -15707,57 +15944,6 @@ bool CMiarex::InitializePanels()
 	}
 
 
-	//merge trailing edge nodes if panel analysis
-/*	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3)
-	{
-		CVector Tl, Tu, Tm;
-		int q, pq;
-		pq=0;
-		for (j=0; j<m_NSurfaces; j++)
-		{
-			pp=0;
-
-			//skip left tip patch
-			if(m_pSurface[j]->m_bIsTipLeft) pq+=m_pSurface[j]->m_NXPanels;
-
-			for (k=0; k<m_pSurface[j]->m_NYPanels; k++)
-			{
-				Tl = m_Node[m_Panel[pq+pp].m_iTA];	
-				Tu = m_Node[m_Panel[pq+pp +2*m_pSurface[j]->m_NXPanels-1].m_iTA];	
-				Tm = (Tl+Tu)/2.0;
-				m_Node[m_Panel[pq+pp].m_iTA]                                = Tm;
-				m_Node[m_Panel[pq+pp +2*m_pSurface[j]->m_NXPanels-1].m_iTA] = Tm;
-
-				pp += m_pSurface[j]->m_NXPanels * 2;
-			}
-			q  = pp - m_pSurface[j]->m_NXPanels * 2;
-			Tl = m_Node[m_Panel[pq+q].m_iTB];	
-			Tu = m_Node[m_Panel[pq+q +2*m_pSurface[j]->m_NXPanels-1].m_iTB];	
-			Tm = (Tl+Tu)/2.0;
-			m_Node[m_Panel[pq+q].m_iTB]                                = Tm;
-			m_Node[m_Panel[pq+q +2*m_pSurface[j]->m_NXPanels-1].m_iTB] = Tm;
-
-			pq+=pp;
-			if(m_pSurface[j]->m_bIsTipRight) pq+=m_pSurface[j]->m_NXPanels;
-		}
-		for (j=0; j<m_NSurfaces; j++)
-		{
-			pp=0;
-			for(k=0; k<m_pSurface[j]->m_NYPanels; k++)
-			{
-				for(l=0; l<m_pSurface[j]->m_NXPanels; l++)
-				{
-					if(m_Panel[pp].m_bIsTrailing)
-						m_Panel[pp].SetFrame(m_Node[m_Panel[pp].m_iLA],m_Node[m_Panel[pp].m_iLB],
-						                     m_Node[m_Panel[pp].m_iTA],m_Node[m_Panel[pp].m_iTB]);
-					pp++;
-				}
-			}
-		}
-	}*/
-
-
-
 	if(bBodyEl)
 	{
 		Nel = CreateBodyElements(ptr);
@@ -15977,6 +16163,7 @@ bool CMiarex::InitializePanels()
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -18552,7 +18739,7 @@ void CMiarex::OnUndo()
 void CMiarex::OnInsertBodyPoint()
 {
 	CVector Real;
-
+	int FrameSel = 0;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
 	if(m_pCurBody->m_bLocked) return;
@@ -18563,20 +18750,22 @@ void CMiarex::OnInsertBodyPoint()
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
 
-		Real.x = (m_RealPopUp.x - m_BodyOffset.x)/m_BodyScale;
-		Real.z = (m_RealPopUp.y - m_BodyOffset.y)/m_BodyScale;
+		Real.x = (m_RealPopUp.x - m_BodyScaledOffset.x)/m_BodyScale;
+		Real.z = (m_RealPopUp.y - m_BodyScaledOffset.y)/m_BodyScale;
 		Real.y = 0.0;
 
 		if(m_pCurFrame)
 		{
-			int sel = m_pCurBody->InsertFrame(Real);
-			if(sel>0) m_pCurFrame = m_pCurBody->m_Frame+sel;
+			FrameSel = m_pCurBody->InsertFrame(Real);
+			if(FrameSel>0) m_pCurFrame = m_pCurBody->m_Frame+FrameSel;
 			else      m_pCurFrame = NULL;
 		}
 
 		m_bResetglBody   = true;
 		m_bResetglBody2D = true;
 		pFrame->SetSaveState(false);
+		m_pBodyCtrlBar->FillFrameList();
+		m_pBodyCtrlBar->SetFrame(FrameSel);		
 		UpdateView();
 	}
 	else if(m_FrameRect.PtInRect(m_ptPopUp) && m_pCurFrame)
@@ -18584,14 +18773,16 @@ void CMiarex::OnInsertBodyPoint()
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
 
-		Real.x = (m_RealPopUp.x - m_FrameOffset.x)/m_FrameScale;
-		Real.y = (m_RealPopUp.y - m_FrameOffset.y)/m_FrameScale;
+		Real.x = (m_RealPopUp.x - m_FrameScaledOffset.x)/m_FrameScale;
+		Real.y = (m_RealPopUp.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
 
-		 m_pCurBody->InsertPoint(Real);
+		int point = m_pCurBody->InsertPoint(Real);
 		m_bResetglBody   = true;
 		m_bResetglBody2D = true;
 		pFrame->SetSaveState(false);
+		m_pBodyCtrlBar->FillPointList();
+		m_pBodyCtrlBar->SetPointSel(point);		
 		UpdateView();
 	}
 }
@@ -18610,8 +18801,8 @@ void CMiarex::OnDeleteBodyPoint()
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
 
-		Real.x =  (m_RealPopUp.x - m_BodyOffset.x)/m_BodyScale;
-		Real.y =  (m_RealPopUp.y - m_BodyOffset.y)/m_BodyScale;
+		Real.x =  (m_RealPopUp.x - m_BodyScaledOffset.x)/m_BodyScale;
+		Real.y =  (m_RealPopUp.y - m_BodyScaledOffset.y)/m_BodyScale;
 		Real.z = 0.0;
 		n =  m_pCurBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 		if (n>=0) 
@@ -18631,8 +18822,8 @@ void CMiarex::OnDeleteBodyPoint()
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
 
-		Real.x =  (m_RealPopUp.x - m_FrameOffset.x)/m_FrameScale;
-		Real.y =  (m_RealPopUp.y - m_FrameOffset.y)/m_FrameScale;
+		Real.x =  (m_RealPopUp.x - m_FrameScaledOffset.x)/m_FrameScale;
+		Real.y =  (m_RealPopUp.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
 
 		n =   m_pCurFrame->IsPoint(Real, m_BodyScale/m_BodyRefScale);
@@ -18718,35 +18909,38 @@ void CMiarex::OnDuplicateCurBody()
 	//Duplicate the currently selected Body
 	if(!m_pCurBody)	return;
 
-
 	CBody* pNewBody= new CBody();
 	pNewBody->Duplicate(m_pCurBody);
 
-	if(!SetModBody(pNewBody)){
+	if(!SetModBody(pNewBody))
+	{
 		delete pNewBody;
 		UpdateView();
 	}
-	else {
+	else 
+	{
 		m_pCurBody = AddBody(pNewBody);
 		m_pBodyCtrlBar->UpdateBodies();
 		SetBody();
 	}
 }
 
-void CMiarex::OnScaleFrame()
+
+void CMiarex::OnScaleCurBody()
 {
-	if(!m_pCurBody || !m_pCurFrame) return;
-	if(m_pCurBody->m_bLocked) return;
+	if(!m_pCurBody) return;
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
 	CBodyScaleDlg dlg(this);
+	dlg.m_pMainFrame = m_pFrame;
+
 	dlg.m_FrameID = m_pCurBody->m_iActiveFrame;
-	dlg.m_bFrameOnly = true;
 
 	if(dlg.DoModal()==IDOK)
 	{
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
-		m_pCurBody->Scale(dlg.m_XFactor,dlg.m_YFactor,dlg.m_ZFactor, true, m_pCurBody->m_iActiveFrame);
+		m_pCurBody->Scale(dlg.m_XFactor, dlg.m_YFactor, dlg.m_ZFactor, dlg.m_bFrameOnly, dlg.m_FrameID);
 		m_bResetglBody     = true;
 		m_bResetglBodyMesh = true;
 		m_bResetglBody2D   = true;
@@ -18754,11 +18948,13 @@ void CMiarex::OnScaleFrame()
 	}
 }
 
-void CMiarex::OnScaleCurBody()
+void CMiarex::OnTranslateCurBody()
 {
 	if(!m_pCurBody) return;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	CBodyScaleDlg dlg(this);
+
+	CBodyTransDlg dlg(this);
+	dlg.m_pMainFrame = m_pFrame;
 
 	dlg.m_FrameID = m_pCurBody->m_iActiveFrame;
 
@@ -18766,7 +18962,7 @@ void CMiarex::OnScaleCurBody()
 	{
 		m_pBodyCtrlBar->TakePicture();
 		m_pBodyCtrlBar->StorePicture();
-		m_pCurBody->Scale(dlg.m_XFactor,dlg.m_YFactor,dlg.m_ZFactor, dlg.m_bFrameOnly, dlg.m_FrameID);
+		m_pCurBody->Translate(dlg.m_XTrans, dlg.m_YTrans, dlg.m_ZTrans, dlg.m_bFrameOnly, dlg.m_FrameID);
 		m_bResetglBody     = true;
 		m_bResetglBodyMesh = true;
 		m_bResetglBody2D   = true;
@@ -18832,20 +19028,23 @@ CBody* CMiarex::AddBody(CBody *pBody)
 			for (j=0; j<m_poaBody->GetSize(); j++)
 			{
 				pOldBody = (CBody*)m_poaBody->GetAt(j);
-				if (pBody->m_BodyName.CompareNoCase(pOldBody->m_BodyName)<0) {
+				if (pBody->m_BodyName.CompareNoCase(pOldBody->m_BodyName)<0) 
+				{
 					m_poaBody->InsertAt(j, pBody);
 					bInserted = true;
 					break;
 				}
 			}	
-			if(!bInserted)	{
+			if(!bInserted)	
+			{
 				m_poaBody->Add(pBody);
 				bInserted = true;
 			}
 			pFrame->SetSaveState(false);
 			return pBody;
 		}
-		else {
+		else 
+		{
 			//Ask for user intentions
 			if(SetModBody(pBody)) 
 			{
@@ -19165,7 +19364,6 @@ void CMiarex::GLCallViewLists()
 		glCallList(VLMVORTICES);
 	}
 
-
 	if(m_bXCP && m_pCurWOpp)
 	{
 		if(m_pCurWing) glCallList(VLMWINGLIFT);
@@ -19226,7 +19424,8 @@ void CMiarex::GLRenderView(CDC *pDC)
 	CW3DBar *pW3DBar = (CW3DBar*)m_pW3DBar;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CChildView *pChildView = (CChildView*)m_pChildWnd;
-	wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
+
+	wglMakeCurrent(pDC->m_hDC,pChildView->m_hRC);
 
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -19317,12 +19516,12 @@ void CMiarex::GLRenderView(CDC *pDC)
 	}
 	glPopMatrix();
 
-
 	glDisable(GL_CLIP_PLANE1);
 	glFinish();
 	SwapBuffers(pDC->m_hDC);
 	wglMakeCurrent(pDC->m_hDC, NULL);
 }
+
 
 void CMiarex::OnLButtonUp(UINT nFlags, CPoint point) 
 {
@@ -19346,18 +19545,20 @@ void CMiarex::OnLButtonUp(UINT nFlags, CPoint point)
 
 				if (m_BodyLineRect.PtInRect(point) && n1>=0 && n1<m_pCurBody->m_NStations)
 				{	//the user has been dragging a point
-					m_pBodyCtrlBar->FillFrameList();
-					m_pBodyCtrlBar->FillPointList();
-					m_pBodyCtrlBar->SetFrameSel(m_pCurBody->m_iActiveFrame);
+
+					m_pBodyCtrlBar->FillFrameCell(n1,1);
+					m_pBodyCtrlBar->FillFrameCell(n1,2);
+					m_pBodyCtrlBar->SetFrame(n1);
 					m_bResetglBody     = true;
 					m_bResetglBodyMesh = true;
 					m_bResetglBody2D   = true;
 				}
 				else if (m_FrameRect.PtInRect(point) && n2>=0 && n2<m_pCurFrame->m_NPoints)
 				{	//the user has been dragging a point
-					m_pBodyCtrlBar->FillFrameList();
-					m_pBodyCtrlBar->FillPointList();
-					m_pBodyCtrlBar->SetPointSel(m_pCurFrame->m_iSelect);
+					m_pBodyCtrlBar->FillFrameCell(n1,1);
+					m_pBodyCtrlBar->FillFrameCell(n1,2);
+					m_pBodyCtrlBar->FillPointCell(n2,1);
+					m_pBodyCtrlBar->FillPointCell(n2,2);
 					m_bResetglBody     = true;
 					m_bResetglBodyMesh = true;
 					m_bResetglBody2D   = true;
@@ -20481,7 +20682,7 @@ double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.GetSize()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			if (Re < pPolar->m_Reynolds) 
@@ -20518,18 +20719,24 @@ double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar
 	}
 
 	// if not Find the two polars
-	for (i=0; i< nPolars; i++){
+	for (i=0; i< nPolars; i++)
+	{
 		pPolar = (CPolar*)m_poaPolar->GetAt(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)){
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.GetSize()>0)
+		{
 			// we have found the first type 1 polar for this foil
 			pPolar->GetClLimits(Clmin, Clmax);
-			if (pPolar->m_Reynolds <= Re) {
-				if(Clmin <= Cl && Cl <= Clmax) {	
+			if (pPolar->m_Reynolds <= Re) 
+			{
+				if(Clmin <= Cl && Cl <= Clmax) 
+				{	
 					pPolar1 = pPolar;
 				}
 			}
-			else {
-				if(Clmin <= Cl && Cl <= Clmax){	
+			else
+			{
+				if(Clmin <= Cl && Cl <= Clmax)
+				{	
 					pPolar2 = pPolar;
 					break;
 				}
@@ -20538,17 +20745,20 @@ double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar
 	}
 
 
-	if (!pPolar2) {
+	if (!pPolar2)
+	{
 		//then Re is greater than that of any polar
 		// so use last polar and interpolate Cls on this polar
 		bOutRe = true;
-		if(!pPolar1){
+		if(!pPolar1)
+		{
 			bOutRe = true; 
 			bError = true;
 			return 0.000;
 		}
 		size = (int)pPolar1->m_Cl.GetSize();
-		if(!size) {
+		if(!size)
+		{
 			bOutRe = true; 
 			bError = true;
 			return 0.000;
@@ -20557,13 +20767,17 @@ double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar
 		pX = (CArray <double, double> *) GetPlrVariable(pPolar1, PlrVar);
 		if(Cl < pPolar1->m_Cl[0])	   return (*pX)[0];
 		if(Cl > pPolar1->m_Cl[size-1]) return (*pX)[size-1];
-		for (i=0; i<size-1; i++){
-			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1]){
+		for (i=0; i<size-1; i++)
+		{
+			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1])
+			{
 				//interpolate
-				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001){//do not divide by zero
+				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001)
+				{//do not divide by zero
 					return (*pX)[i];
 				}
-				else {
+				else 
+				{
 					u = (Cl - pPolar1->m_Cl[i])
 							 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
 					return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
@@ -20604,13 +20818,14 @@ double CMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar
 			Var1 = (*pX)[size-1];
 			bOutRe = true;
 		}
-		else{
+		else
+		{
 			//first Find the point closest to Cl=0
 			pt = 0;
 			dist = abs(pPolar1->m_Cl[0]);
 			for (i=1; i<size;i++)
 			{
-				if (fabs(pPolar1->m_Cl[i])< dist)
+				if (abs(pPolar1->m_Cl[i])< dist)
 				{
 					dist = fabs(pPolar1->m_Cl[i]);
 					pt = i;
@@ -21155,5 +21370,251 @@ double CMiarex::GetCm(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, dou
 	if (Tau<0.0) Tau = 0.0;
 	if (Tau>1.0) Tau = 1.0;
 	return ((1-Tau) * Cm0 + Tau * Cm1);
+}
+
+void CMiarex::OnSelectBodyOverlay()
+{
+	CMainFrame* pMainFrame = (CMainFrame*)m_pFrame;
+
+	CSelectFoilDlg dlg;
+	dlg.m_pMainFrame = m_pFrame;
+
+//	dlg.m_FoilName = m_pRefFoil->m_FoilName;
+
+	if(IDOK == dlg.DoModal())
+	{
+		CWaitCursor Wait;
+		CFoil *pFoil;
+		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
+		if(!pFoil)
+		{
+			AfxMessageBox("Could not find the foil " + dlg.m_FoilName, MB_OK);
+			return;
+		}
+		for(int i=0; i<pFoil->n; i++)
+		{
+			m_pCurBody->m_x[i] = pFoil->x[i];
+			m_pCurBody->m_y[i] = pFoil->y[i];
+		}
+		m_pCurBody->m_np = pFoil->n;
+
+		m_bBodyOverlay = true;
+		CheckMenus();
+	}
+	m_bResetglBodyOverlay = true;
+	UpdateView();
+}
+
+void CMiarex::OnOverlaySection()
+{
+	m_bBodyOverlay = ! m_bBodyOverlay;
+	CheckMenus();
+	UpdateView();
+}
+
+void CMiarex::OnExportBodyDefinition() 
+{
+	CWaitCursor Wait;
+	if(!m_pCurBody) return;
+	m_pCurBody->ExportDefinition();
+
+}
+
+void CMiarex::OnImportBodyDefinition() 
+{
+	CWaitCursor Wait;
+	CMainFrame* pMainFrame = (CMainFrame*)m_pFrame;
+
+	CBody *pNewBody = new CBody();
+	if(!pNewBody) return;
+	if(!pNewBody->ImportDefinition())
+	{
+		delete pNewBody;
+		return;
+	}
+
+	if(!SetModBody(pNewBody))
+	{
+		delete pNewBody;
+		UpdateView();
+	}
+	else 
+	{
+		m_pCurBody = AddBody(pNewBody);
+		m_pBodyCtrlBar->UpdateBodies();
+		if(m_iView==5) 
+		{
+			SetBody();
+			SetBodyScale();
+		}
+		else
+		{
+			m_pCurBody = NULL;
+			UpdateView();
+		}
+	}
+}
+
+
+void CMiarex::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
+{
+	//Refresh the active view
+	if(m_bAnimate) return;// painting is performed elsewhere
+
+	HRESULT hResult;
+	CDC *pDC;
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	
+	pDC = pChildView->GetDC();
+	if(!pDC) return;
+
+	CDC memdc; 
+	CBitmap  bmp;
+	CBitmap * pOldBmp;
+
+	if(m_iView==1 || m_iView==2)
+	{
+		memdc.CreateCompatibleDC(pDC);
+
+		bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
+		pOldBmp = memdc.SelectObject(&bmp);
+
+		memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
+		memdc.SetBkMode(TRANSPARENT);
+
+		if (m_iView==2)
+		{
+			if      (m_iWPlrView == 1) PaintWSingleGraph(&memdc, &m_rCltRect, &m_rDrawRect);
+			else if (m_iWPlrView == 2) PaintWCoupleGraphs(&memdc, &m_rCltRect, &m_rDrawRect);
+			else if (m_iWPlrView == 4) PaintWFourGraphs(&memdc, &m_rCltRect, &m_rDrawRect);
+		} 
+		else if (m_iView==1) 
+		{
+			PaintWOpp(&memdc, &m_rCltRect, &m_rDrawRect);
+		}
+		else if (m_iView==4)
+		{
+			PaintCp(&memdc, &m_rCltRect, &m_rSingleRect);
+		}
+		memdc.SelectObject(pOldBmp);
+		memdc.DeleteDC();
+		HBITMAP hBmp = (HBITMAP)bmp;
+		pImage->Attach(hBmp);
+
+		if(FileType==1)      hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatBMP);
+		else if(FileType==2) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatJPEG);
+		else if(FileType==3) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatGIF);
+		else if(FileType==4) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatPNG);
+
+		if (FAILED(hResult)) 
+		{
+			CString fmt;
+			fmt.Format("Save image failed:\n%x ", hResult);
+			AfxMessageBox(fmt);
+			return;
+		}	
+	}
+	else if(m_iView==3)
+	{	
+		SnapClient(pDC, pImage, FileName, FileType);
+	}
+
+	bmp.DeleteObject();
+
+	pChildView->ReleaseDC(pDC);
+}
+// Snap OpenGL client and send it to ClipBoard
+// so that you can insert it in your favorite
+// image editor, Powerpoint, etc...
+// Replace CRenderView by your own CView-derived class
+void CMiarex::SnapClient(CDC *pDC, CImage *pImage, CString FileName, int FileType)
+{
+	CWaitCursor wait;
+	HRESULT hResult;
+
+	int NbBytes, bitsPerPixel;
+
+	CSize size(m_rCltRect.Width(),m_rCltRect.Height());
+	// Lines have to be 32 bytes aligned
+	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
+	switch(bitsPerPixel)
+	{
+		case 8: 
+		{
+			AfxMessageBox("Cannot (yet ?) save 8 bit depth screen images... Sorry");
+			return;
+		}
+		case 16: 
+		{
+			AfxMessageBox("Cannot (yet ?) save 16 bit depth screen images... Sorry");
+			size.cx -= size.cx % 2; 
+			return;
+		}
+		case 24: 
+		{
+			NbBytes = 3 * size.cx * size.cy;//24 bits type BMP
+			size.cx -= size.cx % 4; break;
+		}
+		case 32:
+		{
+			NbBytes = 4 * size.cx * size.cy;//32 bits type BMP
+			break;
+		}
+		default: break;
+	}
+	CBitmap bmp;
+	bmp.CreateCompatibleBitmap(pDC,size.cx,size.cy);
+
+	CDC MemDC;
+	MemDC.CreateCompatibleDC(NULL);
+	CBitmap *pOldBitmap = MemDC.SelectObject(&bmp);
+
+	// Alloc pixel bytes
+	byte *pPixelData = new byte[NbBytes];
+
+	// Copy from OpenGL
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+    wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
+	glReadBuffer(GL_FRONT);
+	switch(bitsPerPixel)
+	{
+		  case 8: return;
+		  case 16: return;
+		  case 24:
+			  glReadPixels(0,0,size.cx,size.cy,GL_BGR_EXT,GL_UNSIGNED_BYTE,pPixelData);
+			  break;
+		  case 32: 
+			  glReadPixels(0,0,size.cx,size.cy,GL_BGRA_EXT,GL_UNSIGNED_BYTE,pPixelData);
+			  break;
+		  default: break;
+	}
+
+    wglMakeCurrent(pDC->m_hDC, NULL);
+
+	bmp.SetBitmapBits(NbBytes,pPixelData);
+
+	//flip vertically
+	MemDC.StretchBlt(0,size.cy,size.cx, -size.cy,&MemDC,0,0,size.cx,size.cy,SRCCOPY);
+
+	// Cleanup
+	MemDC.SelectObject(pOldBitmap);
+	MemDC.DeleteDC();
+	delete [] pPixelData;
+
+	HBITMAP hBmp = (HBITMAP)bmp;
+	pImage->Attach(hBmp);
+
+	if(FileType==1)      hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatBMP);
+	else if(FileType==2) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatJPEG);
+	else if(FileType==3) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatGIF);
+	else if(FileType==4) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatPNG);
+
+	if (FAILED(hResult)) 
+	{
+		CString fmt;
+		fmt.Format("Save image failed:\n%x ", hResult);
+		AfxMessageBox(fmt);
+		return;
+	}
 }
 

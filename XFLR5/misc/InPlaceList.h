@@ -29,6 +29,7 @@ class CInPlaceList :
 
 // Construction
 public:
+	CInPlaceList();
 	CInPlaceList(CListCtrl *pCtrl, int iItem, int iSubItem);
 
 // Attributes
@@ -47,6 +48,7 @@ public:
 // Implementation
 public:
 	virtual ~CInPlaceList();
+	void Set(int iItem, int iSubItem);
 
 	// Generated message map functions
 protected:
@@ -54,19 +56,19 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	afx_msg void OnNcDestroy();
 	afx_msg void OnCloseup();
+	afx_msg void OnCbnSelchange();
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
 private:
+	int 	m_nSel;
 	int 	m_iItem;
 	int 	m_iSubItem;
-	CStringArray m_strArray ;
-	int 	m_nSel;
-	CListCtrl *m_pListCtrl;
 	bool m_bWingCtrl;
 	BOOL	m_bESC;				// To indicate whether ESC key was pressed
+	CStringArray m_strArray ;
 public:
-	afx_msg void OnCbnSelchange();
+	CListCtrl *m_pListCtrl;
+
 };

@@ -37,26 +37,29 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CPolar::CPolar(){
+CPolar::CPolar()
+{
+	pi = 3.141592654;
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
 	m_Style = 0;// = PS_SOLID
 	m_Width = 1;
 	m_ASpec = 0.0;
-	m_Type = 1;
+	m_Type   = 1;
 	m_ReType = 1;
 	m_MaType = 1;
 	m_Reynolds = 100000.0;
-	m_Mach = 0.0;
-	m_ACrit = 9.0;
-	m_XTop = 1.0;
-	m_XBot = 1.0;
+	m_Mach     = 0.0;
+	m_ACrit    = 9.0;
+	m_XTop     = 1.0;
+	m_XBot     = 1.0;
 	m_FoilName = "";
 	m_PlrName = "";
 }
 
 CPolar::CPolar(CWnd *pParent)
 {
+	pi = 3.141592654;
 	m_pFrame = pParent;
 	m_bIsVisible = true;
 	m_bShowPoints = false;
@@ -88,7 +91,8 @@ void CPolar::Copy(CPolar *pPolar)
 		Remove(i);
 	
 	size  = (int)pPolar->m_Alpha.GetSize();
-	for(i=0; i<size; i++){
+	for(i=0; i<size; i++)
+	{
 		m_Alpha.InsertAt(i,  pPolar->m_Alpha[i],  1);
 		m_Cd.InsertAt(i,     pPolar->m_Cd[i],     1);
 		m_Cdp.InsertAt(i,    pPolar->m_Cdp[i],    1);
@@ -106,21 +110,27 @@ void CPolar::Copy(CPolar *pPolar)
 	}
 }
 
-void CPolar::Export(CString FileName)
+void CPolar::Export(CString FileName, int FileType)
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	CStdioFile XFile;
 	CFileException fe;
-	try {
+	CString strOut, Header, strong;
+	int j;
+
+	try
+	{
 		BOOL bOpen = XFile.Open(FileName, 
 			CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
-		if(!bOpen){
+		if(!bOpen)
+		{
 //			CFileException *pfe = new CFileException(CFileException::invalidFile);
 //			pfe->m_strFileName = FileName;
 			throw &fe;
 		}
 	}
-	catch (CFileException *ex){
+	catch (CFileException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
@@ -131,8 +141,6 @@ void CPolar::Export(CString FileName)
 		return ;
 	}
 
-	CString strOut;
-	CString Header, strong;
 	strong ="\n    " + pFrame->m_VersionName + "\n\n";
 	XFile.WriteString(strong);
 	strong =" Calculated polar for: ";
@@ -155,45 +163,56 @@ void CPolar::Export(CString FileName)
 		m_Mach, m_Reynolds/1.e6, m_ACrit);
 	XFile.WriteString(strong);
 
-	if(m_Type != 4){
-		Header.Format("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+	if(m_Type != 4)
+	{
+		if(FileType==1)	Header.Format("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+		else            Header.Format("alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
 		XFile.WriteString(Header);
-		Header.Format(" ------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
-		XFile.WriteString(Header);
-		for (int j=0; j<m_Alpha.GetSize(); j++){
-			strong.Format(" %7.3f  %7.4f  %8.5f  %8.5f  %7.4f",
-				m_Alpha[j],	m_Cl[j],
-				m_Cd[j], m_Cdp[j],
-				m_Cm[j]);
-			
+		if(FileType==1)
+		{
+			Header.Format(" ------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
+			XFile.WriteString(Header);
+		}
+		for (j=0; j<m_Alpha.GetSize(); j++)
+		{
+			if(FileType==1)	strong.Format(" %7.3f  %7.4f  %8.5f  %8.5f  %7.4f",	m_Alpha[j],	m_Cl[j],m_Cd[j], m_Cdp[j],m_Cm[j]);
+			else            strong.Format("%7.3f,%7.4f,%8.5f,%8.5f,%7.4f",	m_Alpha[j],	m_Cl[j],m_Cd[j], m_Cdp[j],m_Cm[j]);
+
 			XFile.WriteString(strong);
-			if(m_XTr1[j]<990.0){
-				strong.Format("  %6.4f  %6.4f",
-					m_XTr1[j], m_XTr2[j]);
+			if(m_XTr1[j]<990.0)
+			{
+				if(FileType==1)	strong.Format("  %6.4f  %6.4f",m_XTr1[j], m_XTr2[j]);
+				else            strong.Format(",%6.4f,%6.4f",m_XTr1[j], m_XTr2[j]);
 				XFile.WriteString(strong);
 			}
-			strong.Format("  %7.4f  %7.4f  %7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
+			if(FileType==1)	strong.Format("  %7.4f  %7.4f  %7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
+			else            strong.Format(",%7.4f,%7.4f,%7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
 			XFile.WriteString(strong);
 		}
 	}
-	else {
-		Header.Format("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n");
+	else 
+	{
+		if(FileType==1) Header.Format("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n");
+		else            Header.Format("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
 		XFile.WriteString(Header);
-		Header.Format(" ------- -------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
-		XFile.WriteString(Header);
-		for (int j=0; j<m_Alpha.GetSize(); j++){
-			strong.Format(" %7.3f %8.0f  %7.4f  %8.5f  %8.5f  %7.4f",
-				m_Alpha[j],	m_Re[j], m_Cl[j],
-				m_Cd[j], m_Cdp[j],
-				m_Cm[j]);
-			
+		if(FileType==1)
+		{
+			Header.Format(" ------- -------- -------- --------- --------- -------- ------- ------- -------- --------- ---------\n");
+			XFile.WriteString(Header);
+		}
+		for (j=0; j<m_Alpha.GetSize(); j++)
+		{
+			if(FileType==1) strong.Format(" %7.3f %8.0f  %7.4f  %8.5f  %8.5f  %7.4f", m_Alpha[j], m_Re[j], m_Cl[j], m_Cd[j], m_Cdp[j], m_Cm[j]);
+			else            strong.Format(" %7.3f,%8.0f,%7.4f,%8.5f,%8.5f,%7.4f", m_Alpha[j], m_Re[j], m_Cl[j], m_Cd[j], m_Cdp[j], m_Cm[j]);
 			XFile.WriteString(strong);
-			if(m_XTr1[j]<990.0){
-				strong.Format("  %6.4f  %6.4f",
-					m_XTr1[j], m_XTr2[j]);
+			if(m_XTr1[j]<990.0)
+			{
+				if(FileType==1) strong.Format("  %6.4f  %6.4f", m_XTr1[j], m_XTr2[j]);
+				else            strong.Format(",%6.4f,%6.4f", m_XTr1[j], m_XTr2[j]);
 				XFile.WriteString(strong);
 			}
-			strong.Format("  %7.4f  %7.4f  %7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
+			if(FileType==1) strong.Format("  %7.4f  %7.4f  %7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
+			else            strong.Format(",%7.4f,%7.4f,%7.4f\n", m_Cpmn[j],m_HMom[j], m_XCp[j]);
 			XFile.WriteString(strong);
 		}
 	}
@@ -234,7 +253,7 @@ void CPolar::AddData(OpPoint *pOpPoint)
 void CPolar::AddData(XFoil* pXFoil)
 {
 	if(!pXFoil->lvisc) return;
-	double alpha = pXFoil->alfa*180.0/3.141592654;
+	double alpha = pXFoil->alfa*180.0/pi;
 	m_ACrit = pXFoil->acrit;
 
 	AddPoint(alpha, pXFoil->cd, pXFoil->cdp, pXFoil->cl, pXFoil->cm, pXFoil->xoctr[1],
@@ -245,12 +264,19 @@ void CPolar::AddData(XFoil* pXFoil)
 void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm, double Xtr1,
 					  double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp)
 {
+	int i;
 	bool bInserted = false;
 	int size = (int)m_Alpha.GetSize();
-	if(size){
-		for (int i=0; i<size; i++){
-			if(m_Type != 4){
-				if (fabs(Alpha - m_Alpha[i]) < 0.001){// then erase former result
+TRACE("%12.5f     %12.5f     %12.5f     %12.5f \n",Alpha, Cd, Cl, Cm);
+	if(size)
+	{
+		for ( i=0; i<size; i++)
+		{
+			if(m_Type != 4)
+			{
+				if (abs(Alpha - m_Alpha[i]) < 0.001)
+				{
+					// then erase former result
 					m_Alpha[i] =  Alpha;
 					m_Cd[i]    =  Cd;
 					m_Cdp[i]   =  Cdp;
@@ -282,7 +308,9 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 					bInserted = true;
 					break;
 				}
-				else if (Alpha < m_Alpha[i]){// sort by crescending alphas
+				else if (Alpha < m_Alpha[i])
+				{
+					// sort by crescending alphas
 					m_Alpha.InsertAt(i, Alpha, 1);
 					m_Cd.InsertAt(i, Cd, 1);
 					m_Cdp.InsertAt(i, Cdp, 1);
@@ -316,8 +344,12 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 					break;
 				}
 			}
-			else{//m_Type 4 polar, sort by Reynolds numbers
-				if (fabs(Reynolds - m_Re[i]) < 0.1f){// then erase former result
+			else
+			{
+				//m_Type 4 polar, sort by Reynolds numbers
+				if (abs(Reynolds - m_Re[i]) < 0.1)
+				{
+					// then erase former result
 					m_Alpha[i] =  Alpha;
 					m_Cd[i]    =  Cd;
 					m_Cdp[i]   =  Cdp;
@@ -365,7 +397,9 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 			}
 		}
 	}
-	if(!bInserted){// data is appended at the end
+	if(!bInserted)
+	{
+		// data is appended at the end
 		m_Alpha.InsertAt(size, Alpha, 1);
 		m_Cd.InsertAt(size, Cd, 1);
 		m_Cdp.InsertAt(size, Cdp, 1);
@@ -785,7 +819,7 @@ void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
 
 	if(n<=1) {
 		Alpha0 = 0.0;
-		slope = 2.0*3.14159*3.14159/180.0;
+		slope = 2.0*pi*pi/180.0;
 		return;
 	}
 
@@ -804,7 +838,7 @@ void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
 	}
 	if(fn*sum4 == sum2*sum2 || fn*sum1 == sum2 * sum3) {//very improbable...
 		Alpha0 = 0.0;
-		slope = 2.0*3.14159f*3.14159f/180.0;
+		slope = 2.0*pi*pi/180.0;
 		return;
 	}
 

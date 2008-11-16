@@ -28,6 +28,7 @@
 #include "AFoilCtrlBar.h"
 #include "../XDirect/Foil.h"
 #include "../XDirect/XFoil.h"
+#include "atlimage.h"
 
 struct Picture{
 	public:
@@ -138,6 +139,10 @@ private:
 	void DrawXMinGrid(CDC *pDC, double scalex, double scaley, CPoint Offset, CRect dRect, bool bIsPrinting = false);
 	void DrawYGrid(CDC *pDC, double scalex, double scaley, CPoint Offset, CRect dRect, bool bIsPrinting = false);
 	void DrawYMinGrid(CDC *pDC, double scalex, double scaley, CPoint Offset, CRect dRect, bool bIsPrinting = false);
+	void PaintGrids(CDC* pDC); 
+	void PaintFoils(CDC* pDC); 
+	void PaintSplines(CDC* pDC); 
+	void PaintLegend(CDC* pDC); 
 	void OnLButtonDown(UINT nFlags, CPoint point);
 	void OnLButtonUp(UINT nFlags, CPoint point);
 	void OnMouseMove(UINT nFlags, CPoint point);
@@ -145,6 +150,7 @@ private:
 	void OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint);
 	void OnLButtonDblClk(UINT nFlags, CPoint point);
 	void OnMButtonDown(UINT nFlags, CPoint point);
+	void PaintImage(ATL::CImage *pImage, CString &FileName, int FileType);
 	void PFNew();
 	void PFSave();
 	void ReleaseZoom();

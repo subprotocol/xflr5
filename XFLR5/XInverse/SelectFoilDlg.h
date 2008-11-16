@@ -28,6 +28,7 @@
 class CSelectFoilDlg : public CDialog
 {
 	friend class CXInverse;
+	friend class CMiarex;
 // Construction
 public:
 	CString m_FoilName;

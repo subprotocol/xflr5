@@ -69,6 +69,6 @@ private:
 	
 
 private:
-	void Export(CString FileName, CString Version);
+	void Export(CString FileName, CString Version, int FileType);
 	bool SerializeOpp(CArchive &ar, int ArchiveFormat=0);
 };

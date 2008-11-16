@@ -30,6 +30,8 @@
 #include "FInvCtrlBar.h"
 #include "MInvCtrlBar.h"
 #include "XInvClrDlg.h"
+#include "atlimage.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CXInverse window
 
@@ -140,6 +142,9 @@ private:
 	void Clear();
 	void DrawGrid(CDC *pDC, CRect* pCltRect, double scale, CPoint ptOffset, bool bIsPrinting);
 	void Filter(double filt);
+	void PaintGraph(CDC *pDC);
+	void PaintFoil(CDC *pDC);
+	void PaintImage(ATL::CImage *pImage, CString &FileName, int FileType);
 	void ResetMixedQ();
 	void Pertubate();
 	void ResetQ();

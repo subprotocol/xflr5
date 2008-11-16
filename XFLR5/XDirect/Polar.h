@@ -62,6 +62,7 @@ private:
 	double m_XTop; 
 	double m_XBot;
 
+	double pi;
 
 	int m_Style;
 	int m_Width;
@@ -93,7 +94,7 @@ private:
 	
 	void AddData(OpPoint* pOpPoint);
 	void AddData(XFoil* pXFoil);
-	void Export(CString FileName);
+	void Export(CString FileName, int FileType);
 	void ResetPolar();
 	void Copy(CPolar *pPolar);
 

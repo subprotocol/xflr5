@@ -117,6 +117,7 @@ protected:
 	void DrawDihedral(CDC* pDC, CPoint O);
 	void ComputeGeometry();
 	void FillPanelList();
+	void FillCell(int iItem, int iSubItem);
 	void InsertSection(double TPos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, CString Foil,int NChord, int NSpan, int SSpan);
 	void SetResults();
@@ -126,6 +127,7 @@ protected:
 	void SplitPanel(int i, double tau);
 	void ReadParams();
 	void ReadSectionData(int sel);
+
 	bool CheckWing();
 	int IsFoil(CPoint point);
 	double GetAverageSweep();
@@ -151,7 +153,7 @@ protected:
 	afx_msg void OnContextMenu(CWnd* pWnd , CPoint point);
 	afx_msg void OnAppend();
 	afx_msg void OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUpdateMeshFromTotal();

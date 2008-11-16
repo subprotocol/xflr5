@@ -2466,6 +2466,7 @@ void CWing::PanelComputeWing(double *Cp,
 }
 
 
+
 void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted)
 {
 	// calculates the lift and induced drag from the vortices strengths
@@ -2558,6 +2559,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 
 					GamShed +=Gamma[p+pos];
 				}
+//if(m_pPanel[p].m_bIsTrailing) TRACE("%14.5f     %14.5f     %14.5f     \n", pMiarex->m_Node[m_pPanel[p].m_iTA].y, m_pPanel[p].CtrlPt.y, GamShed);     
 				p++;
 			}
 
@@ -2840,8 +2842,191 @@ void CWing::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
 
 
 
+bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *b, double *c, double *d)
+{
+//
+// Given an array of n+1 pairs (x[i], y[i]), with i ranging from 0 to n, 
+// this function calculates the 3rd order cubic spline which interpolate the pairs.
+//
+// The spline is defined for each interval [x[j], x[j+1]) by n third order polynomial functions
+//              p_j(x) = ax3 + bx2 + cx + d
+//
+// The equations to determine the coefficients a,b,c,d are
+//
+// Interpolation : 2n conditions
+//    p_j(x[j])   = y[j];
+//    p_j(x[j+1]) = y[j+1];
+//
+// Continuity of 1st and 2nd order derivatives at internal points: 2(n-1) conditions
+//    p_j'(x[j]) = p_j+1'(x[j])
+//    p_j"(x[j]) = p_j+1"(x[j])
+//
+// Second order derivative is zero at the end points : 2 conditions
+//    p_j"(x[0]) =  p_j"(x[n]) =0
+//
+//
+// This sets a linear system of size 4n which is solved by the Gauss algorithm for coefs a,b,c and d
+// The RHS vector is 
+//	  a[0]
+//	  b[0]
+//	  c[0]
+//	  d[0]
+//	  a[1]
+//    ...
+//	  d[n-1]
+//
+
+	if(n>50) return false;
+	int i,size;
+
+	double *M;// size is 4 coefs x maxstations
+	double *RHS;
+	CVLMDlg *pVLMDlg   = (CVLMDlg*)s_pVLMDlg;
+
+	M = pVLMDlg->m_aij;
+	RHS = pVLMDlg->m_RHS;
+
+/*	for(i=0;i<4*n;i++)
+	{
+		for(j=0; j<4*n; j++) M[i*4*n+j] = 0.0;
+		RHS[i] = 0.0;
+	}*/
+
+	memset(M, 0, 16*n*n*sizeof(double));
+	memset(RHS, 0, 4*n*sizeof(double));
+
+	size = 4*n;
+//	Interpolation conditions
+	for (i=0; i<n; i++)
+	{	
+		//pj(x[i]) = y[i] 
+		M[2*i*size +4*i]     = x[i]*x[i]*x[i];
+		M[2*i*size +4*i + 1] = x[i]*x[i];
+		M[2*i*size +4*i + 2] = x[i];
+		M[2*i*size +4*i + 3] = 1.0;
+
+		//pj(x[i+1]) = y[i+1] 
+		M[(2*i+1)*size +4*i]     = x[i+1]*x[i+1]*x[i+1];
+		M[(2*i+1)*size +4*i + 1] = x[i+1]*x[i+1];
+		M[(2*i+1)*size +4*i + 2] = x[i+1];
+		M[(2*i+1)*size +4*i + 3] = 1.0;
+		
+		RHS[2*i]   = y[i];
+		RHS[2*i+1] = y[i+1];
+	}
+
+//  Derivation conditions
+	for (i=1; i<n; i++)
+	{
+		//continuity of 1st order derivatives
+		
+		M[(2*n+i)*size + 4*(i-1)]     =  3.0*x[i]*x[i];
+		M[(2*n+i)*size + 4*(i-1)+1]   =  2.0     *x[i];
+		M[(2*n+i)*size + 4*(i-1)+2]   =  1.0;
+
+		M[(2*n+i)*size + 4*i]   = -3.0*x[i]*x[i];
+		M[(2*n+i)*size + 4*i+1] = -2.0     *x[i];
+		M[(2*n+i)*size + 4*i+2] = -1.0;
+		
+		RHS[2*n+i]   = 0.0;
+
+		//continuity of 2nd order derivatives
+		M[(3*n+i)*size + 4*(i-1)]     =  6.0*x[i];
+		M[(3*n+i)*size + 4*(i-1)+1]   =  2.0     ;
+
+		M[(3*n+i)*size + 4*i]   = -6.0*x[i];
+		M[(3*n+i)*size + 4*i+1] = -2.0     ;
+		
+		RHS[3*n+i]   = 0.0;
+	}
+
+//	second order derivative is zero at end points = "natural spline"
+	M[2*n*size]     = 6.0*x[0];
+	M[2*n*size+1]   = 2.0;
+	RHS[2*n]        = 0.0;
+
+	M[3*n*size + size-4]   = 6.0*x[n];
+	M[3*n*size + size-3]   = 2.0;
+	RHS[3*n+1]             = 0.0;
+
+	if(!Gauss(M, 4*n, RHS, 1)) 
+		return false;
+
+	for(i=0; i<n; i++)
+	{
+		a[i] = RHS[4*i];
+		b[i] = RHS[4*i+1];
+		c[i] = RHS[4*i+2];
+		d[i] = RHS[4*i+3];
+	}
+
+	return true;
+}
 
 
+void CWing::VLMCubicSplines(double *Gamma)
+{
+	CVLMDlg *pVLMDlg = (CVLMDlg*)s_pVLMDlg;
+	CVector C, Wg;
+	int m,p,j;
+
+	double a[MAXSTATIONS], b[MAXSTATIONS], c[MAXSTATIONS], d[MAXSTATIONS];
+
+	p=0;
+	m=0;
+/*
+int k,l;
+	double y[MAXSTATIONS],Wgz[MAXSTATIONS];
+	for (j=0; j<m_NSurfaces; j++)
+	{
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+			for(l=0; l<m_Surface[j].m_NXPanels; l++)
+			{
+				if(m_pPanel[p].m_bIsTrailing)
+				{
+						C = m_pPanel[p].CtrlPt;
+						C.x = m_Span * 100.0;
+						Wg  = pVLMDlg->GetSpeedVector(C, Gamma);
+				}
+				p++;
+			}
+			Wgz[m] = Wg.z;
+			y[m] = C.y;
+//TRACE("%14.5f    %14.5f    \n", y[m], Wgz[m]);
+			m++;
+		}
+	}*/
+
+	if(!SplineInterpolation(m_NStation, m_SpanPos, m_ICd, a,b,c,d)) return;
+
+	double t=-m_Span/2.0;
+	double dt = m_Span/100.0;
+	double res;
+
+	for(j=0; j<=100; j++)
+	{
+		res = GetInterpolation(t, m_SpanPos, m_NStation, a,b,c,d);
+//TRACE("%14.5f    %14.5f    \n", t, res);
+		t += dt;
+	}
+}
+
+
+
+double CWing::GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d)
+{
+	if(t<=y[0]) 
+		return a[0] * t*t*t + b[0] *t*t + c[0] * t +d[0];
+
+	for (int k=1; k<m; k++)
+	{
+		if(t<=y[k]) 
+			return a[k-1] * t*t*t + b[k-1] *t*t + c[k-1] * t +d[k-1];
+		
+	}
+	return a[m-1] * t*t*t + b[m-1] *t*t + c[m-1] * t +d[m-1];
+}
 
 
 

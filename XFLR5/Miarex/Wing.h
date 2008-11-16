@@ -117,6 +117,9 @@ protected:
 	double IntegralC2(double y1, double y2, double c1, double c2);
 	double IntegralCy(double y1, double y2, double c1, double c2);
 
+	void VLMCubicSplines(double *Gamma);
+	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
+	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 
 //__________________________Variables_______________________

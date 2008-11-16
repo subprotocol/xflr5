@@ -37,6 +37,7 @@ class CFoil  : public CObject
 	friend class CAFoilCtrlBar;
 	friend class CCAddDlg;
 	friend class CEditFoilDlg;
+	friend class CBodyCtrlBar;
 	friend class CFoilSettingsDlg;
 	friend class CFoilAnalysisDlg;
 	friend class CFlapDlg;

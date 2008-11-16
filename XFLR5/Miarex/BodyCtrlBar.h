@@ -74,6 +74,8 @@ public:
 	// Implementation
 	public:
 private:
+	void FillFrameCell(int iItem, int iSubItem);
+	void FillPointCell(int iItem, int iSubItem);
 	void FillFrameList();
 	void FillPointList();
 	void UpdateBodies();
@@ -97,6 +99,7 @@ private:
 	CBody m_UndoPic[20];
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	bool m_bStored;
+	bool m_bResetFrame;
 
 	CFont m_FixedFont;
 	CWnd* m_pMiarex;
@@ -112,8 +115,6 @@ protected:
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnBodyColor();
-//	afx_msg void OnNMClickFrameList(NMHDR *pNMHDR, LRESULT *pResult);
-//	afx_msg void OnNMClickFramePoint(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	afx_msg void OnSelChangeBodyList();
 	afx_msg void OnLvnEndLabelEditFrameList(NMHDR *pNMHDR, LRESULT *pResult);
@@ -125,11 +126,14 @@ protected:
 	afx_msg void OnRadio();
 	afx_msg void OnSelChangeSplineDegree();
 	afx_msg void OnKillFocusPanels();
+	afx_msg void OnKillFocusPointList();
+	afx_msg void OnKillFocusFrameList();
 	afx_msg void OnLocked();
-
+	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnLvnItemchangedFramelist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnItemchangedFramepoints(NMHDR *pNMHDR, LRESULT *pResult);
+	
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnLvnItemchangedFramelist(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnLvnItemchangedFramepoints(NMHDR *pNMHDR, LRESULT *pResult);
 };

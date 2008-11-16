@@ -26,7 +26,6 @@ f/****************************************************************************
 #include "../main/MainFrm.h"
 #include "../misc/UnitsDlg.h"
 #include "Miarex.h"
-#include "Surface.h"
 #include  <math.h>
 #include ".\wingdlg.h"
 
@@ -150,13 +149,12 @@ BEGIN_MESSAGE_MAP(CWingDlg, CDialog)
 	ON_WM_LBUTTONUP()
 	ON_COMMAND(IDM_APPEND, OnAppend)
 	ON_BN_CLICKED(IDC_SIDE2, OnSide)
-	ON_NOTIFY(NM_CLICK, IDC_PANELLIST, OnNMClickPanelList)
-	ON_NOTIFY(NM_RCLICK, IDC_PANELLIST, OnNMRClickPanelList)
+//	ON_NOTIFY(NM_RCLICK, IDC_PANELLIST, OnNMRClickPanelList)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_PANELLIST, OnLvnItemchangedPanellist)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_PANELLIST, OnLvnEndLabelEditPanelList)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_CONTEXTMENU()
 	ON_COMMAND(IDM_RESETSCALE, OnResetscale)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_PANELLIST, OnLvnItemchangedPanellist)
 END_MESSAGE_MAP()
 
 
@@ -256,7 +254,7 @@ BOOL CWingDlg::OnInitDialog()
 	m_ctrlPanelList.GetStyle();
 	m_ctrlPanelList.GetClientRect(&CltRect);
 	int w = CltRect.Width();
-	int w1 = (int)((w-15)/11);
+	int w1 = (int)((w-25)/11);
 	m_ctrlPanelList.InsertColumn(0," ",LVCFMT_RIGHT, 15);
 	m_ctrlPanelList.InsertColumn(1,"Pos."+len,LVCFMT_RIGHT, w1);
 	m_ctrlPanelList.InsertColumn(2,"Chord"+len,LVCFMT_RIGHT,w1);
@@ -291,7 +289,7 @@ BOOL CWingDlg::OnInitDialog()
 	
 	m_DrawRect.left   = CltRect.left+20;
 	m_DrawRect.right  = CltRect.right-20;
-	m_DrawRect.top    = CltRect.top+270;
+	m_DrawRect.top    = CltRect.top+280;
 	m_DrawRect.bottom = CltRect.bottom-20;
 
 	m_ptOffset.x = 50;
@@ -376,7 +374,8 @@ void CWingDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		int res = IsFoil(point);
 
-		if(res>=0){
+		if(res>=0)
+		{
 			m_iSection = res;
 			m_ctrlPanelList.SetItemState(res, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 			m_ctrlPanelList.SetFocus();
@@ -392,7 +391,6 @@ void CWingDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	else 
 	{
 		m_bTrans = false;
-		
 		CDialog::OnLButtonDown(nFlags, point);
 	}
 }
@@ -405,21 +403,26 @@ void CWingDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 
 	CPoint pt = point;
 	ScreenToClient(&pt);
-//	GetCursorPos(&pt);
+	CRect rect;
+	m_ctrlPanelList.GetWindowRect(&rect);
 
-	if(m_DrawRect.PtInRect(pt)){
+	if(m_DrawRect.PtInRect(pt))
+	{
 		int res = IsFoil(pt);
 
-		if(res>=0){
+		if(res>=0)
+		{
 			m_iSection = res;
 		}
-		if(m_iSection>=0){
+		if(m_iSection>=0)
+		{
 
 			m_ctrlPanelList.SetItemState(res, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 			InvalidateRect(&m_DrawRect);
 
 			CMenu menu;
-			if (menu.LoadMenu(IDR_CTXWNGMENU)){
+			if (menu.LoadMenu(IDR_CTXWNGMENU))
+			{
 				CMenu* pPopup = menu.GetSubMenu(0);
 				ASSERT(pPopup != NULL);
 				pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
@@ -427,6 +430,18 @@ void CWingDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 			}
 
 		}
+	}
+	if(rect.PtInRect(point))
+	{
+		CMenu menu;
+		if (menu.LoadMenu(IDR_CTXWNGMENU))
+		{
+			CMenu* pPopup = menu.GetSubMenu(0);
+			ASSERT(pPopup != NULL);
+			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
+				point.x, point.y, this); 
+		}
+
 	}
 }
 
@@ -991,7 +1006,8 @@ void CWingDlg::DrawVLMMesh(CDC *pDC, CPoint O)
 	CPen *pOldPen = pDC->SelectObject(&MeshPen);
 
 
-	if(m_bRightSide){
+	if(m_bRightSide)
+	{
 		for (i=0; i<m_pWing->m_NPanel;i++){
 			//first draw lines parallel to chord,
 			dT  = m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i];
@@ -1072,7 +1088,8 @@ void CWingDlg::DrawVLMMesh(CDC *pDC, CPoint O)
 					// sine distribution
 					yl = m_pWing->m_TPos[i+1] -(sin(k*pi/2.0/m_pWing->m_NYPanels[i])) * (m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i]);
 				}
-				else {
+				else 
+				{
 					//even spacing by default
 					yl = m_pWing->m_TPos[i] +(k*(m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i])/m_pWing->m_NYPanels[i]);
 				}
@@ -1709,7 +1726,107 @@ bool CWingDlg::VLMSetAutoMesh(int total)
 	return true;
 }
 
+void CWingDlg::FillCell(int iItem, int iSubItem)
+{
+	CString strong;
+	switch (iSubItem)
+	{
+		case 0:
+		{
+			strong.Format("%d", iItem);
+			m_ctrlPanelList.SetItemText(iItem, 0, strong);
+			break;
+		}
+		case 1:
+		{
+			strong = GetFormat(m_DTPos[iItem],3);
+			m_ctrlPanelList.SetItemText(iItem,1,strong);
 
+			break;
+		}
+		case 2:
+		{
+			strong = GetFormat(m_DTChord[iItem],3);
+			m_ctrlPanelList.SetItemText(iItem,2,strong);
+
+			break;
+		}
+		case 3:
+		{
+			strong = GetFormat(m_DTOffset[iItem],3);
+			m_ctrlPanelList.SetItemText(iItem,3,strong);
+			break;
+		}
+		case 4:
+		{
+			if(iItem<m_pWing->m_NPanel)	strong.Format("%.2f", m_pWing->m_TDihedral[iItem]);
+			else			strong = " ";
+			m_ctrlPanelList.SetItemText(iItem,4,strong);
+
+			break;
+		}
+		case 5:
+		{
+			strong.Format("%.2f", m_pWing->m_TTwist[iItem]);
+			m_ctrlPanelList.SetItemText(iItem,5,strong);
+			break;
+		}
+		case 6:
+		{
+			if(m_bRightSide) m_ctrlPanelList.SetItemText(iItem,6,m_pWing->m_RFoil[iItem]);
+			else             m_ctrlPanelList.SetItemText(iItem,6,m_pWing->m_LFoil[iItem]);
+			break;
+		}
+		case 7:
+		{
+			if(iItem<m_pWing->m_NPanel)
+			{
+				strong.Format("%d", m_pWing->m_NXPanels[iItem]);
+				m_ctrlPanelList.SetItemText(iItem,7,strong);
+			}
+			else m_ctrlPanelList.SetItemText(iItem,7,"");
+			break;
+		}
+		case 8:
+		{
+			if(iItem<m_pWing->m_NPanel)
+			{
+				if(m_pWing->m_XPanelDist[iItem]==0)			strong = "Uniform";
+				else if(m_pWing->m_XPanelDist[iItem]==1)	strong = "Cosine";
+				m_ctrlPanelList.SetItemText(iItem,8,strong);
+			}
+			else m_ctrlPanelList.SetItemText(iItem,8,"");
+			break;
+		}
+		case 9:
+		{
+			if(iItem<m_pWing->m_NPanel)
+			{
+				strong.Format("%d", m_pWing->m_NYPanels[iItem]);
+				m_ctrlPanelList.SetItemText(iItem,9,strong);
+			}
+			else m_ctrlPanelList.SetItemText(iItem,9,"");
+			break;
+		}
+		case 10:
+		{
+			if(iItem<m_pWing->m_NPanel)
+			{
+				if(m_pWing->m_YPanelDist[iItem]==0)			strong = "Uniform";
+				else if(m_pWing->m_YPanelDist[iItem]==1)	strong = "Cosine";
+				else if(m_pWing->m_YPanelDist[iItem]==2)	strong = "Sine";
+				else if(m_pWing->m_YPanelDist[iItem]==-2)	strong = "-Sine";
+				m_ctrlPanelList.SetItemText(iItem,10,strong);
+			}
+			else m_ctrlPanelList.SetItemText(iItem,10,"");
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
 
 void CWingDlg::FillPanelList()
 {
@@ -1760,7 +1877,8 @@ void CWingDlg::FillPanelList()
 			else if(m_pWing->m_YPanelDist[i]==-2)	strong = "-Sine";
 			m_ctrlPanelList.SetItemText(i,10,strong);
 		}
-		else{
+		else
+		{
 			strong = " ";
 			m_ctrlPanelList.SetItemText(i,7,strong);
 			m_ctrlPanelList.SetItemText(i,8,strong);
@@ -1768,13 +1886,6 @@ void CWingDlg::FillPanelList()
 			m_ctrlPanelList.SetItemText(i,10,strong);
 		}
 	}
-/*
-	//Update Geometry
-	Convert(false);// retrieve the data
-	//
-	ComputeGeometry();
-	SetResults();
-	InvalidateRect(&m_DrawRect);*/
 }	
 
 
@@ -1869,14 +1980,16 @@ CString CWingDlg::GetFormat(double f, int iPrecision)
 		if(pos<0) pos = l;
 		pos = l-pos;
 
-		for (int i=0; i<q; i++){
+		for (int i=0; i<q; i++)
+		{
 			strong.Insert(l-3*(i+1)-i-pos," ");
 			l++;
 		}
 
 		str = strong;
 	}
-	else {
+	else 
+	{
 		int exp  = (int)log10(f)-1;
 		str1.Format("e%d", exp);
 
@@ -1908,6 +2021,7 @@ CString CWingDlg::GetFormat(double f, int iPrecision)
 	}
  	return str;
 }
+
 void CWingDlg::OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -1917,7 +2031,9 @@ void CWingDlg::OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-void CWingDlg::OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult)
+
+/*
+void CWingDlg::OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
 	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
@@ -1925,31 +2041,10 @@ void CWingDlg::OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 		*pResult =0;
 		return ;
 	}
-
-//	POSITION pos = m_ctrlPanelList.GetFirstSelectedItemPosition();
-//	int sel = m_ctrlPanelList.GetNextSelectedItem(pos);
-
 	m_iSection = pNMListView->iItem;
-
-
-	InvalidateRect(&m_DrawRect);
 
 
 	*pResult = 0;
-}
-
-void CWingDlg::OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult)
-{
-/*	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
-	if(pNMListView->iItem == -1 || pNMListView->iSubItem == -1)
-	{
-		*pResult =0;
-		return ;
-	}
-	m_iSection = pNMListView->iItem;
-
-
-	*pResult = 0;*/
 	POSITION pos = m_ctrlPanelList.GetFirstSelectedItemPosition();
 	m_iSection = m_ctrlPanelList.GetNextSelectedItem(pos);
 
@@ -1957,17 +2052,18 @@ void CWingDlg::OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 	CPoint pt;
 	GetCursorPos(&pt);
 	CMenu menu;
-	if (menu.LoadMenu(IDR_CTXWNGMENU)){
+	if (menu.LoadMenu(IDR_CTXWNGMENU))
+	{
 		CMenu* pPopup = menu.GetSubMenu(0);
 		ASSERT(pPopup != NULL);
 		pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,	pt.x, pt.y, this); 
 	}
 }
-
+*/
 
 void CWingDlg::OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 {
-	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+	NMLVDISPINFO *pDispInfo = (NMLVDISPINFO*)pNMHDR;
 
 	*pResult = 0;
 	if(pDispInfo->item.iItem == -1 || pDispInfo->item.iSubItem == -1 )
@@ -1980,7 +2076,9 @@ void CWingDlg::OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult)
 	ReadSectionData(pDispInfo->item.iItem);
     m_bChanged = true;
 
-	FillPanelList();
+	FillCell(pDispInfo->item.iItem, pDispInfo->item.iSubItem);
+//	FillPanelList();
+//	m_ctrlPanelList.SetItemState(m_iSection, LVIS_SELECTED|LVIS_FOCUSED, LVIS_SELECTED|LVIS_FOCUSED);
 	ComputeGeometry();
 	SetResults();
 	InvalidateRect(&m_DrawRect);

@@ -208,11 +208,13 @@ void CAFoil::SetParams(CFoil *pFoil)
 	CMenu *pMenu = m_pFrame->GetMenu();
 	CMenu *pSubMenu = pMenu->GetSubMenu(5);
 
-	if(m_bSF) {
+	if(m_bSF) 
+	{
 		pMenu->GetSubMenu(5)->CheckMenuItem(IDM_BSPLINES,      MF_BYCOMMAND | MF_CHECKED);
 		pMenu->GetSubMenu(5)->CheckMenuItem(IDM_SPLINEDPOINTS, MF_BYCOMMAND | MF_UNCHECKED);
 	}
-	else{
+	else
+	{
 		pMenu->GetSubMenu(5)->CheckMenuItem(IDM_BSPLINES,      MF_BYCOMMAND | MF_UNCHECKED);
 		pMenu->GetSubMenu(5)->CheckMenuItem(IDM_SPLINEDPOINTS, MF_BYCOMMAND | MF_CHECKED);
 	}
@@ -231,17 +233,241 @@ void CAFoil::SetParams(CFoil *pFoil)
 //	m_pACtrl->SelectFoil();
 }
 
+void CAFoil::PaintGrids(CDC* pDC) 
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	COLORREF color;
+	int style, width;
+	LOGBRUSH lb;
+	lb.lbStyle = BS_SOLID;
+
+	CPen *pOldPen;
+	CPen AnyPen(PS_SOLID,50,RGB(0,0,0));
+	pOldPen = pDC->SelectObject(&AnyPen);
+
+	if(m_bZoomPlus)
+	{
+		CRect ZRect(m_ZoomRect.left   - m_rCltRect.left,
+					m_ZoomRect.top    - m_rCltRect.top ,
+					m_ZoomRect.right  - m_rCltRect.left,
+					m_ZoomRect.bottom - m_rCltRect.top );
+		ZRect.NormalizeRect();
+		CPen ZoomPen(PS_DASH,1, RGB(100,100,100));
+		pDC->SelectObject(&ZoomPen);
+		pDC->Rectangle(ZRect);
+	}
+
+	if(m_bCircle) 
+	{
+		int rx = (int)(m_LERad/100.0 * m_fScale);
+		int ry = (int)(m_LERad/100.0 * m_fScale * m_fScaleY);
+		CRect rc(m_ptOffset.x, m_ptOffset.y - ry, m_ptOffset.x+2*rx,m_ptOffset.y + ry);
+		CPen CirclePen(PS_DASH,1,RGB(128,128,128));
+		pDC->SelectObject(&CirclePen);
+		pDC->Ellipse(&rc);
+	}
+	if (m_bNeutralLine) 
+	{
+		color = m_NeutralColor;
+		style = m_NeutralStyle;
+		width = m_NeutralWidth;
+		if(IsBlackAndWhite()) GetBWColor(color, style, width);
+		lb.lbColor = color;
+		CPen NeutralPen(PS_GEOMETRIC | style,GetPenWidth(width,false), &lb);
+		pDC->SelectObject(&NeutralPen);
+		pDC->MoveTo(m_rDrawRect.right,m_ptOffset.y);
+		pDC->LineTo(m_rDrawRect.left,m_ptOffset.y);
+	}
+
+//draw grids
+	if(m_bXGrid)	DrawXGrid(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
+	if(m_bYGrid)	DrawYGrid(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
+	if(m_bXMinGrid) DrawXMinGrid(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
+	if(m_bYMinGrid) DrawYMinGrid(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
+
+	pDC->SetTextColor(pChildView->m_WndTextColor);
+	CFont RFont;
+	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
+	CFont *pOldFont = pDC->SelectObject(&RFont);
+
+	if(m_bScale) DrawScale(pDC, &m_rDrawRect, m_fScale, m_ptOffset,false);
+
+	pDC->SelectObject(pOldFont);
+	pDC->SelectObject(pOldPen);
+}
+
+void CAFoil::PaintFoils(CDC* pDC) 
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	int k;
+	CFoil *pFoil;
+	COLORREF color;
+	int style, width;
+	LOGBRUSH lb;
+	lb.lbStyle = BS_SOLID;
+
+	CPen *pOldPen;
+	CPen AnyPen(PS_SOLID,50,RGB(0,0,0));
+	pOldPen = pDC->SelectObject(&AnyPen);		
+
+	CBrush *pOldBrush;
+	CBrush FillBrush(pChildView->m_crBackColor);
+	pOldBrush = pDC->SelectObject(&FillBrush);
+
+
+	for (k=0; k< GetFoilCount(); k++)
+	{
+		pFoil = (CFoil*)m_poaFoil->GetAt(k);
+		if (pFoil->m_bVisible)
+		{
+			color = pFoil->m_FoilColor;
+			style = pFoil->m_nFoilStyle;
+			width = pFoil->m_nFoilWidth;
+			GetBWColor(color, style, width);
+			
+			lb.lbColor = color;
+			CPen FoilPen(PS_GEOMETRIC | style, GetPenWidth(width, false), &lb);
+
+			pDC->SelectObject(&FoilPen);		
+			pFoil->DrawFoil(pDC, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset, m_rCltRect, false);
+
+			if (pFoil->m_bCenterLine)
+			{
+				CPen CenterPen(PS_DASH,1,color);
+				pDC->SelectObject(&CenterPen);
+				pFoil->DrawMidLine(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
+			}
+			if (pFoil->m_bPoints)
+			{
+				CPen CtrlPen(PS_SOLID,  1, color);
+				pDC->SelectObject(&CtrlPen);
+				pFoil->DrawPoints(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
+			}
+		}
+	}
+	if (m_pBufferFoil->m_bVisible)
+	{
+		color = m_pBufferFoil->m_FoilColor;
+		style = m_pBufferFoil->m_nFoilStyle;
+		width = m_pBufferFoil->m_nFoilWidth;
+		GetBWColor(color, style, width);
+		
+		lb.lbColor = color;
+		CPen FoilPen(PS_GEOMETRIC | style, GetPenWidth(width, false), &lb);	
+
+		CPen *pOld0 = pDC->SelectObject(&FoilPen);		
+		m_pBufferFoil->DrawFoil(pDC, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset, m_rCltRect, false);
+		pDC->SelectObject(pOld0);
+		if (m_pBufferFoil->m_bCenterLine)
+		{
+			CPen CenterPen(PS_DASH,1,color);
+			pDC->SelectObject(&CenterPen);
+			m_pBufferFoil->DrawMidLine(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
+		}
+		if (m_pBufferFoil->m_bPoints)
+		{
+			CPen CtrlPen(PS_SOLID,  1, color);
+			pDC->SelectObject(&CtrlPen);
+			m_pBufferFoil->DrawPoints(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
+		}
+	}
+	pDC->SelectObject(pOldPen);
+	pDC->SelectObject(pOldBrush);
+}
+
+void CAFoil::PaintSplines(CDC* pDC) 
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	COLORREF color;
+	int style, width;
+	LOGBRUSH lb;
+	lb.lbStyle = BS_SOLID;
+
+	CPen *pOldPen;
+	CPen AnyPen(PS_SOLID,50,RGB(0,0,0));
+	pOldPen = pDC->SelectObject(&AnyPen);
+
+	CBrush *pOldBrush;
+	CBrush FillBrush(pChildView->m_crBackColor);
+	pOldBrush = pDC->SelectObject(&FillBrush);
+
+	if (m_bSF)
+	{
+		if(m_pSF->m_bVisible)
+		{
+			color = m_pSF->m_FoilColor;
+			style = m_pSF->m_FoilStyle;
+			width = m_pSF->m_FoilWidth;
+			GetBWColor(color, style, width);
+			lb.lbColor = color;
+			CPen SplinePen(PS_GEOMETRIC | style, GetPenWidth(width,false), &lb);
+
+			pDC->SelectObject(&SplinePen);
+			m_pSF->DrawFoil(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset,false);
+
+			CPen CtrlPen(PS_SOLID, 1, color);
+			pDC->SelectObject(&CtrlPen);
+			m_pSF->DrawCtrlPoints(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
+			
+			if (m_pSF->m_bCenterLine)
+			{
+				CPen CenterPen(PS_DASH, 1, color);
+				pDC->SelectObject(&CenterPen);
+				m_pSF->DrawMidLine(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
+			}
+			if (m_pSF->m_bOutPoints)
+			{
+				CPen OutPen(PS_SOLID,  1, color);
+				pDC->SelectObject(&OutPen);
+				m_pSF->DrawOutPoints(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
+			}
+		}
+	}
+	else if(m_pPF->m_bVisible)
+	{
+		color = m_pPF->m_FoilColor;
+		style = m_pPF->m_FoilStyle;
+		width = m_pPF->m_FoilWidth;
+		if(IsBlackAndWhite()) GetBWColor(color, style, width);
+		lb.lbColor = color;
+		CPen SplinePen(PS_GEOMETRIC | style, GetPenWidth(width,false), &lb);
+
+		pDC->SelectObject(&SplinePen);
+		m_pPF->DrawFoil(pDC, m_fScale, m_fScale*m_fScaleY, m_ptOffset,false);
+
+		CPen CtrlPen(PS_SOLID, 1, color);
+		pDC->SelectObject(&CtrlPen);
+
+		m_pPF->DrawCtrlPoints(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
+
+		if (m_pPF->m_bCenterLine)
+		{
+			CPen CenterPen(PS_DASH, 1, color);
+			pDC->SelectObject(&CenterPen);
+			m_pPF->DrawMidLine(pDC, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
+		}
+	}
+	pDC->SelectObject(pOldPen);
+	pDC->SelectObject(pOldBrush);
+}
+
+
+void CAFoil::PaintLegend(CDC* pDC) 
+{
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+
+	if(m_bShowLegend)
+	{
+		CPoint Place(m_rCltRect.right-350, 20);
+		DrawLegend(pDC, Place, false);
+	}
+}
 
 void CAFoil::UpdateView(CDC* pDC) 
 {
 	CChildView * pChildView = (CChildView*)m_pChildWnd;
 
-	COLORREF color;
-	int style, width;
-	CString str;
-	LOGBRUSH lb;
-	lb.lbStyle = BS_SOLID;
-
+	
 	if(!pDC) pDC = pChildView->GetDC();
 	if(!pDC) return;
 
@@ -257,165 +483,18 @@ void CAFoil::UpdateView(CDC* pDC)
 	memdc.SetTextColor(pChildView->m_WndTextColor);
 	memdc.FillSolidRect(&m_rDrawRect,pChildView->m_crBackColor);
 
-	CFoil *pFoil;
-	CPen     *pOldPen;
-	CBrush   *pOldBrush;
-	CPen BlackPen(PS_SOLID,  1, RGB(0,0,0));
-	pOldPen   = memdc.SelectObject(&BlackPen);
-	pOldBrush =  (CBrush*)memdc.SelectStockObject(NULL_BRUSH);
+	PaintGrids(&memdc);
+	PaintSplines(&memdc);
+	PaintFoils(&memdc);
+	PaintLegend(&memdc);
 
-	if(m_bZoomPlus){
-		CRect ZRect(m_ZoomRect.left   - m_rCltRect.left,
-					m_ZoomRect.top    - m_rCltRect.top ,
-					m_ZoomRect.right  - m_rCltRect.left,
-					m_ZoomRect.bottom - m_rCltRect.top );
-		ZRect.NormalizeRect();
-		CPen ZoomPen(PS_DASH,1, RGB(100,100,100));
-		memdc.SelectObject(&ZoomPen);
-		memdc.Rectangle(ZRect);
-	}
+	CString str;
+	LOGFONT TempFont;
+	memcpy(&TempFont, &pChildView->m_WndLogFont, sizeof(LOGFONT));
 
-	if(m_bCircle) {
-		int rx = (int)(m_LERad/100.0 * m_fScale);
-		int ry = (int)(m_LERad/100.0 * m_fScale * m_fScaleY);
-		CRect rc(m_ptOffset.x, m_ptOffset.y - ry, m_ptOffset.x+2*rx,m_ptOffset.y + ry);
-		CPen CirclePen(PS_DASH,1,RGB(128,128,128));
-		memdc.SelectObject(&CirclePen);
-		memdc.Ellipse(&rc);
-	}
-	if (m_bNeutralLine) {
-		color = m_NeutralColor;
-		style = m_NeutralStyle;
-		width = m_NeutralWidth;
-		if(IsBlackAndWhite()) GetBWColor(color, style, width);
-		lb.lbColor = color;
-		CPen NeutralPen(PS_GEOMETRIC | style,GetPenWidth(width,false), &lb);
-		memdc.SelectObject(&NeutralPen);
-		memdc.MoveTo(m_rDrawRect.right,m_ptOffset.y);
-		memdc.LineTo(m_rDrawRect.left,m_ptOffset.y);
-	}
-
-//draw grids
-	if(m_bXGrid)	DrawXGrid(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
-	if(m_bYGrid)	DrawYGrid(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
-	if(m_bXMinGrid) DrawXMinGrid(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
-	if(m_bYMinGrid) DrawYMinGrid(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rDrawRect);
-
-	memdc.SetTextColor(pChildView->m_WndTextColor);
-	CFont RFont;
-	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
-	CFont *pOldFont = memdc.SelectObject(&RFont);
-
-	if(m_bScale) DrawScale(&memdc, &m_rDrawRect, m_fScale, m_ptOffset,false);
-
-	for (int k=0; k< GetFoilCount(); k++){
-		pFoil = (CFoil*)m_poaFoil->GetAt(k);
-		if (pFoil->m_bVisible){
-			color = pFoil->m_FoilColor;
-			style = pFoil->m_nFoilStyle;
-			width = pFoil->m_nFoilWidth;
-			GetBWColor(color, style, width);
-			
-			lb.lbColor = color;
-			CPen FoilPen(PS_GEOMETRIC | style, GetPenWidth(width, false), &lb);
-
-			memdc.SelectObject(&FoilPen);		
-			pFoil->DrawFoil(&memdc, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset, m_rCltRect, false);
-
-			if (pFoil->m_bCenterLine){
-				CPen CenterPen(PS_DASH,1,color);
-				memdc.SelectObject(&CenterPen);
-				pFoil->DrawMidLine(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
-			}
-			if (pFoil->m_bPoints){
-				CPen CtrlPen(PS_SOLID,  1, color);
-				memdc.SelectObject(&CtrlPen);
-				pFoil->DrawPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
-			}
-		}
-	}
-
-	if (m_pBufferFoil->m_bVisible){
-		color = m_pBufferFoil->m_FoilColor;
-		style = m_pBufferFoil->m_nFoilStyle;
-		width = m_pBufferFoil->m_nFoilWidth;
-		GetBWColor(color, style, width);
-		
-		lb.lbColor = color;
-		CPen FoilPen(PS_GEOMETRIC | style, GetPenWidth(width, false), &lb);	
-
-		CPen *pOld0 = memdc.SelectObject(&FoilPen);		
-		m_pBufferFoil->DrawFoil(&memdc, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset, m_rCltRect, false);
-		memdc.SelectObject(pOld0);
-		if (m_pBufferFoil->m_bCenterLine){
-			CPen CenterPen(PS_DASH,1,color);
-			memdc.SelectObject(&CenterPen);
-			m_pBufferFoil->DrawMidLine(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
-		}
-		if (m_pBufferFoil->m_bPoints){
-			CPen CtrlPen(PS_SOLID,  1, color);
-			memdc.SelectObject(&CtrlPen);
-			m_pBufferFoil->DrawPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, m_rCltRect, false);
-		}
-	}
-	if (m_bSF){
-		if(m_pSF->m_bVisible){
-			color = m_pSF->m_FoilColor;
-			style = m_pSF->m_FoilStyle;
-			width = m_pSF->m_FoilWidth;
-			GetBWColor(color, style, width);
-			lb.lbColor = color;
-			CPen SplinePen(PS_GEOMETRIC | style, GetPenWidth(width,false), &lb);
-
-			memdc.SelectObject(&SplinePen);
-			m_pSF->DrawFoil(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset,false);
-
-			
-			CPen CtrlPen(PS_SOLID, 1, color);
-			memdc.SelectObject(&CtrlPen);
-			m_pSF->DrawCtrlPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
-			
-			if (m_pSF->m_bCenterLine){
-				CPen CenterPen(PS_DASH, 1, color);
-				memdc.SelectObject(&CenterPen);
-				m_pSF->DrawMidLine(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
-			}
-			if (m_pSF->m_bOutPoints){
-				CPen OutPen(PS_SOLID,  1, color);
-				memdc.SelectObject(&OutPen);
-				m_pSF->DrawOutPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
-			}
-		}
-	}
-	else if(m_pPF->m_bVisible)
-	{
-		color = m_pPF->m_FoilColor;
-		style = m_pPF->m_FoilStyle;
-		width = m_pPF->m_FoilWidth;
-		if(IsBlackAndWhite()) GetBWColor(color, style, width);
-		lb.lbColor = color;
-		CPen SplinePen(PS_GEOMETRIC | style, GetPenWidth(width,false), &lb);
-
-		memdc.SelectObject(&SplinePen);
-		m_pPF->DrawFoil(&memdc, m_fScale, m_fScale*m_fScaleY, m_ptOffset,false);
-
-		CPen CtrlPen(PS_SOLID, 1, color);
-		memdc.SelectObject(&CtrlPen);
-
-		m_pPF->DrawCtrlPoints(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
-
-		if (m_pPF->m_bCenterLine){
-			CPen CenterPen(PS_DASH, 1, color);
-			memdc.SelectObject(&CenterPen);
-			m_pPF->DrawMidLine(&memdc, m_fScale,m_fScale*m_fScaleY, m_ptOffset, false);
-		}
-	}
-
-	if(m_bShowLegend){
-		CPoint Place(m_rCltRect.right-350, 20);
-		DrawLegend(&memdc, Place, false);
-	}
-
+	CFont ThisFont;
+	ThisFont.CreateFontIndirect(&TempFont);
+	CFont* pOldFont = memdc.SelectObject(&ThisFont);
 	str.Format("X-Scale = %4.1f", m_fScale/m_fRefScale);
 	memdc.TextOut(5,10, str);
 	str.Format("Y-Scale = %4.1f", m_fScaleY*m_fScale/m_fRefScale);
@@ -424,20 +503,15 @@ void CAFoil::UpdateView(CDC* pDC)
 	memdc.TextOut(5,34, str);
 	str.Format("y  = %7.4f",m_MousePos.y);
 	memdc.TextOut(5,46, str);
+	memdc.SelectObject(pOldFont);
 
-	pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rDrawRect.Width(),m_rDrawRect.Height(),
-		&memdc,0,0,SRCCOPY);
+	pDC->BitBlt(m_rCltRect.left,m_rCltRect.top,m_rDrawRect.Width(),m_rDrawRect.Height(), &memdc,0,0,SRCCOPY);
 
 	pChildView->ReleaseDC(pDC);
 
-	memdc.SelectObject(pOldFont);
 	memdc.SelectObject(pOldBmp);
 
-	memdc.SelectObject(pOldPen);
-	memdc.SelectObject(pOldBrush);
-
 	memdc.DeleteDC();
-
 }
 
 
@@ -538,7 +612,7 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 	m_PointDown.x = point.x;
 	m_PointDown.y = point.y;//
 
-	if(m_rDrawRect.PtInRect(point)) m_pChildWnd->SetFocus();
+//	if(m_rDrawRect.PtInRect(point)) m_pChildWnd->SetFocus();
 
 	if(m_bZoomPlus && m_rDrawRect.PtInRect(point))
 	{
@@ -551,78 +625,103 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 	{
 		if(m_bSF)
 		{
-			if (nFlags & MK_SHIFT) { //shift --> removes the point
+			if (nFlags & MK_SHIFT)
+			{
+				//shift --> removes the point
 				TakePicture();
 				StorePicture();
 				int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				if (n>=0) {
+				if (n>=0) 
+				{
 					m_pSF->m_Extrados.RemovePoint(n);
 					m_pSF->Update(true);
 				}
-				else {
+				else 
+				{
 					int n=m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-					if (n>=0) {
+					if (n>=0) 
+					{
 						m_pSF->m_Intrados.RemovePoint(n);
 						m_pSF->Update(false);
 					}
 				}
 
 			}
-			else if (nFlags & MK_CONTROL) {//Ctrl --> inserts a point
+			else if (nFlags & MK_CONTROL) 
+			{
+				//Ctrl --> inserts a point
 				TakePicture();
 				StorePicture();
 
-				if(Real.y>=0) {
+				if(Real.y>=0) 
+				{
 					m_pSF->m_Extrados.InsertPoint(Real.x,Real.y);
 					m_pSF->Update(true);
 				}
-				else {
+				else 
+				{
 					m_pSF->m_Intrados.InsertPoint(Real.x,Real.y);
 					m_pSF->Update(false);
 				}
 			}
-			else { //Selects the point
+			else
+			{ 
+				//Selects the point
 			
 				m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
 				m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
-				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0){
+				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
+				{
 					TakePicture();
-				}			
-			}
-			if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10){
-				SetCursor(m_hcMove);
-				m_bTrans = true;
+				}
+
+				if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10)
+				{
+					SetCursor(m_hcMove);
+					m_bTrans = true;
+				}
 			}
 		}
-		else{
-			if (nFlags & MK_SHIFT) { //shift --> removes the point
+		else
+		{
+			if (nFlags & MK_SHIFT) 
+			{
+				//shift --> removes the point
 				TakePicture();
 				StorePicture();
 				int n =  m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				if (n>=0) {
+				if (n>=0) 
+				{
 					m_pPF->m_Extrados.RemovePoint(n);
 					m_pPF->Update(true);
 				}
-				else {
+				else 
+				{
 					int n=m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 					if (n>=0) m_pPF->m_Intrados.RemovePoint(n);
 					m_pPF->Update(false);
 				}
 			}
-			else if (nFlags & MK_CONTROL) {//Ctrl --> inserts a point
+			else if (nFlags & MK_CONTROL) 
+			{
+				//Ctrl --> inserts a point
 				TakePicture();
 				StorePicture();
-				if(Real.y>=0) {
+				if(Real.y>=0) 
+				{
 					m_pPF->m_Extrados.InsertPoint(Real.x,Real.y);
 					m_pPF->Update(true);
 				}
-				else {
+				else 
+				{
 					m_pPF->m_Intrados.InsertPoint(Real.x,Real.y);
 					m_pPF->Update(false);
 				}
 				
 			}
-			else { //Selects the point
+			else
+			{ 
+				//Selects the point
 				m_pPF->m_Extrados.m_iSelect = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
 				int n =  m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) ;
 				if(n==-1) m_pPF->m_Extrados.m_iSelect = n;
@@ -632,10 +731,12 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 				if(n==-1) m_pPF->m_Intrados.m_iSelect = n;
 
 				TakePicture();
-			}
-			if(m_pPF->m_Extrados.m_iSelect ==-10 && m_pPF->m_Intrados.m_iSelect ==-10){
-				SetCursor(m_hcMove);
-				m_bTrans = true;
+
+				if(m_pPF->m_Extrados.m_iSelect ==-10 && m_pPF->m_Intrados.m_iSelect ==-10)
+				{
+					SetCursor(m_hcMove);
+					m_bTrans = true;
+				}
 			}
 		}
 	}
@@ -648,12 +749,16 @@ void CAFoil::OnLButtonDown(UINT nFlags, CPoint point)
 void CAFoil::OnLButtonUp(UINT nFlags, CPoint point) 
 {
 	m_bTrans = false;
-	m_pACtrl->FillFoilList();
+//	m_pACtrl->FillFoilList();
 
-	if(m_bZoomPlus && m_rDrawRect.PtInRect(point)){
+	m_pACtrl->UpdateFoil(-10);
+
+	if(m_bZoomPlus && m_rDrawRect.PtInRect(point))
+	{
 		CRect ZRect(&m_ZoomRect);
 		ZRect.NormalizeRect();
-		if(!ZRect.IsRectEmpty()){
+		if(!ZRect.IsRectEmpty())
+		{
 			m_ZoomRect.right     = point.x;
 			m_ZoomRect.bottom    = point.y;
 			m_ZoomRect.NormalizeRect();
@@ -678,17 +783,21 @@ void CAFoil::OnLButtonUp(UINT nFlags, CPoint point)
 			m_ptOffset.y = (int)(ZoomFactor*(m_ptOffset.y-b)+b);
 			m_ZoomRect.SetRectEmpty();
 		}
-		else {
+		else 
+		{
 			m_ZoomRect.SetRectEmpty();
 			ReleaseZoom();
 		}
 	}
-	else if(m_bZoomPlus && !m_rDrawRect.PtInRect(point)){
+	else if(m_bZoomPlus && !m_rDrawRect.PtInRect(point))
+	{
 		ReleaseZoom();
 	}
 
-	else {
-		if(m_bSF){
+	else 
+	{
+		if(m_bSF)
+		{
 //			ReleaseCapture();// in case we have a grip cursor
 			m_pSF->CompMidLine();
 
@@ -705,7 +814,8 @@ void CAFoil::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 			}*/
 		}
-		else{
+		else
+		{
 //			ReleaseCapture();// in case we have a grip cursor
 			m_pPF->CompMidLine();
 
@@ -1048,21 +1158,25 @@ void CAFoil::OnExportSplines()
 	m_pPF->m_Extrados.m_iSelect = -10;
 
 	//check that number of output points is compatible with array sizing
-	if(m_bSF){
-		if(m_pSF->m_Extrados.m_iRes>IQX2) {
+	if(m_bSF)
+	{
+		if(m_pSF->m_Extrados.m_iRes>IQX2)
+		{
 			CString strong;
 			strong.Format("Too many output points on upper surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-		if(m_pSF->m_Intrados.m_iRes>IQX2) {
+		if(m_pSF->m_Intrados.m_iRes>IQX2) 
+		{
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
 	}
-	else {
+	else
+	{
 		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2) {
 			CString strong;
@@ -1071,7 +1185,8 @@ void CAFoil::OnExportSplines()
 			return;
 		}
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2) {
+		if(size>IQX2) 
+		{
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
@@ -1079,42 +1194,25 @@ void CAFoil::OnExportSplines()
 		}
 	}
 
-	while(bNotFound){// until we find a file to export to
-		FoilName.Replace("/", " ");
-		CFileDialog XFileDlg(false, "dat", FoilName, NULL,
-			_T("Labeled Format (.dat)|*.dat|"));
-		if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
+	FoilName.Replace("/", " ");
+	CFileDialog XFileDlg(false, "dat", FoilName, NULL,	_T("Labeled Format (.dat)|*.dat|"));
+	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
 
-		CFileFind FileFinder; 
-		
-		if(!FileFinder.FindFile(FileName)) {// file does not exist : OK to create and export
-			bWrite = true;
-			bNotFound = false;
-		}
-		else{
-			if(IDYES==AfxMessageBox("Overwrite existing file ?", MB_YESNO)){
-				bWrite = true;// file exists, but OK to overwrite and export
-				bNotFound = false;
-			}
-			else bWrite = false;// file exists, but user does not wan't to overwrite
-		}
-	}
-	if(bWrite){
-		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
-		if (bOpen){
-			CString strOut;
-			strOut = FoilName + "\n";
-			XFile.WriteString(strOut);
-			if(m_bSF) {
+	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+	if (bOpen)
+	{
+		CString strOut;
+		strOut = FoilName + "\n";
+		XFile.WriteString(strOut);
+		if(m_bSF) {
 //				XFile.WriteString("1\n");		
-				m_pSF->Export(&XFile);
-			}
-			else {
-//				XFile.WriteString("2\n");		
-				m_pPF->Export(&XFile);
-			}
-			XFile.Close();
+			m_pSF->Export(&XFile);
 		}
+		else {
+//				XFile.WriteString("2\n");		
+			m_pPF->Export(&XFile);
+		}
+		XFile.Close();
 	}
 }
 
@@ -1244,7 +1342,7 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 	}
 
 	COLORREF color;
-	int style, width;
+	int i, style, width;
 	LOGBRUSH lb;
 	lb.lbStyle = BS_SOLID;
 
@@ -1264,7 +1362,8 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 	Offset.y = -int(m_ptOffset.y*conv)-3000;
 
 
-	if(m_bCircle) {
+	if(m_bCircle) 
+	{
 		lb.lbColor = RGB(128,128,128);
 		int rx = (int)(m_LERad/100.0 * scalex);
 		int ry = (int)(m_LERad/100.0 * scalex * m_fScaleY);
@@ -1276,7 +1375,8 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 		pDC->SelectObject(pOld);
 	}
 
-	if(m_bNeutralLine){
+	if(m_bNeutralLine)
+	{
 		color = m_NeutralColor;
 		style = m_NeutralStyle;
 		width = m_NeutralWidth;
@@ -1297,9 +1397,11 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 	if(m_bYMinGrid) DrawYMinGrid(pDC, scalex,scaley, Offset, pRect, true);
 
 	// start with the reference foils
-	for (int i=0; i< m_poaFoil->GetSize();i++){
+	for (i=0; i< m_poaFoil->GetSize();i++)
+	{
 		CFoil* pFoil = (CFoil*)m_poaFoil->GetAt(i);		
-		if(pFoil->m_bVisible){
+		if(pFoil->m_bVisible)
+		{
 			color = pFoil->m_FoilColor;
 			style = pFoil->m_nFoilStyle;
 			width = pFoil->m_nFoilWidth;
@@ -1310,7 +1412,8 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 
 			pDC->SelectObject(&ContourPen);
 			pFoil->DrawFoil(pDC, 0.0, scalex, scaley, Offset, *pRect, true);
-			if (pFoil->m_bCenterLine){
+			if (pFoil->m_bCenterLine)
+			{
 				lb.lbColor = color;
 				CPen CenterPen(PS_GEOMETRIC | PS_DASH, 20, &lb);
 				pDC->SelectObject(&CenterPen);
@@ -1325,8 +1428,10 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 	}
 
 // on with the spline foil 
-	if (m_bSF){
-		if(m_pSF->m_bVisible){
+	if (m_bSF)
+	{
+		if(m_pSF->m_bVisible)
+		{
 			m_pSF->SetViewRect(pRect);
 			color = m_pSF->m_FoilColor;
 			style = m_pSF->m_FoilStyle;
@@ -1343,20 +1448,23 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 			pDC->SelectObject(&PointsPen);
 			m_pSF->DrawCtrlPoints(pDC, scalex, scaley, Offset, true);
 
-			if (m_pSF->m_bCenterLine){
+			if (m_pSF->m_bCenterLine)
+			{
 				lb.lbColor = color;
 				CPen CenterPen(PS_GEOMETRIC | PS_DASH, 20, &lb);
 				pDC->SelectObject(&CenterPen);
 				m_pSF->DrawMidLine(pDC, scalex, scaley, Offset, true);
 			}
-			if (m_pSF->m_bOutPoints){
+			if (m_pSF->m_bOutPoints)
+			{
 				CPen PointsPen(PS_SOLID, 20,  RGB(150,150,150));
 				pDC->SelectObject(&PointsPen);
 				m_pSF->DrawOutPoints(pDC, scalex, scaley, Offset, true);
 			}
 		}
 	}
-	else if(m_pPF->m_bVisible){
+	else if(m_pPF->m_bVisible)
+	{
 		m_pPF->SetViewRect(pRect);
 		color = m_pPF->m_FoilColor;
 		style = m_pPF->m_FoilStyle;
@@ -1369,7 +1477,8 @@ bool CAFoil::PrintAll(CDC *pDC, CRect pRect)
 		pDC->SelectObject(&ContourPen);
 		m_pPF->DrawFoil(pDC, scalex, scaley, Offset, true);
 
-		if (m_pPF->m_bCenterLine){
+		if (m_pPF->m_bCenterLine)
+		{
 			lb.lbColor = color;
 			CPen CenterPen(PS_GEOMETRIC | PS_DASH, 20, &lb);
 			pDC->SelectObject(&CenterPen);
@@ -1599,16 +1708,18 @@ void CAFoil::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 	m_ptPopUp.x = ClientPoint.x;
 	m_ptPopUp.y = ClientPoint.y;
 
-	if(m_rDrawRect.PtInRect(m_ptPopUp)){
+	if(m_rDrawRect.PtInRect(m_ptPopUp))
+	{
 		CMenu menu;
-		if (menu.LoadMenu(IDR_CTXDESIGNMENU)){
+		if (menu.LoadMenu(IDR_CTXDESIGNMENU))
+		{
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 			if(m_bShowLegend)   pPopup->CheckMenuItem(IDM_SHOWLEGEND, MF_BYCOMMAND | MF_CHECKED);
 			else				pPopup->CheckMenuItem(IDM_SHOWLEGEND, MF_BYCOMMAND | MF_UNCHECKED);
 			
 			pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,
-				ClientPoint.x, ClientPoint.y, m_pFrame); // use main window for cmds
+				ScreenPoint.x, ScreenPoint.y, m_pFrame); // use main window for cmds
 		}
 	}
 }
@@ -1959,16 +2070,22 @@ void CAFoil::OnExportFoil()
 
 	FileName = pCurFoil->m_FoilName;
 	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "dat", FileName, OFN_OVERWRITEPROMPT,
-		_T("Labeled Format (.dat)|*.dat|VisuAero Format (.dat)|*.dat|"));
-	if(IDOK==XFileDlg.DoModal()) {
+	static TCHAR BASED_CODE szFilter[] = _T("Labeled Format (*.dat)|*.dat|") _T("VisuAero format (*.dat)|*.dat|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+
+
+	if(IDOK==XFileDlg.DoModal())
+	{
 		DestFileName = XFileDlg.GetPathName();
 		int FilterIndex = XFileDlg.m_ofn.nFilterIndex;
 		CFoil *pFoil = GetFoil(pCurFoil->m_FoilName);
-		if(pFoil) {
+		if(pFoil) 
+		{
 			if(FilterIndex==1)	
 				pFoil->ExportFoil(DestFileName);
-			else {//writing ViSuAero Format, special for... me
+			else 
+			{
+				//writing ViSuAero Format, special for... me
 				BOOL bOpen2 = DestFile.Open(DestFileName, CFile::modeCreate | CFile::modeWrite, &fe);
 
 				OutString  = '"' ;
@@ -1985,7 +2102,8 @@ void CAFoil::OnExportFoil()
 
 				DestFile.WriteString(OutString);
 
-				for (int i=0; i<pCurFoil->n; i++){
+				for (int i=0; i<pCurFoil->n; i++)
+				{
 					OutString.Format("%8.4f, %8.4f\n", pCurFoil->x[i]*100.0, pCurFoil->y[i]*100.0); 
 					DestFile.WriteString(OutString);
 				}
@@ -2024,44 +2142,22 @@ void CAFoil::PFSave()
 {
 	CStdioFile XFile;
 	CFileException fe;
-	CString SFLName;
+	CString SFLName, FileName;
 	
-	bool bNotFound= true;
-	bool bWrite = false;
 	// deselect points so as not to interfere with other mouse commands
 	m_pPF->m_Intrados.m_iSelect = -10;
 	m_pPF->m_Extrados.m_iSelect = -10;
 
-	while(bNotFound){// until we find a file to export to
-		CFileDialog XFileDlg(false, "cfl", NULL, NULL,
-			_T("Curve file (.cfl)|*.cfl|"));
-		if(IDOK==XFileDlg.DoModal()){
-			SFLName = XFileDlg.GetPathName();
+	static TCHAR BASED_CODE szFilter[] = _T("Curve File (*.cfl)|*.cfl|");
+	CFileDialog XFileDlg(false, "cfl", NULL, OFN_OVERWRITEPROMPT, szFilter);
 
-			CFileFind FileFinder; 
-			if(!FileFinder.FindFile(SFLName)) {// file does not exist : OK to create and export
-				bWrite = true;
-				bNotFound = false;
-			}
-			else{
-				if(IDYES==AfxMessageBox("Overwrite existing file ?", MB_YESNO)){
-					bWrite = true;// file exists, but OK to overwrite and export
-					bNotFound = false;
-				}
-				else bWrite = false;// file exists, but user does not wan't to overwrite
-			}
-		}
-		else{//user changed his/her mind
-			bWrite = false; //do not write...
-			bNotFound = false; // ...and exit
-		}
-	}
-	if(bWrite){// we're set to save spline control points
-		BOOL bOpen = XFile.Open(SFLName, CFile::modeCreate | CFile::modeWrite, &fe);
-		if (bOpen){
-			m_pPF->SaveFile(&XFile);
-			XFile.Close();
-		}
+	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
+
+	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+	if (bOpen)
+	{
+		m_pPF->SaveFile(&XFile);
+		XFile.Close();
 	}
 }
 
@@ -2069,44 +2165,21 @@ void CAFoil::SFSave()
 {
 	CStdioFile XFile;
 	CFileException fe;
-	CString SFLName;
-	
-	bool bNotFound= true;
-	bool bWrite = false;
+	CString SFLName, FileName;
 	// deselect points so as not to interfere with other mouse commands
 	m_pSF->m_Intrados.m_iSelect = -10;
 	m_pSF->m_Extrados.m_iSelect = -10;
 
-	while(bNotFound){// until we find a file to export to
-		CFileDialog XFileDlg(false, "sfl", NULL, NULL,
-			_T("Spline file (.sfl)|*.sfl|"));
-		if(IDOK==XFileDlg.DoModal()){
-			SFLName = XFileDlg.GetPathName();
+	static TCHAR BASED_CODE szFilter[] = _T("Spline File (*.sfl)|*.sfl|");
+	CFileDialog XFileDlg(false, "sfl", NULL, OFN_OVERWRITEPROMPT, szFilter);
 
-			CFileFind FileFinder; 
-			if(!FileFinder.FindFile(SFLName)) {// file does not exist : OK to create and export
-				bWrite = true;
-				bNotFound = false;
-			}
-			else{
-				if(IDYES==AfxMessageBox("Overwrite existing file ?", MB_YESNO)){
-					bWrite = true;// file exists, but OK to overwrite and export
-					bNotFound = false;
-				}
-				else bWrite = false;// file exists, but user does not wan't to overwrite
-			}
-		}
-		else{//user changed his/her mind
-			bWrite = false; //do not write...
-			bNotFound = false; // ...and exit
-		}
-	}
-	if(bWrite){// we're set to save spline control points
-		BOOL bOpen = XFile.Open(SFLName, CFile::modeCreate | CFile::modeWrite, &fe);
-		if (bOpen){		
-			m_pSF->SaveFile(&XFile);
-			XFile.Close();
-		}
+	if(IDOK==XFileDlg.DoModal()) FileName = XFileDlg.GetPathName();
+
+	BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+	if (bOpen)
+	{
+		m_pSF->SaveFile(&XFile);
+		XFile.Close();
 	}
 }
 
@@ -2801,20 +2874,9 @@ void CAFoil::OnShowAllFoils()
 
 void CAFoil::SetFoils(CFoil *pCurFoil)
 {
-// import all the buffer foils
-	CFoil *pFoil;
 	m_pACtrl->FillFoilList();
-
-	if(pCurFoil){
-		m_pACtrl->SelectFoil(pCurFoil);
-	}
-	else if(m_poaFoil->GetSize()) {
-		pFoil = (CFoil*)m_poaFoil->GetAt(0);
-		m_pACtrl->SelectFoil(pFoil);
-	}
+	m_pACtrl->SelectFoil(pCurFoil);
 }
-
-
 
 
 void CAFoil::OnHideFoil() 
@@ -2830,8 +2892,10 @@ void CAFoil::OnDeleteFoil()
 {	
 	CFoil *pRefFoil = m_pACtrl->GetFoil();
 	if(!pRefFoil) return;
-	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-	if(pFrame->DeleteFoil(pRefFoil)){
+
+	CMainFrame* pMainFrame = (CMainFrame*)m_pFrame;
+	if(pMainFrame->DeleteFoil(pRefFoil))
+	{
 		m_pACtrl->m_pRefFoil = NULL;
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil();
@@ -3426,90 +3490,6 @@ void CAFoil::OnNacaFoils()
 	UpdateView();
 }
 
-/*
-
-void CAFoil::OnSetFlap() 
-{
-	CFoil *pCurFoil = m_pACtrl->GetFoil();
-	if(!pCurFoil) return;
-
-	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-	UpdateView();	
-
-	CFoil *pNewFoil = new CFoil();
-	pNewFoil->CopyFoil(pCurFoil);
-	pNewFoil->SetTEFlap(true, 80.0, 50.0, 80.0);
-
-	pNewFoil->m_FoilColor  = pFrame->GetColor(0);
-	pNewFoil->m_nFoilStyle = PS_SOLID;
-	pNewFoil->m_nFoilWidth = 1;
-	if(pFrame->SetModFoil(pNewFoil)){
-		m_pACtrl->m_pRefFoil = NULL;
-		m_pACtrl->FillFoilList();
-		m_pACtrl->SetFoil(pNewFoil);
-	}
-	else {
-		pNewFoil = NULL;
-		m_pACtrl->FillFoilList();
-		m_pACtrl->SelectFoil();
-	}
-	m_pBufferFoil->m_bVisible = false;
-	UpdateView();
-	
-}*/
-/*
-void CAFoil::OnSetFlap() 
-{
-	CFoil *pCurFoil = m_pACtrl->GetFoil();
-	if(!pCurFoil) return;
-
-	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-
-	m_pBufferFoil->CopyFoil(pCurFoil);
-	m_pBufferFoil->m_bPoints  = false;
-	m_pBufferFoil->m_bVisible = true;
-	m_pBufferFoil->m_FoilName = pCurFoil->m_FoilName;
-	m_pBufferFoil->m_FoilColor  = RGB(160,160,160);
-	m_pBufferFoil->m_nFoilStyle = PS_DASH;
-	m_pBufferFoil->m_nFoilWidth = 1;
-
-	UpdateView();	
-
-	CFlapDlg dlg(this);
-	dlg.m_pXFoil      = m_pXFoil;
-	dlg.m_pMemFoil    = pCurFoil;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.m_pChildView  = m_pChildWnd;
-		
-	if(IDOK == dlg.DoModal()){
-		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
-		pNewFoil->CopyFoil(m_pBufferFoil);
-		pNewFoil->m_FoilColor  = pFrame->GetColor(0)];
-		pNewFoil->m_nFoilStyle = PS_SOLID;
-		pNewFoil->m_nFoilWidth = 1;
-		if(pFrame->SetModFoil(pNewFoil)){
-			m_pACtrl->m_pRefFoil = NULL;
-			m_pACtrl->FillFoilList();
-			m_pACtrl->SetFoil(pNewFoil);
-		}
-		else {
-			pNewFoil = NULL;
-			m_pACtrl->FillFoilList();
-			m_pACtrl->SelectFoil();
-		}
-	}
-
-	else{
-		m_pACtrl->FillFoilList();
-		m_pACtrl->SelectFoil(pCurFoil);
-		m_pXFoil->m_FoilName ="";
-
-	}
-	m_pBufferFoil->m_bVisible = false;
-	UpdateView();
-	
-}*/
 
 
 void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
@@ -3527,16 +3507,17 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 
 	memcpy(&TempFont, &pChildView->m_WndLogFont, sizeof(LOGFONT));
 
-	if(bIsPrinting){
+	if(bIsPrinting)
+	{
 		TempFont.lfHeight = TempFont.lfHeight*30;
 		LegendSize = 1500;
 		ypos = -330;
 	}
-	else {
+	else 
+	{
 		LegendSize = 20;
 		ypos = 15;
 	}
-
 
 	CFont ThisFont;
 	ThisFont.CreateFontIndirect(&TempFont);
@@ -3549,8 +3530,10 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 	else pDC->SetTextColor(pChildView->m_WndTextColor);
 
 	k=0;
-	if(m_bSF){
-		if(m_pSF->m_bVisible){
+	if(m_bSF)
+	{
+		if(m_pSF->m_bVisible)
+		{
 			color = m_pSF->m_FoilColor;
 			style = m_pSF->m_FoilStyle;
 			width = m_pSF->m_FoilWidth;
@@ -3564,19 +3547,19 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 			pDC->MoveTo(Place.x, Place.y + ypos*k);
 			pDC->LineTo(Place.x + (int)(LegendSize),
 						Place.y + ypos*k);
-			if(m_pSF->m_bOutPoints && !bIsPrinting){
+			if(m_pSF->m_bOutPoints && !bIsPrinting)
+			{
 				x1 = Place.x + (int)(0.5*LegendSize);
-				pDC->Rectangle(x1-2, Place.y + ypos*k-2,
-								x1+2, Place.y + ypos*k+2);
+				pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
 			}
-			pDC->TextOut(Place.x + (int)(1.5*LegendSize),
-							Place.y  + ypos*k-(int)(ypos/2),
-							m_pSF->m_strFoilName);
+			pDC->TextOut(Place.x + (int)(1.5*LegendSize),Place.y  + ypos*k-(int)(ypos/2),m_pSF->m_strFoilName);
 			pDC->SelectObject(pOldPen);
 		}
 	}
-	else{
-		if(m_pPF->m_bVisible){
+	else
+	{
+		if(m_pPF->m_bVisible)
+		{
 			color = m_pPF->m_FoilColor;
 			style = m_pPF->m_FoilStyle;
 			width = m_pPF->m_FoilWidth;
@@ -3588,53 +3571,48 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 			CPen *pOldPen = pDC->SelectObject(&LegendPen);
 
 			pDC->MoveTo(Place.x, Place.y + ypos*k);
-			pDC->LineTo(Place.x + (int)(LegendSize),
-						Place.y + ypos*k);
-			if(m_pPF->m_bOutPoints && !bIsPrinting){
+			pDC->LineTo(Place.x + (int)(LegendSize), Place.y + ypos*k);
+			if(m_pPF->m_bOutPoints && !bIsPrinting)
+			{
 				x1 = Place.x + (int)(0.5*LegendSize);
-				pDC->Rectangle(x1-2, Place.y + ypos*k-2,
-								x1+2, Place.y + ypos*k+2);
+				pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
 			}
-			pDC->TextOut(Place.x + (int)(1.5*LegendSize),
-							Place.y  + ypos*k-(int)(ypos/2),
-							m_pPF->m_strFoilName);
+			pDC->TextOut(Place.x + (int)(1.5*LegendSize), Place.y  + ypos*k-(int)(ypos/2), m_pPF->m_strFoilName);
 			pDC->SelectObject(pOldPen);
 		}
 	}
 	CFoil* pRefFoil;
 
 	k++;
-	for (n=0; n < m_poaFoil->GetSize(); n++){
+	for (n=0; n < m_poaFoil->GetSize(); n++)
+	{
 		pRefFoil = (CFoil*)m_poaFoil->GetAt(n);
-		if(pRefFoil->m_bVisible){
+		if(pRefFoil->m_bVisible)
+		{
 			CString strong;
 			strong = pRefFoil->m_FoilName;
-			if(strong.GetLength()){//is there anything to draw ?
-
+			if(strong.GetLength())
+			{
 				color = pRefFoil->m_FoilColor;
 				style = pRefFoil->m_nFoilStyle;
 				width = pRefFoil->m_nFoilWidth;
 				if(IsBlackAndWhite()) GetBWColor(color, style, width);
 				lb.lbColor = color;
 
-				CPen LegendPen(PS_GEOMETRIC | style, 
-							   GetPenWidth(width,bIsPrinting), &lb);
+				CPen LegendPen(PS_GEOMETRIC | style, GetPenWidth(width,bIsPrinting), &lb);
 
 
 				CPen *pOldPen = pDC->SelectObject(&LegendPen);
 
 				pDC->MoveTo(Place.x, Place.y + ypos*k);
-				pDC->LineTo(Place.x + (int)(LegendSize),
-							Place.y + ypos*k);
+				pDC->LineTo(Place.x + (int)(LegendSize), Place.y + ypos*k);
 
-				if(pRefFoil->m_bPoints && !bIsPrinting){
+				if(pRefFoil->m_bPoints && !bIsPrinting)
+				{
 					x1 = Place.x + (int)(0.5*LegendSize);
-					pDC->Rectangle(x1-2, Place.y + ypos*k-2,
-								   x1+2, Place.y + ypos*k+2);
+					pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
 				}
-				pDC->TextOut(Place.x + (int)(1.5*LegendSize),
-							 Place.y  + ypos*k-(int)(ypos/2),
-							 pRefFoil->m_FoilName);
+				pDC->TextOut(Place.x + (int)(1.5*LegendSize), Place.y  + ypos*k-(int)(ypos/2), pRefFoil->m_FoilName);
 				pDC->SelectObject(pOldPen);
 				k++;
 			}
@@ -3675,7 +3653,8 @@ void CAFoil::OnSplineControls()
 	dlg.m_pPF = m_pPF;
 	dlg.m_bSF = m_bSF;
 
-	if(dlg.DoModal() == IDOK){
+	if(dlg.DoModal() == IDOK)
+	{
 	}
 }
 
@@ -3770,6 +3749,57 @@ void CAFoil::OnSplinedpoints()
 }
 
 
+
+void CAFoil::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
+{
+	//Refresh the active view
+
+	HRESULT hResult;
+	CDC *pDC;
+	CChildView * pChildView = (CChildView*)m_pChildWnd;
+	
+	pDC = pChildView->GetDC();
+	if(!pDC) return;
+
+	
+	CDC memdc; 
+	memdc.CreateCompatibleDC(pDC);
+
+	CBitmap  bmp;
+	bmp.CreateCompatibleBitmap(pDC, m_rCltRect.Width(), m_rCltRect.Height());
+	CBitmap * pOldBmp = memdc.SelectObject(&bmp);
+
+	memdc.FillSolidRect(&m_rCltRect,pChildView->m_crBackColor);
+	memdc.SetBkMode(TRANSPARENT);
+
+	PaintGrids(&memdc);
+	PaintSplines(&memdc);
+	PaintFoils(&memdc);
+	PaintLegend(&memdc);
+
+	memdc.SelectObject(pOldBmp);
+	memdc.DeleteDC();
+
+	HBITMAP hBmp = (HBITMAP)bmp;
+	pImage->Attach(hBmp);
+
+	if(FileType==1)      hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatBMP);
+	else if(FileType==2) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatJPEG);
+	else if(FileType==3) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatGIF);
+	else if(FileType==4) hResult = pImage->Save(_T(FileName), Gdiplus::ImageFormatPNG);
+
+	if (FAILED(hResult)) 
+	{
+		CString fmt;
+		fmt.Format("Save image failed:\n%x ", hResult);
+		AfxMessageBox(fmt);
+		return;
+	}
+
+	bmp.DeleteObject();
+	
+	pChildView->ReleaseDC(pDC);
+}
 
 
 

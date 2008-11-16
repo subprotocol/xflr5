@@ -215,19 +215,22 @@ bool OpPoint::SerializeOpp(CArchive &ar, int ArchiveFormat)
 
 
 
-void OpPoint::Export(CString FileName, CString Version)
+void OpPoint::Export(CString FileName, CString Version, int FileType)
 {
 	CStdioFile XFile;
 	CFileException fe;
-
-	try{
+	int k;
+	try
+	{
 		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);//erase and write
 
-		if(!bOpen){
+		if(!bOpen)
+		{
 			fe.m_strFileName = FileName;
 			throw &fe;
 		}
-		else{
+		else
+		{
 			CString strOut;
 			CString strong;
 			XFile.WriteString(Version);
@@ -236,16 +239,17 @@ void OpPoint::Export(CString FileName, CString Version)
 			XFile.WriteString(strong);
 			strong = m_strPlrName + "\n";
 			XFile.WriteString(strong);
-			strong.Format("Alpha = %5.1f,  Re = %5.1f,  Ma= %6.4f,  ACrit=%4.1f \n\n", Alpha, Reynolds, Mach, ACrit);
+			if(FileType==1) strong.Format("Alpha = %5.1f,  Re = %5.1f,  Ma = %6.4f,  ACrit =%4.1f \n\n", Alpha, Reynolds, Mach, ACrit);
+			else            strong.Format("Alpha =, %5.1f,  Re =, %5.1f,  Ma =, %6.4f,  ACrit =, %4.1f \n\n", Alpha, Reynolds, Mach, ACrit);
 			XFile.WriteString(strong);
 
-			strong.Format("   x        Cpi      Cpv        Qi        Qv\n");
-			XFile.WriteString(strong);
+			if(FileType==1) XFile.WriteString("   x        Cpi      Cpv        Qi        Qv\n");
+			else            XFile.WriteString("x,Cpi,Cpv,Qi,Qv\n");
 
-			for (int k=0; k<n; k++){
-				strong.Format("%7.4f  %7.3f   %7.3f   %7.3f   %7.3f\n",
-					x[k], Cpi[k], Cpv[k], Qi[k], Qv[k]);
-				
+			for (k=0; k<n; k++)
+			{
+				if(FileType==1) strong.Format("%7.4f  %7.3f   %7.3f   %7.3f   %7.3f\n",	x[k], Cpi[k], Cpv[k], Qi[k], Qv[k]);
+				else            strong.Format("%7.4f,%7.3f,%7.3f,%7.3f,%7.3f\n",	x[k], Cpi[k], Cpv[k], Qi[k], Qv[k]);
 				XFile.WriteString(strong);
 			}
 
@@ -253,7 +257,8 @@ void OpPoint::Export(CString FileName, CString Version)
 			XFile.Close();
 		}
 	}
-	catch (CFileException *ex){
+	catch (CFileException *ex)
+	{
 		TCHAR   szCause[255];
 		CString str;
 		ex->GetErrorMessage(szCause, 255);
