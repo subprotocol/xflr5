@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "X-FLR5.h"
+#include "../X-FLR5.h"
 #include "ViewBitmap.h"
 
 

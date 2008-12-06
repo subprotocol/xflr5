@@ -187,6 +187,7 @@ protected:
 	afx_msg void OnQMod();
 	afx_msg void OnShowPoints();
 	afx_msg void OnExportFoil();
+	afx_msg void OnExportGraphToFile();
 	afx_msg void OnQVisc();
 	afx_msg void OnColorStyles();
 	afx_msg void OnAddPoint();

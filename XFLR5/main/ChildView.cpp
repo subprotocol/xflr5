@@ -299,7 +299,7 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 }
 
 
-LRESULT CChildView::OnNcHitTest(CPoint point) 
+UINT CChildView::OnNcHitTest(CPoint point) 
 {
 	CPoint ptClient(point);
 

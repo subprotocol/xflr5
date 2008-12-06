@@ -82,7 +82,8 @@ private:
 //
 //////////////////////////////////////////////////////////////////////
 
-class Graph {
+class Graph 
+{
 public: 
 
 	bool GetAutoX();
@@ -158,6 +159,7 @@ public:
 	COLORREF GetTitleColor();
 	COLORREF GetLabelColor();
 	COLORREF GetLegendColor();
+
 	int GetMargin();
 	int GetBorderWidth();
 	int GetBorderStyle();
@@ -181,6 +183,9 @@ public:
 	void GetYMajGrid(bool *pstate, COLORREF *pclr, int *pstyle, int *pwidth);
 	void GetXMinGrid(bool *pstate, bool *pbAuto, COLORREF *pclr, int *pstyle, int *pwidth, double *punit);
 	void GetYMinGrid(bool *pstate, bool *pbAuto, COLORREF *pclr, int *pstyle, int *pwidth, double *punit);
+	void GetXTitle(CString &str);
+	void GetYTitle(CString &str);
+
 	void GetTitleLogFont(LOGFONT *plgft);
 	void GetLabelLogFont(LOGFONT *plgft);
 	void GetLegendLogFont(LOGFONT *plgft);
@@ -191,6 +196,10 @@ public:
 
 	void DrawGraph(CDC *pDC, CRect* pDRect, bool bIsPrinting);
 	void DrawLegend(CDC* pDC, bool bIsPrinting, CPoint &Place);
+
+	void SetGraphName(CString GraphName);
+	void GetGraphName(CString &GraphName);
+	void ExportToFile(CStdioFile &XFile, int FileType);
 
 	CCurve* GetCurve(int nIndex);
 	CCurve* AddCurve();
@@ -215,6 +224,8 @@ private:
 	void DrawXTicks(CDC *pDC);
 	void DrawYTicks(CDC *pDC);
 	void DrawTitles(CDC* pDC);
+
+	CString m_GraphName;
 
 	int m_Type;
 	int m_LogPixelsY;

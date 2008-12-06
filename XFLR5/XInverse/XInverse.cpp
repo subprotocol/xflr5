@@ -137,11 +137,9 @@ BEGIN_MESSAGE_MAP(CXInverse, CWnd)
 	ON_COMMAND(IDM_EXPORTREFFOIL, OnExportFoil)
 	ON_COMMAND(IDC_STOREFOIL, OnStoreFoil)
 	ON_COMMAND(IDT_LOAD, OnLoadFoil)
-//	ON_COMMAND(IDM_RESETREFCURVES, OnResetRefCurves)
-//	ON_COMMAND(IDM_SHOWREFCURVES, OnShowRefCurves)
-//	ON_COMMAND(IDM_STOREREFCURVE, OnStoreRefCurve)
-	//}}AFX_MSG_MAP
 	ON_COMMAND(IDM_SHOWREFLECTED, OnShowReflected)
+	ON_COMMAND(IDM_EXPORTGRAPHTOFILE, OnExportGraphToFile)
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -718,6 +716,7 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 					m_Spline.m_Input[n].x = xpt;
 					m_Spline.m_Input[n].y = ypt;
 				}
+				m_bSplined = false;
 				m_Spline.SplineCurve();
 			}
 			else if(n == m_Spline.m_iCtrlPoints-1)
@@ -742,6 +741,7 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 					m_Spline.m_Input[n].y = ypt;
 				}
 				m_Spline.SplineCurve();
+				m_bSplined = false;
 			}
 			else if (n==1 && m_bTangentSpline)
 			{
@@ -791,6 +791,7 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 				m_Spline.m_Input[n].x = m_Spline.m_Input[0].x + scal * ux ;
 				m_Spline.m_Input[n].y = m_Spline.m_Input[0].y + scal * uy ;
 				m_Spline.SplineCurve();
+				m_bSplined = false;
 			}
 			else if (n==m_Spline.m_iCtrlPoints-2 && m_bTangentSpline)
 			{
@@ -838,6 +839,7 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 				m_Spline.m_Input[n].x = m_Spline.m_Input[n+1].x + scal * ux;
 				m_Spline.m_Input[n].y = m_Spline.m_Input[n+1].y + scal * uy;
 				m_Spline.SplineCurve();
+				m_bSplined = false;
 			}	
 			else if (n>0 && n<m_Spline.m_iCtrlPoints-1)
 			{
@@ -847,6 +849,7 @@ void CXInverse::OnMouseMove(UINT nFlags, CPoint point)
 				m_Spline.m_Input[n].x = x1;
 				m_Spline.m_Input[n].y = y1;
 				m_Spline.SplineCurve();
+				m_bSplined = false;
 			}
 		}
 	}
@@ -2596,3 +2599,37 @@ void CXInverse::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
 	
 	pChildView->ReleaseDC(pDC);
 }
+
+
+void CXInverse::OnExportGraphToFile()
+{
+
+	CString FileName, str;
+	CStdioFile XFile;
+
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+
+	CFileException fe;
+	CString strong;
+
+	m_QGraph.GetYTitle(FileName);
+	FileName.Replace("/", " ");
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pFrame->m_TextFileFormat;
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
+		pFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
+
+		FileName = XFileDlg.GetPathName();
+		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+
+		if(bOpen)
+		{
+			m_QGraph.ExportToFile(XFile, XFileDlg.m_ofn.nFilterIndex);
+		}
+	}
+}
+

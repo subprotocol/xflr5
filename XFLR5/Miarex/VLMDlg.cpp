@@ -159,6 +159,9 @@ BOOL CVLMDlg::OnInitDialog()
 	m_bCancel   = false;
 	m_bWarning  = false;
 
+	m_bWakeRollUp    = false;
+
+
 	m_ctrlOutput.SetLimitText(100000);
 
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
@@ -367,23 +370,29 @@ bool CVLMDlg::Gauss(double *A, int n, double *B, int m)
 		pA = pa + n;
 		pivot_row = row;
 		for (i=row+1; i < n; pA+=n, i++)
-			if ((dum = abs(*(pA+row))) > max) { 
+		{
+			if ((dum = abs(*(pA+row))) > max) 
+			{ 
 				max = dum; 
 				A_pivot_row = pA; 
 				pivot_row = i; 
 			}
+		}
 		if (max <= 0.0) 
 			return false;                // the matrix A is singular
 		
 			// and if it differs from the current row, interchange the two rows.
 			
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
+		if (pivot_row != row) 
+		{
+			for (i = row; i < n; i++) 
+			{
 				dum = *(pa + i);
 				*(pa + i) = *(A_pivot_row + i);
 				*(A_pivot_row + i) = dum;
 			}
-			for(k=0; k<=m; k++){
+			for(k=0; k<=m; k++)
+			{
 				dum = B[row+k*n];
 				B[row+k*n] = B[pivot_row+k*n];
 				B[pivot_row+k*n] = dum;
@@ -391,7 +400,8 @@ bool CVLMDlg::Gauss(double *A, int n, double *B, int m)
 		}
 		
 		// Perform forward substitution
-		for (i = row+1; i<n; i++) {
+		for (i = row+1; i<n; i++) 
+		{
 			pA = A + i * n;
 			dum = - *(pA + row) / *(pa + row);
 			*(pA + row) = 0.0;
@@ -404,13 +414,15 @@ bool CVLMDlg::Gauss(double *A, int n, double *B, int m)
 	// Perform backward substitution
 	
 	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
+	for (row = n - 1; row >= 0; pa -= n, row--) 
+	{
 		if ( *(pa + row) == 0.0 ) 
 			return false;           // matrix is singular
 		dum = 1.0 / *(pa + row);
 		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
 		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
+		for ( i = 0, pA = A; i < row; pA += n, i++) 
+		{
 			dum = *(pA + row);
 			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
 			for(k=0; k<=m; k++) 
@@ -920,8 +932,6 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				AddString(str);
 			}
 
-//			VLMSetAi(m_Gamma+q*m_MatSize);
-
 			AddString("        Calculating aerodynamic coefficients...\r\n");
 			m_bPointOut          = false;
 			m_pWing->m_Alpha     = Alpha;
@@ -1090,7 +1100,8 @@ CVector CVLMDlg::GetSpeedVector(CVector C, double *Gamma)
 	}
 
 	return VTot;
-}
+} 
+
 
 void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll)
 {
@@ -1249,7 +1260,8 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V
 //				//TODO : check influence on results
 //				VLMCmn(m_pWakePanel[pw].A, m_pWakePanel[pw].B,C,VT,bAll);
 //				V += VT;
-//				if(m_pWPolar->m_bGround) {
+//				if(m_pWPolar->m_bGround) 
+//				{
 //					VLMCmn(AAG, BBG, C, VG);
 //					V.x += VG.x;
 //					V.y += VG.y;
@@ -1257,7 +1269,6 @@ void CVLMDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V
 //				}
 				//simple really !
 			}
-			//so says Katz and Plotkin !
 		}
 	}
 }
@@ -1964,6 +1975,8 @@ void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CV
 	//
 	// Vectorial operations are written explicitly to save computing times (4x more efficient)
 	//
+	double CoreSize = 0.00000;
+	if(abs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	int i;
 
@@ -2013,7 +2026,7 @@ void CVLMDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CV
 		t.y = -r1.x*r0.z + r1.z*r0.x;
 		t.z =  r1.x*r0.y - r1.y*r0.x;
 
-		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > *m_pCoreSize * *m_pCoreSize)
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > CoreSize * CoreSize)
 		{
 			Psi.x /= ftmp;
 			Psi.y /= ftmp;
@@ -2046,6 +2059,8 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 	//
 	// Vectorial operations are written inline to save computing times
 	// -->longer code, but 4x more efficient....
+	double CoreSize = 0.000000;
+	if(abs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	if(!m_pWing) return;
 
@@ -2076,7 +2091,7 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 		t.y = -r1.x*r0.z + r1.z*r0.x;
 		t.z =  r1.x*r0.y - r1.y*r0.x;
 
-		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > *m_pCoreSize * *m_pCoreSize)
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) >CoreSize * CoreSize)
 		{
 			Psi.x /= ftmp;
 			Psi.y /= ftmp;
@@ -2127,7 +2142,7 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 	//Next add 'left' semi-infinite contribution
 	//eq.6-56
 
-	if ((h.x*h.x+h.y*h.y+h.z*h.z) > *m_pCoreSize * *m_pCoreSize)
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
 	{
 		Psi.x /= ftmp;
 		Psi.y /= ftmp;
@@ -2170,7 +2185,7 @@ void CVLMDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVect
 	h.y = -r2.x*t.z + r2.z*t.x;
 	h.z =  r2.x*t.y - r2.y*t.x;
 
-	if ((h.x*h.x+h.y*h.y+h.z*h.z) > *m_pCoreSize * *m_pCoreSize)
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
 	{
 		Psi.x /= ftmp;
 		Psi.y /= ftmp;

@@ -410,6 +410,7 @@ void CWingDlg::OnContextMenu(CWnd* pWnd, CPoint point)
 	{
 		int res = IsFoil(pt);
 
+		m_ctrlPanelList.CloseEdit(); 
 		if(res>=0)
 		{
 			m_iSection = res;
@@ -452,7 +453,8 @@ void CWingDlg::OnMouseMove(UINT nFlags, CPoint point)
 
 	SHORT shZ  = GetKeyState(90);
 
-	if(m_bTrans){
+	if(m_bTrans)
+	{
 		// we translate the wing
 		m_ptOffset.x += point.x - m_PointDown.x;
 		m_ptOffset.y += point.y - m_PointDown.y;
@@ -460,7 +462,8 @@ void CWingDlg::OnMouseMove(UINT nFlags, CPoint point)
 		m_PointDown = point;
 		InvalidateRect(&m_DrawRect);
 	}
-	else if ((nFlags & MK_MBUTTON) ||(shZ & 0x8000)) {
+	else if ((nFlags & MK_MBUTTON) ||(shZ & 0x8000)) 
+	{
 		// we zoom the graph or the wing	
 		if(point.y-m_PointDown.y>0) 
 			m_fWingScale *=1.06;

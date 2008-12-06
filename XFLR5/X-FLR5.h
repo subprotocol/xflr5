@@ -86,6 +86,8 @@ bool GetPrintColor();
 bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
 bool GaussSeidel (double *a, int MatSize, double *b, double *xk, double eps, int IterMax);
 bool Gauss(double *A, int n, double *B, int m);
+double IntegralC2(double y1, double y2, double c1, double c2);
+double IntegralCy(double y1, double y2, double c1, double c2);
 
 // CXFLR5App:
 // See X-FLR6.cpp for the implementation of this class
@@ -152,7 +154,7 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg LRESULT OnNcHitTest(CPoint point);
+	afx_msg UINT OnNcHitTest(CPoint point);
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	//}}AFX_MSG

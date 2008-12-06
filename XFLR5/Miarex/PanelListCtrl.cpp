@@ -218,9 +218,7 @@ CEdit* CPanelListCtrl::EditSubLabel(int nItem, int nCol)
 
 void CPanelListCtrl::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
-	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
-	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+	CloseEdit();
 	CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -230,9 +228,7 @@ void CPanelListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 
 //	CListCtrl::OnLButtonDown(nFlags, point);
 
-	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
-	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
-	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+	CloseEdit();
 
 	if((index = HitTestEx(point, &column)) != -1)
 	{
@@ -254,9 +250,7 @@ void CPanelListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 
 	int column;
 
-	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
-	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
-	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+	CloseEdit();
 
 	if((index = HitTestEx(point, &column)) != -1)
 	{
@@ -421,6 +415,13 @@ CComboBox* CPanelListCtrl::ShowInPlaceList(int nItem, int nCol)
 }
 
 
+void CPanelListCtrl::CloseEdit()
+{
+	if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
+	if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
+	if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+}
+
 void CPanelListCtrl::OnEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LV_DISPINFO *plvDispInfo = (LV_DISPINFO *)pNMHDR;
@@ -445,9 +446,7 @@ BOOL CPanelListCtrl::PreTranslateMessage(MSG* pMsg)
 	{
 		if(pMsg->wParam == VK_TAB)
 		{
-			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
-			if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
-			if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+			CloseEdit();
 
 			POSITION pos = GetFirstSelectedItemPosition();
 			int iItem = GetNextSelectedItem(pos);
@@ -468,9 +467,7 @@ BOOL CPanelListCtrl::PreTranslateMessage(MSG* pMsg)
 		}
 		if(pMsg->wParam == VK_F2)
 		{
-			if(m_IPFloatEdit.GetSafeHwnd())	m_IPFloatEdit.SendMessage(WM_CLOSE);
-			if(m_IPNumEdit.GetSafeHwnd())	m_IPNumEdit.SendMessage(WM_CLOSE);
-			if(m_IPList.GetSafeHwnd())	 	m_IPList.SendMessage(WM_CLOSE);
+			CloseEdit();
 			EnsureVisible(m_iItem, true);
 
 			POSITION pos = GetFirstSelectedItemPosition();

@@ -119,6 +119,9 @@ private:
 	double *m_ReList;
 	double *m_MachList;
 	double *m_NCritList;
+
+	double pi;
+
 	int m_NRe;
 
 	CStdioFile m_XFile;

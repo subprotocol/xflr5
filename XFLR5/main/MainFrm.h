@@ -41,45 +41,43 @@ class CMainFrame : public CFrameWnd
 {
 	friend class CXBody;
 	friend class CXFLR5App;
-	friend class CLLTDlg;
-	friend class CBodyScaleDlg;
-	friend class CBodyTransDlg;
 	friend class CBatchDlg;
-	friend class CBody;
 	friend class CPolar;
-	friend class CViscDlg;
 	friend class CXDirect;
 	friend class CMiarex;
 	friend class CAFoil;
 	friend class CXInverse;
 	friend class CChildView;
+	friend class CViscDlg;
 	friend class CListPlrDlg;
 	friend class CCurveDlgBar;
 	friend class CSelectFoilDlg;
-	friend class CWPolar;
-	friend class CWing;
-	friend class CWingDlg;
-	friend class CPlane;
-	friend class CPlaneDlg;
-	friend class CWOperDlgBar;
-	friend class CPOperDlgBar;
-	friend class CW3DBar;
-	friend class CCtrlAnalysisDlg;
-	friend class CWingScaleDlg;
 	friend class CScaleOppBar;
 	friend class CSpanPosBar;
-	friend class CVLMDlg;
-	friend class C3DPanelDlg;
 	friend class CFlowLinesDlg;
-	friend class CWAdvDlg;
 	friend class CBatchThread;
 	friend class CUFOListDlg;
 	friend class CAFoilCtrlBar;
-	friend class CBodyCtrlBar;
-	friend class CWngAnalysis;
-	friend class CCtrlAnalysis;
+	friend class CWAdvDlg;
+	friend class CWing;
+	friend class CW3DBar;
+	friend class CWingDlg;
+	friend class CWingScaleDlg;
+	friend class CWOperDlgBar;
+	friend class CWPolarAnalysis;
+	friend class CWPolar;
+	friend class CPlane;
+	friend class CPlaneDlg;
+	friend class CBody;
+	friend class CBodyScaleDlg;
+	friend class CBodyTransDlg;
 	friend class CBodyGridDlg;
 	friend class CBodyNURBSDlg;
+	friend class CBodyCtrlBar;
+	friend class CLLTDlg;
+	friend class CVLMDlg;
+	friend class C3DPanelDlg;
+	friend class CCtrlAnalysisDlg;
 	friend class CControlAnalysis;
 
 public:
@@ -146,7 +144,7 @@ private:
 	bool m_bSaved; //true if the project hasn't been modified since the last save
 	bool m_bSaveOpps, m_bSaveWOpps; // true if Opps and WOpps should we saved in the .wpa project file
 	int m_iApp;	// the currently active application, may be XFOILANALYSIS, DIRECTDESIGN, INVERSEDESIGN, or MIAREX
-
+	int m_TextFileFormat; //1=.txt  2=.csv
 
 	//printing parameters
 	double m_LeftMargin, m_RightMargin, m_TopMargin, m_BottomMargin;
@@ -217,7 +215,6 @@ private:
 	void SetProjectName(CString PathName);
 	void ShowOperBar(bool bShow);
 	void WritePolars(CArchive &ar, CFoil *pFoil=NULL);
-	void ExportWPlr(CWPolar * pWPolar);
 	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
 	void DeleteBody(CBody *pThisBody);
 

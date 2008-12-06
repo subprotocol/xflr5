@@ -271,7 +271,7 @@ void CPlaneDlg::OnOK()
 	if(m_pPlane->m_bStab){
 		for (j=0; j<m_pPlane->m_Stab.m_NPanel; j++)
 		{
-			if(fabs(m_pPlane->m_Stab.m_TPos[j]-m_pPlane->m_Stab.m_TPos[j+1]) > pMiarex->m_MinPanelSize) nSurfaces+=2;
+			if(abs(m_pPlane->m_Stab.m_TPos[j]-m_pPlane->m_Stab.m_TPos[j+1]) > pMiarex->m_MinPanelSize) nSurfaces+=2;
 		}
 	}
 	if(m_pPlane->m_bFin)

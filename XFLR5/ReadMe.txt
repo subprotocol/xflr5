@@ -53,7 +53,19 @@ TODO :
 	Set Gauss as global
 
 
-v4.12 November xxx, 2008
+v4.13 December 6th, 2008
+	- Corrected a minor bug in Inverse design which prevented a second consecutive application of the spline
+	- Corrected a minor bug in the display of bodies imported from text files
+	- Set default coresize = 1µm minimum both in VLM and Panel methods
+	- Switched to Trefftz plane integration for lift force in 3D Panel method --> impact on results
+	- Improved the export interface to AVL for planes and wings, including control surfaces
+	- Improved the interface for 3D cross section Cp display
+	- Added an option to export any graph's curves to a .txt or .csv file
+	- Made a few cosmetic improvements
+	
+v4.12 November 16th, 2008
+	- Added options to export/read body definitions to/from simple text files; 
+	  The file format may be obtained by exporting any body
 	- Added an option to export the client area to an image file
 	- Fixed issues with file paths while saving
 	- Fixed the bug which prevented XFLR5 to launch after a selection of the thumbnail window

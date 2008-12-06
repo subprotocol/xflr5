@@ -778,7 +778,7 @@ void CGridPage::OnYMinCheck()
 
 BOOL CGridPage::OnSetActive() 
 {
-	double mx = (double)__max(fabs(m_pGraph->GetXMax()), fabs(m_pGraph->GetXMin()));
+	double mx = (double)__max(abs(m_pGraph->GetXMax()), abs(m_pGraph->GetXMin()));
 	int exp = (int)log10(mx);
 	int precision = 3-exp;
 	if(precision<0) precision = 2;
@@ -786,7 +786,7 @@ BOOL CGridPage::OnSetActive()
 	m_ctrlXMinorUnit.SetValue(m_XMinorUnit);
 
 
-	double my = (double)__max(fabs(m_pGraph->GetYMax()), fabs(m_pGraph->GetYMin()));
+	double my = (double)__max(abs(m_pGraph->GetYMax()), abs(m_pGraph->GetYMin()));
 	exp = (int)log10(my);
 	precision = 3-exp;
 	if(precision<0) precision = 2;
@@ -946,7 +946,7 @@ void CScalePage::SetValues()
 	EnableXAxisCtrls(!m_bAutoX);
 	EnableYAxisCtrls(!m_bAutoY);
 
-	double mx = (double)__max(fabs(m_pGraph->GetXMax()), fabs(m_pGraph->GetXMin()));
+	double mx = (double)__max(abs(m_pGraph->GetXMax()), abs(m_pGraph->GetXMin()));
 	int exp = (int)log10(mx);
 	int precision = 3-exp;
 	if(precision<0) precision = 0;
@@ -955,7 +955,7 @@ void CScalePage::SetValues()
 	m_ctrlXUnit.SetPrecision(precision);
 	m_ctrlX0.SetPrecision(precision);
 
-	double my = (double)__max(fabs(m_pGraph->GetYMax()), fabs(m_pGraph->GetYMin()));
+	double my = (double)__max(abs(m_pGraph->GetYMax()), abs(m_pGraph->GetYMin()));
 	exp = (int)log10(my);
 	precision = 3-exp;
 	if(precision<0) precision = 0;

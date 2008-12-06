@@ -353,7 +353,7 @@ void Graph::DrawYTicks(CDC *pDC)
 				main = yt;
 				ExpFormat(main, exp);
 
-				if(fabs(yt)<1.e-7) 
+				if(abs(yt)<1.e-7) 
 				{
 					main = 0.0;
 					exp  = 0;
@@ -1361,56 +1361,84 @@ void CCurve::GetBWStyle(COLORREF &color, int &style, int &width)
 	GetBWColor(color, style, width);
 }
 
-int CCurve::GetStyle(){
+int CCurve::GetStyle()
+{
 	return CurveStyle;
 }
-int CCurve::GetWidth(){
+
+int CCurve::GetWidth()
+{
 	return CurveWidth;
 }
-void Graph::SetXTitle(LPCTSTR str){
+
+void Graph::SetXTitle(LPCTSTR str)
+{
 	m_XTitle = str;
 }
-void Graph::SetYTitle(LPCTSTR str){
+
+void Graph::SetYTitle(LPCTSTR str)
+{
 	m_YTitle = str;
 }
 
-bool Graph::GetInverted(){
+void Graph::GetXTitle(CString &str)
+{
+	str = m_XTitle;
+}
+
+void Graph::GetYTitle(CString &str)
+{
+	str = m_YTitle;
+}
+
+bool Graph::GetInverted()
+{
 	if(m_bYInverted) return true;
 	else return false;
 }
 
-void Graph::SetInverted(bool bInverted){
+void Graph::SetInverted(bool bInverted)
+{
 	m_bYInverted = bInverted;
 }
 
-bool CCurve::IsVisible(){
+bool CCurve::IsVisible()
+{
 	return m_bIsVisible;
 }
-void CCurve::SetVisible(bool bVisible){
+
+void CCurve::SetVisible(bool bVisible)
+{
 	m_bIsVisible = bVisible;
 }
 
-void Graph::SetLogPixelsY(int n){
+void Graph::SetLogPixelsY(int n)
+{
 	m_LogPixelsY = n;
 }
 
-int Graph::GetLogPixelsY(){
+int Graph::GetLogPixelsY()
+{
 	return m_LogPixelsY;
 }
 
-void Graph::SetMargin(int m){
+void Graph::SetMargin(int m)
+{
 	m_iMargin = m;
 }
 
-int Graph::GetMargin(){
+int Graph::GetMargin()
+{
 	return m_iMargin;
 }
 
-void Graph::SetBkColor(COLORREF cr){
+void Graph::SetBkColor(COLORREF cr)
+{
 	m_BkColor = cr;
 }
 
-void Graph::SetBorderColor(COLORREF crBorder){
+void Graph::SetBorderColor(COLORREF crBorder)
+{
 	m_BorderColor = crBorder;
 }
 
@@ -1961,8 +1989,9 @@ int CCurve::GetClosestPoint(double xs)
 	double dist;
 	double distmax = 1.e10;
 	if (n<1) return -1;
-	for(int i=0; i<n; i++){
-		dist = fabs(xs-x[i]);
+	for(int i=0; i<n; i++)
+	{
+		dist = abs(xs-x[i]);
 		if (dist<distmax){
 			distmax = dist;
 			ref = i;
@@ -1975,7 +2004,8 @@ void CCurve::Copy(CCurve *pCurve)
 	if(!pCurve) return;
 	int i;
 	n  = pCurve->n;
-	for (i=0; i<n ;i++){
+	for (i=0; i<n ;i++)
+	{
 		x[i] = pCurve->x[i];
 		y[i] = pCurve->y[i];
 	}
@@ -2013,7 +2043,7 @@ CVector CCurve::GetClosestRealPoint(double xs)
 		return r;
 	}
 	for(int i=0; i<n; i++){
-		dist = fabs(xs-x[i]);
+		dist = abs(xs-x[i]);
 		if (dist<distmax){
 			distmax = dist;
 			ref = i;
@@ -2136,7 +2166,7 @@ bool Graph::SetXScale()
 
 		if(abs((xmin-xmax)/xmin)<0.001)
 		{
-			if(fabs(xmin)<0.00001) xmax = 1.0;
+			if(abs(xmin)<0.00001) xmax = 1.0;
 			else 
 			{
 				xmax = 2.0 * xmin;
@@ -2242,8 +2272,8 @@ bool Graph::SetYScale()
 		}
 		yo=0.0;
 
-		if (fabs((ymin-ymax)/ymin)<0.001){
-			if(fabs(ymin)<0.00001) ymax = 1.0;
+		if (abs((ymin-ymax)/ymin)<0.001){
+			if(abs(ymin)<0.00001) ymax = 1.0;
 			else {
 				ymax = 2.0 * ymin;
 				if(ymax < ymin){
@@ -2340,8 +2370,8 @@ void Graph::SetAutoXUnit()
 void Graph::SetAutoYUnit()
 {
 	int nymin, nymax;
-	if (m_bIsPrinting) yunit = fabs(2000.0*m_scaley);
-	else yunit = fabs(100.0*m_scaley);
+	if (m_bIsPrinting) yunit = abs(2000.0*m_scaley);
+	else yunit = abs(100.0*m_scaley);
 
 	if (yunit<1.0){
 		exp_y = (int)log10(yunit)-1;
@@ -2374,8 +2404,45 @@ void Graph::SetAutoXMinUnit(bool bAuto)
 	m_bXAutoMinGrid = bAuto;
 	if(bAuto) m_XMinorUnit = xunit/5.0;
 }
+
 void Graph::SetAutoYMinUnit(bool bAuto)
 {
 	m_bYAutoMinGrid = bAuto;
 	if(bAuto) m_YMinorUnit = yunit/5.0;
 }
+
+void Graph::SetGraphName(CString GraphName)
+{
+	m_GraphName = GraphName;
+}
+
+void Graph::GetGraphName(CString &GraphName)
+{
+	GraphName = m_GraphName;
+}
+
+void Graph::ExportToFile(CStdioFile &XFile, int FileType)
+{
+	int i,j;
+	CCurve *pCurve;
+	CString strong;
+
+	for(i=0; i<(int)m_oaCurves.GetSize(); i++)
+	{
+		pCurve = GetCurve(i);
+		if(pCurve && pCurve->n>0)
+		{
+			strong = pCurve->GetTitle();
+			if(FileType==1)	XFile.WriteString("       x               "+strong+" \n");
+			else            XFile.WriteString("x,"+strong+"\n");
+			for(j=0; j<pCurve->n; j++)
+			{
+				if(FileType==1)	strong.Format("%14.5e     %14.5e\n",pCurve->x[j], pCurve->y[j]);
+				else            strong.Format("%14.5e, %14.5e\n",pCurve->x[j], pCurve->y[j]);
+				XFile.WriteString(strong);
+			}
+			XFile.WriteString("\n\n");
+		}
+	}
+}
+

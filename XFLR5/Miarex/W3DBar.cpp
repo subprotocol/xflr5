@@ -201,7 +201,8 @@ void CW3DBar::On3DReset()
 {
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
 	pMiarex->m_glViewportTrans.Set(0.0, 0.0, 0.0);
-	pMiarex->m_bIs3DScaleSet  = false;
+	pMiarex->m_bPickCenter   = false;
+	pMiarex->m_bIs3DScaleSet = false;
 	pMiarex->SetScale();
 	pMiarex->UpdateView();
 }

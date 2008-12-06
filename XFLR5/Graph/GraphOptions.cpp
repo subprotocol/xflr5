@@ -321,30 +321,31 @@ void CGraphOptions::OnApply()
 	pXDirect->m_pTrGraph->SetAuto(m_bAuto);
 	pXDirect->m_pUserGraph->SetAuto(m_bAuto);
 
-	if(!m_bAuto){
+	if(!m_bAuto)
+	{
 		AMax = m_ctrlAMax.GetValue();
 		AMin = m_ctrlAMin.GetValue();
 		AOrigin = m_ctrlAOrigin.GetValue();
 		AUnit = m_ctrlAUnit.GetValue();
-		if(AUnit<=0.0001f) AUnit = (double)fabs((AMax-AMin)/2.f);
+		if(AUnit<=0.0001) AUnit = abs((AMax-AMin)/2.0);
 
 		MMax = m_ctrlMMax.GetValue();
 		MMin = m_ctrlMMin.GetValue();
 		MOrigin = m_ctrlMOrigin.GetValue();
 		MUnit = m_ctrlMUnit.GetValue();
-		if(MUnit<=0.0001f) MUnit = (double)fabs((MMax-MMin)/2.f);
+		if(MUnit<=0.0001) MUnit = abs((MMax-MMin)/2.0);
 
 		LMax = m_ctrlLMax.GetValue();
 		LMin = m_ctrlLMin.GetValue();
 		LOrigin = m_ctrlLOrigin.GetValue();
 		LUnit = m_ctrlLUnit.GetValue();
-		if(LUnit<=0.0001f) LUnit = (double)fabs((LMax-LMin)/2.f);
+		if(LUnit<=0.0001) LUnit = abs((LMax-LMin)/2.0);
 
 		DMax = m_ctrlDMax.GetValue();
 		DMin = m_ctrlDMin.GetValue();
 		DOrigin = m_ctrlDOrigin.GetValue();
 		DUnit = m_ctrlDUnit.GetValue();
-		if(DUnit<=0.0001f) DUnit = (double)fabs((DMax-DMin)/2.f);
+		if(DUnit<=0.0001) DUnit = abs((DMax-DMin)/2.0);
 
 
 		pXDirect->m_pPolarGraph->SetX0(DOrigin);
@@ -383,7 +384,8 @@ void CGraphOptions::OnApply()
 		pXDirect->m_pTrGraph->SetYMax(LMax);
 		pXDirect->m_pTrGraph->SetYUnit(LUnit);
 	}
-	else {
+	else 
+	{
 		pXDirect->m_pPolarGraph->SetXMin(0.0);
 		pXDirect->m_pPolarGraph->SetXMax(0.0);
 		pXDirect->m_pPolarGraph->SetYMin(0.0);

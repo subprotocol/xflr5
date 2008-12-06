@@ -141,9 +141,6 @@ BOOL CWAdvDlg::OnInitDialog()
 
 	m_ctrlVortexPos.EnableWindow(false);
 	m_ctrlControlPos.EnableWindow(false);
-	m_ctrlMaxWakeIter.EnableWindow(false);
-	m_ctrlInterNodes.EnableWindow(false);
-	m_ctrlResetWake.EnableWindow(false);
 	GetDlgItem(IDC_RADIO1)->EnableWindow(false);
 	GetDlgItem(IDC_RADIO2)->EnableWindow(false);
 	GetDlgItem(IDC_RADIO3)->EnableWindow(false);
@@ -152,6 +149,9 @@ BOOL CWAdvDlg::OnInitDialog()
 	GetDlgItem(IDC_RADIO5)->EnableWindow(false);
 	GetDlgItem(IDC_RADIO6)->EnableWindow(false);
 
+	m_ctrlMaxWakeIter.EnableWindow(false);
+	m_ctrlInterNodes.EnableWindow(false);
+	m_ctrlResetWake.EnableWindow(false);
 	m_ctrlRelax.SetFocus();
 
 	return FALSE;

@@ -3529,6 +3529,10 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 	if (IsBlackAndWhite()) pDC->SetTextColor(0);// black is black
 	else pDC->SetTextColor(pChildView->m_WndTextColor);
 
+	CBrush *pOldBrush;
+	CBrush FillBrush(pChildView->m_crBackColor);
+	pOldBrush = pDC->SelectObject(&FillBrush);
+
 	k=0;
 	if(m_bSF)
 	{
@@ -3620,6 +3624,7 @@ void CAFoil::DrawLegend(CDC *pDC, CPoint Place, bool bIsPrinting)
 	}
 
 	pDC->SelectObject(pOldFont);
+	pDC->SelectObject(pOldBrush);
 }
 
 

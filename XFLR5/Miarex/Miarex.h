@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CMiarex Class
-	Copyright (C) 2005 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2005-2008 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "../Graph/Graph.h"
 #include "../misc/UFOListDlg.h"
 #include "./BodyGridDlg.h"
-#include "WngAnalysis.h"
+#include "WPolarAnalysis.h"
 #include "ControlAnalysis.h"
 #include "VLMDlg.h"
 #include "3DPanelDlg.h"
@@ -130,7 +130,6 @@ protected:
 	void OnShowFin();
 	void OnAutoWingScales();
 	void OnDeleteAll();
-	void OnExportPanels();
 	void OnWingGraph4();
 	void OnWingGraph3();
 	void OnWingGraph2();
@@ -146,7 +145,6 @@ protected:
 	void OnRenameCurBody();
 	void OnDeleteCurBody();
 	void OnDuplicateCurBody();
-	void OnExportCurBody();
 	void OnSaveCurBodyAsProject();
 	void OnResetBodyScale();
 	void OnBodyGrid();
@@ -160,6 +158,12 @@ protected:
 	void OnOverlaySection();
 	void OnImportBodyDefinition();
 	void OnExportBodyDefinition();
+	void OnExportWing();
+	void OnExportWPolar();
+	void OnExportWOpp();
+	void OnExportPanels();
+	void OnExportCurBody();
+	void OnExportGraphToFile();
 
 	DECLARE_MESSAGE_MAP()
 
@@ -173,7 +177,6 @@ private:
 	void OnDefineAnalysis();
 	void OnBodyDesign();
 	void OnWPolar();
-	void OnExportWing();
 	void OnLoadProject();
 	void OnSaveProject();
 	void OnDeleteWPolar();
@@ -199,7 +202,6 @@ private:
 	void OnDeleteWPolars();
 	void OnFourGraphs();
 	void OnAbout();
-	void OnExportWOpp();
 	void OnAdjustToWing();
 	void OnPrint();
 	void OnWPolarReset();
@@ -222,7 +224,6 @@ private:
 	void OnShowAllWPlrs();
 	void OnWngHideAll();
 	void OnWngShowAll();
-	void OnImportWing();
 	void OnShowElliptic();
 	void OnResetWingScale();
 	void On3DView();
@@ -236,7 +237,6 @@ private:
 	void OnHideWingOpps();
 	void OnShowWingOpps();
 	void OnWAdvSettings();
-	void OnWPolarExport();
 
 	void GLDrawBodyLegend();
 	void GLDrawAxes();
@@ -278,13 +278,12 @@ private:
 
 	void * GetUFOPlrVariable(CWPolar *pWPolar, int iVar);
 
-	bool AVLImportFile(CString FileName);
 	bool CreateWakeElems(int PanelIndex);
 	bool InitializePanels();
 	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal,
                        CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool VLMIsSameSide(int p, int pp);
-	bool LoadSettings(CArchive &ar);
+	bool LoadSettings(CArchive &ar, int format);
 	bool SetMiarexCursor(CWnd* pWnd, CPoint ptMouse, UINT message);
 	bool SetModBody(CBody *pModBody);
 	bool SetModWing(CWing *pWing);
@@ -378,8 +377,6 @@ private:
 	double GetPlrPointFromCl(   CFoil *pFoil, double Re, double Cl,    int PlrVar, bool &bOutRe, bool &bError);
 	void * GetPlrVariable(CPolar *pPolar, int iVar);
 
-	BOOL AVLReadSurface(CStdioFile *pXFile, int &Line, CWing *pWing, int &NSpan, int &NChord, double &Sspace);
-	BOOL AVLReadSection(CStdioFile *pXFile, int &Line, CWing *pWing, int PanelPos);
 	CString RenameUFO(CString UFOName);
 
 	LRESULT KickIdle();
@@ -422,7 +419,7 @@ private:
 
 	CSurface *m_pSurface[2*MAXPANELS];	// An array with the pointers to the diferrent wing's surfaces
 
-	CWngAnalysis m_WngAnalysis;		// the dialog box for the polar definition
+	CWPolarAnalysis m_WngAnalysis;		// the dialog box for the polar definition
 	CControlAnalysis m_CtrlDlg;
 	CBodyGridDlg  m_BodyGridDlg;
 	
@@ -517,7 +514,6 @@ private:
 	int m_NWakeColumn;			// number of wake columns
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
-	int m_NCpCurves;			// Number of Cp curves stored for display
 	int m_InducedDragPoint;		// 0 if dwonwash is at panel's centroid, 1 if averaged over panel length //used in CWing::VLMTrefftz
 
 	int m_NHoopPoints;			//hoop resolution for NURBS bodies
@@ -528,8 +524,6 @@ private:
 	double m_CurSpanPos;		//Span position for Cp Grpah
 	double m_CoreSize;			// core size for VLM vortices
 	double m_MinPanelSize;			// wing minimum panel size ; panels of less length are ignored
-	double m_Relax;				// LLT relaxation factor
-	double m_CvPrec;			// LLT iteration precision required for convergence
 	double pi;				// ???
 	double m_WingScale;			// scale for 2D display
 	double m_BodyScale;			// scale for 2D display

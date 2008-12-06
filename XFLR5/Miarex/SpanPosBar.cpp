@@ -107,7 +107,8 @@ BOOL CSpanPosBar::OnInitDialogBar()
 
 BOOL CSpanPosBar::PreTranslateMessage(MSG* pMsg) 
 {
-	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN)){
+	if((pMsg->message == WM_KEYDOWN) && (pMsg->wParam == VK_RETURN))
+	{
 		CWnd* ppp = GetFocus();
 
 		if(GetDlgItem(IDC_SPANPOS) == ppp) 
@@ -124,6 +125,7 @@ BOOL CSpanPosBar::PreTranslateMessage(MSG* pMsg)
 			return true;
 		}
 	}	
+
 	return CInitDialogBar::PreTranslateMessage(pMsg);
 }
 
@@ -168,13 +170,17 @@ void CSpanPosBar::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CSpanPosBar::OnKeepCurve()
 {
-//	CCurve *pCurve;
+	CCurve *pCurve, *pNewCurve;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-//	pCurve = pMiarex->m_CpGraph.GetCurve(pMiarex->m_CpGraph.GetCurveCount()-1);
-//	pCurve->SetColor(pFrame->m_crColors[(pMiarex->m_CpGraph.GetCurveCount()-1)%24]);
-	pMiarex->m_NCpCurves++;
+
+	pCurve = pMiarex->m_CpGraph.GetCurve(0);
+	pNewCurve = pMiarex->m_CpGraph.AddCurve();
+	pNewCurve->Copy(pCurve);
+
 	pMiarex->m_CpColor = pFrame->m_crColors[(pMiarex->m_CpGraph.GetCurveCount()-1)%24];
+	pCurve->SetColor(pMiarex->m_CpColor);
+
 	pMiarex->m_CpStyle = PS_SOLID;
 	pMiarex->m_CpWidth = 1;
 	pMiarex->m_bShowCpPoints = false;
@@ -187,8 +193,7 @@ void CSpanPosBar::OnKeepCurve()
 void CSpanPosBar::OnResetCurves()
 {
 	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
-	pMiarex->m_CpGraph.DeleteCurves();
-	pMiarex->m_NCpCurves = 0;
+	for(int i=pMiarex->m_CpGraph.GetCurveCount()-1; i>3 ;i--)	pMiarex->m_CpGraph.DeleteCurve(i);
 	m_bApplied = false;
 	Apply();
 }

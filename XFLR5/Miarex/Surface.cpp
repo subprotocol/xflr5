@@ -230,7 +230,7 @@ double CSurface::GetChord(double const &tau)
 double CSurface::GetOffset(double const &tau)
 {
 	//chord spacing
-	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
+	return m_LA.x + (m_LB.x-m_LA.x) * abs(tau);
 }
 
 void CSurface::SetNormal()
@@ -396,9 +396,13 @@ void CSurface::Copy(CSurface const &Surface)
 	m_bIsRightSurf  = Surface.m_bIsRightSurf;
 	m_bIsCenterSurf = Surface.m_bIsCenterSurf;
 	m_bJoinRight    = Surface.m_bJoinRight;
+	m_bIsInSymPlane = Surface.m_bIsInSymPlane;
 
-	m_nFlapNodes = Surface.m_nFlapNodes;
+	m_bTEFlap       = Surface.m_bTEFlap;
+	m_nFlapNodes  = Surface.m_nFlapNodes;
 	m_nFlapPanels = Surface.m_nFlapPanels;
+	m_HingePoint  = Surface.m_HingePoint;
+	m_HingeVector = Surface.m_HingeVector;
 
 	memcpy(m_FlapNode, Surface.m_FlapNode, sizeof(m_FlapNode));
 	memcpy(m_FlapPanel, Surface.m_FlapPanel, sizeof(m_FlapPanel));

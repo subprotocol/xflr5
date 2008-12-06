@@ -351,6 +351,7 @@ protected:
 	afx_msg void OnExportResults();
 	afx_msg void OnShowCpGraph();
 	afx_msg void OnExportCurrentResults();
+	afx_msg void OnExportGraphToFile();
 	
 	DECLARE_MESSAGE_MAP()
 };

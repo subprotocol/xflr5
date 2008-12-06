@@ -114,12 +114,14 @@ void CEditPlrDlg::OnDeletePt()
 {
 	CString strong;
 	double val;
+	int i;
 	int pos = m_ctrlPointList.GetCurSel();
 	m_ctrlPointList.GetText(pos, strong);
 	sscanf(strong, "%lf", &val);
 	m_ctrlPointList.DeleteString(pos);
 
-	if(LB_ERR == m_ctrlPointList.GetCount()) {
+	if(LB_ERR == m_ctrlPointList.GetCount()) 
+	{
 		m_ctrlPointList.EnableWindow(FALSE);
 		return;
 	}
@@ -128,13 +130,17 @@ void CEditPlrDlg::OnDeletePt()
 	if(pos<0) pos = 0;
 	m_ctrlPointList.SetCurSel(pos);
 
-	if(m_pPolar){
-		for (int i=0; i<m_pPolar->m_Alpha.GetSize();i++){
-			if(m_pPolar->m_Type!=4){
-				if(fabs(m_pPolar->m_Alpha[i]-val) <0.001) m_pPolar->Remove(i);
+	if(m_pPolar)
+	{
+		for (i=0; i<m_pPolar->m_Alpha.GetSize();i++)
+		{
+			if(m_pPolar->m_Type!=4)
+			{
+				if(abs(m_pPolar->m_Alpha[i]-val) <0.001) m_pPolar->Remove(i);
 			}
-			else if(m_pPolar->m_Type==4){
-				if(fabs(m_pPolar->m_Re[i] - val)<0.1) m_pPolar->Remove(i);
+			else if(m_pPolar->m_Type==4)
+			{
+				if(abs(m_pPolar->m_Re[i] - val)<0.1) m_pPolar->Remove(i);
 			}
 		}
 
@@ -142,13 +148,17 @@ void CEditPlrDlg::OnDeletePt()
 		pXDirect->CreatePolarCurves();
 		pXDirect->UpdateView();
 	}
-	else if(m_pWPolar){
-		for (int i=0; i<m_pWPolar->m_Alpha.GetSize();i++){
-			if(m_pWPolar->m_Type!=4){
-				if(fabs(m_pWPolar->m_Alpha[i]-val) <0.001) m_pWPolar->Remove(i);
+	else if(m_pWPolar)
+	{
+		for (i=0; i<m_pWPolar->m_Alpha.GetSize();i++)
+		{
+			if(m_pWPolar->m_Type!=4)
+			{
+				if(abs(m_pWPolar->m_Alpha[i]-val) <0.001) m_pWPolar->Remove(i);
 			}
-			else if(m_pWPolar->m_Type==4){
-				if(fabs(m_pWPolar->m_QInfinite[i] - val)<0.1) m_pWPolar->Remove(i);
+			else if(m_pWPolar->m_Type==4)
+			{
+				if(abs(m_pWPolar->m_QInfinite[i] - val)<0.1) m_pWPolar->Remove(i);
 			}
 		}
 

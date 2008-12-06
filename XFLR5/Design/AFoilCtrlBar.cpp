@@ -636,6 +636,7 @@ void CAFoilCtrlBar::ReSizeCtrls()
 void CAFoilCtrlBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
 {
 	CAFoil* pADlg = (CAFoil*)m_pADlg;
+	CFoil * pOldFoil = m_pRefFoil;
 	CPoint pt;
 	GetCursorPos(&pt);
 	CMenu menu;
@@ -646,7 +647,7 @@ void CAFoilCtrlBar::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)
 		if(m_FoilSelection>0 && m_FoilSelection<=pADlg->m_poaFoil->GetSize())
 		{
 			m_pRefFoil = (CFoil*)pADlg->m_poaFoil->GetAt(m_FoilSelection-1);
-			SetFoil();
+			if(m_pRefFoil !=pOldFoil)	SetFoil();
 
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);

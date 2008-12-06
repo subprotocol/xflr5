@@ -38,7 +38,7 @@ public:
 	CEdit* EditSubLabel( int nItem, int nCol );
 	CComboBox* ShowInPlaceList(int nItem, int nCol);
 	void HighlightCell(int nItem, int nCol );
-
+	void CloseEdit();
 	CStringArray m_strList;
 	int m_nColumns;
 	int m_iItem, m_iSubItem;

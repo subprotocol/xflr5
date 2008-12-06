@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
-#include "..\Design\AFoilCtrlBar.h"
+//#include "..\Design\AFoilCtrlBar.h"
 #include ".\nobeeplistctrl.h"
 
 
@@ -32,6 +32,8 @@ IMPLEMENT_DYNAMIC(CNoBeepListCtrl, CListCtrl)
 CNoBeepListCtrl::CNoBeepListCtrl()
 {
 	m_pParent = NULL;
+	m_iItem = 0;
+	m_iSubItem = 0;
 }
 
 CNoBeepListCtrl::~CNoBeepListCtrl()
@@ -41,6 +43,7 @@ CNoBeepListCtrl::~CNoBeepListCtrl()
 
 BEGIN_MESSAGE_MAP(CNoBeepListCtrl, CListCtrl)
 	ON_WM_LBUTTONDOWN()
+	ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -95,24 +98,40 @@ int CNoBeepListCtrl::HitTestEx(CPoint &point, int *col) const
 void CNoBeepListCtrl::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	int index;
-	CString strong;
-	CAFoilCtrlBar *pACtrlBar = (CAFoilCtrlBar*)m_pParent;
 
 	int column;
 	if((index = HitTestEx(point, &column)) != -1)
 	{
-		pACtrlBar->m_FoilSelection = index;
+		m_iItem = index;
+		m_iSubItem = column;
 		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
 	}
 //	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), 0 );
 //	CListCtrl::OnLButtonDown(nFlags, point);// no annoying Vista beep, thank you
 }
 
+void CNoBeepListCtrl::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	int index;
+
+	int column;
+	if((index = HitTestEx(point, &column)) != -1)
+	{
+		m_iItem = index;
+		m_iSubItem = column;
+		SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED); 
+	}
+//	GetParent()->SendMessage(WM_NOTIFY, GetParent()->GetDlgCtrlID(), 0 );
+//	CListCtrl::OnRButtonDown(nFlags, point);// no annoying Vista beep, thank you
+}
+
+
+
 BOOL CNoBeepListCtrl::PreTranslateMessage(MSG* pMsg)
 {
 	if( pMsg->message == WM_KEYDOWN )
 	{
-		CAFoilCtrlBar *pACtrlBar = (CAFoilCtrlBar*)m_pParent;
+//		CAFoilCtrlBar *pACtrlBar = (CAFoilCtrlBar*)m_pParent;
 		if(pMsg->wParam == VK_ESCAPE)
 		{
 			return TRUE;
@@ -124,11 +143,12 @@ BOOL CNoBeepListCtrl::PreTranslateMessage(MSG* pMsg)
 //			int iItem = GetNextSelectedItem(pos);
 //			int iSubItem = m_iSubItem;
 
-			if (pACtrlBar->m_FoilSelection < GetItemCount()-1) pACtrlBar->m_FoilSelection ++;
+//			if (pACtrlBar->m_FoilSelection < GetItemCount()-1) pACtrlBar->m_FoilSelection ++;
+			if (m_iItem < GetItemCount()-1) m_iItem++;
 
-			EnsureVisible(pACtrlBar->m_FoilSelection, true);
+			EnsureVisible(m_iItem, true);
 
-			SetItemState(pACtrlBar->m_FoilSelection, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+			SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
 			return TRUE;
 		}
 		if(pMsg->wParam == VK_UP)
@@ -138,9 +158,10 @@ BOOL CNoBeepListCtrl::PreTranslateMessage(MSG* pMsg)
 //			int iItem = GetNextSelectedItem(pos);
 //			int iSubItem = m_iSubItem;
 
-			if(pACtrlBar->m_FoilSelection>0) pACtrlBar->m_FoilSelection--;
-			EnsureVisible(pACtrlBar->m_FoilSelection, true);
-			SetItemState(pACtrlBar->m_FoilSelection, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
+//			if(pACtrlBar->m_FoilSelection>0) pACtrlBar->m_FoilSelection--;
+			if(m_iItem>0) m_iItem--;
+			EnsureVisible(m_iItem, true);
+			SetItemState(m_iItem, LVIS_SELECTED | LVIS_FOCUSED,	LVIS_SELECTED | LVIS_FOCUSED); 
 	
 			return TRUE;
 		}

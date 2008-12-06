@@ -137,7 +137,8 @@ BOOL CFlowLinesDlg::PreTranslateMessage(MSG* pMsg)
 
 		if(GetDlgItem(IDC_APPLY) == ppp) 
 			OnApply();
-		else {
+		else 
+		{
 			ReadParams();
 			m_ctrlApply.SetFocus();
 		}

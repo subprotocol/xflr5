@@ -96,7 +96,7 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlXSel.AddString("Centre of pressure Y-Pos");	//23
 		m_ctrlXSel.AddString("Bending moment");				//24
 		m_ctrlXSel.AddString("m.g.Vz");						//25
-		m_ctrlXSel.AddString("Oswald");						//26
+		m_ctrlXSel.AddString("Efficiency");					//26
 		m_ctrlXSel.AddString("(XCp-Xcg)/MAC");				//27
 		m_ctrlXSel.AddString("Control Variable");			//28
 		m_ctrlXSel.AddString("Cy - Lateral force coef.");	//29	
@@ -129,7 +129,7 @@ BOOL CUserVarDlg::OnInitDialog()
 		m_ctrlYSel.AddString("Centre of pressure Y-Pos");	//23
 		m_ctrlYSel.AddString("Bending moment");				//24
 		m_ctrlYSel.AddString("m.g.Vz");						//25
-		m_ctrlYSel.AddString("Oswald");						//26
+		m_ctrlYSel.AddString("Efficiency");					//26
 		m_ctrlYSel.AddString("(XCp-Xcg)/MAC");				//27
 		m_ctrlYSel.AddString("Control Variable");			//28
 		m_ctrlYSel.AddString("Cy - Lateral force coef.");	//29	

@@ -1,271 +1,180 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="7.10"
 	Name="X-FLR6"
 	ProjectGUID="{908C1FD4-78C9-4A85-A225-442BF5024E02}"
-	Keyword="MFCProj"
-	TargetFrameworkVersion="131072"
-	>
+	Keyword="MFCProj">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32"/>
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="false"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_DEPRECATE"
-				MinimalRebuild="true"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
+				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
+				TreatWChar_tAsBuiltInType="TRUE"
+				UsePrecompiledHeader="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="4"
-			/>
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="4"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="OpenGL32.lib Glu32.lib GdiPlus.lib"
+				OutputFile="$(OutDir)/XFLR5.exe"
+				LinkIncremental="2"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="_DEBUG"
+				MkTypLibCompatible="FALSE"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="OpenGL32.lib Glu32.lib"
-				OutputFile="$(OutDir)/XFLR5.exe"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCWebDeploymentTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="1"
-			CharacterSet="2"
-			>
+			CharacterSet="2">
 			<Tool
-				Name="VCPreBuildEventTool"
-			/>
+				Name="VCCLCompilerTool"
+				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
+				MinimalRebuild="FALSE"
+				RuntimeLibrary="0"
+				TreatWChar_tAsBuiltInType="TRUE"
+				UsePrecompiledHeader="3"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="0"/>
 			<Tool
-				Name="VCCustomBuildTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="OpenGL32.lib Glu32.lib GdiPlus.lib"
+				OutputFile="$(OutDir)/XFLR5.exe"
+				LinkIncremental="1"
+				IgnoreAllDefaultLibraries="FALSE"
+				GenerateDebugInformation="TRUE"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
-			/>
+				MkTypLibCompatible="FALSE"/>
 			<Tool
-				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_DEPRECATE"
-				MinimalRebuild="false"
-				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="0"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="OpenGL32.lib Glu32.lib"
-				OutputFile="$(OutDir)/XFLR5.exe"
-				LinkIncremental="1"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCWebDeploymentTool"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 		<Configuration
 			Name="ReleaseXPPro|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="false"
-			/>
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				MinimalRebuild="false"
+				MinimalRebuild="FALSE"
 				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
+				TreatWChar_tAsBuiltInType="TRUE"
+				UsePrecompiledHeader="3"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="3"/>
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="OpenGL32.lib"
 				OutputFile="$(OutDir)/XFLR5.exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
-			/>
+				TargetMachine="1"/>
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="FALSE"/>
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCPostBuildEventTool"/>
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPreBuildEventTool"/>
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -274,1154 +183,868 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath=".\XDirect\2DPanelDlg.cpp"
-				>
+				RelativePath=".\XDirect\2DPanelDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\3DPanelDlg.cpp"
-				>
+				RelativePath=".\Miarex\3DPanelDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\3DPanelThread.cpp"
-				>
+				RelativePath=".\Miarex\3DPanelThread.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\AFoil.cpp"
-				>
+				RelativePath=".\Design\AFoil.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\AFoilCtrlBar.cpp"
-				>
+				RelativePath=".\Design\AFoilCtrlBar.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\AGridDlg.cpp"
-				>
+				RelativePath=".\Design\AGridDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\ArcBall.cpp"
-				>
+				RelativePath=".\Miarex\ArcBall.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\BatchDlg.cpp"
-				>
+				RelativePath=".\XDirect\BatchDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\BatchThread.cpp"
-				>
+				RelativePath=".\XDirect\BatchThread.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Body.cpp"
-				>
+				RelativePath=".\Miarex\Body.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyCtrlBar.cpp"
-				>
+				RelativePath=".\Miarex\BodyCtrlBar.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyGridDlg.cpp"
-				>
+				RelativePath=".\Miarex\BodyGridDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyNURBSDlg.cpp"
-				>
+				RelativePath=".\Miarex\BodyNURBSDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyScaleDlg.cpp"
-				>
+				RelativePath=".\Miarex\BodyScaleDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyTransDlg.cpp"
-				>
+				RelativePath=".\Miarex\BodyTransDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\CAddDlg.cpp"
-				>
+				RelativePath=".\XDirect\CAddDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\main\ChildView.cpp"
-				>
+				RelativePath=".\main\ChildView.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\ClrClasses.cpp"
-				>
+				RelativePath=".\misc\ClrClasses.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\ControlAnalysis.cpp"
-				>
+				RelativePath=".\Miarex\ControlAnalysis.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\CpScaleDlg.cpp"
-				>
+				RelativePath=".\Miarex\CpScaleDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\CurveDlgBar.cpp"
-				>
+				RelativePath=".\Graph\CurveDlgBar.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\EditFoilDlg.cpp"
-				>
+				RelativePath=".\XDirect\EditFoilDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\EditListCtrl.cpp"
-				>
+				RelativePath=".\misc\EditListCtrl.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\EditPlrDlg.cpp"
-				>
+				RelativePath=".\misc\EditPlrDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XInverse\FInvCtrlBar.cpp"
-				>
+				RelativePath=".\XInverse\FInvCtrlBar.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\FlapDlg.cpp"
-				>
+				RelativePath=".\XDirect\FlapDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\FlowLinesDlg.cpp"
-				>
+				RelativePath=".\Miarex\FlowLinesDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\Foil.cpp"
-				>
+				RelativePath=".\XDirect\Foil.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\FoilAnalysisDlg.cpp"
-				>
+				RelativePath=".\XDirect\FoilAnalysisDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\FoilClrDlg.cpp"
-				>
+				RelativePath=".\XDirect\FoilClrDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Frame.cpp"
-				>
+				RelativePath=".\Miarex\Frame.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\GeomDlg.cpp"
-				>
+				RelativePath=".\XDirect\GeomDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\GLLight.cpp"
-				>
+				RelativePath=".\Miarex\GLLight.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\Graph.cpp"
-				>
+				RelativePath=".\Graph\Graph.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\GraphDlg.cpp"
-				>
+				RelativePath=".\Graph\GraphDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\GraphOptions.cpp"
-				>
+				RelativePath=".\Graph\GraphOptions.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\ImportWingDlg.cpp"
-				>
+				RelativePath=".\Miarex\ImportWingDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\InitDialogBar.cpp"
-				>
+				RelativePath=".\misc\InitDialogBar.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceFloatEdit.cpp"
-				>
+				RelativePath=".\misc\InPlaceFloatEdit.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceList.cpp"
-				>
+				RelativePath=".\misc\InPlaceList.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceNumEdit.cpp"
-				>
+				RelativePath=".\misc\InPlaceNumEdit.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\InterpolateDlg.cpp"
-				>
+				RelativePath=".\XDirect\InterpolateDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\LECircleDlg.cpp"
-				>
+				RelativePath=".\Design\LECircleDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\LEDlg.cpp"
-				>
+				RelativePath=".\XDirect\LEDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\LineCbBox.cpp"
-				>
+				RelativePath=".\misc\LineCbBox.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\LinePickerDlg.cpp"
-				>
+				RelativePath=".\misc\LinePickerDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\ListPlrDlg.cpp"
-				>
+				RelativePath=".\Miarex\ListPlrDlg.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Miarex\LLTDlg.cpp"
-				>
+				RelativePath=".\Miarex\LLTDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\LLTThread.cpp"
-				>
+				RelativePath=".\Miarex\LLTThread.cpp">
 			</File>
 			<File
-				RelativePath=".\main\MainFrm.cpp"
-				>
+				RelativePath=".\main\MainFrm.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\MessageDlg.cpp"
-				>
+				RelativePath=".\misc\MessageDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Miarex.cpp"
-				>
+				RelativePath=".\Miarex\Miarex.cpp">
 			</File>
 			<File
-				RelativePath=".\XInverse\MInvCtrlBar.cpp"
-				>
+				RelativePath=".\XInverse\MInvCtrlBar.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\ModDlg.cpp"
-				>
+				RelativePath=".\misc\ModDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\NacaDlg.cpp"
-				>
+				RelativePath=".\XDirect\NacaDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\NameDlg.cpp"
-				>
+				RelativePath=".\misc\NameDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\NoBeepListCtrl.cpp"
-				>
+				RelativePath=".\misc\NoBeepListCtrl.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\NumEdit.cpp"
-				>
+				RelativePath=".\misc\NumEdit.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\OperDlgBar.cpp"
-				>
+				RelativePath=".\XDirect\OperDlgBar.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\OpPoint.cpp"
-				>
+				RelativePath=".\XDirect\OpPoint.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\pages.cpp"
-				>
+				RelativePath=".\Graph\pages.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Panel.cpp"
-				>
+				RelativePath=".\Miarex\Panel.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Miarex\PanelListCtrl.cpp"
-				>
+				RelativePath=".\Miarex\PanelListCtrl.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\XInverse\PertDlg.cpp"
-				>
+				RelativePath=".\XInverse\PertDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\PF.cpp"
-				>
+				RelativePath=".\Design\PF.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Plane.cpp"
-				>
+				RelativePath=".\Miarex\Plane.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\PlaneDlg.cpp"
-				>
+				RelativePath=".\Miarex\PlaneDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\Polar.cpp"
-				>
+				RelativePath=".\XDirect\Polar.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\PolarFilter.cpp"
-				>
+				RelativePath=".\misc\PolarFilter.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Miarex\POpp.cpp"
-				>
+				RelativePath=".\Miarex\POpp.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\PrefsDlg.cpp"
-				>
+				RelativePath=".\misc\PrefsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\PrintOptionsDlg.cpp"
-				>
+				RelativePath=".\misc\PrintOptionsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Quaternion.cpp"
-				>
+				RelativePath=".\Miarex\Quaternion.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\ReListDlg.cpp"
-				>
+				RelativePath=".\XDirect\ReListDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\SaveOptionsDlg.cpp"
-				>
+				RelativePath=".\misc\SaveOptionsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\ScaleOppBar.cpp"
-				>
+				RelativePath=".\Miarex\ScaleOppBar.cpp">
 			</File>
 			<File
-				RelativePath=".\XInverse\SelectFoilDlg.cpp"
-				>
+				RelativePath=".\XInverse\SelectFoilDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\SettingsDlg.cpp"
-				>
+				RelativePath=".\misc\SettingsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\SF.cpp"
-				>
+				RelativePath=".\Design\SF.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\SpanPosBar.cpp"
-				>
+				RelativePath=".\Miarex\SpanPosBar.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\Spline.cpp"
-				>
+				RelativePath=".\Design\Spline.cpp">
 			</File>
 			<File
-				RelativePath=".\Design\SplinesCtrlDlg.cpp"
-				>
+				RelativePath=".\Design\SplinesCtrlDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
-				>
+				RelativePath=".\stdafx.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
+						UsePrecompiledHeader="1"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Miarex\Surface.cpp"
-				>
+				RelativePath=".\Miarex\Surface.cpp">
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="ReleaseXPPro|Win32"
-					>
+					Name="ReleaseXPPro|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						ObjectFile="$(IntDir)/$(InputName)1.obj"
-					/>
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\XDirect\TEGapDlg.cpp"
-				>
+				RelativePath=".\XDirect\TEGapDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\ToolBarDlg.cpp"
-				>
+				RelativePath=".\misc\ToolBarDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\UFOListDlg.cpp"
-				>
+				RelativePath=".\misc\UFOListDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\UnitsDlg.cpp"
-				>
+				RelativePath=".\misc\UnitsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\UserVarDlg.cpp"
-				>
+				RelativePath=".\Graph\UserVarDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\Vector.cpp"
-				>
+				RelativePath=".\misc\Vector.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\ViewBitmap.cpp"
-				>
+				RelativePath=".\misc\ViewBitmap.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\ViscDlg.cpp"
-				>
+				RelativePath=".\XDirect\ViscDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\ViscThread.cpp"
-				>
+				RelativePath=".\XDirect\ViscThread.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\VLMDlg.cpp"
-				>
+				RelativePath=".\Miarex\VLMDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\VLMThread.cpp"
-				>
+				RelativePath=".\Miarex\VLMThread.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\W3DBar.cpp"
-				>
+				RelativePath=".\Miarex\W3DBar.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WAdvDlg.cpp"
-				>
+				RelativePath=".\Miarex\WAdvDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WakeParamsDlg.cpp"
-				>
+				RelativePath=".\Miarex\WakeParamsDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Graph\WGraphVarDlg.cpp"
-				>
+				RelativePath=".\Graph\WGraphVarDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\Wing.cpp"
-				>
+				RelativePath=".\Miarex\Wing.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WingDlg.cpp"
-				>
+				RelativePath=".\Miarex\WingDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WingScaleDlg.cpp"
-				>
+				RelativePath=".\Miarex\WingScaleDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WngAnalysis.cpp"
-				>
+				RelativePath=".\Miarex\WOperDlgBar.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WOperDlgBar.cpp"
-				>
+				RelativePath=".\Miarex\WOpp.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WOpp.cpp"
-				>
+				RelativePath=".\Miarex\WPolar.cpp">
 			</File>
 			<File
-				RelativePath=".\Miarex\WPolar.cpp"
-				>
+				RelativePath=".\Miarex\WPolarAnalysis.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\XDirect.cpp"
-				>
+				RelativePath=".\XDirect\XDirect.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\XFoil.cpp"
-				>
+				RelativePath=".\XDirect\XFoil.cpp">
 			</File>
 			<File
-				RelativePath=".\XDirect\XFoilAdvDlg.cpp"
-				>
+				RelativePath=".\XDirect\XFoilAdvDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XInverse\XInvClrDlg.cpp"
-				>
+				RelativePath=".\XInverse\XInvClrDlg.cpp">
 			</File>
 			<File
-				RelativePath=".\XInverse\XInverse.cpp"
-				>
+				RelativePath=".\XInverse\XInverse.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\XDirect\2DPanelDlg.h"
-				>
+				RelativePath=".\XDirect\2DPanelDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\3DPanelDlg.h"
-				>
+				RelativePath=".\Miarex\3DPanelDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\3DPanelThread.h"
-				>
+				RelativePath=".\Miarex\3DPanelThread.h">
 			</File>
 			<File
-				RelativePath=".\Design\AFoil.h"
-				>
+				RelativePath=".\Design\AFoil.h">
 			</File>
 			<File
-				RelativePath=".\Design\AFoilCtrlBar.h"
-				>
+				RelativePath=".\Design\AFoilCtrlBar.h">
 			</File>
 			<File
-				RelativePath=".\Design\AGridDlg.h"
-				>
+				RelativePath=".\Design\AGridDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\ArcBall.h"
-				>
+				RelativePath=".\Miarex\ArcBall.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\BatchDlg.h"
-				>
+				RelativePath=".\XDirect\BatchDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\BatchThread.h"
-				>
+				RelativePath=".\XDirect\BatchThread.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Body.h"
-				>
+				RelativePath=".\Miarex\Body.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyCtrlBar.h"
-				>
+				RelativePath=".\Miarex\BodyCtrlBar.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyGridDlg.h"
-				>
+				RelativePath=".\Miarex\BodyGridDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyNURBSDlg.h"
-				>
+				RelativePath=".\Miarex\BodyNURBSDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyScaleDlg.h"
-				>
+				RelativePath=".\Miarex\BodyScaleDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\BodyTransDlg.h"
-				>
+				RelativePath=".\Miarex\BodyTransDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\CAddDlg.h"
-				>
+				RelativePath=".\XDirect\CAddDlg.h">
 			</File>
 			<File
-				RelativePath=".\main\ChildView.h"
-				>
+				RelativePath=".\main\ChildView.h">
 			</File>
 			<File
-				RelativePath=".\misc\ClrClasses.h"
-				>
+				RelativePath=".\misc\ClrClasses.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\ControlAnalysis.h"
-				>
+				RelativePath=".\Miarex\ControlAnalysis.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\CpScaleDlg.h"
-				>
+				RelativePath=".\Miarex\CpScaleDlg.h">
 			</File>
 			<File
-				RelativePath=".\Graph\CurveDlgBar.h"
-				>
+				RelativePath=".\Graph\CurveDlgBar.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\EditFoilDlg.h"
-				>
+				RelativePath=".\XDirect\EditFoilDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\EditListCtrl.h"
-				>
+				RelativePath=".\misc\EditListCtrl.h">
 			</File>
 			<File
-				RelativePath=".\misc\EditPlrDlg.h"
-				>
+				RelativePath=".\misc\EditPlrDlg.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\FInvCtrlBar.h"
-				>
+				RelativePath=".\XInverse\FInvCtrlBar.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\FlapDlg.h"
-				>
+				RelativePath=".\XDirect\FlapDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\FloatEdit.cpp"
-				>
+				RelativePath=".\misc\FloatEdit.cpp">
 			</File>
 			<File
-				RelativePath=".\misc\FloatEdit.h"
-				>
+				RelativePath=".\misc\FloatEdit.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\FlowLinesDlg.h"
-				>
+				RelativePath=".\Miarex\FlowLinesDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\Foil.h"
-				>
+				RelativePath=".\XDirect\Foil.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\FoilAnalysisDlg.h"
-				>
+				RelativePath=".\XDirect\FoilAnalysisDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\FoilClrDlg.h"
-				>
+				RelativePath=".\XDirect\FoilClrDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Frame.h"
-				>
+				RelativePath=".\Miarex\Frame.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\GeomDlg.h"
-				>
+				RelativePath=".\XDirect\GeomDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\GLLight.h"
-				>
+				RelativePath=".\Miarex\GLLight.h">
 			</File>
 			<File
-				RelativePath=".\Graph\Graph.h"
-				>
+				RelativePath=".\Graph\Graph.h">
 			</File>
 			<File
-				RelativePath=".\Graph\GraphDlg.h"
-				>
+				RelativePath=".\Graph\GraphDlg.h">
 			</File>
 			<File
-				RelativePath=".\Graph\GraphOptions.h"
-				>
+				RelativePath=".\Graph\GraphOptions.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\ImportWingDlg.h"
-				>
+				RelativePath=".\Miarex\ImportWingDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\InitDialogBar.h"
-				>
+				RelativePath=".\misc\InitDialogBar.h">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceFloatEdit.h"
-				>
+				RelativePath=".\misc\InPlaceFloatEdit.h">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceList.h"
-				>
+				RelativePath=".\misc\InPlaceList.h">
 			</File>
 			<File
-				RelativePath=".\misc\InPlaceNumEdit.h"
-				>
+				RelativePath=".\misc\InPlaceNumEdit.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\InterpolateDlg.h"
-				>
+				RelativePath=".\XDirect\InterpolateDlg.h">
 			</File>
 			<File
-				RelativePath=".\Design\LECircleDlg.h"
-				>
+				RelativePath=".\Design\LECircleDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\LEDlg.h"
-				>
+				RelativePath=".\XDirect\LEDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\LineCbBox.h"
-				>
+				RelativePath=".\misc\LineCbBox.h">
 			</File>
 			<File
-				RelativePath=".\misc\LinePickerDlg.h"
-				>
+				RelativePath=".\misc\LinePickerDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\ListPlrDlg.h"
-				>
+				RelativePath=".\Miarex\ListPlrDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\LLTDlg.h"
-				>
+				RelativePath=".\Miarex\LLTDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\LLTThread.h"
-				>
+				RelativePath=".\Miarex\LLTThread.h">
 			</File>
 			<File
-				RelativePath=".\main\MainFrm.h"
-				>
+				RelativePath=".\main\MainFrm.h">
 			</File>
 			<File
-				RelativePath=".\misc\MessageDlg.h"
-				>
+				RelativePath=".\misc\MessageDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Miarex.h"
-				>
+				RelativePath=".\Miarex\Miarex.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\MInvCtrlBar.h"
-				>
+				RelativePath=".\XInverse\MInvCtrlBar.h">
 			</File>
 			<File
-				RelativePath=".\misc\ModDlg.h"
-				>
+				RelativePath=".\misc\ModDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\NacaDlg.h"
-				>
+				RelativePath=".\XDirect\NacaDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\NameDlg.h"
-				>
+				RelativePath=".\misc\NameDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\NoBeepListCtrl.h"
-				>
+				RelativePath=".\misc\NoBeepListCtrl.h">
 			</File>
 			<File
-				RelativePath=".\misc\NumEdit.h"
-				>
+				RelativePath=".\misc\NumEdit.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\OperDlgBar.h"
-				>
+				RelativePath=".\XDirect\OperDlgBar.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\OpPoint.h"
-				>
+				RelativePath=".\XDirect\OpPoint.h">
 			</File>
 			<File
-				RelativePath=".\Graph\pages.h"
-				>
+				RelativePath=".\Graph\pages.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Panel.h"
-				>
+				RelativePath=".\Miarex\Panel.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\PanelListCtrl.h"
-				>
+				RelativePath=".\Miarex\PanelListCtrl.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\PertDlg.h"
-				>
+				RelativePath=".\XInverse\PertDlg.h">
 			</File>
 			<File
-				RelativePath=".\Design\PF.h"
-				>
+				RelativePath=".\Design\PF.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Plane.h"
-				>
+				RelativePath=".\Miarex\Plane.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\PlaneDlg.h"
-				>
+				RelativePath=".\Miarex\PlaneDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\Polar.h"
-				>
+				RelativePath=".\XDirect\Polar.h">
 			</File>
 			<File
-				RelativePath=".\misc\PolarFilter.h"
-				>
+				RelativePath=".\misc\PolarFilter.h">
 			</File>
 			<File
-				RelativePath=".\PolarFilter.h"
-				>
+				RelativePath=".\PolarFilter.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\POpp.h"
-				>
+				RelativePath=".\Miarex\POpp.h">
 			</File>
 			<File
-				RelativePath=".\misc\PrefsDlg.h"
-				>
+				RelativePath=".\misc\PrefsDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\PrintOptionsDlg.h"
-				>
+				RelativePath=".\misc\PrintOptionsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Quaternion.h"
-				>
+				RelativePath=".\Miarex\Quaternion.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\ReListDlg.h"
-				>
+				RelativePath=".\XDirect\ReListDlg.h">
 			</File>
 			<File
-				RelativePath=".\Resource.h"
-				>
+				RelativePath=".\Resource.h">
 			</File>
 			<File
-				RelativePath=".\misc\SaveOptionsDlg.h"
-				>
+				RelativePath=".\misc\SaveOptionsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\ScaleOppBar.h"
-				>
+				RelativePath=".\Miarex\ScaleOppBar.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\SelectFoilDlg.h"
-				>
+				RelativePath=".\XInverse\SelectFoilDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\SettingsDlg.h"
-				>
+				RelativePath=".\misc\SettingsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Design\SF.h"
-				>
+				RelativePath=".\Design\SF.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\SpanPosBar.h"
-				>
+				RelativePath=".\Miarex\SpanPosBar.h">
 			</File>
 			<File
-				RelativePath=".\Design\Spline.h"
-				>
+				RelativePath=".\Design\Spline.h">
 			</File>
 			<File
-				RelativePath=".\Design\SplinesCtrlDlg.h"
-				>
+				RelativePath=".\Design\SplinesCtrlDlg.h">
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
-				>
+				RelativePath=".\stdafx.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Surface.h"
-				>
+				RelativePath=".\Miarex\Surface.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\TEGapDlg.h"
-				>
+				RelativePath=".\XDirect\TEGapDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\ToolBarDlg.h"
-				>
+				RelativePath=".\misc\ToolBarDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\UFOListDlg.h"
-				>
+				RelativePath=".\misc\UFOListDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\UnitsDlg.h"
-				>
+				RelativePath=".\misc\UnitsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Graph\UserVarDlg.h"
-				>
+				RelativePath=".\Graph\UserVarDlg.h">
 			</File>
 			<File
-				RelativePath=".\misc\Vector.h"
-				>
+				RelativePath=".\misc\Vector.h">
 			</File>
 			<File
-				RelativePath=".\misc\ViewBitmap.h"
-				>
+				RelativePath=".\misc\ViewBitmap.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\ViscDlg.h"
-				>
+				RelativePath=".\XDirect\ViscDlg.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\ViscThread.h"
-				>
+				RelativePath=".\XDirect\ViscThread.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\VLMDlg.h"
-				>
+				RelativePath=".\Miarex\VLMDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\VLMThread.h"
-				>
+				RelativePath=".\Miarex\VLMThread.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\W3DBar.h"
-				>
+				RelativePath=".\Miarex\W3DBar.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WAdvDlg.h"
-				>
+				RelativePath=".\Miarex\WAdvDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WakeParamsDlg.h"
-				>
+				RelativePath=".\Miarex\WakeParamsDlg.h">
 			</File>
 			<File
-				RelativePath=".\Graph\WGraphVarDlg.h"
-				>
+				RelativePath=".\Graph\WGraphVarDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\Wing.h"
-				>
+				RelativePath=".\Miarex\Wing.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WingDlg.h"
-				>
+				RelativePath=".\Miarex\WingDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WingScaleDlg.h"
-				>
+				RelativePath=".\Miarex\WingScaleDlg.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WngAnalysis.h"
-				>
+				RelativePath=".\Miarex\WOperDlgBar.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WOperDlgBar.h"
-				>
+				RelativePath=".\Miarex\WOpp.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WOpp.h"
-				>
+				RelativePath=".\Miarex\WPolar.h">
 			</File>
 			<File
-				RelativePath=".\Miarex\WPolar.h"
-				>
+				RelativePath=".\Miarex\WPolarAnalysis.h">
 			</File>
 			<File
-				RelativePath=".\X-FLR5.cpp"
-				>
+				RelativePath=".\X-FLR5.cpp">
 			</File>
 			<File
-				RelativePath=".\X-FLR5.h"
-				>
+				RelativePath=".\X-FLR5.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\XDirect.h"
-				>
+				RelativePath=".\XDirect\XDirect.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\XFoil.h"
-				>
+				RelativePath=".\XDirect\XFoil.h">
 			</File>
 			<File
-				RelativePath=".\XDirect\XFoilAdvDlg.h"
-				>
+				RelativePath=".\XDirect\XFoilAdvDlg.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\XInvClrDlg.h"
-				>
+				RelativePath=".\XInverse\XInvClrDlg.h">
 			</File>
 			<File
-				RelativePath=".\XInverse\XInverse.h"
-				>
+				RelativePath=".\XInverse\XInverse.h">
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 			<File
-				RelativePath=".\res\afoilbar.bmp"
-				>
+				RelativePath=".\res\afoilbar.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bitmap1.bmp"
-				>
+				RelativePath=".\res\bitmap1.bmp">
 			</File>
 			<File
-				RelativePath=".\res\bitmap2.bmp"
-				>
+				RelativePath=".\res\harrow.cur">
 			</File>
 			<File
-				RelativePath=".\res\harrow.cur"
-				>
+				RelativePath=".\res\hmove.cur">
 			</File>
 			<File
-				RelativePath=".\res\hmove.cur"
-				>
+				RelativePath=".\res\icon1.ico">
 			</File>
 			<File
-				RelativePath=".\res\icon1.ico"
-				>
+				RelativePath=".\res\idr_icon.ico">
 			</File>
 			<File
-				RelativePath=".\res\idr_icon.ico"
-				>
+				RelativePath=".\res\miarexbar.bmp">
 			</File>
 			<File
-				RelativePath=".\res\miarexbar.bmp"
-				>
+				RelativePath=".\res\Test.ico">
 			</File>
 			<File
-				RelativePath=".\res\Test.ico"
-				>
+				RelativePath=".\res\Toolbar.bmp">
 			</File>
 			<File
-				RelativePath=".\res\Toolbar.bmp"
-				>
+				RelativePath=".\res\Untitled.ico">
 			</File>
 			<File
-				RelativePath=".\res\Untitled.ico"
-				>
+				RelativePath=".\res\X-FLR6.ico">
 			</File>
 			<File
-				RelativePath=".\res\X-FLR6.ico"
-				>
+				RelativePath=".\X-FLR6.rc">
 			</File>
 			<File
-				RelativePath=".\X-FLR6.rc"
-				>
+				RelativePath=".\res\X-FLR6.rc2">
 			</File>
 			<File
-				RelativePath=".\res\X-FLR6.rc2"
-				>
+				RelativePath=".\res\X5.ico">
 			</File>
 			<File
-				RelativePath=".\res\X5.ico"
-				>
+				RelativePath=".\res\x6-32.bmp">
 			</File>
 			<File
-				RelativePath=".\res\xflr5bar.bmp"
-				>
+				RelativePath=".\res\xflr5bar.bmp">
 			</File>
 			<File
-				RelativePath=".\res\xinverse.bmp"
-				>
+				RelativePath=".\res\xinverse.bmp">
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
-			>
+			RelativePath=".\ReadMe.txt">
 		</File>
 	</Files>
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="X-FLR6.rc"
-		/>
+			Value="X-FLR6.rc"/>
 	</Globals>
 </VisualStudioProject>

@@ -44,7 +44,7 @@ public:
 	CPanel();
 	virtual ~CPanel();
 
-protected:
+
 	void Rotate(CVector const &HA, CVector const &H, double const&Angle);
 	void Rotate(CVector const &HA, Quaternion & Qt, double const&Angle);
 	void Reset();
@@ -53,7 +53,9 @@ protected:
 	bool Invert33(double *l);
 	CVector GlobalToLocal(CVector const &V);
 	CVector LocalToGlobal(CVector const &V);
+	double GetWidth();
 
+protected:	
 	bool m_bIsLeading;
 	bool m_bIsTrailing;
 	bool m_bIsInSymPlane;
@@ -92,6 +94,5 @@ protected:
 	static double mat[9];
 
 public:
-	bool IsInPanel(CVector & Pt);
 };
 

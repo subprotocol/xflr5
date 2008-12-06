@@ -267,7 +267,6 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 	int i;
 	bool bInserted = false;
 	int size = (int)m_Alpha.GetSize();
-TRACE("%12.5f     %12.5f     %12.5f     %12.5f \n",Alpha, Cd, Cl, Cm);
 	if(size)
 	{
 		for ( i=0; i<size; i++)
@@ -560,16 +559,20 @@ void CPolar::SerializeOldFormat(CArchive &ar)
 
 			bExists = false;
 			if(m_Type!=4){
-				for (int j=0; j<m_Alpha.GetSize(); j++){
-					if(fabs(Alpha-m_Alpha[j])<0.001){
+				for (int j=0; j<m_Alpha.GetSize(); j++)
+				{
+					if(abs(Alpha-m_Alpha[j])<0.001)
+					{
 						bExists = true;
 						break;
 					}
 				}
 			}
 			else{
-				for (int j=0; j<m_Re.GetSize(); j++){
-					if(fabs(Re-m_Re[j])<0.1){
+				for (int j=0; j<m_Re.GetSize(); j++)
+				{
+					if(abs(Re-m_Re[j])<0.1)
+					{
 						bExists = true;
 						break;
 					}
@@ -679,7 +682,8 @@ void CPolar::Serialize(CArchive &ar)
 		if (l) m_bShowPoints =true; else m_bShowPoints = false;
 			
 		bool bExists;
-		for (int i=0; i< n; i++){
+		for (int i=0; i< n; i++)
+		{
 			ar >> Alpha >> Cd >> Cdp >> Cl >> Cm;
 			ar >> XTr1 >> XTr2;
 			ar >> HMom >> Cpmn;
@@ -691,23 +695,30 @@ void CPolar::Serialize(CArchive &ar)
 			else                    XCp = 0.0;
 
 			bExists = false;
-			if(m_Type!=4){
-				for (int j=0; j<m_Alpha.GetSize(); j++){
-					if(fabs(Alpha-m_Alpha[j])<0.001){
+			if(m_Type!=4)
+			{
+				for (int j=0; j<m_Alpha.GetSize(); j++)
+				{
+					if(abs(Alpha-m_Alpha[j])<0.001)
+					{
 						bExists = true;
 						break;
 					}
 				}
 			}
-			else{
-				for (int j=0; j<m_Re.GetSize(); j++){
-					if(fabs(Re-m_Re[j])<0.1){
+			else
+			{
+				for (int j=0; j<m_Re.GetSize(); j++)
+				{
+					if(abs(Re-m_Re[j])<0.1)
+					{
 						bExists = true;
 						break;
 					}
 				}
 			}
-			if(!bExists){
+			if(!bExists)
+			{
 				AddPoint(Alpha, Cd, Cdp, Cl, Cm, XTr1, XTr2, HMom, Cpmn, Re, XCp);
 			}
 		}

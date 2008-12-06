@@ -71,6 +71,7 @@ CBatchDlg::CBatchDlg(CWnd* pParent /*=NULL*/)
 	m_pBatchThread = NULL;
 	m_pXFoil       = NULL;
 	m_Iterations = 0;
+	pi = 3.141592654;
 }
 
 
@@ -581,7 +582,7 @@ void CBatchDlg::UpdateGraph(double Re, double Alpha)
 	m_RmsGraph.DrawGraph(&dcMem, &BltRect,false);
 
 	if(Re>0.0){
-		strong.Format("Re=%8.0f  /  Alpha=%5.2f", Re, Alpha*180.0/3.141592654);
+		strong.Format("Re=%8.0f  /  Alpha=%5.2f", Re, Alpha*180.0/pi);
 		CPoint Place(int((BltRect.left+BltRect.right)/2), BltRect.top+10);
 		CFont *pOldFont = dcMem.SelectObject(&m_TitleFont);
 		dcMem.SetTextAlign(TA_CENTER);
@@ -745,23 +746,23 @@ void CBatchDlg::Analysis2()
 	m_pBatchThread->m_bFromZero = m_bFromZero;
 
 	if(m_bAlpha){
-		m_pBatchThread->m_SpMin = m_SpMin *3.141592654/180.;
-		m_pBatchThread->m_SpMax = m_SpMax *3.141592654/180.;
+		m_pBatchThread->m_SpMin = m_SpMin *pi/180.;
+		m_pBatchThread->m_SpMax = m_SpMax *pi/180.;
 
-		if(m_SpMin< m_SpMax) m_pBatchThread->m_SpInc = fabs(m_SpInc)*3.141592654/180.;
-		else m_pBatchThread->m_SpInc =                -fabs(m_SpInc)*3.141592654/180.;
+		if(m_SpMin< m_SpMax) m_pBatchThread->m_SpInc = abs(m_SpInc)*pi/180.;
+		else m_pBatchThread->m_SpInc =                -abs(m_SpInc)*pi/180.;
 	}
 	else{
 		m_pBatchThread->m_SpMin = m_SpMin ;
 		m_pBatchThread->m_SpMax = m_SpMax ;
-		if(m_SpMin< m_SpMax) m_pBatchThread->m_SpInc = fabs(m_SpInc);
-		else m_pBatchThread->m_SpInc =                -fabs(m_SpInc);
+		if(m_SpMin< m_SpMax) m_pBatchThread->m_SpInc = abs(m_SpInc);
+		else m_pBatchThread->m_SpInc =                -abs(m_SpInc);
 	}
 	m_pBatchThread->m_ReMin = m_ReMin;
 	m_pBatchThread->m_ReMax = m_ReMax;
 
-	if(m_ReMin < m_ReMax) m_pBatchThread->m_ReInc = fabs(m_ReInc);
-	else m_pBatchThread->m_ReInc =                 -fabs(m_ReInc);
+	if(m_ReMin < m_ReMax) m_pBatchThread->m_ReInc = abs(m_ReInc);
+	else m_pBatchThread->m_ReInc =                 -abs(m_ReInc);
 	InitXFoil2();
 }
 
@@ -773,14 +774,14 @@ void CBatchDlg::Analysis3()
 
 	m_pBatchThread->m_SpMin = m_SpMin ;
 	m_pBatchThread->m_SpMax = m_SpMax ;
-	if(m_SpMin< m_SpMax)	m_pBatchThread->m_SpInc = fabs(m_SpInc);
-	else m_pBatchThread->m_SpInc =                   -fabs(m_SpInc);
+	if(m_SpMin< m_SpMax)	m_pBatchThread->m_SpInc = abs(m_SpInc);
+	else m_pBatchThread->m_SpInc =                   -abs(m_SpInc);
 
 	m_pBatchThread->m_ReMin = m_ReMin;
 	m_pBatchThread->m_ReMax = m_ReMax;
 	
-	if(m_ReMin < m_ReMax) m_pBatchThread->m_ReInc = fabs(m_ReInc);
-	else m_pBatchThread->m_ReInc =                 -fabs(m_ReInc);
+	if(m_ReMin < m_ReMax) m_pBatchThread->m_ReInc = abs(m_ReInc);
+	else m_pBatchThread->m_ReInc =                 -abs(m_ReInc);
 
 	InitXFoil2();
 }

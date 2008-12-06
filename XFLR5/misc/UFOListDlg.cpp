@@ -494,8 +494,10 @@ void CUFOListDlg::EnableCommands(bool bEnable)
 
 BOOL CUFOListDlg::PreTranslateMessage(MSG* pMsg)
 {
-	if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
-		if(GetDlgItem(IDOK) != GetFocus()){
+	if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+	{ 
+		if(GetDlgItem(IDOK) != GetFocus())
+		{
 			OnSelect();
 			m_ctrlOK.SetFocus();
 		}
@@ -511,13 +513,18 @@ void CUFOListDlg::OnHdnItemchangedUfolist(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMHEADER phdr = reinterpret_cast<LPNMHEADER>(pNMHDR);
 	// TODO : ajoutez ici le code de votre gestionnaire de notification de contrôle
 	*pResult = 0;
-	if(m_bWing){
-		for (int i=0; i<9; i++){
+	int i;
+	if(m_bWing)
+	{
+		for (i=0; i<9; i++)
+		{
 			m_ColSize[i] = m_ctrlUFOList.GetColumnWidth(i);
 		}
 	}
-	else{
-		for (int i=0; i<12; i++){
+	else
+	{
+		for (i=0; i<12; i++)
+		{
 			m_ColSize[i] = m_ctrlUFOList.GetColumnWidth(i);
 		}
 	}

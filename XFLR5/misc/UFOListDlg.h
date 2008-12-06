@@ -22,7 +22,7 @@
 #pragma once
 #include "afxcmn.h"
 #include "afxwin.h"
-
+#include "NoBeepListCtrl.h"
 
 // Boîte de dialogue CUFOListDlg
 
@@ -36,7 +36,7 @@ public:
 	CButton m_ctrlDelete;
 	CButton m_ctrlSelect;
 	CButton m_ctrlRename;
-	CListCtrl m_ctrlUFOList;
+	CNoBeepListCtrl m_ctrlUFOList;
 
 	enum { IDD = IDD_UFOLISTDLG };
 

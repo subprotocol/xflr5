@@ -79,11 +79,13 @@ bool CPF::CompMidLine(bool first)
 		}
 		m_rpMid[l].x = x;
 		m_rpMid[l].y = (yex+yin)/2.0;
-		if(abs(yex-yin)>m_fThickness){
+		if(abs(yex-yin)>m_fThickness)
+		{
 			m_fThickness = abs(yex-yin);
 			m_fxThickMax = x;
 		}
-		if(abs(m_rpMid[l].y)>fabs(m_fCamber)){
+		if(abs(m_rpMid[l].y)>abs(m_fCamber))
+		{
 			m_fCamber = m_rpMid[l].y;
 			m_fxCambMax = x;
 		}

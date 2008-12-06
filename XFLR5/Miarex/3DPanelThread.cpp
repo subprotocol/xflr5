@@ -236,7 +236,6 @@ bool C3DPanelThread::UnitLoop()
 }
 
 
-
 bool C3DPanelThread::AlphaLoop(void)
 {
 	CString str;

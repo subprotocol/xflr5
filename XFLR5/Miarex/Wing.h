@@ -34,7 +34,7 @@ class CWing : public CObject
 { 
 	friend class CImportWingDlg;
 	friend class CMainFrame;
-	friend class CWngAnalysis;
+	friend class CWPolarAnalysis;
 	friend class CCtrlAnalysis;
 	friend class CWOper;
 	friend class CWOperDlgBar;
@@ -85,7 +85,7 @@ protected:
 	void LLTInitCl();
 	void LLTComputeWing();
 	int  LLTIterate();
-
+ 
 	void CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
 		               double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
@@ -101,7 +101,7 @@ protected:
 	void ScaleChord(double NewChord);
 	bool Gauss(double *A, int n, double *B, int m);
 	bool SerializeWing(CArchive& ar);
-	bool ExportAVLWing(CStdioFile *pXFile, double x, double z, double Thetax, double Thetay, double bFin);
+	bool ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, double z, double Thetax, double Thetay);
 	double Beta(int m, int k);
 	double Eta(int m);
 	double Sigma(int m);
@@ -114,8 +114,6 @@ protected:
 	double GetTwist(double y);
 	double GetZPos(double y);
 	double Getyrel(double SpanPos);
-	double IntegralC2(double y1, double y2, double c1, double c2);
-	double IntegralCy(double y1, double y2, double c1, double c2);
 
 	void VLMCubicSplines(double *Gamma);
 	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
@@ -131,6 +129,9 @@ protected:
 	static CWnd* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
 	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
+	static int s_NLLTStations;
+	static double s_CvPrec;	// Precision required for LLT convergence
+	static double s_RelaxMax;	// relaxation factor for LLT convergence
 
 	CString m_WingName;	//the wing's name
 
@@ -180,8 +181,6 @@ protected:
 	double m_Weight;	// For type 2 analysis
 	double m_Alpha;		// angle of attack
 	double m_Maxa; 		// Used in LLT
-	double m_CvPrec;	// Precision required for LLT convergence
-	double m_RelaxMax;	// relaxation factor for LLT convergence
 
 	double m_VYm; 
 	double m_IYm;		// Induced Yawing Moment

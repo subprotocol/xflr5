@@ -167,23 +167,22 @@ bool CLLTThread::AlphaLoop()
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	int i,iter;
 
-	m_pWing->m_CvPrec = pMiarex->m_CvPrec;
 	m_pWing->m_Alpha = m_Alpha;
 
 
 	pIDlg->AddString("Launching analysis....\r\n\r\n");
 	str.Format("Max iterations     = %d\r\n", m_IterLim);
 	pIDlg->AddString(str);
-	str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
+	str.Format("Alpha precision    = %.6f°\r\n", CWing::s_CvPrec);
 	pIDlg->AddString(str);
-	str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
+	str.Format("Relaxation factor  = %.1f\r\n", CWing::s_RelaxMax);
 	pIDlg->AddString(str);
-	str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
+	str.Format("Number of stations = %d\r\n\r\n", CWing::s_NLLTStations);
 	pIDlg->AddString(str);
 	
 
-	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)fabs(m_DeltaAlpha);
-	int ia  = (int)fabs((m_AlphaMax-m_Alpha)*1.001f/m_DeltaAlpha);
+	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)abs(m_DeltaAlpha);
+	int ia  = (int)abs((m_AlphaMax-m_Alpha)*1.001/m_DeltaAlpha);
 
 	if(!m_bSequence) ia = 0;
 
@@ -258,18 +257,17 @@ bool CLLTThread::ReLoop()
 	CMiarex* pMiarex = (CMiarex*)m_pMiarex;
 	int iter;
 
-	m_pWing->m_CvPrec = pMiarex->m_CvPrec;
 	m_pWing->m_QInf = m_Alpha;
 	//Alpha has been set at CMiarex::SetWPlr
 
 	pIDlg->AddString("Launching analysis....\r\n\r\n");
 	str.Format("Max iterations     = %d\r\n", m_IterLim);
 	pIDlg->AddString(str);
-	str.Format("Alpha precision    = %.6f°\r\n", m_pWing->m_CvPrec);
+	str.Format("Alpha precision    = %.6f°\r\n", CWing::s_CvPrec);
 	pIDlg->AddString(str);
-	str.Format("Relaxation factor  = %.1f\r\n", pMiarex->m_Relax);
+	str.Format("Relaxation factor  = %.1f\r\n", CWing::s_RelaxMax);
 	pIDlg->AddString(str);
-	str.Format("Number of stations = %d\r\n\r\n", m_pWing->m_NStation);
+	str.Format("Number of stations = %d\r\n\r\n", CWing::s_NLLTStations);
 	pIDlg->AddString(str);
 	
 	if(m_AlphaMax<m_Alpha) m_DeltaAlpha = -(double)abs(m_DeltaAlpha);

@@ -59,7 +59,7 @@ public:
 		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
 	void ComputeCenterLine();
 	void Duplicate(CBody *pBody);
-	void Export(int nx, int nh);
+	void ExportGeometry(int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
 	void InsertSideLine(int SideLine);
 	void InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size);

@@ -148,6 +148,7 @@ BEGIN_MESSAGE_MAP(CXDirect, CWnd)
 	ON_COMMAND(ID_CURRENTFOIL_MANAGEFOILS, OnManageFoils)
 	ON_COMMAND(IDM_SHOWCPGRAPH, OnShowCpGraph)
 	ON_COMMAND(IDM_EXPORTCURRESULTS, OnExportCurrentResults)
+	ON_COMMAND(IDM_EXPORTGRAPHTOFILE, OnExportGraphToFile)
 END_MESSAGE_MAP()
 
 
@@ -1478,13 +1479,15 @@ void CXDirect::DrawBL(CDC *pDC, OpPoint* pOpPoint, double scale, int offx, int o
 
 	if(!pOpPoint->m_bVisc || !pOpPoint->m_bDispSurf) return;
 
-	if(!bIsPrinting){
+	if(!bIsPrinting)
+	{
 		offset.x = offx;
 		offset.y = offy;
 		scalex  = scale;
 		scaley  = scale;
 	}
-	else{
+	else
+	{
 		offset.x =  offx;
 		offset.y = -offy;
 		scalex  =  scale;
@@ -1514,7 +1517,8 @@ void CXDirect::DrawBL(CDC *pDC, OpPoint* pOpPoint, double scale, int offx, int o
 	y = (pOpPoint->xd1[1]-0.5)*sina + pOpPoint->yd1[1]*cosa;
 	pDC->MoveTo((int)( x/scalex) + offset.x,
 				(int)(-y/scaley) + offset.y);
-	for (i=2; i<=pOpPoint->nd1; i++){
+	for (i=2; i<=pOpPoint->nd1; i++)
+	{
 		x = (pOpPoint->xd1[i]-0.5)*cosa - pOpPoint->yd1[i]*sina + 0.5;
 		y = (pOpPoint->xd1[i]-0.5)*sina + pOpPoint->yd1[i]*cosa;
 		pDC->LineTo((int)( x/scalex) + offset.x,
@@ -1524,7 +1528,8 @@ void CXDirect::DrawBL(CDC *pDC, OpPoint* pOpPoint, double scale, int offx, int o
 	y = (pOpPoint->xd2[0]-0.5)*sina + pOpPoint->yd2[0]*cosa;
 	pDC->MoveTo((int)( x/scalex) + offset.x,
 				(int)(-y/scaley) + offset.y);
-	for (i=1; i<pOpPoint->nd2; i++){
+	for (i=1; i<pOpPoint->nd2; i++)
+	{
 		x = (pOpPoint->xd2[i]-0.5)*cosa - pOpPoint->yd2[i]*sina + 0.5;
 		y = (pOpPoint->xd2[i]-0.5)*sina + pOpPoint->yd2[i]*cosa;
 		pDC->LineTo((int)( x/scalex) + offset.x,
@@ -1535,7 +1540,8 @@ void CXDirect::DrawBL(CDC *pDC, OpPoint* pOpPoint, double scale, int offx, int o
 	y = (pOpPoint->xd3[0]-0.5)*sina + pOpPoint->yd3[0]*cosa;
 	pDC->MoveTo((int)( x/scalex) + offset.x,
 				(int)(-y/scaley) + offset.y);
-	for (i=1; i<pOpPoint->nd3; i++){
+	for (i=1; i<pOpPoint->nd3; i++)
+	{
 		x = (pOpPoint->xd3[i]-0.5)*cosa - pOpPoint->yd3[i]*sina + 0.5;
 		y = (pOpPoint->xd3[i]-0.5)*sina + pOpPoint->yd3[i]*cosa;
 		pDC->LineTo((int)( x/scalex) + offset.x,
@@ -1630,7 +1636,8 @@ void CXDirect::PaintPolarGraphs(CDC *pDC, CRect* pCltRect)
 	int w3 = (int)(w/3);
 	int w4 = (int)(w/4);
 
-	if(w3>200 && h>250){
+	if(w3>200 && h>250)
+	{
 		CRect Rect1(0,0,w2,h2);
 		CRect Rect2(w2,0,3*w4,h2);
 		CRect Rect3(w2, h2, 3*w4, pCltRect->bottom);
@@ -1641,7 +1648,8 @@ void CXDirect::PaintPolarGraphs(CDC *pDC, CRect* pCltRect)
 		m_pCmGraph->DrawGraph(pDC, &Rect3, false);
 		m_pTrGraph->DrawGraph(pDC, &Rect4, false);
 
-		if(m_bShowUserGraph){
+		if(m_bShowUserGraph)
+		{
 			CRect Rect5(3*w4,h2,pCltRect->right-0,pCltRect->bottom-0);
 			m_pUserGraph->DrawGraph(pDC, &Rect5, false);
 		}
@@ -1650,6 +1658,7 @@ void CXDirect::PaintPolarGraphs(CDC *pDC, CRect* pCltRect)
 		DrawPolarLegend(pDC, false, Place, pCltRect->bottom);
 	}
 }
+
 
 bool CXDirect::LoadSettings(CArchive &ar) 
 {
@@ -3469,6 +3478,7 @@ void CXDirect::DeleteFoil(bool bAsk)
 void CXDirect::OnExportPlr() 
 {
 	if(!m_pCurPolar) return;
+	CMainFrame *pMainFrame = (CMainFrame*)m_pFrame;
 	CStdioFile XFile;
 	CFileException fe;
 	CString FileName;
@@ -3478,9 +3488,11 @@ void CXDirect::OnExportPlr()
 
 	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
 	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pMainFrame->m_TextFileFormat;
 
 	if(IDOK == XFileDlg.DoModal())
 	{
+		pMainFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
 		FileName = XFileDlg.GetPathName();
 		m_pCurPolar->Export(FileName , XFileDlg.m_ofn.nFilterIndex);
 	}
@@ -5278,7 +5290,8 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 		}	
 	}
 	else 
-	{ //single point analysis
+	{ 
+		//single point analysis
 		if(m_bAlpha)
 		{
 			alfa = Alpha*pi/180.0;
@@ -5732,14 +5745,16 @@ void CXDirect::OnExportOpps()
 	}
 
 	int i,j, type;
-
+	CMainFrame * pMainFrame = (CMainFrame*)m_pFrame;
 	CString FileName;
 			
 	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
 	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pMainFrame->m_TextFileFormat;
 
 	if(IDOK == XFileDlg.DoModal())
 	{
+		pMainFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
 		type = XFileDlg.m_ofn.nFilterIndex;
 		FileName = XFileDlg.GetPathName();
 		CStdioFile XFile;
@@ -6006,28 +6021,33 @@ void CXDirect::OnAbout()
 
 CFoil* CXDirect::AddBufferFoil()
 {
-	// Adds a foil to the array for further use should the user
-	// want to visualize graphs for this foil
+	// Adds the buffer foil to the array for further use 
+	int i;
 	CFoil *pOldFoil;
 	CFoil *pFoil;
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	pFoil = NULL;
-	if(!GetFoil(m_BufferFoil.m_FoilName)){
+
+	if(!GetFoil(m_BufferFoil.m_FoilName))
+	{
 		pFoil = new CFoil();
 		if(!pFoil) return NULL;
 		pFoil->CopyFoil(&m_BufferFoil);
 		pFoil->m_FoilColor = pFrame->m_crColors[m_poaFoil->GetSize()%24];
 		pFoil->InitFoil();
 		bool IsInserted = false;
-		for (int i=0; i<m_poaFoil->GetSize(); i++){
+		for (i=0; i<m_poaFoil->GetSize(); i++)
+		{
 			pOldFoil = (CFoil*)m_poaFoil->GetAt(i);
-			if (pFoil->m_FoilName < pOldFoil->m_FoilName){
+			if (pFoil->m_FoilName < pOldFoil->m_FoilName)
+			{
 				m_poaFoil->InsertAt(i, pFoil);
 				IsInserted = true;
 				break;
 			}
 		}
-		if (!IsInserted) {
+		if (!IsInserted) 
+		{
 			m_poaFoil->Add(pFoil);
 		}
 	}
@@ -6044,8 +6064,10 @@ bool CXDirect::InitXFoil(CFoil * pFoil)
 	if(!pFoil) pFoil = m_pCurFoil;
 	if(!pFoil) return  false;
 	m_pXFoil->m_FoilName = pFoil->m_FoilName;
+	int i, k;
 
-	for (int i =0; i<pFoil->n; i++){
+	for (i =0; i<pFoil->n; i++)
+	{
 		m_pXFoil->xb[i+1] = pFoil->x[i];
 		m_pXFoil->yb[i+1] = pFoil->y[i];
 	}
@@ -6071,22 +6093,26 @@ bool CXDirect::InitXFoil(CFoil * pFoil)
 //	m_pXFoil->xstrip[1]  = pFoil->m_XTopTr;
 //	m_pXFoil->xstrip[2]  = pFoil->m_XBotTr;
 
-	if(m_pCurPolar){
+	if(m_pCurPolar)
+	{
 		m_pXFoil->acrit      = m_pCurPolar->m_ACrit;
 		m_pXFoil->xstrip[1]  = m_pCurPolar->m_XTop;
 		m_pXFoil->xstrip[2]  = m_pCurPolar->m_XBot;
 	}
 
-	if(m_pXFoil->Preprocess()){
+	if(m_pXFoil->Preprocess())
+	{
 		m_pXFoil->CheckAngles();
-		for (int k=0; k<m_pXFoil->n;k++){
+		for (k=0; k<m_pXFoil->n;k++)
+		{
 			pFoil->nx[k] = m_pXFoil->nx[k+1];
 			pFoil->ny[k] = m_pXFoil->ny[k+1];
 		}
 		pFoil->n = m_pXFoil->n;
 		return true;
 	}
-	else {
+	else 
+	{
 		AfxMessageBox("Unrecognized foil format", MB_OK);
 		return false;
 	}
@@ -6113,7 +6139,8 @@ void CXDirect::InitXFoil2()
 	m_pXFoil->retyp  = m_pCurPolar->m_ReType;
 	m_pXFoil->matyp  = m_pCurPolar->m_MaType;
 
-	if(m_pCurPolar){
+	if(m_pCurPolar)
+	{
 		m_pXFoil->acrit      = m_pCurPolar->m_ACrit;
 		m_pXFoil->xstrip[1]  = m_pCurPolar->m_XTop;
 		m_pXFoil->xstrip[2]  = m_pCurPolar->m_XBot;
@@ -6122,8 +6149,10 @@ void CXDirect::InitXFoil2()
 	m_pXFoil->lalfa = true;
 	m_pXFoil->qinf  = 1.0;
 
-	if (m_pCurPolar->m_Mach > 0.000001){
-		if(!m_pXFoil->SetMach()){
+	if (m_pCurPolar->m_Mach > 0.000001)
+	{
+		if(!m_pXFoil->SetMach())
+		{
 			CString str;
 			str.Format("... Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 			AfxMessageBox(str, MB_OK);
@@ -6634,9 +6663,11 @@ void CXDirect::OnExportCurOpp()
 
 	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
 	CFileDialog XFileDlg(false, "txt", NULL, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pFrame->m_TextFileFormat;
 
 	if(IDOK == XFileDlg.DoModal())
 	{
+		pFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
 		FileName = XFileDlg.GetPathName();
 		m_pCurOpp->Export(FileName, pFrame->m_VersionName,  XFileDlg.m_ofn.nFilterIndex);
 	}
@@ -7147,9 +7178,11 @@ void CXDirect::OnExportCurrentResults()
 
 	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
 	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pFrame->m_TextFileFormat;
 
 	if(IDOK==XFileDlg.DoModal()) 
 	{
+		pFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
 		DestFileName = XFileDlg.GetPathName();
 		BOOL bOpen = DestFile.Open(DestFileName, CFile::modeCreate | CFile::modeWrite, &fe);
 		if(bOpen)
@@ -7785,4 +7818,39 @@ void CXDirect::PaintImage(ATL::CImage *pImage, CString &FileName, int FileType)
 	bmp.DeleteObject();
 	
 	pChildView->ReleaseDC(pDC);
+}
+
+
+
+void CXDirect::OnExportGraphToFile()
+{
+	if(!m_pCurGraph) return;
+
+	CString FileName, str;
+	CStdioFile XFile;
+
+	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
+
+	CFileException fe;
+	CString strong;
+
+	m_pCurGraph->GetYTitle(FileName);
+	FileName.Replace("/", " ");
+
+	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
+	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
+	XFileDlg.m_ofn.nFilterIndex = pFrame->m_TextFileFormat;
+
+	if(IDOK==XFileDlg.DoModal()) 
+	{
+		pFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
+
+		FileName = XFileDlg.GetPathName();
+		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
+
+		if(bOpen)
+		{
+			m_pCurGraph->ExportToFile(XFile, XFileDlg.m_ofn.nFilterIndex);
+		}
+	}
 }

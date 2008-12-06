@@ -154,7 +154,7 @@ protected:
 	afx_msg void OnAppend();
 	afx_msg void OnLvnItemchangedPanellist(NMHDR *pNMHDR, LRESULT *pResult);
 //	afx_msg void OnNMClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
-	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
+//	afx_msg void OnNMRClickPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditPanelList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnUpdateMeshFromTotal();
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);

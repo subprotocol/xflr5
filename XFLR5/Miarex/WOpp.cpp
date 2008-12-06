@@ -167,19 +167,23 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 		ar << m_NVLMPanels;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
-		if(m_AnalysisType==3){
+		if(m_AnalysisType==3)
+		{
 			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
 		}
 
 		ar << m_WingType;
 		ar << m_nWakeNodes << m_NXWakePanels << m_FirstWakePanel << m_WakeFactor;
 		ar << m_nFlaps;
-		for(k=0; k<m_nFlaps; k++){
+		for(k=0; k<m_nFlaps; k++)
+		{
 			ar << (float)m_FlapMoment[k];
 		}
 	}
-	else {
-		try{			
+	else 
+	{
+		try
+		{			
 			ar >> ArchiveFormat;
 			if(ArchiveFormat<1001|| ArchiveFormat>1100) return false;
 			//read variables
@@ -187,14 +191,16 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			if(!m_WingName.GetLength() || !m_PlrName.GetLength()) return false;
 
 			ar >> a;
-			if (a!=0 && a!=1){
+			if (a!=0 && a!=1)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
 			}
 			if(a) m_bIsVisible = true; else m_bIsVisible = false;
 			ar >> a;
-			if (a!=0 && a!=1){
+			if (a!=0 && a!=1)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -202,7 +208,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			if(a) m_bShowPoints = true; else m_bShowPoints = false;
 
 			ar >> a;
-			if (a!=0 && a!=1){
+			if (a!=0 && a!=1)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -210,7 +217,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			if(a) m_bOut = true; else m_bOut = false;
 
 			ar >> m_AnalysisType;
-			if (a<=0 && a>=10){
+			if (a<=0 && a>=10)
+			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
 				throw pfe;
@@ -277,7 +285,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 			ar >> f; m_XCP =f;
 			ar >> f; m_YCP =f;
 
-			for (k=0; k<m_NStation; k++){
+			for (k=0; k<m_NStation; k++)
+			{
 				ar >> f; m_Re[k] =f;
 				ar >> f; m_Chord[k] =f;
 				ar >> f; m_Twist[k] =f;
@@ -294,17 +303,20 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				ar >> f; m_XTrBot[k] =f;
 				if(ArchiveFormat>=1002)	{ar >> f; m_BendingMoment[k]=f;}
 				else m_BendingMoment[k] = 0.0;
-				if(ArchiveFormat>=1005)	{
+				if(ArchiveFormat>=1005)	
+				{
 					ar >> f; m_Vd[k].x=f;
 					ar >> f; m_Vd[k].y=f;
 					ar >> f; m_Vd[k].z=f;
 				}
-				else {
+				else
+				{
 					m_Vd[k].x = 0.0;
 					m_Vd[k].y = 0.0;
 					m_Vd[k].z = 0.0;
 				}
-				if(ArchiveFormat>=1006)	{
+				if(ArchiveFormat>=1006)	
+				{
 					ar >> f; m_F[k].x=f;
 					ar >> f; m_F[k].y=f;
 					ar >> f; m_F[k].z=f;
@@ -316,7 +328,8 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				}
 			}
 			m_MaxBending = 0.0;
-			for (k=0; k<m_NStation; k++) {
+			for (k=0; k<m_NStation; k++) 
+			{
 				m_MaxBending = max(m_MaxBending, m_BendingMoment[k]);
 			}
 			for (k=0; k<=m_NStation; k++) 
@@ -332,39 +345,49 @@ bool CWOpp::SerializeWOpp(CArchive &ar)
 				else m_StripArea[k] = 0.0;
 
 			}
-			if(ArchiveFormat>=1003){
+			if(ArchiveFormat>=1003)
+			{
 				ar>> m_NVLMPanels;
-				for (p=0; p<m_NVLMPanels;p++){
+				for (p=0; p<m_NVLMPanels;p++)
+				{
 					ar >> f; m_Cp[p] =f;
 
 				}
 			}
-			if(ArchiveFormat>=1009){
-				for (p=0; p<m_NVLMPanels;p++){
+			if(ArchiveFormat>=1009)
+			{
+				for (p=0; p<m_NVLMPanels;p++)
+				{
 					ar >> f; m_G[p] =f;
 					if(ArchiveFormat<1010) m_G[p] =  f/1000.0;
 				}
 			}
-			if(ArchiveFormat>1010){
+			if(ArchiveFormat>1010)
+			{
 				if(m_AnalysisType==3){	
-					for (p=0; p<m_NVLMPanels;p++)	{
+					for (p=0; p<m_NVLMPanels;p++)
+					{
 						ar >> f; m_Sigma[p] = f;
 					}
 				}
 			}
-			if(ArchiveFormat>=1004){
+			if(ArchiveFormat>=1004)
+			{
 				ar>> m_WingType;
 			}
-			if(ArchiveFormat>=1008){
+			if(ArchiveFormat>=1008)
+			{
 				ar >> m_nWakeNodes >> m_NXWakePanels >> m_FirstWakePanel >> m_WakeFactor;
 			}
-			if(ArchiveFormat>=1010){
+			if(ArchiveFormat>=1010)
+			{
 				ar >> m_nFlaps;
 				for(k=0; k<m_nFlaps; k++){
 					ar >>f;  m_FlapMoment[k] = f;
 				}
 			}
-			if(ArchiveFormat<1010){
+			if(ArchiveFormat<1010)
+			{
 				for(k=0; k<m_NStation; k++){
 					m_Chord[k]      /=1000.0;
 					m_XCPSpanAbs[k] /=1000.0;
@@ -442,3 +465,5 @@ void CWOpp::GetBWStyle(COLORREF &color, int &style, int &width)
 	width = m_Width;
 	GetBWColor(color, style, width);
 }
+
+

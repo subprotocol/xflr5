@@ -46,7 +46,7 @@ class CWPolar : public CObject
 	friend class CCurveDlgBar;
 	friend class CWOperDlgBar;
 	friend class CPOperDlgBar;
-	friend class CWngAnalysis;
+	friend class CWPolarAnalysis;
 	friend class CCtrlAnalysis;
 	friend class CNameDlg;
 	friend class CVLMDlg;

@@ -579,7 +579,7 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 }
 
 
-void CBody::Export(int nx, int nh)
+void CBody::ExportGeometry(int nx, int nh)
 {
 	CStdioFile XFile;
 	CFileException fe;
@@ -597,8 +597,12 @@ void CBody::Export(int nx, int nh)
 	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
 	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
 
+	XFileDlg.m_ofn.nFilterIndex = pMainFrame->m_TextFileFormat;
+
+
 	if(IDOK==XFileDlg.DoModal()) 
 	{
+		pMainFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
 		if(XFileDlg.m_ofn.nFilterIndex==1)		str="";
 		else		str=", ";
 		BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeCreate | CFile::modeWrite, &fe);
@@ -1233,12 +1237,14 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
 
 	for (p=0; p<m_NElements; p++)
 	{
-		PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.x = m_pPanel[p].Normal.x * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.y = m_pPanel[p].Normal.y * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area;
+
 		PanelLift = PanelForce.dot(WindNormal);
 		XCP   += m_pPanel[p].CollPt.x * PanelLift;
 		YCP   += m_pPanel[p].CollPt.y * PanelLift;
-		LeverArm = m_pPanel[p].CollPt;
-		LeverArm.x -= XCmRef;
+		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
 		GeomMoment = LeverArm * PanelForce;
 
 		GCm  += GeomMoment.y;
@@ -1281,7 +1287,7 @@ bool CBody::ExportDefinition()
 
 			for(i=0; i<m_NStations; i++)
 			{
-				XFile.WriteString("FRAME\n");
+				XFile.WriteString("FRAME\n\n");
 				for(j=0;j<m_NSideLines; j++)
 				{
 					strong.Format("%14.7f     %14.7f     %14.7f\n",
@@ -1384,10 +1390,9 @@ bool CBody::ImportDefinition()
 			if (bOpen)
 			{	
 				Line = 0;
-			
+				bRead  = ReadAVLString(&XFile, Line, m_BodyName);
+					
 				//Header data
-				ReadAVLString(&XFile, Line,  strong);//Body Name
-				m_BodyName = strong;
 
 				bRead = TRUE;
 
@@ -1455,13 +1460,13 @@ bool CBody::ImportDefinition()
 				}
 				for(i=0; i<m_NStations; i++)
 				{
+					m_FramePosition[i].x =  m_Frame[i].m_Point[0].x                                             + xo;
+					m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0 + zo;
 					for(j=0; j<m_NSideLines; j++)
 					{
-						m_Frame[i].m_Point[j].x += xo;
+						m_Frame[i].m_Point[j].x = 0.0;
 						m_Frame[i].m_Point[j].z += zo;
 					}
-					m_FramePosition[i].x =  m_Frame[i].m_Point[0].x;
-					m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0;
 				}				
 				
 				return true;
@@ -1491,17 +1496,21 @@ bool CBody::ImportDefinition()
  
 int CBody::ReadFrame(CStdioFile *pXFile, int &Line, CFrame *pFrame, double const &Unit)
 {
+	CVector real;
+	double theta[MAXSIDELINES];
+	double angle;
 	CString strong;
-	double x,y,z;
-	int i, res;
+	int i, j, k, res;
 	i = 0;
+
+	memset(theta, 0, sizeof(theta));
 
 	bool bRead =true;
 	while (bRead)
 	{
 		if(!ReadAVLString(pXFile, Line,  strong)) bRead = false;
 
-		res = sscanf(strong, "%lf  %lf  %lf", &x, &y, &z);
+		res = sscanf(strong, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
 		if(res!=3) 
 		{
 			bRead = false;
@@ -1509,9 +1518,26 @@ int CBody::ReadFrame(CStdioFile *pXFile, int &Line, CFrame *pFrame, double const
 		}
 		else 
 		{
-			pFrame->m_Point[i].x = x / Unit;
-			pFrame->m_Point[i].y = y / Unit;
-			pFrame->m_Point[i].z = z / Unit;
+			angle = pi/2.0 - atan2(real.z, real.y);
+			for (j=0; j<i; j++)
+			{
+				if(angle> theta[j]) 
+				{
+					for(k=i; k>j; k--)
+					{
+						theta[k] = theta [k-1];
+						pFrame->m_Point[k].x = pFrame->m_Point[k-1].x;
+						pFrame->m_Point[k].y = pFrame->m_Point[k-1].y;
+						pFrame->m_Point[k].z = pFrame->m_Point[k-1].z;
+					}
+					break;
+				}
+			}
+			// insert at proper place
+			pFrame->m_Point[j].x = real.x / Unit;
+			pFrame->m_Point[j].y = real.y / Unit;
+			pFrame->m_Point[j].z = real.z / Unit;
+			theta[j] = angle;
 			i++;
 		}
 		if(i>=MAXSIDELINES)

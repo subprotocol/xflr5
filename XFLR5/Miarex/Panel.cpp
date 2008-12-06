@@ -402,11 +402,11 @@ void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
 }
 
 
-bool CPanel::IsInPanel(CVector & Pt)
+double CPanel::GetWidth()
 {
-	return false;
+	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
+		        +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
 }
-
 
 
 

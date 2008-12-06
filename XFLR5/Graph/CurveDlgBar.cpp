@@ -136,10 +136,13 @@ void CCurveDlgBar::OnShow()
 		pFrame->SetSaveState(false);
 		pXDirect->UpdateView();
 	}
-	else if(m_idApp == MIAREX){
+	else if(m_idApp == MIAREX)
+	{
 		CMiarex* pMiarex = (CMiarex*)m_pParent;
-		if(pMiarex->m_iView==2){
-			if (pMiarex->m_pCurWPolar){ 
+		if(pMiarex->m_iView==2)
+		{
+			if (pMiarex->m_pCurWPolar)
+			{ 
 				if (m_ctrlShow.GetCheck())       pMiarex->m_pCurWPolar->m_bIsVisible = true;
 				else                             pMiarex->m_pCurWPolar->m_bIsVisible = false;
 				if (m_ctrlShowPoints.GetCheck()) pMiarex->m_pCurWPolar->m_bShowPoints = true;
@@ -156,11 +159,28 @@ void CCurveDlgBar::OnShow()
 			pMiarex->CreateCpCurves(); 
 			pMiarex->UpdateView();
 		}
-		else if (pMiarex->m_pCurPOpp){
-			if (m_ctrlShow.GetCheck())       pMiarex->m_pCurPOpp->m_bIsVisible = true;
-			else                             pMiarex->m_pCurPOpp->m_bIsVisible = false;
-			if (m_ctrlShowPoints.GetCheck()) pMiarex->m_pCurPOpp->m_bShowPoints = true;
-			else                             pMiarex->m_pCurPOpp->m_bShowPoints = false;
+		else if (pMiarex->m_pCurPOpp)
+		{
+			if (m_ctrlShow.GetCheck())    
+			{
+				pMiarex->m_pCurPOpp->m_bIsVisible = true;
+				pMiarex->m_pCurWOpp->m_bIsVisible = true;
+			}
+			else
+			{
+				pMiarex->m_pCurPOpp->m_bIsVisible = false;
+				pMiarex->m_pCurWOpp->m_bIsVisible = false;
+			}
+			if (m_ctrlShowPoints.GetCheck()) 
+			{
+				pMiarex->m_pCurPOpp->m_bShowPoints = true;
+				pMiarex->m_pCurWOpp->m_bShowPoints = true;
+			}
+			else
+			{
+				pMiarex->m_pCurPOpp->m_bShowPoints = false;
+				pMiarex->m_pCurWOpp->m_bShowPoints = false;
+			}
 
 			if(pMiarex->m_iView==1)	pMiarex->CreateWOppCurves(); 
 			pMiarex->UpdateView();
@@ -339,7 +359,8 @@ void CCurveDlgBar::SetParams()
 
 		}
 	}
-	else if (m_idApp == MIAREX){
+	else if (m_idApp == MIAREX)
+	{
 		CMiarex* pMiarex = (CMiarex*)m_pParent;
 		if(pMiarex->m_iView==2){
 			if(!pMiarex->m_pCurWPolar){

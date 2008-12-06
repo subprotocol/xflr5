@@ -493,24 +493,29 @@ bool C3DPanelDlg::Gauss(double *A, int n, double *B, int m, int TaskSize)
 		pA = pa + n;
 		pivot_row = row;
 		for (i=row+1; i < n; pA+=n, i++)
+		{
 			if ((dum = abs(*(pA+row))) > max) 
 			{ 
 				max = dum; 
 				A_pivot_row = pA; 
 				pivot_row = i; 
 			}
+		}
 		if (max <= 0.0) 
 			return false;                // the matrix A is singular
 		
 			// and if it differs from the current row, interchange the two rows.
 			
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
+		if (pivot_row != row) 
+		{
+			for (i = row; i < n; i++) 
+			{
 				dum = *(pa + i);
 				*(pa + i) = *(A_pivot_row + i);
 				*(A_pivot_row + i) = dum;
 			}
-			for(k=0; k<=m; k++){
+			for(k=0; k<=m; k++)
+			{
 				dum = B[row+k*n];
 				B[row+k*n] = B[pivot_row+k*n];
 				B[pivot_row+k*n] = dum;
@@ -518,7 +523,8 @@ bool C3DPanelDlg::Gauss(double *A, int n, double *B, int m, int TaskSize)
 		}
 		
 		// Perform forward substitution
-		for (i = row+1; i<n; i++) {
+		for (i = row+1; i<n; i++) 
+		{
 			pA = A + i * n;
 			dum = - *(pA + row) / *(pa + row);
 			*(pA + row) = 0.0;
@@ -535,13 +541,15 @@ bool C3DPanelDlg::Gauss(double *A, int n, double *B, int m, int TaskSize)
 	// Perform backward substitution
 	
 	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
+	for (row = n - 1; row >= 0; pa -= n, row--) 
+	{
 		if ( *(pa + row) == 0.0 ) 
 			return false;           // matrix is singular
 		dum = 1.0 / *(pa + row);
 		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
 		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
+		for ( i = 0, pA = A; i < row; pA += n, i++) 
+		{
 			dum = *(pA + row);
 			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
 			for(k=0; k<=m; k++) 
@@ -1387,8 +1395,6 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, QInf, Lift, IDrag);
 		}
 
-//		SetDownwash(Mu, Sigma);
-
 		m_CL          =       Force.dot(WindNormal)    /m_pWing->m_Area;
 		m_CX          =       Force.dot(WindDirection) /m_pWing->m_Area;
 		m_CY          =       Force.dot(WindSide)      /m_pWing->m_Area;
@@ -1575,7 +1581,7 @@ void C3DPanelDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, 
 	// vectorial operations are written inline to save computing times
 	// -->longer code, but 4x more efficient....
 	int i;
-	double CoreSize = 0.000001;
+	double CoreSize = 0.00000;
 	if(abs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 	CVector *pNode;
 	if(bWake)	pNode = m_pWakeNode;
@@ -1737,7 +1743,7 @@ void C3DPanelDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, d
 	//vectorial operations are written inline to save computing times
 	//-->longer code, but 4x more efficient....
 	int i;
-	double CoreSize = 0.000001;
+	double CoreSize = 0.00000;
 	if(abs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	phi = 0.0;

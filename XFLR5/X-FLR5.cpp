@@ -350,7 +350,7 @@ void CAboutDlg::OnLButtonUp(UINT nFlags, CPoint point)
 }
 
 
-LRESULT CAboutDlg::OnNcHitTest(CPoint point) 
+UINT CAboutDlg::OnNcHitTest(CPoint point) 
 {
 	CRect rectClient;
 	CPoint ptClient(point);
@@ -1606,6 +1606,38 @@ bool Gauss(double *A, int n, double *B, int m)
 
 
 
+
+double IntegralC2(double y1, double y2, double c1, double c2)
+{
+	// Auxiliary integral used in LLT calculations
+
+	double res = 0.0;
+
+	if (abs(y2-y1)<1.e-5) return 0.0;
+	double g = (c2-c1)/(y2-y1);
+
+	res = (c1-g*y1)*(c1-g*y1)*(y2-y1) +
+		  g * (c1-g*y1)      *(y2*y2-y1*y1)+
+		  g*g/3.0            *(y2*y2*y2-y1*y1*y1);
+
+	return res;
+}
+
+
+double IntegralCy(double y1, double y2, double c1, double c2)
+{
+	// Auxiliary integral used in LLT calculations
+
+	double res = 0.0;
+
+	if (abs(y2-y1)<1.e-5) return (y1+y2)/2.0 * (c1+c2)/2.0;
+
+	double g = (c2-c1)/(y2-y1);
+
+	res = (c1-g*y1)/2.0 *(y2*y2 - y1*y1) + g/3.0 * (y2*y2*y2-y1*y1*y1);
+
+	return res;
+}
 
 
 
