@@ -238,9 +238,10 @@ void CWOperDlgBar::ReadParams()
 		m_Alpha0     = m_ctrlAlpha.GetValue();
 		m_AlphaMax   = m_ctrlAlphaMax.GetValue();
 		m_DeltaAlpha = abs(m_ctrlDeltaAlpha.GetValue());
-		if(abs(m_DeltaAlpha)<0.1) {
-			m_DeltaAlpha = 0.1;
-			m_ctrlDeltaAlpha.SetValue(0.1);
+		if(abs(m_DeltaAlpha)<0.01) 
+		{
+			m_DeltaAlpha = 0.01;
+			m_ctrlDeltaAlpha.SetValue(0.01);
 		}
 	}
 	else if(m_Type==4)
@@ -260,7 +261,7 @@ void CWOperDlgBar::ReadParams()
 		m_DeltaControl = abs(m_ctrlDeltaAlpha.GetValue())/pFrame->m_mstoUnit;
 		if(abs(m_DeltaControl)<0.001)
 		{
-			m_DeltaControl = 0.01;
+			m_DeltaControl = 0.001;
 			m_ctrlDeltaAlpha.SetValue(0.001);
 		}
 	}

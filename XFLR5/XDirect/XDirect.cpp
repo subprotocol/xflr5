@@ -3039,9 +3039,11 @@ void CXDirect::OnMouseMove(UINT nFlags, CPoint point)
 {
 
 	SHORT shZ  = GetKeyState(90);
-	if ((nFlags & MK_LBUTTON) && m_bTrans){
+	if ((nFlags & MK_LBUTTON) && m_bTrans)
+	{
 		m_pCurGraph = GetGraph(point);
-		if(m_pCurGraph && m_bTransGraph && m_bCpGraph){ 
+		if(m_pCurGraph && m_bTransGraph)
+		{ 
 			// we translate the curves inside the graph
 			double xu, yu;
 			m_pCurGraph->SetAuto(false);
@@ -3062,7 +3064,8 @@ void CXDirect::OnMouseMove(UINT nFlags, CPoint point)
 			m_PointDown.y = point.y;
 			if(!m_bAnimate) UpdateView();
 		}
-		else if (m_pCurFoil  && !m_bPolar){
+		else if (m_pCurFoil  && !m_bPolar)
+		{
 			// we translate the airfoil
 			
 			m_ptOffset.x += point.x - m_PointDown.x;
@@ -3074,29 +3077,34 @@ void CXDirect::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	else if (m_pCurFoil && ((nFlags & MK_MBUTTON) || (shZ & 0x8000))){// we zoom the graph or the foil		
+	else if (m_pCurFoil && ((nFlags & MK_MBUTTON) || (shZ & 0x8000)))
+	{// we zoom the graph or the foil		
 		m_pCurGraph = GetGraph(point);
-		if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point) && m_bCpGraph){ 
+		if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point) && m_bCpGraph)
+		{ 
 			//zoom graph
 
 			SHORT shX = GetKeyState('X');
 			SHORT shY = GetKeyState('Y');
 
-			if (shX & 0x8000){
+			if (shX & 0x8000)
+			{
 				//zoom x scale
 				m_pCurGraph->SetAutoX(false);
 				m_pCurGraph->SetAutoX(false);
 				if(point.x-m_PointDown.x<0) m_pCurGraph->Scalex(1.04);
 				else						m_pCurGraph->Scalex(1.0/1.04);
 			}
-			else if(shY & 0x8000){
+			else if(shY & 0x8000)
+			{
 				//zoom y scale
 				m_pCurGraph->SetAutoY(false);
 				m_pCurGraph->SetAutoY(false);
 				if(point.y-m_PointDown.y<0) m_pCurGraph->Scaley(1.04);
 				else						m_pCurGraph->Scaley(1.0/1.04);
 			}
-			else{
+			else
+			{
 				//zoom both
 				m_pCurGraph->SetAuto(false);
 				if(point.y-m_PointDown.y<0) m_pCurGraph->Scale(1.06);
@@ -3170,10 +3178,12 @@ void CXDirect::OnLButtonUp(UINT nFlags, CPoint point)
 
 Graph* CXDirect::GetGraph(CPoint &pt){
 	//pt is in client coordinates
-	if (m_bPolar) {
+	if (m_bPolar)
+	{
 
 		if(m_iPlrView == 1) return m_pCurGraph;// no need for change
-		if(m_iPlrView == 2){
+		if(m_iPlrView == 2)
+		{
 			if(m_pPolarGraph->IsInDrawRect(pt)){return m_pPolarGraph;}
 			if(m_pUserGraph->IsInDrawRect(pt)){return m_pUserGraph;}
 			return NULL;
@@ -3186,7 +3196,10 @@ Graph* CXDirect::GetGraph(CPoint &pt){
 		if(m_pUserGraph->IsInDrawRect(pt)){return m_pUserGraph;}
 	}
 	else 
-		return m_pCpGraph;
+	{
+		if(m_bCpGraph) return m_pCpGraph;
+		else           return NULL;
+	}
 	return NULL;
 }
 
@@ -6436,7 +6449,7 @@ void CXDirect::PaintOpPoint(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 		}
 		if(m_pCurPolar->m_Type ==4)
 		{
-			strong.Format("Alpha = %8.2f°", m_pCurPolar->m_Alpha);
+			strong.Format("Alpha = %8.2f°", m_pCurPolar->m_ASpec);
 			pDC->TextOut(XPos,ZPos+D, strong);
 			D+=12;
 			strong.Format("Mach = %9.3f", m_pCurPolar->m_Mach);

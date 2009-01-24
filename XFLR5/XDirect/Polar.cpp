@@ -290,15 +290,17 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 
 					if(Cl>0.0)	 m_RtCl[i] = 1.0/sqrt(Cl);
 					else         m_RtCl[i] = 0.0;
-					if (Cl>=0.0) m_Cl32Cd.Add(pow(Cl, 1.5)/ Cd);
-					else         m_Cl32Cd.Add(-pow(-Cl, 1.5)/ Cd);
+					if (Cl>=0.0) m_Cl32Cd[i] =  pow( Cl, 1.5)/ Cd;
+					else         m_Cl32Cd[i] = -pow(-Cl, 1.5)/ Cd;
 
 					if(m_Type == 1)	       m_Re[i] =  Reynolds;
-					else if (m_Type == 2){
+					else if (m_Type == 2)
+					{
 						if(Cl>0.0) m_Re[i] =  Reynolds/ sqrt(Cl);
 						else m_Re[i] = 0.0;
 					}
-					else if (m_Type == 3)  {
+					else if (m_Type == 3)  
+					{
 						if(Cl>0.0) m_Re[i] =  Reynolds/(Cl);
 						else m_Re[i] = 0.0;
 					}
@@ -363,14 +365,16 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 
 					if(Cl>0.0)	 m_RtCl[i] = 1.0/sqrt(Cl);
 					else 	     m_RtCl[i] = 0.0;
-					if (Cl>=0.0) m_Cl32Cd.Add(pow(Cl, 1.5)/ Cd);
-					else         m_Cl32Cd.Add(-pow(-Cl, 1.5)/ Cd);
+					if (Cl>=0.0) m_Cl32Cd[i] =  pow( Cl, 1.5)/ Cd;
+					else         m_Cl32Cd[i] = -pow(-Cl, 1.5)/ Cd;
 					m_Re[i] =  Reynolds;
 
 					bInserted = true;
 					break;
 				}
-				else if (Reynolds < m_Re[i]){// sort by crescending Reynolds numbers
+				else if (Reynolds < m_Re[i])
+				{
+					// sort by crescending Reynolds numbers
 					m_Alpha.InsertAt(i, Alpha, 1);
 					m_Cd.InsertAt(i, Cd, 1);
 					m_Cdp.InsertAt(i, Cdp, 1);

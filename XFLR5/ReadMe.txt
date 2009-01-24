@@ -48,9 +48,17 @@ Licence :
 
                        **************************
 
-TODO :
-	Rotate 3D wake panels by -a.o.a ?
-	Set Gauss as global
+
+v4.15 January 24th 2009
+	- Corrected a bug in foil Polar for the power factor Cl3/Cd2
+	- Corrected a bug which could cause the program to crash in the case of a wing defined with flapped foils, if the foils were deleted
+	- Corrected a bug in foil Type 4 polars which could lead to display an incorrect alpha value in the OpPoint view
+	- Corrected a minor bug relative to inoperant graph translation in some cases
+	- Corrected the bug which prevented to run 3D analysis with step less than alpha or Cl = 0.1
+
+
+v4.14 December 30th, 2008 (limited release only)
+
 
 
 v4.13 December 6th, 2008

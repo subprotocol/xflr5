@@ -524,11 +524,17 @@ void CWing::ComputeGeometry()
 	{
 		pFoilA = pFrame->GetFoil(m_RFoil[i-1]);
 		pFoilB = pFrame->GetFoil(m_RFoil[i]);
-		if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && abs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
-		
+		if(pFoilA && pFoilB)
+		{
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && abs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
+		}
+
 		pFoilA = pFrame->GetFoil(m_LFoil[i-1]);
 		pFoilB = pFrame->GetFoil(m_LFoil[i]);
-		if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && abs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
+		if(pFoilA && pFoilB)
+		{
+			if(pFoilA->m_bTEFlap && pFoilB->m_bTEFlap && abs(m_TPos[i]-m_TPos[i-1])>MinPanelSize)	m_nFlaps++;
+		}
 	}
 }
 

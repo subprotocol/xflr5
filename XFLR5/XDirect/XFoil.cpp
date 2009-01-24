@@ -426,7 +426,7 @@ bool XFoil::axset(double hk1, double t1, double rt1, double a1,
 	}
 	
 	//----- small additional term to ensure  dn/dx > 0  near  n = ncrit
-	f_arg = __min(20.0*(acrit-0.5*(a1+a2)) , 20.0);
+	f_arg = min(20.0*(acrit-0.5*(a1+a2)) , 20.0);
 	if(f_arg<=0.0) {
 		exn    = 1.0;
 		exn_a1 = 0.0;
@@ -545,7 +545,7 @@ bool XFoil::bldif(int ityp)
 	hl_hk1 = -1.0/(hk1-1.0);
 	hl_hk2 =  1.0/(hk2-1.0);
 	
-	hlsq = __min(hl*hl, 15.0);
+	hlsq = min(hl*hl, 15.0);
 	ehh = exp(-hlsq*hdcon);
 	upw = 1.0 - 0.5*ehh;
 	upw_hl =        ehh * hl  *hdcon;
@@ -1307,8 +1307,8 @@ bool XFoil::blvar(int ityp){
 	
 	
 //	double gbcon, gccon, ctcon, hkc2;//were are they initialized ?
-	if(ityp==3) hk2 = __max(hk2,1.00005);
-	if(ityp!=3) hk2 = __max(hk2,1.05000);
+	if(ityp==3) hk2 = max(hk2,1.00005);
+	if(ityp!=3) hk2 = max(hk2,1.05000);
 	
 	//---- density thickness shape parameter     ( h** )
 	hct( hk2, m2, hc2, hc2_hk2, hc2_m2 );
@@ -1715,12 +1715,12 @@ bool XFoil::cft(double hk, double rt, double msq, double &cf, double &cf_hk, dou
 	gm1 = gam - 1.0;
 	fc  = sqrt(1.0 + 0.5*gm1*msq);
 	grt = log(rt/fc);
-	grt = __max(grt,3.0);
+	grt = max(grt,3.0);
 	
 	gex = -1.74 - 0.31*hk;
 	
 	f_arg = -1.33*hk;
-	f_arg = __max(-20.0, f_arg );
+	f_arg = max(-20.0, f_arg );
 	
 	thk = tanh(4.0 - hk/0.875);
 	
@@ -1928,7 +1928,7 @@ stop11:
 	ydd = (6.0*t-4.0)*cy1 + (6.0*t-2.0)*cy2;
 	
 	sd = sqrt(xd*xd + yd*yd);
-	sd = __max(sd,0.001*ds);
+	sd = max(sd,0.001*ds);
 	
 	crv = (xd*ydd - yd*xdd) / sd/ sd/ sd;
 	
@@ -2151,7 +2151,7 @@ bool XFoil::dslim(double &dstr, double thet, double msq, double hklim)
 	
 	hkin(h, msq, hk, hk_h, hk_m);
 	
-	double dh = __max(0.0 , hklim-hk ) / hk_h;
+	double dh = max(0.0 , hklim-hk ) / hk_h;
 	dstr = (dstr) + dh*thet;
 	
 	return true;
@@ -2835,7 +2835,7 @@ bool XFoil::ggcalc()
 		//----- minimum panel length adjacent to te
 		ds1 = sqrt((x[1]-x[2]  )*(x[1]-x[2]  ) + (y[1]-y[2]  )*(y[1]-y[2]  ));
 		ds2 = sqrt((x[n]-x[n-1])*(x[n]-x[n-1]) + (y[n]-y[n-1])*(y[n]-y[n-1]));
-		dsmin = __min( ds1 , ds2 );
+		dsmin = min( ds1 , ds2 );
 		
 		//----- control point on bisector just ahead of te point
 		xbis = xte - bwt*dsmin*cbis;
@@ -3222,7 +3222,7 @@ bool XFoil::iblpan()
 		ipan[iblte[1]+iw][1] = ipan[iblte[2]+iw][2];
 		vti[iblte[1]+iw][1] = 1.0;
 	}
-	iblmax = __max(iblte[1],iblte[2]) + nw;
+	iblmax = max(iblte[1],iblte[2]) + nw;
 	if(iblmax>IVX) {
 //		AfxMessageBox("iblpan :  ***  bl array overflow", MB_ICONSTOP | MB_OK);
 		CString str;
@@ -3900,8 +3900,8 @@ bool XFoil::lefind(double &sle, double x[], double xp[],
 		//------ newton delta for sle 
 		dsle = -res/ress;
 		
-		dsle = __max( dsle , -0.02*abs(xchord+ychord) );
-		dsle = __min( dsle ,  0.02*abs(xchord+ychord) );
+		dsle = max( dsle , -0.02*abs(xchord+ychord) );
+		dsle = min( dsle ,  0.02*abs(xchord+ychord) );
 		sle = sle + dsle;
 		if(abs(dsle) < dseps) return true;
 	}
@@ -3942,7 +3942,7 @@ bool XFoil::ludcmp(int n, double a[IQX][IQX], int indx[IQX])
 	
 	for (i=1; i<=n; i++){
 		aamax = 0.0;
-		for (j=1; j<=n; j++) aamax = __max(abs(a[i][j]), aamax);
+		for (j=1; j<=n; j++) aamax = max(abs(a[i][j]), aamax);
 		vv[i] = 1.0/aamax;
 	}
 	
@@ -4213,8 +4213,8 @@ bool XFoil::mrchdu()
 			else dswaki = 0.0;
 			
 			
-			if(ibl<=iblte[is]) dsi = __max(dsi-dswaki,1.02000*thi) + dswaki;
-			if(ibl>iblte[is]) dsi = __max(dsi-dswaki,1.00005*thi) + dswaki;
+			if(ibl<=iblte[is]) dsi = max(dsi-dswaki,1.02000*thi) + dswaki;
+			if(ibl>iblte[is]) dsi = max(dsi-dswaki,1.00005*thi) + dswaki;
 
 			//------ newton iteration loop for current station
 						
@@ -4319,8 +4319,8 @@ bool XFoil::mrchdu()
 				Gauss(4,vs2,vsrez);
 				
 				//-------- determine max changes and underrelax if necessary
-				dmax = __max(abs(vsrez[2]/thi), abs(vsrez[3]/dsi)  );
-				if(ibl>=itran[is]) dmax = __max(dmax,abs(vsrez[1]/(10.0*cti)));
+				dmax = max(abs(vsrez[2]/thi), abs(vsrez[3]/dsi)  );
+				if(ibl>=itran[is]) dmax = max(dmax,abs(vsrez[1]/(10.0*cti)));
 				
 				rlx = 1.0;
 				if(dmax>0.3) rlx = 0.3/dmax;
@@ -4334,8 +4334,8 @@ bool XFoil::mrchdu()
 				 
 				//-------- eliminate absurd transients
 				if(ibl>=itran[is]) {
-					cti = __min(cti , 0.30);
-					cti = __max(cti , 0.0000001);
+					cti = min(cti , 0.30);
+					cti = max(cti , 0.0000001);
 				}
 				
 				if(ibl<=iblte[is]) hklim = 1.02;
@@ -4487,7 +4487,7 @@ bool XFoil::mrchue(){
 
 
 		//      bule = log(uedg(ibl+1,is)/uei) / log(xssi(ibl+1,is)/xsi)
-		//      bule = __max( -.08 , bule )
+		//      bule = max( -.08 , bule )
 		bule = 1.0;
 		ucon = uei/pow(xsi,bule);
 		tsq = 0.45/(ucon*(5.0*bule+1.0)*reybl) * pow(xsi,(1.0-bule));
@@ -4569,9 +4569,9 @@ bool XFoil::mrchue(){
 					//--------- solve newton system for current "2" station
 					Gauss(4,vs2,vsrez);
 					//--------- determine max changes and underrelax if necessary
-					dmax = __max( abs(vsrez[2]/thi), abs(vsrez[3]/dsi) );
-					if(ibl<itran[is]) dmax = __max(dmax,abs(vsrez[1]/10.0));
-					if(ibl>=itran[is]) dmax = __max(dmax,abs(vsrez[1]/cti ));
+					dmax = max( abs(vsrez[2]/thi), abs(vsrez[3]/dsi) );
+					if(ibl<itran[is]) dmax = max(dmax,abs(vsrez[1]/10.0));
+					if(ibl>=itran[is]) dmax = max(dmax,abs(vsrez[1]/cti ));
 					
 					rlx = 1.0;
 					if(dmax>0.3) rlx = 0.3/dmax;
@@ -4618,8 +4618,8 @@ bool XFoil::mrchue(){
 						else htarg = hk1 - 0.15*(x2-x1)/t1;//----------- turbulent case: relatively fast decrease in hk downstream
 						
 						//---------- limit specified hk to something reasonable
-						if(wake) htarg = __max(htarg , 1.01);
-						else htarg = __max(htarg , hmax);
+						if(wake) htarg = max(htarg , 1.01);
+						else htarg = max(htarg , hmax);
 						
 						CString str;
 						str.Format("     mrchue: inverse mode at %3d    hk =%.3f\r\n",ibl,htarg);
@@ -4640,8 +4640,8 @@ bool XFoil::mrchue(){
 					vsrez[4] = htarg - hk2;
 					Gauss(4,vs2,vsrez);
 
-					dmax = __max( abs(vsrez[2]/thi),abs(vsrez[3]/dsi)  );
-					if(ibl>=itran[is]) dmax = __max( dmax , abs(vsrez[1]/cti));
+					dmax = max( abs(vsrez[2]/thi),abs(vsrez[3]/dsi)  );
+					if(ibl>=itran[is]) dmax = max( dmax , abs(vsrez[1]/cti));
 					rlx = 1.0;
 					if(dmax>0.3) rlx = 0.3/dmax;
 					//--------- update variables
@@ -4654,8 +4654,8 @@ bool XFoil::mrchue(){
 				//-------- eliminate absurd transients
 
 				if(ibl>=itran[is]) {
-					cti = __min(cti, 0.30);
-					cti = __max(cti, 0.0000001);
+					cti = min(cti, 0.30);
+					cti = max(cti, 0.0000001);
 				}
 				if(ibl<=iblte[is])  hklim = 1.02;
 				else hklim = 1.00005;
@@ -4770,7 +4770,7 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls){
     //     depending on matyp,retyp flags.
     //-------------------------------------------
 	double rrat;
-	double cla = __max(cls, 0.000001);
+	double cla = max(cls, 0.000001);
 	if(retyp<1 || retyp>3) {
 //		AfxMessageBox("mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re ", MB_ICONSTOP | MB_OK);
 		CString str;
@@ -4979,7 +4979,7 @@ void XFoil::pangen(){
 	cvsum = 0.0;
 	for (k = -nk; k<=nk; k++){
 		frac = double(k)/double(nk);
-		sbk = sble + frac*sbref/__max(cvle,20.0);
+		sbk = sble + frac*sbref/max(cvle,20.0);
 		cvk = abs(curv(sbk,xb,xbp,yb,ybp,sb,nb)) * sbref;
 		cvsum = cvsum + cvk;
 	}
@@ -5001,7 +5001,7 @@ void XFoil::pangen(){
 	
 	//---- set smoothing length = 1 / averaged le curvature, but 
 	//    no more than 5% of chord and no less than 1/4 average panel spacing
-	smool = __max(1.0/__max(cvavg,20.0), 0.25/double(npan/2));
+	smool = max(1.0/max(cvavg,20.0), 0.25/double(npan/2));
 	
 	smoosq = (smool*sbref) *(smool*sbref);
 	
@@ -5105,7 +5105,7 @@ stop51:
 	//---- find max curvature
 	cvmax = 0.;
 	for( i=1; i<= nb; i++){
-		cvmax = __max(cvmax, abs(w5[i]));
+		cvmax = max(cvmax, abs(w5[i]));
 	}
 	
 	//---- normalize curvature array
@@ -5256,7 +5256,7 @@ stop51:
 			dsrat = 1.0 + rlx*dds/ds;
 			if(dsrat>4.0) rlx = (4.0-1.0)*ds/dds;
 			if(dsrat<0.2) rlx = (0.2-1.0)*ds/dds;
-			dmax = __max(abs(w4[i]),dmax);
+			dmax = max(abs(w4[i]),dmax);
 		}
 		
 		//------ update node position
@@ -7511,7 +7511,7 @@ bool XFoil::setexp(double s[], double ds1, double smax, int nn){
 	ccc = rnex - sigma;
 	
 	disc = bbb*bbb - 4.0*aaa*ccc;
-	disc = __max(0.0, disc);
+	disc = max(0.0, disc);
 	
 	if(nex<=1) {
 //		AfxMessageBox("setexp: cannot fill array.  n too small", MB_ICONSTOP | MB_OK);
@@ -9202,7 +9202,7 @@ bool XFoil::update(){
 //---- max allowable cl change per iteration
 	dclmax =  0.5;
 	dclmin = -0.5;
-	if(matyp!=1) dclmin = __max(-0.5, -0.9*cl) ;
+	if(matyp!=1) dclmin = max(-0.5, -0.9*cl) ;
 	hstinv = gamm1*(minf/qinf)*(minf/qinf) / (1.0 + 0.5*gamm1*minf*minf);
 
 //--- calculate new ue distribution assuming no under-relaxation
@@ -9425,7 +9425,7 @@ bool XFoil::update(){
 			}
 			else dswaki = 0.0;
 			//------- eliminate absurd transients
-			if(ibl>=itran[is]) ctau[ibl][is] = __min(ctau[ibl][is], 0.25);
+			if(ibl>=itran[is]) ctau[ibl][is] = min(ctau[ibl][is], 0.25);
 			
 			if(ibl<=iblte[is]) hklim = 1.02;
 			else            hklim = 1.00005;
@@ -9678,8 +9678,8 @@ bool XFoil::xicalc(){
 	dwdxte = crosp / sqrt(1.0 - crosp*crosp);
 	
 	//---- limit cubic to avoid absurd te gap widths
-	dwdxte = __max(dwdxte,-3.0/telrat);
-	dwdxte = __min(dwdxte, 3.0/telrat);
+	dwdxte = max(dwdxte,-3.0/telrat);
+	dwdxte = min(dwdxte, 3.0/telrat);
 	
 	aa =  3.0 + telrat*dwdxte;
 	bb = -2.0 - telrat*dwdxte;
@@ -9736,14 +9736,14 @@ bool XFoil::xifset(int is){
 		sinvrt(str,xstrip[is],w1,w3,s,n);
 		
 		//----- set bl coordinate value
-		xiforc = __min((sst-str), xssi[iblte[is]][is]);
+		xiforc = min((sst-str), xssi[iblte[is]][is]);
 	}
 	else{
 		//----- same for bottom side
 		
 		str = sle + (s[n]-sle)*xstrip[is];
 		sinvrt(str,xstrip[is],w1,w3,s,n);
-		xiforc = __min((str - sst) , xssi[iblte[is]][is]);
+		xiforc = min((str - sst) , xssi[iblte[is]][is]);
 		
 	}
 	
@@ -10051,8 +10051,8 @@ void XFoil::flap(){
 	if(abs(rdef) <= 0.001) return;
 	
 	if(insid) {
-		atop = __max( 0.0 , -rdef );
-		abot = __max( 0.0 ,  rdef );
+		atop = max( 0.0 , -rdef );
+		abot = max( 0.0 ,  rdef );
 	}
 	else{
 		chx = deval(bots,xb,xbp,sb,nb) - deval(tops,xb,xbp,sb,nb);
@@ -10062,13 +10062,13 @@ void XFoil::flap(){
 		crsp = chx*(ybf-0.5*fvy) - chy*(xbf-0.5*fvx);
 		if(crsp >0.0) {
 			//------ flap hinge is above airfoil
-			atop = __max(0.0, rdef);
-			abot = __max(0.0, rdef);
+			atop = max(0.0, rdef);
+			abot = max(0.0, rdef);
 		}
 		else{
 			//------ flap hinge is below airfoil
-			atop = __max(0.0, -rdef);
-			abot = __max(0.0, -rdef);
+			atop = max(0.0, -rdef);
+			abot = max(0.0, -rdef);
 		}
 	}
 	
@@ -10155,7 +10155,7 @@ void XFoil::flap(){
 		}
 		
 		sb2p = sb2 + sfrac*(sb[ib2 ]-sb2);
-		ib2q = __min(ib2+1,nb);
+		ib2q = min(ib2+1,nb);
 		sb2q = sb2 + sfrac*(sb[ib2q]-sb2); 
 		if(sb[ib2] < sb2q) {
 			//------ simply move adjacent point
@@ -10504,7 +10504,7 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 	//---- set approximate slope ds/dw at airfoil nose
 	double cvle = curv(sle,x,xp,y,yp,s,n) * s[n];
 	double cvabs = abs(cvle);
-	double dsdwle = __max(0.001, 0.5/cvabs );
+	double dsdwle = max(0.001, 0.5/cvabs );
 	
 	double tops = sle/s[n];
 	double bots = (s[n]-sle)/s[n];
@@ -10572,7 +10572,7 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 			
 		double dscmax = 0.0;
 		for(ic=1; ic<=nc;ic++)
-			dscmax = __max( dscmax , abs(sc[ic]-scold[ic]) );
+			dscmax = max( dscmax , abs(sc[ic]-scold[ic]) );
 		
 		if(dscmax < seps) break;			
 		
@@ -11057,7 +11057,7 @@ void XFoil::mapgen(int n, double x[],double y[])
 		dcnmax = 0.0;
 		for(int m=1; m<= ncn;m++){
 			cn[m] = cn[m] - dcn[m];
-			dcnmax = __max( (double)abs(dcn[m]) , dcnmax );
+			dcnmax = max( (double)abs(dcn[m]) , dcnmax );
 		}
 		
 		//ccc     call cnfilt(ffilt)
@@ -12540,12 +12540,13 @@ void XFoil::tgap(double gapnew, double blend)
 		dyu = 0.5*(xbp[nb] - xbp[1]);
 	}
 	
-	doc = __min( __max( blend , 0.0 ) , 1.0 );
+	doc = min(max( blend , 0.0 ) , 1.0 );
 	
 	dgap = gapnew - gap;
 
 	//---- go over each point, changing the y-thickness appropriately
-	for (int i=1; i<=nb; i++){
+	for (int i=1; i<=nb; i++)
+	{
 		
 		//------ chord-based x/c
 		xoc = (  (xb[i]-xble)*(xbte-xble)  + (yb[i]-yble)*(ybte-yble) ) / chbsq;
@@ -12556,11 +12557,12 @@ void XFoil::tgap(double gapnew, double blend)
 			if(i==1 || i==nb) tfac = 1.0;
 		}
 		else{
-			arg = __min((1.0-xoc)*(1.0/doc-1.0), 15.0 );
+			arg = min((1.0-xoc)*(1.0/doc-1.0), 15.0 );
 			tfac = exp(-arg);
 		}
 		
-		if(sb[i]<=sble) {
+		if(sb[i]<=sble) 
+		{
 			xb[i] = xb[i] + 0.5*dgap*xoc*tfac*dxu;
 			yb[i] = yb[i] + 0.5*dgap*xoc*tfac*dyu;
 		}
@@ -12594,7 +12596,7 @@ void XFoil::lerad(double rfac, double blend)
 	int i;
 	double doc, cvmax, cv, radius;
 
-	doc = __max( blend , 0.001 );
+	doc = max( blend , 0.001 );
 	
 	lerscl(xb,xbp,yb,ybp,sb,nb, doc,rfac, w1,w2);
 	
@@ -12615,7 +12617,7 @@ void XFoil::lerad(double rfac, double blend)
 	cvmax = 0.0;
 	for(i=(int)(nb/4); i<=(3*nb)/4; i++){
 		cv = curv(sb[i],xb,xbp,yb,ybp,sb,nb);
-		cvmax = __max(abs(cv) , cvmax );
+		cvmax = max(abs(cv) , cvmax );
 	}
 	
 	radius = 1.0/cvmax;

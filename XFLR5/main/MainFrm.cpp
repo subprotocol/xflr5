@@ -210,7 +210,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v4.13_Beta";
+	m_VersionName = "XFLR5_v4.15";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -3100,7 +3100,7 @@ void CMainFrame::LoadSettings()
 	{
 		if(!fp.Open(str, CFile::modeRead, &fe))
 		{
-			if(fe.m_cause == CFileException::none)				AfxMessageBox("Loading Settings : Unknown error");
+/*			if(fe.m_cause == CFileException::none)				AfxMessageBox("Loading Settings : Unknown error");
 			if(fe.m_cause == CFileException::fileNotFound)		AfxMessageBox("Loading Settings : File Not found " + str);
 //			if(fe.m_cause == CFileException::genericException)	AfxMessageBox("Loading Settings : genericException");
 			if(fe.m_cause == CFileException::badPath)			AfxMessageBox("Loading Settings : badPath");
@@ -3114,7 +3114,7 @@ void CMainFrame::LoadSettings()
 			if(fe.m_cause == CFileException::sharingViolation)	AfxMessageBox("Loading Settings : sharingViolation");
 			if(fe.m_cause == CFileException::lockViolation)		AfxMessageBox("Loading Settings : lockViolation");
 			if(fe.m_cause == CFileException::diskFull)			AfxMessageBox("Loading Settings : diskFull");
-			if(fe.m_cause == CFileException::endOfFile)			AfxMessageBox("Loading Settings : endOfFile");
+			if(fe.m_cause == CFileException::endOfFile)			AfxMessageBox("Loading Settings : endOfFile");*/
 		}
 		else
 		{
