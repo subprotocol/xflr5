@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-
+ 
 // RefFoil.cpp: implementation of the CFoil class.
 //
 //////////////////////////////////////////////////////////////////////
@@ -621,11 +621,17 @@ double CFoil::GetCamberSlope(double x)
 	}
 	return 0.0;
 }
+
+void CFoil::GetFoilName(QString &FoilName)
+{
+	FoilName =  m_FoilName;
+}
+
 double CFoil::GetLength()
 {
 	//Returns the foil's length
 
-		return max(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
+        return std::max(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
 }
 
 double CFoil::GetLowerY(double x)
@@ -879,10 +885,10 @@ double CFoil::NormalizeGeometry()
 	double xmin = 1.0;
 	double xmax = 0.0;
 
-	for (i=0; i<nb; i++)
-	{
-		xmin = min(xmin, xb[i]);
-		xmax = max(xmax, xb[i]);
+        for (i=0; i<nb; i++)
+        {
+                xmin = std::min(xmin, xb[i]);
+                xmax = std::max(xmax, xb[i]);
 	}
 	double length = xmax - xmin;
 
@@ -890,11 +896,11 @@ double CFoil::NormalizeGeometry()
 	for (i=0; i<nb; i++) xb[i] -= xmin;
 	
 	//set length to 1.
-	for(i=0; i<nb; i++)
-	{
+	for(i=0; i<nb; i++){
 		xb[i] = xb[i]/length;
 		yb[i] = yb[i]/length;
 	}
+
 
 
 	//reset origin
@@ -1090,7 +1096,7 @@ void  CFoil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 {
 	// Sets a trailing edge flap properties
 	// x and y hinge are in relative % coordinates
-	// angle is in °
+	// angle is in ï¿½
 
 	m_bTEFlap     = bFlap;
 	m_TEXHinge    = xhinge;
@@ -1103,7 +1109,7 @@ void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 {
 	// Sets a leading edge flap properties
 	// x and y hinge are in relative % coordinates
-	// angle is in °
+	// angle is in ï¿½
 	m_bLEFlap     = bFlap;
 	m_LEXHinge    = xhinge;
 	m_LEYHinge    = yhinge;

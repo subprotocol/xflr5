@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-
 #include "Quaternion.h"
 # include <math.h>
 
@@ -52,10 +51,6 @@ Quaternion::Quaternion(double const &t, double const &x, double const &y, double
 {
 	a=t; qx= x; qy=y; qz = z;
 	theta = 2.0*acos(t);
-}
-
-Quaternion::~Quaternion(void)
-{
 }
 
 

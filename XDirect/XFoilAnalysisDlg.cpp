@@ -109,9 +109,13 @@ void XFoilAnalysisDlg::SetupLayout()
 
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
+	buttonsLayout->addStretch(1);
 	buttonsLayout->addWidget(skipButton);
+	buttonsLayout->addStretch(1);
 	buttonsLayout->addWidget(cancelButton);
+	buttonsLayout->addStretch(1);
 	buttonsLayout->addWidget(closeButton);
+	buttonsLayout->addStretch(1);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlTextOutput);

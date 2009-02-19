@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CPlane Class
-	Copyright (C) 2006 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2006-2009 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@ class CPlane
 	friend class MainFrame;
 	friend class CBody;
 	friend class CWing;
+	friend class GL3dViewDlg;
+	friend class PlaneDlg;
+	friend class VLMAnalysisDlg;
 
 // Construction
 public:
@@ -44,7 +47,7 @@ public:
 protected:
 
 	static void * s_pMiarex;
-	static void * s_pFrame;
+	static void * s_pMainFrame;
 	CBody *m_pBody;
 	CWing m_Wing, m_Wing2;
 	CWing m_Stab;

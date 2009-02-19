@@ -68,3 +68,16 @@ void FloatEditDelegate::SetPrecision(int *PrecisionTable)
 {
 	m_Precision = PrecisionTable;
 }
+
+
+
+void FloatEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QString strong;
+	QStyleOptionViewItem myOption = option;
+	myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+	strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(),0,'f', m_Precision[index.column()]);
+	drawDisplay(painter, myOption, myOption.rect, strong);
+	drawFocus(painter, myOption, myOption.rect);
+}
+

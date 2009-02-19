@@ -30,7 +30,7 @@
 #include <QTextStream>
 #include <QColor>
 
-
+bool IsEven(int n);
 bool IsBetween(int f, int f1, int f2);
 bool IsBetween(int f, double f1, double f2);
 Qt::PenStyle GetStyle(int s);
@@ -46,6 +46,13 @@ void GetAreaUnit(QString &str, int unit);
 void GetLengthUnit(QString &str, int unit);
 void GetMomentUnit(QString &str, int unit);
 void GetForceUnit(QString &str, int unit);
+
+double GLGetRed(double tau);
+double GLGetGreen(double tau);
+double GLGetBlue(double tau);
+
+double IntegralC2(double y1, double y2, double c1, double c2);
+double IntegralCy(double y1, double y2, double c1, double c2);
 
 void ReadCString(QDataStream &ar, QString &strong);
 void WriteCString(QDataStream &ar, QString const &strong);

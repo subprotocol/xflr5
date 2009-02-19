@@ -49,10 +49,6 @@ CVector::CVector(double xi, double yi, double zi)
 	z  = zi;
 }
 
-CVector::~CVector()
-{
-
-}
 
 void CVector::Normalize()
 {

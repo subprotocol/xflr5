@@ -104,9 +104,9 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 	m_pctrlNCrit    = new FloatEdit();
 	m_pctrlTopTrans = new FloatEdit();
 	m_pctrlBotTrans = new FloatEdit();
-	m_pctrlNCrit->setMaximumWidth(70);
-	m_pctrlTopTrans->setMaximumWidth(70);
-	m_pctrlBotTrans->setMaximumWidth(70);
+//	m_pctrlNCrit->setMaximumWidth(70);
+//	m_pctrlTopTrans->setMaximumWidth(70);
+//	m_pctrlBotTrans->setMaximumWidth(70);
 	m_pctrlNCrit->setAlignment(   Qt::AlignRight);
 	m_pctrlTopTrans->setAlignment(Qt::AlignRight);
 	m_pctrlBotTrans->setAlignment(Qt::AlignRight);

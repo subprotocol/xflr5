@@ -27,6 +27,7 @@
 #include "Graph.h"
 #include <math.h>
 #include <QTextStream>
+#include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -99,12 +100,10 @@ Graph::Graph()
 	SetDefaults();
 }
 
-
 Graph::~Graph()
 {
-	DeleteCurves();
+//qDebug() << "destroying graph"<<m_GraphName;
 }
-
 
 
 
@@ -332,7 +331,10 @@ void Graph::GetLegendLogFont(QFont *plgft)
 	*plgft = m_LegendLogFont;
 }
 
-
+QColor Graph::GetLegendColor()
+{
+	return m_LegendColor;
+}
 
 
 void Graph::GetGraphName(QString &GraphName)
@@ -562,7 +564,7 @@ void Graph::SetAutoXUnit()
 	if (xunit<1.0)
 	{
 		exp_x = (int)log10(xunit)-1;
-		exp_x=std::max(-4, exp_x);
+		exp_x= std::max(-4, exp_x);
 	}
 	else exp_x = (int)log10(xunit);
 	int main_x = (int)(xunit/pow(10.0, exp_x)*1.000001);
@@ -653,41 +655,6 @@ void Graph::SetAxisStyle(int nStyle)
 void Graph::SetAxisWidth(int Width)
 {
 	m_Width = Width;
-}
-void Graph::SetLabelColor(QColor crColor)
-{
-	m_LabelColor = crColor;
-}
-QColor Graph::GetLegendColor()
-{
-	return m_LegendColor;
-}
-
-void Graph::SetLegendColor(QColor crColor)
-{
-	m_LegendColor = crColor;
-}
-
-void Graph::SetInverted(bool bInverted)
-{
-	m_bYInverted = bInverted;
-}
-
-
-void Graph::SetLogPixelsY(int n)
-{
-	m_LogPixelsY = n;
-}
-
-
-void Graph::SetMargin(double m)
-{
-	m_iMargin = (int)m;
-}
-
-void Graph::SetMargin(int m)
-{
-	m_iMargin = m;
 }
 
 
@@ -791,6 +758,43 @@ void Graph::SetLegendLogFont(QFont *plgft)
 {
 	m_LegendLogFont = * plgft;
 }
+
+
+void Graph::SetLabelColor(QColor crColor)
+{
+	m_LabelColor = crColor;
+}
+
+
+void Graph::SetLegendColor(QColor crColor)
+{
+	m_LegendColor = crColor;
+}
+
+void Graph::SetInverted(bool bInverted)
+{
+	m_bYInverted = bInverted;
+}
+
+
+void Graph::SetLogPixelsY(int n)
+{
+	m_LogPixelsY = n;
+}
+
+
+void Graph::SetMargin(double m)
+{
+	m_iMargin = (int)m;
+}
+
+void Graph::SetMargin(int m)
+{
+	m_iMargin = m;
+}
+
+
+
 void Graph::SetTitleColor(QColor crColor)
 {
 	m_TitleColor = crColor;

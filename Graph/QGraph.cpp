@@ -103,6 +103,7 @@ QGraph::QGraph()
 QGraph::~QGraph()
 {
 	DeleteCurves();
+//qDebug() << "Destroyed ~QGraph";
 }
 
 
@@ -116,6 +117,7 @@ void QGraph::DrawGraph(QRect const &rect, QPainter &painter)
 void QGraph::DrawGraph(QPainter &painter)
 {
 	QColor color;
+	painter.save();
 
 //	Paint background
 	QBrush bg(m_BkColor);
@@ -151,6 +153,7 @@ void QGraph::DrawGraph(QPainter &painter)
 	DrawTitles(painter);
 
 	painter.setClipping(false);
+	painter.restore();
 }
 
 void QGraph::DrawCurve(int nIndex,QPainter &painter)
@@ -209,8 +212,8 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 
 void QGraph::DrawAxes(QPainter &painter)
 {	
-	painter.save();
 	double scaley = m_scaley;
+	painter.save();
 
 	QPen AxesPen(m_AxisColor);
 	AxesPen.setStyle(GetStyle(m_nStyle));
@@ -243,12 +246,12 @@ void QGraph::DrawAxes(QPainter &painter)
 
 void QGraph::DrawTitles(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	//draws the x & y axis name
 	int XPosXTitle, YPosXTitle;
 	int XPosYTitle, YPosYTitle;
 
+	painter.save();
 	XPosXTitle = 5;
 	YPosXTitle = -10;
 	XPosYTitle = -5;
@@ -280,11 +283,11 @@ void QGraph::DrawTitles(QPainter &painter)
 
 void QGraph::DrawXTicks(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(xunit)<0.00000001) return;
 	if(fabs(xmax-xmin)/xunit>30.0) return;
 
+	painter.save();
 	QString strLabel, strLabelExp;
 
 	painter.setFont(m_LabelLogFont);
@@ -311,7 +314,6 @@ void QGraph::DrawXTicks(QPainter &painter)
 	if(yo>=ymin && yo<=ymax) yp = yo;
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
-
 
 	while(xt<=xmax*1.0001)
 	{
@@ -361,11 +363,11 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 void QGraph::DrawYTicks(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(xunit)<0.00000001) return;
 	if(fabs(ymax-ymin)/yunit>30.0) return;
 
+	painter.save();
 	QString strLabel, strLabelExp;
 	int exp;//TODO : exp used uninitialized
 	double main;
@@ -453,11 +455,11 @@ void QGraph::DrawYTicks(QPainter &painter)
 
 void QGraph::DrawXMajGrid(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(xunit)<0.00000001)     return;
 	if(fabs(xmax-xmin)/xunit>30.0) return;
 
+	painter.save();
 	int YMin, YMax;
 
 	QPen GridPen(m_XMajClr);
@@ -485,11 +487,11 @@ void QGraph::DrawXMajGrid(QPainter &painter)
 
 void QGraph::DrawYMajGrid(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(yunit)<0.00000001) return;
 	if(fabs(ymax-ymin)/yunit>30.0) return;
 
+	painter.save();
 	int width;
 	if(m_YMajWidth<=1) width = 1;
 
@@ -517,7 +519,6 @@ void QGraph::DrawYMajGrid(QPainter &painter)
 
 void QGraph::DrawXMinGrid(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(xunit)<0.00000001) return;
 	if(fabs(m_XMinorUnit)<0.00000001) return;
@@ -525,6 +526,7 @@ void QGraph::DrawXMinGrid(QPainter &painter)
 	if(fabs(xmax-xmin)/m_XMinorUnit>100.0) return;
 	int YMin, YMax;
 
+	painter.save();
 	QPen GridPen(m_XMinClr);
 	GridPen.setStyle(GetStyle(m_XMinStyle));
 	GridPen.setWidth(m_XMinWidth);
@@ -550,13 +552,13 @@ void QGraph::DrawXMinGrid(QPainter &painter)
 
 void QGraph::DrawYMinGrid(QPainter &painter)
 {
-	painter.save();
 	double scaley = m_scaley;
 	if(fabs(yunit)<0.00000001) return;
 	if(fabs(m_YMinorUnit)<0.00000001) return;
 	if(fabs(ymax-ymin)/yunit>30.0) return;
 	if(fabs(ymax-ymin)/m_YMinorUnit>100.0) return;
 
+	painter.save();
 	QPen GridPen(m_YMinClr);
 	GridPen.setStyle(GetStyle(m_YMinStyle));
 	GridPen.setWidth(m_YMinWidth);

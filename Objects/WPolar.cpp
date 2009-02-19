@@ -68,7 +68,7 @@ CWPolar::CWPolar()
 	m_AMem      = 0.0;
 	m_Height    = 0.0;
 	m_Density   = 1.225;
-	m_Viscosity = 1.5e-5;//m²/s
+	m_Viscosity = 1.5e-5;//m2/s
 
 	m_nControls = 0;
 	memset(m_MinControl, 0, sizeof(m_MinControl));
@@ -84,6 +84,7 @@ CWPolar::CWPolar()
 CWPolar::~CWPolar()
 {
 	ResetWPlr();
+//qDebug() << "Destroyed WPolar";
 }
 
 

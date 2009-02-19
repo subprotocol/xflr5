@@ -5,106 +5,142 @@
 #include <math.h>
 #include "Graph/QGraph.h"
 #include "Graph/Curve.h"
+#include "Miarex/Miarex.h"
 #include "XDirect/XDirect.h"
 #include "TwoDWidget.h"
 
 TwoDWidget::TwoDWidget(QWidget *parent)
 	: QWidget(parent)
 {
-	m_iView = XFOILANALYSIS;
-	m_pXDirect = NULL;
+	m_pMainFrame = NULL;
+	m_pXDirect   = NULL;
+	m_pMiarex    = NULL;
 
 	setMouseTracking(true);
+	setCursor(Qt::CrossCursor);
 }
 
 TwoDWidget::~TwoDWidget()
 {
-
 }
 
 void TwoDWidget::keyPressEvent(QKeyEvent *event)
 {
-	if(m_iView == XFOILANALYSIS && m_pXDirect)
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
-qDebug() << "TwoDWidget :: keypress event";
 		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->keyPressEvent(event);
+	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->keyPressEvent(event);
 	}
 }
 
 void TwoDWidget::mousePressEvent(QMouseEvent *event)
 {
-	if(m_iView == XFOILANALYSIS && m_pXDirect)
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->mousePressEvent(event);
+	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->mousePressEvent(event);
 	}
 }
 
 
 void TwoDWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(m_iView == XFOILANALYSIS && m_pXDirect)
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->mouseReleaseEvent(event);
+	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->mouseReleaseEvent(event);
 	}
 }
 
 
 void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	if(m_iView == XFOILANALYSIS && m_pXDirect)
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->mouseMoveEvent(event);
 	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->mouseMoveEvent(event);
+	}
 }
 
-void TwoDWidget::resizeEvent ( QResizeEvent * event )
+void TwoDWidget::resizeEvent(QResizeEvent *event)
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	pXDirect->m_rCltRect = rect();
-	pXDirect->SetFoilScale();
+	QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+	if(pXDirect) pXDirect->m_rCltRect = rect();
+	if(pMiarex)  pMiarex->m_rCltRect = rect();
+
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
+	{
+		pXDirect->SetFoilScale(rect());
+	}
+	else  if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		pMiarex->m_bIs2DScaleSet = false;
+		pMiarex->SetScale(rect());
+	}
 }
 
 
 void TwoDWidget::wheelEvent(QWheelEvent *event)
 {
-	if(m_iView == XFOILANALYSIS && m_pXDirect)
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->wheelEvent(event);
+	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->wheelEvent(event);
 	}
 }
 
 void TwoDWidget::paintEvent(QPaintEvent *event)
 {
-	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
-
-	if(m_iView == XFOILANALYSIS && pXDirect)
-	{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
+	{	
+		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 		QPainter painter(this);
-//		painter.setBackgroundMode(Qt::TransparentMode);
 		pXDirect->PaintView(painter);
+	}
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		QPainter painter(this);
+		pMiarex->PaintView(painter);
 	}
 	else
 	{
-/*		QRect rect(30, 50, 600, 300);
-		QGraph Graph;
-		Graph.m_pParent = this;
-		Graph.SetBkColor(QColor(75,12,0,127));
-		Graph.SetAxisColor(QColor(20, 255,100));
-		Graph.SetLabelColor(QColor(200,255,255));
-		Graph.SetTitleColor(QColor(200,150,50));
-		Graph.SetXTitle("abs");
-		Graph.SetYTitle("ordonnee");
-		Graph.SetMargin(20);
-		CCurve *pCurve = Graph.AddCurve();
-		for(int i=0; i<10; i++) pCurve->AddPoint((double)i/3000., sin(i)/50.);
-
-		Graph.SetDrawRect(rect);
-		Graph.DrawGraph();*/
+		QPainter painter(this);
+		painter.fillRect(rect(), pMainFrame->m_BackgroundColor);
 	}
 }
 

@@ -44,6 +44,7 @@ private:
 
 	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 	QPushButton *OKButton, *CancelButton;
+public:
 	int m_XSel, m_YSel;
 
 };

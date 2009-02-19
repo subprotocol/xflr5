@@ -22,8 +22,9 @@
 #include "Plane.h"
 #include "Globals.h"
 #include <math.h>
+#include <QDebug>
 
-void*	CPlane::s_pFrame;
+void*	CPlane::s_pMainFrame;
 void*	CPlane::s_pMiarex ;
 
 //
@@ -116,7 +117,7 @@ void CPlane::ComputePlane(void)
 		for (i=0;i<m_Stab.m_NPanel; i++)
 		{
 			ProjectedArea += m_Stab.m_TLength[i+1]*(m_Stab.m_TChord[i]+m_Stab.m_TChord[i+1])/2.0
-							*cos(m_Stab.m_TDihedral[i])*cos(m_Stab.m_TDihedral[i]);//m²
+							*cos(m_Stab.m_TDihedral[i])*cos(m_Stab.m_TDihedral[i]);//mï¿½
 		
 		}
 		ProjectedArea *=2.0;
@@ -177,7 +178,7 @@ void CPlane::Duplicate(CPlane *pPlane)
 bool CPlane::HasResults()
 {
 	CWPolar *pWPolar;
-	CMainFrame *pMainFrame = (CMainFrame*)s_pFrame;
+	CMainFrame *pMainFrame = (CMainFrame*)s_pMainFrame;
 	bool bHasResults = false;
 	for (int i=0; i< pMainFrame->m_oaWPolar.GetSize(); i++)
 	{
@@ -197,7 +198,7 @@ bool CPlane::HasResults()
 bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 {
 //	CMiarex *pMiarex = (CMiarex*)s_pMiarex;
-//	MainFrame *pFrame = (MainFrame*)s_pFrame;
+//	MainFrame *pFrame = (MainFrame*)s_pMainFrame;
 	QString strong = "Nobody";
 	int ArchiveFormat;// identifies the format of the file
 	if (bIsStoring)

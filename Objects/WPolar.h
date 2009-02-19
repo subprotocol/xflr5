@@ -35,12 +35,16 @@
 
 class CWPolar
 {
+	friend class CWing;
 	friend class QMiarex;
 	friend class MainFrame;
+	friend class WPolarDlg;
+	friend class GL3dViewDlg;
+	friend class LLTAnalysisDlg;
+        friend class VLMAnalysisDlg;
+        friend class PanelAnalysisDlg;
 
 public:
-
-
 	CWPolar();
 	virtual ~CWPolar();
 

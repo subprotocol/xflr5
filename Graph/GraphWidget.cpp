@@ -28,6 +28,8 @@
 GraphWidget::GraphWidget()
 {
 }
+
+
 void GraphWidget::paintEvent(QPaintEvent *  event )
 {
 	if(!m_pGraph) return;
@@ -65,7 +67,6 @@ void GraphWidget::paintEvent(QPaintEvent *  event )
 
 void GraphWidget::resizeEvent ( QResizeEvent * event )
 {
-qDebug("GraphWidget::resizeEvent");
 	QRect r = rect();
 	if(m_pGraph) m_pGraph->SetDrawRect(r);
 

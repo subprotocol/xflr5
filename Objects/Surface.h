@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CSurface Class
-    Copyright (C) 2005-2008 André Deperrois XFLR5@yahoo.com
+	Copyright (C) 2005-2008 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ class CSurface : public QObject
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class CVLMDlg;
+	friend class GL3dViewDlg;
  
 public:
     void AddFlapPanel(CPanel *pPanel);

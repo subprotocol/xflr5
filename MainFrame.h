@@ -27,17 +27,16 @@
 #include <QStringList>
 #include <QtGui/QMainWindow>
 #include <QList>
-#include "GLWidget.h"
 #include "TwoDWidget.h"
 #include "Params.h"
 #include "Objects/Foil.h"
 #include "Objects/Polar.h"
 #include "Objects/OpPoint.h"
 #include "Objects/Plane.h"
-#include "Graph/GraphWidget.h"
 
 class MainFrame : public QMainWindow
 {
+	friend class TwoDWidget;
 	friend class QXDirect;
 	friend class Miarex;
 	friend class AFoil;
@@ -46,8 +45,17 @@ class MainFrame : public QMainWindow
 	friend class CWOpp;
 	friend class QMiarex;
 	friend class CPlane;
+	friend class BodyGridDlg;
 	friend class BatchDlg;
 	friend class InterpolateFoilsDlg;
+	friend class WingDlg;
+	friend class WPolarDlg;
+	friend class PlaneDlg;
+	friend class PanelAnalysisDlg;
+	friend class VLMAnalysisDlg;
+	friend class GL3dBodyDlg;
+	friend class GL3dViewDlg;
+
     Q_OBJECT
 
 public:
@@ -59,6 +67,7 @@ private slots:
 	void AboutQFLR5();
 	void OnCurFoilStyle();
 	void OnDeleteCurPolar();
+	void OnGraphSettings();
 	void OnExportCurGraph();
 	void OnNewProject();
 	void OnLoadFile();
@@ -71,46 +80,65 @@ private slots:
 	void OnSelChangeFoil(int i);
 	void OnSelChangePolar(int i);
 	void OnSelChangeOpp(int i);
+	void OnSelChangeUFO(int i);
+	void OnSelChangeWOpp(int i);
+	void OnSelChangeWPolar(int i);
 	void OnSaveProject();
 	void OnStyle();
+	void OnUnits();
+	void OnXDirect();
+	void OnMiarex();
+	void OnSaveUFOAsProject();
 
 /*___________________________________________Methods_______________________________*/
 private:
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
-	void keyPressEvent(QKeyEvent *event);
+//	void keyPressEvent(QKeyEvent *event);
 	void CreateDockWindows();
 	void CreateActions();
 	void CreateMenus();
 	void CreateXDirectActions();
 	void CreateXDirectMenus();
-	void CreateToolBars();
+	void CreateMiarexActions();
+	void CreateMiarexMenus();
+	void CreateToolbars();
+	void CreateMiarexToolbar();
+	void CreateXDirectToolbar();
 	void CreateStatusBar();
 	void ClientToGL(QPoint const &point, CVector &real);
 	void DeleteProject();
-	void DeletePlane(CPlane *pPlane, bool bResultsOnly);
+	void DeletePlane(CPlane *pPlane, bool bResultsOnly = false);
+	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
 	void GLToClient(CVector const &real, QPoint &point);
 	void LoadSettings();
 	void RemoveOpPoint(bool bCurrent);
 	void SaveSettings();
 	bool SaveProject(QString PathName="");
 	void SetProjectName(QString PathName);
+	void SetMenus();
 	void SetSaveState(bool bSave);
 	void UpdateFoils();
 	void UpdatePolars();
 	void UpdateOpps();
+	void UpdateUFOs();
+	void UpdateWPolars();
+	void UpdateWOpps();
+
 	void UpdateView();
         void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
 
 	int LoadXFLR5File(QString PathName);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring);
+	bool SerializeUFOProject(QDataStream &ar, bool bIsStoring);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool SelectFoil(CFoil *pFoil);
 	bool SelectPolar(CPolar *pPolar);
 	bool SelectOpPoint(OpPoint *pOpp);
 
 	void AddFoil(CFoil *pFoil);
+	CWing *GetWing(QString WingName);
 	CFoil* GetFoil(QString strFoilName);
 	CFoil* ReadFoilFile(QTextStream &ar);
 	CFoil* ReadPolarFile(QDataStream &ar);
@@ -138,27 +166,56 @@ private:
 	void *m_pMiarex;
 	void *m_pAFoil;
 	TwoDWidget *m_p2DWidget;
-	GLWidget *m_pglWidget;
-	GraphWidget *m_pGraphWidget;
 
-	QToolBar *XDirectToolBar;
-	QToolBar *MiarexToolBar;
+	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget;
 
-	QMenu *fileMenu;
-	QMenu *viewMenu;
-	QMenu *foilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu;
+	QToolBar *m_pctrlXDirectToolBar;
+	QToolBar *m_pctrlMiarexToolBar;
+
+	//Common Menus
+	QMenu * MainMenu;
+	QMenu *fileMenu, *helpMenu;
+
+	//  XFoilAnalysis Menus
+	QMenu * XDirectViewMenu;
+	QMenu *FoilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu;
 	QMenu *currentFoilMenu;
-	QMenu *designMenu;
+	QMenu *DesignMenu;
 	QMenu *OpPointMenu;
 	QMenu *PolarMenu, *currentPolarMenu, *GraphPolarMenu, *CurPolarGraphMenu;
-	QMenu *helpMenu;
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
 
+	//Miarex Menus
+	QMenu * MiarexViewMenu;
+	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu;
+	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
+	QMenu *WPlrGraphMenu, *WOppGraphMenu, *WPlrCurGraphMenu;
+	QMenu *WPlrCtxMenu, *WOppCtxMenu;
+
+	//MainFrame actions
+	QAction *OnXDirectAct, *OnMiarexAct;
 	QAction *openAct, *styleAct;
-	QAction *saveAct, *saveProjectAsAct;
-	QAction *newProjectAct;
+	QAction *saveAct, *saveProjectAsAct,*newProjectAct;
+	QAction *unitsAct;
 	QAction *exitAct;
 	QAction *aboutAct, *aboutQtAct;
+
+	//Miarex Actions
+	QAction *WPolarAct, *WOppAct, *W3DAct;
+	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
+	QAction *renameCurUFO, *renameCurWPolar;
+	QAction *deleteCurUFO, *deleteCurWPolar, *deleteCurWOpp;
+	QAction *twoWingGraphs, *fourWingGraphs;
+	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
+	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
+	QAction *twoWPlrGraphs, *allWPlrGraphs, *WGraphVariable;
+	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs;
+	QAction *resetWOppLegend, *resetWPlrLegend;
+	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps, *deleteAllWPlrOpps;
+	QAction *defineWPolar, *advancedSettings;
+	QAction *defineBody, *editCurBody;
+
+	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *defineBatch;
 	QAction *restoreToolbarsAct;
 	QAction *exportCurPolar, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
@@ -178,9 +235,8 @@ private:
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
 
-	QComboBox * m_pctrlFoil;
-	QComboBox * m_pctrlPolar;
-	QComboBox * m_pctrlOpPoint;
+	QComboBox * m_pctrlFoil, * m_pctrlPolar, * m_pctrlOpPoint;
+	QComboBox * m_pctrlUFO, * m_pctrlWPolar, * m_pctrlWOpp;
 	QLabel *m_pctrlProjectName;
 
 	QStringList m_RecentFiles;
@@ -212,12 +268,12 @@ private:
 	double m_NtoUnit;
 	double m_NmtoUnit;
 
-	uint m_LengthUnit;
-	uint m_AreaUnit;
-	uint m_WeightUnit;
-	uint m_SpeedUnit;
-	uint m_ForceUnit;
-	uint m_MomentUnit;
+	int m_LengthUnit;
+	int m_AreaUnit;
+	int m_WeightUnit;
+	int m_SpeedUnit;
+	int m_ForceUnit;
+	int m_MomentUnit;
 
 	QString m_ProjectName, m_FileName, m_LastDirName;
 	QColor m_crColors[30];

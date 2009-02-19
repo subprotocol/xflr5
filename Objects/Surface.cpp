@@ -45,7 +45,7 @@
 #include <QMessageBox>
 #include <math.h>
 #include "Surface.h"
-
+#include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -102,7 +102,135 @@ CSurface::CSurface()
 
 CSurface::~CSurface()
 {
+//qDebug() << "Destroyed ~CSurface";
+}
 
+void CSurface::AddFlapPanel(CPanel *pPanel)
+{
+	bool bFound = false;
+	int i;
+
+	//Add Nodes
+
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		bFound = bFound && pPanel->m_iLA==m_FlapNode[i];
+		if(pPanel->m_iLA== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iLA;
+		m_nFlapNodes++;
+	}
+
+	bFound = false;
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iLB== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iLB;
+		m_nFlapNodes++;
+	}
+
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iTA== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iTA;
+		m_nFlapNodes++;
+	}
+
+	bFound = false;
+	for (i=0; i< m_nFlapNodes; i++)
+	{
+		if(pPanel->m_iTB== m_FlapNode[i])
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapNode[m_nFlapNodes] = pPanel->m_iTB;
+		m_nFlapNodes++;
+	}
+
+	//Add panel;
+	bFound=false;
+	for(i=0; i<m_nFlapPanels; i++)
+	{
+		if(pPanel->m_iElement==m_FlapPanel[i])
+		{
+			bFound =true;
+			break;
+		}
+	}
+	if(!bFound)
+	{
+		m_FlapPanel[m_nFlapPanels] = pPanel->m_iElement;
+		m_nFlapPanels++;
+	}
+}
+
+
+void CSurface::Copy(CSurface const &Surface)
+{
+	m_LA.Copy(Surface.m_LA);
+	m_LB.Copy(Surface.m_LB);
+	m_TA.Copy(Surface.m_TA);
+	m_TB.Copy(Surface.m_TB);
+	m_Dihedral  = Surface.m_Dihedral;
+	m_XDistType = Surface.m_XDistType;
+	m_YDistType = Surface.m_YDistType;
+	m_NElements = Surface.m_NElements;
+
+	m_Dihedral  = Surface.m_Dihedral;
+	m_Length    = Surface.m_Length;
+	m_NXPanels  = Surface.m_NXPanels;
+	m_NYPanels  = Surface.m_NYPanels;
+	m_pFoilA    = Surface.m_pFoilA;
+	m_pFoilB    = Surface.m_pFoilB;
+	m_TwistA    = Surface.m_TwistA;
+	m_TwistB    = Surface.m_TwistB;
+
+	Normal  = Surface.Normal;
+	NormalA = Surface.NormalA;
+	NormalB = Surface.NormalB;
+
+	m_bIsTipLeft    = Surface.m_bIsTipLeft;
+	m_bIsTipRight   = Surface.m_bIsTipRight;
+	m_bIsLeftSurf   = Surface.m_bIsLeftSurf;
+	m_bIsRightSurf  = Surface.m_bIsRightSurf;
+	m_bIsCenterSurf = Surface.m_bIsCenterSurf;
+	m_bJoinRight    = Surface.m_bJoinRight;
+	m_bIsInSymPlane = Surface.m_bIsInSymPlane;
+
+	m_bTEFlap       = Surface.m_bTEFlap;
+	m_nFlapNodes  = Surface.m_nFlapNodes;
+	m_nFlapPanels = Surface.m_nFlapPanels;
+	m_HingePoint  = Surface.m_HingePoint;
+	m_HingeVector = Surface.m_HingeVector;
+
+	memcpy(m_FlapNode, Surface.m_FlapNode, sizeof(m_FlapNode));
+	memcpy(m_FlapPanel, Surface.m_FlapPanel, sizeof(m_FlapPanel));
+	memcpy(m_xPointA, Surface.m_xPointA, sizeof(m_xPointA));
+	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
 }
 
 void CSurface::GetC4(int k, CVector &Pt, double &tau)
@@ -139,72 +267,6 @@ void CSurface::GetNormal(double yrel, CVector &N)
 	N.Normalize();
 }
 
-void CSurface::SetTwist()
-{
-	CVector A4, B4, L, U, T;
-	CVector O(0.0,0.0,0.0);
-
-	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
-	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
-	L = B4 - A4;
-	L.Normalize();
-
-
-	// create a vector perpendicular to NormalA and x-axis
-	T.x = 0.0;
-	T.y = +NormalA.z;
-	T.z = -NormalA.y;
-	//rotate around this axis
-	U = m_LA-A4;
-	U.Rotate(T, m_TwistA);
-	m_LA = A4+ U; 
-
-	U = m_TA-A4;
-	U.Rotate(T, m_TwistA);
-	m_TA = A4 + U;
-
-	NormalA.Rotate(T, m_TwistA);
-
-	// create a vector perpendicular to NormalB and x-axis
-	T.x = 0.0;
-	T.y = +NormalB.z;
-	T.z = -NormalB.y;
-
-	U = m_LB-B4;
-	U.Rotate(T, m_TwistB);
-	m_LB = B4+ U;
-
-	U = m_TB-B4;
-	U.Rotate(T, m_TwistB);
-	m_TB = B4 + U;
-
-	NormalB.Rotate(T, m_TwistB);
-}
-
-void CSurface::SetTwist_Old()
-{
-	double xc4,zc4;
-	CVector O(0.0,0.0,0.0);
-
-	//"A" section first
-	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
-	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
-	m_LA.x = xc4 + (m_LA.x-xc4) * cos(m_TwistA *pi/180.0);
-	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *pi/180.0);
-	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *pi/180.0);
-	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *pi/180.0);
-	NormalA.RotateY(O, m_TwistA);
-
-	//"B" Section next
-	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
-	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
-	m_LB.x = xc4 + (m_LB.x-xc4) * cos(m_TwistB *pi/180.0);
-	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *pi/180.0);
-	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *pi/180.0);
-	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *pi/180.0);
-	NormalB.RotateY(O, m_TwistB);
-}
-
 double CSurface::GetChord(int const &k)
 {
 	double y1, y2;
@@ -225,41 +287,21 @@ double CSurface::GetChord(double const &tau)
     return ChordA + (ChordB-ChordA) * fabs(tau);
 }
 
+
+void CSurface::GetLeadingPt(int k, CVector &C)
+{
+	GetPanel(k,m_NXPanels-1, 0);
+
+	C.x    = (LA.x+LB.x)/2.0;
+	C.y    = (LA.y+LB.y)/2.0;
+	C.z    = (LA.z+LB.z)/2.0;
+}
+
+
 double CSurface::GetOffset(double const &tau)
 {
 	//chord spacing
     return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
-}
-
-void CSurface::SetNormal()
-{
-	CVector LATB, TALB;
-	LATB = m_TB - m_LA;
-	TALB = m_LB - m_TA;
-	Normal = LATB * TALB;
-	Normal.Normalize();
-}
-
-void CSurface::Init()
-{
-	DL.Set(m_LB.x-m_LA.x,m_LB.y-m_LA.y,m_LB.z-m_LA.z);
-	DC.Set(m_TA.x-m_LA.x,m_TA.y-m_LA.y,m_TA.z-m_LA.z);
-	Length = DL.VAbs();
-	Chord  = DC.VAbs();
-	u.Set(DC.x/Chord,  DC.y/Chord,  DC.z/Chord);
-	v.Set(DL.x/Length, DL.y/Length, DL.z/Length);
-
-	m_bIsTipLeft   = false;
-	m_bIsTipRight  = false;
-	m_bIsLeftSurf  = false;
-	m_bIsRightSurf = false;
-
-	CVector LATB, TALB;
-
-	LATB = m_TB - m_LA;
-	TALB = m_LB - m_TA;
-	Normal = LATB * TALB;
-	Normal.Normalize();
 }
 
 void CSurface::GetPanel(int const &k, int const &l, int const &pos)
@@ -361,60 +403,185 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 	Point.z = APt.z * (1.0-yrel)+  BPt.z * yrel ;
 }
 
-
-
-
-void CSurface::Copy(CSurface const &Surface)
+void CSurface::GetTrailingPt(int k, CVector &C)
 {
-	m_LA.Copy(Surface.m_LA);
-	m_LB.Copy(Surface.m_LB);
-	m_TA.Copy(Surface.m_TA);
-	m_TB.Copy(Surface.m_TB);
-	m_Dihedral  = Surface.m_Dihedral;
-	m_XDistType = Surface.m_XDistType;
-	m_YDistType = Surface.m_YDistType;
-	m_NElements = Surface.m_NElements;
+	GetPanel(k,0,0);
 
-	m_Dihedral  = Surface.m_Dihedral;
-	m_Length    = Surface.m_Length;
-	m_NXPanels  = Surface.m_NXPanels;
-	m_NYPanels  = Surface.m_NYPanels;
-	m_pFoilA    = Surface.m_pFoilA;
-	m_pFoilB    = Surface.m_pFoilB;
-	m_TwistA    = Surface.m_TwistA;
-	m_TwistB    = Surface.m_TwistB;
-
-	Normal  = Surface.Normal;
-	NormalA = Surface.NormalA;
-	NormalB = Surface.NormalB;
-
-	m_bIsTipLeft    = Surface.m_bIsTipLeft;
-	m_bIsTipRight   = Surface.m_bIsTipRight;
-	m_bIsLeftSurf   = Surface.m_bIsLeftSurf;
-	m_bIsRightSurf  = Surface.m_bIsRightSurf;
-	m_bIsCenterSurf = Surface.m_bIsCenterSurf;
-	m_bJoinRight    = Surface.m_bJoinRight;
-	m_bIsInSymPlane = Surface.m_bIsInSymPlane;
-
-	m_bTEFlap       = Surface.m_bTEFlap;
-	m_nFlapNodes  = Surface.m_nFlapNodes;
-	m_nFlapPanels = Surface.m_nFlapPanels;
-	m_HingePoint  = Surface.m_HingePoint;
-	m_HingeVector = Surface.m_HingeVector;
-
-	memcpy(m_FlapNode, Surface.m_FlapNode, sizeof(m_FlapNode));
-	memcpy(m_FlapPanel, Surface.m_FlapPanel, sizeof(m_FlapPanel));
-	memcpy(m_xPointA, Surface.m_xPointA, sizeof(m_xPointA));
-	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
+	C.x    = (TA.x+TB.x)/2.0;
+	C.y    = (TA.y+TB.y)/2.0;
+	C.z    = (TA.z+TB.z)/2.0;
 }
 
-void CSurface::Translate(CVector const &T)
+
+double CSurface::GetStripSpanPos(int const &k)
 {
-	m_LA.Translate(T);
-	m_LB.Translate(T);
-	m_TA.Translate(T);
-	m_TB.Translate(T);
+	int  l;
+	double YPos = 0.0;
+	double ZPos = 0.0;
+	//get average span position of the strip
+	// necessary for strips 'distorted' by fuselage;
+
+	for(l=0; l<m_NXPanels; l++)
+	{
+		GetPanel(k,l, 0);
+		YPos += (LA.y+LB.y+TA.y+TB.y)/4.0;
+		ZPos += (LA.z+LB.z+TA.z+TB.z)/4.0;
+	}
+
+	YPos /= m_NXPanels;
+	ZPos /= m_NXPanels;
+
+	YPos -= (m_LA.y + m_TA.y)/2.0;
+	ZPos -= (m_LA.z + m_TA.z)/2.0;
+
+	return sqrt(YPos*YPos+ZPos*ZPos);
 }
+
+
+
+void CSurface::GetyDist(int const &k, double &y1, double &y2)
+{
+	//leading edge
+
+	double YPanels, dk;
+	YPanels = (double)m_NYPanels;
+	dk      = (double)k;
+
+	if(m_YDistType==1)
+	{
+		//cosine case
+		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
+		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
+	}
+	else if(m_YDistType==-2)
+	{
+		//sine case
+		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
+	}
+	else if(m_YDistType==2)
+	{
+		//-sine case
+		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
+		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
+	}
+	else
+	{
+		//equally spaced case
+		y1 =  dk     /YPanels;
+		y2 = (dk+1.0)/YPanels;
+	}
+}
+
+
+void CSurface::Init()
+{
+	DL.Set(m_LB.x-m_LA.x,m_LB.y-m_LA.y,m_LB.z-m_LA.z);
+	DC.Set(m_TA.x-m_LA.x,m_TA.y-m_LA.y,m_TA.z-m_LA.z);
+	Length = DL.VAbs();
+	Chord  = DC.VAbs();
+	u.Set(DC.x/Chord,  DC.y/Chord,  DC.z/Chord);
+	v.Set(DL.x/Length, DL.y/Length, DL.z/Length);
+
+	m_bIsTipLeft   = false;
+	m_bIsTipRight  = false;
+	m_bIsLeftSurf  = false;
+	m_bIsRightSurf = false;
+
+	CVector LATB, TALB;
+
+	LATB = m_TB - m_LA;
+	TALB = m_LB - m_TA;
+	Normal = LATB * TALB;
+	Normal.Normalize();
+}
+
+
+bool CSurface::IsFlapPanel(int const &p)
+{
+	int pp;
+	for(pp=0; pp<m_nFlapPanels; pp++)
+	{
+		if (p==m_FlapPanel[pp]) return true;
+	}
+	return false;
+}
+
+void CSurface::ResetFlap()
+{
+	int i;
+	for(i=0; i<200; i++)
+	{
+		m_FlapPanel[i] = 30000;
+		m_FlapNode[i]  = 30000;
+	}
+	m_nFlapPanels = 0;
+	m_nFlapNodes = 0;
+}
+
+bool CSurface::RotateFlap(double const &Angle)
+{
+	//The average angle between the two tip foil is cancelled
+	//Instead, the Panels are rotated by Angle
+
+	int k,l,p, iFlap;
+	double alpha0;
+	Quaternion Quat;
+	CVector H, HA, HB, R, S;
+	iFlap = 0;
+	p     = 0;
+
+	if(m_pFoilA && m_pFoilB)
+	{
+		//get the approximate initial angle
+		if(fabs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1)
+		{
+			QMessageBox msgBox;
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.setWindowTitle("QFLR5");
+			msgBox.setText("Continous foils for surface do not have the same initial flap angle... aborting\n");
+			msgBox.exec();
+
+			return false;
+		}
+		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
+		//create a hinge unit vector
+		GetPoint(m_posATE, m_posBTE, 0.0, HA, 0);
+		GetPoint(m_posATE, m_posBTE, 1.0, HB, 0);
+		H = HB-HA;
+		H.Normalize();
+
+		Quat.Set(Angle-alpha0, H);
+
+		for (k=0; k<m_nFlapNodes; k++)
+		{
+			R.x = s_pNode[m_FlapNode[k]].x - HA.x;
+			R.y = s_pNode[m_FlapNode[k]].y - HA.y;
+			R.z = s_pNode[m_FlapNode[k]].z - HA.z;
+			Quat.Conjugate(R,S);
+
+			s_pNode[m_FlapNode[k]].x = S.x + HA.x;
+			s_pNode[m_FlapNode[k]].y = S.y + HA.y;
+			s_pNode[m_FlapNode[k]].z = S.z + HA.z;
+		}
+
+		for(l=0; l<m_nFlapPanels; l++)
+		{
+			s_pPanel[m_FlapPanel[l]].SetFrame(
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLA],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLB],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTA],
+				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTB]);
+		}
+
+
+		++iFlap;
+	}
+	else p+= m_NYPanels * m_NXPanels;
+
+	return true;
+}
+
 
 void CSurface::RotateX(CVector const&O, double XTilt)
 {
@@ -457,61 +624,27 @@ void CSurface::RotateZ(CVector const &O, double ZTilt)
 }
 
 
-void CSurface::GetyDist(int const &k, double &y1, double &y2)
-{
-	//leading edge
-
-	double YPanels, dk;
-	YPanels = (double)m_NYPanels;
-	dk      = (double)k;
-
-	if(m_YDistType==1)
-	{
-		//cosine case
-		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
-		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
-	}
-	else if(m_YDistType==-2)
-	{
-		//sine case
-		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
-	}
-	else if(m_YDistType==2)
-	{
-		//-sine case
-		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
-	}
-	else
-	{
-		//equally spaced case
-		y1 =  dk     /YPanels;
-		y2 = (dk+1.0)/YPanels;
-	}
-}
-
-
-
 void CSurface::SetFlap()
 {
-	if(m_pFoilA->m_bTEFlap) 
+	if(m_pFoilA && m_pFoilA->m_bTEFlap)
 	{
 		m_posATE = m_pFoilA->m_TEXHinge/100.0;
 		if(m_posATE>1.0) m_posATE = 1.0; else if(m_posATE<0.0) m_posATE = 0.0;
 	}
 	else m_posATE = 1.0;
 
-	if(m_pFoilB->m_bTEFlap)
+	if(m_pFoilB && m_pFoilB->m_bTEFlap)
 	{
 		m_posBTE = m_pFoilB->m_TEXHinge/100.0;
 		if(m_posBTE>1.0) m_posBTE = 1.0; else if(m_posBTE<0.0) m_posBTE = 0.0;
 	}
 	else m_posBTE = 1.0;
 
-	m_bTEFlap = m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap;
+	if(m_pFoilA && m_pFoilB) m_bTEFlap = m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap;
+	else                     m_bTEFlap = false;
 
-	if(m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap)
+
+	if(m_pFoilA && m_pFoilB && m_pFoilA->m_bTEFlap && m_pFoilB->m_bTEFlap)
 	{
 		CVector HB;
 		//create a hinge unit vector and initialize hinge moment
@@ -706,220 +839,94 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 	SideB_T[0].Set(Node);
 }
 
-void CSurface::GetLeadingPt(int k, CVector &C)
+
+
+void CSurface::SetNormal()
 {
-	GetPanel(k,m_NXPanels-1, 0);
-
-	C.x    = (LA.x+LB.x)/2.0;
-	C.y    = (LA.y+LB.y)/2.0;
-	C.z    = (LA.z+LB.z)/2.0;
-}
-void CSurface::GetTrailingPt(int k, CVector &C)
-{
-	GetPanel(k,0,0);
-
-	C.x    = (TA.x+TB.x)/2.0;
-	C.y    = (TA.y+TB.y)/2.0;
-	C.z    = (TA.z+TB.z)/2.0;
-}
-
-
-double CSurface::GetStripSpanPos(int const &k)
-{
-	int  l;
-	double YPos = 0.0;
-	double ZPos = 0.0;
-	//get average span position of the strip
-	// necessary for strips 'distorted' by fuselage;
-
-	for(l=0; l<m_NXPanels; l++)
-	{
-		GetPanel(k,l, 0);
-		YPos += (LA.y+LB.y+TA.y+TB.y)/4.0;
-		ZPos += (LA.z+LB.z+TA.z+TB.z)/4.0;
-	}
-
-	YPos /= m_NXPanels;
-	ZPos /= m_NXPanels;
-	
-	YPos -= (m_LA.y + m_TA.y)/2.0;
-	ZPos -= (m_LA.z + m_TA.z)/2.0;
-
-	return sqrt(YPos*YPos+ZPos*ZPos);
-}
-void CSurface::ResetFlap()
-{
-	int i;
-	for(i=0; i<200; i++)
-	{
-		m_FlapPanel[i] = 30000;
-		m_FlapNode[i]  = 30000;
-	}
-	m_nFlapPanels = 0;
-	m_nFlapNodes = 0;
-}
-
-bool CSurface::IsFlapPanel(int const &p)
-{
-	int pp;
-	for(pp=0; pp<m_nFlapPanels; pp++)
-	{
-		if (p==m_FlapPanel[pp]) return true;
-	}
-	return false;
-}
-
-void CSurface::AddFlapPanel(CPanel *pPanel)
-{
-	bool bFound = false;
-	int i;
-
-	//Add Nodes
-
-	for (i=0; i< m_nFlapNodes; i++)
-	{
-		bFound = bFound && pPanel->m_iLA==m_FlapNode[i];
-		if(pPanel->m_iLA== m_FlapNode[i])
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if(!bFound)
-	{
-		m_FlapNode[m_nFlapNodes] = pPanel->m_iLA;
-		m_nFlapNodes++;
-	}
-
-	bFound = false;
-	for (i=0; i< m_nFlapNodes; i++)
-	{
-		if(pPanel->m_iLB== m_FlapNode[i])
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if(!bFound)
-	{
-		m_FlapNode[m_nFlapNodes] = pPanel->m_iLB;
-		m_nFlapNodes++;
-	}
-
-	for (i=0; i< m_nFlapNodes; i++)
-	{
-		if(pPanel->m_iTA== m_FlapNode[i])
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if(!bFound)
-	{
-		m_FlapNode[m_nFlapNodes] = pPanel->m_iTA;
-		m_nFlapNodes++;
-	}
-
-	bFound = false;
-	for (i=0; i< m_nFlapNodes; i++)
-	{
-		if(pPanel->m_iTB== m_FlapNode[i])
-		{
-			bFound = true;
-			break;
-		}
-	}
-	if(!bFound)
-	{
-		m_FlapNode[m_nFlapNodes] = pPanel->m_iTB;
-		m_nFlapNodes++;
-	}
-
-	//Add panel;
-	bFound=false;
-	for(i=0; i<m_nFlapPanels; i++)
-	{
-		if(pPanel->m_iElement==m_FlapPanel[i])
-		{
-			bFound =true;
-			break;
-		}
-	}
-	if(!bFound)
-	{
-		m_FlapPanel[m_nFlapPanels] = pPanel->m_iElement;
-		m_nFlapPanels++;
-	}
-}
-
-bool CSurface::RotateFlap(double const &Angle)
-{
-	//The average angle between the two tip foil is cancelled
-	//Instead, the Panels are rotated by Angle
-
-	int k,l,p, iFlap;
-	double alpha0;
-	Quaternion Quat;
-	CVector H, HA, HB, R, S;
-	iFlap = 0;
-	p     = 0;
-
-	if(m_pFoilA && m_pFoilB)
-	{
-		//get the approximate initial angle
-        if(fabs(m_pFoilA->m_TEFlapAngle - m_pFoilB->m_TEFlapAngle)>0.1)
-		{
-            QMessageBox msgBox;
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.setWindowTitle("QFLR5");
-            msgBox.setText("Continous foils for surface do not have the same initial flap angle... aborting\n");
-            msgBox.exec();
-
-			return false;
-		}
-		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
-		//create a hinge unit vector
-		GetPoint(m_posATE, m_posBTE, 0.0, HA, 0);
-		GetPoint(m_posATE, m_posBTE, 1.0, HB, 0);
-		H = HB-HA;
-		H.Normalize();
-
-		Quat.Set(Angle-alpha0, H);
-
-		for (k=0; k<m_nFlapNodes; k++)
-		{
-			R.x = s_pNode[m_FlapNode[k]].x - HA.x;
-			R.y = s_pNode[m_FlapNode[k]].y - HA.y;
-			R.z = s_pNode[m_FlapNode[k]].z - HA.z;
-			Quat.Conjugate(R,S);
-
-			s_pNode[m_FlapNode[k]].x = S.x + HA.x;
-			s_pNode[m_FlapNode[k]].y = S.y + HA.y;
-			s_pNode[m_FlapNode[k]].z = S.z + HA.z;
-		}
-
-		for(l=0; l<m_nFlapPanels; l++)
-		{
-			s_pPanel[m_FlapPanel[l]].SetFrame(
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLA],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLB],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTA],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTB]);
-		}
-
-
-		++iFlap;
-	}
-	else p+= m_NYPanels * m_NXPanels;
-
-	return true;
+	CVector LATB, TALB;
+	LATB = m_TB - m_LA;
+	TALB = m_LB - m_TA;
+	Normal = LATB * TALB;
+	Normal.Normalize();
 }
 
 
 
+void CSurface::SetTwist()
+{
+	CVector A4, B4, L, U, T;
+	CVector O(0.0,0.0,0.0);
+
+	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
+	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
+	L = B4 - A4;
+	L.Normalize();
+
+
+	// create a vector perpendicular to NormalA and x-axis
+	T.x = 0.0;
+	T.y = +NormalA.z;
+	T.z = -NormalA.y;
+	//rotate around this axis
+	U = m_LA-A4;
+	U.Rotate(T, m_TwistA);
+	m_LA = A4+ U;
+
+	U = m_TA-A4;
+	U.Rotate(T, m_TwistA);
+	m_TA = A4 + U;
+
+	NormalA.Rotate(T, m_TwistA);
+
+	// create a vector perpendicular to NormalB and x-axis
+	T.x = 0.0;
+	T.y = +NormalB.z;
+	T.z = -NormalB.y;
+
+	U = m_LB-B4;
+	U.Rotate(T, m_TwistB);
+	m_LB = B4+ U;
+
+	U = m_TB-B4;
+	U.Rotate(T, m_TwistB);
+	m_TB = B4 + U;
+
+	NormalB.Rotate(T, m_TwistB);
+}
+
+void CSurface::SetTwist_Old()
+{
+	double xc4,zc4;
+	CVector O(0.0,0.0,0.0);
+
+	//"A" section first
+	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
+	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
+	m_LA.x = xc4 + (m_LA.x-xc4) * cos(m_TwistA *pi/180.0);
+	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *pi/180.0);
+	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *pi/180.0);
+	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *pi/180.0);
+	NormalA.RotateY(O, m_TwistA);
+
+	//"B" Section next
+	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
+	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
+	m_LB.x = xc4 + (m_LB.x-xc4) * cos(m_TwistB *pi/180.0);
+	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *pi/180.0);
+	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *pi/180.0);
+	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *pi/180.0);
+	NormalB.RotateY(O, m_TwistB);
+}
 
 
 
+void CSurface::Translate(CVector const &T)
+{
+	m_LA.Translate(T);
+	m_LB.Translate(T);
+	m_TA.Translate(T);
+	m_TB.Translate(T);
+}
 
 
 

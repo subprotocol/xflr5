@@ -48,6 +48,7 @@ CPF::CPF()
 
 CPF::~CPF()
 {
+qDebug() << "destroying ~CPF";
 
 }
 
@@ -79,12 +80,12 @@ bool CPF::CompMidLine(bool first)
 		}
 		m_rpMid[l].x = x;
 		m_rpMid[l].y = (yex+yin)/2.0;
-		if(abs(yex-yin)>m_fThickness)
+		if(fabs(yex-yin)>m_fThickness)
 		{
-			m_fThickness = abs(yex-yin);
+			m_fThickness = fabs(yex-yin);
 			m_fxThickMax = x;
 		}
-		if(abs(m_rpMid[l].y)>abs(m_fCamber))
+		if(fabs(m_rpMid[l].y)>fabs(m_fCamber))
 		{
 			m_fCamber = m_rpMid[l].y;
 			m_fxCambMax = x;
@@ -331,6 +332,7 @@ CSplinedPoints::CSplinedPoints()
 
 CSplinedPoints::~CSplinedPoints()
 {
+qDebug() << "destroying ~CSplinedPoints";
 
 }
 
@@ -348,7 +350,7 @@ bool CSplinedPoints::CompSlopes()
 	m_Slope[m_iPoints-1].y = m_RearPoint.y-0.0;
 	val = m_Slope[m_iPoints-1].x*m_Slope[m_iPoints-1].x + m_Slope[m_iPoints-1].y * m_Slope[m_iPoints-1].y;
 	val = sqrt(val);
-	if(abs(val)>0.0000001)
+	if(fabs(val)>0.0000001)
 	{
 		m_Slope[m_iPoints-1].x = m_Slope[m_iPoints-1].x /val;
 		m_Slope[m_iPoints-1].y = m_Slope[m_iPoints-1].y /val;
@@ -364,7 +366,7 @@ bool CSplinedPoints::CompSlopes()
 		m_Slope[k].y = m_ctrlPoint[k+1].y-m_ctrlPoint[k-1].y;
 		val = m_Slope[k].x*m_Slope[k].x + m_Slope[k].y * m_Slope[k].y;
 		val = sqrt(val);
-		if(abs(val)>0.0000001)
+		if(fabs(val)>0.0000001)
 		{
 			m_Slope[k].x = m_Slope[k].x /val;
 			m_Slope[k].y = m_Slope[k].y /val;
@@ -444,7 +446,7 @@ double CSplinedPoints::GetY(double x)
 	LinkSpline.m_iCtrlPoints = 0;
 	for (k=0; k<m_iPoints; k++)
 	{
-		if(abs(x-m_ctrlPoint[k].x )<0.001) return m_ctrlPoint[k].y;
+		if(fabs(x-m_ctrlPoint[k].x )<0.001) return m_ctrlPoint[k].y;
 		if (m_ctrlPoint[k].x < x && x<=m_ctrlPoint[k+1].x)
 		{
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
@@ -524,8 +526,8 @@ int CSplinedPoints::IsControlPoint(CVector Real, double ZoomFactor)
 {
 	for (int k=0; k<m_iPoints; k++)
 	{
-		if (abs(Real.x-m_ctrlPoint[k].x)<0.003/ZoomFactor &&
-			abs(Real.y-m_ctrlPoint[k].y)<0.003/ZoomFactor) return k;
+		if (fabs(Real.x-m_ctrlPoint[k].x)<0.003/ZoomFactor &&
+			fabs(Real.y-m_ctrlPoint[k].y)<0.003/ZoomFactor) return k;
 	}
 	return -10;
 }
@@ -535,8 +537,8 @@ int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 {
 	for (int k=0; k<m_iPoints; k++)
 	{
-		if (abs(x-m_ctrlPoint[k].x)/Zoom<0.003 &&
-			abs(y-m_ctrlPoint[k].y)/Zoom<0.003) return k;
+		if (fabs(x-m_ctrlPoint[k].x)/Zoom<0.003 &&
+			fabs(y-m_ctrlPoint[k].y)/Zoom<0.003) return k;
 	}
 	return -10;
 }
@@ -544,8 +546,8 @@ int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 
 int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 {
-	if (abs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
-		abs(Real.y-m_RearPoint.y)<0.003/ZoomFactor) return -1;
+	if (fabs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
+		fabs(Real.y-m_RearPoint.y)<0.003/ZoomFactor) return -1;
 	return -10;
 }
 

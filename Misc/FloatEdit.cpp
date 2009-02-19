@@ -22,10 +22,16 @@
 #include "FloatEdit.h"
 #include <QDoubleValidator>
 #include <math.h>
+#include <QtDebug>
+
+int FloatEdit::s_MaxWidth;
 
 FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
+	setMaximumWidth(s_MaxWidth);
+	setMinimumHeight(15);
+
 	m_Value = 0.0;
 	m_iniStr = "0.00";
 	m_fMin = -1.e10;
@@ -38,6 +44,8 @@ FloatEdit::FloatEdit(QWidget *pParent)
 
 FloatEdit::FloatEdit(QString str, int precision)
 {
+	setMaximumWidth(s_MaxWidth);
+
 	bool bOK;
 	str.replace(" ","");
 	double d = str.toDouble(&bOK);
@@ -127,22 +135,22 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
     {
-	case Qt::Key_Return:
-	{
-	    GetValue(m_Value);
-	    SetValue(m_Value);
-	    emit(editingFinished());
-		QLineEdit::keyPressEvent(event);
-		break;
-	}
-	case Qt::Key_Escape:
-	{
-	    setText(m_iniStr);
-		QLineEdit::keyPressEvent(event);
-		break;
-	}
-	default:
-	    QLineEdit::keyPressEvent(event);
+		case Qt::Key_Return:
+		{
+			GetValue(m_Value);
+			SetValue(m_Value);
+			emit(editingFinished());
+			QLineEdit::keyPressEvent(event);
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			setText(m_iniStr);
+			QLineEdit::keyPressEvent(event);
+			break;
+		}
+		default:
+			QLineEdit::keyPressEvent(event);
     }
 }
 

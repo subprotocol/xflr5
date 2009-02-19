@@ -28,10 +28,16 @@ protected:
 
 
 private:
-	int m_iView;
+//	int m_iView;
 	QRect m_rCltRect;          // The client window rectangle
-	void * m_pXDirect;
+	void * m_pXDirect, *m_pMiarex;
 	void *m_pMainFrame;
+
+
+
+	QCursor m_hcArrow;
+	QCursor m_hcCross;
+	QCursor m_hcMove;
 };
 
 #endif

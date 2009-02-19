@@ -23,7 +23,7 @@
 
 #include "Spline.h"
 #include "math.h"
-
+#include <QtDebug>
 
 
 
@@ -409,7 +409,7 @@ double CSpline::SplineBlend(int i,  int p, double t)
 	if (p == 0) 
 	{
 		if ((m_knots[i] <= t) && (t < m_knots[i+1]) )	value = 1.0;
-//		else if (abs(m_knots[i]-m_knots[i+1])<pres)	    value = 0.0;
+//		else if (fabs(m_knots[i]-m_knots[i+1])<pres)	    value = 0.0;
 		else 						                    value = 0.0;
 	} 
 	else
@@ -462,7 +462,7 @@ void CSpline::SplineKnots()
 {
 	double a,b;
 	int j;
-        int iDegree = std::min(m_iDegree, m_iCtrlPoints);
+		int iDegree = std::min(m_iDegree, m_iCtrlPoints);
 
 	m_iKnots  = iDegree + m_iCtrlPoints + 1;
 	for (j=0; j<m_iKnots; j++) 

@@ -33,7 +33,6 @@ class CVector
 public: 
 	CVector();
 	CVector(double xi, double yi, double zi);
-	~CVector();
 
 	bool IsSame(CVector const &V);
 	void Set(CVector const &V);

@@ -36,10 +36,13 @@ class CPanel
 	friend class CWing;
 	friend class QMiarex;
 	friend class CBody;
+	friend class VLMAnalysisDlg;
+	friend class PanelAnalysisDlg;
+	friend class GL3dBodyDlg;
+	friend class GL3dViewDlg;
 
 public:
 	CPanel();
-	virtual ~CPanel();
 
 
 	void Rotate(CVector const &HA, CVector const &H, double const&Angle);

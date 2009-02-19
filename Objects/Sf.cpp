@@ -27,6 +27,7 @@
 #include "math.h"
 #include "Sf.h"
 #include "Globals.h"
+#include <QtDebug>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -44,7 +45,9 @@ CSF::CSF()
 	m_bCenterLine  = false;
 }
 
-CSF::~CSF(){
+CSF::~CSF()
+{
+qDebug() << "Destroyed ~CSF";
 
 }
 

@@ -41,6 +41,7 @@ class CFoil
 	friend class CSurface;
 	friend class GLWidget;
 	friend class QXDirect;
+	friend class QMiarex;
 	friend class XFoil;
 	friend class FoilPolarDlg;
 	friend class CWing;
@@ -55,13 +56,56 @@ class CFoil
 	friend class FlapDlg;
 	friend class CAddDlg;
 	friend class BatchDlg;
+	friend class GL3dViewDlg;
+	friend class WingDlg;
 
 public:
-	int IsPoint(CVector Real);
+	static double pi;
 	CFoil();
 	~CFoil();
+	void GetFoilName(QString &FoilName);
+	int IsPoint(CVector Real);
+	void DrawFoil(QPainter &painter, double alpha, double scalex, double scaley,QPoint Offset);
+	void DrawPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
 
-	static double pi;
+	double DeRotate();
+	double GetBaseUpperY(double x);
+	double GetBaseLowerY(double x);
+	double GetUpperY(double x);
+	double GetLowerY(double x);
+	double GetMidY(double x);
+	double GetCamber(double x);
+	double GetCamberAngle(double x);
+	double GetCamberSlope(double x);
+	double GetLength();
+	double GetArea();
+	double GetTopSlope(double x);
+	double GetBotSlope(double x);
+	double NormalizeGeometry();
+	bool CompMidLine(bool bParams);
+
+	bool ExportFoil(QTextStream &out);
+	bool InitFoil();
+	bool SetCamber(double f, double u);
+
+	void CopyFoil(CFoil *pSrcFoil);
+	void DrawFoil(double alpha, double scalex, double scaley, CVector const &Offset);
+	void DrawPoints(double scalex, double scaley, CVector Offset);
+	void DrawMidLine(double scalex, double scaley, CVector Offset);
+	void Serialize(QDataStream &ar, bool bIsStoring);
+	void SetFlap();
+	void SetTEFlap();
+	void SetLEFlap();
+	void SetNaca009();
+	void SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
+	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
+
+
+	bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
+	bool IsBetween(int f, int f1, int f2);
+	bool IsBetween(int f, double f1, double f2);
+
 private:
 
 	QString m_FoilName;		// the foil's name...
@@ -111,46 +155,6 @@ private:
 	double m_LEFlapAngle;
 	double m_LEXHinge, m_LEYHinge;
 
-	bool CompMidLine(bool bParams);
-
-	bool ExportFoil(QTextStream &out);
-	bool InitFoil();
-	bool SetCamber(double f, double u);
-
-	void CopyFoil(CFoil *pSrcFoil);
-	void DrawFoil(double alpha, double scalex, double scaley, CVector const &Offset);
-	void DrawPoints(double scalex, double scaley, CVector Offset);
-	void DrawMidLine(double scalex, double scaley, CVector Offset);
-	void Serialize(QDataStream &ar, bool bIsStoring);
-	void SetFlap();
-	void SetTEFlap();
-	void SetLEFlap();
-	void SetNaca009();
-	void SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
-	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
-
-	void DrawFoil(QPainter &painter, double alpha, double scalex, double scaley,QPoint Offset);
-	void DrawPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
-	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
-
-	double DeRotate();
-	double GetBaseUpperY(double x);
-	double GetBaseLowerY(double x);
-	double GetUpperY(double x);
-	double GetLowerY(double x);
-	double GetMidY(double x);
-	double GetCamber(double x);
-	double GetCamberAngle(double x);
-	double GetCamberSlope(double x);
-	double GetLength();
-	double GetArea();
-	double GetTopSlope(double x);
-	double GetBotSlope(double x);
-    double NormalizeGeometry();
-
-    bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
-    bool IsBetween(int f, int f1, int f2);
-    bool IsBetween(int f, double f1, double f2);
 };
 
 #endif

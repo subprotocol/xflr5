@@ -63,192 +63,6 @@ GraphDlg::GraphDlg()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
-void GraphDlg::SetLayout()
-{
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	RestoreButton = new QPushButton("Restore");
-	OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(RestoreButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
-
-	QTabWidget *pTabWidget = new QTabWidget(this);
-//	pTabWidget->setMinimumWidth(300);
-//	pTabWidget->setMinimumHeight(300);
-
-	ScalePage = new QWidget(this);
-	GridPage = new QWidget(this);
-	FontPage = new QWidget(this);
-	BackPage = new QWidget(this);
-
-	//________Font Page______________________
-	QGridLayout *FontButtons = new QGridLayout;
-
-	QLabel *lab1  = new QLabel("Title font");
-	QLabel *lab2  = new QLabel("Label font");
-	QLabel *lab3 = new QLabel("Legend font");
-	FontButtons->addWidget(lab1,1,1);
-	FontButtons->addWidget(lab2,2,1);
-	FontButtons->addWidget(lab3,3,1);
-
-	m_pctrlTitleButton  = new QPushButton("Title Font");
-	m_pctrlLabelButton  = new QPushButton("Label Font");
-	m_pctrlLegendButton = new QPushButton("Legend Font");
-	FontButtons->addWidget(m_pctrlTitleButton,1,2);
-	FontButtons->addWidget(m_pctrlLabelButton,2,2);
-	FontButtons->addWidget(m_pctrlLegendButton,3,2);
-
-	m_pctrlTitleColor  = new ColorButton;
-	m_pctrlLabelColor  = new ColorButton;
-	m_pctrlLegendColor = new ColorButton;
-	FontButtons->addWidget(m_pctrlTitleColor,1,3);
-	FontButtons->addWidget(m_pctrlLabelColor,2,3);
-	FontButtons->addWidget(m_pctrlLegendColor,3,3);
-
-	FontPage->setLayout(FontButtons);
-	//________End Font Page______________________
-	//________Scale Page______________________
-	QHBoxLayout *HScaleBox = new QHBoxLayout;
-
-	QGridLayout *Labels = new QGridLayout;
-	QLabel *Void0 = new QLabel("     ");
-	QLabel *Void1 = new QLabel("     ");
-	Void0->setMinimumWidth(90);
-	QLabel *MinLabel = new QLabel("Min");
-	QLabel *MaxLabel = new QLabel("Max");
-	QLabel *OriginLabel = new QLabel("Origin");
-	QLabel *UnitLabel = new QLabel("Unit");
-	MinLabel->setAlignment(Qt::AlignRight);
-	MaxLabel->setAlignment(Qt::AlignRight);
-	OriginLabel->setAlignment(Qt::AlignRight);
-	UnitLabel->setAlignment(Qt::AlignRight);
-	Labels->addWidget(Void0,1,1);
-	Labels->addWidget(Void1,2,1);
-	Labels->addWidget(MinLabel,3,1);
-	Labels->addWidget(MaxLabel,4,1);
-	Labels->addWidget(OriginLabel,5,1);
-	Labels->addWidget(UnitLabel,6,1);
-
-	QGridLayout *XData = new QGridLayout;
-	QLabel *Void2 = new QLabel("  ");
-	m_pctrlXAuto    = new QCheckBox("Auto Scale");
-	m_pctrlXMin     = new FloatEdit;
-	m_pctrlXMax     = new FloatEdit;
-	m_pctrlXOrigin  = new FloatEdit;
-	m_pctrlXUnit    = new FloatEdit;
-	m_pctrlXMin->setMaximumWidth(60);
-	m_pctrlXMax->setMaximumWidth(60);
-	m_pctrlXOrigin->setMaximumWidth(60);
-	m_pctrlXUnit->setMaximumWidth(60);
-	XData->addWidget(Void2,1,1);
-	XData->addWidget(m_pctrlXAuto,2,1);
-	XData->addWidget(m_pctrlXMin,3,1);
-	XData->addWidget(m_pctrlXMax,4,1);
-	XData->addWidget(m_pctrlXOrigin,5,1);
-	XData->addWidget(m_pctrlXUnit,6,1);
-	QGroupBox *XDataGroup = new QGroupBox("x Axis");
-	XDataGroup->setLayout(XData);
-
-	QGridLayout *YData = new QGridLayout;
-	m_pctrlYInverted = new QCheckBox("Inverted Axis");
-	m_pctrlYAuto     = new QCheckBox("Auto Scale");
-	m_pctrlYMin      = new FloatEdit;
-	m_pctrlYMax      = new FloatEdit;
-	m_pctrlYOrigin   = new FloatEdit;
-	m_pctrlYUnit     = new FloatEdit;
-	m_pctrlYMin->setMaximumWidth(60);
-	m_pctrlYMax->setMaximumWidth(60);
-	m_pctrlYOrigin->setMaximumWidth(60);
-	m_pctrlYUnit->setMaximumWidth(60);
-	YData->addWidget(m_pctrlYInverted,1,1);
-	YData->addWidget(m_pctrlYAuto,2,1);
-	YData->addWidget(m_pctrlYMin,3,1);
-	YData->addWidget(m_pctrlYMax,4,1);
-	YData->addWidget(m_pctrlYOrigin,5,1);
-	YData->addWidget(m_pctrlYUnit,6,1);
-	QGroupBox *YDataGroup = new QGroupBox("y Axis");
-	YDataGroup->setLayout(YData);
-
-	HScaleBox->addLayout(Labels);
-	HScaleBox->addWidget(XDataGroup);
-	HScaleBox->addWidget(YDataGroup);
-
-	ScalePage->setLayout(HScaleBox);
-	//________End Scale Page______________________
-	//________Axis Page______________________
-	QGridLayout *AxisData = new QGridLayout;
-	QLabel *AxisStyleLabel = new QLabel("Axis Style");
-	AxisStyleLabel->setMinimumWidth(100);
-	m_pctrlXMajGridShow = new QCheckBox("X Major Grid");
-	m_pctrlYMajGridShow = new QCheckBox("Y Major Grid");
-	m_pctrlXMinGridShow = new QCheckBox("X Minor Grid");
-	m_pctrlYMinGridShow = new QCheckBox("Y Minor Grid");
-
-	m_pctrlAxisStyle = new LineButton;
-	m_pctrlAxisStyle->setMinimumWidth(100);
-	m_pctrlXMajGridStyle = new LineButton;
-	m_pctrlYMajGridStyle = new LineButton;
-	m_pctrlXMinGridStyle = new LineButton;
-	m_pctrlYMinGridStyle = new LineButton;
-
-	m_pctrlXMinorUnit = new FloatEdit;
-	m_pctrlYMinorUnit = new FloatEdit;
-	m_pctrlXMinorUnit->setMaximumWidth(70);
-	m_pctrlYMinorUnit->setMaximumWidth(70);
-
-	AxisData->addWidget(AxisStyleLabel,1,1);
-	AxisData->addWidget(m_pctrlXMajGridShow,2,1);
-	AxisData->addWidget(m_pctrlYMajGridShow,3,1);
-	AxisData->addWidget(m_pctrlXMinGridShow,4,1);
-	AxisData->addWidget(m_pctrlYMinGridShow,5,1);
-
-	AxisData->addWidget(m_pctrlAxisStyle,1,2);
-	AxisData->addWidget(m_pctrlXMajGridStyle,2,2);
-	AxisData->addWidget(m_pctrlYMajGridStyle,3,2);
-	AxisData->addWidget(m_pctrlXMinGridStyle,4,2);
-	AxisData->addWidget(m_pctrlYMinGridStyle,5,2);
-
-	AxisData->addWidget(m_pctrlXMinorUnit,4,3);
-	AxisData->addWidget(m_pctrlYMinorUnit,5,3);
-
-	GridPage->setLayout(AxisData);
-	//________End Axis Page______________________
-	//________Back Page______________________
-	QGridLayout *BackData = new QGridLayout;
-	QLabel *GraphBackLabel = new QLabel("Graph Background");
-	GraphBackLabel->setMinimumWidth(100);
-	m_pctrlGraphBorder = new QCheckBox("Graph Border");
-
-	m_pctrlGraphBack = new ColorButton;
-	m_pctrlGraphBack->setMinimumWidth(100);
-	m_pctrlBorderStyle = new LineButton;
-	m_pctrlBorderStyle->setMinimumWidth(100);
-
-	BackData->addWidget(GraphBackLabel,1,1);
-	BackData->addWidget(m_pctrlGraphBorder,2,1);
-
-	BackData->addWidget(m_pctrlGraphBack,1,2);
-	BackData->addWidget(m_pctrlBorderStyle,2,2);
-
-	BackPage->setLayout(BackData);
-	//________End Back Page______________________
-	pTabWidget->addTab(ScalePage, "Scales");
-	pTabWidget->addTab(GridPage, "Axis and Grids");
-	pTabWidget->addTab(FontPage, "Fonts");
-	pTabWidget->addTab(BackPage, "Background");
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(pTabWidget);
-	mainLayout->addLayout(CommandButtons);
-	setLayout(mainLayout);
-}
 
 
 void GraphDlg::OnAxisStyle()
@@ -582,5 +396,199 @@ void GraphDlg::SetParams()
 	m_pctrlGraphBack->SetColor(m_pGraph->GetBackColor());
 }
 
+
+
+void GraphDlg::SetLayout()
+{
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+//	setMinimumHeight(r.height()/2);
+	move(r.width()/3, r.height()/6);
+
+
+	QHBoxLayout *CommandButtons = new QHBoxLayout;
+	RestoreButton = new QPushButton("Restore");
+	OKButton = new QPushButton(tr("OK"));
+	OKButton->setAutoDefault(false);
+	CancelButton = new QPushButton(tr("Cancel"));
+	CancelButton->setAutoDefault(false);
+	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(RestoreButton);
+	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(OKButton);
+	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(CancelButton);
+	CommandButtons->addStretch(1);
+
+	QTabWidget *pTabWidget = new QTabWidget(this);
+//	pTabWidget->setMinimumWidth(300);
+//	pTabWidget->setMinimumHeight(300);
+
+	ScalePage = new QWidget(this);
+	GridPage = new QWidget(this);
+	FontPage = new QWidget(this);
+	BackPage = new QWidget(this);
+
+	//________Font Page______________________
+	QGridLayout *FontButtons = new QGridLayout;
+
+	QLabel *lab1  = new QLabel("Title font");
+	QLabel *lab2  = new QLabel("Label font");
+	QLabel *lab3 = new QLabel("Legend font");
+	FontButtons->addWidget(lab1,1,1);
+	FontButtons->addWidget(lab2,2,1);
+	FontButtons->addWidget(lab3,3,1);
+
+	m_pctrlTitleButton  = new QPushButton("Title Font");
+	m_pctrlLabelButton  = new QPushButton("Label Font");
+	m_pctrlLegendButton = new QPushButton("Legend Font");
+	FontButtons->addWidget(m_pctrlTitleButton,1,2);
+	FontButtons->addWidget(m_pctrlLabelButton,2,2);
+	FontButtons->addWidget(m_pctrlLegendButton,3,2);
+
+	m_pctrlTitleColor  = new ColorButton;
+	m_pctrlLabelColor  = new ColorButton;
+	m_pctrlLegendColor = new ColorButton;
+	FontButtons->addWidget(m_pctrlTitleColor,1,3);
+	FontButtons->addWidget(m_pctrlLabelColor,2,3);
+	FontButtons->addWidget(m_pctrlLegendColor,3,3);
+
+	FontPage->setLayout(FontButtons);
+	//________End Font Page______________________
+	//________Scale Page______________________
+	QHBoxLayout *HScaleBox = new QHBoxLayout;
+
+	QGridLayout *Labels = new QGridLayout;
+	QLabel *Void0 = new QLabel("     ");
+	QLabel *Void1 = new QLabel("     ");
+	Void0->setMinimumWidth(90);
+	QLabel *MinLabel = new QLabel("Min");
+	QLabel *MaxLabel = new QLabel("Max");
+	QLabel *OriginLabel = new QLabel("Origin");
+	QLabel *UnitLabel = new QLabel("Unit");
+	MinLabel->setAlignment(Qt::AlignRight);
+	MaxLabel->setAlignment(Qt::AlignRight);
+	OriginLabel->setAlignment(Qt::AlignRight);
+	UnitLabel->setAlignment(Qt::AlignRight);
+	Labels->addWidget(Void0,1,1);
+	Labels->addWidget(Void1,2,1);
+	Labels->addWidget(MinLabel,3,1);
+	Labels->addWidget(MaxLabel,4,1);
+	Labels->addWidget(OriginLabel,5,1);
+	Labels->addWidget(UnitLabel,6,1);
+
+	QGridLayout *XData = new QGridLayout;
+	QLabel *Void2 = new QLabel("  ");
+	m_pctrlXAuto    = new QCheckBox("Auto Scale");
+	m_pctrlXMin     = new FloatEdit;
+	m_pctrlXMax     = new FloatEdit;
+	m_pctrlXOrigin  = new FloatEdit;
+	m_pctrlXUnit    = new FloatEdit;
+	m_pctrlXMin->setMaximumWidth(60);
+	m_pctrlXMax->setMaximumWidth(60);
+	m_pctrlXOrigin->setMaximumWidth(60);
+	m_pctrlXUnit->setMaximumWidth(60);
+	XData->addWidget(Void2,1,1);
+	XData->addWidget(m_pctrlXAuto,2,1);
+	XData->addWidget(m_pctrlXMin,3,1);
+	XData->addWidget(m_pctrlXMax,4,1);
+	XData->addWidget(m_pctrlXOrigin,5,1);
+	XData->addWidget(m_pctrlXUnit,6,1);
+	QGroupBox *XDataGroup = new QGroupBox("x Axis");
+	XDataGroup->setLayout(XData);
+
+	QGridLayout *YData = new QGridLayout;
+	m_pctrlYInverted = new QCheckBox("Inverted Axis");
+	m_pctrlYAuto     = new QCheckBox("Auto Scale");
+	m_pctrlYMin      = new FloatEdit;
+	m_pctrlYMax      = new FloatEdit;
+	m_pctrlYOrigin   = new FloatEdit;
+	m_pctrlYUnit     = new FloatEdit;
+	m_pctrlYMin->setMaximumWidth(60);
+	m_pctrlYMax->setMaximumWidth(60);
+	m_pctrlYOrigin->setMaximumWidth(60);
+	m_pctrlYUnit->setMaximumWidth(60);
+	YData->addWidget(m_pctrlYInverted,1,1);
+	YData->addWidget(m_pctrlYAuto,2,1);
+	YData->addWidget(m_pctrlYMin,3,1);
+	YData->addWidget(m_pctrlYMax,4,1);
+	YData->addWidget(m_pctrlYOrigin,5,1);
+	YData->addWidget(m_pctrlYUnit,6,1);
+	QGroupBox *YDataGroup = new QGroupBox("y Axis");
+	YDataGroup->setLayout(YData);
+
+	HScaleBox->addLayout(Labels);
+	HScaleBox->addWidget(XDataGroup);
+	HScaleBox->addWidget(YDataGroup);
+
+	ScalePage->setLayout(HScaleBox);
+	//________End Scale Page______________________
+	//________Axis Page______________________
+	QGridLayout *AxisData = new QGridLayout;
+	QLabel *AxisStyleLabel = new QLabel("Axis Style");
+	AxisStyleLabel->setMinimumWidth(100);
+	m_pctrlXMajGridShow = new QCheckBox("X Major Grid");
+	m_pctrlYMajGridShow = new QCheckBox("Y Major Grid");
+	m_pctrlXMinGridShow = new QCheckBox("X Minor Grid");
+	m_pctrlYMinGridShow = new QCheckBox("Y Minor Grid");
+
+	m_pctrlAxisStyle = new LineButton;
+	m_pctrlAxisStyle->setMinimumWidth(100);
+	m_pctrlXMajGridStyle = new LineButton;
+	m_pctrlYMajGridStyle = new LineButton;
+	m_pctrlXMinGridStyle = new LineButton;
+	m_pctrlYMinGridStyle = new LineButton;
+
+	m_pctrlXMinorUnit = new FloatEdit;
+	m_pctrlYMinorUnit = new FloatEdit;
+	m_pctrlXMinorUnit->setMaximumWidth(70);
+	m_pctrlYMinorUnit->setMaximumWidth(70);
+
+	AxisData->addWidget(AxisStyleLabel,1,1);
+	AxisData->addWidget(m_pctrlXMajGridShow,2,1);
+	AxisData->addWidget(m_pctrlYMajGridShow,3,1);
+	AxisData->addWidget(m_pctrlXMinGridShow,4,1);
+	AxisData->addWidget(m_pctrlYMinGridShow,5,1);
+
+	AxisData->addWidget(m_pctrlAxisStyle,1,2);
+	AxisData->addWidget(m_pctrlXMajGridStyle,2,2);
+	AxisData->addWidget(m_pctrlYMajGridStyle,3,2);
+	AxisData->addWidget(m_pctrlXMinGridStyle,4,2);
+	AxisData->addWidget(m_pctrlYMinGridStyle,5,2);
+
+	AxisData->addWidget(m_pctrlXMinorUnit,4,3);
+	AxisData->addWidget(m_pctrlYMinorUnit,5,3);
+
+	GridPage->setLayout(AxisData);
+	//________End Axis Page______________________
+	//________Back Page______________________
+	QGridLayout *BackData = new QGridLayout;
+	QLabel *GraphBackLabel = new QLabel("Graph Background");
+	GraphBackLabel->setMinimumWidth(100);
+	m_pctrlGraphBorder = new QCheckBox("Graph Border");
+
+	m_pctrlGraphBack = new ColorButton;
+	m_pctrlGraphBack->setMinimumWidth(100);
+	m_pctrlBorderStyle = new LineButton;
+	m_pctrlBorderStyle->setMinimumWidth(100);
+
+	BackData->addWidget(GraphBackLabel,1,1);
+	BackData->addWidget(m_pctrlGraphBorder,2,1);
+
+	BackData->addWidget(m_pctrlGraphBack,1,2);
+	BackData->addWidget(m_pctrlBorderStyle,2,2);
+
+	BackPage->setLayout(BackData);
+	//________End Back Page______________________
+	pTabWidget->addTab(ScalePage, "Scales");
+	pTabWidget->addTab(GridPage, "Axis and Grids");
+	pTabWidget->addTab(FontPage, "Fonts");
+	pTabWidget->addTab(BackPage, "Background");
+
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addWidget(pTabWidget);
+	mainLayout->addLayout(CommandButtons);
+	setLayout(mainLayout);
+}
 
 

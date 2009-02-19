@@ -35,6 +35,8 @@ class CPOpp
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class CWPolar;
+	friend class GL3dViewDlg;
+
 public:
 	CPOpp();
 	virtual ~CPOpp();

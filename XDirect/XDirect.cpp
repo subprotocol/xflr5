@@ -25,8 +25,8 @@
 
 #include "../Globals.h"
 #include "../MainFrame.h"
+#include "../Graph/GraphVariableDlg.h"
 #include "../Graph/GraphDlg.h"
-#include "Graph/GraphVariableDlg.h"
 #include "XDirect.h"
 #include "XFoilAnalysisDlg.h"
 #include "FoilPolarDlg.h"
@@ -41,7 +41,7 @@
 #include "FlapDlg.h"
 #include "CAddDlg.h"
 #include "XFoilAdvancedDlg.h"
-#include "Misc/LinePickerDlg.h"
+//#include "Misc/LinePickerDlg.h"
 
 QXDirect::QXDirect(QWidget *parent)
     : QWidget(parent)
@@ -305,15 +305,15 @@ void QXDirect::SetupLayout()
 	DeltaAlphaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	AlphaMinLab->setMaximumWidth(40);
-	AlphaMaxLab->setMaximumWidth(40);
-	DeltaAlphaLab->setMaximumWidth(40);
+//	AlphaMinLab->setMaximumWidth(40);
+//	AlphaMaxLab->setMaximumWidth(40);
+//	DeltaAlphaLab->setMaximumWidth(40);
 	m_pctrlAlphaMin     = new FloatEdit();
 	m_pctrlAlphaMax     = new FloatEdit();
 	m_pctrlAlphaDelta   = new FloatEdit();
-	m_pctrlAlphaMin->setMaximumWidth(70);
-	m_pctrlAlphaMax->setMaximumWidth(70);
-	m_pctrlAlphaDelta->setMaximumWidth(70);
+//	m_pctrlAlphaMin->setMaximumWidth(70);
+//	m_pctrlAlphaMax->setMaximumWidth(70);
+//	m_pctrlAlphaDelta->setMaximumWidth(70);
 	m_pctrlAlphaMin->setMinimumHeight(20);
 	m_pctrlAlphaMax->setMinimumHeight(20);
 	m_pctrlAlphaDelta->setMinimumHeight(20);
@@ -778,10 +778,10 @@ void QXDirect::CreatePolarCurves()
 
 		if (pPolar->m_bIsVisible && pPolar->m_Alpha.size()>0)
 		{
-			if (	pPolar->m_Type == 1 && m_bType1 ||
-				pPolar->m_Type == 2 && m_bType2 ||
-				pPolar->m_Type == 3 && m_bType3 ||
-				pPolar->m_Type == 4 && m_bType4)
+                        if (	(pPolar->m_Type == 1 && m_bType1) ||
+                                (pPolar->m_Type == 2 && m_bType2) ||
+                                (pPolar->m_Type == 3 && m_bType3) ||
+                                (pPolar->m_Type == 4 && m_bType4))
 			{
 				CCurve* pPolarCurve = m_pPolarGraph->AddCurve();
 				CCurve* pCmCurve    = m_pCmGraph->AddCurve();
@@ -1173,7 +1173,10 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 		if(m_pUserGraph->IsInDrawRect(pt)){return m_pUserGraph;}
 	}
 	else
-		return m_pCpGraph;
+	{
+		if(m_bCpGraph) return m_pCpGraph;
+		else           return NULL;
+	}
 	return NULL;
 }
 
@@ -1294,7 +1297,6 @@ void QXDirect::InitXFoil2()
 
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
-qDebug() << "QXDirect:: Key pressed";
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -1432,7 +1434,7 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 
 	if ((event->buttons() & Qt::LeftButton) && m_bTrans)
 	{
-		if(m_pCurGraph && m_bTransGraph && m_bCpGraph)
+		if(m_pCurGraph && m_bTransGraph)
 		{
 			// we translate the curves inside the graph
 			double xu, yu;
@@ -2369,13 +2371,6 @@ void QXDirect::OnDbPlot()
 
 
 
-void QXDirect::OnExportCpGraph()
-{
-	m_pCurGraph = m_pCpGraph;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->OnExportCurGraph();
-}
-
 void QXDirect::OnExportCurXFoilResults()
 {
 	if(!m_pXFoil->lvconv) return;
@@ -2739,24 +2734,6 @@ void QXDirect::OnFoilGeom()
 	UpdateView();
 }
 
-
-void QXDirect::OnGraphSettings()
-{
-	if(!m_pCurGraph) return;
-
-	GraphDlg dlg;
-	QGraph graph;
-	graph.CopySettings(m_pCurGraph);
-	dlg.m_pMemGraph = m_pCurGraph;
-	dlg.m_pGraph = &graph;
-	dlg.SetParams();
-
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		m_pCurGraph->CopySettings(&graph);
-	}
-	UpdateView();
-}
 
 
 
@@ -3700,25 +3677,25 @@ void QXDirect::OnSingleAnalysis()
 		switch (m_pCurPolar->m_Type)
 		{
 			case 1:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 1;
-			break;
+				m_pCurPolar->m_MaType = 1;
+				m_pCurPolar->m_ReType = 1;
+				break;
 			case 2:
-			m_pCurPolar->m_MaType = 2;
-			m_pCurPolar->m_ReType = 2;
-			break;
+				m_pCurPolar->m_MaType = 2;
+				m_pCurPolar->m_ReType = 2;
+				break;
 			case 3:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 3;
-			break;
+				m_pCurPolar->m_MaType = 1;
+				m_pCurPolar->m_ReType = 3;
+				break;
 			case 4:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 1;
-			break;
+				m_pCurPolar->m_MaType = 1;
+				m_pCurPolar->m_ReType = 1;
+				break;
 			default:
-			m_pCurPolar->m_ReType = 1;
-			m_pCurPolar->m_MaType = 1;
-			break;
+				m_pCurPolar->m_ReType = 1;
+				m_pCurPolar->m_MaType = 1;
+				break;
 		}
 
 		m_MachDef = Adlg.m_MachDef;
@@ -4254,7 +4231,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		Back =6;
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
-		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0) Back++;
+		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0) Back++;
 		if(m_pCurPolar->m_Type==2 ) Back++;
 		if(m_pCurPolar->m_Type!=1 && m_pCurPolar->m_Type!=4) Back++;
 
@@ -4293,7 +4270,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		painter.drawText(XPos,ZPos+D, Result);
 		D+=12;
 
-		if(m_pCurOpp->m_bVisc && abs(m_pCurOpp->Cd)>0.0)
+		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0)
 		{
 			Result = QString("         L/D = %1").arg(m_pCurOpp->Cl/m_pCurOpp->Cd, 8, 'f', 2);
 			painter.drawText(XPos,ZPos+D, Result);
@@ -4358,7 +4335,7 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 }
 
 
-void QXDirect::PaintPolarLegend(QPoint place, double bottom, QPainter &painter)
+void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int LegendSize, LegendWidth, ypos, x1;
@@ -4413,10 +4390,10 @@ void QXDirect::PaintPolarLegend(QPoint place, double bottom, QPainter &painter)
 				pPolar->m_PlrName.length() &&
 				pPolar->m_bIsVisible &&
 				pPolar->m_FoilName == str.at(k) &&
-				(pPolar->m_Type == 1 && m_bType1 ||
-				 pPolar->m_Type == 2 && m_bType2 ||
-				 pPolar->m_Type == 3 && m_bType3 ||
-				 pPolar->m_Type == 4 && m_bType4))
+                                ((pPolar->m_Type == 1 && m_bType1) ||
+                                 (pPolar->m_Type == 2 && m_bType2) ||
+                                 (pPolar->m_Type == 3 && m_bType3) ||
+                                 (pPolar->m_Type == 4 && m_bType4)))
 					FoilPlrs++;
 		}
 		if (FoilPlrs)
@@ -4442,10 +4419,10 @@ void QXDirect::PaintPolarLegend(QPoint place, double bottom, QPainter &painter)
 			if(str.at(k) == pPolar->m_FoilName)
 			{
 				if (pPolar->m_Alpha.size() && pPolar->m_PlrName.length() && pPolar->m_bIsVisible &&
-					(pPolar->m_Type == 1 && m_bType1 ||
-					 pPolar->m_Type == 2 && m_bType2 ||
-					 pPolar->m_Type == 3 && m_bType3 ||
-					 pPolar->m_Type == 4 && m_bType4))
+                                        ((pPolar->m_Type == 1 && m_bType1) ||
+                                         (pPolar->m_Type == 2 && m_bType2) ||
+                                         (pPolar->m_Type == 3 && m_bType3) ||
+                                         (pPolar->m_Type == 4 && m_bType4)))
 				{
 					//is there anything to draw ?
 					LegendPen.setColor(pPolar->m_Color);
@@ -4837,6 +4814,12 @@ CFoil* QXDirect::SetFoil(QString FoilName)
 	else         CreateOppCurves();
 	return m_pCurFoil;
 }
+void QXDirect::SetFoilScale(QRect CltRect)
+{
+	m_rCltRect = CltRect;
+
+	SetFoilScale();
+}
 
 
 void QXDirect::SetFoilScale()
@@ -4978,7 +4961,7 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 				if (pOpp->m_strFoilName == m_pCurFoil->m_FoilName &&
 					pOpp->m_strPlrName  == PlrName)
 				{
-					if(abs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001)
+					if(fabs(pOpp->Alpha-m_pCurOpp->Alpha)<0.0001)
 					{
 						m_pCurOpp = pOpp;
 						bFound = true;
@@ -5218,9 +5201,11 @@ void QXDirect::StopAnimate()
 	}
 }
 
+
 void QXDirect::UpdateCurve()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
 	if(m_bPolar && m_pCurPolar)
 	{
 		m_pCurPolar->m_Color = m_CurveColor;
@@ -5235,6 +5220,7 @@ void QXDirect::UpdateCurve()
 		m_pCurOpp->m_Width = (int)m_CurveWidth;
 		CreateOppCurves();
 	}
+
 	UpdateView();
 	pMainFrame->SetSaveState(false);
 }

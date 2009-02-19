@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Quaternion Class
-	Copyright (C) 2008-2008 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 *****************************************************************************/
 
+#ifndef ARCBALL_H
+#define ARCBALL_H
 
 #include "CVector.h"
 
@@ -27,7 +29,7 @@ class Quaternion
 public:
 	Quaternion(void);
 	Quaternion(double const &t, double const &x, double const &y, double const &z);
-	~Quaternion(void);
+
 
 	void Set(double const &real, double const &x, double const &y, double const &z);
 	void Set(double const &Angle, CVector const &R);
@@ -48,3 +50,4 @@ public:
 	static double pi, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t15, t19, t20, t24;
 	static CVector R;	
 };
+#endif

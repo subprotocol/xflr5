@@ -29,6 +29,7 @@
 class GraphWidget : public QWidget
 {
 	friend class XFoilAnalysisDlg;
+	friend class LLTAnalysisDlg;
 	friend class BatchDlg;
 
 public:

@@ -26,8 +26,8 @@
 
 
 #include "Curve.h"
-#include <math.h>
-
+#include "math.h"
+#include <QtDebug>
 
 
 
@@ -47,6 +47,7 @@ CCurve::CCurve()
 
 CCurve::~CCurve()
 {
+//qDebug() << "Destroying ~CCUrve";
 }
 
 double CCurve::GetxMin()
@@ -55,7 +56,7 @@ double CCurve::GetxMin()
 //	if(n==0) xmin = .0; 
 //	else
 		for(int i=0; i<n;i++)
-            xMin = std::min(xMin, x[i]);
+			xMin = qMin(xMin, x[i]);
 	return xMin;
 }
 
@@ -66,7 +67,7 @@ double CCurve::GetxMax()
 //	if(n==0) xmax = 1.0; 
 //	else
 		for(int i=0; i<n;i++)
-            xMax = std::max(xMax, x[i]);
+			xMax = qMax(xMax, x[i]);
 	return xMax;
 }
 
@@ -76,7 +77,7 @@ double CCurve::GetyMin()
 //	if(n==0) ymin = .0; 
 //	else
 		for(int i=0; i<n;i++)
-            yMin = std::min(yMin, y[i]);
+			yMin = qMin(yMin, y[i]);
 	return yMin;
 }
 
@@ -87,7 +88,7 @@ double CCurve::GetyMax()
 //	if(n==0) ymax = 1.0; 
 //	else
 		for(int i=0; i<n;i++)
-            yMax = std::max(yMax, y[i]);
+			yMax = qMax(yMax, y[i]);
 	return yMax;
 }
 

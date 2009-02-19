@@ -1,7 +1,7 @@
 /****************************************************************************
 
     POpp Class
-    Copyright (C) 2006 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2006-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,17 +19,12 @@
 
 *****************************************************************************/
 
-// POpp.cpp: implementation of the CPOpp class.
-//
-//////////////////////////////////////////////////////////////////////
-
+#include <QtDebug>
 
 #include "POpp.h"
 #include "Globals.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
 
 CPOpp::CPOpp()
 {
@@ -63,7 +58,6 @@ CPOpp::CPOpp()
 
 CPOpp::~CPOpp()
 {
-
 }
 
 

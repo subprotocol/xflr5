@@ -31,7 +31,7 @@
 double CBody::s_xKnots[MAXBODYFRAMES*2];
 double CBody::s_hKnots[MAXSIDELINES*2];
 double CBody::s_XPanelPos[300];
-CRectangle CBody::s_rViewRect;
+QRect CBody::s_rViewRect;
 
 
 

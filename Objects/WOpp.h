@@ -1,7 +1,7 @@
 /****************************************************************************
 
     WOpp Class
-    Copyright (C) 2005 André Deperrois XFLR5@yahoo.com
+	Copyright (C) 2005 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ class CWOpp
 	friend class MainFrame;
 	friend class CWPolar;
 	friend class CPOpp;
+	friend class GL3dViewDlg;
 
 public:
 	CWOpp();

@@ -121,6 +121,74 @@ void GraphVariableDlg::FillLists(int iGraphType)
 		m_pctrlYSel->addItem("Re");
 		m_pctrlYSel->addItem("XCp");
 	}
+	else if(iGraphType == 2)
+	{
+		m_pctrlXSel->addItem("Alpha");						//0
+		m_pctrlXSel->addItem("Lift coef.");					//1
+		m_pctrlXSel->addItem("Viscous drag coef.");			//2
+		m_pctrlXSel->addItem("Induced drag coef.");			//3
+		m_pctrlXSel->addItem("Total drag coef.");			//4
+
+		m_pctrlXSel->addItem("Total pitching moment coef.");//5
+		m_pctrlXSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlXSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlXSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlXSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlXSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlXSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlXSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlXSel->addItem("Lift");						//13
+		m_pctrlXSel->addItem("Drag");						//14
+		m_pctrlXSel->addItem("Vx");							//15
+		m_pctrlXSel->addItem("Vz");							//16
+		m_pctrlXSel->addItem("VInf");						//17
+		m_pctrlXSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlXSel->addItem("Pitching Moment");			//19
+		m_pctrlXSel->addItem("Rolling Moment");				//20
+		m_pctrlXSel->addItem("Yawing Moment");				//21
+		m_pctrlXSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlXSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlXSel->addItem("Bending moment");				//24
+		m_pctrlXSel->addItem("m.g.Vz");						//25
+		m_pctrlXSel->addItem("Efficiency");					//26
+		m_pctrlXSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlXSel->addItem("Control Variable");			//28
+		m_pctrlXSel->addItem("Cy - Lateral force coef.");	//29
+
+		m_pctrlYSel->addItem("Alpha");						//0
+		m_pctrlYSel->addItem("Lift coef.");					//1
+		m_pctrlYSel->addItem("Viscous drag coef.");			//2
+		m_pctrlYSel->addItem("Induced drag coef.");			//3
+		m_pctrlYSel->addItem("Total drag coef.");			//4
+
+		m_pctrlYSel->addItem("Total pitching moment coef.");//5
+		m_pctrlYSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlYSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlYSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlYSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlYSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlYSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlYSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlYSel->addItem("Lift");						//13
+		m_pctrlYSel->addItem("Drag");						//14
+		m_pctrlYSel->addItem("Vx");							//15
+		m_pctrlYSel->addItem("Vz");							//16
+		m_pctrlYSel->addItem("VInf");						//17
+		m_pctrlYSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlYSel->addItem("Pitching Moment");			//19
+		m_pctrlYSel->addItem("Rolling Moment");				//20
+		m_pctrlYSel->addItem("Yawing Moment");				//21
+		m_pctrlYSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlYSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlYSel->addItem("Bending moment");				//24
+		m_pctrlYSel->addItem("m.g.Vz");						//25
+		m_pctrlYSel->addItem("Efficiency");					//26
+		m_pctrlYSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlYSel->addItem("Control Variable");			//28
+		m_pctrlYSel->addItem("Cy - Lateral force coef.");	//29
+	}
 	m_pctrlXSel->adjustSize();
 	m_pctrlYSel->adjustSize();
 }
@@ -135,8 +203,8 @@ void GraphVariableDlg::SetSelection(int const &XSel, int const &YSel)
 
 void GraphVariableDlg::GetSelection(int &XSel, int &YSel)
 {
-	XSel = m_XSel;
-	YSel = m_YSel;
+	XSel = m_pctrlXSel->currentRow();
+	YSel = m_pctrlYSel->currentRow();
 }
 
 void GraphVariableDlg::mouseDoubleClickEvent ( QMouseEvent * event )

@@ -28,23 +28,22 @@
 class FloatEditDelegate : public QItemDelegate
 {
 
-	 Q_OBJECT
+	Q_OBJECT
 
- public:
-	 FloatEditDelegate(QObject *parent = 0);
+public:
+	FloatEditDelegate(QObject *parent = 0);
 
-	 QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-	 void setEditorData(QWidget *editor, const QModelIndex &index) const;
-	 void setModelData(QWidget *editor, QAbstractItemModel *model,
-					   const QModelIndex &index) const;
-
-	 void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-	 void SetPrecision(int*PrecisionTable);
+	void setEditorData(QWidget *editor, const QModelIndex &index) const;
+	void setModelData(QWidget *editor, QAbstractItemModel *model,
+				   const QModelIndex &index) const;
+	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void SetPrecision(int*PrecisionTable);
 
 private:
-	 int *m_Precision; ///table of float precisions for each column
+	int *m_Precision; ///table of float precisions for each column
 };
 
 #endif // QFLOATEDITDELEGATE_H

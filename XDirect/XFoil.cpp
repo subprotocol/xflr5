@@ -19,12 +19,13 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+ 
 
 // XFoil.cpp: implementation of the XFoil class.
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <QtDebug>
 
 #include "XFoil.h"
 #include <QDataStream>
@@ -96,7 +97,7 @@ XFoil::XFoil()
 
 XFoil::~XFoil()
 {
-
+qDebug() << "destroying XFoil";
 }
 
 
@@ -2316,11 +2317,13 @@ bool XFoil::Gauss(int nn, double z[IQX][IQX], double r[IQX]){
 
 	double temp, ztmp, pivot;
 	
-	for (np=1; np<=nn-1; np++){
+	for (np=1; np<=nn-1; np++)
+	{
 		nnpp = np+1;
 		//------ find max pivot index nx
 		nx = np;
-		for (nt =nnpp; nt<=nn; nt++){
+		for (nt =nnpp; nt<=nn; nt++)
+		{
 			if (fabs(z[nt][np])>fabs(z[nx][np])) nx = nt;
 		}
 
@@ -3925,8 +3928,8 @@ bool XFoil::lefind(double &sle, double x[], double xp[],
 		//------ newton delta for sle 
 		dsle = -res/ress;
 		
-		dsle = std::max( dsle , -0.02*fabs(xchord+ychord) );
-		dsle = std::min( dsle ,  0.02*fabs(xchord+ychord) );
+		dsle = qMax( dsle , -0.02*fabs(xchord+ychord) );
+		dsle = qMin( dsle ,  0.02*fabs(xchord+ychord) );
 		sle = sle + dsle;
 		if(fabs(dsle) < dseps) return true;
 	}
@@ -12178,7 +12181,7 @@ bool XFoil::mixed(int kqsp)
 		
 	}
 	QMax = niterq;
-//	TRACE("Unconverged - shit/Scheiße/merde !\n");
+//	TRACE("Unconverged - shit/Scheiï¿½e/merde !\n");
 //	TRACE("not quite converged.  can exec again if necessary.\n");
 	return false;
 }

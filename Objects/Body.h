@@ -24,7 +24,7 @@
 
 #include "Panel.h"
 #include "Frame.h"
-#include "Params.h"
+#include "../Params.h"
 
 class CBody
 {
@@ -116,7 +116,7 @@ public:
 	static double s_xKnots[MAXBODYFRAMES*2];
 	static double s_hKnots[MAXSIDELINES*2];
 	static double s_XPanelPos[300];
-    static	CRectangle s_rViewRect;
+	static	QRect s_rViewRect;
 
 };
 #endif

@@ -44,7 +44,7 @@ public:
 	CVector m_Point[MAXSIDELINES];	// the points' positions
 	CSpline m_Spline;
 
-    static CRectangle s_rViewRect;
+	static QRect s_rViewRect;
 };
 
 

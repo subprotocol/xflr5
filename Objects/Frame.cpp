@@ -26,13 +26,13 @@
 #include <math.h>
 
 // CFrame
-CRectangle CFrame::s_rViewRect;
+QRect CFrame::s_rViewRect;
 
 
 CFrame::CFrame()
 {
 	memset(m_Point, 0, sizeof(m_Point));
-	s_rViewRect.SetRectEmpty();
+//	s_rViewRect.SetRectEmpty();
 	m_NPoints = 5;
 	m_Point[0].x = 0.0; m_Point[0].y = 0.00;   m_Point[0].z =  0.025;
 	m_Point[1].x = 0.0; m_Point[1].y = 0.015;  m_Point[1].z =  0.020;

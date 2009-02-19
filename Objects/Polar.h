@@ -36,6 +36,7 @@
 class CPolar
 {
 	friend class MainFrame;
+	friend class QMiarex;
 	friend class QXDirect;
 	friend class BatchDlg;
 	friend class XFoilAnalysisDlg;

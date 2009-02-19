@@ -47,7 +47,7 @@ private slots:
 public:
 	RenameDlg(void *pParent=NULL);
 	void keyPressEvent(QKeyEvent *event);
-	void SetLayout();
+	void SetupLayout();
 
 	QLabel      *m_pctrlMessage;
 	QLineEdit   *m_pctrlName;

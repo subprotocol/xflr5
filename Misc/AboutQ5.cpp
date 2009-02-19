@@ -37,6 +37,12 @@ AboutQ5::~AboutQ5()
 
 void AboutQ5::SetupLayout()
 {
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+	setMinimumHeight(r.height()/2);
+	move(r.width()/3, r.height()/6);
+
+
 	QHBoxLayout *LogoLayout = new QHBoxLayout;
 	m_IconQ5 = new QLabel;
 	m_IconQ5->setObjectName("iconQ5");
@@ -52,16 +58,14 @@ void AboutQ5::SetupLayout()
 
 	QLabel *lab2  = new QLabel("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94");
 	QLabel *lab3  = new QLabel("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00");
-	QLabel *lab4  = new QLabel("Copyright (C) Andre Deperrois 2003-2008");
+	QLabel *lab4  = new QLabel("Copyright (C) Andre Deperrois 2003-2009");
 	QLabel *lab5  = new QLabel("This program is distributed in the hope that it will be useful,");
 	QLabel *lab6  = new QLabel("but WITHOUT ANY WARRANTY; without even the implied warranty of");
 	QLabel *lab7  = new QLabel("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
 	QLabel *lab8  = new QLabel("This program has been developped exclusively for the analysis of model aircraft");
 	QLabel *lab9  = new QLabel("Any other usage is strongly disapproved");
 	QLabel *lab10 = new QLabel("Program distributed  under the terms of the GNU General Public License");
-//	QTextEdit *lab11 = new QTextEdit("Test");
-//	lab11->setMaximumWidth(600);
-//	lab11->setMaximumHeight(80);
+
 	m_pXFLR5Link = new QLabel;
 	m_pXFLR5Link->setText("<a href=http://xflr5.sourceforge.net/xflr5.htm>http://xflr5.sourceforge.net/xflr5.htm</a>");
 	m_pXFLR5Link->setOpenExternalLinks(true);
@@ -72,7 +76,6 @@ void AboutQ5::SetupLayout()
 	OKLayout->addStretch(1);
 	OKLayout->addWidget(OKButton);
 	OKLayout->addStretch(1);
-//	OKButton->setMaximumWidth(70);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addLayout(LogoLayout);
@@ -85,19 +88,15 @@ void AboutQ5::SetupLayout()
 	MainLayout->addWidget(lab6);
 	MainLayout->addWidget(lab7);
 	MainLayout->addWidget(lab8);
-	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab9);
+	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab10);
 	MainLayout->addStretch(1);
-//	MainLayout->addWidget(lab11);
-//	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pXFLR5Link);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(OKLayout);
 	setLayout(MainLayout);
 	setMinimumHeight(400);
-
-
 }
 
 

@@ -40,6 +40,14 @@ class CWing
 	friend class CPOpp;
 	friend class CPlane;
 	friend class CSurface;
+	friend class WingDlg;
+	friend class GL3dViewDlg;
+	friend class LLTAnalysisDlg;
+        friend class VLMAnalysisDlg;
+        friend class PanelAnalysisDlg;
+        friend class PlaneDlg;
+	friend class WPolarDlg;
+	friend class ImportWingDlg;
 
 	// Construction
 public:
@@ -53,9 +61,8 @@ protected:
 
 	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
-/*	bool VLMSetAutoMesh(int total = 0);
+	bool VLMSetAutoMesh(int total = 0);
 	int  VLMGetPanelTotal(void);
-	void VLMCubicSplines(double *Gamma);
 	void VLMSetBending();
 	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
@@ -63,16 +70,22 @@ protected:
 
 	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP, double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
 	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
-	void PanelSetBending();*/
+	void PanelSetBending();
 
-/*	bool LLTInitialize();
+	void VLMCubicSplines(double *Gamma);
+	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
+	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
+
+
+	bool LLTInitialize();
 	bool LLTSetLinearSolution();
 	void LLTInitCl();
 	void LLTComputeWing();
-	int  LLTIterate();*/
- 
-	void CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
-		               double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
+	int  LLTIterate();
+	double Sigma(int m);
+	double Eta(int m);
+	double AlphaInduced(int k);
+	bool CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
 	void Duplicate(CWing *pWing);
 	void ComputeChords(int NStation=0);
@@ -89,7 +102,6 @@ protected:
 	bool SerializeWing(QDataStream &ar, bool bIsStoring);
 //	bool ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, double z, double Thetax, double Thetay);
 
-	double AlphaInduced(int k);
 	double GetAverageSweep();
 	double GetChord(double yob);
 	double GetC4(double yob, double xRef);
@@ -98,14 +110,15 @@ protected:
 	double GetTwist(double y);
 	double GetZPos(double y);
 	double Getyrel(double SpanPos);
+	double Beta(int m, int k);
 
 //	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
-	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
+//	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 
 //__________________________Variables_______________________
 
-	static void* s_pFrame;		//pointer to the Frame window
+	static void* s_pMainFrame;		//pointer to the Frame window
 	static void* s_pMiarex;	//pointer to the Miarex Application window
 	static void* s_pVLMDlg;	//pointer to the VLM analysis dialog class
 	static void* s_pLLTDlg;	//pointer to the VLM analysis dialog class
@@ -164,7 +177,6 @@ protected:
 	double m_Weight;	// For type 2 analysis
 	double m_Alpha;		// angle of attack
 	double m_Maxa; 		// Used in LLT
-	double m_MinPanelSize;
 	double m_VYm; 
 	double m_IYm;		// Induced Yawing Moment
 	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment

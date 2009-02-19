@@ -58,7 +58,6 @@ public slots:
 
 private slots:
 	void OnNacaFoils();
-	void OnGraphSettings();
 	void OnXFoilAdvanced();
 
 	void OnCouplePolarGraphs();
@@ -68,7 +67,6 @@ private slots:
 
 	void OnCpGraphSettings();
 	void OnResetCpGraphScales();
-	void OnExportCpGraph();
 
 	void OnAlphaMinChanged();
 	void OnAlphaMaxChanged();
@@ -150,7 +148,7 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
-	void wheelEvent (QWheelEvent *event );
+	void wheelEvent (QWheelEvent *event);
 
 	void AddOpData(OpPoint *pNewPoint);
 	void Connect();
@@ -158,7 +156,7 @@ protected:
 	void CreatePolarCurves();
 	void DeleteFoil(bool bAsk);
 	void DeleteOpPoint(bool bCurrent);
-	void PaintPolarLegend(QPoint place, double bottom,QPainter &painter);
+	void PaintPolarLegend(QPoint place, int bottom,QPainter &painter);
 	void FillComboBoxes(bool bEnable = true);
 	void FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar);
 	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
@@ -176,6 +174,7 @@ protected:
 	void SetBufferFoil();
 	void SetCurveParams();
 	void SetFoilScale();
+	void SetFoilScale(QRect CltRect);
 	void SetOpPointSequence();
 	void SetAnalysisParams();
 	void SetGraphTitles(Graph* pGraph, int iX, int iY);
@@ -232,9 +231,8 @@ private:
 
 	int m_IconWidth, m_IconHeight; //in the comboboxes for curve style & color
 
-	int m_CurveWidth;
+	int m_CurveStyle, m_CurveWidth;
 	QColor m_CurveColor;
-	int    m_CurveStyle;
 
 	bool m_bAlpha;			//true if performing an analysis based on aoa, false if based on Cl
 	bool m_bStoreOpp;		// true if operating points should be stored after an analysis

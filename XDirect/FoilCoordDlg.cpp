@@ -35,7 +35,6 @@ FoilCoordDlg::FoilCoordDlg()
 
 	m_bApplied  = true;
 	m_bModified = false;
-
 }
 
 
@@ -65,10 +64,8 @@ void FoilCoordDlg::InitDialog()
 	m_pCoordModel = new QStandardItemModel;
 	m_pCoordModel->setRowCount(10);//temporary
 	m_pCoordModel->setColumnCount(2);
-
 	m_pCoordModel->setHeaderData(0, Qt::Horizontal, QObject::tr("X"));
 	m_pCoordModel->setHeaderData(1, Qt::Horizontal, QObject::tr("Y"));
-
 
 	m_pctrlCoordView->setModel(m_pCoordModel);
 

@@ -77,11 +77,6 @@ void CPanel::Reset()
 
 }
 
-CPanel::~CPanel()
-{
-
-}
-
 
 void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {

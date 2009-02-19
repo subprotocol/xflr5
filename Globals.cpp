@@ -33,7 +33,6 @@
 
 void ExpFormat(double &f, int &exp)
 {
-
 	if (f==0.0)
 	{
 		exp = 0;
@@ -55,65 +54,81 @@ void ExpFormat(double &f, int &exp)
 
 void GetAreaUnit(QString &str, int unit)
 {
-	switch(unit){
-		case 0:{
-			str="mm�";
+	switch(unit)
+	{
+		case 0:
+		{
+			str="mm2";
 			break;
 		}
-		case 1:{
-			str="cm�";
+		case 1:
+		{
+			str="cm2";
 			break;
 		}
-		case 2:{
-			str="dm�";
+		case 2:
+		{
+			str="dm2";
 			break;
 		}
-		case 3:{
-			str="m�";
+		case 3:
+		{
+			str="m2";
 			break;
 		}
-		case 4:{
-			str="in�";
+		case 4:
+		{
+			str="in2";
 			break;
 		}
-		case 5:{
-			str="ft�";
+		case 5:
+		{
+			str="ft2";
 			break;
 		}
-		default:{
+		default:
+		{
 			str=" ";
 			break;
 		}
 	}
 }
-void GetlengthUnit(QString &str, int unit)
+void GetLengthUnit(QString &str, int unit)
 {
-	switch(unit){
-		case 0:{
+	switch(unit)
+	{
+		case 0:
+		{
 			str="mm";
 			break;
 		}
-		case 1:{
+		case 1:
+		{
 			str="cm";
 			break;
 		}
-		case 2:{
+		case 2:
+		{
 			str="dm";
 			break;
 		}
-		case 3:{
+		case 3:
+		{
 			str="m";
 			break;
 		}
-		case 4:{
+		case 4:
+		{
 			str="in";
 			break;
 		}
-		case 5:{
+		case 5:
+		{
 			str="ft";
 			break;
 		}
-		default:{
+		default:
+		{
 			str=" ";
 			break;
 		}
@@ -141,20 +156,25 @@ void GetForceUnit(QString &str, int unit)
 
 void GetMomentUnit(QString &str, int unit)
 {
-	switch(unit){
-		case 0:{
+	switch(unit)
+	{
+		case 0:
+		{
 			str="N.m";
 			break;
 		}
-		case 1:{
+		case 1:
+		{
 			str="lbf.in";
 			break;
 		}
-		case 2:{
+		case 2:
+		{
 			str="lbf.ft";
 			break;
 		}
-		default:{
+		default:
+		{
 			str=" ";
 			break;
 		}
@@ -232,6 +252,12 @@ bool IsBetween(int f, int f1, int f2)
 	return true;
 }
 
+
+bool IsEven(int n)
+{
+	if(n%2==0) return true;
+	else return false;
+}
 
 bool IsBetween(int f, double f1, double f2)
 {
@@ -362,12 +388,12 @@ void ReynoldsFormat(QString &str, double f)
 
 
 void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
-			  double &mtoUnit, double &m2toUnit, double &mstoUnit,
-			  double &kgtoUnit, double &NtoUnit, double &NmtoUnit)
+			  double &mtoUnit, double &m2toUnit, double &mstoUnit,  double &kgtoUnit, double &NtoUnit, double &NmtoUnit)
 {
 	switch(LUnit)
 	{
-		case 0:{//mdm
+		case 0:
+		{//mdm
 			mtoUnit  = 1000.0;
 			break;
 		}
@@ -396,28 +422,29 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			break;
 		}
 	}
-	switch(AUnit){
-		case 0:{//mm�
+	switch(AUnit)
+	{
+		case 0:{//mm²
 			m2toUnit = 1000000.0;
 			break;
 		}
-		case 1:{//cm�
+		case 1:{//cm²
 			m2toUnit = 10000.0;
 			break;
 		}
-		case 2:{//dm�
+		case 2:{//dm²
 			m2toUnit = 100.0;
 			break;
 		}
-		case 3:{//m�
+		case 3:{//m²
 			m2toUnit = 1.0;
 			break;
 		}
-		case 4:{//in�
+		case 4:{//in²
 			m2toUnit = 1./0.254/0.254*100.0;
 			break;
 		}
-		case 5:{//ft�
+		case 5:{//ft²
 			m2toUnit = 1./0.254/0.254/144.0*100.0;
 			break;
 		}
@@ -512,8 +539,6 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 }
 
 
-
-
 void Trace(int n)
 {
 //	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
@@ -533,6 +558,7 @@ void Trace(int n)
 	tf->close();
 
 }
+
 
 void Trace(QString msg)
 {
@@ -582,6 +608,7 @@ void Trace(QString msg, int n)
 	ts << str;;
 	tf->close();
 }
+
 
 void Trace(QString msg, double f)
 {
@@ -639,6 +666,57 @@ void WriteCString(QDataStream &ar, QString const &strong)
 
 
 
+double GLGetRed(double tau)
+{
+	if(tau>2.0/3.0)       return 1.0;
+	else if(tau>1.0/3.0)  return (3.0*(tau-1.0/3.0));
+	else				  return 0.0;
+}
+
+double GLGetGreen(double tau)
+{
+	if(tau<0.f || tau>1.0) 	return 0.0;
+	else if(tau<1.0/4.0) 	return (4.0*tau);
+	else if(tau>3.0/4.0) 	return (1.0-4.0*(tau-3.0/4.0));
+	else					return 1.0;
+}
+
+double GLGetBlue(double tau)
+{
+	if(tau>2.0/3.0) 		return 0.0;
+	else if(tau>1.0/3.0)	return (1.0-3.0*(tau-1.0/3.0));
+	else		    		return 1.0;
+}
+
+
+double IntegralC2(double y1, double y2, double c1, double c2)
+{
+	// Auxiliary integral used in LLT calculations
+
+	double res = 0.0;
+
+	if (fabs(y2-y1)<1.e-5) return 0.0;
+	double g = (c2-c1)/(y2-y1);
+
+	res = (c1-g*y1)*(c1-g*y1)*(y2-y1) +
+		  g * (c1-g*y1)      *(y2*y2-y1*y1)+
+		  g*g/3.0            *(y2*y2*y2-y1*y1*y1);
+
+	return res;
+}
+
+
+double IntegralCy(double y1, double y2, double c1, double c2)
+{
+	// Auxiliary integral used in LLT calculations
+
+	double res = 0.0;
+	if (fabs(y2-y1)<1.e-5) return (y1+y2)/2.0 * (c1+c2)/2.0;
+
+	double g = (c2-c1)/(y2-y1);
+	res = (c1-g*y1)/2.0 *(y2*y2 - y1*y1) + g/3.0 * (y2*y2*y2-y1*y1*y1);
+	return res;
+}
 
 
 

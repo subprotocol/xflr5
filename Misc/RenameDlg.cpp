@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	RenameDlg Class
-	Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -27,12 +27,17 @@ RenameDlg::RenameDlg(void *pParent)
 {
 	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
-	SetLayout();
+	SetupLayout();
 }
 
 
-void RenameDlg::SetLayout()
+void RenameDlg::SetupLayout()
 {
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+	setMinimumHeight(r.height()/3);
+	move(r.width()/3, r.height()/6);
+
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 
 	m_pctrlMessage = new QLabel("A Message here");
