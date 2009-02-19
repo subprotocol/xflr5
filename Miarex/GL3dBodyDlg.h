@@ -1,0 +1,200 @@
+/****************************************************************************
+
+	GL3dViewDlg Class
+	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
+ 
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*****************************************************************************/
+ 
+#ifndef GL3DBODYDLG_H
+#define GL3DBODYDLG_H
+
+#include <QDialog>
+#include <QCheckBox>
+#include <QSlider>
+#include <QRadioButton>
+#include <QTableView>
+#include <QPushButton>
+#include "GLWidget.h"
+#include "ArcBall.h"
+#include "BodyGridDlg.h"
+#include "../Misc/FloatEdit.h"
+#include "../Misc/LineCbBox.h"
+#include "../Objects/Body.h"
+
+
+class GL3dBodyDlg : public QDialog
+{
+	Q_OBJECT
+	friend class MainFrame;
+	friend class QMiarex;
+	friend class GLWidget;
+	friend class WingDlg;
+	friend class GLLightDlg;
+
+public:
+	GL3dBodyDlg(void *pParent = NULL);
+	~GL3dBodyDlg();
+
+
+private slots:
+	void OnAxes(int state);
+	void On3DIso();
+	void On3DTop();
+	void On3DLeft();
+	void On3DFront();
+	void On3DReset();
+	void On3DPickCenter();
+	void OnGrid();
+	void OnSetupLight();
+	void OnClipPlane(int pos);
+	void OnLight(int state);
+	void OnSurfaces(int state);
+	void OnOutline(int state);
+	void OnPanels(int state);
+	void OnVortices(int state);
+
+
+
+private:
+	void wheelEvent(QWheelEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event) ;
+	void mouseReleaseEvent(QMouseEvent *event) ;
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
+	void resizeEvent(QResizeEvent *event);
+	void showEvent(QShowEvent *event);
+
+	void SetupLayout();
+	void ClientToGL(QPoint const &point, CVector &real);
+	void GLToClient(CVector const &real, QPoint &point);
+	void GLCreateMesh();
+	void GLCreateCtrlPts();
+	void GLInverseMatrix();
+	void GLCreateBodyBezier();
+	void GLCreateBody2DBodySection();
+	void GLCreateBody3DSplines();
+	void GLCreateBody3DFlatPanels();
+	void GLCreateBodyMesh();
+	void GLCreateBodyPoints();
+	void GLCreateBodyFrames();
+	void GLCreateBodyGrid();
+	void GLCreateBodyOverlay();
+	void GLRenderBody();
+	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
+	void GLSetupLight();
+	void GLDrawAxes();
+	void GLCallViewLists();
+	void GLDraw3D();
+	void GLDrawBodyLegend();
+	void SetBodyScale();
+	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
+	void Set3DRotationCenter();
+	void Set3DRotationCenter(QPoint point);
+
+	void UpdateView();
+
+	bool LoadSettings(QDataStream &ar);
+	bool SaveSettings(QDataStream &ar);
+
+
+private:
+	static void *s_pMiarex;
+	static void *s_pMainFrame;
+	static void *s_pGLLightDlg;
+
+	GLWidget *m_pglWidget;
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlGrid;
+	QSlider *m_pctrlClipPlanePos;
+
+	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
+	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
+	LineCbBox *m_pctrlBodyStyle;
+	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
+	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
+
+	QCursor m_hcArrow;
+	QCursor m_hcCross;
+	QCursor m_hcMove;
+
+	CFrame *m_pFrame;
+	CBody *m_pBody;
+	CPanel *m_pPanel;
+	CVector *m_pNode;
+
+	BodyGridDlg m_BodyGridDlg;
+
+
+	ArcBall m_ArcBall;
+	QPoint m_LastPoint, m_PointDown;
+
+	bool m_bTrans;
+	bool m_bDragPoint;
+	bool m_bArcball;			//true if the arcball is to be displayed
+	bool m_bglLight;
+	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
+	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
+	bool m_bVortices;				// defines whether the corresponfing data should be displayed
+	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
+	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
+	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
+	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed
+	bool m_bResetglBody;
+	bool m_bResetglBodyMesh;
+	bool m_bResetglBody2D;
+	bool m_bResetglBodyOverlay;
+	bool m_bResetglBodyPoints;
+	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
+	bool m_bShowLight;			// true if the virtual light is to be displayed
+	bool m_bCurFrameOnly;
+
+	int m_GLList;
+	int m_iView;
+	int m_NXPoints, m_NHoopPoints;
+
+	double m_ClipPlanePos;
+	double MatIn[4][4], MatOut[4][4];
+	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
+	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
+
+	double pi;
+	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
+	double m_glScaled;//zoom factor for UFO
+	double m_BodyScale, m_FrameScale, m_BodyRefScale, m_FrameRefScale;			// scale for 3D display
+	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
+						// this is not the scale to display the model in the OpenGL view
+	double m_LetterWidth;
+
+	CVector m_UFOOffset;
+	CVector m_BodyOffset;
+	CVector m_FrameOffset;
+
+	CVector m_BodyScalingCenter, m_BodyScaledOffset;
+	CVector m_FrameScalingCenter, m_FrameScaledOffset;
+
+
+	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
+	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector
+	QRect m_BodyLineRect;
+	QRect m_FrameRect;
+	QRect m_BodyRect;
+	QRect m_rCltRect;
+
+};
+
+#endif // GL3DViewDlg_H
