@@ -46,6 +46,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	QRect r = desktop.geometry();
 	FloatEdit::s_MaxWidth = r.width()/15;
 
+
+
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
 	m_AreaUnit    = 3;
@@ -55,6 +57,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_MomentUnit  = 1;
 
 	CreateDockWindows();
+
+	m_ProjectName = "";
 
 	m_BorderClr       = QColor(200,200,200);
 	m_BackgroundColor = QColor(0, 20, 40);
@@ -527,6 +531,7 @@ void MainFrame::CreateDockWindows()
 	PlaneDlg::s_poaWing = &m_oaWing;
 	CWing::s_pMainFrame = this;
 	CWing::s_pMiarex = m_pMiarex;
+	CBody::s_pMainFrame = this;
 	CPlane::s_pMainFrame = this;
 	CPlane::s_pMiarex = m_pMiarex;
 	BodyGridDlg::s_pMainFrame = this;
@@ -577,6 +582,11 @@ void MainFrame::CreateMiarexActions()
 	W3DAct->setStatusTip(tr("Show 3D view"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
+	CpViewAct = new QAction(tr("CpView view"), this);
+	CpViewAct->setStatusTip(tr("Show Cp view"));
+	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
+
+
 	DefineWingAct = new QAction(tr("Define a New Wing"), this);
 	DefineWingAct->setStatusTip(tr("Shows a dialogbox for editing a new wing definition"));
 	DefineWingAct->setShortcut(tr("F3"));
@@ -599,6 +609,14 @@ void MainFrame::CreateMiarexActions()
 	editCurBody = new QAction(tr("Edit the Current Body"), this);
 	editCurBody->setStatusTip(tr("Shows a dialogbox for editing the current body"));
 	connect(editCurBody, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
+
+	exportBody = new QAction(tr("Export Body"), this);
+	exportBody->setStatusTip(tr("Export a body definition from a text file"));
+	connect(exportBody, SIGNAL(triggered()), pMiarex, SLOT(OnExportBody()));
+
+	importBody = new QAction(tr("Import Body"), this);
+	importBody->setStatusTip(tr("Import a body definition from a text file"));
+	connect(importBody, SIGNAL(triggered()), pMiarex, SLOT(OnImportBody()));
 
 
 	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
@@ -695,6 +713,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addAction(WOppAct);
 	MiarexViewMenu->addAction(WPolarAct);
 	MiarexViewMenu->addAction(W3DAct);
+	MiarexViewMenu->addAction(CpViewAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(unitsAct);
 	MiarexViewMenu->addSeparator();
@@ -716,6 +735,8 @@ void MainFrame::CreateMiarexMenus()
 	MiarexBodyMenu = menuBar()->addMenu("Body");
 	MiarexBodyMenu->addAction(defineBody);
 	MiarexBodyMenu->addAction(editCurBody);
+	MiarexBodyMenu->addAction(importBody);
+	MiarexBodyMenu->addAction(exportBody);
 
 	MiarexWPlrMenu = menuBar()->addMenu(tr("&Polars"));
 	MiarexWPlrMenu->addAction(defineWPolar);
@@ -774,6 +795,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addMenu(CurWPlrMenu);
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addMenu(CurWOppMenu);
+	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addAction(showCurWOppOnly);
 	WOppCtxMenu->addAction(showAllWOpps);
 	WOppCtxMenu->addAction(hideAllWOpps);
@@ -2900,6 +2922,7 @@ void MainFrame::OnStyle()
 	dlg.m_TextColor       = m_TextColor;
 	dlg.m_TextFont        = m_TextFont;
 	dlg.m_pRefGraph       = &m_RefGraph;
+	dlg.m_StyleName       = m_StyleName;
 
 	dlg.InitDialog();
 
@@ -2909,6 +2932,7 @@ void MainFrame::OnStyle()
 		m_GraphBackColor  = dlg.m_GraphBackColor;
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
+		m_StyleName       = dlg.m_StyleName;
 		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCpGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCmGraph->SetBkColor(m_GraphBackColor);
@@ -4295,11 +4319,11 @@ QString MainFrame::ShortenFileName(QString &PathName)
 		{
 			strong = PathName.left(40);
 		}
-
 	}
 	else strong = PathName;
 	return strong;
 }
+
 
 void MainFrame::UpdateUFOs()
 {
@@ -4879,7 +4903,7 @@ void MainFrame::UpdateView()
 		}
 		case MIAREX:
 		{
-			QMiarex *pMiarex= (QMiarex*) m_pMiarex;
+			QMiarex *pMiarex= (QMiarex*)m_pMiarex;
 			pMiarex->UpdateView();
 			break;
 		}
@@ -4910,7 +4934,6 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
 		for (i=0; i<m_oaPolar.size();i++)
 		{
 			pPolar = (CPolar*)m_oaPolar.at(i);
-//			pPolar->m_pMainFrame = this;
 			pPolar->Serialize(ar, true);
 		}
 		if(m_bSaveOpps)
@@ -4920,7 +4943,6 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
 			for (i=0; i<m_oaOpp.size();i++)
 			{
 				pOpp = (OpPoint*)m_oaOpp.at(i);
-//					pOpp->m_pParent = this;
 				pOpp->Serialize(ar,true,100002);
 			}
 		}
@@ -4947,7 +4969,6 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
 		for (i=0; i<m_oaPolar.size();i++)
 		{
 			pPolar = (CPolar*)m_oaPolar.at(i);
-//			pPolar->m_pFrame = this;
 			if (pPolar->m_FoilName == pFoil->m_FoilName) pPolar->Serialize(ar, true);
 		}
 	}

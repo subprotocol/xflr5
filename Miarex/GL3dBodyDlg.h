@@ -24,15 +24,19 @@
 
 #include <QDialog>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QLineEdit>
 #include <QSlider>
 #include <QRadioButton>
+#include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
 #include "GLWidget.h"
 #include "ArcBall.h"
 #include "BodyGridDlg.h"
+#include "BodyTableDelegate.h"
 #include "../Misc/FloatEdit.h"
-#include "../Misc/LineCbBox.h"
+#include "../Misc/LineButton.h"
 #include "../Objects/Body.h"
 
 
@@ -44,6 +48,7 @@ class GL3dBodyDlg : public QDialog
 	friend class GLWidget;
 	friend class WingDlg;
 	friend class GLLightDlg;
+	friend class BodyScaleDlg;
 
 public:
 	GL3dBodyDlg(void *pParent = NULL);
@@ -58,6 +63,8 @@ private slots:
 	void On3DFront();
 	void On3DReset();
 	void On3DPickCenter();
+	void OnBodyName();
+	void OnBodyStyle();
 	void OnGrid();
 	void OnSetupLight();
 	void OnClipPlane(int pos);
@@ -66,8 +73,16 @@ private slots:
 	void OnOutline(int state);
 	void OnPanels(int state);
 	void OnVortices(int state);
-
-
+	void OnLineType();
+	void OnInsert();
+	void OnRemove();
+	void OnFrameCellChanged(QWidget *pWidget);
+	void OnFrameItemActivated(const QModelIndex &index);
+	void OnFrameItemClicked(const QModelIndex &index);
+	void OnPointCellChanged(QWidget *pWidget);
+	void OnPointItemActivated(const QModelIndex &index);
+	void OnPointItemClicked(const QModelIndex &index);
+	void OnScaleBody();
 
 private:
 	void wheelEvent(QWheelEvent *event);
@@ -79,6 +94,17 @@ private:
 	void resizeEvent(QResizeEvent *event);
 	void showEvent(QShowEvent *event);
 
+	void ShowContextMenu(QContextMenuEvent * event);
+	void FillFrameTableRow(int row);
+	void FillFrameDataTable();
+	void FillFrameCell(int iItem, int iSubItem);
+	void ReadFrameSectionData(int sel);
+
+	void FillPointCell(int iItem, int iSubItem);
+	void FillPointTableRow(int row);
+	void FillPointDataTable();
+	void ReadPointSectionData(int sel);
+	void SetFrame(int iFrame);
 	void SetupLayout();
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, QPoint &point);
@@ -105,12 +131,17 @@ private:
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
-
+	void SetBody(CBody *pBody);
 	void UpdateView();
 
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
 
+	void TakePicture();
+	void SetPicture();
+	void StorePicture();
+
+	void reject();
 
 private:
 	static void *s_pMiarex;
@@ -122,15 +153,30 @@ private:
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlGrid;
 	QSlider *m_pctrlClipPlanePos;
 
+	QLineEdit *m_pctrlBodyName;
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
-	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
-	LineCbBox *m_pctrlBodyStyle;
+	LineButton *m_pctrlBodyStyle;
 	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
+
+	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
+	QStandardItemModel *m_pFrameModel, *m_pPointModel;
+	BodyTableDelegate *m_pFrameDelegate, *m_pPointDelegate;
+
+	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
 
 	QCursor m_hcArrow;
 	QCursor m_hcCross;
 	QCursor m_hcMove;
+
+	CBody m_TmpPic;
+	CBody m_UndoPic[20];
+	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
+	bool m_bStored;
+	bool m_bResetFrame;
+
+	QPoint m_ptPopUp;
+	CVector m_RealPopUp;
 
 	CFrame *m_pFrame;
 	CBody *m_pBody;
@@ -143,6 +189,7 @@ private:
 	ArcBall m_ArcBall;
 	QPoint m_LastPoint, m_PointDown;
 
+	bool m_bEnableName;
 	bool m_bTrans;
 	bool m_bDragPoint;
 	bool m_bArcball;			//true if the arcball is to be displayed
@@ -166,6 +213,7 @@ private:
 	int m_GLList;
 	int m_iView;
 	int m_NXPoints, m_NHoopPoints;
+	int m_Precision[10];
 
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];

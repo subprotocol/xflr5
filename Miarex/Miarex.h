@@ -26,6 +26,7 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QCheckBox>
+#include <QGroupBox>
 #include <QList>
 #include <QDialog>
 #include <QDataStream>
@@ -101,6 +102,7 @@ private slots:
 	void OnWPolars();
 	void OnWOpps();
 	void On3DView();
+	void OnCpView();
 	void OnNewWing();
 	void OnNewPlane();
 	void OnEditUFO();
@@ -137,6 +139,9 @@ private slots:
 	void OnDeleteCurWPolar();
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
+	void OnAnimate(bool bChecked);
+	void OnAnimateSingle();
+	void OnAnimateSpeed(int val);
 	void OnSequence(int state);
 	void OnInitLLTCalc(int state);
 	void OnStoreWOpp(int state);
@@ -145,7 +150,6 @@ private slots:
 	void OnShowIDrag(int state);
 	void OnShowVDrag(int state);
 	void OnShowTransitions(int state);
-	void OnAnimate(int state);
 	void OnAdjustToWing();
 	void OnAdvancedSettings();
 	void OnHideUFOWPolars();
@@ -154,6 +158,8 @@ private slots:
 	void OnResetWPlrLegend();
 	void OnNewBody();
 	void OnEditCurBody();
+	void OnImportBody();
+	void OnExportBody();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -180,6 +186,7 @@ private:
 	void SetScale(QRect CltRect);
 	void Set2DScale();
 	void Set3DScale();
+	void DrawCpLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWOppLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWPolarLegend(QPainter &painter, QPoint place, int bottom);
 	void PaintWSingleGraph(QPainter &painter);
@@ -232,7 +239,7 @@ private:
 	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal, CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
-
+	bool SetModBody(CBody *pModBody);
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
 
@@ -244,6 +251,11 @@ private:
 //____________________Variables______________________________________
 //
 private:
+	QTimer *m_pAnimateTimer;
+
+	QGroupBox *m_pctrlCpBox;
+	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
+	QSlider *m_pctrlCpSection;
 
 	QCheckBox *m_pctrlSequence;
 	FloatEdit *m_pctrlAlphaMin;

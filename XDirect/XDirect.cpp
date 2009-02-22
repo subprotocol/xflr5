@@ -283,125 +283,6 @@ QXDirect::QXDirect(QWidget *parent)
 }
 
 
-void QXDirect::SetupLayout()
-{
-	QHBoxLayout *SpecVarsBox = new QHBoxLayout;
-
-	m_pctrlSpec1 = new QRadioButton("a");
-	m_pctrlSpec2 = new QRadioButton("Cl");
-	m_pctrlSpec3 = new QRadioButton("Re");
-	m_pctrlSpec1->setFont(QFont("Symbol"));
-	SpecVarsBox->addWidget(m_pctrlSpec1);
-	SpecVarsBox->addWidget(m_pctrlSpec2);
-	SpecVarsBox->addWidget(m_pctrlSpec3);
-
-	m_pctrlSequence = new QCheckBox("Sequence");
-
-	QGridLayout *SequenceGroup = new QGridLayout;
-	QLabel *AlphaMinLab   = new QLabel("Start=");
-	QLabel *AlphaMaxLab   = new QLabel("End=");
-	QLabel *DeltaAlphaLab = new QLabel("D=");
-	DeltaAlphaLab->setFont(QFont("Symbol"));
-	DeltaAlphaLab->setAlignment(Qt::AlignRight);
-	AlphaMinLab->setAlignment(Qt::AlignRight);
-	AlphaMaxLab->setAlignment(Qt::AlignRight);
-//	AlphaMinLab->setMaximumWidth(40);
-//	AlphaMaxLab->setMaximumWidth(40);
-//	DeltaAlphaLab->setMaximumWidth(40);
-	m_pctrlAlphaMin     = new FloatEdit();
-	m_pctrlAlphaMax     = new FloatEdit();
-	m_pctrlAlphaDelta   = new FloatEdit();
-//	m_pctrlAlphaMin->setMaximumWidth(70);
-//	m_pctrlAlphaMax->setMaximumWidth(70);
-//	m_pctrlAlphaDelta->setMaximumWidth(70);
-	m_pctrlAlphaMin->setMinimumHeight(20);
-	m_pctrlAlphaMax->setMinimumHeight(20);
-	m_pctrlAlphaDelta->setMinimumHeight(20);
-	m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
-	SequenceGroup->addWidget(AlphaMinLab,1,1);
-	SequenceGroup->addWidget(AlphaMaxLab,2,1);
-	SequenceGroup->addWidget(DeltaAlphaLab,3,1);
-	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
-	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
-	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
-
-	m_pctrlViscous  = new QCheckBox("Viscous");
-	m_pctrlInitBL   = new QCheckBox("Init BL");
-	m_pctrlStoreOpp = new QCheckBox("Store Opp");
-	m_pctrlAnalyze  = new QPushButton("Analyze");
-
-	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
-	AnalysisGroup->addLayout(SpecVarsBox);
-	AnalysisGroup->addStretch(1);
-	AnalysisGroup->addWidget(m_pctrlSequence);
-	AnalysisGroup->addLayout(SequenceGroup);
-	AnalysisGroup->addStretch(1);
-	AnalysisGroup->addWidget(m_pctrlViscous);
-	AnalysisGroup->addWidget(m_pctrlInitBL);
-	AnalysisGroup->addWidget(m_pctrlStoreOpp);
-	AnalysisGroup->addWidget(m_pctrlAnalyze);
-
-	QGroupBox *AnalysisBox = new QGroupBox("Analysis settings");
-	AnalysisBox->setLayout(AnalysisGroup);
-
-
-	QVBoxLayout *DisplayGroup = new QVBoxLayout;
-	m_pctrlShowBL        = new QCheckBox("Show BL");
-	m_pctrlShowPressure  = new QCheckBox("Show Pressure");
-	m_pctrlAnimate       = new QCheckBox("Animate");
-	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
-	m_pctrlAnimateSpeed->setMinimum(0);
-	m_pctrlAnimateSpeed->setMaximum(500);
-	m_pctrlAnimateSpeed->setSliderPosition(250);
-	m_pctrlAnimateSpeed->setTickInterval(25);
-	m_pctrlAnimateSpeed->setTickPosition(QSlider::TicksBelow);
-	DisplayGroup->addWidget(m_pctrlShowBL);
-	DisplayGroup->addWidget(m_pctrlShowPressure);
-	DisplayGroup->addWidget(m_pctrlAnimate);
-	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
-	QGroupBox *DisplayBox = new QGroupBox("Display");
-	DisplayBox->setLayout(DisplayGroup);
-
-	QVBoxLayout *CurveGroup = new QVBoxLayout;
-	m_pctrlShowCurve  = new QCheckBox("Show Curve");
-	m_pctrlShowPoints = new QCheckBox("Show Points");
-	m_pctrlCurveStyle = new LineCbBox();
-	m_pctrlCurveWidth = new LineCbBox();
-	m_pctrlCurveColor = new LineButton;
-	for (int i=0; i<5; i++)
-	{
-		m_pctrlCurveStyle->addItem("item");
-		m_pctrlCurveWidth->addItem("item");
-	}
-	m_pStyleDelegate = new LineDelegate;
-	m_pWidthDelegate = new LineDelegate;
-	m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
-	m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
-
-	CurveGroup->addWidget(m_pctrlShowCurve);
-	CurveGroup->addWidget(m_pctrlShowPoints);
-	CurveGroup->addWidget(m_pctrlCurveStyle);
-	CurveGroup->addWidget(m_pctrlCurveWidth);
-	CurveGroup->addWidget(m_pctrlCurveColor);
-	QGroupBox *CurveBox = new QGroupBox("Curve settings");
-	CurveBox->setLayout(CurveGroup);
-
-
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(AnalysisBox);
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(DisplayBox);
-	mainLayout->addStretch(1);
-	mainLayout->addWidget(CurveBox);
-	mainLayout->addStretch(1);
-
-	setLayout(mainLayout);
-}
-
-
 QXDirect::~QXDirect()
 {
 	delete m_pCpGraph;
@@ -5190,6 +5071,128 @@ void QXDirect::SetGraphTitles(Graph* pGraph, int iX, int iY)
 			break;
 	}
 }
+
+
+
+void QXDirect::SetupLayout()
+{
+	QHBoxLayout *SpecVarsBox = new QHBoxLayout;
+
+	m_pctrlSpec1 = new QRadioButton("a");
+	m_pctrlSpec2 = new QRadioButton("Cl");
+	m_pctrlSpec3 = new QRadioButton("Re");
+	m_pctrlSpec1->setFont(QFont("Symbol"));
+	SpecVarsBox->addWidget(m_pctrlSpec1);
+	SpecVarsBox->addWidget(m_pctrlSpec2);
+	SpecVarsBox->addWidget(m_pctrlSpec3);
+
+	m_pctrlSequence = new QCheckBox("Sequence");
+
+	QGridLayout *SequenceGroup = new QGridLayout;
+	QLabel *AlphaMinLab   = new QLabel("Start=");
+	QLabel *AlphaMaxLab   = new QLabel("End=");
+	QLabel *DeltaAlphaLab = new QLabel("D=");
+	DeltaAlphaLab->setFont(QFont("Symbol"));
+	DeltaAlphaLab->setAlignment(Qt::AlignRight);
+	AlphaMinLab->setAlignment(Qt::AlignRight);
+	AlphaMaxLab->setAlignment(Qt::AlignRight);
+
+	m_pctrlAlphaMin     = new FloatEdit();
+	m_pctrlAlphaMax     = new FloatEdit();
+	m_pctrlAlphaDelta   = new FloatEdit();
+	m_pctrlAlphaMin->setMinimumHeight(20);
+	m_pctrlAlphaMax->setMinimumHeight(20);
+	m_pctrlAlphaDelta->setMinimumHeight(20);
+	m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
+	m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
+	m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
+	SequenceGroup->addWidget(AlphaMinLab,1,1);
+	SequenceGroup->addWidget(AlphaMaxLab,2,1);
+	SequenceGroup->addWidget(DeltaAlphaLab,3,1);
+	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
+	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
+	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
+
+	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
+	m_pctrlViscous  = new QCheckBox("Viscous");
+	m_pctrlInitBL   = new QCheckBox("Init BL");
+	AnalysisSettings->addWidget(m_pctrlViscous);
+	AnalysisSettings->addWidget(m_pctrlInitBL);
+
+	m_pctrlStoreOpp = new QCheckBox("Store Opp");
+	m_pctrlAnalyze  = new QPushButton("Analyze");
+
+	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
+	AnalysisGroup->addLayout(SpecVarsBox);
+	AnalysisGroup->addStretch(1);
+	AnalysisGroup->addWidget(m_pctrlSequence);
+	AnalysisGroup->addLayout(SequenceGroup);
+	AnalysisGroup->addStretch(1);
+	AnalysisGroup->addLayout(AnalysisSettings);
+	AnalysisGroup->addWidget(m_pctrlStoreOpp);
+	AnalysisGroup->addWidget(m_pctrlAnalyze);
+
+	QGroupBox *AnalysisBox = new QGroupBox("Analysis settings");
+	AnalysisBox->setLayout(AnalysisGroup);
+
+
+	QVBoxLayout *DisplayGroup = new QVBoxLayout;
+	m_pctrlShowBL        = new QCheckBox("Show BL");
+	m_pctrlShowPressure  = new QCheckBox("Show Pressure");
+	m_pctrlAnimate       = new QCheckBox("Animate");
+	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
+	m_pctrlAnimateSpeed->setMinimum(0);
+	m_pctrlAnimateSpeed->setMaximum(500);
+	m_pctrlAnimateSpeed->setSliderPosition(250);
+	m_pctrlAnimateSpeed->setTickInterval(25);
+	m_pctrlAnimateSpeed->setTickPosition(QSlider::TicksBelow);
+	DisplayGroup->addWidget(m_pctrlShowBL);
+	DisplayGroup->addWidget(m_pctrlShowPressure);
+	DisplayGroup->addWidget(m_pctrlAnimate);
+	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
+	QGroupBox *DisplayBox = new QGroupBox("Display");
+	DisplayBox->setLayout(DisplayGroup);
+
+
+	QHBoxLayout *CurveDisplay = new QHBoxLayout;
+	m_pctrlShowCurve  = new QCheckBox("Curve");
+	m_pctrlShowPoints = new QCheckBox("Points");
+	CurveDisplay->addWidget(m_pctrlShowCurve);
+	CurveDisplay->addWidget(m_pctrlShowPoints);
+	QVBoxLayout *CurveGroup = new QVBoxLayout;
+	m_pctrlCurveStyle = new LineCbBox();
+	m_pctrlCurveWidth = new LineCbBox();
+	m_pctrlCurveColor = new LineButton;
+	for (int i=0; i<5; i++)
+	{
+		m_pctrlCurveStyle->addItem("item");
+		m_pctrlCurveWidth->addItem("item");
+	}
+	m_pStyleDelegate = new LineDelegate;
+	m_pWidthDelegate = new LineDelegate;
+	m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
+	m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
+
+	CurveGroup->addLayout(CurveDisplay);
+	CurveGroup->addWidget(m_pctrlCurveStyle);
+	CurveGroup->addWidget(m_pctrlCurveWidth);
+	CurveGroup->addWidget(m_pctrlCurveColor);
+	QGroupBox *CurveBox = new QGroupBox("Curve settings");
+	CurveBox->setLayout(CurveGroup);
+
+
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mainLayout->addStretch(1);
+	mainLayout->addWidget(AnalysisBox);
+	mainLayout->addStretch(1);
+	mainLayout->addWidget(DisplayBox);
+	mainLayout->addStretch(1);
+	mainLayout->addWidget(CurveBox);
+	mainLayout->addStretch(1);
+
+	setLayout(mainLayout);
+}
+
 
 void QXDirect::StopAnimate()
 {

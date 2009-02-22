@@ -22,12 +22,14 @@
 // Body.cpp
 //
 
-
+#include "../MainFrame.h"
 #include "Body.h"
 #include "../Globals.h"
+#include "../Misc/UnitsDlg.h"
 #include <math.h>
 #include <QMessageBox>
 
+void *CBody::s_pMainFrame;
 double CBody::s_xKnots[MAXBODYFRAMES*2];
 double CBody::s_hKnots[MAXSIDELINES*2];
 double CBody::s_XPanelPos[300];
@@ -39,7 +41,7 @@ CBody::CBody()
 {
 	int i;
 	pi = 3.141592654;
-	m_BodyName = "Body";
+	m_BodyName = "BodyName";
 
 	m_BodyColor = QColor(255,200,200);
 	m_BodyStyle = 0;
@@ -103,153 +105,42 @@ CBody::~CBody()
 {
 }
 
-CFrame * CBody::GetFrame(int iSelect)
+
+void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
+						double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted)
 {
-	if(iSelect>=0 && iSelect<m_NStations)
+	int p;
+	double cosa, sina, PanelLift;
+	CVector PanelForce, LeverArm, WindNormal, WindDirection;
+	CVector GeomMoment;
+
+	cosa = cos(Alpha*pi/180.0);
+	sina = sin(Alpha*pi/180.0);
+
+
+	//   Define wind axis
+	WindNormal.Set(   -sina, 0.0, cosa);
+	WindDirection.Set( cosa, 0.0, sina);
+
+	for (p=0; p<m_NElements; p++)
 	{
-		return m_Frame + iSelect;
+		PanelForce.x = m_pPanel[p].Normal.x * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.y = m_pPanel[p].Normal.y * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area;
+
+		PanelLift = PanelForce.dot(WindNormal);
+		XCP   += m_pPanel[p].CollPt.x * PanelLift;
+		YCP   += m_pPanel[p].CollPt.y * PanelLift;
+		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
+		GeomMoment = LeverArm * PanelForce;
+
+		GCm  += GeomMoment.y;
+		GRm  += GeomMoment.dot(WindDirection);
+		GYm  += GeomMoment.dot(WindNormal);
 	}
-	return NULL;
-}
-
-void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID)
-{
-	int i,j;
-	for (i=0; i<m_NStations; i++)
-	{
-		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
-		{
-			if(!bFrameOnly) m_FramePosition[i].x *= XFactor;
-			m_FramePosition[i].y *= YFactor;
-			m_FramePosition[i].z *= ZFactor;
-
-			for(j=0; j<m_Frame[i].m_NPoints; j++)
-			{
-				m_Frame[i].m_Point[j].y *= YFactor;
-				m_Frame[i].m_Point[j].z *= ZFactor;
-			}
-		}
-	}
-	ComputeCenterLine();
-}
-
-void CBody::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID)
-{
-	int i,j;
-	for (i=0; i<m_NStations; i++)
-	{
-		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
-		{
-			m_FramePosition[i].x += XTrans;
-//			m_FramePosition[i].y += YTrans;
-			m_FramePosition[i].z += ZTrans;
-
-			for(j=0; j<m_Frame[i].m_NPoints; j++)
-			{
-//				m_Frame[i].m_Point[j].x += XTrans;
-				m_Frame[i].m_Point[j].z += ZTrans;
-			}
-		}
-	}
-	ComputeCenterLine();
-}
-
-double CBody::GetLength()
-{
-    return fabs(m_FramePosition[m_NStations-1].x - m_FramePosition[0].x);
 }
 
 
-bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring)
-{
-	int ArchiveFormat;
-	int k;
-    float f;
-
-    if(bIsStoring)
-	{
-		ar << 1002;
-
-		//1002 : Added axial and hoop mesh panel numbers for linetype fuselage
-		//1001 : Added bunching parameter
-		//1000 : first format
-		WriteCString(ar, m_BodyName);
-		WriteCOLORREF(ar, m_BodyColor);
-		ar << m_LineType;
-		ar << m_NSideLines;
-		ar << m_NStations;
-		ar << m_iRes;
-		ar << m_nxDegree << m_nhDegree;
-		ar << m_nxPanels << m_nhPanels;
-		ar << (float)m_Bunch;
-
-		for(k=0; k<m_NStations; k++)	  ar << m_xPanels[k];
-		for(k=0; k<m_NSideLines; k++) ar << m_hPanels[k];
-
-		if(m_bClosedSurface) ar<<1; else ar <<0;
-
-		for(k=0; k<m_NStations; k++)
-		{
-            m_Frame[k].SerializeFrame(ar, bIsStoring);
-		}
-		ar << m_NStations;
-		for (k=0; k<m_NStations;k++){
-			ar << (float)m_FramePosition[k].x << (float)m_FramePosition[k].z;
-		}
-
-		ar << 0.0f << 0.0f;
-	}
-	else {
-
-        ar >> ArchiveFormat;
-        if(ArchiveFormat<1000 || ArchiveFormat>1100) return false;
-		ReadCString(ar, m_BodyName);
-		ReadCOLORREF(ar, m_BodyColor);
-        ar >> m_LineType;
-        ar >> m_NSideLines;
-        ar >> m_NStations;
-
-        ar >> m_iRes;
-        ar >> m_nxDegree >> m_nhDegree;
-        ar >> m_nxPanels >> m_nhPanels;
-
-        if(ArchiveFormat>=1001)
-        {
-            ar >> f; m_Bunch = f;
-        }
-
-        if(ArchiveFormat>=1002)
-        {
-            for(k=0; k<m_NStations; k++)	  ar >> m_xPanels[k];
-            for(k=0; k<m_NSideLines; k++) ar >> m_hPanels[k];
-        }
-
-        ar >> k;
-        if(k!=0 && k!=1)
-        {
-            return false;
-        }
-        if (k) m_bClosedSurface = true; else m_bClosedSurface = false;
-
-        for(k=0; k<m_NStations; k++)
-        {
-            m_Frame[k].SerializeFrame(ar, bIsStoring);
-        }
-        //Serialize Bodyline
-        ar >> m_NStations;
-        for (k=0; k<m_NStations;k++)
-        {
-            ar >> f; m_FramePosition[k].x =f;
-            ar >> f; m_FramePosition[k].z =f;
-        }
-        ar >> f;
-        ar >> f;
-
-        SetKnots();
-
-	}
-	return true;
-}
 
 void CBody::ComputeCenterLine()
 {
@@ -260,18 +151,370 @@ void CBody::ComputeCenterLine()
 	}
 }
 
-void CBody::UpdateFramePos(int iFrame)
+
+void CBody::Duplicate(CBody *pBody)
 {
-	int i;
-	double z;
-	z  = m_FramePosition[iFrame].z;
-	z -= (m_Frame[iFrame].m_Point[0].z + m_Frame[iFrame].m_Point[m_NSideLines-1].z)/2.0;
-	
-	for(i=0; i<m_NSideLines; i++)
-	{
-		m_Frame[iFrame].m_Point[i].z += z;
-	}
+	m_NSideLines     = pBody->m_NSideLines;
+	m_NStations      = pBody->m_NStations;
+	m_nxDegree       = pBody->m_nxDegree;
+	m_nhDegree       = pBody->m_nhDegree;
+	m_nxPanels       = pBody->m_nxPanels;
+	m_nhPanels       = pBody->m_nhPanels;
+	m_LineType       = pBody->m_LineType;
+	m_bClosedSurface = pBody->m_bClosedSurface;
+
+	memcpy(m_Frame, pBody->m_Frame, sizeof(m_Frame));
+	memcpy(m_FramePosition, pBody->m_FramePosition, sizeof(m_FramePosition));
+
+	memcpy(m_xPanels, pBody->m_xPanels, sizeof(m_xPanels));
+	memcpy(m_hPanels, pBody->m_hPanels, sizeof(m_hPanels));
+
+	SetKnots();
 }
+
+
+bool CBody::Gauss(double *A, int n, double *B, int m)
+{
+	int row, i, j, pivot_row, k;
+	double max, dum, *pa, *pA, *A_pivot_row;
+	// for each variable find pivot row and perform forward substitution
+	pa = A;
+	for (row = 0; row < (n - 1); row++, pa += n)
+	{
+		//  find the pivot row
+		A_pivot_row = pa;
+		max = fabs(*(pa + row));
+		pA = pa + n;
+		pivot_row = row;
+		for (i=row+1; i < n; pA+=n, i++)
+			if ((dum = fabs(*(pA+row))) > max)
+			{
+				max = dum;
+				A_pivot_row = pA;
+				pivot_row = i;
+			}
+		if (max <= 0.0)
+			return false;                // the matrix A is singular
+
+			// and if it differs from the current row, interchange the two rows.
+
+		if (pivot_row != row) {
+			for (i = row; i < n; i++) {
+				dum = *(pa + i);
+				*(pa + i) = *(A_pivot_row + i);
+				*(A_pivot_row + i) = dum;
+			}
+			for(k=0; k<=m; k++){
+				dum = B[row+k*n];
+				B[row+k*n] = B[pivot_row+k*n];
+				B[pivot_row+k*n] = dum;
+			}
+		}
+
+		// Perform forward substitution
+		for (i = row+1; i<n; i++) {
+			pA = A + i * n;
+			dum = - *(pA + row) / *(pa + row);
+			*(pA + row) = 0.0;
+			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
+			for (k=0; k<=m; k++)
+				B[i+k*n] += dum * B[row+k*n];
+		}
+	}
+
+	// Perform backward substitution
+
+	pa = A + (n - 1) * n;
+	for (row = n - 1; row >= 0; pa -= n, row--) {
+		if ( *(pa + row) == 0.0 )
+			return false;           // matrix is singular
+		dum = 1.0 / *(pa + row);
+		for ( i = row + 1; i < n; i++) *(pa + i) *= dum;
+		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for ( i = 0, pA = A; i < row; pA += n, i++) {
+			dum = *(pA + row);
+			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
+			for(k=0; k<=m; k++)
+				B[i+k*n] -= dum * B[row+k*n];
+		}
+	}
+	return true;
+}
+
+
+
+CFrame * CBody::GetFrame(int iSelect)
+{
+	if(iSelect>=0 && iSelect<m_NStations)
+	{
+		return m_Frame + iSelect;
+	}
+	return NULL;
+}
+
+double CBody::GetLength()
+{
+	return fabs(m_FramePosition[m_NStations-1].x - m_FramePosition[0].x);
+}
+
+
+void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
+{
+	//returns the point corresponding to the parametric values u and v
+	//assumes that the knots have been set previously
+	CVector V, Vh;
+	int i,j;
+
+	if(u>=1.0) u=0.99999999999;
+	if(v>=1.0) v=0.99999999999;
+	for(i=0; i<m_NStations; i++)
+	{
+		Vh.Set(0.0,0.0,0.0);
+		for(j=0; j<m_NSideLines; j++)
+		{
+			cs =  SplineBlend(j, m_nhDegree, v, s_hKnots);
+			Vh.x += m_FramePosition[i].x    * cs;
+			Vh.y += m_Frame[i].m_Point[j].y * cs;
+			Vh.z += m_Frame[i].m_Point[j].z * cs;
+		}
+		bs = SplineBlend(i, m_nxDegree, u, s_xKnots);
+
+		V.x += Vh.x * bs;
+		if(bRight) V.y += Vh.y * bs;
+		else       V.y -= Vh.y * bs;
+		V.z += Vh.z * bs;
+	}
+	Pt = V;
+}
+
+
+void CBody::ExportGeometry(int nx, int nh)
+{
+	QString Header, strong, LengthUnit,str, FileName, DestFileName, OutString;
+	int j,k,l;
+	double u, v;
+	CVector Point;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+
+	FileName = m_BodyName;
+	FileName.replace("/", " ");
+
+	int type = 1;
+
+	QString filter =".csv";
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Polar",
+											pMainFrame->m_LastDirName ,
+											"Text File (*.txt; *.csv)",
+											&filter);
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) type = 2;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+	if(type==1)	str="";
+	else		str=", ";
+
+	out  << (m_BodyName);
+	out  << ("\n\n");
+
+	if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_NStations,3);
+	strong +="       // Number of frame stations\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_NSideLines,3);
+	strong +="       // Number of sidelines\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_nxDegree,3);
+	strong +="       // Spline degree - axial direction\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_nhDegree,3);
+	strong +="       // Spline degree - hoop direction\n";
+	out  << (strong);
+	out  << ("\n\n");
+
+	out  << ("Control Points\n");
+	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+	out  << (strong);
+
+	for (j=0; j<m_NStations; j++)
+	{
+		strong = QString("  Frame "+str+"%1\n").arg(j+1);
+		out  << (strong);
+		for (k=0; k<m_NSideLines; k++)
+		{
+			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
+					 .arg(m_FramePosition[j].x * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit,10,'f',3);
+			out  << (strong);
+		}
+		out  << ("\n");
+	}
+
+	out  << ("\n\n");
+	out  << ("Right Surface Points\n");
+	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+	out  << (strong);
+
+	for (k=0; k<nx; k++)
+	{
+		strong = QString("  Cross Section "+str+"%1\n").arg(k+1,3);
+		out  << (strong);
+
+		u = (double)k / (double)(nx-1);
+
+		for (l=0; l<nh; l++)
+		{
+			v = (double)l / (double)(nh-1);
+			GetPoint(u,  v, true, Point);
+
+			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
+					 .arg(Point.x * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(Point.y * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(Point.z * pMainFrame->m_mtoUnit,10,'f',3);
+			out  << (strong);
+		}
+		out  << ("\n");
+	}
+
+	out  << ("\n\n");
+}
+
+/*
+bool CBody::SetModified()
+{
+	if(m_bLocked)
+	{
+		//unlock...
+		//check if it is used by one or more planes
+		int k;
+		QString strong;
+		QMainWindow *pMainFrame = (QMainWindow*)s_pMainFrame;
+		CPlane *pPlane;
+		bool bIsInUse = false;
+		int resp = IDYES;
+		for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
+		{
+			pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
+			if(pPlane->m_bBody && pPlane->m_pBody==this)
+			{
+				bIsInUse = true;
+				break;
+			}
+		}
+		if(bIsInUse)
+		{
+			strong = "The current body "+m_BodyName+" is used by one or more planes.\n The associated results will be deleted. Continue ?";
+			resp = AfxMessageBox(strong, MB_YESNOCANCEL);
+		}
+		if(resp==IDYES)
+		{
+			for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
+			{
+				pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
+				if(pPlane->m_bBody && pPlane->m_pBody==this)
+				{
+					pMainFrame->DeletePlane(pPlane, true);
+				}
+			}
+			m_bLocked = false;
+			return true;
+		}
+	}
+	return false;
+}*/
+
+double CBody::Getu(double x)
+{
+	if(x<=m_FramePosition[0].x)            return 0.0;
+	if(x>=m_FramePosition[m_NStations-1].x) return 1.0;
+	if(fabs(m_FramePosition[m_NStations-1].x-m_FramePosition[0].x)<0.0000001) return 0.0;
+
+	int i,j, iter=0;
+	double u2, u1, b, c, u, v, xx, xh;
+	u1 = 0.0; u2 = 1.0;
+
+	v = 0.0;//use top line, but doesn't matter
+	while(fabs(u2-u1)>1.0e-6 && iter<200)
+	{
+		u=(u1+u2)/2.0;
+		xx = 0.0;
+		for(i=0; i<m_NStations; i++) //browse all points
+		{
+			xh = 0.0;
+			for(j=0; j<m_NSideLines; j++)
+			{
+				c =  SplineBlend(j, m_nhDegree, v, s_hKnots);
+				xh += m_FramePosition[i].x * c;
+			}
+			b = SplineBlend(i, m_nxDegree, u, s_xKnots);
+			xx += xh * b;
+		}
+		if(xx>x) u2 = u;
+		else     u1 = u;
+		iter++;
+	}
+	return (u1+u2)/2.0;
+}
+
+
+double CBody::Getv(double u, CVector r, bool bRight)
+{
+	double sine = 10000.0;
+
+	if(u<=0.0)             return 0.0;
+	if(u>=1.0)             return 0.0;
+	if(r.VAbs()<1.0e-5) return 0.0;
+
+	int iter=0;
+	double v, v1, v2;
+
+	r.Normalize();
+	v1 = 0.0; v2 = 1.0;
+
+	while(fabs(sine)>1.0e-4 && iter<200)
+	{
+		v=(v1+v2)/2.0;
+		GetPoint(u, v, bRight, t_R);
+		t_R.x = 0.0;
+		t_R.Normalize();//t_R is the unit radial vector for u,v
+
+		sine = (r.y*t_R.z - r.z*t_R.y);
+
+		if(bRight)
+		{
+			if(sine>0.0) v1 = v;
+			else         v2 = v;
+		}
+		else
+		{
+			if(sine>0.0) v2 = v;
+			else         v1 = v;
+		}
+		iter++;
+	}
+
+	return (v1+v2)/2.0;
+}
+
+
 
 void CBody::InsertSideLine(int SideLine)
 {
@@ -281,16 +524,6 @@ void CBody::InsertSideLine(int SideLine)
 		m_Frame[i].InsertPoint(SideLine);
 	}
 	m_NSideLines++;
-	SetKnots();
-}
-
-void CBody::RemoveSideLine(int SideLine)
-{
-	for (int i=0; i<m_NStations; i++)
-	{
-		m_Frame[i].RemovePoint(SideLine);
-	}
-	m_NSideLines--;
 	SetKnots();
 }
 
@@ -415,389 +648,6 @@ int CBody::IsFramePos(CVector Real, double ZoomFactor)
 }
 
 
-void CBody::Duplicate(CBody *pBody)
-{
-	m_NSideLines     = pBody->m_NSideLines;
-	m_NStations      = pBody->m_NStations;
-	m_nxDegree       = pBody->m_nxDegree;
-	m_nhDegree       = pBody->m_nhDegree;
-	m_nxPanels       = pBody->m_nxPanels;
-	m_nhPanels       = pBody->m_nhPanels;
-	m_LineType       = pBody->m_LineType;
-	m_bClosedSurface = pBody->m_bClosedSurface;
-
-	memcpy(m_Frame, pBody->m_Frame, sizeof(m_Frame));
-	memcpy(m_FramePosition, pBody->m_FramePosition, sizeof(m_FramePosition));
-
-	memcpy(m_xPanels, pBody->m_xPanels, sizeof(m_xPanels));
-	memcpy(m_hPanels, pBody->m_hPanels, sizeof(m_hPanels));
-
-	SetKnots();
-}
-
-
-int CBody::RemoveFrame(int n)
-{
-	int k;
-//	m_BodyLine.RemovePoint(n);
-	for(k=n; k<m_NStations; k++)	
-	{
-		m_FramePosition[k] = m_FramePosition[k+1];
-		m_Frame[k].CopyFrame(m_Frame+k+1);
-	}
-	m_NStations--;
-	m_iActiveFrame = n;
-	if(n>=m_NStations)	m_iActiveFrame = m_NStations;
-	if(n<=0)			m_iActiveFrame = 0;
-	m_iHighlight = -1;
-	SetKnots();
-	return m_iActiveFrame;
-}
-
-
-void CBody::RemoveActiveFrame()
-{
-	int k;
-
-	for(k=m_iActiveFrame; k<m_NStations; k++)	
-	{
-		m_FramePosition[k] = m_FramePosition[k+1];
-		m_Frame[k].CopyFrame(m_Frame+k+1);
-	}
-	m_NStations--;
-
-	m_iHighlight = -1;
-	SetKnots();
-}
-
-void CBody::SetKnots()
-{
-	int j;
-	double b;
-    m_nxDegree = std::min(m_nxDegree, m_NStations);
-	m_nxKnots  = m_nxDegree + m_NStations   + 1;
-	b = (double)(m_nxKnots-2*m_nxDegree-1);
-
-
-	// x-dir knots
-	for (j=0; j<m_nxKnots; j++) 
-	{
-		if (j<m_nxDegree+1)  s_xKnots[j] = 0.0;
-		else 
-		{
-			if (j<m_NStations) 
-			{
-                if(fabs(b)>0.0) s_xKnots[j] = (double)(j-m_nxDegree)/b;
-				else           s_xKnots[j] = 1.0; 
-			}
-			else s_xKnots[j] = 1.0;
-		}
-	}
-
-	//hoop knots
-
-    m_nhDegree = std::min(m_nhDegree, m_NSideLines);
-	m_nhKnots  = m_nhDegree + m_NSideLines + 1;
-	b = (double)(m_nhKnots-2*m_nhDegree-1);
-	for (j=0; j<m_nhKnots; j++) 
-	{
-		if (j<m_nhDegree+1)  s_hKnots[j] = 0.0;
-		else 
-		{
-			if (j<m_NSideLines) 
-			{
-                if(fabs(b)>0.0) s_hKnots[j] = (double)(j-m_nhDegree)/b;
-				else           s_hKnots[j] = 1.0;
-			}
-			else s_hKnots[j] = 1.0;
-		}
-	}
-}
-
-double CBody::SplineBlend(int const &index, int const &p, double const &t, double *knots)
-{
-//	Calculate the blending value, this is done recursively.
-//	If the numerator and denominator are 0 the expression is 0.
-//	If the denominator is 0 the expression is 0
-//
-//	   index   is the control point's index
-//	   p       is the spline's degree 	
-//	   t       is the spline parameter
-//
-
-	if (p == 0) 
-	{
-		if ((knots[index] <= t) && (t < knots[index+1]) )	value = 1.0;
-//		else if (abs(knots[index]-knots[index+1])<pres)	    value = 0.0;
-		else 						                value = 0.0;
-	} 
-	else
-	{
-        if (fabs(knots[index+p] - knots[index])<eps && fabs(knots[index+p+1] - knots[index+1])<eps)
-			value = 0.0;
-        else if (fabs(knots[index+p] - knots[index])<eps)
-			value = (knots[index+p+1]-t) / (knots[index+p+1]-knots[index+1])  * SplineBlend(index+1, p-1, t, knots);
-        else if (fabs(knots[index+p+1] - knots[index+1])<eps)
-			value = (t-knots[index])     / (knots[index+p] - knots[index])    * SplineBlend(index,   p-1, t, knots);
-		else 
-			value = (t-knots[index])     / (knots[index+p]  -knots[index])    * SplineBlend(index,   p-1, t, knots) + 
-			        (knots[index+p+1]-t) / (knots[index+p+1]-knots[index+1])  * SplineBlend(index+1 ,p-1, t, knots);
-	}
-	return value;
-}
-
-void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
-{
-	//returns the point corresponding to the parametric values u and v
-	//assumes that the knots have been set previously
-	CVector V, Vh;
-	int i,j;
-
-	if(u>=1.0) u=0.99999999999;
-	if(v>=1.0) v=0.99999999999;
-	for(i=0; i<m_NStations; i++)
-	{
-		Vh.Set(0.0,0.0,0.0);
-		for(j=0; j<m_NSideLines; j++)
-		{
-			cs =  SplineBlend(j, m_nhDegree, v, s_hKnots);
-			Vh.x += m_FramePosition[i].x    * cs;
-			Vh.y += m_Frame[i].m_Point[j].y * cs;
-			Vh.z += m_Frame[i].m_Point[j].z * cs;
-		}
-		bs = SplineBlend(i, m_nxDegree, u, s_xKnots);
-
-		V.x += Vh.x * bs;
-		if(bRight) V.y += Vh.y * bs;
-		else       V.y -= Vh.y * bs;
-		V.z += Vh.z * bs;
-	}
-	Pt = V;
-}
-
-/*
-void CBody::ExportGeometry(int nx, int nh)
-{
-    QFile XFile;
-
-    QString Header, strong, FileName, OutString, LengthUnit,str;
-	int j,k,l;
-	double u, v;
-	CVector Point;
-
-	CMainFrame *pMainFrame = (CMainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
-
-	FileName = m_BodyName;
-	FileName.Replace("/", " ");
-
-	static TCHAR BASED_CODE szFilter[] = _T("Text File (*.txt)|*.txt|") _T("CSV format (*.csv)|*.csv|") ;
-	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, szFilter);
-
-	XFileDlg.m_ofn.nFilterIndex = pMainFrame->m_TextFileFormat;
-
-
-	if(IDOK==XFileDlg.DoModal()) 
-	{
-		pMainFrame->m_TextFileFormat = XFileDlg.m_ofn.nFilterIndex;
-		if(XFileDlg.m_ofn.nFilterIndex==1)		str="";
-		else		str=", ";
-		BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeCreate | CFile::modeWrite, &fe);
-		if (bOpen)
-		{
-			XFile.WriteString(m_BodyName);
-			XFile.WriteString("\n\n");
-	
-			if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
-			XFile.WriteString(strong);
-
-			strong.Format("%3d"+str, m_NStations);
-			strong +="       // Number of frame stations\n";
-			XFile.WriteString(strong);
-
-			strong.Format("%3d"+str, m_NSideLines);
-			strong +="       // Number of sidelines\n";
-			XFile.WriteString(strong);
-
-			strong.Format("%3d"+str, m_nxDegree);	
-			strong +="       // Spline degree - axial direction\n";
-			XFile.WriteString(strong);
-
-			strong.Format("%3d"+str, m_nhDegree);
-			strong +="       // Spline degree - hoop direction\n";
-			XFile.WriteString(strong);
-			XFile.WriteString("\n\n");
-
-			XFile.WriteString("Control Points\n");
-			if(XFileDlg.m_ofn.nFilterIndex==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
-			else                               strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-			XFile.WriteString(strong);
-			
-			for (j=0; j<m_NStations; j++)
-			{
-				strong.Format("  Frame "+str+"%3d\n", j+1);
-				XFile.WriteString(strong);
-				for (k=0; k<m_NSideLines; k++)
-				{
-					strong.Format("   %10.3f"+str+"     %10.3f"+str+"     %10.3f\n", 
-						m_FramePosition[j].x * pMainFrame->m_mtoUnit,
-						m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,
-						m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit);     
-					XFile.WriteString(strong);
-				}
-				XFile.WriteString("\n");
-			}
-
-			XFile.WriteString("\n\n");
-			XFile.WriteString("Right Surface Points\n");
-			if(XFileDlg.m_ofn.nFilterIndex==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
-			else                               strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-			XFile.WriteString(strong);
-			
-			for (k=0; k<nx; k++)
-			{
-				strong.Format("  Cross Section "+str+"%3d\n", k+1);
-				XFile.WriteString(strong);
-
-				u = (double)k / (double)(nx-1); 
-
-				for (l=0; l<nh; l++)
-				{
-					v = (double)l / (double)(nh-1); 
-					GetPoint(u,  v, true, Point);
-
-					strong.Format("   %10.3f"+str+"     %10.3f"+str+"     %10.3f\n", 
-						Point.x * pMainFrame->m_mtoUnit,
-						Point.y * pMainFrame->m_mtoUnit,
-						Point.z * pMainFrame->m_mtoUnit);     
-					XFile.WriteString(strong);
-				}
-				XFile.WriteString("\n");
-			}
-
-			XFile.WriteString("\n\n");
-		}
-	}
-}*/
-
-/*
-bool CBody::SetModified()
-{
-	if(m_bLocked)
-	{
-		//unlock...
-		//check if it is used by one or more planes
-		int k; 
-        QString strong;
-        QMainWindow *pMainFrame = (QMainWindow*)s_pMainFrame;
-		CPlane *pPlane;
-		bool bIsInUse = false;
-		int resp = IDYES;
-		for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
-		{
-			pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
-			if(pPlane->m_bBody && pPlane->m_pBody==this)
-			{
-				bIsInUse = true;
-				break;
-			}
-		}
-		if(bIsInUse)
-		{
-			strong = "The current body "+m_BodyName+" is used by one or more planes.\n The associated results will be deleted. Continue ?";
-			resp = AfxMessageBox(strong, MB_YESNOCANCEL);
-		}
-		if(resp==IDYES)
-		{
-			for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
-			{
-				pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
-				if(pPlane->m_bBody && pPlane->m_pBody==this)
-				{
-					pMainFrame->DeletePlane(pPlane, true);
-				}
-			}
-			m_bLocked = false;
-			return true;
-		}
-	}
-	return false;
-}*/
-
-double CBody::Getu(double x)
-{
-	if(x<=m_FramePosition[0].x)            return 0.0;
-	if(x>=m_FramePosition[m_NStations-1].x) return 1.0;
-    if(fabs(m_FramePosition[m_NStations-1].x-m_FramePosition[0].x)<0.0000001) return 0.0;
-
-	int i,j, iter=0;
-	double u2, u1, b, c, u, v, xx, xh;
-	u1 = 0.0; u2 = 1.0;
-
-	v = 0.0;//use top line, but doesn't matter 
-    while(fabs(u2-u1)>1.0e-6 && iter<200)
-	{
-		u=(u1+u2)/2.0;
-		xx = 0.0;
-		for(i=0; i<m_NStations; i++) //browse all points
-		{
-			xh = 0.0;
-			for(j=0; j<m_NSideLines; j++)
-			{
-				c =  SplineBlend(j, m_nhDegree, v, s_hKnots);
-				xh += m_FramePosition[i].x * c;
-			}
-			b = SplineBlend(i, m_nxDegree, u, s_xKnots);
-			xx += xh * b;
-		}
-		if(xx>x) u2 = u;
-		else     u1 = u;
-		iter++;
-	}
-	return (u1+u2)/2.0;
-}
-
-
-double CBody::Getv(double u, CVector r, bool bRight)
-{
-	double sine = 10000.0;
-
-	if(u<=0.0)             return 0.0;
-	if(u>=1.0)             return 0.0;
-	if(r.VAbs()<1.0e-5) return 0.0;
-
-	int iter=0;
-	double v, v1, v2;
-
-	r.Normalize();
-	v1 = 0.0; v2 = 1.0;
-
-    while(fabs(sine)>1.0e-4 && iter<200)
-	{
-		v=(v1+v2)/2.0;
-		GetPoint(u, v, bRight, t_R);
-		t_R.x = 0.0;
-		t_R.Normalize();//t_R is the unit radial vector for u,v
-		
-        sine = (r.y*t_R.z - r.z*t_R.y);
-
-		if(bRight)
-		{
-			if(sine>0.0) v1 = v;
-			else         v2 = v;
-		}
-		else
-		{
-			if(sine>0.0) v2 = v;
-			else         v1 = v;
-		}
-		iter++;
-	}
-
-	return (v1+v2)/2.0;
-}
-
-
 bool CBody::IsInNURBSBody(CVector Pt)
 {
 	double u, v;
@@ -814,97 +664,6 @@ bool CBody::IsInNURBSBody(CVector Pt)
 	t_N.x = 0.0;
 
 	if(t_r.VAbs()>t_N.VAbs()) return false;
-	return true;
-}
-
-void CBody::SetPanelPos()
-{
-	int i;
-	for(i=0; i<=m_nxPanels; i++) 	
-	{
-		s_XPanelPos[i] =(double)i/(double)m_nxPanels;
-	}
-	return;
-	double y, x;	
-	double a = (m_Bunch+1.0)*.48 ;
-	a = 1./(1.0-a);
-
-	double norm = 1/(1+exp(0.5*a));
-
-	for(i=0; i<=m_nxPanels; i++) 	
-	{
-		x = (double)(i)/(double)m_nxPanels;
-		y = 1.0/(1.0+exp((0.5-x)*a));
-		s_XPanelPos[i] =0.5-((0.5-y)/(0.5-norm))/2.0;
-	}
-}
-
-
-bool CBody::Gauss(double *A, int n, double *B, int m)
-{
- 	int row, i, j, pivot_row, k;
-	double max, dum, *pa, *pA, *A_pivot_row;
-	// for each variable find pivot row and perform forward substitution
-	pa = A;
-	for (row = 0; row < (n - 1); row++, pa += n) 
-	{
-		//  find the pivot row
-		A_pivot_row = pa;
-        max = fabs(*(pa + row));
-		pA = pa + n;
-		pivot_row = row;
-		for (i=row+1; i < n; pA+=n, i++)
-            if ((dum = fabs(*(pA+row))) > max)
-			{ 
-				max = dum; 
-				A_pivot_row = pA; 
-				pivot_row = i; 
-			}
-		if (max <= 0.0) 
-			return false;                // the matrix A is singular
-		
-			// and if it differs from the current row, interchange the two rows.
-			
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
-				dum = *(pa + i);
-				*(pa + i) = *(A_pivot_row + i);
-				*(A_pivot_row + i) = dum;
-			}
-			for(k=0; k<=m; k++){
-				dum = B[row+k*n];
-				B[row+k*n] = B[pivot_row+k*n];
-				B[pivot_row+k*n] = dum;
-			}
-		}
-		
-		// Perform forward substitution
-		for (i = row+1; i<n; i++) {
-			pA = A + i * n;
-			dum = - *(pA + row) / *(pa + row);
-			*(pA + row) = 0.0;
-			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
-			for (k=0; k<=m; k++) 
-				B[i+k*n] += dum * B[row+k*n];
-		}
-	}
-
-	// Perform backward substitution
-	
-	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
-		if ( *(pa + row) == 0.0 ) 
-			return false;           // matrix is singular
-		dum = 1.0 / *(pa + row);
-		for ( i = row + 1; i < n; i++) *(pa + i) *= dum; 
-		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
-			dum = *(pA + row);
-			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
-			for(k=0; k<=m; k++) 
-				B[i+k*n] -= dum * B[row+k*n];
-		}
-	}
 	return true;
 }
 
@@ -1217,117 +976,73 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
-void CBody::ComputeAero(double *Cp, double &XCP, double &YCP, 
-						double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted)
-{
-	int p;
-	double cosa, sina, PanelLift;
-	CVector PanelForce, LeverArm, WindNormal, WindDirection;
-	CVector GeomMoment;
 
-	cosa = cos(Alpha*pi/180.0);
-	sina = sin(Alpha*pi/180.0);
-
-
-	//   Define wind axis
-	WindNormal.Set(   -sina, 0.0, cosa);
-	WindDirection.Set( cosa, 0.0, sina);
-
-	for (p=0; p<m_NElements; p++)
-	{
-		PanelForce.x = m_pPanel[p].Normal.x * (-Cp[p]) * m_pPanel[p].Area;
-		PanelForce.y = m_pPanel[p].Normal.y * (-Cp[p]) * m_pPanel[p].Area;
-		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area;
-
-		PanelLift = PanelForce.dot(WindNormal);
-		XCP   += m_pPanel[p].CollPt.x * PanelLift;
-		YCP   += m_pPanel[p].CollPt.y * PanelLift;
-		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
-		GeomMoment = LeverArm * PanelForce;
-
-		GCm  += GeomMoment.y;
-		GRm  += GeomMoment.dot(WindDirection);
-		GYm  += GeomMoment.dot(WindNormal);
-	}
-}
-
-/*
 bool CBody::ExportDefinition()
 {
-//	CWaitCursor Wait;
-	CMainFrame* pMainFrame = (CMainFrame*)s_pMainFrame;
-
-	CStdioFile XFile;
-	CFileException fe;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, j;
-    QString strong, FileName;
-
+	QString strong,  FileName, DestFileName, OutString;
+	QFile DestFile;
 
 	FileName = m_BodyName;
-	FileName.Replace("/", " ");
-	CFileDialog XFileDlg(false, "txt", FileName, OFN_OVERWRITEPROMPT, _T("Text Format (.txt)|*.txt|"));
+	FileName.replace("/", " ");
 
-	if(IDOK==XFileDlg.DoModal()) 
+	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Definition",
+											pMainFrame->m_LastDirName,
+											"Text Format (*.txt)");
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+
+	QTextStream out(&XFile);
+
+	out << (m_BodyName+"\n\n");
+	out << ("BODYTYPE\n");
+	if(m_LineType==1) out << ("1        # Flat Panels\n\n");
+	if(m_LineType==2) out << ("2        # B-Splines\n\n");
+
+	out << ("OFFSET\n");
+	out << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
+
+	for(i=0; i<m_NStations; i++)
 	{
-		FileName = XFileDlg.GetPathName();
-	
-		BOOL bOpen = XFile.Open(FileName, CFile::modeCreate | CFile::modeWrite, &fe);
-
-		if (bOpen)
+		out << ("FRAME\n\n");
+		for(j=0;j<m_NSideLines; j++)
 		{
-			XFile.WriteString(m_BodyName+"\n\n");
-			XFile.WriteString("BODYTYPE\n");
-			if(m_LineType==1) XFile.WriteString("1        # Flat Panels\n\n");
-			if(m_LineType==2) XFile.WriteString("2        # B-Splines\n\n");
-
-			XFile.WriteString("OFFSET\n");
-			XFile.WriteString("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
-
-			for(i=0; i<m_NStations; i++)
-			{
-				XFile.WriteString("FRAME\n\n");
-				for(j=0;j<m_NSideLines; j++)
-				{
-					strong.Format("%14.7f     %14.7f     %14.7f\n",
-						m_FramePosition[i].x    * pMainFrame->m_mtoUnit,
-						m_Frame[i].m_Point[j].y * pMainFrame->m_mtoUnit,
-						m_Frame[i].m_Point[j].z * pMainFrame->m_mtoUnit);
-					XFile.WriteString(strong);
-				}
-				XFile.WriteString("\n");				
-			}
-			XFile.Close();
-			return true;
+			strong = QString("%1     %2    %3\n")
+					 .arg(m_FramePosition[i].x    * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_Frame[i].m_Point[j].y * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_Frame[i].m_Point[j].z * pMainFrame->m_mtoUnit,14,'f',7);
+			out << (strong);
 		}
-		else
-		{
-			return false;
-		}
+		out << ("\n");
 	}
-	else return false;
+
+	XFile.close();
+	return true;
 
 }
 
 
 bool CBody::ImportDefinition() 
 {
-	CWaitCursor Wait;
 	CFrame NewFrame;
-	CMainFrame* pMainFrame = (CMainFrame*)s_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	CStdioFile XFile;
-	CFileException fe;
 	int res, i, j, Line, NSideLines;
     QString strong, FileName;
-	BOOL bRead;
+	bool bRead;
 
-	double mtoUnit;
-	double xo,yo,zo;
+	double mtoUnit,xo,yo,zo;
 	xo = yo = zo = 0.0;
 
 	m_NStations = 0;
 
-	CUnitsDlg Dlg;
+	UnitsDlg Dlg;
 
 	Dlg.m_bLengthOnly = true;
 	Dlg.m_Length    = pMainFrame->m_LengthUnit;
@@ -1336,161 +1051,149 @@ bool CBody::ImportDefinition()
 	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
 	Dlg.m_Force     = pMainFrame->m_ForceUnit;
 	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
-	Dlg.m_strQuestion = "Choose the length unit to read this file :";
+	Dlg.m_Question = "Choose the length unit to read this file :";
+	Dlg.InitDialog();
 
-
-	CFileDialog XFileDlg(TRUE, "txt", NULL, OFN_HIDEREADONLY, _T("Body data (.txt)|*.txt|"));
-
-	try
+	if(Dlg.exec() == QDialog::Accepted)
 	{
-		if(XFileDlg.DoModal()==IDOK)
+		switch(Dlg.m_Length)
 		{
-			BOOL bOpen = XFile.Open(XFileDlg.GetPathName(), CFile::modeRead, &fe);
-
-			if(Dlg.DoModal() == IDOK)	
-			{
-				switch(Dlg.m_Length)
-				{
-					case 0:{//mdm
-						mtoUnit  = 1000.0;
-						break;
-					}
-					case 1:{//cm
-						mtoUnit  = 100.0;
-						break;
-					}
-					case 2:{//dm
-						mtoUnit  = 10.0;
-						break;
-					}
-					case 3:{//m
-						mtoUnit  = 1.0;
-						break;
-					}
-					case 4:{//in
-						mtoUnit  = 1000.0/25.4;
-						break;
-					}
-					case 5:{///ft
-						mtoUnit  = 1000.0/25.4/12.0;
-						break;
-					}
-					default:{//m
-						mtoUnit  = 1.0;
-						break;
-					}
-				}
-
+			case 0:{//mdm
+				mtoUnit  = 1000.0;
+				break;
 			}
-			else return false;
-
-	
-			if (bOpen)
-			{	
-				Line = 0;
-				bRead  = ReadAVLString(&XFile, Line, m_BodyName);
-					
-				//Header data
-
-				bRead = TRUE;
-
-				while (bRead)
-				{
-					bRead  = ReadAVLString(&XFile, Line, strong);
-					if(!bRead) break;
-
-					if (strong.Find("BODYTYPE", 0) >=0)
-					{
-						bRead  = ReadAVLString(&XFile, Line, strong);
-						if(!bRead) break;
-							res = sscanf(strong, "%d", &m_LineType);
-						if(res==1)
-						{
-							if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
-						}
-					}
-					else if (strong.Find("OFFSET", 0) >=0)
-					{
-						bRead  = ReadAVLString(&XFile, Line, strong);
-						if(!bRead) break;
-						res = sscanf(strong, "%lf  %lf  %lf", &xo, &yo, &zo);
-						if(res==3)
-						{
-							xo /= mtoUnit;
-							zo /= mtoUnit;
-						}
-						//y0 is ignored, body is assumed centered along x-z plane
-					}
-					else if (strong.Find("FRAME", 0)  >=0)
-					{
-                        NSideLines = ame(&XFile, Line, &NewFrame, mtoUnit);
-						
-						if (NSideLines) 
-						{
-							//we need to insert this frame at the proper place in the body
-							for(i=0; i<m_NStations; i++)
-							{
-								if(NewFrame.m_Point[0].x < m_Frame[i].m_Point[0].x)
-								{
-									for(j=m_NStations; j>i; j--)
-									{
-										m_Frame[j].CopyFrame(m_Frame+j-1);
-									}
-									break;
-								}
-							}
-							m_Frame[i].CopyFrame(&NewFrame);
-							m_NSideLines = NSideLines;
-							m_NStations++;
-						}
-					}
-				}
-
-				XFile.Close();
-				
-				for(i=1; i<m_NStations; i++)
-				{
-					if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
-					{
-						AfxMessageBox("Error reading "+m_BodyName+"\nFrames have different number of side points", MB_OK);
-						return false;
-					}
-				}
-				for(i=0; i<m_NStations; i++)
-				{
-					m_FramePosition[i].x =  m_Frame[i].m_Point[0].x                                             + xo;
-					m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0 + zo;
-					for(j=0; j<m_NSideLines; j++)
-					{
-						m_Frame[i].m_Point[j].x = 0.0;
-						m_Frame[i].m_Point[j].z += zo;
-					}
-				}				
-				
-				return true;
+			case 1:{//cm
+				mtoUnit  = 100.0;
+				break;
 			}
-			else
-			{
-				CFileException *pEx = new CFileException(CFileException::invalidFile);
-				pEx->m_strFileName = FileName;
-				throw(pEx);
+			case 2:{//dm
+				mtoUnit  = 10.0;
+				break;
+			}
+			case 3:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+			case 4:{//in
+				mtoUnit  = 1000.0/25.4;
+				break;
+			}
+			case 5:{///ft
+				mtoUnit  = 1000.0/25.4/12.0;
+				break;
+			}
+			default:{//m
+				mtoUnit  = 1.0;
+				break;
 			}
 		}
-		else return false;
+
 	}
-	catch (CFileException *ex)
+	else return false;
+
+	QFile XFile;
+	QString PathName;
+	bool bOK;
+	QByteArray textline;
+	const char *text;
+
+	PathName = QFileDialog::getOpenFileName(pMainFrame, "Open File",
+											pMainFrame->m_LastDirName,
+											"text file (*.txt)");
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+	if(!PathName.length())		return false;
+
+
+	Line = 0;
+	bRead  = ReadAVLString(&XFile, Line, m_BodyName);
+
+	//Header data
+
+	bRead = TRUE;
+
+	while (bRead)
 	{
-		TCHAR   szCause[255];
-        QString str;
-		ex->GetErrorMessage(szCause, 255);
-		str = _T("Error reading body: ");
-		str += szCause;
-		AfxMessageBox(str);
-		ex->Delete();
-		return false;
+		bRead  = ReadAVLString(&XFile, Line, strong);
+		if(!bRead) break;
+
+		if (strong.indexOf("BODYTYPE") >=0)
+		{
+			bRead  = ReadAVLString(&XFile, Line, strong);
+			if(!bRead) break;
+			res = strong.toInt(&bOK);
+			if(bOK)
+			{
+				m_LineType = res;
+				if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
+			}
+		}
+		else if (strong.indexOf("OFFSET") >=0)
+		{
+			bRead  = ReadAVLString(&XFile, Line, strong);
+			if(!bRead) break;
+
+			textline = strong.toAscii();
+			text = textline.constData();
+			res = sscanf(text, "%lf  %lf  %lf", &xo, &yo, &zo);
+
+
+			if(res==3)
+			{
+				xo /= mtoUnit;
+				zo /= mtoUnit;
+			}
+			//y0 is ignored, body is assumed centered along x-z plane
+		}
+		else if (strong.indexOf("FRAME", 0)  >=0)
+		{
+			NSideLines = ReadFrame(&XFile, Line, &NewFrame, mtoUnit);
+
+			if (NSideLines)
+			{
+				//we need to insert this frame at the proper place in the body
+				for(i=0; i<m_NStations; i++)
+				{
+					if(NewFrame.m_Point[0].x < m_Frame[i].m_Point[0].x)
+					{
+						for(j=m_NStations; j>i; j--)
+						{
+							m_Frame[j].CopyFrame(m_Frame+j-1);
+						}
+						break;
+					}
+				}
+				m_Frame[i].CopyFrame(&NewFrame);
+				m_NSideLines = NSideLines;
+				m_NStations++;
+			}
+		}
 	}
+
+	XFile.close();
+
+	for(i=1; i<m_NStations; i++)
+	{
+		if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
+		{
+			QString strong = "Error reading "+m_BodyName+"\nFrames have different number of side points";
+			QMessageBox::warning(pMainFrame, "Error",strong);
+			return false;
+		}
+	}
+	for(i=0; i<m_NStations; i++)
+	{
+		m_FramePosition[i].x =  m_Frame[i].m_Point[0].x                                             + xo;
+		m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0 + zo;
+		for(j=0; j<m_NSideLines; j++)
+		{
+			m_Frame[i].m_Point[j].x = 0.0;
+			m_Frame[i].m_Point[j].z += zo;
+		}
+	}
+
 	return true;
-}*/
+}
  
 int CBody::ReadFrame(QFile *pXFile, int &Line, CFrame *pFrame, double const &Unit)
 {
@@ -1554,7 +1257,303 @@ int CBody::ReadFrame(QFile *pXFile, int &Line, CFrame *pFrame, double const &Uni
 }
 
 
+int CBody::RemoveFrame(int n)
+{
+	int k;
+//	m_BodyLine.RemovePoint(n);
+	for(k=n; k<m_NStations; k++)
+	{
+		m_FramePosition[k] = m_FramePosition[k+1];
+		m_Frame[k].CopyFrame(m_Frame+k+1);
+	}
+	m_NStations--;
+	m_iActiveFrame = n;
+	if(n>=m_NStations)	m_iActiveFrame = m_NStations;
+	if(n<=0)			m_iActiveFrame = 0;
+	m_iHighlight = -1;
+	SetKnots();
+	return m_iActiveFrame;
+}
 
+
+void CBody::RemoveActiveFrame()
+{
+	int k;
+
+	for(k=m_iActiveFrame; k<m_NStations; k++)
+	{
+		m_FramePosition[k] = m_FramePosition[k+1];
+		m_Frame[k].CopyFrame(m_Frame+k+1);
+	}
+	m_NStations--;
+
+	m_iHighlight = -1;
+	SetKnots();
+}
+
+
+void CBody::RemoveSideLine(int SideLine)
+{
+	for (int i=0; i<m_NStations; i++)
+	{
+		m_Frame[i].RemovePoint(SideLine);
+	}
+	m_NSideLines--;
+	SetKnots();
+}
+
+
+
+void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnly, int FrameID)
+{
+	int i,j;
+	for (i=0; i<m_NStations; i++)
+	{
+		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
+		{
+			if(!bFrameOnly) m_FramePosition[i].x *= XFactor;
+			m_FramePosition[i].y *= YFactor;
+			m_FramePosition[i].z *= ZFactor;
+
+			for(j=0; j<m_Frame[i].m_NPoints; j++)
+			{
+				m_Frame[i].m_Point[j].y *= YFactor;
+				m_Frame[i].m_Point[j].z *= ZFactor;
+			}
+		}
+	}
+	ComputeCenterLine();
+}
+
+
+bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring)
+{
+	int ArchiveFormat;
+	int k;
+	float f;
+
+	if(bIsStoring)
+	{
+		ar << 1002;
+
+		//1002 : Added axial and hoop mesh panel numbers for linetype fuselage
+		//1001 : Added bunching parameter
+		//1000 : first format
+		WriteCString(ar, m_BodyName);
+		WriteCOLORREF(ar, m_BodyColor);
+		ar << m_LineType;
+		ar << m_NSideLines;
+		ar << m_NStations;
+		ar << m_iRes;
+		ar << m_nxDegree << m_nhDegree;
+		ar << m_nxPanels << m_nhPanels;
+		ar << (float)m_Bunch;
+
+		for(k=0; k<m_NStations; k++)	  ar << m_xPanels[k];
+		for(k=0; k<m_NSideLines; k++) ar << m_hPanels[k];
+
+		if(m_bClosedSurface) ar<<1; else ar <<0;
+
+		for(k=0; k<m_NStations; k++)
+		{
+			m_Frame[k].SerializeFrame(ar, bIsStoring);
+		}
+		ar << m_NStations;
+		for (k=0; k<m_NStations;k++){
+			ar << (float)m_FramePosition[k].x << (float)m_FramePosition[k].z;
+		}
+
+		ar << 0.0f << 0.0f;
+	}
+	else {
+
+		ar >> ArchiveFormat;
+		if(ArchiveFormat<1000 || ArchiveFormat>1100) return false;
+		ReadCString(ar, m_BodyName);
+		ReadCOLORREF(ar, m_BodyColor);
+		ar >> m_LineType;
+		ar >> m_NSideLines;
+		ar >> m_NStations;
+
+		ar >> m_iRes;
+		ar >> m_nxDegree >> m_nhDegree;
+		ar >> m_nxPanels >> m_nhPanels;
+
+		if(ArchiveFormat>=1001)
+		{
+			ar >> f; m_Bunch = f;
+		}
+
+		if(ArchiveFormat>=1002)
+		{
+			for(k=0; k<m_NStations; k++)	  ar >> m_xPanels[k];
+			for(k=0; k<m_NSideLines; k++) ar >> m_hPanels[k];
+		}
+
+		ar >> k;
+		if(k!=0 && k!=1)
+		{
+			return false;
+		}
+		if (k) m_bClosedSurface = true; else m_bClosedSurface = false;
+
+		for(k=0; k<m_NStations; k++)
+		{
+			m_Frame[k].SerializeFrame(ar, bIsStoring);
+		}
+		//Serialize Bodyline
+		ar >> m_NStations;
+		for (k=0; k<m_NStations;k++)
+		{
+			ar >> f; m_FramePosition[k].x =f;
+			ar >> f; m_FramePosition[k].z =f;
+		}
+		ar >> f;
+		ar >> f;
+
+		SetKnots();
+
+	}
+	return true;
+}
+
+
+
+void CBody::SetPanelPos()
+{
+	int i;
+	for(i=0; i<=m_nxPanels; i++)
+	{
+		s_XPanelPos[i] =(double)i/(double)m_nxPanels;
+	}
+	return;
+	double y, x;
+	double a = (m_Bunch+1.0)*.48 ;
+	a = 1./(1.0-a);
+
+	double norm = 1/(1+exp(0.5*a));
+
+	for(i=0; i<=m_nxPanels; i++)
+	{
+		x = (double)(i)/(double)m_nxPanels;
+		y = 1.0/(1.0+exp((0.5-x)*a));
+		s_XPanelPos[i] =0.5-((0.5-y)/(0.5-norm))/2.0;
+	}
+}
+
+
+void CBody::SetKnots()
+{
+	int j;
+	double b;
+	m_nxDegree = std::min(m_nxDegree, m_NStations);
+	m_nxKnots  = m_nxDegree + m_NStations   + 1;
+	b = (double)(m_nxKnots-2*m_nxDegree-1);
+
+
+	// x-dir knots
+	for (j=0; j<m_nxKnots; j++)
+	{
+		if (j<m_nxDegree+1)  s_xKnots[j] = 0.0;
+		else
+		{
+			if (j<m_NStations)
+			{
+				if(fabs(b)>0.0) s_xKnots[j] = (double)(j-m_nxDegree)/b;
+				else           s_xKnots[j] = 1.0;
+			}
+			else s_xKnots[j] = 1.0;
+		}
+	}
+
+	//hoop knots
+
+	m_nhDegree = std::min(m_nhDegree, m_NSideLines);
+	m_nhKnots  = m_nhDegree + m_NSideLines + 1;
+	b = (double)(m_nhKnots-2*m_nhDegree-1);
+	for (j=0; j<m_nhKnots; j++)
+	{
+		if (j<m_nhDegree+1)  s_hKnots[j] = 0.0;
+		else
+		{
+			if (j<m_NSideLines)
+			{
+				if(fabs(b)>0.0) s_hKnots[j] = (double)(j-m_nhDegree)/b;
+				else           s_hKnots[j] = 1.0;
+			}
+			else s_hKnots[j] = 1.0;
+		}
+	}
+}
+
+double CBody::SplineBlend(int const &index, int const &p, double const &t, double *knots)
+{
+//	Calculate the blending value, this is done recursively.
+//	If the numerator and denominator are 0 the expression is 0.
+//	If the denominator is 0 the expression is 0
+//
+//	   index   is the control point's index
+//	   p       is the spline's degree
+//	   t       is the spline parameter
+//
+
+	if (p == 0)
+	{
+		if ((knots[index] <= t) && (t < knots[index+1]) )	value = 1.0;
+//		else if (abs(knots[index]-knots[index+1])<pres)	    value = 0.0;
+		else 						                value = 0.0;
+	}
+	else
+	{
+		if (fabs(knots[index+p] - knots[index])<eps && fabs(knots[index+p+1] - knots[index+1])<eps)
+			value = 0.0;
+		else if (fabs(knots[index+p] - knots[index])<eps)
+			value = (knots[index+p+1]-t) / (knots[index+p+1]-knots[index+1])  * SplineBlend(index+1, p-1, t, knots);
+		else if (fabs(knots[index+p+1] - knots[index+1])<eps)
+			value = (t-knots[index])     / (knots[index+p] - knots[index])    * SplineBlend(index,   p-1, t, knots);
+		else
+			value = (t-knots[index])     / (knots[index+p]  -knots[index])    * SplineBlend(index,   p-1, t, knots) +
+					(knots[index+p+1]-t) / (knots[index+p+1]-knots[index+1])  * SplineBlend(index+1 ,p-1, t, knots);
+	}
+	return value;
+}
+
+
+
+void CBody::Translate(double XTrans, double YTrans, double ZTrans, bool bFrameOnly, int FrameID)
+{
+	int i,j;
+	for (i=0; i<m_NStations; i++)
+	{
+		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
+		{
+			m_FramePosition[i].x += XTrans;
+//			m_FramePosition[i].y += YTrans;
+			m_FramePosition[i].z += ZTrans;
+
+			for(j=0; j<m_Frame[i].m_NPoints; j++)
+			{
+//				m_Frame[i].m_Point[j].x += XTrans;
+				m_Frame[i].m_Point[j].z += ZTrans;
+			}
+		}
+	}
+	ComputeCenterLine();
+}
+
+
+void CBody::UpdateFramePos(int iFrame)
+{
+	int i;
+	double z;
+	z  = m_FramePosition[iFrame].z;
+	z -= (m_Frame[iFrame].m_Point[0].z + m_Frame[iFrame].m_Point[m_NSideLines-1].z)/2.0;
+
+	for(i=0; i<m_NSideLines; i++)
+	{
+		m_Frame[iFrame].m_Point[i].z += z;
+	}
+}
 
 
 

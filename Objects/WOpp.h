@@ -30,8 +30,7 @@
 #include "../Params.h"
 #include <QString>
 #include <QColor>
-#include <QFile>
-
+#include <QTextStream>
 
 class CWOpp
 {
@@ -59,7 +58,6 @@ private:
 	int m_Style;		//WOpp display style
 	int m_Width;
 	QColor m_Color;
-
 
 	int m_AnalysisType;	//1=LLT, 2=VLM, 3=3D Panels
 	int m_WingType;		//0 for wing, 1 for elevator, 2 for fin
@@ -119,7 +117,7 @@ private:
 
 //________________METHODS____________________________________
 	bool SerializeWOpp(QDataStream &ar, bool bIsStoring);
-	bool Export(QFile *pXFile, int FileType);
+	bool Export(QTextStream &out, int FileType);
 	void GetBWStyle(QColor &color, int &style, int &width);
 	double GetMaxLift();
 };

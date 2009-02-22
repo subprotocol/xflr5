@@ -1670,7 +1670,6 @@ void CWing::PanelComputeWing(double *Cp,
 {
 	MainFrame *pMainFrame    = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex      = (QMiarex*)s_pMiarex;
-//	C3DPanelDlg *p3DDlg   = (C3DPanelDlg*)s_p3DPanelDlg;
 	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
 
 	// calculates the lift coefficients from the vortices strengths
@@ -1689,7 +1688,6 @@ void CWing::PanelComputeWing(double *Cp,
 
 	if(!bTilted) Alpha = m_Alpha;
 	else         Alpha = 0.0;
-
 	cosa = cos(Alpha*pi/180.0);
 	sina = sin(Alpha*pi/180.0);
 
@@ -1754,7 +1752,6 @@ void CWing::PanelComputeWing(double *Cp,
 				XCP       += m_pPanel[p].CollPt.x * PanelForce.dot(WindNormal); //global center of pressure
 				YCP       += m_pPanel[p].CollPt.y * PanelForce.dot(WindNormal);
 				CPStrip   += m_pPanel[p].CollPt.x * NForce;
-
 
 				if(m_Surface[j].m_bTEFlap)
 				{
@@ -1879,7 +1876,7 @@ void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, CVector
 	// using a farfield method
 	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
 
-//	C3DPanelDlg *p3DDlg = (C3DPanelDlg*)s_p3DPanelDlg;
+	PanelAnalysisDlg *pPanelDlg = (PanelAnalysisDlg*)s_p3DPanelDlg;
 
 	int nw, iTA, iTB;
 	int j, k, l, p, pp, m;
@@ -1897,7 +1894,6 @@ void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, CVector
 		cosa = cos(m_Alpha*pi/180.0);
 		sina = sin(m_Alpha*pi/180.0);
 	}
-
 
 	//   Define wind axis
 	WindNormal.Set(   -sina, 0.0, cosa);
@@ -1928,7 +1924,6 @@ void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, CVector
 			iTB = pWakePanel[nw].m_iTB;
 			C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
 
-
 			pp = p;
 			StripArea = 0.0;
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
@@ -1946,7 +1941,7 @@ void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, CVector
 			// If we were to model the downstream part, the total induced speed would be twice larger,
 			// so just add a factor 2 to account for this.
 
-//			p3DDlg->GetSpeedVector(C, Mu, Sigma, Wg);
+			pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
 			InducedAngle = atan2(Wg.dot(WindNormal), m_QInf);
 			m_Ai[m]      = 2.0 * InducedAngle*180/pi;
 
@@ -2610,7 +2605,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 				m_PCd[m]    = pMiarex->GetVar(2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
-//qDebug() << m_Re[m]<<m_Cl[m]<<tau<<bOutRe<<bError;
+
 				m_XTrTop[m] = pMiarex->GetVar(5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
@@ -2828,7 +2823,6 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 				p++;
 			}
 
-//qDebug("%12.5f      %12.5f\n", m_SpanPos[m],GamShed);
 
 			m_Cl[m]  *= 2.0/m_StripArea[m] /m_QInf/m_QInf;
 			m_ICd[m] *= 1.0/m_StripArea[m] /m_QInf/m_QInf;

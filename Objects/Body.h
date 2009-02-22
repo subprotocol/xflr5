@@ -41,8 +41,8 @@ public:
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(QDataStream &ar, bool bIsStoring);
 //	bool SetModified();
-//	bool ImportDefinition() ;
-//	bool ExportDefinition() ;
+	bool ImportDefinition() ;
+	bool ExportDefinition() ;
 
 
 	int InsertFrame(CVector Real);
@@ -60,7 +60,7 @@ public:
 		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
 	void ComputeCenterLine();
 	void Duplicate(CBody *pBody);
-//	void ExportGeometry(int nx, int nh);
+	void ExportGeometry(int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
 	void InsertSideLine(int SideLine);
 	void InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size);
@@ -75,6 +75,7 @@ public:
 
 //____________________VARIABLES_____________________________________________
 
+	static void* s_pMainFrame;
 
 	bool m_bLocked; //true is this body is used by a plane with results
 	bool m_bClosedSurface;

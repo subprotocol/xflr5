@@ -54,7 +54,6 @@ void LEDlg::SetupLayout()
 	QLabel *lab2 = new QLabel("ratio");
 	lab2->setMinimumWidth(80);
 	m_pctrlLE = new FloatEdit;
-	m_pctrlLE->setMaximumWidth(70);
 	LEValue->addWidget(lab1);
 	LEValue->addWidget(m_pctrlLE);
 	LEValue->addWidget(lab2);
@@ -75,9 +74,6 @@ void LEDlg::SetupLayout()
 	OKButton     = new QPushButton(tr("OK"));
 	CancelButton = new QPushButton(tr("Cancel"));
 	ApplyButton  = new QPushButton("Apply");
-	OKButton->setMaximumWidth(70);
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

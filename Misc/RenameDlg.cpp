@@ -117,7 +117,7 @@ void RenameDlg::keyPressEvent(QKeyEvent *event)
 			}
 			else
 			{
-				QDialog::accept();
+				OnOK();
 			}
 			break;
 		}

@@ -106,11 +106,10 @@ CWOpp::~CWOpp()
 }
 
 
-bool CWOpp::Export(	QFile *pXFile, int FileType)
+bool CWOpp::Export(QTextStream &out, int FileType)
 {
-	QString Header, strong;
+	QString Header, strong, Format;
 	int k;
-	QTextStream out(pXFile);
 
 	if(FileType==1) Header = "  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n";
 	else            Header = "  y-span,Chord,Ai,Cl,PCd,ICd,CmGeom,CmAirf,XTrtop,XTrBot,XCP,BM\n";
@@ -118,14 +117,25 @@ bool CWOpp::Export(	QFile *pXFile, int FileType)
 
 	int nStart;
 	if(m_AnalysisType==1) nStart = 1;	
-	else nStart = 0;
+	else                  nStart = 0;
+
+	if(FileType==1) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
+	else            Format = "%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12\n";
 	for (k=nStart; k<m_NStation; k++)
 	{
-//		if(FileType==1) strong.Format("%10.4f  %9.4f   %7.3f   %9.6f   %9.6f   %9.6f   %9.6f   %9.6f    %7.4f   %7.4f   %7.4f   %7.4f\n",
-//			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],	m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
-//		else            strong.Format("%10.4f,%9.4f,%7.3f,%9.6f,%9.6f,%9.6f,%9.6f,%9.6f,%7.4f,%7.4f,%7.4f,%7.4f\n",
-//			m_SpanPos[k], m_Chord[k], m_Ai[k], m_Cl[k], m_PCd[k], m_ICd[k],	m_CmXRef[k],m_CmAirf[k],m_XTrTop[k],m_XTrBot[k], m_XCPSpanRel[k], m_BendingMoment[k]);
-		strong = "TODO...\n";
+		strong = QString(Format)
+			.arg(m_SpanPos[k],10,'f',4)
+			.arg(m_Chord[k],9,'f',4)
+			.arg(m_Ai[k],7,'f',3)
+			.arg(m_Cl[k],9,'f',6)
+			.arg(m_PCd[k],9,'f',6)
+			.arg(m_ICd[k],9,'f',6)
+			.arg(m_CmXRef[k],9,'f',6)
+			.arg(m_CmAirf[k],9,'f',6)
+			.arg(m_XTrTop[k],7,'f',4)
+			.arg(m_XTrBot[k],7,'f',4)
+			.arg(m_XCPSpanRel[k],7,'f',4)
+			.arg(m_BendingMoment[k],7,'f',4);
 		out << strong;
 	}
 	out << "\n\n";

@@ -40,6 +40,7 @@ class MainFrame : public QMainWindow
 	friend class QXDirect;
 	friend class Miarex;
 	friend class AFoil;
+	friend class CBody;
 	friend class CWing;
 	friend class CWPolar;
 	friend class CWOpp;
@@ -126,7 +127,7 @@ private:
 	void UpdateWOpps();
 
 	void UpdateView();
-        void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
+	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
 
 	int LoadXFLR5File(QString PathName);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
@@ -201,7 +202,7 @@ private:
 	QAction *aboutAct, *aboutQtAct;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *renameCurWPolar;
 	QAction *deleteCurUFO, *deleteCurWPolar, *deleteCurWOpp;
@@ -213,7 +214,7 @@ private:
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps, *deleteAllWPlrOpps;
 	QAction *defineWPolar, *advancedSettings;
-	QAction *defineBody, *editCurBody;
+	QAction *defineBody, *editCurBody, *importBody, *exportBody;
 
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *defineBatch;

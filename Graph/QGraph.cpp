@@ -185,20 +185,17 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 		From.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
 		From.setY(int(pCurve->y[0]/scaley+m_ptoffset.y()));
 
-		if(pCurve->PointsVisible())
-			painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
+		if(pCurve->PointsVisible()) painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
 
 		for (int i=1; i<pCurve->n;i++)
 		{
 			To.setX(int(pCurve->x[i]/m_scalex+m_ptoffset.x()));
 			To.setY(int(pCurve->y[i]/scaley+m_ptoffset.y()));
 			painter.drawLine(From, To);
-			if(pCurve->PointsVisible())
-				painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
+			if(pCurve->PointsVisible())	painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
 
 			From = To;
 		}
-
 	}
 	else if(pCurve->n == 1 && pCurve->IsVisible() && pCurve->PointsVisible())
 	{
@@ -327,7 +324,6 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 			if(exp_x>=4 || exp_x<=-4)
 			{
-//				pDC->SetTextAlign(TA_RIGHT);
 				main = xt;
 				ExpFormat(main, exp);
 

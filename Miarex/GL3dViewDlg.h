@@ -71,6 +71,7 @@ private slots:
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
 	void OnVelocityScale(int pos);
+	void OnCpScale();
 
 private:
 	void wheelEvent(QWheelEvent *event);
@@ -123,7 +124,7 @@ private:
 
 	GLWidget *m_pglWidget;
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlCpScales;
 	QSlider *m_pctrlClipPlanePos;
 
 	QCheckBox *m_pctrlLift, *m_pctrlMoment, *m_pctrlIDrag, *m_pctrlVDrag;
@@ -194,25 +195,14 @@ private:
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_LiftScale, m_DragScale, m_VelocityScale;
-	double m_BodyScale, m_FrameScale, m_BodyRefScale, m_FrameRefScale;			// scale for 3D display
 	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
 						// this is not the scale to display the model in the OpenGL view
-	double m_LetterWidth;
 
 	CVector m_UFOOffset;
-	CVector m_BodyOffset;
-	CVector m_FrameOffset;
-
-	CVector m_BodyScalingCenter, m_BodyScaledOffset;
-	CVector m_FrameScalingCenter, m_FrameScaledOffset;
 
 
 	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
 	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector
-	QRect m_BodyLineRect;
-	QRect m_FrameRect;
-	QRect m_BodyRect;
-
 };
 
 #endif // GL3DViewDlg_H

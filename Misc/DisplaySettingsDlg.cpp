@@ -113,6 +113,8 @@ void DisplaySettingsDlg::InitDialog()
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
 	m_pctrlTextColor->SetColor(m_TextColor);
 	m_pctrlTextFont->setText(m_TextFont.family());
+	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
+
 }
 
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)

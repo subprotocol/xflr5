@@ -26,6 +26,7 @@
 
 LinePickerDlg::LinePickerDlg(void *pParent)
 {
+	setWindowTitle("Line Picker");
 	m_pParent = pParent;
 	m_Style  = 0;
 	m_Width  = 1;

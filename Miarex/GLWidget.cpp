@@ -38,8 +38,22 @@ GLWidget::GLWidget(QWidget *parent)
 	m_pMiarex = NULL;
 	m_iView = 3;
 	m_bPlane = true;
+	setMouseTracking(true);
 }
 
+void GLWidget::contextMenuEvent (QContextMenuEvent * event)
+{
+	if(m_bPlane)
+	{
+		GL3dViewDlg *pDlg = (GL3dViewDlg*)m_pParent;
+//		pDlg->contextMenuEvent(event);
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->ShowContextMenu(event);
+	}
+}
 
 void GLWidget::initializeGL()
 {

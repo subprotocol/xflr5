@@ -126,6 +126,10 @@ void BodyGridDlg::SetupLayout()
 	m_pctrlUnit2 = new FloatEdit("101.00");
 	m_pctrlMinUnit  = new FloatEdit("102.00");
 	m_pctrlMinUnit2 = new FloatEdit("103.00");
+	m_pctrlUnit->SetPrecision(3);
+	m_pctrlUnit2->SetPrecision(3);
+	m_pctrlMinUnit->SetPrecision(3);
+	m_pctrlMinUnit2->SetPrecision(3);
 
 	m_pctrlLength1 = new QLabel("mm");
 	m_pctrlLength2 = new QLabel("mm");

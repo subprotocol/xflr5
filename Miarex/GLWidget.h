@@ -49,6 +49,7 @@ private:
 	void initializeGL();
 	void resizeGL(int width, int height);
 	void paintGL();//virtual override
+	void contextMenuEvent (QContextMenuEvent * event);
 
 private slots:
 

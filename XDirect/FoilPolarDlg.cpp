@@ -235,10 +235,12 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 				ReadParams();
 				SetPlrName();
 				OKButton->setFocus();
+				return;
 			}
 			else
 			{
 				QDialog::accept();
+				return;
 			}
 			break;
 		}
