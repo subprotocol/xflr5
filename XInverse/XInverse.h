@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	QLineButton Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	QXInverse Class
+	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,29 +19,61 @@
 
 *****************************************************************************/
 
-#ifndef LINEBUTTON_H
-#define LINEBUTTON_H
 
+#ifndef QXINVERSE_H
+#define QXINVERSE_H
+
+#include <QWidget>
 #include <QPushButton>
+#include <QCheckBox>
+#include "../XDirect/XFoil.h"
+#include "XInverse.h"
 
-class LineButton : public QPushButton
+
+
+class QXInverse : public QWidget
 {
+	Q_OBJECT
+
+	friend class MainFrame;
+	friend class TwoDWidget;
+
 public:
-	LineButton();
+	QXInverse(QWidget *parent = NULL);
+	void SetupLayout();
+	void InitDialog();
+ 
+private slots:
 
-	void paintEvent ( QPaintEvent * event );
 
-	void SetStyle(int const &style, int const &width, QColor const & color);
-	void SetColor(QColor const & color);
-	void SetStyle(int const &style);
-	void SetWidth(int const &width);
-	QColor &GetColor();
-	int & GetStyle();
-	int & GetWidth();
 
 private:
-	QColor m_Color;
-	int m_Style, m_Width;
+	void UpdateView();
+
+	void wheelEvent(QWheelEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void mousePressEvent(QMouseEvent *event) ;
+	void mouseReleaseEvent(QMouseEvent *event) ;
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
+
+
+private:
+	void * m_p2DWidget;
+	void * m_pMainFrame;
+
+	QList<void *> *m_poaFoil;
+	XFoil *m_pXFoil;
+
+	CFoil *m_pCurFoil;
+	QCursor m_hcArrow;
+	QCursor m_hcMove;
+	QCursor m_hcCross;
+
+
 };
 
-#endif // LineButton_H
+#endif // QXINVERSE_H
+
+
+

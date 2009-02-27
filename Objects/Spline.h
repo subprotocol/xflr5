@@ -2,7 +2,7 @@
 
     Spline  Class
 	Copyright (C) 1996 Paul Bourke	http://astronomy.swin.edu.au/~pbourke/curves/spline/
-	Copyright (C) 2003 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2003 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,14 +27,44 @@
 
 #ifndef CSpline_H
 #define CSpline_H
-
+#include <QPainter>
 #include <QRect>
 #include <QFile>
-#include "Foil.h"
+#include "../Objects/CVector.h"
+#include "../Params.h"
 
 class CSpline
 {
+	friend class CSF;
 public:
+
+	CSpline();
+	virtual ~CSpline();
+
+//	bool AddPoint(double x, double y);
+
+	void DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset);
+	void DrawCtrlPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
+	void DrawOutputPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
+
+	bool InsertPoint(double x, double y);
+	bool RemovePoint(int k);
+	int IsControlPoint(CVector Real);
+	int IsControlPoint(double x, double y, double zx, double zy);
+	int IsControlPoint(CVector Real, double ZoomFactor);
+	double SplineBlend(int i, int p, double t);
+	double GetY(double x);
+
+	void Copy(CSpline *pSpline);
+	void Export(QFile *pFile, bool bExtrados);
+	void SplineCurve();
+	void SplineKnots();
+	
+	void SetStyle(int style);
+	void SetWidth(int width);
+	void SetColor(int color);
+	void SetSplineParams(int style, int width, QColor color);
+
 	int m_iHighlight, m_iSelect;
 	int m_iKnots;
 	int m_iRes;
@@ -44,29 +74,11 @@ public:
 	CVector m_Input[SPLINECONTROLSIZE];
 	CVector m_Output[IQX2];
 
-        QRect m_rViewRect;
+	QRect m_rViewRect;
 
-//	bool AddPoint(double x, double y);
-//	bool DrawControlPoint(CDC *pDC, int i, double scalex, double scaley, CPoint Offset, bool IsPrinting);
-//	bool DrawSpline(CDC *pDC, double scx, double scy, CPoint Offset, bool IsPrinting);
-//	void DrawCtrlPoints(CDC *pDC,double scx, double scy, CPoint Offset, bool IsPrinting);
-//	void DrawOutputPoint(CDC *pDC, int i,double scalex, double scaley, CPoint Offset, bool IsPrinting);
-        bool InsertPoint(double x, double y);
-	bool RemovePoint(int k);
-	int IsControlPoint(CVector Real);
-	int IsControlPoint(double x, double y, double zx, double zy);
-	int IsControlPoint(CVector Real, double ZoomFactor);
-	double SplineBlend(int i, int p, double t);
-	double GetY(double x);
-
-	void Copy(CSpline *pSpline);
-        void Export(QFile *pFile, bool bExtrados);
-	void SplineCurve();
-	void SplineKnots();
-
-	CSpline();
-	virtual ~CSpline();
-
+private:
+	QColor m_Color;
+	int m_Style, m_Width;
 };
 
 

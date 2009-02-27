@@ -77,7 +77,9 @@ SOURCES += MainFrame.cpp \
     Main.cpp \
     Globals.cpp \
     TwoDWidget.cpp \
-    Miarex/GL3dBodyDlg.cpp
+    Miarex/GL3dBodyDlg.cpp \
+    Design/FoilTableDelegate.cpp \
+    XInverse/XInverse.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -150,5 +152,7 @@ HEADERS += MainFrame.h \
     Design/AFoil.h \
     Globals.h \
     TwoDWidget.h \
-    Miarex/GL3dBodyDlg.h
+    Miarex/GL3dBodyDlg.h \
+    Design/FoilTableDelegate.h \
+    XInverse/XInverse.h
 RESOURCES += qflr5.qrc

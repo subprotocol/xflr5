@@ -49,6 +49,14 @@ void LineButton::SetWidth(int const & width)
 	update();
 }
 
+void LineButton::SetStyle(int const &style, int const &width, QColor const & color)
+{
+	m_Style = style;
+	m_Width = width;
+	m_Color = color;
+	update();
+}
+
 QColor &LineButton::GetColor()
 {
 	return m_Color;

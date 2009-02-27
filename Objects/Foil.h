@@ -27,7 +27,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QPoint>
-#include "Params.h"
+#include "../Params.h"
 #include "CVector.h"
 #include "CRectangle.h"
 #include <QTextStream>
@@ -35,6 +35,7 @@
 
 class CFoil
 {
+	friend class QAFoil;
 	friend class CPF;
 	friend class CSF;
 	friend class CSplinedPoints;
@@ -58,6 +59,7 @@ class CFoil
 	friend class BatchDlg;
 	friend class GL3dViewDlg;
 	friend class WingDlg;
+        friend class AFoil;
 
 public:
 	static double pi;

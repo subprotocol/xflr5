@@ -2,7 +2,7 @@
 
     Spline Foil Class
 	Copyright (C) 2003 Andre Deperrois XFLR5@yahoo.com
-
+ 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -43,19 +43,34 @@ CSF::CSF()
 	m_bOutPoints   = false;
 	m_bModified    = false;
 	m_bCenterLine  = false;
+	m_Intrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
+	m_Extrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
 }
+
 
 CSF::~CSF()
 {
-qDebug() << "Destroyed ~CSF";
-
 }
+
+
+void CSF::SetCurveParams(int style, int width, QColor color)
+{
+	m_FoilStyle = style;
+	m_FoilWidth = width;
+	m_FoilColor = color;
+	m_Intrados.SetSplineParams(style, width, color);
+	m_Extrados.SetSplineParams(style, width, color);
+}
+
 
 bool CSF::InitSplineFoil()
 {
 	m_bModified   = false;
 	m_strFoilName = "Spline Foil";
-
+	
+	m_Extrados.m_Color = m_FoilColor;
+	m_Extrados.m_Style = m_FoilStyle;
+	m_Extrados.m_Width = m_FoilWidth;
 	m_Extrados.m_iCtrlPoints = 0;
 	m_Extrados.m_iRes = 30;
 	m_Extrados.InsertPoint(0.f , 0.f);
@@ -68,6 +83,9 @@ bool CSF::InitSplineFoil()
 	m_Extrados.SplineKnots();
 	m_Extrados.SplineCurve();
 
+	m_Intrados.m_Color = m_FoilColor;
+	m_Intrados.m_Style = m_FoilStyle;
+	m_Intrados.m_Width = m_FoilWidth;
 	m_Intrados.m_iCtrlPoints = 0;
 	m_Intrados.m_iRes = 30;
 	m_Intrados.InsertPoint(0.f , 0.f);
@@ -85,6 +103,7 @@ bool CSF::InitSplineFoil()
 
 	return true;
 }
+
 
 bool CSF::CompMidLine()
 {
@@ -316,4 +335,50 @@ void CSF::UpdateSelected(double x, double y)
 			return;
 		}
 	}
+}
+
+
+
+void CSF::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
+	m_Intrados.DrawCtrlPoints(painter, scalex, scaley, Offset);
+}
+
+
+void CSF::DrawOutPoints(QPainter & painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawOutputPoints(painter, scalex, scaley, Offset);
+	m_Intrados.DrawOutputPoints(painter, scalex, scaley, Offset);
+}
+
+
+void CSF::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawSpline(painter, scalex, scaley, Offset);
+	m_Intrados.DrawSpline(painter, scalex, scaley, Offset);
+}
+
+
+void CSF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	painter.save();
+	int k;
+	QPoint From, To;
+	
+	QPen MidPen(m_FoilColor);
+	MidPen.setStyle(Qt::DashLine);
+	MidPen.setWidth(1);
+	painter.setPen(MidPen);
+
+	From = QPoint((int)(m_rpMid[0].x*scalex) + Offset.x(), (int)(-m_rpMid[0].y*scaley) + Offset.y());
+
+	for (k=1; k<=100; k++)
+	{
+		To.rx() = (int)( m_rpMid[k*10].x*scalex) + Offset.x();
+		To.ry() = (int)(-m_rpMid[k*10].y*scaley) + Offset.y();
+		painter.drawLine(From, To);
+		From = To;
+	}
+	painter.restore();
 }

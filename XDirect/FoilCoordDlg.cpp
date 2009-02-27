@@ -219,7 +219,6 @@ qDebug() << "OncellChanged";
 
 void FoilCoordDlg::OnItemClicked(QModelIndex index)
 {
-qDebug() << "clicked";
 	int sel = m_pctrlCoordView->currentIndex().row();
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	if(m_pBufferFoil)	m_pBufferFoil->m_iHighLight = sel;

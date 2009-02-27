@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	QLineButton Class
+	FoilTableDelegate Class
 	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,29 +19,38 @@
 
 *****************************************************************************/
 
-#ifndef LINEBUTTON_H
-#define LINEBUTTON_H
+#ifndef FOILTABLEDELEGATE_H
+#define FOILTABLEDELEGATE_H
 
-#include <QPushButton>
+#include <QList>
+#include <QItemDelegate>
+#include "../Misc/FloatEdit.h"
 
-class LineButton : public QPushButton
+class FoilTableDelegate : public QItemDelegate
 {
+	Q_OBJECT
+	friend class QAFoil;
+
 public:
-	LineButton();
+	FoilTableDelegate(QObject *parent = 0);
 
-	void paintEvent ( QPaintEvent * event );
-
-	void SetStyle(int const &style, int const &width, QColor const & color);
-	void SetColor(QColor const & color);
-	void SetStyle(int const &style);
-	void SetWidth(int const &width);
-	QColor &GetColor();
-	int & GetStyle();
-	int & GetWidth();
+	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void setEditorData(QWidget *editor, const QModelIndex &index) const;
+	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
-	QColor m_Color;
-	int m_Style, m_Width;
+	int *m_Precision; ///table of float precisions for each column
+	static void *s_pAFoil;
 };
 
-#endif // LineButton_H
+#endif // FOILTABLEDELEGATE_H
+
+
+
+
+
+
+
+

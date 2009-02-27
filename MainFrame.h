@@ -39,7 +39,7 @@ class MainFrame : public QMainWindow
 	friend class TwoDWidget;
 	friend class QXDirect;
 	friend class Miarex;
-	friend class AFoil;
+	friend class QAFoil;
 	friend class CBody;
 	friend class CWing;
 	friend class CWPolar;
@@ -87,10 +87,11 @@ private slots:
 	void OnSaveProject();
 	void OnStyle();
 	void OnUnits();
+	void OnAFoil();
 	void OnXDirect();
 	void OnMiarex();
 	void OnSaveUFOAsProject();
-
+	void openRecentFile();
 /*___________________________________________Methods_______________________________*/
 private:
 	void closeEvent (QCloseEvent * event);
@@ -104,6 +105,7 @@ private:
 	void CreateMiarexActions();
 	void CreateMiarexMenus();
 	void CreateToolbars();
+	void CreateAFoilToolbar();
 	void CreateMiarexToolbar();
 	void CreateXDirectToolbar();
 	void CreateStatusBar();
@@ -153,8 +155,7 @@ private:
 	QString ShortenFileName(QString &PathName);
 	void AddRecentFile(const QString &PathNAme);
 	void updateRecentFileActions();
-private slots:
-	void openRecentFile();
+
 
 /*___________________________________________Variables_______________________________*/
 public:
@@ -168,10 +169,11 @@ private:
 	void *m_pAFoil;
 	TwoDWidget *m_p2DWidget;
 
-	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget;
+	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget;
 
 	QToolBar *m_pctrlXDirectToolBar;
 	QToolBar *m_pctrlMiarexToolBar;
+	QToolBar *m_pctrlAFoilToolBar;
 
 	//Common Menus
 	QMenu * MainMenu;
@@ -194,7 +196,7 @@ private:
 	QMenu *WPlrCtxMenu, *WOppCtxMenu;
 
 	//MainFrame actions
-	QAction *OnXDirectAct, *OnMiarexAct;
+	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct;
 	QAction *openAct, *styleAct;
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct;
 	QAction *unitsAct;

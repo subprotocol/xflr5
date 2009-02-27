@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Spline Foil Class
-	Copyright (C) 2003 André Deperrois xflr5@yahoo.com
+	Copyright (C) 2003 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@
 #define CSF_H
 
 
-
+#include "Foil.h"
 #include "Spline.h"
 
 
 class CSF  
 {
-	friend class AFoil;;
+	friend class QAFoil;;
 	friend class MainFrame;
 
 
@@ -50,15 +50,16 @@ private:
 	bool Serialize(QDataStream &ar, bool bIsStoring);
 
 	void Copy(CSF* pSF);
-//	bool DrawCtrlPoints(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawMidLine(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawFoil(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawOutPoints(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
+	void DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawOutPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void ExportToBuffer(CFoil *pFoil);
 	void SetViewRect(QRect &rc);
 	void Update(bool bExtrados);
 	void UpdateSelected(double x, double y);
 	void UpdateKnots();
+	void SetCurveParams(int style, int width, QColor color);
 
 	bool m_bModified;
 	bool m_bVisible, m_bOutPoints, m_bCenterLine;

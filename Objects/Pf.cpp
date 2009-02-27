@@ -2,7 +2,7 @@
 
 	Splined Curve Foil class
     Copyright (C) 2004 Andre Deperrois XFLR5@yahoo.com
-
+ 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +24,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "Globals.h"
-#include "../XDirect/XDirect.h"
 #include "Pf.h"
 #include "math.h"
 #include "Spline.h"
@@ -46,11 +45,11 @@ CPF::CPF()
 	memset(m_rpMid, 0, sizeof(m_rpMid));
 }
 
+
 CPF::~CPF()
 {
-qDebug() << "destroying ~CPF";
-
 }
+
 
 bool CPF::CompMidLine(bool first)
 {
@@ -68,18 +67,22 @@ bool CPF::CompMidLine(bool first)
 
 	
 	step = 0.001;
-	for (l=0; l<=1000; l++){
+	for (l=0; l<=1000; l++)
+	{
 		x = l*step;
-		if(first){
+		if(first)
+		{
 			yex = m_Extrados.GetY(x);
 			yin = m_Intrados.GetY(x);
 		}
-		else{
+		else
+		{
 			yex = m_Extrados.m_Outy[l];
 			yin = m_Intrados.m_Outy[l];
 		}
 		m_rpMid[l].x = x;
 		m_rpMid[l].y = (yex+yin)/2.0;
+
 		if(fabs(yex-yin)>m_fThickness)
 		{
 			m_fThickness = fabs(yex-yin);
@@ -94,6 +97,7 @@ bool CPF::CompMidLine(bool first)
 	return true;
 }
 
+
 void CPF::Copy(CPF* pPF)
 {
 	memcpy(&m_Extrados, &pPF->m_Extrados, sizeof(m_Extrados));
@@ -106,8 +110,8 @@ void CPF::Copy(CPF* pPF)
 	m_FoilColor  = pPF->m_FoilColor;
 	m_FoilStyle  = pPF->m_FoilStyle;
 	m_FoilWidth  = pPF->m_FoilWidth;
-
 }
+
 
 void CPF::ExportToBuffer(CFoil *pFoil)
 {
@@ -117,6 +121,7 @@ void CPF::ExportToBuffer(CFoil *pFoil)
 	memcpy(pFoil->yb, pFoil->y, sizeof(pFoil->y));
 	pFoil->nb = pFoil->n;
 }
+
 
 bool CPF::InitSplinedFoil()
 {
@@ -219,7 +224,6 @@ bool CPF::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> f; m_Extrados.m_RearPoint.y =f;
 		ar >> f; m_Intrados.m_RearPoint.x =f;
 		ar >> f; m_Intrados.m_RearPoint.y =f;
-//qDebug() << m_Extrados.m_RearPoint.x << m_Extrados.m_RearPoint.y <<m_Intrados.m_RearPoint.x << m_Intrados.m_RearPoint.y;
 
 		ar >> k;
 		if(k !=0 && k !=1) return false;
@@ -233,10 +237,20 @@ bool CPF::Serialize(QDataStream &ar, bool bIsStoring)
 		if(k !=0 && k !=1) return false;
 		if(k) m_bCenterLine = true; else m_bCenterLine = false;
 
-                Update();
+		Update(true);
 		m_bModified = false;
 		return true;
 	}
+}
+
+
+void CPF::SetCurveParams(int style, int width, QColor color)
+{
+	m_FoilStyle = style;
+	m_FoilWidth = width;
+	m_FoilColor = color;
+	m_Extrados.SetCurveParams(style, width, color);
+	m_Intrados.SetCurveParams(style, width, color);
 }
 
 
@@ -256,13 +270,75 @@ void CPF::SetViewRect(QRect rc)
 
 
 
-void CPF::Update()
+void CPF::Update(bool bExtrados)
 {
 	m_Extrados.CompSlopes();
 	m_Intrados.CompSlopes();
 	m_OutPoints = m_Extrados.m_iPoints + m_Intrados.m_iPoints;
 
 }
+
+
+void CPF::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawSplines(painter, scalex, scaley, Offset);
+	m_Intrados.DrawSplines(painter, scalex, scaley, Offset);
+	CompMidLine();
+}
+
+
+void CPF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	painter.save();
+	QPoint From, To;	
+	From.rx() = (int)( m_rpMid[0].x*scalex) + Offset.x();
+	From.ry() = (int)(-m_rpMid[0].y*scaley) + Offset.y();
+
+	for (int k=1; k<=100; k++)
+	{
+		To.rx() = (int)( m_rpMid[k*10].x*scalex)+Offset.x();
+		To.ry() = (int)(-m_rpMid[k*10].y*scaley)+Offset.y();
+		painter.drawLine(From, To);
+	}
+	painter.restore();
+}
+
+
+
+void CPF::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawControlPoints(painter, scalex, scaley, Offset);
+	m_Intrados.DrawControlPoints(painter, scalex, scaley, Offset);
+	m_Extrados.DrawRearPoint(painter, scalex, scaley, Offset);
+	m_Intrados.DrawRearPoint(painter, scalex, scaley, Offset);
+
+}
+
+
+int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
+{
+	if (fabs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
+		fabs(Real.y-m_RearPoint.y)<0.003/ZoomFactor) return -1;
+	return -10;
+}
+
+
+
+
+bool CSplinedPoints::RemovePoint(int k)
+{
+	int j;
+	if (k>0 && k<m_iPoints)
+	{
+		for (j=k; j<m_iPoints; j++){
+			m_ctrlPoint[j] = m_ctrlPoint[j+1];
+		}
+		m_iPoints--;
+	}
+	CompSlopes();
+	return true;
+}
+
 
 /*
 void CSplinedPoints::Export(QFile *pFile, bool bExtrados)
@@ -318,6 +394,10 @@ void CSplinedPoints::Export(QFile *pFile, bool bExtrados)
 
 CSplinedPoints::CSplinedPoints()
 {
+	m_Style = 0;
+	m_Width = 1;
+	m_Color = QColor(100,150, 60);
+
 	m_iHighlight = -10;
 	m_iSelect    = -10;
 	m_iPoints    = 0;
@@ -330,12 +410,10 @@ CSplinedPoints::CSplinedPoints()
 	memset(m_Slope, 0, sizeof(m_Slope));
 }
 
+
 CSplinedPoints::~CSplinedPoints()
 {
-qDebug() << "destroying ~CSplinedPoints";
-
 }
-
 
 
 
@@ -379,6 +457,7 @@ bool CSplinedPoints::CompSlopes()
 	}
 	return true;
 }
+
 
 void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
 {
@@ -537,33 +616,135 @@ int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 {
 	for (int k=0; k<m_iPoints; k++)
 	{
-		if (fabs(x-m_ctrlPoint[k].x)/Zoom<0.003 &&
-			fabs(y-m_ctrlPoint[k].y)/Zoom<0.003) return k;
+		if (fabs(x-m_ctrlPoint[k].x)/Zoom<0.003 && fabs(y-m_ctrlPoint[k].y)/Zoom<0.003) return k;
 	}
 	return -10;
 }
 
 
-int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
+void CSplinedPoints::DrawControlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
-	if (fabs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
-		fabs(Real.y-m_RearPoint.y)<0.003/ZoomFactor) return -1;
-	return -10;
-}
+	int i, width;
+	width = 3;
 
+	QPen PointPen;
+	QPoint pt;
 
-
-
-bool CSplinedPoints::RemovePoint(int k)
-{
-	int j;
-	if (k>0 && k<m_iPoints)
+	for(i=0; i<m_iPoints; i++)
 	{
-		for (j=k; j<m_iPoints; j++){
-			m_ctrlPoint[j] = m_ctrlPoint[j+1];
+		pt.rx() = (int)( m_ctrlPoint[i].x*scalex)+Offset.x();
+		pt.ry() = (int)(-m_ctrlPoint[i].y*scaley)+Offset.y();
+		if(m_rViewRect.contains(pt)) 
+		{
+			if (m_iSelect==i)
+			{
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(130,130,255));
+			}
+			else if(m_iHighlight==i) 
+			{
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(255,0,0));
+			}
+			else 
+			{
+				PointPen.setWidth(1);
+				PointPen.setColor(m_Color);
+			}
+
+			painter.drawEllipse(pt.x()-width, pt.y()-width,2*width,2*width);
 		}
-		m_iPoints--;
 	}
-	CompSlopes();
-	return true;
 }
+
+
+void CSplinedPoints::DrawSplines(QPainter & painter, double scalex, double scaley, QPoint Offset)
+{
+	int j,k,l;
+	double dist, x1, x2;
+	CSpline LinkSpline;
+	LinkSpline.SetSplineParams(m_Style, m_Width, m_Color);
+	LinkSpline.m_iRes = m_Freq;
+	LinkSpline.m_iDegree = 3;
+	LinkSpline.m_iCtrlPoints = 3;
+	LinkSpline.SplineKnots();
+	LinkSpline.m_rViewRect = m_rViewRect;
+
+	l=0;
+
+	for (k=0; k<m_iPoints-1; k++)
+	{
+		dist = fabs(m_ctrlPoint[k+1].x-m_ctrlPoint[k].x);
+		LinkSpline.m_iCtrlPoints = 0;
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x   + (dist)/3.0 * m_Slope[k].x,
+		                       m_ctrlPoint[k].y   + (dist)/3.0 * m_Slope[k].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (dist)/3.0 * m_Slope[k+1].x,
+		                       m_ctrlPoint[k+1].y - (dist)/3.0 * m_Slope[k+1].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
+		LinkSpline.SplineCurve();
+		LinkSpline.DrawSpline(painter, scalex, scaley, Offset);
+
+		if(m_bOutPts)
+		{
+			LinkSpline.DrawOutputPoints(painter, scalex, scaley, Offset);
+		}
+	
+		x1 = qMin(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+		x2 = qMax(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+
+		while(x1>=0 && x1<x2 && l<=1000)
+		{
+//			l=(int)(x1*1000.001);
+			m_Outy[l] = LinkSpline.GetY(x1);
+			x1 =0.001*(double)l;
+			l++;
+		}
+
+//		l=(int)(x2*1000);
+//		m_Outy[l] = LinkSpline.GetY(x2);
+	}
+}
+
+
+void CSplinedPoints::DrawRearPoint(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	painter.save();
+	QPen RearPen;
+
+	if(m_iHighlight ==-1)
+	{
+		RearPen.setColor(QColor(0,0,255));
+		RearPen.setWidth(2);
+		painter.setPen(RearPen);
+	}
+	else if(m_iSelect ==-1)
+	{
+		RearPen.setColor(QColor(0,0,150));
+		RearPen.setWidth(2);
+		painter.setPen(RearPen);
+	}
+	else
+	{
+		RearPen.setColor(m_Color);
+		painter.setPen(RearPen);
+	}
+
+	painter.drawEllipse((int)(m_RearPoint.x*scalex+Offset.x()-3), (int)(-m_RearPoint.y*scaley+Offset.y()-3), 6, 6);
+	painter.restore();
+}
+
+
+void CSplinedPoints::SetCurveParams(int style, int width, QColor color)
+{
+	m_Style = style;
+	m_Width = width;
+	m_Color = color;
+}
+
+
+
+
+
+
+

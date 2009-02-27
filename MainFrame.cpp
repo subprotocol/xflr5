@@ -361,8 +361,12 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 			else                    OperFoilCtxMenu->exec(ScreenPt);
 			break;
 		}
+		case DIRECTDESIGN:
+		{
+			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+			break;
+		}
 	}
-
 }
 
 
@@ -387,6 +391,11 @@ void MainFrame::CreateActions()
 	OnMiarexAct->setShortcut(tr("Ctrl+6"));
 	OnMiarexAct->setStatusTip(tr("Open Wing/plane design and analysis application"));
 	connect(OnMiarexAct, SIGNAL(triggered()), this, SLOT(OnMiarex()));
+
+	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
+	OnAFoilAct->setShortcut(tr("Ctrl+1"));
+	OnAFoilAct->setStatusTip(tr("Open Foil Deisgn application"));
+	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
 
 	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
  	saveAct->setShortcut(tr("Ctrl+S"));
@@ -453,6 +462,17 @@ void MainFrame::CreateActions()
 }
 
 
+
+void MainFrame::CreateAFoilToolbar()
+{
+
+	m_pctrlAFoilToolBar = addToolBar(tr("Foil"));
+	m_pctrlAFoilToolBar->addAction(newProjectAct);
+	m_pctrlAFoilToolBar->addAction(openAct);
+	m_pctrlAFoilToolBar->addAction(saveAct);
+
+}
+
 void MainFrame::CreateDockWindows()
 {
 	m_pctrlXDirectWidget = new QDockWidget(tr("XDirect"), this);
@@ -462,6 +482,10 @@ void MainFrame::CreateDockWindows()
 	m_pctrlMiarexWidget = new QDockWidget(tr("Miarex"), this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlMiarexWidget);
+
+	m_pctrlAFoilWidget = new QDockWidget(tr("AFoil"), this);
+	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
+	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
 
 	m_p2DWidget = new TwoDWidget(this);
 	setCentralWidget(m_p2DWidget);
@@ -478,12 +502,15 @@ void MainFrame::CreateDockWindows()
 	m_pctrlMiarexWidget->setWidget(pMiarex);
 	m_pctrlMiarexWidget->setVisible(false);
 
-
-	m_pAFoil  = new AFoil(this);
-	AFoil *pAFoil = (AFoil*)m_pAFoil;
+	m_pAFoil  = new QAFoil(this);
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+	pAFoil->setAttribute(Qt::WA_DeleteOnClose, false);
+	m_pctrlAFoilWidget->setWidget(pAFoil);
+	m_pctrlAFoilWidget->setVisible(false);
 
 	m_p2DWidget->m_pXDirect   = pXDirect;
 	m_p2DWidget->m_pMiarex    = pMiarex;
+	m_p2DWidget->m_pAFoil     = pAFoil;
 	m_p2DWidget->m_pMainFrame = this;
 
 	QSizePolicy sizepol;
@@ -502,8 +529,10 @@ void MainFrame::CreateDockWindows()
 	pMiarex->m_poaFoil   = &m_oaFoil;
 	pMiarex->m_poaPolar  = &m_oaPolar;
 
-	pAFoil->m_pMainFrame     = this;
+	pAFoil->m_pMainFrame = this;
 	pAFoil->m_poaFoil    = &m_oaFoil;
+	pAFoil->m_p2DWidget = m_p2DWidget;
+	pAFoil->m_poaFoil   = &m_oaFoil;
 
 	pXDirect->m_pMainFrame             = this;
 	pXDirect->m_p2DWidget              = m_p2DWidget;
@@ -547,6 +576,7 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(saveAct);
 	fileMenu->addAction(saveProjectAsAct);
 	fileMenu->addSeparator();
+	fileMenu->addAction(OnAFoilAct);
 	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
@@ -1237,6 +1267,7 @@ void MainFrame::CreateXDirectMenus()
 	//End XDirect polar Context Menu
 }
 
+
 void MainFrame::CreateStatusBar()
 {
 	statusBar()->showMessage(tr("Ready"));
@@ -1244,11 +1275,16 @@ void MainFrame::CreateStatusBar()
 	m_pctrlProjectName->setMinimumWidth(200);
 	statusBar()->addPermanentWidget(m_pctrlProjectName);
 }
+
+
 void MainFrame::CreateToolbars()
 {
 	CreateXDirectToolbar();
 	CreateMiarexToolbar();
+	CreateAFoilToolbar();
 }
+
+
 void MainFrame::CreateMiarexToolbar()
 {
 	m_pctrlUFO = new QComboBox();
@@ -1308,6 +1344,8 @@ void MainFrame::CreateXDirectToolbar()
 	connect(m_pctrlOpPoint, SIGNAL(activated(int)), this, SLOT(OnSelChangeOpp(int)));
 
 }
+
+
 
 void MainFrame::OnDeleteCurPolar()
 {
@@ -2206,6 +2244,21 @@ int MainFrame::LoadXFLR5File(QString PathName)
 }
 
 
+void MainFrame::OnAFoil()
+{
+	m_iApp = DIRECTDESIGN;
+	m_pctrlMiarexToolBar->hide();
+	m_pctrlXDirectToolBar->hide();
+	m_pctrlAFoilToolBar->show();
+
+	m_pctrlMiarexWidget->hide();
+	m_pctrlXDirectWidget->hide();
+	m_pctrlAFoilWidget->show();
+
+	SetMenus();
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+	pAFoil->SetParams();
+}
 
 
 void MainFrame::OnCurFoilStyle()
@@ -2388,7 +2441,8 @@ void MainFrame::OnLoadFile()
 	}
 	else if(m_iApp==DIRECTDESIGN)
 	{
-//		AFoil.SetFoils();
+		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+//		pAFoil->SetFoils();
 	}
 }
 
@@ -2401,19 +2455,21 @@ void MainFrame::OnLogFile()
 	QDesktopServices::openUrl(FileName);
 }
 
+
 void MainFrame::OnMiarex()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;	m_iApp = MIAREX;
-	QString strong ;pMiarex->m_pCurGraph->GetGraphName(strong);
+	QString strong ;
+	pMiarex->m_pCurGraph->GetGraphName(strong);
 	m_pctrlXDirectToolBar->hide();
-
+	m_pctrlAFoilToolBar->hide();
 	m_pctrlMiarexToolBar->show();
 
 	m_pctrlXDirectWidget->hide();
+	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->show();
 
 	SetMenus();
-
 }
 
 
@@ -2714,9 +2770,17 @@ void MainFrame::OnSaveViewToImageFile()
 	switch(m_iApp)
 	{
 		case XFOILANALYSIS:
+		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 			pXDirect->PaintView(painter);
 			break;
+		}
+		case DIRECTDESIGN:
+		{
+			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+			pAFoil->PaintView(painter);
+			break;
+		}
 	}
 
 	QString FileName;
@@ -2993,7 +3057,9 @@ void MainFrame::OnXDirect()
 	pXDirect->SetFoilScale();
 	m_iApp = XFOILANALYSIS;
 	m_pctrlMiarexToolBar->hide();
+	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->show();
+	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->show();
 	SetMenus();
@@ -3676,7 +3742,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, bool bIsStoring)
 
 	ar << 0;//no POpps
 
-	AFoil *pAFoil = (AFoil*)m_pAFoil;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	pAFoil->m_pSF->Serialize(ar, true);
 	pAFoil->m_pPF->Serialize(ar, true);
 
@@ -3688,7 +3754,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 {
 //	CWaitCursor Wait;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	AFoil *pAFoil = (AFoil*)m_pAFoil;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
 	CWing *pWing     = NULL;
 	CWPolar *pWPolar = NULL;
@@ -4114,6 +4180,14 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(DesignMenu);
 		menuBar()->addMenu(PolarMenu);
 		menuBar()->addMenu(OpPointMenu);
+		menuBar()->addMenu(helpMenu);
+	}
+	else if(m_iApp==DIRECTDESIGN)
+	{
+		menuBar()->clear();
+		menuBar()->addMenu(fileMenu);
+		menuBar()->addMenu(FoilMenu);
+		menuBar()->addMenu(DesignMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp== MIAREX)
@@ -4899,6 +4973,12 @@ void MainFrame::UpdateView()
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 			pXDirect->UpdateView();
+			break;
+		}
+		case DIRECTDESIGN:
+		{
+			QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+			pAFoil->UpdateView();
 			break;
 		}
 		case MIAREX:

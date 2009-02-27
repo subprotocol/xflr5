@@ -592,7 +592,7 @@ void GL3dViewDlg::GLCreateCpLegend()
 	QString strong;
 
 	double labellength, ClientToGL;
-	int maxlength;
+
 	double f, fi,dD, ZPos,dz,Right1, Right2, RightLetter;
 	double color = 0.0;
 	double range, delta;

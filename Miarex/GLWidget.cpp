@@ -69,7 +69,7 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-	double xl, yl, w, h;
+	double w, h;
 	m_rCltRect = geometry();
 	int side = qMax(width, height);
 	w = (double)width;

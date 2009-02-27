@@ -918,7 +918,7 @@ void WingDlg::InitDialog()
 
 	m_pWingDelegate = new WingDelegate;
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
-	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)),         this, SLOT(OnCellChanged(QWidget *)));
+	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	int  *precision = new int[10];
 	precision[0] = 2;//five digits for x and y coordinates

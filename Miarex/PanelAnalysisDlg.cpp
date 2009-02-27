@@ -2668,7 +2668,7 @@ void PanelAnalysisDlg::StartAnalysis()
 }
 
 
-void PanelAnalysisDlg::SumPanelForces(double *Cp, double Alpha, double Qinf, double &Lift, double &Drag)
+void PanelAnalysisDlg::SumPanelForces(double *Cp, double Alpha, double QInf, double &Lift, double &Drag)
 {
 	int p;
 	CVector PanelForce;

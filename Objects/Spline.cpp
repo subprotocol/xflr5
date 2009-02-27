@@ -20,7 +20,7 @@
 
 *****************************************************************************/
 
-
+#include "../Globals.h"
 #include "Spline.h"
 #include "math.h"
 #include <QtDebug>
@@ -35,6 +35,10 @@
 
 CSpline::CSpline()
 {
+	m_Style = 0;
+	m_Width = 1;
+	m_Color = QColor(70, 200, 120);
+
 	m_iHighlight  = -10;
 	m_iSelect     = -10;
 	m_iCtrlPoints =  0;
@@ -82,171 +86,110 @@ void CSpline::Copy(CSpline *pSpline)
         m_rViewRect.setCoords(pSpline->m_rViewRect.left(),  pSpline->m_rViewRect.top(),pSpline->m_rViewRect.right(),  pSpline->m_rViewRect.bottom());
 }
 
-/*
-bool CSpline::DrawControlPoint(CDC *pDC, int i, double scalex,  double scaley, CPoint Offset, bool IsPrinting)
+
+
+void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint &Offset)
 {
-	int width;
-	if (IsPrinting)
-	{
-		width = 60;
-		scaley=-scaley;
-	}
-	else 
-	{
-		width = 3;
+	painter.save();
 
-	}
-
-	CPoint pt;
-	pt.x = (int)( m_Input[i].x*scalex)+Offset.x;
-	pt.y = (int)(-m_Input[i].y*scaley)+Offset.y;
-	if(!m_rViewRect.PtInRect(pt)) return false;
-
-	if (!IsPrinting && m_iSelect==i) 
-	{
-		CPen SelectPen(PS_SOLID, 2, RGB(0,0,150));
-		CPen *pOldPen = pDC->SelectObject(&SelectPen);
-		pDC->Ellipse(pt.x-width,
-					 pt.y-width,
-					 pt.x+width,
-					 pt.y+width);
-		pDC->SelectObject(pOldPen);
-	}
-	else if(!IsPrinting && m_iHighlight==i) 
-	{
-		CPen HighlightPen(PS_SOLID, 2, RGB(255,0,0));
-		CPen *pOldPen = pDC->SelectObject(&HighlightPen);
-		pDC->Ellipse(pt.x-width,
-					 pt.y-width,
-					 pt.x+width,
-					 pt.y+width);
-		pDC->SelectObject(pOldPen);
-	}
-	else pDC->Ellipse(pt.x-width,
-					  pt.y-width,
-					  pt.x+width,
-					  pt.y+width);
-	return true;
-}*/
-
-/*
-void CSpline::DrawCtrlPoints(CDC *pDC, double scx, double scy, CPoint Offset, bool IsPrinting){
-	double scalex, scaley;
-	CPoint pt;
+	QPoint pt;
 	int i, width;
-	if (IsPrinting)
-	{
-		width = 60;
-		scalex=scx;
-		scaley=-scy;
-	}
-	else
-	{
-		width = 3;
-		scalex=scx;
-		scaley=-scy;
-	}
+
+	width  = 3;
+
+	QPen PointPen;
+	PointPen.setWidth(1);
+
+	painter.setPen(PointPen);
 
 	for (i=0; i<m_iCtrlPoints; i++)
 	{
-		pt.x = (int)(m_Input[i].x*scalex+Offset.x);
-		pt.y = (int)(m_Input[i].y*scaley+Offset.y);
-		if(m_rViewRect.PtInRect(pt))
+		pt.rx() = (int)(m_Input[i].x*scalex + Offset.x());
+		pt.ry() = (int)(m_Input[i].y*scaley + Offset.y());
+
+		if(m_rViewRect.contains(pt))
 		{
-			if (!IsPrinting && m_iSelect==i) 
+			if (m_iSelect==i) 
 			{
-				CPen SelectPen(PS_SOLID, 2, RGB(0,0,150));
-				CPen *pOldPen = pDC->SelectObject(&SelectPen);
-				pDC->Ellipse(pt.x-width, pt.y-width, pt.x+width, pt.y+width);
-				pDC->SelectObject(pOldPen);
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(0,0,150));
 			}
-			else if(!IsPrinting && m_iHighlight==i) 
+			else if(m_iHighlight==i) 
 			{
-				CPen HighlightPen(PS_SOLID, 2, RGB(255,0,0));
-				CPen *pOldPen = pDC->SelectObject(&HighlightPen);
-				pDC->Ellipse( pt.x-width, pt.y-width, pt.x+width, pt.y+width);
-				pDC->SelectObject(pOldPen);
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(255,0,0));
 			}
-			else pDC->Ellipse(pt.x-width, pt.y-width, pt.x+width, pt.y+width);
+			else
+			{
+				PointPen.setWidth(1);
+				PointPen.setColor(m_Color);
+			}
+			painter.setPen(PointPen);
+			painter.drawEllipse(pt.x()-width, pt.y()-width, 2*width, 2*width);
 		}
-	}	
+	}
+	painter.restore();
 }
 
-void CSpline::DrawOutputPoint(CDC *pDC, int i,double scalex, double scaley, CPoint Offset, bool IsPrinting)
+
+
+void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley, QPoint &Offset)
 {
+	painter.save();
+	QPoint pt;
 	int width;
-	if (IsPrinting)
+	width = 2;
+
+	QPen OutPen(m_Color);
+	OutPen.setStyle(Qt::SolidLine);
+	OutPen.setWidth(1);
+	painter.setPen(OutPen);
+
+	for (int i=0; i<m_iRes;i++)
 	{
-		width = 50;
-		scaley=-scaley;
-	}
-	else
-	{
-		width = 2;
+		pt.rx() = (int)( m_Output[i].x*scalex + Offset.x());
+		pt.ry() = (int)(-m_Output[i].y*scaley + Offset.y());
+		if(!m_rViewRect.contains(pt)) return;
+
+		painter.drawRect(pt.x()-width, pt.y()-width, 2*width, 2*width);
 	}
 
-	CPoint pt;
-	pt.x = (int)( m_Output[i].x*scalex+Offset.x);
-	pt.y = (int)(-m_Output[i].y*scaley+Offset.y);
-	if(!m_rViewRect.PtInRect(pt)) return ;
-
-	pDC->Rectangle(pt.x-width,
-				   pt.y-width,
-				   pt.x+width,
-				   pt.y+width);
-	return;
+	painter.restore();
 }
 
 
-bool CSpline::DrawSpline(CDC *pDC, double scx, double scy, CPoint Offset, bool IsPrinting)
+void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset)
 {
-	double scalex, scaley;
-	CPoint From, To;
-	int x,y;
+	painter.save();
+
+	QPoint From, To;
+
+	QPen SplinePen(m_Color);
+	SplinePen.setStyle(GetStyle(m_Style));
+	SplinePen.setWidth(m_Width);
+	painter.setPen(SplinePen);
+
 	int k;
 
-	if (IsPrinting)
-	{
-		scalex=scx;
-		scaley=-scy;
-	}
-	else{
-		scalex=scx;
-		scaley=scy;
-	}
-
 	if(m_iCtrlPoints>0)
-	{
-		From.x = (int)( m_Output[0].x*scalex+Offset.x);
-		From.y = (int)(-m_Output[0].y*scaley+Offset.y);
-		pDC->MoveTo(From);
+	{ 
+		From.rx() = (int)( m_Output[0].x * scalex + Offset.x());
+		From.ry() = (int)(-m_Output[0].y * scaley + Offset.y());
+
 		for(k=1; k<m_iRes;k++) 
 		{
-			To.x = (int)( m_Output[k].x*scalex+Offset.x);
-			To.y = (int)(-m_Output[k].y*scaley+Offset.y);
-			if(m_rViewRect.PtInRect(From) && m_rViewRect.PtInRect(To)){
-				pDC->LineTo(To);
-			}
-			else if(m_rViewRect.PtInRect(From) && !m_rViewRect.PtInRect(To)){
-				x = From.x;
-				y = From.y;
-				if(Intersect(x,y, m_rViewRect, From, To))	pDC->LineTo(x,y);
-			}
-			else if(!m_rViewRect.PtInRect(From) && m_rViewRect.PtInRect(To)){
-				x = From.x;
-				y = From.y;
-				if(Intersect(x,y, m_rViewRect, From, To)){
-					pDC->MoveTo(x,y);
-					pDC->LineTo(To);
-				}
-			}
-			else pDC->MoveTo(To);
+			To.rx() = (int)( m_Output[k].x * scalex + Offset.x());
+			To.ry() = (int)(-m_Output[k].y * scaley + Offset.y());
+
+			painter.drawLine(From, To);
+
 			From = To;
 		}
 	}
-	return true;
+	painter.restore();
 }
-*/
+
+
 void CSpline::Export(QFile *pFile, bool bExtrados)
 {
         int k;
@@ -256,16 +199,16 @@ void CSpline::Export(QFile *pFile, bool bExtrados)
         {
                 for (k=m_iRes-1;k>=0; k--)
                 {
-                        strOut=" %7.4f  %7.4f\n";
-                        strOut.arg(m_Output[k].x).arg( m_Output[k].y);
+                        strOut=" %1  %2\n";
+                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
                         out << strOut;
 		}
 	}
 	else {
                 for (k=1;k<m_iRes; k++)
                 {
-                        strOut=" %7.4f  %7.4f\n";
-                        strOut.arg(m_Output[k].x).arg( m_Output[k].y);
+                        strOut=" %1  %2\n";
+                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
                         out << strOut;
                 }
 	}
@@ -277,6 +220,7 @@ double CSpline::GetY(double x)
         int i;
 	if(x<=0.0 || x>=1.0) return 0.0;
 	double y;
+
         for (i=0; i<m_iRes-1; i++)
         {
 		if (m_Output[i].x <m_Output[i+1].x  && 
@@ -389,6 +333,37 @@ bool CSpline::RemovePoint(int k)
 	}
 	return true;
 }
+
+
+void CSpline::SetStyle(int style)
+{
+	m_Style = style;
+}
+
+
+
+void CSpline::SetWidth(int width)
+{
+	m_Width = width;
+}
+
+
+
+void CSpline::SetColor(int color)
+{
+	m_Color = color;
+}
+
+
+
+void CSpline::SetSplineParams(int style, int width, QColor color)
+{
+	m_Width = width;
+	m_Style = style;
+	m_Color = color;
+}
+
+
 
 
 

@@ -2,7 +2,7 @@
 
 	Splined Curve Foil class
     Copyright (C) 2004 Andre Deperrois XFLR5@yahoo.com
-
+ 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -34,11 +34,13 @@ class CSplinedPoints
 {
 public:
 	bool CompSlopes();
-//	bool DrawControlPoint(CDC *pDC, int i, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	bool DrawControlPoints(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	bool DrawSplines(CDC* pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawRearPoint(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
+	
+	void DrawControlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawSplines(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawRearPoint(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	bool RemovePoint(int k);
+
+	void SetCurveParams(int style, int width, QColor color);
 
 	int InsertPoint(double x, double y);
 	int IsControlPoint(CVector Real, double ZoomFactor);
@@ -64,13 +66,15 @@ public:
 	CVector m_Slope[SPLINECONTROLSIZE];    //slope vector at each point
 
 	QRect m_rViewRect;
+	QColor m_Color;
+	int m_Style, m_Width;
 
 };
 
 
 class CPF 
 {
-	friend class AFoil;
+	friend class QAFoil;
 	friend class MainFrame;
 
 
@@ -79,41 +83,39 @@ public:
 	virtual ~CPF();
 
 private:
+	bool CompMidLine(bool first = false);
+	bool InitSplinedFoil();
+	bool Serialize(QDataStream &ar, bool bISStoring);
+
+	void Copy(CPF* pPF);
+	void DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	void ExportToBuffer(CFoil *pFoil);
+	void SetOutPoints(bool state);
+	void SetViewRect(QRect rc);
+	void Update(bool bExtrados);
+	void SetCurveParams(int style, int width, QColor color);
+
 	bool m_bModified;
 	bool m_bVisible, m_bOutPoints, m_bCenterLine;
 
 	int m_OutPoints;
 
-	int	m_FoilStyle;
+	int m_FoilStyle;
 	int m_FoilWidth;
+	QColor m_FoilColor;
 
 	double m_fCamber;
 	double m_fThickness;
 	double m_fxCambMax;
 	double m_fxThickMax;
 
-	QColor m_FoilColor;
-
 	QString m_strFoilName;
 
 	CSplinedPoints m_Extrados;
 	CSplinedPoints m_Intrados;
 	CVector m_rpMid[1001];
-
-	bool CompMidLine(bool first = false);
-
-	bool InitSplinedFoil();
-
-	bool Serialize(QDataStream &ar, bool bISStoring);
-
-	void Copy(CPF* pPF);
-//	bool DrawCtrlPoints(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawFoil(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-//	void DrawMidLine(CDC *pDC, double scalex, double scaley, QPoint Offset, bool IsPrinting);
-	void ExportToBuffer(CFoil *pFoil);
-	void SetOutPoints(bool state);
-	void SetViewRect(QRect rc);
-        void Update();
 
 };
  

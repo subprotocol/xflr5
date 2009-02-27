@@ -7,6 +7,7 @@
 #include "Graph/Curve.h"
 #include "Miarex/Miarex.h"
 #include "XDirect/XDirect.h"
+#include "Design/AFoil.h"
 #include "TwoDWidget.h"
 
 TwoDWidget::TwoDWidget(QWidget *parent)
@@ -15,6 +16,7 @@ TwoDWidget::TwoDWidget(QWidget *parent)
 	m_pMainFrame = NULL;
 	m_pXDirect   = NULL;
 	m_pMiarex    = NULL;
+	m_pAFoil     = NULL;
 
 	setMouseTracking(true);
 	setCursor(Qt::CrossCursor);
@@ -38,6 +40,11 @@ void TwoDWidget::keyPressEvent(QKeyEvent *event)
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->keyPressEvent(event);
 	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->keyPressEvent(event);
+	}
 }
 
 void TwoDWidget::mousePressEvent(QMouseEvent *event)
@@ -52,6 +59,11 @@ void TwoDWidget::mousePressEvent(QMouseEvent *event)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mousePressEvent(event);
+	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->mousePressEvent(event);
 	}
 }
 
@@ -69,6 +81,11 @@ void TwoDWidget::mouseReleaseEvent(QMouseEvent *event)
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mouseReleaseEvent(event);
 	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->mouseReleaseEvent(event);
+	}
 }
 
 
@@ -84,6 +101,11 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mouseMoveEvent(event);
+	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->mouseMoveEvent(event);
 	}
 }
 
@@ -104,6 +126,11 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->SetScale(rect());
 	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->SetScale(rect());
+	}
 }
 
 
@@ -119,6 +146,11 @@ void TwoDWidget::wheelEvent(QWheelEvent *event)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->wheelEvent(event);
+	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->wheelEvent(event);
 	}
 }
 
@@ -136,6 +168,12 @@ void TwoDWidget::paintEvent(QPaintEvent *event)
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		QPainter painter(this);
 		pMiarex->PaintView(painter);
+	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		QPainter painter(this);
+		pAFoil->PaintView(painter);
 	}
 	else
 	{
