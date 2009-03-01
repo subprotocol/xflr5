@@ -56,24 +56,38 @@ class QAFoil : public QWidget
 	friend class MainFrame;
 	friend class FoilTableDelegate;
 	friend class TwoDWidget;
+	friend class AFoilGridDlg;
 
 public:
 	QAFoil(QWidget *parent = NULL);
+	virtual ~QAFoil();
 	void SetupLayout();
 	void InitDialog();
  
 
 private slots:
-	void OnCenterLine();
-	void OnModelPoints();
-	void OnVisible();
+	void OnRenameFoil();
+	void OnGrid();
+	void OnCenterLine(bool bState);
+	void OnPoints(bool bState);
+	void OnVisible(bool bState);
 	void OnFoilStyle();
 	void OnDelete();
 	void OnDuplicate();
 	void OnFoilClicked(const QModelIndex& index);
-
+	void OnCellChanged(QWidget *pWidget);
+	void OnStoreSplines();
+	void OnZoomIn();
+	void OnZoomOut();
+	void OnZoomLess();
+	void OnZoomYOnly();
+	void OnResetYScale();
 
 private:
+	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
+	void DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
+	void DrawXMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
+	void DrawYMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void FillFoilTable();
 	void FillTableRow(int row);
 	void ShowFoil(CFoil* pFoil, bool bShow=true);
@@ -82,7 +96,6 @@ private:
 	void SetFoil(CFoil* pFoil = NULL);
 	void SelectFoil(CFoil* pFoil = NULL);
 	void UpdateFoil(int iFoil = -1);
-	void UpdateBlt();
 	void PaintGrids(QPainter &painter);
 	void PaintSplines(QPainter &painter);
 	void PaintFoils(QPainter &painter);
@@ -92,6 +105,9 @@ private:
 	void SetScale(QRect CltRect);
 
 	void ReleaseZoom();
+
+	void LoadSettings(QDataStream &ar);
+	void SaveSettings(QDataStream &ar);
 
 	void TakePicture();
 	void SetPicture();
@@ -112,7 +128,7 @@ private:
 	LineButton *m_pctrlFoilStyle;
 	QCheckBox *m_pctrlVisible;
 	QCheckBox *m_pctrlCenterLine;
-	QCheckBox *m_pctrlModelPoints;
+	QCheckBox *m_pctrlFoilPoints;
 	QPushButton *m_pctrlRename;
 	QPushButton *m_pctrlDelete;
 	QPushButton *m_pctrlDuplicate;
@@ -131,25 +147,29 @@ private:
 	bool m_bTrans;
 	bool m_bCircle;
 	bool m_bStored;
-	bool m_bXGrid,m_bYGrid;
-	bool m_bXMinGrid, m_bYMinGrid;
 	bool m_bShowLegend;
 	bool m_bXDown, m_bYDown, m_bZDown;
 
+	bool m_bXGrid,m_bYGrid;
+	bool m_bXMinGrid, m_bYMinGrid;
 	int m_XGridStyle, m_YGridStyle;
 	int m_XGridWidth, m_YGridWidth;
 	int m_XMinStyle, m_YMinStyle;
 	int m_XMinWidth, m_YMinWidth;
 	int m_NeutralStyle, m_NeutralWidth;
+	double m_XGridUnit, m_YGridUnit;
+	double m_XMinUnit, m_YMinUnit;
+	QColor m_XGridColor,m_YGridColor;
+	QColor m_XMinColor,m_YMinColor;
+	QColor m_NeutralColor;
+
+
 	int m_StackPos, m_StackSize;// undo : stack position and stack size
-	int m_FoilSelection;
 
 	double m_LERad;
 	double m_fScale;
 	double m_fScaleY;//ratio between y and x scales;
 	double m_fRefScale;
-	double m_XGridUnit, m_YGridUnit;
-	double m_XMinorUnit, m_YMinorUnit;
 
 	QList<void *> *m_poaFoil;
 	XFoil *m_pXFoil;
@@ -168,9 +188,6 @@ private:
 	CVector m_MousePos;
 	CFoil *m_pBufferFoil;
 
-	QColor m_XGridColor,m_YGridColor;
-	QColor m_XMinColor,m_YMinColor;
-	QColor m_NeutralColor;
 
 	QCursor m_hcArrow;
 	QCursor m_hcMove;
@@ -178,7 +195,6 @@ private:
 
 	Picture m_TmpPic;
 	Picture m_UndoPic[50];
-
 };
 
 #endif // QAFOIL_H

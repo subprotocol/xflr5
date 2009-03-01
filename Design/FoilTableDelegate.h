@@ -24,6 +24,7 @@
 
 #include <QList>
 #include <QItemDelegate>
+#include <QStandardItemModel>
 #include "../Misc/FloatEdit.h"
 
 class FoilTableDelegate : public QItemDelegate
@@ -39,8 +40,11 @@ public:
 	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	void drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const;
+	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 
 private:
+	QStandardItemModel *m_pFoilModel;
 	int *m_Precision; ///table of float precisions for each column
 	static void *s_pAFoil;
 };

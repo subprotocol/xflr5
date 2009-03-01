@@ -28,7 +28,14 @@
 #include "../XDirect/NacaFoilDlg.h"
 #include "../Misc/LinePickerDlg.h"
 #include "AFoil.h"
+#include "AFoilGridDlg.h"
 
+QAFoil::~QAFoil()
+{
+//	delete m_pctrlFoilTable;
+//	delete m_pFoilDelegate;
+//	delete m_pFoilModel;
+}
 
 QAFoil::QAFoil(QWidget *parent)
 	: QWidget(parent)
@@ -41,7 +48,6 @@ QAFoil::QAFoil(QWidget *parent)
 	m_MousePos.y = 0.0;
 
 	m_pCurFoil = NULL;
-	m_FoilSelection = 0;
 
 	m_pSF = new CSF();
 	m_pSF->m_bModified = false;
@@ -51,10 +57,11 @@ QAFoil::QAFoil(QWidget *parent)
 	m_pPF->m_bModified = false;
 	m_pPF->InitSplinedFoil();
 
+	m_bSF          = true;
 	m_bZoomPlus    = false;
 	m_bZoomYOnly   = false;
 	m_bTrans       = false;
-	m_bNeutralLine = false;
+	m_bNeutralLine = true;
 	m_bScale       = true;
 	m_bCircle      = false;
 	m_bShowLegend  = true;
@@ -70,6 +77,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_XGridStyle = 1;
 	m_XGridWidth = 1;
 	m_XGridColor = QColor(150,150,150);
+
 	m_bYGrid     = false;
 	m_YGridUnit  = 0.05;
 	m_YGridStyle = 1;
@@ -77,12 +85,13 @@ QAFoil::QAFoil(QWidget *parent)
 	m_YGridColor = QColor(150,150,150);
 
 	m_bXMinGrid  = false;
-	m_XMinorUnit = 0.01;
+	m_XMinUnit = 0.01;
 	m_XMinStyle  = 2;
 	m_XMinWidth  = 1;
 	m_XMinColor  = QColor(70,70,70);
+
 	m_bYMinGrid  = false;
-	m_YMinorUnit = 0.01;
+	m_YMinUnit = 0.01;
 	m_YMinStyle  = 2;
 	m_YMinWidth  = 1;
 	m_YMinColor  = QColor(70,70,70);
@@ -106,6 +115,155 @@ QAFoil::QAFoil(QWidget *parent)
 }
 
 
+void QAFoil::DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+{
+	painter.save();
+	QPen GridPen(m_XGridColor);
+	GridPen.setStyle(GetStyle(m_XGridStyle));
+	GridPen.setWidth(m_XGridWidth);
+	painter.setPen(GridPen);
+
+	double xo = 0.0;
+	double xmin = 0.0;
+	double xmax = 1.0;
+	double ymin = -0.2;
+	double ymax =  0.2;
+
+	int YMin = qMax(int(ymin*scaley)+ Offset.y(), dRect.top());
+	int YMax = qMin(int(ymax*scaley)+ Offset.y(), dRect.bottom());
+
+	double xt = xo-int((xo-xmin)*1.0001/m_XGridUnit)*m_XGridUnit;//one tick at the origin
+
+	while(xt<=xmax*1.001)
+	{
+		//Draw  grid
+		painter.drawLine(int(xt*scalex) + Offset.x(), YMin, int(xt*scalex) + Offset.x(), YMax);
+		xt += m_XGridUnit ;
+	}
+
+	painter.restore();
+}
+
+
+
+
+void QAFoil::DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+{
+	painter.save();
+	QPen GridPen(m_YGridColor);
+	GridPen.setStyle(GetStyle(m_YGridStyle));
+	GridPen.setWidth(m_YGridWidth);
+	painter.setPen(GridPen);
+
+	double yo = 0.0;
+	double ymin = -0.2;
+	double ymax = 0.2;
+	double xmin = 0.0;
+	double xmax = 1.0;
+
+	int XMin = max(int(xmin*scalex)+ Offset.x(), dRect.left());
+	int XMax = min(int(xmax*scalex)+ Offset.x(), dRect.right());
+
+	double yt = yo-int((yo-ymin)*1.0001/m_YGridUnit)*m_YGridUnit;//one tick at the origin
+
+	while(yt<=ymax*1.0001)
+	{
+
+		painter.drawLine(XMin, (int)(yt*scaley) + Offset.y(), XMax, (int)(yt*scaley) + Offset.y());
+
+		yt += m_YGridUnit ;
+	}
+
+	painter.restore();
+}
+
+
+void QAFoil::DrawXMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+{
+	painter.save();
+
+	QPen GridPen(m_XMinColor);
+	GridPen.setWidth(m_XMinWidth);
+	GridPen.setStyle(GetStyle(m_XMinStyle));
+
+	painter.setPen(GridPen);
+
+
+	double xo = 0.0;
+	double xmin = 0.0;
+	double xmax = 1.0;
+	double ymin = -0.2;
+	double ymax =  0.2;
+
+	int YMin = qMax(int(ymin*scaley)+ Offset.y(), dRect.top());
+	int YMax = qMin(int(ymax*scaley)+ Offset.y(), dRect.bottom());
+
+	double xDelta = m_XMinUnit;
+	int MinFreq = (int)(m_XGridUnit/m_XMinUnit);
+	int k=0;
+	double xt = xo-int((xo-xmin)*1.0001/m_XGridUnit)*m_XGridUnit;//one tick at the origin
+
+	while(xt<=xmax*1.001)
+	{
+		if(k%(MinFreq)!=0)
+		{
+			// do not overwrite main grid
+			if (xt>=xmin)
+			{
+				painter.drawLine(int(xt*scalex) + Offset.x(), YMin, int(xt*scalex) + Offset.x(), YMax);
+			}
+		}
+		xt += xDelta;
+		k++;
+	}
+
+	painter.restore();
+}
+
+
+void QAFoil::DrawYMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+{
+	painter.save();
+
+	QPen GridPen(m_YMinColor);
+	GridPen.setWidth(m_YMinWidth);
+	GridPen.setStyle(GetStyle(m_YMinStyle));
+
+	painter.setPen(GridPen);
+
+	double yo = 0.0;
+	double xmin = 0.0;
+	double xmax = 1.0;
+	double ymin = -0.2;
+	double ymax =  0.2;
+
+	int XMin = qMax(int(xmin*scalex)+ Offset.x(), dRect.left());
+	int XMax = qMin(int(xmax*scalex)+ Offset.x(), dRect.right());
+
+//	double yDelta = m_YGridUnit/(m_YMinFreq+1);
+	double yDelta = m_YMinUnit;
+	int MinFreq = (int)(m_YGridUnit/m_YMinUnit);
+	int k=0;
+	double yt = yo-int((yo-ymin)*1.0001/m_YGridUnit)*m_YGridUnit;//one tick at the origin
+
+	while(yt<=ymax*1.001)
+	{
+		if(k%(MinFreq)!=0)
+		{
+		// do not overwrite main grid
+			if (yt>=ymin)
+			{
+				painter.drawLine(XMin, (int)(yt*scaley) + Offset.y(), XMax, (int)(yt*scaley) + Offset.y());
+			}
+		}
+		yt += yDelta;
+		k++;
+	}
+
+	painter.restore();
+}
+
+
 
 void QAFoil::FillFoilTable()
 {
@@ -117,6 +275,7 @@ void QAFoil::FillFoilTable()
 		FillTableRow(i);
 	}
 }
+
 
 void QAFoil::FillTableRow(int row)
 {
@@ -140,12 +299,69 @@ void QAFoil::FillTableRow(int row)
 	ind = m_pFoilModel->index(row, 4, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_fXCamber);
 
+	ind = m_pFoilModel->index(row, 5, QModelIndex());
+	m_pFoilModel->setData(ind,pFoil->n);
+
+
+	if(pFoil && pFoil->m_bTEFlap)
+	{
+		ind = m_pFoilModel->index(row, 6, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_TEFlapAngle);
+
+		ind = m_pFoilModel->index(row, 7, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_TEXHinge);
+
+		ind = m_pFoilModel->index(row, 8, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_TEYHinge);
+
+	}
+	if(pFoil && pFoil->m_bLEFlap)
+	{
+		ind = m_pFoilModel->index(row, 9, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_LEFlapAngle);
+
+		ind = m_pFoilModel->index(row, 10, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_LEXHinge);
+
+		ind = m_pFoilModel->index(row, 11, QModelIndex());
+		m_pFoilModel->setData(ind,pFoil->m_LEYHinge);
+	}
+
+	ind = m_pFoilModel->index(row, 12, QModelIndex());
+	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
+	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
+
 }
 
 void QAFoil::keyPressEvent(QKeyEvent *event)
 {
 	switch (event->key())
 	{
+		case Qt::Key_Escape:
+		{
+			if(m_bZoomPlus)
+			{
+				ReleaseZoom();
+				break;
+			}
+			else if(m_bZoomYOnly)
+			{
+//				CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//				pTB->PressButton(IDT_ZOOMYONLY, false);
+				m_bZoomYOnly = false;
+				break;
+			}
+		}
+		case Qt::Key_F2:
+		{
+			OnRenameFoil();
+			break;
+		}
+		case Qt::Key_F4:
+		{
+			OnStoreSplines();
+			break;
+		}
 		case Qt::Key_X:
 			m_bXDown = true;
 			break;
@@ -166,8 +382,10 @@ void QAFoil::keyReleaseEvent(QKeyEvent *event)
 	switch (event->key())
 	{
 		case Qt::Key_X:
+		{
 			m_bXDown = false;
 			break;
+		}
 		case Qt::Key_Y:
 			m_bYDown = false;
 			break;
@@ -199,11 +417,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 	m_MousePos = MousetoReal(point);
 	CVector Real = m_MousePos;
 
-/*	SHORT sh1  = GetKeyState(VK_LCONTROL);
-	SHORT sh2  = GetKeyState(VK_RCONTROL);
-	SHORT shZ  = GetKeyState('Z');
-	SHORT shX  = GetKeyState('X');
-	SHORT shY  = GetKeyState('Y');*/
 
 	bool bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
@@ -228,73 +441,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 		return;
 	}
 
-	if(!m_bZoomPlus)
-	{
-		//not zooming, check if mouse passes over control point and highlight
-
-		if(m_bSF && m_pSF->m_bVisible)
-		{	
-			int n = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<m_pSF->m_Extrados.m_iCtrlPoints) 
-			{
-				m_pSF->m_Extrados.m_iHighlight = n;
-			}
-			else 
-			{
-				if(m_pSF->m_Extrados.m_iHighlight>=0) 
-				{
-					m_pSF->m_Extrados.m_iHighlight = -10;
-				}
-			}
-			n = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<m_pSF->m_Intrados.m_iCtrlPoints) 
-			{
-				m_pSF->m_Intrados.m_iHighlight = n;
-			}
-			else 
-			{
-				if(m_pSF->m_Intrados.m_iHighlight>=0)
-				{
-					m_pSF->m_Intrados.m_iHighlight = -10;
-				}
-			}
-			UpdateView();
-		}
-		else if (m_pPF->m_bVisible)
-		{
-			bool bFound = false;
-			int n = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pPF->m_Extrados.m_iPoints) 
-			{
-				m_pPF->m_Extrados.m_iHighlight = n;
-				bFound = true;
-			}
-			else if(m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
-			{
-				m_pPF->m_Extrados.m_iHighlight = -1;
-				bFound = true;
-			}
-
-			n = m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pPF->m_Intrados.m_iPoints) 
-			{
-				m_pPF->m_Intrados.m_iHighlight = n;
-				bFound = true;
-			}
-			else if(m_pPF->m_Intrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
-			{
-				m_pPF->m_Intrados.m_iHighlight = -1;
-				bFound = true;
-			}
-			if(!bFound)
-			{
-				m_pPF->m_Extrados.m_iHighlight = -10;
-				m_pPF->m_Intrados.m_iHighlight = -10;
-			}	
-			UpdateView();
-		}
-	}
-	if (event->modifiers() & Qt::MidButton && !m_bZoomPlus)
+	if (event->buttons() & Qt::LeftButton && !m_bZoomPlus)
 	{
 		// user is dragging the point
 		if(m_rCltRect.contains(point))
@@ -378,9 +525,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 			}
 			FillFoilTable();
 		}
-
-		UpdateView();
-		return;
 	}
 	else if (((event->modifiers() & Qt::ControlModifier) )  && !bCtrl)
 	{
@@ -427,9 +571,71 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 			int a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 			m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
 		}
+	}
+	else if(!m_bZoomPlus)
+	{
+		//not zooming, check if mouse passes over control point and highlight
 
-		UpdateView();
-		return;
+		if(m_bSF && m_pSF->m_bVisible)
+		{
+			int n = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>0 && n<m_pSF->m_Extrados.m_iCtrlPoints)
+			{
+				m_pSF->m_Extrados.m_iHighlight = n;
+			}
+			else
+			{
+				if(m_pSF->m_Extrados.m_iHighlight>=0)
+				{
+					m_pSF->m_Extrados.m_iHighlight = -10;
+				}
+			}
+			n = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>0 && n<m_pSF->m_Intrados.m_iCtrlPoints)
+			{
+				m_pSF->m_Intrados.m_iHighlight = n;
+			}
+			else
+			{
+				if(m_pSF->m_Intrados.m_iHighlight>=0)
+				{
+					m_pSF->m_Intrados.m_iHighlight = -10;
+				}
+			}
+			UpdateView();
+		}
+		else if (m_pPF->m_bVisible)
+		{
+			bool bFound = false;
+			int n = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>0 && n<=m_pPF->m_Extrados.m_iPoints)
+			{
+				m_pPF->m_Extrados.m_iHighlight = n;
+				bFound = true;
+			}
+			else if(m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
+			{
+				m_pPF->m_Extrados.m_iHighlight = -1;
+				bFound = true;
+			}
+
+			n = m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>0 && n<=m_pPF->m_Intrados.m_iPoints)
+			{
+				m_pPF->m_Intrados.m_iHighlight = n;
+				bFound = true;
+			}
+			else if(m_pPF->m_Intrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
+			{
+				m_pPF->m_Intrados.m_iHighlight = -1;
+				bFound = true;
+			}
+			if(!bFound)
+			{
+				m_pPF->m_Extrados.m_iHighlight = -10;
+				m_pPF->m_Intrados.m_iHighlight = -10;
+			}
+		}
 	}
 	UpdateView();
 }
@@ -438,7 +644,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 void QAFoil::mousePressEvent(QMouseEvent *event)
 {
 	QPoint point = event->pos();
-
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	CVector Real = MousetoReal(point);
 
 	// get a reference for mouse movements 
@@ -498,7 +704,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 			
 				m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 				m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-
+//qDebug() << "Selected  " <<m_pSF->m_Extrados.m_iSelect<<m_pSF->m_Intrados.m_iSelect;
 				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
 				{
 					TakePicture();
@@ -506,7 +712,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 
 				if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10)
 				{
-					setCursor(m_hcMove);
+					p2DWidget->setCursor(m_hcMove);
 					m_bTrans = true;
 				}
 			}
@@ -563,7 +769,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 
 				if(m_pPF->m_Extrados.m_iSelect ==-10 && m_pPF->m_Intrados.m_iSelect ==-10)
 				{
-					setCursor(m_hcMove);
+					p2DWidget->setCursor(m_hcMove);
 					m_bTrans = true;
 				}
 			}
@@ -579,6 +785,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 	m_bTrans = false;
 	QPoint point = event->pos();
 //	m_pACtrl->UpdateFoil(-10);
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
 	if(m_bZoomPlus && m_rCltRect.contains(point))
 	{
@@ -609,7 +816,8 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 			//scale view
 			m_ptOffset.rx() = (int)(ZoomFactor * (m_ptOffset.x()-a)+a);
 			m_ptOffset.ry() = (int)(ZoomFactor * (m_ptOffset.y()-b)+b);
-			m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
+
+			m_ZoomRect.setRight(m_ZoomRect.left()-1);
 		}
 		else 
 		{
@@ -632,8 +840,92 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 		{
 			m_pPF->CompMidLine();
 		}
-		setCursor(m_hcCross);
+		p2DWidget->setCursor(m_hcCross);
 	}
+
+	UpdateView();
+}
+
+
+void QAFoil::OnGrid()
+{
+	AFoilGridDlg dlg(this);
+
+	dlg.m_bNeutralLine = m_bNeutralLine;
+	dlg.m_NeutralStyle = m_NeutralStyle;
+	dlg.m_NeutralWidth = m_NeutralWidth;
+	dlg.m_NeutralColor = m_NeutralColor;
+
+	dlg.m_bXGrid     = m_bXGrid;
+	dlg.m_bXMinGrid  = m_bXMinGrid;
+	dlg.m_XStyle     = m_XGridStyle;
+	dlg.m_XWidth     = m_XGridWidth;
+	dlg.m_XColor     = m_XGridColor;
+	dlg.m_XUnit      = m_XGridUnit;
+	dlg.m_XMinStyle  = m_XMinStyle;
+	dlg.m_XMinWidth  = m_XMinWidth;
+	dlg.m_XMinColor  = m_XMinColor;
+	dlg.m_XMinUnit   = m_XMinUnit;
+
+	dlg.m_bYGrid     = m_bYGrid;
+	dlg.m_bYMinGrid  = m_bYMinGrid;
+	dlg.m_YStyle     = m_YGridStyle;
+	dlg.m_YWidth     = m_YGridWidth;
+	dlg.m_YColor     = m_YGridColor;
+	dlg.m_YUnit      = m_YGridUnit;
+	dlg.m_YMinStyle  = m_YMinStyle;
+	dlg.m_YMinWidth  = m_YMinWidth;
+	dlg.m_YMinColor  = m_YMinColor;
+	dlg.m_YMinUnit   = m_YMinUnit;
+
+	dlg.InitDialog();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		m_bNeutralLine = dlg.m_bNeutralLine;
+		m_NeutralStyle = dlg.m_NeutralStyle;
+		m_NeutralWidth = dlg.m_NeutralWidth;
+		m_NeutralColor = dlg.m_NeutralColor;
+
+		m_bXGrid     = dlg.m_bXGrid;
+		m_bXMinGrid  = dlg.m_bXMinGrid;
+		m_XGridStyle = dlg.m_XStyle;
+		m_XGridWidth = dlg.m_XWidth;
+		m_XGridColor = dlg.m_XColor;
+		m_XGridUnit  = dlg.m_XUnit;
+		m_XMinStyle  = dlg.m_XMinStyle;
+		m_XMinWidth  = dlg.m_XMinWidth;
+		m_XMinColor  = dlg.m_XMinColor;
+		m_XMinUnit   = dlg.m_XMinUnit;
+
+		m_bYGrid     = dlg.m_bYGrid;
+		m_bYMinGrid  = dlg.m_bYMinGrid;
+		m_YGridStyle = dlg.m_YStyle;
+		m_YGridWidth = dlg.m_YWidth;
+		m_YGridColor = dlg.m_YColor;
+		m_YGridUnit  = dlg.m_YUnit;
+		m_YMinStyle  = dlg.m_YMinStyle;
+		m_YMinWidth  = dlg.m_YMinWidth;
+		m_YMinColor  = dlg.m_YMinColor;
+		m_YMinUnit   = dlg.m_YMinUnit;
+	}
+
+	UpdateView();
+}
+
+
+void QAFoil::OnCellChanged(QWidget *pWidget)
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QModelIndex index = m_pctrlFoilTable->currentIndex();
+	QStandardItem *pItem = m_pFoilModel->item(index.row(),12);
+	bool bVisible = pItem->checkState();
+
+	pItem = m_pFoilModel->item(index.row(),0);
+	QString FoilName =pItem->text();
+
+	CFoil *pFoil= pMainFrame->GetFoil(FoilName);
+	if(pFoil) pFoil->m_bVisible = bVisible;
 
 	UpdateView();
 }
@@ -641,21 +933,26 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 void QAFoil::OnFoilClicked(const QModelIndex& index)
 {
-	if(index.row()>=m_poaFoil->size())
-	{
-		return;
-	}
+	if(index.row()>=m_poaFoil->size()) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	QString FoilName = index.model()->data(index, Qt::EditRole).toString();
+
+	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
+	QString FoilName =pItem->text();
+
 	CFoil *pFoil= pMainFrame->GetFoil(FoilName);
 	SetFoil(pFoil);
 }
 
-void QAFoil::OnCenterLine()
+void QAFoil::OnCenterLine(bool bState)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_FoilSelection==0)
+	if(m_pCurFoil)
+	{
+		if(m_pctrlCenterLine->isChecked()) m_pCurFoil->m_bCenterLine = true;
+		else                               m_pCurFoil->m_bCenterLine = false;
+	}
+	else
 	{
 		if(m_bSF)
 		{
@@ -668,13 +965,9 @@ void QAFoil::OnCenterLine()
 			else                               m_pPF->m_bCenterLine = false;
 		}
 	}
-	else if(m_pCurFoil)
-	{
-		if(m_pctrlCenterLine->isChecked()) m_pCurFoil->m_bCenterLine = true;
-		else                               m_pCurFoil->m_bCenterLine = false;
-	}
+
 	pMainFrame->SetSaveState(false);
-	pMainFrame->UpdateView();
+	UpdateView();
 }
 
 
@@ -695,31 +988,33 @@ void QAFoil::OnFoilStyle()
 		m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
 		m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
 		m_pCurFoil->m_FoilColor = dlg.GetColor();
+		UpdateView();
 	}
 }
 
 
-void QAFoil::OnModelPoints()
+void QAFoil::OnPoints(bool bState)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_FoilSelection==0)
+
+	if(m_pCurFoil)
+	{
+		if (m_pctrlFoilPoints->isChecked()) m_pCurFoil->m_bPoints = true;
+		else m_pCurFoil->m_bPoints = false;
+	}
+	else
 	{
 		if(m_bSF)
 		{
-			if(m_pctrlModelPoints->isChecked()) m_pSF->m_bOutPoints = true;
+			if(m_pctrlFoilPoints->isChecked()) m_pSF->m_bOutPoints = true;
 			else                                m_pSF->m_bOutPoints = false;
 		}
 		else
 		{
-			if(m_pctrlModelPoints->isChecked()) m_pPF->m_bOutPoints = true;
+			if(m_pctrlFoilPoints->isChecked()) m_pPF->m_bOutPoints = true;
 			else                                m_pPF->m_bOutPoints = false;
 			m_pPF->SetOutPoints(m_pPF->m_bOutPoints);
 		}
-	}
-	else if(m_pCurFoil)
-	{
-		if (m_pctrlModelPoints->isChecked()) m_pCurFoil->m_bPoints = true;
-		else m_pCurFoil->m_bPoints = false;
 	}
 
 	pMainFrame->SetSaveState(false);
@@ -727,11 +1022,15 @@ void QAFoil::OnModelPoints()
 }
 
 
-void QAFoil::OnVisible()
+void QAFoil::OnVisible(bool bState)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	if(m_FoilSelection==0)
+	if(m_pCurFoil)
+	{
+		if(m_pctrlVisible->isChecked()) ShowFoil(m_pCurFoil, true);
+		else                            ShowFoil(m_pCurFoil, false);
+	}
+	else
 	{
 		if(m_bSF)
 		{
@@ -743,11 +1042,7 @@ void QAFoil::OnVisible()
 			else                            m_pPF->m_bVisible = false;
 		}
 	}
-	else if(m_pCurFoil)
-	{
-		if(m_pctrlVisible->isChecked()) ShowFoil(m_pCurFoil, true);
-		else                            ShowFoil(m_pCurFoil, false);
-	}
+
 	pMainFrame->SetSaveState(false);
 	UpdateView();
 }
@@ -787,6 +1082,167 @@ void QAFoil::OnDuplicate()
 	}	
 }
 
+
+void QAFoil::OnRenameFoil()
+{
+	if(!m_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->OnRenameCurFoil();
+}
+
+void QAFoil::OnStoreSplines()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_bSF)
+	{
+		if(m_pSF->m_Extrados.m_iRes>IQX2)
+		{
+			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+		if(m_pSF->m_Intrados.m_iRes>IQX2)
+		{
+			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+
+
+		CFoil *pNewFoil = new CFoil();
+		m_pSF->ExportToBuffer(pNewFoil);
+
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilName = "";
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			delete pNewFoil;
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+	else
+	{
+		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+
+		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+//		Trace("m_iPts_Int=",size);
+
+		CFoil *pNewFoil = new CFoil();
+		m_pPF->ExportToBuffer(pNewFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilName = "";
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			delete pNewFoil;
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+	UpdateView();
+}
+
+void QAFoil::OnZoomIn()
+{
+	// can't do two things at the same time can we ?
+	if(!m_bZoomPlus)
+	{
+		if(m_fScale/m_fRefScale <32.0)
+		{
+			m_bZoomPlus = true;
+//			CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//			pTB->PressButton(IDT_ZOOMIN, true);
+		}
+		else
+		{
+			ReleaseZoom();
+		}
+	}
+	else {
+		ReleaseZoom();
+	}
+}
+
+void QAFoil::OnZoomYOnly()
+{
+	TwoDWidget *p2Dwidget = (TwoDWidget*)m_p2DWidget;
+//	CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+	m_bZoomYOnly = !m_bZoomYOnly;
+//	if(m_bZoomYOnly)	pTB->PressButton(IDT_ZOOMYONLY, true);
+//	else				pTB->PressButton(IDT_ZOOMYONLY, false);
+	p2Dwidget->setFocus();
+
+}
+
+
+void QAFoil::OnResetYScale()
+{
+	m_fScaleY = 1.0;
+	UpdateView();
+}
+
+
+
+void QAFoil::OnZoomLess()
+{
+	// can't do two things at the same time can we ?
+	ReleaseZoom();
+
+	double ZoomFactor = 0.8;
+	double newScale = qMax(ZoomFactor*m_fScale, m_fRefScale);
+
+	ZoomFactor = qMax(ZoomFactor, newScale/m_fScale);
+
+	m_fScale = ZoomFactor*m_fScale;
+	int a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
+	int b = (int)((m_rCltRect.top()+m_rCltRect.bottom())/2);
+
+	//scale
+	m_ptOffset.rx() = (int)(ZoomFactor*(m_ptOffset.x()-a)+a);
+	m_ptOffset.ry() = (int)(ZoomFactor*(m_ptOffset.y()-b)+b);
+
+	UpdateView();
+}
+
+
+void QAFoil::OnZoomOut()
+{
+	SetScale();
+	ReleaseZoom();
+	UpdateView();
+}
 
 void QAFoil::PaintLegend(QPainter &painter)
 {
@@ -829,6 +1285,63 @@ void QAFoil::PaintView(QPainter &painter)
 
 void QAFoil::PaintGrids(QPainter &painter)
 {
+	painter.save();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	QColor color;
+	int style, width;
+
+	if(m_bZoomPlus && !m_ZoomRect.isEmpty())
+	{
+		QRect ZRect = m_ZoomRect.normalized();
+		QPen ZoomPen(QColor(100,100,100));
+		ZoomPen.setStyle(Qt::DashLine);
+		QBrush ZoomBrush(pMainFrame->m_BackgroundColor);
+		painter.setPen(ZoomPen);
+		painter.setBrush(ZoomBrush);
+		painter.drawRect(ZRect);
+	}
+
+	if(m_bCircle)
+	{
+		int rx = (int)(m_LERad/100.0 * m_fScale);
+		int ry = (int)(m_LERad/100.0 * m_fScale * m_fScaleY);
+		QRect rc(m_ptOffset.x(), m_ptOffset.y() - ry, m_ptOffset.x()+2*rx,m_ptOffset.y() + ry);
+
+		QPen CirclePen(QColor(128,128,128));
+		CirclePen.setStyle(Qt::DashLine);
+		painter.setPen(CirclePen);
+		painter.drawEllipse(rc);
+	}
+	if (m_bNeutralLine)
+	{
+		color = m_NeutralColor;
+		style = m_NeutralStyle;
+		width = m_NeutralWidth;
+		QPen NPen(m_NeutralColor);
+		NPen.setStyle(GetStyle(m_NeutralStyle));
+		NPen.setWidth(m_NeutralWidth);
+		painter.setPen(NPen);
+
+		painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());
+	}
+
+
+
+//draw grids
+	if(m_bXGrid)	DrawXGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bYGrid)	DrawYGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bXMinGrid) DrawXMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bYMinGrid) DrawYMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+
+/*	pDC->SetTextColor(pChildView->m_WndTextColor);
+	CFont RFont;
+	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
+	CFont *pOldFont = pDC->SelectObject(&RFont);
+
+	if(m_bScale) DrawScale(pDC, &m_rDrawRect, m_fScale, m_ptOffset,false);*/
+
+	painter.restore();
 }
 
 
@@ -970,15 +1483,16 @@ void QAFoil::PaintFoils(QPainter &painter)
 
 void QAFoil::ReleaseZoom()
 {
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	m_bZoomPlus = false;
 	m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
-
-	setCursor(m_hcCross);
+	p2DWidget->setCursor(m_hcCross);
 }
 
 
 void QAFoil::SetScale()
-{//scale is set by user zooming
+{
+	//scale is set by user zooming
 	m_fRefScale = (double)m_rCltRect.width()-150.0;
 
 	m_fScale = m_fRefScale;
@@ -997,7 +1511,8 @@ void QAFoil::SetScale()
 
 
 void QAFoil::SetScale(QRect CltRect)
-{//scale is set by ChildView
+{
+	//scale is set by ChildView
 	m_rCltRect = CltRect;
 
 	int width = m_rCltRect.width();
@@ -1018,48 +1533,8 @@ void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
 
 void QAFoil::SetParams()
 {
-	m_pFoilModel = new QStandardItemModel;
-	m_pFoilModel->setRowCount(10);//temporary
-	m_pFoilModel->setColumnCount(10);
-
-	m_pFoilModel->setHeaderData(0, Qt::Horizontal, "Name");
-	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Camber");
-	m_pFoilModel->setHeaderData(2, Qt::Horizontal, "at");
-	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Thickness");
-	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at");
-
-
-	m_pctrlFoilTable->setModel(m_pFoilModel);
-	m_pctrlFoilTable->setWindowTitle("Foils");
-
-	m_pFoilDelegate = new FoilTableDelegate;
-	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
-
-	int  *precision = new int[10];
-	precision[0] = 2;//five digits for x and y coordinates
-	precision[1] = 2;
-	precision[2] = 2;
-	precision[3] = 1;
-	precision[4] = 2;
-	precision[5] = 1;
-	precision[6] = 0;
-	precision[7] = 0;
-	precision[8] = 0;
-	precision[9] = 0;
-	m_pFoilDelegate->m_Precision = precision;
-
 	FillFoilTable();
-
-	m_pctrlFoilTable->setColumnWidth(0,70);
-	m_pctrlFoilTable->setColumnWidth(1,70);
-	m_pctrlFoilTable->setColumnWidth(2,70);
-	m_pctrlFoilTable->setColumnWidth(3,70);
-	m_pctrlFoilTable->setColumnWidth(4,70);
-	m_pctrlFoilTable->setColumnWidth(5,130);
-	m_pctrlFoilTable->setColumnWidth(6,50);
-	m_pctrlFoilTable->setColumnWidth(7,80);
-	m_pctrlFoilTable->setColumnWidth(8,50);
-	m_pctrlFoilTable->setColumnWidth(9,80);
+	m_pctrlFoilTable->adjustSize();
 }
 
 
@@ -1101,8 +1576,6 @@ void QAFoil::SelectFoil(CFoil* pFoil)
 void QAFoil::SetFoil(CFoil *pFoil)
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	CFoil * pOldFoil = NULL;
-	int i;
 
 	pMainFrame->m_pCurFoil = pFoil;
 	m_pCurFoil = pFoil;
@@ -1113,14 +1586,14 @@ void QAFoil::SetFoil(CFoil *pFoil)
 		{
 			m_pctrlVisible->setChecked(m_pSF->m_bVisible);
 			m_pctrlCenterLine->setChecked(m_pSF->m_bCenterLine);
-			m_pctrlModelPoints->setChecked(m_pSF->m_bOutPoints);
+			m_pctrlFoilPoints->setChecked(m_pSF->m_bOutPoints);
 			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
 		}
 		else
 		{
 			m_pctrlVisible->setChecked(m_pPF->m_bVisible);
 			m_pctrlCenterLine->setChecked(m_pPF->m_bCenterLine);
-			m_pctrlModelPoints->setChecked(m_pPF->m_bOutPoints);
+			m_pctrlFoilPoints->setChecked(m_pPF->m_bOutPoints);
 			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
 		}
 	}
@@ -1128,7 +1601,7 @@ void QAFoil::SetFoil(CFoil *pFoil)
 	{
 		m_pctrlVisible->setChecked(pFoil->m_bVisible);
 		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
-		m_pctrlModelPoints->setChecked(pFoil->m_bPoints);
+		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
 		m_pctrlFoilStyle->SetStyle(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
 	}
 }
@@ -1231,7 +1704,7 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilStyle   = new LineButton;
 	m_pctrlVisible     = new QCheckBox("Show Foil");
 	m_pctrlCenterLine  = new QCheckBox("Show Centerline");
-	m_pctrlModelPoints = new QCheckBox("Show Points");
+	m_pctrlFoilPoints = new QCheckBox("Show Points");
 	m_pctrlRename      = new QPushButton("Rename");
 	m_pctrlDelete      = new QPushButton("Delete");
 	m_pctrlDuplicate   = new QPushButton("Duplicate");
@@ -1244,7 +1717,7 @@ void QAFoil::SetupLayout()
 	RightControls->addStretch(1);
 	RightControls->addWidget(m_pctrlVisible);
 	RightControls->addWidget(m_pctrlCenterLine);
-	RightControls->addWidget(m_pctrlModelPoints);
+	RightControls->addWidget(m_pctrlFoilPoints);
 
 	QHBoxLayout *MainLayout = new QHBoxLayout;
 	MainLayout->addWidget(m_pctrlFoilTable);
@@ -1252,14 +1725,71 @@ void QAFoil::SetupLayout()
 
 	setLayout(MainLayout);
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	connect(m_pctrlFoilStyle, SIGNAL(clicked()), this, SLOT(OnFoilStyle()));
-//	connect(m_pctrlRename, SIGNAL(clicked()), pMainFrame, SLOT(OnRenameCurFoil()));
+	connect(m_pctrlRename, SIGNAL(clicked()), this, SLOT(OnRenameFoil()));
 	connect(m_pctrlDelete, SIGNAL(clicked()), this, SLOT(OnDelete()));
 	connect(m_pctrlDuplicate, SIGNAL(clicked()), this, SLOT(OnDuplicate()));
+	connect(m_pctrlFoilPoints, SIGNAL(clicked(bool)), this, SLOT(OnPoints(bool)));
+	connect(m_pctrlVisible, SIGNAL(clicked(bool)), this, SLOT(OnVisible(bool)));
+	connect(m_pctrlCenterLine, SIGNAL(clicked(bool)), this, SLOT(OnCenterLine(bool)));
 
 	connect(m_pctrlFoilTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
 	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
+
+
+	m_pFoilModel = new QStandardItemModel;
+	m_pFoilModel->setRowCount(10);//temporary
+	m_pFoilModel->setColumnCount(13);
+
+	m_pFoilModel->setHeaderData(0, Qt::Horizontal, "Name");
+	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Camber");
+	m_pFoilModel->setHeaderData(2, Qt::Horizontal, "at");
+	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Thickness");
+	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at");
+	m_pFoilModel->setHeaderData(5, Qt::Horizontal, "Points");
+	m_pFoilModel->setHeaderData(6, Qt::Horizontal, "TE Flap");
+	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "TE XHinge");
+	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "TE YHinge");
+	m_pFoilModel->setHeaderData(9, Qt::Horizontal, "LE Flap");
+	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "LE XHinge");
+	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "LE YHinge");
+	m_pFoilModel->setHeaderData(12, Qt::Horizontal, "Visible");
+
+	m_pctrlFoilTable->setModel(m_pFoilModel);
+	m_pctrlFoilTable->setWindowTitle("Foils");
+
+	m_pFoilDelegate = new FoilTableDelegate;
+	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
+	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
+
+	int  *precision = new int[10];
+	precision[0]  = 2;
+	precision[1]  = 2;
+	precision[2]  = 2;
+	precision[3]  = 2;
+	precision[4]  = 2;
+	precision[5]  = 0;
+	precision[6]  = 2;
+	precision[7]  = 2;
+	precision[8]  = 2;
+	precision[9]  = 2;
+	precision[10] = 2;
+	precision[11] = 2;
+
+	m_pFoilDelegate->m_Precision = precision;
+	connect(m_pFoilDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
+
+
+	m_pctrlFoilTable->setColumnWidth(0,100);
+	m_pctrlFoilTable->setColumnWidth(1,70);
+	m_pctrlFoilTable->setColumnWidth(2,70);
+	m_pctrlFoilTable->setColumnWidth(3,70);
+	m_pctrlFoilTable->setColumnWidth(4,70);
+	m_pctrlFoilTable->setColumnWidth(5,50);
+	m_pctrlFoilTable->setColumnWidth(6,50);
+	m_pctrlFoilTable->setColumnWidth(7,80);
+	m_pctrlFoilTable->setColumnWidth(8,50);
+	m_pctrlFoilTable->setColumnWidth(9,80);
 
 }
 
@@ -1308,11 +1838,6 @@ void QAFoil::TakePicture()
 
 
 void QAFoil::UpdateFoil(int iFoil)
-{
-}
-
-
-void QAFoil::UpdateBlt()
 {
 }
 
@@ -1378,3 +1903,19 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 	UpdateView();
 }
 
+
+void QAFoil::LoadSettings(QDataStream &ar)
+{
+	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
+	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
+	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
+	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
+
+}
+void QAFoil::SaveSettings(QDataStream &ar)
+{
+	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
+	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
+	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
+	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
+}
