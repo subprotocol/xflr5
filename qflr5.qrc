@@ -6,6 +6,11 @@
     <file>images/open.png</file>
     <file>images/paste.png</file>
     <file>images/save.png</file>
+    <file>images/storesplines.png</file>
+    <file>images/ZoomIn.png</file>
+    <file>images/ZoomOut.png</file>
+    <file>images/ZoomLess.png</file>
+    <file>images/ZoomY.png</file>
     <file>images/Q5.png</file>
 </qresource>
 </RCC>

@@ -44,6 +44,10 @@ public:
 	void GenerateFoil();
 	void keyPressEvent(QKeyEvent *event);
 
+	static void *s_pXFoil;
+	void *m_pXDirect;
+	void *m_pAFoil;
+
 	CFoil *m_pBufferFoil;
 	QPushButton *OKButton, *CancelButton;
 	QLineEdit *m_pctrlNumber;
@@ -52,8 +56,6 @@ public:
 
 	bool m_bApplied;
 	bool m_bGenerated;
-	void *m_pXFoil;
-	void *m_pXDirect;
 	int m_Digits;
 
 };

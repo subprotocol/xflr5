@@ -31,11 +31,12 @@ class CAddDlg : public QDialog
 {
 	Q_OBJECT
 
+	friend class MainFrame;
 	friend class QXDirect;
 	friend class QAFoil;
 
 public:
-	CAddDlg(void* pParent = NULL);
+	CAddDlg();
 	void InitDialog();
 	void SetupLayout();
 
@@ -48,6 +49,7 @@ private slots:
 
 
 private:
+	static void* s_pXFoil;
 
 	QPushButton	*ApplyButton, *OKButton, *CancelButton;
 	QLabel *m_pctrlAtPanel;
@@ -63,7 +65,7 @@ private:
 	CFoil* m_pMemFoil;
 	CFoil* m_pBufferFoil;
 	void* m_pXDirect;
-	void* m_pXFoil;
+	void* m_pAFoil;
 	QString Title;
 	double atol;
 	int m_iSplineType;

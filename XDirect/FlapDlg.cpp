@@ -22,10 +22,13 @@
 
 #include "FlapDlg.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
+
 
 FlapDlg::FlapDlg(void *pParent)
 {
-	m_pXDirect = pParent;
+	m_pAFoil   = NULL;
+	m_pXDirect = NULL;
 	m_pMemFoil    = NULL;
 	m_pBufferFoil = NULL;
 	m_bTEFlap     = false;
@@ -79,7 +82,7 @@ void FlapDlg::SetupLayout()
 	m_pctrlTEFlapAngle->setMaximumWidth(70);
 
 	QLabel *lab1 = new QLabel("Flap Angle");
-	QLabel *lab2 = new QLabel("° (+ is down)");
+	QLabel *lab2 = new QLabel("deg (+ is down)");
 	QLabel *lab3 = new QLabel("Hinge X Position");
 	QLabel *lab4 = new QLabel("% Chord");
 	QLabel *lab5 = new QLabel("Hinge Y Position");
@@ -162,7 +165,9 @@ void FlapDlg::ReadParams()
 
 void FlapDlg::OnApply()
 {
+qDebug() << m_pAFoil << m_pXDirect;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
 	if(m_bApplied) return;
 	//reset everything and retry
@@ -175,17 +180,19 @@ void FlapDlg::OnApply()
 
 	m_bApplied = true;
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect)    pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
+
 
 void FlapDlg::keyPressEvent(QKeyEvent *event)
 {
-	// Prevent Return Key from closing App
 	switch (event->key())
 	{
 		case Qt::Key_Escape:
 		{
 			done(0);
+			return;
 		}
 		case Qt::Key_Return:
 		{
@@ -202,7 +209,7 @@ void FlapDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			break;
 	}
 
 	QDialog::keyPressEvent(event);

@@ -344,10 +344,9 @@ void Graph::GetGraphName(QString &GraphName)
 
 
 
-CVector Graph::GetOffset()
+QPoint Graph::GetOffset()
 {
-	CVector V((double)m_ptoffset.x(), (double)m_ptoffset.y(), 0.0);
-	return V;
+	return m_ptoffset;
 }
 
 

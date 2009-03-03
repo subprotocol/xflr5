@@ -73,13 +73,13 @@ bool CSF::InitSplineFoil()
 	m_Extrados.m_Width = m_FoilWidth;
 	m_Extrados.m_iCtrlPoints = 0;
 	m_Extrados.m_iRes = 30;
-	m_Extrados.InsertPoint(0.f , 0.f);
-	m_Extrados.InsertPoint(0.f , 0.00774066f);
-	m_Extrados.InsertPoint(0.0306026f, 0.0343829f);
-	m_Extrados.InsertPoint(0.289036f , 0.0504014f);
-	m_Extrados.InsertPoint(0.576000f,  0.0350933f);
-	m_Extrados.InsertPoint(0.736139f , 0.0269428f);
-	m_Extrados.InsertPoint(1.f , 0.f);
+	m_Extrados.InsertPoint(0.0 , 0.0);
+	m_Extrados.InsertPoint(0.0 , 0.00774066);
+	m_Extrados.InsertPoint(0.0306026, 0.0343829);
+	m_Extrados.InsertPoint(0.289036 , 0.0504014);
+	m_Extrados.InsertPoint(0.576000,  0.0350933);
+	m_Extrados.InsertPoint(0.736139 , 0.0269428);
+	m_Extrados.InsertPoint(1. , 0.);
 	m_Extrados.SplineKnots();
 	m_Extrados.SplineCurve();
 
@@ -88,13 +88,13 @@ bool CSF::InitSplineFoil()
 	m_Intrados.m_Width = m_FoilWidth;
 	m_Intrados.m_iCtrlPoints = 0;
 	m_Intrados.m_iRes = 30;
-	m_Intrados.InsertPoint(0.f , 0.f);
-	m_Intrados.InsertPoint(0.f , -0.00774066f);
-	m_Intrados.InsertPoint(0.0306026f, -0.0343829f);
-	m_Intrados.InsertPoint(0.289036f , -0.0504014f);
-	m_Intrados.InsertPoint(0.576000f,  -0.0350933f);
-	m_Intrados.InsertPoint(0.736139f , -0.0269428f);
-	m_Intrados.InsertPoint(1.f , 0.f);
+	m_Intrados.InsertPoint(0. , 0.);
+	m_Intrados.InsertPoint(0. , -0.00774066);
+	m_Intrados.InsertPoint(0.0306026, -0.0343829);
+	m_Intrados.InsertPoint(0.289036 , -0.0504014);
+	m_Intrados.InsertPoint(0.576000,  -0.0350933);
+	m_Intrados.InsertPoint(0.736139 , -0.0269428);
+	m_Intrados.InsertPoint(1. , 0.);
 	m_Intrados.SplineKnots();
 	m_Intrados.SplineCurve();
 
@@ -239,6 +239,13 @@ bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
 		ReadCOLORREF(ar, m_FoilColor);
 		ar >>m_FoilStyle >> m_FoilWidth;
 
+		m_Extrados.SetStyle(m_FoilStyle);
+		m_Extrados.SetWidth(m_FoilWidth);
+		m_Extrados.SetColor(m_FoilColor);
+		m_Intrados.SetStyle(m_FoilStyle);
+		m_Intrados.SetWidth(m_FoilWidth);
+		m_Intrados.SetColor(m_FoilColor);
+
 		ar >> m_Extrados.m_iCtrlPoints;
 		ar >> m_Extrados.m_iDegree;
 		for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
@@ -382,3 +389,26 @@ void CSF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Of
 	}
 	painter.restore();
 }
+
+bool CSF::Export(QTextStream &out)
+{
+	m_Extrados.Export(out, true);
+	m_Intrados.Export(out, false);
+	return true;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

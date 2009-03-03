@@ -325,7 +325,7 @@ void FoilPolarDlg::SetPlrName()
         {
                 m_PlrName = QString("T%1_Al%2_M%3").arg(m_Type).arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
         }
-	QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
+		QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
         m_PlrName += str;
 
         m_pctrlAnalysisName->setText(m_PlrName);

@@ -36,7 +36,7 @@ class CSF
 {
 	friend class QAFoil;;
 	friend class MainFrame;
-
+	friend class SplineCtrlDlg;
 
 public:
 	CSF();
@@ -44,9 +44,8 @@ public:
 
 private:
 	bool CompMidLine();
-
+	bool Export(QTextStream &out);
 	bool InitSplineFoil();
-
 	bool Serialize(QDataStream &ar, bool bIsStoring);
 
 	void Copy(CSF* pSF);

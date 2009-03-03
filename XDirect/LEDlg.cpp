@@ -24,14 +24,17 @@
 #include "LEDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
 
 
+void *LEDlg::s_pXFoil;
 
-LEDlg::LEDlg(void *pParent)
+LEDlg::LEDlg()
 {
 	m_LErfac    = 1.0;
 	m_Blend     = 0.1;
-	m_pXDirect  = pParent;
+	m_pAFoil    = NULL;
+	m_pXDirect  = NULL;
 	m_bModified = false;
 	m_bApplied  = true;
 
@@ -102,6 +105,7 @@ void LEDlg::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			done(0);
+			return;
 		}
 		case Qt::Key_Return:
 		{
@@ -118,7 +122,7 @@ void LEDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			break;
 	}
 
 	QDialog::keyPressEvent(event);
@@ -145,9 +149,12 @@ void LEDlg::OnChanged()
 void LEDlg::OnApply()
 {
 	if(m_bApplied) return;
+
 	//reset everything and retry
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+
 	int i, j;
 
 	for (i=0; i< m_pMemFoil->nb; i++)
@@ -206,7 +213,9 @@ void LEDlg::OnApply()
 	}
 	m_bApplied = true;
 	m_bModified = true;
-	pXDirect->UpdateView();
+
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 
 }
 

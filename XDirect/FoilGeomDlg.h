@@ -31,8 +31,10 @@
 class FoilGeomDlg : public QDialog
 {
 	Q_OBJECT
-
+	friend class QAFoil;
 	friend class QXDirect;
+	friend class MainFrame;
+
 public:
 	FoilGeomDlg();
 	void InitDialog();
@@ -67,14 +69,18 @@ private:
 
 
 private:
+	static void* s_pXFoil;
+
 	double m_fCamber;
 	double m_fThickness;
 	double m_fXCamber;
 	double m_fXThickness;
-	void* m_pXFoil;
 	CFoil* m_pBufferFoil;
 	CFoil* m_pMemFoil;
+
 	void *m_pXDirect;
+	void *m_pAFoil;
+
 	bool  m_bApplied,m_bAppliedX, m_bModified;
 
 };

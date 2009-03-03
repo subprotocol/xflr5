@@ -18,10 +18,12 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+#include "../Design/AFoil.h"
 #include "XDirect.h"
 #include "XFoil.h"
 #include "FoilGeomDlg.h"
+
+void *FoilGeomDlg::s_pXFoil;
 
 FoilGeomDlg::FoilGeomDlg()
 {
@@ -210,13 +212,15 @@ void FoilGeomDlg::SetupLayout()
 void FoilGeomDlg::Apply()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	//reset everything and retry
 	int i,j;
 
 	for (i=0; i< m_pMemFoil->nb; i++)
 	{
-		pXFoil->xb[i+1] = m_pMemFoil->xb[i] ;
+		pXFoil->xb[i+1] = m_pMemFoil->xb[i];
 		pXFoil->yb[i+1] = m_pMemFoil->yb[i];
 	}
 	pXFoil->nb = m_pMemFoil->nb;
@@ -282,7 +286,8 @@ void FoilGeomDlg::Apply()
 		m_pBufferFoil->SetFlap();
 	}
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 
 }
 
@@ -295,6 +300,7 @@ void FoilGeomDlg::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			done(0);
+			return;
 		}
 		case Qt::Key_Return:
 		{
@@ -312,7 +318,7 @@ void FoilGeomDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			break;
 	}
 
 	QDialog::keyPressEvent(event);
@@ -355,7 +361,8 @@ void FoilGeomDlg::InitDialog()
 void FoilGeomDlg::OnRestore()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
 	m_pBufferFoil->CopyFoil(m_pMemFoil);
 
@@ -381,7 +388,8 @@ void FoilGeomDlg::OnRestore()
 	m_bAppliedX = true;
 	m_bModified = false;
 
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
 
 

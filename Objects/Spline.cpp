@@ -88,13 +88,14 @@ void CSpline::Copy(CSpline *pSpline)
 
 
 
-void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {
 	painter.save();
 
 	QPoint pt;
 	int i, width;
 
+	scaley = -scaley;
 	width  = 3;
 
 	QPen PointPen;
@@ -133,7 +134,7 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QP
 
 
 
-void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley, QPoint Offset)
 {
 	painter.save();
 	QPoint pt;
@@ -158,10 +159,10 @@ void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley,
 }
 
 
-void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoint Offset)
 {
 	painter.save();
-
+	scaley = -scaley;
 	QPoint From, To;
 
 	QPen SplinePen(m_Color);
@@ -173,13 +174,13 @@ void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoin
 
 	if(m_iCtrlPoints>0)
 	{ 
-		From.rx() = (int)( m_Output[0].x * scalex + Offset.x());
-		From.ry() = (int)(-m_Output[0].y * scaley + Offset.y());
+		From.rx() = (int)(m_Output[0].x * scalex + Offset.x());
+		From.ry() = (int)(m_Output[0].y * scaley + Offset.y());
 
 		for(k=1; k<m_iRes;k++) 
 		{
-			To.rx() = (int)( m_Output[k].x * scalex + Offset.x());
-			To.ry() = (int)(-m_Output[k].y * scaley + Offset.y());
+			To.rx() = (int)(m_Output[k].x * scalex + Offset.x());
+			To.ry() = (int)(m_Output[k].y * scaley + Offset.y());
 
 			painter.drawLine(From, To);
 
@@ -190,27 +191,29 @@ void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoin
 }
 
 
-void CSpline::Export(QFile *pFile, bool bExtrados)
+
+void CSpline::Export(QTextStream &out, bool bExtrados)
 {
-        int k;
-        QString strOut;
-        QTextStream out(pFile);
-        if(bExtrados)
-        {
-                for (k=m_iRes-1;k>=0; k--)
-                {
-                        strOut=" %1  %2\n";
-                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
-                        out << strOut;
+	int k;
+	QString strOut;
+
+	if(bExtrados)
+	{
+		for (k=m_iRes-1;k>=0; k--)
+		{
+			strOut=" %1  %2\n";
+			strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
+			out << strOut;
 		}
 	}
-	else {
-                for (k=1;k<m_iRes; k++)
-                {
-                        strOut=" %1  %2\n";
-                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
-                        out << strOut;
-                }
+	else
+	{
+		for (k=1;k<m_iRes; k++)
+		{
+			strOut=" %1  %2\n";
+			strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
+			out << strOut;
+		}
 	}
 }
 
@@ -349,7 +352,7 @@ void CSpline::SetWidth(int width)
 
 
 
-void CSpline::SetColor(int color)
+void CSpline::SetColor(QColor color)
 {
 	m_Color = color;
 }

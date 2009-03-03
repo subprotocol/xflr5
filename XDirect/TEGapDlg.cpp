@@ -23,13 +23,16 @@
 #include "TEGapDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
 
+void *TEGapDlg::s_pXFoil;
 
-TEGapDlg::TEGapDlg(void *pParent)
+TEGapDlg::TEGapDlg()
 {
 	m_Gap   = 0.0;
 	m_Blend = 0.8;
-	m_pXDirect = pParent;
+	m_pAFoil   = NULL;
+	m_pXDirect = NULL;
 	m_bModified = false;
 	m_bApplied  = true;
 
@@ -40,8 +43,8 @@ TEGapDlg::TEGapDlg(void *pParent)
 	connect(ApplyButton, SIGNAL(clicked()),this, SLOT(OnApply()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-
 }
+
 
 void TEGapDlg::SetupLayout()
 {
@@ -94,6 +97,7 @@ void TEGapDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
+
 void TEGapDlg::keyPressEvent(QKeyEvent *event)
 {
 	// Prevent Return Key from closing App
@@ -102,6 +106,7 @@ void TEGapDlg::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			done(0);
+			return;
 		}
 		case Qt::Key_Return:
 		{
@@ -118,11 +123,13 @@ void TEGapDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			break;
 	}
 
 	QDialog::keyPressEvent(event);
 }
+
+
 
 void TEGapDlg::InitDialog()
 {
@@ -154,7 +161,9 @@ void TEGapDlg::OnApply()
 	if(m_bApplied) return;
 	//reset everything and retry
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	int i, j;
 
 	for (i=0; i< m_pMemFoil->nb; i++)
@@ -212,6 +221,7 @@ void TEGapDlg::OnApply()
 	}
 	m_bApplied = true;
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect)    pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 
 }

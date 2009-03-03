@@ -31,10 +31,10 @@ class LEDlg : public QDialog
 {
 	Q_OBJECT
 	friend class QXDirect;
-
+	friend class QAFoil;
 
 public:
-	LEDlg(void *pParent = NULL);
+	LEDlg();
 	void SetupLayout();
 	void InitDialog();
 
@@ -47,17 +47,19 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 
 public:
+	static void* s_pXFoil;
+
+private:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
 	FloatEdit	*m_pctrlBlend, *m_pctrlLE;
 	bool m_bApplied, m_bModified;
 	double m_LErfac, m_Blend;
 
-
+	void *m_pAFoil;
 	void *m_pXDirect;
 
 	CFoil* m_pBufferFoil;
 	CFoil* m_pMemFoil;
-	void* m_pXFoil;
 };
 
 #endif // LEDLG_H

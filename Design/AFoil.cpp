@@ -19,16 +19,29 @@
 
 *****************************************************************************/
 
-
+//QSelectionModel *selections = tableView->selectionModel();
+//QModelIndexList selected = selections->selectedIndexex();
 
 #include <QtGui>
 
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "../XDirect/NacaFoilDlg.h"
+#include "../XDirect/CAddDlg.h"
+#include "../XDirect/TwoDPanelDlg.h"
+#include "../XDirect/TEGapDlg.h"
+#include "../XDirect/LEDlg.h"
+#include "../XDirect/FlapDlg.h"
+#include "../XDirect/FoilCoordDlg.h"
+#include "../XDirect/FoilGeomDlg.h"
+#include "../XDirect/InterpolateFoilsDlg.h"
 #include "../Misc/LinePickerDlg.h"
+#include "../Misc/RenameDlg.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
+#include "SplineCtrlDlg.h"
+
+
 
 QAFoil::~QAFoil()
 {
@@ -36,6 +49,7 @@ QAFoil::~QAFoil()
 //	delete m_pFoilDelegate;
 //	delete m_pFoilModel;
 }
+
 
 QAFoil::QAFoil(QWidget *parent)
 	: QWidget(parent)
@@ -268,11 +282,65 @@ void QAFoil::DrawYMinGrid(QPainter &painter, double scalex, double scaley, QPoin
 void QAFoil::FillFoilTable()
 {
 	int i;
-	m_pFoilModel->setRowCount(m_poaFoil->size());
+	m_pFoilModel->setRowCount(m_poaFoil->size()+1);
+
+	QString str, name;
+	QModelIndex ind;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	double Thickness, xThickness, Camber, xCamber;
+	Thickness = xThickness = Camber = xCamber = 0;
+	int points = 0;
+
+	if(m_bSF)
+	{
+		if(m_pSF) 
+		{
+			name = "Spline foil";
+			Thickness  = m_pSF->m_fThickness*100.0;
+			xThickness = m_pSF->m_fxThickMax*100.0;
+			Camber     = m_pSF->m_fCamber*100.0;
+			xCamber    = m_pSF->m_fxCambMax*100.0;
+			points     = m_pSF->m_OutPoints;
+		}
+	}
+	else
+	{
+		if(m_pPF) 
+		{
+			name = "Splined points foil";
+			Thickness  = m_pPF->m_fThickness*100.0;
+			xThickness = m_pPF->m_fxThickMax*100.0;
+			Camber     = m_pPF->m_fCamber*100.0;
+			xCamber    = m_pPF->m_fxCambMax*100.0;
+			points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
+				     +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
+		}
+	}
+
+
+	ind = m_pFoilModel->index(0, 0, QModelIndex());
+	m_pFoilModel->setData(ind,name);
+
+	ind = m_pFoilModel->index(0, 1, QModelIndex());
+	m_pFoilModel->setData(ind, Thickness);
+
+	ind = m_pFoilModel->index(0, 2, QModelIndex());
+	m_pFoilModel->setData(ind, xThickness);
+
+	ind = m_pFoilModel->index(0, 3, QModelIndex());
+	m_pFoilModel->setData(ind, Camber);
+
+	ind = m_pFoilModel->index(0, 4, QModelIndex());
+	m_pFoilModel->setData(ind,xCamber);
+
+	ind = m_pFoilModel->index(0, 5, QModelIndex());
+	m_pFoilModel->setData(ind, points);
+
 
 	for(i=0; i<m_poaFoil->size(); i++)
 	{
-		FillTableRow(i);
+		FillTableRow(i+1);
 	}
 }
 
@@ -282,7 +350,7 @@ void QAFoil::FillTableRow(int row)
 	QString str, strong;
 	QModelIndex ind;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	CFoil *pFoil = (CFoil*)m_poaFoil->at(row);
+	CFoil *pFoil = (CFoil*)m_poaFoil->at(row-1);
 
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_FoilName);
@@ -407,6 +475,17 @@ CVector QAFoil::MousetoReal(QPoint &point)
 	Real.z = 0.0;
 	
 	return Real;
+}
+
+
+void QAFoil::LoadSettings(QDataStream &ar)
+{
+	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
+	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
+	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
+	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
+	m_pSF->Serialize(ar, false);
+	m_pPF->Serialize(ar, false);
 }
 
 
@@ -704,7 +783,6 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 			
 				m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 				m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-//qDebug() << "Selected  " <<m_pSF->m_Extrados.m_iSelect<<m_pSF->m_Intrados.m_iSelect;
 				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
 				{
 					TakePicture();
@@ -784,7 +862,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 {
 	m_bTrans = false;
 	QPoint point = event->pos();
-//	m_pACtrl->UpdateFoil(-10);
+//	UpdateFoil(-10);
 	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
 	if(m_bZoomPlus && m_rCltRect.contains(point))
@@ -845,6 +923,563 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 	UpdateView();
 }
+
+
+void QAFoil::OnAFoilSetFlap()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	FlapDlg dlg;
+	dlg.m_pAFoil = this;
+	dlg.m_pXFoil      = m_pXFoil;
+	dlg.m_pMemFoil    = m_pCurFoil;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.InitDialog();
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+		SetFoil(pNewFoil);
+	}
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+		m_pXFoil->m_FoilName ="";
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+
+void QAFoil::OnAFoilDerotateFoil()
+{
+	if(!m_pCurFoil) return;
+
+	double angle = m_pCurFoil->DeRotate();
+
+	QString str = QString("Foil has been de-rotated by %1 degrees").arg(angle,6,'f',3);
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->statusBar()->showMessage(str);
+	UpdateView();
+}
+
+
+void QAFoil::OnAFoilNormalizeFoil()
+{
+	if(!m_pCurFoil) return;
+	double length = m_pCurFoil->NormalizeGeometry();
+
+	QString str = QString("Foil has been normalized from %1  to 1.000").arg(length,7,'f',3);
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->statusBar()->showMessage(str);
+
+	UpdateView();
+
+}
+
+void QAFoil::OnAFoilCadd()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_FoilName   = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+	m_pBufferFoil->m_bPoints    = true;
+	m_pBufferFoil->m_bVisible   = true;
+
+	UpdateView();
+
+	CAddDlg Adlg;
+	Adlg.m_pBufferFoil = m_pBufferFoil;
+	Adlg.m_pMemFoil    = m_pCurFoil;
+	Adlg.m_pAFoil      = this;
+	Adlg.InitDialog();
+
+	if(QDialog::Accepted == Adlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 1;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+		m_pXFoil->m_FoilName ="";
+
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+void QAFoil::OnAFoilPanels()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_FoilName  = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+	m_pBufferFoil->m_bPoints   = true;
+	m_pBufferFoil->m_bVisible  = true;
+
+	UpdateView();
+
+	TwoDPanelDlg Pdlg;
+	Pdlg.m_pBufferFoil = m_pBufferFoil;
+	Pdlg.m_pMemFoil    = m_pCurFoil;
+	Pdlg.m_pAFoil      = this;
+
+	if(QDialog::Accepted == Pdlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+//		m_pXFoil->m_FoilName ="";
+
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+void QAFoil::OnAFoilFoilCoordinates()
+{
+	if(!m_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bPoints  = true;
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	FoilCoordDlg dlg;
+	dlg.m_pMemFoil    = m_pCurFoil;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pAFoil      = this;
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_iHighLight = -1;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+		m_pXFoil->m_FoilName ="";
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+void QAFoil::OnAFoilFoilGeom()
+{
+	if(!m_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bPoints  = true;
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	FoilGeomDlg dlg;
+	dlg.m_pMemFoil    = m_pCurFoil;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pAFoil      = this;
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+//		m_pXFoil->m_FoilName ="";
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+
+void QAFoil::OnAFoilSetTEGap()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bPoints    = false;
+	m_pBufferFoil->m_bVisible   = true;
+	m_pBufferFoil->m_FoilName   = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	TEGapDlg Gdlg;
+	Gdlg.m_pBufferFoil = m_pBufferFoil;
+	Gdlg.m_pMemFoil    = m_pCurFoil;
+	Gdlg.m_pAFoil      = this;
+	Gdlg.InitDialog();
+
+	if(QDialog::Accepted == Gdlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints    = false;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+//		m_pXFoil->m_FoilName ="";
+		//to un-initialize XFoil in case user switches to XInverse
+		//Thanks Jean-Marc !
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+void QAFoil::OnAFoilSetLERadius()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bVisible   = true;
+	m_pBufferFoil->m_bPoints    = false;
+	m_pBufferFoil->m_FoilName   = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	LEDlg Ldlg;
+	Ldlg.m_pBufferFoil = m_pBufferFoil;
+	Ldlg.m_pMemFoil    = m_pCurFoil;
+	Ldlg.m_pAFoil      = this;
+	Ldlg.InitDialog();
+
+	if(QDialog::Accepted == Ldlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints    = false;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+	}
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+//		m_pXFoil->m_FoilName ="";
+
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+void QAFoil::OnAFoilInterpolateFoils()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_poaFoil->size()<2)
+	{
+		QMessageBox::warning(pMainFrame,"QFLR5","At least two foils are required");
+		return;
+	}
+
+	if(!m_pCurFoil) SetFoil();
+	if(!m_pCurFoil) return;
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_FoilName  = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+	m_pBufferFoil->m_bPoints   = false;
+	m_pBufferFoil->m_bVisible  = true;
+
+	UpdateView();
+
+	InterpolateFoilsDlg dlg;
+	dlg.m_poaFoil = m_poaFoil;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pMainFrame = m_pMainFrame;
+	dlg.m_pAFoil = this;
+	dlg.InitDialog();
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints = false;
+		pNewFoil->m_FoilName = dlg.m_NewFoilName;
+
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+
+	else
+	{
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+//		dlg.m_pXFoil->m_FoilName ="";
+
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+void QAFoil::OnAFoilNacaFoils()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->SetNaca009();
+	m_pBufferFoil->m_bPoints  = true;
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = "Naca xxxx";
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	NacaFoilDlg dlg;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pAFoil = this;
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		QString str;
+
+		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)
+			str = QString("%1").arg(dlg.m_Digits,4);
+		else
+			str = QString("%1").arg(dlg.m_Digits);
+		str = "NACA "+ str;
+
+		CFoil *pNewFoil    = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+		pNewFoil->m_bPoints    = false;
+		pNewFoil->m_FoilName   = str;
+		if(pMainFrame->SetModFoil(pNewFoil))
+		{
+			m_pCurFoil = NULL;
+			FillFoilTable();
+			SelectFoil(pNewFoil);
+		}
+		else
+		{
+			pNewFoil = NULL;
+			FillFoilTable();
+			SelectFoil();
+		}
+	}
+
+	else
+	{
+		FillFoilTable();;
+		if(m_pCurFoil) SelectFoil(m_pCurFoil);
+		m_pXFoil->m_FoilName ="";
+
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
+
+
+void QAFoil::OnSplineType(bool bState)
+{
+	m_bSF = m_pctrlSF->isChecked();
+	FillFoilTable();
+	UpdateView();
+}
+
+
 
 
 void QAFoil::OnGrid()
@@ -933,15 +1568,22 @@ void QAFoil::OnCellChanged(QWidget *pWidget)
 
 void QAFoil::OnFoilClicked(const QModelIndex& index)
 {
-	if(index.row()>=m_poaFoil->size()) return;
+qDebug() << "FoilClicked";
+	if(index.row()>=m_poaFoil->size()+1) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
 
 	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
 	QString FoilName =pItem->text();
 
-	CFoil *pFoil= pMainFrame->GetFoil(FoilName);
-	SetFoil(pFoil);
+	if(index.row()>0)
+	{
+		CFoil *pFoil= pMainFrame->GetFoil(FoilName);
+		SetFoil(pFoil);
+	}
+	else if(index.row()==0)
+	{
+		SetFoil();
+	}
 }
 
 void QAFoil::OnCenterLine(bool bState)
@@ -974,21 +1616,45 @@ void QAFoil::OnCenterLine(bool bState)
 
 void QAFoil::OnFoilStyle()
 {
-	if(!m_pCurFoil) return;
-
-	LinePickerDlg dlg;
-	dlg.InitDialog(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
-
-	if(QDialog::Accepted==dlg.exec())
+	if(!m_pCurFoil)
 	{
-		m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
-		m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
-		m_pctrlFoilStyle->SetColor(dlg.GetColor());
+		LinePickerDlg dlg;
+		if(m_bSF) dlg.InitDialog(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
+		else      dlg.InitDialog(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
 
-		m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
-		m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
-		m_pCurFoil->m_FoilColor = dlg.GetColor();
-		UpdateView();
+		if(QDialog::Accepted==dlg.exec())
+		{
+			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
+			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
+			m_pctrlFoilStyle->SetColor(dlg.GetColor());
+
+			if(m_bSF)
+			{
+				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+			}
+			else
+			{
+				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+			}
+			UpdateView();
+		}
+	}
+	else
+	{
+		LinePickerDlg dlg;
+		dlg.InitDialog(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
+
+		if(QDialog::Accepted==dlg.exec())
+		{
+			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
+			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
+			m_pctrlFoilStyle->SetColor(dlg.GetColor());
+
+			m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
+			m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
+			m_pCurFoil->m_FoilColor = dlg.GetColor();
+			UpdateView();
+		}
 	}
 }
 
@@ -1082,6 +1748,99 @@ void QAFoil::OnDuplicate()
 	}	
 }
 
+void QAFoil::OnSplineSettings()
+{
+	SplineCtrlDlg dlg(this);
+	dlg.m_pPF = m_pPF;
+	dlg.m_pSF = m_pSF;
+	dlg.m_bSF = m_bSF;
+	dlg.InitDialog();
+	dlg.exec();
+}
+
+
+void QAFoil::OnExportSplines()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	CFoil *pFoil;
+
+	bool bNotFound= true;
+	bool bWrite = false;
+
+	// deselect points so as not to interfere with other mouse commands
+	m_pSF->m_Intrados.m_iSelect = -10;
+	m_pSF->m_Extrados.m_iSelect = -10;
+	m_pPF->m_Intrados.m_iSelect = -10;
+	m_pPF->m_Extrados.m_iSelect = -10;
+	QString strong;
+
+	//check that number of output points is compatible with array sizing
+	if(m_bSF)
+	{
+		if(m_pSF->m_Extrados.m_iRes>IQX2)
+		{
+			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong);
+			return;
+		}
+		if(m_pSF->m_Intrados.m_iRes>IQX2)
+		{
+			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong);
+			return;
+		}
+	}
+	else
+	{
+		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong);
+			return;
+		}
+		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong);
+			return;
+		}
+	}
+
+	QString FileName, DestFileName, OutString;
+	QFile DestFile;
+
+	FileName = "Spline Foil";
+
+	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
+											pMainFrame->m_LastDirName,
+											"Foil File (*.dat)");
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+
+	QString strOut;
+	strOut = FileName + "\n";
+	out << strOut;
+	if(m_bSF)
+	{
+		m_pSF->Export(out);
+	}
+	else
+	{
+		m_pPF->Export(out);
+	}
+	XFile.close();
+}
+
 
 void QAFoil::OnRenameFoil()
 {
@@ -1089,6 +1848,7 @@ void QAFoil::OnRenameFoil()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->OnRenameCurFoil();
 }
+
 
 void QAFoil::OnStoreSplines()
 {
@@ -1490,6 +2250,20 @@ void QAFoil::ReleaseZoom()
 }
 
 
+void QAFoil::SaveSettings(QDataStream &ar)
+{
+	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
+	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
+	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
+	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
+
+	m_pSF->Serialize(ar, true);
+	m_pPF->Serialize(ar, true);
+}
+
+
+
+
 void QAFoil::SetScale()
 {
 	//scale is set by user zooming
@@ -1497,8 +2271,8 @@ void QAFoil::SetScale()
 
 	m_fScale = m_fRefScale;
 
-	double width  = (double)m_rCltRect.width();
-	double height = (double)m_rCltRect.height();
+//	double width  = (double)m_rCltRect.width();
+//	double height = (double)m_rCltRect.height();
 //	double clippedh = height/width * 20.0;
 
 	m_ptOffset.rx() = 75;
@@ -1515,7 +2289,7 @@ void QAFoil::SetScale(QRect CltRect)
 	//scale is set by ChildView
 	m_rCltRect = CltRect;
 
-	int width = m_rCltRect.width();
+//	int width = m_rCltRect.width();
 
 	SetScale();
 }
@@ -1533,6 +2307,11 @@ void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
 
 void QAFoil::SetParams()
 {
+	if(m_bSF) m_pctrlSF->setChecked(true);
+	else      m_pctrlPF->setChecked(true);
+
+	SetFoil(m_pCurFoil);
+
 	FillFoilTable();
 	m_pctrlFoilTable->adjustSize();
 }
@@ -1679,7 +2458,7 @@ void QAFoil::SetPicture()
 		m_pPF->Update(true);
 		m_pPF->Update(false);
 	}
-//	m_pACtrl->SetGap(gap);
+//	SetGap(gap);
 	UpdateView();
 }
 
@@ -1709,7 +2488,14 @@ void QAFoil::SetupLayout()
 	m_pctrlDelete      = new QPushButton("Delete");
 	m_pctrlDuplicate   = new QPushButton("Duplicate");
 
+	QHBoxLayout *SplineOption = new QHBoxLayout;
+	m_pctrlSF = new QRadioButton("Splines");
+	m_pctrlPF = new QRadioButton("Splined points");
+	SplineOption->addWidget(m_pctrlSF);
+	SplineOption->addWidget(m_pctrlPF);
+
 	QVBoxLayout *RightControls = new QVBoxLayout;
+	RightControls->addLayout(SplineOption);
 	RightControls->addWidget(m_pctrlFoilStyle);
 	RightControls->addWidget(m_pctrlRename);
 	RightControls->addWidget(m_pctrlDelete);
@@ -1724,6 +2510,9 @@ void QAFoil::SetupLayout()
 	MainLayout->addLayout(RightControls);
 
 	setLayout(MainLayout);
+	
+	connect(m_pctrlSF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
+	connect(m_pctrlPF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
 
 	connect(m_pctrlFoilStyle, SIGNAL(clicked()), this, SLOT(OnFoilStyle()));
 	connect(m_pctrlRename, SIGNAL(clicked()), this, SLOT(OnRenameFoil()));
@@ -1734,7 +2523,7 @@ void QAFoil::SetupLayout()
 	connect(m_pctrlCenterLine, SIGNAL(clicked(bool)), this, SLOT(OnCenterLine(bool)));
 
 	connect(m_pctrlFoilTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
-	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
+//	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
 
 
 	m_pFoilModel = new QStandardItemModel;
@@ -1901,21 +2690,4 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 	m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
 
 	UpdateView();
-}
-
-
-void QAFoil::LoadSettings(QDataStream &ar)
-{
-	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
-	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
-	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
-	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
-
-}
-void QAFoil::SaveSettings(QDataStream &ar)
-{
-	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
-	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
-	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
-	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
 }

@@ -23,13 +23,15 @@
 #include "../Params.h"
 #include "XFoil.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
 
-TwoDPanelDlg::TwoDPanelDlg(void *pParent)
+void *TwoDPanelDlg::s_pXFoil;
+
+TwoDPanelDlg::TwoDPanelDlg()
 {
 	SetupLayout();
-	m_pXDirect = pParent;
+	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
-	m_pXFoil      = NULL;
 	m_bApplied    = false;
 }
 
@@ -122,7 +124,7 @@ void TwoDPanelDlg::SetupLayout()
 void TwoDPanelDlg::InitDialog()
 {
 
-	XFoil *pXFoil =(XFoil*)m_pXFoil;
+	XFoil *pXFoil =(XFoil*)s_pXFoil;
 	CFoil *pMemFoil = (CFoil *)m_pMemFoil;
 	//memorize initial values
 //	npan   = pXFoil->n;
@@ -156,12 +158,13 @@ void TwoDPanelDlg::OnChanged()
 
 void TwoDPanelDlg::OnApply()
 {
-qDebug() <<  "Applying" << m_bApplied;
 	if(m_bApplied) return;
 
 	//reset everything and retry
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
 	CFoil *pMemFoil = (CFoil*)m_pMemFoil;
 	CFoil *pBufferFoil = (CFoil*)m_pBufferFoil;
 
@@ -214,7 +217,8 @@ qDebug() <<  "Applying" << m_bApplied;
 	}
 	m_bApplied = true;
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect)    pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 
 }
 
@@ -234,7 +238,7 @@ void TwoDPanelDlg::OnOK()
 
 void TwoDPanelDlg::ReadParams()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
 	pXFoil->npan   = m_pctrlNPanels->text().toInt();
 	pXFoil->cvpar  = m_pctrlCVpar->GetValue();

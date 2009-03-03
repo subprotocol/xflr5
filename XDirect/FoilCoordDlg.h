@@ -29,12 +29,14 @@
 #include <QStandardItemModel>
 #include "../Misc/FloatEditDelegate.h"
 #include "Objects/Foil.h"
+#include "../Design/AFoil.h"
 
 class FoilCoordDlg : public QDialog
 {
 	Q_OBJECT
 
 	friend class QXDirect;
+	friend class QAFoil;
 
 public:
 	FoilCoordDlg();
@@ -69,6 +71,7 @@ private:
 
 	bool m_bApplied, m_bModified;
 	void *m_pXDirect;
+	void *m_pAFoil;
 };
 
 #endif // FOILCOORDDLG_H

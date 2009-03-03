@@ -23,15 +23,16 @@
 #include "../MainFrame.h"
 #include "XFoil.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
 
+void *InterpolateFoilsDlg::s_pXFoil;
 
-
-InterpolateFoilsDlg::InterpolateFoilsDlg(void *pParent)
+InterpolateFoilsDlg::InterpolateFoilsDlg()
 {
-	m_pXDirect = pParent;
+	m_pXDirect = NULL;
+	m_pAFoil = NULL;
 	m_pMainFrame = NULL;
 	m_pBufferFoil = NULL;
-	m_pXFoil = NULL;
 	m_poaFoil = NULL;
 
 	SetupLayout();
@@ -196,8 +197,9 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 void InterpolateFoilsDlg::Update()
 {
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	QString strong;
 
 	strong = m_pctrlFoil1->currentText();
@@ -239,7 +241,8 @@ void InterpolateFoilsDlg::Update()
 	str+=strong;
 	m_pctrlThick3->setText(str);
 
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
 
 

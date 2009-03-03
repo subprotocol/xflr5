@@ -80,4 +80,3 @@ void FloatEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	drawDisplay(painter, myOption, myOption.rect, strong);
 	drawFocus(painter, myOption, myOption.rect);
 }
-

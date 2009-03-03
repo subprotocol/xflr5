@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <QtGui>
 #include <QCheckBox>
 #include <math.h>
-
+ 
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "../Graph/GraphVariableDlg.h"
@@ -47,9 +47,6 @@ QXDirect::QXDirect(QWidget *parent)
     : QWidget(parent)
 {
 	SetupLayout();
-
-	m_pXFoil = NULL;
-	m_pXFoil = new XFoil();
 
 	m_CurveStyle = 0;
 	m_CurveWidth = 1;
@@ -1793,10 +1790,10 @@ void QXDirect::OnCadd()
 	m_bBL       = false;
 	OnOpPoints();
 
-	CAddDlg Adlg(this);
+	CAddDlg Adlg;
 	Adlg.m_pBufferFoil = &m_BufferFoil;
 	Adlg.m_pMemFoil    = m_pCurFoil;
-	Adlg.m_pXFoil      = m_pXFoil;
+	Adlg.m_pXDirect    = this;
 	Adlg.Title         = "Refine "+ m_pCurFoil->m_FoilName;
 	Adlg.InitDialog();
 
@@ -2588,7 +2585,6 @@ void QXDirect::OnFoilGeom()
 	UpdateView();
 
 	FoilGeomDlg dlg;
-	dlg.m_pXFoil = m_pXFoil;
 	dlg.m_pMemFoil = m_pCurFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pXDirect = this;
@@ -2744,11 +2740,11 @@ void QXDirect::OnInterpolateFoils()
 	m_bBL       = false;
 	OnOpPoints();
 
-	InterpolateFoilsDlg dlg(this);
+	InterpolateFoilsDlg dlg;
 	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.m_poaFoil     = m_poaFoil;
-	dlg.m_pXFoil      = m_pXFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
+	dlg.m_pXDirect = this;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
@@ -2792,7 +2788,6 @@ void QXDirect::OnNacaFoils()
 
 
 	NacaFoilDlg dlg;
-	dlg.m_pXFoil      = m_pXFoil;
  	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pXDirect    = this;
 
@@ -2931,10 +2926,10 @@ void QXDirect::OnPanels()
 	m_bBL       = false;
 	OnOpPoints();
 
-	TwoDPanelDlg dlg(this);
+	TwoDPanelDlg dlg;
+	dlg.m_pXDirect = this;
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pMemFoil    = m_pCurFoil;
-	dlg.m_pXFoil      = m_pXFoil;
 
 	m_bShowPanels = true;
 	UpdateView();
@@ -3279,10 +3274,9 @@ void QXDirect::OnSetLERadius()
 	m_bBL       = false;
 	OnOpPoints();
 
-	LEDlg Ldlg(this);
+	LEDlg Ldlg;
 	Ldlg.m_pBufferFoil = &m_BufferFoil;
 	Ldlg.m_pMemFoil    = m_pCurFoil;
-	Ldlg.m_pXFoil      = m_pXFoil;
 	Ldlg.m_pXDirect   = this;
 	Ldlg.InitDialog();
 
@@ -3334,7 +3328,6 @@ void QXDirect::OnSetTEGap()
 	Gdlg.m_pXDirect   = this;
 	Gdlg.m_pBufferFoil = &m_BufferFoil;
 	Gdlg.m_pMemFoil    = m_pCurFoil;
-	Gdlg.m_pXFoil      = m_pXFoil;
 	Gdlg.m_Gap         = m_pCurFoil->m_Gap;
 	Gdlg.InitDialog();
 

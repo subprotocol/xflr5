@@ -41,10 +41,12 @@ private slots:
 	void OnVScroll(int val);
 
 public:
-	InterpolateFoilsDlg(void *pParent = NULL);
+	InterpolateFoilsDlg();
 	void InitDialog();
 	void SetupLayout();
 	void Update();
+
+	static void *s_pXFoil;
 
 	CFoil* m_pBufferFoil;
 	QList<void *> *m_poaFoil;
@@ -57,8 +59,8 @@ public:
 	FloatEdit *m_pctrlFrac;
 	QPushButton *OKButton, *CancelButton;
 
-	void *m_pXFoil;
-	void* m_pXDirect;
+	void *m_pXDirect;
+	void *m_pAFoil;
 	void* m_pMainFrame;
 	double m_Frac;
 	QString m_NewFoilName;

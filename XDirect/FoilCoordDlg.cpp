@@ -22,12 +22,16 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
- #include <QHeaderView>
+#include <QHeaderView>
 #include "FoilCoordDlg.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
+
+
 
 FoilCoordDlg::FoilCoordDlg()
 {
+	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
 	m_pMemFoil    = NULL;
@@ -124,14 +128,18 @@ void FoilCoordDlg::OnApply()
 {
 	if(m_bApplied) return;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	m_bApplied = true;
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
 
 void FoilCoordDlg::OnDeletePoint()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
 	int i, sel;
 	QModelIndex index = m_pctrlCoordView->currentIndex();
 	sel = index.row();
@@ -154,12 +162,14 @@ void FoilCoordDlg::OnDeletePoint()
 	FillList();
 	SetSelection(sel);
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
 
 void FoilCoordDlg::OnInsertPoint()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	int i, sel;
 	sel = m_pctrlCoordView->currentIndex().row();
 
@@ -189,14 +199,15 @@ void FoilCoordDlg::OnInsertPoint()
 	SetSelection(sel);
 
 	m_bModified = true;
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
+
 
 
 
 void FoilCoordDlg::OnCellChanged(QWidget *FloatEdit)
 {
-qDebug() << "OncellChanged";
 	double X,Y;
 
 	int  sel = m_pctrlCoordView->currentIndex().row();
@@ -221,15 +232,19 @@ void FoilCoordDlg::OnItemClicked(QModelIndex index)
 {
 	int sel = m_pctrlCoordView->currentIndex().row();
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	if(m_pBufferFoil)	m_pBufferFoil->m_iHighLight = sel;
 
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
+
 
 
 void FoilCoordDlg::OnRestore()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	int i;
 
 	for (i=0;i<m_pMemFoil->nb; i++)
@@ -251,7 +266,8 @@ void FoilCoordDlg::OnRestore()
 	m_bModified = false;
 
 	SetSelection(0);
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
 
 void FoilCoordDlg::ReadSectionData(int sel, double &X, double &Y)

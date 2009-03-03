@@ -49,7 +49,7 @@ public:
 	void DrawYTicks(QPainter &painter);
 	void ExpFormat(double &f, int &exp);
 	void ExportToFile(QFile &XFile, int FileType);
-	void Highlight(CCurve *pCurve, int ref,QPainter &painter);
+	void Highlight(QPainter &painter, CCurve *pCurve, int ref);
 
 	bool Serialize(QDataStream &ar, bool bIsStoring);
 

@@ -36,8 +36,7 @@ class FlapDlg : public QDialog
 public:
 	FlapDlg(void *pParent=NULL);
 
-	friend class CXDirect;
-	friend class CAFoil;
+	friend class QAFoil;
 	friend class QXDirect;
 
 
@@ -81,6 +80,7 @@ private:
 
 	void *m_pXFoil;
 	void *m_pXDirect;
+	void *m_pAFoil;
 
 };
 

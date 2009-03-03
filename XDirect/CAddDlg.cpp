@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Corner Add class
-	Copyright (C) 2004-2008 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2004-2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,14 +21,17 @@
 
 #include "CAddDlg.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
 #include "XFoil.h"
 
-CAddDlg::CAddDlg(void *pParent)
+void *CAddDlg::s_pXFoil;
+
+CAddDlg::CAddDlg()
 {
-	m_pXDirect = pParent;
+	m_pAFoil      = NULL;
+	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
 	m_pMemFoil    = NULL;
-	m_pXFoil      = NULL;
 
 	m_iSplineType = 0;
 	SetupLayout();
@@ -40,7 +43,7 @@ CAddDlg::CAddDlg(void *pParent)
 void CAddDlg::SetupLayout()
 {
 	QGridLayout *RefineGrid =new QGridLayout;
-	QLabel *lab1 = new QLabel("Angle Criterion (°)");
+	QLabel *lab1 = new QLabel("Angle Criterion (deg)");
 	QLabel *lab2 = new QLabel("Type of Spline");
 	QLabel *lab3 = new QLabel("Refinement X Limits");
 	QLabel *lab4 = new QLabel("From");
@@ -103,7 +106,8 @@ void CAddDlg::SetupLayout()
 
 void CAddDlg::OnApply()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	QAFoil * pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	int i;
 
@@ -147,7 +151,8 @@ void CAddDlg::OnApply()
 	strong = QString("(added %1 points to original foil)").arg(added);
 	m_pctrlAdded->setText(strong);
 
-	for (i=0; i< pXFoil->n; i++){
+	for (i=0; i< pXFoil->n; i++)
+	{
 		m_pBufferFoil->xb[i] = pXFoil->x[i+1];
 		m_pBufferFoil->yb[i] = pXFoil->y[i+1];
 	}
@@ -162,8 +167,10 @@ void CAddDlg::OnApply()
 	strong = QString( "at panel position %1").arg(pXFoil->imax);
 	m_pctrlAtPanel->setText(strong);
 
-	pXDirect->UpdateView();
+	if(pXDirect)    pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 }
+
 
 void CAddDlg::OnUniform()
 {
@@ -173,7 +180,7 @@ void CAddDlg::OnUniform()
 
 void CAddDlg::InitDialog()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
 	double xbmin, xbmax, xrf1, xrf2;
 	int ispl;
@@ -201,7 +208,7 @@ void CAddDlg::InitDialog()
 
 	QString strong;
 	pXFoil->CheckAngles();
-	strong = QString( "Maximum panel angle is %1°").arg(pXFoil->amax,0,'f',1);
+	strong = QString( "Maximum panel angle is %1 deg").arg(pXFoil->amax,0,'f',1);
 	m_pctrlMaxAngle->setText(strong);
 	strong = QString( "at panel position %1").arg(pXFoil->imax);
 	m_pctrlAtPanel->setText(strong);
@@ -215,12 +222,13 @@ void CAddDlg::InitDialog()
 
 void CAddDlg::keyPressEvent(QKeyEvent *event)
 {
-	// Prevent Return Key from closing App
+	// Prevent Return Key from closing dialog
 	switch (event->key())
 	{
 		case Qt::Key_Escape:
 		{
 			done(0);
+			return;
 		}
 		case Qt::Key_Return:
 		{
@@ -228,7 +236,6 @@ void CAddDlg::keyPressEvent(QKeyEvent *event)
 			{
 				OnApply();
 				OKButton->setFocus();
-//				m_bApplied  = true;
 			}
 			else
 			{
@@ -237,9 +244,10 @@ void CAddDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			break;
 	}
 
 	QDialog::keyPressEvent(event);
+
 }
 

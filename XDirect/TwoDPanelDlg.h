@@ -40,7 +40,9 @@ private slots:
 	void OnChanged();
 
 public:
-	TwoDPanelDlg(void *pParent = NULL);
+	TwoDPanelDlg();
+
+	static void *s_pXFoil;
 
 	void SetupLayout();
 	void ReadParams();
@@ -64,10 +66,10 @@ public:
 	double xpref1;
 	double xpref2;
 
-	void *m_pXFoil;
 	void *m_pBufferFoil;
 	void *m_pMemFoil;
 	void *m_pXDirect;
+	void *m_pAFoil;
 };
 
 #endif // TWODPANELDLG_H

@@ -27,13 +27,15 @@
 #include "../Misc/FloatEdit.h"
 #include "../Objects/Foil.h"
 
+
 class TEGapDlg : public QDialog
 {
 	Q_OBJECT
 	friend class QXDirect;
+	friend class QAFoil;
 
 public:
-	TEGapDlg(void *pParent = NULL);
+	TEGapDlg();
 	void SetupLayout();
 	void InitDialog();
 
@@ -47,17 +49,17 @@ private:
 
 public:
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
-	FloatEdit	*m_pctrlBlend, *m_pctrlGap;
+	FloatEdit *m_pctrlBlend, *m_pctrlGap;
 
 	bool m_bApplied, m_bModified;
 	double m_Gap, m_Blend;
 
 	void *m_pXDirect;
+	void *m_pAFoil;
 
 	CFoil* m_pBufferFoil;
 	CFoil* m_pMemFoil;
-	void* m_pXFoil;
-
+	static void* s_pXFoil;
 };
 
-#endif // TEGapDlg_H
+#endif // TEGAPDLG_H

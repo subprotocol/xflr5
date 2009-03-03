@@ -24,7 +24,6 @@
 #include "MainFrame.h"
 #include "Globals.h"
 #include "Design/AFoil.h"
-#include "XDirect/XDirect.h"
 #include "Miarex/Miarex.h"
 #include "Miarex/WingDlg.h"
 #include "Miarex/GL3dBodyDlg.h"
@@ -35,6 +34,16 @@
 #include "Misc/LinePickerDlg.h"
 #include "Misc/UnitsDlg.h"
 #include "Graph/GraphDlg.h"
+#include "XDirect/XDirect.h"
+#include "XDirect/NacaFoilDlg.h"
+#include "XDirect/InterpolateFoilsDlg.h"
+#include "XDirect/CAddDlg.h"
+#include "XDirect/TwoDPanelDlg.h"
+#include "XDirect/FoilCoordDlg.h"
+#include "XDirect/FoilGeomDlg.h"
+#include "XDirect/TEGapDlg.h"
+#include "XDirect/LEDlg.h"
+#include "XInverse/XInverse.h"
 
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
@@ -46,7 +55,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	QRect r = desktop.geometry();
 	FloatEdit::s_MaxWidth = r.width()/15;
 
-
+	m_pXFoil = new XFoil();
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -128,11 +137,12 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
 	m_iApp = 0;
-	m_pctrlXDirectToolBar->show();
+	m_pctrlAFoilToolBar->hide();
+	m_pctrlXDirectToolBar->hide();
 	m_pctrlMiarexToolBar->hide();
 	SetMenus();
-
 }
+
 
 MainFrame::~MainFrame()
 {
@@ -457,19 +467,124 @@ void MainFrame::CreateActions()
 	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
+	CreateAFoilActions();
 	CreateXDirectActions();
 	CreateMiarexActions();
+}
+
+
+void MainFrame::CreateAFoilActions()
+{
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
+	AFoilGridAct= new QAction("Grid Options", this);
+	AFoilGridAct->setStatusTip(tr("Define the grid settings for the view"));
+	connect(AFoilGridAct, SIGNAL(triggered()), pAFoil, SLOT(OnGrid()));
+
+	storeSplineAct= new QAction(QIcon(":/images/storesplines.png"), tr("Store Splines"), this);
+	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
+	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
+
+
+	zoomInAct= new QAction(QIcon(":/images/ZoomIn.png"), tr("Zoom in"), this);
+	zoomInAct->setStatusTip(tr("Zoom the view by drawing a rectangle in the client area"));
+	connect(zoomInAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomIn()));
+
+	zoomOutAct= new QAction(QIcon(":/images/ZoomOut.png"), tr("Zoom Out"), this);
+	zoomOutAct->setStatusTip(tr("Zoom out"));
+	connect(zoomOutAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomOut()));
+
+	zoomLessAct= new QAction(QIcon(":/images/ZoomLess.png"), tr("Zoom Less"), this);
+	zoomLessAct->setStatusTip(tr("Zoom Less"));
+	connect(zoomLessAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomLess()));
+
+	zoomYAct= new QAction(QIcon(":/images/ZoomY.png"), tr("Zoom Y Scale"), this);
+	zoomYAct->setStatusTip(tr("Zoom Y scale Only"));
+	connect(zoomYAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomYOnly()));
+
+	AFoilDerotateFoil = new QAction(tr("De-rotate the Foil"), this);
+	connect(AFoilDerotateFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilDerotateFoil()));
+
+	AFoilNormalizeFoil = new QAction(tr("Normalize the Foil"), this);
+	connect(AFoilNormalizeFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilNormalizeFoil()));
+
+	AFoilRefineLocalFoil = new QAction(tr("Refine Locally"), this);
+	connect(AFoilRefineLocalFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilCadd()));
+
+	AFoilRefineGlobalFoil = new QAction(tr("Refine Globally"), this);
+	connect(AFoilRefineGlobalFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilPanels()));
+
+	AFoilEditCoordsFoil = new QAction(tr("Edit Foil Coordinates"), this);
+	connect(AFoilEditCoordsFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilFoilCoordinates()));
+
+	AFoilScaleFoil = new QAction(tr("Scale camber and thickness"), this);
+	connect(AFoilScaleFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilFoilGeom()));
+
+	AFoilSetTEGap = new QAction(tr("Set T.E. Gap"), this);
+	connect(AFoilSetTEGap, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetTEGap()));
+
+	AFoilSetLERadius = new QAction(tr("Set L.E. Radius"), this);
+	connect(AFoilSetLERadius, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetLERadius()));
+
+	AFoilSetFlap = new QAction(tr("Set Flap"), this);
+	connect(AFoilSetFlap, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetFlap()));
+
+	AFoilInterpolateFoils = new QAction(tr("Interpolate Foils"), this);
+	connect(AFoilInterpolateFoils, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilInterpolateFoils()));
+
+	AFoilNacaFoils = new QAction(tr("Naca Foils"), this);
+	connect(AFoilNacaFoils, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilNacaFoils()));
+
+	ExportSplines,
+	SplineSettings = new QAction(tr("Spline Settings"), this);
+	connect(SplineSettings, SIGNAL(triggered()), pAFoil, SLOT(OnSplineSettings()));
+
+	ExportSplines = new QAction(tr("Export Splines"), this);
+	connect(ExportSplines, SIGNAL(triggered()), pAFoil, SLOT(OnExportSplines()));
+}
+
+void MainFrame::CreateAFoilMenus()
+{
+	AFoilViewMenu = menuBar()->addMenu(tr("&View"));
+	AFoilViewMenu->addAction(AFoilGridAct);
+	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(restoreToolbarsAct);
+	AFoilViewMenu->addAction(styleAct);
+	AFoilViewMenu->addAction(saveViewToImageFileAct);
+
+	AFoilDesignMenu = menuBar()->addMenu(tr("&Design"));
+	AFoilDesignMenu->addAction(AFoilNormalizeFoil);
+	AFoilDesignMenu->addAction(AFoilDerotateFoil);
+	AFoilDesignMenu->addAction(AFoilRefineLocalFoil);
+	AFoilDesignMenu->addAction(AFoilRefineGlobalFoil);
+	AFoilDesignMenu->addAction(AFoilEditCoordsFoil);
+	AFoilDesignMenu->addAction(AFoilScaleFoil);
+	AFoilDesignMenu->addAction(AFoilSetTEGap);
+	AFoilDesignMenu->addAction(AFoilSetLERadius);
+	AFoilDesignMenu->addAction(AFoilSetFlap);
+	AFoilDesignMenu->addSeparator();
+	AFoilDesignMenu->addAction(AFoilInterpolateFoils);
+	AFoilDesignMenu->addAction(AFoilNacaFoils);
+
+	AFoilSplineMenu = menuBar()->addMenu("Splines");
+	AFoilSplineMenu->addAction(ExportSplines);
+	AFoilSplineMenu->addAction(SplineSettings);
 }
 
 
 
 void MainFrame::CreateAFoilToolbar()
 {
-
 	m_pctrlAFoilToolBar = addToolBar(tr("Foil"));
 	m_pctrlAFoilToolBar->addAction(newProjectAct);
 	m_pctrlAFoilToolBar->addAction(openAct);
 	m_pctrlAFoilToolBar->addAction(saveAct);
+	m_pctrlAFoilToolBar->addSeparator();
+	m_pctrlAFoilToolBar->addAction(zoomInAct);
+	m_pctrlAFoilToolBar->addAction(zoomOutAct);
+	m_pctrlAFoilToolBar->addAction(zoomLessAct);
+	m_pctrlAFoilToolBar->addAction(zoomYAct);
+	m_pctrlAFoilToolBar->addAction(storeSplineAct);
 
 }
 
@@ -478,6 +593,10 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXDirectWidget = new QDockWidget(tr("XDirect"), this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
+
+	m_pctrlXInverseWidget = new QDockWidget(tr("XInverse"), this);
+	m_pctrlXInverseWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXInverseWidget);
 
 	m_pctrlMiarexWidget = new QDockWidget(tr("Miarex"), this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -495,6 +614,12 @@ void MainFrame::CreateDockWindows()
 	pXDirect->setAttribute(Qt::WA_DeleteOnClose, false);
 	m_pctrlXDirectWidget->setWidget(pXDirect);
 	m_pctrlXDirectWidget->setVisible(false);
+
+	m_pXInverse = new QXInverse(this);
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+	pXInverse->setAttribute(Qt::WA_DeleteOnClose, false);
+	m_pctrlXInverseWidget->setWidget(pXInverse);
+	m_pctrlXInverseWidget->setVisible(false);
 
 	m_pMiarex = new QMiarex(this);
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
@@ -518,24 +643,25 @@ void MainFrame::CreateDockWindows()
 	sizepol.setVerticalPolicy(QSizePolicy::Expanding);
 	m_p2DWidget->setSizePolicy(sizepol);
 
-	pMiarex->m_pMainFrame    = this;
-	pMiarex->m_p2DWidget = m_p2DWidget;
-	pMiarex->m_poaBody   = &m_oaBody;
-	pMiarex->m_poaPlane  = &m_oaPlane;
-	pMiarex->m_poaWing   = &m_oaWing;
-	pMiarex->m_poaWPolar = &m_oaWPolar;
-	pMiarex->m_poaWOpp   = &m_oaWOpp;
-	pMiarex->m_poaPOpp   = &m_oaPOpp;
-	pMiarex->m_poaFoil   = &m_oaFoil;
-	pMiarex->m_poaPolar  = &m_oaPolar;
+	pMiarex->m_pMainFrame = this;
+	pMiarex->m_p2DWidget  = m_p2DWidget;
+	pMiarex->m_poaBody    = &m_oaBody;
+	pMiarex->m_poaPlane   = &m_oaPlane;
+	pMiarex->m_poaWing    = &m_oaWing;
+	pMiarex->m_poaWPolar  = &m_oaWPolar;
+	pMiarex->m_poaWOpp    = &m_oaWOpp;
+	pMiarex->m_poaPOpp    = &m_oaPOpp;
+	pMiarex->m_poaFoil    = &m_oaFoil;
+	pMiarex->m_poaPolar   = &m_oaPolar;
 
 	pAFoil->m_pMainFrame = this;
 	pAFoil->m_poaFoil    = &m_oaFoil;
-	pAFoil->m_p2DWidget = m_p2DWidget;
-	pAFoil->m_poaFoil   = &m_oaFoil;
+	pAFoil->m_p2DWidget  = m_p2DWidget;
+	pAFoil->m_poaFoil    = &m_oaFoil;
 
 	pXDirect->m_pMainFrame             = this;
 	pXDirect->m_p2DWidget              = m_p2DWidget;
+	pXDirect->m_pXFoil                 = m_pXFoil;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
 	pXDirect->m_pPolarGraph->m_pParent = m_p2DWidget;
 	pXDirect->m_pTrGraph->m_pParent    = m_p2DWidget;
@@ -546,24 +672,42 @@ void MainFrame::CreateDockWindows()
 	pXDirect->m_poaPolar = &m_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
+	pXInverse->m_pMainFrame   = this;
+	pXInverse->m_p2DWidget    = m_p2DWidget;
+	pXInverse->m_pXFoil       = m_pXFoil;
+	pXInverse->m_poaFoil      = &m_oaFoil;
+
 	GL3dViewDlg::s_pMainFrame = this;
 	GL3dViewDlg::s_pMiarex    = m_pMiarex;
 	GL3dBodyDlg::s_pMainFrame = this;
 	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
 
-	WingDlg::s_pMainFrame = this;
-	WingDlg::s_pMiarex    = m_pMiarex;
-	WingDlg::s_poaFoil    = &m_oaFoil;
+	WingDlg::s_pMainFrame  = this;
+	WingDlg::s_pMiarex     = m_pMiarex;
+	WingDlg::s_poaFoil     = &m_oaFoil;
+
 	PlaneDlg::s_pMainFrame = this;
-	PlaneDlg::s_pMiarex = m_pMiarex;
-	PlaneDlg::s_poaBody = &m_oaBody;
-	PlaneDlg::s_poaWing = &m_oaWing;
-	CWing::s_pMainFrame = this;
-	CWing::s_pMiarex = m_pMiarex;
-	CBody::s_pMainFrame = this;
-	CPlane::s_pMainFrame = this;
-	CPlane::s_pMiarex = m_pMiarex;
+	PlaneDlg::s_pMiarex    = m_pMiarex;
+	PlaneDlg::s_poaBody    = &m_oaBody;
+	PlaneDlg::s_poaWing    = &m_oaWing;
+
+	CWing::s_pMainFrame    = this;
+	CWing::s_pMiarex       = m_pMiarex;
+
+	CBody::s_pMainFrame    = this;
+
+	CPlane::s_pMainFrame   = this;
+	CPlane::s_pMiarex      = m_pMiarex;
+
 	BodyGridDlg::s_pMainFrame = this;
+
+	NacaFoilDlg::s_pXFoil         = m_pXFoil;
+	InterpolateFoilsDlg::s_pXFoil = m_pXFoil;
+	CAddDlg::s_pXFoil             = m_pXFoil;
+	TwoDPanelDlg::s_pXFoil        = m_pXFoil;
+	FoilGeomDlg::s_pXFoil         = m_pXFoil;
+	TEGapDlg::s_pXFoil            = m_pXFoil;
+	LEDlg::s_pXFoil               = m_pXFoil;
 }
 
 
@@ -593,7 +737,9 @@ void MainFrame::CreateMenus()
 	//Create Application-Specific Menus
 	CreateXDirectMenus();
 	CreateMiarexMenus();
+	CreateAFoilMenus();
 }
+
 
 
 void MainFrame::CreateMiarexActions()
@@ -2087,6 +2233,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 
 void MainFrame::LoadSettings()
 {
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex   = (QMiarex*)m_pMiarex;
 	QString FileName   = QDir::tempPath() + "/QFLR5.set";
@@ -2099,7 +2246,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100512)
+	if(k !=100513)
 	{
 		pXFile->close();
 		return;
@@ -2131,6 +2278,7 @@ void MainFrame::LoadSettings()
 		ar >> strange;
 		m_RecentFiles.append(strange);
 	}
+	pAFoil->LoadSettings(ar);
 	pXDirect->LoadSettings(ar);
 	pMiarex->LoadSettings(ar);
 
@@ -3378,6 +3526,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 void MainFrame::SaveSettings()
 {
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QString FileName = QDir::tempPath() + "/QFLR5.set";
@@ -3391,7 +3540,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100512;
+	ar << 100513;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -3410,6 +3559,7 @@ void MainFrame::SaveSettings()
 	for(int i=0; i<m_RecentFiles.size(); i++)
 		ar << m_RecentFiles.at(i);
 
+	pAFoil->SaveSettings(ar);
 	pXDirect->SaveSettings(ar);
 	pMiarex->SaveSettings(ar);
 
@@ -4186,13 +4336,13 @@ void MainFrame::SetMenus()
 	{
 		menuBar()->clear();
 		menuBar()->addMenu(fileMenu);
-		menuBar()->addMenu(FoilMenu);
-		menuBar()->addMenu(DesignMenu);
+		menuBar()->addMenu(AFoilViewMenu);
+		menuBar()->addMenu(AFoilDesignMenu);
+		menuBar()->addMenu(AFoilSplineMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp== MIAREX)
 	{
-
 		menuBar()->clear();
 		menuBar()->addMenu(fileMenu);
 		menuBar()->addMenu(MiarexViewMenu);

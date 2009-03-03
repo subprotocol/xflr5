@@ -2,7 +2,7 @@
 
 	MainFrame Class
 
-    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,12 +33,14 @@
 #include "Objects/Polar.h"
 #include "Objects/OpPoint.h"
 #include "Objects/Plane.h"
+#include "XDirect/XFoil.h"
 
 class MainFrame : public QMainWindow
 {
 	friend class TwoDWidget;
 	friend class QXDirect;
 	friend class Miarex;
+	friend class QXInverse;
 	friend class QAFoil;
 	friend class CBody;
 	friend class CWing;
@@ -98,17 +100,20 @@ private:
 	void contextMenuEvent (QContextMenuEvent * event) ;
 //	void keyPressEvent(QKeyEvent *event);
 	void CreateDockWindows();
+	void CreateToolbars();
+	void CreateStatusBar();
 	void CreateActions();
 	void CreateMenus();
 	void CreateXDirectActions();
 	void CreateXDirectMenus();
+	void CreateXDirectToolbar();
 	void CreateMiarexActions();
 	void CreateMiarexMenus();
-	void CreateToolbars();
-	void CreateAFoilToolbar();
 	void CreateMiarexToolbar();
-	void CreateXDirectToolbar();
-	void CreateStatusBar();
+	void CreateAFoilActions();
+	void CreateAFoilMenus();
+	void CreateAFoilToolbar();
+
 	void ClientToGL(QPoint const &point, CVector &real);
 	void DeleteProject();
 	void DeletePlane(CPlane *pPlane, bool bResultsOnly = false);
@@ -167,9 +172,14 @@ private:
 	void *m_pXDirect;
 	void *m_pMiarex;
 	void *m_pAFoil;
+	void *m_pXInverse;
+
 	TwoDWidget *m_p2DWidget;
 
-	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget;
+	XFoil *m_pXFoil;		// a pointer to the XFoil object
+
+
+	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget;
 
 	QToolBar *m_pctrlXDirectToolBar;
 	QToolBar *m_pctrlMiarexToolBar;
@@ -178,6 +188,9 @@ private:
 	//Common Menus
 	QMenu * MainMenu;
 	QMenu *fileMenu, *helpMenu;
+
+	//AFoilMenus
+	QMenu *AFoilViewMenu, *AFoilDesignMenu, *AFoilSplineMenu;
 
 	//  XFoilAnalysis Menus
 	QMenu * XDirectViewMenu;
@@ -202,6 +215,13 @@ private:
 	QAction *unitsAct;
 	QAction *exitAct;
 	QAction *aboutAct, *aboutQtAct;
+
+	//AFoil Actions
+	QAction *storeSplineAct, *zoomInAct, *zoomOutAct, *zoomYAct, *zoomLessAct, *AFoilGridAct;
+	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
+	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
+	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
+	QAction *ExportSplines, *SplineSettings;
 
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct;

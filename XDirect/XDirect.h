@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@
 #include "../Graph/QGraph.h"
 #include "XFoil.h"
 
-
 class QXDirect : public QWidget
 {
 	friend class MainFrame;
@@ -57,7 +56,6 @@ public slots:
 
 
 private slots:
-	void OnNacaFoils();
 	void OnXFoilAdvanced();
 
 	void OnCouplePolarGraphs();
@@ -122,7 +120,8 @@ private slots:
 	void OnSetLERadius();
 	void OnSetFlap();
 	void OnInterpolateFoils();
-	
+	void OnNacaFoils();
+
 	void OnAnimateSingle();
 
 
@@ -310,6 +309,7 @@ private:
 	void *m_pMainFrame;
 	void *m_p2DWidget;
 
+	XFoil *m_pXFoil;
 
 	QColor m_crFoilColor, m_crBLColor, m_crPressureColor, m_crNeutralColor; //foil display parameters
 	int m_iFoilStyle, m_iFoilWidth;
@@ -324,8 +324,6 @@ private:
 //	CFoilAnalysisDlg m_Adlg;	// the polar definition dialog box
 //	CUFOListDlg m_UFOdlg;		// the foil management dialog box
 //	CViscDlg m_ViscDlg;		// the dialog class which manages the xfoil calculation and display output
-
-	XFoil *m_pXFoil;		// a pointer to the XFoil object
 
 	double pi;		// no idea
 

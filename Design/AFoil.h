@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QStandardItemModel>
+#include <QRadioButton>
 
 #include "FoilTableDelegate.h"
 #include "../Misc/FloatEdit.h"
@@ -57,6 +58,15 @@ class QAFoil : public QWidget
 	friend class FoilTableDelegate;
 	friend class TwoDWidget;
 	friend class AFoilGridDlg;
+	friend class FlapDlg;
+	friend class NacaFoilDlg;
+	friend class InterpolateFoilsDlg;
+	friend class TwoDPanelDlg;
+	friend class FoilGeomDlg;
+	friend class TEGapDlg;
+	friend class LEDlg;
+	friend class FoilCoordDlg;
+	friend class CAddDlg;
 
 public:
 	QAFoil(QWidget *parent = NULL);
@@ -66,6 +76,7 @@ public:
  
 
 private slots:
+	void OnSplineType(bool bState);
 	void OnRenameFoil();
 	void OnGrid();
 	void OnCenterLine(bool bState);
@@ -82,6 +93,20 @@ private slots:
 	void OnZoomLess();
 	void OnZoomYOnly();
 	void OnResetYScale();
+	void OnExportSplines();
+	void OnSplineSettings();
+
+	void OnAFoilSetFlap();
+	void OnAFoilDerotateFoil();
+	void OnAFoilNormalizeFoil();
+	void OnAFoilCadd();
+	void OnAFoilPanels();
+	void OnAFoilFoilCoordinates();
+	void OnAFoilFoilGeom();
+	void OnAFoilSetTEGap();
+	void OnAFoilSetLERadius();
+	void OnAFoilInterpolateFoils();
+	void OnAFoilNacaFoils();
 
 private:
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
@@ -125,6 +150,7 @@ private:
 
 
 private:
+	QRadioButton *m_pctrlSF, *m_pctrlPF;
 	LineButton *m_pctrlFoilStyle;
 	QCheckBox *m_pctrlVisible;
 	QCheckBox *m_pctrlCenterLine;

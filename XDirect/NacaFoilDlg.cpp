@@ -22,10 +22,17 @@
 
 #include "NacaFoilDlg.h"
 #include "XDirect.h"
+#include "../Design/AFoil.h"
+
+
+
+void *NacaFoilDlg::s_pXFoil;
 
 
 NacaFoilDlg::NacaFoilDlg()
 {
+	m_pAFoil = NULL;
+	m_pXDirect = NULL;
 	m_bApplied   = false;
 	m_bGenerated = false;
 	m_pBufferFoil = NULL;
@@ -97,8 +104,9 @@ void NacaFoilDlg::GenerateFoil()
 {
 	if(m_bApplied) return;
 	int itype;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	m_bApplied   = true;
 	pXFoil->lflap = false;
 	pXFoil->lbflap = false;
@@ -147,7 +155,8 @@ void NacaFoilDlg::GenerateFoil()
 	m_pBufferFoil->n = pXFoil->nb;
 	m_pBufferFoil->InitFoil();
 
-	pXDirect->UpdateView();
+	if(pXDirect) pXDirect->UpdateView();
+	else if(pAFoil) pAFoil->UpdateView();
 	m_bGenerated = true;
 }
 
