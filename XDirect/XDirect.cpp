@@ -18,7 +18,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+ 
 #include <QtGui>
 #include <QCheckBox>
 #include <math.h>
@@ -4010,7 +4010,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_BufferFoil.m_bTEFlap)
 	{
-		str1 = QString("Flap Angle = %1°").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
+		str1 = QString("Flap Angle = %1 deg").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
 		painter.drawText(LeftPos,ZPos+D, str1);
 		D+=12;
 
@@ -4080,7 +4080,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		}
 		if(m_pCurPolar->m_Type ==4)
 		{
-			strong = QString("Alpha = %1°").arg(m_pCurPolar->m_ASpec,8,'f',2);
+			strong = QString("Alpha = %1 deg").arg(m_pCurPolar->m_ASpec,8,'f',2);
 			painter.drawText(XPos,ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, strong);
 			D+=12;
 			strong = QString("Mach = %1").arg(m_pCurPolar->m_Mach,9,'f',3);

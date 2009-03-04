@@ -297,10 +297,10 @@ void QAFoil::FillFoilTable()
 		if(m_pSF) 
 		{
 			name = "Spline foil";
-			Thickness  = m_pSF->m_fThickness*100.0;
-			xThickness = m_pSF->m_fxThickMax*100.0;
-			Camber     = m_pSF->m_fCamber*100.0;
-			xCamber    = m_pSF->m_fxCambMax*100.0;
+			Thickness  = m_pSF->m_fThickness;
+			xThickness = m_pSF->m_fxThickMax;
+			Camber     = m_pSF->m_fCamber;
+			xCamber    = m_pSF->m_fxCambMax;
 			points     = m_pSF->m_OutPoints;
 		}
 	}
@@ -309,10 +309,10 @@ void QAFoil::FillFoilTable()
 		if(m_pPF) 
 		{
 			name = "Splined points foil";
-			Thickness  = m_pPF->m_fThickness*100.0;
-			xThickness = m_pPF->m_fxThickMax*100.0;
-			Camber     = m_pPF->m_fCamber*100.0;
-			xCamber    = m_pPF->m_fxCambMax*100.0;
+			Thickness  = m_pPF->m_fThickness;
+			xThickness = m_pPF->m_fxThickMax;
+			Camber     = m_pPF->m_fCamber;
+			xCamber    = m_pPF->m_fxCambMax;
 			points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
 				     +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
 		}
@@ -396,7 +396,7 @@ void QAFoil::FillTableRow(int row)
 	}
 
 	ind = m_pFoilModel->index(row, 12, QModelIndex());
-	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
+	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked,   Qt::CheckStateRole);
 	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
 
 }
@@ -480,6 +480,7 @@ CVector QAFoil::MousetoReal(QPoint &point)
 
 void QAFoil::LoadSettings(QDataStream &ar)
 {
+	ar >> m_bSF;
 	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
 	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
 	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
@@ -2252,6 +2253,7 @@ void QAFoil::ReleaseZoom()
 
 void QAFoil::SaveSettings(QDataStream &ar)
 {
+	ar << m_bSF;
 	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
 	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
 	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;

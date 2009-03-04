@@ -62,6 +62,7 @@ struct blData
 class XFoil
 {
 	friend class QXDirect;
+	friend class QXInverse;
 	friend class FoilGeomDlg;
 	friend class TEGapDlg;
 	friend class LEDlg;

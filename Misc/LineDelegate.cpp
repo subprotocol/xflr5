@@ -31,7 +31,7 @@ LineDelegate::LineDelegate(QObject *parent)
 	//initialize with something, just in case
 	for (int i=0; i<5; i++)
 	{
-		m_LineWidth[i] = i;
+		m_LineWidth[i] = i+1;
 		m_LineStyle[i] = i;
 	}
 
@@ -55,9 +55,9 @@ void LineDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 //	else                                        painter->setBrush(QBrush(Qt::black));
 
 	painter->drawLine(option.rect.x()+3,
-					  option.rect.y() + option.rect.height()/2,
-					  option.rect.width()-6,
-					  option.rect.y() + option.rect.height()/2);
+	                  option.rect.y() + option.rect.height()/2,
+	                  option.rect.width()-6,
+	                  option.rect.y() + option.rect.height()/2);
 	painter->restore();
 }
 

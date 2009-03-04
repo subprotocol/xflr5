@@ -39,6 +39,12 @@ public:
 	SplineCtrlDlg(void *pParent=NULL);
 	void InitDialog();
 
+private slots:
+	void OnSelChangeDegExtrados(int sel);
+	void OnSelChangeDegIntrados(int sel);
+	void OnEditFinishedOutExtrados();
+	void OnEditFinishedOutIntrados();
+
 private:
 	void SetupLayout();
 

@@ -24,6 +24,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include "SplineCtrlDlg.h"
+#include "AFoil.h"
 
 
 SplineCtrlDlg::SplineCtrlDlg(void *pParent)
@@ -77,6 +78,10 @@ void SplineCtrlDlg::SetupLayout()
 
 	connect(OKButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(m_pctrlOutExtrados, SIGNAL(editingFinished()), this, SLOT(OnEditFinishedOutExtrados()));
+	connect(m_pctrlOutIntrados, SIGNAL(editingFinished()), this, SLOT(OnEditFinishedOutIntrados()));
+	connect(m_pctrlDegExtrados,    SIGNAL(activated(int)), this, SLOT(OnSelChangeDegExtrados(int)));
+	connect(m_pctrlDegIntrados,    SIGNAL(activated(int)), this, SLOT(OnSelChangeDegIntrados(int)));
 
 }
 
@@ -125,6 +130,62 @@ void SplineCtrlDlg::InitDialog()
 	m_pctrlDegExtrados->setFocus();
 }
 
+
+void SplineCtrlDlg::OnSelChangeDegExtrados(int sel)
+{
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	m_pSF->m_Extrados.m_iDegree = m_pctrlDegExtrados->currentIndex()+2;
+	m_pSF->Update(true);
+	pAFoil->UpdateView();
+}
+
+
+void SplineCtrlDlg::OnSelChangeDegIntrados(int sel)
+{
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	m_pSF->m_Intrados.m_iDegree = m_pctrlDegIntrados->currentIndex()+2;
+	m_pSF->Update(false);
+	pAFoil->UpdateView();
+}
+
+
+
+void SplineCtrlDlg::OnEditFinishedOutExtrados()
+{
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	if(pAFoil->m_bSF)
+	{
+		int n = m_pctrlOutExtrados->GetValue();
+		if(n<1) m_pctrlOutExtrados->SetValue(1);
+		if(n>IQX2-10) m_pctrlOutExtrados->SetValue(IQX2-10);
+		m_pSF->m_Extrados.m_iRes = m_pctrlOutExtrados->GetValue();
+		m_pSF->Update(true);
+	}
+	else
+	{
+		m_pPF->m_Extrados.m_Freq = m_pctrlOutExtrados->GetValue();
+	}
+	pAFoil->UpdateView();
+}
+
+
+void SplineCtrlDlg::OnEditFinishedOutIntrados()
+{
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	if(pAFoil->m_bSF)
+	{
+		int n = m_pctrlOutIntrados->GetValue();
+		if(n<1) m_pctrlOutIntrados->SetValue(1);
+		if(n>IQX2-10) m_pctrlOutIntrados->SetValue(IQX2-10);
+		m_pSF->m_Intrados.m_iRes = m_pctrlOutIntrados->GetValue();
+		m_pSF->Update(true);
+	}
+	else
+	{
+		m_pPF->m_Intrados.m_Freq = m_pctrlOutIntrados->GetValue();
+	}
+	pAFoil->UpdateView();
+}
 
 
 

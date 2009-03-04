@@ -67,6 +67,7 @@ class QAFoil : public QWidget
 	friend class LEDlg;
 	friend class FoilCoordDlg;
 	friend class CAddDlg;
+	friend class SplineCtrlDlg;
 
 public:
 	QAFoil(QWidget *parent = NULL);

@@ -49,8 +49,9 @@ public:
 	void InitDialog();
  
 private slots:
-
-
+	void OnGraphOptions();
+	void OnTangentSpline();
+	void OnShowSpline();
 
 private:
 	void UpdateView();
@@ -65,6 +66,12 @@ private:
 	void PaintGraph(QPainter &painter);
 	void PaintFoil(QPainter &painter);
 	void SetScale(QRect CltRect);
+	void ReleaseZoom();
+	void Smooth(int Pos1 = -1, int Pos2 = -1);
+	void CreateMCurve();
+	void CreateQCurve();
+	void CancelSpline();
+	void CancelSmooth();
 
 private:
 	QTextEdit *m_pctrlOutput;

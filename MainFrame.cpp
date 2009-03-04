@@ -2246,7 +2246,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100513)
+	if(k !=100514)
 	{
 		pXFile->close();
 		return;
@@ -3540,7 +3540,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100513;
+	ar << 100514;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();

@@ -83,7 +83,7 @@ void CSpline::Copy(CSpline *pSpline)
 	memcpy(m_Input, &pSpline->m_Input, sizeof(m_Input));
 	memcpy(m_Output, &pSpline->m_Output, sizeof(m_Output));
 	memcpy(m_knots, &pSpline->m_knots, sizeof(m_knots));
-        m_rViewRect.setCoords(pSpline->m_rViewRect.left(),  pSpline->m_rViewRect.top(),pSpline->m_rViewRect.right(),  pSpline->m_rViewRect.bottom());
+	m_rViewRect.setCoords(pSpline->m_rViewRect.left(),  pSpline->m_rViewRect.top(),pSpline->m_rViewRect.right(),  pSpline->m_rViewRect.bottom());
 }
 
 
@@ -150,12 +150,11 @@ void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley,
 	{
 		pt.rx() = (int)( m_Output[i].x*scalex + Offset.x());
 		pt.ry() = (int)(-m_Output[i].y*scaley + Offset.y());
-		if(!m_rViewRect.contains(pt)) return;
 
 		painter.drawRect(pt.x()-width, pt.y()-width, 2*width, 2*width);
 	}
-
 	painter.restore();
+
 }
 
 
@@ -220,17 +219,16 @@ void CSpline::Export(QTextStream &out, bool bExtrados)
 
 double CSpline::GetY(double x)
 {
-        int i;
+	int i;
 	if(x<=0.0 || x>=1.0) return 0.0;
 	double y;
 
-        for (i=0; i<m_iRes-1; i++)
-        {
-		if (m_Output[i].x <m_Output[i+1].x  && 
-                        m_Output[i].x <= x && x<=m_Output[i+1].x )
-                {
+	for (i=0; i<m_iRes-1; i++)
+	{
+		if (m_Output[i].x <m_Output[i+1].x  && m_Output[i].x <= x && x<=m_Output[i+1].x )
+		{
 			y = (m_Output[i].y 	+ (m_Output[i+1].y-m_Output[i].y)
-								 /(m_Output[i+1].x-m_Output[i].x)*(x-m_Output[i].x));
+			/(m_Output[i+1].x-m_Output[i].x)*(x-m_Output[i].x));
 			return y;
 		}
 	}
@@ -392,11 +390,11 @@ double CSpline::SplineBlend(int i,  int p, double t)
 	} 
 	else
 	{
-                if (fabs(m_knots[i+p] - m_knots[i])<pres && fabs(m_knots[i+p+1] - m_knots[i+1])<pres)
+		if (fabs(m_knots[i+p] - m_knots[i])<pres && fabs(m_knots[i+p+1] - m_knots[i+1])<pres)
 			value = 0.0;
-                else if (fabs(m_knots[i+p] - m_knots[i])<pres)
+		else if (fabs(m_knots[i+p] - m_knots[i])<pres)
 			value = (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1, p-1, t);
-                else if (fabs(m_knots[i+p+1]-m_knots[i+1])<pres)
+		else if (fabs(m_knots[i+p+1]-m_knots[i+1])<pres)
 			value = (t - m_knots[i])   / (m_knots[i+p] - m_knots[i])   * SplineBlend(i,   p-1, t);
 		else 
 			value = (t - m_knots[i])   / (m_knots[i+p]-m_knots[i])	   * SplineBlend(i,   p-1, t) + 
@@ -440,7 +438,7 @@ void CSpline::SplineKnots()
 {
 	double a,b;
 	int j;
-		int iDegree = std::min(m_iDegree, m_iCtrlPoints);
+	int iDegree = std::min(m_iDegree, m_iCtrlPoints);
 
 	m_iKnots  = iDegree + m_iCtrlPoints + 1;
 	for (j=0; j<m_iKnots; j++) 
@@ -467,7 +465,7 @@ void CSpline::SplineKnots()
 double Bernstein(int i, int n, double u)
 {
 	int k;
-        double pui, pu1i1;
+	double pui, pu1i1;
 
 	int fi  = 1;
 	int fni = 1;

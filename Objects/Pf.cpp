@@ -346,7 +346,8 @@ bool CSplinedPoints::RemovePoint(int k)
 	int j;
 	if (k>0 && k<m_iPoints)
 	{
-		for (j=k; j<m_iPoints; j++){
+		for (j=k; j<m_iPoints; j++)
+		{
 			m_ctrlPoint[j] = m_ctrlPoint[j+1];
 		}
 		m_iPoints--;
@@ -354,8 +355,6 @@ bool CSplinedPoints::RemovePoint(int k)
 	CompSlopes();
 	return true;
 }
-
-
 
 
 
@@ -454,7 +453,8 @@ void CSplinedPoints::Export(QTextStream &out, bool bExtrados)
 			}
 		}
 	}
-	else {
+	else
+	{
 		for (int k=0; k<m_iPoints; k++)
 		{
 			LinkSpline.m_iCtrlPoints = -1;
@@ -507,7 +507,8 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
 			}
 		}
 	}
-	else {
+	else
+	{
 		for (k=0; k<m_iPoints-1; k++)
 		{
 			LinkSpline.m_iCtrlPoints = 0;
@@ -572,7 +573,8 @@ int CSplinedPoints::InsertPoint(double x, double y)
 		m_ctrlPoint[0].y = y;
 		m_iPoints++;
 	}
-	else{
+	else
+	{
 		if(x<m_ctrlPoint[0].x)
 		{	// if we're the new minimum point
 			for (j=m_iPoints; j>=0; j--)
@@ -584,7 +586,9 @@ int CSplinedPoints::InsertPoint(double x, double y)
 			ipoint = 0;
 			m_iPoints++;
 		}
-		else{// if we're the new maximum point
+		else
+		{
+			// if we're the new maximum point
 			if(x>=m_ctrlPoint[m_iPoints-1].x)
 			{
 				m_ctrlPoint[m_iPoints].x = x;
