@@ -47,7 +47,9 @@ private slots:
 
 private:
 	void SetupLayout();
+	void keyPressEvent(QKeyEvent *event);
 
+	QPushButton *OKButton;
 	FloatEdit *m_pctrlOutExtrados;
 	FloatEdit *m_pctrlOutIntrados;
 	QComboBox *m_pctrlDegExtrados;

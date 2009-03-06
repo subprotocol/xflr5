@@ -27,10 +27,13 @@
 #include <QPixmap>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QSlider>
+#include <QPushButton>
 #include <QList>
 #include <QDialog>
 #include <QDataStream>
-#include "GL3dViewDlg.h"
+
+#include "ArcBall.h"
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
 #include "WPolarDlg.h"
@@ -61,6 +64,7 @@ class QMiarex : public QWidget
 	friend class TwoDWidget;
 	friend class GL3dViewDlg;
 	friend class GL3dBodyDlg;
+	friend class GLLightDlg;
 	friend class WingDlg;
 	friend class CWing;
 	friend class LLTAnalysisDlg;
@@ -161,13 +165,63 @@ private slots:
 	void OnImportBody();
 	void OnExportBody();
 
+	void OnAxes(int state);
+	void On3DCp(bool bChecked);
+	void On3DIso();
+	void On3DTop();
+	void On3DLeft();
+	void On3DFront();
+	void On3DReset();
+	void On3DPickCenter();
+	void OnSetupLight();
+	void OnClipPlane(int pos);
+	void OnLight(int state);
+	void OnSurfaces(int state);
+	void OnOutline(int state);
+	void OnPanels(int state);
+	void OnVortices(int state);
+	void OnDownwash(int state);
+	void OnMoment(int state);
+
+	void OnLiftScale(int pos);
+	void OnDragScale(int pos);
+	void OnVelocityScale(int pos);
+	void OnCpScale();
+
 private:
 	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void wheelEvent (QWheelEvent *event);
 	void showEvent(QShowEvent *event);
+
+	void ClientToGL(QPoint const &point, CVector &real);
+	void GLToClient(CVector const &real, QPoint &point);
+	void GLCreateGeom(CWing *pWing, int List, QColor wingcolor);
+	void GLCreateMesh();
+	void GLCreateCtrlPts();
+	void GLCreateVortices();
+	void GLCreateLiftForce();
+	void GLCreateMoments();
+	void GLCreateCp();
+	void GLCreateCpLegend();
+	void GLCreateWOppLegend();
+	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List, int surf0);
+	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List);
+	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List);
+	void GLInverseMatrix();
+	void GLRenderView();
+	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
+	void GLSetupLight();
+	void GLDrawAxes();
+	void GLCallViewLists();
+	void GLDraw3D();
+	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
+	void Set3DRotationCenter();
+	void Set3DRotationCenter(QPoint point);
+
 
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void CreateCpCurves();
@@ -265,9 +319,10 @@ private:
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;
 
-	QCheckBox *m_pctrlHalfWing, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag;
-	QCheckBox *m_pctrlTrans, *m_pctrlDownwash,  *m_pctrlAnimate;
+	QCheckBox *m_pctrlHalfWing, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans,  *m_pctrlAnimate;
 	QSlider *m_pctrlAnimateSpeed;
+	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
+	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 
 	QCheckBox *m_pctrlShowCurve;
 	QCheckBox *m_pctrlShowPoints;
@@ -276,16 +331,80 @@ private:
 	LineButton *m_pctrlCurveColor;
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlCpScales;
+	QSlider *m_pctrlClipPlanePos;
+
+
+
+
+	ArcBall m_ArcBall;
+
+	QPoint m_LastPoint, m_PointDown;
+	bool m_bDragPoint;
+	bool m_bArcball;			//true if the arcball is to be displayed
+	bool m_bglLight;
+	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
+	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
+	bool m_b3DCp, m_bDownwash; 	// defines whether the corresponding data should be displayed
+	bool m_bMoments;							// defines whether the corresponfing data should be displayed
+	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
+	bool m_bVortices;				// defines whether the corresponfing data should be displayed
+	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
+	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
+	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
+
+	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
+	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed
+	bool m_bResetglWake;			// true if the wake OpenGL list needs to be refreshed
+	bool m_bResetglOpp, m_bResetglLift, m_bResetglDrag, m_bResetglDownwash;			// true if the OpenGL lists need to be refreshed
+	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be refreshed
+	bool m_bResetglLegend;          //needs to be reset is window has been resized
+	bool m_bResetglBody;
+	bool m_bResetglBodyMesh;
+	bool m_bResetglBody2D;
+	bool m_bResetglBodyOverlay;
+	bool m_bResetglBodyPoints;
+	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
+	bool m_bWakePanels;
+	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
+	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
+	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
+	bool m_bShowLight;			// true if the virtual light is to be displayed
+	bool m_bAutoScales;
+
+	int m_GLList;
+	int m_iView;
+
+	double m_ClipPlanePos;
+	double MatIn[4][4], MatOut[4][4];
+	double m_LegendMin, m_LegendMax;
+
+	double pi;
+	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
+	double m_glScaled;//zoom factor for UFO
+	double m_LiftScale, m_DragScale, m_VelocityScale;
+	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
+						// this is not the scale to display the model in the OpenGL view
+
+	CVector m_UFOOffset;
+
+
+	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
+	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector
+
+
+
 	int m_CurveStyle, m_CurveWidth;
 	QColor m_CurveColor;
 
 	GL3dBodyDlg m_GL3dBody;
-	GL3dViewDlg m_GL3dView;
 	GLLightDlg m_GLLightDlg;
 	WPolarDlg m_WngAnalysis;
 
 	void* m_pMainFrame ;			// a pointer to the frame class
 	void *m_p2DWidget;
+	void *m_pGLWidget;
 
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the VLM calculations
 	VLMAnalysisDlg *m_pVLMDlg;			// the dialog class which manages the VLM calculations
@@ -326,7 +445,6 @@ protected:
 
 //	bool m_bIsPrinting;			// the view is being printed
 	bool m_bTrans;				// the view is being dragged
-	bool m_bDragPoint;				// a point is being dragged
 	bool m_bType1, m_bType2, m_bType4, m_bType5, m_bType6;	// polar types to be displayed
 	bool m_bShowElliptic;			// true if the elliptic loading should be displayed in the local lift graph
 	bool m_bStoreWOpp;			// true if the WOpp should be stored after a calculation
@@ -341,15 +459,13 @@ protected:
 	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
 	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
 	bool m_bIs2DScaleSet;		// true if the 2D scale has been set, false if needs to be reset
-	bool m_bAutoScales;			// true if the scale is to be reset after each UFO selection
 	bool m_bLogFile;			// true if the log file warning is turned on
 	bool m_bResetWake;
 //	bool m_bVLMFinished;		// true if the VLM calculation is finished
 	bool m_bSetNewWake;			// true if the wake needs to be reset
 	bool m_bDirichlet;			// true if Dirichlet BC are applied in 3D panel analysis, false if Neumann
 	bool m_bTrefftz;			// true if the induced drag should be calculated in the Trefftz plane, false if calculated by summation over panels
-	bool m_bXTop, m_bXBot, m_bXCP, m_bXCmRef; 	// defines whether the corresponfing data should be displayed
-	bool m_bICd, m_bVCd;  	// defines whether the corresponfing data should be displayed
+	bool m_bXCmRef; 	// defines whether the corresponfing data should be displayed
 	bool m_bSequence;
 	bool m_bInitLLTCalc;
 
@@ -357,8 +473,6 @@ protected:
 	int m_NSurfaces;
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
 	int m_MatSize;			// the matrix size
-	int m_iView;				//1=opp, 2=plr, 3=3D, 4=Cp, 5=BodyDesign
-	int m_GLList;				// number of current Open Gl Lists
 	int m_iWingView;			// defines how many graphs will be displayed in WOpp view
 	int m_iWPlrView;			// defines how many graphs will be displayed in WPolar view
 	int m_XW1, m_YW1, m_XW2, m_YW2, m_XW3, m_YW3, m_XW4, m_YW4; 	// the WPolar graph variables
@@ -379,7 +493,6 @@ protected:
 	double m_CurSpanPos;		//Span position for Cp Grpah
 	double m_CoreSize;			// core size for VLM vortices
 	double m_MinPanelSize;			// wing minimum panel size ; panels of less length are ignored
-	double pi;				// ???
 	double m_WingScale;			// scale for 2D display
 	double m_LastWOpp;			// last WOPP selected, try to set the same if it exists, for the new polar
 
@@ -427,8 +540,6 @@ protected:
 
 	QFile* m_pXFile;			// a pointer to the output .log file
 
-	QPoint m_LastPoint;			// last mouse position point
-	QPoint m_PointDown;			//last place where the user clicked
 	QPoint m_ptOffset;			// client offset position for wing display
 	QPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
 	QPoint m_WingLegendOffset;		// client offset position for WOPP polar legend

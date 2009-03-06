@@ -31,37 +31,41 @@ class GLWidget : public QGLWidget
 {
     Q_OBJECT
 
+	friend class QMiarex;
+	friend class GL3dViewDlg;
+	friend class GL3dBodyDlg;
 	friend class MainFrame;
-	friend class QXDirect;
+
 public:
 	GLWidget(QWidget *parent = 0);
-	~GLWidget();
-	void UpdateView();
+
+
 
 private:
-
-
-
-protected:
 	void initializeGL();
+	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 	void resizeGL(int width, int height);
+	void paintGL();//virtual override
+	void contextMenuEvent (QContextMenuEvent * event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void wheelEvent (QWheelEvent *event );
 
-	void paintGL();//virtual override
-
 private slots:
 
 private:
-	int m_iView;
-	QColor m_wndTextColor;
-	QRect m_rCltRect;          // The client window rectangle
-	CRectangle *m_pGLViewRect; // The OpenGl Viewport
-	double m_ScaletoGL;        // conversion factor from window client coordinates to GL Viewport coordinates
+	void *m_pParent;
 	void * m_pMiarex;
 
+	QColor m_wndTextColor;
+	QRect m_rCltRect;        // The client window rectangle
+	CRectangle m_GLViewRect; // The OpenGl Viewport
+	double m_ScaletoGL;      // conversion factor from window client coordinates to GL Viewport coordinates
+	bool m_bPlane;
+
+	int m_iView;//Wing=3  Body=5
 };
 
 #endif

@@ -25,7 +25,7 @@
 #include <QVBoxLayout>
 #include "SplineCtrlDlg.h"
 #include "AFoil.h"
-
+#include <QtDebug>
 
 SplineCtrlDlg::SplineCtrlDlg(void *pParent)
 {
@@ -60,12 +60,9 @@ void SplineCtrlDlg::SetupLayout()
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton        = new QPushButton("OK");
-	QPushButton *CancelButton    = new QPushButton("Cancel");
+	OKButton = new QPushButton("OK");
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
@@ -77,7 +74,6 @@ void SplineCtrlDlg::SetupLayout()
 	setLayout(MainLayout);
 
 	connect(OKButton, SIGNAL(clicked()), this, SLOT(accept()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(m_pctrlOutExtrados, SIGNAL(editingFinished()), this, SLOT(OnEditFinishedOutExtrados()));
 	connect(m_pctrlOutIntrados, SIGNAL(editingFinished()), this, SLOT(OnEditFinishedOutIntrados()));
 	connect(m_pctrlDegExtrados,    SIGNAL(activated(int)), this, SLOT(OnSelChangeDegExtrados(int)));
@@ -129,6 +125,38 @@ void SplineCtrlDlg::InitDialog()
 
 	m_pctrlDegExtrados->setFocus();
 }
+
+
+void SplineCtrlDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			return;
+		}
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus())
+			{
+				OKButton->setFocus();
+				return;
+			}
+			else
+			{
+				QDialog::accept();
+				return;
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+	QDialog::keyPressEvent(event);
+}
+
 
 
 void SplineCtrlDlg::OnSelChangeDegExtrados(int sel)

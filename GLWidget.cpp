@@ -24,80 +24,149 @@
 #include <QtGui>
 #include <QtOpenGL>
 #include "MainFrame.h"
+#include "Miarex/Miarex.h"
 #include <math.h>
 #include "Graph/Curve.h"
-#include "Miarex/Miarex.h"
-
+#include "Miarex/GL3dBodyDlg.h"
 #include "GLWidget.h"
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
+	m_pParent = parent;
 	m_wndTextColor = QColor(200,200,200);
-	m_iView = XFOILANALYSIS;
 	m_pMiarex = NULL;
+	m_iView = 3;
+	m_bPlane = true;
+	setMouseTracking(true);
 }
 
-GLWidget::~GLWidget()
+void GLWidget::contextMenuEvent (QContextMenuEvent * event)
 {
-
-}
-
-
-void GLWidget::initializeGL()
-{
-	glClearColor(0.0, 0.0784, 0.1569, 1.0);
+	if(m_iView == 3)
+	{
+		QMiarex *pMiarex = (QMiarex *)m_pMiarex;
+		pMiarex->contextMenuEvent(event);
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->ShowContextMenu(event);
+	}
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	if(m_iView == MIAREX && m_pMiarex)
+	if(m_iView == 3)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mousePressEvent(event);
 	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->mousePressEvent(event);
+	}
 }
+
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(m_iView == MIAREX && m_pMiarex)
+	if(m_iView == 3)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mouseReleaseEvent(event);
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->mouseReleaseEvent(event);
 	}
 }
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	if(m_iView == MIAREX && m_pMiarex)
+	if(m_iView == 3)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->mouseMoveEvent(event);
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->mouseMoveEvent(event);
 	}
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
-	if(m_iView == MIAREX && m_pMiarex)
+	if(m_iView == 3)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->wheelEvent(event);
 	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->wheelEvent(event);
+	}
 }
+
+
+void GLWidget::initializeGL()
+{
+	glClearColor(.1, 0.0784, 0.1569, 1.0);
+}
+
+
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+	if(m_iView == 3)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->keyPressEvent(event);
+	}
+}
+
+void GLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+	if(m_iView == 3)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->keyReleaseEvent(event);
+	}
+}
+
 
 void GLWidget::paintGL()
 {
-    UpdateView();
+	if(m_iView == 3)
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->GLDraw3D();
+		pMiarex->GLRenderView();
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		pDlg->GLDraw3D();
+		pDlg->GLRenderBody();
+	}
 }
 
 
 void GLWidget::resizeGL(int width, int height)
 {
+	double w, h;
 	m_rCltRect = geometry();
 	int side = qMax(width, height);
-	glViewport((width - side) / 2, (height - side) / 2, side, side);
+	w = (double)width;
+	h = (double)height;
 
-	double w =(double)width;
-	double h = (double)height;
+	glViewport((width - side) / 2, (height - side) / 2, side, side);
+//	d = qMax(w,h);
+//	glViewport(0,0, d, d);
 
 	if(w>h) m_ScaletoGL = 1.0/w;
 	else    m_ScaletoGL = 1.0/h;
@@ -109,28 +178,10 @@ void GLWidget::resizeGL(int width, int height)
 //	glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 60.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	if(w>h)	m_pGLViewRect->SetRect(-s, s*h/w, s, -s*h/w);
-	else    m_pGLViewRect->SetRect(-s*w/h, s, s*w/h, -s*h/w);
-//qDebug("l=%f   t=%f   r=%f   b=%f",m_pGLViewRect->left, m_pGLViewRect->top, m_pGLViewRect->right,m_pGLViewRect->bottom);
-
+	if(w>h)	m_GLViewRect.SetRect(-s, s*h/w, s, -s*h/w);
+	else    m_GLViewRect.SetRect(-s*w/h, s, s*w/h, -s*h/w);
 }
 
-
-void GLWidget::UpdateView()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glPushMatrix();
-	{
-		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
-
-		if(m_iView == MIAREX && pMiarex)
-		{
-	//		pMiarex->PaintView();
-		}
-	}
-	glPopMatrix();
-}
 
 
 

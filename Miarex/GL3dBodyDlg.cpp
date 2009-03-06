@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-  
+ 
 #include "../MainFrame.h"
 #include "../Globals.h" 
 #include "../Misc/LinePickerDlg.h"
@@ -4259,6 +4259,7 @@ void GL3dBodyDlg::SetupLayout()
 	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_bPlane = false;
+	m_pglWidget->m_iView  = 5;
 
 	m_pglWidget->setMinimumHeight(r.height()/3);
 	m_pglWidget->setSizePolicy(szPolicyExpanding);

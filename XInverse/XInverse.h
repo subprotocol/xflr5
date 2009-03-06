@@ -56,6 +56,7 @@ private slots:
 private:
 	void UpdateView();
 
+	void showEvent(QShowEvent *event);
 	void wheelEvent(QWheelEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mousePressEvent(QMouseEvent *event) ;
@@ -81,10 +82,14 @@ private:
 	QCheckBox *m_pctrlShowSpline, *m_pctrlTangentSpline, *m_pctrlSymm;
 	FloatEdit *m_pctrlSpec, *m_pctrlFilterParam, *m_pctrlTGapy, *m_pctrlTGapx, *m_pctrlTAngle;
 
-	QTextEdit *m_pctrlMSpec;
+	QTextEdit *m_pctrlMSpec, *m_pctrlMOutput;
 	FloatEdit *m_pctrlIter;
 	QPushButton	*m_pctrlMark;
 	QCheckBox *m_pctrlCpxx;
+
+	QCheckBox *m_pctrlMShowSpline, *m_pctrlMTangentSpline;
+	QPushButton *m_pctrlMExec, *m_pctrlMNewSpline, *m_pctrlMApplySpline, *m_pctrlMSmooth, *m_pctrlMResetQSpec;
+
 
 	QVBoxLayout *m_pctrlMInvLayout,*m_pctrlFInvLayout;
 

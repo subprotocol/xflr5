@@ -32,14 +32,16 @@
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
+	m_bFullInverse = false;
+
+
 	m_hcArrow = QCursor(Qt::ArrowCursor);
 	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 	
 	m_pXFoil = NULL;
 
-	m_bTransGraph = false;
-	m_bFullInverse = true;
+	m_bTransGraph    = false;
 	m_bLoaded        = false;
 	m_bSaved         = true;
 	m_bZoomPlus      = false;
@@ -102,155 +104,69 @@ QXInverse::QXInverse(QWidget *parent)
 }
 
 
-void QXInverse::SetupLayout()
+
+
+
+void QXInverse::CreateQCurve()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/3);
-	move(r.width()/3, r.height()/6);
+	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	double x,y;
+	m_pQCurve->n = 0;
 
-	QGridLayout *SpecLayout = new QGridLayout;
-	m_pctrlSpecAlpha = new QRadioButton("Alpha");
-	m_pctrlSpecCl = new QRadioButton("Cl");
-	m_pctrlSpecif = new QLabel("Alpha = ");
-	m_pctrlSpec   = new FloatEdit("1.23");
-	SpecLayout->addWidget(m_pctrlSpecAlpha,1,1);
-	SpecLayout->addWidget(m_pctrlSpecCl,1,2);
-	SpecLayout->addWidget(m_pctrlSpecif,2,1);
-	SpecLayout->addWidget(m_pctrlSpec,2,2);
-	QGroupBox *SpecBox = new QGroupBox("Specification");
-	SpecBox->setLayout(SpecLayout);
+	int points;
+	if(m_bFullInverse) points = 257;
+	else points  = pXFoil->n;
 
-	QVBoxLayout *ModLayout = new QVBoxLayout;
-	m_pctrlShowSpline = new QCheckBox("ShowSpline");
-	m_pctrlTangentSpline = new QCheckBox("Spline tangent to curve");
-	m_pctrlNewSpline   = new QPushButton("New Spline");
-	m_pctrlApplySpline = new QPushButton("Apply Spline");
-	m_pctrlResetQSpec  = new QPushButton("Reset QSpec");
-	m_pctrlPert        = new QPushButton("Pert");
-	ModLayout->addWidget(m_pctrlShowSpline);
-	ModLayout->addWidget(m_pctrlTangentSpline);
-	ModLayout->addWidget(m_pctrlNewSpline);
-	ModLayout->addWidget(m_pctrlApplySpline);
-	ModLayout->addWidget(m_pctrlResetQSpec);
-	ModLayout->addWidget(m_pctrlPert);
-	QGroupBox *ModBox = new QGroupBox("Modification");
-	ModBox->setLayout(ModLayout);
-
-	QVBoxLayout *SmoothLayout = new QVBoxLayout;
-	m_pctrlSmooth = new QPushButton("Smooth QSpec");
-	m_pctrlFilter = new QPushButton("Hannig Filter");
-	QHBoxLayout *FilterLayout = new QHBoxLayout;
-	QLabel *lab0 = new QLabel("Filter parameter");
-	m_pctrlFilterParam = new FloatEdit("2.34");
-	FilterLayout->addWidget(lab0);
-	FilterLayout->addWidget(m_pctrlFilter);
-	SmoothLayout->addWidget(m_pctrlSmooth);
-	SmoothLayout->addWidget(m_pctrlFilter);
-	SmoothLayout->addLayout(FilterLayout);
-	QGroupBox *SmoothBox = new QGroupBox;
-	SmoothBox->setLayout(SmoothLayout);
-
-	QGridLayout *TELayout = new QGridLayout;
-	QLabel *lab1 = new QLabel("T.E. Angle");
-	QLabel *lab2 = new QLabel("T.E. Gap dx/c");
-	QLabel *lab3 = new QLabel("T.E. Gap dy/c");
-	m_pctrlTAngle = new FloatEdit("3.681");
-	m_pctrlTGapx  = new FloatEdit("0.001");
-	m_pctrlTGapy  = new FloatEdit("0.002");
-	m_pctrlTAngle->SetPrecision(3);
-	m_pctrlTGapx->SetPrecision(3);
-	m_pctrlTGapy->SetPrecision(3);
-	TELayout->addWidget(lab1,1,1);
-	TELayout->addWidget(lab2,2,1);
-	TELayout->addWidget(lab3,3,1);
-	TELayout->addWidget(m_pctrlTAngle,1,2);
-	TELayout->addWidget(m_pctrlTGapx,2,2);
-	TELayout->addWidget(m_pctrlTGapy,3,2);
-	m_pctrlSymm = new QCheckBox("Symmetric foil");
-	QVBoxLayout *ConstraintsLayout = new QVBoxLayout;
-	ConstraintsLayout->addLayout(TELayout);
-	ConstraintsLayout->addWidget(m_pctrlSymm);
-	QGroupBox *ConstraintsBox = new QGroupBox("Constraints");
-	ConstraintsBox->setLayout(ConstraintsLayout);
-
-	m_pctrlExec = new QPushButton("Execute");
-	m_pctrlOutput = new QTextEdit("Output here");
-
-	m_pctrlFInvLayout = new QVBoxLayout;
-	m_pctrlFInvLayout->addWidget(SpecBox);
-	m_pctrlFInvLayout->addWidget(ModBox);
-	m_pctrlFInvLayout->addWidget(SmoothBox);
-	m_pctrlFInvLayout->addWidget(ConstraintsBox);
-	m_pctrlFInvLayout->addWidget(m_pctrlExec);
-	m_pctrlFInvLayout->addWidget(m_pctrlOutput);
-	m_pctrlFInvLayout->addStretch(1);
-
-	//specific MInv Controls
-	m_pctrlMSpec = new QTextEdit("Alpha = \nCl = \n");
-	m_pctrlIter = new FloatEdit("11");
-	m_pctrlMark = new QPushButton("Mark for modification");
-	m_pctrlCpxx = new QCheckBox("End Point Constraint");
-
-	QVBoxLayout *MSplineslayout = new QVBoxLayout;
-	MSplineslayout->addWidget(m_pctrlShowSpline);
-	MSplineslayout->addWidget(m_pctrlTangentSpline);
-	MSplineslayout->addWidget(m_pctrlNewSpline);
-	MSplineslayout->addWidget(m_pctrlApplySpline);
-	MSplineslayout->addWidget(m_pctrlMark);
-	MSplineslayout->addWidget(m_pctrlSmooth);
-	MSplineslayout->addWidget(m_pctrlResetQSpec);
-	QGroupBox *MSplinesBox = new QGroupBox("Modification");
-	MSplinesBox->setLayout(MSplineslayout);
-
-	QVBoxLayout *FoilLayout = new QVBoxLayout;
-	FoilLayout->addWidget(m_pctrlCpxx);
-	FoilLayout->addWidget(m_pctrlExec);
-	QHBoxLayout *MaxIter = new QHBoxLayout;
-	QLabel *lab10 = new QLabel("Max Iterations");
-	MaxIter->addWidget(lab10);
-	MaxIter->addWidget(m_pctrlIter);
-	FoilLayout->addLayout(MaxIter);
-	QGroupBox *FoilBox = new QGroupBox("Foil");
-
-	m_pctrlMInvLayout = new QVBoxLayout;
-	m_pctrlMInvLayout->addWidget(m_pctrlMSpec);
-	m_pctrlMInvLayout->addWidget(MSplinesBox);
-	m_pctrlMInvLayout->addWidget(FoilBox);
-	m_pctrlMInvLayout->addWidget(m_pctrlOutput);
-}
-
-
-
-void QXInverse::PaintView(QPainter &painter)
-{
-	painter.save();
-
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
-	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
-	PaintGraph(painter);
-	PaintFoil(painter);
-
-	painter.restore();
-}
-
-
-void QXInverse::UpdateView()
-{
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-
-	if(m_p2DWidget)
+	for (int i=1; i<=points; i++)
 	{
-		p2DWidget->update();
+		x = 1.0 - pXFoil->sspec[i];
+		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
+		m_pQCurve->AddPoint(x,y);
 	}
 }
 
 
-void QXInverse::wheelEvent(QWheelEvent *event)
+void QXInverse::CreateMCurve()
 {
+	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	int i, points;
+	double x,y;
+	m_pMCurve->n = 0;
+	m_pReflectedCurve->n = 0;
+
+	if(m_bFullInverse) points = 257;
+	else               points = pXFoil->n;
+
+	for (i=1; i<=points; i++)
+	{
+		x = 1.0 - pXFoil->sspec[i];
+		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
+		m_pMCurve->AddPoint(x,y);
+		m_pReflectedCurve->AddPoint(pXFoil->sspec[i],-y);
+	}
 }
 
+
+void QXInverse::CancelSmooth()
+{
+	m_bSmooth = false;
+	m_bGetPos = false;
+	m_pctrlSmooth->setChecked(false);
+}
+void QXInverse::CancelSpline()
+{
+	m_pctrlOutput->setText(" ");
+//	pXInv->m_bSpline  = false;
+	m_bSplined = false;
+//	m_ctrlShowSpline.SetCheck(0);
+	m_pctrlNewSpline->setChecked(false);
+	m_bSmooth = false;
+	m_bGetPos = false;
+	m_nPos    = 0;
+	m_tmpPos  = -1;
+	m_Pos1    = -1;
+	m_Pos2    = -1;
+}
 
 void QXInverse::mouseMoveEvent(QMouseEvent *event)
 {
@@ -871,6 +787,32 @@ void QXInverse::keyReleaseEvent(QKeyEvent *event)
 }
 
 
+void QXInverse::OnGraphOptions()
+{
+	GraphDlg dlg;
+	dlg.m_pGraph = &m_QGraph;
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		UpdateView();
+	}
+}
+
+
+void QXInverse::OnShowSpline()
+{
+	m_bSpline = m_pctrlShowSpline->isChecked();
+	m_bSplined =   !m_bSpline;
+	UpdateView();
+}
+
+
+void QXInverse::OnTangentSpline()
+{
+	m_bTangentSpline = m_pctrlTangentSpline->isChecked();
+}
+
+
 void QXInverse::PaintGraph(QPainter &painter)
 {
 	painter.save();
@@ -1006,6 +948,164 @@ void QXInverse::PaintFoil(QPainter &painter)
 }
 
 
+
+void QXInverse::PaintView(QPainter &painter)
+{
+	painter.save();
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+	PaintGraph(painter);
+	PaintFoil(painter);
+
+	painter.restore();
+}
+
+
+
+void QXInverse::ReleaseZoom()
+{
+	m_bZoomPlus = false;
+	m_ZoomRect.setRight(m_ZoomRect.left());
+	m_ZoomRect.setTop(m_ZoomRect.bottom());
+//	CToolBarCtrl *pTB = &(m_pXInverseBar->GetToolBarCtrl());
+//	pTB->PressButton(IDT_ZOOMIN, false);
+}
+
+
+void QXInverse::SetupLayout()
+{
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+//	setMinimumHeight(r.height()/3);
+	move(r.width()/3, r.height()/6);
+
+	QGridLayout *SpecLayout = new QGridLayout;
+	m_pctrlSpecAlpha = new QRadioButton("Alpha");
+	m_pctrlSpecCl = new QRadioButton("Cl");
+	m_pctrlSpecif = new QLabel("Alpha = ");
+	m_pctrlSpecif->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlSpec   = new FloatEdit("1.23");
+	SpecLayout->addWidget(m_pctrlSpecAlpha,1,1);
+	SpecLayout->addWidget(m_pctrlSpecCl,1,2);
+	SpecLayout->addWidget(m_pctrlSpecif,2,1);
+	SpecLayout->addWidget(m_pctrlSpec,2,2);
+	QGroupBox *SpecBox = new QGroupBox("Specification");
+	SpecBox->setLayout(SpecLayout);
+
+	QGridLayout *ModLayout = new QGridLayout;
+	m_pctrlShowSpline    = new QCheckBox("ShowSpline");
+	m_pctrlTangentSpline = new QCheckBox("Tangent Spline");
+	m_pctrlNewSpline     = new QPushButton("New Spline");
+	m_pctrlApplySpline   = new QPushButton("Apply Spline");
+	m_pctrlResetQSpec    = new QPushButton("Reset QSpec");
+	m_pctrlPert          = new QPushButton("Pert");
+	ModLayout->addWidget(m_pctrlShowSpline,1,1);
+	ModLayout->addWidget(m_pctrlTangentSpline,1,2);
+	ModLayout->addWidget(m_pctrlNewSpline,2,1);
+	ModLayout->addWidget(m_pctrlApplySpline,2,2);
+	ModLayout->addWidget(m_pctrlResetQSpec,3,1);
+	ModLayout->addWidget(m_pctrlPert,3,2);
+	QGroupBox *ModBox = new QGroupBox("Modification");
+	ModBox->setLayout(ModLayout);
+
+	QGridLayout *SmoothLayout = new QGridLayout;
+	m_pctrlSmooth = new QPushButton("Smooth QSpec");
+	m_pctrlFilter = new QPushButton("Hannig Filter");
+	QLabel *lab0 = new QLabel("Filter parameter");
+	lab0->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlFilterParam = new FloatEdit("2.34");
+	SmoothLayout->addWidget(m_pctrlSmooth,1,1);
+	SmoothLayout->addWidget(m_pctrlFilter,1,2);
+	SmoothLayout->addWidget(lab0,2,1);
+	SmoothLayout->addWidget(m_pctrlFilterParam,2,2);
+	QGroupBox *SmoothBox = new QGroupBox;
+	SmoothBox->setLayout(SmoothLayout);
+
+	QGridLayout *TELayout = new QGridLayout;
+	QLabel *lab1 = new QLabel("T.E. Angle");
+	QLabel *lab2 = new QLabel("T.E. Gap dx/c");
+	QLabel *lab3 = new QLabel("T.E. Gap dy/c");
+	lab1->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	lab2->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	lab3->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+	m_pctrlTAngle = new FloatEdit("3.681");
+	m_pctrlTGapx  = new FloatEdit("0.001");
+	m_pctrlTGapy  = new FloatEdit("0.002");
+	m_pctrlTAngle->SetPrecision(3);
+	m_pctrlTGapx->SetPrecision(3);
+	m_pctrlTGapy->SetPrecision(3);
+	TELayout->addWidget(lab1,1,1);
+	TELayout->addWidget(lab2,2,1);
+	TELayout->addWidget(lab3,3,1);
+	TELayout->addWidget(m_pctrlTAngle,1,2);
+	TELayout->addWidget(m_pctrlTGapx,2,2);
+	TELayout->addWidget(m_pctrlTGapy,3,2);
+	m_pctrlSymm = new QCheckBox("Symmetric foil");
+	QVBoxLayout *ConstraintsLayout = new QVBoxLayout;
+	ConstraintsLayout->addLayout(TELayout);
+	ConstraintsLayout->addWidget(m_pctrlSymm);
+	QGroupBox *ConstraintsBox = new QGroupBox("Constraints");
+	ConstraintsBox->setLayout(ConstraintsLayout);
+
+	m_pctrlExec = new QPushButton("Execute");
+	m_pctrlOutput = new QTextEdit("Output here");
+
+	m_pctrlFInvLayout = new QVBoxLayout;
+	m_pctrlFInvLayout->addWidget(SpecBox);
+	m_pctrlFInvLayout->addWidget(ModBox);
+	m_pctrlFInvLayout->addWidget(SmoothBox);
+	m_pctrlFInvLayout->addWidget(ConstraintsBox);
+	m_pctrlFInvLayout->addWidget(m_pctrlExec);
+	m_pctrlFInvLayout->addWidget(m_pctrlOutput);
+	m_pctrlFInvLayout->addStretch(1);
+
+	//specific MInv Controls
+	m_pctrlMSpec = new QTextEdit("Alpha = Cl =");
+//	m_pctrlMSpec->setMaximumHeight((int)((rect().height()/8)));
+	m_pctrlIter = new FloatEdit("11");
+	m_pctrlMark = new QPushButton("Mark for modification");
+	m_pctrlCpxx = new QCheckBox("End Point Constraint");
+	m_pctrlMExec = new QPushButton("Execute");
+	m_pctrlMOutput = new QTextEdit("Output here");
+
+	QGridLayout *MSplineslayout = new QGridLayout;
+	m_pctrlMShowSpline    = new QCheckBox("ShowSpline");
+	m_pctrlMTangentSpline = new QCheckBox("Tangent Spline");
+	m_pctrlMNewSpline     = new QPushButton("New Spline");
+	m_pctrlMApplySpline   = new QPushButton("Apply Spline");
+	m_pctrlMSmooth        = new QPushButton("Smooth");
+	m_pctrlMResetQSpec    = new QPushButton("ResetQSpec");
+	MSplineslayout->addWidget(m_pctrlMShowSpline,1,1);
+	MSplineslayout->addWidget(m_pctrlMTangentSpline,1,2);
+	MSplineslayout->addWidget(m_pctrlMNewSpline,2,1);
+	MSplineslayout->addWidget(m_pctrlMApplySpline,2,2);
+	MSplineslayout->addWidget(m_pctrlMark,3,1,1,2);
+	MSplineslayout->addWidget(m_pctrlMSmooth,4,1);
+	MSplineslayout->addWidget(m_pctrlMResetQSpec,4,2);
+	QGroupBox *MSplinesBox = new QGroupBox("Modification");
+	MSplinesBox->setLayout(MSplineslayout);
+
+	QVBoxLayout *FoilLayout = new QVBoxLayout;
+	FoilLayout->addWidget(m_pctrlCpxx);
+	FoilLayout->addWidget(m_pctrlMExec);
+	QHBoxLayout *MaxIter = new QHBoxLayout;
+	QLabel *lab10 = new QLabel("Max Iterations");
+	MaxIter->addWidget(lab10);
+	MaxIter->addWidget(m_pctrlIter);
+	FoilLayout->addLayout(MaxIter);
+	QGroupBox *FoilBox = new QGroupBox("Foil");
+
+	m_pctrlMInvLayout = new QVBoxLayout;
+	m_pctrlMInvLayout->addWidget(m_pctrlMSpec);
+	m_pctrlMInvLayout->addWidget(MSplinesBox);
+	m_pctrlMInvLayout->addWidget(FoilBox);
+	m_pctrlMInvLayout->addWidget(m_pctrlMOutput);
+	m_pctrlMInvLayout->addStretch(1);
+}
+
+
 void QXInverse::SetScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;
@@ -1028,28 +1128,9 @@ void QXInverse::SetScale(QRect CltRect)
 }
 
 
-void QXInverse::ReleaseZoom()
+void QXInverse::showEvent(QShowEvent *event)
 {
-	m_bZoomPlus = false;
-	m_ZoomRect.setRight(m_ZoomRect.left());
-	m_ZoomRect.setTop(m_ZoomRect.bottom());
-//	CToolBarCtrl *pTB = &(m_pXInverseBar->GetToolBarCtrl());
-//	pTB->PressButton(IDT_ZOOMIN, false);
 }
-
-
-
-void QXInverse::OnGraphOptions()
-{
-	GraphDlg dlg;
-	dlg.m_pGraph = &m_QGraph;
-
-	if(QDialog::Accepted == dlg.exec())
-	{
-		UpdateView();
-	}
-}
-
 
 
 void QXInverse::Smooth(int Pos1, int Pos2)
@@ -1093,78 +1174,20 @@ void QXInverse::Smooth(int Pos1, int Pos2)
 
 
 
-
-void QXInverse::CreateQCurve()
+void QXInverse::UpdateView()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	double x,y;
-	m_pQCurve->n = 0;
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
-	int points;
-	if(m_bFullInverse) points = 257;
-	else points  = pXFoil->n;
-
-	for (int i=1; i<=points; i++)
+	if(m_p2DWidget)
 	{
-		x = 1.0 - pXFoil->sspec[i];
-		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
-		m_pQCurve->AddPoint(x,y);
+		p2DWidget->update();
 	}
 }
 
 
-void QXInverse::CreateMCurve()
+
+void QXInverse::wheelEvent(QWheelEvent *event)
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	int i, points;
-	double x,y;
-	m_pMCurve->n = 0;
-	m_pReflectedCurve->n = 0;
-
-	if(m_bFullInverse) points = 257;
-	else               points = pXFoil->n;
-
-	for (i=1; i<=points; i++)
-	{
-		x = 1.0 - pXFoil->sspec[i];
-		y = pXFoil->qcomp(pXFoil->qspec[1][i])/pXFoil->qinf;
-		m_pMCurve->AddPoint(x,y);
-		m_pReflectedCurve->AddPoint(pXFoil->sspec[i],-y);
-	}
-}
-
-
-void QXInverse::CancelSmooth()
-{
-	m_bSmooth = false;
-	m_bGetPos = false;
-	m_pctrlSmooth->setChecked(false);
-}
-void QXInverse::CancelSpline()
-{
-	m_pctrlOutput->setText(" ");
-//	pXInv->m_bSpline  = false;
-	m_bSplined = false;
-//	m_ctrlShowSpline.SetCheck(0);
-	m_pctrlNewSpline->setChecked(false);
-	m_bSmooth = false;
-	m_bGetPos = false;
-	m_nPos    = 0;
-	m_tmpPos  = -1;
-	m_Pos1    = -1;
-	m_Pos2    = -1;
-}
-
-void QXInverse::OnTangentSpline()
-{
-	m_bTangentSpline = m_pctrlTangentSpline->isChecked();
-}
-
-void QXInverse::OnShowSpline()
-{
-	m_bSpline = m_pctrlShowSpline->isChecked();
-	m_bSplined =   !m_bSpline;
-	UpdateView();
 }
 
 

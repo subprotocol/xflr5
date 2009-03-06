@@ -48,7 +48,7 @@ protected:
 	void wheelEvent (QWheelEvent *event );
 	void resizeEvent ( QResizeEvent * event );
 	void paintEvent(QPaintEvent *event);
-
+	void showEvent ( QShowEvent * event );
 
 private:
 

@@ -29,8 +29,10 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	MainFrame w;
 	w.setWindowTitle("QFLR5");
-	w.setMinimumWidth(900);
-	w.setMinimumHeight(500);
+//	w.setMinimumWidth(900);
+//	w.setMinimumHeight(500);
+	w.resize(w.m_wndSize);
+	w.move(w.m_wndPos);
 
 	if(w.m_bMaximized)	w.showMaximized();
 	else                w.show();

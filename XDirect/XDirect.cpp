@@ -3928,7 +3928,6 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	QString Result, str, str1;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
-
 	if (m_rCltRect.width()<150 || m_rCltRect.height()<150) return;
 
 	if(m_bNeutralLine)
@@ -4688,6 +4687,8 @@ CFoil* QXDirect::SetFoil(QString FoilName)
 	else         CreateOppCurves();
 	return m_pCurFoil;
 }
+
+
 void QXDirect::SetFoilScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;

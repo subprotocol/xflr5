@@ -58,9 +58,7 @@ SOURCES += MainFrame.cpp \
     Miarex/PanelAnalysisDlg.cpp \
     Miarex/LLTAnalysisDlg.cpp \
     Miarex/ImportWingDlg.cpp \
-    Miarex/GLWidget.cpp \
     Miarex/GLLightDlg.cpp \
-    Miarex/GL3dViewDlg.cpp \
     Miarex/CpScaleDlg.cpp \
     Miarex/BodyTableDelegate.cpp \
     Miarex/Miarex.cpp \
@@ -81,8 +79,10 @@ SOURCES += MainFrame.cpp \
     Design/FoilTableDelegate.cpp \
     XInverse/XInverse.cpp \
     Design/AFoilGridDlg.cpp \
-    Design/SplineCtrlDlg.cpp
+    Design/SplineCtrlDlg.cpp \
+    GLWidget.cpp
 HEADERS += MainFrame.h \
+    Params.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
     XDirect/XFoilAdvancedDlg.h \
@@ -137,10 +137,8 @@ HEADERS += MainFrame.h \
     Miarex/LLTAnalysisDlg.h \
     Miarex/ImportWingDlg.h \
     Miarex/GLLightDlg.h \
-    Miarex/GL3dViewDlg.h \
     Miarex/CpScaleDlg.h \
     Miarex/Miarex.h \
-    Miarex/GLWidget.h \
     Miarex/ArcBall.h \
     Miarex/BodyGridDlg.h \
     Miarex/BodyTableDelegate.h \
@@ -158,5 +156,6 @@ HEADERS += MainFrame.h \
     Design/FoilTableDelegate.h \
     XInverse/XInverse.h \
     Design/AFoilGridDlg.h \
-    Design/SplineCtrlDlg.h
+    Design/SplineCtrlDlg.h \
+    GLWidget.h
 RESOURCES += qflr5.qrc

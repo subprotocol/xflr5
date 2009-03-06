@@ -182,6 +182,34 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
+void TwoDWidget::showEvent ( QShowEvent * event )
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(m_pXDirect)
+	{
+		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->SetFoilScale(rect());
+	}
+	else  if(m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->m_bIs2DScaleSet = false;
+		pMiarex->SetScale(rect());
+	}
+	else if(m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->SetScale(rect());
+	}
+	else if(m_pXInverse)
+	{
+		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
+		pXInverse->SetScale(rect());
+	}
+}
+
+
 void TwoDWidget::resizeEvent(QResizeEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -189,13 +217,11 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-		pXDirect->m_rCltRect = rect();
 		pXDirect->SetFoilScale(rect());
 	}
 	else  if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
-		pMiarex->m_rCltRect = rect();
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->SetScale(rect());
 	}

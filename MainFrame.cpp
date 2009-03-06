@@ -313,8 +313,8 @@ void MainFrame::AddRecentFile(const QString &PathName)
 void MainFrame::closeEvent (QCloseEvent * event)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_GL3dView.hide();
-	pMiarex->m_GL3dView.close();
+//	pMiarex->m_GL3dView.hide();
+//	pMiarex->m_GL3dView.close();
 
 	if(!m_bSaved)
 	{
@@ -404,8 +404,13 @@ void MainFrame::CreateActions()
 
 	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
 	OnAFoilAct->setShortcut(tr("Ctrl+1"));
-	OnAFoilAct->setStatusTip(tr("Open Foil Deisgn application"));
+	OnAFoilAct->setStatusTip(tr("Open Foil Design application"));
 	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
+
+	OnXInverseAct = new QAction(tr("&Inverse Foil Design"), this);
+	OnXInverseAct->setShortcut(tr("Ctrl+3"));
+	OnXInverseAct->setStatusTip(tr("Open Full Inverse foil design application"));
+	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
 
 	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
  	saveAct->setShortcut(tr("Ctrl+S"));
@@ -607,7 +612,13 @@ void MainFrame::CreateDockWindows()
 	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
 
 	m_p2DWidget = new TwoDWidget(this);
-	setCentralWidget(m_p2DWidget);
+	m_pGLWidget = new GLWidget(this);
+
+	m_pctrlCentralWidget = new QStackedWidget;
+	m_pctrlCentralWidget->addWidget(m_p2DWidget);
+	m_pctrlCentralWidget->addWidget(m_pGLWidget);
+
+	setCentralWidget(m_pctrlCentralWidget);
 
 	m_pXDirect = new QXDirect(this);
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
@@ -637,6 +648,9 @@ void MainFrame::CreateDockWindows()
 	m_p2DWidget->m_pMiarex    = pMiarex;
 	m_p2DWidget->m_pAFoil     = pAFoil;
 	m_p2DWidget->m_pMainFrame = this;
+
+	m_pGLWidget->m_pMiarex    = pMiarex;
+	pMiarex->m_pGLWidget      = m_pGLWidget;
 
 	QSizePolicy sizepol;
 	sizepol.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -677,8 +691,8 @@ void MainFrame::CreateDockWindows()
 	pXInverse->m_pXFoil       = m_pXFoil;
 	pXInverse->m_poaFoil      = &m_oaFoil;
 
-	GL3dViewDlg::s_pMainFrame = this;
-	GL3dViewDlg::s_pMiarex    = m_pMiarex;
+//	GL3dViewDlg::s_pMainFrame = this;
+//	GL3dViewDlg::s_pMiarex    = m_pMiarex;
 	GL3dBodyDlg::s_pMainFrame = this;
 	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
 
@@ -721,6 +735,7 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(saveProjectAsAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(OnAFoilAct);
+	fileMenu->addAction(OnXInverseAct);
 	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
@@ -2252,8 +2267,8 @@ void MainFrame::LoadSettings()
 		return;
 	}
 	ar >> a >> b >> c >> d;
-	QPoint pt(a,b);
-	QSize sz(c,d);
+	m_wndPos = QPoint(a,b);
+	m_wndSize = QSize(c,d);
 //	resize(sz);
 //	move(pt);
 	ar >> m_bMaximized;
@@ -2401,6 +2416,7 @@ void MainFrame::OnAFoil()
 
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->hide();
+	m_pctrlXInverseWidget->hide();
 	m_pctrlAFoilWidget->show();
 
 	SetMenus();
@@ -2560,11 +2576,11 @@ void MainFrame::OnLoadFile()
 	if(pos>0) m_LastDirName = PathName.left(pos);
 	if(!PathName.length())		return;
 
-	m_iApp = LoadXFLR5File(PathName);
+	int app = LoadXFLR5File(PathName);
 	if(m_iApp==0)
 	{
-//		if (app == XFOILANALYSIS) OnXDirect();
-//		else if(app==MIAREX)      OnMiarex();
+		if (app == XFOILANALYSIS) OnXDirect();
+		else if(app==MIAREX)      OnMiarex();
 	}
 	else if(m_iApp==XFOILANALYSIS)
 	{
@@ -2615,10 +2631,16 @@ void MainFrame::OnMiarex()
 
 	m_pctrlXDirectWidget->hide();
 	m_pctrlAFoilWidget->hide();
+	m_pctrlXInverseWidget->hide();
 	m_pctrlMiarexWidget->show();
 
+	pMiarex->SetUFO();
+	UpdateUFOs();
 	SetMenus();
+	SetCentralWidget();
+	pMiarex->UpdateView();
 }
+
 
 
 void MainFrame::OnResetCurGraphScales()
@@ -3135,7 +3157,6 @@ void MainFrame::OnStyle()
 	dlg.m_TextFont        = m_TextFont;
 	dlg.m_pRefGraph       = &m_RefGraph;
 	dlg.m_StyleName       = m_StyleName;
-
 	dlg.InitDialog();
 
 	if(dlg.exec() ==QDialog::Accepted)
@@ -3201,15 +3222,34 @@ void MainFrame::OnUnits()
 
 void MainFrame::OnXDirect()
 {
+	m_iApp = XFOILANALYSIS;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetFoilScale();
-	m_iApp = XFOILANALYSIS;
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->show();
 	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->hide();
+	m_pctrlXInverseWidget->hide();
 	m_pctrlXDirectWidget->show();
+	SetMenus();
+	UpdateFoils();
+}
+
+
+
+void MainFrame::OnXInverse()
+{
+	m_iApp = INVERSEDESIGN;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+//	pXInverse->SetFoilScale();
+	m_pctrlMiarexToolBar->hide();
+	m_pctrlAFoilToolBar->hide();
+	m_pctrlXDirectToolBar->hide();
+	m_pctrlAFoilWidget->hide();
+	m_pctrlMiarexWidget->hide();
+	m_pctrlXDirectWidget->hide();
+	m_pctrlXInverseWidget->show();
 	SetMenus();
 }
 
@@ -3222,14 +3262,19 @@ void MainFrame::openRecentFile()
 	QXDirect *pXDirect = (QXDirect*) m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*) m_pMiarex;
 
-	m_iApp = LoadXFLR5File(action->data().toString());
-
-	if(m_iApp==0)
+	int app = LoadXFLR5File(action->data().toString());
+	if(app==0)
 	{
-//remove filename from list
+		//remove filename from list
 		QString FileName = action->data().toString();
 		m_RecentFiles.removeAll(FileName);
 		updateRecentFileActions();
+	}
+
+	if(m_iApp==0)
+	{
+		if(app==XFOILANALYSIS) OnXDirect();
+		else if (app==MIAREX) OnMiarex();
 	}
 	else if(m_iApp==XFOILANALYSIS)
 	{
@@ -4312,6 +4357,18 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 	}
 }
 
+void MainFrame::SetCentralWidget()
+{
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	if(m_iApp!=MIAREX || (m_iApp==MIAREX && pMiarex->m_iView!=3))
+	{
+		m_pctrlCentralWidget->setCurrentIndex(0);
+	}
+	else if(m_iApp==MIAREX && pMiarex->m_iView==3)
+	{
+		m_pctrlCentralWidget->setCurrentIndex(1);
+	}
+}
 
 void MainFrame::SetMenus()
 {
@@ -4350,6 +4407,12 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(MiarexBodyMenu);
 		menuBar()->addMenu(MiarexWPlrMenu);
 		menuBar()->addMenu(MiarexWOppMenu);
+		menuBar()->addMenu(helpMenu);
+	}
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		menuBar()->clear();
+		menuBar()->addMenu(fileMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 }
@@ -5203,3 +5266,4 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
 		}
 	}
 }
+

@@ -28,6 +28,7 @@
 #include <QtGui/QMainWindow>
 #include <QList>
 #include "TwoDWidget.h"
+#include "GLWidget.h"
 #include "Params.h"
 #include "Objects/Foil.h"
 #include "Objects/Polar.h"
@@ -91,9 +92,11 @@ private slots:
 	void OnUnits();
 	void OnAFoil();
 	void OnXDirect();
+	void OnXInverse();
 	void OnMiarex();
 	void OnSaveUFOAsProject();
 	void openRecentFile();
+
 /*___________________________________________Methods_______________________________*/
 private:
 	void closeEvent (QCloseEvent * event);
@@ -122,7 +125,6 @@ private:
 	void LoadSettings();
 	void RemoveOpPoint(bool bCurrent);
 	void SaveSettings();
-	bool SaveProject(QString PathName="");
 	void SetProjectName(QString PathName);
 	void SetMenus();
 	void SetSaveState(bool bSave);
@@ -132,15 +134,18 @@ private:
 	void UpdateUFOs();
 	void UpdateWPolars();
 	void UpdateWOpps();
-
 	void UpdateView();
 	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
 
+	void SetCentralWidget();
+
 	int LoadXFLR5File(QString PathName);
+
+	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring);
 	bool SerializeUFOProject(QDataStream &ar, bool bIsStoring);
-	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
+	bool SaveProject(QString PathName="");
 	bool SelectFoil(CFoil *pFoil);
 	bool SelectPolar(CPolar *pPolar);
 	bool SelectOpPoint(OpPoint *pOpp);
@@ -165,6 +170,8 @@ private:
 /*___________________________________________Variables_______________________________*/
 public:
 	bool m_bMaximized;
+	QPoint m_wndPos;
+	QSize  m_wndSize;
 	QString m_StyleName;
 	QString m_VersionName;
 
@@ -174,10 +181,11 @@ private:
 	void *m_pAFoil;
 	void *m_pXInverse;
 
+	QStackedWidget *m_pctrlCentralWidget;
 	TwoDWidget *m_p2DWidget;
+	GLWidget   *m_pGLWidget;
 
 	XFoil *m_pXFoil;		// a pointer to the XFoil object
-
 
 	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget;
 
@@ -209,7 +217,7 @@ private:
 	QMenu *WPlrCtxMenu, *WOppCtxMenu;
 
 	//MainFrame actions
-	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct;
+	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct;
 	QAction *openAct, *styleAct;
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct;
 	QAction *unitsAct;
