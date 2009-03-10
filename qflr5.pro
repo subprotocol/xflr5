@@ -79,10 +79,9 @@ SOURCES += MainFrame.cpp \
     Design/FoilTableDelegate.cpp \
     XInverse/XInverse.cpp \
     Design/AFoilGridDlg.cpp \
-    Design/SplineCtrlDlg.cpp \
+    Miarex/GL3DScales.cpp \
     GLWidget.cpp
 HEADERS += MainFrame.h \
-    Params.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
     XDirect/XFoilAdvancedDlg.h \
@@ -156,6 +155,6 @@ HEADERS += MainFrame.h \
     Design/FoilTableDelegate.h \
     XInverse/XInverse.h \
     Design/AFoilGridDlg.h \
-    Design/SplineCtrlDlg.h \
+    Miarex/GL3DScales.h \
     GLWidget.h
 RESOURCES += qflr5.qrc

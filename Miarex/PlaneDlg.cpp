@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 #include "../Globals.h"
-#include "../MainFrame.h"
+#include "../MainFrame.h" 
 #include "Miarex.h"
 #include "WingDlg.h"
 #include "PlaneDlg.h"
@@ -40,6 +40,8 @@ PlaneDlg::PlaneDlg()
 {
 	setWindowTitle("Plane Editor");
 	m_pPlane = NULL;
+
+	pi = 3.141592654;
 
 	m_bAcceptName    = true;
 	m_bChanged      = false;
@@ -92,7 +94,7 @@ void PlaneDlg::ComputePlane(void)
 		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++)
 		{
 			ProjectedArea += m_pPlane->m_Stab.m_TLength[i+1]*(m_pPlane->m_Stab.m_TChord[i]+m_pPlane->m_Stab.m_TChord[i+1])/2.0
-							*cos(m_pPlane->m_Stab.m_TDihedral[i])*cos(m_pPlane->m_Stab.m_TDihedral[i]);//m�
+							*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0)*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0);
 
 		}
 		ProjectedArea *=2.0;

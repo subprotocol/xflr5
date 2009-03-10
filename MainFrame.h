@@ -2,7 +2,7 @@
 
 	MainFrame Class
 
-    Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,28 +26,27 @@
 #include <QWidget>
 #include <QStringList>
 #include <QtGui/QMainWindow>
+#include "GLWidget.h"
 #include <QList>
 #include "TwoDWidget.h"
-#include "GLWidget.h"
 #include "Params.h"
 #include "Objects/Foil.h"
 #include "Objects/Polar.h"
 #include "Objects/OpPoint.h"
 #include "Objects/Plane.h"
-#include "XDirect/XFoil.h"
 
 class MainFrame : public QMainWindow
 {
 	friend class TwoDWidget;
 	friend class QXDirect;
-	friend class Miarex;
-	friend class QXInverse;
+	friend class QMiarex;
 	friend class QAFoil;
+	friend class QXInverse;
+	friend class Miarex;
 	friend class CBody;
 	friend class CWing;
 	friend class CWPolar;
 	friend class CWOpp;
-	friend class QMiarex;
 	friend class CPlane;
 	friend class BodyGridDlg;
 	friend class BatchDlg;
@@ -59,6 +58,7 @@ class MainFrame : public QMainWindow
 	friend class VLMAnalysisDlg;
 	friend class GL3dBodyDlg;
 	friend class GL3dViewDlg;
+	friend class GL3DScales;
 
     Q_OBJECT
 
@@ -96,7 +96,6 @@ private slots:
 	void OnMiarex();
 	void OnSaveUFOAsProject();
 	void openRecentFile();
-
 /*___________________________________________Methods_______________________________*/
 private:
 	void closeEvent (QCloseEvent * event);
@@ -125,6 +124,8 @@ private:
 	void LoadSettings();
 	void RemoveOpPoint(bool bCurrent);
 	void SaveSettings();
+	bool SaveProject(QString PathName="");
+	void SetCentralWidget();
 	void SetProjectName(QString PathName);
 	void SetMenus();
 	void SetSaveState(bool bSave);
@@ -134,18 +135,15 @@ private:
 	void UpdateUFOs();
 	void UpdateWPolars();
 	void UpdateWOpps();
+
 	void UpdateView();
 	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
 
-	void SetCentralWidget();
-
 	int LoadXFLR5File(QString PathName);
-
-	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring);
 	bool SerializeUFOProject(QDataStream &ar, bool bIsStoring);
-	bool SaveProject(QString PathName="");
+	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool SelectFoil(CFoil *pFoil);
 	bool SelectPolar(CPolar *pPolar);
 	bool SelectOpPoint(OpPoint *pOpp);
@@ -170,24 +168,20 @@ private:
 /*___________________________________________Variables_______________________________*/
 public:
 	bool m_bMaximized;
-	QPoint m_wndPos;
-	QSize  m_wndSize;
 	QString m_StyleName;
 	QString m_VersionName;
 
 private:
+	void *m_pXInverse;
 	void *m_pXDirect;
 	void *m_pMiarex;
 	void *m_pAFoil;
-	void *m_pXInverse;
-
-	QStackedWidget *m_pctrlCentralWidget;
+	void *m_pGL3DScales;
 	TwoDWidget *m_p2DWidget;
+	QStackedWidget *m_pctrlCentralWidget;
 	GLWidget   *m_pGLWidget;
 
-	XFoil *m_pXFoil;		// a pointer to the XFoil object
-
-	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget;
+	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget, *m_pctrl3DScalesWidget;
 
 	QToolBar *m_pctrlXDirectToolBar;
 	QToolBar *m_pctrlMiarexToolBar;
@@ -198,7 +192,7 @@ private:
 	QMenu *fileMenu, *helpMenu;
 
 	//AFoilMenus
-	QMenu *AFoilViewMenu, *AFoilDesignMenu, *AFoilSplineMenu;
+	QMenu *AFoilViewMenu, *AFoilDesignMenu;
 
 	//  XFoilAnalysis Menus
 	QMenu * XDirectViewMenu;
@@ -214,7 +208,7 @@ private:
 	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu;
 	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
 	QMenu *WPlrGraphMenu, *WOppGraphMenu, *WPlrCurGraphMenu;
-	QMenu *WPlrCtxMenu, *WOppCtxMenu;
+	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu;
 
 	//MainFrame actions
 	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct;
@@ -229,7 +223,6 @@ private:
 	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
-	QAction *ExportSplines, *SplineSettings;
 
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct;

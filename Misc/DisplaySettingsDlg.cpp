@@ -120,7 +120,8 @@ void DisplaySettingsDlg::InitDialog()
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 {
 	qApp->setStyle(StyleName);
-	m_StyleName = StyleName;
+
+	if(m_pMainFrame) ((MainFrame*)m_pMainFrame)->m_StyleName = StyleName;
 }
 
 

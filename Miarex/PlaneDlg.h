@@ -78,7 +78,8 @@ private:
 	CPlane * m_pPlane;
 	bool m_bChanged;
 	bool m_bAcceptName;
-
+	
+	double pi;
 
 private:
 	QLabel *m_pctrlSurf1;

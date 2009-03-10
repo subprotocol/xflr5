@@ -37,7 +37,6 @@ GLWidget::GLWidget(QWidget *parent)
 	m_wndTextColor = QColor(200,200,200);
 	m_pMiarex = NULL;
 	m_iView = 3;
-	m_bPlane = true;
 	setMouseTracking(true);
 }
 
@@ -125,6 +124,11 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->keyPressEvent(event);
 	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->keyPressEvent(event);
+	}
 }
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
@@ -133,6 +137,11 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->keyReleaseEvent(event);
+	}
+	else
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->keyReleaseEvent(event);
 	}
 }
 
@@ -158,6 +167,11 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
+	if(m_iView == 3)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->Set3DScale();
+	}
 	double w, h;
 	m_rCltRect = geometry();
 	int side = qMax(width, height);

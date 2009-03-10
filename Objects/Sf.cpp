@@ -239,13 +239,6 @@ bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
 		ReadCOLORREF(ar, m_FoilColor);
 		ar >>m_FoilStyle >> m_FoilWidth;
 
-		m_Extrados.SetStyle(m_FoilStyle);
-		m_Extrados.SetWidth(m_FoilWidth);
-		m_Extrados.SetColor(m_FoilColor);
-		m_Intrados.SetStyle(m_FoilStyle);
-		m_Intrados.SetWidth(m_FoilWidth);
-		m_Intrados.SetColor(m_FoilColor);
-
 		ar >> m_Extrados.m_iCtrlPoints;
 		ar >> m_Extrados.m_iDegree;
 		for (k=0; k<m_Extrados.m_iCtrlPoints;k++)
@@ -389,26 +382,3 @@ void CSF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Of
 	}
 	painter.restore();
 }
-
-bool CSF::Export(QTextStream &out)
-{
-	m_Extrados.Export(out, true);
-	m_Intrados.Export(out, false);
-	return true;
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -33,6 +33,7 @@ public:
 
 	FloatEdit(QWidget *pParent  = NULL);
 	FloatEdit(QString str, int precision=2);
+	FloatEdit(double d, int precision=2);
 
 	double GetValue();
 	bool GetValue(double &f);

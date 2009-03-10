@@ -77,8 +77,9 @@ private:
 	QPushButton *m_pctrlDefaults, *m_pctrlClose;
 
 private:
-	void* m_pMiarex;
+	void* m_pGL3dViewDlg;
 	void *m_pGL3dBodyDlg;
+	void *m_pMiarex;
 
 	float m_Ambient, m_Diffuse, m_Specular;
 	float m_MatAmbient, m_MatDiffuse, m_MatSpecular, m_MatEmission;

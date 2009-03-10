@@ -27,7 +27,7 @@
 #include "../Objects/CRectangle.h"
 #include <QRect>
 #include <QDataStream>
-
+#include <QPoint>
 
 class QGraph : public Graph
 {
@@ -52,6 +52,7 @@ public:
 	void Highlight(QPainter &painter, CCurve *pCurve, int ref);
 
 	bool Serialize(QDataStream &ar, bool bIsStoring);
+	QPoint GetOffset();
 
 
 public:

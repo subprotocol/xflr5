@@ -41,6 +41,7 @@ class PanelAnalysisDlg : public QDialog
 	Q_OBJECT
 
 	friend class QMiarex;
+	friend class MainFrame;
 	friend class CWing;
 
 public:
@@ -101,8 +102,8 @@ private:
 	CVector GetSpeedVector(CVector C, double *Gamma);
 
 
-	void *m_pMiarex;
-	void *m_pMainFrame;
+	static void *s_pMiarex;
+	static void *s_pMainFrame;
 
 	QFile *m_pXFile;
 

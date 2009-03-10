@@ -631,7 +631,7 @@ double CFoil::GetLength()
 {
 	//Returns the foil's length
 
-        return std::max(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
+		return qMax(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
 }
 
 double CFoil::GetLowerY(double x)
@@ -887,8 +887,8 @@ double CFoil::NormalizeGeometry()
 
         for (i=0; i<nb; i++)
         {
-                xmin = std::min(xmin, xb[i]);
-                xmax = std::max(xmax, xb[i]);
+				xmin = qMin(xmin, xb[i]);
+				xmax = qMax(xmax, xb[i]);
 	}
 	double length = xmax - xmin;
 

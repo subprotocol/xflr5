@@ -27,9 +27,9 @@
 
 #include "Surface.h"
 #include "Panel.h"
-#include <QFile>
 
-
+/////////////////////////////////////////////////////////////////////////////
+// CWing dialog
 
 
 class CWing
@@ -43,9 +43,9 @@ class CWing
 	friend class WingDlg;
 	friend class GL3dViewDlg;
 	friend class LLTAnalysisDlg;
-	friend class VLMAnalysisDlg;
-	friend class PanelAnalysisDlg;
-	friend class PlaneDlg;
+        friend class VLMAnalysisDlg;
+        friend class PanelAnalysisDlg;
+        friend class PlaneDlg;
 	friend class WPolarDlg;
 	friend class ImportWingDlg;
 

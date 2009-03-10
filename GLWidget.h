@@ -32,13 +32,11 @@ class GLWidget : public QGLWidget
     Q_OBJECT
 
 	friend class QMiarex;
-	friend class GL3dViewDlg;
 	friend class GL3dBodyDlg;
 	friend class MainFrame;
 
 public:
 	GLWidget(QWidget *parent = 0);
-
 
 
 private:
@@ -58,12 +56,12 @@ private slots:
 private:
 	void *m_pParent;
 	void * m_pMiarex;
+	void *m_pMainFrame;
 
 	QColor m_wndTextColor;
 	QRect m_rCltRect;        // The client window rectangle
 	CRectangle m_GLViewRect; // The OpenGl Viewport
 	double m_ScaletoGL;      // conversion factor from window client coordinates to GL Viewport coordinates
-	bool m_bPlane;
 
 	int m_iView;//Wing=3  Body=5
 };

@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-  
+ 
 #include "../MainFrame.h"
 #include "../Globals.h"
 #include "Miarex.h"
@@ -240,11 +240,10 @@ GL3dViewDlg::GL3dViewDlg(void *pParent)
 	connect(m_pctrlSurfaces, SIGNAL(stateChanged(int)), this, SLOT(OnSurfaces(int)));
 	connect(m_pctrlOutline, SIGNAL(stateChanged(int)), this, SLOT(OnOutline(int)));
 
+	connect(m_pctrlCp, SIGNAL(clicked(bool)),this, SLOT(On3DCp(bool)));
 	connect(m_pctrlLift, SIGNAL(stateChanged(int)), this, SLOT(OnLift(int)));
 	connect(m_pctrlIDrag, SIGNAL(stateChanged(int)), this, SLOT(OnIDrag(int)));
 	connect(m_pctrlVDrag, SIGNAL(stateChanged(int)), this, SLOT(OnVDrag(int)));
-
-	connect(m_pctrlCp, SIGNAL(clicked(bool)),this, SLOT(On3DCp(bool)));
 	connect(m_pctrlMoment, SIGNAL(stateChanged(int)), this, SLOT(OnMoment(int)));
 	connect(m_pctrlDownwash, SIGNAL(stateChanged(int)), this, SLOT(OnDownwash(int)));
 
@@ -3331,7 +3330,7 @@ void GL3dViewDlg::mouseMoveEvent(QMouseEvent *event)
 	}
 	m_LastPoint = point;
 
-
+//	CWnd::OnMouseMove(nFlags, point);
 }
 
 
@@ -3447,7 +3446,7 @@ void GL3dViewDlg::On3DTop()
 
 void GL3dViewDlg::On3DLeft()
 {
-	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90deg around x
+	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90° around x
 	Set3DRotationCenter();
 	UpdateView();
 }
@@ -3455,8 +3454,8 @@ void GL3dViewDlg::On3DLeft()
 
 void GL3dViewDlg::On3DFront()
 {
-	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90deg around y
-	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90deg around x
+	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90° around y
+	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90° around x
 
 	m_ArcBall.SetQuat(Qt1 * Qt2);
 	Set3DRotationCenter();
@@ -3599,8 +3598,8 @@ void GL3dViewDlg::OnSetupLight()
 	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
 	m_bShowLight = true;
 	UpdateView();
-//	pGLLightDlg->m_pGL3dViewDlg = this;
-//	pGLLightDlg->exec();
+	pGLLightDlg->m_pGL3dViewDlg = this;
+	pGLLightDlg->exec();
 
 	m_bShowLight = false;
 
@@ -4030,15 +4029,15 @@ void GL3dViewDlg::SetupLayout()
 	QVBoxLayout *WOppGroup = new QVBoxLayout;
 	QGridLayout *WOppCheckLayout = new QGridLayout;
 	m_pctrlLift          = new QCheckBox("Lift");
+	m_pctrlMoment        = new QCheckBox("Moment");
 	m_pctrlIDrag         = new QCheckBox("Ind. Drag");
 	m_pctrlVDrag         = new QCheckBox("Visc. Drag");
 	m_pctrlTrans         = new QCheckBox("Trans.");
-	m_pctrlMoment        = new QCheckBox("Moment");
 	m_pctrlDownwash      = new QCheckBox("Downw.");
 	m_pctrlCp            = new QCheckBox("Cp");
 	m_pctrlSurfVel       = new QCheckBox("Surf. Vel.");
-	m_pctrlStream        = new QCheckBox("Stream");
 	m_pctrlAnimate       = new QCheckBox("Anim.");
+	m_pctrlStream        = new QCheckBox("Stream");
 	m_pctrlLift->setSizePolicy(szPolicyMinimum);
 	m_pctrlMoment->setSizePolicy(szPolicyMinimum);
 	m_pctrlIDrag->setSizePolicy(szPolicyMinimum);

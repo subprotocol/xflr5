@@ -1446,7 +1446,7 @@ void CBody::SetKnots()
 {
 	int j;
 	double b;
-	m_nxDegree = std::min(m_nxDegree, m_NStations);
+	m_nxDegree = qMin(m_nxDegree, m_NStations);
 	m_nxKnots  = m_nxDegree + m_NStations   + 1;
 	b = (double)(m_nxKnots-2*m_nxDegree-1);
 
@@ -1468,7 +1468,7 @@ void CBody::SetKnots()
 
 	//hoop knots
 
-	m_nhDegree = std::min(m_nhDegree, m_NSideLines);
+	m_nhDegree = qMin(m_nhDegree, m_NSideLines);
 	m_nhKnots  = m_nhDegree + m_NSideLines + 1;
 	b = (double)(m_nhKnots-2*m_nhDegree-1);
 	for (j=0; j<m_nhKnots; j++)

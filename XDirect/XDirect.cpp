@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
- 
+
 #include <QtGui>
 #include <QCheckBox>
 #include <math.h>
@@ -47,6 +47,9 @@ QXDirect::QXDirect(QWidget *parent)
     : QWidget(parent)
 {
 	SetupLayout();
+
+	m_pXFoil = NULL;
+	m_pXFoil = new XFoil();
 
 	m_CurveStyle = 0;
 	m_CurveWidth = 1;
@@ -3928,6 +3931,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	QString Result, str, str1;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+
 	if (m_rCltRect.width()<150 || m_rCltRect.height()<150) return;
 
 	if(m_bNeutralLine)
@@ -4009,7 +4013,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_BufferFoil.m_bTEFlap)
 	{
-		str1 = QString("Flap Angle = %1 deg").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
+		str1 = QString("Flap Angle = %1°").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
 		painter.drawText(LeftPos,ZPos+D, str1);
 		D+=12;
 
@@ -4079,7 +4083,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		}
 		if(m_pCurPolar->m_Type ==4)
 		{
-			strong = QString("Alpha = %1 deg").arg(m_pCurPolar->m_ASpec,8,'f',2);
+			strong = QString("Alpha = %1°").arg(m_pCurPolar->m_ASpec,8,'f',2);
 			painter.drawText(XPos,ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, strong);
 			D+=12;
 			strong = QString("Mach = %1").arg(m_pCurPolar->m_Mach,9,'f',3);
@@ -4687,8 +4691,6 @@ CFoil* QXDirect::SetFoil(QString FoilName)
 	else         CreateOppCurves();
 	return m_pCurFoil;
 }
-
-
 void QXDirect::SetFoilScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;

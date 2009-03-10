@@ -67,6 +67,20 @@ FloatEdit::FloatEdit(QString str, int precision)
 	setAlignment(Qt::AlignRight);
 }
 
+FloatEdit::FloatEdit(double d, int precision)
+{
+	setMaximumWidth(s_MaxWidth);
+	bool bOK;
+	m_Value = d;
+	m_iniStr = QString("%1").arg(d,0,'f',precision);
+
+	m_fMin = -1.e10;
+	m_fMax =  1.e10;
+	m_iPrecision = precision;
+	QDoubleValidator *v = new QDoubleValidator(this);
+	setValidator(v);
+	setAlignment(Qt::AlignRight);
+}
 
 bool FloatEdit::CheckBeforeExit()
 {

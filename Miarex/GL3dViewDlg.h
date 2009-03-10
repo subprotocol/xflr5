@@ -26,7 +26,7 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QPushButton>
-#include "../GLWidget.h"
+#include "GLWidget.h"
 #include "../Objects/Plane.h"
 #include "../Objects/WPolar.h"
 #include "../Objects/WOpp.h"
@@ -127,12 +127,10 @@ private:
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlCpScales;
 	QSlider *m_pctrlClipPlanePos;
 
-	QCheckBox *m_pctrlLift, *m_pctrlIDrag, *m_pctrlTrans, *m_pctrlVDrag, *m_pctrlAnimate;
-	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
-	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
+	QCheckBox *m_pctrlLift, *m_pctrlMoment, *m_pctrlIDrag, *m_pctrlVDrag;
+	QCheckBox *m_pctrlTrans, *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlAnimate, *m_pctrlStream;
 	QSlider *m_pctrlAnimateSpeed;
-
-
+	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 	QCursor m_hcArrow;
 	QCursor m_hcCross;
 	QCursor m_hcMove;

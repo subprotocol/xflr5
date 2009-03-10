@@ -1,24 +1,3 @@
-/****************************************************************************
-
-	TwoDWidget Class
-
-    Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-*****************************************************************************/
 
 
 #include <QtGui>
@@ -28,8 +7,8 @@
 #include "Graph/Curve.h"
 #include "Miarex/Miarex.h"
 #include "XDirect/XDirect.h"
-#include "XInverse/XInverse.h"
 #include "Design/AFoil.h"
+#include "XInverse/XInverse.h"
 #include "TwoDWidget.h"
 
 
@@ -41,7 +20,6 @@ TwoDWidget::TwoDWidget(QWidget *parent)
 	m_pXDirect   = NULL;
 	m_pMiarex    = NULL;
 	m_pAFoil     = NULL;
-	m_pXInverse  = NULL;
 
 	setMouseTracking(true);
 	setCursor(Qt::CrossCursor);
@@ -50,6 +28,8 @@ TwoDWidget::TwoDWidget(QWidget *parent)
 TwoDWidget::~TwoDWidget()
 {
 }
+
+
 
 void TwoDWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -182,7 +162,7 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-void TwoDWidget::showEvent ( QShowEvent * event )
+void TwoDWidget::showEvent(QShowEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -296,7 +276,5 @@ void TwoDWidget::paintEvent(QPaintEvent *event)
 		painter.fillRect(rect(), pMainFrame->m_BackgroundColor);
 	}
 }
-
-
 
 

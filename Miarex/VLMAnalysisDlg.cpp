@@ -29,6 +29,8 @@
 #include "../Objects/CVector.h"
 #include "Miarex.h"
 
+void *VLMAnalysisDlg::s_pMiarex;
+void *VLMAnalysisDlg::s_pMainFrame;
 
 VLMAnalysisDlg::VLMAnalysisDlg()
 {
@@ -84,8 +86,6 @@ VLMAnalysisDlg::VLMAnalysisDlg()
 	m_pFin    = NULL;
 	m_pWPolar = NULL;
 	m_pPlane  = NULL;
-	m_pMiarex     = NULL;
-	m_pMainFrame  = NULL;
 
 	m_ppPanel       = NULL;
 	m_pPanel        = NULL;
@@ -180,7 +180,7 @@ bool VLMAnalysisDlg::ControlLoop()
 	Quaternion Quat;
 	CWing *pWing, *pStab;
 
-//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+//	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	CVector H(0.0, 1.0, 0.0);
 	CVector O(0.0, 0.0, 0.0);
@@ -638,7 +638,7 @@ bool VLMAnalysisDlg::ReLoop()
 	int nrhs;
 	double Alpha = 0.0;
 
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	if(m_QInfMax<m_QInfMin) m_QInfDelta = -fabs(m_QInfDelta);
 	nrhs  = (int)fabs((m_QInfMax-m_QInfMin)*1.0001/m_QInfDelta) + 1;
@@ -699,8 +699,8 @@ bool VLMAnalysisDlg::ReLoop()
 
 void VLMAnalysisDlg::SetFileHeader()
 {
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
@@ -790,7 +790,7 @@ bool VLMAnalysisDlg::UnitLoop()
 	int i, nrhs;
 	QString str;
 
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	CVector O(0.0,0.0,0.0);
 
@@ -925,7 +925,7 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 
 bool VLMAnalysisDlg::VLMSolveDouble()
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange;
 
 	int Size;
@@ -969,7 +969,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	//	- Sort results i.a.w. panel numbering
 	//______________________________________________________________________________________
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange;
 
 	int p, q, pp, Size;
@@ -1207,8 +1207,8 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	// the adequate variable, from Cl, on the XFoil polar mesh
 	// at each span station
 	int q, pos, Station;
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
 	double WingLift, WingIDrag, Alpha;
 	double cosa, sina, beta;

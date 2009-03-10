@@ -158,7 +158,6 @@ public:
 	void GetLabelLogFont(QFont *plgft);
 	void GetLegendLogFont(QFont *plgft);
 	void GetClientRect(QRect &Rect);
-	QPoint GetOffset();
 
 	void SetDefaults();
 	void SetGraphName(QString GraphName);

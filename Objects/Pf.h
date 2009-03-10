@@ -39,7 +39,6 @@ public:
 	void DrawSplines(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawRearPoint(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	bool RemovePoint(int k);
-	void Export(QTextStream &out, bool bExtrados);
 
 	void SetCurveParams(int style, int width, QColor color);
 
@@ -50,7 +49,7 @@ public:
 
 	double GetY(double x);
 
-	void Export(QTextStream &out);
+//	void Export(QFile *pFile, bool bExtrados);
 	void ExportToBuffer(CFoil *pFoil, bool bExtrados);
 
 	CSplinedPoints();
@@ -77,7 +76,7 @@ class CPF
 {
 	friend class QAFoil;
 	friend class MainFrame;
-	friend class SplineCtrlDlg;
+
 
 public:
 	CPF();
@@ -87,7 +86,6 @@ private:
 	bool CompMidLine(bool first = false);
 	bool InitSplinedFoil();
 	bool Serialize(QDataStream &ar, bool bISStoring);
-	bool Export(QTextStream &out);
 
 	void Copy(CPF* pPF);
 	void DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);

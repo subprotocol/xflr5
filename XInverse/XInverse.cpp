@@ -23,17 +23,17 @@
 #include <QGridLayout>
 #include <QtGui>
 
+#include "XInverse.h"
 #include "../Globals.h"
 #include "../MainFrame.h"
-#include "XInverse.h"
 #include "../Objects/Foil.h"
 #include "../Graph/GraphDlg.h"
 
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
-	m_bFullInverse = false;
-
+	m_bFullInverse = true;
+	pi = 3.141592654;
 
 	m_hcArrow = QCursor(Qt::ArrowCursor);
 	m_hcCross = QCursor(Qt::CrossCursor);
@@ -98,13 +98,9 @@ QXInverse::QXInverse(QWidget *parent)
 
 	SetupLayout();
 
-	if(m_bFullInverse) setLayout(m_pctrlFInvLayout);
-	else               setLayout(m_pctrlMInvLayout);
-
+	if(m_bFullInverse) m_pctrlStackedInv->setCurrentIndex(0);
+	else               m_pctrlStackedInv->setCurrentIndex(1);
 }
-
-
-
 
 
 void QXInverse::CreateQCurve()
@@ -817,7 +813,6 @@ void QXInverse::PaintGraph(QPainter &painter)
 {
 	painter.save();
 
-
 //  draw  the graph	
 	if(m_rGraphRect.width()>200 && m_rGraphRect.height()>150)
 	{
@@ -831,10 +826,8 @@ void QXInverse::PaintGraph(QPainter &painter)
 
 	if(m_bZoomPlus && !ZRect.isEmpty()) 
 	{
-/*		QRect ZRect(m_ZoomRect.left()   - m_rCltRect.left(),
-					m_ZoomRect.top()    - m_rCltRect.top(),
-					m_ZoomRect.right()  - m_rCltRect.left(),
-					m_ZoomRect.bottom() - m_rCltRect.top());
+/*		QRect ZRect(m_ZoomRect.left()   - m_rCltRect.left(), m_ZoomRect.top()    - m_rCltRect.top(),
+		            m_ZoomRect.right()  - m_rCltRect.left(), m_ZoomRect.bottom() - m_rCltRect.top());
 		ZRect.NormalizeRect();*/
 		QPen ZoomPen(QColor(100,100,100));
 		ZoomPen.setStyle(Qt::DashLine);
@@ -851,9 +844,10 @@ void QXInverse::PaintGraph(QPainter &painter)
 		SplinePen.setWidth(m_SplineWidth);
 		
 		painter.setPen(SplinePen);
+		QPoint pt = m_QGraph.GetOffset();
 
-		m_Spline.DrawSpline(painter, 1.0/m_QGraph.GetXScale(), -1.0/m_QGraph.GetYScale(), m_QGraph.GetOffset());
-		m_Spline.DrawCtrlPoints(painter, 1.0/m_QGraph.GetXScale(), -1.0/m_QGraph.GetYScale(), m_QGraph.GetOffset());
+		m_Spline.DrawSpline(painter, 1.0/m_QGraph.GetXScale(), -1.0/m_QGraph.GetYScale(), pt);
+		m_Spline.DrawCtrlPoints(painter, 1.0/m_QGraph.GetXScale(), -1.0/m_QGraph.GetYScale(), pt);
 		
 	}
 
@@ -1052,31 +1046,34 @@ void QXInverse::SetupLayout()
 	m_pctrlExec = new QPushButton("Execute");
 	m_pctrlOutput = new QTextEdit("Output here");
 
-	m_pctrlFInvLayout = new QVBoxLayout;
-	m_pctrlFInvLayout->addWidget(SpecBox);
-	m_pctrlFInvLayout->addWidget(ModBox);
-	m_pctrlFInvLayout->addWidget(SmoothBox);
-	m_pctrlFInvLayout->addWidget(ConstraintsBox);
-	m_pctrlFInvLayout->addWidget(m_pctrlExec);
-	m_pctrlFInvLayout->addWidget(m_pctrlOutput);
-	m_pctrlFInvLayout->addStretch(1);
+	QVBoxLayout *FInvLayout = new QVBoxLayout;
+	FInvLayout->addWidget(SpecBox);
+	FInvLayout->addWidget(ModBox);
+	FInvLayout->addWidget(SmoothBox);
+	FInvLayout->addWidget(ConstraintsBox);
+	FInvLayout->addWidget(m_pctrlExec);
+	FInvLayout->addWidget(m_pctrlOutput);
+	FInvLayout->addStretch(1);
+	m_pctrlFInvWidget = new QWidget(this);
+	m_pctrlFInvWidget->setLayout(FInvLayout);
 
 	//specific MInv Controls
-	m_pctrlMSpec = new QTextEdit("Alpha = Cl =");
-//	m_pctrlMSpec->setMaximumHeight((int)((rect().height()/8)));
-	m_pctrlIter = new FloatEdit("11");
-	m_pctrlMark = new QPushButton("Mark for modification");
-	m_pctrlCpxx = new QCheckBox("End Point Constraint");
-	m_pctrlMExec = new QPushButton("Execute");
-	m_pctrlMOutput = new QTextEdit("Output here");
-
-	QGridLayout *MSplineslayout = new QGridLayout;
+	m_pctrlMSpec          = new QTextEdit("Alpha = Cl =");
+	m_pctrlIter           = new FloatEdit("11");
+	m_pctrlMark           = new QPushButton("Mark for modification");
+	m_pctrlCpxx           = new QCheckBox("End Point Constraint");
+	m_pctrlMExec          = new QPushButton("Execute");
+	m_pctrlMOutput        = new QTextEdit("Output here");
 	m_pctrlMShowSpline    = new QCheckBox("ShowSpline");
 	m_pctrlMTangentSpline = new QCheckBox("Tangent Spline");
 	m_pctrlMNewSpline     = new QPushButton("New Spline");
 	m_pctrlMApplySpline   = new QPushButton("Apply Spline");
 	m_pctrlMSmooth        = new QPushButton("Smooth");
 	m_pctrlMResetQSpec    = new QPushButton("ResetQSpec");
+
+//	m_pctrlMSpec->setMaximumHeight((int)((rect().height()/8)));
+
+	QGridLayout *MSplineslayout = new QGridLayout;
 	MSplineslayout->addWidget(m_pctrlMShowSpline,1,1);
 	MSplineslayout->addWidget(m_pctrlMTangentSpline,1,2);
 	MSplineslayout->addWidget(m_pctrlMNewSpline,2,1);
@@ -1097,12 +1094,18 @@ void QXInverse::SetupLayout()
 	FoilLayout->addLayout(MaxIter);
 	QGroupBox *FoilBox = new QGroupBox("Foil");
 
-	m_pctrlMInvLayout = new QVBoxLayout;
-	m_pctrlMInvLayout->addWidget(m_pctrlMSpec);
-	m_pctrlMInvLayout->addWidget(MSplinesBox);
-	m_pctrlMInvLayout->addWidget(FoilBox);
-	m_pctrlMInvLayout->addWidget(m_pctrlMOutput);
-	m_pctrlMInvLayout->addStretch(1);
+	QVBoxLayout *MInvLayout = new QVBoxLayout;
+	MInvLayout->addWidget(m_pctrlMSpec);
+	MInvLayout->addWidget(MSplinesBox);
+	MInvLayout->addWidget(FoilBox);
+	MInvLayout->addWidget(m_pctrlMOutput);
+	MInvLayout->addStretch(1);
+	m_pctrlMInvWidget = new QWidget(this);
+	m_pctrlMInvWidget->setLayout(MInvLayout);
+
+	m_pctrlStackedInv = new QStackedWidget;
+	m_pctrlStackedInv->addWidget(m_pctrlFInvWidget);
+	m_pctrlStackedInv->addWidget(m_pctrlMInvWidget);
 }
 
 
@@ -1188,7 +1191,139 @@ void QXInverse::UpdateView()
 
 void QXInverse::wheelEvent(QWheelEvent *event)
 {
+	ReleaseZoom();
+	QPoint pttmp(event->pos().x(), event->pos().y());
+	if(m_QGraph.IsInDrawRect(pttmp))
+	{
+//		SHORT shX = GetKeyState('X');
+//		SHORT shY = GetKeyState('Y');
+
+/*		if (shX & 0x8000)
+		{
+			//zoom x scale
+			m_QGraph.SetAutoX(false);
+			if(zDelta>0) m_QGraph.Scalex(1.06);
+			else         m_QGraph.Scalex(1.0/1.06);
+		}
+		else if(shY & 0x8000)
+		{
+			//zoom y scale
+			m_QGraph.SetAutoY(false);
+			if(zDelta>0) m_QGraph.Scaley(1.06);
+			else         m_QGraph.Scaley(1.0/1.06);
+		}
+		else */
+		{
+			//zoom both
+			m_QGraph.SetAuto(false);
+			if(event->delta()>0) m_QGraph.Scale(1.06);
+			else               m_QGraph.Scale(1.0/1.06);
+		}
+	}
+	else
+	{
+		double scale = m_fScale;
+
+		if(event->delta()<0) m_fScale *= 1.06;
+		else         m_fScale /= 1.06;
+
+		int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);
+		m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
+	}
+	UpdateView();
 }
 
 
 
+
+
+void QXInverse::SetFoil()
+{
+	int i;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	XFoil *pXFoil = (XFoil*)m_pXFoil;
+
+	QString strong;
+	for(i=1; i<=pXFoil->n; i++)
+	{
+		m_pModFoil->x[i-1] = pXFoil->x[i];
+		m_pModFoil->y[i-1] = pXFoil->y[i];
+	}
+	m_pModFoil->n = pXFoil->n;
+
+	if(m_bFullInverse)
+	{
+		pXFoil->InitMDES();
+		CreateQCurve();
+		CreateMCurve();
+//		ResetQ();
+
+		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/pi);
+		m_pctrlTAngle->SetValue(pXFoil->agte*180.0);//agte expressed in pi units:!?!?
+		m_pctrlTGapx->SetValue(real(pXFoil->dzte));
+		m_pctrlTGapy->SetValue(imag(pXFoil->dzte));
+	}
+	else
+	{
+		// Mixed Inverse
+		pXFoil->InitQDES();
+		CreateQCurve();
+		CreateMCurve();
+//		ResetMixedQ();
+		strong = QString("Alpha = %1 \r\n      Cl = %2")
+								.arg(pXFoil->algam/pXFoil->dtor,0,'f',3).arg(pXFoil->clgam,0,'f',3);
+		m_pctrlMSpec->setText(strong);
+		m_pctrlIter->SetValue(pXFoil->niterq);
+	}
+
+	if(pXFoil->lvisc)
+	{
+		//a previous xfoil calculation is still active, so add the associated viscous curve
+		double x,y;
+		double dsp, dqv, sp1, sp2, qv1, qv2;
+		m_pQVCurve->n = 0;
+		for(i=2; i<= pXFoil->n; i++)	
+		{
+			dsp = pXFoil->s[i] - pXFoil->s[i-1];
+			dqv = pXFoil->qcomp(pXFoil->qvis[i]) - pXFoil->qcomp(pXFoil->qvis[i-1]);
+			sp1 = (pXFoil->s[i-1] + 0.25*dsp)/pXFoil->s[pXFoil->n];
+			sp2 = (pXFoil->s[i]   - 0.25*dsp)/pXFoil->s[pXFoil->n];
+			qv1 = pXFoil->qcomp(pXFoil->qvis[i-1]) + 0.25*dqv;
+			qv2 = pXFoil->qcomp(pXFoil->qvis[i]  ) - 0.25*dqv;
+			x = 1.0 - sp1;
+			y = qv1/pXFoil->qinf;
+			m_pQVCurve->AddPoint(x,y);
+			x = 1.0 - sp2;
+			y = qv2/pXFoil->qinf;
+			m_pQVCurve->AddPoint(x,y);
+		}
+		m_pQVCurve->SetVisible(true);
+	}
+	else
+	{
+		m_pQVCurve->SetVisible(false);
+	}
+
+	m_bLoaded = true;
+}
+
+
+void QXInverse::ResetScale()
+{
+	m_ptOffset.rx() = m_rGraphRect.left() +(int)(1.0*m_QGraph.GetMargin());
+	m_fRefScale  = m_rGraphRect.width()-2.0*m_QGraph.GetMargin();
+
+	m_ptOffset.ry() = m_rCltRect.bottom()-100;
+	m_fScale = m_fRefScale;
+}
+
+
+void QXInverse::SetRect(QRect CltRect)
+{
+	m_rCltRect = CltRect;
+	m_rGraphRect = m_rCltRect;
+	m_rGraphRect.adjust(-20,-20,-20,-200);
+
+	m_Spline.m_rViewRect = m_rGraphRect;
+	ResetScale();
+}

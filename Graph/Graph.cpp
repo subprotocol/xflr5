@@ -343,13 +343,6 @@ void Graph::GetGraphName(QString &GraphName)
 }
 
 
-
-QPoint Graph::GetOffset()
-{
-	return m_ptoffset;
-}
-
-
 QColor Graph::GetTitleColor()
 {
 	return m_TitleColor;

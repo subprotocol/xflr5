@@ -679,6 +679,12 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 	XFile.close();
 }
 
+QPoint QGraph::GetOffset()
+{
+	return m_ptoffset;
+}
+
+
 void QGraph::Highlight(QPainter &painter, CCurve *pCurve, int ref)
 {
 	painter.save();
@@ -686,14 +692,9 @@ void QGraph::Highlight(QPainter &painter, CCurve *pCurve, int ref)
 	int y = int(pCurve->y[ref]/m_scaley)  +m_ptoffset.y();
 
 	QPen HighlightPen(QColor(255,100,100));
-	HighlightPen.setStyle(Qt::SolidLine);
 	HighlightPen.setWidth(2);
 	painter.setPen(HighlightPen);
-	QRect r;
-	r.setLeft(x-3);
-	r.setTop(y-3);
-	r.setWidth(6);
-	r.setHeight(6);
+	QRect r(x-3,y-3,6,6);;
 	painter.drawRect(r);
 	painter.restore();
 }

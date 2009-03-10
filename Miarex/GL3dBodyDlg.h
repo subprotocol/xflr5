@@ -31,7 +31,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
-#include "../GLWidget.h"
+#include "GLWidget.h"
 #include "ArcBall.h"
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"
@@ -63,7 +63,6 @@ private slots:
 	void On3DFront();
 	void On3DReset();
 	void On3DPickCenter();
-	void OnBodyName();
 	void OnBodyStyle();
 	void OnGrid();
 	void OnSetupLight();
@@ -141,7 +140,7 @@ private:
 	void SetPicture();
 	void StorePicture();
 
-	void reject();
+	void accept();
 
 private:
 	static void *s_pMiarex;

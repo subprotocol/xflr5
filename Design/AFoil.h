@@ -67,7 +67,6 @@ class QAFoil : public QWidget
 	friend class LEDlg;
 	friend class FoilCoordDlg;
 	friend class CAddDlg;
-	friend class SplineCtrlDlg;
 
 public:
 	QAFoil(QWidget *parent = NULL);
@@ -94,8 +93,6 @@ private slots:
 	void OnZoomLess();
 	void OnZoomYOnly();
 	void OnResetYScale();
-	void OnExportSplines();
-	void OnSplineSettings();
 
 	void OnAFoilSetFlap();
 	void OnAFoilDerotateFoil();

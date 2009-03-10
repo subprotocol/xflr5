@@ -29,8 +29,7 @@
 #define CSpline_H
 #include <QPainter>
 #include <QRect>
-#include <QTextStream>
-
+#include <QFile>
 #include "../Objects/CVector.h"
 #include "../Params.h"
 
@@ -44,9 +43,9 @@ public:
 
 //	bool AddPoint(double x, double y);
 
-	void DrawSpline(QPainter & painter, double scalex, double scaley, QPoint Offset);
-	void DrawCtrlPoints(QPainter & painter,double scalex, double scaley, QPoint Offset);
-	void DrawOutputPoints(QPainter & painter,double scalex, double scaley, QPoint Offset);
+	void DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset);
+	void DrawCtrlPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
+	void DrawOutputPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
 
 	bool InsertPoint(double x, double y);
 	bool RemovePoint(int k);
@@ -57,13 +56,13 @@ public:
 	double GetY(double x);
 
 	void Copy(CSpline *pSpline);
-	void Export(QTextStream &out, bool bExtrados);
+	void Export(QFile *pFile, bool bExtrados);
 	void SplineCurve();
 	void SplineKnots();
 	
 	void SetStyle(int style);
 	void SetWidth(int width);
-	void SetColor(QColor color);
+	void SetColor(int color);
 	void SetSplineParams(int style, int width, QColor color);
 
 	int m_iHighlight, m_iSelect;

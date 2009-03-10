@@ -26,7 +26,6 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QCheckBox>
-#include <QGroupBox>
 #include <QSlider>
 #include <QPushButton>
 #include <QList>
@@ -62,7 +61,7 @@ class QMiarex : public QWidget
 	friend class MainFrame;
 	friend class GLWidget;
 	friend class TwoDWidget;
-	friend class GL3dViewDlg;
+	friend class GL3DScales;
 	friend class GL3dBodyDlg;
 	friend class GLLightDlg;
 	friend class WingDlg;
@@ -114,8 +113,8 @@ private slots:
 	void OnCurveStyle(int index);
 	void OnCurveWidth(int index);
 	void OnCurveColor();
-	void OnShowPoints(bool checked);
-	void OnShowCurve(bool checked);
+	void OnShowPoints();
+	void OnShowCurve();
 	void OnSingleWPlrGraph1();
 	void OnSingleWPlrGraph2();
 	void OnSingleWPlrGraph3();
@@ -143,17 +142,17 @@ private slots:
 	void OnDeleteCurWPolar();
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
-	void OnAnimate(bool bChecked);
+	void OnAnimate();
 	void OnAnimateSingle();
 	void OnAnimateSpeed(int val);
-	void OnSequence(int state);
-	void OnInitLLTCalc(int state);
-	void OnStoreWOpp(int state);
-	void OnHalfWing(int state);
-	void OnShowLift(int state);
-	void OnShowIDrag(int state);
-	void OnShowVDrag(int state);
-	void OnShowTransitions(int state);
+	void OnSequence();
+	void OnInitLLTCalc();
+	void OnStoreWOpp();
+	void OnHalfWing();
+	void OnShowLift();
+	void OnShowIDrag();
+	void OnShowVDrag();
+	void OnShowTransitions();
 	void OnAdjustToWing();
 	void OnAdvancedSettings();
 	void OnHideUFOWPolars();
@@ -165,8 +164,8 @@ private slots:
 	void OnImportBody();
 	void OnExportBody();
 
-	void OnAxes(int state);
-	void On3DCp(bool bChecked);
+	void OnAxes();
+	void On3DCp();
 	void On3DIso();
 	void On3DTop();
 	void On3DLeft();
@@ -175,18 +174,19 @@ private slots:
 	void On3DPickCenter();
 	void OnSetupLight();
 	void OnClipPlane(int pos);
-	void OnLight(int state);
-	void OnSurfaces(int state);
-	void OnOutline(int state);
-	void OnPanels(int state);
-	void OnVortices(int state);
-	void OnDownwash(int state);
-	void OnMoment(int state);
+	void OnLight();
+	void OnSurfaces();
+	void OnOutline();
+	void OnPanels();
+	void OnVortices();
+	void OnDownwash();
+	void OnMoment();
+	void OnStreamlines();
 
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
 	void OnVelocityScale(int pos);
-	void OnCpScale();
+	void OnGL3DScale();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -205,6 +205,7 @@ private:
 	void GLCreateVortices();
 	void GLCreateLiftForce();
 	void GLCreateMoments();
+	void GLCreateStreamLines();
 	void GLCreateCp();
 	void GLCreateCpLegend();
 	void GLCreateWOppLegend();
@@ -307,7 +308,6 @@ private:
 private:
 	QTimer *m_pAnimateTimer;
 
-	QGroupBox *m_pctrlCpBox;
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
 	QSlider *m_pctrlCpSection;
 
@@ -322,7 +322,6 @@ private:
 	QCheckBox *m_pctrlHalfWing, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans,  *m_pctrlAnimate;
 	QSlider *m_pctrlAnimateSpeed;
 	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
-	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 
 	QCheckBox *m_pctrlShowCurve;
 	QCheckBox *m_pctrlShowPoints;
@@ -332,10 +331,13 @@ private:
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlCpScales;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 	QSlider *m_pctrlClipPlanePos;
 
+	QPushButton *m_pctrl3DSettings;
 
+
+	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 
 
 	ArcBall m_ArcBall;

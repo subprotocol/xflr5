@@ -29,6 +29,7 @@
 #include <QCheckBox>
 #include <QTextEdit>
 #include <QLabel>
+#include <QStackedWidget>
 #include <QVBoxLayout>
 #include "../Misc/FloatEdit.h"
 #include "../XDirect/XFoil.h"
@@ -67,12 +68,15 @@ private:
 	void PaintGraph(QPainter &painter);
 	void PaintFoil(QPainter &painter);
 	void SetScale(QRect CltRect);
+	void ResetScale();
 	void ReleaseZoom();
 	void Smooth(int Pos1 = -1, int Pos2 = -1);
 	void CreateMCurve();
 	void CreateQCurve();
 	void CancelSpline();
 	void CancelSmooth();
+	void SetFoil();
+	void SetRect(QRect CltRect);
 
 private:
 	QTextEdit *m_pctrlOutput;
@@ -90,8 +94,8 @@ private:
 	QCheckBox *m_pctrlMShowSpline, *m_pctrlMTangentSpline;
 	QPushButton *m_pctrlMExec, *m_pctrlMNewSpline, *m_pctrlMApplySpline, *m_pctrlMSmooth, *m_pctrlMResetQSpec;
 
-
-	QVBoxLayout *m_pctrlMInvLayout,*m_pctrlFInvLayout;
+	QWidget *m_pctrlMInvWidget,*m_pctrlFInvWidget;
+	QStackedWidget *m_pctrlStackedInv;
 
 	void * m_p2DWidget;
 	void * m_pMainFrame;
@@ -110,6 +114,7 @@ private:
 	QCursor m_hcMove;
 	QCursor m_hcCross;
 
+	double pi;
 
 	bool m_bLoaded;
 	bool m_bTrans;

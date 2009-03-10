@@ -25,7 +25,6 @@
 #include "Panel.h"
 #include "Frame.h"
 #include "../Params.h"
-#include <QFile>
 
 class CBody
 {

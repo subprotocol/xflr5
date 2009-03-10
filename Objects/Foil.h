@@ -42,6 +42,7 @@ class CFoil
 	friend class CSurface;
 	friend class GLWidget;
 	friend class QXDirect;
+	friend class QXInverse;
 	friend class QMiarex;
 	friend class XFoil;
 	friend class FoilPolarDlg;
@@ -59,7 +60,7 @@ class CFoil
 	friend class BatchDlg;
 	friend class GL3dViewDlg;
 	friend class WingDlg;
-	friend class QXInverse;
+        friend class AFoil;
 
 public:
 	static double pi;

@@ -27,7 +27,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QtDebug>
-#include "Miarex.h"
+
 
 GLLightDlg::GLLightDlg()
 {
@@ -276,8 +276,8 @@ void GLLightDlg::SetupLayout()
 void GLLightDlg::Apply()
 {
 	ReadParams();
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->UpdateView();
+//	GL3dViewDlg *pGL3dViewDlg = (GL3dViewDlg*)m_pGL3dViewDlg;
+//	pGL3dViewDlg->UpdateView();
 }
 
 void GLLightDlg::OnSlider(int pos)
@@ -325,8 +325,8 @@ void GLLightDlg::OnDefaults()
 
 	SetParams();
 
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->UpdateView();
+//	GL3dViewDlg *pGL3dViewDlg = (GL3dViewDlg*)m_pGL3dViewDlg;
+//	pGL3dViewDlg->UpdateView();
 //qDebug() << "Applied###" << m_Ambient<< m_Diffuse<<m_Specular<<m_MatAmbient<<m_MatDiffuse<<m_MatSpecular<<m_MatEmission<<m_iMatShininess;
 }
 

@@ -36,11 +36,8 @@
 #include "../XDirect/FoilGeomDlg.h"
 #include "../XDirect/InterpolateFoilsDlg.h"
 #include "../Misc/LinePickerDlg.h"
-#include "../Misc/RenameDlg.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
-#include "SplineCtrlDlg.h"
-
 
 
 QAFoil::~QAFoil()
@@ -297,10 +294,10 @@ void QAFoil::FillFoilTable()
 		if(m_pSF) 
 		{
 			name = "Spline foil";
-			Thickness  = m_pSF->m_fThickness;
-			xThickness = m_pSF->m_fxThickMax;
-			Camber     = m_pSF->m_fCamber;
-			xCamber    = m_pSF->m_fxCambMax;
+			Thickness  = m_pSF->m_fThickness*100.0;
+			xThickness = m_pSF->m_fxThickMax*100.0;
+			Camber     = m_pSF->m_fCamber*100.0;
+			xCamber    = m_pSF->m_fxCambMax*100.0;
 			points     = m_pSF->m_OutPoints;
 		}
 	}
@@ -309,10 +306,10 @@ void QAFoil::FillFoilTable()
 		if(m_pPF) 
 		{
 			name = "Splined points foil";
-			Thickness  = m_pPF->m_fThickness;
-			xThickness = m_pPF->m_fxThickMax;
-			Camber     = m_pPF->m_fCamber;
-			xCamber    = m_pPF->m_fxCambMax;
+			Thickness  = m_pPF->m_fThickness*100.0;
+			xThickness = m_pPF->m_fxThickMax*100.0;
+			Camber     = m_pPF->m_fCamber*100.0;
+			xCamber    = m_pPF->m_fxCambMax*100.0;
 			points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
 				     +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
 		}
@@ -396,7 +393,7 @@ void QAFoil::FillTableRow(int row)
 	}
 
 	ind = m_pFoilModel->index(row, 12, QModelIndex());
-	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked,   Qt::CheckStateRole);
+	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
 	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
 
 }
@@ -480,13 +477,10 @@ CVector QAFoil::MousetoReal(QPoint &point)
 
 void QAFoil::LoadSettings(QDataStream &ar)
 {
-	ar >> m_bSF;
 	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
 	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
 	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
 	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
-	m_pSF->Serialize(ar, false);
-	m_pPF->Serialize(ar, false);
 }
 
 
@@ -1631,11 +1625,15 @@ void QAFoil::OnFoilStyle()
 
 			if(m_bSF)
 			{
-				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+				m_pSF->m_FoilStyle = dlg.GetStyle();
+				m_pSF->m_FoilWidth = dlg.GetWidth();
+				m_pSF->m_FoilColor = dlg.GetColor();
 			}
 			else
 			{
-				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+				m_pPF->m_FoilStyle = dlg.GetStyle();
+				m_pPF->m_FoilWidth = dlg.GetWidth();
+				m_pPF->m_FoilColor = dlg.GetColor();
 			}
 			UpdateView();
 		}
@@ -1747,99 +1745,6 @@ void QAFoil::OnDuplicate()
 		FillFoilTable();
 		SetFoil(pNewFoil);
 	}	
-}
-
-void QAFoil::OnSplineSettings()
-{
-	SplineCtrlDlg dlg(this);
-	dlg.m_pPF = m_pPF;
-	dlg.m_pSF = m_pSF;
-	dlg.m_bSF = m_bSF;
-	dlg.InitDialog();
-	dlg.exec();
-}
-
-
-void QAFoil::OnExportSplines()
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	CFoil *pFoil;
-
-	bool bNotFound= true;
-	bool bWrite = false;
-
-	// deselect points so as not to interfere with other mouse commands
-	m_pSF->m_Intrados.m_iSelect = -10;
-	m_pSF->m_Extrados.m_iSelect = -10;
-	m_pPF->m_Intrados.m_iSelect = -10;
-	m_pPF->m_Extrados.m_iSelect = -10;
-	QString strong;
-
-	//check that number of output points is compatible with array sizing
-	if(m_bSF)
-	{
-		if(m_pSF->m_Extrados.m_iRes>IQX2)
-		{
-			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong);
-			return;
-		}
-		if(m_pSF->m_Intrados.m_iRes>IQX2)
-		{
-			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong);
-			return;
-		}
-	}
-	else
-	{
-		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong);
-			return;
-		}
-		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong);
-			return;
-		}
-	}
-
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
-
-	FileName = "Spline Foil";
-
-	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
-											pMainFrame->m_LastDirName,
-											"Foil File (*.dat)");
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
-
-	QTextStream out(&XFile);
-
-
-	QString strOut;
-	strOut = FileName + "\n";
-	out << strOut;
-	if(m_bSF)
-	{
-		m_pSF->Export(out);
-	}
-	else
-	{
-		m_pPF->Export(out);
-	}
-	XFile.close();
 }
 
 
@@ -2253,14 +2158,10 @@ void QAFoil::ReleaseZoom()
 
 void QAFoil::SaveSettings(QDataStream &ar)
 {
-	ar << m_bSF;
 	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
 	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
 	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
 	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
-
-	m_pSF->Serialize(ar, true);
-	m_pPF->Serialize(ar, true);
 }
 
 
@@ -2273,8 +2174,8 @@ void QAFoil::SetScale()
 
 	m_fScale = m_fRefScale;
 
-//	double width  = (double)m_rCltRect.width();
-//	double height = (double)m_rCltRect.height();
+	double width  = (double)m_rCltRect.width();
+	double height = (double)m_rCltRect.height();
 //	double clippedh = height/width * 20.0;
 
 	m_ptOffset.rx() = 75;
@@ -2291,7 +2192,7 @@ void QAFoil::SetScale(QRect CltRect)
 	//scale is set by ChildView
 	m_rCltRect = CltRect;
 
-//	int width = m_rCltRect.width();
+	int width = m_rCltRect.width();
 
 	SetScale();
 }
@@ -2311,8 +2212,6 @@ void QAFoil::SetParams()
 {
 	if(m_bSF) m_pctrlSF->setChecked(true);
 	else      m_pctrlPF->setChecked(true);
-
-	SetFoil(m_pCurFoil);
 
 	FillFoilTable();
 	m_pctrlFoilTable->adjustSize();

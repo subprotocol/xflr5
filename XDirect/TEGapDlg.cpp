@@ -115,12 +115,10 @@ void TEGapDlg::keyPressEvent(QKeyEvent *event)
 				OnApply();
 				OKButton->setFocus();
 				m_bApplied  = true;
-				return;
 			}
 			else
 			{
 				QDialog::accept();
-				return;
 			}
 			break;
 		}

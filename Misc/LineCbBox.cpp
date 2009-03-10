@@ -24,11 +24,9 @@
 #include <QPainter>
 #include <QPaintEvent>
 
-
 LineCbBox::LineCbBox(void *pParent)
 {
 }
-
 
 LineCbBox::LineCbBox(int const &style, int const &width, QColor const &color)
 {
@@ -37,7 +35,6 @@ LineCbBox::LineCbBox(int const &style, int const &width, QColor const &color)
 	m_Color = color;
 }
 
-
 void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
 {
 	m_Style = style;
@@ -45,9 +42,9 @@ void LineCbBox::SetLine(int const &style, int const &width, QColor const &color)
 	m_Color = color;
 }
 
-
 void LineCbBox::paintEvent (QPaintEvent *event)
 {
+
 	QPainter painter(this);
 	painter.save();
 

@@ -18,8 +18,6 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
-
 #include <QDesktopWidget>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -31,6 +29,9 @@
 #include "../Objects/CVector.h"
 #include "Miarex.h"
  
+
+void *PanelAnalysisDlg::s_pMiarex;
+void *PanelAnalysisDlg::s_pMainFrame;
 
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
@@ -81,8 +82,8 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_pStab   = NULL;
 	m_pFin    = NULL;
 	m_pPlane  = NULL;
-	m_pMiarex      = NULL;
-	m_pMainFrame   = NULL;
+	s_pMiarex      = NULL;
+	s_pMainFrame   = NULL;
 	m_pWPolar      = NULL;;
 
 	m_ppPanel       = NULL;
@@ -427,7 +428,7 @@ bool PanelAnalysisDlg::CreateWakeContribution()
 //	double Delta_phi_inf = 0.0;
 	double PHC[MAXSTATIONS];
 	CVector VHC[MAXSTATIONS];
-//	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+//	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	AddString("      Adding the wake's contribution...\r\n");
 
 	if(m_b3DSymetric) Size = m_MatSize/2;
@@ -554,8 +555,8 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 	// 	Scale the doublet and source strength i.a.w. the speeds
 	//______________________________________________________________________________________
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-//	QMiarex *pMiarex   = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+//	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
 
 	QString strong, strange;
 	int p, q, pp;
@@ -681,8 +682,8 @@ bool PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 	// calculates the various wing coefficients by interpolating
 	// the adequate variable, from Cl, on the XFoil polar mesh
 	// at each span station
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-//	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+//	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int q;
 	QString str, strong;
 
@@ -724,7 +725,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	// calculates the various wing coefficients by interpolating
 	// the adequate variable, from Cl, on the XFoil polar mesh
 	// at each span station
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int pos, Station;
 	double *Mu, *Sigma;
 	double cosa, sina;
@@ -1533,7 +1534,7 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 
 void PanelAnalysisDlg::RelaxWake()
 {
-		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	CVector V, VL, VT;
 	int mw, kw, lw, llw;
 	int nInter;
@@ -1650,7 +1651,7 @@ bool PanelAnalysisDlg::ReLoop()
 	double QInf  = 0.0;
 	double Alpha = 0.0;
 
-		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 		if(m_QInfMax<m_QInf) m_QInfDelta = -fabs(m_QInfDelta);
 		nrhs  = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1 ;
@@ -2336,7 +2337,7 @@ void PanelAnalysisDlg::SetAi(int qrhs)
 /*
 void PanelAnalysisDlg::RelaxWake()
 {
-	CMiarex *pMiarex = (CMiarex*)m_pMiarex;
+	CMiarex *pMiarex = (CMiarex*)s_pMiarex;
 	CVector V, VL, VT;
 	int mw, kw, lw, llw;
 	double t, dx;
@@ -2459,7 +2460,7 @@ void PanelAnalysisDlg::RelaxWake()
 
 void PanelAnalysisDlg::SetFileHeader()
 {
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QTextStream out(m_pXFile);
 
@@ -2691,7 +2692,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	QString str;
 	CVector O(0.0,0.0,0.0);
 
-		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int n, nrhs, nWakeIter, MaxWakeIter, TotalTime;
 	double Alpha;
 

@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
- 
+  
 #include "../MainFrame.h"
 #include "../Globals.h" 
 #include "../Misc/LinePickerDlg.h"
@@ -180,7 +180,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pctrlFrameTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
 	connect(m_pctrlFrameTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
 	connect(m_pctrlBodyStyle, SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
-	connect(m_pctrlBodyName, SIGNAL(editingFinished()), this, SLOT(OnBodyName()));
 
 	setMouseTracking(true);
 }
@@ -195,6 +194,7 @@ GL3dBodyDlg::~GL3dBodyDlg()
 
 void GL3dBodyDlg::ClientToGL(QPoint const &point, CVector &real)
 {
+//qDebug() << "l="<< geometry().left() <<	  "t="<<geometry().top() << point.x() << point.y();
 	if(!m_pglWidget) return;
 	double h2 = (double)m_pglWidget->m_rCltRect.height() /2.0;
 	double w2 = (double)m_pglWidget->m_rCltRect.width()  /2.0;
@@ -3030,8 +3030,8 @@ bool GL3dBodyDlg::LoadSettings(QDataStream &ar)
 
 void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 {
-	QPoint point(event->pos().x() - m_pglWidget->geometry().x(), event->pos().y() - m_pglWidget->geometry().y());
-//qDebug() << "mouse at " <<point.x() << point.y();
+	QPoint point(event->pos().x(), event->pos().y());
+
 	int n;
 	CVector Real;
 
@@ -3184,7 +3184,8 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			int n = m_pBody->IsFramePos(Real, m_BodyScale);
+//qDebug()<< Real.x << Real.y << m_BodyScale;
+			int n = m_pBody->IsFramePos(Real, 1.0);
 			m_pBody->m_iHighlight = -10;
 			if (n>=0 && n<=m_pBody->m_NStations)
 			{
@@ -3198,7 +3199,8 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
-			int n = (m_pFrame)->IsPoint(Real, m_FrameScale);
+//qDebug()<< Real.x << Real.y << m_FrameScale;
+			int n = (m_pFrame)->IsPoint(Real, 1.0);
 			(m_pFrame)->m_iHighlight = -10;
 			if (n>=0 && n<=(m_pFrame)->m_NPoints)
 			{
@@ -3215,9 +3217,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 {
 	int iF;
-	QPoint point(event->pos().x() - m_pglWidget->geometry().x(), event->pos().y() - m_pglWidget->geometry().y());
-
-//qDebug() << event->pos().x() - m_pglWidget->geometry().x() << event->pos().y() - m_pglWidget->geometry().y();
+	QPoint point(event->pos().x(), event->pos().y());
 
 	CVector Real;
 	bool bCtrl = false;
@@ -3254,8 +3254,8 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			iF = m_pBody->IsFramePos(Real, m_BodyScale);
-//qDebug() << "IF = " << iF;
+			iF = m_pBody->IsFramePos(Real, 1.0);
+
 			if(iF >=0)
 			{
 				TakePicture();
@@ -3274,7 +3274,8 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
-			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, m_FrameScale);
+
+			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, 1.0);
 			if(m_pFrame->m_iSelect >=0)
 			{
 				TakePicture();
@@ -3297,7 +3298,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 
 void GL3dBodyDlg::mouseReleaseEvent(QMouseEvent *event)
 {
-	QPoint point(event->pos().x() - m_pglWidget->geometry().x(), event->pos().y() - m_pglWidget->geometry().y());
+	QPoint point(event->pos().x(), event->pos().y());
 
 	setCursor(m_hcCross);
 
@@ -3474,10 +3475,7 @@ void GL3dBodyDlg::OnAxes(int state)
 	UpdateView();
 }
 
-void GL3dBodyDlg::OnBodyName()
-{
-	m_pBody->m_BodyName = m_pctrlBodyName->text();
-}
+
 
 
 void GL3dBodyDlg::OnBodyStyle()
@@ -3774,8 +3772,6 @@ void GL3dBodyDlg::OnVortices(int state)
 
 
 
-
-
 void GL3dBodyDlg::ReadFrameSectionData(int sel)
 {
 	if(sel>=m_pFrameModel->rowCount()) return;
@@ -3845,12 +3841,14 @@ void GL3dBodyDlg::ReadPointSectionData(int sel)
 }
 
 
-void GL3dBodyDlg::reject()
+void GL3dBodyDlg::accept()
 {
+	m_pBody->m_BodyName = m_pctrlBodyName->text();
+
 	int res = QMessageBox::question(window(), "Body Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 	if (QMessageBox::No == res) QDialog::reject();
 	else if (QMessageBox::Cancel == res) return;
-	else accept();
+	else done(QDialog::Accepted);
 }
 
 
@@ -4258,8 +4256,7 @@ void GL3dBodyDlg::SetupLayout()
 	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
 	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 	m_pglWidget = new GLWidget(this);
-	m_pglWidget->m_bPlane = false;
-	m_pglWidget->m_iView  = 5;
+	m_pglWidget->m_iView = 5;
 
 	m_pglWidget->setMinimumHeight(r.height()/3);
 	m_pglWidget->setSizePolicy(szPolicyExpanding);
@@ -4372,6 +4369,15 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlBodyStyle = new LineButton;
 	m_pctrlBodyStyle->setSizePolicy(szPolicyMinimum);
 
+	QHBoxLayout *CommandButtons = new QHBoxLayout;
+	QPushButton *OKButton = new QPushButton(tr("OK"));
+	OKButton->setAutoDefault(false);
+	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+	CancelButton->setAutoDefault(false);
+	CommandButtons->addWidget(OKButton);
+	CommandButtons->addWidget(CancelButton);
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	BodyParams->addWidget(m_pctrlBodyName);
 	BodyParams->addStretch(1);
@@ -4379,6 +4385,8 @@ void GL3dBodyDlg::SetupLayout()
 	BodyParams->addStretch(1);
 	BodyParams->addLayout(BodyType);
 	BodyParams->addLayout(Params);
+	BodyParams->addStretch(1);
+	BodyParams->addLayout(CommandButtons);
 
 	m_pctrlFrameTable = new QTableView;
 	m_pctrlFrameTable->setSizePolicy(szPolicyMinimum);
@@ -4488,7 +4496,6 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	ScreenPt.rx() += geometry().x();
 	ScreenPt.ry() += geometry().y();
 	CtxMenu->exec(ScreenPt);
-//qDebug() << m_ptPopUp.x() << m_ptPopUp.y();
 
 	setCursor(m_hcCross);
 }
