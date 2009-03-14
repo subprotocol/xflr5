@@ -51,11 +51,12 @@ private slots:
 
 
 private:
+	void showEvent(QShowEvent *event);
+	void hideEvent(QHideEvent *event);
+
 	void SetupLayout();
 	void ReadStreamParams();
-	void showEvent(QShowEvent *event);
-	void *m_pMiarex;
-	void *m_pMainFrame;
+
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
 
@@ -69,6 +70,9 @@ private:
 
 	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3;
 
+
+	void *m_pMiarex;
+	void *m_pMainFrame;
 
 	int m_pos;
 	int m_NX;

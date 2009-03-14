@@ -134,6 +134,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_crColors[27] = QColor(170,170,170),
 	m_crColors[28] = QColor(210,210,210),
 
+	m_pCurFoil = NULL;
+
 	m_bSaved     = true;
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
@@ -378,6 +380,12 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 			break;
 		}
+		case INVERSEDESIGN:
+		{
+			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+			InverseContextMenu->exec(ScreenPt);
+			break;
+		}
 	}
 }
 
@@ -401,7 +409,7 @@ void MainFrame::CreateActions()
 
 	OnXInverseAct = new QAction(tr("&XFoil Inverse Analysis"), this);
 	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
-	connect(OnXDirectAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
+	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
 
 
 	OnMiarexAct = new QAction(tr("&Wing and Plane Design"), this);
@@ -457,7 +465,6 @@ void MainFrame::CreateActions()
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
-
 	GraphDlgAction = new QAction(tr("Define Graph Settings"), this);
 	connect(GraphDlgAction, SIGNAL(triggered()), this, SLOT(OnGraphSettings()));
 
@@ -476,6 +483,7 @@ void MainFrame::CreateActions()
 
 	CreateAFoilActions();
 	CreateXDirectActions();
+	CreateXInverseActions();
 	CreateMiarexActions();
 }
 
@@ -648,6 +656,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrlAFoilWidget->setVisible(false);
 
 	m_p2DWidget->m_pXDirect   = pXDirect;
+	m_p2DWidget->m_pXInverse  = pXInverse;
 	m_p2DWidget->m_pMiarex    = pMiarex;
 	m_p2DWidget->m_pAFoil     = pAFoil;
 	m_p2DWidget->m_pMainFrame = this;
@@ -689,8 +698,11 @@ void MainFrame::CreateDockWindows()
 	pXDirect->m_poaPolar = &m_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
-//	GL3dViewDlg::s_pMainFrame = this;
-//	GL3dViewDlg::s_pMiarex    = m_pMiarex;
+	pXInverse->m_pMainFrame       = this;
+	pXInverse->m_pXFoil           = pXDirect->m_pXFoil;
+	pXInverse->m_p2DWidget        = m_p2DWidget;
+	pXInverse->m_poaFoil          = &m_oaFoil;
+
 	GL3dBodyDlg::s_pMainFrame = this;
 	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
 
@@ -730,6 +742,7 @@ void MainFrame::CreateDockWindows()
 }
 
 
+
 void MainFrame::CreateMenus()
 {
 // Create common File, View and Help menus
@@ -756,6 +769,7 @@ void MainFrame::CreateMenus()
 
 	//Create Application-Specific Menus
 	CreateXDirectMenus();
+	CreateXInverseMenus();
 	CreateMiarexMenus();
 	CreateAFoilMenus();
 }
@@ -1445,6 +1459,82 @@ void MainFrame::CreateXDirectMenus()
 	OperPolarCtxMenu->addAction(hideAllOpPoints);
 
 	//End XDirect polar Context Menu
+}
+
+void MainFrame::CreateXInverseActions()
+{
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+
+	StoreFoil = new QAction(tr("Store Foil"), this);
+	StoreFoil->setStatusTip(tr("Store Foil in database"));
+	connect(StoreFoil, SIGNAL(triggered()), pXInverse, SLOT(OnStoreFoil()));
+
+	InverseStyles = new QAction(tr("Define Styles"), this);
+	InverseStyles->setStatusTip(tr("Define the styles for this view"));
+	connect(InverseStyles, SIGNAL(triggered()), pXInverse, SLOT(OnInverseStyles()));
+
+	InverseResetScale = new QAction(tr("Reset foil scale"), this);
+	connect(InverseResetScale, SIGNAL(triggered()), pXInverse, SLOT(OnResetFoilScale()));
+
+	InverseInsertCtrlPt = new QAction(tr("Insert Control Point"), this);
+	connect(InverseInsertCtrlPt, SIGNAL(triggered()), pXInverse, SLOT(OnInsertCtrlPt()));
+
+	InverseRemoveCtrlPt = new QAction(tr("Remove Control Point"), this);
+	connect(InverseRemoveCtrlPt, SIGNAL(triggered()), pXInverse, SLOT(OnRemoveCtrlPt()));
+
+	InvQInitial = new QAction(tr("Show Q-Initial"), this);
+	connect(InvQInitial, SIGNAL(triggered()), pXInverse, SLOT(OnQInitial()));
+
+	InvQSpec = new QAction(tr("Show Q-Spec"), this);
+	connect(InvQSpec, SIGNAL(triggered()), pXInverse, SLOT(OnQSpec()));
+
+	InvQViscous = new QAction(tr("Show Q-Viscous"), this);
+	connect(InvQViscous, SIGNAL(triggered()), pXInverse, SLOT(OnQViscous()));
+
+	InvQPoints = new QAction(tr("Show Points"), this);
+	connect(InvQPoints, SIGNAL(triggered()), pXInverse, SLOT(OnQPoints()));
+
+	InvQReflected = new QAction(tr("Show Reflected"), this);
+	connect(InvQReflected, SIGNAL(triggered()), pXInverse, SLOT(OnQReflected()));
+}
+
+
+
+void MainFrame::CreateXInverseMenus()
+{
+	//MainMenu for XInverse Application
+	XInverseViewMenu = menuBar()->addMenu(tr("&View"));
+	XInverseViewMenu->addAction(InverseStyles);
+	XInverseViewMenu->addAction(GraphDlgAction);
+	XInverseViewMenu->addSeparator();
+	XInverseViewMenu->addAction(restoreToolbarsAct);
+	XInverseViewMenu->addAction(styleAct);
+	XInverseViewMenu->addAction(saveViewToImageFileAct);
+
+	InverseFoilMenu = menuBar()->addMenu(tr("&Foil"));
+	InverseFoilMenu->addAction(StoreFoil);
+	InverseFoilMenu->addAction(InverseResetScale);
+	InverseFoilMenu->addSeparator();
+	InverseFoilMenu->addAction(InvQInitial);
+	InverseFoilMenu->addAction(InvQSpec);
+	InverseFoilMenu->addAction(InvQViscous);
+	InverseFoilMenu->addAction(InvQPoints);
+	InverseFoilMenu->addAction(InvQReflected);
+
+	//Context Menu for XINverse Application
+	InverseContextMenu = new QMenu("Context Menu",this);
+	InverseContextMenu->addAction(InverseStyles);
+	InverseContextMenu->addAction(GraphDlgAction);
+	InverseContextMenu->addSeparator();
+	InverseContextMenu->addAction(InverseInsertCtrlPt);
+	InverseContextMenu->addAction(InverseRemoveCtrlPt);
+	InverseContextMenu->addSeparator();
+	InverseContextMenu->addAction(InvQInitial);
+	InverseContextMenu->addAction(InvQSpec);
+	InverseContextMenu->addAction(InvQViscous);
+	InverseContextMenu->addAction(InvQPoints);
+	InverseContextMenu->addAction(InvQReflected);
+
 }
 
 
@@ -2267,11 +2357,14 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 
 void MainFrame::LoadSettings()
 {
-	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	QMiarex *pMiarex   = (QMiarex*)m_pMiarex;
+	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
+	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
+
 	QString FileName   = QDir::tempPath() + "/QFLR5.set";
 	QFile *pXFile = new QFile(FileName);
+
 	if (!pXFile->open(QIODevice::ReadOnly)) return;
 
 	int k;
@@ -2280,7 +2373,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100515)
+	if(k !=100516)
 	{
 		pXFile->close();
 		return;
@@ -2315,7 +2408,7 @@ void MainFrame::LoadSettings()
 	pAFoil->LoadSettings(ar);
 	pXDirect->LoadSettings(ar);
 	pMiarex->LoadSettings(ar);
-
+	pXInverse->LoadSettings(ar);
 	pXFile->close();
 }
 
@@ -2514,7 +2607,7 @@ void MainFrame::OnExportCurGraph()
 
 void MainFrame::OnGraphSettings()
 {
-
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex= (QMiarex*) m_pMiarex;
 	QGraph *pGraph = NULL;
@@ -2528,6 +2621,11 @@ void MainFrame::OnGraphSettings()
 		case XFOILANALYSIS:
 		{
 			pGraph = pXDirect->m_pCurGraph;
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			pGraph = &pXInverse->m_QGraph;
 			break;
 		}
 	}
@@ -3245,6 +3343,8 @@ void MainFrame::OnUnits()
 
 void MainFrame::OnXDirect()
 {
+	UpdateFoils();
+
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetFoilScale();
 	m_iApp = XFOILANALYSIS;
@@ -3263,6 +3363,11 @@ void MainFrame::OnXDirect()
 
 void MainFrame::OnXInverse()
 {
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	pXDirect->m_bAnimate = false;
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bAnimate = false;
+
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 //	pXInverse->SetScale();
 	m_iApp = INVERSEDESIGN;
@@ -3275,6 +3380,7 @@ void MainFrame::OnXInverse()
 	m_pctrlXInverseWidget->show();
 	SetCentralWidget();
 	SetMenus();
+	pXInverse->SetParams();
 }
 
 void MainFrame::openRecentFile()
@@ -3285,15 +3391,19 @@ void MainFrame::openRecentFile()
 	QXDirect *pXDirect = (QXDirect*) m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*) m_pMiarex;
 
-	m_iApp = LoadXFLR5File(action->data().toString());
+	int App = LoadXFLR5File(action->data().toString());
 
-	if(m_iApp==0)
+	if(m_iApp==0) m_iApp = App;
+
+	if(App==0)
 	{
 //remove filename from list
+		m_iApp = App;
 		QString FileName = action->data().toString();
 		m_RecentFiles.removeAll(FileName);
 		updateRecentFileActions();
 	}
+
 	else if(m_iApp==XFOILANALYSIS)
 	{
 		SetSaveState(false);
@@ -3303,8 +3413,10 @@ void MainFrame::openRecentFile()
 			if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
 			else                   pXDirect->CreateOppCurves();
 		}
+		OnXDirect();
 		UpdateFoils();
 		UpdateView();
+
 	}
 	else if(m_iApp==MIAREX)
 	{
@@ -3321,6 +3433,10 @@ void MainFrame::openRecentFile()
 	else if(m_iApp==DIRECTDESIGN)
 	{
 //		AFoil.SetFoils();
+	}
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		OnXInverse();
 	}
 }
 
@@ -3554,11 +3670,7 @@ bool MainFrame::SaveProject(QString PathName)
 		QString FileName = m_ProjectName;
 		if(FileName.right(1)=="*") 	FileName = FileName.left(FileName.length()-1);
 		FileName.replace("/", " ");
-/*		QFileDialog dlg;
-		dlg.setFilter(".wpa");
-		dlg.setDirectory(m_LastDirName);
-		dlg.selectFile(FileName);
-		PathName = dlg.getSaveFileName(this);*/
+
 		PathName = QFileDialog::getSaveFileName(this, "Save the Project File",
 												m_LastDirName+"/"+FileName,
 												"XFLR5 Project File (*.wpa)", &Filter);
@@ -3592,6 +3704,7 @@ void MainFrame::SaveSettings()
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QString FileName = QDir::tempPath() + "/QFLR5.set";
 	QFile *pXFile = new QFile(FileName);
 
@@ -3603,7 +3716,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100515;
+	ar << 100516;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -3625,7 +3738,7 @@ void MainFrame::SaveSettings()
 	pAFoil->SaveSettings(ar);
 	pXDirect->SaveSettings(ar);
 	pMiarex->SaveSettings(ar);
-
+	pXInverse->SaveSettings(ar);
 	pXFile->close();
 }
 
@@ -4406,6 +4519,14 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(DesignMenu);
 		menuBar()->addMenu(PolarMenu);
 		menuBar()->addMenu(OpPointMenu);
+		menuBar()->addMenu(helpMenu);
+	}
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		menuBar()->clear();
+		menuBar()->addMenu(fileMenu);
+		menuBar()->addMenu(XInverseViewMenu);
+		menuBar()->addMenu(InverseFoilMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp==DIRECTDESIGN)

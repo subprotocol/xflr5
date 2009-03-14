@@ -36,6 +36,8 @@
 class CSpline
 {
 	friend class CSF;
+	friend class QXInverse;
+	friend class InverseOptionsDlg;
 public:
 
 	CSpline();
@@ -62,7 +64,7 @@ public:
 	
 	void SetStyle(int style);
 	void SetWidth(int width);
-	void SetColor(int color);
+	void SetColor(QColor color);
 	void SetSplineParams(int style, int width, QColor color);
 
 	int m_iHighlight, m_iSelect;

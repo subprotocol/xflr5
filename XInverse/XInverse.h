@@ -31,11 +31,12 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include "XInverse.h"
 #include "../Misc/FloatEdit.h"
 #include "../XDirect/XFoil.h"
-#include "XInverse.h"
 #include "../Graph/QGraph.h"
 #include "../Objects/Spline.h"
+
 
 class QXInverse : public QWidget
 {
@@ -43,6 +44,7 @@ class QXInverse : public QWidget
 
 	friend class MainFrame;
 	friend class TwoDWidget;
+	friend class InverseOptionsDlg;
 
 public:
 	QXInverse(QWidget *parent = NULL);
@@ -50,9 +52,31 @@ public:
 	void InitDialog();
  
 private slots:
+	void OnCpxx();
+	void OnInverseApp();
+	void OnMarkSegment();
 	void OnGraphOptions();
+	void OnInverseStyles();
 	void OnTangentSpline();
 	void OnShowSpline();
+	void OnNewSpline();
+	void OnApplySpline();
+	void OnSpecal();
+	void OnQReset();
+	void OnFilter();
+	void OnSmooth();
+	void OnSymm() ;
+	void OnExecute();
+	void OnStoreFoil();
+	void OnResetFoilScale();
+	void OnInsertCtrlPt();
+	void OnRemoveCtrlPt();
+	void OnQInitial();
+	void OnQSpec();
+	void OnQViscous();
+	void OnQPoints();
+	void OnQReflected();
+
 
 private:
 	void UpdateView();
@@ -64,21 +88,42 @@ private:
 	void mouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
+
+	void DrawGrid(QPainter &painter, double scale);
 	void PaintView(QPainter &painter);
 	void PaintGraph(QPainter &painter);
 	void PaintFoil(QPainter &painter);
 	void SetScale(QRect CltRect);
+	void ResetQ();
 	void ResetScale();
+	void ResetMixedQ();
 	void ReleaseZoom();
 	void Smooth(int Pos1 = -1, int Pos2 = -1);
+	void Clear();
+	void Connect();
 	void CreateMCurve();
 	void CreateQCurve();
+	void CancelMark();
 	void CancelSpline();
 	void CancelSmooth();
+	void Pertubate();
 	void SetFoil();
-	void SetRect(QRect CltRect);
+	void SetTAngle(double a);
+	void SetTGap(double tr, double ti);
+//	void SetRect(QRect CltRect);
+	void ExecMDES();
+	void LoadSettings(QDataStream &ar);
+	void SaveSettings(QDataStream &ar);
+
+	bool ExecQDES();
+	bool SetParams();
+	bool InitXFoil(CFoil * pFoil);
+
+
+	double qincom(double qc, double qinf, double tklam);
 
 private:
+	QRadioButton *m_pctrlFullInverse, *m_pctrlMixedInverse;
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
 	QRadioButton *m_pctrlSpecAlpha, *m_pctrlSpecCl;
@@ -88,7 +133,7 @@ private:
 
 	QTextEdit *m_pctrlMSpec, *m_pctrlMOutput;
 	FloatEdit *m_pctrlIter;
-	QPushButton	*m_pctrlMark;
+	QPushButton *m_pctrlMark;
 	QCheckBox *m_pctrlCpxx;
 
 	QCheckBox *m_pctrlMShowSpline, *m_pctrlMTangentSpline;
@@ -136,7 +181,6 @@ private:
 	int m_Mk1, m_Mk2;
 	int m_tmpPos, m_Pos1, m_Pos2, m_nPos, m_SplineLeftPos, m_SplineRightPos;
 	int m_LogPixelsY;
-	int m_SplineStyle, m_SplineWidth;
 	double xd, yd;
 	double xu, yu;
 	double m_fScale, m_fRefScale;
@@ -150,8 +194,6 @@ private:
 	CCurve* m_pMCurve;
 	CCurve* m_pReflectedCurve;
 
-
-	QColor m_SplineClr;
 
 	QRect m_rCltRect, m_rGraphRect;
 	QRect m_ZoomRect;

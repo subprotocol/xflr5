@@ -80,7 +80,8 @@ SOURCES += MainFrame.cpp \
     XInverse/XInverse.cpp \
     Design/AFoilGridDlg.cpp \
     Miarex/GL3DScales.cpp \
-    GLWidget.cpp
+    GLWidget.cpp \
+    XInverse/InverseOptionsDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -156,5 +157,6 @@ HEADERS += MainFrame.h \
     XInverse/XInverse.h \
     Design/AFoilGridDlg.h \
     Miarex/GL3DScales.h \
-    GLWidget.h
+    GLWidget.h \
+    XInverse/InverseOptionsDlg.h
 RESOURCES += qflr5.qrc

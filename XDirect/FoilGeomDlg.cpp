@@ -170,9 +170,6 @@ void FoilGeomDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	RestoreButton  = new QPushButton("Restore");
-	CancelButton->setMaximumWidth(70);
-	RestoreButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(RestoreButton);
 	CommandButtons->addStretch(1);

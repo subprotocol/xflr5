@@ -51,6 +51,7 @@ class CFoil
 	friend class NacaFoilDlg;
 	friend class FoilCoordDlg;
 	friend class TwoDPanelDlg;
+	friend class InverseOptionsDlg;
 	friend class InterpolateFoilsDlg;
 	friend class FoilGeomDlg;
 	friend class TEGapDlg;

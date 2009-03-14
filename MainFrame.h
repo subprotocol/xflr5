@@ -109,6 +109,8 @@ private:
 	void CreateXDirectActions();
 	void CreateXDirectMenus();
 	void CreateXDirectToolbar();
+	void CreateXInverseActions();
+	void CreateXInverseMenus();
 	void CreateMiarexActions();
 	void CreateMiarexMenus();
 	void CreateMiarexToolbar();
@@ -203,6 +205,9 @@ private:
 	QMenu *PolarMenu, *currentPolarMenu, *GraphPolarMenu, *CurPolarGraphMenu;
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
 
+	//XInverse menu
+	QMenu *XInverseViewMenu, *InverseFoilMenu, *InverseContextMenu;
+
 	//Miarex Menus
 	QMenu * MiarexViewMenu;
 	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu;
@@ -259,9 +264,13 @@ private:
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
 
-	QComboBox * m_pctrlFoil, * m_pctrlPolar, * m_pctrlOpPoint;
-	QComboBox * m_pctrlUFO, * m_pctrlWPolar, * m_pctrlWOpp;
+	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
+	QComboBox *m_pctrlUFO, *m_pctrlWPolar, * m_pctrlWOpp;
 	QLabel *m_pctrlProjectName;
+
+	//XInverse Actions
+	QAction *StoreFoil, *InverseStyles, *InverseResetScale, *InverseInsertCtrlPt, *InverseRemoveCtrlPt;
+	QAction *InvQInitial, *InvQSpec, *InvQViscous, *InvQPoints, *InvQReflected;
 
 	QStringList m_RecentFiles;
 

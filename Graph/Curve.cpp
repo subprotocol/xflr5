@@ -185,7 +185,8 @@ int CCurve::GetClosestPoint(double xs)
 	for(int i=0; i<n; i++)
 	{
         dist = fabs(xs-x[i]);
-		if (dist<distmax){
+		if (dist<distmax)
+		{
 			distmax = dist;
 			ref = i;
 		}

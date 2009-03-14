@@ -9863,7 +9863,8 @@ void QMiarex::OnGL3DScale()
 {
 	if(m_iView != 3) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->m_pctrl3DScalesWidget->show();
+	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
+	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
 }
 
 
@@ -14275,6 +14276,7 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
 	m_pctrl3DSettings =new QPushButton("3D Scales");
+	m_pctrl3DSettings->setCheckable(true);
 	QVBoxLayout *DisplayLayout = new QVBoxLayout;
 	DisplayLayout->addLayout(CheckDispLayout);
 	DisplayLayout->addWidget(m_pctrl3DSettings);

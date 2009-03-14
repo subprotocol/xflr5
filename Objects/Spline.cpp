@@ -83,7 +83,7 @@ void CSpline::Copy(CSpline *pSpline)
 	memcpy(m_Input, &pSpline->m_Input, sizeof(m_Input));
 	memcpy(m_Output, &pSpline->m_Output, sizeof(m_Output));
 	memcpy(m_knots, &pSpline->m_knots, sizeof(m_knots));
-        m_rViewRect.setCoords(pSpline->m_rViewRect.left(),  pSpline->m_rViewRect.top(),pSpline->m_rViewRect.right(),  pSpline->m_rViewRect.bottom());
+	m_rViewRect.setCoords(pSpline->m_rViewRect.left(),  pSpline->m_rViewRect.top(),pSpline->m_rViewRect.right(),  pSpline->m_rViewRect.bottom());
 }
 
 
@@ -102,14 +102,13 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QP
 	PointPen.setWidth(1);
 
 	painter.setPen(PointPen);
-
 	for (i=0; i<m_iCtrlPoints; i++)
 	{
 		pt.rx() = (int)(m_Input[i].x*scalex + Offset.x());
 		pt.ry() = (int)(m_Input[i].y*scaley + Offset.y());
 
-		if(m_rViewRect.contains(pt))
-		{
+//		if(m_rViewRect.contains(pt))
+//		{
 			if (m_iSelect==i) 
 			{
 				PointPen.setWidth(2);
@@ -127,7 +126,8 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QP
 			}
 			painter.setPen(PointPen);
 			painter.drawEllipse(pt.x()-width, pt.y()-width, 2*width, 2*width);
-		}
+//qDebug() << 	m_Input[i].x  << m_Input[i].y << 		pt.x()<< pt.y();
+//		}
 	}
 	painter.restore();
 }
@@ -350,7 +350,7 @@ void CSpline::SetWidth(int width)
 
 
 
-void CSpline::SetColor(int color)
+void CSpline::SetColor(QColor color)
 {
 	m_Color = color;
 }

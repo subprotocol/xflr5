@@ -2812,8 +2812,8 @@ void QXDirect::OnNacaFoils()
 		pNewFoil->m_FoilName = str;
 		m_pCurOpp = (OpPoint*)ptr;
 		CFoil *pOldFoil = pMainFrame->GetFoil(str);
-		if(pOldFoil)		pMainFrame->SetModFoil(pNewFoil);
-		else				pMainFrame->AddFoil(pNewFoil);
+		if(pOldFoil) pMainFrame->SetModFoil(pNewFoil);
+		else         pMainFrame->AddFoil(pNewFoil);
 		pMainFrame->UpdateFoils();
 
 	}

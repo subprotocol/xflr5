@@ -277,6 +277,12 @@ void GL3DScales::OnVelocityScale(int pos)
 	pMiarex->UpdateView();
 }
 
+void GL3DScales::hideEvent(QHideEvent *event)
+{
+	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	if(pMiarex)	pMiarex->m_pctrl3DSettings->setChecked(false);
+}
+
 
 void GL3DScales::showEvent(QShowEvent *event)
 {
