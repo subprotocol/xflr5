@@ -59,6 +59,7 @@ class MainFrame : public QMainWindow
 	friend class GL3dBodyDlg;
 	friend class GL3dViewDlg;
 	friend class GL3DScales;
+	friend class ManageBodiesDlg;
 
     Q_OBJECT
 
@@ -100,7 +101,8 @@ private slots:
 private:
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
-//	void keyPressEvent(QKeyEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+
 	void CreateDockWindows();
 	void CreateToolbars();
 	void CreateStatusBar();
@@ -242,7 +244,7 @@ private:
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps, *deleteAllWPlrOpps;
 	QAction *defineWPolar, *advancedSettings;
-	QAction *defineBody, *editCurBody, *importBody, *exportBody;
+	QAction *defineBody, *editCurBody, *importBody, *exportBody, *ManageBodies;
 
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *defineBatch;

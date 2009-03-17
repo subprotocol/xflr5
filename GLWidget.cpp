@@ -167,11 +167,6 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int width, int height)
 {
-	if(m_iView == 3)
-	{
-		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
-		pMiarex->Set3DScale();
-	}
 	double w, h;
 	m_rCltRect = geometry();
 	int side = qMax(width, height);
@@ -194,6 +189,13 @@ void GLWidget::resizeGL(int width, int height)
 	glLoadIdentity();
 	if(w>h)	m_GLViewRect.SetRect(-s, s*h/w, s, -s*h/w);
 	else    m_GLViewRect.SetRect(-s*w/h, s, s*w/h, -s*h/w);
+
+	if(m_iView == 3)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->m_ArcBall.GetMatrix();
+		pMiarex->Set3DScale();
+	}
 }
 
 

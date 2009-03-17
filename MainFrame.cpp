@@ -705,6 +705,7 @@ void MainFrame::CreateDockWindows()
 
 	GL3dBodyDlg::s_pMainFrame = this;
 	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
+	GL3dBodyDlg::s_poaBody    = &m_oaBody;
 
 	WingDlg::s_pMainFrame  = this;
 	WingDlg::s_pMiarex     = m_pMiarex;
@@ -803,17 +804,18 @@ void MainFrame::CreateMiarexActions()
 	connect(DefineWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewWing()));
 
 	DefinePlaneAct = new QAction(tr("Define a New Plane"), this);
-	DefinePlaneAct->setStatusTip(tr("Shows a dialogbox for editing a new plane definition"));
-	DefinePlaneAct->setShortcut(tr("Shift+F3"));
+	DefinePlaneAct->setStatusTip(tr("Shows a dialogbox to create a new plane definition"));
+	DefinePlaneAct->setShortcut(tr("Ctrl+F3"));
 	connect(DefinePlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewPlane()));
 
 	EditUFOAct = new QAction(tr("Edit..."), this);
-	EditUFOAct->setStatusTip(tr("Shows a dialogbox for editing the currently selected wing or plane"));
-	EditUFOAct->setShortcut(tr("Ctrl+F3"));
+	EditUFOAct->setStatusTip(tr("Shows a dialogbox to edit the currently selected wing or plane"));
+	EditUFOAct->setShortcut(tr("Shift+F3"));
 	connect(EditUFOAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditUFO()));
 
 	defineBody = new QAction(tr("Define a New Body"), this);
 	defineBody->setStatusTip(tr("Shows a dialogbox for editing a new body definition"));
+	defineBody->setShortcut(tr("F10"));
 	connect(defineBody, SIGNAL(triggered()), pMiarex, SLOT(OnNewBody()));
 
 	editCurBody = new QAction(tr("Edit the Current Body"), this);
@@ -828,6 +830,9 @@ void MainFrame::CreateMiarexActions()
 	importBody->setStatusTip(tr("Import a body definition from a text file"));
 	connect(importBody, SIGNAL(triggered()), pMiarex, SLOT(OnImportBody()));
 
+	ManageBodies = new QAction(tr("Manage Bodies"), this);
+	ManageBodies->setStatusTip(tr("Manage the body list : Rename, Duplicate, Delete"));
+	connect(ManageBodies, SIGNAL(triggered()), pMiarex, SLOT(OnManageBodies()));
 
 	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
 	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
@@ -948,6 +953,8 @@ void MainFrame::CreateMiarexMenus()
 	MiarexBodyMenu->addAction(editCurBody);
 	MiarexBodyMenu->addAction(importBody);
 	MiarexBodyMenu->addAction(exportBody);
+	MiarexBodyMenu->addSeparator();
+	MiarexBodyMenu->addAction(ManageBodies);
 
 	MiarexWPlrMenu = menuBar()->addMenu(tr("&Polars"));
 	MiarexWPlrMenu->addAction(defineWPolar);
@@ -2219,7 +2226,45 @@ OpPoint *MainFrame::GetOpp(double Alpha)
     return NULL;// shouldn't ever get here, fortunately
 }
 
+void MainFrame::keyPressEvent(QKeyEvent *event)
+{
+	bool bCtrl = false;
+	if(event->modifiers() & Qt::ControlModifier) bCtrl = true;
+	switch (event->key())
+	{
+/*		case Qt::Key_1:
+		{
+			if(bCtrl)
+			{
+				QAFoil *pAFoil = (QAFoil *)m_pAFoil;
+				pAFoil->m_bSF = true;
+				OnAFoil();
+				event->accept();
+			}
+			break;
+		}
+		case Qt::Key_2:
+		{
+			if(bCtrl)
+			{
+				QAFoil *pAFoil = (QAFoil *)m_pAFoil;
+				pAFoil->m_bSF = false;
+				OnAFoil();
+				event->accept();
+			}
+			break;
+		}*/
+		case Qt::Key_Control:
+		{
 
+			break;
+		}
+
+		default:
+//			QWidget::keyPressEvent(event);
+			event->ignore();
+	}
+}
 
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
@@ -2373,7 +2418,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100516)
+	if(k !=100517)
 	{
 		pXFile->close();
 		return;
@@ -2409,6 +2454,10 @@ void MainFrame::LoadSettings()
 	pXDirect->LoadSettings(ar);
 	pMiarex->LoadSettings(ar);
 	pXInverse->LoadSettings(ar);
+
+	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
+	p3DScales->LoadSettings(ar);
+
 	pXFile->close();
 }
 
@@ -3287,6 +3336,8 @@ void MainFrame::OnStyle()
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
 		m_StyleName       = dlg.m_StyleName;
+		qApp->setStyle(m_StyleName);
+
 		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCpGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCmGraph->SetBkColor(m_GraphBackColor);
@@ -3716,7 +3767,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100516;
+	ar << 100517;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -3739,6 +3790,10 @@ void MainFrame::SaveSettings()
 	pXDirect->SaveSettings(ar);
 	pMiarex->SaveSettings(ar);
 	pXInverse->SaveSettings(ar);
+
+	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
+	p3DScales->SaveSettings(ar);
+
 	pXFile->close();
 }
 

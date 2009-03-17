@@ -25,6 +25,7 @@
 #include "../Globals.h"
 #include "../Misc/RenameDlg.h"
 #include "../Graph/GraphVariableDlg.h"
+#include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
 #include "GL3DScales.h"
 #include "WingDlg.h"
@@ -3199,6 +3200,34 @@ void QMiarex::CreateWPolarCurves()
 }
 
 
+void QMiarex::DeleteBody(CBody *pThisBody)
+{
+	if(!pThisBody)
+	{
+		return;
+	}
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->SetSaveState(false);
+	int i;
+
+	// ... Find the Body in the object array and remove it...
+	CBody* pBody;
+	for (i=m_poaBody->size()-1; i>=0; i--)
+	{
+		pBody = (CBody*)m_poaBody->at(i);
+		if (pBody == pThisBody)
+		{
+			m_poaBody->removeAt(i);
+			delete pBody;
+			if(pBody == m_pCurBody)
+			{
+				m_pCurBody = NULL;
+				m_pCurFrame = NULL;
+			}
+			break;
+		}
+	}
+}
 void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 {
 	//draws the WOpps legend to the device context,
@@ -9392,10 +9421,6 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 
 	m_GL3dBody.LoadSettings(ar);
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
-	p3DScales->LoadSettings(ar);
-
 	return true;
 }
 
@@ -9611,7 +9636,6 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 
 			ClientToGL(point, Real);
 			if(m_rCltRect.contains(point)) pGLWidget->setFocus();
-
 
 			if(m_bPickCenter)
 			{
@@ -11269,13 +11293,6 @@ void QMiarex::OnInitLLTCalc()
 }
 
 
-
-void QMiarex::OnLButtonDown(QMouseEvent *event)
-{
-
-}
-
-
 void QMiarex::OnLiftScale(int pos)
 {
 	m_LiftScale    = pos/100.0/sqrt(1.01-pos/100.0);
@@ -11283,7 +11300,17 @@ void QMiarex::OnLiftScale(int pos)
 	UpdateView();
 }
 
-
+void QMiarex::OnManageBodies()
+{
+	ManageBodiesDlg dlg;
+	dlg.m_pMiarex = this;
+	dlg.m_pMainFrame = m_pMainFrame;
+	dlg.m_pGL3dBodyDlg = &m_GL3dBody;
+	dlg.m_poaBody = m_poaBody;
+	dlg.m_poaPlane = m_poaPlane;
+	dlg.InitDialog();
+	dlg.exec();
+}
 
 void QMiarex::OnNewBody()
 {
@@ -12290,7 +12317,6 @@ void QMiarex::PaintView(QPainter &painter)
 
 	//Refresh the active view
 //	if(m_bAnimate)	return;// painting is performed elsewhere
-
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 
 	if (m_iView==2)
@@ -12971,11 +12997,6 @@ bool QMiarex::SaveSettings(QDataStream &ar)
 
 	m_GL3dBody.SaveSettings(ar);
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
-	p3DScales->SaveSettings(ar);
-
-
 	return true;
 }
 
@@ -13161,7 +13182,7 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 void QMiarex::Set3DScale()
 {	
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	m_rCltRect = pGLWidget->geometry();
+//	m_rCltRect = pGLWidget->geometry();
 	
 	
 	if(m_iView==3) m_bResetglLegend = true;
@@ -13184,8 +13205,6 @@ void QMiarex::Set3DScale()
 		m_glViewportTrans.z = 0.0;
 		m_bIs3DScaleSet = true;
 	}
-
-
 	else //(m_iView==3)
 	{
 		double gh = (double)m_rCltRect.height()/(double)m_rCltRect.width() ;
@@ -13394,24 +13413,23 @@ bool QMiarex::SetModBody(CBody *pModBody)
 					if(pBody == pModBody)
 					{
 						m_poaBody->removeAt(l);
-						// but don't delete it !
-						//and re-insert it
-						for (l=0; l<m_poaBody->size();l++)
-						{
-							pBody = (CBody*)m_poaBody->at(l);
-
-							if (pBody->m_BodyName.compare(pModBody->m_BodyName, Qt::CaseInsensitive)>0)
-							{
-								//then insert before
-								m_poaBody->insert(l, pModBody);
-								bInserted = true;
-								break;
-							}
-						}
-						if(!bInserted)	m_poaBody->append(pModBody);
+						// but don't delete it ! we need to re-insert it
 						break;
 					}
 				}
+				for (l=0; l<m_poaBody->size();l++)
+				{
+					pBody = (CBody*)m_poaBody->at(l);
+
+					if (pBody->m_BodyName.compare(pModBody->m_BodyName, Qt::CaseInsensitive)>0)
+					{
+						//then insert before
+						m_poaBody->insert(l, pModBody);
+						bInserted = true;
+						break;
+					}
+				}
+				if(!bInserted)	m_poaBody->append(pModBody);
 				pMainFrame->SetSaveState(false);
 				return true;
 			}

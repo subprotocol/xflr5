@@ -49,6 +49,7 @@ class GL3dBodyDlg : public QDialog
 	friend class WingDlg;
 	friend class GLLightDlg;
 	friend class BodyScaleDlg;
+	friend class ManageBodiesDlg;
 
 public:
 	GL3dBodyDlg(void *pParent = NULL);
@@ -56,7 +57,7 @@ public:
 
 
 private slots:
-	void OnAxes(int state);
+	void OnAxes();
 	void On3DIso();
 	void On3DTop();
 	void On3DLeft();
@@ -67,13 +68,14 @@ private slots:
 	void OnGrid();
 	void OnSetupLight();
 	void OnClipPlane(int pos);
-	void OnLight(int state);
-	void OnSurfaces(int state);
-	void OnOutline(int state);
-	void OnPanels(int state);
-	void OnVortices(int state);
+	void OnLight();
+	void OnSurfaces();
+	void OnOutline();
+	void OnPanels();
+	void OnVortices();
 	void OnLineType();
 	void OnInsert();
+//	void OnOK();
 	void OnRemove();
 	void OnFrameCellChanged(QWidget *pWidget);
 	void OnFrameItemActivated(const QModelIndex &index);
@@ -82,6 +84,8 @@ private slots:
 	void OnPointItemActivated(const QModelIndex &index);
 	void OnPointItemClicked(const QModelIndex &index);
 	void OnScaleBody();
+
+
 
 private:
 	void wheelEvent(QWheelEvent *event);
@@ -148,8 +152,10 @@ private:
 	static void *s_pGLLightDlg;
 
 	GLWidget *m_pglWidget;
+
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlGrid;
+
 	QSlider *m_pctrlClipPlanePos;
 
 	QLineEdit *m_pctrlBodyName;
@@ -184,6 +190,7 @@ private:
 
 	BodyGridDlg m_BodyGridDlg;
 
+	static QList<void*> *s_poaBody;
 
 	ArcBall m_ArcBall;
 	QPoint m_LastPoint, m_PointDown;

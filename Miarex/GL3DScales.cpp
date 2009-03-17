@@ -52,6 +52,7 @@ GL3DScales::GL3DScales(QWidget *parent)
 	connect(m_pctrlVelocityScaleSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnVelocityScale(int)));
 }
 
+
 void GL3DScales::SetupLayout()
 {
 	QSizePolicy szPolicyExpanding;

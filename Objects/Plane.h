@@ -38,6 +38,7 @@ class CPlane
 	friend class GL3dViewDlg;
 	friend class PlaneDlg;
 	friend class VLMAnalysisDlg;
+	friend class ManageBodiesDlg;
 
 // Construction
 public:

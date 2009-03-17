@@ -737,10 +737,8 @@ void PlaneDlg::SetupLayout()
 	move(r.width()/4, r.height()/8);
 
 	QVBoxLayout *NameLayout = new QVBoxLayout;
-	QLabel *lab0 = new QLabel("Plane Name:");
 	m_pctrlPlaneName = new QLineEdit("PlaneName");
 	m_pctrlPlaneName->setMinimumWidth(120);
-	NameLayout->addWidget(lab0);
 	NameLayout->addWidget(m_pctrlPlaneName);
 	QGroupBox *NameBox = new QGroupBox("Plane Name");
 	NameBox->setLayout(NameLayout);
@@ -915,6 +913,14 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab106 = new QLabel("TailVolume = ");
 	QLabel *lab107 = new QLabel("Plane Volume = ");
 	QLabel *lab108 = new QLabel("Total Panels = ");
+	lab101->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab102->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab103->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab104->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab105->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab106->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab107->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab108->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlWingSurface    = new QLabel("1.00");
 	m_pctrlStabSurface    = new QLabel("2.00");
 	m_pctrlWingSpan       = new QLabel("3.00");

@@ -70,6 +70,7 @@ class QMiarex : public QWidget
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class PlaneDlg;
+	friend class ManageBodiesDlg;
 
 	Q_OBJECT
 
@@ -78,27 +79,6 @@ public:
 
 	QMiarex(QWidget *parent = NULL);
 	~QMiarex();
-
-	CWPolar* AddWPolar(CWPolar* pWPolar);
-	CWPolar* GetWPolar(QString WPolarName);
-	CWing* AddWing(CWing *pWing);
-	CWOpp* GetWOpp(double Alpha);
-	CPOpp* GetPOpp(double Alpha);
-	CBody* AddBody(CBody *pBody);
-
-	CPlane * AddPlane(CPlane *pPlane);
-	CPlane * GetPlane(QString PlaneName);
-	CWing * GetWing(QString WingName);
-	CBody *GetBody(QString BodyName);
-	CWOpp* InsertWOpp(CWOpp *pNewPoint);
-	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
-	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
-	void SetUFO(QString UFOName="");
-	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
-	void OnLButtonDown(QMouseEvent *event);
-
-	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
-	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 
 
 private slots:
@@ -163,7 +143,7 @@ private slots:
 	void OnEditCurBody();
 	void OnImportBody();
 	void OnExportBody();
-
+	void OnManageBodies();
 	void OnAxes();
 	void On3DCp();
 	void On3DIso();
@@ -222,6 +202,27 @@ private:
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
+
+	CWPolar* AddWPolar(CWPolar* pWPolar);
+	CWPolar* GetWPolar(QString WPolarName);
+	CWing* AddWing(CWing *pWing);
+	CWOpp* GetWOpp(double Alpha);
+	CPOpp* GetPOpp(double Alpha);
+	CBody* AddBody(CBody *pBody);
+
+	CPlane * AddPlane(CPlane *pPlane);
+	CPlane * GetPlane(QString PlaneName);
+	CWing * GetWing(QString WingName);
+	CBody *GetBody(QString BodyName);
+	CWOpp* InsertWOpp(CWOpp *pNewPoint);
+	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
+	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
+	void SetUFO(QString UFOName="");
+	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
+	void DeleteBody(CBody *pThisBody);
+
+	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
+	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 
 
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);

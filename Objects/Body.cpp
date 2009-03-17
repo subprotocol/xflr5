@@ -101,9 +101,6 @@ CBody::CBody()
 	SetKnots();
 }
 
-CBody::~CBody()
-{
-}
 
 
 void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,

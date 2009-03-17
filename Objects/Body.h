@@ -30,7 +30,6 @@ class CBody
 {
 public:
 	CBody();
-	virtual ~CBody();
 
 	CFrame* GetFrame(int iSelect);
 	

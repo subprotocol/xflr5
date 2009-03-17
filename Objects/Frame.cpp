@@ -45,10 +45,6 @@ CFrame::CFrame()
 	m_iSelect    =  0;
 }
 
-CFrame::~CFrame()
-{
-}
-
 
 int CFrame::IsPoint(CVector Point, double ZoomFactor)
 {

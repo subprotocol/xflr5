@@ -66,6 +66,8 @@ void* GL3dBodyDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dBodyDlg::s_pGLLightDlg;
 
 
+QList <void*> *GL3dBodyDlg::s_poaBody;
+
 GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 {
 	setWindowTitle("Body Edition");
@@ -169,17 +171,17 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
-	connect(m_pctrlAxes, SIGNAL(stateChanged(int)), this, SLOT(OnAxes(int)));
-	connect(m_pctrlPanels, SIGNAL(stateChanged(int)), this, SLOT(OnPanels(int)));
-	connect(m_pctrlVortices, SIGNAL(stateChanged(int)), this, SLOT(OnVortices(int)));
-	connect(m_pctrlLight, SIGNAL(stateChanged(int)), this, SLOT(OnLight(int)));
-	connect(m_pctrlSurfaces, SIGNAL(stateChanged(int)), this, SLOT(OnSurfaces(int)));
-	connect(m_pctrlOutline, SIGNAL(stateChanged(int)), this, SLOT(OnOutline(int)));
+	connect(m_pctrlAxes,       SIGNAL(clicked()), this, SLOT(OnAxes()));
+	connect(m_pctrlPanels,     SIGNAL(clicked()), this, SLOT(OnPanels()));
+	connect(m_pctrlVortices,   SIGNAL(clicked()), this, SLOT(OnVortices()));
+	connect(m_pctrlLight,      SIGNAL(clicked()), this, SLOT(OnLight()));
+	connect(m_pctrlSurfaces,   SIGNAL(clicked()), this, SLOT(OnSurfaces()));
+	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 	connect(m_pctrlFlatPanels, SIGNAL(clicked()), this, SLOT(OnLineType()));
-	connect(m_pctrlBSplines, SIGNAL(clicked()), this, SLOT(OnLineType()));
+	connect(m_pctrlBSplines,   SIGNAL(clicked()), this, SLOT(OnLineType()));
+	connect(m_pctrlBodyStyle,  SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
 	connect(m_pctrlFrameTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
 	connect(m_pctrlFrameTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
-	connect(m_pctrlBodyStyle, SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
 
 	setMouseTracking(true);
 }
@@ -3468,7 +3470,7 @@ void GL3dBodyDlg::On3DPickCenter()
 
 
 
-void GL3dBodyDlg::OnAxes(int state)
+void GL3dBodyDlg::OnAxes()
 {
 	m_bAxes = m_pctrlAxes->isChecked();
 //	m_bResetglBody2D = true;
@@ -3591,7 +3593,7 @@ void GL3dBodyDlg::OnInsert()
 
 
 
-void GL3dBodyDlg::OnLight(int state)
+void GL3dBodyDlg::OnLight()
 {
 	m_bglLight = m_pctrlLight->isChecked();
 	UpdateView();
@@ -3622,14 +3624,25 @@ void GL3dBodyDlg::OnLineType()
 }
 
 
-void GL3dBodyDlg::OnOutline(int state)
+void GL3dBodyDlg::accept()
+{
+	m_pBody->m_BodyName = m_pctrlBodyName->text();
+
+	int res = QMessageBox::question(window(), "Body Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+	if (QMessageBox::No == res) QDialog::reject();
+	else if (QMessageBox::Cancel == res) return;
+	else done(QDialog::Accepted);
+}
+
+
+void GL3dBodyDlg::OnOutline()
 {
 	m_bOutline = m_pctrlOutline->isChecked();
 	UpdateView();
 }
 
 
-void GL3dBodyDlg::OnPanels(int state)
+void GL3dBodyDlg::OnPanels()
 {
 	m_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
@@ -3757,14 +3770,14 @@ void GL3dBodyDlg::OnSetupLight()
 }
 
 
-void GL3dBodyDlg::OnSurfaces(int state)
+void GL3dBodyDlg::OnSurfaces()
 {
 	m_bSurfaces = m_pctrlSurfaces->isChecked();
 	UpdateView();
 }
 
 
-void GL3dBodyDlg::OnVortices(int state)
+void GL3dBodyDlg::OnVortices()
 {
 	m_bVortices = m_pctrlVortices->isChecked();
 	UpdateView();
@@ -3838,17 +3851,6 @@ void GL3dBodyDlg::ReadPointSectionData(int sel)
 	strong.replace(" ","");
 	k =strong.toInt(&bOK);
 	if(bOK) m_pBody->m_hPanels[sel] = k;
-}
-
-
-void GL3dBodyDlg::accept()
-{
-	m_pBody->m_BodyName = m_pctrlBodyName->text();
-
-	int res = QMessageBox::question(window(), "Body Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-	if (QMessageBox::No == res) QDialog::reject();
-	else if (QMessageBox::Cancel == res) return;
-	else done(QDialog::Accepted);
 }
 
 
@@ -4281,21 +4283,10 @@ void GL3dBodyDlg::SetupLayout()
 	ThreeDParams->addWidget(m_pctrlPanels, 3,1);
 	ThreeDParams->addWidget(m_pctrlVortices, 3,2);
 
-	QHBoxLayout *ThreeDView = new QHBoxLayout;
 	m_pctrlX          = new QPushButton("X");
 	m_pctrlY          = new QPushButton("Y");
 	m_pctrlZ          = new QPushButton("Z");
 	m_pctrlIso        = new QPushButton("Iso");
-	m_pctrlX->setSizePolicy(szPolicyMinimum);
-	m_pctrlY->setSizePolicy(szPolicyMinimum);
-	m_pctrlZ->setSizePolicy(szPolicyMinimum);
-	m_pctrlIso->setSizePolicy(szPolicyMinimum);
-	ThreeDView->addWidget(m_pctrlX);
-	ThreeDView->addWidget(m_pctrlY);
-	ThreeDView->addWidget(m_pctrlZ);
-	ThreeDView->addWidget(m_pctrlIso);
-
-	QHBoxLayout *ThreeDCtrls = new QHBoxLayout;
 	m_pctrlPickCenter = new QPushButton("Pick Center");
 	m_pctrlReset      = new QPushButton("Reset");
 	m_pctrlGLLight    = new QPushButton("Light");
@@ -4304,11 +4295,20 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlReset->setSizePolicy(szPolicyMinimum);
 	m_pctrlGLLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlGrid->setSizePolicy(szPolicyMinimum);
+	m_pctrlX->setSizePolicy(szPolicyMinimum);
+	m_pctrlY->setSizePolicy(szPolicyMinimum);
+	m_pctrlZ->setSizePolicy(szPolicyMinimum);
+	m_pctrlIso->setSizePolicy(szPolicyMinimum);
 
-	ThreeDCtrls->addWidget(m_pctrlReset);
-	ThreeDCtrls->addWidget(m_pctrlPickCenter);
-	ThreeDCtrls->addWidget(m_pctrlGLLight);
-	ThreeDCtrls->addWidget(m_pctrlGrid);
+	QGridLayout*ThreeDView = new QGridLayout;
+	ThreeDView->addWidget(m_pctrlX,1,1);
+	ThreeDView->addWidget(m_pctrlY,1,2);
+	ThreeDView->addWidget(m_pctrlZ,1,3);
+	ThreeDView->addWidget(m_pctrlIso,2,1);
+	ThreeDView->addWidget(m_pctrlReset,2,2);
+	ThreeDView->addWidget(m_pctrlGrid,2,3);
+	ThreeDView->addWidget(m_pctrlGLLight,3,1);
+	ThreeDView->addWidget(m_pctrlPickCenter,3,2,1,2);
 
 	m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
 	m_pctrlClipPlanePos->setMinimum(-300);
@@ -4319,7 +4319,7 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
 
 	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
-	ThreeDViewControls->addLayout(ThreeDCtrls);
+//	ThreeDViewControls->addLayout(ThreeDCtrls);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
 
 	QVBoxLayout *ControlsLayout = new QVBoxLayout;
@@ -4364,29 +4364,20 @@ void GL3dBodyDlg::SetupLayout()
 	Params->addWidget(m_pctrlNXPanels,3,2);
 	Params->addWidget(m_pctrlNHoopPanels,3,3);
 
+//	m_pctrlBodyList = new QComboBox;
 	m_pctrlBodyName = new QLineEdit("BodyName");
 	QVBoxLayout *BodyParams = new QVBoxLayout;
 	m_pctrlBodyStyle = new LineButton;
 	m_pctrlBodyStyle->setSizePolicy(szPolicyMinimum);
 
-	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
-	CancelButton->setAutoDefault(false);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addWidget(CancelButton);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
+//	BodyParams->addWidget(m_pctrlBodyList);
 	BodyParams->addWidget(m_pctrlBodyName);
-	BodyParams->addStretch(1);
 	BodyParams->addWidget(m_pctrlBodyStyle);
 	BodyParams->addStretch(1);
 	BodyParams->addLayout(BodyType);
 	BodyParams->addLayout(Params);
-	BodyParams->addStretch(1);
-	BodyParams->addLayout(CommandButtons);
+
 
 	m_pctrlFrameTable = new QTableView;
 	m_pctrlFrameTable->setSizePolicy(szPolicyMinimum);
@@ -4396,7 +4387,22 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlPointTable->setSizePolicy(szPolicyMinimum);
 	m_pctrlPointTable->setWindowTitle("Points");
 
+
+	QVBoxLayout *CommandButtons = new QVBoxLayout;
+	QPushButton *OKButton = new QPushButton(tr("Close"));
+	OKButton->setAutoDefault(true);
+	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+	CancelButton->setAutoDefault(false);
+	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(OKButton);
+	CommandButtons->addWidget(CancelButton);
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
+
+
 	QHBoxLayout *AllControls = new QHBoxLayout;
+	AllControls->addLayout(CommandButtons);
+	AllControls->addStretch(1);
 	AllControls->addLayout(BodyParams);
 	AllControls->addStretch(1);
 	AllControls->addWidget(m_pctrlFrameTable);
@@ -4504,8 +4510,10 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 
 void GL3dBodyDlg::showEvent(QShowEvent *event)
 {
+	m_bResetglBody = true;
 	m_bIs3DScaleSet = false;
 	SetBodyScale();
+
 	m_pctrlBodyName->setText(m_pBody->m_BodyName);
 	m_pctrlOutline->setChecked(m_bOutline);
 	m_pctrlPanels->setChecked(m_bVLMPanels);
@@ -4568,4 +4576,20 @@ void  GL3dBodyDlg::wheelEvent(QWheelEvent *event)
 	UpdateView();
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

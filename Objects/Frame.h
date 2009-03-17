@@ -29,7 +29,6 @@ class CFrame : public QObject
 {
 public:
 	CFrame();
-	virtual ~CFrame();
     bool SerializeFrame(QDataStream &ar, bool bIsStoring);
 	int IsPoint(CVector Point, double ZoomFactor);
 	int InsertPoint(CVector Real);

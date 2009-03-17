@@ -351,7 +351,6 @@ void ArcBall::SphereCoords(double mx, double my, CVector &V)
 //	ay -= *m_pOffy + *m_pTransy;
 	ax -= *m_pOffx ;
 	ay -= *m_pOffy ;
-
 /*	m.Set(ax-ab_eye.x, ay-ab_eye.y, az-ab_eye.z);
 
 	// mouse position represents ray: eye + t*m
@@ -379,7 +378,6 @@ void ArcBall::SphereCoords(double mx, double my, CVector &V)
 // begin arcball rotation
 void ArcBall::Start(int mx, int my)
 {
-//qDebug() << "arcBall start";
 	// saves a copy of the current rotation for comparison
 	QuatCopy(ab_last,ab_quat);
 	if(ab_planar)

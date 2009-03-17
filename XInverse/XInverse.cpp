@@ -1097,6 +1097,8 @@ void QXInverse::OnCpxx()
 	pXFoil->lcpxx = m_pctrlCpxx->isChecked();
 }
 
+
+
 void QXInverse::OnExecute()
 {
 	if (m_bZoomPlus) ReleaseZoom();
@@ -1391,7 +1393,10 @@ void QXInverse::OnSymm()
 
 void QXInverse::OnTangentSpline()
 {
-	m_bTangentSpline = m_pctrlTangentSpline->isChecked();
+	if(m_bFullInverse) m_bTangentSpline = m_pctrlTangentSpline->isChecked();
+	else               m_bTangentSpline = m_pctrlMTangentSpline->isChecked();
+	m_pctrlTangentSpline->setChecked(m_bTangentSpline);
+	m_pctrlMTangentSpline->setChecked(m_bTangentSpline);
 }
 
 
@@ -1805,7 +1810,6 @@ void QXInverse::Connect()
 	connect(m_pctrlFullInverse,   SIGNAL(clicked()), this, SLOT(OnInverseApp()));
 	connect(m_pctrlMixedInverse,  SIGNAL(clicked()), this, SLOT(OnInverseApp()));
 
-
 	connect(m_pctrlShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
 	connect(m_pctrlNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
 	connect(m_pctrlApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
@@ -1816,14 +1820,14 @@ void QXInverse::Connect()
 	connect(m_pctrlSymm,          SIGNAL(clicked()), this, SLOT(OnSymm()));
 	connect(m_pctrlExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
 
-	connect(m_pctrlMNewSpline,    SIGNAL(clicked()), this, SLOT(OnNewSpline()));
-	connect(m_pctrlMark,          SIGNAL(clicked()), this, SLOT(OnMarkSegment()));
-	connect(m_pctrlMApplySpline,  SIGNAL(clicked()), this, SLOT(OnApplySpline()));
-	connect(m_pctrlMShowSpline,   SIGNAL(clicked()), this, SLOT(OnShowSpline()));
-	connect(m_pctrlMResetQSpec,   SIGNAL(clicked()), this, SLOT(OnQReset()));
-	connect(m_pctrlCpxx,          SIGNAL(clicked()), this, SLOT(OnCpxx()));
-	connect(m_pctrlMExec,         SIGNAL(clicked()), this, SLOT(OnExecute()));
-
+	connect(m_pctrlMNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
+	connect(m_pctrlMark,           SIGNAL(clicked()), this, SLOT(OnMarkSegment()));
+	connect(m_pctrlMApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
+	connect(m_pctrlMTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
+	connect(m_pctrlMShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
+	connect(m_pctrlMResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
+	connect(m_pctrlCpxx,           SIGNAL(clicked()), this, SLOT(OnCpxx()));
+	connect(m_pctrlMExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
 }
 
 
