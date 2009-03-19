@@ -247,6 +247,9 @@ void CAFoil::PaintGrids(CDC* pDC)
 
 	if(m_bZoomPlus)
 	{
+		pDC->SetBkMode(TRANSPARENT);
+		CBrush ZoomBrush(pChildView->m_crBackColor);
+		CBrush *pOldBrush = pDC->SelectObject(&ZoomBrush);
 		CRect ZRect(m_ZoomRect.left   - m_rCltRect.left,
 					m_ZoomRect.top    - m_rCltRect.top ,
 					m_ZoomRect.right  - m_rCltRect.left,
@@ -255,6 +258,7 @@ void CAFoil::PaintGrids(CDC* pDC)
 		CPen ZoomPen(PS_DASH,1, RGB(100,100,100));
 		pDC->SelectObject(&ZoomPen);
 		pDC->Rectangle(ZRect);
+		pDC->SelectObject(pOldBrush);
 	}
 
 	if(m_bCircle) 
@@ -466,7 +470,6 @@ void CAFoil::PaintLegend(CDC* pDC)
 void CAFoil::UpdateView(CDC* pDC) 
 {
 	CChildView * pChildView = (CChildView*)m_pChildWnd;
-
 	
 	if(!pDC) pDC = pChildView->GetDC();
 	if(!pDC) return;
@@ -1533,6 +1536,7 @@ BOOL CAFoil::PreTranslateMessage(MSG* pMsg)
 				CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
 				pTB->PressButton(IDT_ZOOMYONLY, false);
 				m_bZoomYOnly = false;
+				return true; // no need to process further
 			}
 		}
 		if(pMsg->wParam == VK_UP){ 
@@ -2738,14 +2742,17 @@ void CAFoil::SaveSettings(CArchive& ar)
 void CAFoil::OnStoreFoil() 
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	if(m_bSF){
-		if(m_pSF->m_Extrados.m_iRes>IQX2) {
+	if(m_bSF)
+	{
+		if(m_pSF->m_Extrados.m_iRes>IQX2)
+		{
 			CString strong;
 			strong.Format("Too many output points on upper surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
 			return;
 		}
-		if(m_pSF->m_Intrados.m_iRes>IQX2) {
+		if(m_pSF->m_Intrados.m_iRes>IQX2) 
+		{
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
@@ -2761,20 +2768,24 @@ void CAFoil::OnStoreFoil()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = "";
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();
 		}
 	}
-	else{
+	else
+	{
 		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2) {
+		if(size>IQX2) 
+		{
 			CString strong;
 			strong.Format("Too many output points on upper surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
@@ -2782,7 +2793,8 @@ void CAFoil::OnStoreFoil()
 		}
 //		Trace("m_iPts_Ext=",size);
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2) {
+		if(size>IQX2) 
+		{
 			CString strong;
 			strong.Format("Too many output points on lower surface\n Max =%d", IQX2);
 			AfxMessageBox( strong, MB_OK);
@@ -2797,12 +2809,14 @@ void CAFoil::OnStoreFoil()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = "";
-		if(pFrame->SetModFoil(pNewFoil)){
+		if(pFrame->SetModFoil(pNewFoil))
+		{
 			m_pACtrl->m_pRefFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil(pNewFoil);
 		}
-		else {
+		else 
+		{
 			pNewFoil = NULL;
 			m_pACtrl->FillFoilList();
 			m_pACtrl->SelectFoil();

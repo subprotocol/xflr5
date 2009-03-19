@@ -1737,7 +1737,6 @@ bool XFoil::cft(double hk, double rt, double msq, double &cf, double &cf_hk, dou
 
 bool XFoil::clcalc(double xref, double yref)
 {
-
 	// modified arcds : all other variables are member variables (ex fortran common)
 	//-----------------------------------------------------------
 	//	   integrates surface pressures to get cl and cm.
@@ -7731,13 +7730,15 @@ bool XFoil::specal()
 	else   if (!cpcalc(n,qinv,qinf,minf,cpi)) return false;// no need to carry on
 */
 	cpcalc(n,qinv,qinf,minf,cpi);
-	if(lvisc) {
+	if(lvisc) 
+	{
 		cpcalc(n+nw,qvis,qinf,minf,cpv);
 		cpcalc(n+nw,qinv,qinf,minf,cpi);
 	}
 	else 
+	{
 		cpcalc(n,qinv,qinf,minf,cpi);
-
+	}
 	if(lflap) mhinge();
 	
 	//Added arcds to get inviscid q after viscous calculation

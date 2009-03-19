@@ -134,6 +134,8 @@ protected:
 	bool m_bChanged;
 	bool m_bCheckName;
 
+	double pi;
+
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
 	virtual void OnCancel();

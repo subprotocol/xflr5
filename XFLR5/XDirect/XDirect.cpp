@@ -508,7 +508,7 @@ OpPoint* CXDirect::AddOpPoint(OpPoint *pNewPoint)
 		}
 		else
 		{
-			if(!m_pXFoil->lvconv)
+			if(!m_pXFoil->lvconv && m_pXFoil->lvisc)
 			{
 				delete pNewPoint;
 				return NULL;
@@ -5249,11 +5249,10 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 	CString str;
 	CString strAppDirectory;
 	char    szAppPath[MAX_PATH] = "";
-	::GetModuleFileName(0, szAppPath, sizeof(szAppPath) - 1);
-	// Extract directory
+	GetTempPath(MAX_PATH,szAppPath);
 	strAppDirectory = szAppPath;
-	strAppDirectory = strAppDirectory.Left(strAppDirectory.GetLength()-9);
 	str =strAppDirectory + "XFLR5.log";
+
 	m_XFile.Open(str, CFile::modeCreate | CFile::modeWrite);
 	m_pXFoil->pXFile = &m_XFile;
 

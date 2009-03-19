@@ -48,6 +48,13 @@ Licence :
 
                        **************************
 
+v4.16 March xxx, 2009
+	- Corrected the bug by which the main wing's position wasn't taken into account in the calculation of a plane's tail volume
+	- Also in the tail volume calculation, corrected the confusion between deg and rads which gave false values if the elevator was not in the xy plane
+	- Corrected the bug which prevented convergence of foil inviscid analysis the first time
+	- Improved the export option for Plane/wing operating points, to enable post-processing of Cp values in a spreadsheet
+	- made other minor corrections
+
 
 v4.15 January 24th 2009
 	- Corrected a bug in foil Polar for the power factor Cl3/Cd2

@@ -41,7 +41,7 @@ CPlaneDlg::CPlaneDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CPlaneDlg)
 	//}}AFX_DATA_INIT
-	
+	pi = 3.141592654;	
 	m_pPlane = NULL;
 
 	m_bCheckName    = true;
@@ -121,6 +121,7 @@ BEGIN_MESSAGE_MAP(CPlaneDlg, CDialog)
 	ON_BN_CLICKED(IDC_IMPORTWING, OnImportWing)
 	ON_EN_UPDATE(IDC_PLANENAME, OnPlaneName)
 	ON_BN_CLICKED(IDC_SYMFIN, OnSymFin)
+	ON_EN_KILLFOCUS(IDC_XLEWING, OnChanged)
 	ON_EN_KILLFOCUS(IDC_WINGTILT, OnChanged)
 	ON_EN_KILLFOCUS(IDC_STABTILT, OnChanged)
 	ON_EN_KILLFOCUS(IDC_FINTILT, OnChanged)
@@ -546,14 +547,14 @@ void CPlaneDlg::ComputePlane(void)
 {
 	if(m_pPlane->m_bStab)
 	{
-		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0;
+		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0 - m_pPlane->m_LEWing.x;
 		double area = m_pPlane->m_Wing.m_Area;
 		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_Area;
 
 		double ProjectedArea = 0.0;
 		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++){
 			ProjectedArea += m_pPlane->m_Stab.m_TLength[i+1]*(m_pPlane->m_Stab.m_TChord[i]+m_pPlane->m_Stab.m_TChord[i+1])/2.0
-							*cos(m_pPlane->m_Stab.m_TDihedral[i])*cos(m_pPlane->m_Stab.m_TDihedral[i]);//m²
+							*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0)*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0);//m²
 		
 		}
 		ProjectedArea *=2.0;

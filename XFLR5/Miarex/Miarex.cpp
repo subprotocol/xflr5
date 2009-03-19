@@ -7280,14 +7280,15 @@ void CMiarex::OnAbout()
 }
 
 
+
 void CMiarex::OnExportWOpp() 
 {
 	//Exprt the currently selected WOpp to the text file
 	if(!m_pCurWOpp)return ;// is there anything to export ?
 
-	int l,p;
+	int j,k,l,p, iStrip, coef;
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
-	CString FileName,str,sep;
+	CString FileName,str,sep,Format;
 	CStdioFile XFile;
 	CFileException fe;
 
@@ -7409,211 +7410,154 @@ void CMiarex::OnExportWOpp()
 
 		if(m_pCurWOpp->m_AnalysisType>=2)
 		{
-			if(m_pCurPOpp)
+			if(m_pCurPOpp) XFile.WriteString("Main Wing Cp Coefficients\n");
+			else           XFile.WriteString("Wing Cp Coefficients\n");
+			coef = 1;		
+			if(m_pCurWOpp->m_AnalysisType==2)	
 			{
-				XFile.WriteString("Main Wing Cp Coefficients\n");
-
-				if(XFileDlg.m_ofn.nFilterIndex==1)
-				{
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-					for(p=0; p<m_pCurWing->m_MatSize; p++)
-					{
-						
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d""     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z,  m_pCurWOpp->m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z,  m_pCurWOpp->m_Cp[p]);
-							
-						XFile.WriteString(strong);
-					}
-				}
-				else
-				{
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
-					for(p=0; p<m_pCurWing->m_MatSize; p++)
-					{
-			
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z,  m_pCurWOpp->m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z,  m_pCurWOpp->m_Cp[p]);
-				
-						XFile.WriteString(strong);
-					}
-				}
-				XFile.WriteString("\n");
-
-				if(m_pCurWing2)
-				{
-					XFile.WriteString("Secondary Wing Cp Coefficients\n");
-
-					if(XFileDlg.m_ofn.nFilterIndex==1)
-					{
-
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-						for(p=0; p<m_pCurWing2->m_MatSize; p++)
-						{
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z, 
-									m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z, 
-									m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-							XFile.WriteString(strong);
-						}
-					}
-					else
-					{
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
-						for(p=0; p<m_pCurWing2->m_MatSize; p++)
-						{
-				
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
-					
-							XFile.WriteString(strong);
-						}
-					}
-				}
-				XFile.WriteString("\n");
-
-				if(m_pCurStab)
-				{
-					XFile.WriteString("Elevator Cp Coefficients\n");
-
-					if(XFileDlg.m_ofn.nFilterIndex==1)
-					{
-
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-						for(p=0; p<m_pCurStab->m_MatSize; p++)
-						{
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z, 
-									m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z, 
-									m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-							XFile.WriteString(strong);
-						}
-					}
-					else
-					{
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
-						for(p=0; p<m_pCurStab->m_MatSize; p++)
-						{
-				
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_StabWOpp.m_Cp[p]);
-					
-							XFile.WriteString(strong);
-						}
-					}
-				}
-				XFile.WriteString("\n");
-
-				if(m_pCurFin)
-				{
-					XFile.WriteString("Fin Cp Coefficients\n");
-					if(XFileDlg.m_ofn.nFilterIndex==1)
-					{
-
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-						for(p=0; p<m_pCurFin->m_MatSize; p++)
-						{
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z, 
-									m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-									m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z, 
-									m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-							XFile.WriteString(strong);
-						}
-					}
-					else
-					{
-						if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-						else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z             Cp\n");
-						for(p=0; p<m_pCurFin->m_MatSize; p++)
-						{
-				
-							if(m_pCurWOpp->m_AnalysisType==2)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z,  m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-							else if(m_pCurWOpp->m_AnalysisType==3)
-								strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, 
-									m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z,  m_pCurPOpp->m_FinWOpp.m_Cp[p]);
-					
-							XFile.WriteString(strong);
-						}
-					}
-				}
-				XFile.WriteString("\n");
-
+				if(XFileDlg.m_ofn.nFilterIndex==1) XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+				else                               XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
 			}
-			else if(m_pCurWOpp)
+			else if(m_pCurWOpp->m_AnalysisType==3)
 			{
-				if(XFileDlg.m_ofn.nFilterIndex==1)
+				coef = 2;
+				if(XFileDlg.m_ofn.nFilterIndex==1) XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+				else                               XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
+			}
+
+			if(XFileDlg.m_ofn.nFilterIndex==1) Format = "%4d     %11.3e     %11.3e     %11.3e     %11.4f\n";
+			else                               Format = "%4d,%11.3e,%11.3e,%11.3e,%11.3f\n";
+
+			p=0;
+			iStrip = 0;
+			for (j=0; j<m_pCurWing->m_NSurfaces; j++)
+			{
+				if(m_pCurWing->m_Surface[j].m_bIsTipLeft) p+= m_pCurWing->m_Surface[j].m_NXPanels;
+
+				for(k=0; k<m_pCurWing->m_Surface[j].m_NYPanels; k++)
 				{
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-					for(p=0; p<m_MatSize; p++)
+					iStrip++;
+					strong.Format("Strip %d\n", iStrip);
+					XFile.WriteString(strong);
+
+					for(l=0; l<m_pCurWing->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, m_pCurWOpp->m_Cp[p]);
+						if(m_pCurWOpp->m_AnalysisType==2) 
+						{
+							strong.Format(Format, p, m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, m_pCurWOpp->m_Cp[p]);
+						}
 						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d     %11.3e     %11.3e     %11.3e     %11.3f\n", p, 
-								m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, m_pCurWOpp->m_Cp[p]);
+						{
+							strong.Format(Format, p, m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, m_pCurWOpp->m_Cp[p]);
+						}
 						XFile.WriteString(strong);
+						p++;
 					}
 				}
-				else
+			}
+			XFile.WriteString("\n\n");
+
+			if(m_pCurWing2)
+			{
+				XFile.WriteString("Wing2 Cp Coefficients\n");
+				p=0;
+				iStrip = 0;
+				for (j=0; j<m_pCurWing2->m_NSurfaces; j++)
 				{
-					if(m_pCurWOpp->m_AnalysisType==2)		XFile.WriteString("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-					else if(m_pCurWOpp->m_AnalysisType==3)	XFile.WriteString("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
-					for(p=0; p<m_MatSize; p++)
+					if(m_pCurWing2->m_Surface[j].m_bIsTipLeft) p+= m_pCurWing2->m_Surface[j].m_NXPanels;
+
+					for(k=0; k<m_pCurWing2->m_Surface[j].m_NYPanels; k++)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2)
-							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z, m_pCurWOpp->m_Cp[p]);
-						else if(m_pCurWOpp->m_AnalysisType==3)
-							strong.Format("%4d,%11.3e,%11.3e,%11.3e,%11.3f\n", p, m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z, m_pCurWOpp->m_Cp[p]);
+						iStrip++;
+						strong.Format("Strip %d\n", iStrip);
 						XFile.WriteString(strong);
+
+						for(l=0; l<m_pCurWing2->m_Surface[j].m_NXPanels * coef; l++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2) 
+							{
+								strong.Format(Format, p, m_pCurWing2->m_pPanel[p].CtrlPt.x, m_pCurWing2->m_pPanel[p].CtrlPt.y, m_pCurWing2->m_pPanel[p].CtrlPt.z, m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+							}
+							else if(m_pCurWOpp->m_AnalysisType==3)
+							{
+								strong.Format(Format, p, m_pCurWing2->m_pPanel[p].CollPt.x, m_pCurWing2->m_pPanel[p].CollPt.y, m_pCurWing2->m_pPanel[p].CollPt.z, m_pCurPOpp->m_Wing2WOpp.m_Cp[p]);
+							}
+							XFile.WriteString(strong);
+							p++;
+						}
+					}
+				}
+			}
+			XFile.WriteString("\n\n");
+
+			if(m_pCurStab)
+			{
+				XFile.WriteString("Elevator Cp Coefficients\n");
+				p=0;
+				iStrip = 0;
+				for (j=0; j<m_pCurStab->m_NSurfaces; j++)
+				{
+					if(m_pCurWing->m_Surface[j].m_bIsTipLeft) p+= m_pCurStab->m_Surface[j].m_NXPanels;
+
+					for(k=0; k<m_pCurStab->m_Surface[j].m_NYPanels; k++)
+					{
+						iStrip++;
+						strong.Format("Strip %d\n", iStrip);
+						XFile.WriteString(strong);
+
+						for(l=0; l<m_pCurStab->m_Surface[j].m_NXPanels * coef; l++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2) 
+							{
+								strong.Format(Format, p, m_pCurStab->m_pPanel[p].CtrlPt.x, m_pCurStab->m_pPanel[p].CtrlPt.y, m_pCurStab->m_pPanel[p].CtrlPt.z, m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+							}
+							else if(m_pCurWOpp->m_AnalysisType==3)
+							{
+								strong.Format(Format, p, m_pCurStab->m_pPanel[p].CollPt.x, m_pCurStab->m_pPanel[p].CollPt.y, m_pCurStab->m_pPanel[p].CollPt.z, m_pCurPOpp->m_StabWOpp.m_Cp[p]);
+							}
+							XFile.WriteString(strong);
+							p++;
+						}
+					}
+				}
+			}
+			XFile.WriteString("\n\n");
+			if(m_pCurFin)
+			{
+				XFile.WriteString("Fin Cp Coefficients\n");
+				p=0;
+				iStrip = 0;
+				for (j=0; j<m_pCurFin->m_NSurfaces; j++)
+				{
+					if(m_pCurFin->m_Surface[j].m_bIsTipLeft) p+= m_pCurFin->m_Surface[j].m_NXPanels;
+
+					for(k=0; k<m_pCurFin->m_Surface[j].m_NYPanels; k++)
+					{
+						iStrip++;
+						strong.Format("Strip %d\n", iStrip);
+						XFile.WriteString(strong);
+
+						for(l=0; l<m_pCurFin->m_Surface[j].m_NXPanels * coef; l++)
+						{
+							if(m_pCurWOpp->m_AnalysisType==2) 
+							{
+								strong.Format(Format, p, m_pCurFin->m_pPanel[p].CtrlPt.x, m_pCurFin->m_pPanel[p].CtrlPt.y, m_pCurFin->m_pPanel[p].CtrlPt.z, m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+							}
+							else if(m_pCurWOpp->m_AnalysisType==3)
+							{
+								strong.Format(Format, p, m_pCurFin->m_pPanel[p].CollPt.x, m_pCurFin->m_pPanel[p].CollPt.y, m_pCurFin->m_pPanel[p].CollPt.z, m_pCurPOpp->m_FinWOpp.m_Cp[p]);
+							}
+							XFile.WriteString(strong);
+							p++;
+						}
 					}
 				}
 			}
 		}
 		XFile.WriteString("\n\n");
-
 		XFile.Close();
 	}
 }
-
-
 void CMiarex::OnWPolarReset() 
 {
 	//Reset the current WPolar's data
