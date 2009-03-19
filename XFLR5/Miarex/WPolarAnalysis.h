@@ -1,6 +1,6 @@
 /****************************************************************************
 
-    CWngAnalysis Class
+    CWPolarAnalysis Class
 	Copyright (C) 2005 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@
 
 
 #pragma once
-// WngAnalysis.h : header file
+// WPolarAnalysis.h : header file
 //
 #include "WakeParamsDlg.h"
 #include "../misc/FloatEdit.h"
@@ -31,20 +31,20 @@
 #include "afxcmn.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// CWngAnalysis dialog
+// CWPolarAnalysis dialog
 
-class CWngAnalysis : public CDialog
+class CWPolarAnalysis : public CDialog
 {
 	friend class CLLTThread;
 	friend class CMiarex;
 	friend class CMainFrame;
 // Construction
 public:
-	CWngAnalysis(CWnd* pParent = NULL);   // standard constructor
+	CWPolarAnalysis(CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
-	//{{AFX_DATA(CWngAnalysis)
-	enum { IDD = IDD_WNGANALYSIS };
+	//{{AFX_DATA(CWPolarAnalysis)
+	enum { IDD = IDD_WPOLARANALYSIS };
 	CButton	m_ctrlWakeRollUp;
 	CButton	m_ctrlVLM2;
 	CButton	m_ctrlVLM1;
@@ -89,7 +89,7 @@ public:
 
 // Overrides
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CWngAnalysis)
+	//{{AFX_VIRTUAL(CWPolarAnalysis)
 	public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	protected:

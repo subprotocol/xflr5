@@ -1,6 +1,6 @@
 /****************************************************************************
 
-    CWngAnalysis Class
+    CWPolarAnalysis Class
 	Copyright (C) 2005 André Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
@@ -19,21 +19,21 @@
 
 *****************************************************************************/
 
-// WngAnalysis.cpp : implementation file
+// WPolarAnalysis.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "../X-FLR5.h"
 #include "../main/MainFrm.h"
 #include <math.h>
-#include ".\wnganalysis.h"
+#include ".\WPolarAnalysis.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// CWngAnalysis dialog
+// CWPolarAnalysis dialog
 
 
-CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
-	: CDialog(CWngAnalysis::IDD, pParent)
+CWPolarAnalysis::CWPolarAnalysis(CWnd* pParent /*=NULL*/)
+	: CDialog(CWPolarAnalysis::IDD, pParent)
 {
 	m_BAutoName = TRUE;
 
@@ -68,7 +68,7 @@ CWngAnalysis::CWngAnalysis(CWnd* pParent /*=NULL*/)
 }
 
 
-void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
+void CWPolarAnalysis::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_WAKEROLLUP, m_ctrlWakeRollUp);
@@ -115,7 +115,7 @@ void CWngAnalysis::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
+BEGIN_MESSAGE_MAP(CWPolarAnalysis, CDialog)
 	ON_EN_KILLFOCUS(IDC_QINF, OnKillFocusQInf)
 	ON_BN_CLICKED(IDC_WTYPE1, OnType)
 	ON_EN_KILLFOCUS(IDC_WEIGHT, OnKillFocusWeight)
@@ -145,10 +145,10 @@ BEGIN_MESSAGE_MAP(CWngAnalysis, CDialog)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CWngAnalysis message handlers
+// CWPolarAnalysis message handlers
 
 
-BOOL CWngAnalysis::OnInitDialog() 
+BOOL CWPolarAnalysis::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
 
@@ -291,7 +291,7 @@ BOOL CWngAnalysis::OnInitDialog()
 }
 
 
-BOOL CWngAnalysis::PreTranslateMessage(MSG* pMsg) 
+BOOL CWPolarAnalysis::PreTranslateMessage(MSG* pMsg) 
 {
 	if(pMsg->message == WM_KEYDOWN ){ 
 		CWnd* pWnd = GetFocus();
@@ -318,7 +318,7 @@ BOOL CWngAnalysis::PreTranslateMessage(MSG* pMsg)
 }
 
 
-void CWngAnalysis::ReadParams()
+void CWPolarAnalysis::ReadParams()
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_Alpha  = m_ctrlAlpha.GetValue();
@@ -349,7 +349,7 @@ void CWngAnalysis::ReadParams()
 }
 
 
-void CWngAnalysis::SetWPolarName()
+void CWPolarAnalysis::SetWPolarName()
 {
 	if(!m_BAutoName) return;
 	CString str, strong;
@@ -414,7 +414,7 @@ void CWngAnalysis::SetWPolarName()
 }
 
 
-void CWngAnalysis::OnOK() 
+void CWPolarAnalysis::OnOK() 
 {
 	CWPolar * pWPolarNew;
 
@@ -452,7 +452,7 @@ void CWngAnalysis::OnOK()
 }
 
 
-void CWngAnalysis::OnKillFocusQInf() 
+void CWPolarAnalysis::OnKillFocusQInf() 
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_QInf = m_ctrlQInf.GetValue() / pFrame->m_mstoUnit;
@@ -461,7 +461,7 @@ void CWngAnalysis::OnKillFocusQInf()
 }
 
 
-void CWngAnalysis::OnKillFocusWeight() 
+void CWPolarAnalysis::OnKillFocusWeight() 
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_Weight = abs(m_ctrlWeight.GetValue()) /pFrame->m_kgtoUnit;
@@ -471,7 +471,7 @@ void CWngAnalysis::OnKillFocusWeight()
 }
 
 
-void CWngAnalysis::OnKillFocusXCmRef() 
+void CWPolarAnalysis::OnKillFocusXCmRef() 
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_XCmRef = m_ctrlXCmRef.GetValue() /pFrame->m_mtoUnit;
@@ -479,27 +479,27 @@ void CWngAnalysis::OnKillFocusXCmRef()
 }
 
 
-void CWngAnalysis::OnKillFocusAlpha() 
+void CWPolarAnalysis::OnKillFocusAlpha() 
 {
 	m_Alpha = m_ctrlAlpha.GetValue();
 	SetWPolarName();
 }
 
-void CWngAnalysis::OnKillFocusBeta() 
+void CWPolarAnalysis::OnKillFocusBeta() 
 {
 	m_Beta = m_ctrlBeta.GetValue();
 	SetWPolarName();
 }
 
 
-void CWngAnalysis::OnKillFocusHeight()
+void CWPolarAnalysis::OnKillFocusHeight()
 {
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
 	m_Height = m_ctrlHeight.GetValue() /pFrame->m_mtoUnit;
 	SetWPolarName();
 }
 
-void CWngAnalysis::OnType() 
+void CWPolarAnalysis::OnType() 
 {	
 	int sel = GetCheckedRadioButton(IDC_WTYPE1, IDC_WTYPE4);
 	if (sel == IDC_WTYPE1) 
@@ -520,7 +520,7 @@ void CWngAnalysis::OnType()
 }
 
 
-void CWngAnalysis::CheckType()
+void CWPolarAnalysis::CheckType()
 {
 	switch (m_Type){
 		case 1:{
@@ -543,7 +543,7 @@ void CWngAnalysis::CheckType()
 }
 
 
-void CWngAnalysis::EnableControls()
+void CWPolarAnalysis::EnableControls()
 {
 	switch (m_Type)
 	{
@@ -598,7 +598,7 @@ void CWngAnalysis::EnableControls()
 }
 
 
-void CWngAnalysis::SetReynolds()
+void CWPolarAnalysis::SetReynolds()
 {
 	CString str, strUnit;
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
@@ -648,7 +648,7 @@ void CWngAnalysis::SetReynolds()
 }
 
 
-void CWngAnalysis::SetWingLoad()
+void CWPolarAnalysis::SetWingLoad()
 {
 	CString str;
 	CMainFrame* pFrame = (CMainFrame*)m_pParent;
@@ -661,19 +661,19 @@ void CWngAnalysis::SetWingLoad()
 }
 
 
-void CWngAnalysis::OnKillFocusViscosity() 
+void CWPolarAnalysis::OnKillFocusViscosity() 
 {
 	ReadParams();
 	SetReynolds();
 }
 
-void CWngAnalysis::OnKillFocusDensity() 
+void CWPolarAnalysis::OnKillFocusDensity() 
 {
 	ReadParams();
 	SetReynolds();
 }
 
-void CWngAnalysis::OnUnit() 
+void CWPolarAnalysis::OnUnit() 
 {
 	if(IDC_UNIT1 == GetCheckedRadioButton(IDC_UNIT1, IDC_UNIT2)){
 		m_UnitType   = 1;
@@ -690,7 +690,7 @@ void CWngAnalysis::OnUnit()
 	SetDensity();
 }
 
-void CWngAnalysis::SetDensity() 
+void CWPolarAnalysis::SetDensity() 
 {
 	int exp, precision;
 	if(IDC_UNIT1 == GetCheckedRadioButton(IDC_UNIT1, IDC_UNIT2)){
@@ -712,7 +712,7 @@ void CWngAnalysis::SetDensity()
 }
 
 
-void CWngAnalysis::OnAutoName() 
+void CWPolarAnalysis::OnAutoName() 
 {
 	if (m_ctrlAutoName.GetCheck()){
 		m_BAutoName = TRUE;
@@ -726,13 +726,13 @@ void CWngAnalysis::OnAutoName()
 }
 
  
-void CWngAnalysis::OnSetFocusWPolarName() 
+void CWPolarAnalysis::OnSetFocusWPolarName() 
 {
  	m_BAutoName = false;
  	m_ctrlAutoName.SetCheck(FALSE);
 }
 
-void CWngAnalysis::OnMethod() 
+void CWPolarAnalysis::OnMethod() 
 {
 	if (GetCheckedRadioButton(IDC_METHOD1, IDC_METHOD3)==IDC_METHOD1)
 	{
@@ -783,7 +783,7 @@ void CWngAnalysis::OnMethod()
 	SetWPolarName();
 }
 
-void CWngAnalysis::OnVLMMethod() 
+void CWPolarAnalysis::OnVLMMethod() 
 {
 	if(GetCheckedRadioButton(IDC_VLM1,IDC_VLM2)==IDC_VLM1)	{
 		m_bVLM1 = true;
@@ -797,7 +797,7 @@ void CWngAnalysis::OnVLMMethod()
 }
 
 
-void CWngAnalysis::OnWakeRollUp() 
+void CWPolarAnalysis::OnWakeRollUp() 
 {
 	if(m_ctrlWakeRollUp.GetCheck()) 
 	{
@@ -813,7 +813,7 @@ void CWngAnalysis::OnWakeRollUp()
 }
 
 
-void CWngAnalysis::OnTiltedGeom()
+void CWPolarAnalysis::OnTiltedGeom()
 {
 	if(m_ctrlTiltGeom.GetCheck()) 
 	{
@@ -835,7 +835,7 @@ void CWngAnalysis::OnTiltedGeom()
 }
 
 
-void CWngAnalysis::OnViscous()
+void CWPolarAnalysis::OnViscous()
 {
 	if(m_ctrlViscous.GetCheck()) m_bViscous = true;
 	else                         m_bViscous = false;
@@ -844,7 +844,7 @@ void CWngAnalysis::OnViscous()
 }
 
 
-void CWngAnalysis::OnGroundEffect()
+void CWPolarAnalysis::OnGroundEffect()
 {
 	if(m_ctrlGroundEffect.GetCheck())
 	{
@@ -860,7 +860,7 @@ void CWngAnalysis::OnGroundEffect()
 }
 
 
-void CWngAnalysis::OnWakeParams()
+void CWPolarAnalysis::OnWakeParams()
 {
 	m_WakeParamsdlg.DoModal();
 
@@ -869,7 +869,7 @@ void CWngAnalysis::OnWakeParams()
 	m_NXWakePanels = m_WakeParamsdlg.m_NXWakePanels;
 }
 
-void CWngAnalysis::OnThinSurfaces()
+void CWPolarAnalysis::OnThinSurfaces()
 {
 	if(m_ctrlThinSurfaces.GetCheck()) m_bThinSurfaces = true;
 	else                              m_bThinSurfaces = false;
