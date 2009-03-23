@@ -37,6 +37,8 @@ CWPolarAnalysis::CWPolarAnalysis(CWnd* pParent /*=NULL*/)
 {
 	m_BAutoName = TRUE;
 
+	m_RefAreaType = 1;
+
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 1.0;
 	m_XCmRef     = 0.0;
@@ -126,6 +128,8 @@ BEGIN_MESSAGE_MAP(CWPolarAnalysis, CDialog)
 	ON_EN_KILLFOCUS(IDC_DENSITY, OnKillFocusDensity)
 	ON_BN_CLICKED(IDC_AUTONAME, OnAutoName)
 	ON_EN_SETFOCUS(IDC_WPOLARNAME, OnSetFocusWPolarName)
+	ON_BN_CLICKED(IDC_AREA1, OnArea)
+	ON_BN_CLICKED(IDC_AREA2, OnArea)
 	ON_BN_CLICKED(IDC_METHOD1, OnMethod)
 	ON_BN_CLICKED(IDC_METHOD2, OnMethod)
 	ON_BN_CLICKED(IDC_METHOD3, OnMethod)
@@ -256,16 +260,19 @@ BOOL CWPolarAnalysis::OnInitDialog()
 		CheckRadioButton(IDC_METHOD1, IDC_METHOD3, IDC_METHOD2);
 		m_ctrlViscous.EnableWindow(true);
 	}
-	else if(m_AnalysisType==3) {
+	else if(m_AnalysisType==3)
+	{
 
 		CheckRadioButton(IDC_METHOD1, IDC_METHOD3, IDC_METHOD3);
 		m_ctrlViscous.EnableWindow(true);
 	}
 
-	if(m_bVLM1)	{
+	if(m_bVLM1)	
+	{
 		CheckRadioButton(IDC_VLM1, IDC_VLM2, IDC_VLM1);
 	}
-	else {
+	else 
+	{
 		CheckRadioButton(IDC_VLM1, IDC_VLM2, IDC_VLM2);
 	}
 
@@ -279,6 +286,15 @@ BOOL CWPolarAnalysis::OnInitDialog()
 	m_ctrlThinSurfaces.EnableWindow(FALSE);
 //	if(m_bThinSurfaces)	m_ctrlThinSurfaces.SetCheck(TRUE);
 //	else                m_ctrlThinSurfaces.SetCheck(FALSE);
+
+	if(m_RefAreaType==1) 
+	{
+		CheckRadioButton(IDC_AREA1, IDC_AREA2, IDC_AREA1);
+	}
+	else 
+	{
+		CheckRadioButton(IDC_AREA1, IDC_AREA2, IDC_AREA2);
+	}
 
 	m_WakeParamsdlg.m_NXWakePanels    = m_NXWakePanels;
 	m_WakeParamsdlg.m_TotalWakeLength = m_TotalWakeLength;
@@ -317,6 +333,12 @@ BOOL CWPolarAnalysis::PreTranslateMessage(MSG* pMsg)
 	return CDialog::PreTranslateMessage(pMsg);
 }
 
+void CWPolarAnalysis::OnArea()
+{
+	if(IDC_AREA1 == GetCheckedRadioButton(IDC_AREA1,IDC_AREA2)) m_RefAreaType = 1;
+	else                                                        m_RefAreaType = 2;
+	SetWPolarName();
+}
 
 void CWPolarAnalysis::ReadParams()
 {
@@ -339,6 +361,8 @@ void CWPolarAnalysis::ReadParams()
 		m_Density   = m_ctrlDensity.GetValue() / 0.00194122;
 		m_Viscosity = m_ctrlViscosity.GetValue() / 10.7182881;
 	}
+	if(IDC_AREA1 == GetCheckedRadioButton(IDC_AREA1,IDC_AREA2)) m_RefAreaType = 1;
+	else                                                        m_RefAreaType = 2;
 
 	SetDensity();
 
@@ -402,13 +426,19 @@ void CWPolarAnalysis::SetWPolarName()
 		if(m_bWakeRollUp) m_WPolarName += "-W";
 	}
 
-	if(!m_bViscous) {
+	if(!m_bViscous) 
+	{
 		m_WPolarName += "-Inviscid";
 	}
 
-	if(m_bGround) {
+	if(m_bGround)
+	{
 		strong.Format("%.2f", m_Height),
 		m_WPolarName += "-G"+strong;
+	}
+	if(m_RefAreaType==2) 
+	{
+		m_WPolarName += "-xy_area";
 	}
 	m_ctrlWPolarName.SetWindowText(m_WPolarName);
 }

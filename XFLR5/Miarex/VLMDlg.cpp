@@ -845,6 +845,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
 	double WingLift, WingIDrag, Alpha;
 	double cosa, sina, beta;
+	double Area, Span;
 	CString str, strong;
 	CVector Force, WindNormal, WindDirection, WindSide;
 
@@ -952,7 +953,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			AddString("         Calculating wing...\r\n");
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp, 
-						VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+				VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 
 			m_pWing->VLMSetBending();
 			if(m_pWing->m_bWingOut)  m_bPointOut = true;
@@ -973,7 +974,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
 										m_Cp+m_pWing->m_MatSize,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				IDrag += WingIDrag;
 
 				m_pWing2->VLMSetBending();
@@ -997,7 +998,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				IDrag += WingIDrag;
 
 				m_pStab->VLMSetBending();
@@ -1021,7 +1022,7 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, 
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
 				IDrag += WingIDrag;
@@ -1029,25 +1030,36 @@ void CVLMDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->VLMSetBending();
 			}
 
-//			m_CL          =  2.0*Lift /m_QInf/m_QInf/m_pWing->m_Area;
-			m_CL          =  2.0*Force.dot(WindNormal)    /m_QInf/m_QInf/m_pWing->m_Area;
-			m_CX          =  2.0*Force.dot(WindDirection) /m_QInf/m_QInf/m_pWing->m_Area;
-			m_CY          =  2.0*Force.dot(WindSide)      /m_QInf/m_QInf/m_pWing->m_Area;
 
-			m_InducedDrag =  1.0*IDrag/m_QInf/m_QInf/m_pWing->m_Area;
-			m_ViscousDrag =  1.0*VDrag              /m_pWing->m_Area;
+			if(m_pWPolar->m_RefAreaType==1)
+			{
+				Area = m_pWing->m_Area;
+				Span = m_pWing->m_Span;
+			}
+			else
+			{
+				Area = m_pWing->m_ProjectedArea;
+				Span = m_pWing->m_ProjectedSpan;
+			}
+
+			m_CL          =  2.0*Force.dot(WindNormal)    /m_QInf/m_QInf /Area;
+			m_CX          =  2.0*Force.dot(WindDirection) /m_QInf/m_QInf /Area;
+			m_CY          =  2.0*Force.dot(WindSide)      /m_QInf/m_QInf /Area;
+
+			m_InducedDrag =  1.0*IDrag/m_QInf/m_QInf/Area;
+			m_ViscousDrag =  1.0*VDrag              /Area;
 
 			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 
-			m_GCm *=  1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
-			m_GRm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
-			m_GYm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+			m_GCm *=  1.0 / Area /m_pWing->m_MAChord /qdyn;
+			m_GRm *=  1.0 / Area /Span               /qdyn;
+			m_GYm *=  1.0 / Area /Span               /qdyn;
 
-			m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
-			m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
+			m_VCm *=  1.0 / Area /m_pWing->m_MAChord /qdyn;
+			m_VYm *=  1.0 / Area /Span               /qdyn;
+			m_IYm *=  1.0 / Area /Span               /qdyn;
 
-			m_IYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 
 			VLMSetDownwash(m_Gamma+q*m_MatSize);
 

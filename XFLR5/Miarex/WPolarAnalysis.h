@@ -116,6 +116,7 @@ private:
 	int m_Type;
 	int m_UnitType;//1= International, 2= English
 	int m_AnalysisType; //0=LLT;1=VLM;2=Panel
+	int m_RefAreaType; //1=classic or 2=projected on x-yplane
 
 	bool m_bVLM1; //true if Classic, false if Quendez
 	bool m_bThinSurfaces;//true if Plane Panel calculation on middle surface, false if on top & bottom
@@ -123,7 +124,6 @@ private:
 	bool m_bTiltedGeom;//true if calculation is performed on the tilted geometry, at alpha=0.0
 	bool m_bViscous;
 	bool m_bGround;
-
 	double m_QInf, m_Weight, m_Alpha, m_XCmRef;
 	double m_Beta;
 	double m_Density, m_Viscosity;
@@ -143,6 +143,7 @@ private:
 	virtual void OnOK();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnKillFocusQInf();
+	afx_msg void OnArea();
 	afx_msg void OnType();
 	afx_msg void OnGroundEffect();
 	afx_msg void OnKillFocusHeight();

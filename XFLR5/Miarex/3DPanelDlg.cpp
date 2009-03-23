@@ -1246,9 +1246,22 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 	double *Mu, *Sigma;
 	double cosa, sina;
 	double Lift, IDrag, VDrag ,XCP, YCP, QInf;
+	double Area, Span;
 	CVector WindNormal, WindDirection, WindSide;
 	CVector Force;
 	CString str;
+
+	if(m_pWPolar->m_RefAreaType==1) 
+	{
+		Area = m_pWing->m_Area;
+		Span = m_pWing->m_Span;
+	}
+	else
+	{
+		Area = m_pWing->m_ProjectedArea;
+		Span = m_pWing->m_ProjectedSpan;
+	}
+
 
 	bool bThinSurf = m_pWPolar->m_bThinSurfaces;
 
@@ -1311,7 +1324,7 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 		AddString("       Calculating wing...\r\n");
 		m_pWing->PanelTrefftz(m_Cp+qrhs*m_MatSize, Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
-			                      m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+		                          m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 		m_pWing->PanelSetBending();
 
 		pos = m_pWing->m_MatSize;
@@ -1329,7 +1342,7 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			m_pWing2->m_Density   = m_pWPolar->m_Density;
 			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
 			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
-									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
 
@@ -1349,7 +1362,7 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos,
 									  VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
-									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pStab->PanelSetBending();
 
 			pos += m_pStab->m_MatSize;
@@ -1370,7 +1383,7 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			
 			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
-								     m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+								     m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pFin->PanelSetBending();
 			pos += m_pFin->m_MatSize;
 
@@ -1395,24 +1408,23 @@ bool C3DPanelDlg::ComputePlane(double Alpha, int qrhs)
 			SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, QInf, Lift, IDrag);
 		}
 
-		m_CL          =       Force.dot(WindNormal)    /m_pWing->m_Area;
-		m_CX          =       Force.dot(WindDirection) /m_pWing->m_Area;
-		m_CY          =       Force.dot(WindSide)      /m_pWing->m_Area;
+		m_CL          =       Force.dot(WindNormal)    /Area;
+		m_CX          =       Force.dot(WindDirection) /Area;
+		m_CY          =       Force.dot(WindSide)      /Area;
 
-		m_InducedDrag =  1.0*IDrag/m_pWing->m_Area;
-		m_ViscousDrag =  1.0*VDrag/m_pWing->m_Area;
+		m_InducedDrag =  1.0*IDrag/Area;
+		m_ViscousDrag =  1.0*VDrag/Area;
 
 		m_XCP         = XCP/Force.dot(WindNormal);
 		m_YCP         = YCP/Force.dot(WindNormal);
 
-		m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord;
-		m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
-		m_GYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
+		m_GCm *= 1.0 / Area /m_pWing->m_MAChord;
+		m_GRm *= 1.0 / Area /Span;
+		m_GYm *= 1.0 / Area /Span;
 
-		m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord;
-		m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
-
-		m_IYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
+		m_VCm *= 1.0 / Area /m_pWing->m_MAChord;
+		m_VYm *= 1.0 / Area /Span;
+		m_IYm *= 1.0 / Area /Span;
 
 		if(m_bPointOut) m_bWarning = true;
 

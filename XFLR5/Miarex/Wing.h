@@ -74,9 +74,10 @@ protected:
 	void VLMSetBending();
 	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted);
+                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted, int RefAreaType);
 
-	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP, double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
+	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP, 
+		                double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType);
 	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelSetBending();
 
@@ -170,6 +171,8 @@ protected:
 	double m_yMac;		// mean aerodynamic chord span position
 	double m_Density, m_Viscosity; //fluid properties
 	double m_Area;		// wing surface
+	double m_ProjectedArea;		// wing surface projected on xy plane, for the calculation of aero coeficients
+	double m_ProjectedSpan;
 	double m_Volume;	// for tentative wieght calculations
 	double m_AR;		// Aspect ratio
 	double m_TR;		// Taper ratio

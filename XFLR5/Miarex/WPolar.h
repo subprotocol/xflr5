@@ -101,6 +101,11 @@ private:
 	double m_TotalWakeLength;
 	double m_WakePanelFactor;
 
+	int m_RefAreaType;	//1 if planform area, 2 if planform area projected on xy plane
+						//if 2, span is also projected on xy plane
+						//1 is default case up to v4.15
+
+
 	bool SerializeWPlr(CArchive &ar);
 
 	void AddPoint(CWOpp* pWOpp);

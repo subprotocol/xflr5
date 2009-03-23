@@ -407,6 +407,8 @@ void CWing::Duplicate(CWing *pWing)
 	m_NPanel		= pWing->m_NPanel;
 	m_Span			= pWing->m_Span;
 	m_Area		    = pWing->m_Area;
+	m_ProjectedSpan = pWing->m_ProjectedSpan;
+	m_ProjectedArea = pWing->m_ProjectedArea;
 	m_AR			= pWing->m_AR;
 	m_TR			= pWing->m_TR;
 	m_GChord		= pWing->m_GChord;
@@ -469,6 +471,7 @@ void CWing::ComputeGeometry()
 	int i, k;
 
 	double surface = 0.0;
+	double xysurface = 0.0;
 	m_TLength[0] = 0.0;
 	m_TYProj[0]  = m_TPos[0];
 	for (i=1; i<=m_NPanel; i++)
@@ -479,6 +482,7 @@ void CWing::ComputeGeometry()
 	
 
 	m_Span    = 2.0 * m_TPos[m_NPanel]; 
+	m_ProjectedSpan = 0.0;
 	m_MAChord = 0.0;
 	m_yMac    = 0.0;
 	m_Volume  = 0.0;
@@ -487,14 +491,20 @@ void CWing::ComputeGeometry()
 		pFoilA = pFrame->GetFoil(m_RFoil[k]);
 		pFoilB = pFrame->GetFoil(m_RFoil[k+1]);
 		surface   += m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0;//m²
+		xysurface += (m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0) * cos(m_TDihedral[k]*pi/180.0);
+		m_ProjectedSpan += m_TLength[k+1] * cos(m_TDihedral[k]*pi/180.0);
 		if(pFoilA && pFoilB) 
 			m_Volume  += m_TLength[k+1]*(pFoilA->GetArea()*m_TChord[k] + pFoilB->GetArea()*m_TChord[k+1])/2.0;//m3
 		m_MAChord += IntegralC2(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 		m_yMac    += IntegralCy(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 	}
+
+	m_ProjectedSpan *=2.0;
+
 	if(!m_bIsFin || m_bSymFin || m_bDoubleFin)
 	{
 		m_Area    = 2.0 * surface;
+		m_ProjectedArea = 2.0 * xysurface;
 		m_Volume *= 2.0;
 		m_MAChord = m_MAChord * 2.0 / m_Area;
 		m_yMac    = m_yMac    * 2.0 / m_Area;
@@ -505,13 +515,13 @@ void CWing::ComputeGeometry()
 	else
 	{ 
 		m_Area = surface;
+		m_ProjectedArea = xysurface;
 		m_MAChord = m_MAChord / m_Area;
 		m_yMac    = m_yMac    / m_Area;
 
 		m_GChord  = m_Area/m_Span*2.0;
 		m_AR      = m_Span*m_Span/m_Area/2.0;
 	}
-
 	if(m_TChord[m_NPanel]>0.0)	m_TR = m_TChord[0]/m_TChord[m_NPanel];
 	else						m_TR = 99999.0;
 
@@ -835,8 +845,7 @@ void CWing::LLTInitCl()
 		yob   = cos(k*pi/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_Span/2.0, tau);
 		m_Re[k] = m_Chord[k] * m_QInf /m_Viscosity;
-		m_Cl[k] = pMiarex->GetCl(pFoil0, pFoil1, m_Re[k],
-								 m_Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
+		m_Cl[k] = pMiarex->GetCl(pFoil0, pFoil1, m_Re[k], m_Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
 	}
 	if(m_Type == 2)
 	{
@@ -2000,7 +2009,7 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XCP, double &YCP,
 		                   double &GCm,   double &VCm, double &GRm,   double &GYm, double &IYm, double &VYm, 
-						   bool bViscous, bool bTilted)
+						   bool bViscous, bool bTilted, int RefAreaType)
 {
 	//calculates :
 	// - the moments and the centre of pressure positions by summation over the apnels
@@ -2087,7 +2096,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 				// for each panel along the chord, add the lift coef
 				PanelForce  = VInf * m_pPanel[p].Vortex;
-				PanelForce *= Gamma[p] * m_Density;         //Newtons
+				PanelForce *= Gamma[p] * m_Density;                 //Newtons
 
 				if(!m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 				{
@@ -2096,8 +2105,8 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 					PanelForce -= Force;
 				}
 				Moment0 = LeverArmC4 * PanelForce;
-				m_CmAirf[m]  += Moment0.y;						//N.m
-				GeomMoment   += PanelLeverArm * PanelForce;		//N.m
+				m_CmAirf[m]  += Moment0.y;                          //N.m
+				GeomMoment   += PanelLeverArm * PanelForce;         //N.m
 
 				StripForce += PanelForce;
 				NForce = PanelForce.dot(SurfaceNormal);
@@ -2166,10 +2175,9 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 //			m_CmAirf[m]     = Cm4*2.0      /StripArea/m_QInf/100.0;//error up to v2.00, corrected in v2.01
 //			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/m_QInf;//up to v2.04
 
-
 			// ______________Global moments, in N.m __________________
-			DragMoment = LeverArm * DragVector;
-//			GeomMoment = LeverArm * StripForce;
+			DragMoment += LeverArm * DragVector;
+
 			m_GCm += GeomMoment.y ;
 			m_GRm += GeomMoment.dot(WindDirection);
 			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
@@ -2214,23 +2222,36 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 			m++;
 		}
 		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
-	}
+	} 
 
 	//global plane dimensionless coefficients
-	GCm += m_GCm;
+	GCm += m_GCm ;//+ DragMoment.y;
 	 //sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
 	GYm -= m_GYm;
 	VYm -= m_VYm;
 	IYm -= m_IYm;
 
+	//Note : the following results are unused, for information only
+	double Area, Span;
+	if(RefAreaType==1) 
+	{
+		Area = m_Area;
+		Span = m_Span;
+	}
+	else 
+	{
+		Area = m_ProjectedArea;
+		Span = m_ProjectedSpan;
+	}
+
 	// wing dimensionless coefficients
-	m_GCm *=  1.0/ q / m_Area /m_MAChord;
+	m_GCm *=  1.0/ q / Area /m_MAChord;
 	 //sign convention for rolling and yawing is opposite to algebric results
-	m_GRm *= -1.0/ q / m_Area /m_Span;
-	m_GYm *= -1.0/ q / m_Area /m_Span;
-	m_VYm *= -1.0/ q / m_Area /m_Span;
-	m_IYm *= -1.0/ q / m_Area /m_Span;
+	m_GRm *= -1.0/ q / Area /Span;
+	m_GYm *= -1.0/ q / Area /Span;
+	m_VYm *= -1.0/ q / Area /Span;
+	m_IYm *= -1.0/ q / Area /Span;
 
 }
 
@@ -2284,10 +2305,9 @@ void CWing::VLMSetBending()
 }
 
 
-void CWing::PanelComputeWing(double *Cp, 
-							 double &VDrag, double &XCP, double &YCP,
-							 double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm,
-							 bool bViscous, bool bThinSurface, bool bTilted)
+void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
+                             double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm,
+                             bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType)
 {
 	CMainFrame *pFrame    = (CMainFrame*)s_pFrame;
 	CMiarex *pMiarex      = (CMiarex*)s_pMiarex;
@@ -2300,7 +2320,7 @@ void CWing::PanelComputeWing(double *Cp,
 	bool bPointOutRe, bPointOutCl, bOutRe, bError;	CString string, strong;
 	CFoil *pFoil0, *pFoil1;
 	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment, DragMoment, GeomMoment, PtC4, PtLE, DragVector;
-	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelForce, StripForce, Moment0, WindNormal, WindDirection;
+	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PanelForce, StripForce, Moment0, WindNormal, WindDirection;
 	double CPStrip, tau, NForce, Alpha, cosa, sina;
 
 	bOutRe = bError = false;
@@ -2357,18 +2377,24 @@ void CWing::PanelComputeWing(double *Cp,
 
 			LeverArm = PtC4;
 			LeverArm.x -= pWPolar->m_XCmRef;
-//			LeverArm.z -= .043;//Special correction for Jibe 2 panel model REMOVE - REMOVE - REMOVE
+
+			GeomMoment.Set(0.0,0.0,0.0);
 
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
-				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;	// Newtons/q
-				StripForce += PanelForce;										// Newtons/q
-				NForce = PanelForce.dot(SurfaceNormal);							// Newtons/q
+				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
+				StripForce += PanelForce;                                           // Newtons/q
+				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
 
 				LeverArmC4 = m_pPanel[p].CollPt- PtC4;
 
-				Moment0 = LeverArmC4 * PanelForce;								// N.m/q
-				m_CmAirf[m]  += Moment0.y;										// N.m/q
+				Moment0 = LeverArmC4 * PanelForce;                                  // N.m/q
+				m_CmAirf[m]  += Moment0.y;                                          // N.m/q
+
+				PanelLeverArm.x = m_pPanel[p].CollPt.x - pWPolar->m_XCmRef;
+				PanelLeverArm.y = m_pPanel[p].CollPt.y;
+				PanelLeverArm.z = m_pPanel[p].CollPt.z;
+				GeomMoment += PanelLeverArm * PanelForce;
 
 				m_StripArea[m]    += m_pPanel[p].Area;
 				
@@ -2435,17 +2461,15 @@ void CWing::PanelComputeWing(double *Cp,
 
 
 			//global moments, in N.m/q
-			DragMoment = LeverArm * DragVector;
-			GeomMoment = LeverArm * StripForce ;
+			DragMoment += LeverArm * DragVector;
 
-			m_GCm += GeomMoment.y + m_CmAirf[m];
+			m_GCm += GeomMoment.y;
 			m_GRm += GeomMoment.dot(WindDirection);
 			m_GYm += GeomMoment.dot(WindNormal);
 
 			m_VYm += DragMoment.dot(WindNormal);
 
 			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y ; 
-
 
 			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m];//vectorial formulation
 			m_CmXRef[m]     = GeomMoment.y/m_Chord[m]/m_StripArea[m];
@@ -2485,21 +2509,38 @@ void CWing::PanelComputeWing(double *Cp,
 		if(!bThinSurface && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;//do not consider right tip patch
 		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
 	}
+
 	//global plane dimensionless coefficients
-	GCm += m_GCm;
+	GCm += m_GCm + DragMoment.y;
+
+	TRACE("%14.5e     %14.5e      \n", m_GCm,DragMoment.y);
 	//sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
 	GYm -= m_GYm;
 	VYm -= m_VYm;
 	IYm -= m_IYm;
 
+	//Note : the following results are unused,for information only
+	double Area, Span;
+	if(RefAreaType==1) 
+	{
+		Area = m_Area;
+		Span = m_Span;
+	}
+	else 
+	{
+		Area = m_ProjectedArea;
+		Span = m_ProjectedSpan;
+	}
+
+
 	// wing dimensionless coefficients
-	m_GCm *=  1.0 / m_Area /m_MAChord;
+	m_GCm *=  1.0 / Area /m_MAChord;
 	//sign convention for rolling and yawing is opposite to algebric results
-	m_GRm *= -1.0 / m_Area /m_Span;
-	m_GYm *= -1.0 / m_Area /m_Span;
-	m_VYm *= -1.0 / m_Area /m_Span;
-	m_IYm *= -1.0 / m_Area /m_Span;
+	m_GRm *= -1.0 / Area /Span;
+	m_GYm *= -1.0 / Area /Span;
+	m_VYm *= -1.0 / Area /Span;
+	m_IYm *= -1.0 / Area /Span;
 
 }
 

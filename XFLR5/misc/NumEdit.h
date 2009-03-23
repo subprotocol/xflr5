@@ -37,7 +37,7 @@ public:
 
 // Operations
 public:
-
+ 
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CNumEdit)

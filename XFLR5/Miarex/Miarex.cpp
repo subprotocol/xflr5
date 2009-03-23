@@ -2898,6 +2898,8 @@ void CMiarex::SaveSettings(CArchive &ar)
 	ar << CWing::s_NLLTStations;
 
 	ar << m_WngAnalysis.m_WakePanelFactor << m_WngAnalysis.m_TotalWakeLength << m_WngAnalysis.m_NXWakePanels;
+	ar << m_WngAnalysis.m_UnitType << m_WngAnalysis.m_RefAreaType;
+
 	ar << m_MaxWakeIter     << m_WakeInterNodes << m_CoreSize;
 
 	ar << m_MinPanelSize;
@@ -2942,7 +2944,6 @@ void CMiarex::SaveSettings(CArchive &ar)
 	if(m_bAutoCpScale)        ar << 1; else ar<<0;
 
 	ar << m_CpColor << m_CpStyle << m_CpWidth;
-	ar << m_WngAnalysis.m_UnitType;
 	ar << m_WingColor << m_StabColor << m_FinColor;
 
 	ar << m_FlowLinesDlg.m_NX      << m_FlowLinesDlg.m_DeltaL;
@@ -3120,6 +3121,8 @@ bool CMiarex::LoadSettings(CArchive &ar, int format)
 		CWing::s_NLLTStations = k;
 
 		ar >> m_WngAnalysis.m_WakePanelFactor >>  m_WngAnalysis.m_TotalWakeLength >>  m_WngAnalysis.m_NXWakePanels;
+		ar >> m_WngAnalysis.m_UnitType >> m_WngAnalysis.m_RefAreaType;
+
 		ar >> m_MaxWakeIter     >> m_WakeInterNodes >> m_CoreSize;
 		if(format<100413) m_CoreSize = 0.000001;
 
@@ -3451,16 +3454,6 @@ bool CMiarex::LoadSettings(CArchive &ar, int format)
 			m_CpWidth = 1;
 			throw pfe;
 		}
-
-
-		ar >> k;
-		if(k<0 || k>2){
-			CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-			pfe->m_strFileName = ar.m_strFileName;
-			m_WngAnalysis.m_UnitType = 1;
-			throw pfe;
-		}
-		m_WngAnalysis.m_UnitType = k;
 
 		ar >> c;
 		if(c<0 || c>RGB(255,255,255)){
@@ -5028,7 +5021,8 @@ void CMiarex::PrintSingleWingGraph(CDC *pDC, CRect *pCltRect)
 	if(m_pCurWPolar) ZPos +=800;
 	D = 000;
 
-	if(m_pCurWing){
+	if(m_pCurWing)
+	{
 		area = m_pCurWing->m_Area;
 		if(m_pCurWing2) area += m_pCurWing2->m_Area;
 		pDC->TextOut(LeftPos,ZPos, m_pCurWing->m_WingName);
@@ -5045,7 +5039,8 @@ void CMiarex::PrintSingleWingGraph(CDC *pDC, CRect *pCltRect)
 		pDC->TextOut(LeftPos,ZPos-D, Result);
 		D+=400;
 
-		if(m_pCurWPolar){
+		if(m_pCurWPolar)
+		{
 			GetWeightUnit(str1, pFrame->m_WeightUnit);
 			GetAreaUnit(str2, pFrame->m_AreaUnit);
 			Result.Format("Plane weight = %6.2f ", m_pCurWing->m_Weight*pFrame->m_kgtoUnit);
@@ -7988,11 +7983,11 @@ void CMiarex::PaintSingleWingGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 
 	int D = 0;
 	int LeftPos = margin;
-	int ZPos    = pCltRect->Height()-10*12;
+	int ZPos    = pCltRect->Height()-12*12;
 	if(m_pCurWing)
 	{
 		double area = m_pCurWing->m_Area;
-		if(m_pCurWing2) area += m_pCurWing2->m_Area;
+//		if(m_pCurWing2) area += m_pCurWing2->m_Area;
 		if(m_pCurPlane && m_pCurStab) ZPos-=14;
 		if(m_pCurWPolar) ZPos-=24;
 		if(m_iView!=2) 
@@ -8018,10 +8013,21 @@ void CMiarex::PaintSingleWingGraph(CDC *pDC, CRect *pCltRect, CRect *pDrawRect)
 			pDC->TextOut(LeftPos,ZPos+D, strong);
 			D+=12;
 
+			str1.Format("XYProj. Span = %7.2f ", m_pCurWing->m_ProjectedSpan*pFrame->m_mtoUnit);
+			strong = str1+length;
+			pDC->TextOut(LeftPos,ZPos+D, strong);
+			D+=12;
+
 			str1.LoadString(IDS_WINGAREA);
 			Result.Format(str1+surface, area * pFrame->m_m2toUnit);
 			pDC->TextOut(LeftPos,ZPos+D, Result);
 			D+=12;
+
+			str1.Format("XYProj. Area = %7.2f ", m_pCurWing->m_ProjectedArea * pFrame->m_m2toUnit);
+			strong = str1+surface;
+			pDC->TextOut(LeftPos,ZPos+D, strong);
+			D+=12;
+
 			if(m_pCurWPolar)
 			{
 				GetWeightUnit(str, pFrame->m_WeightUnit);
@@ -12325,7 +12331,7 @@ void CMiarex::GLCreateWingLegend()
 
 	double dD      = 12.0/(double)width*2.0*m_GLScale;
 	double LeftPos = -0.98*m_GLScale;
-	double ZPos = -m_GLScale + 8.0*dD +0.02*m_GLScale;
+	double ZPos = -m_GLScale + 10.0*dD +0.02*m_GLScale;
 
 
 	glNewList(WINGLEGEND,GL_COMPILE);
@@ -12340,7 +12346,7 @@ void CMiarex::GLCreateWingLegend()
 		if(m_pCurWing)
 		{
 			double area = m_pCurWing->m_Area;
-			if(m_pCurWing2) area += m_pCurWing2->m_Area;
+//			if(m_pCurWing2) area += m_pCurWing2->m_Area;
 			if(m_pCurPlane && m_pCurStab) ZPos+=dD;
 			if(m_pCurWPolar) ZPos+=2.0*dD;
 			CString length, surface;
@@ -12361,11 +12367,24 @@ void CMiarex::GLCreateWingLegend()
 			glCallLists(Result.GetLength(), GL_UNSIGNED_BYTE, Result);
 
 			ZPos -=dD;
+			str1.Format("XYProj. Span = %7.2f ", m_pCurWing->m_ProjectedSpan*pFrame->m_mtoUnit);
+			strong = str1+length;
+			glRasterPos2d(LeftPos,ZPos);
+			glCallLists(Result.GetLength(), GL_UNSIGNED_BYTE, strong);
+
+			ZPos -=dD;
 			str1.LoadString(IDS_WINGAREA);
 			Result.Format(str1+surface, area * pFrame->m_m2toUnit);
 			glRasterPos2d(LeftPos,ZPos);
-
 			glCallLists(Result.GetLength(), GL_UNSIGNED_BYTE, Result);
+
+			ZPos -=dD;
+			str1.Format("XYProj. Area = %7.2f ", m_pCurWing->m_ProjectedArea * pFrame->m_m2toUnit);
+			strong = str1+surface;
+			glRasterPos2d(LeftPos,ZPos);
+			glCallLists(Result.GetLength(), GL_UNSIGNED_BYTE, strong);
+
+
 			ZPos -=dD;
 			if(m_pCurWPolar)
 			{
@@ -18263,6 +18282,7 @@ void CMiarex::OnDefineAnalysis()
 		m_CtrlDlg.m_Density   = m_WngAnalysis.m_Density;
 
 		//Then add WPolar to array
+		pCurWPolar->m_RefAreaType     = m_WngAnalysis.m_RefAreaType;
 		pCurWPolar->m_Type            = m_WngAnalysis.m_Type;
 		pCurWPolar->m_QInf            = m_WngAnalysis.m_QInf;
 		pCurWPolar->m_Weight          = m_WngAnalysis.m_Weight;

@@ -210,7 +210,7 @@ CMainFrame::CMainFrame()
 	wndpl.rcNormalPosition.bottom = 768; 
 	wndpl.showCmd = 1;
 
-	m_VersionName = "XFLR5_v4.15";
+	m_VersionName = "XFLR5_v4.16";
 	m_ProjectName = "";
 
 	XDirect.m_pFrame    = this;
@@ -3031,7 +3031,7 @@ void CMainFrame::SaveSettings()
 	else
 	{
 		CArchive ar(&fp, CArchive::store);
-		ar << 100413;
+		ar << 100416;
 			//100413 : Set default core radius to 1 micron
 			//100322 : corrected wake params
 			//100321 : added woperdlgbar properties
@@ -3121,11 +3121,11 @@ void CMainFrame::LoadSettings()
 			CArchive ar(&fp, CArchive::load);
 
 			ar >> ArchiveFormat;
-			if(ArchiveFormat<100322)
+			if(ArchiveFormat!=100416)
 			{
-				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
-				pfe->m_strFileName = ar.m_strFileName;
-				throw pfe;
+				ar.Close();
+				fp.Close();
+				return;
 			}
 			ar >> wndpl.rcNormalPosition.left  >> wndpl.rcNormalPosition.top; //used in XFLR5App
 			ar >> wndpl.rcNormalPosition.right >> wndpl.rcNormalPosition.bottom;//used in XFLR5App

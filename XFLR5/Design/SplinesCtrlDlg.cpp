@@ -195,10 +195,10 @@ BOOL CSplinesCtrlDlg::OnInitDialog()
 	{
 		m_ctrlDegExtrados.EnableWindow(false);
 		m_ctrlDegIntrados.EnableWindow(false);
-		m_ctrlOutExtrados.m_iMin = 3;
-		m_ctrlOutExtrados.m_iMax = 30;
-		m_ctrlOutIntrados.m_iMin = 3;
-		m_ctrlOutIntrados.m_iMax = 30;
+		m_ctrlOutExtrados.SetMin(3);
+		m_ctrlOutExtrados.SetMax(30);
+		m_ctrlOutIntrados.SetMin(3);
+		m_ctrlOutIntrados.SetMax(30);
 
 		m_ctrlOutExtrados.SetValue(m_pPF->m_Extrados.m_Freq);
 		m_ctrlOutIntrados.SetValue(m_pPF->m_Intrados.m_Freq);

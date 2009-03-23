@@ -54,6 +54,8 @@ CWPolar::CWPolar(CWnd* pParent)
 	m_TotalWakeLength = 1.0;
 	m_WakePanelFactor =1.1;
 
+	m_RefAreaType = 1;
+
 	m_AnalysisType = 0;
 	m_Type   = 1;
 	m_Style  = 0;
@@ -312,7 +314,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 	{
 		//write variables
 		
-		ar << 1015; // identifies the format of the file
+		ar << 1016; // identifies the format of the file
+					// 1016 : added reference area type 
 					// 1015 : added lateral force coefficient 
 					// 1014 : added control results
 					// 1013 : added control variables
@@ -351,6 +354,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar << (float)m_Beta ;
 		ar << (float)m_XCmRef;
 		ar <<(float)m_Density << (float)m_Viscosity;
+	
+		ar << m_RefAreaType;
 
 		ar <<(int)m_Alpha.GetSize();
 		for (i=0; i< (int)m_Alpha.GetSize(); i++)
@@ -459,7 +464,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			if(n) m_bTiltedGeom =true; else m_bTiltedGeom = false;
 		}
 
-		if(ArchiveFormat>=1006){
+		if(ArchiveFormat>=1006)
+		{
 			ar >> n; 
 			if (n!=0 && n!=1){
 				m_PlrName ="";
@@ -469,7 +475,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		}
 		if(ArchiveFormat>=1009){
 			ar >> n; 
-			if (n!=0 && n!=1){
+			if (n!=0 && n!=1)
+			{
 				m_PlrName ="";
 				return false;
 			}
@@ -477,7 +484,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		}
 
 
-		if(ArchiveFormat>=1010){
+		if(ArchiveFormat>=1010)
+		{
 			ar >> n; 
 			if (n!=0 && n!=1){
 				m_PlrName ="";
@@ -495,13 +503,15 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			}
 		}
 
-		if(ArchiveFormat>=1011){
+		if(ArchiveFormat>=1011)
+		{
 			ar >> f; 			m_TotalWakeLength  = f;
 			ar >> f; 			m_WakePanelFactor = f;
 		}
 
 		ar >> n; 
-		if (n!=0 && n!=1){
+		if (n!=0 && n!=1)
+		{
 			m_PlrName ="";
 			return false;
 		}
@@ -509,7 +519,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 			if(n) m_bIsVisible =true; else m_bIsVisible = false;
 		}
 		ar >> n; 
-		if (n!=0 && n!=1){
+		if (n!=0 && n!=1)
+		{
 			m_PlrName ="";
 			return false;
 		}
@@ -518,7 +529,8 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		}
 
 		ar >> n;
-		if (n<1 || n>10){
+		if (n<1 || n>10)
+		{
 			m_PlrName ="";
 			return false;
 		}
@@ -534,12 +546,17 @@ bool CWPolar::SerializeWPlr(CArchive &ar)
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
 
+		if(ArchiveFormat>=1016) ar >> m_RefAreaType;
+		else                    m_RefAreaType=1;
+
 		ar >> n;
-		if (n<0 || n> 100000){
+		if (n<0 || n> 100000)
+		{
 			m_PlrName ="";
 			return false;
 		}
-		if(ArchiveFormat<1010){
+		if(ArchiveFormat<1010)
+		{
 			m_WArea    /=100.0;
 			m_WMAChord /=1000.0;
 			m_WSpan    /=1000.0;
