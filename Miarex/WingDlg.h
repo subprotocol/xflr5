@@ -37,8 +37,6 @@
 #include "WingDelegate.h"
 
 
-
-
 class WingDlg : public QDialog
 {
 	Q_OBJECT
@@ -105,9 +103,10 @@ private:
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlWingVolume, *m_pctrlMAC, *m_pctrlGeomChord;
 	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
 	QLabel *m_pctrlVLMPanels, *m_pctrl3DPanels;
+	QLabel *m_pctrlProjectedArea, *m_pctrlProjectedSpan;
 
-	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4;
-	QLabel *m_pctrlAreaUnit, * m_pctrlVolumeUnit;
+	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4, *m_pctrlLength5;
+	QLabel *m_pctrlAreaUnit, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
 	QTableView *m_pctrlWingTable;
 	QStandardItemModel *m_pWingModel;
 	WingDelegate *m_pWingDelegate;

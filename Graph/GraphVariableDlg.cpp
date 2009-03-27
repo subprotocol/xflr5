@@ -77,6 +77,9 @@ void GraphVariableDlg::SetupLayout()
 	MainLayout->addStretch(1);
 
 	setLayout(MainLayout);
+
+	connect(m_pctrlXSel, SIGNAL(itemDoubleClicked (QListWidgetItem *)), SLOT(OnOK()));
+	connect(m_pctrlYSel, SIGNAL(itemDoubleClicked (QListWidgetItem *)), SLOT(OnOK()));
 }
 
 void GraphVariableDlg::InitDialog(int iGraphType)
@@ -205,11 +208,6 @@ void GraphVariableDlg::GetSelection(int &XSel, int &YSel)
 {
 	XSel = m_pctrlXSel->currentRow();
 	YSel = m_pctrlYSel->currentRow();
-}
-
-void GraphVariableDlg::mouseDoubleClickEvent ( QMouseEvent * event )
-{
-	OnOK();
 }
 
 

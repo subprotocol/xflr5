@@ -25,6 +25,7 @@
 #include "../Globals.h"
 #include "../Misc/RenameDlg.h"
 #include "../Graph/GraphVariableDlg.h"
+#include "../Graph/WingGraphVarDlg.h"
 #include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
 #include "GL3DScales.h"
@@ -96,16 +97,6 @@
 //3D
 #define BODYGEOM            1302
 #define BODYSURFACES        1303
-//2D
-#define BODYAXIALLINES      1304
-#define BODYFRAME		    1305
-#define BODYFRAME3D         1306
-#define BODYFRAMEGRID		1307
-#define BODYLINEGRID		1308
-#define BODYPOINTS			1309
-#define FRAMEPOINTS			1310
-#define BODYOVERLAY			1311
-
 #define BODYMESHPANELS		1312
 #define BODYMESHBACK		1313
 
@@ -491,12 +482,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_bAutoScales         = false;
 
-	m_bBodyOverlay        = false;
 	m_bResetglBody        = false;//otherwise endless repaint if no body present
-	m_bResetglBody2D      = false;//
-	m_bResetglBodyPoints  = false;
-	m_bResetglBody2D      = false;
-	m_bResetglBodyOverlay = true;
 	m_bResetglBodyMesh    = true;
 
 	m_bResetglGeom       = true;
@@ -621,6 +607,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlSurfaces, SIGNAL(clicked()), SLOT(OnSurfaces()));
 	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnOutline()));
 	connect(m_pctrlPanels, SIGNAL(clicked()), SLOT(OnPanels()));
+	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
 
 	connect(m_pctrlAxes, SIGNAL(clicked()), SLOT(OnAxes()));
@@ -5454,7 +5441,7 @@ void QMiarex::GLCallViewLists()
 		if(m_pCurStab)   glCallList(STABOUTLINE);
 		if(m_pCurFin)    glCallList(FINOUTLINE);
 		if(m_pCurPlane)  glTranslated((m_pCurPlane)->m_BodyPos.x, 0.0, (m_pCurPlane)->m_BodyPos.z);
-		if(m_pCurBody)	  glCallList(BODYGEOM);
+		if(m_pCurBody)	 glCallList(BODYGEOM);
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->m_BodyPos.x, 0.0, -(m_pCurPlane)->m_BodyPos.z);
 	}
 
@@ -7713,44 +7700,6 @@ void QMiarex::GLDraw3D()
 
 	glClearColor(pMainFrame->m_BackgroundColor.redF(), pMainFrame->m_BackgroundColor.greenF(), pMainFrame->m_BackgroundColor.blueF(),0.0);
 
-	if((m_bResetglBody2D || m_bResetglBodyPoints) && m_pCurBody)
-	{
-		if(glIsList(BODYPOINTS))
-		{
-			glDeleteLists(BODYPOINTS,2);
-			m_GLList -=2;
-		}
-
-//		GLCreateBodyPoints();
-		m_bResetglBodyPoints = false;
-	}
-
-	if(m_bResetglBodyOverlay && m_pCurBody)
-	{
-		if(glIsList(BODYOVERLAY))
-		{
-			glDeleteLists(BODYOVERLAY,1);
-			m_GLList -=1;
-		}
-
-//		GLCreateBodyOverlay();
-		m_bResetglBodyOverlay = false;
-	}
-
-	if(m_bResetglBody2D && m_pCurBody)
-	{
-		if(glIsList(BODYAXIALLINES))
-		{
-			glDeleteLists(BODYAXIALLINES,5);
-			m_GLList -=5;
-		}
-
-//		GLCreateBody2DBodySection();
-//		GLCreateBodyFrames();
-//		GLCreateBodyGrid();
-		m_bResetglBody2D = false;
-	}
-
 	if(m_bResetglBody && m_pCurBody)
 	{
 		m_ArcBall.GetMatrix();
@@ -7763,8 +7712,8 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-//		if((m_pCurBody)->m_LineType==1)	    GLCreateBody3DFlatPanels();
-//		else if((m_pCurBody)->m_LineType==2)	GLCreateBody3DSplines();
+		if(m_pCurBody->m_LineType==1)	   m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
+		else if(m_pCurBody->m_LineType==2) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHPANELS))
@@ -7772,7 +7721,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYMESHPANELS,2);
 			m_GLList -=2;
 		}
-//		GLCreateBodyMesh();
+		m_GL3dBody.GLCreateBodyMesh(m_pCurBody);
 		m_bResetglBodyMesh = false;
 	}
 
@@ -9270,6 +9219,20 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
+		case Qt::Key_V:
+		{
+			if(m_pCurGraph)
+			{
+				if (m_iView==2)     OnDefinePolarGraphVariables();
+				else if(m_iView==1) OnDefineWingGraphVariables();
+			}
+			break;
+		}
+		case Qt::Key_F2:
+		{
+			OnRenameCurUFO();
+			break;
+		}
 		case Qt::Key_F4:
 		{
 			On3DView();
@@ -9414,7 +9377,6 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 	m_CpGraph.Serialize(ar, false);
 
 	ar >> m_bXTop >> m_bXBot >> m_bXCP >> m_bXCmRef >> m_bICd >> m_bVCd;
-
 	ar >> m_bWakePanels >> m_bSurfaces >> m_bOutline >> m_bVLMPanels;
 	ar >> m_bAxes  >> m_b3DCp >> m_bDownwash >> m_bMoments;
 	ar >> m_bAutoCpScale >> m_bShowCpScale >> m_bXTop >> m_bXBot >> m_bXCP;
@@ -9431,6 +9393,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	CVector Real;
 	QPoint Delta(event->pos().x() - m_LastPoint.x(), event->pos().y() - m_LastPoint.y());
 	QPoint point = event->pos();
+	m_pCurGraph = GetGraph(point);
 	bool bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 
@@ -9513,7 +9476,6 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 		if ((event->buttons() & Qt::LeftButton) && m_bTrans && (m_iView==1 || m_iView==2 || m_iView==4))
 		{
-			m_pCurGraph = GetGraph(point);
 			if(m_pCurGraph && m_bTransGraph)
 			{
 				// we translate the curves inside the graph
@@ -9574,7 +9536,6 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 			// we zoom the graph or the wing
 			if(m_iView ==1 ||m_iView==2 || m_iView==4)
 			{
-				m_pCurGraph = GetGraph(point);
 				if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
 				{
 					//zoom graph
@@ -9883,15 +9844,6 @@ void QMiarex::OnClipPlane(int pos)
 }
 
 
-void QMiarex::OnGL3DScale()
-{
-	if(m_iView != 3) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
-	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
-}
-
-
 void QMiarex::OnDownwash()
 {
 	m_bDownwash = m_pctrlDownwash->isChecked();
@@ -9933,31 +9885,6 @@ void QMiarex::OnPanels()
 	UpdateView();
 }
 
-void QMiarex::OnSurfaces()
-{
-	m_bSurfaces = m_pctrlSurfaces->isChecked();
-	UpdateView();
-}
-
-
-void QMiarex::OnSetupLight()
-{
-	m_bShowLight = true;
-	UpdateView();
-	m_GLLightDlg.m_pMiarex = this;
-	m_GLLightDlg.exec();
-
-	m_bShowLight = false;
-
-	GLSetupLight();
-	UpdateView();
-}
-
-void QMiarex::OnVortices()
-{
-	m_bVortices = m_pctrlVortices->isChecked();
-	UpdateView();
-}
 
 
 void QMiarex::OnAnalyze()
@@ -10256,6 +10183,290 @@ void QMiarex::OnAdvancedSettings()
 }
 
 
+
+void QMiarex::OnCpView()
+{
+	if (m_bAnimate) StopAnimate();
+
+	if(m_iView==4)
+	{
+		UpdateView();
+		return;
+	}
+
+	SetWPlrLegendPos();//TODO remove
+	m_iView=4;
+	m_pCurGraph = &m_CpGraph;
+
+	m_pctrlMiddleControls->setCurrentIndex(1);
+	m_pctrBottomControls->setCurrentIndex(0);
+
+	CreateCpCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+
+void QMiarex::OnCurWOppOnly()
+{
+	m_bCurWOppOnly = !m_bCurWOppOnly;
+	if(m_iView==1)
+	{
+		CreateWOppCurves();
+		UpdateView();
+	}
+}
+
+void QMiarex::OnCurveColor()
+{
+	bool bOK;
+	QRgb rgb = m_CurveColor.rgba();
+	rgb = QColorDialog::getRgba(rgb, &bOK);
+	m_CurveColor = QColor::fromRgba(rgb);
+
+	FillComboBoxes();
+
+	UpdateCurve();
+}
+
+void QMiarex::OnCurveStyle(int index)
+{
+	m_CurveStyle = index;
+	FillComboBoxes();
+	UpdateCurve();
+}
+
+void QMiarex::OnCurveWidth(int index)
+{
+	m_CurveWidth = index+1;
+	FillComboBoxes();
+	UpdateCurve();
+}
+
+void QMiarex::OnDefineWingGraphVariables()
+{
+	//define the curernt WPolar graph's vaiable
+	if(!m_pCurGraph && m_iView!=2) return;
+	WingGraphVarDlg dlg;
+	int i;
+	int Var = m_WOppVar1;
+	if     (m_pCurGraph==&m_WingGraph1) Var = m_WOppVar1;
+	else if(m_pCurGraph==&m_WingGraph2) Var = m_WOppVar2;
+	else if(m_pCurGraph==&m_WingGraph3) Var = m_WOppVar3;
+	else if(m_pCurGraph==&m_WingGraph4) Var = m_WOppVar4;
+
+	dlg.m_iVar = Var;
+	dlg.InitDialog();
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		for (i=m_WingGraph1.GetCurveCount()-1; i>0; i--){//0 is curretn curve
+			m_WingGraph1.DeleteCurve(i);
+		}
+		for (i=m_WingGraph2.GetCurveCount()-1; i>0; i--){//0 is curretn curve
+			m_WingGraph2.DeleteCurve(i);
+		}
+		for (i=m_WingGraph2.GetCurveCount()-1; i>0; i--){//0 is curretn curve
+			m_WingGraph2.DeleteCurve(i);
+		}
+		for (i=m_WingGraph3.GetCurveCount()-1; i>0; i--)
+		{
+			m_WingGraph3.DeleteCurve(i);
+		}
+		if (m_pCurGraph==&m_WingGraph1)
+		{
+			m_WOppVar1 = dlg.m_iVar;
+			m_WingGraph1.SetAutoY(true);
+			m_WingGraph1.SetAutoYMinUnit(true);
+		}
+		else if (m_pCurGraph==&m_WingGraph2)
+		{
+			m_WOppVar2 = dlg.m_iVar;
+			m_WingGraph2.SetAutoY(true);
+			m_WingGraph2.SetAutoYMinUnit(true);
+		}
+		else if (m_pCurGraph==&m_WingGraph3)
+		{
+			m_WOppVar3 = dlg.m_iVar;
+			m_WingGraph3.SetAutoY(true);
+			m_WingGraph3.SetAutoYMinUnit(true);
+		}
+		else if (m_pCurGraph==&m_WingGraph4)
+		{
+			m_WOppVar4 = dlg.m_iVar;
+			m_WingGraph4.SetAutoY(true);
+			m_WingGraph4.SetAutoYMinUnit(true);
+		}
+		if (m_iView==1)     CreateWOppCurves();
+		UpdateView();
+	}
+}
+void QMiarex::OnDefinePolarGraphVariables()
+{
+	//define the variables for the current graph
+	GraphVariableDlg dlg;
+	dlg.InitDialog(2);
+
+
+	if(m_pCurGraph == &m_WPlrGraph1)
+	{
+		dlg.SetSelection(m_XW1, m_YW1);
+		if(QDialog::Accepted == dlg.exec())
+		{
+			m_XW1 = dlg.m_XSel;
+			m_YW1 = dlg.m_YSel;
+//			dlg.GetSelection(m_XW1, m_YW1);
+			SetWGraphTitles(&m_WPlrGraph1,m_XW1, m_YW1);
+			m_WPlrGraph1.SetAuto(true);
+			m_WPlrGraph1.SetAutoYMinUnit(true);
+		}
+	}
+	else if(m_pCurGraph == &m_WPlrGraph2)
+	{
+		dlg.SetSelection(m_XW2, m_YW2);
+		if(QDialog::Accepted == dlg.exec())
+		{
+			m_XW2 = dlg.m_XSel;
+			m_YW2 = dlg.m_YSel;
+			SetWGraphTitles(&m_WPlrGraph2,m_XW2, m_YW2);
+			m_WPlrGraph2.SetAuto(true);
+			m_WPlrGraph2.SetAutoYMinUnit(true);
+		}
+	}
+	else if(m_pCurGraph == &m_WPlrGraph3)
+	{
+		dlg.SetSelection(m_XW3, m_YW3);
+		if(QDialog::Accepted == dlg.exec())
+		{
+			m_XW3 = dlg.m_XSel;
+			m_YW3 = dlg.m_YSel;
+			SetWGraphTitles(&m_WPlrGraph3,m_XW3, m_YW3);
+			m_WPlrGraph3.SetAuto(true);
+			m_WPlrGraph3.SetAutoYMinUnit(true);
+		}
+	}
+	else if(m_pCurGraph == &m_WPlrGraph4)
+	{
+		dlg.SetSelection(m_XW4, m_YW4);
+		if(QDialog::Accepted == dlg.exec())
+		{
+			m_XW4 = dlg.m_XSel;
+			m_YW4 = dlg.m_YSel;
+			SetWGraphTitles(&m_WPlrGraph4,m_XW4, m_YW4);
+			m_WPlrGraph4.SetAuto(true);
+			m_WPlrGraph4.SetAutoYMinUnit(true);
+		}
+	}
+	CreateWPolarCurves();
+	UpdateView();
+}
+
+void QMiarex::OnDefineWPolar()
+{
+	if(!m_pCurWing) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	int i,j;
+
+	CWPolar* pNewWPolar       = new CWPolar;
+	if (m_pCurPlane) pNewWPolar->m_UFOName = m_pCurPlane->m_PlaneName;
+	else             pNewWPolar->m_UFOName = m_pCurWing->m_WingName;
+	pNewWPolar->m_WArea        = m_pCurWing->m_Area;
+	pNewWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
+	pNewWPolar->m_WSpan        = m_pCurWing->m_Span;
+//	m_WngAnalysis.m_pWPolar    = pNewWPolar;
+
+	m_WngAnalysis.m_pMainFrame = m_pMainFrame;
+	m_WngAnalysis.m_pWing       = m_pCurWing;
+	m_WngAnalysis.m_pPlane      = m_pCurPlane;
+	m_WngAnalysis.m_pMainFrame  = m_pMainFrame;
+	m_WngAnalysis.m_poaWPolar   = m_poaWPolar;
+	if(m_pCurPlane)		m_WngAnalysis.m_UFOName   = m_pCurPlane->m_PlaneName;
+	else				m_WngAnalysis.m_UFOName   = m_pCurWing->m_WingName;
+	m_WngAnalysis.InitDialog();
+
+	if (m_WngAnalysis.exec() == QDialog::Accepted)
+	{
+/*		m_Ctrlm_WngAnalysis.m_QInf      = m_WngAnalysis.m_QInf;
+		m_Ctrlm_WngAnalysis.m_Weight    = m_WngAnalysis.m_Weight;
+		m_Ctrlm_WngAnalysis.m_Viscosity = m_WngAnalysis.m_Viscosity;
+		m_Ctrlm_WngAnalysis.m_Density   = m_WngAnalysis.m_Density;*/
+
+		//Then add WPolar to array
+		pNewWPolar->m_RefAreaType     = m_WngAnalysis.m_RefAreaType;
+		pNewWPolar->m_Type            = m_WngAnalysis.m_Type;
+		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
+		pNewWPolar->m_Weight          = m_WngAnalysis.m_Weight;
+		pNewWPolar->m_XCmRef          = m_WngAnalysis.m_XCmRef;
+		pNewWPolar->m_Beta            = m_WngAnalysis.m_Beta;
+		pNewWPolar->m_ASpec           = m_WngAnalysis.m_Alpha;
+		pNewWPolar->m_PlrName         = m_WngAnalysis.m_WPolarName;
+		pNewWPolar->m_Density         = m_WngAnalysis.m_Density;
+		pNewWPolar->m_Viscosity       = m_WngAnalysis.m_Viscosity;
+		pNewWPolar->m_bVLM1           = m_WngAnalysis.m_bVLM1;
+		pNewWPolar->m_bTiltedGeom     = m_WngAnalysis.m_bTiltedGeom;
+		pNewWPolar->m_bWakeRollUp     = m_WngAnalysis.m_bWakeRollUp;
+		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
+		pNewWPolar->m_AnalysisType    = m_WngAnalysis.m_AnalysisType;
+		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
+		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
+		pNewWPolar->m_Height          = m_WngAnalysis.m_Height;
+		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
+		pNewWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
+		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
+
+		pNewWPolar->m_bPolar       = true;
+
+		pNewWPolar->m_Color = pMainFrame->GetColor(4);
+		CWPolar *pWPolar;
+		bool bFound;
+		for(i=0; i<30;i++)
+		{
+			bFound = false;
+			for (j=0; j<m_poaWPolar->size();j++)
+			{
+				pWPolar = (CWPolar*)m_poaWPolar->at(j);
+				if(pWPolar->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+			}
+			if(!bFound)
+			{
+				pNewWPolar->m_Color = pMainFrame->m_crColors[i];
+				break;
+			}
+		}
+		pNewWPolar->m_bIsVisible = true;
+
+		pWPolar = GetWPolar(pNewWPolar->m_PlrName);
+		pMainFrame->SetSaveState(false);
+		if(pWPolar)
+		{
+			delete pNewWPolar;
+			m_pCurWPolar = pWPolar;
+		}
+		else
+		{
+			m_pCurWPolar = AddWPolar(pNewWPolar);
+		}
+		m_pCurPOpp = NULL;
+		m_pCurWOpp = NULL;
+
+		m_bResetglGeom = true;
+		m_bResetglMesh = true;
+		m_bResetglOpp  = true;
+		m_bResetglWake = true;
+
+		pMainFrame->UpdateWPolars();
+		SetWPlr();
+		UpdateView();
+		m_pctrlAnalyze->setFocus();
+	}
+	else
+	{
+		delete pNewWPolar;
+	}
+
+}
+
+
 void QMiarex::OnDeleteAllWPlrOpps()
 {
 	//Delete all the WOpps or POpps associated to the current WPolar
@@ -10327,6 +10538,313 @@ void QMiarex::OnDeleteAllWOpps()
 	else if(m_iView==4)	CreateCpCurves();
 	UpdateView();
 }
+
+
+void QMiarex::OnDeleteCurUFO()
+{
+	//Delete the currently selected wing, if any
+	if(!m_pCurWing) return;
+	m_bAnimate = false;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString strong;
+	if(m_pCurPlane)	strong = "Are you sure you want to delete the plane :\n" +  m_pCurPlane->m_PlaneName +"?\n";
+	else 	        strong = "Are you sure you want to delete the wing :\n" +   m_pCurWing->m_WingName +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+
+
+	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
+	else            pMainFrame->DeleteWing(m_pCurWing, false);
+
+	pMainFrame->UpdateUFOs();
+	SetUFO();
+	CreateWPolarCurves();
+
+	UpdateView();
+}
+
+void QMiarex::OnDeleteCurWOpp()
+{
+	//Deletes the currently selected WOpp or POpp
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	int i;
+	if(m_pCurPOpp)
+	{
+		CPOpp* pPOpp;
+		for (i = m_poaPOpp->size()-1; i>=0; i--)
+		{
+			pPOpp = (CPOpp*)m_poaPOpp->at(i);
+			if(pPOpp == m_pCurPOpp)
+			{
+				m_poaPOpp->removeAt(i);
+				delete pPOpp;
+				break;
+			}
+		}
+		m_pCurPOpp = NULL;
+		m_pCurWOpp = NULL;
+		pMainFrame->UpdateWOpps();
+		SetWOpp(true);
+		pMainFrame->SetSaveState(false);
+		if (m_iView==1)     CreateWOppCurves();
+		else if(m_iView==4)	CreateCpCurves();
+
+		UpdateView();
+	}
+
+	else if(m_pCurWOpp)
+	{
+		CWOpp* pWOpp;
+		for (i = m_poaWOpp->size()-1; i>=0; i--)
+		{
+			pWOpp = (CWOpp*)m_poaWOpp->at(i);
+			if(pWOpp == m_pCurWOpp)
+			{
+				m_poaWOpp->removeAt(i);
+				delete pWOpp;
+				m_pCurWOpp = NULL;
+				break;
+			}
+		}
+		pMainFrame->UpdateWOpps();
+		SetWOpp(true);
+		if(pMainFrame->m_pctrlWOpp->count())
+		{
+			QString strong;
+			double x;
+			pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
+			strong = pMainFrame->m_pctrlWOpp->itemText(0);
+			bool bRes;
+			x = strong.toDouble(&bRes);
+			if(bRes)
+			{
+				m_pCurWOpp = GetWOpp(x);
+			}
+			else m_pCurWOpp = NULL;
+		}
+		else
+		{
+			m_pCurWOpp = NULL;
+		}
+		pMainFrame->SetSaveState(false);
+		if (m_iView==1)     CreateWOppCurves();
+		else if(m_iView==4)	CreateCpCurves();
+
+		UpdateView();
+	}
+}
+
+void QMiarex::OnDeleteCurWPolar()
+{
+	//delete the current WPolar
+	if(!m_pCurWPolar) return;
+	m_bAnimate = false;
+	int i;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	QString strong, UFOName;
+
+	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
+	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
+	else return;
+
+	strong = "Are you sure you want to delete the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+
+	//first remove all WOpps associated to the Wing Polar
+	CWOpp * pWOpp;
+	for (i=m_poaWOpp->size()-1; i>=0; i--)
+	{
+		pWOpp = (CWOpp*)m_poaWOpp->at(i);
+		if (pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pWOpp->m_WingName == UFOName)
+		{
+			m_poaWOpp->removeAt(i);
+			delete pWOpp;
+		}
+	}
+	//next remove all the POpps associated to the Wing Polar
+	CPOpp * pPOpp;
+	for (i=m_poaPOpp->size()-1; i>=0; i--)
+	{
+		pPOpp = (CPOpp*)m_poaPOpp->at(i);
+		if (pPOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pPOpp->m_PlaneName == UFOName)
+		{
+			m_poaPOpp->removeAt(i);
+			delete pPOpp;
+		}
+	}
+	//next remove the WPolar
+	CWPolar* pWPolar;
+	for (i=(int)m_poaWPolar->size()-1;i>=0; i--)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		if (pWPolar == m_pCurWPolar)
+		{
+			m_poaWPolar->removeAt(i);
+			delete pWPolar;
+			break;
+		}
+	}
+	m_pCurPOpp = NULL;
+	m_pCurWOpp = NULL;
+	m_pCurWPolar = NULL;
+	pMainFrame->SetSaveState(false);
+	pMainFrame->UpdateWPolars();
+	SetWPlr();
+	UpdateView();
+}
+
+
+void QMiarex::OnEditCurBody()
+{
+	if(!m_pCurBody) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	CBody memBody;
+	memBody.Duplicate(m_pCurBody);
+	m_GL3dBody.SetBody(m_pCurBody);
+	m_GL3dBody.m_bEnableName = false;
+
+	if(m_GL3dBody.exec() == QDialog::Accepted)
+	{
+		m_bResetglBody = true;
+		m_bResetglBodyMesh = true;
+		m_bResetglGeom = true;
+		m_bResetglMesh = true;
+		pMainFrame->SetSaveState(false);
+	}
+	else m_pCurBody->Duplicate(&memBody);
+}
+
+void QMiarex::OnEditUFO()
+{
+	//Edit the currently selected wing
+	if(!m_pCurWing)	return;
+	if(m_iView==5) return;
+
+	if(m_pCurPlane)
+	{
+		EditPlane(m_pCurPlane);
+		return;
+	}
+
+	int i;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	CWPolar *pWPolar;
+	CWOpp* pWOpp;
+	WingDlg WingDlg;
+	WingDlg.m_pWing = m_pCurWing;
+	WingDlg.m_bAcceptName= false;
+	WingDlg.InitDialog();
+
+	bool bHasResults = false;
+	for (i=0; i< m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		if (pWPolar->m_Alpha.size() && pWPolar->m_UFOName == m_pCurWing->m_WingName)
+		{
+			bHasResults = true;
+			break;
+		}
+	}
+
+	for (i=0; i< m_poaWOpp->size(); i++)
+	{
+		pWOpp = (CWOpp*)m_poaWOpp->at(i);
+		if(pWOpp->m_WingName == m_pCurWing->m_WingName)
+		{
+			bHasResults = true;
+			break;
+		}
+	}
+
+	//save a copy just in case user changes his mind (users !...)
+	CWing* pSaveWing= new CWing;
+	pSaveWing->Duplicate(m_pCurWing);
+
+
+	if(QDialog::Accepted == WingDlg.exec())
+	{
+		if(WingDlg.m_bChanged)
+		{
+			if(bHasResults)
+			{
+				QString str = "The modification will erase all results associated to this Wing.\nContinue ?";
+
+				int Ans = QMessageBox::question(this, "QFLR5", str, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+				if (Ans == QMessageBox::Cancel)
+				{
+					//restore geometry for initial wing
+					m_pCurWing->Duplicate(pSaveWing);
+					delete pSaveWing; // clean up
+					return;
+				}
+				else if(QMessageBox::No)
+				{
+					//create new wing
+					CWing* pNewWing= new CWing();
+					pNewWing->Duplicate(m_pCurWing);
+					//restore geometry for initial wing
+					m_pCurWing->Duplicate(pSaveWing);
+					delete pSaveWing; // clean up
+
+					if(!SetModWing(pNewWing))
+					{
+						delete pNewWing;
+					}
+					else //QMessageBox::Yes
+					{
+						m_pCurWing = AddWing(pNewWing);
+						pMainFrame->SetSaveState(false);
+
+					}
+					SetUFO();
+					pMainFrame->UpdateUFOs();
+					UpdateView();
+					return;
+				}
+			}
+
+			//then modifications are automatically recorded
+//			pMainFrame->DeleteWing(m_pCurWing, true);// will also set new surface and Aerochord in WPolars
+			if(m_iView==3)
+			{
+				m_bResetglGeom = true;
+				m_bResetglMesh = true;
+//				m_bResetglOpp  = true;
+			}
+			else
+			{
+				if(m_iView==2)		CreateWPolarCurves();
+				else if(m_iView==1)	CreateWOppCurves();
+				else if(m_iView==4)	CreateCpCurves();
+			}
+		}
+		SetUFO();
+		pMainFrame->UpdateWPolars();
+		SetWPlr();
+		SetScale();
+		SetWGraphScale();
+		OnAdjustToWing() ;
+		UpdateView();
+	}
+	else
+	{
+		// restore original
+		m_pCurWing->Duplicate(pSaveWing);
+		UpdateView();
+	}
+	delete pSaveWing; // clean up
+}
+
+
+
+void QMiarex::OnExportBody()
+{
+	if(!m_pCurBody) return;
+	m_pCurBody->ExportGeometry(m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
+}
+
 
 void QMiarex::OnExportCurWOpp()
 {
@@ -10618,547 +11136,6 @@ void QMiarex::OnExportCurWOpp()
 }
 
 
-
-void QMiarex::OnHalfWing()
-{
-	m_bHalfWing = m_pctrlHalfWing->isChecked();
-	if(m_iView==1)
-	{
-		SetWGraphScale();
-		Set2DScale();
-		OnAdjustToWing();
-		UpdateView();
-	}
-}
-
-
-void QMiarex::OnCpView()
-{
-	if (m_bAnimate) StopAnimate();
-
-	if(m_iView==4)
-	{
-		UpdateView();
-		return;
-	}
-
-	SetWPlrLegendPos();//TODO remove
-	m_iView=4;
-	m_pCurGraph = &m_CpGraph;
-
-	m_pctrlMiddleControls->setCurrentIndex(1);
-	m_pctrBottomControls->setCurrentIndex(0);
-
-	CreateCpCurves();
-	SetCurveParams();
-	UpdateView();
-}
-
-
-
-void QMiarex::OnCurWOppOnly()
-{
-	m_bCurWOppOnly = !m_bCurWOppOnly;
-	if(m_iView==1)
-	{
-		CreateWOppCurves();
-		UpdateView();
-	}
-}
-
-void QMiarex::OnCurveColor()
-{
-	bool bOK;
-	QRgb rgb = m_CurveColor.rgba();
-	rgb = QColorDialog::getRgba(rgb, &bOK);
-	m_CurveColor = QColor::fromRgba(rgb);
-
-	FillComboBoxes();
-
-	UpdateCurve();
-}
-
-void QMiarex::OnCurveStyle(int index)
-{
-	m_CurveStyle = index;
-	FillComboBoxes();
-	UpdateCurve();
-}
-
-void QMiarex::OnCurveWidth(int index)
-{
-	m_CurveWidth = index+1;
-	FillComboBoxes();
-	UpdateCurve();
-}
-
-void QMiarex::OnDefineGraphVariables()
-{
-	//define the variables for the current graph
-	GraphVariableDlg dlg;
-	dlg.InitDialog(2);
-
-
-	if(m_pCurGraph == &m_WPlrGraph1)
-	{
-		dlg.SetSelection(m_XW1, m_YW1);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW1 = dlg.m_XSel;
-			m_YW1 = dlg.m_YSel;
-//			dlg.GetSelection(m_XW1, m_YW1);
-			SetWGraphTitles(&m_WPlrGraph1,m_XW1, m_YW1);
-			m_WPlrGraph1.SetAuto(true);
-			m_WPlrGraph1.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph2)
-	{
-		dlg.SetSelection(m_XW2, m_YW2);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW2 = dlg.m_XSel;
-			m_YW2 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph2,m_XW2, m_YW2);
-			m_WPlrGraph2.SetAuto(true);
-			m_WPlrGraph2.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph3)
-	{
-		dlg.SetSelection(m_XW3, m_YW3);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW3 = dlg.m_XSel;
-			m_YW3 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph3,m_XW3, m_YW3);
-			m_WPlrGraph3.SetAuto(true);
-			m_WPlrGraph3.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph4)
-	{
-		dlg.SetSelection(m_XW4, m_YW4);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW4 = dlg.m_XSel;
-			m_YW4 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph4,m_XW4, m_YW4);
-			m_WPlrGraph4.SetAuto(true);
-			m_WPlrGraph4.SetAutoYMinUnit(true);
-		}
-	}
-	CreateWPolarCurves();
-	UpdateView();
-}
-
-void QMiarex::OnDefineWPolar()
-{
-	if(!m_pCurWing) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	int i,j;
-
-	CWPolar* pNewWPolar       = new CWPolar;
-	if (m_pCurPlane) pNewWPolar->m_UFOName = m_pCurPlane->m_PlaneName;
-	else             pNewWPolar->m_UFOName = m_pCurWing->m_WingName;
-	pNewWPolar->m_WArea        = m_pCurWing->m_Area;
-	pNewWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
-	pNewWPolar->m_WSpan        = m_pCurWing->m_Span;
-//	m_WngAnalysis.m_pWPolar    = pNewWPolar;
-
-	m_WngAnalysis.m_pMainFrame = m_pMainFrame;
-	m_WngAnalysis.m_pWing       = m_pCurWing;
-	m_WngAnalysis.m_pPlane      = m_pCurPlane;
-	m_WngAnalysis.m_pMainFrame  = m_pMainFrame;
-	m_WngAnalysis.m_poaWPolar   = m_poaWPolar;
-	if(m_pCurPlane)		m_WngAnalysis.m_UFOName   = m_pCurPlane->m_PlaneName;
-	else				m_WngAnalysis.m_UFOName   = m_pCurWing->m_WingName;
-	m_WngAnalysis.InitDialog();
-
-	if (m_WngAnalysis.exec() == QDialog::Accepted)
-	{
-/*		m_Ctrlm_WngAnalysis.m_QInf      = m_WngAnalysis.m_QInf;
-		m_Ctrlm_WngAnalysis.m_Weight    = m_WngAnalysis.m_Weight;
-		m_Ctrlm_WngAnalysis.m_Viscosity = m_WngAnalysis.m_Viscosity;
-		m_Ctrlm_WngAnalysis.m_Density   = m_WngAnalysis.m_Density;*/
-
-		//Then add WPolar to array
-		pNewWPolar->m_Type            = m_WngAnalysis.m_Type;
-		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
-		pNewWPolar->m_Weight          = m_WngAnalysis.m_Weight;
-		pNewWPolar->m_XCmRef          = m_WngAnalysis.m_XCmRef;
-		pNewWPolar->m_Beta            = m_WngAnalysis.m_Beta;
-		pNewWPolar->m_ASpec           = m_WngAnalysis.m_Alpha;
-		pNewWPolar->m_PlrName         = m_WngAnalysis.m_WPolarName;
-		pNewWPolar->m_Density         = m_WngAnalysis.m_Density;
-		pNewWPolar->m_Viscosity       = m_WngAnalysis.m_Viscosity;
-		pNewWPolar->m_bVLM1           = m_WngAnalysis.m_bVLM1;
-		pNewWPolar->m_bTiltedGeom     = m_WngAnalysis.m_bTiltedGeom;
-		pNewWPolar->m_bWakeRollUp     = m_WngAnalysis.m_bWakeRollUp;
-		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
-		pNewWPolar->m_AnalysisType    = m_WngAnalysis.m_AnalysisType;
-		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
-		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
-		pNewWPolar->m_Height          = m_WngAnalysis.m_Height;
-		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
-		pNewWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
-		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
-
-		pNewWPolar->m_bPolar       = true;
-
-		pNewWPolar->m_Color = pMainFrame->GetColor(4);
-		CWPolar *pWPolar;
-		bool bFound;
-		for(i=0; i<30;i++)
-		{
-			bFound = false;
-			for (j=0; j<m_poaWPolar->size();j++)
-			{
-				pWPolar = (CWPolar*)m_poaWPolar->at(j);
-				if(pWPolar->m_Color == pMainFrame->m_crColors[i]) bFound = true;
-			}
-			if(!bFound)
-			{
-				pNewWPolar->m_Color = pMainFrame->m_crColors[i];
-				break;
-			}
-		}
-		pNewWPolar->m_bIsVisible = true;
-
-		pWPolar = GetWPolar(pNewWPolar->m_PlrName);
-		pMainFrame->SetSaveState(false);
-		if(pWPolar)
-		{
-			delete pNewWPolar;
-			m_pCurWPolar = pWPolar;
-		}
-		else
-		{
-			m_pCurWPolar = AddWPolar(pNewWPolar);
-		}
-		m_pCurPOpp = NULL;
-		m_pCurWOpp = NULL;
-
-		m_bResetglGeom = true;
-		m_bResetglMesh = true;
-		m_bResetglOpp  = true;
-		m_bResetglWake = true;
-
-		pMainFrame->UpdateWPolars();
-		SetWPlr();
-		UpdateView();
-		m_pctrlAnalyze->setFocus();
-	}
-	else
-	{
-		delete pNewWPolar;
-	}
-
-}
-
-
-void QMiarex::OnDeleteCurUFO()
-{
-	//Delete the currently selected wing, if any
-	if(!m_pCurWing) return;
-	m_bAnimate = false;
-
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString strong;
-	if(m_pCurPlane)	strong = "Are you sure you want to delete the plane :\n" +  m_pCurPlane->m_PlaneName +"?\n";
-	else 	        strong = "Are you sure you want to delete the wing :\n" +   m_pCurWing->m_WingName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
-
-
-	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
-	else            pMainFrame->DeleteWing(m_pCurWing, false);
-
-	pMainFrame->UpdateUFOs();
-	SetUFO();
-	CreateWPolarCurves();
-
-	UpdateView();
-}
-
-void QMiarex::OnDeleteCurWOpp()
-{
-	//Deletes the currently selected WOpp or POpp
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	int i;
-	if(m_pCurPOpp)
-	{
-		CPOpp* pPOpp;
-		for (i = m_poaPOpp->size()-1; i>=0; i--)
-		{
-			pPOpp = (CPOpp*)m_poaPOpp->at(i);
-			if(pPOpp == m_pCurPOpp)
-			{
-				m_poaPOpp->removeAt(i);
-				delete pPOpp;
-				break;
-			}
-		}
-		m_pCurPOpp = NULL;
-		m_pCurWOpp = NULL;
-		pMainFrame->UpdateWOpps();
-		SetWOpp(true);
-		pMainFrame->SetSaveState(false);
-		if (m_iView==1)     CreateWOppCurves();
-		else if(m_iView==4)	CreateCpCurves();
-
-		UpdateView();
-	}
-
-	else if(m_pCurWOpp)
-	{
-		CWOpp* pWOpp;
-		for (i = m_poaWOpp->size()-1; i>=0; i--)
-		{
-			pWOpp = (CWOpp*)m_poaWOpp->at(i);
-			if(pWOpp == m_pCurWOpp)
-			{
-				m_poaWOpp->removeAt(i);
-				delete pWOpp;
-				m_pCurWOpp = NULL;
-				break;
-			}
-		}
-		pMainFrame->UpdateWOpps();
-		SetWOpp(true);
-		if(pMainFrame->m_pctrlWOpp->count())
-		{
-			QString strong;
-			double x;
-			pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
-			strong = pMainFrame->m_pctrlWOpp->itemText(0);
-			bool bRes;
-			x = strong.toDouble(&bRes);
-			if(bRes)
-			{
-				m_pCurWOpp = GetWOpp(x);
-			}
-			else m_pCurWOpp = NULL;
-		}
-		else
-		{
-			m_pCurWOpp = NULL;
-		}
-		pMainFrame->SetSaveState(false);
-		if (m_iView==1)     CreateWOppCurves();
-		else if(m_iView==4)	CreateCpCurves();
-
-		UpdateView();
-	}
-}
-
-void QMiarex::OnDeleteCurWPolar()
-{
-	//delete the current WPolar
-	if(!m_pCurWPolar) return;
-	m_bAnimate = false;
-	int i;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	QString strong, UFOName;
-
-	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
-	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
-	else return;
-
-	strong = "Are you sure you want to delete the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
-
-	//first remove all WOpps associated to the Wing Polar
-	CWOpp * pWOpp;
-	for (i=m_poaWOpp->size()-1; i>=0; i--)
-	{
-		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if (pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pWOpp->m_WingName == UFOName)
-		{
-			m_poaWOpp->removeAt(i);
-			delete pWOpp;
-		}
-	}
-	//next remove all the POpps associated to the Wing Polar
-	CPOpp * pPOpp;
-	for (i=m_poaPOpp->size()-1; i>=0; i--)
-	{
-		pPOpp = (CPOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pPOpp->m_PlaneName == UFOName)
-		{
-			m_poaPOpp->removeAt(i);
-			delete pPOpp;
-		}
-	}
-	//next remove the WPolar
-	CWPolar* pWPolar;
-	for (i=(int)m_poaWPolar->size()-1;i>=0; i--)
-	{
-		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		if (pWPolar == m_pCurWPolar)
-		{
-			m_poaWPolar->removeAt(i);
-			delete pWPolar;
-			break;
-		}
-	}
-	m_pCurPOpp = NULL;
-	m_pCurWOpp = NULL;
-	m_pCurWPolar = NULL;
-	pMainFrame->SetSaveState(false);
-	pMainFrame->UpdateWPolars();
-	SetWPlr();
-	UpdateView();
-}
-
-
-void QMiarex::OnEditCurBody()
-{
-	if(!m_pCurBody) return;
-
-	CBody memBody;
-	memBody.Duplicate(m_pCurBody);
-	m_GL3dBody.SetBody(m_pCurBody);
-	m_GL3dBody.m_bEnableName = false;
-
-	if(m_GL3dBody.exec() == QDialog::Accepted)
-	{
-//		SetModBody(pBody);
-//		pMainFrame->SetSaveState(false);
-	}
-	else m_pCurBody->Duplicate(&memBody);
-}
-
-void QMiarex::OnEditUFO()
-{
-	//Edit the currently selected wing
-	if(!m_pCurWing)	return;
-	if(m_iView==5) return;
-
-	if(m_pCurPlane)
-	{
-		EditPlane(m_pCurPlane);
-		return;
-	}
-
-	int i;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	CWPolar *pWPolar;
-	CWOpp* pWOpp;
-	WingDlg WingDlg;
-	WingDlg.m_pWing = m_pCurWing;
-	WingDlg.m_bAcceptName= false;
-	WingDlg.InitDialog();
-
-	bool bHasResults = false;
-	for (i=0; i< m_poaWPolar->size(); i++)
-	{
-		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		if (pWPolar->m_Alpha.size() && pWPolar->m_UFOName == m_pCurWing->m_WingName)
-		{
-			bHasResults = true;
-			break;
-		}
-	}
-
-	for (i=0; i< m_poaWOpp->size(); i++)
-	{
-		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if(pWOpp->m_WingName == m_pCurWing->m_WingName)
-		{
-			bHasResults = true;
-			break;
-		}
-	}
-
-	//save a copy just in case user changes his mind (users !...)
-	CWing* pSaveWing= new CWing;
-	pSaveWing->Duplicate(m_pCurWing);
-
-
-	if(QDialog::Accepted == WingDlg.exec())
-	{
-		if(WingDlg.m_bChanged)
-		{
-			if(bHasResults)
-			{
-				QString str = "The modification will erase all results associated to this Wing.\nContinue ?";
-
-				int Ans = QMessageBox::question(this, "QFLR5", str, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-				if (Ans == QMessageBox::Cancel)
-				{
-					//restore geometry for initial wing
-					m_pCurWing->Duplicate(pSaveWing);
-					delete pSaveWing; // clean up
-					return;
-				}
-				else if(QMessageBox::No)
-				{
-					//create new wing
-					CWing* pNewWing= new CWing();
-					pNewWing->Duplicate(m_pCurWing);
-					//restore geometry for initial wing
-					m_pCurWing->Duplicate(pSaveWing);
-					delete pSaveWing; // clean up
-
-					if(!SetModWing(pNewWing))
-					{
-						delete pNewWing;
-					}
-					else //QMessageBox::Yes
-					{
-						m_pCurWing = AddWing(pNewWing);
-						pMainFrame->SetSaveState(false);
-
-					}
-					SetUFO();
-					pMainFrame->UpdateUFOs();
-					UpdateView();
-					return;
-				}
-			}
-
-			//then modifications are automatically recorded
-//			pMainFrame->DeleteWing(m_pCurWing, true);// will also set new surface and Aerochord in WPolars
-			if(m_iView==3)
-			{
-				m_bResetglGeom = true;
-				m_bResetglMesh = true;
-//				m_bResetglOpp  = true;
-			}
-			else
-			{
-				if(m_iView==2)		CreateWPolarCurves();
-				else if(m_iView==1)	CreateWOppCurves();
-				else if(m_iView==4)	CreateCpCurves();
-			}
-		}
-		SetUFO();
-		pMainFrame->UpdateWPolars();
-		SetWPlr();
-		SetScale();
-		SetWGraphScale();
-		OnAdjustToWing() ;
-		UpdateView();
-	}
-	else
-	{
-		// restore original
-		m_pCurWing->Duplicate(pSaveWing);
-		UpdateView();
-	}
-	delete pSaveWing; // clean up
-}
-
-
-
-void QMiarex::OnExportBody()
-{
-	if(!m_pCurBody) return;
-	m_pCurBody->ExportGeometry(m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
-}
-
-
 void QMiarex::OnFourWingGraphs()
 {
 	//The user has requested four wing graphs
@@ -11181,6 +11158,29 @@ void QMiarex::OnFourWPlrGraphs()
 	SetWPlrLegendPos();
 	UpdateView();
 }
+
+
+void QMiarex::OnGL3DScale()
+{
+	if(m_iView != 3) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
+	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
+}
+
+
+void QMiarex::OnHalfWing()
+{
+	m_bHalfWing = m_pctrlHalfWing->isChecked();
+	if(m_iView==1)
+	{
+		SetWGraphScale();
+		Set2DScale();
+		OnAdjustToWing();
+		UpdateView();
+	}
+}
+
 
 
 void QMiarex::OnHideAllWPolars()
@@ -11707,7 +11707,6 @@ void QMiarex::OnShowLift()
 	{
 		if(!m_bAnimate) UpdateView();
 	}
-
 }
 
 
@@ -11952,6 +11951,28 @@ void QMiarex::OnStreamlines()
 	if(m_iView==3) UpdateView();
 }
 
+void QMiarex::OnSurfaces()
+{
+	m_bSurfaces = m_pctrlSurfaces->isChecked();
+	UpdateView();
+}
+
+
+void QMiarex::OnSetupLight()
+{
+	m_bShowLight = true;
+	UpdateView();
+	m_GLLightDlg.m_pMiarex = this;
+	m_GLLightDlg.exec();
+
+	m_bShowLight = false;
+
+	GLSetupLight();
+	UpdateView();
+}
+
+
+
 
 void QMiarex::OnTwoWingGraphs()
 {
@@ -11971,6 +11992,13 @@ void QMiarex::OnVelocityScale(int pos)
 	m_bResetglDownwash = true;
 	UpdateView();
 }
+
+void QMiarex::OnVortices()
+{
+	m_bVortices = m_pctrlVortices->isChecked();
+	UpdateView();
+}
+
 
 void QMiarex::OnWOpps()
 {
@@ -13291,6 +13319,8 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlMoment->setChecked(m_bMoments);
 	m_pctrlTrans->setChecked(m_bXTop);
 	m_pctrlLift->setChecked(m_bXCP);
+	m_pctrlIDrag->setChecked(m_bICd);
+	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlLight->setChecked(m_bglLight);
 	m_pctrlSurfaces->setChecked(m_bSurfaces);
@@ -14116,12 +14146,10 @@ void QMiarex::SetUFO(QString UFOName)
 	if(m_pCurBody)
 	{
 		m_bResetglBody   = true;
-		m_bResetglBody2D = true;
 	}
 	else
 	{
 		m_bResetglBody   = false;
-		m_bResetglBody2D = false;
 	}
 
 	m_bResetglMesh = true;

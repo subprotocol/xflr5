@@ -47,7 +47,7 @@ PlaneDlg::PlaneDlg()
 	m_bChanged      = false;
 	SetupLayout();
 
-	connect(m_pctrlBiplane, SIGNAL(stateChanged(int)), this, SLOT(OnBiplane(int)));
+	connect(m_pctrlBiplane, SIGNAL(clicked()), this, SLOT(OnBiplane()));
 	connect(m_pctrlStabCheck,     SIGNAL(stateChanged(int)), this, SLOT(OnStab(int)));
 	connect(m_pctrlFinCheck,     SIGNAL(stateChanged(int)), this, SLOT(OnFin(int)));
 
@@ -62,11 +62,12 @@ PlaneDlg::PlaneDlg()
 	connect(m_pctrlExportWing2, SIGNAL(clicked()), this, SLOT(OnExportWing2()));
 	connect(m_pctrlDefineStab, SIGNAL(clicked()), this, SLOT(OnDefineStab()));
 	connect(m_pctrlDefineFin, SIGNAL(clicked()), this, SLOT(OnDefineFin()));
+	connect(m_pctrlEditBody, SIGNAL(clicked()), this, SLOT(OnEditBody()));
 
 	connect(OKButton,     SIGNAL(clicked()), this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-	connect(m_pctrlBody, SIGNAL(stateChanged(int)), this, SLOT(OnBodyCheck(int)));
+	connect(m_pctrlBody, SIGNAL(clicked()), this, SLOT(OnBodyCheck()));
 	connect(m_pctrlBodyList,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeBodyList(int)));
 
 	connect(m_pctrlXLEStab,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
@@ -87,8 +88,8 @@ void PlaneDlg::ComputePlane(void)
 	if(m_pPlane->m_bStab)
 	{
 		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0;
-		double area = m_pPlane->m_Wing.m_Area;
-		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_Area;
+		double area = m_pPlane->m_Wing.m_ProjectedArea;
+		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
 		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++)
@@ -156,7 +157,7 @@ void PlaneDlg::InitDialog()
 }
 
 
-void PlaneDlg::OnBiplane(int state)
+void PlaneDlg::OnBiplane()
 {
 	if(m_pctrlBiplane->isChecked()) m_pPlane->m_bBiplane = true; else m_pPlane->m_bBiplane = false;
 	if(m_pPlane->m_bBiplane)
@@ -181,7 +182,7 @@ void PlaneDlg::OnBiplane(int state)
 
 
 
-void PlaneDlg::OnBodyCheck(int state)
+void PlaneDlg::OnBodyCheck()
 {
 	m_bChanged = true;
 	if(m_pctrlBody->isChecked())
@@ -191,6 +192,7 @@ void PlaneDlg::OnBodyCheck(int state)
 			m_pctrlBodyList->setEnabled(true);
 			m_pctrlXBody->setEnabled(true);
 			m_pctrlZBody->setEnabled(true);
+			m_pctrlEditBody->setEnabled(true);
 			m_pPlane->m_bBody=true;
 
 			OnSelChangeBodyList();
@@ -201,6 +203,7 @@ void PlaneDlg::OnBodyCheck(int state)
 			m_pctrlBodyList->setEnabled(false);
 			m_pctrlXBody->setEnabled(false);
 			m_pctrlZBody->setEnabled(false);
+			m_pctrlEditBody->setEnabled(false);
 		}
 	}
 	else
@@ -209,6 +212,7 @@ void PlaneDlg::OnBodyCheck(int state)
 		m_pctrlBodyList->setEnabled(false);
 		m_pctrlXBody->setEnabled(false);
 		m_pctrlZBody->setEnabled(false);
+		m_pctrlEditBody->setEnabled(false);
 	}
 	SetResults();
 }
@@ -306,6 +310,29 @@ void PlaneDlg::OnDoubleFin(int state)
 	}
 	m_bChanged = true;
 	SetResults();
+}
+
+
+void PlaneDlg::OnEditBody()
+{
+	if(!m_pPlane->m_pBody) return;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	CBody memBody;
+	memBody.Duplicate(m_pPlane->m_pBody);
+	pMiarex->m_GL3dBody.SetBody(m_pPlane->m_pBody);
+	pMiarex->m_GL3dBody.m_bEnableName = false;
+
+	if(pMiarex->m_GL3dBody.exec() == QDialog::Accepted)
+	{
+		pMiarex->m_bResetglBody = true;
+		pMiarex->m_bResetglBodyMesh = true;
+		pMiarex->m_bResetglGeom = true;
+		pMiarex->m_bResetglMesh = true;
+		pMainFrame->SetSaveState(false);
+	}
+	else m_pPlane->m_pBody->Duplicate(&memBody);
 }
 
 
@@ -612,11 +639,12 @@ void PlaneDlg::SetParams()
 	}
 	else
 	{
-		if(m_pctrlBodyList->count())	m_pctrlBodyList->setCurrentIndex(0);
-		else						m_pctrlBody->setEnabled(false);
+		if(m_pctrlBodyList->count()) m_pctrlBodyList->setCurrentIndex(0);
+		else						 m_pctrlBody->setEnabled(false);
 		m_pctrlBodyList->setEnabled(false);
 		m_pctrlXBody->setEnabled(false);
 		m_pctrlZBody->setEnabled(false);
+		m_pctrlEditBody->setEnabled(false);
 	}
 
 	m_pctrlPlaneName->setText(m_pPlane->m_PlaneName);
@@ -638,9 +666,7 @@ void PlaneDlg::SetParams()
 	m_pctrlZBody->SetValue(m_pPlane->m_BodyPos.z * pMainFrame->m_mtoUnit);
 
 	m_pctrlBiplane->setChecked(m_pPlane->m_bBiplane);
-	int state;
-	if(m_pPlane->m_bBiplane) state =1; else state = 0;
-	OnBiplane(state);
+	OnBiplane();
 
 	m_pctrlXLEFin->SetValue(m_pPlane->m_LEFin.x* pMainFrame->m_mtoUnit);
 	m_pctrlYLEFin->SetValue(m_pPlane->m_LEFin.y* pMainFrame->m_mtoUnit);
@@ -878,9 +904,11 @@ void PlaneDlg::SetupLayout()
 
 	QHBoxLayout *BodyName = new QHBoxLayout;
 	m_pctrlBody = new QCheckBox("Body");
+	m_pctrlEditBody = new QPushButton("Edit...");
 	m_pctrlBodyList = new QComboBox;
 	BodyName->addWidget(m_pctrlBody);
 	BodyName->addWidget(m_pctrlBodyList);
+	BodyName->addWidget(m_pctrlEditBody);
 	m_pctrlBodyList->setMinimumWidth(250);
 	BodyName->addStretch(1);
 	QHBoxLayout *BodyPos = new QHBoxLayout;

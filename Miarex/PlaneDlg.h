@@ -45,7 +45,7 @@ private slots:
 	void OnOK();
 	void OnFin(int state);
 	void OnStab(int state);
-	void OnBodyCheck(int state);
+	void OnBodyCheck();
 	void OnDefineWing();
 	void OnDefineFin();
 	void OnDefineStab();
@@ -55,10 +55,11 @@ private slots:
 	void OnSymFin(int state);
 	void OnDoubleFin(int state);
 	void OnExportWing();
-	void OnBiplane(int state);
+	void OnBiplane();
 	void OnDefineWing2();
 	void OnImportWing2();
 	void OnExportWing2();
+	void OnEditBody();
 	void OnSelChangeBodyList(int pos = 0);
 
 private:
@@ -74,7 +75,6 @@ private:
 
 	static void * s_pMiarex;
 	static void * s_pMainFrame;
-	CBody *m_pBody;
 	CPlane * m_pPlane;
 	bool m_bChanged;
 	bool m_bAcceptName;
@@ -139,7 +139,7 @@ private:
 	QPushButton	*m_pctrlDefineFin;
 	QPushButton	*m_pctrlVTail;
 	QPushButton	*m_pctrlDefineStab;
-	QPushButton	*m_pctrlCheckPanels;
+	QPushButton *m_pctrlEditBody;
 	QPushButton *OKButton;
 	QPushButton *CancelButton;
 

@@ -123,8 +123,6 @@ bool VLMAnalysisDlg::AlphaLoop()
 
 	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -fabs(m_AlphaDelta);
 	nrhs  = (int)fabs((m_AlphaMax-m_AlphaMin)*1.0001/m_AlphaDelta) + 1;
-//qDebug() << "AlphaLoop "<< m_AlphaMin  << m_AlphaMax << m_AlphaDelta << nrhs << m_bSequence;
-//qDebug() << m_pWPolar << m_pWPolar->m_Weight<<m_pWPolar->m_Density << m_pWPolar->m_Viscosity << m_pWPolar->m_QInf;
 
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
@@ -1320,7 +1318,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			AddString("         Calculating Trefftz plane...\r\n");
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 			AddString("         Calculating Aero Forces...\r\n");
-			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 
 			AddString("         Calculating Bending...\r\n");
 			m_pWing->VLMSetBending();
@@ -1343,7 +1341,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
 										m_Cp+m_pWing->m_MatSize,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				IDrag += WingIDrag;
 
 				m_pWing2->VLMSetBending();
@@ -1367,7 +1365,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				IDrag += WingIDrag;
 
 				m_pStab->VLMSetBending();
@@ -1391,7 +1389,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 				if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
 				IDrag += WingIDrag;

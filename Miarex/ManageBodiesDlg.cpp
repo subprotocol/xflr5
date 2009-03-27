@@ -43,12 +43,14 @@ ManageBodiesDlg::ManageBodiesDlg()
 void ManageBodiesDlg::SetupLayout()
 {
 	m_pctrlNameList = new QListWidget;
+	m_pctrlNew = new QPushButton("New");
 	m_pctrlEdit = new QPushButton("Edit");
 	m_pctrlRename = new QPushButton("Rename");
 	m_pctrlDelete = new QPushButton("Delete");
 	m_pctrlDuplicate = new QPushButton("Duplicate");
 	QPushButton * CloseButton = new QPushButton("Close");
 	QVBoxLayout *ButtonsLayout = new QVBoxLayout;
+	ButtonsLayout->addWidget(m_pctrlNew);
 	ButtonsLayout->addWidget(m_pctrlEdit);
 	ButtonsLayout->addWidget(m_pctrlRename);
 	ButtonsLayout->addWidget(m_pctrlDelete);

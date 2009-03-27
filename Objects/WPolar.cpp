@@ -53,6 +53,7 @@ CWPolar::CWPolar()
 
 	m_AnalysisType = 0;
 	m_Type   = 1;
+	m_RefAreaType = 1;
 	m_Style  = 0;
 	m_Width  = 1;
 	m_Color  = 255;//red
@@ -902,8 +903,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 	{
 		//write variables
 		
-		ar << 1015; // identifies the format of the file
-					// 1015 : added lateral force coefficient 
+		ar << 1016; // identifies the format of the file
+					// 1016 : added lateral force coefficient
+					// 1015 : added lateral force coefficient
 					// 1014 : added control results
 					// 1013 : added control variables
 					// 1012 : redefined the moment coefficients
@@ -942,7 +944,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 		ar << (float)m_ASpec ;
 		ar << (float)m_Beta ;
 		ar << (float)m_XCmRef;
-		ar <<(float)m_Density << (float)m_Viscosity;
+		ar <<( float)m_Density << (float)m_Viscosity;
+
+		ar << m_RefAreaType;
 
 		ar <<(int)m_Alpha.size();
 		for (i=0; i< (int)m_Alpha.size(); i++)
@@ -1134,6 +1138,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
+
+		if(ArchiveFormat>1016) ar >> m_RefAreaType;
+		else                   m_RefAreaType = 1;
 
 		ar >> n;
 		if (n<0 || n> 100000){

@@ -1070,14 +1070,6 @@ void WingDlg::mouseReleaseEvent(QMouseEvent *event)
 
 void WingDlg::OnCellChanged(QWidget *pWidget)
 {
-/*	if(m_iSection>m_pWing->m_NPanel)
-	{
-		//the user has filled a cell in the last line
-		//so add an item before reading
-		m_pWing->m_NPanel++;
-		m_pWingModel->setRowCount(m_pWing->m_NPanel+2);
-		FillTableRow(m_pWing->m_NPanel);
-	}*/
 	ReadSectionData(m_iSection);
 	
 	repaint();
@@ -1424,9 +1416,7 @@ void WingDlg::ReadParams()
 	m_pWing->m_WingName = m_pctrlWingName->text();
 	ReadSectionData(m_iSection);
 
-	//Update Geometry
-//	Convert(false);// retrieve the data
-	//
+
 }
 
 void WingDlg::ReadSectionData(int sel)
@@ -1505,8 +1495,7 @@ void WingDlg::ReadSectionData(int sel)
 	else if(strong=="-Sine")	m_pWing->m_YPanelDist[sel] = -2;
 
 	//Update Geometry
-//	Convert(false);// retrieve the data
-	//
+	m_pWing->ComputeGeometry();
 }
 
 
@@ -1561,106 +1550,125 @@ void WingDlg::SetupLayout()
 	m_pctrlLength2 = new QLabel("mm");
 	m_pctrlLength3 = new QLabel("mm");
 	m_pctrlLength4 = new QLabel("mm");
-	m_pctrlAreaUnit = new QLabel("mm2");
+	m_pctrlLength5 = new QLabel("mm");
+	m_pctrlAreaUnit   = new QLabel("mm2");
+	m_pctrlAreaUnit2  = new QLabel("mm2");
 	m_pctrlVolumeUnit = new QLabel("mm3");
 	m_pctrlLength1->setAlignment(Qt::AlignLeft);
 	m_pctrlLength2->setAlignment(Qt::AlignLeft);
 	m_pctrlLength3->setAlignment(Qt::AlignLeft);
 	m_pctrlLength4->setAlignment(Qt::AlignLeft);
+	m_pctrlLength5->setAlignment(Qt::AlignLeft);
 	m_pctrlAreaUnit->setAlignment(Qt::AlignLeft);
+	m_pctrlAreaUnit2->setAlignment(Qt::AlignLeft);
 	m_pctrlVolumeUnit->setAlignment(Qt::AlignLeft);
 
 	QGridLayout *DataLayout = new QGridLayout;
 
 	QLabel *lab1 = new QLabel("Wing Span");
 	QLabel *lab2 = new QLabel("Area");
+	QLabel *lab100 = new QLabel("Projected Span");
+	QLabel *lab200 = new QLabel("Projected Area");
 	QLabel *lab3 = new QLabel("Volume");
-	QLabel *lab4 = new QLabel("Mean Geom. Chord");
-	QLabel *lab5 = new QLabel("Mean Aero Chord");
-	QLabel *lab6 = new QLabel("Total VLM Panels");
+	QLabel *lab4 = new QLabel("Total VLM Panels");
+	QLabel *lab12 = new QLabel("Number of 3D Panels");
 	lab1->setAlignment(Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignRight);
+	lab100->setAlignment(Qt::AlignRight);
+	lab200->setAlignment(Qt::AlignRight);
 	lab3->setAlignment(Qt::AlignRight);
 	lab4->setAlignment(Qt::AlignRight);
-	lab5->setAlignment(Qt::AlignRight);
-	lab6->setAlignment(Qt::AlignRight);
+	lab12->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(lab1,1,1);
 	DataLayout->addWidget(lab2,2,1);
-	DataLayout->addWidget(lab3,3,1);
-	DataLayout->addWidget(lab4,4,1);
-	DataLayout->addWidget(lab5,5,1);
-	DataLayout->addWidget(lab6,6,1);
+	DataLayout->addWidget(lab100,3,1);
+	DataLayout->addWidget(lab200,4,1);
+	DataLayout->addWidget(lab3,5,1);
+	DataLayout->addWidget(lab4,6,1);
+	DataLayout->addWidget(lab12,7,1);
 	m_pctrlWingSpan   = new QLabel("2000.00");
 	m_pctrlWingArea   = new QLabel("30.0");
+	m_pctrlProjectedArea = new QLabel("25.0");
+	m_pctrlProjectedSpan = new QLabel("1900.0");;
 	m_pctrlWingVolume = new QLabel("000.0e+03");
-	m_pctrlMAC        = new QLabel("150.0");
-	m_pctrlGeomChord  = new QLabel("170.0");
 	m_pctrlVLMPanels  = new QLabel("500");
+	m_pctrl3DPanels  = new QLabel("1000");
 	m_pctrlWingSpan->setAlignment(Qt::AlignRight);
 	m_pctrlWingArea->setAlignment(Qt::AlignRight);
+	m_pctrlProjectedSpan->setAlignment(Qt::AlignRight);
+	m_pctrlProjectedArea->setAlignment(Qt::AlignRight);
 	m_pctrlWingVolume->setAlignment(Qt::AlignRight);
-	m_pctrlMAC->setAlignment(Qt::AlignRight);
-	m_pctrlGeomChord->setAlignment(Qt::AlignRight);
 	m_pctrlVLMPanels->setAlignment(Qt::AlignRight);
+	m_pctrl3DPanels->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(m_pctrlWingSpan,   1,2);
 	DataLayout->addWidget(m_pctrlWingArea,   2,2);
-	DataLayout->addWidget(m_pctrlWingVolume, 3,2);
-	DataLayout->addWidget(m_pctrlMAC,        4,2);
-	DataLayout->addWidget(m_pctrlGeomChord,  5,2);
+	DataLayout->addWidget(m_pctrlProjectedSpan,   3,2);
+	DataLayout->addWidget(m_pctrlProjectedArea,   4,2);
+	DataLayout->addWidget(m_pctrlWingVolume, 5,2);
 	DataLayout->addWidget(m_pctrlVLMPanels,  6,2);
+	DataLayout->addWidget(m_pctrl3DPanels,    7,2);
 
 	DataLayout->addWidget(m_pctrlLength1,1,3);
 	DataLayout->addWidget(m_pctrlAreaUnit,2,3);
-	DataLayout->addWidget(m_pctrlVolumeUnit,3,3);
-	DataLayout->addWidget(m_pctrlLength2,4,3);
-	DataLayout->addWidget(m_pctrlLength3,5,3);
+	DataLayout->addWidget(m_pctrlLength2,3,3);
+	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
+	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
 	QLabel *lab13 = new QLabel("Max is 1000");
 	lab13->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab13 ,6,3);
-
+	QLabel *lab15 = new QLabel("Max is 2000");
+	lab15->setAlignment(Qt::AlignLeft);
+	DataLayout->addWidget(lab15, 7, 3);
+	QLabel *lab5 = new QLabel("Mean Geom. Chord");
+	QLabel *lab6 = new QLabel("Mean Aero Chord");
 	QLabel *lab7 = new QLabel("MAC Span Pos");
 	QLabel *lab8 = new QLabel("Aspect ratio");
 	QLabel *lab9 = new QLabel("Taper Ratio");
 	QLabel *lab10 = new QLabel("Root to Tip Sweep");
 	QLabel *lab11 = new QLabel("Number of Flaps");
-	QLabel *lab12 = new QLabel("Number of 3D Panels");
+	lab5->setAlignment(Qt::AlignRight);
+	lab6->setAlignment(Qt::AlignRight);
 	lab7->setAlignment(Qt::AlignRight);
 	lab8->setAlignment(Qt::AlignRight);
 	lab9->setAlignment(Qt::AlignRight);
 	lab10->setAlignment(Qt::AlignRight);
 	lab11->setAlignment(Qt::AlignRight);
-	lab12->setAlignment(Qt::AlignRight);
-	DataLayout->addWidget(lab7,1,5);
-	DataLayout->addWidget(lab8,2,5);
-	DataLayout->addWidget(lab9,3,5);
-	DataLayout->addWidget(lab10,4,5);
-	DataLayout->addWidget(lab11,5,5);
-	DataLayout->addWidget(lab12,6,5);
+	DataLayout->addWidget(lab5,1,5);
+	DataLayout->addWidget(lab6,2,5);
+	DataLayout->addWidget(lab7,3,5);
+	DataLayout->addWidget(lab8,4,5);
+	DataLayout->addWidget(lab9,5,5);
+	DataLayout->addWidget(lab10,6,5);
+	DataLayout->addWidget(lab11,7,5);
+
+	m_pctrlMAC        = new QLabel("150.0");
+	m_pctrlGeomChord  = new QLabel("170.0");
 	m_pctrlMACSpanPos   = new QLabel("466.00");
 	m_pctrlAspectRatio   = new QLabel("13.33");
 	m_pctrlTaperRatio = new QLabel("1.50");
 	m_pctrlSweep        = new QLabel("2.58");
 	m_pctrlNFlaps  = new QLabel("0");
-	m_pctrl3DPanels  = new QLabel("1000");
+	m_pctrlMAC->setAlignment(Qt::AlignRight);
+	m_pctrlGeomChord->setAlignment(Qt::AlignRight);
 	m_pctrlMACSpanPos->setAlignment(Qt::AlignRight);
 	m_pctrlAspectRatio->setAlignment(Qt::AlignRight);
 	m_pctrlTaperRatio->setAlignment(Qt::AlignRight);
 	m_pctrlSweep->setAlignment(Qt::AlignRight);
 	m_pctrlNFlaps->setAlignment(Qt::AlignRight);
-	m_pctrl3DPanels->setAlignment(Qt::AlignRight);
-	DataLayout->addWidget(m_pctrlMACSpanPos,  1,6);
-	DataLayout->addWidget(m_pctrlAspectRatio, 2,6);
-	DataLayout->addWidget(m_pctrlTaperRatio,  3,6);
-	DataLayout->addWidget(m_pctrlSweep,       4,6);
-	DataLayout->addWidget(m_pctrlNFlaps,      5,6);
-	DataLayout->addWidget(m_pctrl3DPanels,    6,6);
-	DataLayout->addWidget(m_pctrlLength4, 1, 7);
+	DataLayout->addWidget(m_pctrlMAC,        1,6);
+	DataLayout->addWidget(m_pctrlGeomChord,  2,6);
+	DataLayout->addWidget(m_pctrlMACSpanPos,  3,6);
+	DataLayout->addWidget(m_pctrlAspectRatio, 4,6);
+	DataLayout->addWidget(m_pctrlTaperRatio,  5,6);
+	DataLayout->addWidget(m_pctrlSweep,       6,6);
+	DataLayout->addWidget(m_pctrlNFlaps,      7,6);
+	DataLayout->addWidget(m_pctrlLength3, 1, 7);
+	DataLayout->addWidget(m_pctrlLength4, 2, 7);
+	DataLayout->addWidget(m_pctrlLength5, 3, 7);
 	QLabel *lab14 = new QLabel("deg");
 	lab14->setAlignment(Qt::AlignLeft);
-	DataLayout->addWidget(lab14, 4, 7);
-	QLabel *lab15 = new QLabel("(Max is 2000)");
-	lab15->setAlignment(Qt::AlignLeft);
-	DataLayout->addWidget(lab15, 6, 7);
+	DataLayout->addWidget(lab14, 6, 7);
+
 
 	m_pctrlWingTable = new QTableView(this);
 	m_pctrlWingTable->setMinimumWidth(800);
@@ -1704,14 +1712,20 @@ void WingDlg::SetWingData()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str;
 
-	str = QString("%1").arg(m_pWing->m_Area*pMainFrame->m_m2toUnit,7,'f',2);
-	m_pctrlWingArea->setText(str);
-
 	str = QString("%1").arg(m_pWing->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
 	m_pctrlWingVolume->setText(str);
 
+	str = QString("%1").arg(m_pWing->m_Area*pMainFrame->m_m2toUnit,7,'f',2);
+	m_pctrlWingArea->setText(str);
+
 	str = QString("%1").arg(m_pWing->m_Span*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
+
+	str = QString("%1").arg(m_pWing->m_ProjectedArea*pMainFrame->m_m2toUnit,7,'f',2);
+	m_pctrlProjectedArea->setText(str);
+
+	str = QString("%1").arg(m_pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,5,'f',2);
+	m_pctrlProjectedSpan->setText(str);
 
 	str = QString("%1").arg(m_pWing->m_GChord*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlGeomChord->setText(str);

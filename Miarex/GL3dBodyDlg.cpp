@@ -459,7 +459,7 @@ void GL3dBodyDlg::GLCreateMesh()
 }
 
 
-void GL3dBodyDlg::GLCreateBodyBezier()
+void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 {
 	int i,j,l;
 	l=0;
@@ -473,17 +473,17 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 	GLfloat rightpts[MAXBODYFRAMES*30*3];
 	GLfloat leftpts[MAXBODYFRAMES*30*3];
 
-	if(!m_pBody)
+	if(!pBody)
 		return;
 
-	for(i=0;i<m_pBody->m_NStations; i++)
+	for(i=0;i<pBody->m_NStations; i++)
 	{
-		pFrame = m_pBody->m_Frame+i;
+		pFrame = pBody->m_Frame+i;
 		for(j=0;j<pFrame->m_NPoints; j++)
 		{
-//			if(pFrame->m_NPoints != m_pBody->m_NSideLines) ASSERT(FALSE);
+//			if(pFrame->m_NPoints != pBody->m_NSideLines) ASSERT(FALSE);
 
-			rightpts[l+0]= (GLfloat)(m_pBody->m_FramePosition[i].x);
+			rightpts[l+0]= (GLfloat)(pBody->m_FramePosition[i].x);
 			rightpts[l+1]= (GLfloat)pFrame->m_Point[j].y;
 			rightpts[l+2]= (GLfloat)pFrame->m_Point[j].z;
 
@@ -492,14 +492,14 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 	}
 
 	l=0;
-	for(i=0;i<m_pBody->m_NStations; i++)
+	for(i=0;i<pBody->m_NStations; i++)
 	{
-		pFrame = m_pBody->m_Frame+i;
+		pFrame = pBody->m_Frame+i;
 		for(j=pFrame->m_NPoints-1;j>=0; j--)
 		{
-//			if(pFrame->m_NPoints != m_pBody->m_NSideLines) ASSERT(FALSE);
+//			if(pFrame->m_NPoints != pBody->m_NSideLines) ASSERT(FALSE);
 
-			leftpts[l+0]=  (GLfloat)(m_pBody->m_FramePosition[i].x);
+			leftpts[l+0]=  (GLfloat)(pBody->m_FramePosition[i].x);
 			leftpts[l+1]= -(GLfloat)pFrame->m_Point[j].y;
 			leftpts[l+2]=  (GLfloat)pFrame->m_Point[j].z;
 
@@ -511,11 +511,11 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 	{
 		m_GLList++;
 //		glShadeModel(GL_FLAT);
-		color = m_pBody->m_BodyColor;
+		color = pBody->m_BodyColor;
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
-		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, m_pBody->m_NSideLines*3, m_pBody->m_NStations,
-								  0.0, 1.0, 3,                          m_pBody->m_NSideLines,
+		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
+								  0.0, 1.0, 3,                          pBody->m_NSideLines,
 				rightpts);
 
 		glPolygonMode(GL_FRONT,GL_FILL);
@@ -537,8 +537,8 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 			}*/
 //		glPopMatrix();
 
-		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, m_pBody->m_NSideLines*3, m_pBody->m_NStations,
-								  0.0, 1.0, 3,                          m_pBody->m_NSideLines,
+		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
+								  0.0, 1.0, 3,                          pBody->m_NSideLines,
 				leftpts);
 
 //		glEnable(GL_MAP2_VERTEX_3);
@@ -580,8 +580,8 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
-		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, m_pBody->m_NSideLines*3, m_pBody->m_NStations,
-								  0.0, 1.0, 3,                       m_pBody->m_NSideLines,
+		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
+								  0.0, 1.0, 3,                       pBody->m_NSideLines,
 				rightpts);
 
 		glPolygonMode(GL_FRONT,GL_LINE);
@@ -592,8 +592,8 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 		glEvalMesh2(GL_LINE, 0, 8, 0, 8);
 
 
-		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, m_pBody->m_NSideLines*3, m_pBody->m_NStations,
-								  0.0, 1.0, 3,                          m_pBody->m_NSideLines,
+		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
+								  0.0, 1.0, 3,                          pBody->m_NSideLines,
 				leftpts);
 
 		glEvalMesh2(GL_LINE, 0, 8, 0, 8);
@@ -602,7 +602,7 @@ void GL3dBodyDlg::GLCreateBodyBezier()
 }
 
 
-void GL3dBodyDlg::GLCreateBody3DSplines()
+void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 {
 	int i,j,k,l;
 	int p, style, width, nx, nh;
@@ -634,7 +634,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 		for (l=0; l<=nh; l++)
 		{
 			v = (double)l / (double)nh;
-			m_pBody->GetPoint(u,  v, true, m_T[p]);
+			pBody->GetPoint(u,  v, true, m_T[p]);
 			p++;
 		}
 	}
@@ -643,7 +643,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 	{
 		m_GLList++;
 
-		color = m_pBody->m_BodyColor;
+		color = pBody->m_BodyColor;
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 		glLineWidth(1.0);
 		glEnable(GL_DEPTH_TEST);
@@ -745,16 +745,16 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 		u=0.0; v = 0.0;
 
 		// sides
-		for (i=1; i<m_pBody->m_NStations-1; i++)
+		for (i=1; i<pBody->m_NStations-1; i++)
 		{
-			u = m_pBody->Getu(m_pBody->m_FramePosition[i].x);
+			u = pBody->Getu(pBody->m_FramePosition[i].x);
 
 			glBegin(GL_LINE_STRIP);
 			{
 				v = 0.0;
 				for (j=0; j<nh; j++)
 				{
-					m_pBody->GetPoint(u,v,true, Point);
+					pBody->GetPoint(u,v,true, Point);
 					glVertex3d(Point.x, Point.y, Point.z);
 					v += hinc;
 				}
@@ -765,7 +765,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 				v = 0.0;
 				for (j=0; j<nh; j++)
 				{
-					m_pBody->GetPoint(u,v,false, Point);
+					pBody->GetPoint(u,v,false, Point);
 					glVertex3d(Point.x,Point.y, Point.z);
 					v += hinc;
 				}
@@ -780,7 +780,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 			v = 0.0;
 			for (i=0; i<=nh; i++)
 			{
-				m_pBody->GetPoint(u,v, true, Point);
+				pBody->GetPoint(u,v, true, Point);
 				glVertex3d(Point.x, Point.y, Point.z);
 				u += xinc;
 			}
@@ -794,7 +794,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 			v = 1.0;
 			for (i=0; i<=nh; i++)
 			{
-				m_pBody->GetPoint(u,v, true, Point);
+				pBody->GetPoint(u,v, true, Point);
 				glVertex3d(Point.x, Point.y, Point.z);
 				u += xinc;
 			}
@@ -806,9 +806,9 @@ void GL3dBodyDlg::GLCreateBody3DSplines()
 
 
 
-void GL3dBodyDlg::GLCreateBodyMesh()
+void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 {
-	if(!m_pBody)
+	if(!pBody)
 	{
 		glNewList(BODYMESHPANELS,GL_COMPILE);
 		{
@@ -828,10 +828,10 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	nx = m_pBody->m_nxPanels;
-	nh = m_pBody->m_nhPanels;
+	nx = pBody->m_nxPanels;
+	nh = pBody->m_nhPanels;
 
-	if(m_pBody->m_LineType==1) //LINES
+	if(pBody->m_LineType==1) //LINES
 	{
 		glNewList(BODYMESHPANELS,GL_COMPILE);
 		{
@@ -849,32 +849,32 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 
 			glLineWidth(1.0);
 
-			for (i=0; i<m_pBody->m_NStations-1; i++)
+			for (i=0; i<pBody->m_NStations-1; i++)
 			{
-				for (j=0; j<m_pBody->m_xPanels[i]; j++)
+				for (j=0; j<pBody->m_xPanels[i]; j++)
 				{
-					dj  = (double) j   /(double)(m_pBody->m_xPanels[i]);
-					dj1 = (double)(j+1)/(double)(m_pBody->m_xPanels[i]);
+					dj  = (double) j   /(double)(pBody->m_xPanels[i]);
+					dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
 
 					//body left side
-					for (k=0; k<m_pBody->m_NSideLines-1; k++)
+					for (k=0; k<pBody->m_NSideLines-1; k++)
 					{
 						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLB.y = -(1.0- dj) * m_pBody->m_Frame[i].m_Point[k].y   -  dj * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PLB.z =  (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].z   +  dj * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PLB.x =  (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLB.y = -(1.0- dj) * pBody->m_Frame[i].m_Point[k].y   -  dj * pBody->m_Frame[i+1].m_Point[k].y;
+						PLB.z =  (1.0- dj) * pBody->m_Frame[i].m_Point[k].z   +  dj * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PTB.x =  (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTB.y = -(1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].y   - dj1 * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PTB.z =  (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].z   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PTB.x =  (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTB.y = -(1.0-dj1) * pBody->m_Frame[i].m_Point[k].y   - dj1 * pBody->m_Frame[i+1].m_Point[k].y;
+						PTB.z =  (1.0-dj1) * pBody->m_Frame[i].m_Point[k].z   + dj1 * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PLA.x =  (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLA.y = -(1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].y -  dj * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PLA.z =  (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].z +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PLA.x =  (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLA.y = -(1.0- dj) * pBody->m_Frame[i].m_Point[k+1].y -  dj * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PLA.z =  (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].z +  dj * pBody->m_Frame[i+1].m_Point[k+1].z;
 
-						PTA.x =  (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTA.y = -(1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].y - dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PTA.z =  (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PTA.x =  (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTA.y = -(1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].y - dj1 * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PTA.z =  (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].z + dj1 * pBody->m_Frame[i+1].m_Point[k+1].z;
 
 						glBegin(GL_QUAD_STRIP);
 						{
@@ -885,9 +885,9 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 							glVertex3d(LB.x, LB.y, LB.z);
 							glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<m_pBody->m_hPanels[k]; l++)
+							for (l=0; l<pBody->m_hPanels[k]; l++)
 							{
-								dl1  = (double) (l+1)   /(double)(m_pBody->m_hPanels[k]);
+								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
 								LA = PLB * (1.0- dl1) + PLA * dl1;
 								TA = PTB * (1.0- dl1) + PTA * dl1;
 
@@ -906,24 +906,24 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 						glEnd();
 					}
 					//body right side
-					for (k=m_pBody->m_NSideLines-2; k>=0; k--)
+					for (k=pBody->m_NSideLines-2; k>=0; k--)
 					{
 						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLA.y = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].y   +  dj * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PLA.z = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].z   +  dj * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PLA.x = (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLA.y = (1.0- dj) * pBody->m_Frame[i].m_Point[k].y   +  dj * pBody->m_Frame[i+1].m_Point[k].y;
+						PLA.z = (1.0- dj) * pBody->m_Frame[i].m_Point[k].z   +  dj * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PTA.x = (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTA.y = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].y   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PTA.z = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].z   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PTA.x = (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTA.y = (1.0-dj1) * pBody->m_Frame[i].m_Point[k].y   + dj1 * pBody->m_Frame[i+1].m_Point[k].y;
+						PTA.z = (1.0-dj1) * pBody->m_Frame[i].m_Point[k].z   + dj1 * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PLB.x = (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLB.y = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].y +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PLB.z = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].z +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PLB.x = (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLB.y = (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].y +  dj * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PLB.z = (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].z +  dj * pBody->m_Frame[i+1].m_Point[k+1].z;
 
-						PTB.x = (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTB.y = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].y + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PTB.z = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PTB.x = (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTB.y = (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].y + dj1 * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PTB.z = (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].z + dj1 * pBody->m_Frame[i+1].m_Point[k+1].z;
 
 						glBegin(GL_QUAD_STRIP);
 						{
@@ -934,9 +934,9 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 							glVertex3d(LB.x, LB.y, LB.z);
 							glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<m_pBody->m_hPanels[k]; l++)
+							for (l=0; l<pBody->m_hPanels[k]; l++)
 							{
-								dl1  = (double) (l+1)   /(double)(m_pBody->m_hPanels[k]);
+								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
 								LA = PLB * (1.0- dl1) + PLA * dl1;
 								TA = PTB * (1.0- dl1) + PTA * dl1;
 
@@ -977,32 +977,32 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 
 			glLineWidth(1.0);
 
-			for (i=0; i<m_pBody->m_NStations-1; i++)
+			for (i=0; i<pBody->m_NStations-1; i++)
 			{
-				for (j=0; j<m_pBody->m_xPanels[i]; j++)
+				for (j=0; j<pBody->m_xPanels[i]; j++)
 				{
-					dj  = (double) j   /(double)(m_pBody->m_xPanels[i]);
-					dj1 = (double)(j+1)/(double)(m_pBody->m_xPanels[i]);
+					dj  = (double) j   /(double)(pBody->m_xPanels[i]);
+					dj1 = (double)(j+1)/(double)(pBody->m_xPanels[i]);
 
 					//body left side
-					for (k=0; k<m_pBody->m_NSideLines-1; k++)
+					for (k=0; k<pBody->m_NSideLines-1; k++)
 					{
 						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLB.y = -(1.0- dj) * m_pBody->m_Frame[i].m_Point[k].y   -  dj * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PLB.z =  (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].z   +  dj * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PLB.x =  (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLB.y = -(1.0- dj) * pBody->m_Frame[i].m_Point[k].y   -  dj * pBody->m_Frame[i+1].m_Point[k].y;
+						PLB.z =  (1.0- dj) * pBody->m_Frame[i].m_Point[k].z   +  dj * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PTB.x =  (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTB.y = -(1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].y   - dj1 * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PTB.z =  (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].z   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PTB.x =  (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTB.y = -(1.0-dj1) * pBody->m_Frame[i].m_Point[k].y   - dj1 * pBody->m_Frame[i+1].m_Point[k].y;
+						PTB.z =  (1.0-dj1) * pBody->m_Frame[i].m_Point[k].z   + dj1 * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PLA.x =  (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLA.y = -(1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].y -  dj * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PLA.z =  (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].z +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PLA.x =  (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLA.y = -(1.0- dj) * pBody->m_Frame[i].m_Point[k+1].y -  dj * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PLA.z =  (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].z +  dj * pBody->m_Frame[i+1].m_Point[k+1].z;
 
-						PTA.x =  (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTA.y = -(1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].y - dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PTA.z =  (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PTA.x =  (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTA.y = -(1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].y - dj1 * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PTA.z =  (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].z + dj1 * pBody->m_Frame[i+1].m_Point[k+1].z;
 
 						glBegin(GL_QUAD_STRIP);
 						{
@@ -1013,9 +1013,9 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 							glVertex3d(LB.x, LB.y, LB.z);
 							glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<m_pBody->m_hPanels[k]; l++)
+							for (l=0; l<pBody->m_hPanels[k]; l++)
 							{
-								dl1  = (double) (l+1)   /(double)(m_pBody->m_hPanels[k]);
+								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
 								LA = PLB * (1.0- dl1) + PLA * dl1;
 								TA = PTB * (1.0- dl1) + PTA * dl1;
 
@@ -1034,24 +1034,24 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 						glEnd();
 					}
 					//body right side
-					for (k=m_pBody->m_NSideLines-1; k>=0; k--)
+					for (k=pBody->m_NSideLines-1; k>=0; k--)
 					{
 						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLA.y = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].y   +  dj * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PLA.z = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k].z   +  dj * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PLA.x = (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLA.y = (1.0- dj) * pBody->m_Frame[i].m_Point[k].y   +  dj * pBody->m_Frame[i+1].m_Point[k].y;
+						PLA.z = (1.0- dj) * pBody->m_Frame[i].m_Point[k].z   +  dj * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PTA.x = (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTA.y = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].y   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].y;
-						PTA.z = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k].z   + dj1 * m_pBody->m_Frame[i+1].m_Point[k].z;
+						PTA.x = (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTA.y = (1.0-dj1) * pBody->m_Frame[i].m_Point[k].y   + dj1 * pBody->m_Frame[i+1].m_Point[k].y;
+						PTA.z = (1.0-dj1) * pBody->m_Frame[i].m_Point[k].z   + dj1 * pBody->m_Frame[i+1].m_Point[k].z;
 
-						PLB.x = (1.0- dj) * m_pBody->m_FramePosition[i].x      +  dj * m_pBody->m_FramePosition[i+1].x;
-						PLB.y = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].y +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PLB.z = (1.0- dj) * m_pBody->m_Frame[i].m_Point[k+1].z +  dj * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PLB.x = (1.0- dj) * pBody->m_FramePosition[i].x      +  dj * pBody->m_FramePosition[i+1].x;
+						PLB.y = (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].y +  dj * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PLB.z = (1.0- dj) * pBody->m_Frame[i].m_Point[k+1].z +  dj * pBody->m_Frame[i+1].m_Point[k+1].z;
 
-						PTB.x = (1.0-dj1) * m_pBody->m_FramePosition[i].x      + dj1 * m_pBody->m_FramePosition[i+1].x;
-						PTB.y = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].y + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].y;
-						PTB.z = (1.0-dj1) * m_pBody->m_Frame[i].m_Point[k+1].z + dj1 * m_pBody->m_Frame[i+1].m_Point[k+1].z;
+						PTB.x = (1.0-dj1) * pBody->m_FramePosition[i].x      + dj1 * pBody->m_FramePosition[i+1].x;
+						PTB.y = (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].y + dj1 * pBody->m_Frame[i+1].m_Point[k+1].y;
+						PTB.z = (1.0-dj1) * pBody->m_Frame[i].m_Point[k+1].z + dj1 * pBody->m_Frame[i+1].m_Point[k+1].z;
 
 						glBegin(GL_QUAD_STRIP);
 						{
@@ -1062,9 +1062,9 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 							glVertex3d(LB.x, LB.y, LB.z);
 							glVertex3d(TB.x, TB.y, TB.z);
 
-							for (l=0; l<m_pBody->m_hPanels[k]; l++)
+							for (l=0; l<pBody->m_hPanels[k]; l++)
 							{
-								dl1  = (double) (l+1)   /(double)(m_pBody->m_hPanels[k]);
+								dl1  = (double) (l+1)   /(double)(pBody->m_hPanels[k]);
 								LA = PLB * (1.0- dl1) + PLA * dl1;
 								TA = PTB * (1.0- dl1) + PTA * dl1;
 
@@ -1088,16 +1088,16 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 		}
 		glEndList();
 	}
-	else if(m_pBody->m_LineType==2) //NURBS
+	else if(pBody->m_LineType==2) //NURBS
 	{
 		p = 0;
 		for (k=0; k<=nx; k++)
 		{
-			uk  = m_pBody->s_XPanelPos[k];
+			uk  = pBody->s_XPanelPos[k];
 			for (l=0; l<=nh; l++)
 			{
 				v = (double)l / (double)(nh);
-				m_pBody->GetPoint(uk,  v, true, m_L[p]);
+				pBody->GetPoint(uk,  v, true, m_L[p]);
 				p++;
 			}
 		}
@@ -1249,7 +1249,7 @@ void GL3dBodyDlg::GLCreateBodyMesh()
 	}
 }
 
-void GL3dBodyDlg::GLCreateBody3DFlatPanels()
+void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 {
 	int j,k;
 	QColor color;
@@ -1268,23 +1268,23 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels()
 		glPolygonOffset(1.0,1.0);
 		glLineWidth(1.0);
 
-		color = m_pBody->m_BodyColor;
+		color = pBody->m_BodyColor;
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
-		for (k=0; k<m_pBody->m_NSideLines-1;k++)
+		for (k=0; k<pBody->m_NSideLines-1;k++)
 		{
-			for (j=0; j<m_pBody->m_NStations-1;j++)
+			for (j=0; j<pBody->m_NStations-1;j++)
 			{
-				Tj.Set(m_pBody->m_FramePosition[j].x,     0.0, 0.0);
-				Tjp1.Set(m_pBody->m_FramePosition[j+1].x, 0.0, 0.0);
+				Tj.Set(pBody->m_FramePosition[j].x,     0.0, 0.0);
+				Tjp1.Set(pBody->m_FramePosition[j+1].x, 0.0, 0.0);
 
 				glBegin(GL_QUADS);
 				{
-					P1 = m_pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
-					P2 = m_pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
-					P3 = m_pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
-					P4 = m_pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
+					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
+					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
+					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -1343,18 +1343,18 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels()
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
-		for (k=0; k<m_pBody->m_NSideLines-1;k++)
+		for (k=0; k<pBody->m_NSideLines-1;k++)
 		{
-			for (j=0; j<m_pBody->m_NStations-1;j++)
+			for (j=0; j<pBody->m_NStations-1;j++)
 			{
-				Tj.Set(m_pBody->m_FramePosition[j].x,     0.0, 0.0);
-				Tjp1.Set(m_pBody->m_FramePosition[j+1].x, 0.0, 0.0);
+				Tj.Set(pBody->m_FramePosition[j].x,     0.0, 0.0);
+				Tjp1.Set(pBody->m_FramePosition[j+1].x, 0.0, 0.0);
 
 				glBegin(GL_QUADS);
-					P1 = m_pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
-					P2 = m_pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
-					P3 = m_pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
-					P4 = m_pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
+					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
+					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
+					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -2495,8 +2495,8 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pBody->m_LineType==1)	    GLCreateBody3DFlatPanels();
-		else if(m_pBody->m_LineType==2)	GLCreateBody3DSplines();
+		if(m_pBody->m_LineType==1)	    GLCreateBody3DFlatPanels(m_pBody);
+		else if(m_pBody->m_LineType==2)	GLCreateBody3DSplines(m_pBody);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHPANELS))
@@ -2504,7 +2504,7 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYMESHPANELS,2);
 			m_GLList -=2;
 		}
-		GLCreateBodyMesh();
+		GLCreateBodyMesh(m_pBody);
 		m_bResetglBodyMesh = false;
 	}
 
@@ -2515,7 +2515,7 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYMESHPANELS,2);
 			m_GLList -=2;
 		}
-		GLCreateBodyMesh();
+		GLCreateBodyMesh(m_pBody);
 		m_bResetglBodyMesh = false;
 	}
 
@@ -2984,7 +2984,7 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 	{
 		case Qt::Key_Escape:
 		{
-			reject();
+			OnCancel();
 			break;
 		}
 		case Qt::Key_Control:
@@ -3187,7 +3187,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
 //qDebug()<< Real.x << Real.y << m_BodyScale;
-			int n = m_pBody->IsFramePos(Real, 1.0);
+			int n = m_pBody->IsFramePos(Real, m_BodyScale);
 			m_pBody->m_iHighlight = -10;
 			if (n>=0 && n<=m_pBody->m_NStations)
 			{
@@ -3202,7 +3202,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
 //qDebug()<< Real.x << Real.y << m_FrameScale;
-			int n = (m_pFrame)->IsPoint(Real, 1.0);
+			int n = (m_pFrame)->IsPoint(Real, m_FrameScale);
 			(m_pFrame)->m_iHighlight = -10;
 			if (n>=0 && n<=(m_pFrame)->m_NPoints)
 			{
@@ -3256,7 +3256,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			iF = m_pBody->IsFramePos(Real, 1.0);
+			iF = m_pBody->IsFramePos(Real, m_BodyScale);
 
 			if(iF >=0)
 			{
@@ -3277,7 +3277,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
 
-			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, 1.0);
+			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, m_FrameScale);
 			if(m_pFrame->m_iSelect >=0)
 			{
 				TakePicture();
@@ -3623,16 +3623,16 @@ void GL3dBodyDlg::OnLineType()
 	UpdateView();
 }
 
-
-void GL3dBodyDlg::accept()
+void GL3dBodyDlg::OnCancel()
 {
 	m_pBody->m_BodyName = m_pctrlBodyName->text();
 
-	int res = QMessageBox::question(window(), "Body Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+	int res = QMessageBox::question(window(), "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 	if (QMessageBox::No == res) QDialog::reject();
 	else if (QMessageBox::Cancel == res) return;
 	else done(QDialog::Accepted);
 }
+
 
 
 void GL3dBodyDlg::OnOutline()
@@ -4397,7 +4397,7 @@ void GL3dBodyDlg::SetupLayout()
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addWidget(CancelButton);
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
-	connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
+	connect(CancelButton, SIGNAL(clicked()),this, SLOT(OnCancel()));
 
 
 	QHBoxLayout *AllControls = new QHBoxLayout;
@@ -4565,12 +4565,19 @@ void  GL3dBodyDlg::wheelEvent(QWheelEvent *event)
 	{
 		if(event->delta()<0) m_BodyScale *= 1.06;
 		else                 m_BodyScale /= 1.06;
+		m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
+							   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+								0.0);
 		m_bResetglBody2D=true;
 	}
 	else if(m_FrameRect.contains(point))
 	{
 		if(event->delta()<0) m_FrameScale *= 1.06;
 		else                 m_FrameScale /= 1.06;
+		m_FrameScaledOffset.Set((1.0 - m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
+								(1.0 - m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+								 0.0);
+
 		m_bResetglBody2D=true;
 	}
 	UpdateView();

@@ -57,6 +57,7 @@ private:
 
 private slots:
 	void OnOK();
+	void OnArea();
 	void OnUnit();
 	void OnMethod();
 	void OnAutoName(int state);
@@ -100,6 +101,7 @@ private:
 	double m_TotalWakeLength;//% mac
 	double m_WakePanelFactor;
 
+	int m_RefAreaType;
 
 	FloatEdit *m_pctrlXCmRef;
 	FloatEdit *m_pctrlDensity;
@@ -120,6 +122,7 @@ private:
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4;
 	QRadioButton *m_pctrlMethod1, *m_pctrlMethod2, *m_pctrlMethod3, *m_pctrlMethod4;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
+	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 
 	QLabel *m_pctrlSRe;
 	QLabel *m_pctrlRRe;

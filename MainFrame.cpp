@@ -818,10 +818,6 @@ void MainFrame::CreateMiarexActions()
 	defineBody->setShortcut(tr("F10"));
 	connect(defineBody, SIGNAL(triggered()), pMiarex, SLOT(OnNewBody()));
 
-	editCurBody = new QAction(tr("Edit the Current Body"), this);
-	editCurBody->setStatusTip(tr("Shows a dialogbox for editing the current body"));
-	connect(editCurBody, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
-
 	exportBody = new QAction(tr("Export Body"), this);
 	exportBody->setStatusTip(tr("Export a body definition from a text file"));
 	connect(exportBody, SIGNAL(triggered()), pMiarex, SLOT(OnExportBody()));
@@ -887,7 +883,7 @@ void MainFrame::CreateMiarexActions()
 	connect(allWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWPlrGraphs()));
 
 	WGraphVariable = new QAction(tr("Define Variables"), this);
-	connect(WGraphVariable, SIGNAL(triggered()), pMiarex, SLOT(OnDefineGraphVariables()));
+	connect(WGraphVariable, SIGNAL(triggered()), pMiarex, SLOT(OnDefinePolarGraphVariables()));
 
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
@@ -950,7 +946,6 @@ void MainFrame::CreateMiarexMenus()
 
 	MiarexBodyMenu = menuBar()->addMenu("Body");
 	MiarexBodyMenu->addAction(defineBody);
-	MiarexBodyMenu->addAction(editCurBody);
 	MiarexBodyMenu->addAction(importBody);
 	MiarexBodyMenu->addAction(exportBody);
 	MiarexBodyMenu->addSeparator();

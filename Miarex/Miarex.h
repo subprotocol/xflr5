@@ -69,6 +69,7 @@ class QMiarex : public QWidget
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
+	friend class CPlane;
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
 
@@ -101,7 +102,8 @@ private slots:
 	void OnSingleWPlrGraph4();
 	void OnTwoWPlrGraphs();
 	void OnFourWPlrGraphs();
-	void OnDefineGraphVariables();
+	void OnDefinePolarGraphVariables();
+	void OnDefineWingGraphVariables();
 	void OnHideAllWPolars();
 	void OnShowAllWPolars();
 	void OnSingleWingGraph1();
@@ -354,7 +356,6 @@ private:
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
-	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
 	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
 
 	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
@@ -365,9 +366,6 @@ private:
 	bool m_bResetglLegend;          //needs to be reset is window has been resized
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
-	bool m_bResetglBody2D;
-	bool m_bResetglBodyOverlay;
-	bool m_bResetglBodyPoints;
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
 	bool m_bWakePanels;
 	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed

@@ -75,7 +75,7 @@ private:
 	bool ReLoop();
 	bool UnitLoop();
 	bool ControlLoop();
-	bool Gauss(double *A, int n, double *B, int m);
+	bool Gauss(double *A, int n, double *B, int m, int TaskSize);
 
 	void AddString(QString strong);
 	void CheckSolution();

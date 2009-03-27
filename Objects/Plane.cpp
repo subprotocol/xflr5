@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "Plane.h"
+#include "../Miarex/Miarex.h"
 #include "Globals.h"
 #include <math.h>
 #include <QDebug>
@@ -197,7 +198,7 @@ bool CPlane::HasResults()
 
 bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 {
-//	CMiarex *pMiarex = (CMiarex*)s_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 //	MainFrame *pFrame = (MainFrame*)s_pMainFrame;
 	QString strong = "Nobody";
 	int ArchiveFormat;// identifies the format of the file
@@ -336,8 +337,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 			ar >> k;
 			if(k)  m_bBody=true; else m_bBody=false;
 			ReadCString(ar,strong);
-//			m_pBody = pMiarex->GetBody(strong);
-			m_pBody = NULL; //TODO
+			m_pBody = pMiarex->GetBody(strong);
 		}
 		else m_pBody = NULL;
 

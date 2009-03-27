@@ -65,6 +65,9 @@ WPolarDlg::WPolarDlg()
 	m_TotalWakeLength = 100.0;//x mac
 	m_WakePanelFactor = 1.1;
 
+	m_RefAreaType = 1;
+	double m_ReferenceArea = 0.0;
+
 //	m_SymbolFont.CreatePointFont(100, "Symbol");
 	m_UnitType  = 1;
 
@@ -101,6 +104,9 @@ void WPolarDlg::Connect()
 	connect(m_pctrlQInf, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlHeight, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlWPolarName, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+
+	connect(m_pctrlArea1, SIGNAL(clicked()),this, SLOT(OnArea()));
+	connect(m_pctrlArea2, SIGNAL(clicked()),this, SLOT(OnArea()));
 
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -285,6 +291,15 @@ void WPolarDlg::InitDialog()
 //	m_pctrlWakeRollUp->setEnabled(false);
 	m_bWakeRollUp = false;
 
+	if(m_RefAreaType==1)
+	{
+		m_pctrlArea1->setChecked(true);
+	}
+	else if(m_RefAreaType==2)
+	{
+		m_pctrlArea2->setChecked(true);
+	}
+
 	SetWPolarName();
 
 
@@ -335,6 +350,20 @@ void WPolarDlg::keyPressEvent(QKeyEvent *event)
 	}
 
 	QDialog::keyPressEvent(event);
+}
+
+
+void WPolarDlg::OnArea()
+{
+	if(m_pctrlArea1->isChecked())
+	{
+		m_RefAreaType = 1;
+	}
+	else if(m_pctrlArea2->isChecked())
+	{
+		m_RefAreaType = 2;
+	}
+	SetWPolarName();
 }
 
 
@@ -516,6 +545,15 @@ void WPolarDlg::ReadValues()
 	{
 		m_Density   = m_pctrlDensity->GetValue() / 0.00194122;
 		m_Viscosity = m_pctrlViscosity->GetValue() / 10.7182881;
+	}
+
+	if(m_pctrlArea1->isChecked())
+	{
+		m_RefAreaType = 1;
+	}
+	else if(m_pctrlArea2->isChecked())
+	{
+		m_RefAreaType = 2;
 	}
 
 	SetDensity();
@@ -703,6 +741,14 @@ void WPolarDlg::SetupLayout()
 	DataLayout->addWidget(OptionsGroup,4,1);
 	DataLayout->addWidget(GroundGroup,4,2);
 
+	QHBoxLayout *AreaOptions = new QHBoxLayout;
+	m_pctrlArea1 = new QRadioButton("Wing Planform Area");
+	m_pctrlArea2 = new QRadioButton("Wing Planform Area projected on xy plane");
+	AreaOptions->addWidget(m_pctrlArea1);
+	AreaOptions->addWidget(m_pctrlArea2);
+	QGroupBox *AreaBox = new QGroupBox("Reference Area for Aero Coefficients");
+	AreaBox->setLayout(AreaOptions);
+
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
 	OKButton->setDefault(true);
@@ -715,6 +761,7 @@ void WPolarDlg::SetupLayout()
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
 	MainLayout->addLayout(DataLayout);
+	MainLayout->addWidget(AreaBox);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
@@ -785,6 +832,12 @@ void WPolarDlg::SetWPolarName()
 	{
 		strong = QString("%1").arg(m_Height,0,'f',2),
 		m_WPolarName += "-G"+strong;
+	}
+	if(m_AnalysisType==1) m_WPolarName += "-planform_area";
+	else
+	{
+		if(m_RefAreaType==1) m_WPolarName += "-dev_area";
+		if(m_RefAreaType==2) m_WPolarName += "-proj_area";
 	}
 	m_pctrlWPolarName->setText(m_WPolarName);
 }

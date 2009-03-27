@@ -38,7 +38,6 @@ private slots:
 	void OnOK();
 
 private:
-	void mouseDoubleClickEvent ( QMouseEvent * event );
 	void SetupLayout();
 	void FillLists(int iGraphType);
 

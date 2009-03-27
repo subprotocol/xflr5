@@ -50,6 +50,7 @@ class GL3dBodyDlg : public QDialog
 	friend class GLLightDlg;
 	friend class BodyScaleDlg;
 	friend class ManageBodiesDlg;
+	friend class PlaneDlg;
 
 public:
 	GL3dBodyDlg(void *pParent = NULL);
@@ -76,6 +77,7 @@ private slots:
 	void OnLineType();
 	void OnInsert();
 //	void OnOK();
+	void OnCancel();
 	void OnRemove();
 	void OnFrameCellChanged(QWidget *pWidget);
 	void OnFrameItemActivated(const QModelIndex &index);
@@ -114,11 +116,11 @@ private:
 	void GLCreateMesh();
 	void GLCreateCtrlPts();
 	void GLInverseMatrix();
-	void GLCreateBodyBezier();
 	void GLCreateBody2DBodySection();
-	void GLCreateBody3DSplines();
-	void GLCreateBody3DFlatPanels();
-	void GLCreateBodyMesh();
+	void GLCreateBodyBezier(CBody *pBody);
+	void GLCreateBody3DSplines(CBody *pBody);
+	void GLCreateBody3DFlatPanels(CBody *pBody);
+	void GLCreateBodyMesh(CBody *pBody);
 	void GLCreateBodyPoints();
 	void GLCreateBodyFrames();
 	void GLCreateBodyGrid();
@@ -144,7 +146,6 @@ private:
 	void SetPicture();
 	void StorePicture();
 
-	void accept();
 
 private:
 	static void *s_pMiarex;

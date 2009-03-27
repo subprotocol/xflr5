@@ -136,20 +136,20 @@ bool PanelAnalysisDlg::AlphaLoop()
 	
 //ESTIMATED UNIT TIMES FOR OPERATIONS
 //CreateMatrix :		 15
-//CreateRHS :			 10 x 2
+//CreateRHS :			 10 x 1
 //CreateWakeContribution :	 1 x 2 x MaxWakeIter
 //SolveMultiple :			30        x MaxWakeIter
 //CreateDoubletStrength : 	 1 x nrhs x MaxWakeIter
 //RelaxWake :				20 x nrhs x MaxWakeIter
 //ComputeAeroCoefs :		 5 x nrhs
 	
-	TotalTime = 15 + 2*10 + 5 * nrhs + 30 * MaxWakeIter + 2*MaxWakeIter + 1 * nrhs * MaxWakeIter;
+	TotalTime = 15 + 10 + 2*MaxWakeIter + 30 * MaxWakeIter +  1 * nrhs * MaxWakeIter + 5 * nrhs;
 
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*nrhs*MaxWakeIter;
 //	if(!m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
 
 	m_pctrlProgress->setMinimum(0);
-        m_pctrlProgress->setMaximum(TotalTime);
+	m_pctrlProgress->setMaximum(TotalTime);
 	m_Progress = 0;
 
 	str = QString("   Solving the problem... \r\n");
@@ -181,7 +181,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	}
 	if (m_bCancel) return true;
 
-        if (!SolveMultiple(m_Alpha, m_AlphaDelta, nrhs))
+	if (!SolveMultiple(m_Alpha, m_AlphaDelta, nrhs))
 	{
 		AddString("\r\n\r\nSingular matrix - aborting....\r\n");
 		m_bWarning = true;
@@ -190,7 +190,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	if (m_bCancel) return true;
 
-        if(!CreateDoubletStrength(m_Alpha, m_AlphaDelta, nrhs))
+	if(!CreateDoubletStrength(m_Alpha, m_AlphaDelta, nrhs))
 	{
 		AddString("\r\n\r\nFailed to create doublet strengths....\r\n");
 		m_bWarning = true;
@@ -199,7 +199,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	if (m_bCancel) return true;
 
-        if(!ComputeAeroCoefs(m_Alpha, m_AlphaDelta, nrhs))
+	if(!ComputeAeroCoefs(m_Alpha, m_AlphaDelta, nrhs))
 	{
 		AddString("\r\n\r\nFailed to compute aerodynamics....\r\n");
 		m_bWarning = true;
@@ -332,9 +332,7 @@ bool PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 			else                         m_Sigma[p] = -1.0/4.0/pi* QInf[q].dot(m_ppPanel[pp]->Normal);
 			p++;
 		}
-		SetProgress(1*nval, (double)q/(double)nval);
 	}
-	m_Progress += 1 * nval;
 
 	m = 0;
 	for (p=0; p<Size; p++)
@@ -404,10 +402,10 @@ bool PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 			}
 		}
 		m++;
-		SetProgress(9, (double)m/(double)(nval*Size));
+		SetProgress(10, (double)m/(double)Size);
 	}
 
-	m_Progress += 9 ;
+	m_Progress += 10;
 	return true;
 }
 
@@ -713,8 +711,8 @@ bool PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 		}
 	}
 
-	m_Progress += 5*nrhs;
 	SetProgress(5*nrhs,1.0);
+	m_Progress += 5*nrhs;
 
 	return true;
 }
@@ -793,7 +791,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		AddString("       Calculating wing...\r\n");
 		m_pWing->PanelTrefftz(m_Cp+qrhs*m_MatSize, Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
-			                      m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+								  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 		m_pWing->PanelSetBending();
 
 		pos = m_pWing->m_MatSize;
@@ -811,7 +809,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			m_pWing2->m_Density   = m_pWPolar->m_Density;
 			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
 			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
-			                           m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
 
@@ -830,7 +828,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			m_pStab->m_Density   = m_pWPolar->m_Density;
 			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
-			                          m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pStab->PanelSetBending();
 
 			pos += m_pStab->m_MatSize;
@@ -851,7 +849,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			
 			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
-			                         m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom);
+									 m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pFin->PanelSetBending();
 			pos += m_pFin->m_MatSize;
 
@@ -1280,7 +1278,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 }
 
 
-bool PanelAnalysisDlg::Gauss(double *A, int n, double *B, int m)
+bool PanelAnalysisDlg::Gauss(double *A, int n, double *B, int m, int TaskSize)
 {
 	int row, i, j, pivot_row, k;
 	double max, dum, *pa, *pA, *A_pivot_row;
@@ -1335,7 +1333,9 @@ bool PanelAnalysisDlg::Gauss(double *A, int n, double *B, int m)
 			for (k=0; k<=m; k++)
 				B[i+k*n] += dum * B[row+k*n];
 		}
+		SetProgress((int)(TaskSize/2), (double)row/(double)n);
 	}
+	m_Progress +=  (int)(TaskSize/2);
 
 	// Perform backward substitution
 
@@ -1357,7 +1357,9 @@ bool PanelAnalysisDlg::Gauss(double *A, int n, double *B, int m)
 			for(k=0; k<=m; k++)
 				B[i+k*n] -= dum * B[row+k*n];
 		}
+		SetProgress((int)(TaskSize/2), (double)(n-1-row)/(double)n);
 	}
+	m_Progress +=  (int)(TaskSize/2);
 	return true;
 }
 
@@ -1475,6 +1477,7 @@ void PanelAnalysisDlg::InitDialog()
 			str += "     2nd wing is asymmetric\r\n";
 		}
 	}
+
 	if(m_pStab)
 	{
 		if(!m_pStab->m_bSymetric)
@@ -1708,7 +1711,6 @@ bool PanelAnalysisDlg::ReLoop()
 		m_bWarning = true;
 		return true;
 	}
-
 //first solve for unit speed... calculation is linear
 
 		if (!CreateRHS(Alpha, m_AlphaDelta, 1))
@@ -2559,14 +2561,13 @@ bool PanelAnalysisDlg::SolveMultiple(double V0, double VDelta, int nval)
 	memcpy(m_RHS+Size, m_sinRHS, Size * sizeof(double));
 
 //double row[VLMMATSIZE]; memcpy(row, m_aij, sizeof(row));
-	if(!Gauss(m_aij, Size, m_RHS, 2))
+	if(!Gauss(m_aij, Size, m_RHS, 2, 30))
 	{
 		AddString("      Singular Matrix.... Aborting calculation...\r\n");
 		m_bConverged = false;
 		return false;
 	}
 	else m_bConverged = true;
-
 
 	memcpy(m_cosRHS, m_RHS,      Size * sizeof(double));
 	memcpy(m_sinRHS, m_RHS+Size, Size * sizeof(double));
@@ -2783,7 +2784,7 @@ bool PanelAnalysisDlg::UnitLoop()
 
 			if (m_bCancel) return true;
 
-						if (!SolveMultiple(Alpha, m_AlphaDelta, 1))
+			if (!SolveMultiple(Alpha, m_AlphaDelta, 1))
 			{
 				AddString("\r\n\r\nSingular matrix - aborting....\r\n");
 				m_bWarning = true;
@@ -2792,7 +2793,7 @@ bool PanelAnalysisDlg::UnitLoop()
 
 			if (m_bCancel) return true;
 
-						if(!CreateDoubletStrength(Alpha, m_AlphaDelta, 1))
+			if(!CreateDoubletStrength(Alpha, m_AlphaDelta, 1))
 			{
 					AddString("\r\n\r\nFailed to create doublet strengths....\r\n");
 					m_bWarning = true;
@@ -2807,7 +2808,7 @@ bool PanelAnalysisDlg::UnitLoop()
 		AddString("\r\n");
 
 
-				if(!ComputeAeroCoefs(Alpha, m_AlphaDelta, 1))
+		if(!ComputeAeroCoefs(Alpha, m_AlphaDelta, 1))
 		{
 				AddString("\r\n\r\nFailed to compute aerodynamic coefficients....\r\n");
 				m_bWarning = true;

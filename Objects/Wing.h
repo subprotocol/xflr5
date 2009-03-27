@@ -43,9 +43,9 @@ class CWing
 	friend class WingDlg;
 	friend class GL3dViewDlg;
 	friend class LLTAnalysisDlg;
-        friend class VLMAnalysisDlg;
-        friend class PanelAnalysisDlg;
-        friend class PlaneDlg;
+	friend class VLMAnalysisDlg;
+	friend class PanelAnalysisDlg;
+	friend class PlaneDlg;
 	friend class WPolarDlg;
 	friend class ImportWingDlg;
 
@@ -66,9 +66,10 @@ protected:
 	void VLMSetBending();
 	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-                        double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted);
+						double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted, int RefAreaType);
 
-	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP, double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
+	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
+						  double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType);
 	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelSetBending();
 
@@ -161,11 +162,13 @@ protected:
 
 	double pi;		//
 	double m_Span;		// wing span
+	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord
 	double m_MAChord;	// mean aerodynamic chord
 	double m_yMac;		// mean aerodynamic chord span position
 	double m_Density, m_Viscosity; //fluid properties
 	double m_Area;		// wing surface
+	double m_ProjectedArea;		// wing surface projected on xy plane;
 	double m_Volume;	// for tentative wieght calculations
 	double m_AR;		// Aspect ratio
 	double m_TR;		// Taper ratio
@@ -177,7 +180,7 @@ protected:
 	double m_Weight;	// For type 2 analysis
 	double m_Alpha;		// angle of attack
 	double m_Maxa; 		// Used in LLT
-	double m_VYm; 
+	double m_VYm, m_VCm;
 	double m_IYm;		// Induced Yawing Moment
 	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment
 

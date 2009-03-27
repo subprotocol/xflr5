@@ -53,6 +53,7 @@ public:
 private:
 	int m_AnalysisType;
 	int m_Type;
+	int m_RefAreaType;
 	double m_QInf;
 	double m_Weight;
 	double m_ASpec;

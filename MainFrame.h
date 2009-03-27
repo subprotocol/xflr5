@@ -244,7 +244,7 @@ private:
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps, *deleteAllWPlrOpps;
 	QAction *defineWPolar, *advancedSettings;
-	QAction *defineBody, *editCurBody, *importBody, *exportBody, *ManageBodies;
+	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
 
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *defineBatch;
