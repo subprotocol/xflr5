@@ -193,26 +193,26 @@ void TwoDWidget::showEvent(QShowEvent *event)
 void TwoDWidget::resizeEvent(QResizeEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QXDirect  *pXDirect  = (QXDirect*)m_pXDirect;
+	QMiarex   *pMiarex   = (QMiarex*)m_pMiarex;
+	QAFoil    *pAFoil    = (QAFoil*)m_pAFoil;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
+	if(m_pXDirect)
 	{
-		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->SetFoilScale(rect());
 	}
-	else  if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
+	if(m_pMiarex)
 	{
-		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->SetScale(rect());
 	}
-	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	if(m_pAFoil)
 	{
-		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
 		pAFoil->SetScale(rect());
 	}
-	else if(pMainFrame->m_iApp == INVERSEDESIGN && m_pXInverse)
+	if(m_pXInverse)
 	{
-		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
 		pXInverse->SetScale(rect());
 	}
 }

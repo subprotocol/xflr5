@@ -69,15 +69,33 @@ void LinePickerDlg::InitDialog(int style, int width, QColor color)
 }
 
 
+
+void LinePickerDlg::InitDialog()
+{
+	QString str;
+	for (int i=0; i<5; i++)
+	{
+		str = QString("%1").arg(i);
+		m_pctrlWidth->addItem(str);
+	}
+	m_pctrlStyle->addItem("solid");//string doesn't matter
+	m_pctrlStyle->addItem("dash");
+	m_pctrlStyle->addItem("dot");
+	m_pctrlStyle->addItem("dashdot");
+	m_pctrlStyle->addItem("dashdotdot");
+
+	FillBoxes();
+}
+
 void LinePickerDlg::SetupLayout()
 {
 	QGridLayout *StyleLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel("Style");
 	QLabel *lab2 = new QLabel("Width");
 	QLabel *lab3 = new QLabel("Color");
-	lab1->setAlignment(Qt::AlignRight);
-	lab2->setAlignment(Qt::AlignRight);
-	lab3->setAlignment(Qt::AlignRight);
+	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab1->setMinimumWidth(60);
 	lab2->setMinimumWidth(60);
 	lab3->setMinimumWidth(60);
@@ -186,6 +204,30 @@ QColor & LinePickerDlg::GetColor()
 {
 	return m_Color;
 }
+
+void LinePickerDlg::SetColor(QColor color)
+{
+	m_Color = color;
+	FillBoxes();
+	repaint();
+}
+
+void LinePickerDlg::SetWidth(int width)
+{
+	m_Width = width;
+	FillBoxes();
+	repaint();
+}
+
+
+void LinePickerDlg::SetStyle(int style)
+{
+	m_Style = style;
+	FillBoxes();
+	repaint();
+}
+
+
 
 
 

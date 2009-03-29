@@ -390,6 +390,33 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 }
 
 
+void CPolar::Copy(CPolar *pPolar)
+{
+	int i;
+	int size  = (int)m_Alpha.size();
+	for(i=size-1; i>=0; i--)
+		Remove(i);
+
+	size  = (int)pPolar->m_Alpha.size();
+	for(i=0; i<size; i++)
+	{
+		m_Alpha.insert(i,  pPolar->m_Alpha[i]);
+		m_Cd.insert(i,     pPolar->m_Cd[i]);
+		m_Cdp.insert(i,    pPolar->m_Cdp[i]);
+		m_Cl.insert(i,     pPolar-> m_Cl[i]);
+		m_Cm.insert(i,     pPolar->m_Cm[i]);
+		m_XTr1.insert(i,   pPolar->m_XTr1[i]);
+		m_XTr2.insert(i,   pPolar->m_XTr2[i]);
+		m_HMom.insert(i,   pPolar->m_HMom[i]);
+		m_Cpmn.insert(i,   pPolar->m_Cpmn[i]);
+		m_ClCd.insert(i,   pPolar->m_ClCd[i]);
+		m_RtCl.insert(i,   pPolar->m_RtCl[i]);
+		m_Cl32Cd.insert(i, pPolar->m_Cl32Cd[i]);
+		m_Re.insert(i,     pPolar->m_Re[i]);
+		m_XCp.insert(i,    pPolar->m_XCp[i]);
+	}
+}
+
 void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 {
     int i, j, n, l;

@@ -717,29 +717,19 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	}
 }
 
-void CWPolar::Export(QString FileName, int FileType)
+void CWPolar::Export(QTextStream &out, int FileType)
 {
-	MainFrame* pFrame = (MainFrame*)m_pParent;
+	MainFrame* pMainFrame = (MainFrame*)m_pParent;
 	int j;
 	QString strOut, Header, strong, str;
 
-	QFile XFile(FileName);
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 
-	QTextStream out(&XFile);
 
 	if (FileType==1)
 	{
-//		strong=  pFrame->m_VersionName +"\n";
-		strong = "QFLR5";//TODO
+	//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
+		strong = "QFLR5_v.0001\n\n";//TODO
 		out << strong;
-
-//		SYSTEMTIME tm;
-//		GetLocalTime(&tm);
-//		QString str;
-//		str.Format("%02d/%02d/%d  at  %02d:%02d:%02d \n", tm.wMonth, tm.wDay, tm.wYear,tm.wHour, tm.wMinute, tm.wSecond);
-//		out << str;
-
 
 		strong ="Wing name :        "+ m_UFOName + "\n";
 		out << strong;
@@ -747,20 +737,31 @@ void CWPolar::Export(QString FileName, int FileType)
 		strong ="Wing polar name :  "+ m_PlrName + "\n";
 		out << strong;
 
-		GetSpeedUnit(str, pFrame->m_SpeedUnit);
+		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		str +="\n\n";
-		strong = QString("Freestream speed : %1 ").arg(m_QInf*pFrame->m_mstoUnit,3,'f',1);
+		strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
 		strong +=str;
 		out << strong;
 
-		Header = "   alpha      CL           ICd        PCd        TCd        CY        GCm         GRm        GYm       IYm       QInf        XCP\n";
+		Header = "   alpha      CL          ICd        PCd        TCd        CY        GCm         GRm        GYm       IYm       QInf        XCP\n";
 		out << Header;
-//		Header.Format(" _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n");
-//		XFile.WriteString(Header);
+		Header = " _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n";
+		out << Header;
 		for (j=0; j<m_Alpha.size(); j++)
 		{
-//			strong.Format(" %8.3f  %9.6f    %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %9.6f  %8.4f    %9.4f\n",
-//				m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_CY[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
+			strong = QString(" %1  %2  %3  %4  %5  %6  %7  %8  %9  %10  %11  %12\n")
+					 .arg(m_Alpha[j],8,'f',3)
+					 .arg(m_Cl[j], 9,'f',6)
+					 .arg(m_ICd[j],9,'f',6)
+					 .arg(m_PCd[j],9,'f',6)
+					 .arg(m_TCd[j],9,'f',6)
+					 .arg(m_CY[j] ,9,'f',6)
+					 .arg(m_GCm[j],9,'f',6)
+					 .arg(m_GRm[j],9,'f',6)
+					 .arg(m_GYm[j],9,'f',6)
+					 .arg(m_IYm[j],9,'f',6)
+					 .arg(m_QInfinite[j],8,'f',4)
+					 .arg(m_XCP[j],9,'f',4);
 
 			out << strong;
 		}
@@ -770,16 +771,9 @@ void CWPolar::Export(QString FileName, int FileType)
 		QString strOut;
 		QString Header, strong;
 
-		strong = "QFLR5";
-//		strong=  pFrame->m_VersionName +"\n";
+	//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
+		strong = "QFLR5_v.0001\n\n";//TODO
 		out << strong;
-
-//		SYSTEMTIME tm;
-//		GetLocalTime(&tm);
-//		QString str;
-//		str.Format("%02d/%02d/%d  at  %02d:%02d:%02d \n", tm.wMonth, tm.wDay, tm.wYear,tm.wHour, tm.wMinute, tm.wSecond);
-//		out << str;
-
 
 		strong ="Wing name :, "+ m_UFOName + "\n";
 		out << strong;
@@ -787,29 +781,40 @@ void CWPolar::Export(QString FileName, int FileType)
 		strong ="Wing polar name :, "+ m_PlrName + "\n";
 		out << strong;
 
-		GetSpeedUnit(str, pFrame->m_SpeedUnit);
+		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		str +="\n\n";
-		strong = QString("Freestream speed :, %1 ").arg(m_QInf*pFrame->m_mstoUnit,3,'f',1);
+		strong = QString("Freestream speed :, %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
 		strong +=str;
 		out << strong;
 
 		Header = "alpha, CL, ICd, PCd, TCd, CY, GCm, GRm,GYm, IYm, QInf, XCP\n";
 		out << Header;
-//		Header.Format(" _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n");
-//		XFile.WriteString(Header);
+		Header = " _________,  ________,   ________,  _________,  _________,  _________,  _________,  _________,  _________,  _________,  _________,  _________\n";
+		out << Header;
 		for (j=0; j<m_Alpha.size(); j++)
 		{
 //			strong.Format(" %8.3f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %8.4f,  %9.4f\n",
-//				m_Alpha[j],	m_Cl[j], m_ICd[j], m_PCd[j], m_TCd[j], m_CY[j], m_GCm[j], m_GRm[j], m_GYm[j], m_IYm[j], m_QInfinite[j], m_XCP[j]);
+			strong = QString(" %1,  %2,  %3,  %4,  %5,  %6,  %7,  %8,  %9,  %10,  %11,  %12\n")
+					 .arg(m_Alpha[j],8,'f',3)
+					 .arg(m_Cl[j], 9,'f',6)
+					 .arg(m_ICd[j],9,'f',6)
+					 .arg(m_PCd[j],9,'f',6)
+					 .arg(m_TCd[j],9,'f',6)
+					 .arg(m_CY[j] ,9,'f',6)
+					 .arg(m_GCm[j],9,'f',6)
+					 .arg(m_GRm[j],9,'f',6)
+					 .arg(m_GYm[j],9,'f',6)
+					 .arg(m_IYm[j],9,'f',6)
+					 .arg(m_QInfinite[j],8,'f',4)
+					 .arg(m_XCP[j],9,'f',4);
 
 			out << strong;
 
 		}
 	}
 	out << "\n\n";
-	XFile.close();
+
 	return ;
-		
 }
 
 
@@ -1139,8 +1144,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
 
-		if(ArchiveFormat>1016) ar >> m_RefAreaType;
-		else                   m_RefAreaType = 1;
+		if(ArchiveFormat>=1016) ar >> m_RefAreaType;
+		else                    m_RefAreaType = 1;
 
 		ar >> n;
 		if (n<0 || n> 100000){

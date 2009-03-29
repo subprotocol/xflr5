@@ -35,11 +35,16 @@ class LinePickerDlg : public QDialog
 public:
 	LinePickerDlg(void *pParent = NULL);
 
+	void InitDialog();
 	void InitDialog(int style, int width, QColor color);
 
 	int &GetWidth();
 	int &GetStyle();
 	QColor &GetColor();
+
+	void SetColor(QColor color);
+	void SetWidth(int width);
+	void SetStyle(int style);
 
 	void FillBoxes();
 	void SetupLayout();

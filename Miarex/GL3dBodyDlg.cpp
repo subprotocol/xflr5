@@ -111,6 +111,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_FrameScale    = 1.0;
 	m_FrameRefScale = 1.0;
 
+	m_bChanged    = false;
 	m_bEnableName = true;
 
 	m_bBodyOverlay        = false;
@@ -188,11 +189,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 
 
 
-GL3dBodyDlg::~GL3dBodyDlg()
-{
-}
-
-
 
 void GL3dBodyDlg::ClientToGL(QPoint const &point, CVector &real)
 {
@@ -212,6 +208,7 @@ void GL3dBodyDlg::ClientToGL(QPoint const &point, CVector &real)
 		real.y = -((double)point.y() - h2) / h2;
 	}
 }
+
 
 void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 {
@@ -347,10 +344,6 @@ void GL3dBodyDlg::FillPointTableRow(int row)
 	ind = m_pPointModel->index(row, 2, QModelIndex());
 	m_pPointModel->setData(ind, m_pBody->m_hPanels[row]);
 }
-
-
-
-
 
 
 
@@ -2984,7 +2977,7 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 	{
 		case Qt::Key_Escape:
 		{
-			OnCancel();
+			reject();
 			break;
 		}
 		case Qt::Key_Control:
@@ -3492,6 +3485,7 @@ void GL3dBodyDlg::OnBodyStyle()
 
 	if(QDialog::Accepted==dlg.exec())
 	{
+		m_bChanged = true;
 		m_pBody->m_BodyStyle = dlg.GetStyle();
 		m_pBody->m_BodyWidth = dlg.GetWidth();
 		m_pBody->m_BodyColor = dlg.GetColor();
@@ -3516,6 +3510,7 @@ void GL3dBodyDlg::OnClipPlane(int pos)
 
 void GL3dBodyDlg::OnFrameCellChanged(QWidget *pWidget)
 {
+	m_bChanged = true;
 	ReadFrameSectionData(m_pBody->m_iActiveFrame);
 	repaint();
 }
@@ -3549,6 +3544,7 @@ void GL3dBodyDlg::OnGrid()
 void GL3dBodyDlg::OnInsert()
 {
 	CVector Real;
+	m_bChanged = true;
 	int FrameSel = 0;
 
 	if(m_BodyLineRect.contains(m_ptPopUp))
@@ -3602,6 +3598,7 @@ void GL3dBodyDlg::OnLight()
 
 void GL3dBodyDlg::OnLineType()
 {
+	m_bChanged = true;
 	if(m_pctrlFlatPanels->isChecked())
 	{
 		m_pBody->m_LineType = 1;
@@ -3621,16 +3618,6 @@ void GL3dBodyDlg::OnLineType()
 	m_bResetglBody2D = true;
 	m_bResetglBody = true;
 	UpdateView();
-}
-
-void GL3dBodyDlg::OnCancel()
-{
-	m_pBody->m_BodyName = m_pctrlBodyName->text();
-
-	int res = QMessageBox::question(window(), "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-	if (QMessageBox::No == res) QDialog::reject();
-	else if (QMessageBox::Cancel == res) return;
-	else done(QDialog::Accepted);
 }
 
 
@@ -3851,6 +3838,22 @@ void GL3dBodyDlg::ReadPointSectionData(int sel)
 	strong.replace(" ","");
 	k =strong.toInt(&bOK);
 	if(bOK) m_pBody->m_hPanels[sel] = k;
+}
+
+
+void GL3dBodyDlg::reject()
+{
+	if(m_bChanged)
+	{
+		m_pBody->m_BodyName = m_pctrlBodyName->text();
+
+		int res = QMessageBox::question(window(), "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		if (QMessageBox::No == res) QDialog::reject();
+		else if (QMessageBox::Cancel == res) return;
+		else done(QDialog::Accepted);
+	}
+	else QDialog::reject();
+
 }
 
 
@@ -4389,7 +4392,7 @@ void GL3dBodyDlg::SetupLayout()
 
 
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("Close"));
+	QPushButton *OKButton = new QPushButton(tr("Save and Close"));
 	OKButton->setAutoDefault(true);
 	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setAutoDefault(false);
@@ -4397,7 +4400,7 @@ void GL3dBodyDlg::SetupLayout()
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addWidget(CancelButton);
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
-	connect(CancelButton, SIGNAL(clicked()),this, SLOT(OnCancel()));
+	connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
 
 
 	QHBoxLayout *AllControls = new QHBoxLayout;
@@ -4510,6 +4513,7 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 
 void GL3dBodyDlg::showEvent(QShowEvent *event)
 {
+	m_bChanged    = false;
 	m_bResetglBody = true;
 	m_bIs3DScaleSet = false;
 	SetBodyScale();
@@ -4538,6 +4542,7 @@ void GL3dBodyDlg::showEvent(QShowEvent *event)
 
 void GL3dBodyDlg::TakePicture()
 {
+	m_bChanged = true;
 	m_bStored = false;
 	m_TmpPic.Duplicate(m_pBody);
 }

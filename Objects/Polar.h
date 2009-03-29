@@ -40,6 +40,7 @@ class CPolar
 	friend class QXDirect;
 	friend class BatchDlg;
 	friend class XFoilAnalysisDlg;
+	friend class EditPlrDlg;
 
 private:
 	int m_Type;// the Polar format type - used for Serialize action
@@ -94,6 +95,7 @@ private:
 
 	void AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);
+	void Copy(CPolar *pPolar);
 
 protected:
 	void GetLinearizedCl(double &Alpha0, double &slope);

@@ -72,6 +72,7 @@ class QMiarex : public QWidget
 	friend class CPlane;
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
+	friend class EditPlrDlg;
 
 	Q_OBJECT
 
@@ -83,7 +84,14 @@ public:
 
 
 private slots:
+	void On3DPrefs();
+	void OnShowEllipticCurve();
+	void OnWing2Curve();
+	void OnStabCurve();
+	void OnFinCurve();
+	void OnShowXCmRef();
 	void OnWPolars();
+	void OnExporttoAVL();
 	void OnWOpps();
 	void On3DView();
 	void OnCpView();
@@ -115,6 +123,8 @@ private slots:
 	void OnExportCurWOpp();
 	void OnCurWOppOnly();
 	void OnDeleteAllWPlrOpps();
+	void OnHideAllWPlrOpps();
+	void OnShowAllWPlrOpps();
 	void OnDeleteAllWOpps();
 	void OnHideAllWOpps();
 	void OnShowAllWOpps();
@@ -122,6 +132,9 @@ private slots:
 	void OnRenameCurWPolar();
 	void OnDeleteCurUFO();
 	void OnDeleteCurWPolar();
+	void OnEditCurWPolar();
+	void OnExportCurWPolar();
+	void OnResetCurWPolar();
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
 	void OnAnimate();

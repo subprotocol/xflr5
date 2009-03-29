@@ -54,7 +54,6 @@ class GL3dBodyDlg : public QDialog
 
 public:
 	GL3dBodyDlg(void *pParent = NULL);
-	~GL3dBodyDlg();
 
 
 private slots:
@@ -77,7 +76,7 @@ private slots:
 	void OnLineType();
 	void OnInsert();
 //	void OnOK();
-	void OnCancel();
+	void reject();
 	void OnRemove();
 	void OnFrameCellChanged(QWidget *pWidget);
 	void OnFrameItemActivated(const QModelIndex &index);
@@ -96,7 +95,7 @@ private:
 	void mouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-	void resizeEvent(QResizeEvent *event);
+	void resizeEvent(QResizeEvent *evendyt);
 	void showEvent(QShowEvent *event);
 
 	void ShowContextMenu(QContextMenuEvent * event);
@@ -180,6 +179,8 @@ private:
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	bool m_bStored;
 	bool m_bResetFrame;
+
+	bool m_bChanged;
 
 	QPoint m_ptPopUp;
 	CVector m_RealPopUp;

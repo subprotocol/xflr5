@@ -41,8 +41,9 @@ class CWPolar
 	friend class WPolarDlg;
 	friend class GL3dViewDlg;
 	friend class LLTAnalysisDlg;
-        friend class VLMAnalysisDlg;
-        friend class PanelAnalysisDlg;
+	friend class VLMAnalysisDlg;
+	friend class PanelAnalysisDlg;
+	friend class EditPlrDlg;
 
 public:
 	CWPolar();
@@ -97,7 +98,7 @@ private:
 	void AddPoint(CPOpp* pPOpp);
 	void CalculatePoint(int i);
 	void Copy(CWPolar *pWPolar);
-	void Export(QString FileName, int FileType);
+	void Export(QTextStream &out, int FileType);
 	void Remove(int i);
 	void ResetWPlr();
 

@@ -45,6 +45,7 @@ class QXDirect : public QWidget
 	friend class QFoilGeomDlg;
 	friend class QTEGapDlg;
 	friend class QCAddDlg;
+	friend class EditPlrDlg;
 
     Q_OBJECT
 
@@ -82,13 +83,14 @@ private slots:
 	void OnDelCurOpp();
 	void OnDeleteFoilPolars();
 	void OnDeltaAlphaChanged();
+	void OnEditCurPolar();
 	void OnExportCurFoil();
 	void OnExportCurOpp();
 	void OnExportCurPolar();
 	void OnHideAllOpps();
 	void OnHideAllPolars();
 	void OnHideFoilPolars();
-	void OnInitBL(int state);
+	void OnInitBL();
 	void OnOpPoints();
 	void OnPolars();
 	void OnPolarGraphVariable();
@@ -96,20 +98,20 @@ private slots:
 	void OnResetFoilScale();
 	void OnResetXFoil();
 	void OnSavePolars();
-	void OnSequence(int state);
+	void OnSequence();
 	void OnShowFoilPolars();
-	void OnShowBL(int state);
-	void OnShowCurve(int state);
+	void OnShowBL();
+	void OnShowCurve();
 	void OnShowNeutralLine();
-	void OnShowPoints(int state);
+	void OnShowPoints();
 	void OnShowPanels();
 	void OnShowAllOpps();
 	void OnShowAllPolars();
-	void OnShowPressure(int state);
+	void OnShowPressure();
 	void OnSingleAnalysis();
 	void OnSpec();
-	void OnStoreOpp(int state);
-	void OnViscous(int state);
+	void OnStoreOpp();
+	void OnViscous();
 
 	void OnDerotateFoil();
 	void OnNormalizeFoil();

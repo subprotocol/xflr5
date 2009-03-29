@@ -259,7 +259,6 @@ void ManageBodiesDlg::SetBody(CBody *pBody)
 
 void ManageBodiesDlg::UpdateBodyList()
 {
-
 	CBody * pBody;
 	m_pctrlNameList->clear();
 	for (int i=0; i<m_poaBody->size(); i++)
@@ -267,7 +266,6 @@ void ManageBodiesDlg::UpdateBodyList()
 		pBody = (CBody*)m_poaBody->at(i);
 		m_pctrlNameList->addItem(pBody->m_BodyName);
 	}
-
 }
 
 

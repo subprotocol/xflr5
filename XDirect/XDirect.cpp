@@ -27,6 +27,7 @@
 #include "../MainFrame.h"
 #include "../Graph/GraphVariableDlg.h"
 #include "../Graph/GraphDlg.h"
+#include "../Misc/EditPlrDlg.h"
 #include "XDirect.h"
 #include "XFoilAnalysisDlg.h"
 #include "FoilPolarDlg.h"
@@ -556,13 +557,13 @@ void QXDirect::Connect()
 	connect(m_pctrlCurveStyle, SIGNAL(activated(int)), this, SLOT(OnCurveStyle(int)));
 	connect(m_pctrlCurveWidth, SIGNAL(activated(int)), this, SLOT(OnCurveWidth(int)));
 	connect(m_pctrlCurveColor, SIGNAL(clicked()), this, SLOT(OnCurveColor()));
-	connect(m_pctrlSequence, SIGNAL(stateChanged(int)), this, SLOT(OnSequence(int)));
-	connect(m_pctrlInitBL, SIGNAL(stateChanged(int)), this, SLOT(OnInitBL(int)));
-	connect(m_pctrlShowBL, SIGNAL(stateChanged(int)), this, SLOT(OnShowBL(int)));
-	connect(m_pctrlShowPressure, SIGNAL(stateChanged(int)), this, SLOT(OnShowPressure(int)));
-	connect(m_pctrlStoreOpp, SIGNAL(stateChanged(int)), this, SLOT(OnStoreOpp(int)));
-	connect(m_pctrlShowPoints, SIGNAL(stateChanged(int)), this, SLOT(OnShowPoints(int)));
-	connect(m_pctrlShowCurve, SIGNAL(stateChanged(int)), this, SLOT(OnShowCurve(int)));
+	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
+	connect(m_pctrlInitBL, SIGNAL(clicked()), this, SLOT(OnInitBL()));
+	connect(m_pctrlShowBL, SIGNAL(clicked()), this, SLOT(OnShowBL()));
+	connect(m_pctrlShowPressure, SIGNAL(clicked()), this, SLOT(OnShowPressure()));
+	connect(m_pctrlStoreOpp, SIGNAL(clicked()), this, SLOT(OnStoreOpp()));
+	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowPoints()));
+	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 
 	connect(m_pctrlAnimate, SIGNAL(clicked(bool)), this, SLOT(OnAnimate(bool)));
 	connect(m_pctrlAnimateSpeed, SIGNAL(sliderMoved(int)), this, SLOT(OnAnimateSpeed(int)));
@@ -2250,7 +2251,37 @@ void QXDirect::OnDbPlot()
 	UpdateView();
 }
 
+void QXDirect::OnEditCurPolar()
+{
+	if (!m_pCurPolar) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
+	CPolar MemPolar;
+	MemPolar.Copy(m_pCurPolar);
+
+	EditPlrDlg dlg;
+	dlg.m_pPolar = m_pCurPolar;
+	dlg.m_pXDirect = this;
+	dlg.InitDialog();
+
+	bool bPoints = m_pCurPolar->m_bShowPoints;
+	m_pCurPolar->m_bShowPoints = true;
+
+	CreatePolarCurves();
+	UpdateView();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		pMainFrame->SetSaveState(false);
+	}
+	else
+	{
+		m_pCurPolar->Copy(&MemPolar);
+	}
+	m_pCurPolar->m_bShowPoints = bPoints;
+	CreatePolarCurves();
+	UpdateView();
+}
 
 void QXDirect::OnExportCurXFoilResults()
 {
@@ -2707,10 +2738,10 @@ void QXDirect::OnHideFoilPolars()
 }
 
 
-void QXDirect::OnInitBL(int state)
+void QXDirect::OnInitBL()
 {
 	if(!m_pXFoil) return;
-	if (state == Qt::Checked)
+	if (m_pctrlInitBL->isChecked())
 	{
 		m_pXFoil->lblini = false;
 		m_pXFoil->lipan  = false;
@@ -3205,9 +3236,8 @@ void QXDirect::OnSavePolars()
 }
 
 
-void QXDirect::OnSequence(int state)
+void QXDirect::OnSequence()
 {
-	state =0;
 	m_bSequence = m_pctrlSequence->isChecked();
 	SetOpPointSequence();
 }
@@ -3395,9 +3425,9 @@ void QXDirect::OnShowAllPolars()
 }
 
 
-void QXDirect::OnShowBL(int state)
+
+void QXDirect::OnShowBL()
 {
-	state = 0;
 	if(m_pctrlShowBL->isChecked())
 	{
 		if(m_bPolar) OnOpPoints();
@@ -3411,6 +3441,7 @@ void QXDirect::OnShowBL(int state)
 	}
 	if(!m_bAnimate)	UpdateView();
 }
+
 
 void QXDirect::OnShowFoilPolars()
 {
@@ -3432,7 +3463,7 @@ void QXDirect::OnShowFoilPolars()
 }
 
 
-void QXDirect::OnShowCurve(int state)
+void QXDirect::OnShowCurve()
 {
 	//user has toggled visible switch
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -3441,15 +3472,14 @@ void QXDirect::OnShowCurve(int state)
 	{
 		if (m_pCurPolar)
 		{ 
-			if (state==Qt::Checked) m_pCurPolar->m_bIsVisible = true;
-			else                    m_pCurPolar->m_bIsVisible = false;
+			m_pCurPolar->m_bIsVisible = m_pctrlShowCurve->isChecked();
+
 		}
 		CreatePolarCurves(); 
 	}
 	else if (m_pCurOpp)
 	{
-		if (state==Qt::Checked) m_pCurOpp->m_bIsVisible = true;
-		else                    m_pCurOpp->m_bIsVisible = false;
+		m_pCurOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
 		CreateOppCurves(); 
 	}
 	pMainFrame->SetSaveState(false);
@@ -3470,7 +3500,7 @@ void QXDirect::OnShowPanels()
 }
 
 
-void QXDirect::OnShowPoints(int state)
+void QXDirect::OnShowPoints()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -3478,15 +3508,13 @@ void QXDirect::OnShowPoints(int state)
 	{
 		if (m_pCurPolar)
 		{ 
-			if (state==Qt::Checked) m_pCurPolar->m_bShowPoints = true;
-			else                    m_pCurPolar->m_bShowPoints = false;
+			m_pCurPolar->m_bShowPoints = m_pctrlShowPoints->isChecked();
 		}
 		CreatePolarCurves(); 
 	}
 	else if (m_pCurOpp)
 	{
-		if (state==Qt::Checked) m_pCurOpp->m_bShowPoints = true;
-		else                    m_pCurOpp->m_bShowPoints = false;
+		m_pCurOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
 		CreateOppCurves(); 
 	}
 	
@@ -3495,9 +3523,9 @@ void QXDirect::OnShowPoints(int state)
 }
 
 
-void QXDirect::OnShowPressure(int state)
+
+void QXDirect::OnShowPressure()
 {
-	state = 0;
 	if(m_pctrlShowPressure->isChecked())
 	{
 		if(m_bPolar) OnOpPoints();
@@ -3625,10 +3653,9 @@ void QXDirect::OnSpec()
 	else if (m_pctrlSpec3->isChecked()) m_bAlpha = false;
 }
 
-void QXDirect::OnStoreOpp(int state)
+void QXDirect::OnStoreOpp()
 {
-	if(state == Qt::Checked) m_bStoreOpp = true;
-	else                     m_bStoreOpp = false;
+	m_bStoreOpp = m_pctrlStoreOpp->isChecked();
 }
 
 
@@ -3682,16 +3709,9 @@ void QXDirect::OnUePlot()
 }
 
 
-void QXDirect::OnViscous(int state)
+void QXDirect::OnViscous()
 {
-	if (state == Qt::Checked)
-	{
-		m_bViscous = true;
-	}
-	else
-	{
-		m_bViscous = false;
-	}
+	m_bViscous = m_pctrlViscous->isChecked();
 }
 
 
@@ -4512,7 +4532,6 @@ void QXDirect::SetAnalysisParams()
 		else         m_pctrlSpec2->setChecked(true);
 		m_pctrlSpec3->setEnabled(false);
 	}
-
 	SetOpPointSequence();
 
 	SetCurveParams();

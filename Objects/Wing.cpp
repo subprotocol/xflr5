@@ -774,60 +774,57 @@ void CWing::Duplicate(CWing *pWing)
 
 
 
-/*
-bool CWing::ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, double z, double Thetax, double Thetay)
+bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay)
 { 
 	// Exports the current wing to AVL format
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CStdioFile XFile;
-	CFileException fe;
+
 	int j;
     QString strong, str;
 
-	pXFile->WriteString("#=================================================\n");
-	pXFile->WriteString("SURFACE                      | (keyword)\n");
-	pXFile->WriteString(m_WingName);
-	pXFile->WriteString("\n");
-	pXFile->WriteString("#Nchord    Cspace   [ Nspan Sspace ]\n");			
+	out << ("#=================================================\n");
+	out << ("SURFACE                      | (keyword)\n");
+	out << (m_WingName);
+	out << ("\n");
+	out << ("#Nchord    Cspace   [ Nspan Sspace ]\n");
 
-	strong = QString("%3d        %3.1f\n", m_NXPanels[0], 1.0);
-	pXFile->WriteString(strong);
+	strong = QString("%1        %2\n").arg( m_NXPanels[0]).arg(1.0,3,'f',1);
+	out << (strong);
 
-
-	pXFile->WriteString("\n");
-	pXFile->WriteString("INDEX                        | (keyword)\n");
-	strong = QString("%3d                          | Lsurf\n", index);
-	pXFile->WriteString(strong);
+	out << ("\n");
+	out << ("INDEX                        | (keyword)\n");
+	strong = QString("%1                          | Lsurf\n").arg(index,3);
+	out << (strong);
 
 	if(!m_bIsFin)
 	{
-		pXFile->WriteString("\n");
-		pXFile->WriteString("YDUPLICATE\n");
-		pXFile->WriteString("0.0\n");
+		out << ("\n");
+		out << ("YDUPLICATE\n");
+		out << ("0.0\n");
 	}
 	else if(m_bDoubleFin)
 	{
-		pXFile->WriteString("\n");
-		pXFile->WriteString("YDUPLICATE\n");
-		strong = QString("%9.4f\n", y);
-		pXFile->WriteString(strong);
+		out << ("\n");
+		out << ("YDUPLICATE\n");
+		strong = QString("%1\n").arg(y,9,'f',4);
+		out << (strong);
 	}
 
-	pXFile->WriteString("\n");
-	pXFile->WriteString("SCALE\n");
-	pXFile->WriteString("1.0  1.0  1.0\n");
+	out << ("\n");
+	out << ("SCALE\n");
+	out << ("1.0  1.0  1.0\n");
 
-	pXFile->WriteString("\n");
-	pXFile->WriteString("TRANSLATE\n");
-	pXFile->WriteString("0.0  0.0  0.0\n");
+	out << ("\n");
+	out << ("TRANSLATE\n");
+	out << ("0.0  0.0  0.0\n");
 
-	pXFile->WriteString("\n");
-	pXFile->WriteString("ANGLE\n");
-	strong = QString("%8.3f                         | dAinc\n", Thetay);
-	pXFile->WriteString(strong);
+	out << ("\n");
+	out << ("ANGLE\n");
+	strong = QString("%1                         | dAinc\n").arg(Thetay,8,'f',3);
+	out << (strong);
 
-	pXFile->WriteString("\n\n");
+	out << ("\n\n");
 
 	//write only right wing surfaces since we have provided YDUPLICATE
 	CSurface ASurface;
@@ -840,61 +837,71 @@ bool CWing::ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, dou
 		//Remove twist, since AVL processes it as a mod of the angle of attack thru the dAInc command
 		ASurface.m_TwistA = ASurface.m_TwistB = 0.0;
 		ASurface.SetTwist();
-		pXFile->WriteString("#______________\nSECTION                                                     |  (keyword)\n");
+		out << ("#______________\nSECTION                                                     |  (keyword)\n");
 		
-		strong = QString("%9.4f %9.4f %9.4f %9.4f %7.3f  %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
-			ASurface.m_LA.x          *pMainFrame->m_mtoUnit,
-			ASurface.m_LA.y          *pMainFrame->m_mtoUnit,
-			ASurface.m_LA.z          *pMainFrame->m_mtoUnit,
-			ASurface.GetChord(0.0)   *pMainFrame->m_mtoUnit,
-			m_Surface[j].m_TwistA,
-			ASurface.m_NYPanels,
-			ASurface.m_YDistType);
-		pXFile->WriteString(strong);
-		pXFile->WriteString("\n");
-		pXFile->WriteString("AFIL 0.0 1.0\n");
-		pXFile->WriteString(ASurface.m_pFoilA->m_FoilName +".dat\n");
-		pXFile->WriteString("\n");
+		strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
+				 .arg(ASurface.m_LA.x          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LA.y          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LA.z          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(0.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(m_Surface[j].m_TwistA,7,'f',3)
+				 .arg(ASurface.m_NYPanels,3)
+				 .arg(ASurface.m_YDistType,3);
+		out << (strong);
+		out << ("\n");
+		out << ("AFIL 0.0 1.0\n");
+		out << (ASurface.m_pFoilA->m_FoilName +".dat\n");
+		out << ("\n");
 		if(ASurface.m_bTEFlap) 
 		{
-			pXFile->WriteString("CONTROL                                                     |  (keyword)\n");
-			str = QString("_Flap_%d  ",iFlap);
+			out << ("CONTROL                                                     |  (keyword)\n");
+			str = QString("_Flap_%1  ").arg(iFlap);
 			strong = m_WingName;
-			strong.Replace(" ", "_");
+			strong.replace(" ", "_");
 			strong += str;
-			str = QString("%5.2f  ", 2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle));
+			str = QString("%1  ")
+				  .arg(2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle),5,'f',2);
 			strong += str;
-			str = QString("%5.3f  %10.4f  %10.4f  %10.4f  -1.0  ", ASurface.m_pFoilA->m_TEXHinge/100.0, ASurface.m_HingeVector.x, ASurface.m_HingeVector.y, ASurface.m_HingeVector.z);
+			str = QString("%1  %2  %3  %4  -1.0  ")
+				  .arg(ASurface.m_pFoilA->m_TEXHinge/100.0,5,'f',3)
+				  .arg(ASurface.m_HingeVector.x,10,'f',4)
+				  .arg(ASurface.m_HingeVector.y,10,'f',4)
+				  .arg(ASurface.m_HingeVector.z,10,'f',4);
 			strong +=str + "| name, gain,  Xhinge,  XYZhvec,  SgnDup\n";
-			pXFile->WriteString(strong);
+			out << (strong);
 
 			//write the same flap at the other end
-			pXFile->WriteString("\n#______________\nSECTION                                                     |  (keyword)\n");
+			out << ("\n#______________\nSECTION                                                     |  (keyword)\n");
 			
-			strong = QString("%9.4f %9.4f %9.4f %9.4f %7.3f  %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
-				ASurface.m_LB.x          *pMainFrame->m_mtoUnit,
-				ASurface.m_LB.y          *pMainFrame->m_mtoUnit,
-				ASurface.m_LB.z          *pMainFrame->m_mtoUnit,
-				ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,
-				m_Surface[j].m_TwistB,
-				ASurface.m_NYPanels,
-				ASurface.m_YDistType);
-			pXFile->WriteString(strong);
-			pXFile->WriteString("\n");
-			pXFile->WriteString("AFIL 0.0 1.0\n");
-			pXFile->WriteString(ASurface.m_pFoilB->m_FoilName +".dat\n");
-			pXFile->WriteString("\n");
+			strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
+				 .arg(ASurface.m_LB.x          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.y          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.z          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(m_Surface[j].m_TwistB,7,'f',3)
+				 .arg(ASurface.m_NYPanels,3)
+				 .arg(ASurface.m_YDistType,3);
+			out << (strong);
 
-			pXFile->WriteString("CONTROL                                                     |  (keyword)\n");
-			str = QString("_Flap_%d  ",iFlap);
+			out << ("\n");
+			out << ("AFIL 0.0 1.0\n");
+			out << (ASurface.m_pFoilB->m_FoilName +".dat\n");
+			out << ("\n");
+
+			out << ("CONTROL                                                     |  (keyword)\n");
+			str = QString("_Flap_%1  ").arg(iFlap);
 			strong = m_WingName;
-			strong.Replace(" ", "_");
+			strong.replace(" ", "_");
 			strong += str;
-			str = QString("%5.2f  ", 2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle));
+			str = QString("%1  ").arg(2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle),5,'f',2);
 			strong += str;
-			str = QString("%5.3f  %10.4f  %10.4f  %10.4f  -1.0  ", ASurface.m_pFoilB->m_TEXHinge/100.0, ASurface.m_HingeVector.x, ASurface.m_HingeVector.y, ASurface.m_HingeVector.z);
+			str = QString("%1  %2  %3  %4  -1.0  ")
+				  .arg(ASurface.m_pFoilB->m_TEXHinge/100.0,5,'f',3)
+				  .arg(ASurface.m_HingeVector.x,10,'f',4)
+				  .arg(ASurface.m_HingeVector.y,10,'f',4)
+				  .arg(ASurface.m_HingeVector.z,10,'f',4);
 			strong +=str + "| name, gain,  Xhinge,  XYZhvec,  SgnDup\n\n";
-			pXFile->WriteString(strong);
+			out << (strong);
 
 			iFlap++;
 		}
@@ -902,28 +909,28 @@ bool CWing::ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, dou
 	//write last panel, if no flap before
 	if(!ASurface.m_bTEFlap)
 	{
-		pXFile->WriteString("#______________\nSECTION                                                     |  (keyword)\n");
-		strong = QString("%9.4f %9.4f %9.4f %9.4f %7.3f  %3d  %3d   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n",
-			ASurface.m_LB.x          *pMainFrame->m_mtoUnit,
-			ASurface.m_LB.y          *pMainFrame->m_mtoUnit,
-			ASurface.m_LB.z          *pMainFrame->m_mtoUnit,
-			ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,
-			m_Surface[j-1].m_TwistB,
-			ASurface.m_NYPanels,
-			ASurface.m_YDistType);
-		pXFile->WriteString(strong);
-		pXFile->WriteString("\n");
-		pXFile->WriteString("AFIL 0.0 1.0\n");
-		pXFile->WriteString(ASurface.m_pFoilB->m_FoilName +".dat\n");
-		pXFile->WriteString("\n");
+		out << ("#______________\nSECTION                                                     |  (keyword)\n");
+		strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
+				 .arg(ASurface.m_LB.x          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.y          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.m_LB.z          *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,9,'f',4)
+				 .arg(m_Surface[j].m_TwistB,7,'f',3)
+				 .arg(ASurface.m_NYPanels,3)
+				 .arg(ASurface.m_YDistType,3);
 
+		out << (strong);
+		out << ("\n");
+		out << ("AFIL 0.0 1.0\n");
+		out << (ASurface.m_pFoilB->m_FoilName +".dat\n");
+		out << ("\n");
 	}
 
-	pXFile->WriteString("\n\n");
+	out << ("\n\n");
 
 	return true;
 }
-*/
+
 
 
 double CWing::Eta(int m)

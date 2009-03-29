@@ -86,8 +86,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	LoadSettings();
 	qApp->setStyle(m_StyleName);
-
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+
 	pXDirect->SetAnalysisParams();
 	CreateActions();
 	CreateMenus();
@@ -797,6 +797,8 @@ void MainFrame::CreateMiarexActions()
 	CpViewAct->setStatusTip(tr("Show Cp view"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
+	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
+	connect(W3DPrefsAct, SIGNAL(triggered()), pMiarex, SLOT(On3DPrefs()));
 
 	DefineWingAct = new QAction(tr("Define a New Wing"), this);
 	DefineWingAct->setStatusTip(tr("Shows a dialogbox for editing a new wing definition"));
@@ -835,6 +837,10 @@ void MainFrame::CreateMiarexActions()
 	fourWingGraphs = new QAction(tr("All OpPoint Graphs"), this);
 	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
 
+	exporttoAVL = new QAction(tr("Export to AVL..."), this);
+	connect(exporttoAVL, SIGNAL(triggered()), pMiarex, SLOT(OnExporttoAVL()));
+
+
 	exportCurWOpp = new QAction(tr("Export..."), this);
 	connect(exportCurWOpp, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWOpp()));
 
@@ -853,9 +859,23 @@ void MainFrame::CreateMiarexActions()
 	deleteAllWOpps = new QAction(tr("Delete All OpPoints"), this);
 	connect(deleteAllWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteAllWOpps()));
 
+	showAllWPlrOpps = new QAction(tr("Show Associated OpPoints"), this);
+	connect(showAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWPlrOpps()));
+	hideAllWPlrOpps = new QAction(tr("Hide Associated OpPoints"), this);
+	connect(hideAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnHideAllWPlrOpps()));
 	deleteAllWPlrOpps = new QAction(tr("Delete Associated OpPoints"), this);
 	connect(deleteAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteAllWPlrOpps()));
 
+	showEllipticCurve = new QAction(tr("Show Elliptic Curve"), this);
+	connect(showEllipticCurve, SIGNAL(triggered()), pMiarex, SLOT(OnShowEllipticCurve()));
+	showXCmRefLocation = new QAction(tr("Show XCmRef location"), this);
+	connect(showXCmRefLocation, SIGNAL(triggered()), pMiarex, SLOT(OnShowXCmRef()));
+	showStabCurve = new QAction(tr("Show Stab Curve"), this);
+	connect(showStabCurve, SIGNAL(triggered()), pMiarex, SLOT(OnStabCurve()));
+	showFinCurve = new QAction(tr("Show Fin Curve"), this);
+	connect(showFinCurve, SIGNAL(triggered()), pMiarex, SLOT(OnFinCurve()));
+	showWing2Curve = new QAction(tr("Show Second Wing Curve"), this);
+	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
 	defineWPolar = new QAction(tr("Define Analysis"), this);
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
@@ -897,8 +917,6 @@ void MainFrame::CreateMiarexActions()
 
 	renameCurUFO = new QAction(tr("Rename..."), this);
 	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
-	renameCurWPolar = new QAction(tr("Rename..."), this);
-	connect(renameCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurWPolar()));
 
 	deleteCurUFO = new QAction(tr("Delete..."), this);
 	connect(deleteCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurUFO()));
@@ -906,6 +924,14 @@ void MainFrame::CreateMiarexActions()
 	SaveUFOAsProject = new QAction(tr("Save as Project..."), this);
 	connect(SaveUFOAsProject, SIGNAL(triggered()), this, SLOT(OnSaveUFOAsProject()));
 
+	renameCurWPolar = new QAction(tr("Rename..."), this);
+	connect(renameCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurWPolar()));
+	editCurWPolar = new QAction(tr("Edit ..."), this);
+	connect(editCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWPolar()));
+	exportCurWPolar = new QAction(tr("Export ..."), this);
+	connect(exportCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWPolar()));
+	resetCurWPolar = new QAction(tr("Reset ..."), this);
+	connect(resetCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnResetCurWPolar()));
 	deleteCurWPolar = new QAction(tr("Delete ..."), this);
 	connect(deleteCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurWPolar()));
 
@@ -927,6 +953,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addAction(CpViewAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(unitsAct);
+	MiarexViewMenu->addAction(W3DPrefsAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(restoreToolbarsAct);
 	MiarexViewMenu->addAction(styleAct);
@@ -940,6 +967,7 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addAction(renameCurUFO);
 	currentUFOMenu->addAction(deleteCurUFO);
 	currentUFOMenu->addAction(SaveUFOAsProject);
+	currentUFOMenu->addAction(exporttoAVL);
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(hideUFOWPlrs);
 	currentUFOMenu->addAction(showUFOWPlrs);
@@ -954,8 +982,14 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWPlrMenu = menuBar()->addMenu(tr("&Polars"));
 	MiarexWPlrMenu->addAction(defineWPolar);
 	CurWPlrMenu = MiarexWPlrMenu->addMenu("Current Polar");
+	CurWPlrMenu->addAction(editCurWPolar);
 	CurWPlrMenu->addAction(renameCurWPolar);
 	CurWPlrMenu->addAction(deleteCurWPolar);
+	CurWPlrMenu->addAction(exportCurWPolar);
+	CurWPlrMenu->addAction(resetCurWPolar);
+	CurWPlrMenu->addSeparator();
+	CurWPlrMenu->addAction(showAllWPlrOpps);
+	CurWPlrMenu->addAction(hideAllWPlrOpps);
 	CurWPlrMenu->addAction(deleteAllWPlrOpps);
 	MiarexWPlrMenu->addSeparator();
 	MiarexWPlrMenu->addAction(hideAllWPlrs);
@@ -981,8 +1015,13 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWOppMenu->addAction(showCurWOppOnly);
 	MiarexWOppMenu->addAction(showAllWOpps);
 	MiarexWOppMenu->addAction(hideAllWOpps);
-	MiarexWOppMenu->addSeparator();
 	MiarexWOppMenu->addAction(deleteAllWOpps);
+	MiarexWOppMenu->addSeparator();
+	MiarexWOppMenu->addAction(showEllipticCurve);
+	MiarexWOppMenu->addAction(showXCmRefLocation);
+	MiarexWOppMenu->addAction(showWing2Curve);
+	MiarexWOppMenu->addAction(showStabCurve);
+	MiarexWOppMenu->addAction(showFinCurve);
 	MiarexWOppMenu->addSeparator();
 	WOppGraphMenu = MiarexWOppMenu->addMenu("Graphs");
 	WOppGraphMenu->addAction(WingGraph1);
@@ -1015,6 +1054,16 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addAction(deleteAllWOpps);
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addMenu(WOppGraphMenu);
+	WOppCtxMenu->addSeparator();
+	WOppCtxMenu->addAction(showEllipticCurve);
+	WOppCtxMenu->addAction(showXCmRefLocation);
+	WOppCtxMenu->addAction(showWing2Curve);
+	WOppCtxMenu->addAction(showStabCurve);
+	WOppCtxMenu->addAction(showFinCurve);
+	WOppCtxMenu->addSeparator();
+	WOppCtxMenu->addAction(advancedSettings);
+	WOppCtxMenu->addAction(viewLogFile);
+
 
 	//Polar View Context Menu
 	WPlrCtxMenu = new QMenu("Context Menu",this);
@@ -1132,6 +1181,10 @@ void MainFrame::CreateXDirectActions()
 	deletePolar = new QAction(tr("Delete the polar"), this);
 	deletePolar->setStatusTip(tr("Deletes the currently selected polar"));
 	connect(deletePolar, SIGNAL(triggered()), this, SLOT(OnDeleteCurPolar()));
+
+	editCurPolar = new QAction(tr("Edit the polar"), this);
+	editCurPolar->setStatusTip(tr("Remove the unconverged or erroneaous points of the currently selected polar"));
+	connect(editCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnEditCurPolar()));
 
 	exportCurPolar = new QAction(tr("Export the Polar"), this);
 	connect(exportCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurPolar()));
@@ -1310,6 +1363,8 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu = PolarMenu->addMenu("Current Polar");
 	currentPolarMenu->addAction(exportCurPolar);
 	currentPolarMenu->addAction(deletePolar);
+	currentPolarMenu->addAction(editCurPolar);
+
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(definePolar);
 	PolarMenu->addAction(defineBatch);
@@ -1403,6 +1458,7 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu = OperFoilCtxMenu->addMenu("Current Polar");
 	CurPolarCtxMenu->addAction(deletePolar);
 	CurPolarCtxMenu->addAction(exportCurPolar);
+	CurPolarCtxMenu->addAction(editCurPolar);
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(showInviscidCurve);
 	OperFoilCtxMenu->addSeparator();//_______________
@@ -1443,6 +1499,7 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu = OperPolarCtxMenu->addMenu("Current Polar");
 	CurPolarCtxMenu->addAction(deletePolar);
 	CurPolarCtxMenu->addAction(exportCurPolar);
+	CurPolarCtxMenu->addAction(editCurPolar);
 	OperPolarCtxMenu->addSeparator();//_______________
 	OperPolarCtxMenu->addAction(allPolarGraphsSettingsAct);
 	OperPolarCtxMenu->addAction( allPolarGraphsScales);
@@ -1855,13 +1912,17 @@ void MainFrame::DeleteProject()
 		m_oaOpp.removeAt(i);
 		delete (OpPoint*)pObj;
 	}
+qDebug() << "Deleting bodies" << m_oaBody.size();
 	for (i=m_oaBody.size()-1; i>=0; i--)
 	{
 		pObj = m_oaBody.at(i);
+CBody *pBody = (CBody*)pObj;
+qDebug() << pBody << pBody->m_BodyName;
 		m_oaBody.removeAt(i);
 		delete (CBody*)pObj;
+qDebug() << "deleted";
 	}
-
+qDebug() << "next";
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_pCurPlane  = NULL;
 	pMiarex->m_pCurPOpp   = NULL;
@@ -2785,8 +2846,8 @@ void MainFrame::OnLogFile()
 void MainFrame::OnMiarex()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;	m_iApp = MIAREX;
-	QString strong ;
-	pMiarex->m_pCurGraph->GetGraphName(strong);
+//	QString strong ;
+//	pMiarex->m_pCurGraph->GetGraphName(strong);
 	m_pctrlXDirectToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlMiarexToolBar->show();
@@ -3310,7 +3371,10 @@ void MainFrame::OnSelChangeOpp(int i)
 
 void MainFrame::OnStyle()
 {
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
+	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 
 	QGraph m_RefGraph;//which setttings ?
 
@@ -3340,6 +3404,18 @@ void MainFrame::OnStyle()
 		pXDirect->m_pTrGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pUserGraph->SetBkColor(m_GraphBackColor);
 
+		pXInverse->m_QGraph.SetBkColor(m_GraphBackColor);
+
+		pMiarex->m_WingGraph1.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WingGraph2.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WingGraph3.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WingGraph4.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WPlrGraph1.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WPlrGraph2.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WPlrGraph3.SetBkColor(m_GraphBackColor);
+		pMiarex->m_WPlrGraph4.SetBkColor(m_GraphBackColor);
+		pMiarex->m_CpGraph.SetBkColor(m_GraphBackColor);
+
 		if(dlg.m_bIsGraphModified)
 		{
 			pXDirect->m_pPolarGraph->CopySettings(&m_RefGraph, false);
@@ -3348,6 +3424,18 @@ void MainFrame::OnStyle()
 			pXDirect->m_pCzGraph->CopySettings(&m_RefGraph, false);
 			pXDirect->m_pTrGraph->CopySettings(&m_RefGraph, false);
 			pXDirect->m_pUserGraph->CopySettings(&m_RefGraph, false);
+
+			pXInverse->m_QGraph.CopySettings(&m_RefGraph, false);
+
+			pMiarex->m_WingGraph1.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WingGraph2.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WingGraph3.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WingGraph4.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WPlrGraph1.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WPlrGraph2.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WPlrGraph3.CopySettings(&m_RefGraph, false);
+			pMiarex->m_WPlrGraph4.CopySettings(&m_RefGraph, false);
+			pMiarex->m_CpGraph.CopySettings(&m_RefGraph, false);
 		}
 	}
 }
@@ -3443,7 +3531,6 @@ void MainFrame::openRecentFile()
 
 	if(App==0)
 	{
-//remove filename from list
 		m_iApp = App;
 		QString FileName = action->data().toString();
 		m_RecentFiles.removeAll(FileName);
@@ -3452,8 +3539,6 @@ void MainFrame::openRecentFile()
 
 	else if(m_iApp==XFOILANALYSIS)
 	{
-		SetSaveState(false);
-
 		if(m_oaPolar.size())
 		{
 			if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
@@ -4469,8 +4554,10 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 					if(pPOpp) delete pPOpp;
 				}
 				pMiarex->AddBody(pBody);
+qDebug() << pBody;
 			}
 		}
+qDebug() << "Read bodies "<<n << i;
 
 		if(ArchiveFormat>=100006)
 		{ //read the planes

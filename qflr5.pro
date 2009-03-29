@@ -83,7 +83,9 @@ SOURCES += MainFrame.cpp \
     GLWidget.cpp \
     XInverse/InverseOptionsDlg.cpp \
     Miarex/ManageBodiesDlg.cpp \
-    Graph/WingGraphVarDlg.cpp
+    Graph/WingGraphVarDlg.cpp \
+    Misc/EditPlrDlg.cpp \
+    Miarex/W3dPrefsDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -162,5 +164,7 @@ HEADERS += MainFrame.h \
     GLWidget.h \
     XInverse/InverseOptionsDlg.h \
     Miarex/ManageBodiesDlg.h \
-    Graph/WingGraphVarDlg.h
+    Graph/WingGraphVarDlg.h \
+    Misc/EditPlrDlg.h \
+    Miarex/W3dPrefsDlg.h
 RESOURCES += qflr5.qrc

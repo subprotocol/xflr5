@@ -101,7 +101,7 @@ protected:
 	void ScaleChord(double NewChord);
 	bool Gauss(double *A, int n, double *B, int m);
 	bool SerializeWing(QDataStream &ar, bool bIsStoring);
-//	bool ExportAVLWing(CStdioFile *pXFile, int index, double x, double y, double z, double Thetax, double Thetay);
+	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
 	double GetAverageSweep();
 	double GetChord(double yob);

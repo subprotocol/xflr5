@@ -232,22 +232,25 @@ private:
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *renameCurWPolar;
-	QAction *deleteCurUFO, *deleteCurWPolar, *deleteCurWOpp;
+	QAction *deleteCurUFO,*editCurWPolar,*exportCurWPolar, *resetCurWPolar,*deleteCurWPolar, *deleteCurWOpp;
 	QAction *twoWingGraphs, *fourWingGraphs;
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
 	QAction *twoWPlrGraphs, *allWPlrGraphs, *WGraphVariable;
 	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs;
 	QAction *resetWOppLegend, *resetWPlrLegend;
-	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps, *deleteAllWPlrOpps;
+	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
+	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
 	QAction *defineWPolar, *advancedSettings;
 	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
+	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
+	QAction *exporttoAVL;
 
 	//XDirect Actions
-	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *defineBatch;
+	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch;
 	QAction *restoreToolbarsAct;
 	QAction *exportCurPolar, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
 	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;
