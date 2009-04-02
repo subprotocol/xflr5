@@ -85,7 +85,9 @@ SOURCES += MainFrame.cpp \
     Miarex/ManageBodiesDlg.cpp \
     Graph/WingGraphVarDlg.cpp \
     Misc/EditPlrDlg.cpp \
-    Miarex/W3dPrefsDlg.cpp
+    Miarex/W3dPrefsDlg.cpp \
+    Miarex/CtrlPolarDlg.cpp \
+    Miarex/CtrlTableDelegate.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -166,5 +168,7 @@ HEADERS += MainFrame.h \
     Miarex/ManageBodiesDlg.h \
     Graph/WingGraphVarDlg.h \
     Misc/EditPlrDlg.h \
-    Miarex/W3dPrefsDlg.h
+    Miarex/W3dPrefsDlg.h \
+    Miarex/CtrlPolarDlg.h \
+    Miarex/CtrlTableDelegate.h
 RESOURCES += qflr5.qrc

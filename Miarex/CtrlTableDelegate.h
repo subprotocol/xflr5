@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	FoilTableDelegate Class
+	CtrlTableDelegate Class
 	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,37 +19,37 @@
 
 *****************************************************************************/
 
-#ifndef FOILTABLEDELEGATE_H
-#define FOILTABLEDELEGATE_H
+#ifndef CTRLTABLEDELEGATE_H
+#define CTRLTABLEDELEGATE_H
 
 #include <QList>
 #include <QItemDelegate>
 #include <QStandardItemModel>
 #include "../Misc/FloatEdit.h"
 
-class FoilTableDelegate : public QItemDelegate
+class CtrlTableDelegate : public QItemDelegate
 {
 	Q_OBJECT
-	friend class QAFoil;
+	friend class CtrlPolarDlg;
 
 public:
-	FoilTableDelegate(QObject *parent = 0);
+	CtrlTableDelegate(QObject *parent = 0);
 
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	void setEditorData(QWidget *editor, const QModelIndex &index) const;
 	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 	void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-//	void drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const;
+	void drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const;
 	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 
 private:
-	QStandardItemModel *m_pFoilModel;
+	QStandardItemModel *m_pCtrlModel;
 	int *m_Precision; ///table of float precisions for each column
-	static void *s_pAFoil;
+	static void *s_pMiarex;
 };
 
-#endif // FOILTABLEDELEGATE_H
+#endif // CTRLTABLEDELEGATE_H
 
 
 

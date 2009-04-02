@@ -142,6 +142,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_iApp = 0;
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
+	m_pctrlXInverseToolBar->hide();
 	m_pctrlMiarexToolBar->hide();
 	SetMenus();
 }
@@ -378,6 +379,7 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 		case DIRECTDESIGN:
 		{
 			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+			AFoilCtxMenu->exec(ScreenPt);
 			break;
 		}
 		case INVERSEDESIGN:
@@ -461,7 +463,7 @@ void MainFrame::CreateActions()
 	exportCurGraphAct->setStatusTip(tr("Export the current graph data to a text file"));
 	connect(exportCurGraphAct, SIGNAL(triggered()), this, SLOT(OnExportCurGraph()));
 
-	resetCurGraphScales = new QAction(tr("Reset Graph Scales"), this);
+	resetCurGraphScales = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales"), this);
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
@@ -496,24 +498,38 @@ void MainFrame::CreateAFoilActions()
 	AFoilGridAct->setStatusTip(tr("Define the grid settings for the view"));
 	connect(AFoilGridAct, SIGNAL(triggered()), pAFoil, SLOT(OnGrid()));
 
-	storeSplineAct= new QAction(QIcon(":/images/storesplines.png"), tr("Store Splines"), this);
+	storeSplineAct= new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Splines"), this);
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
 
-
-	zoomInAct= new QAction(QIcon(":/images/ZoomIn.png"), tr("Zoom in"), this);
+	zoomInAct= new QAction(QIcon(":/images/OnZoomIn.png"), tr("Zoom in"), this);
 	zoomInAct->setStatusTip(tr("Zoom the view by drawing a rectangle in the client area"));
 	connect(zoomInAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomIn()));
 
-	zoomOutAct= new QAction(QIcon(":/images/ZoomOut.png"), tr("Zoom Out"), this);
-	zoomOutAct->setStatusTip(tr("Zoom out"));
-	connect(zoomOutAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomOut()));
+	ResetXScaleAct= new QAction(QIcon(":/images/ZoomOut.png"), tr("Reset X Scale"), this);
+	ResetXScaleAct->setStatusTip(tr("Resets the scale to fit the current screen width"));
+	connect(ResetXScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetXScale()));
 
-	zoomLessAct= new QAction(QIcon(":/images/ZoomLess.png"), tr("Zoom Less"), this);
+	UndoAFoilAct= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
+	UndoAFoilAct->setStatusTip(tr("Cancels the last modifiction made to the splines"));
+	connect(UndoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnUndo()));
+
+	RedoAFoilAct= new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
+	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
+	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
+
+	ResetYScaleAct= new QAction(tr("Reset Y Scale"), this);
+	connect(ResetYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetYScale()));
+
+	ResetXYScaleAct= new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset Scales"), this);
+	ResetXYScaleAct->setStatusTip(tr("Resets the x and y scales to screen size"));
+	connect(ResetXYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetScales()));
+
+	zoomLessAct= new QAction(QIcon(":/images/OnZoomLess.png"), tr("Zoom Less"), this);
 	zoomLessAct->setStatusTip(tr("Zoom Less"));
 	connect(zoomLessAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomLess()));
 
-	zoomYAct= new QAction(QIcon(":/images/ZoomY.png"), tr("Zoom Y Scale"), this);
+	zoomYAct= new QAction(QIcon(":/images/OnZoomYScale.png"), tr("Zoom Y Scale"), this);
 	zoomYAct->setStatusTip(tr("Zoom Y scale Only"));
 	connect(zoomYAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomYOnly()));
 
@@ -557,11 +573,18 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu = menuBar()->addMenu(tr("&View"));
 	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(zoomInAct);
+	AFoilViewMenu->addAction(ResetXScaleAct);
+	AFoilViewMenu->addAction(zoomLessAct);
+	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(restoreToolbarsAct);
 	AFoilViewMenu->addAction(styleAct);
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
 	AFoilDesignMenu = menuBar()->addMenu(tr("&Design"));
+	AFoilDesignMenu->addAction(UndoAFoilAct);
+	AFoilDesignMenu->addAction(RedoAFoilAct);
+	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(AFoilNormalizeFoil);
 	AFoilDesignMenu->addAction(AFoilDerotateFoil);
 	AFoilDesignMenu->addAction(AFoilRefineLocalFoil);
@@ -574,6 +597,17 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(AFoilInterpolateFoils);
 	AFoilDesignMenu->addAction(AFoilNacaFoils);
+
+
+	//AFoil Context Menu
+	AFoilCtxMenu = new QMenu("Context Menu",this);
+	AFoilCtxMenu->addMenu(AFoilDesignMenu);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(ResetXScaleAct);
+	AFoilCtxMenu->addAction(ResetYScaleAct);
+	AFoilCtxMenu->addAction(ResetXYScaleAct);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(AFoilGridAct);
 }
 
 
@@ -586,8 +620,12 @@ void MainFrame::CreateAFoilToolbar()
 	m_pctrlAFoilToolBar->addAction(saveAct);
 	m_pctrlAFoilToolBar->addSeparator();
 	m_pctrlAFoilToolBar->addAction(zoomInAct);
-	m_pctrlAFoilToolBar->addAction(zoomOutAct);
 	m_pctrlAFoilToolBar->addAction(zoomLessAct);
+	m_pctrlAFoilToolBar->addAction(ResetXScaleAct);
+	m_pctrlAFoilToolBar->addSeparator();
+	m_pctrlAFoilToolBar->addAction(UndoAFoilAct);
+	m_pctrlAFoilToolBar->addAction(RedoAFoilAct);
+
 	m_pctrlAFoilToolBar->addAction(zoomYAct);
 	m_pctrlAFoilToolBar->addAction(storeSplineAct);
 
@@ -781,19 +819,19 @@ void MainFrame::CreateMiarexActions()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
-	WOppAct = new QAction(tr("OpPoint view"), this);
+	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint view"), this);
 	WOppAct->setStatusTip(tr("Show Operating point view"));
 	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
 
-	WPolarAct = new QAction(tr("Polar view"), this);
+	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
 	WPolarAct->setStatusTip(tr("Show Polar view"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
-	W3DAct = new QAction(tr("3D view"), this);
+	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D view"), this);
 	W3DAct->setStatusTip(tr("Show 3D view"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
-	CpViewAct = new QAction(tr("CpView view"), this);
+	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("CpView view"), this);
 	CpViewAct->setStatusTip(tr("Show Cp view"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
@@ -879,6 +917,9 @@ void MainFrame::CreateMiarexActions()
 
 	defineWPolar = new QAction(tr("Define Analysis"), this);
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
+
+	defineCtrlPolar = new QAction(tr("Define a Control Analysis"), this);
+	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
 	WingGraph1 = new QAction(tr("Wing Graph 1"), this);
 	connect(WingGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph1()));
@@ -981,6 +1022,7 @@ void MainFrame::CreateMiarexMenus()
 
 	MiarexWPlrMenu = menuBar()->addMenu(tr("&Polars"));
 	MiarexWPlrMenu->addAction(defineWPolar);
+	MiarexWPlrMenu->addAction(defineCtrlPolar);
 	CurWPlrMenu = MiarexWPlrMenu->addMenu("Current Polar");
 	CurWPlrMenu->addAction(editCurWPolar);
 	CurWPlrMenu->addAction(renameCurWPolar);
@@ -1098,15 +1140,102 @@ void MainFrame::CreateMiarexMenus()
 
 
 
+void MainFrame::CreateMiarexToolbar()
+{
+	m_pctrlUFO = new QComboBox();
+	m_pctrlWPolar = new QComboBox;
+	m_pctrlWOpp = new QComboBox;
+
+	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlUFO->setMinimumWidth(200);
+	m_pctrlWPolar->setMinimumWidth(200);
+	m_pctrlWOpp->setMinimumWidth(30);
+	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
+	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
+	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
+
+	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
+	m_pctrlMiarexToolBar->addAction(newProjectAct);
+	m_pctrlMiarexToolBar->addAction(openAct);
+	m_pctrlMiarexToolBar->addAction(saveAct);
+	m_pctrlMiarexToolBar->addSeparator();
+	m_pctrlMiarexToolBar->addAction(WOppAct);
+	m_pctrlMiarexToolBar->addAction(WPolarAct);
+	m_pctrlMiarexToolBar->addAction(W3DAct);
+	m_pctrlMiarexToolBar->addAction(CpViewAct);
+	m_pctrlMiarexToolBar->addSeparator();
+	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolar);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlWOpp);
+
+	connect(m_pctrlUFO,    SIGNAL(activated(int)), this, SLOT(OnSelChangeUFO(int)));
+	connect(m_pctrlWPolar, SIGNAL(activated(int)), this, SLOT(OnSelChangeWPolar(int)));
+	connect(m_pctrlWOpp,   SIGNAL(activated(int)), this, SLOT(OnSelChangeWOpp(int)));
+}
+
+
+void MainFrame::CreateStatusBar()
+{
+	statusBar()->showMessage(tr("Ready"));
+	m_pctrlProjectName = new QLabel(" ");
+	m_pctrlProjectName->setMinimumWidth(200);
+	statusBar()->addPermanentWidget(m_pctrlProjectName);
+}
+
+
+void MainFrame::CreateToolbars()
+{
+	CreateXDirectToolbar();
+	CreateXInverseToolbar();
+	CreateMiarexToolbar();
+	CreateAFoilToolbar();
+}
+
+
+void MainFrame::CreateXDirectToolbar()
+{
+	m_pctrlFoil = new QComboBox();	
+	m_pctrlPolar = new QComboBox;
+	m_pctrlOpPoint = new QComboBox;
+
+	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlFoil->setMinimumWidth(200);
+	m_pctrlPolar->setMinimumWidth(200);
+	m_pctrlOpPoint->setMinimumWidth(30);
+
+	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
+	m_pctrlXDirectToolBar->addAction(newProjectAct);
+	m_pctrlXDirectToolBar->addAction(openAct);
+	m_pctrlXDirectToolBar->addAction(saveAct);
+	m_pctrlXDirectToolBar->addSeparator();
+	m_pctrlXDirectToolBar->addAction(OpPointsAct);
+	m_pctrlXDirectToolBar->addAction(PolarsAct);
+	m_pctrlXDirectToolBar->addSeparator();
+	m_pctrlXDirectToolBar->addWidget(m_pctrlFoil);
+	m_pctrlXDirectToolBar->addWidget(m_pctrlPolar);
+	m_pctrlXDirectToolBar->addWidget(m_pctrlOpPoint);
+
+	connect(m_pctrlFoil,    SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil(int)));
+	connect(m_pctrlPolar,   SIGNAL(activated(int)), this, SLOT(OnSelChangePolar(int)));
+	connect(m_pctrlOpPoint, SIGNAL(activated(int)), this, SLOT(OnSelChangeOpp(int)));
+
+}
+
+
+
 void MainFrame::CreateXDirectActions()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 
-	OpPointsAct = new QAction(tr("OpPoint view"), this);
+	OpPointsAct = new QAction(QIcon(":/images/OnCpView.png"), tr("OpPoint view"), this);
 	OpPointsAct->setStatusTip(tr("Show Operating point view"));
 	connect(OpPointsAct, SIGNAL(triggered()), pXDirect, SLOT(OnOpPoints()));
 
-	PolarsAct = new QAction(tr("Polar view"), this);
+	PolarsAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
 	PolarsAct->setStatusTip(tr("Show Polar view"));
 	connect(PolarsAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolars()));
 
@@ -1524,15 +1653,20 @@ void MainFrame::CreateXInverseActions()
 {
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-	StoreFoil = new QAction(tr("Store Foil"), this);
+	StoreFoil = new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Foil"), this);
 	StoreFoil->setStatusTip(tr("Store Foil in database"));
 	connect(StoreFoil, SIGNAL(triggered()), pXInverse, SLOT(OnStoreFoil()));
+
+	ExtractFoil = new QAction(QIcon(":/images/OnExtractFoil.png"),tr("Extract Foil"), this);
+	ExtractFoil->setStatusTip(tr("Extract a Foil from the database for modification"));
+	connect(ExtractFoil, SIGNAL(triggered()), pXInverse, SLOT(OnExtractFoil()));
 
 	InverseStyles = new QAction(tr("Define Styles"), this);
 	InverseStyles->setStatusTip(tr("Define the styles for this view"));
 	connect(InverseStyles, SIGNAL(triggered()), pXInverse, SLOT(OnInverseStyles()));
 
-	InverseResetScale = new QAction(tr("Reset foil scale"), this);
+	InverseResetScale = new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset foil scale"), this);
+	InverseResetScale->setStatusTip(tr("Resets the scale to fit the screen size"));
 	connect(InverseResetScale, SIGNAL(triggered()), pXInverse, SLOT(OnResetFoilScale()));
 
 	InverseInsertCtrlPt = new QAction(tr("Insert Control Point"), this);
@@ -1559,6 +1693,7 @@ void MainFrame::CreateXInverseActions()
 
 
 
+
 void MainFrame::CreateXInverseMenus()
 {
 	//MainMenu for XInverse Application
@@ -1570,8 +1705,14 @@ void MainFrame::CreateXInverseMenus()
 	XInverseViewMenu->addAction(styleAct);
 	XInverseViewMenu->addAction(saveViewToImageFileAct);
 
+	InverseGraphMenu = menuBar()->addMenu(tr("&Graph"));
+	InverseGraphMenu->addAction(GraphDlgAction);
+	InverseGraphMenu->addAction(resetCurGraphScales);
+	InverseGraphMenu->addAction(exportCurGraphAct);
+
 	InverseFoilMenu = menuBar()->addMenu(tr("&Foil"));
 	InverseFoilMenu->addAction(StoreFoil);
+	InverseFoilMenu->addAction(ExtractFoil);
 	InverseFoilMenu->addAction(InverseResetScale);
 	InverseFoilMenu->addSeparator();
 	InverseFoilMenu->addAction(InvQInitial);
@@ -1597,83 +1738,20 @@ void MainFrame::CreateXInverseMenus()
 }
 
 
-void MainFrame::CreateStatusBar()
+
+void MainFrame::CreateXInverseToolbar()
 {
-	statusBar()->showMessage(tr("Ready"));
-	m_pctrlProjectName = new QLabel(" ");
-	m_pctrlProjectName->setMinimumWidth(200);
-	statusBar()->addPermanentWidget(m_pctrlProjectName);
+	m_pctrlXInverseToolBar = addToolBar(tr("XInverse"));
+	m_pctrlXInverseToolBar->addAction(newProjectAct);
+	m_pctrlXInverseToolBar->addAction(openAct);
+	m_pctrlXInverseToolBar->addAction(saveAct);
+	m_pctrlXInverseToolBar->addSeparator();
+	m_pctrlXInverseToolBar->addAction(ExtractFoil);
+	m_pctrlXInverseToolBar->addAction(StoreFoil);
+	m_pctrlXInverseToolBar->addSeparator();
+	m_pctrlXInverseToolBar->addAction(resetCurGraphScales);
+	m_pctrlXInverseToolBar->addAction(InverseResetScale);
 }
-
-
-void MainFrame::CreateToolbars()
-{
-	CreateXDirectToolbar();
-	CreateMiarexToolbar();
-	CreateAFoilToolbar();
-}
-
-
-void MainFrame::CreateMiarexToolbar()
-{
-	m_pctrlUFO = new QComboBox();
-	m_pctrlWPolar = new QComboBox;
-	m_pctrlWOpp = new QComboBox;
-
-	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlUFO->setMinimumWidth(200);
-	m_pctrlWPolar->setMinimumWidth(200);
-	m_pctrlWOpp->setMinimumWidth(30);
-	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
-	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
-	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
-
-	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
-	m_pctrlMiarexToolBar->addAction(newProjectAct);
-	m_pctrlMiarexToolBar->addAction(openAct);
-	m_pctrlMiarexToolBar->addAction(saveAct);
-	m_pctrlMiarexToolBar->addSeparator();
-	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolar);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlWOpp);
-
-	connect(m_pctrlUFO,    SIGNAL(activated(int)), this, SLOT(OnSelChangeUFO(int)));
-	connect(m_pctrlWPolar, SIGNAL(activated(int)), this, SLOT(OnSelChangeWPolar(int)));
-	connect(m_pctrlWOpp,   SIGNAL(activated(int)), this, SLOT(OnSelChangeWOpp(int)));
-}
-
-
-
-void MainFrame::CreateXDirectToolbar()
-{
-	m_pctrlFoil = new QComboBox();	
-	m_pctrlPolar = new QComboBox;
-	m_pctrlOpPoint = new QComboBox;
-
-	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlFoil->setMinimumWidth(200);
-	m_pctrlPolar->setMinimumWidth(200);
-	m_pctrlOpPoint->setMinimumWidth(30);
-
-	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
-	m_pctrlXDirectToolBar->addAction(newProjectAct);
-	m_pctrlXDirectToolBar->addAction(openAct);
-	m_pctrlXDirectToolBar->addAction(saveAct);
-	m_pctrlXDirectToolBar->addSeparator();
-	m_pctrlXDirectToolBar->addWidget(m_pctrlFoil);
-	m_pctrlXDirectToolBar->addWidget(m_pctrlPolar);
-	m_pctrlXDirectToolBar->addWidget(m_pctrlOpPoint);
-
-	connect(m_pctrlFoil,    SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil(int)));
-	connect(m_pctrlPolar,   SIGNAL(activated(int)), this, SLOT(OnSelChangePolar(int)));
-	connect(m_pctrlOpPoint, SIGNAL(activated(int)), this, SLOT(OnSelChangeOpp(int)));
-
-}
-
 
 
 void MainFrame::OnDeleteCurPolar()
@@ -1912,17 +1990,12 @@ void MainFrame::DeleteProject()
 		m_oaOpp.removeAt(i);
 		delete (OpPoint*)pObj;
 	}
-qDebug() << "Deleting bodies" << m_oaBody.size();
 	for (i=m_oaBody.size()-1; i>=0; i--)
 	{
 		pObj = m_oaBody.at(i);
-CBody *pBody = (CBody*)pObj;
-qDebug() << pBody << pBody->m_BodyName;
 		m_oaBody.removeAt(i);
 		delete (CBody*)pObj;
-qDebug() << "deleted";
 	}
-qDebug() << "next";
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_pCurPlane  = NULL;
 	pMiarex->m_pCurPOpp   = NULL;
@@ -2629,6 +2702,7 @@ void MainFrame::OnAFoil()
 	m_iApp = DIRECTDESIGN;
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
+	m_pctrlXInverseToolBar->hide();
 	m_pctrlAFoilToolBar->show();
 
 	m_pctrlMiarexWidget->hide();
@@ -2849,6 +2923,7 @@ void MainFrame::OnMiarex()
 //	QString strong ;
 //	pMiarex->m_pCurGraph->GetGraphName(strong);
 	m_pctrlXDirectToolBar->hide();
+	m_pctrlXInverseToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlMiarexToolBar->show();
 //	m_pctrl3DScalesWidget->show();
@@ -2883,6 +2958,12 @@ void MainFrame::OnResetCurGraphScales()
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 			pGraph = pXDirect->m_pCurGraph;
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+			pGraph = &pXInverse->m_QGraph;
 			break;
 		}
 	}
@@ -3484,6 +3565,7 @@ void MainFrame::OnXDirect()
 	m_iApp = XFOILANALYSIS;
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
+	m_pctrlXInverseToolBar->hide();
 	m_pctrlXDirectToolBar->show();
 	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->hide();
@@ -3508,6 +3590,8 @@ void MainFrame::OnXInverse()
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
+	m_pctrlXInverseToolBar->show();
+
 	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->hide();
@@ -4554,10 +4638,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 					if(pPOpp) delete pPOpp;
 				}
 				pMiarex->AddBody(pBody);
-qDebug() << pBody;
 			}
 		}
-qDebug() << "Read bodies "<<n << i;
 
 		if(ArchiveFormat>=100006)
 		{ //read the planes

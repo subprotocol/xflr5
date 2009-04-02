@@ -190,8 +190,8 @@ void CAddDlg::InitDialog()
 
 	for( int i=1; i<= pXFoil->nb; i++)
 	{
-		xbmin = std::min(xbmin, pXFoil->xb[i]);
-		xbmax = std::max(xbmax, pXFoil->xb[i]);
+		xbmin = qMin(xbmin, pXFoil->xb[i]);
+		xbmax = qMax(xbmax, pXFoil->xb[i]);
 	}
 
 	//----- default inputs

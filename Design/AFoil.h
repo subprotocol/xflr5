@@ -86,13 +86,16 @@ private slots:
 	void OnDelete();
 	void OnDuplicate();
 	void OnFoilClicked(const QModelIndex& index);
-	void OnCellChanged(QWidget *pWidget);
+//	void OnCellChanged(QWidget *pWidget);
 	void OnStoreSplines();
 	void OnZoomIn();
-	void OnZoomOut();
 	void OnZoomLess();
 	void OnZoomYOnly();
+	void OnResetXScale();
 	void OnResetYScale();
+	void OnResetScales();
+	void OnUndo();
+	void OnRedo();
 
 	void OnAFoilSetFlap();
 	void OnAFoilDerotateFoil();

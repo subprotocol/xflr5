@@ -160,11 +160,16 @@ void CBody::Duplicate(CBody *pBody)
 	m_LineType       = pBody->m_LineType;
 	m_bClosedSurface = pBody->m_bClosedSurface;
 
-	memcpy(m_Frame, pBody->m_Frame, sizeof(m_Frame));
-	memcpy(m_FramePosition, pBody->m_FramePosition, sizeof(m_FramePosition));
-
-	memcpy(m_xPanels, pBody->m_xPanels, sizeof(m_xPanels));
-	memcpy(m_hPanels, pBody->m_hPanels, sizeof(m_hPanels));
+	for(int i=0; i<m_NStations; i++)
+	{
+		m_Frame[i].CopyFrame(pBody->m_Frame+i);
+		m_FramePosition[i].Copy(pBody->m_FramePosition[i]);
+		m_xPanels[i] = pBody->m_xPanels[i];
+	}
+	for(int i=0; i<m_NSideLines; i++)
+	{
+		m_hPanels[i] = pBody->m_hPanels[i];
+	}
 
 	SetKnots();
 }

@@ -6,11 +6,20 @@
     <file>images/open.png</file>
     <file>images/paste.png</file>
     <file>images/save.png</file>
-    <file>images/storesplines.png</file>
-    <file>images/ZoomIn.png</file>
-    <file>images/ZoomOut.png</file>
-    <file>images/ZoomLess.png</file>
-    <file>images/ZoomY.png</file>
+    <file>images/On3DView.png</file>
+    <file>images/OnBody.png</file>
+    <file>images/OnCpView.png</file>
+    <file>images/OnExtractFoil.png</file>
+    <file>images/OnPolarView.png</file>
+    <file>images/OnRedo.png</file>
+    <file>images/OnResetFoilScale.png</file>
+    <file>images/OnResetGraphScale.png</file>
+    <file>images/OnStoreFoil.png</file>
+    <file>images/OnUndo.png</file>
+    <file>images/OnWOppView.png</file>
+    <file>images/OnZoomIn.png</file>
+    <file>images/OnZoomLess.png</file>
+    <file>images/OnZoomYScale.png</file>
     <file>images/Q5.png</file>
 </qresource>
 </RCC>

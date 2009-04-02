@@ -619,7 +619,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 			else
 			{
 				m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/Lift);
-                                strong = QString("      Alpha=%1   QInf = %1").arg(V0+q*VDelta,5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
+								strong = QString("      Alpha=%1   QInf = %2").arg(V0+q*VDelta,5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
                                 GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 				strong+= strange + "\r\n";
 				AddString(strong);

@@ -381,7 +381,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		m_MaxBending = 0.0;
 		for (k=0; k<m_NStation; k++)
 		{
-			m_MaxBending = std::max(m_MaxBending, m_BendingMoment[k]);
+			m_MaxBending = qMax(m_MaxBending, m_BendingMoment[k]);
 		}
 		for (k=0; k<=m_NStation; k++)
 		{

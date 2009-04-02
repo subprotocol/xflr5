@@ -43,9 +43,9 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 	}
 	if(index.column()==12)
 	{
-/*		QCheckBox *editor = new QCheckBox(parent);
-//		editor->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		return editor;*/
+		QCheckBox *editor = new QCheckBox(parent);
+//		editor->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+		return editor;
 	}
 	else
 	{
@@ -58,56 +58,57 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 	return NULL;
 }
 
-
-void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
-	if(index.column()==0)
-	{
-		QString strong = index.model()->data(index, Qt::EditRole).toString();
-		QLineEdit *lineEdit = (QLineEdit*)editor;
-		lineEdit->setText(strong);
-	}
-	if(index.column()==12)
-	{
-/*		QVariant value = index.data(Qt::CheckStateRole);
-		Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
-
-		QCheckBox *checkBox = (QCheckBox*)editor;
-		checkBox->setChecked(state == Qt::Checked);
-//qDebug() << "Setting editor data " << (state == Qt::Checked);*/
-	}
-	else
-	{
-		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		floatEdit->SetValue(value);
-	}
-}
-
-
-void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
-{
-	if(index.column()==0)
-	{
-		QString strong;
-		QLineEdit *pLineEdit = static_cast<QLineEdit*>(editor);
-		strong = pLineEdit->text();
-		model->setData(index, strong, Qt::EditRole);
-	}
-	else if(index.column()==12)
-	{
 /*
-		QCheckBox *checkBox = (QCheckBox*)editor;
-		if(checkBox->isChecked()) model->setData(index, Qt::Checked, Qt::CheckStateRole);
-		else                      model->setData(index, Qt::Unchecked, Qt::CheckStateRole);
+void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const
+{
+//qDebug() << 	"drawCheck";
+	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+
+	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
+										  check(option, option.rect, Qt::Checked).size(),
+										  QRect(option.rect.x() + textMargin, option.rect.y(),
+												option.rect.width() - (textMargin * 2), option.rect.height()));
+	QItemDelegate::drawCheck(painter, option, checkRect, state);
+}
 */
+
+bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+						 const QModelIndex &index)
+{
+	// make sure that the item is checkable
+	Qt::ItemFlags flags = model->flags(index);
+	if (!(flags & Qt::ItemIsUserCheckable) || !(flags & Qt::ItemIsEnabled))
+		return false;
+
+	// make sure that we have a check state
+	QVariant value = index.data(Qt::CheckStateRole);
+	if (!value.isValid())
+		return false;
+
+	// make sure that we have the right event type
+	if (event->type() == QEvent::MouseButtonRelease)
+	{
+		const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
+		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
+											  check(option, option.rect, Qt::Checked).size(),
+											  QRect(option.rect.x() + textMargin, option.rect.y(),
+													option.rect.width() - (2 * textMargin), option.rect.height()));
+
+		if (!checkRect.contains(static_cast<QMouseEvent*>(event)->pos())) return false;
+	}
+	else if (event->type() == QEvent::KeyPress)
+	{
+		if (   static_cast<QKeyEvent*>(event)->key() != Qt::Key_Space
+			&& static_cast<QKeyEvent*>(event)->key() != Qt::Key_Select)
+			return false;
 	}
 	else
 	{
-		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue()/100.0;
-		model->setData(index, value, Qt::EditRole);
+		return false;
 	}
+
+	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+	return model->setData(index, state, Qt::CheckStateRole);
 }
 
 
@@ -164,61 +165,67 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 }
 
 
+
+
+
+void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+	if(index.column()==0)
+	{
+		QString strong = index.model()->data(index, Qt::EditRole).toString();
+		QLineEdit *lineEdit = (QLineEdit*)editor;
+		lineEdit->setText(strong);
+	}
+	if(index.column()==12)
+	{
+		QVariant value = index.data(Qt::CheckStateRole);
+//		Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+//qDebug() << "Setting editor data " << (state == Qt::Checked) << value.toInt();
+
+
+		QCheckBox *checkBox = (QCheckBox*)editor;
+//		checkBox->setChecked(state == Qt::Checked);
+		checkBox->setChecked(value.toInt()==Qt::Checked);
+
+	}
+	else
+	{
+		double value = index.model()->data(index, Qt::EditRole).toDouble();
+		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		floatEdit->SetValue(value);
+	}
+}
+
+
+void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+	if(index.column()==0)
+	{
+		QString strong;
+		QLineEdit *pLineEdit = static_cast<QLineEdit*>(editor);
+		strong = pLineEdit->text();
+		model->setData(index, strong, Qt::EditRole);
+	}
+	else if(index.column()==12)
+	{
+
+		QCheckBox *checkBox = (QCheckBox*)editor;
+qDebug() << "Setting Model Data" << 		checkBox->isChecked();
+		if(checkBox->isChecked()) model->setData(index, Qt::Checked, Qt::CheckStateRole);
+		else                      model->setData(index, Qt::Unchecked, Qt::CheckStateRole);
+
+	}
+	else
+	{
+		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		double value = floatEdit->GetValue()/100.0;
+		model->setData(index, value, Qt::EditRole);
+	}
+}
+
+
 void FoilTableDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
 	editor->setGeometry(option.rect);
 }
 
-
-void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const
-{
-//qDebug() << 	"drawCheck";
-	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-
-	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-										  check(option, option.rect, Qt::Checked).size(),
-										  QRect(option.rect.x() + textMargin, option.rect.y(),
-												option.rect.width() - (textMargin * 2), option.rect.height()));
-	QItemDelegate::drawCheck(painter, option, checkRect, state);
-}
-
-
-bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
-						 const QModelIndex &index)
-{
-	// make sure that the item is checkable
-	Qt::ItemFlags flags = model->flags(index);
-	if (!(flags & Qt::ItemIsUserCheckable) || !(flags & Qt::ItemIsEnabled))
-		return false;
-
-	// make sure that we have a check state
-	QVariant value = index.data(Qt::CheckStateRole);
-	if (!value.isValid())
-		return false;
-
-	// make sure that we have the right event type
-	if (event->type() == QEvent::MouseButtonRelease)
-	{
-		const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-											  check(option, option.rect, Qt::Checked).size(),
-											  QRect(option.rect.x() + textMargin, option.rect.y(),
-													option.rect.width() - (2 * textMargin), option.rect.height()));
-
-		if (!checkRect.contains(static_cast<QMouseEvent*>(event)->pos())) return false;
-	}
-	else if (event->type() == QEvent::KeyPress)
-	{
-		if (   static_cast<QKeyEvent*>(event)->key() != Qt::Key_Space
-			&& static_cast<QKeyEvent*>(event)->key() != Qt::Key_Select)
-			return false;
-	}
-	else
-	{
-		return false;
-	}
-
-	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked
-						? Qt::Unchecked : Qt::Checked);
-	return model->setData(index, state, Qt::CheckStateRole);
-}

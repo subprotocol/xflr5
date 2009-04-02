@@ -68,6 +68,7 @@ private slots:
 	void OnSymm() ;
 	void OnExecute();
 	void OnStoreFoil();
+	void OnExtractFoil();
 	void OnResetFoilScale();
 	void OnInsertCtrlPt();
 	void OnRemoveCtrlPt();
@@ -76,6 +77,7 @@ private slots:
 	void OnQViscous();
 	void OnQPoints();
 	void OnQReflected();
+	void OnResetGraphScale();
 
 
 private:

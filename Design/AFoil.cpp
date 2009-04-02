@@ -1539,31 +1539,14 @@ void QAFoil::OnGrid()
 		m_YMinColor  = dlg.m_YMinColor;
 		m_YMinUnit   = dlg.m_YMinUnit;
 	}
-
 	UpdateView();
 }
 
 
-void QAFoil::OnCellChanged(QWidget *pWidget)
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QModelIndex index = m_pctrlFoilTable->currentIndex();
-	QStandardItem *pItem = m_pFoilModel->item(index.row(),12);
-	bool bVisible = pItem->checkState();
-
-	pItem = m_pFoilModel->item(index.row(),0);
-	QString FoilName =pItem->text();
-
-	CFoil *pFoil= pMainFrame->GetFoil(FoilName);
-	if(pFoil) pFoil->m_bVisible = bVisible;
-
-	UpdateView();
-}
 
 
 void QAFoil::OnFoilClicked(const QModelIndex& index)
 {
-qDebug() << "FoilClicked";
 	if(index.row()>=m_poaFoil->size()+1) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -1580,6 +1563,7 @@ qDebug() << "FoilClicked";
 		SetFoil();
 	}
 }
+
 
 void QAFoil::OnCenterLine(bool bState)
 {
@@ -1685,33 +1669,6 @@ void QAFoil::OnPoints(bool bState)
 	pMainFrame->SetSaveState(false);
 	UpdateView();
 }
-
-
-void QAFoil::OnVisible(bool bState)
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_pCurFoil)
-	{
-		if(m_pctrlVisible->isChecked()) ShowFoil(m_pCurFoil, true);
-		else                            ShowFoil(m_pCurFoil, false);
-	}
-	else
-	{
-		if(m_bSF)
-		{
-			if(m_pctrlVisible->isChecked()) m_pSF->m_bVisible = true;
-			else                            m_pSF->m_bVisible = false;
-		}
-		else {
-			if(m_pctrlVisible->isChecked()) m_pPF->m_bVisible = true;
-			else                            m_pPF->m_bVisible = false;
-		}
-	}
-
-	pMainFrame->SetSaveState(false);
-	UpdateView();
-}
-
 
 
 void QAFoil::OnDelete()
@@ -1840,6 +1797,58 @@ void QAFoil::OnStoreSplines()
 	UpdateView();
 }
 
+
+void QAFoil::OnResetXScale()
+{
+	SetScale();
+	ReleaseZoom();
+	UpdateView();
+}
+
+
+void QAFoil::OnResetYScale()
+{
+	m_fScaleY = 1.0;
+	UpdateView();
+}
+
+
+void QAFoil::OnResetScales()
+{
+	m_fScaleY = 1.0;
+	SetScale();
+	ReleaseZoom();
+	UpdateView();
+}
+
+
+void QAFoil::OnVisible(bool bState)
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_pCurFoil)
+	{
+		if(m_pctrlVisible->isChecked()) ShowFoil(m_pCurFoil, true);
+		else                            ShowFoil(m_pCurFoil, false);
+	}
+	else
+	{
+		if(m_bSF)
+		{
+			if(m_pctrlVisible->isChecked()) m_pSF->m_bVisible = true;
+			else                            m_pSF->m_bVisible = false;
+		}
+		else {
+			if(m_pctrlVisible->isChecked()) m_pPF->m_bVisible = true;
+			else                            m_pPF->m_bVisible = false;
+		}
+	}
+
+	pMainFrame->SetSaveState(false);
+	UpdateView();
+}
+
+
+
 void QAFoil::OnZoomIn()
 {
 	// can't do two things at the same time can we ?
@@ -1873,13 +1882,6 @@ void QAFoil::OnZoomYOnly()
 }
 
 
-void QAFoil::OnResetYScale()
-{
-	m_fScaleY = 1.0;
-	UpdateView();
-}
-
-
 
 void QAFoil::OnZoomLess()
 {
@@ -1903,16 +1905,10 @@ void QAFoil::OnZoomLess()
 }
 
 
-void QAFoil::OnZoomOut()
-{
-	SetScale();
-	ReleaseZoom();
-	UpdateView();
-}
-
 void QAFoil::PaintLegend(QPainter &painter)
 {
 }
+
 
 void QAFoil::PaintView(QPainter &painter)
 {
@@ -2467,7 +2463,7 @@ void QAFoil::SetupLayout()
 	precision[11] = 2;
 
 	m_pFoilDelegate->m_Precision = precision;
-	connect(m_pFoilDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
+//	connect(m_pFoilDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 
 	m_pctrlFoilTable->setColumnWidth(0,100);
@@ -2592,3 +2588,92 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 	UpdateView();
 }
+
+
+
+
+void QAFoil::OnUndo() 
+{
+	if(m_StackPos>0) 
+	{
+		if(m_StackPos == m_StackSize)
+		{
+			//if we're at the first undo command, save current state
+			TakePicture();
+			StorePicture();//in case we redo
+			m_StackPos--;
+		}
+		m_StackPos--;
+		SetPicture();
+//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//		if(m_StackPos==0) pTB->EnableButton(IDT_UNDO, false);
+//		pTB->EnableButton(IDT_REDO, true);
+	}
+	else 
+	{
+		m_StackPos = 0;
+	}
+}
+
+
+
+void QAFoil::OnRedo() 
+{
+	if(m_StackPos<m_StackSize-1) 
+	{
+		m_StackPos++;
+		SetPicture();
+//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//		pTB->EnableButton(IDT_UNDO, true);
+//		if(m_StackPos==m_StackSize-1) pTB->EnableButton(IDT_REDO, false);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -644,8 +644,8 @@ double CPolar::GetCm0()
 	double Clmax = -1000.0;
     for (i=0; i<m_Cl.size(); i++)
     {
-        Clmin = std::min(Clmin, m_Cl[i]);
-        Clmax = std::max(Clmax, m_Cl[i]);
+		Clmin = qMin(Clmin, m_Cl[i]);
+		Clmax = qMax(Clmax, m_Cl[i]);
 	}
 	if(!(Clmin<0.0) || !(Clmax>0.0)) return 0.0;
 	int k=0;
@@ -670,8 +670,8 @@ double CPolar::GetZeroLiftAngle()
 	double Clmax = -1000.0;
     for (int i=0; i<m_Cl.size(); i++)
     {
-        Clmin = std::min(Clmin, m_Cl[i]);
-        Clmax = std::max(Clmax, m_Cl[i]);
+		Clmin = qMin(Clmin, m_Cl[i]);
+		Clmax = qMax(Clmax, m_Cl[i]);
 	}
 	if(!(Clmin<0.0) || !(Clmax>0.0)) return 0.0;
 	int k=0;

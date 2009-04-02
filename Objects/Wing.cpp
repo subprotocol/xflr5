@@ -1564,7 +1564,7 @@ void CWing::LLTComputeWing()
 
 		dy = (yjp-yj)/2.0 + (yj-yjm)/2.0;
 
-		m_StripArea[j] = m_Chord[j]*dy;//m�
+		m_StripArea[j] = m_Chord[j]*dy;//m2
 	}
 
 	//dynamic pressure, kg/m3

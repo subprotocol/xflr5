@@ -60,6 +60,7 @@ class MainFrame : public QMainWindow
 	friend class GL3dViewDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
+	friend class CtrlPolarDlg;
 
     Q_OBJECT
 
@@ -113,6 +114,7 @@ private:
 	void CreateXDirectToolbar();
 	void CreateXInverseActions();
 	void CreateXInverseMenus();
+	void CreateXInverseToolbar();
 	void CreateMiarexActions();
 	void CreateMiarexMenus();
 	void CreateMiarexToolbar();
@@ -187,7 +189,7 @@ private:
 
 	QDockWidget *m_pctrlXDirectWidget, *m_pctrlMiarexWidget, *m_pctrlAFoilWidget, *m_pctrlXInverseWidget, *m_pctrl3DScalesWidget;
 
-	QToolBar *m_pctrlXDirectToolBar;
+	QToolBar *m_pctrlXDirectToolBar, *m_pctrlXInverseToolBar;
 	QToolBar *m_pctrlMiarexToolBar;
 	QToolBar *m_pctrlAFoilToolBar;
 
@@ -197,6 +199,7 @@ private:
 
 	//AFoilMenus
 	QMenu *AFoilViewMenu, *AFoilDesignMenu;
+	QMenu *AFoilCtxMenu;
 
 	//  XFoilAnalysis Menus
 	QMenu * XDirectViewMenu;
@@ -208,7 +211,7 @@ private:
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
 
 	//XInverse menu
-	QMenu *XInverseViewMenu, *InverseFoilMenu, *InverseContextMenu;
+	QMenu *XInverseViewMenu, *InverseFoilMenu, *InverseGraphMenu, *InverseContextMenu;
 
 	//Miarex Menus
 	QMenu * MiarexViewMenu;
@@ -226,10 +229,13 @@ private:
 	QAction *aboutAct, *aboutQtAct;
 
 	//AFoil Actions
-	QAction *storeSplineAct, *zoomInAct, *zoomOutAct, *zoomYAct, *zoomLessAct, *AFoilGridAct;
+	QAction *storeSplineAct, *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
+	QAction *zoomYAct, *zoomLessAct, *AFoilGridAct;
 	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
+	QAction *UndoAFoilAct, *RedoAFoilAct;
+
 
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct;
@@ -244,7 +250,7 @@ private:
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
-	QAction *defineWPolar, *advancedSettings;
+	QAction *defineWPolar, *defineCtrlPolar, *advancedSettings;
 	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL;
@@ -274,8 +280,9 @@ private:
 	QLabel *m_pctrlProjectName;
 
 	//XInverse Actions
-	QAction *StoreFoil, *InverseStyles, *InverseResetScale, *InverseInsertCtrlPt, *InverseRemoveCtrlPt;
+	QAction *StoreFoil, *ExtractFoil, *InverseStyles, *InverseResetScale, *InverseInsertCtrlPt, *InverseRemoveCtrlPt;
 	QAction *InvQInitial, *InvQSpec, *InvQViscous, *InvQPoints, *InvQReflected;
+	QAction *InverseResetGraphScale;
 
 	QStringList m_RecentFiles;
 

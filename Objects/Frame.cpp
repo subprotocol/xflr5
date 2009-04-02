@@ -158,7 +158,7 @@ int CFrame::InsertPoint(CVector Real)
 void CFrame::CopyFrame(CFrame *pFrame)
 {
 	m_NPoints = pFrame->m_NPoints;
-	memcpy(m_Point, pFrame->m_Point, sizeof(m_Point));
+	for(int i=0; i<m_NPoints; i++) m_Point[i].Copy(pFrame->m_Point[i]);
 }
 
 

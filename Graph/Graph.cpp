@@ -556,7 +556,7 @@ void Graph::SetAutoXUnit()
 	if (xunit<1.0)
 	{
 		exp_x = (int)log10(xunit)-1;
-		exp_x= std::max(-4, exp_x);
+		exp_x= qMax(-4, exp_x);
 	}
 	else exp_x = (int)log10(xunit);
 	int main_x = (int)(xunit/pow(10.0, exp_x)*1.000001);
@@ -601,7 +601,7 @@ void Graph::SetAutoYUnit()
 	if (yunit<1.0)
 	{
 		exp_y = (int)log10(yunit)-1;
-		exp_y = std::max(-4, exp_y);
+		exp_y = qMax(-4, exp_y);
 	}
 	else  exp_y = (int)log10(yunit);
 	int main_y = (int)(yunit/pow(10.0, exp_y));
@@ -890,8 +890,8 @@ bool Graph::SetXScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
                 if (pCurve->IsVisible() && pCurve->n>0)
                 {
-                    Cxmin = std::min(Cxmin, pCurve->GetxMin());
-                    Cxmax = std::max(Cxmax, pCurve->GetxMax());
+					Cxmin = qMin(Cxmin, pCurve->GetxMin());
+					Cxmax = qMax(Cxmax, pCurve->GetxMax());
 				}
 			}
 
@@ -900,8 +900,8 @@ bool Graph::SetXScale()
 			
 			if(m_Type == 1)
 			{
-                xmin = std::min(xmin, Cxmin);
-                xmax = std::max(xmax, Cxmax);
+				xmin = qMin(xmin, Cxmin);
+				xmax = qMax(xmax, Cxmax);
 			}
 			else
 			{
@@ -920,8 +920,8 @@ bool Graph::SetXScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if (pCurve->IsVisible() && pCurve->n>0)
 				{
-                    xmin = std::min(xmin, pCurve->x[0]);
-                    xmax = std::max(xmax, pCurve->x[0]);
+					xmin = qMin(xmin, pCurve->x[0]);
+					xmax = qMax(xmax, pCurve->x[0]);
 				}
 			}
 		}
@@ -961,7 +961,7 @@ bool Graph::SetXScale()
 		if (xunit<1.0)
 		{
 			exp_x = (int)log10(xunit)-1;
-            exp_x=std::max(-4, exp_x);
+			exp_x=qMax(-4, exp_x);
 		}
 		else exp_x = (int)log10(xunit);
 
@@ -1008,8 +1008,8 @@ bool Graph::SetYScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
                 if (pCurve->IsVisible() && pCurve->n>0)
                 {
-                    Cymin = std::min(Cymin, pCurve->GetyMin());
-                    Cymax = std::max(Cymax, pCurve->GetyMax());
+					Cymin = qMin(Cymin, pCurve->GetyMin());
+					Cymax = qMax(Cymax, pCurve->GetyMax());
 				}
 			}
             if(Cymax<=Cymin)
@@ -1019,8 +1019,8 @@ bool Graph::SetYScale()
 
             if(m_Type == 1)
             {
-                ymin = std::min(ymin, Cymin);
-                ymax = std::max(ymax, Cymax);
+				ymin = qMin(ymin, Cymin);
+				ymax = qMax(ymax, Cymax);
 			}
             else
             {
@@ -1038,8 +1038,8 @@ bool Graph::SetYScale()
 				pCurve = (CCurve*)m_oaCurves[nc];
                 if (pCurve->IsVisible() && pCurve->n>0)
                 {
-                    ymin = std::min(ymin, pCurve->y[0]);
-                    ymax = std::max(ymax, pCurve->y[0]);
+					ymin = qMin(ymin, pCurve->y[0]);
+					ymax = qMax(ymax, pCurve->y[0]);
 				}
 			}
 		}
@@ -1086,7 +1086,7 @@ bool Graph::SetYScale()
 		if (yunit<1.0)
 		{
 			exp_y = (int)log10(yunit)-1;
-            exp_y = std::max(-4, exp_y);
+			exp_y = qMax(-4, exp_y);
 		}
 		else  exp_y = (int)log10(yunit);
 

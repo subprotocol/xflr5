@@ -1123,7 +1123,36 @@ void QXInverse::OnExecute()
 	UpdateView();
 }
 
+void QXInverse::OnExtractFoil()
+{
+	//Extracts a foil from the database for display and modification
 
+/*	CSelectFoilDlg dlg;
+	dlg.m_pMainFrame = m_pFrame;
+
+	if(m_bLoaded)
+	{
+		dlg.m_FoilName = m_pRefFoil->m_FoilName;
+	}
+
+	if(IDOK == dlg.DoModal())
+	{
+		CWaitCursor Wait;
+		m_bMark = false;
+		m_bMarked = false;
+		m_bSpline = false;
+		m_bSplined  = true;
+		CFoil *pFoil;
+		CMainFrame* pFrame = (CMainFrame*)m_pFrame;
+		pFoil = pFrame->GetFoil(dlg.m_FoilName);
+		pFrame->SetCurrentFoil(pFoil);
+		m_pRefFoil->CopyFoil(pFoil);
+
+		m_pModFoil->m_FoilName = m_pRefFoil->m_FoilName + " Modified";
+		InitXFoil(m_pRefFoil);
+		SetFoil();
+	}*/
+}
 
 void QXInverse::OnFilter()
 {
@@ -2174,3 +2203,10 @@ void QXInverse::SaveSettings(QDataStream &ar)
 
 
 
+void QXInverse::OnResetGraphScale()
+{
+	ReleaseZoom();
+	m_QGraph.SetAuto(true);
+	m_QGraph.Init();
+	UpdateView();
+}

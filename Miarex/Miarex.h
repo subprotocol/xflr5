@@ -36,6 +36,7 @@
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
 #include "WPolarDlg.h"
+#include "CtrlPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "VLMAnalysisDlg.h"
 #include "../Misc/FloatEdit.h"
@@ -110,6 +111,7 @@ private slots:
 	void OnSingleWPlrGraph4();
 	void OnTwoWPlrGraphs();
 	void OnFourWPlrGraphs();
+	void OnDefineCtrlPolar();
 	void OnDefinePolarGraphVariables();
 	void OnDefineWingGraphVariables();
 	void OnHideAllWPolars();
@@ -412,16 +414,18 @@ private:
 	int m_CurveStyle, m_CurveWidth;
 	QColor m_CurveColor;
 
-	GL3dBodyDlg m_GL3dBody;
-	GLLightDlg m_GLLightDlg;
-	WPolarDlg m_WngAnalysis;
+	GL3dBodyDlg  m_GL3dBody;
+	GLLightDlg   m_GLLightDlg;
+	WPolarDlg    m_WngAnalysis;
+	CtrlPolarDlg m_CtrlPolarDlg;
+
+	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the VLM calculations
+	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 
 	void* m_pMainFrame ;			// a pointer to the frame class
 	void *m_p2DWidget;
 	void *m_pGLWidget;
 
-	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the VLM calculations
-	VLMAnalysisDlg *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 
 protected:
 	CPanel m_Panel[VLMMATSIZE];		// the panel array for the currently loaded UFO

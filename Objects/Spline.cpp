@@ -438,7 +438,7 @@ void CSpline::SplineKnots()
 {
 	double a,b;
 	int j;
-		int iDegree = std::min(m_iDegree, m_iCtrlPoints);
+		int iDegree = qMin(m_iDegree, m_iCtrlPoints);
 
 	m_iKnots  = iDegree + m_iCtrlPoints + 1;
 	for (j=0; j<m_iKnots; j++) 

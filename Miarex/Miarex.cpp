@@ -10278,6 +10278,8 @@ void QMiarex::OnCpView()
 		UpdateView();
 		return;
 	}
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->SetCentralWidget();
 
 	SetWPlrLegendPos();//TODO remove
 	m_iView=4;
@@ -10446,6 +10448,130 @@ void QMiarex::OnDefinePolarGraphVariables()
 	UpdateView();
 }
 
+
+void QMiarex::OnDefineCtrlPolar()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	m_CtrlPolarDlg.m_QInf          = m_WngAnalysis.m_QInf;
+	m_CtrlPolarDlg.m_Weight        = m_WngAnalysis.m_Weight;
+	m_CtrlPolarDlg.m_Viscosity     = m_WngAnalysis.m_Viscosity;
+	m_CtrlPolarDlg.m_Density       = m_WngAnalysis.m_Density;
+	m_CtrlPolarDlg.m_RefAreaType   = m_WngAnalysis.m_RefAreaType;
+
+
+	m_CtrlPolarDlg.m_pPlane = m_pCurPlane;
+	m_CtrlPolarDlg.m_pWing  = m_pCurWing;
+	m_CtrlPolarDlg.m_pWing2 = m_pCurWing;
+	m_CtrlPolarDlg.m_pStab  = m_pCurStab;
+	m_CtrlPolarDlg.m_pFin   = m_pCurFin;
+	m_CtrlPolarDlg.m_pMainFrame = m_pMainFrame;
+	m_CtrlPolarDlg.m_poaXPolar  = m_poaWPolar;
+
+
+	CWPolar* pCurWPolar       = new CWPolar;
+	if (m_pCurPlane) pCurWPolar->m_UFOName = m_pCurPlane->m_PlaneName;
+	else             pCurWPolar->m_UFOName = m_pCurWing->m_WingName;
+	pCurWPolar->m_WArea        = m_pCurWing->m_Area;
+	pCurWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
+	pCurWPolar->m_WSpan        = m_pCurWing->m_Span;
+
+
+	m_CtrlPolarDlg.InitDialog();
+	if(m_CtrlPolarDlg.exec() == QDialog::Accepted)
+	{
+		m_WngAnalysis.m_QInf          = m_CtrlPolarDlg.m_QInf;
+		m_WngAnalysis.m_Weight        = m_CtrlPolarDlg.m_Weight;
+		m_WngAnalysis.m_Viscosity     = m_CtrlPolarDlg.m_Viscosity;
+		m_WngAnalysis.m_Density       = m_CtrlPolarDlg.m_Density;
+		m_WngAnalysis.m_RefAreaType   = m_CtrlPolarDlg.m_RefAreaType;
+
+		//Then add WPolar to array
+		pCurWPolar->m_Type            = m_CtrlPolarDlg.m_Type;
+		pCurWPolar->m_QInf            = m_CtrlPolarDlg.m_QInf;
+		pCurWPolar->m_Weight          = m_CtrlPolarDlg.m_Weight;
+		pCurWPolar->m_PlrName         = m_CtrlPolarDlg.m_WPolarName;
+		pCurWPolar->m_Density         = m_CtrlPolarDlg.m_Density;
+		pCurWPolar->m_Viscosity       = m_CtrlPolarDlg.m_Viscosity;
+		pCurWPolar->m_bViscous        = m_CtrlPolarDlg.m_bViscous;
+		pCurWPolar->m_RefAreaType     = m_CtrlPolarDlg.m_RefAreaType;
+		pCurWPolar->m_bVLM1           = true;
+		pCurWPolar->m_bTiltedGeom     = false;
+		pCurWPolar->m_bWakeRollUp     = false;
+		pCurWPolar->m_AnalysisType    = 2; //vlm
+		pCurWPolar->m_bThinSurfaces   = false;
+		pCurWPolar->m_bGround         = false;
+		pCurWPolar->m_XCmRef          = 0.0;
+		pCurWPolar->m_ASpec           = 0.0;
+		pCurWPolar->m_Beta            = 0.0;
+		pCurWPolar->m_Height          = 0.0;
+		pCurWPolar->m_TotalWakeLength = 10.0;
+		pCurWPolar->m_WakePanelFactor = 1.1;
+		pCurWPolar->m_NXWakePanels    = 1;
+
+		pCurWPolar->m_nControls = m_CtrlPolarDlg.m_nControls;
+		for(int i=0; i<m_CtrlPolarDlg.m_nControls; i++)
+		{
+			pCurWPolar->m_bActiveControl[i] = m_CtrlPolarDlg.m_bActiveControl[i];
+			pCurWPolar->m_MinControl[i]     = m_CtrlPolarDlg.m_MinControl[i];
+			pCurWPolar->m_MaxControl[i]     = m_CtrlPolarDlg.m_MaxControl[i];
+		}
+
+		for(int i=m_CtrlPolarDlg.m_nControls; i<MAXCONTROLS; i++)
+		{
+			pCurWPolar->m_bActiveControl[i] = false;
+		}
+
+		pCurWPolar->m_bPolar = true;
+
+		pCurWPolar->m_Color = pMainFrame->GetColor(4);
+		CWPolar *pWPolar;
+		bool bFound;
+		for(int i=0; i<30;i++)
+		{
+			bFound = false;
+			for (int j=0; j<m_poaWPolar->size();j++)
+			{
+				pWPolar = (CWPolar*)m_poaWPolar->at(j);
+				if(pWPolar->m_Color == pMainFrame->m_crColors[i]) bFound = true;
+			}
+			if(!bFound) 
+			{
+				pCurWPolar->m_Color = pMainFrame->m_crColors[i];
+				break;
+			}
+		}
+		pCurWPolar->m_bIsVisible = true;
+
+		pWPolar = GetWPolar(pCurWPolar->m_PlrName);
+		pMainFrame->SetSaveState(false);
+		if(pWPolar)
+		{
+			delete pCurWPolar;
+			m_pCurWPolar = pWPolar;
+		}
+		else 
+		{
+			m_pCurWPolar = AddWPolar(pCurWPolar);
+		}
+		m_pCurPOpp = NULL;
+		m_pCurWOpp = NULL;
+
+		m_bResetglGeom = true;
+		m_bResetglOpp  = true;
+		m_bResetglMesh = true;
+		m_bResetglWake = true;
+		
+		pMainFrame->UpdateWPolars();
+		SetWPlr();
+		UpdateView();
+	}
+	else
+	{
+		delete pCurWPolar;
+	}
+}
+
+
 void QMiarex::OnDefineWPolar()
 {
 	if(!m_pCurWing) return;
@@ -10465,17 +10591,12 @@ void QMiarex::OnDefineWPolar()
 	m_WngAnalysis.m_pPlane      = m_pCurPlane;
 	m_WngAnalysis.m_pMainFrame  = m_pMainFrame;
 	m_WngAnalysis.m_poaWPolar   = m_poaWPolar;
-	if(m_pCurPlane)		m_WngAnalysis.m_UFOName   = m_pCurPlane->m_PlaneName;
-	else				m_WngAnalysis.m_UFOName   = m_pCurWing->m_WingName;
+	if(m_pCurPlane)	m_WngAnalysis.m_UFOName   = m_pCurPlane->m_PlaneName;
+	else            m_WngAnalysis.m_UFOName   = m_pCurWing->m_WingName;
 	m_WngAnalysis.InitDialog();
 
 	if (m_WngAnalysis.exec() == QDialog::Accepted)
 	{
-/*		m_Ctrlm_WngAnalysis.m_QInf      = m_WngAnalysis.m_QInf;
-		m_Ctrlm_WngAnalysis.m_Weight    = m_WngAnalysis.m_Weight;
-		m_Ctrlm_WngAnalysis.m_Viscosity = m_WngAnalysis.m_Viscosity;
-		m_Ctrlm_WngAnalysis.m_Density   = m_WngAnalysis.m_Density;*/
-
 		//Then add WPolar to array
 		pNewWPolar->m_RefAreaType     = m_WngAnalysis.m_RefAreaType;
 		pNewWPolar->m_Type            = m_WngAnalysis.m_Type;
