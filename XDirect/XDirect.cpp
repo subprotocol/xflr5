@@ -2925,21 +2925,26 @@ void QXDirect::OnNPlot()
 void QXDirect::OnOpPoints()
 {
 	if(!m_bPolar) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	m_bPolar = false;
 	CreateOppCurves();
 	SetFoilScale();
 	SetCurveParams();
-
+	pMainFrame->m_pctrlOppView->setChecked(true);
+	pMainFrame->m_pctrlPolarView->setChecked(false);
 	UpdateView();
 }
 
 void QXDirect::OnPolars()
 {
 	if(m_bPolar) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bPolar = true;
 	CreatePolarCurves();
 	SetCurveParams();
+	pMainFrame->m_pctrlOppView->setChecked(false);
+	pMainFrame->m_pctrlPolarView->setChecked(true);
 	UpdateView();
 }
 void QXDirect::OnPanels()

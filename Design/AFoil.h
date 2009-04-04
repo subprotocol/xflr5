@@ -96,7 +96,8 @@ private slots:
 	void OnResetScales();
 	void OnUndo();
 	void OnRedo();
-
+	void OnSplineControls();
+	void OnNewSplines();
 	void OnAFoilSetFlap();
 	void OnAFoilDerotateFoil();
 	void OnAFoilNormalizeFoil();
@@ -118,7 +119,6 @@ private:
 	void FillTableRow(int row);
 	void ShowFoil(CFoil* pFoil, bool bShow=true);
 	void SetParams();
-	void SetSplineData();
 	void SetFoil(CFoil* pFoil = NULL);
 	void SelectFoil(CFoil* pFoil = NULL);
 	void UpdateFoil(int iFoil = -1);
@@ -129,7 +129,8 @@ private:
 	void PaintView(QPainter &painter);
 	void SetScale();
 	void SetScale(QRect CltRect);
-
+	void PFNew();
+	void SFNew();
 	void ReleaseZoom();
 
 	void LoadSettings(QDataStream &ar);

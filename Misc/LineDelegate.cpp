@@ -31,7 +31,7 @@ LineDelegate::LineDelegate(QObject *parent)
 	//initialize with something, just in case
 	for (int i=0; i<5; i++)
 	{
-		m_LineWidth[i] = i;
+		m_LineWidth[i] = i+1;
 		m_LineStyle[i] = i;
 	}
 

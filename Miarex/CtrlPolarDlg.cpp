@@ -403,6 +403,7 @@ void CtrlPolarDlg::OnOK()
 
 	if(m_pctrlType5->isChecked()) m_Type=5;
 	else                          m_Type=6;
+	accept();
 }
 
 

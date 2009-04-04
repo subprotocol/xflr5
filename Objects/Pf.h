@@ -32,6 +32,7 @@
 
 class CSplinedPoints 
 {
+	friend class SplineCtrlsDlg;
 public:
 	bool CompSlopes();
 	
@@ -76,7 +77,7 @@ class CPF
 {
 	friend class QAFoil;
 	friend class MainFrame;
-
+	friend class SplineCtrlsDlg;
 
 public:
 	CPF();

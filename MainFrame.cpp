@@ -502,6 +502,14 @@ void MainFrame::CreateAFoilActions()
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
 
+	splineControlsAct= new QAction(tr("Splines Params"), this);
+	splineControlsAct->setStatusTip(tr("Define parameters for the splines : degree, number of out points"));
+	connect(splineControlsAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplineControls()));
+
+	newSplinesAct= new QAction(tr("New Splines"), this);
+	newSplinesAct->setStatusTip(tr("Reset the splines"));
+	connect(newSplinesAct, SIGNAL(triggered()), pAFoil, SLOT(OnNewSplines()));
+
 	zoomInAct= new QAction(QIcon(":/images/OnZoomIn.png"), tr("Zoom in"), this);
 	zoomInAct->setStatusTip(tr("Zoom the view by drawing a rectangle in the client area"));
 	connect(zoomInAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomIn()));
@@ -598,6 +606,11 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addAction(AFoilInterpolateFoils);
 	AFoilDesignMenu->addAction(AFoilNacaFoils);
 
+	AFoilSplineMenu = menuBar()->addMenu(tr("&Splines"));
+	AFoilSplineMenu->addAction(newSplinesAct);
+	AFoilSplineMenu->addAction(splineControlsAct);
+	AFoilSplineMenu->addAction(storeSplineAct);
+
 
 	//AFoil Context Menu
 	AFoilCtxMenu = new QMenu("Context Menu",this);
@@ -614,21 +627,29 @@ void MainFrame::CreateAFoilMenus()
 
 void MainFrame::CreateAFoilToolbar()
 {
+	m_pctrlZoomY = new QToolButton;
+	m_pctrlZoomY->setDefaultAction(zoomYAct);
+	m_pctrlZoomY->setCheckable(true);
+
+	m_pctrlZoomIn = new QToolButton;
+	m_pctrlZoomIn->setDefaultAction(zoomInAct);
+	m_pctrlZoomIn->setCheckable(true);
+
 	m_pctrlAFoilToolBar = addToolBar(tr("Foil"));
 	m_pctrlAFoilToolBar->addAction(newProjectAct);
 	m_pctrlAFoilToolBar->addAction(openAct);
 	m_pctrlAFoilToolBar->addAction(saveAct);
 	m_pctrlAFoilToolBar->addSeparator();
-	m_pctrlAFoilToolBar->addAction(zoomInAct);
+	m_pctrlAFoilToolBar->addWidget(m_pctrlZoomIn);
 	m_pctrlAFoilToolBar->addAction(zoomLessAct);
 	m_pctrlAFoilToolBar->addAction(ResetXScaleAct);
+	m_pctrlAFoilToolBar->addWidget(m_pctrlZoomY);
 	m_pctrlAFoilToolBar->addSeparator();
 	m_pctrlAFoilToolBar->addAction(UndoAFoilAct);
 	m_pctrlAFoilToolBar->addAction(RedoAFoilAct);
 
-	m_pctrlAFoilToolBar->addAction(zoomYAct);
+	m_pctrlAFoilToolBar->addSeparator();
 	m_pctrlAFoilToolBar->addAction(storeSplineAct);
-
 }
 
 void MainFrame::CreateDockWindows()
@@ -1146,6 +1167,19 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlWPolar = new QComboBox;
 	m_pctrlWOpp = new QComboBox;
 
+	m_pctrl3dView = new QToolButton;
+	m_pctrl3dView->setDefaultAction(W3DAct);
+	m_pctrl3dView->setCheckable(true);
+	m_pctrlWPolarView = new QToolButton;
+	m_pctrlWPolarView->setDefaultAction(WPolarAct);
+	m_pctrlWPolarView->setCheckable(true);
+	m_pctrlWOppView = new QToolButton;
+	m_pctrlWOppView->setDefaultAction(WOppAct);
+	m_pctrlWOppView->setCheckable(true);
+	m_pctrlCpView = new QToolButton;
+	m_pctrlCpView->setDefaultAction(CpViewAct);
+	m_pctrlCpView->setCheckable(true);
+
 	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -1161,10 +1195,10 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addAction(openAct);
 	m_pctrlMiarexToolBar->addAction(saveAct);
 	m_pctrlMiarexToolBar->addSeparator();
-	m_pctrlMiarexToolBar->addAction(WOppAct);
-	m_pctrlMiarexToolBar->addAction(WPolarAct);
-	m_pctrlMiarexToolBar->addAction(W3DAct);
-	m_pctrlMiarexToolBar->addAction(CpViewAct);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlWOppView);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolarView);
+	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolar);
@@ -1200,6 +1234,13 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlPolar = new QComboBox;
 	m_pctrlOpPoint = new QComboBox;
 
+	m_pctrlPolarView = new QToolButton;
+	m_pctrlPolarView->setDefaultAction(PolarsAct);
+	m_pctrlPolarView->setCheckable(true);
+	m_pctrlOppView = new QToolButton;
+	m_pctrlOppView->setDefaultAction(OpPointsAct);
+	m_pctrlOppView->setCheckable(true);
+
 	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -1212,8 +1253,8 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlXDirectToolBar->addAction(openAct);
 	m_pctrlXDirectToolBar->addAction(saveAct);
 	m_pctrlXDirectToolBar->addSeparator();
-	m_pctrlXDirectToolBar->addAction(OpPointsAct);
-	m_pctrlXDirectToolBar->addAction(PolarsAct);
+	m_pctrlXDirectToolBar->addWidget(m_pctrlOppView);
+	m_pctrlXDirectToolBar->addWidget(m_pctrlPolarView);
 	m_pctrlXDirectToolBar->addSeparator();
 	m_pctrlXDirectToolBar->addWidget(m_pctrlFoil);
 	m_pctrlXDirectToolBar->addWidget(m_pctrlPolar);
@@ -2355,45 +2396,6 @@ OpPoint *MainFrame::GetOpp(double Alpha)
     return NULL;// shouldn't ever get here, fortunately
 }
 
-void MainFrame::keyPressEvent(QKeyEvent *event)
-{
-	bool bCtrl = false;
-	if(event->modifiers() & Qt::ControlModifier) bCtrl = true;
-	switch (event->key())
-	{
-/*		case Qt::Key_1:
-		{
-			if(bCtrl)
-			{
-				QAFoil *pAFoil = (QAFoil *)m_pAFoil;
-				pAFoil->m_bSF = true;
-				OnAFoil();
-				event->accept();
-			}
-			break;
-		}
-		case Qt::Key_2:
-		{
-			if(bCtrl)
-			{
-				QAFoil *pAFoil = (QAFoil *)m_pAFoil;
-				pAFoil->m_bSF = false;
-				OnAFoil();
-				event->accept();
-			}
-			break;
-		}*/
-		case Qt::Key_Control:
-		{
-
-			break;
-		}
-
-		default:
-//			QWidget::keyPressEvent(event);
-			event->ignore();
-	}
-}
 
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
@@ -2547,7 +2549,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100517)
+	if(k !=100519)
 	{
 		pXFile->close();
 		return;
@@ -2873,11 +2875,12 @@ void MainFrame::OnLoadFile()
 	if(pos>0) m_LastDirName = PathName.left(pos);
 	if(!PathName.length())		return;
 
-	m_iApp = LoadXFLR5File(PathName);
-	if(m_iApp==0)
+	int App = LoadXFLR5File(PathName);
+
+	if(m_iApp==0) m_iApp = App;
+
+	if(App==0)
 	{
-//		if (app == XFOILANALYSIS) OnXDirect();
-//		else if(app==MIAREX)      OnMiarex();
 	}
 	else if(m_iApp==XFOILANALYSIS)
 	{
@@ -2903,7 +2906,13 @@ void MainFrame::OnLoadFile()
 	else if(m_iApp==DIRECTDESIGN)
 	{
 		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
-//		pAFoil->SetFoils();
+		pAFoil->SetParams();
+		pAFoil->SelectFoil(pAFoil->m_pCurFoil);
+	}
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		OnXInverse();
+		UpdateView();
 	}
 }
 
@@ -2932,14 +2941,12 @@ void MainFrame::OnMiarex()
 	m_pctrlAFoilWidget->hide();
 	m_pctrlXInverseWidget->hide();
 	m_pctrlMiarexWidget->show();
-	if(pMiarex->m_iView==3) pMiarex->m_pctrBottomControls->setCurrentIndex(1);
-	else                    pMiarex->m_pctrBottomControls->setCurrentIndex(0);
-
+	pMiarex->SetControls();
 	pMiarex->SetUFO();
 	UpdateUFOs();
 	SetMenus();
 	SetCentralWidget();
-	pMiarex->UpdateView();
+	UpdateView();
 }
 
 
@@ -3573,6 +3580,8 @@ void MainFrame::OnXDirect()
 	m_pctrlXInverseWidget->hide();
 	SetCentralWidget();
 	SetMenus();
+	m_pctrlOppView->setChecked(!pXDirect->m_bPolar);
+	m_pctrlPolarView->setChecked(pXDirect->m_bPolar);
 }
 
 
@@ -3636,22 +3645,20 @@ void MainFrame::openRecentFile()
 	else if(m_iApp==MIAREX)
 	{
 		UpdateUFOs();
-
 		pMiarex->SetUFO();
-//		pMiarex->SetBody();
-
 		OnMiarex();
-
 		UpdateView();
 
 	}
 	else if(m_iApp==DIRECTDESIGN)
 	{
-//		AFoil.SetFoils();
+		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+		pAFoil->SetParams();
 	}
 	else if(m_iApp==INVERSEDESIGN)
 	{
 		OnXInverse();
+		UpdateView();
 	}
 }
 
@@ -3758,7 +3765,7 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 	memcpy(pFoil->y, pFoil->yb, sizeof(pFoil->yb));
 	pFoil->n=pFoil->nb;
 
-	pFoil->m_FoilColor = QColor(255,0,120);
+	pFoil->m_FoilColor = GetColor(0);
 //   delete pFoil;
 //	m_pglWidget->m_pFoil = pFoil;
 	pFoil->InitFoil();
@@ -3931,7 +3938,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100517;
+	ar << 100519;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -4754,6 +4761,7 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(fileMenu);
 		menuBar()->addMenu(AFoilViewMenu);
 		menuBar()->addMenu(AFoilDesignMenu);
+		menuBar()->addMenu(AFoilSplineMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp== MIAREX)

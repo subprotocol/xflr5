@@ -22,7 +22,7 @@
 // PF.cpp: implementation of the CPF class.
 //
 //////////////////////////////////////////////////////////////////////
-
+#include <QtDebug>
 #include "Globals.h"
 #include "Pf.h"
 #include "math.h"
@@ -111,6 +111,44 @@ void CPF::Copy(CPF* pPF)
 	m_FoilStyle  = pPF->m_FoilStyle;
 	m_FoilWidth  = pPF->m_FoilWidth;
 }
+
+
+void CPF::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawSplines(painter, scalex, scaley, Offset);
+	m_Intrados.DrawSplines(painter, scalex, scaley, Offset);
+	CompMidLine();
+}
+
+
+void CPF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	painter.save();
+	QPoint From, To;
+	From.rx() = (int)( m_rpMid[0].x*scalex) + Offset.x();
+	From.ry() = (int)(-m_rpMid[0].y*scaley) + Offset.y();
+
+	for (int k=1; k<=100; k++)
+	{
+		To.rx() = (int)( m_rpMid[k*10].x*scalex)+Offset.x();
+		To.ry() = (int)(-m_rpMid[k*10].y*scaley)+Offset.y();
+		painter.drawLine(From, To);
+		From = To;
+	}
+	painter.restore();
+}
+
+
+
+void CPF::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	m_Extrados.DrawControlPoints(painter, scalex, scaley, Offset);
+	m_Intrados.DrawControlPoints(painter, scalex, scaley, Offset);
+	m_Extrados.DrawRearPoint(painter, scalex, scaley, Offset);
+	m_Intrados.DrawRearPoint(painter, scalex, scaley, Offset);
+
+}
+
 
 
 void CPF::ExportToBuffer(CFoil *pFoil)
@@ -278,43 +316,6 @@ void CPF::Update(bool bExtrados)
 
 }
 
-
-void CPF::DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	m_Extrados.DrawSplines(painter, scalex, scaley, Offset);
-	m_Intrados.DrawSplines(painter, scalex, scaley, Offset);
-	CompMidLine();
-}
-
-
-void CPF::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	painter.save();
-	QPoint From, To;	
-	From.rx() = (int)( m_rpMid[0].x*scalex) + Offset.x();
-	From.ry() = (int)(-m_rpMid[0].y*scaley) + Offset.y();
-
-	for (int k=1; k<=100; k++)
-	{
-		To.rx() = (int)( m_rpMid[k*10].x*scalex)+Offset.x();
-		To.ry() = (int)(-m_rpMid[k*10].y*scaley)+Offset.y();
-		painter.drawLine(From, To);
-	}
-	painter.restore();
-}
-
-
-
-void CPF::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	m_Extrados.DrawControlPoints(painter, scalex, scaley, Offset);
-	m_Intrados.DrawControlPoints(painter, scalex, scaley, Offset);
-	m_Extrados.DrawRearPoint(painter, scalex, scaley, Offset);
-	m_Intrados.DrawRearPoint(painter, scalex, scaley, Offset);
-
-}
-
-
 int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 {
 	if (fabs(Real.x-m_RearPoint.x)<0.003/ZoomFactor &&
@@ -323,21 +324,6 @@ int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 }
 
 
-
-
-bool CSplinedPoints::RemovePoint(int k)
-{
-	int j;
-	if (k>0 && k<m_iPoints)
-	{
-		for (j=k; j<m_iPoints; j++){
-			m_ctrlPoint[j] = m_ctrlPoint[j+1];
-		}
-		m_iPoints--;
-	}
-	CompSlopes();
-	return true;
-}
 
 
 /*
@@ -457,6 +443,121 @@ bool CSplinedPoints::CompSlopes()
 	}
 	return true;
 }
+
+void CSplinedPoints::DrawControlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	int i, width;
+	width = 3;
+
+	QPen PointPen;
+	QPoint pt;
+
+	for(i=0; i<m_iPoints; i++)
+	{
+		pt.rx() = (int)( m_ctrlPoint[i].x*scalex)+Offset.x();
+		pt.ry() = (int)(-m_ctrlPoint[i].y*scaley)+Offset.y();
+		if(m_rViewRect.contains(pt))
+		{
+			if (m_iSelect==i)
+			{
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(130,130,255));
+			}
+			else if(m_iHighlight==i)
+			{
+				PointPen.setWidth(2);
+				PointPen.setColor(QColor(255,0,0));
+			}
+			else
+			{
+				PointPen.setWidth(1);
+				PointPen.setColor(m_Color);
+			}
+
+			painter.setPen(PointPen);
+			painter.drawEllipse(pt.x()-width, pt.y()-width,2*width,2*width);
+		}
+	}
+}
+
+
+void CSplinedPoints::DrawRearPoint(QPainter &painter, double scalex, double scaley, QPoint Offset)
+{
+	painter.save();
+	QPen RearPen;
+
+	if(m_iHighlight ==-1)
+	{
+		RearPen.setColor(QColor(255,0,0));
+		RearPen.setWidth(2);
+		painter.setPen(RearPen);
+	}
+	else if(m_iSelect ==-1)
+	{
+		RearPen.setColor(QColor(0,0,150));
+		RearPen.setWidth(2);
+		painter.setPen(RearPen);
+	}
+	else
+	{
+		RearPen.setColor(m_Color);
+		RearPen.setWidth(1);
+		painter.setPen(RearPen);
+	}
+
+	painter.drawEllipse((int)(m_RearPoint.x*scalex+Offset.x()-3), (int)(-m_RearPoint.y*scaley+Offset.y()-3), 6, 6);
+	painter.restore();
+}
+
+
+void CSplinedPoints::DrawSplines(QPainter & painter, double scalex, double scaley, QPoint Offset)
+{
+	int j,k,l;
+	double dist, x1, x2;
+	CSpline LinkSpline;
+	LinkSpline.SetSplineParams(m_Style, m_Width, m_Color);
+	LinkSpline.m_iRes = m_Freq;
+	LinkSpline.m_iDegree = 3;
+	LinkSpline.m_iCtrlPoints = 3;
+	LinkSpline.SplineKnots();
+	LinkSpline.m_rViewRect = m_rViewRect;
+
+	l=0;
+
+	for (k=0; k<m_iPoints-1; k++)
+	{
+		dist = fabs(m_ctrlPoint[k+1].x-m_ctrlPoint[k].x);
+		LinkSpline.m_iCtrlPoints = 0;
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k].x   + (dist)/3.0 * m_Slope[k].x,
+							   m_ctrlPoint[k].y   + (dist)/3.0 * m_Slope[k].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (dist)/3.0 * m_Slope[k+1].x,
+							   m_ctrlPoint[k+1].y - (dist)/3.0 * m_Slope[k+1].y);
+		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
+		LinkSpline.SplineCurve();
+		LinkSpline.DrawSpline(painter, scalex, scaley, Offset);
+
+		if(m_bOutPts)
+		{
+			LinkSpline.DrawOutputPoints(painter, scalex, scaley, Offset);
+		}
+
+		x1 = qMin(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+		x2 = qMax(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
+
+		while(x1>=0 && x1<x2 && l<=1000)
+		{
+//			l=(int)(x1*1000.001);
+			m_Outy[l] = LinkSpline.GetY(x1);
+			x1 =0.001*(double)l;
+			l++;
+		}
+
+//		l=(int)(x2*1000);
+//		m_Outy[l] = LinkSpline.GetY(x2);
+	}
+}
+
 
 
 void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
@@ -622,116 +723,18 @@ int CSplinedPoints::IsControlPoint(double x, double y, double Zoom)
 }
 
 
-void CSplinedPoints::DrawControlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
+bool CSplinedPoints::RemovePoint(int k)
 {
-	int i, width;
-	width = 3;
-
-	QPen PointPen;
-	QPoint pt;
-
-	for(i=0; i<m_iPoints; i++)
+	int j;
+	if (k>0 && k<m_iPoints)
 	{
-		pt.rx() = (int)( m_ctrlPoint[i].x*scalex)+Offset.x();
-		pt.ry() = (int)(-m_ctrlPoint[i].y*scaley)+Offset.y();
-		if(m_rViewRect.contains(pt)) 
-		{
-			if (m_iSelect==i)
-			{
-				PointPen.setWidth(2);
-				PointPen.setColor(QColor(130,130,255));
-			}
-			else if(m_iHighlight==i) 
-			{
-				PointPen.setWidth(2);
-				PointPen.setColor(QColor(255,0,0));
-			}
-			else 
-			{
-				PointPen.setWidth(1);
-				PointPen.setColor(m_Color);
-			}
-
-			painter.drawEllipse(pt.x()-width, pt.y()-width,2*width,2*width);
+		for (j=k; j<m_iPoints; j++){
+			m_ctrlPoint[j] = m_ctrlPoint[j+1];
 		}
+		m_iPoints--;
 	}
-}
-
-
-void CSplinedPoints::DrawSplines(QPainter & painter, double scalex, double scaley, QPoint Offset)
-{
-	int j,k,l;
-	double dist, x1, x2;
-	CSpline LinkSpline;
-	LinkSpline.SetSplineParams(m_Style, m_Width, m_Color);
-	LinkSpline.m_iRes = m_Freq;
-	LinkSpline.m_iDegree = 3;
-	LinkSpline.m_iCtrlPoints = 3;
-	LinkSpline.SplineKnots();
-	LinkSpline.m_rViewRect = m_rViewRect;
-
-	l=0;
-
-	for (k=0; k<m_iPoints-1; k++)
-	{
-		dist = fabs(m_ctrlPoint[k+1].x-m_ctrlPoint[k].x);
-		LinkSpline.m_iCtrlPoints = 0;
-		LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-		LinkSpline.InsertPoint(m_ctrlPoint[k].x   + (dist)/3.0 * m_Slope[k].x,
-		                       m_ctrlPoint[k].y   + (dist)/3.0 * m_Slope[k].y);
-		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (dist)/3.0 * m_Slope[k+1].x,
-		                       m_ctrlPoint[k+1].y - (dist)/3.0 * m_Slope[k+1].y);
-		LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
-		LinkSpline.SplineCurve();
-		LinkSpline.DrawSpline(painter, scalex, scaley, Offset);
-
-		if(m_bOutPts)
-		{
-			LinkSpline.DrawOutputPoints(painter, scalex, scaley, Offset);
-		}
-	
-		x1 = qMin(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
-		x2 = qMax(m_ctrlPoint[k].x, m_ctrlPoint[k+1].x);
-
-		while(x1>=0 && x1<x2 && l<=1000)
-		{
-//			l=(int)(x1*1000.001);
-			m_Outy[l] = LinkSpline.GetY(x1);
-			x1 =0.001*(double)l;
-			l++;
-		}
-
-//		l=(int)(x2*1000);
-//		m_Outy[l] = LinkSpline.GetY(x2);
-	}
-}
-
-
-void CSplinedPoints::DrawRearPoint(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	painter.save();
-	QPen RearPen;
-
-	if(m_iHighlight ==-1)
-	{
-		RearPen.setColor(QColor(0,0,255));
-		RearPen.setWidth(2);
-		painter.setPen(RearPen);
-	}
-	else if(m_iSelect ==-1)
-	{
-		RearPen.setColor(QColor(0,0,150));
-		RearPen.setWidth(2);
-		painter.setPen(RearPen);
-	}
-	else
-	{
-		RearPen.setColor(m_Color);
-		painter.setPen(RearPen);
-	}
-
-	painter.drawEllipse((int)(m_RearPoint.x*scalex+Offset.x()-3), (int)(-m_RearPoint.y*scaley+Offset.y()-3), 6, 6);
-	painter.restore();
+	CompSlopes();
+	return true;
 }
 
 

@@ -59,7 +59,7 @@ void LineCbBox::paintEvent (QPaintEvent *event)
 	painter.setBackgroundMode(Qt::TransparentMode);
 
 	QPen LinePen(m_Color);
-	LinePen.setStyle(::GetStyle(m_Style));
+	LinePen.setStyle(GetStyle(m_Style));
 	LinePen.setWidth(m_Width);
 	painter.setPen(LinePen);
 	painter.drawLine(r.left()+5, r.height()/2, r.width()-10, r.height()/2);

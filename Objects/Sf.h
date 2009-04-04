@@ -36,6 +36,7 @@ class CSF
 {
 	friend class QAFoil;;
 	friend class MainFrame;
+	friend class SplineCtrlsDlg;
 
 
 public:

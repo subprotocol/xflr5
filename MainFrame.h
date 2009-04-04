@@ -102,7 +102,6 @@ private slots:
 private:
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
-	void keyPressEvent(QKeyEvent *event);
 
 	void CreateDockWindows();
 	void CreateToolbars();
@@ -198,7 +197,7 @@ private:
 	QMenu *fileMenu, *helpMenu;
 
 	//AFoilMenus
-	QMenu *AFoilViewMenu, *AFoilDesignMenu;
+	QMenu *AFoilViewMenu, *AFoilDesignMenu, *AFoilSplineMenu;
 	QMenu *AFoilCtxMenu;
 
 	//  XFoilAnalysis Menus
@@ -229,13 +228,14 @@ private:
 	QAction *aboutAct, *aboutQtAct;
 
 	//AFoil Actions
-	QAction *storeSplineAct, *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
+	QAction *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
 	QAction *zoomYAct, *zoomLessAct, *AFoilGridAct;
 	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
-
+	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct;
+	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct;
@@ -254,6 +254,8 @@ private:
 	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL;
+	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
+
 
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch;
@@ -274,6 +276,7 @@ private:
 	QAction *defineCpGraphSettings, *resetCpGraphScales, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
+	QToolButton *m_pctrlPolarView, *m_pctrlOppView;
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
 	QComboBox *m_pctrlUFO, *m_pctrlWPolar, * m_pctrlWOpp;

@@ -9745,6 +9745,7 @@ void QMiarex::On3DView()
 	m_pctrlMiddleControls->setCurrentIndex(0);
 	m_pctrBottomControls->setCurrentIndex(1);
 	UpdateView();
+	CheckButtons();
 //	CheckMenus();
 }
 
@@ -10278,11 +10279,12 @@ void QMiarex::OnCpView()
 		UpdateView();
 		return;
 	}
+	m_iView=4;
+
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->SetCentralWidget();
 
 	SetWPlrLegendPos();//TODO remove
-	m_iView=4;
 	m_pCurGraph = &m_CpGraph;
 
 	m_pctrlMiddleControls->setCurrentIndex(1);
@@ -10290,10 +10292,18 @@ void QMiarex::OnCpView()
 
 	CreateCpCurves();
 	SetCurveParams();
+	CheckButtons();
 	UpdateView();
 }
 
-
+void QMiarex::CheckButtons()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->m_pctrlWOppView->setChecked(m_iView==1);
+	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==2);
+	pMainFrame->m_pctrl3dView->setChecked(m_iView==3);
+	pMainFrame->m_pctrlCpView->setChecked(m_iView==4);
+}
 
 void QMiarex::OnCurWOppOnly()
 {
@@ -10922,6 +10932,13 @@ void QMiarex::OnEditCurBody()
 	else m_pCurBody->Duplicate(&memBody);
 }
 
+
+void QMiarex::OnEditCurWPolar()
+{
+}
+
+
+
 void QMiarex::OnEditUFO()
 {
 	//Edit the currently selected wing
@@ -11442,6 +11459,19 @@ void QMiarex::OnExporttoAVL()
 	if(m_pCurFin)   m_pCurFin->ExportAVLWing(out, index+3, 0.0, m_pCurPlane->m_LEFin.y, 0.0, 0.0, m_pCurPlane->m_StabTilt);
 
 	XFile.close();
+}
+
+
+
+void QMiarex::OnFinCurve()
+{
+	m_bShowFin = !m_bShowFin;
+//	CheckMenus();
+
+	if (m_iView==1)     CreateWOppCurves();
+	else if(m_iView==4)	CreateCpCurves();
+
+	UpdateView();
 }
 
 
@@ -12097,6 +12127,26 @@ void QMiarex::OnShowAllWPlrOpps()
 }
 
 
+void QMiarex::OnShowEllipticCurve()
+{
+	m_bShowElliptic = !m_bShowElliptic;
+//	CheckMenus();
+
+	CreateWOppCurves();
+	UpdateView();
+}
+
+
+
+void QMiarex::OnShowXCmRef()
+{
+	//Show the Moment reference point
+	m_bXCmRef = !m_bXCmRef;
+
+	UpdateView();
+}
+
+
 void QMiarex::OnShowLift()
 {
 	m_bXCP	 = m_pctrlLift->isChecked();
@@ -12326,6 +12376,7 @@ void QMiarex::OnSingleWingGraph3()
 	UpdateView();
 }
 
+
 void QMiarex::OnSingleWingGraph4()
 {
 	//The user has requested a single wing graph
@@ -12337,6 +12388,19 @@ void QMiarex::OnSingleWingGraph4()
 	SetWingLegendPos();
 	UpdateView();
 }
+
+
+void QMiarex::OnStabCurve()
+{
+	m_bShowStab = !m_bShowStab;
+//	CheckMenus();
+
+	if (m_iView==1)     CreateWOppCurves();
+	else if(m_iView==4)	CreateCpCurves();
+
+	UpdateView();
+}
+
 
 void QMiarex::OnStreamlines()
 {
@@ -12397,6 +12461,18 @@ void QMiarex::OnVortices()
 }
 
 
+void QMiarex::OnWing2Curve()
+{
+	m_bShowWing2 = !m_bShowWing2;
+//	CheckMenus();
+
+	if (m_iView==1)     CreateWOppCurves();
+	else if(m_iView==4)	CreateCpCurves();
+
+	UpdateView();
+}
+
+
 void QMiarex::OnWOpps()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -12418,6 +12494,7 @@ void QMiarex::OnWOpps()
 	Set2DScale();
 	CreateWOppCurves();
 	SetCurveParams();
+	CheckButtons();
 
 	UpdateView();
 }
@@ -12443,6 +12520,7 @@ void QMiarex::OnWPolars()
 	SetWPlrLegendPos();//TODO remove
 	CreateWPolarCurves();
 	SetCurveParams();
+	CheckButtons();
 
 	UpdateView();
 }
@@ -13726,6 +13804,14 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
 }
 
+
+void QMiarex::SetControls()
+{
+	CheckButtons();
+	if(m_iView==3) m_pctrBottomControls->setCurrentIndex(1);
+	else           m_pctrBottomControls->setCurrentIndex(0);
+
+}
 
 void QMiarex::SetCurveParams()
 {
@@ -15778,62 +15864,6 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 	}
 }
-
-void QMiarex::OnEditCurWPolar()
-{
-}
-
-
-void QMiarex::OnShowEllipticCurve()
-{
-	m_bShowElliptic = !m_bShowElliptic;
-//	CheckMenus();
-
-	CreateWOppCurves();
-	UpdateView();
-}
-
-void QMiarex::OnWing2Curve()
-{
-	m_bShowWing2 = !m_bShowWing2;
-//	CheckMenus();
-
-	if (m_iView==1)     CreateWOppCurves();
-	else if(m_iView==4)	CreateCpCurves();
-
-	UpdateView();
-}
-
-void QMiarex::OnStabCurve()
-{
-	m_bShowStab = !m_bShowStab;
-//	CheckMenus();
-
-	if (m_iView==1)     CreateWOppCurves();
-	else if(m_iView==4)	CreateCpCurves();
-
-	UpdateView();
-}
-
-void QMiarex::OnFinCurve()
-{
-	m_bShowFin = !m_bShowFin;
-//	CheckMenus();
-
-	if (m_iView==1)     CreateWOppCurves();
-	else if(m_iView==4)	CreateCpCurves();
-
-	UpdateView();
-}
-
-void QMiarex::OnShowXCmRef()
-{
-	//Show the Moment reference point
-	m_bXCmRef = !m_bXCmRef;
-
-	UpdateView();
-}
-
 
 
 

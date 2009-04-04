@@ -41,12 +41,6 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 		editor->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		return editor;
 	}
-	if(index.column()==12)
-	{
-		QCheckBox *editor = new QCheckBox(parent);
-//		editor->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-		return editor;
-	}
 	else
 	{
 		FloatEdit *editor = new FloatEdit(parent);
@@ -146,15 +140,6 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else if(index.column()==12 )
-	{
-		QVariant value = index.data(Qt::CheckStateRole);
-		int val = value.toInt();
-		Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
-//qDebug() << val << state << index.row();// <<Qt::Checked<<Qt::Unchecked;
-		drawCheck(painter, myOption, myOption.rect, state);
-		drawFocus(painter, myOption, myOption.rect);
-	}
 	else
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
@@ -176,18 +161,6 @@ void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 		QLineEdit *lineEdit = (QLineEdit*)editor;
 		lineEdit->setText(strong);
 	}
-	if(index.column()==12)
-	{
-		QVariant value = index.data(Qt::CheckStateRole);
-//		Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
-//qDebug() << "Setting editor data " << (state == Qt::Checked) << value.toInt();
-
-
-		QCheckBox *checkBox = (QCheckBox*)editor;
-//		checkBox->setChecked(state == Qt::Checked);
-		checkBox->setChecked(value.toInt()==Qt::Checked);
-
-	}
 	else
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
@@ -205,15 +178,6 @@ void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 		QLineEdit *pLineEdit = static_cast<QLineEdit*>(editor);
 		strong = pLineEdit->text();
 		model->setData(index, strong, Qt::EditRole);
-	}
-	else if(index.column()==12)
-	{
-
-		QCheckBox *checkBox = (QCheckBox*)editor;
-qDebug() << "Setting Model Data" << 		checkBox->isChecked();
-		if(checkBox->isChecked()) model->setData(index, Qt::Checked, Qt::CheckStateRole);
-		else                      model->setData(index, Qt::Unchecked, Qt::CheckStateRole);
-
 	}
 	else
 	{

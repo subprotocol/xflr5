@@ -248,6 +248,8 @@ private:
 	void SetWGraphTitles(Graph* pGraph, int iX, int iY);
 	void SetWingLegendPos();
 	void SetupLayout();
+	void SetControls();
+	void CheckButtons();
 	void CreateWPolarCurves();
 	void CreateWOppCurves();
 	void SetWGraphScale();

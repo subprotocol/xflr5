@@ -1753,7 +1753,8 @@ void QXInverse::SetupLayout()
 	ConstraintsBox->setLayout(ConstraintsLayout);
 
 	m_pctrlExec = new QPushButton("Execute");
-	m_pctrlOutput = new QTextEdit("Output here");
+	m_pctrlOutput = new QTextEdit(" ");
+	m_pctrlOutput->setEnabled(false);
 
 	QVBoxLayout *FInvLayout = new QVBoxLayout;
 	FInvLayout->addWidget(SpecBox);
@@ -1781,6 +1782,7 @@ void QXInverse::SetupLayout()
 	m_pctrlMResetQSpec    = new QPushButton("ResetQSpec");
 	m_pctrlMNewSpline->setCheckable(true);
 	m_pctrlMark->setCheckable(true);
+	m_pctrlMOutput->setEnabled(false);
 
 	QGridLayout *MSplineslayout = new QGridLayout;
 	MSplineslayout->addWidget(m_pctrlMShowSpline,1,1);

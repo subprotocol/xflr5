@@ -38,7 +38,7 @@
 #include "../Misc/LinePickerDlg.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
-
+#include "SplineCtrlsDlg.h"
 
 QAFoil::~QAFoil()
 {
@@ -392,14 +392,15 @@ void QAFoil::FillTableRow(int row)
 		m_pFoilModel->setData(ind,pFoil->m_LEYHinge);
 	}
 
-	ind = m_pFoilModel->index(row, 12, QModelIndex());
+/*	ind = m_pFoilModel->index(row, 12, QModelIndex());
 	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
-	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
+	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);*/
 
 }
 
 void QAFoil::keyPressEvent(QKeyEvent *event)
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	switch (event->key())
 	{
 		case Qt::Key_Escape:
@@ -411,8 +412,7 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 			}
 			else if(m_bZoomYOnly)
 			{
-//				CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//				pTB->PressButton(IDT_ZOOMYONLY, false);
+				pMainFrame->m_pctrlZoomY->setChecked(false);
 				m_bZoomYOnly = false;
 				break;
 			}
@@ -477,10 +477,18 @@ CVector QAFoil::MousetoReal(QPoint &point)
 
 void QAFoil::LoadSettings(QDataStream &ar)
 {
+	ar >> m_bSF;
 	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
 	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
 	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
 	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
+
+	int style, width;
+	QColor color;
+	ar >> style >> width >> color;
+	m_pSF->SetCurveParams(style, width, color);
+	ar >> style >> width >> color;
+	m_pPF->SetCurveParams(style, width, color);
 }
 
 
@@ -490,7 +498,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 	QPoint point = event->pos();
 	m_MousePos = MousetoReal(point);
 	CVector Real = m_MousePos;
-
 
 	bool bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
@@ -1467,11 +1474,65 @@ void QAFoil::OnAFoilNacaFoils()
 }
 
 
-void QAFoil::OnSplineType(bool bState)
+void QAFoil::OnCenterLine(bool bState)
 {
-	m_bSF = m_pctrlSF->isChecked();
-	FillFoilTable();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_pCurFoil)
+	{
+		if(m_pctrlCenterLine->isChecked()) m_pCurFoil->m_bCenterLine = true;
+		else                               m_pCurFoil->m_bCenterLine = false;
+	}
+	else
+	{
+		if(m_bSF)
+		{
+			if(m_pctrlCenterLine->isChecked()) m_pSF->m_bCenterLine = true;
+			else                               m_pSF->m_bCenterLine = false;
+		}
+		else
+		{
+			if(m_pctrlCenterLine->isChecked()) m_pPF->m_bCenterLine = true;
+			else                               m_pPF->m_bCenterLine = false;
+		}
+	}
+
+	pMainFrame->SetSaveState(false);
 	UpdateView();
+}
+
+
+
+void QAFoil::OnDelete()
+{
+	if(!m_pCurFoil) return;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->DeleteFoil(m_pCurFoil);
+	FillFoilTable();
+	SetFoil();
+	UpdateView();
+}
+
+
+void QAFoil::OnDuplicate()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!m_pCurFoil) return;
+	CFoil *pNewFoil = new CFoil;
+	pNewFoil->CopyFoil(m_pCurFoil);
+	pNewFoil->InitFoil();
+
+	if(pMainFrame->SetModFoil(pNewFoil))
+	{
+		FillFoilTable();
+		SetFoil(pNewFoil);
+	}
+	else
+	{
+		pNewFoil = NULL;
+		FillFoilTable();
+		SetFoil(pNewFoil);
+	}
 }
 
 
@@ -1565,34 +1626,6 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 }
 
 
-void QAFoil::OnCenterLine(bool bState)
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_pCurFoil)
-	{
-		if(m_pctrlCenterLine->isChecked()) m_pCurFoil->m_bCenterLine = true;
-		else                               m_pCurFoil->m_bCenterLine = false;
-	}
-	else
-	{
-		if(m_bSF)
-		{
-			if(m_pctrlCenterLine->isChecked()) m_pSF->m_bCenterLine = true;
-			else                               m_pSF->m_bCenterLine = false;
-		}
-		else
-		{
-			if(m_pctrlCenterLine->isChecked()) m_pPF->m_bCenterLine = true;
-			else                               m_pPF->m_bCenterLine = false;
-		}
-	}
-
-	pMainFrame->SetSaveState(false);
-	UpdateView();
-}
-
-
-
 void QAFoil::OnFoilStyle()
 {
 	if(!m_pCurFoil)
@@ -1609,15 +1642,11 @@ void QAFoil::OnFoilStyle()
 
 			if(m_bSF)
 			{
-				m_pSF->m_FoilStyle = dlg.GetStyle();
-				m_pSF->m_FoilWidth = dlg.GetWidth();
-				m_pSF->m_FoilColor = dlg.GetColor();
+				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
 			}
 			else
 			{
-				m_pPF->m_FoilStyle = dlg.GetStyle();
-				m_pPF->m_FoilWidth = dlg.GetWidth();
-				m_pPF->m_FoilColor = dlg.GetColor();
+				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
 			}
 			UpdateView();
 		}
@@ -1639,6 +1668,20 @@ void QAFoil::OnFoilStyle()
 			UpdateView();
 		}
 	}
+}
+
+
+void QAFoil::OnNewSplines()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_bSF) SFNew();
+	else      PFNew();
+
+	m_StackPos  = 0;
+	m_StackSize = 0;
+
+	pMainFrame->SetSaveState(false);
+	UpdateView();
 }
 
 
@@ -1668,40 +1711,6 @@ void QAFoil::OnPoints(bool bState)
 
 	pMainFrame->SetSaveState(false);
 	UpdateView();
-}
-
-
-void QAFoil::OnDelete()
-{
-	if(!m_pCurFoil) return;
-
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->DeleteFoil(m_pCurFoil);
-	FillFoilTable();
-	SetFoil();
-	UpdateView();
-}
-
-
-void QAFoil::OnDuplicate()
-{
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	if(!m_pCurFoil) return;
-	CFoil *pNewFoil = new CFoil;
-	pNewFoil->CopyFoil(m_pCurFoil);
-	pNewFoil->InitFoil();
-
-	if(pMainFrame->SetModFoil(pNewFoil))
-	{
-		FillFoilTable();
-		SetFoil(pNewFoil);
-	}
-	else 
-	{
-		pNewFoil = NULL;
-		FillFoilTable();
-		SetFoil(pNewFoil);
-	}	
 }
 
 
@@ -1748,8 +1757,6 @@ void QAFoil::OnStoreSplines()
 		}
 		else
 		{
-			delete pNewFoil;
-			pNewFoil = NULL;
 			FillFoilTable();
 			SelectFoil();
 		}
@@ -1821,6 +1828,47 @@ void QAFoil::OnResetScales()
 	UpdateView();
 }
 
+void QAFoil::OnSplineControls()
+{
+	SplineCtrlsDlg dlg;
+	dlg.m_pSF = m_pSF;
+	dlg.m_pPF = m_pPF;
+	dlg.m_bSF = m_bSF;
+	dlg.InitDialog();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		if(m_bSF)
+		{
+			m_pSF->m_Extrados.m_iDegree = dlg.m_pctrlDegExtrados->currentIndex()+2;
+			m_pSF->m_Intrados.m_iDegree = dlg.m_pctrlDegIntrados->currentIndex()+2;
+		}
+		if(m_bSF)
+		{
+			int n = dlg.m_pctrlOutExtrados->GetValue();
+			if(n<1) dlg.m_pctrlOutExtrados->SetValue(1);
+			if(n>IQX2-10) dlg.m_pctrlOutExtrados->SetValue(IQX2-10);
+			m_pSF->m_Extrados.m_iRes = dlg.m_pctrlOutExtrados->GetValue();
+			m_pSF->Update(true);
+		}
+		else
+		{
+			m_pPF->m_Extrados.m_Freq = dlg.m_pctrlOutExtrados->GetValue();
+			m_pPF->m_Intrados.m_Freq = dlg.m_pctrlOutIntrados->GetValue();
+		}
+	}
+}
+
+
+
+void QAFoil::OnSplineType(bool bState)
+{
+	m_bSF = m_pctrlSF->isChecked();
+	SetFoil(NULL);
+	FillFoilTable();
+	UpdateView();
+}
+
 
 void QAFoil::OnVisible(bool bState)
 {
@@ -1857,8 +1905,9 @@ void QAFoil::OnZoomIn()
 		if(m_fScale/m_fRefScale <32.0)
 		{
 			m_bZoomPlus = true;
-//			CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//			pTB->PressButton(IDT_ZOOMIN, true);
+			MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+			pMainFrame->m_pctrlZoomIn->setChecked(true);
+
 		}
 		else
 		{
@@ -1872,13 +1921,12 @@ void QAFoil::OnZoomIn()
 
 void QAFoil::OnZoomYOnly()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	TwoDWidget *p2Dwidget = (TwoDWidget*)m_p2DWidget;
-//	CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
 	m_bZoomYOnly = !m_bZoomYOnly;
-//	if(m_bZoomYOnly)	pTB->PressButton(IDT_ZOOMYONLY, true);
-//	else				pTB->PressButton(IDT_ZOOMYONLY, false);
+	if(m_bZoomYOnly)	pMainFrame->m_pctrlZoomY->setChecked(true);
+	else				pMainFrame->m_pctrlZoomY->setChecked(false);
 	p2Dwidget->setFocus();
-
 }
 
 
@@ -2049,17 +2097,18 @@ void QAFoil::PaintSplines(QPainter &painter)
 		SplinePen.setColor(m_pPF->m_FoilColor);
 		painter.setPen(SplinePen);
 
+//qDebug() << "Splined  Color " << m_pPF->m_FoilColor;
 		m_pPF->DrawFoil(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset);
 
-		CtrlPen.setStyle(Qt::SolidLine);
+/*		CtrlPen.setStyle(Qt::SolidLine);
 		CtrlPen.setColor(m_pPF->m_FoilColor);
-		painter.setPen(CtrlPen);
+		painter.setPen(CtrlPen);*/
 
 		m_pPF->DrawCtrlPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
 
 		if (m_pPF->m_bCenterLine)
 		{
-			CenterPen.setColor(m_pSF->m_FoilColor);
+			CenterPen.setColor(m_pPF->m_FoilColor);
 			CenterPen.setStyle(Qt::DashLine);
 			painter.setPen(CenterPen);
 
@@ -2142,9 +2191,25 @@ void QAFoil::PaintFoils(QPainter &painter)
 }
 
 
+void QAFoil::PFNew()
+{
+	bool bLoadNew = true;
+	if(m_pPF->m_bModified)
+	{
+		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", "Discard changes to Splines ?",
+													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		{
+			bLoadNew = false;
+		}
+	}
+	if(bLoadNew) m_pPF->InitSplinedFoil();
+}
+
 
 void QAFoil::ReleaseZoom()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->m_pctrlZoomIn->setChecked(false);
 	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	m_bZoomPlus = false;
 	m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
@@ -2154,10 +2219,14 @@ void QAFoil::ReleaseZoom()
 
 void QAFoil::SaveSettings(QDataStream &ar)
 {
+	ar << m_bSF;
 	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
 	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
 	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
 	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
+
+	ar << m_pSF->m_FoilStyle << m_pSF->m_FoilWidth << m_pSF->m_FoilColor;
+	ar << m_pPF->m_FoilStyle << m_pPF->m_FoilWidth << m_pPF->m_FoilColor;
 }
 
 
@@ -2191,114 +2260,6 @@ void QAFoil::SetScale(QRect CltRect)
 	int width = m_rCltRect.width();
 
 	SetScale();
-}
-
-
-void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
-{
-	if(!pFoil) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	m_pCurFoil->m_bVisible = bShow;
-	SetFoil(pFoil);
-	pMainFrame->SetSaveState(false);
-}
-
-
-void QAFoil::SetParams()
-{
-	if(m_bSF) m_pctrlSF->setChecked(true);
-	else      m_pctrlPF->setChecked(true);
-
-	FillFoilTable();
-	m_pctrlFoilTable->adjustSize();
-}
-
-
-void QAFoil::SetSplineData()
-{
-}
-
-
-void QAFoil::SelectFoil(CFoil* pFoil)
-{
-	int i;
-
-	if(pFoil)
-	{
-		QModelIndex ind;
-		QString FoilName;
-		SetFoil(pFoil);
-
-		for(i=0; i< m_pFoilModel->rowCount(); i++)
-		{
-			ind = m_pFoilModel->index(i, 0, QModelIndex());
-			FoilName = ind.model()->data(ind, Qt::EditRole).toString();
-
-			if(FoilName == pFoil->m_FoilName)
-			{
-				m_pctrlFoilTable->selectRow(i+1);
-				break;
-			}
-		}
-	}
-	else
-	{
-		SetFoil(NULL);
-		m_pctrlFoilTable->selectRow(0);
-	}
-}
-
-
-void QAFoil::SetFoil(CFoil *pFoil)
-{
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
-	pMainFrame->m_pCurFoil = pFoil;
-	m_pCurFoil = pFoil;
-
-	if(!pFoil)
-	{
-		if(m_bSF)
-		{
-			m_pctrlVisible->setChecked(m_pSF->m_bVisible);
-			m_pctrlCenterLine->setChecked(m_pSF->m_bCenterLine);
-			m_pctrlFoilPoints->setChecked(m_pSF->m_bOutPoints);
-			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
-		}
-		else
-		{
-			m_pctrlVisible->setChecked(m_pPF->m_bVisible);
-			m_pctrlCenterLine->setChecked(m_pPF->m_bCenterLine);
-			m_pctrlFoilPoints->setChecked(m_pPF->m_bOutPoints);
-			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
-		}
-	}
-	else
-	{
-		m_pctrlVisible->setChecked(pFoil->m_bVisible);
-		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
-		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
-		m_pctrlFoilStyle->SetStyle(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
-	}
-}
-
-
-void QAFoil::StorePicture()
-{
-	if(m_StackPos>=50)
-	{
-		for (int i=1; i<50; i++)
-		{
-			memcpy(&m_UndoPic[i-1],&m_UndoPic[i], sizeof(Picture));
-		}
-		m_StackPos = 49;
-		m_StackSize = 49;
-	}
-	memcpy(&m_UndoPic[m_StackPos], &m_TmpPic, sizeof(Picture));
-	m_bStored = true;
-	m_StackPos++;
-	m_StackSize = m_StackPos;
-
 }
 
 void QAFoil::SetPicture()
@@ -2407,7 +2368,7 @@ void QAFoil::SetupLayout()
 	MainLayout->addLayout(RightControls);
 
 	setLayout(MainLayout);
-	
+
 	connect(m_pctrlSF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
 	connect(m_pctrlPF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
 
@@ -2425,7 +2386,7 @@ void QAFoil::SetupLayout()
 
 	m_pFoilModel = new QStandardItemModel;
 	m_pFoilModel->setRowCount(10);//temporary
-	m_pFoilModel->setColumnCount(13);
+	m_pFoilModel->setColumnCount(12);
 
 	m_pFoilModel->setHeaderData(0, Qt::Horizontal, "Name");
 	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Camber");
@@ -2439,7 +2400,7 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setHeaderData(9, Qt::Horizontal, "LE Flap");
 	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "LE XHinge");
 	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "LE YHinge");
-	m_pFoilModel->setHeaderData(12, Qt::Horizontal, "Visible");
+//	m_pFoilModel->setHeaderData(12, Qt::Horizontal, "Visible");
 
 	m_pctrlFoilTable->setModel(m_pFoilModel);
 	m_pctrlFoilTable->setWindowTitle("Foils");
@@ -2447,6 +2408,9 @@ void QAFoil::SetupLayout()
 	m_pFoilDelegate = new FoilTableDelegate;
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
+
+//	QHeaderView *pHeader = new QHeaderView(Qt::Horizontal);
+//	m_pctrlFoilTable->setHorizontalHeader(pHeader);
 
 	int  *precision = new int[10];
 	precision[0]  = 2;
@@ -2476,6 +2440,128 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setColumnWidth(7,80);
 	m_pctrlFoilTable->setColumnWidth(8,50);
 	m_pctrlFoilTable->setColumnWidth(9,80);
+
+}
+
+
+
+
+
+void QAFoil::SelectFoil(CFoil* pFoil)
+{
+	int i;
+
+	if(pFoil)
+	{
+		QModelIndex ind;
+		QString FoilName;
+		SetFoil(pFoil);
+
+		for(i=0; i< m_pFoilModel->rowCount(); i++)
+		{
+			ind = m_pFoilModel->index(i, 0, QModelIndex());
+			FoilName = ind.model()->data(ind, Qt::EditRole).toString();
+
+			if(FoilName == pFoil->m_FoilName)
+			{
+				m_pctrlFoilTable->selectRow(i+1);
+				break;
+			}
+		}
+	}
+	else
+	{
+		SetFoil(NULL);
+		m_pctrlFoilTable->selectRow(0);
+	}
+}
+
+
+void QAFoil::SetFoil(CFoil *pFoil)
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pMainFrame->m_pCurFoil = pFoil;
+	m_pCurFoil = pFoil;
+
+	if(!pFoil)
+	{
+		if(m_bSF)
+		{
+			m_pctrlVisible->setChecked(m_pSF->m_bVisible);
+			m_pctrlCenterLine->setChecked(m_pSF->m_bCenterLine);
+			m_pctrlFoilPoints->setChecked(m_pSF->m_bOutPoints);
+			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
+		}
+		else
+		{
+			m_pctrlVisible->setChecked(m_pPF->m_bVisible);
+			m_pctrlCenterLine->setChecked(m_pPF->m_bCenterLine);
+			m_pctrlFoilPoints->setChecked(m_pPF->m_bOutPoints);
+			m_pctrlFoilStyle->SetStyle(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
+		}
+	}
+	else
+	{
+		m_pctrlVisible->setChecked(pFoil->m_bVisible);
+		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
+		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
+		m_pctrlFoilStyle->SetStyle(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
+	}
+}
+
+
+void QAFoil::SetParams()
+{
+	if(m_bSF) m_pctrlSF->setChecked(true);
+	else      m_pctrlPF->setChecked(true);
+
+	FillFoilTable();
+	m_pctrlFoilTable->adjustSize();
+
+	SelectFoil(m_pCurFoil);
+}
+
+void QAFoil::SFNew()
+{
+	bool bLoadNew = true;
+	if(m_pSF->m_bModified)
+	{
+		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", "Discard changes to Splines ?",
+													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		{
+			bLoadNew = false;
+		}
+	}
+	if(bLoadNew) m_pSF->InitSplineFoil();
+}
+
+
+
+void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
+{
+	if(!pFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	m_pCurFoil->m_bVisible = bShow;
+	SetFoil(pFoil);
+	pMainFrame->SetSaveState(false);
+}
+
+void QAFoil::StorePicture()
+{
+	if(m_StackPos>=50)
+	{
+		for (int i=1; i<50; i++)
+		{
+			memcpy(&m_UndoPic[i-1],&m_UndoPic[i], sizeof(Picture));
+		}
+		m_StackPos = 49;
+		m_StackSize = 49;
+	}
+	memcpy(&m_UndoPic[m_StackPos], &m_TmpPic, sizeof(Picture));
+	m_bStored = true;
+	m_StackPos++;
+	m_StackSize = m_StackPos;
 
 }
 
