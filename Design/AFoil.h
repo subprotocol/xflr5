@@ -76,6 +76,7 @@ public:
  
 
 private slots:
+	void OnExportSplinesToFile();
 	void OnSplineType(bool bState);
 	void OnRenameFoil();
 	void OnGrid();
@@ -85,8 +86,8 @@ private slots:
 	void OnFoilStyle();
 	void OnDelete();
 	void OnDuplicate();
+	void OnExportCurFoil();
 	void OnFoilClicked(const QModelIndex& index);
-//	void OnCellChanged(QWidget *pWidget);
 	void OnStoreSplines();
 	void OnZoomIn();
 	void OnZoomLess();
@@ -157,9 +158,7 @@ private:
 	QCheckBox *m_pctrlVisible;
 	QCheckBox *m_pctrlCenterLine;
 	QCheckBox *m_pctrlFoilPoints;
-	QPushButton *m_pctrlRename;
-	QPushButton *m_pctrlDelete;
-	QPushButton *m_pctrlDuplicate;
+	QPushButton *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate, *m_pctrlExport;
 	QTableView *m_pctrlFoilTable;
 	QStandardItemModel *m_pFoilModel;
 	FoilTableDelegate *m_pFoilDelegate;

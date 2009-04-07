@@ -341,14 +341,9 @@ void MainFrame::closeEvent (QCloseEvent * event)
 	}
 
 	DeleteProject();
-
 	SaveSettings();
-
 	event->accept();//continue closing
 }
-
-
-
 
 
 void MainFrame::contextMenuEvent (QContextMenuEvent * event)
@@ -413,7 +408,6 @@ void MainFrame::CreateActions()
 	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
 	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
 
-
 	OnMiarexAct = new QAction(tr("&Wing and Plane Design"), this);
 	OnMiarexAct->setShortcut(tr("Ctrl+6"));
 	OnMiarexAct->setStatusTip(tr("Open Wing/plane design and analysis application"));
@@ -451,8 +445,7 @@ void MainFrame::CreateActions()
 	{
 		recentFileActs[i] = new QAction(this);
 		recentFileActs[i]->setVisible(false);
-		connect(recentFileActs[i], SIGNAL(triggered()),
-				this, SLOT(openRecentFile()));
+		connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
 	}
 
 	styleAct = new QAction("Set Style", this);
@@ -506,6 +499,10 @@ void MainFrame::CreateAFoilActions()
 	splineControlsAct->setStatusTip(tr("Define parameters for the splines : degree, number of out points"));
 	connect(splineControlsAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplineControls()));
 
+	exportSplinesToFileAct= new QAction(tr("Export Splines To File"), this);
+	exportSplinesToFileAct->setStatusTip(tr("Define parameters for the splines : degree, number of out points"));
+	connect(exportSplinesToFileAct, SIGNAL(triggered()), pAFoil, SLOT(OnExportSplinesToFile()));
+
 	newSplinesAct= new QAction(tr("New Splines"), this);
 	newSplinesAct->setStatusTip(tr("Reset the splines"));
 	connect(newSplinesAct, SIGNAL(triggered()), pAFoil, SLOT(OnNewSplines()));
@@ -514,7 +511,7 @@ void MainFrame::CreateAFoilActions()
 	zoomInAct->setStatusTip(tr("Zoom the view by drawing a rectangle in the client area"));
 	connect(zoomInAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomIn()));
 
-	ResetXScaleAct= new QAction(QIcon(":/images/ZoomOut.png"), tr("Reset X Scale"), this);
+	ResetXScaleAct= new QAction(QIcon(":/images/OnResetXScale.png"), tr("Reset X Scale"), this);
 	ResetXScaleAct->setStatusTip(tr("Resets the scale to fit the current screen width"));
 	connect(ResetXScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetXScale()));
 
@@ -582,14 +579,14 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(zoomInAct);
-	AFoilViewMenu->addAction(ResetXScaleAct);
 	AFoilViewMenu->addAction(zoomLessAct);
+	AFoilViewMenu->addAction(ResetXScaleAct);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(restoreToolbarsAct);
 	AFoilViewMenu->addAction(styleAct);
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
-	AFoilDesignMenu = menuBar()->addMenu(tr("&Design"));
+	AFoilDesignMenu = menuBar()->addMenu(tr("&Foil Design"));
 	AFoilDesignMenu->addAction(UndoAFoilAct);
 	AFoilDesignMenu->addAction(RedoAFoilAct);
 	AFoilDesignMenu->addSeparator();
@@ -610,11 +607,13 @@ void MainFrame::CreateAFoilMenus()
 	AFoilSplineMenu->addAction(newSplinesAct);
 	AFoilSplineMenu->addAction(splineControlsAct);
 	AFoilSplineMenu->addAction(storeSplineAct);
-
+	AFoilSplineMenu->addAction(exportSplinesToFileAct);
 
 	//AFoil Context Menu
 	AFoilCtxMenu = new QMenu("Context Menu",this);
 	AFoilCtxMenu->addMenu(AFoilDesignMenu);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addMenu(AFoilSplineMenu);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(ResetXScaleAct);
 	AFoilCtxMenu->addAction(ResetYScaleAct);
@@ -622,7 +621,6 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(AFoilGridAct);
 }
-
 
 
 void MainFrame::CreateAFoilToolbar()
@@ -841,18 +839,22 @@ void MainFrame::CreateMiarexActions()
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
 	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint view"), this);
+	WOppAct->setCheckable(true);
 	WOppAct->setStatusTip(tr("Show Operating point view"));
 	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
 
 	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
+	WPolarAct->setCheckable(true);
 	WPolarAct->setStatusTip(tr("Show Polar view"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D view"), this);
+	W3DAct->setCheckable(true);
 	W3DAct->setStatusTip(tr("Show 3D view"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
 	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("CpView view"), this);
+	CpViewAct->setCheckable(true);
 	CpViewAct->setStatusTip(tr("Show Cp view"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
@@ -891,14 +893,8 @@ void MainFrame::CreateMiarexActions()
 	ManageBodies->setStatusTip(tr("Manage the body list : Rename, Duplicate, Delete"));
 	connect(ManageBodies, SIGNAL(triggered()), pMiarex, SLOT(OnManageBodies()));
 
-	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
-	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
-	fourWingGraphs = new QAction(tr("All OpPoint Graphs"), this);
-	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
-
 	exporttoAVL = new QAction(tr("Export to AVL..."), this);
 	connect(exporttoAVL, SIGNAL(triggered()), pMiarex, SLOT(OnExporttoAVL()));
-
 
 	exportCurWOpp = new QAction(tr("Export..."), this);
 	connect(exportCurWOpp, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWOpp()));
@@ -910,6 +906,7 @@ void MainFrame::CreateMiarexActions()
 	connect(resetWPlrLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWPlrLegend()));
 
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
+	showCurWOppOnly->setCheckable(true);
 	connect(showCurWOppOnly, SIGNAL(triggered()), pMiarex, SLOT(OnCurWOppOnly()));
 	showAllWOpps = new QAction(tr("Show All OpPoints"), this);
 	connect(showAllWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWOpps()));
@@ -926,14 +923,23 @@ void MainFrame::CreateMiarexActions()
 	connect(deleteAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteAllWPlrOpps()));
 
 	showEllipticCurve = new QAction(tr("Show Elliptic Curve"), this);
+	showEllipticCurve->setCheckable(true);
 	connect(showEllipticCurve, SIGNAL(triggered()), pMiarex, SLOT(OnShowEllipticCurve()));
+
 	showXCmRefLocation = new QAction(tr("Show XCmRef location"), this);
+	showXCmRefLocation->setCheckable(true);
 	connect(showXCmRefLocation, SIGNAL(triggered()), pMiarex, SLOT(OnShowXCmRef()));
+
 	showStabCurve = new QAction(tr("Show Stab Curve"), this);
+	showStabCurve->setCheckable(true);
 	connect(showStabCurve, SIGNAL(triggered()), pMiarex, SLOT(OnStabCurve()));
+
 	showFinCurve = new QAction(tr("Show Fin Curve"), this);
+	showFinCurve->setCheckable(true);
 	connect(showFinCurve, SIGNAL(triggered()), pMiarex, SLOT(OnFinCurve()));
+
 	showWing2Curve = new QAction(tr("Show Second Wing Curve"), this);
+	showWing2Curve->setCheckable(true);
 	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
 	defineWPolar = new QAction(tr("Define Analysis"), this);
@@ -942,30 +948,49 @@ void MainFrame::CreateMiarexActions()
 	defineCtrlPolar = new QAction(tr("Define a Control Analysis"), this);
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
+	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
+	twoWingGraphs->setCheckable(true);
+	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
+	fourWingGraphs = new QAction(tr("All OpPoint Graphs"), this);
+	fourWingGraphs->setCheckable(true);
+	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
 	WingGraph1 = new QAction(tr("Wing Graph 1"), this);
+	WingGraph1->setCheckable(true);
 	connect(WingGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph1()));
 	WingGraph2 = new QAction(tr("Wing Graph 2"), this);
+	WingGraph2->setCheckable(true);
 	connect(WingGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph2()));
 	WingGraph3 = new QAction(tr("Wing Graph 3"), this);
+	WingGraph3->setCheckable(true);
 	connect(WingGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph3()));
 	WingGraph4 = new QAction(tr("Wing Graph 4"), this);
+	WingGraph4->setCheckable(true);
 	connect(WingGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph4()));
 
-	WPlrGraph1 = new QAction(tr("Polar Graph 1"), this);
-	connect(WPlrGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph1()));
-	WPlrGraph2 = new QAction(tr("Polar Graph 2"), this);
-	connect(WPlrGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph2()));
-	WPlrGraph3 = new QAction(tr("Polar Graph 3"), this);
-	connect(WPlrGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph3()));
-	WPlrGraph4 = new QAction(tr("Polar Graph 4"), this);
-	connect(WPlrGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph4()));
 	twoWPlrGraphs = new QAction(tr("Two Polar Graphs"), this);
+	twoWPlrGraphs->setCheckable(true);
 	connect(twoWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWPlrGraphs()));
 	allWPlrGraphs = new QAction(tr("All Polar Graphs"), this);
+	allWPlrGraphs->setCheckable(true);
 	connect(allWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWPlrGraphs()));
+	WPlrGraph1 = new QAction(tr("Polar Graph 1"), this);
+	WPlrGraph1->setCheckable(true);
+	connect(WPlrGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph1()));
+	WPlrGraph2 = new QAction(tr("Polar Graph 2"), this);
+	WPlrGraph2->setCheckable(true);
+	connect(WPlrGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph2()));
+	WPlrGraph3 = new QAction(tr("Polar Graph 3"), this);
+	WPlrGraph3->setCheckable(true);
+	connect(WPlrGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph3()));
+	WPlrGraph4 = new QAction(tr("Polar Graph 4"), this);
+	WPlrGraph4->setCheckable(true);
+	connect(WPlrGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph4()));
 
-	WGraphVariable = new QAction(tr("Define Variables"), this);
-	connect(WGraphVariable, SIGNAL(triggered()), pMiarex, SLOT(OnDefinePolarGraphVariables()));
+	WPlrGraphVariable = new QAction(tr("Define Variables"), this);
+	connect(WPlrGraphVariable, SIGNAL(triggered()), pMiarex, SLOT(OnDefinePolarGraphVariables()));
+
+	WingGraphVariablesAct = new QAction(tr("Define Variables"), this);
+	connect(WingGraphVariablesAct, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWingGraphVariables()));
 
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
@@ -1086,6 +1111,12 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWOppMenu->addAction(showStabCurve);
 	MiarexWOppMenu->addAction(showFinCurve);
 	MiarexWOppMenu->addSeparator();
+	WOppCurGraphMenu = MiarexWOppMenu->addMenu("Current Graph");
+	WOppCurGraphMenu->addAction(WingGraphVariablesAct);
+	WOppCurGraphMenu->addAction(GraphDlgAction);
+	WOppCurGraphMenu->addAction(exportCurGraphAct);
+	WOppCurGraphMenu->addAction(resetCurGraphScales);
+
 	WOppGraphMenu = MiarexWOppMenu->addMenu("Graphs");
 	WOppGraphMenu->addAction(WingGraph1);
 	WOppGraphMenu->addAction(WingGraph2);
@@ -1096,9 +1127,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppGraphMenu->addAction(fourWingGraphs);
 	WOppGraphMenu->addSeparator();
 	WOppGraphMenu->addAction(resetWOppLegend);
-	WOppGraphMenu->addAction(GraphDlgAction);
-	WOppGraphMenu->addAction(resetCurGraphScales);
-	WOppGraphMenu->addAction(exportCurGraphAct);
+
 	MiarexWOppMenu->addSeparator();
 	MiarexWOppMenu->addAction(advancedSettings);
 	MiarexWOppMenu->addAction(viewLogFile);
@@ -1115,6 +1144,8 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addAction(showAllWOpps);
 	WOppCtxMenu->addAction(hideAllWOpps);
 	WOppCtxMenu->addAction(deleteAllWOpps);
+	WOppCtxMenu->addSeparator();
+	WOppCtxMenu->addMenu(WOppCurGraphMenu);
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addMenu(WOppGraphMenu);
 	WOppCtxMenu->addSeparator();
@@ -1137,7 +1168,7 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCurGraphMenu = WPlrCtxMenu->addMenu("Current Graph");
 	WPlrCurGraphMenu->addAction(GraphDlgAction);
 	WPlrCurGraphMenu->addAction(resetCurGraphScales);
-	WPlrCurGraphMenu->addAction(WGraphVariable);
+	WPlrCurGraphMenu->addAction(WPlrGraphVariable);
 	WPlrCurGraphMenu->addAction(exportCurGraphAct);
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addMenu(WPlrGraphMenu);
@@ -1273,10 +1304,12 @@ void MainFrame::CreateXDirectActions()
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 
 	OpPointsAct = new QAction(QIcon(":/images/OnCpView.png"), tr("OpPoint view"), this);
+	OpPointsAct->setCheckable(true);
 	OpPointsAct->setStatusTip(tr("Show Operating point view"));
 	connect(OpPointsAct, SIGNAL(triggered()), pXDirect, SLOT(OnOpPoints()));
 
 	PolarsAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
+	PolarsAct->setCheckable(true);
 	PolarsAct->setStatusTip(tr("Show Polar view"));
 	connect(PolarsAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolars()));
 
@@ -1286,8 +1319,6 @@ void MainFrame::CreateXDirectActions()
 	resetCpGraphScales = new QAction(tr("Reset Cp Graph Scales"), this);
 	connect(resetCpGraphScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetCpGraphScales()));
 
-	AllPolarGraphsAct = new QAction(tr("All Polar Graphs"), this);
-	connect(AllPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnAllPolarGraphs()));
 
 	allPolarGraphsSettingsAct = new QAction(tr("All Polar Graph Settings"), this);
 	allPolarGraphsSettingsAct->setStatusTip("Modifies the setting for all polar graphs simultaneously");
@@ -1301,12 +1332,18 @@ void MainFrame::CreateXDirectActions()
 	connect(curPolarGraphVariableAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolarGraphVariable()));
 
 	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs"), this);
+	TwoPolarGraphsAct->setCheckable(true);
 	connect(TwoPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnCouplePolarGraphs()));
+
+	AllPolarGraphsAct = new QAction(tr("All Polar Graphs"), this);
+	AllPolarGraphsAct->setCheckable(true);
+	connect(AllPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnAllPolarGraphs()));
 
 	for (int i = 0; i < 5; ++i)
 	{
 		PolarGraphAct[i] = new QAction(this);
 		PolarGraphAct[i]->setData(i);
+		PolarGraphAct[i]->setCheckable(true);
 		connect(PolarGraphAct[i], SIGNAL(triggered()), pXDirect, SLOT(OnSinglePolarGraph()));
 	}
 	PolarGraphAct[0]->setText("Cl vs.Cd");
@@ -1360,6 +1397,7 @@ void MainFrame::CreateXDirectActions()
 	connect(exportCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurPolar()));
 
 	showPanels = new QAction(tr("Show Panels"), this);
+	showPanels->setCheckable(true);
 	showPanels->setStatusTip(tr("Show the foil's panels"));
 	connect(showPanels, SIGNAL(triggered()), pXDirect, SLOT(OnShowPanels()));
 
@@ -1367,12 +1405,13 @@ void MainFrame::CreateXDirectActions()
 	resetFoilScale->setStatusTip(tr("Resets the foil's scale to original size"));
 	connect(resetFoilScale, SIGNAL(triggered()), pXDirect, SLOT(OnResetFoilScale()));
 
-	showInviscidCurve = new QAction(tr("Show Inviscid"), this);
+	showInviscidCurve = new QAction(tr("Show Inviscid Curve"), this);
+	showInviscidCurve->setCheckable(true);
 	showInviscidCurve->setStatusTip(tr("Display the Opp's inviscid curve"));
 	connect(showInviscidCurve, SIGNAL(triggered()), pXDirect, SLOT(OnCpi()));
 
-
 	showNeutralLine = new QAction(tr("Neutral Line"), this);
+	showNeutralLine->setCheckable(true);
 	connect(showNeutralLine, SIGNAL(triggered()), pXDirect, SLOT(OnShowNeutralLine()));
 
 	showAllPolars = new QAction(tr("Show All Polars"), this);
@@ -1444,10 +1483,12 @@ void MainFrame::CreateXDirectActions()
 	connect(NacaFoils, SIGNAL(triggered()), pXDirect, SLOT(OnNacaFoils()));
 
 	setCpVarGraph = new QAction(tr("Cp Variable"), this);
+	setCpVarGraph->setCheckable(true);
 	setCpVarGraph->setStatusTip(tr("Sets Cp vs. chord graph"));
 	connect(setCpVarGraph, SIGNAL(triggered()), pXDirect, SLOT(OnCpGraph()));
 
 	setQVarGraph = new QAction(tr("Q Variable"), this);
+	setQVarGraph->setCheckable(true);
 	setQVarGraph->setStatusTip(tr("Sets Speed vs. chord graph"));
 	connect(setQVarGraph, SIGNAL(triggered()), pXDirect, SLOT(OnQGraph()));
 
@@ -1543,7 +1584,7 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addAction(hideAllPolars);
 	PolarMenu->addSeparator();
 	GraphPolarMenu = PolarMenu->addMenu("Polar Graphs");
-	CurPolarGraphMenu = GraphPolarMenu->addMenu("Polar Graphs");
+	CurPolarGraphMenu = GraphPolarMenu->addMenu("Current Graph");
 	CurPolarGraphMenu->addAction(curPolarGraphVariableAct);
 	CurPolarGraphMenu->addAction(GraphDlgAction);
 	CurPolarGraphMenu->addAction(resetCurGraphScales);
@@ -1630,12 +1671,12 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addAction(editCurPolar);
 	OperFoilCtxMenu->addSeparator();//_______________
-	OperFoilCtxMenu->addAction(showInviscidCurve);
 	OperFoilCtxMenu->addSeparator();//_______________
 	CurGraphCtxMenu = OperFoilCtxMenu->addMenu("Cp graph");
 	CurGraphCtxMenu->addAction(resetCpGraphScales);
 	CurGraphCtxMenu->addAction(defineCpGraphSettings);
 	CurGraphCtxMenu->addAction(exportCurGraphAct);
+	CurGraphCtxMenu->addAction(showInviscidCurve);
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(definePolar);
 	OperFoilCtxMenu->addAction(defineBatch);
@@ -2731,10 +2772,15 @@ void MainFrame::OnCurFoilStyle()
 		m_pCurFoil->m_FoilColor  = dlg.GetColor();
 		m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
 		m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
+		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->m_BufferFoil.m_FoilColor  = m_pCurFoil->m_FoilColor;
+		pXDirect->m_BufferFoil.m_nFoilStyle = m_pCurFoil->m_nFoilStyle;
+		pXDirect->m_BufferFoil.m_nFoilWidth = m_pCurFoil->m_nFoilWidth;
 		SetSaveState(false);
 	}
 	UpdateView();
 }
+
 
 void MainFrame::OnExportCurGraph()
 {
@@ -2908,6 +2954,7 @@ void MainFrame::OnLoadFile()
 		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 		pAFoil->SetParams();
 		pAFoil->SelectFoil(pAFoil->m_pCurFoil);
+		UpdateView();
 	}
 	else if(m_iApp==INVERSEDESIGN)
 	{
@@ -3580,8 +3627,7 @@ void MainFrame::OnXDirect()
 	m_pctrlXInverseWidget->hide();
 	SetCentralWidget();
 	SetMenus();
-	m_pctrlOppView->setChecked(!pXDirect->m_bPolar);
-	m_pctrlPolarView->setChecked(pXDirect->m_bPolar);
+	pXDirect->CheckButtons();
 }
 
 
@@ -3654,6 +3700,7 @@ void MainFrame::openRecentFile()
 	{
 		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 		pAFoil->SetParams();
+		UpdateView();
 	}
 	else if(m_iApp==INVERSEDESIGN)
 	{
@@ -3766,8 +3813,6 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 	pFoil->n=pFoil->nb;
 
 	pFoil->m_FoilColor = GetColor(0);
-//   delete pFoil;
-//	m_pglWidget->m_pFoil = pFoil;
 	pFoil->InitFoil();
 
 	return pFoil;

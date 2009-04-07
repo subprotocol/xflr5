@@ -1542,6 +1542,44 @@ CWPolar* QMiarex::AddWPolar(CWPolar *pWPolar)
 
 
 
+void QMiarex::CheckButtons()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pMainFrame->m_pctrlWOppView->setChecked(m_iView==1);
+	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==2);
+	pMainFrame->m_pctrl3dView->setChecked(m_iView==3);
+	pMainFrame->m_pctrlCpView->setChecked(m_iView==4);
+
+	pMainFrame->WOppAct->setChecked(m_iView==1);
+	pMainFrame->WPolarAct->setChecked(m_iView==2);
+	pMainFrame->W3DAct->setChecked(m_iView==3);
+	pMainFrame->CpViewAct->setChecked(m_iView==4);
+
+	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
+	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
+	pMainFrame->showStabCurve->setChecked(m_bShowStab);
+	pMainFrame->showFinCurve->setChecked(m_bShowFin);
+	pMainFrame->showWing2Curve->setChecked(m_bShowWing2);
+
+	pMainFrame->showCurWOppOnly->setChecked(m_bCurWOppOnly);
+
+	pMainFrame->WingGraph1->setChecked(m_iWingView==1 && (m_pCurWingGraph == &m_WingGraph1));
+	pMainFrame->WingGraph2->setChecked(m_iWingView==1 && (m_pCurWingGraph == &m_WingGraph2));
+	pMainFrame->WingGraph3->setChecked(m_iWingView==1 && (m_pCurWingGraph == &m_WingGraph3));
+	pMainFrame->WingGraph4->setChecked(m_iWingView==1 && (m_pCurWingGraph == &m_WingGraph4));
+	pMainFrame->twoWingGraphs->setChecked(m_iWingView==2);
+	pMainFrame->fourWingGraphs->setChecked(m_iWingView==4);
+
+	pMainFrame->WPlrGraph1->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == &m_WPlrGraph1));
+	pMainFrame->WPlrGraph2->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == &m_WPlrGraph2));
+	pMainFrame->WPlrGraph3->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == &m_WPlrGraph3));
+	pMainFrame->WPlrGraph4->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == &m_WPlrGraph4));
+	pMainFrame->twoWPlrGraphs->setChecked(m_iWPlrView==2);
+	pMainFrame->allWPlrGraphs->setChecked(m_iWPlrView==4);
+}
+
+
 void QMiarex::ClientToGL(QPoint const &point, CVector &real)
 {
 	double h2 = (double)m_rCltRect.height() /2.0;
@@ -10296,14 +10334,6 @@ void QMiarex::OnCpView()
 	UpdateView();
 }
 
-void QMiarex::CheckButtons()
-{
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->m_pctrlWOppView->setChecked(m_iView==1);
-	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==2);
-	pMainFrame->m_pctrl3dView->setChecked(m_iView==3);
-	pMainFrame->m_pctrlCpView->setChecked(m_iView==4);
-}
 
 void QMiarex::OnCurWOppOnly()
 {
@@ -10313,7 +10343,9 @@ void QMiarex::OnCurWOppOnly()
 		CreateWOppCurves();
 		UpdateView();
 	}
+	CheckButtons();
 }
+
 
 void QMiarex::OnCurveColor()
 {
@@ -10327,6 +10359,7 @@ void QMiarex::OnCurveColor()
 	UpdateCurve();
 }
 
+
 void QMiarex::OnCurveStyle(int index)
 {
 	m_CurveStyle = index;
@@ -10334,12 +10367,14 @@ void QMiarex::OnCurveStyle(int index)
 	UpdateCurve();
 }
 
+
 void QMiarex::OnCurveWidth(int index)
 {
 	m_CurveWidth = index+1;
 	FillComboBoxes();
 	UpdateCurve();
 }
+
 
 void QMiarex::OnDefineWingGraphVariables()
 {
@@ -10357,7 +10392,9 @@ void QMiarex::OnDefineWingGraphVariables()
 	dlg.InitDialog();
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		for (i=m_WingGraph1.GetCurveCount()-1; i>0; i--){//0 is curretn curve
+		for (i=m_WingGraph1.GetCurveCount()-1; i>0; i--)
+		{
+			//0 is current curve
 			m_WingGraph1.DeleteCurve(i);
 		}
 		for (i=m_WingGraph2.GetCurveCount()-1; i>0; i--){//0 is curretn curve
@@ -10398,6 +10435,8 @@ void QMiarex::OnDefineWingGraphVariables()
 		UpdateView();
 	}
 }
+
+
 void QMiarex::OnDefinePolarGraphVariables()
 {
 	//define the variables for the current graph
@@ -11480,7 +11519,7 @@ void QMiarex::OnFourWingGraphs()
 	//The user has requested four wing graphs
 	m_iWingView = 4;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
 	UpdateView();
@@ -11492,7 +11531,7 @@ void QMiarex::OnFourWPlrGraphs()
 {
 	m_iWPlrView = 4;
 
-//	CheckMenus();
+	CheckButtons();
 	CreateWPolarCurves();
 	SetWPlrLegendPos();
 	UpdateView();
@@ -12281,6 +12320,7 @@ void QMiarex::OnSingleWPlrGraph1()
 		SetWPlrLegendPos();
 		UpdateView();
 	}
+	CheckButtons();
 }
 
 
@@ -12296,6 +12336,7 @@ void QMiarex::OnSingleWPlrGraph2()
 		SetWPlrLegendPos();
 		UpdateView();
 	}
+	CheckButtons();
 }
 
 
@@ -12311,6 +12352,7 @@ void QMiarex::OnSingleWPlrGraph3()
 		SetWPlrLegendPos();
 		UpdateView();
 	}
+	CheckButtons();
 }
 
 
@@ -12326,16 +12368,7 @@ void QMiarex::OnSingleWPlrGraph4()
 		SetWPlrLegendPos();
 		UpdateView();
 	}
-}
-
-
-void QMiarex::OnTwoWPlrGraphs()
-{
-	m_iWPlrView = 2;
-//	CheckMenus();
-	CreateWPolarCurves();
-	SetWPlrLegendPos();
-	UpdateView();
+	CheckButtons();
 }
 
 
@@ -12345,8 +12378,9 @@ void QMiarex::OnSingleWingGraph1()
 	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph1;
+	m_pCurWingGraph = &m_WingGraph1;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
 	UpdateView();
@@ -12357,8 +12391,9 @@ void QMiarex::OnSingleWingGraph2()
 	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph2;
+	m_pCurWingGraph = &m_WingGraph2;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
 	UpdateView();
@@ -12369,8 +12404,9 @@ void QMiarex::OnSingleWingGraph3()
 	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph3;
+	m_pCurWingGraph = &m_WingGraph3;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
 	UpdateView();
@@ -12382,8 +12418,9 @@ void QMiarex::OnSingleWingGraph4()
 	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph4;
+	m_pCurWingGraph = &m_WingGraph4;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
 	UpdateView();
@@ -12440,9 +12477,20 @@ void QMiarex::OnTwoWingGraphs()
 	//The user has requested two wing graphs
 	m_iWingView = 2;
 	m_iView = 1;
-//	CheckMenus();
+	CheckButtons();
 	CreateWOppCurves();
 	SetWingLegendPos();
+	UpdateView();
+}
+
+
+
+void QMiarex::OnTwoWPlrGraphs()
+{
+	m_iWPlrView = 2;
+	CheckButtons();
+	CreateWPolarCurves();
+	SetWPlrLegendPos();
 	UpdateView();
 }
 

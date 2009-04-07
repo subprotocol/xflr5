@@ -161,6 +161,12 @@ void CPF::ExportToBuffer(CFoil *pFoil)
 }
 
 
+void CPF::ExportToFile(QTextStream &out)
+{
+	m_Extrados.ExportToFile(out,true);
+	m_Intrados.ExportToFile(out,false);
+}
+
 bool CPF::InitSplinedFoil()
 {
 	m_bModified   = false;
@@ -323,57 +329,6 @@ int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 	return -10;
 }
 
-
-
-
-/*
-void CSplinedPoints::Export(QFile *pFile, bool bExtrados)
-{
-	QString strOut;
-	CSpline LinkSpline;
-	LinkSpline.m_iRes = m_Freq;
-	LinkSpline.m_rViewRect.CopyRect(&m_rViewRect);
-
-	if(bExtrados){
-		for (int k=m_iPoints-1;k>=0; k--){
-			LinkSpline.m_iCtrlPoints = -1;
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
-								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].x,
-								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-			for (int j=LinkSpline.m_iRes-1;j>=1; j--){
-				strOut.Format(" %7.4f  %7.4f\n", LinkSpline.m_Output[j].x,
-												 LinkSpline.m_Output[j].y);
-				pFile->WriteString(strOut);
-			}
-		}
-	}
-	else {
-		for (int k=0; k<m_iPoints; k++){
-			LinkSpline.m_iCtrlPoints = -1;
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
-								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].x,
-								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-			for (int j=0; j<LinkSpline.m_iRes-1;j++){
-				strOut.Format(" %7.4f  %7.4f\n", LinkSpline.m_Output[j].x,
-												 LinkSpline.m_Output[j].y);
-				pFile->WriteString(strOut);
-			}
-		}
-		strOut.Format(" %7.4f  %7.4f\n", 1.0,0.);
-		pFile->WriteString(strOut);
-	}
-}
-*/
 
 
 
@@ -574,10 +529,10 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
 		{
 			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
-								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].x,
-								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].x,
+								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].x,
+								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
@@ -590,15 +545,16 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
 		}
 
 	}
-	else {
+	else
+	{
 		for (k=0; k<m_iPoints-1; k++)
 		{
 			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
-								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].x,
-								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].x,
+								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].x,
+								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
@@ -618,6 +574,67 @@ void CSplinedPoints::ExportToBuffer(CFoil *pFoil, bool bExtrados)
 
 
 
+void CSplinedPoints::ExportToFile(QTextStream &out, bool bExtrados)
+{
+	QString strOut;
+	CSpline LinkSpline;
+	LinkSpline.m_iRes = m_Freq;
+	LinkSpline.m_rViewRect = m_rViewRect;
+
+	if(bExtrados)
+	{
+		for (int k=m_iPoints-2;k>=0; k--)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].x,
+								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].x,
+								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
+			LinkSpline.SplineKnots();
+			LinkSpline.SplineCurve();
+			for (int j=LinkSpline.m_iRes-1;j>=1; j--)
+			{
+				strOut = QString(" %1  %2\n")
+						 .arg(LinkSpline.m_Output[j].x,7,'f',4)
+						 .arg(LinkSpline.m_Output[j].y,7,'f',4);
+				out << strOut;
+			}
+		}
+	}
+	else
+	{
+		for (int k=0; k<m_iPoints-1; k++)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].x,
+								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].x,
+								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
+			LinkSpline.SplineKnots();
+			LinkSpline.SplineCurve();
+			for (int j=0; j<LinkSpline.m_iRes-1;j++)
+			{
+				strOut = QString(" %1  %2\n")
+						 .arg(LinkSpline.m_Output[j].x,7,'f',4)
+						 .arg(LinkSpline.m_Output[j].y,7,'f',4);
+				out << strOut;
+			}
+		}
+		strOut = QString(" %1  %2\n")
+						 .arg(1.0,7,'f',4)
+						 .arg(0.0,7,'f',4);
+		out << strOut;
+	}
+}
+
+
+
+
+
 double CSplinedPoints::GetY(double x)
 {
 	int k;
@@ -630,10 +647,10 @@ double CSplinedPoints::GetY(double x)
 		if (m_ctrlPoint[k].x < x && x<=m_ctrlPoint[k+1].x)
 		{
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
-								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
-			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].x,
-								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k+1].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k].x   + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].x,
+								   m_ctrlPoint[k].y   + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k].y);
+			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].x,
+								   m_ctrlPoint[k+1].y - (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.0 * m_Slope[k+1].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();

@@ -545,6 +545,36 @@ OpPoint* QXDirect::AddOpPoint(OpPoint *pNewPoint)
 }
 
 
+void QXDirect::CheckButtons()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pMainFrame->m_pctrlOppView->setChecked(!m_bPolar);
+	pMainFrame->m_pctrlPolarView->setChecked(m_bPolar);
+
+	pMainFrame->OpPointsAct->setChecked(!m_bPolar);
+	pMainFrame->PolarsAct->setChecked(m_bPolar);
+
+	pMainFrame->showPanels->setChecked(m_bShowPanels);
+	pMainFrame->showNeutralLine->setChecked(m_bNeutralLine);
+	pMainFrame->showInviscidCurve->setChecked(m_bShowInviscid);
+	pMainFrame->showCurOppOnly->setChecked(m_bCurOppOnly);
+
+	pMainFrame->setCpVarGraph->setChecked(m_OppVar==0);
+	pMainFrame->setQVarGraph->setChecked(m_OppVar==1);
+
+	pMainFrame->PolarGraphAct[0]->setChecked(m_iPlrView==1 && m_iPlrGraph == 1);
+	pMainFrame->PolarGraphAct[1]->setChecked(m_iPlrView==1 && m_iPlrGraph == 2);
+	pMainFrame->PolarGraphAct[2]->setChecked(m_iPlrView==1 && m_iPlrGraph == 3);
+	pMainFrame->PolarGraphAct[3]->setChecked(m_iPlrView==1 && m_iPlrGraph == 4);
+	pMainFrame->PolarGraphAct[4]->setChecked(m_iPlrView==1 && m_iPlrGraph == 5);
+
+	pMainFrame->TwoPolarGraphsAct->setChecked(m_iPlrView==2);
+	pMainFrame->AllPolarGraphsAct->setChecked(m_iPlrView==0);
+}
+
+
+
 void QXDirect::Connect()
 {
 	connect(m_pctrlSpec1, SIGNAL(clicked()), this, SLOT(OnSpec()));
@@ -1196,34 +1226,41 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_1:
 			m_iPlrView  = 1;
 			m_iPlrGraph = 1;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_2:
 			m_iPlrView  = 1;
 			m_iPlrGraph = 2;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_3:
 			m_iPlrView  = 1;
 			m_iPlrGraph = 3;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_4:
 			m_iPlrView  = 1;
 			m_iPlrGraph = 4;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_5:
 			m_iPlrView  = 1;
 			m_iPlrGraph = 5;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_A:
 			m_iPlrView = 0;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_T:
 			m_iPlrView = 2;
+			CheckButtons();
 			UpdateView();
 			break;
 		case Qt::Key_V:
@@ -1449,6 +1486,7 @@ void QXDirect::OnAllPolarGraphs()
 {
 	m_iPlrView  = 0;
 	m_bPolar = true;
+	CheckButtons();
 	UpdateView();
 }
 
@@ -1944,7 +1982,7 @@ void QXDirect::OnCpGraph()
 	CreateOppCurves();
 	m_pCpGraph->SetYTitle("Q");
 
-//	CheckMenu();
+	CheckButtons();
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
 	UpdateView();
@@ -1972,6 +2010,7 @@ void QXDirect::OnCpi()
 	m_bShowInviscid = !m_bShowInviscid;
 
 	CreateOppCurves();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2931,8 +2970,7 @@ void QXDirect::OnOpPoints()
 	CreateOppCurves();
 	SetFoilScale();
 	SetCurveParams();
-	pMainFrame->m_pctrlOppView->setChecked(true);
-	pMainFrame->m_pctrlPolarView->setChecked(false);
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2943,10 +2981,11 @@ void QXDirect::OnPolars()
 	m_bPolar = true;
 	CreatePolarCurves();
 	SetCurveParams();
-	pMainFrame->m_pctrlOppView->setChecked(false);
-	pMainFrame->m_pctrlPolarView->setChecked(true);
+	CheckButtons();
 	UpdateView();
 }
+
+
 void QXDirect::OnPanels()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -3083,7 +3122,8 @@ void QXDirect::OnQGraph()
 	CreateOppCurves();
 	m_pCpGraph->SetYTitle("Q");
 
-//	CheckMenu();
+	CheckButtons();
+
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
 	UpdateView();
@@ -3495,6 +3535,8 @@ void QXDirect::OnShowNeutralLine()
 {
 	m_bNeutralLine = !m_bNeutralLine;
 	if(!m_bPolar) UpdateView();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->showNeutralLine->setChecked(m_bNeutralLine);
 }
 
 
@@ -3502,6 +3544,8 @@ void QXDirect::OnShowPanels()
 {
 	m_bShowPanels = !m_bShowPanels;
 	if(!m_bPolar)	UpdateView();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->showPanels->setChecked(m_bShowPanels);
 }
 
 
@@ -3545,6 +3589,8 @@ void QXDirect::OnShowPressure()
 	if(!m_bAnimate)		UpdateView();
 }
 
+
+
 void QXDirect::OnSinglePolarGraph()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
@@ -3553,8 +3599,11 @@ void QXDirect::OnSinglePolarGraph()
 	m_iPlrView  = 1;
 	m_iPlrGraph = action->data().toInt()+1;
 	m_bPolar = true;
+	CheckButtons();
 	UpdateView();
 }
+
+
 
 void QXDirect::OnSingleAnalysis()
 {

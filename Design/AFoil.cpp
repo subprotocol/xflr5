@@ -405,6 +405,8 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 	{
 		case Qt::Key_Escape:
 		{
+//			TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+//			p2DWidget->setCursor(m_hcCross);
 			if(m_bZoomPlus)
 			{
 				ReleaseZoom();
@@ -737,7 +739,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 		m_ZoomRect.setTopLeft(point);
 		m_ZoomRect.setBottomRight(point);
 	}
-	else if(!m_bZoomPlus)
+	else if(!m_bZoomPlus && (event->buttons() & Qt::LeftButton))
 	{
 		if(m_bSF)
 		{
@@ -1536,6 +1538,116 @@ void QAFoil::OnDuplicate()
 }
 
 
+void QAFoil::OnExportCurFoil()
+{
+	if(!m_pCurFoil)	return;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString FileName, DestFileName, OutString;
+	QFile DestFile;
+
+	FileName = m_pCurFoil->m_FoilName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
+											pMainFrame->m_LastDirName,
+											"Foil File (*.dat)");
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+	m_pCurFoil->ExportFoil(out);
+	XFile.close();
+}
+
+
+void QAFoil::OnExportSplinesToFile()
+{
+	CFoil *pFoil;
+	QString FoilName = "Spline Foil";
+	QString FileName, strong;
+	QString strOut;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	// deselect points so as not to interfere with other mouse commands
+	m_pSF->m_Intrados.m_iSelect = -10;
+	m_pSF->m_Extrados.m_iSelect = -10;
+	m_pPF->m_Intrados.m_iSelect = -10;
+	m_pPF->m_Extrados.m_iSelect = -10;
+
+	//check that the number of output points is consistent with the array's size
+	if(m_bSF)
+	{
+		if(m_pSF->m_Extrados.m_iRes>IQX2)
+		{
+			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+		if(m_pSF->m_Intrados.m_iRes>IQX2)
+		{
+			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+	}
+	else
+	{
+		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
+		if(size>IQX2)
+		{
+			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			return;
+		}
+	}
+
+	QFile DestFile;
+
+	FileName.replace("/", " ");
+	FileName = QFileDialog::getSaveFileName(this, "Export Splines", pMainFrame->m_LastDirName,
+											"Text File (*.dat)");
+
+	int pos, type;
+	pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+
+	strOut = FoilName + "\n";
+	out << strOut;
+	if(m_bSF)
+	{
+//				XFile.WriteString("1\n");
+		m_pSF->ExportToFile(out);
+	}
+	else
+	{
+//				XFile.WriteString("2\n");
+		m_pPF->ExportToFile(out);
+	}
+	XFile.close();
+}
+
 
 
 void QAFoil::OnGrid()
@@ -1719,6 +1831,7 @@ void QAFoil::OnRenameFoil()
 	if(!m_pCurFoil) return;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->OnRenameCurFoil();
+	FillFoilTable();
 }
 
 
@@ -1955,6 +2068,100 @@ void QAFoil::OnZoomLess()
 
 void QAFoil::PaintLegend(QPainter &painter)
 {
+	painter.save();
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(m_bShowLegend)
+	{
+		CFoil* pRefFoil;
+		QString strong;
+		QPoint Place(m_rCltRect.right()-350, 20);
+
+		int LegendSize, ypos, x1, n, k, delta;
+
+		LegendSize = 20;
+		ypos = 15;
+		delta = 5;
+
+		painter.setBackgroundMode(Qt::TransparentMode);
+
+		QPen TextPen(pMainFrame->m_TextColor);
+		painter.setPen(TextPen);
+		QPen LegendPen;
+
+		k=0;
+		if(m_bSF)
+		{
+			if(m_pSF->m_bVisible)
+			{
+				LegendPen.setColor(m_pSF->m_FoilColor);
+				LegendPen.setStyle(GetStyle(m_pSF->m_FoilStyle));
+				LegendPen.setWidth(m_pSF->m_FoilWidth);
+
+				painter.setPen(LegendPen);
+				painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
+				if(m_pSF->m_bOutPoints )
+				{
+//					x1 = Place.x + (int)(0.5*LegendSize);
+//					pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
+					x1 = Place.x() + (int)(0.5*LegendSize);
+					painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
+				}
+				painter.setPen(TextPen);
+				painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, m_pSF->m_strFoilName);
+			}
+		}
+		else
+		{
+			if(m_pPF->m_bVisible)
+			{
+				LegendPen.setColor(m_pPF->m_FoilColor);
+				LegendPen.setStyle(GetStyle(m_pPF->m_FoilStyle));
+				LegendPen.setWidth(m_pPF->m_FoilWidth);
+
+				painter.setPen(LegendPen);
+				painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
+
+				if(m_pPF->m_bOutPoints)
+				{
+//					x1 = Place.x + (int)(0.5*LegendSize);
+//					pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
+					x1 = Place.x() + (int)(0.5*LegendSize);
+					painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
+				}
+				painter.setPen(TextPen);
+				painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, m_pPF->m_strFoilName);
+			}
+		}
+		k++;
+		for (n=0; n < m_poaFoil->size(); n++)
+		{
+			pRefFoil = (CFoil*)m_poaFoil->at(n);
+			if(pRefFoil && pRefFoil->m_bVisible)
+			{
+				strong = pRefFoil->m_FoilName;
+				if(strong.length())
+				{
+					LegendPen.setColor(pRefFoil->m_FoilColor);
+					LegendPen.setStyle(GetStyle(pRefFoil->m_nFoilStyle));
+					LegendPen.setWidth(pRefFoil->m_nFoilWidth);
+
+					painter.setPen(LegendPen);
+					painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
+
+					if(pRefFoil->m_bPoints)
+					{
+						x1 = Place.x() + (int)(0.5*LegendSize);
+						painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
+					}
+					painter.setPen(TextPen);
+					painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, pRefFoil->m_FoilName);
+					k++;
+				}
+			}
+		}
+	}
+	painter.restore();
 }
 
 
@@ -2341,10 +2548,18 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilStyle   = new LineButton;
 	m_pctrlVisible     = new QCheckBox("Show Foil");
 	m_pctrlCenterLine  = new QCheckBox("Show Centerline");
-	m_pctrlFoilPoints = new QCheckBox("Show Points");
+	m_pctrlFoilPoints  = new QCheckBox("Show Points");
+
 	m_pctrlRename      = new QPushButton("Rename");
 	m_pctrlDelete      = new QPushButton("Delete");
 	m_pctrlDuplicate   = new QPushButton("Duplicate");
+	m_pctrlExport      = new QPushButton("Export");
+
+	QGridLayout *FoilCommands = new QGridLayout;
+	FoilCommands->addWidget(m_pctrlRename,1,1);
+	FoilCommands->addWidget(m_pctrlDelete,1,2);
+	FoilCommands->addWidget(m_pctrlDuplicate,2,1);
+	FoilCommands->addWidget(m_pctrlExport,2,2);
 
 	QHBoxLayout *SplineOption = new QHBoxLayout;
 	m_pctrlSF = new QRadioButton("Splines");
@@ -2355,9 +2570,7 @@ void QAFoil::SetupLayout()
 	QVBoxLayout *RightControls = new QVBoxLayout;
 	RightControls->addLayout(SplineOption);
 	RightControls->addWidget(m_pctrlFoilStyle);
-	RightControls->addWidget(m_pctrlRename);
-	RightControls->addWidget(m_pctrlDelete);
-	RightControls->addWidget(m_pctrlDuplicate);
+	RightControls->addLayout(FoilCommands);
 	RightControls->addStretch(1);
 	RightControls->addWidget(m_pctrlVisible);
 	RightControls->addWidget(m_pctrlCenterLine);
@@ -2376,6 +2589,7 @@ void QAFoil::SetupLayout()
 	connect(m_pctrlRename, SIGNAL(clicked()), this, SLOT(OnRenameFoil()));
 	connect(m_pctrlDelete, SIGNAL(clicked()), this, SLOT(OnDelete()));
 	connect(m_pctrlDuplicate, SIGNAL(clicked()), this, SLOT(OnDuplicate()));
+	connect(m_pctrlExport, SIGNAL(clicked()), this, SLOT(OnExportCurFoil()));
 	connect(m_pctrlFoilPoints, SIGNAL(clicked(bool)), this, SLOT(OnPoints(bool)));
 	connect(m_pctrlVisible, SIGNAL(clicked(bool)), this, SLOT(OnVisible(bool)));
 	connect(m_pctrlCenterLine, SIGNAL(clicked(bool)), this, SLOT(OnCenterLine(bool)));

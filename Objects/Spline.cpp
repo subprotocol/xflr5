@@ -191,27 +191,26 @@ void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoin
 }
 
 
-void CSpline::Export(QFile *pFile, bool bExtrados)
+void CSpline::Export(QTextStream &out, bool bExtrados)
 {
-        int k;
-        QString strOut;
-        QTextStream out(pFile);
-        if(bExtrados)
-        {
-                for (k=m_iRes-1;k>=0; k--)
-                {
-                        strOut=" %1  %2\n";
-                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
-                        out << strOut;
+	int k;
+	QString strOut;
+
+	if(bExtrados)
+	{
+		for (k=m_iRes-1;k>=0; k--)
+		{
+			strOut= QString(" %1  %2\n").arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
+			out << strOut;
 		}
 	}
-	else {
-                for (k=1;k<m_iRes; k++)
-                {
-                        strOut=" %1  %2\n";
-                        strOut.arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
-                        out << strOut;
-                }
+	else
+	{
+		for (k=1;k<m_iRes; k++)
+		{
+			strOut=QString(" %1  %2\n").arg(m_Output[k].x,7,'f',4).arg( m_Output[k].y,7,'f',4);
+			out << strOut;
+		}
 	}
 }
 

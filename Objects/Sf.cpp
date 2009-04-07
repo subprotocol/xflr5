@@ -186,6 +186,11 @@ void CSF::ExportToBuffer(CFoil *pFoil)
 }
 
 
+void CSF::ExportToFile(QTextStream &out)
+{
+	m_Extrados.Export(out, true);
+	m_Intrados.Export(out, false);
+}
 
 void CSF::SetViewRect(QRect &rc)
 {

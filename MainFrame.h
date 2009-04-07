@@ -216,7 +216,7 @@ private:
 	QMenu * MiarexViewMenu;
 	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu;
 	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
-	QMenu *WPlrGraphMenu, *WOppGraphMenu, *WPlrCurGraphMenu;
+	QMenu *WPlrGraphMenu,*WPlrCurGraphMenu, *WOppGraphMenu, *WOppCurGraphMenu;
 	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu;
 
 	//MainFrame actions
@@ -234,7 +234,7 @@ private:
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
-	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct;
+	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
@@ -245,7 +245,7 @@ private:
 	QAction *twoWingGraphs, *fourWingGraphs;
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
-	QAction *twoWPlrGraphs, *allWPlrGraphs, *WGraphVariable;
+	QAction *twoWPlrGraphs, *allWPlrGraphs, *WPlrGraphVariable, *WingGraphVariablesAct;
 	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs;
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;

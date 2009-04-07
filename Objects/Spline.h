@@ -30,6 +30,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QFile>
+#include <QTextStream>
 #include "../Objects/CVector.h"
 #include "../Params.h"
 
@@ -58,7 +59,7 @@ public:
 	double GetY(double x);
 
 	void Copy(CSpline *pSpline);
-	void Export(QFile *pFile, bool bExtrados);
+	void Export(QTextStream &out, bool bExtrados);
 	void SplineCurve();
 	void SplineKnots();
 	

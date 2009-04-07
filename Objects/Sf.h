@@ -56,6 +56,7 @@ private:
 	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawOutPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void ExportToBuffer(CFoil *pFoil);
+	void ExportToFile(QTextStream &out);
 	void SetViewRect(QRect &rc);
 	void Update(bool bExtrados);
 	void UpdateSelected(double x, double y);

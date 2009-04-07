@@ -50,7 +50,7 @@ public:
 
 	double GetY(double x);
 
-//	void Export(QFile *pFile, bool bExtrados);
+	void ExportToFile(QTextStream &out, bool bExtrados);
 	void ExportToBuffer(CFoil *pFoil, bool bExtrados);
 
 	CSplinedPoints();
@@ -93,6 +93,7 @@ private:
 	void DrawFoil(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
 	void ExportToBuffer(CFoil *pFoil);
+	void ExportToFile(QTextStream &out);
 	void SetOutPoints(bool state);
 	void SetViewRect(QRect rc);
 	void Update(bool bExtrados);

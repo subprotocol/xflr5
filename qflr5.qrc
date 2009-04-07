@@ -19,6 +19,7 @@
     <file>images/OnWOppView.png</file>
     <file>images/OnZoomIn.png</file>
     <file>images/OnZoomLess.png</file>
+    <file>images/OnResetXScale.png</file>
     <file>images/OnZoomYScale.png</file>
     <file>images/Q5.png</file>
 </qresource>

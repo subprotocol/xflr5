@@ -153,6 +153,7 @@ protected:
 	void wheelEvent (QWheelEvent *event);
 
 	void AddOpData(OpPoint *pNewPoint);
+	void CheckButtons();
 	void Connect();
 	void CreateOppCurves(OpPoint *pOpp= NULL);
 	void CreatePolarCurves();
