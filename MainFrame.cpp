@@ -1424,6 +1424,7 @@ void MainFrame::CreateXDirectActions()
 	connect(saveFoilPolars, SIGNAL(triggered()), pXDirect, SLOT(OnSavePolars()));
 
 	showCurOppOnly = new QAction(tr("Show Current Opp Only"), this);
+	showCurOppOnly->setCheckable(true);
 	connect(showCurOppOnly, SIGNAL(triggered()), pXDirect, SLOT(OnCurOppOnly()));
 
 	showAllOpPoints = new QAction(tr("Show All Opps"), this);
