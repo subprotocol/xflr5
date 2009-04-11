@@ -92,8 +92,6 @@ void UnitsDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	CancelButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);

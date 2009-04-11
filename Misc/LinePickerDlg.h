@@ -38,6 +38,8 @@ public:
 	void InitDialog();
 	void InitDialog(int style, int width, QColor color);
 
+	void keyPressEvent(QKeyEvent *event);
+
 	int &GetWidth();
 	int &GetStyle();
 	QColor &GetColor();

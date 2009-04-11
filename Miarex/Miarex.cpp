@@ -579,6 +579,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlLift->setChecked(m_bXCP);
 
+	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
 	connect(m_pctrlStoreWOpp, SIGNAL(clicked()), this, SLOT(OnStoreWOpp()));
 	connect(m_pctrlInitLLTCalc, SIGNAL(clicked()), this, SLOT(OnInitLLTCalc()));
@@ -9149,6 +9153,13 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Return:
 		{
 			if(!m_pctrlAnalyze->hasFocus()) m_pctrlAnalyze->setFocus();
+			else OnAnalyze();
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			StopAnimate();
+			UpdateView();
 			break;
 		}
 		case Qt::Key_1:
@@ -9263,6 +9274,15 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			{
 				if (m_iView==2)     OnDefinePolarGraphVariables();
 				else if(m_iView==1) OnDefineWingGraphVariables();
+			}
+			break;
+		}
+		case Qt::Key_G:
+		{
+			if(m_pCurGraph)
+			{
+				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+				pMainFrame->OnGraphSettings();
 			}
 			break;
 		}
@@ -9952,6 +9972,85 @@ void QMiarex::On3DPickCenter()
 
 
 
+void QMiarex::OnAllWingGraphScales()
+{
+	//resets the scale of the current graph
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	double halfspan = m_pCurWing->m_Span/2.0;
+
+	m_WingGraph1.SetAuto(true);
+	m_WingGraph1.ResetXLimits();
+	m_WingGraph1.ResetYLimits();
+	m_WingGraph1.SetAutoX(false);
+	m_WingGraph2.SetAuto(true);
+	m_WingGraph2.ResetXLimits();
+	m_WingGraph2.ResetYLimits();
+	m_WingGraph2.SetAutoX(false);
+	m_WingGraph3.SetAuto(true);
+	m_WingGraph3.ResetXLimits();
+	m_WingGraph3.ResetYLimits();
+	m_WingGraph3.SetAutoX(false);
+	m_WingGraph4.SetAuto(true);
+	m_WingGraph4.ResetXLimits();
+	m_WingGraph4.ResetYLimits();
+	m_WingGraph4.SetAutoX(false);
+
+	if(m_bHalfWing)
+	{
+		m_WingGraph1.SetXMin(0.0);
+		m_WingGraph2.SetXMin(0.0);
+		m_WingGraph3.SetXMin(0.0);
+		m_WingGraph4.SetXMin(0.0);
+	}
+	else
+	{
+		m_WingGraph1.SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+		m_WingGraph2.SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+		m_WingGraph3.SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+		m_WingGraph4.SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+	}
+	m_WingGraph1.SetXMax( halfspan*pMainFrame->m_mtoUnit);
+	m_WingGraph2.SetXMax( halfspan*pMainFrame->m_mtoUnit);
+	m_WingGraph3.SetXMax( halfspan*pMainFrame->m_mtoUnit);
+	m_WingGraph4.SetXMax( halfspan*pMainFrame->m_mtoUnit);
+
+	UpdateView();
+}
+
+
+void QMiarex::OnAllWPolarGraphScales()
+{
+	if(m_iView==2)
+	{
+		m_WPlrGraph1.SetAuto(true);
+		m_WPlrGraph1.ResetXLimits();
+		m_WPlrGraph1.ResetYLimits();
+		m_WPlrGraph2.SetAuto(true);
+		m_WPlrGraph2.ResetXLimits();
+		m_WPlrGraph2.ResetYLimits();
+		m_WPlrGraph3.SetAuto(true);
+		m_WPlrGraph3.ResetXLimits();
+		m_WPlrGraph3.ResetYLimits();
+		m_WPlrGraph4.SetAuto(true);
+		m_WPlrGraph4.ResetXLimits();
+		m_WPlrGraph4.ResetYLimits();
+	}
+	else if(m_iView==1)
+	{
+		SetWGraphScale();
+
+	}
+	else if(m_iView==4)
+	{
+		double halfspan = m_pCurWing->m_Span/2.0;
+		m_CpGraph.SetAuto(true);
+		m_CpGraph.ResetXLimits();
+		m_CpGraph.ResetYLimits();
+	}
+	UpdateView();
+}
+
+
 void QMiarex::OnAxes()
 {
 	m_bAxes = m_pctrlAxes->isChecked();
@@ -10009,15 +10108,8 @@ void QMiarex::OnPanels()
 	UpdateView();
 }
 
-
-
-void QMiarex::OnAnalyze()
+void QMiarex::OnReadAnalysisData()
 {
-	int l;
-	double V0, VMax, VDelta;
-	if(!m_pCurWing || !m_pCurWPolar) return;
-
-//	Read Analysis Params;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	m_bSequence = m_pctrlSequence->isChecked();
@@ -10033,23 +10125,17 @@ void QMiarex::OnAnalyze()
 			m_AlphaDelta = 0.01;
 			m_pctrlAlphaDelta->SetValue(0.01);
 		}
-		V0     = m_AlphaMin;
-		VMax   = m_AlphaMax;
-		VDelta = m_AlphaDelta;
 	}
 	else if(m_pCurWPolar->m_Type==4)
 	{
 		m_QInfMin   = m_pctrlAlphaMin->GetValue()         /pMainFrame->m_mstoUnit;
 		m_QInfMax   = m_pctrlAlphaMax->GetValue()         /pMainFrame->m_mstoUnit;
 		m_QInfDelta = fabs(m_pctrlAlphaDelta->GetValue()) /pMainFrame->m_mstoUnit;
-		if(fabs(m_QInfDelta)<0.1) 
+		if(fabs(m_QInfDelta)<0.1)
 		{
 			m_QInfDelta = 1.0;
 			m_pctrlAlphaDelta->SetValue(1.0);
 		}
-		V0     = m_QInfMin;
-		VMax   = m_QInfMax;
-		VDelta = m_QInfDelta;
 	}
 	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
 	{
@@ -10061,6 +10147,32 @@ void QMiarex::OnAnalyze()
 			m_ControlDelta = 0.001;
 			m_pctrlAlphaDelta->SetValue(0.001);
 		}
+	}
+}
+
+void QMiarex::OnAnalyze()
+{
+	int l;
+	double V0, VMax, VDelta;
+	if(!m_pCurWing || !m_pCurWPolar) return;
+
+//	Read Analysis Params;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(m_pCurWPolar->m_Type <4)
+	{
+		V0     = m_AlphaMin;
+		VMax   = m_AlphaMax;
+		VDelta = m_AlphaDelta;
+	}
+	else if(m_pCurWPolar->m_Type==4)
+	{
+		V0     = m_QInfMin;
+		VMax   = m_QInfMax;
+		VDelta = m_QInfDelta;
+	}
+	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
+	{
 		V0     = m_ControlMin;
 		VMax   = m_ControlMax;
 		VDelta = m_ControlDelta;
@@ -11552,6 +11664,7 @@ void QMiarex::OnHalfWing()
 	m_bHalfWing = m_pctrlHalfWing->isChecked();
 	if(m_iView==1)
 	{
+		m_bIs2DScaleSet = false;
 		SetWGraphScale();
 		Set2DScale();
 		OnAdjustToWing();
@@ -12006,6 +12119,35 @@ void QMiarex::OnResetCurWPolar()
 	}
 }
 
+
+void QMiarex::OnResetWingGraphScale()
+{
+	//resets the scale of the current graph
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!m_pCurGraph) return;
+	m_pCurGraph->SetAuto(true);
+	m_pCurGraph->ResetXLimits();
+	m_pCurGraph->ResetYLimits();
+	if (m_pCurGraph == &m_WingGraph1 ||
+		m_pCurGraph == &m_WingGraph2 ||
+		m_pCurGraph == &m_WingGraph3 ||
+		m_pCurGraph == &m_WingGraph4)
+	{
+		m_pCurGraph->SetAutoX(false);
+		double halfspan = m_pCurWing->m_Span/2.0;
+		if(m_bHalfWing) m_pCurGraph->SetXMin(0.0);
+		else            m_pCurGraph->SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+		m_pCurGraph->SetXMax( halfspan*pMainFrame->m_mtoUnit);
+	}
+	UpdateView();
+}
+
+void QMiarex::OnResetWingScale()
+{
+	m_bIs2DScaleSet = false;
+	Set2DScale();
+	UpdateView();
+}
 
 void QMiarex::OnResetWOppLegend()
 {
@@ -12673,8 +12815,8 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 				QPoint PtLegend;
 				PtLegend.rx() = (int)(m_rCltRect.width()/2);
 				PtLegend.ry() = m_rCltRect.bottom();
-				PaintXTr(painter, m_ptOffset, PtLegend, m_WingScale);
-				if (m_bXCP)    PaintXCP(painter, m_ptOffset,PtLegend, m_WingScale);
+				PaintXTr(painter, m_ptOffset, m_WingScale);
+				if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
 				if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
 			}
 
@@ -13030,7 +13172,7 @@ void QMiarex::PaintWFourGraphs(QPainter &painter)
 
 
 
-void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, QPoint OLegend, double scale)
+void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the transition lines on the 2D view
 	if(!m_pCurWing)	return;
@@ -13112,7 +13254,7 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, QPoint OLegend, double s
 	painter.restore();
 }
 
-void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, QPoint OLegend, double scale)
+void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the lift line and center of pressure position on the the 2D view
 	if(!m_pCurWing)	return;
@@ -13171,8 +13313,9 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, QPoint OLegend, double s
 void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 {
 	//Draws the moment reference point on the 2D view
-	if(!m_pCurWing || m_pCurWPolar)	return;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!m_pCurWing || !m_pCurWPolar)	return;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	painter.save();
 	QPoint O(ORef);
 	QPoint offset;
@@ -13186,9 +13329,8 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 	O.rx() = offset.x();
 	O.ry() = offset.y();
 
-	QPen XCmRefPen;
+	QPen XCmRefPen(pMainFrame->m_TextColor);
 	painter.setPen(XCmRefPen);
-
 
 	int XCm = O.x() ;
 	int YCm = O.y() + (int)(m_pCurWPolar->m_XCmRef*scaley);
@@ -13358,8 +13500,8 @@ QString QMiarex::RenameUFO(QString UFOName)
 void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-	double cosa = cos(Angle*pi/180.0);
-	double sina = sin(Angle*pi/180.0);
+//	double cosa = cos(Angle*pi/180.0);
+//	double sina = sin(Angle*pi/180.0);
 	int iLA, iLB, iTA, iTB;
 	CVector LATB, TALB, Pt, Ptr, Trans;
 
@@ -13426,8 +13568,8 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-	double cosb = cos(Beta*pi/180.0);
-	double sinb = sin(Beta*pi/180.0);
+//	double cosb = cos(Beta*pi/180.0);
+//	double sinb = sin(Beta*pi/180.0);
 	int iLA, iLB, iTA, iTB;
 	CVector LATB, TALB, Pt, Ptr, Trans;
 
@@ -13732,7 +13874,7 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 
 void QMiarex::Set3DScale()
 {	
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+//	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 //	m_rCltRect = pGLWidget->geometry();
 	
 	

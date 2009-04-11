@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 #include "FlapDlg.h"
 #include "CAddDlg.h"
 #include "XFoilAdvancedDlg.h"
-//#include "Misc/LinePickerDlg.h"
+#include "XDirectStyleDlg.h"
 
 QXDirect::QXDirect(QWidget *parent)
     : QWidget(parent)
@@ -1300,6 +1300,9 @@ void QXDirect::LoadSettings(QDataStream &ar)
 	ar >> m_bPolar >> m_bShowUserGraph >> m_bShowPanels >> m_bType1 >> m_bType2 >> m_bType3 >> m_bType4;
 	ar >> m_bAutoInitBL >> m_bFromList >> m_bFromZero >> m_bShowTextOutput >> m_bNeutralLine >> m_bCurOppOnly;
 	ar >> m_bShowInviscid >> m_bCpGraph >> m_bSequence;
+	ar >> m_crBLColor       >> m_iBLStyle       >> m_iBLWidth;
+	ar >> m_crPressureColor >> m_iPressureStyle >> m_iPressureWidth;
+	ar >> m_crNeutralColor >> m_iNeutralStyle >> m_iNeutralWidth;
 
 	ar >> m_OppVar >> m_IterLim ;
 	ar >> m_XPolar >> m_YPolar >> m_XCz >> m_YCz >> m_XCm >> m_YCm >> m_XTr >> m_YTr >> m_XUser >> m_YUser;
@@ -1595,7 +1598,7 @@ void QXDirect::OnAnimate(bool bChecked)
 				pOpPoint->m_strPlrName  == m_pCurPolar->m_PlrName &&
 				pOpPoint->m_strFoilName == m_pCurFoil->m_FoilName)
 			{
-					if(m_pCurOpp->Alpha - pOpPoint->Alpha<0.0001)
+					if(fabs(m_pCurOpp->Alpha - pOpPoint->Alpha)<0.0001)
 						m_posAnimate = l-1;
 			}
 		}
@@ -3769,6 +3772,35 @@ void QXDirect::OnViscous()
 }
 
 
+void QXDirect::OnXDirectStyle()
+{
+	XDirectStyleDlg dlg;
+	dlg.m_pXDirect = this;
+	dlg.m_iBLStyle         = m_iBLStyle;
+	dlg.m_iBLWidth         = m_iBLWidth;
+	dlg.m_crBLColor        = m_crBLColor;
+	dlg.m_iPressureStyle   = m_iPressureStyle;
+	dlg.m_iPressureWidth   = m_iPressureWidth;
+	dlg.m_crPressureColor  = m_crPressureColor;
+	dlg.m_iNeutralStyle    = m_iNeutralStyle;
+	dlg.m_iNeutralWidth    = m_iNeutralWidth;
+	dlg.m_crNeutralColor   = m_crNeutralColor;
+	dlg.InitDialog();
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		m_iBLStyle         = dlg.m_iBLStyle;
+		m_iBLWidth         = dlg.m_iBLWidth;
+		m_crBLColor        = dlg.m_crBLColor;
+		m_iPressureStyle   = dlg.m_iPressureStyle;
+		m_iPressureWidth   = dlg.m_iPressureWidth;
+		m_crPressureColor  = dlg.m_crPressureColor;
+		m_iNeutralStyle    = dlg.m_iNeutralStyle;
+		m_iNeutralWidth    = dlg.m_iNeutralWidth;
+		m_crNeutralColor   = dlg.m_crNeutralColor;
+	}
+	UpdateView();
+}
+
 void QXDirect::OnXFoilAdvanced()
 {
 	XFoilAdvancedDlg dlg;
@@ -4527,6 +4559,10 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_bPolar << m_bShowUserGraph << m_bShowPanels << m_bType1 << m_bType2 << m_bType3 << m_bType4;
 	ar << m_bAutoInitBL << m_bFromList << m_bFromZero << m_bShowTextOutput << m_bNeutralLine << m_bCurOppOnly;
 	ar << m_bShowInviscid << m_bCpGraph << m_bSequence;
+
+	ar << m_crBLColor       << m_iBLStyle       << m_iBLWidth;
+	ar << m_crPressureColor << m_iPressureStyle << m_iPressureWidth;
+	ar << m_crNeutralColor << m_iNeutralStyle << m_iNeutralWidth;
 
 	ar << m_OppVar << m_IterLim << m_XPolar << m_YPolar << m_XCz << m_YCz;
 	ar << m_XCm << m_YCm << m_XTr << m_YTr << m_XUser << m_YUser;

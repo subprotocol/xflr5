@@ -77,7 +77,6 @@ private slots:
 	void OnQViscous();
 	void OnQPoints();
 	void OnQReflected();
-	void OnResetGraphScale();
 
 
 private:
@@ -91,6 +90,7 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 
+	void CheckActions();
 	void DrawGrid(QPainter &painter, double scale);
 	void PaintView(QPainter &painter);
 	void PaintGraph(QPainter &painter);

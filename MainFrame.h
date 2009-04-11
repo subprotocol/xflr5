@@ -95,6 +95,7 @@ private slots:
 	void OnAFoil();
 	void OnXDirect();
 	void OnXInverse();
+	void OnXInverseMixed();
 	void OnMiarex();
 	void OnSaveUFOAsProject();
 	void openRecentFile();
@@ -220,12 +221,15 @@ private:
 	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu;
 
 	//MainFrame actions
-	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct;
+	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct, *OnMixedInverseAct;
 	QAction *openAct, *styleAct;
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct;
 	QAction *unitsAct;
 	QAction *exitAct;
 	QAction *aboutAct, *aboutQtAct;
+	QAction *recentFileActs[MAXRECENTFILES];
+	QAction *separatorAct;
+	QAction *saveViewToImageFileAct;
 
 	//AFoil Actions
 	QAction *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
@@ -234,6 +238,7 @@ private:
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
+	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
@@ -245,7 +250,8 @@ private:
 	QAction *twoWingGraphs, *fourWingGraphs;
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
-	QAction *twoWPlrGraphs, *allWPlrGraphs, *WPlrGraphVariable, *WingGraphVariablesAct;
+	QAction *twoWPlrGraphs, *allWPlrGraphs;
+	QAction  *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale, *allWPolarGraphsScalesAct, *allWingGraphsScalesAct;
 	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs;
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
@@ -253,7 +259,7 @@ private:
 	QAction *defineWPolar, *defineCtrlPolar, *advancedSettings;
 	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
-	QAction *exporttoAVL;
+	QAction *exporttoAVL, *resetWingScale;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
 
 
@@ -270,9 +276,7 @@ private:
 	QAction *GraphDlgAction,*exportCurGraphAct, *resetCurGraphScales, *allPolarGraphsSettingsAct, *allPolarGraphsScales, *curPolarGraphVariableAct;
 	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct;
 	QAction *PolarGraphAct[5];
-	QAction *recentFileActs[MAXRECENTFILES];
-	QAction *separatorAct;
-	QAction *saveViewToImageFileAct;
+	QAction *XDirectStyleAct;
 	QAction *defineCpGraphSettings, *resetCpGraphScales, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;

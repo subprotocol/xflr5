@@ -85,6 +85,10 @@ public:
 
 
 private slots:
+	void OnAllWingGraphScales();
+	void OnAllWPolarGraphScales();
+	void OnResetWingGraphScale();
+	void OnReadAnalysisData();
 	void On3DPrefs();
 	void OnShowEllipticCurve();
 	void OnWing2Curve();
@@ -178,6 +182,7 @@ private slots:
 	void OnVortices();
 	void OnDownwash();
 	void OnMoment();
+	void OnResetWingScale();
 	void OnStreamlines();
 
 	void OnLiftScale(int pos);
@@ -269,8 +274,8 @@ private:
 	void PaintWFourGraphs(QPainter &painter);
 	void PaintWOpp(QPainter &painter);
 	void PaintXCmRef(QPainter &painter, QPoint ORef, double scale);
-	void PaintXCP(QPainter &painter, QPoint ORef, QPoint OLegend, double scale);
-	void PaintXTr(QPainter &painter, QPoint ORef, QPoint OLegend, double scale);
+	void PaintXCP(QPainter &painter, QPoint ORef, double scale);
+	void PaintXTr(QPainter &painter, QPoint ORef, double scale);
 	void PaintCp(QPainter &painter);
 	void PaintFourWingGraph(QPainter &painter);
 	void PaintTwoWingGraph(QPainter &painter);

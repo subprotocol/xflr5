@@ -59,10 +59,10 @@ GraphDlg::GraphDlg()
 	connect(m_pctrlBorderStyle, SIGNAL(clicked()), this, SLOT(OnBorderStyle()));
 
 	connect(RestoreButton, SIGNAL(clicked()),this, SLOT(OnRestoreParams()));
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-}
 
+}
 
 
 void GraphDlg::OnAxisStyle()
@@ -172,6 +172,19 @@ void GraphDlg::OnLegendFont()
 
 void GraphDlg::OnOK()
 {
+	m_pGraph->SetAutoX(m_pctrlXAuto->isChecked());
+	m_pGraph->SetXMin(m_pctrlXMin->GetValue());
+	m_pGraph->SetXMax(m_pctrlXMax->GetValue());
+	m_pGraph->SetX0(m_pctrlXOrigin->GetValue());
+	m_pGraph->SetXUnit(m_pctrlXUnit->GetValue());
+
+	m_pGraph->SetAutoY(m_pctrlYAuto->isChecked());
+	m_pGraph->SetYMin(m_pctrlYMin->GetValue());
+	m_pGraph->SetYMax(m_pctrlYMax->GetValue());
+	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
+	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
+
+	accept();
 }
 
 void GraphDlg::OnRestoreParams()

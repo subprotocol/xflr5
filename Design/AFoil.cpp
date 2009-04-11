@@ -1650,6 +1650,71 @@ void QAFoil::OnExportSplinesToFile()
 
 
 
+
+void QAFoil::OnFoilClicked(const QModelIndex& index)
+{
+	if(index.row()>=m_poaFoil->size()+1) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
+	QString FoilName =pItem->text();
+
+	if(index.row()>0)
+	{
+		CFoil *pFoil= pMainFrame->GetFoil(FoilName);
+		SetFoil(pFoil);
+	}
+	else if(index.row()==0)
+	{
+		SetFoil();
+	}
+}
+
+
+void QAFoil::OnFoilStyle()
+{
+	if(!m_pCurFoil)
+	{
+		LinePickerDlg dlg;
+		if(m_bSF) dlg.InitDialog(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
+		else      dlg.InitDialog(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
+
+		if(QDialog::Accepted==dlg.exec())
+		{
+			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
+			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
+			m_pctrlFoilStyle->SetColor(dlg.GetColor());
+
+			if(m_bSF)
+			{
+				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+			}
+			else
+			{
+				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
+			}
+			UpdateView();
+		}
+	}
+	else
+	{
+		LinePickerDlg dlg;
+		dlg.InitDialog(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
+
+		if(QDialog::Accepted==dlg.exec())
+		{
+			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
+			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
+			m_pctrlFoilStyle->SetColor(dlg.GetColor());
+
+			m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
+			m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
+			m_pCurFoil->m_FoilColor = dlg.GetColor();
+			UpdateView();
+		}
+	}
+}
+
 void QAFoil::OnGrid()
 {
 	AFoilGridDlg dlg(this);
@@ -1718,68 +1783,18 @@ void QAFoil::OnGrid()
 
 
 
-void QAFoil::OnFoilClicked(const QModelIndex& index)
+void QAFoil::OnHideAllFoils()
 {
-	if(index.row()>=m_poaFoil->size()+1) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	QStandardItem *pItem = m_pFoilModel->item(index.row(),0);
-	QString FoilName =pItem->text();
-
-	if(index.row()>0)
+	pMainFrame->SetSaveState(false);
+	CFoil*pFoil;
+	for (int k=0; k<m_poaFoil->size(); k++)
 	{
-		CFoil *pFoil= pMainFrame->GetFoil(FoilName);
-		SetFoil(pFoil);
+		pFoil = (CFoil*)m_poaFoil->at(k);
+		pFoil->m_bVisible = false;
 	}
-	else if(index.row()==0)
-	{
-		SetFoil();
-	}
-}
-
-
-void QAFoil::OnFoilStyle()
-{
-	if(!m_pCurFoil)
-	{
-		LinePickerDlg dlg;
-		if(m_bSF) dlg.InitDialog(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
-		else      dlg.InitDialog(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
-
-		if(QDialog::Accepted==dlg.exec())
-		{
-			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
-			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
-			m_pctrlFoilStyle->SetColor(dlg.GetColor());
-
-			if(m_bSF)
-			{
-				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
-			}
-			else
-			{
-				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
-			}
-			UpdateView();
-		}
-	}
-	else
-	{
-		LinePickerDlg dlg;
-		dlg.InitDialog(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
-
-		if(QDialog::Accepted==dlg.exec())
-		{
-			m_pctrlFoilStyle->SetStyle(dlg.GetStyle());
-			m_pctrlFoilStyle->SetWidth(dlg.GetWidth());
-			m_pctrlFoilStyle->SetColor(dlg.GetColor());
-
-			m_pCurFoil->m_nFoilStyle = dlg.GetStyle();
-			m_pCurFoil->m_nFoilWidth = dlg.GetWidth();
-			m_pCurFoil->m_FoilColor = dlg.GetColor();
-			UpdateView();
-		}
-	}
+	m_pctrlVisible->setChecked(false);
+	UpdateView();
 }
 
 
@@ -1826,6 +1841,19 @@ void QAFoil::OnPoints(bool bState)
 }
 
 
+void QAFoil::OnRedo()
+{
+	if(m_StackPos<m_StackSize-1)
+	{
+		m_StackPos++;
+		SetPicture();
+//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//		pTB->EnableButton(IDT_UNDO, true);
+//		if(m_StackPos==m_StackSize-1) pTB->EnableButton(IDT_REDO, false);
+	}
+}
+
+
 void QAFoil::OnRenameFoil()
 {
 	if(!m_pCurFoil) return;
@@ -1833,6 +1861,22 @@ void QAFoil::OnRenameFoil()
 	pMainFrame->OnRenameCurFoil();
 	FillFoilTable();
 }
+
+
+void QAFoil::OnShowAllFoils()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->SetSaveState(false);
+	CFoil*pFoil;
+	for (int k=0; k<m_poaFoil->size(); k++)
+	{
+		pFoil = (CFoil*)m_poaFoil->at(k);
+		pFoil->m_bVisible = true;
+	}
+	m_pctrlVisible->setChecked(true);
+	UpdateView();
+}
+
 
 
 void QAFoil::OnStoreSplines()
@@ -1981,6 +2025,32 @@ void QAFoil::OnSplineType(bool bState)
 	FillFoilTable();
 	UpdateView();
 }
+
+
+
+void QAFoil::OnUndo()
+{
+	if(m_StackPos>0)
+	{
+		if(m_StackPos == m_StackSize)
+		{
+			//if we're at the first undo command, save current state
+			TakePicture();
+			StorePicture();//in case we redo
+			m_StackPos--;
+		}
+		m_StackPos--;
+		SetPicture();
+//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
+//		if(m_StackPos==0) pTB->EnableButton(IDT_UNDO, false);
+//		pTB->EnableButton(IDT_REDO, true);
+	}
+	else
+	{
+		m_StackPos = 0;
+	}
+}
+
 
 
 void QAFoil::OnVisible(bool bState)
@@ -2892,79 +2962,23 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 
 
-void QAFoil::OnUndo() 
+void QAFoil::OnHideCurrentFoil()
 {
-	if(m_StackPos>0) 
-	{
-		if(m_StackPos == m_StackSize)
-		{
-			//if we're at the first undo command, save current state
-			TakePicture();
-			StorePicture();//in case we redo
-			m_StackPos--;
-		}
-		m_StackPos--;
-		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		if(m_StackPos==0) pTB->EnableButton(IDT_UNDO, false);
-//		pTB->EnableButton(IDT_REDO, true);
-	}
-	else 
-	{
-		m_StackPos = 0;
-	}
+	if(!m_pCurFoil) return;
+	ShowFoil(m_pCurFoil, false);
+	UpdateView();
+
 }
 
 
 
-void QAFoil::OnRedo() 
+void QAFoil::OnShowCurrentFoil()
 {
-	if(m_StackPos<m_StackSize-1) 
-	{
-		m_StackPos++;
-		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		pTB->EnableButton(IDT_UNDO, true);
-//		if(m_StackPos==m_StackSize-1) pTB->EnableButton(IDT_REDO, false);
-	}
+	if(!m_pCurFoil) return;
+	ShowFoil(m_pCurFoil, true);
+	UpdateView();
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

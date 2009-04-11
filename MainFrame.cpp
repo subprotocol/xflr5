@@ -399,24 +399,30 @@ void MainFrame::CreateActions()
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(OnLoadFile()));
 
+	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
+	OnAFoilAct->setShortcut(tr("Ctrl+1"));
+	OnAFoilAct->setStatusTip(tr("Open Foil Deisgn application"));
+	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
+
+	OnXInverseAct = new QAction(tr("&XFoil Inverse Design"), this);
+	OnXInverseAct->setShortcut(tr("Ctrl+3"));
+	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
+	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
+
+	OnMixedInverseAct = new QAction(tr("&XFoil Mixed Inverse Design"), this);
+	OnMixedInverseAct->setShortcut(tr("Ctrl+4"));
+	OnMixedInverseAct->setStatusTip(tr("Open XFoil Mixed Inverse analysis application"));
+	connect(OnMixedInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverseMixed()));
+
 	OnXDirectAct = new QAction(tr("&XFoil Direct Analysis"), this);
 	OnXDirectAct->setShortcut(tr("Ctrl+5"));
 	OnXDirectAct->setStatusTip(tr("Open XFoil direct analysis application"));
 	connect(OnXDirectAct, SIGNAL(triggered()), this, SLOT(OnXDirect()));
 
-	OnXInverseAct = new QAction(tr("&XFoil Inverse Analysis"), this);
-	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
-	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
-
 	OnMiarexAct = new QAction(tr("&Wing and Plane Design"), this);
 	OnMiarexAct->setShortcut(tr("Ctrl+6"));
 	OnMiarexAct->setStatusTip(tr("Open Wing/plane design and analysis application"));
 	connect(OnMiarexAct, SIGNAL(triggered()), this, SLOT(OnMiarex()));
-
-	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
-	OnAFoilAct->setShortcut(tr("Ctrl+1"));
-	OnAFoilAct->setStatusTip(tr("Open Foil Deisgn application"));
-	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
 
 	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
  	saveAct->setShortcut(tr("Ctrl+S"));
@@ -523,6 +529,17 @@ void MainFrame::CreateAFoilActions()
 	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
 	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
 
+	ShowAllFoils= new QAction(tr("Show All Foils"), this);
+	connect(ShowAllFoils, SIGNAL(triggered()), pAFoil, SLOT(OnShowAllFoils()));
+	HideAllFoils= new QAction(tr("Hide All Foils"), this);
+	connect(HideAllFoils, SIGNAL(triggered()), pAFoil, SLOT(OnHideAllFoils()));
+
+	ShowCurrentFoil= new QAction(tr("Show Current Foil"), this);
+	connect(ShowCurrentFoil, SIGNAL(triggered()), pAFoil, SLOT(OnShowCurrentFoil()));
+
+	HideCurrentFoil= new QAction(tr("Hide Current Foil"), this);
+	connect(HideCurrentFoil, SIGNAL(triggered()), pAFoil, SLOT(OnHideCurrentFoil()));
+
 	ResetYScaleAct= new QAction(tr("Reset Y Scale"), this);
 	connect(ResetYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetYScale()));
 
@@ -576,11 +593,18 @@ void MainFrame::CreateAFoilActions()
 void MainFrame::CreateAFoilMenus()
 {
 	AFoilViewMenu = menuBar()->addMenu(tr("&View"));
-	AFoilViewMenu->addAction(AFoilGridAct);
+	AFoilViewMenu->addAction(ShowCurrentFoil);
+	AFoilViewMenu->addAction(HideCurrentFoil);
+	AFoilViewMenu->addAction(ShowAllFoils);
+	AFoilViewMenu->addAction(HideAllFoils);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(zoomInAct);
 	AFoilViewMenu->addAction(zoomLessAct);
 	AFoilViewMenu->addAction(ResetXScaleAct);
+	AFoilViewMenu->addAction(ResetYScaleAct);
+	AFoilViewMenu->addAction(ResetXYScaleAct);
+	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(restoreToolbarsAct);
 	AFoilViewMenu->addAction(styleAct);
@@ -614,6 +638,11 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addMenu(AFoilDesignMenu);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilSplineMenu);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(ShowCurrentFoil);
+	AFoilCtxMenu->addAction(HideCurrentFoil);
+	AFoilCtxMenu->addAction(ShowAllFoils);
+	AFoilCtxMenu->addAction(HideAllFoils);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(ResetXScaleAct);
 	AFoilCtxMenu->addAction(ResetYScaleAct);
@@ -649,6 +678,8 @@ void MainFrame::CreateAFoilToolbar()
 	m_pctrlAFoilToolBar->addSeparator();
 	m_pctrlAFoilToolBar->addAction(storeSplineAct);
 }
+
+
 
 void MainFrame::CreateDockWindows()
 {
@@ -811,8 +842,8 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(saveProjectAsAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(OnAFoilAct);
-	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnXInverseAct);
+	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
 	for (int i = 0; i < MAXRECENTFILES; ++i)
@@ -905,6 +936,9 @@ void MainFrame::CreateMiarexActions()
 	resetWPlrLegend = new QAction(tr("Reset Polar Legend"), this);
 	connect(resetWPlrLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWPlrLegend()));
 
+	resetWingScale = new QAction(tr("Reset Wing Scale"), this);
+	connect(resetWingScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingScale()));
+
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
 	showCurWOppOnly->setCheckable(true);
 	connect(showCurWOppOnly, SIGNAL(triggered()), pMiarex, SLOT(OnCurWOppOnly()));
@@ -992,6 +1026,15 @@ void MainFrame::CreateMiarexActions()
 	WingGraphVariablesAct = new QAction(tr("Define Variables"), this);
 	connect(WingGraphVariablesAct, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWingGraphVariables()));
 
+	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Scales"), this);
+	connect(ResetWingGraphScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingGraphScale()));
+
+	allWingGraphsScalesAct = new QAction(tr("Reset Scales"), this);
+	connect(allWingGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWingGraphScales()));
+
+	allWPolarGraphsScalesAct = new QAction(tr("Reset Graph Scales"), this);
+	connect(allWPolarGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphScales()));
+
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
 	showUFOWPlrs = new QAction(tr("Show Associated Polars"), this);
@@ -1058,6 +1101,8 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(hideUFOWPlrs);
 	currentUFOMenu->addAction(showUFOWPlrs);
+	currentUFOMenu->addSeparator();
+	currentUFOMenu->addAction(resetWingScale);
 
 	MiarexBodyMenu = menuBar()->addMenu("Body");
 	MiarexBodyMenu->addAction(defineBody);
@@ -1092,6 +1137,7 @@ void MainFrame::CreateMiarexMenus()
 	WPlrGraphMenu->addAction(twoWPlrGraphs);
 	WPlrGraphMenu->addAction(allWPlrGraphs);
 	WPlrGraphMenu->addSeparator();
+	WPlrGraphMenu->addAction(allWPolarGraphsScalesAct);
 	WPlrGraphMenu->addAction(resetWPlrLegend);
 
 
@@ -1115,7 +1161,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppCurGraphMenu->addAction(WingGraphVariablesAct);
 	WOppCurGraphMenu->addAction(GraphDlgAction);
 	WOppCurGraphMenu->addAction(exportCurGraphAct);
-	WOppCurGraphMenu->addAction(resetCurGraphScales);
+	WOppCurGraphMenu->addAction(ResetWingGraphScale);
 
 	WOppGraphMenu = MiarexWOppMenu->addMenu("Graphs");
 	WOppGraphMenu->addAction(WingGraph1);
@@ -1126,6 +1172,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppGraphMenu->addAction(twoWingGraphs);
 	WOppGraphMenu->addAction(fourWingGraphs);
 	WOppGraphMenu->addSeparator();
+	WOppGraphMenu->addAction(allWingGraphsScalesAct);
 	WOppGraphMenu->addAction(resetWOppLegend);
 
 	MiarexWOppMenu->addSeparator();
@@ -1154,6 +1201,8 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addAction(showWing2Curve);
 	WOppCtxMenu->addAction(showStabCurve);
 	WOppCtxMenu->addAction(showFinCurve);
+	WOppCtxMenu->addSeparator();
+	WOppCtxMenu->addAction(resetWingScale);
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addAction(advancedSettings);
 	WOppCtxMenu->addAction(viewLogFile);
@@ -1396,6 +1445,10 @@ void MainFrame::CreateXDirectActions()
 	exportCurPolar = new QAction(tr("Export the Polar"), this);
 	connect(exportCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurPolar()));
 
+	XDirectStyleAct = new QAction(tr("Define Styles"), this);
+	XDirectStyleAct->setStatusTip(tr("Define the style for the boundary layer and the pressure arrows"));
+	connect(XDirectStyleAct, SIGNAL(triggered()), pXDirect, SLOT(OnXDirectStyle()));
+
 	showPanels = new QAction(tr("Show Panels"), this);
 	showPanels->setCheckable(true);
 	showPanels->setStatusTip(tr("Show the foil's panels"));
@@ -1556,6 +1609,7 @@ void MainFrame::CreateXDirectMenus()
 	FoilMenu->addAction(resetFoilScale);
 	FoilMenu->addAction(showPanels);
 	FoilMenu->addAction(showNeutralLine);
+	FoilMenu->addAction(XDirectStyleAct);
 
 	DesignMenu = menuBar()->addMenu(tr("&Design"));
 	DesignMenu->addAction(NormalizeFoil);
@@ -1692,6 +1746,7 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addAction(resetFoilScale);
 	OperFoilCtxMenu->addAction(showPanels);
 	OperFoilCtxMenu->addAction(showNeutralLine);
+	OperFoilCtxMenu->addAction(XDirectStyleAct);
 	//End XDirect foil Context Menu
 
 
@@ -1759,18 +1814,23 @@ void MainFrame::CreateXInverseActions()
 	connect(InverseRemoveCtrlPt, SIGNAL(triggered()), pXInverse, SLOT(OnRemoveCtrlPt()));
 
 	InvQInitial = new QAction(tr("Show Q-Initial"), this);
+	InvQInitial->setCheckable(true);
 	connect(InvQInitial, SIGNAL(triggered()), pXInverse, SLOT(OnQInitial()));
 
 	InvQSpec = new QAction(tr("Show Q-Spec"), this);
+	InvQSpec->setCheckable(true);
 	connect(InvQSpec, SIGNAL(triggered()), pXInverse, SLOT(OnQSpec()));
 
 	InvQViscous = new QAction(tr("Show Q-Viscous"), this);
+	InvQViscous->setCheckable(true);
 	connect(InvQViscous, SIGNAL(triggered()), pXInverse, SLOT(OnQViscous()));
 
 	InvQPoints = new QAction(tr("Show Points"), this);
+	InvQPoints->setCheckable(true);
 	connect(InvQPoints, SIGNAL(triggered()), pXInverse, SLOT(OnQPoints()));
 
 	InvQReflected = new QAction(tr("Show Reflected"), this);
+	InvQReflected->setCheckable(true);
 	connect(InvQReflected, SIGNAL(triggered()), pXInverse, SLOT(OnQReflected()));
 }
 
@@ -1807,6 +1867,7 @@ void MainFrame::CreateXInverseMenus()
 	//Context Menu for XINverse Application
 	InverseContextMenu = new QMenu("Context Menu",this);
 	InverseContextMenu->addAction(InverseStyles);
+	InverseContextMenu->addAction(resetCurGraphScales);
 	InverseContextMenu->addAction(GraphDlgAction);
 	InverseContextMenu->addSeparator();
 	InverseContextMenu->addAction(InverseInsertCtrlPt);
@@ -2439,6 +2500,8 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 }
 
 
+
+
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
 	CFoil *pFoil;
@@ -2591,7 +2654,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100519)
+	if(k !=100521)
 	{
 		pXFile->close();
 		return;
@@ -2743,6 +2806,12 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 void MainFrame::OnAFoil()
 {
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->StopAnimate();
+
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	pXDirect->StopAnimate();
+
 	m_iApp = DIRECTDESIGN;
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
@@ -2965,8 +3034,6 @@ void MainFrame::OnLoadFile()
 }
 
 
-
-
 void MainFrame::OnLogFile()
 {
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
@@ -2976,6 +3043,9 @@ void MainFrame::OnLogFile()
 
 void MainFrame::OnMiarex()
 {
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	pXDirect->StopAnimate();
+
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;	m_iApp = MIAREX;
 //	QString strong ;
 //	pMiarex->m_pCurGraph->GetGraphName(strong);
@@ -3019,6 +3089,7 @@ void MainFrame::OnResetCurGraphScales()
 		{
 			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 			pGraph = &pXInverse->m_QGraph;
+			pXInverse->ReleaseZoom();
 			break;
 		}
 	}
@@ -3614,6 +3685,8 @@ void MainFrame::OnUnits()
 void MainFrame::OnXDirect()
 {
 	UpdateFoils();
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->StopAnimate();
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetFoilScale();
@@ -3632,13 +3705,12 @@ void MainFrame::OnXDirect()
 }
 
 
-
 void MainFrame::OnXInverse()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	pXDirect->m_bAnimate = false;
+	pXDirect->StopAnimate();
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_bAnimate = false;
+	pMiarex->StopAnimate();
 
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 //	pXInverse->SetScale();
@@ -3652,6 +3724,33 @@ void MainFrame::OnXInverse()
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->hide();
 	m_pctrlXInverseWidget->show();
+	SetCentralWidget();
+	pXInverse->m_bFullInverse = true;
+	SetMenus();
+	pXInverse->SetParams();
+}
+
+
+void MainFrame::OnXInverseMixed()
+{
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	pXDirect->StopAnimate();
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->StopAnimate();
+
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+//	pXInverse->SetScale();
+	m_iApp = INVERSEDESIGN;
+	m_pctrlMiarexToolBar->hide();
+	m_pctrlAFoilToolBar->hide();
+	m_pctrlXDirectToolBar->hide();
+	m_pctrlXInverseToolBar->show();
+
+	m_pctrlAFoilWidget->hide();
+	m_pctrlMiarexWidget->hide();
+	m_pctrlXDirectWidget->hide();
+	m_pctrlXInverseWidget->show();
+	pXInverse->m_bFullInverse = false;
 	SetCentralWidget();
 	SetMenus();
 	pXInverse->SetParams();
@@ -3984,7 +4083,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100519;
+	ar << 100521;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -5605,6 +5704,12 @@ void MainFrame::UpdateView()
 		{
 			QMiarex *pMiarex= (QMiarex*)m_pMiarex;
 			pMiarex->UpdateView();
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+			pXInverse->UpdateView();
 			break;
 		}
 	}

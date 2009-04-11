@@ -88,7 +88,8 @@ SOURCES += MainFrame.cpp \
     Miarex/W3dPrefsDlg.cpp \
     Miarex/CtrlPolarDlg.cpp \
     Miarex/CtrlTableDelegate.cpp \
-    Design/SplineCtrlsDlg.cpp
+    Design/SplineCtrlsDlg.cpp \
+    XDirect/XDirectStyleDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -172,6 +173,7 @@ HEADERS += MainFrame.h \
     Miarex/W3dPrefsDlg.h \
     Miarex/CtrlPolarDlg.h \
     Miarex/CtrlTableDelegate.h \
-    Design/SplineCtrlsDlg.h
+    Design/SplineCtrlsDlg.h \
+    XDirect/XDirectStyleDlg.h
 RESOURCES += qflr5.qrc
 FORMS += 

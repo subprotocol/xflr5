@@ -48,6 +48,29 @@ LinePickerDlg::LinePickerDlg(void *pParent)
 }
 
 
+void LinePickerDlg::FillBoxes()
+{
+	m_pctrlStyle->SetLine(m_Style, m_Width, m_Color);
+	m_pctrlWidth->SetLine(m_Style, m_Width, m_Color);
+
+	m_pctrlColor->SetStyle(m_Style);
+	m_pctrlColor->SetWidth(m_Width);
+
+	m_pctrlColor->SetColor(m_Color);
+	m_pStyleDelegate->SetLineColor(m_Color);
+	m_pWidthDelegate->SetLineColor(m_Color);
+
+	int LineWidth[5];
+	for (int i=0; i<5;i++) LineWidth[i] = m_Width;
+	m_pStyleDelegate->SetLineWidth(LineWidth); // the same selected width for all styles
+
+
+	int LineStyle[5];
+	for (int i=0; i<5;i++) LineStyle[i] = m_Style;
+	m_pWidthDelegate->SetLineStyle(LineStyle); //the same selected style for all widths
+}
+
+
 void LinePickerDlg::InitDialog(int style, int width, QColor color)
 {
 	m_Color = color;
@@ -86,6 +109,103 @@ void LinePickerDlg::InitDialog()
 
 	FillBoxes();
 }
+
+
+
+void LinePickerDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus())
+			{
+				OKButton->setFocus();
+				return;
+			}
+			else
+			{
+				accept();
+				return;
+			}
+			break;
+		}
+	}
+
+	QDialog::keyPressEvent(event);
+}
+
+
+
+void LinePickerDlg::OnWidth(int val)
+{
+	m_Width = val+1;
+	FillBoxes();
+	repaint();
+	OKButton->setFocus();
+}
+
+
+void LinePickerDlg::OnStyle(int val)
+{
+	m_Style = val;
+	FillBoxes();
+	repaint();
+	OKButton->setFocus();
+}
+
+
+void LinePickerDlg::OnColor()
+{
+	bool bOK = true;
+
+	QRgb rgb = m_Color.rgba();
+	rgb = QColorDialog::getRgba(rgb, &bOK);
+	m_Color = QColor::fromRgba(rgb);
+
+	FillBoxes();
+	repaint();
+	OKButton->setFocus();
+}
+
+
+
+int & LinePickerDlg::GetWidth()
+{
+	return m_Width;
+}
+
+
+int & LinePickerDlg::GetStyle()
+{
+	return m_Style;
+}
+
+
+QColor & LinePickerDlg::GetColor()
+{
+	return m_Color;
+}
+
+void LinePickerDlg::SetColor(QColor color)
+{
+	m_Color = color;
+	FillBoxes();
+	repaint();
+}
+
+
+
+
+
+void LinePickerDlg::SetStyle(int style)
+{
+	m_Style = style;
+	FillBoxes();
+	repaint();
+}
+
 
 void LinePickerDlg::SetupLayout()
 {
@@ -135,83 +255,6 @@ void LinePickerDlg::SetupLayout()
 
 
 
-void LinePickerDlg::OnWidth(int val)
-{
-	m_Width = val+1;
-	FillBoxes();
-	repaint();
-}
-
-
-void LinePickerDlg::OnStyle(int val)
-{
-	m_Style = val;
-	FillBoxes();
-	repaint();
-}
-
-
-void LinePickerDlg::FillBoxes()
-{
-	m_pctrlStyle->SetLine(m_Style, m_Width, m_Color);
-	m_pctrlWidth->SetLine(m_Style, m_Width, m_Color);
-
-	m_pctrlColor->SetStyle(m_Style);
-	m_pctrlColor->SetWidth(m_Width);
-
-	m_pctrlColor->SetColor(m_Color);
-	m_pStyleDelegate->SetLineColor(m_Color);
-	m_pWidthDelegate->SetLineColor(m_Color);
-
-	int LineWidth[5];
-	for (int i=0; i<5;i++) LineWidth[i] = m_Width;
-	m_pStyleDelegate->SetLineWidth(LineWidth); // the same selected width for all styles
-
-
-	int LineStyle[5];
-	for (int i=0; i<5;i++) LineStyle[i] = m_Style;
-	m_pWidthDelegate->SetLineStyle(LineStyle); //the same selected style for all widths
-}
-
-
-void LinePickerDlg::OnColor()
-{
-	bool bOK = true;
-
-	QRgb rgb = m_Color.rgba();
-	rgb = QColorDialog::getRgba(rgb, &bOK);
-	m_Color = QColor::fromRgba(rgb);
-
-	FillBoxes();
-	repaint();
-}
-
-
-
-int & LinePickerDlg::GetWidth()
-{
-	return m_Width;
-}
-
-
-int & LinePickerDlg::GetStyle()
-{
-	return m_Style;
-}
-
-
-QColor & LinePickerDlg::GetColor()
-{
-	return m_Color;
-}
-
-void LinePickerDlg::SetColor(QColor color)
-{
-	m_Color = color;
-	FillBoxes();
-	repaint();
-}
-
 void LinePickerDlg::SetWidth(int width)
 {
 	m_Width = width;
@@ -220,12 +263,6 @@ void LinePickerDlg::SetWidth(int width)
 }
 
 
-void LinePickerDlg::SetStyle(int style)
-{
-	m_Style = style;
-	FillBoxes();
-	repaint();
-}
 
 
 

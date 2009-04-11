@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ class QXDirect : public QWidget
 	friend class QTEGapDlg;
 	friend class QCAddDlg;
 	friend class EditPlrDlg;
+	friend class XDirectStyleDlg;
 
     Q_OBJECT
 
@@ -112,6 +113,7 @@ private slots:
 	void OnSpec();
 	void OnStoreOpp();
 	void OnViscous();
+	void OnXDirectStyle();
 
 	void OnDerotateFoil();
 	void OnNormalizeFoil();

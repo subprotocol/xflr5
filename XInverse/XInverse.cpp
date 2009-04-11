@@ -121,6 +121,49 @@ QXInverse::QXInverse(QWidget *parent)
 }
 
 
+void QXInverse::CancelMark()
+{
+	m_pctrlMark->setChecked(false);
+	m_bGetPos = false;
+	m_bMark   = false;
+}
+
+void QXInverse::CancelSmooth()
+{
+	m_bSmooth = false;
+	m_bGetPos = false;
+	m_pctrlSmooth->setChecked(false);
+}
+
+
+void QXInverse::CancelSpline()
+{
+	m_pctrlOutput->setPlainText(" ");
+//	m_bSpline  = false;
+	m_bSplined = false;
+//	m_ctrlShowSpline.SetCheck(0);
+	m_pctrlNewSpline->setChecked(false);
+	m_bSmooth = false;
+	m_bGetPos = false;
+	m_nPos    = 0;
+	m_tmpPos  = -1;
+	m_Pos1    = -1;
+	m_Pos2    = -1;
+}
+
+
+
+
+void QXInverse::CheckActions()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->InvQInitial->setChecked(m_pQCurve->IsVisible());
+	pMainFrame->InvQSpec->setChecked(m_pMCurve->IsVisible());
+	pMainFrame->InvQViscous->setChecked(m_pQVCurve->IsVisible());
+	pMainFrame->InvQPoints->setChecked(m_bShowPoints);
+	pMainFrame->InvQReflected->setChecked(m_bReflected);
+}
+
 void QXInverse::Clear()
 {
 	m_pRefFoil->n = 0;
@@ -132,6 +175,35 @@ void QXInverse::Clear()
 	m_pQCurve->ResetCurve();
 	m_pQVCurve->ResetCurve();
 }
+
+
+
+void QXInverse::Connect()
+{
+	connect(m_pctrlFullInverse,   SIGNAL(clicked()), this, SLOT(OnInverseApp()));
+	connect(m_pctrlMixedInverse,  SIGNAL(clicked()), this, SLOT(OnInverseApp()));
+
+	connect(m_pctrlShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
+	connect(m_pctrlNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
+	connect(m_pctrlApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
+	connect(m_pctrlTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
+	connect(m_pctrlResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
+	connect(m_pctrlSmooth,        SIGNAL(clicked()), this, SLOT(OnSmooth()));
+	connect(m_pctrlFilter,        SIGNAL(clicked()), this, SLOT(OnFilter()));
+	connect(m_pctrlSymm,          SIGNAL(clicked()), this, SLOT(OnSymm()));
+	connect(m_pctrlExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
+
+	connect(m_pctrlMNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
+	connect(m_pctrlMark,           SIGNAL(clicked()), this, SLOT(OnMarkSegment()));
+	connect(m_pctrlMApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
+	connect(m_pctrlMTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
+	connect(m_pctrlMShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
+	connect(m_pctrlMResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
+	connect(m_pctrlCpxx,           SIGNAL(clicked()), this, SLOT(OnCpxx()));
+	connect(m_pctrlMExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
+}
+
+
 
 void QXInverse::CreateQCurve()
 {
@@ -172,35 +244,6 @@ void QXInverse::CreateMCurve()
 	}
 }
 
-void QXInverse::CancelMark()
-{
-	m_pctrlMark->setChecked(false);
-	m_bGetPos = false;
-	m_bMark   = false;
-}
-
-void QXInverse::CancelSmooth()
-{
-	m_bSmooth = false;
-	m_bGetPos = false;
-	m_pctrlSmooth->setChecked(false);
-}
-
-
-void QXInverse::CancelSpline()
-{
-	m_pctrlOutput->setPlainText(" ");
-//	m_bSpline  = false;
-	m_bSplined = false;
-//	m_ctrlShowSpline.SetCheck(0);
-	m_pctrlNewSpline->setChecked(false);
-	m_bSmooth = false;
-	m_bGetPos = false;
-	m_nPos    = 0;
-	m_tmpPos  = -1;
-	m_Pos1    = -1;
-	m_Pos2    = -1;
-}
 
 void QXInverse::DrawGrid(QPainter &painter, double scale)
 {
@@ -486,6 +529,16 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 
 void QXInverse::keyReleaseEvent(QKeyEvent *event)
 {
+}
+
+
+
+void QXInverse::LoadSettings(QDataStream &ar)
+{
+	ar >> m_Spline.m_Color >> m_Spline.m_Style >> m_Spline.m_Width;
+	ar >> m_pRefFoil->m_FoilColor >> m_pRefFoil->m_nFoilStyle >> m_pRefFoil->m_nFoilWidth;
+	ar >> m_pModFoil->m_FoilColor >> m_pModFoil->m_nFoilStyle >> m_pModFoil->m_nFoilWidth;
+	m_QGraph.Serialize(ar, false);
 }
 
 
@@ -1275,9 +1328,11 @@ void QXInverse::OnNewSpline()
 }
 
 
+
 void QXInverse::OnQInitial()
 {
 	m_pQCurve->SetVisible(!m_pQCurve->IsVisible());
+	CheckActions();
 	UpdateView();
 }
 
@@ -1285,6 +1340,7 @@ void QXInverse::OnQInitial()
 void QXInverse::OnQSpec()
 {
 	m_pMCurve->SetVisible(!m_pMCurve->IsVisible());
+	CheckActions();
 	UpdateView();
 }
 
@@ -1297,6 +1353,7 @@ void QXInverse::OnQViscous()
 		m_pQVCurve->SetVisible(!m_pQVCurve->IsVisible());
 		UpdateView();
 	}
+	CheckActions();
 }
 
 
@@ -1305,6 +1362,7 @@ void QXInverse::OnQPoints()
 	m_bShowPoints = !m_bShowPoints;
 	m_pQCurve->ShowPoints(m_bShowPoints);
 	m_pMCurve->ShowPoints(m_bShowPoints);
+	CheckActions();
 	UpdateView();
 }
 
@@ -1313,6 +1371,7 @@ void QXInverse::OnQReflected()
 {
 	m_bReflected = !m_bReflected;
 	m_pReflectedCurve->SetVisible(m_bReflected);
+	CheckActions();
 	UpdateView();
 }
 
@@ -1344,6 +1403,8 @@ void QXInverse::OnResetFoilScale()
 	ResetScale();
 	UpdateView();
 }
+
+
 
 void QXInverse::OnSpecal()
 {
@@ -1675,6 +1736,15 @@ void QXInverse::ResetScale()
 }
 
 
+void QXInverse::SaveSettings(QDataStream &ar)
+{
+	ar << m_Spline.m_Color << m_Spline.m_Style << m_Spline.m_Width;
+	ar << m_pRefFoil->m_FoilColor << m_pRefFoil->m_nFoilStyle << m_pRefFoil->m_nFoilWidth;
+	ar << m_pModFoil->m_FoilColor << m_pModFoil->m_nFoilStyle << m_pModFoil->m_nFoilWidth;
+	m_QGraph.Serialize(ar, true);
+}
+
+
 
 void QXInverse::SetupLayout()
 {
@@ -1834,33 +1904,6 @@ void QXInverse::SetupLayout()
 	setLayout(MainLayout);
 	Connect();
 }
-
-
-void QXInverse::Connect()
-{
-	connect(m_pctrlFullInverse,   SIGNAL(clicked()), this, SLOT(OnInverseApp()));
-	connect(m_pctrlMixedInverse,  SIGNAL(clicked()), this, SLOT(OnInverseApp()));
-
-	connect(m_pctrlShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
-	connect(m_pctrlNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
-	connect(m_pctrlApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
-	connect(m_pctrlTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
-	connect(m_pctrlResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
-	connect(m_pctrlSmooth,        SIGNAL(clicked()), this, SLOT(OnSmooth()));
-	connect(m_pctrlFilter,        SIGNAL(clicked()), this, SLOT(OnFilter()));
-	connect(m_pctrlSymm,          SIGNAL(clicked()), this, SLOT(OnSymm()));
-	connect(m_pctrlExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
-
-	connect(m_pctrlMNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
-	connect(m_pctrlMark,           SIGNAL(clicked()), this, SLOT(OnMarkSegment()));
-	connect(m_pctrlMApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
-	connect(m_pctrlMTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
-	connect(m_pctrlMShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
-	connect(m_pctrlMResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
-	connect(m_pctrlCpxx,           SIGNAL(clicked()), this, SLOT(OnCpxx()));
-	connect(m_pctrlMExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
-}
-
 
 
 void QXInverse::SetTAngle(double a)
@@ -2101,6 +2144,7 @@ bool QXInverse::SetParams()
 			}
 
 			Clear();
+			CheckActions();
 			return false;
 		}
 	}
@@ -2122,7 +2166,7 @@ bool QXInverse::SetParams()
 	m_pModFoil->m_FoilName = pXFoil->m_FoilName + " Modified";
 
 	SetFoil();
-
+	CheckActions();
 	return true;
 }
 
@@ -2182,33 +2226,5 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 		int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);
 		m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
 	}
-	UpdateView();
-}
-
-
-
-void QXInverse::LoadSettings(QDataStream &ar)
-{
-	ar >> m_Spline.m_Color >> m_Spline.m_Style >> m_Spline.m_Width;
-	ar >> m_pRefFoil->m_FoilColor >> m_pRefFoil->m_nFoilStyle >> m_pRefFoil->m_nFoilWidth;
-	ar >> m_pModFoil->m_FoilColor >> m_pModFoil->m_nFoilStyle >> m_pModFoil->m_nFoilWidth;
-	m_QGraph.Serialize(ar, false);
-}
-
-void QXInverse::SaveSettings(QDataStream &ar)
-{
-	ar << m_Spline.m_Color << m_Spline.m_Style << m_Spline.m_Width;
-	ar << m_pRefFoil->m_FoilColor << m_pRefFoil->m_nFoilStyle << m_pRefFoil->m_nFoilWidth;
-	ar << m_pModFoil->m_FoilColor << m_pModFoil->m_nFoilStyle << m_pModFoil->m_nFoilWidth;
-	m_QGraph.Serialize(ar, true);
-}
-
-
-
-void QXInverse::OnResetGraphScale()
-{
-	ReleaseZoom();
-	m_QGraph.SetAuto(true);
-	m_QGraph.Init();
 	UpdateView();
 }

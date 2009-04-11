@@ -35,7 +35,6 @@ class GraphDlg : public QDialog
 	friend class Graph;
 
 private:
-	void ReadParams();
 	void SetLayout();
 
 public:

@@ -88,6 +88,10 @@ private slots:
 	void OnDuplicate();
 	void OnExportCurFoil();
 	void OnFoilClicked(const QModelIndex& index);
+	void OnShowAllFoils();
+	void OnHideAllFoils();
+	void OnHideCurrentFoil();
+	void OnShowCurrentFoil();
 	void OnStoreSplines();
 	void OnZoomIn();
 	void OnZoomLess();
