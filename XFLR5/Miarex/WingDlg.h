@@ -62,11 +62,17 @@ public:
 
 	enum { IDD = IDD_WINGDLG };
 	CStatic	m_ctrlSweep;
-	CStatic	m_ctrlLength5;
 	CStatic	m_ctrlYMac;
 	CStatic	m_ctrlArea;
+	CStatic	m_ctrlArea2;
+	CStatic	m_ctrlSurface;
+	CStatic	m_ctrlSurfaceXY;
+	CStatic	m_ctrlSpan;
+	CStatic	m_ctrlSpanXY;
 	CStatic	m_ctrlVolumeUnit;
 	CStatic	m_ctrlVolume;
+	CStatic	m_ctrlLength5;
+	CStatic	m_ctrlLength4;
 	CStatic	m_ctrlLength3;
 	CStatic	m_ctrlLength2;
 	CStatic	m_ctrlLength1;
@@ -74,9 +80,7 @@ public:
 	CStatic	m_ctrlAeroChord;
 	CStatic	m_ctrlMeanChord;
 	CStatic	m_ctrlTaperRatio;
-	CStatic	m_ctrlSurface;
 	CStatic	m_ctrlAspectRatio;
-	CStatic	m_ctrlSpan;
 	CClrBtn m_ctrlWingColor;
 	CButton	m_ctrlVLMMesh;
 	CButton	m_ctrlLeftWing;

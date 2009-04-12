@@ -1868,17 +1868,19 @@ bool XFoil::cpcalc(int n, double q[], double qinf, double minf, double cp[])
 	
 	denneg = false;
 	
-	for (int i=1; i<= n; i++){
+	for (int i=1; i<= n; i++)
+	{
 		cpinc = 1.0 - (q[i]/qinf)*(q[i]/qinf);
 		den = beta + bfac*cpinc;
 		cp[i] = cpinc / den;
 		if(den <= 0.0) denneg = true;
 	}
 	
-	if(denneg)  {
+	if(denneg)  
+	{
 		CString str;
 		str.Format(" CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
-		AfxMessageBox(str);
+//		AfxMessageBox(str);
 		if(pXFile) pXFile->WriteString(str);
 		return false;
 	}

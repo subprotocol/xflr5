@@ -554,9 +554,11 @@ void CSplinedPoints::Export(CStdioFile *pFile, bool bExtrados)
 	LinkSpline.m_iRes = m_Freq;
 	LinkSpline.m_rViewRect.CopyRect(&m_rViewRect);
 
-	if(bExtrados){
-		for (int k=m_iPoints-1;k>=0; k--){
-			LinkSpline.m_iCtrlPoints = -1;
+	if(bExtrados)
+	{
+		for (int k=m_iPoints-2;k>=0; k--)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
 								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
@@ -565,16 +567,19 @@ void CSplinedPoints::Export(CStdioFile *pFile, bool bExtrados)
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
-			for (int j=LinkSpline.m_iRes-1;j>=1; j--){
+			for (int j=LinkSpline.m_iRes-1;j>=1; j--)
+			{
 				strOut.Format(" %7.4f  %7.4f\n", LinkSpline.m_Output[j].x,
 												 LinkSpline.m_Output[j].y);
 				pFile->WriteString(strOut);
 			}
 		}
 	}
-	else {
-		for (int k=0; k<m_iPoints; k++){
-			LinkSpline.m_iCtrlPoints = -1;
+	else
+	{
+		for (int k=0; k<m_iPoints-1; k++)
+		{
+			LinkSpline.m_iCtrlPoints = 0;
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x, m_ctrlPoint[k].y);
 			LinkSpline.InsertPoint(m_ctrlPoint[k].x + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].x,
 								   m_ctrlPoint[k].y + (m_ctrlPoint[k+1].x-m_ctrlPoint[k].x)/3.f * m_Slope[k].y);
@@ -583,7 +588,8 @@ void CSplinedPoints::Export(CStdioFile *pFile, bool bExtrados)
 			LinkSpline.InsertPoint(m_ctrlPoint[k+1].x, m_ctrlPoint[k+1].y);
 			LinkSpline.SplineKnots();
 			LinkSpline.SplineCurve();
-			for (int j=0; j<LinkSpline.m_iRes-1;j++){
+			for (int j=0; j<LinkSpline.m_iRes-1;j++)
+			{
 				strOut.Format(" %7.4f  %7.4f\n", LinkSpline.m_Output[j].x,
 												 LinkSpline.m_Output[j].y);
 				pFile->WriteString(strOut);

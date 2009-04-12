@@ -2946,9 +2946,11 @@ void CXDirect::OnContextMenu(CPoint ScreenPoint, CPoint ClientPoint)
 //			}
 		}
 	}
-	else if (m_pCurGraph){
+	else 
+	{
 		CMenu menu;
-		if (menu.LoadMenu(IDR_CTXXDIRECTFOILMENU)){
+		if (menu.LoadMenu(IDR_CTXXDIRECTFOILMENU))
+		{
 			CMenu* pPopup = menu.GetSubMenu(0);
 			ASSERT(pPopup != NULL);
 
@@ -3910,7 +3912,7 @@ void CXDirect::OnDeletePlr()
 	int l;
 	CString str;
 
-	str = "Are you sure you want to delete polar :\n  "+m_pCurPolar->m_PlrName;
+	str = "Are you sure you want to delete the polar :\n  "+m_pCurPolar->m_PlrName;
 	str += "\n and all associated OpPoints ?";
 
 	if (IDYES == AfxMessageBox(str, MB_YESNOCANCEL)){
@@ -3952,7 +3954,7 @@ void CXDirect::OnDelFoilPolars() {
 
 	CString str;
 
-	str = "Are you sure you want to delete polars and OpPoints\n";
+	str = "Are you sure you want to delete the polars and the OpPoints\n";
 	str +="associated to "+m_pCurFoil->m_FoilName  + " ?";
 
 	if (IDYES == AfxMessageBox(str, MB_YESNOCANCEL)){
@@ -5295,7 +5297,8 @@ void CXDirect::Analysis1(double Alpha, double AlphaMax, double DeltaAlpha, bool 
 					m_XFile.WriteString(str);
 					m_pCurOpp = AddOpPoint();
 				}
-				else{
+				else
+				{
 					OnCpCalcError();
 				}
 			}
@@ -6272,7 +6275,7 @@ void CXDirect::OnDuplicateFoil()
 		pFrame->SetSaveState(false);
 
 	}
-	delete pNewFoil;	
+	else delete pNewFoil;	
 }
 
 

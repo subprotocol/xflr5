@@ -235,7 +235,7 @@ BEGIN
     LTEXT           "mm",IDC_LUNIT2,286,77,12,8
 END
 
-IDD_WINGDLG DIALOGEX 0, 0, 552, 342
+IDD_WINGDLG DIALOGEX 0, 0, 552, 365
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Wing"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
@@ -248,48 +248,54 @@ BEGIN
     CONTROL         "Left Wing",IDC_SIDE1,"Button",BS_AUTORADIOBUTTON,72,49,
                     50,8
     CONTROL         "Color",IDC_WINGCOLOR,"Button",BS_OWNERDRAW | WS_TABSTOP,
-                    23,69,59,11
-    PUSHBUTTON      "Reset VLM Mesh",IDC_VLMMESH,94,68,59,11
-    EDITTEXT        IDC_VLMPANELS,275,69,45,12,ES_RIGHT | ES_AUTOHSCROLL | 
+                    24,78,59,11
+    PUSHBUTTON      "Reset VLM Mesh",IDC_VLMMESH,97,78,59,11
+    EDITTEXT        IDC_VLMPANELS,275,81,45,12,ES_RIGHT | ES_AUTOHSCROLL | 
                     ES_NUMBER
     CONTROL         "",IDC_PANELLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
                     WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,88,538,86,WS_EX_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,164,322,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,322,322,50,14
+                    WS_TABSTOP,7,102,538,86,WS_EX_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,164,345,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,322,345,50,14
     LTEXT           "Wing Name",IDC_STATIC,16,18,38,8
-    GROUPBOX        "Wing Data",IDC_STATIC,7,7,538,78
-    RTEXT           "Wing Span",IDC_STATIC,236,15,42,8
-    RTEXT           "Aspect Ratio",IDC_STATIC,416,25,42,8
-    RTEXT           "Taper Ratio",IDC_STATIC,416,35,42,8
-    RTEXT           "Area",IDC_STATIC,236,25,42,8
-    RTEXT           "Mean Geom. Chord",IDC_STATIC,216,47,61,8
-    RTEXT           "Mean Aero. Chord",IDC_STATIC,216,57,61,8
+    GROUPBOX        "Wing Data",IDC_STATIC,7,7,538,90
+    RTEXT           "Developed Wing Span",IDC_STATIC,198,15,80,8
+    RTEXT           "Aspect Ratio",IDC_STATIC,416,48,42,8
+    RTEXT           "Taper Ratio",IDC_STATIC,416,59,42,8
+    RTEXT           "Developed area",IDC_STATIC,198,37,80,8
+    RTEXT           "Mean Geom. Chord",IDC_STATIC,388,37,61,8
+    RTEXT           "Mean Aero. Chord",IDC_STATIC,393,15,61,8
     LTEXT           "mm",IDC_LENGTH1,337,15,16,8
-    LTEXT           "dm²",IDC_AREA,337,25,20,8
-    LTEXT           "mm",IDC_LENGTH2,337,47,20,8
-    LTEXT           "mm",IDC_LENGTH3,337,57,20,8
+    LTEXT           "dm²",IDC_AREA,337,37,20,8
+    LTEXT           "mm",IDC_LENGTH2,518,37,20,8
+    LTEXT           "mm",IDC_LENGTH3,518,15,20,8
     RTEXT           "Span",IDC_SPAN,289,15,44,8
-    RTEXT           "Surf",IDC_SURFACE,289,25,44,8
-    RTEXT           "chm",IDC_MEANCHORD,289,47,44,8
-    RTEXT           "aec",IDC_AEROCHORD,289,57,44,8
-    RTEXT           "AR",IDC_ASPECTRATIO,468,25,30,8
-    RTEXT           "TR",IDC_TAPERRATIO,468,35,30,8
-    RTEXT           "M.A.C. Span Pos",IDC_STATIC,396,15,61,8
-    LTEXT           "mm",IDC_LENGTH5,504,15,20,8
-    RTEXT           "ymac",IDC_YMAC,468,15,30,8
-    RTEXT           "Root to Tip Sweep",IDC_STATIC,398,45,60,8
-    RTEXT           "00",IDC_SWEEP,468,45,30,8
-    LTEXT           "°",IDC_STATIC,504,44,11,10
-    RTEXT           "Total VLM Panels",IDC_STATIC,210,71,61,8
-    LTEXT           "(Max is 1000)",IDC_STATIC,324,71,43,8
-    RTEXT           "Number of Flaps",IDC_STATIC,398,56,59,8
-    RTEXT           "00",IDC_NFLAPS,468,56,30,8
-    RTEXT           "Volume",IDC_STATIC,236,36,42,8
-    LTEXT           "m3",IDC_VOLUMEUNIT,337,36,20,8
-    RTEXT           "Vol",IDC_VOLUME,289,36,44,8
-    RTEXT           "Total 3D Panels",IDC_TOTAL3DPANELS,402,71,132,8
+    RTEXT           "Surf",IDC_SURFACE,289,37,44,8
+    RTEXT           "chm",IDC_MEANCHORD,467,37,44,8
+    RTEXT           "aec",IDC_AEROCHORD,467,15,44,8
+    RTEXT           "AR",IDC_ASPECTRATIO,467,48,44,8
+    RTEXT           "TR",IDC_TAPERRATIO,467,59,44,8
+    RTEXT           "M.A.C. Span Pos",IDC_STATIC,395,26,61,8
+    LTEXT           "mm",IDC_LENGTH5,518,26,20,8
+    RTEXT           "ymac",IDC_YMAC,467,26,44,8
+    RTEXT           "Root to Tip Sweep",IDC_STATIC,398,70,60,8
+    RTEXT           "00",IDC_SWEEP,467,70,44,8
+    LTEXT           "°",IDC_STATIC,518,69,11,10
+    RTEXT           "Total VLM Panels",IDC_STATIC,210,83,61,8
+    LTEXT           "(Max is 1000)",IDC_STATIC,324,83,43,8
+    RTEXT           "Number of Flaps",IDC_STATIC,198,70,80,8
+    RTEXT           "00",IDC_NFLAPS,289,70,44,8
+    RTEXT           "Volume",IDC_STATIC,198,59,80,8
+    LTEXT           "m3",IDC_VOLUMEUNIT,339,59,20,8
+    RTEXT           "Vol",IDC_VOLUME,289,59,44,8
+    RTEXT           "Total 3D Panels",IDC_TOTAL3DPANELS,402,83,132,8
+    RTEXT           "Projected area",IDC_STATIC,198,48,80,8
+    LTEXT           "dm²",IDC_AREA2,337,48,20,8
+    RTEXT           "Surf",IDC_SURFACEXY,289,48,44,8
+    RTEXT           "Projected Wing Span",IDC_STATIC,198,26,80,8
+    LTEXT           "mm",IDC_LENGTH4,338,26,16,8
+    RTEXT           "Span",IDC_SPANXY,289,26,44,8
 END
 
 IDD_WGRAPHVARDLG DIALOGEX 0, 0, 186, 202
@@ -2093,49 +2099,53 @@ BEGIN
                     IDC_STATIC,7,86,172,20
 END
 
-IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 324
+IDD_CONTROLANALYSIS DIALOGEX 0, 0, 323, 333
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Control Analysis"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_WPOLARNAME,76,22,238,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WPOLARNAME,58,8,246,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_QINF,89,40,40,12,ES_RIGHT
+    EDITTEXT        IDC_WEIGHT,88,56,40,12,ES_RIGHT
     CONTROL         "Type 5 (Fixed Speed)",IDC_WTYPE5,"Button",
-                    BS_AUTORADIOBUTTON | WS_GROUP,16,66,83,10
+                    BS_AUTORADIOBUTTON | WS_GROUP,205,40,83,10
     CONTROL         "Type 6 (Fixed Lift)",IDC_WTYPE6,"Button",
-                    BS_AUTORADIOBUTTON,106,66,72,10
+                    BS_AUTORADIOBUTTON,205,52,72,10
     CONTROL         "Viscous",IDC_VISCOUS,"Button",BS_AUTOCHECKBOX | 
-                    WS_TABSTOP,18,81,47,8
-    EDITTEXT        IDC_QINF,81,95,40,12,ES_RIGHT
-    EDITTEXT        IDC_WEIGHT,80,110,40,12,ES_RIGHT
+                    WS_TABSTOP,205,64,47,8
+    CONTROL         "Developed planform area",IDC_AREA1,"Button",
+                    BS_AUTORADIOBUTTON | WS_GROUP,19,105,95,10
+    CONTROL         "Projected area",IDC_AREA2,"Button",BS_AUTORADIOBUTTON,
+                    19,121,62,10
     CONTROL         "International",IDC_UNIT1,"Button",BS_AUTORADIOBUTTON | 
-                    WS_GROUP,202,62,55,8
-    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,260,62,
+                    WS_GROUP,190,101,55,8
+    CONTROL         "Imperial",IDC_UNIT2,"Button",BS_AUTORADIOBUTTON,260,101,
                     39,8
-    EDITTEXT        IDC_DENSITY,225,77,41,12,ES_RIGHT
-    EDITTEXT        IDC_VISCOSITY,225,94,41,12,ES_RIGHT
+    EDITTEXT        IDC_DENSITY,222,116,41,12,ES_RIGHT
+    EDITTEXT        IDC_VISCOSITY,222,133,41,12,ES_RIGHT
     CONTROL         "",IDC_CONTROLLIST,"SysListView32",LVS_REPORT | 
                     LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | 
                     WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | 
-                    WS_TABSTOP,7,126,308,140,WS_EX_RIGHT
-    DEFPUSHBUTTON   "OK",IDOK,80,302,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,194,302,50,14
-    LTEXT           "Wing Name",IDC_WINGNAME,9,11,247,8
-    RTEXT           "r =",IDC_RHO,197,78,15,13
-    LTEXT           "kg/m3",IDC_SDENSITY,275,78,32,8
-    RTEXT           "n =",IDC_NU,195,96,17,12
-    LTEXT           "m²/s",IDC_SVISCOSITY,275,96,31,8
-    GROUPBOX        "Aerodynamic Data",IDC_STATIC,189,48,126,63
-    LTEXT           "Polar Name",IDC_STATIC,9,23,61,11
-    LTEXT           "Polar Type = 5",IDC_STATIC,9,36,72,11
-    LTEXT           "Analysis is VLM1",IDC_STATIC,9,50,54,8
+                    WS_TABSTOP,7,153,308,113,WS_EX_RIGHT
+    DEFPUSHBUTTON   "OK",IDOK,80,311,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,194,311,50,14
+    RTEXT           "r =",IDC_RHO,194,117,15,13
+    LTEXT           "kg/m3",IDC_SDENSITY,271,118,32,8
+    RTEXT           "n =",IDC_NU,192,135,17,12
+    LTEXT           "m²/s",IDC_SVISCOSITY,271,135,31,8
+    GROUPBOX        "Fluid Data",IDC_STATIC,171,87,144,63
+    LTEXT           "Polar Name",IDC_STATIC,9,9,45,11
+    LTEXT           "Note 3 : Analysis is VLM1",IDC_STATIC,7,293,81,8
     LTEXT           "Note 1 : if the control for XCmRef is inactive, then the minimum value will be used for the analysis",
                     IDC_STATIC,7,270,304,8
     LTEXT           "Note 2 : the analysis may be of the viscous type only if all flap controls are inactive",
                     IDC_STATIC,7,281,304,8
-    LTEXT           "Free Stream Speed",IDC_STATIC,13,96,61,8
-    LTEXT           "m/s",IDC_SPEEDUNIT,129,96,20,8
-    RTEXT           "Plane Weight",IDC_STATIC,18,112,55,8
-    LTEXT           "kg",IDC_WEIGHTUNIT,128,112,20,8
+    LTEXT           "Free Stream Speed",IDC_STATIC,21,42,61,8
+    LTEXT           "m/s",IDC_SPEEDUNIT,137,42,20,8
+    RTEXT           "Plane Weight",IDC_STATIC,26,58,55,8
+    LTEXT           "kg",IDC_WEIGHTUNIT,136,58,20,8
+    GROUPBOX        "Polar Type",IDC_STATIC,171,28,144,53
+    GROUPBOX        "Plane and flight data",IDC_STATIC,7,28,154,53
+    GROUPBOX        "Area Type",IDC_STATIC,7,87,154,62
 END
 
 IDD_BODYTRANSDLG DIALOGEX 0, 0, 201, 162
@@ -2250,7 +2260,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 545
         TOPMARGIN, 7
-        BOTTOMMARGIN, 336
+        BOTTOMMARGIN, 359
     END
 
     IDD_WGRAPHVARDLG, DIALOG
@@ -2796,7 +2806,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 315
         TOPMARGIN, 7
-        BOTTOMMARGIN, 316
+        BOTTOMMARGIN, 325
     END
 
     IDD_BODYTRANSDLG, DIALOG

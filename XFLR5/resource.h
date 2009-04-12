@@ -319,6 +319,7 @@
 #define IDC_WANALYSIS                   1257
 #define IDC_SPAN                        1258
 #define IDC_SHOWBL                      1259
+#define IDC_SPANXY                      1259
 #define IDC_ALPHAMAX                    1260
 #define IDC_DELTAALPHA                  1261
 #define IDC_QINF                        1262
@@ -334,6 +335,7 @@
 #define IDC_RRE                         1272
 #define IDC_SURFACE                     1273
 #define IDC_QINFCL                      1274
+#define IDC_SURFACEXY                   1274
 #define IDC_VISCOUS                     1275
 #define IDC_WINGNAME                    1276
 #define IDC_THINSURFACES                1277
@@ -430,6 +432,7 @@
 #define IDC_LENGTH5                     1378
 #define IDC_WEIGHTUNIT                  1379
 #define IDC_SPEEDUNIT                   1380
+#define IDC_LENGTH8                     1380
 #define IDC_LENGTHUNIT                  1381
 #define IDC_UNIT1                       1382
 #define IDC_UNIT2                       1383

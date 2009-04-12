@@ -53,7 +53,7 @@ CWingDlg::CWingDlg(CWnd* pParent /*=NULL*/)
 	m_FixedFont.CreatePointFont(85, "Courier New");
 
 	m_ptOffset.x = 50;
-	m_ptOffset.y = 350;
+	m_ptOffset.y = 360;
 	m_fWingScale = -1.0;
 
 	m_iSection   = 0;
@@ -85,7 +85,7 @@ CWingDlg::CWingDlg(CWnd* pParent /*=NULL*/, CWing* pWing/*=NULL*/)
 	m_FixedFont.CreatePointFont(85, "Courier New");
 
 	m_ptOffset.x = 50;
-	m_ptOffset.y = 350;
+	m_ptOffset.y = 360;
 	m_fWingScale = -1.0;
 
 	m_iSection   = 0;
@@ -109,24 +109,28 @@ void CWingDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SWEEP, m_ctrlSweep);
 	DDX_Control(pDX, IDC_VLMMESH, m_ctrlVLMMesh);
-	DDX_Control(pDX, IDC_LENGTH5, m_ctrlLength5);
 	DDX_Control(pDX, IDC_YMAC, m_ctrlYMac);
 	DDX_Control(pDX, IDC_SIDE1, m_ctrlLeftWing);
 	DDX_Control(pDX, IDC_SYMETRIC, m_ctrlSymetric);
 	DDX_Control(pDX, IDC_PANELLIST, m_ctrlPanelList);
-	DDX_Control(pDX, IDC_AREA, m_ctrlArea);
 	DDX_Control(pDX, IDC_VOLUMEUNIT, m_ctrlVolumeUnit);
-	DDX_Control(pDX, IDC_LENGTH3, m_ctrlLength3);
-	DDX_Control(pDX, IDC_LENGTH2, m_ctrlLength2);
 	DDX_Control(pDX, IDC_LENGTH1, m_ctrlLength1);
+	DDX_Control(pDX, IDC_LENGTH2, m_ctrlLength2);
+	DDX_Control(pDX, IDC_LENGTH3, m_ctrlLength3);
+	DDX_Control(pDX, IDC_LENGTH4, m_ctrlLength4);
+	DDX_Control(pDX, IDC_LENGTH5, m_ctrlLength5);
 	DDX_Control(pDX, IDC_AEROCHORD, m_ctrlAeroChord);
 	DDX_Control(pDX, IDC_WINGNAME, m_ctrlWingName);
+	DDX_Control(pDX, IDC_AREA, m_ctrlArea);
+	DDX_Control(pDX, IDC_AREA2, m_ctrlArea2);
+	DDX_Control(pDX, IDC_SURFACE, m_ctrlSurface);
+	DDX_Control(pDX, IDC_SURFACEXY, m_ctrlSurfaceXY);
 	DDX_Control(pDX, IDC_SPAN, m_ctrlSpan);
+	DDX_Control(pDX, IDC_SPANXY, m_ctrlSpanXY);
 	DDX_Control(pDX, IDCANCEL, m_ctrlCancel);
 	DDX_Control(pDX, IDOK, m_ctrlOK);
 	DDX_Control(pDX, IDC_MEANCHORD, m_ctrlMeanChord);
 	DDX_Control(pDX, IDC_TAPERRATIO, m_ctrlTaperRatio);
-	DDX_Control(pDX, IDC_SURFACE, m_ctrlSurface);
 	DDX_Control(pDX, IDC_VOLUME, m_ctrlVolume);
 	DDX_Control(pDX, IDC_WINGCOLOR, m_ctrlWingColor);
 	DDX_Control(pDX, IDC_ASPECTRATIO, m_ctrlAspectRatio);
@@ -219,8 +223,10 @@ BOOL CWingDlg::OnInitDialog()
 	m_ctrlLength1.SetWindowText(len);
 	m_ctrlLength2.SetWindowText(len);
 	m_ctrlLength3.SetWindowText(len);
+	m_ctrlLength4.SetWindowText(len);
 	m_ctrlLength5.SetWindowText(len);
 	m_ctrlArea.SetWindowText(surf);
+	m_ctrlArea2.SetWindowText(surf);
 	m_ctrlVolumeUnit.SetWindowText(len+"3");
 
 	CFoil*pFoil= NULL;
@@ -293,7 +299,7 @@ BOOL CWingDlg::OnInitDialog()
 	m_DrawRect.bottom = CltRect.bottom-20;
 
 	m_ptOffset.x = 50;
-	m_ptOffset.y = 330;
+	m_ptOffset.y = 360;
 
 	SetScale();
 
@@ -315,7 +321,7 @@ void CWingDlg::OnResetscale()
 	//Resets the wing's display scale
 
 	m_ptOffset.x = 50;
-	m_ptOffset.y = 330;
+	m_ptOffset.y = 360;
 	SetScale();
 	InvalidateRect(&m_DrawRect);
 }
@@ -331,11 +337,17 @@ void CWingDlg::SetResults()
 	str.Format("%7.2f", m_pWing->m_Area*pFrame->m_m2toUnit);
 	m_ctrlSurface.SetWindowText(str);
 
+	str.Format("%7.2f", m_pWing->m_ProjectedArea*pFrame->m_m2toUnit);
+	m_ctrlSurfaceXY.SetWindowText(str);
+
 	str.Format("%5.2e", m_pWing->m_Volume*pFrame->m_mtoUnit*pFrame->m_mtoUnit*pFrame->m_mtoUnit);
 	m_ctrlVolume.SetWindowText(str);
 
 	str.Format("%5.2f", m_pWing->m_Span*pFrame->m_mtoUnit);
 	m_ctrlSpan.SetWindowText(str);
+
+	str.Format("%5.2f", m_pWing->m_ProjectedSpan*pFrame->m_mtoUnit);
+	m_ctrlSpanXY.SetWindowText(str);
 
 	str.Format("%5.2f", m_pWing->m_GChord*pFrame->m_mtoUnit);
 	m_ctrlMeanChord.SetWindowText(str);
@@ -682,6 +694,8 @@ void CWingDlg::ComputeGeometry()
 	double MinPanelSize;
 	int i, k;
 
+	double spanXY = 0;
+	double surfaceXY = 0;
 	double surface = 0.0;
 	m_pWing->m_TLength[0] = 0.0;
 	m_pWing->m_TYProj[0]  = m_pWing->m_TPos[0];
@@ -701,14 +715,18 @@ void CWingDlg::ComputeGeometry()
 		pFoilA = pFrame->GetFoil(m_pWing->m_RFoil[k]);
 		pFoilB = pFrame->GetFoil(m_pWing->m_RFoil[k+1]);
 		surface   += m_pWing->m_TLength[k+1]*(m_pWing->m_TChord[k]+m_pWing->m_TChord[k+1])/2.0;//m²
+		surfaceXY += m_pWing->m_TLength[k+1] * cos(m_pWing->m_TDihedral[k]*pi/180.0) *(m_pWing->m_TChord[k]+m_pWing->m_TChord[k+1])/2.0;
+		spanXY    += m_pWing->m_TLength[k+1] * cos(m_pWing->m_TDihedral[k]*pi/180.0);
 		if(pFoilA && pFoilB) 
 			m_pWing->m_Volume  += m_pWing->m_TLength[k+1]*(pFoilA->GetArea()*m_pWing->m_TChord[k] + pFoilB->GetArea()*m_pWing->m_TChord[k+1])/2.0;//m3
 		m_pWing->m_MAChord += IntegralC2(m_pWing->m_TPos[k], m_pWing->m_TPos[k+1], m_pWing->m_TChord[k], m_pWing->m_TChord[k+1]);
 		m_yMac    += IntegralCy(m_pWing->m_TPos[k], m_pWing->m_TPos[k+1], m_pWing->m_TChord[k], m_pWing->m_TChord[k+1]);
 	}
+	m_pWing->m_ProjectedSpan    = 2.0 * spanXY;
 	if(!m_pWing->m_bIsFin || m_pWing->m_bSymFin || m_pWing->m_bDoubleFin)
 	{
 		m_pWing->m_Area    = 2.0 * surface;
+		m_pWing->m_ProjectedArea    = 2.0 * surfaceXY;
 		m_pWing->m_Volume *= 2.0;
 		m_pWing->m_MAChord = m_pWing->m_MAChord * 2.0 / m_pWing->m_Area;
 		m_yMac             = m_yMac             * 2.0 / m_pWing->m_Area;
@@ -719,6 +737,7 @@ void CWingDlg::ComputeGeometry()
 	else
 	{ 
 		m_pWing->m_Area = surface;
+		m_pWing->m_ProjectedArea    = surfaceXY;
 		m_pWing->m_MAChord = m_pWing->m_MAChord / m_pWing->m_Area;
 		m_yMac    = m_yMac    / m_pWing->m_Area;
 
@@ -759,8 +778,8 @@ void CWingDlg::SetScale()
 	double sc1 = 2.0*(m_DrawRect.Width()-130)/m_pWing->m_Span;
 	double sc2 = (m_DrawRect.Height()-90)/m_pWing->m_TChord[0];
 	double sc3 = (m_DrawRect.Height()-90)/(m_pWing->m_TChord[m_pWing->m_NPanel]+m_pWing->m_TOffset[m_pWing->m_NPanel]);
-	m_fWingScale = __min(sc1, sc2);
-	m_fWingScale = __min(m_fWingScale, sc3);
+	m_fWingScale = min(sc1, sc2);
+	m_fWingScale = min(m_fWingScale, sc3);
 }
 
 

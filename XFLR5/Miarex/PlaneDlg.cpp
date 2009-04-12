@@ -551,11 +551,12 @@ void CPlaneDlg::ComputePlane(void)
 	if(m_pPlane->m_bStab)
 	{
 		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0 - m_pPlane->m_LEWing.x;
-		double area = m_pPlane->m_Wing.m_Area;
-		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_Area;
+		double area = m_pPlane->m_Wing.m_ProjectedArea;
+		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
-		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++){
+		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++)
+		{
 			ProjectedArea += m_pPlane->m_Stab.m_TLength[i+1]*(m_pPlane->m_Stab.m_TChord[i]+m_pPlane->m_Stab.m_TChord[i+1])/2.0
 							*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0)*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0);//m²
 		
@@ -570,7 +571,8 @@ void CPlaneDlg::ComputePlane(void)
 	m_pPlane->m_Volume = m_pPlane->m_Wing.m_Volume;
 	if(m_pPlane->m_bBiplane)	m_pPlane->m_Volume += m_pPlane->m_Wing2.m_Volume;
 	if(m_pPlane->m_bStab)		m_pPlane->m_Volume += m_pPlane->m_Stab.m_Volume;
-	if(m_pPlane->m_bFin)	{
+	if(m_pPlane->m_bFin)
+	{
 		m_pPlane->m_Volume += m_pPlane->m_Fin.m_Volume;
 		if(m_pPlane->m_bDoubleFin || m_pPlane->m_bSymFin) m_pPlane->m_Volume += m_pPlane->m_Fin.m_Volume;
 	}

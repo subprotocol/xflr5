@@ -2052,11 +2052,13 @@ void CAFoil::OnDuplicate()
 	pNewFoil->CopyFoil(pCurFoil);
 	pNewFoil->InitFoil();
 
-	if(pFrame->SetModFoil(pNewFoil)){
+	if(pFrame->SetModFoil(pNewFoil))
+	{
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil(pNewFoil);
 	}
-	else {
+	else 
+	{
 		pNewFoil = NULL;
 		m_pACtrl->FillFoilList();
 		m_pACtrl->SelectFoil();

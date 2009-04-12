@@ -185,7 +185,7 @@ protected:
 	double m_Alpha;		// angle of attack
 	double m_Maxa; 		// Used in LLT
 
-	double m_VYm; 
+	double m_VYm, m_VCm; // Viscous yawing and pitching moments for the wing
 	double m_IYm;		// Induced Yawing Moment
 	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment
 

@@ -91,6 +91,7 @@ public:
 	afx_msg void OnNMRClickCtrlList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnLvnEndLabelEditControlList(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnType();
+	afx_msg void OnAreaType();
 	afx_msg void OnOK();
 	afx_msg void OnUnit();
 
@@ -102,6 +103,7 @@ public:
 	void SetDensity();
 	void SetWPolarName();
 
+	int m_RefAreaType;
 	int m_iSelection;
 	int m_UnitType;//1= International, 2= English
 	int m_nControls;

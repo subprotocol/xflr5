@@ -38,6 +38,7 @@ CControlAnalysis::CControlAnalysis(CWnd* pParent /*=NULL*/)
 	m_pWing2 = NULL;
 	m_pStab  = NULL;
 	m_pFin   = NULL;
+	m_RefAreaType = 1;
 
 	memset(m_MinControl, 0, sizeof(m_MinControl));
 	memset(m_MaxControl, 0, sizeof(m_MaxControl));
@@ -111,6 +112,8 @@ BEGIN_MESSAGE_MAP(CControlAnalysis, CDialog)
 	ON_NOTIFY(NM_CLICK, IDC_CONTROLLIST, OnNMClickCtrlList)
 	ON_NOTIFY(NM_RCLICK, IDC_CONTROLLIST, OnNMRClickCtrlList)
 	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_CONTROLLIST, OnLvnEndLabelEditControlList)
+	ON_BN_CLICKED(IDC_AREA1, OnAreaType)
+	ON_BN_CLICKED(IDC_AREA2, OnAreaType)
 	ON_BN_CLICKED(IDC_WTYPE5, OnType)
 	ON_BN_CLICKED(IDC_WTYPE6, OnType)
 	ON_BN_CLICKED(IDC_VISCOUS, OnViscous)
@@ -150,6 +153,9 @@ BOOL CControlAnalysis::OnInitDialog()
 	if(m_UnitType==1) CheckRadioButton(IDC_UNIT1, IDC_UNIT2, IDC_UNIT1);
 	else              CheckRadioButton(IDC_UNIT1, IDC_UNIT2, IDC_UNIT2);
 	OnUnit();
+
+	if(m_RefAreaType==1) CheckRadioButton(IDC_AREA1, IDC_AREA2, IDC_AREA1);
+	else                 CheckRadioButton(IDC_AREA1, IDC_AREA2, IDC_AREA2);
 
 	CRect CltRect;
 	m_ctrlControlList.GetStyle();
@@ -202,6 +208,7 @@ void CControlAnalysis::ReadSectionData(int sel)
 	if(res==1) m_MaxControl[sel] =d;
 	if(sel==0) m_MaxControl[sel] /= pFrame->m_mtoUnit;
 }
+
 
 void CControlAnalysis::OnUnit() 
 {
@@ -597,6 +604,8 @@ void CControlAnalysis::SetWPolarName()
 			}
 		}
 	}
+	if(m_RefAreaType==1) m_WPolarName += "-planform_area";
+	else m_WPolarName += "-xy_area";
 	m_ctrlWPolarName.SetWindowText(m_WPolarName);
 }
 
@@ -641,3 +650,12 @@ void CControlAnalysis::OnKillFocus()
 	ReadData();
 	SetWPolarName();
 }
+
+void CControlAnalysis::OnAreaType() 
+{
+	if(GetCheckedRadioButton(IDC_AREA1, IDC_AREA2)==IDC_AREA1) m_RefAreaType = 1;
+	else                                                       m_RefAreaType = 2;
+	SetWPolarName();
+}
+
+

@@ -5415,8 +5415,8 @@ bool CMainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 	if(bAsk)
 	{
-		strong = "Are you sure you want to delete \n" + pFoil->m_FoilName ;
-		strong+= "\nand all associated OpPoints and Polars ?";
+		strong = "Are you sure you want to delete \n" + pFoil->m_FoilName;
+		strong+= "\nfrom this project and all associated OpPoints and Polars ?";
 		if(IDYES == AfxMessageBox(strong, MB_YESNOCANCEL)) bDelete = true;
 		else return false;
 	}

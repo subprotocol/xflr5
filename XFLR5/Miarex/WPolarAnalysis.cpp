@@ -436,9 +436,10 @@ void CWPolarAnalysis::SetWPolarName()
 		strong.Format("%.2f", m_Height),
 		m_WPolarName += "-G"+strong;
 	}
-	if(m_RefAreaType==2) 
+
+	if(m_AnalysisType!=1) //not LLT
 	{
-		m_WPolarName += "-xy_area";
+		if(m_RefAreaType==2) m_WPolarName += "-Proj_area";
 	}
 	m_ctrlWPolarName.SetWindowText(m_WPolarName);
 }

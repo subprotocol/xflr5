@@ -255,7 +255,6 @@ bool CBatchThread::ReLoop()
 							str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							AfxMessageBox(str, MB_OK);
 							m_bCancel = true;
-							pBDlg->CleanUp();
 							return FALSE;
 						}
 					}
@@ -274,7 +273,6 @@ bool CBatchThread::ReLoop()
 							str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							AfxMessageBox(str, MB_OK);
 							m_bCancel = true;
-							pBDlg->CleanUp();
 							return FALSE;
 						}
 					}
@@ -310,7 +308,8 @@ bool CBatchThread::ReLoop()
 
 					}
 					CXDirect* pXDirect = (CXDirect*)pBDlg->m_pXDirect;
-					if(pXDirect->m_bPolar){
+					if(pXDirect->m_bPolar)
+					{
 						pXDirect->CreatePolarCurves();
 						pXDirect->UpdateView();
 					}
@@ -383,7 +382,6 @@ bool CBatchThread::AlphaLoop()
 					str.Format("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 					AfxMessageBox(str, MB_OK);
 					m_bCancel = true;
-					pBDlg->CleanUp();
 					return FALSE;
 				}
 

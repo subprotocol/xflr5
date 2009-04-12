@@ -9702,7 +9702,7 @@ void CMiarex::Animate(bool bAnimate)
 			if (pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&
 				pWOpp->m_WingName == m_pCurWing->m_WingName) 
 			{
-					if(m_pCurWOpp->m_Alpha - pWOpp->m_Alpha<0.0001) 
+					if(abs(m_pCurWOpp->m_Alpha - pWOpp->m_Alpha)<0.0001) 
 						m_posAnimate = l-1;
 			}
 		}
@@ -20153,17 +20153,18 @@ void CMiarex::OnControlAnalysis()
 	CMainFrame* pFrame = (CMainFrame*)m_pFrame;
 	int i,j;
 
-	m_CtrlDlg.m_pPlane     = m_pCurPlane;
-	m_CtrlDlg.m_pWing      = m_pCurWing;
-	m_CtrlDlg.m_pWing2     = m_pCurWing2;
-	m_CtrlDlg.m_pStab      = m_pCurStab;
-	m_CtrlDlg.m_pFin       = m_pCurFin;
-	m_CtrlDlg.m_pMainFrame = m_pFrame;
-	m_CtrlDlg.m_poaXPolar  = &pFrame->m_oaWPolar;
-	m_CtrlDlg.m_QInf      = m_WngAnalysis.m_QInf;
-	m_CtrlDlg.m_Weight    = m_WngAnalysis.m_Weight;
-	m_CtrlDlg.m_Viscosity = m_WngAnalysis.m_Viscosity;
-	m_CtrlDlg.m_Density  = m_WngAnalysis.m_Density;
+	m_CtrlDlg.m_pPlane      = m_pCurPlane;
+	m_CtrlDlg.m_pWing       = m_pCurWing;
+	m_CtrlDlg.m_pWing2      = m_pCurWing2;
+	m_CtrlDlg.m_pStab       = m_pCurStab;
+	m_CtrlDlg.m_pFin        = m_pCurFin;
+	m_CtrlDlg.m_pMainFrame  = m_pFrame;
+	m_CtrlDlg.m_poaXPolar   = &pFrame->m_oaWPolar;
+	m_CtrlDlg.m_QInf        = m_WngAnalysis.m_QInf;
+	m_CtrlDlg.m_Weight      = m_WngAnalysis.m_Weight;
+	m_CtrlDlg.m_Viscosity   = m_WngAnalysis.m_Viscosity;
+	m_CtrlDlg.m_Density     = m_WngAnalysis.m_Density;
+	m_CtrlDlg.m_RefAreaType = m_WngAnalysis.m_RefAreaType;
 
 	if(m_pCurPlane) 
 		m_CtrlDlg.m_UFOName   = m_pCurPlane->m_PlaneName;
@@ -20179,10 +20180,11 @@ void CMiarex::OnControlAnalysis()
 
 	if (m_CtrlDlg.DoModal() == IDOK)
 	{
-		m_WngAnalysis.m_QInf      = m_CtrlDlg.m_QInf;
-		m_WngAnalysis.m_Weight    = m_CtrlDlg.m_Weight;
-		m_WngAnalysis.m_Viscosity = m_CtrlDlg.m_Viscosity;
-		m_WngAnalysis.m_Density   = m_CtrlDlg.m_Density;
+		m_WngAnalysis.m_QInf        = m_CtrlDlg.m_QInf;
+		m_WngAnalysis.m_Weight      = m_CtrlDlg.m_Weight;
+		m_WngAnalysis.m_Viscosity   = m_CtrlDlg.m_Viscosity;
+		m_WngAnalysis.m_Density     = m_CtrlDlg.m_Density;
+		m_WngAnalysis.m_RefAreaType = m_CtrlDlg.m_RefAreaType;
 
 		//Then add WPolar to array
 		pCurWPolar->m_Type = m_CtrlDlg.m_Type;
@@ -20191,6 +20193,7 @@ void CMiarex::OnControlAnalysis()
 		pCurWPolar->m_PlrName         = m_CtrlDlg.m_WPolarName;
 		pCurWPolar->m_Density         = m_CtrlDlg.m_Density;
 		pCurWPolar->m_Viscosity       = m_CtrlDlg.m_Viscosity;
+		pCurWPolar->m_RefAreaType     = m_CtrlDlg.m_RefAreaType;
 		pCurWPolar->m_bVLM1           = true;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;

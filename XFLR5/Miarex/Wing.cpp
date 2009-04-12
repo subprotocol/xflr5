@@ -131,6 +131,7 @@ CWing::CWing(CWnd* pParent /*=NULL*/)
 	m_IYm               = 0.0;
 	m_GCm               = 0.0;
 	m_GRm               = 0.0;
+	m_VCm               = 0.0;
 	m_VYm               = 0.0;
 	m_XCP               = 0.0;
 	m_YCP               = 0.0;
@@ -2046,7 +2047,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 	VInf = WindDirection * m_QInf;
 
 	m_GRm = m_GCm = 0.0;
-	m_GYm = m_IYm = m_VYm = 0.0;
+	m_GYm = m_IYm = m_VCm = m_VYm = 0.0;
 
 	for (m=0; m< m_NStation; m++)	m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
 
@@ -2176,17 +2177,18 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 //			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/m_QInf;//up to v2.04
 
 			// ______________Global moments, in N.m __________________
-			DragMoment += LeverArm * DragVector;
+			DragMoment = LeverArm * DragVector;
 
 			m_GCm += GeomMoment.y ;
 			m_GRm += GeomMoment.dot(WindDirection);
 			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
 
+			m_VCm += DragMoment.y;
 			m_VYm += DragMoment.dot(WindNormal);
 			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y / 2.0 * m_Density *m_QInf*m_QInf; 
 
 			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m]/q;
-			m_CmXRef[m]     = GeomMoment.y/m_Chord[m]/m_StripArea[m]/q;
+			m_CmXRef[m]     = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m]/q;
 			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
 
 
@@ -2225,7 +2227,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 	} 
 
 	//global plane dimensionless coefficients
-	GCm += m_GCm ;//+ DragMoment.y;
+	GCm += m_GCm + m_VCm;
 	 //sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
 	GYm -= m_GYm;
@@ -2247,6 +2249,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 	// wing dimensionless coefficients
 	m_GCm *=  1.0/ q / Area /m_MAChord;
+	m_VCm *=  1.0/ q / Area /m_MAChord;
 	 //sign convention for rolling and yawing is opposite to algebric results
 	m_GRm *= -1.0/ q / Area /Span;
 	m_GYm *= -1.0/ q / Area /Span;
@@ -2339,7 +2342,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 	WindDirection.Set( cosa, 0.0, sina);
 
 	m_GRm = m_GCm = 0.0;
-	m_GYm = m_IYm = m_VYm = 0.0;
+	m_GYm = m_IYm = m_VCm = m_VYm = 0.0;
 
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
 
@@ -2449,7 +2452,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				if(bError) bPointOutCl = true;
 				m_ViscousDrag = m_PCd[m] * m_StripArea[m];
 				VDrag         += m_PCd[m] * m_StripArea[m];
-				DragVector.x = m_PCd[m]*m_StripArea[m];
+				DragVector.x = m_PCd[m]*m_StripArea[m];// N/q
 			}
 			else
 			{
@@ -2459,20 +2462,20 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				DragVector.x = 0.0;
 			}
 
-
 			//global moments, in N.m/q
-			DragMoment += LeverArm * DragVector;
+			DragMoment = LeverArm * DragVector;
 
 			m_GCm += GeomMoment.y;
 			m_GRm += GeomMoment.dot(WindDirection);
 			m_GYm += GeomMoment.dot(WindNormal);
 
+			m_VCm += DragMoment.y;
 			m_VYm += DragMoment.dot(WindNormal);
 
 			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y ; 
 
 			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m];//vectorial formulation
-			m_CmXRef[m]     = GeomMoment.y/m_Chord[m]/m_StripArea[m];
+			m_CmXRef[m]     = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m];
 			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
 
 			if(bPointOutCl)
@@ -2511,14 +2514,14 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 	}
 
 	//global plane dimensionless coefficients
-	GCm += m_GCm + DragMoment.y;
+	GCm += m_GCm + m_VCm;
 
-	TRACE("%14.5e     %14.5e      \n", m_GCm,DragMoment.y);
 	//sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
 	GYm -= m_GYm;
 	VYm -= m_VYm;
 	IYm -= m_IYm;
+
 
 	//Note : the following results are unused,for information only
 	double Area, Span;
@@ -2532,10 +2535,9 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 		Area = m_ProjectedArea;
 		Span = m_ProjectedSpan;
 	}
-
-
 	// wing dimensionless coefficients
 	m_GCm *=  1.0 / Area /m_MAChord;
+	m_VCm *=  1.0 / Area /m_MAChord;
 	//sign convention for rolling and yawing is opposite to algebric results
 	m_GRm *= -1.0 / Area /Span;
 	m_GYm *= -1.0 / Area /Span;
@@ -2619,9 +2621,6 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 
 					GamShed[m] += Gamma[p+pos];
 				}
-#ifdef _DEBUG
-//		if(m_pPanel[p].m_bIsTrailing) TRACE("%14.5f, %14.5f,  %14.5f,  %14.5f\n",	C.y - m_pPanel[p].Vortex.y/2.0, C.y + m_pPanel[p].Vortex.y/2.0, GamShed[m], Wg.z);     
-#endif
 				p++;
 			}
 

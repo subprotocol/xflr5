@@ -323,8 +323,8 @@ void CUFOListDlg::OnDelete()
 	if(m_bWing){
 		CWing *pWing = pMiarex->GetWing(Name);
 		CPlane *pPlane = pMiarex->GetPlane(Name);
-		if(pPlane)	   strong = "Are you sure you want to delete the plane :\n" + pPlane->m_PlaneName +"?\n";
-		else if(pWing) strong = "Are you sure you want to delete the wing :\n" +  pWing->m_WingName +"?\n";
+		if(pPlane)	   strong = "Are you sure you want to delete the plane :\n" + pPlane->m_PlaneName +" from this project?\n";
+		else if(pWing) strong = "Are you sure you want to delete the wing :\n" +  pWing->m_WingName +" from this project?\n";
 		if(IDYES != AfxMessageBox(strong, MB_YESNOCANCEL)) return;
 		if(pWing) {
 			pFrame->DeleteWing(pWing);

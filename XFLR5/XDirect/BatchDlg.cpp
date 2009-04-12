@@ -126,6 +126,7 @@ BEGIN_MESSAGE_MAP(CBatchDlg, CDialog)
 	ON_BN_CLICKED(IDC_CLOSE, OnClose)
 	ON_BN_CLICKED(IDC_INITBL, OnInitBL)
 	ON_BN_CLICKED(IDC_SHOWTEXTOUTPUT, OnShowTextOutput)
+	ON_BN_CLICKED(IDC_RADIO1, OnRange)
 	ON_BN_CLICKED(IDC_RADIO2, OnRange)
 	ON_BN_CLICKED(IDC_CREATELIST, OnCreateList)
 	ON_BN_CLICKED(IDC_FROMZERO, OnFromZero)
@@ -135,7 +136,6 @@ BEGIN_MESSAGE_MAP(CBatchDlg, CDialog)
 	ON_BN_CLICKED(IDC_TYPE2, OnType1)
 	ON_BN_CLICKED(IDC_TYPE3, OnType1)
 	ON_BN_CLICKED(IDC_TYPE4, OnType1)
-	ON_BN_CLICKED(IDC_RADIO1, OnRange)
 	ON_BN_CLICKED(IDC_CANCEL, OnCancel)
 	ON_WM_DRAWITEM()
 	//}}AFX_MSG_MAP
@@ -522,8 +522,10 @@ bool CBatchDlg::InitXFoil2()
 	m_pXFoil->xstrip[1]  = m_XTopTr;
 	m_pXFoil->xstrip[2]  = m_XBotTr;
 
-	if (m_Mach !=0.f){
-		if(!m_pXFoil->SetMach()){
+	if (m_Mach !=0.0)
+	{
+		if(!m_pXFoil->SetMach())
+		{
 			CString str;
 			str.Format("Invalid Analysis Settings\nCPCALC: local speed too large \n Compressibility corrections invalid ");
 			AfxMessageBox(str, MB_OK);
@@ -819,6 +821,7 @@ void CBatchDlg::OnRange()
 	m_ctrlReMin.EnableWindow(!m_bFromList);
 	m_ctrlReMax.EnableWindow(!m_bFromList);
 	m_ctrlReInc.EnableWindow(!m_bFromList);
+	m_ctrlMach.EnableWindow(!m_bFromList);
 }
 
 
