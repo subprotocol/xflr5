@@ -27,6 +27,9 @@ void *FoilGeomDlg::s_pXFoil;
 
 FoilGeomDlg::FoilGeomDlg()
 {
+	m_pXDirect = NULL;
+	m_pAFoil   = NULL;
+
 	SetupLayout();
 
 	connect(RestoreButton, SIGNAL(clicked()),this, SLOT(OnRestore()));

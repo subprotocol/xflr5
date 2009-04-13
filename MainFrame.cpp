@@ -1536,6 +1536,9 @@ void MainFrame::CreateXDirectActions()
 	NacaFoils = new QAction(tr("Naca Foils"), this);
 	connect(NacaFoils, SIGNAL(triggered()), pXDirect, SLOT(OnNacaFoils()));
 
+	DuplicateFoil = new QAction(tr("Duplicate"), this);
+	connect(DuplicateFoil, SIGNAL(triggered()), pXDirect, SLOT(OnDuplicateFoil()));
+
 	setCpVarGraph = new QAction(tr("Cp Variable"), this);
 	setCpVarGraph->setCheckable(true);
 	setCpVarGraph->setStatusTip(tr("Sets Cp vs. chord graph"));
@@ -1597,6 +1600,7 @@ void MainFrame::CreateXDirectMenus()
 	currentFoilMenu = FoilMenu->addMenu("Current Foil");
 	currentFoilMenu->addAction(setCurFoilStyle);
 	currentFoilMenu->addSeparator();
+	currentFoilMenu->addAction(DuplicateFoil);
 	currentFoilMenu->addAction(exportCurFoil);
 	currentFoilMenu->addAction(renameCurFoil);
 	currentFoilMenu->addAction(deleteCurFoil);
@@ -1696,6 +1700,7 @@ void MainFrame::CreateXDirectMenus()
 	CurFoilCtxMenu = OperFoilCtxMenu->addMenu("Current Foil");
 	CurFoilCtxMenu->addAction(setCurFoilStyle);
 	CurFoilCtxMenu->addSeparator();
+	CurFoilCtxMenu->addAction(DuplicateFoil);
 	CurFoilCtxMenu->addAction(renameCurFoil);
 	CurFoilCtxMenu->addAction(deleteCurFoil);
 	CurFoilCtxMenu->addAction(exportCurFoil);
@@ -5089,8 +5094,8 @@ void MainFrame::SetSaveState(bool bSave)
 	if (!bSave)
 	{
 		m_ProjectName += "*";
-		m_pctrlProjectName->setText(m_ProjectName);
 	}
+	m_pctrlProjectName->setText(m_ProjectName);
 }
 
 

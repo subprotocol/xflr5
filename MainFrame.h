@@ -272,7 +272,7 @@ private:
 	QAction *viewXFoilAdvanced, *viewLogFile, *showPanels, *showNeutralLine, *resetFoilScale, *showInviscidCurve;
 	QAction *exportCurFoil, *deleteCurFoil, *renameCurFoil, *setCurFoilStyle;
 	QAction *DerotateFoil, *NormalizeFoil, *RefineLocalFoil, *RefineGlobalFoil , *EditCoordsFoil, *ScaleFoil;
-	QAction *SetTEGap, *SetLERadius, *SetFlap, *InterpolateFoils, *NacaFoils;
+	QAction *SetTEGap, *SetLERadius, *SetFlap, *InterpolateFoils, *NacaFoils, *DuplicateFoil;
 	QAction *GraphDlgAction,*exportCurGraphAct, *resetCurGraphScales, *allPolarGraphsSettingsAct, *allPolarGraphsScales, *curPolarGraphVariableAct;
 	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct;
 	QAction *PolarGraphAct[5];

@@ -60,6 +60,9 @@ void LinePickerDlg::FillBoxes()
 	m_pStyleDelegate->SetLineColor(m_Color);
 	m_pWidthDelegate->SetLineColor(m_Color);
 
+	m_pctrlStyle->setCurrentIndex(m_Style);
+	m_pctrlWidth->setCurrentIndex(m_Width-1);
+
 	int LineWidth[5];
 	for (int i=0; i<5;i++) LineWidth[i] = m_Width;
 	m_pStyleDelegate->SetLineWidth(LineWidth); // the same selected width for all styles

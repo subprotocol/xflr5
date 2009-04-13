@@ -945,7 +945,8 @@ void QAFoil::OnAFoilSetFlap()
 	UpdateView();
 
 	FlapDlg dlg;
-	dlg.m_pAFoil = this;
+	dlg.m_pAFoil      = this;
+	dlg.m_pXDirect    = NULL;
 	dlg.m_pXFoil      = m_pXFoil;
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
@@ -1031,6 +1032,7 @@ void QAFoil::OnAFoilCadd()
 	CAddDlg Adlg;
 	Adlg.m_pBufferFoil = m_pBufferFoil;
 	Adlg.m_pMemFoil    = m_pCurFoil;
+	Adlg.m_pXDirect    = NULL;
 	Adlg.m_pAFoil      = this;
 	Adlg.InitDialog();
 
@@ -1088,6 +1090,7 @@ void QAFoil::OnAFoilPanels()
 	TwoDPanelDlg Pdlg;
 	Pdlg.m_pBufferFoil = m_pBufferFoil;
 	Pdlg.m_pMemFoil    = m_pCurFoil;
+	Pdlg.m_pXDirect    = NULL;
 	Pdlg.m_pAFoil      = this;
 
 	if(QDialog::Accepted == Pdlg.exec())
@@ -1143,6 +1146,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 	FoilCoordDlg dlg;
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pXDirect    = NULL;
 	dlg.m_pAFoil      = this;
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1199,6 +1203,8 @@ void QAFoil::OnAFoilFoilGeom()
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pAFoil      = this;
+	dlg.m_pXDirect    = NULL;
+	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -1255,6 +1261,7 @@ void QAFoil::OnAFoilSetTEGap()
 	TEGapDlg Gdlg;
 	Gdlg.m_pBufferFoil = m_pBufferFoil;
 	Gdlg.m_pMemFoil    = m_pCurFoil;
+	Gdlg.m_pXDirect    = NULL;
 	Gdlg.m_pAFoil      = this;
 	Gdlg.InitDialog();
 
@@ -1312,6 +1319,7 @@ void QAFoil::OnAFoilSetLERadius()
 	LEDlg Ldlg;
 	Ldlg.m_pBufferFoil = m_pBufferFoil;
 	Ldlg.m_pMemFoil    = m_pCurFoil;
+	Ldlg.m_pXDirect    = NULL;
 	Ldlg.m_pAFoil      = this;
 	Ldlg.InitDialog();
 
@@ -1375,7 +1383,8 @@ void QAFoil::OnAFoilInterpolateFoils()
 	dlg.m_poaFoil = m_poaFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pMainFrame = m_pMainFrame;
-	dlg.m_pAFoil = this;
+	dlg.m_pXDirect  = NULL;
+	dlg.m_pAFoil    = this;
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1430,6 +1439,7 @@ void QAFoil::OnAFoilNacaFoils()
 
 	NacaFoilDlg dlg;
 	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.m_pXDirect = NULL;
 	dlg.m_pAFoil = this;
 
 	if(QDialog::Accepted == dlg.exec())
@@ -2374,7 +2384,6 @@ void QAFoil::PaintSplines(QPainter &painter)
 		SplinePen.setColor(m_pPF->m_FoilColor);
 		painter.setPen(SplinePen);
 
-//qDebug() << "Splined  Color " << m_pPF->m_FoilColor;
 		m_pPF->DrawFoil(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset);
 
 /*		CtrlPen.setStyle(Qt::SolidLine);

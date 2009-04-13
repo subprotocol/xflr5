@@ -26,6 +26,9 @@
 
 LineCbBox::LineCbBox(void *pParent)
 {
+	m_Style = 0;
+	m_Width = 1;
+	m_Color = QColor(255,100,50);
 }
 
 LineCbBox::LineCbBox(int const &style, int const &width, QColor const &color)

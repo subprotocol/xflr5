@@ -859,7 +859,7 @@ void QXDirect::FillComboBoxes(bool bEnable)
 	m_pctrlCurveColor->update();
 
 	m_pctrlCurveStyle->setCurrentIndex(m_CurveStyle);
-	m_pctrlCurveWidth->setCurrentIndex((int)m_CurveWidth-1);
+	m_pctrlCurveWidth->setCurrentIndex(m_CurveWidth-1);
 
 }
 
@@ -1839,6 +1839,7 @@ void QXDirect::OnCadd()
 	Adlg.m_pBufferFoil = &m_BufferFoil;
 	Adlg.m_pMemFoil    = m_pCurFoil;
 	Adlg.m_pXDirect    = this;
+	Adlg.m_pAFoil      = NULL;
 	Adlg.Title         = "Refine "+ m_pCurFoil->m_FoilName;
 	Adlg.InitDialog();
 
@@ -2293,6 +2294,27 @@ void QXDirect::OnDbPlot()
 	UpdateView();
 }
 
+
+void QXDirect::OnDuplicateFoil()
+{
+	if(!m_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	CFoil *pNewFoil = new CFoil();
+	pNewFoil->CopyFoil(m_pCurFoil);
+	pNewFoil->InitFoil();
+
+	m_BufferFoil.CopyFoil(pNewFoil);
+	if(pMainFrame->SetModFoil(pNewFoil))
+	{
+		SetFoil();
+		pMainFrame->UpdateFoils();
+		UpdateView();
+		pMainFrame->SetSaveState(false);
+	}
+	else delete pNewFoil;
+}
+
+
 void QXDirect::OnEditCurPolar()
 {
 	if (!m_pCurPolar) return;
@@ -2600,6 +2622,7 @@ void QXDirect::OnFoilCoordinates()
 
 	FoilCoordDlg dlg;
 	dlg.m_pXDirect = this;
+	dlg.m_pAFoil = NULL;
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.InitDialog();
@@ -2664,6 +2687,7 @@ void QXDirect::OnFoilGeom()
 	dlg.m_pMemFoil = m_pCurFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pXDirect = this;
+	dlg.m_pAFoil   = NULL;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
@@ -2821,6 +2845,7 @@ void QXDirect::OnInterpolateFoils()
 	dlg.m_poaFoil     = m_poaFoil;
 	dlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
 	dlg.m_pXDirect = this;
+	dlg.m_pAFoil   = NULL;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
@@ -2866,6 +2891,7 @@ void QXDirect::OnNacaFoils()
 	NacaFoilDlg dlg;
  	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pXDirect    = this;
+	dlg.m_pAFoil      = NULL;
 
 	if (dlg.exec() == QDialog::Accepted)
 	{
@@ -3009,6 +3035,7 @@ void QXDirect::OnPanels()
 
 	TwoDPanelDlg dlg;
 	dlg.m_pXDirect = this;
+	dlg.m_pAFoil   = NULL;
 	dlg.m_pBufferFoil = &m_BufferFoil;
 	dlg.m_pMemFoil    = m_pCurFoil;
 
@@ -3312,6 +3339,7 @@ void QXDirect::OnSetFlap()
 	dlg.m_pMemFoil     = m_pCurFoil;
 	dlg.m_pXFoil       = m_pXFoil;
 	dlg.m_pXDirect     = this;
+	dlg.m_pAFoil       = NULL;
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -3359,6 +3387,7 @@ void QXDirect::OnSetLERadius()
 	Ldlg.m_pBufferFoil = &m_BufferFoil;
 	Ldlg.m_pMemFoil    = m_pCurFoil;
 	Ldlg.m_pXDirect   = this;
+	Ldlg.m_pAFoil     = NULL;
 	Ldlg.InitDialog();
 
 	if(QDialog::Accepted == Ldlg.exec())
@@ -3407,6 +3436,7 @@ void QXDirect::OnSetTEGap()
 
 	TEGapDlg Gdlg;
 	Gdlg.m_pXDirect   = this;
+	Gdlg.m_pAFoil     = NULL;
 	Gdlg.m_pBufferFoil = &m_BufferFoil;
 	Gdlg.m_pMemFoil    = m_pCurFoil;
 	Gdlg.m_Gap         = m_pCurFoil->m_Gap;
