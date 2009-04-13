@@ -3031,7 +3031,7 @@ void CMainFrame::SaveSettings()
 	else
 	{
 		CArchive ar(&fp, CArchive::store);
-		ar << 100416;
+		ar << 200416;
 			//100413 : Set default core radius to 1 micron
 			//100322 : corrected wake params
 			//100321 : added woperdlgbar properties
@@ -3121,7 +3121,7 @@ void CMainFrame::LoadSettings()
 			CArchive ar(&fp, CArchive::load);
 
 			ar >> ArchiveFormat;
-			if(ArchiveFormat!=100416)
+			if(ArchiveFormat!=200416)
 			{
 				ar.Close();
 				fp.Close();

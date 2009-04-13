@@ -207,24 +207,18 @@ void CWingScaleDlg::OnChordScale()
 	}	
 }
 
+
 void CWingScaleDlg::OnSweepScale() 
 {
-	if(m_ctrlSweepScale.GetCheck()){
-		m_ctrlSweep.EnableWindow(true);
-	}
-	else{
-		m_ctrlSweep.EnableWindow(false);
-	}		
+	if(m_ctrlSweepScale.GetCheck()) m_ctrlSweep.EnableWindow(true);
+	else                            m_ctrlSweep.EnableWindow(false);
 }
+
 
 void CWingScaleDlg::OnTwistScale() 
 {
-	if(m_ctrlTwistScale.GetCheck()){
-		m_ctrlTwist.EnableWindow(true);
-	}
-	else{
-		m_ctrlTwist.EnableWindow(false);
-	}		
+	if(m_ctrlTwistScale.GetCheck()) m_ctrlTwist.EnableWindow(true);
+	else                            m_ctrlTwist.EnableWindow(false);
 }
 
 

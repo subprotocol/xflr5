@@ -223,7 +223,7 @@ void CFloatEdit::SetValue(double f)
 	}
 	else 
 	{
-		exp  = (int)log10(f)-1;
+		exp  = (int)log10(f*1.000001)-1;
 		str1.Format("e%d", exp);
 
 		double main = (float)(f/pow(10.0, exp)*1.000001);

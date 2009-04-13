@@ -161,10 +161,10 @@ void CWAdvDlg::ReadParams()
 {
 	CMainFrame *pFrame = (CMainFrame*)m_pFrame;
 
-	m_Iter      = __max(m_ctrlIterMax.GetValue(),1);
-	m_Relax     = __max(m_ctrlRelax.GetValue(), 1.0);
-	m_AlphaPrec = __max(m_ctrlAlphaPrec.GetValue(),0.0001);
-	m_NStation  = __max(m_ctrlNStation.GetValue(),2);
+	m_Iter      = max(m_ctrlIterMax.GetValue(),1);
+	m_Relax     = max(m_ctrlRelax.GetValue(), 1.0);
+	m_AlphaPrec = max(m_ctrlAlphaPrec.GetValue(),0.0001);
+	m_NStation  = max(m_ctrlNStation.GetValue(),2);
 
 	if(!IsEven(m_NStation))	   m_NStation++;
 	if(m_NStation>MAXSTATIONS) m_NStation=MAXSTATIONS;

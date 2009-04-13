@@ -604,8 +604,7 @@ void CControlAnalysis::SetWPolarName()
 			}
 		}
 	}
-	if(m_RefAreaType==1) m_WPolarName += "-planform_area";
-	else m_WPolarName += "-xy_area";
+	if(m_RefAreaType==2) m_WPolarName += "-Proj_area";
 	m_ctrlWPolarName.SetWindowText(m_WPolarName);
 }
 

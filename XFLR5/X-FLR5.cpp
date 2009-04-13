@@ -162,7 +162,7 @@ BOOL CXFLR5App::InitInstance()
 		{
 			CArchive ar(&fp, CArchive::load);
 			ar >> k;
-			if(k!=100322)
+			if(k!=200416)
 			{
 				CArchiveException *pfe = new CArchiveException(CArchiveException::badIndex);
 				pfe->m_strFileName = ar.m_strFileName;
@@ -173,7 +173,7 @@ BOOL CXFLR5App::InitInstance()
 			x=l; y=t; cx = max(r-l,200); cy = max(b-t,200);
 			ar.Close();
 			fp.Close();
-		}
+		} 
 	}
 	catch (CArchiveException *ex)
 	{
