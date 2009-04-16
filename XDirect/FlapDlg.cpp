@@ -74,13 +74,6 @@ void FlapDlg::SetupLayout()
 	m_pctrlTEFlapAngle = new FloatEdit;
 	m_pctrlLEFlapAngle = new FloatEdit;
 
-	m_pctrlLEXHinge->setMaximumWidth(70);
-	m_pctrlLEYHinge->setMaximumWidth(70);
-	m_pctrlTEXHinge->setMaximumWidth(70);
-	m_pctrlTEYHinge->setMaximumWidth(70);
-	m_pctrlLEFlapAngle->setMaximumWidth(70);
-	m_pctrlTEFlapAngle->setMaximumWidth(70);
-
 	QLabel *lab1 = new QLabel("Flap Angle");
 	QLabel *lab2 = new QLabel("deg (+ is down)");
 	QLabel *lab3 = new QLabel("Hinge X Position");
@@ -107,9 +100,7 @@ void FlapDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	ApplyButton  = new QPushButton("Apply");
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
+
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

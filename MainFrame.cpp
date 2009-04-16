@@ -454,7 +454,7 @@ void MainFrame::CreateActions()
 		connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
 	}
 
-	styleAct = new QAction("Set Style", this);
+	styleAct = new QAction("General Display Settings", this);
 	connect(styleAct, SIGNAL(triggered()), this, SLOT(OnStyle()));
 
 
@@ -939,6 +939,9 @@ void MainFrame::CreateMiarexActions()
 	resetWingScale = new QAction(tr("Reset Wing Scale"), this);
 	connect(resetWingScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingScale()));
 
+	scaleWingAct = new QAction(tr("Scale Wing"), this);
+	connect(scaleWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnScaleWing()));
+
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
 	showCurWOppOnly->setCheckable(true);
 	connect(showCurWOppOnly, SIGNAL(triggered()), pMiarex, SLOT(OnCurWOppOnly()));
@@ -981,6 +984,10 @@ void MainFrame::CreateMiarexActions()
 
 	defineCtrlPolar = new QAction(tr("Define a Control Analysis"), this);
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
+
+
+	defineWPolar = new QAction(tr("Define Analysis"), this);
+	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
 	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
 	twoWingGraphs->setCheckable(true);
@@ -1039,6 +1046,8 @@ void MainFrame::CreateMiarexActions()
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
 	showUFOWPlrs = new QAction(tr("Show Associated Polars"), this);
 	connect(showUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWPolars()));
+	deleteUFOWPlrs = new QAction(tr("Delete Associated Polars"), this);
+	connect(deleteUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWPolars()));
 
 	hideAllWPlrs = new QAction(tr("Hide All Polars"), this);
 	connect(hideAllWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideAllWPolars()));
@@ -1097,10 +1106,14 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addAction(renameCurUFO);
 	currentUFOMenu->addAction(deleteCurUFO);
 	currentUFOMenu->addAction(SaveUFOAsProject);
+	currentUFOMenu->addSeparator();
+	currentUFOMenu->addAction(scaleWingAct);
+	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(exporttoAVL);
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(hideUFOWPlrs);
 	currentUFOMenu->addAction(showUFOWPlrs);
+	currentUFOMenu->addAction(deleteUFOWPlrs);
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(resetWingScale);
 
@@ -3627,6 +3640,7 @@ void MainFrame::OnStyle()
 		pMiarex->m_WPlrGraph3.SetBkColor(m_GraphBackColor);
 		pMiarex->m_WPlrGraph4.SetBkColor(m_GraphBackColor);
 		pMiarex->m_CpGraph.SetBkColor(m_GraphBackColor);
+		pMiarex->m_bResetglLegend = true;
 
 		if(dlg.m_bIsGraphModified)
 		{
@@ -3650,6 +3664,7 @@ void MainFrame::OnStyle()
 			pMiarex->m_CpGraph.CopySettings(&m_RefGraph, false);
 		}
 	}
+	UpdateView();
 }
 
 

@@ -2112,8 +2112,9 @@ void CWing::ScaleChord(double NewChord)
 		m_TChord[i]    *= ratio;
 		m_TOffset[i]   *= ratio;
 	}
-//	//ComputeGeometry();
+	ComputeGeometry();
 }
+
 
 void CWing::ScaleSpan(double NewSpan)
 {
@@ -2122,8 +2123,7 @@ void CWing::ScaleSpan(double NewSpan)
 		m_TPos[i]      *= NewSpan/m_Span;
 		m_TLength[i]   *= NewSpan/m_Span;
 	}
-	//ComputeGeometry();
-
+	ComputeGeometry();
 }
 
 
@@ -2362,7 +2362,7 @@ void CWing::SetSweep(double Sweep)
 			m_TOffset[i] = NewTipOffset*m_TPos[i]/(m_Span/2.0);
 		}
 	}
-	//ComputeGeometry();
+	ComputeGeometry();
 }
 
 void CWing::SetTwist(double Twist)
@@ -2382,7 +2382,7 @@ void CWing::SetTwist(double Twist)
 			m_TTwist[i] = Twist*m_TPos[i]/(m_Span/2.0);
 		}
 	}
-	//ComputeGeometry();
+	ComputeGeometry();
 }
 
 

@@ -29,7 +29,6 @@ int FloatEdit::s_MaxWidth;
 FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
-	setMaximumWidth(s_MaxWidth);
 	setMinimumHeight(15);
 
 	m_Value = 0.0;
@@ -44,8 +43,6 @@ FloatEdit::FloatEdit(QWidget *pParent)
 
 FloatEdit::FloatEdit(QString str, int precision)
 {
-	setMaximumWidth(s_MaxWidth);
-
 	bool bOK;
 	str.replace(" ","");
 	double d = str.toDouble(&bOK);
@@ -69,7 +66,6 @@ FloatEdit::FloatEdit(QString str, int precision)
 
 FloatEdit::FloatEdit(double d, int precision)
 {
-	setMaximumWidth(s_MaxWidth);
 	bool bOK;
 	m_Value = d;
 	m_iniStr = QString("%1").arg(d,0,'f',precision);

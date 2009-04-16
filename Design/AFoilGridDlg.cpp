@@ -185,9 +185,7 @@ void AFoilGridDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("Accept"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	ApplyButton  = new QPushButton("Apply");
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
+
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

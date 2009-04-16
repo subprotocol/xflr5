@@ -40,7 +40,6 @@ void XFoilAdvancedDlg::SetupLayout()
 	QLabel *lab1 = new QLabel("VAccel");
 	lab1->setAlignment(Qt::AlignRight);
 	m_pctrlVAccel = new FloatEdit;
-	m_pctrlVAccel->setMaximumWidth(70);
 	m_pctrlVAccel->setAlignment(Qt::AlignRight);
 	VAccelBox->addStretch(1);
 	VAccelBox->addWidget(lab1);
@@ -50,7 +49,6 @@ void XFoilAdvancedDlg::SetupLayout()
 	QLabel *lab2 = new QLabel("Iteration Limit");
 	lab2->setAlignment(Qt::AlignRight);
 	m_pctrlIterLimit = new QLineEdit;
-	m_pctrlIterLimit->setMaximumWidth(70);
 	m_pctrlIterLimit->setAlignment(Qt::AlignRight);
 	QValidator *IterValid = new QIntValidator(0, 100000000, this);
 	m_pctrlIterLimit->setValidator(IterValid);
@@ -63,8 +61,6 @@ void XFoilAdvancedDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	CancelButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);

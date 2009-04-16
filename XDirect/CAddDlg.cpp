@@ -53,9 +53,7 @@ void CAddDlg::SetupLayout()
 	m_pctrlAngTol = new FloatEdit;
 	m_pctrlFrom   = new FloatEdit;
 	m_pctrlTo     = new FloatEdit;
-	m_pctrlAngTol->setMaximumWidth(70);
-	m_pctrlFrom->setMaximumWidth(70);
-	m_pctrlTo->setMaximumWidth(70);
+
 	m_pctrlrb1 = new QRadioButton("Uniform");
 	m_pctrlrb2 = new QRadioButton("Arc Length");
 
@@ -79,9 +77,7 @@ void CAddDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("Accept"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	ApplyButton  = new QPushButton("Apply");
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
+
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

@@ -35,7 +35,11 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 	m_bAutoName = true;
 
 //	setMinimumHeight(400);
+	SetupLayout();
+}
 
+void FoilPolarDlg::SetupLayout()
+{
 	QVBoxLayout *Analysis = new QVBoxLayout;
 	QHBoxLayout *autoname = new QHBoxLayout;
 	m_rbAuto1 = new QRadioButton("Automatic");
@@ -66,15 +70,13 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 
 	QHBoxLayout *AeroData = new QHBoxLayout;
 	m_pctrlReLabel   = new QLabel("  Re =");
-	m_pctrlReLabel->setAlignment(Qt::AlignRight);
+	m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlMachLabel = new QLabel("Mach =");
-	m_pctrlMachLabel->setAlignment(Qt::AlignRight);
+	m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlReynolds = new FloatEdit();
-	m_pctrlReynolds->setFixedWidth(60);
-	m_pctrlReynolds->setAlignment(Qt::AlignRight);
+	m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlMach = new FloatEdit();
-	m_pctrlMach->setFixedWidth(60);
-	m_pctrlMach->setAlignment(Qt::AlignRight);
+	m_pctrlMach->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	AeroData->addWidget(m_pctrlReLabel);
 	AeroData->addWidget(m_pctrlReynolds);
 	AeroData->addWidget(m_pctrlMachLabel);
@@ -104,20 +106,18 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 	m_pctrlNCrit    = new FloatEdit();
 	m_pctrlTopTrans = new FloatEdit();
 	m_pctrlBotTrans = new FloatEdit();
-//	m_pctrlNCrit->setMaximumWidth(70);
-//	m_pctrlTopTrans->setMaximumWidth(70);
-//	m_pctrlBotTrans->setMaximumWidth(70);
+
 	m_pctrlNCrit->setAlignment(   Qt::AlignRight);
 	m_pctrlTopTrans->setAlignment(Qt::AlignRight);
 	m_pctrlBotTrans->setAlignment(Qt::AlignRight);
-	Transitions->addWidget(FreeTransLabel,   1,1, 1,1, Qt::AlignLeft);
-	Transitions->addWidget(ForceTransLabel,  2,1, 1,1, Qt::AlignLeft);
-	Transitions->addWidget(NCritLabel,       1,2, 1,1, Qt::AlignRight);
-	Transitions->addWidget(TopTripLabel,     2,2, 1,1, Qt::AlignRight);
-	Transitions->addWidget(BotTripLabel,     3,2, 1,1, Qt::AlignRight);
-	Transitions->addWidget(m_pctrlNCrit,     1,3, 1,1, Qt::AlignRight);
-	Transitions->addWidget(m_pctrlTopTrans,  2,3, 1,1, Qt::AlignRight);
-	Transitions->addWidget(m_pctrlBotTrans,  3,3, 1,1, Qt::AlignRight);
+	Transitions->addWidget(FreeTransLabel,   1,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
+	Transitions->addWidget(ForceTransLabel,  2,1, 1,1, Qt::AlignLeft| Qt::AlignVCenter);
+	Transitions->addWidget(NCritLabel,       1,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+	Transitions->addWidget(TopTripLabel,     2,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+	Transitions->addWidget(BotTripLabel,     3,2, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+	Transitions->addWidget(m_pctrlNCrit,     1,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+	Transitions->addWidget(m_pctrlTopTrans,  2,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
+	Transitions->addWidget(m_pctrlBotTrans,  3,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
 	QGroupBox *TransGroup = new QGroupBox("Transition settings");
 	TransGroup->setLayout(Transitions);
 
@@ -155,13 +155,13 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 	m_pctrlMach->SetMin(0.0);
 	m_pctrlMach->SetMax(1000.0);
 
-	connect(m_rbAuto1, SIGNAL(toggled(bool)), this, SLOT(OnAutoName()));
-	connect(m_rbAuto2, SIGNAL(toggled(bool)), this, SLOT(OnAutoName()));
+	connect(m_rbAuto1, SIGNAL(clicked()), this, SLOT(OnAutoName()));
+	connect(m_rbAuto2, SIGNAL(clicked()), this, SLOT(OnAutoName()));
 
-	connect(m_rbtype1, SIGNAL(toggled(bool)), this, SLOT(OnPolarType()));
-	connect(m_rbtype2, SIGNAL(toggled(bool)), this, SLOT(OnPolarType()));
-	connect(m_rbtype3, SIGNAL(toggled(bool)), this, SLOT(OnPolarType()));
-	connect(m_rbtype4, SIGNAL(toggled(bool)), this, SLOT(OnPolarType()));
+	connect(m_rbtype1, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype2, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype3, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype4, SIGNAL(clicked()), this, SLOT(OnPolarType()));
 
 	connect(m_pctrlReynolds, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
 	connect(m_pctrlMach, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
@@ -172,8 +172,8 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 
 void FoilPolarDlg::EditingFinished()
 {
-    SetPlrName();
-    OKButton->setFocus();
+	SetPlrName();
+//	OKButton->setFocus();
 }
 
 void FoilPolarDlg::InitDialog()
@@ -237,7 +237,7 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 				OKButton->setFocus();
 				return;
 			}
-			else
+			else if(OKButton->hasFocus())
 			{
 				QDialog::accept();
 				return;
@@ -248,7 +248,7 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 			QDialog::keyPressEvent(event);
 	}
 
-	QDialog::keyPressEvent(event);
+//	QDialog::keyPressEvent(event);
 }
 
 

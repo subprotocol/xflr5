@@ -471,10 +471,7 @@ void GraphDlg::SetLayout()
 	//________Scale Page______________________
 	QHBoxLayout *HScaleBox = new QHBoxLayout;
 
-	QGridLayout *Labels = new QGridLayout;
-	QLabel *Void0 = new QLabel("     ");
-	QLabel *Void1 = new QLabel("     ");
-	Void0->setMinimumWidth(90);
+	QVBoxLayout *Labels = new QVBoxLayout;
 	QLabel *MinLabel = new QLabel("Min");
 	QLabel *MaxLabel = new QLabel("Max");
 	QLabel *OriginLabel = new QLabel("Origin");
@@ -483,12 +480,11 @@ void GraphDlg::SetLayout()
 	MaxLabel->setAlignment(Qt::AlignRight);
 	OriginLabel->setAlignment(Qt::AlignRight);
 	UnitLabel->setAlignment(Qt::AlignRight);
-	Labels->addWidget(Void0,1,1);
-	Labels->addWidget(Void1,2,1);
-	Labels->addWidget(MinLabel,3,1);
-	Labels->addWidget(MaxLabel,4,1);
-	Labels->addWidget(OriginLabel,5,1);
-	Labels->addWidget(UnitLabel,6,1);
+	Labels->addStretch(1);
+	Labels->addWidget(MinLabel);
+	Labels->addWidget(MaxLabel);
+	Labels->addWidget(OriginLabel);
+	Labels->addWidget(UnitLabel);
 
 	QGridLayout *XData = new QGridLayout;
 	QLabel *Void2 = new QLabel("  ");
@@ -497,10 +493,7 @@ void GraphDlg::SetLayout()
 	m_pctrlXMax     = new FloatEdit;
 	m_pctrlXOrigin  = new FloatEdit;
 	m_pctrlXUnit    = new FloatEdit;
-	m_pctrlXMin->setMaximumWidth(60);
-	m_pctrlXMax->setMaximumWidth(60);
-	m_pctrlXOrigin->setMaximumWidth(60);
-	m_pctrlXUnit->setMaximumWidth(60);
+
 	XData->addWidget(Void2,1,1);
 	XData->addWidget(m_pctrlXAuto,2,1);
 	XData->addWidget(m_pctrlXMin,3,1);
@@ -517,10 +510,7 @@ void GraphDlg::SetLayout()
 	m_pctrlYMax      = new FloatEdit;
 	m_pctrlYOrigin   = new FloatEdit;
 	m_pctrlYUnit     = new FloatEdit;
-	m_pctrlYMin->setMaximumWidth(60);
-	m_pctrlYMax->setMaximumWidth(60);
-	m_pctrlYOrigin->setMaximumWidth(60);
-	m_pctrlYUnit->setMaximumWidth(60);
+
 	YData->addWidget(m_pctrlYInverted,1,1);
 	YData->addWidget(m_pctrlYAuto,2,1);
 	YData->addWidget(m_pctrlYMin,3,1);
@@ -554,8 +544,6 @@ void GraphDlg::SetLayout()
 
 	m_pctrlXMinorUnit = new FloatEdit;
 	m_pctrlYMinorUnit = new FloatEdit;
-	m_pctrlXMinorUnit->setMaximumWidth(70);
-	m_pctrlYMinorUnit->setMaximumWidth(70);
 
 	AxisData->addWidget(AxisStyleLabel,1,1);
 	AxisData->addWidget(m_pctrlXMajGridShow,2,1);

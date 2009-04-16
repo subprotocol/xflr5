@@ -54,7 +54,6 @@ void TEGapDlg::SetupLayout()
 	lab1->setMinimumWidth(150);
 	QLabel *lab2 = new QLabel("% chord");
 	m_pctrlGap = new FloatEdit;
-	m_pctrlGap->setMaximumWidth(70);
 	GapValue->addWidget(lab1);
 	GapValue->addWidget(m_pctrlGap);
 	GapValue->addWidget(lab2);
@@ -65,7 +64,6 @@ void TEGapDlg::SetupLayout()
 	lab3->setMinimumWidth(150);
 	QLabel *lab4 = new QLabel("% chord");
 	m_pctrlBlend = new FloatEdit;
-	m_pctrlBlend->setMaximumWidth(70);
 	BlendValue->addWidget(lab3);
 	BlendValue->addWidget(m_pctrlBlend);
 	BlendValue->addWidget(lab4);
@@ -74,9 +72,6 @@ void TEGapDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	ApplyButton  = new QPushButton("Apply");
-	OKButton->setMaximumWidth(70);
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

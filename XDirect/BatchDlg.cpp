@@ -109,16 +109,16 @@ void BatchDlg::SetLayout()
 	QLabel *MinVal   = new QLabel("Min");
 	QLabel *MaxVal   = new QLabel("Max");
 	QLabel *DeltaVal = new QLabel("Increment");
+	MinVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+	MaxVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+	DeltaVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	m_pctrlReType  = new QLabel("Reynolds=");
 	m_pctrlMaType  = new QLabel("Mach=");
 	m_pctrlReMin   = new FloatEdit("100 000",0);
 	m_pctrlReMax   = new FloatEdit("150 000",0);
 	m_pctrlReDelta = new FloatEdit("50 000",0);
-	m_pctrlReMin->setMaximumWidth(70);
-	m_pctrlReMax->setMaximumWidth(70);
-	m_pctrlReDelta->setMaximumWidth(70);
 	m_pctrlMach    = new FloatEdit("0.00");
-	m_pctrlMach->setMaximumWidth(70);
+
 	BatchVars->addWidget(m_rbRange1, 1, 2);
 	BatchVars->addWidget(m_rbRange2, 1, 3);
 	BatchVars->addWidget(m_pctrlEditList, 1, 4);
@@ -143,13 +143,13 @@ void BatchDlg::SetLayout()
 	QLabel *SpecMin   = new QLabel("Min");
 	QLabel *SpecMax   = new QLabel("Max");
 	QLabel *SpecDelta = new QLabel("Increment");
+	SpecMin->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+	SpecMax->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+	SpecDelta->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	m_pctrlSpecVar    = new QLabel("Spec =");
 	m_pctrlSpecMin    = new FloatEdit("0.00");
 	m_pctrlSpecMax    = new FloatEdit("1.00");
 	m_pctrlSpecDelta  = new FloatEdit("0.50");
-	m_pctrlSpecMin->setMaximumWidth(70);
-	m_pctrlSpecMax->setMaximumWidth(70);
-	m_pctrlSpecDelta->setMaximumWidth(70);
 	RangeVars->addWidget(Spec, 1, 1);
 	RangeVars->addWidget(m_rbspec1, 1, 2);
 	RangeVars->addWidget(m_rbspec2, 1, 3);
@@ -174,9 +174,6 @@ void BatchDlg::SetLayout()
 	m_pctrlNCrit   = new FloatEdit("9.00");
 	m_pctrlXTopTr = new FloatEdit("1.00");
 	m_pctrlXBotTr = new FloatEdit("1.00");
-	m_pctrlNCrit->setMaximumWidth(50);
-	m_pctrlXTopTr->setMaximumWidth(50);
-	m_pctrlXBotTr->setMaximumWidth(50);
 	TransVars->addWidget(FreeTransMethod, 1, 1);
 	TransVars->addWidget(NCritLabel, 1, 2);
 	TransVars->addWidget(m_pctrlNCrit, 1, 3);

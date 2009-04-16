@@ -86,7 +86,6 @@ void InterpolateFoilsDlg::SetupLayout()
 	m_pctrlSlider->setSliderPosition(100);
 	m_pctrlSlider->setTickInterval(10);
 	m_pctrlSlider->setTickPosition(QSlider::TicksLeft);
-	m_pctrlFrac->setMaximumWidth(50);
 	RightSide->addWidget(m_pctrlSlider);
 	RightSide->addWidget(m_pctrlFrac);
 	RightSide->addStretch(1);

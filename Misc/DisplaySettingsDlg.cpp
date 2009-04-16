@@ -53,9 +53,10 @@ void DisplaySettingsDlg::SetupLayout()
 
 	QRegExp regExp("Q(.*)Style");
 	QString defaultStyle = QApplication::style()->metaObject()->className();
-
 	if (defaultStyle == QLatin1String("QMacStyle"))
 		defaultStyle = QLatin1String("Macintosh (Aqua)");
+	else if (defaultStyle == QLatin1String("OxygenStyle"))
+		defaultStyle = QLatin1String("Oxygen");
 	else if (regExp.exactMatch(defaultStyle))
 		defaultStyle = regExp.cap(1);
 
@@ -162,8 +163,7 @@ void DisplaySettingsDlg::OnTextColor()
 	QRgb rgba = m_TextColor.rgba();
 	rgba = QColorDialog::getRgba(rgba, &bOK);
 	m_TextColor = QColor::fromRgba(rgba);
-	m_pctrlBackColor->SetColor(m_TextColor);
-
+	m_pctrlTextColor->SetColor(m_TextColor);
 }
 
 

@@ -56,13 +56,11 @@ void FoilGeomDlg::SetupLayout()
 	m_pctrlCamberSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlCamberSlide->setMinimumWidth(200);
 	m_pctrlCamber =new FloatEdit;
-	m_pctrlCamber->setMaximumWidth(70);
 	m_pctrlXCamberSlide = new QSlider;
 	m_pctrlXCamberSlide->setOrientation(Qt::Horizontal);
 	m_pctrlXCamberSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlXCamberSlide->setMinimumWidth(200);
 	m_pctrlXCamber = new FloatEdit;
-	m_pctrlXCamber->setMaximumWidth(70);
 	QLabel *lab1 = new QLabel("Value");
 	QLabel *lab2 = new QLabel("%Chord");
 	QLabel *lab3 = new QLabel("0%");
@@ -115,13 +113,11 @@ void FoilGeomDlg::SetupLayout()
 	m_pctrlThickSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlThickSlide->setMinimumWidth(200);
 	m_pctrlThickness =new FloatEdit;
-	m_pctrlThickness->setMaximumWidth(70);
 	m_pctrlXThickSlide = new QSlider;
 	m_pctrlXThickSlide->setOrientation(Qt::Horizontal);
 	m_pctrlXThickSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlXThickSlide->setMinimumWidth(200);
 	m_pctrlXThickness = new FloatEdit;
-	m_pctrlXThickness->setMaximumWidth(70);
 	QLabel *lab11 = new QLabel("Value");
 	QLabel *lab12 = new QLabel("%Chord");
 	QLabel *lab13 = new QLabel("0%");

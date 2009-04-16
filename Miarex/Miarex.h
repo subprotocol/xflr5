@@ -143,6 +143,7 @@ private slots:
 	void OnResetCurWPolar();
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
+	void OnDeleteUFOWPolars();
 	void OnAnimate();
 	void OnAnimateSingle();
 	void OnAnimateSpeed(int val);
@@ -150,6 +151,7 @@ private slots:
 	void OnInitLLTCalc();
 	void OnStoreWOpp();
 	void OnHalfWing();
+	void OnScaleWing();
 	void OnShowLift();
 	void OnShowIDrag();
 	void OnShowVDrag();
@@ -210,6 +212,7 @@ private:
 	void GLCreateStreamLines();
 	void GLCreateCp();
 	void GLCreateCpLegend();
+	void GLCreateWingLegend();
 	void GLCreateWOppLegend();
 	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List, int surf0);
 	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List);

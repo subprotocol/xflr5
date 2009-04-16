@@ -61,6 +61,7 @@ class MainFrame : public QMainWindow
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
+	friend class WingScaleDlg;
 
     Q_OBJECT
 
@@ -252,14 +253,14 @@ private:
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
 	QAction *twoWPlrGraphs, *allWPlrGraphs;
 	QAction  *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale, *allWPolarGraphsScalesAct, *allWingGraphsScalesAct;
-	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs;
+	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
 	QAction *defineWPolar, *defineCtrlPolar, *advancedSettings;
 	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
-	QAction *exporttoAVL, *resetWingScale;
+	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
 
 

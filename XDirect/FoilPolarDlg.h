@@ -41,6 +41,7 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void InitDialog();
     void SetPlrName();
+	void SetupLayout();
 
     void *m_pParent;
 

@@ -60,18 +60,11 @@ void TwoDPanelDlg::SetupLayout()
 	m_pctrlCVpar  = new FloatEdit;
 	m_pctrlCTErat = new FloatEdit;
 	m_pctrlCTRrat = new FloatEdit;
-	m_pctrlNPanels->setMaximumWidth(70);
-	m_pctrlCVpar->setMaximumWidth(70);
-	m_pctrlCTErat->setMaximumWidth(70);
-	m_pctrlCTRrat->setMaximumWidth(70);
 	m_pctrlXsRef1 = new FloatEdit;
 	m_pctrlXsRef2 = new FloatEdit;
 	m_pctrlXpRef1 = new FloatEdit;
 	m_pctrlXpRef2 = new FloatEdit;
-	m_pctrlXsRef1->setMaximumWidth(70);
-	m_pctrlXsRef2->setMaximumWidth(70);
-	m_pctrlXpRef1->setMaximumWidth(70);
-	m_pctrlXpRef2->setMaximumWidth(70);
+
 	InputData->addWidget(m_pctrlNPanels, 1, 2);
 	InputData->addWidget(m_pctrlCVpar,         2, 2);
 	InputData->addWidget(m_pctrlCTErat,        3, 2);
@@ -94,9 +87,6 @@ void TwoDPanelDlg::SetupLayout()
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
 	ApplyButton   = new QPushButton("Apply");
-	CancelButton->setMaximumWidth(70);
-	ApplyButton->setMaximumWidth(70);
-	OKButton->setMaximumWidth(70);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);

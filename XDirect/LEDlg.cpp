@@ -68,7 +68,6 @@ void LEDlg::SetupLayout()
 	QLabel *lab4 = new QLabel("% chord");
 	lab4->setMinimumWidth(80);
 	m_pctrlBlend = new FloatEdit;
-	m_pctrlBlend->setMaximumWidth(70);
 	BlendValue->addWidget(lab3);
 	BlendValue->addWidget(m_pctrlBlend);
 	BlendValue->addWidget(lab4);
