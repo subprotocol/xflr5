@@ -140,6 +140,36 @@ void TwoDPanelDlg::InitDialog()
 }
 
 
+void TwoDPanelDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			done(0);
+			return;
+		}
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OnApply();
+				OKButton->setFocus();
+				m_bApplied  = true;
+			}
+			else
+			{
+				event->ignore();
+			}
+			break;
+		}
+		default:
+			event->ignore();
+			break;
+	}
+}
+
 void TwoDPanelDlg::OnChanged()
 {
 	m_bApplied = false;
@@ -174,7 +204,7 @@ void TwoDPanelDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), "QFLR5", "Unrecognized foil format");
+		QMessageBox::information(this, "QFLR5", "Unrecognized foil format");
 		return;
 	}
 
@@ -184,7 +214,7 @@ void TwoDPanelDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(window(), "QFLR5", "Panel number cannot exceed 350");
+		QMessageBox::information(this, "QFLR5", "Panel number cannot exceed 350");
 		//reset everything and retry
 		for (int i=0; i< pMemFoil->nb; i++)
 		{
@@ -209,8 +239,8 @@ void TwoDPanelDlg::OnApply()
 	m_bModified = true;
 	if(pXDirect)    pXDirect->UpdateView();
 	else if(pAFoil) pAFoil->UpdateView();
-
 }
+
 
 void TwoDPanelDlg::OnOK()
 {

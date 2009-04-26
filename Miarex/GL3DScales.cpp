@@ -55,13 +55,16 @@ GL3DScales::GL3DScales(QWidget *parent)
 
 void GL3DScales::SetupLayout()
 {
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
+	setSizePolicy(szPolicyMinimum);
+
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
 
-	QSizePolicy szPolicyMinimum;
-	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
-	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 
 	QGridLayout *CpScaleLayout = new QGridLayout;
 	m_pctrlAutoCpScale = new QCheckBox("Auto Scales");
@@ -83,37 +86,40 @@ void GL3DScales::SetupLayout()
 
 //_______________________3D Scales
 
-	QGridLayout *ScaleLayout = new QGridLayout;
+	QVBoxLayout *SliderLayout = new QVBoxLayout;
 	m_pctrlLiftScaleSlider  = new QSlider(Qt::Horizontal);
 	m_pctrlLiftScaleSlider->setMinimum(0);
 	m_pctrlLiftScaleSlider->setMaximum(100);
 	m_pctrlLiftScaleSlider->setSliderPosition(50);
 	m_pctrlLiftScaleSlider->setTickInterval(5);
 	m_pctrlLiftScaleSlider->setTickPosition(QSlider::TicksBelow);
-	m_pctrlLiftScaleSlider->setSizePolicy(szPolicyMinimum);
 	m_pctrlDragScaleSlider = new QSlider(Qt::Horizontal);
 	m_pctrlDragScaleSlider->setMinimum(0);
 	m_pctrlDragScaleSlider->setMaximum(100);
 	m_pctrlDragScaleSlider->setSliderPosition(50);
 	m_pctrlDragScaleSlider->setTickInterval(5);
 	m_pctrlDragScaleSlider->setTickPosition(QSlider::TicksBelow);
-	m_pctrlDragScaleSlider->setSizePolicy(szPolicyMinimum);
 	m_pctrlVelocityScaleSlider  = new QSlider(Qt::Horizontal);
 	m_pctrlVelocityScaleSlider->setMinimum(0);
 	m_pctrlVelocityScaleSlider->setMaximum(100);
 	m_pctrlVelocityScaleSlider->setSliderPosition(50);
 	m_pctrlVelocityScaleSlider->setTickInterval(5);
 	m_pctrlVelocityScaleSlider->setTickPosition(QSlider::TicksBelow);
-	m_pctrlVelocityScaleSlider->setSizePolicy(szPolicyMinimum);
+	SliderLayout->addWidget(m_pctrlLiftScaleSlider);
+	SliderLayout->addWidget(m_pctrlDragScaleSlider);
+	SliderLayout->addWidget(m_pctrlVelocityScaleSlider);
+
+	QVBoxLayout *LabelLayout = new QVBoxLayout;
 	QLabel *lab2 = new QLabel("Lift ");
 	QLabel *lab3 = new QLabel("Drag ");
 	QLabel *lab4 = new QLabel("Velocity ");
-	ScaleLayout->addWidget(lab2,1,1);
-	ScaleLayout->addWidget(m_pctrlLiftScaleSlider,1,2);
-	ScaleLayout->addWidget(lab3,2,1);
-	ScaleLayout->addWidget(m_pctrlDragScaleSlider,2,2);
-	ScaleLayout->addWidget(lab4,3,1);
-	ScaleLayout->addWidget(m_pctrlVelocityScaleSlider,3,2);
+	LabelLayout->addWidget(lab2);
+	LabelLayout->addWidget(lab3);
+	LabelLayout->addWidget(lab4);
+
+	QHBoxLayout *ScaleLayout = new QHBoxLayout;
+	ScaleLayout->addLayout(LabelLayout);
+	ScaleLayout->addLayout(SliderLayout);
 	QGroupBox *ScaleBox = new QGroupBox("Vector Scales");
 	ScaleBox->setLayout(ScaleLayout);
 
@@ -128,7 +134,7 @@ void GL3DScales::SetupLayout()
 	m_pctrlLengthUnit2 = new QLabel("km");
 	m_pctrlLengthUnit3 = new QLabel("m");
 	m_pctrlLE = new QRadioButton("L.E.");
-	m_pctrlTE = new QRadioButton("L.E.");
+	m_pctrlTE = new QRadioButton("T.E.");
 	m_pctrlLine = new QRadioButton("Y-Line");
 	QLabel *lab5 = new QLabel("X-axis points");
 	QLabel *lab6 = new QLabel("1st segment");
@@ -149,19 +155,23 @@ void GL3DScales::SetupLayout()
 	LengthLayout->addWidget(m_pctrlLengthUnit1, 2, 3);
 	LengthLayout->addWidget(lab7, 3, 1);
 	LengthLayout->addWidget(m_pctrlXFactor, 3, 2);
-	QGroupBox *LengthBox = new QGroupBox("Streamline length params");
+	QGroupBox *LengthBox = new QGroupBox("Streamline length");
 	LengthBox->setLayout(LengthLayout);
 
-	QGridLayout *StartLayout = new QGridLayout;
-	StartLayout->addWidget(m_pctrlLE,1,1);
-	StartLayout->addWidget(m_pctrlTE,1,2);
-	StartLayout->addWidget(m_pctrlLine,1,3);
-	StartLayout->addWidget(lab8,2,1);
-	StartLayout->addWidget(m_pctrlXOffset,2,2);
-	StartLayout->addWidget(m_pctrlLengthUnit2,2,3);
-	StartLayout->addWidget(lab9,3,1);
-	StartLayout->addWidget(m_pctrlZOffset,3,2);
-	StartLayout->addWidget(m_pctrlLengthUnit3,3,3);
+	QHBoxLayout *LineLayout = new QHBoxLayout;
+	LineLayout->addWidget(m_pctrlLE);
+	LineLayout->addWidget(m_pctrlTE);
+	LineLayout->addWidget(m_pctrlLine);
+	QGridLayout *OffsetLayout = new QGridLayout;
+	OffsetLayout->addWidget(lab8,1,1);
+	OffsetLayout->addWidget(m_pctrlXOffset,1,2);
+	OffsetLayout->addWidget(m_pctrlLengthUnit2,1,3);
+	OffsetLayout->addWidget(lab9,2,1);
+	OffsetLayout->addWidget(m_pctrlZOffset,2,2);
+	OffsetLayout->addWidget(m_pctrlLengthUnit3,2,3);
+	QVBoxLayout *StartLayout = new QVBoxLayout;
+	StartLayout->addLayout(LineLayout);
+	StartLayout->addLayout(OffsetLayout);
 	QGroupBox *StartBox = new QGroupBox("Start Streamline at");
 	StartBox->setLayout(StartLayout);
 

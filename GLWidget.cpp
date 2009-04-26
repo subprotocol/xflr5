@@ -199,6 +199,11 @@ void GLWidget::resizeGL(int width, int height)
 	}
 }
 
+void GLWidget::RenderText(double const &x, double const &y, QString const &strong, QFont const &font, QColor const &color)
+{
+	glColor3d(color.redF(), color.greenF(), color.blueF());
+	renderText(x, y, strong, font);
+}
 
 
 

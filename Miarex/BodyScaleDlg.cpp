@@ -25,7 +25,6 @@
 #include <QVBoxLayout>
 #include <QDesktopWidget>
 #include <QLabel>
-#include <QPushButton>
 #include "../MainFrame.h"
 #include "../Globals.h"
 #include "../Objects/Wing.h"
@@ -113,8 +112,8 @@ void BodyScaleDlg::SetupLayout()
 	ScaleLayout->addWidget(m_pctrlZScaleFactor,4,2);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton      = new QPushButton(tr("OK"));
-	QPushButton *CancelButton  = new QPushButton(tr("Cancel"));
+	OKButton      = new QPushButton(tr("OK"));
+	CancelButton  = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);
@@ -148,6 +147,34 @@ void BodyScaleDlg::EnableControls()
 {
 
 }
+
+
+
+void BodyScaleDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OKButton->setFocus();
+				return;
+			}
+			else
+			{
+				OnOK();
+				return;
+			}
+			break;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+
 
 void BodyScaleDlg::OnRadio()
 {
@@ -183,6 +210,7 @@ void BodyScaleDlg::OnEditingFinished()
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	m_FrameID = m_pctrlFrameID->GetValue()-1;
 	pGL3dBodyDlg->m_pBody->m_iActiveFrame = m_FrameID;
+	pGL3dBodyDlg->m_pFrame = pGL3dBodyDlg->m_pBody->GetFrame(pGL3dBodyDlg->m_pBody->m_iActiveFrame);
 	pGL3dBodyDlg->m_bResetglBody2D = true;
 	pGL3dBodyDlg->UpdateView();
 

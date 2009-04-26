@@ -65,6 +65,10 @@ private slots:
 	void On3DReset();
 	void On3DPickCenter();
 	void OnBodyStyle();
+	void OnExportBodyDef();
+	void OnExportBodyGeom();
+	void OnImportBodyDef() ;
+	void OnTranslateBody();
 	void OnGrid();
 	void OnSetupLight();
 	void OnClipPlane(int pos);
@@ -72,20 +76,19 @@ private slots:
 	void OnSurfaces();
 	void OnOutline();
 	void OnPanels();
-	void OnVortices();
 	void OnLineType();
 	void OnInsert();
-//	void OnOK();
+	void OnResetScales();
+	void OnShowCurFrameOnly();
 	void reject();
 	void OnRemove();
 	void OnFrameCellChanged(QWidget *pWidget);
-	void OnFrameItemActivated(const QModelIndex &index);
 	void OnFrameItemClicked(const QModelIndex &index);
 	void OnPointCellChanged(QWidget *pWidget);
-	void OnPointItemActivated(const QModelIndex &index);
 	void OnPointItemClicked(const QModelIndex &index);
 	void OnScaleBody();
-
+	void OnUndo();
+	void OnRedo();
 
 
 private:
@@ -96,9 +99,9 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void resizeEvent(QResizeEvent *evendyt);
+	void ShowContextMenu(QContextMenuEvent * event);
 	void showEvent(QShowEvent *event);
 
-	void ShowContextMenu(QContextMenuEvent * event);
 	void FillFrameTableRow(int row);
 	void FillFrameDataTable();
 	void FillFrameCell(int iItem, int iSubItem);
@@ -108,6 +111,8 @@ private:
 	void FillPointTableRow(int row);
 	void FillPointDataTable();
 	void ReadPointSectionData(int sel);
+
+	void InitDialog();
 	void SetFrame(int iFrame);
 	void SetupLayout();
 	void ClientToGL(QPoint const &point, CVector &real);
@@ -153,8 +158,10 @@ private:
 
 	GLWidget *m_pglWidget;
 
-	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight, *m_pctrlGrid;
+	QWidget *m_pctrlControlsWidget;
+
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight;
 
 	QSlider *m_pctrlClipPlanePos;
 
@@ -163,12 +170,18 @@ private:
 	LineButton *m_pctrlBodyStyle;
 	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
+	QPushButton *MenuButton;
+	QMenu *BodyMenu;
 
 	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
 	QStandardItemModel *m_pFrameModel, *m_pPointModel;
 	BodyTableDelegate *m_pFrameDelegate, *m_pPointDelegate;
 
 	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
+	QAction *m_pShowCurFrameOnly, *m_pResetScales;
+	QAction *m_pUndo, *m_pRedo;
+	QAction *ExportBodyDef, *ImportBodyDef, *ExportBodyGeom, *TranslateBody, *m_pSetupLight;
+	QAction *m_pGrid;
 
 	QCursor m_hcArrow;
 	QCursor m_hcCross;
@@ -182,6 +195,7 @@ private:
 
 	bool m_bChanged;
 
+	QPoint m_MousePos;
 	QPoint m_ptPopUp;
 	CVector m_RealPopUp;
 
@@ -204,11 +218,8 @@ private:
 	bool m_bglLight;
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
-	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
 	bool m_bBodyOverlay;		//true if a foil should be overlayed on the body cross-section
-	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
-	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
 	bool m_bResetglBody2D;

@@ -186,14 +186,14 @@ bool XFoilAnalysisDlg::AlphaLoop()
 		{
 			if(m_bAlpha)
 			{
-				strange = QString("Alfa = %1 ........ ").arg( m_pXFoil->alfa*180.0/3.141592654,7,'f',2);
-				UpdateOutput(strange);
 				alfa = m_AlphaMin+ia*m_DeltaAlpha;
 				m_pXFoil->alfa = alfa*pi/180.0;
 				m_pXFoil->lalfa = true;
 				m_pXFoil->qinf = 1.0;
 				str = QString("\r\n\r\nAlpha = %1\r\n\r\n").arg(alfa,5,'f',2);
 				WriteString(str);
+				strange = QString("Alfa = %1 ........ ").arg(m_pXFoil->alfa*180.0/pi,7,'f',2);
+				UpdateOutput(strange);
 
 				// here we go !
 				if (!m_pXFoil->specal())
@@ -206,15 +206,16 @@ bool XFoilAnalysisDlg::AlphaLoop()
 			}
 			else
 			{
-				strange = QString("Cl = %1 ........ ").arg(m_pXFoil->clspec,7,'f',2);
-				UpdateOutput(strange);
-
 				m_pXFoil->lalfa = false;
 				m_pXFoil->alfa = 0.0;
 				m_pXFoil->qinf = 1.0;
 				m_pXFoil->clspec = m_ClMin+ia*m_DeltaCl;
 				str = QString("\r\n\r\nCl = %1\r\n\r\n").arg(m_pXFoil->clspec, 10,'f',3);
 				WriteString(str);
+
+				strange = QString("Cl = %1 ........ ").arg(m_pXFoil->clspec,7,'f',2);
+				UpdateOutput(strange);
+
 				if(!m_pXFoil->speccl())
 				{
 					str = "Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";

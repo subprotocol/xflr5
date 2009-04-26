@@ -62,8 +62,9 @@ class MainFrame : public QMainWindow
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
 	friend class WingScaleDlg;
+	friend class BodyTransDlg;
 
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	MainFrame(QWidget *parent = 0, Qt::WFlags flags = 0);
@@ -75,6 +76,7 @@ private slots:
 	void OnCurFoilStyle();
 	void OnDeleteCurPolar();
 	void OnGraphSettings();
+	void OnGuidelines();
 	void OnExportCurGraph();
 	void OnNewProject();
 	void OnLoadFile();
@@ -130,6 +132,7 @@ private:
 	void GLToClient(CVector const &real, QPoint &point);
 	void LoadSettings();
 	void RemoveOpPoint(bool bCurrent);
+	void SetCurrentFoil(CFoil* pFoil);
 	void SaveSettings();
 	bool SaveProject(QString PathName="");
 	void SetCentralWidget();
@@ -149,7 +152,7 @@ private:
 	int LoadXFLR5File(QString PathName);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring);
-	bool SerializeUFOProject(QDataStream &ar, bool bIsStoring);
+	bool SerializeUFOProject(QDataStream &ar);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool SelectFoil(CFoil *pFoil);
 	bool SelectPolar(CPolar *pPolar);
@@ -224,10 +227,10 @@ private:
 	//MainFrame actions
 	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct, *OnMixedInverseAct;
 	QAction *openAct, *styleAct;
-	QAction *saveAct, *saveProjectAsAct,*newProjectAct;
+	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct;
 	QAction *unitsAct;
 	QAction *exitAct;
-	QAction *aboutAct, *aboutQtAct;
+	QAction *aboutAct, *aboutQtAct, *guidelinesAct;
 	QAction *recentFileActs[MAXRECENTFILES];
 	QAction *separatorAct;
 	QAction *saveViewToImageFileAct;
@@ -246,14 +249,17 @@ private:
 	//Miarex Actions
 	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
-	QAction *renameCurUFO, *renameCurWPolar;
-	QAction *deleteCurUFO,*editCurWPolar,*exportCurWPolar, *resetCurWPolar,*deleteCurWPolar, *deleteCurWOpp;
+	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
+	QAction *renameCurWPolar, *editCurWPolar,*exportCurWPolar, *resetCurWPolar;
+	QAction *deleteCurWPolar, *deleteCurWOpp;
 	QAction *twoWingGraphs, *fourWingGraphs;
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
 	QAction *twoWPlrGraphs, *allWPlrGraphs;
 	QAction  *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale, *allWPolarGraphsScalesAct, *allWingGraphsScalesAct;
-	QAction *hideAllWPlrs, *showAllWPlrs, *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
+	QAction *hideAllWPlrs, *showAllWPlrs;
+	QAction *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
+	QAction *hideUFOWOpps, *showUFOWOpps, *deleteUFOWOpps;
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;

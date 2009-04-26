@@ -187,10 +187,9 @@ void XDirectStyleDlg::keyPressEvent(QKeyEvent *event)
 				accept();
 				return;
 			}
+			event->ignore();
 			break;
 		}
 	}
-
-	QDialog::keyPressEvent(event);
 }
 */

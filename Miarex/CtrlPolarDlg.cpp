@@ -312,10 +312,9 @@ void CtrlPolarDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
 	}
 
-	QDialog::keyPressEvent(event);
 }
 
 

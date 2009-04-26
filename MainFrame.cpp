@@ -133,6 +133,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_crColors[26] = QColor(130,130,130),
 	m_crColors[27] = QColor(170,170,170),
 	m_crColors[28] = QColor(210,210,210),
+	m_crColors[29] = QColor(255,255,255),
 
 	m_pCurFoil = NULL;
 
@@ -316,7 +317,7 @@ void MainFrame::AddRecentFile(const QString &PathName)
 
 void MainFrame::closeEvent (QCloseEvent * event)
 {
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 //	pMiarex->m_GL3dView.hide();
 //	pMiarex->m_GL3dView.close();
 
@@ -373,13 +374,13 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 		}
 		case DIRECTDESIGN:
 		{
-			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+//			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 			AFoilCtxMenu->exec(ScreenPt);
 			break;
 		}
 		case INVERSEDESIGN:
 		{
-			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+//			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 			InverseContextMenu->exec(ScreenPt);
 			break;
 		}
@@ -394,6 +395,11 @@ void MainFrame::CreateActions()
 	newProjectAct->setStatusTip(tr("Save and close the current project, create a new project"));
 	connect(newProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
 
+	closeProjectAct = new QAction(QIcon(":/images/new.png"), tr("Close the Project"), this);
+	closeProjectAct->setShortcut(tr("Ctrl+W"));
+	closeProjectAct->setStatusTip(tr("Save and close the current project"));
+	connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
+
 	openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
 	openAct->setShortcut(tr("Ctrl+O"));
 	openAct->setStatusTip(tr("Open an existing file"));
@@ -401,7 +407,7 @@ void MainFrame::CreateActions()
 
 	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
 	OnAFoilAct->setShortcut(tr("Ctrl+1"));
-	OnAFoilAct->setStatusTip(tr("Open Foil Deisgn application"));
+	OnAFoilAct->setStatusTip(tr("Open Foil Design application"));
 	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
 
 	OnXInverseAct = new QAction(tr("&XFoil Inverse Design"), this);
@@ -473,6 +479,10 @@ void MainFrame::CreateActions()
 	exitAct->setShortcut(tr("Ctrl+Q"));
 	exitAct->setStatusTip(tr("Exit the application"));
 	connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
+
+	guidelinesAct = new QAction(tr("&Guidelines"), this);
+	guidelinesAct->setStatusTip(tr("Show the guidelines for some help"));
+	connect(guidelinesAct, SIGNAL(triggered()), this, SLOT(OnGuidelines()));
 
 	aboutAct = new QAction(tr("&About"), this);
 	aboutAct->setStatusTip(tr("QFLR5"));
@@ -611,9 +621,6 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
 	AFoilDesignMenu = menuBar()->addMenu(tr("&Foil Design"));
-	AFoilDesignMenu->addAction(UndoAFoilAct);
-	AFoilDesignMenu->addAction(RedoAFoilAct);
-	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(AFoilNormalizeFoil);
 	AFoilDesignMenu->addAction(AFoilDerotateFoil);
 	AFoilDesignMenu->addAction(AFoilRefineLocalFoil);
@@ -628,6 +635,9 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addAction(AFoilNacaFoils);
 
 	AFoilSplineMenu = menuBar()->addMenu(tr("&Splines"));
+	AFoilSplineMenu->addAction(UndoAFoilAct);
+	AFoilSplineMenu->addAction(RedoAFoilAct);
+	AFoilSplineMenu->addSeparator();
 	AFoilSplineMenu->addAction(newSplinesAct);
 	AFoilSplineMenu->addAction(splineControlsAct);
 	AFoilSplineMenu->addAction(storeSplineAct);
@@ -769,11 +779,6 @@ void MainFrame::CreateDockWindows()
 	pMiarex->m_poaFoil   = &m_oaFoil;
 	pMiarex->m_poaPolar  = &m_oaPolar;
 
-	pAFoil->m_pMainFrame = this;
-	pAFoil->m_poaFoil    = &m_oaFoil;
-	pAFoil->m_p2DWidget = m_p2DWidget;
-	pAFoil->m_poaFoil   = &m_oaFoil;
-
 	pXDirect->m_pMainFrame             = this;
 	pXDirect->m_p2DWidget              = m_p2DWidget;
 	pXDirect->m_pCpGraph->m_pParent    = m_p2DWidget;
@@ -785,6 +790,12 @@ void MainFrame::CreateDockWindows()
 	pXDirect->m_poaFoil  = &m_oaFoil;
 	pXDirect->m_poaPolar = &m_oaPolar;
 	pXDirect->m_poaOpp   = &m_oaOpp;
+
+	pAFoil->m_pMainFrame = this;
+	pAFoil->m_poaFoil    = &m_oaFoil;
+	pAFoil->m_p2DWidget  = m_p2DWidget;
+	pAFoil->m_poaFoil    = &m_oaFoil;
+	pAFoil->m_pXFoil     = pXDirect->m_pXFoil;
 
 	pXInverse->m_pMainFrame       = this;
 	pXInverse->m_pXFoil           = pXDirect->m_pXFoil;
@@ -840,6 +851,7 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(openAct);
 	fileMenu->addAction(saveAct);
 	fileMenu->addAction(saveProjectAsAct);
+	fileMenu->addAction(closeProjectAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(OnAFoilAct);
 	fileMenu->addAction(OnXInverseAct);
@@ -853,6 +865,7 @@ void MainFrame::CreateMenus()
 	updateRecentFileActions();
 
 	helpMenu = menuBar()->addMenu(tr("&Help"));
+	helpMenu->addAction(guidelinesAct);
 	helpMenu->addAction(aboutAct);
 	helpMenu->addAction(aboutQtAct);
 
@@ -872,21 +885,25 @@ void MainFrame::CreateMiarexActions()
 	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint view"), this);
 	WOppAct->setCheckable(true);
 	WOppAct->setStatusTip(tr("Show Operating point view"));
+	WOppAct->setShortcut(tr("F5"));
 	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
 
 	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
 	WPolarAct->setCheckable(true);
 	WPolarAct->setStatusTip(tr("Show Polar view"));
+	WPolarAct->setShortcut(tr("F8"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D view"), this);
 	W3DAct->setCheckable(true);
 	W3DAct->setStatusTip(tr("Show 3D view"));
+	W3DAct->setShortcut(tr("F4"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
 	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("CpView view"), this);
 	CpViewAct->setCheckable(true);
 	CpViewAct->setStatusTip(tr("Show Cp view"));
+	CpViewAct->setShortcut(tr("F9"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
 	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
@@ -979,15 +996,13 @@ void MainFrame::CreateMiarexActions()
 	showWing2Curve->setCheckable(true);
 	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
-	defineWPolar = new QAction(tr("Define Analysis"), this);
+	defineWPolar = new QAction(tr("Define an Analysis"), this);
+	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
 	defineCtrlPolar = new QAction(tr("Define a Control Analysis"), this);
+	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
-
-
-	defineWPolar = new QAction(tr("Define Analysis"), this);
-	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
 	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
 	twoWingGraphs->setCheckable(true);
@@ -1054,11 +1069,21 @@ void MainFrame::CreateMiarexActions()
 	showAllWPlrs = new QAction(tr("Show All Polars"), this);
 	connect(showAllWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWPolars()));
 
+	hideUFOWOpps = new QAction(tr("Hide Associated OpPoints"), this);
+	connect(hideUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWOpps()));
+	showUFOWOpps = new QAction(tr("Show Associated OpPoints"), this);
+	connect(showUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWOpps()));
+	deleteUFOWOpps = new QAction(tr("Delete Associated OpPoints"), this);
+	connect(deleteUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWOpps()));
+
 	renameCurUFO = new QAction(tr("Rename..."), this);
 	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
 
 	deleteCurUFO = new QAction(tr("Delete..."), this);
 	connect(deleteCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurUFO()));
+
+	duplicateCurUFO = new QAction(tr("Duplicate..."), this);
+	connect(duplicateCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnDuplicateCurUFO()));
 
 	SaveUFOAsProject = new QAction(tr("Save as Project..."), this);
 	connect(SaveUFOAsProject, SIGNAL(triggered()), this, SLOT(OnSaveUFOAsProject()));
@@ -1104,6 +1129,7 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu = UFOMenu->addMenu("Current UFO");
 	currentUFOMenu->addAction(EditUFOAct);
 	currentUFOMenu->addAction(renameCurUFO);
+	currentUFOMenu->addAction(duplicateCurUFO);
 	currentUFOMenu->addAction(deleteCurUFO);
 	currentUFOMenu->addAction(SaveUFOAsProject);
 	currentUFOMenu->addSeparator();
@@ -1114,6 +1140,10 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addAction(hideUFOWPlrs);
 	currentUFOMenu->addAction(showUFOWPlrs);
 	currentUFOMenu->addAction(deleteUFOWPlrs);
+	currentUFOMenu->addSeparator();
+	currentUFOMenu->addAction(hideUFOWOpps);
+	currentUFOMenu->addAction(showUFOWOpps);
+	currentUFOMenu->addAction(deleteUFOWOpps);
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(resetWingScale);
 
@@ -2180,7 +2210,7 @@ void MainFrame::DeleteProject()
 		pMiarex->SetUFO();
 		pMiarex->CreateWPolarCurves();
 		pMiarex->CreateWOppCurves();
-//		pMiarex->CreateCpCurves();
+		pMiarex->CreateCpCurves();
 //		pMiarex->SetBody();
 	}
 	else if (m_iApp==XFOILANALYSIS)
@@ -2189,16 +2219,17 @@ void MainFrame::DeleteProject()
 		if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
 		else                   pXDirect->CreateOppCurves();
 	}
-
-/*	m_AFoilCtrlBar.m_pRefFoil = NULL;
-	if(m_iApp==DIRECTDESIGN)
+	else if (m_iApp==DIRECTDESIGN)
 	{
-		m_AFoilCtrlBar.FillFoilList();
-		m_AFoilCtrlBar.SelectFoil();
+		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+		pAFoil->FillFoilTable();
+		pAFoil->SelectFoil();
 	}
-
-	XInverse.Clear();*/
-
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		QXInverse *pXInverse =(QXInverse*)m_pXInverse;
+		pXInverse->Clear();
+	}
 	SetProjectName("");
 	SetSaveState(true);
 }
@@ -2672,7 +2703,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100521)
+	if(k !=100525)
 	{
 		pXFile->close();
 		return;
@@ -2765,7 +2796,9 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				pXDirect->m_pCurOpp   = NULL;
 				m_pCurFoil = pXDirect->SetFoil(pFoil);
 				pXDirect->SetPolar();
-//				AFoil.SetFoils(m_pCurFoil);
+				QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+				pAFoil->SetFoil(pFoil);
+				pAFoil->SelectFoil(pFoil);
 				XFile.close();
 				SetSaveState(false);
 				AddRecentFile(PathName);
@@ -2962,6 +2995,13 @@ void MainFrame::OnGraphSettings()
 }
 
 
+void MainFrame::OnGuidelines()
+{
+	QString FileName = qApp->applicationDirPath() + "/Guidelines.pdf" ;
+	QDesktopServices::openUrl(FileName);
+}
+
+
 void MainFrame::OnNewProject()
 {
 	if(!m_bSaved)
@@ -3079,6 +3119,7 @@ void MainFrame::OnMiarex()
 	m_pctrlMiarexWidget->show();
 	pMiarex->SetControls();
 	pMiarex->SetUFO();
+	pMiarex->m_bArcball = false;
 	UpdateUFOs();
 	SetMenus();
 	SetCentralWidget();
@@ -3304,9 +3345,60 @@ void MainFrame::OnRestoreToolbars()
 {
 	if(m_iApp==XFOILANALYSIS)
 	{
-		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-		pXDirect->setVisible(!pXDirect->isVisible());
+		m_pctrlXInverseToolBar->hide();
+		m_pctrlAFoilToolBar->hide();
+		m_pctrlMiarexToolBar->hide();
+		m_pctrl3DScalesWidget->hide();
+
+		m_pctrlAFoilWidget->hide();
+		m_pctrlXInverseWidget->hide();
+		m_pctrlMiarexWidget->hide();
+
+		m_pctrlXDirectToolBar->show();
+		m_pctrlXDirectWidget->show();
 	}
+	else if(m_iApp==DIRECTDESIGN)
+	{
+		m_pctrlXInverseToolBar->hide();
+		m_pctrlMiarexToolBar->hide();
+		m_pctrlXDirectToolBar->hide();
+		m_pctrl3DScalesWidget->hide();
+
+		m_pctrlXDirectWidget->hide();
+		m_pctrlXInverseWidget->hide();
+		m_pctrlMiarexWidget->hide();
+
+		m_pctrlAFoilToolBar->show();
+		m_pctrlAFoilWidget->show();
+	}
+	else if(m_iApp==INVERSEDESIGN)
+	{
+		m_pctrlAFoilToolBar->hide();
+		m_pctrlMiarexToolBar->hide();
+		m_pctrlXDirectToolBar->hide();
+		m_pctrl3DScalesWidget->hide();
+
+		m_pctrlAFoilWidget->hide();
+		m_pctrlXDirectWidget->hide();
+		m_pctrlMiarexWidget->hide();
+
+		m_pctrlXInverseToolBar->show();
+		m_pctrlXInverseWidget->show();
+	}
+	else if(m_iApp==MIAREX)
+	{
+		m_pctrlXInverseToolBar->hide();
+		m_pctrlAFoilToolBar->hide();
+		m_pctrlXDirectToolBar->hide();
+		m_pctrl3DScalesWidget->hide();
+
+		m_pctrlAFoilWidget->hide();
+		m_pctrlXDirectWidget->hide();
+		m_pctrlXInverseWidget->hide();
+		m_pctrlMiarexWidget->show();
+		m_pctrlMiarexToolBar->show();
+	}
+
 }
 
 void MainFrame::OnSaveProject()
@@ -3375,7 +3467,7 @@ void MainFrame::OnSaveUFOAsProject()
 
 	QDataStream ar(&fp);
 	ar.setByteOrder(QDataStream::LittleEndian);
-	SerializeUFOProject(ar, true);
+	SerializeUFOProject(ar);
 	m_FileName = PathName;
 	fp.close();
 
@@ -3386,23 +3478,6 @@ void MainFrame::OnSaveViewToImageFile()
 	QSize sz(m_p2DWidget->geometry().width(), m_p2DWidget->geometry().height());
 	QImage img(sz, QImage::Format_RGB32);
 	QPainter painter(&img);
-
-	switch(m_iApp)
-	{
-		case XFOILANALYSIS:
-		{
-			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-			pXDirect->PaintView(painter);
-			break;
-		}
-		case DIRECTDESIGN:
-		{
-			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
-			pAFoil->PaintView(painter);
-			break;
-		}
-	}
-
 	QString FileName;
 	QString Filter;
 	switch(m_ImageFormat)
@@ -3428,10 +3503,59 @@ void MainFrame::OnSaveViewToImageFile()
 											m_LastDirName,
 											"Windows Bitmap (*.bmp);;JPEG (*.jpg);;Portable Network Graphics (*.png)",
 											&Filter);
+	if(Filter == "Windows Bitmap (*.bmp)")
+	{
+		if(FileName.right(4)!=".bmp") FileName+= ".bmp";
+		m_ImageFormat = 0;
+	}
+	else if(Filter == "JPEG (*.jpg)")
+	{
+		if(FileName.right(4)!=".jpg") FileName+= ".jpg";
+		m_ImageFormat = 1;
+	}
+	else if(Filter == "Portable Network Graphics (*.png)")
+	{
+		if(FileName.right(4)!=".png") FileName+= ".png";
+		m_ImageFormat = 2;
+	}
+
+
+	switch(m_iApp)
+	{
+		case XFOILANALYSIS:
+		{
+			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+			pXDirect->PaintView(painter);
+			break;
+		}
+		case DIRECTDESIGN:
+		{
+			QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+			pAFoil->PaintView(painter);
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+			pXInverse->PaintView(painter);
+			break;
+		}
+		case MIAREX:
+		{
+			QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+			if(pMiarex->m_iView==3)
+			{
+				pMiarex->SnapClient(FileName, m_ImageFormat);
+				return;
+			}
+			else pMiarex->PaintView(painter);
+			break;
+		}
+	}
+
+
 	img.save(FileName);
-	if(Filter == "Windows Bitmap (*.bmp)")                 m_ImageFormat = 0;
-	else if(Filter == "JPEG (*.jpg)")                      m_ImageFormat = 1;
-	else if(Filter == "Portable Network Graphics (*.png)") m_ImageFormat = 2;
+
 /*
 BMP	Windows Bitmap	Read/write
 GIF	Graphic Interchange Format (optional)	Read
@@ -3495,7 +3619,7 @@ void MainFrame::OnSelChangeWOpp(int i)
 	{
 		pMiarex->m_pCurWOpp = NULL;
 		if (pMiarex->m_iView==1)     pMiarex->CreateWOppCurves();
-//		else if(pMiarex->m_iView==4) pMiarex->CreateCpCurves();
+		else if(pMiarex->m_iView==4) pMiarex->CreateCpCurves();
 		pMiarex->UpdateView();
 		return;
 	}
@@ -3599,7 +3723,7 @@ void MainFrame::OnStyle()
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
+//	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 
 	QGraph m_RefGraph;//which setttings ?
 
@@ -4103,7 +4227,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100521;
+	ar << 100525;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -4216,7 +4340,7 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
     return false;
 }
 
-bool MainFrame::SerializeUFOProject(QDataStream &ar, bool bIsStoring)
+bool MainFrame::SerializeUFOProject(QDataStream &ar)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	if(!pMiarex->m_pCurWing)
@@ -4892,6 +5016,15 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 	}
 }
 
+
+void MainFrame::SetCurrentFoil(CFoil* pFoil)
+{
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil   *pAFoil = (QAFoil*)m_pAFoil;
+	pXDirect->SetFoil(pFoil);
+	pAFoil->SetFoil(pFoil);
+	m_pCurFoil = pFoil;
+}
 
 void MainFrame::SetMenus()
 {

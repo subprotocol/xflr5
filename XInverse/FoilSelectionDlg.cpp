@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	ImportWingDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	FoilSelectionDlg Classes
+		Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,41 +20,29 @@
 *****************************************************************************/
 
 #include <QVBoxLayout>
-#include <QDesktopWidget>
-#include <QLabel>
+#include <QHBoxLayout>
 #include <QPushButton>
-#include "../Objects/Wing.h"
-#include "ImportWingDlg.h"
+#include "../Objects/Foil.h"
+#include "FoilSelectionDlg.h"
 
-ImportWingDlg::ImportWingDlg()
+FoilSelectionDlg::FoilSelectionDlg()
 {
+	m_poaFoil = NULL;
+	m_FoilName = "";
 	SetupLayout();
 }
 
-void ImportWingDlg::InitDialog()
-{
-	CWing *pWing;
-	for(int i=0;i<m_poaWing->size(); i++)
-	{
-		pWing = (CWing*)m_poaWing->at(i);
-		m_pctrlNameList->addItem(pWing->m_WingName);
-	}
-}
 
-void ImportWingDlg::SetupLayout()
-{
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/3);
-	move(r.width()/3, r.height()/6);
 
+
+void FoilSelectionDlg::SetupLayout()
+{
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-
-	QLabel *lab = new QLabel("Select the wing to import");
 
 	m_pctrlNameList = new QListWidget;
 	m_pctrlNameList->setMinimumHeight(300);
-	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnOK()));
+	connect(m_pctrlNameList, SIGNAL(itemClicked(QListWidgetItem *)),       this, SLOT(OnSelChangeList(QListWidgetItem *)));
+	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnDoubleClickList(QListWidgetItem *)));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("OK"));
@@ -70,7 +58,6 @@ void ImportWingDlg::SetupLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	MainLayout->addStretch(1);
-	MainLayout->addWidget(lab);
 	MainLayout->addWidget(m_pctrlNameList);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
@@ -79,12 +66,31 @@ void ImportWingDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
-
-
-void ImportWingDlg::OnOK()
+void FoilSelectionDlg::OnOK()
 {
 	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
-	m_WingName = pItem->text();
-	QDialog::accept();
+	m_FoilName = pItem->text();
+	accept();
 }
 
+void FoilSelectionDlg::OnSelChangeList(QListWidgetItem *pItem)
+{
+	m_FoilName = pItem->text();
+}
+
+
+void FoilSelectionDlg::OnDoubleClickList(QListWidgetItem *pItem)
+{
+	OnOK();
+}
+
+void FoilSelectionDlg::InitDialog()
+{
+	if(!m_poaFoil) return;
+	CFoil *pFoil;
+	for (int i=0; i<m_poaFoil->size(); i++)
+	{
+		pFoil = (CFoil*)m_poaFoil->at(i);
+		m_pctrlNameList->addItem(pFoil->m_FoilName);
+	}
+}

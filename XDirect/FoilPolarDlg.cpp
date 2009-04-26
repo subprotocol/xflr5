@@ -245,10 +245,8 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
 	}
-
-//	QDialog::keyPressEvent(event);
 }
 
 

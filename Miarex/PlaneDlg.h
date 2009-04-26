@@ -43,8 +43,8 @@ public:
 
 private slots:
 	void OnOK();
-	void OnFin(int state);
-	void OnStab(int state);
+	void OnFin();
+	void OnStab();
 	void OnBodyCheck();
 	void OnDefineWing();
 	void OnDefineFin();
@@ -52,8 +52,8 @@ private slots:
 	void OnChanged();
 	void OnImportWing();
 	void OnPlaneName();
-	void OnSymFin(int state);
-	void OnDoubleFin(int state);
+	void OnSymFin();
+	void OnDoubleFin();
 	void OnExportWing();
 	void OnBiplane();
 	void OnDefineWing2();
@@ -68,6 +68,7 @@ private:
 	void SetResults();
 	void ReadParams();
 	void SetParams();
+	void keyPressEvent(QKeyEvent *event);
 
 private:
 	static QList <void*> *s_poaWing;

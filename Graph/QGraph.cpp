@@ -103,7 +103,6 @@ QGraph::QGraph()
 QGraph::~QGraph()
 {
 	DeleteCurves();
-//qDebug() << "Destroyed ~QGraph";
 }
 
 

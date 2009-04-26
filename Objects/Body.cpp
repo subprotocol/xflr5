@@ -43,19 +43,21 @@ CBody::CBody()
 	pi = 3.141592654;
 	m_BodyName = "BodyName";
 
-	m_BodyColor = QColor(255,200,200);
+	m_BodyColor = QColor(100,130,200);
 	m_BodyStyle = 0;
 	m_BodyWidth = 1;
 
 	m_FramePosition[0].Set( -0.1,  0.0,  0.0);
 	m_FramePosition[1].Set( -0.07, 0.0,  0.0);
-	m_FramePosition[2].Set(  0.1,  0.0,  0.0);
-	m_FramePosition[3].Set(  0.6,  0.0,  0.0);
+	m_FramePosition[2].Set(  0.03,  0.0,  0.0);
+	m_FramePosition[3].Set(  0.07, 0.0,  0.0);
+	m_FramePosition[4].Set(  0.55,  0.0,  0.0);
+	m_FramePosition[5].Set(  0.6,  0.0,  0.0);
 
 	m_bLocked        = false;
 	m_bClosedSurface = false;
 
-	m_NStations  = 4;
+	m_NStations  = 6;
 	m_NSideLines = 5;
 
 	m_iActiveFrame =  1;
@@ -84,6 +86,24 @@ CBody::CBody()
 	m_Frame[0].m_Point[2].Set(0.,0.0,0.0);
 	m_Frame[0].m_Point[3].Set(0.,0.0,0.0);
 	m_Frame[0].m_Point[4].Set(0.,0.0,0.0);
+
+	m_Frame[1].m_Point[0].Set(0.,0.000,  0.008);
+	m_Frame[1].m_Point[1].Set(0.,0.005,  0.005);
+	m_Frame[1].m_Point[2].Set(0.,0.006,  0.000);
+	m_Frame[1].m_Point[3].Set(0.,0.005, -0.005);
+	m_Frame[1].m_Point[4].Set(0.,0.000, -0.008);
+
+	m_Frame[3].m_Point[0].Set(0.,0.000,  0.020);
+	m_Frame[3].m_Point[1].Set(0.,0.010,  0.015);
+	m_Frame[3].m_Point[2].Set(0.,0.015,  0.000);
+	m_Frame[3].m_Point[3].Set(0.,0.010, -0.015);
+	m_Frame[3].m_Point[4].Set(0.,0.000, -0.020);
+
+	m_Frame[4].m_Point[0].Set(0.,0.000,  0.005);
+	m_Frame[4].m_Point[1].Set(0.,0.003,  0.005);
+	m_Frame[4].m_Point[2].Set(0.,0.005,  0.000);
+	m_Frame[4].m_Point[3].Set(0.,0.003, -0.005);
+	m_Frame[4].m_Point[4].Set(0.,0.000, -0.005);
 
 	m_Frame[m_NStations-1].m_Point[0].Set(0.,0.0,0.0);
 	m_Frame[m_NStations-1].m_Point[1].Set(0.,0.0,0.0);
@@ -172,6 +192,167 @@ void CBody::Duplicate(CBody *pBody)
 	}
 
 	SetKnots();
+}
+
+
+bool CBody::ExportDefinition()
+{
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	int i, j;
+	QString strong,  FileName, DestFileName, OutString;
+	QFile DestFile;
+
+	FileName = m_BodyName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Definition",
+											pMainFrame->m_LastDirName,
+											"Text Format (*.txt)");
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+
+	QTextStream out(&XFile);
+
+	out << (m_BodyName+"\n\n");
+	out << ("BODYTYPE\n");
+	if(m_LineType==1) out << ("1        # Flat Panels\n\n");
+	if(m_LineType==2) out << ("2        # B-Splines\n\n");
+
+	out << ("OFFSET\n");
+	out << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
+
+	for(i=0; i<m_NStations; i++)
+	{
+		out << ("FRAME\n\n");
+		for(j=0;j<m_NSideLines; j++)
+		{
+			strong = QString("%1     %2    %3\n")
+					 .arg(m_FramePosition[i].x    * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_Frame[i].m_Point[j].y * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_Frame[i].m_Point[j].z * pMainFrame->m_mtoUnit,14,'f',7);
+			out << (strong);
+		}
+		out << ("\n");
+	}
+
+	XFile.close();
+	return true;
+
+}
+
+
+void CBody::ExportGeometry(int nx, int nh)
+{
+	QString Header, strong, LengthUnit,str, FileName, DestFileName, OutString;
+	int j,k,l;
+	double u, v;
+	CVector Point;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+
+	FileName = m_BodyName;
+	FileName.replace("/", " ");
+
+	int type = 1;
+
+	QString filter =".csv";
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Polar",
+											pMainFrame->m_LastDirName ,
+											"Text File (*.txt; *.csv)",
+											&filter);
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) type = 2;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+	if(type==1)	str="";
+	else		str=", ";
+
+	out  << (m_BodyName);
+	out  << ("\n\n");
+
+	if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_NStations,3);
+	strong +="       // Number of frame stations\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_NSideLines,3);
+	strong +="       // Number of sidelines\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_nxDegree,3);
+	strong +="       // Spline degree - axial direction\n";
+	out  << (strong);
+
+	strong = QString("%1"+str).arg(m_nhDegree,3);
+	strong +="       // Spline degree - hoop direction\n";
+	out  << (strong);
+	out  << ("\n\n");
+
+	out  << ("Control Points\n");
+	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+	out  << (strong);
+
+	for (j=0; j<m_NStations; j++)
+	{
+		strong = QString("  Frame "+str+"%1\n").arg(j+1);
+		out  << (strong);
+		for (k=0; k<m_NSideLines; k++)
+		{
+			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
+					 .arg(m_FramePosition[j].x * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit,10,'f',3);
+			out  << (strong);
+		}
+		out  << ("\n");
+	}
+
+	out  << ("\n\n");
+	out  << ("Right Surface Points\n");
+	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
+	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
+	out  << (strong);
+
+	for (k=0; k<nx; k++)
+	{
+		strong = QString("  Cross Section "+str+"%1\n").arg(k+1,3);
+		out  << (strong);
+
+		u = (double)k / (double)(nx-1);
+
+		for (l=0; l<nh; l++)
+		{
+			v = (double)l / (double)(nh-1);
+			GetPoint(u,  v, true, Point);
+
+			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
+					 .arg(Point.x * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(Point.y * pMainFrame->m_mtoUnit,10,'f',3)
+					 .arg(Point.z * pMainFrame->m_mtoUnit,10,'f',3);
+			out  << (strong);
+		}
+		out  << ("\n");
+	}
+
+	out  << ("\n\n");
 }
 
 
@@ -289,115 +470,6 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 	Pt = V;
 }
 
-
-void CBody::ExportGeometry(int nx, int nh)
-{
-	QString Header, strong, LengthUnit,str, FileName, DestFileName, OutString;
-	int j,k,l;
-	double u, v;
-	CVector Point;
-
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
-
-	FileName = m_BodyName;
-	FileName.replace("/", " ");
-
-	int type = 1;
-
-	QString filter =".csv";
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Polar",
-											pMainFrame->m_LastDirName ,
-											"Text File (*.txt; *.csv)",
-											&filter);
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
-
-	QTextStream out(&XFile);
-
-	if(type==1)	str="";
-	else		str=", ";
-
-	out  << (m_BodyName);
-	out  << ("\n\n");
-
-	if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_NStations,3);
-	strong +="       // Number of frame stations\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_NSideLines,3);
-	strong +="       // Number of sidelines\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_nxDegree,3);
-	strong +="       // Spline degree - axial direction\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_nhDegree,3);
-	strong +="       // Spline degree - hoop direction\n";
-	out  << (strong);
-	out  << ("\n\n");
-
-	out  << ("Control Points\n");
-	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
-	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-	out  << (strong);
-
-	for (j=0; j<m_NStations; j++)
-	{
-		strong = QString("  Frame "+str+"%1\n").arg(j+1);
-		out  << (strong);
-		for (k=0; k<m_NSideLines; k++)
-		{
-			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
-					 .arg(m_FramePosition[j].x * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit,10,'f',3);
-			out  << (strong);
-		}
-		out  << ("\n");
-	}
-
-	out  << ("\n\n");
-	out  << ("Right Surface Points\n");
-	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
-	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-	out  << (strong);
-
-	for (k=0; k<nx; k++)
-	{
-		strong = QString("  Cross Section "+str+"%1\n").arg(k+1,3);
-		out  << (strong);
-
-		u = (double)k / (double)(nx-1);
-
-		for (l=0; l<nh; l++)
-		{
-			v = (double)l / (double)(nh-1);
-			GetPoint(u,  v, true, Point);
-
-			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
-					 .arg(Point.x * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(Point.y * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(Point.z * pMainFrame->m_mtoUnit,10,'f',3);
-			out  << (strong);
-		}
-		out  << ("\n");
-	}
-
-	out  << ("\n\n");
-}
 
 /*
 bool CBody::SetModified()
@@ -975,58 +1047,6 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
 	}
 	if(bIntersect) I = P;
 	return bIntersect;
-}
-
-
-
-bool CBody::ExportDefinition()
-{
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	int i, j;
-	QString strong,  FileName, DestFileName, OutString;
-	QFile DestFile;
-
-	FileName = m_BodyName;
-	FileName.replace("/", " ");
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Definition",
-											pMainFrame->m_LastDirName,
-											"Text Format (*.txt)");
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
-
-	QTextStream out(&XFile);
-
-	out << (m_BodyName+"\n\n");
-	out << ("BODYTYPE\n");
-	if(m_LineType==1) out << ("1        # Flat Panels\n\n");
-	if(m_LineType==2) out << ("2        # B-Splines\n\n");
-
-	out << ("OFFSET\n");
-	out << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
-
-	for(i=0; i<m_NStations; i++)
-	{
-		out << ("FRAME\n\n");
-		for(j=0;j<m_NSideLines; j++)
-		{
-			strong = QString("%1     %2    %3\n")
-					 .arg(m_FramePosition[i].x    * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_Frame[i].m_Point[j].y * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_Frame[i].m_Point[j].z * pMainFrame->m_mtoUnit,14,'f',7);
-			out << (strong);
-		}
-		out << ("\n");
-	}
-
-	XFile.close();
-	return true;
-
 }
 
 

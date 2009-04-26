@@ -76,7 +76,6 @@ void CpScaleDlg::SetupLayout()
 void CpScaleDlg::InitDialog()
 {
 	m_pctrlAutoCpScale->setChecked(m_bAutoCpScale);
-qDebug() << m_LegendMin << m_LegendMax;
 	m_pctrlLegendMin->SetValue(m_LegendMin);
 	m_pctrlLegendMax->SetValue(m_LegendMax);
 	m_pctrlLegendMin->setEnabled(!m_bAutoCpScale);

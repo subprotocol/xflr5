@@ -49,6 +49,7 @@ VLMAnalysisDlg::VLMAnalysisDlg()
 	m_bCancel        = false;
 	m_bTrefftz       = false;
 	m_bIsFinished    = false;
+	m_bTrace         = true;
 
 	m_MatSize        = 0;
 	m_nNodes         = 0;
@@ -161,6 +162,8 @@ bool VLMAnalysisDlg::AlphaLoop()
 		return true;
 	}
 	VLMSolveMultiple(m_AlphaMin, m_AlphaDelta, nrhs);
+
+	AddString("\n");
 
 	if (m_bCancel) return true;
 
@@ -1197,9 +1200,10 @@ double VLMAnalysisDlg::VLMComputeCm(double alpha)
 		Cm += -PanelLeverArm.x * Force.z + PanelLeverArm.z*Force.x; //N.m/rho;
 		qApp->processEvents();
 	}
-
 	return Cm;
 }
+
+
 
 void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 {

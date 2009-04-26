@@ -35,6 +35,8 @@ FoilTableDelegate::FoilTableDelegate(QObject *parent)
 
 QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
+	return NULL;//No edition possible - display only
+
 	if(index.column()==0)
 	{
 		QLineEdit *editor = new QLineEdit(parent);
@@ -55,7 +57,6 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 /*
 void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const
 {
-//qDebug() << 	"drawCheck";
 	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
 
 	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
@@ -69,6 +70,7 @@ void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem 
 bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
 						 const QModelIndex &index)
 {
+	return false;
 	// make sure that the item is checkable
 	Qt::ItemFlags flags = model->flags(index);
 	if (!(flags & Qt::ItemIsUserCheckable) || !(flags & Qt::ItemIsEnabled))
@@ -143,7 +145,7 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	else
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
-		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble()*100.0,0,'f', m_Precision[index.column()]);
+		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble()*100.0, 0,'f', m_Precision[index.column()]);
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}

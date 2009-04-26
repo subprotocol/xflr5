@@ -48,11 +48,11 @@ PlaneDlg::PlaneDlg()
 	SetupLayout();
 
 	connect(m_pctrlBiplane, SIGNAL(clicked()), this, SLOT(OnBiplane()));
-	connect(m_pctrlStabCheck,     SIGNAL(stateChanged(int)), this, SLOT(OnStab(int)));
-	connect(m_pctrlFinCheck,     SIGNAL(stateChanged(int)), this, SLOT(OnFin(int)));
+	connect(m_pctrlStabCheck,     SIGNAL(clicked()), this, SLOT(OnStab()));
+	connect(m_pctrlFinCheck,     SIGNAL(clicked()), this, SLOT(OnFin()));
 
-	connect(m_pctrlSymFin,    SIGNAL(stateChanged(int)), this, SLOT(OnSymFin(int)));
-	connect(m_pctrlDoubleFin, SIGNAL(stateChanged(int)), this, SLOT(OnDoubleFin(int)));
+	connect(m_pctrlSymFin,    SIGNAL(clicked()), this, SLOT(OnSymFin()));
+	connect(m_pctrlDoubleFin, SIGNAL(clicked()), this, SLOT(OnDoubleFin()));
 
 	connect(m_pctrlDefineWing,  SIGNAL(clicked()), this, SLOT(OnDefineWing()));
 	connect(m_pctrlImportWing,  SIGNAL(clicked()), this, SLOT(OnImportWing()));
@@ -154,6 +154,31 @@ void PlaneDlg::InitDialog()
 	m_bChanged = false;
 
 	m_pPlane->m_bDoubleSymFin = true;
+}
+
+
+void PlaneDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OKButton->setFocus();
+				return;
+			}
+			else
+			{
+				OnOK();
+				return;
+			}
+			break;
+		}
+		default:
+			event->ignore();
+	}
 }
 
 
@@ -294,7 +319,7 @@ void PlaneDlg::OnDefineWing2()
 }
 
 
-void PlaneDlg::OnDoubleFin(int state)
+void PlaneDlg::OnDoubleFin()
 {
 	if (m_pctrlDoubleFin->isChecked())
 	{
@@ -404,7 +429,7 @@ void PlaneDlg::OnImportWing2()
 }
 
 
-void PlaneDlg::OnFin(int state)
+void PlaneDlg::OnFin()
 {
 	m_bChanged = true;
 	if(m_pctrlFinCheck->isChecked())
@@ -503,7 +528,7 @@ void PlaneDlg::OnOK()
 
 
 
-void PlaneDlg::OnStab(int state)
+void PlaneDlg::OnStab()
 {
 	m_bChanged = true;
 	if(m_pctrlStabCheck->isChecked())
@@ -526,7 +551,7 @@ void PlaneDlg::OnStab(int state)
 }
 
 
-void PlaneDlg::OnSymFin(int state) 
+void PlaneDlg::OnSymFin()
 {	
 	if (m_pctrlSymFin->isChecked()) 
 	{
@@ -674,9 +699,9 @@ void PlaneDlg::SetParams()
 	m_pctrlFinCheck->setChecked(m_pPlane->m_bFin);
 	m_pctrlDoubleFin->setChecked(m_pPlane->m_bDoubleFin);
 	m_pctrlSymFin->setChecked(m_pPlane->m_bSymFin);
-	OnFin(m_pPlane->m_bSymFin);
+	OnFin();
 	m_pctrlStabCheck->setChecked(m_pPlane->m_bStab);
-	OnStab(m_pPlane->m_bStab);
+	OnStab();
 }
 
 

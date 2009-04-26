@@ -144,6 +144,7 @@ private slots:
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
 	void OnDeleteUFOWPolars();
+	void OnDuplicateCurUFO();
 	void OnAnimate();
 	void OnAnimateSingle();
 	void OnAnimateSpeed(int val);
@@ -160,6 +161,9 @@ private slots:
 	void OnAdvancedSettings();
 	void OnHideUFOWPolars();
 	void OnShowUFOWPolars();
+	void OnHideUFOWOpps();
+	void OnShowUFOWOpps();
+	void OnDeleteUFOWOpps();
 	void OnResetWOppLegend();
 	void OnResetWPlrLegend();
 	void OnNewBody();
@@ -214,9 +218,10 @@ private:
 	void GLCreateCpLegend();
 	void GLCreateWingLegend();
 	void GLCreateWOppLegend();
-	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List, int surf0);
+	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List);
 	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List);
 	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List);
+	void GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List);
 	void GLInverseMatrix();
 	void GLRenderView();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
@@ -245,11 +250,11 @@ private:
 	void SetUFO(QString UFOName="");
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
-
+	void SnapClient(QString const &FileName, int FileType);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 
-
+	void DuplicatePlane();
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void CreateCpCurves();
 	void UpdateUnits();
@@ -326,7 +331,7 @@ private:
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
 
-	bool EditPlane(CPlane *pPlane);
+	bool EditCurPlane();
 
 	QString RenameUFO(QString UFOName);
 	QGraph* GetGraph(QPoint &pt);

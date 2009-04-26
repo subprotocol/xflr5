@@ -38,7 +38,7 @@ public:
 	void CopyFrame(CFrame *pFrame);
 
 	int m_iHighlight;
-	int m_iSelect;
+	static int s_iSelect;
 	int m_NPoints;			// the number of points defining the frame
 	CVector m_Point[MAXSIDELINES];	// the points' positions
 	CSpline m_Spline;

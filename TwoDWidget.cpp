@@ -164,7 +164,7 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 
 void TwoDWidget::showEvent(QShowEvent *event)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	if(m_pXDirect)
 	{
@@ -192,7 +192,7 @@ void TwoDWidget::showEvent(QShowEvent *event)
 
 void TwoDWidget::resizeEvent(QResizeEvent *event)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QXDirect  *pXDirect  = (QXDirect*)m_pXDirect;
 	QMiarex   *pMiarex   = (QMiarex*)m_pMiarex;
 	QAFoil    *pAFoil    = (QAFoil*)m_pAFoil;

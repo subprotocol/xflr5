@@ -90,7 +90,9 @@ SOURCES += MainFrame.cpp \
     Miarex/CtrlTableDelegate.cpp \
     Design/SplineCtrlsDlg.cpp \
     XDirect/XDirectStyleDlg.cpp \
-    Miarex/WingScaleDlg.cpp
+    Miarex/WingScaleDlg.cpp \
+    XInverse/FoilSelectionDlg.cpp \
+    Miarex/BodyTransDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -176,6 +178,9 @@ HEADERS += MainFrame.h \
     Miarex/CtrlTableDelegate.h \
     Design/SplineCtrlsDlg.h \
     XDirect/XDirectStyleDlg.h \
-    Miarex/WingScaleDlg.h
+    Miarex/WingScaleDlg.h \
+    XInverse/FoilSelectionDlg.h \
+    Miarex/BodyTransDlg.h
+win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 

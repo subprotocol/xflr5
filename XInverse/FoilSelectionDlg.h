@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	ImportWingDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	FoilSelectionDlg Classes
+		Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,33 +20,33 @@
 *****************************************************************************/
 
 
-#ifndef IMPORTWINGDLG_H
-#define IMPORTWINGDLG_H
+#ifndef FOILSELECTIONDLG_H
+#define FOILSELECTIONDLG_H
 
 #include <QDialog>
 #include <QListWidget>
+#include <QList>
 
-class ImportWingDlg : public QDialog
+class FoilSelectionDlg : public QDialog
 {
 	Q_OBJECT
-
-	friend class PlaneDlg;
+	friend class QXInverse;
 
 public:
-    ImportWingDlg();
+    FoilSelectionDlg();
 
 private slots:
 	void OnOK();
+	void OnSelChangeList(QListWidgetItem *);
+	void OnDoubleClickList(QListWidgetItem *pItem);
 
 private:
 	void SetupLayout();
 	void InitDialog();
-	void OnSelChangeList(QListWidgetItem *pItem);
 
 	QListWidget *m_pctrlNameList;
-	QString  m_WingName;
-	QList <void*> *m_poaWing;
-
+	QString m_FoilName;
+	QList <void*> *m_poaFoil;
 };
 
-#endif // IMPORTWINGDLG_H
+#endif // FOILSELECTIONDLG_H

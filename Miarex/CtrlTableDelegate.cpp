@@ -134,7 +134,6 @@ void CtrlTableDelegate::updateEditorGeometry(QWidget *editor, const QStyleOption
 
 void CtrlTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const
 {
-//qDebug() << 	"drawCheck";
 	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
 
 	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,

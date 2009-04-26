@@ -118,10 +118,9 @@ void TEGapDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
+			event->ignore();
 			break;
 	}
-
-	QDialog::keyPressEvent(event);
 }
 
 

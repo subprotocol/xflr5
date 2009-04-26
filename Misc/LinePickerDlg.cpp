@@ -135,8 +135,6 @@ void LinePickerDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 	}
-
-	QDialog::keyPressEvent(event);
 }
 
 

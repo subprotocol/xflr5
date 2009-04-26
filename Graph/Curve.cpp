@@ -47,7 +47,6 @@ CCurve::CCurve()
 
 CCurve::~CCurve()
 {
-//qDebug() << "Destroying ~CCUrve";
 }
 
 double CCurve::GetxMin()

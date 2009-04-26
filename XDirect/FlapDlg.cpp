@@ -156,7 +156,6 @@ void FlapDlg::ReadParams()
 
 void FlapDlg::OnApply()
 {
-qDebug() << m_pAFoil << m_pXDirect;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
@@ -200,10 +199,9 @@ void FlapDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
+			event->ignore();
 			break;
 	}
-
-	QDialog::keyPressEvent(event);
 }
 
 void FlapDlg::EnableLEFlap(bool bEnable)
@@ -253,6 +251,10 @@ void FlapDlg::OnChanged()
 
 void FlapDlg::OnOK()
 {
-	if(!m_bApplied) OnApply();
+	if(!m_bApplied)
+	{
+		OnApply();
+		accept();
+	}
 	else done(1);
 }

@@ -32,6 +32,7 @@
 #include "Globals.h"
 #include "../Miarex/Miarex.h"
 #include "../Miarex/LLTAnalysisDlg.h"
+#include "../Miarex/VLMAnalysisDlg.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CWing dialog
@@ -829,7 +830,7 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 	//write only right wing surfaces since we have provided YDUPLICATE
 	CSurface ASurface;
 	int iFlap = 1;
-	int iSurface = 0;
+//	int iSurface = 0;
 	for(j=(int)(m_NSurfaces/2); j<m_NSurfaces; j++)
 	{
 		ASurface.Copy(m_Surface[j]);
@@ -2524,7 +2525,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
-//	CVLMDlg *pVLMDlg   = (CVLMDlg*)s_pVLMDlg;
+	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
 	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
 
 	int  j, k, l, p, m, nFlap;
@@ -2701,22 +2702,22 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 			if(bPointOutCl)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("       Span pos = %9.2f ").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString("          Span pos = %1 ").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %6.2f could not be interpolated\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(",  Cl = %1 could not be interpolated\r\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
-//				if(m_bTrace) pVLMDlg->AddString(strong);
+				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;
 
 			}
 			else if(bPointOutRe)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("       Span pos = %1").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString("          Span pos = %1").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
@@ -2724,7 +2725,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 				string = QString(",  Cl = %1 is outside the flight envelope\r\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
-//				if(m_bTrace) pVLMDlg->AddString(strong);
+				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;
 			}
 			m++;

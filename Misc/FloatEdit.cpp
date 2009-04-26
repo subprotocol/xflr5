@@ -187,13 +187,13 @@ void FloatEdit::SetValue(double f)
     QString str, str1;
     int q, r, exp, i, pos, l;
 
-    if ((f==0.0 || fabs(f)>pow(10.0, -m_iPrecision)) && f <1000.0)
+	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <1000.0)
     {
 		switch (m_iPrecision)
 		{
 			//there probably is a more elegant way to do this,
 			case 0:
-				str=QString("%1").arg(f,0,'f',0);
+				str=QString("%1").arg(f);
 				break;
 			case 1:
 				str=QString("%1").arg(f,0,'f',1);

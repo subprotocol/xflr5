@@ -154,7 +154,7 @@ void ManageBodiesDlg::OnDuplicate()
 {
 	if(!m_pBody) return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 
 	CBody *pBody = new CBody;
@@ -168,7 +168,7 @@ void ManageBodiesDlg::OnDuplicate()
 void ManageBodiesDlg::OnEdit()
 {
 	if(!m_pBody) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	CBody memBody;
 
@@ -207,7 +207,6 @@ void ManageBodiesDlg::OnNew()
 void ManageBodiesDlg::OnRename()
 {
 	if(!m_pBody) return;
-	MainFrame *pFrame = (MainFrame*)m_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 
 	pMiarex->SetModBody(m_pBody);
@@ -219,8 +218,6 @@ void ManageBodiesDlg::OnRename()
 
 void ManageBodiesDlg::InitDialog()
 {
-	int i=-1;
-
 	UpdateBodyList();
 	SetBody();
 }

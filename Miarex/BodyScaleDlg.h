@@ -25,6 +25,7 @@
 
 #include <QDialog>
 #include <QCheckBox>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QLabel>
 #include "../Misc/FloatEdit.h"
@@ -50,10 +51,12 @@ private:
 	void SetupLayout();
 	void InitDialog();
 	void EnableControls();
+	void keyPressEvent(QKeyEvent *event);
 
 private:
 	static void *s_pMainFrame;
 
+	QPushButton *OKButton, *CancelButton;
 	QRadioButton *m_pctrlBody, *m_pctrlFrame;
 	FloatEdit *m_pctrlXScaleFactor;
 	FloatEdit *m_pctrlYScaleFactor;

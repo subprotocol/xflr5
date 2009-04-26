@@ -27,7 +27,7 @@
 
 // CFrame
 QRect CFrame::s_rViewRect;
-
+int CFrame::s_iSelect;
 
 CFrame::CFrame()
 {
@@ -42,7 +42,7 @@ CFrame::CFrame()
 
 	m_NPoints = 5;
 	m_iHighlight = -1;
-	m_iSelect    =  0;
+	s_iSelect    =  0;
 }
 
 
@@ -94,7 +94,7 @@ bool CFrame::SerializeFrame(QDataStream &ar, bool bIsStoring)
 void CFrame::RemoveSelectedPoint()
 {
 	int k;
-	for (k=m_iSelect; k<m_NPoints; k++)
+	for (k=s_iSelect; k<m_NPoints; k++)
 	{
 		m_Point[k] = m_Point[k+1];
 	}
@@ -123,7 +123,7 @@ void CFrame::InsertPoint(int n)
 	}
 	m_Point[n] = (m_Point[n+1] + m_Point[n-1])/2.0;
 	m_NPoints++;
-	m_iSelect = n;
+	s_iSelect = n;
 }
 
 
@@ -142,16 +142,16 @@ int CFrame::InsertPoint(CVector Real)
 			m_Point[k].z = Real.y;
 			if(k==0 || k==m_NPoints) m_Point[k].y =0.0;
 			m_NPoints++;
-			m_iSelect = k;
+			s_iSelect = k;
 			return k;
 		}
 	}
 
 	m_Point[m_NPoints].y = 0;
 	m_Point[m_NPoints].z = Real.y;
-	m_iSelect = m_NPoints;
+	s_iSelect = m_NPoints;
 	m_NPoints++;
-	return m_iSelect;
+	return s_iSelect;
 }
 
 

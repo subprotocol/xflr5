@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	ImportWingDlg Class
+	BodyTransDlg Class
 	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,34 +19,52 @@
 
 *****************************************************************************/
 
-
-#ifndef IMPORTWINGDLG_H
-#define IMPORTWINGDLG_H
+#ifndef BODYTRANSDLG_H
+#define BODYTRANSDLG_H
 
 #include <QDialog>
-#include <QListWidget>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QLabel>
 
-class ImportWingDlg : public QDialog
+#include "../Misc/FloatEdit.h"
+
+class BodyTransDlg : public QDialog
 {
 	Q_OBJECT
-
-	friend class PlaneDlg;
+	friend class QMiarex;
+	friend class CBody;
+	friend class GL3dBodyDlg;
 
 public:
-    ImportWingDlg();
+    BodyTransDlg();
+	void InitDialog();
 
 private slots:
 	void OnOK();
+	void OnFrameOnly();
 
 private:
+	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
-	void InitDialog();
-	void OnSelChangeList(QListWidgetItem *pItem);
 
-	QListWidget *m_pctrlNameList;
-	QString  m_WingName;
-	QList <void*> *m_poaWing;
+	FloatEdit *m_pctrlXTransFactor;
+	FloatEdit *m_pctrlYTransFactor;
+	FloatEdit *m_pctrlZTransFactor;
+	FloatEdit *m_pctrlFrameID;
+	QCheckBox *m_pctrlFrameOnly;
+	QLabel *m_pctrlLength1;
+	QLabel *m_pctrlLength2;
+	QLabel *m_pctrlLength3;
+	QPushButton *OKButton, *CancelButton;
+
+	void * m_pMiarex;
+	void * m_pMainFrame;
+
+	double m_XTrans, m_YTrans, m_ZTrans;
+	bool   m_bFrameOnly;
+	int    m_FrameID;
 
 };
 
-#endif // IMPORTWINGDLG_H
+#endif // BODYTRANSDLG_H

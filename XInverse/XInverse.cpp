@@ -25,6 +25,7 @@
 
 #include "XInverse.h"
 #include "InverseOptionsDlg.h"
+#include "FoilSelectionDlg.h"
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "../Objects/Foil.h"
@@ -1180,31 +1181,31 @@ void QXInverse::OnExtractFoil()
 {
 	//Extracts a foil from the database for display and modification
 
-/*	CSelectFoilDlg dlg;
-	dlg.m_pMainFrame = m_pFrame;
+	FoilSelectionDlg dlg;
+	dlg.m_poaFoil = m_poaFoil;
+	dlg.InitDialog();
 
 	if(m_bLoaded)
 	{
 		dlg.m_FoilName = m_pRefFoil->m_FoilName;
 	}
 
-	if(IDOK == dlg.DoModal())
+	if(QDialog::Accepted == dlg.exec())
 	{
-		CWaitCursor Wait;
 		m_bMark = false;
 		m_bMarked = false;
 		m_bSpline = false;
 		m_bSplined  = true;
 		CFoil *pFoil;
-		CMainFrame* pFrame = (CMainFrame*)m_pFrame;
-		pFoil = pFrame->GetFoil(dlg.m_FoilName);
-		pFrame->SetCurrentFoil(pFoil);
+		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
+		pMainFrame->SetCurrentFoil(pFoil);
 		m_pRefFoil->CopyFoil(pFoil);
 
 		m_pModFoil->m_FoilName = m_pRefFoil->m_FoilName + " Modified";
 		InitXFoil(m_pRefFoil);
 		SetFoil();
-	}*/
+	}
 }
 
 void QXInverse::OnFilter()

@@ -294,10 +294,10 @@ void QAFoil::FillFoilTable()
 		if(m_pSF) 
 		{
 			name = "Spline foil";
-			Thickness  = m_pSF->m_fThickness*100.0;
-			xThickness = m_pSF->m_fxThickMax*100.0;
-			Camber     = m_pSF->m_fCamber*100.0;
-			xCamber    = m_pSF->m_fxCambMax*100.0;
+			Thickness  = m_pSF->m_fThickness;
+			xThickness = m_pSF->m_fxThickMax;
+			Camber     = m_pSF->m_fCamber;
+			xCamber    = m_pSF->m_fxCambMax;
 			points     = m_pSF->m_OutPoints;
 		}
 	}
@@ -306,12 +306,12 @@ void QAFoil::FillFoilTable()
 		if(m_pPF) 
 		{
 			name = "Splined points foil";
-			Thickness  = m_pPF->m_fThickness*100.0;
-			xThickness = m_pPF->m_fxThickMax*100.0;
-			Camber     = m_pPF->m_fCamber*100.0;
-			xCamber    = m_pPF->m_fxCambMax*100.0;
+			Thickness  = m_pPF->m_fThickness;
+			xThickness = m_pPF->m_fxThickMax;
+			Camber     = m_pPF->m_fCamber;
+			xCamber    = m_pPF->m_fxCambMax;
 			points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
-				     +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
+						 +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
 		}
 	}
 
@@ -374,10 +374,10 @@ void QAFoil::FillTableRow(int row)
 		m_pFoilModel->setData(ind,pFoil->m_TEFlapAngle);
 
 		ind = m_pFoilModel->index(row, 7, QModelIndex());
-		m_pFoilModel->setData(ind,pFoil->m_TEXHinge);
+		m_pFoilModel->setData(ind,pFoil->m_TEXHinge/100.0);
 
 		ind = m_pFoilModel->index(row, 8, QModelIndex());
-		m_pFoilModel->setData(ind,pFoil->m_TEYHinge);
+		m_pFoilModel->setData(ind,pFoil->m_TEYHinge/100.0);
 
 	}
 	if(pFoil && pFoil->m_bLEFlap)
@@ -386,17 +386,17 @@ void QAFoil::FillTableRow(int row)
 		m_pFoilModel->setData(ind,pFoil->m_LEFlapAngle);
 
 		ind = m_pFoilModel->index(row, 10, QModelIndex());
-		m_pFoilModel->setData(ind,pFoil->m_LEXHinge);
+		m_pFoilModel->setData(ind,pFoil->m_LEXHinge/100.0);
 
 		ind = m_pFoilModel->index(row, 11, QModelIndex());
-		m_pFoilModel->setData(ind,pFoil->m_LEYHinge);
+		m_pFoilModel->setData(ind,pFoil->m_LEYHinge/100.0);
 	}
 
 /*	ind = m_pFoilModel->index(row, 12, QModelIndex());
 	if(pFoil->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
 	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);*/
-
 }
+
 
 void QAFoil::keyPressEvent(QKeyEvent *event)
 {
@@ -481,9 +481,11 @@ void QAFoil::LoadSettings(QDataStream &ar)
 {
 	ar >> m_bSF;
 	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
-	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth >> m_NeutralStyle >> m_NeutralWidth;
+	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth;
 	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
-	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor >> m_NeutralColor;
+	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor;
+
+	ar >> m_NeutralStyle >> m_NeutralWidth >> m_NeutralColor;
 
 	int style, width;
 	QColor color;
@@ -491,6 +493,13 @@ void QAFoil::LoadSettings(QDataStream &ar)
 	m_pSF->SetCurveParams(style, width, color);
 	ar >> style >> width >> color;
 	m_pPF->SetCurveParams(style, width, color);
+//	ar >> m_pSF->m_FoilStyle >> m_pSF->m_FoilWidth  >> m_pSF->m_FoilColor;
+//	ar >> m_pPF->m_FoilStyle >> m_pPF->m_FoilWidth  >> m_pPF->m_FoilColor;
+	ar >> m_pSF->m_bVisible  >> m_pSF->m_bOutPoints >> m_pSF->m_bCenterLine;
+	ar >> m_pPF->m_bVisible  >> m_pPF->m_bOutPoints >> m_pPF->m_bCenterLine;
+
+	ar >> m_bCircle >> m_bNeutralLine >> m_bScale >> m_bShowLegend;
+
 }
 
 
@@ -951,6 +960,7 @@ void QAFoil::OnAFoilSetFlap()
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.InitDialog();
+
 	if(QDialog::Accepted == dlg.exec())
 	{
 		//then duplicate the buffer foil and add it
@@ -963,15 +973,15 @@ void QAFoil::OnAFoilSetFlap()
 		{
 			m_pCurFoil = NULL;
 			FillFoilTable();
+			SetFoil(pNewFoil);
 			SelectFoil(pNewFoil);
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
-		SetFoil(pNewFoil);
 	}
 	else
 	{
@@ -1042,7 +1052,7 @@ void QAFoil::OnAFoilCadd()
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(m_pBufferFoil);
 		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
-		pNewFoil->m_nFoilStyle = 1;
+		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 
@@ -1054,9 +1064,9 @@ void QAFoil::OnAFoilCadd()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 
@@ -1092,6 +1102,7 @@ void QAFoil::OnAFoilPanels()
 	Pdlg.m_pMemFoil    = m_pCurFoil;
 	Pdlg.m_pXDirect    = NULL;
 	Pdlg.m_pAFoil      = this;
+	Pdlg.InitDialog();
 
 	if(QDialog::Accepted == Pdlg.exec())
 	{
@@ -1110,9 +1121,9 @@ void QAFoil::OnAFoilPanels()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 
@@ -1168,9 +1179,9 @@ void QAFoil::OnAFoilFoilCoordinates()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 	else
@@ -1224,9 +1235,9 @@ void QAFoil::OnAFoilFoilGeom()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 
@@ -1283,8 +1294,9 @@ void QAFoil::OnAFoilSetTEGap()
 		}
 		else
 		{
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 	else
@@ -1341,9 +1353,9 @@ void QAFoil::OnAFoilSetLERadius()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil(pNewFoil);
+			SelectFoil(m_pCurFoil);
 		}
 	}
 	else
@@ -1406,9 +1418,9 @@ void QAFoil::OnAFoilInterpolateFoils()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 
@@ -1448,7 +1460,7 @@ void QAFoil::OnAFoilNacaFoils()
 		QString str;
 
 		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)
-			str = QString("%1").arg(dlg.m_Digits,4);
+			str = QString("%1").arg(dlg.m_Digits,4,10,QChar('0'));
 		else
 			str = QString("%1").arg(dlg.m_Digits);
 		str = "NACA "+ str;
@@ -1468,9 +1480,9 @@ void QAFoil::OnAFoilNacaFoils()
 		}
 		else
 		{
-			pNewFoil = NULL;
+//			pNewFoil = NULL;
 			FillFoilTable();
-			SelectFoil();
+			SelectFoil(m_pCurFoil);
 		}
 	}
 
@@ -1521,7 +1533,7 @@ void QAFoil::OnDelete()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->DeleteFoil(m_pCurFoil);
 	FillFoilTable();
-	SetFoil();
+	SelectFoil();
 	UpdateView();
 }
 
@@ -2151,6 +2163,8 @@ void QAFoil::PaintLegend(QPainter &painter)
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
+	painter.setFont(pMainFrame->m_TextFont);
+
 	if(m_bShowLegend)
 	{
 		CFoil* pRefFoil;
@@ -2254,6 +2268,7 @@ void QAFoil::PaintView(QPainter &painter)
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 
+	painter.setFont(pMainFrame->m_TextFont);
 
 	QPen TextPen(pMainFrame->m_TextColor);
 	painter.setPen(TextPen);
@@ -2507,12 +2522,18 @@ void QAFoil::SaveSettings(QDataStream &ar)
 {
 	ar << m_bSF;
 	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
-	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth << m_NeutralStyle << m_NeutralWidth;
+	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth;
 	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
-	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor << m_NeutralColor;
+	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor;
+
+	ar << m_NeutralStyle << m_NeutralWidth << m_NeutralColor;
 
 	ar << m_pSF->m_FoilStyle << m_pSF->m_FoilWidth << m_pSF->m_FoilColor;
 	ar << m_pPF->m_FoilStyle << m_pPF->m_FoilWidth << m_pPF->m_FoilColor;
+	ar << m_pSF->m_bVisible << m_pSF->m_bOutPoints << m_pSF->m_bCenterLine;
+	ar << m_pPF->m_bVisible << m_pPF->m_bOutPoints << m_pPF->m_bCenterLine;
+
+	ar << m_bCircle << m_bNeutralLine << m_bScale << m_bShowLegend;
 }
 
 
@@ -2616,12 +2637,13 @@ void QAFoil::SetupLayout()
 
 	m_pctrlFoilTable   = new QTableView(this);
 
-	m_pctrlFoilTable->setMinimumWidth(800);
+//	m_pctrlFoilTable->setMinimumWidth(800);
 	m_pctrlFoilTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlFoilTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	QSizePolicy szPolicyExpanding;
-	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
 	m_pctrlFoilTable->setSizePolicy(szPolicyExpanding);
 
 	m_pctrlFoilStyle   = new LineButton;
@@ -2682,17 +2704,17 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setColumnCount(12);
 
 	m_pFoilModel->setHeaderData(0, Qt::Horizontal, "Name");
-	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Camber");
-	m_pFoilModel->setHeaderData(2, Qt::Horizontal, "at");
-	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Thickness");
-	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at");
+	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Thickness (%)");
+	m_pFoilModel->setHeaderData(2, Qt::Horizontal, "at (%)");
+	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Camber (%)");
+	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at (%)");
 	m_pFoilModel->setHeaderData(5, Qt::Horizontal, "Points");
-	m_pFoilModel->setHeaderData(6, Qt::Horizontal, "TE Flap");
-	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "TE XHinge");
-	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "TE YHinge");
-	m_pFoilModel->setHeaderData(9, Qt::Horizontal, "LE Flap");
-	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "LE XHinge");
-	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "LE YHinge");
+	m_pFoilModel->setHeaderData(6, Qt::Horizontal, "T.E. Flap (deg)");
+	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "T.E. XHinge");
+	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "T.E. YHinge");
+	m_pFoilModel->setHeaderData(9, Qt::Horizontal, "L.E. Flap (deg)");
+	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "L.E. XHinge");
+	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "L.E. YHinge");
 //	m_pFoilModel->setHeaderData(12, Qt::Horizontal, "Visible");
 
 	m_pctrlFoilTable->setModel(m_pFoilModel);
@@ -2705,7 +2727,7 @@ void QAFoil::SetupLayout()
 //	QHeaderView *pHeader = new QHeaderView(Qt::Horizontal);
 //	m_pctrlFoilTable->setHorizontalHeader(pHeader);
 
-	int  *precision = new int[10];
+	int  *precision = new int[12];
 	precision[0]  = 2;
 	precision[1]  = 2;
 	precision[2]  = 2;
@@ -2721,22 +2743,31 @@ void QAFoil::SetupLayout()
 
 	m_pFoilDelegate->m_Precision = precision;
 //	connect(m_pFoilDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
-
-
-	m_pctrlFoilTable->setColumnWidth(0,100);
-	m_pctrlFoilTable->setColumnWidth(1,70);
-	m_pctrlFoilTable->setColumnWidth(2,70);
-	m_pctrlFoilTable->setColumnWidth(3,70);
-	m_pctrlFoilTable->setColumnWidth(4,70);
-	m_pctrlFoilTable->setColumnWidth(5,50);
-	m_pctrlFoilTable->setColumnWidth(6,50);
-	m_pctrlFoilTable->setColumnWidth(7,80);
-	m_pctrlFoilTable->setColumnWidth(8,50);
-	m_pctrlFoilTable->setColumnWidth(9,80);
-
 }
 
 
+void QAFoil::resizeEvent(QResizeEvent *event)
+{
+	int w = m_pctrlFoilTable->width();
+	int w12 = (int)((double)w/12.0);
+	int w14 = (int)((double)w/14.0);
+
+	m_pctrlFoilTable->setColumnWidth(1,w12);
+	m_pctrlFoilTable->setColumnWidth(2,w12);
+	m_pctrlFoilTable->setColumnWidth(3,w12);
+	m_pctrlFoilTable->setColumnWidth(4,w12);
+	m_pctrlFoilTable->setColumnWidth(5,w14);//points
+
+	m_pctrlFoilTable->setColumnWidth(6,w14);//TE Flap
+	m_pctrlFoilTable->setColumnWidth(7,w12);//TE XHinge
+	m_pctrlFoilTable->setColumnWidth(8,w12);//TE YHinge
+
+	m_pctrlFoilTable->setColumnWidth(9, w14);//LE Flap
+	m_pctrlFoilTable->setColumnWidth(10,w12);//LE XHinge
+	m_pctrlFoilTable->setColumnWidth(11,w12);//LE YHinge
+
+	m_pctrlFoilTable->setColumnWidth(0,w-8*w12-3*w14-20);
+}
 
 
 
@@ -2757,7 +2788,7 @@ void QAFoil::SelectFoil(CFoil* pFoil)
 
 			if(FoilName == pFoil->m_FoilName)
 			{
-				m_pctrlFoilTable->selectRow(i+1);
+				m_pctrlFoilTable->selectRow(i);
 				break;
 			}
 		}
@@ -2810,7 +2841,7 @@ void QAFoil::SetParams()
 	else      m_pctrlPF->setChecked(true);
 
 	FillFoilTable();
-	m_pctrlFoilTable->adjustSize();
+//	m_pctrlFoilTable->adjustSize();
 
 	SelectFoil(m_pCurFoil);
 }

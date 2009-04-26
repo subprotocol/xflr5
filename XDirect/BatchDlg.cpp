@@ -100,7 +100,7 @@ void BatchDlg::SetLayout()
 //	AnalysisType->setMaximumHeight(50);
 	QGroupBox *AnalysisTypeGroup = new QGroupBox("Analysis Type");
 	AnalysisTypeGroup->setLayout(AnalysisType);
-	AnalysisTypeGroup->setMaximumHeight(70);
+//	AnalysisTypeGroup->setMaximumHeight(70);
 
 	QGridLayout *BatchVars = new QGridLayout;
 	m_rbRange1 = new QRadioButton("Range");
@@ -471,16 +471,22 @@ void BatchDlg::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_Escape:
 		{
-			m_bSkipPoint = true;
-			m_bSkipPolar = true;
-			m_bCancel    = true;
+			if(m_bIsRunning)
+			{
+				m_bSkipPoint = true;
+				m_bSkipPolar = true;
+				m_bCancel    = true;
+			}
+			else
+			{
+				reject();
+				//close the dialog box
+			}
 			break;
 		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
 	}
-
-//	QDialog::keyPressEvent(event);
 }
 
 

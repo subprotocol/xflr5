@@ -301,6 +301,7 @@ bool PanelAnalysisDlg::CreateMatrix()
 
 	m_Progress += 15;
 
+	qApp->processEvents();
 	return true;
 }
 
@@ -406,6 +407,7 @@ bool PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 	}
 
 	m_Progress += 10;
+	qApp->processEvents();
 	return true;
 }
 
@@ -538,6 +540,7 @@ bool PanelAnalysisDlg::CreateWakeContribution()
 	}
 	m_Progress += 2;
 
+	qApp->processEvents();
 	return true;
 }
 
@@ -571,6 +574,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 		{
 			if(!ComputeOnBody(q, V0+q*VDelta)) return false;
 			SetProgress(1*nval, (double)q/(double)nval);
+			qApp->processEvents();
 		}
 	}
 	else
@@ -583,6 +587,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 				m_Cp[p+q*m_MatSize] = m_Cp[p];
 			}
 			SetProgress(1*nval, (double)q/(double)nval);
+			qApp->processEvents();
 		}
 	}
 	m_Progress += 1*nval ;
@@ -671,6 +676,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 		}
 	}
 
+	qApp->processEvents();
 	return true;
 }
 
@@ -741,7 +747,6 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	WindNormal.Set(-sina, 0.0, cosa);
 	WindDirection.Set(cosa, 0.0, sina);
 	WindSide = WindNormal * WindDirection;
-
 	
 	Mu     = m_Mu    + qrhs*m_MatSize;
 	Sigma  = m_Sigma + qrhs*m_MatSize;
@@ -907,6 +912,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		AddString("\r\n");
 	}
 	else m_bPointOut = true;
+	qApp->processEvents();
 
 	return true;
 }
@@ -1542,7 +1548,6 @@ void PanelAnalysisDlg::RelaxWake()
 	int mw, kw, lw, llw;
 	int nInter;
 	double t, dx, dx0;
-	double damping = 1.0;
 	double *Mu    = m_Mu   ;
 	double *Sigma = m_Sigma;
 
@@ -1651,13 +1656,12 @@ bool PanelAnalysisDlg::ReLoop()
 {
 	QString str;
 	int nrhs, TotalTime;
-	double QInf  = 0.0;
 	double Alpha = 0.0;
 
-		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-		if(m_QInfMax<m_QInf) m_QInfDelta = -fabs(m_QInfDelta);
-		nrhs  = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1 ;
+	if(m_QInfMax<m_QInf) m_QInfDelta = -fabs(m_QInfDelta);
+	nrhs  = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1 ;
 
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)

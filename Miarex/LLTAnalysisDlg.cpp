@@ -128,7 +128,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
-	m_IterGraph.SetYMinGrid(true, true, QColor(100,100,100), 2, 1, 4);
+	m_IterGraph.SetYMinGrid(false, true, QColor(100,100,100), 2, 1, 4);
 
 	for (i=0; i<=ia; i++)
 	{
@@ -287,6 +287,7 @@ void LLTAnalysisDlg::OnCancelAnalysis()
 {
 	m_bSkip = true;
 	m_bExit = true;
+	m_bCancel = true;
 }
 
 
@@ -349,7 +350,8 @@ void LLTAnalysisDlg::SetupLayout()
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/2);
-	move(r.width()/3, r.height()/6);
+	setMinimumWidth(r.width()/3);
+//	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -466,7 +468,7 @@ bool LLTAnalysisDlg::ReLoop()
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
-	m_IterGraph.SetYMinGrid(true, true, QColor(100,100,100), 2, 1, 4);
+	m_IterGraph.SetYMinGrid(false, true, QColor(100,100,100), 2, 1, 4);
 
 	for (i=0; i<=ia; i++)
 	{

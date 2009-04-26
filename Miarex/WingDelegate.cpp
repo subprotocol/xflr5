@@ -23,14 +23,20 @@
 #include <QtGui>
 #include "../Objects/Foil.h"
 #include "WingDelegate.h"
+#include "WingDlg.h"
+
 
 WingDelegate::WingDelegate(QObject *parent)
  : QItemDelegate(parent)
 {
+	m_pWingDlg = parent;
 }
 
 QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
+	WingDlg *pWingDlg = (WingDlg*)m_pWingDlg;
+	pWingDlg->SetCurrentSection(index.row());
+
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		FloatEdit *editor = new FloatEdit(parent);

@@ -60,11 +60,11 @@ private slots:
 	void OnArea();
 	void OnUnit();
 	void OnMethod();
-	void OnAutoName(int state);
-	void OnWakeRollUp(int state);
-	void OnTiltedGeom(int state);
-	void OnViscous(int state);
-	void OnGroundEffect(int state);
+	void OnAutoName();
+	void OnWakeRollUp();
+	void OnTiltedGeom();
+	void OnViscous();
+	void OnGroundEffect();
 	void OnWPolarType();
 	void OnEditingFinished();
 

@@ -185,12 +185,15 @@ void NacaFoilDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
 	}
-
-	QDialog::keyPressEvent(event);
- }
+}
 
 
 

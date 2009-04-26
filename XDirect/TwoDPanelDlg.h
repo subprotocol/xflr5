@@ -31,7 +31,7 @@
 class TwoDPanelDlg : public QDialog
 {
 	Q_OBJECT
-
+	friend class QAFoil;
 	friend class QXDirect;
 
 private slots:
@@ -44,9 +44,12 @@ public:
 
 	static void *s_pXFoil;
 
+	void InitDialog();
+
+private:
+	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 	void ReadParams();
-	void InitDialog();
 
 	QPushButton *OKButton, *CancelButton, *ApplyButton;
 

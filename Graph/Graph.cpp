@@ -102,7 +102,6 @@ Graph::Graph()
 
 Graph::~Graph()
 {
-//qDebug() << "destroying graph"<<m_GraphName;
 }
 
 

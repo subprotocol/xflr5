@@ -240,10 +240,7 @@ void CAddDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-			break;
+			event->ignore();
 	}
-
-	QDialog::keyPressEvent(event);
-
 }
 

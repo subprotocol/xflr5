@@ -45,12 +45,14 @@ class WingDlg : public QDialog
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class PlaneDlg;
+	friend class WingDelegate;
 
 public:
     WingDlg();
 	void InitDialog();
 
 private slots:
+	void OnCancel();
 	void OnDelete();
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
@@ -62,6 +64,7 @@ private slots:
 	void OnInsertBefore();
 	void OnInsertAfter();
 	void OnDeleteSection();
+	void OnResetMesh();
 
 private:
 	void showEvent(QShowEvent *event);
@@ -87,8 +90,10 @@ private:
 	void FillTableRow(int row);
 	void ReadParams();
 	void ReadSectionData(int sel);
+	void SetCurrentSection(int section);
 	void SetScale();
 	int VLMGetPanelTotal();
+	bool VLMSetAutoMesh(int total=0);
 
 	double GetOffset(double yob);
 	double GetZPos(double y);

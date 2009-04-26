@@ -61,7 +61,8 @@ class CFoil
 	friend class BatchDlg;
 	friend class GL3dViewDlg;
 	friend class WingDlg;
-        friend class AFoil;
+	friend class AFoil;
+	friend class FoilSelectionDlg;
 
 public:
 	static double pi;

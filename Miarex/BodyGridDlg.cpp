@@ -18,6 +18,8 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+
+
 #include <QtDebug>
 #include <QGroupBox>
 #include <QGridLayout>
@@ -111,9 +113,9 @@ void BodyGridDlg::SetupLayout()
 //	setMinimumHeight(r.height()/3);
 //	move(r.width()/3, r.height()/6);
 
-	m_pctrlScales = new QCheckBox("Show Scales");
-	m_pctrlGrid  = new QCheckBox("Main Grid");
-	m_pctrlGrid2 = new QCheckBox("Main Grid");
+	m_pctrlScales   = new QCheckBox("Show Scales");
+	m_pctrlGrid     = new QCheckBox("Main Grid");
+	m_pctrlGrid2    = new QCheckBox("Main Grid");
 	m_pctrlMinGrid  = new QCheckBox("Minor Grid");
 	m_pctrlMinGrid2 = new QCheckBox("Minor Grid");
 
@@ -184,8 +186,9 @@ void BodyGridDlg::SetupLayout()
 
 	setLayout(MainLayout);
 
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(Cancel, SIGNAL(clicked()), this, SLOT(reject()));
+
 	connect(m_pctrlGrid, SIGNAL(clicked()), this, SLOT(OnGrid()));
 	connect(m_pctrlMinGrid, SIGNAL(clicked()), this, SLOT(OnMinGrid()));
 	connect(m_pctrlGrid2, SIGNAL(clicked()), this, SLOT(OnGrid2()));
@@ -215,7 +218,8 @@ void BodyGridDlg::EnableControls()
 
 void BodyGridDlg::OnOK()
 {
-	QDialog::accept();
+	m_bScale = m_pctrlScales->isChecked();
+	accept();
 }
 
 
@@ -223,7 +227,6 @@ void BodyGridDlg::OnOK()
 void BodyGridDlg::OnGrid()
 {
 	m_bGrid = m_pctrlGrid->isChecked();
-qDebug() << "Ongrid" << m_bGrid;
 	EnableControls();
 }
 
@@ -250,7 +253,6 @@ void BodyGridDlg::OnMinGrid2()
 
 void BodyGridDlg::OnLineStyle()
 {
-qDebug() << "OnLineStyle";
 	LinePickerDlg dlg;
 	dlg.InitDialog(m_Style, m_Width, m_Color);
 

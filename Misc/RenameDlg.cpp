@@ -33,10 +33,10 @@ RenameDlg::RenameDlg(void *pParent)
 
 void RenameDlg::SetupLayout()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/3);
-	move(r.width()/3, r.height()/6);
+//	QDesktopWidget desktop;
+//	QRect r = desktop.geometry();
+//	setMinimumHeight(r.height()/3);
+//	move(r.width()/3, r.height()/6);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 
@@ -48,7 +48,8 @@ void RenameDlg::SetupLayout()
 	m_pctrlName = new QLineEdit("");
 	m_pctrlNameList = new QListWidget;
 	m_pctrlNameList->setMinimumHeight(300);
-	connect(m_pctrlNameList,    SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnSelChangeList(QListWidgetItem *)));
+	connect(m_pctrlNameList, SIGNAL(itemClicked(QListWidgetItem *)),       this, SLOT(OnSelChangeList(QListWidgetItem *)));
+	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnDoubleClickList(QListWidgetItem *)));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
@@ -96,7 +97,8 @@ void RenameDlg::InitDialog()
 	m_pctrlName->setFocus();
 	m_pctrlName->selectAll();
 
-	for (int i=0; i<m_pstrArray->size(); i++){
+	for (int i=0; i<m_pstrArray->size(); i++)
+	{
 		m_pctrlNameList->addItem(m_pstrArray->at(i));
 	}
 }
@@ -122,10 +124,9 @@ void RenameDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-		QDialog::keyPressEvent(event);
+			event->ignore();
 	}
 
-	QDialog::keyPressEvent(event);
 }
 
 
@@ -179,6 +180,17 @@ void RenameDlg::OnSelChangeList(QListWidgetItem * pItem)
 	m_pctrlName->selectAll();
 }
 
+
+
+
+void RenameDlg::OnDoubleClickList(QListWidgetItem * pItem)
+{
+//	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
+
+	QString str = pItem->text();
+	m_pctrlName->setText(str);
+	OnOK();
+}
 
 
 

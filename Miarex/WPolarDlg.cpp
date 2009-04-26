@@ -89,11 +89,11 @@ void WPolarDlg::Connect()
 	connect(m_pctrlType2, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 	connect(m_pctrlType4, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 
-	connect(m_pctrlAutoName, SIGNAL(stateChanged(int)), this, SLOT(OnAutoName(int)));
-	connect(m_pctrlWakeRollUp, SIGNAL(stateChanged(int)), this, SLOT(OnWakeRollUp(int)));
-	connect(m_pctrlTiltGeom, SIGNAL(stateChanged(int)), this, SLOT(OnTiltedGeom(int)));
-	connect(m_pctrlViscous, SIGNAL(stateChanged(int)), this, SLOT(OnViscous(int)));
-	connect(m_pctrlGroundEffect, SIGNAL(stateChanged(int)), this, SLOT(OnGroundEffect(int)));
+	connect(m_pctrlAutoName, SIGNAL(clicked()), this, SLOT(OnAutoName()));
+	connect(m_pctrlWakeRollUp, SIGNAL(clicked()), this, SLOT(OnWakeRollUp()));
+	connect(m_pctrlTiltGeom, SIGNAL(clicked()), this, SLOT(OnTiltedGeom()));
+	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
+	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
 
 	connect(m_pctrlXCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlDensity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
@@ -257,7 +257,7 @@ void WPolarDlg::InitDialog()
 	if(m_bTiltedGeom)	m_pctrlTiltGeom->setChecked(true);
 	if(m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
 
-	OnTiltedGeom(m_bTiltedGeom);
+	OnTiltedGeom();
 
 	if(m_AnalysisType==0) m_AnalysisType=2;//former m_bLLT=false;
 	if(m_AnalysisType==1)
@@ -346,10 +346,8 @@ void WPolarDlg::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
 	}
-
-	QDialog::keyPressEvent(event);
 }
 
 
@@ -375,24 +373,24 @@ void WPolarDlg::OnEditingFinished()
 }
 
 
-void WPolarDlg::OnAutoName(int state)
+void WPolarDlg::OnAutoName()
 {
 	m_bAutoName = m_pctrlAutoName->isChecked();
 }
 
-void WPolarDlg::OnTiltedGeom(int state)
+void WPolarDlg::OnTiltedGeom()
 {
 	m_bTiltedGeom = m_pctrlTiltGeom->isChecked();
 	SetWPolarName();
 	EnableControls();}
 
-void WPolarDlg::OnViscous(int state)
+void WPolarDlg::OnViscous()
 {
 	m_bViscous = m_pctrlViscous->isChecked();
 	SetWPolarName();
 	EnableControls();}
 
-void WPolarDlg::OnGroundEffect(int state)
+void WPolarDlg::OnGroundEffect()
 {
 	m_bGround = m_pctrlGroundEffect->isChecked();
 	m_pctrlHeight->setEnabled(m_bGround);
@@ -502,7 +500,7 @@ void WPolarDlg::OnUnit()
 	SetDensity();
 }
 
-void WPolarDlg::OnWakeRollUp(int state)
+void WPolarDlg::OnWakeRollUp()
 {
 }
 
@@ -833,12 +831,8 @@ void WPolarDlg::SetWPolarName()
 		strong = QString("%1").arg(m_Height,0,'f',2),
 		m_WPolarName += "-G"+strong;
 	}
-	if(m_AnalysisType==1) m_WPolarName += "-planform_area";
-	else
-	{
-		if(m_RefAreaType==1) m_WPolarName += "-dev_area";
-		if(m_RefAreaType==2) m_WPolarName += "-proj_area";
-	}
+	if(m_AnalysisType!=1 && m_RefAreaType==2) m_WPolarName += "-proj_area";
+
 	m_pctrlWPolarName->setText(m_WPolarName);
 }
 

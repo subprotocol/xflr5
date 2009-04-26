@@ -42,6 +42,7 @@ public:
 	void SetPointers(int*PrecisionTable, int *pNPanels);
 
 private:
+	void *m_pWingDlg;
 	int *m_pNPanels;
 	int *m_Precision; ///table of float precisions for each column
 	QList <void*> *m_poaFoil;

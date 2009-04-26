@@ -42,7 +42,7 @@ private slots:
 	void OnOverwrite();
 	void OnOK();
 	void OnSelChangeList(QListWidgetItem * pItem);
-
+	void OnDoubleClickList(QListWidgetItem * pItem);
 
 public:
 	RenameDlg(void *pParent=NULL);

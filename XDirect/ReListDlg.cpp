@@ -139,12 +139,6 @@ void ReListDlg::OnDelete()
 	QModelIndex index = m_pctrlReView->currentIndex();
 	sel = index.row();
 
-	for (i=0; i<m_NRe; i++)
-	{
-		qDebug() << "i=" << i << "   Re="<< m_ReList[i];
-	}
-	qDebug() << "START delete";
-
 	if(sel<0) return;
 
 	for (i=sel;i<m_NRe-1; i++)
@@ -155,7 +149,6 @@ void ReListDlg::OnDelete()
 	}
 
 	m_NRe --;
-
 
 	FillReModel();
 }

@@ -1676,28 +1676,12 @@ void QXDirect::OnAnimateSpeed(int val)
 
 void QXDirect::OnAnalyze()
 {
-/*An alternative is to call setModal(true) or setWindowModality(), then show().
- Unlike exec(), show() returns control to the caller immediately.
- Calling setModal(true) is especially useful for progress dialogs, where the user
- must have the ability to interact with the dialog, e.g. to cancel a long
- running operation. If you use show() and setModal(true) together to perform
- a long operation, you must call QApplication::processEvents() periodically
- during processing to enable the user to interact with the dialog.
- (See QProgressDialog.)*/
-/*	TestDlg tdlg;
-	tdlg.setModal(true);
-	tdlg.show();
-	tdlg.SetTimer();
-	tdlg.repaint();
-	Sleep(3000);
-	return;*/
 	if(!m_pCurFoil || !m_pCurPolar) return;
 	if(m_bViscous) m_pXFoil->lvisc = true;
 
 	ReadParams();
 
 	XFoilAnalysisDlg m_XFDlg;
-
 
 	m_XFDlg.SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
 	m_XFDlg.SetCl(m_Cl, m_ClMax, m_ClDelta);
@@ -1713,7 +1697,6 @@ void QXDirect::OnAnalyze()
 	m_XFDlg.m_IterLim = m_IterLim;
 	m_XFDlg.m_pXFoil = m_pXFoil;
 	m_XFDlg.setMinimumSize(600,400);
-	m_XFDlg.setMaximumSize(600,500);
 	m_XFDlg.InitDialog();
 	m_XFDlg.setModal(true);
 	m_XFDlg.show();
@@ -2360,8 +2343,8 @@ void QXDirect::OnExportCurXFoilResults()
 	double uei;
 	double que = 0.5*m_pXFoil->qinf*m_pXFoil->qinf;
 	double qrf = m_pXFoil->qinf;
-	int nside1, nside2, ibl, type;
-
+	int nside1, nside2, ibl;
+	int type = 1;
 
 	FileName = m_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
@@ -2372,6 +2355,9 @@ void QXDirect::OnExportCurXFoilResults()
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	pos  = FileName.lastIndexOf(".csv");
+	if(pos>0) type = 2;
 
 	QFile DestFile(FileName);
 
@@ -2897,7 +2883,7 @@ void QXDirect::OnNacaFoils()
 	{
 		QString str;
 		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)
-			str = QString("%1").arg(dlg.m_Digits,4);
+			str = QString("%1").arg(dlg.m_Digits,4,10,QChar('0'));
 		else
 			str = QString("%1").arg(dlg.m_Digits);
 		str = "NACA "+ str;
@@ -2993,7 +2979,7 @@ void QXDirect::OnNPlot()
 void QXDirect::OnOpPoints()
 {
 	if(!m_bPolar) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	m_bPolar = false;
 	CreateOppCurves();
@@ -3006,7 +2992,7 @@ void QXDirect::OnOpPoints()
 void QXDirect::OnPolars()
 {
 	if(m_bPolar) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bPolar = true;
 	CreatePolarCurves();
 	SetCurveParams();
@@ -3282,8 +3268,6 @@ void QXDirect::OnRtLPlot()
 }
 
 
-
-
 void QXDirect::OnSavePolars()
 {
 	if(!m_pCurFoil || !m_poaPolar->size()) return;
@@ -3294,18 +3278,21 @@ void QXDirect::OnSavePolars()
 	FileName = m_pCurFoil->m_FoilName + ".plr";
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, tr("Polar File"), pMainFrame->m_LastDirName, tr("Polar File (*.plr)"));
+	FileName = QFileDialog::getSaveFileName(this, tr("Polar File"), pMainFrame->m_LastDirName+"/"+FileName, tr("Polar File (*.plr)"));
+
+	QString strong = FileName.right(4);
+	if(strong !=".plr" || strong !=".PLR") FileName += ".plr";
+
 	QFile XFile(FileName);
 	if (!XFile.open(QIODevice::WriteOnly)) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
-
 	QDataStream ar(&XFile);
 	ar.setByteOrder(QDataStream::LittleEndian);
 
-        pMainFrame->WritePolars(ar, m_pCurFoil);
+	pMainFrame->WritePolars(ar, m_pCurFoil);
 
 	XFile.close();
 }
@@ -4093,7 +4080,6 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 		if(m_bPressure && m_pCurOpp) PaintPressure(painter, m_pCurOpp, m_fFoilScale);
 		if(m_bBL && m_pCurOpp)       PaintBL(painter, m_pCurOpp, m_fFoilScale);
-
 	}
 
 	if(m_bCpGraph)
@@ -4357,7 +4343,8 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 
 	LegendSize = 30;
 	LegendWidth = 210;
-	ypos = 14;
+	QFontMetrics fm(pMainFrame->m_TextFont);
+	ypos = fm.height();
 
 	painter.setFont(pMainFrame->m_TextFont);
 
@@ -4450,11 +4437,11 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 						x1 = place.x() + (int)(1.5*LegendSize);
 						painter.drawRect(x1-2, place.y() + (int)(1.*ypos*ny), 4, 4);
 					}
-					ny++ ;
 
 					painter.setPen(TextPen);
-					painter.drawText(place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny)-(int)(ypos/2),
+					painter.drawText(place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny)+(int)(ypos/3),
 									 pPolar->m_PlrName);
+					ny++ ;
 				}
 			}
 		}

@@ -51,7 +51,7 @@ WingDlg::WingDlg()
 
 	m_bAcceptName = true;
 	m_bRightSide  = true;
-	m_bChanged    = true;
+	m_bChanged    = false;
 	m_bTrans      = false;
 	m_iSection = 0;
 	m_yMAC = 0.;
@@ -73,10 +73,8 @@ WingDlg::WingDlg()
 	m_pContextMenu->addAction(m_pInsertBefore);
 	m_pContextMenu->addAction(m_pInsertAfter);
 	m_pContextMenu->addAction(m_pDeleteSection);
-	m_pctrlWingTable->setSelectionMode(QAbstractItemView::NoSelection);
-	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged);
 
+	connect(m_pctrlResetMesh, SIGNAL(clicked()),this, SLOT(OnResetMesh()));
 	connect(m_pctrlWingColor, SIGNAL(clicked()),this, SLOT(OnWingColor()));
 	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
 	connect(m_pctrlRightSide, SIGNAL(clicked()),this, SLOT(OnSide()));
@@ -225,6 +223,7 @@ void WingDlg::contextMenuEvent(QContextMenuEvent *event)
 		if(res>=0)
 		{
 			m_iSection = res;
+//qDebug() << "Context Menu " << m_iSection;
 		}
 		if(m_iSection>=0)
 		{
@@ -366,7 +365,7 @@ void WingDlg::DrawFoils(QPainter &painter, QPoint O)
 	FoilPen.setStyle(Qt::DashLine);
 	QPen HighPen(Qt::red);
 	HighPen.setStyle(Qt::DashLine);
-
+	HighPen.setWidth(4);
 
 	painter.setPen(FoilPen);
 
@@ -754,7 +753,7 @@ void WingDlg::FillDataTable()
 	if(!m_pWing) return;
 	int i;
 //	if(m_pWing->m_bVLMAutoMesh) VLMSetAutoMesh();
-	m_pWingModel->setRowCount(m_pWing->m_NPanel+2);
+	m_pWingModel->setRowCount(m_pWing->m_NPanel+1);
 
 	for(i=0; i<=m_pWing->m_NPanel; i++)
 	{
@@ -787,12 +786,12 @@ void WingDlg::FillTableRow(int row)
 	if(m_bRightSide) m_pWingModel->setData(ind, m_pWing->m_RFoil[row]);
 	else             m_pWingModel->setData(ind, m_pWing->m_LFoil[row]);
 
-	if(row<m_pWing->m_NPanel)
+	if(row<=m_pWing->m_NPanel)
 	{
 		ind = m_pWingModel->index(row, 6, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NXPanels[row]);
 
-		if(m_pWing->m_XPanelDist[row]==0)		 strong = "Uniform";
+		if(m_pWing->m_XPanelDist[row]==0)      strong = "Uniform";
 		else if(m_pWing->m_XPanelDist[row]==1) strong = "Cosine";
 		ind = m_pWingModel->index(row, 7, QModelIndex());
 		m_pWingModel->setData(ind, strong);
@@ -800,10 +799,10 @@ void WingDlg::FillTableRow(int row)
 		ind = m_pWingModel->index(row, 8, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NYPanels[row]);
 
-		if(m_pWing->m_YPanelDist[row]==0)			strong = "Uniform";
-		else if(m_pWing->m_YPanelDist[row]==1)	strong = "Cosine";
-		else if(m_pWing->m_YPanelDist[row]==2)	strong = "Sine";
-		else if(m_pWing->m_YPanelDist[row]==-2)	strong = "-Sine";
+		if(m_pWing->m_YPanelDist[row]==0)       strong = "Uniform";
+		else if(m_pWing->m_YPanelDist[row]==1)  strong = "Cosine";
+		else if(m_pWing->m_YPanelDist[row]==2)  strong = "Sine";
+		else if(m_pWing->m_YPanelDist[row]==-2) strong = "-Sine";
 		ind = m_pWingModel->index(row, 9, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 	}
@@ -820,6 +819,7 @@ void WingDlg::FillTableRow(int row)
 		m_pWingModel->setData(ind, " ");
 	}
 }
+
 
 double WingDlg::GetChord(double yob)
 {
@@ -916,7 +916,7 @@ void WingDlg::InitDialog()
 	m_pctrlWingTable->setModel(m_pWingModel);
 	m_pctrlWingTable->setWindowTitle(QObject::tr("Wing definition"));
 
-	m_pWingDelegate = new WingDelegate;
+	m_pWingDelegate = new WingDelegate(this);
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
 	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
@@ -1004,11 +1004,15 @@ void WingDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			OnCancel();
+			break;
+		}
 		default:
-			QDialog::keyPressEvent(event);
+			event->ignore();
+			break;
 	}
-
-	QDialog::keyPressEvent(event);
 }
 
 
@@ -1022,6 +1026,7 @@ void WingDlg::mousePressEvent(QMouseEvent *event)
 		if(res>=0)
 		{
 			m_iSection = res;
+//qDebug() << "Mouse press " << m_iSection;
 			m_pctrlWingTable->selectRow(res);
 			m_pctrlWingTable->setFocus();
 			repaint();
@@ -1068,12 +1073,76 @@ void WingDlg::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
+void WingDlg::OnCancel()
+{
+	if(m_bChanged)
+	{
+		QString strong = tr("Discard the changes ?");
+		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			return;
+	}
+	reject();
+}
+
+
+
 void WingDlg::OnCellChanged(QWidget *pWidget)
 {
-	ReadSectionData(m_iSection);
-	
+//qDebug() << "OnCellChanged" << m_iSection;
+//	ReadSectionData(m_iSection);
+	m_bChanged = true;
+	ReadParams();
 	repaint();
 }
+
+void WingDlg::OnDelete()
+{
+	if(m_iSection<=0)
+	{
+		QMessageBox::warning(this, "QFLR5","The first section cannot be deleted");
+		return;
+	}
+
+	int ny, k, size, total;
+
+	size = m_pWingModel->rowCount();
+	if(size<=2)
+	{
+		QMessageBox::warning(this, "QFLR5","Two panel sections at least are required... cannot delete");
+		return;
+	}
+
+	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
+
+	total = VLMGetPanelTotal();
+	for (k=m_iSection; k<size; k++)
+	{
+		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k+1];
+		m_pWing->m_TChord[k]    = m_pWing->m_TChord[k+1];
+		m_pWing->m_TOffset[k]   = m_pWing->m_TOffset[k+1];
+		m_pWing->m_TTwist[k]     = m_pWing->m_TTwist[k+1];
+		m_pWing->m_TDihedral[k]  = m_pWing->m_TDihedral[k+1];
+		m_pWing->m_NXPanels[k]   = m_pWing->m_NXPanels[k+1];
+		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k+1];
+		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k+1];
+		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k+1];
+		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k+1];
+		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k+1];
+	}
+	m_pWing->m_NPanel--;
+
+	m_pWing->m_NYPanels[m_iSection-1] = ny;
+
+//	m_pWing->m_bVLMAutoMesh = true;
+//	Convert(false);
+//	VLMSetAutoMesh(total);
+	FillDataTable();
+	ComputeGeometry();
+	SetWingData();
+	m_bChanged = true;
+}
+
+
 
 
 void WingDlg::OnDeleteSection()
@@ -1198,10 +1267,9 @@ void WingDlg::OnInsertAfter()
 
 	for (k=m_pWing->m_NPanel+1; k>n; k--)
 	{
-
-		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k-1];
-		m_pWing->m_TChord[k]    = m_pWing->m_TChord[k-1];
-		m_pWing->m_TOffset[k]   = m_pWing->m_TOffset[k-1];
+		m_pWing->m_TPos[k]       = m_pWing->m_TPos[k-1];
+		m_pWing->m_TChord[k]     = m_pWing->m_TChord[k-1];
+		m_pWing->m_TOffset[k]    = m_pWing->m_TOffset[k-1];
 		m_pWing->m_TTwist[k]     = m_pWing->m_TTwist[k-1];
 		m_pWing->m_TDihedral[k]  = m_pWing->m_TDihedral[k-1];
 		m_pWing->m_NXPanels[k]   = m_pWing->m_NXPanels[k-1];
@@ -1210,17 +1278,15 @@ void WingDlg::OnInsertAfter()
 		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k-1];
 		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k-1];
 	}
-
+qDebug() << m_pWing->m_NXPanels[m_pWing->m_NPanel+1]  << m_pWing->m_NYPanels[m_pWing->m_NPanel+1];
 	if(n+1<m_pWing->m_NPanel)
 	{
-
 		m_pWing->m_TPos[n+1]    = (m_pWing->m_TPos[n]    + m_pWing->m_TPos[n+2])   /2.0;
 		m_pWing->m_TChord[n+1]  = (m_pWing->m_TChord[n]  + m_pWing->m_TChord[n+2]) /2.0;
 		m_pWing->m_TOffset[n+1] = (m_pWing->m_TOffset[n] + m_pWing->m_TOffset[n+2])/2.0;
 	}
 	else
 	{
-
 		m_pWing->m_TPos[n+1]     = m_pWing->m_TPos[n+1]*1.1;
 		m_pWing->m_TChord[n+1]   = m_pWing->m_TChord[n+1]/1.1;
 		m_pWing->m_TOffset[n+1]  = m_pWing->m_TOffset[n+1] + m_pWing->m_TChord[n] - m_pWing->m_TChord[n+1] ;
@@ -1232,10 +1298,12 @@ void WingDlg::OnInsertAfter()
 	m_pWing->m_XPanelDist[n+1] = m_pWing->m_XPanelDist[n];
 	m_pWing->m_YPanelDist[n+1] = m_pWing->m_YPanelDist[n];
 	m_pWing->m_RFoil[n+1]      = m_pWing->m_RFoil[n];
+qDebug() << m_pWing->m_NXPanels[n+1]  << m_pWing->m_NYPanels[n+1];
 
 	m_pWing->m_NYPanels[n+1] = qMax(1,(int)(ny/2));
 	m_pWing->m_NYPanels[n]   = qMax(1,ny-m_pWing->m_NYPanels[n+1]);
 
+qDebug() << m_pWing->m_NXPanels[n+1]  << m_pWing->m_NYPanels[n+1];
 	m_pWing->m_NPanel++;
 
 //	m_pWing->m_bVLMAutoMesh = true;
@@ -1253,70 +1321,28 @@ void WingDlg::OnInsertAfter()
 void WingDlg::OnItemActivated(const QModelIndex &index)
 {
 	m_iSection = index.row();
+//qDebug()<< "Activated item "<< m_iSection;
 	repaint();
 }
+
+
 
 void WingDlg::OnItemClicked(const QModelIndex &index)
 {
 	if(index.row()>m_pWing->m_NPanel)
 	{
 		//the user has filled a cell in the last line
-		//so add an item before reading
-		m_pWing->m_NPanel++;
-		m_pWingModel->setRowCount(m_pWing->m_NPanel+2);
-		FillTableRow(m_pWing->m_NPanel);
+		if(index.row()<MAXPANELS-1)
+		{
+			//so add an item before reading
+			m_pWing->m_NPanel++;
+			m_pWingModel->setRowCount(m_pWing->m_NPanel+2);
+			FillTableRow(m_pWing->m_NPanel);
+		}
 	}
 	m_iSection = index.row();
+//qDebug() << "Item Clicked   "<< m_iSection;
 	repaint();
-}
-
-
-
-void WingDlg::OnDelete()
-{
-	if(m_iSection<=0)
-	{
-		QMessageBox::warning(this, "QFLR5","The first section cannot be deleted");
-		return;
-	}
-
-	int ny, k, size, total;
-
-	size = m_pWingModel->rowCount();
-	if(size<=2)
-	{
-		QMessageBox::warning(this, "QFLR5","Two panel sections at least are required... cannot delete");
-		return;
-	}
-
-	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
-
-	total = VLMGetPanelTotal();
-	for (k=m_iSection; k<size; k++)
-	{
-		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k+1];
-		m_pWing->m_TChord[k]    = m_pWing->m_TChord[k+1];
-		m_pWing->m_TOffset[k]   = m_pWing->m_TOffset[k+1];
-		m_pWing->m_TTwist[k]     = m_pWing->m_TTwist[k+1];
-		m_pWing->m_TDihedral[k]  = m_pWing->m_TDihedral[k+1];
-		m_pWing->m_NXPanels[k]   = m_pWing->m_NXPanels[k+1];
-		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k+1];
-		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k+1];
-		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k+1];
-		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k+1];
-		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k+1];
-	}
-	m_pWing->m_NPanel--;
-
-	m_pWing->m_NYPanels[m_iSection-1] = ny;
-
-//	m_pWing->m_bVLMAutoMesh = true;
-//	Convert(false);
-//	VLMSetAutoMesh(total);
-	FillDataTable();
-	ComputeGeometry();
-	SetWingData();
-	m_bChanged = true;
 }
 
 
@@ -1340,6 +1366,17 @@ void WingDlg::OnOK()
 	m_pWing->ComputeGeometry();
 	accept();
 }
+
+
+void WingDlg::OnResetMesh()
+{
+	VLMSetAutoMesh();
+	FillDataTable();;
+	SetWingData();
+	m_bChanged = true;
+	repaint();
+}
+
 
 void WingDlg::OnSide()
 {
@@ -1414,9 +1451,14 @@ void WingDlg::paintEvent(QPaintEvent *event)
 void WingDlg::ReadParams()
 {
 	m_pWing->m_WingName = m_pctrlWingName->text();
-	ReadSectionData(m_iSection);
+//	ReadSectionData(m_iSection);
+//qDebug() << "Row count = "<< m_pWingModel->rowCount();
+	for (int i=0; i< m_pWingModel->rowCount();  i++)
+	{
+		ReadSectionData(i);
+	}
 
-
+	repaint();
 }
 
 void WingDlg::ReadSectionData(int sel)
@@ -1498,7 +1540,11 @@ void WingDlg::ReadSectionData(int sel)
 	m_pWing->ComputeGeometry();
 }
 
-
+void WingDlg::SetCurrentSection(int section)
+{
+	m_iSection = section;
+	repaint();
+}
 
 void WingDlg::SetScale()
 {
@@ -1619,6 +1665,10 @@ void WingDlg::SetupLayout()
 	QLabel *lab15 = new QLabel("Max is 2000");
 	lab15->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab15, 7, 3);
+
+
+	QGridLayout *Data2Layout = new QGridLayout;
+
 	QLabel *lab5 = new QLabel("Mean Geom. Chord");
 	QLabel *lab6 = new QLabel("Mean Aero Chord");
 	QLabel *lab7 = new QLabel("MAC Span Pos");
@@ -1633,13 +1683,13 @@ void WingDlg::SetupLayout()
 	lab9->setAlignment(Qt::AlignRight);
 	lab10->setAlignment(Qt::AlignRight);
 	lab11->setAlignment(Qt::AlignRight);
-	DataLayout->addWidget(lab5,1,5);
-	DataLayout->addWidget(lab6,2,5);
-	DataLayout->addWidget(lab7,3,5);
-	DataLayout->addWidget(lab8,4,5);
-	DataLayout->addWidget(lab9,5,5);
-	DataLayout->addWidget(lab10,6,5);
-	DataLayout->addWidget(lab11,7,5);
+	Data2Layout->addWidget(lab5,1,1);
+	Data2Layout->addWidget(lab6,2,1);
+	Data2Layout->addWidget(lab7,3,1);
+	Data2Layout->addWidget(lab8,4,1);
+	Data2Layout->addWidget(lab9,5,1);
+	Data2Layout->addWidget(lab10,6,1);
+	Data2Layout->addWidget(lab11,7,1);
 
 	m_pctrlMAC        = new QLabel("150.0");
 	m_pctrlGeomChord  = new QLabel("170.0");
@@ -1655,28 +1705,30 @@ void WingDlg::SetupLayout()
 	m_pctrlTaperRatio->setAlignment(Qt::AlignRight);
 	m_pctrlSweep->setAlignment(Qt::AlignRight);
 	m_pctrlNFlaps->setAlignment(Qt::AlignRight);
-	DataLayout->addWidget(m_pctrlMAC,        1,6);
-	DataLayout->addWidget(m_pctrlGeomChord,  2,6);
-	DataLayout->addWidget(m_pctrlMACSpanPos,  3,6);
-	DataLayout->addWidget(m_pctrlAspectRatio, 4,6);
-	DataLayout->addWidget(m_pctrlTaperRatio,  5,6);
-	DataLayout->addWidget(m_pctrlSweep,       6,6);
-	DataLayout->addWidget(m_pctrlNFlaps,      7,6);
-	DataLayout->addWidget(m_pctrlLength3, 1, 7);
-	DataLayout->addWidget(m_pctrlLength4, 2, 7);
-	DataLayout->addWidget(m_pctrlLength5, 3, 7);
+	Data2Layout->addWidget(m_pctrlMAC,         1,2);
+	Data2Layout->addWidget(m_pctrlGeomChord,   2,2);
+	Data2Layout->addWidget(m_pctrlMACSpanPos,  3,2);
+	Data2Layout->addWidget(m_pctrlAspectRatio, 4,2);
+	Data2Layout->addWidget(m_pctrlTaperRatio,  5,2);
+	Data2Layout->addWidget(m_pctrlSweep,       6,2);
+	Data2Layout->addWidget(m_pctrlNFlaps,      7,2);
+	Data2Layout->addWidget(m_pctrlLength3, 1, 3);
+	Data2Layout->addWidget(m_pctrlLength4, 2, 3);
+	Data2Layout->addWidget(m_pctrlLength5, 3, 3);
 	QLabel *lab14 = new QLabel("deg");
 	lab14->setAlignment(Qt::AlignLeft);
-	DataLayout->addWidget(lab14, 6, 7);
+	Data2Layout->addWidget(lab14, 6, 3);
 
 
 	m_pctrlWingTable = new QTableView(this);
 	m_pctrlWingTable->setMinimumWidth(800);
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
-	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);//we only need to select panel sections
+	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+//	m_pctrlWingTable->setSelectionMode(QAbstractItemView::NoSelection);
+	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged);
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
-//	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
 	m_pctrlWingTable->setSizePolicy(szPolicyExpanding);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -1688,12 +1740,15 @@ void WingDlg::SetupLayout()
 	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(CancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
 	QHBoxLayout *TopLayout = new QHBoxLayout;
 	TopLayout->addLayout(DefLayout);
-//	TopLayout->addStretch(1);
+	TopLayout->addSpacing(30);
 	TopLayout->addLayout(DataLayout);
+	TopLayout->addSpacing(30);
+	TopLayout->addLayout(Data2Layout);
+
 	QVBoxLayout *MainLayout = new QVBoxLayout(this);
 	MainLayout->addLayout(TopLayout);
 //	MainLayout->addStretch(1);
@@ -1791,6 +1846,53 @@ int WingDlg::VLMGetPanelTotal()
 //	if(!m_bMiddle) total *=2;
 	if(!m_pWing->m_bIsFin) return total*2;
 	else                   return total;
+}
+
+
+
+
+bool WingDlg::VLMSetAutoMesh(int total)
+{
+	//set automatic mesh : keep it simple
+	m_pWing->m_bVLMAutoMesh = true;
+	m_bChanged = true;
+	//split (NYTotal) panels on each side proportionnaly to length, and space evenly
+	//Set VLMMATSIZE/NYTotal panels along chord
+	int NYTotal, size;
+
+	if(!total){
+		size = (int)(VLMMATSIZE/4);//why not ? Too much refinement isn't worthwile
+		NYTotal = 22;
+	}
+	else{
+		size = total;
+		NYTotal = (int)sqrt((float)size);
+	}
+
+	NYTotal *= 2;
+
+	double d1, d2; //spanwise panel densities at i and i+1
+
+	for (int i=0; i<m_pWing->m_NPanel;i++)
+	{
+		d1 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i],  3) + 0.5;
+		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i+1],3) + 0.5;
+		m_pWing->m_NYPanels[i] = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i])/m_pWing->m_Span);
+		m_pWing->m_NXPanels[i] = (int) (size/NYTotal);
+		m_pWing->m_NXPanels[i] = qMin(m_pWing->m_NXPanels[i], MAXCHORDPANELS);
+
+		if(m_pWing->m_NYPanels[i]==0) m_pWing->m_NYPanels[i] = 1;
+		if(m_pWing->m_NXPanels[i]==0) m_pWing->m_NXPanels[i] = 1;
+//		m_pWing->m_XPanelDist[i] = 1;//cosine distribution
+//		m_pWing->m_YPanelDist[i] = 0;//uniformly distributed, except at the root and tip (see next)
+	}
+
+	if(VLMGetPanelTotal()>VLMMATSIZE/2)
+	{
+		QMessageBox::warning(this, "QFLR5", "Too many panels\nReduce the mesh size");
+		return false;
+	}
+	return true;
 }
 
 
