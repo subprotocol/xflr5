@@ -116,6 +116,12 @@ private slots:
 	void OnViscous();
 	void OnXDirectStyle();
 
+	void OnShowPolarOpps();
+	void OnHidePolarOpps();
+	void OnDeletePolarOpps();
+	void OnShowFoilOpps();
+	void OnHideFoilOpps();
+	void OnDeleteFoilOpps();
 	void OnDerotateFoil();
 	void OnNormalizeFoil();
 	void OnCadd();
@@ -166,6 +172,7 @@ protected:
 	void FillComboBoxes(bool bEnable = true);
 	void FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar);
 	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
+	void InsertOpPoint(OpPoint *pNewPoint);
 	void LoadSettings(QDataStream &ar);
 
 	void PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale);
@@ -203,7 +210,7 @@ protected:
 	CPolar *SetPolar(QString PlrName);
 	OpPoint *SetOpp(double Alpha=-123456789.0);
 
-	OpPoint* AddOpPoint(OpPoint *pNewPoint=NULL);
+	OpPoint* AddOpPoint();
 
 private:
 	QTimer *m_pAnimateTimer;
@@ -266,6 +273,7 @@ private:
 
 	int m_posAnimate;		// the current aoa in the animation
 	int m_OppVar;			// defined the variable to be displayed in the Cp graph
+	int m_XFoilVar;
 	int m_IterLim;			// max iteratio limit for XFoil
 	int m_XPolar, m_YPolar;	// variables for the first polar graph
 	int m_XCz, m_YCz;		// variables for the second polar graph

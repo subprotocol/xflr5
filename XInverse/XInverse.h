@@ -78,12 +78,12 @@ private slots:
 	void OnQViscous();
 	void OnQPoints();
 	void OnQReflected();
+	void OnPertubate();
 
 
 private:
 	void UpdateView();
 
-	void showEvent(QShowEvent *event);
 	void wheelEvent(QWheelEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mousePressEvent(QMouseEvent *event) ;
@@ -109,7 +109,6 @@ private:
 	void CancelMark();
 	void CancelSpline();
 	void CancelSmooth();
-	void Pertubate();
 	void SetFoil();
 	void SetTAngle(double a);
 	void SetTGap(double tr, double ti);

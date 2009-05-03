@@ -4866,7 +4866,7 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls){
 		//TRACE("     artificially limiting re to %f\n",reinf1*100.0);
 		QString str("mrcl: cl too low for chosen Re(Cl) dependence\r\n");
 		WriteString(str);
-		str = QString("      artificially limiting Re to %.0f\r\n").arg(reinf1*100.0,0,'f',0);
+		str = QString("      artificially limiting Re to %1\r\n").arg(reinf1*100.0,0,'f',0);
 		WriteString(str);
 		reinf = reinf1*100.0;
 		r_cls = 0.0;
@@ -7879,7 +7879,8 @@ bool XFoil::speccl(){
 void XFoil::splina(double x[], double xs[], double s[], int n){
 //      dimension x(n),xs(n),s(n)
       bool lend;
-	  double ds, dx, xs1, xs2;//TODO : xs1 and 2 used uninitialized
+	  double ds, dx, xs1, xs2;
+	  xs1 = xs2 = 0.0;//TODO : xs1 and 2 used uninitialized
 //-------------------------------------------------------
 //     calculates spline coefficients for x(s).          |
 //     a simple averaging of adjacent segment slopes     |

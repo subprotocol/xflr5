@@ -63,7 +63,7 @@ class MainFrame : public QMainWindow
 	friend class CtrlPolarDlg;
 	friend class WingScaleDlg;
 	friend class BodyTransDlg;
-
+	friend class GLWidget;
 	Q_OBJECT
 
 public:
@@ -84,6 +84,7 @@ private slots:
 	void OnRenameCurFoil();
 	void OnResetCurGraphScales();
 	void OnRestoreToolbars();
+	void OnSaveOptions();
 	bool OnSaveProjectAs();
 	void OnSaveViewToImageFile();
 	void OnSelChangeFoil(int i);
@@ -164,7 +165,7 @@ private:
 	CFoil* ReadFoilFile(QTextStream &ar);
 	CFoil* ReadPolarFile(QDataStream &ar);
 	CFoil* SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil = false);
-	CPolar *GetPolar(QString strPolarName);
+	CPolar *GetPolar(QString m_FoilName, QString PolarName);
 	CPolar* AddPolar(CPolar *pPolar);
 	OpPoint *GetOpp(double Alpha);
 	QColor GetColor(int type);
@@ -210,7 +211,7 @@ private:
 	QMenu *FoilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu;
 	QMenu *currentFoilMenu;
 	QMenu *DesignMenu;
-	QMenu *OpPointMenu;
+	QMenu *OpPointMenu, *CpGraphMenu;
 	QMenu *PolarMenu, *currentPolarMenu, *GraphPolarMenu, *CurPolarGraphMenu;
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
 
@@ -227,7 +228,7 @@ private:
 	//MainFrame actions
 	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct, *OnMixedInverseAct;
 	QAction *openAct, *styleAct;
-	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct;
+	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct, *saveOptionsAct;
 	QAction *unitsAct;
 	QAction *exitAct;
 	QAction *aboutAct, *aboutQtAct, *guidelinesAct;
@@ -275,6 +276,8 @@ private:
 	QAction *restoreToolbarsAct;
 	QAction *exportCurPolar, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
 	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;
+	QAction *hideFoilOpps, *showFoilOpps, *deleteFoilOpps;
+	QAction *hidePolarOpps, *showPolarOpps, *deletePolarOpps;
 	QAction *exportCurOpp, *deleteCurOpp, *resetXFoil;
 	QAction *viewXFoilAdvanced, *viewLogFile, *showPanels, *showNeutralLine, *resetFoilScale, *showInviscidCurve;
 	QAction *exportCurFoil, *deleteCurFoil, *renameCurFoil, *setCurFoilStyle;

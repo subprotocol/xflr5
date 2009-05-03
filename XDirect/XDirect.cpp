@@ -77,6 +77,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_bShowUserGraph  = true;
 	m_bSequence       = false;
 
+	m_Type            = 1;
 
 	m_bTrans          = false;
 	m_bType1          = true;
@@ -111,8 +112,9 @@ QXDirect::QXDirect(QWidget *parent)
 
 	m_bPolar          = true;
 	m_iPlrGraph = 1;
-	m_iPlrView  = 1;
+	m_iPlrView  = 0;
 	m_OppVar    = 0;
+	m_XFoilVar  = 0;
 	m_FoilYPos  = 150;
 
 	m_PointDown.setX(0);
@@ -148,7 +150,7 @@ QXDirect::QXDirect(QWidget *parent)
 
 	m_Reynolds      = 100000.0;
 	m_ReynoldsMax   = 150000.0;
-	m_ReynoldsDelta =  50000.0;
+	m_ReynoldsDelta =  10000.0;
 
 	m_NCrit = 9.0;
 	m_XTopTr = 1.0;
@@ -421,90 +423,37 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 
 
 
-OpPoint* QXDirect::AddOpPoint(OpPoint *pNewPoint)
+OpPoint* QXDirect::AddOpPoint()
 {
 	// adds an Operating Point to the array from XFoil results
 
 	MainFrame*pMainFrame = (MainFrame*)m_pMainFrame;
 	int i;
 
-	if(!pNewPoint) 
+	OpPoint *pNewPoint = new OpPoint();
+	if(pNewPoint ==NULL)
 	{
-		pNewPoint = new OpPoint();
-		if(pNewPoint ==NULL) 
-		{
 //			AfxMessageBox("Not enough memory to store the OpPoint\nOnly the polar point will be saved", MB_OK);
-			return NULL;
-		}
-		else
-		{
-			if(!m_pXFoil->lvconv)
-			{
-				delete pNewPoint;
-				return NULL;
-			}
-			pNewPoint->m_pOperWidget = this;
-			pNewPoint->Alpha = m_pXFoil->alfa * 180/pi;
-			pNewPoint->m_Color = pMainFrame->GetColor(2);
-			AddOpData(pNewPoint);
-			pMainFrame->SetSaveState(false);
-		}
+		return NULL;
 	}
-
-	if(m_bStoreOpp)
+	else
 	{
-		bool bIsInserted = false;
-		OpPoint* pOpPoint;
-		CPolar *pPolar = pMainFrame->GetPolar(pNewPoint->m_strPlrName);
-		m_pCurPolar = pPolar;
-		if(!pPolar) 
+		if(!m_pXFoil->lvconv)
 		{
 			delete pNewPoint;
 			return NULL;
 		}
+		pNewPoint->m_pOperWidget = this;
+		pNewPoint->Alpha = m_pXFoil->alfa * 180/pi;
+		pNewPoint->m_Color = pMainFrame->GetColor(2);
+		AddOpData(pNewPoint);
+		pMainFrame->SetSaveState(false);
+	}
 
-		// first add the OpPoint to the OpPoint Array for the current FoilName
-		for (i=0; i<m_poaOpp->size(); i++)
-		{
-			pOpPoint = (OpPoint*)m_poaOpp->at(i);
-			if (pNewPoint->m_strFoilName.compare(pOpPoint->m_strFoilName)<0)
-			{
-				//insert point
-				m_poaOpp->insert(i, pNewPoint);
-				bIsInserted = true;
-				i = m_poaOpp->size();// to break
-			}
-			else if (pNewPoint->m_strFoilName == pOpPoint->m_strFoilName)
-			{
-				if (pNewPoint->Reynolds < pOpPoint->Reynolds)
-				{
-					//insert point
-					m_poaOpp->insert(i, pNewPoint);
-					bIsInserted = true;
-					i = m_poaOpp->size();// to break
-				}
-				else if (fabs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0)
-				{
-					if(fabs(pNewPoint->Alpha - pOpPoint->Alpha)<0.005)
-					{
-						//replace existing point
-						m_poaOpp->removeAt(i);
-						delete pOpPoint;
-						m_poaOpp->insert(i, pNewPoint);
-						bIsInserted = true;
-						i = m_poaOpp->size();// to break
-					}
-					else if (pNewPoint->Alpha < pOpPoint->Alpha)
-					{
-						//insert point
-						m_poaOpp->insert(i, pNewPoint);
-						bIsInserted = true;
-						i = m_poaOpp->size();// to break
-					}
-				}
-			}
-		}
-		if (!bIsInserted) 	m_poaOpp->append(pNewPoint);
+	if(m_bStoreOpp)
+	{
+		//insert the OpPoint in the Operating points array
+		InsertOpPoint(pNewPoint);
 	}
 
 	// Now insert OpPoint in the current CPolar object
@@ -571,6 +520,17 @@ void QXDirect::CheckButtons()
 
 	pMainFrame->TwoPolarGraphsAct->setChecked(m_iPlrView==2);
 	pMainFrame->AllPolarGraphsAct->setChecked(m_iPlrView==0);
+
+	pMainFrame->CurXFoilCtPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==1);
+	pMainFrame->CurXFoilDbPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==2);
+	pMainFrame->CurXFoilDtPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==3);
+	pMainFrame->CurXFoilRtLPlot->setChecked(!m_bPolar && m_OppVar==2 && m_XFoilVar ==4);
+	pMainFrame->CurXFoilRtPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==5);
+	pMainFrame->CurXFoilNPlot->setChecked(!m_bPolar   && m_OppVar==2 && m_XFoilVar ==6);
+	pMainFrame->CurXFoilCdPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==7);
+	pMainFrame->CurXFoilCfPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==8);
+	pMainFrame->CurXFoilUePlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==9);
+	pMainFrame->CurXFoilHPlot->setChecked(!m_bPolar   && m_OppVar==2 && m_XFoilVar ==10);
 }
 
 
@@ -1205,6 +1165,63 @@ void QXDirect::InitXFoil2()
 	}
 }
 
+void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
+{
+	if(!pNewPoint) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	bool bIsInserted = false;
+	OpPoint* pOpPoint;
+	CPolar *pPolar = pMainFrame->GetPolar(pNewPoint->m_strFoilName, pNewPoint->m_strPlrName);
+//		m_pCurPolar = pPolar;
+	if(!pPolar)
+	{
+		delete pNewPoint;
+		return ;
+	}
+
+	// first add the OpPoint to the OpPoint Array for the current FoilName
+	for (int i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpPoint = (OpPoint*)m_poaOpp->at(i);
+		if (pNewPoint->m_strFoilName.compare(pOpPoint->m_strFoilName)<0)
+		{
+			//insert point
+			m_poaOpp->insert(i, pNewPoint);
+			bIsInserted = true;
+			i = m_poaOpp->size();// to break
+		}
+		else if (pNewPoint->m_strFoilName == pOpPoint->m_strFoilName)
+		{
+			if (pNewPoint->Reynolds < pOpPoint->Reynolds)
+			{
+				//insert point
+				m_poaOpp->insert(i, pNewPoint);
+				bIsInserted = true;
+				i = m_poaOpp->size();// to break
+			}
+			else if (fabs(pNewPoint->Reynolds-pOpPoint->Reynolds)<1.0)
+			{
+				if(fabs(pNewPoint->Alpha - pOpPoint->Alpha)<0.005)
+				{
+					//replace existing point
+					m_poaOpp->removeAt(i);
+					delete pOpPoint;
+					m_poaOpp->insert(i, pNewPoint);
+					bIsInserted = true;
+					i = m_poaOpp->size();// to break
+				}
+				else if (pNewPoint->Alpha < pOpPoint->Alpha)
+				{
+					//insert point
+					m_poaOpp->insert(i, pNewPoint);
+					bIsInserted = true;
+					i = m_poaOpp->size();// to break
+				}
+			}
+		}
+	}
+	if (!bIsInserted) 	m_poaOpp->append(pNewPoint);
+}
 
 
 void QXDirect::keyPressEvent(QKeyEvent *event)
@@ -1304,7 +1321,7 @@ void QXDirect::LoadSettings(QDataStream &ar)
 	ar >> m_crPressureColor >> m_iPressureStyle >> m_iPressureWidth;
 	ar >> m_crNeutralColor >> m_iNeutralStyle >> m_iNeutralWidth;
 
-	ar >> m_OppVar >> m_IterLim ;
+	ar >> m_OppVar >> m_XFoilVar >> m_IterLim ;
 	ar >> m_XPolar >> m_YPolar >> m_XCz >> m_YCz >> m_XCm >> m_YCm >> m_XTr >> m_YTr >> m_XUser >> m_YUser;
 
 	if(m_OppVar == 0 || m_OppVar>=2)
@@ -1823,7 +1840,6 @@ void QXDirect::OnCadd()
 	Adlg.m_pMemFoil    = m_pCurFoil;
 	Adlg.m_pXDirect    = this;
 	Adlg.m_pAFoil      = NULL;
-	Adlg.Title         = "Refine "+ m_pCurFoil->m_FoilName;
 	Adlg.InitDialog();
 
 	m_bShowPanels = true;
@@ -1863,6 +1879,7 @@ void QXDirect::OnCfPlot()
 	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
+	m_XFoilVar = 8;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -1896,7 +1913,7 @@ void QXDirect::OnCfPlot()
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -1909,6 +1926,7 @@ void QXDirect::OnCdPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar = 7;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -1942,7 +1960,7 @@ void QXDirect::OnCdPlot()
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -1951,6 +1969,7 @@ void QXDirect::OnCouplePolarGraphs()
 {
 	m_iPlrView  = 2;
 	m_bPolar = true;
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2007,6 +2026,7 @@ void QXDirect::OnCtPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar=1;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -2037,7 +2057,7 @@ void QXDirect::OnCtPlot()
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 
 }
@@ -2117,6 +2137,133 @@ void QXDirect::OnDelCurOpp()
 }
 
 
+void QXDirect::OnDeletePolarOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=m_poaOpp->size()-1; i>=0; i--)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
+			m_poaOpp->removeAt(i);
+			if(m_pCurOpp == pOpp) m_pCurOpp=NULL;
+			delete pOpp;
+	}
+	pMainFrame->SetSaveState(false);
+	pMainFrame->UpdateOpps();
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+void QXDirect::OnShowPolarOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
+			pOpp->m_bIsVisible = true;
+	}
+	pMainFrame->SetSaveState(false);
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+void QXDirect::OnHidePolarOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
+			pOpp->m_bIsVisible = false;
+	}
+	pMainFrame->SetSaveState(false);
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+
+void QXDirect::OnDeleteFoilOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=m_poaOpp->size()-1; i>=0; i--)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName)
+			m_poaOpp->removeAt(i);
+			if(m_pCurOpp == pOpp) m_pCurOpp=NULL;
+			delete pOpp;
+	}
+	pMainFrame->SetSaveState(false);
+	pMainFrame->UpdateOpps();
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+void QXDirect::OnShowFoilOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName)
+			pOpp->m_bIsVisible = true;
+	}
+	pMainFrame->SetSaveState(false);
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+void QXDirect::OnHideFoilOpps()
+{
+	if(!m_pCurFoil || !m_pCurPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	OpPoint *pOpp;
+
+	for(int i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName)
+			pOpp->m_bIsVisible = false;
+	}
+	pMainFrame->SetSaveState(false);
+	if(!m_bPolar) CreateOppCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
 void QXDirect::OnDeleteFoilPolars()
 {
 	if(!m_pCurFoil) return;
@@ -2174,22 +2321,16 @@ void QXDirect::OnDeltaAlphaChanged()
 	{
 		if(m_bAlpha)
 		{
-			m_AlphaDelta      = m_pctrlAlphaDelta->text().toDouble();
-			m_pctrlAlphaDelta->clear();
-			m_pctrlAlphaDelta->insert(str.setNum(m_AlphaDelta,'f',2));
+			m_AlphaDelta      = m_pctrlAlphaDelta->GetValue();
 		}
 		else
 		{
-			m_ClDelta    = m_pctrlAlphaDelta->text().toDouble();
-			m_pctrlAlphaDelta->clear();
-			m_pctrlAlphaDelta->insert(str.setNum(m_ClDelta,'f',2));
+			m_ClDelta    = m_pctrlAlphaDelta->GetValue();
 		}
 	}
 	else
 	{
-			m_ReynoldsDelta      = m_pctrlAlphaDelta->text().toDouble();
-			m_pctrlAlphaDelta->clear();
-			m_pctrlAlphaDelta->insert(str.setNum(m_ReynoldsDelta,'f',0));
+			m_ReynoldsDelta      = m_pctrlAlphaDelta->GetValue();
 	}
 }
 
@@ -2214,6 +2355,7 @@ void QXDirect::OnDtPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar=3;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -2238,7 +2380,7 @@ void QXDirect::OnDtPlot()
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2248,6 +2390,7 @@ void QXDirect::OnDbPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar = 2;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -2273,7 +2416,7 @@ void QXDirect::OnDbPlot()
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2706,6 +2849,7 @@ void QXDirect::OnHPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar = 10;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -2733,7 +2877,7 @@ void QXDirect::OnHPlot()
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -2937,6 +3081,7 @@ void QXDirect::OnNPlot()
 	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
+	m_XFoilVar=6;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -2970,7 +3115,7 @@ void QXDirect::OnNPlot()
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -3203,6 +3348,7 @@ void QXDirect::OnRtPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar=5;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -3224,7 +3370,7 @@ void QXDirect::OnRtPlot()
 
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -3235,6 +3381,7 @@ void QXDirect::OnRtLPlot()
 	int i;
 
 	m_OppVar = 2;
+	m_XFoilVar=4;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -3263,7 +3410,7 @@ void QXDirect::OnRtLPlot()
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -3634,12 +3781,13 @@ void QXDirect::OnSingleAnalysis()
     if(!m_pCurFoil) return;
 
 	FoilPolarDlg Adlg(this);
-	Adlg.m_MachDef = m_MachDef;
-	Adlg.m_NCrit   = m_NCrit;
-	Adlg.m_XBotTr  = m_XBotTr;
-	Adlg.m_XTopTr  = m_XTopTr;
-	Adlg.m_Mach    = m_Mach;
+	Adlg.m_MachDef  = m_MachDef;
+	Adlg.m_NCrit    = m_NCrit;
+	Adlg.m_XBotTr   = m_XBotTr;
+	Adlg.m_XTopTr   = m_XTopTr;
+	Adlg.m_Mach     = m_Mach;
 	Adlg.m_Reynolds = m_Reynolds;
+	Adlg.m_Type     = m_Type;
 
 	Adlg.InitDialog();
 
@@ -3677,11 +3825,12 @@ void QXDirect::OnSingleAnalysis()
 				break;
 		}
 
-		m_MachDef = Adlg.m_MachDef;
-		m_NCrit   = Adlg.m_NCrit;
-		m_XBotTr  = Adlg.m_XBotTr;
-		m_XTopTr  = Adlg.m_XTopTr;
-		m_Mach    = Adlg.m_Mach;
+		m_Type     = Adlg.m_Type;
+		m_MachDef  = Adlg.m_MachDef;
+		m_NCrit    = Adlg.m_NCrit;
+		m_XBotTr   = Adlg.m_XBotTr;
+		m_XTopTr   = Adlg.m_XTopTr;
+		m_Mach     = Adlg.m_Mach;
 		m_Reynolds = Adlg.m_Reynolds;
 
 
@@ -3743,6 +3892,7 @@ void QXDirect::OnUePlot()
 	int nside1, nside2, ibl;
 
 	m_OppVar = 2;
+	m_XFoilVar = 9;
 	m_pCpGraph->DeleteCurves();
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
@@ -3778,7 +3928,7 @@ void QXDirect::OnUePlot()
 	}
 	m_pCpGraph->SetXScale();
 	SetFoilScale();
-//	CheckMenu();
+	CheckButtons();
 	UpdateView();
 }
 
@@ -4135,7 +4285,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_BufferFoil.m_bTEFlap)
 	{
-		str1 = QString("Flap Angle = %1°").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
+		str1 = QString("Flap Angle = %1 deg").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
 		painter.drawText(LeftPos,ZPos+D, str1);
 		D+=12;
 
@@ -4205,7 +4355,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		}
 		if(m_pCurPolar->m_Type ==4)
 		{
-			strong = QString("Alpha = %1°").arg(m_pCurPolar->m_ASpec,8,'f',2);
+			strong = QString("Alpha = %1 deg").arg(m_pCurPolar->m_ASpec,8,'f',2);
 			painter.drawText(XPos,ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, strong);
 			D+=12;
 			strong = QString("Mach = %1").arg(m_pCurPolar->m_Mach,9,'f',3);
@@ -4253,7 +4403,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		}
 		if(m_pCurPolar->m_Type!=4)
 		{
-			Result = QString("       Alpha = %1?").arg(m_pCurOpp->Alpha, 8, 'f', 2);
+			Result = QString("       Alpha = %1 deg").arg(m_pCurOpp->Alpha, 8, 'f', 2);
 			painter.drawText(XPos,ZPos+D, Result);
 			D+=12;
 		}
@@ -4560,7 +4710,6 @@ void QXDirect::ReadParams()
 }
 
 
-
 void QXDirect::SaveSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
@@ -4581,7 +4730,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_crPressureColor << m_iPressureStyle << m_iPressureWidth;
 	ar << m_crNeutralColor << m_iNeutralStyle << m_iNeutralWidth;
 
-	ar << m_OppVar << m_IterLim << m_XPolar << m_YPolar << m_XCz << m_YCz;
+	ar << m_OppVar << m_XFoilVar << m_IterLim << m_XPolar << m_YPolar << m_XCz << m_YCz;
 	ar << m_XCm << m_YCm << m_XTr << m_YTr << m_XUser << m_YUser;
 	ar << m_iPlrGraph << m_iPlrView;
 	ar << m_Alpha << m_AlphaMax << m_AlphaDelta;
@@ -4590,7 +4739,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_NCrit << m_XTopTr << m_XBotTr;
 	ar << m_Mach << m_MachDef;
 	ar << m_Type;
-	ar <<	m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL ;
+	ar << m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL ;
 
 	ar << m_NRe;
 	for (int i=0; i<m_NRe; i++) ar << m_ReList[i] << m_MachList[i] << m_NCritList[i];
@@ -4817,6 +4966,10 @@ CFoil* QXDirect::SetFoil(QString FoilName)
 	else         CreateOppCurves();
 	return m_pCurFoil;
 }
+
+
+
+
 void QXDirect::SetFoilScale(QRect CltRect)
 {
 	m_rCltRect = CltRect;
@@ -4858,6 +5011,7 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 		SetAnalysisParams();
 		return NULL;
 	}
+
 	if(pPolar) m_pCurPolar = pPolar;
 
 	if(!m_pCurPolar)
@@ -4907,6 +5061,7 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 	if (m_bPolar) CreatePolarCurves();
 	SetAnalysisParams();
 	SetOpp();
+
 	return m_pCurPolar;
 }
 
@@ -4917,6 +5072,8 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 	// sets it as the active polar
 	// and initializes XFoil
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(!m_pCurFoil) return NULL;
 
 	if(!PlrName.length())
 	{// try to read it
@@ -4929,7 +5086,7 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 		//else
 		PlrName = pMainFrame->m_pctrlPolar->currentText();
 	}
-	m_pCurPolar = pMainFrame->GetPolar(PlrName);
+	m_pCurPolar = pMainFrame->GetPolar(m_pCurFoil->m_FoilName, PlrName);
 
 	if (!m_pCurPolar || !m_pCurFoil ||
 		!m_pCurPolar->m_FoilName.length() ||
@@ -4981,6 +5138,7 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 	SetAnalysisParams();
 
 	SetOpp();
+
 	return m_pCurPolar;
 }
 
@@ -5323,6 +5481,7 @@ void QXDirect::StopAnimate()
 		m_pAnimateTimer->stop();
 		m_bAnimate = false;
 		m_pctrlAnimate->setChecked(false);
+		SetOpp();
 	}
 }
 

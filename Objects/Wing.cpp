@@ -2851,8 +2851,8 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 
 	p=0;
 	m=0;
-	int n=0;
-	int N = 50;
+//	int n=0;
+//	int N = 50;
 
 	for (j=0; j<m_NSurfaces; j++)
 	{

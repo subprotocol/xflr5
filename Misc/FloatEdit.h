@@ -29,7 +29,6 @@
 class FloatEdit : public QLineEdit
 {
 public:
-	static int s_MaxWidth;
 
 	FloatEdit(QWidget *pParent  = NULL);
 	FloatEdit(QString str, int precision=2);
@@ -52,9 +51,6 @@ public:
 	int m_iPrecision;
 	double m_fMin, m_fMax;
 	QString m_iniStr;
-
-signals:
-
 
 };
 

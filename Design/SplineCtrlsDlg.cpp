@@ -26,6 +26,7 @@
 
 SplineCtrlsDlg::SplineCtrlsDlg()
 {
+	setWindowTitle("Spline Parameters");
 	m_pSF = NULL;
 	m_pPF = NULL;
 	SetuLayout();

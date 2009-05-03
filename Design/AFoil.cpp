@@ -2546,8 +2546,8 @@ void QAFoil::SetScale()
 
 	m_fScale = m_fRefScale;
 
-	double width  = (double)m_rCltRect.width();
-	double height = (double)m_rCltRect.height();
+//	double width  = (double)m_rCltRect.width();
+//	double height = (double)m_rCltRect.height();
 //	double clippedh = height/width * 20.0;
 
 	m_ptOffset.rx() = 75;
@@ -2564,7 +2564,7 @@ void QAFoil::SetScale(QRect CltRect)
 	//scale is set by ChildView
 	m_rCltRect = CltRect;
 
-	int width = m_rCltRect.width();
+//	int width = m_rCltRect.width();
 
 	SetScale();
 }

@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	Corner Add class
-	Copyright (C) 2004-2009 Andre Deperrois xflr5@yahoo.com
+	PertDlg class
+	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,57 +19,64 @@
 
 *****************************************************************************/
 
-#ifndef CADDDLG_H
-#define CADDDLG_H
+#ifndef PERTDLG_H
+#define PERTDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QTableView>
+#include <QStandardItem>
+#include "../Misc/FloatEditDelegate.h"
 #include "../Objects/Foil.h"
 #include "../Misc/FloatEdit.h"
+#include "../Params.h"
 
-class CAddDlg : public QDialog
+class PertDlg : public QDialog
 {
 	Q_OBJECT
 
-	friend class MainFrame;
-	friend class QXDirect;
-	friend class QAFoil;
-
 public:
-	CAddDlg();
-	void InitDialog();
-	void SetupLayout();
-
-private:
-	void keyPressEvent(QKeyEvent *event);
+	PertDlg(void *pParent=NULL);
+	friend class MainFrame;
+	friend class QXInverse;
 
 private slots:
+	void OnCellChanged(QWidget *pWidget);
+	void OnRestore();
 	void OnApply();
-	void OnUniform();
+	void OnOK();
+
+private:
+	void SetupLayout();
+	void InitDialog();
+	void FillCnModel() ;
+	void ReadData();
+
+private:
+
+	QPushButton *OKButton, *CancelButton, *ApplyButton, *RestoreButton;
+
+	QTableView *m_pctrlCnTable;
+	QStandardItemModel *m_pCnModel;
+	FloatEditDelegate *m_pFloatDelegate;
+
+//	FloatEdit *m_pctrlCnr;
+//	FloatEdit *m_pctrlCni;
+//	QListBox *m_pctrlCnList;
+
+protected:
+	void keyPressEvent(QKeyEvent *event);
+
 
 
 private:
-	static void* s_pXFoil;
-
-	QPushButton	*ApplyButton, *OKButton, *CancelButton;
-	QLabel *m_pctrlAtPanel;
-	QLabel *m_pctrlTotal;
-	QLabel *m_pctrlAdded;
-	QLabel *m_pctrlMaxAngle;
-	QRadioButton	*m_pctrlrb1;
-	QRadioButton	*m_pctrlrb2;
-	FloatEdit	*m_pctrlTo;
-	FloatEdit	*m_pctrlFrom;
-	FloatEdit	*m_pctrlAngTol;
-
-	CFoil* m_pMemFoil;
-	CFoil* m_pBufferFoil;
-	void* m_pXDirect;
-	void* m_pAFoil;
-	double atol;
-	int m_iSplineType;
-
-
+	void * m_pXInverse;
+	int   m_nc; 
+	double m_cnr[IMX+1];
+	double m_cni[IMX+1];
+	double m_backr[IMX+1];
+	double m_backi[IMX+1];
 };
+#endif
 
-#endif // CADDDLG_H

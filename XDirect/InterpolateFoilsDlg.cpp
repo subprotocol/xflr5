@@ -29,6 +29,7 @@ void *InterpolateFoilsDlg::s_pXFoil;
 
 InterpolateFoilsDlg::InterpolateFoilsDlg()
 {
+	setWindowTitle("Interpolate Foils");
 	m_pXDirect = NULL;
 	m_pAFoil = NULL;
 	m_pMainFrame = NULL;

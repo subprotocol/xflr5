@@ -159,7 +159,7 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 {
 	painter.save();
 	double scaley = m_scaley;
-
+	int i;
 	int ptside = 2;
 
 	CCurve* pCurve = GetCurve(nIndex);
@@ -186,7 +186,7 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 
 		if(pCurve->PointsVisible()) painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
 
-		for (int i=1; i<pCurve->n;i++)
+		for (i=1; i<pCurve->n;i++)
 		{
 			To.setX(int(pCurve->x[i]/m_scalex+m_ptoffset.x()));
 			To.setY(int(pCurve->y[i]/scaley+m_ptoffset.y()));
@@ -194,6 +194,15 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 			if(pCurve->PointsVisible())	painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
 
 			From = To;
+		}
+		if(pCurve->PointsVisible())
+		{
+			for (i=0; i<pCurve->n;i++)
+			{
+				painter.drawRect(int(pCurve->x[i]/m_scalex+m_ptoffset.x())-ptside,
+								 int(pCurve->y[i]/  scaley+m_ptoffset.y())-ptside,
+								 2*ptside,2*ptside);
+			}
 		}
 	}
 	else if(pCurve->n == 1 && pCurve->IsVisible() && pCurve->PointsVisible())

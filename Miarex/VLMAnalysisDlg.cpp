@@ -545,7 +545,7 @@ void VLMAnalysisDlg::InitDialog()
 
 	m_bVLMSymetric = m_pWing->m_bSymetric;
 
-	if(abs(m_pWPolar->m_Beta)>0.001)
+	if(fabs(m_pWPolar->m_Beta)>0.001)
 	{
 		str += "     Sideslip is asymmetric\r\n";
 		m_bVLMSymetric = false;

@@ -148,6 +148,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *event)
 
 void GLWidget::paintGL()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 	if(m_iView == 3)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

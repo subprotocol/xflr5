@@ -26,6 +26,7 @@
 #include "XInverse.h"
 #include "InverseOptionsDlg.h"
 #include "FoilSelectionDlg.h"
+#include "PertDlg.h"
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "../Objects/Foil.h"
@@ -190,6 +191,7 @@ void QXInverse::Connect()
 	connect(m_pctrlTangentSpline, SIGNAL(clicked()), this, SLOT(OnTangentSpline()));
 	connect(m_pctrlResetQSpec,    SIGNAL(clicked()), this, SLOT(OnQReset()));
 	connect(m_pctrlSmooth,        SIGNAL(clicked()), this, SLOT(OnSmooth()));
+	connect(m_pctrlPert,          SIGNAL(clicked()), this, SLOT(OnPertubate()));
 	connect(m_pctrlFilter,        SIGNAL(clicked()), this, SLOT(OnFilter()));
 	connect(m_pctrlSymm,          SIGNAL(clicked()), this, SLOT(OnSymm()));
 	connect(m_pctrlExec,          SIGNAL(clicked()), this, SLOT(OnExecute()));
@@ -536,6 +538,7 @@ void QXInverse::keyReleaseEvent(QKeyEvent *event)
 
 void QXInverse::LoadSettings(QDataStream &ar)
 {
+	ar >> m_bFullInverse;
 	ar >> m_Spline.m_Color >> m_Spline.m_Style >> m_Spline.m_Width;
 	ar >> m_pRefFoil->m_FoilColor >> m_pRefFoil->m_nFoilStyle >> m_pRefFoil->m_nFoilWidth;
 	ar >> m_pModFoil->m_FoilColor >> m_pModFoil->m_nFoilStyle >> m_pModFoil->m_nFoilWidth;
@@ -1640,20 +1643,21 @@ void QXInverse::PaintView(QPainter &painter)
 }
 
 
-void QXInverse::Pertubate()
+void QXInverse::OnPertubate()
 {
-
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
-
+	int m;
 	pXFoil->pert_init(1);
 
-/*	CPertDlg dlg;
-	for (m=0; m<=__min(32, m_pXFoil->nc); m++)
+	PertDlg dlg;
+	for (m=0; m<=qMin(32, pXFoil->nc); m++)
 	{
 		dlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
 		dlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
+//qDebug() <<	dlg.m_cnr[m]	<<dlg.m_cni[m];
 	}
 	dlg.m_nc = qMin(32, pXFoil->nc);
+	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
@@ -1666,7 +1670,7 @@ void QXInverse::Pertubate()
 		CreateMCurve();
 		m_pMCurve->SetVisible(true);
 		UpdateView();
-	}*/
+	}
 }
 
 
@@ -1739,6 +1743,7 @@ void QXInverse::ResetScale()
 
 void QXInverse::SaveSettings(QDataStream &ar)
 {
+	ar << m_bFullInverse;
 	ar << m_Spline.m_Color << m_Spline.m_Style << m_Spline.m_Width;
 	ar << m_pRefFoil->m_FoilColor << m_pRefFoil->m_nFoilStyle << m_pRefFoil->m_nFoilWidth;
 	ar << m_pModFoil->m_FoilColor << m_pModFoil->m_nFoilStyle << m_pModFoil->m_nFoilWidth;
@@ -1938,9 +1943,6 @@ void QXInverse::SetScale(QRect CltRect)
 }
 
 
-void QXInverse::showEvent(QShowEvent *event)
-{
-}
 
 void QXInverse::Smooth(int Pos1, int Pos2)
 {
@@ -2074,6 +2076,9 @@ bool QXInverse::SetParams()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	CFoil*pFoil;
+
+	m_pctrlFullInverse->setChecked(m_bFullInverse);
+	m_pctrlMixedInverse->setChecked(!m_bFullInverse);
 
 	m_pQCurve->SetColor(m_pRefFoil->m_FoilColor);
 	m_pQCurve->SetStyle(m_pRefFoil->m_nFoilStyle);

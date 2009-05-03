@@ -31,6 +31,7 @@
  
 WPolarDlg::WPolarDlg()
 {
+	setWindowTitle("Analysis Definition");
 	m_pMainFrame = NULL;
 	m_pWing      = NULL;
 	m_pPlane     = NULL;
@@ -66,7 +67,6 @@ WPolarDlg::WPolarDlg()
 	m_WakePanelFactor = 1.1;
 
 	m_RefAreaType = 1;
-	double m_ReferenceArea = 0.0;
 
 //	m_SymbolFont.CreatePointFont(100, "Symbol");
 	m_UnitType  = 1;
@@ -165,6 +165,7 @@ void WPolarDlg::InitDialog()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str;
 	QString str1,str2;
+
 
 	int i;
 
@@ -809,7 +810,7 @@ void WPolarDlg::SetWPolarName()
 	strong = QString("-%1").arg(m_XCmRef*pMainFrame->m_mtoUnit,6,'f',2);
 	m_WPolarName += strong + str;
 
-	if(abs(m_Beta) > .001)
+	if(fabs(m_Beta) > .001)
 	{
 		strong = QString("-b%1°").arg(m_Beta,0,'f',1);
 		m_WPolarName += strong;

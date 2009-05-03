@@ -27,6 +27,7 @@
 
 W3dPrefsDlg::W3dPrefsDlg()
 {
+	setWindowTitle("3D Styles");
 	m_pMiarex = NULL;
 	SetupLayout();
 

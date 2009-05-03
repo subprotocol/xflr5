@@ -243,7 +243,7 @@ void BatchDlg::AlphaLoop()
 	QString StrTmp;
 	int iRe, iAlpha, nAlpha;
 	double alphadeg;
-	nAlpha = (int)(abs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
+	nAlpha = (int)(fabs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
 
 	for (iAlpha=0; iAlpha<=nAlpha; iAlpha++)
 	{
@@ -289,9 +289,9 @@ void BatchDlg::AlphaLoop()
 					return;
 				}
 
-				if (abs(pXFoil->alfa-pXFoil->awake) > 0.00001) pXFoil->lwake  = false;
-				if (abs(pXFoil->alfa-pXFoil->avisc) > 0.00001) pXFoil->lvconv = false;
-				if (abs(pXFoil->minf-pXFoil->mvisc) > 0.00001) pXFoil->lvconv = false;
+				if (fabs(pXFoil->alfa-pXFoil->awake) > 0.00001) pXFoil->lwake  = false;
+				if (fabs(pXFoil->alfa-pXFoil->avisc) > 0.00001) pXFoil->lvconv = false;
+				if (fabs(pXFoil->minf-pXFoil->mvisc) > 0.00001) pXFoil->lvconv = false;
 
 				pXFoil->lwake  = false;
 				pXFoil->lvconv = false;
@@ -402,6 +402,8 @@ void BatchDlg::CleanUp()
 void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 {
 //	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	if(!m_pCurFoil) return;
+
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_pCurPolar = new CPolar;
 	m_pCurPolar->m_FoilName   = m_FoilName;
@@ -446,7 +448,7 @@ void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 	m_pCurPolar->m_Color = pMainFrame->GetColor(1);
 
 	SetPlrName();
-	CPolar *pPolar = pMainFrame->GetPolar(m_pCurPolar->m_PlrName);
+	CPolar *pPolar = pMainFrame->GetPolar(m_pCurFoil->m_FoilName, m_pCurPolar->m_PlrName);
 
 	if(pPolar)
 	{

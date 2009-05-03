@@ -429,11 +429,11 @@ bool XFoilAnalysisDlg::ReLoop()
 				return FALSE;
 			}
 
-			if (abs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001)
+			if (fabs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001)
 				m_pXFoil->lwake  = false;
-			if (abs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001)
+			if (fabs(m_pXFoil->alfa-m_pXFoil->avisc) > 0.00001)
 				m_pXFoil->lvconv = false;
-			if (abs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001)
+			if (fabs(m_pXFoil->minf-m_pXFoil->mvisc) > 0.00001)
 				m_pXFoil->lvconv = false;
 
 			m_pXFoil->lwake = false;

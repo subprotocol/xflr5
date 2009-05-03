@@ -92,7 +92,9 @@ SOURCES += MainFrame.cpp \
     XDirect/XDirectStyleDlg.cpp \
     Miarex/WingScaleDlg.cpp \
     XInverse/FoilSelectionDlg.cpp \
-    Miarex/BodyTransDlg.cpp
+    Miarex/BodyTransDlg.cpp \
+    XInverse/PertDlg.cpp \
+    Misc/SaveOptionsDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -180,7 +182,9 @@ HEADERS += MainFrame.h \
     XDirect/XDirectStyleDlg.h \
     Miarex/WingScaleDlg.h \
     XInverse/FoilSelectionDlg.h \
-    Miarex/BodyTransDlg.h
+    Miarex/BodyTransDlg.h \
+    XInverse/PertDlg.h \
+    Misc/SaveOptionsDlg.h
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 

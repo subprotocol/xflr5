@@ -108,7 +108,7 @@ void BodyTransDlg::OnFrameOnly()
 
 void BodyTransDlg::SetupLayout()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QHBoxLayout *FrameID = new QHBoxLayout;
 	m_pctrlFrameOnly = new QCheckBox("Frame Only");

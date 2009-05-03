@@ -22,9 +22,7 @@
 #include "FloatEdit.h"
 #include <QDoubleValidator>
 #include <math.h>
-#include <QtDebug>
 
-int FloatEdit::s_MaxWidth;
 
 FloatEdit::FloatEdit(QWidget *pParent)
 {

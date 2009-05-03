@@ -90,7 +90,6 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 	int a, b, k, Format;
 	float f,gg;
 
-
     if(bIsStoring)
     {
 		ar << 100003;
@@ -114,7 +113,7 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 		for (k=0; k<nd2; k++)	ar << (float)xd2[k] << (float)yd2[k];
 		for (k=0; k<nd3; k++)	ar << (float)xd3[k] << (float)yd3[k];
 		ar<<m_Style<<m_Width;
-		ReadCOLORREF(ar,m_Color);
+		WriteCOLORREF(ar,m_Color);
 		if(m_bIsVisible)     ar<<1; else ar<<0;
 		if(m_bShowPoints)    ar<<1; else ar<<0;
 	}

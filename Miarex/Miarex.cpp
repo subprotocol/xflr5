@@ -5792,6 +5792,7 @@ void QMiarex::GLCreateCpLegend()
 	range = (m_LegendMax - m_LegendMin);
 	delta = range / 20;
 
+
 	glNewList(WOPPCPLEGENDTXT,GL_COMPILE);
 	{
 		m_GLList++;
@@ -5801,7 +5802,6 @@ void QMiarex::GLCreateCpLegend()
 		glPolygonMode(GL_FRONT,GL_LINE);
 
 		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-
 		// Draw the labels
 		for (i=0; i<=20; i ++)
 		{
@@ -5811,7 +5811,9 @@ void QMiarex::GLCreateCpLegend()
 			labellength = (fm.width(strong)+5) * ClientToGL;
 			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
 		}
-		pGLWidget->renderText(Right1, ZPos+21.0*dz, "Cp",pMainFrame->m_TextFont);
+		strong = "Cp";
+		labellength = (fm.width(strong)+5) * ClientToGL;
+		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong,pMainFrame->m_TextFont);
 	}
 	glEndList();
 
@@ -6927,7 +6929,7 @@ void QMiarex::GLCreateMoments()
 
 		glBegin(GL_LINE_STRIP);
 		{
-			for (i=0; i<=int(abs(amp)); i++)
+			for (i=0; i<=int(fabs(amp)); i++)
 			{
 				angle = sign*(double)i/500.0*pi;
 				glVertex3d(radius*cos(angle),0.0,radius*sin(angle));
@@ -6970,7 +6972,7 @@ void QMiarex::GLCreateMoments()
 		if (amp>0.0) sign = -1.0; else sign = 1.0;
 
 		glBegin(GL_LINE_STRIP);
-			for (i=0; i<=int(abs(amp)); i++)
+			for (i=0; i<=int(fabs(amp)); i++)
 			{
 				angle = sign*(double)i/500.0*pi;
 				glVertex3d(0.0,radius*cos(angle),radius*sin(angle));
@@ -7009,7 +7011,7 @@ void QMiarex::GLCreateMoments()
 
 		glBegin(GL_LINE_STRIP);
 		{
-			for (i=0; i<=int(abs(amp)); i++)
+			for (i=0; i<=int(fabs(amp)); i++)
 			{
 				angle = sign*(double)i/500.0*pi;
 				glVertex3d(-radius*cos(angle),-radius*sin(angle),0.0);
@@ -8539,7 +8541,7 @@ void QMiarex::GLInverseMatrix()
 
 void QMiarex::GLRenderView()
 {
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -8554,6 +8556,9 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
+//		glColor3d(1.0,0.0,0.0);
+//		pGLWidget->renderText(0.0, .3,  0.0, "Hello",pMainFrame->m_TextFont);
+
 		if(m_iView==3)
 		{
 			if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 /*&& m_bShowCpScale*/)
@@ -10074,7 +10079,6 @@ void QMiarex::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdo
 void QMiarex::On3DView()
 {
 	m_bArcball = false;
-
 	if(m_iView==3) 
 	{
 		m_pctrlMiddleControls->setCurrentIndex(0);
@@ -16615,16 +16619,12 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 
 
 
-// Snap OpenGL client and send it to ClipBoard
-// so that you can insert it in your favorite
-// image editor, Powerpoint, etc...
-// Replace CRenderView by your own CView-derived class
 void QMiarex::SnapClient(QString const &FileName, int FileType)
 {
 	int NbBytes, bitsPerPixel;
-//	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 
 	QSize size(m_rCltRect.width(),m_rCltRect.height());
+
 	// Lines have to be 32 bits aligned
 //	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
 	bitsPerPixel = 24;
@@ -16646,7 +16646,7 @@ void QMiarex::SnapClient(QString const &FileName, int FileType)
 		case 24:
 		{
 			NbBytes = 3 * size.width() * size.height();//24 bits type BMP
-			size.setWidth(width - size.width() % 4);
+//			size.setWidth(width - size.width() % 4);
 			break;
 		}
 		case 32:
@@ -16660,44 +16660,29 @@ void QMiarex::SnapClient(QString const &FileName, int FileType)
 			return;
 		}
 	}
-/*	CBitmap bmp;
-	bmp.CreateCompatibleBitmap(pDC,size.width(),size.height());
-
-	CDC MemDC;
-	MemDC.CreateCompatibleDC(NULL);
-	CBitmap *pOldBitmap = MemDC.SelectObject(&bmp);*/
-
-	// Alloc pixel bytes
-//	byte *pPixelData = new byte[NbBytes];
 	uchar *pPixelData = new uchar[NbBytes];
 
 	// Copy from OpenGL
-//	wglMakeCurrent(pDC->m_hDC, pChildView->m_hRC);
 	glReadBuffer(GL_FRONT);
 	switch(bitsPerPixel)
 	{
 		  case 8: return;
 		  case 16: return;
 		  case 24:
-			  glReadPixels(0,0,size.width(),size.height(),GL_BGR_EXT,GL_UNSIGNED_BYTE,pPixelData);
+			  glReadPixels(0,0,size.width(),size.height(),GL_RGB,GL_UNSIGNED_BYTE,pPixelData);
 			  break;
 		  case 32:
-			  glReadPixels(0,0,size.width(),size.height(),GL_BGRA_EXT,GL_UNSIGNED_BYTE,pPixelData);
+			  glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
 			  break;
 		  default: break;
 	}
 
-//	bmp.SetBitmapBits(NbBytes,pPixelData);
+	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
+	QImage FlippedImaged = Image.mirrored(false, true);	//flip vertically
 
-	QImage Image(pPixelData, size.width(),size.height(), NbBytes/ size.height(), QImage::Format_RGB888);
-	//flip vertically
-//	MemDC.StretchBlt(0,size.height(),size.width(), -size.height(),&MemDC,0,0,size.width(),size.height(),SRCCOPY);
+	delete pPixelData;
 
-	delete [] pPixelData;
-
-//	HBITMAP hBmp = (HBITMAP)bmp;
-//	pImage->Attach(hBmp);
-	Image.save(FileName);
+	FlippedImaged.save(FileName);
 }
 
 

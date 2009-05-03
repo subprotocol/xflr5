@@ -31,6 +31,7 @@ void *NacaFoilDlg::s_pXFoil;
 
 NacaFoilDlg::NacaFoilDlg()
 {
+	setWindowTitle("NACA Foils");
 	m_pAFoil = NULL;
 	m_pXDirect = NULL;
 	m_bApplied   = false;
@@ -62,7 +63,7 @@ void NacaFoilDlg::SetLayout()
 	m_pctrlPanels->setAlignment(Qt::AlignRight);
 	MainGrid->addWidget(NacaNumber,     1,1, 1,1, Qt::AlignRight);
 	MainGrid->addWidget(m_pctrlNumber,  1,2, 1,1, Qt::AlignRight);
-	MainGrid->addWidget(m_pctrlMessage, 2,1, 1,1, Qt::AlignLeft);
+	MainGrid->addWidget(m_pctrlMessage, 2,1, 1,2, Qt::AlignRight);
 	MainGrid->addWidget(PanelNumber,    3,1, 1,1, Qt::AlignRight);
 	MainGrid->addWidget(m_pctrlPanels,  3,2, 1,1, Qt::AlignRight);
 
@@ -81,9 +82,9 @@ void NacaFoilDlg::SetLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->setSpacing(30);
-
 	mainLayout->addLayout(MainGrid);
+	mainLayout->addStretch(1);
+	mainLayout->addSpacing(30);
 	mainLayout->addLayout(CommandButtons);
 
 	setLayout(mainLayout);

@@ -28,6 +28,7 @@ void *CAddDlg::s_pXFoil;
 
 CAddDlg::CAddDlg()
 {
+	setWindowTitle("Local Refinement");
 	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
@@ -212,7 +213,6 @@ void CAddDlg::InitDialog()
 	strong = QString("Total number of points is %1").arg(pXFoil->n);
 	m_pctrlTotal->setText(strong);
 
-	setWindowTitle(Title);
 }
 
 
