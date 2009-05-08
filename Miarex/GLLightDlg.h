@@ -34,6 +34,7 @@ class GLLightDlg : public QDialog
 	friend class QMiarex;
 	friend class GL3dBodyDlg;
 	friend class GL3dViewDlg;
+	friend class GL3dWingDlg;
 
 public:
     GLLightDlg();
@@ -79,6 +80,7 @@ private:
 private:
 	void* m_pGL3dViewDlg;
 	void *m_pGL3dBodyDlg;
+	void *m_pGL3dWingDlg;
 	void *m_pMiarex;
 
 	float m_Ambient, m_Diffuse, m_Specular;

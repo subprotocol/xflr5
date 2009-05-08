@@ -176,6 +176,11 @@ void PlaneDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
 		default:
 			event->ignore();
 	}
@@ -241,6 +246,20 @@ void PlaneDlg::OnBodyCheck()
 	}
 	SetResults();
 }
+
+
+void PlaneDlg::OnCancel()
+{
+	if(m_bChanged)
+	{
+		QString strong = tr("Discard the changes ?");
+		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			return;
+	}
+//	reject();
+	done(QDialog::Rejected);
+}
+
 
 
 void PlaneDlg::OnChanged()
@@ -641,6 +660,12 @@ void PlaneDlg::ReadParams()
 }
 
 
+void PlaneDlg::reject()
+{
+	OnCancel();
+}
+
+
 void PlaneDlg::SetParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -804,9 +829,9 @@ void PlaneDlg::SetupLayout()
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlXLEWing = new FloatEdit("0.00");
-	m_pctrlZLEWing = new FloatEdit("0.00");
-	m_pctrlWingTilt = new FloatEdit("0.0");
+	m_pctrlXLEWing = new FloatEdit(0.00);
+	m_pctrlZLEWing = new FloatEdit(0.00);
+	m_pctrlWingTilt = new FloatEdit(0.0);
 	m_pctrlLen1 = new QLabel("mm");
 	m_pctrlLen2 = new QLabel("mm");
 	QLabel *lab4 = new QLabel("deg");
@@ -837,9 +862,9 @@ void PlaneDlg::SetupLayout()
 	lab11->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab12->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab13->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlXLEWing2 = new FloatEdit("0.00");
-	m_pctrlZLEWing2 = new FloatEdit("0.00");
-	m_pctrlWingTilt2 = new FloatEdit("0.0");
+	m_pctrlXLEWing2 = new FloatEdit(0.00);
+	m_pctrlZLEWing2 = new FloatEdit(0.00);
+	m_pctrlWingTilt2 = new FloatEdit(0.0);
 	m_pctrlLen3 = new QLabel("mm");
 	m_pctrlLen4 = new QLabel("mm");
 	QLabel *lab14 = new QLabel("deg");
@@ -867,9 +892,9 @@ void PlaneDlg::SetupLayout()
 	lab21->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab22->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab23->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlXLEStab = new FloatEdit("550.00");
-	m_pctrlZLEStab = new FloatEdit("550.00");
-	m_pctrlStabTilt = new FloatEdit("0.0");
+	m_pctrlXLEStab = new FloatEdit(550.00);
+	m_pctrlZLEStab = new FloatEdit(550.00);
+	m_pctrlStabTilt = new FloatEdit(0.0);
 	m_pctrlLen5 = new QLabel("mm");
 	m_pctrlLen6 = new QLabel("mm");
 	QLabel *lab24 = new QLabel("deg");
@@ -900,10 +925,10 @@ void PlaneDlg::SetupLayout()
 	lab32->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab33->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	lab34->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlXLEFin = new FloatEdit("600.00");
-	m_pctrlYLEFin = new FloatEdit("0.00");
-	m_pctrlZLEFin = new FloatEdit("50.00");
-	m_pctrlFinTilt = new FloatEdit("0.0");
+	m_pctrlXLEFin = new FloatEdit(600.00);
+	m_pctrlYLEFin = new FloatEdit(0.00);
+	m_pctrlZLEFin = new FloatEdit(50.00);
+	m_pctrlFinTilt = new FloatEdit(0.0);
 	m_pctrlLen5 = new QLabel("mm");
 	m_pctrlLen6 = new QLabel("mm");
 	m_pctrlLen7 = new QLabel("mm");
@@ -937,8 +962,8 @@ void PlaneDlg::SetupLayout()
 	m_pctrlBodyList->setMinimumWidth(250);
 	BodyName->addStretch(1);
 	QHBoxLayout *BodyPos = new QHBoxLayout;
-	m_pctrlXBody = new FloatEdit("0.00");
-	m_pctrlZBody = new FloatEdit("0.00");
+	m_pctrlXBody = new FloatEdit(0.00);
+	m_pctrlZBody = new FloatEdit(0.00);
 	QLabel *lab41 = new QLabel("x=");
 	QLabel *lab42 = new QLabel("z=");
 	m_pctrlLen8 = new QLabel("mm");

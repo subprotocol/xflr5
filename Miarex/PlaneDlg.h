@@ -49,6 +49,7 @@ private slots:
 	void OnDefineWing();
 	void OnDefineFin();
 	void OnDefineStab();
+	void OnCancel();
 	void OnChanged();
 	void OnImportWing();
 	void OnPlaneName();
@@ -69,6 +70,7 @@ private:
 	void ReadParams();
 	void SetParams();
 	void keyPressEvent(QKeyEvent *event);
+	void reject();
 
 private:
 	static QList <void*> *s_poaWing;

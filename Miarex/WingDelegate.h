@@ -30,6 +30,7 @@ class WingDelegate : public QItemDelegate
 {
 	Q_OBJECT
 	friend class WingDlg;
+	friend class GL3dWingDlg;
 
 public:
 	WingDelegate(QObject *parent = 0);

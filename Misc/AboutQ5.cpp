@@ -25,7 +25,7 @@
 
 AboutQ5::AboutQ5(void *parent)
 {
-//	m_ui->setupUi(this);
+	setWindowTitle("About QFLR5");
 
 	SetupLayout();
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
@@ -41,6 +41,7 @@ void AboutQ5::SetupLayout()
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/2);
 	move(r.width()/3, r.height()/6);
+
 
 
 	QHBoxLayout *LogoLayout = new QHBoxLayout;
@@ -66,10 +67,18 @@ void AboutQ5::SetupLayout()
 	QLabel *lab9  = new QLabel("Any other usage is strongly disapproved");
 	QLabel *lab10 = new QLabel("Program distributed  under the terms of the GNU General Public License");
 
+	QPushButton *AboutQt = new QPushButton("About Qt");
+	connect(AboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
+
 	m_pXFLR5Link = new QLabel;
 	m_pXFLR5Link->setText("<a href=http://xflr5.sourceforge.net/xflr5.htm>http://xflr5.sourceforge.net/xflr5.htm</a>");
 	m_pXFLR5Link->setOpenExternalLinks(true);
 	m_pXFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+
+	QHBoxLayout *LinkLayout = new QHBoxLayout;
+	LinkLayout->addWidget(m_pXFLR5Link);
+	LinkLayout->addStretch(1);
+	LinkLayout->addWidget(AboutQt);
 
 	OKButton = new QPushButton("OK");
 	QHBoxLayout *OKLayout = new QHBoxLayout;
@@ -92,7 +101,7 @@ void AboutQ5::SetupLayout()
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab10);
 	MainLayout->addStretch(1);
-	MainLayout->addWidget(m_pXFLR5Link);
+	MainLayout->addLayout(LinkLayout);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(OKLayout);
 	setLayout(MainLayout);

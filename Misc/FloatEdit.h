@@ -30,28 +30,28 @@ class FloatEdit : public QLineEdit
 {
 public:
 
-	FloatEdit(QWidget *pParent  = NULL);
-	FloatEdit(QString str, int precision=2);
+	FloatEdit(QWidget *pParent=NULL);
 	FloatEdit(double d, int precision=2);
 
 	double GetValue();
 	bool GetValue(double &f);
-	bool CheckBeforeExit();
-	void Clear();
 	void SetMin(double f);
 	void SetMax(double f);
 	void SetValue(double f);
 	void SetPrecision(int i);
+
+private:
+	bool IsInBounds(double f);
+	void FormatValue(double const &f, QString &str);
 	void focusInEvent ( QFocusEvent * event );
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent ( QShowEvent * event );
+	double ReadValue();
 
 	double m_Value;
 	int m_iPrecision;
 	double m_fMin, m_fMax;
-	QString m_iniStr;
-
 };
 
 #endif // FLOATEDIT_H

@@ -26,6 +26,7 @@
 #include "Design/AFoil.h"
 #include "Miarex/Miarex.h"
 #include "Miarex/WingDlg.h"
+#include "Miarex/GL3dWingDlg.h"
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
 #include "Miarex/PlaneDlg.h"
@@ -84,8 +85,12 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
 
+	m_StyleName = "Cleanlooks";
+
 	LoadSettings();
+
 	qApp->setStyle(m_StyleName);
+
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 
 	pXDirect->SetAnalysisParams();
@@ -490,9 +495,6 @@ void MainFrame::CreateActions()
 	aboutAct->setStatusTip(tr("QFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
-	aboutQtAct = new QAction(tr("About &Qt"), this);
-	aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 	CreateAFoilActions();
 	CreateXDirectActions();
@@ -762,9 +764,6 @@ void MainFrame::CreateDockWindows()
 	m_p2DWidget->m_pAFoil     = pAFoil;
 	m_p2DWidget->m_pMainFrame = this;
 
-	m_pGLWidget->m_pMiarex = pMiarex;
-	m_pGLWidget->m_pMainFrame = this;
-
 	QSizePolicy sizepol;
 	sizepol.setHorizontalPolicy(QSizePolicy::Expanding);
 	sizepol.setVerticalPolicy(QSizePolicy::Expanding);
@@ -808,6 +807,13 @@ void MainFrame::CreateDockWindows()
 	GL3dBodyDlg::s_pMainFrame = this;
 	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
 	GL3dBodyDlg::s_poaBody    = &m_oaBody;
+
+	GL3dWingDlg::s_pMainFrame = this;
+	GL3dWingDlg::s_pMiarex    = m_pMiarex;
+	GL3dWingDlg::s_poaFoil     = &m_oaFoil;
+
+	GLWidget::s_pMainFrame = this;
+	GLWidget::s_pMiarex = m_pMiarex;
 
 	WingDlg::s_pMainFrame  = this;
 	WingDlg::s_pMiarex     = m_pMiarex;
@@ -872,7 +878,6 @@ void MainFrame::CreateMenus()
 	helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(guidelinesAct);
 	helpMenu->addAction(aboutAct);
-	helpMenu->addAction(aboutQtAct);
 
 	//Create Application-Specific Menus
 	CreateXDirectMenus();
@@ -2749,7 +2754,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100528)
+	if(k !=100529)
 	{
 		pXFile->close();
 		return;
@@ -2761,6 +2766,7 @@ void MainFrame::LoadSettings()
 //	move(pt);
 	ar >> m_bMaximized;
 	ar >> m_StyleName;
+
 	ar >> m_LastDirName;
 	ar >> m_LengthUnit >> m_AreaUnit >> m_WeightUnit >> m_SpeedUnit >> m_ForceUnit >> m_MomentUnit;
 	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
@@ -4280,7 +4286,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100528;
+	ar << 100529;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();

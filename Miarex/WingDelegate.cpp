@@ -128,6 +128,10 @@ void WingDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 	}
 
 	if(index.row()> *m_pNPanels) strong=" ";
+	if(index.row()== *m_pNPanels)
+	{
+		if(index.column()==3 ||index.column()>=6) strong = " ";
+	}
 	drawDisplay(painter, myOption, myOption.rect, strong);
 	drawFocus(painter, myOption, myOption.rect);
 }

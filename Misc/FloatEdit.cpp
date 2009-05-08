@@ -22,15 +22,14 @@
 #include "FloatEdit.h"
 #include <QDoubleValidator>
 #include <math.h>
+#include <QtDebug>
 
 
 FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
-	setMinimumHeight(15);
-
 	m_Value = 0.0;
-	m_iniStr = "0.00";
+
 	m_fMin = -1.e10;
 	m_fMax =  1.e10;
 	m_iPrecision = 2;
@@ -39,34 +38,12 @@ FloatEdit::FloatEdit(QWidget *pParent)
 	setAlignment(Qt::AlignRight);
 }
 
-FloatEdit::FloatEdit(QString str, int precision)
-{
-	bool bOK;
-	str.replace(" ","");
-	double d = str.toDouble(&bOK);
-	if(bOK)
-	{
-		m_Value = d;
-		m_iniStr = str;
-	}
-	else
-	{
-		m_Value = 0.0;
-		m_iniStr = "0.00";
-	}
-	m_fMin = -1.e10;
-	m_fMax =  1.e10;
-	m_iPrecision = precision;
-	QDoubleValidator *v = new QDoubleValidator(this);
-	setValidator(v);
-	setAlignment(Qt::AlignRight);
-}
+
 
 FloatEdit::FloatEdit(double d, int precision)
 {
 	bool bOK;
 	m_Value = d;
-	m_iniStr = QString("%1").arg(d,0,'f',precision);
 
 	m_fMin = -1.e10;
 	m_fMax =  1.e10;
@@ -76,7 +53,8 @@ FloatEdit::FloatEdit(double d, int precision)
 	setAlignment(Qt::AlignRight);
 }
 
-bool FloatEdit::CheckBeforeExit()
+
+bool FloatEdit::IsInBounds(double f)
 {
     if ( m_Value<m_fMin || m_Value> m_fMax)
     {
@@ -86,79 +64,89 @@ bool FloatEdit::CheckBeforeExit()
 }
 
 
-void FloatEdit::Clear()
-{
-    setText(" ");
-}
-
-
 
 void FloatEdit::focusInEvent ( QFocusEvent * event )
 {
-    //save initial text just in case
-    m_iniStr = text();
-    m_iniStr.replace(" ","");
-    setText(m_iniStr);
-    selectAll();
+	selectAll();
 }
 
 
 void FloatEdit::focusOutEvent ( QFocusEvent * event )
 {
-    if(!CheckBeforeExit())
-		setText(m_iniStr);//user blundered
+	QString str;
+	double f = ReadValue();
+	if(IsInBounds(f))
+	{
+		m_Value = f;
+		FormatValue(m_Value, str);
+		setText(str);
+		emit(editingFinished());
+	}
     else
     {
-		m_Value = GetValue();
-		SetValue(m_Value);
-		emit(editingFinished());
-    }
+		FormatValue(m_Value, str);
+		setText(str);
+	}
+}
+
+
+double FloatEdit::ReadValue()
+{
+	bool bOK;
+	QString strange = text();
+	strange.replace(" ", "");
+	double f = strange.toDouble(&bOK);
+	if(bOK) return f;
+	else    return m_Value;
 }
 
 
 double FloatEdit::GetValue()
 {
-    double f;
-
-    QString str;
-    str = text();
-    str.replace(" ","");
-    f = str.toDouble();
-    return f;
+	return m_Value;
 }
+
 
 bool FloatEdit::GetValue(double &f)
 {
-
-    QString str;
-
-    str = text();
-    str.replace(" ","");
-    f = str.toDouble();
+	f = m_Value;
     return true;
 }
 
 
 void FloatEdit::keyPressEvent(QKeyEvent *event)
 {
-    switch (event->key())
+	QString str;
+	switch (event->key())
     {
 		case Qt::Key_Return:
 		{
-			GetValue(m_Value);
-			SetValue(m_Value);
-			emit(editingFinished());
+			double f = ReadValue();
+			if(IsInBounds(f))
+			{
+				m_Value = f;
+			}
+			FormatValue(m_Value, str);
+			setText(str);
+//			emit(editingFinished());
 			QLineEdit::keyPressEvent(event);
+
 			break;
 		}
 		case Qt::Key_Escape:
 		{
-			setText(m_iniStr);
+			FormatValue(m_Value, str);
+			setText(str);
 			QLineEdit::keyPressEvent(event);
 			break;
 		}
 		default:
+		{
 			QLineEdit::keyPressEvent(event);
+			double f = ReadValue();
+			if(IsInBounds(f)) m_Value = f;
+			break;
+		}
     }
 }
 
@@ -181,12 +169,20 @@ void FloatEdit::SetMax(double f)
 
 void FloatEdit::SetValue(double f)
 {
-    m_Value = f;
-    QString str, str1;
-    int q, r, exp, i, pos, l;
+	QString str;
+	m_Value = f;
+	FormatValue(m_Value,str);
+	setText(str);
+}
+
+
+void FloatEdit::FormatValue(double const &f, QString &str)
+{
+	QString str1;
+	int q, r, exp, i, pos, l;
 
 	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <1000.0)
-    {
+	{
 		switch (m_iPrecision)
 		{
 			//there probably is a more elegant way to do this,
@@ -223,9 +219,9 @@ void FloatEdit::SetValue(double f)
 			default:
 				str=QString("%1").arg(f,0,'f',2);
 		}
-    }
-    else if(f>=1000.0)
-    {
+	}
+	else if(f>=1000.0)
+	{
 		exp = (int)log10(f);
 		r = exp%3;
 		q = (exp-r)/3;
@@ -280,10 +276,10 @@ void FloatEdit::SetValue(double f)
 			l++;
 		}
 
-	    str = strong;
-    }
-    else
-    {
+		str = strong;
+	}
+	else
+	{
 		exp  = (int)log10(f)-1;
 		str1 = QString("e%1").arg( exp);
 
@@ -312,15 +308,15 @@ void FloatEdit::SetValue(double f)
 				str=QString("%1").arg(main,0,'f',2);
 		}
 		str += str1;
-    }
-	m_iniStr = str;
-	setText(str);
+	}
 }
 
 
 void FloatEdit::showEvent ( QShowEvent * event )
 {
-	setText(m_iniStr);
+	QString str;
+	FormatValue(m_Value, str);
+	setText(str);
 }
 
 

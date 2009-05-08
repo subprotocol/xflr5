@@ -38,7 +38,8 @@ class CSurface : public QObject
 	friend class MainFrame;
 	friend class CVLMDlg;
 	friend class GL3dViewDlg;
- 
+	friend class GL3dWingDlg;
+
 public:
     void AddFlapPanel(CPanel *pPanel);
 	void Copy(CSurface const &Surface);

@@ -33,6 +33,7 @@ class GLWidget : public QGLWidget
 
 	friend class QMiarex;
 	friend class GL3dBodyDlg;
+	friend class GL3dWingDlg;
 	friend class MainFrame;
 
 public:
@@ -57,8 +58,8 @@ private slots:
 
 private:
 	void *m_pParent;
-	void * m_pMiarex;
-	void *m_pMainFrame;
+	static void *s_pMiarex;
+	static void *s_pMainFrame;
 
 	QColor m_wndTextColor;
 	QRect m_rCltRect;        // The client window rectangle

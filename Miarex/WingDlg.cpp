@@ -84,13 +84,14 @@ WingDlg::WingDlg()
 	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 
 
+
 }
 
 bool WingDlg::CheckWing()
 {
 	if(!m_pWing->m_WingName.length())
 	{
-		QMessageBox::warning(this, "QFLR5", "Please enter a name for the wing");
+		QMessageBox::warning(this, "Warning", "Please enter a name for the wing");
 		m_pctrlWingName->setFocus();
 		return false;
 	}
@@ -98,21 +99,21 @@ bool WingDlg::CheckWing()
 	{
 		if(m_pWing->m_TPos[k]*1.00001 < m_pWing->m_TPos[k-1])
 		{
-			QMessageBox::warning(this, "QFLR5", "Warning : Panel sequence is inconsistent");
+			QMessageBox::warning(this, "Warning", "Warning : Panel sequence is inconsistent");
 			return false;
 		}
 	}
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "QFLR5", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
 		return false;
 	}
 
 	if(m_pWing->m_nFlaps>=20)
 	{
 		QString strong = "Only 10 flaps x 2 will be handled";
-		if (QMessageBox::Ok != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Ok|QMessageBox::Cancel))
+		if (QMessageBox::Ok != QMessageBox::question(window(), "Question", strong, QMessageBox::Ok|QMessageBox::Cancel))
 		  return false;
 	}
 	return true;
@@ -223,7 +224,6 @@ void WingDlg::contextMenuEvent(QContextMenuEvent *event)
 		if(res>=0)
 		{
 			m_iSection = res;
-//qDebug() << "Context Menu " << m_iSection;
 		}
 		if(m_iSection>=0)
 		{
@@ -934,8 +934,6 @@ void WingDlg::InitDialog()
 	m_pWingDelegate->SetPointers(precision,&m_pWing->m_NPanel);
 	m_pWingDelegate->m_poaFoil = s_poaFoil;
 
-
-//	Convert(true);
 	FillDataTable();
 
 	m_pctrlWingTable->setColumnWidth(0,70);
@@ -948,7 +946,6 @@ void WingDlg::InitDialog()
 	m_pctrlWingTable->setColumnWidth(7,80);
 	m_pctrlWingTable->setColumnWidth(8,50);
 	m_pctrlWingTable->setColumnWidth(9,80);
-//	m_pctrlWingTable->resizeColumnsToContents();
 
 	SetWingData();
 }
@@ -1026,7 +1023,6 @@ void WingDlg::mousePressEvent(QMouseEvent *event)
 		if(res>=0)
 		{
 			m_iSection = res;
-//qDebug() << "Mouse press " << m_iSection;
 			m_pctrlWingTable->selectRow(res);
 			m_pctrlWingTable->setFocus();
 			repaint();
@@ -1078,17 +1074,17 @@ void WingDlg::OnCancel()
 	if(m_bChanged)
 	{
 		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		if (QMessageBox::Yes != QMessageBox::question(this, "Warning", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			return;
 	}
-	reject();
+//	reject();
+	done(QDialog::Rejected);
 }
 
 
 
 void WingDlg::OnCellChanged(QWidget *pWidget)
 {
-//qDebug() << "OnCellChanged" << m_iSection;
 //	ReadSectionData(m_iSection);
 	m_bChanged = true;
 	ReadParams();
@@ -1099,7 +1095,7 @@ void WingDlg::OnDelete()
 {
 	if(m_iSection<=0)
 	{
-		QMessageBox::warning(this, "QFLR5","The first section cannot be deleted");
+		QMessageBox::warning(this, "Warning","The first section cannot be deleted");
 		return;
 	}
 
@@ -1108,7 +1104,7 @@ void WingDlg::OnDelete()
 	size = m_pWingModel->rowCount();
 	if(size<=2)
 	{
-		QMessageBox::warning(this, "QFLR5","Two panel sections at least are required... cannot delete");
+		QMessageBox::warning(this, "Warning","Two panel sections at least are required... cannot delete");
 		return;
 	}
 
@@ -1151,7 +1147,7 @@ void WingDlg::OnDeleteSection()
 
 	if(m_iSection==0)
 	{
-		QMessageBox::warning(this, "QFLR5","The first section cannot be deleted");
+		QMessageBox::warning(this, "Warning","The first section cannot be deleted");
 		return;
 	}
 
@@ -1197,12 +1193,12 @@ void WingDlg::OnInsertBefore()
 {
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "QFLR5", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
 		return;
 	}
 	if(m_iSection<=0)
 	{
-		QMessageBox::warning(this, "QFLR5", "No insertion possible before the first section");
+		QMessageBox::warning(this, "Warning", "No insertion possible before the first section");
 		return;
 	}
 	int k,n,total, ny;
@@ -1254,13 +1250,14 @@ void WingDlg::OnInsertAfter()
 {
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "QFLR5", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
 		return;
 	}
 
 	int k,n,ny,total;
 
 	n  = m_iSection;
+
 	if(n<0) n=m_pWing->m_NPanel;
 	ny = m_pWing->m_NYPanels[n];
 	total = VLMGetPanelTotal();
@@ -1278,8 +1275,7 @@ void WingDlg::OnInsertAfter()
 		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k-1];
 		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k-1];
 	}
-qDebug() << m_pWing->m_NXPanels[m_pWing->m_NPanel+1]  << m_pWing->m_NYPanels[m_pWing->m_NPanel+1];
-	if(n+1<m_pWing->m_NPanel)
+	if(n<m_pWing->m_NPanel)
 	{
 		m_pWing->m_TPos[n+1]    = (m_pWing->m_TPos[n]    + m_pWing->m_TPos[n+2])   /2.0;
 		m_pWing->m_TChord[n+1]  = (m_pWing->m_TChord[n]  + m_pWing->m_TChord[n+2]) /2.0;
@@ -1298,12 +1294,10 @@ qDebug() << m_pWing->m_NXPanels[m_pWing->m_NPanel+1]  << m_pWing->m_NYPanels[m_p
 	m_pWing->m_XPanelDist[n+1] = m_pWing->m_XPanelDist[n];
 	m_pWing->m_YPanelDist[n+1] = m_pWing->m_YPanelDist[n];
 	m_pWing->m_RFoil[n+1]      = m_pWing->m_RFoil[n];
-qDebug() << m_pWing->m_NXPanels[n+1]  << m_pWing->m_NYPanels[n+1];
 
 	m_pWing->m_NYPanels[n+1] = qMax(1,(int)(ny/2));
 	m_pWing->m_NYPanels[n]   = qMax(1,ny-m_pWing->m_NYPanels[n+1]);
 
-qDebug() << m_pWing->m_NXPanels[n+1]  << m_pWing->m_NYPanels[n+1];
 	m_pWing->m_NPanel++;
 
 //	m_pWing->m_bVLMAutoMesh = true;
@@ -1321,7 +1315,7 @@ qDebug() << m_pWing->m_NXPanels[n+1]  << m_pWing->m_NYPanels[n+1];
 void WingDlg::OnItemActivated(const QModelIndex &index)
 {
 	m_iSection = index.row();
-//qDebug()<< "Activated item "<< m_iSection;
+
 	repaint();
 }
 
@@ -1341,7 +1335,7 @@ void WingDlg::OnItemClicked(const QModelIndex &index)
 		}
 	}
 	m_iSection = index.row();
-//qDebug() << "Item Clicked   "<< m_iSection;
+
 	repaint();
 }
 
@@ -1452,14 +1446,14 @@ void WingDlg::ReadParams()
 {
 	m_pWing->m_WingName = m_pctrlWingName->text();
 //	ReadSectionData(m_iSection);
-//qDebug() << "Row count = "<< m_pWingModel->rowCount();
+//qDebug() << "Reading params";
 	for (int i=0; i< m_pWingModel->rowCount();  i++)
 	{
 		ReadSectionData(i);
 	}
-
 	repaint();
 }
+
 
 void WingDlg::ReadSectionData(int sel)
 {
@@ -1496,23 +1490,23 @@ void WingDlg::ReadSectionData(int sel)
 	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_TDihedral[sel] =d;
 
-
 	pItem = m_pWingModel->item(sel,4);
 	strong =pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
-	if(bOK) m_pWing->m_TTwist[sel] =d;
+	if(bOK) m_pWing->m_TTwist[sel] = d;
 
 	pItem = m_pWingModel->item(sel,5);
 	strong =pItem->text();
-	if(m_bRightSide)	m_pWing->m_RFoil[sel] = strong;
-	else                m_pWing->m_LFoil[sel] = strong;
+	if(m_bRightSide) m_pWing->m_RFoil[sel] = strong;
+	else             m_pWing->m_LFoil[sel] = strong;
 
 	pItem = m_pWingModel->item(sel,6);
-	strong =pItem->text();
+	strong = pItem->text();
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_NXPanels[sel] =(int)qMax(1.0,d);
+	
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");
@@ -1539,6 +1533,13 @@ void WingDlg::ReadSectionData(int sel)
 	//Update Geometry
 	m_pWing->ComputeGeometry();
 }
+
+
+void WingDlg::reject()
+{
+	OnCancel();
+}
+
 
 void WingDlg::SetCurrentSection(int section)
 {
@@ -1889,7 +1890,7 @@ bool WingDlg::VLMSetAutoMesh(int total)
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "QFLR5", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
 		return false;
 	}
 	return true;

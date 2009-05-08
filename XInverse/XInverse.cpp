@@ -1764,7 +1764,7 @@ void QXInverse::SetupLayout()
 	m_pctrlSpecCl = new QRadioButton("Cl");
 	m_pctrlSpecif = new QLabel("Alpha = ");
 	m_pctrlSpecif->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-	m_pctrlSpec   = new FloatEdit("1.23");
+	m_pctrlSpec   = new FloatEdit(1.23);
 	SpecLayout->addWidget(m_pctrlSpecAlpha,1,1);
 	SpecLayout->addWidget(m_pctrlSpecCl,1,2);
 	SpecLayout->addWidget(m_pctrlSpecif,2,1);
@@ -1794,7 +1794,7 @@ void QXInverse::SetupLayout()
 	m_pctrlFilter = new QPushButton("Hannig Filter");
 	QLabel *lab0 = new QLabel("Filter parameter");
 	lab0->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-	m_pctrlFilterParam = new FloatEdit("2.34");
+	m_pctrlFilterParam = new FloatEdit(2.34);
 	SmoothLayout->addWidget(m_pctrlSmooth,1,1);
 	SmoothLayout->addWidget(m_pctrlFilter,1,2);
 	SmoothLayout->addWidget(lab0,2,1);
@@ -1809,9 +1809,9 @@ void QXInverse::SetupLayout()
 	lab1->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 	lab3->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-	m_pctrlTAngle = new FloatEdit("3.681");
-	m_pctrlTGapx  = new FloatEdit("0.001");
-	m_pctrlTGapy  = new FloatEdit("0.002");
+	m_pctrlTAngle = new FloatEdit(3.681);
+	m_pctrlTGapx  = new FloatEdit(0.001);
+	m_pctrlTGapy  = new FloatEdit(0.002);
 	m_pctrlTAngle->SetPrecision(3);
 	m_pctrlTGapx->SetPrecision(3);
 	m_pctrlTGapy->SetPrecision(3);
@@ -1845,7 +1845,7 @@ void QXInverse::SetupLayout()
 
 	//specific MInv Controls
 	m_pctrlMSpec          = new QTextEdit("Alpha = Cl =");
-	m_pctrlIter           = new FloatEdit("11");
+	m_pctrlIter           = new FloatEdit(11);
 	m_pctrlMark           = new QPushButton("Mark for modification");
 	m_pctrlCpxx           = new QCheckBox("End Point Constraint");
 	m_pctrlMExec          = new QPushButton("Execute");

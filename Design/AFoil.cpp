@@ -2263,7 +2263,7 @@ void QAFoil::PaintView(QPainter &painter)
 {
 	painter.save();
 
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
@@ -2299,7 +2299,7 @@ void QAFoil::PaintGrids(QPainter &painter)
 {
 	painter.save();
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	QColor color;
 	int style, width;
 

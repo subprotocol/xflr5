@@ -28,7 +28,7 @@ void *CAddDlg::s_pXFoil;
 
 CAddDlg::CAddDlg()
 {
-	setWindowTitle("Local Refinement");
+	setWindowTitle("Local Panel Refinement");
 	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;

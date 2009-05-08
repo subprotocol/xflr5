@@ -1111,11 +1111,7 @@ bool QXDirect::InitXFoil()
 	}
 	else
 	{
-		QMessageBox msgBox;
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
-		msgBox.setText("Unrecognized foil format");
-		msgBox.exec();
+		QMessageBox::warning(window(), "Warning","Unrecognized foil format");
 		return false;
 	}
 }
@@ -1156,11 +1152,8 @@ void QXDirect::InitXFoil2()
 		{
 			QString str;
 			str = "... Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
-			QMessageBox msgBox;
-			msgBox.setStandardButtons(QMessageBox::Ok);
-			msgBox.setWindowTitle("QFLR5");
-			msgBox.setText("str");
-			msgBox.exec();
+			QMessageBox::warning(window(), "Warning",str);
+
 		}
 	}
 }
@@ -1305,11 +1298,7 @@ void QXDirect::LoadSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
 	{
-		QMessageBox msgBox;
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
-		msgBox.setText("archive has an issue");
-		msgBox.exec();
+		QMessageBox::warning(window(), "Warning","Archive has an issue");
 		return;
 	}
 
@@ -2125,7 +2114,7 @@ void QXDirect::OnDelCurOpp()
 	strong += str;
 	strong += "  ?";
 
-	if (QMessageBox::Yes == QMessageBox::question(window(), "QFLR5", strong,
+	if (QMessageBox::Yes == QMessageBox::question(window(), "Question", strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 	{
 		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -2276,7 +2265,7 @@ void QXDirect::OnDeleteFoilPolars()
 
 	strong = "Are you sure you want to delete polars and OpPoints\n";
 	strong +="associated to "+m_pCurFoil->m_FoilName  + " ?";
-	if (QMessageBox::Yes == QMessageBox::question(window(), "QFLR5", strong,
+	if (QMessageBox::Yes == QMessageBox::question(window(), "Question", strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 
 	{
@@ -2953,11 +2942,7 @@ void QXDirect::OnInterpolateFoils()
 {
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox msgBox;
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
-		msgBox.setText("At least two foils are required");
-		msgBox.exec();
+		QMessageBox::warning(window(), "Warning", "At least two foils are required");
 		return;
 	}
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -4714,11 +4699,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
 	{
-		QMessageBox msgBox;
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
-		msgBox.setText("file is closed");
-		msgBox.exec();
+		QMessageBox::warning(window(), "Warning", "File is closed");
 		return;
 	}
 	ar << m_bAlpha << m_bStoreOpp << m_bViscous << m_bInitBL << m_bBL << m_bPressure;

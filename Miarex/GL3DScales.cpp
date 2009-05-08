@@ -68,8 +68,8 @@ void GL3DScales::SetupLayout()
 
 	QGridLayout *CpScaleLayout = new QGridLayout;
 	m_pctrlAutoCpScale = new QCheckBox("Auto Scales");
-	m_pctrlLegendMin = new FloatEdit("61.234");
-	m_pctrlLegendMax = new FloatEdit("3.5555");
+	m_pctrlLegendMin = new FloatEdit(61.234);
+	m_pctrlLegendMax = new FloatEdit(3.5555);
 	m_pctrlLegendMin->SetPrecision(2);
 	m_pctrlLegendMax->SetPrecision(2);
 	QLabel *lab0 = new QLabel("Min");

@@ -66,7 +66,7 @@ private:
 
 	bool AlphaLoop();
 	bool ReLoop();
-	bool Iterate();
+	int Iterate();
 
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;

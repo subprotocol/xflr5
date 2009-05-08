@@ -64,6 +64,8 @@ class MainFrame : public QMainWindow
 	friend class WingScaleDlg;
 	friend class BodyTransDlg;
 	friend class GLWidget;
+	friend class GL3dWingDlg;
+	friend class WAdvancedDlg;
 	Q_OBJECT
 
 public:
@@ -231,7 +233,7 @@ private:
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct, *saveOptionsAct;
 	QAction *unitsAct;
 	QAction *exitAct;
-	QAction *aboutAct, *aboutQtAct, *guidelinesAct;
+	QAction *aboutAct, *guidelinesAct;
 	QAction *recentFileActs[MAXRECENTFILES];
 	QAction *separatorAct;
 	QAction *saveViewToImageFileAct;

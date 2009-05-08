@@ -49,6 +49,7 @@ class CWing
 	friend class WPolarDlg;
 	friend class ImportWingDlg;
 	friend class CtrlPolarDlg;
+	friend class GL3dWingDlg;
 
 	// Construction
 public:

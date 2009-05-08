@@ -527,8 +527,8 @@ void CtrlPolarDlg::SetupLayout()
 	QGridLayout *PlaneLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel("Free Stream Speed");
 	QLabel *lab2 = new QLabel("Plane Weight");
-	m_pctrlQInf    = new FloatEdit("10.05");
-	m_pctrlWeight  = new FloatEdit("1.234");
+	m_pctrlQInf    = new FloatEdit(10.05);
+	m_pctrlWeight  = new FloatEdit(1.234);
 	m_pctrlSpeedUnit   = new QLabel("m/s");
 	m_pctrlWeightUnit  = new QLabel("kg");
 	PlaneLayout->addWidget(lab1,1,1);
@@ -545,10 +545,10 @@ void CtrlPolarDlg::SetupLayout()
 	m_pctrlUnit1 = new QRadioButton("International");
 	m_pctrlUnit2 = new QRadioButton("Imperial");
 	m_pctrlRho           = new QLabel("r");
-	m_pctrlDensity       = new FloatEdit("1.500e-5",3);
+	m_pctrlDensity       = new FloatEdit(1.500e-5,3);
 	m_pctrlDensityUnit   = new QLabel("kg/m3");
 	m_pctrlNu            = new QLabel("n");
-	m_pctrlViscosity     = new FloatEdit("1.225",3);
+	m_pctrlViscosity     = new FloatEdit(1.225,3);
 	m_pctrlViscosityUnit = new QLabel("m2/s");
 	AeroDataLayout->addWidget(lab9,1,1);
 	AeroDataLayout->addWidget(m_pctrlUnit1,1,2);

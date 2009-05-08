@@ -346,6 +346,10 @@ void WPolarDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+		}
 		default:
 			event->ignore();
 	}
@@ -626,11 +630,11 @@ void WPolarDlg::SetupLayout()
 	PlaneLayout->addWidget(lab3,3,1);
 	PlaneLayout->addWidget(lab4,4,1);
 	PlaneLayout->addWidget(lab5,5,1);
-	m_pctrlQInf    = new FloatEdit("10.05");
-	m_pctrlWeight  = new FloatEdit("1.234");
-	m_pctrlXCmRef  = new FloatEdit("100.00");
-	m_pctrlAlpha   = new FloatEdit("1.00");
-	m_pctrlBeta    = new FloatEdit("0.00");
+	m_pctrlQInf    = new FloatEdit(10.05);
+	m_pctrlWeight  = new FloatEdit(1.234);
+	m_pctrlXCmRef  = new FloatEdit(100.00);
+	m_pctrlAlpha   = new FloatEdit(1.00);
+	m_pctrlBeta    = new FloatEdit(0.00);
 	PlaneLayout->addWidget(m_pctrlQInf,1,2);
 	PlaneLayout->addWidget(m_pctrlWeight,2,2);
 	PlaneLayout->addWidget(m_pctrlXCmRef,3,2);
@@ -689,10 +693,10 @@ void WPolarDlg::SetupLayout()
 	m_pctrlUnit1 = new QRadioButton("International");
 	m_pctrlUnit2 = new QRadioButton("Imperial");
 	m_pctrlRho = new QLabel("r");
-	m_pctrlDensity = new FloatEdit("1.500e-5",3);
+	m_pctrlDensity = new FloatEdit(1.500e-5,3);
 	m_pctrlDensityUnit = new QLabel("kg/m3");
 	m_pctrlNu = new QLabel("n");
-	m_pctrlViscosity = new FloatEdit("1.225",3);
+	m_pctrlViscosity = new FloatEdit(1.225,3);
 	m_pctrlViscosityUnit = new QLabel("m2/s");
 	AeroDataLayout->addWidget(lab9,1,1);
 	AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
@@ -721,7 +725,7 @@ void WPolarDlg::SetupLayout()
 	QGridLayout * GroundLayout =new QGridLayout;
 	m_pctrlGroundEffect = new QCheckBox("Ground Effect");
 	QLabel *lab10 = new QLabel("Height =");
-	m_pctrlHeight = new FloatEdit("0.00",2);
+	m_pctrlHeight = new FloatEdit(0.00,2);
 	m_pctrlLengthUnit2 = new QLabel("mm");
 	GroundLayout->addWidget(m_pctrlGroundEffect,1,1);
 	GroundLayout->addWidget(lab10,2,1);

@@ -41,7 +41,6 @@ public:
     WPolarDlg();
 
 private:
-
 	void keyPressEvent(QKeyEvent *event);
 
 	void SetupLayout();

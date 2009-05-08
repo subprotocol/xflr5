@@ -74,6 +74,7 @@ class QMiarex : public QWidget
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
 	friend class EditPlrDlg;
+	friend class GL3dWingDlg;
 
 	Q_OBJECT
 
@@ -207,7 +208,7 @@ private:
 
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, QPoint &point);
-	void GLCreateGeom(CWing *pWing, int List, QColor wingcolor);
+	void GLCreateGeom(CWing *pWing, int List);
 	void GLCreateMesh();
 	void GLCreateCtrlPts();
 	void GLCreateVortices();

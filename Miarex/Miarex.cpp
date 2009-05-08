@@ -28,8 +28,10 @@
 #include "../Misc/RenameDlg.h"
 #include "../Graph/GraphVariableDlg.h"
 #include "../Graph/WingGraphVarDlg.h"
+#include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
+#include "GL3dWingDlg.h"
 #include "GL3DScales.h"
 #include "WingDlg.h"
 #include "PlaneDlg.h"
@@ -207,7 +209,7 @@ QMiarex::QMiarex(QWidget *parent)
 	CSurface::s_pPanel = m_Panel;
 	CSurface::s_pNode  = m_Node;
 
-
+	GL3dWingDlg::s_pGLLightDlg = &m_GLLightDlg;
 	GL3dBodyDlg::s_pGLLightDlg = &m_GLLightDlg;
 
 	m_GLList = 0;
@@ -614,6 +616,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlSurfaces, SIGNAL(clicked()), SLOT(OnSurfaces()));
 	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnOutline()));
 	connect(m_pctrlPanels, SIGNAL(clicked()), SLOT(OnPanels()));
+	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
 
@@ -1147,7 +1150,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 	if(pNewPoint == NULL)
 	{
-		QMessageBox::warning(window(),"QFLR5","Not enough memory to store the OpPoint\n");
+		QMessageBox::warning(window(),"Warning","Not enough memory to store the OpPoint\n");
 		return;
 	}
 	else
@@ -5843,7 +5846,7 @@ void QMiarex::GLCreateCpLegend()
 }
 
 
-void QMiarex::GLCreateGeom(CWing *pWing, int List, QColor wingcolor)
+void QMiarex::GLCreateGeom(CWing *pWing, int List)
 {
 	if(!pWing) return;
 
@@ -5860,7 +5863,7 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List, QColor wingcolor)
 		m_GLList++;
 		glLineWidth(1.0);
 
-		color = wingcolor;
+		color = pWing->m_WingColor;
 		style = 0;
 		width = 0;
 
@@ -7587,7 +7590,6 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 
 void QMiarex::GLCreateVortices()
 {
-
 	int p;
 	CVector A, B, C, D, AC, BD;
 	glEnable (GL_LINE_STIPPLE);
@@ -8204,7 +8206,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(WINGSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurWing,WINGSURFACES,(m_pCurWing)->m_WingColor);
+			GLCreateGeom(m_pCurWing,WINGSURFACES);
 		}
 
 		if(m_pCurWing2)
@@ -8214,7 +8216,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(WING2SURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurWing2,WING2SURFACES,(m_pCurWing2)->m_WingColor);
+			GLCreateGeom(m_pCurWing2,WING2SURFACES);
 		}
 
 		if(m_pCurStab)
@@ -8224,7 +8226,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(STABSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurStab,STABSURFACES, (m_pCurStab)->m_WingColor);
+			GLCreateGeom(m_pCurStab,STABSURFACES);
 		}
 
 		if(m_pCurFin)
@@ -8234,7 +8236,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(FINSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurFin,FINSURFACES, (m_pCurFin)->m_WingColor);
+			GLCreateGeom(m_pCurFin,FINSURFACES);
 		}
 
 		m_bResetglGeom = false;
@@ -8847,7 +8849,7 @@ bool QMiarex::InitializePanels()
 		QString strong;
 		strong = QString("The total number of panels is %1\n The Max Number is %2\nA reduction of the number of panels is required")
 						  .arg(m_MatSize).arg(VLMMATSIZE);
-		QMessageBox::warning(this,"QFLR5",strong);
+		QMessageBox::warning(this,"Warning",strong);
 		m_MatSize = 0;
 		m_nNodes  = 0;
 		return false;
@@ -9663,6 +9665,8 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	LLTDlg.m_AlphaMax   = VMax;
 	LLTDlg.m_AlphaDelta = VDelta;
 
+	LLTDlg.m_IterLim = m_Iter;
+
 	LLTDlg.InitDialog();
 
 	LLTDlg.show();
@@ -9745,10 +9749,16 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 
 	ar >> m_LiftScale >> m_DragScale >> m_VelocityScale;
 
+	ar >> m_bLogFile >> m_bDirichlet >> m_bTrefftz >> m_bKeepOutOpps >> m_bResetWake;
+	ar >> m_Iter  >> m_WakeInterNodes >> m_MaxWakeIter >> m_InducedDragPoint;
+	ar >> CPanel::m_CtrlPos >> CPanel::m_VortexPos >> CWing::s_RelaxMax >> CWing::s_CvPrec >> CWing::s_NLLTStations;
+	ar >> m_CoreSize >> m_MinPanelSize;
+
 	m_GL3dBody.LoadSettings(ar);
 
 	return true;
 }
+
 
 
 void QMiarex::mouseMoveEvent(QMouseEvent *event)
@@ -10413,14 +10423,14 @@ void QMiarex::OnAnalyze()
 		{
 			QString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_RFoil[l] +"...\nAborting Calculation";
-			QMessageBox::warning(this, "QFLR5", strong);
+			QMessageBox::warning(this, "Warning", strong);
 			return;
 		}
 		if (!pMainFrame->GetFoil(m_pCurWing->m_LFoil[l]))
 		{
 			QString strong;
 			strong = "Could not find the wing's foil "+ m_pCurWing->m_LFoil[l] +"...\nAborting Calculation";
-			QMessageBox::warning(this, "QFLR5", strong);
+			QMessageBox::warning(this, "Warning", strong);
 			return;
 		}
 	}
@@ -10432,14 +10442,14 @@ void QMiarex::OnAnalyze()
 			{
 				QString strong;
 				strong = "Could not find the elevator's foil "+ m_pCurStab->m_RFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "QFLR5", strong);
+				QMessageBox::warning(this, "Warning", strong);
 				return;
 			}
 			if (!pMainFrame->GetFoil(m_pCurStab->m_LFoil[l]))
 			{
 				QString strong;
 				strong = "Could not find the elevator's foil "+ m_pCurStab->m_LFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "QFLR5", strong);
+				QMessageBox::warning(this, "Warning", strong);
 				return;
 			}
 		}
@@ -10453,7 +10463,7 @@ void QMiarex::OnAnalyze()
 			{
 				QString strong;
 				strong = "Could not find the fin's foil "+ m_pCurFin->m_RFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "QFLR5", strong);
+				QMessageBox::warning(this, "Warning", strong);
 				return;
 			}
 		}
@@ -10635,6 +10645,49 @@ void QMiarex::OnAdjustToWing()
 
 void QMiarex::OnAdvancedSettings()
 {
+	WAdvancedDlg dlg;
+	dlg.m_AlphaPrec       = CWing::s_CvPrec;
+	dlg.m_Relax           = CWing::s_RelaxMax;
+	dlg.m_NStation        = CWing::s_NLLTStations;
+	dlg.m_Iter            = m_Iter;
+	dlg.m_MaxWakeIter     = m_MaxWakeIter;
+	dlg.m_CoreSize        = m_CoreSize;
+	dlg.m_bResetWake      = m_bResetWake;
+	dlg.m_bDirichlet      = m_bDirichlet;
+	dlg.m_bTrefftz        = m_bTrefftz;
+	dlg.m_bKeepOutOpps    = m_bKeepOutOpps;
+	dlg.m_bLogFile        = m_bLogFile;
+	dlg.m_MinPanelSize    = m_MinPanelSize;
+	dlg.m_ControlPos      = CPanel::m_CtrlPos;
+	dlg.m_VortexPos       = CPanel::m_VortexPos;
+	dlg.m_WakeInterNodes  = m_WakeInterNodes;
+	dlg.m_pMainFrame = m_pMainFrame;
+
+	dlg.InitDialog();
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		CWing::s_CvPrec        = dlg.m_AlphaPrec;
+		CWing::s_RelaxMax      = dlg.m_Relax;
+		CWing::s_NLLTStations  = dlg.m_NStation;
+		m_Iter                 = dlg.m_Iter;
+		m_MaxWakeIter          = dlg.m_MaxWakeIter;
+		m_CoreSize             = dlg.m_CoreSize;
+		m_bResetWake           = dlg.m_bResetWake;
+		m_bDirichlet           = dlg.m_bDirichlet;
+		m_bTrefftz             = dlg.m_bTrefftz;
+		m_bKeepOutOpps         = dlg.m_bKeepOutOpps;
+		m_WakeInterNodes       = dlg.m_WakeInterNodes;
+		m_MinPanelSize         = dlg.m_MinPanelSize;
+
+		m_InducedDragPoint     = dlg.m_InducedDragPoint;
+
+		CPanel::m_CtrlPos      = dlg.m_ControlPos;
+		CPanel::m_VortexPos    = dlg.m_VortexPos;
+
+		if(dlg.m_bLogFile) m_bLogFile = true; else m_bLogFile = false;
+		m_bResetglWake    = true;
+		UpdateView();
+	}
 }
 
 
@@ -11151,7 +11204,7 @@ void QMiarex::OnDeleteCurUFO()
 	QString strong;
 	if(m_pCurPlane)	strong = "Are you sure you want to delete the plane :\n" +  m_pCurPlane->m_PlaneName +"?\n";
 	else 	        strong = "Are you sure you want to delete the wing :\n" +   m_pCurWing->m_WingName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 
 	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
@@ -11321,7 +11374,7 @@ void QMiarex::OnDeleteCurWPolar()
 	else return;
 
 	strong = "Are you sure you want to delete the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	//first remove all WOpps associated to the Wing Polar
 	CWOpp * pWOpp;
@@ -11503,7 +11556,7 @@ void QMiarex::OnEditUFO()
 			{
 				QString str = "The modification will erase all results associated to this Wing.\nContinue ?";
 
-				int Ans = QMessageBox::question(this, "QFLR5", str, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+				int Ans = QMessageBox::question(this, "Question", str, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 				if (Ans == QMessageBox::Cancel)
 				{
 					//restore geometry for initial wing
@@ -12235,7 +12288,9 @@ void QMiarex::OnNewWing()
 	int i;
 	CWing *pOldWing;
 	CWing* pWing = new CWing;
+
 	WingDlg WingDlg;
+//	GL3dWingDlg WingDlg;
 	WingDlg.m_pWing = pWing;
 	WingDlg.m_bAcceptName= true;
 	WingDlg.InitDialog();
@@ -12580,7 +12635,7 @@ void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
 	QString strong = "Are you sure you want to reset the content of the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	m_pCurWPolar->ResetWPlr();
 	if(m_iView==2)
@@ -14243,6 +14298,11 @@ bool QMiarex::SaveSettings(QDataStream &ar)
 
 	ar << m_LiftScale << m_DragScale << m_VelocityScale;
 
+	ar << m_bLogFile << m_bDirichlet << m_bTrefftz << m_bKeepOutOpps << m_bResetWake;
+	ar << m_Iter  << m_WakeInterNodes << m_MaxWakeIter << m_InducedDragPoint;
+	ar << CPanel::m_CtrlPos << CPanel::m_VortexPos << CWing::s_RelaxMax << CWing::s_CvPrec << CWing::s_NLLTStations;
+	ar << m_CoreSize << m_MinPanelSize;
+
 	m_GL3dBody.SaveSettings(ar);
 
 	return true;
@@ -14713,7 +14773,7 @@ bool QMiarex::SetModBody(CBody *pModBody)
 				if(bIsInUse)
 				{
 					strong = "The body "+pOldBody->m_BodyName+" is used by one or more planes.\n Overwrite anyway ? (Results will be lost)";
-					resp = QMessageBox::question(this, "QFLR5", strong, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+					resp = QMessageBox::question(this, "Question", strong, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 				}
 				if(resp == QMessageBox::Yes)
 				{
@@ -15120,7 +15180,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 			}
 			else if(pOldPlane)
 			{
-				if(pOldPlane->m_bActive) QMessageBox::warning(window(), "QFLR5","Cannot overwrite current plane");
+				if(pOldPlane->m_bActive) QMessageBox::warning(window(), "Warning","Cannot overwrite current plane");
 				else
 				{
 					for (k=0; k<m_poaPlane->size(); k++)
@@ -16403,6 +16463,77 @@ void QMiarex::showEvent(QShowEvent *event)
 
 
 
+void QMiarex::SnapClient(QString const &FileName, int FileType)
+{
+	int NbBytes, bitsPerPixel;
+
+	QSize size(m_rCltRect.width(),m_rCltRect.height());
+
+	// Lines have to be 32 bits aligned
+//	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
+	bitsPerPixel = 24;
+	int width = size.width();
+
+	switch(bitsPerPixel)
+	{
+		case 8:
+		{
+			QMessageBox::warning(this,"Warning","Cannot (yet ?) save 8 bit depth opengl screen images... Sorry");
+			return;
+		}
+		case 16:
+		{
+			QMessageBox::warning(this,"Warning","Cannot (yet ?) save 16 bit depth opengl screen images... Sorry");
+			size.setWidth(width - size.width() % 2);
+			return;
+		}
+		case 24:
+		{
+			NbBytes = 3 * size.width() * size.height();//24 bits type BMP
+//			size.setWidth(width - size.width() % 4);
+			break;
+		}
+		case 32:
+		{
+			NbBytes = 4 * size.width() * size.height();//32 bits type BMP
+			break;
+		}
+		default:
+		{
+			QMessageBox::warning(this,"Warning","Unidentified bit depth... Sorry");
+			return;
+		}
+	}
+	uchar *pPixelData = new uchar[NbBytes];
+
+	// Copy from OpenGL
+	glReadBuffer(GL_FRONT);
+	switch(bitsPerPixel)
+	{
+		  case 8: return;
+		  case 16: return;
+		  case 24:
+			  glReadPixels(0,0,size.width(),size.height(),GL_RGB,GL_UNSIGNED_BYTE,pPixelData);
+			  break;
+		  case 32:
+			  glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
+			  break;
+		  default: break;
+	}
+
+	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
+	QImage FlippedImaged = Image.mirrored(false, true);	//flip vertically
+
+	delete pPixelData;
+
+	FlippedImaged.save(FileName);
+}
+
+
+
+
+
+
 void QMiarex::StopAnimate()
 {
 	if(!m_bAnimate) return;
@@ -16615,75 +16746,5 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 	}
 }
-
-
-
-
-void QMiarex::SnapClient(QString const &FileName, int FileType)
-{
-	int NbBytes, bitsPerPixel;
-
-	QSize size(m_rCltRect.width(),m_rCltRect.height());
-
-	// Lines have to be 32 bits aligned
-//	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
-	bitsPerPixel = 24;
-	int width = size.width();
-
-	switch(bitsPerPixel)
-	{
-		case 8:
-		{
-			QMessageBox::warning(this,"QFLR5","Cannot (yet ?) save 8 bit depth opengl screen images... Sorry");
-			return;
-		}
-		case 16:
-		{
-			QMessageBox::warning(this,"QFLR5","Cannot (yet ?) save 16 bit depth opengl screen images... Sorry");
-			size.setWidth(width - size.width() % 2);
-			return;
-		}
-		case 24:
-		{
-			NbBytes = 3 * size.width() * size.height();//24 bits type BMP
-//			size.setWidth(width - size.width() % 4);
-			break;
-		}
-		case 32:
-		{
-			NbBytes = 4 * size.width() * size.height();//32 bits type BMP
-			break;
-		}
-		default:
-		{
-			QMessageBox::warning(this,"QFLR5","Unidentified bit depth... Sorry");
-			return;
-		}
-	}
-	uchar *pPixelData = new uchar[NbBytes];
-
-	// Copy from OpenGL
-	glReadBuffer(GL_FRONT);
-	switch(bitsPerPixel)
-	{
-		  case 8: return;
-		  case 16: return;
-		  case 24:
-			  glReadPixels(0,0,size.width(),size.height(),GL_RGB,GL_UNSIGNED_BYTE,pPixelData);
-			  break;
-		  case 32:
-			  glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
-			  break;
-		  default: break;
-	}
-
-	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
-	QImage FlippedImaged = Image.mirrored(false, true);	//flip vertically
-
-	delete pPixelData;
-
-	FlippedImaged.save(FileName);
-}
-
 
 

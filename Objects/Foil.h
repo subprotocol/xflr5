@@ -60,6 +60,7 @@ class CFoil
 	friend class CAddDlg;
 	friend class BatchDlg;
 	friend class GL3dViewDlg;
+	friend class GL3dWingDlg;
 	friend class WingDlg;
 	friend class AFoil;
 	friend class FoilSelectionDlg;

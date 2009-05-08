@@ -114,10 +114,10 @@ void BatchDlg::SetLayout()
 	DeltaVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	m_pctrlReType  = new QLabel("Reynolds=");
 	m_pctrlMaType  = new QLabel("Mach=");
-	m_pctrlReMin   = new FloatEdit("100 000",0);
-	m_pctrlReMax   = new FloatEdit("150 000",0);
-	m_pctrlReDelta = new FloatEdit("50 000",0);
-	m_pctrlMach    = new FloatEdit("0.00");
+	m_pctrlReMin   = new FloatEdit(100000,0);
+	m_pctrlReMax   = new FloatEdit(150000,0);
+	m_pctrlReDelta = new FloatEdit(50000,0);
+	m_pctrlMach    = new FloatEdit(0.00);
 
 	BatchVars->addWidget(m_rbRange1, 1, 2);
 	BatchVars->addWidget(m_rbRange2, 1, 3);
@@ -147,9 +147,9 @@ void BatchDlg::SetLayout()
 	SpecMax->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	SpecDelta->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	m_pctrlSpecVar    = new QLabel("Spec =");
-	m_pctrlSpecMin    = new FloatEdit("0.00");
-	m_pctrlSpecMax    = new FloatEdit("1.00");
-	m_pctrlSpecDelta  = new FloatEdit("0.50");
+	m_pctrlSpecMin    = new FloatEdit(0.00);
+	m_pctrlSpecMax    = new FloatEdit(1.00);
+	m_pctrlSpecDelta  = new FloatEdit(0.50);
 	RangeVars->addWidget(Spec, 1, 1);
 	RangeVars->addWidget(m_rbspec1, 1, 2);
 	RangeVars->addWidget(m_rbspec2, 1, 3);
@@ -171,9 +171,9 @@ void BatchDlg::SetLayout()
 	QLabel *ForcedTransMethod = new QLabel("Forced transitions");
 	QLabel *TopTransLabel = new QLabel("Trip Location (top)");
 	QLabel *BotTransLabel = new QLabel("Trip Location (bottom)");
-	m_pctrlNCrit   = new FloatEdit("9.00");
-	m_pctrlXTopTr = new FloatEdit("1.00");
-	m_pctrlXBotTr = new FloatEdit("1.00");
+	m_pctrlNCrit   = new FloatEdit(9.00);
+	m_pctrlXTopTr = new FloatEdit(1.00);
+	m_pctrlXBotTr = new FloatEdit(1.00);
 	TransVars->addWidget(FreeTransMethod, 1, 1);
 	TransVars->addWidget(NCritLabel, 1, 2);
 	TransVars->addWidget(m_pctrlNCrit, 1, 3);

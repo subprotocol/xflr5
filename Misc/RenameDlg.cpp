@@ -25,6 +25,7 @@
 
 RenameDlg::RenameDlg(void *pParent)
 {
+	setWindowTitle("Rename");
 	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
 	SetupLayout();
@@ -105,7 +106,6 @@ void RenameDlg::InitDialog()
 
 
 
-
 void RenameDlg::keyPressEvent(QKeyEvent *event)
 {
 	// Prevent Return Key from closing App
@@ -121,7 +121,12 @@ void RenameDlg::keyPressEvent(QKeyEvent *event)
 			{
 				OnOK();
 			}
-			break;
+			return;
+		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
 		}
 		default:
 			event->ignore();

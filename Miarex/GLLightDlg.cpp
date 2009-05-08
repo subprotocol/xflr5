@@ -31,6 +31,7 @@
 
 GLLightDlg::GLLightDlg()
 {
+	m_pGL3dViewDlg = m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
 	m_bCullFaces     = false;
 	m_bShade         = true;
 	m_bSmooth        = true;

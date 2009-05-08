@@ -37,6 +37,7 @@ TwoDPanelDlg::TwoDPanelDlg()
 
 void TwoDPanelDlg::SetupLayout()
 {
+	setWindowTitle("Global Panel Refinement");
 	QGridLayout *InputData = new QGridLayout;
 	QLabel *l1 = new QLabel("Number of Panels");
 	QLabel *l2 = new QLabel("Panel Bunching Parameter");
