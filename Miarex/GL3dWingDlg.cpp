@@ -34,13 +34,16 @@
 #include <math.h>
 
 #define WINGGEOMETRY        1400
+#define WINGOUTLINE         1401
+#define SECTIONHIGHLIGHT    1402
 
 #define MESHPANELS			1410
-#define MESHBACK			1420
+#define MESHBACK			1411
 
 
 #define ARCBALL             1430
 #define ARCPOINT            1431
+
 
 void* GL3dWingDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dWingDlg::s_pMiarex;	//pointer to the Miarex Application window
@@ -56,14 +59,10 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 
 	m_pWing = NULL;
 
-	m_hcArrow.setShape(Qt::ArrowCursor);
-	m_hcCross.setShape(Qt::CrossCursor);
-	m_hcMove.setShape(Qt::ClosedHandCursor);
-
 	pi = 3.141592654;
 
 	m_iView      = 3;
-	m_iSection   = 0;
+	m_iSection   = -1;
 	m_yMAC       = 0.0;
 	m_GLList     = 0;
 
@@ -79,6 +78,8 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_StackSize = 0; //the current stacksize
 	m_StackPos  = 0; //the current position of the stack
 
+	m_bResetglSectionHighlight = true;
+	m_bResetglWing             = true;
 	m_bChanged           = false;
 	m_bEnableName        = true;
 	m_bAcceptName        = true;
@@ -93,7 +94,6 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_bglLight           = true;
 	m_bPickCenter        = false;
 	m_bShowLight         = false;
-	m_bIs3DScaleSet      = false;
 	m_bRightSide  = true;
 
 	m_LastPoint.setX(0);
@@ -115,15 +115,11 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
 
 
-	m_pSetupLight    = new QAction("Light Setup", this);
+//	m_pSetupLight    = new QAction("Light Setup", this);
 	m_pResetScales   = new QAction("Reset Scales", this);
 	m_pInsertBefore  = new QAction("Insert Before", this);
 	m_pInsertAfter   = new QAction("Insert after", this);
 	m_pDeleteSection = new QAction("Delete section", this);
-	m_pUndo          = new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
-	m_pUndo->setStatusTip(tr("Cancels the last modifiction made to the wing"));
-	m_pRedo          = new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
-	m_pRedo->setStatusTip(tr("Restores the last cancelled modification made to the wing"));
 
 	m_pContextMenu = new QMenu("Section",this);
 	m_pContextMenu->addAction(m_pInsertBefore);
@@ -192,8 +188,8 @@ void GL3dWingDlg::ClientToGL(QPoint const &point, CVector &real)
 void GL3dWingDlg::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
-	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
+//	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
+//	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
 	m_pWing->ComputeGeometry();
 	m_pWing->CreateSurfaces(CVector(0.0,0.0,0.0), 0.0, 0.0);
 	for (int i=0; i<m_pWing->m_NSurfaces; i++) m_pWing->m_Surface[i].SetSidePoints(NULL, 0.0, 0.0);
@@ -226,7 +222,7 @@ void GL3dWingDlg::Connect()
 	m_pWingModel->setColumnCount(3);
 
 	m_pctrlWingTable->setModel(m_pWingModel);
-	m_pWingDelegate = new WingDelegate;
+	m_pWingDelegate = new WingDelegate(this);
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
 	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
@@ -235,10 +231,8 @@ void GL3dWingDlg::Connect()
 	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
 	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
 
-	connect(m_pRedo, SIGNAL(triggered()), this, SLOT(OnRedo()));
-	connect(m_pUndo, SIGNAL(triggered()), this, SLOT(OnUndo()));
-	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(OnResetScales()));
-	connect(m_pSetupLight, SIGNAL(triggered()), SLOT(OnSetupLight()));
+	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(On3DReset()));
+	connect(m_pctrlSetupLight, SIGNAL(clicked()), SLOT(OnSetupLight()));
 
 	connect(m_pctrlIso, SIGNAL(clicked()),this, SLOT(On3DIso()));
 	connect(m_pctrlX, SIGNAL(clicked()),this, SLOT(On3DFront()));
@@ -255,6 +249,9 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlSurfaces,   SIGNAL(clicked()), this, SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 
+	connect(m_pctrlInsertBefore, SIGNAL(clicked()),this, SLOT(OnInsertBefore()));
+	connect(m_pctrlInsertAfter, SIGNAL(clicked()),this, SLOT(OnInsertAfter()));
+	connect(m_pctrlDeleteSection, SIGNAL(clicked()),this, SLOT(OnDeleteSection()));
 	connect(m_pctrlResetMesh, SIGNAL(clicked()),this, SLOT(OnResetMesh()));
 	connect(m_pctrlWingColor, SIGNAL(clicked()),this, SLOT(OnWingColor()));
 	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
@@ -335,7 +332,6 @@ void GL3dWingDlg::FillDataTable()
 {
 	if(!m_pWing) return;
 	int i;
-//	if(m_pWing->m_bVLMAutoMesh) VLMSetAutoMesh();
 	m_pWingModel->setRowCount(m_pWing->m_NPanel+1);
 
 	for(i=0; i<=m_pWing->m_NPanel; i++)
@@ -796,49 +792,284 @@ void GL3dWingDlg::GLCreateGeometry()
 
 }
 
+void GL3dWingDlg::GLCreateSectionHighlight()
+{
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	int j,l;
+	CVector Pt, A, B, C, D, N, BD, AC, LATB, TALB;
+
+	int section = 0;
+	for(j=0; j<m_pWing->m_NPanel; j++)
+	{
+		if(j==m_iSection) break;
+		if(fabs(m_pWing->m_TPos[j+1]-m_pWing->m_TPos[j]) > pMiarex->m_MinPanelSize)
+			section++;
+	}
+
+
+	glNewList(SECTIONHIGHLIGHT,GL_COMPILE);
+	{
+		m_GLList++;
+
+		glPolygonMode(GL_FRONT,GL_LINE);
+		glDisable (GL_LINE_STIPPLE);
+		glColor3d(1.0, 0.0, 0.0);
+		glLineWidth(3);
+
+		if(m_pWing->m_bSymetric || m_bRightSide)
+		{
+			if(m_iSection<m_pWing->m_NPanel)
+			{
+				j = m_pWing->m_NSurfaces/2 + section;
+				glBegin(GL_LINE_STRIP);
+				{
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(0, l, 1);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+					}
+
+					glVertex3d(m_pWing->m_Surface[j].LA.x,
+							   m_pWing->m_Surface[j].LA.y,
+							   m_pWing->m_Surface[j].LA.z);
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(0, l, -1);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+					}
+				}
+				glEnd();
+			}
+			else
+			{
+				j = m_pWing->m_NSurfaces/2 + section -1;
+				glBegin(GL_LINE_STRIP);
+				{
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, 1);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+
+					glVertex3d(m_pWing->m_Surface[j].LB.x,
+							   m_pWing->m_Surface[j].LB.y,
+							   m_pWing->m_Surface[j].LB.z);
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, -1);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+				}
+				glEnd();
+			}
+		}
+		if(m_pWing->m_bSymetric || !m_bRightSide)
+		{
+			if(m_iSection>0)
+			{
+				j = m_pWing->m_NSurfaces/2 - section;
+				glBegin(GL_LINE_STRIP);
+				{
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(0, l, 1);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+					}
+
+					glVertex3d(m_pWing->m_Surface[j].LA.x,
+							   m_pWing->m_Surface[j].LA.y,
+							   m_pWing->m_Surface[j].LA.z);
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(0, l, -1);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+					}
+				}
+				glEnd();
+			}
+			else
+			{
+				j = m_pWing->m_NSurfaces/2 - 1;
+				glBegin(GL_LINE_STRIP);
+				{
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, 1);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+
+					glVertex3d(m_pWing->m_Surface[j].LB.x,
+							   m_pWing->m_Surface[j].LB.y,
+							   m_pWing->m_Surface[j].LB.z);
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, -1);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+				}
+				glEnd();
+			}
+		}
+	}
+	glEndList();
+}
+
+
 void GL3dWingDlg::GLCreateMesh()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QColor color;
-	int iLA, iLB, iTA, iTB;
-	int style, width, p;
-	CVector A, B, N;
-	N.Set(0.0, 0.0, 0.0);
+	int style, width, j,l,k;
+	CVector A, B, C, D, N, LATB, TALB;
 
 	glNewList(MESHPANELS,GL_COMPILE);
 	{
 		m_GLList++;
 		glEnable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//		glEnable(GL_POLYGON_OFFSET_FILL);
-//		glPolygonOffset(1.0, 1.0);
 
 		color = pMiarex->m_VLMColor;
 		style = pMiarex->m_VLMStyle;
 		width = pMiarex->m_VLMWidth;
 
-		glLineWidth(1.0);
+		glLineWidth(width);
 
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
+		for (j=0; j<m_pWing->m_NSurfaces; j++)
 		{
-				glBegin(GL_QUADS);
+			for(k=0; k<m_pWing->m_Surface[j].m_NYPanels; k++)
+			{
+				glBegin(GL_QUAD_STRIP);
 				{
-					iLA = m_pPanel[p].m_iLA;
-					iLB = m_pPanel[p].m_iLB;
-					iTA = m_pPanel[p].m_iTA;
-					iTB = m_pPanel[p].m_iTB;
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(k,l,1);
 
-					glNormal3d(m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
-					glVertex3d(m_pNode[iLA].x, m_pNode[iLA].y, m_pNode[iLA].z);
-					glVertex3d(m_pNode[iTA].x, m_pNode[iTA].y, m_pNode[iTA].z);
-					glVertex3d(m_pNode[iTB].x, m_pNode[iTB].y, m_pNode[iTB].z);
-					glVertex3d(m_pNode[iLB].x, m_pNode[iLB].y, m_pNode[iLB].z);
+						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
+						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(k,l,-1);
+
+						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
+						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(m_pWing->m_Surface[j].LA.x,
+								   m_pWing->m_Surface[j].LA.y,
+								   m_pWing->m_Surface[j].LA.z);
+						glVertex3d(m_pWing->m_Surface[j].LB.x,
+								   m_pWing->m_Surface[j].LB.y,
+								   m_pWing->m_Surface[j].LB.z);
+					}
+					glVertex3d(m_pWing->m_Surface[j].TA.x,
+							   m_pWing->m_Surface[j].TA.y,
+							   m_pWing->m_Surface[j].TA.z);
+					glVertex3d(m_pWing->m_Surface[j].TB.x,
+							   m_pWing->m_Surface[j].TB.y,
+							   m_pWing->m_Surface[j].TB.z);
 				}
 				glEnd();
+			}
+		}
+		//tip patches
+		for (j=0; j<m_pWing->m_NSurfaces; j++)
+		{
+			if(m_pWing->m_Surface[j].m_bIsTipLeft)
+			{
+				for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+				{
+					glBegin(GL_QUADS);
+					{
+						m_pWing->m_Surface[j].GetPanel(0,l,1);
+						A = m_pWing->m_Surface[j].TA;
+						B = m_pWing->m_Surface[j].LA;
+						m_pWing->m_Surface[j].GetPanel(0,l,-1);
+						C = m_pWing->m_Surface[j].LA;
+						D = m_pWing->m_Surface[j].TA;
+
+						LATB = A-C;
+						TALB = D-B;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(A.x,A.y,A.z);
+						glVertex3d(B.x,B.y,B.z);
+						glVertex3d(C.x,C.y,C.z);
+						glVertex3d(D.x,D.y,D.z);
+					}
+					glEnd();
+				}
+			}
+			if(m_pWing->m_Surface[j].m_bIsTipRight)
+			{
+				for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+				{
+					glBegin(GL_QUADS);
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,1);
+						A = m_pWing->m_Surface[j].TB;
+						B = m_pWing->m_Surface[j].LB;
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,-1);
+						C = m_pWing->m_Surface[j].LB;
+						D = m_pWing->m_Surface[j].TB;
+
+						LATB = A-C;
+						TALB = D-B;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(A.x,A.y,A.z);
+						glVertex3d(B.x,B.y,B.z);
+						glVertex3d(C.x,C.y,C.z);
+						glVertex3d(D.x,D.y,D.z);
+					}
+					glEnd();
+				}
+			}
 		}
 	}
 	glEndList();
@@ -860,24 +1091,120 @@ void GL3dWingDlg::GLCreateMesh()
 		glLineWidth(1.0);
 		glDisable (GL_LINE_STIPPLE);
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
-		{
-				glBegin(GL_QUADS);
-				{
-					iLA = m_pPanel[p].m_iLA;
-					iLB = m_pPanel[p].m_iLB;
-					iTA = m_pPanel[p].m_iTA;
-					iTB = m_pPanel[p].m_iTB;
 
-					glVertex3d(m_pNode[iLA].x, m_pNode[iLA].y, m_pNode[iLA].z);
-					glVertex3d(m_pNode[iTA].x, m_pNode[iTA].y, m_pNode[iTA].z);
-					glVertex3d(m_pNode[iTB].x, m_pNode[iTB].y, m_pNode[iTB].z);
-					glVertex3d(m_pNode[iLB].x, m_pNode[iLB].y, m_pNode[iLB].z);
-					glNormal3d(m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
+		for (j=0; j<m_pWing->m_NSurfaces; j++)
+		{
+			for(k=0; k<m_pWing->m_Surface[j].m_NYPanels; k++)
+			{
+				glBegin(GL_QUAD_STRIP);
+				{
+					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+					{
+						m_pWing->m_Surface[j].GetPanel(k,l,1);
+
+						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
+						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(m_pWing->m_Surface[j].TA.x,
+								   m_pWing->m_Surface[j].TA.y,
+								   m_pWing->m_Surface[j].TA.z);
+						glVertex3d(m_pWing->m_Surface[j].TB.x,
+								   m_pWing->m_Surface[j].TB.y,
+								   m_pWing->m_Surface[j].TB.z);
+					}
+
+					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
+					{
+						m_pWing->m_Surface[j].GetPanel(k,l,-1);
+
+						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
+						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(m_pWing->m_Surface[j].LA.x,
+								   m_pWing->m_Surface[j].LA.y,
+								   m_pWing->m_Surface[j].LA.z);
+						glVertex3d(m_pWing->m_Surface[j].LB.x,
+								   m_pWing->m_Surface[j].LB.y,
+								   m_pWing->m_Surface[j].LB.z);
+					}
+					glVertex3d(m_pWing->m_Surface[j].TA.x,
+							   m_pWing->m_Surface[j].TA.y,
+							   m_pWing->m_Surface[j].TA.z);
+					glVertex3d(m_pWing->m_Surface[j].TB.x,
+							   m_pWing->m_Surface[j].TB.y,
+							   m_pWing->m_Surface[j].TB.z);
 				}
 				glEnd();
+			}
 		}
 
+		for (j=0; j<m_pWing->m_NSurfaces; j++)
+		{
+			if(m_pWing->m_Surface[j].m_bIsTipLeft)
+			{
+				for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+				{
+					glBegin(GL_QUADS);
+					{
+						m_pWing->m_Surface[j].GetPanel(0,l,1);
+						A = m_pWing->m_Surface[j].TA;
+						B = m_pWing->m_Surface[j].LA;
+						m_pWing->m_Surface[j].GetPanel(0,l,-1);
+						C = m_pWing->m_Surface[j].LA;
+						D = m_pWing->m_Surface[j].TA;
+
+						LATB = A-C;
+						TALB = D-B;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(A.x,A.y,A.z);
+						glVertex3d(B.x,B.y,B.z);
+						glVertex3d(C.x,C.y,C.z);
+						glVertex3d(D.x,D.y,D.z);
+					}
+					glEnd();
+				}
+			}
+			if(m_pWing->m_Surface[j].m_bIsTipRight)
+			{
+				for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
+				{
+					glBegin(GL_QUADS);
+					{
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,1);
+						A = m_pWing->m_Surface[j].TB;
+						B = m_pWing->m_Surface[j].LB;
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,-1);
+						C = m_pWing->m_Surface[j].LB;
+						D = m_pWing->m_Surface[j].TB;
+
+						LATB = A-C;
+						TALB = D-B;
+
+						N = LATB *TALB;
+						N. Normalize();
+
+						glNormal3d(N.x, N.y, N.z);
+						glVertex3d(A.x,A.y,A.z);
+						glVertex3d(B.x,B.y,B.z);
+						glVertex3d(C.x,C.y,C.z);
+						glVertex3d(D.x,D.y,D.z);
+					}
+					glEnd();
+				}
+			}
+		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
@@ -1128,6 +1455,20 @@ void GL3dWingDlg::GLDraw3D()
 		glEndList();
 	}
 
+	if(m_bResetglSectionHighlight || m_bResetglWing)
+	{
+		if(glIsList(SECTIONHIGHLIGHT))
+		{
+			glDeleteLists(SECTIONHIGHLIGHT,1);
+			m_GLList-=1;
+		}
+		if(m_iSection>=0)
+		{
+			GLCreateSectionHighlight();
+			m_bResetglSectionHighlight = false;
+		}
+	}
+
 	if(m_bResetglWing)
 	{
 		if(glIsList(WINGGEOMETRY))
@@ -1137,12 +1478,12 @@ void GL3dWingDlg::GLDraw3D()
 		}
 		GLCreateGeometry();
 
-/*		if(glIsList(MESHPANELS))
+		if(glIsList(MESHPANELS))
 		{
 			glDeleteLists(MESHPANELS,2);
 			m_GLList-=2;
 		}
-		GLCreateMesh();*/
+		GLCreateMesh();
 
 		m_bResetglWing = false;
 	}
@@ -1231,7 +1572,7 @@ void GL3dWingDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 
 void GL3dWingDlg::GLRenderView()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -1307,6 +1648,11 @@ void GL3dWingDlg::GLRenderView()
 			glCallList(WINGGEOMETRY+1);
 		}
 
+		if(m_iSection>=0)
+		{
+			glCallList(SECTIONHIGHLIGHT);
+		}
+
 		if(m_bglLight)
 		{
 			glEnable(GL_LIGHTING);
@@ -1323,6 +1669,15 @@ void GL3dWingDlg::GLRenderView()
 			glCallList(WINGGEOMETRY);
 		}
 
+
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+
+		if(m_bVLMPanels)
+		{
+			if(!m_bSurfaces) glCallList(MESHBACK);
+			glCallList(MESHPANELS);
+		}
 	}
 
 	glDisable(GL_LIGHTING);
@@ -1443,18 +1798,39 @@ void GL3dWingDlg::GLToClient(CVector const &real, QPoint &point)
 }
 
 
-void GL3dWingDlg::InitDialog()
+bool GL3dWingDlg::InitDialog(CWing *pWing)
 {
+	QString str;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
-	if(!m_pWing) return;
+
+	GetAreaUnit(str, pMainFrame->m_AreaUnit);
+	m_pctrlAreaUnit1->setText(str);
+	m_pctrlAreaUnit2->setText(str);
+
+	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+
+	m_pctrlLength1->setText(str);
+	m_pctrlLength2->setText(str);
+	m_pctrlLength3->setText(str);
+	m_pctrlLength4->setText(str);
+	m_pctrlLength5->setText(str);
+	m_pWing = pWing;
+	if(!m_pWing) return false;
+	ComputeGeometry();
 
 	m_pctrlWingName->setText(m_pWing->m_WingName);
 	if(!m_bAcceptName) m_pctrlWingName->setEnabled(false);
 	m_pctrlSymetric->setChecked(m_pWing->m_bSymetric);
 	m_pctrlRightSide->setChecked(m_pWing->m_bSymetric);
 	m_pctrlLeftSide->setEnabled(!m_pWing->m_bSymetric);
+	m_pctrlRightSide->setChecked(m_bRightSide);
+	m_pctrlLeftSide->setChecked(!m_bRightSide);
+
+	m_pctrlSurfaces->setChecked(m_bSurfaces);
+	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlPanels->setChecked(m_bVLMPanels);
+	m_pctrlLight->setChecked(m_bglLight);
 
 	m_pctrlWingColor->SetColor(m_pWing->m_WingColor);
 
@@ -1462,9 +1838,9 @@ void GL3dWingDlg::InitDialog()
 	m_pWingModel->setRowCount(30);//temporary
 	m_pWingModel->setColumnCount(10);
 
-	m_pWingModel->setHeaderData(0, Qt::Horizontal, QObject::tr("y-pos"));
-	m_pWingModel->setHeaderData(1, Qt::Horizontal, QObject::tr("chord"));
-	m_pWingModel->setHeaderData(2, Qt::Horizontal, QObject::tr("offset"));
+	m_pWingModel->setHeaderData(0, Qt::Horizontal, "y ("+str+")");
+	m_pWingModel->setHeaderData(1, Qt::Horizontal, "chord ("+str+")");
+	m_pWingModel->setHeaderData(2, Qt::Horizontal, "offset ("+str+")");
 	m_pWingModel->setHeaderData(3, Qt::Horizontal, QObject::tr("dihedral"));
 	m_pWingModel->setHeaderData(4, Qt::Horizontal, QObject::tr("twist"));
 	m_pWingModel->setHeaderData(5, Qt::Horizontal, QObject::tr("foil"));
@@ -1496,7 +1872,6 @@ void GL3dWingDlg::InitDialog()
 
 
 //	Convert(true);
-	FillDataTable();
 
 	m_pctrlWingTable->setColumnWidth(0,70);
 	m_pctrlWingTable->setColumnWidth(1,70);
@@ -1510,10 +1885,11 @@ void GL3dWingDlg::InitDialog()
 	m_pctrlWingTable->setColumnWidth(9,80);
 //	m_pctrlWingTable->resizeColumnsToContents();
 
+	FillDataTable();
 	SetWingData();
-
+	SetCurrentSection(m_iSection);
+	return true;
 }
-
 
 
 void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
@@ -1525,30 +1901,6 @@ void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
 
 	switch (event->key())
 	{
-		case Qt::Key_Z:
-		{
-			if(bCtrl)
-			{
-				if(bShift)
-				{
-					OnRedo();
-				}
-				else OnUndo();
-				event->accept();
-			}
-			else event->ignore();
-			break;
-		}
-		case Qt::Key_Y:
-		{
-			if(bCtrl)
-			{
-				OnRedo();
-				event->accept();
-			}
-			else event->ignore();
-			break;
-		}
 		case Qt::Key_Escape:
 		{
 			reject();
@@ -1593,12 +1945,11 @@ bool GL3dWingDlg::LoadSettings(QDataStream &ar)
 }
 
 
-void GL3dWingDlg::mouseMoveEvent(QMouseEvent *event)
+void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
-//	QPoint point(event->pos().x() - geometry().x(), event->pos().y()-geometry().y());
+	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
 	m_MousePos = event->pos();
-	int n;
 	CVector Real;
 
 	QPoint Delta(point.x() - m_LastPoint.x(), point.y() - m_LastPoint.y());
@@ -1612,7 +1963,7 @@ void GL3dWingDlg::mouseMoveEvent(QMouseEvent *event)
 
 	if (event->buttons()   & Qt::LeftButton)
 	{
-		if(bCtrl&& m_3DWingRect.contains(point))
+		if(bCtrl&& m_3DWingRect.contains(glPoint))
 		{
 			//rotate
 			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
@@ -1621,7 +1972,7 @@ void GL3dWingDlg::mouseMoveEvent(QMouseEvent *event)
 		else if(m_bTrans)
 		{
 			//translate
-			if(m_3DWingRect.contains(point))
+			if(m_3DWingRect.contains(glPoint))
 			{
 				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
 				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
@@ -1639,26 +1990,26 @@ void GL3dWingDlg::mouseMoveEvent(QMouseEvent *event)
 	{
 		// we scale the wing
 
-		if(m_pWing && m_3DWingRect.contains(point))
+		if(m_pWing && m_3DWingRect.contains(glPoint))
 		{	//zoom 3D Wing
 			if(point.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.04;
 			else                            m_glScaled /= (GLfloat)1.04;
 			UpdateView();
 		}
 	}
-	else 
-	{
-		//Highlight points
 
-	}
 	m_LastPoint = point;
 }
 
 
-void GL3dWingDlg::mousePressEvent(QMouseEvent *event)
+void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 {
-	int iF;
+	// the event has been sent by GLWidget, so event is in GL Widget coordinates
+	// but m_3DWingRect is in window client coordinates
+	// the difference is m_pglWidget->geometry() !
+
 	QPoint point(event->pos().x(), event->pos().y());
+	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
 
 	CVector Real;
 	bool bCtrl = false;
@@ -1666,8 +2017,7 @@ void GL3dWingDlg::mousePressEvent(QMouseEvent *event)
 
 	ClientToGL(point, Real);
 
-	if(m_pglWidget->m_rCltRect.contains(point)) m_pglWidget->setFocus();
-
+	if(m_3DWingRect.contains(glPoint)) m_pglWidget->setFocus();
 
 	if(m_bPickCenter)
 	{
@@ -1678,7 +2028,8 @@ void GL3dWingDlg::mousePressEvent(QMouseEvent *event)
 	else
 	{
 		m_bTrans=true;
-		if(m_pWing && m_3DWingRect.contains(point))
+
+		if(m_pWing && m_3DWingRect.contains(glPoint))
 		{
 			m_ArcBall.Start(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
 			m_bCrossPoint = true;
@@ -1686,7 +2037,8 @@ void GL3dWingDlg::mousePressEvent(QMouseEvent *event)
 			if (!bCtrl)
 			{
 				m_bTrans = true;
-				setCursor(m_hcMove);
+				m_pglWidget->setCursor(Qt::ClosedHandCursor);
+
 			}
 				UpdateView();
 		}
@@ -1701,11 +2053,12 @@ void GL3dWingDlg::mousePressEvent(QMouseEvent *event)
 
 
 
-void GL3dWingDlg::mouseReleaseEvent(QMouseEvent *event)
+void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
 
-	setCursor(m_hcCross);
+	m_pglWidget->setCursor(Qt::CrossCursor);
+
 	
 	m_bTrans = false;
 	m_bDragPoint  = false;
@@ -1820,7 +2173,6 @@ void GL3dWingDlg::On3DReset()
 	m_glViewportTrans.Set(0.0, 0.0, 0.0);
 	m_bPickCenter   = false;
 	m_pctrlPickCenter->setChecked(false);
-	m_bIs3DScaleSet = false;
 
 	SetWingScale();
 	UpdateView();
@@ -1872,63 +2224,14 @@ void GL3dWingDlg::OnCellChanged(QWidget *pWidget)
 	m_bChanged = true;
 	m_bResetglWing = true;
 	ReadParams();
+	SetWingData();
 	UpdateView();
 }
 
 
-void GL3dWingDlg::OnDelete()
-{
-	if(m_iSection<=0)
-	{
-		QMessageBox::warning(this, "Warning", "The first section cannot be deleted");
-		return;
-	}
-
-	int ny, k, size, total;
-
-	size = m_pWingModel->rowCount();
-	if(size<=2)
-	{
-		QMessageBox::warning(this, "Warning","Two panel sections at least are required... cannot delete");
-		return;
-	}
-
-	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
-
-	total = VLMGetPanelTotal();
-	for (k=m_iSection; k<size; k++)
-	{
-		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k+1];
-		m_pWing->m_TChord[k]    = m_pWing->m_TChord[k+1];
-		m_pWing->m_TOffset[k]   = m_pWing->m_TOffset[k+1];
-		m_pWing->m_TTwist[k]     = m_pWing->m_TTwist[k+1];
-		m_pWing->m_TDihedral[k]  = m_pWing->m_TDihedral[k+1];
-		m_pWing->m_NXPanels[k]   = m_pWing->m_NXPanels[k+1];
-		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k+1];
-		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k+1];
-		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k+1];
-		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k+1];
-		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k+1];
-	}
-	m_pWing->m_NPanel--;
-
-	m_pWing->m_NYPanels[m_iSection-1] = ny;
-
-//	m_pWing->m_bVLMAutoMesh = true;
-//	Convert(false);
-//	VLMSetAutoMesh(total);
-	FillDataTable();
-	ComputeGeometry();
-	SetWingData();
-	m_bChanged = true;
-}
-
-
-
-
 void GL3dWingDlg::OnDeleteSection()
 {
-	if(m_iSection<0) return;
+	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 
 	if(m_iSection==0)
 	{
@@ -1962,20 +2265,12 @@ void GL3dWingDlg::OnDeleteSection()
 
 	m_pWing->m_NYPanels[m_iSection-1] = ny;
 
-//	m_pWing->m_bVLMAutoMesh = true;
-//	Convert(false);
-//	VLMSetAutoMesh(total);
 	FillDataTable();
 	ComputeGeometry();
 	SetWingData();
 	m_bChanged = true;
+	m_bResetglWing = true;
 	UpdateView();
-}
-
-
-void GL3dWingDlg::OnInsert()
-{
-
 }
 
 
@@ -1988,109 +2283,10 @@ void GL3dWingDlg::OnLight()
 
 
 
-void GL3dWingDlg::OnOutline()
-{
-	m_bOutline = m_pctrlOutline->isChecked();
-	UpdateView();
-}
-
-
-void GL3dWingDlg::OnPanels()
-{
-	m_bVLMPanels = m_pctrlPanels->isChecked();
-	UpdateView();
-}
-
-
-
-
-void GL3dWingDlg::OnRedo()
-{
-	if(m_StackPos<m_StackSize-1)
-	{
-		m_StackPos++;
-		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		pTB->EnableButton(IDT_UNDO, true);
-//		if(m_StackPos==m_StackSize-1) 	pTB->EnableButton(IDT_REDO, false);
-	}
-}
-
-void GL3dWingDlg::OnUndo()
-{
-	if(m_StackPos>0)
-	{
-		if(m_StackPos == m_StackSize)
-		{
-			//if we're at the first undo command, save current state
-			TakePicture();
-			StorePicture();//in case we redo
-			m_StackPos--;
-		}
-		m_StackPos--;
-		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		if(m_StackPos==0)	pTB->EnableButton(IDT_UNDO, false);
-//		pTB->EnableButton(IDT_REDO, true);
-	}
-	else m_StackPos = 0;
-}
-
-
-
-void GL3dWingDlg::OnResetScales()
-{
-	m_bIs3DScaleSet  = false;
-	SetWingScale();
-	UpdateView();
-}
-
-
-
-void GL3dWingDlg::OnSetupLight()
-{
-	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
-	m_bShowLight = true;
-	UpdateView();
-	pGLLightDlg->m_pGL3dWingDlg = this;
-	pGLLightDlg->exec();
-
-	m_bShowLight = false;
-
-	GLSetupLight();
-	UpdateView();
-}
-
-void GL3dWingDlg::OnSurfaces()
-{
-	m_bSurfaces = m_pctrlSurfaces->isChecked();
-	UpdateView();
-}
-
-
-void GL3dWingDlg::OnOK()
-{
-	ReadParams();
-	if(!CheckWing()) return;
-
-	if(m_pWing->m_bSymetric)
-	{
-		for (int i=0; i<=m_pWing->m_NPanel; i++)
-		{
-			m_pWing->m_LFoil[i]   = m_pWing->m_RFoil[i];
-		}
-	}
-
-	m_pWing->m_bVLMAutoMesh = false;
-
-	m_pWing->ComputeGeometry();
-	accept();
-}
-
-
-
 void GL3dWingDlg::OnInsertBefore()
 {
+	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
+
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
 		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
@@ -2132,14 +2328,11 @@ void GL3dWingDlg::OnInsertBefore()
 
 	m_pWing->m_NPanel++;
 
-//	m_pWing->m_bVLMAutoMesh = true;
-
-//	Convert(false);
-//	VLMSetAutoMesh(total);
 	FillDataTable();
 	ComputeGeometry();
 	SetWingData();
 	m_bChanged = true;
+	m_bResetglWing = true;
 	UpdateView();
 }
 
@@ -2148,12 +2341,12 @@ void GL3dWingDlg::OnInsertBefore()
 
 void GL3dWingDlg::OnInsertAfter()
 {
+	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
 		QMessageBox::warning(this, "QFLR5", "The maximum number of panels has been reached");
 		return;
 	}
-
 	int k,n,ny,total;
 
 	n  = m_iSection;
@@ -2174,6 +2367,7 @@ void GL3dWingDlg::OnInsertAfter()
 		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k-1];
 		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k-1];
 		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k-1];
+		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k-1];
 	}
 
 	if(n<m_pWing->m_NPanel)
@@ -2195,6 +2389,7 @@ void GL3dWingDlg::OnInsertAfter()
 	m_pWing->m_XPanelDist[n+1] = m_pWing->m_XPanelDist[n];
 	m_pWing->m_YPanelDist[n+1] = m_pWing->m_YPanelDist[n];
 	m_pWing->m_RFoil[n+1]      = m_pWing->m_RFoil[n];
+	m_pWing->m_LFoil[n+1]      = m_pWing->m_LFoil[n];
 
 	m_pWing->m_NYPanels[n+1] = qMax(1,(int)(ny/2));
 	m_pWing->m_NYPanels[n]   = qMax(1,ny-m_pWing->m_NYPanels[n+1]);
@@ -2202,21 +2397,12 @@ void GL3dWingDlg::OnInsertAfter()
 	m_pWing->m_NPanel++;
 
 //	m_pWing->m_bVLMAutoMesh = true;
-//	VLMSetAutoMesh(total);
 
 	FillDataTable();
 	ComputeGeometry();
 	SetWingData();
 	m_bChanged = true;
-	UpdateView();
-}
-
-
-
-void GL3dWingDlg::OnItemActivated(const QModelIndex &index)
-{
-	m_iSection = index.row();
-
+	m_bResetglWing = true;
 	UpdateView();
 }
 
@@ -2235,19 +2421,73 @@ void GL3dWingDlg::OnItemClicked(const QModelIndex &index)
 			FillTableRow(m_pWing->m_NPanel);
 		}
 	}
-	m_iSection = index.row();
-
+	SetCurrentSection(index.row());
 	UpdateView();
 }
+
+
+
+void GL3dWingDlg::OnOK()
+{
+	ReadParams();
+
+	if(!CheckWing()) return;
+
+	if(m_pWing->m_bSymetric)
+	{
+		for (int i=0; i<=m_pWing->m_NPanel; i++)
+		{
+			m_pWing->m_LFoil[i]   = m_pWing->m_RFoil[i];
+		}
+	}
+
+	m_pWing->m_bVLMAutoMesh = false;
+
+	m_pWing->ComputeGeometry();
+	accept();
+}
+
+
+
+void GL3dWingDlg::OnOutline()
+{
+	m_bOutline = m_pctrlOutline->isChecked();
+	UpdateView();
+}
+
+
+void GL3dWingDlg::OnPanels()
+{
+	m_bVLMPanels = m_pctrlPanels->isChecked();
+	UpdateView();
+}
+
 
 
 
 void GL3dWingDlg::OnResetMesh()
 {
 	VLMSetAutoMesh();
-	FillDataTable();;
+	FillDataTable();
 	SetWingData();
+	ComputeGeometry();
 	m_bChanged = true;
+	m_bResetglWing = true;
+	UpdateView();
+}
+
+
+void GL3dWingDlg::OnSetupLight()
+{
+	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
+	m_bShowLight = true;
+	UpdateView();
+	pGLLightDlg->m_pGL3dWingDlg = this;
+	pGLLightDlg->exec();
+
+	m_bShowLight = false;
+
+	GLSetupLight();
 	UpdateView();
 }
 
@@ -2256,9 +2496,19 @@ void GL3dWingDlg::OnSide()
 {
 	m_bRightSide = m_pctrlRightSide->isChecked();
 	FillDataTable();
+
 	m_bChanged = true;
+
+	m_bResetglSectionHighlight = true;
 	UpdateView();
 }
+
+void GL3dWingDlg::OnSurfaces()
+{
+	m_bSurfaces = m_pctrlSurfaces->isChecked();
+	UpdateView();
+}
+
 
 
 void GL3dWingDlg::OnSymetric()
@@ -2276,9 +2526,12 @@ void GL3dWingDlg::OnSymetric()
 		m_pctrlLeftSide->setEnabled(true);
 	}
 
-	UpdateView();
 	m_bChanged = true;
+
+	m_bResetglSectionHighlight = true;
+	UpdateView();
 }
+
 
 void GL3dWingDlg::OnWingColor()
 {
@@ -2290,6 +2543,8 @@ void GL3dWingDlg::OnWingColor()
 	rgb = QColorDialog::getRgba(rgb, &bOK);
 	m_pWing->m_WingColor = QColor::fromRgba(rgb);
 	m_pctrlWingColor->SetColor(m_pWing->m_WingColor);
+	m_bResetglWing = true;
+	UpdateView();
 }
 
 
@@ -2306,6 +2561,7 @@ void GL3dWingDlg::ReadParams()
 	ComputeGeometry();
 	UpdateView();
 }
+
 
 void GL3dWingDlg::ReadSectionData(int sel)
 {
@@ -2409,20 +2665,6 @@ void GL3dWingDlg::reject()
 }
 
 
-void GL3dWingDlg::resizeEvent(QResizeEvent *event)
-{
-	m_bIs3DScaleSet = false;
-
-	SetWingScale();
-
-	int w4 = m_pctrlWingTable->width()/4;
-	m_pctrlWingTable->setColumnWidth(0,w4);
-	m_pctrlWingTable->setColumnWidth(1,w4);
-	m_pctrlWingTable->setColumnWidth(2,w4);
-
-
-//	UpdateView();
-}
 
 
 
@@ -2455,7 +2697,6 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 	//finds the closest panel under the point,
 	//and changes the rotation vector and viewport translation
 	int  i, j;
-
 	CVector N, LATB, TALB, LA, LB, TA, TB;
 	CVector I, A, B, AA, BB, PP, U;
 	double dmin;
@@ -2491,18 +2732,32 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 	U.Normalize();
 
 	bool bIntersect = false;
-
-
-/*	if(m_pBody->m_LineType==2)
+	double dist;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
+	for(j=0; j<m_pWing->m_NSurfaces; j++)
 	{
-		...
-		bIntersect = true;
-	}*/
+N = m_pWing->m_Surface[j].Normal;
+LA = m_pWing->m_Surface[j].m_LA;
+TA = m_pWing->m_Surface[j].m_TA;
+LB = m_pWing->m_Surface[j].m_LB;
+TB = m_pWing->m_Surface[j].m_TB;
+		bIntersect = pMiarex->Intersect(m_pWing->m_Surface[j].m_LA,
+										m_pWing->m_Surface[j].m_LB,
+										m_pWing->m_Surface[j].m_TA,
+										m_pWing->m_Surface[j].m_TB,
+										m_pWing->m_Surface[j].Normal,
+										AA, U, I, dist);
+		if(bIntersect)
+		{
+			dmin = dist;
+			PP.Set(I);
+			break;
+		}
+	}
 
 
 	if(bIntersect)
 	{
-
 //		instantaneous visual transition
 //		m_glRotCenter -= PP * m_glScaled;
 
@@ -2529,38 +2784,48 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 
 void GL3dWingDlg::SetCurrentSection(int section)
 {
-//	m_iSection = section;
-	UpdateView();
+	m_iSection = section;
+	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel)
+	{
+		m_pctrlInsertAfter->setEnabled(false);
+		m_pctrlInsertBefore->setEnabled(false);
+		m_pctrlDeleteSection->setEnabled(false);
+	}
+	else
+	{
+		m_pctrlInsertAfter->setEnabled(true);
+		m_pctrlInsertBefore->setEnabled(true);
+		m_pctrlDeleteSection->setEnabled(true);
+
+		QString str;
+		str = QString("Insert after section %1").arg(m_iSection+1);
+		m_pctrlInsertAfter->setText(str);
+		str = QString("Insert before section %1").arg(m_iSection+1);
+		m_pctrlInsertBefore->setText(str);
+		str = QString("Delete section %1").arg(m_iSection+1);
+		m_pctrlDeleteSection->setText(str);
+	}
+
+	m_bResetglSectionHighlight = true;
 }
 
-
-void GL3dWingDlg::SetWing(CWing *pWing)
-{
-	m_pWing = pWing;
-	if(!m_pWing) return;
-
-	m_pWingDelegate->SetPointers(m_Precision,&m_pWing->m_NPanel);
-
-	//Fill all widget data
-	FillDataTable();;
-}
 
 
 
 void GL3dWingDlg::SetWingScale()
 {
-
 //if(m_bIs3DScaleSet) return;
 
 	//wing along X axis will take 3/4 of the screen
-	m_glScaled = (GLfloat)(3./4.*2.0*m_pWing->m_Span);
+	m_glScaled = (GLfloat)(3./4.*2.0/m_pWing->m_Span);
 	m_glViewportTrans.x = 0.0;
 	m_glViewportTrans.y = 0.0;
 	m_glViewportTrans.z = 0.0;
-	m_bIs3DScaleSet = true;
 
 	m_UFOOffset.x = 0.0;
 	m_UFOOffset.y = 0.0;
+
+	Set3DRotationCenter();
 }
 
 
@@ -2620,15 +2885,8 @@ void GL3dWingDlg::SetWingData()
 
 
 
-void GL3dWingDlg::SetPicture()
-{
-	UpdateView();
-}
-
-
 void GL3dWingDlg::SetupLayout()
 {
-	int i;
 	QString str;
 
 	QDesktopWidget desktop;
@@ -2660,10 +2918,17 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlRightSide    = new QRadioButton(tr("Right Side"));
 	m_pctrlLeftSide     = new QRadioButton(tr("Left Side"));
 	m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
+	m_pctrlInsertBefore   = new QPushButton(tr("Insert Before"));
+	m_pctrlInsertAfter    = new QPushButton(tr("Insert After"));
+	m_pctrlDeleteSection  = new QPushButton(tr("Delete Section"));
+
 	SymLayout->addWidget(m_pctrlSymetric);
 	SymLayout->addWidget(m_pctrlRightSide);
 	SymLayout->addWidget(m_pctrlLeftSide);
 	SymLayout->addStretch(1);
+	SymLayout->addWidget(m_pctrlInsertBefore);
+	SymLayout->addWidget(m_pctrlInsertAfter);
+	SymLayout->addWidget(m_pctrlDeleteSection);
 	SymLayout->addWidget(m_pctrlResetMesh);
 
 	QHBoxLayout *NameLayout = new QHBoxLayout;
@@ -2675,11 +2940,17 @@ void GL3dWingDlg::SetupLayout()
 
 	m_pctrlWingTable = new QTableView(this);
 	m_pctrlWingTable->setMinimumWidth(800);
+	m_pctrlWingTable->setMinimumHeight(200);
 //	m_pctrlWingTable->setMaximumHeight((int)(r.height()/4));
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged);
+	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									  QAbstractItemView::DoubleClicked |
+									  QAbstractItemView::SelectedClicked |
+									  QAbstractItemView::EditKeyPressed);
+
 	m_pctrlWingTable->setSizePolicy(szPolicyExpanding);
+	m_pctrlWingTable->setCornerButtonEnabled (false);
 
 	DefLayout->addLayout(NameLayout);
 	DefLayout->addLayout(SymLayout);
@@ -2697,7 +2968,7 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlLength3    = new QLabel("mm");
 	m_pctrlLength4    = new QLabel("mm");
 	m_pctrlLength5    = new QLabel("mm");
-	m_pctrlAreaUnit   = new QLabel("mm2");
+	m_pctrlAreaUnit1  = new QLabel("mm2");
 	m_pctrlAreaUnit2  = new QLabel("mm2");
 	m_pctrlVolumeUnit = new QLabel("mm3");
 	m_pctrlLength1->setAlignment(Qt::AlignLeft);
@@ -2705,7 +2976,7 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlLength3->setAlignment(Qt::AlignLeft);
 	m_pctrlLength4->setAlignment(Qt::AlignLeft);
 	m_pctrlLength5->setAlignment(Qt::AlignLeft);
-	m_pctrlAreaUnit->setAlignment(Qt::AlignLeft);
+	m_pctrlAreaUnit1->setAlignment(Qt::AlignLeft);
 	m_pctrlAreaUnit2->setAlignment(Qt::AlignLeft);
 	m_pctrlVolumeUnit->setAlignment(Qt::AlignLeft);
 
@@ -2754,7 +3025,7 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrl3DPanels,  14,2);
 
 	DataLayout->addWidget(m_pctrlLength1,1,3);
-	DataLayout->addWidget(m_pctrlAreaUnit,2,3);
+	DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
@@ -2826,6 +3097,7 @@ void GL3dWingDlg::SetupLayout()
 	QGridLayout *ThreeDParams = new QGridLayout;
 	m_pctrlAxes       = new QCheckBox("Axes");
 	m_pctrlLight      = new QCheckBox("Light");
+	m_pctrlSetupLight = new QPushButton("Setup Light");
 	m_pctrlSurfaces   = new QCheckBox("Surfaces");
 	m_pctrlOutline    = new QCheckBox("Outline");
 	m_pctrlPanels     = new QCheckBox("Panels");
@@ -2835,10 +3107,11 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlOutline->setSizePolicy(szPolicyMinimum);
 	m_pctrlPanels->setSizePolicy(szPolicyMinimum);
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
-	ThreeDParams->addWidget(m_pctrlLight, 1,2);
+	ThreeDParams->addWidget(m_pctrlPanels, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-	ThreeDParams->addWidget(m_pctrlPanels, 3,1);
+	ThreeDParams->addWidget(m_pctrlLight, 3,1);
+	ThreeDParams->addWidget(m_pctrlSetupLight, 3,2);
 
 	m_pctrlX          = new QPushButton("X");
 	m_pctrlY          = new QPushButton("Y");
@@ -2861,6 +3134,7 @@ void GL3dWingDlg::SetupLayout()
 	QHBoxLayout* ThreeDView = new QHBoxLayout;
 	ThreeDView->addWidget(m_pctrlIso);
 	ThreeDView->addWidget(m_pctrlReset);
+	ThreeDView->addWidget(m_pctrlPickCenter);
 
 	m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
 	m_pctrlClipPlanePos->setMinimum(-300);
@@ -2872,25 +3146,10 @@ void GL3dWingDlg::SetupLayout()
 
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
 	QLabel *ClipLabel = new QLabel("Clip Plane");
+	ClipLabel->setSizePolicy(szPolicyMaximum);
 	ThreeDViewControls->addWidget(ClipLabel);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
 
-
-	QHBoxLayout *ActionButtons = new QHBoxLayout;
-	QPushButton *UndoButton = new QPushButton(QIcon(":/images/OnUndo.png"), tr("Undo"));
-	QPushButton *RedoButton = new QPushButton(QIcon(":/images/OnRedo.png"), tr("Redo"));
-	QPushButton *MenuButton = new QPushButton(tr("Other"));
-
-	QMenu *WingMenu = new QMenu("Actions...",this);
-	WingMenu->addAction(m_pSetupLight);
-	WingMenu->addSeparator();
-	MenuButton->setMenu(WingMenu);
-
-	ActionButtons->addWidget(UndoButton);
-	ActionButtons->addWidget(RedoButton);
-	ActionButtons->addWidget(MenuButton);
-	connect(UndoButton, SIGNAL(clicked()),this, SLOT(OnUndo()));
-	connect(RedoButton, SIGNAL(clicked()),this, SLOT(OnRedo()));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("Save and Close"));
@@ -2899,24 +3158,18 @@ void GL3dWingDlg::SetupLayout()
 	CancelButton->setAutoDefault(false);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addWidget(CancelButton);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()),this, SLOT(reject()));
 
-	QVBoxLayout *WingActions = new QVBoxLayout;
-	WingActions->addStretch(1);
-	WingActions->addLayout(ActionButtons);
-	WingActions->addStretch(1);
-	WingActions->addLayout(CommandButtons);
 
 	QVBoxLayout *All3DControls = new QVBoxLayout;
 	All3DControls->addStretch(1);
 	All3DControls->addLayout(ThreeDParams);
 	All3DControls->addLayout(AxisView);
 	All3DControls->addLayout(ThreeDView);
-	All3DControls->addWidget(m_pctrlPickCenter);
 	All3DControls->addLayout(ThreeDViewControls);
 	All3DControls->addStretch(1);
-	All3DControls->addLayout(WingActions);
+	All3DControls->addLayout(CommandButtons);
 
 	RightLayout->addLayout(DataLayout);
 //	RightLayout->addStretch(1);
@@ -2951,17 +3204,14 @@ void GL3dWingDlg::ShowContextMenu(QContextMenuEvent * event)
 	ScreenPt.ry() += geometry().y();
 	CtxMenu->exec(ScreenPt);
 
-	setCursor(m_hcCross);
+	m_pglWidget->setCursor(Qt::CrossCursor);
 }
 
 
 void GL3dWingDlg::showEvent(QShowEvent *event)
 {
-	m_bChanged    = false;
-	ComputeGeometry();
-	InitDialog();
+//	InitDialog();
 	m_bResetglWing = true;
-	m_bIs3DScaleSet = false;
 	SetWingScale();
 	m_3DWingRect = m_pglWidget->geometry();
 	CVector O(0.0,0.0,0.0);
@@ -2970,36 +3220,6 @@ void GL3dWingDlg::showEvent(QShowEvent *event)
 }
 
 
-
-void GL3dWingDlg::StorePicture()
-{
-	int i;
-	if(m_StackPos>=20)
-	{
-		for (i=1; i<20; i++)
-		{
-//			m_UndoPic[i-1].Duplicate(m_UndoPic+i);
-		}
-		m_StackPos = 19;
-		m_StackSize = 19;
-	}
-//	m_UndoPic[m_StackPos].Duplicate(&m_TmpPic);
-
-	m_bStored = true;
-	m_StackPos++;
-	m_StackSize = m_StackPos;
-
-}
-
-
-
-
-void GL3dWingDlg::TakePicture()
-{
-	m_bChanged = true;
-	m_bStored = false;
-//	m_TmpPic.Duplicate(m_pWing);
-}
 
 
 void GL3dWingDlg::UpdateView()
@@ -3045,27 +3265,29 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 		size = (int)(VLMMATSIZE/4);//why not ? Too much refinement isn't worthwile
 		NYTotal = 22;
 	}
-	else{
+	else
+	{
 		size = total;
 		NYTotal = (int)sqrt((float)size);
 	}
 
 	NYTotal *= 2;
 
-	double d1, d2; //spanwise panel densities at i and i+1
+//	double d1, d2; //spanwise panel densities at i and i+1
 
 	for (int i=0; i<m_pWing->m_NPanel;i++)
 	{
-		d1 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i],  3) + 0.5;
-		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i+1],3) + 0.5;
-		m_pWing->m_NYPanels[i] = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i])/m_pWing->m_Span);
+//		d1 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i],  3) + 0.5;
+//		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i+1],3) + 0.5;
+//		m_pWing->m_NYPanels[i] = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i])/m_pWing->m_Span);
+
+		m_pWing->m_NYPanels[i] = (int)(fabs(m_pWing->m_TPos[i+1] - m_pWing->m_TPos[i])* (double)NYTotal/m_pWing->m_Span);
+
 		m_pWing->m_NXPanels[i] = (int) (size/NYTotal);
 		m_pWing->m_NXPanels[i] = qMin(m_pWing->m_NXPanels[i], MAXCHORDPANELS);
 
 		if(m_pWing->m_NYPanels[i]==0) m_pWing->m_NYPanels[i] = 1;
 		if(m_pWing->m_NXPanels[i]==0) m_pWing->m_NXPanels[i] = 1;
-//		m_pWing->m_XPanelDist[i] = 1;//cosine distribution
-//		m_pWing->m_YPanelDist[i] = 0;//uniformly distributed, except at the root and tip (see next)
 	}
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
@@ -3078,14 +3300,15 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 
 
-void  GL3dWingDlg::wheelEvent(QWheelEvent *event)
+void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
+	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
 
-	if(m_pglWidget->m_rCltRect.contains(point)) m_pglWidget->setFocus();	//The mouse button has been wheeled
+	if(m_3DWingRect.contains(glPoint)) m_pglWidget->setFocus();	//The mouse button has been wheeled
 	//Process the message
 //	point is in client coordinates
-	if(m_3DWingRect.contains(point))
+	if(m_3DWingRect.contains(glPoint))
 	{
 		if(event->delta()<0) m_glScaled *= (GLfloat)1.06;
 		else                 m_glScaled /= (GLfloat)1.06;

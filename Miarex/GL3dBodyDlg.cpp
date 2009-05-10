@@ -78,10 +78,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 
 	m_pBody = NULL;
 
-	m_hcArrow.setShape(Qt::ArrowCursor);
-	m_hcCross.setShape(Qt::CrossCursor);
-	m_hcMove.setShape(Qt::ClosedHandCursor);
-
 	pi = 3.141592654;
 
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
@@ -3262,7 +3258,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			if (!bCtrl)
 			{
 				m_bTrans = true;
-				setCursor(m_hcMove);
+				m_pglWidget->setCursor(Qt::ClosedHandCursor);
 			}
 				UpdateView();
 		}
@@ -3305,7 +3301,8 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 				m_pctrlPointTable->selectRow(CFrame::s_iSelect);
 			}
 		}
-		if(m_bTrans) setCursor(m_hcMove);
+		if(m_bTrans)	m_pglWidget->setCursor(Qt::ClosedHandCursor);
+
 	}
 	
 
@@ -3321,7 +3318,8 @@ void GL3dBodyDlg::mouseReleaseEvent(QMouseEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
 
-	setCursor(m_hcCross);
+	m_pglWidget->setCursor(Qt::CrossCursor);
+
 
 	if(!m_bTrans)
 	{
@@ -4459,6 +4457,7 @@ void GL3dBodyDlg::SetupLayout()
 
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
 	QLabel *ClipLabel = new QLabel("Clip Plane");
+	ClipLabel->setSizePolicy(szPolicyMaximum);
 	ThreeDViewControls->addWidget(ClipLabel);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
 
@@ -4693,7 +4692,7 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	ScreenPt.ry() += geometry().y();
 	CtxMenu->exec(ScreenPt);
 
-	setCursor(m_hcCross);
+	m_pglWidget->setCursor(Qt::CrossCursor);
 }
 
 void GL3dBodyDlg::InitDialog()

@@ -58,12 +58,11 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
-	m_AreaUnit    = 3;
-	m_WeightUnit  = 0;
-	m_SpeedUnit   = 5;
-	m_ForceUnit   = 2;
-	m_MomentUnit  = 1;
-
+	m_AreaUnit    = 1;
+	m_WeightUnit  = 1;
+	m_SpeedUnit   = 0;
+	m_ForceUnit   = 0;
+	m_MomentUnit  = 0;
 	CreateDockWindows();
 
 	m_ProjectName = "";
@@ -328,7 +327,8 @@ void MainFrame::closeEvent (QCloseEvent * event)
 	if(!m_bSaved)
 	{
 		int resp = QMessageBox::question(this, "Exit", tr("Save the project before exit ?"),
-										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+										 QMessageBox::Yes);
 		if(resp == QMessageBox::Yes)
 		{
 			if(!SaveProject(m_FileName))
@@ -875,7 +875,7 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(exitAct);
 	updateRecentFileActions();
 
-	helpMenu = menuBar()->addMenu(tr("&Help"));
+	helpMenu = menuBar()->addMenu(tr("&?"));
 	helpMenu->addAction(guidelinesAct);
 	helpMenu->addAction(aboutAct);
 
@@ -1064,7 +1064,7 @@ void MainFrame::CreateMiarexActions()
 	allWingGraphsScalesAct = new QAction(tr("Reset Scales"), this);
 	connect(allWingGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWingGraphScales()));
 
-	allWPolarGraphsScalesAct = new QAction(tr("Reset Graph Scales"), this);
+	allWPolarGraphsScalesAct = new QAction(tr("Reset All Graph Scales"), this);
 	connect(allWPolarGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphScales()));
 
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
@@ -1181,7 +1181,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWPlrMenu->addAction(hideAllWPlrs);
 	MiarexWPlrMenu->addAction(showAllWPlrs);
 	MiarexWPlrMenu->addSeparator();
-	WPlrGraphMenu = MiarexWPlrMenu->addMenu("Graphs");
+	WPlrGraphMenu = MiarexWPlrMenu->addMenu("Graph Selection");
 	WPlrGraphMenu->addAction(WPlrGraph1);
 	WPlrGraphMenu->addAction(WPlrGraph2);
 	WPlrGraphMenu->addAction(WPlrGraph3);
@@ -1189,9 +1189,8 @@ void MainFrame::CreateMiarexMenus()
 	WPlrGraphMenu->addSeparator();
 	WPlrGraphMenu->addAction(twoWPlrGraphs);
 	WPlrGraphMenu->addAction(allWPlrGraphs);
-	WPlrGraphMenu->addSeparator();
-	WPlrGraphMenu->addAction(allWPolarGraphsScalesAct);
-	WPlrGraphMenu->addAction(resetWPlrLegend);
+	MiarexWPlrMenu->addAction(allWPolarGraphsScalesAct);
+	MiarexWPlrMenu->addAction(resetWPlrLegend);
 
 
 	MiarexWOppMenu = menuBar()->addMenu(tr("&OpPoint"));
@@ -1267,13 +1266,14 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addMenu(CurWPlrMenu);
 	WPlrCtxMenu->addSeparator();
+	WPlrCtxMenu->addAction(allWPolarGraphsScalesAct);
+	WPlrCtxMenu->addAction(resetWPlrLegend);
+	WPlrCtxMenu->addMenu(WPlrGraphMenu);
 	WPlrCurGraphMenu = WPlrCtxMenu->addMenu("Current Graph");
 	WPlrCurGraphMenu->addAction(GraphDlgAction);
 	WPlrCurGraphMenu->addAction(resetCurGraphScales);
 	WPlrCurGraphMenu->addAction(WPlrGraphVariable);
 	WPlrCurGraphMenu->addAction(exportCurGraphAct);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addMenu(WPlrGraphMenu);
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addAction(hideAllWPlrs);
 	WPlrCtxMenu->addAction(showAllWPlrs);

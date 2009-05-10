@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 
-
+#include <QtDebug>
 #include <QtGui>
 #include <QtOpenGL>
 #include "MainFrame.h"
@@ -40,7 +40,9 @@ GLWidget::GLWidget(QWidget *parent)
 	m_pParent = parent;
 	m_wndTextColor = QColor(200,200,200);
 	m_iView = 3;
+
 	setMouseTracking(true);
+	setCursor(Qt::CrossCursor);
 }
 
 void GLWidget::contextMenuEvent (QContextMenuEvent * event)
@@ -77,7 +79,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 	else if(m_iView == 7)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->mousePressEvent(event);
+		pDlg->MousePressEvent(event);
 	}
 }
 
@@ -96,7 +98,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 	else if(m_iView == 7)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->mouseReleaseEvent(event);
+		pDlg->MouseReleaseEvent(event);
 	}
 }
 
@@ -115,7 +117,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 	else if(m_iView == 7)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->mouseMoveEvent(event);
+		pDlg->MouseMoveEvent(event);
 	}
 }
 
@@ -134,7 +136,7 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 	else if(m_iView == 7)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->wheelEvent(event);
+		pDlg->WheelEvent(event);
 	}
 }
 
@@ -224,8 +226,6 @@ void GLWidget::resizeGL(int width, int height)
 //	d = qMax(w,h);
 //	glViewport(0,0, d, d);
 
-	if(w>h) m_ScaletoGL = 1.0/w;
-	else    m_ScaletoGL = 1.0/h;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -243,6 +243,12 @@ void GLWidget::resizeGL(int width, int height)
 		pMiarex->m_ArcBall.GetMatrix();
 		pMiarex->SetScale(m_rCltRect);
 		pMiarex->Set3DScale();
+	}
+	else if(m_iView == 7)
+	{
+		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
+		pDlg->m_3DWingRect = m_rCltRect;
+//qDebug() << "Setting Rect" << 		m_rCltRect.left() <<m_rCltRect.top()<<m_rCltRect.width()<<m_rCltRect.height();
 	}
 }
 

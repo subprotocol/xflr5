@@ -49,7 +49,7 @@ class WingDlg : public QDialog
 
 public:
     WingDlg();
-	void InitDialog();
+	bool InitDialog(CWing *pWing);
 
 private slots:
 	void OnCancel();
@@ -112,7 +112,7 @@ private:
 	QLabel *m_pctrlProjectedArea, *m_pctrlProjectedSpan;
 
 	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4, *m_pctrlLength5;
-	QLabel *m_pctrlAreaUnit, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
+	QLabel *m_pctrlAreaUnit1, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
 	QTableView *m_pctrlWingTable;
 	QStandardItemModel *m_pWingModel;
 	WingDelegate *m_pWingDelegate;

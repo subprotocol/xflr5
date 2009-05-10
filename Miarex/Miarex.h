@@ -33,6 +33,7 @@
 #include <QDataStream>
 
 #include "ArcBall.h"
+#include "GL3dWingDlg.h"
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
 #include "WPolarDlg.h"
@@ -430,6 +431,7 @@ private:
 	int m_CurveStyle, m_CurveWidth;
 	QColor m_CurveColor;
 
+	GL3dWingDlg  m_WingDlg;
 	GL3dBodyDlg  m_GL3dBody;
 	GLLightDlg   m_GLLightDlg;
 	WPolarDlg    m_WngAnalysis;
@@ -580,14 +582,8 @@ protected:
 	QPoint m_ptPopUp;
 	CVector m_RealPopUp;
 
-
 	QRect m_rCltRect; // the client and drawing rectangles
 	QRect m_rSingleRect;
-
-
-	QCursor m_hcArrow;
-	QCursor m_hcCross;
-	QCursor m_hcMove;
 
 	QGraph m_WingGraph1;			// the WOpp graphs
 	QGraph m_WingGraph2;

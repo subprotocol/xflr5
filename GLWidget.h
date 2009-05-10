@@ -64,7 +64,6 @@ private:
 	QColor m_wndTextColor;
 	QRect m_rCltRect;        // The client window rectangle
 	CRectangle m_GLViewRect; // The OpenGl Viewport
-	double m_ScaletoGL;      // conversion factor from window client coordinates to GL Viewport coordinates
 
 	int m_iView;//Wing=3  Body=5
 };

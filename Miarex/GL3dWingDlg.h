@@ -42,12 +42,6 @@
 
 
 
-struct PicWing
-{
-	public:
-//		double xExt[SPLINECONTROLSIZE];
-};
-
 class GL3dWingDlg: public QDialog
 {
 	Q_OBJECT
@@ -57,6 +51,7 @@ class GL3dWingDlg: public QDialog
 	friend class CWing;
 	friend class GLLightDlg;
 	friend class PlaneDlg;
+	friend class WingDelegate;
 
 public:
 	GL3dWingDlg(void *pParent = NULL);
@@ -78,17 +73,11 @@ private slots:
 	void OnOutline();
 	void OnPanels();
 
-	void OnInsert();
-	void OnResetScales();
 	void reject();
-	void OnUndo();
-	void OnRedo();
 
 	void OnCancel();
-	void OnDelete();
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
-	void OnItemActivated(const QModelIndex &index);
 	void OnItemClicked(const QModelIndex &index);
 	void OnWingColor();
 	void OnSide();
@@ -100,13 +89,12 @@ private slots:
 
 
 private:
-	void wheelEvent(QWheelEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mousePressEvent(QMouseEvent *event) ;
-	void mouseReleaseEvent(QMouseEvent *event) ;
+	void WheelEvent(QWheelEvent *event);
+	void MouseMoveEvent(QMouseEvent *event);
+	void MousePressEvent(QMouseEvent *event) ;
+	void MouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-	void resizeEvent(QResizeEvent *evendyt);
 	void ShowContextMenu(QContextMenuEvent * event);
 	void showEvent(QShowEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
@@ -125,7 +113,7 @@ private:
 	int VLMGetPanelTotal();
 	bool VLMSetAutoMesh(int total=0);
 
-	void InitDialog();
+	bool InitDialog(CWing *pWing);
 	void Connect();
 	void SetupLayout();
 	void ClientToGL(QPoint const &point, CVector &real);
@@ -133,6 +121,7 @@ private:
 	void GLCreateMesh();
 	void GLRenderView();
 	void GLCreateGeometry();
+	void GLCreateSectionHighlight();
 	void GLInverseMatrix();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLSetupLight();
@@ -142,16 +131,11 @@ private:
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
-	void SetWing(CWing *pWing = NULL);
 	void SetWingScale();
 	void UpdateView();
 
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
-
-	void TakePicture();
-	void SetPicture();
-	void StorePicture();
 
 
 private:
@@ -166,21 +150,22 @@ private:
 	QRadioButton *m_pctrlLeftSide, *m_pctrlRightSide;
 	ColorButton *m_pctrlWingColor;
 	QPushButton *m_pctrlResetMesh;
+	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection;
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlWingVolume, *m_pctrlMAC, *m_pctrlGeomChord;
 	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;
 	QLabel *m_pctrlVLMPanels, *m_pctrl3DPanels;
 	QLabel *m_pctrlProjectedArea, *m_pctrlProjectedSpan;
 
 	QLabel *m_pctrlLength1, *m_pctrlLength2, *m_pctrlLength3, *m_pctrlLength4, *m_pctrlLength5;
-	QLabel *m_pctrlAreaUnit, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
+	QLabel *m_pctrlAreaUnit1, *m_pctrlAreaUnit2, * m_pctrlVolumeUnit;
 	QTableView *m_pctrlWingTable;
 	QStandardItemModel *m_pWingModel;
 	WingDelegate *m_pWingDelegate;
 
-	QPushButton *MenuButton;
 	QPushButton *OKButton, *CancelButton;
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight;
+	QPushButton *m_pctrlSetupLight;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 
 	QSlider *m_pctrlClipPlanePos;
 
@@ -188,7 +173,6 @@ private:
 
 	QAction *m_pResetScales;
 	QAction *m_pUndo, *m_pRedo;
-	QAction *m_pSetupLight;
 
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection;
@@ -210,9 +194,9 @@ private:
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
-	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bResetglWing;
+	bool m_bResetglSectionHighlight;
 
 	int m_iSection;
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
@@ -227,12 +211,6 @@ private:
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];
 
-	QCursor m_hcArrow;
-	QCursor m_hcCross;
-	QCursor m_hcMove;
-
-	PicWing m_TmpPic;
-	PicWing m_UndoPic[20];
 
 	QPoint m_MousePos;
 	QPoint m_ptPopUp;

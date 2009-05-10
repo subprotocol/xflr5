@@ -32,6 +32,7 @@
 
 CtrlPolarDlg::CtrlPolarDlg()
 {
+	setWindowTitle("Control Polar Definition");
 	m_pMainFrame = NULL;
 	m_pMiarex    = NULL;
 
@@ -145,7 +146,7 @@ void CtrlPolarDlg::FillControlList()
 	if(m_pPlane)
 	{
 		ind = m_pControlModel->index(1, 0, QModelIndex());
-		m_pControlModel->setData(ind, "Wing Tilt (°)");
+		m_pControlModel->setData(ind, "Wing Tilt (deg)");
 
 		ind = m_pControlModel->index(1, 1, QModelIndex());
 		if(m_bActiveControl[1])	m_pControlModel->setData(ind, 1);
@@ -162,7 +163,7 @@ void CtrlPolarDlg::FillControlList()
 		if(m_pStab)
 		{
 			ind = m_pControlModel->index(2, 0, QModelIndex());
-			m_pControlModel->setData(ind, "Elevator Tilt (°)");
+			m_pControlModel->setData(ind, "Elevator Tilt (deg)");
 
 			ind = m_pControlModel->index(2, 1, QModelIndex());
 			if(m_bActiveControl[2])	m_pControlModel->setData(ind, 1);
@@ -181,7 +182,7 @@ void CtrlPolarDlg::FillControlList()
 	for(i=0; i<m_pWing->m_nFlaps; i++)
 	{
 		ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
-		strong = QString("Wing Flap angle %1 (°)").arg(i+1);
+		strong = QString("Wing Flap angle %1 (deg)").arg(i+1);
 		m_pControlModel->setData(ind, strong);
 		ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
 		if(m_bActiveControl[i+m_nControls]) m_pControlModel->setData(ind, 1);
@@ -201,7 +202,7 @@ void CtrlPolarDlg::FillControlList()
 		for(i=0; i<m_pStab->m_nFlaps; i++)
 		{
 			ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
-			strong = QString("Elevator Flap %1 (°)").arg(i+1);
+			strong = QString("Elevator Flap %1 (deg)").arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
 			ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
@@ -310,6 +311,10 @@ void CtrlPolarDlg::keyPressEvent(QKeyEvent *event)
 				return;
 			}
 			break;
+		}
+		case Qt::Key_Escape:
+		{
+			reject();
 		}
 		default:
 			event->ignore();
@@ -469,7 +474,18 @@ void CtrlPolarDlg::ReadParams()
 	SetDensity();
 }
 
+void CtrlPolarDlg::resizeEvent(QResizeEvent *event)
+{
+	int w = m_pctrlControlTable->width();
+	int w3  = (int)((double)w/3.0);
+	int w6 = (int)((double)w/6.0);
+	int w4 = (int)((double)w/4.0*.9);
 
+	m_pctrlControlTable->setColumnWidth(0,w3);
+	m_pctrlControlTable->setColumnWidth(1,w6);
+	m_pctrlControlTable->setColumnWidth(2,w4);
+	m_pctrlControlTable->setColumnWidth(3,w4);
+}
 
 
 void CtrlPolarDlg::SetDensity()
@@ -502,7 +518,7 @@ void CtrlPolarDlg::SetupLayout()
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()/3);
-	move(r.width()/3, r.height()/6);
+//	move(r.width()/3, r.height()/6);
 
 	QVBoxLayout *NameLayout = new QVBoxLayout;
 	m_pctrlUFOName = new QLabel("WingName");
@@ -579,6 +595,7 @@ void CtrlPolarDlg::SetupLayout()
 
 	m_pctrlControlTable = new QTableView(this);
 	m_pctrlControlTable->setMinimumWidth(400);
+	m_pctrlControlTable->setMinimumHeight(200);
 	m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pCtrlDelegate = new CtrlTableDelegate;
@@ -667,7 +684,7 @@ void CtrlPolarDlg::SetWPolarName()
 	{
 		if(m_bActiveControl[1] && m_pPlane)
 		{
-			strong = QString("-W(%1°/%2°)")
+			strong = QString("-W(%1 deg/%2 deg)")
 							   .arg(m_MinControl[1],0,'f',1)
 							   .arg(m_MaxControl[1],0,'f',1);
 			m_WPolarName += strong;
@@ -679,7 +696,7 @@ void CtrlPolarDlg::SetWPolarName()
 	{
 		if(m_bActiveControl[2])
 		{
-			strong = QString("-E(%1°/%2°)").arg(m_MinControl[2],0,'f',1).arg(m_MaxControl[2],0,'f',1);
+			strong = QString("-E(%1 deg/%2 deg)").arg(m_MinControl[2],0,'f',1).arg(m_MaxControl[2],0,'f',1);
 			m_WPolarName += strong;
 		}
 		nCtrl++;
@@ -689,7 +706,7 @@ void CtrlPolarDlg::SetWPolarName()
 	{
 		if(m_bActiveControl[i+nCtrl])
 		{
-			strong = QString("-WF%1(%2°/%3°)")
+			strong = QString("-WF%1(%2 deg/%3 deg)")
 					 .arg(i+1)
 					 .arg(m_MinControl[i+nCtrl],0,'f',1)
 					 .arg(m_MaxControl[i+nCtrl],0,'f',1);
@@ -704,17 +721,13 @@ void CtrlPolarDlg::SetWPolarName()
 		{
 			if(m_bActiveControl[i+nCtrl])
 			{
-				strong = QString("-EF%1(%2°/%3°)").arg(i+1).arg(m_MinControl[i+nCtrl]).arg(m_MaxControl[i+nCtrl]);
+				strong = QString("-EF%1(%2 deg/%3 deg)").arg(i+1).arg(m_MinControl[i+nCtrl]).arg(m_MaxControl[i+nCtrl]);
 				m_WPolarName += strong;
 			}
 		}
 	}
-	if(m_RefAreaType==1) m_WPolarName += "-planform_area";
-	else
-	{
-		if(m_RefAreaType==1) m_WPolarName += "-dev_area";
-		if(m_RefAreaType==2) m_WPolarName += "-proj_area";
-	}
+
+	if(m_RefAreaType==2) m_WPolarName += "-proj_area";
 
 	m_pctrlWPolarName->setText(m_WPolarName);
 }

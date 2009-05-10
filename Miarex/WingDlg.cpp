@@ -889,9 +889,10 @@ double WingDlg::GetZPos(double y)
 
 
 
-void WingDlg::InitDialog()
+bool WingDlg::InitDialog(CWing *pWing)
 {
-	if(!m_pWing) return;
+	m_pWing = pWing;
+	if(!m_pWing) return false;
 
 	m_pctrlWingName->setText(m_pWing->m_WingName);
 	if(!m_bAcceptName) m_pctrlWingName->setEnabled(false);
@@ -948,6 +949,20 @@ void WingDlg::InitDialog()
 	m_pctrlWingTable->setColumnWidth(9,80);
 
 	SetWingData();
+
+	QString str;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(str, pMainFrame->m_LengthUnit);
+	m_pctrlLength1->setText(str);
+	m_pctrlLength2->setText(str);
+	m_pctrlLength3->setText(str);
+	m_pctrlLength4->setText(str);
+	m_pctrlLength5->setText(str);
+	GetAreaUnit(str, pMainFrame->m_AreaUnit);
+	m_pctrlAreaUnit1->setText(str);
+	m_pctrlAreaUnit2->setText(str);
+
+	return true;
 }
 
 
@@ -1598,7 +1613,7 @@ void WingDlg::SetupLayout()
 	m_pctrlLength3 = new QLabel("mm");
 	m_pctrlLength4 = new QLabel("mm");
 	m_pctrlLength5 = new QLabel("mm");
-	m_pctrlAreaUnit   = new QLabel("mm2");
+	m_pctrlAreaUnit1  = new QLabel("mm2");
 	m_pctrlAreaUnit2  = new QLabel("mm2");
 	m_pctrlVolumeUnit = new QLabel("mm3");
 	m_pctrlLength1->setAlignment(Qt::AlignLeft);
@@ -1606,7 +1621,7 @@ void WingDlg::SetupLayout()
 	m_pctrlLength3->setAlignment(Qt::AlignLeft);
 	m_pctrlLength4->setAlignment(Qt::AlignLeft);
 	m_pctrlLength5->setAlignment(Qt::AlignLeft);
-	m_pctrlAreaUnit->setAlignment(Qt::AlignLeft);
+	m_pctrlAreaUnit1->setAlignment(Qt::AlignLeft);
 	m_pctrlAreaUnit2->setAlignment(Qt::AlignLeft);
 	m_pctrlVolumeUnit->setAlignment(Qt::AlignLeft);
 
@@ -1656,7 +1671,7 @@ void WingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrl3DPanels,    7,2);
 
 	DataLayout->addWidget(m_pctrlLength1,1,3);
-	DataLayout->addWidget(m_pctrlAreaUnit,2,3);
+	DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
@@ -1725,8 +1740,10 @@ void WingDlg::SetupLayout()
 	m_pctrlWingTable->setMinimumWidth(800);
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-//	m_pctrlWingTable->setSelectionMode(QAbstractItemView::NoSelection);
-	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged);
+/*	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									  QAbstractItemView::DoubleClicked |
+									  QAbstractItemView::SelectedClicked |
+									  QAbstractItemView::EditKeyPressed);*/
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);

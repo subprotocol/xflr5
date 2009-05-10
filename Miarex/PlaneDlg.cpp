@@ -273,15 +273,15 @@ void PlaneDlg::OnChanged()
 
 void PlaneDlg::OnDefineWing()
 {
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing);
-	WingDlg WingDlg;
-	WingDlg.m_pWing = &m_pPlane->m_Wing;
-	WingDlg.InitDialog();
-	if(WingDlg.exec() ==QDialog::Accepted)	
+//	WingDlg WingDlg;
+	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing);
+	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
-		if(WingDlg.m_bChanged) m_bChanged = true;
+		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing.Duplicate(&SaveWing);
 }
@@ -289,17 +289,17 @@ void PlaneDlg::OnDefineWing()
 
 void PlaneDlg::OnDefineFin() 
 {
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Fin);
-	WingDlg WingDlg;
-	WingDlg.m_pWing = &m_pPlane->m_Fin;
-	WingDlg.InitDialog();
+//	WingDlg WingDlg;
+	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Fin);
 
 
-	if(WingDlg.exec() ==QDialog::Accepted)
+	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();	
-		if(WingDlg.m_bChanged) m_bChanged = true;
+		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
 	}
 	else   m_pPlane->m_Fin.Duplicate(&SaveWing);
 }
@@ -307,15 +307,15 @@ void PlaneDlg::OnDefineFin()
 
 void PlaneDlg::OnDefineStab() 
 {
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Stab);
-	WingDlg WingDlg;
-	WingDlg.m_pWing = &m_pPlane->m_Stab;
-	WingDlg.InitDialog();
-	if(WingDlg.exec() == QDialog::Accepted)	 
+//	WingDlg WingDlg;
+	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Stab);
+	if(pMiarex->m_WingDlg.exec() == QDialog::Accepted)
 	{
 		SetResults();	
-		if(WingDlg.m_bChanged) m_bChanged = true;
+		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
 	}
 	else  m_pPlane->m_Stab.Duplicate(&SaveWing);
 }
@@ -324,15 +324,15 @@ void PlaneDlg::OnDefineStab()
 
 void PlaneDlg::OnDefineWing2()
 {
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing2);
-	WingDlg WingDlg;
-	WingDlg.m_pWing = &m_pPlane->m_Wing2;
-	WingDlg.InitDialog();
-	if(WingDlg.exec() ==QDialog::Accepted)	
+//	WingDlg WingDlg;
+	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing2);
+	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
-		if(WingDlg.m_bChanged) m_bChanged = true;
+		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing2.Duplicate(&SaveWing);
 }

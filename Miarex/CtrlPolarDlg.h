@@ -59,6 +59,7 @@ private slots:
 	void OnUnit();
 
 private:
+	void resizeEvent(QResizeEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void ReadCtrlData();
 	void FillControlList();

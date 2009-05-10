@@ -31,7 +31,6 @@
 #include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
-#include "GL3dWingDlg.h"
 #include "GL3DScales.h"
 #include "WingDlg.h"
 #include "PlaneDlg.h"
@@ -115,9 +114,6 @@ QMiarex::QMiarex(QWidget *parent)
 	//construct evrything
 	pi = 3.141592654;
 
-	m_hcArrow.setShape(Qt::ArrowCursor);
-	m_hcCross.setShape(Qt::CrossCursor);
-	m_hcMove.setShape(Qt::ClosedHandCursor);
 
 	m_pMainFrame  = NULL;
 	m_pXFile      = NULL;
@@ -214,39 +210,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_GLList = 0;
 
-	m_bDirichlet         = true;
-	m_bTrefftz           = true;
 
-	m_bXTop              = true;
-	m_bXBot              = true;
-	m_bXCP               = true;
-	m_bICd               = true;
-	m_bVCd               = true;
-
-	m_bXCmRef            = true;
-	m_bLogFile           = false;
-	m_bHalfWing          = true;
-	m_bTransGraph        = true;
-//	m_bIsPrinting        = false;
-	m_bCurWOppOnly       = true;
-	m_bStoreWOpp         = true;
-	m_bKeepOutOpps       = false;
-	m_bCurFrameOnly      = true;
-	m_bTrans             = false;
-	m_bDragPoint         = false;
-	m_bType1             = true;
-	m_bType2             = true;
-	m_bType4             = true;
-	m_bType5             = true;
-	m_bType6             = true;
-	m_bShowElliptic      = false;
-	m_bShowWing2         = true;
-	m_bShowStab          = true;
-	m_bShowFin           = true;
-	m_bIs2DScaleSet      = false;
-	m_bAutoScales        = false;
-	m_bAnimate           = false;
-	m_bAnimatePlus       = true;
 
 	m_pAnimateTimer = new QTimer(this);
 	m_posAnimate         = 0;
@@ -485,6 +449,42 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_LiftScale = m_DragScale = m_VelocityScale = 0.7;
 
+
+	m_bDirichlet         = true;
+	m_bTrefftz           = true;
+
+	m_b3DCp              = false;
+	m_bXCP               = true;
+	m_bDownwash          = true;
+	m_bMoments           = false;
+	m_bICd               = true;
+	m_bVCd               = true;
+	m_bTrans             = false;
+	m_bXTop              = false;
+	m_bXBot              = false;
+
+	m_bXCmRef            = true;
+	m_bLogFile           = false;
+	m_bHalfWing          = false;
+	m_bTransGraph        = true;
+//	m_bIsPrinting        = false;
+	m_bCurWOppOnly       = true;
+	m_bStoreWOpp         = true;
+	m_bKeepOutOpps       = false;
+	m_bCurFrameOnly      = true;
+	m_bType1             = true;
+	m_bType2             = true;
+	m_bType4             = true;
+	m_bType5             = true;
+	m_bType6             = true;
+	m_bShowElliptic      = false;
+	m_bShowWing2         = true;
+	m_bShowStab          = true;
+	m_bShowFin           = true;
+	m_bIs2DScaleSet      = false;
+	m_bAutoScales        = false;
+	m_bAnimate           = false;
+	m_bAnimatePlus       = true;
 	m_bAutoScales         = false;
 
 	m_bResetglBody        = false;//otherwise endless repaint if no body present
@@ -501,7 +501,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bResetglLegend     = true;
 	m_bResetglFlow       = true;
 
-	m_bTrans             = false;
 	m_bDragPoint         = false;
 	m_bArcball           = false;
 	m_bStream            = false;
@@ -514,17 +513,11 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bVLMPanels         = false;
 	m_bAxes              = true;
 	m_bglLight           = true;
-	m_b3DCp              = false;
-	m_bDownwash          = true;
-	m_bMoments           = true;
 	m_bPickCenter        = false;
 	m_bAutoCpScale	     = false;
 	m_bShowCpScale       = true;
 	m_bShowLight         = false;
 	m_bIs3DScaleSet      = false;
-	m_bXTop              = false;
-	m_bXBot              = false;
-	m_bXCP               = false;
 
 	m_LastPoint.setX(0);
 	m_LastPoint.setY(0);
@@ -7821,7 +7814,7 @@ void QMiarex::GLCreateWOppLegend()
 	dD = fm.height();//pixels
 
 	YPos = m_rCltRect.bottom()- 12 * dD;
-	YPos += m_pCurWOpp->m_nFlaps * dD;
+	YPos -= m_pCurWOpp->m_nFlaps * dD;
 	XPos = m_rCltRect.right() - 10 ;
 
 	glNewList(WOPPLEGEND,GL_COMPILE);
@@ -9988,7 +9981,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 				if (!bCtrl)
 				{
 					m_bTrans = true;
-					setCursor(m_hcMove);
+					pGLWidget->setCursor(Qt::ClosedHandCursor);
 				}
 			}
 
@@ -10023,8 +10016,9 @@ void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 {
 	if(m_iView==3)
 	{
+		QGLWidget* pGLWidget = (QGLWidget*)m_pGLWidget;
 		QPoint point(event->pos().x(), event->pos().y());
-		setCursor(m_hcCross);
+		pGLWidget->setCursor(Qt::CrossCursor);
 
 		m_bCrossPoint = false;
 		UpdateView();
@@ -10596,6 +10590,16 @@ void QMiarex::OnAnimateSingle()
 			if (m_iView==1)
 			{
 				CreateWOppCurves();
+				UpdateView();
+			}
+			else if (m_iView==3)
+			{
+				m_bResetglOpp      = true;
+				m_bResetglDownwash = true;
+				m_bResetglLift     = true;
+				m_bResetglDrag     = true;
+				m_bResetglWake     = true;
+				m_bResetglLegend   = true;
 				UpdateView();
 			}
 			else if(m_iView==4)
@@ -11204,7 +11208,9 @@ void QMiarex::OnDeleteCurUFO()
 	QString strong;
 	if(m_pCurPlane)	strong = "Are you sure you want to delete the plane :\n" +  m_pCurPlane->m_PlaneName +"?\n";
 	else 	        strong = "Are you sure you want to delete the wing :\n" +   m_pCurWing->m_WingName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+												  QMessageBox::Cancel)) return;
 
 
 	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
@@ -11374,7 +11380,9 @@ void QMiarex::OnDeleteCurWPolar()
 	else return;
 
 	strong = "Are you sure you want to delete the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+												  QMessageBox::Cancel)) return;
 
 	//first remove all WOpps associated to the Wing Polar
 	CWOpp * pWOpp;
@@ -11517,10 +11525,8 @@ void QMiarex::OnEditUFO()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CWPolar *pWPolar;
 	CWOpp* pWOpp;
-	WingDlg WingDlg;
-	WingDlg.m_pWing = m_pCurWing;
-	WingDlg.m_bAcceptName= false;
-	WingDlg.InitDialog();
+	m_WingDlg.m_bAcceptName= false;
+	m_WingDlg.InitDialog(m_pCurWing);
 
 	bool bHasResults = false;
 	for (i=0; i< m_poaWPolar->size(); i++)
@@ -11548,15 +11554,17 @@ void QMiarex::OnEditUFO()
 	pSaveWing->Duplicate(m_pCurWing);
 
 
-	if(QDialog::Accepted == WingDlg.exec())
+	if(QDialog::Accepted == m_WingDlg.exec())
 	{
-		if(WingDlg.m_bChanged)
+		if(m_WingDlg.m_bChanged)
 		{
 			if(bHasResults)
 			{
 				QString str = "The modification will erase all results associated to this Wing.\nContinue ?";
 
-				int Ans = QMessageBox::question(this, "Question", str, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+				int Ans = QMessageBox::question(this, "Question", str,
+												QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+												QMessageBox::Cancel);
 				if (Ans == QMessageBox::Cancel)
 				{
 					//restore geometry for initial wing
@@ -12289,13 +12297,11 @@ void QMiarex::OnNewWing()
 	CWing *pOldWing;
 	CWing* pWing = new CWing;
 
-	WingDlg WingDlg;
-//	GL3dWingDlg WingDlg;
-	WingDlg.m_pWing = pWing;
-	WingDlg.m_bAcceptName= true;
-	WingDlg.InitDialog();
+//	WingDlg WingDlg;
+	m_WingDlg.m_bAcceptName= true;
+	if(!m_WingDlg.InitDialog(pWing)) return;
 
-	if(QDialog::Accepted == WingDlg.exec())
+	if(QDialog::Accepted == m_WingDlg.exec())
 	{
 		pMainFrame->SetSaveState(false);
 		bool bExists = false;
@@ -12635,7 +12641,9 @@ void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
 	QString strong = "Are you sure you want to reset the content of the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+												  QMessageBox::Cancel)) return;
 
 	m_pCurWPolar->ResetWPlr();
 	if(m_iView==2)
@@ -13345,6 +13353,7 @@ void QMiarex::PaintFourWingGraph(QPainter &painter)
 	}
 }
 
+
 void QMiarex::PaintCp(QPainter &painter)
 {
 	painter.save();
@@ -13512,6 +13521,7 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 		if(l==2)      Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
 		else if(l==3) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
 		else if(l==4) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+		else          Result = "No unit defined for speed...";
 
 		Result += str;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
@@ -14444,8 +14454,6 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 		for(p=0; p<m_MatSize; p++)
 		{
 			if(m_Panel[p].Intersect(AA, U, I, dist))
-//			if(Intersect(m_Node[m_Panel[p].m_iLA], m_Node[m_Panel[p].m_iLB], m_Node[m_Panel[p].m_iTA], m_Node[m_Panel[p].m_iTB],
-//				         m_Panel[p].Normal, AA, U, I, dist))
 			{
 				if(dist < dmin)
 				{
@@ -14773,7 +14781,9 @@ bool QMiarex::SetModBody(CBody *pModBody)
 				if(bIsInUse)
 				{
 					strong = "The body "+pOldBody->m_BodyName+" is used by one or more planes.\n Overwrite anyway ? (Results will be lost)";
-					resp = QMessageBox::question(this, "Question", strong, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+					resp = QMessageBox::question(this, "Question", strong,
+												 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+												 QMessageBox::Cancel);
 				}
 				if(resp == QMessageBox::Yes)
 				{
@@ -15135,7 +15145,8 @@ bool QMiarex::SetModWing(CWing *pModWing)
 			//user wants to overwrite
 			pOldWing  = GetWing(RDlg.m_strName);
 			pOldPlane = GetPlane(RDlg.m_strName);
-			if(pOldWing){
+			if(pOldWing)
+			{
 				for (k=0; k<m_poaWing->size(); k++)
 				{
 					pWing = (CWing*)m_poaWing->at(k);

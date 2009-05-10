@@ -183,9 +183,6 @@ private:
 	QAction *ExportBodyDef, *ImportBodyDef, *ExportBodyGeom, *TranslateBody, *m_pSetupLight;
 	QAction *m_pGrid;
 
-	QCursor m_hcArrow;
-	QCursor m_hcCross;
-	QCursor m_hcMove;
 
 	CBody m_TmpPic;
 	CBody m_UndoPic[20];
