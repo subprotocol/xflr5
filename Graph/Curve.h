@@ -56,6 +56,7 @@ public:
 
 	int AddPoint(double xn, double yn);
 	int GetClosestPoint(double xs);
+	int GetClosestPoint(double xs, double ys);
 	int GetStyle();
 	int GetWidth();
 

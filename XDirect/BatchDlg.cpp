@@ -194,7 +194,7 @@ void BatchDlg::SetLayout()
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
 	m_pctrlGraphOutput = new GraphWidget;
 	m_pctrlGraphOutput->m_pGraph = &m_RmsGraph;
-	m_pctrlGraphOutput->setMinimumHeight(300);
+//	m_pctrlGraphOutput->setMinimumHeight(300);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	m_pctrlClose     = new QPushButton("Close");
@@ -221,8 +221,8 @@ void BatchDlg::SetLayout()
 
 	QVBoxLayout *RightSide = new QVBoxLayout;
 	RightSide->addWidget(m_pctrlInitBL);
-	RightSide->addWidget(m_pctrlTextOutput);
-	RightSide->addWidget(m_pctrlGraphOutput);
+	RightSide->addWidget(m_pctrlTextOutput,1);
+	RightSide->addWidget(m_pctrlGraphOutput,2);
 	RightSide->addLayout(CommandButtons);
 
 

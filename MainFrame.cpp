@@ -321,8 +321,6 @@ void MainFrame::AddRecentFile(const QString &PathName)
 void MainFrame::closeEvent (QCloseEvent * event)
 {
 //	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-//	pMiarex->m_GL3dView.hide();
-//	pMiarex->m_GL3dView.close();
 
 	if(!m_bSaved)
 	{
@@ -2602,7 +2600,6 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 
 
 
-
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
 	CFoil *pFoil;
@@ -2989,6 +2986,7 @@ void MainFrame::OnExportCurGraph()
 											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&SelectedFilter, options);
 
+	if(!FileName.length()) return;
 
 	int pos, type;
 	pos = FileName.lastIndexOf("/");
@@ -3056,7 +3054,9 @@ void MainFrame::OnGuidelines()
 
 
 void MainFrame::OnNewProject()
-{
+{	
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
 	if(!m_bSaved)
 	{
 		int resp = QMessageBox::question(window(), "QFLR5", "Save the current project ?",
@@ -3094,13 +3094,14 @@ void MainFrame::OnLoadFile()
 	QString PathName;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
 
 	PathName = QFileDialog::getOpenFileName(this, "Open File",
 											m_LastDirName, 
 											"XFLR5 file (*.dat *.plr *.wpa)");
+	if(!PathName.length())		return;
 	int pos = PathName.lastIndexOf("/");
 	if(pos>0) m_LastDirName = PathName.left(pos);
-	if(!PathName.length())		return;
 
 	int App = LoadXFLR5File(PathName);
 
@@ -3485,6 +3486,8 @@ void MainFrame::OnSaveProject()
 		SetSaveState(true);
 		statusBar()->showMessage("The project " + m_ProjectName + " has been saved");
 	}
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
 }
 
 
@@ -3498,13 +3501,17 @@ bool MainFrame::OnSaveProjectAs()
 		statusBar()->showMessage("The project " + m_ProjectName + " has been saved");
 		SetSaveState(true);
 	}
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
 	return true;
 }
 
 
 void MainFrame::OnSaveUFOAsProject()
 {
-	QMiarex *pMiarex= (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
+
 	QString strong;
 	if(pMiarex->m_pCurPlane)     strong = pMiarex->m_pCurPlane->m_PlaneName;
 	else if(pMiarex->m_pCurWing) strong = pMiarex->m_pCurWing->m_WingName;
@@ -3522,12 +3529,12 @@ void MainFrame::OnSaveUFOAsProject()
 	PathName = QFileDialog::getSaveFileName(this, "Save the Project File",
 											m_LastDirName+"/"+FileName,
 											"XFLR5 Project File (*.wpa)", &Filter);
+	if(!PathName.length()) return;//nothing more to do
 	int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 	if(pos<0) PathName += ".wpa";
 	pos = PathName.lastIndexOf("/");
 	if(pos>0) m_LastDirName = PathName.left(pos);
 
-	if(!PathName.length()) return;//nothing more to do
 
 	QFile fp(PathName);
 
@@ -3547,6 +3554,9 @@ void MainFrame::OnSaveUFOAsProject()
 
 void MainFrame::OnSaveViewToImageFile()
 {
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
+
 	QSize sz(m_p2DWidget->geometry().width(), m_p2DWidget->geometry().height());
 	QImage img(sz, QImage::Format_RGB32);
 	QPainter painter(&img);
@@ -3575,6 +3585,8 @@ void MainFrame::OnSaveViewToImageFile()
 											m_LastDirName,
 											"Windows Bitmap (*.bmp);;JPEG (*.jpg);;Portable Network Graphics (*.png)",
 											&Filter);
+	if(!FileName.length()) return;
+
 	if(Filter == "Windows Bitmap (*.bmp)")
 	{
 		if(FileName.right(4)!=".bmp") FileName+= ".bmp";
@@ -3615,9 +3627,10 @@ void MainFrame::OnSaveViewToImageFile()
 		case MIAREX:
 		{
 			QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+			pMiarex->m_bArcball = false;
+
 			if(pMiarex->m_iView==3)
 			{
-				pMiarex->m_bArcball = false;
 				pMiarex->UpdateView();
 				pMiarex->SnapClient(FileName, m_ImageFormat);
 				return;
@@ -4244,12 +4257,12 @@ bool MainFrame::SaveProject(QString PathName)
 		PathName = QFileDialog::getSaveFileName(this, "Save the Project File",
 												m_LastDirName+"/"+FileName,
 												"XFLR5 Project File (*.wpa)", &Filter);
+		if(!PathName.length()) return false;//nothing more to do
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 		if(pos<0) PathName += ".wpa";
 		pos = PathName.lastIndexOf("/");
 		if(pos>0) m_LastDirName = PathName.left(pos);
 	}
-	if(!PathName.length()) return false;//nothing more to do
 
 	QString strong;
 	QFile fp(PathName);

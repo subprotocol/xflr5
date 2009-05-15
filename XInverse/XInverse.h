@@ -157,10 +157,6 @@ private:
 
 	CSpline m_Spline;
 
-	QCursor m_hcArrow;
-	QCursor m_hcMove;
-	QCursor m_hcCross;
-
 	double pi;
 
 	bool m_bLoaded;

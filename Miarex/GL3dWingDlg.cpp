@@ -212,9 +212,6 @@ void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 
 
 
-
-
-
 void GL3dWingDlg::Connect()
 {
 	m_pWingModel = new QStandardItemModel;
@@ -2667,6 +2664,12 @@ void GL3dWingDlg::reject()
 
 
 
+void GL3dWingDlg::resizeEvent(QResizeEvent *event)
+{
+	m_3DWingRect = m_pglWidget->geometry();
+	SetWingScale();
+}
+
 
 bool GL3dWingDlg::SaveSettings(QDataStream &ar)
 {
@@ -2736,11 +2739,11 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	for(j=0; j<m_pWing->m_NSurfaces; j++)
 	{
-N = m_pWing->m_Surface[j].Normal;
-LA = m_pWing->m_Surface[j].m_LA;
-TA = m_pWing->m_Surface[j].m_TA;
-LB = m_pWing->m_Surface[j].m_LB;
-TB = m_pWing->m_Surface[j].m_TB;
+		N = m_pWing->m_Surface[j].Normal;
+		LA = m_pWing->m_Surface[j].m_LA;
+		TA = m_pWing->m_Surface[j].m_TA;
+		LB = m_pWing->m_Surface[j].m_LB;
+		TB = m_pWing->m_Surface[j].m_TB;
 		bIntersect = pMiarex->Intersect(m_pWing->m_Surface[j].m_LA,
 										m_pWing->m_Surface[j].m_LB,
 										m_pWing->m_Surface[j].m_TA,
@@ -2825,6 +2828,11 @@ void GL3dWingDlg::SetWingScale()
 	m_UFOOffset.x = 0.0;
 	m_UFOOffset.y = 0.0;
 
+	m_ArcBall.GetMatrix();
+	CVector eye(0.0,0.0,1.0);
+	CVector up(0.0,1.0,0.0);
+	m_ArcBall.SetZoom(0.3,eye,up);
+
 	Set3DRotationCenter();
 }
 
@@ -2908,8 +2916,8 @@ void GL3dWingDlg::SetupLayout()
 
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 7;
-	m_pglWidget->setMinimumHeight(400);
-	m_pglWidget->setMinimumWidth(500);
+//	m_pglWidget->setMinimumHeight(400);
+//	m_pglWidget->setMinimumWidth(500);
 
 /*_____________Start Top Layout Here____________*/
 	QVBoxLayout *DefLayout = new QVBoxLayout;
@@ -2939,8 +2947,8 @@ void GL3dWingDlg::SetupLayout()
 	NameLayout->addWidget(m_pctrlWingColor);
 
 	m_pctrlWingTable = new QTableView(this);
-	m_pctrlWingTable->setMinimumWidth(800);
-	m_pctrlWingTable->setMinimumHeight(200);
+	m_pctrlWingTable->setMinimumWidth(700);
+//	m_pctrlWingTable->setMinimumHeight(200);
 //	m_pctrlWingTable->setMaximumHeight((int)(r.height()/4));
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -2954,14 +2962,14 @@ void GL3dWingDlg::SetupLayout()
 
 	DefLayout->addLayout(NameLayout);
 	DefLayout->addLayout(SymLayout);
-	DefLayout->addWidget(m_pctrlWingTable);
+	DefLayout->addWidget(m_pctrlWingTable,1);
 
 	m_pctrlControlsWidget = new QWidget;
 	m_pctrlControlsWidget->setLayout(DefLayout);
 
 	QVBoxLayout *LeftLayout = new QVBoxLayout;
 	LeftLayout->addWidget(m_pctrlControlsWidget);
-	LeftLayout->addWidget(m_pglWidget);
+	LeftLayout->addWidget(m_pglWidget,1);
 
 	m_pctrlLength1    = new QLabel("mm");
 	m_pctrlLength2    = new QLabel("mm");
@@ -3214,7 +3222,6 @@ void GL3dWingDlg::showEvent(QShowEvent *event)
 	m_bResetglWing = true;
 	SetWingScale();
 	m_3DWingRect = m_pglWidget->geometry();
-	CVector O(0.0,0.0,0.0);
 
 	UpdateView();
 }

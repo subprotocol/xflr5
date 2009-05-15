@@ -932,7 +932,6 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 	QString strong, strange;
 
 	int Size;
-
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
 

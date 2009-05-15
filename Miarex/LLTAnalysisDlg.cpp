@@ -348,9 +348,10 @@ void LLTAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/2);
+	setMinimumHeight(r.height()/3);
 	setMinimumWidth(r.width()/3);
 //	move(r.width()/3, r.height()/6);
+
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -362,8 +363,8 @@ void LLTAnalysisDlg::SetupLayout()
 	m_pGraphWidget->setMinimumWidth(r.width()/4);
 	m_pGraphWidget->m_pGraph = &m_IterGraph;
 
-	QHBoxLayout *GraphLayout = new QHBoxLayout;
-	GraphLayout->addWidget(m_pGraphWidget);
+//	QHBoxLayout *GraphLayout = new QHBoxLayout;
+//	GraphLayout->addWidget(m_pGraphWidget,1);
 
 	QPushButton *skipButton   = new QPushButton(tr("Skip"));
 	QPushButton *cancelButton = new QPushButton(tr("Cancel"));
@@ -380,7 +381,7 @@ void LLTAnalysisDlg::SetupLayout()
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addLayout(GraphLayout);
+	mainLayout->addWidget(m_pGraphWidget,1);
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);
 }

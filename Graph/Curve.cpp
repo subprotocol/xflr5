@@ -183,7 +183,7 @@ int CCurve::GetClosestPoint(double xs)
 	if (n<1) return -1;
 	for(int i=0; i<n; i++)
 	{
-        dist = fabs(xs-x[i]);
+		dist = fabs(xs-x[i]);
 		if (dist<distmax)
 		{
 			distmax = dist;
@@ -192,6 +192,26 @@ int CCurve::GetClosestPoint(double xs)
 	}
 	return ref;
 }
+
+int CCurve::GetClosestPoint(double xs, double ys)
+{
+	int ref = -1;
+	double dist;
+	double distmax = 1.e10;
+	if (n<1) return -1;
+	for(int i=0; i<n; i++)
+	{
+		dist = sqrt((xs-x[i])*(xs-x[i]) + (ys-y[i])*(ys-y[i]));
+		if (dist<distmax)
+		{
+			distmax = dist;
+			ref = i;
+		}
+	}
+	return ref;
+}
+
+
 void CCurve::Copy(CCurve *pCurve)
 {
 	if(!pCurve) return;

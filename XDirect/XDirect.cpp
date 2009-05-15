@@ -2485,6 +2485,7 @@ void QXDirect::OnExportCurXFoilResults()
 											pMainFrame->m_LastDirName,
 											"Text File (*.dat *.csv)");
 
+	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
@@ -2634,6 +2635,7 @@ void QXDirect::OnExportCurFoil()
 											pMainFrame->m_LastDirName,
 											"Foil File (*.dat)");
 
+	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
@@ -2662,6 +2664,7 @@ void QXDirect::OnExportCurOpp()
 											pMainFrame->m_LastDirName ,
 											"Text File (*.txt; *.csv)",
 											&filter);
+	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -2696,6 +2699,7 @@ void QXDirect::OnExportCurPolar()
 											pMainFrame->m_LastDirName + "/"+FileName,
 											"Text File (*.txt; *.csv)",
 											&filter);
+	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -3411,6 +3415,7 @@ void QXDirect::OnSavePolars()
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Polar File"), pMainFrame->m_LastDirName+"/"+FileName, tr("Polar File (*.plr)"));
+	if(!FileName.length()) return;
 
 	QString strong = FileName.right(4);
 	if(strong !=".plr" || strong !=".PLR") FileName += ".plr";

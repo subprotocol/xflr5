@@ -38,10 +38,6 @@ QXInverse::QXInverse(QWidget *parent)
 	m_bFullInverse = false;
 	pi = 3.141592654;
 
-	m_hcArrow = QCursor(Qt::ArrowCursor);
-	m_hcCross = QCursor(Qt::CrossCursor);
-	m_hcMove  = QCursor(Qt::ClosedHandCursor);
-	
 	m_pXFoil = NULL;
 
 	m_bTransGraph    = false;
@@ -165,6 +161,7 @@ void QXInverse::CheckActions()
 	pMainFrame->InvQPoints->setChecked(m_bShowPoints);
 	pMainFrame->InvQReflected->setChecked(m_bReflected);
 }
+
 
 void QXInverse::Clear()
 {
@@ -556,7 +553,8 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 	QPoint point = event->pos();
 	if(m_bGetPos)
 	{
-		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+//		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
 	}
 	else if(m_bZoomPlus && (event->buttons() & Qt::LeftButton))
 	{
@@ -603,7 +601,8 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			{
 				// user is dragging end point
 				// find closest graph point
-				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+//				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
 				m_SplineLeftPos = ipt;
 				xpt = m_pMCurve->x[ipt];
 				ypt = m_pMCurve->y[ipt];
@@ -627,7 +626,8 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			{
 				// user is dragging end point
 				// find closest graph point
-				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+//				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+				ipt = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
 				m_SplineRightPos = ipt;
 				xpt = m_pMCurve->x[ipt];
 				ypt = m_pMCurve->y[ipt];
@@ -825,6 +825,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 
 void QXInverse::mousePressEvent(QMouseEvent *event)
 {
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	bool bCtrl, bShift;
 	bCtrl = bShift = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl  = true;
@@ -844,7 +845,7 @@ void QXInverse::mousePressEvent(QMouseEvent *event)
 			if(m_QGraph.IsInDrawRect(pttmp))
 			{
 				m_bTransGraph = true;
-				setCursor(m_hcMove);
+				p2DWidget->setCursor(Qt::ClosedHandCursor);
 				xd = m_QGraph.ClientTox(point.x());
 				yd = m_QGraph.ClientToy(point.y());
 				if(m_bSpline)
@@ -893,7 +894,7 @@ void QXInverse::mousePressEvent(QMouseEvent *event)
 			}
 			else
 			{
-				setCursor(m_hcMove);
+				p2DWidget->setCursor(Qt::ClosedHandCursor);
 				m_bTrans = true;
 				m_bZoomPlus = false;
 			}
@@ -909,6 +910,7 @@ void QXInverse::mousePressEvent(QMouseEvent *event)
 void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 {
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	m_bTrans = false;
 
 	int tmp, width, height;
@@ -973,11 +975,13 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 	{
 		if(m_nPos == 0)
 		{
-			m_Pos1 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+//			m_Pos1 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+			m_Pos1 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
 		}
 		if(m_nPos == 1)
 		{
-			m_Pos2 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+//			m_Pos2 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
+			m_Pos2 = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
 		}
 		m_nPos++;
 		if(m_nPos == 2) 
@@ -1087,11 +1091,11 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 
 	if(m_QGraph.IsInDrawRect(point))
 	{
-		setCursor(m_hcCross);
+		p2DWidget->setCursor(Qt::CrossCursor);
 	}
 	else 
 	{
-		setCursor(m_hcArrow);
+		p2DWidget->setCursor(Qt::ArrowCursor);
 	}
 	UpdateView();
 }
@@ -1329,6 +1333,38 @@ void QXInverse::OnNewSpline()
 		CancelSpline();
 	}
 	UpdateView();
+}
+
+
+
+void QXInverse::OnPertubate()
+{
+	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	int m;
+	pXFoil->pert_init(1);
+
+	PertDlg dlg;
+	for (m=0; m<=qMin(32, pXFoil->nc); m++)
+	{
+		dlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
+		dlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
+//qDebug() <<	dlg.m_cnr[m]	<<dlg.m_cni[m];
+	}
+	dlg.m_nc = qMin(32, pXFoil->nc);
+	dlg.InitDialog();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		for (m=0; m<=qMin(32, pXFoil->nc); m++)
+		{
+			pXFoil->cn[m] = complex<double>(dlg.m_cnr[m],dlg.m_cni[m]);
+		}
+
+		pXFoil->pert_process(1);
+		CreateMCurve();
+		m_pMCurve->SetVisible(true);
+		UpdateView();
+	}
 }
 
 
@@ -1641,38 +1677,6 @@ void QXInverse::PaintView(QPainter &painter)
 
 	painter.restore();
 }
-
-
-void QXInverse::OnPertubate()
-{
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	int m;
-	pXFoil->pert_init(1);
-
-	PertDlg dlg;
-	for (m=0; m<=qMin(32, pXFoil->nc); m++)
-	{
-		dlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
-		dlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
-//qDebug() <<	dlg.m_cnr[m]	<<dlg.m_cni[m];
-	}
-	dlg.m_nc = qMin(32, pXFoil->nc);
-	dlg.InitDialog();
-
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		for (m=0; m<=qMin(32, pXFoil->nc); m++)
-		{
-			pXFoil->cn[m] = complex<double>(dlg.m_cnr[m],dlg.m_cni[m]);
-		}
-
-		pXFoil->pert_process(1);
-		CreateMCurve();
-		m_pMCurve->SetVisible(true);
-		UpdateView();
-	}
-}
-
 
 double QXInverse::qincom(double qc, double qinf, double tklam)
 {
@@ -2077,8 +2081,16 @@ bool QXInverse::SetParams()
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
 	CFoil*pFoil;
 
-	m_pctrlFullInverse->setChecked(m_bFullInverse);
-	m_pctrlMixedInverse->setChecked(!m_bFullInverse);
+	if(m_bFullInverse)
+	{
+		m_pctrlFullInverse->setChecked(true);
+		m_pctrlStackedInv->setCurrentIndex(0);
+	}
+	else
+	{
+		m_pctrlMixedInverse->setChecked(true);
+		m_pctrlStackedInv->setCurrentIndex(1);
+	}
 
 	m_pQCurve->SetColor(m_pRefFoil->m_FoilColor);
 	m_pQCurve->SetStyle(m_pRefFoil->m_nFoilStyle);

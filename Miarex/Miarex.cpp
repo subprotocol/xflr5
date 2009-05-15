@@ -11298,7 +11298,7 @@ void QMiarex::OnDeleteCurWOpp()
 
 void QMiarex::OnDeleteUFOWOpps()
 {
-	//Switch all WOpps view to off for the current UFO
+	//Delete all Opps for the current UFO
 	CPOpp *pPOpp;
 	CWOpp *pWOpp;
 	int i;
@@ -11327,6 +11327,9 @@ void QMiarex::OnDeleteUFOWOpps()
 			}
 		}
 	}
+
+	m_pCurWOpp = NULL;
+	m_pCurPOpp = NULL;
 
 	if (m_iView==1)     CreateWOppCurves();
 	else if(m_iView==4)	CreateCpCurves();
@@ -11661,6 +11664,7 @@ void QMiarex::OnExportCurWOpp()
 											"Text File (*.txt; *.csv)",
 											&filter);
 
+	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
@@ -11949,7 +11953,7 @@ void QMiarex::OnExportCurWPolar()
 											pMainFrame->m_LastDirName + "/"+FileName,
 											"Text File (*.txt; *.csv)",
 											&filter);
-
+	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
@@ -11985,6 +11989,7 @@ void QMiarex::OnExporttoAVL()
 											pMainFrame->m_LastDirName + "/"+FileName,
 											"AVL Text File (*.avl)",
 											&filter);
+	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -16667,6 +16672,9 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 
 	m_pVLMDlg->m_pPlane     = m_pCurPlane;
 	m_pVLMDlg->m_pWing      = m_pCurWing;
+	m_pVLMDlg->m_pWing2     = m_pCurWing2;
+	m_pVLMDlg->m_pStab      = m_pCurStab;
+	m_pVLMDlg->m_pFin       = m_pCurFin;
 	m_pVLMDlg->m_pWPolar    = m_pCurWPolar;
 	m_pVLMDlg->m_bSequence  = bSequence;
 

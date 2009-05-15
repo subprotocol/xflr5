@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QSlider>
+#include <QPushButton>
 #include <QDataStream>
 
 class GLLightDlg : public QDialog
@@ -33,7 +34,6 @@ class GLLightDlg : public QDialog
 	Q_OBJECT
 	friend class QMiarex;
 	friend class GL3dBodyDlg;
-	friend class GL3dViewDlg;
 	friend class GL3dWingDlg;
 
 public:
@@ -78,7 +78,6 @@ private:
 	QPushButton *m_pctrlDefaults, *m_pctrlClose;
 
 private:
-	void* m_pGL3dViewDlg;
 	void *m_pGL3dBodyDlg;
 	void *m_pGL3dWingDlg;
 	void *m_pMiarex;

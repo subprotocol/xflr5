@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include "GLLightDlg.h"
-#include "GL3dViewDlg.h"
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -31,7 +30,7 @@
 
 GLLightDlg::GLLightDlg()
 {
-	m_pGL3dViewDlg = m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
+	m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
 	m_bCullFaces     = false;
 	m_bShade         = true;
 	m_bSmooth        = true;
@@ -277,28 +276,22 @@ void GLLightDlg::SetupLayout()
 void GLLightDlg::Apply()
 {
 	ReadParams();
-//	GL3dViewDlg *pGL3dViewDlg = (GL3dViewDlg*)m_pGL3dViewDlg;
-//	pGL3dViewDlg->UpdateView();
 }
 
 void GLLightDlg::OnSlider(int pos)
 {
-//qDebug() << "onslider";
 	Apply();
 }
 
 void GLLightDlg::OnChanged(int state)
 {
-//qDebug() << "Changed from---" <<m_bColorMaterial<< m_bCullFaces<< m_bSmooth<<m_bDepthTest<<m_bShade<<m_bLocalView;
 	Apply();
-//qDebug() << "Changed to-----" <<m_bColorMaterial<< m_bCullFaces<< m_bSmooth<<m_bDepthTest<<m_bShade<<m_bLocalView;
 }
 
 
 
 void GLLightDlg::OnDefaults()
 {
-//qDebug() << "Applied###" << m_Ambient<< m_Diffuse<<m_Specular<<m_MatAmbient<<m_MatDiffuse<<m_MatSpecular<<m_MatEmission<<m_iMatShininess;
 	m_bCullFaces = false;
 	m_bShade     = true;
 	m_bSmooth    = true;
@@ -326,9 +319,6 @@ void GLLightDlg::OnDefaults()
 
 	SetParams();
 
-//	GL3dViewDlg *pGL3dViewDlg = (GL3dViewDlg*)m_pGL3dViewDlg;
-//	pGL3dViewDlg->UpdateView();
-//qDebug() << "Applied###" << m_Ambient<< m_Diffuse<<m_Specular<<m_MatAmbient<<m_MatDiffuse<<m_MatSpecular<<m_MatEmission<<m_iMatShininess;
 }
 
 

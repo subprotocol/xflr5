@@ -3578,7 +3578,6 @@ void GL3dBodyDlg::OnImportBodyDef()
 
 void GL3dBodyDlg::OnFrameCellChanged(QWidget *pWidget)
 {
-//qDebug() << "On Frame Cell Changed";
 	m_bChanged = true;
 	ReadFrameSectionData(m_pBody->m_iActiveFrame);
 	UpdateView();
@@ -3703,7 +3702,6 @@ void GL3dBodyDlg::OnPanels()
 
 void GL3dBodyDlg::OnPointCellChanged(QWidget *pWidget)
 {
-//qDebug() << "On Point Cell Changed";
 	m_bChanged = true;
 	ReadPointSectionData(CFrame::s_iSelect);
 	m_bResetglBodyPoints = true;
@@ -3715,7 +3713,6 @@ void GL3dBodyDlg::OnPointCellChanged(QWidget *pWidget)
 
 void GL3dBodyDlg::OnPointItemClicked(const QModelIndex &index)
 {
-//qDebug() << "Clicked point " << index.row() << " from  "<<m_pFrame;
 	if(!m_pFrame) return;
 	CFrame::s_iSelect = index.row();
 	m_pFrame->m_iHighlight = index.row();
@@ -4005,7 +4002,6 @@ void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 	m_pctrlPointTable->setColumnWidth(0,w4);
 	m_pctrlPointTable->setColumnWidth(1,w4);
 	m_pctrlPointTable->setColumnWidth(2,w4);
-//qDebug() << "Resizing GL3dBodyDlg"<<	m_pglWidget->m_GLViewRect.width() << m_pglWidget->m_GLViewRect.height();
 
 
 //	UpdateView();
@@ -4403,10 +4399,7 @@ void GL3dBodyDlg::SetupLayout()
 
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 5;
-	m_pglWidget->setMinimumHeight(500);
-//	m_pglWidget->setSizePolicy(szPolicyMaximum);
-//	m_pglWidget->setMinimumHeight(r.height()/2);
-//	m_pglWidget->setSizePolicy(szPolicyExpanding);
+//	m_pglWidget->setMinimumHeight(500);
 
 	QGridLayout *ThreeDParams = new QGridLayout;
 	m_pctrlAxes       = new QCheckBox("Axes");
@@ -4541,7 +4534,6 @@ void GL3dBodyDlg::SetupLayout()
 	FramePointLayout->addWidget(m_pctrlPointTable);
 //	FramePointLayout->addStretch(1);
 
-
 	QHBoxLayout *ActionButtons = new QHBoxLayout;
 	QPushButton *UndoButton = new QPushButton(QIcon(":/images/OnUndo.png"), tr("Undo"));
 	QPushButton *RedoButton = new QPushButton(QIcon(":/images/OnRedo.png"), tr("Redo"));
@@ -4595,14 +4587,10 @@ void GL3dBodyDlg::SetupLayout()
 
 	m_pctrlControlsWidget = new QWidget;
 	m_pctrlControlsWidget->setLayout(AllControls);
-//	int maxSize =qMax(200, geometry().height()/10);
-//	m_pctrlControlsWidget->setMaximumHeight(geometry().height()/3);
-//	m_pctrlControlsWidget->setMinimumHeight(200);
-//	m_pctrlControlsWidget->setSizePolicy(szPolicyMinimum);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(m_pglWidget);
-	MainLayout->addWidget(m_pctrlControlsWidget);
+	MainLayout->addWidget(m_pglWidget,2);
+	MainLayout->addWidget(m_pctrlControlsWidget,1);
 
 	setLayout(MainLayout);
 
@@ -4738,7 +4726,6 @@ void GL3dBodyDlg::showEvent(QShowEvent *event)
 
 
 	UpdateView();
-//qDebug() << "Showing GL3dBodyDlg";
 }
 
 

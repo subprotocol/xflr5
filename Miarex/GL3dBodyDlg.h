@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	GL3dViewDlg Class
+	GL3dBodyDlg Class
 	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
  
 	This program is free software; you can redistribute it and/or modify
@@ -261,4 +261,4 @@ private:
 
 };
 
-#endif // GL3DViewDlg_H
+#endif // GL3DBodyDlg_H

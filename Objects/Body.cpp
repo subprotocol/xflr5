@@ -208,6 +208,7 @@ bool CBody::ExportDefinition()
 	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Definition",
 											pMainFrame->m_LastDirName,
 											"Text Format (*.txt)");
+	if(!FileName.length()) return false;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -267,6 +268,7 @@ void CBody::ExportGeometry(int nx, int nh)
 											pMainFrame->m_LastDirName ,
 											"Text File (*.txt; *.csv)",
 											&filter);
+	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -1122,9 +1124,9 @@ bool CBody::ImportDefinition()
 	PathName = QFileDialog::getOpenFileName(pMainFrame, "Open File",
 											pMainFrame->m_LastDirName,
 											"text file (*.txt)");
+	if(!PathName.length())		return false;
 	int pos = PathName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
-	if(!PathName.length())		return false;
 
 
 	Line = 0;

@@ -39,7 +39,6 @@ class CWPolar
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class WPolarDlg;
-	friend class GL3dViewDlg;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;

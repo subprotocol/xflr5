@@ -1574,7 +1574,7 @@ void QAFoil::OnExportCurFoil()
 	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
 											pMainFrame->m_LastDirName,
 											"Foil File (*.dat)");
-
+	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
@@ -1644,6 +1644,7 @@ void QAFoil::OnExportSplinesToFile()
 	FileName = QFileDialog::getSaveFileName(this, "Export Splines", pMainFrame->m_LastDirName,
 											"Text File (*.dat)");
 
+	if(!FileName.length()) return;
 	int pos, type;
 	pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
