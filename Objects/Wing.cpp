@@ -1977,7 +1977,6 @@ void CWing::PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos, CVector
 			iTA = pWakePanel[nw].m_iTA;
 			iTB = pWakePanel[nw].m_iTB;
 			C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
-
 			pp = p;
 			StripArea = 0.0;
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)

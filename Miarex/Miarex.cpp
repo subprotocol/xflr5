@@ -7683,6 +7683,80 @@ void QMiarex::GLCreateVortices()
 }
 
 
+void QMiarex::GLCreateWakePanels()
+{
+	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisType<=1) return;
+	if(m_nWakeNodes==0 || m_WakeSize==0) return;
+	int pw;
+	CVector APt, BPt, TransA, TransB;
+	int iWLA, iWLB, iWTA, iWTB;
+	double r,g,b;
+
+	CVector *pWNode;
+	pWNode = m_WakeNode;
+	if(m_pCurWOpp && m_pCurWPolar->m_bWakeRollUp) pWNode = m_TempWakeNode;
+
+//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	glNewList(WINGWAKEPANELS,GL_COMPILE);
+	{
+		m_GLList++;
+
+		glEnable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+		glColor3d(m_WakeColor.redF(),m_WakeColor.greenF(),m_WakeColor.blueF());
+		glEnable (GL_LINE_STIPPLE);
+		glLineWidth(m_WakeWidth);
+
+		if(m_WakeStyle == 1) 		glLineStipple (1, 0x1111);
+		else if(m_WakeStyle== 2) 	glLineStipple (1, 0x0F0F);
+		else if(m_WakeStyle== 3) 	glLineStipple (1, 0x1C47);
+		else						glLineStipple (1, 0xFFFF);// Solid
+
+		for (pw=0; pw<m_WakeSize; pw++)
+		{
+			iWLA = m_WakePanel[pw].m_iLA;
+			iWLB = m_WakePanel[pw].m_iLB;
+			APt = pWNode[iWLA];
+			BPt = pWNode[iWLB];
+			TransA = APt;
+			TransB = BPt;
+			if(m_pCurWPolar->m_bTiltedGeom && !m_pCurWPolar->m_bWakeRollUp && m_pCurWOpp )
+			{
+				APt.RotateY(m_pCurWOpp->m_Alpha);
+				BPt.RotateY(m_pCurWOpp->m_Alpha);
+			}
+			TransA = APt - TransA;
+			TransB = BPt - TransB;
+
+			iWLA = m_WakePanel[pw].m_iLA;
+			iWTA = m_WakePanel[pw].m_iTA;
+			iWLB = m_WakePanel[pw].m_iLB;
+			iWTB = m_WakePanel[pw].m_iTB;
+
+			glBegin(GL_QUADS);
+			{
+				glVertex3d(pWNode[iWLA].x + TransA.x,
+						   pWNode[iWLA].y + TransA.y,
+						   pWNode[iWLA].z + TransA.z);
+				glVertex3d(pWNode[iWLB].x + TransB.x,
+						   pWNode[iWLB].y + TransB.y,
+						   pWNode[iWLB].z + TransB.z);
+				glVertex3d(pWNode[iWTB].x + TransB.x,
+						   pWNode[iWTB].y + TransB.y,
+						   pWNode[iWTB].z + TransB.z);
+				glVertex3d(pWNode[iWTA].x + TransA.x,
+						   pWNode[iWTA].y + TransA.y,
+						   pWNode[iWTA].z + TransA.z);
+			}
+			glEnd();
+		}
+	}
+	glEndList();
+}
+
+
 void QMiarex::GLCreateWingLegend()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -8267,7 +8341,7 @@ void QMiarex::GLDraw3D()
 		}
 		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3)
 		{
-//			GLCreateWakePanels(WINGWAKEPANELS);
+			GLCreateWakePanels();
 		}
 		m_bResetglWake = false;
 	}

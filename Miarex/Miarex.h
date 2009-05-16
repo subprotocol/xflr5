@@ -218,6 +218,7 @@ private:
 	void GLCreateStreamLines();
 	void GLCreateCp();
 	void GLCreateCpLegend();
+	void GLCreateWakePanels();
 	void GLCreateWingLegend();
 	void GLCreateWOppLegend();
 	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List);
