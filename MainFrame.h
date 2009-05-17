@@ -57,6 +57,7 @@ class MainFrame : public QMainWindow
 	friend class PanelAnalysisDlg;
 	friend class VLMAnalysisDlg;
 	friend class GL3dBodyDlg;
+	friend class GL3dViewDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
@@ -285,7 +286,7 @@ private:
 	QAction *DerotateFoil, *NormalizeFoil, *RefineLocalFoil, *RefineGlobalFoil , *EditCoordsFoil, *ScaleFoil;
 	QAction *SetTEGap, *SetLERadius, *SetFlap, *InterpolateFoils, *NacaFoils, *DuplicateFoil;
 	QAction *GraphDlgAction,*exportCurGraphAct, *resetCurGraphScales, *allPolarGraphsSettingsAct, *allPolarGraphsScales, *curPolarGraphVariableAct;
-	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct;
+	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct, *resetGraphLegend;
 	QAction *PolarGraphAct[5];
 	QAction *XDirectStyleAct;
 	QAction *defineCpGraphSettings, *resetCpGraphScales, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;

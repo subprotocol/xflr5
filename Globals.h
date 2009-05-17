@@ -24,7 +24,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <Qt>
+#include <Qt> 
 #include <QFile>
 #include <QString>
 #include <QTextStream>

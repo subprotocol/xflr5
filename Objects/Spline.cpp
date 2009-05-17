@@ -126,7 +126,6 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QP
 			}
 			painter.setPen(PointPen);
 			painter.drawEllipse(pt.x()-width, pt.y()-width, 2*width, 2*width);
-//qDebug() << 	m_Input[i].x  << m_Input[i].y << 		pt.x()<< pt.y();
 //		}
 	}
 	painter.restore();

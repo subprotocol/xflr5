@@ -102,7 +102,6 @@ CSurface::CSurface()
 
 CSurface::~CSurface()
 {
-//qDebug() << "Destroyed ~CSurface";
 }
 
 void CSurface::AddFlapPanel(CPanel *pPanel)

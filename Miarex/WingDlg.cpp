@@ -23,6 +23,7 @@
 #include "../Globals.h"
 #include "Miarex.h"
 #include "./WingDlg.h"
+#include "GL3dViewDlg.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -1460,7 +1461,6 @@ void WingDlg::ReadParams()
 {
 	m_pWing->m_WingName = m_pctrlWingName->text();
 //	ReadSectionData(m_iSection);
-//qDebug() << "Reading params";
 	for (int i=0; i< m_pWingModel->rowCount();  i++)
 	{
 		ReadSectionData(i);

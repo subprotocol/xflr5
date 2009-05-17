@@ -30,9 +30,9 @@
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
 #include "Miarex/PlaneDlg.h"
-#include "Misc/AboutQ5.h"
+#include "Misc/AboutQ5.h" 
 #include "Misc/DisplaySettingsDlg.h"
-#include "Misc/RenameDlg.h"
+#include "Misc/RenameDlg.h" 
 #include "Misc/LinePickerDlg.h"
 #include "Misc/UnitsDlg.h"
 #include "Misc/SaveOptionsDlg.h"
@@ -52,7 +52,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("Q5");
-	m_VersionName = "QFLR5 v5.01";
+	m_VersionName = "QFLR5 v5.00";
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 
@@ -88,10 +88,10 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	LoadSettings();
 
-	qApp->setStyle(m_StyleName);
+//	qApp->setStyle(m_StyleName);
+
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-
 	pXDirect->SetAnalysisParams();
 	CreateActions();
 	CreateMenus();
@@ -321,6 +321,8 @@ void MainFrame::AddRecentFile(const QString &PathName)
 void MainFrame::closeEvent (QCloseEvent * event)
 {
 //	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+//	pMiarex->m_GL3dView.hide();
+//	pMiarex->m_GL3dView.close();
 
 	if(!m_bSaved)
 	{
@@ -1426,6 +1428,9 @@ void MainFrame::CreateXDirectActions()
 	allPolarGraphsScales = new QAction(tr("Reset All Polar Graph Scales"), this);
 	connect(allPolarGraphsScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetAllPolarGraphsScales()));
 
+	resetGraphLegend = new QAction(tr("Reset Legend Position"), this);
+	connect(resetGraphLegend, SIGNAL(triggered()), pXDirect, SLOT(OnResetGraphLegend()));
+
 	curPolarGraphVariableAct = new QAction(tr("Polar Graph Variable"), this);
 	curPolarGraphVariableAct->setStatusTip("Defines the X and Y variables for this graph");
 	connect(curPolarGraphVariableAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolarGraphVariable()));
@@ -1736,6 +1741,7 @@ void MainFrame::CreateXDirectMenus()
 	GraphPolarMenu->addSeparator();
 	GraphPolarMenu->addAction(allPolarGraphsSettingsAct);
 	GraphPolarMenu->addAction(allPolarGraphsScales);
+	GraphPolarMenu->addAction(resetGraphLegend);
 	GraphPolarMenu->addSeparator();
 	GraphPolarMenu->addAction(AllPolarGraphsAct);
 	GraphPolarMenu->addAction(TwoPolarGraphsAct);
@@ -1868,6 +1874,7 @@ void MainFrame::CreateXDirectMenus()
 	OperPolarCtxMenu->addSeparator();//_______________
 	OperPolarCtxMenu->addAction(allPolarGraphsSettingsAct);
 	OperPolarCtxMenu->addAction( allPolarGraphsScales);
+	OperPolarCtxMenu->addAction(resetGraphLegend);
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu("Current Graph");
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
 	CurGraphCtxMenu->addAction(curPolarGraphVariableAct);
@@ -2751,7 +2758,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100529)
+	if(k !=100530)
 	{
 		pXFile->close();
 		return;
@@ -3816,7 +3823,7 @@ void MainFrame::OnStyle()
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
 		m_StyleName       = dlg.m_StyleName;
-		qApp->setStyle(m_StyleName);
+
 
 		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCpGraph->SetBkColor(m_GraphBackColor);
@@ -3917,7 +3924,9 @@ void MainFrame::OnXDirect()
 	m_pctrlXInverseWidget->hide();
 	SetCentralWidget();
 	SetMenus();
+	pXDirect->SetPolarLegendPos();
 	pXDirect->CheckButtons();
+	pXDirect->UpdateView();
 }
 
 
@@ -4299,7 +4308,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100529;
+	ar << 100530;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -4848,7 +4857,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 				}
 
 				ar >> pMiarex->m_WngAnalysis.m_AnalysisType;
-
 			}
 			if(ArchiveFormat>=100006)
 			{
@@ -4880,7 +4888,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		{
 			pWing = new CWing;
 
-
 			if (!pWing->SerializeWing(ar, bIsStoring))
 			{
 					if(pWing) delete pWing;
@@ -4888,7 +4895,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			}
 			if(pWing)
 			{
-//					pWing->ComputeGeometry();
 				pWing = pMiarex->AddWing(pWing);
 			}
 			else
@@ -5019,7 +5025,10 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 				pPlane = new CPlane();
 				if(pPlane)
 				{
-					if(pPlane->SerializePlane(ar, bIsStoring)) pMiarex->AddPlane(pPlane);
+					if(pPlane->SerializePlane(ar, bIsStoring))
+					{
+						pMiarex->AddPlane(pPlane);
+					}
 					else
 					{
 						if(pPlane) delete pPlane;
@@ -5085,6 +5094,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			pWing->ComputeGeometry();
 		}
 
+		if(m_iApp==MIAREX) pMiarex->SetUFO();
+
 		return true;
 	}
 }
@@ -5098,6 +5109,8 @@ void MainFrame::SetCurrentFoil(CFoil* pFoil)
 	pAFoil->SetFoil(pFoil);
 	m_pCurFoil = pFoil;
 }
+
+
 
 void MainFrame::SetMenus()
 {
@@ -5230,13 +5243,17 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 			}
 			else if(resp==10)
 			{
-				// user wants to overwrite existing airfoil
-				//So delete any foil with that name
+				// the user wants to overwrite existing airfoil
+				// So delete any foil with that name
 				for (l=m_oaFoil.size()-1;l>=0; l--)
 				{
 					pOldFoil = (CFoil*)m_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
 					{
+						pNewFoil->m_FoilColor  = pOldFoil->m_FoilColor;
+						pNewFoil->m_nFoilStyle = pOldFoil->m_nFoilStyle;
+						pNewFoil->m_nFoilWidth = pOldFoil->m_nFoilWidth;
+						pNewFoil->m_bPoints    = pOldFoil->m_bPoints;
 						m_oaFoil.removeAt(l);
 						delete pOldFoil;
 						if(m_pCurFoil == pOldFoil)           m_pCurFoil = NULL;

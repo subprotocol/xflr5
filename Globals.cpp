@@ -30,7 +30,7 @@
 #include <QDateTime> 
 #include <QByteArray>
 #include <math.h>
-
+ 
 void ExpFormat(double &f, int &exp)
 {
 	if (f==0.0)

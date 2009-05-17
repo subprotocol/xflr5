@@ -37,6 +37,7 @@ class CSurface : public QObject
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class CVLMDlg;
+	friend class GL3dViewDlg;
 	friend class GL3dWingDlg;
 
 public:

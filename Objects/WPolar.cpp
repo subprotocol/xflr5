@@ -85,7 +85,6 @@ CWPolar::CWPolar()
 CWPolar::~CWPolar()
 {
 	ResetWPlr();
-//qDebug() << "Destroyed WPolar";
 }
 
 

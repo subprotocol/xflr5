@@ -27,7 +27,7 @@
 #include "Params.h"
 #include "Objects/CRectangle.h"
 
-class GLWidget : public QGLWidget
+class GLWidget : public QGLWidget 
 {
     Q_OBJECT
 

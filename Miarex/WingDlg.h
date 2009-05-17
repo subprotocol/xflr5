@@ -31,10 +31,10 @@
 #include <QLineEdit>
 #include <QTableView>
 #include <QStandardItemModel>
-#include "WingDelegate.h"
 #include "../Objects/Wing.h"
 #include "../Misc/ColorButton.h"
 #include "../Params.h"
+#include "WingDelegate.h"
 
 
 class WingDlg : public QDialog

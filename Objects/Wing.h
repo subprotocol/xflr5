@@ -41,6 +41,7 @@ class CWing
 	friend class CPlane;
 	friend class CSurface;
 	friend class WingDlg;
+	friend class GL3dViewDlg;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;

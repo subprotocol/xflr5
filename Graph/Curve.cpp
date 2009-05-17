@@ -23,7 +23,7 @@
 // Graph.cpp: implementation of the Graph class.
 //
 //////////////////////////////////////////////////////////////////////
-
+ 
 
 #include "Curve.h"
 #include "math.h"

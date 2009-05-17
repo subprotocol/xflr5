@@ -119,7 +119,6 @@ void PertDlg::OnApply()
 void PertDlg::OnOK()
 {
 	ReadData();
-//	for(int i=0; i <m_pCnModel->rowCount(); i++)		qDebug() << i << m_cnr[i] << m_cni[i];
 	accept();
 }
 
@@ -215,10 +214,7 @@ void PertDlg::FillCnModel()
 
 		QModelIndex Zindex =m_pCnModel->index(i, 2, QModelIndex());
 		m_pCnModel->setData(Zindex, m_cni[i]);
-//qDebug() <<	m_cnr[i]	<<m_cni[i];
 	}
-//	m_pctrlCnTable->resizeRowsToContents();
-//	m_pctrlCnTable->resizeColumnsToContents();
 }
 
 

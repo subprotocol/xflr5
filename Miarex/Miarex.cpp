@@ -3178,7 +3178,6 @@ void QMiarex::CreateWPolarCurves()
 	for (int k=0; k<m_poaWPolar->size(); k++)
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(k);
-//qDebug() << pWPolar->m_UFOName << pWPolar->m_PlrName;
 		if (pWPolar->m_bIsVisible && pWPolar->m_Alpha.size()>0 &&
                         ((m_bType1 && pWPolar->m_Type == 1) ||
                          (m_bType2 && pWPolar->m_Type == 2) ||
@@ -7683,80 +7682,6 @@ void QMiarex::GLCreateVortices()
 }
 
 
-void QMiarex::GLCreateWakePanels()
-{
-	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisType<=1) return;
-	if(m_nWakeNodes==0 || m_WakeSize==0) return;
-	int pw;
-	CVector APt, BPt, TransA, TransB;
-	int iWLA, iWLB, iWTA, iWTB;
-	double r,g,b;
-
-	CVector *pWNode;
-	pWNode = m_WakeNode;
-	if(m_pCurWOpp && m_pCurWPolar->m_bWakeRollUp) pWNode = m_TempWakeNode;
-
-//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
-	glNewList(WINGWAKEPANELS,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-
-		glColor3d(m_WakeColor.redF(),m_WakeColor.greenF(),m_WakeColor.blueF());
-		glEnable (GL_LINE_STIPPLE);
-		glLineWidth(m_WakeWidth);
-
-		if(m_WakeStyle == 1) 		glLineStipple (1, 0x1111);
-		else if(m_WakeStyle== 2) 	glLineStipple (1, 0x0F0F);
-		else if(m_WakeStyle== 3) 	glLineStipple (1, 0x1C47);
-		else						glLineStipple (1, 0xFFFF);// Solid
-
-		for (pw=0; pw<m_WakeSize; pw++)
-		{
-			iWLA = m_WakePanel[pw].m_iLA;
-			iWLB = m_WakePanel[pw].m_iLB;
-			APt = pWNode[iWLA];
-			BPt = pWNode[iWLB];
-			TransA = APt;
-			TransB = BPt;
-			if(m_pCurWPolar->m_bTiltedGeom && !m_pCurWPolar->m_bWakeRollUp && m_pCurWOpp )
-			{
-				APt.RotateY(m_pCurWOpp->m_Alpha);
-				BPt.RotateY(m_pCurWOpp->m_Alpha);
-			}
-			TransA = APt - TransA;
-			TransB = BPt - TransB;
-
-			iWLA = m_WakePanel[pw].m_iLA;
-			iWTA = m_WakePanel[pw].m_iTA;
-			iWLB = m_WakePanel[pw].m_iLB;
-			iWTB = m_WakePanel[pw].m_iTB;
-
-			glBegin(GL_QUADS);
-			{
-				glVertex3d(pWNode[iWLA].x + TransA.x,
-						   pWNode[iWLA].y + TransA.y,
-						   pWNode[iWLA].z + TransA.z);
-				glVertex3d(pWNode[iWLB].x + TransB.x,
-						   pWNode[iWLB].y + TransB.y,
-						   pWNode[iWLB].z + TransB.z);
-				glVertex3d(pWNode[iWTB].x + TransB.x,
-						   pWNode[iWTB].y + TransB.y,
-						   pWNode[iWTB].z + TransB.z);
-				glVertex3d(pWNode[iWTA].x + TransA.x,
-						   pWNode[iWTA].y + TransA.y,
-						   pWNode[iWTA].z + TransA.z);
-			}
-			glEnd();
-		}
-	}
-	glEndList();
-}
-
-
 void QMiarex::GLCreateWingLegend()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -8341,7 +8266,7 @@ void QMiarex::GLDraw3D()
 		}
 		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3)
 		{
-			GLCreateWakePanels();
+//			GLCreateWakePanels(WINGWAKEPANELS);
 		}
 		m_bResetglWake = false;
 	}
@@ -15317,7 +15242,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 				}
 			}
 			pModWing->m_WingName = RDlg.m_strName;
-			m_pCurWing = pModWing;
+//			m_pCurWing = pModWing;
 
 			pMainFrame->SetSaveState(false);
 			return true;
@@ -15444,7 +15369,6 @@ void QMiarex::SetUFO(QString UFOName)
 	int i;
 	CWing *pWing;
 	CPlane *pPlane;
-
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!UFOName.length())
 	{
@@ -15452,16 +15376,26 @@ void QMiarex::SetUFO(QString UFOName)
 		else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 		else
 		{
+			// Find out which is first in Alphabetical order
+			QString FirstWingName, FirstPlaneName;
 			if(m_poaWing->size())
 			{
 				pWing = (CWing*)m_poaWing->at(0);
-				if(pWing) UFOName = pWing->m_WingName;
+				if(pWing) FirstWingName = pWing->m_WingName;
 			}
 			else if(m_poaPlane->size())
 			{
 				pPlane = (CPlane*)m_poaPlane->at(0);
-				if(pPlane) UFOName = pPlane->m_PlaneName;
+				if(pPlane) FirstPlaneName = pPlane->m_PlaneName;
 			}
+			if(FirstPlaneName.length())
+			{
+				if(FirstWingName.compare(FirstPlaneName, Qt::CaseInsensitive) >0)
+					UFOName = FirstPlaneName;
+				else
+					UFOName = FirstWingName;
+			}
+			else UFOName = FirstWingName;
 			if(!UFOName.size())
 			{
 				m_pCurPlane = NULL;
@@ -15798,6 +15732,7 @@ void QMiarex::SetupLayout()
 	m_pctrlPickCenter     = new QPushButton("Pick Center");
 	m_pctrlReset          = new QPushButton("Reset");
 
+	m_pctrlPickCenter->setCheckable(true);
 	m_pctrlPickCenter->setSizePolicy(szPolicyMinimum);
 	m_pctrlReset->setSizePolicy(szPolicyMinimum);
 	ThreeDCtrls->addWidget(m_pctrlReset,1,1);
@@ -16752,9 +16687,35 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->m_pWPolar    = m_pCurWPolar;
 	m_pVLMDlg->m_bSequence  = bSequence;
 
-	m_pVLMDlg->m_AlphaMin   = V0;
-	m_pVLMDlg->m_AlphaMax   = VMax;
-	m_pVLMDlg->m_AlphaDelta = VDelta;
+	m_pVLMDlg->m_bWakeRollUp    = m_pCurWPolar->m_bWakeRollUp;
+	m_pVLMDlg->m_MaxWakeIter    = m_MaxWakeIter;
+	m_pVLMDlg->m_WakeInterNodes = m_WakeInterNodes;
+	m_pVLMDlg->m_NWakeColumn    = m_NWakeColumn;
+	m_pVLMDlg->m_nWakeNodes     = m_nWakeNodes;
+	m_pVLMDlg->m_WakeSize       = m_WakeSize;
+	m_pVLMDlg->m_bTrefftz       = m_bTrefftz;
+
+	if(m_pCurWPolar->m_Type<3)
+	{
+		m_pVLMDlg->m_AlphaMin   = V0;
+		m_pVLMDlg->m_AlphaMax   = VMax;
+		m_pVLMDlg->m_AlphaDelta = VDelta;
+	}
+	else if(m_pCurWPolar->m_Type==4)
+	{
+		m_pVLMDlg->m_AlphaMin      = m_pCurWPolar->m_ASpec;
+		m_pVLMDlg->m_QInfMin       = V0;
+		m_pVLMDlg->m_QInfMax       = VMax;
+		m_pVLMDlg->m_QInfDelta     = VDelta;
+	}
+	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
+	{
+		m_pVLMDlg->m_AlphaMin      = m_pCurWPolar->m_ASpec;
+		m_pVLMDlg->m_QInfMin       = m_pCurWPolar->m_QInf;
+		m_pVLMDlg->m_ControlMin    = V0;
+		m_pVLMDlg->m_ControlMax    = VMax;
+		m_pVLMDlg->m_ControlDelta  = VDelta;
+	}
 
 	m_pVLMDlg->m_MatSize    = m_MatSize;
 	m_pVLMDlg->m_nNodes     = m_nNodes;

@@ -97,7 +97,6 @@ XFoil::XFoil()
 
 XFoil::~XFoil()
 {
-qDebug() << "destroying XFoil";
 }
 
 

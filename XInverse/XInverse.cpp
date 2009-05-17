@@ -22,7 +22,7 @@
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QtGui>
-
+ 
 #include "XInverse.h"
 #include "InverseOptionsDlg.h"
 #include "FoilSelectionDlg.h"
@@ -1348,7 +1348,6 @@ void QXInverse::OnPertubate()
 	{
 		dlg.m_cnr[m] = (double)real(pXFoil->cn[m]);
 		dlg.m_cni[m] = (double)imag(pXFoil->cn[m]);
-//qDebug() <<	dlg.m_cnr[m]	<<dlg.m_cni[m];
 	}
 	dlg.m_nc = qMin(32, pXFoil->nc);
 	dlg.InitDialog();

@@ -24,7 +24,7 @@
 #include <QtGui>
 #include <QtOpenGL>
 #include "MainFrame.h"
-#include "Miarex/Miarex.h"
+#include "Miarex/Miarex.h" 
 #include <math.h>
 #include "Graph/Curve.h"
 #include "Miarex/GL3dBodyDlg.h"
@@ -248,7 +248,6 @@ void GLWidget::resizeGL(int width, int height)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->m_3DWingRect = m_rCltRect;
-qDebug() << "Setting Rect" << 		m_rCltRect.left() <<m_rCltRect.top()<<m_rCltRect.width()<<m_rCltRect.height();
 	}
 }
 

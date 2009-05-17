@@ -283,7 +283,6 @@ void QAFoil::FillFoilTable()
 
 	QString str, name;
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	double Thickness, xThickness, Camber, xCamber;
 	Thickness = xThickness = Camber = xCamber = 0;
@@ -346,7 +345,6 @@ void QAFoil::FillTableRow(int row)
 {
 	QString str, strong;
 	QModelIndex ind;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CFoil *pFoil = (CFoil*)m_poaFoil->at(row-1);
 
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
@@ -1498,7 +1496,7 @@ void QAFoil::OnAFoilNacaFoils()
 }
 
 
-void QAFoil::OnCenterLine(bool bState)
+void QAFoil::OnCenterLine()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_pCurFoil)
@@ -1591,7 +1589,6 @@ void QAFoil::OnExportCurFoil()
 
 void QAFoil::OnExportSplinesToFile()
 {
-	CFoil *pFoil;
 	QString FoilName = "Spline Foil";
 	QString FileName, strong;
 	QString strOut;
@@ -1835,7 +1832,7 @@ void QAFoil::OnNewSplines()
 }
 
 
-void QAFoil::OnPoints(bool bState)
+void QAFoil::OnPoints()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -2041,7 +2038,7 @@ void QAFoil::OnSplineControls()
 
 
 
-void QAFoil::OnSplineType(bool bState)
+void QAFoil::OnSplineType()
 {
 	m_bSF = m_pctrlSF->isChecked();
 	SetFoil(NULL);
@@ -2076,7 +2073,7 @@ void QAFoil::OnUndo()
 
 
 
-void QAFoil::OnVisible(bool bState)
+void QAFoil::OnVisible()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_pCurFoil)
@@ -2684,17 +2681,17 @@ void QAFoil::SetupLayout()
 
 	setLayout(MainLayout);
 
-	connect(m_pctrlSF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
-	connect(m_pctrlPF, SIGNAL(clicked(bool)), this, SLOT(OnSplineType(bool)));
+	connect(m_pctrlSF, SIGNAL(clicked()), this, SLOT(OnSplineType()));
+	connect(m_pctrlPF, SIGNAL(clicked()), this, SLOT(OnSplineType()));
 
 	connect(m_pctrlFoilStyle, SIGNAL(clicked()), this, SLOT(OnFoilStyle()));
 	connect(m_pctrlRename, SIGNAL(clicked()), this, SLOT(OnRenameFoil()));
 	connect(m_pctrlDelete, SIGNAL(clicked()), this, SLOT(OnDelete()));
 	connect(m_pctrlDuplicate, SIGNAL(clicked()), this, SLOT(OnDuplicate()));
 	connect(m_pctrlExport, SIGNAL(clicked()), this, SLOT(OnExportCurFoil()));
-	connect(m_pctrlFoilPoints, SIGNAL(clicked(bool)), this, SLOT(OnPoints(bool)));
-	connect(m_pctrlVisible, SIGNAL(clicked(bool)), this, SLOT(OnVisible(bool)));
-	connect(m_pctrlCenterLine, SIGNAL(clicked(bool)), this, SLOT(OnCenterLine(bool)));
+	connect(m_pctrlFoilPoints, SIGNAL(clicked()), this, SLOT(OnPoints()));
+	connect(m_pctrlVisible, SIGNAL(clicked()), this, SLOT(OnVisible()));
+	connect(m_pctrlCenterLine, SIGNAL(clicked()), this, SLOT(OnCenterLine()));
 
 	connect(m_pctrlFoilTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
 //	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));

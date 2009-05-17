@@ -28,7 +28,7 @@ protected:
 	void paintEvent(QPaintEvent *event);
 	void showEvent(QShowEvent *event);
 
-
+ 
 private:
 	QRect m_rCltRect;          // The client window rectangle
 	void * m_pXDirect, *m_pMiarex, *m_pAFoil, *m_pXInverse;

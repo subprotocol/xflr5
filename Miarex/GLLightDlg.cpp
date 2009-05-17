@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "GLLightDlg.h"
+#include "GL3dViewDlg.h"
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -30,7 +31,7 @@
 
 GLLightDlg::GLLightDlg()
 {
-	m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
+	m_pGL3dViewDlg = m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
 	m_bCullFaces     = false;
 	m_bShade         = true;
 	m_bSmooth        = true;
@@ -350,13 +351,11 @@ void GLLightDlg::ReadParams(void)
 	m_XLight  = ((float)m_pctrlXLight->value()-50.0f)/factor;
 	m_YLight  = ((float)m_pctrlYLight->value()-50.0f)/factor;
 	m_ZLight  = ((float)m_pctrlZLight->value()-50.0f)/factor;;
-//qDebug() << "read Params-----" <<m_bColorMaterial<< m_bCullFaces<< m_bSmooth<<m_bDepthTest<<m_bShade<<m_bLocalView;
 }
 
 
 void GLLightDlg::SetParams(void)
 {
-//qDebug() << "Setting Params-----" <<m_bColorMaterial<< m_bCullFaces<< m_bSmooth<<m_bDepthTest<<m_bShade<<m_bLocalView;
 	float factor = 50.0f;
 	m_pctrlXLight->setValue((int)((m_XLight+1.0)*factor));
 	m_pctrlYLight->setValue((int)((m_YLight+1.0)*factor));
@@ -382,7 +381,6 @@ void GLLightDlg::SetParams(void)
 	m_pctrlLocalView->setChecked(m_bLocalView);
 	m_pctrlDepthTest->setChecked(m_bDepthTest);
 	m_pctrlColorMaterial->setChecked(m_bColorMaterial);
-//qDebug() <<m_pctrlColorMaterial->isChecked() << m_pctrlCullFaces->isChecked() << m_pctrlSmooth->isChecked() <<m_pctrlDepthTest->isChecked() <<m_pctrlShade->isChecked()  <<m_pctrlLocalView->isChecked();
 }
 
 

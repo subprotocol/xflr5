@@ -178,12 +178,11 @@ bool VLMAnalysisDlg::ControlLoop()
 {
 	int i, j, nrhs, iter, nCtrl;
 	QString str;
+	double eps = 1.e-7;
 	double t, Cm, angle;
 	double a, a0, a1, Cm0, Cm1, tmp;
 	Quaternion Quat;
 	CWing *pWing, *pStab;
-
-//	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	CVector H(0.0, 1.0, 0.0);
 	CVector O(0.0, 0.0, 0.0);
@@ -228,7 +227,6 @@ bool VLMAnalysisDlg::ControlLoop()
 		m_Ctrl = t;
 
 		//update the variables & geometry
-		// XcmRef, T5-10.0 m/s-CG(0.00)mm-W(0.0�/5.0�)-E(1.0�/4.0�)-WF2(3.0�/2.0�)-EF1(4.0�/1.0�)
 		// if plane : WingTilt, elevator Tilt
 		// if flaps : wing flaps, elevator flaps
 		if(m_pWPolar->m_bActiveControl[0])
@@ -376,7 +374,7 @@ bool VLMAnalysisDlg::ControlLoop()
 				a1  = -pi/4.0;
 			}
 
-			while (fabs(Cm)>.0000001 && iter <100)
+			while (fabs(Cm)>eps && iter <100)
 			{
 				a = (a0+a1)/2.0;
 				Cm = VLMComputeCm(a*180.0/pi);
@@ -399,7 +397,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 			Cm = VLMComputeCm(a*180.0/pi);
 
-			if(fabs(Cm)<1.e-7)
+			if(fabs(Cm)<eps)
 			{
 				VLMSolveMultiple(a*180.0/pi, 0.0, 1);
 				VLMComputePlane(a*180.0/pi, m_ControlDelta, 1);

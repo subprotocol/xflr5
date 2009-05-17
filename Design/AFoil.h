@@ -77,12 +77,12 @@ public:
 
 private slots:
 	void OnExportSplinesToFile();
-	void OnSplineType(bool bState);
+	void OnSplineType();
 	void OnRenameFoil();
 	void OnGrid();
-	void OnCenterLine(bool bState);
-	void OnPoints(bool bState);
-	void OnVisible(bool bState);
+	void OnCenterLine();
+	void OnPoints();
+	void OnVisible();
 	void OnFoilStyle();
 	void OnDelete();
 	void OnDuplicate();

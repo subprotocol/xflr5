@@ -23,7 +23,6 @@
 #include "../Miarex/Miarex.h"
 #include "Globals.h"
 #include <math.h>
-#include <QDebug>
 
 void*	CPlane::s_pMainFrame;
 void*	CPlane::s_pMiarex ;

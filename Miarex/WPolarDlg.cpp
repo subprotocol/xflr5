@@ -62,7 +62,7 @@ WPolarDlg::WPolarDlg()
 	m_bViscous      = true;
 	m_bGround       = false;
 
-	m_NXWakePanels    = 1;
+	m_NXWakePanels    = 5;
 	m_TotalWakeLength = 100.0;//x mac
 	m_WakePanelFactor = 1.1;
 
@@ -165,6 +165,7 @@ void WPolarDlg::InitDialog()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str;
 	QString str1,str2;
+
 
 	int i;
 
@@ -287,8 +288,8 @@ void WPolarDlg::InitDialog()
 	}
 
 
-	m_pctrlWakeParams->setEnabled(false);
-	m_pctrlWakeRollUp->setEnabled(false);
+//	m_pctrlWakeParams->setEnabled(false);
+//	m_pctrlWakeRollUp->setEnabled(false);
 	m_bWakeRollUp = false;
 
 	if(m_RefAreaType==1)

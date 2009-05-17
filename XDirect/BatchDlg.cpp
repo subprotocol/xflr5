@@ -958,7 +958,6 @@ void BatchDlg::OnEditReList()
 			m_ReList[i]    = dlg.m_ReList[i];
 			m_MachList[i]  = dlg.m_MachList[i];
 			m_NCritList[i] = dlg.m_NCritList[i];
-//qDebug() << m_ReList[i] << m_MachList[i] << m_NCritList[i];
 		}
 		m_NRe = dlg.m_NRe;
 	}

@@ -128,6 +128,7 @@ private slots:
 	void OnPanels();
 	void OnFoilCoordinates();
 	void OnFoilGeom();
+	void OnResetGraphLegend();
 	void OnSetTEGap();
 	void OnSetLERadius();
 	void OnSetFlap();
@@ -191,6 +192,7 @@ protected:
 	void SetOpPointSequence();
 	void SetAnalysisParams();
 	void SetGraphTitles(Graph* pGraph, int iX, int iY);
+	void SetPolarLegendPos();
 	void SetupLayout();	
 	void StopAnimate();
 	void UpdateCurve();
@@ -317,9 +319,6 @@ private:
 
 	QFile m_XFile;		//output file for the analysis
 
-	QCursor m_hcMove;
-	QCursor m_hcCross;
-	QCursor m_hcArrow;
 
 	void *m_pMainFrame;
 	void *m_p2DWidget;
@@ -334,7 +333,7 @@ private:
 	QRect m_rCltRect;		// the client area
 	QPoint m_PointDown;		// the client point for the last mouse left-click
 	QPoint m_FoilOffset;		// the screen offset position for the foil display
-
+	QPoint m_PolarLegendOffset;
 //	CFoilAnalysisDlg m_Adlg;	// the polar definition dialog box
 //	CUFOListDlg m_UFOdlg;		// the foil management dialog box
 //	CViscDlg m_ViscDlg;		// the dialog class which manages the xfoil calculation and display output

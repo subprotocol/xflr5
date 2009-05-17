@@ -35,6 +35,7 @@ class CPlane
 	friend class MainFrame;
 	friend class CBody;
 	friend class CWing;
+	friend class GL3dViewDlg;
 	friend class PlaneDlg;
 	friend class VLMAnalysisDlg;
 	friend class ManageBodiesDlg;

@@ -28,7 +28,7 @@ SOURCES += MainFrame.cpp \
     Objects/Spline.cpp \
     Objects/Panel.cpp \
     Objects/Sf.cpp \
-    Objects/Quaternion.cpp \
+    Objects/Quaternion.cpp \ 
     Objects/OpPoint.cpp \
     Objects/Frame.cpp \
     Objects/POpp.cpp \

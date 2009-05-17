@@ -38,6 +38,7 @@ class CWOpp
 	friend class MainFrame;
 	friend class CWPolar;
 	friend class CPOpp;
+	friend class GL3dViewDlg;
 
 public:
 	CWOpp();

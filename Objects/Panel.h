@@ -39,6 +39,7 @@ class CPanel
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class GL3dBodyDlg;
+	friend class GL3dViewDlg;
 	friend class GL3dWingDlg;
 
 public:

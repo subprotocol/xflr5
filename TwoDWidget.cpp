@@ -28,7 +28,7 @@ TwoDWidget::TwoDWidget(QWidget *parent)
 TwoDWidget::~TwoDWidget()
 {
 }
-
+ 
 
 
 void TwoDWidget::keyPressEvent(QKeyEvent *event)

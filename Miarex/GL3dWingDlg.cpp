@@ -1868,20 +1868,6 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingDelegate->m_poaFoil = s_poaFoil;
 
 
-//	Convert(true);
-
-	m_pctrlWingTable->setColumnWidth(0,70);
-	m_pctrlWingTable->setColumnWidth(1,70);
-	m_pctrlWingTable->setColumnWidth(2,70);
-	m_pctrlWingTable->setColumnWidth(3,70);
-	m_pctrlWingTable->setColumnWidth(4,70);
-	m_pctrlWingTable->setColumnWidth(5,130);
-	m_pctrlWingTable->setColumnWidth(6,50);
-	m_pctrlWingTable->setColumnWidth(7,80);
-	m_pctrlWingTable->setColumnWidth(8,50);
-	m_pctrlWingTable->setColumnWidth(9,80);
-//	m_pctrlWingTable->resizeColumnsToContents();
-
 	FillDataTable();
 	SetWingData();
 	SetCurrentSection(m_iSection);
@@ -2662,12 +2648,26 @@ void GL3dWingDlg::reject()
 }
 
 
-
-
 void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 {
 	m_3DWingRect = m_pglWidget->geometry();
 	SetWingScale();
+
+	double w = (double)m_pctrlWingTable->width()*.97;
+	int w6  = (int)(w/6.);
+	int w8  = (int)(w/8.);
+	int w12 = (int)(w/12.);
+
+	m_pctrlWingTable->setColumnWidth(0, w12);
+	m_pctrlWingTable->setColumnWidth(1, w12);
+	m_pctrlWingTable->setColumnWidth(2, w12);
+	m_pctrlWingTable->setColumnWidth(3, w12);
+	m_pctrlWingTable->setColumnWidth(4, w12);
+	m_pctrlWingTable->setColumnWidth(5, w6);
+	m_pctrlWingTable->setColumnWidth(6, w12);
+	m_pctrlWingTable->setColumnWidth(7, w8);
+	m_pctrlWingTable->setColumnWidth(8, w12);
+	m_pctrlWingTable->setColumnWidth(9, w8);
 }
 
 

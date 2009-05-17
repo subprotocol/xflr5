@@ -245,7 +245,6 @@ void GL3DScales::OnCpScale()
 	pMiarex->m_bResetglOpp = true;
 	pMiarex->m_bResetglLegend = true;
 	pMiarex->UpdateView();
-//qDebug() << "CpScales"<< m_bAutoCpScale<<m_LegendMin;
 }
 
 
