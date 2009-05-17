@@ -600,7 +600,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlMoment, SIGNAL(clicked()), this, SLOT(OnMoment()));
 	connect(m_pctrlDownwash, SIGNAL(clicked()), this, SLOT(OnDownwash()));
 	connect(m_pctrlStream, SIGNAL(clicked()), this, SLOT(OnStreamlines()));
-	connect(m_pctrl3DSettings, SIGNAL(clicked()), this, SLOT(OnGL3DScale()));
+//	connect(m_pctrl3DSettings, SIGNAL(clicked()), this, SLOT(OnGL3DScale()));
 
 	connect(m_pctrlAnimate, SIGNAL(clicked()), this, SLOT(OnAnimate()));
 	connect(m_pctrlAnimateSpeed, SIGNAL(sliderMoved(int)), this, SLOT(OnAnimateSpeed(int)));
@@ -8535,7 +8535,7 @@ void QMiarex::GLInverseMatrix()
 
 void QMiarex::GLRenderView()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -10188,8 +10188,10 @@ void QMiarex::On3DReset()
 	m_bPickCenter   = false;
 	m_bIs3DScaleSet = false;
 	Set3DScale();
+	Set3DRotationCenter();
 	UpdateView();
 }
+
 
 void QMiarex::On3DPrefs()
 {
@@ -12080,12 +12082,13 @@ void QMiarex::OnGL3DScale()
 {
 	if(m_iView != 3)
 	{
-		m_pctrl3DSettings->setChecked(false);
+//		m_pctrl3DSettings->setChecked(false);
 		return;
 	}
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
-	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
+	pMainFrame->m_pctrl3DScalesWidget->show();
+//	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
+//	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
 }
 
 
@@ -13210,6 +13213,7 @@ void QMiarex::OnSurfaces()
 
 void QMiarex::OnSetupLight()
 {
+	if(m_iView!=3) return;
 	m_bShowLight = true;
 	UpdateView();
 	m_GLLightDlg.m_pMiarex = this;
@@ -13317,7 +13321,7 @@ void QMiarex::OnWPolars()
 	m_pctrlMiddleControls->setCurrentIndex(0);
 	m_pctrBottomControls->setCurrentIndex(0);
 
-	SetWPlrLegendPos();//TODO remove
+//	SetWPlrLegendPos();//TODO remove
 	CreateWPolarCurves();
 	SetCurveParams();
 	CheckButtons();
@@ -13724,7 +13728,11 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 
 void QMiarex::PaintWSingleGraph(QPainter &painter)
 {
-	if(!m_pCurGraph) return;
+	if(!m_pCurGraph)
+	{
+		m_pCurGraph = &m_WPlrGraph1;
+//		return;
+	}
 
 	int h  = m_rCltRect.height();
 	int w  = m_rCltRect.width();
@@ -15635,13 +15643,13 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
-	m_pctrl3DSettings =new QPushButton("3D Scales");
-	m_pctrl3DSettings->setCheckable(true);
-	QVBoxLayout *DisplayLayout = new QVBoxLayout;
-	DisplayLayout->addLayout(CheckDispLayout);
-	DisplayLayout->addWidget(m_pctrl3DSettings);
+//	m_pctrl3DSettings =new QPushButton("3D Scales");
+//	m_pctrl3DSettings->setCheckable(true);
+//	QVBoxLayout *DisplayLayout = new QVBoxLayout;
+//	DisplayLayout->addLayout(CheckDispLayout);
+//	DisplayLayout->addWidget(m_pctrl3DSettings);
 	QGroupBox *DisplayBox = new QGroupBox("Display");
-	DisplayBox->setLayout(DisplayLayout);
+	DisplayBox->setLayout(CheckDispLayout);
 
 
 //_______________________Curve params

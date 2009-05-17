@@ -23,7 +23,6 @@
 #include "../Globals.h"
 #include "Miarex.h"
 #include "./WingDlg.h"
-#include "GL3dViewDlg.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>

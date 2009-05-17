@@ -620,17 +620,17 @@ void VLMAnalysisDlg::pgmat(double const &mach, double const &alfa, double const 
 	sinb = sin(beta);
 	cosb = cos(beta);
 
-	pg[1][1] =  cosa*cosb*binv;
-	pg[1][2] =      -sinb*binv;
-	pg[1][3] =  sina*cosb*binv;
+	pg[0][0] =  cosa*cosb*binv;
+	pg[0][1] =      -sinb*binv;
+	pg[0][2] =  sina*cosb*binv;
 
-	pg[2][1] =  cosa*sinb;
-	pg[2][2] =       cosb;
-	pg[2][3] =  sina*sinb;
+	pg[1][0] =  cosa*sinb;
+	pg[1][1] =       cosb;
+	pg[1][2] =  sina*sinb;
 
-	pg[3][1] = -sina;
-	pg[3][2] =   0.0;
-	pg[3][3] =  cosa;
+	pg[2][0] = -sina;
+	pg[2][1] =   0.0;
+	pg[2][2] =  cosa;
 }
 
 bool VLMAnalysisDlg::ReLoop()

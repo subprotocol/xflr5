@@ -919,6 +919,12 @@ void MainFrame::CreateMiarexActions()
 	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
 	connect(W3DPrefsAct, SIGNAL(triggered()), pMiarex, SLOT(On3DPrefs()));
 
+	W3DScalesAct = new QAction(tr("3D Scales"), this);
+	connect(W3DScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnGL3DScale()));
+
+	W3DLightAct = new QAction(tr("3D Light Options"), this);
+	connect(W3DLightAct, SIGNAL(triggered()), pMiarex, SLOT(OnSetupLight()));
+
 	DefineWingAct = new QAction(tr("Define a New Wing"), this);
 	DefineWingAct->setStatusTip(tr("Shows a dialogbox for editing a new wing definition"));
 	DefineWingAct->setShortcut(tr("F3"));
@@ -1128,10 +1134,13 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(unitsAct);
 	MiarexViewMenu->addAction(W3DPrefsAct);
+	MiarexViewMenu->addAction(W3DScalesAct);
+	MiarexViewMenu->addAction(W3DLightAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(restoreToolbarsAct);
 	MiarexViewMenu->addAction(styleAct);
 	MiarexViewMenu->addAction(saveViewToImageFileAct);
+
 
 	UFOMenu = menuBar()->addMenu(tr("&Wing-Plane"));
 	UFOMenu->addAction(DefineWingAct);
@@ -1290,6 +1299,9 @@ void MainFrame::CreateMiarexMenus()
 	W3DCtxMenu->addAction(showAllWOpps);
 	W3DCtxMenu->addAction(hideAllWOpps);
 	W3DCtxMenu->addAction(deleteAllWOpps);
+	W3DCtxMenu->addSeparator();
+	W3DCtxMenu->addAction(W3DScalesAct);
+	W3DCtxMenu->addAction(W3DLightAct);
 }
 
 

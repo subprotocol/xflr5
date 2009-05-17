@@ -369,7 +369,7 @@ private:
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 	QSlider *m_pctrlClipPlanePos;
 
-	QPushButton *m_pctrl3DSettings;
+//	QPushButton *m_pctrl3DSettings;
 
 
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;

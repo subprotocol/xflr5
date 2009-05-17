@@ -57,7 +57,6 @@ class MainFrame : public QMainWindow
 	friend class PanelAnalysisDlg;
 	friend class VLMAnalysisDlg;
 	friend class GL3dBodyDlg;
-	friend class GL3dViewDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
@@ -250,7 +249,7 @@ private:
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
 	QAction *renameCurWPolar, *editCurWPolar,*exportCurWPolar, *resetCurWPolar;

@@ -52,7 +52,7 @@ private slots:
 
 private:
 	void showEvent(QShowEvent *event);
-	void hideEvent(QHideEvent *event);
+//	void hideEvent(QHideEvent *event);
 
 	void SetupLayout();
 	void ReadStreamParams();

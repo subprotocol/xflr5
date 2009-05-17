@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include "GLLightDlg.h"
-#include "GL3dViewDlg.h"
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -31,7 +30,7 @@
 
 GLLightDlg::GLLightDlg()
 {
-	m_pGL3dViewDlg = m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
+	m_pGL3dBodyDlg = m_pGL3dWingDlg = NULL;
 	m_bCullFaces     = false;
 	m_bShade         = true;
 	m_bSmooth        = true;
