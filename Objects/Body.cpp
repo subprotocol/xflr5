@@ -592,6 +592,183 @@ double CBody::Getv(double u, CVector r, bool bRight)
 
 
 
+bool CBody::ImportDefinition()
+{
+	CFrame NewFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+
+	int res, i, j, Line, NSideLines;
+	QString strong, FileName;
+	bool bRead;
+
+	double mtoUnit,xo,yo,zo;
+	xo = yo = zo = 0.0;
+
+	m_NStations = 0;
+
+	UnitsDlg Dlg;
+
+	Dlg.m_bLengthOnly = true;
+	Dlg.m_Length    = pMainFrame->m_LengthUnit;
+	Dlg.m_Area      = pMainFrame->m_AreaUnit;
+	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
+	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
+	Dlg.m_Force     = pMainFrame->m_ForceUnit;
+	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
+	Dlg.m_Question = "Choose the length unit to read this file :";
+	Dlg.InitDialog();
+
+	if(Dlg.exec() == QDialog::Accepted)
+	{
+		switch(Dlg.m_Length)
+		{
+			case 0:{//mdm
+				mtoUnit  = 1000.0;
+				break;
+			}
+			case 1:{//cm
+				mtoUnit  = 100.0;
+				break;
+			}
+			case 2:{//dm
+				mtoUnit  = 10.0;
+				break;
+			}
+			case 3:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+			case 4:{//in
+				mtoUnit  = 1000.0/25.4;
+				break;
+			}
+			case 5:{///ft
+				mtoUnit  = 1000.0/25.4/12.0;
+				break;
+			}
+			default:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+		}
+
+	}
+	else return false;
+
+	QString PathName;
+	bool bOK;
+	QByteArray textline;
+	const char *text;
+
+	PathName = QFileDialog::getOpenFileName(pMainFrame, "Open File",
+											pMainFrame->m_LastDirName,
+											"text file (*.txt)");
+	if(!PathName.length())		return false;
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+
+	QFile XFile(PathName);
+	if (!XFile.open(QIODevice::ReadOnly))
+	{
+		QString strange = "Could not read the file\n"+PathName;
+		QMessageBox::warning(pMainFrame, "Warning", strange);
+		return false;
+	}
+
+	QTextStream in(&XFile);
+
+	Line = 0;
+	bRead  = ReadAVLString(in, Line, strong);
+	m_BodyName = strong.trimmed();
+	//Header data
+
+	bRead = TRUE;
+	while (bRead)
+	{
+		bRead  = ReadAVLString(in, Line, strong);
+		if(!bRead) break;
+//qDebug() << strong;
+		if (strong.indexOf("BODYTYPE") >=0)
+		{
+			bRead  = ReadAVLString(in, Line, strong);
+//qDebug() << strong;
+			if(!bRead) break;
+			res = strong.toInt(&bOK);
+			if(bOK)
+			{
+				m_LineType = res;
+				if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
+			}
+		}
+		else if (strong.indexOf("OFFSET") >=0)
+		{
+			bRead  = ReadAVLString(in, Line, strong);
+//qDebug() << strong;
+			if(!bRead) break;
+
+			textline = strong.toAscii();
+			text = textline.constData();
+			res = sscanf(text, "%lf  %lf  %lf", &xo, &yo, &zo);
+
+
+			if(res==3)
+			{
+				xo /= mtoUnit;
+				zo /= mtoUnit;
+			}
+			//y0 is ignored, body is assumed centered along x-z plane
+		}
+		else if (strong.indexOf("FRAME", 0)  >=0)
+		{
+			NSideLines = ReadFrame(in, Line, &NewFrame, mtoUnit);
+
+			if (NSideLines)
+			{
+				//we need to insert this frame at the proper place in the body
+				for(i=0; i<m_NStations; i++)
+				{
+					if(NewFrame.m_Point[0].x < m_Frame[i].m_Point[0].x)
+					{
+						for(j=m_NStations; j>i; j--)
+						{
+							m_Frame[j].CopyFrame(m_Frame+j-1);
+						}
+						break;
+					}
+				}
+				m_Frame[i].CopyFrame(&NewFrame);
+				m_NSideLines = NSideLines;
+				m_NStations++;
+			}
+		}
+	}
+
+	XFile.close();
+
+	for(i=1; i<m_NStations; i++)
+	{
+		if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
+		{
+			QString strong = "Error reading "+m_BodyName+"\nFrames have different number of side points";
+			QMessageBox::warning(pMainFrame, "Error",strong);
+			return false;
+		}
+	}
+	for(i=0; i<m_NStations; i++)
+	{
+		m_FramePosition[i].x =  m_Frame[i].m_Point[0].x                                             + xo;
+		m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0 + zo;
+		for(j=0; j<m_NSideLines; j++)
+		{
+			m_Frame[i].m_Point[j].x = 0.0;
+			m_Frame[i].m_Point[j].z += zo;
+		}
+	}
+
+	return true;
+}
+
+
 void CBody::InsertSideLine(int SideLine)
 {
 	if(SideLine==0) SideLine++;
@@ -710,39 +887,6 @@ int CBody::InsertFrame(CVector Real)
 
 	return n+1;
 }
-
-
-int CBody::IsFramePos(CVector Real, double ZoomFactor)
-{ 
-	int k;
-	for (k=0; k<m_NStations; k++)
-	{
-        if (fabs(Real.x-m_FramePosition[k].x)<0.006/ZoomFactor &&
-            fabs(Real.y-m_FramePosition[k].z)<0.006/ZoomFactor) return k;
-	}
-	return -10;
-}
-
-
-bool CBody::IsInNURBSBody(CVector Pt)
-{
-	double u, v;
-	bool bRight;
-
-	u = Getu(Pt.x);
-	t_r.Set(0.0, Pt.y, Pt.z);
-
-	if(Pt.y>=0.0) bRight = true;	else bRight = false;
-
-	v = Getv(u, t_r, bRight);
-	GetPoint(u, v, bRight, t_N);
-
-	t_N.x = 0.0;
-
-	if(t_r.VAbs()>t_N.VAbs()) return false;
-	return true;
-}
-
 
 void CBody::InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size)
 {
@@ -1052,174 +1196,41 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
-bool CBody::ImportDefinition() 
+
+int CBody::IsFramePos(CVector Real, double ZoomFactor)
 {
-	CFrame NewFrame;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
-	int res, i, j, Line, NSideLines;
-    QString strong, FileName;
-	bool bRead;
-
-	double mtoUnit,xo,yo,zo;
-	xo = yo = zo = 0.0;
-
-	m_NStations = 0;
-
-	UnitsDlg Dlg;
-
-	Dlg.m_bLengthOnly = true;
-	Dlg.m_Length    = pMainFrame->m_LengthUnit;
-	Dlg.m_Area      = pMainFrame->m_AreaUnit;
-	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
-	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
-	Dlg.m_Force     = pMainFrame->m_ForceUnit;
-	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
-	Dlg.m_Question = "Choose the length unit to read this file :";
-	Dlg.InitDialog();
-
-	if(Dlg.exec() == QDialog::Accepted)
+	int k;
+	for (k=0; k<m_NStations; k++)
 	{
-		switch(Dlg.m_Length)
-		{
-			case 0:{//mdm
-				mtoUnit  = 1000.0;
-				break;
-			}
-			case 1:{//cm
-				mtoUnit  = 100.0;
-				break;
-			}
-			case 2:{//dm
-				mtoUnit  = 10.0;
-				break;
-			}
-			case 3:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-			case 4:{//in
-				mtoUnit  = 1000.0/25.4;
-				break;
-			}
-			case 5:{///ft
-				mtoUnit  = 1000.0/25.4/12.0;
-				break;
-			}
-			default:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-		}
-
+		if (fabs(Real.x-m_FramePosition[k].x)<0.006/ZoomFactor &&
+			fabs(Real.y-m_FramePosition[k].z)<0.006/ZoomFactor) return k;
 	}
-	else return false;
-
-	QFile XFile;
-	QString PathName;
-	bool bOK;
-	QByteArray textline;
-	const char *text;
-
-	PathName = QFileDialog::getOpenFileName(pMainFrame, "Open File",
-											pMainFrame->m_LastDirName,
-											"text file (*.txt)");
-	if(!PathName.length())		return false;
-	int pos = PathName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+	return -10;
+}
 
 
-	Line = 0;
-	bRead  = ReadAVLString(&XFile, Line, m_BodyName);
+bool CBody::IsInNURBSBody(CVector Pt)
+{
+	double u, v;
+	bool bRight;
 
-	//Header data
+	u = Getu(Pt.x);
+	t_r.Set(0.0, Pt.y, Pt.z);
 
-	bRead = TRUE;
+	if(Pt.y>=0.0) bRight = true;	else bRight = false;
 
-	while (bRead)
-	{
-		bRead  = ReadAVLString(&XFile, Line, strong);
-		if(!bRead) break;
+	v = Getv(u, t_r, bRight);
+	GetPoint(u, v, bRight, t_N);
 
-		if (strong.indexOf("BODYTYPE") >=0)
-		{
-			bRead  = ReadAVLString(&XFile, Line, strong);
-			if(!bRead) break;
-			res = strong.toInt(&bOK);
-			if(bOK)
-			{
-				m_LineType = res;
-				if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
-			}
-		}
-		else if (strong.indexOf("OFFSET") >=0)
-		{
-			bRead  = ReadAVLString(&XFile, Line, strong);
-			if(!bRead) break;
+	t_N.x = 0.0;
 
-			textline = strong.toAscii();
-			text = textline.constData();
-			res = sscanf(text, "%lf  %lf  %lf", &xo, &yo, &zo);
-
-
-			if(res==3)
-			{
-				xo /= mtoUnit;
-				zo /= mtoUnit;
-			}
-			//y0 is ignored, body is assumed centered along x-z plane
-		}
-		else if (strong.indexOf("FRAME", 0)  >=0)
-		{
-			NSideLines = ReadFrame(&XFile, Line, &NewFrame, mtoUnit);
-
-			if (NSideLines)
-			{
-				//we need to insert this frame at the proper place in the body
-				for(i=0; i<m_NStations; i++)
-				{
-					if(NewFrame.m_Point[0].x < m_Frame[i].m_Point[0].x)
-					{
-						for(j=m_NStations; j>i; j--)
-						{
-							m_Frame[j].CopyFrame(m_Frame+j-1);
-						}
-						break;
-					}
-				}
-				m_Frame[i].CopyFrame(&NewFrame);
-				m_NSideLines = NSideLines;
-				m_NStations++;
-			}
-		}
-	}
-
-	XFile.close();
-
-	for(i=1; i<m_NStations; i++)
-	{
-		if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
-		{
-			QString strong = "Error reading "+m_BodyName+"\nFrames have different number of side points";
-			QMessageBox::warning(pMainFrame, "Error",strong);
-			return false;
-		}
-	}
-	for(i=0; i<m_NStations; i++)
-	{
-		m_FramePosition[i].x =  m_Frame[i].m_Point[0].x                                             + xo;
-		m_FramePosition[i].z = (m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0 + zo;
-		for(j=0; j<m_NSideLines; j++)
-		{
-			m_Frame[i].m_Point[j].x = 0.0;
-			m_Frame[i].m_Point[j].z += zo;
-		}
-	}
-
+	if(t_r.VAbs()>t_N.VAbs()) return false;
 	return true;
 }
- 
-int CBody::ReadFrame(QFile *pXFile, int &Line, CFrame *pFrame, double const &Unit)
+
+
+
+int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit)
 {
 	CVector real;
 	double theta[MAXSIDELINES];
@@ -1235,16 +1246,17 @@ int CBody::ReadFrame(QFile *pXFile, int &Line, CFrame *pFrame, double const &Uni
 	bool bRead =true;
 	while (bRead)
 	{
-        if(!ReadAVLString(pXFile, Line,  strong)) bRead = false;
+		if(!ReadAVLString(in, Line,  strong)) bRead = false;
 
         textline = strong.toAscii();
         text = textline.constData();
         res = sscanf(text, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
+//qDebug() << strong << real.x << real.y << real.z;
 
         if(res!=3)
 		{
 			bRead = false;
-			Rewind1Line(pXFile, Line, strong);
+			Rewind1Line(in, Line, strong);
 		}
 		else 
 		{

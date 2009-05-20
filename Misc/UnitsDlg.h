@@ -56,6 +56,7 @@ private:
 	QLabel *m_pctrlWeightFactor;
 	QLabel *m_pctrltrQuestionFactor;
 	QLabel *m_pctrlMomentFactor;
+	QLabel *m_pctrlQuestion;
 
 private:
 	void InitDialog();

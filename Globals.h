@@ -34,8 +34,8 @@ bool IsEven(int n);
 bool IsBetween(int f, int f1, int f2);
 bool IsBetween(int f, double f1, double f2);
 Qt::PenStyle GetStyle(int s);
-bool ReadAVLString(QFile *pXFile, int &Line, QString &strong);
-bool Rewind1Line(QFile *pXFile, int &Line, QString &strong);
+bool ReadAVLString(QTextStream &in, int &Line, QString &strong);
+bool Rewind1Line(QTextStream &in, int &Line, QString &strong);
 
 
 void ExpFormat(double &f, int &exp);

@@ -4399,7 +4399,7 @@ void GL3dBodyDlg::SetupLayout()
 
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 5;
-//	m_pglWidget->setMinimumHeight(500);
+	m_pglWidget->setMinimumHeight(400);
 
 	QGridLayout *ThreeDParams = new QGridLayout;
 	m_pctrlAxes       = new QCheckBox("Axes");

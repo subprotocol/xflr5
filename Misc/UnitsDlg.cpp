@@ -55,6 +55,8 @@ void UnitsDlg::SetupLayout()
 	UnitsLayout->addWidget(lab5, 5,1);
 	UnitsLayout->addWidget(lab6, 6,1);
 
+	m_pctrlQuestion = new QLabel("Define the project units");
+
 	m_pctrlLengthFactor = new QLabel(" ");
 	m_pctrlSurfaceFactor = new QLabel(" ");
 	m_pctrlWeightFactor = new QLabel(" ");
@@ -99,6 +101,7 @@ void UnitsDlg::SetupLayout()
 	CommandButtons->addStretch(1);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	MainLayout->addWidget(m_pctrlQuestion);
 	MainLayout->addLayout(UnitsLayout);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
@@ -168,8 +171,10 @@ void UnitsDlg::InitDialog()
 		m_pctrlForce->setEnabled(false);
 		m_pctrlMoment->setEnabled(false);
 	}
-
+	m_pctrlQuestion->setText(m_Question);
 }
+
+
 void UnitsDlg::OnSelChanged(const QString &strong)
 {
 	m_Length  = m_pctrlLength->currentIndex();

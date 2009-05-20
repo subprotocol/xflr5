@@ -680,12 +680,8 @@ CBody* QMiarex::AddBody(CBody *pBody)
 		}
 		else
 		{
-			//make it simple for now
-			delete pBody; return NULL;
-
 			//Ask for user intentions
-
-/*			if(SetModBody(pBody))
+			if(SetModBody(pBody))
 			{
 				m_poaBody->append(pBody);
 				return pBody;
@@ -694,7 +690,7 @@ CBody* QMiarex::AddBody(CBody *pBody)
 			{
 				delete pBody;
 				return NULL;
-			}*/
+			}
 
 			bExists = false;
 		}
@@ -11494,6 +11490,7 @@ void QMiarex::OnEditCurBody()
 	memBody.Duplicate(m_pCurBody);
 	m_GL3dBody.SetBody(m_pCurBody);
 	m_GL3dBody.m_bEnableName = false;
+	m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -12212,6 +12209,7 @@ void QMiarex::OnHideUFOWPolars()
 
 void QMiarex::OnImportBody()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CBody *pNewBody = new CBody();
 	if(!pNewBody) return;
 	if(!pNewBody->ImportDefinition())
@@ -12227,10 +12225,26 @@ void QMiarex::OnImportBody()
 	}
 	else
 	{
-		m_pCurBody = AddBody(pNewBody);
+//		if(!m_pCurBody) return;
+		m_pCurBody = pNewBody;
+		CBody memBody;
+		memBody.Duplicate(m_pCurBody);
+		m_GL3dBody.SetBody(m_pCurBody);
+		m_GL3dBody.m_bEnableName = false;
+		m_GL3dBody.setWindowState(Qt::WindowMaximized);
+
+		if(m_GL3dBody.exec() == QDialog::Accepted)
+		{
+			m_bResetglBody = true;
+			m_bResetglBodyMesh = true;
+			m_bResetglGeom = true;
+			m_bResetglMesh = true;
+		}
+		else m_pCurBody->Duplicate(&memBody);
 
 		m_pCurBody = NULL;
 		UpdateView();
+		pMainFrame->SetSaveState(false);
 	}
 }
 

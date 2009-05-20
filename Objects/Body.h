@@ -48,7 +48,7 @@ public:
 	int InsertPoint(CVector Real);
 	int IsFramePos(CVector Real, double ZoomFactor);
 	int RemoveFrame(int n);
-    int ReadFrame(QFile *pXFile, int &Line, CFrame *pFrame, double const &Unit);
+	int ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit);
 
 	double GetLength();
 	double Getu(double x);

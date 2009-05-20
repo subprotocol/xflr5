@@ -467,7 +467,7 @@ void CSplinedPoints::DrawRearPoint(QPainter &painter, double scalex, double scal
 
 void CSplinedPoints::DrawSplines(QPainter & painter, double scalex, double scaley, QPoint Offset)
 {
-	int j,k,l;
+	int k,l;
 	double dist, x1, x2;
 	CSpline LinkSpline;
 	LinkSpline.SetSplineParams(m_Style, m_Width, m_Color);

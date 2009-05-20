@@ -30,7 +30,7 @@
 #include <QDateTime> 
 #include <QByteArray>
 #include <math.h>
- 
+#include <QtDebug>
 void ExpFormat(double &f, int &exp)
 {
 	if (f==0.0)
@@ -286,22 +286,21 @@ Qt::PenStyle GetStyle(int s)
 
 
 
-bool ReadAVLString(QFile *pXFile, int &Line, QString &strong)
+bool ReadAVLString(QTextStream &in, int &Line, QString &strong)
 {
 	bool bRead = true;
 	bool bComment = true;
 	int pos;
 	QString str;
-	QTextStream in(pXFile);
-
 
 	while(bComment && !in.atEnd())
 	{
 		bComment = false;
 
 		strong = in.readLine();
-		//TODO : seek for eof
 //		bRead = pXFile->ReadString(strong);
+		if(in.atEnd()) return false;
+
 
 		pos = strong.indexOf("#",0);
 		if(pos==0)		bComment = true;
@@ -316,7 +315,11 @@ bool ReadAVLString(QFile *pXFile, int &Line, QString &strong)
 		Line++;
 	}
 
-	return bRead;
+	if(in.atEnd())
+	{
+		return false;
+	}
+	return true;
 }
 
 
@@ -351,10 +354,10 @@ void ReadCString(QDataStream &ar, QString &strong)
 }
 
 
-bool Rewind1Line(QFile *pXFile, int &Line, QString &strong)
+bool Rewind1Line(QTextStream &in, int &Line, QString &strong)
 {
 	int length = strong.length() * 1+2;//1 char takes one byte in the file ?
-	QTextStream in(pXFile);
+
 	int pos = in.pos();
 	in.seek(pos-length);
 	Line--;
