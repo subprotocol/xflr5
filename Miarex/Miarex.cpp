@@ -10353,7 +10353,6 @@ void QMiarex::OnAllWPolarGraphScales()
 	}
 	else if(m_iView==4)
 	{
-//		double halfspan = m_pCurWing->m_Span/2.0;
 		m_CpGraph.SetAuto(true);
 		m_CpGraph.ResetXLimits();
 		m_CpGraph.ResetYLimits();
@@ -12746,6 +12745,9 @@ void QMiarex::OnScaleWing()
 			pMainFrame->UpdateUFOs();
 			SetUFO();
 		}
+		if(m_iView==1) CreateWOppCurves();
+		else if(m_iView==2) CreateWPolarCurves();
+		else if(m_iView==4) CreateCpCurves();
 		UpdateView();
 	}
 }
@@ -12961,6 +12963,7 @@ void QMiarex::OnShowLift()
 void QMiarex::OnShowIDrag()
 {
 	m_bICd = m_pctrlIDrag->isChecked();
+	m_bResetglDrag = true;
 	if(m_iView==1 || m_iView == 3)
 	{
 		if(!m_bAnimate) UpdateView();
@@ -12971,6 +12974,7 @@ void QMiarex::OnShowIDrag()
 void QMiarex::OnShowVDrag()
 {
 	m_bVCd = m_pctrlVDrag->isChecked();
+	m_bResetglDrag = true;
 	if(m_iView==1 || m_iView == 3)
 	{
 		if(!m_bAnimate) UpdateView();
@@ -13208,7 +13212,7 @@ void QMiarex::OnStreamlines()
 	m_bStream = m_pctrlStream->isChecked();
 	if(m_pctrlStream->isChecked())
 	{
-		m_bResetglStream = true;
+//		m_bResetglStream = true;
 	}
 	if(m_iView==3) UpdateView();
 }
@@ -13335,7 +13339,7 @@ void QMiarex::OnWPolars()
 	m_pctrlMiddleControls->setCurrentIndex(0);
 	m_pctrBottomControls->setCurrentIndex(0);
 
-//	SetWPlrLegendPos();//TODO remove
+	SetWPlrLegendPos();//TODO remove
 	CreateWPolarCurves();
 	SetCurveParams();
 	CheckButtons();
@@ -15405,7 +15409,7 @@ void QMiarex::SetUFO(QString UFOName)
 				pWing = (CWing*)m_poaWing->at(0);
 				if(pWing) FirstWingName = pWing->m_WingName;
 			}
-			else if(m_poaPlane->size())
+			if(m_poaPlane->size())
 			{
 				pPlane = (CPlane*)m_poaPlane->at(0);
 				if(pPlane) FirstPlaneName = pPlane->m_PlaneName;
@@ -15418,6 +15422,7 @@ void QMiarex::SetUFO(QString UFOName)
 					UFOName = FirstWingName;
 			}
 			else UFOName = FirstWingName;
+
 			if(!UFOName.size())
 			{
 				m_pCurPlane = NULL;
@@ -15430,6 +15435,7 @@ void QMiarex::SetUFO(QString UFOName)
 				m_pCurPOpp  = NULL;
 				if(m_iView==2)      CreateWPolarCurves();
 				else if(m_iView==1) CreateWOppCurves();
+				else if(m_iView==4) CreateCpCurves();
 				return;
 			}
 		}
@@ -15829,50 +15835,28 @@ void QMiarex::SetWGraphScale()
 		if(m_bHalfWing) xmin = 0.0;
 		else            xmin = -halfspan*pMainFrame->m_mtoUnit;
 
-//first iteration is to set Min and Maj units
-
-		m_WingGraph1.SetAuto(true);
-		m_WingGraph1.ResetXLimits();
-		m_WingGraph1.ResetYLimits();
-		m_WingGraph2.SetAuto(true);
-		m_WingGraph2.ResetXLimits();
-		m_WingGraph2.ResetYLimits();
-		m_WingGraph3.SetAuto(true);
-		m_WingGraph3.ResetXLimits();
-		m_WingGraph3.ResetYLimits();
-		m_WingGraph4.SetAuto(true);
-		m_WingGraph4.ResetXLimits();
-		m_WingGraph4.ResetYLimits();
-
 		m_WingGraph1.SetAutoX(false);
 		m_WingGraph1.SetXMin(xmin);
 		m_WingGraph1.SetXMax( halfspan*pMainFrame->m_mtoUnit);
-		m_WingGraph1.SetXScale();
 		m_WingGraph1.SetAutoXUnit();
-		m_WingGraph1.SetXMax( halfspan*pMainFrame->m_mtoUnit);
 
 		m_WingGraph2.SetAutoX(false);
 		m_WingGraph2.SetXMin(xmin);
 		m_WingGraph2.SetXMax( halfspan*pMainFrame->m_mtoUnit);
-		m_WingGraph2.SetXScale();
 		m_WingGraph2.SetAutoXUnit();
-		m_WingGraph2.SetXMax( halfspan*pMainFrame->m_mtoUnit);
 
 		m_WingGraph3.SetAutoX(false);
 		m_WingGraph3.SetXMin(xmin);
 		m_WingGraph3.SetXMax( halfspan*pMainFrame->m_mtoUnit);
-		m_WingGraph3.SetXScale();
 		m_WingGraph3.SetAutoXUnit();
-		m_WingGraph3.SetXMax( halfspan*pMainFrame->m_mtoUnit);
 
 		m_WingGraph4.SetAutoX(false);
 		m_WingGraph4.SetXMin(xmin);
 		m_WingGraph4.SetXMax( halfspan*pMainFrame->m_mtoUnit);
-		m_WingGraph4.SetXScale();
 		m_WingGraph4.SetAutoXUnit();
-		m_WingGraph4.SetXMax( halfspan*pMainFrame->m_mtoUnit);
 	}
 }
+
 
 void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 {
@@ -16116,9 +16100,11 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		pMainFrame->UpdateWOpps();
 	}
 
+	if(m_iView==1) CreateWOppCurves();
+	else if(m_iView==2) CreateWPolarCurves();
+	else if(m_iView==4) CreateCpCurves();
 	SetAnalysisParams();
 	SetCurveParams();
-	CreateWPolarCurves();
 	m_bResetglLegend = true;
 
 	m_pVLMDlg->m_pWPolar       = m_pCurWPolar;

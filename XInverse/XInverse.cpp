@@ -23,7 +23,7 @@
 #include <QGridLayout>
 #include <QtGui>
  
-#include "XInverse.h"
+#include "XInverse.h" 
 #include "InverseOptionsDlg.h"
 #include "FoilSelectionDlg.h"
 #include "PertDlg.h"

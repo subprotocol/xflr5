@@ -549,8 +549,8 @@ void Graph::SetAutoXMinUnit(bool bAuto)
 void Graph::SetAutoXUnit()
 {
 	int nxmin, nxmax;
-	xunit = 100.0*m_scalex;
-//	xunit = (xmax-xmin)/5.0;
+//	xunit = 100.0*m_scalex;
+	xunit = (xmax-xmin)/5.0;
 
 	if (xunit<1.0)
 	{
@@ -577,8 +577,8 @@ void Graph::SetAutoXUnit()
 	if (nxmax*xunit*1.0001 < xmax)
 		nxmax++;
 	int nx = nxmax - nxmin;
-	xmin = xo + (double)nxmin * xunit;
-	xmax = xo + (double)nxmax * xunit;
+//	xmin = xo + (double)nxmin * xunit;
+//	xmax = xo + (double)nxmax * xunit;
 	m_scalex  = (double)nx * xunit /m_w;
 
 }

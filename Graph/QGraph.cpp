@@ -313,8 +313,11 @@ void QGraph::DrawXTicks(QPainter &painter)
 	LabelPen.setWidth(m_Width);
 	painter.setPen(LabelPen);
 
+	double xt = xo-(xo-xmin);//one tick at the origin
+	int  nx = (int)((xo-xmin)/xunit);
+	xt = xo - nx*xunit;
+//qDebug() <<"start" <<xt << xmin <<xo;
 
-	double xt = xo-(xo-xmin)*1.0001;//one tick at the origin
 	double yp;
 	if(yo>=ymin && yo<=ymax) yp = yo;
 	else if(yo>ymax)         yp = ymax;

@@ -4249,7 +4249,6 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		m_pCpGraph->DrawLegend(painter, Place);//Graph::DrawLegend uses graph's legend font and color
 	}
 
-
 	// Write Titles and results
 	QString strong;
 
@@ -4652,8 +4651,6 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 	}
 
 	if (m_pCurGraph) m_pCurGraph->DrawGraph(Rect1, painter);
-
-
 }
 
 
@@ -4988,11 +4985,10 @@ void QXDirect::SetFoilScale()
 	QRect rect(10, 10, + m_rCltRect.width()-20, m_rCltRect.height()-2*m_FoilYPos);
 	m_pCpGraph->SetDrawRect(rect);
 
-	m_FoilOffset.rx() = m_rCltRect.left() +(int)(1.0*m_pCpGraph->GetMargin());
+	m_FoilOffset.rx() = rect.left() +(int)(1.0*m_pCpGraph->GetMargin());
 	m_FoilOffset.ry() = m_rCltRect.bottom()-m_FoilYPos;
 
-
-	m_fFoilScale = (m_rCltRect.width()-2.0*m_pCpGraph->GetMargin());
+	m_fFoilScale = (rect.width()-2.0*m_pCpGraph->GetMargin());
 	if(m_OppVar>=2)
 	{
 		double p0  = m_pCpGraph->xToClient(0.0);
