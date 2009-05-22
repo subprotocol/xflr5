@@ -170,7 +170,6 @@ bool VLMAnalysisDlg::AlphaLoop()
 	VLMComputePlane(m_AlphaMin, m_AlphaDelta, nrhs);
 
 	if (m_bCancel) return true;
-
 	return true;
 }
 

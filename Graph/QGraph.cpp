@@ -209,7 +209,7 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 	{
 		To.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
 		To.setY(int(pCurve->y[0]/scaley+m_ptoffset.y()));
-		painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
+		painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
 	}
 	painter.restore();
 }

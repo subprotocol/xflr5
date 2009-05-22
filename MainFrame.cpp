@@ -3152,7 +3152,8 @@ void MainFrame::OnLoadFile()
 
 		UpdateUFOs();
 		pMiarex->SetUFO();
-//		pMiarex->SetBody();
+		pMiarex->m_bIs2DScaleSet = false;
+		pMiarex->Set2DScale();
 		OnMiarex();
 
 		UpdateView();
@@ -3680,6 +3681,8 @@ void MainFrame::OnSelChangeUFO(int i)
 	UpdateWPolars();
 	UpdateWOpps();
 	pMiarex->SetWPlr(false);
+	pMiarex->m_bIs2DScaleSet = false;
+	pMiarex->Set2DScale();
 	pMiarex->UpdateView();
 }
 
@@ -4027,8 +4030,8 @@ void MainFrame::openRecentFile()
 	}
 	else if(m_iApp==MIAREX)
 	{
-		UpdateUFOs();
-		pMiarex->SetUFO();
+//		UpdateUFOs();
+//		pMiarex->SetUFO();
 		OnMiarex();
 		UpdateView();
 

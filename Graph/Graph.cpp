@@ -351,6 +351,13 @@ double Graph::GetX0()
 	return xo;
 }
 
+
+bool Graph::GetXMajGrid()
+{
+	return m_bXMajGrid;
+}
+
+
 void Graph::GetXMajGrid(bool &bstate, QColor &clr, int &style, int &width)
 {
 	bstate = m_bXMajGrid;
@@ -359,6 +366,11 @@ void Graph::GetXMajGrid(bool &bstate, QColor &clr, int &style, int &width)
 	width = m_XMajWidth;
 }
 
+
+bool Graph::GetXMinGrid()
+{
+	return m_bXMinGrid;
+}
 
 void Graph::GetXMinGrid(bool &state, bool &bAuto, QColor &clr, int &style, int &width, double &unit)
 {
@@ -395,6 +407,12 @@ double Graph::GetXUnit()
 	return xunit;
 }
 
+
+bool Graph::GetYMajGrid()
+{
+	return m_bYMajGrid;
+}
+
 void Graph::GetYMajGrid(bool &state, QColor &clr, int &style, int &width)
 {
 	state = m_bYMajGrid;
@@ -406,6 +424,12 @@ void Graph::GetYMajGrid(bool &state, QColor &clr, int &style, int &width)
 void Graph::GetYTitle(QString &str)
 {
 	str = m_YTitle;
+}
+
+
+bool Graph::GetYMinGrid()
+{
+	return m_bYMinGrid;
 }
 
 
@@ -1188,27 +1212,6 @@ int Graph::yToClient(double y)
 	return (int)(y/m_scaley + m_ptoffset.y());
 }
 
-
-
-bool Graph::GetXMajGrid()
-{
-	return m_bXMajGrid;
-}
-
-bool Graph::GetYMajGrid()
-{
-	return m_bYMajGrid;
-}
-
-bool Graph::GetXMinGrid()
-{
-	return m_bXMinGrid;
-}
-
-bool Graph::GetYMinGrid()
-{
-	return m_bYMinGrid;
-}
 
 void Graph::SetXMajGrid(bool const &bGrid)
 {

@@ -3789,6 +3789,8 @@ bool QMiarex::EditCurPlane()
 		}
 		SetUFO();
 		pMainFrame->UpdateWPolars();
+		m_bIs2DScaleSet = false;
+		SetScale();
 		OnAdjustToWing();
 		UpdateView();
 	}
@@ -7192,6 +7194,7 @@ void QMiarex::GLCreateStreamLines()
 		m_GLList++;
 		return;
 	}
+
 	QProgressDialog dlg("Calculating Streamlines...", "Cancel", 0, m_MatSize, this);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.setValue(0);
@@ -7422,7 +7425,6 @@ void QMiarex::GLCreateStreamLines()
 	memcpy(m_WakePanel, m_RefWakePanel,  m_WakeSize   * sizeof(CPanel));
 	memcpy(m_WakeNode,  m_RefWakeNode,   m_nWakeNodes * sizeof(CVector));
 
-//	dlg.ShowWindow(SW_HIDE);
 }
 
 
@@ -8488,7 +8490,6 @@ void QMiarex::GLDraw3D()
 				}
 				GLCreateStreamLines();
 				m_bResetglStream = false;
-//				UpdateView();
 			}
 		}
 	}
@@ -8499,7 +8500,6 @@ void QMiarex::GLDraw3D()
 		{
 			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
 			{
-
 				if(glIsList(SURFACESPEEDS))
 				{
 					glDeleteLists(SURFACESPEEDS,1);
@@ -8507,7 +8507,6 @@ void QMiarex::GLDraw3D()
 				}
 //				GLCreateSurfSpeeds();
 				m_bResetglFlow = false;
-//				UpdateView();
 			}
 		}
 	}
@@ -10364,7 +10363,6 @@ void QMiarex::OnAllWPolarGraphScales()
 void QMiarex::OnAxes()
 {
 	m_bAxes = m_pctrlAxes->isChecked();
-//	m_bResetglBody2D = true;
 	UpdateView();
 }
 
@@ -11513,7 +11511,6 @@ void QMiarex::OnEditUFO()
 {
 	//Edit the currently selected wing
 	if(!m_pCurWing)	return;
-	if(m_iView==5) return;
 
 	if(m_pCurPlane)
 	{
@@ -11619,6 +11616,7 @@ void QMiarex::OnEditUFO()
 		SetUFO();
 		pMainFrame->UpdateWPolars();
 		SetWPlr();
+		m_bIs2DScaleSet = false;
 		SetScale();
 		SetWGraphScale();
 		OnAdjustToWing() ;
@@ -12348,12 +12346,9 @@ void QMiarex::OnNewWing()
 		pMainFrame->SetSaveState(false);
 		m_pCurPlane = NULL;
 		SetUFO();
-		if(m_iView==1)
-		{
-			SetScale();
-			OnAdjustToWing();
-		}
+		m_bIs2DScaleSet = false;
 		SetScale();
+		if(m_iView==1)	OnAdjustToWing();
 		SetWGraphScale();
 
 		pMainFrame->UpdateUFOs();
@@ -12719,6 +12714,13 @@ void QMiarex::OnScaleWing()
 {
 	if(!m_pCurWing) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(m_pCurPlane)
+	{
+		QMessageBox::warning(window(),"Warning","No scaling function is implemented for plane objects");
+		return;
+	}
+
 	WingScaleDlg dlg;
 	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.InitDialog(m_pCurWing->m_Span, m_pCurWing->m_TChord[0], m_pCurWing->GetAverageSweep(), m_pCurWing->m_TTwist[m_pCurWing->m_NPanel]);
@@ -16734,11 +16736,9 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->show();
 	m_pVLMDlg->StartAnalysis();
 
-	if(m_iView!=2) SetWOpp(false, V0);
-
-	else CreateWPolarCurves();
+	SetWOpp(false, V0);
+	if(m_iView==2) CreateWPolarCurves();
 	pMainFrame->UpdateWOpps();
-	SetWOpp(true);
 
 	m_pVLMDlg->hide();
 
@@ -16751,6 +16751,7 @@ bool QMiarex::VLMIsSameSide(int p, int pp)
 	if(m_Panel[p].m_iPos==m_Panel[pp].m_iPos) return true;
 	return false;
 }
+
 
 void QMiarex::wheelEvent(QWheelEvent *event)
 {

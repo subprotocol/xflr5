@@ -161,7 +161,7 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 		pXInverse->mouseMoveEvent(event);
 	}
 }
-
+/*
 void TwoDWidget::showEvent(QShowEvent *event)
 {
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -187,7 +187,7 @@ void TwoDWidget::showEvent(QShowEvent *event)
 		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
 		pXInverse->SetScale(rect());
 	}
-}
+}*/
 
 
 void TwoDWidget::resizeEvent(QResizeEvent *event)
@@ -201,11 +201,14 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 	if(m_pXDirect)
 	{
 		pXDirect->SetFoilScale(rect());
+		pXDirect->SetPolarLegendPos();
 	}
 	if(m_pMiarex)
 	{
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->SetScale(rect());
+		if(pMiarex->m_iView==1) pMiarex->SetWingLegendPos();
+		if(pMiarex->m_iView==2) pMiarex->SetWPlrLegendPos();
 	}
 	if(m_pAFoil)
 	{
@@ -242,6 +245,7 @@ void TwoDWidget::wheelEvent(QWheelEvent *event)
 		pXInverse->wheelEvent(event);
 	}
 }
+
 
 void TwoDWidget::paintEvent(QPaintEvent *event)
 {
