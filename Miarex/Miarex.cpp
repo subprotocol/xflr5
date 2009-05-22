@@ -600,7 +600,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlMoment, SIGNAL(clicked()), this, SLOT(OnMoment()));
 	connect(m_pctrlDownwash, SIGNAL(clicked()), this, SLOT(OnDownwash()));
 	connect(m_pctrlStream, SIGNAL(clicked()), this, SLOT(OnStreamlines()));
-//	connect(m_pctrl3DSettings, SIGNAL(clicked()), this, SLOT(OnGL3DScale()));
+	connect(m_pctrlSurfVel, SIGNAL(clicked()), this, SLOT(OnSurfaceSpeeds()));
 
 	connect(m_pctrlAnimate, SIGNAL(clicked()), this, SLOT(OnAnimate()));
 	connect(m_pctrlAnimateSpeed, SIGNAL(sliderMoved(int)), this, SLOT(OnAnimateSpeed(int)));
@@ -7424,8 +7424,157 @@ void QMiarex::GLCreateStreamLines()
 	memcpy(m_Node,  m_MemNode,  m_nNodes  * sizeof(CVector));
 	memcpy(m_WakePanel, m_RefWakePanel,  m_WakeSize   * sizeof(CPanel));
 	memcpy(m_WakeNode,  m_RefWakeNode,   m_nWakeNodes * sizeof(CVector));
-
 }
+
+
+
+
+void QMiarex::GLCreateSurfSpeeds()
+{
+	if(!m_pCurWOpp || m_pCurWOpp->m_AnalysisType==1)
+	{
+		glNewList(SURFACESPEEDS, GL_COMPILE);
+		m_GLList++;
+		glEndList();
+		return;
+	}
+
+	QProgressDialog dlg("Calculating Surface speed vectors...", "Cancel", 0, m_MatSize, this);
+	dlg.setWindowModality(Qt::WindowModal);
+	dlg.setValue(0);
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QColor color;
+	int style, width, p;
+	double factor;
+	double r,g,b, length, sinT, cosT, beta, *Gamma, *Mu, *Sigma;
+	double x1, x2, y1, y2, z1, z2, xe, ye, ze, dlx, dlz;
+	CVector C, V, VT;
+	CVector RefPoint(0.0,0.0,0.0);
+
+	factor = 0.2;
+	if(m_pCurPOpp)
+	{
+		Gamma = m_pCurPOpp->m_G;
+		Mu    = m_pCurPOpp->m_G;
+		Sigma = m_pCurPOpp->m_Sigma;
+	}
+	else if (m_pCurWOpp)
+	{
+		Gamma = m_pCurWOpp->m_G;
+		Mu    = m_pCurWOpp->m_G;
+		Sigma = m_pCurWOpp->m_Sigma;
+	}
+	else
+	{
+		Gamma = NULL;
+		Mu    = NULL;
+		Sigma = NULL;
+	}
+
+	glNewList(SURFACESPEEDS, GL_COMPILE);
+	{
+		m_GLList++;
+
+		glEnable (GL_LINE_STIPPLE);
+		glPolygonMode(GL_FRONT,GL_LINE);
+
+		glLineWidth(m_WakeWidth);
+
+		if(m_WakeStyle == 1)     glLineStipple (1, 0x1111);
+		else if(m_WakeStyle== 2) glLineStipple (1, 0x0F0F);
+		else if(m_WakeStyle== 3) glLineStipple (1, 0x1C47);
+		else                     glLineStipple (1, 0xFFFF);// Solid
+
+
+		glColor3d(m_WakeColor.redF(),m_WakeColor.greenF(),m_WakeColor.blueF());
+
+		if(Gamma)
+		{
+			for (p=0; p<m_MatSize; p++)
+			{
+				VT.Set(m_pCurWOpp->m_QInf,0.0,0.0);
+
+				if(m_pCurWPolar->m_AnalysisType==2)
+				{
+					C.Copy(m_Panel[p].CtrlPt);
+					VT += m_pVLMDlg->GetSpeedVector(C, Gamma);
+					VT *= m_VelocityScale/100.0;
+//					if(!m_pCurWPolar->m_bTiltedGeom)
+						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
+						//Tilt the geometry w.r.t. sideslip
+//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
+				}
+				else if(m_pCurWPolar->m_AnalysisType==3)
+				{
+					C.Copy(m_Panel[p].CollPt);
+					m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
+					VT += V;
+					VT *= m_VelocityScale/100.0;
+//					if(!m_pCurWPolar->m_bTiltedGeom)
+						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
+						//Tilt the geometry w.r.t. sideslip
+//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
+				}
+
+				length = VT.VAbs()*factor;
+				xe     = C.x+factor*VT.x;
+				ye     = C.y+factor*VT.y;
+				ze     = C.z+factor*VT.z;
+				if(length>0.0)
+				{
+					cosT   = (xe-C.x)/length;
+					sinT   = (ze-C.z)/length;
+					dlx     = 0.15*length;
+					dlz     = 0.07*length;
+					beta   = atan((ye-C.y)/length)*180.0/pi;
+				}
+				else {
+					cosT   = 0.0;
+					sinT   = 0.0;
+					dlx    = 0.0;
+					dlz    = 0.0;
+				}
+
+				x1 = xe -dlx*cosT - dlz*sinT;
+				y1 = ye;
+				z1 = ze -dlx*sinT + dlz*cosT;
+
+				x2 = xe -dlx*cosT + dlz*sinT;
+				y2 = ye;
+				z2 = ze -dlx*sinT - dlz*cosT;
+
+				glBegin(GL_LINES);
+				{
+					glVertex3d(C.x, C.y, C.z);
+					glVertex3d(xe,ye,ze);
+				}
+				glEnd();
+
+				glBegin(GL_LINES);
+				{
+					glVertex3d(xe, ye, ze);
+					glVertex3d(x1, y1, z1);
+				}
+				glEnd();
+
+				glBegin(GL_LINES);
+				{
+					glVertex3d(xe, ye, ze);
+					glVertex3d(x2, y2, z2);
+				}
+				glEnd();
+
+				dlg.setValue(p);
+				if(dlg.wasCanceled()) break;
+			}
+		}
+		glDisable (GL_LINE_STIPPLE);
+	}
+	glEndList();
+}
+
+
 
 
 void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
@@ -8505,7 +8654,7 @@ void QMiarex::GLDraw3D()
 					glDeleteLists(SURFACESPEEDS,1);
 					m_GLList -=1;
 				}
-//				GLCreateSurfSpeeds();
+				GLCreateSurfSpeeds();
 				m_bResetglFlow = false;
 			}
 		}
@@ -9659,11 +9808,13 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	LLTDlg.show();
 	LLTDlg.StartAnalysis();
 
-	if(m_iView!=2) SetWOpp(false, V0);
-	
-	else CreateWPolarCurves();
+	if(m_bLogFile && LLTDlg.m_bWarning) pMainFrame->OnLogFile();
+
 	pMainFrame->UpdateWOpps();
-	SetWOpp(true);
+	SetWOpp(false, V0);
+
+	if(m_iView==2) CreateWPolarCurves();
+
 	UpdateView();
 }
 
@@ -10457,9 +10608,20 @@ void QMiarex::OnAnalyze()
 		}
 	}
 
-	if(m_pCurWPolar->m_AnalysisType==1)      LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
-	else if(m_pCurWPolar->m_AnalysisType==2) VLMAnalyze(V0, VMax, VDelta, m_bSequence);
-	else if(m_pCurWPolar->m_AnalysisType==3) PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+
+	if(m_pCurWPolar->m_AnalysisType==1)
+	{
+		LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
+	}
+	else if(m_pCurWPolar->m_AnalysisType==2)
+	{
+		VLMAnalyze(V0, VMax, VDelta, m_bSequence);
+	}
+	else if(m_pCurWPolar->m_AnalysisType==3)
+	{
+		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+	}
+
 }
 
 
@@ -13231,6 +13393,18 @@ void QMiarex::OnSurfaces()
 }
 
 
+
+void QMiarex::OnSurfaceSpeeds()
+{
+	m_bSpeeds = m_pctrlSurfVel->isChecked();
+	if(m_pctrlSurfVel->isChecked())
+	{
+//		m_bResetglStream = true;
+	}
+	if(m_iView==3) UpdateView();
+}
+
+
 void QMiarex::OnSetupLight()
 {
 	if(m_iView!=3) return;
@@ -14071,11 +14245,11 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
 
-	if(m_iView!=2) SetWOpp(false, V0);
+	if(m_bLogFile && m_pPanelDlg->m_bWarning) pMainFrame->OnLogFile();
 
-	else CreateWPolarCurves();
 	pMainFrame->UpdateWOpps();
-	SetWOpp(true);
+	SetWOpp(false, V0);
+	if(m_iView==2) CreateWPolarCurves();
 
 	m_pPanelDlg->hide();
 
@@ -15292,10 +15466,10 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 	// else set it to NULL
 	if(!m_pCurPlane) return false;
 
+
 	CPOpp *pPOpp = NULL;
 	if(bCurrent) pPOpp = m_pCurPOpp;
 	else         pPOpp = GetPOpp(Alpha);
-
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong;
 	double x;
@@ -15316,7 +15490,6 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 	}
 
 //	if(!pPOpp) pPOpp = m_pCurPOpp;
-
 
 	if(!pPOpp)
 	{
@@ -15416,14 +15589,16 @@ void QMiarex::SetUFO(QString UFOName)
 				pPlane = (CPlane*)m_poaPlane->at(0);
 				if(pPlane) FirstPlaneName = pPlane->m_PlaneName;
 			}
-			if(FirstPlaneName.length())
+			if(FirstPlaneName.length() && FirstWingName.length())
 			{
 				if(FirstWingName.compare(FirstPlaneName, Qt::CaseInsensitive) >0)
 					UFOName = FirstPlaneName;
 				else
 					UFOName = FirstWingName;
 			}
-			else UFOName = FirstWingName;
+			else if(FirstPlaneName.length()) UFOName = FirstPlaneName;
+			else if(FirstWingName.length())  UFOName = FirstWingName;
+
 
 			if(!UFOName.size())
 			{
@@ -15445,6 +15620,7 @@ void QMiarex::SetUFO(QString UFOName)
 
 	m_pCurPlane = GetPlane(UFOName);
 	m_pCurWing  = GetWing(UFOName);
+
 
 	pMainFrame->UpdateWPolars();
 
@@ -16559,13 +16735,8 @@ void QMiarex::SnapClient(QString const &FileName, int FileType)
 	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
 	QImage FlippedImaged = Image.mirrored(false, true);	//flip vertically
 
-	delete pPixelData;
-
 	FlippedImaged.save(FileName);
 }
-
-
-
 
 
 
@@ -16736,9 +16907,10 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->show();
 	m_pVLMDlg->StartAnalysis();
 
+	if(m_bLogFile && m_pVLMDlg->m_bWarning) pMainFrame->OnLogFile();
+	pMainFrame->UpdateWOpps();
 	SetWOpp(false, V0);
 	if(m_iView==2) CreateWPolarCurves();
-	pMainFrame->UpdateWOpps();
 
 	m_pVLMDlg->hide();
 

@@ -2668,8 +2668,8 @@ void PanelAnalysisDlg::StartAnalysis()
 	else 	if(m_pWPolar->m_Type==4)                          ReLoop();
 	else 	if(m_pWPolar->m_Type==5 || m_pWPolar->m_Type==6)  ControlLoop();
 
-	if (!m_bCancel && !m_bWarning) strong = "\r\nVLM Analysis completed successfully\r\n";
-	else if (m_bWarning)           strong = "\r\nVLM Analysis completed ... Errors encountered\r\n";
+	if (!m_bCancel && !m_bWarning) strong = "\r\nPanel Analysis completed successfully\r\n";
+	else if (m_bWarning)           strong = "\r\nPanel Analysis completed ... Errors encountered\r\n";
 	AddString(strong);
 	m_bIsFinished = true;
 	m_pctrlCancel->setText("Close");

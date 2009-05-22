@@ -1689,6 +1689,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
+	PanelAnalysisDlg *p3DPanelDlg = (PanelAnalysisDlg*)s_p3DPanelDlg;
 	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
 
 	// calculates the lift coefficients from the vortices strengths
@@ -1864,7 +1865,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 
 				string = QString(",  Cl = %6.2f could not be interpolated\r\n").arg(m_Cl[m]);
 				strong+=string;
-//				if(m_bTrace) p3DDlg->AddString(strong);
+				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
 
 			}
@@ -1879,7 +1880,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 
 				string = QString(",  Cl = %1 is outside the flight envelope\r\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
-//				if(m_bTrace) p3DDlg->AddString(strong);
+				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
 			}
 			m++;

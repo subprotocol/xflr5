@@ -1328,7 +1328,6 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			pos = m_pWing->m_MatSize;
 
 			Station = m_pWing->m_NStation;
-			AddString("         Done...\r\n");
 
 			if(m_pWing2)
 			{
@@ -1422,7 +1421,6 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			VLMSetDownwash(m_Gamma+q*m_MatSize);
 
 			if(m_bPointOut) m_bWarning = true;
-
 			if(m_bConverged)
 			{
 				if(m_pPlane)

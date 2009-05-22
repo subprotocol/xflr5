@@ -454,9 +454,9 @@ void MainFrame::CreateActions()
 	restoreToolbarsAct->setStatusTip(tr("Restores the toolbars to their original state"));
 	connect(restoreToolbarsAct, SIGNAL(triggered()), this, SLOT(OnRestoreToolbars()));
 
-	saveViewToImageFileAct = new QAction("Save to Image File", this);
+	saveViewToImageFileAct = new QAction("Save View to Image File", this);
 	saveViewToImageFileAct->setShortcut(tr("Ctrl+I"));
-	saveViewToImageFileAct->setStatusTip(tr("SAves the current view to a file on disk"));
+	saveViewToImageFileAct->setStatusTip(tr("Saves the current view to a file on disk"));
 	connect(saveViewToImageFileAct, SIGNAL(triggered()), this, SLOT(OnSaveViewToImageFile()));
 
 
@@ -663,6 +663,8 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(ResetXYScaleAct);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(AFoilGridAct);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(saveViewToImageFileAct);
 }
 
 
@@ -1267,6 +1269,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addAction(advancedSettings);
 	WOppCtxMenu->addAction(viewLogFile);
+	WOppCtxMenu->addAction(saveViewToImageFileAct);
 
 
 	//Polar View Context Menu
@@ -1286,6 +1289,9 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addAction(hideAllWPlrs);
 	WPlrCtxMenu->addAction(showAllWPlrs);
+	WPlrCtxMenu->addSeparator();
+	WPlrCtxMenu->addAction(saveViewToImageFileAct);
+
 
 	//W3D View Context Menu
 	W3DCtxMenu = new QMenu("Context Menu",this);
@@ -1302,6 +1308,9 @@ void MainFrame::CreateMiarexMenus()
 	W3DCtxMenu->addSeparator();
 	W3DCtxMenu->addAction(W3DScalesAct);
 	W3DCtxMenu->addAction(W3DLightAct);
+	W3DCtxMenu->addSeparator();
+	W3DCtxMenu->addAction(saveViewToImageFileAct);
+
 }
 
 
@@ -3072,42 +3081,6 @@ void MainFrame::OnGuidelines()
 }
 
 
-void MainFrame::OnNewProject()
-{	
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_bArcball = false;
-	if(!m_bSaved)
-	{
-		int resp = QMessageBox::question(window(), "QFLR5", "Save the current project ?",
-										  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-
-		if (QMessageBox::Cancel == resp)
-		{
-			return;
-		}
-		else if (QMessageBox::Yes == resp)
-		{
-			if(SaveProject(m_FileName))
-			{
-				SetSaveState(true);
-				statusBar()->showMessage("The project " + m_ProjectName + " has been saved");
-			}
-			else return; //save failed, don't close
-		}
-		else if (QMessageBox::No == resp)
-		{
-			DeleteProject();
-		}
-	}
-	else
-	{
-		DeleteProject();
-	}
-
-	UpdateView();
-}
-
-
 void MainFrame::OnLoadFile()
 {
 	QString PathName;
@@ -3149,9 +3122,8 @@ void MainFrame::OnLoadFile()
 	}
 	else if(m_iApp==MIAREX)
 	{
-
-		UpdateUFOs();
-		pMiarex->SetUFO();
+//		UpdateUFOs();
+//		pMiarex->SetUFO();
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
 		OnMiarex();
@@ -3187,13 +3159,11 @@ void MainFrame::OnMiarex()
 	pXDirect->StopAnimate();
 
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;	m_iApp = MIAREX;
-//	QString strong ;
-//	pMiarex->m_pCurGraph->GetGraphName(strong);
+
 	m_pctrlXDirectToolBar->hide();
 	m_pctrlXInverseToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlMiarexToolBar->show();
-//	m_pctrl3DScalesWidget->show();
 
 	m_pctrlXDirectWidget->hide();
 	m_pctrlAFoilWidget->hide();
@@ -3205,6 +3175,42 @@ void MainFrame::OnMiarex()
 	UpdateUFOs();
 	SetMenus();
 	SetCentralWidget();
+	UpdateView();
+}
+
+
+void MainFrame::OnNewProject()
+{
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
+	if(!m_bSaved)
+	{
+		int resp = QMessageBox::question(window(), "QFLR5", "Save the current project ?",
+										  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+
+		if (QMessageBox::Cancel == resp)
+		{
+			return;
+		}
+		else if (QMessageBox::Yes == resp)
+		{
+			if(SaveProject(m_FileName))
+			{
+				SetSaveState(true);
+				statusBar()->showMessage("The project " + m_ProjectName + " has been saved");
+			}
+			else return; //save failed, don't close
+		}
+		else if (QMessageBox::No == resp)
+		{
+			DeleteProject();
+		}
+	}
+	else
+	{
+		DeleteProject();
+	}
+
 	UpdateView();
 }
 
@@ -4032,9 +4038,10 @@ void MainFrame::openRecentFile()
 	{
 //		UpdateUFOs();
 //		pMiarex->SetUFO();
+		pMiarex->m_bIs2DScaleSet = false;
+		pMiarex->Set2DScale();
 		OnMiarex();
 		UpdateView();
-
 	}
 	else if(m_iApp==DIRECTDESIGN)
 	{
@@ -5564,7 +5571,7 @@ void MainFrame::UpdateWOpps()
 	{
 		m_pctrlWOpp->setEnabled(false);
 		pMiarex->m_pCurWOpp = NULL;
-//		Miarex.SetWOpp(true);
+//		pMiarex->SetWOpp(true);
 		return;
 	}
 

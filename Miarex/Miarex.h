@@ -192,6 +192,7 @@ private slots:
 	void OnMoment();
 	void OnResetWingScale();
 	void OnStreamlines();
+	void OnSurfaceSpeeds();
 
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
@@ -216,6 +217,7 @@ private:
 	void GLCreateLiftForce();
 	void GLCreateMoments();
 	void GLCreateStreamLines();
+	void GLCreateSurfSpeeds();
 	void GLCreateCp();
 	void GLCreateCpLegend();
 	void GLCreateWingLegend();
