@@ -361,6 +361,7 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 	{
 		case MIAREX:
 		{
+			W3DScalesAct->setChecked(m_pctrl3DScalesWidget->isVisible());
 			QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 			pMiarex->m_pCurGraph = pMiarex->GetGraph(CltPt);
 			if(pMiarex->m_iView==1)       WOppCtxMenu->exec(ScreenPt);
@@ -922,6 +923,7 @@ void MainFrame::CreateMiarexActions()
 	connect(W3DPrefsAct, SIGNAL(triggered()), pMiarex, SLOT(On3DPrefs()));
 
 	W3DScalesAct = new QAction(tr("3D Scales"), this);
+	W3DScalesAct->setCheckable(true);
 	connect(W3DScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnGL3DScale()));
 
 	W3DLightAct = new QAction(tr("3D Light Options"), this);
@@ -3122,14 +3124,12 @@ void MainFrame::OnLoadFile()
 	}
 	else if(m_iApp==MIAREX)
 	{
-//		UpdateUFOs();
-//		pMiarex->SetUFO();
+		UpdateUFOs();
+		pMiarex->SetUFO();
+		pMiarex->m_bArcball = false;
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
-		OnMiarex();
-
 		UpdateView();
-
 	}
 	else if(m_iApp==DIRECTDESIGN)
 	{

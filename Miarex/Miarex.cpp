@@ -19,13 +19,13 @@
 *****************************************************************************/
 
 #include <QGLWidget>
-#include <QProgressDialog>
 #include <QAction>
 #include "Miarex.h"
 #include "../MainFrame.h"
 #include "../TwoDWidget.h"
 #include "../Globals.h"
 #include "../Misc/RenameDlg.h"
+#include "../Misc/ProgressDlg.h"
 #include "../Graph/GraphVariableDlg.h"
 #include "../Graph/WingGraphVarDlg.h"
 #include "WAdvancedDlg.h"
@@ -612,6 +612,10 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
+	connect(m_pctrlKeepCpSection,  SIGNAL(clicked()), this, SLOT(OnKeepCpSection()));
+	connect(m_pctrlResetCpSection, SIGNAL(clicked()), this, SLOT(OnResetCpSection()));
+	connect(m_pctrlCpSectionSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnCpSection(int)));
+	connect(m_pctrlSpanPos, SIGNAL(editingFinished()), this, SLOT(OnCpPosition()));
 
 	connect(m_pctrlAxes, SIGNAL(clicked()), SLOT(OnAxes()));
 	connect(m_pctrlX, SIGNAL(clicked()), SLOT(On3DFront()));
@@ -1961,7 +1965,6 @@ void QMiarex::CreateCpCurves()
 	CVector N;
 	CCurve *pCurve = NULL;
 	QString str1, str2, str3;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	for (i=0; i<4; i++)
 	{
@@ -2004,7 +2007,6 @@ void QMiarex::CreateCpCurves()
 			if(m_pCurWing->m_pPanel[p].m_bIsTrailing && m_pCurWing->m_pPanel[p].m_iPos<=0)
 			{
 				SpanInc += m_pCurWing->m_pPanel[p].GetWidth();
-//TRACE("%10.3f     %10.3f\n", SpanPos, SpanInc);
 				if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing->m_Span<0.001)
 				{
 					bFound = true;
@@ -6371,6 +6373,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 	int Istyle, Iwidth, Vstyle, Vwidth;
 	QColor Icolor, Vcolor;
 
+	double coef = 5.0;
 
 	GLushort IDash, VDash;
 
@@ -6427,8 +6430,8 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 					xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 					dih = pWing->GetDihedral(yob)*pi/180.0;
-					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/1.0;
-					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/1.0;
+					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
+					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
 					if(m_bICd)
 					{
 						glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
@@ -6485,7 +6488,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 							dih = pWing->GetDihedral(yob)*pi/180.0;
 
 							amp  = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-							amp *= m_DragScale/1.0;
+							amp *= m_DragScale/coef;
 
 							glVertex3d(xt + amp * cos(dih)*cosa,
 									   yt,
@@ -6512,7 +6515,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 							if(m_bICd) amp+=pWOpp->m_ICd[i];
 							amp +=pWOpp->m_PCd[i];
 							amp *= q0*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-							amp *= m_DragScale/1.0;
+							amp *= m_DragScale/coef;
 
 							glVertex3d( xt + amp * cos(dih)*cosa,
 										yt ,
@@ -6532,8 +6535,8 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 					for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
 					{
 						pWing->m_Surface[j].GetTrailingPt(k, C);
-						amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/30.0;
-						amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/30.0;
+						amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/coef;
+						amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/coef;
 						if(m_bICd)
 						{
 							glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
@@ -6594,7 +6597,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 								{
 									pWing->m_Surface[j].GetTrailingPt(k, C);
 									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/30.0;
+									amp *= m_DragScale/coef;
 									glVertex3d(C.x + amp*cosa,
 											   C.y,
 											   C.z - amp*sina);
@@ -6604,20 +6607,24 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 						}
 						glEnd();
 					}
-					if(m_bVCd){
+					if(m_bVCd)
+					{
 						glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
 						glLineStipple (1, VDash);// Solid
 						glLineWidth((GLfloat)(Vwidth));
 						glBegin(GL_LINE_STRIP);
+						{
 							i = 0;
-							for (j=0; j<pWing->m_NSurfaces; j++){//All surfaces
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++){
+							for (j=0; j<pWing->m_NSurfaces; j++)
+							{
+								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
+								{
 									pWing->m_Surface[j].GetTrailingPt(k, C);
 									amp=0.0;
 									if(m_bICd) amp+=pWOpp->m_ICd[i];
 									amp +=pWOpp->m_PCd[i];
 									amp *= q0*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/30.0;
+									amp *= m_DragScale/coef;
 
 									glVertex3d(C.x + amp*cosa,
 											   C.y,
@@ -6625,26 +6632,33 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 									i++;
 								}
 							}
+						}
 						glEnd();
 					}
 				}
-				else {
-					if(m_bICd){
+				else
+				{
+					if(m_bICd)
+					{
 						glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
 						glLineStipple (1, IDash);// Solid
 						glLineWidth((GLfloat)Iwidth);
 						i = 0;
-						for (j=0; j<pWing->m_NSurfaces; j++){//All surfaces
+						for (j=0; j<pWing->m_NSurfaces; j++)
+						{
 							glBegin(GL_LINE_STRIP);
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++){
+							{
+								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
+								{
 									pWing->m_Surface[j].GetTrailingPt(k, C);
 									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/30.0;
+									amp *= m_DragScale/coef;
 									glVertex3d(C.x + amp*cosa,
 											   C.y,
 											   C.z - amp*sina);
 									i++;
 								}
+							}
 							glEnd();
 						}
 					}
@@ -6654,16 +6668,18 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 						glLineStipple (1, VDash);// Solid
 						glLineWidth((GLfloat)Vwidth);
 						i = 0;
-						for (j=0; j<pWing->m_NSurfaces; j++){//All surfaces
+						for (j=0; j<pWing->m_NSurfaces; j++)
+						{
 							glBegin(GL_LINE_STRIP);
 							{
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++){
+								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
+								{
 									pWing->m_Surface[j].GetTrailingPt(k, C);
 									amp=0.0;
 									if(m_bICd) amp+=pWOpp->m_ICd[i];
 									amp +=pWOpp->m_PCd[i];
 									amp *= q0*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/30.0;
+									amp *= m_DragScale/coef;
 
 									glVertex3d(C.x + amp*cosa,
 											   C.y,
@@ -7195,9 +7211,11 @@ void QMiarex::GLCreateStreamLines()
 		return;
 	}
 
-	QProgressDialog dlg("Calculating Streamlines...", "Cancel", 0, m_MatSize, this);
+	ProgressDlg dlg;
+	dlg.InitDialog(0, m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
-	dlg.setValue(0);
+	dlg.SetValue(0);
+	dlg.show();
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
@@ -7362,27 +7380,6 @@ void QMiarex::GLCreateStreamLines()
 						D.z += p3DScales->m_ZOffset;
 						ds = p3DScales->m_DeltaL;
 
-/*						// One very special case is where we initiate the streamlines exactly at the T.E.
-						// without offset either in X ou Z directions
-						if(p3DScales->m_pos==1 && abs(p3DScales->m_XOffset)<0.001 && abs(p3DScales->m_ZOffset)<0.001)
-						{
-							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-							V1 = m_Node[pWing->m_pPanel[p].m_iTB] - m_Node[pWing->m_pPanel[p].m_iLB];
-							V1. Normalize();
-
-							if(m_pCurWOpp->m_AnalysisType==3)
-							{
-								//corresponding upper panel is the next one coming up
-								for (i=p; i<pWing->m_MatSize; i++)
-								{
-									if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
-								}
-								V2 = m_Node[pWing->m_pPanel[i].m_iTB] - m_Node[pWing->m_pPanel[i].m_iLB];
-								V2.Normalize();
-								V1 = (V1+V2);
-								V1.Normalize();//V1 is parallel to the bisector angle
-							}
-						}*/
 						V1.Set(0.0,0.0,0.0);
 
 						glBegin(GL_LINE_STRIP);
@@ -7407,11 +7404,12 @@ void QMiarex::GLCreateStreamLines()
 						glEnd();
 					}
 
-					dlg.setValue(m);
+					dlg.SetValue(m);
 					m++;
-					if(dlg.wasCanceled()) break;
+
+					if(dlg.IsCanceled()) break;
 				}
-				if(dlg.wasCanceled()) break;
+				if(dlg.IsCanceled()) break;
 			}
 		}
 
@@ -7439,15 +7437,16 @@ void QMiarex::GLCreateSurfSpeeds()
 		return;
 	}
 
-	QProgressDialog dlg("Calculating Surface speed vectors...", "Cancel", 0, m_MatSize, this);
-	dlg.setWindowModality(Qt::WindowModal);
-	dlg.setValue(0);
+	ProgressDlg dlg;
+	dlg.InitDialog(0, m_MatSize);
+	dlg.setModal(true);
+	dlg.SetValue(0);
+	dlg.show();
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QColor color;
-	int style, width, p;
+	int p;
 	double factor;
-	double r,g,b, length, sinT, cosT, beta, *Gamma, *Mu, *Sigma;
+	double length, sinT, cosT, beta, *Gamma, *Mu, *Sigma;
 	double x1, x2, y1, y2, z1, z2, xe, ye, ze, dlx, dlz;
 	CVector C, V, VT;
 	CVector RefPoint(0.0,0.0,0.0);
@@ -7565,15 +7564,16 @@ void QMiarex::GLCreateSurfSpeeds()
 				}
 				glEnd();
 
-				dlg.setValue(p);
-				if(dlg.wasCanceled()) break;
+				dlg.SetValue(p);
+				if(dlg.IsCanceled()) break;
 			}
 		}
 		glDisable (GL_LINE_STIPPLE);
 	}
 	glEndList();
-}
 
+	dlg.hide();
+}
 
 
 
@@ -7601,7 +7601,8 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 		glColor3d(m_XTopColor.redF(),m_XTopColor.greenF(),m_XTopColor.blueF());
 
 		glLineWidth((GLfloat)m_XTopWidth);
-		if(pWOpp){
+		if(pWOpp)
+		{
 			if(pWOpp->m_AnalysisType==1)
 			{
 				glBegin(GL_LINE_STRIP);
@@ -7618,7 +7619,8 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 				}
 				glEnd();
 			}
-			else{
+			else
+			{
 				if(!pWing->m_bIsFin)
 				{
 					glBegin(GL_LINE_STRIP);
@@ -7678,10 +7680,14 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 		glColor3d(m_XBotColor.redF(),m_XBotColor.greenF(),m_XBotColor.blueF());
 
 		glLineWidth((GLfloat)m_XBotWidth);
-		if(pWOpp){
-			if(pWOpp->m_AnalysisType==1){
+		if(pWOpp)
+		{
+			if(pWOpp->m_AnalysisType==1)
+			{
 				glBegin(GL_LINE_STRIP);
-					for (i=1; i<pWOpp->m_NStation; i++){
+				{
+					for (i=1; i<pWOpp->m_NStation; i++)
+					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 						xt = pWing->GetOffset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
@@ -7690,32 +7696,44 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 
 						glVertex3d(xt,yt, zt);
 					}
+				}
 				glEnd();
 			}
-			else{
-				if(!pWing->m_bIsFin){
+			else
+			{
+				if(!pWing->m_bIsFin)
+				{
 					glBegin(GL_LINE_STRIP);
+					{
 						int m = 0;
-						for(j=0; j<pWing->m_NSurfaces; j++){
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++){
+						for(j=0; j<pWing->m_NSurfaces; j++)
+						{
+							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
+							{
 								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
 							}
 						}
+					}
 					glEnd();
 				}
-				else{
+				else
+				{
 					int m = 0;
-					for(j=0; j<pWing->m_NSurfaces; j++){
+					for(j=0; j<pWing->m_NSurfaces; j++)
+					{
 						glBegin(GL_LINE_STRIP);
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++){
+						{
+							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
+							{
 								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
 							}
+						}
 						glEnd();
 					}
 				}
@@ -10522,7 +10540,16 @@ void QMiarex::OnAnalyze()
 {
 	int l;
 	double V0, VMax, VDelta;
-	if(!m_pCurWing || !m_pCurWPolar) return;
+	if(!m_pCurWing)
+	{
+		QMessageBox::warning(this, "Warning", "Define a wing or a plane object before running a calculation");
+		return;
+	}
+	if(!m_pCurWPolar)
+	{
+		QMessageBox::warning(this, "Warning", "Define an analysis/polar before running a calculation");
+		return;
+	}
 
 //	Read Analysis Params;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -12242,7 +12269,10 @@ void QMiarex::OnGL3DScale()
 		return;
 	}
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->m_pctrl3DScalesWidget->show();
+	if(pMainFrame->m_pctrl3DScalesWidget->isVisible())	pMainFrame->m_pctrl3DScalesWidget->hide();
+	else                                               	pMainFrame->m_pctrl3DScalesWidget->show();
+
+	pMainFrame->W3DScalesAct->setChecked(pMainFrame->m_pctrl3DScalesWidget->isVisible());
 //	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();
 //	else                               pMainFrame->m_pctrl3DScalesWidget->hide();
 }
@@ -12279,6 +12309,49 @@ void QMiarex::OnHideAllWPolars()
 	UpdateView();
 }
 
+
+
+void QMiarex::OnHideAllWPlrOpps()
+{
+	int i;
+	//Switch all WOpps view to on for the current UFO and WPolar
+	m_bCurWOppOnly = false;
+
+	CPOpp *pPOpp;
+	CWOpp *pWOpp;
+	if(m_pCurPlane)
+	{
+		for (i=0; i< m_poaPOpp->size(); i++)
+		{
+			pPOpp = (CPOpp*)m_poaPOpp->at(i);
+			if (pPOpp->m_PlaneName == m_pCurWPolar->m_UFOName &&
+				pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName)
+			{
+				pPOpp->m_bIsVisible = false;
+			}
+		}
+	}
+	else if (m_pCurWing)
+	{
+		for (i=0; i< m_poaWOpp->size(); i++)
+		{
+			pWOpp = (CWOpp*)m_poaWOpp->at(i);
+			if (pWOpp->m_WingName == m_pCurWPolar->m_UFOName &&
+				pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName)
+			{
+				pWOpp->m_bIsVisible = false;
+			}
+		}
+	}
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->SetSaveState(false);
+	SetCurveParams();
+
+	if (m_iView==1)     CreateWOppCurves();
+	else if(m_iView==4)	CreateCpCurves();
+
+	UpdateView();
+}
 
 
 void QMiarex::OnHideAllWOpps()
@@ -13004,49 +13077,6 @@ void QMiarex::OnShowAllWPolars()
 	CreateWPolarCurves();
 	pMainFrame->SetSaveState(false);
 	SetCurveParams();
-	UpdateView();
-}
-
-
-void QMiarex::OnHideAllWPlrOpps()
-{
-	int i;
-	//Switch all WOpps view to on for the current UFO and WPolar
-	m_bCurWOppOnly = false;
-
-	CPOpp *pPOpp;
-	CWOpp *pWOpp;
-	if(m_pCurPlane)
-	{
-		for (i=0; i< m_poaPOpp->size(); i++)
-		{
-			pPOpp = (CPOpp*)m_poaPOpp->at(i);
-			if (pPOpp->m_PlaneName == m_pCurWPolar->m_UFOName &&
-				pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName)
-			{
-				pPOpp->m_bIsVisible = false;
-			}
-		}
-	}
-	else if (m_pCurWing)
-	{
-		for (i=0; i< m_poaWOpp->size(); i++)
-		{
-			pWOpp = (CWOpp*)m_poaWOpp->at(i);
-			if (pWOpp->m_WingName == m_pCurWPolar->m_UFOName &&
-				pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName)
-			{
-				pWOpp->m_bIsVisible = false;
-			}
-		}
-	}
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->SetSaveState(false);
-	SetCurveParams();
-
-	if (m_iView==1)     CreateWOppCurves();
-	else if(m_iView==4)	CreateCpCurves();
-
 	UpdateView();
 }
 
@@ -14830,6 +14860,11 @@ void QMiarex::SetControls()
 	if(m_iView==3) m_pctrBottomControls->setCurrentIndex(1);
 	else           m_pctrBottomControls->setCurrentIndex(0);
 
+	if(m_iView==4) 	m_pctrlMiddleControls->setCurrentIndex(1);
+	else            m_pctrlMiddleControls->setCurrentIndex(0);
+
+	m_pctrlSpanPos->SetValue(m_CurSpanPos);
+	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
 }
 
 void QMiarex::SetCurveParams()
@@ -15880,18 +15915,24 @@ void QMiarex::SetupLayout()
 
 //_______________________Cp Params
 	QVBoxLayout *CpParams = new QVBoxLayout;
-	m_pctrlCpSection = new QSlider(Qt::Horizontal);
-	m_pctrlCpSection->setMinimum(-100);
-	m_pctrlCpSection->setMaximum(100);
-	m_pctrlCpSection->setSliderPosition(00);
-	m_pctrlCpSection->setTickInterval(10);
-	m_pctrlCpSection->setTickPosition(QSlider::TicksBelow);
+	m_pctrlCpSectionSlider = new QSlider(Qt::Horizontal);
+	m_pctrlCpSectionSlider->setMinimum(-100);
+	m_pctrlCpSectionSlider->setMaximum(100);
+	m_pctrlCpSectionSlider->setSliderPosition(00);
+	m_pctrlCpSectionSlider->setTickInterval(10);
+	m_pctrlCpSectionSlider->setTickPosition(QSlider::TicksBelow);
+	QHBoxLayout *CpPos = new QHBoxLayout;
+	QLabel *label1000 = new QLabel("Span Position");
+	m_pctrlSpanPos = new FloatEdit(0.0, 3);
+	CpPos->addWidget(label1000);
+	CpPos->addWidget(m_pctrlSpanPos);
 	QHBoxLayout *CpSections = new QHBoxLayout;
 	m_pctrlKeepCpSection = new QPushButton("Keep");
 	m_pctrlResetCpSection = new QPushButton("Reset");
 	CpSections->addWidget(m_pctrlKeepCpSection);
 	CpSections->addWidget(m_pctrlResetCpSection);
-	CpParams->addWidget(m_pctrlCpSection);
+	CpParams->addWidget(m_pctrlCpSectionSlider);
+	CpParams->addLayout(CpPos);
 	CpParams->addLayout(CpSections);
 	CpParams->addStretch(1);
 	QGroupBox *CpBox = new QGroupBox("Cp Sections");
@@ -16980,6 +17021,56 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 			UpdateView();
 		}
 	}
+}
+
+
+void QMiarex::OnKeepCpSection()
+{
+	CCurve *pCurve, *pNewCurve;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pCurve = m_CpGraph.GetCurve(0);
+	pNewCurve = m_CpGraph.AddCurve();
+	pNewCurve->Copy(pCurve);
+
+	m_CpColor = pMainFrame->m_crColors[(m_CpGraph.GetCurveCount()-1)%24];
+	pCurve->SetColor(m_CpColor);
+
+	m_CpStyle = 0;
+	m_CpWidth = 1;
+	m_bShowCpPoints = false;
+	SetCurveParams();
+
+//	m_CurSpanPos = m_SpanPos;
+	CreateCpCurves();
+	UpdateView();
+}
+
+
+void QMiarex::OnResetCpSection()
+{
+	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
+//	m_CurSpanPos = m_SpanPos;
+	CreateCpCurves();
+	UpdateView();
+}
+
+
+void QMiarex::OnCpSection(int pos)
+{
+	m_CurSpanPos = (double)pos/100.0;
+	m_pctrlSpanPos->SetValue(m_CurSpanPos);
+	CreateCpCurves();
+	UpdateView();
+}
+
+
+void QMiarex::OnCpPosition()
+{
+	m_CurSpanPos = m_pctrlSpanPos->GetValue();
+	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
+	CreateCpCurves();
+	UpdateView();
 }
 
 

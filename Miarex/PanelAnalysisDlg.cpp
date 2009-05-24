@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-#include <QDesktopWidget>
+
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
@@ -2500,11 +2500,11 @@ void PanelAnalysisDlg::SetProgress(int TaskSize, double TaskProgress)
 
 void PanelAnalysisDlg::SetupLayout()
 {
-	QDesktopWidget desktop;
+/*	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/3);
 	setMinimumWidth(r.width()/3);
-	move(r.width()/3, r.height()/6);
+	move(r.width()/3, r.height()/6);*/
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);

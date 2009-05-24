@@ -28,7 +28,7 @@ SOURCES += MainFrame.cpp \
     Objects/Spline.cpp \
     Objects/Panel.cpp \
     Objects/Sf.cpp \
-    Objects/Quaternion.cpp \ 
+    Objects/Quaternion.cpp \
     Objects/OpPoint.cpp \
     Objects/Frame.cpp \
     Objects/POpp.cpp \
@@ -96,7 +96,8 @@ SOURCES += MainFrame.cpp \
     XInverse/PertDlg.cpp \
     Misc/SaveOptionsDlg.cpp \
     Miarex/WAdvancedDlg.cpp \
-    Miarex/GL3dWingDlg.cpp
+    Miarex/GL3dWingDlg.cpp \
+    Misc/ProgressDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -188,7 +189,8 @@ HEADERS += MainFrame.h \
     XInverse/PertDlg.h \
     Misc/SaveOptionsDlg.h \
     Miarex/WAdvancedDlg.h \
-    Miarex/GL3dWingDlg.h
+    Miarex/GL3dWingDlg.h \
+    Misc/ProgressDlg.h
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 

@@ -193,6 +193,10 @@ private slots:
 	void OnResetWingScale();
 	void OnStreamlines();
 	void OnSurfaceSpeeds();
+	void OnCpSection(int pos);
+	void OnKeepCpSection();
+	void OnResetCpSection();
+	void OnCpPosition();
 
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
@@ -346,8 +350,8 @@ private:
 	QTimer *m_pAnimateTimer;
 
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
-	QSlider *m_pctrlCpSection;
-
+	QSlider *m_pctrlCpSectionSlider;
+	FloatEdit *m_pctrlSpanPos;
 	QCheckBox *m_pctrlSequence;
 	FloatEdit *m_pctrlAlphaMin;
 	FloatEdit *m_pctrlAlphaMax;
