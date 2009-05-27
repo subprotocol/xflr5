@@ -519,7 +519,6 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_G:
 		{
-
 			OnGraphOptions();
 			return;
 		}

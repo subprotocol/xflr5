@@ -306,6 +306,7 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 
 void MainFrame::AddRecentFile(const QString &PathName)
 {
+
 	m_RecentFiles.removeAll(PathName);
 	m_RecentFiles.prepend(PathName);
 	while (m_RecentFiles.size() > MAXRECENTFILES)
@@ -410,6 +411,10 @@ void MainFrame::CreateActions()
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(OnLoadFile()));
 
+	insertAct = new QAction(tr("&Insert Project..."), this);
+	insertAct->setStatusTip(tr("Insert an existing project in the current project"));
+	connect(insertAct, SIGNAL(triggered()), this, SLOT(OnInsertProject()));
+
 	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
 	OnAFoilAct->setShortcut(tr("Ctrl+1"));
 	OnAFoilAct->setStatusTip(tr("Open Foil Design application"));
@@ -480,7 +485,7 @@ void MainFrame::CreateActions()
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
-	GraphDlgAction = new QAction(tr("Define Graph Settings"), this);
+	GraphDlgAction = new QAction(tr("Define Graph Settings (G)"), this);
 	connect(GraphDlgAction, SIGNAL(triggered()), this, SLOT(OnGraphSettings()));
 
 	exitAct = new QAction(tr("E&xit"), this);
@@ -861,6 +866,7 @@ void MainFrame::CreateMenus()
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newProjectAct);
 	fileMenu->addAction(openAct);
+	fileMenu->addAction(insertAct);
 	fileMenu->addAction(closeProjectAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAct);
@@ -1454,15 +1460,15 @@ void MainFrame::CreateXDirectActions()
 	resetGraphLegend = new QAction(tr("Reset Legend Position"), this);
 	connect(resetGraphLegend, SIGNAL(triggered()), pXDirect, SLOT(OnResetGraphLegend()));
 
-	curPolarGraphVariableAct = new QAction(tr("Polar Graph Variable"), this);
+	curPolarGraphVariableAct = new QAction(tr("Polar Graph Variable (V)"), this);
 	curPolarGraphVariableAct->setStatusTip("Defines the X and Y variables for this graph");
 	connect(curPolarGraphVariableAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolarGraphVariable()));
 
-	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs"), this);
+	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs (T)"), this);
 	TwoPolarGraphsAct->setCheckable(true);
 	connect(TwoPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnCouplePolarGraphs()));
 
-	AllPolarGraphsAct = new QAction(tr("All Polar Graphs"), this);
+	AllPolarGraphsAct = new QAction(tr("All Polar Graphs (A)"), this);
 	AllPolarGraphsAct->setCheckable(true);
 	connect(AllPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnAllPolarGraphs()));
 
@@ -1473,11 +1479,11 @@ void MainFrame::CreateXDirectActions()
 		PolarGraphAct[i]->setCheckable(true);
 		connect(PolarGraphAct[i], SIGNAL(triggered()), pXDirect, SLOT(OnSinglePolarGraph()));
 	}
-	PolarGraphAct[0]->setText("Cl vs.Cd");
-	PolarGraphAct[1]->setText("Cl vs.Alpha");
-	PolarGraphAct[2]->setText("Cl vs. Xtr.");
-	PolarGraphAct[3]->setText("Cm vs.Alpha");
-	PolarGraphAct[4]->setText("Glide ratio vs. alpha");
+	PolarGraphAct[0]->setText("Cl vs.Cd (1)");
+	PolarGraphAct[1]->setText("Cl vs.Alpha (2)");
+	PolarGraphAct[2]->setText("Cl vs. Xtr. (3)");
+	PolarGraphAct[3]->setText("Cm vs.Alpha (4)");
+	PolarGraphAct[4]->setText("Glide ratio vs. alpha (5)");
 
 
 	deleteCurFoil = new QAction(tr("Delete..."), this);
@@ -2269,6 +2275,7 @@ void MainFrame::DeleteProject()
 		m_oaBody.removeAt(i);
 		delete (CBody*)pObj;
 	}
+
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_pCurPlane  = NULL;
 	pMiarex->m_pCurPOpp   = NULL;
@@ -2827,7 +2834,6 @@ void MainFrame::LoadSettings()
 }
 
 
-
 int MainFrame::LoadXFLR5File(QString PathName)
 {
 	QFile XFile(PathName);
@@ -2908,6 +2914,8 @@ int MainFrame::LoadXFLR5File(QString PathName)
 					}
 				}
 
+				QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
 				DeleteProject();
 
 				QDataStream ar(&XFile);
@@ -2919,20 +2927,22 @@ int MainFrame::LoadXFLR5File(QString PathName)
 					UpdateFoils();
 					UpdateView();
 				}
-
 				AddRecentFile(PathName);
 				SetSaveState(true);
 				SetProjectName(PathName);
 
 				XFile.close();
+				QApplication::restoreOverrideCursor();
 				if(m_oaPlane.size() || m_oaWing.size()) return MIAREX;
 				else                                    return XFOILANALYSIS;
 			}
 		}
 	}
 	XFile.close();
+
 	return 0;
 }
+
 
 
 void MainFrame::OnAFoil()
@@ -3080,6 +3090,58 @@ void MainFrame::OnGuidelines()
 {
 	QString FileName = qApp->applicationDirPath() + "/Guidelines.pdf" ;
 	QDesktopServices::openUrl(FileName);
+}
+
+
+void MainFrame::OnInsertProject()
+{
+	QString PathName;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->m_bArcball = false;
+
+	PathName = QFileDialog::getOpenFileName(this, "Open File",
+											m_LastDirName,
+											"Project file (*.wpa)");
+	if(!PathName.length())		return;
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) m_LastDirName = PathName.left(pos);
+
+
+	QFile XFile(PathName);
+	if (!XFile.open(QIODevice::ReadOnly))
+	{
+		QString strange = "Could not read the file\n"+PathName;
+		QMessageBox::information(window(), "Warning", strange);
+		return;
+	}
+	QDataStream ar(&XFile);
+	ar.setByteOrder(QDataStream::LittleEndian);
+
+	SerializeProject(ar, false);
+
+
+	if(m_iApp == MIAREX)
+	{
+		UpdateUFOs();
+		pMiarex->SetUFO();
+
+		if(pMiarex->m_iView==2)      pMiarex->CreateWPolarCurves();
+		else if(pMiarex->m_iView==1) pMiarex->CreateWOppCurves();
+		else if(pMiarex->m_iView==4) pMiarex->CreateCpCurves();
+	}
+	else if(m_iApp == XFOILANALYSIS)
+	{
+		if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+		else		         pXDirect->CreateOppCurves();
+		UpdateFoils();
+	}
+	else if(m_iApp == DIRECTDESIGN)
+	{
+		pAFoil->SetFoil();
+	}
+	UpdateView();
 }
 
 
@@ -3665,10 +3727,9 @@ void MainFrame::OnSaveViewToImageFile()
 			break;
 		}
 	}
-
-
 	img.save(FileName);
 }
+
 
 void MainFrame::OnSelChangeUFO(int i)
 {

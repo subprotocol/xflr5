@@ -44,10 +44,14 @@ GraphDlg::GraphDlg()
 	connect(m_pctrlLabelButton, SIGNAL(clicked()),  this, SLOT(OnLabelFont()));
 	connect(m_pctrlLegendButton, SIGNAL(clicked()), this, SLOT(OnLegendFont()));
 
+	connect(m_pctrlXAuto, SIGNAL(clicked()), this, SLOT(OnAutoX()));
+	connect(m_pctrlYAuto, SIGNAL(clicked()), this, SLOT(OnAutoY()));
+
 	connect(m_pctrlXMajGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnXMajGridShow(int)));
 	connect(m_pctrlYMajGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnYMajGridShow(int)));
 	connect(m_pctrlXMinGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnXMinGridShow(int)));
 	connect(m_pctrlYMinGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnYMinGridShow(int)));
+
 	connect(m_pctrlAxisStyle, SIGNAL(clicked()), this, SLOT(OnAxisStyle()));
 	connect(m_pctrlXMajGridStyle, SIGNAL(clicked()), this, SLOT(OnXMajGridStyle()));
 	connect(m_pctrlYMajGridStyle, SIGNAL(clicked()), this, SLOT(OnYMajGridStyle()));
@@ -64,6 +68,47 @@ GraphDlg::GraphDlg()
 
 }
 
+void GraphDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	// Generate the foil instead
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OKButton->setFocus();
+			}
+			else
+			{
+				QDialog::accept();
+			}
+			break;
+		}
+
+		default:
+			event->ignore();
+	}
+}
+
+void GraphDlg::OnAutoX()
+{
+	bool bAuto = m_pctrlXAuto->checkState() == Qt::Checked;
+	m_pctrlXMin->setEnabled(!bAuto);
+	m_pctrlXMax->setEnabled(!bAuto);
+	m_pctrlXUnit->setEnabled(!bAuto);
+	m_pctrlXOrigin->setEnabled(!bAuto);
+}
+
+void GraphDlg::OnAutoY()
+{
+	bool bAuto = m_pctrlYAuto->checkState() == Qt::Checked;
+	m_pctrlYMin->setEnabled(!bAuto);
+	m_pctrlYMax->setEnabled(!bAuto);
+	m_pctrlYUnit->setEnabled(!bAuto);
+	m_pctrlYOrigin->setEnabled(!bAuto);
+}
 
 void GraphDlg::OnAxisStyle()
 {
@@ -332,6 +377,9 @@ void GraphDlg::SetParams()
 {
 	QString strong;
 
+	m_pctrlXAuto->setChecked(m_pGraph->GetAutoX());
+	m_pctrlYAuto->setChecked(m_pGraph->GetAutoY());
+
 	m_pctrlXMin->SetValue(m_pGraph->GetXMin());
 	m_pctrlXMax->SetValue(m_pGraph->GetXMax());
 	m_pctrlXOrigin->SetValue(m_pGraph->GetX0());
@@ -340,6 +388,9 @@ void GraphDlg::SetParams()
 	m_pctrlYMax->SetValue(m_pGraph->GetYMax());
 	m_pctrlYOrigin->SetValue(m_pGraph->GetY0());
 	m_pctrlYUnit->SetValue(m_pGraph->GetYUnit());
+
+	OnAutoX();
+	OnAutoY();
 
 	m_pctrlTitleColor->SetColor(m_pGraph->GetTitleColor());
 	m_pctrlLabelColor->SetColor(m_pGraph->GetLabelColor());
@@ -359,7 +410,6 @@ void GraphDlg::SetParams()
 	m_pctrlLegendButton->setFont(font);
 
 
-
 	bool bState, bAuto;
 	QColor color;
 	int style, width;
@@ -374,7 +424,6 @@ void GraphDlg::SetParams()
 
 	m_pGraph->GetXMinGrid(bState, bAuto,color, style, width, unit);
 	m_pctrlXMinGridShow->setChecked(bState);
-	m_pctrlXAuto->setChecked(bAuto);
 	m_pctrlXMinGridStyle->SetColor(color);
 	m_pctrlXMinGridStyle->SetStyle(style);
 	m_pctrlXMinGridStyle->SetWidth(width);
@@ -390,7 +439,6 @@ void GraphDlg::SetParams()
 
 	m_pGraph->GetYMinGrid(bState, bAuto,color, style, width, unit);
 	m_pctrlYMinGridShow->setChecked(bState);
-	m_pctrlYAuto->setChecked(bAuto);
 	m_pctrlYMinGridStyle->SetColor(color);
 	m_pctrlYMinGridStyle->SetStyle(style);
 	m_pctrlYMinGridStyle->SetWidth(width);
@@ -416,7 +464,7 @@ void GraphDlg::SetLayout()
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()/2);
-	move(r.width()/3, r.height()/6);
+//	move(r.width()/3, r.height()/6);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;

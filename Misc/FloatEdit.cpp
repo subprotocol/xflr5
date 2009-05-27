@@ -48,6 +48,7 @@ FloatEdit::FloatEdit(double d, int precision)
 	m_fMin = -1.e10;
 	m_fMax =  1.e10;
 	m_iPrecision = precision;
+
 	QDoubleValidator *v = new QDoubleValidator(this);
 	setValidator(v);
 	setAlignment(Qt::AlignRight);

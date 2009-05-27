@@ -167,10 +167,6 @@ void Graph::CopySettings(Graph *pGraph, bool bScales)
 	m_BorderColor   = pGraph->m_BorderColor;
 	m_BorderStyle   = pGraph->m_BorderStyle;
 	m_BorderWidth   = pGraph->m_BorderWidth;
-	m_bXMajGrid     = pGraph->m_bXMajGrid;
-	m_bXMinGrid     = pGraph->m_bXMinGrid;
-	m_bYMajGrid     = pGraph->m_bYMajGrid;
-	m_bYMinGrid     = pGraph->m_bYMinGrid;
 	m_LabelColor    = pGraph->m_LabelColor;
 	m_LabelLogFont  = pGraph->m_LabelLogFont;
 	m_LegendColor   = pGraph->m_LegendColor;
@@ -191,6 +187,17 @@ void Graph::CopySettings(Graph *pGraph, bool bScales)
 	m_YMinClr       = pGraph->m_YMinClr;
 	m_YMinStyle     = pGraph->m_YMinStyle;
 	m_YMinWidth     = pGraph->m_YMinWidth;
+
+	m_bAutoX        = pGraph->m_bAutoX;
+	m_bAutoY        = pGraph->m_bAutoY;
+	m_bXAutoMinGrid = pGraph->m_bXAutoMinGrid;
+	m_bYAutoMinGrid = pGraph->m_bYAutoMinGrid;
+	m_bYInverted    = pGraph->m_bYInverted;
+	m_bXMajGrid     = pGraph->m_bXMajGrid;
+	m_bXMinGrid     = pGraph->m_bXMinGrid;
+	m_bYMajGrid     = pGraph->m_bYMajGrid;
+	m_bYMinGrid     = pGraph->m_bYMinGrid;
+	m_bBorder       = pGraph->m_bBorder;
 }
 
 
@@ -573,8 +580,8 @@ void Graph::SetAutoXMinUnit(bool bAuto)
 void Graph::SetAutoXUnit()
 {
 	int nxmin, nxmax;
-//	xunit = 100.0*m_scalex;
-	xunit = (xmax-xmin)/5.0;
+	xunit = 100.0*m_scalex;
+//	xunit = (xmax-xmin)/5.0;
 
 	if (xunit<1.0)
 	{

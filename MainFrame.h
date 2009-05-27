@@ -79,6 +79,7 @@ private slots:
 	void OnGraphSettings();
 	void OnGuidelines();
 	void OnExportCurGraph();
+	void OnInsertProject();
 	void OnNewProject();
 	void OnLoadFile();
 	void OnLogFile();
@@ -228,7 +229,7 @@ private:
 
 	//MainFrame actions
 	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct, *OnMixedInverseAct;
-	QAction *openAct, *styleAct;
+	QAction *openAct, *insertAct, *styleAct;
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct, *saveOptionsAct;
 	QAction *unitsAct;
 	QAction *exitAct;

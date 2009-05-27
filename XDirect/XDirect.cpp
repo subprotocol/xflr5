@@ -1215,6 +1215,7 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -1276,8 +1277,11 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			CheckButtons();
 			UpdateView();
 			break;
+		case Qt::Key_G:
+			if(m_pCurGraph)	pMainFrame->OnGraphSettings();
+			break;
 		case Qt::Key_V:
-			if(m_bPolar && m_pCurGraph) 	OnPolarGraphVariable();
+			if(m_bPolar && m_pCurGraph) OnPolarGraphVariable();
 			break;
 		case Qt::Key_F5:
 			if(!m_bPolar) return;
@@ -4861,7 +4865,6 @@ CFoil* QXDirect::SetFoil(CFoil* pFoil)
 		}
 	}
 
-
 	if(m_pCurFoil && !InitXFoil())
 	{
 		DeleteFoil(false);
@@ -4889,7 +4892,6 @@ CFoil* QXDirect::SetFoil(CFoil* pFoil)
 	SetBufferFoil();
 
 	SetPolar();
-
 
 //		if(m_bPolar) CreatePolarCurves();
 //		else         CreateOppCurves();

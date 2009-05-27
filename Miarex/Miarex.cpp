@@ -15602,6 +15602,7 @@ void QMiarex::SetScale(QRect CltRect)
 
 void QMiarex::SetUFO(QString UFOName)
 {
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	int i;
 	CWing *pWing;
 	CPlane *pPlane;
@@ -15648,6 +15649,9 @@ void QMiarex::SetUFO(QString UFOName)
 				if(m_iView==2)      CreateWPolarCurves();
 				else if(m_iView==1) CreateWOppCurves();
 				else if(m_iView==4) CreateCpCurves();
+
+				QApplication::restoreOverrideCursor();
+
 				return;
 			}
 		}
@@ -15667,6 +15671,8 @@ void QMiarex::SetUFO(QString UFOName)
 		m_pCurFin   = NULL;
 		m_pCurWOpp  = NULL;
 		m_pCurPOpp  = NULL;
+
+		QApplication::restoreOverrideCursor();
 		return;
 	}
 
@@ -15786,6 +15792,7 @@ void QMiarex::SetUFO(QString UFOName)
 
 	SetScale();
 	SetWGraphScale();
+	QApplication::restoreOverrideCursor();
 }
 
 
@@ -15800,6 +15807,11 @@ void QMiarex::SetupLayout()
 	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
 	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+
 //_______________________Analysis
 	m_pctrlSequence = new QCheckBox("Sequence");
 	QGridLayout *SequenceGroup = new QGridLayout;
@@ -15810,9 +15822,10 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit();
-	m_pctrlAlphaMax     = new FloatEdit();
-	m_pctrlAlphaDelta   = new FloatEdit();
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 4);
+	m_pctrlAlphaMax     = new FloatEdit(1., 5);
+	m_pctrlAlphaDelta   = new FloatEdit(0.5, 6);
+
 	m_pctrlAlphaMin->setMinimumHeight(20);
 	m_pctrlAlphaMax->setMinimumHeight(20);
 	m_pctrlAlphaDelta->setMinimumHeight(20);
@@ -15827,7 +15840,7 @@ void QMiarex::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
 
 	m_pctrlInitLLTCalc = new QCheckBox("Init LLT");
-	m_pctrlStoreWOpp    = new QCheckBox("Store Opp");
+	m_pctrlStoreWOpp    = new QCheckBox("Store OpPoint");
 	m_pctrlAnalyze     = new QPushButton("Analyze");
 
 
@@ -15965,10 +15978,10 @@ void QMiarex::SetupLayout()
 	m_pctrlY          = new QPushButton("Y");
 	m_pctrlZ          = new QPushButton("Z");
 	m_pctrlIso        = new QPushButton("Iso");
-	m_pctrlX->setSizePolicy(szPolicyMinimum);
-	m_pctrlY->setSizePolicy(szPolicyMinimum);
-	m_pctrlZ->setSizePolicy(szPolicyMinimum);
-	m_pctrlIso->setSizePolicy(szPolicyMinimum);
+	m_pctrlX->setSizePolicy(szPolicyMaximum);
+	m_pctrlY->setSizePolicy(szPolicyMaximum);
+	m_pctrlZ->setSizePolicy(szPolicyMaximum);
+	m_pctrlIso->setSizePolicy(szPolicyMaximum);
 
 	ThreeDView->addWidget(m_pctrlX,1,1);
 	ThreeDView->addWidget(m_pctrlY,1,2);
@@ -15980,8 +15993,8 @@ void QMiarex::SetupLayout()
 	m_pctrlReset          = new QPushButton("Reset");
 
 	m_pctrlPickCenter->setCheckable(true);
-	m_pctrlPickCenter->setSizePolicy(szPolicyMinimum);
-	m_pctrlReset->setSizePolicy(szPolicyMinimum);
+	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
+	m_pctrlReset->setSizePolicy(szPolicyMaximum);
 	ThreeDCtrls->addWidget(m_pctrlReset,1,1);
 	ThreeDCtrls->addWidget(m_pctrlPickCenter,1,2);
 
@@ -16090,6 +16103,8 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 	else return;
+
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	if(bCurrent) pWPolar = m_pCurWPolar;
 	else
@@ -16337,6 +16352,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	m_pPanelDlg->m_nNodes      = m_nNodes;
 	m_pPanelDlg->m_NSurfaces   = m_NSurfaces;
 	m_pPanelDlg->m_NWakeColumn = m_NWakeColumn;
+	QApplication::restoreOverrideCursor();
 }
 
 

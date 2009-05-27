@@ -40,6 +40,7 @@ private slots:
 private:
 	void SetupLayout();
 	void FillLists(int iGraphType);
+	void keyPressEvent(QKeyEvent *event);
 
 	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 	QPushButton *OKButton, *CancelButton;

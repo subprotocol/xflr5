@@ -50,6 +50,8 @@ private slots:
 	void OnLegendColor();
 	void OnLabelColor();
 	void OnRestoreParams();
+	void OnAutoX();
+	void OnAutoY();
 	void OnAxisStyle();
 	void OnXMajGridStyle();
 	void OnXMinGridStyle();
@@ -63,7 +65,9 @@ private slots:
 	void OnGraphBackColor();
 	void OnBorderStyle();
 
-public:
+private:
+	void keyPressEvent(QKeyEvent *event);
+
 	QWidget *ScalePage, *FontPage, *BackPage, *GridPage;
 
 	QPushButton *OKButton,*CancelButton, *RestoreButton;
@@ -83,11 +87,10 @@ public:
 	ColorButton *m_pctrlGraphBack;
 	LineButton *m_pctrlBorderStyle;
 
-	Graph *m_pGraph, *m_pMemGraph;
 	QFont *m_pTitleFont, *m_pLegendFont, *m_pLabelFont;
 
-private:
-
+public:
+	Graph *m_pGraph, *m_pMemGraph;
 };
 
 #endif // GRAPHDLG_H

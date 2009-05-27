@@ -164,7 +164,11 @@ void WAdvancedDlg::SetupLayout()
 	BothSides->addLayout(LeftSide);
 	BothSides->addLayout(RightSide);
 
+	QLineEdit *Test = new QLineEdit("Nothing");
+
+
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	MainLayout->addWidget(Test);
 	MainLayout->addLayout(BothSides);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);

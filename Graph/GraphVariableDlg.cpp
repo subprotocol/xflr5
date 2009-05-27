@@ -196,6 +196,30 @@ void GraphVariableDlg::FillLists(int iGraphType)
 	m_pctrlYSel->adjustSize();
 }
 
+void GraphVariableDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	// Generate the foil instead
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OKButton->setFocus();
+			}
+			else
+			{
+				QDialog::accept();
+			}
+			break;
+		}
+
+		default:
+			event->ignore();
+	}
+}
+
 void GraphVariableDlg::SetSelection(int const &XSel, int const &YSel)
 {
 	m_XSel = XSel;

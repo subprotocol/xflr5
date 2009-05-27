@@ -168,19 +168,19 @@ void ManageBodiesDlg::OnDuplicate()
 void ManageBodiesDlg::OnEdit()
 {
 	if(!m_pBody) return;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	CBody memBody;
 
 	memBody.Duplicate(m_pBody);
-//	pGL3dBodyDlg->SetBody(m_pBody);
+	pGL3dBodyDlg->SetBody(m_pBody);
 	pGL3dBodyDlg->m_bEnableName = false;
-/*
+
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
 		pMainFrame->SetSaveState(false);
 	}
-	else m_pBody->Duplicate(&memBody);*/
+	else m_pBody->Duplicate(&memBody);
 }
 
 
