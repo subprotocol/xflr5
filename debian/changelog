@@ -1,0 +1,20 @@
+qflr5 (5.0~svn103-1) jaunty; urgency=low
+  
+  * Ubuntu package for the for the QFLR5.
+  * Svn updated to svn head.
+  * Cleaned up the deb-package a bit to get it ready for being committed to svn.
+  * Tested that the deb package compiles on Ubuntu Jaunty.
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Mon, 01 Jun 2009 13:11:17 +0300
+
+qflr5 (5.0~svn101-1) jaunty; urgency=low
+
+  * Upgraded to the latest trunk version
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Fri, 29 May 2009 15:26:12 +0300
+
+qflr5 (5.0~svn91-1) unstable; urgency=low
+
+  * Initial deb package created.
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Fri, 15 May 2009 11:54:02 +0300

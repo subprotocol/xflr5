@@ -2,7 +2,7 @@
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
 QT += opengl
-TARGET = QFLR5
+TARGET = qflr5
 TEMPLATE = app
 SOURCES += MainFrame.cpp \
     XDirect/XFoil.cpp \
@@ -197,3 +197,19 @@ HEADERS += MainFrame.h \
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 
+
+unix {
+    #VARIABLES
+    isEmpty(PREFIX) {
+        PREFIX = /usr/local
+  }
+  BINDIR = $$PREFIX/bin
+  DATADIR = $$PREFIX/share
+
+  #MAKE INSTALL
+  INSTALLS += target
+
+  target.path =$$BINDIR
+
+}
+
