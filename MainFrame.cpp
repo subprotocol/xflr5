@@ -71,6 +71,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_BackgroundColor = QColor(0, 20, 40);
 	m_GraphBackColor  = QColor(0, 30, 50);
 	m_TextColor       = QColor(220,220,220);
+
+//	m_TextFont.setFamily(m_TextFont.defaultFamily());
+	m_TextFont.setStyleHint(QFont::TypeWriter);
 	m_TextFont.setFamily("Courier");
 	m_ImageFormat = 2;
 
@@ -88,16 +91,12 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	LoadSettings();
 
-//	qApp->setStyle(m_StyleName);
-
-
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetAnalysisParams();
 	CreateActions();
 	CreateMenus();
 	CreateToolbars();
 	CreateStatusBar();
-
 
 // second line
 	m_crColors[0] = QColor(255,0,0),
@@ -154,7 +153,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 MainFrame::~MainFrame()
 {
-//	delete m_p2DWidget;
 }
 
 
@@ -314,9 +312,6 @@ void MainFrame::AddRecentFile(const QString &PathName)
 
 	updateRecentFileActions();
 }
-
-
-
 
 
 void MainFrame::closeEvent (QCloseEvent * event)
@@ -554,6 +549,16 @@ void MainFrame::CreateAFoilActions()
 	HideAllFoils= new QAction(tr("Hide All Foils"), this);
 	connect(HideAllFoils, SIGNAL(triggered()), pAFoil, SLOT(OnHideAllFoils()));
 
+
+	AFoilDelete = new QAction(tr("Delete..."), this);
+	connect(AFoilDelete, SIGNAL(triggered()), pAFoil, SLOT(OnDelete()));
+
+	AFoilRename = new QAction(tr("Rename..."), this);
+	connect(AFoilRename, SIGNAL(triggered()), this, SLOT(OnRenameCurFoil()));
+
+	AFoilExport = new QAction(tr("Export..."), this);
+	connect(AFoilExport, SIGNAL(triggered()), pAFoil, SLOT(OnExportCurFoil()));
+
 	ShowCurrentFoil= new QAction(tr("Show Current Foil"), this);
 	connect(ShowCurrentFoil, SIGNAL(triggered()), pAFoil, SLOT(OnShowCurrentFoil()));
 
@@ -599,6 +604,9 @@ void MainFrame::CreateAFoilActions()
 	AFoilSetLERadius = new QAction(tr("Set L.E. Radius"), this);
 	connect(AFoilSetLERadius, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetLERadius()));
 
+	AFoilLECircle = new QAction(tr("Show LE Circle"), this);
+	connect(AFoilLECircle, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilLECircle()));
+
 	AFoilSetFlap = new QAction(tr("Set Flap"), this);
 	connect(AFoilSetFlap, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetFlap()));
 
@@ -624,6 +632,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(ResetYScaleAct);
 	AFoilViewMenu->addAction(ResetXYScaleAct);
 	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(AFoilLECircle);
 	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(restoreToolbarsAct);
@@ -655,6 +664,10 @@ void MainFrame::CreateAFoilMenus()
 
 	//AFoil Context Menu
 	AFoilCtxMenu = new QMenu("Context Menu",this);
+	AFoilCtxMenu->addAction(AFoilRename);
+	AFoilCtxMenu->addAction(AFoilDelete);
+	AFoilCtxMenu->addAction(AFoilExport);
+	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilDesignMenu);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilSplineMenu);
@@ -668,6 +681,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(ResetYScaleAct);
 	AFoilCtxMenu->addAction(ResetXYScaleAct);
 	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(AFoilLECircle);
 	AFoilCtxMenu->addAction(AFoilGridAct);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(saveViewToImageFileAct);
@@ -724,7 +738,6 @@ void MainFrame::CreateDockWindows()
 
 	m_p2DWidget = new TwoDWidget(this);
 	m_pGLWidget = new GLWidget(this);
-	setCentralWidget(m_p2DWidget);
 
 	m_pXDirect = new QXDirect(this);
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
@@ -856,6 +869,8 @@ void MainFrame::CreateDockWindows()
 	FoilGeomDlg::s_pXFoil         = pXDirect->m_pXFoil;
 	TEGapDlg::s_pXFoil            = pXDirect->m_pXFoil;
 	LEDlg::s_pXFoil               = pXDirect->m_pXFoil;
+
+	GraphDlg::s_pMainFrame = this;
 }
 
 
@@ -919,7 +934,7 @@ void MainFrame::CreateMiarexActions()
 	W3DAct->setShortcut(tr("F4"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
-	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("CpView view"), this);
+	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("Cp view"), this);
 	CpViewAct->setCheckable(true);
 	CpViewAct->setStatusTip(tr("Show Cp view"));
 	CpViewAct->setShortcut(tr("F9"));
@@ -1083,6 +1098,12 @@ void MainFrame::CreateMiarexActions()
 	allWPolarGraphsScalesAct = new QAction(tr("Reset All Graph Scales"), this);
 	connect(allWPolarGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphScales()));
 
+	allWingGraphsSettings = new QAction(tr("All Graph Settings"), this);
+	connect(allWingGraphsSettings, SIGNAL(triggered()), pMiarex, SLOT(OnAllWingGraphSettings()));
+
+	allWPolarGraphsSettings = new QAction(tr("All Graph Settings"), this);
+	connect(allWPolarGraphsSettings, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphSettings()));
+
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
 	showUFOWPlrs = new QAction(tr("Show Associated Polars"), this);
@@ -1208,6 +1229,7 @@ void MainFrame::CreateMiarexMenus()
 	WPlrGraphMenu->addSeparator();
 	WPlrGraphMenu->addAction(twoWPlrGraphs);
 	WPlrGraphMenu->addAction(allWPlrGraphs);
+	MiarexWPlrMenu->addAction(allWPolarGraphsSettings);
 	MiarexWPlrMenu->addAction(allWPolarGraphsScalesAct);
 	MiarexWPlrMenu->addAction(resetWPlrLegend);
 
@@ -1243,6 +1265,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppGraphMenu->addAction(twoWingGraphs);
 	WOppGraphMenu->addAction(fourWingGraphs);
 	WOppGraphMenu->addSeparator();
+	WOppGraphMenu->addAction(allWingGraphsSettings);
 	WOppGraphMenu->addAction(allWingGraphsScalesAct);
 	WOppGraphMenu->addAction(resetWOppLegend);
 
@@ -1286,6 +1309,7 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addMenu(CurWPlrMenu);
 	WPlrCtxMenu->addSeparator();
+	WPlrCtxMenu->addAction(allWPolarGraphsSettings);
 	WPlrCtxMenu->addAction(allWPolarGraphsScalesAct);
 	WPlrCtxMenu->addAction(resetWPlrLegend);
 	WPlrCtxMenu->addMenu(WPlrGraphMenu);
@@ -1318,16 +1342,15 @@ void MainFrame::CreateMiarexMenus()
 	W3DCtxMenu->addAction(W3DLightAct);
 	W3DCtxMenu->addSeparator();
 	W3DCtxMenu->addAction(saveViewToImageFileAct);
-
 }
 
 
 
 void MainFrame::CreateMiarexToolbar()
 {
-	m_pctrlUFO = new QComboBox();
+	m_pctrlUFO    = new QComboBox();
 	m_pctrlWPolar = new QComboBox;
-	m_pctrlWOpp = new QComboBox;
+	m_pctrlWOpp   = new QComboBox;
 
 	m_pctrl3dView = new QToolButton;
 	m_pctrl3dView->setDefaultAction(W3DAct);
@@ -1392,8 +1415,8 @@ void MainFrame::CreateToolbars()
 
 void MainFrame::CreateXDirectToolbar()
 {
-	m_pctrlFoil = new QComboBox();	
-	m_pctrlPolar = new QComboBox;
+	m_pctrlFoil    = new QComboBox();
+	m_pctrlPolar   = new QComboBox;
 	m_pctrlOpPoint = new QComboBox;
 
 	m_pctrlPolarView = new QToolButton;
@@ -1492,11 +1515,11 @@ void MainFrame::CreateXDirectActions()
 	renameCurFoil = new QAction(tr("Rename..."), this);
 	connect(renameCurFoil, SIGNAL(triggered()), this, SLOT(OnRenameCurFoil()));
 
-	setCurFoilStyle = new QAction(tr("Set Style..."), this);
-	connect(setCurFoilStyle, SIGNAL(triggered()), this, SLOT(OnCurFoilStyle()));
-
 	exportCurFoil = new QAction(tr("Export..."), this);
 	connect(exportCurFoil, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurFoil()));
+
+	setCurFoilStyle = new QAction(tr("Set Style..."), this);
+	connect(setCurFoilStyle, SIGNAL(triggered()), this, SLOT(OnCurFoilStyle()));
 
 	deleteFoilPolars = new QAction(tr("Delete associated polars"), this);
 	deleteFoilPolars->setStatusTip(tr("Delete all the polars associated to this foil"));
@@ -1967,6 +1990,7 @@ void MainFrame::CreateXInverseActions()
 	InvQReflected = new QAction(tr("Show Reflected"), this);
 	InvQReflected->setCheckable(true);
 	connect(InvQReflected, SIGNAL(triggered()), pXInverse, SLOT(OnQReflected()));
+
 }
 
 
@@ -2020,10 +2044,19 @@ void MainFrame::CreateXInverseMenus()
 
 void MainFrame::CreateXInverseToolbar()
 {
+	m_pctrlFullInverse  = new QRadioButton("Full Inverse");
+	m_pctrlMixedInverse = new QRadioButton("Mixed Inverse");
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+	connect(m_pctrlFullInverse, SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
+	connect(m_pctrlMixedInverse, SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
+
 	m_pctrlXInverseToolBar = addToolBar(tr("XInverse"));
 	m_pctrlXInverseToolBar->addAction(newProjectAct);
 	m_pctrlXInverseToolBar->addAction(openAct);
 	m_pctrlXInverseToolBar->addAction(saveAct);
+	m_pctrlXInverseToolBar->addSeparator();
+	m_pctrlXInverseToolBar->addWidget(m_pctrlFullInverse);
+	m_pctrlXInverseToolBar->addWidget(m_pctrlMixedInverse);
 	m_pctrlXInverseToolBar->addSeparator();
 	m_pctrlXInverseToolBar->addAction(ExtractFoil);
 	m_pctrlXInverseToolBar->addAction(StoreFoil);
@@ -2031,6 +2064,7 @@ void MainFrame::CreateXInverseToolbar()
 	m_pctrlXInverseToolBar->addAction(resetCurGraphScales);
 	m_pctrlXInverseToolBar->addAction(InverseResetScale);
 }
+
 
 
 void MainFrame::OnDeleteCurPolar()
@@ -2927,6 +2961,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 					UpdateFoils();
 					UpdateView();
 				}
+
 				AddRecentFile(PathName);
 				SetSaveState(true);
 				SetProjectName(PathName);
@@ -2961,8 +2996,8 @@ void MainFrame::OnAFoil()
 
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->hide();
-	m_pctrlAFoilWidget->show();
 	m_pctrlXInverseWidget->hide();
+	m_pctrlAFoilWidget->show();
 
 	SetCentralWidget();
 	SetMenus();
@@ -3074,11 +3109,14 @@ void MainFrame::OnGraphSettings()
 	GraphDlg dlg;
 	QGraph graph;
 	graph.CopySettings(pGraph);
-	dlg.m_pMemGraph = pGraph;
-	dlg.m_pGraph = &graph;
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph = pGraph;
 	dlg.SetParams();
 
 	if(dlg.exec() == QDialog::Accepted)
+	{
+	}
+	else
 	{
 		pGraph->CopySettings(&graph);
 	}
@@ -3231,6 +3269,7 @@ void MainFrame::OnMiarex()
 	m_pctrlAFoilWidget->hide();
 	m_pctrlXInverseWidget->hide();
 	m_pctrlMiarexWidget->show();
+
 	pMiarex->SetControls();
 	pMiarex->SetUFO();
 	pMiarex->m_bArcball = false;
@@ -3996,14 +4035,17 @@ void MainFrame::OnXDirect()
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetFoilScale();
 	m_iApp = XFOILANALYSIS;
+
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXInverseToolBar->hide();
 	m_pctrlXDirectToolBar->show();
+
 	m_pctrlAFoilWidget->hide();
 	m_pctrlMiarexWidget->hide();
-	m_pctrlXDirectWidget->show();
 	m_pctrlXInverseWidget->hide();
+	m_pctrlXDirectWidget->show();
+
 	SetCentralWidget();
 	SetMenus();
 	pXDirect->SetPolarLegendPos();
@@ -4022,6 +4064,7 @@ void MainFrame::OnXInverse()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 //	pXInverse->SetScale();
 	m_iApp = INVERSEDESIGN;
+
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlAFoilToolBar->hide();
 	m_pctrlXDirectToolBar->hide();
@@ -4031,6 +4074,7 @@ void MainFrame::OnXInverse()
 	m_pctrlMiarexWidget->hide();
 	m_pctrlXDirectWidget->hide();
 	m_pctrlXInverseWidget->show();
+
 	SetCentralWidget();
 	pXInverse->m_bFullInverse = true;
 	SetMenus();
@@ -4435,6 +4479,7 @@ void MainFrame::SetCentralWidget()
 		m_pctrlCentralWidget->setCurrentIndex(1);
 	}
 }
+
 
 bool MainFrame::SelectFoil(CFoil *pFoil)
 {

@@ -33,13 +33,13 @@
 
 EditPlrDlg::EditPlrDlg()
 {
+	setWindowTitle("Polar Points Edition");
 	m_pMiarex     = NULL;
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
 	m_pWPolar     = NULL;
 
 	SetupLayout();
-
 }
 
 
@@ -93,7 +93,9 @@ void EditPlrDlg::FillTable()
 				m_pctrlAlphaList->addItem(strong);
 			}
 		}
-	}}
+	}
+}
+
 
 void EditPlrDlg::keyPressEvent(QKeyEvent *event)
 {
@@ -187,8 +189,12 @@ void EditPlrDlg::SetupLayout()
 	m_pctrlAlphaList = new QListWidget;
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
+	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlAlphaList);
+	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
+	MainLayout->addStretch(1);
+
 	setLayout(MainLayout);
 
 	connect(m_pctrlDeletePoint, SIGNAL(clicked()),this, SLOT(OnDeletePoint()));

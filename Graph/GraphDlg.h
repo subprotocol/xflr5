@@ -34,8 +34,6 @@ class GraphDlg : public QDialog
 	Q_OBJECT
 	friend class Graph;
 
-private:
-	void SetLayout();
 
 public:
 	GraphDlg();
@@ -43,6 +41,7 @@ public:
 
 private slots:
 	void OnOK();
+	void OnApply();
 	void OnTitleFont();
 	void OnLegendFont();
 	void OnLabelFont();
@@ -64,13 +63,17 @@ private slots:
 	void OnGraphBorder(int state);
 	void OnGraphBackColor();
 	void OnBorderStyle();
+	void OnYInverted();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
+	void SetupLayout();
+	void SetApplied(bool bApplied);
+	void Connect();
 
 	QWidget *ScalePage, *FontPage, *BackPage, *GridPage;
 
-	QPushButton *OKButton,*CancelButton, *RestoreButton;
+	QPushButton *OKButton,*CancelButton, *RestoreButton, *ApplyButton;
 	QPushButton *m_pctrlTitleButton, * m_pctrlLegendButton, *m_pctrlLabelButton;
 	ColorButton *m_pctrlTitleColor, *m_pctrlLabelColor, *m_pctrlLegendColor;
 	QLabel *m_pctrlTitleLabel, *m_pctrlLabelLabel, *m_pctrlLegendLabel;
@@ -89,8 +92,13 @@ private:
 
 	QFont *m_pTitleFont, *m_pLegendFont, *m_pLabelFont;
 
+	bool m_bApplied;
+
 public:
 	Graph *m_pGraph, *m_pMemGraph;
+	Graph *m_GraphArray[5];
+	int m_NGraph;
+	static void *s_pMainFrame;
 };
 
 #endif // GRAPHDLG_H

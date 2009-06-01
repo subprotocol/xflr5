@@ -26,6 +26,8 @@
 #include "../Globals.h"
 #include "../Misc/RenameDlg.h"
 #include "../Misc/ProgressDlg.h"
+#include "../Misc/EditPlrDlg.h"
+#include "../Graph/GraphDlg.h"
 #include "../Graph/GraphVariableDlg.h"
 #include "../Graph/WingGraphVarDlg.h"
 #include "WAdvancedDlg.h"
@@ -210,15 +212,13 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_GLList = 0;
 
-
-
 	m_pAnimateTimer = new QTimer(this);
 	m_posAnimate         = 0;
 
 	m_pCurWingGraph = &m_WingGraph1;
 	m_pCurWPlrGraph = &m_WPlrGraph1;
 
-	m_WingGraph1.SetAutoX(false);
+	m_WingGraph1.SetAutoX(true);
 //	m_WingGraph1.SetXUnit(2.0);
 	m_WingGraph1.SetXMin(-1.0);
 	m_WingGraph1.SetXMax( 1.0);
@@ -231,7 +231,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WingGraph1.SetType(1);
 	m_WingGraph1.SetMargin(50);
 
-	m_WingGraph2.SetAutoX(false);
+	m_WingGraph2.SetAutoX(true);
 	m_WingGraph2.SetXUnit(2.0);
 	m_WingGraph2.SetXMin(-10.0);
 	m_WingGraph2.SetXMax( 10.0);
@@ -244,7 +244,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WingGraph2.SetType(1);
 	m_WingGraph2.SetMargin(50);
 
-	m_WingGraph3.SetAutoX(false);
+	m_WingGraph3.SetAutoX(true);
 	m_WingGraph3.SetXUnit(2.0);
 	m_WingGraph3.SetXMin(-10.0);
 	m_WingGraph3.SetXMax( 10.0);
@@ -257,7 +257,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WingGraph3.SetType(1);
 	m_WingGraph3.SetMargin(50);
 
-	m_WingGraph4.SetAutoX(false);
+	m_WingGraph4.SetAutoX(true);
 	m_WingGraph4.SetXUnit(2.0);
 	m_WingGraph4.SetXMin(-10.0);
 	m_WingGraph4.SetXMax( 10.0);
@@ -449,6 +449,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_LiftScale = m_DragScale = m_VelocityScale = 0.7;
 
+	m_bXPressed = m_bYPressed = false;
 
 	m_bDirichlet         = true;
 	m_bTrefftz           = true;
@@ -7874,7 +7875,7 @@ void QMiarex::GLCreateWingLegend()
 		glDisable(GL_LIGHT0);
 
 //		pGLWidget->SetTextColor(pMainFrame->m_TextColor);
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+//		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 		if(m_pCurWing)
 		{
 			double area = m_pCurWing->m_Area;
@@ -7985,7 +7986,7 @@ void QMiarex::GLCreateWOppLegend()
 	{
 		m_GLList++;
 
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+//		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
@@ -9732,6 +9733,12 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_X:
+			m_bXPressed = true;
+			break;
+		case Qt::Key_Y:
+			m_bYPressed = true;
+			break;
 		case Qt::Key_G:
 		{
 			if(m_pCurGraph)
@@ -9793,6 +9800,12 @@ void QMiarex::keyReleaseEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
+		case Qt::Key_X:
+			if(!event->isAutoRepeat()) m_bXPressed = false;
+			break;
+		case Qt::Key_Y:
+			if(!event->isAutoRepeat()) m_bYPressed = false;
+			break;
 		default:
 			event->ignore();
 	}
@@ -9915,11 +9928,17 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 	return true;
 }
 
+void QMiarex::mouseDoubleClickEvent ( QMouseEvent * event )
+{
+	if(m_iView==3 || !m_pCurGraph) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->OnGraphSettings();
+}
 
 
 void QMiarex::mouseMoveEvent(QMouseEvent *event)
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!hasFocus()) setFocus();
 	CVector Real;
 	QPoint Delta(event->pos().x() - m_LastPoint.x(), event->pos().y() - m_LastPoint.y());
 	QPoint point = event->pos();
@@ -9929,18 +9948,12 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 	if(m_iView==3)
 	{
-		GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+//		GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 		QPoint pt(event->pos().x(), event->pos().y());
 		CVector Real;
 		ClientToGL(pt, Real);
 
-		if(!pGLWidget->hasFocus()) pGLWidget->setFocus();
-
-	//	SHORT shX  = GetKeyState('X');
-	//	SHORT shY  = GetKeyState('Y');
-	//	SHORT shZ  = GetKeyState('Z');
-	//	SHORT sh1  = GetKeyState(VK_LCONTROL);
-	//	SHORT sh2  = GetKeyState(VK_RCONTROL);
+//		if(!pGLWidget->hasFocus()) pGLWidget->setFocus();
 
 		if (event->buttons() & Qt::LeftButton && m_iView==3)
 		{
@@ -10001,8 +10014,8 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	}
 	else
 	{
-		TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-		if(!p2DWidget->hasFocus()) p2DWidget->setFocus();
+//		TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+//		if(!p2DWidget->hasFocus()) p2DWidget->setFocus();
 
 		if ((event->buttons() & Qt::LeftButton) && m_bTrans && (m_iView==1 || m_iView==2 || m_iView==4))
 		{
@@ -10174,6 +10187,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 		m_LastPoint = point;
 	}
 }
+
 
 void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -10528,6 +10542,61 @@ void QMiarex::OnAllWPolarGraphScales()
 	UpdateView();
 }
 
+void QMiarex::OnAllWingGraphSettings()
+{
+	GraphDlg dlg;
+	QGraph graph;
+	graph.CopySettings(&m_WingGraph1);
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph    = &m_WingGraph1;
+	dlg.m_GraphArray[0] = &m_WingGraph1;
+	dlg.m_GraphArray[1] = &m_WingGraph2;
+	dlg.m_GraphArray[2] = &m_WingGraph3;
+	dlg.m_GraphArray[3] = &m_WingGraph4;
+	dlg.m_NGraph = 4;
+	dlg.SetParams();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+	}
+	else
+	{
+		m_WingGraph1.CopySettings(&graph);
+		m_WingGraph2.CopySettings(&graph);
+		m_WingGraph3.CopySettings(&graph);
+		m_WingGraph4.CopySettings(&graph);
+	}
+	UpdateView();
+}
+
+
+void QMiarex::OnAllWPolarGraphSettings()
+{
+	GraphDlg dlg;
+	QGraph graph;
+	graph.CopySettings(&m_WPlrGraph1);
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph    = &m_WPlrGraph1;
+	dlg.m_GraphArray[0] = &m_WPlrGraph1;
+	dlg.m_GraphArray[1] = &m_WPlrGraph2;
+	dlg.m_GraphArray[2] = &m_WPlrGraph3;
+	dlg.m_GraphArray[3] = &m_WPlrGraph4;
+	dlg.m_NGraph = 4;
+	dlg.SetParams();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+	}
+	else
+	{
+		m_WPlrGraph1.CopySettings(&graph);
+		m_WPlrGraph2.CopySettings(&graph);
+		m_WPlrGraph3.CopySettings(&graph);
+		m_WPlrGraph4.CopySettings(&graph);
+	}
+	UpdateView();
+}
+
 
 void QMiarex::OnAxes()
 {
@@ -10878,6 +10947,31 @@ void QMiarex::OnAdvancedSettings()
 }
 
 
+void QMiarex::OnClipPlane(int pos)
+{
+	double planepos =  (double)pos/100.0;
+	m_ClipPlanePos = sinh(planepos) * 0.5;
+	UpdateView();
+}
+
+
+
+void QMiarex::OnCpSection(int pos)
+{
+	m_CurSpanPos = (double)pos/100.0;
+	m_pctrlSpanPos->SetValue(m_CurSpanPos);
+	CreateCpCurves();
+	UpdateView();
+}
+
+
+void QMiarex::OnCpPosition()
+{
+	m_CurSpanPos = m_pctrlSpanPos->GetValue();
+	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
+	CreateCpCurves();
+	UpdateView();
+}
 
 void QMiarex::OnCpView()
 {
@@ -10905,13 +10999,6 @@ void QMiarex::OnCpView()
 	UpdateView();
 }
 
-
-void QMiarex::OnClipPlane(int pos)
-{
-	double planepos =  (double)pos/100.0;
-	m_ClipPlanePos = sinh(planepos) * 0.5;
-	UpdateView();
-}
 
 
 void QMiarex::OnCurWOppOnly()
@@ -11079,6 +11166,7 @@ void QMiarex::OnDefinePolarGraphVariables()
 
 void QMiarex::OnDefineCtrlPolar()
 {
+	m_bArcball = false;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_CtrlPolarDlg.m_QInf          = m_WngAnalysis.m_QInf;
 	m_CtrlPolarDlg.m_Weight        = m_WngAnalysis.m_Weight;
@@ -11479,6 +11567,18 @@ void QMiarex::OnDeleteCurWOpp()
 
 
 
+
+void QMiarex::OnResetCpSection()
+{
+	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
+//	m_CurSpanPos = m_SpanPos;
+	CreateCpCurves();
+	UpdateView();
+}
+
+
+
+
 void QMiarex::OnDeleteUFOWOpps()
 {
 	//Delete all Opps for the current UFO
@@ -11549,6 +11649,28 @@ void QMiarex::OnDeleteUFOWPolars()
 	UpdateView();
 }
 
+
+void QMiarex::OnKeepCpSection()
+{
+	CCurve *pCurve, *pNewCurve;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pCurve = m_CpGraph.GetCurve(0);
+	pNewCurve = m_CpGraph.AddCurve();
+	pNewCurve->Copy(pCurve);
+
+	m_CpColor = pMainFrame->m_crColors[(m_CpGraph.GetCurveCount()-1)%24];
+	pCurve->SetColor(m_CpColor);
+
+	m_CpStyle = 0;
+	m_CpWidth = 1;
+	m_bShowCpPoints = false;
+	SetCurveParams();
+
+//	m_CurSpanPos = m_SpanPos;
+	CreateCpCurves();
+	UpdateView();
+}
 
 
 void QMiarex::OnDeleteCurWPolar()
@@ -11692,6 +11814,35 @@ void QMiarex::OnEditCurBody()
 
 void QMiarex::OnEditCurWPolar()
 {
+	//Edit the current WPolar data
+	if (!m_pCurWPolar) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	CWPolar MemWPolar;
+	MemWPolar.Copy(m_pCurWPolar);
+	EditPlrDlg dlg;
+	dlg.m_pWPolar = m_pCurWPolar;
+	dlg.m_pMiarex = this;
+	dlg.InitDialog();
+
+	bool bPoints = m_pCurWPolar->m_bShowPoints;
+	m_pCurWPolar->m_bShowPoints = true;
+	CreateWPolarCurves();
+	UpdateView();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		pMainFrame->SetSaveState(false);
+	}
+	else
+	{
+		m_pCurWPolar->Copy(&MemWPolar);
+	}
+	m_pCurWPolar->m_bShowPoints = bPoints;
+	CreateWPolarCurves();
+//	pMainFrame->UpdateWOpps();
+//	SetWOpp(true);
+	UpdateView();
 }
 
 
@@ -14610,6 +14761,12 @@ void QMiarex::Set2DScale()
 	m_WingGraph3.Init();
 	m_WingGraph4.Init();
 
+	m_WingGraph1.SetAutoXUnit();
+	m_WingGraph2.SetAutoXUnit();
+	m_WingGraph3.SetAutoXUnit();
+	m_WingGraph4.SetAutoXUnit();
+
+
 	if(m_iView==1)      SetWingLegendPos();
 	else if(m_iView==2) SetWPlrLegendPos();
 
@@ -15822,9 +15979,9 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 4);
-	m_pctrlAlphaMax     = new FloatEdit(1., 5);
-	m_pctrlAlphaDelta   = new FloatEdit(0.5, 6);
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 2);
+	m_pctrlAlphaMax     = new FloatEdit(1., 2);
+	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
 
 	m_pctrlAlphaMin->setMinimumHeight(20);
 	m_pctrlAlphaMax->setMinimumHeight(20);
@@ -17003,24 +17160,21 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		m_pCurGraph = GetGraph(pt);
 		if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt))
 		{
-//			SHORT sh1 = GetKeyState('X');
-//			SHORT sh2 = GetKeyState('Y');
-
-/*			if (sh1 & 0x8000)
+			if (m_bXPressed)
 			{
 				//zoom x scale
 				m_pCurGraph->SetAutoX(false);
-				if(zDelta>0) m_pCurGraph->Scalex(1.06);
-				else m_pCurGraph->Scalex(1.0/1.06);
+				if(event->delta()>0) m_pCurGraph->Scalex(1.06);
+				else                 m_pCurGraph->Scalex(1.0/1.06);
 			}
-			else if(sh2 & 0x8000)
+			else if(m_bYPressed)
 			{
 				//zoom y scale
 				m_pCurGraph->SetAutoY(false);
-				if(zDelta>0) m_pCurGraph->Scaley(1.06);
-				else m_pCurGraph->Scaley(1.0/1.06);
+				if(event->delta()>0) m_pCurGraph->Scaley(1.06);
+				else                 m_pCurGraph->Scaley(1.0/1.06);
 			}
-			else*/
+			else
 			{
 				//zoom both
 				m_pCurGraph->SetAuto(false);
@@ -17038,55 +17192,3 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 	}
 }
-
-
-void QMiarex::OnKeepCpSection()
-{
-	CCurve *pCurve, *pNewCurve;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	pCurve = m_CpGraph.GetCurve(0);
-	pNewCurve = m_CpGraph.AddCurve();
-	pNewCurve->Copy(pCurve);
-
-	m_CpColor = pMainFrame->m_crColors[(m_CpGraph.GetCurveCount()-1)%24];
-	pCurve->SetColor(m_CpColor);
-
-	m_CpStyle = 0;
-	m_CpWidth = 1;
-	m_bShowCpPoints = false;
-	SetCurveParams();
-
-//	m_CurSpanPos = m_SpanPos;
-	CreateCpCurves();
-	UpdateView();
-}
-
-
-void QMiarex::OnResetCpSection()
-{
-	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
-//	m_CurSpanPos = m_SpanPos;
-	CreateCpCurves();
-	UpdateView();
-}
-
-
-void QMiarex::OnCpSection(int pos)
-{
-	m_CurSpanPos = (double)pos/100.0;
-	m_pctrlSpanPos->SetValue(m_CurSpanPos);
-	CreateCpCurves();
-	UpdateView();
-}
-
-
-void QMiarex::OnCpPosition()
-{
-	m_CurSpanPos = m_pctrlSpanPos->GetValue();
-	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
-	CreateCpCurves();
-	UpdateView();
-}
-
-

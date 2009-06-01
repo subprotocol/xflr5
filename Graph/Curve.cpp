@@ -27,7 +27,7 @@
 
 #include "Curve.h"
 #include "math.h"
-#include <QtDebug>
+#include "Graph.h"
 
 
 
@@ -195,16 +195,17 @@ int CCurve::GetClosestPoint(double xs)
 
 int CCurve::GetClosestPoint(double xs, double ys)
 {
+	Graph *pGraph = (Graph*)m_pParentGraph;
 	int ref = -1;
-	double dist;
-	double distmax = 1.e10;
+	double dist2;
+	double dist2max = 1.e10;
 	if (n<1) return -1;
 	for(int i=0; i<n; i++)
 	{
-		dist = sqrt((xs-x[i])*(xs-x[i]) + (ys-y[i])*(ys-y[i]));
-		if (dist<distmax)
+		dist2 = (xs-x[i])*(xs-x[i])/pGraph->GetXScale()/pGraph->GetXScale() + (ys-y[i])*(ys-y[i])/pGraph->GetYScale()/pGraph->GetYScale();
+		if (dist2<dist2max)
 		{
-			distmax = dist;
+			dist2max = dist2;
 			ref = i;
 		}
 	}

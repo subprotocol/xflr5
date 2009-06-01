@@ -7,9 +7,6 @@
 #define MIAREX         4
 #define XBODY          5
 
-
-#define GLF_START_LIST 5000
-
 #define MAXPANELS          25
 #define MAXSTATIONS	      100 //max number of stations for LLT or VLM analysis
 #define MAXCHORDPANELS	   30

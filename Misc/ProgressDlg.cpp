@@ -72,7 +72,6 @@ void ProgressDlg::SetupLayout()
 
 void ProgressDlg::OnCancel()
 {
-qDebug()	<< "Cancelling";
 	m_bCancel = true;
 	reject();
 }

@@ -33,7 +33,6 @@ TwoDWidget::~TwoDWidget()
 
 void TwoDWidget::keyPressEvent(QKeyEvent *event)
 {
-
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
@@ -161,33 +160,32 @@ void TwoDWidget::mouseMoveEvent(QMouseEvent *event)
 		pXInverse->mouseMoveEvent(event);
 	}
 }
-/*
-void TwoDWidget::showEvent(QShowEvent *event)
-{
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	if(m_pXDirect)
+void TwoDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(pMainFrame->m_iApp == XFOILANALYSIS && m_pXDirect)
 	{
 		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-		pXDirect->SetFoilScale(rect());
+		pXDirect->mouseDoubleClickEvent(event );
 	}
-	else  if(m_pMiarex)
+	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
-		pMiarex->m_bIs2DScaleSet = false;
-		pMiarex->SetScale(rect());
+		pMiarex->mouseDoubleClickEvent(event );
 	}
-	else if(m_pAFoil)
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
 	{
-		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
-		pAFoil->SetScale(rect());
+//		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+//		pAFoil->SetScale(rect());
 	}
-	else if(m_pXInverse)
+	else if(pMainFrame->m_iApp == INVERSEDESIGN && m_pXInverse)
 	{
 		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
-		pXInverse->SetScale(rect());
+		pXInverse->mouseDoubleClickEvent(event );
 	}
-}*/
+}
 
 
 void TwoDWidget::resizeEvent(QResizeEvent *event)

@@ -87,7 +87,7 @@ private:
 	QPushButton *m_pctrlCancel;
 
 	bool m_bSequence;
-	bool m_bSkip, m_bExit, m_bCancel, m_bWarning;
+	bool m_bCancel, m_bWarning;
 
 	int m_State;
 
@@ -98,7 +98,6 @@ private:
 	static void *s_pMainFrame;
 
 	QFile *m_pXFile;
-
 
 	double pi;
 	double *m_RHS;

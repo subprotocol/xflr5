@@ -687,11 +687,9 @@ bool CBody::ImportDefinition()
 	{
 		bRead  = ReadAVLString(in, Line, strong);
 		if(!bRead) break;
-//qDebug() << strong;
 		if (strong.indexOf("BODYTYPE") >=0)
 		{
 			bRead  = ReadAVLString(in, Line, strong);
-//qDebug() << strong;
 			if(!bRead) break;
 			res = strong.toInt(&bOK);
 			if(bOK)
@@ -703,7 +701,6 @@ bool CBody::ImportDefinition()
 		else if (strong.indexOf("OFFSET") >=0)
 		{
 			bRead  = ReadAVLString(in, Line, strong);
-//qDebug() << strong;
 			if(!bRead) break;
 
 			textline = strong.toAscii();
@@ -1251,7 +1248,6 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
         textline = strong.toAscii();
         text = textline.constData();
         res = sscanf(text, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
-//qDebug() << strong << real.x << real.y << real.z;
 
         if(res!=3)
 		{

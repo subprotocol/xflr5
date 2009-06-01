@@ -162,7 +162,7 @@ void RenameDlg::OnOK()
 		if(strong == m_strName)
 		{
 			QString str = "Do you wish to overwrite "+m_strName + " ?";
-			if (QMessageBox::Yes == QMessageBox::question(window(), "QFLR5", str,
+			if (QMessageBox::Yes == QMessageBox::question(window(), "Question", str,
 														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			{
 				done(10);

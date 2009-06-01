@@ -39,6 +39,7 @@
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
 #include "SplineCtrlsDlg.h"
+#include "LECircleDlg.h"
 
 QAFoil::~QAFoil()
 {
@@ -74,7 +75,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bTrans       = false;
 	m_bNeutralLine = true;
 	m_bScale       = true;
-	m_bCircle      = false;
+	m_bLECircle      = false;
 	m_bShowLegend  = true;
 	m_bStored      = false;
 	m_bXDown = m_bYDown = m_bZDown = false;
@@ -496,7 +497,7 @@ void QAFoil::LoadSettings(QDataStream &ar)
 	ar >> m_pSF->m_bVisible  >> m_pSF->m_bOutPoints >> m_pSF->m_bCenterLine;
 	ar >> m_pPF->m_bVisible  >> m_pPF->m_bOutPoints >> m_pPF->m_bCenterLine;
 
-	ar >> m_bCircle >> m_bNeutralLine >> m_bScale >> m_bShowLegend;
+	ar >> m_bLECircle >> m_bNeutralLine >> m_bScale >> m_bShowLegend;
 
 }
 
@@ -878,11 +879,11 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 	if(m_bZoomPlus && m_rCltRect.contains(point))
 	{
+		m_ZoomRect.setBottomRight(point);
 		QRect ZRect = m_ZoomRect.normalized();
 	
 		if(!ZRect.isEmpty())
 		{
-			m_ZoomRect.setBottomRight(point);
 			m_ZoomRect = ZRect;
 
 			double ZoomFactor = qMin((double)m_rCltRect.width()  / (double)m_ZoomRect.width() , 
@@ -906,7 +907,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 			m_ptOffset.rx() = (int)(ZoomFactor * (m_ptOffset.x()-a)+a);
 			m_ptOffset.ry() = (int)(ZoomFactor * (m_ptOffset.y()-b)+b);
 
-			m_ZoomRect.setRight(m_ZoomRect.left()-1);
+			m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
 		}
 		else 
 		{
@@ -1078,6 +1079,24 @@ void QAFoil::OnAFoilCadd()
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
+
+
+void QAFoil::OnAFoilLECircle()
+{
+	LECircleDlg dlg;
+	dlg.m_Radius      = m_LERad;
+	dlg.m_bShowRadius = m_bLECircle;
+	dlg.m_pAFoil      = this;
+	dlg.InitDialog();
+
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		m_LERad = dlg.m_Radius;
+		m_bLECircle = dlg.m_bShowRadius;
+	}
+	UpdateView();
+}
+
 
 void QAFoil::OnAFoilPanels()
 {
@@ -2156,6 +2175,67 @@ void QAFoil::OnZoomLess()
 }
 
 
+void QAFoil::PaintGrids(QPainter &painter)
+{
+	painter.save();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	QColor color;
+	int style, width;
+
+	if(m_bZoomPlus)
+	{
+		QRect ZRect = m_ZoomRect.normalized();
+		QPen ZoomPen(QColor(100,100,100));
+		ZoomPen.setStyle(Qt::DashLine);
+		painter.setPen(ZoomPen);
+		painter.drawRect(ZRect);
+	}
+
+	if(m_bLECircle)
+	{
+		int rx = (int)(m_LERad/100.0 * m_fScale);
+		int ry = (int)(m_LERad/100.0 * m_fScale * m_fScaleY);
+		QRect rc(m_ptOffset.x(), m_ptOffset.y() - ry,  2*rx, 2*ry);
+
+		QPen CirclePen(QColor(128,128,128));
+		CirclePen.setStyle(Qt::DashLine);
+		painter.setPen(CirclePen);
+		painter.drawEllipse(rc);
+	}
+	if (m_bNeutralLine)
+	{
+		color = m_NeutralColor;
+		style = m_NeutralStyle;
+		width = m_NeutralWidth;
+		QPen NPen(m_NeutralColor);
+		NPen.setStyle(GetStyle(m_NeutralStyle));
+		NPen.setWidth(m_NeutralWidth);
+		painter.setPen(NPen);
+
+		painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());
+	}
+
+
+
+//draw grids
+	if(m_bXGrid)	DrawXGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bYGrid)	DrawYGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bXMinGrid) DrawXMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+	if(m_bYMinGrid) DrawYMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
+
+/*	pDC->SetTextColor(pChildView->m_WndTextColor);
+	CFont RFont;
+	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
+	CFont *pOldFont = pDC->SelectObject(&RFont);
+
+	if(m_bScale) DrawScale(pDC, &m_rDrawRect, m_fScale, m_ptOffset,false);*/
+
+	painter.restore();
+}
+
+
+
 void QAFoil::PaintLegend(QPainter &painter)
 {
 	painter.save();
@@ -2290,69 +2370,6 @@ void QAFoil::PaintView(QPainter &painter)
 	painter.restore();
 }
 
-
-
-
-void QAFoil::PaintGrids(QPainter &painter)
-{
-	painter.save();
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-	QColor color;
-	int style, width;
-
-	if(m_bZoomPlus && !m_ZoomRect.isEmpty())
-	{
-		QRect ZRect = m_ZoomRect.normalized();
-		QPen ZoomPen(QColor(100,100,100));
-		ZoomPen.setStyle(Qt::DashLine);
-		QBrush ZoomBrush(pMainFrame->m_BackgroundColor);
-		painter.setPen(ZoomPen);
-		painter.setBrush(ZoomBrush);
-		painter.drawRect(ZRect);
-	}
-
-	if(m_bCircle)
-	{
-		int rx = (int)(m_LERad/100.0 * m_fScale);
-		int ry = (int)(m_LERad/100.0 * m_fScale * m_fScaleY);
-		QRect rc(m_ptOffset.x(), m_ptOffset.y() - ry, m_ptOffset.x()+2*rx,m_ptOffset.y() + ry);
-
-		QPen CirclePen(QColor(128,128,128));
-		CirclePen.setStyle(Qt::DashLine);
-		painter.setPen(CirclePen);
-		painter.drawEllipse(rc);
-	}
-	if (m_bNeutralLine)
-	{
-		color = m_NeutralColor;
-		style = m_NeutralStyle;
-		width = m_NeutralWidth;
-		QPen NPen(m_NeutralColor);
-		NPen.setStyle(GetStyle(m_NeutralStyle));
-		NPen.setWidth(m_NeutralWidth);
-		painter.setPen(NPen);
-
-		painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());
-	}
-
-
-
-//draw grids
-	if(m_bXGrid)	DrawXGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
-	if(m_bYGrid)	DrawYGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
-	if(m_bXMinGrid) DrawXMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
-	if(m_bYMinGrid) DrawYMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
-
-/*	pDC->SetTextColor(pChildView->m_WndTextColor);
-	CFont RFont;
-	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
-	CFont *pOldFont = pDC->SelectObject(&RFont);
-
-	if(m_bScale) DrawScale(pDC, &m_rDrawRect, m_fScale, m_ptOffset,false);*/
-
-	painter.restore();
-}
 
 
 
@@ -2531,7 +2548,7 @@ void QAFoil::SaveSettings(QDataStream &ar)
 	ar << m_pSF->m_bVisible << m_pSF->m_bOutPoints << m_pSF->m_bCenterLine;
 	ar << m_pPF->m_bVisible << m_pPF->m_bOutPoints << m_pPF->m_bCenterLine;
 
-	ar << m_bCircle << m_bNeutralLine << m_bScale << m_bShowLegend;
+	ar << m_bLECircle << m_bNeutralLine << m_bScale << m_bShowLegend;
 }
 
 
@@ -2694,7 +2711,7 @@ void QAFoil::SetupLayout()
 	connect(m_pctrlCenterLine, SIGNAL(clicked()), this, SLOT(OnCenterLine()));
 
 	connect(m_pctrlFoilTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
-//	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
+	connect(m_pctrlFoilTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFoilClicked(const QModelIndex&)));
 
 
 	m_pFoilModel = new QStandardItemModel;

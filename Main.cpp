@@ -62,6 +62,20 @@ int main(int argc, char *argv[])
 
 	if(w.m_bMaximized)	w.showMaximized();
 	else                w.show();
+
+	QString PathName, Extension;
+	PathName=argv[1];
+
+	Extension = PathName.right(4);
+	if(Extension.compare(".wpa",Qt::CaseInsensitive)==0 ||
+	   Extension.compare(".plr",Qt::CaseInsensitive)==0)
+	{
+		int app = w.LoadXFLR5File(PathName);
+
+		if (app == MIAREX)             w.OnMiarex();
+		else if (app == XFOILANALYSIS) w.OnXDirect();
+	}
+
 	return app.exec();
 }
 

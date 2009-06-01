@@ -26,13 +26,13 @@ protected:
 	void wheelEvent (QWheelEvent *event );
 	void resizeEvent ( QResizeEvent * event );
 	void paintEvent(QPaintEvent *event);
-//	void showEvent(QShowEvent *event);
-
+	void mouseDoubleClickEvent ( QMouseEvent * event );
  
 private:
 	QRect m_rCltRect;          // The client window rectangle
 	void * m_pXDirect, *m_pMiarex, *m_pAFoil, *m_pXInverse;
 	void *m_pMainFrame;
+
 };
 
 #endif

@@ -247,6 +247,7 @@ void CtrlPolarDlg::InitDialog()
 
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+
 	m_pctrlSpeedUnit->setText(str);
 	m_pctrlQInf->SetValue(m_QInf*pMainFrame->m_mstoUnit);
 
@@ -334,6 +335,15 @@ void CtrlPolarDlg::OnArea()
 	{
 		m_RefAreaType = 2;
 	}
+	SetWPolarName();
+}
+
+
+
+
+void CtrlPolarDlg::OnCellChanged(QWidget *pWidget)
+{
+	ReadCtrlData();
 	SetWPolarName();
 }
 
@@ -560,10 +570,13 @@ void CtrlPolarDlg::SetupLayout()
 	QLabel *lab9 = new QLabel("Unit");
 	m_pctrlUnit1 = new QRadioButton("International");
 	m_pctrlUnit2 = new QRadioButton("Imperial");
-	m_pctrlRho           = new QLabel("r");
+	m_pctrlRho           = new QLabel("r=");
 	m_pctrlDensity       = new FloatEdit(1.500e-5,3);
 	m_pctrlDensityUnit   = new QLabel("kg/m3");
-	m_pctrlNu            = new QLabel("n");
+	m_pctrlNu            = new QLabel("n=");
+	m_pctrlRho->setFont(QFont("Symbol"));
+	m_pctrlNu->setFont(QFont("Symbol"));
+
 	m_pctrlViscosity     = new FloatEdit(1.225,3);
 	m_pctrlViscosityUnit = new QLabel("m2/s");
 	AeroDataLayout->addWidget(lab9,1,1);
@@ -601,6 +614,7 @@ void CtrlPolarDlg::SetupLayout()
 	m_pCtrlDelegate = new CtrlTableDelegate;
 	m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
 	m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
+	connect(m_pCtrlDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	int  *precision = new int[6];
 	precision[0]  = 2;
@@ -645,6 +659,7 @@ void CtrlPolarDlg::SetupLayout()
 
 void CtrlPolarDlg::SetWPolarName()
 {
+	if(!m_bAutoName) return;
 	QString str, strong;
 	int i, nCtrl;
 
@@ -727,6 +742,10 @@ void CtrlPolarDlg::SetWPolarName()
 		}
 	}
 
+	if(!m_bViscous)
+	{
+		m_WPolarName += "-Inviscid";
+	}
 	if(m_RefAreaType==2) m_WPolarName += "-proj_area";
 
 	m_pctrlWPolarName->setText(m_WPolarName);

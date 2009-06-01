@@ -74,6 +74,8 @@ QXDirect::QXDirect(QWidget *parent)
 	m_bShowUserGraph  = true;
 	m_bSequence       = false;
 
+	m_bXPressed = m_bYPressed = false;
+
 	m_Type            = 1;
 
 	m_bTrans          = false;
@@ -621,7 +623,6 @@ void QXDirect::CreateOppCurves(OpPoint *pOpp)
 			}
 		}
 	}
-
 }
 
 
@@ -1161,7 +1162,7 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 	bool bIsInserted = false;
 	OpPoint* pOpPoint;
 	CPolar *pPolar = pMainFrame->GetPolar(pNewPoint->m_strFoilName, pNewPoint->m_strPlrName);
-//		m_pCurPolar = pPolar;
+
 	if(!pPolar)
 	{
 		delete pNewPoint;
@@ -1229,6 +1230,12 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 			StopAnimate();
 			UpdateView();
+			break;
+		case Qt::Key_X:
+			m_bXPressed = true;
+			break;
+		case Qt::Key_Y:
+			m_bYPressed = true;
 			break;
 		case Qt::Key_1:
 			m_iPlrView  = 1;
@@ -1301,6 +1308,24 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 }
 
 
+void QXDirect::keyReleaseEvent(QKeyEvent *event)
+{
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	switch (event->key())
+	{
+		case Qt::Key_X:
+			if(!event->isAutoRepeat()) m_bXPressed = false;
+			break;
+		case Qt::Key_Y:
+			if(!event->isAutoRepeat()) m_bYPressed = false;
+			break;
+		default:
+			QWidget::keyReleaseEvent(event);
+	}
+}
+
+
 void QXDirect::LoadSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
@@ -1359,6 +1384,19 @@ void QXDirect::LoadSettings(QDataStream &ar)
 
 }
 
+
+void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(!m_bPolar)
+	{
+		if (!m_pCpGraph->IsInDrawRect(event->pos())) return;
+	}
+	else if(!m_pCurGraph) return;
+
+	pMainFrame->OnGraphSettings();
+}
 
 
 void QXDirect::mouseMoveEvent(QMouseEvent *event)
@@ -1512,16 +1550,26 @@ void QXDirect::OnAllPolarGraphs()
 	UpdateView();
 }
 
+
 void QXDirect::OnAllPolarGraphsSetting()
 {
 	GraphDlg dlg;
 	QGraph graph;
 	graph.CopySettings(m_pPolarGraph);
-	dlg.m_pMemGraph = m_pPolarGraph;
-	dlg.m_pGraph = &graph;
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph    = m_pPolarGraph;
+	dlg.m_GraphArray[0] = m_pPolarGraph;
+	dlg.m_GraphArray[1] = m_pCmGraph;
+	dlg.m_GraphArray[2] = m_pCzGraph;
+	dlg.m_GraphArray[3] = m_pTrGraph;
+	dlg.m_GraphArray[4] = m_pUserGraph;
+	dlg.m_NGraph = 5;
 	dlg.SetParams();
 
 	if(dlg.exec() == QDialog::Accepted)
+	{
+	}
+	else
 	{
 		m_pPolarGraph->CopySettings(&graph);
 		m_pCmGraph->CopySettings(&graph);
@@ -1532,18 +1580,13 @@ void QXDirect::OnAllPolarGraphsSetting()
 	UpdateView();
 }
 
+
 void QXDirect::OnAlphaMinChanged()
 {
 	QString str;
-/*	QString str1;
-	str = m_pctrlAlphaMin->text();
-	str1.setNum(m_Alpha,'f',6);
-	QMessageBox msgBox;
-	msgBox.setStandardButtons(QMessageBox::Ok);
-	msgBox.setWindowTitle("QFLR5");
-	msgBox.setText("text="+str+"\nvalue="+str1);
-	msgBox.exec();*/
+
 	if(!m_pCurPolar) return;
+
 	if(m_pCurPolar->m_Type !=4)
 	{
 		if(m_bAlpha)
@@ -1982,13 +2025,13 @@ void QXDirect::OnCpGraph()
 	m_bPolar = false;
 	if(m_OppVar!=0)
 	{
-		m_pCpGraph->ResetLimits();
+//		m_pCpGraph->ResetLimits();
 		m_pCpGraph->SetAuto(true);
 	}
 	m_OppVar = 0;
 	m_pCpGraph->SetInverted(true);
 	CreateOppCurves();
-	m_pCpGraph->SetYTitle("Q");
+	m_pCpGraph->SetYTitle("Cp");
 
 	CheckButtons();
 	m_pCpGraph->SetXScale();
@@ -3251,6 +3294,7 @@ void QXDirect::OnQGraph()
 	SetFoilScale();
 	UpdateView();
 }
+
 
 void QXDirect::OnResetAllPolarGraphsScales()
 {
@@ -5555,30 +5599,28 @@ void QXDirect::UpdateView()
 void QXDirect::wheelEvent (QWheelEvent *event )
 {
 //	point is in client coordinates
+//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
 	QPoint pt(event->x(), event->y()); //client coordinates
 	m_pCurGraph = GetGraph(pt);
 
 	if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt) && m_bCpGraph)
 	{
-/*		SHORT shX = GetKeyState('X');
-		SHORT shY = GetKeyState('Y');
-
-		if (shX & 0x8000)
+		if (m_bXPressed)
 		{
 			//zoom x scale
 			m_pCurGraph->SetAutoX(false);
-			if(zDelta>0) m_pCurGraph->Scalex(1.06);
-			else m_pCurGraph->Scalex(1.0/1.06);
+			if(event->delta()>0) m_pCurGraph->Scalex(1.06);
+			else                 m_pCurGraph->Scalex(1.0/1.06);
 		}
-		else if(shY & 0x8000)
+		else if(m_bYPressed)
 		{
 			//zoom y scale
 			m_pCurGraph->SetAutoY(false);
-			if(zDelta>0) m_pCurGraph->Scaley(1.06);
-			else m_pCurGraph->Scaley(1.0/1.06);
+			if(event->delta()>0) m_pCurGraph->Scaley(1.06);
+			else                 m_pCurGraph->Scaley(1.0/1.06);
 		}
-		else*/
+		else
 		{
 			//zoom both
 			m_pCurGraph->SetAuto(false);

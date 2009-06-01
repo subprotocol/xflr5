@@ -97,7 +97,8 @@ SOURCES += MainFrame.cpp \
     Misc/SaveOptionsDlg.cpp \
     Miarex/WAdvancedDlg.cpp \
     Miarex/GL3dWingDlg.cpp \
-    Misc/ProgressDlg.cpp
+    Misc/ProgressDlg.cpp \
+    Design/LECircleDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -190,7 +191,9 @@ HEADERS += MainFrame.h \
     Misc/SaveOptionsDlg.h \
     Miarex/WAdvancedDlg.h \
     Miarex/GL3dWingDlg.h \
-    Misc/ProgressDlg.h
+    Misc/ProgressDlg.h \
+    Params.h \
+    Design/LECircleDlg.h
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 

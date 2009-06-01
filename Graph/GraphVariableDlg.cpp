@@ -24,6 +24,7 @@
 
 GraphVariableDlg::GraphVariableDlg()
 {
+	setWindowTitle("Graph Variables");
 	m_XSel = 0;
 	m_YSel = 1;
 	SetupLayout();
@@ -32,6 +33,19 @@ GraphVariableDlg::GraphVariableDlg()
 
 void GraphVariableDlg::SetupLayout()
 {
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+
 	QHBoxLayout *AxisNames = new QHBoxLayout;
 	QLabel *YAxis = new QLabel("YAxis");
 	QLabel *vs = new QLabel("vs.");
@@ -49,8 +63,10 @@ void GraphVariableDlg::SetupLayout()
 	m_pctrlYSel = new QListWidget;
 	m_pctrlXSel->setMinimumWidth(40);
 	m_pctrlYSel->setMinimumWidth(40);
-	m_pctrlXSel->setMinimumHeight(350);
-	m_pctrlYSel->setMinimumHeight(350);
+	m_pctrlXSel->setMinimumHeight(500);
+	m_pctrlYSel->setMinimumHeight(500);
+/*	m_pctrlXSel->setSizePolicy(szPolicyExpanding);
+	m_pctrlYSel->setSizePolicy(szPolicyExpanding);*/
 	VariableBox->addStretch(1);
 	VariableBox->addWidget(m_pctrlYSel);
 	VariableBox->addStretch(1);
@@ -69,7 +85,6 @@ void GraphVariableDlg::SetupLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QVBoxLayout *MainLayout = new QVBoxLayout(this);
-	MainLayout->addStretch(1);
 	MainLayout->addLayout(AxisNames);
 	MainLayout->addLayout(VariableBox);
 	MainLayout->addStretch(1);
@@ -198,8 +213,6 @@ void GraphVariableDlg::FillLists(int iGraphType)
 
 void GraphVariableDlg::keyPressEvent(QKeyEvent *event)
 {
-	// Prevent Return Key from closing App
-	// Generate the foil instead
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -214,7 +227,11 @@ void GraphVariableDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
-
+		case Qt::Key_Escape:
+		{
+			reject();
+			break;
+		}
 		default:
 			event->ignore();
 	}

@@ -58,6 +58,7 @@ QXInverse::QXInverse(QWidget *parent)
 	m_bMark    = false;
 	m_bMarked  = false;
 	m_bSmooth  = false;
+	m_bXPressed = m_bYPressed = false;
 
 	m_pRefFoil = new CFoil();
 	m_pModFoil = new CFoil();
@@ -108,12 +109,10 @@ QXInverse::QXInverse(QWidget *parent)
 	SetupLayout();
 	if(m_bFullInverse)
 	{
-		m_pctrlFullInverse->setChecked(true);
 		m_pctrlStackedInv->setCurrentIndex(0);
 	}
 	else
 	{
-		m_pctrlMixedInverse->setChecked(true);
 		m_pctrlStackedInv->setCurrentIndex(1);
 	}
 }
@@ -179,9 +178,6 @@ void QXInverse::Clear()
 
 void QXInverse::Connect()
 {
-	connect(m_pctrlFullInverse,   SIGNAL(clicked()), this, SLOT(OnInverseApp()));
-	connect(m_pctrlMixedInverse,  SIGNAL(clicked()), this, SLOT(OnInverseApp()));
-
 	connect(m_pctrlShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
 	connect(m_pctrlNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
 	connect(m_pctrlApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
@@ -462,9 +458,15 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 {
 	bool bCtrl;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl  = true;
-
 	switch (event->key())
 	{
+		case Qt::Key_X:
+			m_bXPressed = true;
+			break;
+		case Qt::Key_Y:
+			m_bYPressed = true;
+			break;
+
 		case Qt::Key_Escape:
 		{
 			if(m_bZoomPlus)
@@ -512,7 +514,6 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 			break;
 		}
 
-
 		case Qt::Key_Z:
 		{
 			return;//User is zooming with 'Z' key instead of mouse midle button
@@ -522,12 +523,25 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 			OnGraphOptions();
 			return;
 		}
+		default:
+			QWidget::keyPressEvent(event);
 	}
 }
 
 
 void QXInverse::keyReleaseEvent(QKeyEvent *event)
 {
+	switch (event->key())
+	{
+		case Qt::Key_X:
+			if(!event->isAutoRepeat()) m_bXPressed = false;
+			break;
+		case Qt::Key_Y:
+			if(!event->isAutoRepeat()) m_bYPressed = false;
+			break;
+		default:
+			QWidget::keyReleaseEvent(event);
+	}
 }
 
 
@@ -543,9 +557,18 @@ void QXInverse::LoadSettings(QDataStream &ar)
 
 
 
+void QXInverse::mouseDoubleClickEvent ( QMouseEvent * event )
+{
+	if (!m_QGraph.IsInDrawRect(event->pos())) return;
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->OnGraphSettings();
+}
+
+
 void QXInverse::mouseMoveEvent(QMouseEvent *event)
 {
-//	SHORT shZ  = GetKeyState(90);
+	if(!hasFocus()) setFocus();//to catch keyboard input;
 	double x1,y1, xmin, xmax, ymin,  ymax, xpt, ypt, scale, ux, uy, unorm, vx, vy, vnorm, scal;
 	double xx0,xx1,xx2,yy0,yy1,yy2;
 	int a, n, ipt;
@@ -1211,6 +1234,7 @@ void QXInverse::OnExtractFoil()
 		m_pModFoil->m_FoilName = m_pRefFoil->m_FoilName + " Modified";
 		InitXFoil(m_pRefFoil);
 		SetFoil();
+		UpdateView();
 	}
 }
 
@@ -1259,16 +1283,15 @@ void QXInverse::OnInsertCtrlPt()
 
 void QXInverse::OnInverseApp()
 {
-	m_bFullInverse = m_pctrlFullInverse->isChecked();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	m_bFullInverse = pMainFrame->m_pctrlFullInverse->isChecked();
 
 	if(m_bFullInverse)
 	{
-		m_pctrlFullInverse->setChecked(true);
 		m_pctrlStackedInv->setCurrentIndex(0);
 	}
 	else
 	{
-		m_pctrlMixedInverse->setChecked(true);
 		m_pctrlStackedInv->setCurrentIndex(1);
 	}
 	SetFoil();
@@ -1301,8 +1324,8 @@ void QXInverse::OnMarkSegment()
 	m_bGetPos = true;
 	m_nPos    = 0;
 
-	m_pctrlNewSpline->setChecked(false);
-	m_pctrlShowSpline->setChecked(false);
+	m_pctrlMNewSpline->setChecked(false);
+	m_pctrlMShowSpline->setChecked(false);
 
 	UpdateView();
 }
@@ -1897,16 +1920,7 @@ void QXInverse::SetupLayout()
 	m_pctrlStackedInv->addWidget(m_pctrlFInvWidget);
 	m_pctrlStackedInv->addWidget(m_pctrlMInvWidget);
 
-	QHBoxLayout * AppLayout = new QHBoxLayout;
-	m_pctrlFullInverse = new QRadioButton("Full Inverse");
-	m_pctrlMixedInverse = new QRadioButton("Mixed Inverse");
-	AppLayout->addWidget(m_pctrlFullInverse);
-	AppLayout->addWidget(m_pctrlMixedInverse);
-	QGroupBox *AppBox = new QGroupBox("App");
-	AppBox->setLayout(AppLayout);
-
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(AppBox);
 	MainLayout->addWidget(m_pctrlStackedInv);
 	MainLayout->addStretch(1);
 	setLayout(MainLayout);
@@ -2007,7 +2021,6 @@ void QXInverse::SetFoil()
 		pXFoil->InitMDES();
 		CreateQCurve();
 		CreateMCurve();
-//		ResetQ();
 
 		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/pi);
 		m_pctrlTAngle->SetValue(pXFoil->agte*180.0);//agte expressed in pi units:!?!?
@@ -2020,9 +2033,7 @@ void QXInverse::SetFoil()
 		pXFoil->InitQDES();
 		CreateQCurve();
 		CreateMCurve();
-//		ResetMixedQ();
-		strong = QString("Alpha = %1 \r\n      Cl = %2")
-								.arg(pXFoil->algam/pXFoil->dtor,0,'f',3).arg(pXFoil->clgam,0,'f',3);
+		strong = QString("Alpha = %1 \r\n      Cl = %2").arg(pXFoil->algam/pXFoil->dtor,0,'f',3).arg(pXFoil->clgam,0,'f',3);
 		m_pctrlMSpec->setPlainText(strong);
 		m_pctrlIter->SetValue(pXFoil->niterq);
 	}
@@ -2058,20 +2069,6 @@ void QXInverse::SetFoil()
 	m_bLoaded = true;
 }
 
-/*
-
-void QXInverse::SetRect(QRect CltRect)
-{
-	m_rCltRect = CltRect;
-	m_rGraphRect = m_rCltRect;
-	m_rGraphRect.adjust(-20,-20,-20,-500);
-
-	m_Spline.m_rViewRect = m_rGraphRect;
-	ResetScale();
-}*/
-
-
-
 
 bool QXInverse::SetParams() 
 {
@@ -2081,12 +2078,14 @@ bool QXInverse::SetParams()
 
 	if(m_bFullInverse)
 	{
-		m_pctrlFullInverse->setChecked(true);
+		pMainFrame->m_pctrlFullInverse->setChecked(true);
+		pMainFrame->m_pctrlMixedInverse->setChecked(false);
 		m_pctrlStackedInv->setCurrentIndex(0);
 	}
 	else
 	{
-		m_pctrlMixedInverse->setChecked(true);
+		pMainFrame->m_pctrlFullInverse->setChecked(false);
+		pMainFrame->m_pctrlMixedInverse->setChecked(true);
 		m_pctrlStackedInv->setCurrentIndex(1);
 	}
 
@@ -2199,37 +2198,32 @@ void QXInverse::UpdateView()
 
 
 
-
-
 void QXInverse::wheelEvent(QWheelEvent *event)
 {
 	ReleaseZoom();
 	QPoint pttmp(event->pos().x(), event->pos().y());
 	if(m_QGraph.IsInDrawRect(pttmp))
 	{
-//		SHORT shX = GetKeyState('X');
-//		SHORT shY = GetKeyState('Y');
-
-/*		if (shX & 0x8000)
+		if (m_bXPressed)
 		{
 			//zoom x scale
 			m_QGraph.SetAutoX(false);
-			if(zDelta>0) m_QGraph.Scalex(1.06);
-			else         m_QGraph.Scalex(1.0/1.06);
+			if(event->delta()>0) m_QGraph.Scalex(1.06);
+			else                 m_QGraph.Scalex(1.0/1.06);
 		}
-		else if(shY & 0x8000)
+		else if(m_bYPressed)
 		{
 			//zoom y scale
 			m_QGraph.SetAutoY(false);
-			if(zDelta>0) m_QGraph.Scaley(1.06);
-			else         m_QGraph.Scaley(1.0/1.06);
+			if(event->delta()>0) m_QGraph.Scaley(1.06);
+			else                 m_QGraph.Scaley(1.0/1.06);
 		}
-		else */
+		else
 		{
 			//zoom both
 			m_QGraph.SetAuto(false);
 			if(event->delta()>0) m_QGraph.Scale(1.06);
-			else               m_QGraph.Scale(1.0/1.06);
+			else                 m_QGraph.Scale(1.0/1.06);
 		}
 	}
 	else
@@ -2237,7 +2231,7 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 		double scale = m_fScale;
 
 		if(event->delta()<0) m_fScale *= 1.06;
-		else         m_fScale /= 1.06;
+		else                 m_fScale /= 1.06;
 
 		int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);
 		m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);

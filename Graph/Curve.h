@@ -1,7 +1,7 @@
 /****************************************************************************
 
-    Graph Classes
-	Copyright (C) 2003 Andre Deperrois xflr5@yahoo.com
+	Curve Class
+	Copyright (C) 2003-2009 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 class CCurve : public QObject
 {
+	friend class Graph;
 
 public:
 	CVector GetClosestRealPoint(double xs);
@@ -77,6 +78,8 @@ private:
 	QString m_strName;
 	int CurveStyle;
 	int CurveWidth;
+
+	void *m_pParentGraph;
 };
 
 

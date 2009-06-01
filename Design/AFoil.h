@@ -65,6 +65,7 @@ class QAFoil : public QWidget
 	friend class FoilGeomDlg;
 	friend class TEGapDlg;
 	friend class LEDlg;
+	friend class LECircleDlg;
 	friend class FoilCoordDlg;
 	friend class CAddDlg;
 
@@ -76,6 +77,7 @@ public:
  
 
 private slots:
+	void OnAFoilLECircle();
 	void OnExportSplinesToFile();
 	void OnSplineType();
 	void OnRenameFoil();
@@ -177,7 +179,7 @@ private:
 	bool m_bZoomYOnly;
 	bool m_bNeutralLine;
 	bool m_bTrans;
-	bool m_bCircle;
+	bool m_bLECircle;
 	bool m_bStored;
 	bool m_bShowLegend;
 	bool m_bXDown, m_bYDown, m_bZDown;

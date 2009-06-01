@@ -36,6 +36,7 @@ void *VLMAnalysisDlg::s_pMainFrame;
 
 VLMAnalysisDlg::VLMAnalysisDlg()
 {
+	setWindowTitle("VLM Analysis");
 	SetupLayout();
 	pi = 3.141592654;
 
@@ -172,6 +173,8 @@ bool VLMAnalysisDlg::AlphaLoop()
 	if (m_bCancel) return true;
 	return true;
 }
+
+
 
 bool VLMAnalysisDlg::ControlLoop()
 {
@@ -352,7 +355,9 @@ bool VLMAnalysisDlg::ControlLoop()
 			Cm0 = VLMComputeCm(a0*180.0/pi);
 			Cm1 = VLMComputeCm(a1*180.0/pi);
 			iter++;
+			if(m_bCancel) break;
 		}
+		if(m_bCancel) break;
 
 		if(iter>=100)
 		{
@@ -387,7 +392,7 @@ bool VLMAnalysisDlg::ControlLoop()
 					a0  = a;
 					Cm0 = Cm;
 				}
-
+//qDebug() << Cm << a*180/pi << iter;
 				iter++;
 			}
 
@@ -398,6 +403,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 			if(fabs(Cm)<eps)
 			{
+//qDebug() <<  Cm << eps;
 				VLMSolveMultiple(a*180.0/pi, 0.0, 1);
 				VLMComputePlane(a*180.0/pi, m_ControlDelta, 1);
 			}
@@ -409,6 +415,7 @@ bool VLMAnalysisDlg::ControlLoop()
 				m_bWarning = true;
 			}
 		}
+		if(m_bCancel) break;
 	}
 
 	memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
@@ -590,9 +597,9 @@ void VLMAnalysisDlg::InitDialog()
 
 void VLMAnalysisDlg::OnCancelAnalysis()
 {
-	m_bSkip = true;
-	m_bExit = true;
+	m_bCancel = true;
 //	if(m_bIsFinished) done(1);
+	WriteString("Analysis Cancelled\n");
 }
 
 
@@ -730,7 +737,7 @@ void VLMAnalysisDlg::SetupLayout()
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/3);
 	setMinimumWidth(r.width()/3);
-	move(r.width()/3, r.height()/6);
+//	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -922,250 +929,6 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 	return true;
 }
 
-
-bool VLMAnalysisDlg::VLMSolveDouble()
-{
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString strong, strange;
-
-	int Size;
-	if(m_bVLMSymetric) Size = m_MatSize/2;
-	else               Size = m_MatSize;
-
-
-	//______________________________________________________________________________________
-	// Solve the system for unit vortex circulation
-
-	AddString("      Solving the linear system...\r\n");
-
-	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
-	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
-
-	if(!Gauss(m_aij,Size, m_RHS, 2))
-	{
-		AddString("      Singular Matrix.... Aborting calculation...\r\n");
-		m_bConverged = false;
-		return false;
-	}
-	else m_bConverged = true;
-
-	memcpy(m_xRHS, m_RHS,      Size * sizeof(double));
-	memcpy(m_zRHS, m_RHS+Size, Size * sizeof(double));
-
-	return true;
-}
-
-
-
-bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
-{
-	//______________________________________________________________________________________
-	// Method :
-	// 	- If the polar is of type 1 or 2, solve the linear system
-	//	  for all AlphaDeltas simultaneously, for a unit speed
-	//	- If the polar is of type 4, solve only for unit speed and for the specified Alpha
-	//	- Reconstruct right side results if calculation was symetric
-	//	- Sort results i.a.w. panel numbering
-	//______________________________________________________________________________________
-
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString strong, strange;
-
-	int p, q, pp, Size;
-	int n, o, o1, nel, m;
-
-	double Lift, alpha, cosa, sina;
-	double row[VLMMATSIZE];memset(row, 0, sizeof(row));
-
-	CVector N, Force, WindNormal;
-	CVector VInf;
-
-	if(m_bVLMSymetric) Size = m_MatSize/2;
-	else               Size = m_MatSize;
-	//reconstruct all results from cosine and sine unit vectors
-
-	m=0;
-	if(m_pWPolar->m_Type !=4)
-	{
-		for (q=0; q<nval;q++)
-		{
-			alpha = V0 + q * VDelta;
-			cosa = cos(alpha*pi/180.0);
-			sina = sin(alpha*pi/180.0);
-			for(p=0; p<Size; p++)
-			{
-				m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
-				m++;
-			}
-		}
-	}
-	else
-	{
-		cosa = cos(m_AlphaMin*pi/180.0);
-		sina = sin(m_AlphaMin*pi/180.0);
-		for(p=0; p<Size; p++)
-		{
-			m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
-			m++;
-		}
-	}
-	qApp->processEvents();
-
-	//______________________________________________________________________________________
-	// Calculate speeds i.a.w. polar types
-
-	AddString("      Calculating the vortices circulations...\r\n");
-
-	//so far we have a unit Vortex Strength
-	if(m_pWPolar->m_Type==2)
-	{
-		//type 2; find the speeds which will create a lift equal to the weight
-		AddString("      Calculating speeds to balance the weight\r\n\r\n");
-
-		for (q=0; q<nval;q++)
-		{
-			alpha = V0+q*VDelta;
-			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
-			VInf.Set(cos(alpha*pi/180.0),  0.0, sin(alpha*pi/180.0));
-			memcpy(row, m_RHS+q*Size, sizeof(row));
-			Lift = 0.0;
-			p=0;
-			for (p=0; p<Size; p++)
-			{
-				// for each panel along the chord, add the lift coef
-				if(m_pWPolar->m_bVLM1 || m_ppPanel[p]->m_bIsTrailing)
-				{
-					//changed v4.00 Leading-->Trailing
-					Force = VInf * m_ppPanel[p]->Vortex;
-					Lift += Force.dot(WindNormal) * row[p];
-				}
-				else
-				{
-					Force = VInf * m_ppPanel[p]->Vortex;
-					Lift += Force.dot(WindNormal) * row[p];
-					Force = VInf * m_ppPanel[p-1]->Vortex;
-					Lift -= Force.dot(WindNormal) * row[p];
-				}
-			}
-			if(m_bVLMSymetric) Lift *=2.0;
-
-			if(Lift<=0.0)
-			{
-				strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n").arg(V0+q*VDelta,0,'f',2);
-				if(m_bTrace) AddString(strong);
-				m_bPointOut = true;
-				m_bWarning = true;
-				m_VLMQInf[q] = -100.0;
-			}
-			else
-			{
-				m_VLMQInf[q] =  sqrt( 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density / Lift);
-				strong = QString("      Alpha=%1   QInf = %2").arg(V0+q*VDelta,5,'f',2).arg(m_VLMQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
-				GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
-				strong+= strange + "\r\n";
-				if(m_bTrace) AddString(strong);
-			}
-		}
-	}
-
-	else if (m_pWPolar->m_Type==1)
-		for (q=0; q<nval;q++) m_VLMQInf[q] = m_pWPolar->m_QInf;
-
-	else if (m_pWPolar->m_Type==4)
-		for (q=0; q<nval;q++) m_VLMQInf[q] = V0 + q*VDelta;
-
-	else if (m_pWPolar->m_Type==5)
-		m_VLMQInf[0] = m_pWPolar->m_QInf;
-
-	else if(m_pWPolar->m_Type==6)
-	{
-		//type 2; find the speeds which will create a lift equal to the weight
-		AddString("      Calculating speeds to balance the weight\r\n\r\n");
-
-		VInf.Set(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
-		WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
-
-		memcpy(row, m_RHS, sizeof(row));
-		Lift = 0.0;
-
-		for (p=0; p<Size; p++)
-		{
-			// for each panel along the chord, add the lift coef
-			Force = VInf * m_ppPanel[p]->Vortex;
-			Lift += Force.dot(WindNormal) * row[p];
-		}
-		if(m_bVLMSymetric) Lift *=2.0;
-
-		if(Lift<=0.0)
-		{
-			strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n").arg(V0+q*VDelta,0,'f',2);
-			if(m_bTrace) AddString(strong);
-			m_bPointOut = true;
-			m_bWarning = true;
-			m_VLMQInf[0] = -100.0;
-		}
-		else
-		{
-			m_VLMQInf[0] =  sqrt( 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density / Lift);
-			strong = QString("      Alpha=%1   QInf = %2").arg(V0,5,'f',2).arg(m_VLMQInf[0]*pMainFrame->m_mstoUnit,5,'f',2);
-			GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
-			strong+= strange + "\r\n";
-			AddString(strong);
-		}
-	}
-
-	//______________________________________________________________________________________
-	// Scale circulations to speeds
-
-	p=0;
-	for (q=0; q<nval;q++)
-	{
-		for(pp=0; pp<Size; pp++)
-		{
-			if(m_pWPolar->m_Type!=4)	m_Gamma[q*Size+pp] = m_RHS[q*Size+pp]*m_VLMQInf[q];
-			else 						m_Gamma[q*Size+pp] = m_RHS[pp]*m_VLMQInf[q];
-		}
-	}
-	//______________________________________________________________________________________
-	//Reconstruct right side results
-
-	double *GammaRef = m_aij;//use existing reserved memory, do not re-allocate
-	if(m_bVLMSymetric)
-	{
-		memcpy(GammaRef, m_Gamma, nval*Size*sizeof(double));
-
-		for (q=0; q<nval;q++)
-		{
-			n  =  q    * Size;
-			o  =  q    * m_MatSize;
-			o1 = (q+1) * m_MatSize;
-
-			for (p=0; p<m_MatSize/2; p++)
-			{
-				m_Gamma[o+p]    = GammaRef[n+p];
-				m_Gamma[o1-1-p] = GammaRef[n+p];
-			}
-		}
-	}
-
-	//______________________________________________________________________________________
-	//at this stage, m_Gamma is ordered as m_ppPanel[]... need to sort as m_pPanel
-
-	memcpy(GammaRef, m_Gamma, nval*m_MatSize*sizeof(double));
-
-	for (q=0; q<nval;q++)
-	{
-		o  =  q * m_MatSize;
-
-		for (p=0; p<m_MatSize; p++)
-		{
-			nel = m_ppPanel[p]->m_iElement;
-			m_Gamma[o+nel]    = GammaRef[o+p];
-		}
-	}
-	return  true;
-}
-
 double VLMAnalysisDlg::VLMComputeCm(double alpha)
 {
 	CVector V(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
@@ -1317,12 +1080,10 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GCm = m_VCm         = 0.0;
 			m_GYm = m_VYm = m_IYm = 0.0;
 
-			AddString("         Calculating Trefftz plane...\r\n");
+			AddString("       Calculating main wing...\r\n");
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
-			AddString("         Calculating Aero Forces...\r\n");
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 
-			AddString("         Calculating Bending...\r\n");
 			m_pWing->VLMSetBending();
 			if(m_pWing->m_bWingOut)  m_bPointOut = true;
 			pos = m_pWing->m_MatSize;
@@ -1409,10 +1170,10 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 
+//qDebug() << m_GCm;
 			m_GCm *=  1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
 			m_GRm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 			m_GYm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
-
 			m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
 			m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 
@@ -2001,6 +1762,253 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 		for (m=0; m<m_pFin->m_NStation; m++)	m_pFin->m_Ai[m] = Ai[m+pos];
 	}
 }
+
+
+
+
+bool VLMAnalysisDlg::VLMSolveDouble()
+{
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strong, strange;
+
+	int Size;
+	if(m_bVLMSymetric) Size = m_MatSize/2;
+	else               Size = m_MatSize;
+
+
+	//______________________________________________________________________________________
+	// Solve the system for unit vortex circulation
+
+	AddString("      Solving the linear system...\r\n");
+
+	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
+	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
+
+	if(!Gauss(m_aij,Size, m_RHS, 2))
+	{
+		AddString("      Singular Matrix.... Aborting calculation...\r\n");
+		m_bConverged = false;
+		return false;
+	}
+	else m_bConverged = true;
+
+	memcpy(m_xRHS, m_RHS,      Size * sizeof(double));
+	memcpy(m_zRHS, m_RHS+Size, Size * sizeof(double));
+
+	return true;
+}
+
+
+
+bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
+{
+	//______________________________________________________________________________________
+	// Method :
+	// 	- If the polar is of type 1 or 2, solve the linear system
+	//	  for all AlphaDeltas simultaneously, for a unit speed
+	//	- If the polar is of type 4, solve only for unit speed and for the specified Alpha
+	//	- Reconstruct right side results if calculation was symetric
+	//	- Sort results i.a.w. panel numbering
+	//______________________________________________________________________________________
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strong, strange;
+
+	int p, q, pp, Size;
+	int n, o, o1, nel, m;
+
+	double Lift, alpha, cosa, sina;
+	double row[VLMMATSIZE];memset(row, 0, sizeof(row));
+
+	CVector N, Force, WindNormal;
+	CVector VInf;
+
+	if(m_bVLMSymetric) Size = m_MatSize/2;
+	else               Size = m_MatSize;
+	//reconstruct all results from cosine and sine unit vectors
+
+	m=0;
+	if(m_pWPolar->m_Type !=4)
+	{
+		for (q=0; q<nval;q++)
+		{
+			alpha = V0 + q * VDelta;
+			cosa = cos(alpha*pi/180.0);
+			sina = sin(alpha*pi/180.0);
+			for(p=0; p<Size; p++)
+			{
+				m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
+				m++;
+			}
+		}
+	}
+	else
+	{
+		cosa = cos(m_AlphaMin*pi/180.0);
+		sina = sin(m_AlphaMin*pi/180.0);
+		for(p=0; p<Size; p++)
+		{
+			m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
+			m++;
+		}
+	}
+	qApp->processEvents();
+
+	//______________________________________________________________________________________
+	// Calculate speeds i.a.w. polar types
+
+	AddString("      Calculating the vortices circulations...\r\n");
+
+	//so far we have a unit Vortex Strength
+	if(m_pWPolar->m_Type==2)
+	{
+		//type 2; find the speeds which will create a lift equal to the weight
+		AddString("      Calculating speeds to balance the weight\r\n\r\n");
+
+		for (q=0; q<nval;q++)
+		{
+			alpha = V0+q*VDelta;
+			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
+			VInf.Set(cos(alpha*pi/180.0),  0.0, sin(alpha*pi/180.0));
+			memcpy(row, m_RHS+q*Size, sizeof(row));
+			Lift = 0.0;
+			p=0;
+			for (p=0; p<Size; p++)
+			{
+				// for each panel along the chord, add the lift coef
+				if(m_pWPolar->m_bVLM1 || m_ppPanel[p]->m_bIsTrailing)
+				{
+					//changed v4.00 Leading-->Trailing
+					Force = VInf * m_ppPanel[p]->Vortex;
+					Lift += Force.dot(WindNormal) * row[p];
+				}
+				else
+				{
+					Force = VInf * m_ppPanel[p]->Vortex;
+					Lift += Force.dot(WindNormal) * row[p];
+					Force = VInf * m_ppPanel[p-1]->Vortex;
+					Lift -= Force.dot(WindNormal) * row[p];
+				}
+			}
+			if(m_bVLMSymetric) Lift *=2.0;
+
+			if(Lift<=0.0)
+			{
+				strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n").arg(V0+q*VDelta,0,'f',2);
+				if(m_bTrace) AddString(strong);
+				m_bPointOut = true;
+				m_bWarning = true;
+				m_VLMQInf[q] = -100.0;
+			}
+			else
+			{
+				m_VLMQInf[q] =  sqrt( 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density / Lift);
+				strong = QString("      Alpha=%1   QInf = %2").arg(V0+q*VDelta,5,'f',2).arg(m_VLMQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
+				GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
+				strong+= strange + "\r\n";
+				if(m_bTrace) AddString(strong);
+			}
+		}
+	}
+
+	else if (m_pWPolar->m_Type==1)
+		for (q=0; q<nval;q++) m_VLMQInf[q] = m_pWPolar->m_QInf;
+
+	else if (m_pWPolar->m_Type==4)
+		for (q=0; q<nval;q++) m_VLMQInf[q] = V0 + q*VDelta;
+
+	else if (m_pWPolar->m_Type==5)
+		m_VLMQInf[0] = m_pWPolar->m_QInf;
+
+	else if(m_pWPolar->m_Type==6)
+	{
+		//type 2; find the speeds which will create a lift equal to the weight
+		AddString("      Calculating speeds to balance the weight\r\n\r\n");
+
+		VInf.Set(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
+		WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));
+
+		memcpy(row, m_RHS, sizeof(row));
+		Lift = 0.0;
+
+		for (p=0; p<Size; p++)
+		{
+			// for each panel along the chord, add the lift coef
+			Force = VInf * m_ppPanel[p]->Vortex;
+			Lift += Force.dot(WindNormal) * row[p];
+		}
+		if(m_bVLMSymetric) Lift *=2.0;
+
+		if(Lift<=0.0)
+		{
+			strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n").arg(V0+q*VDelta,0,'f',2);
+			if(m_bTrace) AddString(strong);
+			m_bPointOut = true;
+			m_bWarning = true;
+			m_VLMQInf[0] = -100.0;
+		}
+		else
+		{
+			m_VLMQInf[0] =  sqrt( 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density / Lift);
+			strong = QString("      Alpha=%1   QInf = %2").arg(V0,5,'f',2).arg(m_VLMQInf[0]*pMainFrame->m_mstoUnit,5,'f',2);
+			GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
+			strong+= strange + "\r\n";
+			AddString(strong);
+		}
+	}
+
+	//______________________________________________________________________________________
+	// Scale circulations to speeds
+
+	p=0;
+	for (q=0; q<nval;q++)
+	{
+		for(pp=0; pp<Size; pp++)
+		{
+			if(m_pWPolar->m_Type!=4)	m_Gamma[q*Size+pp] = m_RHS[q*Size+pp]*m_VLMQInf[q];
+			else 						m_Gamma[q*Size+pp] = m_RHS[pp]*m_VLMQInf[q];
+		}
+	}
+	//______________________________________________________________________________________
+	//Reconstruct right side results
+
+	double *GammaRef = m_aij;//use existing reserved memory, do not re-allocate
+	if(m_bVLMSymetric)
+	{
+		memcpy(GammaRef, m_Gamma, nval*Size*sizeof(double));
+
+		for (q=0; q<nval;q++)
+		{
+			n  =  q    * Size;
+			o  =  q    * m_MatSize;
+			o1 = (q+1) * m_MatSize;
+
+			for (p=0; p<m_MatSize/2; p++)
+			{
+				m_Gamma[o+p]    = GammaRef[n+p];
+				m_Gamma[o1-1-p] = GammaRef[n+p];
+			}
+		}
+	}
+
+	//______________________________________________________________________________________
+	//at this stage, m_Gamma is ordered as m_ppPanel[]... need to sort as m_pPanel
+
+	memcpy(GammaRef, m_Gamma, nval*m_MatSize*sizeof(double));
+
+	for (q=0; q<nval;q++)
+	{
+		o  =  q * m_MatSize;
+
+		for (p=0; p<m_MatSize; p++)
+		{
+			nel = m_ppPanel[p]->m_iElement;
+			m_Gamma[o+nel]    = GammaRef[o+p];
+		}
+	}
+	return  true;
+}
+
 
 
 void VLMAnalysisDlg::WriteString(QString strong)

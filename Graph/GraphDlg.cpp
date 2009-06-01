@@ -21,9 +21,13 @@
 
 #include "GraphDlg.h"
 #include "../Misc/LinePickerDlg.h"
+#include "../MainFrame.h"
 #include <QFontDialog>
 #include <QColorDialog>
 #include <QPalette>
+
+void *GraphDlg::s_pMainFrame;
+
 
 GraphDlg::GraphDlg()
 {
@@ -31,11 +35,18 @@ GraphDlg::GraphDlg()
 
 	m_pMemGraph = NULL;
 	m_pGraph    = NULL;
+	m_NGraph      = 0 ;
+	m_bApplied = true;
 
 	m_pTitleFont = m_pLegendFont = m_pLabelFont = NULL;
 
-	SetLayout();
+	SetupLayout();
+	Connect();
+}
 
+
+void GraphDlg::Connect()
+{
 	connect(m_pctrlTitleColor, SIGNAL(clicked()),  this, SLOT(OnTitleColor()));
 	connect(m_pctrlLabelColor, SIGNAL(clicked()),  this, SLOT(OnLabelColor()));
 	connect(m_pctrlLegendColor, SIGNAL(clicked()), this, SLOT(OnLegendColor()));
@@ -46,6 +57,7 @@ GraphDlg::GraphDlg()
 
 	connect(m_pctrlXAuto, SIGNAL(clicked()), this, SLOT(OnAutoX()));
 	connect(m_pctrlYAuto, SIGNAL(clicked()), this, SLOT(OnAutoY()));
+	connect(m_pctrlYInverted, SIGNAL(clicked()), this, SLOT(OnYInverted()));
 
 	connect(m_pctrlXMajGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnXMajGridShow(int)));
 	connect(m_pctrlYMajGridShow, SIGNAL(stateChanged(int)), this, SLOT(OnYMajGridShow(int)));
@@ -65,6 +77,7 @@ GraphDlg::GraphDlg()
 	connect(RestoreButton, SIGNAL(clicked()),this, SLOT(OnRestoreParams()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(ApplyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
 
 }
 
@@ -86,11 +99,31 @@ void GraphDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
-
+		case Qt::Key_Escape:
+		{
+			reject();
+			break;
+		}
 		default:
 			event->ignore();
 	}
 }
+
+
+void GraphDlg::OnApply()
+{
+//	if(!m_pMemGraph) return;
+//	m_pMemGraph->CopySettings(m_pGraph);
+	for(int i=0; i<m_NGraph; i++)
+	{
+		m_GraphArray[i]->CopySettings(m_pGraph);
+	}
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->UpdateView();
+	SetApplied(true);
+}
+
 
 void GraphDlg::OnAutoX()
 {
@@ -99,7 +132,9 @@ void GraphDlg::OnAutoX()
 	m_pctrlXMax->setEnabled(!bAuto);
 	m_pctrlXUnit->setEnabled(!bAuto);
 	m_pctrlXOrigin->setEnabled(!bAuto);
+	SetApplied(false);
 }
+
 
 void GraphDlg::OnAutoY()
 {
@@ -108,6 +143,7 @@ void GraphDlg::OnAutoY()
 	m_pctrlYMax->setEnabled(!bAuto);
 	m_pctrlYUnit->setEnabled(!bAuto);
 	m_pctrlYOrigin->setEnabled(!bAuto);
+	SetApplied(false);
 }
 
 void GraphDlg::OnAxisStyle()
@@ -121,6 +157,7 @@ void GraphDlg::OnAxisStyle()
 		m_pctrlAxisStyle->SetStyle(dlg.GetStyle());
 		m_pctrlAxisStyle->SetWidth(dlg.GetWidth());
 		m_pctrlAxisStyle->SetColor(dlg.GetColor());
+		SetApplied(false);
 	}
 }
 
@@ -142,6 +179,7 @@ void GraphDlg::OnBorderStyle()
 		m_pctrlBorderStyle->SetStyle(dlg.GetStyle());
 		m_pctrlBorderStyle->SetWidth(dlg.GetWidth());
 		m_pctrlBorderStyle->SetColor(dlg.GetColor());
+		SetApplied(false);
 	}
 }
 
@@ -149,6 +187,7 @@ void GraphDlg::OnGraphBorder(int state)
 {
 	bool bShow = (state==Qt::Checked);
 	m_pGraph->SetBorder(bShow);
+	SetApplied(false);
 }
 
 void GraphDlg::OnGraphBackColor()
@@ -162,15 +201,19 @@ void GraphDlg::OnGraphBackColor()
 
 	m_pGraph->SetBkColor(BkColor);
 	m_pctrlGraphBack->SetColor(m_pGraph->GetBackColor());
-
+	SetApplied(false);
 }
+
 
 void GraphDlg::OnLabelColor()
 {
 	QColor color = m_pGraph->GetLabelColor();
 	m_pGraph->SetLabelColor(QColorDialog::getRgba(color.rgba()));
 	m_pctrlLabelColor->SetColor(m_pGraph->GetLabelColor());
+	SetApplied(false);
 }
+
+
 
 void GraphDlg::OnLabelFont()
 {
@@ -184,6 +227,7 @@ void GraphDlg::OnLabelFont()
 	   m_pctrlLabelButton->setFont(font);
 	   m_pctrlLabelButton->setText(font.family());
 	   m_pGraph->SetLabelLogFont(&font);
+		SetApplied(false);
 	}
 }
 
@@ -194,7 +238,10 @@ void GraphDlg::OnLegendColor()
 	QColor color = m_pGraph->GetLabelColor();
 	m_pGraph->SetLegendColor(QColorDialog::getRgba(color.rgba()));
 	m_pctrlLegendColor->SetColor(m_pGraph->GetLegendColor());
+	SetApplied(false);
 }
+
+
 
 void GraphDlg::OnLegendFont()
 {
@@ -209,6 +256,7 @@ void GraphDlg::OnLegendFont()
 	   m_pctrlLegendButton->setFont(font);
 	   m_pctrlLegendButton->setText(font.family());
 	   m_pGraph->SetLegendLogFont(&font);
+		SetApplied(false);
 	}
 }
 
@@ -229,13 +277,27 @@ void GraphDlg::OnOK()
 	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
 	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
 
+	for(int i=0; i<m_NGraph; i++)
+	{
+		m_GraphArray[i]->CopySettings(m_pGraph);
+	}
 	accept();
 }
 
 void GraphDlg::OnRestoreParams()
 {
 	m_pGraph->CopySettings(m_pMemGraph);
+
+	for(int i=0; i<m_NGraph; i++)
+	{
+		m_GraphArray[i]->CopySettings(m_pMemGraph);
+	}
+
 	SetParams();
+	SetApplied(true);
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->UpdateView();
 }
 
 
@@ -244,7 +306,9 @@ void GraphDlg::OnTitleColor()
 	QColor color = m_pGraph->GetTitleColor();
 	m_pGraph->SetTitleColor(QColorDialog::getRgba(color.rgba()));
 	m_pctrlTitleColor->SetColor(m_pGraph->GetTitleColor());
+	SetApplied(false);
 }
+
 
 void GraphDlg::OnTitleFont()
 {
@@ -259,6 +323,7 @@ void GraphDlg::OnTitleFont()
 	   m_pctrlTitleButton->setFont(font);
 	   m_pctrlTitleButton->setText(font.family());
 	   m_pGraph->SetTitleLogFont(&font);
+		SetApplied(false);
 	}
 }
 
@@ -279,6 +344,7 @@ void GraphDlg::OnXMajGridStyle()
 		m_pctrlXMajGridStyle->SetStyle(dlg.GetStyle());
 		m_pctrlXMajGridStyle->SetWidth(dlg.GetWidth());
 		m_pctrlXMajGridStyle->SetColor(dlg.GetColor());
+		SetApplied(false);
 	}
 }
 
@@ -298,8 +364,43 @@ void GraphDlg::OnXMinGridStyle()
 		m_pctrlXMinGridStyle->SetStyle(dlg.GetStyle());
 		m_pctrlXMinGridStyle->SetWidth(dlg.GetWidth());
 		m_pctrlXMinGridStyle->SetColor(dlg.GetColor());
+		SetApplied(false);
 	}
 
+}
+
+
+void GraphDlg::OnXMajGridShow(int state)
+{
+	bool bShow = (state==Qt::Checked);
+	m_pGraph->SetXMajGrid(bShow);
+	m_pctrlXMajGridStyle->setEnabled(bShow);
+	SetApplied(false);
+}
+
+
+void GraphDlg::OnXMinGridShow(int state)
+{
+	bool bShow = (state==Qt::Checked);
+	m_pGraph->SetXMinGrid(bShow);
+	m_pctrlXMinGridStyle->setEnabled(bShow);
+	SetApplied(false);
+}
+
+
+void GraphDlg::OnYInverted()
+{
+	m_pGraph->SetInverted(m_pctrlYInverted->checkState() == Qt::Checked);
+	SetApplied(false);
+}
+
+
+void GraphDlg::OnYMajGridShow(int state)
+{
+	bool bShow = (state==Qt::Checked);
+	m_pGraph->SetYMajGrid(bShow);
+	m_pctrlYMajGridStyle->setEnabled(bShow);
+	SetApplied(false);
 }
 
 void GraphDlg::OnYMajGridStyle()
@@ -320,6 +421,16 @@ void GraphDlg::OnYMajGridStyle()
 	}
 }
 
+
+void GraphDlg::OnYMinGridShow(int state)
+{
+	bool bShow = (state==Qt::Checked);
+	m_pGraph->SetYMinGrid(bShow);
+	m_pctrlYMinGridStyle->setEnabled(bShow);
+	SetApplied(false);
+}
+
+
 void GraphDlg::OnYMinGridStyle()
 {
 	LinePickerDlg dlg;
@@ -336,42 +447,16 @@ void GraphDlg::OnYMinGridStyle()
 		m_pctrlYMinGridStyle->SetStyle(dlg.GetStyle());
 		m_pctrlYMinGridStyle->SetWidth(dlg.GetWidth());
 		m_pctrlYMinGridStyle->SetColor(dlg.GetColor());
+		SetApplied(false);
 	}
 }
 
 
-void GraphDlg::OnXMajGridShow(int state)
+void GraphDlg::SetApplied(bool bApplied)
 {
-	bool bShow = (state==Qt::Checked);
-	m_pGraph->SetXMajGrid(bShow);
-	m_pctrlXMajGridStyle->setEnabled(bShow);
+	m_bApplied = bApplied;
+	ApplyButton->setEnabled(!bApplied);
 }
-
-
-void GraphDlg::OnYMajGridShow(int state)
-{
-	bool bShow = (state==Qt::Checked);
-	m_pGraph->SetYMajGrid(bShow);
-	m_pctrlYMajGridStyle->setEnabled(bShow);
-}
-
-
-void GraphDlg::OnXMinGridShow(int state)
-{
-	bool bShow = (state==Qt::Checked);
-	m_pGraph->SetXMinGrid(bShow);
-	m_pctrlXMinGridStyle->setEnabled(bShow);
-}
-
-
-void GraphDlg::OnYMinGridShow(int state)
-{
-	bool bShow = (state==Qt::Checked);
-	m_pGraph->SetYMinGrid(bShow);
-	m_pctrlYMinGridStyle->setEnabled(bShow);
-}
-
-
 
 void GraphDlg::SetParams()
 {
@@ -455,11 +540,15 @@ void GraphDlg::SetParams()
 	m_pctrlBorderStyle->SetWidth(m_pGraph->GetBorderWidth());
 
 	m_pctrlGraphBack->SetColor(m_pGraph->GetBackColor());
+
+	m_pctrlYInverted->setChecked(m_pGraph->GetInverted());
+
+	SetApplied(true);
 }
 
 
 
-void GraphDlg::SetLayout()
+void GraphDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
@@ -470,11 +559,15 @@ void GraphDlg::SetLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	RestoreButton = new QPushButton("Restore");
 	OKButton = new QPushButton(tr("OK"));
-	OKButton->setAutoDefault(false);
+	OKButton->setAutoDefault(true);
 	CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setAutoDefault(false);
+	ApplyButton = new QPushButton(tr("Apply"));
+	ApplyButton->setAutoDefault(false);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(RestoreButton);
+	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);
@@ -519,7 +612,8 @@ void GraphDlg::SetLayout()
 	//________Scale Page______________________
 	QHBoxLayout *HScaleBox = new QHBoxLayout;
 
-	QVBoxLayout *Labels = new QVBoxLayout;
+	QGridLayout *ScaleData = new QGridLayout;
+
 	QLabel *MinLabel = new QLabel("Min");
 	QLabel *MaxLabel = new QLabel("Max");
 	QLabel *OriginLabel = new QLabel("Origin");
@@ -528,30 +622,24 @@ void GraphDlg::SetLayout()
 	MaxLabel->setAlignment(Qt::AlignRight);
 	OriginLabel->setAlignment(Qt::AlignRight);
 	UnitLabel->setAlignment(Qt::AlignRight);
-	Labels->addStretch(1);
-	Labels->addWidget(MinLabel);
-	Labels->addWidget(MaxLabel);
-	Labels->addWidget(OriginLabel);
-	Labels->addWidget(UnitLabel);
+//	ScaleData->addStretch(1);
+	ScaleData->addWidget(MinLabel,3,1);
+	ScaleData->addWidget(MaxLabel,4,1);
+	ScaleData->addWidget(OriginLabel,5,1);
+	ScaleData->addWidget(UnitLabel,6,1);
 
-	QGridLayout *XData = new QGridLayout;
-	QLabel *Void2 = new QLabel("  ");
 	m_pctrlXAuto    = new QCheckBox("Auto Scale");
 	m_pctrlXMin     = new FloatEdit;
 	m_pctrlXMax     = new FloatEdit;
 	m_pctrlXOrigin  = new FloatEdit;
 	m_pctrlXUnit    = new FloatEdit;
 
-	XData->addWidget(Void2,1,1);
-	XData->addWidget(m_pctrlXAuto,2,1);
-	XData->addWidget(m_pctrlXMin,3,1);
-	XData->addWidget(m_pctrlXMax,4,1);
-	XData->addWidget(m_pctrlXOrigin,5,1);
-	XData->addWidget(m_pctrlXUnit,6,1);
-	QGroupBox *XDataGroup = new QGroupBox("x Axis");
-	XDataGroup->setLayout(XData);
+	ScaleData->addWidget(m_pctrlXAuto,2,2);
+	ScaleData->addWidget(m_pctrlXMin,3,2);
+	ScaleData->addWidget(m_pctrlXMax,4,2);
+	ScaleData->addWidget(m_pctrlXOrigin,5,2);
+	ScaleData->addWidget(m_pctrlXUnit,6,2);
 
-	QGridLayout *YData = new QGridLayout;
 	m_pctrlYInverted = new QCheckBox("Inverted Axis");
 	m_pctrlYAuto     = new QCheckBox("Auto Scale");
 	m_pctrlYMin      = new FloatEdit;
@@ -559,20 +647,19 @@ void GraphDlg::SetLayout()
 	m_pctrlYOrigin   = new FloatEdit;
 	m_pctrlYUnit     = new FloatEdit;
 
-	YData->addWidget(m_pctrlYInverted,1,1);
-	YData->addWidget(m_pctrlYAuto,2,1);
-	YData->addWidget(m_pctrlYMin,3,1);
-	YData->addWidget(m_pctrlYMax,4,1);
-	YData->addWidget(m_pctrlYOrigin,5,1);
-	YData->addWidget(m_pctrlYUnit,6,1);
-	QGroupBox *YDataGroup = new QGroupBox("y Axis");
-	YDataGroup->setLayout(YData);
+	ScaleData->addWidget(m_pctrlYInverted,1,3);
+	ScaleData->addWidget(m_pctrlYAuto,2,3);
+	ScaleData->addWidget(m_pctrlYMin,3,3);
+	ScaleData->addWidget(m_pctrlYMax,4,3);
+	ScaleData->addWidget(m_pctrlYOrigin,5,3);
+	ScaleData->addWidget(m_pctrlYUnit,6,3);
 
-	HScaleBox->addLayout(Labels);
-	HScaleBox->addWidget(XDataGroup);
-	HScaleBox->addWidget(YDataGroup);
 
-	ScalePage->setLayout(HScaleBox);
+//	HScaleBox->addLayout(Labels);
+//	HScaleBox->addWidget(XDataGroup);
+//	HScaleBox->addWidget(YDataGroup);
+
+	ScalePage->setLayout(ScaleData);
 	//________End Scale Page______________________
 	//________Axis Page______________________
 	QGridLayout *AxisData = new QGridLayout;

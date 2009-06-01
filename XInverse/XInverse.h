@@ -90,6 +90,7 @@ private:
 	void mouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
+	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	void CheckActions();
 	void DrawGrid(QPainter &painter, double scale);
@@ -125,7 +126,6 @@ private:
 	double qincom(double qc, double qinf, double tklam);
 
 private:
-	QRadioButton *m_pctrlFullInverse, *m_pctrlMixedInverse;
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
 	QRadioButton *m_pctrlSpecAlpha, *m_pctrlSpecCl;
@@ -159,6 +159,7 @@ private:
 
 	double pi;
 
+	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 	bool m_bLoaded;
 	bool m_bTrans;
 	bool m_bModFoil, m_bRefFoil;

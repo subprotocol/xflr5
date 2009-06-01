@@ -109,10 +109,12 @@ Graph::~Graph()
 CCurve* Graph::AddCurve()
 {
 	CCurve *pCurve = new CCurve();
-	if(pCurve){
+	if(pCurve)
+	{
         int nIndex = m_oaCurves.size();
 		pCurve->SetColor(m_CurveColors[nIndex%10]);
         pCurve->SetStyle(Qt::SolidLine);
+		pCurve->m_pParentGraph = this;
         m_oaCurves.append(pCurve);
 	}
 	return pCurve;
@@ -610,8 +612,7 @@ void Graph::SetAutoXUnit()
 	int nx = nxmax - nxmin;
 //	xmin = xo + (double)nxmin * xunit;
 //	xmax = xo + (double)nxmax * xunit;
-	m_scalex  = (double)nx * xunit /m_w;
-
+//	m_scalex  = (double)nx * xunit /m_w;
 }
 
 
@@ -986,16 +987,16 @@ bool Graph::SetXScale()
 		//scales are set manually
 		if(m_w<=0.0) return false;
 	
-		m_scalex   =  (xmax-xmin)/m_w;
-
+//		m_scalex   =  (xmax-xmin)/m_w;
 		if (xunit<1.0)
 		{
 			exp_x = (int)log10(xunit)-1;
-			exp_x=qMax(-4, exp_x);
+			exp_x = qMax(-4, exp_x);
 		}
 		else exp_x = (int)log10(xunit);
 
 	}
+	m_scalex   =  (xmax-xmin)/m_w;
 
 	//graph center position
 	int Xg = (m_rCltRect.right() + m_rCltRect.left())/2;
@@ -1003,7 +1004,7 @@ bool Graph::SetXScale()
 	int Xc = (int)((xmin+xmax)/2.0/m_scalex);
 	// center graph in drawing rectangle
 	m_ptoffset.rx() = (Xg-Xc);
-
+//qDebug() << "Setting" << xmin << xmax << m_scalex << m_ptoffset.x();
 	return true;
 }
 
@@ -1208,18 +1209,6 @@ void Graph::Scaley(double zoom)
 }
 
 
-
-int Graph::xToClient(double x)
-{
-	return (int)(x/m_scalex + m_ptoffset.x());
-}
-
-int Graph::yToClient(double y)
-{
-	return (int)(y/m_scaley + m_ptoffset.y());
-}
-
-
 void Graph::SetXMajGrid(bool const &bGrid)
 {
 	m_bXMajGrid = bGrid;
@@ -1239,3 +1228,17 @@ void Graph::SetYMinGrid(bool const &bGrid)
 {
 	m_bYMinGrid = bGrid;
 }
+
+
+
+
+int Graph::xToClient(double x)
+{
+	return (int)(x/m_scalex + m_ptoffset.x());
+}
+
+int Graph::yToClient(double y)
+{
+	return (int)(y/m_scaley + m_ptoffset.y());
+}
+

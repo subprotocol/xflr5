@@ -183,14 +183,14 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 	if(pCurve->n>1 && pCurve->IsVisible())
 	{
 		From.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
-		From.setY(int(pCurve->y[0]/scaley+m_ptoffset.y()));
+		From.setY(int(pCurve->y[0]/scaley  +m_ptoffset.y()));
 
 		if(pCurve->PointsVisible()) painter.drawRect(From.x()-ptside,From.y()-ptside, 2*ptside,2*ptside);
 
 		for (i=1; i<pCurve->n;i++)
 		{
 			To.setX(int(pCurve->x[i]/m_scalex+m_ptoffset.x()));
-			To.setY(int(pCurve->y[i]/scaley+m_ptoffset.y()));
+			To.setY(int(pCurve->y[i]/scaley  +m_ptoffset.y()));
 			painter.drawLine(From, To);
 			if(pCurve->PointsVisible())	painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
 
@@ -209,7 +209,7 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 	else if(pCurve->n == 1 && pCurve->IsVisible() && pCurve->PointsVisible())
 	{
 		To.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
-		To.setY(int(pCurve->y[0]/scaley+m_ptoffset.y()));
+		To.setY(int(pCurve->y[0]/scaley  +m_ptoffset.y()));
 		painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
 	}
 	painter.restore();
@@ -315,7 +315,6 @@ void QGraph::DrawXTicks(QPainter &painter)
 	LabelPen.setStyle(GetStyle(m_nStyle));
 	LabelPen.setWidth(m_Width);
 	painter.setPen(LabelPen);
-
 	double xt = xo-(xo-xmin);//one tick at the origin
 	int  nx = (int)((xo-xmin)/xunit);
 	xt = xo - nx*xunit;
@@ -352,7 +351,7 @@ void QGraph::DrawXTicks(QPainter &painter)
 			}
 			else
 			{
-				if(exp_x>0)        strLabel = QString("%1").arg(xt,0,'f',1);
+				if(exp_x>0)        strLabel = QString("%1").arg(xt,0,'f',0);
 				else if (exp_x>=-1) strLabel = QString("%1").arg(xt,6,'f',1);
 				else if (exp_x>=-2) strLabel = QString("%1").arg(xt,6,'f',2);
 				else if (exp_x>=-3) strLabel = QString("%1").arg(xt,6,'f',3);

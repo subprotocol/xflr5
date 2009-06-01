@@ -57,6 +57,7 @@ private slots:
 	void OnViscous();
 	void OnType();
 	void OnUnit();
+	void OnCellChanged(QWidget *pWidget);
 
 private:
 	void resizeEvent(QResizeEvent *event);

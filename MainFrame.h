@@ -65,12 +65,21 @@ class MainFrame : public QMainWindow
 	friend class GLWidget;
 	friend class GL3dWingDlg;
 	friend class WAdvancedDlg;
+	friend class GraphDlg;
+
 	Q_OBJECT
 
 public:
 	MainFrame(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~MainFrame();
+	int LoadXFLR5File(QString PathName);
 
+public slots:
+	void OnAFoil();
+	void OnXDirect();
+	void OnXInverse();
+	void OnXInverseMixed();
+	void OnMiarex();
 
 private slots:
 	void AboutQFLR5();
@@ -98,11 +107,6 @@ private slots:
 	void OnSaveProject();
 	void OnStyle();
 	void OnUnits();
-	void OnAFoil();
-	void OnXDirect();
-	void OnXInverse();
-	void OnXInverseMixed();
-	void OnMiarex();
 	void OnSaveUFOAsProject();
 	void openRecentFile();
 /*___________________________________________Methods_______________________________*/
@@ -152,7 +156,6 @@ private:
 	void UpdateView();
 	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
 
-	int LoadXFLR5File(QString PathName);
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring);
 	bool SerializeUFOProject(QDataStream &ar);
@@ -241,9 +244,11 @@ private:
 	//AFoil Actions
 	QAction *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
 	QAction *zoomYAct, *zoomLessAct, *AFoilGridAct;
+	QAction *AFoilDelete, *AFoilRename, *AFoilExport;
 	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
+	QAction *AFoilLECircle;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
@@ -259,7 +264,8 @@ private:
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
 	QAction *twoWPlrGraphs, *allWPlrGraphs;
-	QAction  *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale, *allWPolarGraphsScalesAct, *allWingGraphsScalesAct;
+	QAction *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale;
+	QAction *allWPolarGraphsScalesAct, *allWingGraphsScalesAct, *allWPolarGraphsSettings, *allWingGraphsSettings;
 	QAction *hideAllWPlrs, *showAllWPlrs;
 	QAction *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
 	QAction *hideUFOWOpps, *showUFOWOpps, *deleteUFOWOpps;
@@ -296,6 +302,7 @@ private:
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
 	QComboBox *m_pctrlUFO, *m_pctrlWPolar, * m_pctrlWOpp;
+	QRadioButton *m_pctrlFullInverse, *m_pctrlMixedInverse;
 	QLabel *m_pctrlProjectName;
 
 	//XInverse Actions

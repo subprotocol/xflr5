@@ -31,6 +31,7 @@ void *LEDlg::s_pXFoil;
 
 LEDlg::LEDlg()
 {
+	setWindowTitle("Leading Edge");
 	m_LErfac    = 1.0;
 	m_Blend     = 0.1;
 	m_pAFoil    = NULL;
@@ -96,6 +97,7 @@ void LEDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
+
 void LEDlg::keyPressEvent(QKeyEvent *event)
 {
 	// Prevent Return Key from closing App
@@ -126,6 +128,7 @@ void LEDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
 void LEDlg::InitDialog()
 {
 	m_pctrlLE->SetMin(  0.0);
@@ -137,6 +140,7 @@ void LEDlg::InitDialog()
 	m_pctrlLE->SetValue(m_LErfac);
 	m_pctrlBlend->SetValue(m_Blend*100.0);
 }
+
 
 void LEDlg::OnChanged()
 {

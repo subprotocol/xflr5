@@ -89,6 +89,8 @@ public:
 private slots:
 	void OnAllWingGraphScales();
 	void OnAllWPolarGraphScales();
+	void OnAllWingGraphSettings();
+	void OnAllWPolarGraphSettings();
 	void OnResetWingGraphScale();
 	void OnReadAnalysisData();
 	void On3DPrefs();
@@ -211,6 +213,7 @@ private:
 	void mouseReleaseEvent(QMouseEvent *event);
 	void wheelEvent (QWheelEvent *event);
 	void showEvent(QShowEvent *event);
+	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, QPoint &point);
@@ -411,6 +414,7 @@ private:
 	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bAutoScales;
+	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
 	int m_GLList;
 	int m_iView;

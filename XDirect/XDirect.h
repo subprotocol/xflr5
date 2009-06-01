@@ -157,10 +157,12 @@ signals:
 
 protected:
 	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void wheelEvent (QWheelEvent *event);
+	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	void AddOpData(OpPoint *pNewPoint);
 	void CheckButtons();
@@ -272,6 +274,7 @@ private:
 	bool m_bShowInviscid;	// true if the inviscid results should be displayed
 	bool m_bCpGraph;		// true if the Cp graph should be displayed
 	bool m_bSequence;		// true if a sequential analysis is to be performed
+	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
 	int m_posAnimate;		// the current aoa in the animation
 	int m_OppVar;			// defined the variable to be displayed in the Cp graph
@@ -341,7 +344,6 @@ private:
 	XFoil *m_pXFoil;		// a pointer to the XFoil object
 
 	double pi;		// no idea
-
 };
 
 

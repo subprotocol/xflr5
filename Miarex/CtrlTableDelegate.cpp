@@ -82,7 +82,7 @@ void CtrlTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	else
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue()/100.0;
+		double value = floatEdit->GetValue();
 		model->setData(index, value, Qt::EditRole);
 	}
 }

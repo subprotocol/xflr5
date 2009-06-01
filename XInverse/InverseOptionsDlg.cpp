@@ -25,6 +25,7 @@
 
 InverseOptionsDlg::InverseOptionsDlg()
 {
+	setWindowTitle("XInverse Style");
 	m_pXInverse = NULL;
 	SetupLayout();
 
