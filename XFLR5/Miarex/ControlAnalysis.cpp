@@ -88,7 +88,7 @@ void CControlAnalysis::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CONTROLLIST, m_ctrlControlList);
 	DDX_Control(pDX, IDC_WPOLARNAME, m_ctrlWPolarName);
-	DDX_Control(pDX, IDC_WINGNAME, m_ctrlUFOName);
+//	DDX_Control(pDX, IDC_WINGNAME, m_ctrlUFOName);
 	DDX_Control(pDX, IDC_DENSITY, m_ctrlDensity);
 	DDX_Control(pDX, IDC_VISCOSITY, m_ctrlViscosity);
 	DDX_Control(pDX, IDC_SVISCOSITY, m_ctrlSViscosity);
@@ -172,7 +172,7 @@ BOOL CControlAnalysis::OnInitDialog()
 
 	for (int i=0; i<100; i++) m_ctrlControlList.m_iPrecision[i] = 4;
 
-	m_ctrlUFOName.SetWindowText(m_UFOName);
+//	m_ctrlUFOName.SetWindowText(m_UFOName);
 	m_ctrlWPolarName.SetWindowText(m_WPolarName);
 	FillControlList();
 	SetWPolarName();

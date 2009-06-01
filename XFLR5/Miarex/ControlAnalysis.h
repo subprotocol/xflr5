@@ -50,7 +50,7 @@ public:
 	CStatic	m_ctrlNu;
 	CStatic m_ctrlSpeedUnit;
 	CEditListCtrl m_ctrlControlList;
-	CStatic m_ctrlUFOName;
+//	CStatic m_ctrlUFOName;
 	CFloatEdit m_ctrlWeight;
 	CStatic m_ctrlWeightUnit;
 	CButton m_ctrlViscous;

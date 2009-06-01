@@ -5360,6 +5360,9 @@ void CXDirect::AnalysisAlpha(double AlphaMin, double AlphaMax, double DeltaAlpha
 	m_ViscDlg.m_IterLim      = m_IterLim;
 	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
 
+	if(m_pCurPolar->m_Type == 4) m_ViscDlg.m_bType4 = true;
+	else                         m_ViscDlg.m_bType4 = false;
+
 	m_ViscDlg.SetAlpha(AlphaMin,AlphaMax,DeltaAlpha);
 
 	m_ViscDlg.DoModal();
@@ -5379,6 +5382,9 @@ void CXDirect::AnalysisCl(double ClMin, double ClMax, double DeltaCl, bool bSequ
 	m_ViscDlg.m_IterLim      = m_IterLim;
 	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
 
+	if(m_pCurPolar->m_Type == 4) m_ViscDlg.m_bType4 = true;
+	else                         m_ViscDlg.m_bType4 = false;
+
 	m_ViscDlg.SetCl(ClMin, ClMax, DeltaCl);
 	
 	m_ViscDlg.DoModal();
@@ -5397,7 +5403,9 @@ void CXDirect::AnalysisRe(double ReMin, double ReMax, double DeltaRe, bool bSequ
 	m_ViscDlg.m_bAlpha       = false;
 	m_ViscDlg.m_IterLim      = m_IterLim;
 	m_ViscDlg.m_FoilName     = m_pCurFoil->m_FoilName;
+
 	if(m_pCurPolar->m_Type == 4) m_ViscDlg.m_bType4 = true;
+	else                         m_ViscDlg.m_bType4 = false;
 
 	m_ViscDlg.SetRe(ReMin,ReMax,DeltaRe);
 	
