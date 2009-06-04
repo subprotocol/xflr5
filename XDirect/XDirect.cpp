@@ -2298,20 +2298,33 @@ void QXDirect::OnDeltaAlphaChanged()
 	}
 }
 
+
 void QXDirect::OnDerotateFoil()
 {
 	if(!m_pCurFoil) return;
 	QString str;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	double angle = m_pCurFoil->DeRotate();
-	SetBufferFoil();
-	pMainFrame->SetSaveState(false);
+	StopAnimate();
+
+	CFoil *pNewFoil = new CFoil;
+	pNewFoil->CopyFoil(m_pCurFoil);
+
+	double angle = pNewFoil->DeRotate();
 	str = QString("The foil has been de-rotated by %1 degrees").arg(angle,6,'f',3);
 	pMainFrame->statusBar()->showMessage(str);
 
-	UpdateView();
+	pNewFoil->m_nFoilStyle = 0;
+	pNewFoil->m_nFoilWidth = 1;
+	pNewFoil->m_bPoints = false;
+	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 
+	pMainFrame->SetModFoil(pNewFoil);
+	pMainFrame->UpdateFoils();
+	pMainFrame->SetSaveState(false);
+
+	UpdateView();
 }
+
 
 void QXDirect::OnDtPlot()
 {
@@ -3442,7 +3455,7 @@ void QXDirect::OnSavePolars()
 	if(!FileName.length()) return;
 
 	QString strong = FileName.right(4);
-	if(strong !=".plr" || strong !=".PLR") FileName += ".plr";
+	if(strong !=".plr" && strong !=".PLR") FileName += ".plr";
 
 	QFile XFile(FileName);
 	if (!XFile.open(QIODevice::WriteOnly)) return;

@@ -112,12 +112,26 @@ void GraphDlg::keyPressEvent(QKeyEvent *event)
 
 void GraphDlg::OnApply()
 {
-//	if(!m_pMemGraph) return;
-//	m_pMemGraph->CopySettings(m_pGraph);
+	m_pGraph->SetAutoX(m_pctrlXAuto->isChecked());
+	m_pGraph->SetXMin(m_pctrlXMin->GetValue());
+	m_pGraph->SetXMax(m_pctrlXMax->GetValue());
+	m_pGraph->SetX0(m_pctrlXOrigin->GetValue());
+	m_pGraph->SetXUnit(m_pctrlXUnit->GetValue());
+
+	m_pGraph->SetAutoY(m_pctrlYAuto->isChecked());
+	m_pGraph->SetYMin(m_pctrlYMin->GetValue());
+	m_pGraph->SetYMax(m_pctrlYMax->GetValue());
+	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
+	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
+
+	m_pGraph->SetInverted(m_pctrlYInverted->isChecked());
+
 	for(int i=0; i<m_NGraph; i++)
 	{
 		m_GraphArray[i]->CopySettings(m_pGraph);
 	}
+
+
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->UpdateView();
@@ -455,7 +469,7 @@ void GraphDlg::OnYMinGridStyle()
 void GraphDlg::SetApplied(bool bApplied)
 {
 	m_bApplied = bApplied;
-	ApplyButton->setEnabled(!bApplied);
+//	ApplyButton->setEnabled(!bApplied);
 }
 
 void GraphDlg::SetParams()

@@ -25,8 +25,10 @@
 
 void *FoilGeomDlg::s_pXFoil;
 
+
 FoilGeomDlg::FoilGeomDlg()
 {
+	setWindowTitle("Foil Geometry");
 	m_pXDirect = NULL;
 	m_pAFoil   = NULL;
 

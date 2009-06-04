@@ -964,14 +964,12 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring)
 		//Archive Format 1001 : adds the modified foil to the file
 
 		ReadCString(ar, m_FoilName);
-Trace("++++"+m_FoilName+"+++++");
 		if(ArchiveFormat>=1002)
 		{
 			ar >> m_nFoilStyle >> m_nFoilWidth;
 			ReadCOLORREF(ar, m_FoilColor);
 
 		}
-
 		if(ArchiveFormat>=1003)
 		{
 			ar >> p;

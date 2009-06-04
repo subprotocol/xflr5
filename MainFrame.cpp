@@ -3286,7 +3286,7 @@ void MainFrame::OnNewProject()
 	pMiarex->m_bArcball = false;
 	if(!m_bSaved)
 	{
-		int resp = QMessageBox::question(window(), "QFLR5", "Save the current project ?",
+		int resp = QMessageBox::question(window(), "Question", "Save the current project ?",
 										  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 
 		if (QMessageBox::Cancel == resp)

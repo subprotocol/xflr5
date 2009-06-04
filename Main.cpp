@@ -26,7 +26,7 @@
 
 int main(int argc, char *argv[])
 {
-	QString StyleName = "Cleanlooks";
+	QString StyleName;
 
 	QString FileName   = QDir::tempPath() + "/QFLR5.set";
 	QFile *pXFile = new QFile(FileName);
@@ -49,10 +49,11 @@ int main(int argc, char *argv[])
 	QPoint pt(a,b);
 	QSize sz(c,d);
 
-	// QT Help Warning: To ensure that the application's style is set correctly, it is best to call this function before the QApplication constructor, if possible.
-	qApp->setStyle(StyleName);
 
+	QCleanlooksStyle style;
 	QApplication app(argc, argv);
+	if(StyleName.length()) qApp->setStyle(StyleName);
+	else                   qApp->setStyle(&style);
 
 	MainFrame w;
 	w.setWindowTitle("QFLR5");

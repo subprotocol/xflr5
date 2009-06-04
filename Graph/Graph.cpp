@@ -146,7 +146,6 @@ double Graph::ClientToy(int y)
 
 void Graph::CopySettings(Graph *pGraph, bool bScales)
 {
-
 	if(bScales)
 	{
 		xmin            = pGraph->xmin;

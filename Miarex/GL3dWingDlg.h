@@ -121,7 +121,7 @@ private:
 	void GLToClient(CVector const &real, QPoint &point);
 	void GLCreateMesh();
 	void GLRenderView();
-//	void GLCreateGeometry();
+	void GLDrawFoils();
 	void GLCreateSectionHighlight();
 	void GLInverseMatrix();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);

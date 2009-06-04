@@ -1580,6 +1580,18 @@ void QMiarex::CheckButtons()
 	pMainFrame->WPlrGraph4->setChecked(m_iWPlrView==1 && (m_pCurWPlrGraph == &m_WPlrGraph4));
 	pMainFrame->twoWPlrGraphs->setChecked(m_iWPlrView==2);
 	pMainFrame->allWPlrGraphs->setChecked(m_iWPlrView==4);
+
+	m_pctrlHalfWing->setEnabled(m_iView==1);
+	m_pctrlLift->setEnabled(m_iView==1||m_iView==3);
+	m_pctrlTrans->setEnabled(m_iView==1||m_iView==3);
+	m_pctrlIDrag->setEnabled(m_iView==3);
+	m_pctrlVDrag->setEnabled(m_iView==3);
+	m_pctrlCp->setEnabled(m_iView==3);
+	m_pctrlDownwash->setEnabled(m_iView==3);
+	m_pctrlVortices->setEnabled(m_iView==3);
+	m_pctrlMoment->setEnabled(m_iView==3);
+	m_pctrlStream->setEnabled(m_iView==3);
+	m_pctrlSurfVel->setEnabled(m_iView==3);
 }
 
 
@@ -10620,6 +10632,10 @@ void QMiarex::OnAnalyze()
 		return;
 	}
 
+	m_bStream = m_bSpeeds = false;
+	m_pctrlStream->setChecked(false);
+	m_pctrlSurfVel->setChecked(false);
+
 //	Read Analysis Params;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -10642,13 +10658,6 @@ void QMiarex::OnAnalyze()
 		VDelta = m_ControlDelta;
 	}
 
-/*	if(m_pCurWPolar->m_Type <3)
-		Analyze(m_Alpha0, m_AlphaMax, m_AlphaDelta, m_bSequence, m_bInitCalc);
-	else if(m_pCurWPolar->m_Type==4)
-		Analyze(m_QInf0, m_QInfMax, m_DeltaQInf, m_bSequence, m_bInitCalc);
-	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
-		Analyze(m_Control0, m_ControlMax, m_DeltaControl, m_bSequence, m_bInitCalc);
-*/
 
 	// check if all the foils are there...
 	// ...could have been deleted or renamed or not imported with AVL wing or whatever

@@ -222,6 +222,7 @@ void GL3dWingDlg::Connect()
 	m_pWingDelegate = new WingDelegate(this);
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
 	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
+//	connect(m_pctrlWingTable, SIGNAL(activated(const QModelIndex &)), this, SLOT(OnItemActivated(const QModelIndex&)));
 	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
@@ -254,9 +255,6 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
 	connect(m_pctrlRightSide, SIGNAL(clicked()),this, SLOT(OnSide()));
 	connect(m_pctrlLeftSide, SIGNAL(clicked()),this, SLOT(OnSide()));
-//	connect(m_pctrlWingTable, SIGNAL(activated(const QModelIndex &)), this, SLOT(OnItemActivated(const QModelIndex&)));
-	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
-	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 }
 
 
@@ -539,6 +537,36 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 		}
 	}
 	glEndList();
+}
+
+
+void GL3dWingDlg::GLDrawFoils()
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	int j;
+	CFoil *pFoil;
+
+	glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+
+	for(j=0; j<m_pWing->m_NSurfaces; j++)
+	{
+		pFoil = m_pWing->m_Surface[j].m_pFoilA;
+
+		if(pFoil)
+		{
+			m_pWing->m_Surface[j].GetPanel(0, 0, 1);
+			m_pglWidget->renderText(m_pWing->m_Surface[j].TA.x, m_pWing->m_Surface[j].TA.y, m_pWing->m_Surface[j].TA.z,
+									pFoil->m_FoilName);
+		}
+	}
+	j = m_pWing->m_NSurfaces-1;
+	pFoil = m_pWing->m_Surface[j].m_pFoilB;
+	if(pFoil)
+	{
+		m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, 0, 1);
+		m_pglWidget->renderText(m_pWing->m_Surface[j].TA.x, m_pWing->m_Surface[j].TA.y, m_pWing->m_Surface[j].TA.z,
+								pFoil->m_FoilName);
+	}
 }
 
 
@@ -1288,6 +1316,7 @@ void GL3dWingDlg::GLRenderView()
 			glCallList(MESHPANELS);
 		}
 	}
+	GLDrawFoils();
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
@@ -2512,7 +2541,6 @@ void GL3dWingDlg::SetupLayout()
 	QDesktopWidget desktop;
 	QRect r = desktop.screenGeometry();
 	setMaximumHeight(r.height());
-//	int r1 = geometry().width();
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -2528,8 +2556,6 @@ void GL3dWingDlg::SetupLayout()
 
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 7;
-//	m_pglWidget->setMinimumHeight(400);
-//	m_pglWidget->setMinimumWidth(500);
 
 /*_____________Start Top Layout Here____________*/
 	QVBoxLayout *DefLayout = new QVBoxLayout;
