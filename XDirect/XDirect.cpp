@@ -529,6 +529,11 @@ void QXDirect::CheckButtons()
 	pMainFrame->CurXFoilCfPlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==8);
 	pMainFrame->CurXFoilUePlot->setChecked(!m_bPolar  && m_OppVar==2 && m_XFoilVar ==9);
 	pMainFrame->CurXFoilHPlot->setChecked(!m_bPolar   && m_OppVar==2 && m_XFoilVar ==10);
+
+	m_pctrlShowPressure->setEnabled(!m_bPolar);
+	m_pctrlShowBL->setEnabled(!m_bPolar);
+	m_pctrlAnimate->setEnabled(!m_bPolar);
+	m_pctrlAnimateSpeed->setEnabled(!m_bPolar);
 }
 
 
@@ -1369,7 +1374,7 @@ void QXDirect::LoadSettings(QDataStream &ar)
 	ar >> m_NCrit >> m_XTopTr >> m_XBotTr;
 	ar >> m_Mach >> m_MachDef;
 	ar >> m_Type;
-	ar >> m_pXFoil->vaccel >> m_IterLim >> m_bAutoInitBL ;
+	ar >> m_pXFoil->vaccel >> m_IterLim >> m_bAutoInitBL >> m_pXFoil->m_bFullReport  ;
 	ar >> m_NRe;
 	for (int i=0; i<m_NRe; i++) ar >> m_ReList[i] >> m_MachList[i] >> m_NCritList[i];
 
@@ -1381,7 +1386,6 @@ void QXDirect::LoadSettings(QDataStream &ar)
 	m_pUserGraph->Serialize(ar, false);
 
 	m_pCpGraph->Serialize(ar, false);
-
 }
 
 
@@ -4046,6 +4050,7 @@ void QXDirect::OnXFoilAdvanced()
 	dlg.m_IterLimit = m_IterLim;
 	dlg.m_VAccel  = m_pXFoil->vaccel;
 	dlg.m_bInitBL = m_bAutoInitBL;
+	dlg.m_bFullReport    = m_pXFoil->m_bFullReport;
 	dlg.InitDialog();
 
 	if (QDialog::Accepted == dlg.exec())
@@ -4053,6 +4058,7 @@ void QXDirect::OnXFoilAdvanced()
 		m_pXFoil->vaccel = dlg.m_VAccel;
 		m_IterLim        = dlg.m_IterLimit;
 		m_bAutoInitBL    = dlg.m_bInitBL;
+		m_pXFoil->m_bFullReport    = dlg.m_bFullReport;
 	}
 }
 
@@ -4798,7 +4804,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_NCrit << m_XTopTr << m_XBotTr;
 	ar << m_Mach << m_MachDef;
 	ar << m_Type;
-	ar << m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL ;
+	ar << m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL << m_pXFoil->m_bFullReport ;
 
 	ar << m_NRe;
 	for (int i=0; i<m_NRe; i++) ar << m_ReList[i] << m_MachList[i] << m_NCritList[i];

@@ -449,14 +449,14 @@ void QAFoil::keyReleaseEvent(QKeyEvent *event)
 	{
 		case Qt::Key_X:
 		{
-			m_bXDown = false;
+			if(!event->isAutoRepeat()) m_bXDown = false;
 			break;
 		}
 		case Qt::Key_Y:
-			m_bYDown = false;
+			if(!event->isAutoRepeat()) m_bYDown = false;
 			break;
 		case Qt::Key_Z:
-			m_bZDown = false;
+			if(!event->isAutoRepeat()) m_bZDown = false;
 			break;	
 		default:
 			QWidget::keyReleaseEvent(event);
@@ -504,6 +504,7 @@ void QAFoil::LoadSettings(QDataStream &ar)
 
 void QAFoil::mouseMoveEvent(QMouseEvent *event)
 {
+	if(!hasFocus()) setFocus();
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QPoint point = event->pos();
 	m_MousePos = MousetoReal(point);
@@ -647,7 +648,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 				else
 				{
 					if(point.y()-m_PointDown.y()>0) m_fScale *= 1.06;
-					else		                m_fScale /= 1.06;
+					else		                    m_fScale /= 1.06;
 				}
 
 			}
@@ -1661,7 +1662,7 @@ void QAFoil::OnExportSplinesToFile()
 											"Text File (*.dat)");
 
 	if(!FileName.length()) return;
-	int pos, type;
+	int pos;
 	pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
@@ -1837,6 +1838,17 @@ void QAFoil::OnHideAllFoils()
 }
 
 
+
+void QAFoil::OnHideCurrentFoil()
+{
+	if(!m_pCurFoil) return;
+	ShowFoil(m_pCurFoil, false);
+	UpdateView();
+
+}
+
+
+
 void QAFoil::OnNewSplines()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -1915,6 +1927,17 @@ void QAFoil::OnShowAllFoils()
 	m_pctrlVisible->setChecked(true);
 	UpdateView();
 }
+
+
+
+void QAFoil::OnShowCurrentFoil()
+{
+	if(!m_pCurFoil) return;
+	ShowFoil(m_pCurFoil, true);
+	UpdateView();
+
+}
+
 
 
 
@@ -2141,6 +2164,7 @@ void QAFoil::OnZoomIn()
 	}
 }
 
+
 void QAFoil::OnZoomYOnly()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -2178,7 +2202,6 @@ void QAFoil::OnZoomLess()
 void QAFoil::PaintGrids(QPainter &painter)
 {
 	painter.save();
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 //	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	QColor color;
 	int style, width;
@@ -3013,28 +3036,6 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 	UpdateView();
 }
-
-
-
-
-void QAFoil::OnHideCurrentFoil()
-{
-	if(!m_pCurFoil) return;
-	ShowFoil(m_pCurFoil, false);
-	UpdateView();
-
-}
-
-
-
-void QAFoil::OnShowCurrentFoil()
-{
-	if(!m_pCurFoil) return;
-	ShowFoil(m_pCurFoil, true);
-	UpdateView();
-
-}
-
 
 
 

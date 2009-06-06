@@ -46,7 +46,7 @@ private slots:
 
 private:
 	void SetupLayout();
-	QCheckBox *m_pctrlInitBL;
+	QCheckBox *m_pctrlInitBL, *m_pctrlFullReport;
 	QLineEdit *m_pctrlIterLimit;
 	FloatEdit * m_pctrlVAccel;
 	QPushButton *OKButton, *CancelButton;
@@ -54,7 +54,7 @@ private:
 	int m_IterLimit;
 	double m_VAccel;
 	bool m_bInitBL;
-
+	bool m_bFullReport;
 
 };
 

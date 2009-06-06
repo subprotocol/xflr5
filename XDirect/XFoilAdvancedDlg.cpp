@@ -29,6 +29,7 @@ XFoilAdvancedDlg::XFoilAdvancedDlg()
 	m_IterLimit = 100;
 	m_VAccel = 0.001;
 	m_bInitBL = true;
+	m_bFullReport = false;
 
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -57,6 +58,7 @@ void XFoilAdvancedDlg::SetupLayout()
 	IterBox->addWidget(m_pctrlIterLimit);
 
 	m_pctrlInitBL = new QCheckBox("Re-initialize BLs after an unconverged iteration");
+	m_pctrlFullReport = new QCheckBox("Show full log report for an XFoil analysis");
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
@@ -72,10 +74,12 @@ void XFoilAdvancedDlg::SetupLayout()
 	MainLayout->addLayout(VAccelBox);
 	MainLayout->addLayout(IterBox);
 	MainLayout->addWidget(m_pctrlInitBL);
+	MainLayout->addWidget(m_pctrlFullReport);
 	MainLayout->addLayout(CommandButtons);
 
 	setLayout(MainLayout);
 }
+
 
 void XFoilAdvancedDlg::InitDialog()
 {
@@ -83,7 +87,9 @@ void XFoilAdvancedDlg::InitDialog()
 	m_pctrlInitBL->setChecked(m_bInitBL);
 	QString str = QString("%1").arg(m_IterLimit);
 	m_pctrlIterLimit->setText(str);
+	m_pctrlFullReport->setChecked(m_bFullReport);
 }
+
 
 void XFoilAdvancedDlg::OnOK()
 {
@@ -91,5 +97,6 @@ void XFoilAdvancedDlg::OnOK()
 	m_IterLimit = str.toInt();
 	m_VAccel = m_pctrlVAccel->GetValue();
 	m_bInitBL = m_pctrlInitBL->isChecked();
+	m_bFullReport = m_pctrlFullReport->isChecked();
 	done(1);
 }

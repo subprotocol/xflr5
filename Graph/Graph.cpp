@@ -608,7 +608,7 @@ void Graph::SetAutoXUnit()
 	nxmax = int((xmax-xo)/xunit);
 	if (nxmax*xunit*1.0001 < xmax)
 		nxmax++;
-	int nx = nxmax - nxmin;
+//	int nx = nxmax - nxmin;
 //	xmin = xo + (double)nxmin * xunit;
 //	xmax = xo + (double)nxmax * xunit;
 //	m_scalex  = (double)nx * xunit /m_w;
@@ -1003,7 +1003,6 @@ bool Graph::SetXScale()
 	int Xc = (int)((xmin+xmax)/2.0/m_scalex);
 	// center graph in drawing rectangle
 	m_ptoffset.rx() = (Xg-Xc);
-//qDebug() << "Setting" << xmin << xmax << m_scalex << m_ptoffset.x();
 	return true;
 }
 

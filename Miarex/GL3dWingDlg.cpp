@@ -1525,6 +1525,13 @@ void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
 
 	switch (event->key())
 	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus()) OKButton->setFocus();
+			else                      accept();
+
+			break;
+		}
 		case Qt::Key_Escape:
 		{
 			reject();
@@ -1540,6 +1547,7 @@ void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
 			event->ignore();
 	}
 }
+
 
 
 void GL3dWingDlg::keyReleaseEvent(QKeyEvent *event)
@@ -2798,9 +2806,9 @@ void GL3dWingDlg::SetupLayout()
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton(tr("Save and Close"));
+	OKButton = new QPushButton(tr("Save and Close"));
 	OKButton->setAutoDefault(true);
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+	CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setAutoDefault(false);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addWidget(CancelButton);

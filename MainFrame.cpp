@@ -2822,7 +2822,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100530)
+	if(k !=100532)
 	{
 		pXFile->close();
 		return;
@@ -2932,7 +2932,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				if(!m_bSaved)
 				{
 					QString strong = "Save the current project ?";
-					int resp =  QMessageBox::question(0,"QFLR5", strong,  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+					int resp =  QMessageBox::question(0,"Save", strong,  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 					if(resp==QMessageBox::Cancel)
 					{
 						XFile.close();
@@ -4435,7 +4435,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100530;
+	ar << 100532;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();

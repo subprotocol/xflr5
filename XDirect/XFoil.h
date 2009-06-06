@@ -342,7 +342,7 @@ private:
 	void CreateXBL(double xs[IVX][3],int &nside1, int &nside2);
 	void FillHk(double ws[IVX][3], int nside1, int nside2);
 	void FillRTheta(double ws[IVX][3], int nside1, int nside2);
-	void WriteString(QString str);
+	void WriteString(QString str, bool bFullReport = false);
 
 //____________VARIABLES___________________________________________________		
 	
@@ -359,6 +359,7 @@ private:
 //	QString name, namepol, codepol, nameref;
 //	QString ispars;
 
+	bool m_bFullReport;
 //	bool lpacc,lqvdes,,lqrefl,lcpref,lforef,lpfile,lpfilx;
 //	bool lppsho,lplot,lclip,lvlab,lcurs,lcminp, lhmomp,lland;
 //	bool lplcam,lgparm,lnorm,,lgsym,lgslop, lcslop,lclock,

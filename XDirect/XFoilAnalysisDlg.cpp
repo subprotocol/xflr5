@@ -190,7 +190,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 				m_pXFoil->alfa = alfa*pi/180.0;
 				m_pXFoil->lalfa = true;
 				m_pXFoil->qinf = 1.0;
-				str = QString("\r\n\r\nAlpha = %1\r\n\r\n").arg(alfa,5,'f',2);
+				str = QString("\r\n\r\nAlpha = %1\r\n").arg(alfa,5,'f',2);
 				WriteString(str);
 				strange = QString("Alfa = %1 ........ ").arg(m_pXFoil->alfa*180.0/pi,7,'f',2);
 				UpdateOutput(strange);
@@ -210,7 +210,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 				m_pXFoil->alfa = 0.0;
 				m_pXFoil->qinf = 1.0;
 				m_pXFoil->clspec = m_ClMin+ia*m_DeltaCl;
-				str = QString("\r\n\r\nCl = %1\r\n\r\n").arg(m_pXFoil->clspec, 10,'f',3);
+				str = QString("\r\n\r\nCl = %1\r\n").arg(m_pXFoil->clspec, 10,'f',3);
 				WriteString(str);
 
 				strange = QString("Cl = %1 ........ ").arg(m_pXFoil->clspec,7,'f',2);
@@ -295,6 +295,10 @@ bool XFoilAnalysisDlg::Iterate()
 	QString str, strange;
 	CCurve *pCurve0 = m_RmsGraph.GetCurve(0);
 	CCurve *pCurve1 = m_RmsGraph.GetCurve(1);
+
+	str="   Initializing viscous analysis ...\r\n";
+	WriteString(str);
+
 	if(!m_pXFoil->viscal())
 	{
 		m_pXFoil->lvconv = false;//point is unconverged
@@ -304,14 +308,14 @@ bool XFoilAnalysisDlg::Iterate()
 		return true;// to exit loop
 		}
 
-	str="\r\n Solving BL system ...\r\n\r\n";
+	str="   Solving BL system ...\r\n";
 	WriteString(str);
 
 
 	while(m_Iterations<m_IterLim  && !m_pXFoil->lvconv && !m_bSkip)
 	{
 		qApp->processEvents();
-		str= QString(" Iteration %1 ... \r\n").arg(m_Iterations);
+		str= QString("   Iteration %1 ... \r\n").arg(m_Iterations);
 
 		WriteString(str);
 
@@ -416,7 +420,7 @@ bool XFoilAnalysisDlg::ReLoop()
 			m_pXFoil->reinf1 = Re;
 			m_pXFoil->lalfa = true;
 			m_pXFoil->qinf = 1.0;
-			str = QString("\r\n\r\nRe = %1\r\n\r\n").arg(Re,8,'f',0);
+			str = QString("\r\n\r\nRe = %1\r\n").arg(Re,8,'f',0);
 			WriteString(str);
 
 			// here we go !
@@ -496,12 +500,12 @@ void XFoilAnalysisDlg::SetRe(double ReMin, double ReMax, double DeltaRe)
 void XFoilAnalysisDlg::SetFileHeader()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << "QFLR5 v001";
+	out << pMainFrame->m_VersionName;
 	out << "\n";
 	out << m_FoilName;
 	out << "\n";

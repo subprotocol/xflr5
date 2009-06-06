@@ -89,7 +89,7 @@ private slots:
 	void OnScaleBody();
 	void OnUndo();
 	void OnRedo();
-
+	void OnBodyName();
 
 private:
 	void wheelEvent(QWheelEvent *event);

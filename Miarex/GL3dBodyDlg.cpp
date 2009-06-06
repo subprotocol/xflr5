@@ -203,6 +203,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pctrlBSplines,   SIGNAL(clicked()), this, SLOT(OnLineType()));
 	connect(m_pctrlBodyStyle,  SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
 
+	connect(m_pctrlBodyName,   SIGNAL(editingFinished()), this, SLOT(OnBodyName()));
 	setMouseTracking(true);
 }
 
@@ -3495,7 +3496,10 @@ void GL3dBodyDlg::OnAxes()
 	UpdateView();
 }
 
-
+void GL3dBodyDlg::OnBodyName()
+{
+	m_pBody->m_BodyName = m_pctrlBodyName->text();
+}
 
 
 void GL3dBodyDlg::OnBodyStyle()

@@ -1584,6 +1584,8 @@ void QMiarex::CheckButtons()
 	m_pctrlHalfWing->setEnabled(m_iView==1);
 	m_pctrlLift->setEnabled(m_iView==1||m_iView==3);
 	m_pctrlTrans->setEnabled(m_iView==1||m_iView==3);
+	m_pctrlAnimate->setEnabled(m_iView==1||m_iView==3);
+	m_pctrlAnimateSpeed->setEnabled(m_iView==1||m_iView==3);
 	m_pctrlIDrag->setEnabled(m_iView==3);
 	m_pctrlVDrag->setEnabled(m_iView==3);
 	m_pctrlCp->setEnabled(m_iView==3);
@@ -5780,15 +5782,17 @@ void QMiarex::GLCreateCpLegend()
 	if(w>h)
 	{
 		XPos  = 1.0;
-		ZPos  = h/w * (-1.0 + 2.0/3.0);
+//		ZPos  = h/w * (-1.0 + 2.0/3.0);
 		dz    = h/w*1.0/20.0;
+		ZPos  = h/w - 23.0*dz;
 		ClientToGL = 2.0/w;
 	}
 	else
 	{
 		XPos = w/h;
-		ZPos  = (-1.0 + 2.0/3.0);
+//		ZPos  = (-1.0 + 2.0/3.0);
 		dz    = 1.0/20.0;
+		ZPos  = 1.0 - 23.0*dz;
 		ClientToGL = 2.0/h;
 	}
 
@@ -5806,6 +5810,10 @@ void QMiarex::GLCreateCpLegend()
 		m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
+//		glBegin(GL_LINES);
+//		glVertex3d(-1.0, h/w, 0.0);
+//		glVertex3d(0.0, 0.0, 0.0);
+//		glEnd();
 
 		glPolygonMode(GL_FRONT,GL_LINE);
 
@@ -9960,12 +9968,9 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 	if(m_iView==3)
 	{
-//		GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 		QPoint pt(event->pos().x(), event->pos().y());
 		CVector Real;
 		ClientToGL(pt, Real);
-
-//		if(!pGLWidget->hasFocus()) pGLWidget->setFocus();
 
 		if (event->buttons() & Qt::LeftButton && m_iView==3)
 		{
@@ -10026,9 +10031,6 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	}
 	else
 	{
-//		TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-//		if(!p2DWidget->hasFocus()) p2DWidget->setFocus();
-
 		if ((event->buttons() & Qt::LeftButton) && m_bTrans && (m_iView==1 || m_iView==2 || m_iView==4))
 		{
 			if(m_pCurGraph && m_bTransGraph)
@@ -14463,10 +14465,10 @@ QString QMiarex::RenameUFO(QString UFOName)
 		OldName = pPlane->m_PlaneName;
 		SetModPlane(pPlane);
 
-		pPlane->m_Wing.m_WingName = pPlane->m_PlaneName+"_Wing";
+		pPlane->m_Wing.m_WingName  = pPlane->m_PlaneName+"_Wing";
 		pPlane->m_Wing2.m_WingName = pPlane->m_PlaneName+"_Wing2";
-		pPlane->m_Stab.m_WingName = pPlane->m_PlaneName+"_Elev";
-		pPlane->m_Fin.m_WingName = pPlane->m_PlaneName+"_Fin";
+		pPlane->m_Stab.m_WingName  = pPlane->m_PlaneName+"_Elev";
+		pPlane->m_Fin.m_WingName   = pPlane->m_PlaneName+"_Fin";
 
 		for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
 		{

@@ -48,6 +48,7 @@ XFoil::XFoil()
 	
 	// imx   number of complex mapping coefficients  cn
 	m_bTrace = false;
+	m_bFullReport = false;
 	pi = 3.141592654;
 	
 	sccon = 5.6  ;
@@ -1896,19 +1897,21 @@ bool XFoil::cpcalc(int n, double q[], double qinf, double minf, double cp[])
 		msgBox.setWindowTitle("QFLR5");
 		msgBox.setText(str);
 		msgBox.exec();
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 
 	return true;
 }
-void XFoil::WriteString(QString str)
+void XFoil::WriteString(QString str, bool bFullReport)
 {
+	if(!bFullReport && !m_bFullReport) return;
 	if(!pXFile) return;
 	if(!pXFile->isOpen()) return;
 	QTextStream ds(pXFile);
 	ds << str;
 }
+
 
 double XFoil::curv(double ss, double x[], double xs[], double y[], double ys[], double s[], int n){
 //-----------------------------------------------
@@ -2788,7 +2791,7 @@ bool XFoil::ggcalc()
 	double bwt = 0.1;
 	
 	//TRACE("calculating unit vorticity distributions ...\n");
-	QString str(" Calculating unit vorticity distributions ...\r\n");
+	QString str("   Calculating unit vorticity distributions ...\r\n");
 	WriteString(str);
 
 
@@ -3256,10 +3259,10 @@ bool XFoil::iblpan()
 	{
 //		AfxMessageBox("iblpan :  ***  bl array overflow", MB_ICONSTOP | MB_OK);
 		QString str("iblpan :  ***  bl array overflow");
-		WriteString(str);
+		WriteString(str, true);
 
 		str = QString("Increase IVX to at least %1\r\n").arg(iblmax);
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	
@@ -3287,7 +3290,7 @@ bool XFoil::iblsys()
 	if(nsys>2*IVX)
 	{
 		QString str("*** iblsys: bl system array overflow. ***");
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	
@@ -3962,7 +3965,7 @@ bool XFoil::ludcmp(int n, double a[IQX][IQX], int indx[IQX])
 	double dum, sum, aamax;
 	if(n>nvx) {
 		QString str("Stop ludcmp: array overflow. Increase nvx");
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	
@@ -4377,7 +4380,7 @@ bool XFoil::mrchdu()
 
 			
 			str = QString("     mrchdu: convergence failed at %1 ,  side %2, res =%3\r\n").arg(ibl).arg(is).arg(dmax, 4, 'f', 3);
-			WriteString(str);
+			WriteString(str, true);
 
 			if (dmax<= 0.1) goto stop109;			
 				//------ the current unconverged solution might still be reasonable...
@@ -4699,7 +4702,7 @@ stop100:
 
 			//TRACE(" mrchue: convergence failed at %d,  side %d, res = %f\n", ibl, is, dmax);
 			str = QString("     mrchue: convergence failed at %1,  side %2, res = %3\r\n").arg( ibl).arg( is).arg( dmax,0,'f',3);
-			WriteString(str);
+			WriteString(str, true);
 
 			//------ the current unconverged solution might still be reasonable...
 			if(dmax > 0.1) {
@@ -4800,13 +4803,13 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls){
 	if(retyp<1 || retyp>3)
 	{
 		QString str("    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re ");
-		WriteString(str);
-		retyp = 1; 
+		WriteString(str, true);
+		retyp = 1;
 	}
 	if(matyp<1 || matyp>3)
 	{
 		QString str("    mrcl:  illegal Mach(cls) dependence trigger\r\n Setting fixed Mach");
-		WriteString(str);
+		WriteString(str, true);
 		matyp = 1;
 	}
 	
@@ -4850,9 +4853,9 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls){
 	{
 		//TRACE("      artificially limiting mach to  0.99\n");
 		QString str("mrcl: Cl too low for chosen Mach(Cl) dependence\r\n");
-		WriteString(str);
+		WriteString(str, true);
 		str = "      artificially limiting mach to  0.99";
-		WriteString(str);
+		WriteString(str, true);
 		minf = 0.99;
 		m_cls = 0.0;
 	}
@@ -4864,9 +4867,9 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls){
 	{
 		//TRACE("     artificially limiting re to %f\n",reinf1*100.0);
 		QString str("mrcl: cl too low for chosen Re(Cl) dependence\r\n");
-		WriteString(str);
+		WriteString(str, true);
 		str = QString("      artificially limiting Re to %1\r\n").arg(reinf1*100.0,0,'f',0);
-		WriteString(str);
+		WriteString(str, true);
 		reinf = reinf1*100.0;
 		r_cls = 0.0;
 	}
@@ -5297,7 +5300,7 @@ stop51:
 
 	//TRACE("Paneling convergence failed.  Continuing anyway...\n");
 		str = "Paneling convergence failed.  Continuing anyway...\r\n";
-		WriteString(str);
+		WriteString(str, true);
 
 stop11:
 
@@ -5337,7 +5340,7 @@ stop11:
 				if(n > IQX-1){
 					//TRACE("panel: too many panels. increase iqx in xfoil.inc");
 					QString str = "Panel: Too many panels. Increase IQX";
-					WriteString(str);
+					WriteString(str, true);
 					return;
 				}
 				x[i] = xbcorn;
@@ -6423,7 +6426,7 @@ bool XFoil::qdcalc(){
 	double bbb[IQX];
 	
 	//TRACE("calculating source influence matrix ...\n");
-	QString str = " Calculating source influence matrix ...\r\n";
+	QString str = "   Calculating source influence matrix ...\r\n";
 	WriteString(str);
 
 
@@ -7050,7 +7053,7 @@ bool XFoil::setbl(){
 	{
 		//----- initialize bl by marching with ue (fudge at separation)
 		//TRACE(" initializing bl ...\n");
-		QString str = " Initializing bl ...\r\n";
+		QString str = "   Initializing bl ...\r\n";
 		WriteString(str);
 
 		mrchue();
@@ -7469,7 +7472,7 @@ void XFoil::scheck(double x[], double y[], int *n, double stol, bool *lchange){
 	if(stol>0.3)
 	{
 		QString str("scheck:  bad value for small panels (stol > 0.3)\r\n");
-		WriteString(str);
+		WriteString(str, true);
 		return;
 	}
 	int im1, ip1, ip2;
@@ -7549,7 +7552,7 @@ bool XFoil::setexp(double s[], double ds1, double smax, int nn)
 	if(nex<=1)
 	{
 		QString str("setexp: cannot fill array.  n too small\r\n");
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	else {
@@ -7575,7 +7578,7 @@ bool XFoil::setexp(double s[], double ds1, double smax, int nn)
 
 
 	str = "Setexp: Convergence failed.  Continuing anyway ...\r\n";
-	WriteString(str);
+	WriteString(str, true);
 
 
 	//-- set up stretched array using converged geometric ratio
@@ -7667,7 +7670,7 @@ bool XFoil::sinvrt(double &si, double xi,
 	}
 	
 	QString str = "Sinvrt: spline inversion failed, input value returned\r\n";
-	WriteString(str);
+	WriteString(str, true);
 	si = sisav;
 
 	return false;
@@ -7745,7 +7748,7 @@ bool XFoil::specal()
 	if(!bConv)
 	{
 		QString str("Specal:  MInf convergence failed\r\n");
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	
@@ -7838,7 +7841,7 @@ bool XFoil::speccl(){
 	if(!bConv)
 	{
 		QString str = "Speccl:  cl convergence failed";
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	
@@ -7946,7 +7949,7 @@ bool XFoil::splind(double x[], double xs[], double s[], int n, double xs1, doubl
 	if(n>nmax)
 	{
 		QString str = "splind: array overflow, increase nmax";
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 	for(int i=2; i<= n-1;i++)
@@ -8267,7 +8270,7 @@ bool XFoil::stfind()
 	if(!bFound)
 	{
 		QString str = "stfind: Stagnation point not found. Continuing ...\r\n";
-		WriteString(str);
+		WriteString(str, true);
 		i = n/2;
 	}
 
@@ -8718,7 +8721,7 @@ bool XFoil::trchek(){
 
 	//TRACE("trchek2 - n2 convergence failed\n");
 	str = "trchek2 - n2 convergence failed\r\n";
-	WriteString(str);
+	WriteString(str, true);
 
 stop101:
 
@@ -9662,7 +9665,7 @@ bool XFoil::ViscousIter()
 	{
 		lvconv = false;
 		str = "--------UNCONVERGED----------\r\n\r\n";
-		WriteString(str);
+		WriteString(str, true);
 		return false;
 	}
 
@@ -9672,7 +9675,7 @@ bool XFoil::ViscousIter()
 		avisc = alfa;	
 		mvisc = minf;
 		str = "----------CONVERGED----------\r\n\r\n";
-		WriteString(str);
+		WriteString(str, true);
 	}
 
 	return true;
@@ -9822,16 +9825,15 @@ bool XFoil::xyWake()
 	double ds, ds1, sx, sy, smod;
 	double psi, psi_x,psi_y;
 //
-	//TRACE("calculating wake trajectory ...\n");
-	QString str(" Calculating wake trajectory ...\r\n");
-	WriteString(str);
+	QString str("   Calculating wake trajectory ...\r\n");
+	WriteString(str, true);
 	//
 	//--- number of wake points
 	nw = n/8 + 2;
 	if(nw>IWX)
 	{
 		QString str(" XYWake: array size (IWX) too small.\n  Last wake point index reduced.");
-		WriteString(str);
+		WriteString(str, true);
 		nw = IWX;
 	}
 	
@@ -9992,7 +9994,7 @@ int XFoil::arefine(double x[],double y[], double s[], double xs[], double ys[],
 	
 stop90: 
 	QString str = "sdouble:  Arrays will overflow.  No action taken.\r\n";
-	WriteString(str);
+	WriteString(str, true);
 
 //	nnew = 0;
 	return 0;

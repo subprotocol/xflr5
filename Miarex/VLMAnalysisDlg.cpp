@@ -392,7 +392,6 @@ bool VLMAnalysisDlg::ControlLoop()
 					a0  = a;
 					Cm0 = Cm;
 				}
-//qDebug() << Cm << a*180/pi << iter;
 				iter++;
 			}
 
@@ -403,7 +402,6 @@ bool VLMAnalysisDlg::ControlLoop()
 
 			if(fabs(Cm)<eps)
 			{
-//qDebug() <<  Cm << eps;
 				VLMSolveMultiple(a*180.0/pi, 0.0, 1);
 				VLMComputePlane(a*180.0/pi, m_ControlDelta, 1);
 			}
@@ -1170,7 +1168,6 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
 
-//qDebug() << m_GCm;
 			m_GCm *=  1.0 / m_pWing->m_Area /m_pWing->m_MAChord /qdyn;
 			m_GRm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
 			m_GYm *=  1.0 / m_pWing->m_Area /m_pWing->m_Span    /qdyn;
