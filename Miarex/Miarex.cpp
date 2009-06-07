@@ -293,7 +293,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph3.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetYMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetXTitle("Alpha");
-	m_WPlrGraph3.SetYTitle("Cl");
+	m_WPlrGraph3.SetYTitle("Cl^(3/2)/Cd");
 	m_WPlrGraph3.SetXMin(-0.0);
 	m_WPlrGraph3.SetXMax( 0.1);
 	m_WPlrGraph3.SetYMin(-0.01);
@@ -304,13 +304,15 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph4.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph4.SetYMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph4.SetXTitle("Alpha");
-	m_WPlrGraph4.SetYTitle("Cl");
+	m_WPlrGraph4.SetYTitle("Cl/Cd");
 	m_WPlrGraph4.SetXMin(-0.0);
 	m_WPlrGraph4.SetXMax( 0.1);
 	m_WPlrGraph4.SetYMin(-0.01);
 	m_WPlrGraph4.SetYMax( 0.01);
 	m_WPlrGraph4.SetType(0);
 	m_WPlrGraph4.SetMargin(50);
+
+
 
 	m_CpGraph.SetInverted(true);
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);

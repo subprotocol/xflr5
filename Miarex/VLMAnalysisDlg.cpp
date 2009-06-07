@@ -281,30 +281,33 @@ bool VLMAnalysisDlg::ControlLoop()
 		//wing first
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			if(m_pWPolar->m_bActiveControl[nCtrl])
-			{
-				angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
-
-				if(!pWing->m_Surface[j].RotateFlap(angle))  return false;
-			}
-			nCtrl++;
-		}
-
-		//elevator next and last
-		if(pStab)
-		{
-			for (j=0; j<pStab->m_NSurfaces; j++)
+			if(pWing->m_Surface[j].m_bTEFlap)
 			{
 				if(m_pWPolar->m_bActiveControl[nCtrl])
 				{
 					angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
 
-					if(!pStab->m_Surface[j].RotateFlap(angle)) return false;
+					if(!pWing->m_Surface[j].RotateFlap(angle))  return false;
 				}
 				nCtrl++;
 			}
 		}
-
+		//elevator next and last
+		if(pStab)
+		{
+			for (j=0; j<pStab->m_NSurfaces; j++)
+			{
+				if(pStab->m_Surface[j].m_bTEFlap)
+				{
+					if(m_pWPolar->m_bActiveControl[nCtrl])
+					{
+						angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
+						if(!pStab->m_Surface[j].RotateFlap(angle)) return false;
+					}
+					nCtrl++;
+				}
+			}
+		}
 		str = QString("      ...Control = %1\r\n").arg(m_ControlMin+i*m_ControlDelta,8,'f',2);
 		AddString(str);
 
@@ -358,7 +361,6 @@ bool VLMAnalysisDlg::ControlLoop()
 			if(m_bCancel) break;
 		}
 		if(m_bCancel) break;
-
 		if(iter>=100)
 		{
 			//no zero moment alpha
@@ -824,7 +826,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		pMiarex->RotateGeomY(m_AlphaMin+i*m_AlphaDelta, O);
 
-		str = QString("      ...Alpha = %1\r\n").arg(m_AlphaMin+i*m_AlphaDelta,8,'f',2);
+		str = QString("        ...Alpha = %1\r\n").arg(m_AlphaMin+i*m_AlphaDelta,8,'f',2);
 		AddString(str);
 
 		if (m_bCancel) break;
@@ -926,6 +928,7 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 //double row[VLMMATSIZE]; memcpy(row, m_aij, Size*sizeof(double));
 	return true;
 }
+
 
 double VLMAnalysisDlg::VLMComputeCm(double alpha)
 {
@@ -1078,7 +1081,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GCm = m_VCm         = 0.0;
 			m_GYm = m_VYm = m_IYm = 0.0;
 
-			AddString("       Calculating main wing...\r\n");
+			AddString("         Calculating main wing...\r\n");
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_GRm, m_GYm, m_IYm, m_VYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 
@@ -1860,7 +1863,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	if(m_pWPolar->m_Type==2)
 	{
 		//type 2; find the speeds which will create a lift equal to the weight
-		AddString("      Calculating speeds to balance the weight\r\n\r\n");
+		AddString("      Calculating speeds to balance the weight\r\n");
 
 		for (q=0; q<nval;q++)
 		{
@@ -1920,7 +1923,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	else if(m_pWPolar->m_Type==6)
 	{
 		//type 2; find the speeds which will create a lift equal to the weight
-		AddString("      Calculating speeds to balance the weight\r\n\r\n");
+		AddString("      Calculating speeds to balance the weight\r\n");
 
 		VInf.Set(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
 		WindNormal.Set(-sin(alpha*pi/180.0), 0.0, cos(alpha*pi/180.0));

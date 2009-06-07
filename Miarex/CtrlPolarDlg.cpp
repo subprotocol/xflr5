@@ -105,7 +105,7 @@ void CtrlPolarDlg::Connect()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	m_pControlModel = new QStandardItemModel;
-	m_pControlModel->setRowCount(6);//temporary
+	m_pControlModel->setRowCount(10);//temporary
 	m_pControlModel->setColumnCount(4);
 
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, "Control Name");
@@ -122,12 +122,12 @@ void CtrlPolarDlg::Connect()
 
 void CtrlPolarDlg::FillControlList()
 {
+	m_pControlModel->setRowCount(m_nControls);//temporary
 	QString str, strong;
 	QModelIndex ind;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int i;
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	m_pControlModel->setRowCount(m_nControls);
 
 	ind = m_pControlModel->index(0, 0, QModelIndex());
 	m_pControlModel->setData(ind, "XCmRef ("+str+")");
@@ -525,11 +525,6 @@ void CtrlPolarDlg::SetDensity()
 
 void CtrlPolarDlg::SetupLayout()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/3);
-//	move(r.width()/3, r.height()/6);
-
 	QVBoxLayout *NameLayout = new QVBoxLayout;
 	m_pctrlUFOName = new QLabel("WingName");
 	m_pctrlAutoName = new QCheckBox("Auto Analysis Name");

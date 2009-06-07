@@ -91,18 +91,19 @@ void CtrlTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 void CtrlTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	QString strong;
-	int NCtrls = 2;
+//	int NCtrls = 2;
 	QStyleOptionViewItem myOption = option;
 //	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 //	NCtrls = pMiarex->m_poaCtrl->size();
 
-	if(index.row()> NCtrls)
+/*	if(index.row()> NCtrls)
 	{
 		strong=" ";
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else if(index.column()==0)
+	else */
+	if(index.column()==0)
 	{
 		myOption.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
 		strong = index.model()->data(index, Qt::DisplayRole).toString();

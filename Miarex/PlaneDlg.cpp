@@ -70,10 +70,14 @@ PlaneDlg::PlaneDlg()
 	connect(m_pctrlBody, SIGNAL(clicked()), this, SLOT(OnBodyCheck()));
 	connect(m_pctrlBodyList,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeBodyList(int)));
 
-	connect(m_pctrlXLEStab,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlWingTilt, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlStabTilt, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlFinTilt,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	connect(m_pctrlXLEWing,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	connect(m_pctrlZLEWing,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	connect(m_pctrlXLEWing2, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	connect(m_pctrlZLEWing2, SIGNAL(editingFinished()), this, SLOT(OnChanged()));
+	connect(m_pctrlXLEStab,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlZLEStab,  SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlXLEFin,   SIGNAL(editingFinished()), this, SLOT(OnChanged()));
 	connect(m_pctrlZLEFin,   SIGNAL(editingFinished()), this, SLOT(OnChanged()));
