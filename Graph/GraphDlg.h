@@ -64,6 +64,8 @@ private slots:
 	void OnGraphBackColor();
 	void OnBorderStyle();
 	void OnYInverted();
+	void OnActivePage(int index);
+	void OnVariableChanged();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -71,7 +73,13 @@ private:
 	void SetApplied(bool bApplied);
 	void Connect();
 
+	void FillVariableList();
+
+
 	QWidget *ScalePage, *FontPage, *BackPage, *GridPage;
+	QWidget *VariablePage;
+
+	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 
 	QPushButton *OKButton,*CancelButton, *RestoreButton, *ApplyButton;
 	QPushButton *m_pctrlTitleButton, * m_pctrlLegendButton, *m_pctrlLabelButton;
@@ -98,6 +106,11 @@ public:
 	Graph *m_pGraph, *m_pMemGraph;
 	Graph *m_GraphArray[5];
 	int m_NGraph;
+	int m_XSel, m_YSel;
+	int m_iGraphType;
+	bool m_bVariableChanged;
+
+	static int s_ActivePage;
 	static void *s_pMainFrame;
 };
 

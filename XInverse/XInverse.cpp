@@ -520,7 +520,7 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_G:
 		{
-			OnGraphOptions();
+			OnGraphSettings();
 			return;
 		}
 		default:
@@ -561,8 +561,7 @@ void QXInverse::mouseDoubleClickEvent ( QMouseEvent * event )
 {
 	if (!m_QGraph.IsInDrawRect(event->pos())) return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->OnGraphSettings();
+	OnGraphSettings();
 }
 
 
@@ -1252,15 +1251,30 @@ void QXInverse::OnFilter()
 
 
 
-void QXInverse::OnGraphOptions()
+
+void QXInverse::OnGraphSettings()
 {
 	GraphDlg dlg;
+	dlg.m_iGraphType = 31;
+	dlg.m_XSel = 0;
+	dlg.m_YSel = 0;
 	dlg.m_pGraph = &m_QGraph;
 
-	if(QDialog::Accepted == dlg.exec())
+
+	QGraph graph;
+	graph.CopySettings(&m_QGraph);
+	dlg.m_pMemGraph = &m_QGraph;
+	dlg.m_pGraph = &m_QGraph;
+	dlg.SetParams();
+
+	if(dlg.exec() == QDialog::Accepted)
 	{
-		UpdateView();
 	}
+	else
+	{
+		m_QGraph.CopySettings(&graph);
+	}
+	UpdateView();
 }
 
 

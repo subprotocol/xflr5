@@ -95,7 +95,6 @@ private slots:
 	void OnInitBL();
 	void OnOpPoints();
 	void OnPolars();
-	void OnPolarGraphVariable();
 	void OnResetAllPolarGraphsScales();
 	void OnResetFoilScale();
 	void OnResetXFoil();
@@ -115,6 +114,7 @@ private slots:
 	void OnStoreOpp();
 	void OnViscous();
 	void OnXDirectStyle();
+	void OnGraphSettings();
 
 	void OnShowPolarOpps();
 	void OnHidePolarOpps();

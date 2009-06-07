@@ -120,8 +120,8 @@ void QGraph::DrawGraph(QPainter &painter)
 	painter.save();
 
 //	Paint background
-	QBrush bg(m_BkColor);
-	painter.setBackground(bg);
+//	QBrush bg(m_BkColor);
+//	painter.setBackground(bg);
 
 //	Draw Border
 	if(m_bBorder) color = m_BorderColor;
@@ -136,6 +136,8 @@ void QGraph::DrawGraph(QPainter &painter)
 	Init();
 
 	painter.setClipRect(m_rCltRect);
+
+	painter.setBackgroundMode(Qt::TransparentMode);
 
 	if(m_bXMinGrid) DrawXMinGrid(painter);
 	if(m_bYMinGrid) DrawYMinGrid(painter);

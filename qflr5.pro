@@ -67,7 +67,6 @@ SOURCES += MainFrame.cpp \
     Miarex/BodyScaleDlg.cpp \
     Graph/QGraph.cpp \
     Graph/GraphWidget.cpp \
-    Graph/GraphVariableDlg.cpp \
     Graph/GraphDlg.cpp \
     Graph/Graph.cpp \
     Graph/Curve.cpp \
@@ -83,7 +82,6 @@ SOURCES += MainFrame.cpp \
     GLWidget.cpp \
     XInverse/InverseOptionsDlg.cpp \
     Miarex/ManageBodiesDlg.cpp \
-    Graph/WingGraphVarDlg.cpp \
     Misc/EditPlrDlg.cpp \
     Miarex/W3dPrefsDlg.cpp \
     Miarex/CtrlPolarDlg.cpp \
@@ -161,7 +159,6 @@ HEADERS += MainFrame.h \
     Miarex/BodyTableDelegate.h \
     Miarex/BodyScaleDlg.h \
     Graph/GraphWidget.h \
-    Graph/GraphVariableDlg.h \
     Graph/Graph.h \
     Graph/GraphDlg.h \
     Graph/Curve.h \
@@ -177,7 +174,6 @@ HEADERS += MainFrame.h \
     GLWidget.h \
     XInverse/InverseOptionsDlg.h \
     Miarex/ManageBodiesDlg.h \
-    Graph/WingGraphVarDlg.h \
     Misc/EditPlrDlg.h \
     Miarex/W3dPrefsDlg.h \
     Miarex/CtrlPolarDlg.h \
@@ -197,19 +193,13 @@ HEADERS += MainFrame.h \
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 
-
-unix {
-    #VARIABLES
-    isEmpty(PREFIX) {
-        PREFIX = /usr/local
-  }
-  BINDIR = $$PREFIX/bin
-  DATADIR = $$PREFIX/share
-
-  #MAKE INSTALL
-  INSTALLS += target
-
-  target.path =$$BINDIR
-
+unix { 
+    # VARIABLES
+    isEmpty(PREFIX):PREFIX = /usr/local
+    BINDIR = $$PREFIX/bin
+    DATADIR = $$PREFIX/share
+    
+    # MAKE INSTALL
+    INSTALLS += target
+    target.path = $$BINDIR
 }
-

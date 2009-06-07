@@ -26,6 +26,7 @@
 #include <QColorDialog>
 #include <QPalette>
 
+int GraphDlg::s_ActivePage;
 void *GraphDlg::s_pMainFrame;
 
 
@@ -33,10 +34,15 @@ GraphDlg::GraphDlg()
 {
 	setWindowTitle("Graph Settings");
 
+	m_iGraphType = 1;
 	m_pMemGraph = NULL;
 	m_pGraph    = NULL;
 	m_NGraph      = 0 ;
 	m_bApplied = true;
+	m_bVariableChanged = false;
+
+	m_XSel = 0;
+	m_YSel = 1;
 
 	m_pTitleFont = m_pLegendFont = m_pLabelFont = NULL;
 
@@ -74,12 +80,23 @@ void GraphDlg::Connect()
 	connect(m_pctrlGraphBack, SIGNAL(clicked()), this, SLOT(OnGraphBackColor()));
 	connect(m_pctrlBorderStyle, SIGNAL(clicked()), this, SLOT(OnBorderStyle()));
 
+/*	connect(m_pctrlXSel, SIGNAL(itemActivated ( QListWidgetItem*)), SLOT(OnVariableChanged()));
+	connect(m_pctrlYSel, SIGNAL(itemActivated ( QListWidgetItem*)), SLOT(OnVariableChanged()));
+	connect(m_pctrlXSel, SIGNAL(itemClicked ( QListWidgetItem*)), SLOT(OnVariableChanged()));
+	connect(m_pctrlYSel, SIGNAL(itemClicked ( QListWidgetItem*)), SLOT(OnVariableChanged()));*/
+	connect(m_pctrlXSel, SIGNAL(itemSelectionChanged()), SLOT(OnVariableChanged()));
+	connect(m_pctrlYSel, SIGNAL(itemSelectionChanged()), SLOT(OnVariableChanged()));
+
+	connect(m_pctrlXSel, SIGNAL(itemDoubleClicked (QListWidgetItem *)), SLOT(OnOK()));
+	connect(m_pctrlYSel, SIGNAL(itemDoubleClicked (QListWidgetItem *)), SLOT(OnOK()));
+
 	connect(RestoreButton, SIGNAL(clicked()),this, SLOT(OnRestoreParams()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(ApplyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-
 }
+
+
 
 void GraphDlg::keyPressEvent(QKeyEvent *event)
 {
@@ -109,6 +126,10 @@ void GraphDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+void GraphDlg::OnActivePage(int index)
+{
+	s_ActivePage = index;
+}
 
 void GraphDlg::OnApply()
 {
@@ -295,6 +316,10 @@ void GraphDlg::OnOK()
 	{
 		m_GraphArray[i]->CopySettings(m_pGraph);
 	}
+
+	m_XSel = m_pctrlXSel->currentRow();
+	m_YSel = m_pctrlYSel->currentRow();
+
 	accept();
 }
 
@@ -341,6 +366,11 @@ void GraphDlg::OnTitleFont()
 	}
 }
 
+
+void GraphDlg::OnVariableChanged()
+{
+	m_bVariableChanged = true;
+}
 
 
 void GraphDlg::OnXMajGridStyle()
@@ -557,6 +587,11 @@ void GraphDlg::SetParams()
 
 	m_pctrlYInverted->setChecked(m_pGraph->GetInverted());
 
+	FillVariableList();
+	m_pctrlXSel->setCurrentRow(m_XSel);
+	m_pctrlYSel->setCurrentRow(m_YSel);
+	m_bVariableChanged = false;
+
 	SetApplied(true);
 }
 
@@ -592,10 +627,45 @@ void GraphDlg::SetupLayout()
 //	pTabWidget->setMinimumWidth(300);
 //	pTabWidget->setMinimumHeight(300);
 
-	ScalePage = new QWidget(this);
-	GridPage = new QWidget(this);
-	FontPage = new QWidget(this);
-	BackPage = new QWidget(this);
+	ScalePage    = new QWidget(this);
+	GridPage     = new QWidget(this);
+	FontPage     = new QWidget(this);
+	BackPage     = new QWidget(this);
+	VariablePage = new QWidget(this);
+
+	//________Variable Page______________________
+
+	QHBoxLayout *AxisNames = new QHBoxLayout;
+	QLabel *YAxis = new QLabel("YAxis");
+	QLabel *vs = new QLabel("vs.");
+	QLabel *XAxis = new QLabel("XAxis");
+	AxisNames->addStretch(1);
+	AxisNames->addWidget(YAxis);
+	AxisNames->addStretch(1);
+	AxisNames->addWidget(vs);
+	AxisNames->addStretch(1);
+	AxisNames->addWidget(XAxis);
+	AxisNames->addStretch(1);
+
+	QHBoxLayout *VariableBox = new QHBoxLayout;
+	m_pctrlXSel = new QListWidget;
+	m_pctrlYSel = new QListWidget;
+	m_pctrlXSel->setMinimumWidth(30);
+	m_pctrlYSel->setMinimumWidth(30);
+	m_pctrlXSel->setMinimumHeight(200);
+	m_pctrlYSel->setMinimumHeight(200);
+	VariableBox->addStretch(1);
+	VariableBox->addWidget(m_pctrlYSel);
+	VariableBox->addStretch(1);
+	VariableBox->addWidget(m_pctrlXSel);
+	VariableBox->addStretch(1);
+
+	QVBoxLayout *VariableLayout = new QVBoxLayout(this);
+	VariableLayout->addLayout(AxisNames);
+	VariableLayout->addLayout(VariableBox);
+	VariableLayout->addStretch(1);
+
+	VariablePage->setLayout(VariableLayout);
 
 	//________Font Page______________________
 	QGridLayout *FontButtons = new QGridLayout;
@@ -620,6 +690,7 @@ void GraphDlg::SetupLayout()
 	FontButtons->addWidget(m_pctrlTitleColor,1,3);
 	FontButtons->addWidget(m_pctrlLabelColor,2,3);
 	FontButtons->addWidget(m_pctrlLegendColor,3,3);
+
 
 	FontPage->setLayout(FontButtons);
 	//________End Font Page______________________
@@ -714,7 +785,7 @@ void GraphDlg::SetupLayout()
 	//________Back Page______________________
 	QGridLayout *BackData = new QGridLayout;
 	QLabel *GraphBackLabel = new QLabel("Graph Background");
-	GraphBackLabel->setMinimumWidth(100);
+	GraphBackLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlGraphBorder = new QCheckBox("Graph Border");
 
 	m_pctrlGraphBack = new ColorButton;
@@ -730,10 +801,14 @@ void GraphDlg::SetupLayout()
 
 	BackPage->setLayout(BackData);
 	//________End Back Page______________________
+	pTabWidget->addTab(VariablePage, "Variables");
 	pTabWidget->addTab(ScalePage, "Scales");
 	pTabWidget->addTab(GridPage, "Axis and Grids");
 	pTabWidget->addTab(FontPage, "Fonts");
 	pTabWidget->addTab(BackPage, "Background");
+
+	pTabWidget->setCurrentIndex(s_ActivePage);
+	connect(pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(pTabWidget);
@@ -742,3 +817,154 @@ void GraphDlg::SetupLayout()
 }
 
 
+
+void GraphDlg::FillVariableList()
+{
+	if(m_iGraphType == 31)
+	{
+		m_pctrlXSel->addItem("X - Chord");
+		m_pctrlYSel->addItem("Q - Speed");
+	}
+	else if(m_iGraphType==51)
+	{
+		//foil oppoint graph variables
+		m_pctrlXSel->addItem("X - chord");
+		m_pctrlYSel->addItem("Cp");
+		m_pctrlYSel->addItem("Q - Speed");
+
+	}
+	else if(m_iGraphType==52)
+	{
+		//foil polar graph variables
+		m_pctrlXSel->addItem("Alpha");
+		m_pctrlXSel->addItem("Cl");
+		m_pctrlXSel->addItem("Cd");
+		m_pctrlXSel->addItem("Cd x 10000");
+		m_pctrlXSel->addItem("Cdp");
+		m_pctrlXSel->addItem("Cm");
+		m_pctrlXSel->addItem("Xtr1");
+		m_pctrlXSel->addItem("Xtr2");
+		m_pctrlXSel->addItem("HMom");
+		m_pctrlXSel->addItem("Cpmin");
+		m_pctrlXSel->addItem("Cl/Cd");
+		m_pctrlXSel->addItem("|Cl|^(3/2)/Cd");
+		m_pctrlXSel->addItem("1/Cl^1/2");
+		m_pctrlXSel->addItem("Re");
+		m_pctrlXSel->addItem("XCp");
+
+		m_pctrlYSel->addItem("Alpha");
+		m_pctrlYSel->addItem("Cl");
+		m_pctrlYSel->addItem("Cd");
+		m_pctrlYSel->addItem("Cd x 10000");
+		m_pctrlYSel->addItem("Cdp");
+		m_pctrlYSel->addItem("Cm");
+		m_pctrlYSel->addItem("Xtr1");
+		m_pctrlYSel->addItem("Xtr2");
+		m_pctrlYSel->addItem("HMom");
+		m_pctrlYSel->addItem("Cpmin");
+		m_pctrlYSel->addItem("Cl/Cd");
+		m_pctrlYSel->addItem("|Cl|^(3/2)/Cd");
+		m_pctrlYSel->addItem("1/Cl^1/2");
+		m_pctrlYSel->addItem("Re");
+		m_pctrlYSel->addItem("XCp");
+	}
+	else if(m_iGraphType==61)
+	{
+		//wing graph variable
+		m_pctrlXSel->addItem("Y - span");
+
+		m_pctrlYSel->addItem("Induced Angle");						//0
+		m_pctrlYSel->addItem("Total Angle");						//1
+		m_pctrlYSel->addItem("Local lift coef.");					//2
+		m_pctrlYSel->addItem("Local Lift C.Cl/M.A.C.");				//3
+		m_pctrlYSel->addItem("Airfoil viscous drag coef.");			//4
+		m_pctrlYSel->addItem("Induced drag coef.");					//5
+		m_pctrlYSel->addItem("Total drag coef.");					//6
+		m_pctrlYSel->addItem("Local Drag C.Cd/M.A.C.");				//7
+		m_pctrlYSel->addItem("Airfoil Pitching moment coef.");		//8
+		m_pctrlYSel->addItem("Geom. Pitching moment coef.");		//9
+		m_pctrlYSel->addItem("Total Pitching moment coef.");		//10
+		m_pctrlYSel->addItem("Reynolds");							//11
+		m_pctrlYSel->addItem("Top Transition x-pos%");				//12
+		m_pctrlYSel->addItem("Bottom Transition x-pos%");			//13
+		m_pctrlYSel->addItem("Centre of Pressure x-pos%");			//14
+		m_pctrlYSel->addItem("Bending moment");						//15
+	}
+	else if(m_iGraphType == 62)
+	{
+		//WingPolar Graph Variables
+		m_pctrlXSel->addItem("Alpha");						//0
+		m_pctrlXSel->addItem("Lift coef.");					//1
+		m_pctrlXSel->addItem("Viscous drag coef.");			//2
+		m_pctrlXSel->addItem("Induced drag coef.");			//3
+		m_pctrlXSel->addItem("Total drag coef.");			//4
+
+		m_pctrlXSel->addItem("Total pitching moment coef.");//5
+		m_pctrlXSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlXSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlXSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlXSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlXSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlXSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlXSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlXSel->addItem("Lift");						//13
+		m_pctrlXSel->addItem("Drag");						//14
+		m_pctrlXSel->addItem("Vx");							//15
+		m_pctrlXSel->addItem("Vz");							//16
+		m_pctrlXSel->addItem("VInf");						//17
+		m_pctrlXSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlXSel->addItem("Pitching Moment");			//19
+		m_pctrlXSel->addItem("Rolling Moment");				//20
+		m_pctrlXSel->addItem("Yawing Moment");				//21
+		m_pctrlXSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlXSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlXSel->addItem("Bending moment");				//24
+		m_pctrlXSel->addItem("m.g.Vz");						//25
+		m_pctrlXSel->addItem("Efficiency");					//26
+		m_pctrlXSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlXSel->addItem("Control Variable");			//28
+		m_pctrlXSel->addItem("Cy - Lateral force coef.");	//29
+
+		m_pctrlYSel->addItem("Alpha");						//0
+		m_pctrlYSel->addItem("Lift coef.");					//1
+		m_pctrlYSel->addItem("Viscous drag coef.");			//2
+		m_pctrlYSel->addItem("Induced drag coef.");			//3
+		m_pctrlYSel->addItem("Total drag coef.");			//4
+
+		m_pctrlYSel->addItem("Total pitching moment coef.");//5
+		m_pctrlYSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlYSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlYSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlYSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlYSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlYSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlYSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlYSel->addItem("Lift");						//13
+		m_pctrlYSel->addItem("Drag");						//14
+		m_pctrlYSel->addItem("Vx");							//15
+		m_pctrlYSel->addItem("Vz");							//16
+		m_pctrlYSel->addItem("VInf");						//17
+		m_pctrlYSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlYSel->addItem("Pitching Moment");			//19
+		m_pctrlYSel->addItem("Rolling Moment");				//20
+		m_pctrlYSel->addItem("Yawing Moment");				//21
+		m_pctrlYSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlYSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlYSel->addItem("Bending moment");				//24
+		m_pctrlYSel->addItem("m.g.Vz");						//25
+		m_pctrlYSel->addItem("Efficiency");					//26
+		m_pctrlYSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlYSel->addItem("Control Variable");			//28
+		m_pctrlYSel->addItem("Cy - Lateral force coef.");	//29
+	}
+	else if(m_iGraphType == 64)
+	{
+		m_pctrlXSel->addItem("X - Chord");
+		m_pctrlYSel->addItem("Cp");
+	}
+
+	m_pctrlXSel->adjustSize();
+	m_pctrlYSel->adjustSize();
+}

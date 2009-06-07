@@ -276,8 +276,11 @@ void PlaneDlg::OnDefineWing()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing);
-//	WingDlg WingDlg;
+//	GL3dWingDlg WingDlg;
+
+	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing);
+
 	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
@@ -292,7 +295,9 @@ void PlaneDlg::OnDefineFin()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Fin);
-//	WingDlg WingDlg;
+	GL3dWingDlg WingDlg;
+
+	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Fin);
 
 
@@ -310,8 +315,11 @@ void PlaneDlg::OnDefineStab()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Stab);
-//	WingDlg WingDlg;
+	GL3dWingDlg WingDlg;
+
+	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Stab);
+
 	if(pMiarex->m_WingDlg.exec() == QDialog::Accepted)
 	{
 		SetResults();	
@@ -327,8 +335,11 @@ void PlaneDlg::OnDefineWing2()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing2);
-//	WingDlg WingDlg;
+	GL3dWingDlg WingDlg;
+
+	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing2);
+
 	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
@@ -589,24 +600,7 @@ void PlaneDlg::OnSymFin()
 	m_bChanged = true;
 	SetResults();
 }
-/*
-BOOL PlaneDlg::PreTranslateMessage(MSG* pMsg) 
-{
-	CWnd* pWnd = GetFocus();
-	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN){ 
-		if(GetDlgItem(IDCANCEL) != pWnd && GetDlgItem(IDOK) != pWnd) {
-			m_pctrlOK.SetFocus();
-//			ReadParams();
-//			SetResults();
-		}
-		else if(GetDlgItem(IDOK) == pWnd ) OnOK();
-		else if(GetDlgItem(IDCANCEL) == pWnd ) OnCancel();
 
-		return true;
-	}
-
-	return CDialog::PreTranslateMessage(pMsg);
-}*/
 
 void PlaneDlg::OnSelChangeBodyList(int pos)
 {
@@ -807,11 +801,6 @@ void PlaneDlg::SetResults()
 
 void PlaneDlg::SetupLayout()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/2);
-	move(r.width()/4, r.height()/8);
-
 	QVBoxLayout *NameLayout = new QVBoxLayout;
 	m_pctrlPlaneName = new QLineEdit("PlaneName");
 	m_pctrlPlaneName->setMinimumWidth(120);
@@ -826,9 +815,9 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab1 = new QLabel("x=");
 	QLabel *lab2 = new QLabel("z=");
 	QLabel *lab3 = new QLabel("Tilt Angle=");
-	lab1->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEWing = new FloatEdit(0.00);
 	m_pctrlZLEWing = new FloatEdit(0.00);
 	m_pctrlWingTilt = new FloatEdit(0.0);
@@ -859,9 +848,9 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab11 = new QLabel("x=");
 	QLabel *lab12 = new QLabel("z=");
 	QLabel *lab13 = new QLabel("Tilt Angle=");
-	lab11->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab12->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab13->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab12->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEWing2 = new FloatEdit(0.00);
 	m_pctrlZLEWing2 = new FloatEdit(0.00);
 	m_pctrlWingTilt2 = new FloatEdit(0.0);
@@ -889,9 +878,9 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab21 = new QLabel("x=");
 	QLabel *lab22 = new QLabel("z=");
 	QLabel *lab23 = new QLabel("Tilt Angle=");
-	lab21->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab22->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab23->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab21->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab22->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEStab = new FloatEdit(550.00);
 	m_pctrlZLEStab = new FloatEdit(550.00);
 	m_pctrlStabTilt = new FloatEdit(0.0);
@@ -921,10 +910,10 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab32 = new QLabel("y=");
 	QLabel *lab33 = new QLabel("z=");
 	QLabel *lab34 = new QLabel("Tilt Angle=");
-	lab31->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab32->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab33->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab34->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab31->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab32->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab33->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab34->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEFin = new FloatEdit(600.00);
 	m_pctrlYLEFin = new FloatEdit(0.00);
 	m_pctrlZLEFin = new FloatEdit(50.00);
@@ -991,14 +980,14 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab106 = new QLabel("TailVolume = ");
 	QLabel *lab107 = new QLabel("Plane Volume = ");
 	QLabel *lab108 = new QLabel("Total Panels = ");
-	lab101->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab102->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab103->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab104->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab105->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab106->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab107->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab108->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab101->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab102->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab103->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab104->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab105->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab106->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab107->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	lab108->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlWingSurface    = new QLabel("1.00");
 	m_pctrlStabSurface    = new QLabel("2.00");
 	m_pctrlWingSpan       = new QLabel("3.00");

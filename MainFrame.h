@@ -85,7 +85,6 @@ private slots:
 	void AboutQFLR5();
 	void OnCurFoilStyle();
 	void OnDeleteCurPolar();
-	void OnGraphSettings();
 	void OnGuidelines();
 	void OnExportCurGraph();
 	void OnInsertProject();
@@ -263,8 +262,8 @@ private:
 	QAction *twoWingGraphs, *fourWingGraphs;
 	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
-	QAction *twoWPlrGraphs, *allWPlrGraphs;
-	QAction *WPlrGraphVariable, *WingGraphVariablesAct, *ResetWingGraphScale;
+	QAction *twoWPlrGraphs, *allWPlrGraphs, *MiarexGraphDlg;
+	QAction *ResetWingGraphScale;
 	QAction *allWPolarGraphsScalesAct, *allWingGraphsScalesAct, *allWPolarGraphsSettings, *allWingGraphsSettings;
 	QAction *hideAllWPlrs, *showAllWPlrs;
 	QAction *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
@@ -291,7 +290,7 @@ private:
 	QAction *exportCurFoil, *deleteCurFoil, *renameCurFoil, *setCurFoilStyle;
 	QAction *DerotateFoil, *NormalizeFoil, *RefineLocalFoil, *RefineGlobalFoil , *EditCoordsFoil, *ScaleFoil;
 	QAction *SetTEGap, *SetLERadius, *SetFlap, *InterpolateFoils, *NacaFoils, *DuplicateFoil;
-	QAction *GraphDlgAction,*exportCurGraphAct, *resetCurGraphScales, *allPolarGraphsSettingsAct, *allPolarGraphsScales, *curPolarGraphVariableAct;
+	QAction *XDirectGraphDlg,*exportCurGraphAct, *resetCurGraphScales, *allPolarGraphsSettingsAct, *allPolarGraphsScales;
 	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct, *resetGraphLegend;
 	QAction *PolarGraphAct[5];
 	QAction *XDirectStyleAct;
@@ -308,7 +307,7 @@ private:
 	//XInverse Actions
 	QAction *StoreFoil, *ExtractFoil, *InverseStyles, *InverseResetScale, *InverseInsertCtrlPt, *InverseRemoveCtrlPt;
 	QAction *InvQInitial, *InvQSpec, *InvQViscous, *InvQPoints, *InvQReflected;
-	QAction *InverseResetGraphScale;
+	QAction *InverseResetGraphScale, *XInverseGraphDlg;
 
 	QStringList m_RecentFiles;
 

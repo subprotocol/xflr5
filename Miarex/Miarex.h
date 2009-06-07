@@ -120,8 +120,6 @@ private slots:
 	void OnTwoWPlrGraphs();
 	void OnFourWPlrGraphs();
 	void OnDefineCtrlPolar();
-	void OnDefinePolarGraphVariables();
-	void OnDefineWingGraphVariables();
 	void OnHideAllWPolars();
 	void OnShowAllWPolars();
 	void OnSingleWingGraph1();
@@ -199,6 +197,7 @@ private slots:
 	void OnKeepCpSection();
 	void OnResetCpSection();
 	void OnCpPosition();
+	void OnGraphSettings();
 
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);

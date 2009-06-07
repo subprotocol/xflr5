@@ -60,6 +60,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_MousePos.y = 0.0;
 
 	m_pCurFoil = NULL;
+	m_poaFoil  = NULL;
 
 	m_pSF = new CSF();
 	m_pSF->m_bModified = false;

@@ -2548,7 +2548,8 @@ void GL3dWingDlg::SetupLayout()
 
 	QDesktopWidget desktop;
 	QRect r = desktop.screenGeometry();
-	setMaximumHeight(r.height());
+//	setMaximumHeight(r.height());
+	setMinimumHeight(700);
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);

@@ -59,6 +59,7 @@ private slots:
 	void OnArea();
 	void OnUnit();
 	void OnMethod();
+	void OnWPolarName();
 	void OnAutoName();
 	void OnWakeRollUp();
 	void OnTiltedGeom();

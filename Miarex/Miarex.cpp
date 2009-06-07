@@ -28,8 +28,6 @@
 #include "../Misc/ProgressDlg.h"
 #include "../Misc/EditPlrDlg.h"
 #include "../Graph/GraphDlg.h"
-#include "../Graph/GraphVariableDlg.h"
-#include "../Graph/WingGraphVarDlg.h"
 #include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
@@ -9748,8 +9746,8 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_pCurGraph)
 			{
-				if (m_iView==2)     OnDefinePolarGraphVariables();
-				else if(m_iView==1) OnDefineWingGraphVariables();
+				GraphDlg::s_ActivePage=0;
+				OnGraphSettings();
 			}
 			break;
 		}
@@ -9763,7 +9761,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_pCurGraph)
 			{
-				pMainFrame->OnGraphSettings();
+				OnGraphSettings();
 			}
 			break;
 		}
@@ -9952,7 +9950,7 @@ void QMiarex::mouseDoubleClickEvent ( QMouseEvent * event )
 {
 	if(m_iView==3 || !m_pCurGraph) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->OnGraphSettings();
+	OnGraphSettings();
 }
 
 
@@ -11052,127 +11050,6 @@ void QMiarex::OnCurveWidth(int index)
 	UpdateCurve();
 }
 
-
-void QMiarex::OnDefineWingGraphVariables()
-{
-	//define the curernt WPolar graph's vaiable
-	if(!m_pCurGraph && m_iView!=2) return;
-	WingGraphVarDlg dlg;
-	int i;
-	int Var = m_WOppVar1;
-	if     (m_pCurGraph==&m_WingGraph1) Var = m_WOppVar1;
-	else if(m_pCurGraph==&m_WingGraph2) Var = m_WOppVar2;
-	else if(m_pCurGraph==&m_WingGraph3) Var = m_WOppVar3;
-	else if(m_pCurGraph==&m_WingGraph4) Var = m_WOppVar4;
-
-	dlg.m_iVar = Var;
-	dlg.InitDialog();
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		for (i=m_WingGraph1.GetCurveCount()-1; i>0; i--)
-		{
-			//0 is current curve
-			m_WingGraph1.DeleteCurve(i);
-		}
-		for (i=m_WingGraph2.GetCurveCount()-1; i>0; i--){//0 is curretn curve
-			m_WingGraph2.DeleteCurve(i);
-		}
-		for (i=m_WingGraph2.GetCurveCount()-1; i>0; i--){//0 is curretn curve
-			m_WingGraph2.DeleteCurve(i);
-		}
-		for (i=m_WingGraph3.GetCurveCount()-1; i>0; i--)
-		{
-			m_WingGraph3.DeleteCurve(i);
-		}
-		if (m_pCurGraph==&m_WingGraph1)
-		{
-			m_WOppVar1 = dlg.m_iVar;
-			m_WingGraph1.SetAutoY(true);
-			m_WingGraph1.SetAutoYMinUnit(true);
-		}
-		else if (m_pCurGraph==&m_WingGraph2)
-		{
-			m_WOppVar2 = dlg.m_iVar;
-			m_WingGraph2.SetAutoY(true);
-			m_WingGraph2.SetAutoYMinUnit(true);
-		}
-		else if (m_pCurGraph==&m_WingGraph3)
-		{
-			m_WOppVar3 = dlg.m_iVar;
-			m_WingGraph3.SetAutoY(true);
-			m_WingGraph3.SetAutoYMinUnit(true);
-		}
-		else if (m_pCurGraph==&m_WingGraph4)
-		{
-			m_WOppVar4 = dlg.m_iVar;
-			m_WingGraph4.SetAutoY(true);
-			m_WingGraph4.SetAutoYMinUnit(true);
-		}
-		if (m_iView==1)     CreateWOppCurves();
-		UpdateView();
-	}
-}
-
-
-void QMiarex::OnDefinePolarGraphVariables()
-{
-	//define the variables for the current graph
-	GraphVariableDlg dlg;
-	dlg.InitDialog(2);
-
-
-	if(m_pCurGraph == &m_WPlrGraph1)
-	{
-		dlg.SetSelection(m_XW1, m_YW1);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW1 = dlg.m_XSel;
-			m_YW1 = dlg.m_YSel;
-//			dlg.GetSelection(m_XW1, m_YW1);
-			SetWGraphTitles(&m_WPlrGraph1,m_XW1, m_YW1);
-			m_WPlrGraph1.SetAuto(true);
-			m_WPlrGraph1.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph2)
-	{
-		dlg.SetSelection(m_XW2, m_YW2);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW2 = dlg.m_XSel;
-			m_YW2 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph2,m_XW2, m_YW2);
-			m_WPlrGraph2.SetAuto(true);
-			m_WPlrGraph2.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph3)
-	{
-		dlg.SetSelection(m_XW3, m_YW3);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW3 = dlg.m_XSel;
-			m_YW3 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph3,m_XW3, m_YW3);
-			m_WPlrGraph3.SetAuto(true);
-			m_WPlrGraph3.SetAutoYMinUnit(true);
-		}
-	}
-	else if(m_pCurGraph == &m_WPlrGraph4)
-	{
-		dlg.SetSelection(m_XW4, m_YW4);
-		if(QDialog::Accepted == dlg.exec())
-		{
-			m_XW4 = dlg.m_XSel;
-			m_YW4 = dlg.m_YSel;
-			SetWGraphTitles(&m_WPlrGraph4,m_XW4, m_YW4);
-			m_WPlrGraph4.SetAuto(true);
-			m_WPlrGraph4.SetAutoYMinUnit(true);
-		}
-	}
-	CreateWPolarCurves();
-	UpdateView();
-}
 
 
 void QMiarex::OnDefineCtrlPolar()
@@ -12440,6 +12317,116 @@ void QMiarex::OnGL3DScale()
 }
 
 
+void QMiarex::OnGraphSettings()
+{
+	QGraph *pGraph = NULL;
+	GraphDlg dlg;
+
+	pGraph = m_pCurGraph;
+	if(!pGraph) return;
+	if(m_iView==1)
+	{
+		dlg.m_iGraphType = 61;
+		if(pGraph == &m_WingGraph1)      dlg.m_YSel = m_WOppVar1;
+		else if(pGraph == &m_WingGraph2) dlg.m_YSel = m_WOppVar2;
+		else if(pGraph == &m_WingGraph3) dlg.m_YSel = m_WOppVar3;
+		else if(pGraph == &m_WingGraph4) dlg.m_YSel = m_WOppVar4;
+	}
+	else if(m_iView==2)
+	{
+		dlg.m_iGraphType = 62;
+		if(pGraph == &m_WPlrGraph1)
+		{
+			dlg.m_XSel = m_XW1;
+			dlg.m_YSel = m_YW1;
+		}
+		else if(pGraph == &m_WPlrGraph2)
+		{
+			dlg.m_XSel = m_XW2;
+			dlg.m_YSel = m_YW2;
+		}
+		else if(pGraph == &m_WPlrGraph3)
+		{
+			dlg.m_XSel = m_XW3;
+			dlg.m_YSel = m_YW3;
+		}
+		else if(pGraph == &m_WPlrGraph4)
+		{
+			dlg.m_XSel = m_XW4;
+			dlg.m_YSel = m_YW4;
+		}
+
+	}
+	else if(m_iView==4) dlg.m_iGraphType = 64;
+
+	if(!pGraph) return;
+
+	QGraph graph;
+	graph.CopySettings(pGraph);
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph = pGraph;
+	dlg.SetParams();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		if(m_iView==1)
+		{
+			if(pGraph == &m_WingGraph1)      m_WOppVar1 = dlg.m_YSel;
+			else if(pGraph == &m_WingGraph2) m_WOppVar2 = dlg.m_YSel;
+			else if(pGraph == &m_WingGraph3) m_WOppVar3 = dlg.m_YSel;
+			else if(pGraph == &m_WingGraph4) m_WOppVar4 = dlg.m_YSel;
+			if(dlg.m_bVariableChanged)
+			{
+				m_pCurGraph->SetAutoY(true);
+				m_pCurGraph->SetAutoYMinUnit(true);
+			}
+
+			CreateWOppCurves();
+		}
+		else if(m_iView==2)
+		{
+			if(pGraph == &m_WPlrGraph1)
+			{
+				m_XW1 = dlg.m_XSel;
+				m_YW1 = dlg.m_YSel;
+				SetWGraphTitles(&m_WPlrGraph1, m_XW1,m_YW1);
+			}
+			else if(pGraph == &m_WPlrGraph2)
+			{
+				m_XW2 = dlg.m_XSel;
+				m_YW2 = dlg.m_YSel;
+				SetWGraphTitles(&m_WPlrGraph2, m_XW2,m_YW2);
+			}
+			else if(pGraph == &m_WPlrGraph3)
+			{
+				m_XW3 = dlg.m_XSel;
+				m_YW3 = dlg.m_YSel;
+				SetWGraphTitles(&m_WPlrGraph3, m_XW3,m_YW3);
+			}
+			else if(pGraph == &m_WPlrGraph4)
+			{
+				m_XW4 = dlg.m_XSel;
+				m_YW4 = dlg.m_YSel;
+				SetWGraphTitles(&m_WPlrGraph4, m_XW4,m_YW4);
+			}
+			if(dlg.m_bVariableChanged)
+			{
+				m_pCurGraph->SetAuto(true);
+				m_pCurGraph->SetAutoYMinUnit(true);
+			}
+			CreateWPolarCurves();
+		}
+	}
+	else
+	{
+		pGraph->CopySettings(&graph);
+	}
+	UpdateView();
+}
+
+
+
+
 void QMiarex::OnHalfWing()
 {
 	m_bHalfWing = m_pctrlHalfWing->isChecked();
@@ -13043,7 +13030,7 @@ void QMiarex::OnRenameCurUFO()
 	if(m_pCurPlane)      RenameUFO(m_pCurPlane->m_PlaneName);
 	else if (m_pCurWing) RenameUFO(m_pCurWing->m_WingName);
 	pMainFrame->UpdateUFOs();
-//	m_bResetglLegend = true;
+	m_bResetglLegend = true;
 	UpdateView();
 }
 

@@ -56,7 +56,6 @@ private slots:
 	void OnCpxx();
 	void OnInverseApp();
 	void OnMarkSegment();
-	void OnGraphOptions();
 	void OnInverseStyles();
 	void OnTangentSpline();
 	void OnShowSpline();
@@ -79,7 +78,7 @@ private slots:
 	void OnQPoints();
 	void OnQReflected();
 	void OnPertubate();
-
+	void OnGraphSettings();
 
 private:
 	void UpdateView();

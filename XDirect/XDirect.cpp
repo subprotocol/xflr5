@@ -25,7 +25,6 @@
  
 #include "../Globals.h"
 #include "../MainFrame.h"
-#include "../Graph/GraphVariableDlg.h"
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
 #include "XDirect.h"
@@ -1221,7 +1220,7 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -1290,10 +1289,14 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		case Qt::Key_G:
-			if(m_pCurGraph)	pMainFrame->OnGraphSettings();
+			if(m_pCurGraph) OnGraphSettings();
 			break;
 		case Qt::Key_V:
-			if(m_bPolar && m_pCurGraph) OnPolarGraphVariable();
+			if(m_bPolar && m_pCurGraph)
+			{
+				GraphDlg::s_ActivePage=0;
+				OnGraphSettings();
+			}
 			break;
 		case Qt::Key_F5:
 			if(!m_bPolar) return;
@@ -1391,15 +1394,13 @@ void QXDirect::LoadSettings(QDataStream &ar)
 
 void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
 	if(!m_bPolar)
 	{
 		if (!m_pCpGraph->IsInDrawRect(event->pos())) return;
 	}
 	else if(!m_pCurGraph) return;
 
-	pMainFrame->OnGraphSettings();
+	OnGraphSettings();
 }
 
 
@@ -2827,6 +2828,121 @@ void QXDirect::OnFoilGeom()
 
 
 
+void QXDirect::OnGraphSettings()
+{
+	QGraph *pGraph = NULL;
+	GraphDlg dlg;
+
+	pGraph = m_pCurGraph;
+	if(!pGraph) return;
+	if(!m_bPolar)
+	{
+		dlg.m_iGraphType = 51;
+		dlg.m_YSel = m_OppVar;
+	}
+	else
+	{
+		dlg.m_iGraphType = 52;
+		if(m_pCurGraph == m_pPolarGraph)
+		{
+			dlg.m_XSel = m_XPolar;
+			dlg.m_YSel = m_YPolar;
+		}
+		else if(m_pCurGraph == m_pCzGraph)
+		{
+			dlg.m_XSel = m_XCz;
+			dlg.m_YSel = m_YCz;
+		}
+		else if(m_pCurGraph == m_pCmGraph)
+		{
+			dlg.m_XSel = m_XCm;
+			dlg.m_YSel = m_YCm;
+		}
+		else if(m_pCurGraph == m_pTrGraph)
+		{
+			dlg.m_XSel = m_XTr;
+			dlg.m_YSel = m_YTr;
+		}
+		else if(m_pCurGraph == m_pUserGraph)
+		{
+			dlg.m_XSel = m_XUser;
+			dlg.m_YSel = m_YUser;
+		}
+	}
+
+	QGraph graph;
+	graph.CopySettings(pGraph);
+	dlg.m_pMemGraph = &graph;
+	dlg.m_pGraph = pGraph;
+	dlg.SetParams();
+
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		if(!m_bPolar)
+		{
+			m_OppVar = dlg.m_YSel;
+
+			if(m_OppVar == 0 || m_OppVar>=2)
+			{
+				m_pCpGraph->SetYTitle("Cp");
+				m_pCpGraph->SetInverted(true);
+			}
+			else
+			{
+				m_pCpGraph->SetYTitle("Q");
+				m_pCpGraph->SetInverted(false);
+			}
+			m_pCpGraph->ResetYLimits();
+			CreateOppCurves();
+		}
+		else
+		{
+			if(m_pPolarGraph == pGraph)
+			{
+				m_XPolar = dlg.m_XSel;
+				m_YPolar = dlg.m_YSel;
+				SetGraphTitles(m_pPolarGraph, m_XPolar,m_YPolar);
+			}
+			else if(m_pCzGraph == pGraph)
+			{
+				m_XCz = dlg.m_XSel;
+				m_YCz = dlg.m_YSel;
+				SetGraphTitles(m_pCzGraph, m_XCz, m_YCz);
+			}
+			else if(m_pCmGraph == pGraph)
+			{
+				m_XCm = dlg.m_XSel;
+				m_YCm = dlg.m_YSel;
+				SetGraphTitles(m_pCmGraph, m_XCm, m_YCm);
+			}
+			else if(m_pTrGraph == pGraph)
+			{
+				m_XTr = dlg.m_XSel;
+				m_YTr = dlg.m_YSel;
+				SetGraphTitles(m_pTrGraph, m_XTr, m_YTr);
+			}
+			else if(m_pUserGraph == pGraph)
+			{
+				m_XUser = dlg.m_XSel;
+				m_YUser = dlg.m_YSel;
+				SetGraphTitles(m_pUserGraph, m_XUser, m_YUser);
+			}
+			if(dlg.m_bVariableChanged)
+			{
+				pGraph->SetAuto(true);
+				pGraph->SetAutoYMinUnit(true);
+			}
+			CreatePolarCurves();
+		}
+	}
+	else
+	{
+		pGraph->CopySettings(&graph);
+	}
+	UpdateView();
+}
+
+
 
 void QXDirect::OnHPlot()
 {
@@ -3223,74 +3339,6 @@ void QXDirect::OnPanels()
 	UpdateView();
 }
 
-void QXDirect::OnPolarGraphVariable()
-{
-	if(!m_pCurGraph) return;
-	if(!m_bPolar)    return;
-	GraphVariableDlg dlg;
-	dlg.InitDialog(1);
-
-	if(m_pCurGraph == m_pPolarGraph)
-	{
-		dlg.SetSelection(m_XPolar, m_YPolar);
-	}
-	else if(m_pCurGraph == m_pCmGraph)
-	{
-		dlg.SetSelection(m_XCm, m_YCm);
-	}
-	else if(m_pCurGraph == m_pCzGraph)
-	{
-		dlg.SetSelection(m_XCz, m_YCz);
-	}
-	else if(m_pCurGraph == m_pTrGraph)
-	{
-		dlg.SetSelection(m_XTr, m_YTr);
-	}
-	else if(m_pCurGraph == m_pUserGraph)
-	{
-		dlg.SetSelection(m_XUser, m_YUser);
-	}
-	else return;
-
-	if(QDialog::Accepted == dlg.exec())
-	{
-		int iX, iY;
-		dlg.GetSelection(iX, iY);
-
-		SetGraphTitles(m_pCurGraph, iX, iY);
-
-		if(m_pCurGraph == m_pPolarGraph)
-		{
-			m_XPolar = iX;
-			m_YPolar = iY;
-		}
-		if(m_pCurGraph == m_pCmGraph)
-		{
-			m_XCm = iX;
-			m_YCm = iY;
-		}
-		if(m_pCurGraph == m_pCzGraph)
-		{
-			m_XCz = iX;
-			m_YCz = iY;
-		}
-		if(m_pCurGraph == m_pTrGraph)
-		{
-			m_XTr = iX;
-			m_YTr = iY;
-		}
-		if(m_pCurGraph == m_pUserGraph)
-		{
-			m_XUser = iX;
-			m_YUser = iY;
-		}
-
-		if(iY == 4) m_pCurGraph->SetInverted(true); else m_pCurGraph->SetInverted(false);
-		m_pCurGraph->ResetLimits();
-		CreatePolarCurves();
-		UpdateView();
-	}
-}
 
 void QXDirect::OnQGraph()
 {
@@ -4553,7 +4601,6 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 	if(m_bShowUserGraph)	m_pUserGraph->DrawGraph(Rect6, painter);
 	else				 	painter.fillRect(Rect6, pMainFrame->m_BackgroundColor);
 
-
 	PaintPolarLegend(m_PolarLegendOffset,  h, painter);
 }
 
@@ -4591,14 +4638,13 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 
 	nFoils= str.size();
 
-//	painter.SetTextAlign(TA_LEFT);
 	painter.setBackgroundMode(Qt::TransparentMode);
 	painter.setFont(pMainFrame->m_TextFont);
 	QPen TextPen(pMainFrame->m_TextColor);
 	TextPen.setWidth(1);
 	painter.setPen(TextPen);
-	QBrush LegendBrush(pMainFrame->m_BackgroundColor);
-	painter.setBrush(LegendBrush);
+//	QBrush LegendBrush(pMainFrame->m_BackgroundColor);
+//	painter.setBrush(LegendBrush);
 
 	QPen LegendPen;
 	LegendPen.setWidth(1);
@@ -4671,6 +4717,8 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 		}
 		if (FoilPlrs) ny++;
 	}
+//	painter.setBackgroundMode(Qt::OpaqueMode);
+
 }
 
 
@@ -4687,7 +4735,6 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 	painter.fillRect(Rect2, pMainFrame->m_BackgroundColor);
 
 	PaintPolarLegend(m_PolarLegendOffset, h, painter);
-
 	switch (m_iPlrGraph)
 	{
 		case 1:
@@ -4768,9 +4815,9 @@ void QXDirect::ReadParams()
 	}
 	else
 	{
-			m_Reynolds      = m_pctrlAlphaMin->GetValue();
-			m_ReynoldsMax   = m_pctrlAlphaMax->GetValue();
-			m_ReynoldsDelta = m_pctrlAlphaDelta->GetValue();
+		m_Reynolds      = m_pctrlAlphaMin->GetValue();
+		m_ReynoldsMax   = m_pctrlAlphaMax->GetValue();
+		m_ReynoldsDelta = m_pctrlAlphaDelta->GetValue();
 	}
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitBL   = m_pctrlInitBL->isChecked();
@@ -4795,8 +4842,8 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_crPressureColor << m_iPressureStyle << m_iPressureWidth;
 	ar << m_crNeutralColor << m_iNeutralStyle << m_iNeutralWidth;
 
-	ar << m_OppVar << m_XFoilVar << m_IterLim << m_XPolar << m_YPolar << m_XCz << m_YCz;
-	ar << m_XCm << m_YCm << m_XTr << m_YTr << m_XUser << m_YUser;
+	ar << m_OppVar << m_XFoilVar << m_IterLim;
+	ar << m_XPolar << m_YPolar << m_XCz << m_YCz << m_XCm << m_YCm << m_XTr << m_YTr << m_XUser << m_YUser;
 	ar << m_iPlrGraph << m_iPlrView;
 	ar << m_Alpha << m_AlphaMax << m_AlphaDelta;
 	ar << m_Cl << m_ClMax << m_ClDelta;

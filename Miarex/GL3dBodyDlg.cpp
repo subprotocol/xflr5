@@ -2960,6 +2960,39 @@ void GL3dBodyDlg::GLToClient(CVector const &real, QPoint &point)
 
 
 
+void GL3dBodyDlg::InitDialog()
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString length;
+	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
+	m_pFrameModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
+	m_pFrameModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+	m_pPointModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
+	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
+	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+
+	m_pctrlBodyName->setText(m_pBody->m_BodyName);
+	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlPanels->setChecked(m_bVLMPanels);
+	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlSurfaces->setChecked(m_bSurfaces);
+	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
+	m_pctrlSurfaces->setChecked(m_bSurfaces);
+
+	int w4 = m_pctrlFrameTable->width()/4;
+	m_pctrlFrameTable->setColumnWidth(0,w4);
+	m_pctrlFrameTable->setColumnWidth(1,w4);
+	m_pctrlFrameTable->setColumnWidth(2,w4);
+	w4 = m_pctrlPointTable->width()/4;
+	m_pctrlPointTable->setColumnWidth(0,w4);
+	m_pctrlPointTable->setColumnWidth(1,w4);
+	m_pctrlPointTable->setColumnWidth(2,w4);
+}
+
+
 void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 {
 	bool bShift = false;
@@ -3988,10 +4021,6 @@ void GL3dBodyDlg::reject()
 
 void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 {
-/*	m_pglWidget->setMinimumWidth(geometry().width()-200);
-	m_pglWidget->m_rCltRect = m_pglWidget->geometry();
-	UpdateView();*/
-//	m_pctrlControlsWidget->setMaximumHeight(geometry().height()/3);
 	m_bResetglBody2D = true;
 
 	m_bIs3DScaleSet = false;
@@ -4687,37 +4716,6 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	m_pglWidget->setCursor(Qt::CrossCursor);
 }
 
-void GL3dBodyDlg::InitDialog()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString length;
-	GetLengthUnit(length, pMainFrame->m_LengthUnit);
-	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
-	m_pFrameModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
-	m_pFrameModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
-	m_pPointModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
-	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
-	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
-
-	m_pctrlBodyName->setText(m_pBody->m_BodyName);
-	m_pctrlOutline->setChecked(m_bOutline);
-	m_pctrlPanels->setChecked(m_bVLMPanels);
-	m_pctrlAxes->setChecked(m_bAxes);
-	m_pctrlLight->setChecked(m_bglLight);
-	m_pctrlSurfaces->setChecked(m_bSurfaces);
-	m_pctrlOutline->setChecked(m_bOutline);
-	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
-	m_pctrlSurfaces->setChecked(m_bSurfaces);
-
-	int w4 = m_pctrlFrameTable->width()/4;
-	m_pctrlFrameTable->setColumnWidth(0,w4);
-	m_pctrlFrameTable->setColumnWidth(1,w4);
-	m_pctrlFrameTable->setColumnWidth(2,w4);
-	w4 = m_pctrlPointTable->width()/4;
-	m_pctrlPointTable->setColumnWidth(0,w4);
-	m_pctrlPointTable->setColumnWidth(1,w4);
-	m_pctrlPointTable->setColumnWidth(2,w4);
-}
 
 
 void GL3dBodyDlg::showEvent(QShowEvent *event)

@@ -62,7 +62,7 @@ WPolarDlg::WPolarDlg()
 	m_bViscous      = true;
 	m_bGround       = false;
 
-	m_NXWakePanels    = 5;
+	m_NXWakePanels    = 1;
 	m_TotalWakeLength = 100.0;//x mac
 	m_WakePanelFactor = 1.1;
 
@@ -104,6 +104,7 @@ void WPolarDlg::Connect()
 	connect(m_pctrlQInf, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlHeight, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlWPolarName, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlWPolarName, SIGNAL(textEdited ( const QString &  )), this, SLOT(OnWPolarName()));
 
 	connect(m_pctrlArea1, SIGNAL(clicked()),this, SLOT(OnArea()));
 	connect(m_pctrlArea2, SIGNAL(clicked()),this, SLOT(OnArea()));
@@ -165,7 +166,6 @@ void WPolarDlg::InitDialog()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString str;
 	QString str1,str2;
-
 
 	int i;
 
@@ -381,6 +381,7 @@ void WPolarDlg::OnEditingFinished()
 void WPolarDlg::OnAutoName()
 {
 	m_bAutoName = m_pctrlAutoName->isChecked();
+	if(m_bAutoName) SetWPolarName();
 }
 
 void WPolarDlg::OnTiltedGeom()
@@ -505,8 +506,16 @@ void WPolarDlg::OnUnit()
 	SetDensity();
 }
 
+
 void WPolarDlg::OnWakeRollUp()
 {
+}
+
+
+void WPolarDlg::OnWPolarName()
+{
+	m_bAutoName = false;
+	m_pctrlAutoName->setChecked(false);
 }
 
 void WPolarDlg::OnWPolarType()
@@ -769,6 +778,8 @@ void WPolarDlg::SetupLayout()
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
 	setLayout(MainLayout);
+
+	m_pctrlWakeParams->setEnabled(false);
 }
 
 
@@ -862,7 +873,7 @@ void WPolarDlg::SetReynolds()
 		m_pctrlSRe->setText(strange+str);
 
 //		m_pctrlQInfStat->setText(" ");
-//		m_pctrlQInfCl->setText(" ");
+		m_pctrlQInfCl->setText(" ");
 	}
 	else if (m_Type ==2)
 	{
@@ -871,6 +882,7 @@ void WPolarDlg::SetReynolds()
 		str += strUnit;
 		strange = "Qinf.sqrt(Cl) =";
 		m_pctrlQInfCl->setText(strange+str);
+//		m_pctrlQInfStat.setText("Qinf.sqrt(Cl) =");
 
 		double RRe = m_pWing->m_TChord[0] * QCl/m_Viscosity;
 		ReynoldsFormat(str, RRe);
@@ -885,7 +897,7 @@ void WPolarDlg::SetReynolds()
 	else if (m_Type ==4)
 	{
 //		m_pctrlQInfStat->setText(" ");
-//		m_pctrlQInfCl->setText(" ");
+		m_pctrlQInfCl->setText(" ");
 		m_pctrlRRe->setText(" ");
 		m_pctrlSRe->setText(" ");
 		m_pctrlReRoot->setText(" ");
@@ -907,8 +919,6 @@ void WPolarDlg::SetWingLoad()
 	GetWeightUnit(str1, pMainFrame->m_WeightUnit);
 	GetAreaUnit(str2, pMainFrame->m_AreaUnit);
 	m_pctrlWingLoad->setText("Wing Loading = "+str+str1+"/"+str2);
-
-
 }
 
 

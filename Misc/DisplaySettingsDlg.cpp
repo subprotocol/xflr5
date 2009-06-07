@@ -173,7 +173,13 @@ void DisplaySettingsDlg::OnTextFont()
 {
 	bool ok;
 
+#ifdef Q_WS_MAC
+	//20090604 Mac OS Native font dialog does not work well under QT 4.5.1
+	//QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
+	QFont font = QFontDialog::getFont(&ok, m_TextFont, this, "",QFontDialog::DontUseNativeDialog);
+#else
 	QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
+#endif
 
 	if (ok)
 	{

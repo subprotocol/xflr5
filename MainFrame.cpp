@@ -72,9 +72,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_GraphBackColor  = QColor(0, 30, 50);
 	m_TextColor       = QColor(220,220,220);
 
-//	m_TextFont.setFamily(m_TextFont.defaultFamily());
 	m_TextFont.setStyleHint(QFont::TypeWriter);
-	m_TextFont.setFamily("Courier");
+	m_TextFont.setFamily(m_TextFont.defaultFamily());
+
 	m_ImageFormat = 2;
 
 	m_mtoUnit   = 1.0;
@@ -480,9 +480,6 @@ void MainFrame::CreateActions()
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
-	GraphDlgAction = new QAction(tr("Define Graph Settings (G)"), this);
-	connect(GraphDlgAction, SIGNAL(triggered()), this, SLOT(OnGraphSettings()));
-
 	exitAct = new QAction(tr("E&xit"), this);
 	exitAct->setShortcut(tr("Ctrl+Q"));
 	exitAct->setStatusTip(tr("Exit the application"));
@@ -815,7 +812,6 @@ void MainFrame::CreateDockWindows()
 	pXDirect->m_poaOpp   = &m_oaOpp;
 
 	pAFoil->m_pMainFrame = this;
-	pAFoil->m_poaFoil    = &m_oaFoil;
 	pAFoil->m_p2DWidget  = m_p2DWidget;
 	pAFoil->m_poaFoil    = &m_oaFoil;
 	pAFoil->m_pXFoil     = pXDirect->m_pXFoil;
@@ -871,6 +867,7 @@ void MainFrame::CreateDockWindows()
 	LEDlg::s_pXFoil               = pXDirect->m_pXFoil;
 
 	GraphDlg::s_pMainFrame = this;
+	GraphDlg::s_ActivePage = 0;
 }
 
 
@@ -1045,49 +1042,46 @@ void MainFrame::CreateMiarexActions()
 	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
-	twoWingGraphs = new QAction(tr("Two OpPoint Graphs"), this);
+	MiarexGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	connect(MiarexGraphDlg, SIGNAL(triggered()), pMiarex, SLOT(OnGraphSettings()));
+
+	twoWingGraphs = new QAction(tr("Two OpPoint Graphs\t(T)"), this);
 	twoWingGraphs->setCheckable(true);
 	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
-	fourWingGraphs = new QAction(tr("All OpPoint Graphs"), this);
+	fourWingGraphs = new QAction(tr("All OpPoint Graphs\t(A)"), this);
 	fourWingGraphs->setCheckable(true);
 	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
-	WingGraph1 = new QAction(tr("Wing Graph 1"), this);
+	WingGraph1 = new QAction(tr("Wing Graph 1\t(1)"), this);
 	WingGraph1->setCheckable(true);
 	connect(WingGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph1()));
-	WingGraph2 = new QAction(tr("Wing Graph 2"), this);
+	WingGraph2 = new QAction(tr("Wing Graph 2\t(2)"), this);
 	WingGraph2->setCheckable(true);
 	connect(WingGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph2()));
-	WingGraph3 = new QAction(tr("Wing Graph 3"), this);
+	WingGraph3 = new QAction(tr("Wing Graph 3\t(3)"), this);
 	WingGraph3->setCheckable(true);
 	connect(WingGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph3()));
-	WingGraph4 = new QAction(tr("Wing Graph 4"), this);
+	WingGraph4 = new QAction(tr("Wing Graph 4\t(4)"), this);
 	WingGraph4->setCheckable(true);
 	connect(WingGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph4()));
 
-	twoWPlrGraphs = new QAction(tr("Two Polar Graphs"), this);
+	twoWPlrGraphs = new QAction(tr("Two Polar Graphs\t(T)"), this);
 	twoWPlrGraphs->setCheckable(true);
 	connect(twoWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWPlrGraphs()));
-	allWPlrGraphs = new QAction(tr("All Polar Graphs"), this);
+	allWPlrGraphs = new QAction(tr("All Polar Graphs\t(A)"), this);
 	allWPlrGraphs->setCheckable(true);
 	connect(allWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWPlrGraphs()));
-	WPlrGraph1 = new QAction(tr("Polar Graph 1"), this);
+	WPlrGraph1 = new QAction(tr("Polar Graph 1\t(1)"), this);
 	WPlrGraph1->setCheckable(true);
 	connect(WPlrGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph1()));
-	WPlrGraph2 = new QAction(tr("Polar Graph 2"), this);
+	WPlrGraph2 = new QAction(tr("Polar Graph 2\t(2)"), this);
 	WPlrGraph2->setCheckable(true);
 	connect(WPlrGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph2()));
-	WPlrGraph3 = new QAction(tr("Polar Graph 3"), this);
+	WPlrGraph3 = new QAction(tr("Polar Graph 3\t(3)"), this);
 	WPlrGraph3->setCheckable(true);
 	connect(WPlrGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph3()));
-	WPlrGraph4 = new QAction(tr("Polar Graph 4"), this);
+	WPlrGraph4 = new QAction(tr("Polar Graph 4\t(4)"), this);
 	WPlrGraph4->setCheckable(true);
 	connect(WPlrGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph4()));
-
-	WPlrGraphVariable = new QAction(tr("Define Variables"), this);
-	connect(WPlrGraphVariable, SIGNAL(triggered()), pMiarex, SLOT(OnDefinePolarGraphVariables()));
-
-	WingGraphVariablesAct = new QAction(tr("Define Variables"), this);
-	connect(WingGraphVariablesAct, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWingGraphVariables()));
 
 	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Scales"), this);
 	connect(ResetWingGraphScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingGraphScale()));
@@ -1251,8 +1245,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWOppMenu->addAction(showFinCurve);
 	MiarexWOppMenu->addSeparator();
 	WOppCurGraphMenu = MiarexWOppMenu->addMenu("Current Graph");
-	WOppCurGraphMenu->addAction(WingGraphVariablesAct);
-	WOppCurGraphMenu->addAction(GraphDlgAction);
+	WOppCurGraphMenu->addAction(MiarexGraphDlg);
 	WOppCurGraphMenu->addAction(exportCurGraphAct);
 	WOppCurGraphMenu->addAction(ResetWingGraphScale);
 
@@ -1314,9 +1307,8 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu->addAction(resetWPlrLegend);
 	WPlrCtxMenu->addMenu(WPlrGraphMenu);
 	WPlrCurGraphMenu = WPlrCtxMenu->addMenu("Current Graph");
-	WPlrCurGraphMenu->addAction(GraphDlgAction);
+	WPlrCurGraphMenu->addAction(MiarexGraphDlg);
 	WPlrCurGraphMenu->addAction(resetCurGraphScales);
-	WPlrCurGraphMenu->addAction(WPlrGraphVariable);
 	WPlrCurGraphMenu->addAction(exportCurGraphAct);
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addAction(hideAllWPlrs);
@@ -1467,7 +1459,7 @@ void MainFrame::CreateXDirectActions()
 	PolarsAct->setStatusTip(tr("Show Polar view"));
 	connect(PolarsAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolars()));
 
-	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings"), this);
+	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings\t(G)"), this);
 	connect(defineCpGraphSettings, SIGNAL(triggered()), pXDirect, SLOT(OnCpGraphSettings()));
 
 	resetCpGraphScales = new QAction(tr("Reset Cp Graph Scales"), this);
@@ -1480,18 +1472,17 @@ void MainFrame::CreateXDirectActions()
 	allPolarGraphsScales = new QAction(tr("Reset All Polar Graph Scales"), this);
 	connect(allPolarGraphsScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetAllPolarGraphsScales()));
 
+	XDirectGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	connect(XDirectGraphDlg, SIGNAL(triggered()), pXDirect, SLOT(OnGraphSettings()));
+
 	resetGraphLegend = new QAction(tr("Reset Legend Position"), this);
 	connect(resetGraphLegend, SIGNAL(triggered()), pXDirect, SLOT(OnResetGraphLegend()));
 
-	curPolarGraphVariableAct = new QAction(tr("Polar Graph Variable (V)"), this);
-	curPolarGraphVariableAct->setStatusTip("Defines the X and Y variables for this graph");
-	connect(curPolarGraphVariableAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolarGraphVariable()));
-
-	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs (T)"), this);
+	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs\t(T)"), this);
 	TwoPolarGraphsAct->setCheckable(true);
 	connect(TwoPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnCouplePolarGraphs()));
 
-	AllPolarGraphsAct = new QAction(tr("All Polar Graphs (A)"), this);
+	AllPolarGraphsAct = new QAction(tr("All Polar Graphs\t(A)"), this);
 	AllPolarGraphsAct->setCheckable(true);
 	connect(AllPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnAllPolarGraphs()));
 
@@ -1786,8 +1777,7 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addSeparator();
 	GraphPolarMenu = PolarMenu->addMenu("Polar Graphs");
 	CurPolarGraphMenu = GraphPolarMenu->addMenu("Current Graph");
-	CurPolarGraphMenu->addAction(curPolarGraphVariableAct);
-	CurPolarGraphMenu->addAction(GraphDlgAction);
+	CurPolarGraphMenu->addAction(XDirectGraphDlg);
 	CurPolarGraphMenu->addAction(resetCurGraphScales);
 	CurPolarGraphMenu->addAction(exportCurGraphAct);
 	GraphPolarMenu->addSeparator();
@@ -1929,8 +1919,7 @@ void MainFrame::CreateXDirectMenus()
 	OperPolarCtxMenu->addAction(resetGraphLegend);
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu("Current Graph");
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
-	CurGraphCtxMenu->addAction(curPolarGraphVariableAct);
-	CurGraphCtxMenu->addAction(GraphDlgAction);
+	CurGraphCtxMenu->addAction(XDirectGraphDlg);
 	CurGraphCtxMenu->addAction(exportCurGraphAct);
 	OperPolarCtxMenu->addSeparator();//_______________
 	OperPolarCtxMenu->addAction(definePolar);
@@ -1989,7 +1978,10 @@ void MainFrame::CreateXInverseActions()
 
 	InvQReflected = new QAction(tr("Show Reflected"), this);
 	InvQReflected->setCheckable(true);
+
 	connect(InvQReflected, SIGNAL(triggered()), pXInverse, SLOT(OnQReflected()));
+	XInverseGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	connect(XInverseGraphDlg, SIGNAL(triggered()), pXInverse, SLOT(OnGraphSettings()));
 
 }
 
@@ -2001,14 +1993,14 @@ void MainFrame::CreateXInverseMenus()
 	//MainMenu for XInverse Application
 	XInverseViewMenu = menuBar()->addMenu(tr("&View"));
 	XInverseViewMenu->addAction(InverseStyles);
-	XInverseViewMenu->addAction(GraphDlgAction);
+	XInverseViewMenu->addAction(XInverseGraphDlg);
 	XInverseViewMenu->addSeparator();
 	XInverseViewMenu->addAction(restoreToolbarsAct);
 	XInverseViewMenu->addAction(styleAct);
 	XInverseViewMenu->addAction(saveViewToImageFileAct);
 
 	InverseGraphMenu = menuBar()->addMenu(tr("&Graph"));
-	InverseGraphMenu->addAction(GraphDlgAction);
+	InverseGraphMenu->addAction(XInverseGraphDlg);
 	InverseGraphMenu->addAction(resetCurGraphScales);
 	InverseGraphMenu->addAction(exportCurGraphAct);
 
@@ -2023,11 +2015,11 @@ void MainFrame::CreateXInverseMenus()
 	InverseFoilMenu->addAction(InvQPoints);
 	InverseFoilMenu->addAction(InvQReflected);
 
-	//Context Menu for XINverse Application
+	//Context Menu for XInverse Application
 	InverseContextMenu = new QMenu("Context Menu",this);
 	InverseContextMenu->addAction(InverseStyles);
 	InverseContextMenu->addAction(resetCurGraphScales);
-	InverseContextMenu->addAction(GraphDlgAction);
+	InverseContextMenu->addAction(XInverseGraphDlg);
 	InverseContextMenu->addSeparator();
 	InverseContextMenu->addAction(InverseInsertCtrlPt);
 	InverseContextMenu->addAction(InverseRemoveCtrlPt);
@@ -3078,56 +3070,10 @@ void MainFrame::OnExportCurGraph()
 }
 
 
-
-void MainFrame::OnGraphSettings()
-{
-	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	QMiarex *pMiarex= (QMiarex*) m_pMiarex;
-	QGraph *pGraph = NULL;
-	switch(m_iApp)
-	{
-		case MIAREX:
-		{
-			pGraph = pMiarex->m_pCurGraph;
-			break;
-		}
-		case XFOILANALYSIS:
-		{
-			pGraph = pXDirect->m_pCurGraph;
-			break;
-		}
-		case INVERSEDESIGN:
-		{
-			pGraph = &pXInverse->m_QGraph;
-			break;
-		}
-	}
-
-	if(!pGraph) return;
-
-	GraphDlg dlg;
-	QGraph graph;
-	graph.CopySettings(pGraph);
-	dlg.m_pMemGraph = &graph;
-	dlg.m_pGraph = pGraph;
-	dlg.SetParams();
-
-	if(dlg.exec() == QDialog::Accepted)
-	{
-	}
-	else
-	{
-		pGraph->CopySettings(&graph);
-	}
-	UpdateView();
-}
-
-
 void MainFrame::OnGuidelines()
 {
 	QString FileName = qApp->applicationDirPath() + "/Guidelines.pdf" ;
-	QDesktopServices::openUrl(FileName);
+	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
 
 
@@ -3249,7 +3195,8 @@ void MainFrame::OnLoadFile()
 void MainFrame::OnLogFile()
 {
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
-	QDesktopServices::openUrl(FileName);
+	// 20090605 Francesco Meschia
+	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
 
 
