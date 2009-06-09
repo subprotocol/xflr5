@@ -393,17 +393,19 @@ void QGraph::DrawYTicks(QPainter &painter)
 	TickSize = 5;
 	xExpOff  = 7;
 
-
 	QPen LabelPen(m_AxisColor);
 	LabelPen.setStyle(GetStyle(m_nStyle));
 	LabelPen.setWidth(m_Width);
 
-	double yt = ymin;
+//	double yt = ymin;
 	double xp;
 
 	if(xo>=xmin && xo<=xmax) xp = xo;
 	else if(xo>xmax)         xp = xmax;
 	else                     xp = xmin;
+
+	double yt = yo-int((yo-ymin)*1.0001/yunit)*yunit;//one tick at the origin
+
 
 	while(yt<=ymax*1.0001)
 	{

@@ -270,7 +270,7 @@ void GraphDlg::OnLabelFont()
 
 void GraphDlg::OnLegendColor()
 {
-	QColor color = m_pGraph->GetLabelColor();
+	QColor color = m_pGraph->GetLegendColor();
 	m_pGraph->SetLegendColor(QColorDialog::getRgba(color.rgba()));
 	m_pctrlLegendColor->SetColor(m_pGraph->GetLegendColor());
 	SetApplied(false);

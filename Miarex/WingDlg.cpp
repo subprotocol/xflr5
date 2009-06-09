@@ -1020,6 +1020,11 @@ void WingDlg::keyPressEvent(QKeyEvent *event)
 			OnCancel();
 			break;
 		}
+		case Qt::Key_Delete:
+		{
+			OnDeleteSection();
+			break;
+		}
 		default:
 			event->ignore();
 			break;
@@ -1105,53 +1110,6 @@ void WingDlg::OnCellChanged(QWidget *pWidget)
 	repaint();
 }
 
-void WingDlg::OnDelete()
-{
-	if(m_iSection<=0)
-	{
-		QMessageBox::warning(this, "Warning","The first section cannot be deleted");
-		return;
-	}
-
-	int ny, k, size, total;
-
-	size = m_pWingModel->rowCount();
-	if(size<=2)
-	{
-		QMessageBox::warning(this, "Warning","Two panel sections at least are required... cannot delete");
-		return;
-	}
-
-	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
-
-	total = VLMGetPanelTotal();
-	for (k=m_iSection; k<size; k++)
-	{
-		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k+1];
-		m_pWing->m_TChord[k]    = m_pWing->m_TChord[k+1];
-		m_pWing->m_TOffset[k]   = m_pWing->m_TOffset[k+1];
-		m_pWing->m_TTwist[k]     = m_pWing->m_TTwist[k+1];
-		m_pWing->m_TDihedral[k]  = m_pWing->m_TDihedral[k+1];
-		m_pWing->m_NXPanels[k]   = m_pWing->m_NXPanels[k+1];
-		m_pWing->m_NYPanels[k]   = m_pWing->m_NYPanels[k+1];
-		m_pWing->m_XPanelDist[k] = m_pWing->m_XPanelDist[k+1];
-		m_pWing->m_YPanelDist[k] = m_pWing->m_YPanelDist[k+1];
-		m_pWing->m_RFoil[k]      = m_pWing->m_RFoil[k+1];
-		m_pWing->m_LFoil[k]      = m_pWing->m_LFoil[k+1];
-	}
-	m_pWing->m_NPanel--;
-
-	m_pWing->m_NYPanels[m_iSection-1] = ny;
-
-//	m_pWing->m_bVLMAutoMesh = true;
-//	Convert(false);
-//	VLMSetAutoMesh(total);
-	FillDataTable();
-	ComputeGeometry();
-	SetWingData();
-	m_bChanged = true;
-}
-
 
 
 
@@ -1168,8 +1126,11 @@ void WingDlg::OnDeleteSection()
 	int ny, k, size, total;
 
 	size = m_pWingModel->rowCount();
-	if(size<=2) return;
-
+	if(size<=2)
+	{
+		QMessageBox::warning(this, "Warning","Two panel sections at least are required... cannot delete");
+		return;
+	}
 	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
 
 	total = VLMGetPanelTotal();

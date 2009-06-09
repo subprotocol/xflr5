@@ -53,7 +53,6 @@ public:
 
 private slots:
 	void OnCancel();
-	void OnDelete();
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
 	void OnItemActivated(const QModelIndex &index);

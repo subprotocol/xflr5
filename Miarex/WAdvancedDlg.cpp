@@ -117,7 +117,7 @@ void WAdvancedDlg::SetupLayout()
 	VLMLayout->addWidget(lab9,3,3);
 	VLMBox->setLayout(VLMLayout);
 
-	QGroupBox *LLTBox = new QGroupBox("Lifitng Line Method");
+	QGroupBox *LLTBox = new QGroupBox("Lifting Line Method");
 	QGridLayout *LLTLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel("Relax. factor");
 	QLabel *lab2 = new QLabel("Alpha Precision");

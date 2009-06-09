@@ -24,6 +24,7 @@
 #include "../MainFrame.h"
 #include "../TwoDWidget.h"
 #include "../Globals.h"
+#include "../Misc/ModDlg.h"
 #include "../Misc/RenameDlg.h"
 #include "../Misc/ProgressDlg.h"
 #include "../Misc/EditPlrDlg.h"
@@ -3748,12 +3749,13 @@ void QMiarex::DuplicatePlane()
 	}
 }
 
-bool QMiarex::EditCurPlane()
+
+void QMiarex::EditCurPlane()
 {
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(!m_pCurPlane) return false;
-	if(m_iView==5)   return false;
+	if(!m_pCurPlane) return;
+	if(m_iView==5)   return;
 	CWPolar *pWPolar;
 	CPOpp* pPOpp;
 	bool bHasResults = false;
@@ -3792,7 +3794,40 @@ bool QMiarex::EditCurPlane()
 	{
 		if(PlaneDlg.m_bChanged)
 		{
-			if(bHasResults) SetModPlane(m_pCurPlane);
+			if(bHasResults)
+			{
+//				SetModPlane(m_pCurPlane);
+				ModDlg dlg;
+				dlg.m_Question = "The modification will erase all results associated to this Plane.\nContinue ?";
+				dlg.InitDialog();
+				int Ans = dlg.exec();
+				if (Ans == QDialog::Rejected)
+				{
+					//restore geometry
+					m_pCurPlane->Duplicate(pSavePlane);
+					delete pSavePlane; // clean up
+					return;
+				}
+				else if(Ans==20)
+				{
+					CPlane* pNewPlane= new CPlane();
+					pNewPlane->Duplicate(m_pCurPlane);
+					if(!SetModPlane(pNewPlane))
+					{
+						delete pNewPlane;
+					}
+					else
+					{
+						m_pCurPlane = AddPlane(pNewPlane);
+					}
+					pMainFrame->UpdateUFOs();
+					SetUFO();
+					UpdateView();
+					delete pSavePlane; // clean up
+					return;
+				}
+			}
+
 
 			//then modifications are automatically recorded
 			pMainFrame->DeletePlane(m_pCurPlane, true);// will also set new surface and Aerochord in WPolars
@@ -3804,8 +3839,8 @@ bool QMiarex::EditCurPlane()
 			else if(m_iView==4)	CreateCpCurves();
 
 		}
+		pMainFrame->UpdateUFOs();
 		SetUFO();
-		pMainFrame->UpdateWPolars();
 		m_bIs2DScaleSet = false;
 		SetScale();
 		OnAdjustToWing();
@@ -3816,10 +3851,9 @@ bool QMiarex::EditCurPlane()
 		// restore original
 		m_pCurPlane->Duplicate(pSavePlane);
 		delete pSavePlane; // clean up
-		return false;
+		return ;
 	}
 	delete pSavePlane; // clean up
-	return true;
 }
 
 
@@ -9942,6 +9976,7 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 	ar >> m_Iter  >> m_WakeInterNodes >> m_MaxWakeIter >> m_InducedDragPoint;
 	ar >> CPanel::m_CtrlPos >> CPanel::m_VortexPos >> CWing::s_RelaxMax >> CWing::s_CvPrec >> CWing::s_NLLTStations;
 	ar >> m_CoreSize >> m_MinPanelSize;
+	ar >> m_bShowWing2 >> m_bShowStab >> m_bShowFin;
 
 	m_GL3dBody.LoadSettings(ar);
 
@@ -9951,7 +9986,7 @@ bool QMiarex::LoadSettings(QDataStream &ar)
 void QMiarex::mouseDoubleClickEvent ( QMouseEvent * event )
 {
 	if(m_iView==3 || !m_pCurGraph) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	OnGraphSettings();
 }
 
@@ -11787,19 +11822,18 @@ void QMiarex::OnEditUFO()
 		{
 			if(bHasResults)
 			{
-				QString str = "The modification will erase all results associated to this Wing.\nContinue ?";
-
-				int Ans = QMessageBox::question(this, "Question", str,
-												QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
-												QMessageBox::Cancel);
-				if (Ans == QMessageBox::Cancel)
+				ModDlg dlg;
+				dlg.m_Question = "The modification will erase all results associated to this Wing.\nContinue ?";
+				dlg.InitDialog();
+				int Ans = dlg.exec();
+				if (Ans == QDialog::Rejected)
 				{
 					//restore geometry for initial wing
 					m_pCurWing->Duplicate(pSaveWing);
 					delete pSaveWing; // clean up
 					return;
 				}
-				else if(Ans == QMessageBox::No)
+				else if(Ans==20)
 				{
 					//create new wing
 					CWing* pNewWing= new CWing();
@@ -11812,20 +11846,16 @@ void QMiarex::OnEditUFO()
 					{
 						delete pNewWing;
 					}
-					else //QMessageBox::Yes
+					else
 					{
 						m_pCurWing = AddWing(pNewWing);
-						pMainFrame->SetSaveState(false);
-
 					}
-					SetUFO();
-					if(m_iView==1)      CreateWOppCurves();
-					else if(m_iView==2) CreateWPolarCurves();
-					else if(m_iView==4)	CreateCpCurves();
 					pMainFrame->UpdateUFOs();
+					SetUFO();
 					UpdateView();
 					return;
 				}
+
 			}
 
 			//then modifications are automatically recorded
@@ -11843,9 +11873,10 @@ void QMiarex::OnEditUFO()
 				else if(m_iView==4)	CreateCpCurves();
 			}
 		}
+		pMainFrame->UpdateUFOs();
 		SetUFO();
-		pMainFrame->UpdateWPolars();
-		SetWPlr();
+//		pMainFrame->UpdateWPolars();
+//		SetWPlr();
 		m_bIs2DScaleSet = false;
 		SetScale();
 		SetWGraphScale();
@@ -14699,6 +14730,8 @@ bool QMiarex::SaveSettings(QDataStream &ar)
 	ar << m_Iter  << m_WakeInterNodes << m_MaxWakeIter << m_InducedDragPoint;
 	ar << CPanel::m_CtrlPos << CPanel::m_VortexPos << CWing::s_RelaxMax << CWing::s_CvPrec << CWing::s_NLLTStations;
 	ar << m_CoreSize << m_MinPanelSize;
+
+	ar << m_bShowWing2 << m_bShowStab << m_bShowFin;
 
 	m_GL3dBody.SaveSettings(ar);
 

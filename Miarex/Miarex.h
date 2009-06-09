@@ -311,15 +311,13 @@ private:
 	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void RotateGeomY(double const &Angle, CVector const &P);
 	void RotateGeomZ(double const &Beta, CVector const &P);
+	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
+	void EditCurPlane();
 
 	int CreateBodyElements(CPanel *pPanel);
 	int CreateElements(CSurface *pSurface);
 	int IsWakeNode(CVector &Pt);
 	int IsNode(CVector &Pt);
-	bool InitializePanels();
-	bool CreateWakeElems(int PanelIndex);
-	bool VLMIsSameSide(int p, int pp);
-	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 
 	double GetCl(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
 	double GetCm(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
@@ -334,6 +332,9 @@ private:
 	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
 	void * GetPlrVariable(CPolar *pPolar, int iVar);
 
+	bool InitializePanels();
+	bool CreateWakeElems(int PanelIndex);
+	bool VLMIsSameSide(int p, int pp);
 	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal, CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
@@ -341,7 +342,6 @@ private:
 	bool LoadSettings(QDataStream &ar);
 	bool SaveSettings(QDataStream &ar);
 
-	bool EditCurPlane();
 
 	QString RenameUFO(QString UFOName);
 	QGraph* GetGraph(QPoint &pt);

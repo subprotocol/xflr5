@@ -985,10 +985,10 @@ void MainFrame::CreateMiarexActions()
 	exportCurWOpp = new QAction(tr("Export..."), this);
 	connect(exportCurWOpp, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWOpp()));
 
-	resetWOppLegend = new QAction(tr("Reset OpPoint Legend"), this);
+	resetWOppLegend = new QAction(tr("Reset Legend Position"), this);
 	connect(resetWOppLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWOppLegend()));
 
-	resetWPlrLegend = new QAction(tr("Reset Polar Legend"), this);
+	resetWPlrLegend = new QAction(tr("Reset Legend Position"), this);
 	connect(resetWPlrLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWPlrLegend()));
 
 	resetWingScale = new QAction(tr("Reset Wing Scale"), this);
@@ -2808,13 +2808,14 @@ void MainFrame::LoadSettings()
 
 	if (!pXFile->open(QIODevice::ReadOnly)) return;
 
+	bool bFloat;
 	int k;
 	int a,b,c,d;
 	QString strange;
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100532)
+	if(k !=100535)
 	{
 		pXFile->close();
 		return;
@@ -2822,9 +2823,27 @@ void MainFrame::LoadSettings()
 	ar >> a >> b >> c >> d;
 	QPoint pt(a,b);
 	QSize sz(c,d);
-//	resize(sz);
-//	move(pt);
+
 	ar >> m_bMaximized;
+
+	ar >> bFloat >> pt.rx()>> pt.ry();
+	m_pctrlMiarexWidget->setFloating(bFloat);
+	if(bFloat) m_pctrlMiarexWidget->move(pt);
+
+	ar >> bFloat >> pt.rx()>> pt.ry();
+	m_pctrlXDirectWidget->setFloating(bFloat);
+	if(bFloat) m_pctrlXDirectWidget->move(pt);
+
+	ar >> bFloat >> pt.rx()>> pt.ry() >> sz.rwidth() >> sz.rheight();
+	m_pctrlAFoilWidget->setFloating(bFloat);
+	m_pctrlAFoilWidget->resize(sz);
+	if(bFloat) m_pctrlAFoilWidget->move(pt);
+
+	ar >> bFloat >> pt.rx()>> pt.ry();
+	m_pctrlXInverseWidget->setFloating(bFloat);
+	if(bFloat) m_pctrlXInverseWidget->move(pt);
+
+
 	ar >> m_StyleName;
 
 	ar >> m_LastDirName;
@@ -2857,6 +2876,7 @@ void MainFrame::LoadSettings()
 	p3DScales->LoadSettings(ar);
 
 	pXFile->close();
+
 }
 
 
@@ -3105,6 +3125,7 @@ void MainFrame::OnInsertProject()
 
 	SerializeProject(ar, false);
 
+	SetSaveState(false);
 
 	if(m_iApp == MIAREX)
 	{
@@ -4382,12 +4403,19 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100532;
+	ar << 100535;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
 	ar << frameGeometry().height();
 	ar << isMaximized();
+
+	ar <<  m_pctrlMiarexWidget->isFloating() << m_pctrlMiarexWidget->frameGeometry().x() << m_pctrlMiarexWidget->frameGeometry().y();
+	ar <<  m_pctrlXDirectWidget->isFloating() << m_pctrlXDirectWidget->frameGeometry().x() << m_pctrlXDirectWidget->frameGeometry().y();
+	ar <<  m_pctrlAFoilWidget->isFloating() << m_pctrlAFoilWidget->frameGeometry().x() << m_pctrlAFoilWidget->frameGeometry().y();
+	ar <<  m_pctrlAFoilWidget->frameGeometry().width() <<  m_pctrlAFoilWidget->frameGeometry().height();
+	ar <<  m_pctrlXInverseWidget->isFloating() << m_pctrlXInverseWidget->frameGeometry().x() << m_pctrlXInverseWidget->frameGeometry().y();
+
 	ar << m_StyleName;
 
 	ar << m_LastDirName;

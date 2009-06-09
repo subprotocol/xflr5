@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	FoilGeomDlg Class
-	Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -392,11 +392,14 @@ void FoilGeomDlg::OnRestore()
 
 
 
-
 void FoilGeomDlg::OnCamber()
 {
 	m_bApplied = false;
+	m_fCamber = m_pctrlCamber->GetValue();
+	m_pctrlCamberSlide->setValue(m_fCamber*10.0);
+	Apply();
 }
+
 
 void FoilGeomDlg::OnCamberSlide(int pos)
 {
@@ -406,6 +409,7 @@ void FoilGeomDlg::OnCamberSlide(int pos)
 	Apply();
 }
 
+
 void FoilGeomDlg::OnOK()
 {
 	if(!m_bApplied || !m_bAppliedX)	Apply();
@@ -413,9 +417,13 @@ void FoilGeomDlg::OnOK()
 	else done(1);
 }
 
+
 void FoilGeomDlg::OnThickness()
 {
 	m_bApplied = false;
+	m_fThickness = m_pctrlThickness->GetValue();
+	m_pctrlThickSlide->setValue(m_fThickness*10.0);
+	Apply();
 }
 
 
@@ -436,6 +444,15 @@ void FoilGeomDlg::OnXCamberSlide(int pos)
 }
 
 
+void FoilGeomDlg::OnXCamber()
+{
+	m_bAppliedX = false;
+	m_fXCamber = m_pctrlXCamber->GetValue();
+	m_pctrlXCamberSlide->setValue(m_fXCamber*10.0);
+	Apply();
+}
+
+
 void FoilGeomDlg::OnXThickSlide(int pos)
 {
 	m_fXThickness = (double)pos/10.0;
@@ -446,15 +463,12 @@ void FoilGeomDlg::OnXThickSlide(int pos)
 
 
 
-
-void FoilGeomDlg::OnXCamber()
-{
-	m_bAppliedX = false;
-}
-
 void FoilGeomDlg::OnXThickness()
 {
 	m_bAppliedX = false;
+	m_fXThickness = m_pctrlXThickness->GetValue();
+	m_pctrlXThickSlide->setValue(m_fXThickness*10.0);
+	Apply();
 }
 
 
