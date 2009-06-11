@@ -70,20 +70,21 @@ private slots:
 private:
 	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
+	void SetButtonColors();
 	void SetApplied(bool bApplied);
 	void Connect();
 
 	void FillVariableList();
 
 
-	QWidget *ScalePage, *FontPage, *BackPage, *GridPage;
+	QWidget *ScalePage, *FontPage, *GridPage;
 	QWidget *VariablePage;
 
 	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 
 	QPushButton *OKButton,*CancelButton, *RestoreButton, *ApplyButton;
 	QPushButton *m_pctrlTitleButton, * m_pctrlLegendButton, *m_pctrlLabelButton;
-	ColorButton *m_pctrlTitleColor, *m_pctrlLabelColor, *m_pctrlLegendColor;
+	QPushButton*m_pctrlTitleClr, *m_pctrlLabelClr, *m_pctrlLegendClr;
 	QLabel *m_pctrlTitleLabel, *m_pctrlLabelLabel, *m_pctrlLegendLabel;
 
 	QCheckBox *m_pctrlXAuto, *m_pctrlYAuto, *m_pctrlYInverted;

@@ -32,6 +32,7 @@
 
 WingScaleDlg::WingScaleDlg(void *pParent)
 {
+	setWindowTitle("Scale Wing Dlg");
 	m_pMainFrame = NULL;
 	m_bSweep = m_bSpan = m_bChord = m_bTwist = false;
 
@@ -234,8 +235,8 @@ void WingScaleDlg::ReadData()
 
 	m_NewSpan  = m_pctrlNewSpan->GetValue()  / pMainFrame->m_mtoUnit;
 	m_NewChord = m_pctrlNewChord->GetValue() / pMainFrame->m_mtoUnit;
-	m_NewSweep = m_pctrlNewSweep->GetValue() / pMainFrame->m_mtoUnit;
-	m_NewTwist = m_pctrlNewChord->GetValue() / pMainFrame->m_mtoUnit;
+	m_NewSweep = m_pctrlNewSweep->GetValue();
+	m_NewTwist = m_pctrlNewTwist->GetValue();
 }
 
 

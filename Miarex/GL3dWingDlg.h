@@ -73,9 +73,7 @@ private slots:
 	void OnOutline();
 	void OnPanels();
 
-	void reject();
 
-	void OnCancel();
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
 	void OnItemClicked(const QModelIndex &index);
@@ -86,9 +84,12 @@ private slots:
 	void OnInsertAfter();
 	void OnDeleteSection();
 	void OnResetMesh();
+	void OnScaleWing();
 
 
 private:
+	void reject();
+
 	void WheelEvent(QWheelEvent *event);
 	void MouseMoveEvent(QMouseEvent *event);
 	void MousePressEvent(QMouseEvent *event) ;
@@ -150,7 +151,7 @@ private:
 	QCheckBox *m_pctrlSymetric;
 	QRadioButton *m_pctrlLeftSide, *m_pctrlRightSide;
 	ColorButton *m_pctrlWingColor;
-	QPushButton *m_pctrlResetMesh;
+	QPushButton *m_pctrlResetMesh, *m_pctrlScaleWing;
 	QPushButton *m_pctrlInsertBefore, *m_pctrlInsertAfter, *m_pctrlDeleteSection;
 	QLabel *m_pctrlWingSpan, *m_pctrlWingArea, *m_pctrlWingVolume, *m_pctrlMAC, *m_pctrlGeomChord;
 	QLabel *m_pctrlMACSpanPos, *m_pctrlAspectRatio, *m_pctrlTaperRatio, *m_pctrlSweep, *m_pctrlNFlaps;

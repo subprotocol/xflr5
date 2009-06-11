@@ -405,19 +405,16 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 	{
 		case Qt::Key_Escape:
 		{
-//			TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-//			p2DWidget->setCursor(m_hcCross);
 			if(m_bZoomPlus)
 			{
 				ReleaseZoom();
-				break;
 			}
 			else if(m_bZoomYOnly)
 			{
 				pMainFrame->m_pctrlZoomY->setChecked(false);
 				m_bZoomYOnly = false;
-				break;
 			}
+			break;
 		}
 		case Qt::Key_F2:
 		{
@@ -1000,12 +997,41 @@ void QAFoil::OnAFoilDerotateFoil()
 {
 	if(!m_pCurFoil) return;
 
-	double angle = m_pCurFoil->DeRotate();
+	m_pBufferFoil->CopyFoil(m_pCurFoil);
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = m_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
 
+	UpdateView();
+
+	double angle = m_pBufferFoil->DeRotate();
 	QString str = QString("Foil has been de-rotated by %1 degrees").arg(angle,6,'f',3);
-
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->statusBar()->showMessage(str);
+
+	//then duplicate the buffer foil and add it
+	CFoil *pNewFoil = new CFoil();
+	pNewFoil->CopyFoil(m_pBufferFoil);
+	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+	pNewFoil->m_nFoilStyle = 0;
+	pNewFoil->m_nFoilWidth = 1;
+	if(pMainFrame->SetModFoil(pNewFoil))
+	{
+		m_pCurFoil = NULL;
+		FillFoilTable();
+		SetFoil(pNewFoil);
+		SelectFoil(pNewFoil);
+	}
+	else
+	{
+//			pNewFoil = NULL;
+		FillFoilTable();
+		SelectFoil(m_pCurFoil);
+	}
+	m_pBufferFoil->m_bVisible = false;
+
 	UpdateView();
 }
 
@@ -2272,7 +2298,6 @@ void QAFoil::PaintLegend(QPainter &painter)
 		CFoil* pRefFoil;
 		QString strong;
 		QPoint Place(m_rCltRect.right()-350, 20);
-
 		int LegendSize, ypos, x1, n, k, delta;
 
 		LegendSize = 20;

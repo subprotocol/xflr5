@@ -255,6 +255,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 
 void XFoilAnalysisDlg::InitDialog()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
@@ -286,6 +287,8 @@ void XFoilAnalysisDlg::InitDialog()
 	m_RmsGraph.SetYMax(1.0);
 
 	m_RmsGraph.SetMargin(40);
+
+	if(pMainFrame) m_RmsGraph.CopySettings(&pMainFrame->m_RefGraph, false);
 }
 
 

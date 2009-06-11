@@ -2366,6 +2366,7 @@ void CWing::SetSweep(double Sweep)
 	ComputeGeometry();
 }
 
+
 void CWing::SetTwist(double Twist)
 {
 	if(fabs(m_TTwist[m_NPanel])>0.0001)

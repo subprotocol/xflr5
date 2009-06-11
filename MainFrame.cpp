@@ -25,7 +25,6 @@
 #include "Globals.h"
 #include "Design/AFoil.h"
 #include "Miarex/Miarex.h"
-#include "Miarex/WingDlg.h"
 #include "Miarex/GL3dWingDlg.h"
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
@@ -48,6 +47,7 @@
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
 
+
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
@@ -69,7 +69,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_BorderClr       = QColor(200,200,200);
 	m_BackgroundColor = QColor(0, 20, 40);
-	m_GraphBackColor  = QColor(0, 30, 50);
 	m_TextColor       = QColor(220,220,220);
 
 	m_TextFont.setStyleHint(QFont::TypeWriter);
@@ -832,10 +831,6 @@ void MainFrame::CreateDockWindows()
 	GLWidget::s_pMainFrame = this;
 	GLWidget::s_pMiarex = m_pMiarex;
 
-	WingDlg::s_pMainFrame  = this;
-	WingDlg::s_pMiarex     = m_pMiarex;
-	WingDlg::s_poaFoil     = &m_oaFoil;
-
 	PlaneDlg::s_pMainFrame = this;
 	PlaneDlg::s_pMiarex    = m_pMiarex;
 	PlaneDlg::s_poaBody    = &m_oaBody;
@@ -1118,6 +1113,7 @@ void MainFrame::CreateMiarexActions()
 	connect(deleteUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWOpps()));
 
 	renameCurUFO = new QAction(tr("Rename..."), this);
+	renameCurUFO->setShortcut(tr("F2"));
 	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
 
 	deleteCurUFO = new QAction(tr("Delete..."), this);
@@ -2815,7 +2811,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100535)
+	if(k !=100537)
 	{
 		pXFile->close();
 		return;
@@ -2850,7 +2846,7 @@ void MainFrame::LoadSettings()
 	ar >> m_LengthUnit >> m_AreaUnit >> m_WeightUnit >> m_SpeedUnit >> m_ForceUnit >> m_MomentUnit;
 	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
-	ar >> m_BackgroundColor >> m_GraphBackColor >> m_TextColor;
+	ar >> m_BackgroundColor  >> m_TextColor;
 	ar >> m_TextFont;
 	ar >> m_ImageFormat;
 	ar >> m_bSaveOpps >> m_bSaveWOpps;
@@ -2874,6 +2870,8 @@ void MainFrame::LoadSettings()
 
 	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
 	p3DScales->LoadSettings(ar);
+
+	m_RefGraph.Serialize(ar, false);
 
 	pXFile->close();
 
@@ -3893,11 +3891,9 @@ void MainFrame::OnStyle()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 //	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
 
-	QGraph m_RefGraph;//which setttings ?
-
 	DisplaySettingsDlg dlg(this);
 	dlg.m_BackgroundColor = m_BackgroundColor;
-	dlg.m_GraphBackColor  = m_GraphBackColor;
+//	dlg.m_GraphBackColor  = m_GraphBackColor;
 	dlg.m_TextColor       = m_TextColor;
 	dlg.m_TextFont        = m_TextFont;
 	dlg.m_pRefGraph       = &m_RefGraph;
@@ -3908,13 +3904,12 @@ void MainFrame::OnStyle()
 	if(dlg.exec() ==QDialog::Accepted)
 	{
 		m_BackgroundColor = dlg.m_BackgroundColor;
-		m_GraphBackColor  = dlg.m_GraphBackColor;
+//		m_GraphBackColor  = dlg.m_GraphBackColor;
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
 		m_StyleName       = dlg.m_StyleName;
 
-
-		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
+/*		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCpGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCmGraph->SetBkColor(m_GraphBackColor);
 		pXDirect->m_pCzGraph->SetBkColor(m_GraphBackColor);
@@ -3931,7 +3926,8 @@ void MainFrame::OnStyle()
 		pMiarex->m_WPlrGraph2.SetBkColor(m_GraphBackColor);
 		pMiarex->m_WPlrGraph3.SetBkColor(m_GraphBackColor);
 		pMiarex->m_WPlrGraph4.SetBkColor(m_GraphBackColor);
-		pMiarex->m_CpGraph.SetBkColor(m_GraphBackColor);
+		pMiarex->m_CpGraph.SetBkColor(m_GraphBackColor);*/
+
 		pMiarex->m_bResetglLegend = true;
 
 		if(dlg.m_bIsGraphModified)
@@ -4377,11 +4373,15 @@ bool MainFrame::SaveProject(QString PathName)
 		return false;
 	}
 
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
 	QDataStream ar(&fp);
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeProject(ar,true);
 	m_FileName = PathName;
 	fp.close();
+
+	QApplication::restoreOverrideCursor();
 	return true;
 }
 
@@ -4403,7 +4403,7 @@ void MainFrame::SaveSettings()
 
 	QDataStream ar(pXFile);
 
-	ar << 100535;
+	ar << 100537;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -4421,7 +4421,7 @@ void MainFrame::SaveSettings()
 	ar << m_LastDirName;
 
 	ar << m_LengthUnit << m_AreaUnit << m_WeightUnit << m_SpeedUnit << m_ForceUnit << m_MomentUnit;
-	ar << m_BackgroundColor <<  m_GraphBackColor << m_TextColor;
+	ar << m_BackgroundColor <<  m_TextColor;
 	ar << m_TextFont ;
 	ar << m_ImageFormat;
 	ar << m_bSaveOpps << m_bSaveWOpps;
@@ -4437,6 +4437,8 @@ void MainFrame::SaveSettings()
 
 	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
 	p3DScales->SaveSettings(ar);
+
+	m_RefGraph.Serialize(ar, true);
 
 	pXFile->close();
 }

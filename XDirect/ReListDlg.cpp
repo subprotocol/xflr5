@@ -153,6 +153,7 @@ void ReListDlg::OnDelete()
 	FillReModel();
 }
 
+
 void ReListDlg::OnInsert()
 {
 	int i, sel;
@@ -166,14 +167,16 @@ void ReListDlg::OnInsert()
 		m_NCritList[i] = m_NCritList[i-1];
 	}
 
-	m_ReList[sel]    = (m_ReList[sel-1]+m_ReList[sel+1])      /2.0;
-	m_MachList[sel]  = (m_MachList[sel-1]+m_MachList[sel+1])  /2.0;
-	m_NCritList[sel] = (m_NCritList[sel-1]+m_NCritList[sel+1])/2.0;
+	if(sel>0)	m_ReList[sel]    = (m_ReList[sel-1]+m_ReList[sel+1]) /2.0;
+	else        m_ReList[sel]    = m_ReList[sel+1]                   /2.0;
+	m_MachList[sel]  = m_MachList[sel+1];
+	m_NCritList[sel] = m_NCritList[sel+1];
 
 	m_NRe ++;
 
 	FillReModel();
 }
+
 
 void ReListDlg::OnOK()
 {

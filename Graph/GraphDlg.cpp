@@ -53,9 +53,9 @@ GraphDlg::GraphDlg()
 
 void GraphDlg::Connect()
 {
-	connect(m_pctrlTitleColor, SIGNAL(clicked()),  this, SLOT(OnTitleColor()));
-	connect(m_pctrlLabelColor, SIGNAL(clicked()),  this, SLOT(OnLabelColor()));
-	connect(m_pctrlLegendColor, SIGNAL(clicked()), this, SLOT(OnLegendColor()));
+	connect(m_pctrlTitleClr, SIGNAL(clicked()),  this, SLOT(OnTitleColor()));
+	connect(m_pctrlLabelClr, SIGNAL(clicked()),  this, SLOT(OnLabelColor()));
+	connect(m_pctrlLegendClr, SIGNAL(clicked()), this, SLOT(OnLegendColor()));
 
 	connect(m_pctrlTitleButton, SIGNAL(clicked()),  this, SLOT(OnTitleFont()));
 	connect(m_pctrlLabelButton, SIGNAL(clicked()),  this, SLOT(OnLabelFont()));
@@ -126,10 +126,12 @@ void GraphDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
 void GraphDlg::OnActivePage(int index)
 {
 	s_ActivePage = index;
 }
+
 
 void GraphDlg::OnApply()
 {
@@ -225,6 +227,7 @@ void GraphDlg::OnGraphBorder(int state)
 	SetApplied(false);
 }
 
+
 void GraphDlg::OnGraphBackColor()
 {
 	QColor BkColor = m_pGraph->GetBackColor();
@@ -236,7 +239,8 @@ void GraphDlg::OnGraphBackColor()
 
 	m_pGraph->SetBkColor(BkColor);
 	m_pctrlGraphBack->SetColor(m_pGraph->GetBackColor());
-	SetApplied(false);
+	SetButtonColors();
+	SetApplied(false);	
 }
 
 
@@ -244,7 +248,18 @@ void GraphDlg::OnLabelColor()
 {
 	QColor color = m_pGraph->GetLabelColor();
 	m_pGraph->SetLabelColor(QColorDialog::getRgba(color.rgba()));
-	m_pctrlLabelColor->SetColor(m_pGraph->GetLabelColor());
+
+	QPalette palette = m_pctrlLabelClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::Button, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetLabelColor());
+		m_pctrlLabelClr->setPalette(palette);
+		m_pctrlLabelClr->setAutoFillBackground(true);
+	}
+
 	SetApplied(false);
 }
 
@@ -272,7 +287,18 @@ void GraphDlg::OnLegendColor()
 {
 	QColor color = m_pGraph->GetLegendColor();
 	m_pGraph->SetLegendColor(QColorDialog::getRgba(color.rgba()));
-	m_pctrlLegendColor->SetColor(m_pGraph->GetLegendColor());
+
+	QPalette palette = m_pctrlLegendClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::Button, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetLegendColor());
+		m_pctrlLegendClr->setPalette(palette);
+		m_pctrlLegendClr->setAutoFillBackground(true);
+	}
+
 	SetApplied(false);
 }
 
@@ -344,7 +370,18 @@ void GraphDlg::OnTitleColor()
 {
 	QColor color = m_pGraph->GetTitleColor();
 	m_pGraph->SetTitleColor(QColorDialog::getRgba(color.rgba()));
-	m_pctrlTitleColor->SetColor(m_pGraph->GetTitleColor());
+
+	QPalette palette = m_pctrlTitleClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::Button, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetTitleColor());
+		m_pctrlTitleClr->setPalette(palette);
+		m_pctrlTitleClr->setAutoFillBackground(true);
+	}
+
 	SetApplied(false);
 }
 
@@ -502,6 +539,28 @@ void GraphDlg::SetApplied(bool bApplied)
 //	ApplyButton->setEnabled(!bApplied);
 }
 
+void GraphDlg::SetButtonColors()
+{
+	QPalette palette = m_pctrlTitleClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_pGraph->GetBackColor());
+		palette.setColor(QPalette::Button, m_pGraph->GetBackColor());
+
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetTitleColor());
+		m_pctrlTitleClr->setPalette(palette);
+
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetLegendColor());
+		m_pctrlLegendClr->setPalette(palette);
+
+		palette.setColor(QPalette::ButtonText, m_pGraph->GetLabelColor());
+		m_pctrlLabelClr->setPalette(palette);
+	}
+
+}
+
 void GraphDlg::SetParams()
 {
 	QString strong;
@@ -521,9 +580,7 @@ void GraphDlg::SetParams()
 	OnAutoX();
 	OnAutoY();
 
-	m_pctrlTitleColor->SetColor(m_pGraph->GetTitleColor());
-	m_pctrlLabelColor->SetColor(m_pGraph->GetLabelColor());
-	m_pctrlLegendColor->SetColor(m_pGraph->GetLegendColor());
+	SetButtonColors();
 
 	QFont font;
 	m_pGraph->GetLabelLogFont(&font);
@@ -601,8 +658,6 @@ void GraphDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/2);
-//	move(r.width()/3, r.height()/6);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -630,7 +685,6 @@ void GraphDlg::SetupLayout()
 	ScalePage    = new QWidget(this);
 	GridPage     = new QWidget(this);
 	FontPage     = new QWidget(this);
-	BackPage     = new QWidget(this);
 	VariablePage = new QWidget(this);
 
 	//________Variable Page______________________
@@ -673,29 +727,64 @@ void GraphDlg::SetupLayout()
 	QLabel *lab1  = new QLabel("Title font");
 	QLabel *lab2  = new QLabel("Label font");
 	QLabel *lab3 = new QLabel("Legend font");
+	lab1->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+	lab2->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
+	lab3->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 	FontButtons->addWidget(lab1,1,1);
 	FontButtons->addWidget(lab2,2,1);
 	FontButtons->addWidget(lab3,3,1);
 
-	m_pctrlTitleButton  = new QPushButton("Title Font");
-	m_pctrlLabelButton  = new QPushButton("Label Font");
-	m_pctrlLegendButton = new QPushButton("Legend Font");
+	m_pctrlTitleButton  = new QPushButton("Set Title Font");
+	m_pctrlLabelButton  = new QPushButton("Set Label Font");
+	m_pctrlLegendButton = new QPushButton("Set Legend Font");
 	FontButtons->addWidget(m_pctrlTitleButton,1,2);
 	FontButtons->addWidget(m_pctrlLabelButton,2,2);
 	FontButtons->addWidget(m_pctrlLegendButton,3,2);
 
-	m_pctrlTitleColor  = new ColorButton;
-	m_pctrlLabelColor  = new ColorButton;
-	m_pctrlLegendColor = new ColorButton;
-	FontButtons->addWidget(m_pctrlTitleColor,1,3);
-	FontButtons->addWidget(m_pctrlLabelColor,2,3);
-	FontButtons->addWidget(m_pctrlLegendColor,3,3);
+	m_pctrlTitleClr  = new QPushButton("Title Color");
+	m_pctrlLabelClr  = new QPushButton("Label Color");
+	m_pctrlLegendClr = new QPushButton("Legend Color");
+	m_pctrlTitleClr->setAutoFillBackground(true);
+	m_pctrlLegendClr->setAutoFillBackground(true);
+	m_pctrlLabelClr->setAutoFillBackground(true);
+
+	FontButtons->addWidget(m_pctrlTitleClr,1,3);
+	FontButtons->addWidget(m_pctrlLabelClr,2,3);
+	FontButtons->addWidget(m_pctrlLegendClr,3,3);
+
+	QGroupBox *FontBox = new QGroupBox("Fonts");
+	FontBox->setLayout(FontButtons);
 
 
-	FontPage->setLayout(FontButtons);
+	QGridLayout *BackData = new QGridLayout;
+	QLabel *GraphBackLabel = new QLabel("Graph Background");
+	GraphBackLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	m_pctrlGraphBorder = new QCheckBox("Graph Border");
+
+	m_pctrlGraphBack = new ColorButton;
+	m_pctrlGraphBack->setMinimumWidth(100);
+	m_pctrlBorderStyle = new LineButton;
+	m_pctrlBorderStyle->setMinimumWidth(100);
+
+	BackData->addWidget(GraphBackLabel,1,1);
+	BackData->addWidget(m_pctrlGraphBorder,2,1,1,1,Qt::AlignRight | Qt::AlignVCenter);
+
+	BackData->addWidget(m_pctrlGraphBack,1,2);
+	BackData->addWidget(m_pctrlBorderStyle,2,2);
+
+	QGroupBox *BackBox = new QGroupBox("BackGround");
+	BackBox->setLayout(BackData);
+
+
+	QVBoxLayout *FontLayout = new QVBoxLayout;
+	FontLayout->addWidget(FontBox);
+	FontLayout->addStretch(1);
+	FontLayout->addWidget(BackBox);
+	FontLayout->addStretch(1);
+	FontPage->setLayout(FontLayout);
 	//________End Font Page______________________
+
 	//________Scale Page______________________
-	QHBoxLayout *HScaleBox = new QHBoxLayout;
 
 	QGridLayout *ScaleData = new QGridLayout;
 
@@ -782,30 +871,12 @@ void GraphDlg::SetupLayout()
 
 	GridPage->setLayout(AxisData);
 	//________End Axis Page______________________
-	//________Back Page______________________
-	QGridLayout *BackData = new QGridLayout;
-	QLabel *GraphBackLabel = new QLabel("Graph Background");
-	GraphBackLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlGraphBorder = new QCheckBox("Graph Border");
 
-	m_pctrlGraphBack = new ColorButton;
-	m_pctrlGraphBack->setMinimumWidth(100);
-	m_pctrlBorderStyle = new LineButton;
-	m_pctrlBorderStyle->setMinimumWidth(100);
 
-	BackData->addWidget(GraphBackLabel,1,1);
-	BackData->addWidget(m_pctrlGraphBorder,2,1);
-
-	BackData->addWidget(m_pctrlGraphBack,1,2);
-	BackData->addWidget(m_pctrlBorderStyle,2,2);
-
-	BackPage->setLayout(BackData);
-	//________End Back Page______________________
 	pTabWidget->addTab(VariablePage, "Variables");
 	pTabWidget->addTab(ScalePage, "Scales");
 	pTabWidget->addTab(GridPage, "Axis and Grids");
-	pTabWidget->addTab(FontPage, "Fonts");
-	pTabWidget->addTab(BackPage, "Background");
+	pTabWidget->addTab(FontPage, "Fonts and BackGround");
 
 	pTabWidget->setCurrentIndex(s_ActivePage);
 	connect(pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));

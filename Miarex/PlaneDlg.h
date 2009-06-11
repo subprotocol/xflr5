@@ -49,7 +49,6 @@ private slots:
 	void OnDefineWing();
 	void OnDefineFin();
 	void OnDefineStab();
-	void OnCancel();
 	void OnChanged();
 	void OnImportWing();
 	void OnPlaneName();

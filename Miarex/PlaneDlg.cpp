@@ -21,7 +21,6 @@
 #include "../Globals.h"
 #include "../MainFrame.h" 
 #include "Miarex.h"
-#include "WingDlg.h"
 #include "PlaneDlg.h"
 #include "ImportWingDlg.h"
 #include <QGridLayout>
@@ -249,19 +248,6 @@ void PlaneDlg::OnBodyCheck()
 		m_pctrlEditBody->setEnabled(false);
 	}
 	SetResults();
-}
-
-
-void PlaneDlg::OnCancel()
-{
-	if(m_bChanged)
-	{
-		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-			return;
-	}
-//	reject();
-	done(QDialog::Rejected);
 }
 
 
@@ -660,7 +646,19 @@ void PlaneDlg::ReadParams()
 
 void PlaneDlg::reject()
 {
-	OnCancel();
+	if(m_bChanged)
+	{
+		QString strong = tr("Save the changes ?");
+		int Ans = QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		if (QMessageBox::Yes == Ans)
+		{
+			OnOK();
+			return;
+		}
+		else if(QMessageBox::Cancel == Ans) return;
+	}
+//	reject();
+	done(QDialog::Rejected);
 }
 
 

@@ -553,7 +553,8 @@ void QGraph::DrawXMinGrid(QPainter &painter)
 	YMax = (int)(ymax/scaley)+ m_ptoffset.y();
 
 	double xDelta = m_XMinorUnit;
-	double xt = xmin;//one tick at the origin
+	double xt = xo-int((xo-xmin)*1.0001/xDelta)*xDelta;//one tick at the origin
+
 
 	while(xt<=xmax*1.001)
 	{

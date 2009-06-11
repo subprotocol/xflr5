@@ -2835,6 +2835,7 @@ void QXDirect::OnGraphSettings()
 
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
+
 	if(!m_bPolar)
 	{
 		dlg.m_iGraphType = 51;
@@ -2874,6 +2875,7 @@ void QXDirect::OnGraphSettings()
 	graph.CopySettings(pGraph);
 	dlg.m_pMemGraph = &graph;
 	dlg.m_pGraph = pGraph;
+
 	dlg.SetParams();
 
 	if(dlg.exec() == QDialog::Accepted)

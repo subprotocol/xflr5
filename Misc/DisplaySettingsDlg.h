@@ -40,7 +40,8 @@ public:
 	void InitDialog();
 
 	ColorButton *m_pctrlBackColor;
-	ColorButton *m_pctrlTextColor;
+//	ColorButton *m_pctrlTextColor;
+	QPushButton *m_pctrlTextClr;
 	QPushButton *m_pctrlTextFont;
 	QPushButton *m_pctrlGraphSettings;
 	QPushButton *OKButton, *CancelButton;
@@ -51,7 +52,6 @@ public:
 
 	void *m_pMainFrame;
 	QColor m_BackgroundColor;
-	QColor m_GraphBackColor;
 	QColor m_TextColor;
 	QFont m_TextFont;
 	QGraph *m_pRefGraph;

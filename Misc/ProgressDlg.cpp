@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	PanelAnalysisDlg Class
+	ProgressDlg Class
 	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify

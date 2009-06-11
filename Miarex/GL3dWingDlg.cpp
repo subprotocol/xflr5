@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include "WingScaleDlg.h"
 #include <QtDebug>
 #include <math.h>
 
@@ -251,6 +252,7 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlInsertAfter, SIGNAL(clicked()),this, SLOT(OnInsertAfter()));
 	connect(m_pctrlDeleteSection, SIGNAL(clicked()),this, SLOT(OnDeleteSection()));
 	connect(m_pctrlResetMesh, SIGNAL(clicked()),this, SLOT(OnResetMesh()));
+	connect(m_pctrlScaleWing, SIGNAL(clicked()),this, SLOT(OnScaleWing()));
 	connect(m_pctrlWingColor, SIGNAL(clicked()),this, SLOT(OnWingColor()));
 	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
 	connect(m_pctrlRightSide, SIGNAL(clicked()),this, SLOT(OnSide()));
@@ -1535,6 +1537,11 @@ void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			reject();
+			return;
+		}
+		case Qt::Key_Delete:
+		{
+			OnDeleteSection();
 			break;
 		}
 		case Qt::Key_Control:
@@ -1560,11 +1567,7 @@ void GL3dWingDlg::keyReleaseEvent(QKeyEvent *event)
 			UpdateView();
 			break;
 		}
-		case Qt::Key_Escape:
-		{
-			hide();
-			break;
-		}
+
 		default:
 			event->ignore();
 	}
@@ -1835,19 +1838,6 @@ void GL3dWingDlg::OnClipPlane(int pos)
 	UpdateView();
 }
 
-
-
-void GL3dWingDlg::OnCancel()
-{
-	if(m_bChanged)
-	{
-		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-			return;
-	}
-//	reject();
-	done(QDialog::Rejected);
-}
 
 
 
@@ -2124,6 +2114,33 @@ void GL3dWingDlg::OnSetupLight()
 }
 
 
+void GL3dWingDlg::OnScaleWing()
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	WingScaleDlg dlg;
+	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.InitDialog(m_pWing->m_Span, m_pWing->m_TChord[0], m_pWing->GetAverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		if (dlg.m_bSpan || dlg.m_bChord || dlg.m_bSweep || dlg.m_bTwist)
+		{
+			if(dlg.m_bSpan)  m_pWing->ScaleSpan(dlg.m_NewSpan);
+			if(dlg.m_bChord) m_pWing->ScaleChord(dlg.m_NewChord);
+			if(dlg.m_bSweep) m_pWing->SetSweep(dlg.m_NewSweep);
+			if(dlg.m_bTwist) m_pWing->SetTwist(dlg.m_NewTwist);
+		}
+
+		FillDataTable();
+		m_bChanged = true;
+		m_bResetglWing = true;
+		m_bResetglSectionHighlight = true;
+		ComputeGeometry();
+		UpdateView();
+	}
+}
+
 void GL3dWingDlg::OnSide()
 {
 	m_bRightSide = m_pctrlRightSide->isChecked();
@@ -2283,18 +2300,17 @@ void GL3dWingDlg::ReadSectionData(int sel)
 
 void GL3dWingDlg::reject()
 {
+qDebug() << "Rejecting";
 	if(m_bChanged)
 	{
-		m_pWing->m_WingName = m_pctrlWingName->text();
-
-		int res = QMessageBox::question(window(), "Wing Dlg Exit", "Save the wing ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-		if (QMessageBox::No == res) QDialog::reject();
-		else if (QMessageBox::Cancel == res) return;
-		else done(QDialog::Accepted);
+		QString strong = tr("Discard the changes ?");
+		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			return;
 	}
-	else QDialog::reject();
-
+//	reject();
+	done(QDialog::Rejected);
 }
+
 
 
 void GL3dWingDlg::resizeEvent(QResizeEvent *event)
@@ -2572,7 +2588,6 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlSymetric     = new QCheckBox(tr("Symetric"));
 	m_pctrlRightSide    = new QRadioButton(tr("Right Side"));
 	m_pctrlLeftSide     = new QRadioButton(tr("Left Side"));
-	m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
 	m_pctrlInsertBefore   = new QPushButton(tr("Insert Before"));
 	m_pctrlInsertAfter    = new QPushButton(tr("Insert After"));
 	m_pctrlDeleteSection  = new QPushButton(tr("Delete Section"));
@@ -2584,7 +2599,6 @@ void GL3dWingDlg::SetupLayout()
 	SymLayout->addWidget(m_pctrlInsertBefore);
 	SymLayout->addWidget(m_pctrlInsertAfter);
 	SymLayout->addWidget(m_pctrlDeleteSection);
-	SymLayout->addWidget(m_pctrlResetMesh);
 
 	QHBoxLayout *NameLayout = new QHBoxLayout;
 	m_pctrlWingName     = new QLineEdit("WingName");
@@ -2805,6 +2819,13 @@ void GL3dWingDlg::SetupLayout()
 	ThreeDViewControls->addWidget(ClipLabel);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
 
+	QHBoxLayout *WingModCommands = new QHBoxLayout;
+	m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
+	m_pctrlScaleWing    = new QPushButton(tr("Scale Wing"));
+	WingModCommands->addWidget(m_pctrlResetMesh);
+	WingModCommands->addWidget(m_pctrlScaleWing);
+
+
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("Save and Close"));
@@ -2824,16 +2845,14 @@ void GL3dWingDlg::SetupLayout()
 	All3DControls->addLayout(ThreeDView);
 	All3DControls->addLayout(ThreeDViewControls);
 	All3DControls->addStretch(1);
+	All3DControls->addLayout(WingModCommands);
+	All3DControls->addStretch(1);
 	All3DControls->addLayout(CommandButtons);
+
 
 	RightLayout->addLayout(DataLayout);
 //	RightLayout->addStretch(1);
 	RightLayout->addLayout(All3DControls);
-
-
-/*	QGridLayout *MainLayout = new QGridLayout;
-	MainLayout->addLayout(LeftLayout,1,1);
-	MainLayout->addLayout(RightLayout,1,2,2,1);*/
 
 	QHBoxLayout *MainLayout = new QHBoxLayout;
 	MainLayout->addLayout(LeftLayout);

@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
 	QPoint pt(a,b);
 	QSize sz(c,d);
 
-	QCleanlooksStyle style;
+//	QCleanlooksStyle style;
 	QApplication app(argc, argv);
-	if(StyleName.length()) qApp->setStyle(StyleName);
-	else                   qApp->setStyle(&style);
+//	if(StyleName.length()) qApp->setStyle(StyleName);
+//	else                   qApp->setStyle(&style);
 
 	MainFrame w;
 	w.setWindowTitle("QFLR5");

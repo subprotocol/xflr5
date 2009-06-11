@@ -34,6 +34,8 @@
 #include "Objects/Polar.h"
 #include "Objects/OpPoint.h"
 #include "Objects/Plane.h"
+#include "Graph/QGraph.h"
+
 
 class MainFrame : public QMainWindow
 {
@@ -49,6 +51,7 @@ class MainFrame : public QMainWindow
 	friend class CWOpp;
 	friend class CPlane;
 	friend class BodyGridDlg;
+	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
 	friend class InterpolateFoilsDlg;
 	friend class WingDlg;
@@ -66,6 +69,7 @@ class MainFrame : public QMainWindow
 	friend class GL3dWingDlg;
 	friend class WAdvancedDlg;
 	friend class GraphDlg;
+	friend class LLTAnalysisDlg;
 
 	Q_OBJECT
 
@@ -325,6 +329,7 @@ private:
 
 	CRectangle m_GLViewRect; // The OpenGl Viewport
 
+
 	int m_iApp;
 
 	bool m_bSaved;
@@ -348,8 +353,8 @@ private:
 	QString m_ProjectName, m_FileName, m_LastDirName;
 	QColor m_crColors[30];
 
+	QGraph m_RefGraph;//Reference setttings
 	QColor m_BackgroundColor;
-	QColor m_GraphBackColor;
 	QColor m_TextColor;
 	QColor m_BorderClr;
 	QFont m_TextFont;

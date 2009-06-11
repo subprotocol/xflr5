@@ -33,7 +33,6 @@
 #include "ManageBodiesDlg.h"
 #include "GLLightDlg.h"
 #include "GL3DScales.h"
-#include "WingDlg.h"
 #include "PlaneDlg.h"
 #include "WPolarDlg.h"
 #include "LLTAnalysisDlg.h"
@@ -3409,8 +3408,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 		LegendPen.setColor(m_pCurWOpp->m_Color);
 		painter.setPen(LegendPen);
 
-		painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.2*ypos*ny),
-						 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.2*ypos*ny));
+		painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
+						 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
 
 		if(m_pCurWOpp->m_bShowPoints)
 		{
@@ -3439,7 +3438,9 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 		if(m_pCurWOpp->m_bOut) str4+=" (Out)";
 
 		painter.setPen(TextPen);
-		painter.drawText(place.x() + (int)(3*LegendSize), place.y() + (int)(1.*ypos*ny)+(int)(ypos/2), str1+str2+str3+str4);
+		painter.drawText(place.x() + (int)(3*LegendSize),
+						 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3),
+						 str1+str2+str3+str4);
 	}
 	else
 	{
@@ -3465,14 +3466,16 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 				if (!bStarted || (abs(bottom) > abs(YPos)))
 				{
 					ny++;
-					painter.drawText(place.x() + (int)(1*LegendSize), place.y() + ypos*ny-(int)(ypos/2), str.at(k));
+					painter.drawText(place.x() + (int)(1*LegendSize),
+									 place.y() + ypos*ny-(int)(ypos/3), str.at(k));
 				}
 				else
 				{
 				// move rigth if outside screen
 					place.rx() += LegendWidth;
 					ny=1;
-					painter.drawText(place.x() + (int)(1*LegendSize), place.y() + ypos*ny-(int)(ypos/2), str.at(k));
+					painter.drawText(place.x() + (int)(1*LegendSize),
+									 place.y() + ypos*ny-(int)(ypos/3), str.at(k));
 				}
 
 				bStarted = true;
@@ -3530,7 +3533,6 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 					pPOpp = (CPOpp*)m_poaPOpp->at(nc);
 					if(str.at(k) == pPOpp->m_PlaneName && pPOpp->m_bIsVisible)
 					{
-						ny++ ;
 						if(abs(bottom)<abs(place.y() + (int)(1.*ypos*ny+ypos)))
 						{
 							//move right
@@ -3543,7 +3545,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						painter.setPen(LegendPen);
 
 						painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
-																 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
+										 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
 
 						if(pPOpp->m_bShowPoints)
 						{
@@ -3567,10 +3569,12 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						}
 
 						if(pPOpp->m_WingWOpp.m_bTiltedGeom) str4 += "_TG";
-						if(pPOpp->m_WingWOpp.m_bOut)         str4+=" (Out)";
+						if(pPOpp->m_WingWOpp.m_bOut)        str4+=" (Out)";
 
 						painter.setPen(TextPen);
-						painter.drawText(place.x() + (int)(3*LegendSize), place.y() + (int)(1.*ypos*ny)-(int)(ypos/2), str1+str2+str3+str4);
+						painter.drawText(place.x() + (int)(3*LegendSize),
+										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), str1+str2+str3+str4);
+						ny++ ;
 					}
 				}
 				if (UFOPts) ny++;
@@ -3712,7 +3716,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 							painter.drawRect(x1-2, place.y()-2 + (int)(1.*ypos*ny), 4, 4);
 						}
 						painter.setPen(TextPen);
-						painter.drawText(place.x() + (int)(2.0*LegendSize), place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->m_PlrName);
+						painter.drawText(place.x() + (int)(2.0*LegendSize),
+										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->m_PlrName);
 						ny++ ;
 					}
 				}
@@ -8410,7 +8415,6 @@ void QMiarex::GLDraw3D()
 
 	if(m_bResetglGeom  && m_iView==3)
 	{
-
 		if(m_pCurWing)
 		{
 			if(glIsList(WINGSURFACES))
@@ -9813,7 +9817,8 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F5:
 		{
-			OnWOpps();			break;
+			OnWOpps();
+			break;
 		}
 		case Qt::Key_F6:
 		{
@@ -10313,6 +10318,7 @@ void QMiarex::On3DView()
 	{
 		m_pctrlMiddleControls->setCurrentIndex(0);
 		m_pctrBottomControls->setCurrentIndex(1);
+		CheckButtons();
 		UpdateView();
 		return;
 	}
@@ -11025,6 +11031,7 @@ void QMiarex::OnCpView()
 
 	if(m_iView==4)
 	{
+		CheckButtons();
 		UpdateView();
 		return;
 	}
@@ -12413,7 +12420,6 @@ void QMiarex::OnGraphSettings()
 				m_pCurGraph->SetAutoY(true);
 				m_pCurGraph->SetAutoYMinUnit(true);
 			}
-
 			CreateWOppCurves();
 		}
 		else if(m_iView==2)
@@ -13132,12 +13138,6 @@ void QMiarex::OnScaleWing()
 	if(!m_pCurWing) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	if(m_pCurPlane)
-	{
-		QMessageBox::warning(window(),"Warning","No scaling function is implemented for plane objects");
-		return;
-	}
-
 	WingScaleDlg dlg;
 	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.InitDialog(m_pCurWing->m_Span, m_pCurWing->m_TChord[0], m_pCurWing->GetAverageSweep(), m_pCurWing->m_TTwist[m_pCurWing->m_NPanel]);
@@ -13146,22 +13146,32 @@ void QMiarex::OnScaleWing()
 	{
 		if (dlg.m_bSpan || dlg.m_bChord || dlg.m_bSweep || dlg.m_bTwist)
 		{
-			CWing* pNewWing= new CWing;
-			pNewWing->Duplicate(m_pCurWing);
-			if(dlg.m_bSpan)  pNewWing->ScaleSpan(dlg.m_NewSpan);
-			if(dlg.m_bChord) pNewWing->ScaleChord(dlg.m_NewChord);
-			if(dlg.m_bSweep) pNewWing->SetSweep(dlg.m_NewSweep);
-			if(dlg.m_bTwist) pNewWing->SetTwist(dlg.m_NewTwist);
-			if(SetModWing(pNewWing))
+			if(m_pCurPlane)
 			{
-				m_pCurWing = AddWing(pNewWing);
-				m_pCurWPolar = NULL;
-				m_pCurPOpp = NULL;
-				m_pCurWOpp = NULL;
+				if(dlg.m_bSpan)  m_pCurWing->ScaleSpan(dlg.m_NewSpan);
+				if(dlg.m_bChord) m_pCurWing->ScaleChord(dlg.m_NewChord);
+				if(dlg.m_bSweep) m_pCurWing->SetSweep(dlg.m_NewSweep);
+				if(dlg.m_bTwist) m_pCurWing->SetTwist(dlg.m_NewTwist);
 			}
 			else
-				delete pNewWing;
-			pMainFrame->UpdateUFOs();
+			{
+				CWing* pNewWing= new CWing;
+				pNewWing->Duplicate(m_pCurWing);
+				if(dlg.m_bSpan)  pNewWing->ScaleSpan(dlg.m_NewSpan);
+				if(dlg.m_bChord) pNewWing->ScaleChord(dlg.m_NewChord);
+				if(dlg.m_bSweep) pNewWing->SetSweep(dlg.m_NewSweep);
+				if(dlg.m_bTwist) pNewWing->SetTwist(dlg.m_NewTwist);
+				if(SetModWing(pNewWing))
+				{
+					m_pCurWing = AddWing(pNewWing);
+					m_pCurWPolar = NULL;
+					m_pCurPOpp = NULL;
+					m_pCurWOpp = NULL;
+				}
+				else
+					delete pNewWing;
+				pMainFrame->UpdateUFOs();
+			}
 			SetUFO();
 		}
 		if(m_iView==1) CreateWOppCurves();
@@ -13170,6 +13180,7 @@ void QMiarex::OnScaleWing()
 		UpdateView();
 	}
 }
+
 
 void QMiarex::OnSequence()
 {
@@ -13689,6 +13700,7 @@ void QMiarex::OnWOpps()
 
 	if(m_iView==1)
 	{
+		CheckButtons();
 		UpdateView();
 		return;
 	}
@@ -13717,6 +13729,7 @@ void QMiarex::OnWPolars()
 
 	if(m_iView==2)
 	{
+		CheckButtons();
 		UpdateView();
 		return;
 	}
@@ -13727,7 +13740,7 @@ void QMiarex::OnWPolars()
 	m_pctrlMiddleControls->setCurrentIndex(0);
 	m_pctrBottomControls->setCurrentIndex(0);
 
-	SetWPlrLegendPos();//TODO remove
+	SetWPlrLegendPos();
 	CreateWPolarCurves();
 	SetCurveParams();
 	CheckButtons();
@@ -13890,7 +13903,7 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 
 			if(m_pCurPlane && m_pCurStab)
 			{
-				str1 = QString("Tail Volume =   %1").arg(m_pCurPlane->m_TailVolume,7,'f',3);
+				str1 = QString("Tail Volume =      %1").arg(m_pCurPlane->m_TailVolume,7,'f',3);
 				painter.drawText(LeftPos, ZPos+D, str1);
 				D+=dheight;
 			}

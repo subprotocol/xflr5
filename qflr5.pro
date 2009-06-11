@@ -51,7 +51,6 @@ SOURCES += MainFrame.cpp \
     Misc/FloatEdit.cpp \
     Misc/AboutQ5.cpp \
     Miarex/WPolarDlg.cpp \
-    Miarex/WingDlg.cpp \
     Miarex/WingDelegate.cpp \
     Miarex/VLMAnalysisDlg.cpp \
     Miarex/PlaneDlg.cpp \
@@ -145,7 +144,6 @@ HEADERS += MainFrame.h \
     Misc/FloatEdit.h \
     Misc/AboutQ5.h \
     Miarex/WPolarDlg.h \
-    Miarex/WingDlg.h \
     Miarex/WingDelegate.h \
     Miarex/VLMAnalysisDlg.h \
     Miarex/PlaneDlg.h \

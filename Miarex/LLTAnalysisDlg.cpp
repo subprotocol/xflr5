@@ -193,6 +193,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 void LLTAnalysisDlg::InitDialog()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
@@ -219,6 +220,8 @@ void LLTAnalysisDlg::InitDialog()
 	m_IterGraph.SetYMax(1.0);
 
 	m_IterGraph.SetMargin(40);
+
+	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
 }
 
 

@@ -591,20 +591,14 @@ void BatchDlg::InitDialog()
 
 	m_Iterations = 0;
 	ResetCurves();
-}
 
-/*
-
-	m_pXFoil->lblini = false;
-	m_pXFoil->lipan = false;
-
-	m_pXFoil->reinf1 = m_pCurPolar->m_Reynolds;
-	if (m_pCurPolar->m_Type == 4) m_pXFoil->alfa = m_pCurPolar->m_ASpec*pi/180.0;
-	m_pXFoil->lalfa = true;
-	m_pXFoil->qinf  = 1.0;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(pMainFrame) m_RmsGraph.CopySettings(&pMainFrame->m_RefGraph, false);
 
 }
-*/
+
+
+
 bool BatchDlg::InitXFoil2()
 {
 	XFoil *pXFoil = (XFoil*)m_pXFoil;

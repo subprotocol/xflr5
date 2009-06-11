@@ -37,7 +37,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 
 	connect(m_pctrlBackColor, SIGNAL(clicked()),this, SLOT(OnBackgroundColor()));
 	connect(m_pctrlGraphSettings, SIGNAL(clicked()),this, SLOT(OnGraphSettings()));
-	connect(m_pctrlTextColor, SIGNAL(clicked()),this, SLOT(OnTextColor()));
+	connect(m_pctrlTextClr, SIGNAL(clicked()),this, SLOT(OnTextColor()));
 	connect(m_pctrlTextFont, SIGNAL(clicked()),this, SLOT(OnTextFont()));
 
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
@@ -68,11 +68,11 @@ void DisplaySettingsDlg::SetupLayout()
 	m_pctrlBackColor      = new ColorButton;
 	m_pctrlGraphSettings  = new QPushButton;
 	m_pctrlTextFont       = new QPushButton;
-	m_pctrlTextColor      = new ColorButton;
+	m_pctrlTextClr        = new QPushButton("Text Color");
 	m_pctrlBackColor->setMinimumWidth(120);
 	m_pctrlGraphSettings->setMinimumWidth(120);
 	m_pctrlTextFont->setMinimumWidth(120);
-	m_pctrlTextColor->setMinimumWidth(120);
+	m_pctrlTextClr->setMinimumWidth(120);
 	QLabel *lab1 = new QLabel("View Background");
 	QLabel *lab2 = new QLabel("All Graph Settings");
 	QLabel *lab3 = new QLabel("Text Font");
@@ -84,7 +84,7 @@ void DisplaySettingsDlg::SetupLayout()
 	ColorButtons->addWidget(m_pctrlBackColor,2,1);
 	ColorButtons->addWidget(m_pctrlGraphSettings,2,2);
 	ColorButtons->addWidget(m_pctrlTextFont,4,1);
-	ColorButtons->addWidget(m_pctrlTextColor,4,2);
+	ColorButtons->addWidget(m_pctrlTextClr,4,2);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
@@ -112,10 +112,19 @@ void DisplaySettingsDlg::SetupLayout()
 void DisplaySettingsDlg::InitDialog()
 {
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
-	m_pctrlTextColor->SetColor(m_TextColor);
 	m_pctrlTextFont->setText(m_TextFont.family());
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
 
+	QPalette palette = m_pctrlTextClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Button, m_BackgroundColor);
+		palette.setColor(QPalette::ButtonText, m_TextColor);
+		m_pctrlTextClr->setPalette(palette);
+		m_pctrlTextClr->setAutoFillBackground(true);
+		m_pctrlTextClr->setFont(m_TextFont);
+	}
 }
 
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
@@ -134,6 +143,16 @@ void DisplaySettingsDlg::OnBackgroundColor()
 	rgba = QColorDialog::getRgba(rgba, &bOK);
 	m_BackgroundColor = QColor::fromRgba(rgba);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
+
+	QPalette palette = m_pctrlTextClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_BackgroundColor);
+		palette.setColor(QPalette::Button, m_BackgroundColor);
+		palette.setColor(QPalette::ButtonText, m_TextColor);
+		m_pctrlTextClr->setPalette(palette);
+	}
 }
 
 
@@ -164,7 +183,17 @@ void DisplaySettingsDlg::OnTextColor()
 	QRgb rgba = m_TextColor.rgba();
 	rgba = QColorDialog::getRgba(rgba, &bOK);
 	m_TextColor = QColor::fromRgba(rgba);
-	m_pctrlTextColor->SetColor(m_TextColor);
+
+	QPalette palette = m_pctrlTextClr->palette();
+	QColor listColor = palette.color(QPalette::Button);
+	if(listColor.isValid())
+	{
+		palette.setColor(QPalette::Background, m_BackgroundColor);
+		palette.setColor(QPalette::Button, m_BackgroundColor);
+		palette.setColor(QPalette::ButtonText, m_TextColor);
+		m_pctrlTextClr->setPalette(palette);
+		m_pctrlTextClr->setAutoFillBackground(true);
+	}
 }
 
 
@@ -186,6 +215,7 @@ void DisplaySettingsDlg::OnTextFont()
 		m_TextFont = font;
 		m_pctrlTextFont->setText(m_TextFont.family());
 		m_pctrlTextFont->setFont(m_TextFont);
+		m_pctrlTextClr->setFont(m_TextFont);
 	}
 }
 
