@@ -137,7 +137,7 @@ bool GL3dWingDlg::CheckWing()
 {
 	if(!m_pWing->m_WingName.length())
 	{
-		QMessageBox::warning(this, "QFLR5", "Please enter a name for the wing");
+		QMessageBox::warning(this, "Warning", "Please enter a name for the wing");
 		m_pctrlWingName->setFocus();
 		return false;
 	}
@@ -145,21 +145,21 @@ bool GL3dWingDlg::CheckWing()
 	{
 		if(m_pWing->m_TPos[k]*1.00001 < m_pWing->m_TPos[k-1])
 		{
-			QMessageBox::warning(this, "QFLR5", "Warning : Panel sequence is inconsistent");
+			QMessageBox::warning(this, "Warning", "Warning : Panel sequence is inconsistent");
 			return false;
 		}
 	}
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "QFLR5", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
 		return false;
 	}
 
 	if(m_pWing->m_nFlaps>=20)
 	{
 		QString strong = "Only 10 flaps x 2 will be handled";
-		if (QMessageBox::Ok != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Ok|QMessageBox::Cancel))
+		if (QMessageBox::Ok != QMessageBox::question(window(), "Question", strong, QMessageBox::Ok|QMessageBox::Cancel))
 		  return false;
 	}
 	return true;
@@ -556,8 +556,8 @@ void GL3dWingDlg::GLDrawFoils()
 
 		if(pFoil)
 		{
-			m_pWing->m_Surface[j].GetPanel(0, 0, 1);
-			m_pglWidget->renderText(m_pWing->m_Surface[j].TA.x, m_pWing->m_Surface[j].TA.y, m_pWing->m_Surface[j].TA.z,
+//			m_pWing->m_Surface[j].GetPanel(0, 0, 1);
+			m_pglWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
 									pFoil->m_FoilName);
 		}
 	}
@@ -565,8 +565,8 @@ void GL3dWingDlg::GLDrawFoils()
 	pFoil = m_pWing->m_Surface[j].m_pFoilB;
 	if(pFoil)
 	{
-		m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, 0, 1);
-		m_pglWidget->renderText(m_pWing->m_Surface[j].TA.x, m_pWing->m_Surface[j].TA.y, m_pWing->m_Surface[j].TA.z,
+//		m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, 0, 1);
+		m_pglWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
 								pFoil->m_FoilName);
 	}
 }
@@ -1966,7 +1966,7 @@ void GL3dWingDlg::OnInsertAfter()
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "QFLR5", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
 		return;
 	}
 	int k,n,ny,total;
@@ -2300,7 +2300,6 @@ void GL3dWingDlg::ReadSectionData(int sel)
 
 void GL3dWingDlg::reject()
 {
-qDebug() << "Rejecting";
 	if(m_bChanged)
 	{
 		QString strong = tr("Discard the changes ?");

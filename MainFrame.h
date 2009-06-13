@@ -70,6 +70,7 @@ class MainFrame : public QMainWindow
 	friend class WAdvancedDlg;
 	friend class GraphDlg;
 	friend class LLTAnalysisDlg;
+	friend class DisplaySettingsDlg;
 
 	Q_OBJECT
 
@@ -146,6 +147,7 @@ private:
 	void SaveSettings();
 	bool SaveProject(QString PathName="");
 	void SetCentralWidget();
+	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
 	void SetMenus();
 	void SetSaveState(bool bSave);
@@ -212,14 +214,14 @@ private:
 
 	//AFoilMenus
 	QMenu *AFoilViewMenu, *AFoilDesignMenu, *AFoilSplineMenu;
-	QMenu *AFoilCtxMenu;
+	QMenu *AFoilCtxMenu,*AFoilCurrentFoilMenu;
 
 	//  XFoilAnalysis Menus
 	QMenu * XDirectViewMenu;
-	QMenu *FoilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu;
+	QMenu *FoilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu, *CurOppCtxMenu;
 	QMenu *currentFoilMenu;
 	QMenu *DesignMenu;
-	QMenu *OpPointMenu, *CpGraphMenu;
+	QMenu *OpPointMenu, *CpGraphMenu, *currentOppMenu;
 	QMenu *PolarMenu, *currentPolarMenu, *GraphPolarMenu, *CurPolarGraphMenu;
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
 
@@ -228,7 +230,7 @@ private:
 
 	//Miarex Menus
 	QMenu * MiarexViewMenu;
-	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu;
+	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu, *CurBodyMenu;
 	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
 	QMenu *WPlrGraphMenu,*WPlrCurGraphMenu, *WOppGraphMenu, *WOppCurGraphMenu;
 	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu;
@@ -276,7 +278,7 @@ private:
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
 	QAction *showAllWPlrOpps, *hideAllWPlrOpps, * deleteAllWPlrOpps;
 	QAction *defineWPolar, *defineCtrlPolar, *advancedSettings;
-	QAction *defineBody, *importBody, *exportBody, *ManageBodies;
+	QAction *defineBody, *importBody, *exportBody, *ManageBodies, *EditCurBody;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
@@ -359,6 +361,7 @@ private:
 	QColor m_BorderClr;
 	QFont m_TextFont;
 
+	int m_SettingsFormat;
 	int m_ImageFormat;
 };
 

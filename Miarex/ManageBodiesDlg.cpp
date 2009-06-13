@@ -119,12 +119,12 @@ void ManageBodiesDlg::OnDelete()
 	if(bIsInUse)
 	{
 		strong = "The body " +  m_pBody->m_BodyName +" is in use by a plane.\n Delete Anyhow?\n";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 	else
 	{
 		strong = "Are you sure you want to delete the body :\n" +  m_pBody->m_BodyName +"?\n";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 
 	if(bIsInUse)

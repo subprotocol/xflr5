@@ -124,8 +124,13 @@ public:
 	int GetLogPixelsY();
 	int GetMargin();
 	int GetAxisStyle();
-	int GetBorderWidth();
 	int GetAxisWidth();
+	int GetBorderWidth();
+	int GetXVariable();
+	int GetYVariable();
+	void SetVariables(int const & X, int const & Y);
+	void SetXVariable(int const & X);
+	void SetYVariable(int const & Y);
 	double GetX0();
 	double GetXMin();
 	double GetXMax();
@@ -236,6 +241,7 @@ private:
 	int m_BorderStyle;
 	int m_BorderWidth;
 
+	int m_X, m_Y; //index of X and Y variables
 };
 
 #endif

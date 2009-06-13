@@ -1240,3 +1240,40 @@ int Graph::yToClient(double y)
 	return (int)(y/m_scaley + m_ptoffset.y());
 }
 
+
+int Graph::GetXVariable()
+{
+	return m_X;
+}
+
+
+
+int Graph::GetYVariable()
+{
+	return m_Y;
+}
+
+
+
+void Graph::SetVariables(int const & X, int const & Y)
+{
+	m_X = X;
+	m_Y = Y;
+}
+
+
+
+void Graph::SetXVariable(int const & X)
+{
+	m_X = X;
+}
+
+
+
+void Graph::SetYVariable(int const & Y)
+{
+	m_Y = Y;
+}
+
+
+

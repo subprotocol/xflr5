@@ -27,6 +27,7 @@
 
 XDirectStyleDlg::XDirectStyleDlg()
 {
+	setWindowTitle("XDirect Styles");
 	m_pXDirect = NULL;
 
 	SetupLayout();
@@ -169,7 +170,7 @@ void XDirectStyleDlg::OnRestoreDefaults()
 	m_pctrlPressure->SetStyle(m_iPressureStyle, m_iPressureWidth, m_crPressureColor);
 }
 
-/*
+
 void XDirectStyleDlg::keyPressEvent(QKeyEvent *event)
 {
 	// Prevent Return Key from closing App
@@ -190,6 +191,11 @@ void XDirectStyleDlg::keyPressEvent(QKeyEvent *event)
 			event->ignore();
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			break;
+		}
 	}
 }
-*/
+

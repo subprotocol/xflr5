@@ -99,11 +99,7 @@ CFoil::CFoil()
 
 CFoil::~CFoil()
 {
-/*	QMessageBox msgBox;
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setWindowTitle("QFLR5");
-        msgBox.setText("Foil : deleting object");
-	msgBox.exec();*/
+
 }
 
 
@@ -714,10 +710,9 @@ bool CFoil::InitFoil()
     {
         QMessageBox msgBox;
         msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
         msgBox.setText("Foil Error : no points");
         msgBox.exec();
-//         QMessageBox::warning(window(), tr("QFLR5"), tr("Foil Error : no points"), QMessageBox::Ok);
     }
 	while (k<nb)
 	{

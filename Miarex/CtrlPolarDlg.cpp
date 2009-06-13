@@ -384,7 +384,7 @@ void CtrlPolarDlg::OnOK()
 	if(!bActive)
 	{
 		strong = "No Active Control. Continue ?";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "QFLR5", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 
 	CWPolar * pWPolarNew;
@@ -394,7 +394,7 @@ void CtrlPolarDlg::OnOK()
 
 	if(!LineLength)
 	{
-		QMessageBox::warning(this, "QFLR5", "Must enter a name");
+		QMessageBox::warning(this, "Warning", "Must enter a name");
 		m_pctrlWPolarName->setFocus();
 		return;
 	}
@@ -406,7 +406,7 @@ void CtrlPolarDlg::OnOK()
 			pWPolarNew = (CWPolar*)m_poaXPolar->at(j);
 			if (pWPolarNew->m_PlrName == m_WPolarName && pWPolarNew->m_UFOName  == m_UFOName)
 			{
-				QMessageBox::warning(this,"QFLR5","The polar's name already exists");
+				QMessageBox::warning(this,"Warning","The polar's name already exists");
 				return;
 			}
 		}

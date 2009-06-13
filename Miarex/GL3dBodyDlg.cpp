@@ -617,7 +617,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	{
 		QString strong;
 		strong = QString("Resolution cannot exceed %1").arg(10000);
-		QMessageBox::warning(this, "QFLR5", strong);
+		QMessageBox::warning(this, "Warning", strong);
 		return;
 	}
 
@@ -3862,6 +3862,10 @@ void GL3dBodyDlg::OnScaleBody()
 	if(!m_pBody) return;
 
 	BodyScaleDlg dlg(this);
+	if(m_FrameRect.contains(m_ptPopUp))
+	{
+		dlg.m_bFrameOnly = true;
+	}
 	dlg.m_FrameID = m_pBody->m_iActiveFrame;
 	dlg.InitDialog();
 

@@ -784,7 +784,7 @@ int CBody::InsertPoint(CVector Real)
 	{
         QMessageBox msgBox;
         msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
         msgBox.setText("Please select a Frame before inserting a point");
         msgBox.exec();
 

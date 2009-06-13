@@ -181,7 +181,7 @@ void LEDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), "QFLR5", "Unrecognized foil format");
+		QMessageBox::information(window(), "Warning", "Unrecognized foil format");
 		return;
 	}
 
@@ -192,7 +192,7 @@ void LEDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(window(), "QFLR5", "Panel number cannot exceed 300");
+		QMessageBox::information(window(), "Warning", "Panel number cannot exceed 300");
 		//reset everything and retry
 		for (i=0; i< m_pMemFoil->nb; i++)
 		{

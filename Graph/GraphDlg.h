@@ -76,7 +76,7 @@ private:
 
 	void FillVariableList();
 
-
+	QTabWidget *m_pTabWidget;
 	QWidget *ScalePage, *FontPage, *GridPage;
 	QWidget *VariablePage;
 
@@ -105,7 +105,7 @@ private:
 
 public:
 	Graph *m_pGraph, *m_pMemGraph;
-	Graph *m_GraphArray[5];
+	Graph *m_GraphArray[15];
 	int m_NGraph;
 	int m_XSel, m_YSel;
 	int m_iGraphType;

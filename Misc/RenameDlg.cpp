@@ -148,7 +148,7 @@ void RenameDlg::OnOK()
 	m_strName = m_pctrlName->text();
 	if (!m_strName.length())
 	{
-		QMessageBox::warning(this, "QFLR5", "Must enter a name");
+		QMessageBox::warning(this, "Warning", "Must enter a name");
 		m_pctrlName->setFocus();
 		return;
 	}

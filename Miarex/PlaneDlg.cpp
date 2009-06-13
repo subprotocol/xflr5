@@ -90,7 +90,7 @@ void PlaneDlg::ComputePlane(void)
 {
 	if(m_pPlane->m_bStab)
 	{
-		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0;
+		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_LEWing.x -m_pPlane->m_Wing.m_TChord[0]/4.0;
 		double area = m_pPlane->m_Wing.m_ProjectedArea;
 		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_ProjectedArea;
 
@@ -504,7 +504,7 @@ void PlaneDlg::OnOK()
 	if(n>VLMMATSIZE)
 	{
 		strong = QString("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required").arg(n).arg(VLMMATSIZE);
-		QMessageBox::warning(this, "QFLR5",strong);
+		QMessageBox::warning(this, "Warning",strong);
 		return ;
 	}
 
@@ -539,7 +539,7 @@ void PlaneDlg::OnOK()
 	{
 		strong = QString("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required")
 			.arg(nSurfaces).arg(MAXPANELS);
-		QMessageBox::warning(this, "QFLR5", strong);
+		QMessageBox::warning(this, "Warning", strong);
 		return ;
 	}
 

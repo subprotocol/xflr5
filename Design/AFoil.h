@@ -140,6 +140,8 @@ private:
 	void SFNew();
 	void ReleaseZoom();
 
+	void CheckButtons();
+
 	void LoadSettings(QDataStream &ar);
 	void SaveSettings(QDataStream &ar);
 

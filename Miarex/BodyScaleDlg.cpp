@@ -61,12 +61,12 @@ void BodyScaleDlg::InitDialog()
 	if(!m_bFrameOnly)
 	{
 		m_pctrlBody->setChecked(true);
+		m_pctrlFrame->setChecked(false);
 	}
 	else
 	{
+		m_pctrlBody->setChecked(false);
 		m_pctrlFrame->setChecked(true);
-		m_pctrlBody->setEnabled(false);
-		m_pctrlFrame->setEnabled(false);
 		m_pctrlXScaleFactor->setEnabled(false);
 	}
 

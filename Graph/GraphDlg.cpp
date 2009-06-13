@@ -98,6 +98,162 @@ void GraphDlg::Connect()
 
 
 
+
+void GraphDlg::FillVariableList()
+{
+	if(m_iGraphType == 31)
+	{
+		m_pctrlXSel->addItem("X - Chord");
+		m_pctrlYSel->addItem("Q - Speed");
+	}
+	else if(m_iGraphType==51)
+	{
+		//foil oppoint graph variables
+		m_pctrlXSel->addItem("X - chord");
+		m_pctrlYSel->addItem("Cp");
+		m_pctrlYSel->addItem("Q - Speed");
+
+	}
+	else if(m_iGraphType==52)
+	{
+		//foil polar graph variables
+		m_pctrlXSel->addItem("Alpha");
+		m_pctrlXSel->addItem("Cl");
+		m_pctrlXSel->addItem("Cd");
+		m_pctrlXSel->addItem("Cd x 10000");
+		m_pctrlXSel->addItem("Cdp");
+		m_pctrlXSel->addItem("Cm");
+		m_pctrlXSel->addItem("Xtr1");
+		m_pctrlXSel->addItem("Xtr2");
+		m_pctrlXSel->addItem("HMom");
+		m_pctrlXSel->addItem("Cpmin");
+		m_pctrlXSel->addItem("Cl/Cd");
+		m_pctrlXSel->addItem("|Cl|^(3/2)/Cd");
+		m_pctrlXSel->addItem("1/Cl^1/2");
+		m_pctrlXSel->addItem("Re");
+		m_pctrlXSel->addItem("XCp");
+
+		m_pctrlYSel->addItem("Alpha");
+		m_pctrlYSel->addItem("Cl");
+		m_pctrlYSel->addItem("Cd");
+		m_pctrlYSel->addItem("Cd x 10000");
+		m_pctrlYSel->addItem("Cdp");
+		m_pctrlYSel->addItem("Cm");
+		m_pctrlYSel->addItem("Xtr1");
+		m_pctrlYSel->addItem("Xtr2");
+		m_pctrlYSel->addItem("HMom");
+		m_pctrlYSel->addItem("Cpmin");
+		m_pctrlYSel->addItem("Cl/Cd");
+		m_pctrlYSel->addItem("|Cl|^(3/2)/Cd");
+		m_pctrlYSel->addItem("1/Cl^1/2");
+		m_pctrlYSel->addItem("Re");
+		m_pctrlYSel->addItem("XCp");
+	}
+	else if(m_iGraphType==61)
+	{
+		//wing graph variable
+		m_pctrlXSel->addItem("Y - span");
+
+		m_pctrlYSel->addItem("Induced Angle");						//0
+		m_pctrlYSel->addItem("Total Angle");						//1
+		m_pctrlYSel->addItem("Local lift coef.");					//2
+		m_pctrlYSel->addItem("Local Lift C.Cl/M.A.C.");				//3
+		m_pctrlYSel->addItem("Airfoil viscous drag coef.");			//4
+		m_pctrlYSel->addItem("Induced drag coef.");					//5
+		m_pctrlYSel->addItem("Total drag coef.");					//6
+		m_pctrlYSel->addItem("Local Drag C.Cd/M.A.C.");				//7
+		m_pctrlYSel->addItem("Airfoil Pitching moment coef.");		//8
+		m_pctrlYSel->addItem("Geom. Pitching moment coef.");		//9
+		m_pctrlYSel->addItem("Total Pitching moment coef.");		//10
+		m_pctrlYSel->addItem("Reynolds");							//11
+		m_pctrlYSel->addItem("Top Transition x-pos%");				//12
+		m_pctrlYSel->addItem("Bottom Transition x-pos%");			//13
+		m_pctrlYSel->addItem("Centre of Pressure x-pos%");			//14
+		m_pctrlYSel->addItem("Bending moment");						//15
+	}
+	else if(m_iGraphType == 62)
+	{
+		//WingPolar Graph Variables
+		m_pctrlXSel->addItem("Alpha");						//0
+		m_pctrlXSel->addItem("Lift coef.");					//1
+		m_pctrlXSel->addItem("Viscous drag coef.");			//2
+		m_pctrlXSel->addItem("Induced drag coef.");			//3
+		m_pctrlXSel->addItem("Total drag coef.");			//4
+
+		m_pctrlXSel->addItem("Total pitching moment coef.");//5
+		m_pctrlXSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlXSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlXSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlXSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlXSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlXSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlXSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlXSel->addItem("Lift");						//13
+		m_pctrlXSel->addItem("Drag");						//14
+		m_pctrlXSel->addItem("Vx");							//15
+		m_pctrlXSel->addItem("Vz");							//16
+		m_pctrlXSel->addItem("VInf");						//17
+		m_pctrlXSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlXSel->addItem("Pitching Moment");			//19
+		m_pctrlXSel->addItem("Rolling Moment");				//20
+		m_pctrlXSel->addItem("Yawing Moment");				//21
+		m_pctrlXSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlXSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlXSel->addItem("Bending moment");				//24
+		m_pctrlXSel->addItem("m.g.Vz");						//25
+		m_pctrlXSel->addItem("Efficiency");					//26
+		m_pctrlXSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlXSel->addItem("Control Variable");			//28
+		m_pctrlXSel->addItem("Cy - Lateral force coef.");	//29
+
+		m_pctrlYSel->addItem("Alpha");						//0
+		m_pctrlYSel->addItem("Lift coef.");					//1
+		m_pctrlYSel->addItem("Viscous drag coef.");			//2
+		m_pctrlYSel->addItem("Induced drag coef.");			//3
+		m_pctrlYSel->addItem("Total drag coef.");			//4
+
+		m_pctrlYSel->addItem("Total pitching moment coef.");//5
+		m_pctrlYSel->addItem("Total rolling moment coef.");		//6
+		m_pctrlYSel->addItem("Total yawing moment coef.");  //7
+		m_pctrlYSel->addItem("Viscous yawing moment coef.");//8
+		m_pctrlYSel->addItem("Induced yawing moment coef.");//9
+
+		m_pctrlYSel->addItem("Glide ratio Cl/Cd");			//10
+		m_pctrlYSel->addItem("Power factor Cl^(3/2)/Cd");	//11
+		m_pctrlYSel->addItem("1/Rt(Cl)");					//12
+		m_pctrlYSel->addItem("Lift");						//13
+		m_pctrlYSel->addItem("Drag");						//14
+		m_pctrlYSel->addItem("Vx");							//15
+		m_pctrlYSel->addItem("Vz");							//16
+		m_pctrlYSel->addItem("VInf");						//17
+		m_pctrlYSel->addItem("Descent angle atan(Cd/Cl)");	//18
+		m_pctrlYSel->addItem("Pitching Moment");			//19
+		m_pctrlYSel->addItem("Rolling Moment");				//20
+		m_pctrlYSel->addItem("Yawing Moment");				//21
+		m_pctrlYSel->addItem("Centre of pressure X-Pos");	//22
+		m_pctrlYSel->addItem("Centre of pressure Y-Pos");	//23
+		m_pctrlYSel->addItem("Bending moment");				//24
+		m_pctrlYSel->addItem("m.g.Vz");						//25
+		m_pctrlYSel->addItem("Efficiency");					//26
+		m_pctrlYSel->addItem("(XCp-Xcg)/MAC");				//27
+		m_pctrlYSel->addItem("Control Variable");			//28
+		m_pctrlYSel->addItem("Cy - Lateral force coef.");	//29
+	}
+	else if(m_iGraphType == 64)
+	{
+		m_pctrlXSel->addItem("X - Chord");
+		m_pctrlYSel->addItem("Cp");
+	}
+
+	m_pctrlXSel->adjustSize();
+	m_pctrlYSel->adjustSize();
+}
+
+
+
+
+
 void GraphDlg::keyPressEvent(QKeyEvent *event)
 {
 	// Prevent Return Key from closing App
@@ -130,6 +286,7 @@ void GraphDlg::keyPressEvent(QKeyEvent *event)
 void GraphDlg::OnActivePage(int index)
 {
 	s_ActivePage = index;
+	ApplyButton->setEnabled(m_pTabWidget->currentIndex()!=0);
 }
 
 
@@ -153,8 +310,6 @@ void GraphDlg::OnApply()
 	{
 		m_GraphArray[i]->CopySettings(m_pGraph);
 	}
-
-
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->UpdateView();
@@ -345,6 +500,7 @@ void GraphDlg::OnOK()
 
 	m_XSel = m_pctrlXSel->currentRow();
 	m_YSel = m_pctrlYSel->currentRow();
+	m_pGraph->SetVariables(m_pctrlXSel->currentRow(), m_pctrlYSel->currentRow());
 
 	accept();
 }
@@ -645,11 +801,14 @@ void GraphDlg::SetParams()
 	m_pctrlYInverted->setChecked(m_pGraph->GetInverted());
 
 	FillVariableList();
-	m_pctrlXSel->setCurrentRow(m_XSel);
-	m_pctrlYSel->setCurrentRow(m_YSel);
+
+	m_pctrlXSel->setCurrentRow(m_pGraph->GetXVariable());
+	m_pctrlYSel->setCurrentRow(m_pGraph->GetYVariable());
 	m_bVariableChanged = false;
 
 	SetApplied(true);
+
+	ApplyButton->setEnabled(m_pTabWidget->currentIndex()!=0);
 }
 
 
@@ -678,9 +837,9 @@ void GraphDlg::SetupLayout()
 	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
 
-	QTabWidget *pTabWidget = new QTabWidget(this);
-//	pTabWidget->setMinimumWidth(300);
-//	pTabWidget->setMinimumHeight(300);
+	m_pTabWidget = new QTabWidget(this);
+//	m_pTabWidget->setMinimumWidth(300);
+//	m_pTabWidget->setMinimumHeight(300);
 
 	ScalePage    = new QWidget(this);
 	GridPage     = new QWidget(this);
@@ -873,169 +1032,20 @@ void GraphDlg::SetupLayout()
 	//________End Axis Page______________________
 
 
-	pTabWidget->addTab(VariablePage, "Variables");
-	pTabWidget->addTab(ScalePage, "Scales");
-	pTabWidget->addTab(GridPage, "Axis and Grids");
-	pTabWidget->addTab(FontPage, "Fonts and BackGround");
+	m_pTabWidget->addTab(VariablePage, "Variables");
+	m_pTabWidget->addTab(ScalePage, "Scales");
+	m_pTabWidget->addTab(GridPage, "Axis and Grids");
+	m_pTabWidget->addTab(FontPage, "Fonts and BackGround");
 
-	pTabWidget->setCurrentIndex(s_ActivePage);
-	connect(pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));
+	m_pTabWidget->setCurrentIndex(s_ActivePage);
+	connect(m_pTabWidget, SIGNAL(currentChanged (int)), this, SLOT(OnActivePage(int)));
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addWidget(pTabWidget);
+	mainLayout->addWidget(m_pTabWidget);
 	mainLayout->addLayout(CommandButtons);
 	setLayout(mainLayout);
 }
 
 
 
-void GraphDlg::FillVariableList()
-{
-	if(m_iGraphType == 31)
-	{
-		m_pctrlXSel->addItem("X - Chord");
-		m_pctrlYSel->addItem("Q - Speed");
-	}
-	else if(m_iGraphType==51)
-	{
-		//foil oppoint graph variables
-		m_pctrlXSel->addItem("X - chord");
-		m_pctrlYSel->addItem("Cp");
-		m_pctrlYSel->addItem("Q - Speed");
 
-	}
-	else if(m_iGraphType==52)
-	{
-		//foil polar graph variables
-		m_pctrlXSel->addItem("Alpha");
-		m_pctrlXSel->addItem("Cl");
-		m_pctrlXSel->addItem("Cd");
-		m_pctrlXSel->addItem("Cd x 10000");
-		m_pctrlXSel->addItem("Cdp");
-		m_pctrlXSel->addItem("Cm");
-		m_pctrlXSel->addItem("Xtr1");
-		m_pctrlXSel->addItem("Xtr2");
-		m_pctrlXSel->addItem("HMom");
-		m_pctrlXSel->addItem("Cpmin");
-		m_pctrlXSel->addItem("Cl/Cd");
-		m_pctrlXSel->addItem("|Cl|^(3/2)/Cd");
-		m_pctrlXSel->addItem("1/Cl^1/2");
-		m_pctrlXSel->addItem("Re");
-		m_pctrlXSel->addItem("XCp");
-
-		m_pctrlYSel->addItem("Alpha");
-		m_pctrlYSel->addItem("Cl");
-		m_pctrlYSel->addItem("Cd");
-		m_pctrlYSel->addItem("Cd x 10000");
-		m_pctrlYSel->addItem("Cdp");
-		m_pctrlYSel->addItem("Cm");
-		m_pctrlYSel->addItem("Xtr1");
-		m_pctrlYSel->addItem("Xtr2");
-		m_pctrlYSel->addItem("HMom");
-		m_pctrlYSel->addItem("Cpmin");
-		m_pctrlYSel->addItem("Cl/Cd");
-		m_pctrlYSel->addItem("|Cl|^(3/2)/Cd");
-		m_pctrlYSel->addItem("1/Cl^1/2");
-		m_pctrlYSel->addItem("Re");
-		m_pctrlYSel->addItem("XCp");
-	}
-	else if(m_iGraphType==61)
-	{
-		//wing graph variable
-		m_pctrlXSel->addItem("Y - span");
-
-		m_pctrlYSel->addItem("Induced Angle");						//0
-		m_pctrlYSel->addItem("Total Angle");						//1
-		m_pctrlYSel->addItem("Local lift coef.");					//2
-		m_pctrlYSel->addItem("Local Lift C.Cl/M.A.C.");				//3
-		m_pctrlYSel->addItem("Airfoil viscous drag coef.");			//4
-		m_pctrlYSel->addItem("Induced drag coef.");					//5
-		m_pctrlYSel->addItem("Total drag coef.");					//6
-		m_pctrlYSel->addItem("Local Drag C.Cd/M.A.C.");				//7
-		m_pctrlYSel->addItem("Airfoil Pitching moment coef.");		//8
-		m_pctrlYSel->addItem("Geom. Pitching moment coef.");		//9
-		m_pctrlYSel->addItem("Total Pitching moment coef.");		//10
-		m_pctrlYSel->addItem("Reynolds");							//11
-		m_pctrlYSel->addItem("Top Transition x-pos%");				//12
-		m_pctrlYSel->addItem("Bottom Transition x-pos%");			//13
-		m_pctrlYSel->addItem("Centre of Pressure x-pos%");			//14
-		m_pctrlYSel->addItem("Bending moment");						//15
-	}
-	else if(m_iGraphType == 62)
-	{
-		//WingPolar Graph Variables
-		m_pctrlXSel->addItem("Alpha");						//0
-		m_pctrlXSel->addItem("Lift coef.");					//1
-		m_pctrlXSel->addItem("Viscous drag coef.");			//2
-		m_pctrlXSel->addItem("Induced drag coef.");			//3
-		m_pctrlXSel->addItem("Total drag coef.");			//4
-
-		m_pctrlXSel->addItem("Total pitching moment coef.");//5
-		m_pctrlXSel->addItem("Total rolling moment coef.");		//6
-		m_pctrlXSel->addItem("Total yawing moment coef.");  //7
-		m_pctrlXSel->addItem("Viscous yawing moment coef.");//8
-		m_pctrlXSel->addItem("Induced yawing moment coef.");//9
-
-		m_pctrlXSel->addItem("Glide ratio Cl/Cd");			//10
-		m_pctrlXSel->addItem("Power factor Cl^(3/2)/Cd");	//11
-		m_pctrlXSel->addItem("1/Rt(Cl)");					//12
-		m_pctrlXSel->addItem("Lift");						//13
-		m_pctrlXSel->addItem("Drag");						//14
-		m_pctrlXSel->addItem("Vx");							//15
-		m_pctrlXSel->addItem("Vz");							//16
-		m_pctrlXSel->addItem("VInf");						//17
-		m_pctrlXSel->addItem("Descent angle atan(Cd/Cl)");	//18
-		m_pctrlXSel->addItem("Pitching Moment");			//19
-		m_pctrlXSel->addItem("Rolling Moment");				//20
-		m_pctrlXSel->addItem("Yawing Moment");				//21
-		m_pctrlXSel->addItem("Centre of pressure X-Pos");	//22
-		m_pctrlXSel->addItem("Centre of pressure Y-Pos");	//23
-		m_pctrlXSel->addItem("Bending moment");				//24
-		m_pctrlXSel->addItem("m.g.Vz");						//25
-		m_pctrlXSel->addItem("Efficiency");					//26
-		m_pctrlXSel->addItem("(XCp-Xcg)/MAC");				//27
-		m_pctrlXSel->addItem("Control Variable");			//28
-		m_pctrlXSel->addItem("Cy - Lateral force coef.");	//29
-
-		m_pctrlYSel->addItem("Alpha");						//0
-		m_pctrlYSel->addItem("Lift coef.");					//1
-		m_pctrlYSel->addItem("Viscous drag coef.");			//2
-		m_pctrlYSel->addItem("Induced drag coef.");			//3
-		m_pctrlYSel->addItem("Total drag coef.");			//4
-
-		m_pctrlYSel->addItem("Total pitching moment coef.");//5
-		m_pctrlYSel->addItem("Total rolling moment coef.");		//6
-		m_pctrlYSel->addItem("Total yawing moment coef.");  //7
-		m_pctrlYSel->addItem("Viscous yawing moment coef.");//8
-		m_pctrlYSel->addItem("Induced yawing moment coef.");//9
-
-		m_pctrlYSel->addItem("Glide ratio Cl/Cd");			//10
-		m_pctrlYSel->addItem("Power factor Cl^(3/2)/Cd");	//11
-		m_pctrlYSel->addItem("1/Rt(Cl)");					//12
-		m_pctrlYSel->addItem("Lift");						//13
-		m_pctrlYSel->addItem("Drag");						//14
-		m_pctrlYSel->addItem("Vx");							//15
-		m_pctrlYSel->addItem("Vz");							//16
-		m_pctrlYSel->addItem("VInf");						//17
-		m_pctrlYSel->addItem("Descent angle atan(Cd/Cl)");	//18
-		m_pctrlYSel->addItem("Pitching Moment");			//19
-		m_pctrlYSel->addItem("Rolling Moment");				//20
-		m_pctrlYSel->addItem("Yawing Moment");				//21
-		m_pctrlYSel->addItem("Centre of pressure X-Pos");	//22
-		m_pctrlYSel->addItem("Centre of pressure Y-Pos");	//23
-		m_pctrlYSel->addItem("Bending moment");				//24
-		m_pctrlYSel->addItem("m.g.Vz");						//25
-		m_pctrlYSel->addItem("Efficiency");					//26
-		m_pctrlYSel->addItem("(XCp-Xcg)/MAC");				//27
-		m_pctrlYSel->addItem("Control Variable");			//28
-		m_pctrlYSel->addItem("Cy - Lateral force coef.");	//29
-	}
-	else if(m_iGraphType == 64)
-	{
-		m_pctrlXSel->addItem("X - Chord");
-		m_pctrlYSel->addItem("Cp");
-	}
-
-	m_pctrlXSel->adjustSize();
-	m_pctrlYSel->adjustSize();
-}

@@ -129,7 +129,7 @@ void CAddDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), "QFLR5", "Unrecognized foil format");
+		QMessageBox::information(window(), "Warning", "Unrecognized foil format");
 		return;
 	}
 

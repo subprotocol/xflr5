@@ -46,6 +46,7 @@ class QXInverse : public QWidget
 	friend class TwoDWidget;
 	friend class InverseOptionsDlg;
 	friend class FoilSelectionDlg;
+	friend class DisplaySettingsDlg;
 
 public:
 	QXInverse(QWidget *parent = NULL);

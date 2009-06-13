@@ -128,7 +128,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, "QFLR5","The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, "Warning","The number of points to be calculated will be limited to 100");
 		nrhs = 100;
 	}
 
@@ -1666,7 +1666,7 @@ bool PanelAnalysisDlg::ReLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, "QFLR5","The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, "Warning","The number of points to be calculated will be limited to 100");
 //		if(res ==IDCANCEL) return false;
 		nrhs = 100;
 	}
@@ -2707,7 +2707,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-				QMessageBox::warning(this, "QFLR5","The number of points to be calculated will be limited to 100");
+				QMessageBox::warning(this, "Warning","The number of points to be calculated will be limited to 100");
 				nrhs = 100;
 		}
 

@@ -56,6 +56,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
 
+	m_SettingsFormat = 100545;
+
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
 	m_AreaUnit    = 1;
@@ -328,7 +330,6 @@ void MainFrame::closeEvent (QCloseEvent * event)
 		{
 			if(!SaveProject(m_FileName))
 			{
-				QMessageBox::information(this, tr("QFLR5"), tr("Could not save the project"));
 				event->ignore();
 				return;
 			}
@@ -660,16 +661,17 @@ void MainFrame::CreateAFoilMenus()
 
 	//AFoil Context Menu
 	AFoilCtxMenu = new QMenu("Context Menu",this);
-	AFoilCtxMenu->addAction(AFoilRename);
-	AFoilCtxMenu->addAction(AFoilDelete);
-	AFoilCtxMenu->addAction(AFoilExport);
+	AFoilCurrentFoilMenu = AFoilCtxMenu->addMenu(tr("Current Foil"));
+	AFoilCurrentFoilMenu->addAction(AFoilRename);
+	AFoilCurrentFoilMenu->addAction(AFoilDelete);
+	AFoilCurrentFoilMenu->addAction(AFoilExport);
+	AFoilCurrentFoilMenu->addAction(ShowCurrentFoil);
+	AFoilCurrentFoilMenu->addAction(HideCurrentFoil);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilDesignMenu);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilSplineMenu);
 	AFoilCtxMenu->addSeparator();
-	AFoilCtxMenu->addAction(ShowCurrentFoil);
-	AFoilCtxMenu->addAction(HideCurrentFoil);
 	AFoilCtxMenu->addAction(ShowAllFoils);
 	AFoilCtxMenu->addAction(HideAllFoils);
 	AFoilCtxMenu->addSeparator();
@@ -962,6 +964,9 @@ void MainFrame::CreateMiarexActions()
 	defineBody->setShortcut(tr("F10"));
 	connect(defineBody, SIGNAL(triggered()), pMiarex, SLOT(OnNewBody()));
 
+	EditCurBody = new QAction(tr("Edit Current"), this);
+	connect(EditCurBody, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
+
 	exportBody = new QAction(tr("Export Body"), this);
 	exportBody->setStatusTip(tr("Export a body definition from a text file"));
 	connect(exportBody, SIGNAL(triggered()), pMiarex, SLOT(OnExportBody()));
@@ -973,6 +978,7 @@ void MainFrame::CreateMiarexActions()
 	ManageBodies = new QAction(tr("Manage Bodies"), this);
 	ManageBodies->setStatusTip(tr("Manage the body list : Rename, Duplicate, Delete"));
 	connect(ManageBodies, SIGNAL(triggered()), pMiarex, SLOT(OnManageBodies()));
+
 
 	exporttoAVL = new QAction(tr("Export to AVL..."), this);
 	connect(exporttoAVL, SIGNAL(triggered()), pMiarex, SLOT(OnExporttoAVL()));
@@ -1189,6 +1195,7 @@ void MainFrame::CreateMiarexMenus()
 
 	MiarexBodyMenu = menuBar()->addMenu("Body");
 	MiarexBodyMenu->addAction(defineBody);
+	MiarexBodyMenu->addAction(EditCurBody);
 	MiarexBodyMenu->addAction(importBody);
 	MiarexBodyMenu->addAction(exportBody);
 	MiarexBodyMenu->addSeparator();
@@ -1266,6 +1273,10 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu = new QMenu("Context Menu",this);
 	WOppCtxMenu->addMenu(currentUFOMenu);
 	WOppCtxMenu->addSeparator();
+	CurBodyMenu = WOppCtxMenu->addMenu("Current Body");
+	CurBodyMenu->addAction(EditCurBody);
+	CurBodyMenu->addAction(exportBody);
+	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addMenu(CurWPlrMenu);
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addMenu(CurWOppMenu);
@@ -1296,6 +1307,8 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu = new QMenu("Context Menu",this);
 	WPlrCtxMenu->addMenu(currentUFOMenu);
 	WPlrCtxMenu->addSeparator();
+	WPlrCtxMenu->addMenu(CurBodyMenu);
+	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addMenu(CurWPlrMenu);
 	WPlrCtxMenu->addSeparator();
 	WPlrCtxMenu->addAction(allWPolarGraphsSettings);
@@ -1316,6 +1329,8 @@ void MainFrame::CreateMiarexMenus()
 	//W3D View Context Menu
 	W3DCtxMenu = new QMenu("Context Menu",this);
 	W3DCtxMenu->addMenu(currentUFOMenu);
+	W3DCtxMenu->addSeparator();
+	W3DCtxMenu->addMenu(CurBodyMenu);
 	W3DCtxMenu->addSeparator();
 	W3DCtxMenu->addMenu(CurWPlrMenu);
 	W3DCtxMenu->addSeparator();
@@ -1598,11 +1613,10 @@ void MainFrame::CreateXDirectActions()
 	hideAllOpPoints = new QAction(tr("Hide All Opps"), this);
 	connect(hideAllOpPoints, SIGNAL(triggered()), pXDirect, SLOT(OnHideAllOpps()));
 
-	exportCurOpp = new QAction(tr("Export Current Opp"), this);
+	exportCurOpp = new QAction(tr("Export"), this);
 	connect(exportCurOpp, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurOpp()));
 
-
-	deleteCurOpp = new QAction(tr("Delete Current Opp"), this);
+	deleteCurOpp = new QAction(tr("Delete"), this);
 	connect(deleteCurOpp, SIGNAL(triggered()), pXDirect, SLOT(OnDelCurOpp()));
 
 	resetXFoil = new QAction(tr("Reset XFoil"), this);
@@ -1789,6 +1803,9 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addSeparator();
 
 	OpPointMenu = menuBar()->addMenu(tr("Operating Points"));
+	currentOppMenu = OpPointMenu->addMenu(tr("Current OpPoint"));
+	currentOppMenu->addAction(exportCurOpp);
+	currentOppMenu->addAction(deleteCurOpp);
 	CpGraphMenu = OpPointMenu->addMenu("Graph");
 	CpGraphMenu->addAction(setCpVarGraph);
 	CpGraphMenu->addAction(setQVarGraph);
@@ -1813,12 +1830,9 @@ void MainFrame::CreateXDirectMenus()
 	CpGraphMenu->addAction(defineCpGraphSettings);
 	CpGraphMenu->addAction(exportCurGraphAct);
 	OpPointMenu->addSeparator();
+	OpPointMenu->addAction(showCurOppOnly);
 	OpPointMenu->addAction(hideAllOpPoints);
 	OpPointMenu->addAction(showAllOpPoints);
-	OpPointMenu->addSeparator();
-	OpPointMenu->addAction(showCurOppOnly);
-	OpPointMenu->addAction(exportCurOpp);
-	OpPointMenu->addAction(deleteCurOpp);
 	OpPointMenu->addSeparator();
 	OpPointMenu->addAction(resetXFoil);
 	OpPointMenu->addAction(viewXFoilAdvanced);
@@ -1868,7 +1882,12 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu->addAction(showPolarOpps);
 	CurPolarCtxMenu->addAction(hidePolarOpps);
 	CurPolarCtxMenu->addAction(deletePolarOpps);
+
 	OperFoilCtxMenu->addSeparator();//_______________
+	CurOppCtxMenu = OperFoilCtxMenu->addMenu("Current OpPoint");
+	CurOppCtxMenu->addAction(exportCurOpp);
+	CurOppCtxMenu->addAction(deleteCurOpp);
+
 	OperFoilCtxMenu->addSeparator();//_______________
 //	CurGraphCtxMenu = OperFoilCtxMenu->addMenu("Cp graph");
 	OperFoilCtxMenu->addMenu(CpGraphMenu);
@@ -1881,7 +1900,6 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addAction(hideAllPolars);
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(showCurOppOnly);
-	OperFoilCtxMenu->addAction(deleteCurOpp);
 	OperFoilCtxMenu->addAction(showAllOpPoints);
 	OperFoilCtxMenu->addAction(hideAllOpPoints);
 	OperFoilCtxMenu->addSeparator();//_______________
@@ -2066,7 +2084,7 @@ void MainFrame::OnDeleteCurPolar()
 	str = "Are you sure you want to delete the polar :\n  "+pXDirect->m_pCurPolar->m_PlrName;
 	str += "\n and all the associated OpPoints ?";
 
-	if (QMessageBox::Yes == QMessageBox::question(window(), "QFLR5", str,
+	if (QMessageBox::Yes == QMessageBox::question(window(), "Question", str,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 	{
 		// start by removing all OpPoints
@@ -2116,7 +2134,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 		strong = "Are you sure you want to delete \n" + pFoil->m_FoilName ;
 		strong+= "\nand all associated OpPoints and Polars ?";
 
-		int resp=QMessageBox::question(0,"QFLR5", strong,  QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
+		int resp=QMessageBox::question(this,"Question", strong,  QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
 		if(resp==QMessageBox::Yes)			bDelete = true;
 		else return false;
     }
@@ -2156,6 +2174,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 		pXDirect->m_pCurOpp = NULL;
 		pXDirect->m_pCurPolar = NULL;
 		pXDirect->m_pCurFoil = NULL;
+		pXDirect->CheckButtons();
 		SetSaveState(false);
     }
     return true;
@@ -2321,6 +2340,7 @@ void MainFrame::DeleteProject()
 		pMiarex->CreateWPolarCurves();
 		pMiarex->CreateWOppCurves();
 		pMiarex->CreateCpCurves();
+		pMiarex->CheckButtons();
 //		pMiarex->SetBody();
 	}
 	else if (m_iApp==XFOILANALYSIS)
@@ -2811,7 +2831,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k !=100537)
+	if(k != m_SettingsFormat)
 	{
 		pXFile->close();
 		return;
@@ -2821,6 +2841,7 @@ void MainFrame::LoadSettings()
 	QSize sz(c,d);
 
 	ar >> m_bMaximized;
+	ar >> m_StyleName;
 
 	ar >> bFloat >> pt.rx()>> pt.ry();
 	m_pctrlMiarexWidget->setFloating(bFloat);
@@ -2840,7 +2861,6 @@ void MainFrame::LoadSettings()
 	if(bFloat) m_pctrlXInverseWidget->move(pt);
 
 
-	ar >> m_StyleName;
 
 	ar >> m_LastDirName;
 	ar >> m_LengthUnit >> m_AreaUnit >> m_WeightUnit >> m_SpeedUnit >> m_ForceUnit >> m_MomentUnit;
@@ -2884,7 +2904,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	if (!XFile.open(QIODevice::ReadOnly))
 	{
 		QString strange = "Could not read the file\n"+PathName;
-		QMessageBox::information(window(), "QFLR5", strange);
+		QMessageBox::information(window(), "Info", strange);
 		return 0;
 	}
 
@@ -2908,6 +2928,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 		AddRecentFile(PathName);
 		SetSaveState(false);
+		pXDirect->CheckButtons();
 		return XFOILANALYSIS;
 	}
 	else
@@ -2932,6 +2953,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				XFile.close();
 				SetSaveState(false);
 				AddRecentFile(PathName);
+				pXDirect->CheckButtons();
 				return XFOILANALYSIS;
 			}
 		}
@@ -2978,6 +3000,9 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 				XFile.close();
 				QApplication::restoreOverrideCursor();
+
+				pXDirect->CheckButtons();
+
 				if(m_oaPlane.size() || m_oaWing.size()) return MIAREX;
 				else                                    return XFOILANALYSIS;
 			}
@@ -3194,6 +3219,7 @@ void MainFrame::OnLoadFile()
 		pMiarex->m_bArcball = false;
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
+		pMiarex->CheckButtons();
 		UpdateView();
 	}
 	else if(m_iApp==DIRECTDESIGN)
@@ -3242,6 +3268,7 @@ void MainFrame::OnMiarex()
 	UpdateUFOs();
 	SetMenus();
 	SetCentralWidget();
+	pMiarex->CheckButtons();
 	UpdateView();
 }
 
@@ -3610,7 +3637,7 @@ void MainFrame::OnSaveUFOAsProject()
 	else if(pMiarex->m_pCurWing) strong = pMiarex->m_pCurWing->m_WingName;
 	else
 	{
-		QMessageBox::warning(this, "QFLR5", "Nothing to save");
+		QMessageBox::warning(this, "Warning", "Nothing to save");
 		return ;
 	}
 
@@ -3633,7 +3660,7 @@ void MainFrame::OnSaveUFOAsProject()
 
 	if (!fp.open(QIODevice::WriteOnly))
 	{
-		QMessageBox::information(window(), tr("QFLR5"), tr("Could not open the file for writing"));
+		QMessageBox::warning(window(), tr("Warning"), tr("Could not open the file for writing"));
 		return;
 	}
 
@@ -3755,6 +3782,7 @@ void MainFrame::OnSelChangeUFO(int i)
 	pMiarex->SetWPlr(false);
 	pMiarex->m_bIs2DScaleSet = false;
 	pMiarex->Set2DScale();
+	pMiarex->CheckButtons();
 	pMiarex->UpdateView();
 }
 
@@ -3770,8 +3798,8 @@ void MainFrame::OnSelChangeWPolar(int i)
 	m_iApp = MIAREX;
 	pMiarex->SetWPlr(false, strong);
 	pMiarex->SetWOpp(true);
+	pMiarex->CheckButtons();
 	pMiarex->UpdateView();
-
 }
 
 
@@ -3832,6 +3860,7 @@ void MainFrame::OnSelChangeFoil(int i)
 	pXDirect->SetPolar();
 	m_iApp = XFOILANALYSIS;
 	UpdatePolars();
+	pXDirect->CheckButtons();
 	UpdateView();
 }
 
@@ -3849,6 +3878,7 @@ void MainFrame::OnSelChangePolar(int i)
     m_iApp = XFOILANALYSIS;
 	pXDirect->SetPolar(strong);
 	UpdateOpps();
+	pXDirect->CheckButtons();
 	UpdateView();
 }
 
@@ -3875,7 +3905,7 @@ void MainFrame::OnSelChangeOpp(int i)
     }
     else
     {
-	    QMessageBox::information(window(), tr("QFLR5"), tr("Unknown Operating point"));
+		QMessageBox::warning(window(), tr("Warning"), tr("Unknown Operating point"));
 		pXDirect->m_pCurOpp = NULL;
 		pXDirect->SetOpp();
     }
@@ -3888,12 +3918,10 @@ void MainFrame::OnStyle()
 {
 	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
-	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-//	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
+//	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
 	DisplaySettingsDlg dlg(this);
 	dlg.m_BackgroundColor = m_BackgroundColor;
-//	dlg.m_GraphBackColor  = m_GraphBackColor;
 	dlg.m_TextColor       = m_TextColor;
 	dlg.m_TextFont        = m_TextFont;
 	dlg.m_pRefGraph       = &m_RefGraph;
@@ -3904,54 +3932,18 @@ void MainFrame::OnStyle()
 	if(dlg.exec() ==QDialog::Accepted)
 	{
 		m_BackgroundColor = dlg.m_BackgroundColor;
-//		m_GraphBackColor  = dlg.m_GraphBackColor;
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
 		m_StyleName       = dlg.m_StyleName;
-
-/*		pXDirect->m_pPolarGraph->SetBkColor(m_GraphBackColor);
-		pXDirect->m_pCpGraph->SetBkColor(m_GraphBackColor);
-		pXDirect->m_pCmGraph->SetBkColor(m_GraphBackColor);
-		pXDirect->m_pCzGraph->SetBkColor(m_GraphBackColor);
-		pXDirect->m_pTrGraph->SetBkColor(m_GraphBackColor);
-		pXDirect->m_pUserGraph->SetBkColor(m_GraphBackColor);
-
-		pXInverse->m_QGraph.SetBkColor(m_GraphBackColor);
-
-		pMiarex->m_WingGraph1.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WingGraph2.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WingGraph3.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WingGraph4.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WPlrGraph1.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WPlrGraph2.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WPlrGraph3.SetBkColor(m_GraphBackColor);
-		pMiarex->m_WPlrGraph4.SetBkColor(m_GraphBackColor);
-		pMiarex->m_CpGraph.SetBkColor(m_GraphBackColor);*/
 
 		pMiarex->m_bResetglLegend = true;
 
 		if(dlg.m_bIsGraphModified)
 		{
-			pXDirect->m_pPolarGraph->CopySettings(&m_RefGraph, false);
-			pXDirect->m_pCpGraph->CopySettings(&m_RefGraph, false);
-			pXDirect->m_pCmGraph->CopySettings(&m_RefGraph, false);
-			pXDirect->m_pCzGraph->CopySettings(&m_RefGraph, false);
-			pXDirect->m_pTrGraph->CopySettings(&m_RefGraph, false);
-			pXDirect->m_pUserGraph->CopySettings(&m_RefGraph, false);
-
-			pXInverse->m_QGraph.CopySettings(&m_RefGraph, false);
-
-			pMiarex->m_WingGraph1.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WingGraph2.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WingGraph3.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WingGraph4.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WPlrGraph1.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WPlrGraph2.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WPlrGraph3.CopySettings(&m_RefGraph, false);
-			pMiarex->m_WPlrGraph4.CopySettings(&m_RefGraph, false);
-			pMiarex->m_CpGraph.CopySettings(&m_RefGraph, false);
+			SetGraphSettings(&m_RefGraph);
 		}
 	}
+	pXDirect->m_pCpGraph->SetInverted(true);
 	UpdateView();
 }
 
@@ -4249,7 +4241,7 @@ CFoil * MainFrame::ReadPolarFile(QDataStream &ar)
 	if(n<100000)
 	{
 		//old format
-		QMessageBox::information(window(), "QFLR5", "Obsolete format, cannot read");
+		QMessageBox::warning(window(), "Warning", "Obsolete format, cannot read");
 		return NULL;
 	}
 	else if (n >=100000)
@@ -4369,7 +4361,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 	if (!fp.open(QIODevice::WriteOnly))
 	{
-		QMessageBox::information(window(), tr("QFLR5"), tr("Could not open the file for writing"));
+		QMessageBox::warning(window(), tr("Warning"), tr("Could not open the file for writing"));
 		return false;
 	}
 
@@ -4397,18 +4389,19 @@ void MainFrame::SaveSettings()
 
 	if (!pXFile->open(QIODevice::WriteOnly))
 	{
-		QMessageBox::information(window(), tr("QFLR5"), tr("could not write saved settings"));
+		QMessageBox::warning(window(), tr("Warning"), tr("could not write saved settings"));
 		return;
 	}
 
 	QDataStream ar(pXFile);
 
-	ar << 100537;
+	ar << m_SettingsFormat;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
 	ar << frameGeometry().height();
 	ar << isMaximized();
+	ar << m_StyleName;
 
 	ar <<  m_pctrlMiarexWidget->isFloating() << m_pctrlMiarexWidget->frameGeometry().x() << m_pctrlMiarexWidget->frameGeometry().y();
 	ar <<  m_pctrlXDirectWidget->isFloating() << m_pctrlXDirectWidget->frameGeometry().x() << m_pctrlXDirectWidget->frameGeometry().y();
@@ -4416,7 +4409,6 @@ void MainFrame::SaveSettings()
 	ar <<  m_pctrlAFoilWidget->frameGeometry().width() <<  m_pctrlAFoilWidget->frameGeometry().height();
 	ar <<  m_pctrlXInverseWidget->isFloating() << m_pctrlXInverseWidget->frameGeometry().x() << m_pctrlXInverseWidget->frameGeometry().y();
 
-	ar << m_StyleName;
 
 	ar << m_LastDirName;
 
@@ -4532,7 +4524,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	if(!pMiarex->m_pCurWing)
 	{
-		QMessageBox::warning(this, "QFLR5", "Nothing to save");
+		QMessageBox::warning(this, "Warning", "Nothing to save");
 		return false;
 	}
 	QString UFOName;
@@ -5440,6 +5432,39 @@ void MainFrame::SetSaveState(bool bSave)
 	}
 	m_pctrlProjectName->setText(m_ProjectName);
 }
+
+
+
+
+
+
+void MainFrame::SetGraphSettings(Graph *pGraph)
+{
+	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
+	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+
+
+	pXDirect->m_pPolarGraph->CopySettings(pGraph, false);
+	pXDirect->m_pCpGraph->CopySettings(pGraph, false);
+	pXDirect->m_pCmGraph->CopySettings(pGraph, false);
+	pXDirect->m_pCzGraph->CopySettings(pGraph, false);
+	pXDirect->m_pTrGraph->CopySettings(pGraph, false);
+	pXDirect->m_pUserGraph->CopySettings(pGraph, false);
+
+	pXInverse->m_QGraph.CopySettings(pGraph, false);
+
+	pMiarex->m_WingGraph1.CopySettings(pGraph, false);
+	pMiarex->m_WingGraph2.CopySettings(pGraph, false);
+	pMiarex->m_WingGraph3.CopySettings(pGraph, false);
+	pMiarex->m_WingGraph4.CopySettings(pGraph, false);
+	pMiarex->m_WPlrGraph1.CopySettings(pGraph, false);
+	pMiarex->m_WPlrGraph2.CopySettings(pGraph, false);
+	pMiarex->m_WPlrGraph3.CopySettings(pGraph, false);
+	pMiarex->m_WPlrGraph4.CopySettings(pGraph, false);
+	pMiarex->m_CpGraph.CopySettings(pGraph, false);
+}
+
 
 
 QString MainFrame::ShortenFileName(QString &PathName)

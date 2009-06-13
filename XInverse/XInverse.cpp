@@ -448,7 +448,7 @@ bool QXInverse::InitXFoil(CFoil * pFoil)
 	}
 	else
 	{
-		QMessageBox::warning(pMainFrame,"QFLR5","Unrecognized foil format");
+		QMessageBox::warning(pMainFrame,"Warning","Unrecognized foil format");
 		return false;
 	}
 }

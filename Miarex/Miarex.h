@@ -76,6 +76,7 @@ class QMiarex : public QWidget
 	friend class ManageBodiesDlg;
 	friend class EditPlrDlg;
 	friend class GL3dWingDlg;
+	friend class DisplaySettingsDlg;
 
 	Q_OBJECT
 
@@ -268,7 +269,7 @@ private:
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void CreateCpCurves();
 	void UpdateUnits();
-	void SetWGraphTitles(Graph* pGraph, int iX, int iY);
+	void SetWGraphTitles(Graph* pGraph);
 	void SetWingLegendPos();
 	void SetupLayout();
 	void SetControls();
@@ -277,7 +278,7 @@ private:
 	void CreateWOppCurves();
 	void SetWGraphScale();
 	void FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar);
-	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve, int Var);
+	void FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve);
 	void *GetUFOPlrVariable(CWPolar *pWPolar, int iVar);
 	void JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr);
 	void SetScale();
@@ -521,7 +522,6 @@ protected:
 	int m_iWingView;			// defines how many graphs will be displayed in WOpp view
 	int m_iWPlrView;			// defines how many graphs will be displayed in WPolar view
 	int m_XW1, m_YW1, m_XW2, m_YW2, m_XW3, m_YW3, m_XW4, m_YW4; 	// the WPolar graph variables
-	int m_WOppVar1,m_WOppVar2, m_WOppVar3, m_WOppVar4; 		// the WOpp graph variables
 	int m_Iter ;				// the number of iterations for LLT
 	int m_NStation ;			// the number of stations for LLT
 	int m_posAnimate;			// the current animation aoa index

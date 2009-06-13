@@ -768,6 +768,8 @@ bool QGraph::Serialize(QDataStream &ar, bool bIsStoring)
 		ar << m_BkColor.red() << m_BkColor.green() << m_BkColor.blue();
 
 		ar << m_bYInverted;
+
+		ar << m_X << m_Y;
 	}
 	else
 	{
@@ -831,6 +833,8 @@ bool QGraph::Serialize(QDataStream &ar, bool bIsStoring)
 		SetBkColor(QColor(r,g,b));
 
 		ar >> m_bYInverted ;
+
+		ar >> m_X >> m_Y;
 	}
 	return true;
 }

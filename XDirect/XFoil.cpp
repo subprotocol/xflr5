@@ -109,7 +109,7 @@ bool XFoil::abcopy()
 		QString str("abcopy: buffer airfoil not available");
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText(str);
 		msgBox.exec();
 		return false;
@@ -123,7 +123,7 @@ bool XFoil::abcopy()
 		str1+=str2;
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText(str1);
 		msgBox.exec();
 
@@ -1894,7 +1894,7 @@ bool XFoil::cpcalc(int n, double q[], double qinf, double minf, double cp[])
 		QString str(" CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText(str);
 		msgBox.exec();
 		WriteString(str, true);
@@ -2988,7 +2988,7 @@ void XFoil::hipnt(double chpnt, double thpnt)
 		strong = QString("Current chordline angle: %1\nproceeding anyway...").arg(arot,5,'f',2);
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText(str+strong);
 		msgBox.exec();
 	}
@@ -4941,7 +4941,7 @@ void XFoil::pangen(){
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("PanGen: buffer airfoil not available.");
 		msgBox.exec();
 		n = 0;
@@ -10480,7 +10480,7 @@ bool XFoil::eiwset(int nc1){
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("eiwset: Array overflow. Increase ICX.");
 		msgBox.exec();
 		return false;
@@ -10896,7 +10896,7 @@ void XFoil::zlefind(complex<double>*zle,complex<double>zc[],double wc[],
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("zlefind: le location failed.");
 		msgBox.exec();
 		wcle = wc[icle];
@@ -11064,7 +11064,7 @@ void XFoil::qccalc(int ispec,double *alfa, double *cl, double *cm,
 
 	QMessageBox msgBox;
 	msgBox.setStandardButtons(QMessageBox::Ok);
-	msgBox.setWindowTitle("QFLR5");
+	msgBox.setWindowTitle("Warning");
 	msgBox.setText(str);
 	msgBox.exec();
 }
@@ -11309,7 +11309,7 @@ void XFoil::cncalc(double qc[], bool lsymm)
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("CNCALC: array overflow.");
 		msgBox.exec();		return;
 	}
@@ -11750,7 +11750,7 @@ void XFoil::pert_process(int kqsp)
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("TE gap,chord did not converge");
 		msgBox.exec();
 		return;
@@ -12220,7 +12220,7 @@ bool XFoil::ExecQDES()
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText("Target segment cannot include \nstagnation point in mixed-inverse");
 		msgBox.exec();
 
@@ -12929,7 +12929,7 @@ bool XFoil::naca5(int ides, int nside)
 		ides = 0;
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("QFLR5");
+		msgBox.setWindowTitle("Warning");
 		msgBox.setText(str);
 		msgBox.exec();
 

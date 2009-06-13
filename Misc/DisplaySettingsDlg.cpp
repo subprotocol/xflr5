@@ -23,6 +23,9 @@
 #include <QtGui>
 #include "DisplaySettingsDlg.h"
 #include "../MainFrame.h"
+#include "../Miarex/Miarex.h"
+#include "../XDirect/XDirect.h"
+#include "../XInverse/XInverse.h"
 #include "../Graph/GraphDlg.h"
 
 
@@ -61,30 +64,33 @@ void DisplaySettingsDlg::SetupLayout()
 		defaultStyle = regExp.cap(1);
 
 	m_pctrlStyles->addItems(QStyleFactory::keys());
-
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(defaultStyle));
 
-	QGridLayout *ColorButtons = new QGridLayout;
-	m_pctrlBackColor      = new ColorButton;
-	m_pctrlGraphSettings  = new QPushButton;
-	m_pctrlTextFont       = new QPushButton;
-	m_pctrlTextClr        = new QPushButton("Text Color");
-	m_pctrlBackColor->setMinimumWidth(120);
+
+	m_pctrlGraphSettings  = new QPushButton(tr("All Graph Settings"));
 	m_pctrlGraphSettings->setMinimumWidth(120);
+	QHBoxLayout *GraphLayout = new QHBoxLayout;
+	GraphLayout->addWidget(m_pctrlGraphSettings);
+	QGroupBox *GraphBox = new QGroupBox(tr("Graph Settings"));
+	GraphBox->setLayout(GraphLayout);
+
+
+	QHBoxLayout *BackLayout = new QHBoxLayout;
+	m_pctrlBackColor      = new ColorButton;
+	m_pctrlBackColor->setMinimumWidth(120);
+	BackLayout->addWidget(m_pctrlBackColor);
+	QGroupBox *BackBox = new QGroupBox(tr("Background Color"));
+	BackBox->setLayout(BackLayout);
+
+	QHBoxLayout *FontLayout = new QHBoxLayout;
+	m_pctrlTextFont       = new QPushButton;
+	m_pctrlTextClr        = new QPushButton(tr("Text Color"));
 	m_pctrlTextFont->setMinimumWidth(120);
 	m_pctrlTextClr->setMinimumWidth(120);
-	QLabel *lab1 = new QLabel("View Background");
-	QLabel *lab2 = new QLabel("All Graph Settings");
-	QLabel *lab3 = new QLabel("Text Font");
-	QLabel *lab4 = new QLabel("Text Color");
-	ColorButtons->addWidget(lab1, 1,1);
-	ColorButtons->addWidget(lab2, 1,2);
-	ColorButtons->addWidget(lab3, 3,1);
-	ColorButtons->addWidget(lab4, 3,2);
-	ColorButtons->addWidget(m_pctrlBackColor,2,1);
-	ColorButtons->addWidget(m_pctrlGraphSettings,2,2);
-	ColorButtons->addWidget(m_pctrlTextFont,4,1);
-	ColorButtons->addWidget(m_pctrlTextClr,4,2);
+	FontLayout->addWidget(m_pctrlTextFont);
+	FontLayout->addWidget(m_pctrlTextClr);
+	QGroupBox *FontBox = new QGroupBox(tr("Font"));
+	FontBox->setLayout(FontLayout);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
@@ -100,7 +106,11 @@ void DisplaySettingsDlg::SetupLayout()
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlStyles);
 	MainLayout->addStretch(1);
-	MainLayout->addLayout(ColorButtons);
+	MainLayout->addWidget(BackBox);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(FontBox);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(GraphBox);
 	MainLayout->addSpacing(20);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
@@ -108,6 +118,7 @@ void DisplaySettingsDlg::SetupLayout()
 
 	setLayout(MainLayout);
 }
+
 
 void DisplaySettingsDlg::InitDialog()
 {
@@ -126,6 +137,7 @@ void DisplaySettingsDlg::InitDialog()
 		m_pctrlTextClr->setFont(m_TextFont);
 	}
 }
+
 
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 {
@@ -159,8 +171,33 @@ void DisplaySettingsDlg::OnBackgroundColor()
 void DisplaySettingsDlg::OnGraphSettings()
 {
 	if(!m_pRefGraph) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QXDirect *pXDirect   = (QXDirect*)pMainFrame->m_pXDirect;
+	QMiarex *pMiarex     = (QMiarex*)pMainFrame->m_pMiarex;
+	QXInverse *pXInverse = (QXInverse*)pMainFrame->m_pXInverse;
 
 	GraphDlg dlg;
+
+	dlg.m_GraphArray[0] = pXDirect->m_pCpGraph;
+	dlg.m_GraphArray[1] = pXDirect->m_pPolarGraph;
+	dlg.m_GraphArray[2] = pXDirect->m_pCmGraph;
+	dlg.m_GraphArray[3] = pXDirect->m_pCzGraph;
+	dlg.m_GraphArray[4] = pXDirect->m_pTrGraph;
+	dlg.m_GraphArray[5] = pXDirect->m_pUserGraph;
+
+	dlg.m_GraphArray[6] = &pMiarex->m_WingGraph1;
+	dlg.m_GraphArray[7] = &pMiarex->m_WingGraph2;
+	dlg.m_GraphArray[8] = &pMiarex->m_WingGraph3;
+	dlg.m_GraphArray[9] = &pMiarex->m_WingGraph4;
+	dlg.m_GraphArray[10] = &pMiarex->m_WPlrGraph1;
+	dlg.m_GraphArray[11] = &pMiarex->m_WPlrGraph2;
+	dlg.m_GraphArray[12] = &pMiarex->m_WPlrGraph3;
+	dlg.m_GraphArray[13] = &pMiarex->m_WPlrGraph4;
+
+	dlg.m_GraphArray[14] = &pXInverse->m_QGraph;
+
+	dlg.m_NGraph = 15;
+
 	QGraph graph;
 	graph.CopySettings(m_pRefGraph);
 

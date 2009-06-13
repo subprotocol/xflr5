@@ -47,6 +47,7 @@ class QXDirect : public QWidget
 	friend class QCAddDlg;
 	friend class EditPlrDlg;
 	friend class XDirectStyleDlg;
+	friend class DisplaySettingsDlg;
 
     Q_OBJECT
 
@@ -194,6 +195,7 @@ protected:
 	void SetOpPointSequence();
 	void SetAnalysisParams();
 	void SetGraphTitles(Graph* pGraph, int iX, int iY);
+	void SetGraphTitles(Graph* pGraph);
 	void SetPolarLegendPos();
 	void SetupLayout();	
 	void StopAnimate();
@@ -277,14 +279,9 @@ private:
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
 	int m_posAnimate;		// the current aoa in the animation
-	int m_OppVar;			// defined the variable to be displayed in the Cp graph
-	int m_XFoilVar;
+	int m_XFoilVar;			// defines the variable for current XFoil results
 	int m_IterLim;			// max iteratio limit for XFoil
-	int m_XPolar, m_YPolar;	// variables for the first polar graph
-	int m_XCz, m_YCz;		// variables for the second polar graph
-	int m_XCm, m_YCm;		// variables for the third polar graph
-	int m_XTr, m_YTr;		// variables for the fourth polar graph
-	int m_XUser, m_YUser;	// variables for the fifth polar graph
+
 	int m_iPlrGraph;		// defines whch polar graph is selected if m_iPlrView=1
 	int m_iPlrView;			// 0 is all, 1 is single, 2 is two !
 	int m_FoilYPos;		// y position for the foil display, in pixels from the bottom of the screen

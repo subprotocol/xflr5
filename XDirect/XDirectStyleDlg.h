@@ -41,7 +41,7 @@ private slots:
 	void OnPressureStyle();
 
 private:
-//	void keyPressEvent(QKeyEvent *event);
+	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 
 	void *m_pXDirect;

@@ -180,7 +180,7 @@ void WPolarDlg::InitDialog()
 	{
 		if(m_pWing->m_NXPanels[i]!= m_pWing->m_NXPanels[i+1])
 			{
-				QMessageBox::warning(this, "QFLR5","The number of chordwise VLM-panels across the span is not uniform\n Panel method is disabled");
+				QMessageBox::warning(this, "Warning","The number of chordwise VLM-panels across the span is not uniform\n Panel method is disabled");
 				bWarning = true;
 				break;
 			}
@@ -388,13 +388,17 @@ void WPolarDlg::OnTiltedGeom()
 {
 	m_bTiltedGeom = m_pctrlTiltGeom->isChecked();
 	SetWPolarName();
-	EnableControls();}
+	EnableControls();
+}
+
 
 void WPolarDlg::OnViscous()
 {
 	m_bViscous = m_pctrlViscous->isChecked();
 	SetWPolarName();
-	EnableControls();}
+	EnableControls();
+}
+
 
 void WPolarDlg::OnGroundEffect()
 {
@@ -417,6 +421,8 @@ void WPolarDlg::OnMethod()
 		m_pctrlTiltGeom->setChecked(false);
 		m_pctrlTiltGeom->setEnabled(false);
 		m_pctrlBeta->setEnabled(false);
+		m_pctrlGroundEffect->setEnabled(false);
+		m_pctrlHeight->setEnabled(false);
 //		m_pctrlThinSurfaces.SetCheck(TRUE);
 //		m_pctrlThinSurfaces.setEnabled(false);
 
@@ -432,6 +438,8 @@ void WPolarDlg::OnMethod()
 		m_pctrlWakeRollUp->setEnabled(false);
 		m_pctrlWakeParams->setEnabled(false);
 		m_bVLM1 = m_pctrlMethod2->isChecked();
+		m_pctrlGroundEffect->setEnabled(true);
+		m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked());
 	}
 	else if (m_pctrlMethod4->isChecked())
 	{
@@ -439,6 +447,8 @@ void WPolarDlg::OnMethod()
 		m_pctrlTiltGeom->setEnabled(true);
 		m_bThinSurfaces = false;
 		m_pctrlBeta->setEnabled(true);
+		m_pctrlGroundEffect->setEnabled(true);
+		m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked());
 
 //		m_pctrlWakeRollUp.setEnabled(TRUE);
 //		if(m_bWakeRollUp)	m_pctrlWakeParams.setEnabled(TRUE);
@@ -459,7 +469,7 @@ void WPolarDlg::OnOK()
 	int LineLength = m_WPolarName.length();
 	if(!LineLength)
 	{
-		QMessageBox::warning(this, "QFLR5","Must enter a name for the polar");
+		QMessageBox::warning(this, "Warning","Must enter a name for the polar");
 		m_pctrlWPolarName->setFocus();
 		return;
 	}
@@ -471,9 +481,7 @@ void WPolarDlg::OnOK()
 			pWPolarNew = (CWPolar*)m_poaWPolar->at(j);
 			if (pWPolarNew->m_PlrName == m_WPolarName &&pWPolarNew->m_UFOName  == m_UFOName)
 			{
-				QMessageBox::warning(this, "QFLR5","The polar's name already exists");
-//				m_ctrlWPolarName.SetSel(0,-1);
-//				m_ctrlWPolarName.SetFocus();
+				QMessageBox::warning(this, "Warning","The polar's name already exists");
 				return;
 			}
 		}

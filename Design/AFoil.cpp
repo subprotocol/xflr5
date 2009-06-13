@@ -128,6 +128,35 @@ QAFoil::QAFoil(QWidget *parent)
 }
 
 
+void QAFoil::CheckButtons()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pctrlDelete->setEnabled(m_pCurFoil);
+	m_pctrlDuplicate->setEnabled(m_pCurFoil);
+	m_pctrlRename->setEnabled(m_pCurFoil);
+	m_pctrlExport->setEnabled(m_pCurFoil);
+
+	pMainFrame->AFoilCurrentFoilMenu->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilDelete->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilRename->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilExport->setEnabled(m_pCurFoil);
+	pMainFrame->ShowCurrentFoil->setEnabled(m_pCurFoil);
+	pMainFrame->HideCurrentFoil->setEnabled(m_pCurFoil);
+
+	pMainFrame->AFoilDerotateFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilEditCoordsFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilInterpolateFoils->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilNormalizeFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilRefineGlobalFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilRefineLocalFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilScaleFoil->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilSetFlap->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilSetLERadius->setEnabled(m_pCurFoil);
+	pMainFrame->AFoilSetTEGap->setEnabled(m_pCurFoil);
+}
+
+
 void QAFoil::DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
 {
 	painter.save();
@@ -136,9 +165,9 @@ void QAFoil::DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint O
 	GridPen.setWidth(m_XGridWidth);
 	painter.setPen(GridPen);
 
-	double xo = 0.0;
-	double xmin = 0.0;
-	double xmax = 1.0;
+	double xo   =  0.0;
+	double xmin =  0.0;
+	double xmax =  1.0;
 	double ymin = -0.2;
 	double ymax =  0.2;
 
@@ -1420,7 +1449,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox::warning(pMainFrame,"QFLR5","At least two foils are required");
+		QMessageBox::warning(pMainFrame,"Warning","At least two foils are required");
 		return;
 	}
 
@@ -1654,13 +1683,13 @@ void QAFoil::OnExportSplinesToFile()
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
 			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
 			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 	}
@@ -1670,14 +1699,14 @@ void QAFoil::OnExportSplinesToFile()
 		if(size>IQX2)
 		{
 			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
 			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 	}
@@ -1735,6 +1764,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 	{
 		SetFoil();
 	}
+	CheckButtons();
 }
 
 
@@ -1976,13 +2006,13 @@ void QAFoil::OnStoreSplines()
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
 			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
 			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 
@@ -2013,7 +2043,7 @@ void QAFoil::OnStoreSplines()
 		if(size>IQX2)
 		{
 			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 
@@ -2021,7 +2051,7 @@ void QAFoil::OnStoreSplines()
 		if(size>IQX2)
 		{
 			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "QFLR5", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
 			return;
 		}
 //		Trace("m_iPts_Int=",size);
@@ -2561,7 +2591,7 @@ void QAFoil::PFNew()
 	bool bLoadNew = true;
 	if(m_pPF->m_bModified)
 	{
-		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", "Discard changes to Splines ?",
+		if (QMessageBox::Yes != QMessageBox::question(this, "Question", "Discard changes to Splines ?",
 													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 		{
 			bLoadNew = false;
@@ -2896,6 +2926,7 @@ void QAFoil::SetFoil(CFoil *pFoil)
 		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
 		m_pctrlFoilStyle->SetStyle(m_pCurFoil->m_nFoilStyle, m_pCurFoil->m_nFoilWidth, m_pCurFoil->m_FoilColor);
 	}
+	CheckButtons();
 }
 
 
@@ -2908,14 +2939,16 @@ void QAFoil::SetParams()
 //	m_pctrlFoilTable->adjustSize();
 
 	SelectFoil(m_pCurFoil);
+	CheckButtons();
 }
+
 
 void QAFoil::SFNew()
 {
 	bool bLoadNew = true;
 	if(m_pSF->m_bModified)
 	{
-		if (QMessageBox::Yes != QMessageBox::question(this, "QFLR5", "Discard changes to Splines ?",
+		if (QMessageBox::Yes != QMessageBox::question(this, "Question", "Discard changes to Splines ?",
 													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 		{
 			bLoadNew = false;

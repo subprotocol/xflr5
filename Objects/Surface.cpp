@@ -537,7 +537,7 @@ bool CSurface::RotateFlap(double const &Angle)
 		{
 			QMessageBox msgBox;
 			msgBox.setStandardButtons(QMessageBox::Ok);
-			msgBox.setWindowTitle("QFLR5");
+			msgBox.setWindowTitle("Warning");
 			msgBox.setText("Continous foils for surface do not have the same initial flap angle... aborting\n");
 			msgBox.exec();
 
