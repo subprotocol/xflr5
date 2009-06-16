@@ -54,7 +54,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle("QFLR5");
 	m_VersionName = "QFLR5 v5.00";
 
-	m_SettingsFormat = 100551;
+	m_SettingsFormat = 100552;
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;

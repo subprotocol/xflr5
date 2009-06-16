@@ -293,7 +293,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph3.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetYMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetXTitle("Alpha");
-	m_WPlrGraph3.SetYTitle("Cl^(3/2)/Cd");
+	m_WPlrGraph3.SetYTitle("GCm");
 	m_WPlrGraph3.SetXMin(-0.0);
 	m_WPlrGraph3.SetXMax( 0.1);
 	m_WPlrGraph3.SetYMin(-0.01);

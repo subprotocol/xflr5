@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	{
 		qApp->setStyle(StyleName);
 	}
-	else                   qApp->setStyle(&style);
+//	else                   qApp->setStyle(&style);
 
 
 	MainFrame w;
