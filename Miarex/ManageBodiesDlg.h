@@ -49,6 +49,8 @@ private slots:
 	void OnDuplicate();
 	void OnEdit();
 	void OnNew();
+	void OnExportDefinition();
+	void OnExportGeometry();
 
 private:
 	void SetBody(CBody *pBody = NULL);
@@ -64,6 +66,7 @@ private:
 
 	CBody *m_pBody;
 	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
+	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
 	QListWidget *m_pctrlNameList;
 
 };

@@ -34,10 +34,21 @@ class DisplaySettingsDlg : public QDialog
 {
 	Q_OBJECT
 
+	friend class MainFrame;
 public:
 	DisplaySettingsDlg(void *pParent=NULL);
-	void SetupLayout();
 	void InitDialog();
+
+private slots:
+	void OnStyleChanged(const QString &StyleName);
+	void OnBackgroundColor();
+	void OnGraphSettings();
+	void OnTextColor();
+	void OnTextFont();
+
+private:
+	void reject();
+	void SetupLayout();
 
 	ColorButton *m_pctrlBackColor;
 //	ColorButton *m_pctrlTextColor;
@@ -55,14 +66,9 @@ public:
 	QColor m_TextColor;
 	QFont m_TextFont;
 	QGraph *m_pRefGraph;
+	QGraph m_MemGraph;
 	bool m_bIsGraphModified;
 
-private slots:
-	void OnStyleChanged(const QString &StyleName);
-	void OnBackgroundColor();
-	void OnGraphSettings();
-	void OnTextColor();
-	void OnTextFont();
 };
 
 

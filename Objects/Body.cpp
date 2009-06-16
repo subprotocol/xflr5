@@ -47,22 +47,22 @@ CBody::CBody()
 	m_BodyStyle = 0;
 	m_BodyWidth = 1;
 
-	m_FramePosition[0].Set( -0.1,  0.0,  0.0);
+	m_FramePosition[0].Set( -0.10, 0.0,  0.0);
 	m_FramePosition[1].Set( -0.07, 0.0,  0.0);
-	m_FramePosition[2].Set(  0.03,  0.0,  0.0);
-	m_FramePosition[3].Set(  0.07, 0.0,  0.0);
-	m_FramePosition[4].Set(  0.55,  0.0,  0.0);
-	m_FramePosition[5].Set(  0.6,  0.0,  0.0);
+	m_FramePosition[2].Set(  0.00, 0.0,  0.0);
+	m_FramePosition[3].Set(  0.12, 0.0,  0.0);
+	m_FramePosition[4].Set(  0.18, 0.0,  0.0);
+	m_FramePosition[5].Set(  0.60, 0.0,  0.0);
+	m_FramePosition[6].Set(  0.63, 0.0,  0.0);
 
-	m_bLocked        = false;
 	m_bClosedSurface = false;
 
-	m_NStations  = 6;
+	m_NStations  = 7;
 	m_NSideLines = 5;
 
 	m_iActiveFrame =  1;
 	m_iHighlight   = -1;
-	m_LineType     =  1;
+	m_LineType     =  2;
 
 	m_nxDegree = 3;
 	m_nhDegree = 3;
@@ -81,38 +81,52 @@ CBody::CBody()
 
 	eps = 1.0e-06;
 
-	m_Frame[0].m_Point[0].Set(0.,0.0,0.0);
-	m_Frame[0].m_Point[1].Set(0.,0.0,0.0);
-	m_Frame[0].m_Point[2].Set(0.,0.0,0.0);
-	m_Frame[0].m_Point[3].Set(0.,0.0,0.0);
-	m_Frame[0].m_Point[4].Set(0.,0.0,0.0);
+	m_Frame[0].m_Point[0].Set(-0.110, 0.0, -0.0124);
+	m_Frame[0].m_Point[1].Set(-0.110, 0.0, -0.0124);
+	m_Frame[0].m_Point[2].Set(-0.110, 0.0, -0.0124);
+	m_Frame[0].m_Point[3].Set(-0.110, 0.0, -0.0124);
+	m_Frame[0].m_Point[4].Set(-0.110, 0.0, -0.0124);
 
-	m_Frame[1].m_Point[0].Set(0.,0.000,  0.008);
-	m_Frame[1].m_Point[1].Set(0.,0.005,  0.005);
-	m_Frame[1].m_Point[2].Set(0.,0.006,  0.000);
-	m_Frame[1].m_Point[3].Set(0.,0.005, -0.005);
-	m_Frame[1].m_Point[4].Set(0.,0.000, -0.008);
+	m_Frame[1].m_Point[0].Set(-0.0936, 0.000,  0.0035);
+	m_Frame[1].m_Point[1].Set(-0.0936, 0.011,  0.0003);
+	m_Frame[1].m_Point[2].Set(-0.0936, 0.013, -0.0136);
+	m_Frame[1].m_Point[3].Set(-0.0936, 0.011, -0.0257);
+	m_Frame[1].m_Point[4].Set(-0.0936, 0.000, -0.0266);
 
-	m_Frame[3].m_Point[0].Set(0.,0.000,  0.020);
-	m_Frame[3].m_Point[1].Set(0.,0.010,  0.015);
-	m_Frame[3].m_Point[2].Set(0.,0.015,  0.000);
-	m_Frame[3].m_Point[3].Set(0.,0.010, -0.015);
-	m_Frame[3].m_Point[4].Set(0.,0.000, -0.020);
+	m_Frame[2].m_Point[0].Set(-0.0067, 0.000,  0.0378);
+	m_Frame[2].m_Point[1].Set(-0.0067, 0.028,  0.0406);
+	m_Frame[2].m_Point[2].Set(-0.0067, 0.037,  0.0016);
+	m_Frame[2].m_Point[3].Set(-0.0067, 0.034, -0.0408);
+	m_Frame[2].m_Point[4].Set(-0.0067, 0.000, -0.0445);
 
-	m_Frame[4].m_Point[0].Set(0.,0.000,  0.005);
-	m_Frame[4].m_Point[1].Set(0.,0.003,  0.005);
-	m_Frame[4].m_Point[2].Set(0.,0.005,  0.000);
-	m_Frame[4].m_Point[3].Set(0.,0.003, -0.005);
-	m_Frame[4].m_Point[4].Set(0.,0.000, -0.005);
+	m_Frame[3].m_Point[0].Set(0.0943, 0.000,  0.0252);
+	m_Frame[3].m_Point[1].Set(0.0943, 0.012,  0.0192);
+	m_Frame[3].m_Point[2].Set(0.0943, 0.018,  0.0012);
+	m_Frame[3].m_Point[3].Set(0.0943, 0.012, -0.0168);
+	m_Frame[3].m_Point[4].Set(0.0943, 0.000, -0.0228);
 
-	m_Frame[m_NStations-1].m_Point[0].Set(0.,0.0,0.0);
-	m_Frame[m_NStations-1].m_Point[1].Set(0.,0.0,0.0);
-	m_Frame[m_NStations-1].m_Point[2].Set(0.,0.0,0.0);
-	m_Frame[m_NStations-1].m_Point[3].Set(0.,0.0,0.0);
-	m_Frame[m_NStations-1].m_Point[4].Set(0.,0.0,0.0);
+	m_Frame[4].m_Point[0].Set(0.242, 0.000,  0.0075);
+	m_Frame[4].m_Point[1].Set(0.242, 0.006,  0.0090);
+	m_Frame[4].m_Point[2].Set(0.242, 0.009,  0.0011);
+	m_Frame[4].m_Point[3].Set(0.242, 0.007, -0.0059);
+	m_Frame[4].m_Point[4].Set(0.242, 0.000, -0.0051);
+
+	m_Frame[5].m_Point[0].Set(0.636, 0.000,  0.0138);
+	m_Frame[5].m_Point[1].Set(0.636, 0.010,  0.0132);
+	m_Frame[5].m_Point[2].Set(0.636, 0.012, -0.0001);
+	m_Frame[5].m_Point[3].Set(0.636, 0.010, -0.0098);
+	m_Frame[5].m_Point[4].Set(0.636, 0.000, -0.0106);
+
+	m_Frame[6].m_Point[0].Set(0.660, 0.00,  0.0);
+	m_Frame[6].m_Point[1].Set(0.660, 0.00,  0.0);
+	m_Frame[6].m_Point[2].Set(0.660, 0.00,  0.0);
+	m_Frame[6].m_Point[3].Set(0.660, 0.00, -0.0);
+	m_Frame[6].m_Point[4].Set(0.660, 0.00, -0.0);
+
+	ComputeCenterLine();
 
 	for(i=0; i<MAXBODYFRAMES;i++) m_xPanels[i] = 1;
-	for(i=0; i<MAXSIDELINES;i++)      m_hPanels[i] = 1;
+	for(i=0; i<MAXSIDELINES;i++)  m_hPanels[i] = 1;
 
 	memset(m_x, 0, sizeof(m_x));
 	memset(m_y, 0, sizeof(m_y));
@@ -264,9 +278,9 @@ void CBody::ExportGeometry(int nx, int nh)
 
 	QString filter =".csv";
 
-	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Polar",
+	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Geometry",
 											pMainFrame->m_LastDirName ,
-											"Text File (*.txt; *.csv)",
+											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&filter);
 	if(!FileName.length()) return;
 
@@ -287,47 +301,6 @@ void CBody::ExportGeometry(int nx, int nh)
 	out  << (m_BodyName);
 	out  << ("\n\n");
 
-	if(m_LineType==1) strong = "Line Surfaces\n\n"; else strong = "NURBS\n\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_NStations,3);
-	strong +="       // Number of frame stations\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_NSideLines,3);
-	strong +="       // Number of sidelines\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_nxDegree,3);
-	strong +="       // Spline degree - axial direction\n";
-	out  << (strong);
-
-	strong = QString("%1"+str).arg(m_nhDegree,3);
-	strong +="       // Spline degree - hoop direction\n";
-	out  << (strong);
-	out  << ("\n\n");
-
-	out  << ("Control Points\n");
-	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
-	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-	out  << (strong);
-
-	for (j=0; j<m_NStations; j++)
-	{
-		strong = QString("  Frame "+str+"%1\n").arg(j+1);
-		out  << (strong);
-		for (k=0; k<m_NSideLines; k++)
-		{
-			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
-					 .arg(m_FramePosition[j].x * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(m_Frame[j].m_Point[k].y * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(m_Frame[j].m_Point[k].z * pMainFrame->m_mtoUnit,10,'f',3);
-			out  << (strong);
-		}
-		out  << ("\n");
-	}
-
-	out  << ("\n\n");
 	out  << ("Right Surface Points\n");
 	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
 	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
@@ -473,49 +446,6 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 }
 
 
-/*
-bool CBody::SetModified()
-{
-	if(m_bLocked)
-	{
-		//unlock...
-		//check if it is used by one or more planes
-		int k;
-		QString strong;
-		QMainWindow *pMainFrame = (QMainWindow*)s_pMainFrame;
-		CPlane *pPlane;
-		bool bIsInUse = false;
-		int resp = IDYES;
-		for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
-		{
-			pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
-			if(pPlane->m_bBody && pPlane->m_pBody==this)
-			{
-				bIsInUse = true;
-				break;
-			}
-		}
-		if(bIsInUse)
-		{
-			strong = "The current body "+m_BodyName+" is used by one or more planes.\n The associated results will be deleted. Continue ?";
-			resp = AfxMessageBox(strong, MB_YESNOCANCEL);
-		}
-		if(resp==IDYES)
-		{
-			for(k=0; k<pMainFrame->m_oaPlane.GetSize(); k++)
-			{
-				pPlane = (CPlane*)pMainFrame->m_oaPlane.GetAt(k);
-				if(pPlane->m_bBody && pPlane->m_pBody==this)
-				{
-					pMainFrame->DeletePlane(pPlane, true);
-				}
-			}
-			m_bLocked = false;
-			return true;
-		}
-	}
-	return false;
-}*/
 
 double CBody::Getu(double x)
 {
@@ -1256,7 +1186,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 		}
 		else 
 		{
-			angle = pi/2.0 - atan2(real.z, real.y);
+			angle = atan2(real.z, real.y);
 			for (j=0; j<i; j++)
 			{
 				if(angle> theta[j]) 

@@ -49,6 +49,7 @@ private:
 	void FillReModel();
 	void SetupLayout();
 	void SortData();
+	void keyPressEvent(QKeyEvent *event);
 
 private:
 	QPushButton *m_pctrlInsert, *m_pctrlDelete;

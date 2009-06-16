@@ -172,7 +172,8 @@ private slots:
 	void OnNewBody();
 	void OnEditCurBody();
 	void OnImportBody();
-	void OnExportBody();
+	void OnExportBodyDef();
+	void OnExportBodyGeom();
 	void OnManageBodies();
 	void OnAxes();
 	void On3DCp();
@@ -454,7 +455,8 @@ private:
 	void *m_p2DWidget;
 	void *m_pGLWidget;
 
-
+private:
+	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 protected:
 	CPanel m_Panel[VLMMATSIZE];		// the panel array for the currently loaded UFO
 	CPanel m_WakePanel[VLMMATSIZE];	// the reference current wake panel array

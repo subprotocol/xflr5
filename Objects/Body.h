@@ -76,7 +76,6 @@ public:
 
 	static void* s_pMainFrame;
 
-	bool m_bLocked; //true is this body is used by a plane with results
 	bool m_bClosedSurface;
 
 	int m_NSideLines;

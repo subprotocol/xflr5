@@ -42,7 +42,6 @@ FloatEdit::FloatEdit(QWidget *pParent)
 
 FloatEdit::FloatEdit(double d, int precision)
 {
-	bool bOK;
 	m_Value = d;
 
 	m_fMin = -1.e10;

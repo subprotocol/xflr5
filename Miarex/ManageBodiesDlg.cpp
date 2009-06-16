@@ -35,26 +35,30 @@ ManageBodiesDlg::ManageBodiesDlg()
 	m_pMiarex = NULL;
 	m_pMainFrame = NULL;
 	m_pBody = NULL;
-	setWindowTitle("Body Dlg");
+	setWindowTitle("Body Management");
 	SetupLayout();
 }
 
 
 void ManageBodiesDlg::SetupLayout()
 {
-	m_pctrlNameList = new QListWidget;
-	m_pctrlNew = new QPushButton("New");
-	m_pctrlEdit = new QPushButton("Edit");
-	m_pctrlRename = new QPushButton("Rename");
-	m_pctrlDelete = new QPushButton("Delete");
-	m_pctrlDuplicate = new QPushButton("Duplicate");
-	QPushButton * CloseButton = new QPushButton("Close");
+	m_pctrlNameList   = new QListWidget;
+	m_pctrlNew        = new QPushButton("New");
+	m_pctrlEdit       = new QPushButton("Edit");
+	m_pctrlRename     = new QPushButton("Rename");
+	m_pctrlDelete     = new QPushButton("Delete");
+	m_pctrlDuplicate  = new QPushButton("Duplicate");
+	m_pctrlExportDef  = new QPushButton("Export Definition");
+	m_pctrlExportGeom = new QPushButton("Export Geometry");
+	QPushButton *CloseButton   = new QPushButton("Close");
 	QVBoxLayout *ButtonsLayout = new QVBoxLayout;
 	ButtonsLayout->addWidget(m_pctrlNew);
 	ButtonsLayout->addWidget(m_pctrlEdit);
 	ButtonsLayout->addWidget(m_pctrlRename);
 	ButtonsLayout->addWidget(m_pctrlDelete);
 	ButtonsLayout->addWidget(m_pctrlDuplicate);
+	ButtonsLayout->addWidget(m_pctrlExportDef);
+	ButtonsLayout->addWidget(m_pctrlExportGeom);
 	ButtonsLayout->addStretch(1);
 	ButtonsLayout->addWidget(CloseButton);
 	QHBoxLayout *MainLayout = new QHBoxLayout;
@@ -62,13 +66,15 @@ void ManageBodiesDlg::SetupLayout()
 	MainLayout->addLayout(ButtonsLayout);
 	setLayout(MainLayout);
 
-	connect(m_pctrlNameList, SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnNameList(QListWidgetItem *)));
-	connect(m_pctrlNew, SIGNAL(clicked()), this, SLOT(OnNew()));
-	connect(m_pctrlEdit, SIGNAL(clicked()), this, SLOT(OnEdit()));
-	connect(m_pctrlRename, SIGNAL(clicked()), this, SLOT(OnRename()));
-	connect(m_pctrlDelete, SIGNAL(clicked()), this, SLOT(OnDelete()));
-	connect(m_pctrlDuplicate, SIGNAL(clicked()), this, SLOT(OnDuplicate()));
-	connect(CloseButton, SIGNAL(clicked()), this, SLOT(accept()));
+	connect(m_pctrlNameList,   SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnNameList(QListWidgetItem *)));
+	connect(m_pctrlNew,        SIGNAL(clicked()), this, SLOT(OnNew()));
+	connect(m_pctrlEdit,       SIGNAL(clicked()), this, SLOT(OnEdit()));
+	connect(m_pctrlRename,     SIGNAL(clicked()), this, SLOT(OnRename()));
+	connect(m_pctrlDelete,     SIGNAL(clicked()), this, SLOT(OnDelete()));
+	connect(m_pctrlDuplicate,  SIGNAL(clicked()), this, SLOT(OnDuplicate()));
+	connect(m_pctrlExportDef,  SIGNAL(clicked()), this, SLOT(OnExportDefinition()));
+	connect(m_pctrlExportGeom, SIGNAL(clicked()), this, SLOT(OnExportGeometry()));
+	connect(CloseButton,       SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 
@@ -175,6 +181,7 @@ void ManageBodiesDlg::OnEdit()
 	memBody.Duplicate(m_pBody);
 	pGL3dBodyDlg->SetBody(m_pBody);
 	pGL3dBodyDlg->m_bEnableName = false;
+	pGL3dBodyDlg->InitDialog();
 
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
@@ -183,6 +190,23 @@ void ManageBodiesDlg::OnEdit()
 	else m_pBody->Duplicate(&memBody);
 }
 
+
+
+
+void ManageBodiesDlg::OnExportDefinition()
+{
+	if(!m_pBody) return;
+	m_pBody->ExportDefinition();
+}
+
+
+void ManageBodiesDlg::OnExportGeometry()
+{
+	if(!m_pBody) return;
+	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
+	m_pBody->ExportGeometry(pGL3dBodyDlg->m_NXPoints, pGL3dBodyDlg->m_NHoopPoints);
+}
 
 
 

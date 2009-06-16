@@ -2511,7 +2511,7 @@ void QXDirect::OnExportCurXFoilResults()
 
 	FileName = QFileDialog::getSaveFileName(this, "Export Current XFoil Results",
 											pMainFrame->m_LastDirName,
-											"Text File (*.dat *.csv)");
+											"Text File (*.txt);;Comma Separated Values (*.csv)");
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
@@ -2688,9 +2688,9 @@ void QXDirect::OnExportCurOpp()
 	QFile DestFile;
 	int type = 1;
 
-	FileName = QFileDialog::getSaveFileName(this, "Export Polar",
+	FileName = QFileDialog::getSaveFileName(this, "Export OpPoint",
 											pMainFrame->m_LastDirName ,
-											"Text File (*.txt; *.csv)",
+											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&filter);
 	if(!FileName.length()) return;
 
@@ -2705,7 +2705,7 @@ void QXDirect::OnExportCurOpp()
 
 	QTextStream out(&XFile);
 
-	m_pCurOpp->ExportOpp(out, "QFLR5 v0.01", type);
+	m_pCurOpp->ExportOpp(out, pMainFrame->m_VersionName, type);
 	XFile.close();
 }
 
@@ -2725,7 +2725,7 @@ void QXDirect::OnExportCurPolar()
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, "Export Polar",
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt; *.csv)",
+											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&filter);
 	if(!FileName.length()) return;
 
@@ -4604,17 +4604,23 @@ void QXDirect::PaintPolarGraphs(QPainter &painter)
 
 void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int LegendSize, LegendWidth, ypos, x1;
 	QColor color;
 	int i,j,k,l,nc,ny,nFoils;
 
 	LegendSize = 30;
 	LegendWidth = 210;
-	QFontMetrics fm(pMainFrame->m_TextFont);
+
+	QFont TextFont;
+	m_pPolarGraph->GetLegendLogFont(&TextFont);
+	painter.setFont(TextFont);
+
+	QFontMetrics fm(TextFont);
 	ypos = fm.height();
 
-	painter.setFont(pMainFrame->m_TextFont);
+	QPen TextPen(m_pPolarGraph->GetLegendColor());
+	painter.setPen(TextPen);
+	TextPen.setWidth(1);
 
 	QStringList str; // we need to make an inventory of foils
 	CPolar * pPolar;
@@ -4636,12 +4642,6 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 	nFoils= str.size();
 
 	painter.setBackgroundMode(Qt::TransparentMode);
-	painter.setFont(pMainFrame->m_TextFont);
-	QPen TextPen(pMainFrame->m_TextColor);
-	TextPen.setWidth(1);
-	painter.setPen(TextPen);
-//	QBrush LegendBrush(pMainFrame->m_BackgroundColor);
-//	painter.setBrush(LegendBrush);
 
 	QPen LegendPen;
 	LegendPen.setWidth(1);
@@ -4949,6 +4949,21 @@ void QXDirect::SetCurveParams()
 		else
 		{
 			FillComboBoxes(false);
+		}
+	}
+	if(m_pCurPolar)
+	{
+		if(m_pCurPolar->m_Type!=4)
+		{
+			m_pctrlUnit1->setText(QString::fromUtf8("°"));
+			m_pctrlUnit2->setText(QString::fromUtf8("°"));
+			m_pctrlUnit3->setText(QString::fromUtf8("°"));
+		}
+		else
+		{
+			m_pctrlUnit1->setText("");
+			m_pctrlUnit2->setText("");
+			m_pctrlUnit3->setText("");
 		}
 	}
 }
@@ -5298,7 +5313,7 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 	}
 	m_pCurOpp = pOpp;
 
-	CreateOppCurves();
+	if(!m_bPolar) CreateOppCurves();
 
 //	m_posAnimate = pFrame->m_pctrlOpp.GetCurSel(); //TODO
 	SetCurveParams();
@@ -5622,6 +5637,10 @@ void QXDirect::SetupLayout()
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
 
+	m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
+	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
+	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
+
 	m_pctrlAlphaMin     = new FloatEdit();
 	m_pctrlAlphaMax     = new FloatEdit();
 	m_pctrlAlphaDelta   = new FloatEdit();
@@ -5637,6 +5656,9 @@ void QXDirect::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
 	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
 	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
+	SequenceGroup->addWidget(m_pctrlUnit1,1,3);
+	SequenceGroup->addWidget(m_pctrlUnit2,2,3);
+	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
 
 	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
 	m_pctrlViscous  = new QCheckBox("Viscous");
@@ -5797,6 +5819,9 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 			if(event->delta()>0) m_pCurGraph->Scale(1.06);
 			else                 m_pCurGraph->Scale(1.0/1.06);
 		}
+
+		m_pCurGraph->SetAutoXUnit();
+		m_pCurGraph->SetAutoYUnit();
 
 		if(!m_bAnimate) UpdateView();
 	}

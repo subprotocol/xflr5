@@ -87,6 +87,7 @@ private slots:
 	void OnScaleWing();
 
 
+
 private:
 	void reject();
 

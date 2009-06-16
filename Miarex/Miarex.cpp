@@ -312,9 +312,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph4.SetType(0);
 	m_WPlrGraph4.SetMargin(50);
 
-
-
-	m_CpGraph.SetInverted(true);
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_CpGraph.SetYMajGrid(true, QColor(120,120,120),2,1);
 	m_CpGraph.SetXTitle("x");
@@ -325,6 +322,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_CpGraph.SetYMax( 0.01);
 	m_CpGraph.SetType(0);
 	m_CpGraph.SetMargin(50);
+	m_CpGraph.SetInverted(true);
 
 	for(int i=0; i<4;i++) m_CpGraph.AddCurve(); // four curves for wing, wing2, stab and fin
 
@@ -643,6 +641,7 @@ CBody* QMiarex::AddBody(CBody *pBody)
 	QString strong;
 	int i,j;
 
+
 	if(pBody->m_BodyName.length())
 	{
 		for (i=0; i<m_poaBody->size(); i++)
@@ -799,8 +798,6 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 				break;
 			}
 		}
-
-		if(m_pCurPlane->m_bBody && m_pCurPlane->m_pBody) m_pCurPlane->m_pBody->m_bLocked = true;
 
 		pWOpp = &pPOpp->m_WingWOpp;
 
@@ -1593,7 +1590,8 @@ void QMiarex::CheckButtons()
 
 	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
 	pMainFrame->EditCurBody->setEnabled(m_pCurBody);
-	pMainFrame->exportBody->setEnabled(m_pCurBody);
+	pMainFrame->exportBodyDef->setEnabled(m_pCurBody);
+	pMainFrame->exportBodyGeom->setEnabled(m_pCurBody);
 
 	pMainFrame->defineCtrlPolar->setEnabled(m_pCurWing);
 	pMainFrame->defineWPolar->setEnabled(m_pCurWing);
@@ -1601,7 +1599,6 @@ void QMiarex::CheckButtons()
 	pMainFrame->currentUFOMenu->setEnabled(m_pCurWing);
 	pMainFrame->CurWPlrMenu->setEnabled(m_pCurWPolar);
 	pMainFrame->CurWOppMenu->setEnabled(m_pCurWOpp);
-
 }
 
 
@@ -3346,11 +3343,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 	ny=0;
 
-	QColor color;
 	QString strong, str1, str2, str3, str4;
-
-	QFontMetrics fm(pMainFrame->m_TextFont);
-	ypos = fm.height();
 
 	LegendSize = 30;
 	LegendWidth = 260;
@@ -3389,11 +3382,17 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 	}
 
 	painter.setBackgroundMode(Qt::TransparentMode);
-	painter.setFont(pMainFrame->m_TextFont);
 
-	QPen TextPen(pMainFrame->m_TextColor);
-	TextPen.setWidth(1);
+	QFont TextFont;
+	m_WingGraph1.GetLegendLogFont(&TextFont);
+	painter.setFont(TextFont);
+
+	QFontMetrics fm(TextFont);
+	ypos = fm.height();
+
+	QPen TextPen(m_WingGraph1.GetLegendColor());
 	painter.setPen(TextPen);
+	TextPen.setWidth(1);
 
 	QBrush LegendBrush(pMainFrame->m_BackgroundColor);
 	painter.setBrush(LegendBrush);
@@ -3606,21 +3605,27 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 	int LegendSize, LegendWidth, ypos;
 	int i,j,k,l, ny, x1;
 
-	QColor color;
-	QFont TempFont;
-	m_WPlrGraph1.GetLegendLogFont(&TempFont);
 
 	LegendSize = 30;
 	LegendWidth = 280;
 
-	QFontMetrics fm(pMainFrame->m_TextFont);
+	QFont TextFont;
+	m_WPlrGraph1.GetLegendLogFont(&TextFont);
+	painter.setFont(TextFont);
+
+	QFontMetrics fm(TextFont);
 	ypos = fm.height();
+
+	QPen TextPen(m_WPlrGraph1.GetLegendColor());
+	painter.setPen(TextPen);
+	TextPen.setWidth(1);
 
 
 	QStringList str; // we need to make an inventory of wings
 	CWPolar * pWPolar;
 	CWing *pWing;
 	CPlane *pPlane;
+
 	for (j=0; j<m_poaWing->size(); j++)
 	{
 		pWing = (CWing*)m_poaWing->at(j);
@@ -3651,12 +3656,7 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 
 	int nUFOs= str.size();
 
-
 	painter.setBackgroundMode(Qt::TransparentMode);
-	painter.setFont(pMainFrame->m_TextFont);
-	QPen TextPen(pMainFrame->m_TextColor);
-	TextPen.setWidth(1);
-	painter.setPen(TextPen);
 	QBrush LegendBrush(pMainFrame->m_BackgroundColor);
 	painter.setBrush(LegendBrush);
 
@@ -10407,7 +10407,7 @@ void QMiarex::On3DTop()
 
 void QMiarex::On3DLeft()
 {
-	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90° around x
+	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90 deg around x
 	Set3DRotationCenter();
 	UpdateView();
 }
@@ -10415,8 +10415,8 @@ void QMiarex::On3DLeft()
 
 void QMiarex::On3DFront()
 {
-	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90° around y
-	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90° around x
+	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90 deg around y
+	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90 deg around x
 
 	m_ArcBall.SetQuat(Qt1 * Qt2);
 	Set3DRotationCenter();
@@ -10602,6 +10602,7 @@ void QMiarex::OnAllWPolarGraphScales()
 		m_CpGraph.SetAuto(true);
 		m_CpGraph.ResetXLimits();
 		m_CpGraph.ResetYLimits();
+		m_CpGraph.SetInverted(true);
 	}
 	UpdateView();
 }
@@ -11710,21 +11711,76 @@ void QMiarex::OnEditCurBody()
 	if(!m_pCurBody) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	CBody memBody;
-	memBody.Duplicate(m_pCurBody);
-	m_GL3dBody.SetBody(m_pCurBody);
+	CBody *pNewBody = new CBody;
+	pNewBody->Duplicate(m_pCurBody);
+	m_GL3dBody.SetBody(pNewBody);
 	m_GL3dBody.m_bEnableName = false;
 	m_GL3dBody.setWindowState(Qt::WindowMaximized);
+	m_GL3dBody.InitDialog();
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
+		bool bUsed = false;
+		CPlane *pPlane;
+		CWPolar *pWPolar;
+		for (int i=0; i< m_poaPlane->size(); i++)
+		{
+			pPlane = (CPlane*)m_poaPlane->at(i);
+			if(pPlane->m_bBody && pPlane->m_pBody==m_pCurBody)
+			{
+				// Does this plane have results
+				for(int j=0; j<m_poaWPolar->size(); j++)
+				{
+					pWPolar = (CWPolar*)m_poaWPolar->at(j);
+					if(pWPolar->m_UFOName==pPlane->m_PlaneName && pWPolar->m_Alpha.size())
+					{
+						bUsed = true;
+						break;
+					}
+				}
+				if(bUsed) break;
+			}
+		}
+		if(bUsed)
+		{
+/*			ModDlg dlg;
+			dlg.m_Question = "The modification will erase all results associated to the planes which use this body.\nContinue ?";
+			dlg.InitDialog();
+			int Ans = dlg.exec();
+			if (Ans == QDialog::Rejected)
+			{
+				//restore geometry for initial body
+				m_pCurBody->Duplicate(&memBody);
+				return;
+			}
+			else if(Ans==20)
+			{
+				//create new body
+				CBody* pNewBody= new CBody;
+				pNewBody->Duplicate(m_pCurBody);
+
+				if(!SetModBody(pNewBody))
+				{
+					delete pNewBody;
+				}
+			}*/
+			if(SetModBody(pNewBody))
+			{
+				m_pCurBody = pNewBody;
+			}
+			else
+			{
+				delete pNewBody;
+				return;
+			}
+		}
 		m_bResetglBody = true;
 		m_bResetglBodyMesh = true;
 		m_bResetglGeom = true;
 		m_bResetglMesh = true;
 		pMainFrame->SetSaveState(false);
 	}
-	else m_pCurBody->Duplicate(&memBody);
+	else delete pNewBody;
 }
 
 
@@ -11846,7 +11902,6 @@ void QMiarex::OnEditUFO()
 					UpdateView();
 					return;
 				}
-
 			}
 
 			//then modifications are automatically recorded
@@ -11885,7 +11940,14 @@ void QMiarex::OnEditUFO()
 
 
 
-void QMiarex::OnExportBody()
+void QMiarex::OnExportBodyDef()
+{
+	if(!m_pCurBody) return;
+	m_pCurBody->ExportDefinition();
+}
+
+
+void QMiarex::OnExportBodyGeom()
 {
 	if(!m_pCurBody) return;
 	m_pCurBody->ExportGeometry(m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
@@ -11908,7 +11970,7 @@ void QMiarex::OnExportCurWOpp()
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, "Export Wing Opp",
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt; *.csv)",
+											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&filter);
 
 	if(!FileName.length()) return;
@@ -12198,7 +12260,7 @@ void QMiarex::OnExportCurWPolar()
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, "Export Polar",
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt; *.csv)",
+											"Text File (*.txt);;Comma Separated Values (*.csv)",
 											&filter);
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
@@ -12691,6 +12753,8 @@ void QMiarex::OnNewBody()
 
 	m_GL3dBody.SetBody(pBody);
 	m_GL3dBody.setWindowState(Qt::WindowMaximized);
+	m_GL3dBody.InitDialog();
+
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
 		AddBody(pBody);
@@ -13216,9 +13280,11 @@ void QMiarex::OnStoreWOpp()
 
 void QMiarex::OnShowAllWOpps()
 {
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	int i;
 	//Switch all WOpps view to on for all UFO and WPolar
 	m_bCurWOppOnly = false;
+	pMainFrame->showCurWOppOnly->setChecked(false);
 
 	CPOpp *pPOpp;
 	CWOpp *pWOpp;
@@ -13232,7 +13298,7 @@ void QMiarex::OnShowAllWOpps()
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
 		pPOpp->m_bIsVisible = true;
 	}
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
 	pMainFrame->SetSaveState(false);
 	SetCurveParams();
 
@@ -15058,6 +15124,7 @@ void QMiarex::SetControls()
 
 void QMiarex::SetCurveParams()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_iView==2)
 	{
 		if(m_pCurWPolar)
@@ -15109,6 +15176,23 @@ void QMiarex::SetCurveParams()
 		else
 		{
 			FillComboBoxes(false);
+		}
+	}
+	if(m_pCurWPolar)
+	{
+		if(m_pCurWPolar->m_Type!=4)
+		{
+			m_pctrlUnit1->setText(QString::fromUtf8("°"));
+			m_pctrlUnit2->setText(QString::fromUtf8("°"));
+			m_pctrlUnit3->setText(QString::fromUtf8("°"));
+		}
+		else
+		{
+			QString str;
+			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+			m_pctrlUnit1->setText(str);
+			m_pctrlUnit2->setText(str);
+			m_pctrlUnit3->setText(str);
 		}
 	}
 }
@@ -16000,7 +16084,7 @@ void QMiarex::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-
+	setSizePolicy(szPolicyMinimum);
 //_______________________Analysis
 	m_pctrlSequence = new QCheckBox("Sequence");
 	QGridLayout *SequenceGroup = new QGridLayout;
@@ -16015,6 +16099,10 @@ void QMiarex::SetupLayout()
 	m_pctrlAlphaMax     = new FloatEdit(1., 2);
 	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
 
+	m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
+	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
+	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
+
 	m_pctrlAlphaMin->setMinimumHeight(20);
 	m_pctrlAlphaMax->setMinimumHeight(20);
 	m_pctrlAlphaDelta->setMinimumHeight(20);
@@ -16027,6 +16115,9 @@ void QMiarex::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
 	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
 	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
+	SequenceGroup->addWidget(m_pctrlUnit1,1,3);
+	SequenceGroup->addWidget(m_pctrlUnit2,2,3);
+	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
 
 	m_pctrlInitLLTCalc = new QCheckBox("Init LLT");
 	m_pctrlStoreWOpp    = new QCheckBox("Store OpPoint");
@@ -17076,11 +17167,9 @@ void QMiarex::UpdateUnits()
 		}
 		else if(m_iView==4)	CreateCpCurves();
 	}
-//	m_bResetglOpp = true;
-//	m_bResetglGeom = true;
+	SetCurveParams();
 	UpdateView();
-//	p3DScales->SetUnits();
-//	p3DScales->SetParams();
+
 }
 
 void QMiarex::UpdateView()
@@ -17213,6 +17302,9 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 				if(event->delta()>0) m_pCurGraph->Scale(1.06);
 				else                 m_pCurGraph->Scale(1.0/1.06);
 			}
+
+			m_pCurGraph->SetAutoXUnit();
+			m_pCurGraph->SetAutoYUnit();
 			UpdateView();
 
 		}

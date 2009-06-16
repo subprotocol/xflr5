@@ -201,8 +201,8 @@ private:
 	bool m_bIsPrinting;
 	bool m_bBorder;
 
-	int m_nStyle;// axis style
-	int m_Width;// axis width
+	int m_AxisStyle;// axis style
+	int m_AxisWidth;// axis width
 
 	int m_XMajStyle, m_YMajStyle;
 	int m_XMajWidth, m_YMajWidth;

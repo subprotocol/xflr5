@@ -80,6 +80,9 @@ private slots:
 	void OnQReflected();
 	void OnPertubate();
 	void OnGraphSettings();
+	void OnZoomIn();
+	void OnZoomX();
+	void OnZoomY();
 
 private:
 	void UpdateView();
@@ -167,7 +170,7 @@ private:
 	bool m_bMark, m_bMarked;
 	bool m_bSpline, m_bSplined;
 	bool m_bSmooth;
-	bool m_bZoomPlus;
+	bool m_bZoomPlus, m_bZoomXOnly, m_bZoomYOnly;
 	bool m_bFullInverse;// mixed inverse if false
 	bool m_bSaved;
 	bool m_bReflected;

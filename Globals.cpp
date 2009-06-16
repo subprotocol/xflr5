@@ -288,7 +288,6 @@ Qt::PenStyle GetStyle(int s)
 
 bool ReadAVLString(QTextStream &in, int &Line, QString &strong)
 {
-	bool bRead = true;
 	bool bComment = true;
 	int pos;
 	QString str;

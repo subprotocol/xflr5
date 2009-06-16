@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 	QSize sz(c,d);
 
 	QCleanlooksStyle style;
+	QApplication app(argc, argv);
 
 	if(StyleName.length())
 	{
@@ -57,10 +58,8 @@ int main(int argc, char *argv[])
 	}
 	else                   qApp->setStyle(&style);
 
-	QApplication app(argc, argv);
 
 	MainFrame w;
-	w.setWindowTitle("QFLR5");
 
 	w.resize(sz);
 	w.move(pt);

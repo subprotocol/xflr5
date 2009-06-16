@@ -218,18 +218,22 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType)
     out<< strong;
     strong = m_strPlrName + "\n";
     out<< strong;
-    if(FileType==1) strong=QString("Alpha = %5.1f,  Re = %5.1f,  Ma = %6.4f,  ACrit =%4.1f \n\n").arg(Alpha).arg(Reynolds).arg(Mach).arg(ACrit);
-    else            strong=QString("Alpha =, %5.1f,  Re =, %5.1f,  Ma =, %6.4f,  ACrit =, %4.1f \n\n").arg(Alpha).arg(Reynolds).arg(Mach).arg(ACrit);
-    out<< strong;
+	if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
+								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
+	else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
+								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
+	out<< strong;
 
     if(FileType==1) out << "   x        Cpi      Cpv        Qi        Qv\n";
     else            out << "x,Cpi,Cpv,Qi,Qv\n";
 
     for (k=0; k<n; k++)
     {
-        if(FileType==1) strong=QString("%7.4f  %7.3f   %7.3f   %7.3f   %7.3f\n").arg(x[k]).arg(Cpi[k]).arg(Cpv[k]).arg(Qi[k]).arg(Qv[k]);
-        else            strong=QString("%7.4f,%7.3f,%7.3f,%7.3f,%7.3f\n").arg(x[k]).arg(Cpi[k]).arg(Cpv[k]).arg(Qi[k]).arg(Qv[k]);
-        out<< strong;
+		if(FileType==1) strong=QString("%1  %2   %3   %4   %5\n")
+									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
+		else            strong=QString("%1,%2,%3,%4,%5\n")
+									   .arg(x[k],7,'f',4).arg(Cpi[k],7,'f',3).arg(Cpv[k],7,'f',3).arg(Qi[k],7,'f',3).arg(Qv[k],7,'f',3);
+		out<< strong;
     }
 
     out << "\n\n";

@@ -174,8 +174,8 @@ void Graph::CopySettings(Graph *pGraph, bool bScales)
 	m_LegendLogFont = pGraph->m_LegendLogFont;
 	m_TitleColor    = pGraph->m_TitleColor;
 	m_TitleLogFont  = pGraph->m_TitleLogFont;
-	m_nStyle        = pGraph->m_nStyle;
-	m_Width         = pGraph->m_Width;
+	m_AxisStyle     = pGraph->m_AxisStyle;
+	m_AxisWidth     = pGraph->m_AxisWidth;
 	m_XMajClr       = pGraph->m_XMajClr;
 	m_XMajStyle     = pGraph->m_XMajStyle;
 	m_XMajWidth     = pGraph->m_XMajWidth;
@@ -261,12 +261,12 @@ QColor Graph::GetBackColor()
 
 int Graph::GetAxisStyle()
 {
-	return m_nStyle;
+	return m_AxisStyle;
 }
 
 int Graph::GetAxisWidth()
 {
-	return m_Width;
+	return m_AxisWidth;
 }
 
 
@@ -416,6 +416,13 @@ double Graph::GetXUnit()
 }
 
 
+int Graph::GetXVariable()
+{
+	return m_X;
+}
+
+
+
 bool Graph::GetYMajGrid()
 {
 	return m_bYMajGrid;
@@ -476,6 +483,12 @@ double Graph::GetYScale()
 }
 
 
+int Graph::GetYVariable()
+{
+	return m_Y;
+}
+
+
 bool Graph::Init()
 {
 	double Margin;
@@ -533,22 +546,62 @@ void Graph::ResetLimits()
 
 void Graph::ResetXLimits()
 {
-	if(m_bAutoX){
+	if(m_bAutoX)
+	{
 		xmin =  0.0;
 		xmax =  0.1;
 		xo   =  0.0;
 	}
 }
 
+
 void Graph::ResetYLimits()
 {
-	if(m_bAutoY){
+	if(m_bAutoY)
+	{
 		ymin =   0.000;
 		ymax =   0.001;
 		yo   =   0.000;
 	}
 }
 
+
+void Graph::Scale(double zoom)
+{
+	if (zoom<0.01) zoom =0.01;
+	m_bAutoX = false;
+	m_bAutoY = false;
+
+	double xm = (xmin + xmax)/2.0;
+	xmin = xm+(xmin-xm)*zoom;
+	xmax = xm+(xmax-xm)*zoom;
+
+	double ym = (ymin + ymax)/2.0;
+	ymin = ym+(ymin-ym)*zoom;
+	ymax = ym+(ymax-ym)*zoom;
+}
+
+
+void Graph::Scalex(double zoom)
+{
+	if (zoom<0.01) zoom =0.01;
+	m_bAutoX = false;
+
+	double xm = (xmin + xmax)/2.0;
+	xmin = xm+(xmin-xm)*zoom;
+	xmax = xm+(xmax-xm)*zoom;
+
+}
+
+void Graph::Scaley(double zoom)
+{
+	if (zoom<0.01) zoom =0.01;
+	m_bAutoY = false;
+
+	double ym = (ymin + ymax)/2.0;
+	ymin = ym+(ymin-ym)*zoom;
+	ymax = ym+(ymax-ym)*zoom;
+}
 
 //___________________Start Sets______________________________________________________________
 
@@ -580,16 +633,15 @@ void Graph::SetAutoXMinUnit(bool bAuto)
 
 void Graph::SetAutoXUnit()
 {
-	int nxmin, nxmax;
-	xunit = 100.0*m_scalex;
-//	xunit = (xmax-xmin)/5.0;
+//	xunit = 100.0*m_scalex;
+	xunit = (xmax-xmin)/3.0;
 
 	if (xunit<1.0)
 	{
-		exp_x = (int)log10(xunit)-1;
-		exp_x= qMax(-4, exp_x);
+		exp_x = (int)log10(xunit*1.00001)-1;
+		exp_x = qMax(-4, exp_x);
 	}
-	else exp_x = (int)log10(xunit);
+	else exp_x = (int)log10(xunit*1.00001);
 	int main_x = (int)(xunit/pow(10.0, exp_x)*1.000001);
 
 
@@ -600,18 +652,6 @@ void Graph::SetAutoXUnit()
 	else
 		xunit = 5.0*pow(10.0,exp_x);
 
-
-	// finally reset scales to a multiple of units
-	nxmin = int((xmin-xo)/xunit*1.0001);
-	if (nxmin*xunit > xmin)
-		nxmin--;//*1.0000001 to account for doubleing point computation errors
-	nxmax = int((xmax-xo)/xunit);
-	if (nxmax*xunit*1.0001 < xmax)
-		nxmax++;
-//	int nx = nxmax - nxmin;
-//	xmin = xo + (double)nxmin * xunit;
-//	xmax = xo + (double)nxmax * xunit;
-//	m_scalex  = (double)nx * xunit /m_w;
 }
 
 
@@ -621,19 +661,18 @@ void Graph::SetAutoYMinUnit(bool bAuto)
 	if(bAuto) m_YMinorUnit = yunit/5.0;
 }
 
+
 void Graph::SetAutoYUnit()
 {
-	int nymin, nymax;
- //   if (m_bIsPrinting) yunit = fabs(2000.0*m_scaley);
- //   else               yunit = fabs(100.0*m_scaley);
-
+//	yunit = 100.0 * m_scaley;
 	yunit = (ymax-ymin)/5.0;
 	if (yunit<1.0)
 	{
-		exp_y = (int)log10(yunit)-1;
+		exp_y = (int)log10(yunit*1.00001)-1;
 		exp_y = qMax(-4, exp_y);
 	}
-	else  exp_y = (int)log10(yunit);
+	else  exp_y = (int)log10(yunit*1.00001);
+
 	int main_y = (int)(yunit/pow(10.0, exp_y));
 
 	if(main_y<2)
@@ -641,26 +680,13 @@ void Graph::SetAutoYUnit()
 	else if (main_y<5)
 		yunit = 2.0*pow(10.0,exp_y);
 	else
-		yunit = 5.0*pow(10.0,exp_y);
-
-	// finally reset scales to a multiple of units
-	nymin = (int)((ymin-yo)/yunit*1.000001);
-	if (nymin*yunit*1.0001 > ymin) nymin--;
-	nymax = (int)((ymax-yo)/yunit);
-	if (nymax*yunit*1.0001 < ymax) nymax++;
-	int ny = nymax - nymin;
-	ymax = yo + nymax * yunit;
-	ymin = yo + nymin * yunit;
-	m_scaley   =  ny * yunit /(double)m_h;
-
-	if(!m_bYInverted)
-		m_scaley = -m_scaley;
+		yunit = 5.0*pow(10.0,exp_y);	
 }
 
 void Graph::SetAxisData(int s, int w, QColor clr)
 {
-	m_nStyle = s;
-	m_Width = w;
+	m_AxisStyle = s;
+	m_AxisWidth = w;
 	m_AxisColor = clr;
 }
 
@@ -671,12 +697,12 @@ void Graph::SetAxisColor(QColor crColor)
 
 void Graph::SetAxisStyle(int nStyle)
 {
-	m_nStyle = nStyle;
+	m_AxisStyle = nStyle;
 }
 
 void Graph::SetAxisWidth(int Width)
 {
-	m_Width = Width;
+	m_AxisWidth = Width;
 }
 
 
@@ -720,17 +746,18 @@ void Graph::SetGraphName(QString GraphName)
 {
 	m_GraphName = GraphName;
 }
+
 void Graph::SetDefaults()
 {
-    m_BkColor = QColor(0,30,50);
+	m_BkColor = QColor(0,20,20);
     m_BorderColor = QColor(200,200,200);
 	m_BorderStyle = 0;
 	m_BorderWidth = 3;
 
 	m_LogPixelsY = 96;
 
-	m_nStyle = 0;
-	m_Width = 1;
+	m_AxisStyle = 0;
+	m_AxisWidth = 1;
 
 	m_bYInverted = false;
 
@@ -834,6 +861,15 @@ void Graph::SetType(int type)
 	m_Type = type;
 }
 
+
+
+void Graph::SetVariables(int const & X, int const & Y)
+{
+	m_X = X;
+	m_Y = Y;
+}
+
+
 void Graph::SetWindow(double x1, double x2, double y1, double y2)
 {
 	m_bAutoX = false;
@@ -847,46 +883,54 @@ void Graph::SetWindow(double x1, double x2, double y1, double y2)
 void Graph::SetX0(double f){
 	xo = f;
 }
-void Graph::SetXMin(double f){
-	xmin = f;
+
+
+
+void Graph::SetXMajGrid(bool const &state, QColor const &clr, int const &style, int const &width)
+{
+	m_bXMajGrid = state;
+	m_XMajClr   = clr;
+	m_XMajStyle = style;
+	m_XMajWidth = width;
 }
+
+
+void Graph::SetXMajGrid(bool const &bGrid)
+{
+	m_bXMajGrid = bGrid;
+}
+
+void Graph::SetXMinGrid(bool const &bGrid)
+{
+	m_bXMinGrid = bGrid;
+}
+
+
+
 void Graph::SetXMax(double f){
 	xmax = f;
 }
-void Graph::SetXUnit(double f){
-	xunit = f;
+
+
+void Graph::SetXMin(double f){
+	xmin = f;
 }
-void Graph::SetY0(double f){
-	yo = f;
+
+void Graph::SetXMinGrid(bool state, bool bAuto, QColor clr, int style, int width, double unit)
+{
+	m_bXMinGrid = state;
+	m_bXAutoMinGrid = bAuto;
+	m_XMinClr   = clr;
+	m_XMinStyle = style;
+	m_XMinWidth = width;
+	if(unit>0.0) m_XMinorUnit  = unit;
 }
-void Graph::SetYMin(double f){
-	ymin = f;
-}
-void Graph::SetYMax(double f){
-	ymax = f;
-}
-void Graph::SetYUnit(double f){
-	yunit = f;
-}
+
+
+
 void Graph::SetXMinorUnit(double f){
 	m_XMinorUnit = f;
 }
-void Graph::SetYMinorUnit(double f){
-	m_YMinorUnit = f;
-}
-
-
-void Graph::SetXTitle(QString str)
-{
-	m_XTitle = str;
-}
-
-void Graph::SetYTitle(QString str)
-{
-	m_YTitle = str;
-}
-
-
 
 
 bool Graph::SetXScale()
@@ -895,13 +939,13 @@ bool Graph::SetXScale()
 	int nc;
 
 	if(m_bAutoX)
-	{	
+	{
 		bool bCurve = false;
 
-        if (m_oaCurves.size())
+		if (m_oaCurves.size())
 		{
 			//init only if we have a curve
-            for (nc=0; nc < m_oaCurves.size(); nc++)
+			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if (pCurve->IsVisible() && pCurve->n>1)
@@ -915,11 +959,11 @@ bool Graph::SetXScale()
 		{
 			Cxmin =  9999999.0;
 			Cxmax = -9999999.0;
-            for (nc=0; nc < m_oaCurves.size(); nc++)
-            {
+			for (nc=0; nc < m_oaCurves.size(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
-                if (pCurve->IsVisible() && pCurve->n>0)
-                {
+				if (pCurve->IsVisible() && pCurve->n>0)
+				{
 					Cxmin = qMin(Cxmin, pCurve->GetxMin());
 					Cxmax = qMax(Cxmax, pCurve->GetxMax());
 				}
@@ -927,7 +971,7 @@ bool Graph::SetXScale()
 
 			if(Cxmax<=Cxmin)
 				Cxmax = (Cxmin+1.0)*2.0;
-			
+
 			if(m_Type == 1)
 			{
 				xmin = qMin(xmin, Cxmin);
@@ -940,12 +984,12 @@ bool Graph::SetXScale()
 			}
 			if(Cxmin>=0.0) xmin = 0.0;
 			if(Cxmax<=0.0) xmax = 0.0;
-			
+
 		}
 		else
 		{
 			// until things are made clear
-            for (nc=0; nc < m_oaCurves.size(); nc++)
+			for (nc=0; nc < m_oaCurves.size(); nc++)
 			{
 				pCurve = (CCurve*)m_oaCurves[nc];
 				if (pCurve->IsVisible() && pCurve->n>0)
@@ -957,10 +1001,10 @@ bool Graph::SetXScale()
 		}
 		xo=0.0;
 
-        if(fabs((xmin-xmax)/xmin)<0.001)
+		if(fabs((xmin-xmax)/xmin)<0.001)
 		{
-            if(fabs(xmin)<0.00001) xmax = 1.0;
-			else 
+			if(fabs(xmin)<0.00001) xmax = 1.0;
+			else
 			{
 				xmax = 2.0 * xmin;
 				if(xmax < xmin)
@@ -982,17 +1026,17 @@ bool Graph::SetXScale()
 		SetAutoXUnit();
 	}
 	else
-	{ 
+	{
 		//scales are set manually
 		if(m_w<=0.0) return false;
-	
+
 //		m_scalex   =  (xmax-xmin)/m_w;
 		if (xunit<1.0)
 		{
-			exp_x = (int)log10(xunit)-1;
+			exp_x = (int)log10(xunit*1.00001)-1;
 			exp_x = qMax(-4, exp_x);
 		}
-		else exp_x = (int)log10(xunit);
+		else exp_x = (int)log10(xunit*1.00001);
 
 	}
 	m_scalex   =  (xmax-xmin)/m_w;
@@ -1006,10 +1050,58 @@ bool Graph::SetXScale()
 	return true;
 }
 
+
+
+void Graph::SetXUnit(double f){
+	xunit = f;
+}
+
+void Graph::SetXTitle(QString str)
+{
+	m_XTitle = str;
+}
+
+
+
+void Graph::SetXVariable(int const & X)
+{
+	m_X = X;
+}
+
+
+
+
+void Graph::SetYMin(double f){
+	ymin = f;
+}
+
+void Graph::SetYMinorUnit(double f){
+	m_YMinorUnit = f;
+}
+
+
+void Graph::SetYMax(double f){
+	ymax = f;
+}
+
+void Graph::SetY0(double f){
+	yo = f;
+}
+
+void Graph::SetYTitle(QString str)
+{
+	m_YTitle = str;
+}
+
+void Graph::SetYUnit(double f){
+	yunit = f;
+}
+
+
+
 bool Graph::SetYScale()
 {
     int nc;
-
     CCurve *pCurve;
 
     if(m_bAutoY)
@@ -1091,12 +1183,17 @@ bool Graph::SetYScale()
 
 		if(m_h<=0.0) return false;
 
+		if (!m_bYInverted)
+		{
+			m_scaley   = -(ymax-ymin)/m_h;
+		}
+		else
+		{
+			m_scaley   =  (ymax-ymin)/m_h;
+		}
 
-		//try to set an automatic scale for Y Axis		
-
+		//try to set an automatic scale for Y Axis
 		SetAutoYUnit();
-
-
 	}
 	else
 	{
@@ -1114,10 +1211,10 @@ bool Graph::SetYScale()
 
 		if (yunit<1.0)
 		{
-			exp_y = (int)log10(yunit)-1;
+			exp_y = (int)log10(yunit*1.00001)-1;
 			exp_y = qMax(-4, exp_y);
 		}
-		else  exp_y = (int)log10(yunit);
+		else  exp_y = (int)log10(yunit*1.00001);
 
 	}
 
@@ -1131,15 +1228,6 @@ bool Graph::SetYScale()
 	return true;
 }
 
-
-void Graph::SetXMajGrid(bool const &state, QColor const &clr, int const &style, int const &width)
-{
-	m_bXMajGrid = state;
-	m_XMajClr   = clr;
-	m_XMajStyle = style;
-	m_XMajWidth = width;
-}
-
 void Graph::SetYMajGrid(bool const &state, QColor const &clr, int const &style, int const &width)
 {
 	m_bYMajGrid = state;
@@ -1148,14 +1236,10 @@ void Graph::SetYMajGrid(bool const &state, QColor const &clr, int const &style, 
 	m_YMajWidth = width;
 }
 
-void Graph::SetXMinGrid(bool state, bool bAuto, QColor clr, int style, int width, double unit)
+
+void Graph::SetYMajGrid(bool const &bGrid)
 {
-	m_bXMinGrid = state;
-	m_bXAutoMinGrid = bAuto;
-	m_XMinClr   = clr;
-	m_XMinStyle = style;
-	m_XMinWidth = width;
-	if(unit>0.0) m_XMinorUnit  = unit;
+	m_bYMajGrid = bGrid;
 }
 
 void Graph::SetYMinGrid(bool state, bool bAuto, QColor clr, int style, int width, double unit)
@@ -1167,60 +1251,7 @@ void Graph::SetYMinGrid(bool state, bool bAuto, QColor clr, int style, int width
 	m_YMinWidth = width;
 	if(unit>0.0) m_YMinorUnit  = unit;
 }
-//___________________End Sets______________________________________________________________
 
-
-void Graph::Scale(double zoom)
-{
-	if (zoom<0.01) zoom =0.01;
-	m_bAutoX = false;
-	m_bAutoY = false;
-
-	double xm = (xmin + xmax)/2.0;
-	xmin = xm+(xmin-xm)*zoom;
-	xmax = xm+(xmax-xm)*zoom;
-
-	double ym = (ymin + ymax)/2.0;
-	ymin = ym+(ymin-ym)*zoom;
-	ymax = ym+(ymax-ym)*zoom;
-}
-
-void Graph::Scalex(double zoom)
-{
-	if (zoom<0.01) zoom =0.01;
-	m_bAutoX = false;
-
-	double xm = (xmin + xmax)/2.0;
-	xmin = xm+(xmin-xm)*zoom;
-	xmax = xm+(xmax-xm)*zoom;
-
-}
-
-void Graph::Scaley(double zoom)
-{
-	if (zoom<0.01) zoom =0.01;
-	m_bAutoY = false;
-
-	double ym = (ymin + ymax)/2.0;
-	ymin = ym+(ymin-ym)*zoom;
-	ymax = ym+(ymax-ym)*zoom;
-}
-
-
-void Graph::SetXMajGrid(bool const &bGrid)
-{
-	m_bXMajGrid = bGrid;
-}
-
-void Graph::SetYMajGrid(bool const &bGrid)
-{
-	m_bYMajGrid = bGrid;
-}
-
-void Graph::SetXMinGrid(bool const &bGrid)
-{
-	m_bXMinGrid = bGrid;
-}
 
 void Graph::SetYMinGrid(bool const &bGrid)
 {
@@ -1229,6 +1260,12 @@ void Graph::SetYMinGrid(bool const &bGrid)
 
 
 
+
+
+void Graph::SetYVariable(int const & Y)
+{
+	m_Y = Y;
+}
 
 int Graph::xToClient(double x)
 {
@@ -1240,40 +1277,6 @@ int Graph::yToClient(double y)
 	return (int)(y/m_scaley + m_ptoffset.y());
 }
 
-
-int Graph::GetXVariable()
-{
-	return m_X;
-}
-
-
-
-int Graph::GetYVariable()
-{
-	return m_Y;
-}
-
-
-
-void Graph::SetVariables(int const & X, int const & Y)
-{
-	m_X = X;
-	m_Y = Y;
-}
-
-
-
-void Graph::SetXVariable(int const & X)
-{
-	m_X = X;
-}
-
-
-
-void Graph::SetYVariable(int const & Y)
-{
-	m_Y = Y;
-}
 
 
 

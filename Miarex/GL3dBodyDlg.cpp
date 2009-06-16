@@ -2968,7 +2968,7 @@ void GL3dBodyDlg::InitDialog()
 	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
 	m_pFrameModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
 	m_pFrameModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
-	m_pPointModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
+	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
 	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
 	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
 
@@ -2990,6 +2990,8 @@ void GL3dBodyDlg::InitDialog()
 	m_pctrlPointTable->setColumnWidth(0,w4);
 	m_pctrlPointTable->setColumnWidth(1,w4);
 	m_pctrlPointTable->setColumnWidth(2,w4);
+
+	m_pctrlBodyName->setEnabled(m_bEnableName);
 }
 
 
@@ -3144,16 +3146,13 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			int n = m_pBody->m_iActiveFrame;
 			if (n>=0 && n<=m_pBody->m_NStations && !m_bTrans && m_bDragPoint)
 			{
-				if(!m_pBody->m_bLocked)
-				{
-					//dragging a point
-					m_pFrame = m_pBody->m_Frame + m_pBody->m_iActiveFrame;
-					m_pBody->m_FramePosition[n].x = Real.x;
-					m_pBody->m_FramePosition[n].z = Real.y;
-					m_pBody->UpdateFramePos(n);
-					m_bTrans = false;
-					m_bResetglBody2D = true;
-				}
+				//dragging a point
+				m_pFrame = m_pBody->m_Frame + m_pBody->m_iActiveFrame;
+				m_pBody->m_FramePosition[n].x = Real.x;
+				m_pBody->m_FramePosition[n].z = Real.y;
+				m_pBody->UpdateFramePos(n);
+				m_bTrans = false;
+				m_bResetglBody2D = true;
 			}
 
 			UpdateView();
@@ -3167,28 +3166,23 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			if(m_pFrame)	n = CFrame::s_iSelect;
 			else			n = -10;
 			if (n>0 && n<m_pFrame->m_NPoints-1 && !m_bTrans && m_bDragPoint)
-			{	//dragging a point
-				if(!m_pBody->m_bLocked)
-				{
-					if(Real.x<0.0) 	m_pFrame->m_Point[n].y = 0.0;
-					else            m_pFrame->m_Point[n].y = Real.x;
-					m_pFrame->m_Point[n].z = Real.y;
-					m_pBody->ComputeCenterLine();
-					m_bTrans = false;
-					m_bResetglBody2D = true;
-				}
+			{
+				//dragging a point
+				if(Real.x<0.0) 	m_pFrame->m_Point[n].y = 0.0;
+				else            m_pFrame->m_Point[n].y = Real.x;
+				m_pFrame->m_Point[n].z = Real.y;
+				m_pBody->ComputeCenterLine();
+				m_bTrans = false;
+				m_bResetglBody2D = true;
 			}
 			else if ((n==0 || n==m_pFrame->m_NPoints-1)  && !m_bTrans && m_bDragPoint)
 			{
-				if(!m_pBody->m_bLocked)
-				{
-					//dragging a point
-					m_pFrame->m_Point[n].y = 0.0;
-					m_pFrame->m_Point[n].z = Real.y;
-					m_pBody->ComputeCenterLine();
-					m_bTrans = false;
-					m_bResetglBody2D = true;
-				}
+				//dragging a point
+				m_pFrame->m_Point[n].y = 0.0;
+				m_pFrame->m_Point[n].z = Real.y;
+				m_pBody->ComputeCenterLine();
+				m_bTrans = false;
+				m_bResetglBody2D = true;
 			}
 
 			UpdateView();
@@ -3484,7 +3478,7 @@ void GL3dBodyDlg::On3DTop()
 
 void GL3dBodyDlg::On3DLeft()
 {
-	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90° around x
+	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90 deg around x
 	Set3DRotationCenter();
 	UpdateView();
 }
@@ -3492,8 +3486,8 @@ void GL3dBodyDlg::On3DLeft()
 
 void GL3dBodyDlg::On3DFront()
 {
-	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90° around y
-	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90° around x
+	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90 deg around y
+	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90 deg around x
 
 	m_ArcBall.SetQuat(Qt1 * Qt2);
 	Set3DRotationCenter();
@@ -3531,7 +3525,7 @@ void GL3dBodyDlg::OnAxes()
 
 void GL3dBodyDlg::OnBodyName()
 {
-	m_pBody->m_BodyName = m_pctrlBodyName->text();
+	if(m_pBody) m_pBody->m_BodyName = m_pctrlBodyName->text();
 }
 
 
@@ -4014,9 +4008,17 @@ void GL3dBodyDlg::reject()
 		m_pBody->m_BodyName = m_pctrlBodyName->text();
 
 		int res = QMessageBox::question(window(), "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
-		if (QMessageBox::No == res) QDialog::reject();
+		if (QMessageBox::No == res)
+		{
+			m_pBody = NULL;
+			QDialog::reject();
+		}
 		else if (QMessageBox::Cancel == res) return;
-		else done(QDialog::Accepted);
+		else
+		{
+			m_pBody = NULL;
+			done(QDialog::Accepted);
+		}
 	}
 	else QDialog::reject();
 
@@ -4725,7 +4727,7 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 void GL3dBodyDlg::showEvent(QShowEvent *event)
 {
 	m_bChanged    = false;
-	InitDialog();
+//	InitDialog();
 	m_bResetglBody = true;
 	m_bIs3DScaleSet = false;
 	SetBodyScale();

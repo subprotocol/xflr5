@@ -221,6 +221,8 @@ protected:
 private:
 	QTimer *m_pAnimateTimer;
 
+	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
+
 	QRadioButton *m_pctrlSpec1;
 	QRadioButton *m_pctrlSpec2;
 	QRadioButton *m_pctrlSpec3;

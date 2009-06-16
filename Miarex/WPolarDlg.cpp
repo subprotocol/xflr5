@@ -660,8 +660,8 @@ void WPolarDlg::SetupLayout()
 	m_pctrlSpeedUnit   = new QLabel("m/s");
 	m_pctrlWeightUnit  = new QLabel("kg");
 	m_pctrlLengthUnit1 = new QLabel("mm");
-	QLabel *lab6 = new QLabel("deg.");
-	QLabel *lab7 = new QLabel("deg.");
+	QLabel *lab6 = new QLabel(QString::fromUtf8("°"));
+	QLabel *lab7 = new QLabel(QString::fromUtf8("°"));
 	PlaneLayout->addWidget(m_pctrlSpeedUnit ,1,3);
 	PlaneLayout->addWidget(m_pctrlWeightUnit ,2,3);
 	PlaneLayout->addWidget(m_pctrlLengthUnit1 ,3,3);
@@ -813,7 +813,7 @@ void WPolarDlg::SetWPolarName()
 	}
 	else if(m_Type==4)
 	{
-		m_WPolarName = QString("T4-%1deg").arg(m_Alpha,0,'f',3);
+		m_WPolarName = QString(QString::fromUtf8("T4-%1°")).arg(m_Alpha,0,'f',3);
 	}
 
 	if(m_AnalysisType==1) m_WPolarName += "-LLT";
@@ -835,7 +835,7 @@ void WPolarDlg::SetWPolarName()
 
 	if(fabs(m_Beta) > .001)
 	{
-		strong = QString("-b%1°").arg(m_Beta,0,'f',1);
+		strong = QString(QString::fromUtf8("-b%1°")).arg(m_Beta,0,'f',1);
 		m_WPolarName += strong;
 	}
 

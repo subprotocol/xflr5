@@ -224,8 +224,8 @@ void QGraph::DrawAxes(QPainter &painter)
 	painter.save();
 
 	QPen AxesPen(m_AxisColor);
-	AxesPen.setStyle(GetStyle(m_nStyle));
-	AxesPen.setWidth(m_Width);
+	AxesPen.setStyle(GetStyle(m_AxisStyle));
+	AxesPen.setWidth(m_AxisWidth);
 	painter.setPen(AxesPen);
 
 
@@ -314,8 +314,8 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 	QPen LabelPen(m_AxisColor);
 
-	LabelPen.setStyle(GetStyle(m_nStyle));
-	LabelPen.setWidth(m_Width);
+	LabelPen.setStyle(GetStyle(m_AxisStyle));
+	LabelPen.setWidth(m_AxisWidth);
 	painter.setPen(LabelPen);
 	double xt = xo-(xo-xmin);//one tick at the origin
 	int  nx = (int)((xo-xmin)/xunit);
@@ -394,8 +394,8 @@ void QGraph::DrawYTicks(QPainter &painter)
 	xExpOff  = 7;
 
 	QPen LabelPen(m_AxisColor);
-	LabelPen.setStyle(GetStyle(m_nStyle));
-	LabelPen.setWidth(m_Width);
+	LabelPen.setStyle(GetStyle(m_AxisStyle));
+	LabelPen.setWidth(m_AxisWidth);
 
 //	double yt = ymin;
 	double xp;
@@ -405,7 +405,6 @@ void QGraph::DrawYTicks(QPainter &painter)
 	else                     xp = xmin;
 
 	double yt = yo-int((yo-ymin)*1.0001/yunit)*yunit;//one tick at the origin
-
 
 	while(yt<=ymax*1.0001)
 	{

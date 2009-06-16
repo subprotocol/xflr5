@@ -44,6 +44,8 @@ QXInverse::QXInverse(QWidget *parent)
 	m_bLoaded        = false;
 	m_bSaved         = true;
 	m_bZoomPlus      = false;
+	m_bZoomXOnly     = false;
+	m_bZoomYOnly     = false;
 	m_bShowPoints    = false;
 	m_bRefCurves     = false;
 	m_bTangentSpline = false;
@@ -533,6 +535,23 @@ void QXInverse::keyReleaseEvent(QKeyEvent *event)
 {
 	switch (event->key())
 	{
+		case Qt::Key_Escape:
+		{
+			if(m_bZoomPlus) ReleaseZoom();
+			if(m_bZoomXOnly)
+			{
+				m_bZoomXOnly = false;
+				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+				pMainFrame->m_pctrlInvZoomX->setChecked(false);
+			}
+			if(m_bZoomYOnly)
+			{
+				m_bZoomYOnly = false;
+				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+				pMainFrame->m_pctrlInvZoomY->setChecked(false);
+			}
+			break;
+		}
 		case Qt::Key_X:
 			if(!event->isAutoRepeat()) m_bXPressed = false;
 			break;
@@ -1554,6 +1573,47 @@ void QXInverse::OnSymm()
 	pXFoil->lqspec = false;
 }
 
+void QXInverse::OnZoomIn()
+{
+	if(!m_bZoomPlus)
+	{
+		if(m_fScale/m_fRefScale <32.0)
+		{
+			m_bZoomPlus = true;
+			MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+			pMainFrame->m_pctrlInvZoomIn->setChecked(true);
+		}
+		else
+		{
+			ReleaseZoom();
+		}
+	}
+	else {
+		ReleaseZoom();
+	}
+}
+
+
+void QXInverse::OnZoomX()
+{
+	ReleaseZoom();
+	m_bZoomYOnly = false;
+	m_bZoomXOnly = !m_bZoomXOnly;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->m_pctrlInvZoomX->setChecked(m_bZoomXOnly);
+	pMainFrame->m_pctrlInvZoomY->setChecked(m_bZoomYOnly);
+}
+
+
+void QXInverse::OnZoomY()
+{
+	ReleaseZoom();
+	m_bZoomXOnly = false;
+	m_bZoomYOnly = !m_bZoomYOnly;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->m_pctrlInvZoomX->setChecked(m_bZoomXOnly);
+	pMainFrame->m_pctrlInvZoomY->setChecked(m_bZoomYOnly);
+}
 
 
 void QXInverse::OnTangentSpline()
@@ -1739,11 +1799,11 @@ double QXInverse::qincom(double qc, double qinf, double tklam)
 
 void QXInverse::ReleaseZoom()
 {
-	m_bZoomPlus = false;
+	m_bZoomPlus  = false;
 	m_ZoomRect.setRight(m_ZoomRect.left());
 	m_ZoomRect.setTop(m_ZoomRect.bottom());
-//	CToolBarCtrl *pTB = &(m_pXInverseBar->GetToolBarCtrl());
-//	pTB->PressButton(IDT_ZOOMIN, false);
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->m_pctrlInvZoomIn->setChecked(false);
 }
 
 
@@ -2211,21 +2271,20 @@ void QXInverse::UpdateView()
 }
 
 
-
 void QXInverse::wheelEvent(QWheelEvent *event)
 {
 	ReleaseZoom();
 	QPoint pttmp(event->pos().x(), event->pos().y());
 	if(m_QGraph.IsInDrawRect(pttmp))
 	{
-		if (m_bXPressed)
+		if (m_bXPressed || m_bZoomXOnly)
 		{
 			//zoom x scale
 			m_QGraph.SetAutoX(false);
 			if(event->delta()>0) m_QGraph.Scalex(1.06);
 			else                 m_QGraph.Scalex(1.0/1.06);
 		}
-		else if(m_bYPressed)
+		else if(m_bYPressed || m_bZoomYOnly)
 		{
 			//zoom y scale
 			m_QGraph.SetAutoY(false);
@@ -2239,6 +2298,8 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 			if(event->delta()>0) m_QGraph.Scale(1.06);
 			else                 m_QGraph.Scale(1.0/1.06);
 		}
+		m_QGraph.SetAutoXUnit();
+		m_QGraph.SetAutoYUnit();
 	}
 	else
 	{
@@ -2252,3 +2313,5 @@ void QXInverse::wheelEvent(QWheelEvent *event)
 	}
 	UpdateView();
 }
+
+

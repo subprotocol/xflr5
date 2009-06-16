@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+ 
 //QSelectionModel *selections = tableView->selectionModel();
 //QModelIndexList selected = selections->selectedIndexex();
 
@@ -2201,7 +2201,6 @@ void QAFoil::OnVisible()
 
 void QAFoil::OnZoomIn()
 {
-	// can't do two things at the same time can we ?
 	if(!m_bZoomPlus)
 	{
 		if(m_fScale/m_fRefScale <32.0)
@@ -2803,13 +2802,12 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Camber (%)");
 	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at (%)");
 	m_pFoilModel->setHeaderData(5, Qt::Horizontal, "Points");
-	m_pFoilModel->setHeaderData(6, Qt::Horizontal, "T.E. Flap (deg)");
-	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "T.E. XHinge");
-	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "T.E. YHinge");
-	m_pFoilModel->setHeaderData(9, Qt::Horizontal, "L.E. Flap (deg)");
-	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "L.E. XHinge");
-	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "L.E. YHinge");
-//	m_pFoilModel->setHeaderData(12, Qt::Horizontal, "Visible");
+	m_pFoilModel->setHeaderData(6, Qt::Horizontal, QString::fromUtf8("TE Flap (°)"));
+	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "TE XHinge");
+	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "TE YHinge");
+	m_pFoilModel->setHeaderData(9, Qt::Horizontal, QString::fromUtf8("TE Flap (°)"));
+	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "LE XHinge");
+	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "LE YHinge");
 
 	m_pctrlFoilTable->setModel(m_pFoilModel);
 	m_pctrlFoilTable->setWindowTitle("Foils");
@@ -2843,8 +2841,8 @@ void QAFoil::SetupLayout()
 void QAFoil::resizeEvent(QResizeEvent *event)
 {
 	int w = m_pctrlFoilTable->width();
-	int w12 = (int)((double)w/12.0);
-	int w14 = (int)((double)w/14.0);
+	int w12 = (int)((double)w/13.0);
+	int w14 = (int)((double)w/15.0);
 
 	m_pctrlFoilTable->setColumnWidth(1,w12);
 	m_pctrlFoilTable->setColumnWidth(2,w12);

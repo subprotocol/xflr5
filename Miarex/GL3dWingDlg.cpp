@@ -1843,6 +1843,7 @@ void GL3dWingDlg::OnClipPlane(int pos)
 
 void GL3dWingDlg::OnCellChanged(QWidget *pWidget)
 {
+
 	m_bChanged = true;
 	m_bResetglWing = true;
 	ReadParams();
@@ -1953,6 +1954,7 @@ void GL3dWingDlg::OnInsertBefore()
 	FillDataTable();
 	ComputeGeometry();
 	SetWingData();
+
 	m_bChanged = true;
 	m_bResetglWing = true;
 	UpdateView();
@@ -2048,7 +2050,6 @@ void GL3dWingDlg::OnItemClicked(const QModelIndex &index)
 }
 
 
-
 void GL3dWingDlg::OnOK()
 {
 	ReadParams();
@@ -2066,6 +2067,8 @@ void GL3dWingDlg::OnOK()
 	m_pWing->m_bVLMAutoMesh = false;
 
 	m_pWing->ComputeGeometry();
+
+	m_bChanged = false;
 	accept();
 }
 
@@ -2097,6 +2100,10 @@ void GL3dWingDlg::OnResetMesh()
 	m_bResetglWing = true;
 	UpdateView();
 }
+
+
+
+
 
 
 void GL3dWingDlg::OnSetupLight()
@@ -2306,7 +2313,7 @@ void GL3dWingDlg::reject()
 		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			return;
 	}
-//	reject();
+	m_bChanged = false;
 	done(QDialog::Rejected);
 }
 
@@ -2927,6 +2934,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 {
 	//set automatic mesh : keep it simple
 	m_pWing->m_bVLMAutoMesh = true;
+
 	m_bChanged = true;
 	//split (NYTotal) panels on each side proportionnaly to length, and space evenly
 	//Set VLMMATSIZE/NYTotal panels along chord

@@ -76,6 +76,28 @@ void ReListDlg::InitDialog()
 }
 
 
+void ReListDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus()) OKButton->setFocus();
+			else                      accept();
+
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+
 void ReListDlg::OnCellChanged(QWidget *FloatEdit)
 {
 //sort the data in case the Re Number was changed

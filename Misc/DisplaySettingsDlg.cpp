@@ -122,6 +122,7 @@ void DisplaySettingsDlg::SetupLayout()
 
 void DisplaySettingsDlg::InitDialog()
 {
+	m_MemGraph.CopySettings(m_pRefGraph);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
 	m_pctrlTextFont->setText(m_TextFont.family());
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
@@ -133,7 +134,7 @@ void DisplaySettingsDlg::InitDialog()
 		palette.setColor(QPalette::Button, m_BackgroundColor);
 		palette.setColor(QPalette::ButtonText, m_TextColor);
 		m_pctrlTextClr->setPalette(palette);
-		m_pctrlTextClr->setAutoFillBackground(true);
+//		m_pctrlTextClr->setAutoFillBackground(true);
 		m_pctrlTextClr->setFont(m_TextFont);
 	}
 }
@@ -160,13 +161,43 @@ void DisplaySettingsDlg::OnBackgroundColor()
 	QColor listColor = palette.color(QPalette::Button);
 	if(listColor.isValid())
 	{
-		palette.setColor(QPalette::Background, m_BackgroundColor);
+//		palette.setColor(QPalette::Background, m_BackgroundColor);
 		palette.setColor(QPalette::Button, m_BackgroundColor);
 		palette.setColor(QPalette::ButtonText, m_TextColor);
 		m_pctrlTextClr->setPalette(palette);
 	}
 }
 
+void DisplaySettingsDlg::reject()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QXDirect *pXDirect   = (QXDirect*)pMainFrame->m_pXDirect;
+	QMiarex *pMiarex     = (QMiarex*)pMainFrame->m_pMiarex;
+	QXInverse *pXInverse = (QXInverse*)pMainFrame->m_pXInverse;
+
+	pXDirect->m_pCpGraph->CopySettings(&m_MemGraph);
+	pXDirect->m_pCpGraph->SetInverted(true);
+
+	pXDirect->m_pPolarGraph->CopySettings(&m_MemGraph);
+	pXDirect->m_pCmGraph->CopySettings(&m_MemGraph);
+	pXDirect->m_pCzGraph->CopySettings(&m_MemGraph);
+	pXDirect->m_pTrGraph->CopySettings(&m_MemGraph);
+	pXDirect->m_pUserGraph->CopySettings(&m_MemGraph);
+
+	pMiarex->m_WingGraph1.CopySettings(&m_MemGraph);
+	pMiarex->m_WingGraph2.CopySettings(&m_MemGraph);
+	pMiarex->m_WingGraph3.CopySettings(&m_MemGraph);
+	pMiarex->m_WingGraph4.CopySettings(&m_MemGraph);
+	pMiarex->m_WPlrGraph1.CopySettings(&m_MemGraph);
+	pMiarex->m_WPlrGraph2.CopySettings(&m_MemGraph);
+	pMiarex->m_WPlrGraph3.CopySettings(&m_MemGraph);
+	pMiarex->m_WPlrGraph4.CopySettings(&m_MemGraph);
+
+	pXInverse->m_QGraph.CopySettings(&m_MemGraph);
+	pXInverse->m_QGraph.SetInverted(true);
+
+	QDialog::reject();
+}
 
 void DisplaySettingsDlg::OnGraphSettings()
 {
@@ -210,6 +241,9 @@ void DisplaySettingsDlg::OnGraphSettings()
 	{
 		m_pRefGraph->CopySettings(dlg.m_pGraph);
 		m_bIsGraphModified = true;
+
+		pXDirect->m_pCpGraph->SetInverted(true);
+		pXInverse->m_QGraph.SetInverted(true);
 	}
 }
 
@@ -225,11 +259,11 @@ void DisplaySettingsDlg::OnTextColor()
 	QColor listColor = palette.color(QPalette::Button);
 	if(listColor.isValid())
 	{
-		palette.setColor(QPalette::Background, m_BackgroundColor);
+//		palette.setColor(QPalette::Background, m_BackgroundColor);
 		palette.setColor(QPalette::Button, m_BackgroundColor);
 		palette.setColor(QPalette::ButtonText, m_TextColor);
 		m_pctrlTextClr->setPalette(palette);
-		m_pctrlTextClr->setAutoFillBackground(true);
+//		m_pctrlTextClr->setAutoFillBackground(true);
 	}
 }
 
