@@ -48,7 +48,11 @@ Licence :
 
                        **************************
 
-v4.17 June xxth, 2009
+v4.18 June xxx, 2009
+	- Corrected a bug in Body import routine
+	- Corrected a bug in control polar execution for wings with flaps
+
+v4.17 June 1st, 2009
 	- Corrected the bug which prevented the definition of a control polar
 	- Corrected the bug which prevented to run a foil Type 1 analysis after having run a type 4 analysis
 

@@ -1518,7 +1518,7 @@ int CBody::ReadFrame(CStdioFile *pXFile, int &Line, CFrame *pFrame, double const
 		}
 		else 
 		{
-			angle = pi/2.0 - atan2(real.z, real.y);
+			angle = atan2(real.z, real.y);
 			for (j=0; j<i; j++)
 			{
 				if(angle> theta[j]) 

@@ -411,32 +411,35 @@ bool CVLMThread::ControlLoop()
 				nCtrl = 3;
 			}
 		}
-
 		// flap controls
 		//wing first
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			if(m_pWPolar->m_bActiveControl[nCtrl])
-			{
-				angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
-
-				if(!pWing->m_Surface[j].RotateFlap(angle))  return false;
-			}
-			nCtrl++;
-		}
-
-		//elevator next and last
-		if(pStab)
-		{
-			for (j=0; j<pStab->m_NSurfaces; j++)
+			if(pWing->m_Surface[j].m_bTEFlap)
 			{
 				if(m_pWPolar->m_bActiveControl[nCtrl])
 				{
 					angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
 
-					if(!pStab->m_Surface[j].RotateFlap(angle)) return false;
+					if(!pWing->m_Surface[j].RotateFlap(angle))  return false;
 				}
 				nCtrl++;
+			}
+		}
+		//elevator next and last
+		if(pStab)
+		{
+			for (j=0; j<pStab->m_NSurfaces; j++)
+			{
+				if(pStab->m_Surface[j].m_bTEFlap)
+				{
+					if(m_pWPolar->m_bActiveControl[nCtrl])
+					{
+						angle = m_pWPolar->m_MinControl[nCtrl] + t * (m_pWPolar->m_MaxControl[nCtrl] - m_pWPolar->m_MinControl[nCtrl]);
+						if(!pStab->m_Surface[j].RotateFlap(angle)) return false;
+					}
+					nCtrl++;
+				}
 			}
 		}
 
