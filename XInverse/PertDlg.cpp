@@ -47,10 +47,10 @@ PertDlg::PertDlg(void *pParent)
 void PertDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	RestoreButton	= new QPushButton("Restore");
-	ApplyButton	= new QPushButton("Apply");
-	OKButton        = new QPushButton("OK");
-	CancelButton    = new QPushButton("Cancel");
+	RestoreButton	= new QPushButton(tr("Restore"));
+	ApplyButton	= new QPushButton(tr("Apply"));
+	OKButton        = new QPushButton(tr("OK"));
+	CancelButton    = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(RestoreButton);
 	CommandButtons->addWidget(ApplyButton);

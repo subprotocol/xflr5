@@ -99,7 +99,7 @@ void FlapDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton("Apply");
+	ApplyButton  = new QPushButton(tr("Apply"));
 
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
@@ -147,7 +147,7 @@ void FlapDlg::ReadParams()
 
 	if(m_LEXHinge>=m_TEXHinge && m_bLEFlap && m_bTEFlap)
 	{
-		QMessageBox::information(window(), "Warning", "The trailing edge hinge must be downstream of the leading edge hinge");
+		QMessageBox::information(window(), tr("Warning"), "The trailing edge hinge must be downstream of the leading edge hinge");
 		m_pctrlLEXHinge->setFocus();
 		m_pctrlLEXHinge->selectAll();
 	}

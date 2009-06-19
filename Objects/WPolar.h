@@ -43,6 +43,7 @@ class CWPolar
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class EditPlrDlg;
+	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
 
 public:

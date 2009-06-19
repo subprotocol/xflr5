@@ -291,7 +291,7 @@ void FoilCoordDlg::SetupLayout()
 	m_pctrlInsertPoint	= new QPushButton("Insert Point");
 	m_pctrlDeletePoint	= new QPushButton("Delete Point");
 	m_pctrlRestore      = new QPushButton("Restore");
-	m_pctrlApply        = new QPushButton("Apply");
+	m_pctrlApply        = new QPushButton(tr("Apply"));
 	OKButton            = new QPushButton("OK");
 	CancelButton        = new QPushButton("Cancel");
 	CommandButtons->addStretch(1);

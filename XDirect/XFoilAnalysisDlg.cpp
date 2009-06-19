@@ -411,6 +411,9 @@ bool XFoilAnalysisDlg::ReLoop()
 	int total=int((m_ReMax*1.0001-m_ReMin)/m_DeltaRe);//*1.0001 to make sure upper limit is included
 
 	total = abs(total);
+
+	if(!m_bSequence) total = 0;
+
 	QString strange;
 
 	for (ia=0; ia<=total; ia++)

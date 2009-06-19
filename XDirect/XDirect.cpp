@@ -33,7 +33,7 @@
 #include "TwoDPanelDlg.h"
 #include "InterpolateFoilsDlg.h"
 #include "NacaFoilDlg.h"
-#include "BatchDlg.h"
+#include "BatchDlg.h" 
 #include "FoilCoordDlg.h"
 #include "FoilGeomDlg.h"
 #include "TEGapDlg.h"
@@ -42,6 +42,8 @@
 #include "CAddDlg.h"
 #include "XFoilAdvancedDlg.h"
 #include "XDirectStyleDlg.h"
+#include "ManageFoilsDlg.h"
+
 
 QXDirect::QXDirect(QWidget *parent)
     : QWidget(parent)
@@ -60,7 +62,6 @@ QXDirect::QXDirect(QWidget *parent)
 	Connect();
 
 	FillComboBoxes(false);
-
 
 	pi = 3.141592654;
 
@@ -167,14 +168,13 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pUserGraph->SetVariables(0,10);
 
 	m_pCpGraph->SetXTitle("X");
-	m_pCpGraph->SetYTitle("Cp");
+	m_pCpGraph->SetYTitle(tr("Cp"));
 	m_pCpGraph->SetInverted(true);
 	m_pCpGraph->SetXMin(0.0);
 	m_pCpGraph->SetXMax(1.0);
 	m_pCpGraph->SetYMin(-0.1);
 	m_pCpGraph->SetYMax(0.1);
 	m_pCpGraph->SetMargin(50);
-	m_pCpGraph->SetBkColor(QColor(0,30,50));
 	m_pCpGraph->SetBorderColor(QColor(200,200,200));
 	m_pCpGraph->SetBorder(true);
 	m_pCpGraph->SetBorderStyle(0);
@@ -184,7 +184,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pPolarGraph->SetYMin(-0.1);
 	m_pPolarGraph->SetYMax(0.1);
 	m_pPolarGraph->SetType(2);
-	m_pPolarGraph->SetBkColor(QColor(0,30,50));
 	m_pPolarGraph->SetBorderColor(QColor(200,200,200));
 	m_pPolarGraph->SetBorder(true);
 	m_pPolarGraph->SetBorderStyle(0);
@@ -196,7 +195,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCmGraph->SetYMin(-0.1);
 	m_pCmGraph->SetYMax(0.1);
 	m_pCmGraph->SetType(2);
-	m_pCmGraph->SetBkColor(QColor(0,30,50));
 	m_pCmGraph->SetBorderColor(QColor(200,200,200));
 	m_pCmGraph->SetBorder(true);
 	m_pCmGraph->SetBorderStyle(0);
@@ -208,7 +206,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCzGraph->SetYMin(-0.1);
 	m_pCzGraph->SetYMax(0.1);
 	m_pCzGraph->SetType(2);
-	m_pCzGraph->SetBkColor(QColor(0,30,50));
 	m_pCzGraph->SetBorderColor(QColor(200,200,200));
 	m_pCzGraph->SetBorder(true);
 	m_pCzGraph->SetBorderStyle(0);
@@ -220,7 +217,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pTrGraph->SetYMin(-0.1);
 	m_pTrGraph->SetYMax(0.1);
 	m_pTrGraph->SetType(2);
-	m_pTrGraph->SetBkColor(QColor(0,30,50));
 	m_pTrGraph->SetBorderColor(QColor(200,200,200));
 	m_pTrGraph->SetBorder(true);
 	m_pTrGraph->SetBorderStyle(0);
@@ -232,7 +228,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pUserGraph->SetYMin(-0.1);
 	m_pUserGraph->SetYMax(0.1);
 	m_pUserGraph->SetType(2);
-	m_pUserGraph->SetBkColor(QColor(0,30,50));
 	m_pUserGraph->SetBorderColor(QColor(200,200,200));
 	m_pUserGraph->SetBorder(true);
 	m_pUserGraph->SetBorderStyle(0);
@@ -341,10 +336,10 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 
 	if(pOpPoint->m_bTEFlap || pOpPoint->m_bLEFlap)
 	{
-//		SetHingeMoments(pOpPoint); //TODO
-//		pOpPoint->HMom = m_pXFoil->hmom;
-//		pOpPoint->XForce = m_pXFoil->hfx;
-//		pOpPoint->YForce = m_pXFoil->hfy;
+		SetHingeMoments(pOpPoint);
+/*		pOpPoint->m_TEHMom = m_pXFoil->hmom;
+		pOpPoint->XForce   = m_pXFoil->hfx;
+		pOpPoint->YForce   = m_pXFoil->hfy;*/
 	}
 
 	if(!m_pXFoil->lvisc || !m_pXFoil->lvconv)	return;
@@ -426,7 +421,6 @@ OpPoint* QXDirect::AddOpPoint()
 	OpPoint *pNewPoint = new OpPoint();
 	if(pNewPoint ==NULL)
 	{
-//			AfxMessageBox("Not enough memory to store the OpPoint\nOnly the polar point will be saved", MB_OK);
 		return NULL;
 	}
 	else
@@ -879,7 +873,7 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 					pCurve->AddPoint(pOpp->x[j], pOpp->Cpi[j]);
 				}
 			}
-			pGraph->SetYTitle("Cp");
+			pGraph->SetYTitle(tr("Cp"));
 			break;
 		}
 		case 1:
@@ -895,7 +889,7 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 					pCurve->AddPoint(pOpp->x[j], pOpp->Qi[j]);
 				}
 			}
-			pGraph->SetYTitle("Q");
+			pGraph->SetYTitle(tr("Q"));
 			break;
 		}
 		default:
@@ -910,7 +904,7 @@ void QXDirect::FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool b
 					pCurve->AddPoint(pOpp->x[j], pOpp->Cpi[j]);
 				}
 			}
-			pGraph->SetYTitle("Cp");
+			pGraph->SetYTitle(tr("Cp"));
 			break;
 		}
 	}
@@ -1148,7 +1142,7 @@ bool QXDirect::InitXFoil()
 	}
 	else
 	{
-		QMessageBox::warning(window(), "Warning","Unrecognized foil format");
+		QMessageBox::warning(window(), tr("Warning"), tr("Unrecognized foil format"));
 		return false;
 	}
 }
@@ -1188,8 +1182,8 @@ void QXDirect::InitXFoil2()
 		if(!m_pXFoil->SetMach())
 		{
 			QString str;
-			str = "... Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
-			QMessageBox::warning(window(), "Warning",str);
+			str = tr("... Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+			QMessageBox::warning(window(), tr("Warning"),str);
 
 		}
 	}
@@ -1374,7 +1368,7 @@ void QXDirect::LoadSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
 	{
-		QMessageBox::warning(window(), "Warning","Archive has an issue");
+		QMessageBox::warning(window(), tr("Warning"), tr("Archive file is corrupted"));
 		return;
 	}
 
@@ -1390,12 +1384,12 @@ void QXDirect::LoadSettings(QDataStream &ar)
 
 	if(m_pCpGraph->GetYVariable() == 0 || m_pCpGraph->GetYVariable()>=2)
 	{
-		m_pCpGraph->SetYTitle("Cp");
+		m_pCpGraph->SetYTitle(tr("Cp"));
 		m_pCpGraph->SetInverted(true);
 	}
 	else
 	{
-		m_pCpGraph->SetYTitle("Q");
+		m_pCpGraph->SetYTitle(tr("Q"));
 		m_pCpGraph->SetInverted(false);
 	}
 
@@ -1965,8 +1959,8 @@ void QXDirect::OnCfPlot()
 	m_pCpGraph->SetYTitle("Cf");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double que = 0.5*m_pXFoil->qinf*m_pXFoil->qinf;
 
@@ -2012,8 +2006,8 @@ void QXDirect::OnCdPlot()
 	m_pCpGraph->SetYTitle("Cd'");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double qrf = m_pXFoil->qinf;
 
@@ -2064,7 +2058,7 @@ void QXDirect::OnCpGraph()
 	m_pCpGraph->SetYVariable(0);
 	m_pCpGraph->SetInverted(true);
 	CreateOppCurves();
-	m_pCpGraph->SetYTitle("Cp");
+	m_pCpGraph->SetYTitle(tr("Cp"));
 
 	CheckButtons();
 	m_pCpGraph->SetXScale();
@@ -2109,15 +2103,15 @@ void QXDirect::OnCtPlot()
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
 	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Max Shear");
+	m_pCpGraph->SetYTitle(tr("Max Shear"));
 	CCurve * pCurve0 = m_pCpGraph->AddCurve();
 	CCurve * pCurve1 = m_pCpGraph->AddCurve();
 	CCurve * pCurve2 = m_pCpGraph->AddCurve();
 	CCurve * pCurve3 = m_pCpGraph->AddCurve();
-	pCurve0->SetTitle("Top Shear");
-	pCurve1->SetTitle("Top Shear eq");
-	pCurve2->SetTitle("Bot Shear");
-	pCurve3->SetTitle("Bot Shear eq");
+	pCurve0->SetTitle(tr("Top Shear"));
+	pCurve1->SetTitle(tr("Top Shear eq"));
+	pCurve2->SetTitle(tr("Bot Shear"));
+	pCurve3->SetTitle(tr("Bot Shear eq"));
 
 	double x[IVX][3];
 	int nside1, nside2;
@@ -2198,13 +2192,13 @@ void QXDirect::OnDelCurOpp()
 
 	if (!pOpPoint) return;
 	QString strong,str;
-	strong = "Are you sure you want to delete the Operating Point \n";
+	strong = tr("Are you sure you want to delete the Operating Point \n");
 	if(m_pCurPolar->m_Type !=4) str = QString("Alpha = %1").arg(pOpPoint->Alpha,0,'f',2);
 	else str = QString("Reynolds = %1").arg(pOpPoint->Reynolds,0,'f',0);
 	strong += str;
 	strong += "  ?";
 
-	if (QMessageBox::Yes == QMessageBox::question(window(), "Question", strong,
+	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 	{
 		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -2276,9 +2270,9 @@ void QXDirect::OnDeleteFoilPolars()
 
 	QString strong;
 
-	strong = "Are you sure you want to delete polars and OpPoints\n";
-	strong +="associated to "+m_pCurFoil->m_FoilName  + " ?";
-	if (QMessageBox::Yes == QMessageBox::question(window(), "Question", strong,
+	strong = tr("Are you sure you want to delete polars and OpPoints\n");
+	strong +=tr("associated to ")+m_pCurFoil->m_FoilName  + " ?";
+	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 
 	{
@@ -2350,7 +2344,7 @@ void QXDirect::OnDerotateFoil()
 	pNewFoil->CopyFoil(m_pCurFoil);
 
 	double angle = pNewFoil->DeRotate();
-	str = QString("The foil has been de-rotated by %1 degrees").arg(angle,6,'f',3);
+	str = QString(tr("The foil has been de-rotated by %1 degrees")).arg(angle,6,'f',3);
 	pMainFrame->statusBar()->showMessage(str);
 
 	pNewFoil->m_nFoilStyle = 0;
@@ -2509,9 +2503,9 @@ void QXDirect::OnExportCurXFoilResults()
 	FileName = m_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, "Export Current XFoil Results",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Current XFoil Results"),
 											pMainFrame->m_LastDirName,
-											"Text File (*.txt);;Comma Separated Values (*.csv)");
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
@@ -2659,9 +2653,9 @@ void QXDirect::OnExportCurFoil()
 	FileName = m_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
 											pMainFrame->m_LastDirName,
-											"Foil File (*.dat)");
+											tr("Foil File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
@@ -2688,9 +2682,9 @@ void QXDirect::OnExportCurOpp()
 	QFile DestFile;
 	int type = 1;
 
-	FileName = QFileDialog::getSaveFileName(this, "Export OpPoint",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
 											pMainFrame->m_LastDirName ,
-											"Text File (*.txt);;Comma Separated Values (*.csv)",
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
@@ -2723,9 +2717,9 @@ void QXDirect::OnExportCurPolar()
 
 	FileName = m_pCurPolar->m_PlrName;
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, "Export Polar",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Polar"),
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt);;Comma Separated Values (*.csv)",
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
@@ -2893,12 +2887,12 @@ void QXDirect::OnGraphSettings()
 		{
 			if(m_pCpGraph->GetYVariable() == 0 || m_pCpGraph->GetYVariable()>=2)
 			{
-				m_pCpGraph->SetYTitle("Cp");
+				m_pCpGraph->SetYTitle(tr("Cp"));
 				m_pCpGraph->SetInverted(true);
 			}
 			else
 			{
-				m_pCpGraph->SetYTitle("Q");
+				m_pCpGraph->SetYTitle(tr("Q"));
 				m_pCpGraph->SetInverted(false);
 			}
 			m_pCpGraph->ResetYLimits();
@@ -2957,8 +2951,8 @@ void QXDirect::OnHPlot()
 	m_pCpGraph->SetYTitle("Hk");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double x[IVX][3],y[IVX][3];
 	int nside1, nside2;
@@ -3094,7 +3088,7 @@ void QXDirect::OnInterpolateFoils()
 {
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox::warning(window(), "Warning", "At least two foils are required");
+		QMessageBox::warning(window(), tr("Warning"), tr("At least two foils are required"));
 		return;
 	}
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -3139,6 +3133,25 @@ void QXDirect::OnInterpolateFoils()
 }
 
 
+void QXDirect::OnManageFoils()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	ManageFoilsDlg dlg;
+	dlg.m_pMainFrame  = m_pMainFrame;
+	QString FoilName = "";
+	if(m_pCurFoil) FoilName = m_pCurFoil->m_FoilName;
+	dlg.InitDialog(FoilName);
+	dlg.exec();
+
+	if(dlg.m_pFoil) SetFoil(dlg.m_pFoil);
+	else            SetFoil();
+
+	pMainFrame->UpdateFoils();
+	pMainFrame->SetSaveState(false);
+	CheckButtons();
+	UpdateView();
+}
+
 
 void QXDirect::OnNacaFoils()
 {
@@ -3153,7 +3166,6 @@ void QXDirect::OnNacaFoils()
 
 	CreateOppCurves();
 	UpdateView();
-
 
 	NacaFoilDlg dlg;
  	dlg.m_pBufferFoil = &m_BufferFoil;
@@ -3203,7 +3215,7 @@ void QXDirect::OnNormalizeFoil()
 	double length = m_pCurFoil->NormalizeGeometry();
 	InitXFoil();
 	SetBufferFoil();
-	str = QString("The foil has been normalized from %1  to 1.000").arg(length,7,'f',3);
+	str = QString(tr("The foil has been normalized from %1  to 1.000")).arg(length,7,'f',3);
 	pMainFrame->SetSaveState(false);
 	pMainFrame->statusBar()->showMessage(str);
 
@@ -3227,8 +3239,8 @@ void QXDirect::OnNPlot()
 	m_pCpGraph->SetYTitle("A/A0");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double x[IVX][3],y[IVX][3];
 
@@ -3351,7 +3363,7 @@ void QXDirect::OnQGraph()
 	m_pCpGraph->SetXVariable(1);
 	m_pCpGraph->SetInverted(false);
 	CreateOppCurves();
-	m_pCpGraph->SetYTitle("Q");
+	m_pCpGraph->SetYTitle(tr("Q"));
 
 	CheckButtons();
 
@@ -3434,8 +3446,8 @@ void QXDirect::OnRtPlot()
 	m_pCpGraph->SetYTitle("Re_Theta");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double x[IVX][3],y[IVX][3];
 	int nside1, nside2;
@@ -3467,8 +3479,8 @@ void QXDirect::OnRtLPlot()
 	m_pCpGraph->SetYTitle("Re_Theta");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	double x[IVX][3],y[IVX][3];
 	int nside1, nside2;
@@ -4025,8 +4037,8 @@ void QXDirect::OnUePlot()
 	m_pCpGraph->SetYTitle("Ue/Vinf");
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
-	pTopCurve->SetTitle("Top");
-	pBotCurve->SetTitle("Bot");
+	pTopCurve->SetTitle(tr("Top"));
+	pBotCurve->SetTitle(tr("Bot"));
 
 	m_pXFoil->CreateXBL(x, nside1, nside2);
 	//---- fill compressible ue arrays
@@ -4389,38 +4401,38 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	D = 0;
 	str = "%";
-	str1 = QString("Thickness        = %1").arg(m_BufferFoil.m_fThickness*100.0, 6, 'f', 2);
+	str1 = QString(tr("Thickness        = %1")).arg(m_BufferFoil.m_fThickness*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString("Max.Thick.pos.   = %1").arg(m_BufferFoil.m_fXThickness*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max.Thick.pos.   = %1")).arg(m_BufferFoil.m_fXThickness*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString("Max. Camber      = %1").arg( m_BufferFoil.m_fCamber*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max. Camber      = %1")).arg( m_BufferFoil.m_fCamber*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString("Max.Thick.pos.   = %1").arg(m_BufferFoil.m_fXCamber*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max.Thick.pos.   = %1")).arg(m_BufferFoil.m_fXCamber*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString("Number of Panels =  %1").arg( m_BufferFoil.n);
+	str1 = QString(tr("Number of Panels =  %1")).arg( m_BufferFoil.n);
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D += dD;
 
 	if(m_BufferFoil.m_bTEFlap)
 	{
-		str1 = QString("Flap Angle = %1 deg").arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
+		str1 = QString(tr("Flap Angle = %1 deg")).arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
 		painter.drawText(LeftPos,ZPos+D, str1);
 		D += dD;
 
-		str1 = QString("XHinge = %1").arg( m_BufferFoil.m_TEXHinge, 6, 'f', 1);
+		str1 = QString(tr("XHinge = %1")).arg( m_BufferFoil.m_TEXHinge, 6, 'f', 1);
 		strong+="%";
 		painter.drawText(LeftPos,ZPos+D, str1+strong);
 		D += dD;
 
-		str1 = QString("YHinge = %1").arg( m_BufferFoil.m_TEYHinge, 6, 'f', 1);
+		str1 = QString(tr("YHinge = %1")).arg( m_BufferFoil.m_TEYHinge, 6, 'f', 1);
 		strong+="%";
 		painter.drawText(LeftPos,ZPos+D, str1+strong);
 		D += dD;
@@ -4440,7 +4452,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		if(m_pCurPolar->m_Type!=1 && m_pCurPolar->m_Type!=4) Back++;
 	}
 
-	int dwidth = fm.width("Forced Upper Trans. = 123456789");
+	int dwidth = fm.width(tr("TE Hinge Moment/span = 123456789"));
 
 	ZPos = m_rCltRect.bottom()-Back*dD - 10;
 	XPos = m_rCltRect.right()-dwidth-20;
@@ -4449,7 +4461,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_pCurPolar)
 	{
-		str1 = QString("Polar Type =         %1").arg( m_pCurPolar->m_Type);
+		str1 = QString(tr("Polar Type =         %1")).arg( m_pCurPolar->m_Type);
 		painter.drawText(XPos,ZPos, dwidth, dD, Qt::AlignRight | Qt::AlignTop, str1);
 		D += dD;
 		if(m_pCurPolar->m_Type ==1)
@@ -4498,10 +4510,10 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 		D += dD;
 
-		strong = QString("Forced Upper Trans. = %1").arg(m_pCurPolar->m_XTop,9,'f',3);
+		strong = QString(tr("Forced Upper Trans. = %1")).arg(m_pCurPolar->m_XTop,9,'f',3);
 		painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 		D += dD;
-		strong = QString("Forced Lower Trans. = %1").arg(m_pCurPolar->m_XBot, 9, 'f', 3);
+		strong = QString(tr("Forced Lower Trans. = %1")).arg(m_pCurPolar->m_XBot, 9, 'f', 3);
 		painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 		D += dD;
 
@@ -4522,47 +4534,47 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			}
 			if(m_pCurPolar->m_Type!=4)
 			{
-				Result = QString("       Alpha = %1 deg").arg(m_pCurOpp->Alpha, 5, 'f', 2);
+				Result = QString(tr("       Alpha = %1 deg")).arg(m_pCurOpp->Alpha, 5, 'f', 2);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
-			Result = QString("          Cl = %1").arg(m_pCurOpp->Cl, 9, 'f', 3);
+			Result = QString(tr("          Cl = %1")).arg(m_pCurOpp->Cl, 9, 'f', 3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
-			Result = QString("          Cm = %1").arg(m_pCurOpp->Cm, 9, 'f', 3);
+			Result = QString(tr("          Cm = %1")).arg(m_pCurOpp->Cm, 9, 'f', 3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
-			Result = QString("          Cd = %1").arg(m_pCurOpp->Cd, 9, 'f', 3);
+			Result = QString(tr("          Cd = %1")).arg(m_pCurOpp->Cd, 9, 'f', 3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
 			if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0)
 			{
-				Result = QString("         L/D = %1").arg(m_pCurOpp->Cl/m_pCurOpp->Cd, 9, 'f', 3);
+				Result = QString(tr("         L/D = %1")).arg(m_pCurOpp->Cl/m_pCurOpp->Cd, 9, 'f', 3);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
 
-			Result = QString("Upper Trans. = %1").arg(m_pCurOpp->Xtr1, 9, 'f', 3);
+			Result = QString(tr("Upper Trans. = %1")).arg(m_pCurOpp->Xtr1, 9, 'f', 3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
-			Result = QString("Lower Trans. = %1").arg(m_pCurOpp->Xtr2, 9, 'f', 3);
+			Result = QString(tr("Lower Trans. = %1")).arg(m_pCurOpp->Xtr2, 9, 'f', 3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 			D += dD;
 
 			if(m_pCurOpp->m_bTEFlap)
 			{
-				Result = QString("TE Hinge Moment/span = %1").arg(m_pCurOpp->m_TEHMom, 9, 'e', 3);
+				Result = QString(tr("TE Hinge Moment/span = %1")).arg(m_pCurOpp->m_TEHMom, 9, 'e', 3);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
 
 			if(m_pCurOpp->m_bLEFlap)
 			{
-				Result = QString("LE Hinge Moment/span = %1").arg(m_pCurOpp->m_LEHMom, 9, 'e', 3);
+				Result = QString(tr("LE Hinge Moment/span = %1")).arg(m_pCurOpp->m_LEHMom, 9, 'e', 3);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
@@ -4827,7 +4839,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 {
 	if(ar.status() != QDataStream::Ok)
 	{
-		QMessageBox::warning(window(), "Warning", "File is closed");
+		QMessageBox::warning(window(), tr("Warning"), tr("File is closed"));
 		return;
 	}
 	ar << m_bAlpha << m_bStoreOpp << m_bViscous << m_bInitBL << m_bBL << m_bPressure;
@@ -4864,11 +4876,11 @@ void QXDirect::SaveSettings(QDataStream &ar)
 
 void QXDirect::SetAnalysisParams()
 {
-	if(m_bViscous)	m_pctrlViscous->setChecked(true);      else m_pctrlViscous->setChecked(false);
-	if(m_bInitBL)	m_pctrlInitBL->setChecked(true);       else m_pctrlInitBL->setChecked(false);
-	if(m_bStoreOpp)	m_pctrlStoreOpp->setChecked(true);     else m_pctrlStoreOpp->setChecked(false);
-	if(m_bPressure)	m_pctrlShowPressure->setChecked(true); else m_pctrlShowPressure->setChecked(false);
-	if(m_bBL)	    m_pctrlShowBL->setChecked(true);       else m_pctrlShowBL->setChecked(false);
+	m_pctrlViscous->setChecked(m_bViscous);
+	m_pctrlInitBL->setChecked(m_bInitBL);
+	m_pctrlStoreOpp->setChecked(m_bStoreOpp);
+	m_pctrlShowPressure->setChecked(m_bPressure);
+	m_pctrlShowBL->setChecked(m_bBL);
 
 	if(m_pCurPolar)
 	{
@@ -5121,6 +5133,86 @@ void QXDirect::SetFoilScale()
 }
 
 
+void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
+{
+	bool bFound;
+	int i;
+	double hmom, hfx, hfy;
+	double dx, dy, xmid, ymid, pmid;
+	double xof, yof;
+	double ymin, ymax;
+	xof = m_pCurFoil->m_TEXHinge/100.0;
+	ymin = m_pCurFoil->GetBaseLowerY(xof);
+	ymax = m_pCurFoil->GetBaseUpperY(xof);
+	yof = ymin + (ymax-ymin) * m_pCurFoil->m_TEYHinge/100.0;
+
+	if(m_pCurFoil->m_bTEFlap)
+	{
+		hmom = 0.0;
+		hfx  = 0.0;
+		hfy  = 0.0;
+
+		//---- integrate pressures on top and bottom sides of flap
+		for (i=0;i<m_pCurFoil->n-1;i++)
+		{
+			if (m_pCurFoil->x[i]>xof &&	m_pCurFoil->x[i+1]>xof)
+			{
+				dx = m_pCurFoil->x[i+1] - m_pCurFoil->x[i];
+				dy = m_pCurFoil->y[i+1] - m_pCurFoil->y[i];
+				xmid = 0.5*(m_pCurFoil->x[i+1]+m_pCurFoil->x[i]) - xof;
+				ymid = 0.5*(m_pCurFoil->y[i+1]+m_pCurFoil->y[i]) - yof;
+
+				if(pOpPoint->m_bVisc)	pmid = 0.5*(pOpPoint->Cpv[i+1] + pOpPoint->Cpv[i]);
+				else					pmid = 0.5*(pOpPoint->Cpi[i+1] + pOpPoint->Cpi[i]);
+
+
+				hmom += pmid * (xmid*dx + ymid*dy);
+				hfx  -= pmid * dy;
+				hfy  += pmid * dx;
+			}
+		}
+		//Next add top chunk left out in the previous loop
+		bFound = false;
+/*		for (i=0;i<m_pCurFoil->n-1;i++){
+			if(m_pCurFoil->x[i]>xof && m_pCurFoil->x[i+1]<xof){
+				bFound =true;
+				break;
+			}
+		}
+		if(bFound) {
+			dx = topx - x[i-1];
+			dy = topy - y[i-1];
+			xmid = 0.5*(topx+x[i-1]) - xof;
+			ymid = 0.5*(topy+y[i-1]) - yof;
+			if(s[i] != s[i-1]) frac = (tops-s[i-1])/(s[i]-s[i-1]);
+			else	 frac = 0.0;
+
+			if(lvisc) {
+				topp = cpv[i]*frac + cpv[i-1]*(1.0-frac);
+				pmid = 0.5*(topp+cpv[i-1]);
+			}
+			else{
+				topp = cpi[i]*frac + cpi[i-1]*(1.0-frac);
+				pmid = 0.5*(topp+cpi[i-1]);
+			}
+			hmom = hmom + pmid*(xmid*dx + ymid*dy);
+			hfx  = hfx  - pmid* dy;
+			hfy  = hfy  + pmid* dx;
+		}*/
+		//Then add bottom chunk left out
+
+
+		//Next add internal hinge to top surface contribution
+
+		//Next add internal hinge to bottom surface contribution
+
+		//store the results
+		pOpPoint->m_TEHMom = hmom;
+		pOpPoint->XForce   = hfx;
+		pOpPoint->YForce   = hfy;
+	}
+}
+
 CPolar * QXDirect::SetPolar(CPolar *pPolar)
 {
 	// Finds the plr
@@ -5325,21 +5417,33 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 
 void QXDirect::SetOpPointSequence()
 {
-	if(m_bSequence)
+	m_pctrlSequence->setEnabled(m_pCurPolar);
+	m_pctrlAlphaMin->setEnabled(m_pCurPolar);
+	m_pctrlAnalyze->setEnabled(m_pCurPolar);
+	m_pctrlViscous->setEnabled(m_pCurPolar);
+	m_pctrlInitBL->setEnabled(m_pCurPolar);
+	m_pctrlStoreOpp->setEnabled(m_pCurPolar);
+
+	if(m_bSequence && m_pCurPolar)
 	{
 		m_pctrlSequence->setCheckState(Qt::Checked);
 		m_pctrlAlphaMax->setEnabled(true);
 		m_pctrlAlphaDelta->setEnabled(true);
 	}
-	else
+	else if (m_pCurPolar)
 	{
 		m_pctrlSequence->setCheckState(Qt::Unchecked);
 		m_pctrlAlphaMax->setEnabled(false);
 		m_pctrlAlphaDelta->setEnabled(false);
 	}
+	else
+	{
+		m_pctrlAlphaMax->setEnabled(false);
+		m_pctrlAlphaDelta->setEnabled(false);
+	}
 
 
-	if(!m_pCurPolar || (m_pCurPolar && m_pCurPolar->m_Type != 4))
+	if(m_pCurPolar && m_pCurPolar->m_Type != 4)
 	{
 		if(m_pctrlSpec3->isChecked())
 		{
@@ -5359,16 +5463,35 @@ void QXDirect::SetOpPointSequence()
 			m_pctrlAlphaMax->SetValue(m_ClMax);
 			m_pctrlAlphaDelta->SetValue(m_ClDelta);
 		}
+		m_pctrlSpec1->setEnabled(true);
+		m_pctrlSpec2->setEnabled(true);
+		m_pctrlSpec3->setEnabled(false);
 	}
-	else
+	else if(m_pCurPolar && m_pCurPolar->m_Type == 4)
 	{
 		m_pctrlSpec3->setChecked(true);
 		m_bAlpha = true;		// no choice with type 4 polars
 		m_pctrlAlphaMin->SetValue(m_Reynolds);
 		m_pctrlAlphaMax->SetValue(m_ReynoldsMax);
 		m_pctrlAlphaDelta->SetValue(m_ReynoldsDelta);
+		m_pctrlSpec1->setEnabled(false);
+		m_pctrlSpec2->setEnabled(false);
+		m_pctrlSpec3->setEnabled(true);
+	}
+	else
+	{
+		m_pctrlSpec1->setEnabled(false);
+		m_pctrlSpec2->setEnabled(false);
+		m_pctrlSpec3->setEnabled(false);
 	}
 }
+
+
+
+
+
+
+
 
 void QXDirect::SetGraphTitles(Graph* pGraph)
 {
@@ -5376,210 +5499,103 @@ void QXDirect::SetGraphTitles(Graph* pGraph)
 	switch (pGraph->GetXVariable())
 	{
 		case 0:
-			pGraph->SetXTitle("Alpha");
+			pGraph->SetXTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetXTitle("Cl");
+			pGraph->SetXTitle(tr("Cl"));
 			break;
 		case 2:
-			pGraph->SetXTitle("Cd");
+			pGraph->SetXTitle(tr("Cd"));
 			break;
 		case 3:
-			pGraph->SetXTitle("Cd x 10000");
+			pGraph->SetXTitle(tr("Cd x 10000"));
 			break;
 		case 4:
-			pGraph->SetXTitle("Cdp");
+			pGraph->SetXTitle(tr("Cdp"));
 			break;
 		case 5:
-			pGraph->SetXTitle("Cm");
+			pGraph->SetXTitle(tr("Cm"));
 			break;
 		case 6:
-			pGraph->SetXTitle("Xtr1");
+			pGraph->SetXTitle(tr("Xtr1"));
 			break;
 		case 7:
-			pGraph->SetXTitle("Xtr2");
+			pGraph->SetXTitle(tr("Xtr2"));
 			break;
 		case 8:
-			pGraph->SetXTitle("HMom");
+			pGraph->SetXTitle(tr("HMom"));
 			break;
 		case 9:
-			pGraph->SetXTitle("Cpmin");
+			pGraph->SetXTitle(tr("Cpmin"));
 			break;
 		case 10:
-			pGraph->SetXTitle("Cl/Cd");
+			pGraph->SetXTitle(tr("Cl/Cd"));
 			break;
 		case 11:
-			pGraph->SetXTitle("|Cl|^(3/2)/Cd");
+			pGraph->SetXTitle(tr("|Cl|^(3/2)/Cd"));
 			break;
 		case 12:
-			pGraph->SetXTitle("1/Rt(Cl)");
+			pGraph->SetXTitle(tr("1/Rt(Cl)"));
 			break;
 		case 13:
-			pGraph->SetXTitle("Re");
+			pGraph->SetXTitle(tr("Re"));
 			break;
 		case 14:
-			pGraph->SetXTitle("XCp");
+			pGraph->SetXTitle(tr("XCp"));
 			break;
 		default:
-			pGraph->SetXTitle("Alpha");
+			pGraph->SetXTitle(tr("Alpha"));
 			break;
 	}
 	switch (pGraph->GetYVariable())
 	{
 		case 0:
-			pGraph->SetYTitle("Alpha");
+			pGraph->SetYTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetYTitle("Cl");
+			pGraph->SetYTitle(tr("Cl"));
 			break;
 		case 2:
-			pGraph->SetYTitle("Cd");
+			pGraph->SetYTitle(tr("Cd"));
 			break;
 		case 3:
-			pGraph->SetYTitle("Cd x 10000");
+			pGraph->SetYTitle(tr("Cd x 10000"));
 			break;
 		case 4:
-			pGraph->SetYTitle("Cdp");
+			pGraph->SetYTitle(tr("Cdp"));
 			break;
 		case 5:
-			pGraph->SetYTitle("Cm");
+			pGraph->SetYTitle(tr("Cm"));
 			break;
 		case 6:
-			pGraph->SetYTitle("Xtr1");
+			pGraph->SetYTitle(tr("Xtr1"));
 			break;
 		case 7:
-			pGraph->SetYTitle("Xtr2");
+			pGraph->SetYTitle(tr("Xtr2"));
 			break;
 		case 8:
-			pGraph->SetYTitle("HMom");
+			pGraph->SetYTitle(tr("HMom"));
 			break;
 		case 9:
-			pGraph->SetYTitle("Cpmin");
+			pGraph->SetYTitle(tr("Cpmin"));
 			break;
 		case 10:
-			pGraph->SetYTitle("Cl/Cd");
+			pGraph->SetYTitle(tr("Cl/Cd"));
 			break;
 		case 11:
-			pGraph->SetYTitle("|Cl|^(3/2)/Cd");
+			pGraph->SetYTitle(tr("|Cl|^(3/2)/Cd"));
 			break;
 		case 12:
-			pGraph->SetYTitle("1/Rt(Cl)");
+			pGraph->SetYTitle(tr("1/Rt(Cl)"));
 			break;
 		case 13:
-			pGraph->SetYTitle("Re");
+			pGraph->SetYTitle(tr("Re"));
 			break;
 		case 14:
-			pGraph->SetYTitle("XCp");
+			pGraph->SetYTitle(tr("XCp"));
 			break;
 		default:
-			pGraph->SetYTitle("Alpha");
-			break;
-	}
-}
-
-
-void QXDirect::SetGraphTitles(Graph* pGraph, int iX, int iY)
-{
-	switch (iX)
-	{
-		case 0:
-			pGraph->SetXTitle("Alpha");
-			break;
-		case 1:
-			pGraph->SetXTitle("Cl");
-			break;
-		case 2:
-			pGraph->SetXTitle("Cd");
-			break;
-		case 3:
-			pGraph->SetXTitle("Cd x 10000");
-			break;
-		case 4:
-			pGraph->SetXTitle("Cdp");
-			break;
-		case 5:
-			pGraph->SetXTitle("Cm");
-			break;
-		case 6:
-			pGraph->SetXTitle("Xtr1");
-			break;
-		case 7:
-			pGraph->SetXTitle("Xtr2");
-			break;
-		case 8:
-			pGraph->SetXTitle("HMom");
-			break;
-		case 9:
-			pGraph->SetXTitle("Cpmin");
-			break;
-		case 10:
-			pGraph->SetXTitle("Cl/Cd");
-			break;
-		case 11:
-			pGraph->SetXTitle("|Cl|^(3/2)/Cd");
-			break;
-		case 12:
-			pGraph->SetXTitle("1/Rt(Cl)");
-			break;
-		case 13:
-			pGraph->SetXTitle("Re");
-			break;
-		case 14:
-			pGraph->SetXTitle("XCp");
-			break;
-		default:
-			pGraph->SetXTitle("Alpha");
-			break;
-	}
-	switch (iY)
-	{
-		case 0:
-			pGraph->SetYTitle("Alpha");
-			break;
-		case 1:
-			pGraph->SetYTitle("Cl");
-			break;
-		case 2:
-			pGraph->SetYTitle("Cd");
-			break;
-		case 3:
-			pGraph->SetYTitle("Cd x 10000");
-			break;
-		case 4:
-			pGraph->SetYTitle("Cdp");
-			break;
-		case 5:
-			pGraph->SetYTitle("Cm");
-			break;
-		case 6:
-			pGraph->SetYTitle("Xtr1");
-			break;
-		case 7:
-			pGraph->SetYTitle("Xtr2");
-			break;
-		case 8:
-			pGraph->SetYTitle("HMom");
-			break;
-		case 9:
-			pGraph->SetYTitle("Cpmin");
-			break;
-		case 10:
-			pGraph->SetYTitle("Cl/Cd");
-			break;
-		case 11:
-			pGraph->SetYTitle("|Cl|^(3/2)/Cd");
-			break;
-		case 12:
-			pGraph->SetYTitle("1/Rt(Cl)");
-			break;
-		case 13:
-			pGraph->SetYTitle("Re");
-			break;
-		case 14:
-			pGraph->SetYTitle("XCp");
-			break;
-		default:
-			pGraph->SetYTitle("Alpha");
+			pGraph->SetYTitle(tr("Alpha"));
 			break;
 	}
 }
@@ -5619,19 +5635,19 @@ void QXDirect::SetupLayout()
 	QHBoxLayout *SpecVarsBox = new QHBoxLayout;
 
 	m_pctrlSpec1 = new QRadioButton("a");
-	m_pctrlSpec2 = new QRadioButton("Cl");
-	m_pctrlSpec3 = new QRadioButton("Re");
+	m_pctrlSpec2 = new QRadioButton(tr("Cl"));
+	m_pctrlSpec3 = new QRadioButton(tr("Re"));
 	m_pctrlSpec1->setFont(QFont("Symbol"));
 	SpecVarsBox->addWidget(m_pctrlSpec1);
 	SpecVarsBox->addWidget(m_pctrlSpec2);
 	SpecVarsBox->addWidget(m_pctrlSpec3);
 
-	m_pctrlSequence = new QCheckBox("Sequence");
+	m_pctrlSequence = new QCheckBox(tr("Sequence"));
 
 	QGridLayout *SequenceGroup = new QGridLayout;
-	QLabel *AlphaMinLab   = new QLabel("Start=");
-	QLabel *AlphaMaxLab   = new QLabel("End=");
-	QLabel *DeltaAlphaLab = new QLabel("D=");
+	QLabel *AlphaMinLab   = new QLabel(tr("Start="));
+	QLabel *AlphaMaxLab   = new QLabel(tr("End="));
+	QLabel *DeltaAlphaLab = new QLabel(tr("D="));
 	DeltaAlphaLab->setFont(QFont("Symbol"));
 	DeltaAlphaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
@@ -5661,13 +5677,13 @@ void QXDirect::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
 
 	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
-	m_pctrlViscous  = new QCheckBox("Viscous");
-	m_pctrlInitBL   = new QCheckBox("Init BL");
+	m_pctrlViscous  = new QCheckBox(tr("Viscous"));
+	m_pctrlInitBL   = new QCheckBox(tr("Init BL"));
 	AnalysisSettings->addWidget(m_pctrlViscous);
 	AnalysisSettings->addWidget(m_pctrlInitBL);
 
-	m_pctrlStoreOpp = new QCheckBox("Store Opp");
-	m_pctrlAnalyze  = new QPushButton("Analyze");
+	m_pctrlStoreOpp = new QCheckBox(tr("Store Opp"));
+	m_pctrlAnalyze  = new QPushButton(tr("Analyze"));
 
 	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
 	AnalysisGroup->addLayout(SpecVarsBox);
@@ -5679,14 +5695,14 @@ void QXDirect::SetupLayout()
 	AnalysisGroup->addWidget(m_pctrlStoreOpp);
 	AnalysisGroup->addWidget(m_pctrlAnalyze);
 
-	QGroupBox *AnalysisBox = new QGroupBox("Analysis settings");
+	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
 	AnalysisBox->setLayout(AnalysisGroup);
 
 
 	QVBoxLayout *DisplayGroup = new QVBoxLayout;
-	m_pctrlShowBL        = new QCheckBox("Show BL");
-	m_pctrlShowPressure  = new QCheckBox("Show Pressure");
-	m_pctrlAnimate       = new QCheckBox("Animate");
+	m_pctrlShowBL        = new QCheckBox(tr("Show BL"));
+	m_pctrlShowPressure  = new QCheckBox(tr("Show Pressure"));
+	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
 	m_pctrlAnimateSpeed->setMaximum(500);
@@ -5697,13 +5713,13 @@ void QXDirect::SetupLayout()
 	DisplayGroup->addWidget(m_pctrlShowPressure);
 	DisplayGroup->addWidget(m_pctrlAnimate);
 	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
-	QGroupBox *DisplayBox = new QGroupBox("Display");
+	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(DisplayGroup);
 
 
 	QHBoxLayout *CurveDisplay = new QHBoxLayout;
-	m_pctrlShowCurve  = new QCheckBox("Curve");
-	m_pctrlShowPoints = new QCheckBox("Points");
+	m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
+	m_pctrlShowPoints = new QCheckBox(tr("Points"));
 	CurveDisplay->addWidget(m_pctrlShowCurve);
 	CurveDisplay->addWidget(m_pctrlShowPoints);
 	QVBoxLayout *CurveGroup = new QVBoxLayout;
@@ -5724,7 +5740,7 @@ void QXDirect::SetupLayout()
 	CurveGroup->addWidget(m_pctrlCurveStyle);
 	CurveGroup->addWidget(m_pctrlCurveWidth);
 	CurveGroup->addWidget(m_pctrlCurveColor);
-	QGroupBox *CurveBox = new QGroupBox("Curve settings");
+	QGroupBox *CurveBox = new QGroupBox(tr("Graph Curve Settings"));
 	CurveBox->setLayout(CurveGroup);
 
 

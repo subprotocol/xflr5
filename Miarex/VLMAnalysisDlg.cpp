@@ -131,7 +131,7 @@ bool VLMAnalysisDlg::AlphaLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, "Warning","The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, tr("Warning"),"The number of points to be calculated will be limited to 100");
 //		if(res ==IDCANCEL) return false;
 		nrhs = 100;
 	}
@@ -199,7 +199,7 @@ bool VLMAnalysisDlg::ControlLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this,"Warning","The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this,tr("Warning"),"The number of points to be calculated will be limited to 100");
 		nrhs = 100;
 	}
 
@@ -653,7 +653,7 @@ bool VLMAnalysisDlg::ReLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, "Warning", "The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, tr("Warning"), "The number of points to be calculated will be limited to 100");
 		nrhs = 100;
 	}
 	m_bTrace = true;
@@ -809,7 +809,7 @@ bool VLMAnalysisDlg::UnitLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, "Warning","The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, tr("Warning"),"The number of points to be calculated will be limited to 100");
 		nrhs = 100;
 	}
 
@@ -975,11 +975,10 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
 	double WingLift, WingIDrag, Alpha;
-	double cosa, sina, beta;
+	double cosa, sina;
 	QString str, strong;
 	CVector Force, WindNormal, WindDirection, WindSide;
 
-	beta = 0.0;
 	m_pWing->m_bTrace   = false;
 	m_pWing->m_bVLM1    = m_pWPolar->m_bVLM1;
 	m_pWing->m_bTrace   = true;

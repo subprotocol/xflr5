@@ -96,7 +96,11 @@ SOURCES += MainFrame.cpp \
     Miarex/GL3dWingDlg.cpp \
     Misc/ProgressDlg.cpp \
     Design/LECircleDlg.cpp \
-    Misc/ModDlg.cpp
+    Misc/ModDlg.cpp \
+    Misc/TranslatorDlg.cpp \
+    XDirect/ManageFoilsDlg.cpp \
+    Miarex/ManageUFOsDlg.cpp \
+    Miarex/UFOTableDelegate.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -189,7 +193,12 @@ HEADERS += MainFrame.h \
     Misc/ProgressDlg.h \
     Params.h \
     Design/LECircleDlg.h \
-    Misc/ModDlg.h
+    Misc/ModDlg.h \
+    Misc/TranslatorDlg.h \
+    XDirect/ManageFoilsDlg.h \
+    Miarex/ManageUFOsDlg.h \
+    Miarex/UFOTableDelegate.h
+TRANSLATIONS = qflr5_fr.ts
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 
@@ -203,6 +212,3 @@ unix {
     INSTALLS += target
     target.path = $$BINDIR
 }
-
-
-

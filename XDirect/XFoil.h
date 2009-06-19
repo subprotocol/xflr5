@@ -860,8 +860,6 @@ c   dxyg        airfoil grid-plot annotation increment
 c   gtick       airfoil-plot tick marks size [as fraction of arc length]
 */
 
-
-
 };
 
 #endif

@@ -23,6 +23,7 @@
 #include "Miarex.h"
 #include "ManageBodiesDlg.h"
 #include "../Objects/Plane.h"
+#include "../Misc/ModDlg.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QListWidgetItem>
@@ -35,7 +36,7 @@ ManageBodiesDlg::ManageBodiesDlg()
 	m_pMiarex = NULL;
 	m_pMainFrame = NULL;
 	m_pBody = NULL;
-	setWindowTitle("Body Management");
+	setWindowTitle(tr("Body Management"));
 	SetupLayout();
 }
 
@@ -43,14 +44,14 @@ ManageBodiesDlg::ManageBodiesDlg()
 void ManageBodiesDlg::SetupLayout()
 {
 	m_pctrlNameList   = new QListWidget;
-	m_pctrlNew        = new QPushButton("New");
-	m_pctrlEdit       = new QPushButton("Edit");
-	m_pctrlRename     = new QPushButton("Rename");
-	m_pctrlDelete     = new QPushButton("Delete");
-	m_pctrlDuplicate  = new QPushButton("Duplicate");
-	m_pctrlExportDef  = new QPushButton("Export Definition");
-	m_pctrlExportGeom = new QPushButton("Export Geometry");
-	QPushButton *CloseButton   = new QPushButton("Close");
+	m_pctrlNew        = new QPushButton(tr("New"));
+	m_pctrlEdit       = new QPushButton(tr("Edit"));
+	m_pctrlRename     = new QPushButton(tr("Rename"));
+	m_pctrlDelete     = new QPushButton(tr("Delete"));
+	m_pctrlDuplicate  = new QPushButton(tr("Duplicate"));
+	m_pctrlExportDef  = new QPushButton(tr("Export Definition"));
+	m_pctrlExportGeom = new QPushButton(tr("Export Geometry"));
+	QPushButton *CloseButton   = new QPushButton(tr("Close"));
 	QVBoxLayout *ButtonsLayout = new QVBoxLayout;
 	ButtonsLayout->addWidget(m_pctrlNew);
 	ButtonsLayout->addWidget(m_pctrlEdit);
@@ -98,6 +99,20 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 	}
 }
 
+bool ManageBodiesDlg::IsInUse(CBody *pBody)
+{
+	int i;
+	CPlane *pOldPlane;
+	for (i=0; i<m_poaPlane->count();i++)
+	{
+		pOldPlane = (CPlane*)m_poaPlane->at(i);
+		if(pOldPlane->m_bBody && pOldPlane->m_pBody == m_pBody)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 
 void ManageBodiesDlg::OnDelete()
@@ -107,34 +122,14 @@ void ManageBodiesDlg::OnDelete()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 
-	int i;
 	QString strong;
+	int i;
 	CPlane *pOldPlane;
-	bool bIsInUse = false;
 
-	for (i=0; i<m_poaPlane->count();i++)
+	if(IsInUse(m_pBody))
 	{
-		pOldPlane = (CPlane*)m_poaPlane->at(i);
-		if(pOldPlane->m_bBody && pOldPlane->m_pBody == m_pBody)
-		{
-			bIsInUse = true;
-			break;
-		}
-	}
-
-	if(bIsInUse)
-	{
-		strong = "The body " +  m_pBody->m_BodyName +" is in use by a plane.\n Delete Anyhow?\n";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
-	}
-	else
-	{
-		strong = "Are you sure you want to delete the body :\n" +  m_pBody->m_BodyName +"?\n";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
-	}
-
-	if(bIsInUse)
-	{
+		strong = tr("The body ") +  m_pBody->m_BodyName + tr(" is in use by a plane.\n Delete Anyhow?\n");
+		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 		for (i=0; i<m_poaPlane->count();i++)
 		{
 			pOldPlane = (CPlane*)m_poaPlane->at(i);
@@ -146,6 +141,11 @@ void ManageBodiesDlg::OnDelete()
 			}
 			pMiarex->m_bResetglGeom = true;
 		}
+	}
+	else
+	{
+		strong = tr("Are you sure you want to delete the body :\n") +  m_pBody->m_BodyName +"?\n";
+		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 
 	pMiarex->DeleteBody(m_pBody);
@@ -175,9 +175,33 @@ void ManageBodiesDlg::OnEdit()
 {
 	if(!m_pBody) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
-	CBody memBody;
 
+	bool bUsed = false;
+	int i;
+	CPlane *pPlane;
+	CWPolar *pWPolar;
+	for (i=0; i< pMiarex->m_poaPlane->size(); i++)
+	{
+		pPlane = (CPlane*)m_poaPlane->at(i);
+		if(pPlane->m_bBody && pPlane->m_pBody==m_pBody)
+		{
+			// Does this plane have results
+			for(int j=0; j<pMiarex->m_poaWPolar->size(); j++)
+			{
+				pWPolar = (CWPolar*)pMiarex->m_poaWPolar->at(j);
+				if(pWPolar->m_UFOName==pPlane->m_PlaneName && pWPolar->m_Alpha.size())
+				{
+					bUsed = true;
+					break;
+				}
+			}
+			if(bUsed) break;
+		}
+	}
+
+	CBody memBody;
 	memBody.Duplicate(m_pBody);
 	pGL3dBodyDlg->SetBody(m_pBody);
 	pGL3dBodyDlg->m_bEnableName = false;
@@ -185,7 +209,61 @@ void ManageBodiesDlg::OnEdit()
 
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
-		pMainFrame->SetSaveState(false);
+		if(bUsed)
+		{
+			ModDlg dlg;
+			dlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
+			dlg.InitDialog();
+			int Ans = dlg.exec();
+			if (Ans == QDialog::Rejected)
+			{
+				//restore geometry
+				m_pBody->Duplicate(&memBody);
+				return;
+			}
+			else if(Ans==20)
+			{
+				CBody* pNewBody= new CBody();
+				pNewBody->Duplicate(m_pBody);
+				m_pBody->Duplicate(&memBody);
+				if(!pMiarex->SetModBody(pNewBody))
+				{
+					delete pNewBody;
+				}
+
+				return;
+			}
+			else
+			{
+				//delete all results associated to planes using this body
+				for (i=0; i<pMiarex->m_poaPlane->count();i++)
+				{
+					pPlane = (CPlane*)pMiarex->m_poaPlane->at(i);
+					if(pPlane->m_pBody == m_pBody)
+					{
+						pMainFrame->DeletePlane(pPlane, true);
+					}
+				}
+			}
+		}
+
+		if(m_pBody == pMiarex->m_pCurBody)
+		{
+			if(pMiarex->m_iView==2)		pMiarex->CreateWPolarCurves();
+			else if(pMiarex->m_iView==1)	pMiarex->CreateWOppCurves();
+			else if(pMiarex->m_iView==4)	pMiarex->CreateCpCurves();
+	
+			pMiarex->SetUFO();
+			pMiarex->m_bResetglBody     = true;
+			pMiarex->m_bResetglBodyMesh = true;
+			pMiarex->m_bResetglGeom     = true;
+			pMiarex->m_bResetglMesh     = true;
+			pMainFrame->UpdateWOpps();
+			pMainFrame->SetSaveState(false);
+			pMiarex->m_bIs2DScaleSet = false;
+			pMiarex->SetScale();
+			pMiarex->UpdateView();
+		}
 	}
 	else m_pBody->Duplicate(&memBody);
 }

@@ -25,12 +25,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <QtCore>
+#include "../MainFrame.h"
 #include "Foil.h"
 #include "Spline.h"
 #include <math.h>
 #include "Globals.h"
 #include <QTextStream>
-#include <QtGui>
 #include <QtOpenGL>
 
 //////////////////////////////////////////////////////////////////////
@@ -710,8 +710,8 @@ bool CFoil::InitFoil()
     {
         QMessageBox msgBox;
         msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("Warning");
-        msgBox.setText("Foil Error : no points");
+		msgBox.setWindowTitle(MainFrame::tr("Warning"));
+		msgBox.setText(MainFrame::tr("Foil Error : no points"));
         msgBox.exec();
     }
 	while (k<nb)

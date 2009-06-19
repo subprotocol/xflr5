@@ -274,7 +274,7 @@ void PlaneDlg::OnDefineWing()
 	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
-		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
+		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing.Duplicate(&SaveWing);
 }
@@ -294,7 +294,7 @@ void PlaneDlg::OnDefineFin()
 	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();	
-		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
+		m_bChanged = true;
 	}
 	else   m_pPlane->m_Fin.Duplicate(&SaveWing);
 }
@@ -313,7 +313,7 @@ void PlaneDlg::OnDefineStab()
 	if(pMiarex->m_WingDlg.exec() == QDialog::Accepted)
 	{
 		SetResults();	
-		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
+		m_bChanged = true;
 	}
 	else  m_pPlane->m_Stab.Duplicate(&SaveWing);
 }
@@ -333,7 +333,7 @@ void PlaneDlg::OnDefineWing2()
 	if(pMiarex->m_WingDlg.exec() ==QDialog::Accepted)
 	{
 		SetResults();
-		if(pMiarex->m_WingDlg.m_bChanged) m_bChanged = true;
+		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing2.Duplicate(&SaveWing);
 }
@@ -350,7 +350,7 @@ void PlaneDlg::OnDoubleFin()
 	}
 	else
 	{
-			m_pctrlYLEFin->setEnabled(false);
+		m_pctrlYLEFin->setEnabled(false);
 		m_pPlane->m_bDoubleFin = false;
 	}
 	m_bChanged = true;
@@ -376,6 +376,7 @@ void PlaneDlg::OnEditBody()
 		pMiarex->m_bResetglGeom = true;
 		pMiarex->m_bResetglMesh = true;
 		pMainFrame->SetSaveState(false);
+		m_bChanged = true;
 	}
 	else m_pPlane->m_pBody->Duplicate(&memBody);
 }
@@ -504,7 +505,7 @@ void PlaneDlg::OnOK()
 	if(n>VLMMATSIZE)
 	{
 		strong = QString("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required").arg(n).arg(VLMMATSIZE);
-		QMessageBox::warning(this, "Warning",strong);
+		QMessageBox::warning(this, tr("Warning"),strong);
 		return ;
 	}
 
@@ -539,7 +540,7 @@ void PlaneDlg::OnOK()
 	{
 		strong = QString("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required")
 			.arg(nSurfaces).arg(MAXPANELS);
-		QMessageBox::warning(this, "Warning", strong);
+		QMessageBox::warning(this, tr("Warning"), strong);
 		return ;
 	}
 

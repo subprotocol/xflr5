@@ -74,10 +74,11 @@ class QMiarex : public QWidget
 	friend class CPlane;
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
+	friend class ManageUFOsDlg;
 	friend class EditPlrDlg;
 	friend class GL3dWingDlg;
 	friend class DisplaySettingsDlg;
-
+	friend class UFOTableDelegate;
 	Q_OBJECT
 
 
@@ -200,6 +201,7 @@ private slots:
 	void OnResetCpSection();
 	void OnCpPosition();
 	void OnGraphSettings();
+	void OnManageUFOs();
 
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
@@ -617,7 +619,6 @@ protected:
 	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
 	CPlane * m_pCurPlane;			// the currently selected Plane
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
-	CFrame *m_pCurFrame;
 	CBody *m_pCurBody;
 
 	QColor m_WingColor, m_StabColor, m_FinColor;

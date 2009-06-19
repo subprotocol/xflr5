@@ -71,6 +71,8 @@ class MainFrame : public QMainWindow
 	friend class GraphDlg;
 	friend class LLTAnalysisDlg;
 	friend class DisplaySettingsDlg;
+	friend class ManageFoilsDlg;
+	friend class ManageUFOsDlg;
 
 	Q_OBJECT
 
@@ -170,6 +172,8 @@ private:
 	bool SelectOpPoint(OpPoint *pOpp);
 
 	void AddFoil(CFoil *pFoil);
+	void RenameFoil(CFoil *pFoil);
+
 	CWing *GetWing(QString WingName);
 	CFoil* GetFoil(QString strFoilName);
 	CFoil* ReadFoilFile(QTextStream &ar);
@@ -281,6 +285,7 @@ private:
 	QAction *defineBody, *importBody, *exportBodyDef, *exportBodyGeom, *ManageBodies, *EditCurBody;
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
+	QAction *ManageUFOs;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
 
 
@@ -303,6 +308,7 @@ private:
 	QAction *defineCpGraphSettings, *resetCpGraphScales, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
+	QAction *ManageFoilsAct;
 	QToolButton *m_pctrlPolarView, *m_pctrlOppView;
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;

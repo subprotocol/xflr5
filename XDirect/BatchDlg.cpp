@@ -283,7 +283,7 @@ void BatchDlg::AlphaLoop()
 				if (!pXFoil->specal())
 				{
 					str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
-					QMessageBox::information(this, "Warning", str);
+					QMessageBox::information(this, tr("Warning"), str);
 					m_bCancel = true;
 					CleanUp();
 					return;
@@ -644,7 +644,7 @@ bool BatchDlg::InitXFoil2()
 		{
 			QString str;
 			str = "Invalid Analysis Settings\nCPCALC: local speed too large \n Compressibility corrections invalid ";
-			QMessageBox::information(window(), "Warning", str);
+			QMessageBox::information(window(), tr("Warning"), str);
 		}
 	}
 
@@ -684,7 +684,7 @@ bool BatchDlg::Iterate()
 	{
 		pXFoil->lvconv = false;//point is unconverged
 		str ="CpCalc: local speed too large \r\n Compressibility corrections invalid";
-		QMessageBox::information(this, "Warning", str);
+		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
 		return true;
@@ -719,7 +719,7 @@ bool BatchDlg::Iterate()
 	{
 		pXFoil->lvconv = false;//point is unconverged
 		str ="CpCalc: local speed too large \r\n Compressibility corrections invalid";
-		QMessageBox::information(this, "Warning", str);
+		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
 		pXFoil->lblini = false;
@@ -1107,7 +1107,7 @@ void BatchDlg::ReLoop()
 						if (!pXFoil->specal())
 						{
 							str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
-							QMessageBox::information(this, "Warning", str);
+							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
 							return;
@@ -1125,7 +1125,7 @@ void BatchDlg::ReLoop()
 						if(!pXFoil->speccl())
 						{
 							str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
-							QMessageBox::information(this, "Warning", str);
+							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
 							return;

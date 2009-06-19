@@ -54,7 +54,7 @@ void ReListDlg::InitDialog()
 
 	m_pReModel->setHeaderData(0, Qt::Horizontal, QObject::tr("Re"));
 	m_pReModel->setHeaderData(1, Qt::Horizontal, QObject::tr("Mach"));
-	m_pReModel->setHeaderData(1, Qt::Horizontal, QObject::tr("NCrit"));
+	m_pReModel->setHeaderData(2, Qt::Horizontal, QObject::tr("NCrit"));
 
 	m_pctrlReView->setModel(m_pReModel);
 	m_pctrlReView->setColumnWidth(0,90);

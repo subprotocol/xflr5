@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	ModDlg class
-	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
+	TranslatorDlg Class
+	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,32 +20,27 @@
 *****************************************************************************/
 
 
-#ifndef MODDLG_H
-#define MODDLG_H
+#ifndef TRANSLATORDLG_H
+#define TRANSLATORDLG_H
 
 #include <QDialog>
-#include <QTextEdit>
-#include <QLabel>
+#include <QPushButton>
+#include <QListWidget>
 
-class ModDlg : public QDialog
+class TranslatorDlg : public QDialog
 {
-	Q_OBJECT
-
-	friend class QMiarex;
-	friend class ManageBodiesDlg;
 public:
-    ModDlg();
+    TranslatorDlg();
 
 private slots:
-	void OnSaveAsNew();
-
+	void OnOK();
 private:
 	void SetupLayout();
 	void InitDialog();
+	QListWidget *m_pctrlLanguageList;
+	QPushButton *OKButton;
 
-	QLabel * m_pctrlQuestion;
-
-	QString m_Question;
+	QString m_Language;
 };
 
-#endif // MODDLG_H
+#endif // TRANSLATORDLG_H

@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	FoilTableDelegate Class
+	UFOTableDelegate Class
 	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -21,20 +21,19 @@
 
 
 #include <QtGui>
-#include "FoilTableDelegate.h"
-#include "AFoil.h"
+#include "UFOTableDelegate.h"
+#include "Miarex.h"
 
 
-void *FoilTableDelegate::s_pAFoil;
+void *UFOTableDelegate::s_pMiarex;
 
-
-FoilTableDelegate::FoilTableDelegate(QObject *parent)
+UFOTableDelegate::UFOTableDelegate(QObject *parent)
  : QItemDelegate(parent)
 {
 }
 
 
-QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
+QWidget *UFOTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
 	return NULL;//No edition possible - display only
 
@@ -55,20 +54,8 @@ QWidget *FoilTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 	return NULL;
 }
 
-/*
-void FoilTableDelegate::drawCheck(QPainter *painter, const QStyleOptionViewItem &option, const QRect &, Qt::CheckState state) const
-{
-	const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
 
-	QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-										  check(option, option.rect, Qt::Checked).size(),
-										  QRect(option.rect.x() + textMargin, option.rect.y(),
-												option.rect.width() - (textMargin * 2), option.rect.height()));
-	QItemDelegate::drawCheck(painter, option, checkRect, state);
-}
-*/
-
-bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+bool UFOTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
 						 const QModelIndex &index)
 {
 	return false;
@@ -109,14 +96,15 @@ bool FoilTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, co
 }
 
 
-void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void UFOTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	QString strong;
 	QStyleOptionViewItem myOption = option;
-	QAFoil *pAFoil = (QAFoil*)s_pAFoil;
-	int NFoils = pAFoil->m_poaFoil->size();
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	int NUFOs = pMiarex->m_poaWing->size();
+	NUFOs    += pMiarex->m_poaPlane->size();
 
-	if(index.row()> NFoils)
+	if(index.row()> NUFOs)
 	{
 		strong=" ";
 		drawDisplay(painter, myOption, myOption.rect, strong);
@@ -129,24 +117,17 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else if(index.column()==5)
-	{
-		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
-		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toInt());
-		drawDisplay(painter, myOption, myOption.rect, strong);
-		drawFocus(painter, myOption, myOption.rect);
-	}
-	else if(index.column()==6 || index.column()==9)
+	else if(index.column()==1 || index.column()==2 || index.column()==3|| index.column()==4|| index.column()==5)
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
 		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(), 0,'f',m_Precision[index.column()]);
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else
+	else if(index.column()==6)
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
-		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble()*100.0, 0,'f', m_Precision[index.column()]);
+		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toInt());
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
@@ -154,9 +135,7 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 
 
 
-
-
-void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void UFOTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
 	if(index.column()==0)
 	{
@@ -173,7 +152,7 @@ void FoilTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 }
 
 
-void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void UFOTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
 	if(index.column()==0)
 	{
@@ -185,13 +164,13 @@ void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	else
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue()/100.0;
+		double value = floatEdit->GetValue();
 		model->setData(index, value, Qt::EditRole);
 	}
 }
 
 
-void FoilTableDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+void UFOTableDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
 	editor->setGeometry(option.rect);
 }

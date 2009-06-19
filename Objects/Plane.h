@@ -39,6 +39,7 @@ class CPlane
 	friend class VLMAnalysisDlg;
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
+	friend class ManageUFOsDlg;
 
 // Construction
 public:

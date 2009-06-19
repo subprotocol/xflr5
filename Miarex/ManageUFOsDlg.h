@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	ManageBodiesDlg  Classes
-	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
+	ManageUFOsDlg Class
+	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,60 +20,56 @@
 *****************************************************************************/
 
 
-#ifndef MANAGEBODIESDLG_H
-#define MANAGEBODIESDLG_H
-
-
-#include "../Objects/Body.h"
+#ifndef MANAGEUFOSDLG_H
+#define MANAGEUFOSDLG_H
 
 #include <QDialog>
-#include <QListWidget>
+
 #include <QPushButton>
+#include <QTableView>
+#include <QStandardItemModel>
+#include "UFOTableDelegate.h"
+#include "../Objects/Plane.h"
 
 
-class ManageBodiesDlg : public QDialog
+class ManageUFOsDlg : public QDialog
 {
 	Q_OBJECT
-
-	friend class CBody;
 	friend class QMiarex;
+	friend class MainFrame;
 
 public:
-    ManageBodiesDlg();
-	void InitDialog();
+	ManageUFOsDlg();
+	void InitDialog(QString &UFOName);
 
 private slots:
-	void OnNameList(QListWidgetItem *pItem);
-	void OnRename();
 	void OnDelete();
-	void OnDuplicate();
-	void OnEdit();
-	void OnNew();
-	void OnExportDefinition();
-	void OnExportGeometry();
+	void OnRename();
+	void OnUFOClicked(const QModelIndex& index);
+	void OnDoubleClickTable(const QModelIndex &index);
+
 
 private:
-	void SetBody(CBody *pBody = NULL);
+	void resizeEvent(QResizeEvent *event);
+	void keyPressEvent(QKeyEvent *event);
+
+	void FillUFOTable();
+	void FillWingRow(int row);
+	void FillPlaneRow(int row, int n);
+
 	void SetupLayout();
-	void UpdateBodyList();
-	bool IsInUse(CBody *pBody);
-	void *m_pMainFrame;
-	void *m_pMiarex;
-	void *m_pGL3dBodyDlg;
+	void SelectUFO();
 
-	QList <void*> *m_poaBody;
-	QList <void*> *m_poaPlane;
+private:
+	QPushButton *CloseButton;
+	QPushButton *m_pctrlRename, *m_pctrlDelete;
+	QTableView *m_pctrlUFOTable;
+	QStandardItemModel *m_pUFOModel;
+	UFOTableDelegate *m_pUFODelegate;
 
-	CBody *m_pBody;
-	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
-	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
-	QListWidget *m_pctrlNameList;
-
+	CWing *m_pWing;
+	CPlane *m_pPlane;
+	void *m_pMainFrame, *m_pMiarex;
 };
 
-
-
-#endif // MANAGEBODIESDLG_H
-
-
-
+#endif // MANAGEUFOSDLG_H

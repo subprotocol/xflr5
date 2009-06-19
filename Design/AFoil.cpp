@@ -1449,7 +1449,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox::warning(pMainFrame,"Warning","At least two foils are required");
+		QMessageBox::warning(pMainFrame,tr("Warning"),"At least two foils are required");
 		return;
 	}
 
@@ -1683,13 +1683,13 @@ void QAFoil::OnExportSplinesToFile()
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
 			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
 			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 	}
@@ -1699,14 +1699,14 @@ void QAFoil::OnExportSplinesToFile()
 		if(size>IQX2)
 		{
 			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
 			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 	}
@@ -2006,13 +2006,13 @@ void QAFoil::OnStoreSplines()
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
 			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
 			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 
@@ -2043,7 +2043,7 @@ void QAFoil::OnStoreSplines()
 		if(size>IQX2)
 		{
 			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 
@@ -2051,7 +2051,7 @@ void QAFoil::OnStoreSplines()
 		if(size>IQX2)
 		{
 			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
-			QMessageBox::warning(pMainFrame, "Warning", strong, QMessageBox::Ok);
+			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 //		Trace("m_iPts_Int=",size);

@@ -23,11 +23,14 @@
 
 #include <QtGui/QApplication>
 #include "MainFrame.h"
+#include "Misc/TranslatorDlg.h"
 
 int main(int argc, char *argv[])
 {
-	QString StyleName;
+	QApplication app(argc, argv);
 
+	QString StyleName;
+	QString LanguageName;
 	QString FileName   = QDir::tempPath() + "/QFLR5.set";
 	QFile *pXFile = new QFile(FileName);
 	int a,b,c,d,k;
@@ -46,17 +49,20 @@ int main(int argc, char *argv[])
 		ar >> StyleName;
 		pXFile->close();
 	}
+
 	QPoint pt(a,b);
 	QSize sz(c,d);
 
-	QCleanlooksStyle style;
-	QApplication app(argc, argv);
+/*	QTranslator qtTranslator;
+	qtTranslator.load("qt_" + QLocale::system().name(),
+	QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+	app.installTranslator(&qtTranslator);
 
-	if(StyleName.length())
-	{
-		qApp->setStyle(StyleName);
-	}
-//	else                   qApp->setStyle(&style);
+	QTranslator qflr5Translator;
+	qflr5Translator.load("qflr5_" + QLocale::system().name());
+	app.installTranslator(&qflr5Translator);*/
+
+	if(StyleName.length())	qApp->setStyle(StyleName);
 
 
 	MainFrame w;
@@ -74,10 +80,10 @@ int main(int argc, char *argv[])
 	if(Extension.compare(".wpa",Qt::CaseInsensitive)==0 ||
 	   Extension.compare(".plr",Qt::CaseInsensitive)==0)
 	{
-		int app = w.LoadXFLR5File(PathName);
+		int iApp = w.LoadXFLR5File(PathName);
 
-		if (app == MIAREX)             w.OnMiarex();
-		else if (app == XFOILANALYSIS) w.OnXDirect();
+		if (iApp == MIAREX)             w.OnMiarex();
+		else if (iApp == XFOILANALYSIS) w.OnXDirect();
 	}
 
 	return app.exec();

@@ -41,7 +41,7 @@ CBody::CBody()
 {
 	int i;
 	pi = 3.141592654;
-	m_BodyName = "BodyName";
+	m_BodyName = UnitsDlg::tr("BodyName");
 
 	m_BodyColor = QColor(100,130,200);
 	m_BodyStyle = 0;
@@ -185,6 +185,7 @@ void CBody::ComputeCenterLine()
 
 void CBody::Duplicate(CBody *pBody)
 {
+	m_BodyColor      = pBody->m_BodyColor;
 	m_NSideLines     = pBody->m_NSideLines;
 	m_NStations      = pBody->m_NStations;
 	m_nxDegree       = pBody->m_nxDegree;
@@ -219,9 +220,9 @@ bool CBody::ExportDefinition()
 	FileName = m_BodyName;
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Definition",
+	FileName = QFileDialog::getSaveFileName(pMainFrame, UnitsDlg::tr("Export Body Definition"),
 											pMainFrame->m_LastDirName,
-											"Text Format (*.txt)");
+											UnitsDlg::tr("Text Format (*.txt)"));
 	if(!FileName.length()) return false;
 
 	int pos = FileName.lastIndexOf("/");
@@ -264,7 +265,7 @@ bool CBody::ExportDefinition()
 void CBody::ExportGeometry(int nx, int nh)
 {
 	QString Header, strong, LengthUnit,str, FileName, DestFileName, OutString;
-	int j,k,l;
+	int k,l;
 	double u, v;
 	CVector Point;
 
@@ -278,9 +279,9 @@ void CBody::ExportGeometry(int nx, int nh)
 
 	QString filter =".csv";
 
-	FileName = QFileDialog::getSaveFileName(pMainFrame, "Export Body Geometry",
+	FileName = QFileDialog::getSaveFileName(pMainFrame, UnitsDlg::tr("Export Body Geometry"),
 											pMainFrame->m_LastDirName ,
-											"Text File (*.txt);;Comma Separated Values (*.csv)",
+											UnitsDlg::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 
@@ -545,7 +546,7 @@ bool CBody::ImportDefinition()
 	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
 	Dlg.m_Force     = pMainFrame->m_ForceUnit;
 	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
-	Dlg.m_Question = "Choose the length unit to read this file :";
+	Dlg.m_Question = UnitsDlg::tr("Choose the length unit to read this file :");
 	Dlg.InitDialog();
 
 	if(Dlg.exec() == QDialog::Accepted)
@@ -590,9 +591,9 @@ bool CBody::ImportDefinition()
 	QByteArray textline;
 	const char *text;
 
-	PathName = QFileDialog::getOpenFileName(pMainFrame, "Open File",
+	PathName = QFileDialog::getOpenFileName(pMainFrame, UnitsDlg::tr("Open File"),
 											pMainFrame->m_LastDirName,
-											"text file (*.txt)");
+											UnitsDlg::tr("Text file (*.txt)"));
 	if(!PathName.length())		return false;
 	int pos = PathName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
@@ -600,8 +601,8 @@ bool CBody::ImportDefinition()
 	QFile XFile(PathName);
 	if (!XFile.open(QIODevice::ReadOnly))
 	{
-		QString strange = "Could not read the file\n"+PathName;
-		QMessageBox::warning(pMainFrame, "Warning", strange);
+		QString strange = UnitsDlg::tr("Could not read the file\n")+PathName;
+		QMessageBox::warning(pMainFrame, UnitsDlg::tr("Warning"), strange);
 		return false;
 	}
 
@@ -676,8 +677,8 @@ bool CBody::ImportDefinition()
 	{
 		if(m_Frame[i].m_NPoints != m_Frame[i-1].m_NPoints)
 		{
-			QString strong = "Error reading "+m_BodyName+"\nFrames have different number of side points";
-			QMessageBox::warning(pMainFrame, "Error",strong);
+			QString strong = UnitsDlg::tr("Error reading ")+m_BodyName+UnitsDlg::tr("\nFrames have different number of side points");
+			QMessageBox::warning(pMainFrame, UnitsDlg::tr("Error"),strong);
 			return false;
 		}
 	}
@@ -714,8 +715,8 @@ int CBody::InsertPoint(CVector Real)
 	{
         QMessageBox msgBox;
         msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle("Warning");
-        msgBox.setText("Please select a Frame before inserting a point");
+		msgBox.setWindowTitle(UnitsDlg::tr("Warning"));
+		msgBox.setText(UnitsDlg::tr("Please select a Frame before inserting a point"));
         msgBox.exec();
 
 		return -1;
@@ -1114,7 +1115,6 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I, bool bRight)
 					break;
 				}
 			}
-//TRACE("Stat=%3d  Side=%3d    x=%10.5f    y=%10.5f    z=%10.5f\n",i,k,P.x, P.y, P.z);
 		}
 		if(bIntersect) break;
 	}
@@ -1161,12 +1161,12 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 {
 	CVector real;
 	double theta[MAXSIDELINES];
-    double angle;
-    QByteArray textline;
-    const char *text;
-    QString strong;
+	double angle;
+	QByteArray textline;
+	const char *text;
+	QString strong;
 	int i, j, k, res;
-    i = 0;
+	i = 0;
 
 	memset(theta, 0, sizeof(theta));
 
@@ -1175,11 +1175,11 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 	{
 		if(!ReadAVLString(in, Line,  strong)) bRead = false;
 
-        textline = strong.toAscii();
-        text = textline.constData();
-        res = sscanf(text, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
+		textline = strong.toAscii();
+		text = textline.constData();
+		res = sscanf(text, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
 
-        if(res!=3)
+		if(res!=3)
 		{
 			bRead = false;
 			Rewind1Line(in, Line, strong);

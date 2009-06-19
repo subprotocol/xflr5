@@ -49,7 +49,7 @@ class CWing
 	friend class ImportWingDlg;
 	friend class CtrlPolarDlg;
 	friend class GL3dWingDlg;
-
+	friend class ManageUFOsDlg;
 	// Construction
 public:
 

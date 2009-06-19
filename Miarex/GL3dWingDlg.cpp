@@ -137,7 +137,7 @@ bool GL3dWingDlg::CheckWing()
 {
 	if(!m_pWing->m_WingName.length())
 	{
-		QMessageBox::warning(this, "Warning", "Please enter a name for the wing");
+		QMessageBox::warning(this, tr("Warning"), "Please enter a name for the wing");
 		m_pctrlWingName->setFocus();
 		return false;
 	}
@@ -145,14 +145,14 @@ bool GL3dWingDlg::CheckWing()
 	{
 		if(m_pWing->m_TPos[k]*1.00001 < m_pWing->m_TPos[k-1])
 		{
-			QMessageBox::warning(this, "Warning", "Warning : Panel sequence is inconsistent");
+			QMessageBox::warning(this, tr("Warning"), tr("Warning : Panel sequence is inconsistent"));
 			return false;
 		}
 	}
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), "Too many panels\nReduce the mesh size");
 		return false;
 	}
 
@@ -1858,7 +1858,7 @@ void GL3dWingDlg::OnDeleteSection()
 
 	if(m_iSection==0)
 	{
-		QMessageBox::warning(this, "Warning","The first section cannot be deleted");
+		QMessageBox::warning(this, tr("Warning"),"The first section cannot be deleted");
 		return;
 	}
 
@@ -1912,12 +1912,12 @@ void GL3dWingDlg::OnInsertBefore()
 
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), "The maximum number of panels has been reached");
 		return;
 	}
 	if(m_iSection<=0)
 	{
-		QMessageBox::warning(this, "Warning", "No insertion possible before the first section");
+		QMessageBox::warning(this, tr("Warning"), "No insertion possible before the first section");
 		return;
 	}
 	int k,n,total, ny;
@@ -1968,7 +1968,7 @@ void GL3dWingDlg::OnInsertAfter()
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), "The maximum number of panels has been reached");
 		return;
 	}
 	int k,n,ny,total;
@@ -2972,7 +2972,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), "Too many panels\nReduce the mesh size");
 		return false;
 	}
 	return true;

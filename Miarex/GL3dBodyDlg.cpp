@@ -617,7 +617,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	{
 		QString strong;
 		strong = QString("Resolution cannot exceed %1").arg(10000);
-		QMessageBox::warning(this, "Warning", strong);
+		QMessageBox::warning(this, tr("Warning"), strong);
 		return;
 	}
 

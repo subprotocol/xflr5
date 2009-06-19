@@ -34,16 +34,11 @@ RenameDlg::RenameDlg(void *pParent)
 
 void RenameDlg::SetupLayout()
 {
-//	QDesktopWidget desktop;
-//	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/3);
-//	move(r.width()/3, r.height()/6);
-
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 
 	m_pctrlMessage = new QLabel("A Message here");
 
-	m_pctrlNote = new QLabel("Enter the new name");
+	m_pctrlNote = new QLabel(tr("Enter the new name"));
 	m_pctrlNote->setMinimumWidth(350);
 
 	m_pctrlName = new QLineEdit("");
@@ -148,7 +143,7 @@ void RenameDlg::OnOK()
 	m_strName = m_pctrlName->text();
 	if (!m_strName.length())
 	{
-		QMessageBox::warning(this, "Warning", "Must enter a name");
+		QMessageBox::warning(this, tr("Warning"), tr("Must enter a name"));
 		m_pctrlName->setFocus();
 		return;
 	}

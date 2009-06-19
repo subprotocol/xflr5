@@ -175,7 +175,7 @@ void GL3DScales::SetupLayout()
 	QGroupBox *StartBox = new QGroupBox("Start Streamline at");
 	StartBox->setLayout(StartLayout);
 
-	ApplyButton = new QPushButton("Apply");
+	ApplyButton = new QPushButton(tr("Apply"));
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addWidget(ScaleBox);

@@ -63,6 +63,8 @@ class CFoil
 	friend class WingDlg;
 	friend class AFoil;
 	friend class FoilSelectionDlg;
+	friend class ManageFoilsDlg;
+
 
 public:
 	static double pi;

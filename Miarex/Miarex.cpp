@@ -17,7 +17,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+ 
 #include <QGLWidget>
 #include <QAction>
 #include "Miarex.h"
@@ -31,6 +31,7 @@
 #include "../Graph/GraphDlg.h"
 #include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
+#include "ManageUFOsDlg.h"
 #include "GLLightDlg.h"
 #include "GL3DScales.h"
 #include "PlaneDlg.h"
@@ -126,7 +127,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pCurStab    = NULL;
 	m_pCurFin     = NULL;
 	m_pCurPOpp    = NULL;
-	m_pCurFrame   = NULL;
 	m_pCurBody    = NULL;
 	m_pCurWPolar  = NULL;
 	m_pCurWOpp    = NULL;
@@ -270,8 +270,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_WPlrGraph1.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph1.SetYMajGrid(true, QColor(120,120,120),2,1);
-	m_WPlrGraph1.SetXTitle("Cd");
-	m_WPlrGraph1.SetYTitle("Cl");
+	m_WPlrGraph1.SetXTitle(tr("Cd"));
+	m_WPlrGraph1.SetYTitle(tr("Cl"));
 	m_WPlrGraph1.SetXMin(-0.0);
 	m_WPlrGraph1.SetXMax( 0.1);
 	m_WPlrGraph1.SetYMin(-0.01);
@@ -281,8 +281,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_WPlrGraph2.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph2.SetYMajGrid(true, QColor(120,120,120),2,1);
-	m_WPlrGraph2.SetXTitle("Alpha");
-	m_WPlrGraph2.SetYTitle("Cl");
+	m_WPlrGraph2.SetXTitle(tr("Alpha"));
+	m_WPlrGraph2.SetYTitle(tr("Cl"));
 	m_WPlrGraph2.SetXMin(-0.0);
 	m_WPlrGraph2.SetXMax( 0.1);
 	m_WPlrGraph2.SetYMin(-0.01);
@@ -292,8 +292,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_WPlrGraph3.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetYMajGrid(true, QColor(120,120,120),2,1);
-	m_WPlrGraph3.SetXTitle("Alpha");
-	m_WPlrGraph3.SetYTitle("GCm");
+	m_WPlrGraph3.SetXTitle(tr("Alpha"));
+	m_WPlrGraph3.SetYTitle(tr("GCm"));
 	m_WPlrGraph3.SetXMin(-0.0);
 	m_WPlrGraph3.SetXMax( 0.1);
 	m_WPlrGraph3.SetYMin(-0.01);
@@ -303,8 +303,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_WPlrGraph4.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph4.SetYMajGrid(true, QColor(120,120,120),2,1);
-	m_WPlrGraph4.SetXTitle("Alpha");
-	m_WPlrGraph4.SetYTitle("Cl/Cd");
+	m_WPlrGraph4.SetXTitle(tr("Alpha"));
+	m_WPlrGraph4.SetYTitle(tr("Cl/Cd"));
 	m_WPlrGraph4.SetXMin(-0.0);
 	m_WPlrGraph4.SetXMax( 0.1);
 	m_WPlrGraph4.SetYMin(-0.01);
@@ -314,8 +314,8 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_CpGraph.SetYMajGrid(true, QColor(120,120,120),2,1);
-	m_CpGraph.SetXTitle("x");
-	m_CpGraph.SetYTitle("Cp");
+	m_CpGraph.SetXTitle(tr("x"));
+	m_CpGraph.SetYTitle(tr("Cp"));
 	m_CpGraph.SetXMin( 0.0);
 	m_CpGraph.SetXMax( 0.1);
 	m_CpGraph.SetYMin(-0.01);
@@ -681,12 +681,7 @@ CBody* QMiarex::AddBody(CBody *pBody)
 		else
 		{
 			//Ask for user intentions
-			if(SetModBody(pBody))
-			{
-				m_poaBody->append(pBody);
-				return pBody;
-			}
-			else
+			if(!SetModBody(pBody))
 			{
 				delete pBody;
 				return NULL;
@@ -1137,7 +1132,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 	if(pNewPoint == NULL)
 	{
-		QMessageBox::warning(window(),"Warning","Not enough memory to store the OpPoint\n");
+		QMessageBox::warning(window(),tr("Warning"),tr("Not enough memory to store the OpPoint\n"));
 		return;
 	}
 	else
@@ -2103,7 +2098,7 @@ void QMiarex::CreateCpCurves()
 				pCurve->SetStyle(m_CpStyle);
 				pCurve->SetWidth(m_CpWidth);
 				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle("Wing2_"+str2+str3);
+				pCurve->SetTitle(tr("Wing2_")+str2+str3);
 
 				for (pp=p; pp<p+coef*m_pCurWing2->m_Surface[0].m_NXPanels; pp++)
 				{
@@ -2140,7 +2135,7 @@ void QMiarex::CreateCpCurves()
 				pCurve->SetStyle(m_CpStyle);
 				pCurve->SetWidth(m_CpWidth);
 				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle("Elevator_"+str2+str3);
+				pCurve->SetTitle(tr("Elevator_")+str2+str3);
 
 				for (pp=p; pp<p+coef*m_pCurStab->m_Surface[0].m_NXPanels; pp++)
 				{
@@ -2178,7 +2173,7 @@ void QMiarex::CreateCpCurves()
 				pCurve->SetStyle(m_CpStyle);
 				pCurve->SetWidth(m_CpWidth);
 				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle("Fin_"+str2+str3);
+				pCurve->SetTitle(tr("Fin_")+str2+str3);
 
 				for (pp=p; pp<p+coef*m_pCurFin->m_Surface[0].m_NXPanels; pp++)
 				{
@@ -3266,12 +3261,14 @@ void QMiarex::DeleteBody(CBody *pThisBody)
 			if(pBody == m_pCurBody)
 			{
 				m_pCurBody = NULL;
-				m_pCurFrame = NULL;
+				SetUFO();
 			}
 			break;
 		}
 	}
 }
+
+
 void QMiarex::DrawCpLegend(QPainter &painter, QPoint place, int bottom)
 {
 	//draws the WOpps legend to the device context,
@@ -3811,7 +3808,7 @@ void QMiarex::EditCurPlane()
 			{
 //				SetModPlane(m_pCurPlane);
 				ModDlg dlg;
-				dlg.m_Question = "The modification will erase all results associated to this Plane.\nContinue ?";
+				dlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
 				dlg.InitDialog();
 				int Ans = dlg.exec();
 				if (Ans == QDialog::Rejected)
@@ -3934,7 +3931,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
 			}
-			pGraph->SetYTitle("Induced Angle");
+			pGraph->SetYTitle(tr("Induced Angle"));
 			break;
 		}
 		case 1:
@@ -3944,7 +3941,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit,
 					pWOpp->m_Alpha + pWOpp->m_Ai[i] + pWOpp->m_Twist[i]);
 			}
-			pGraph->SetYTitle("Total Angle");
+			pGraph->SetYTitle(tr("Total Angle"));
 			break;
 		}
 		case 2:
@@ -3953,7 +3950,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i]);
 			}
-			pGraph->SetYTitle("Cl");
+			pGraph->SetYTitle(tr("Cl"));
 			break;
 		}
 		case 3:
@@ -3962,7 +3959,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cl[i] * pWOpp->m_Chord[i]/pWOpp->m_MAChord);
 			}
-			pGraph->SetYTitle("Local lift");
+			pGraph->SetYTitle(tr("Local lift"));
 			break;
 		}
 		case 4:
@@ -3971,7 +3968,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]);
 			}
-			pGraph->SetYTitle("Airfoil drag");
+			pGraph->SetYTitle(tr("Airfoil drag"));
 			break;
 		}
 		case 5:
@@ -3980,7 +3977,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_ICd[i]);
 			}
-			pGraph->SetYTitle("Induced drag");
+			pGraph->SetYTitle(tr("Induced drag"));
 			break;
 		}
 		case 6:
@@ -3989,7 +3986,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_PCd[i]+ pWOpp->m_ICd[i]);
 			}
-			pGraph->SetYTitle("Total drag");
+			pGraph->SetYTitle(tr("Total drag"));
 			break;
 		}
 		case 7:
@@ -3998,7 +3995,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, (pWOpp->m_PCd[i]+ pWOpp->m_ICd[i])* pWOpp->m_Chord[i]/pWOpp->m_MAChord);
 			}
-			pGraph->SetYTitle("Local drag");
+			pGraph->SetYTitle(tr("Local drag"));
 			break;
 		}
 		case 8:
@@ -4007,7 +4004,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_CmAirf[i]);
 			}
-			pGraph->SetYTitle("Cm Airfoil");
+			pGraph->SetYTitle(tr("Cm Airfoil"));
 			break;
 		}
 		case 9:
@@ -4016,7 +4013,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_CmXRef[i]);
 			}
-			pGraph->SetYTitle("Cm XRef");
+			pGraph->SetYTitle(tr("Cm XRef"));
 			break;
 		}
 		case 10:
@@ -4025,7 +4022,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cm[i]);
 			}
-			pGraph->SetYTitle("Cm");
+			pGraph->SetYTitle(tr("Cm"));
 			break;
 		}
 		case 11:
@@ -4034,7 +4031,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Re[i]);
 			}
-			pGraph->SetYTitle("Re");
+			pGraph->SetYTitle(tr("Re"));
 			break;
 		}
 		case 12:
@@ -4043,7 +4040,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrTop[i]);
 			}
-			pGraph->SetYTitle("Top Trans x-Pos %");
+			pGraph->SetYTitle(tr("Top Trans x-Pos %"));
 			break;
 		}
 		case 13:
@@ -4052,7 +4049,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XTrBot[i]);
 			}
-			pGraph->SetYTitle("Bot Trans x-Pos %");
+			pGraph->SetYTitle(tr("Bot Trans x-Pos %"));
 			break;
 		}
 		case 14:
@@ -4061,7 +4058,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_XCPSpanRel[i]*100.0);
 			}
-			pGraph->SetYTitle("CP x-Pos %");
+			pGraph->SetYTitle(tr("CP x-Pos %"));
 			break;
 		}
 		case 15:
@@ -4073,7 +4070,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			}
 			QString str;
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
-			pGraph->SetYTitle("BM (" + str + ")" );
+			pGraph->SetYTitle(tr("BM (") + str + ")");
 			break;
 		}
 		default:
@@ -4082,7 +4079,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			{
 				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Ai[i]);
 			}
-			pGraph->SetYTitle("Induced Angle");
+			pGraph->SetYTitle(tr("Induced Angle"));
 		}
 	}
 }
@@ -5875,7 +5872,7 @@ void QMiarex::GLCreateCpLegend()
 			labellength = (fm.width(strong)+5) * ClientToGL;
 			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
 		}
-		strong = "Cp";
+		strong = tr("Cp");
 		labellength = (fm.width(strong)+5) * ClientToGL;
 		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong,pMainFrame->m_TextFont);
 	}
@@ -7736,7 +7733,6 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 	glNewList(List+1,GL_COMPILE);
 	{
 		m_GLList++;
-		//Trace("GL lists = %5d", m_GLList);
 		glEnable (GL_LINE_STIPPLE);
 		glPolygonMode(GL_FRONT,GL_LINE);
 		glLineWidth((GLfloat)m_XBotWidth);
@@ -7958,22 +7954,22 @@ void QMiarex::GLCreateWingLegend()
 
 			ZPos +=dD;
 
-			str1 = QString("Wing Span      = %1 ").arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit, 8,'f',3);
+			str1 = QString(tr("Wing Span      = %1 ")).arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit, 8,'f',3);
 			strong = str1 + length;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString("XYProj. Span   = %1 ").arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
+			str1 = QString(tr("XYProj. Span   = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
 			str1 += length;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString("Wing Area      = %1 ").arg(area * pMainFrame->m_m2toUnit, 8,'f',3);
+			str1 = QString(tr("Wing Area      = %1 ")).arg(area * pMainFrame->m_m2toUnit, 8,'f',3);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString("XYProj. Area   = %1 ").arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
+			str1 = QString(tr("XYProj. Area   = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
 			strong = str1+surface;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
@@ -7981,13 +7977,13 @@ void QMiarex::GLCreateWingLegend()
 			if(m_pCurWPolar)
 			{
 				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				str1 = QString("Plane Weight   = %1 ").arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,7,'f',2);
+				str1 = QString(tr("Plane Weight   = %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,7,'f',2);
 				Result = str1 + str;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 				ZPos +=dD;
 				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				str1 = QString("Wing Load      = %1 ").arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit, 8,'f',3);
+				str1 = QString(tr("Wing Load      = %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit, 8,'f',3);
 				Result = str1 + str+"/" + strong;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
@@ -7995,32 +7991,32 @@ void QMiarex::GLCreateWingLegend()
 
 			if(m_pCurPlane && m_pCurStab)
 			{
-				Result = QString("Tail Volume    = %1").arg(m_pCurPlane->m_TailVolume,7,'f',2);
+				Result = QString(tr("Tail Volume    = %1")).arg(m_pCurPlane->m_TailVolume,7,'f',2);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
 			}
 
-			Result = QString("Root Chord     = %1 ").arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(tr("Root Chord     = %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString("M.A.C.         = %1 ").arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(tr("M.A.C.         = %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString("Tip Twist      = %1").arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
+			Result = QString(tr("Tip Twist      = %1")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString("Aspect Ratio   = %1").arg(m_pCurWing->m_AR,7,'f',2);
+			Result = QString(tr("Aspect Ratio   = %1")).arg(m_pCurWing->m_AR,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString("Taper Ratio    = %1").arg(m_pCurWing->m_TR,7,'f',2);
+			Result = QString(tr("Taper Ratio    = %1")).arg(m_pCurWing->m_TR,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString("Root-Tip Sweep = %1").arg(m_pCurWing->GetAverageSweep(),7,'f',2);
+			Result = QString(tr("Root-Tip Sweep = %1")).arg(m_pCurWing->GetAverageSweep(),7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 		}
 
@@ -8063,68 +8059,68 @@ void QMiarex::GLCreateWOppLegend()
 			if(m_pCurWOpp->m_bOut)
 			{
 				YPos -=dD;
-				Result = "Point is out of the flight envelope";
+				Result = tr("Point is out of the flight envelope");
 				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 			}
 
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 			l = str.length();
-			if     (l==2) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-			else if(l==3) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-			else if(l==4) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+			if     (l==2) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+			else if(l==3) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+			else if(l==4) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("Alpha = %1 ").arg(m_pCurWOpp->m_Alpha,9,'f',4);
+			Result = QString(tr("Alpha = %1 ")).arg(m_pCurWOpp->m_Alpha,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("CL = %1 ").arg(m_pCurWOpp->m_CL, 9,'f',4);
+			Result = QString(tr("CL = %1 ")).arg(m_pCurWOpp->m_CL, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("CD = %1 ").arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag,9,'f',4);
+			Result = QString(tr("CD = %1 ")).arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/pi/m_pCurWing->m_AR;
-			Result = QString("Efficiency = %1 ").arg(cxielli/m_pCurWOpp->m_InducedDrag,9,'f',4);
+			Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("Cl/Cd = %1 ").arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag),9,'f',4);
+			Result = QString(tr("Cl/Cd = %1 ")).arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag),9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("GCm = %1 ").arg(m_pCurWOpp->m_GCm,9,'f',4);
+			Result = QString(tr("GCm = %1 ")).arg(m_pCurWOpp->m_GCm,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("Rolling Moment = %1 ").arg(m_pCurWOpp->m_GRm, 9,'f',4);
+			Result = QString(tr("Rolling Moment = %1 ")).arg(m_pCurWOpp->m_GRm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("Induced Moment = %1 ").arg(m_pCurWOpp->m_IYm, 9,'f',4);
+			Result = QString(tr("Induced Moment = %1 ")).arg(m_pCurWOpp->m_IYm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString("Airfoil Yawing Moment = %1 ").arg(m_pCurWOpp->m_GYm, 9,'f',4);
+			Result = QString(tr("Airfoil Yawing Moment = %1 ")).arg(m_pCurWOpp->m_GYm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			GetLengthUnit(str, pMainFrame->m_LengthUnit);
 			l = str.length();
-			if (l==1)     Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
-			else if(l==2) Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			else if(l>=3) Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			if (l==1)     Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
+			else if(l==2) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			else if(l>=3) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			for(i=0; i<m_pCurWOpp->m_nFlaps; i++)
 			{
-				Result = QString("Flap Moment[%1] = %2").arg(i+1).arg(m_pCurWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
+				Result = QString(tr("Flap Moment[%1] = %2")).arg(i+1).arg(m_pCurWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
 				GetMomentUnit(str, pMainFrame->m_MomentUnit);
 				Result += str;
 				YPos += dD;
@@ -8780,9 +8776,6 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
-//		glColor3d(1.0,0.0,0.0);
-//		pGLWidget->renderText(0.0, .3,  0.0, "Hello",pMainFrame->m_TextFont);
-
 		if(m_iView==3)
 		{
 			if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 /*&& m_bShowCpScale*/)
@@ -9030,7 +9023,7 @@ bool QMiarex::InitializePanels()
 	if(!m_pCurWing) return false;
 	int j,k,l;
 	QProgressDialog dlg(this);
-	dlg.setLabelText("Creating Elements... please Wait");
+	dlg.setLabelText(tr("Creating Elements... please Wait"));
 	dlg.setMinimum(0);
 	dlg.setMaximum(100);
 	dlg.setWindowModality(Qt::WindowModal);
@@ -9069,9 +9062,9 @@ bool QMiarex::InitializePanels()
 	if(m_MatSize>VLMMATSIZE)
 	{
 		QString strong;
-		strong = QString("The total number of panels is %1\n The Max Number is %2\nA reduction of the number of panels is required")
+		strong = QString(tr("The total number of panels is %1\n The Max Number is %2\nA reduction of the number of panels is required"))
 						  .arg(m_MatSize).arg(VLMMATSIZE);
-		QMessageBox::warning(this,"Warning",strong);
+		QMessageBox::warning(this,tr("Warning"),strong);
 		m_MatSize = 0;
 		m_nNodes  = 0;
 		return false;
@@ -10676,12 +10669,12 @@ void QMiarex::OnAnalyze()
 	double V0, VMax, VDelta;
 	if(!m_pCurWing)
 	{
-		QMessageBox::warning(this, "Warning", "Define a wing or a plane object before running a calculation");
+		QMessageBox::warning(this, tr("Warning"), tr("Please define a wing or a plane object before running a calculation"));
 		return;
 	}
 	if(!m_pCurWPolar)
 	{
-		QMessageBox::warning(this, "Warning", "Define an analysis/polar before running a calculation");
+		QMessageBox::warning(this, tr("Warning"), tr("Please define an analysis/polar before running a calculation"));
 		return;
 	}
 
@@ -10719,15 +10712,15 @@ void QMiarex::OnAnalyze()
 		if (!pMainFrame->GetFoil(m_pCurWing->m_RFoil[l]))
 		{
 			QString strong;
-			strong = "Could not find the wing's foil "+ m_pCurWing->m_RFoil[l] +"...\nAborting Calculation";
-			QMessageBox::warning(this, "Warning", strong);
+			strong = tr("Could not find the wing's foil ")+ m_pCurWing->m_RFoil[l] +tr("...\nAborting Calculation");
+			QMessageBox::warning(this, tr("Warning"), strong);
 			return;
 		}
 		if (!pMainFrame->GetFoil(m_pCurWing->m_LFoil[l]))
 		{
 			QString strong;
-			strong = "Could not find the wing's foil "+ m_pCurWing->m_LFoil[l] +"...\nAborting Calculation";
-			QMessageBox::warning(this, "Warning", strong);
+			strong = tr("Could not find the wing's foil ")+ m_pCurWing->m_LFoil[l] +tr("...\nAborting Calculation");
+			QMessageBox::warning(this, tr("Warning"), strong);
 			return;
 		}
 	}
@@ -10738,15 +10731,15 @@ void QMiarex::OnAnalyze()
 			if (!pMainFrame->GetFoil(m_pCurStab->m_RFoil[l]))
 			{
 				QString strong;
-				strong = "Could not find the elevator's foil "+ m_pCurStab->m_RFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "Warning", strong);
+				strong = tr("Could not find the elevator's foil ")+ m_pCurStab->m_RFoil[l] +tr("...\nAborting Calculation");
+				QMessageBox::warning(this, tr("Warning"), strong);
 				return;
 			}
 			if (!pMainFrame->GetFoil(m_pCurStab->m_LFoil[l]))
 			{
 				QString strong;
-				strong = "Could not find the elevator's foil "+ m_pCurStab->m_LFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "Warning", strong);
+				strong = tr("Could not find the elevator's foil ")+ m_pCurStab->m_LFoil[l] +tr("...\nAborting Calculation");
+				QMessageBox::warning(this, tr("Warning"), strong);
 				return;
 			}
 		}
@@ -10759,8 +10752,8 @@ void QMiarex::OnAnalyze()
 			if (!pMainFrame->GetFoil(m_pCurFin->m_RFoil[l]))
 			{
 				QString strong;
-				strong = "Could not find the fin's foil "+ m_pCurFin->m_RFoil[l] +"...\nAborting Calculation";
-				QMessageBox::warning(this, "Warning", strong);
+				strong = tr("Could not find the fin's foil ")+ m_pCurFin->m_RFoil[l] +tr("...\nAborting Calculation");
+				QMessageBox::warning(this, tr("Warning"), strong);
 				return;
 			}
 		}
@@ -11422,9 +11415,9 @@ void QMiarex::OnDeleteCurUFO()
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong;
-	if(m_pCurPlane)	strong = "Are you sure you want to delete the plane :\n" +  m_pCurPlane->m_PlaneName +"?\n";
-	else 	        strong = "Are you sure you want to delete the wing :\n" +   m_pCurWing->m_WingName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+	if(m_pCurPlane)	strong = tr("Are you sure you want to delete the plane :\n") +  m_pCurPlane->m_PlaneName +"?\n";
+	else 	        strong = tr("Are you sure you want to delete the wing :\n") +   m_pCurWing->m_WingName +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
@@ -11603,8 +11596,8 @@ void QMiarex::OnDeleteCurWPolar()
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 	else return;
 
-	strong = "Are you sure you want to delete the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+	strong = tr("Are you sure you want to delete the polar :\n") +  m_pCurWPolar->m_PlrName +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
@@ -11708,79 +11701,95 @@ void QMiarex::OnDuplicateCurUFO()
 
 void QMiarex::OnEditCurBody()
 {
-	if(!m_pCurBody) return;
+	if(!m_pCurBody || !m_pCurPlane) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	CBody *pNewBody = new CBody;
-	pNewBody->Duplicate(m_pCurBody);
-	m_GL3dBody.SetBody(pNewBody);
+	bool bUsed = false;
+	int i;
+	CPlane *pPlane;
+	CWPolar *pWPolar;
+	for (i=0; i< m_poaPlane->size(); i++)
+	{
+		pPlane = (CPlane*)m_poaPlane->at(i);
+		if(pPlane->m_bBody && pPlane->m_pBody==m_pCurBody)
+		{
+			// Does this plane have results
+			for(int j=0; j<m_poaWPolar->size(); j++)
+			{
+				pWPolar = (CWPolar*)m_poaWPolar->at(j);
+				if(pWPolar->m_UFOName==pPlane->m_PlaneName && pWPolar->m_Alpha.size())
+				{
+					bUsed = true;
+					break;
+				}
+			}
+			if(bUsed) break;
+		}
+	}
+
+	CBody memBody;
+	memBody.Duplicate(m_pCurBody);
+	m_GL3dBody.SetBody(m_pCurBody);
 	m_GL3dBody.m_bEnableName = false;
 	m_GL3dBody.setWindowState(Qt::WindowMaximized);
 	m_GL3dBody.InitDialog();
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
-		bool bUsed = false;
-		CPlane *pPlane;
-		CWPolar *pWPolar;
-		for (int i=0; i< m_poaPlane->size(); i++)
-		{
-			pPlane = (CPlane*)m_poaPlane->at(i);
-			if(pPlane->m_bBody && pPlane->m_pBody==m_pCurBody)
-			{
-				// Does this plane have results
-				for(int j=0; j<m_poaWPolar->size(); j++)
-				{
-					pWPolar = (CWPolar*)m_poaWPolar->at(j);
-					if(pWPolar->m_UFOName==pPlane->m_PlaneName && pWPolar->m_Alpha.size())
-					{
-						bUsed = true;
-						break;
-					}
-				}
-				if(bUsed) break;
-			}
-		}
 		if(bUsed)
 		{
-/*			ModDlg dlg;
-			dlg.m_Question = "The modification will erase all results associated to the planes which use this body.\nContinue ?";
+			ModDlg dlg;
+			dlg.m_Question = tr("The modification will erase all results for the planes using this body.\nContinue ?");
 			dlg.InitDialog();
 			int Ans = dlg.exec();
 			if (Ans == QDialog::Rejected)
 			{
-				//restore geometry for initial body
+				//restore geometry
 				m_pCurBody->Duplicate(&memBody);
 				return;
 			}
 			else if(Ans==20)
 			{
-				//create new body
-				CBody* pNewBody= new CBody;
+				CBody* pNewBody= new CBody();
 				pNewBody->Duplicate(m_pCurBody);
-
+				m_pCurBody->Duplicate(&memBody);
 				if(!SetModBody(pNewBody))
 				{
 					delete pNewBody;
 				}
-			}*/
-			if(SetModBody(pNewBody))
-			{
-				m_pCurBody = pNewBody;
+
+				return;
 			}
 			else
 			{
-				delete pNewBody;
-				return;
+				//delete all results associated to planes using this body
+				for (i=0; i<m_poaPlane->count();i++)
+				{
+					pPlane = (CPlane*)m_poaPlane->at(i);
+					if(pPlane->m_pBody == m_pCurBody)
+					{
+						pMainFrame->DeletePlane(pPlane, true);
+					}
+				}
 			}
 		}
-		m_bResetglBody = true;
+
+		if(m_iView==2)		CreateWPolarCurves();
+		else if(m_iView==1)	CreateWOppCurves();
+		else if(m_iView==4)	CreateCpCurves();
+
+		SetUFO();
+		m_bResetglBody     = true;
 		m_bResetglBodyMesh = true;
-		m_bResetglGeom = true;
-		m_bResetglMesh = true;
+		m_bResetglGeom     = true;
+		m_bResetglMesh     = true;
+		pMainFrame->UpdateWOpps();
 		pMainFrame->SetSaveState(false);
+		m_bIs2DScaleSet = false;
+		SetScale();
+		UpdateView();
 	}
-	else delete pNewBody;
+	else m_pCurBody->Duplicate(&memBody);
 }
 
 
@@ -11870,7 +11879,7 @@ void QMiarex::OnEditUFO()
 			if(bHasResults)
 			{
 				ModDlg dlg;
-				dlg.m_Question = "The modification will erase all results associated to this Wing.\nContinue ?";
+				dlg.m_Question = tr("The modification will erase all results associated to this Wing.\nContinue ?");
 				dlg.InitDialog();
 				int Ans = dlg.exec();
 				if (Ans == QDialog::Rejected)
@@ -11968,9 +11977,9 @@ void QMiarex::OnExportCurWOpp()
 
 	FileName = m_pCurWOpp->m_PlrName;
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, "Export Wing Opp",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Wing OpPoint"),
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt);;Comma Separated Values (*.csv)",
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 
 	if(!FileName.length()) return;
@@ -11997,51 +12006,51 @@ void QMiarex::OnExportCurWOpp()
 
 	strong = m_pCurWOpp->m_PlrName + "\n";
 	out << strong;
-	strong = QString("QInf  ="+sep+" %1 "+sep).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,9,'f',4);
+	strong = QString(tr("QInf  =")+sep+" %1 "+sep).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,9,'f',4);
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 	strong+=str+"\n";
 
 	out << strong;
-	strong = QString("Alpha = "+sep+"%1\n").arg(m_pCurWOpp->m_Alpha,9,'f',4);
+	strong = QString(tr("Alpha = ")+sep+"%1\n").arg(m_pCurWOpp->m_Alpha,9,'f',4);
 	out << strong;
 
-	strong = QString("Cl    = "+sep+"%1\n").arg(m_pCurWOpp->m_CL,9,'f',4);
+	strong = QString(tr("Cl    = ")+sep+"%1\n").arg(m_pCurWOpp->m_CL,9,'f',4);
 	out << strong;
 
-	strong = QString("Cy    = "+sep+"%1\n").arg(m_pCurWOpp->m_CY,9,'f',4);
+	strong = QString(tr("Cy    = ")+sep+"%1\n").arg(m_pCurWOpp->m_CY,9,'f',4);
 	out << strong;
 
-	if(type==1) strong = QString("Cd    = %1     ICd   = %2     PCd   = %3\n")
+	if(type==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
 		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,9,'f',4)
 		.arg(m_pCurWOpp->m_InducedDrag,9,'f',4)
 		.arg(m_pCurWOpp->m_ViscousDrag,9,'f',4);
-	else        strong = QString("Cd=,%1,ICd=, %2,PCd=, %3\n")
+	else        strong = QString(tr("Cd=,%1,ICd=, %2,PCd=, %3\n"))
 		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,9,'f',4)
 		.arg(m_pCurWOpp->m_InducedDrag,9,'f',4)
 		.arg(m_pCurWOpp->m_ViscousDrag,9,'f',4);
 	out << strong;
 
-	strong = QString("GCm   ="+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 9,'f',4);
+	strong = QString(tr("GCm   =")+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 9,'f',4);
 	out << strong;
 
-	strong = QString("GRm   = "+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 9,'f',4);
+	strong = QString(tr("GRm   = ")+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 9,'f',4);
 	out << strong;
 
-	if(type==1) strong = QString("IYm   = %1     PYm   = %2 \n").arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
-	else        strong = QString("IYm=, %1,PYm=, %2\n").arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
+	if(type==1) strong = QString(tr("IYm   = %1     PYm   = %2 \n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
+	else        strong = QString(tr("IYm=, %1,PYm=, %2\n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
 	out << strong;
 
-	if(type==1) strong = QString("XCP   = %1     YCP   = %2 \n").arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
-	else        strong = QString("XCP=, %1, YCP=, %2 \n").arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
+	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
+	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
 	out << strong;
 
-	strong = QString("Bend. ="+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
+	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
 	out << strong;
 
-	out << ("Main Wing Data\n");
+	out << (tr("Main Wing Data\n"));
 	for (l=0; l<m_pCurWOpp->m_nFlaps; l++)
 	{
-		strong = QString("Flap "+sep+"%1"+sep+" moment = "+sep+"%2").arg(l+1).arg(m_pCurWOpp->m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
+		strong = QString(tr("Flap ")+sep+"%1"+sep+tr(" moment = ")+sep+"%2").arg(l+1).arg(m_pCurWOpp->m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
 		GetMomentUnit(str, pMainFrame->m_MomentUnit);
 		strong += str +"\n";
 		out << strong;
@@ -12258,9 +12267,9 @@ void QMiarex::OnExportCurWPolar()
 
 	FileName = m_pCurWPolar->m_PlrName;
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, "Export Polar",
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Polar"),
 											pMainFrame->m_LastDirName + "/"+FileName,
-											"Text File (*.txt);;Comma Separated Values (*.csv)",
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
@@ -12725,7 +12734,6 @@ void QMiarex::OnLight()
 }
 
 
-
 void QMiarex::OnManageBodies()
 {
 	ManageBodiesDlg dlg;
@@ -12737,6 +12745,34 @@ void QMiarex::OnManageBodies()
 	dlg.InitDialog();
 	dlg.exec();
 }
+
+void QMiarex::OnManageUFOs()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	ManageUFOsDlg dlg;
+	dlg.m_pMainFrame = m_pMainFrame;
+	dlg.m_pMiarex    = this;
+
+	QString UFOName = "";
+	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
+	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
+
+	dlg.InitDialog(UFOName);
+	dlg.exec();
+
+	if(dlg.m_pPlane)     SetUFO(dlg.m_pPlane->m_PlaneName);
+	else if(dlg.m_pWing) SetUFO(dlg.m_pWing->m_WingName);
+	else                 SetUFO();
+
+	pMainFrame->UpdateUFOs();
+	CheckButtons();
+	pMainFrame->SetSaveState(false);
+
+	m_bResetglGeom = true;
+	m_bResetglMesh = true;
+	UpdateView();
+}
+
 
 
 void QMiarex::OnMoment()
@@ -12961,7 +12997,7 @@ void QMiarex::OnRenameCurWPolar()
 	RenameDlg dlg(this);
 	dlg.m_pstrArray = & NameList;
 
-	dlg.m_strQuestion = "Enter the new name for the wing polar :";
+	dlg.m_strQuestion = tr("Enter the new name for the wing polar :");
 	dlg.m_strName     = m_pCurWPolar->m_PlrName;
 
 	bool bExists = true;
@@ -13129,8 +13165,8 @@ void QMiarex::OnResetCpSection()
 void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
-	QString strong = "Are you sure you want to reset the content of the polar :\n" +  m_pCurWPolar->m_PlrName +"?\n";
-	if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong,
+	QString strong = tr("Are you sure you want to reset the content of the polar :\n")+  m_pCurWPolar->m_PlrName +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
@@ -13888,7 +13924,7 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 	int dwidth, dheight;
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dheight = fm.height();
-	dwidth = fm.width("abcdefghijklmnopqrstuvwxyz012345678");
+	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 
 	int D = 0;
 	int LeftPos = margin;
@@ -13919,22 +13955,22 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 			GetLengthUnit(length, pMainFrame->m_LengthUnit);
 			GetAreaUnit(surface,  pMainFrame->m_AreaUnit);
 
-			str1 = QString("Wing Span =   %1 ").arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit,12,'f',3);
+			str1 = QString(tr("Wing Span =   %1 ")).arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit,12,'f',3);
 			str1 += length;
 			painter.drawText(LeftPos,ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("xyProj. Span = %1 ").arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,11,'f',3);
+			str1 = QString(tr("xyProj. Span = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,11,'f',3);
 			str1 += length;
 			painter.drawText(LeftPos,ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("Wing Area =  %1 ").arg(area * pMainFrame->m_m2toUnit,13,'f',3);
+			str1 = QString(tr("Wing Area =  %1 ")).arg(area * pMainFrame->m_m2toUnit,13,'f',3);
 			str1 += surface;
 			painter.drawText(LeftPos,ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("xyProj. Area = %1 ").arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,11,'f',3);
+			str1 = QString(tr("xyProj. Area = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,11,'f',3);
 			str1 += surface;
 			painter.drawText(LeftPos,ZPos+D, str1);
 			D+=dheight;
@@ -13942,13 +13978,13 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 			if(m_pCurWPolar)
 			{
 				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				Result = QString("Plane Weight =  %1 ").arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
+				Result = QString(tr("Plane Weight =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
 				Result += str;
 				painter.drawText(LeftPos, ZPos+D, Result);
 				D+=dheight;
 
 				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				Result = QString("Wing Load =  %1 ").arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit,13,'f',3);
+				Result = QString(tr("Wing Load =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit,13,'f',3);
 				Result += str + "/" + strong;
 				painter.drawText(LeftPos, ZPos+D, Result);
 				D+=dheight;
@@ -13956,40 +13992,40 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 
 			if(m_pCurPlane && m_pCurStab)
 			{
-				str1 = QString("Tail Volume =      %1").arg(m_pCurPlane->m_TailVolume,7,'f',3);
+				str1 = QString(tr("Tail Volume =      %1")).arg(m_pCurPlane->m_TailVolume,7,'f',3);
 				painter.drawText(LeftPos, ZPos+D, str1);
 				D+=dheight;
 			}
 
-			str1 = QString("Root Chord =   %1 ").arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 11,'f', 3);
+			str1 = QString(tr("Root Chord =   %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 11,'f', 3);
 			Result = str1+length;
 			painter.drawText(LeftPos, ZPos+D, Result);
 			D+=dheight;
 
-			str1 = QString("MAC =          %1 ").arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 11,'f', 3);
+			str1 = QString(tr("MAC =          %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 11,'f', 3);
 			Result = str1+length;
 			painter.drawText(LeftPos, ZPos+D, Result);
 			D+=dheight;
 
-			str1 = QString("TipTwist =   %1 deg").arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
+			str1 = QString(tr("TipTwist =   %1 deg")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
 			painter.drawText(LeftPos, ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("Aspect Ratio =   %1").arg(m_pCurWing->m_AR,9,'f',3);
+			str1 = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,9,'f',3);
 			painter.drawText(LeftPos, ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("Taper Ratio =   %1").arg(m_pCurWing->m_TR,10,'f',3);
+			str1 = QString(tr("Taper Ratio =   %1")).arg(m_pCurWing->m_TR,10,'f',3);
 			painter.drawText(LeftPos, ZPos+D, str1);
 			D+=dheight;
 
-			str1 = QString("Root-Tip Sweep = %1 deg").arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
+			str1 = QString(tr("Root-Tip Sweep = %1 deg")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
 			painter.drawText(LeftPos, ZPos+D, str1);
 		}
 	}
 
 	D = 0;
-	int RightPos = m_rCltRect.right()-margin-fm.width("abcdefghijklmnopqrstuvwxyz01234567");
+	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
 	ZPos	 = m_rCltRect.height()-11*dheight;
 	if(m_pCurWOpp && m_pCurWOpp->m_bOut) ZPos -= dheight;
 	if(m_pCurWOpp) ZPos -= dheight*m_pCurWOpp->m_nFlaps;
@@ -14006,66 +14042,66 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 		Result += str;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("Alpha = %1 ").arg(m_pCurWOpp->m_Alpha, 9,'f',4);
+		Result = QString(tr("Alpha = %1 ")).arg(m_pCurWOpp->m_Alpha, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 		if(m_pCurWOpp->m_bOut)
 		{
-			Result = "Point is out of the flight envelope";
+			Result = tr("Point is out of the flight envelope");
 			D+=dheight;
 			painter.drawText(RightPos, ZPos+D, Result);
 		}
 
-		Result = QString("Lift Coef. = %1 ").arg(m_pCurWOpp->m_CL, 9,'f',4);
+		Result = QString(tr("Lift Coef. = %1 ")).arg(m_pCurWOpp->m_CL, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 
-		Result = QString("Drag Coef. = %1 ").arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag, 9,'f',4);
+		Result = QString(tr("Drag Coef. = %1 ")).arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 		/*		oswald=CZ^2/CXi/pi/allongement;*/
 		double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/pi/m_pCurWing->m_AR;
-		Result = QString("Efficiency = %1 ").arg(cxielli/m_pCurWOpp->m_InducedDrag, 9,'f',4);
+		Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("Cl/Cd = %1 ").arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag), 9,'f',4);
+		Result = QString(tr("Cl/Cd = %1 ")).arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag), 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("GCm = %1 ").arg(m_pCurWOpp->m_GCm,9,'f',4);
-		D+=dheight;
-		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
-
-
-		Result = QString("Rolling Moment Coef. = %1 ").arg(m_pCurWOpp->m_GRm, 9,'f',4);
+		Result = QString(tr("GCm = %1 ")).arg(m_pCurWOpp->m_GCm,9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 
-		Result = QString("Induced Moment Coef = %1 ").arg(m_pCurWOpp->m_IYm, 9,'f',4);
+		Result = QString(tr("Rolling Moment Coef. = %1 ")).arg(m_pCurWOpp->m_GRm, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString("Profile Yawing Moment = %1 ").arg(m_pCurWOpp->m_GYm, 9,'f',4);
+
+		Result = QString(tr("Induced Moment Coef = %1 ")).arg(m_pCurWOpp->m_IYm, 9,'f',4);
+		D+=dheight;
+		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+		Result = QString(tr("Profile Yawing Moment = %1 ")).arg(m_pCurWOpp->m_GYm, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
 		l = str.length();
-		if (l==1)     Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,8,'f',3);
-		else if(l==2) Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
-		else if(l>=3) Result = QString("XCP = %1 ").arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
+		if (l==1)     Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,8,'f',3);
+		else if(l==2) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
+		else if(l>=3) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
 		Result += str;
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 		for(i=0; i<m_pCurWOpp->m_nFlaps; i++)
 		{
-			Result = QString("Flap %1 Moment =%2").arg(i+1).arg(m_pCurWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit,9,'f',4);
+			Result = QString(tr("Flap %1 Moment =%2")).arg(i+1).arg(m_pCurWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit,9,'f',4);
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
 			Result += str;
 			D+=dheight;
@@ -14321,7 +14357,7 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 		int x = (int)(m_rCltRect.width()/2);
 		int y = m_rCltRect.bottom();
 		painter.drawLine(x-60,  y - 50, x-40,  y - 50);
-		painter.drawText(x-35, y - 48, "Top transition");
+		painter.drawText(x-35, y - 48, tr("Top transition"));
 
 	}
 
@@ -14349,7 +14385,7 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 		int x = (int)(m_rCltRect.width()/2);
 		int y = m_rCltRect.bottom();
 		painter.drawLine(x-60,  y - 35, x-40,  y - 35);
-		painter.drawText(x-35, y - 33, "Bottom transition");
+		painter.drawText(x-35, y - 33, tr("Bottom transition"));
 
 	}
 	painter.restore();
@@ -14407,7 +14443,7 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 	int x = (int)(m_rCltRect.width()/2);
 	int y1 = m_rCltRect.bottom();
 	painter.drawLine(x-60,  y1- 20, x-40,  y1 - 20);
-	painter.drawText(x-35, y1 - 18, "Centre of Pressure");
+	painter.drawText(x-35, y1 - 18, tr("Centre of Pressure"));
 	painter.restore();
 }
 
@@ -14439,10 +14475,11 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 	QRect CM(XCm-size, YCm-size, 2*size, 2*size);
 	painter.drawEllipse(CM);
 
-	painter.drawText(XCm+10, YCm-5, "Moment ref. location");
+	painter.drawText(XCm+10, YCm-5, tr("Moment ref. location"));
 
 	painter.restore();
 }
+
 
 void QMiarex::PaintWOpp(QPainter &painter)
 {
@@ -14551,10 +14588,10 @@ QString QMiarex::RenameUFO(QString UFOName)
 		OldName = pPlane->m_PlaneName;
 		SetModPlane(pPlane);
 
-		pPlane->m_Wing.m_WingName  = pPlane->m_PlaneName+"_Wing";
-		pPlane->m_Wing2.m_WingName = pPlane->m_PlaneName+"_Wing2";
-		pPlane->m_Stab.m_WingName  = pPlane->m_PlaneName+"_Elev";
-		pPlane->m_Fin.m_WingName   = pPlane->m_PlaneName+"_Fin";
+		pPlane->m_Wing.m_WingName  = pPlane->m_PlaneName+tr("_Wing");
+		pPlane->m_Wing2.m_WingName = pPlane->m_PlaneName+tr("_Wing2");
+		pPlane->m_Stab.m_WingName  = pPlane->m_PlaneName+tr("_Elev");
+		pPlane->m_Fin.m_WingName   = pPlane->m_PlaneName+tr("_Fin");
 
 		for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
 		{
@@ -15067,24 +15104,18 @@ void QMiarex::SetAnalysisParams()
 
 	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->m_Type <3))
 	{
-//		m_pctrlSpec->setText("a");
-//		m_pctrlSpec.SetFont(&m_SymbolFont);
 		m_pctrlAlphaMin->SetValue(m_AlphaMin);
 		m_pctrlAlphaMax->SetValue(m_AlphaMax);
 		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
 	}
 	else if(m_pCurWPolar  && m_pCurWPolar->m_Type ==4)
 	{
-//		m_pctrlSpec->setText("VInf");
-//		m_pctrlSpec.SetFont(&m_StdFont);
 		m_pctrlAlphaMin->SetValue(m_QInfMin*pMainFrame->m_mstoUnit);
 		m_pctrlAlphaMax->SetValue(m_QInfMax*pMainFrame->m_mstoUnit);
 		m_pctrlAlphaDelta->SetValue(m_QInfDelta*pMainFrame->m_mstoUnit);
 	}
 	else if(m_pCurWPolar && (m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6))
 	{
-//		m_pctrlSpec->setText("t");
-//		m_pctrlSpec.SetFont(&m_StdFont);
 		m_pctrlAlphaMin->SetValue(m_ControlMin);
 		m_pctrlAlphaMax->SetValue(m_ControlMax);
 		m_pctrlAlphaDelta->SetValue(m_ControlDelta);
@@ -15220,7 +15251,7 @@ bool QMiarex::SetModBody(CBody *pModBody)
 
 	RenameDlg RDlg(this);
 	RDlg.m_pstrArray = & NameList;
-	RDlg.m_strQuestion = "Enter the new name for the Body :";
+	RDlg.m_strQuestion = tr("Enter the new name for the Body :");
 	RDlg.m_strName = pModBody->m_BodyName;
 	RDlg.InitDialog();
 
@@ -15294,8 +15325,8 @@ bool QMiarex::SetModBody(CBody *pModBody)
 				}
 				if(bIsInUse)
 				{
-					strong = "The body "+pOldBody->m_BodyName+" is used by one or more planes.\n Overwrite anyway ? (Results will be lost)";
-					resp = QMessageBox::question(this, "Question", strong,
+					strong = tr("The body ") + pOldBody->m_BodyName+ tr(" is used by one or more planes.\n Overwrite anyway ? (Results will be lost)");
+					resp = QMessageBox::question(this, tr("Question"), strong,
 												 QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
 												 QMessageBox::Cancel);
 				}
@@ -15310,7 +15341,6 @@ bool QMiarex::SetModBody(CBody *pModBody)
 							if(pBody==m_pCurBody)
 							{
 								m_pCurBody = NULL;
-								m_pCurFrame = NULL;
 							}
 							delete pBody;
 							bExists = false;
@@ -15374,7 +15404,7 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 	}
 	RenameDlg RDlg(this);
 	RDlg.m_pstrArray = & NameList;
-	RDlg.m_strQuestion = "Enter the new name for the Plane :";
+	RDlg.m_strQuestion = tr("Enter the new name for the Plane :");
 	RDlg.m_strName     = pModPlane->m_PlaneName;
 	RDlg.InitDialog();
 
@@ -15590,7 +15620,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 	}
 	RenameDlg RDlg(this);
 	RDlg.m_pstrArray = & NameList;
-	RDlg.m_strQuestion = "Enter the new name for the wing :";
+	RDlg.m_strQuestion = tr("Enter the new name for the wing :");
 	RDlg.m_strName = pModWing->m_WingName;
 	RDlg.InitDialog();
 
@@ -15705,7 +15735,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 			}
 			else if(pOldPlane)
 			{
-				if(pOldPlane->m_bActive) QMessageBox::warning(window(), "Warning","Cannot overwrite current plane");
+				if(pOldPlane->m_bActive) QMessageBox::warning(window(), tr("Warning"),tr("Cannot overwrite current plane"));
 				else
 				{
 					for (k=0; k<m_poaPlane->size(); k++)
@@ -16086,11 +16116,11 @@ void QMiarex::SetupLayout()
 
 	setSizePolicy(szPolicyMinimum);
 //_______________________Analysis
-	m_pctrlSequence = new QCheckBox("Sequence");
+	m_pctrlSequence = new QCheckBox(tr("Sequence"));
 	QGridLayout *SequenceGroup = new QGridLayout;
-	QLabel *AlphaMinLab   = new QLabel("Start=");
-	QLabel *AlphaMaxLab   = new QLabel("End=");
-	QLabel *AlphaDeltaLab = new QLabel("D=");
+	QLabel *AlphaMinLab   = new QLabel(tr("Start="));
+	QLabel *AlphaMaxLab   = new QLabel(tr("End="));
+	QLabel *AlphaDeltaLab = new QLabel(tr("D="));
 	AlphaDeltaLab->setFont(QFont("Symbol"));
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
@@ -16119,9 +16149,9 @@ void QMiarex::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlUnit2,2,3);
 	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
 
-	m_pctrlInitLLTCalc = new QCheckBox("Init LLT");
-	m_pctrlStoreWOpp    = new QCheckBox("Store OpPoint");
-	m_pctrlAnalyze     = new QPushButton("Analyze");
+	m_pctrlInitLLTCalc = new QCheckBox(tr("Init LLT"));
+	m_pctrlStoreWOpp    = new QCheckBox(tr("Store OpPoint"));
+	m_pctrlAnalyze     = new QPushButton(tr("Analyze"));
 
 
 	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
@@ -16135,22 +16165,22 @@ void QMiarex::SetupLayout()
 	AnalysisGroup->addLayout(AnalysisSettings);
 	AnalysisGroup->addWidget(m_pctrlAnalyze);
 
-	QGroupBox *AnalysisBox = new QGroupBox("Analysis settings");
+	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
 	AnalysisBox->setLayout(AnalysisGroup);
 
 //_______________________Display
 	QGridLayout *CheckDispLayout = new QGridLayout;
-	m_pctrlHalfWing      = new QCheckBox("1/2 wing");
-	m_pctrlLift          = new QCheckBox("Lift");
-	m_pctrlIDrag         = new QCheckBox("Ind. Drag");
-	m_pctrlVDrag         = new QCheckBox("Visc. Drag");
-	m_pctrlTrans         = new QCheckBox("Trans.");
-	m_pctrlMoment        = new QCheckBox("Moment");
-	m_pctrlDownwash      = new QCheckBox("Downw.");
-	m_pctrlCp            = new QCheckBox("Cp");
-	m_pctrlSurfVel       = new QCheckBox("Surf. Vel.");
-	m_pctrlStream        = new QCheckBox("Stream");
-	m_pctrlAnimate       = new QCheckBox("Animate");
+	m_pctrlHalfWing      = new QCheckBox(tr("1/2 wing"));
+	m_pctrlLift          = new QCheckBox(tr("Lift"));
+	m_pctrlIDrag         = new QCheckBox(tr("Ind. Drag"));
+	m_pctrlVDrag         = new QCheckBox(tr("Visc. Drag"));
+	m_pctrlTrans         = new QCheckBox(tr("Trans."));
+	m_pctrlMoment        = new QCheckBox(tr("Moment"));
+	m_pctrlDownwash      = new QCheckBox(tr("Downw."));
+	m_pctrlCp            = new QCheckBox(tr("Cp"));
+	m_pctrlSurfVel       = new QCheckBox(tr("Surf. Vel."));
+	m_pctrlStream        = new QCheckBox(tr("Stream"));
+	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
 	m_pctrlAnimateSpeed->setMaximum(500);
@@ -16169,26 +16199,26 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
-//	m_pctrl3DSettings =new QPushButton("3D Scales");
+//	m_pctrl3DSettings =new QPushButton(tr("3D Scales"));
 //	m_pctrl3DSettings->setCheckable(true);
 //	QVBoxLayout *DisplayLayout = new QVBoxLayout;
 //	DisplayLayout->addLayout(CheckDispLayout);
 //	DisplayLayout->addWidget(m_pctrl3DSettings);
-	QGroupBox *DisplayBox = new QGroupBox("Display");
+	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(CheckDispLayout);
 
 
 //_______________________Curve params
 	QVBoxLayout *CurveGroup = new QVBoxLayout;
-	m_pctrlShowCurve  = new QCheckBox("Curve");
-	m_pctrlShowPoints = new QCheckBox("Points");
+	m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
+	m_pctrlShowPoints = new QCheckBox(tr("Points"));
 	m_pctrlCurveStyle = new LineCbBox();
 	m_pctrlCurveWidth = new LineCbBox();
 	m_pctrlCurveColor = new LineButton;
 	for (int i=0; i<5; i++)
 	{
-		m_pctrlCurveStyle->addItem("item");
-		m_pctrlCurveWidth->addItem("item");
+		m_pctrlCurveStyle->addItem(tr("item"));
+		m_pctrlCurveWidth->addItem(tr("item"));
 	}
 	m_pStyleDelegate = new LineDelegate;
 	m_pWidthDelegate = new LineDelegate;
@@ -16203,7 +16233,7 @@ void QMiarex::SetupLayout()
 	CurveGroup->addWidget(m_pctrlCurveWidth);
 	CurveGroup->addWidget(m_pctrlCurveColor);
 	CurveGroup->addStretch(1);
-	QGroupBox *CurveBox = new QGroupBox("Curve settings");
+	QGroupBox *CurveBox = new QGroupBox(tr("Curve settings"));
 	CurveBox->setLayout(CurveGroup);
 
 //_______________________Cp Params
@@ -16215,31 +16245,31 @@ void QMiarex::SetupLayout()
 	m_pctrlCpSectionSlider->setTickInterval(10);
 	m_pctrlCpSectionSlider->setTickPosition(QSlider::TicksBelow);
 	QHBoxLayout *CpPos = new QHBoxLayout;
-	QLabel *label1000 = new QLabel("Span Position");
+	QLabel *label1000 = new QLabel(tr("Span Position"));
 	m_pctrlSpanPos = new FloatEdit(0.0, 3);
 	CpPos->addWidget(label1000);
 	CpPos->addWidget(m_pctrlSpanPos);
 	QHBoxLayout *CpSections = new QHBoxLayout;
-	m_pctrlKeepCpSection = new QPushButton("Keep");
-	m_pctrlResetCpSection = new QPushButton("Reset");
+	m_pctrlKeepCpSection = new QPushButton(tr("Keep"));
+	m_pctrlResetCpSection = new QPushButton(tr("Reset"));
 	CpSections->addWidget(m_pctrlKeepCpSection);
 	CpSections->addWidget(m_pctrlResetCpSection);
 	CpParams->addWidget(m_pctrlCpSectionSlider);
 	CpParams->addLayout(CpPos);
 	CpParams->addLayout(CpSections);
 	CpParams->addStretch(1);
-	QGroupBox *CpBox = new QGroupBox("Cp Sections");
+	QGroupBox *CpBox = new QGroupBox(tr("Cp Sections"));
 	CpBox->setLayout(CpParams);
 
 //_______________________3D view controls
 	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
 	QGridLayout *ThreeDParams = new QGridLayout;
-	m_pctrlAxes       = new QCheckBox("Axes");
-	m_pctrlLight      = new QCheckBox("Light");
-	m_pctrlSurfaces   = new QCheckBox("Surfaces");
-	m_pctrlOutline    = new QCheckBox("Outline");
-	m_pctrlPanels     = new QCheckBox("Panels");
-	m_pctrlVortices   = new QCheckBox("Vortices");
+	m_pctrlAxes       = new QCheckBox(tr("Axes"));
+	m_pctrlLight      = new QCheckBox(tr("Light"));
+	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
+	m_pctrlOutline    = new QCheckBox(tr("Outline"));
+	m_pctrlPanels     = new QCheckBox(tr("Panels"));
+	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
@@ -16269,8 +16299,8 @@ void QMiarex::SetupLayout()
 	ThreeDView->addWidget(m_pctrlIso,2,2);
 
 	QGridLayout *ThreeDCtrls = new QGridLayout;
-	m_pctrlPickCenter     = new QPushButton("Pick Center");
-	m_pctrlReset          = new QPushButton("Reset");
+	m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
+	m_pctrlReset          = new QPushButton(tr("Reset"));
 
 	m_pctrlPickCenter->setCheckable(true);
 	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
@@ -16448,7 +16478,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	CVector RefPoint(0.0, 0.0, 0.0);
 	if(m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001)
 	{
-//		RotateGeomZ(m_pCurWPolar->m_Beta, RefPoint);
+		RotateGeomZ(m_pCurWPolar->m_Beta, RefPoint);
 	}
 
 	if(m_pCurWPolar && m_pCurWPolar->m_UFOName==UFOName)
@@ -16805,198 +16835,198 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 	switch (pGraph->GetXVariable())
 	{
 		case 0:
-			pGraph->SetXTitle("Alpha");
+			pGraph->SetXTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetXTitle("Cl");
+			pGraph->SetXTitle(tr("Cl"));
 			break;
 		case 2:
-			pGraph->SetXTitle("VCd");
+			pGraph->SetXTitle(tr("VCd"));
 			break;
 		case 3:
-			pGraph->SetXTitle("ICd");
+			pGraph->SetXTitle(tr("ICd"));
 			break;
 		case 4:
-			pGraph->SetXTitle("Cd");
+			pGraph->SetXTitle(tr("Cd"));
 			break;
 		case 5:
-			pGraph->SetXTitle("GCm");// Total Pitching moment coef.
+			pGraph->SetXTitle(tr("GCm"));// Total Pitching moment coef.
 			break;
 		case 6:
-			pGraph->SetXTitle("GRm");// Total Rolling moment coef.
+			pGraph->SetXTitle(tr("GRm"));// Total Rolling moment coef.
 			break;
 		case 7:
-			pGraph->SetXTitle("GYm");// Total Yawing moment coef.
+			pGraph->SetXTitle(tr("GYm"));// Total Yawing moment coef.
 			break;
 		case 8:
-			pGraph->SetXTitle("VYm");// Profile yawing moment
+			pGraph->SetXTitle(tr("VYm"));// Profile yawing moment
 			break;
 		case 9:
-			pGraph->SetXTitle("IYm");// Induced yawing moment
+			pGraph->SetXTitle(tr("IYm"));// Induced yawing moment
 			break;
 		case 10:
-			pGraph->SetXTitle("Cl/Cd");
+			pGraph->SetXTitle(tr("Cl/Cd"));
 			break;
 		case 11:
-			pGraph->SetXTitle("Cl^(3/2)/Cd");
+			pGraph->SetXTitle(tr("Cl^(3/2)/Cd"));
 			break;
 		case 12:
-			pGraph->SetXTitle("1/Rt(Cl)");
+			pGraph->SetXTitle(tr("1/Rt(Cl)"));
 			break;
 		case 13:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Lift (N)");
-			else pGraph->SetXTitle("Lift (lbf)");
+			else pGraph->SetXTitle(tr("Lift (lbf)"));
 			break;
 		case 14:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Drag (N)");
-			else pGraph->SetXTitle("Drag (lbf)");
+			else pGraph->SetXTitle(tr("Drag (lbf)"));
 			break;
 		case 15:
-			pGraph->SetXTitle("Vx "+StrSpeed);
+			pGraph->SetXTitle(tr("Vx ")+StrSpeed);
 			break;
 		case 16:
-			pGraph->SetXTitle("Vz "+StrSpeed);
+			pGraph->SetXTitle(tr("Vz ")+StrSpeed);
 			break;
 		case 17:
-			pGraph->SetXTitle("V "+StrSpeed);
+			pGraph->SetXTitle(tr("V ")+StrSpeed);
 			break;
 		case 18:
-			pGraph->SetXTitle("Gamma");
+			pGraph->SetXTitle(tr("Gamma"));
 			break;
 		case 19:
-			pGraph->SetXTitle("PM");
+			pGraph->SetXTitle(tr("PM"));
 			break;
 		case 20:
-			pGraph->SetXTitle("RM");
+			pGraph->SetXTitle(tr("RM"));
 			break;
 		case 21:
-			pGraph->SetXTitle("YM");
+			pGraph->SetXTitle(tr("YM"));
 			break;
 		case 22:
-			pGraph->SetXTitle("XCP "+ StrLength);
+			pGraph->SetXTitle(tr("XCP ")+ StrLength);
 			break;
 		case 23:
-			pGraph->SetXTitle("YCP "+ StrLength);
+			pGraph->SetXTitle(tr("YCP ")+ StrLength);
 			break;
 		case 24:
-			pGraph->SetXTitle("BM "+ StrMoment);
+			pGraph->SetXTitle(tr("BM ")+ StrMoment);
 			break;
 		case 25:
-			pGraph->SetXTitle("m.g.Vz (W)");
+			pGraph->SetXTitle(tr("m.g.Vz (W)"));
 			break;
 		case 26:
-			pGraph->SetXTitle("Efficiency");
+			pGraph->SetXTitle(tr("Efficiency"));
 			break;
 		case 27:
-			pGraph->SetXTitle("(XCp-XCG)/MAC(%)");
+			pGraph->SetXTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
 		case 28:
-			pGraph->SetXTitle("ctrl");
+			pGraph->SetXTitle(tr("ctrl"));
 			break;
 		case 29:
-			pGraph->SetXTitle("CY");
+			pGraph->SetXTitle(tr("CY"));
 			break;
 		default:
-			pGraph->SetXTitle("Alpha");
+			pGraph->SetXTitle(tr("Alpha"));
 			break;
 	}
 
 	switch (pGraph->GetYVariable())
 	{
 		case 0:
-			pGraph->SetYTitle("Alpha");
+			pGraph->SetYTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetYTitle("Cl");
+			pGraph->SetYTitle(tr("Cl"));
 			break;
 		case 2:
-			pGraph->SetYTitle("VCd");
+			pGraph->SetYTitle(tr("VCd"));
 			break;
 		case 3:
-			pGraph->SetYTitle("ICd");
+			pGraph->SetYTitle(tr("ICd"));
 			break;
 		case 4:
-			pGraph->SetYTitle("Cd");
+			pGraph->SetYTitle(tr("Cd"));
 			break;
 		case 5:
-			pGraph->SetYTitle("GCm");// Total Pitching moment coef.
+			pGraph->SetYTitle(tr("GCm"));// Total Pitching moment coef.
 			break;
 		case 6:
-			pGraph->SetYTitle("GRm");// Total Rolling moment coef.
+			pGraph->SetYTitle(tr("GRm"));// Total Rolling moment coef.
 			break;
 		case 7:
-			pGraph->SetYTitle("GYm");// Total Yawing moment coef.
+			pGraph->SetYTitle(tr("GYm"));// Total Yawing moment coef.
 			break;
 		case 8:
-			pGraph->SetYTitle("VYm");// Profile yawing moment
+			pGraph->SetYTitle(tr("VYm"));// Profile yawing moment
 			break;
 		case 9:
-			pGraph->SetYTitle("IYm");// Induced yawing moment
+			pGraph->SetYTitle(tr("IYm"));// Induced yawing moment
 			break;
 		case 10:
-			pGraph->SetYTitle("Cl/Cd");
+			pGraph->SetYTitle(tr("Cl/Cd"));
 			break;
 		case 11:
-			pGraph->SetYTitle("Cl^(3/2)/Cd");
+			pGraph->SetYTitle(tr("Cl^(3/2)/Cd"));
 			break;
 		case 12:
-			pGraph->SetYTitle("1/Rt(Cl)");
+			pGraph->SetYTitle(tr("1/Rt(Cl)"));
 			break;
 		case 13:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Lift (N)");
-			else pGraph->SetYTitle("Lift (lbf)");
+			else pGraph->SetYTitle(tr("Lift (lbf)"));
 			break;
 		case 14:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Drag (N)");
-			else pGraph->SetYTitle("Drag (lbf)");
+			else pGraph->SetYTitle(tr("Drag (lbf)"));
 			break;
 		case 15:
-			pGraph->SetYTitle("Vx "+StrSpeed);
+			pGraph->SetYTitle(tr("Vx ")+StrSpeed);
 			break;
 		case 16:
-			pGraph->SetYTitle("Vz "+StrSpeed);
+			pGraph->SetYTitle(tr("Vz ")+StrSpeed);
 			break;
 		case 17:
-			pGraph->SetYTitle("V "+StrSpeed);
+			pGraph->SetYTitle(tr("V ")+StrSpeed);
 			break;
 		case 18:
-			pGraph->SetYTitle("Gamma");
+			pGraph->SetYTitle(tr("Gamma"));
 			break;
 		case 19:
-			pGraph->SetYTitle("PM");
+			pGraph->SetYTitle(tr("PM"));
 			break;
 		case 20:
-			pGraph->SetYTitle("RM");
+			pGraph->SetYTitle(tr("RM"));
 			break;
 		case 21:
-			pGraph->SetYTitle("YM");
+			pGraph->SetYTitle(tr("YM"));
 			break;
 		case 22:
-			pGraph->SetYTitle("XCP "+ StrLength);
+			pGraph->SetYTitle(tr("XCP ")+ StrLength);
 			break;
 		case 23:
-			pGraph->SetYTitle("YCP "+ StrLength);
+			pGraph->SetYTitle(tr("YCP ")+ StrLength);
 			break;
 		case 24:
-			pGraph->SetYTitle("BM "+ StrMoment);
+			pGraph->SetYTitle(tr("BM ")+ StrMoment);
 			break;
 		case 25:
-			pGraph->SetYTitle("m.g.Vz (W)");
+			pGraph->SetYTitle(tr("m.g.Vz (W)"));
 			break;
 		case 26:
-			pGraph->SetYTitle("Efficiency");
+			pGraph->SetYTitle(tr("Efficiency"));
 			break;
 		case 27:
-			pGraph->SetYTitle("(XCp-XCG)/MAC(%)");
+			pGraph->SetYTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
 		case 28:
-			pGraph->SetYTitle("ctrl var");
+			pGraph->SetYTitle(tr("ctrl var"));
 			break;
 		case 29:
-			pGraph->SetYTitle("CY");
+			pGraph->SetYTitle(tr("CY"));
 			break;
 		default:
-			pGraph->SetYTitle("Alpha");
+			pGraph->SetYTitle(tr("Alpha"));
 			break;
 	}
 }
@@ -17026,12 +17056,12 @@ void QMiarex::SnapClient(QString const &FileName, int FileType)
 	{
 		case 8:
 		{
-			QMessageBox::warning(this,"Warning","Cannot (yet ?) save 8 bit depth opengl screen images... Sorry");
+			QMessageBox::warning(this,tr("Warning"),tr("Cannot (yet ?) save 8 bit depth opengl screen images... Sorry"));
 			return;
 		}
 		case 16:
 		{
-			QMessageBox::warning(this,"Warning","Cannot (yet ?) save 16 bit depth opengl screen images... Sorry");
+			QMessageBox::warning(this,tr("Warning"),tr("Cannot (yet ?) save 16 bit depth opengl screen images... Sorry"));
 			size.setWidth(width - size.width() % 2);
 			return;
 		}
@@ -17048,7 +17078,7 @@ void QMiarex::SnapClient(QString const &FileName, int FileType)
 		}
 		default:
 		{
-			QMessageBox::warning(this,"Warning","Unidentified bit depth... Sorry");
+			QMessageBox::warning(this,tr("Warning"),tr("Unidentified bit depth... Sorry"));
 			return;
 		}
 	}

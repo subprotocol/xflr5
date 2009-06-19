@@ -77,7 +77,7 @@ void CAddDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("Accept"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton("Apply");
+	ApplyButton  = new QPushButton(tr("Apply"));
 
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
@@ -129,7 +129,7 @@ void CAddDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), "Warning", "Unrecognized foil format");
+		QMessageBox::information(window(), tr("Warning"), "Unrecognized foil format");
 		return;
 	}
 

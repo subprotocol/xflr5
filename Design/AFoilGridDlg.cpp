@@ -182,7 +182,7 @@ void AFoilGridDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("Accept"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton("Apply");
+	ApplyButton  = new QPushButton(tr("Apply"));
 
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);

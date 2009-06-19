@@ -76,7 +76,7 @@ void LEDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton     = new QPushButton(tr("OK"));
 	CancelButton = new QPushButton(tr("Cancel"));
-	ApplyButton  = new QPushButton("Apply");
+	ApplyButton  = new QPushButton(tr("Apply"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);
@@ -181,7 +181,7 @@ void LEDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), "Warning", "Unrecognized foil format");
+		QMessageBox::information(window(), tr("Warning"), "Unrecognized foil format");
 		return;
 	}
 
@@ -192,7 +192,7 @@ void LEDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(window(), "Warning", "Panel number cannot exceed 300");
+		QMessageBox::information(window(), tr("Warning"), "Panel number cannot exceed 300");
 		//reset everything and retry
 		for (i=0; i< m_pMemFoil->nb; i++)
 		{

@@ -136,8 +136,9 @@ private slots:
 	void OnInterpolateFoils();
 	void OnNacaFoils();
 
-	void OnAnimateSingle();
+	void OnManageFoils();
 
+	void OnAnimateSingle();
 
 	void OnQGraph();
 	void OnCpGraph();
@@ -192,6 +193,7 @@ protected:
 	void SetCurveParams();
 	void SetFoilScale();
 	void SetFoilScale(QRect CltRect);
+	void SetHingeMoments(OpPoint *pOpPoint);
 	void SetOpPointSequence();
 	void SetAnalysisParams();
 	void SetGraphTitles(Graph* pGraph, int iX, int iY);

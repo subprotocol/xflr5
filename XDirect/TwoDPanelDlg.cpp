@@ -87,7 +87,7 @@ void TwoDPanelDlg::SetupLayout()
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	ApplyButton   = new QPushButton("Apply");
+	ApplyButton   = new QPushButton(tr("Apply"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ApplyButton);
 	CommandButtons->addStretch(1);
@@ -205,7 +205,7 @@ void TwoDPanelDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(this, "Warning", "Unrecognized foil format");
+		QMessageBox::information(this, tr("Warning"), "Unrecognized foil format");
 		return;
 	}
 
@@ -215,7 +215,7 @@ void TwoDPanelDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(this, "Warning", "Panel number cannot exceed 350");
+		QMessageBox::information(this, tr("Warning"), "Panel number cannot exceed 350");
 		//reset everything and retry
 		for (int i=0; i< pMemFoil->nb; i++)
 		{

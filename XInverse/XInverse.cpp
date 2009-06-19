@@ -450,7 +450,7 @@ bool QXInverse::InitXFoil(CFoil * pFoil)
 	}
 	else
 	{
-		QMessageBox::warning(pMainFrame,"Warning","Unrecognized foil format");
+		QMessageBox::warning(pMainFrame,tr("Warning"),tr("Unrecognized foil format"));
 		return false;
 	}
 }
