@@ -3280,6 +3280,7 @@ void QXDirect::OnOpPoints()
 	CreateOppCurves();
 	SetFoilScale();
 	SetCurveParams();
+	SetAnalysisParams();
 	CheckButtons();
 	UpdateView();
 }
@@ -3291,6 +3292,7 @@ void QXDirect::OnPolars()
 	m_bPolar = true;
 	CreatePolarCurves();
 	SetCurveParams();
+	SetAnalysisParams();
 	CheckButtons();
 	UpdateView();
 }

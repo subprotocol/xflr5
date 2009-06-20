@@ -21,11 +21,14 @@
 
 #include <QtGui>
 #include "AboutQ5.h"
+#include "../MainFrame.h"
 #include <QBitmap>
 
 AboutQ5::AboutQ5(void *parent)
 {
 	setWindowTitle("About QFLR5");
+
+	m_pMainFrame = parent;
 
 	SetupLayout();
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
@@ -37,19 +40,13 @@ AboutQ5::~AboutQ5()
 
 void AboutQ5::SetupLayout()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/2);
-	move(r.width()/3, r.height()/6);
-
-
-
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QHBoxLayout *LogoLayout = new QHBoxLayout;
 	m_IconQ5 = new QLabel;
 	m_IconQ5->setObjectName("iconQ5");
 	m_IconQ5->setGeometry(QRect(20, 0, 61, 71));
 	m_IconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/Q5.png")));
-	QLabel *lab1  = new QLabel("QFLR5_v5.00");
+	QLabel *lab1  = new QLabel(pMainFrame->m_VersionName);
 	lab1->setAlignment(Qt::AlignLeft);
 	LogoLayout->addWidget(m_IconQ5);
 	LogoLayout->addStretch(1);
@@ -96,6 +93,7 @@ void AboutQ5::SetupLayout()
 	MainLayout->addWidget(lab5);
 	MainLayout->addWidget(lab6);
 	MainLayout->addWidget(lab7);
+	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab8);
 	MainLayout->addWidget(lab9);
 	MainLayout->addStretch(1);

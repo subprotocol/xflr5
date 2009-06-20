@@ -108,7 +108,6 @@ void ManageFoilsDlg::keyPressEvent(QKeyEvent *event)
 void ManageFoilsDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlSelect     = new QPushButton(tr("Select"));
 	m_pctrlDelete     = new QPushButton(tr("Delete"));
 	m_pctrlRename     = new QPushButton(tr("Rename"));
 	m_pctrlExport     = new QPushButton(tr("Export Foil"));
@@ -116,7 +115,6 @@ void ManageFoilsDlg::SetupLayout()
 	CloseButton     = new QPushButton(tr("Close"));
 
 	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(m_pctrlSelect);
 	CommandButtons->addWidget(m_pctrlDelete);
 	CommandButtons->addWidget(m_pctrlRename);
 	CommandButtons->addWidget(m_pctrlExport);

@@ -53,7 +53,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
-	m_VersionName = "QFLR5 v5.00";
+	m_VersionName = "QFLR5 v0.01";
 
 	m_SettingsFormat = 100552;
 
@@ -158,7 +158,7 @@ MainFrame::~MainFrame()
 
 void MainFrame::AboutQFLR5()
 {
-	AboutQ5 dlg;
+	AboutQ5 dlg(this);
 	dlg.exec();
 }
 
@@ -1915,7 +1915,6 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addAction(resetFoilScale);
 	OperFoilCtxMenu->addAction(showPanels);
 	OperFoilCtxMenu->addAction(showNeutralLine);
-	OperFoilCtxMenu->addAction(XDirectStyleAct);
 	//End XDirect foil Context Menu
 
 

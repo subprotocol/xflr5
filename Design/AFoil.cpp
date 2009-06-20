@@ -2858,7 +2858,7 @@ void QAFoil::resizeEvent(QResizeEvent *event)
 	m_pctrlFoilTable->setColumnWidth(10,w12);//LE XHinge
 	m_pctrlFoilTable->setColumnWidth(11,w12);//LE YHinge
 
-	m_pctrlFoilTable->setColumnWidth(0,w-8*w12-3*w14-20);
+	m_pctrlFoilTable->setColumnWidth(0,w-8*w12-3*w14-40);
 }
 
 

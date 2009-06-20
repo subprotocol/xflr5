@@ -155,7 +155,7 @@ void ManageUFOsDlg::SetupLayout()
 	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Wing Span"));
 	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("AR"));
 	m_pUFOModel->setHeaderData(3, Qt::Horizontal, tr("TR"));
-	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8("Rt-Tip Sweep(°)");
+	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8("°)");
 	m_pUFOModel->setHeaderData(4, Qt::Horizontal, str);
 	m_pUFOModel->setHeaderData(5, Qt::Horizontal, tr("Tail Volume"));
 

@@ -41,6 +41,7 @@ private:
 	QLabel * m_pXFLR5Link;
 	QLabel *m_IconQ5;
 
+	void *m_pMainFrame;
 };
 
 #endif // AboutQ5_H
