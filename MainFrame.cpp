@@ -1576,6 +1576,10 @@ void MainFrame::CreateXDirectActions()
 	deletePolar->setStatusTip(tr("Deletes the currently selected polar"));
 	connect(deletePolar, SIGNAL(triggered()), this, SLOT(OnDeleteCurPolar()));
 
+	resetCurPolar = new QAction(tr("Reset"), this);
+	resetCurPolar->setStatusTip(tr("Deletes the contents of the currently selected polar"));
+	connect(resetCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnResetCurPolar()));
+
 	editCurPolar = new QAction(tr("Edit"), this);
 	editCurPolar->setStatusTip(tr("Remove the unconverged or erroneaous points of the currently selected polar"));
 	connect(editCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnEditCurPolar()));
@@ -1791,6 +1795,7 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu->addAction(exportCurPolar);
 	currentPolarMenu->addAction(deletePolar);
 	currentPolarMenu->addAction(editCurPolar);
+	currentPolarMenu->addAction(resetCurPolar);
 	currentPolarMenu->addSeparator();
 	currentPolarMenu->addAction(showPolarOpps);
 	currentPolarMenu->addAction(hidePolarOpps);
@@ -1887,6 +1892,7 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu->addAction(deletePolar);
 	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addAction(editCurPolar);
+	CurPolarCtxMenu->addAction(resetCurPolar);
 	CurPolarCtxMenu->addSeparator();
 	CurPolarCtxMenu->addAction(showPolarOpps);
 	CurPolarCtxMenu->addAction(hidePolarOpps);
@@ -1935,6 +1941,7 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu->addAction(deletePolar);
 	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addAction(editCurPolar);
+	CurPolarCtxMenu->addAction(resetCurPolar);
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Graph"));
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
@@ -2068,7 +2075,7 @@ void MainFrame::CreateXInverseToolbar()
 	m_pctrlFullInverse  = new QRadioButton(tr("Full Inverse"));
 	m_pctrlMixedInverse = new QRadioButton(tr("Mixed Inverse"));
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	connect(m_pctrlFullInverse, SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
+	connect(m_pctrlFullInverse,  SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
 	connect(m_pctrlMixedInverse, SIGNAL(clicked()), pXInverse, SLOT(OnInverseApp()));
 
 	m_pctrlInvZoomX = new QToolButton;
@@ -2707,6 +2714,29 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 }
 
 
+void MainFrame::keyPressEvent(QKeyEvent *event)
+{
+	if(m_iApp == XFOILANALYSIS && m_pXDirect)
+	{
+		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->keyPressEvent(event);
+	}
+	else if(m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->keyPressEvent(event);
+	}
+	else if(m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->keyPressEvent(event);
+	}
+	else if(m_iApp == INVERSEDESIGN && m_pXInverse)
+	{
+		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
+		pXInverse->keyPressEvent(event);
+	}
+}
 
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
@@ -4073,7 +4103,7 @@ void MainFrame::OnXInverse()
 	m_pctrlXInverseWidget->show();
 
 	SetCentralWidget();
-	pXInverse->m_bFullInverse = true;
+//	pXInverse->m_bFullInverse = true;
 	SetMenus();
 	pXInverse->SetParams();
 }

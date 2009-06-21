@@ -136,7 +136,8 @@ private:
 	QCheckBox *m_pctrlShowSpline, *m_pctrlTangentSpline, *m_pctrlSymm;
 	FloatEdit *m_pctrlSpec, *m_pctrlFilterParam, *m_pctrlTGapy, *m_pctrlTGapx, *m_pctrlTAngle;
 
-	QTextEdit *m_pctrlMSpec, *m_pctrlMOutput;
+	QLineEdit *m_pctrlMAlphaSpec, *m_pctrlMClSpec;
+	QTextEdit *m_pctrlMOutput;
 	FloatEdit *m_pctrlIter;
 	QPushButton *m_pctrlMark;
 	QCheckBox *m_pctrlCpxx;

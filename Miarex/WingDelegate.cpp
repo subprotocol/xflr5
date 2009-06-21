@@ -35,8 +35,8 @@ WingDelegate::WingDelegate(QObject *parent)
 QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
 	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
-	pWingDlg->SetCurrentSection(index.row());
-	pWingDlg->UpdateView();
+//	pWingDlg->SetCurrentSection(index.row());
+//	pWingDlg->UpdateView();
 
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{

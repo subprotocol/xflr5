@@ -31,6 +31,7 @@
 
 DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 {
+	setWindowTitle(tr("General Display Settings"));
 	m_pMainFrame = pParent;
 	m_bIsGraphModified = false;
 

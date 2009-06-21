@@ -25,6 +25,7 @@
 #include <QLineEdit>
 #include <QString>
 #include <QKeyEvent>
+#include <QDoubleValidator>
 
 class FloatEdit : public QLineEdit
 {
@@ -43,15 +44,16 @@ public:
 private:
 	bool IsInBounds(double f);
 	void FormatValue(double const &f, QString &str);
-	void focusInEvent ( QFocusEvent * event );
+//	void focusInEvent ( QFocusEvent * event );
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent ( QShowEvent * event );
 	double ReadValue();
 
+	QDoubleValidator *v;
+
 	double m_Value;
 	int m_iPrecision;
-	double m_fMin, m_fMax;
 };
 
 #endif // FLOATEDIT_H

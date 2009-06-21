@@ -2218,11 +2218,7 @@ void GL3dBodyDlg::GLDrawAxes()
 	else if(pMiarex->m_3DAxisStyle== 3) glLineStipple (1, 0x1C47);
 	else                                glLineStipple (1, 0xFFFF);// Solid
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.1*(double)i*l, 0.0, 0.0);
-//		}
-//	glEnd();
+
 	glBegin(GL_LINES);
 		glVertex3d(-.8, 0.0, 0.0);
 		glVertex3d( .8, 0.0, 0.0);
@@ -2238,14 +2234,8 @@ void GL3dBodyDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.050*l, -0.020*l);
-		glVertex3d(1.0*l, -0.020*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.020*l, -0.020*l);
-		glVertex3d(1.0*l, -0.050*l, -0.050*l);
-	glEnd();
+	m_pglWidget->renderText( .8, 0.0, 0.0, "X");
+
 
 // Y axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -2253,11 +2243,6 @@ void GL3dBodyDlg::GLDrawAxes()
 		glVertex3d(0.0, -.8, 0.0);
 		glVertex3d(0.0,  .8, 0.0);
 	glEnd();
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.1*(double)i*l, 0.0);
-//		}
-//	glEnd();
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -2270,14 +2255,7 @@ void GL3dBodyDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	glBegin(GL_LINES);
-		glVertex3d(-0.020*l, 1.0*l, -0.020*l);
-		glVertex3d(-0.050*l, 1.0*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(-0.050*l, 1.0*l,-0.020*l);
-		glVertex3d(-0.035*l, 1.0*l,-0.035*l);
-	glEnd();
+	m_pglWidget->renderText( 0.0, .8, 0.0, "Y");
 
 // Z axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -2286,11 +2264,6 @@ void GL3dBodyDlg::GLDrawAxes()
 		glVertex3d(0.0, 0.0,  .8);
 	glEnd();
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.0, 0.1*(double)i*l);
-//		}
-//	glEnd();
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -2303,13 +2276,8 @@ void GL3dBodyDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	glBegin(GL_LINE_STRIP);
-		glVertex3d(-0.050*l, -0.050*l,1.0*l);
-		glVertex3d(-0.050*l, -0.020*l,1.0*l);
+	m_pglWidget->renderText( 0.0, 0.0, .8, "Z");
 
-		glVertex3d(-0.020*l, -0.050*l,1.0*l);
-		glVertex3d(-0.020*l, -0.020*l,1.0*l);
-	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 }
 

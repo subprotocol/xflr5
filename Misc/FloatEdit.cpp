@@ -20,9 +20,8 @@
 *****************************************************************************/
 
 #include "FloatEdit.h"
-#include <QDoubleValidator>
+//#include <QDoubleValidator>
 #include <math.h>
-#include <QtDebug>
 
 
 FloatEdit::FloatEdit(QWidget *pParent)
@@ -30,10 +29,9 @@ FloatEdit::FloatEdit(QWidget *pParent)
 	setParent(pParent);
 	m_Value = 0.0;
 
-	m_fMin = -1.e10;
-	m_fMax =  1.e10;
 	m_iPrecision = 2;
-	QDoubleValidator *v = new QDoubleValidator(this);
+	v = new QDoubleValidator(this);
+	v->setRange(-1.e10, 1.e10, 1000);
 	setValidator(v);
 	setAlignment(Qt::AlignRight);
 }
@@ -44,11 +42,10 @@ FloatEdit::FloatEdit(double d, int precision)
 {
 	m_Value = d;
 
-	m_fMin = -1.e10;
-	m_fMax =  1.e10;
 	m_iPrecision = precision;
 
-	QDoubleValidator *v = new QDoubleValidator(this);
+	v = new QDoubleValidator(this);
+	v->setRange(-1.e10, 1.e10, 1000);
 	setValidator(v);
 	setAlignment(Qt::AlignRight);
 }
@@ -56,25 +53,27 @@ FloatEdit::FloatEdit(double d, int precision)
 
 bool FloatEdit::IsInBounds(double f)
 {
-    if ( m_Value<m_fMin || m_Value> m_fMax)
-    {
-	    return false;
-    }
-    return true;
+	int pos = 0;
+	QString strange = text();
+	strange.replace(" ", "");
+
+	if (v->validate(strange, pos)==QValidator::Acceptable) return true;
+	else                                                  return false;
 }
 
 
-
+/*
 void FloatEdit::focusInEvent ( QFocusEvent * event )
 {
 	selectAll();
-}
+}*/
 
 
 void FloatEdit::focusOutEvent ( QFocusEvent * event )
 {
 	QString str;
 	double f = ReadValue();
+
 	if(IsInBounds(f))
 	{
 		m_Value = f;
@@ -87,6 +86,7 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 		FormatValue(m_Value, str);
 		setText(str);
 	}
+	QLineEdit::focusOutEvent(event);
 }
 
 
@@ -158,12 +158,12 @@ void FloatEdit::SetPrecision(int i)
 
 void FloatEdit::SetMin(double f)
 {
-    m_fMin = f;
+	v->setBottom(f);
 }
 
 void FloatEdit::SetMax(double f)
 {
-    m_fMax = f;
+	v->setTop(f);
 }
 
 
@@ -181,133 +181,13 @@ void FloatEdit::FormatValue(double const &f, QString &str)
 	QString str1;
 	int q, r, exp, i, pos, l;
 
-	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <1000.0)
+	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <1000000000.0)
 	{
-		switch (m_iPrecision)
-		{
-			//there probably is a more elegant way to do this,
-			case 0:
-				str=QString("%1").arg(f);
-				break;
-			case 1:
-				str=QString("%1").arg(f,0,'f',1);
-				break;
-			case 2:
-				str=QString("%1").arg(f,0,'f',2);
-				break;
-			case 3:
-				str=QString("%1").arg(f,0,'f',3);
-				break;
-			case 4:
-				str=QString("%1").arg(f,0,'f',4);
-				break;
-			case 5:
-				str=QString("%1").arg(f,0,'f',5);
-				break;
-			case 6:
-				str=QString("%1").arg(f,0,'f',6);
-				break;
-			case 7:
-				str=QString("%1").arg(f,0,'f',7);
-				break;
-			case 8:
-				str=QString("%1").arg(f,0,'f',8);
-				break;
-			case 9:
-				str=QString("%1").arg(f,0,'f',9);
-				break;
-			default:
-				str=QString("%1").arg(f,0,'f',2);
-		}
-	}
-	else if(f>=1000.0)
-	{
-		exp = (int)log10(f);
-		r = exp%3;
-		q = (exp-r)/3;
-
-		QString strong;
-
-		switch (m_iPrecision)
-		{
-			//there is probably is a more elegant way to do this,
-			case 0:
-				strong=QString("%1").arg(f,0,'f',0);
-				break;
-			case 1:
-				strong=QString("%1").arg(f,0,'f',1);
-				break;
-			case 2:
-				strong=QString("%1").arg(f,0,'f',2);
-				break;
-			case 3:
-				strong=QString("%1").arg(f,0,'f',3);
-				break;
-			case 4:
-				strong=QString("%1").arg(f,0,'f',4);
-				break;
-			case 5:
-				strong=QString("%1").arg(f,0,'f',5);
-				break;
-			case 6:
-				strong=QString("%1").arg(f,0,'f',6);
-				break;
-			case 7:
-				strong=QString("%1").arg(f,0,'f',7);
-				break;
-			case 8:
-				strong=QString("%1").arg(f,0,'f',8);
-				break;
-			case 9:
-				strong=QString("%1").arg(f,0,'f',9);
-				break;
-			default:
-				strong=QString("%1").arg(f,0,'f',2);
-		}
-
-		l = strong.length();
-		pos = strong.indexOf(".");
-		if(pos<0) pos = l;
-		pos = l-pos;
-
-		for (i=0; i<q; i++)
-		{
-			strong.insert(l-3*(i+1)-i-pos," ");
-			l++;
-		}
-
-		str = strong;
+		str=QString("%1").arg(f,0,'f', m_iPrecision);
 	}
 	else
 	{
-		exp  = (int)log10(f)-1;
-		str1 = QString("e%1").arg( exp);
-
-		double main = (float)(f/pow(10.0, exp)*1.000001);
-		switch (m_iPrecision)
-		{
-			case 0:
-				str=QString("%1").arg(main,0,'f',0);
-				break;
-			case 1:
-				str=QString("%1").arg(main,0,'f',1);
-				break;
-			case 2:
-				str=QString("%1").arg(main,0,'f',2);
-				break;
-			case 3:
-				str=QString("%1").arg(main,0,'f',3);
-				break;
-			case 4:
-				str=QString("%1").arg(main,0,'f',4);
-				break;
-			case 5:
-				str=QString("%1").arg(main,0,'f',5);
-				break;
-			default:
-				str=QString("%1").arg(main,0,'f',2);
-		}
-		str += str1;
+		str=QString("%1").arg(f,0,'e',m_iPrecision);
 	}
 }
 

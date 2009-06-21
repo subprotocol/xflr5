@@ -8142,23 +8142,19 @@ void QMiarex::GLDrawAxes()
 {
 	double l = .8;
 //	if(m_pCurWing) l=1.1*m_pCurWing->m_Span/2.0;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	glPolygonMode(GL_FRONT,GL_LINE);
 	glLineWidth((GLfloat)(m_3DAxisWidth));
 
 	glColor3d(m_3DAxisColor.redF(),m_3DAxisColor.greenF(),m_3DAxisColor.blueF());
 
-// X axis____________
 	glEnable (GL_LINE_STIPPLE);
 	if(m_3DAxisStyle == 1) 		glLineStipple (1, 0x1111);
 	else if(m_3DAxisStyle== 2) 	glLineStipple (1, 0x0F0F);
 	else if(m_3DAxisStyle== 3) 	glLineStipple (1, 0x1C47);
 	else						glLineStipple (1, 0xFFFF);// Solid
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.1*(double)i*l, 0.0, 0.0);
-//		}
-//	glEnd();
+// X axis____________
 	glBegin(GL_LINES);
 		glVertex3d(-.8, 0.0, 0.0);
 		glVertex3d( .8, 0.0, 0.0);
@@ -8174,14 +8170,8 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.050*l, -0.020*l);
-		glVertex3d(1.0*l, -0.020*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.020*l, -0.020*l);
-		glVertex3d(1.0*l, -0.050*l, -0.050*l);
-	glEnd();
+	pGLWidget->renderText( .8, 0.0, 0.0, "X");
+
 
 // Y axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -8189,11 +8179,6 @@ void QMiarex::GLDrawAxes()
 		glVertex3d(0.0, -.8, 0.0);
 		glVertex3d(0.0,  .8, 0.0);
 	glEnd();
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.1*(double)i*l, 0.0);
-//		}
-//	glEnd();
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -8206,14 +8191,7 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	glBegin(GL_LINES);
-		glVertex3d(-0.020*l, 1.0*l, -0.020*l);
-		glVertex3d(-0.050*l, 1.0*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(-0.050*l, 1.0*l,-0.020*l);
-		glVertex3d(-0.035*l, 1.0*l,-0.035*l);
-	glEnd();
+	pGLWidget->renderText( 0.0, .8, 0.0, "Y");
 
 // Z axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -8222,11 +8200,7 @@ void QMiarex::GLDrawAxes()
 		glVertex3d(0.0, 0.0,  .8);
 	glEnd();
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.0, 0.1*(double)i*l);
-//		}
-//	glEnd();
+
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -8239,13 +8213,8 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	glBegin(GL_LINE_STRIP);
-		glVertex3d(-0.050*l, -0.050*l,1.0*l);
-		glVertex3d(-0.050*l, -0.020*l,1.0*l);
+	pGLWidget->renderText( 0.0, 0.0, .8, "Z");
 
-		glVertex3d(-0.020*l, -0.050*l,1.0*l);
-		glVertex3d(-0.020*l, -0.020*l,1.0*l);
-	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 }
 
@@ -13824,6 +13793,7 @@ void QMiarex::OnWPolars()
 	}
 
 	m_iView=2;
+	m_pCurGraph = &m_WPlrGraph1;
 
 	pMainFrame->SetCentralWidget();
 	m_pctrlMiddleControls->setCurrentIndex(0);

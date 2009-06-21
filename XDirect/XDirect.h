@@ -99,6 +99,7 @@ private slots:
 	void OnResetAllPolarGraphsScales();
 	void OnResetFoilScale();
 	void OnResetXFoil();
+	void OnResetCurPolar();
 	void OnSavePolars();
 	void OnSequence();
 	void OnShowFoilPolars();

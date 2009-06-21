@@ -27,6 +27,8 @@
 
 FlapDlg::FlapDlg(void *pParent)
 {
+	setWindowTitle(tr("Flap Dlg"));
+
 	m_pAFoil   = NULL;
 	m_pXDirect = NULL;
 	m_pMemFoil    = NULL;
@@ -147,7 +149,7 @@ void FlapDlg::ReadParams()
 
 	if(m_LEXHinge>=m_TEXHinge && m_bLEFlap && m_bTEFlap)
 	{
-		QMessageBox::information(window(), tr("Warning"), "The trailing edge hinge must be downstream of the leading edge hinge");
+		QMessageBox::information(window(), tr("Warning"), tr("The trailing edge hinge must be downstream of the leading edge hinge"));
 		m_pctrlLEXHinge->setFocus();
 		m_pctrlLEXHinge->selectAll();
 	}

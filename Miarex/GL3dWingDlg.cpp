@@ -215,14 +215,13 @@ void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 
 void GL3dWingDlg::Connect()
 {
-	m_pWingModel = new QStandardItemModel;
+/*	m_pWingModel = new QStandardItemModel;
 	m_pWingModel->setRowCount(10);//temporary
 	m_pWingModel->setColumnCount(3);
 
 	m_pctrlWingTable->setModel(m_pWingModel);
 	m_pWingDelegate = new WingDelegate(this);
-	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
-	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
+	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);*/
 //	connect(m_pctrlWingTable, SIGNAL(activated(const QModelIndex &)), this, SLOT(OnItemActivated(const QModelIndex&)));
 	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
@@ -413,7 +412,6 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 			section++;
 	}
 
-
 	glNewList(SECTIONHIGHLIGHT,GL_COMPILE);
 	{
 		m_GLList++;
@@ -423,7 +421,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 		glColor3d(1.0, 0.0, 0.0);
 		glLineWidth(3);
 
-		if(m_pWing->m_bSymetric || m_bRightSide)
+		if((m_pWing->m_bSymetric || m_bRightSide) && !m_pWing->m_bIsFin)
 		{
 			if(m_iSection<m_pWing->m_NPanel)
 			{
@@ -482,9 +480,10 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 		}
 		if(m_pWing->m_bSymetric || !m_bRightSide)
 		{
-			if(m_iSection>0)
+			if(m_iSection>0 )
 			{
-				j = m_pWing->m_NSurfaces/2 - section;
+				if(!m_pWing->m_bIsFin) j = m_pWing->m_NSurfaces/2 - section;
+				else                   j = m_pWing->m_NSurfaces - section;
 				glBegin(GL_LINE_STRIP);
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
@@ -511,7 +510,8 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 			}
 			else
 			{
-				j = m_pWing->m_NSurfaces/2 - 1;
+				if(!m_pWing->m_bIsFin) j = m_pWing->m_NSurfaces/2 - 1;
+				else                   j = m_pWing->m_NSurfaces - 1;
 				glBegin(GL_LINE_STRIP);
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
@@ -869,11 +869,7 @@ void GL3dWingDlg::GLDrawAxes()
 	else if(pMiarex->m_3DAxisStyle== 3) glLineStipple (1, 0x1C47);
 	else                                glLineStipple (1, 0xFFFF);// Solid
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.1*(double)i*l, 0.0, 0.0);
-//		}
-//	glEnd();
+
 	glBegin(GL_LINES);
 		glVertex3d(-.8, 0.0, 0.0);
 		glVertex3d( .8, 0.0, 0.0);
@@ -889,14 +885,8 @@ void GL3dWingDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.050*l, -0.020*l);
-		glVertex3d(1.0*l, -0.020*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(1.0*l, -0.020*l, -0.020*l);
-		glVertex3d(1.0*l, -0.050*l, -0.050*l);
-	glEnd();
+	m_pglWidget->renderText( .8, 0.0, 0.0, "X");
+
 
 // Y axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -904,12 +894,6 @@ void GL3dWingDlg::GLDrawAxes()
 		glVertex3d(0.0, -.8, 0.0);
 		glVertex3d(0.0,  .8, 0.0);
 	glEnd();
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.1*(double)i*l, 0.0);
-//		}
-//	glEnd();
-
 	//Arrow
 	glBegin(GL_LINES);
 		glVertex3d( 0.0,     1.0*l,  0.0);
@@ -921,14 +905,8 @@ void GL3dWingDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	glBegin(GL_LINES);
-		glVertex3d(-0.020*l, 1.0*l, -0.020*l);
-		glVertex3d(-0.050*l, 1.0*l, -0.050*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d(-0.050*l, 1.0*l,-0.020*l);
-		glVertex3d(-0.035*l, 1.0*l,-0.035*l);
-	glEnd();
+	m_pglWidget->renderText(0.0,  .8, 0.0,"Y");
+
 
 // Z axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -937,11 +915,6 @@ void GL3dWingDlg::GLDrawAxes()
 		glVertex3d(0.0, 0.0,  .8);
 	glEnd();
 
-//	glBegin(GL_LINE_STRIP);
-//		for(i=-9; i<=10; i++){
-//			glVertex3d(0.0, 0.0, 0.1*(double)i*l);
-//		}
-//	glEnd();
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -954,13 +927,8 @@ void GL3dWingDlg::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	glBegin(GL_LINE_STRIP);
-		glVertex3d(-0.050*l, -0.050*l,1.0*l);
-		glVertex3d(-0.050*l, -0.020*l,1.0*l);
+	m_pglWidget->renderText(0.0, 0.0, .8, "Z");
 
-		glVertex3d(-0.020*l, -0.050*l,1.0*l);
-		glVertex3d(-0.020*l, -0.020*l,1.0*l);
-	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 }
 
@@ -1441,6 +1409,7 @@ void GL3dWingDlg::GLToClient(CVector const &real, QPoint &point)
 bool GL3dWingDlg::InitDialog(CWing *pWing)
 {
 	QString str;
+	m_iSection = 0;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	GetAreaUnit(str, pMainFrame->m_AreaUnit);
@@ -1513,6 +1482,7 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 
 	FillDataTable();
 	SetWingData();
+	m_pctrlWingTable->selectRow(m_iSection);
 	SetCurrentSection(m_iSection);
 	return true;
 }
@@ -1840,10 +1810,8 @@ void GL3dWingDlg::OnClipPlane(int pos)
 
 
 
-
 void GL3dWingDlg::OnCellChanged(QWidget *pWidget)
 {
-
 	m_bChanged = true;
 	m_bResetglWing = true;
 	ReadParams();
@@ -1852,13 +1820,14 @@ void GL3dWingDlg::OnCellChanged(QWidget *pWidget)
 }
 
 
+
 void GL3dWingDlg::OnDeleteSection()
 {
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 
 	if(m_iSection==0)
 	{
-		QMessageBox::warning(this, tr("Warning"),"The first section cannot be deleted");
+		QMessageBox::warning(this, tr("Warning"),tr("The first section cannot be deleted"));
 		return;
 	}
 
@@ -1956,6 +1925,7 @@ void GL3dWingDlg::OnInsertBefore()
 	SetWingData();
 
 	m_bChanged = true;
+	m_bResetglSectionHighlight = true;
 	m_bResetglWing = true;
 	UpdateView();
 }
@@ -2102,10 +2072,6 @@ void GL3dWingDlg::OnResetMesh()
 }
 
 
-
-
-
-
 void GL3dWingDlg::OnSetupLight()
 {
 	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
@@ -2148,13 +2114,13 @@ void GL3dWingDlg::OnScaleWing()
 	}
 }
 
+
 void GL3dWingDlg::OnSide()
 {
 	m_bRightSide = m_pctrlRightSide->isChecked();
 	FillDataTable();
 
 	m_bChanged = true;
-
 	m_bResetglSectionHighlight = true;
 	UpdateView();
 }
@@ -2183,7 +2149,6 @@ void GL3dWingDlg::OnSymetric()
 	}
 
 	m_bChanged = true;
-
 	m_bResetglSectionHighlight = true;
 	UpdateView();
 }
@@ -2215,7 +2180,6 @@ void GL3dWingDlg::ReadParams()
 	}
 	//Update Geometry
 	ComputeGeometry();
-	UpdateView();
 }
 
 
@@ -2479,7 +2443,6 @@ void GL3dWingDlg::SetCurrentSection(int section)
 		str = QString("Delete section %1").arg(m_iSection+1);
 		m_pctrlDeleteSection->setText(str);
 	}
-
 	m_bResetglSectionHighlight = true;
 }
 

@@ -119,6 +119,7 @@ private slots:
 private:
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
+	void keyPressEvent(QKeyEvent *event);
 
 	void CreateDockWindows();
 	void CreateToolbars();
@@ -290,7 +291,7 @@ private:
 
 
 	//XDirect Actions
-	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch;
+	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch, *resetCurPolar;
 	QAction *restoreToolbarsAct;
 	QAction *exportCurPolar, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
 	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;

@@ -3421,6 +3421,23 @@ void QXDirect::OnResetGraphLegend()
 }
 
 
+void QXDirect::OnResetCurPolar()
+{
+	if(!m_pCurPolar) return;
+	m_pCurPolar->ResetPolar();
+
+	OpPoint*pOpp;
+	for(int i=0; i< m_poaOpp->size();i++)
+	{
+		pOpp = (OpPoint*)m_poaOpp->at(i);
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName) delete pOpp;
+	}
+	m_pCurOpp = NULL;
+
+	if(m_bPolar) CreatePolarCurves();
+	else         CreateOppCurves();
+
+}
 
 void QXDirect::OnResetXFoil()
 {
@@ -5756,6 +5773,20 @@ void QXDirect::SetupLayout()
 	mainLayout->addStretch(1);
 
 	setLayout(mainLayout);
+
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+	setSizePolicy(szPolicyMaximum);
 }
 
 
