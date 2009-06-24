@@ -73,23 +73,6 @@ QGraph::QGraph()
 	m_ptoffset.setX(0);
 	m_ptoffset.setY(0);
 
-	m_CurveColors[0] = QColor(255,   0,   0);
-	m_CurveColors[1] = QColor(  0,   0, 255);
-	m_CurveColors[2] = QColor(  0, 255,   0);
-	m_CurveColors[3] = QColor(255, 255,   0);
-	m_CurveColors[4] = QColor(  0, 255, 255);
-	m_CurveColors[5] = QColor(255,   0, 255);
-	m_CurveColors[6] = QColor(255, 125,  70);
-	m_CurveColors[7] = QColor( 70, 125, 255);
-	m_CurveColors[8] = QColor(125, 255,  70);
-	m_CurveColors[9] = QColor(255, 70,  200);
-
-	m_CurveStyles[0] = Qt::SolidLine;	// A plain line.
-	m_CurveStyles[1] = Qt::DashLine;	// Dashes separated by a few pixels. 
-	m_CurveStyles[2] = Qt::DotLine;		// Dots separated by a few pixels. 
-	m_CurveStyles[3] = Qt::DashDotLine;	// Alternate dots and dashes. 
-	m_CurveStyles[4] = Qt::DashDotDotLine;	// One dash, two dots, one dash, two dots.
-
 	m_iMargin = 10;
 	m_h       =  0;
 	m_w       =  0;
@@ -341,7 +324,7 @@ void QGraph::DrawXTicks(QPainter &painter)
 				main = xt;
 				ExpFormat(main, exp);
 
-				strLabel = QString("%1 10").arg(main,5,'f',1);
+				strLabel = QString("%1 10").arg(main,5,'f',2);
 				painter.drawText(int(xt/m_scalex) - fm.width(strLabel)/2  +m_ptoffset.x(),
 								 int(yp/scaley)   + TickSize*2 +height    +m_ptoffset.y(),
 								 strLabel);
@@ -428,7 +411,7 @@ void QGraph::DrawYTicks(QPainter &painter)
 					exp  = 0;
 				}
 
-				strLabel = QString("%1 10").arg(main,4,'f',1);
+				strLabel = QString("%1 10").arg(main,5,'f',2);
 				strLabelExp= QString("%1").arg(exp);
 
 				painter.drawText((int)(xp/m_scalex) - fm.width(strLabel)-TickSize*3 + m_ptoffset.x(),

@@ -12968,6 +12968,7 @@ void QMiarex::OnRenameCurWPolar()
 
 	dlg.m_strQuestion = tr("Enter the new name for the wing polar :");
 	dlg.m_strName     = m_pCurWPolar->m_PlrName;
+	dlg.InitDialog();
 
 	bool bExists = true;
 
@@ -13455,6 +13456,7 @@ void QMiarex::OnShowCurve()
 		if(m_iView==1)
 		{
 			m_pCurWOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
+			if(m_pCurPOpp) m_pCurPOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
 			CreateWOppCurves();
 		}
 		else if (m_iView==4)
@@ -13482,6 +13484,7 @@ void QMiarex::OnShowPoints()
 	else if (m_iView==1 && m_pCurWOpp)
 	{
 		m_pCurWOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
+		if(m_pCurPOpp) m_pCurPOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
 		CreateWOppCurves();
 	}
 	else if (m_iView==4 && m_pCurWOpp)

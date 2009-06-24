@@ -34,7 +34,6 @@
 //////////////////////////////////////////////////////////////////////
 //static variables must be initialized in C++
 QColor Graph::m_CurveColors[10];
-int Graph::m_CurveStyles[5];
 
 
 Graph::Graph()
@@ -84,12 +83,6 @@ Graph::Graph()
 	m_CurveColors[7] = QColor( 70, 125, 255);
 	m_CurveColors[8] = QColor(125, 255,  70);
 	m_CurveColors[9] = QColor(255, 70,  200);
-
-	m_CurveStyles[0] = 0;
-	m_CurveStyles[1] = 1;
-	m_CurveStyles[2] = 2;
-	m_CurveStyles[3] = 3;
-	m_CurveStyles[4] = 4;
 
 	m_iMargin= 44;
 
@@ -783,15 +776,15 @@ void Graph::SetDefaults()
 	m_YMajStyle = 1;
 	m_XMajWidth = 1;
 	m_YMajWidth = 1;
-    m_XMajClr   = QColor(120,120,120);
-    m_YMajClr   = QColor(120,120,120);
+	m_XMajClr   = QColor(90,90,90);
+	m_YMajClr   = QColor(90,90,90);
 
 	m_XMinStyle = 1;
 	m_YMinStyle = 1;
 	m_XMinWidth = 1;
 	m_YMinWidth = 1;
-    m_XMinClr   = QColor(70,70,70);
-    m_YMinClr   = QColor(70,70,70);
+	m_XMinClr   = QColor(50,50,50);
+	m_YMinClr   = QColor(50,50,50);
 
 	m_XMinorUnit = 0.1;
 	m_YMinorUnit = 0.1;

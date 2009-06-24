@@ -947,6 +947,11 @@ void GraphDlg::SetupLayout()
 
 	QGridLayout *ScaleData = new QGridLayout;
 
+	QLabel *XAxis2 = new QLabel("X Axis");
+	QLabel *YAxis2 = new QLabel("Y Axis");
+	XAxis2->setAlignment(Qt::AlignCenter);
+	YAxis2->setAlignment(Qt::AlignCenter);
+
 	QLabel *MinLabel = new QLabel("Min");
 	QLabel *MaxLabel = new QLabel("Max");
 	QLabel *OriginLabel = new QLabel("Origin");
@@ -967,11 +972,12 @@ void GraphDlg::SetupLayout()
 	m_pctrlXOrigin  = new FloatEdit;
 	m_pctrlXUnit    = new FloatEdit;
 
-	ScaleData->addWidget(m_pctrlXAuto,2,2);
-	ScaleData->addWidget(m_pctrlXMin,3,2);
-	ScaleData->addWidget(m_pctrlXMax,4,2);
-	ScaleData->addWidget(m_pctrlXOrigin,5,2);
-	ScaleData->addWidget(m_pctrlXUnit,6,2);
+	ScaleData->addWidget(XAxis2,1,2);
+	ScaleData->addWidget(m_pctrlXAuto,3,2);
+	ScaleData->addWidget(m_pctrlXMin,4,2);
+	ScaleData->addWidget(m_pctrlXMax,5,2);
+	ScaleData->addWidget(m_pctrlXOrigin,6,2);
+	ScaleData->addWidget(m_pctrlXUnit,7,2);
 
 	m_pctrlYInverted = new QCheckBox("Inverted Axis");
 	m_pctrlYAuto     = new QCheckBox("Auto Scale");
@@ -980,17 +986,13 @@ void GraphDlg::SetupLayout()
 	m_pctrlYOrigin   = new FloatEdit;
 	m_pctrlYUnit     = new FloatEdit;
 
-	ScaleData->addWidget(m_pctrlYInverted,1,3);
-	ScaleData->addWidget(m_pctrlYAuto,2,3);
-	ScaleData->addWidget(m_pctrlYMin,3,3);
-	ScaleData->addWidget(m_pctrlYMax,4,3);
-	ScaleData->addWidget(m_pctrlYOrigin,5,3);
-	ScaleData->addWidget(m_pctrlYUnit,6,3);
-
-
-//	HScaleBox->addLayout(Labels);
-//	HScaleBox->addWidget(XDataGroup);
-//	HScaleBox->addWidget(YDataGroup);
+	ScaleData->addWidget(YAxis2,1,3);
+	ScaleData->addWidget(m_pctrlYInverted,2,3);
+	ScaleData->addWidget(m_pctrlYAuto,3,3);
+	ScaleData->addWidget(m_pctrlYMin,4,3);
+	ScaleData->addWidget(m_pctrlYMax,5,3);
+	ScaleData->addWidget(m_pctrlYOrigin,6,3);
+	ScaleData->addWidget(m_pctrlYUnit,7,3);
 
 	ScalePage->setLayout(ScaleData);
 	//________End Scale Page______________________

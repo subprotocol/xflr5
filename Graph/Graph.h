@@ -179,7 +179,6 @@ public:
 	virtual ~Graph();
 
 	static QColor m_CurveColors[10];
-	static int      m_CurveStyles[5];
 
 private:
 

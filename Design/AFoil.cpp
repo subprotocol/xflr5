@@ -157,6 +157,82 @@ void QAFoil::CheckButtons()
 }
 
 
+
+void QAFoil::DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
+{
+	int i;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	painter.save();
+
+	painter.setFont(pMainFrame->m_TextFont);
+
+	QFontMetrics fm(pMainFrame->m_TextFont);
+	int dD = fm.height();
+	int dW = fm.width("0.1");
+
+/*	QPen NPen(m_NeutralColor);
+	NPen.setStyle(GetStyle(m_NeutralStyle));
+	NPen.setWidth(m_NeutralWidth);
+	painter.setPen(NPen);
+
+	painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());*/
+
+	int TickSize, xTextOff, offy;
+
+	TickSize = (int)(dD/2);
+	xTextOff = 14;
+	offy = m_ptOffset.y();
+
+	QPen TextPen(pMainFrame->m_TextColor);
+	painter.setPen(TextPen);
+
+	double xo = 0.0;
+	double xmin = 0.0;
+	double xmax = 1.0;
+//	double ymin = -0.2;
+//	double ymax =  0.2;
+	double XGridUnit = 0.1;
+	double XHalfGridUnit = 0.05;
+	double XMinGridUnit = 0.01;
+
+	double xt  = xo-int((xo-xmin)*1.0001/XGridUnit)*XGridUnit;//one tick at the origin
+	double xht = xo-int((xo-xmin)*1.0001/XHalfGridUnit)*XHalfGridUnit;//one tick at the origin
+	double xmt = xo-int((xo-xmin)*1.0001/XMinGridUnit)*XMinGridUnit;//one tick at the origin
+
+	painter.drawLine(int(xt*scalex) + m_ptOffset.x(), offy, int(xmax*scalex) + m_ptOffset.x(), offy);
+
+	QString strLabel;
+
+	while(xt<=xmax*1.001)
+	{
+		//Draw  ticks
+		painter.drawLine(int(xt*scalex) + m_ptOffset.x(), offy, int(xt*scalex) + m_ptOffset.x(), offy+TickSize*2);
+		strLabel = QString("%1").arg(xt,4,'f',1);
+		painter.drawText(int(xt*scalex)+m_ptOffset.x()-dW/2, offy+dD*2, strLabel);
+		xt += XGridUnit ;
+	}
+
+//	while(xht<=xmax*1.001)
+	xht = 0;
+	for(i=0;i<1/XHalfGridUnit;i++)
+	{
+		if(i%2!=0) painter.drawLine(int(xht*scalex) + m_ptOffset.x(), offy, int(xht*scalex) + m_ptOffset.x(), offy+TickSize*2);
+		xht += XHalfGridUnit ;
+	}
+
+	xmt=0;
+//	while(xmt<=xmax*1.001)
+	for(i=0;i<1/XMinGridUnit;i++)
+	{
+		if(i%5!=0) painter.drawLine(int(xmt*scalex) + m_ptOffset.x(), offy,int(xmt*scalex) + m_ptOffset.x(), offy+TickSize);
+		xmt += XMinGridUnit ;
+	}
+
+	painter.restore();
+}
+
+
+
 void QAFoil::DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
 {
 	painter.save();
@@ -935,7 +1011,8 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 			m_ptOffset.rx() = (int)(ZoomFactor * (m_ptOffset.x()-a)+a);
 			m_ptOffset.ry() = (int)(ZoomFactor * (m_ptOffset.y()-b)+b);
 
-			m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
+//			m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
+			m_ZoomRect.setRight(m_ZoomRect.left()-1);
 		}
 		else 
 		{
@@ -1816,6 +1893,7 @@ void QAFoil::OnGrid()
 {
 	AFoilGridDlg dlg(this);
 
+	dlg.m_bScale       = m_bScale;
 	dlg.m_bNeutralLine = m_bNeutralLine;
 	dlg.m_NeutralStyle = m_NeutralStyle;
 	dlg.m_NeutralWidth = m_NeutralWidth;
@@ -1847,6 +1925,7 @@ void QAFoil::OnGrid()
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
+		m_bScale       = dlg.m_bScale;
 		m_bNeutralLine = dlg.m_bNeutralLine;
 		m_NeutralStyle = dlg.m_NeutralStyle;
 		m_NeutralWidth = dlg.m_NeutralWidth;
@@ -2262,7 +2341,7 @@ void QAFoil::PaintGrids(QPainter &painter)
 	QColor color;
 	int style, width;
 
-	if(m_bZoomPlus)
+	if(m_bZoomPlus&& !m_ZoomRect.isEmpty())
 	{
 		QRect ZRect = m_ZoomRect.normalized();
 		QPen ZoomPen(QColor(100,100,100));
@@ -2282,6 +2361,7 @@ void QAFoil::PaintGrids(QPainter &painter)
 		painter.setPen(CirclePen);
 		painter.drawEllipse(rc);
 	}
+	
 	if (m_bNeutralLine)
 	{
 		color = m_NeutralColor;
@@ -2295,20 +2375,13 @@ void QAFoil::PaintGrids(QPainter &painter)
 		painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());
 	}
 
-
-
-//draw grids
+	//draw grids
 	if(m_bXGrid)	DrawXGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 	if(m_bYGrid)	DrawYGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 	if(m_bXMinGrid) DrawXMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 	if(m_bYMinGrid) DrawYMinGrid(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 
-/*	pDC->SetTextColor(pChildView->m_WndTextColor);
-	CFont RFont;
-	RFont.CreateFontIndirect(&pChildView->m_WndLogFont);
-	CFont *pOldFont = pDC->SelectObject(&RFont);
-
-	if(m_bScale) DrawScale(pDC, &m_rDrawRect, m_fScale, m_ptOffset,false);*/
+	if(m_bScale) DrawScale(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset, m_rCltRect);
 
 	painter.restore();
 }
@@ -2419,7 +2492,6 @@ void QAFoil::PaintView(QPainter &painter)
 {
 	painter.save();
 
-//	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
@@ -2606,7 +2678,9 @@ void QAFoil::ReleaseZoom()
 	pMainFrame->m_pctrlZoomIn->setChecked(false);
 	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 	m_bZoomPlus = false;
-	m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
+
+	m_ZoomRect.setRight(m_ZoomRect.left()-1);
+	m_ZoomRect.setTop(m_ZoomRect.bottom()+1);
 	p2DWidget->setCursor(m_hcCross);
 }
 

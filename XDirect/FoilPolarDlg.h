@@ -45,8 +45,8 @@ public:
 
     void *m_pParent;
 
-    QRadioButton *m_rbAuto1;
-    QRadioButton *m_rbAuto2;
+	QRadioButton *m_pctrlAuto1;
+	QRadioButton *m_pctrlAuto2;
 
     QLabel *m_pctrlReLabel;
     QLabel *m_pctrlMachLabel;
@@ -73,7 +73,6 @@ public:
     double m_Reynolds;
     double m_Mach;
     double m_ReDef;
-    double m_MachDef;
     double m_ASpec;
     double m_XTopTr, m_XBotTr;
     double m_NCrit;
@@ -82,7 +81,9 @@ public:
 
 public slots:
     void OnAutoName();
+	void OnOK();
     void OnPolarType();
+	void OnNameChanged();
     void EditingFinished();
 
 };

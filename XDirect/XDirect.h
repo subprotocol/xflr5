@@ -68,7 +68,6 @@ private slots:
 	void OnAllPolarGraphsSetting();
 
 	void OnCpGraphSettings();
-	void OnResetCpGraphScales();
 
 	void OnAlphaMinChanged();
 	void OnAlphaMaxChanged();
@@ -136,9 +135,8 @@ private slots:
 	void OnSetFlap();
 	void OnInterpolateFoils();
 	void OnNacaFoils();
-
 	void OnManageFoils();
-
+	void OnRenamePolar();
 	void OnAnimateSingle();
 
 	void OnQGraph();
@@ -300,7 +298,8 @@ private:
 	double m_Alpha, m_AlphaMax, m_AlphaDelta;
 	double m_Cl, m_ClMax, m_ClDelta;
 	double m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta;
-	double m_MachDef, m_Mach;
+	double m_Mach;
+	double m_ASpec;
 	double m_NCrit, m_XTopTr, m_XBotTr;
 	int m_Type;
 

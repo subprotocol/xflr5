@@ -27,6 +27,7 @@
 #include "../MainFrame.h"
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
+#include "Misc/RenameDlg.h"
 #include "XDirect.h"
 #include "XFoilAnalysisDlg.h"
 #include "FoilPolarDlg.h"
@@ -135,10 +136,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCurOpp      = NULL;
 
 
-	m_Reynolds      = 100000.0;
-	m_ReynoldsMax   = 150000.0;
-	m_ReynoldsDelta =  10000.0;
-
 	m_NCrit = 9.0;
 	m_XTopTr = 1.0;
 	m_XBotTr = 1.0;
@@ -150,6 +147,11 @@ QXDirect::QXDirect(QWidget *parent)
 	m_Cl         = 0.0;
 	m_ClMax      = 1.0;
 	m_ClDelta    = 0.1;
+	m_Reynolds      = 100000.0;
+	m_ReynoldsMax   = 150000.0;
+	m_ReynoldsDelta =  10000.0;
+
+	m_ASpec = 0.0;
 
 	m_pCpGraph    = new QGraph();
 
@@ -1399,7 +1401,7 @@ void QXDirect::LoadSettings(QDataStream &ar)
 	ar >> m_Cl >> m_ClMax >> m_ClDelta;
 	ar >> m_Reynolds >> m_ReynoldsMax >> m_ReynoldsDelta;
 	ar >> m_NCrit >> m_XTopTr >> m_XBotTr;
-	ar >> m_Mach >> m_MachDef;
+	ar >> m_Mach >> m_ASpec;
 	ar >> m_Type;
 	ar >> m_pXFoil->vaccel >> m_IterLim >> m_bAutoInitBL >> m_pXFoil->m_bFullReport  ;
 	ar >> m_NRe;
@@ -1868,7 +1870,7 @@ void QXDirect::OnBatchAnalysis()
 	m_Cl               = BDlg.m_ClMin;
 	m_ClMax            = BDlg.m_ClMax;
 	m_ClDelta          = BDlg.m_ClInc;
-	m_MachDef          = BDlg.m_Mach;
+	m_Mach             = BDlg.m_Mach;
 	m_Type             = BDlg.m_Type;
 	m_NCrit            = BDlg.m_NCrit;
 	m_XTopTr           = BDlg.m_XTopTr;
@@ -3375,6 +3377,120 @@ void QXDirect::OnQGraph()
 }
 
 
+void QXDirect::OnRenamePolar()
+{
+	if(!m_pCurPolar) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!m_pCurPolar) return;
+	if(!m_pCurFoil) return;
+
+	int resp, k,l;
+	CPolar* pPolar;
+	OpPoint * pOpp;
+	QString OldName = m_pCurPolar->m_PlrName;
+
+	QStringList NameList;
+	for(k=0; k<m_poaPolar->size(); k++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(k);
+		if(pPolar->m_FoilName == m_pCurFoil->m_FoilName)
+			NameList.append(pPolar->m_PlrName);
+	}
+	RenameDlg RDlg(this);
+	RDlg.m_pstrArray = & NameList;
+	RDlg.m_strQuestion = "Enter the new name for the foil polar :";
+	RDlg.m_strName     = m_pCurPolar->m_PlrName;
+	RDlg.InitDialog();
+
+	bool bExists = true;
+
+	while (bExists)
+	{
+		resp = RDlg.exec();
+		if(resp==QDialog::Accepted)
+		{
+			if (OldName == RDlg.m_strName) return;
+			//Is the new name already used ?
+			bExists = false;
+			for (k=0; k<m_poaPolar->size(); k++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(k);
+				if (pPolar->m_PlrName == RDlg.m_strName)
+				{
+					bExists = true;
+					break;
+				}
+			}
+			if(!bExists)
+			{
+				m_pCurPolar->m_PlrName = RDlg.m_strName;
+				for (l=(int)m_poaOpp->size()-1;l>=0; l--)
+				{
+					pOpp = (OpPoint*)m_poaOpp->at(l);
+					if (pOpp->m_strPlrName == OldName &&
+						pOpp->m_strFoilName == m_pCurFoil->m_FoilName)
+					{
+						pOpp->m_strPlrName = RDlg.m_strName;
+					}
+				}
+			}
+			pMainFrame->SetSaveState(false);
+		}
+		else if(resp ==10)
+		{//user wants to overwrite
+			if (OldName == RDlg.m_strName) return;
+			for (k=0; k<m_poaPolar->size(); k++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(k);
+				if (pPolar->m_PlrName == RDlg.m_strName)
+				{
+					bExists = true;
+					break;
+				}
+			}
+			for (l=m_poaOpp->size()-1;l>=0; l--)
+			{
+				pOpp = (OpPoint*)m_poaOpp->at(l);
+				if (pOpp->m_strPlrName == pPolar->m_PlrName)
+				{
+					m_poaOpp->removeAt(l);
+					if(pOpp==m_pCurOpp) m_pCurOpp = NULL;
+					delete pOpp;
+				}
+			}
+			m_poaPolar->removeAt(k);
+			if(pPolar==m_pCurPolar) m_pCurPolar = NULL;
+			delete pPolar;
+
+			//and rename everything
+			m_pCurPolar->m_PlrName = RDlg.m_strName;
+
+			for (l=m_poaOpp->size()-1;l>=0; l--)
+			{
+				pOpp = (OpPoint*)m_poaOpp->at(l);
+				if (pOpp->m_strPlrName == OldName &&
+					pOpp->m_strFoilName == m_pCurFoil->m_FoilName)
+				{
+					pOpp->m_strPlrName = RDlg.m_strName;
+				}
+			}
+
+			bExists = false;
+			pMainFrame->SetSaveState(false);
+		}
+		else
+		{
+			return ;//cancelled
+		}
+	}
+	m_pCurPolar = NULL;
+	m_pCurOpp   = NULL;
+	SetPolar();
+	pMainFrame->UpdatePolars();
+	UpdateView();
+}
+
+
 void QXDirect::OnResetAllPolarGraphsScales()
 {
 	m_pPolarGraph->SetAuto(true);
@@ -3400,12 +3516,6 @@ void QXDirect::OnResetAllPolarGraphsScales()
 	UpdateView();
 }
 
-void QXDirect::OnResetCpGraphScales()
-{
-	m_pCurGraph = m_pCpGraph;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	pMainFrame->OnResetCurGraphScales();
-}
 
 void QXDirect::OnResetFoilScale()
 {
@@ -3936,13 +4046,13 @@ void QXDirect::OnSingleAnalysis()
     if(!m_pCurFoil) return;
 
 	FoilPolarDlg Adlg(this);
-	Adlg.m_MachDef  = m_MachDef;
 	Adlg.m_NCrit    = m_NCrit;
 	Adlg.m_XBotTr   = m_XBotTr;
 	Adlg.m_XTopTr   = m_XTopTr;
 	Adlg.m_Mach     = m_Mach;
 	Adlg.m_Reynolds = m_Reynolds;
 	Adlg.m_Type     = m_Type;
+	Adlg.m_ASpec    = m_ASpec;
 
 	Adlg.InitDialog();
 
@@ -3981,13 +4091,12 @@ void QXDirect::OnSingleAnalysis()
 		}
 
 		m_Type     = Adlg.m_Type;
-		m_MachDef  = Adlg.m_MachDef;
 		m_NCrit    = Adlg.m_NCrit;
 		m_XBotTr   = Adlg.m_XBotTr;
 		m_XTopTr   = Adlg.m_XTopTr;
 		m_Mach     = Adlg.m_Mach;
 		m_Reynolds = Adlg.m_Reynolds;
-
+		m_ASpec    = Adlg.m_ASpec;
 
 		m_pCurPolar->m_Reynolds = Adlg.m_Reynolds;
 		m_pCurPolar->m_Mach     = Adlg.m_Mach;
@@ -4014,7 +4123,7 @@ void QXDirect::OnSingleAnalysis()
 			}
 		}
 
-		SetPolar();
+		SetPolar(m_pCurPolar);
 		SetBufferFoil();
 		UpdateView();
 		pMainFrame->UpdatePolars();
@@ -4876,7 +4985,7 @@ void QXDirect::SaveSettings(QDataStream &ar)
 	ar << m_Cl << m_ClMax << m_ClDelta;
 	ar << m_Reynolds << m_ReynoldsMax << m_ReynoldsDelta;
 	ar << m_NCrit << m_XTopTr << m_XBotTr;
-	ar << m_Mach << m_MachDef;
+	ar << m_Mach << m_ASpec;
 	ar << m_Type;
 	ar << m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL << m_pXFoil->m_bFullReport ;
 

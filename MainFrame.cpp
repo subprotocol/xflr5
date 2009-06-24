@@ -1480,8 +1480,8 @@ void MainFrame::CreateXDirectActions()
 	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings\t(G)"), this);
 	connect(defineCpGraphSettings, SIGNAL(triggered()), pXDirect, SLOT(OnCpGraphSettings()));
 
-	resetCpGraphScales = new QAction(tr("Reset Cp Graph Scales"), this);
-	connect(resetCpGraphScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetCpGraphScales()));
+//	resetCpGraphScales = new QAction(tr("Reset Cp Graph Scales"), this);
+//	connect(resetCpGraphScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetCpGraphScales()));
 
 	allPolarGraphsSettingsAct = new QAction(tr("All Polar Graph Settings"), this);
 	allPolarGraphsSettingsAct->setStatusTip("Modifies the setting for all polar graphs simultaneously");
@@ -1594,6 +1594,9 @@ void MainFrame::CreateXDirectActions()
 	ManageFoilsAct = new QAction(tr("Manage Foils"), this);
 	ManageFoilsAct->setShortcut(tr("F7"));
 	connect(ManageFoilsAct, SIGNAL(triggered()), pXDirect, SLOT(OnManageFoils()));
+
+	RenamePolarAct = new QAction(tr("Rename"), this);
+	connect(RenamePolarAct, SIGNAL(triggered()), pXDirect, SLOT(OnRenamePolar()));
 
 	showPanels = new QAction(tr("Show Panels"), this);
 	showPanels->setCheckable(true);
@@ -1792,10 +1795,11 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addAction(defineBatch);
 	PolarMenu->addSeparator();
 	currentPolarMenu = PolarMenu->addMenu(tr("Current Polar"));
-	currentPolarMenu->addAction(exportCurPolar);
-	currentPolarMenu->addAction(deletePolar);
 	currentPolarMenu->addAction(editCurPolar);
 	currentPolarMenu->addAction(resetCurPolar);
+	currentPolarMenu->addAction(deletePolar);
+	currentPolarMenu->addAction(RenamePolarAct);
+	currentPolarMenu->addAction(exportCurPolar);
 	currentPolarMenu->addSeparator();
 	currentPolarMenu->addAction(showPolarOpps);
 	currentPolarMenu->addAction(hidePolarOpps);
@@ -1840,7 +1844,7 @@ void MainFrame::CreateXDirectMenus()
 	CurXFoilResults->addAction(CurXFoilUePlot);
 	CurXFoilResults->addAction(CurXFoilHPlot);
 	CpGraphMenu->addSeparator();
-	CpGraphMenu->addAction(resetCpGraphScales);
+	CpGraphMenu->addAction(resetCurGraphScales);
 	CpGraphMenu->addAction(defineCpGraphSettings);
 	CpGraphMenu->addAction(exportCurGraphAct);
 	OpPointMenu->addSeparator();
@@ -1889,10 +1893,11 @@ void MainFrame::CreateXDirectMenus()
 
 	OperFoilCtxMenu->addSeparator();//_______________
 	CurPolarCtxMenu = OperFoilCtxMenu->addMenu(tr("Current Polar"));
-	CurPolarCtxMenu->addAction(deletePolar);
-	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addAction(editCurPolar);
 	CurPolarCtxMenu->addAction(resetCurPolar);
+	CurPolarCtxMenu->addAction(deletePolar);
+	CurPolarCtxMenu->addAction(RenamePolarAct);
+	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addSeparator();
 	CurPolarCtxMenu->addAction(showPolarOpps);
 	CurPolarCtxMenu->addAction(hidePolarOpps);
@@ -1921,6 +1926,8 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addAction(resetFoilScale);
 	OperFoilCtxMenu->addAction(showPanels);
 	OperFoilCtxMenu->addAction(showNeutralLine);
+	OperFoilCtxMenu->addSeparator();//_______________
+	OperFoilCtxMenu->addAction(saveViewToImageFileAct);
 	//End XDirect foil Context Menu
 
 
@@ -1938,10 +1945,11 @@ void MainFrame::CreateXDirectMenus()
 	CurFoilCtxMenu->addSeparator();
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurPolarCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Polar"));
-	CurPolarCtxMenu->addAction(deletePolar);
-	CurPolarCtxMenu->addAction(exportCurPolar);
 	CurPolarCtxMenu->addAction(editCurPolar);
 	CurPolarCtxMenu->addAction(resetCurPolar);
+	CurPolarCtxMenu->addAction(deletePolar);
+	CurPolarCtxMenu->addAction(RenamePolarAct);
+	CurPolarCtxMenu->addAction(exportCurPolar);
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Graph"));
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
@@ -1957,6 +1965,8 @@ void MainFrame::CreateXDirectMenus()
 	OperPolarCtxMenu->addAction(hideAllPolars);
 	OperPolarCtxMenu->addAction(showAllOpPoints);
 	OperPolarCtxMenu->addAction(hideAllOpPoints);
+	OperPolarCtxMenu->addSeparator();//_______________
+	OperPolarCtxMenu->addAction(saveViewToImageFileAct);
 
 	//End XDirect polar Context Menu
 }
@@ -3383,7 +3393,8 @@ void MainFrame::OnResetCurGraphScales()
 		case XFOILANALYSIS:
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-			pGraph = pXDirect->m_pCurGraph;
+			if(!pXDirect->m_bPolar) pGraph = pXDirect->m_pCpGraph;
+			else pGraph = pXDirect->m_pCurGraph;
 			break;
 		}
 		case INVERSEDESIGN:

@@ -118,6 +118,7 @@ private slots:
 	void OnAFoilNacaFoils();
 
 private:
+	void DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawXMinGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);

@@ -1000,7 +1000,8 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 			{
 				m_QGraph.SetWindow(xmin, xmax, ymin, ymax);
 			}
-			m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
+			m_ZoomRect.setRight(m_ZoomRect.left()-1);
+			m_ZoomRect.setTop(m_ZoomRect.bottom()+1);
 		}
 		else 
 		{
@@ -1800,8 +1801,8 @@ double QXInverse::qincom(double qc, double qinf, double tklam)
 void QXInverse::ReleaseZoom()
 {
 	m_bZoomPlus  = false;
-	m_ZoomRect.setRight(m_ZoomRect.left());
-	m_ZoomRect.setTop(m_ZoomRect.bottom());
+	m_ZoomRect.setRight(m_ZoomRect.left()-1);
+	m_ZoomRect.setTop(m_ZoomRect.bottom()+1);
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->m_pctrlInvZoomIn->setChecked(false);
 }

@@ -42,13 +42,13 @@ void FoilPolarDlg::SetupLayout()
 {
 	QVBoxLayout *Analysis = new QVBoxLayout;
 	QHBoxLayout *autoname = new QHBoxLayout;
-	m_rbAuto1 = new QRadioButton("Automatic");
-	m_rbAuto2 = new QRadioButton("UserDefined");
+	m_pctrlAuto1 = new QRadioButton("Automatic");
+	m_pctrlAuto2 = new QRadioButton("User Defined");
 	m_pctrlAnalysisName = new QLineEdit("Analysis Name");
 	autoname->addStretch(1);
-	autoname->addWidget(m_rbAuto1);
+	autoname->addWidget(m_pctrlAuto1);
 	autoname->addStretch(1);
-	autoname->addWidget(m_rbAuto2);
+	autoname->addWidget(m_pctrlAuto2);
 	autoname->addStretch(1);
 	Analysis->addLayout(autoname);
 	Analysis->addWidget(m_pctrlAnalysisName);
@@ -94,7 +94,7 @@ void FoilPolarDlg::SetupLayout()
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QGridLayout *Transitions = new QGridLayout;
@@ -147,7 +147,7 @@ void FoilPolarDlg::SetupLayout()
 
 
 	m_pctrlReynolds->SetPrecision(0);
-	m_pctrlReynolds->SetMin(0.0);
+	m_pctrlReynolds->SetMin(-1.0e10);
 	m_pctrlReynolds->SetMax(1.e10);
 
 
@@ -155,8 +155,8 @@ void FoilPolarDlg::SetupLayout()
 	m_pctrlMach->SetMin(0.0);
 	m_pctrlMach->SetMax(1000.0);
 
-	connect(m_rbAuto1, SIGNAL(clicked()), this, SLOT(OnAutoName()));
-	connect(m_rbAuto2, SIGNAL(clicked()), this, SLOT(OnAutoName()));
+	connect(m_pctrlAuto1, SIGNAL(clicked()), this, SLOT(OnAutoName()));
+	connect(m_pctrlAuto2, SIGNAL(clicked()), this, SLOT(OnAutoName()));
 
 	connect(m_rbtype1, SIGNAL(clicked()), this, SLOT(OnPolarType()));
 	connect(m_rbtype2, SIGNAL(clicked()), this, SLOT(OnPolarType()));
@@ -168,6 +168,8 @@ void FoilPolarDlg::SetupLayout()
 	connect(m_pctrlNCrit, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
 	connect(m_pctrlTopTrans, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
 	connect(m_pctrlBotTrans, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
+
+	connect(m_pctrlAnalysisName, SIGNAL(textEdited (const QString &)), this, SLOT(OnNameChanged()));
 }
 
 void FoilPolarDlg::EditingFinished()
@@ -192,7 +194,7 @@ void FoilPolarDlg::InitDialog()
 	m_pctrlBotTrans->SetValue(m_XBotTr);
 
 	m_bAutoName = true;
-	m_rbAuto1->setChecked(true);
+	m_pctrlAuto1->setChecked(true);
 
 	switch(m_Type)
 	{
@@ -239,7 +241,7 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 			}
 			else if(OKButton->hasFocus())
 			{
-				QDialog::accept();
+				OnOK();
 				return;
 			}
 			break;
@@ -257,7 +259,7 @@ void FoilPolarDlg::keyPressEvent(QKeyEvent *event)
 
 void FoilPolarDlg::OnAutoName()
 {
-	if(m_rbAuto2->isChecked())
+	if(m_pctrlAuto2->isChecked())
 	{
 		m_bAutoName = false;
 		m_pctrlAnalysisName->setFocus();
@@ -268,6 +270,21 @@ void FoilPolarDlg::OnAutoName()
 		m_bAutoName = true;
 		SetPlrName();
 	}
+}
+
+
+void FoilPolarDlg::OnNameChanged()
+{
+	m_bAutoName = false;
+	m_pctrlAuto1->setChecked(false);
+	m_pctrlAuto2->setChecked(true);
+}
+
+
+void FoilPolarDlg::OnOK()
+{
+	m_PlrName = m_pctrlAnalysisName->text();
+	accept();
 }
 
 
@@ -316,6 +333,7 @@ void FoilPolarDlg::SetPlrName()
 {
     ReadParams();
     QString Name;
+
     if(m_bAutoName)
     {
         if(m_Type!=4)
@@ -328,7 +346,7 @@ void FoilPolarDlg::SetPlrName()
         {
                 m_PlrName = QString("T%1_Al%2_M%3").arg(m_Type).arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
         }
-	QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
+		QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
         m_PlrName += str;
 
         m_pctrlAnalysisName->setText(m_PlrName);
@@ -344,11 +362,9 @@ void FoilPolarDlg::ReadParams()
     if(m_Type==4) m_ASpec    = str.toDouble();
     else          m_Reynolds = str.toDouble();
 
-
     m_Mach     = m_pctrlMach->text().toDouble();
     m_pctrlMach->clear();
     m_pctrlMach->insert(str.setNum(m_Mach,'f',2));
-
 
     m_NCrit  = m_pctrlNCrit->text().toDouble();
     m_XTopTr = m_pctrlTopTrans->text().toDouble();

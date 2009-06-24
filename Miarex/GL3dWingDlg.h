@@ -72,7 +72,7 @@ private slots:
 	void OnSurfaces();
 	void OnOutline();
 	void OnPanels();
-
+	void OnFoilNames();
 
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
@@ -166,7 +166,7 @@ private:
 	WingDelegate *m_pWingDelegate;
 
 	QPushButton *OKButton, *CancelButton;
-	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
 	QPushButton *m_pctrlSetupLight;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 
@@ -200,6 +200,7 @@ private:
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bResetglWing;
 	bool m_bResetglSectionHighlight;
+	bool m_bFoilNames;
 
 	int m_iSection;
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size

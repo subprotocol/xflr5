@@ -134,6 +134,11 @@ void LinePickerDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
 	}
 }
 

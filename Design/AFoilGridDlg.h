@@ -42,6 +42,7 @@ public:
 private slots:
 	void OnApply();
 	void OnOK();
+	void OnScale();
 	void OnNeutralStyle();
 	void OnXMajStyle();
 	void OnXMinStyle();
@@ -58,12 +59,12 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 
 	void *m_pAFoil;
-	QCheckBox  *m_pctrlNeutralShow, *m_pctrlXMajShow, *m_pctrlYMajShow, *m_pctrlXMinShow, *m_pctrlYMinShow;
+	QCheckBox  *m_pctrlNeutralShow, *m_pctrlScale, *m_pctrlXMajShow, *m_pctrlYMajShow, *m_pctrlXMinShow, *m_pctrlYMinShow;
 	LineButton *m_pctrlNeutralStyle, *m_pctrlXMajStyle, *m_pctrlYMajStyle, *m_pctrlXMinStyle, *m_pctrlYMinStyle;
 	FloatEdit *m_pctrlXUnit, *m_pctrlYUnit,*m_pctrlXMinUnit, *m_pctrlYMinUnit;
 	QPushButton	*ApplyButton, *OKButton, *CancelButton;
 
-	bool m_bNeutralLine;
+	bool m_bNeutralLine, m_bScale;
 	bool m_bXGrid,m_bYGrid;
 	bool m_bXMinGrid, m_bYMinGrid;
 	int m_XStyle, m_YStyle;

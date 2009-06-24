@@ -81,6 +81,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 
 	m_bResetglSectionHighlight = true;
 	m_bResetglWing             = true;
+	m_bFoilNames         = true;
 	m_bChanged           = false;
 	m_bEnableName        = true;
 	m_bAcceptName        = true;
@@ -238,6 +239,7 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlZ, SIGNAL(clicked()),this, SLOT(On3DTop()));
 	connect(m_pctrlReset, SIGNAL(clicked()),this, SLOT(On3DReset()));
 	connect(m_pctrlPickCenter, SIGNAL(clicked()),this, SLOT(On3DPickCenter()));
+	connect(m_pctrlFoilNames, SIGNAL(clicked()),this, SLOT(OnFoilNames()));
 
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
@@ -1286,7 +1288,7 @@ void GL3dWingDlg::GLRenderView()
 			glCallList(MESHPANELS);
 		}
 	}
-	GLDrawFoils();
+	if(m_bFoilNames) GLDrawFoils();
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
@@ -1440,6 +1442,7 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlPanels->setChecked(m_bVLMPanels);
 	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlFoilNames->setChecked(m_bFoilNames);
 
 	m_pctrlWingColor->SetColor(m_pWing->m_WingColor);
 
@@ -1865,7 +1868,11 @@ void GL3dWingDlg::OnDeleteSection()
 	UpdateView();
 }
 
-
+void GL3dWingDlg::OnFoilNames()
+{
+	m_bFoilNames = m_pctrlFoilNames->isChecked();
+	UpdateView();
+}
 
 void GL3dWingDlg::OnLight()
 {
@@ -2739,6 +2746,7 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlSurfaces   = new QCheckBox("Surfaces");
 	m_pctrlOutline    = new QCheckBox("Outline");
 	m_pctrlPanels     = new QCheckBox("Panels");
+	m_pctrlFoilNames  = new QCheckBox("Foil Names");
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
@@ -2750,6 +2758,7 @@ void GL3dWingDlg::SetupLayout()
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
 	ThreeDParams->addWidget(m_pctrlLight, 3,1);
 	ThreeDParams->addWidget(m_pctrlSetupLight, 3,2);
+	ThreeDParams->addWidget(m_pctrlFoilNames, 4,1,1,2);
 
 	m_pctrlX          = new QPushButton("X");
 	m_pctrlY          = new QPushButton("Y");

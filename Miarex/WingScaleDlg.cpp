@@ -105,8 +105,10 @@ void WingScaleDlg::SetupLayout()
 
 	m_pctrlUnit20 = new QLabel;
 	m_pctrlUnit21 = new QLabel;
+	QLabel *Unit22 = new QLabel(QString::fromUtf8("°"));
 	ScaleLayout->addWidget(m_pctrlUnit20, 2,4);
 	ScaleLayout->addWidget(m_pctrlUnit21, 3,4);
+	ScaleLayout->addWidget(Unit22,        4,4);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("OK"));
@@ -178,6 +180,7 @@ void WingScaleDlg::InitDialog(double const &RefSpan, double const &RefChord, dou
 	m_pctrlRefChord->setText(strong);
 
 	strong = QString("%1").arg(m_RefSweep,8,'f',2);
+	strong += QString::fromUtf8("°");
 	m_pctrlRefSweep->setText(strong);
 
 	strong = QString("%1").arg(m_RefTwist,8,'f',2);

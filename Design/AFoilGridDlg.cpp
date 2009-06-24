@@ -28,7 +28,10 @@
 
 AFoilGridDlg::AFoilGridDlg(void *pParent)
 {
+	setWindowTitle("Grid Options");
 	m_pAFoil = pParent;
+
+	m_bScale = false;
 
 	m_bXGrid     = false;
 	m_XUnit  = 0.05;
@@ -64,6 +67,7 @@ AFoilGridDlg::AFoilGridDlg(void *pParent)
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
+	connect(m_pctrlScale, SIGNAL(clicked()), this, SLOT(OnScale()));
 	connect(m_pctrlNeutralShow, SIGNAL(clicked(bool)), this, SLOT(OnNeutralShow(bool)));
 	connect(m_pctrlXMajShow, SIGNAL(clicked(bool)), this, SLOT(OnXMajShow(bool)));
 	connect(m_pctrlYMajShow, SIGNAL(clicked(bool)), this, SLOT(OnYMajShow(bool)));
@@ -125,6 +129,7 @@ void AFoilGridDlg::InitDialog()
 	m_pctrlXMinUnit->setEnabled(m_bXMinGrid);
 	m_pctrlYMinUnit->setEnabled(m_bYMinGrid);
 
+	m_pctrlScale->setChecked(m_bScale);
 	m_pctrlNeutralShow->setChecked(m_bNeutralLine);
 	m_pctrlXMajShow->setChecked(m_bXGrid);
 	m_pctrlYMajShow->setChecked(m_bYGrid);
@@ -142,6 +147,7 @@ void AFoilGridDlg::SetupLayout()
 {
 	QGridLayout *GridData = new QGridLayout;
 	m_pctrlNeutralShow = new QCheckBox("Neutral Line");
+	m_pctrlScale       = new QCheckBox("X-Scale");
 	m_pctrlXMajShow = new QCheckBox("X Major Grid");
 	m_pctrlYMajShow = new QCheckBox("Y Major Grid");
 	m_pctrlXMinShow = new QCheckBox("X Minor Grid");
@@ -174,10 +180,12 @@ void AFoilGridDlg::SetupLayout()
 	GridData->addWidget(m_pctrlXMinStyle,4,2);
 	GridData->addWidget(m_pctrlYMinStyle,5,2);
 
+	GridData->addWidget(m_pctrlScale,1,3);
 	GridData->addWidget(m_pctrlXUnit,2,3);
 	GridData->addWidget(m_pctrlYUnit,3,3);
 	GridData->addWidget(m_pctrlXMinUnit,4,3);
 	GridData->addWidget(m_pctrlYMinUnit,5,3);
+
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("Accept"));
@@ -289,6 +297,12 @@ void AFoilGridDlg::OnNeutralShow(bool bShow)
 	m_pctrlNeutralStyle->setEnabled(m_bNeutralLine);
 }
 
+void AFoilGridDlg::OnScale()
+{
+	m_bScale = m_pctrlScale->isChecked();
+}
+
+
 void AFoilGridDlg::OnXMajShow(bool bShow)
 {
 	m_bXGrid = bShow;
@@ -341,6 +355,8 @@ void AFoilGridDlg::OnApply()
 	m_YUnit = m_pctrlYUnit->GetValue();
 	m_XMinUnit = m_pctrlXMinUnit->GetValue();
 	m_YMinUnit = m_pctrlYMinUnit->GetValue();
+
+	pAFoil->m_bScale       = m_bScale;
 
 	pAFoil->m_bNeutralLine = m_bNeutralLine;
 	pAFoil->m_NeutralStyle = m_NeutralStyle;

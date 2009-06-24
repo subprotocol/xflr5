@@ -306,10 +306,10 @@ private:
 	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct, *resetGraphLegend;
 	QAction *PolarGraphAct[5];
 	QAction *XDirectStyleAct;
-	QAction *defineCpGraphSettings, *resetCpGraphScales, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
+	QAction *defineCpGraphSettings, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
-	QAction *ManageFoilsAct;
+	QAction *ManageFoilsAct, *RenamePolarAct;
 	QToolButton *m_pctrlPolarView, *m_pctrlOppView;
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
