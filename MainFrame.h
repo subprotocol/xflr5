@@ -275,6 +275,7 @@ private:
 	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
 	QAction *twoWPlrGraphs, *allWPlrGraphs, *MiarexGraphDlg;
 	QAction *ResetWingGraphScale;
+	QAction *MiarexPolarFilter;
 	QAction *allWPolarGraphsScalesAct, *allWingGraphsScalesAct, *allWPolarGraphsSettings, *allWingGraphsSettings;
 	QAction *hideAllWPlrs, *showAllWPlrs;
 	QAction *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
@@ -306,6 +307,7 @@ private:
 	QAction *TwoPolarGraphsAct, *AllPolarGraphsAct, *resetGraphLegend;
 	QAction *PolarGraphAct[5];
 	QAction *XDirectStyleAct;
+	QAction *XDirectPolarFilter;
 	QAction *defineCpGraphSettings, *exportCpGraphAct, *setQVarGraph, *setCpVarGraph;
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;

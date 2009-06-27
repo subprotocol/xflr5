@@ -68,7 +68,7 @@ private slots:
 	void OnAllPolarGraphsSetting();
 
 	void OnCpGraphSettings();
-
+	void OnPolarFilter();
 	void OnAlphaMinChanged();
 	void OnAlphaMaxChanged();
 	void OnAnalyze();

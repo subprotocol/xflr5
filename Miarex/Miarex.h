@@ -202,7 +202,7 @@ private slots:
 	void OnCpPosition();
 	void OnGraphSettings();
 	void OnManageUFOs();
-
+	void OnPolarFilter();
 	void OnLiftScale(int pos);
 	void OnDragScale(int pos);
 	void OnVelocityScale(int pos);

@@ -28,6 +28,7 @@
 #include "../Misc/RenameDlg.h"
 #include "../Misc/ProgressDlg.h"
 #include "../Misc/EditPlrDlg.h"
+#include "../Misc/PolarFilterDlg.h"
 #include "../Graph/GraphDlg.h"
 #include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
@@ -12940,6 +12941,32 @@ void QMiarex::OnReadAnalysisData()
 	}
 }
 
+
+void QMiarex::OnPolarFilter()
+{
+	PolarFilterDlg dlg;
+	dlg.m_bMiarex = true;
+	dlg.m_bType1 = m_bType1;
+	dlg.m_bType2 = m_bType2;
+	dlg.m_bType4 = m_bType4;
+	dlg.m_bType5 = m_bType5;
+	dlg.m_bType6 = m_bType6;
+	dlg.InitDialog();
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		m_bType1 = dlg.m_bType1;
+		m_bType2 = dlg.m_bType2;
+		m_bType4 = dlg.m_bType4;
+		m_bType5 = dlg.m_bType5;
+		m_bType6 = dlg.m_bType6;
+		if(m_iView==2)
+		{
+			CreateWPolarCurves();
+			UpdateView();
+		}
+	}
+}
+
 void QMiarex::OnRenameCurWPolar()
 {
 	//Rename the currently selected Wing Polar
@@ -13484,7 +13511,7 @@ void QMiarex::OnShowPoints()
 	else if (m_iView==1 && m_pCurWOpp)
 	{
 		m_pCurWOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
-		if(m_pCurPOpp) m_pCurPOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
+		if(m_pCurPOpp) m_pCurPOpp->m_bIsVisible = m_pctrlShowPoints->isChecked();
 		CreateWOppCurves();
 	}
 	else if (m_iView==4 && m_pCurWOpp)

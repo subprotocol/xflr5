@@ -937,6 +937,9 @@ void MainFrame::CreateMiarexActions()
 	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
 	connect(W3DPrefsAct, SIGNAL(triggered()), pMiarex, SLOT(On3DPrefs()));
 
+	MiarexPolarFilter = new QAction(tr("Polar Filter"), this);
+	connect(MiarexPolarFilter, SIGNAL(triggered()), pMiarex, SLOT(OnPolarFilter()));
+
 	W3DScalesAct = new QAction(tr("3D Scales"), this);
 	W3DScalesAct->setCheckable(true);
 	connect(W3DScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnGL3DScale()));
@@ -1227,6 +1230,8 @@ void MainFrame::CreateMiarexMenus()
 	CurWPlrMenu->addAction(hideAllWPlrOpps);
 	CurWPlrMenu->addAction(deleteAllWPlrOpps);
 	MiarexWPlrMenu->addSeparator();
+	MiarexWPlrMenu->addAction(MiarexPolarFilter);
+	MiarexWPlrMenu->addSeparator();
 	MiarexWPlrMenu->addAction(hideAllWPlrs);
 	MiarexWPlrMenu->addAction(showAllWPlrs);
 	MiarexWPlrMenu->addSeparator();
@@ -1480,8 +1485,8 @@ void MainFrame::CreateXDirectActions()
 	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings\t(G)"), this);
 	connect(defineCpGraphSettings, SIGNAL(triggered()), pXDirect, SLOT(OnCpGraphSettings()));
 
-//	resetCpGraphScales = new QAction(tr("Reset Cp Graph Scales"), this);
-//	connect(resetCpGraphScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetCpGraphScales()));
+	XDirectPolarFilter = new QAction(tr("Polar Filter"), this);
+	connect(XDirectPolarFilter, SIGNAL(triggered()), pXDirect, SLOT(OnPolarFilter()));
 
 	allPolarGraphsSettingsAct = new QAction(tr("All Polar Graph Settings"), this);
 	allPolarGraphsSettingsAct->setStatusTip("Modifies the setting for all polar graphs simultaneously");
@@ -1804,6 +1809,8 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu->addAction(showPolarOpps);
 	currentPolarMenu->addAction(hidePolarOpps);
 	currentPolarMenu->addAction(deletePolarOpps);
+	PolarMenu->addSeparator();
+	PolarMenu->addAction(XDirectPolarFilter);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(showAllPolars);
 	PolarMenu->addAction(hideAllPolars);
@@ -4202,17 +4209,16 @@ void MainFrame::openRecentFile()
 
 CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 {
-	QString Strong, StrTemp;
+	QString Strong;
 	QString FoilName;
-	CFoil* pFoil = NULL;
-	int pos, res, line, i, ip;
-	pos = line = 0;
-	double x,y, area;
+	QString strx, stry;
 
+	CFoil* pFoil = NULL;
+	int pos, res, i, ip;
+	pos = 0;
+	double x,y, z,area;
 	bool bRead;
 
-	QByteArray textline;
-	const char *text;
 
 	pFoil = new CFoil();
 	if(!pFoil)	return NULL;
@@ -4225,9 +4231,8 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 
 	if(!in.atEnd())
 	{
-		textline = Strong.toAscii();
-		text = textline.constData();
-		res = sscanf(text, "%lf%lf", &x,&y);
+		FoilName = Strong;
+		ReadValues(Strong, res,x,y,z);
 		if(res==2)
 		{
 			//there isn't a name on the first line
@@ -4238,24 +4243,19 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 				pFoil->nb=1;
 			}
 		}
-		else FoilName = Strong;
 		// remove fore and aft spaces
 		FoilName = FoilName.trimmed();
 	}
 
 	bRead = true;
-
-	while (bRead)
+	do
 	{
 		Strong = in.readLine();
 		pos = Strong.indexOf("#",0);
 
-		if (bRead && pos<0)
+		if (!Strong.isNull() && bRead && pos<0)
 		{
-
-			textline = Strong.toAscii();
-			text = textline.constData();
-			res = sscanf(text, "%lf%lf", &x,&y);
+			ReadValues(Strong, res, x,y,z);
 			if(res==2)
 			{
 				pFoil->xb[pFoil->nb] = x;
@@ -4269,11 +4269,11 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 			}
 			else bRead = false;
 		}
-	}
+	}while (bRead && !Strong.isNull());
 
 	pFoil->m_FoilName = FoilName;
 
-// Check if the foil was written clockwise or counter-clockwise
+	// Check if the foil was written clockwise or counter-clockwise
 
 	area = 0.0;
 	for (i=0; i<pFoil->nb; i++)

@@ -31,6 +31,7 @@
 #include <QByteArray>
 #include <math.h>
 #include <QtDebug>
+
 void ExpFormat(double &f, int &exp)
 {
 	if (f==0.0)
@@ -721,7 +722,63 @@ double IntegralCy(double y1, double y2, double c1, double c2)
 }
 
 
+void ReadValues(QString line, int &res, double &x, double &y, double &z)
+{
+/*	char *sx = new char[30];
+	char *sy = new char[30];
+	char *text;*/
+	QString str;
+	bool bOK;
 
+	line = line.simplified();
+	int pos = line.indexOf(" ");
+	res = 0;
+	if(pos>0)
+	{
+		str = line.left(pos);
+		line = line.right(line.length()-pos);
+	}
+	else
+	{
+		str = line;
+		line = "";
+	}
+	x = str.toDouble(&bOK);
+	if(bOK) res++;
+	else
+	{
+		y=z=0.0;
+		return;
+	}
+
+	line = line.trimmed();
+	pos = line.indexOf(" ");
+	if(pos>0)
+	{
+		str = line.left(pos);
+		line = line.right(line.length()-pos);
+	}
+	else
+	{
+		str = line;
+		line = "";
+	}
+	y = str.toDouble(&bOK);
+	if(bOK) res++;
+	else
+	{
+		z=0.0;
+		return;
+	}
+
+	line = line.trimmed();
+	if(!line.isEmpty())
+	{
+		z = line.toDouble(&bOK);
+		if(bOK) res++;
+	}
+	else z=0.0;
+}
 
 
 

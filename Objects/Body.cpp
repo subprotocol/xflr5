@@ -638,7 +638,6 @@ bool CBody::ImportDefinition()
 			text = textline.constData();
 			res = sscanf(text, "%lf  %lf  %lf", &xo, &yo, &zo);
 
-
 			if(res==3)
 			{
 				xo /= mtoUnit;
@@ -1159,7 +1158,7 @@ bool CBody::IsInNURBSBody(CVector Pt)
 
 int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit)
 {
-	CVector real;
+	double x,y,z;
 	double theta[MAXSIDELINES];
 	double angle;
 	QByteArray textline;
@@ -1167,6 +1166,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 	QString strong;
 	int i, j, k, res;
 	i = 0;
+	x=y=z=0.0;
 
 	memset(theta, 0, sizeof(theta));
 
@@ -1174,10 +1174,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 	while (bRead)
 	{
 		if(!ReadAVLString(in, Line,  strong)) bRead = false;
-
-		textline = strong.toAscii();
-		text = textline.constData();
-		res = sscanf(text, "%lf  %lf  %lf", &real.x, &real.y, &real.z);
+		ReadValues(strong, res, x,y,z);
 
 		if(res!=3)
 		{
@@ -1186,7 +1183,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 		}
 		else 
 		{
-			angle = atan2(real.z, real.y);
+			angle = atan2(z, y);
 			for (j=0; j<i; j++)
 			{
 				if(angle> theta[j]) 
@@ -1202,9 +1199,9 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 				}
 			}
 			// insert at proper place
-			pFrame->m_Point[j].x = real.x / Unit;
-			pFrame->m_Point[j].y = real.y / Unit;
-			pFrame->m_Point[j].z = real.z / Unit;
+			pFrame->m_Point[j].x = x / Unit;
+			pFrame->m_Point[j].y = y / Unit;
+			pFrame->m_Point[j].z = z / Unit;
 			theta[j] = angle;
 			i++;
 		}

@@ -27,6 +27,7 @@
 #include "../MainFrame.h"
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
+#include "../Misc/PolarFilterDlg.h"
 #include "Misc/RenameDlg.h"
 #include "XDirect.h"
 #include "XFoilAnalysisDlg.h"
@@ -3299,6 +3300,28 @@ void QXDirect::OnPolars()
 	UpdateView();
 }
 
+void QXDirect::OnPolarFilter()
+{
+	PolarFilterDlg dlg;
+	dlg.m_bMiarex = false;
+	dlg.m_bType1 = m_bType1;
+	dlg.m_bType2 = m_bType2;
+	dlg.m_bType3 = m_bType3;
+	dlg.m_bType4 = m_bType4;
+	dlg.InitDialog();
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		m_bType1 = dlg.m_bType1;
+		m_bType2 = dlg.m_bType2;
+		m_bType3 = dlg.m_bType3;
+		m_bType4 = dlg.m_bType4;
+		if(m_bPolar)
+		{
+			CreatePolarCurves();
+			UpdateView();
+		}
+	}
+}
 
 void QXDirect::OnPanels()
 {
@@ -3380,9 +3403,8 @@ void QXDirect::OnQGraph()
 void QXDirect::OnRenamePolar()
 {
 	if(!m_pCurPolar) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(!m_pCurPolar) return;
 	if(!m_pCurFoil) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	int resp, k,l;
 	CPolar* pPolar;
@@ -3415,7 +3437,7 @@ void QXDirect::OnRenamePolar()
 			for (k=0; k<m_poaPolar->size(); k++)
 			{
 				pPolar = (CPolar*)m_poaPolar->at(k);
-				if (pPolar->m_PlrName == RDlg.m_strName)
+				if ((pPolar->m_FoilName==m_pCurFoil->m_FoilName) && (pPolar->m_PlrName == RDlg.m_strName))
 				{
 					bExists = true;
 					break;

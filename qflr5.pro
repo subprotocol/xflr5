@@ -100,7 +100,8 @@ SOURCES += MainFrame.cpp \
     Misc/TranslatorDlg.cpp \
     XDirect/ManageFoilsDlg.cpp \
     Miarex/ManageUFOsDlg.cpp \
-    Miarex/UFOTableDelegate.cpp
+    Miarex/UFOTableDelegate.cpp \
+    Misc/PolarFilterDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -197,7 +198,8 @@ HEADERS += MainFrame.h \
     Misc/TranslatorDlg.h \
     XDirect/ManageFoilsDlg.h \
     Miarex/ManageUFOsDlg.h \
-    Miarex/UFOTableDelegate.h
+    Miarex/UFOTableDelegate.h \
+    Misc/PolarFilterDlg.h
 TRANSLATIONS = qflr5_fr.ts
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
