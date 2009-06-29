@@ -26,8 +26,8 @@
 
 #include "math.h"
 #include "Sf.h"
-#include "Globals.h"
-#include <QtDebug>
+#include "../Globals.h"
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

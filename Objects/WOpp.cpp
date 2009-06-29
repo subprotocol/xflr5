@@ -24,7 +24,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "WOpp.h"
-#include "Globals.h"
+#include "../Globals.h"
 #include <math.h>
 #include <QTextStream>
 #include <QtDebug>

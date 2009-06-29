@@ -201,7 +201,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 					str = "Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
 					WriteString(str);
 					m_bExit = true;
-					return FALSE;
+					return false;
 				}
 			}
 			else
@@ -436,7 +436,7 @@ bool XFoilAnalysisDlg::ReLoop()
 				str = "Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
 				WriteString(str);
 				m_bExit = true;
-				return FALSE;
+				return false;
 			}
 
 			if (fabs(m_pXFoil->alfa-m_pXFoil->awake) > 0.00001)
@@ -465,7 +465,7 @@ bool XFoilAnalysisDlg::ReLoop()
 			break;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 

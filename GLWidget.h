@@ -35,6 +35,7 @@ class GLWidget : public QGLWidget
 	friend class GL3dBodyDlg;
 	friend class GL3dWingDlg;
 	friend class MainFrame;
+	friend class ArcBall;
 
 public:
 	GLWidget(QWidget *parent = 0);

@@ -191,6 +191,7 @@ private slots:
 	void OnOutline();
 	void OnPanels();
 	void OnVortices();
+	void OnFoilNames();
 	void OnDownwash();
 	void OnMoment();
 	void OnResetWingScale();
@@ -236,6 +237,7 @@ private:
 	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List);
 	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List);
 	void GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List);
+	void GLDrawFoils();
 	void GLInverseMatrix();
 	void GLRenderView();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
@@ -377,7 +379,8 @@ private:
 	LineButton *m_pctrlCurveColor;
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
-	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlVortices;
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
+	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 	QSlider *m_pctrlClipPlanePos;
 
@@ -398,6 +401,7 @@ private:
 	bool m_b3DCp, m_bDownwash; 	// defines whether the corresponding data should be displayed
 	bool m_bMoments;							// defines whether the corresponfing data should be displayed
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
+	bool m_bFoilNames;
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
 	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed

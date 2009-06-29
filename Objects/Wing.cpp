@@ -28,8 +28,8 @@
   
 #include  <math.h>
 #include "Wing.h"
-#include "MainFrame.h"
-#include "Globals.h"
+#include "../MainFrame.h"
+#include "../Globals.h"
 #include "../Miarex/Miarex.h"
 #include "../Miarex/LLTAnalysisDlg.h"
 #include "../Miarex/VLMAnalysisDlg.h"

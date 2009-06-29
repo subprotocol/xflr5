@@ -22,8 +22,7 @@
 // PF.cpp: implementation of the CPF class.
 //
 //////////////////////////////////////////////////////////////////////
-#include <QtDebug>
-#include "Globals.h"
+#include "../Globals.h"
 #include "Pf.h"
 #include "math.h"
 #include "Spline.h"

@@ -1070,7 +1070,6 @@ bool PanelAnalysisDlg::ComputeOnBody(int qrhs, double Alpha)
 		else
 		{
 			DELP = 0.0;
-//			ASSERT(FALSE);
 		}
 		//find middle of side 2
 		S2 = (m_pNode[m_pPanel[p].m_iTA] + m_pNode[m_pPanel[p].m_iTB])/2.0 - m_pPanel[p].CollPt;

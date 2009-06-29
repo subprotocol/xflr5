@@ -468,7 +468,7 @@ bool LLTAnalysisDlg::ReLoop()
 	str = "Initializing analysis...\r\n";
 	UpdateOutput(str);
 
-	if(!m_pWing->LLTInitialize()) return FALSE;
+	if(!m_pWing->LLTInitialize()) return false;
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);

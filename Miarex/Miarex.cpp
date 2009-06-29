@@ -116,7 +116,6 @@ QMiarex::QMiarex(QWidget *parent)
 	//construct evrything
 	pi = 3.141592654;
 
-
 	m_pMainFrame  = NULL;
 	m_pXFile      = NULL;
 	m_pPanelDlg   = NULL;
@@ -463,6 +462,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bLogFile           = false;
 	m_bHalfWing          = false;
 	m_bTransGraph        = true;
+	m_bFoilNames         = false;
 //	m_bIsPrinting        = false;
 	m_bCurWOppOnly       = true;
 	m_bStoreWOpp         = true;
@@ -523,11 +523,11 @@ QMiarex::QMiarex(QWidget *parent)
 	memset(MatIn, 0, 16*sizeof(double));
 	memset(MatOut, 0, 16*sizeof(double));
 
-	m_ArcBall.m_pOffx    = &m_UFOOffset.x;
-	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
-	m_ArcBall.m_pTransx  = &m_glViewportTrans.x;
-	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
-
+	m_ArcBall.m_pOffx     = &m_UFOOffset.x;
+	m_ArcBall.m_pOffy     = &m_UFOOffset.y;
+	m_ArcBall.m_pTransx   = &m_glViewportTrans.x;
+	m_ArcBall.m_pTransy   = &m_glViewportTrans.y;
+	m_ArcBall.m_pRect     = &m_rCltRect;
 
 	m_pVLMDlg = new VLMAnalysisDlg;
 	CWing::s_pVLMDlg     = m_pVLMDlg;
@@ -606,6 +606,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnOutline()));
 	connect(m_pctrlPanels, SIGNAL(clicked()), SLOT(OnPanels()));
 	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
+	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 
 	connect(m_pctrlKeepCpSection,  SIGNAL(clicked()), this, SLOT(OnKeepCpSection()));
@@ -3422,11 +3423,11 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 			painter.drawRect(x1-2, place.y() + (int)(1.*ypos*ny)-2, 4, 4);
 		}
 
-		str1 = QString("V=%1").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
+		str1 = QString("_V=%1").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 		GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 		str3 = QString("_a=%1").arg(m_pCurWOpp->m_Alpha,5,'f',2);
 
-		if(m_pCurWOpp->m_AnalysisType==1)  str4="-LLT";
+		if(m_pCurWOpp->m_AnalysisType==1)  str4="_LLT";
 		else if(m_pCurWOpp->m_AnalysisType==2)
 		{
 			if(m_pCurWOpp->m_bVLM1)	str4="_VLM1";
@@ -3472,7 +3473,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 				{
 					ny++;
 					painter.drawText(place.x() + (int)(1*LegendSize),
-									 place.y() + ypos*ny-(int)(ypos/3), str.at(k));
+									 place.y() + ypos*ny-(int)(ypos/2), str.at(k));
 				}
 				else
 				{
@@ -3480,7 +3481,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 					place.rx() += LegendWidth;
 					ny=1;
 					painter.drawText(place.x() + (int)(1*LegendSize),
-									 place.y() + ypos*ny-(int)(ypos/3), str.at(k));
+									 place.y() + ypos*ny-(int)(ypos/2), str.at(k));
 				}
 
 				bStarted = true;
@@ -3507,11 +3508,11 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 							painter.drawRect(x1-2, place.y() + (int)(1.*ypos*ny)-2, 4,4);
 						}
 
-						str1 = QString("V=%1").arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
+						str1 = QString("_V=%1").arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 						GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 						str3 = QString("_a=%1").arg(pWOpp->m_Alpha,5,'f',2);
 
-						if(pWOpp->m_AnalysisType==1) str4 ="-LLT";
+						if(pWOpp->m_AnalysisType==1) str4 ="_LLT";
 						else if(pWOpp->m_AnalysisType==2)
 						{
 							if(pWOpp->m_bVLM1)       str4 ="_VLM1";
@@ -3560,16 +3561,16 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 						str1 = QString("V=%1").arg(pPOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 						GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
-						str3 = QString("-a=%1").arg(pPOpp->m_Alpha,5,'f',2);
+						str3 = QString("_a=%1").arg(pPOpp->m_Alpha,5,'f',2);
 
 						if(pPOpp->m_WingWOpp.m_AnalysisType==2)
 						{
-							if(pPOpp->m_bVLM1)      str4 ="-VLM1";
-							else                    str4 ="-VLM2";
+							if(pPOpp->m_bVLM1)      str4 ="_VLM1";
+							else                    str4 ="_VLM2";
 						}
 						else if(pPOpp->m_WingWOpp.m_AnalysisType==3)
 						{
-							str4="-Panel";
+							str4="_Panel";
 							if(pPOpp->m_WingWOpp.m_bThinSurface) str4 += "_Thin";
 						}
 
@@ -5033,7 +5034,8 @@ void QMiarex::GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double
 		Alpha00 = 0.0;
 		Slope0 = 2.0 * pi *pi/180.0;
 	}
-	else{
+	else
+	{
 		pPolar1 = NULL;
 		pPolar2 = NULL;
 		for (i=0; i<m_poaPolar->size(); i++)
@@ -8712,6 +8714,50 @@ void QMiarex::GLDraw3D()
 		}
 	}
 }
+void QMiarex::GLDrawFoils()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+	int i,j;
+	CFoil *pFoil;
+	CWing *pWing[4];
+	pWing[0] = m_pCurWing;
+	pWing[1] = m_pCurWing2;
+	pWing[2] = m_pCurStab;
+	pWing[3] = m_pCurFin;
+
+
+	glColor3d(pMainFrame->m_TextColor.redF(), pMainFrame->m_TextColor.greenF(), pMainFrame->m_TextColor.blueF());
+
+	for(int i=0; i<4; i++)
+	{
+		if(pWing[i])
+		{
+			for(j=0; j<pWing[i]->m_NSurfaces; j++)
+			{
+				pFoil = pWing[i]->m_Surface[j].m_pFoilA;
+
+				if(pFoil)
+				{
+					pGLWidget->renderText(pWing[i]->m_Surface[j].m_TA.x, pWing[i]->m_Surface[j].m_TA.y, pWing[i]->m_Surface[j].m_TA.z,
+											pFoil->m_FoilName);
+				}
+			}
+			j = pWing[i]->m_NSurfaces-1;
+			pFoil = pWing[i]->m_Surface[j].m_pFoilB;
+			if(pFoil)
+			{
+				pGLWidget->renderText(pWing[i]->m_Surface[j].m_TB.x, pWing[i]->m_Surface[j].m_TB.y, pWing[i]->m_Surface[j].m_TB.z,
+										pFoil->m_FoilName);
+			}
+		}
+	}
+}
+
+
+
+
+
 
 
 void QMiarex::GLInverseMatrix()
@@ -8824,6 +8870,7 @@ void QMiarex::GLRenderView()
 		gluSphere(quadric,.5,40,40);*/
 
 		GLCallViewLists();
+		if(m_bFoilNames) GLDrawFoils();
 	}
 	glPopMatrix();
 
@@ -12340,6 +12387,12 @@ void QMiarex::OnFinCurve()
 	UpdateView();
 }
 
+
+void QMiarex::OnFoilNames()
+{
+	m_bFoilNames = m_pctrlFoilNames->isChecked();
+	UpdateView();
+}
 
 void QMiarex::OnFourWingGraphs()
 {
@@ -16269,6 +16322,7 @@ void QMiarex::SetupLayout()
 	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
 	m_pctrlOutline    = new QCheckBox(tr("Outline"));
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
+	m_pctrlFoilNames  = new QCheckBox("Foil Names");
 	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
@@ -16276,12 +16330,13 @@ void QMiarex::SetupLayout()
 	m_pctrlOutline->setSizePolicy(szPolicyMinimum);
 	m_pctrlPanels->setSizePolicy(szPolicyMinimum);
 	m_pctrlVortices->setSizePolicy(szPolicyMinimum);
+	m_pctrlFoilNames->setSizePolicy(szPolicyMinimum);
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
 	ThreeDParams->addWidget(m_pctrlLight, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
 	ThreeDParams->addWidget(m_pctrlPanels, 3,1);
-	ThreeDParams->addWidget(m_pctrlVortices, 3,2);
+	ThreeDParams->addWidget(m_pctrlFoilNames, 3,2);
 
 	QGridLayout *ThreeDView = new QGridLayout;
 	m_pctrlX          = new QPushButton("X");

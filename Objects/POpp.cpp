@@ -22,7 +22,7 @@
 #include <QtDebug>
 
 #include "POpp.h"
-#include "Globals.h"
+#include "../Globals.h"
 
 
 

@@ -25,8 +25,8 @@
 #include <QDialog>
 #include <QPushButton>
 
-#include "Objects/Polar.h"
-#include "Objects/WPolar.h"
+#include "../Objects/Polar.h"
+#include "../Objects/WPolar.h"
 
 
 class EditPlrDlg : public QDialog
@@ -37,7 +37,7 @@ class EditPlrDlg : public QDialog
 	friend class QMiarex;
 
 public:
-    EditPlrDlg();
+	EditPlrDlg();
 	void InitDialog();
 
 private slots:

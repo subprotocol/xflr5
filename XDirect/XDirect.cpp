@@ -28,7 +28,7 @@
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
 #include "../Misc/PolarFilterDlg.h"
-#include "Misc/RenameDlg.h"
+#include "../Misc/RenameDlg.h"
 #include "XDirect.h"
 #include "XFoilAnalysisDlg.h"
 #include "FoilPolarDlg.h"
@@ -3568,6 +3568,7 @@ void QXDirect::OnResetCurPolar()
 
 	if(m_bPolar) CreatePolarCurves();
 	else         CreateOppCurves();
+	UpdateView();
 
 }
 

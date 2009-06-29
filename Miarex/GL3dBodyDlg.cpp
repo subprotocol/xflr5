@@ -20,20 +20,19 @@
 *****************************************************************************/
   
 #include "../MainFrame.h"
-#include "../Globals.h" 
+#include "../GLWidget.h"
+#include "../Globals.h"
 #include "../Misc/LinePickerDlg.h"
 #include "BodyTransDlg.h"
 #include "Miarex.h"
 #include "BodyScaleDlg.h"
 #include "GL3dBodyDlg.h"
-#include "GLWidget.h" 
 #include "GLLightDlg.h"
-#include <QDesktopWidget>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include <QtDebug>
+
 #include <math.h>
 
 #define VLMCTRLPTS          1250
@@ -145,6 +144,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
 	m_ArcBall.m_pTransx  = &m_glViewportTrans.x;
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
+	m_ArcBall.m_pRect    = &m_rCltRect;
 
 
 	m_pInsertPoint      = new QAction("Insert", this);
@@ -475,7 +475,6 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 		pFrame = pBody->m_Frame+i;
 		for(j=0;j<pFrame->m_NPoints; j++)
 		{
-//			if(pFrame->m_NPoints != pBody->m_NSideLines) ASSERT(FALSE);
 
 			rightpts[l+0]= (GLfloat)(pBody->m_FramePosition[i].x);
 			rightpts[l+1]= (GLfloat)pFrame->m_Point[j].y;
@@ -491,7 +490,6 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 		pFrame = pBody->m_Frame+i;
 		for(j=pFrame->m_NPoints-1;j>=0; j--)
 		{
-//			if(pFrame->m_NPoints != pBody->m_NSideLines) ASSERT(FALSE);
 
 			leftpts[l+0]=  (GLfloat)(pBody->m_FramePosition[i].x);
 			leftpts[l+1]= -(GLfloat)pFrame->m_Point[j].y;
@@ -3297,7 +3295,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 				m_pctrlPointTable->selectRow(CFrame::s_iSelect);
 			}
 		}
-		if(m_bTrans)	m_pglWidget->setCursor(Qt::ClosedHandCursor);
+		if(m_bTrans && !bCtrl)	m_pglWidget->setCursor(Qt::ClosedHandCursor);
 
 	}
 	
@@ -4407,6 +4405,7 @@ void GL3dBodyDlg::SetupLayout()
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 5;
 	m_pglWidget->setMinimumHeight(400);
+	m_ArcBall.m_pGLWidget = m_pglWidget;
 
 	QGridLayout *ThreeDParams = new QGridLayout;
 	m_pctrlAxes       = new QCheckBox("Axes");

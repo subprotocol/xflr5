@@ -21,7 +21,7 @@
 
 #include "Plane.h"
 #include "../Miarex/Miarex.h"
-#include "Globals.h"
+#include "../Globals.h"
 #include <math.h>
 
 void*	CPlane::s_pMainFrame;

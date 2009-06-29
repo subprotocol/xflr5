@@ -31,7 +31,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
-#include "GLWidget.h"
+#include "../GLWidget.h"
 #include "ArcBall.h"
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"

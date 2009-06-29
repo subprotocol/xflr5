@@ -21,17 +21,16 @@
   
 #include "../MainFrame.h" 
 #include "../Globals.h" 
+#include "../GLWidget.h"
 #include "Miarex.h"
 #include "GL3dWingDlg.h"
-#include "GLWidget.h" 
 #include "GLLightDlg.h"
+#include "WingScaleDlg.h"
 #include <QDesktopWidget>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include "WingScaleDlg.h"
-#include <QtDebug>
 #include <math.h>
 
 #define WINGGEOMETRY        1400
@@ -115,6 +114,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
 	m_ArcBall.m_pTransx  = &m_glViewportTrans.x;
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
+	m_ArcBall.m_pRect    = &m_rCltRect;
 
 
 //	m_pSetupLight    = new QAction("Light Setup", this);
@@ -2096,8 +2096,6 @@ void GL3dWingDlg::OnSetupLight()
 
 void GL3dWingDlg::OnScaleWing()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	WingScaleDlg dlg;
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.InitDialog(m_pWing->m_Span, m_pWing->m_TChord[0], m_pWing->GetAverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
@@ -2557,6 +2555,7 @@ void GL3dWingDlg::SetupLayout()
 
 	m_pglWidget = new GLWidget(this);
 	m_pglWidget->m_iView = 7;
+	m_ArcBall.m_pGLWidget = m_pglWidget;
 
 /*_____________Start Top Layout Here____________*/
 	QVBoxLayout *DefLayout = new QVBoxLayout;
@@ -2742,7 +2741,6 @@ void GL3dWingDlg::SetupLayout()
 	QGridLayout *ThreeDParams = new QGridLayout;
 	m_pctrlAxes       = new QCheckBox("Axes");
 	m_pctrlLight      = new QCheckBox("Light");
-	m_pctrlSetupLight = new QPushButton("Setup Light");
 	m_pctrlSurfaces   = new QCheckBox("Surfaces");
 	m_pctrlOutline    = new QCheckBox("Outline");
 	m_pctrlPanels     = new QCheckBox("Panels");
@@ -2757,8 +2755,7 @@ void GL3dWingDlg::SetupLayout()
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
 	ThreeDParams->addWidget(m_pctrlLight, 3,1);
-	ThreeDParams->addWidget(m_pctrlSetupLight, 3,2);
-	ThreeDParams->addWidget(m_pctrlFoilNames, 4,1,1,2);
+	ThreeDParams->addWidget(m_pctrlFoilNames, 3,2);
 
 	m_pctrlX          = new QPushButton("X");
 	m_pctrlY          = new QPushButton("Y");
@@ -2800,8 +2797,10 @@ void GL3dWingDlg::SetupLayout()
 	QHBoxLayout *WingModCommands = new QHBoxLayout;
 	m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
 	m_pctrlScaleWing    = new QPushButton(tr("Scale Wing"));
+	m_pctrlSetupLight = new QPushButton("Setup Light");
 	WingModCommands->addWidget(m_pctrlResetMesh);
 	WingModCommands->addWidget(m_pctrlScaleWing);
+	WingModCommands->addWidget(m_pctrlSetupLight);
 
 
 

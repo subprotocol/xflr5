@@ -21,6 +21,7 @@
 *****************************************************************************/
 
 
+#include "../GLWidget.h"
 #include "ArcBall.h"
 #include <QtOpenGL>
 #include "math.h"
@@ -28,20 +29,20 @@
 
 ArcBall::ArcBall(void)
 {
-//	m_pGLScale = NULL;
-	m_pOffx = NULL;
-	m_pOffy = NULL;
-	m_pTransx = NULL;
-	m_pTransy = NULL;
+	m_pGLWidget = NULL;
+	m_pOffx     = NULL;
+	m_pOffy     = NULL;
+	m_pTransx   = NULL;
+	m_pTransy   = NULL;
+	m_pRect     = NULL;
 
 	pi = 3.141592654;
 	angle = 0.0;
 	Quat.a  = 0.0;
-	Quat.qx = 0.0;
-	Quat.qy = 0.0;
-	Quat.qz = 0.0;
 
-	ax = 0.0; ay = 0.0; az = 0.0;
+	Quat.qx = Quat.qy = Quat.qz = 0.0;
+
+	ax = ay = az = 0.0;
 
 	ab_quat[0]	= -0.65987748f;
 	ab_quat[1]	=  0.38526487f;
@@ -134,7 +135,7 @@ void ArcBall::Move(int mx, int my)
 {
 	if(ab_planar)
 	{
-		PlanarCoords((double)mx,(double)my, ab_curr);
+		PlanarCoords(mx,my, ab_curr);
 		if(ab_curr == ab_start) return;
 
 		// d is motion since the last position
@@ -186,18 +187,6 @@ void ArcBall::Move(int mx, int my)
 }
 
 
-// get intersection with plane for "trackball" style rotation
-void ArcBall::PlanarCoords(double mx, double my, CVector &V)
-{
-	gluUnProject(mx,my,0,ab_glm,ab_glp,ab_glv,&ax,&ay,&az);
-	m.Set(ax- ab_eye.x, ay- ab_eye.y, az- ab_eye.z);
-	// intersect the point with the trackball plane
-	t = (ab_planedist - ab_zoom)*1.0 / (ab_eyedir.dot(m));
-	d = ab_eye + m*t;
-
-	V.Set(d.dot(ab_up),d.dot(ab_out),0.0);
-}
-
 
 // reset the rotation matrix
 void ArcBall::QuatIdentity(float* q)
@@ -208,6 +197,7 @@ void ArcBall::QuatIdentity(float* q)
 	q[12]=0; q[13]=0; q[14]=0; q[15]=1;
 }
 
+
 // copy a rotation matrix
 void ArcBall::QuatCopy(float* dst, float* src)
 {
@@ -215,6 +205,7 @@ void ArcBall::QuatCopy(float* dst, float* src)
 	dst[4]=src[4]; dst[5]=src[5]; dst[6] =src[6];
 	dst[8]=src[8]; dst[9]=src[9]; dst[10]=src[10];
 }
+
 
 // convert the quaternion into a rotation matrix
 void ArcBall::QuattoMatrix(float* q, Quaternion Qt)
@@ -264,11 +255,13 @@ void ArcBall::Reset()
 	QuatIdentity(ab_last);
 }
 
+
 // affect the arcball's orientation on openGL
 void ArcBall::Rotate()
 {
 	glMultMatrixf(ab_quat);
 }
+
 
 void ArcBall::RotateCrossPoint()
 {
@@ -279,17 +272,9 @@ void ArcBall::RotateCrossPoint()
 	cosa2  = sqrt((1.0 + cosa)*0.5);
 	angle = 2.0*acos(cosa2)*180.0/pi;
 
-
 	p = aa * ab_curr;
 	p.Normalize();
-
-//	p *=sina2;
-//	Quat.Set(cosa2, p.x, p.y, p.z);
-
-//	QuattoMatrix(ab_crosspoint, Quat);
-//	glMultMatrixf(ab_crosspoint); 
 }
-
 
 
 void ArcBall::SetQuat(Quaternion Qt)
@@ -304,6 +289,7 @@ void ArcBall::SetQuat(Quaternion Qt)
 	QuattoMatrix(ab_quat, Quat);
 }
 
+
 void ArcBall::SetQuat(double r, double qx, double qy, double qz)
 {
 	if(fabs(r)<=1.0) angle = 2.0*acos(r) *  180.0/pi;
@@ -315,7 +301,6 @@ void ArcBall::SetQuat(double r, double qx, double qy, double qz)
 
 	QuattoMatrix(ab_quat, Quat);
 }
-
 
 
 void ArcBall::SetZoom(double radius, CVector eye, CVector up)
@@ -340,31 +325,31 @@ void ArcBall::SetZoom(double radius, CVector eye, CVector up)
 }
 
 
-void ArcBall::SphereCoords(double mx, double my, CVector &V)
+void ArcBall::PlanarCoords(int const &mx, int const &my, CVector &V)
+{
+//	gluUnProject(mx,my,0,ab_glm,ab_glp,ab_glv,&ax,&ay,&az);
+
+	ClientToGL(mx, my, ax, ay);
+
+	m.Set(ax- ab_eye.x, ay- ab_eye.y, az- ab_eye.z);
+	// intersect the point with the trackball plane
+	t = (ab_planedist - ab_zoom)*1.0 / (ab_eyedir.dot(m));
+	d = ab_eye + m*t;
+
+	V.Set(d.dot(ab_up),d.dot(ab_out),0.0);
+}
+
+
+void ArcBall::SphereCoords(int const &mx, int const &my, CVector &V)
 {
 	// find the intersection with the sphere
-	gluUnProject(mx, my, 0.0,
-				 ab_glm, ab_glp, ab_glv,
-				 &ax,&ay,&az);
+//	gluUnProject(mx, my, 0.0, ab_glm, ab_glp, ab_glv, &ax,&ay);
 
-//	ax -= *m_pOffx - *m_pTransx;
-//	ay -= *m_pOffy + *m_pTransy;
+	ClientToGL(mx, my, ax, ay);
+
 	ax -= *m_pOffx ;
 	ay -= *m_pOffy ;
-/*	m.Set(ax-ab_eye.x, ay-ab_eye.y, az-ab_eye.z);
 
-	// mouse position represents ray: eye + t*m
-	// intersecting with a sphere centered at the origin
-	a = m.x*m.x+m.y*m.y+m.z*m.z;
-	b = ab_eye.dot(m);
-	delta = (b*b) - a*(ab_zoom2 - ab_sphere2);
-	if(delta <= 0.0)
-		return EdgeCoords(m);
-	t = (-b - sqrt(delta)) / a;
-
-	sc = ab_eye+(m*t);*/
-
-	//more intuitive with ray parallel to z-axis in ortho frustrum
 	if(ab_sphere2>ax*ax+ay*ay) V.Set(ax,ay,sqrt(ab_sphere2-ax*ax-ay*ay));
 	else                       V.Set(ax,ay,0.0);
 //	else return EdgeCoords(ax, ay);
@@ -374,27 +359,41 @@ void ArcBall::SphereCoords(double mx, double my, CVector &V)
 
 
 
-
 // begin arcball rotation
 void ArcBall::Start(int mx, int my)
 {
 	// saves a copy of the current rotation for comparison
 	QuatCopy(ab_last,ab_quat);
 	if(ab_planar)
-		PlanarCoords((GLdouble)mx,(GLdouble)my, ab_start);
+		PlanarCoords(mx, my, ab_start);
 	else
-		SphereCoords((GLdouble)mx,(GLdouble)my, ab_start);
+		SphereCoords(mx, my, ab_start);
 	ab_curr = ab_start;
 }
 
 
 
+void ArcBall::ClientToGL(int const &x, int const &y, double &glx, double &gly)
+{
+	double h2, w2;
 
+	if(!m_pGLWidget) return;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 
+	h2 = (double)pGLWidget->m_rCltRect.height() /2.0;
+	w2 = (double)pGLWidget->m_rCltRect.width()  /2.0;
 
-
-
-
+	if(w2>h2)
+	{
+		glx = ((double)x - w2) / w2;
+		gly = ((double)y - h2) / w2;
+	}
+	else
+	{
+		glx = ((double)x - w2) / h2;
+		gly = ((double)y - h2) / h2;
+	}
+}
 
 
 

@@ -26,7 +26,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
-#include "Misc/FloatEdit.h"
+#include "../Misc/FloatEdit.h"
 
 class WAdvancedDlg : public QDialog
 {

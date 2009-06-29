@@ -24,14 +24,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <QtCore>
 #include "../MainFrame.h"
 #include "Foil.h"
 #include "Spline.h"
 #include <math.h>
-#include "Globals.h"
+#include "../Globals.h"
 #include <QTextStream>
-#include <QtOpenGL>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

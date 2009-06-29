@@ -613,7 +613,7 @@ bool CBody::ImportDefinition()
 	m_BodyName = strong.trimmed();
 	//Header data
 
-	bRead = TRUE;
+	bRead = true;
 	while (bRead)
 	{
 		bRead  = ReadAVLString(in, Line, strong);

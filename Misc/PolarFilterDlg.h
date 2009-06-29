@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	TwoDPanelDlg Class
-	Copyright (C) 2008-2008 Andre Deperrois xflr5@yahoo.com
+	PolarFilterDlg Class
+	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -20,59 +20,47 @@
 *****************************************************************************/
 
 
-#ifndef TWODPANELDLG_H
-#define TWODPANELDLG_H
+#ifndef POLARFILTERDLG_H
+#define POLARFILTERDLG_H
 
-#include <QtGui>
 #include <QDialog>
-#include "../Misc/FloatEdit.h"
+#include <QCheckBox>
+#include <QPushButton>
+#include <QtGui>
 
 
-class TwoDPanelDlg : public QDialog
+class PolarFilterDlg : public QDialog
 {
 	Q_OBJECT
-	friend class QAFoil;
+
+	friend class QMiarex;
 	friend class QXDirect;
 
-private slots:
-	void OnApply();
-	void OnOK();
-	void OnChanged();
-
 public:
-	TwoDPanelDlg();
-
-	static void *s_pXFoil;
-
+	PolarFilterDlg(void *pParent=NULL);
 	void InitDialog();
+
+private slots:
+	void OnOK();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
-	void ReadParams();
 
-	QPushButton *OKButton, *CancelButton, *ApplyButton;
-
-	QLineEdit  *m_pctrlNPanels;
-	FloatEdit *m_pctrlCVpar,  *m_pctrlCTErat, *m_pctrlCTRrat;
-	FloatEdit *m_pctrlXsRef1, *m_pctrlXsRef2, *m_pctrlXpRef1, *m_pctrlXpRef2;
-
-	bool m_bApplied;
-	bool m_bModified;
-
-	int npan;
-	double cvpar;
-	double cterat;
-	double ctrrat;
-	double xsref1;
-	double xsref2;
-	double xpref1;
-	double xpref2;
-
-	void *m_pBufferFoil;
-	void *m_pMemFoil;
-	void *m_pXDirect;
-	void *m_pAFoil;
+	QPushButton *OKButton;
+	QCheckBox *m_pctrlType1, *m_pctrlType2, *m_pctrlType3, *m_pctrlType4, *m_pctrlType5, *m_pctrlType6;
+	bool m_bType1, m_bType2, m_bType3, m_bType4, m_bType5, m_bType6;
+	bool m_bMiarex;
 };
 
-#endif // TWODPANELDLG_H
+
+#endif // POLARFILTERDLG_H
+
+
+
+
+
+
+
+
+

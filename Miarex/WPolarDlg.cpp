@@ -38,7 +38,7 @@ WPolarDlg::WPolarDlg()
 
 	m_WPolarName = "WPolar Name";
 
-	m_bAutoName = TRUE;
+	m_bAutoName = true;
 
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 1.0;
@@ -145,7 +145,7 @@ void WPolarDlg::EnableControls()
 			break;
 		}
 	}
-	if(!m_pPlane) m_pctrlMethod1->setEnabled(TRUE);
+	if(!m_pPlane) m_pctrlMethod1->setEnabled(true);
 
 	if (m_pctrlMethod1->isChecked())
 	{
@@ -191,7 +191,7 @@ void WPolarDlg::InitDialog()
 	m_pctrlNu->setFont(SymbolFont);
 
 
-	m_bAutoName = TRUE;
+	m_bAutoName = true;
 	m_pctrlAutoName->setChecked(true);
 
 	m_pctrlQInf->SetValue(m_QInf);
@@ -311,9 +311,9 @@ void WPolarDlg::InitDialog()
 	OnMethod();
 
 
-//	m_pctrlThinSurfaces->setEnabled(FALSE);
-//	if(m_bThinSurfaces)	m_pctrlThinSurfaces.SetCheck(TRUE);
-//	else                m_pctrlThinSurfaces.SetCheck(FALSE);
+//	m_pctrlThinSurfaces->setEnabled(false);
+//	if(m_bThinSurfaces)	m_pctrlThinSurfaces.SetCheck(true);
+//	else                m_pctrlThinSurfaces.SetCheck(false);
 
 //	m_WakeParamsdlg.m_NXWakePanels    = m_NXWakePanels;
 //	m_WakeParamsdlg.m_TotalWakeLength = m_TotalWakeLength;
@@ -423,7 +423,7 @@ void WPolarDlg::OnMethod()
 		m_pctrlBeta->setEnabled(false);
 		m_pctrlGroundEffect->setEnabled(false);
 		m_pctrlHeight->setEnabled(false);
-//		m_pctrlThinSurfaces.SetCheck(TRUE);
+//		m_pctrlThinSurfaces.SetCheck(true);
 //		m_pctrlThinSurfaces.setEnabled(false);
 
 		m_pctrlWakeRollUp->setEnabled(false);
@@ -450,9 +450,9 @@ void WPolarDlg::OnMethod()
 		m_pctrlGroundEffect->setEnabled(true);
 		m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked());
 
-//		m_pctrlWakeRollUp.setEnabled(TRUE);
-//		if(m_bWakeRollUp)	m_pctrlWakeParams.setEnabled(TRUE);
-//		else				m_pctrlWakeParams.setEnabled(FALSE);
+//		m_pctrlWakeRollUp.setEnabled(true);
+//		if(m_bWakeRollUp)	m_pctrlWakeParams.setEnabled(true);
+//		else				m_pctrlWakeParams.setEnabled(false);
 
 	}
 	EnableControls();

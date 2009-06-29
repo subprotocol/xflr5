@@ -62,6 +62,7 @@
 
 #include "../Objects/CVector.h"
 #include "../Objects/Quaternion.h"
+#include <QRect>
 
 class ArcBall
 {
@@ -77,14 +78,15 @@ public:
 	void Start(int mx, int my);
 	void Move(int mx, int my);
 	void GetMatrix();
-	void SphereCoords(double mx, double my, CVector &V);// find the intersection with the sphere
-	void PlanarCoords(double mx, double my, CVector &V);// get intersection with plane for "trackball" style rotation
+	void SphereCoords(int const &mx, int const &my, CVector &V);// find the intersection with the sphere
+	void PlanarCoords(int const &mx, int const &my, CVector &V);// get intersection with plane for "trackball" style rotation
 	void EdgeCoords(CVector m, CVector &V);	// find the intersection with the plane through the visible edge
 	void RotateCrossPoint();
 	void QuatIdentity(float* q);	// reset the rotation matrix
 	void QuatCopy(float* dst, float* src);// copy a rotation matrix
 	void QuattoMatrix(float* q, Quaternion Qt);// convert the quaternion into a rotation matrix
 	void QuatNext(float* dest, float* left, float* right);// multiply two rotation matrices
+	void ClientToGL(int const &x, int const &y, double &glx, double &gly);
 
 	float ab_quat[16];
 	float ab_last[16];
@@ -104,6 +106,8 @@ public:
 	bool ab_planar;
 	double ab_planedist;
 
+	void *m_pGLWidget;
+
 	CVector ab_start;
 	CVector ab_curr;
 	CVector ab_eye;
@@ -121,6 +125,7 @@ public:
 	//	object offset
 	double *m_pOffx, *m_pOffy;
 	double *m_pTransx, *m_pTransy;
+	QRect *m_pRect;
 
 	//avoid lengthy recurring memory allocations
 	CVector aa, c, m, ec, sc, p, d;

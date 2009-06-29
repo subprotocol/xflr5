@@ -27,7 +27,7 @@
 #define OPPOINT_H
 
 #include <QtGui>
-#include "Params.h"
+#include "../Params.h"
 
 class OpPoint
 {

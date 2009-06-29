@@ -789,6 +789,7 @@ void	MainFrame::CreateDockWindows()
 	pMiarex->m_pMainFrame    = this;
 	pMiarex->m_p2DWidget = m_p2DWidget;
 	pMiarex->m_pGLWidget = m_pGLWidget;
+	pMiarex->m_ArcBall.m_pGLWidget = m_pGLWidget;
 	pMiarex->m_poaBody   = &m_oaBody;
 	pMiarex->m_poaPlane  = &m_oaPlane;
 	pMiarex->m_poaWing   = &m_oaWing;

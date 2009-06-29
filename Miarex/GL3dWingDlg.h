@@ -32,7 +32,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
-#include "GLWidget.h"
+#include "../GLWidget.h"
 #include "ArcBall.h"
 #include "WingDelegate.h"
 #include "../Misc/FloatEdit.h"
