@@ -50,7 +50,18 @@ Licence :
 
 QFLR5 v0.01 Beta June 20th 2009
 	- First release
-
+        - Also runs on Linux and MacOSX.
+        - To compile under Ubuntu/Debian Linux, please do the following:
+          go to the directory, type dpkg-buildpackage -rfakeroot.
+        - To compile manually on any Linux distro, please follow the following steps:
+          1. qmake
+          2. make
+          3. sudo make install 
+        - To compile on MacOSX, please follow the following steps:
+          1. qmake -project
+          2. qmake -spec macx-g++
+          3. make -j3
+          4. sudo make install
 
 v4.17 June 1st, 2009
 	- Corrected the bug which prevented the definition of a control polar

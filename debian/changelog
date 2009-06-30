@@ -1,3 +1,9 @@
+qflr5 (0.01b-ubuntu1) jaunty; urgency=low
+
+  * 0.01 beta. First official release for Debian/Ubuntu
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Tue, 30 Jun 2009 12:27:36 +0300
+
 qflr5 (5.0~svn103-1) jaunty; urgency=low
   
   * Ubuntu package for the for the QFLR5.
