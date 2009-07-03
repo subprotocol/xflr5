@@ -191,7 +191,6 @@ void MainFrame::AddFoil(CFoil *pFoil)
 
 }
 
-
 CPolar* MainFrame::AddPolar(CPolar *pPolar)
 {
     if(!pPolar) return NULL;
@@ -3193,7 +3192,15 @@ void MainFrame::OnExportCurGraph()
 
 void MainFrame::OnGuidelines()
 {
-	QString FileName = qApp->applicationDirPath() + "/Guidelines.pdf" ;
+        QDir dir(qApp->applicationDirPath());
+#ifdef Q_WS_MAC
+        dir.cdUp();
+        dir.cdUp();
+        dir.cdUp();
+        QString FileName = dir.absoluteFilePath("Guidelines.pdf");
+#else
+        QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
 

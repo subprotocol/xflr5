@@ -22,12 +22,13 @@
 
 
 #include <QtGui/QApplication>
+#include "QFLR5Application.h"
 #include "MainFrame.h"
 #include "Misc/TranslatorDlg.h"
 
 int main(int argc, char *argv[])
 {
-	QApplication app(argc, argv);
+        QFLR5Application app(argc, argv);
 
 	QString StyleName;
 	QString LanguageName;
@@ -66,6 +67,7 @@ int main(int argc, char *argv[])
 
 
 	MainFrame w;
+        app.setQFLR5MainWindow(&w);
 
 	w.resize(sz);
 	w.move(pt);

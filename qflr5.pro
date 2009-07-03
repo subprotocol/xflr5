@@ -2,8 +2,10 @@
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
 QT += opengl
-TARGET = qflr5
+TARGET = QFLR5
 TEMPLATE = app
+CONFIG += x86 \
+    ppc
 SOURCES += MainFrame.cpp \
     XDirect/XFoil.cpp \
     XDirect/XFoilAnalysisDlg.cpp \
@@ -101,7 +103,8 @@ SOURCES += MainFrame.cpp \
     XDirect/ManageFoilsDlg.cpp \
     Miarex/ManageUFOsDlg.cpp \
     Miarex/UFOTableDelegate.cpp \
-    Misc/PolarFilterDlg.cpp
+    Misc/PolarFilterDlg.cpp \
+    QFLR5Application.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -199,7 +202,8 @@ HEADERS += MainFrame.h \
     XDirect/ManageFoilsDlg.h \
     Miarex/ManageUFOsDlg.h \
     Miarex/UFOTableDelegate.h \
-    Misc/PolarFilterDlg.h
+    Misc/PolarFilterDlg.h \
+    QFLR5Application.h
 TRANSLATIONS = qflr5_fr.ts
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
@@ -214,3 +218,10 @@ unix {
     INSTALLS += target
     target.path = $$BINDIR
 }
+mac { 
+    QMAKE_INFO_PLIST = mac/Info.plist
+    ICON = mac/qflr5.icns
+}
+OTHER_FILES += mac/Info.plist \
+    mac/Info.plist \
+    mac/Info.plist

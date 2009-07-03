@@ -191,6 +191,7 @@ private:
 	void updateRecentFileActions();
 
 
+
 /*___________________________________________Variables_______________________________*/
 public:
 	bool m_bMaximized;
