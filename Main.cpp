@@ -28,7 +28,7 @@
 
 int main(int argc, char *argv[])
 {
-        QFLR5Application app(argc, argv);
+	QFLR5Application app(argc, argv);
 
 	QString StyleName;
 	QString LanguageName;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 
 	MainFrame w;
-        app.setQFLR5MainWindow(&w);
+	app.setQFLR5MainWindow(&w);
 
 	w.resize(sz);
 	w.move(pt);

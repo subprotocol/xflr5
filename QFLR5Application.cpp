@@ -29,20 +29,23 @@ QFLR5Application::QFLR5Application(int &argc, char**& argv) : QApplication(argc,
 
 bool QFLR5Application::event(QEvent *event)
 {
-    switch (event->type()) {
-    case QEvent::FileOpen:
-        int iApp = this->mainFrame->LoadXFLR5File(static_cast<QFileOpenEvent *>(
-                event)->file());
-        if (iApp == MIAREX)             this->mainFrame->OnMiarex();
-        else if (iApp == XFOILANALYSIS) this->mainFrame->OnXDirect();
+	int iApp;
+	switch (event->type())
+	{
+		case QEvent::FileOpen:
+		{
+			iApp = this->mainFrame->LoadXFLR5File(static_cast<QFileOpenEvent *>(event)->file());
+			if (iApp == MIAREX)             this->mainFrame->OnMiarex();
+			else if (iApp == XFOILANALYSIS) this->mainFrame->OnXDirect();
 
-        return true;
+			return true;
+		}
     default:
         return QApplication::event(event);
     }
 }
 
 void QFLR5Application::setQFLR5MainWindow(MainFrame *mf)
-    {
-        this->mainFrame = mf;
-    }
+{
+	this->mainFrame = mf;
+}

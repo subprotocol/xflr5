@@ -48,7 +48,7 @@ Licence :
 
                        **************************
 
-QFLR5 v0.01 Beta June 20th 2009
+QFLR5 v0.01 Beta July 4th 2009
 	- First release
         - Also runs on Linux and MacOSX.
         - To compile under Ubuntu/Debian Linux, please do the following:
@@ -94,7 +94,7 @@ v4.14 December 30th, 2008 (limited release only)
 v4.13 December 6th, 2008
 	- Corrected a minor bug in Inverse design which prevented a second consecutive application of the spline
 	- Corrected a minor bug in the display of bodies imported from text files
-	- Set default coresize = 1µm minimum both in VLM and Panel methods
+	- Set default coresize = 1ï¿½m minimum both in VLM and Panel methods
 	- Switched to Trefftz plane integration for lift force in 3D Panel method --> impact on results
 	- Improved the export interface to AVL for planes and wings, including control surfaces
 	- Improved the interface for 3D cross section Cp display
@@ -423,7 +423,7 @@ v2.02 December 11th,2005  (Limited release only)
 
 v2.01 November 7th,2005 
 	Reverted to Trefftz plane analysis for induced drag calculations. 
-	cf. Guidelines Rev. §5-4-2 for detailed explanations.
+	cf. Guidelines Rev. ï¿½5-4-2 for detailed explanations.
 
 v2.006 November xxxth,2005 (Limited release only)
 	Added NCrit parameter in Batch Analysis from list
@@ -655,7 +655,7 @@ v1.17	April 18th,2004
 
 
 v1.16	March 26th,2004
-	Solved Bug in Animate() which mixed Öppoints from different foils
+	Solved Bug in Animate() which mixed ï¿½ppoints from different foils
 	Resized arrays in Direct Design 
 	Corrected and improved scaling of Foils' thickness and camber
 	Made minor enhancements and corrections

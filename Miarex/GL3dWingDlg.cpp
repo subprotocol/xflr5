@@ -63,7 +63,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 
 	m_iView      = 3;
 	m_iSection   = -1;
-	m_yMAC       = 0.0;
+//	m_yMAC       = 0.0;
 	m_GLList     = 0;
 
 	m_UFOOffset.Set( 0.0, 0.0, 0.0);
@@ -2045,7 +2045,6 @@ void GL3dWingDlg::OnOK()
 
 	m_pWing->ComputeGeometry();
 
-	m_bChanged = false;
 	accept();
 }
 
@@ -2505,7 +2504,7 @@ void GL3dWingDlg::SetWingData()
 	str = QString("%1").arg(m_pWing->m_MAChord*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlMAC->setText(str);
 
-	str = QString("%1").arg(m_yMAC*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_yMac*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlMACSpanPos->setText(str);
 
 	str = QString("%1").arg(m_pWing->m_AR,5,'f',2);
@@ -2515,9 +2514,8 @@ void GL3dWingDlg::SetWingData()
 	else                                         str = "Undefined";
 	m_pctrlTaperRatio->setText(str);
 
-	//TODO
-//	str = QString("%5.2f").arg(GetAverageSweep(),5,'f',2));
-//	m_pctrlSweep->SetWindowText(str);
+	str = QString("%1").arg(m_pWing->GetAverageSweep(),5,'f',2);
+	m_pctrlSweep->setText(str);
 
 	int VLMTotal=100;
 	VLMTotal = VLMGetPanelTotal();
@@ -2862,6 +2860,7 @@ void GL3dWingDlg::ShowContextMenu(QContextMenuEvent * event)
 void GL3dWingDlg::showEvent(QShowEvent *event)
 {
 //	InitDialog();
+	m_bChanged = false;
 	m_bResetglWing = true;
 	SetWingScale();
 	m_3DWingRect = m_pglWidget->geometry();

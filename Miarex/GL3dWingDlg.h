@@ -209,7 +209,7 @@ private:
 	int m_Precision[10];
 
 	double pi;
-	double m_yMAC;
+//	double m_yMAC;
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_ClipPlanePos;

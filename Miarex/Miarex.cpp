@@ -11949,6 +11949,7 @@ void QMiarex::OnEditUFO()
 		SetUFO();
 //		pMainFrame->UpdateWPolars();
 //		SetWPlr();
+		m_bResetglStream = true;
 		m_bIs2DScaleSet = false;
 		SetScale();
 		SetWGraphScale();
@@ -11959,6 +11960,10 @@ void QMiarex::OnEditUFO()
 	{
 		// restore original
 		m_pCurWing->Duplicate(pSaveWing);
+		m_pCurWing->CreateSurfaces(CVector(0.0,0.0,0.0), 0.0, 0.0);
+		for (int i=0; i<m_pCurWing->m_NSurfaces; i++)
+			m_pCurWing->m_Surface[i].SetSidePoints(NULL, 0.0, 0.0);
+
 		UpdateView();
 	}
 	delete pSaveWing; // clean up
@@ -11988,14 +11993,18 @@ void QMiarex::OnExportCurWOpp()
 	int iStrip,j,k,l,p, coef;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString filter =".csv";
-	QString FileName, DestFileName, OutString,sep,str, Format;
+	QString FileName, DestFileName, OutString, sep, str, strong, Format;
 	QFile DestFile;
 	int type = 1;
 
-	FileName = m_pCurWOpp->m_PlrName;
-	FileName.replace("/", " ");
+	strong = QString("a=%1_v=%2").arg(m_pCurWOpp->m_Alpha, 5,'f',2).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',2);
+	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+	strong = m_pCurWOpp->m_WingName+"_"+strong+str;
+
+	strong.replace(" ","");
+	strong.replace("/", "");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Wing OpPoint"),
-											pMainFrame->m_LastDirName + "/"+FileName,
+											pMainFrame->m_LastDirName +'/'+strong,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
 											&filter);
 
@@ -12014,7 +12023,7 @@ void QMiarex::OnExportCurWOpp()
 	if(type==1) sep = ""; else sep=",";
 
 
-	QString strOut, Header, strong;
+	QString strOut, Header;
 	out << pMainFrame->m_VersionName;
 	out << "\n\n";
 
