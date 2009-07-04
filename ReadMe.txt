@@ -1,4 +1,4 @@
-	
+﻿	
 *******************************************************************************
 
 
@@ -48,20 +48,13 @@ Licence :
 
                        **************************
 
-QFLR5 v0.01 Beta July 4th 2009
-	- First release
-        - Also runs on Linux and MacOSX.
-        - To compile under Ubuntu/Debian Linux, please do the following:
-          go to the directory, type dpkg-buildpackage -rfakeroot.
-        - To compile manually on any Linux distro, please follow the following steps:
-          1. qmake
-          2. make
-          3. sudo make install 
-        - To compile on MacOSX, please follow the following steps:
-          1. qmake -project
-          2. qmake -spec macx-g++
-          3. make -j3
-          4. sudo make install
+QFLR5 v0.01 Beta July 4th 2009 - first release
+	QFLR5 is a re-write of XFLR5 using the Qt4 libraries. 
+	The goal is to make the code cross-platform and available for Linux and Mac OS.
+	The current beta version offers 95% of functionnalities available in XFLR5, and does not provide any additional feature except for a different look and feel interface.
+	In the future, only this cross platform version will be supported.
+	Once it has reached a stable state, it will be released as XFLR5 v5.00
+
 
 v4.17 June 1st, 2009
 	- Corrected the bug which prevented the definition of a control polar
