@@ -16,10 +16,10 @@ Compilation instructions
           3. sudo make install 
 
         - To compile on MacOSX, please follow the following steps:
-          1. qmake -project
+          1. qmake -makefile
           2. qmake -spec macx-g++
           3. make -j3
-          4. sudo make install
+          4. ./mac/makedist	
 
 	- To compile on Windows, the easiest way is to download QtCreator from Trolltech.
 	  QtCreator comes with the MinGW compiler.
