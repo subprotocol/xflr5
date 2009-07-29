@@ -650,7 +650,8 @@ void PlaneDlg::reject()
 	if(m_bChanged)
 	{
 		QString strong = tr("Save the changes ?");
-		int Ans = QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		int Ans = QMessageBox::question(this, "Question", strong,
+										QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 		if (QMessageBox::Yes == Ans)
 		{
 			OnOK();

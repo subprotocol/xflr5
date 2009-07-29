@@ -2556,8 +2556,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 	m_GRm = m_GCm = 0.0;
 	m_GYm = m_IYm = m_VCm = m_VYm = 0.0;
-
-	for (m=0; m< m_NStation; m++)	m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
+	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * m_QInf /m_Viscosity;
 
 	bOutRe = bError = false;
 	m = p = nFlap = 0;

@@ -43,6 +43,7 @@ public:
 
 private:
 
+	void RenderText(int    const &x, int    const &y, QString const &strong, QFont const &font, QColor const &color);
 	void RenderText(double const &x, double const &y, QString const &strong, QFont const &font, QColor const &color);
 	void initializeGL();
 	void keyPressEvent(QKeyEvent *event);

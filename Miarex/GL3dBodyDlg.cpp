@@ -164,17 +164,17 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_pRedo->setStatusTip(tr("Restores the last cancelled modification made to the body"));
 	connect(m_pRedo, SIGNAL(triggered()), this, SLOT(OnRedo()));
 
-	ExportBodyGeom = new QAction(tr("Export Body Geometry to File"), this);
-	connect(ExportBodyGeom, SIGNAL(triggered()), this, SLOT(OnExportBodyGeom()));
+	m_pExportBodyGeom = new QAction(tr("Export Body Geometry to File"), this);
+	connect(m_pExportBodyGeom, SIGNAL(triggered()), this, SLOT(OnExportBodyGeom()));
 
-	ExportBodyDef = new QAction(tr("Export Body Definition to File"), this);
-	connect(ExportBodyDef, SIGNAL(triggered()), this, SLOT(OnExportBodyDef()));
+	m_pExportBodyDef = new QAction(tr("Export Body Definition to File"), this);
+	connect(m_pExportBodyDef, SIGNAL(triggered()), this, SLOT(OnExportBodyDef()));
 
-	ImportBodyDef = new QAction(tr("Import Body Definition from File"), this);
-	connect(ImportBodyDef, SIGNAL(triggered()), this, SLOT(OnImportBodyDef()));
+	m_pImportBodyDef = new QAction(tr("Import Body Definition from File"), this);
+	connect(m_pImportBodyDef, SIGNAL(triggered()), this, SLOT(OnImportBodyDef()));
 
-	TranslateBody = new QAction(tr("Translate Body"), this);
-	connect(TranslateBody, SIGNAL(triggered()), this, SLOT(OnTranslateBody()));
+	m_pTranslateBody = new QAction(tr("Translate"), this);
+	connect(m_pTranslateBody, SIGNAL(triggered()), this, SLOT(OnTranslateBody()));
 	SetupLayout();
 
 	connect(m_pInsertPoint, SIGNAL(triggered()), this, SLOT(OnInsert()));
@@ -204,6 +204,9 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pctrlBodyStyle,  SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
 
 	connect(m_pctrlBodyName,   SIGNAL(editingFinished()), this, SLOT(OnBodyName()));
+
+	connect(m_pctrlXDegree,    SIGNAL(activated(int)), this, SLOT(OnSelChangeXDegree(int)));
+	connect(m_pctrlHoopDegree,    SIGNAL(activated(int)), this, SLOT(OnSelChangeHoopDegree(int)));
 	setMouseTracking(true);
 }
 
@@ -1273,10 +1276,15 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 
 				glBegin(GL_QUADS);
 				{
-					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
-					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
-					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
-					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+//					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
+//					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
+//					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
+//					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+
+					P1 = pBody->m_Frame[j].m_Point[k];			P1.x = pBody->m_FramePosition[j].x;
+					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.x = pBody->m_FramePosition[j+1].x;
+					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.x = pBody->m_FramePosition[j+1].x;
+					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.x = pBody->m_FramePosition[j].x;
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -1343,10 +1351,16 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 				Tjp1.Set(pBody->m_FramePosition[j+1].x, 0.0, 0.0);
 
 				glBegin(GL_QUADS);
-					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
-					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
-					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
-					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+				{
+//					P1 = pBody->m_Frame[j].m_Point[k];			P1.Translate(Tj);
+//					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.Translate(Tjp1);
+//					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.Translate(Tjp1);
+//					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.Translate(Tj);
+
+					P1 = pBody->m_Frame[j].m_Point[k];			P1.x = pBody->m_FramePosition[j].x;
+					P2 = pBody->m_Frame[j+1].m_Point[k];		P2.x = pBody->m_FramePosition[j+1].x;
+					P3 = pBody->m_Frame[j+1].m_Point[k+1];		P3.x = pBody->m_FramePosition[j+1].x;
+					P4 = pBody->m_Frame[j].m_Point[k+1];		P4.x = pBody->m_FramePosition[j].x;
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -1357,9 +1371,10 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 					glVertex3d(P2.x, P2.y, P2.z);
 					glVertex3d(P3.x, P3.y, P3.z);
 					glVertex3d(P4.x, P4.y, P4.z);
-
+				}
 				glEnd();
 				glBegin(GL_QUADS);
+				{
 					//and symetric quad
 					P1.y = -P1.y;
 					P2.y = -P2.y;
@@ -1374,7 +1389,7 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 					glVertex3d(P3.x, P3.y, P3.z);
 					glVertex3d(P2.x, P2.y, P2.z);
 					glVertex3d(P1.x, P1.y, P1.z);
-
+				}
 				glEnd();
 			}
 		}
@@ -1444,8 +1459,6 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 	int i,k,style, width;
 
 	QColor color;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-//	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 
 	if(!m_pBody)
 	{
@@ -2490,8 +2503,6 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 
 	GetLengthUnit(strLengthUnit, pMainFrame->m_LengthUnit);
 
-//	double w = (double)m_rCltRect.width();
-
 //	glNewList(BODYLEGEND,GL_COMPILE);//create 2D Splines or Lines
 
 	//draw view rectangles
@@ -2761,7 +2772,7 @@ void GL3dBodyDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glBegin(GL_TRIANGLES);
-	glColor3ub(cr.redF(),cr.greenF(),cr.blueF());
+	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
 
 	double start_lat = -90;
 	double start_lon = 0.0;
@@ -2997,7 +3008,7 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			reject();
-			break;
+			return;
 		}
 		case Qt::Key_Control:
 		{
@@ -3019,11 +3030,6 @@ void GL3dBodyDlg::keyReleaseEvent(QKeyEvent *event)
 		{
 			m_bArcball = false;
 			UpdateView();
-			break;
-		}
-		case Qt::Key_Escape:
-		{
-			hide();
 			break;
 		}
 		default:
@@ -3842,6 +3848,42 @@ void GL3dBodyDlg::OnScaleBody()
 	}
 }
 
+void GL3dBodyDlg::OnSelChangeXDegree(int sel)
+{
+	if(!m_pBody) return;
+	if (sel <0) return;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->SetSaveState(false);
+
+	TakePicture();
+	StorePicture();
+
+	m_pBody->m_nxDegree = sel+1;
+	m_pBody->SetKnots();
+	m_bResetglBody   = true;
+	m_bResetglBody2D = true;
+	UpdateView();
+}
+
+
+void GL3dBodyDlg::OnSelChangeHoopDegree(int sel)
+{
+	if(!m_pBody) return;
+	if (sel <0) return;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->SetSaveState(false);
+
+	TakePicture();
+	StorePicture();
+
+	m_pBody->m_nhDegree = sel+1;
+	m_pBody->SetKnots();
+	m_bResetglBody   = true;
+	m_bResetglBody2D = true;
+	UpdateView();
+}
 
 
 void GL3dBodyDlg::OnSetupLight()
@@ -3973,7 +4015,7 @@ void GL3dBodyDlg::reject()
 	{
 		m_pBody->m_BodyName = m_pctrlBodyName->text();
 
-		int res = QMessageBox::question(window(), "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		int res = QMessageBox::question(this, "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 		if (QMessageBox::No == res)
 		{
 			m_pBody = NULL;
@@ -3984,10 +4026,10 @@ void GL3dBodyDlg::reject()
 		{
 			m_pBody = NULL;
 			done(QDialog::Accepted);
+			return;
 		}
 	}
-	else QDialog::reject();
-
+	done(QDialog::Rejected);
 }
 
 
@@ -4529,6 +4571,12 @@ void GL3dBodyDlg::SetupLayout()
 	FramePosLayout->addWidget(LabelFrame);
 	FramePosLayout->addWidget(m_pctrlFrameTable);
 //	FramePosLayout->addStretch(1);
+	m_pctrlFrameTable->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_pctrlFrameTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									   QAbstractItemView::DoubleClicked |
+									   QAbstractItemView::SelectedClicked |
+									   QAbstractItemView::EditKeyPressed);
 
 	QVBoxLayout * FramePointLayout = new QVBoxLayout;
 	m_pctrlPointTable = new QTableView;
@@ -4539,6 +4587,12 @@ void GL3dBodyDlg::SetupLayout()
 	FramePointLayout->addWidget(LabelPoints);
 	FramePointLayout->addWidget(m_pctrlPointTable);
 //	FramePointLayout->addStretch(1);
+	m_pctrlPointTable->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_pctrlPointTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_pctrlPointTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									   QAbstractItemView::DoubleClicked |
+									   QAbstractItemView::SelectedClicked |
+									   QAbstractItemView::EditKeyPressed);
 
 	QHBoxLayout *ActionButtons = new QHBoxLayout;
 	QPushButton *UndoButton = new QPushButton(QIcon(":/images/OnUndo.png"), tr("Undo"));
@@ -4551,11 +4605,11 @@ void GL3dBodyDlg::SetupLayout()
 	BodyMenu->addSeparator();
 	BodyMenu->addAction(m_pGrid);
 	BodyMenu->addSeparator();
-	BodyMenu->addAction(ImportBodyDef);
-	BodyMenu->addAction(ExportBodyDef);
-	BodyMenu->addAction(ExportBodyGeom);
+	BodyMenu->addAction(m_pImportBodyDef);
+	BodyMenu->addAction(m_pExportBodyDef);
+	BodyMenu->addAction(m_pExportBodyGeom);
 	BodyMenu->addSeparator();
-	BodyMenu->addAction(TranslateBody);
+	BodyMenu->addAction(m_pTranslateBody);
 	BodyMenu->addAction(m_pScaleBody);
 	BodyMenu->addSeparator();
 	MenuButton->setMenu(BodyMenu);
@@ -4666,6 +4720,8 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	QMenu *CtxMenu = new QMenu("Context Menu",this);
 	CtxMenu->addAction(m_pInsertPoint);
 	CtxMenu->addAction(m_pRemovePoint);
+	CtxMenu->addSeparator();
+	CtxMenu->addAction(m_pTranslateBody);
 	CtxMenu->addAction(m_pScaleBody);
 	CtxMenu->addSeparator();
 	CtxMenu->addAction(m_pShowCurFrameOnly);
@@ -4674,6 +4730,10 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	CtxMenu->addSeparator();
 	CtxMenu->addAction(m_pUndo);
 	CtxMenu->addAction(m_pRedo);
+	CtxMenu->addSeparator();
+	CtxMenu->addAction(m_pImportBodyDef);
+	CtxMenu->addAction(m_pExportBodyDef);
+	CtxMenu->addAction(m_pExportBodyGeom);
 
 	QPoint CltPt = event->pos();
 	QPoint ScreenPt = event->pos();

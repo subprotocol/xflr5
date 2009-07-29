@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
 	QFLR5Application app(argc, argv);
 
-	QString StyleName;
+	QString StyleName = "Cleanlooks";
 	QString LanguageName;
 	QString FileName   = QDir::tempPath() + "/QFLR5.set";
 	QFile *pXFile = new QFile(FileName);

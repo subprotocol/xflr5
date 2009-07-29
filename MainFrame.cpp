@@ -55,7 +55,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle("QFLR5");
 	m_VersionName = "QFLR5 v0.01";
 
-	m_SettingsFormat = 100552;
+	m_SettingsFormat = 100553;
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -74,6 +74,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_TextFont.setStyleHint(QFont::TypeWriter);
 	m_TextFont.setFamily(m_TextFont.defaultFamily());
+	m_TextFont.setPointSize(10);
 
 	m_ImageFormat = 2;
 
@@ -713,7 +714,7 @@ void MainFrame::CreateAFoilToolbar()
 
 
 
-void	MainFrame::CreateDockWindows()
+void MainFrame::CreateDockWindows()
 {
 	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

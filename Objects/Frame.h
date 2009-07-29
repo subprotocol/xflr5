@@ -40,7 +40,7 @@ public:
 	int m_iHighlight;
 	static int s_iSelect;
 	int m_NPoints;			// the number of points defining the frame
-	CVector m_Point[MAXSIDELINES];	// the points' positions
+	CVector m_Point[MAXSIDELINES];	// the point's positions
 	CSpline m_Spline;
 
 	static QRect s_rViewRect;

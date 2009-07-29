@@ -586,9 +586,6 @@ void BatchDlg::InitDialog()
 	m_pctrlSkipOpp->setEnabled(false);
 	m_pctrlSkipPolar->setEnabled(false);
 
-//	m_TitleFont.CreateFontIndirect(&LgFt);
-//	m_TitleFont.CreatePointFont(85, "Courier New");
-
 	m_Iterations = 0;
 	ResetCurves();
 

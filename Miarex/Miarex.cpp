@@ -5559,7 +5559,7 @@ void QMiarex::GLCallViewLists()
 		glCallList(PANELCP);
 	}
 
-	if (m_pCurWPolar && abs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
@@ -5877,7 +5877,7 @@ void QMiarex::GLCreateCpLegend()
 		}
 		strong = tr("Cp");
 		labellength = (fm.width(strong)+5) * ClientToGL;
-		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong,pMainFrame->m_TextFont);
+		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong, pMainFrame->m_TextFont);
 	}
 	glEndList();
 
@@ -7952,6 +7952,7 @@ void QMiarex::GLCreateWingLegend()
 			if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 			else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 
+//			pGLWidget->RenderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextColor);
 //			pGLWidget->RenderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextFont, pMainFrame->m_TextColor);
 			pGLWidget->renderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextFont);
 
@@ -8143,6 +8144,7 @@ void QMiarex::GLCreateWOppLegend()
 
 void QMiarex::GLDrawAxes()
 {
+	MainFrame * pMainFrame =(MainFrame*)m_pMainFrame;
 	double l = .8;
 //	if(m_pCurWing) l=1.1*m_pCurWing->m_Span/2.0;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
@@ -8173,7 +8175,7 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	pGLWidget->renderText( .8, 0.0, 0.0, "X");
+	pGLWidget->renderText( .8, 0.0, 0.0, "X", pMainFrame->m_TextFont);
 
 
 // Y axis____________
@@ -8194,7 +8196,7 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	pGLWidget->renderText( 0.0, .8, 0.0, "Y");
+	pGLWidget->renderText( 0.0, .8, 0.0, "Y", pMainFrame->m_TextFont);
 
 // Z axis____________
 	glEnable (GL_LINE_STIPPLE);
@@ -8216,7 +8218,7 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	pGLWidget->renderText( 0.0, 0.0, .8, "Z");
+	pGLWidget->renderText( 0.0, 0.0, .8, "Z", pMainFrame->m_TextFont);
 
 	glDisable (GL_LINE_STIPPLE);
 }
@@ -8718,7 +8720,7 @@ void QMiarex::GLDrawFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	int i,j;
+	int j;
 	CFoil *pFoil;
 	CWing *pWing[4];
 	pWing[0] = m_pCurWing;
@@ -8740,7 +8742,7 @@ void QMiarex::GLDrawFoils()
 				if(pFoil)
 				{
 					pGLWidget->renderText(pWing[i]->m_Surface[j].m_TA.x, pWing[i]->m_Surface[j].m_TA.y, pWing[i]->m_Surface[j].m_TA.z,
-											pFoil->m_FoilName);
+											pFoil->m_FoilName, pMainFrame->m_TextFont);
 				}
 			}
 			j = pWing[i]->m_NSurfaces-1;
@@ -8748,7 +8750,7 @@ void QMiarex::GLDrawFoils()
 			if(pFoil)
 			{
 				pGLWidget->renderText(pWing[i]->m_Surface[j].m_TB.x, pWing[i]->m_Surface[j].m_TB.y, pWing[i]->m_Surface[j].m_TB.z,
-										pFoil->m_FoilName);
+										pFoil->m_FoilName, pMainFrame->m_TextFont);
 			}
 		}
 	}
@@ -8792,23 +8794,18 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
-		if(m_iView==3)
+		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 )
 		{
-			if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 /*&& m_bShowCpScale*/)
-			{
-				glCallList(WOPPCPLEGENDTXT);
-				glCallList(WOPPCPLEGENDCLR);
-			}
-			if(m_pCurWing)
-				glCallList(WINGLEGEND);
-			if(m_pCurWOpp)
-				glCallList(WOPPLEGEND);
+			glCallList(WOPPCPLEGENDTXT);
+			glCallList(WOPPCPLEGENDCLR);
 		}
+		if(m_pCurWing)			glCallList(WINGLEGEND);
+		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
 
 		GLSetupLight();
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-/*		if(m_bShowLight)
+		if(m_bShowLight)
 		{
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
@@ -8825,7 +8822,7 @@ void QMiarex::GLRenderView()
 				GLRenderSphere(color,radius,18,18);
 			}
 			glPopMatrix();
-		}*/
+		}
 
 		glLoadIdentity();
 		if(m_bCrossPoint && m_bArcball)
@@ -8858,24 +8855,15 @@ void QMiarex::GLRenderView()
 
 		if(m_bAxes)  GLDrawAxes();
 
-/*		GLUquadricObj* quadric;
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		quadric = gluNewQuadric();
-		gluQuadricDrawStyle(quadric,GLU_FILL);
-		gluQuadricNormals(quadric,GLU_SMOOTH);
-		gluQuadricTexture(quadric, GL_TRUE);
-		gluSphere(quadric,.5,40,40);*/
 
 		GLCallViewLists();
 		if(m_bFoilNames) GLDrawFoils();
 	}
 	glPopMatrix();
-
 	glDisable(GL_CLIP_PLANE1);
-	glFinish();
+	
+	
+//	glFinish();
 //	SwapBuffers(pDC->m_hDC);
 //	wglMakeCurrent(pDC->m_hDC, NULL);
 }
@@ -8886,7 +8874,7 @@ void QMiarex::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int Nu
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glBegin(GL_TRIANGLES);
-	glColor3ub(cr.redF(),cr.greenF(),cr.blueF());
+	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
 
 	double start_lat = -90;
 	double start_lon = 0.0;
@@ -8997,10 +8985,10 @@ void QMiarex::GLSetupLight()
 	glLightfv(GL_LIGHT0, GL_POSITION, fLightPosition0);
 
 
-	float fMatAmbient[4]   = {m_GLLightDlg.m_MatAmbient,  m_GLLightDlg.m_MatAmbient,   m_GLLightDlg.m_MatAmbient,1.0f};
-	float fMatSpecular[4]  = {m_GLLightDlg.m_MatSpecular, m_GLLightDlg.m_MatSpecular,  m_GLLightDlg.m_MatSpecular,1.0f};
-	float fMatDiffuse[4]   = {m_GLLightDlg.m_MatDiffuse,  m_GLLightDlg.m_MatDiffuse,   m_GLLightDlg.m_MatDiffuse,1.0f};
-	float fMatEmission[4]  = {m_GLLightDlg.m_MatEmission, m_GLLightDlg.m_MatEmission,  m_GLLightDlg.m_MatEmission,1.0f};
+	float fMatAmbient[4]   = {m_GLLightDlg.m_MatAmbient,  m_GLLightDlg.m_MatAmbient,   m_GLLightDlg.m_MatAmbient,  1.0f};
+	float fMatSpecular[4]  = {m_GLLightDlg.m_MatSpecular, m_GLLightDlg.m_MatSpecular,  m_GLLightDlg.m_MatSpecular, 1.0f};
+	float fMatDiffuse[4]   = {m_GLLightDlg.m_MatDiffuse,  m_GLLightDlg.m_MatDiffuse,   m_GLLightDlg.m_MatDiffuse,  1.0f};
+	float fMatEmission[4]  = {m_GLLightDlg.m_MatEmission, m_GLLightDlg.m_MatEmission,  m_GLLightDlg.m_MatEmission, 1.0f};
 
 	if(m_GLLightDlg.m_bColorMaterial)
 	{
@@ -9020,7 +9008,7 @@ void QMiarex::GLSetupLight()
 	glMaterialfv(GL_FRONT, GL_AMBIENT,   fMatAmbient);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE,   fMatDiffuse);
 	glMaterialfv(GL_FRONT, GL_EMISSION,  fMatEmission);
-	glMateriali(GL_FRONT, GL_SHININESS,  m_GLLightDlg.m_iMatShininess);
+	glMateriali( GL_FRONT, GL_SHININESS, m_GLLightDlg.m_iMatShininess);
 
 	if(m_GLLightDlg.m_bDepthTest)  glEnable(GL_DEPTH_TEST);     else glDisable(GL_DEPTH_TEST);
 	if(m_GLLightDlg.m_bCullFaces)  glEnable(GL_CULL_FACE);      else glDisable(GL_CULL_FACE);
@@ -11586,7 +11574,7 @@ void QMiarex::OnDeleteUFOWPolars()
 	for(int i=m_poaWPolar->size()-1; i>=0; i--)
 	{
 		pWPolar  = (CWPolar *)m_poaWPolar->at(i);
-		if(pWPolar->m_UFOName==Name)
+		if(pWPolar && pWPolar->m_UFOName==Name)
 		{
 			m_poaWPolar->removeAt(i);
 			delete pWPolar;
@@ -13955,17 +13943,8 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 	int i;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	int margin = 10;
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-	int w2 = (int)(w/2);
 
-// Write wing data
-
-	QString Result, str, strong;
-	QString str1;
-
-	if (m_pCurGraph && m_pCurWing && w2>200 && h>250)
+	if (m_pCurGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
 	{
 		if(m_rCltRect.width()<200 || m_rCltRect.height()<200)
 		{
@@ -13988,103 +13967,149 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 	dheight = fm.height();
 	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 
+	if(m_pCurWing)
+	{
+		PaintWing(painter, m_ptOffset, m_WingScale);
+		if(m_pCurWOpp && m_pCurWOpp->m_bIsVisible)
+		{
+			QPoint PtLegend;
+			PtLegend.rx() = (int)(m_rCltRect.width()/2);
+			PtLegend.ry() = m_rCltRect.bottom();
+			PaintXTr(painter, m_ptOffset, m_WingScale);
+			if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
+			if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
+		}
+		PaintWingLegend(painter, m_rCltRect);
+		if(m_pCurWOpp) PaintWOppLegend(painter, m_rCltRect);
+	}
+	painter.restore();
+}
+
+
+void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
+{
+	if(!m_pCurWing) return;
+	painter.save();
+
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString Result, str, strong;
+	QString str1;
+
+	int margin = 10;
+	int h  = CltRect.height();
+	int w  = CltRect.width();
+	int w2 = (int)(w/2);
+
+	int dwidth, dheight;
+	QFontMetrics fm(pMainFrame->m_TextFont);
+	dheight = fm.height();
+	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
 	int LeftPos = margin;
 	int ZPos    = m_rCltRect.height()-11*dheight;
 
-	if(m_pCurWing)
+	double area = m_pCurWing->m_Area;
+	if(m_pCurWing2)               area += m_pCurWing2->m_Area;
+	if(m_pCurPlane && m_pCurStab) ZPos -= dheight;
+	if(m_pCurWPolar)              ZPos -= dheight*2;
+
+	painter.drawText(LeftPos, ZPos, m_pCurWing->m_WingName);
+	D+=dheight;
+	QString length, surface;
+	GetLengthUnit(length, pMainFrame->m_LengthUnit);
+	GetAreaUnit(surface,  pMainFrame->m_AreaUnit);
+
+	str1 = QString(tr("Wing Span =   %1 ")).arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit,12,'f',3);
+	str1 += length;
+	painter.drawText(LeftPos,ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("xyProj. Span = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,11,'f',3);
+	str1 += length;
+	painter.drawText(LeftPos,ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("Wing Area =  %1 ")).arg(area * pMainFrame->m_m2toUnit,13,'f',3);
+	str1 += surface;
+	painter.drawText(LeftPos,ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("xyProj. Area = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,11,'f',3);
+	str1 += surface;
+	painter.drawText(LeftPos,ZPos+D, str1);
+	D+=dheight;
+
+	if(m_pCurWPolar)
 	{
-		double area = m_pCurWing->m_Area;
-		if(m_pCurWing2)               area += m_pCurWing2->m_Area;
-		if(m_pCurPlane && m_pCurStab) ZPos -= dheight;
-		if(m_pCurWPolar)              ZPos -= dheight*2;
-		if(m_iView!=2)
-		{
-			PaintWing(painter, m_ptOffset, m_WingScale);
-			if(m_pCurWOpp && m_pCurWOpp->m_bIsVisible)
-			{
-				QPoint PtLegend;
-				PtLegend.rx() = (int)(m_rCltRect.width()/2);
-				PtLegend.ry() = m_rCltRect.bottom();
-				PaintXTr(painter, m_ptOffset, m_WingScale);
-				if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
-				if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
-			}
+		GetWeightUnit(str, pMainFrame->m_WeightUnit);
+		Result = QString(tr("Plane Weight =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
+		Result += str;
+		painter.drawText(LeftPos, ZPos+D, Result);
+		D+=dheight;
 
-			painter.drawText(LeftPos, ZPos, m_pCurWing->m_WingName);
-			D+=dheight;
-			QString length, surface;
-			GetLengthUnit(length, pMainFrame->m_LengthUnit);
-			GetAreaUnit(surface,  pMainFrame->m_AreaUnit);
-
-			str1 = QString(tr("Wing Span =   %1 ")).arg(m_pCurWing->m_Span*pMainFrame->m_mtoUnit,12,'f',3);
-			str1 += length;
-			painter.drawText(LeftPos,ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("xyProj. Span = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,11,'f',3);
-			str1 += length;
-			painter.drawText(LeftPos,ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("Wing Area =  %1 ")).arg(area * pMainFrame->m_m2toUnit,13,'f',3);
-			str1 += surface;
-			painter.drawText(LeftPos,ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("xyProj. Area = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,11,'f',3);
-			str1 += surface;
-			painter.drawText(LeftPos,ZPos+D, str1);
-			D+=dheight;
-
-			if(m_pCurWPolar)
-			{
-				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				Result = QString(tr("Plane Weight =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
-				Result += str;
-				painter.drawText(LeftPos, ZPos+D, Result);
-				D+=dheight;
-
-				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				Result = QString(tr("Wing Load =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit,13,'f',3);
-				Result += str + "/" + strong;
-				painter.drawText(LeftPos, ZPos+D, Result);
-				D+=dheight;
-			}
-
-			if(m_pCurPlane && m_pCurStab)
-			{
-				str1 = QString(tr("Tail Volume =      %1")).arg(m_pCurPlane->m_TailVolume,7,'f',3);
-				painter.drawText(LeftPos, ZPos+D, str1);
-				D+=dheight;
-			}
-
-			str1 = QString(tr("Root Chord =   %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 11,'f', 3);
-			Result = str1+length;
-			painter.drawText(LeftPos, ZPos+D, Result);
-			D+=dheight;
-
-			str1 = QString(tr("MAC =          %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 11,'f', 3);
-			Result = str1+length;
-			painter.drawText(LeftPos, ZPos+D, Result);
-			D+=dheight;
-
-			str1 = QString(tr("TipTwist =   %1 deg")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
-			painter.drawText(LeftPos, ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,9,'f',3);
-			painter.drawText(LeftPos, ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("Taper Ratio =   %1")).arg(m_pCurWing->m_TR,10,'f',3);
-			painter.drawText(LeftPos, ZPos+D, str1);
-			D+=dheight;
-
-			str1 = QString(tr("Root-Tip Sweep = %1 deg")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
-			painter.drawText(LeftPos, ZPos+D, str1);
-		}
+		GetAreaUnit(strong, pMainFrame->m_AreaUnit);
+		Result = QString(tr("Wing Load =  %1 ")).arg(m_pCurWing->m_Weight*pMainFrame->m_kgtoUnit/area/pMainFrame->m_m2toUnit,13,'f',3);
+		Result += str + "/" + strong;
+		painter.drawText(LeftPos, ZPos+D, Result);
+		D+=dheight;
 	}
+
+	if(m_pCurPlane && m_pCurStab)
+	{
+		str1 = QString(tr("Tail Volume =      %1")).arg(m_pCurPlane->m_TailVolume,7,'f',3);
+		painter.drawText(LeftPos, ZPos+D, str1);
+		D+=dheight;
+	}
+
+	str1 = QString(tr("Root Chord =   %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 11,'f', 3);
+	Result = str1+length;
+	painter.drawText(LeftPos, ZPos+D, Result);
+	D+=dheight;
+
+	str1 = QString(tr("MAC =          %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 11,'f', 3);
+	Result = str1+length;
+	painter.drawText(LeftPos, ZPos+D, Result);
+	D+=dheight;
+
+	str1 = QString(tr("TipTwist =   %1 deg")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
+	painter.drawText(LeftPos, ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,9,'f',3);
+	painter.drawText(LeftPos, ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("Taper Ratio =   %1")).arg(m_pCurWing->m_TR,10,'f',3);
+	painter.drawText(LeftPos, ZPos+D, str1);
+	D+=dheight;
+
+	str1 = QString(tr("Root-Tip Sweep = %1 deg")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
+	painter.drawText(LeftPos, ZPos+D, str1);
+
+	painter.restore();
+}
+
+void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
+{
+	if(!m_pCurWOpp) return;
+	painter.save();
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString Result, str, strong;
+	QString str1;
+
+	int i;
+	int margin = 10;
+	int h  = CltRect.height();
+	int w  = CltRect.width();
+	int w2 = (int)(w/2);
+
+	int dwidth, dheight;
+	QFontMetrics fm(pMainFrame->m_TextFont);
+	dheight = fm.height();
+	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
+	int D = 0;
+	int LeftPos = margin;
+	int ZPos    = m_rCltRect.height()-11*dheight;
 
 	D = 0;
 	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));

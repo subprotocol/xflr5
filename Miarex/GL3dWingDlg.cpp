@@ -1120,7 +1120,7 @@ void GL3dWingDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glBegin(GL_TRIANGLES);
-	glColor3ub(cr.redF(),cr.greenF(),cr.blueF());
+	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
 
 	double start_lat = -90;
 	double start_lon = 0.0;
@@ -2592,7 +2592,7 @@ void GL3dWingDlg::SetupLayout()
 									  QAbstractItemView::EditKeyPressed);
 
 	m_pctrlWingTable->setSizePolicy(szPolicyExpanding);
-	m_pctrlWingTable->setCornerButtonEnabled (false);
+//	m_pctrlWingTable->setCornerButtonEnabled (false);
 
 	DefLayout->addLayout(NameLayout);
 	DefLayout->addLayout(SymLayout);

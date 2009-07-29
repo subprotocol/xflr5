@@ -47,6 +47,8 @@ void BodyTransDlg::InitDialog()
 	m_pctrlYTransFactor->SetValue(m_YTrans);
 	m_pctrlZTransFactor->SetValue(m_ZTrans);
 
+	m_pctrlYTransFactor->setEnabled(false);
+
 	m_pctrlFrameOnly->setChecked(m_bFrameOnly);
 	m_pctrlFrameID->SetValue(m_FrameID);
 	m_pctrlFrameID->setEnabled(m_bFrameOnly);
@@ -56,7 +58,6 @@ void BodyTransDlg::InitDialog()
 	m_pctrlLength1->setText(length);
 	m_pctrlLength2->setText(length);
 	m_pctrlLength3->setText(length);
-
 }
 
 

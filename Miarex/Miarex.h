@@ -319,6 +319,8 @@ private:
 	void RotateGeomZ(double const &Beta, CVector const &P);
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void EditCurPlane();
+	void PaintWingLegend(QPainter &painter, QRect const & CltRect);
+	void PaintWOppLegend(QPainter &painter, QRect const & CltRect);
 
 	int CreateBodyElements(CPanel *pPanel);
 	int CreateElements(CSurface *pSurface);

@@ -41,6 +41,8 @@ GLWidget::GLWidget(QWidget *parent)
 	m_wndTextColor = QColor(200,200,200);
 	m_iView = 3;
 
+	setAutoFillBackground(false);
+
 	setMouseTracking(true);
 	setCursor(Qt::CrossCursor);
 }
@@ -196,6 +198,10 @@ void GLWidget::paintGL()
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->GLDraw3D();
 		pMiarex->GLRenderView();
+
+	//	QPainter painter(this);
+	//	pMiarex->PaintWingLegend(painter, m_rCltRect);
+	//	pMiarex->PaintWOppLegend(painter, m_rCltRect);
 	}
 	else if(m_iView == 5)
 	{
@@ -258,5 +264,11 @@ void GLWidget::RenderText(double const &x, double const &y, QString const &stron
 }
 
 
+
+void GLWidget::RenderText(int const &x, int const &y, QString const &strong, QFont const &font, QColor const &color)
+{
+	glColor3d(color.redF(), color.greenF(), color.blueF());
+	renderText(x, y, strong);
+}
 
 

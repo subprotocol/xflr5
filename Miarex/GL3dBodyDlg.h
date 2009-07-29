@@ -80,7 +80,6 @@ private slots:
 	void OnInsert();
 	void OnResetScales();
 	void OnShowCurFrameOnly();
-	void reject();
 	void OnRemove();
 	void OnFrameCellChanged(QWidget *pWidget);
 	void OnFrameItemClicked(const QModelIndex &index);
@@ -90,6 +89,8 @@ private slots:
 	void OnUndo();
 	void OnRedo();
 	void OnBodyName();
+	void OnSelChangeXDegree(int sel);
+	void OnSelChangeHoopDegree(int sel);
 
 private:
 	void wheelEvent(QWheelEvent *event);
@@ -101,6 +102,7 @@ private:
 	void resizeEvent(QResizeEvent *evendyt);
 	void ShowContextMenu(QContextMenuEvent * event);
 	void showEvent(QShowEvent *event);
+	void reject();
 
 	void FillFrameTableRow(int row);
 	void FillFrameDataTable();
@@ -180,7 +182,7 @@ private:
 	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
 	QAction *m_pShowCurFrameOnly, *m_pResetScales;
 	QAction *m_pUndo, *m_pRedo;
-	QAction *ExportBodyDef, *ImportBodyDef, *ExportBodyGeom, *TranslateBody, *m_pSetupLight;
+	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody, *m_pSetupLight;
 	QAction *m_pGrid;
 
 
