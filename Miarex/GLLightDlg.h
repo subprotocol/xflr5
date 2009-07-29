@@ -1,3 +1,4 @@
+
 /****************************************************************************
 
 	GLLightDlg class
@@ -48,10 +49,11 @@ public:
 
 private:
 	void SetupLayout();
+	void showEvent(QShowEvent *event);
 
 private slots:
 	void OnSlider(int pos);
-	void OnChanged(int state);
+	void OnChanged();
 	void OnDefaults();
 
 private:
@@ -96,3 +98,4 @@ public:
 };
 
 #endif // GLLIGHTDLG_H
+

@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "GLLightDlg.h"
+#include "Miarex.h"
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QVBoxLayout>
@@ -56,7 +57,6 @@ GLLightDlg::GLLightDlg()
 	m_YLight   =  0.02f;
 	m_ZLight   =  0.68f;
 	SetupLayout();
-	SetParams();
 	setWindowTitle("OpenGL Light Options");
 
 	connect(m_pctrlClose, SIGNAL(clicked()),this, SLOT(accept()));
@@ -76,12 +76,12 @@ GLLightDlg::GLLightDlg()
 	connect(m_pctrlYLight, SIGNAL(sliderMoved(int)), this, SLOT(OnSlider(int)));
 	connect(m_pctrlZLight, SIGNAL(sliderMoved(int)), this, SLOT(OnSlider(int)));
 
-	connect(m_pctrlColorMaterial, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
-	connect(m_pctrlDepthTest, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
-	connect(m_pctrlCullFaces, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
-	connect(m_pctrlShade, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
-	connect(m_pctrlSmooth, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
-	connect(m_pctrlLocalView, SIGNAL(stateChanged(int)), this, SLOT(OnChanged(int)));
+	connect(m_pctrlColorMaterial, SIGNAL(clicked()), this, SLOT(OnChanged()));
+	connect(m_pctrlDepthTest, SIGNAL(clicked()), this, SLOT(OnChanged()));
+	connect(m_pctrlCullFaces, SIGNAL(clicked()), this, SLOT(OnChanged()));
+	connect(m_pctrlShade, SIGNAL(clicked()), this, SLOT(OnChanged()));
+	connect(m_pctrlSmooth, SIGNAL(clicked()), this, SLOT(OnChanged()));
+	connect(m_pctrlLocalView, SIGNAL(clicked()), this, SLOT(OnChanged()));
 
 }
 
@@ -276,6 +276,8 @@ void GLLightDlg::SetupLayout()
 void GLLightDlg::Apply()
 {
 	ReadParams();
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	pMiarex->UpdateView();
 }
 
 void GLLightDlg::OnSlider(int pos)
@@ -283,7 +285,8 @@ void GLLightDlg::OnSlider(int pos)
 	Apply();
 }
 
-void GLLightDlg::OnChanged(int state)
+
+void GLLightDlg::OnChanged()
 {
 	Apply();
 }
@@ -349,7 +352,7 @@ void GLLightDlg::ReadParams(void)
 	float factor = 50.0f;
 	m_XLight  = ((float)m_pctrlXLight->value()-50.0f)/factor;
 	m_YLight  = ((float)m_pctrlYLight->value()-50.0f)/factor;
-	m_ZLight  = ((float)m_pctrlZLight->value()-50.0f)/factor;;
+	m_ZLight  = ((float)m_pctrlZLight->value()-50.0f)/factor;
 }
 
 
@@ -453,7 +456,6 @@ bool GLLightDlg::LoadSettings(QDataStream &ar)
 		return false;
 	}
 	if(k) m_bColorMaterial = true; else m_bColorMaterial = false;
-
 	return true;
 
 }
@@ -474,5 +476,10 @@ bool GLLightDlg::SaveSettings(QDataStream &ar)
 	if(m_bDepthTest)		ar << 1; else ar << 0;
 	if(m_bColorMaterial)	ar << 1; else ar << 0;
 	return true;
+}
+
+void GLLightDlg::showEvent(QShowEvent *event)
+{
+	SetParams();
 }
 

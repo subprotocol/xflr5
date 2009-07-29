@@ -8799,8 +8799,10 @@ void QMiarex::GLRenderView()
 			glCallList(WOPPCPLEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
 		}
+
 		if(m_pCurWing)			glCallList(WINGLEGEND);
 		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
+
 
 		GLSetupLight();
 		glDisable(GL_LIGHTING);
@@ -14089,6 +14091,7 @@ void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
 	painter.restore();
 }
 
+
 void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
 {
 	if(!m_pCurWOpp) return;
@@ -14110,6 +14113,7 @@ void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
 	int D = 0;
 	int LeftPos = margin;
 	int ZPos    = m_rCltRect.height()-11*dheight;
+
 
 	D = 0;
 	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
