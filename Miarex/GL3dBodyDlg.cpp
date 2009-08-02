@@ -4573,10 +4573,8 @@ void GL3dBodyDlg::SetupLayout()
 //	FramePosLayout->addStretch(1);
 	m_pctrlFrameTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlFrameTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::CurrentChanged |
-									   QAbstractItemView::DoubleClicked |
-									   QAbstractItemView::SelectedClicked |
-									   QAbstractItemView::EditKeyPressed);
+	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
+
 
 	QVBoxLayout * FramePointLayout = new QVBoxLayout;
 	m_pctrlPointTable = new QTableView;
@@ -4589,10 +4587,7 @@ void GL3dBodyDlg::SetupLayout()
 //	FramePointLayout->addStretch(1);
 	m_pctrlPointTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlPointTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlPointTable->setEditTriggers(QAbstractItemView::CurrentChanged |
-									   QAbstractItemView::DoubleClicked |
-									   QAbstractItemView::SelectedClicked |
-									   QAbstractItemView::EditKeyPressed);
+	m_pctrlPointTable->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
 	QHBoxLayout *ActionButtons = new QHBoxLayout;
 	QPushButton *UndoButton = new QPushButton(QIcon(":/images/OnUndo.png"), tr("Undo"));
@@ -4665,26 +4660,28 @@ void GL3dBodyDlg::SetupLayout()
 	m_pFrameModel = new QStandardItemModel;
 	m_pFrameModel->setRowCount(10);//temporary
 	m_pFrameModel->setColumnCount(3);
-
-
 	m_pctrlFrameTable->setModel(m_pFrameModel);
+	QItemSelectionModel *selectionModelFrame = new QItemSelectionModel(m_pFrameModel);
+	m_pctrlFrameTable->setSelectionModel(selectionModelFrame);
+	connect(selectionModelFrame, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnFrameItemClicked(QModelIndex)));
 	m_pFrameDelegate = new BodyTableDelegate;
 	m_pctrlFrameTable->setItemDelegate(m_pFrameDelegate);
 	connect(m_pFrameDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnFrameCellChanged(QWidget *)));
-	connect(m_pctrlFrameTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
-	connect(m_pctrlFrameTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
+//	connect(m_pctrlFrameTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
+//	connect(m_pctrlFrameTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
 
 	m_pPointModel = new QStandardItemModel;
 	m_pPointModel->setRowCount(10);//temporary
 	m_pPointModel->setColumnCount(3);
-
-
 	m_pctrlPointTable->setModel(m_pPointModel);
+	QItemSelectionModel *selectionModelPoint = new QItemSelectionModel(m_pPointModel);
+	m_pctrlPointTable->setSelectionModel(selectionModelPoint);
+	connect(selectionModelPoint, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnPointItemClicked(QModelIndex)));
 	m_pPointDelegate = new BodyTableDelegate;
 	m_pctrlPointTable->setItemDelegate(m_pPointDelegate);
 	connect(m_pPointDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnPointCellChanged(QWidget *)));
-	connect(m_pctrlPointTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
-	connect(m_pctrlPointTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
+//	connect(m_pctrlPointTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
+//	connect(m_pctrlPointTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
 
 	m_Precision[0] = 3;//five digits for x and y coordinates
 	m_Precision[1] = 3;

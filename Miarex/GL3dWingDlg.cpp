@@ -224,8 +224,8 @@ void GL3dWingDlg::Connect()
 	m_pWingDelegate = new WingDelegate(this);
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);*/
 //	connect(m_pctrlWingTable, SIGNAL(activated(const QModelIndex &)), this, SLOT(OnItemActivated(const QModelIndex&)));
-	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
-	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
+//	connect(m_pctrlWingTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
+//	connect(m_pctrlWingTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
 	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
 	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
 	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
@@ -1462,7 +1462,11 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingModel->setHeaderData(9, Qt::Horizontal, QObject::tr("Y-dist"));
 
 	m_pctrlWingTable->setModel(m_pWingModel);
-	m_pctrlWingTable->setWindowTitle(QObject::tr("Wing definition"));
+
+	QItemSelectionModel *selectionModel = new QItemSelectionModel(m_pWingModel);
+	m_pctrlWingTable->setSelectionModel(selectionModel);
+	connect(selectionModel, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnItemClicked(QModelIndex)));
+
 
 	m_pWingDelegate = new WingDelegate(this);
 	m_pctrlWingTable->setItemDelegate(m_pWingDelegate);
@@ -2581,6 +2585,7 @@ void GL3dWingDlg::SetupLayout()
 	NameLayout->addWidget(m_pctrlWingColor);
 
 	m_pctrlWingTable = new QTableView(this);
+	m_pctrlWingTable->setWindowTitle(QObject::tr("Wing definition"));
 	m_pctrlWingTable->setMinimumWidth(700);
 //	m_pctrlWingTable->setMinimumHeight(200);
 //	m_pctrlWingTable->setMaximumHeight((int)(r.height()/4));

@@ -38,8 +38,6 @@ QWidget *BodyTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 
 	editor->SetPrecision(m_Precision[index.column()]);
 	return editor;
-	
-	return NULL;
 }
 
 

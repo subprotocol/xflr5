@@ -44,7 +44,7 @@ public:
 private:
 	bool IsInBounds(double f);
 	void FormatValue(double const &f, QString &str);
-//	void focusInEvent ( QFocusEvent * event );
+	void focusInEvent ( QFocusEvent * event );
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent ( QShowEvent * event );

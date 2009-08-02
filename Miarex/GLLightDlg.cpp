@@ -295,6 +295,8 @@ void GLLightDlg::OnChanged()
 
 void GLLightDlg::OnDefaults()
 {
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+
 	m_bCullFaces = false;
 	m_bShade     = true;
 	m_bSmooth    = true;
@@ -322,6 +324,7 @@ void GLLightDlg::OnDefaults()
 
 	SetParams();
 
+	pMiarex->UpdateView();
 }
 
 

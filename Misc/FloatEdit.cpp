@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 #include "FloatEdit.h"
-//#include <QDoubleValidator>
 #include <math.h>
 
 
@@ -62,11 +61,11 @@ bool FloatEdit::IsInBounds(double f)
 }
 
 
-/*
+
 void FloatEdit::focusInEvent ( QFocusEvent * event )
 {
 	selectAll();
-}*/
+}
 
 
 void FloatEdit::focusOutEvent ( QFocusEvent * event )
