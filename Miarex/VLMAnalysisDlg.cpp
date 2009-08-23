@@ -595,10 +595,27 @@ void VLMAnalysisDlg::InitDialog()
 }
 
 
+void VLMAnalysisDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			OnCancelAnalysis();
+			event->accept();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+
 void VLMAnalysisDlg::OnCancelAnalysis()
 {
+	if(m_pXFile->isOpen()) m_pXFile->close();
 	m_bCancel = true;
-//	if(m_bIsFinished) done(1);
+	if(m_bIsFinished) done(1);
 	WriteString("Analysis Cancelled\n");
 }
 
@@ -735,9 +752,9 @@ void VLMAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/3);
-	setMinimumWidth(r.width()/3);
-//	move(r.width()/3, r.height()/6);
+	setMinimumHeight(r.height()/2);
+	setMinimumWidth(r.width()/2);
+	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -748,7 +765,9 @@ void VLMAnalysisDlg::SetupLayout()
 	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
+	buttonsLayout->addStretch(1);
 	buttonsLayout->addWidget(m_pctrlCancel);
+	buttonsLayout->addStretch(1);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlTextOutput);
@@ -756,11 +775,6 @@ void VLMAnalysisDlg::SetupLayout()
 	setLayout(mainLayout);
 }
 
-
-void VLMAnalysisDlg::showEvent(QShowEvent *event)
-{
-//	StartAnalysis();
-}
 
 
 void VLMAnalysisDlg::StartAnalysis()

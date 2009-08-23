@@ -36,7 +36,7 @@ class NacaFoilDlg : public QDialog
 
 private slots:
 	void EditingFinished();
-
+	void OnOK();
 
 public:
 	NacaFoilDlg();

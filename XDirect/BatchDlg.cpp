@@ -171,6 +171,9 @@ void BatchDlg::SetLayout()
 	QLabel *ForcedTransMethod = new QLabel("Forced transitions");
 	QLabel *TopTransLabel = new QLabel("Trip Location (top)");
 	QLabel *BotTransLabel = new QLabel("Trip Location (bottom)");
+	NCritLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	TopTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	BotTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	m_pctrlNCrit   = new FloatEdit(9.00);
 	m_pctrlXTopTr = new FloatEdit(1.00);
 	m_pctrlXBotTr = new FloatEdit(1.00);
@@ -348,19 +351,19 @@ void BatchDlg::Analysis2()
 		m_AlphaMin = m_SpMin;
 		m_AlphaMax = m_SpMax;
 
-		if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  abs(m_SpInc);
-		else                       m_AlphaInc = -abs(m_SpInc);
+		if(m_AlphaMin< m_AlphaMax) m_AlphaInc =  fabs(m_SpInc);
+		else                       m_AlphaInc = -fabs(m_SpInc);
 	}
 	else
 	{
 		m_ClMin = m_SpMin ;
 		m_ClMax = m_SpMax ;
-		if(m_ClMin< m_ClMax) m_ClInc =  abs(m_ClInc);
-		else                 m_ClInc = -abs(m_ClInc);
+		if(m_ClMin< m_ClMax) m_ClInc =  fabs(m_ClInc);
+		else                 m_ClInc = -fabs(m_ClInc);
 	}
 
-	if(m_ReMin < m_ReMax)  m_ReInc =  abs(m_ReInc);
-	else                   m_ReInc = -abs(m_ReInc);
+	if(m_ReMin < m_ReMax)  m_ReInc =  fabs(m_ReInc);
+	else                   m_ReInc = -fabs(m_ReInc);
 	InitXFoil2();
 }
 
@@ -372,12 +375,12 @@ void BatchDlg::Analysis3()
 
 	m_AlphaMin = m_SpMin ;
 	m_AlphaMax = m_SpMax ;
-	if(m_SpMin< m_SpMax) m_AlphaInc =  abs(m_SpInc);
-	else                 m_AlphaInc = -abs(m_SpInc);
+	if(m_SpMin< m_SpMax) m_AlphaInc =  fabs(m_SpInc);
+	else                 m_AlphaInc = -fabs(m_SpInc);
 
 
-	if(m_ReMin < m_ReMax) m_ReInc =  abs(m_ReInc);
-	else                  m_ReInc = -abs(m_ReInc);
+	if(m_ReMin < m_ReMax) m_ReInc =  fabs(m_ReInc);
+	else                  m_ReInc = -fabs(m_ReInc);
 
 	InitXFoil2();
 }
@@ -928,6 +931,8 @@ void BatchDlg::OnClose()
 	done(1);
 }
 
+
+
 void BatchDlg::OnEditReList()
 {
 	ReListDlg dlg;
@@ -1018,6 +1023,8 @@ void BatchDlg::ReadParams()
 	}
 
 	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
+	if(m_ReMax<=0.0) m_ReMax = fabs(m_ReMax);
+	m_SpInc = fabs(m_SpInc);
 
 	m_Mach     = m_pctrlMach->GetValue();
 	if(m_Mach<=0.0) m_Mach = 0.0;
@@ -1069,6 +1076,8 @@ void BatchDlg::ReLoop()
 			SpInc = m_SpInc;
 		}
 
+		if(SpMin > SpMax) SpInc = -fabs(SpInc);
+
 		m_bSkipPolar = false;
 
 		for (series=0; series<MaxSeries;series++)
@@ -1076,7 +1085,7 @@ void BatchDlg::ReLoop()
 			qApp->processEvents();
 			if(m_bCancel) break;
 
-			total = int((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
+			total = (int)fabs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 
 			CreatePolar(pXFoil->reinf1, pXFoil->minf1, pXFoil->acrit);
 			if (m_bInitBL)

@@ -50,7 +50,7 @@ public:
 	CWPolar();
 	virtual ~CWPolar();
 
-	void* m_pParent;
+	static void* s_pMainFrame;
 
 private:
 	int m_AnalysisType;
@@ -97,6 +97,7 @@ private:
 
 	void AddPoint(CWOpp* pWOpp);
 	void AddPoint(CPOpp* pPOpp);
+	void AddPoint(double alpha, double CL, double ICd, double PCd, double TCd, double CY, double GCm, double GRm, double GYm, double IYm, double QInf, double XCP);
 	void CalculatePoint(int i);
 	void Copy(CWPolar *pWPolar);
 	void Export(QTextStream &out, int FileType);

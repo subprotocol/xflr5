@@ -59,6 +59,7 @@ private:
 	QPushButton *m_pctrlCancel;
 	QProgressBar *m_pctrlProgress;
 
+	void keyPressEvent(QKeyEvent *event);
 
 	bool ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	bool ComputeOnBody(int q, double Alpha);
@@ -92,7 +93,6 @@ private:
 	void SetDownwash(double *Mu, double *Sigma);
 	void SetAi(int qrhs);
 	void SetupLayout();
-	void showEvent(QShowEvent *event);
 	void StartAnalysis();
 	void SumPanelForces(double *Cp, double Alpha, double QInf, double &Lift, double &Drag);
 	void UpdateView();

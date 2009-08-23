@@ -41,7 +41,7 @@ private:
 private slots:
 	void OnOverwrite();
 	void OnOK();
-	void OnSelChangeList(QListWidgetItem * pItem);
+	void OnSelChangeList(int iItem);
 	void OnDoubleClickList(QListWidgetItem * pItem);
 
 public:

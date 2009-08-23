@@ -35,6 +35,7 @@ void *PanelAnalysisDlg::s_pMainFrame;
 
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
+	setWindowTitle("3D Panel Analysis");
 	SetupLayout();
 
 	m_Alpha      = 0.0;
@@ -50,7 +51,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	eps = 1.e-7;
 
 	m_bSequence      = false;
-        m_bIsFinished      = false;
+	m_bIsFinished      = false;
 	m_b3DSymetric    = false;
 	m_bSequence      = false;
 	m_bWarning       = false;
@@ -1524,12 +1525,27 @@ void PanelAnalysisDlg::InitDialog()
 
 
 
+void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			OnCancelAnalysis();
+			event->accept();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
 
 void PanelAnalysisDlg::OnCancelAnalysis()
 {
+	if(m_pXFile->isOpen()) m_pXFile->close();
 	m_bSkip = true;
 	m_bExit = true;
-//	if(m_bIsFinished) done(1);
+	if(m_bIsFinished) done(1);
 
 	m_bCancel                 = true;
 	m_pWing->m_bCancel        = true;
@@ -1542,7 +1558,7 @@ void PanelAnalysisDlg::OnCancelAnalysis()
 
 void PanelAnalysisDlg::RelaxWake()
 {
-		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	CVector V, VL, VT;
 	int mw, kw, lw, llw;
 	int nInter;
@@ -2499,11 +2515,11 @@ void PanelAnalysisDlg::SetProgress(int TaskSize, double TaskProgress)
 
 void PanelAnalysisDlg::SetupLayout()
 {
-/*	QDesktopWidget desktop;
+	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/3);
-	setMinimumWidth(r.width()/3);
-	move(r.width()/3, r.height()/6);*/
+	setMinimumHeight(r.height()/2);
+	setMinimumWidth(r.width()/2);
+	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -2519,18 +2535,19 @@ void PanelAnalysisDlg::SetupLayout()
 	m_pctrlCancel = new QPushButton(tr("Cancel"));
 	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
+	QHBoxLayout *ButtonLayout = new QHBoxLayout;
+	ButtonLayout->addStretch(1);
+	ButtonLayout->addWidget(m_pctrlCancel);
+	ButtonLayout->addStretch(1);
+
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlTextOutput);
 	mainLayout->addWidget(m_pctrlProgress);
-	mainLayout->addWidget(m_pctrlCancel);
+	mainLayout->addLayout(ButtonLayout);
 	setLayout(mainLayout);
 }
 
 
-void PanelAnalysisDlg::showEvent(QShowEvent *event)
-{
-//	StartAnalysis();
-}
 
 
 bool PanelAnalysisDlg::SolveMultiple(double V0, double VDelta, int nval)

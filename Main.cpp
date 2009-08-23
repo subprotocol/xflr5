@@ -65,6 +65,17 @@ int main(int argc, char *argv[])
 
 	if(StyleName.length())	qApp->setStyle(StyleName);
 
+#ifdef Q_WS_MAC
+	qDebug() << "Running on Mac";
+#else
+#ifdef Q_WS_X11
+	qDebug() << "Running on X11";
+#else
+#ifdef Q_WS_WIN
+	qDebug() << "Running on Windows";
+#endif
+#endif
+#endif
 
 	MainFrame w;
 	app.setQFLR5MainWindow(&w);

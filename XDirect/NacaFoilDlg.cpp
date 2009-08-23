@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Naca Foil Dlg
-	Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ void NacaFoilDlg::SetLayout()
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -180,9 +180,9 @@ void NacaFoilDlg::keyPressEvent(QKeyEvent *event)
 					m_pctrlNumber->selectAll();
 				}
 			}
-			else
+			else if (OKButton->hasFocus())
 			{
-				QDialog::accept();
+				OnOK();
 			}
 			break;
 		}
@@ -197,4 +197,8 @@ void NacaFoilDlg::keyPressEvent(QKeyEvent *event)
 }
 
 
-
+void NacaFoilDlg::OnOK()
+{
+	GenerateFoil();
+	accept();
+}

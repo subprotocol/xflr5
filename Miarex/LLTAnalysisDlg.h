@@ -23,7 +23,7 @@
 #define LLTANALYSISDLG_H
 
 #include <QDialog>
-#include <QGLWidget>
+#include <QPushButton>
 #include <QString>
 #include <QFile>
 #include <QTextEdit>
@@ -51,9 +51,7 @@ private slots:
 
 
 private:
-	void accept();
-	void reject();
-
+	void keyPressEvent(QKeyEvent *event);
 	void ResetCurves();
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
 
@@ -68,12 +66,14 @@ private:
 	bool ReLoop();
 	int Iterate();
 
+	QPushButton *m_pctrlCancel, *m_pctrlSkip;
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;
 
 	bool m_bAlpha;
 	bool m_bSequence;
-	bool m_bSkip, m_bExit, m_bCancel, m_bWarning;
+	bool m_bSkip, m_bExit, m_bCancel, m_bWarning, m_bError;
+	bool m_bFinished;
 
 	int m_State;
 	int m_Iterations, m_IterLim;

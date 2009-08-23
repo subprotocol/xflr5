@@ -29,6 +29,7 @@ void *TEGapDlg::s_pXFoil;
 
 TEGapDlg::TEGapDlg()
 {
+	setWindowTitle("T.E. Gap");
 	m_Gap   = 0.0;
 	m_Blend = 0.8;
 	m_pAFoil   = NULL;

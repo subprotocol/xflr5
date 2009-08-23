@@ -125,6 +125,7 @@ void ReListDlg::SetupLayout()
 
 	m_pctrlReView->setMinimumHeight(500);
 	m_pctrlReView->setMinimumWidth(350);
+	m_pctrlReView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
 	MainLayout->addWidget(m_pctrlReView);

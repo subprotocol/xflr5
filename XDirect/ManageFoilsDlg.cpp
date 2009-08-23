@@ -208,6 +208,8 @@ void ManageFoilsDlg::FillTableRow(int row)
 	ind = m_pFoilModel->index(row, 0, QModelIndex());
 	m_pFoilModel->setData(ind,pFoil->m_FoilName);
 
+	if(pFoil->m_FoilDescription.length()) m_pFoilModel->setData(ind, pFoil->m_FoilDescription, Qt::ToolTipRole);
+
 	ind = m_pFoilModel->index(row, 1, QModelIndex());
 	m_pFoilModel->setData(ind, pFoil->m_fThickness);
 

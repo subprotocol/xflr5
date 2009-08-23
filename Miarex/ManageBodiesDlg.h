@@ -68,7 +68,6 @@ private:
 	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
 	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
 	QListWidget *m_pctrlNameList;
-
 };
 
 

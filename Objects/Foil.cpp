@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Reference Foil Class
-	Copyright (C) 2003-2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2003-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ CFoil::CFoil()
 	m_bSaved      = true;
 
 	m_FoilName = "";
+	m_FoilDescription = "";
 
 	m_fCamber     = 0.0;
 	m_fXCamber    = 0.0;
@@ -223,9 +224,6 @@ double CFoil::DeRotate()
 	
 	xte = (m_rpIntrados[m_iInt].x+m_rpExtrados[m_iExt].x)/2.0;
 	yte = (m_rpIntrados[m_iInt].y+m_rpExtrados[m_iExt].y)/2.0;
-
-
-
 
 	// then find current angle
 	angle = atan2(yte-yle, xte-xle);// xle=tle=0;
@@ -909,11 +907,14 @@ double CFoil::NormalizeGeometry()
 }
 
 
-void CFoil::Serialize(QDataStream &ar, bool bIsStoring)
+void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	// saves or loads the foil to the archive ar
 
-	int ArchiveFormat = 1005;
+	int ArchiveFormat;
+	if(ProjectFormat==5)      ArchiveFormat = 1006;
+	else if(ProjectFormat==4) ArchiveFormat = 1005;
+	// 1006 : QFLR5 v0.02 : added Foil description
 	// 1005 : added LE Flap data
 	// 1004 : added Points and Centerline property
 	// 1003 : added Visible property
@@ -922,14 +923,11 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring)
 	int p, j;
 	float f,ff;
 
-//	qint8 qi, ch;
-//	qint32 colorref;
-//	int r,g,b;
-
 	if(bIsStoring)
 	{
 		ar << ArchiveFormat;
 		WriteCString(ar, m_FoilName);
+		if(ProjectFormat==5) WriteCString(ar, m_FoilDescription);
 		ar << m_nFoilStyle << m_nFoilWidth;
 		WriteCOLORREF(ar, m_FoilColor);
 		if (m_bVisible)		ar << 1; else ar << 0;
@@ -954,9 +952,11 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring)
 	else 
 	{
 		ar >> ArchiveFormat;
-		//Archive Format 1001 : adds the modified foil to the file
-
 		ReadCString(ar, m_FoilName);
+		if(ArchiveFormat>=1006)
+		{
+			ReadCString(ar, m_FoilDescription);
+		}
 		if(ArchiveFormat>=1002)
 		{
 			ar >> m_nFoilStyle >> m_nFoilWidth;

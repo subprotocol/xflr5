@@ -43,7 +43,7 @@ CBody::CBody()
 	pi = 3.141592654;
 	m_BodyName = UnitsDlg::tr("BodyName");
 
-	m_BodyColor = QColor(100,130,200);
+	m_BodyColor = QColor(190,130,130);
 	m_BodyStyle = 0;
 	m_BodyWidth = 1;
 
@@ -582,7 +582,6 @@ bool CBody::ImportDefinition()
 				break;
 			}
 		}
-
 	}
 	else return false;
 
@@ -1285,7 +1284,7 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnl
 }
 
 
-bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring)
+bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int k;
@@ -1293,12 +1292,15 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring)
 
 	if(bIsStoring)
 	{
-		ar << 1002;
-
+		if(ProjectFormat==5)      ar << 1003;
+		else if(ProjectFormat==4) ar << 1002;
+		//1003 : QFLR5 v0.02 : added body description field
 		//1002 : Added axial and hoop mesh panel numbers for linetype fuselage
 		//1001 : Added bunching parameter
 		//1000 : first format
 		WriteCString(ar, m_BodyName);
+		if(ProjectFormat==5) WriteCString(ar, m_BodyDescription);
+
 		WriteCOLORREF(ar, m_BodyColor);
 		ar << m_LineType;
 		ar << m_NSideLines;
@@ -1324,11 +1326,14 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring)
 
 		ar << 0.0f << 0.0f;
 	}
-	else {
-
+	else
+	{
 		ar >> ArchiveFormat;
 		if(ArchiveFormat<1000 || ArchiveFormat>1100) return false;
+
 		ReadCString(ar, m_BodyName);
+		if(ArchiveFormat>=1003) ReadCString(ar, m_BodyDescription);
+
 		ReadCOLORREF(ar, m_BodyColor);
 		ar >> m_LineType;
 		ar >> m_NSideLines;

@@ -190,7 +190,6 @@ void WPolarDlg::InitDialog()
 	m_pctrlRho->setFont(SymbolFont);
 	m_pctrlNu->setFont(SymbolFont);
 
-
 	m_bAutoName = true;
 	m_pctrlAutoName->setChecked(true);
 

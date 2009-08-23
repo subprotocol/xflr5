@@ -525,6 +525,12 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 			OnGraphSettings();
 			return;
 		}
+		case Qt::Key_R:
+		{
+			m_QGraph.SetAuto(true);
+			UpdateView();
+			break;
+		}
 		default:
 			QWidget::keyPressEvent(event);
 	}
@@ -1774,6 +1780,7 @@ void QXInverse::PaintView(QPainter &painter)
 	painter.restore();
 }
 
+
 double QXInverse::qincom(double qc, double qinf, double tklam)
 {
 //-------------------------------------
@@ -1781,7 +1788,7 @@ double QXInverse::qincom(double qc, double qinf, double tklam)
 //     karman-tsien compressible speed
 //-------------------------------------
 
-	if(tklam<1.0e-4 || abs(qc)<1.0e-4)
+	if(tklam<1.0e-4 || fabs(qc)<1.0e-4)
 	{
 //----- for nearly incompressible case or very small speed, use asymptotic
 //      expansion of singular quadratic formula to avoid numerical problems
@@ -1790,7 +1797,7 @@ double QXInverse::qincom(double qc, double qinf, double tklam)
 	else
 	{
 //----- use quadratic formula for typical case
-		double tmp = 0.5f*(1.0 - tklam)*qinf/(qc*tklam);
+		double tmp = 0.5*(1.0 - tklam)*qinf/(qc*tklam);
 		return (qinf*tmp*((double)sqrt(1.0 + 1.0/(tklam*tmp*tmp)) - 1.0));
 	}
 }

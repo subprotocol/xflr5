@@ -38,9 +38,9 @@ InterpolateFoilsDlg::InterpolateFoilsDlg()
 
 	SetupLayout();
 
-	connect(m_pctrlFoil1,    SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil1(int)));
-	connect(m_pctrlFoil2,    SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil2(int)));
-	connect(m_pctrlFrac, SIGNAL(editingFinished()), this, SLOT(OnFrac()));
+	connect(m_pctrlFoil1,  SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil1(int)));
+	connect(m_pctrlFoil2,  SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil2(int)));
+	connect(m_pctrlFrac,   SIGNAL(editingFinished()), this, SLOT(OnFrac()));
 	connect(m_pctrlSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnVScroll(int)));
 }
 
@@ -100,7 +100,7 @@ void InterpolateFoilsDlg::SetupLayout()
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(CancelButton);
 	CommandButtons->addStretch(1);
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	LeftSide->addStretch(1);
 	LeftSide->addLayout(CommandButtons);
@@ -138,6 +138,36 @@ void InterpolateFoilsDlg::InitDialog()
 }
 
 
+void InterpolateFoilsDlg::keyPressEvent(QKeyEvent *event)
+{
+	// Prevent Return Key from closing App
+	// Generate the foil instead
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				Update();
+				OKButton->setFocus();
+			}
+			else if (OKButton->hasFocus())
+			{
+				OnOK();
+			}
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+
 void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 {
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
@@ -166,6 +196,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 	Update();
 }
 
+
 void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 {
 	i=0;
@@ -193,6 +224,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 	}
 	Update();
 }
+
 
 void InterpolateFoilsDlg::Update()
 {
@@ -259,12 +291,15 @@ void InterpolateFoilsDlg::OnFrac()
 void InterpolateFoilsDlg::OnOK()
 {
 	m_NewFoilName = m_pctrlNewFoilName->text();
+	m_pBufferFoil->m_FoilName = m_NewFoilName;
 
 	QDialog::accept();
 }
 
+
 void InterpolateFoilsDlg::OnVScroll(int val)
 {
+	val = m_pctrlSlider->sliderPosition();
 	m_Frac = 100.0 - (double)val;
 	m_pctrlFrac->SetValue(m_Frac);
 	Update();

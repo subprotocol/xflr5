@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QCheckBox>
 #include <QComboBox>
 #include "../Objects/Plane.h"
@@ -125,6 +126,7 @@ private:
 	FloatEdit  *m_pctrlWingTilt;
 	FloatEdit  *m_pctrlWingTilt2;
 	QLineEdit *m_pctrlPlaneName;
+	QTextEdit *m_pctrlPlaneDescription;
 	QComboBox *m_pctrlBodyList;
 	QCheckBox *m_pctrlBiplane;
 	QCheckBox *m_pctrlBody;

@@ -31,6 +31,7 @@
 
 FoilCoordDlg::FoilCoordDlg()
 {
+	setWindowTitle("Foil Coordinates");
 	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;

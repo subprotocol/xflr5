@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
- 
+
 #ifndef GL3DWINGDLG_H
 #define GL3DWINGDLG_H
 
@@ -26,6 +26,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QSlider>
 #include <QLabel>
 #include <QRadioButton>
@@ -66,7 +67,7 @@ private slots:
 	void On3DReset();
 	void On3DPickCenter();
 
-	void OnSetupLight();
+//	void OnSetupLight();
 	void OnClipPlane(int pos);
 	void OnLight();
 	void OnSurfaces();
@@ -149,6 +150,7 @@ private:
 	static QList <void*> *s_poaWing;
 
 	QLineEdit *m_pctrlWingName;
+	QTextEdit *m_pctrlWingDescription;
 	QCheckBox *m_pctrlSymetric;
 	QRadioButton *m_pctrlLeftSide, *m_pctrlRightSide;
 	ColorButton *m_pctrlWingColor;
@@ -167,7 +169,6 @@ private:
 
 	QPushButton *OKButton, *CancelButton;
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
-	QPushButton *m_pctrlSetupLight;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 
 	QSlider *m_pctrlClipPlanePos;

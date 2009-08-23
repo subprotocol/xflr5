@@ -141,6 +141,8 @@ void PlaneDlg::InitDialog()
 	m_pctrlLen9->setText(len);
 	m_pctrlLen10->setText(len);
 	m_pctrlLen11->setText(len);
+	m_pctrlLen12->setText(len);
+	m_pctrlLen13->setText(len);
 
 	m_pctrlSurf1->setText(surf);
 	m_pctrlSurf2->setText(surf);
@@ -149,6 +151,15 @@ void PlaneDlg::InitDialog()
 	m_pctrlVolume->setText(len+"3");
 
 	m_pctrlPlaneName->setText(m_pPlane->m_PlaneName);
+
+	if(m_pPlane->m_PlaneDescription.length())
+	{
+		m_pctrlPlaneDescription->setPlainText(m_pPlane->m_PlaneDescription);
+	}
+	else
+	{
+		m_pctrlPlaneDescription->setPlainText("");
+	}
 
 	SetParams();
 	SetResults();
@@ -368,6 +379,7 @@ void PlaneDlg::OnEditBody()
 	memBody.Duplicate(m_pPlane->m_pBody);
 	pMiarex->m_GL3dBody.SetBody(m_pPlane->m_pBody);
 	pMiarex->m_GL3dBody.m_bEnableName = false;
+	pMiarex->m_GL3dBody.InitDialog();
 
 	if(pMiarex->m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -485,9 +497,10 @@ void PlaneDlg::OnFin()
 void PlaneDlg::OnPlaneName() 
 {
 	m_pPlane->m_PlaneName = m_pctrlPlaneName->text();
-	m_pPlane->m_Wing.m_WingName = m_pPlane->m_PlaneName+"_Wing";
-	m_pPlane->m_Stab.m_WingName = m_pPlane->m_PlaneName+"_Elev";
-	m_pPlane->m_Fin.m_WingName = m_pPlane->m_PlaneName+"_Fin";
+	m_pPlane->m_Wing.m_WingName  = m_pPlane->m_PlaneName+"_Wing";
+	m_pPlane->m_Wing2.m_WingName = m_pPlane->m_PlaneName+"_Wing2";
+	m_pPlane->m_Stab.m_WingName  = m_pPlane->m_PlaneName+"_Elev";
+	m_pPlane->m_Fin.m_WingName   = m_pPlane->m_PlaneName+"_Fin";
 }
 
 
@@ -497,6 +510,9 @@ void PlaneDlg::OnOK()
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	QString strong;
 	ReadParams();
+
+	m_pPlane->m_PlaneDescription = m_pctrlPlaneDescription->toPlainText();
+
 	ComputePlane();
 
 	n = m_pPlane->m_Wing.VLMGetPanelTotal();
@@ -600,7 +616,6 @@ void PlaneDlg::OnSelChangeBodyList(int pos)
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int sel = m_pctrlBodyList->currentIndex();
 	if (sel >= 0) strong = m_pctrlBodyList->itemText(sel);
-
 	m_pPlane->m_pBody = pMiarex->GetBody(strong);
 }
 
@@ -673,7 +688,6 @@ void PlaneDlg::SetParams()
 
 	if(m_pPlane->m_bBody) m_pctrlBody->setChecked(true);
 	else                  m_pctrlBody->setChecked(false);
-
 	for(i=0; i<s_poaBody->size(); i++)
 	{
 		pBody = (CBody*)s_poaBody->at(i);
@@ -798,7 +812,6 @@ void PlaneDlg::SetResults()
 
 	str = QString("%1").arg(m_pPlane->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
 	m_pctrlVolume->setText(str);
-
 }
 
 
@@ -807,8 +820,14 @@ void PlaneDlg::SetupLayout()
 {
 	QVBoxLayout *NameLayout = new QVBoxLayout;
 	m_pctrlPlaneName = new QLineEdit("PlaneName");
-	m_pctrlPlaneName->setMinimumWidth(120);
+//	m_pctrlPlaneName->setMinimumWidth(120);
+	m_pctrlPlaneDescription = new QTextEdit();
+	m_pctrlPlaneDescription->setToolTip("Enter here a short description for the plane");
+	QLabel *PlaneDescription = new QLabel(tr("Description:"));
+
 	NameLayout->addWidget(m_pctrlPlaneName);
+	NameLayout->addWidget(PlaneDescription);
+	NameLayout->addWidget(m_pctrlPlaneDescription);
 	QGroupBox *NameBox = new QGroupBox("Plane Name");
 	NameBox->setLayout(NameLayout);
 
@@ -922,9 +941,9 @@ void PlaneDlg::SetupLayout()
 	m_pctrlYLEFin = new FloatEdit(0.00);
 	m_pctrlZLEFin = new FloatEdit(50.00);
 	m_pctrlFinTilt = new FloatEdit(0.0);
-	m_pctrlLen5 = new QLabel("mm");
-	m_pctrlLen6 = new QLabel("mm");
-	m_pctrlLen7 = new QLabel("mm");
+	m_pctrlLen7= new QLabel("mm");
+	m_pctrlLen8 = new QLabel("mm");
+	m_pctrlLen9 = new QLabel("mm");
 	QLabel *lab35 = new QLabel(QString::fromUtf8("°"));
 	FinLayout->addWidget(m_pctrlFinCheck,1,1);
 	FinLayout->addWidget(m_pctrlDefineFin, 2,1);
@@ -938,9 +957,9 @@ void PlaneDlg::SetupLayout()
 	FinLayout->addWidget(m_pctrlYLEFin,3,3);
 	FinLayout->addWidget(m_pctrlZLEFin,4,3);
 	FinLayout->addWidget(m_pctrlFinTilt,5,3);
-	FinLayout->addWidget(m_pctrlLen5,2,4);
-	FinLayout->addWidget(m_pctrlLen6,3,4);
-	FinLayout->addWidget(m_pctrlLen7,4,4);
+	FinLayout->addWidget(m_pctrlLen7,2,4);
+	FinLayout->addWidget(m_pctrlLen8,3,4);
+	FinLayout->addWidget(m_pctrlLen9,4,4);
 	FinLayout->addWidget(lab35,5,4);
 	QGroupBox *FinBox = new QGroupBox("Fin");
 	FinBox->setLayout(FinLayout);
@@ -952,23 +971,23 @@ void PlaneDlg::SetupLayout()
 	BodyName->addWidget(m_pctrlBody);
 	BodyName->addWidget(m_pctrlBodyList);
 	BodyName->addWidget(m_pctrlEditBody);
-	m_pctrlBodyList->setMinimumWidth(250);
+//	m_pctrlBodyList->setMinimumWidth(250);
 	BodyName->addStretch(1);
 	QHBoxLayout *BodyPos = new QHBoxLayout;
 	m_pctrlXBody = new FloatEdit(0.00);
 	m_pctrlZBody = new FloatEdit(0.00);
 	QLabel *lab41 = new QLabel("x=");
 	QLabel *lab42 = new QLabel("z=");
-	m_pctrlLen8 = new QLabel("mm");
-	m_pctrlLen9 = new QLabel("mm");
+	m_pctrlLen10 = new QLabel("mm");
+	m_pctrlLen11 = new QLabel("mm");
 	BodyPos->addStretch(1);
 	BodyPos->addWidget(lab41);
 	BodyPos->addWidget(m_pctrlXBody);
-	BodyPos->addWidget(m_pctrlLen8);
+	BodyPos->addWidget(m_pctrlLen10);
 	BodyPos->addStretch(1);
 	BodyPos->addWidget(lab42);
 	BodyPos->addWidget(m_pctrlZBody);
-	BodyPos->addWidget(m_pctrlLen9);
+	BodyPos->addWidget(m_pctrlLen11);
 	BodyPos->addStretch(1);
 	QVBoxLayout *BodyLayout = new QVBoxLayout;
 	BodyLayout->addLayout(BodyName);
@@ -1012,8 +1031,8 @@ void PlaneDlg::SetupLayout()
 	m_pctrlSurf1 = new QLabel("dm2");
 	m_pctrlSurf2 = new QLabel("dm2");
 	m_pctrlSurf3 = new QLabel("dm2");
-	m_pctrlLen10 = new QLabel("mm");
-	m_pctrlLen11 = new QLabel("mm");
+	m_pctrlLen12 = new QLabel("mm");
+	m_pctrlLen13 = new QLabel("mm");
 	m_pctrlVolume = new QLabel("mm3");
 	QGridLayout *Data1Layout = new QGridLayout;
 	Data1Layout->addWidget(lab101, 1, 1);
@@ -1021,13 +1040,13 @@ void PlaneDlg::SetupLayout()
 	Data1Layout->addWidget(m_pctrlSurf1, 1, 3);
 	Data1Layout->addWidget(lab102, 2, 1);
 	Data1Layout->addWidget(m_pctrlWingSpan, 2, 2);
-	Data1Layout->addWidget(m_pctrlLen10, 2, 3);
+	Data1Layout->addWidget(m_pctrlLen12, 2, 3);
 	Data1Layout->addWidget(lab103, 3, 1);
 	Data1Layout->addWidget(m_pctrlStabSurface, 3, 2);
 	Data1Layout->addWidget(m_pctrlSurf2, 3, 3);
 	Data1Layout->addWidget(lab104, 4, 1);
 	Data1Layout->addWidget(m_pctrlStabLeverArm, 4, 2);
-	Data1Layout->addWidget(m_pctrlLen11, 4, 3);
+	Data1Layout->addWidget(m_pctrlLen13, 4, 3);
 	QGridLayout *Data2Layout = new QGridLayout;
 	Data2Layout->addWidget(lab105, 1, 1);
 	Data2Layout->addWidget(m_pctrlFinSurface, 1, 2);

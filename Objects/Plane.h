@@ -68,10 +68,10 @@ protected:
 
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	QString m_PlaneName;
-
+	QString m_PlaneDescription;
 
 private:
-	bool SerializePlane(QDataStream &ar, bool bIsStoring);
+	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 //	bool HasResults();
 	void Duplicate(CPlane *pPlane);
 	void ComputePlane(void);

@@ -24,7 +24,7 @@
 #define MANAGEUFOSDLG_H
 
 #include <QDialog>
-
+#include <QTextEdit>
 #include <QPushButton>
 #include <QTableView>
 #include <QStandardItemModel>
@@ -45,7 +45,7 @@ public:
 private slots:
 	void OnDelete();
 	void OnRename();
-	void OnUFOClicked(const QModelIndex& index);
+	void OnUFOClicked(QModelIndex index);
 	void OnDoubleClickTable(const QModelIndex &index);
 
 
@@ -63,6 +63,7 @@ private:
 private:
 	QPushButton *CloseButton;
 	QPushButton *m_pctrlRename, *m_pctrlDelete;
+	QTextEdit *m_pctrlDescription;
 	QTableView *m_pctrlUFOTable;
 	QStandardItemModel *m_pUFOModel;
 	UFOTableDelegate *m_pUFODelegate;

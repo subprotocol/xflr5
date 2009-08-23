@@ -100,7 +100,7 @@ public:
 	void DrawFoil(double alpha, double scalex, double scaley, CVector const &Offset);
 	void DrawPoints(double scalex, double scaley, CVector Offset);
 	void DrawMidLine(double scalex, double scaley, CVector Offset);
-	void Serialize(QDataStream &ar, bool bIsStoring);
+	void Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	void SetFlap();
 	void SetTEFlap();
 	void SetLEFlap();
@@ -116,6 +116,7 @@ public:
 private:
 
 	QString m_FoilName;		// the foil's name...
+	QString m_FoilDescription;
 	QColor m_FoilColor;	//... and its color
 
 	bool m_bVisible;	//true if the foil is to be displayed

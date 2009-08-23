@@ -195,7 +195,7 @@ bool CPlane::HasResults()
 
 
 
-bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
+bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 //	MainFrame *pFrame = (MainFrame*)s_pMainFrame;
@@ -204,7 +204,9 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 	if (bIsStoring)
 	{
 		// storing code
-		ar << 1010;
+		if(ProjectFormat==5)      ar << 1011;
+		else if(ProjectFormat==4) ar << 1010;
+		//1011 : QFLR5 v0.02 : added Plane description field
 		//1010 : added body LE x and z position
 		//1009 : added Main wing LE x and z position
 		//1008 : added body data
@@ -215,10 +217,12 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		//1003 : Added fin tilt;
 		//1002 : Added doublefin;
 		WriteCString(ar, m_PlaneName);
-		m_Wing.SerializeWing(ar, true);
-		m_Wing2.SerializeWing(ar, true);
-		m_Stab.SerializeWing(ar, true);
-		m_Fin.SerializeWing(ar, true);
+		if(ProjectFormat==5)      WriteCString(ar, m_PlaneDescription);
+
+		m_Wing.SerializeWing(ar, true, ProjectFormat);
+		m_Wing2.SerializeWing(ar, true, ProjectFormat);
+		m_Stab.SerializeWing(ar, true, ProjectFormat);
+		m_Fin.SerializeWing(ar, true, ProjectFormat);
 		if(m_bStab)          ar <<1; else ar <<0;
 		if(m_bFin)           ar <<1; else ar <<0;
 		if(m_bDoubleFin)     ar <<1; else ar <<0;
@@ -259,15 +263,14 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring)
 		}
 
 		ReadCString(ar,m_PlaneName);
-		if (m_PlaneName.length() ==0)
-		{
-			return false;
-		}
+		if (m_PlaneName.length() ==0) return false;
 
-		m_Wing.SerializeWing(ar, false);
-		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar, false);
-		m_Stab.SerializeWing(ar, false);
-		m_Fin.SerializeWing(ar, false);
+		if(ArchiveFormat>=1011) ReadCString(ar, m_PlaneDescription);
+
+		m_Wing.SerializeWing(ar, false, ProjectFormat);
+		if(ArchiveFormat>=1007) m_Wing2.SerializeWing(ar, false, ProjectFormat);
+		m_Stab.SerializeWing(ar, false, ProjectFormat);
+		m_Fin.SerializeWing(ar, false, ProjectFormat);
 
 		ar >>k;
 		if(k) m_bStab = true; else m_bStab = false;

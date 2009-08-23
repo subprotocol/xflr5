@@ -40,6 +40,8 @@ private slots:
 	void OnOK();
 	void OnVScroll(int val);
 
+	void keyPressEvent(QKeyEvent *event);
+
 public:
 	InterpolateFoilsDlg();
 	void InitDialog();

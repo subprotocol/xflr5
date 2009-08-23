@@ -956,15 +956,15 @@ void GraphDlg::SetupLayout()
 	QLabel *MaxLabel = new QLabel("Max");
 	QLabel *OriginLabel = new QLabel("Origin");
 	QLabel *UnitLabel = new QLabel("Unit");
-	MinLabel->setAlignment(Qt::AlignRight);
-	MaxLabel->setAlignment(Qt::AlignRight);
-	OriginLabel->setAlignment(Qt::AlignRight);
-	UnitLabel->setAlignment(Qt::AlignRight);
+	MinLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	MaxLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	OriginLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	UnitLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 //	ScaleData->addStretch(1);
-	ScaleData->addWidget(MinLabel,3,1);
-	ScaleData->addWidget(MaxLabel,4,1);
-	ScaleData->addWidget(OriginLabel,5,1);
-	ScaleData->addWidget(UnitLabel,6,1);
+	ScaleData->addWidget(MinLabel,4,1);
+	ScaleData->addWidget(MaxLabel,5,1);
+	ScaleData->addWidget(OriginLabel,6,1);
+	ScaleData->addWidget(UnitLabel,7,1);
 
 	m_pctrlXAuto    = new QCheckBox("Auto Scale");
 	m_pctrlXMin     = new FloatEdit;

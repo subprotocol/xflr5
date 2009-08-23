@@ -77,7 +77,6 @@ void BodyGridDlg::InitDialog()
 	m_pctrlLength4->setText(length);
 
 	m_pctrlScales->setChecked(m_bScale);
-
 	m_pctrlGrid->setChecked(m_bGrid);
 	m_pctrlLine->SetStyle(m_Style);
 	m_pctrlLine->SetWidth(m_Width);

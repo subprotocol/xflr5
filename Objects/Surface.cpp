@@ -702,7 +702,6 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 			SideA[l+1]   = LA + NormalA * zA/cosdA;
 			SideB[l+1]   = LB + NormalB * zB/cosdB;
 
-
 			if(l==0)
 			{
 				zA = m_pFoilA->GetLowerY(xTA)*chordA;
@@ -731,12 +730,12 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 			SideB_B[l+1] = LB;
 			if(l==0)
 			{
-				SideA[0]   = LA;
-				SideB[0]   = LB;
-				SideA_T[0] = LA;
-				SideB_T[0] = LB;
-				SideA_B[0] = LA;
-				SideB_B[0] = LB;
+				SideA[0]   = TA;
+				SideB[0]   = TB;
+				SideA_T[0] = TA;
+				SideB_T[0] = TB;
+				SideA_B[0] = TA;
+				SideB_B[0] = TB;
 			}
 		}
 

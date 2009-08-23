@@ -101,7 +101,7 @@ protected:
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
 	bool Gauss(double *A, int n, double *B, int m);
-	bool SerializeWing(QDataStream &ar, bool bIsStoring);
+	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
 	double GetAverageSweep();
@@ -220,6 +220,7 @@ protected:
 	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
 	double m_xPanel[MAXCHORDPANELS];	//chorwise position of VLM panels
 
+	QString m_WingDescription;
 
  	CPanel *m_pPanel;			//pointer to the VLM Panel array
 

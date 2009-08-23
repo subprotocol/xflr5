@@ -24,6 +24,7 @@
 
 XFoilAdvancedDlg::XFoilAdvancedDlg()
 {
+	setWindowTitle("XFoil Settings");
 	SetupLayout();
 
 	m_IterLimit = 100;
@@ -88,6 +89,35 @@ void XFoilAdvancedDlg::InitDialog()
 	QString str = QString("%1").arg(m_IterLimit);
 	m_pctrlIterLimit->setText(str);
 	m_pctrlFullReport->setChecked(m_bFullReport);
+}
+
+
+
+
+void XFoilAdvancedDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Return:
+		{
+			if(!OKButton->hasFocus() && !CancelButton->hasFocus())
+			{
+				OKButton->setFocus();
+			}
+			else if (OKButton->hasFocus())
+			{
+				OnOK();
+			}
+			break;
+		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			return;
+		}
+		default:
+			event->ignore();
+	}
 }
 
 

@@ -18,7 +18,7 @@
 
 *****************************************************************************/
 
- 
+
 #ifndef QMIAREX_H
 #define QMIAREX_H
 
@@ -39,6 +39,7 @@
 #include "WPolarDlg.h"
 #include "CtrlPolarDlg.h"
 #include "PanelAnalysisDlg.h"
+#include "LLTAnalysisDlg.h"
 #include "VLMAnalysisDlg.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
@@ -208,6 +209,7 @@ private slots:
 	void OnDragScale(int pos);
 	void OnVelocityScale(int pos);
 	void OnGL3DScale();
+	void OnImportWPolar();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -266,7 +268,7 @@ private:
 	void SetUFO(QString UFOName="");
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
-	void SnapClient(QString const &FileName, int FileType);
+	void SnapClient(QString const &FileName);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 
@@ -322,7 +324,7 @@ private:
 	void PaintWingLegend(QPainter &painter, QRect const & CltRect);
 	void PaintWOppLegend(QPainter &painter, QRect const & CltRect);
 
-	int CreateBodyElements(CPanel *pPanel);
+	int CreateBodyElements();
 	int CreateElements(CSurface *pSurface);
 	int IsWakeNode(CVector &Pt);
 	int IsNode(CVector &Pt);
@@ -331,7 +333,7 @@ private:
 	double GetCm(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
 	double GetCm0(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
 	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
-	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
+	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau,  bool &bOutRe, bool &bError);
 	double GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
 	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
 	double GetPlrPointFromAlpha(CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
@@ -456,6 +458,7 @@ private:
 	WPolarDlg    m_WngAnalysis;
 	CtrlPolarDlg m_CtrlPolarDlg;
 
+	LLTAnalysisDlg *m_pLLTDlg;
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the VLM calculations
 	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 

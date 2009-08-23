@@ -54,9 +54,8 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 	m_bExit       = false;
 	m_bCancel     = false;
 	m_bWarning    = false;
-
-	m_pXFile = NULL;
-
+	m_bError      = false;
+	m_bFinished   = false;
 
 	m_Iterations =  0;
 	m_IterLim    = 20;
@@ -79,23 +78,6 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 
 
 
-void LLTAnalysisDlg::reject()
-{
-	m_bSkip = true;
-	m_bExit = true;
-	m_pXFile->close();
-
-	QDialog::reject();
-}
-
-void LLTAnalysisDlg::accept()
-{
-	m_bSkip = true;
-	m_bExit = true;
-	if(m_pXFile) m_pXFile->close();
-
-	QDialog::accept();
-}
 
 
 bool LLTAnalysisDlg::AlphaLoop()
@@ -157,6 +139,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		else if (iter==-1 && !m_bCancel)
 		{
 			str= QString("    ...negative Lift... Aborting\r\n");
+			m_bError = true;
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
 		}
@@ -168,16 +151,17 @@ bool LLTAnalysisDlg::AlphaLoop()
 			m_pWing->LLTComputeWing();// generates wing results, 
 			if (m_pWing->m_bWingOut) m_bWarning = true;
 			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-			if(m_pWing->m_bWingOut)
+/*			if(m_pWing->m_bWingOut)
 			{
 				str= QString("\r\n");
 				UpdateOutput(str);
-			}
+			}*/
 			m_pWing->m_bInitCalc = false;
 		}
 		else 
 		{
 			if (m_pWing->m_bWingOut) m_bWarning = true;
+			m_bError = true;
 			str= QString("    ...unconverged after %2 iterations\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
@@ -285,11 +269,29 @@ int LLTAnalysisDlg::Iterate()
 }
 
 
+void LLTAnalysisDlg::keyPressEvent(QKeyEvent *event)
+{
+	switch (event->key())
+	{
+		case Qt::Key_Escape:
+		{
+			OnCancelAnalysis();
+			event->accept();
+			return;
+		}
+		default:
+			event->ignore();
+	}
+}
+
+
 void LLTAnalysisDlg::OnCancelAnalysis()
 {
+	if(m_pXFile->isOpen()) m_pXFile->close();
 	m_bSkip = true;
 	m_bExit = true;
 	m_bCancel = true;
+	if(m_bFinished) done(1);
 }
 
 
@@ -323,7 +325,6 @@ void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlph
 void LLTAnalysisDlg::SetFileHeader()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
@@ -351,10 +352,9 @@ void LLTAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/3);
-	setMinimumWidth(r.width()/3);
-//	move(r.width()/3, r.height()/6);
-
+	setMinimumHeight(r.height()/2);
+	setMinimumWidth(r.width()/2);
+	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
@@ -369,17 +369,17 @@ void LLTAnalysisDlg::SetupLayout()
 //	QHBoxLayout *GraphLayout = new QHBoxLayout;
 //	GraphLayout->addWidget(m_pGraphWidget,1);
 
-	QPushButton *skipButton   = new QPushButton(tr("Skip"));
-	QPushButton *cancelButton = new QPushButton(tr("Cancel"));
+	m_pctrlSkip   = new QPushButton(tr("Skip"));
+	m_pctrlCancel = new QPushButton(tr("Cancel"));
 
-	connect(skipButton,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
+	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
+	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(skipButton);
+	buttonsLayout->addWidget(m_pctrlSkip);
 	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(cancelButton);
+	buttonsLayout->addWidget(m_pctrlCancel);
 	buttonsLayout->addStretch(1);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -396,6 +396,15 @@ void LLTAnalysisDlg::StartAnalysis()
 	//all set to launch the analysis
 	if(!m_pWPolar || !m_pWing) return;
 
+	m_bSkip       = false;
+	m_bExit       = false;
+	m_bCancel     = false;
+	m_bWarning    = false;
+	m_bError      = false;
+	m_bFinished   = false;
+
+	m_pctrlTextOutput->clear();
+
 	if (m_pWPolar->m_Type!=4)
 	{
 		m_pWing->m_Viscosity = m_pWPolar->m_Viscosity;
@@ -406,6 +415,17 @@ void LLTAnalysisDlg::StartAnalysis()
 	{
 		ReLoop();
 	}
+
+	m_bFinished = true;
+	QString strange = "\r\n_________\r\nAnalysis completed";
+	if(m_bWarning)      strange += " ...some points are outside the flight envelope";
+	else if(m_bError)	strange += " ...some points are unconverged";
+
+	strange+= "\r\n";
+
+	UpdateOutput(strange);
+	m_pctrlCancel->setText("Close");
+	m_pctrlSkip->setEnabled(false);
 
 	m_bSkip   = false;
 	m_bExit   = false;
@@ -496,6 +516,7 @@ bool LLTAnalysisDlg::ReLoop()
 		if(iter<0)
 		{
 			//unconverged
+			m_bError = true;
 			m_bWarning = true;
 			str = QString("\r\n");
 			UpdateOutput(str);
@@ -512,18 +533,19 @@ bool LLTAnalysisDlg::ReLoop()
 			str = QString("    ...converged after %1 iterations\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->LLTComputeWing();// generates wing results, 
-			if (m_pWing->m_bWingOut)m_bWarning = true;
+			if (m_pWing->m_bWingOut) m_bWarning = true;
 			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-			if(m_pWing->m_bWingOut)
+/*			if(m_pWing->m_bWingOut)
 			{
 				str = QString("\r\n");
 				UpdateOutput(str);
-			}
+			}*/
 			m_pWing->m_bInitCalc = false;
 		}
 		else
 		{
 			if (m_pWing->m_bWingOut) m_bWarning = true;
+			m_bError = true;
 			str = QString("    ...unconverged after %1 iterations\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;

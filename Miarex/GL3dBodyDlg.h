@@ -26,6 +26,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QSlider>
 #include <QRadioButton>
 #include <QStandardItemModel>
@@ -70,7 +71,7 @@ private slots:
 	void OnImportBodyDef() ;
 	void OnTranslateBody();
 	void OnGrid();
-	void OnSetupLight();
+//	void OnSetupLight();
 	void OnClipPlane(int pos);
 	void OnLight();
 	void OnSurfaces();
@@ -91,6 +92,7 @@ private slots:
 	void OnBodyName();
 	void OnSelChangeXDegree(int sel);
 	void OnSelChangeHoopDegree(int sel);
+	void OnOK();
 
 private:
 	void wheelEvent(QWheelEvent *event);
@@ -138,6 +140,8 @@ private:
 	void GLCallViewLists();
 	void GLDraw3D();
 	void GLDrawBodyLegend();
+	void GLDrawBodyLineScale();
+	void GLDrawBodyFrameScale();
 	void SetBodyScale();
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
@@ -164,10 +168,14 @@ private:
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight;
+	QPushButton *m_pctrlUndo, *m_pctrlRedo;
+	QPushButton *m_pctrlOK, *m_pctrlCancel;
 
 	QSlider *m_pctrlClipPlanePos;
 
 	QLineEdit *m_pctrlBodyName;
+	QTextEdit *m_pctrlBodyDescription;
+
 	QRadioButton *m_pctrlFlatPanels, *m_pctrlBSplines;
 	LineButton *m_pctrlBodyStyle;
 	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
@@ -182,7 +190,7 @@ private:
 	QAction *m_pInsertPoint, *m_pRemovePoint, *m_pScaleBody;
 	QAction *m_pShowCurFrameOnly, *m_pResetScales;
 	QAction *m_pUndo, *m_pRedo;
-	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody, *m_pSetupLight;
+	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody;// *m_pSetupLight;
 	QAction *m_pGrid;
 
 

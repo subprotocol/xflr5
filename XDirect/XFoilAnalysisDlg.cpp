@@ -25,9 +25,11 @@
 #include "XDirect.h"
 #include "../MainFrame.h"
 
+void *XFoilAnalysisDlg::s_pMainFrame;
+void *XFoilAnalysisDlg::s_pXDirect;
+
 XFoilAnalysisDlg::XFoilAnalysisDlg()
 {
-
 	setWindowTitle(tr("XFoil Analysis"));
 	SetupLayout();
 
@@ -52,11 +54,10 @@ XFoilAnalysisDlg::XFoilAnalysisDlg()
 
 	m_bSkip       = false;
 	m_bExit       = false;
-	m_bCalc       = false;
+	m_bFinished   = false;
 	m_bAutoInitBL = true;
 
 	m_pXFile = NULL;
-
 
 	m_Iterations =  0;
 	m_IterLim    = 20;
@@ -79,13 +80,11 @@ XFoilAnalysisDlg::XFoilAnalysisDlg()
 
 	m_pXFoil       = NULL;
 	m_pXFile       = NULL;
-	m_pXDirect     = NULL;
-	m_pMainFrame   = NULL;
-
 }
+
+
 void XFoilAnalysisDlg::SetupLayout()
 {
-
 	m_pctrlTextOutput = new QTextEdit;
 	m_pctrlTextOutput->setReadOnly(true);
 	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
@@ -99,22 +98,18 @@ void XFoilAnalysisDlg::SetupLayout()
 	QHBoxLayout *GraphLayout = new QHBoxLayout;
 	GraphLayout->addWidget(m_pGraphWidget);
 
-	QPushButton *skipButton   = new QPushButton(tr("Skip"));
-	QPushButton *cancelButton = new QPushButton(tr("Cancel"));
-	QPushButton *closeButton  = new QPushButton(tr("Close"));
+	m_pctrlSkip   = new QPushButton(tr("Skip"));
+	m_pctrlCancel = new QPushButton(tr("Cancel"));
 
-	connect(skipButton,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
-	connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
-	connect(closeButton,  SIGNAL(clicked()), this, SLOT(close()));
+	connect(m_pctrlSkip,   SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
+	connect(m_pctrlCancel, SIGNAL(clicked()), this, SLOT(OnCancelAnalysis()));
 
 
 	QHBoxLayout *buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(skipButton);
+	buttonsLayout->addWidget(m_pctrlSkip);
 	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(cancelButton);
-	buttonsLayout->addStretch(1);
-	buttonsLayout->addWidget(closeButton);
+	buttonsLayout->addWidget(m_pctrlCancel);
 	buttonsLayout->addStretch(1);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -144,7 +139,7 @@ void XFoilAnalysisDlg::accept()
 
 void XFoilAnalysisDlg::AddOpPoint()
 {
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	pXDirect->AddOpPoint();
 	if(pXDirect->m_bPolar)
 	{
@@ -179,6 +174,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 	if(!m_bSequence) total = 0;
 
 	QString strange;
+
 
 	for (ia=0; ia<=total; ia++)
 	{
@@ -255,7 +251,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 
 void XFoilAnalysisDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
@@ -273,7 +269,7 @@ void XFoilAnalysisDlg::InitDialog()
 	m_RmsGraph.GetCurve(0)->SetTitle(str);
 	str = "max";
 	m_RmsGraph.GetCurve(1)->SetTitle(str);
-        m_RmsGraph.GetCurve(1)->SetStyle(0);
+	m_RmsGraph.GetCurve(1)->SetStyle(0);
 
 	m_RmsGraph.SetAutoX(true);
 	m_RmsGraph.SetXMin(0.0);
@@ -314,7 +310,6 @@ bool XFoilAnalysisDlg::Iterate()
 	str="   Solving BL system ...\r\n";
 	WriteString(str);
 
-
 	while(m_Iterations<m_IterLim  && !m_pXFoil->lvconv && !m_bSkip)
 	{
 		qApp->processEvents();
@@ -352,7 +347,6 @@ bool XFoilAnalysisDlg::Iterate()
 		m_pXFoil->lipan = false;
 		return true;// to exit loop
 	}
-	m_bCalc = true;
 
 	if(m_Iterations>=m_IterLim && !m_pXFoil->lvconv)
 	{
@@ -385,10 +379,12 @@ bool XFoilAnalysisDlg::Iterate()
 	}
 }
 
+
 void XFoilAnalysisDlg::OnCancelAnalysis()
 {
 	m_bSkip = true;
 	m_bExit = true;
+	if(m_bFinished) reject();
 }
 
 
@@ -505,8 +501,8 @@ void XFoilAnalysisDlg::SetRe(double ReMin, double ReMax, double DeltaRe)
 
 void XFoilAnalysisDlg::SetFileHeader()
 {
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
@@ -533,6 +529,12 @@ void XFoilAnalysisDlg::SetFileHeader()
 
 void XFoilAnalysisDlg::StartAnalysis()
 {
+	m_pctrlCancel->setText("Cancel");
+	m_pctrlSkip->setEnabled(true);
+	m_bSkip     = false;
+	m_bExit     = false;
+	m_bFinished = false;
+
 	//all set to launch the analysis
 	if (!m_bType4)
 	{
@@ -543,8 +545,9 @@ void XFoilAnalysisDlg::StartAnalysis()
 		ReLoop();
 	}
 
-	m_bSkip   = false;
-	m_bExit   = false;
+	m_bFinished = true;
+	m_pctrlCancel->setText("Close");
+	m_pctrlSkip->setEnabled(false);
 }
 
 

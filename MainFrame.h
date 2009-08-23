@@ -91,7 +91,6 @@ public slots:
 private slots:
 	void AboutQFLR5();
 	void OnCurFoilStyle();
-	void OnDeleteCurPolar();
 	void OnGuidelines();
 	void OnExportCurGraph();
 	void OnInsertProject();
@@ -162,11 +161,11 @@ private:
 	void UpdateWOpps();
 
 	void UpdateView();
-	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL);
+	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL, int ProjectFormat=5);
 
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
-	bool SerializeProject(QDataStream &ar, bool bIsStoring);
-	bool SerializeUFOProject(QDataStream &ar);
+	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat = 5);
+	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool SelectFoil(CFoil *pFoil);
 	bool SelectPolar(CPolar *pPolar);
@@ -189,7 +188,6 @@ private:
 	QString ShortenFileName(QString &PathName);
 	void AddRecentFile(const QString &PathNAme);
 	void updateRecentFileActions();
-
 
 
 /*___________________________________________Variables_______________________________*/
@@ -289,6 +287,7 @@ private:
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QAction *ManageUFOs;
+	QAction *m_pImportWPolar;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
 
 
@@ -313,6 +312,7 @@ private:
 	QAction *CurXFoilResExport, * CurXFoilCtPlot, *CurXFoilDbPlot, *CurXFoilDtPlot, *CurXFoilRtLPlot;
 	QAction *CurXFoilRtPlot, *CurXFoilNPlot, *CurXFoilCdPlot, *CurXFoilCfPlot, *CurXFoilUePlot, *CurXFoilHPlot;
 	QAction *ManageFoilsAct, *RenamePolarAct;
+	QAction *m_pImportJavaFoilPolar, *m_pImportXFoilPolar;
 	QToolButton *m_pctrlPolarView, *m_pctrlOppView;
 
 	QComboBox *m_pctrlFoil, *m_pctrlPolar, * m_pctrlOpPoint;
@@ -340,8 +340,7 @@ private:
 	QList <void *> m_oaPOpp;
 	QList <void *> m_oaBody;
 
-	CRectangle m_GLViewRect; // The OpenGl Viewport
-
+	QPoint m_DlgPos;//preferred position for dialog boxes
 
 	int m_iApp;
 

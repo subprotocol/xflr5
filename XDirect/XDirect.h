@@ -33,6 +33,7 @@
 #include "../Objects/OpPoint.h"
 #include "../Graph/QGraph.h"
 #include "XFoil.h"
+#include "XFoilAnalysisDlg.h"
 
 
 class QXDirect : public QWidget
@@ -82,6 +83,7 @@ private slots:
 	void OnCurveColor();
 	void OnDeleteCurFoil();
 	void OnDelCurOpp();
+	void OnDeleteCurPolar();
 	void OnDeleteFoilPolars();
 	void OnDeltaAlphaChanged();
 	void OnDuplicateFoil();
@@ -92,6 +94,8 @@ private slots:
 	void OnHideAllOpps();
 	void OnHideAllPolars();
 	void OnHideFoilPolars();
+	void OnImportJavaFoilPolar();
+	void OnImportXFoilPolar();
 	void OnInitBL();
 	void OnOpPoints();
 	void OnPolars();
@@ -110,7 +114,7 @@ private slots:
 	void OnShowAllOpps();
 	void OnShowAllPolars();
 	void OnShowPressure();
-	void OnSingleAnalysis();
+	void OnDefinePolar();
 	void OnSpec();
 	void OnStoreOpp();
 	void OnViscous();
@@ -340,7 +344,7 @@ private:
 	QPoint m_PolarLegendOffset;
 //	CFoilAnalysisDlg m_Adlg;	// the polar definition dialog box
 //	CUFOListDlg m_UFOdlg;		// the foil management dialog box
-//	CViscDlg m_ViscDlg;		// the dialog class which manages the xfoil calculation and display output
+	XFoilAnalysisDlg m_XFdlg;	// the dialog class which manages the xfoil calculation and display output
 
 	XFoil *m_pXFoil;		// a pointer to the XFoil object
 

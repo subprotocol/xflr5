@@ -30,9 +30,7 @@
 #include <math.h>
 #include "../Globals.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+void *CWPolar::s_pMainFrame;
 
 CWPolar::CWPolar()
 {
@@ -87,6 +85,128 @@ CWPolar::~CWPolar()
 	ResetWPlr();
 }
 
+
+void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double TCd,  double CY,
+					   double GCm,   double GRm, double GYm, double IYm, double QInf, double XCP)
+{
+	bool bInserted = false;
+	int i;
+	int size = (int)m_Alpha.size();
+
+	if(size)
+	{
+		for (i=0; i<size; i++)
+		{
+			if(m_Type <4)
+			{
+				if (fabs(alpha - m_Alpha[i]) < 0.001)
+				{
+					// then erase former result
+					m_Alpha[i]      =  alpha;
+					m_Cl[i]         =  CL;
+					m_CY[i]         =  CY;
+					m_ICd[i]        =  ICd;
+					m_PCd[i]        =  PCd;
+					m_TCd[i]        =  ICd+PCd;
+
+					m_GCm[i]        =  GCm;
+					m_GRm[i]        =  GRm;
+					m_GYm[i]        =  GYm;
+					m_VYm[i]        =  0.0;
+					m_IYm[i]        =  IYm;
+
+					m_QInfinite[i]  =  QInf;
+					m_XCP[i]        =  XCP;
+					m_YCP[i]        =  0.0;
+					m_MaxBending[i] =  0.0;
+					m_Ctrl[i]       =  0.0;
+					bInserted = true;
+					break;
+				}
+				else if (alpha < m_Alpha[i])
+				{
+					// sort by crescending alphas
+					m_Alpha.insert(i, alpha);
+					m_Cl.insert(i,  CL);
+					m_CY.insert(i,  CY);
+					m_ICd.insert(i, ICd);
+					m_PCd.insert(i, PCd);
+					m_TCd.insert(i, ICd + PCd);
+
+					m_GCm.insert(i, GCm);
+					m_GRm.insert(i, GRm);
+					m_GYm.insert(i, GYm);
+					m_VYm.insert(i, 0.0);
+					m_IYm.insert(i, IYm);
+
+					m_QInfinite.insert(i, QInf);
+					m_XCP.insert(i,  XCP);
+					m_YCP.insert(i,  0.0);
+					m_MaxBending.insert(i, 0.0);
+					m_Ctrl.insert(i, 0.0);
+
+					m_1Cl.insert(i,0.0);//make room for computed values
+					m_ClCd.insert(i,0.0);
+					m_Cl32Cd.insert(i,0.0);
+					m_Vx.insert(i,0.0);
+					m_Vz.insert(i,0.0);
+					m_L.insert(i,0.0);
+					m_D.insert(i,0.0);
+					m_Gamma.insert(i,0.0);
+					m_Rm.insert(i, 0.0);
+					m_Pm.insert(i, 0.0);
+					m_Ym.insert(i, 0.0);
+					m_VertPower.insert(i, 0.0);
+					m_Oswald.insert(i, 0.0);
+					m_SM.insert(i, 0.0);
+
+					bInserted = true;
+					break;
+				}
+			}
+		}
+	}
+	if(bInserted) CalculatePoint(i);
+	else
+	{
+		// data is appended at the end
+		m_Alpha.append(alpha);
+		m_Cl.append(CL);
+		m_CY.append(CY);
+		m_ICd.append(ICd);
+		m_PCd.append(PCd);
+		m_TCd.append(ICd + PCd);
+
+		m_GCm.append(GCm);
+		m_GRm.append(GRm);
+		m_GYm.append(GYm);
+		m_VYm.append(0.0);
+		m_IYm.append(IYm);
+
+		m_QInfinite.append(QInf);
+		m_XCP.append(XCP);
+		m_YCP.append(0.0);
+		m_MaxBending.append(0.0);
+		m_Ctrl.append(0.0);
+
+		m_1Cl.append(0.0);//make room for computed values
+		m_ClCd.append(0.0);
+		m_Cl32Cd.append(0.0);
+		m_Vx.append(0.0);
+		m_Vz.append(0.0);
+		m_L.append(0.0);
+		m_D.append(0.0);
+		m_Gamma.append(0.0);
+		m_Rm.append(0.0);
+		m_Pm.append(0.0);
+		m_Ym.append(0.0);
+		m_VertPower.append(0.0);
+		m_Oswald.append(0.0);
+		m_SM.append(0.0);
+
+		CalculatePoint(size);
+	}
+}
 
 
 void CWPolar::AddPoint(CWOpp *pWOpp)
@@ -716,14 +836,12 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	}
 }
 
+
 void CWPolar::Export(QTextStream &out, int FileType)
 {
-	MainFrame* pMainFrame = (MainFrame*)m_pParent;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
 	QString strOut, Header, strong, str;
-
-
-
 	if (FileType==1)
 	{
 	//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
@@ -738,7 +856,7 @@ void CWPolar::Export(QTextStream &out, int FileType)
 
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		str +="\n\n";
-		strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
+		strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
 		strong +=str;
 		out << strong;
 

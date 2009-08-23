@@ -53,9 +53,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
-	m_VersionName = "QFLR5 v0.01";
+	m_VersionName = "QFLR5 v0.02";
 
-	m_SettingsFormat = 100553;
+	m_SettingsFormat = 100555;
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -89,6 +89,10 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_bSaveWOpps = true;
 
 	m_StyleName = "Cleanlooks";
+
+	QDesktopWidget desktop;
+	QRect r = desktop.screenGeometry();
+	m_DlgPos = QPoint((int)(r.width()/3), (int)(r.height()/3));
 
 	LoadSettings();
 
@@ -351,6 +355,8 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 	QPoint ScreenPt = event->pos();
 	ScreenPt.rx() += geometry().x();
 	ScreenPt.ry() += geometry().y();
+
+
 	switch(m_iApp)
 	{
 		case MIAREX:
@@ -474,7 +480,7 @@ void MainFrame::CreateActions()
 	exportCurGraphAct->setStatusTip(tr("Export the current graph data to a text file"));
 	connect(exportCurGraphAct, SIGNAL(triggered()), this, SLOT(OnExportCurGraph()));
 
-	resetCurGraphScales = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales"), this);
+	resetCurGraphScales = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales \t(R)"), this);
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
@@ -845,6 +851,8 @@ void MainFrame::CreateDockWindows()
 
 	CBody::s_pMainFrame    = this;
 
+	CWPolar::s_pMainFrame  = this;
+
 	VLMAnalysisDlg::s_pMainFrame = this;
 	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;
@@ -853,6 +861,8 @@ void MainFrame::CreateDockWindows()
 	CPlane::s_pMainFrame   = this;
 	CPlane::s_pMiarex      = m_pMiarex;
 
+	XFoilAnalysisDlg::s_pMainFrame  = this;
+	XFoilAnalysisDlg::s_pXDirect = m_pXDirect;
 	BodyGridDlg::s_pMainFrame = this;
 	NacaFoilDlg::s_pXFoil         = pXDirect->m_pXFoil;
 	InterpolateFoilsDlg::s_pXFoil = pXDirect->m_pXFoil;
@@ -864,6 +874,8 @@ void MainFrame::CreateDockWindows()
 
 	GraphDlg::s_pMainFrame = this;
 	GraphDlg::s_ActivePage = 0;
+
+
 
 	UFOTableDelegate::s_pMiarex = m_pMiarex;
 }
@@ -1010,6 +1022,9 @@ void MainFrame::CreateMiarexActions()
 	ManageUFOs = new QAction(tr("Manage UFOs"), this);
 	ManageUFOs->setShortcut(tr("F7"));
 	connect(ManageUFOs, SIGNAL(triggered()), pMiarex, SLOT(OnManageUFOs()));
+
+	m_pImportWPolar = new QAction(tr("Import Polar"), this);
+	connect(m_pImportWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnImportWPolar()));
 
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
 	showCurWOppOnly->setCheckable(true);
@@ -1230,6 +1245,8 @@ void MainFrame::CreateMiarexMenus()
 	CurWPlrMenu->addAction(showAllWPlrOpps);
 	CurWPlrMenu->addAction(hideAllWPlrOpps);
 	CurWPlrMenu->addAction(deleteAllWPlrOpps);
+	MiarexWPlrMenu->addSeparator();
+	MiarexWPlrMenu->addAction(m_pImportWPolar);
 	MiarexWPlrMenu->addSeparator();
 	MiarexWPlrMenu->addAction(MiarexPolarFilter);
 	MiarexWPlrMenu->addSeparator();
@@ -1571,7 +1588,7 @@ void MainFrame::CreateXDirectActions()
 	definePolar = new QAction(tr("Define an Analysis"), this);
 	definePolar->setShortcut(tr("F6"));
 	definePolar->setStatusTip(tr("Defines a single analysis/polar"));
-	connect(definePolar, SIGNAL(triggered()), pXDirect, SLOT(OnSingleAnalysis()));
+	connect(definePolar, SIGNAL(triggered()), pXDirect, SLOT(OnDefinePolar()));
 
 	defineBatch = new QAction(tr("Batch Analysis"), this);
 	defineBatch->setShortcut(tr("Shift+F6"));
@@ -1580,7 +1597,7 @@ void MainFrame::CreateXDirectActions()
 
 	deletePolar = new QAction(tr("Delete"), this);
 	deletePolar->setStatusTip(tr("Deletes the currently selected polar"));
-	connect(deletePolar, SIGNAL(triggered()), this, SLOT(OnDeleteCurPolar()));
+	connect(deletePolar, SIGNAL(triggered()), pXDirect, SLOT(OnDeleteCurPolar()));
 
 	resetCurPolar = new QAction(tr("Reset"), this);
 	resetCurPolar->setStatusTip(tr("Deletes the contents of the currently selected polar"));
@@ -1743,6 +1760,12 @@ void MainFrame::CreateXDirectActions()
 	CurXFoilHPlot = new QAction(tr("Kinematic Shape Parameter"), this);
 	CurXFoilHPlot->setCheckable(true);
 	connect(CurXFoilHPlot, SIGNAL(triggered()), pXDirect, SLOT(OnHPlot()));
+
+	m_pImportJavaFoilPolar = new QAction(tr("Import JavaFoil Polar"), this);
+	connect(m_pImportJavaFoilPolar, SIGNAL(triggered()), pXDirect, SLOT(OnImportJavaFoilPolar()));
+
+	m_pImportXFoilPolar = new QAction(tr("Import XFoil Polar"), this);
+	connect(m_pImportXFoilPolar, SIGNAL(triggered()), pXDirect, SLOT(OnImportXFoilPolar()));
 }
 
 
@@ -1810,6 +1833,9 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu->addAction(showPolarOpps);
 	currentPolarMenu->addAction(hidePolarOpps);
 	currentPolarMenu->addAction(deletePolarOpps);
+	PolarMenu->addSeparator();
+	PolarMenu->addAction(m_pImportXFoilPolar);
+	PolarMenu->addAction(m_pImportJavaFoilPolar);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(XDirectPolarFilter);
 	PolarMenu->addSeparator();
@@ -2128,51 +2154,6 @@ void MainFrame::CreateXInverseToolbar()
 
 
 
-void MainFrame::OnDeleteCurPolar()
-{
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	if(!pXDirect->m_pCurPolar) return;
-	OpPoint *pOpPoint;
-	int l;
-	QString str;
-
-	str = tr("Are you sure you want to delete the polar :\n  ") + pXDirect->m_pCurPolar->m_PlrName;
-	str += tr("\n and all the associated OpPoints ?");
-
-	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
-		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-	{
-		// start by removing all OpPoints
-		for (l=m_oaOpp.size()-1; l>=0; l--)
-		{
-			pOpPoint = (OpPoint*)m_oaOpp.at(l);
-			if (pOpPoint->m_strPlrName == pXDirect->m_pCurPolar->m_PlrName &&
-				pOpPoint->m_strFoilName == pXDirect->m_pCurFoil->m_FoilName)
-			{
-				m_oaOpp.removeAt(l);
-				delete pOpPoint;
-			}
-		}
-		// then remove CPolar and update views
-		for (l=m_oaPolar.size()-1; l>=0; l--)
-		{
-			if(pXDirect->m_pCurPolar == m_oaPolar.at(l))
-			{
-				m_oaPolar.removeAt(l);
-				delete pXDirect->m_pCurPolar;
-			}
-		}
-		pXDirect->m_pCurOpp   = NULL;
-		pXDirect->m_pCurPolar = NULL;
-	}
-
-	UpdatePolars();
-	pXDirect->SetPolar();
-
-	SetSaveState(false);
-	UpdateView();
-}
-
 bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
@@ -2182,59 +2163,56 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
     OpPoint * pOpPoint;
     CPolar* pPolar;
     int j;
-    bool bDelete = true;
 
     if(bAsk)
     {
 		strong = tr("Are you sure you want to delete \n") + pFoil->m_FoilName ;
 		strong+= +"\n" + tr("and all associated OpPoints and Polars ?");
 
-		int resp=QMessageBox::question(this,tr("Question"), strong,  QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
-		if(resp==QMessageBox::Yes)			bDelete = true;
-		else return false;
+		int resp = QMessageBox::question(this,tr("Question"), strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+		if(resp != QMessageBox::Yes) return false;
     }
 
-    if (bDelete)
-    {
-		for (j= m_oaOpp.size()-1; j>=0; j--)
+	for (j= m_oaOpp.size()-1; j>=0; j--)
+	{
+		pOpPoint = (OpPoint*)m_oaOpp[j];
+		if(pOpPoint->m_strFoilName == pFoil->m_FoilName)
 		{
-			pOpPoint = (OpPoint*)m_oaOpp[j];
-			if(pOpPoint->m_strFoilName == pFoil->m_FoilName)
-			{
-				m_oaOpp.removeAt(j);
-				delete pOpPoint;
-			}
+			m_oaOpp.removeAt(j);
+			delete pOpPoint;
 		}
-		for (j= (int)m_oaPolar.size()-1;j>=0; j--)
+	}
+	for (j= (int)m_oaPolar.size()-1;j>=0; j--)
+	{
+		pPolar = (CPolar*)m_oaPolar.at(j);
+		if(pPolar->m_FoilName == pFoil->m_FoilName)
 		{
-			pPolar = (CPolar*)m_oaPolar.at(j);
-			if(pPolar->m_FoilName == pFoil->m_FoilName)
-			{
-				m_oaPolar.removeAt(j);
-				delete pPolar;
-			}
+			m_oaPolar.removeAt(j);
+			delete pPolar;
 		}
-		for (j=0; j< m_oaFoil.size(); j++)
+	}
+	for (j=0; j< m_oaFoil.size(); j++)
+	{
+		pOldFoil = (CFoil*)m_oaFoil.at(j);
+		if (pOldFoil == pFoil)
 		{
-			pOldFoil = (CFoil*)m_oaFoil.at(j);
-			if (pOldFoil == pFoil)
-			{
-				m_oaFoil.removeAt(j);
-				delete pOldFoil;
-				if(m_pCurFoil == pOldFoil)           m_pCurFoil = NULL;
-				if(pXDirect->m_pCurFoil == pOldFoil) pXDirect->m_pCurFoil = NULL;
-				break;
-			}
+			m_oaFoil.removeAt(j);
+			delete pOldFoil;
+			if(m_pCurFoil == pOldFoil)           m_pCurFoil = NULL;
+			if(pXDirect->m_pCurFoil == pOldFoil) pXDirect->m_pCurFoil = NULL;
+			break;
 		}
-		pXDirect->m_pCurOpp = NULL;
-		pXDirect->m_pCurPolar = NULL;
-		pXDirect->m_pCurFoil = NULL;
-		pXDirect->CheckButtons();
-		SetSaveState(false);
-    }
-    return true;
+	}
+	pXDirect->m_pCurOpp = NULL;
+	pXDirect->m_pCurPolar = NULL;
+	pXDirect->m_pCurFoil = NULL;
+	pXDirect->CheckButtons();
+	SetSaveState(false);
 
+	return true;
 }
+
+
 
 void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 {
@@ -2756,6 +2734,7 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
 	CFoil *pFoil;
@@ -2946,6 +2925,8 @@ void MainFrame::LoadSettings()
 	ar >> m_TextFont;
 	ar >> m_ImageFormat;
 	ar >> m_bSaveOpps >> m_bSaveWOpps;
+	ar >> k; m_DlgPos.rx() = k;
+	ar >> k; m_DlgPos.ry() = k;
 
 	ar >> k;
 	if(k<0 || k> MAXRECENTFILES)
@@ -3065,7 +3046,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				QDataStream ar(&XFile);
 				ar.setByteOrder(QDataStream::LittleEndian);
 
-				if(SerializeProject(ar, false))
+				if(SerializeProject(ar, false, 1))
 				{
 					m_pCurFoil = pXDirect->SetFoil();
 					UpdateFoils();
@@ -3232,7 +3213,7 @@ void MainFrame::OnInsertProject()
 	QDataStream ar(&XFile);
 	ar.setByteOrder(QDataStream::LittleEndian);
 
-	SerializeProject(ar, false);
+	SerializeProject(ar, false, 1);
 
 	SetSaveState(false);
 
@@ -3464,12 +3445,15 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 			NameList.append(pOldFoil->m_FoilName);
 		}
 		RenameDlg dlg(this);
+		dlg.move(m_DlgPos);
 		dlg.m_pstrArray = & NameList;
 		dlg.m_strQuestion = tr("Enter the foil's new name");
 		dlg.m_strName = OldName;
 		bool bExists = false;
 		dlg.InitDialog();
 		int resp = dlg.exec();
+		m_DlgPos = dlg.pos();
+
 		strong = dlg.m_strName;
 
 		if(QDialog::Accepted == resp)
@@ -3759,7 +3743,7 @@ void MainFrame::OnSaveUFOAsProject()
 
 	QDataStream ar(&fp);
 	ar.setByteOrder(QDataStream::LittleEndian);
-	SerializeUFOProject(ar);
+	SerializeUFOProject(ar,5);
 	m_FileName = PathName;
 	fp.close();
 
@@ -3845,7 +3829,7 @@ void MainFrame::OnSaveViewToImageFile()
 			if(pMiarex->m_iView==3)
 			{
 				pMiarex->UpdateView();
-				pMiarex->SnapClient(FileName, m_ImageFormat);
+				pMiarex->SnapClient(FileName);
 				return;
 			}
 			else pMiarex->PaintView(painter);
@@ -3865,8 +3849,8 @@ void MainFrame::OnSelChangeUFO(int i)
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->StopAnimate();
 	QString strong;
-	int sel = m_pctrlUFO->currentIndex();
-	if (sel >=0) strong = m_pctrlUFO->itemText(sel);
+//	int sel = m_pctrlUFO->currentIndex();
+	if (i >=0) strong = m_pctrlUFO->itemText(i);
 	pMiarex->SetUFO(strong);
 
 	m_iApp = MIAREX;
@@ -3886,8 +3870,8 @@ void MainFrame::OnSelChangeWPolar(int i)
 	pMiarex->StopAnimate();
 
 	QString strong;
-	int sel = m_pctrlWPolar->currentIndex();
-	if (sel >=0) strong = m_pctrlWPolar->itemText(sel);
+//	int sel = m_pctrlWPolar->currentIndex();
+	if (i >=0) strong = m_pctrlWPolar->itemText(i);
 	m_iApp = MIAREX;
 	pMiarex->SetWPlr(false, strong);
 	pMiarex->SetWOpp(true);
@@ -4018,6 +4002,7 @@ void MainFrame::OnStyle()
 //	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
 	DisplaySettingsDlg dlg(this);
+	dlg.move(m_DlgPos);
 	dlg.m_BackgroundColor = m_BackgroundColor;
 	dlg.m_TextColor       = m_TextColor;
 	dlg.m_TextFont        = m_TextFont;
@@ -4040,6 +4025,7 @@ void MainFrame::OnStyle()
 			SetGraphSettings(&m_RefGraph);
 		}
 	}
+	m_DlgPos = dlg.pos();
 
 	pXDirect->m_pCpGraph->SetInverted(true);
 	UpdateView();
@@ -4049,6 +4035,7 @@ void MainFrame::OnStyle()
 void MainFrame::OnUnits()
 {
 	UnitsDlg dlg;
+	dlg.move(m_DlgPos);
 	dlg.m_Length = m_LengthUnit;
 	dlg.m_Area   = m_AreaUnit;
 	dlg.m_Weight = m_WeightUnit;
@@ -4077,6 +4064,7 @@ void MainFrame::OnUnits()
 			pMiarex->UpdateUnits();
 		}
 	}
+	m_DlgPos = dlg.pos();
 }
 
 
@@ -4430,16 +4418,19 @@ void MainFrame::RemoveOpPoint(bool bCurrent)
 
 bool MainFrame::SaveProject(QString PathName)
 {
+	QString Filter = ".wpa";
+	QString FileName = m_ProjectName;
+	int Format = 5;
+
 	if(!PathName.length())
 	{
-		QString Filter = ".wpa";
-		QString FileName = m_ProjectName;
 		if(FileName.right(1)=="*") 	FileName = FileName.left(FileName.length()-1);
 		FileName.replace("/", " ");
 
 		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 												m_LastDirName+"/"+FileName,
-												tr("XFLR5 Project File (*.wpa)"), &Filter);
+												tr("QFLR5 v5.00 Project File (*.wpa);;XFLR5 v4.00 Project File (*.wpa)"),
+												&Filter);
 		if(!PathName.length()) return false;//nothing more to do
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 		if(pos<0) PathName += ".wpa";
@@ -4447,6 +4438,8 @@ bool MainFrame::SaveProject(QString PathName)
 		if(pos>0) m_LastDirName = PathName.left(pos);
 	}
 
+	if(Filter=="XFLR5 v4.00 Project File (*.wpa)")      Format = 4;// readable by XFLR5 v4
+	else if(Filter=="QFLR5 v5.00 Project File (*.wpa)") Format = 5;// foil, wing and plane descriptions shall be saved
 	QString strong;
 	QFile fp(PathName);
 
@@ -4460,7 +4453,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 	QDataStream ar(&fp);
 	ar.setByteOrder(QDataStream::LittleEndian);
-	SerializeProject(ar,true);
+	SerializeProject(ar,true, Format);
 	m_FileName = PathName;
 	fp.close();
 
@@ -4508,6 +4501,7 @@ void MainFrame::SaveSettings()
 	ar << m_TextFont ;
 	ar << m_ImageFormat;
 	ar << m_bSaveOpps << m_bSaveWOpps;
+	ar << m_DlgPos.x() << m_DlgPos.y();
 
 	ar << m_RecentFiles.size();
 	for(int i=0; i<m_RecentFiles.size(); i++)
@@ -4610,7 +4604,7 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
     return false;
 }
 
-bool MainFrame::SerializeUFOProject(QDataStream &ar)
+bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	if(!pMiarex->m_pCurWing)
@@ -4680,7 +4674,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	if(!pPlane)
 	{
 		ar << 1;//just one wing
-		pWing->SerializeWing(ar,true);
+		pWing->SerializeWing(ar,true, ProjectFormat);
 	}
 	else ar <<0;
 
@@ -4697,7 +4691,6 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	for (i=0; i<m_oaWPolar.size();i++)
 	{
 		pWPolar = (CWPolar*)m_oaWPolar.at(i);
-		pWPolar->m_pParent = this;
 		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar, true);
 	}
 
@@ -4815,7 +4808,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	for (i=0; i<(int)FoilList.size(); i++)
 	{
 		pFoil = GetFoil(FoilList[i]);
-		pFoil->Serialize(ar, true);
+		pFoil->Serialize(ar, true, ProjectFormat);
 	}
 	int n = 0;
 	for (i=0; i<FoilList.size(); i++)
@@ -4851,7 +4844,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	if(pPlane && pPlane->m_bBody && pPlane->m_pBody)
 	{
 		ar << 1;
-		pPlane->m_pBody->SerializeBody(ar, true);
+		pPlane->m_pBody->SerializeBody(ar, true, ProjectFormat);
 	}
 	else ar <<0; //no plane
 
@@ -4860,7 +4853,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 	if(pPlane)
 	{
 		ar <<1;
-		pPlane->SerializePlane(ar, true);
+		pPlane->SerializePlane(ar, true, ProjectFormat);
 	}
 	else ar <<0;
 
@@ -4874,9 +4867,9 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar)
 }
 
 
-bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
+bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
-//	CWaitCursor Wait;
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
@@ -4939,7 +4932,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		for (i=0; i<m_oaWing.size();i++)
 		{
 			pWing = (CWing*)m_oaWing.at(i);
-			pWing->SerializeWing(ar, true);
+			pWing->SerializeWing(ar, true, ProjectFormat);
 		}
 
 		// now store all the WPolars
@@ -4947,7 +4940,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		for (i=0; i<m_oaWPolar.size();i++)
 		{
 			pWPolar = (CWPolar*)m_oaWPolar.at(i);
-			pWPolar->m_pParent = this;
 			pWPolar->SerializeWPlr(ar, bIsStoring);
 		}
 
@@ -4964,14 +4956,14 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		else ar << 0;
 
 		// then the foils,  polars and Opps
-                WritePolars(ar);
+				WritePolars(ar, NULL, ProjectFormat);
 
 		// next the bodies
 		ar << (int)m_oaBody.size();
 		for (i=0; i<m_oaBody.size();i++)
 		{
 			pBody = (CBody*)m_oaBody.at(i);
-			pBody->SerializeBody(ar, bIsStoring);
+			pBody->SerializeBody(ar, bIsStoring, ProjectFormat);
 		}
 
 		// last write the planes...
@@ -4979,7 +4971,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		for (i=0; i<m_oaPlane.size();i++)
 		{
 			pPlane = (CPlane*)m_oaPlane.at(i);
-			pPlane->SerializePlane(ar, bIsStoring);
+			pPlane->SerializePlane(ar, bIsStoring, ProjectFormat);
 		}
 
 		if(m_bSaveWOpps)
@@ -4997,6 +4989,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
 		pAFoil->m_pPF->Serialize(ar, bIsStoring);
 
+		QApplication::restoreOverrideCursor();
 		return true;
 	}
 	else
@@ -5076,9 +5069,10 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		{
 			pWing = new CWing;
 
-			if (!pWing->SerializeWing(ar, bIsStoring))
+			if (!pWing->SerializeWing(ar, bIsStoring, ProjectFormat))
 			{
 					if(pWing) delete pWing;
+					QApplication::restoreOverrideCursor();
 					return false;
 			}
 			if(pWing)
@@ -5103,6 +5097,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			if (!bWPolarOK)
 			{
 				if(pWPolar) delete pWPolar;
+				QApplication::restoreOverrideCursor();
 				return false;
 			}
 			if(!pWPolar->m_AnalysisType==1 && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
@@ -5118,6 +5113,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			pWOpp = new CWOpp();
 			if (ArchiveFormat<=100001)
 			{
+				QApplication::restoreOverrideCursor();
 				return false;
 			}
 			else
@@ -5133,6 +5129,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			if (!bWOppOK)
 			{
 				if(pWOpp) delete pWOpp;
+				QApplication::restoreOverrideCursor();
 				return false;
 			}
 
@@ -5150,6 +5147,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 		{
 			if(!LoadPolarFileV3(ar, bIsStoring,100002))
 			{
+				QApplication::restoreOverrideCursor();
 				return false;
 			}
 		}
@@ -5159,11 +5157,13 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			{
 				if(!LoadPolarFileV3(ar, bIsStoring))
 				{
+					QApplication::restoreOverrideCursor();
 					return false;
 				}
 			}
 			else
 			{
+				QApplication::restoreOverrideCursor();
 				return false;
 			}
 		}
@@ -5196,7 +5196,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 			{
 				pBody = new CBody();
 
-				if (!pBody->SerializeBody(ar, bIsStoring))
+				if (!pBody->SerializeBody(ar, bIsStoring, ProjectFormat))
 				{
 					if(pPOpp) delete pPOpp;
 				}
@@ -5213,13 +5213,14 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 				pPlane = new CPlane();
 				if(pPlane)
 				{
-					if(pPlane->SerializePlane(ar, bIsStoring))
+					if(pPlane->SerializePlane(ar, bIsStoring, ProjectFormat))
 					{
 						pMiarex->AddPlane(pPlane);
 					}
 					else
 					{
 						if(pPlane) delete pPlane;
+						QApplication::restoreOverrideCursor();
 						return false;
 					}
 				}
@@ -5235,8 +5236,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 
 					if (!pWPolar->SerializeWPlr(ar, bIsStoring))
 					{
-
 						if(pWPolar) delete pWPolar;
+						QApplication::restoreOverrideCursor();
 						return false;
 					}
 					if(!pWPolar->m_AnalysisType==1 && ArchiveFormat <100003)
@@ -5253,6 +5254,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 				if (!pPOpp->SerializePOpp(ar, bIsStoring))
 				{
 					if(pPOpp) delete pPOpp;
+					QApplication::restoreOverrideCursor();
 					return false;
 				}
 				pMiarex->AddPOpp(false, NULL, NULL, NULL, pPOpp);
@@ -5273,6 +5275,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring)
 
 		if(m_iApp==MIAREX) pMiarex->SetUFO();
 
+		QApplication::restoreOverrideCursor();
 		return true;
 	}
 }
@@ -5390,6 +5393,7 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 				NameList.append(pFoil->m_FoilName);
 			}
 			RenameDlg dlg(this);
+			dlg.move(m_DlgPos);
 			dlg.m_pstrArray = & NameList;
 			dlg.m_strQuestion = tr("A foil of that name already exists\r\nPlease enter a new name");
 			dlg.m_strName = pNewFoil->m_FoilName;
@@ -5398,6 +5402,7 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 			bool exists = false;
 			QString strong;
 			int resp = dlg.exec();
+			m_DlgPos = dlg.pos();
 			strong = dlg.m_strName;
 
 			if(QDialog::Accepted == resp)
@@ -5964,11 +5969,11 @@ void MainFrame::UpdatePolars()
     //count the number of polars associated to the current foil
     for (i=0; i<m_oaPolar.size(); i++)
     {
-	pPolar = (CPolar*)m_oaPolar[i];
-	if(pPolar->m_FoilName == m_pCurFoil->m_FoilName)
-	{
-	    size++;
-	}
+		pPolar = (CPolar*)m_oaPolar[i];
+		if(pPolar->m_FoilName == m_pCurFoil->m_FoilName)
+		{
+			size++;
+		}
     }
     if (size)
     {
@@ -5992,21 +5997,18 @@ void MainFrame::UpdatePolars()
 			{
 				m_pctrlPolar->setCurrentIndex(0);
 				strong = m_pctrlPolar->itemText(0);
-		//		pXDirect->SetPolar(strong);
 			}
 		}
 		else
 		{
 			m_pctrlPolar->setCurrentIndex(0);
 			strong = m_pctrlPolar->itemText(0);
-	//			pXDirect->SetPolar(strong);
 		}
     }
     else
     {
 		// otherwise disable control
 		m_pctrlPolar->setEnabled(false);
-	//		pXDirect->SetPolar();
     }
 
     UpdateOpps();
@@ -6169,21 +6171,22 @@ void MainFrame::UpdateView()
 }
 
 
-void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
+void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 {
 	int i;
 	if(!pFoil)
 	{
-		ar << 100002;
-		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
+		ar << 100003;
+		//100003 : added foil comment
 		//100002 : means we are serializings opps in the new numbered format
+		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
 		//first write foils
 		ar << (int)m_oaFoil.size();
 
 		for (i=0; i<m_oaFoil.size(); i++)
 		{
 			pFoil = (CFoil*)m_oaFoil.at(i);
-			pFoil->Serialize(ar, true);
+			pFoil->Serialize(ar, true, ProjectFormat);
 		}
 
 		//then write polars
@@ -6208,12 +6211,13 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil)
 	}
 	else
 	{
-		ar << 100002;
-		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
+		ar << 100003;
+		//100003 : added foil comment
 		//100002 : means we are serializings opps in the new numbered format
+		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
 		//first write foil
 		ar << 1;//only one this time
-		pFoil->Serialize(ar,true);
+		pFoil->Serialize(ar,true, ProjectFormat);
 		//count polars associated to the foil
 		CPolar * pPolar ;
 		int n=0;

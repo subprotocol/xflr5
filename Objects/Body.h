@@ -38,7 +38,7 @@ public:
 	bool Intersect(CVector A, CVector B, CVector &I, bool bRight);
 	bool IntersectPanels(CVector A, CVector B, CVector &I, bool bRight);
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
-	bool SerializeBody(QDataStream &ar, bool bIsStoring);
+	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 //	bool SetModified();
 	bool ImportDefinition() ;
 	bool ExportDefinition() ;
@@ -96,6 +96,7 @@ public:
 	double  m_x[IBX], m_y[IBX];	// the point coordinates of the overlayed body
 
     QString m_BodyName;
+	QString m_BodyDescription;
 
     QColor m_BodyColor;
 

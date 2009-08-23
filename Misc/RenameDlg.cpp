@@ -42,9 +42,10 @@ void RenameDlg::SetupLayout()
 	m_pctrlNote->setMinimumWidth(350);
 
 	m_pctrlName = new QLineEdit("");
+	QLabel* NameListLabel = new QLabel(tr("Existing Names:"));
 	m_pctrlNameList = new QListWidget;
-	m_pctrlNameList->setMinimumHeight(300);
-	connect(m_pctrlNameList, SIGNAL(itemClicked(QListWidgetItem *)),       this, SLOT(OnSelChangeList(QListWidgetItem *)));
+//	m_pctrlNameList->setMinimumHeight(300);
+	connect(m_pctrlNameList, SIGNAL(currentRowChanged(int)), this, SLOT(OnSelChangeList(int)));
 	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnDoubleClickList(QListWidgetItem *)));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -65,18 +66,32 @@ void RenameDlg::SetupLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(OverwriteButton, SIGNAL(clicked()), this, SLOT(OnOverwrite()));
 
-	QLabel *m_pctrlNote = new QLabel;
-	m_pctrlNote->setText("Note : Overwrite will delete Opps and reset polars");
+	QLabel *LabelNote = new QLabel;
+	LabelNote->setText("Note : Overwrite will delete Opps and reset polars");
 
-	MainLayout->addStretch(1);
+	MainLayout->setStretchFactor(m_pctrlMessage, 1);
+	MainLayout->setStretchFactor(m_pctrlName, 1);
+	MainLayout->setStretchFactor(NameListLabel, 1);
+	MainLayout->setStretchFactor(m_pctrlNameList, 5);
+	MainLayout->setStretchFactor(CommandButtons, 1);
+	MainLayout->setStretchFactor(LabelNote, 1);
+
 	MainLayout->addWidget(m_pctrlMessage);
 	MainLayout->addWidget(m_pctrlName);
 	MainLayout->addStretch(1);
+	MainLayout->addWidget(NameListLabel);
 	MainLayout->addWidget(m_pctrlNameList);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
-	MainLayout->addWidget(m_pctrlNote);
-	MainLayout->addStretch(1);
+	MainLayout->addWidget(LabelNote);
+
+	MainLayout->setStretchFactor(m_pctrlMessage, 1);
+	MainLayout->setStretchFactor(m_pctrlName, 1);
+	MainLayout->setStretchFactor(NameListLabel, 1);
+	MainLayout->setStretchFactor(m_pctrlNameList, 5);
+	MainLayout->setStretchFactor(CommandButtons, 1);
+	MainLayout->setStretchFactor(LabelNote, 1);
+
 
 	setLayout(MainLayout);
 }
@@ -171,9 +186,9 @@ void RenameDlg::OnOK()
 }
 
 
-void RenameDlg::OnSelChangeList(QListWidgetItem * pItem)
+void RenameDlg::OnSelChangeList(int item)
 {
-//	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
+	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
 
 	QString str = pItem->text();
 	m_pctrlName->setText(str);

@@ -45,6 +45,7 @@ private slots:
 	void OnOK();
 
 private:
+	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 	QCheckBox *m_pctrlInitBL, *m_pctrlFullReport;
 	QLineEdit *m_pctrlIterLimit;

@@ -52,10 +52,9 @@ private slots:
 
 
 private:
-	void showEvent(QShowEvent *event);
+	void keyPressEvent(QKeyEvent *event);
 
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
-
 	void SetFileHeader();
 	void SetupLayout();
 	void StartAnalysis();

@@ -108,7 +108,8 @@ CWing::CWing()
 	m_bVLMSymetric  = false;
 	m_bChanged      = false;
 
-	m_WingName  = "Wing Name";
+	m_WingName        = "Wing Name";
+	m_WingDescription = "";
 	m_WingColor =  16762944;
 
 	m_QInf     = 0.0;
@@ -1410,6 +1411,7 @@ void CWing::LLTComputeWing()
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	LLTAnalysisDlg *pLLTDlg = (LLTAnalysisDlg*)s_pLLTDlg;
 	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
+	if(!pWPolar) return;
 
 	CFoil* pFoil0 = NULL;
 	CFoil* pFoil1 = NULL;
@@ -1465,7 +1467,7 @@ void CWing::LLTComputeWing()
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XCPSpanRel[m]  = pMiarex->GetXCp(pFoil0, pFoil1, m_Re[m], m_Alpha+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
+		m_XCPSpanRel[m]  = pMiarex->GetXCp(pFoil0, pFoil1, m_Re[m], m_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
 		if(fabs(m_XCPSpanRel[m])<0.000001)
 		{
@@ -1511,7 +1513,7 @@ void CWing::LLTComputeWing()
 			string = QString(" ,  A+Ai+Twist = %1 could not be interpolated\r\n").arg(m_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
-			pLLTDlg->WriteString(strong);
+			pLLTDlg->UpdateOutput(strong);
 			m_bWingOut = true;
 			m_bConverged = false;
 		}
@@ -1527,7 +1529,7 @@ void CWing::LLTComputeWing()
 			string = QString(" ,  A+Ai+Twist = %1 is outside the flight envelope\r\n").arg(m_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
-			pLLTDlg->WriteString(strong);
+			pLLTDlg->UpdateOutput(strong);
 			m_bWingOut = true;
 		}
 	}
@@ -1863,7 +1865,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %6.2f could not be interpolated\r\n").arg(m_Cl[m]);
+				string = QString(",  Cl = %1 could not be interpolated\r\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
 				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2128,7 +2130,7 @@ void CWing::ScaleSpan(double NewSpan)
 }
 
 
-bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring)
+bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	//saves or loads the wing data to the archive ar
 
@@ -2138,7 +2140,9 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring)
 
 	if(bIsStoring)
 	{	// storing code
-		ar << 1007;
+		if(ProjectFormat==5)      ar << 1008;
+		else if(ProjectFormat==4) ar << 1007;
+			//1008 : QFLR5 v0.02 : Added wing description field
 			//1007 : Changed length units to m
 			//1006 : Added Wing Color v2.99-15
 			//1005 : Added Chordwise spacing (v2.99-00)
@@ -2147,6 +2151,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring)
 			//1002 : save VLM Mesh (v1.99-12)
 			//1001 : initial format
 		WriteCString(ar, m_WingName);
+		if(ProjectFormat==5) WriteCString(ar, m_WingDescription);
 
 		ar << 0; //non elliptic...
 
@@ -2186,10 +2191,13 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring)
 		}
 
 		ReadCString(ar,m_WingName);
-		if (m_WingName.length() ==0)
+		if (m_WingName.length() ==0) return false;
+
+		if (ArchiveFormat >=1008)
 		{
-			return false;
+			ReadCString(ar, m_WingDescription);
 		}
+
 		ar >> k;
 		if(k!=0){
 			m_WingName = "";

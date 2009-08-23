@@ -129,7 +129,6 @@ void ManageUFOsDlg::SetupLayout()
 	CommandButtons->addStretch(1);
 
 	m_pctrlUFOTable   = new QTableView(this);
-
 	m_pctrlUFOTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlUFOTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -139,13 +138,21 @@ void ManageUFOsDlg::SetupLayout()
 	m_pctrlUFOTable->setSizePolicy(szPolicyExpanding);
 	m_pctrlUFOTable->setMinimumWidth(800);
 
+	m_pctrlDescription = new QTextEdit;
+	m_pctrlDescription->setEnabled(false);
+	QLabel *Description = new QLabel(tr("Description:"));
+
+	QVBoxLayout *LeftLayout = new QVBoxLayout;
+	LeftLayout->addWidget(m_pctrlUFOTable);
+	LeftLayout->addWidget(Description);
+	LeftLayout->addWidget(m_pctrlDescription);
+	LeftLayout->setStretchFactor(m_pctrlUFOTable, 5);
+	LeftLayout->setStretchFactor(m_pctrlDescription, 1);
+
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
-	MainLayout->addWidget(m_pctrlUFOTable);
+	MainLayout->addLayout(LeftLayout);
 	MainLayout->addLayout(CommandButtons);
 	setLayout(MainLayout);
-
-	connect(m_pctrlUFOTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnUFOClicked(const QModelIndex&)));
-	connect(m_pctrlUFOTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnUFOClicked(const QModelIndex&)));
 
 	m_pUFOModel = new QStandardItemModel;
 	m_pUFOModel->setRowCount(10);//temporary
@@ -161,6 +168,10 @@ void ManageUFOsDlg::SetupLayout()
 
 	m_pctrlUFOTable->setModel(m_pUFOModel);
 	m_pctrlUFOTable->setWindowTitle(tr("UFOs"));
+
+	QItemSelectionModel *selectionModel = new QItemSelectionModel(m_pUFOModel);
+	m_pctrlUFOTable->setSelectionModel(selectionModel);
+	connect(selectionModel, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnUFOClicked(QModelIndex)));
 
 	m_pUFODelegate = new UFOTableDelegate;
 
@@ -206,7 +217,8 @@ void ManageUFOsDlg::FillWingRow(int row)
 	CWing *pWing = (CWing*)pMainFrame->m_oaWing.at(row);
 
 	ind = m_pUFOModel->index(row, 0, QModelIndex());
-	m_pUFOModel->setData(ind,pWing->m_WingName);
+	m_pUFOModel->setData(ind, pWing->m_WingName);
+	if(pWing->m_WingDescription.length()) m_pUFOModel->setData(ind, pWing->m_WingDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row, 1, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_Span);
@@ -236,6 +248,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 	ind = m_pUFOModel->index(row+n, 0, QModelIndex());
 	m_pUFOModel->setData(ind,pPlane->m_PlaneName);
+	if(pPlane->m_PlaneDescription.length()) m_pUFOModel->setData(ind, pPlane->m_PlaneDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row+n, 1, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_Span);
@@ -315,7 +328,7 @@ void ManageUFOsDlg::OnDoubleClickTable(const QModelIndex &index)
 
 
 
-void ManageUFOsDlg::OnUFOClicked(const QModelIndex& index)
+void ManageUFOsDlg::OnUFOClicked(QModelIndex index)
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
@@ -323,8 +336,16 @@ void ManageUFOsDlg::OnUFOClicked(const QModelIndex& index)
 	QString UFOName = pItem->text();
 
 	m_pWing = pMiarex->GetWing(UFOName);
-	if(m_pWing) m_pPlane = NULL; //not necessary...
-	else        m_pPlane = pMiarex->GetPlane(UFOName);
+	if(m_pWing)
+	{
+		m_pPlane = NULL; //not necessary...
+		m_pctrlDescription->setText(m_pWing->m_WingDescription);
+	}
+	else
+	{
+		m_pPlane = pMiarex->GetPlane(UFOName);
+		if(m_pPlane) m_pctrlDescription->setText(m_pPlane->m_PlaneDescription);
+	}
 }
 
 

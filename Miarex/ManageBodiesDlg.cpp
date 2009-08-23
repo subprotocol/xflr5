@@ -43,14 +43,14 @@ ManageBodiesDlg::ManageBodiesDlg()
 
 void ManageBodiesDlg::SetupLayout()
 {
-	m_pctrlNameList   = new QListWidget;
-	m_pctrlNew        = new QPushButton(tr("New"));
-	m_pctrlEdit       = new QPushButton(tr("Edit"));
-	m_pctrlRename     = new QPushButton(tr("Rename"));
-	m_pctrlDelete     = new QPushButton(tr("Delete"));
-	m_pctrlDuplicate  = new QPushButton(tr("Duplicate"));
-	m_pctrlExportDef  = new QPushButton(tr("Export Definition"));
-	m_pctrlExportGeom = new QPushButton(tr("Export Geometry"));
+	m_pctrlNameList    = new QListWidget;
+	m_pctrlNew         = new QPushButton(tr("New"));
+	m_pctrlEdit        = new QPushButton(tr("Edit"));
+	m_pctrlRename      = new QPushButton(tr("Rename"));
+	m_pctrlDelete      = new QPushButton(tr("Delete"));
+	m_pctrlDuplicate   = new QPushButton(tr("Duplicate"));
+	m_pctrlExportDef   = new QPushButton(tr("Export Definition"));
+	m_pctrlExportGeom  = new QPushButton(tr("Export Geometry"));
 	QPushButton *CloseButton   = new QPushButton(tr("Close"));
 	QVBoxLayout *ButtonsLayout = new QVBoxLayout;
 	ButtonsLayout->addWidget(m_pctrlNew);
@@ -281,7 +281,6 @@ void ManageBodiesDlg::OnExportDefinition()
 void ManageBodiesDlg::OnExportGeometry()
 {
 	if(!m_pBody) return;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	m_pBody->ExportGeometry(pGL3dBodyDlg->m_NXPoints, pGL3dBodyDlg->m_NHoopPoints);
 }
@@ -338,6 +337,7 @@ void ManageBodiesDlg::SetBody(CBody *pBody)
 		{
 			pItem =  m_pctrlNameList->item(i);
 			if(pItem->text() == m_pBody->m_BodyName) break;
+			pItem->setToolTip(m_pBody->m_BodyDescription);
 		}
 		if(i>=0) m_pctrlNameList->setCurrentRow(i);
 	}
@@ -348,6 +348,7 @@ void ManageBodiesDlg::SetBody(CBody *pBody)
 			m_pctrlNameList->setCurrentRow(0);
 			pItem =  m_pctrlNameList->item(0);
 			m_pBody = pMiarex->GetBody(pItem->text());
+			if(m_pBody) pItem->setToolTip(m_pBody->m_BodyDescription);
 		}
 		else m_pBody = NULL;
 	}
@@ -359,6 +360,7 @@ void ManageBodiesDlg::UpdateBodyList()
 {
 	CBody * pBody;
 	m_pctrlNameList->clear();
+
 	for (int i=0; i<m_poaBody->size(); i++)
 	{
 		pBody = (CBody*)m_poaBody->at(i);

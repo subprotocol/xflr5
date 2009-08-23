@@ -28,6 +28,7 @@
 #include <QString>
 #include <QFile>
 #include <QTextEdit>
+#include <QPushButton>
 #include <QPoint>
 #include "../Graph/QGraph.h"
 #include "../Graph/GraphWidget.h"
@@ -37,6 +38,7 @@ class XFoilAnalysisDlg : public QDialog
 {
 	Q_OBJECT
 
+	friend class MainFrame;
 	friend class QXDirect;
 
 public:
@@ -76,11 +78,12 @@ private:
 
 	GraphWidget * m_pGraphWidget;
 	QTextEdit *m_pctrlTextOutput;
+	QPushButton* m_pctrlCancel, *m_pctrlSkip;
 
 	bool m_bAlpha;
 	bool m_bType4;
 	bool m_bSequence;
-	bool m_bSkip, m_bExit, m_bCalc, m_bAutoInitBL;
+	bool m_bSkip, m_bExit, m_bFinished, m_bAutoInitBL;
 
 	int m_Iterations, m_IterLim;
 
@@ -88,8 +91,9 @@ private:
 	double m_ClMin, m_ClMax, m_DeltaCl;
 	double m_ReMin, m_ReMax, m_DeltaRe;
 
-	void * m_pXDirect;
-	void *m_pMainFrame;
+	static void *s_pXDirect;
+	static void *s_pMainFrame;
+
 	QTimer *EventTimer;
 	QFile *m_pXFile;
 	QPoint m_LegendPlace;
