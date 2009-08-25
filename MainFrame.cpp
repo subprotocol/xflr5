@@ -20,7 +20,9 @@
 *****************************************************************************/
 
 //#include <QDesktopWidget>
+
 #include <QtGui>
+
 #include "MainFrame.h"
 #include "Globals.h"
 #include "Design/AFoil.h"
@@ -47,6 +49,10 @@
 #include "XDirect/TEGapDlg.h"
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
+
+
+
+
 
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
@@ -2875,7 +2881,14 @@ void MainFrame::LoadSettings()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 
-	QString FileName   = QDir::tempPath() + "/QFLR5.set";
+        QString FileName;
+
+#ifdef Q_WS_MAC
+        QSettings settings("QFLR5", "QFLR5");
+        FileName = settings.fileName();
+#else
+        FileName   = QDir::tempPath() + "/QFLR5.set";
+#endif
 	QFile *pXFile = new QFile(FileName);
 
 	if (!pXFile->open(QIODevice::ReadOnly)) return;
@@ -4468,7 +4481,15 @@ void MainFrame::SaveSettings()
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QString FileName = QDir::tempPath() + "/QFLR5.set";
+        QString FileName;
+
+#ifdef Q_WS_MAC
+        QSettings settings("QFLR5", "QFLR5");
+        FileName = settings.fileName();
+#else
+        FileName   = QDir::tempPath() + "/QFLR5.set";
+#endif
+
 	QFile *pXFile = new QFile(FileName);
 
 	if (!pXFile->open(QIODevice::WriteOnly))

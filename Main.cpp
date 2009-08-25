@@ -32,7 +32,15 @@ int main(int argc, char *argv[])
 
 	QString StyleName = "Cleanlooks";
 	QString LanguageName;
-	QString FileName   = QDir::tempPath() + "/QFLR5.set";
+
+        QString FileName;
+
+#ifdef Q_WS_MAC
+        QSettings settings("QFLR5", "QFLR5");
+        FileName = settings.fileName();
+#else
+        FileName   = QDir::tempPath() + "/QFLR5.set";
+#endif
 	QFile *pXFile = new QFile(FileName);
 	int a,b,c,d,k;
 	a=b=50;
