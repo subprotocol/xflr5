@@ -80,6 +80,7 @@ private slots:
 	void OnQReflected();
 	void OnPertubate();
 	void OnGraphSettings();
+	void OnSpecInv() ;
 	void OnZoomIn();
 	void OnZoomX();
 	void OnZoomY();

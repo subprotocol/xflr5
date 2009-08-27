@@ -43,6 +43,8 @@ public:
 
 	bool GetAutoX();
 	bool GetAutoY();
+	bool GetAutoXMin();
+	bool GetAutoYMin();
 	bool GetBorder();
 	bool GetInverted();
 	bool IsInDrawRect(CVector const &pt);

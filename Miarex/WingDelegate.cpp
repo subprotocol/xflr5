@@ -34,16 +34,17 @@ WingDelegate::WingDelegate(QObject *parent)
 
 QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
-	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
+//	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
 //	pWingDlg->SetCurrentSection(index.row());
 //	pWingDlg->UpdateView();
-
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		FloatEdit *editor = new FloatEdit(parent);
 		editor->setAlignment(Qt::AlignRight);
 
 		editor->SetPrecision(m_Precision[index.column()]);
+		if(index.column()==6) editor->SetMax(MAXCHORDPANELS-1);
+		if(index.column()==8) editor->SetMax(MAXSTATIONS-1);
 		return editor;
 	}
 	else

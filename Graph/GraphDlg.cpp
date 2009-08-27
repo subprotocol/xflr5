@@ -76,6 +76,9 @@ void GraphDlg::Connect()
 	connect(m_pctrlXMinGridStyle, SIGNAL(clicked()), this, SLOT(OnXMinGridStyle()));
 	connect(m_pctrlYMinGridStyle, SIGNAL(clicked()), this, SLOT(OnYMinGridStyle()));
 
+	connect(m_pctrlAutoXMinUnit, SIGNAL(clicked()), this, SLOT(OnAutoMinGrid()));
+	connect(m_pctrlAutoYMinUnit, SIGNAL(clicked()), this, SLOT(OnAutoMinGrid()));
+
 	connect(m_pctrlGraphBorder, SIGNAL(stateChanged(int)), this, SLOT(OnGraphBorder(int)));
 	connect(m_pctrlGraphBack, SIGNAL(clicked()), this, SLOT(OnGraphBackColor()));
 	connect(m_pctrlBorderStyle, SIGNAL(clicked()), this, SLOT(OnBorderStyle()));
@@ -304,6 +307,18 @@ void GraphDlg::OnApply()
 	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
 	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
 
+	double MinUnit;
+	if(!m_pctrlAutoXMinUnit->isChecked())
+	{
+		MinUnit = m_pctrlXMinorUnit->GetValue();
+		m_pGraph->SetXMinorUnit(MinUnit);
+	}
+	if(!m_pctrlAutoYMinUnit->isChecked())
+	{
+		MinUnit = m_pctrlYMinorUnit->GetValue();
+		m_pGraph->SetYMinorUnit(MinUnit);
+	}
+
 	m_pGraph->SetInverted(m_pctrlYInverted->isChecked());
 
 	for(int i=0; i<m_NGraph; i++)
@@ -314,6 +329,19 @@ void GraphDlg::OnApply()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->UpdateView();
 	SetApplied(true);
+}
+
+
+void GraphDlg::OnAutoMinGrid()
+{
+	bool bAuto;
+	bAuto = m_pctrlAutoXMinUnit->isChecked();
+	m_pGraph->SetAutoXMinUnit(bAuto);
+	m_pctrlXMinorUnit->setEnabled(!bAuto);
+
+	bAuto = m_pctrlAutoYMinUnit->isChecked();
+	m_pGraph->SetAutoYMinUnit(bAuto);
+	m_pctrlYMinorUnit->setEnabled(!bAuto);
 }
 
 
@@ -493,6 +521,25 @@ void GraphDlg::OnOK()
 	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
 	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
 
+	double MinUnit;
+	if(!m_pctrlAutoXMinUnit->isChecked())
+	{
+		MinUnit = m_pctrlXMinorUnit->GetValue();
+		m_pGraph->SetXMinorUnit(MinUnit);
+		m_pGraph->SetAutoXMinUnit(false);
+	}
+	else
+		m_pGraph->SetAutoXMinUnit(true);
+
+	if(!m_pctrlAutoYMinUnit->isChecked())
+	{
+		MinUnit = m_pctrlYMinorUnit->GetValue();
+		m_pGraph->SetYMinorUnit(MinUnit);
+		m_pGraph->SetAutoYMinUnit(false);
+	}
+	else
+		m_pGraph->SetAutoYMinUnit(true);
+
 	for(int i=0; i<m_NGraph; i++)
 	{
 		m_GraphArray[i]->CopySettings(m_pGraph);
@@ -621,6 +668,9 @@ void GraphDlg::OnXMinGridShow(int state)
 	bool bShow = (state==Qt::Checked);
 	m_pGraph->SetXMinGrid(bShow);
 	m_pctrlXMinGridStyle->setEnabled(bShow);
+	m_pctrlAutoXMinUnit->setEnabled(bShow);
+	m_pctrlXMinorUnit->setEnabled(bShow && !m_pGraph->GetAutoXMin());
+
 	SetApplied(false);
 }
 
@@ -664,6 +714,9 @@ void GraphDlg::OnYMinGridShow(int state)
 	bool bShow = (state==Qt::Checked);
 	m_pGraph->SetYMinGrid(bShow);
 	m_pctrlYMinGridStyle->setEnabled(bShow);
+	m_pctrlAutoYMinUnit->setEnabled(bShow);
+	m_pctrlYMinorUnit->setEnabled(bShow && !m_pGraph->GetAutoYMin());
+
 	SetApplied(false);
 }
 
@@ -772,7 +825,10 @@ void GraphDlg::SetParams()
 	m_pctrlXMinGridStyle->SetWidth(width);
 	m_pctrlXMinGridStyle->setEnabled(bState);
 	m_pctrlXMinorUnit->SetValue(unit);
-
+	m_pctrlAutoXMinUnit->setChecked(bAuto);
+	m_pctrlAutoXMinUnit->setEnabled(bState);
+	m_pctrlXMinorUnit->setEnabled(!bAuto && bState);
+	
 	m_pGraph->GetYMajGrid(bState, color, style, width);
 	m_pctrlYMajGridShow->setChecked(bState);
 	m_pctrlYMajGridStyle->SetColor(color);
@@ -787,6 +843,9 @@ void GraphDlg::SetParams()
 	m_pctrlYMinGridStyle->SetWidth(width);
 	m_pctrlYMinGridStyle->setEnabled(bState);
 	m_pctrlYMinorUnit->SetValue(unit);
+	m_pctrlAutoYMinUnit->setChecked(bAuto);
+	m_pctrlAutoYMinUnit->setEnabled(bState);
+	m_pctrlYMinorUnit->setEnabled(!bAuto && bState);
 
 	m_pctrlAxisStyle->SetColor(m_pGraph->GetAxisColor());
 	m_pctrlAxisStyle->SetStyle(m_pGraph->GetAxisStyle());
@@ -883,22 +942,28 @@ void GraphDlg::SetupLayout()
 	//________Font Page______________________
 	QGridLayout *FontButtons = new QGridLayout;
 
-	QLabel *lab1  = new QLabel("Title font");
-	QLabel *lab2  = new QLabel("Label font");
-	QLabel *lab3 = new QLabel("Legend font");
+	QLabel *lab1  = new QLabel("Title");
+	QLabel *lab2  = new QLabel("Label");
+	QLabel *lab3 = new QLabel("Legend");
+	QLabel *lab402  = new QLabel("Font");
+	QLabel *lab403  = new QLabel("Color");
 	lab1->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-	FontButtons->addWidget(lab1,1,1);
-	FontButtons->addWidget(lab2,2,1);
-	FontButtons->addWidget(lab3,3,1);
+	lab402->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+	lab403->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
+	FontButtons->addWidget(lab402,1,2);
+	FontButtons->addWidget(lab403,1,3);
+	FontButtons->addWidget(lab1,2,1);
+	FontButtons->addWidget(lab2,3,1);
+	FontButtons->addWidget(lab3,4,1);
 
 	m_pctrlTitleButton  = new QPushButton("Set Title Font");
 	m_pctrlLabelButton  = new QPushButton("Set Label Font");
 	m_pctrlLegendButton = new QPushButton("Set Legend Font");
-	FontButtons->addWidget(m_pctrlTitleButton,1,2);
-	FontButtons->addWidget(m_pctrlLabelButton,2,2);
-	FontButtons->addWidget(m_pctrlLegendButton,3,2);
+	FontButtons->addWidget(m_pctrlTitleButton,2,2);
+	FontButtons->addWidget(m_pctrlLabelButton,3,2);
+	FontButtons->addWidget(m_pctrlLegendButton,4,2);
 
 	m_pctrlTitleClr  = new QPushButton("Title Color");
 	m_pctrlLabelClr  = new QPushButton("Label Color");
@@ -907,9 +972,9 @@ void GraphDlg::SetupLayout()
 //	m_pctrlLegendClr->setAutoFillBackground(true);
 //	m_pctrlLabelClr->setAutoFillBackground(true);
 
-	FontButtons->addWidget(m_pctrlTitleClr,1,3);
-	FontButtons->addWidget(m_pctrlLabelClr,2,3);
-	FontButtons->addWidget(m_pctrlLegendClr,3,3);
+	FontButtons->addWidget(m_pctrlTitleClr,2,3);
+	FontButtons->addWidget(m_pctrlLabelClr,3,3);
+	FontButtons->addWidget(m_pctrlLegendClr,4,3);
 
 	QGroupBox *FontBox = new QGroupBox("Fonts");
 	FontBox->setLayout(FontButtons);
@@ -1004,6 +1069,8 @@ void GraphDlg::SetupLayout()
 	m_pctrlYMajGridShow = new QCheckBox("Y Major Grid");
 	m_pctrlXMinGridShow = new QCheckBox("X Minor Grid");
 	m_pctrlYMinGridShow = new QCheckBox("Y Minor Grid");
+	m_pctrlAutoXMinUnit = new QCheckBox("Auto Unit");
+	m_pctrlAutoYMinUnit = new QCheckBox("Auto Unit");
 
 	m_pctrlAxisStyle = new LineButton;
 	m_pctrlAxisStyle->setMinimumWidth(100);
@@ -1027,8 +1094,10 @@ void GraphDlg::SetupLayout()
 	AxisData->addWidget(m_pctrlXMinGridStyle,4,2);
 	AxisData->addWidget(m_pctrlYMinGridStyle,5,2);
 
-	AxisData->addWidget(m_pctrlXMinorUnit,4,3);
-	AxisData->addWidget(m_pctrlYMinorUnit,5,3);
+	AxisData->addWidget(m_pctrlAutoXMinUnit,4,3);
+	AxisData->addWidget(m_pctrlAutoYMinUnit,5,3);
+	AxisData->addWidget(m_pctrlXMinorUnit,4,4);
+	AxisData->addWidget(m_pctrlYMinorUnit,5,4);
 
 	GridPage->setLayout(AxisData);
 	//________End Axis Page______________________

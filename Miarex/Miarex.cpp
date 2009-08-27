@@ -346,9 +346,9 @@ QMiarex::QMiarex(QWidget *parent)
 	m_nNodes  = 0;
 	m_MatSize = 0;
 
-	m_WingColor =  QColor(0,130,130);
-	m_StabColor =  QColor(30,50, 100);
-	m_FinColor  =  QColor(60,60,180);
+	m_WingColor =  QColor(203,222, 222);
+	m_StabColor =  QColor(200, 230, 250);
+	m_FinColor  =  QColor(207, 227, 255);
 
 //	m_GLLightDlg.m_pMiarex = this;
 
@@ -380,7 +380,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_VLMStyle    = 0;
 	m_VLMWidth    = 1;
-	m_VLMColor    = QColor(100,100,100);
+	m_VLMColor    = QColor(180,180,180);
 
 	m_3DAxisStyle    = 3;
 	m_3DAxisWidth    = 1;
@@ -7281,13 +7281,15 @@ void QMiarex::GLCreateStreamLines()
 		return;
 	}
 
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
 	ProgressDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog(0, m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);
 	dlg.show();
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
 	bool bFound;
 	int i;
@@ -10452,7 +10454,9 @@ void QMiarex::On3DReset()
 
 void QMiarex::On3DPrefs()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	W3dPrefsDlg SDlg;
+	SDlg.move(pMainFrame->m_DlgPos);
 	SDlg.m_pMiarex = this;
 	SDlg.m_bWakePanels    = m_bWakePanels;
 	SDlg.m_3DAxisColor    = m_3DAxisColor;
@@ -10534,7 +10538,10 @@ void QMiarex::On3DPrefs()
 
 		UpdateView();
 	}
+	pMainFrame->m_DlgPos = SDlg.pos();
 }
+
+
 
 void QMiarex::On3DPickCenter()
 {
@@ -15769,6 +15776,10 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 			}
 
 			pModPlane->m_PlaneName = RDlg.m_strName;
+			pModPlane->m_Wing.m_WingName = pModPlane->m_PlaneName+"_Wing";
+			pModPlane->m_Wing2.m_WingName = pModPlane->m_PlaneName+"_Wing2";
+			pModPlane->m_Stab.m_WingName  = pModPlane->m_PlaneName+"_Elev";
+			pModPlane->m_Fin.m_WingName   = pModPlane->m_PlaneName+"_Fin";
 			//place the Plane in alphabetical order in the array
 			//remove the current Plane from the array
 			for (l=0; l<m_poaPlane->size();l++)
@@ -16446,10 +16457,24 @@ void QMiarex::SetupLayout()
 	QHBoxLayout *ShowCurve = new QHBoxLayout;
 	ShowCurve->addWidget(m_pctrlShowCurve);
 	ShowCurve->addWidget(m_pctrlShowPoints);
+
+	QGridLayout *CurveStyleLayout = new QGridLayout;
+	QLabel *lab200 = new QLabel(tr("Style"));
+	QLabel *lab201 = new QLabel(tr("Width"));
+	QLabel *lab202 = new QLabel(tr("Color"));
+	lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	CurveStyleLayout->addWidget(lab200,1,1);
+	CurveStyleLayout->addWidget(lab201,2,1);
+	CurveStyleLayout->addWidget(lab202,3,1);
+	CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
+	CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
+	CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
+	CurveStyleLayout->setColumnStretch(2,5);
+
 	CurveGroup->addLayout(ShowCurve);
-	CurveGroup->addWidget(m_pctrlCurveStyle);
-	CurveGroup->addWidget(m_pctrlCurveWidth);
-	CurveGroup->addWidget(m_pctrlCurveColor);
+	CurveGroup->addLayout(CurveStyleLayout);
 	CurveGroup->addStretch(1);
 	QGroupBox *CurveBox = new QGroupBox(tr("Curve settings"));
 	CurveBox->setLayout(CurveGroup);

@@ -6282,10 +6282,26 @@ void QXDirect::SetupLayout()
 	m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
 	m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
 
+	QGridLayout *CurveStyleLayout = new QGridLayout;
+	QLabel *lab200 = new QLabel(tr("Style"));
+	QLabel *lab201 = new QLabel(tr("Width"));
+	QLabel *lab202 = new QLabel(tr("Color"));
+	lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+	CurveStyleLayout->addWidget(lab200,1,1);
+	CurveStyleLayout->addWidget(lab201,2,1);
+	CurveStyleLayout->addWidget(lab202,3,1);
+	CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
+	CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
+	CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
+	CurveStyleLayout->setColumnStretch(2,5);
+
+
 	CurveGroup->addLayout(CurveDisplay);
-	CurveGroup->addWidget(m_pctrlCurveStyle);
-	CurveGroup->addWidget(m_pctrlCurveWidth);
-	CurveGroup->addWidget(m_pctrlCurveColor);
+	CurveGroup->addLayout(CurveStyleLayout);
+	CurveGroup->addStretch(1);
+
 	QGroupBox *CurveBox = new QGroupBox(tr("Graph Curve Settings"));
 	CurveBox->setLayout(CurveGroup);
 

@@ -204,9 +204,6 @@ void WPolarDlg::InitDialog()
 	else if(m_Type==2) m_pctrlType2->setChecked(true);
 	else if(m_Type==4) m_pctrlType4->setChecked(true);
 
-	m_pctrlWeight->SetPrecision(3);
-	m_pctrlDensity->SetPrecision(5);
-	m_pctrlViscosity->SetPrecision(3);
 
 	OnUnit();
 
@@ -647,7 +644,10 @@ void WPolarDlg::SetupLayout()
 	PlaneLayout->addWidget(lab4,4,1);
 	PlaneLayout->addWidget(lab5,5,1);
 	m_pctrlQInf    = new FloatEdit(10.05);
+	m_pctrlQInf->SetMin(0.0);
 	m_pctrlWeight  = new FloatEdit(1.234);
+	m_pctrlWeight->SetPrecision(3);
+	m_pctrlWeight->SetMin(0.0);
 	m_pctrlXCmRef  = new FloatEdit(100.00);
 	m_pctrlAlpha   = new FloatEdit(1.00);
 	m_pctrlBeta    = new FloatEdit(0.00);
@@ -714,6 +714,10 @@ void WPolarDlg::SetupLayout()
 	m_pctrlNu = new QLabel("n");
 	m_pctrlViscosity = new FloatEdit(1.225,3);
 	m_pctrlViscosityUnit = new QLabel("m2/s");
+	m_pctrlDensity->SetPrecision(5);
+	m_pctrlViscosity->SetPrecision(3);
+	m_pctrlDensity->SetMin(0.0);
+	m_pctrlViscosity->SetMin(0.0);
 	AeroDataLayout->addWidget(lab9,1,1);
 	AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
 	AeroDataLayout->addWidget(m_pctrlUnit2,1,3);

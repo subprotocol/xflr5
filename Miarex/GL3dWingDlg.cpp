@@ -92,7 +92,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_bCrossPoint        = false;
 	m_bSurfaces          = true;
 	m_bOutline           = true;
-	m_bVLMPanels         = false;
+	m_bVLMPanels         = true;
 	m_bAxes              = true;
 	m_bglLight           = true;
 	m_bPickCenter        = false;
@@ -829,7 +829,6 @@ void GL3dWingDlg::GLDraw3D()
 
 	glClearColor(pMainFrame->m_BackgroundColor.redF(), pMainFrame->m_BackgroundColor.greenF(), pMainFrame->m_BackgroundColor.blueF(),0.0);
 
-
 	if(m_bResetglWing)
 	{
 		int row, col, NumAngles, NumCircles;
@@ -1184,7 +1183,6 @@ void GL3dWingDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 void GL3dWingDlg::GLRenderView()
 {
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
@@ -2200,6 +2198,8 @@ void GL3dWingDlg::ReadParams()
 	{
 		ReadSectionData(i);
 	}
+
+
 	//Update Geometry
 	ComputeGeometry();
 }
@@ -2265,6 +2265,7 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_NXPanels[sel] =(int)qMax(1.0,d);
+
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");

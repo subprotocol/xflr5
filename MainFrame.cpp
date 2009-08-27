@@ -341,6 +341,7 @@ void MainFrame::closeEvent (QCloseEvent * event)
 				event->ignore();
 				return;
 			}
+			AddRecentFile(m_FileName);
 		}
 		else if (resp==QMessageBox::Cancel)
 		{

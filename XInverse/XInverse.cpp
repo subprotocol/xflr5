@@ -180,6 +180,9 @@ void QXInverse::Clear()
 
 void QXInverse::Connect()
 {
+	connect(m_pctrlSpecAlpha,     SIGNAL(clicked()), this, SLOT(OnSpecal()));
+	connect(m_pctrlSpecCl,        SIGNAL(clicked()), this, SLOT(OnSpecal()));
+	connect(m_pctrlSpec,          SIGNAL(editingFinished()), this, SLOT(OnSpecInv()));
 	connect(m_pctrlShowSpline,    SIGNAL(clicked()), this, SLOT(OnShowSpline()));
 	connect(m_pctrlNewSpline,     SIGNAL(clicked()), this, SLOT(OnNewSpline()));
 	connect(m_pctrlApplySpline,   SIGNAL(clicked()), this, SLOT(OnApplySpline()));
@@ -1235,7 +1238,10 @@ void QXInverse::OnExtractFoil()
 {
 	//Extracts a foil from the database for display and modification
 
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
 	FoilSelectionDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_poaFoil = m_poaFoil;
 	dlg.InitDialog();
 
@@ -1251,7 +1257,6 @@ void QXInverse::OnExtractFoil()
 		m_bSpline = false;
 		m_bSplined  = true;
 		CFoil *pFoil;
-		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
 		pMainFrame->SetCurrentFoil(pFoil);
 		m_pRefFoil->CopyFoil(pFoil);
@@ -1261,6 +1266,7 @@ void QXInverse::OnExtractFoil()
 		SetFoil();
 		UpdateView();
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 }
 
 void QXInverse::OnFilter()
@@ -1280,7 +1286,10 @@ void QXInverse::OnFilter()
 
 void QXInverse::OnGraphSettings()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GraphDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
+
 	dlg.m_iGraphType = 31;
 	dlg.m_XSel = 0;
 	dlg.m_YSel = 0;
@@ -1300,6 +1309,7 @@ void QXInverse::OnGraphSettings()
 	{
 		m_QGraph.CopySettings(&graph);
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	UpdateView();
 }
 
@@ -1523,6 +1533,29 @@ void QXInverse::OnSpecal()
 		m_pctrlSpec->SetPrecision(3);
 		m_pctrlSpec->SetValue(pXFoil->clqsp[1]);
 	}
+}
+
+
+void QXInverse::OnSpecInv()
+{
+	if (m_bZoomPlus) ReleaseZoom();
+	XFoil *pXFoil = (XFoil*)m_pXFoil;
+
+	if(m_pctrlSpecAlpha->isChecked())
+	{
+		pXFoil->alqsp[1] = m_pctrlSpec->GetValue()*pi/180.0;
+		pXFoil->iacqsp = 1;
+		pXFoil->qspcir();
+	}
+	else if(m_pctrlSpecCl->isChecked())
+	{
+		pXFoil->clqsp[1] = m_pctrlSpec->GetValue();
+		pXFoil->iacqsp = 2;
+		pXFoil->qspcir();
+	}
+	CreateQCurve();
+	CreateMCurve();
+	UpdateView();
 }
 
 
@@ -1834,6 +1867,7 @@ void QXInverse::ResetQ()
 	pXFoil->cncalc(pXFoil->qgamm,false);
 	pXFoil->qspcir();
 	CreateMCurve();
+	UpdateView();
 }
 
 

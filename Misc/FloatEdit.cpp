@@ -156,10 +156,12 @@ void FloatEdit::SetPrecision(int i)
     m_iPrecision = i;
 }
 
+
 void FloatEdit::SetMin(double f)
 {
 	v->setBottom(f);
 }
+
 
 void FloatEdit::SetMax(double f)
 {

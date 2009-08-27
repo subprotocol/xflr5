@@ -385,7 +385,6 @@ void FoilGeomDlg::OnRestore()
 	m_bApplied  = true;
 	m_bAppliedX = true;
 	m_bModified = false;
-
 	if(pXDirect) pXDirect->UpdateView();
 	else if(pAFoil) pAFoil->UpdateView();
 }

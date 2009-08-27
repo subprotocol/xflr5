@@ -171,26 +171,7 @@ void CPlane::Duplicate(CPlane *pPlane)
 
 	m_bBody = pPlane->m_bBody ;
 	m_pBody = pPlane->m_pBody;
-
 }
-
-/*
-bool CPlane::HasResults()
-{
-	CWPolar *pWPolar;
-	CMainFrame *pMainFrame = (CMainFrame*)s_pMainFrame;
-	bool bHasResults = false;
-	for (int i=0; i< pMainFrame->m_oaWPolar.GetSize(); i++)
-	{
-		pWPolar = (CWPolar*)pMainFrame->m_oaWPolar.GetAt(i);
-		if (pWPolar->m_Alpha.GetSize() && pWPolar->m_UFOName == m_PlaneName)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}*/
 
 
 

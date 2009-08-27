@@ -110,7 +110,7 @@ CWing::CWing()
 
 	m_WingName        = "Wing Name";
 	m_WingDescription = "";
-	m_WingColor =  16762944;
+	m_WingColor =  QColor(203,222,222);
 
 	m_QInf     = 0.0;
 	m_QInf0    = 0.0;

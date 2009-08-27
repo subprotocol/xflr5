@@ -1107,11 +1107,9 @@ void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 	m_LEFlapAngle = angle;
 }
 
-void CFoil::SetFlap()
-{
-	// modifies the current airfoil's geometry 
-	// by setting a flap i.a.w. the member variables
 
+void CFoil::SetLEFlap()
+{
 	int i, j, k, l, p, i1, i2;//TODO : k used uninitialized
 	double xh, yh, dx, dy;
 	CVector M;
@@ -1119,6 +1117,495 @@ void CFoil::SetFlap()
 	double cosa, sina;
 
 	double pi = 3.141592654;
+
+	cosa = cos(m_LEFlapAngle*pi/180.0);
+	sina = sin(m_LEFlapAngle*pi/180.0);
+	//first convert xhinge and yhinge in absolute coordinates
+	xh = m_LEXHinge/100.0;
+	double ymin = GetBaseLowerY(xh);
+	double ymax = GetBaseUpperY(xh);
+	yh = ymin + m_LEYHinge/100.0 * (ymax-ymin);
+
+	// insert a breakpoint at xhinge location, if there isn't one already
+	int iUpperh = 0;
+	int iLowerh = 0;
+	for (i=0; i<m_iExt; i++)
+	{
+		if(fabs(m_rpExtrados[i].x-xh)<0.001)
+		{
+			//then no need to add an extra point, just break
+			iUpperh = i;
+			break;
+		}
+		else if(m_rpExtrados[i].x>xh)
+		{
+			//insert one
+			for(j=m_iExt+1; j>i; j--)
+			{
+				m_rpExtrados[j].x = m_rpExtrados[j-1].x;
+				m_rpExtrados[j].y = m_rpExtrados[j-1].y;
+			}
+
+			m_rpExtrados[i].x = xh;
+			m_rpExtrados[i].y = ymax;
+			iUpperh = i;
+			m_iExt+=1;
+			break;
+		}
+	}
+
+	for (i=0; i<m_iInt; i++)
+	{
+		if(fabs(m_rpIntrados[i].x-xh)<0.001)
+		{
+			//then no need to add an Intra point, just break
+			iLowerh = i;
+			break;
+		}
+		else if(m_rpIntrados[i].x>xh)
+		{//insert one
+			for(j=m_iInt+1; j>i; j--)
+			{
+				m_rpIntrados[j].x = m_rpIntrados[j-1].x;
+				m_rpIntrados[j].y = m_rpIntrados[j-1].y;
+			}
+
+			m_rpIntrados[i].x = xh;
+			m_rpIntrados[i].y = ymin;
+			iLowerh = i;
+			m_iInt+=1;
+			break;
+		}
+	}
+
+	// rotate all points upstream of xh
+	if(m_LEFlapAngle>0.0)
+	{
+		//insert an extra point on intrados
+		for (i=m_iInt+1; i>iLowerh; i--)
+		{
+			m_rpIntrados[i] = m_rpIntrados[i-1];
+		}
+		m_rpIntrados[iLowerh] = m_rpIntrados[iLowerh+1];
+		iLowerh++;
+		m_iInt++;
+
+		// extend to infinity last segments around hinge on flap internal side to make sure
+		// they intersect the spline on the other side
+		m_rpIntrados[iLowerh-1].x += 30.0*(m_rpIntrados[iLowerh-1].x-m_rpIntrados[iLowerh-2].x);
+		m_rpIntrados[iLowerh-1].y += 30.0*(m_rpIntrados[iLowerh-1].y-m_rpIntrados[iLowerh-2].y);
+		m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh+1].x);
+		m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh+1].y);
+	}
+	if(m_LEFlapAngle<0.0)
+	{
+		//insert an extra point on extrados
+		for (i=m_iExt+1; i>iUpperh; i--)
+		{
+			m_rpExtrados[i] = m_rpExtrados[i-1];
+		}
+		m_rpExtrados[iUpperh] = m_rpExtrados[iUpperh+1];
+		iUpperh++;
+		m_iExt++;
+
+		// extend to infinity last segments around hinge on flap internal side to make sure
+		// they intersect the spline on the other side
+		m_rpExtrados[iUpperh-1].x += 30.0 * (m_rpExtrados[iUpperh-1].x - m_rpExtrados[iUpperh-2].x);
+		m_rpExtrados[iUpperh-1].y += 30.0 * (m_rpExtrados[iUpperh-1].y - m_rpExtrados[iUpperh-2].y);
+		m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x   - m_rpExtrados[iUpperh+1].x);
+		m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y   - m_rpExtrados[iUpperh+1].y);
+	}
+	for (i=0; i<iUpperh; i++)
+	{
+		dx = m_rpExtrados[i].x-xh;
+		dy = m_rpExtrados[i].y-yh;
+		m_rpExtrados[i].x = xh + cosa * dx - sina * dy;
+		m_rpExtrados[i].y = yh + sina * dx + cosa * dy;
+	}
+	for (i=0; i<iLowerh; i++)
+	{
+		dx = m_rpIntrados[i].x-xh;
+		dy = m_rpIntrados[i].y-yh;
+		m_rpIntrados[i].x = xh + cosa * dx - sina * dy;
+		m_rpIntrados[i].y = yh + sina * dx + cosa * dy;
+	}
+
+	CSpline LinkSpline;
+	LinkSpline.m_iRes = 4;
+	LinkSpline.m_iDegree = 2;
+	LinkSpline.m_iCtrlPoints = 0;
+
+	if(m_LEFlapAngle<0.0)
+	{
+
+		//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
+		Intersect(m_rpIntrados[iLowerh-2], m_rpIntrados[iLowerh-1],
+				  m_rpIntrados[iLowerh],   m_rpIntrados[iLowerh+1], &M);
+		//sanity check
+		if(M.x <= m_rpIntrados[iLowerh-1].x || M.x >= m_rpIntrados[iLowerh].x)
+			M = (m_rpIntrados[iLowerh-1] + m_rpIntrados[iLowerh])/2.0;
+
+		LinkSpline.InsertPoint(m_rpIntrados[iLowerh-1].x,m_rpIntrados[iLowerh-1].y);
+		LinkSpline.InsertPoint(M.x, M.y);
+		LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
+		LinkSpline.SplineKnots();
+		LinkSpline.SplineCurve();
+		//retrieve point 1 and 2 and insert them
+		for (i=m_iInt; i>=iLowerh; i--)
+		{
+			m_rpIntrados[i+2].x = m_rpIntrados[i].x;
+			m_rpIntrados[i+2].y = m_rpIntrados[i].y;
+		}
+
+		m_rpIntrados[iLowerh+1].x = LinkSpline.m_Output[2].x;
+		m_rpIntrados[iLowerh+1].y = LinkSpline.m_Output[2].y;
+		m_rpIntrados[iLowerh].x   = LinkSpline.m_Output[1].x;
+		m_rpIntrados[iLowerh].y   = LinkSpline.m_Output[1].y;
+
+		m_iInt+=2;
+	}
+	if(m_LEFlapAngle>0.0)
+	{
+
+		//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
+		Intersect(m_rpExtrados[iUpperh-2], m_rpExtrados[iUpperh-1],
+				  m_rpExtrados[iUpperh],   m_rpExtrados[iUpperh+1], &M);
+
+		//sanity check
+		if(M.x <= m_rpExtrados[iUpperh-1].x || M.x >= m_rpExtrados[iUpperh].x)
+			M = (m_rpExtrados[iUpperh-1] + m_rpExtrados[iUpperh])/2.0;
+
+		LinkSpline.InsertPoint(m_rpExtrados[iUpperh-1].x,m_rpExtrados[iUpperh-1].y);
+		LinkSpline.InsertPoint(M.x, M.y);
+		LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
+		LinkSpline.SplineKnots();
+		LinkSpline.SplineCurve();
+		//retrieve point 1 and 2 and insert them
+		for (i=m_iExt; i>=iUpperh; i--)
+		{
+			m_rpExtrados[i+2].x = m_rpExtrados[i].x;
+			m_rpExtrados[i+2].y = m_rpExtrados[i].y;
+		}
+
+		m_rpExtrados[iUpperh+1].x = LinkSpline.m_Output[2].x;
+		m_rpExtrados[iUpperh+1].y = LinkSpline.m_Output[2].y;
+		m_rpExtrados[iUpperh].x   = LinkSpline.m_Output[1].x;
+		m_rpExtrados[iUpperh].y   = LinkSpline.m_Output[1].y;
+
+		m_iExt+=2;
+	}
+	// trim upper surface first
+	i1 = iUpperh;
+	i2 = iUpperh-1;
+	p=0;
+	bIntersect = false;
+	for (j=i2-1; j>0; j--)
+	{
+		for (k=i1;k<m_iExt; k++)
+		{
+			if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1],
+						 m_rpExtrados[k], m_rpExtrados[k+1], &M))
+			{
+				bIntersect = true;
+				break;
+			}
+		}
+		if(bIntersect) break;
+	}
+
+	if(bIntersect)
+	{
+		m_rpExtrados[j+1].x = M.x;
+		m_rpExtrados[j+1].y = M.y;
+		p=1;
+		for (l=k+1;l<=m_iExt; l++){
+			m_rpExtrados[j+1+p]  = m_rpExtrados[l];
+			p++;
+		}
+		m_iExt = j+p;
+	}
+
+	// trim lower surface next
+	i1 = iLowerh;
+	i2 = iLowerh-1;
+	p=0;
+	bIntersect = false;
+	for (j=i2-1; j>0; j--)
+	{
+		for (k=i1;k<m_iInt; k++)
+		{
+			if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1],
+						 m_rpIntrados[k], m_rpIntrados[k+1], &M))
+			{
+				bIntersect = true;
+				break;
+			}
+		}
+		if(bIntersect) break;
+	}
+
+	if(bIntersect)
+	{
+		m_rpIntrados[j+1].x = M.x;
+		m_rpIntrados[j+1].y = M.y;
+		p=1;
+		for (l=k+1;l<=m_iInt; l++)
+		{
+			m_rpIntrados[j+1+p]  = m_rpIntrados[l];
+			p++;
+		}
+		m_iInt = j+p;
+	}
+}
+
+
+void CFoil::SetTEFlap()
+{
+	int i, j, k, l, p, i1, i2;//TODO : k used uninitialized
+	double xh, yh, dx, dy;
+	CVector M;
+	bool bIntersect;
+	double cosa, sina;
+
+	double pi = 3.141592654;
+	cosa = cos(m_TEFlapAngle*pi/180.0);
+	sina = sin(m_TEFlapAngle*pi/180.0);
+	//first convert xhinge and yhinge in absolute coordinates
+	xh = m_TEXHinge/100.0;
+	double ymin = GetBaseLowerY(xh);
+	double ymax = GetBaseUpperY(xh);
+	yh = ymin + m_TEYHinge/100.0 * (ymax-ymin);
+	// insert a breakpoint at xhinge location, if there isn't one already
+	int iUpperh = 0;
+	int iLowerh = 0;
+	for (i=0; i<m_iExt; i++)
+	{
+					if(fabs(m_rpExtrados[i].x-xh)<0.001)
+		{
+			//then no need to add an extra point, just break
+			iUpperh = i;
+			break;
+		}
+		else if(m_rpExtrados[i].x>xh)
+		{
+			for(j=m_iExt+1; j>i; j--)
+			{
+				m_rpExtrados[j].x = m_rpExtrados[j-1].x;
+				m_rpExtrados[j].y = m_rpExtrados[j-1].y;
+			}
+			m_rpExtrados[i].x = xh;
+			m_rpExtrados[i].y = ymax;
+			iUpperh = i;
+			m_iExt++;
+			break;
+		}
+	}
+
+	for (i=0; i<m_iInt; i++)
+	{
+					if(fabs(m_rpIntrados[i].x-xh)<0.001)
+		{
+			//then no need to add an Intra point, just break
+			iLowerh = i;
+			break;
+		}
+		else if(m_rpIntrados[i].x>xh)
+		{
+			for(j=m_iInt+1; j>i; j--)
+			{
+				m_rpIntrados[j].x = m_rpIntrados[j-1].x;
+				m_rpIntrados[j].y = m_rpIntrados[j-1].y;
+			}
+			m_rpIntrados[i].x = xh;
+			m_rpIntrados[i].y = ymin;
+			iLowerh = i;
+			m_iInt++;
+			break;
+		}
+	}
+
+	// rotate all points downstream of xh
+	if(m_TEFlapAngle>0.0)
+	{
+		//insert an extra point on intrados
+		for (i=m_iInt+1; i>iLowerh; i--)
+		{
+			m_rpIntrados[i] = m_rpIntrados[i-1];
+		}
+		m_iInt++;
+		// extend to infinity last segments around hinge on flap internal side to make sure
+		// they intersect the spline on the other side
+		m_rpIntrados[iLowerh+1].x += 30.0*(m_rpIntrados[iLowerh+1].x - m_rpIntrados[iLowerh+2].x);
+		m_rpIntrados[iLowerh+1].y += 30.0*(m_rpIntrados[iLowerh+1].y - m_rpIntrados[iLowerh+2].y);
+		m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh-1].x);
+		m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh-1].y);
+	}
+	if(m_TEFlapAngle<0.0)
+	{
+		//insert an extra point on extrados
+		for (i=m_iExt+1; i>iUpperh; i--)
+		{
+			m_rpExtrados[i] = m_rpExtrados[i-1];
+		}
+		m_iExt++;
+
+		// extend to infinity last segments around hinge on flap internal side to make sure
+		// they intersect the spline on the other side
+		m_rpExtrados[iUpperh+1].x += 30.0*(m_rpExtrados[iUpperh+1].x-m_rpExtrados[iUpperh+2].x);
+		m_rpExtrados[iUpperh+1].y += 30.0*(m_rpExtrados[iUpperh+1].y-m_rpExtrados[iUpperh+2].y);
+		m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x-m_rpExtrados[iUpperh-1].x);
+		m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y-m_rpExtrados[iUpperh-1].y);
+	}
+	for (i=iUpperh+1; i<=m_iExt; i++)
+	{
+		dx = m_rpExtrados[i].x-xh;
+		dy = m_rpExtrados[i].y-yh;
+		m_rpExtrados[i].x = xh + cosa * dx + sina * dy;
+		m_rpExtrados[i].y = yh - sina * dx + cosa * dy;
+	}
+	for (i=iLowerh+1; i<=m_iInt; i++)
+	{
+		dx = m_rpIntrados[i].x-xh;
+		dy = m_rpIntrados[i].y-yh;
+		m_rpIntrados[i].x = xh + cosa * dx + sina * dy;
+		m_rpIntrados[i].y = yh - sina * dx + cosa * dy;
+	}
+
+	CSpline LinkSpline;
+	LinkSpline.m_iRes = 4;
+	LinkSpline.m_iDegree = 2;
+	LinkSpline.m_iCtrlPoints = 0;
+
+	if(m_TEFlapAngle<0.0)
+	{
+		//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
+		Intersect(m_rpIntrados[iLowerh-1], m_rpIntrados[iLowerh],
+				  m_rpIntrados[iLowerh+1], m_rpIntrados[iLowerh+2], &M);
+
+		//sanity check
+		if(M.x <= m_rpIntrados[iLowerh].x || M.x >= m_rpIntrados[iLowerh+1].x)
+			M = (m_rpIntrados[iLowerh] + m_rpIntrados[iLowerh+1])/2.0;
+
+		LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
+		LinkSpline.InsertPoint(M.x, M.y);
+		LinkSpline.InsertPoint(m_rpIntrados[iLowerh+1].x,m_rpIntrados[iLowerh+1].y);
+		LinkSpline.SplineKnots();
+		LinkSpline.SplineCurve();
+		//retrieve point 1 and 2 and insert them
+		for (i=m_iInt; i>=iLowerh+1; i--)
+		{
+			m_rpIntrados[i+2].x = m_rpIntrados[i].x;
+			m_rpIntrados[i+2].y = m_rpIntrados[i].y;
+		}
+
+		m_rpIntrados[iLowerh+2].x = LinkSpline.m_Output[2].x;
+		m_rpIntrados[iLowerh+2].y = LinkSpline.m_Output[2].y;
+		m_rpIntrados[iLowerh+1].x = LinkSpline.m_Output[1].x;
+		m_rpIntrados[iLowerh+1].y = LinkSpline.m_Output[1].y;
+
+		m_iInt+=2;
+	}
+	else if(m_TEFlapAngle>0.0)
+	{
+		//define a 3 ctrl-pt spline to smooth the connection between foil and flap on top side
+		Intersect(m_rpExtrados[iUpperh-1], m_rpExtrados[iUpperh],
+				  m_rpExtrados[iUpperh+1], m_rpExtrados[iUpperh+2], &M);
+
+		//sanity check
+		if(M.x <= m_rpExtrados[iUpperh].x || M.x >= m_rpExtrados[iUpperh+1].x)
+			M = (m_rpExtrados[iUpperh] + m_rpExtrados[iUpperh+1])/2.0;
+
+		LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
+		LinkSpline.InsertPoint(M.x, M.y);
+		LinkSpline.InsertPoint(m_rpExtrados[iUpperh+1].x,m_rpExtrados[iUpperh+1].y);
+		LinkSpline.SplineKnots();
+		LinkSpline.SplineCurve();
+
+		//retrieve point 1 and 2 and insert them
+		for (i=m_iExt; i>=iUpperh+1; i--)
+		{
+			m_rpExtrados[i+2].x = m_rpExtrados[i].x;
+			m_rpExtrados[i+2].y = m_rpExtrados[i].y;
+		}
+
+		m_rpExtrados[iUpperh+2].x = LinkSpline.m_Output[2].x;
+		m_rpExtrados[iUpperh+2].y = LinkSpline.m_Output[2].y;
+		m_rpExtrados[iUpperh+1].x = LinkSpline.m_Output[1].x;
+		m_rpExtrados[iUpperh+1].y = LinkSpline.m_Output[1].y;
+
+		m_iExt+=2;
+	}
+
+	// trim upper surface first
+
+	i1 = iUpperh;
+	i2 = iUpperh+1;
+	p=0;
+	bIntersect = false;
+	for (j=i2; j<m_iExt; j++)
+	{
+		for (k=i1;k>0; k--)
+		{
+			if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1],
+						m_rpExtrados[k], m_rpExtrados[k-1], &M))
+			{
+					bIntersect = true;
+					break;
+			}
+		}
+		if(bIntersect) break;
+	}
+
+	if(bIntersect)
+	{
+		m_rpExtrados[k] = M;
+		p=1;
+		for (l=j+1;l<=m_iExt; l++)
+		{
+			m_rpExtrados[k+p]  = m_rpExtrados[l];
+			p++;
+		}
+		m_iExt = k+p-1;
+	}
+// trim lower surface next
+
+	i1 = iLowerh;
+	i2 = iLowerh+1;
+	p=0;
+	bIntersect = false;
+	for (j=i2; j<m_iInt; j++)
+	{
+		for (k=i1;k>0; k--)
+		{
+			if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1],
+						m_rpIntrados[k], m_rpIntrados[k-1], &M))
+			{
+					bIntersect = true;
+					break;
+			}
+		}
+		if(bIntersect) break;
+	}
+
+	if(bIntersect)
+	{
+		m_rpIntrados[k] = M;
+		p=1;
+		for (l=j+1;l<=m_iInt; l++)
+		{
+			m_rpIntrados[k+p]  = m_rpIntrados[l];
+			p++;
+		}
+		m_iInt = k+p-1;
+	}
+}
+
+
+void CFoil::SetFlap()
+{
+	int i;
+	// modifies the current airfoil's geometry 
+	// by setting a flap i.a.w. the member variables
 
 	//copy the base foil to the current foil
 	memcpy(m_rpExtrados, m_BaseExtrados, sizeof(m_rpExtrados));
@@ -1128,481 +1615,8 @@ void CFoil::SetFlap()
 	m_iInt = m_iBaseInt;
 
 
-	if(m_bLEFlap)
-	{
-		cosa = cos(m_LEFlapAngle*pi/180.0);
-		sina = sin(m_LEFlapAngle*pi/180.0);
-		//first convert xhinge and yhinge in absolute coordinates
-		xh = m_LEXHinge/100.0;
-		double ymin = GetBaseLowerY(xh);
-		double ymax = GetBaseUpperY(xh);
-		yh = ymin + m_LEYHinge/100.0 * (ymax-ymin);
-
-		// insert a breakpoint at xhinge location, if there isn't one already
-		int iUpperh = 0;
-		int iLowerh = 0;
-		for (i=0; i<m_iExt; i++)
-		{
-                        if(fabs(m_rpExtrados[i].x-xh)<0.001)
-			{
-				//then no need to add an extra point, just break
-				iUpperh = i;
-				break;
-			}
-			else if(m_rpExtrados[i].x>xh)
-			{
-				//insert one
-				for(j=m_iExt+1; j>i; j--)
-				{
-					m_rpExtrados[j].x = m_rpExtrados[j-1].x;
-					m_rpExtrados[j].y = m_rpExtrados[j-1].y;
-				}
-
-				m_rpExtrados[i].x = xh;
-				m_rpExtrados[i].y = ymax;
-				iUpperh = i;
-				m_iExt+=1;
-				break;
-			}
-		}
-		
-		for (i=0; i<m_iInt; i++)
-		{
-                        if(fabs(m_rpIntrados[i].x-xh)<0.001)
-			{
-				//then no need to add an Intra point, just break
-				iLowerh = i;
-				break;
-			}
-			else if(m_rpIntrados[i].x>xh)
-			{//insert one
-				for(j=m_iInt+1; j>i; j--)
-				{
-					m_rpIntrados[j].x = m_rpIntrados[j-1].x;
-					m_rpIntrados[j].y = m_rpIntrados[j-1].y;
-				}
-
-				m_rpIntrados[i].x = xh;
-				m_rpIntrados[i].y = ymin;
-				iLowerh = i;
-				m_iInt+=1;
-				break;
-			}
-		}
-
-		// rotate all points upstream of xh
-		if(m_LEFlapAngle>0.0)
-		{
-			//insert an extra point on intrados
-			for (i=m_iInt+1; i>iLowerh; i--){
-				m_rpIntrados[i] = m_rpIntrados[i-1];
-			}
-			m_rpIntrados[iLowerh] = m_rpIntrados[iLowerh+1];
-			iLowerh++;
-			m_iInt++;
-
-			// extend to infinity last segments around hinge on flap internal side to make sure 
-			// they intersect the spline on the other side
-			m_rpIntrados[iLowerh-1].x += 30.0*(m_rpIntrados[iLowerh-1].x-m_rpIntrados[iLowerh-2].x);
-			m_rpIntrados[iLowerh-1].y += 30.0*(m_rpIntrados[iLowerh-1].y-m_rpIntrados[iLowerh-2].y);
-			m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh+1].x);
-			m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh+1].y);
-		}
-		if(m_LEFlapAngle<0.0)
-		{
-			//insert an extra point on extrados
-			for (i=m_iExt+1; i>iUpperh; i--)
-			{
-				m_rpExtrados[i] = m_rpExtrados[i-1];
-			}
-			m_rpExtrados[iUpperh] = m_rpExtrados[iUpperh+1];
-			iUpperh++;
-			m_iExt++;
-
-			// extend to infinity last segments around hinge on flap internal side to make sure 
-			// they intersect the spline on the other side
-			m_rpExtrados[iUpperh-1].x += 30.0 * (m_rpExtrados[iUpperh-1].x - m_rpExtrados[iUpperh-2].x);
-			m_rpExtrados[iUpperh-1].y += 30.0 * (m_rpExtrados[iUpperh-1].y - m_rpExtrados[iUpperh-2].y);
-			m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x   - m_rpExtrados[iUpperh+1].x);
-			m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y   - m_rpExtrados[iUpperh+1].y);
-		}
-		for (i=0; i<iUpperh; i++)
-		{
-			dx = m_rpExtrados[i].x-xh;
-			dy = m_rpExtrados[i].y-yh;
-			m_rpExtrados[i].x = xh + cosa * dx - sina * dy;
-			m_rpExtrados[i].y = yh + sina * dx + cosa * dy;
-		}
-		for (i=0; i<iLowerh; i++)
-		{
-			dx = m_rpIntrados[i].x-xh;
-			dy = m_rpIntrados[i].y-yh;
-			m_rpIntrados[i].x = xh + cosa * dx - sina * dy;
-			m_rpIntrados[i].y = yh + sina * dx + cosa * dy;
-		}
-
-		CSpline LinkSpline;
-		LinkSpline.m_iRes = 4;
-		LinkSpline.m_iDegree = 3;
-		LinkSpline.m_iCtrlPoints = -1;
-
-		if(m_LEFlapAngle<0.0)
-		{
-
-			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
-			Intersect(m_rpIntrados[iLowerh-2], m_rpIntrados[iLowerh-1],
-					  m_rpIntrados[iLowerh],   m_rpIntrados[iLowerh+1], &M);
-			//sanity check
-			if(M.x <= m_rpIntrados[iLowerh-1].x || M.x >= m_rpIntrados[iLowerh].x)
-				M = (m_rpIntrados[iLowerh-1] + m_rpIntrados[iLowerh])/2.0;
-
-			LinkSpline.InsertPoint(m_rpIntrados[iLowerh-1].x,m_rpIntrados[iLowerh-1].y);
-			LinkSpline.InsertPoint(M.x, M.y);
-			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-			//retrieve point 1 and 2 and insert them
-			for (i=m_iInt; i>=iLowerh; i--)
-			{
-				m_rpIntrados[i+2].x = m_rpIntrados[i].x;
-				m_rpIntrados[i+2].y = m_rpIntrados[i].y;
-			}
-
-			m_rpIntrados[iLowerh+1].x = LinkSpline.m_Output[2].x;
-			m_rpIntrados[iLowerh+1].y = LinkSpline.m_Output[2].y;
-			m_rpIntrados[iLowerh].x   = LinkSpline.m_Output[1].x;
-			m_rpIntrados[iLowerh].y   = LinkSpline.m_Output[1].y;
-
-			m_iInt+=2;
-		}
-		if(m_LEFlapAngle>0.0)
-		{
-
-			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
-			Intersect(m_rpExtrados[iUpperh-2], m_rpExtrados[iUpperh-1],
-					  m_rpExtrados[iUpperh],   m_rpExtrados[iUpperh+1], &M);
-
-			//sanity check
-			if(M.x <= m_rpExtrados[iUpperh-1].x || M.x >= m_rpExtrados[iUpperh].x)
-				M = (m_rpExtrados[iUpperh-1] + m_rpExtrados[iUpperh])/2.0;
-
-			LinkSpline.InsertPoint(m_rpExtrados[iUpperh-1].x,m_rpExtrados[iUpperh-1].y);
-			LinkSpline.InsertPoint(M.x, M.y);
-			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-			//retrieve point 1 and 2 and insert them
-			for (i=m_iExt; i>=iUpperh; i--)
-			{
-				m_rpExtrados[i+2].x = m_rpExtrados[i].x;
-				m_rpExtrados[i+2].y = m_rpExtrados[i].y;
-			}
-
-			m_rpExtrados[iUpperh+1].x = LinkSpline.m_Output[2].x;
-			m_rpExtrados[iUpperh+1].y = LinkSpline.m_Output[2].y;
-			m_rpExtrados[iUpperh].x   = LinkSpline.m_Output[1].x;
-			m_rpExtrados[iUpperh].y   = LinkSpline.m_Output[1].y;
-
-			m_iExt+=2;
-		}
-		// trim upper surface first
-		i1 = iUpperh;
-		i2 = iUpperh-1;
-		p=0;
-		bIntersect = false;
-		for (j=i2-1; j>0; j--)
-		{
-			for (k=i1;k<m_iExt; k++)
-			{
-				if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1],
-							 m_rpExtrados[k], m_rpExtrados[k+1], &M))
-				{
-					bIntersect = true;
-					break;
-				}
-			}
-			if(bIntersect) break;
-		}
-
-		if(bIntersect) 
-		{
-			m_rpExtrados[j+1].x = M.x;
-			m_rpExtrados[j+1].y = M.y;
-			p=1;
-			for (l=k+1;l<=m_iExt; l++){
-				m_rpExtrados[j+1+p]  = m_rpExtrados[l];
-				p++;
-			}
-			m_iExt = j+p;
-		}
-
-		// trim lower surface next
-		i1 = iLowerh;
-		i2 = iLowerh-1;
-		p=0;
-		bIntersect = false;
-		for (j=i2-1; j>0; j--)
-		{
-			for (k=i1;k<m_iInt; k++)
-			{
-				if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1],
-							 m_rpIntrados[k], m_rpIntrados[k+1], &M))
-				{
-					bIntersect = true;
-					break;
-				}
-			}
-			if(bIntersect) break;
-		}
-
-		if(bIntersect) 
-		{
-			m_rpIntrados[j+1].x = M.x;
-			m_rpIntrados[j+1].y = M.y;
-			p=1;
-			for (l=k+1;l<=m_iInt; l++)
-			{
-				m_rpIntrados[j+1+p]  = m_rpIntrados[l];
-				p++;
-			}
-			m_iInt = j+p;
-		}
-	}
-
-// Trailing Edge Flap
-	if(m_bTEFlap)
-	{
-		cosa = cos(m_TEFlapAngle*pi/180.0);
-		sina = sin(m_TEFlapAngle*pi/180.0);
-		//first convert xhinge and yhinge in absolute coordinates
-		xh = m_TEXHinge/100.0;
-		double ymin = GetBaseLowerY(xh);
-		double ymax = GetBaseUpperY(xh);
-		yh = ymin + m_TEYHinge/100.0 * (ymax-ymin);
-		// insert a breakpoint at xhinge location, if there isn't one already
-		int iUpperh = 0;
-		int iLowerh = 0;
-		for (i=0; i<m_iExt; i++)
-		{
-                        if(fabs(m_rpExtrados[i].x-xh)<0.001)
-			{
-				//then no need to add an extra point, just break
-				iUpperh = i;
-				break;
-			}
-			else if(m_rpExtrados[i].x>xh)
-			{
-				for(j=m_iExt+1; j>i; j--)
-				{
-					m_rpExtrados[j].x = m_rpExtrados[j-1].x;
-					m_rpExtrados[j].y = m_rpExtrados[j-1].y;
-				}
-				m_rpExtrados[i].x = xh;
-				m_rpExtrados[i].y = ymax;
-				iUpperh = i;
-				m_iExt++;
-				break;
-			}
-		}
-		
-		for (i=0; i<m_iInt; i++)
-		{
-                        if(fabs(m_rpIntrados[i].x-xh)<0.001)
-			{
-				//then no need to add an Intra point, just break
-				iLowerh = i;
-				break;
-			}
-			else if(m_rpIntrados[i].x>xh)
-			{
-				for(j=m_iInt+1; j>i; j--)
-				{
-					m_rpIntrados[j].x = m_rpIntrados[j-1].x;
-					m_rpIntrados[j].y = m_rpIntrados[j-1].y;
-				}
-				m_rpIntrados[i].x = xh;
-				m_rpIntrados[i].y = ymin;
-				iLowerh = i;
-				m_iInt++;
-				break;
-			}
-		}
-
-		// rotate all points downstream of xh
-		if(m_TEFlapAngle>0.0)
-		{
-			//insert an extra point on intrados
-			for (i=m_iInt+1; i>iLowerh; i--)
-			{
-				m_rpIntrados[i] = m_rpIntrados[i-1];
-			}
-			m_iInt++;
-			// extend to infinity last segments around hinge on flap internal side to make sure 
-			// they intersect the spline on the other side
-			m_rpIntrados[iLowerh+1].x += 30.0*(m_rpIntrados[iLowerh+1].x - m_rpIntrados[iLowerh+2].x);
-			m_rpIntrados[iLowerh+1].y += 30.0*(m_rpIntrados[iLowerh+1].y - m_rpIntrados[iLowerh+2].y);
-			m_rpIntrados[iLowerh].x   += 30.0*(m_rpIntrados[iLowerh].x   - m_rpIntrados[iLowerh-1].x);
-			m_rpIntrados[iLowerh].y   += 30.0*(m_rpIntrados[iLowerh].y   - m_rpIntrados[iLowerh-1].y);
-		}
-		if(m_TEFlapAngle<0.0)
-		{
-			//insert an extra point on extrados
-			for (i=m_iExt+1; i>iUpperh; i--)
-			{
-				m_rpExtrados[i] = m_rpExtrados[i-1];
-			}
-			m_iExt++;
-
-			// extend to infinity last segments around hinge on flap internal side to make sure 
-			// they intersect the spline on the other side
-			m_rpExtrados[iUpperh+1].x += 30.0*(m_rpExtrados[iUpperh+1].x-m_rpExtrados[iUpperh+2].x);
-			m_rpExtrados[iUpperh+1].y += 30.0*(m_rpExtrados[iUpperh+1].y-m_rpExtrados[iUpperh+2].y);
-			m_rpExtrados[iUpperh].x   += 30.0 * (m_rpExtrados[iUpperh].x-m_rpExtrados[iUpperh-1].x);
-			m_rpExtrados[iUpperh].y   += 30.0 * (m_rpExtrados[iUpperh].y-m_rpExtrados[iUpperh-1].y);
-		}
-		for (i=iUpperh+1; i<=m_iExt; i++)
-		{
-			dx = m_rpExtrados[i].x-xh;
-			dy = m_rpExtrados[i].y-yh;
-			m_rpExtrados[i].x = xh + cosa * dx + sina * dy;
-			m_rpExtrados[i].y = yh - sina * dx + cosa * dy;
-		}
-		for (i=iLowerh+1; i<=m_iInt; i++)
-		{
-			dx = m_rpIntrados[i].x-xh;
-			dy = m_rpIntrados[i].y-yh;
-			m_rpIntrados[i].x = xh + cosa * dx + sina * dy;
-			m_rpIntrados[i].y = yh - sina * dx + cosa * dy;
-		}
-
-		CSpline LinkSpline;
-		LinkSpline.m_iRes = 4;
-		LinkSpline.m_iDegree = 2;
-		LinkSpline.m_iCtrlPoints = 0;
-
-		if(m_TEFlapAngle<0.0)
-		{
-			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on bottom side
-			Intersect(m_rpIntrados[iLowerh-1], m_rpIntrados[iLowerh],
-					  m_rpIntrados[iLowerh+1], m_rpIntrados[iLowerh+2], &M);
-
-			//sanity check
-			if(M.x <= m_rpIntrados[iLowerh].x || M.x >= m_rpIntrados[iLowerh+1].x)
-				M = (m_rpIntrados[iLowerh] + m_rpIntrados[iLowerh+1])/2.0;
-
-			LinkSpline.InsertPoint(m_rpIntrados[iLowerh].x,m_rpIntrados[iLowerh].y);
-			LinkSpline.InsertPoint(M.x, M.y);
-			LinkSpline.InsertPoint(m_rpIntrados[iLowerh+1].x,m_rpIntrados[iLowerh+1].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-			//retrieve point 1 and 2 and insert them
-			for (i=m_iInt; i>=iLowerh+1; i--)
-			{
-				m_rpIntrados[i+2].x = m_rpIntrados[i].x;
-				m_rpIntrados[i+2].y = m_rpIntrados[i].y;
-			}
-
-			m_rpIntrados[iLowerh+2].x = LinkSpline.m_Output[2].x;
-			m_rpIntrados[iLowerh+2].y = LinkSpline.m_Output[2].y;
-			m_rpIntrados[iLowerh+1].x = LinkSpline.m_Output[1].x;
-			m_rpIntrados[iLowerh+1].y = LinkSpline.m_Output[1].y;
-
-			m_iInt+=2;
-		}
-		else if(m_TEFlapAngle>0.0)
-		{
-			//define a 3 ctrl-pt spline to smooth the connection between foil and flap on top side
-			Intersect(m_rpExtrados[iUpperh-1], m_rpExtrados[iUpperh],
-					  m_rpExtrados[iUpperh+1], m_rpExtrados[iUpperh+2], &M);
-
-			//sanity check
-			if(M.x <= m_rpExtrados[iUpperh].x || M.x >= m_rpExtrados[iUpperh+1].x)
-				M = (m_rpExtrados[iUpperh] + m_rpExtrados[iUpperh+1])/2.0;
-
-			LinkSpline.InsertPoint(m_rpExtrados[iUpperh].x,m_rpExtrados[iUpperh].y);
-			LinkSpline.InsertPoint(M.x, M.y);
-			LinkSpline.InsertPoint(m_rpExtrados[iUpperh+1].x,m_rpExtrados[iUpperh+1].y);
-			LinkSpline.SplineKnots();
-			LinkSpline.SplineCurve();
-				
-			//retrieve point 1 and 2 and insert them
-			for (i=m_iExt; i>=iUpperh+1; i--)
-			{
-				m_rpExtrados[i+2].x = m_rpExtrados[i].x;
-				m_rpExtrados[i+2].y = m_rpExtrados[i].y;
-			}
-
-			m_rpExtrados[iUpperh+2].x = LinkSpline.m_Output[2].x;
-			m_rpExtrados[iUpperh+2].y = LinkSpline.m_Output[2].y;
-			m_rpExtrados[iUpperh+1].x = LinkSpline.m_Output[1].x;
-			m_rpExtrados[iUpperh+1].y = LinkSpline.m_Output[1].y;
-
-			m_iExt+=2;
-		}
-
-		// trim upper surface first
-		
-		i1 = iUpperh;
-		i2 = iUpperh+1;
-		p=0;
-		bIntersect = false;
-		for (j=i2; j<m_iExt; j++)
-		{
-			for (k=i1;k>0; k--)
-			{
-				if(Intersect(m_rpExtrados[j], m_rpExtrados[j+1],
-							m_rpExtrados[k], m_rpExtrados[k-1], &M))
-				{
-						bIntersect = true;
-						break;
-				}
-			}
-			if(bIntersect) break;
-		}
-
-		if(bIntersect) 
-		{
-			m_rpExtrados[k] = M;
-			p=1;
-			for (l=j+1;l<=m_iExt; l++)
-			{
-				m_rpExtrados[k+p]  = m_rpExtrados[l];
-				p++;
-			}
-			m_iExt = k+p-1;
-		}
-	// trim lower surface next
-		
-		i1 = iLowerh;
-		i2 = iLowerh+1;
-		p=0;
-		bIntersect = false;
-		for (j=i2; j<m_iInt; j++)
-		{
-			for (k=i1;k>0; k--)
-			{
-				if(Intersect(m_rpIntrados[j], m_rpIntrados[j+1],
-							m_rpIntrados[k], m_rpIntrados[k-1], &M))
-				{
-						bIntersect = true;
-						break;
-				}
-			}
-			if(bIntersect) break;
-		}
-
-		if(bIntersect) 
-		{
-			m_rpIntrados[k] = M;
-			p=1;
-			for (l=j+1;l<=m_iInt; l++)
-			{
-				m_rpIntrados[k+p]  = m_rpIntrados[l];
-				p++;
-			}
-			m_iInt = k+p-1;
-		}
-	}
+	if(m_bLEFlap) SetLEFlap();
+	if(m_bTEFlap) SetTEFlap();
 
 	//And finally rebuild the current foil
 	for (i=m_iExt; i>=0; i--)

@@ -271,6 +271,21 @@ bool Graph::GetAutoY()
 {
 	return m_bAutoY;
 }
+
+
+
+
+bool Graph::GetAutoXMin()
+{
+	return m_bXAutoMinGrid;
+}
+bool Graph::GetAutoYMin()
+{
+	return m_bYAutoMinGrid;
+}
+
+
+
 bool Graph::GetBorder()
 {
 	return m_bBorder;
@@ -376,7 +391,7 @@ bool Graph::GetXMinGrid()
 void Graph::GetXMinGrid(bool &state, bool &bAuto, QColor &clr, int &style, int &width, double &unit)
 {
 	state = m_bXMinGrid;
-	bAuto = m_bYAutoMinGrid;
+	bAuto = m_bXAutoMinGrid;
 	clr   = m_XMinClr;
 	style = m_XMinStyle;
 	width = m_XMinWidth;
@@ -444,7 +459,7 @@ bool Graph::GetYMinGrid()
 void Graph::GetYMinGrid(bool &state, bool &bAuto, QColor &clr, int &style, int &width, double &unit)
 {
 	state = m_bYMinGrid;
-	bAuto = m_bXAutoMinGrid;
+	bAuto = m_bYAutoMinGrid;
 	clr   = m_YMinClr;
 	style = m_YMinStyle;
 	width = m_YMinWidth;

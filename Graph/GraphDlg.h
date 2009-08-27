@@ -51,6 +51,7 @@ private slots:
 	void OnRestoreParams();
 	void OnAutoX();
 	void OnAutoY();
+	void OnAutoMinGrid();
 	void OnAxisStyle();
 	void OnXMajGridStyle();
 	void OnXMinGridStyle();
@@ -92,6 +93,7 @@ private:
 	FloatEdit *m_pctrlYMin, *m_pctrlYMax, *m_pctrlYOrigin,*m_pctrlYUnit;
 
 	QCheckBox *m_pctrlXMajGridShow, *m_pctrlYMajGridShow, *m_pctrlXMinGridShow, *m_pctrlYMinGridShow;
+	QCheckBox *m_pctrlAutoXMinUnit, *m_pctrlAutoYMinUnit;
 	LineButton *m_pctrlAxisStyle, *m_pctrlXMajGridStyle, *m_pctrlYMajGridStyle, *m_pctrlXMinGridStyle, *m_pctrlYMinGridStyle;
 	FloatEdit *m_pctrlXMinorUnit, *m_pctrlYMinorUnit;
 

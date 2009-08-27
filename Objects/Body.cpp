@@ -43,7 +43,7 @@ CBody::CBody()
 	pi = 3.141592654;
 	m_BodyName = UnitsDlg::tr("BodyName");
 
-	m_BodyColor = QColor(190,130,130);
+	m_BodyColor = QColor(210,240,240);
 	m_BodyStyle = 0;
 	m_BodyWidth = 1;
 

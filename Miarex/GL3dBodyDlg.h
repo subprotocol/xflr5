@@ -121,7 +121,6 @@ private:
 	void SetupLayout();
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, QPoint &point);
-	void GLCreateMesh();
 	void GLCreateCtrlPts();
 	void GLInverseMatrix();
 	void GLCreateBody2DBodySection();

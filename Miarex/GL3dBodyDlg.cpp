@@ -368,94 +368,6 @@ void GL3dBodyDlg::FillPointTableRow(int row)
 }
 
 
-void GL3dBodyDlg::GLCreateMesh()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-
-	QColor color;
-	int iLA, iLB, iTA, iTB;
-	int style, width, p;
-	CVector A, B, N;
-	N.Set(0.0, 0.0, 0.0);
-
-	glNewList(MESHPANELS,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//		glEnable(GL_POLYGON_OFFSET_FILL);
-//		glPolygonOffset(1.0, 1.0);
-
-		color = pMiarex->m_VLMColor;
-		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
-
-		glLineWidth(1.0);
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		for (p=0; p<pMiarex->m_MatSize; p++)
-		{
-				glBegin(GL_QUADS);
-				{
-					iLA = m_pPanel[p].m_iLA;
-					iLB = m_pPanel[p].m_iLB;
-					iTA = m_pPanel[p].m_iTA;
-					iTB = m_pPanel[p].m_iTB;
-
-					glNormal3d(m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
-					glVertex3d(m_pNode[iLA].x, m_pNode[iLA].y, m_pNode[iLA].z);
-					glVertex3d(m_pNode[iTA].x, m_pNode[iTA].y, m_pNode[iTA].z);
-					glVertex3d(m_pNode[iTB].x, m_pNode[iTB].y, m_pNode[iTB].z);
-					glVertex3d(m_pNode[iLB].x, m_pNode[iLB].y, m_pNode[iLB].z);
-				}
-				glEnd();
-		}
-	}
-	glEndList();
-
-	glNewList(MESHBACK,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-
-		color = pMainFrame->m_BackgroundColor;
-		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		glLineWidth(1.0);
-		glDisable (GL_LINE_STIPPLE);
-
-		for (p=0; p<pMiarex->m_MatSize; p++)
-		{
-				glBegin(GL_QUADS);
-				{
-					iLA = m_pPanel[p].m_iLA;
-					iLB = m_pPanel[p].m_iLB;
-					iTA = m_pPanel[p].m_iTA;
-					iTB = m_pPanel[p].m_iTB;
-
-					glVertex3d(m_pNode[iLA].x, m_pNode[iLA].y, m_pNode[iLA].z);
-					glVertex3d(m_pNode[iTA].x, m_pNode[iTA].y, m_pNode[iTA].z);
-					glVertex3d(m_pNode[iTB].x, m_pNode[iTB].y, m_pNode[iTB].z);
-					glVertex3d(m_pNode[iLB].x, m_pNode[iLB].y, m_pNode[iLB].z);
-					glNormal3d(m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
-				}
-				glEnd();
-		}
-
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-	glEndList();
-}
-
-
 void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 {
 	int i,j,l;
@@ -812,7 +724,6 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 		}
 		return;
 	}
-
 	int i,j,k,l;
 	int p, style, width, nx, nh;
 	double uk, v, dj, dj1, dl1;
@@ -1085,6 +996,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 	}
 	else if(pBody->m_LineType==2) //NURBS
 	{
+		m_pBody->SetPanelPos();
 		p = 0;
 		for (k=0; k<=nx; k++)
 		{
