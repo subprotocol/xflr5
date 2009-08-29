@@ -1744,7 +1744,7 @@ void QXInverse::PaintGraph(QPainter &painter)
 void QXInverse::PaintFoil(QPainter &painter)
 {
 	painter.save();
-
+	QString str,str1,str2;
 
 //	draw the scale/grid
 	if(m_bModFoil || m_bRefFoil)
@@ -1767,9 +1767,9 @@ void QXInverse::PaintFoil(QPainter &painter)
 		painter.setPen(FoilPen);
 
 		m_pRefFoil->DrawFoil(painter, -alpha, m_fScale, m_fScale, m_ptOffset);
-		painter.drawLine(20, m_rCltRect.bottom()-40, 40, m_rCltRect.bottom()-40);
+		painter.drawLine(20, m_rGraphRect.bottom()+20, 40, m_rGraphRect.bottom()+20);
 		painter.setPen(TextPen);
-		painter.drawText(50, m_rCltRect.bottom()-35, m_pRefFoil->m_FoilName);
+		painter.drawText(50, m_rGraphRect.bottom()+25, m_pRefFoil->m_FoilName);
 	}
 
 	if(m_bModFoil && m_bLoaded) 
@@ -1780,9 +1780,9 @@ void QXInverse::PaintFoil(QPainter &painter)
 		painter.setPen(ModPen);
 
 		m_pModFoil->DrawFoil(painter, -alpha, m_fScale, m_fScale, m_ptOffset);
-		painter.drawLine(20, m_rCltRect.bottom()-20, 40, m_rCltRect.bottom()-20);
+		painter.drawLine(20, m_rGraphRect.bottom()+35, 40, m_rGraphRect.bottom()+35);
 		painter.setPen(TextPen);
-		painter.drawText(50, m_rCltRect.bottom()-15, m_pModFoil->m_FoilName);
+		painter.drawText(50, m_rGraphRect.bottom()+40, m_pModFoil->m_FoilName);
 	}
 
 	if (m_pRefFoil->m_bPoints)
@@ -1794,6 +1794,45 @@ void QXInverse::PaintFoil(QPainter &painter)
 
 		m_pRefFoil->DrawPoints(painter, 1.0,  1.0, m_ptOffset);
 	}
+
+	painter.setFont(pMainFrame->m_TextFont);
+	QFontMetrics fm(pMainFrame->m_TextFont);
+	int dD = fm.height();
+	int Back = 4;
+	int LeftPos = m_rCltRect.left()+10;
+	int ZPos = m_rCltRect.bottom() - 10 - Back*dD;
+
+	int D = 0;
+
+	str = tr("                     Base");
+	if(m_bModFoil && m_bLoaded)  str +=tr("       Mod.");
+
+	painter.drawText(LeftPos,ZPos+D, str);
+	D += dD;
+
+	str1 = QString(tr("Thickness        = %1%")).arg(m_pRefFoil->m_fThickness*100.0, 6, 'f', 2);
+	if(m_bModFoil && m_bLoaded)  str2 = QString("    %1%").arg(m_pModFoil->m_fThickness*100.0, 6, 'f', 2);
+	else str2 = "";
+	painter.drawText(LeftPos,ZPos+D, str1+str2);
+	D += dD;
+
+	str1 = QString(tr("Max.Thick.pos.   = %1%")).arg(m_pRefFoil->m_fXThickness*100.0, 6, 'f', 2);
+	if(m_bModFoil && m_bLoaded)  str2 = QString("    %1%").arg(m_pModFoil->m_fXThickness*100.0, 6, 'f', 2);
+	else str2 = "";
+	painter.drawText(LeftPos,ZPos+D, str1+str2);
+	D += dD;
+
+	str1 = QString(tr("Max. Camber      = %1%")).arg( m_pRefFoil->m_fCamber*100.0, 6, 'f', 2);
+	if(m_bModFoil && m_bLoaded)  str2 = QString("    %1%").arg(m_pModFoil->m_fCamber*100.0, 6, 'f', 2);
+	else str2 = "";
+	painter.drawText(LeftPos,ZPos+D, str1+str2);
+	D += dD;
+
+	str1 = QString(tr("Max.Thick.pos.   = %1%")).arg(m_pRefFoil->m_fXCamber*100.0, 6, 'f', 2);
+	if(m_bModFoil && m_bLoaded)  str2 = QString("    %1%").arg(m_pModFoil->m_fXCamber*100.0, 6, 'f', 2);
+	else str2 = "";
+	painter.drawText(LeftPos,ZPos+D, str1+str2);
+	D += dD;
 
 	painter.restore();
 }
@@ -2086,7 +2125,7 @@ void QXInverse::SetScale(QRect CltRect)
 	m_rCltRect = CltRect;
 
 	int h = CltRect.height();
-	int h4 = (int)(h/4.0);
+	int h4 = (int)(h/3.0);
 	int w = CltRect.width();
 	int w20 = (int)(w/20);
 	m_rGraphRect = QRect(w20, 10, + m_rCltRect.width()-2*w20, m_rCltRect.height()-h4);
@@ -2119,6 +2158,20 @@ void QXInverse::SetupLayout()
 //	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()/3);
 //	move(r.width()/3, r.height()/6);
+
+	QSizePolicy szPolicyExpanding;
+	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
+
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+	setSizePolicy(szPolicyMaximum);
 
 	QGridLayout *SpecLayout = new QGridLayout;
 	m_pctrlSpecAlpha = new QRadioButton(tr("Alpha"));
@@ -2160,7 +2213,7 @@ void QXInverse::SetupLayout()
 	SmoothLayout->addWidget(m_pctrlFilter,1,2);
 	SmoothLayout->addWidget(lab0,2,1);
 	SmoothLayout->addWidget(m_pctrlFilterParam,2,2);
-	QGroupBox *SmoothBox = new QGroupBox;
+	QGroupBox *SmoothBox = new QGroupBox(tr("Smoothing"));
 	SmoothBox->setLayout(SmoothLayout);
 
 	QGridLayout *TELayout = new QGridLayout;

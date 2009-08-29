@@ -102,8 +102,16 @@ void RenameDlg::InitDialog()
 	m_pctrlNote->setText(m_Note);
 
 	if(!m_bEnableOverwrite) OverwriteButton->setEnabled(false);
+
+	if(m_strName.length())
+	{
+		m_pctrlMessage->setText(m_strQuestion);
+	}
+	else
+	{
+		m_pctrlMessage->setText("Enter a name");
+	}
 	m_StartName = m_strName;
-	m_pctrlMessage->setText(m_strQuestion);
 	m_pctrlName->setText(m_StartName);
 	m_pctrlName->setFocus();
 	m_pctrlName->selectAll();

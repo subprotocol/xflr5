@@ -784,4 +784,123 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 
 
 
+bool ludcmp(int n, double *a, int *indx)
+{
+	//    *******************************************************
+	//    *                                                     *
+	//    *   factors a full nxn matrix into an lu form.        *
+	//    *   subr. baksub can back-substitute it with some rhs.*
+	//    *   assumes matrix is non-singular...                 *
+	//    *    ...if it isn"t, a divide by zero will result.    *
+	//    *                                                     *
+	//    *   a is the matrix...                                *
+	//    *     ...replaced with its lu factors.                *
+	//    *                                                     *
+	//    *                              mark drela  1988       *
+	//    *                                                     *
+	//    *  Translated to C - Andre Deperrois  2003-2009       *
+	//    *******************************************************
+	//
+	//
+	bool bimaxok = false;
+	int imax = -1;
+	int i, j, k;
+	double vv[VLMMATSIZE];//use temporary global array
+	double dum, sum, aamax;
+
+	if(n>IQX)
+	{
+//		QString str("Stop ludcmp: array overflow. Increase nvx");
+//		WriteString(str, true);
+		return false;
+	}
+
+	for (i=1; i<=n; i++)
+	{
+		aamax = 0.0;
+		for (j=1; j<=n; j++) aamax = qMax(fabs(*(a+i*n+j)), aamax);
+		vv[i] = 1.0/aamax;
+	}
+
+	for(j=1;j<= n;j++)
+	{
+		for(i=1; i<=j-1; i++)
+		{
+			sum = *(a+i*n+j);
+			for (k=1;k<= i-1;k++) sum -= *(a+i*n+k)* *(a+k*n+j);
+			*(a+i*n+j) = sum;
+		}
+
+		aamax = 0.0;
+
+		for (i=j; i<=n;i++)
+		{
+			sum = *(a+i*n+j);
+			for (k=1;k<= j-1;k++) sum -= *(a+i*n+k)* *(a+k*n+j);
+			*(a+i*n+j) = sum ;
+			dum = (vv[i]*fabs(sum));
+			if(dum>=aamax)
+			{
+				imax = i;
+				aamax = dum;
+				bimaxok = true;
+			}
+		}
+
+		if(imax<0) return false;
+
+		if(j!=imax)
+		{
+			for (k=1; k<= n; k++)
+			{
+				dum = *(a+imax*n+k);
+				*(a+imax*n+k) = *(a+j*n+k);
+				*(a+j*n+k)    = dum;
+			}
+			vv[imax] = vv[j];
+		}
+
+		indx[j] = imax;
+		if(j!=n)
+		{
+			dum /= *(a+j*n+j);
+			for(i=j+1; i<= n;i++) *(a+i*n+j) *= dum;
+		}
+	}
+	return true;
+}
+
+
+bool baksub(int n, double *a, int *indx, double *b)
+{
+	double sum;
+	int i, ii, ll, j;
+	ii = 0;
+	for (i=1;i<= n;i++)
+	{
+		ll = indx[i];
+		sum = b[ll];
+		b[ll] = b[i];
+		if(ii!=0)
+			for (j=ii;j<=i-1;j++) sum -= *(a+i*n+j) * b[j];
+		else
+			if(sum!=0.0) ii = i;
+
+		b[i] = sum;
+	}
+
+	for (i=n; i>=1; i--)
+	{
+		sum = b[i];
+		if(i<n)
+		for (j=i+1; j<= n; j++) sum -= *(a+i*n+j) * b[j];
+		b[i] = sum/ *(a+i*n+i);
+	}
+	return true;
+}
+
+
+
+
+
 

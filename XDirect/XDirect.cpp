@@ -480,6 +480,7 @@ OpPoint* QXDirect::AddOpPoint()
 	{
 		SetOpp(-1.e10);
 	}
+
 	pMainFrame->SetSaveState(false);
 	return pNewPoint;
 }
@@ -1934,7 +1935,7 @@ void QXDirect::OnCadd()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -2360,6 +2361,7 @@ void QXDirect::OnDeleteCurPolar()
 			{
 				m_poaPolar->removeAt(l);
 				delete m_pCurPolar;
+				break;
 			}
 		}
 		m_pCurOpp   = NULL;
@@ -2385,10 +2387,13 @@ void QXDirect::OnDeletePolarOpps()
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
 		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
+		{
 			m_poaOpp->removeAt(i);
-			if(m_pCurOpp == pOpp) m_pCurOpp=NULL;
 			delete pOpp;
+		}
 	}
+
+	m_pCurOpp=NULL;
 	pMainFrame->SetSaveState(false);
 	pMainFrame->UpdateOpps();
 	if(!m_bPolar) CreateOppCurves();
@@ -2410,10 +2415,12 @@ void QXDirect::OnDeleteFoilOpps()
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
 		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName)
+		{
 			m_poaOpp->removeAt(i);
-			if(m_pCurOpp == pOpp) m_pCurOpp=NULL;
 			delete pOpp;
+		}
 	}
+	m_pCurOpp = NULL;
 	pMainFrame->SetSaveState(false);
 	pMainFrame->UpdateOpps();
 	if(!m_bPolar) CreateOppCurves();
@@ -2514,7 +2521,7 @@ void QXDirect::OnDerotateFoil()
 	pNewFoil->m_bPoints = false;
 	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 
-	pMainFrame->SetModFoil(pNewFoil);
+	if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 	pMainFrame->UpdateFoils();
 	pMainFrame->SetSaveState(false);
 
@@ -2955,7 +2962,7 @@ void QXDirect::OnFoilCoordinates()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -3010,7 +3017,7 @@ void QXDirect::OnFoilGeom()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -3846,7 +3853,7 @@ void QXDirect::OnPanels()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = true;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -4050,7 +4057,11 @@ void QXDirect::OnResetCurPolar()
 	for(int i=0; i< m_poaOpp->size();i++)
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
-		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName) delete pOpp;
+		if(pOpp->m_strFoilName==m_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
+		{
+			m_poaOpp->removeAt(i);
+			delete pOpp;
+		}
 	}
 	m_pCurOpp = NULL;
 
@@ -4217,7 +4228,7 @@ void QXDirect::OnSetFlap()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -4266,7 +4277,7 @@ void QXDirect::OnSetLERadius()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 	else
@@ -4319,7 +4330,7 @@ void QXDirect::OnSetTEGap()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 		m_pCurOpp = (OpPoint*)ptr;
-		pMainFrame->SetModFoil(pNewFoil);
+		if(!pMainFrame->SetModFoil(pNewFoil))	SetBufferFoil();
 		pMainFrame->UpdateFoils();
 	}
 
@@ -4972,17 +4983,17 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_BufferFoil.m_bTEFlap)
 	{
-		str1 = QString(tr("Flap Angle = %1 deg")).arg( m_BufferFoil.m_TEFlapAngle, 6, 'f', 2);
+		str1 = QString(tr("Flap Angle = %1")+QString::fromUtf8("°")).arg( m_BufferFoil.m_TEFlapAngle, 7, 'f', 2);
 		painter.drawText(LeftPos,ZPos+D, str1);
 		D += dD;
 
-		str1 = QString(tr("XHinge = %1")).arg( m_BufferFoil.m_TEXHinge, 6, 'f', 1);
-		strong+="%";
+		str1 = QString(tr("XHinge     = %1")).arg( m_BufferFoil.m_TEXHinge, 6, 'f', 1);
+		strong="%";
 		painter.drawText(LeftPos,ZPos+D, str1+strong);
 		D += dD;
 
-		str1 = QString(tr("YHinge = %1")).arg( m_BufferFoil.m_TEYHinge, 6, 'f', 1);
-		strong+="%";
+		str1 = QString(tr("YHinge     = %1")).arg( m_BufferFoil.m_TEYHinge, 6, 'f', 1);
+		strong="%";
 		painter.drawText(LeftPos,ZPos+D, str1+strong);
 		D += dD;
 	}
@@ -5047,7 +5058,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		}
 		if(m_pCurPolar->m_Type ==4)
 		{
-			strong = QString("Alpha = %1 deg").arg(m_pCurPolar->m_ASpec,8,'f',2);
+			strong = QString("Alpha = %1 "+QString::fromUtf8("°")).arg(m_pCurPolar->m_ASpec,10,'f',2);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 			strong = QString("Mach = %1").arg(m_pCurPolar->m_Mach,9,'f',3);
@@ -5083,7 +5094,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			}
 			if(m_pCurPolar->m_Type!=4)
 			{
-				Result = QString(tr("       Alpha = %1 deg")).arg(m_pCurOpp->Alpha, 5, 'f', 2);
+				Result = QString(tr("       Alpha = %1 ")+QString::fromUtf8("°")).arg(m_pCurOpp->Alpha, 7, 'f', 2);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}

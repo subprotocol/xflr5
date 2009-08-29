@@ -1,6 +1,8 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
+#define PI             3.14159265358979
+
 #define XFOILANALYSIS  1
 #define DIRECTDESIGN   2
 #define INVERSEDESIGN  3

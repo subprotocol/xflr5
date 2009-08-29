@@ -16343,7 +16343,7 @@ void QMiarex::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-	setSizePolicy(szPolicyMinimum);
+	setSizePolicy(szPolicyMaximum);
 //_______________________Analysis
 	m_pctrlSequence = new QCheckBox(tr("Sequence"));
 	QGridLayout *SequenceGroup = new QGridLayout;

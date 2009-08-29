@@ -29,13 +29,17 @@
 #include <QString>
 #include <QTextStream>
 #include <QColor>
+#include "Params.h"
+
 
 bool IsEven(int n);
 bool IsBetween(int f, int f1, int f2);
 bool IsBetween(int f, double f1, double f2);
-Qt::PenStyle GetStyle(int s);
 bool ReadAVLString(QTextStream &in, int &Line, QString &strong);
 bool Rewind1Line(QTextStream &in, int &Line, QString &strong);
+
+bool ludcmp(int n, double *a, int *indx);
+bool baksub(int n, double *a, int *indx, double *b);
 
 void ReadValues(QString line, int &res, double &x, double &y, double &z);
 
@@ -68,4 +72,7 @@ void Trace(QString msg, double f);
 void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			  double &mtoUnit, double &m2toUnit, double &mstoUnit,  double &kgtoUnit,
 			  double &NtoUnit, double &NmtoUnit);
+
+Qt::PenStyle GetStyle(int s);
+
 #endif // FUNCTIONS_H

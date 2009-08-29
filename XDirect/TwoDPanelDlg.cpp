@@ -108,13 +108,12 @@ void TwoDPanelDlg::SetupLayout()
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
-
 	setMinimumHeight(250);
 }
 
+
 void TwoDPanelDlg::InitDialog()
 {
-
 	XFoil *pXFoil =(XFoil*)s_pXFoil;
 	CFoil *pMemFoil = (CFoil *)m_pMemFoil;
 	//memorize initial values
@@ -173,7 +172,8 @@ void TwoDPanelDlg::keyPressEvent(QKeyEvent *event)
 
 void TwoDPanelDlg::OnChanged()
 {
-	m_bApplied = false;
+	m_bApplied  = false;
+	OnApply();
 }
 
 
@@ -215,7 +215,8 @@ void TwoDPanelDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(this, tr("Warning"), "Panel number cannot exceed 350");
+		QString strange = QString(tr("The total number of panels cannot exceed %1")).arg(IQX);
+		QMessageBox::information(this, tr("Warning"), strange);
 		//reset everything and retry
 		for (int i=0; i< pMemFoil->nb; i++)
 		{

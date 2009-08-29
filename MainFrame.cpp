@@ -520,7 +520,7 @@ void MainFrame::CreateAFoilActions()
 	AFoilGridAct->setStatusTip(tr("Define the grid settings for the view"));
 	connect(AFoilGridAct, SIGNAL(triggered()), pAFoil, SLOT(OnGrid()));
 
-	storeSplineAct= new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Splines"), this);
+	storeSplineAct= new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Splines as Foil"), this);
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
 
@@ -4042,6 +4042,7 @@ void MainFrame::OnStyle()
 	m_DlgPos = dlg.pos();
 
 	pXDirect->m_pCpGraph->SetInverted(true);
+	pMiarex->m_CpGraph.SetInverted(true);
 	UpdateView();
 }
 
@@ -4135,6 +4136,7 @@ void MainFrame::OnXInverse()
 //	pXInverse->m_bFullInverse = true;
 	SetMenus();
 	pXInverse->SetParams();
+	pXInverse->UpdateView();
 }
 
 
@@ -4161,6 +4163,7 @@ void MainFrame::OnXInverseMixed()
 	SetCentralWidget();
 	SetMenus();
 	pXInverse->SetParams();
+	pXInverse->UpdateView();
 }
 
 void MainFrame::openRecentFile()
