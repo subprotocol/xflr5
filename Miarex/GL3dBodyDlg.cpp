@@ -996,7 +996,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 	}
 	else if(pBody->m_LineType==2) //NURBS
 	{
-		m_pBody->SetPanelPos();
+		pBody->SetPanelPos();
 		p = 0;
 		for (k=0; k<=nx; k++)
 		{
@@ -1025,6 +1025,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 
 			//left side first;
 			p=0;
+
 			for (k=0; k<nx; k++)
 			{
 				glBegin(GL_QUAD_STRIP);
@@ -1045,6 +1046,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 					}
 				glEnd();
 			}
+
 			//right side next;
 			p=0;
 			for (k=0; k<nx; k++)

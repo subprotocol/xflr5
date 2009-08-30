@@ -26,21 +26,31 @@
 #include <QDialog>
 #include <QPushButton>
 #include <QListWidget>
+#include <QStringList>
+
 
 class TranslatorDlg : public QDialog
 {
+	Q_OBJECT
+
+	friend class MainFrame;
 public:
-    TranslatorDlg();
+	TranslatorDlg(void *pParent=NULL);
 
 private slots:
 	void OnOK();
+
 private:
 	void SetupLayout();
 	void InitDialog();
-	QListWidget *m_pctrlLanguageList;
-	QPushButton *OKButton;
+	QStringList findQmFiles();
+	QString languageName(const QString &qmFile);
 
-	QString m_Language;
+
+	QListWidget *m_pctrlLanguageList;
+	QMap<QString, QString> qmFileForLanguage;
+
+	QString m_LanguageFilePath;
 };
 
 #endif // TRANSLATORDLG_H

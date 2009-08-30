@@ -8719,6 +8719,9 @@ void QMiarex::GLDraw3D()
 		}
 	}
 }
+
+
+
 void QMiarex::GLDrawFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -8867,7 +8870,7 @@ void QMiarex::GLRenderView()
 	glPopMatrix();
 	glDisable(GL_CLIP_PLANE1);
 	
-	
+
 //	glFinish();
 //	SwapBuffers(pDC->m_hDC);
 //	wglMakeCurrent(pDC->m_hDC, NULL);

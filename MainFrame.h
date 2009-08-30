@@ -95,6 +95,7 @@ private slots:
 	void OnExportCurGraph();
 	void OnInsertProject();
 	void OnNewProject();
+	void OnLanguage();
 	void OnLoadFile();
 	void OnLogFile();
 	void OnRenameCurFoil();
@@ -195,6 +196,7 @@ public:
 	bool m_bMaximized;
 	QString m_StyleName;
 	QString m_VersionName;
+	static int s_SettingsFormat;
 
 private:
 	void *m_pXInverse;
@@ -244,6 +246,7 @@ private:
 	QAction *openAct, *insertAct, *styleAct;
 	QAction *saveAct, *saveProjectAsAct,*newProjectAct, *closeProjectAct, *saveOptionsAct;
 	QAction *unitsAct;
+	QAction *languageAct;
 	QAction *exitAct;
 	QAction *aboutAct, *guidelinesAct;
 	QAction *recentFileActs[MAXRECENTFILES];
@@ -362,7 +365,7 @@ private:
 	int m_ForceUnit;
 	int m_MomentUnit;
 
-	QString m_ProjectName, m_FileName, m_LastDirName;
+	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath;
 	QColor m_crColors[30];
 
 	QGraph m_RefGraph;//Reference setttings
@@ -371,7 +374,6 @@ private:
 	QColor m_BorderClr;
 	QFont m_TextFont;
 
-	int m_SettingsFormat;
 	int m_ImageFormat;
 };
 

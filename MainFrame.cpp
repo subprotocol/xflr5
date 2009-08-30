@@ -1,7 +1,7 @@
 /****************************************************************************
 
     MainFrame  Class
-    Copyright (C) 2008 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2008-2009 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@
 #include "Misc/LinePickerDlg.h"
 #include "Misc/UnitsDlg.h"
 #include "Misc/SaveOptionsDlg.h"
+#include "Misc/TranslatorDlg.h"
 #include "Graph/GraphDlg.h"
 #include "XDirect/XDirect.h"
 #include "XDirect/NacaFoilDlg.h"
@@ -53,15 +54,13 @@
 
 
 
-
+int MainFrame::s_SettingsFormat = 100558;
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
 	m_VersionName = "QFLR5 v0.02";
-
-	m_SettingsFormat = 100555;
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -325,7 +324,8 @@ void MainFrame::AddRecentFile(const QString &PathName)
 
 void MainFrame::closeEvent (QCloseEvent * event)
 {
-//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+
+	//	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 //	pMiarex->m_GL3dView.hide();
 //	pMiarex->m_GL3dView.close();
 
@@ -351,6 +351,7 @@ void MainFrame::closeEvent (QCloseEvent * event)
 	}
 
 	DeleteProject();
+
 	SaveSettings();
 	event->accept();//continue closing
 }
@@ -461,6 +462,10 @@ void MainFrame::CreateActions()
 	unitsAct = new QAction(tr("Define units..."), this);
 	unitsAct->setStatusTip(tr("Define the units for this project"));
 	connect(unitsAct, SIGNAL(triggered()), this, SLOT(OnUnits()));
+
+	languageAct = new QAction(tr("Language..."), this);
+	languageAct->setStatusTip(tr("Define the default language for the application"));
+	connect(languageAct, SIGNAL(triggered()), this, SLOT(OnLanguage()));
 
 	restoreToolbarsAct	 = new QAction(tr("Restore toolbars"), this);
 	restoreToolbarsAct->setStatusTip(tr("Restores the toolbars to their original state"));
@@ -906,6 +911,8 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(OnXInverseAct);
 	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnMiarexAct);
+	separatorAct = fileMenu->addSeparator();
+	fileMenu->addAction(languageAct);
 	separatorAct = fileMenu->addSeparator();
 	for (int i = 0; i < MAXRECENTFILES; ++i)
 		fileMenu->addAction(recentFileActs[i]);
@@ -2901,7 +2908,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k != m_SettingsFormat)
+	if(k != s_SettingsFormat)
 	{
 		pXFile->close();
 		return;
@@ -2911,7 +2918,7 @@ void MainFrame::LoadSettings()
 	QSize sz(c,d);
 
 	ar >> m_bMaximized;
-	ar >> m_StyleName;
+	ar >> m_StyleName >> m_LanguageFilePath;
 
 	ar >> bFloat >> pt.rx()>> pt.ry();
 	m_pctrlMiarexWidget->setFloating(bFloat);
@@ -3251,6 +3258,21 @@ void MainFrame::OnInsertProject()
 		pAFoil->SetFoil();
 	}
 	UpdateView();
+}
+
+
+void MainFrame::OnLanguage()
+{
+	TranslatorDlg dlg;
+	dlg.move(m_DlgPos);
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		m_LanguageFilePath = dlg.m_LanguageFilePath;
+		QTranslator translator;
+		translator.load(m_LanguageFilePath);
+		qApp->installTranslator(&translator);//will have no effect widgets which are already constructed,
+	}
+	m_DlgPos = dlg.pos();
 }
 
 
@@ -4485,7 +4507,7 @@ void MainFrame::SaveSettings()
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-        QString FileName;
+	QString FileName;
 
 #ifdef Q_WS_MAC
         QSettings settings("QFLR5", "QFLR5");
@@ -4503,14 +4525,13 @@ void MainFrame::SaveSettings()
 	}
 
 	QDataStream ar(pXFile);
-
-	ar << m_SettingsFormat;
+	ar << s_SettingsFormat;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
 	ar << frameGeometry().height();
 	ar << isMaximized();
-	ar << m_StyleName;
+	ar << m_StyleName << m_LanguageFilePath;
 
 	ar <<  m_pctrlMiarexWidget->isFloating() << m_pctrlMiarexWidget->frameGeometry().x() << m_pctrlMiarexWidget->frameGeometry().y();
 	ar <<  m_pctrlXDirectWidget->isFloating() << m_pctrlXDirectWidget->frameGeometry().x() << m_pctrlXDirectWidget->frameGeometry().y();
@@ -4530,7 +4551,9 @@ void MainFrame::SaveSettings()
 
 	ar << m_RecentFiles.size();
 	for(int i=0; i<m_RecentFiles.size(); i++)
+	{
 		ar << m_RecentFiles.at(i);
+	}
 
 	pAFoil->SaveSettings(ar);
 	pXDirect->SaveSettings(ar);

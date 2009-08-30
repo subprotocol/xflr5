@@ -24,16 +24,14 @@
 #include <QtGui/QApplication>
 #include "QFLR5Application.h"
 #include "MainFrame.h"
-#include "Misc/TranslatorDlg.h"
 
 int main(int argc, char *argv[])
 {
 	QFLR5Application app(argc, argv);
 
 	QString StyleName = "Cleanlooks";
-	QString LanguageName;
-
-        QString FileName;
+	QString LanguagePath ="";
+	QString FileName;
 
 #ifdef Q_WS_MAC
         QSettings settings("QFLR5", "QFLR5");
@@ -41,6 +39,7 @@ int main(int argc, char *argv[])
 #else
         FileName   = QDir::tempPath() + "/QFLR5.set";
 #endif
+
 	QFile *pXFile = new QFile(FileName);
 	int a,b,c,d,k;
 	a=b=50;
@@ -52,34 +51,32 @@ int main(int argc, char *argv[])
 	{
 		QDataStream ar(pXFile);
 		ar >> k;//format
-
-		ar >> a >> b >> c >> d;
-		ar >> bMaximized;
-		ar >> StyleName;
+		if(k==MainFrame::s_SettingsFormat)
+		{
+			ar >> a >> b >> c >> d;
+			ar >> bMaximized;
+			ar >> StyleName >> LanguagePath;
+		}
 		pXFile->close();
+	}
+
+	QTranslator qflr5Translator;
+
+	if(LanguagePath.length())
+	{
+		if(qflr5Translator.load(LanguagePath)) app.installTranslator(&qflr5Translator);
 	}
 
 	QPoint pt(a,b);
 	QSize sz(c,d);
 
-/*	QTranslator qtTranslator;
-	qtTranslator.load("qt_" + QLocale::system().name(),
-	QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-	app.installTranslator(&qtTranslator);
-
-	QTranslator qflr5Translator;
-	qflr5Translator.load("qflr5_" + QLocale::system().name());
-	app.installTranslator(&qflr5Translator);*/
-
 	if(StyleName.length())	qApp->setStyle(StyleName);
-
 
 	MainFrame w;
 	app.setQFLR5MainWindow(&w);
 
 	w.resize(sz);
 	w.move(pt);
-
 	if(w.m_bMaximized)	w.showMaximized();
 	else                w.show();
 
