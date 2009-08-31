@@ -1306,10 +1306,12 @@ void QAFoil::OnAFoilFoilCoordinates()
 	UpdateView();
 
 	FoilCoordDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_pMemFoil    = m_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pXDirect    = NULL;
 	dlg.m_pAFoil      = this;
+	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -1341,6 +1343,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 		SelectFoil(m_pCurFoil);
 		m_pXFoil->m_FoilName ="";
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
