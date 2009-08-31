@@ -59,7 +59,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
-	m_VersionName = "QFLR5 v0.02";
+	m_VersionName = "QFLR5 v0.02 Beta";
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
