@@ -44,8 +44,15 @@ void TranslatorDlg::OnOK()
 {
 	//read user language selection and exit
 	QListWidgetItem *pItem =  m_pctrlLanguageList->currentItem();
-	if(pItem) m_LanguageFilePath = qmFileForLanguage[pItem->text()];
-	else      m_LanguageFilePath = "";
+	if(pItem)
+	{
+		if(pItem->text()=="English") m_LanguageFilePath = "";
+		else m_LanguageFilePath = qmFileForLanguage[pItem->text()];
+	}
+	else
+	{
+		m_LanguageFilePath = "";
+	}
 
 	QMessageBox::warning(this, tr("Warning"), tr("The change will take effect at the next session"));
 
@@ -89,6 +96,8 @@ void TranslatorDlg::InitDialog()
 {
 	QStringList qmFiles = findQmFiles();
 	qmFiles.sort();
+	qmFileForLanguage.insert("English", "English");
+	m_pctrlLanguageList->addItem("English (default)");
 	for (int i = 0; i < qmFiles.size(); ++i)
 	{
 		qmFileForLanguage.insert(languageName(qmFiles[i]), qmFiles[i]);

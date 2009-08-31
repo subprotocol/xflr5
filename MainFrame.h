@@ -190,13 +190,11 @@ private:
 	void AddRecentFile(const QString &PathNAme);
 	void updateRecentFileActions();
 
-
 /*___________________________________________Variables_______________________________*/
 public:
 	bool m_bMaximized;
 	QString m_StyleName;
 	QString m_VersionName;
-	static int s_SettingsFormat;
 
 private:
 	void *m_pXInverse;

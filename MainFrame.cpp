@@ -54,7 +54,6 @@
 
 
 
-int MainFrame::s_SettingsFormat = 100558;
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
@@ -2908,7 +2907,7 @@ void MainFrame::LoadSettings()
 
 	QDataStream ar(pXFile);
 	ar >> k;//format
-	if(k != s_SettingsFormat)
+	if(k != SETTINGSFORMAT)
 	{
 		pXFile->close();
 		return;
@@ -3268,9 +3267,6 @@ void MainFrame::OnLanguage()
 	if(dlg.exec()==QDialog::Accepted)
 	{
 		m_LanguageFilePath = dlg.m_LanguageFilePath;
-		QTranslator translator;
-		translator.load(m_LanguageFilePath);
-		qApp->installTranslator(&translator);//will have no effect widgets which are already constructed,
 	}
 	m_DlgPos = dlg.pos();
 }
@@ -4525,7 +4521,7 @@ void MainFrame::SaveSettings()
 	}
 
 	QDataStream ar(pXFile);
-	ar << s_SettingsFormat;
+	ar << SETTINGSFORMAT;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
 	ar << frameGeometry().width();
@@ -6062,6 +6058,7 @@ void MainFrame::UpdatePolars()
     UpdateOpps();
 }
 
+
 void MainFrame::UpdateOpps()
 {
     // fills the combobox with the Opp names associated to XDirect's current foil
@@ -6283,3 +6280,9 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 	}
 }
+
+
+
+
+
+

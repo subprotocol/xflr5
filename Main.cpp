@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	{
 		QDataStream ar(pXFile);
 		ar >> k;//format
-		if(k==MainFrame::s_SettingsFormat)
+		if(k==SETTINGSFORMAT)
 		{
 			ar >> a >> b >> c >> d;
 			ar >> bMaximized;

@@ -783,7 +783,6 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 
 
 
-
 bool ludcmp(int n, double *a, int *indx)
 {
 	//    *******************************************************
