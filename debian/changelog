@@ -1,3 +1,9 @@
+qflr5 (0.02b-ubuntu1) jaunty; urgency=low
+
+  * 0.02 beta for Ubuntu
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Fri, 04 Sep 2009 12:43:53 +0300
+
 qflr5 (0.01b-ubuntu1) jaunty; urgency=low
 
   * 0.01 beta. First official release for Debian/Ubuntu
