@@ -27,7 +27,7 @@
 
 W3dPrefsDlg::W3dPrefsDlg()
 {
-	setWindowTitle("3D Styles");
+	setWindowTitle(tr("3D Styles"));
 	m_pMiarex = NULL;
 	SetupLayout();
 
@@ -65,17 +65,17 @@ void W3dPrefsDlg::InitDialog()
 
 void W3dPrefsDlg::SetupLayout()
 {
-	QLabel *lab1 = new QLabel("Axis");
-	QLabel *lab2 = new QLabel("Outline");
-	QLabel *lab3 = new QLabel("VLM Mesh");
-	QLabel *lab4 = new QLabel("Top transition");
-	QLabel *lab5 = new QLabel("Bottom transition");
-	QLabel *lab6 = new QLabel("Lift");
-	QLabel *lab7 = new QLabel("Moments");
-	QLabel *lab8 = new QLabel("Induced Drag");
-	QLabel *lab9 = new QLabel("Viscous Drag");
-	QLabel *lab10 = new QLabel("Downwash");
-	QLabel *lab11 = new QLabel("WakePanels");
+	QLabel *lab1 = new QLabel(tr("Axis"));
+	QLabel *lab2 = new QLabel(tr("Outline"));
+	QLabel *lab3 = new QLabel(tr("VLM Mesh"));
+	QLabel *lab4 = new QLabel(tr("Top transition"));
+	QLabel *lab5 = new QLabel(tr("Bottom transition"));
+	QLabel *lab6 = new QLabel(tr("Lift"));
+	QLabel *lab7 = new QLabel(tr("Moments"));
+	QLabel *lab8 = new QLabel(tr("Induced Drag"));
+	QLabel *lab9 = new QLabel(tr("Viscous Drag"));
+	QLabel *lab10 = new QLabel(tr("Downwash"));
+	QLabel *lab11 = new QLabel(tr("WakePanels"));
 	m_pctrlAxis     = new LineButton;
 	m_pctrlOutline  = new LineButton;
 	m_pctrlVLMMesh  = new LineButton;
@@ -87,7 +87,7 @@ void W3dPrefsDlg::SetupLayout()
 	m_pctrlViscousDrag = new LineButton;
 	m_pctrlDownwash    = new LineButton;
 	m_pctrlWakePanels  = new LineButton;
-	m_pctrlShowWake = new QCheckBox("Show Wake Panels");
+	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 
 	QGridLayout *PrefsLayout = new QGridLayout;
 	PrefsLayout->addWidget(lab1,1,1);
@@ -269,6 +269,7 @@ void W3dPrefsDlg::OnMoments()
 	}
 	repaint();
 }
+
 void W3dPrefsDlg::OnDownwash()
 {
 	LinePickerDlg LPdlg;
@@ -277,7 +278,8 @@ void W3dPrefsDlg::OnDownwash()
 	LPdlg.SetWidth(m_DownwashWidth);
 	LPdlg.InitDialog();
 
-	if (QDialog::Accepted == LPdlg.exec()){
+	if (QDialog::Accepted == LPdlg.exec())
+	{
 		m_DownwashColor = LPdlg.GetColor();
 		m_DownwashStyle = LPdlg.GetStyle();
 		m_DownwashWidth = LPdlg.GetWidth();

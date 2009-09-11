@@ -37,7 +37,7 @@ void *PlaneDlg::s_pMainFrame;
 
 PlaneDlg::PlaneDlg()
 {
-	setWindowTitle("Plane Editor");
+	setWindowTitle(tr("Plane Editor"));
 	m_pPlane = NULL;
 
 	pi = 3.141592654;
@@ -520,7 +520,7 @@ void PlaneDlg::OnOK()
 	if(m_pPlane->m_bFin)  n+= m_pPlane->m_Fin.VLMGetPanelTotal();
 	if(n>VLMMATSIZE)
 	{
-		strong = QString("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required").arg(n).arg(VLMMATSIZE);
+		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(n).arg(VLMMATSIZE);
 		QMessageBox::warning(this, tr("Warning"),strong);
 		return ;
 	}
@@ -554,7 +554,7 @@ void PlaneDlg::OnOK()
 	}
 	if(nSurfaces >2*MAXPANELS)
 	{
-		strong = QString("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required")
+		strong = QString(tr("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required"))
 			.arg(nSurfaces).arg(MAXPANELS);
 		QMessageBox::warning(this, tr("Warning"), strong);
 		return ;
@@ -665,7 +665,7 @@ void PlaneDlg::reject()
 	if(m_bChanged)
 	{
 		QString strong = tr("Save the changes ?");
-		int Ans = QMessageBox::question(this, "Question", strong,
+		int Ans = QMessageBox::question(this, tr("Question"), strong,
 										QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 		if (QMessageBox::Yes == Ans)
 		{
@@ -819,25 +819,25 @@ void PlaneDlg::SetResults()
 void PlaneDlg::SetupLayout()
 {
 	QVBoxLayout *NameLayout = new QVBoxLayout;
-	m_pctrlPlaneName = new QLineEdit("PlaneName");
+	m_pctrlPlaneName = new QLineEdit(tr("Plane Name"));
 //	m_pctrlPlaneName->setMinimumWidth(120);
 	m_pctrlPlaneDescription = new QTextEdit();
-	m_pctrlPlaneDescription->setToolTip("Enter here a short description for the plane");
+	m_pctrlPlaneDescription->setToolTip(tr("Enter here a short description for the plane"));
 	QLabel *PlaneDescription = new QLabel(tr("Description:"));
 
 	NameLayout->addWidget(m_pctrlPlaneName);
 	NameLayout->addWidget(PlaneDescription);
 	NameLayout->addWidget(m_pctrlPlaneDescription);
-	QGroupBox *NameBox = new QGroupBox("Plane Name");
+	QGroupBox *NameBox = new QGroupBox(tr("Plane Name"));
 	NameBox->setLayout(NameLayout);
 
 	QGridLayout *MainWing = new QGridLayout;
-	m_pctrlDefineWing = new QPushButton("Define");
-	m_pctrlImportWing = new QPushButton("Import");
-	m_pctrlExportWing = new QPushButton("Export");
-	QLabel *lab1 = new QLabel("x=");
-	QLabel *lab2 = new QLabel("z=");
-	QLabel *lab3 = new QLabel("Tilt Angle=");
+	m_pctrlDefineWing = new QPushButton(tr("Define"));
+	m_pctrlImportWing = new QPushButton(tr("Import"));
+	m_pctrlExportWing = new QPushButton(tr("Export"));
+	QLabel *lab1 = new QLabel(tr("x="));
+	QLabel *lab2 = new QLabel(tr("z="));
+	QLabel *lab3 = new QLabel(tr("Tilt Angle="));
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -859,18 +859,18 @@ void PlaneDlg::SetupLayout()
 	MainWing->addWidget(m_pctrlLen1,1,4);
 	MainWing->addWidget(m_pctrlLen2,2,4);
 	MainWing->addWidget(lab4,3,4);
-	QGroupBox *MainWingBox = new QGroupBox("Main Wing");
+	QGroupBox *MainWingBox = new QGroupBox(tr("Main Wing"));
 	MainWingBox->setLayout(MainWing);
 
 	QGridLayout *MainWing2 = new QGridLayout;
-	m_pctrlBiplane = new QCheckBox("Biplane");
+	m_pctrlBiplane = new QCheckBox(tr("Biplane"));
 	MainWing2->addWidget(m_pctrlBiplane,1,1);
-	m_pctrlDefineWing2 = new QPushButton("Define");
-	m_pctrlImportWing2 = new QPushButton("Import");
-	m_pctrlExportWing2 = new QPushButton("Export");
-	QLabel *lab11 = new QLabel("x=");
-	QLabel *lab12 = new QLabel("z=");
-	QLabel *lab13 = new QLabel("Tilt Angle=");
+	m_pctrlDefineWing2 = new QPushButton(tr("Define"));
+	m_pctrlImportWing2 = new QPushButton(tr("Import"));
+	m_pctrlExportWing2 = new QPushButton(tr("Export"));
+	QLabel *lab11 = new QLabel(tr("x="));
+	QLabel *lab12 = new QLabel(tr("z="));
+	QLabel *lab13 = new QLabel(tr("Tilt Angle="));
 	lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab12->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -892,15 +892,15 @@ void PlaneDlg::SetupLayout()
 	MainWing2->addWidget(m_pctrlLen3,2,4);
 	MainWing2->addWidget(m_pctrlLen4,3,4);
 	MainWing2->addWidget(lab14,4,4);
-	QGroupBox *MainWing2Box = new QGroupBox("Wing 2");
+	QGroupBox *MainWing2Box = new QGroupBox(tr("Wing 2"));
 	MainWing2Box->setLayout(MainWing2);
 
 	QGridLayout *StabLayout = new QGridLayout;
-	m_pctrlStabCheck = new QCheckBox("Elevator");
-	m_pctrlDefineStab = new QPushButton("Define");
-	QLabel *lab21 = new QLabel("x=");
-	QLabel *lab22 = new QLabel("z=");
-	QLabel *lab23 = new QLabel("Tilt Angle=");
+	m_pctrlStabCheck = new QCheckBox(tr("Elevator"));
+	m_pctrlDefineStab = new QPushButton(tr("Define"));
+	QLabel *lab21 = new QLabel(tr("x="));
+	QLabel *lab22 = new QLabel(tr("z="));
+	QLabel *lab23 = new QLabel(tr("Tilt Angle="));
 	lab21->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab22->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -921,18 +921,18 @@ void PlaneDlg::SetupLayout()
 	StabLayout->addWidget(m_pctrlLen5,2,4);
 	StabLayout->addWidget(m_pctrlLen6,4,4);
 	StabLayout->addWidget(lab24,5,4);
-	QGroupBox *StabBox = new QGroupBox("Elevator");
+	QGroupBox *StabBox = new QGroupBox(tr("Elevator"));
 	StabBox->setLayout(StabLayout);
 
 	QGridLayout *FinLayout = new QGridLayout;
-	m_pctrlFinCheck = new QCheckBox("Fin");
-	m_pctrlDefineFin = new QPushButton("Define");
-	m_pctrlDoubleFin = new QCheckBox("Double Fin");
-	m_pctrlSymFin = new QCheckBox("Symetric Fin");
-	QLabel *lab31 = new QLabel("x=");
-	QLabel *lab32 = new QLabel("y=");
-	QLabel *lab33 = new QLabel("z=");
-	QLabel *lab34 = new QLabel("Tilt Angle=");
+	m_pctrlFinCheck = new QCheckBox(tr("Fin"));
+	m_pctrlDefineFin = new QPushButton(tr("Define"));
+	m_pctrlDoubleFin = new QCheckBox(tr("Double Fin"));
+	m_pctrlSymFin = new QCheckBox(tr("Symetric Fin"));
+	QLabel *lab31 = new QLabel(tr("x="));
+	QLabel *lab32 = new QLabel(tr("y="));
+	QLabel *lab33 = new QLabel(tr("z="));
+	QLabel *lab34 = new QLabel(tr("Tilt Angle="));
 	lab31->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab32->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab33->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -961,12 +961,12 @@ void PlaneDlg::SetupLayout()
 	FinLayout->addWidget(m_pctrlLen8,3,4);
 	FinLayout->addWidget(m_pctrlLen9,4,4);
 	FinLayout->addWidget(lab35,5,4);
-	QGroupBox *FinBox = new QGroupBox("Fin");
+	QGroupBox *FinBox = new QGroupBox(tr("Fin"));
 	FinBox->setLayout(FinLayout);
 
 	QHBoxLayout *BodyName = new QHBoxLayout;
-	m_pctrlBody = new QCheckBox("Body");
-	m_pctrlEditBody = new QPushButton("Edit...");
+	m_pctrlBody = new QCheckBox(tr("Body"));
+	m_pctrlEditBody = new QPushButton(tr("Edit..."));
 	m_pctrlBodyList = new QComboBox;
 	BodyName->addWidget(m_pctrlBody);
 	BodyName->addWidget(m_pctrlBodyList);
@@ -976,8 +976,8 @@ void PlaneDlg::SetupLayout()
 	QHBoxLayout *BodyPos = new QHBoxLayout;
 	m_pctrlXBody = new FloatEdit(0.00);
 	m_pctrlZBody = new FloatEdit(0.00);
-	QLabel *lab41 = new QLabel("x=");
-	QLabel *lab42 = new QLabel("z=");
+	QLabel *lab41 = new QLabel(tr("x="));
+	QLabel *lab42 = new QLabel(tr("z="));
 	m_pctrlLen10 = new QLabel("mm");
 	m_pctrlLen11 = new QLabel("mm");
 	BodyPos->addStretch(1);
@@ -992,17 +992,17 @@ void PlaneDlg::SetupLayout()
 	QVBoxLayout *BodyLayout = new QVBoxLayout;
 	BodyLayout->addLayout(BodyName);
 	BodyLayout->addLayout(BodyPos);
-	QGroupBox *BodyBox = new QGroupBox("Body");
+	QGroupBox *BodyBox = new QGroupBox(tr("Body"));
 	BodyBox->setLayout(BodyLayout);
 
-	QLabel *lab101 = new QLabel("Wing Area = ");
-	QLabel *lab102 = new QLabel("Wing Span = ");
-	QLabel *lab103 = new QLabel("Elev. Area = ");
-	QLabel *lab104 = new QLabel("Elev. Lever Arm = ");
-	QLabel *lab105 = new QLabel("Fin Area = ");
-	QLabel *lab106 = new QLabel("TailVolume = ");
-	QLabel *lab107 = new QLabel("Plane Volume = ");
-	QLabel *lab108 = new QLabel("Total Panels = ");
+	QLabel *lab101 = new QLabel(tr("Wing Area = "));
+	QLabel *lab102 = new QLabel(tr("Wing Span = "));
+	QLabel *lab103 = new QLabel(tr("Elev. Area = "));
+	QLabel *lab104 = new QLabel(tr("Elev. Lever Arm = "));
+	QLabel *lab105 = new QLabel(tr("Fin Area = "));
+	QLabel *lab106 = new QLabel(tr("TailVolume = "));
+	QLabel *lab107 = new QLabel(tr("Plane Volume = "));
+	QLabel *lab108 = new QLabel(tr("Total Panels = "));
 	lab101->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab102->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab103->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

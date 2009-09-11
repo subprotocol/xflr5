@@ -28,7 +28,7 @@ void *CAddDlg::s_pXFoil;
 
 CAddDlg::CAddDlg()
 {
-	setWindowTitle("Local Panel Refinement");
+	setWindowTitle(tr("Local Panel Refinement"));
 	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
@@ -44,19 +44,19 @@ CAddDlg::CAddDlg()
 void CAddDlg::SetupLayout()
 {
 	QGridLayout *RefineGrid =new QGridLayout;
-	QLabel *lab1 = new QLabel("Angle Criterion (deg)");
-	QLabel *lab2 = new QLabel("Type of Spline");
-	QLabel *lab3 = new QLabel("Refinement X Limits");
-	QLabel *lab4 = new QLabel("From");
-	QLabel *lab5 = new QLabel("To");
+	QLabel *lab1 = new QLabel(tr("Angle Criterion ")+QString::fromUtf8("°)"));
+	QLabel *lab2 = new QLabel(tr("Type of Spline"));
+	QLabel *lab3 = new QLabel(tr("Refinement X Limits"));
+	QLabel *lab4 = new QLabel(tr("From"));
+	QLabel *lab5 = new QLabel(tr("To"));
 	lab4->setAlignment(Qt::AlignCenter);
 	lab5->setAlignment(Qt::AlignCenter);
 	m_pctrlAngTol = new FloatEdit;
 	m_pctrlFrom   = new FloatEdit;
 	m_pctrlTo     = new FloatEdit;
 
-	m_pctrlrb1 = new QRadioButton("Uniform");
-	m_pctrlrb2 = new QRadioButton("Arc Length");
+	m_pctrlrb1 = new QRadioButton(tr("Uniform"));
+	m_pctrlrb2 = new QRadioButton(tr("Arc Length"));
 
 	RefineGrid->addWidget(lab1,1,1);
 	RefineGrid->addWidget(lab2,2,1);
@@ -69,10 +69,10 @@ void CAddDlg::SetupLayout()
 	RefineGrid->addWidget(m_pctrlFrom,5,2);
 	RefineGrid->addWidget(m_pctrlTo,5,3);
 
-	m_pctrlTotal    = new QLabel("Total");
-	m_pctrlAdded    = new QLabel("Added");
-	m_pctrlMaxAngle = new QLabel("MaxAngle");
-	m_pctrlAtPanel  = new QLabel("AtPanel");
+	m_pctrlTotal    = new QLabel(tr("Total"));
+	m_pctrlAdded    = new QLabel(tr("Added"));
+	m_pctrlMaxAngle = new QLabel(tr("MaxAngle"));
+	m_pctrlAtPanel  = new QLabel(tr("At Panel"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("Accept"));
@@ -129,7 +129,7 @@ void CAddDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), tr("Warning"), "Unrecognized foil format");
+		QMessageBox::information(window(), tr("Warning"), tr("Unrecognized foil format"));
 		return;
 	}
 
@@ -143,9 +143,9 @@ void CAddDlg::OnApply()
 	pXFoil->abcopy();
 
 	QString strong;
-	strong  =QString("Total number of points is %1").arg(pXFoil->n);
+	strong  =QString(tr("Total number of points is %1")).arg(pXFoil->n);
 	m_pctrlTotal->setText(strong);
-	strong = QString("(added %1 points to original foil)").arg(added);
+	strong = QString(tr("(added %1 points to original foil)")).arg(added);
 	m_pctrlAdded->setText(strong);
 
 	for (i=0; i< pXFoil->n; i++)
@@ -159,9 +159,9 @@ void CAddDlg::OnApply()
 	m_pBufferFoil->SetFlap();
 
 	pXFoil->CheckAngles();
-	strong = QString( "Maximum panel angle is %1").arg( pXFoil->amax,0,'f',1);
+	strong = QString(tr("Maximum panel angle is %1")).arg( pXFoil->amax,0,'f',1);
 	m_pctrlMaxAngle->setText(strong);
-	strong = QString( "at panel position %1").arg(pXFoil->imax);
+	strong = QString(tr("at panel position %1")).arg(pXFoil->imax);
 	m_pctrlAtPanel->setText(strong);
 
 	if(pXDirect)    pXDirect->UpdateView();
@@ -205,12 +205,12 @@ void CAddDlg::InitDialog()
 
 	QString strong;
 	pXFoil->CheckAngles();
-	strong = QString( "Maximum panel angle is %1 deg").arg(pXFoil->amax,0,'f',1);
+	strong = QString(tr("Maximum panel angle is %1 deg")).arg(pXFoil->amax,0,'f',1);
 	m_pctrlMaxAngle->setText(strong);
-	strong = QString( "at panel position %1").arg(pXFoil->imax);
+	strong = QString(tr("at panel position %1")).arg(pXFoil->imax);
 	m_pctrlAtPanel->setText(strong);
 	m_pctrlAdded->setText("  ");
-	strong = QString("Total number of points is %1").arg(pXFoil->n);
+	strong = QString(tr("Total number of points is %1")).arg(pXFoil->n);
 	m_pctrlTotal->setText(strong);
 
 }

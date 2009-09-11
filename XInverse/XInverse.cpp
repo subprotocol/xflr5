@@ -161,6 +161,19 @@ void QXInverse::CheckActions()
 	pMainFrame->InvQViscous->setChecked(m_pQVCurve->IsVisible());
 	pMainFrame->InvQPoints->setChecked(m_bShowPoints);
 	pMainFrame->InvQReflected->setChecked(m_bReflected);
+
+	if(m_bFullInverse)
+	{
+		m_pctrlShowSpline->setChecked(m_bSpline);
+		m_pctrlTangentSpline->setChecked(m_bTangentSpline);
+	}
+	else
+	{
+		XFoil *pXFoil = (XFoil*)m_pXFoil;
+		m_pctrlMShowSpline->setChecked(m_bSpline);
+		m_pctrlMTangentSpline->setChecked(m_bTangentSpline);
+		m_pctrlCpxx->setChecked(pXFoil->lcpxx);
+	}
 }
 
 
@@ -374,7 +387,7 @@ bool QXInverse::ExecQDES()
 
 	QString str;
 	QString strong = "";
-	strong = tr("   dNMax       dGMax\r\n");
+	strong = "   dNMax       dGMax\r\n";
 	for(int l=1; l<=pXFoil->QMax; l++)
 	{
 		str = QString("%1e  %2\r\n").arg(pXFoil->dnTrace[l],7,'e',3).arg(pXFoil->dgTrace[l],7,'e',3);
@@ -604,11 +617,13 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 	{
 //		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
 		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()), m_QGraph.ClientToy(point.y()));
+		UpdateView();
 	}
 	else if(m_bZoomPlus && (event->buttons() & Qt::LeftButton))
 	{
 		m_ZoomRect.setRight(point.x());
 		m_ZoomRect.setBottom(point.y());
+		UpdateView();
 	}
 	else if(m_rCltRect.contains(point) && (event->buttons() & Qt::LeftButton) && m_bTrans)
 	{
@@ -635,6 +650,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			m_ptOffset.rx() += point.x() - m_PointDown.x();
 			m_ptOffset.ry() += point.y() - m_PointDown.y();
 		}
+		UpdateView();
 		m_PointDown = point;
 	}
 	else if ((event->buttons() & Qt::LeftButton)  && !m_bZoomPlus && m_bSpline && m_Spline.m_iSelect>=0) 
@@ -798,14 +814,12 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			}	
 			else if (n>0 && n<m_Spline.m_iCtrlPoints-1)
 			{
-//				if(x1<m_Spline.m_Input[0].x)                        x1 = m_Spline.m_Input[0].x;
-//				if(x1>m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x) x1 = m_Spline.m_Input[m_Spline.m_iCtrlPoints-1].x;
-
 				m_Spline.m_Input[n].x = x1;
 				m_Spline.m_Input[n].y = y1;
 				m_Spline.SplineCurve();
 				m_bSplined = false;
 			}
+			UpdateView();
 		}
 	}
 	else if((event->buttons() & Qt::MidButton) /*||  (shZ & 0x8000)*/)
@@ -815,31 +829,9 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 		if(m_QGraph.IsInDrawRect(pttmp))
 		{
 			//zoom graph
-
-/*			SHORT shX = GetKeyState('X');
-			SHORT shY = GetKeyState('Y');
-
-			if (shX & 0x8000)
-			{
-				//zoom x scale
-				m_QGraph.SetAutoX(false);
-				if(point.x()-m_PointDown.x()<0) m_QGraph.Scalex(1.04);
-				else                            m_QGraph.Scalex(1.0/1.04);
-			}
-			else if(shY & 0x8000)
-			{
-				//zoom y scale
-				m_QGraph.SetAutoY(false);
-				if(point.y()-m_PointDown.y()<0) m_QGraph.Scaley(1.04);
-				else                            m_QGraph.Scaley(1.0/1.04);
-			}
-			else*/
-			{
-				//zoom both
-				m_QGraph.SetAuto(false);
-				if(point.y()-m_PointDown.y()<0) m_QGraph.Scale(1.06);
-				else                            m_QGraph.Scale(1.0/1.06);
-			}
+			m_QGraph.SetAuto(false);
+			if(point.y()-m_PointDown.y()<0) m_QGraph.Scale(1.06);
+			else                            m_QGraph.Scale(1.0/1.06);
 		}
 		else
 		{
@@ -851,6 +843,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 			m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
 		}
+		UpdateView();
 		m_PointDown = point;
 	}
 	else
@@ -866,9 +859,9 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 				m_Spline.m_iHighlight = n;
 			}
 			else m_Spline.m_iHighlight = -1;
+			UpdateView();
 		}
 	}
-	UpdateView();
 }
 
 

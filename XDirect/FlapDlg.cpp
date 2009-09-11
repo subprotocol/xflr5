@@ -67,8 +67,8 @@ FlapDlg::FlapDlg(void *pParent)
 void FlapDlg::SetupLayout()
 {
 	QGridLayout *FlapData = new QGridLayout;
-	m_pctrlLEFlapCheck = new QCheckBox("L.E. Flap");
-	m_pctrlTEFlapCheck = new QCheckBox("T.E. Flap");
+	m_pctrlLEFlapCheck = new QCheckBox(tr("L.E. Flap"));
+	m_pctrlTEFlapCheck = new QCheckBox(tr("T.E. Flap"));
 	m_pctrlLEXHinge    = new FloatEdit;
 	m_pctrlLEYHinge    = new FloatEdit;
 	m_pctrlTEXHinge    = new FloatEdit;
@@ -76,12 +76,12 @@ void FlapDlg::SetupLayout()
 	m_pctrlTEFlapAngle = new FloatEdit;
 	m_pctrlLEFlapAngle = new FloatEdit;
 
-	QLabel *lab1 = new QLabel("Flap Angle");
-	QLabel *lab2 = new QLabel("deg (+ is down)");
-	QLabel *lab3 = new QLabel("Hinge X Position");
-	QLabel *lab4 = new QLabel("% Chord");
-	QLabel *lab5 = new QLabel("Hinge Y Position");
-	QLabel *lab6 = new QLabel("% Thickness");
+	QLabel *lab1 = new QLabel(tr("Flap Angle"));
+	QLabel *lab2 = new QLabel(QString::fromUtf8("°")+(" (+ is down)"));
+	QLabel *lab3 = new QLabel(tr("Hinge X Position"));
+	QLabel *lab4 = new QLabel(tr("% Chord"));
+	QLabel *lab5 = new QLabel(tr("Hinge Y Position"));
+	QLabel *lab6 = new QLabel(tr("% Thickness"));
 
 	FlapData->addWidget(m_pctrlLEFlapCheck, 1, 2);
 	FlapData->addWidget(m_pctrlTEFlapCheck, 1, 3);

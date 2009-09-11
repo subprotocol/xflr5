@@ -59,7 +59,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
     : QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
-	m_VersionName = "QFLR5 v0.02 Beta";
+	m_VersionName = "QFLR5 v0.03 Beta";
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -1681,7 +1681,7 @@ void MainFrame::CreateXDirectActions()
 	defineBatch->setStatusTip(tr("Tip : you don't want to use that option..."));
 	connect(viewXFoilAdvanced, SIGNAL(triggered()), pXDirect, SLOT(OnXFoilAdvanced()));
 
-	viewLogFile = new QAction(tr("View Log File"), this);
+	viewLogFile = new QAction(tr("View Log File\t(L)"), this);
 	connect(viewLogFile, SIGNAL(triggered()), this, SLOT(OnLogFile()));
 
 	DerotateFoil = new QAction(tr("De-rotate the Foil"), this);
@@ -3263,6 +3263,18 @@ void MainFrame::OnInsertProject()
 void MainFrame::OnLanguage()
 {
 	TranslatorDlg dlg;
+
+	QDir dir(qApp->applicationDirPath());
+#ifdef Q_WS_MAC
+		dir.cdUp();
+		dir.cdUp();
+		dir.cdUp();
+#else
+//        QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
+	dlg.m_TranslationDirPath = dir.canonicalPath()+"/translations";
+
+	dlg.InitDialog();
 	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
@@ -3691,15 +3703,19 @@ void MainFrame::OnRestoreToolbars()
 	}
 
 }
+
+
 void MainFrame::OnSaveOptions()
 {
 	SaveOptionsDlg dlg;
 	dlg.InitDialog(m_bSaveOpps, m_bSaveWOpps);
+	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
 		m_bSaveOpps  = dlg.m_bOpps;
 		m_bSaveWOpps = dlg.m_bWOpps;
 	}
+	m_DlgPos = dlg.pos();
 }
 
 

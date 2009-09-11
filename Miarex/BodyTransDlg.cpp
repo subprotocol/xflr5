@@ -31,6 +31,7 @@
 
 BodyTransDlg::BodyTransDlg()
 {
+	setWindowTitle(tr("Body Translation"));
 	m_XTrans = m_YTrans = m_ZTrans = 0.0;
 	m_bFrameOnly = false;
 	m_FrameID = 0;
@@ -112,15 +113,15 @@ void BodyTransDlg::SetupLayout()
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QHBoxLayout *FrameID = new QHBoxLayout;
-	m_pctrlFrameOnly = new QCheckBox("Frame Only");
+	m_pctrlFrameOnly = new QCheckBox(tr("Frame Only"));
 	m_pctrlFrameID = new FloatEdit(0.0,0);
 	FrameID->addWidget(m_pctrlFrameOnly);
 	FrameID->addWidget(m_pctrlFrameID);
 
 	QGridLayout *TransLayout = new QGridLayout;
-	QLabel * XTrans = new QLabel("X Translation");
-	QLabel * YTrans = new QLabel("Y Translation");
-	QLabel * ZTrans = new QLabel("Z Translation");
+	QLabel * XTrans = new QLabel(tr("X Translation"));
+	QLabel * YTrans = new QLabel(tr("Y Translation"));
+	QLabel * ZTrans = new QLabel(tr("Z Translation"));
 	m_pctrlXTransFactor = new FloatEdit(0.0,3);
 	m_pctrlYTransFactor = new FloatEdit(0.0,3);
 	m_pctrlZTransFactor = new FloatEdit(0.0,3);
@@ -138,8 +139,8 @@ void BodyTransDlg::SetupLayout()
 	TransLayout->addWidget(m_pctrlLength3,3,3);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton       = new QPushButton("OK");
-	CancelButton   = new QPushButton("Cancel");
+	OKButton       = new QPushButton(tr("OK"));
+	CancelButton   = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);

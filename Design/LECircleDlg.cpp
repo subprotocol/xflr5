@@ -29,7 +29,7 @@
 
 LECircleDlg::LECircleDlg()
 {
-	setWindowTitle("L.E. Circle");
+	setWindowTitle(tr("L.E. Circle"));
 	SetupLayout();
 }
 
@@ -38,15 +38,15 @@ void LECircleDlg::SetupLayout()
 {
 	QHBoxLayout *LERadius = new QHBoxLayout;
 	m_pctrlRadius = new FloatEdit(0.0,3);
-	QLabel *lab0 = new QLabel("r=");
-	QLabel *lab1 = new QLabel("% Chord");
+	QLabel *lab0 = new QLabel(tr("r="));
+	QLabel *lab1 = new QLabel(tr("% Chord"));
 	lab0->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	LERadius->addStretch(1);
 	LERadius->addWidget(lab0);
 	LERadius->addWidget(m_pctrlRadius);
 	LERadius->addWidget(lab1);
 
-	m_pctrlShow = new QCheckBox("Show");
+	m_pctrlShow = new QCheckBox(tr("Show"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton     = new QPushButton(tr("OK"));

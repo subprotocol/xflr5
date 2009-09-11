@@ -30,7 +30,7 @@
 
 WAdvancedDlg::WAdvancedDlg()
 {
-	setWindowTitle("Wing Analysis Advanced Settings");
+	setWindowTitle(tr("Wing Analysis Advanced Settings"));
 	m_NStation  = 20;
 	m_AlphaPrec = 0.01;
 	m_Relax     = 20.;
@@ -63,9 +63,9 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlLength  = new QLabel("");
 	m_pctrlLength2 = new QLabel("");
 
-	m_pctrlLogFile     = new QCheckBox("View Log File after errors");
-	m_pctrlResetWake   = new QCheckBox("Reset Wake between each angle");
-	m_pctrlKeepOutOpps = new QCheckBox("Store points outside the polar mesh");
+	m_pctrlLogFile     = new QCheckBox(tr("View Log File after errors"));
+	m_pctrlResetWake   = new QCheckBox(tr("Reset Wake between each angle"));
+	m_pctrlKeepOutOpps = new QCheckBox(tr("Store points outside the polar mesh"));
 
 	m_pctrlInterNodes   = new FloatEdit();
 	m_pctrlRelax        = new FloatEdit(20,1);
@@ -78,13 +78,13 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlVortexPos    = new FloatEdit(25.0, 2);
 	m_pctrlControlPos   = new FloatEdit(75.0, 2);
 
-	QGroupBox *AllBox = new QGroupBox("All Analysis");
+	QGroupBox *AllBox = new QGroupBox(tr("All Analysis"));
 	QVBoxLayout *AllLayout = new QVBoxLayout;
 	AllLayout->addWidget(m_pctrlLogFile);
 	AllLayout->addWidget(m_pctrlKeepOutOpps);
 	AllBox->setLayout(AllLayout);
 
-	QGroupBox *VLMPanelBox = new QGroupBox("VLM and Panel Methods");
+	QGroupBox *VLMPanelBox = new QGroupBox(tr("VLM and Panel Methods"));
 	QHBoxLayout *VLMPanelLayout = new QHBoxLayout;
 	QLabel *lab10 = new QLabel("Core Size");
 	lab10->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -94,11 +94,11 @@ void WAdvancedDlg::SetupLayout()
 	VLMPanelLayout->addWidget(m_pctrlLength2);
 	VLMPanelBox->setLayout(VLMPanelLayout);
 
-	QGroupBox *VLMBox = new QGroupBox("VLM Method");
+	QGroupBox *VLMBox = new QGroupBox(tr("VLM Method"));
 	QGridLayout *VLMLayout = new QGridLayout;
-	QLabel *lab5 = new QLabel("Ignore wing panels with span <");
-	QLabel *lab6 = new QLabel("Vortex Position");
-	QLabel *lab7 = new QLabel("Control Point Position");
+	QLabel *lab5 = new QLabel(tr("Ignore wing panels with span <"));
+	QLabel *lab6 = new QLabel(tr("Vortex Position"));
+	QLabel *lab7 = new QLabel(tr("Control Point Position"));
 	QLabel *lab8 = new QLabel("%");
 	QLabel *lab9 = new QLabel("%");
 	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -117,12 +117,12 @@ void WAdvancedDlg::SetupLayout()
 	VLMLayout->addWidget(lab9,3,3);
 	VLMBox->setLayout(VLMLayout);
 
-	QGroupBox *LLTBox = new QGroupBox("Lifting Line Method");
+	QGroupBox *LLTBox = new QGroupBox(tr("Lifting Line Method"));
 	QGridLayout *LLTLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel("Relax. factor");
-	QLabel *lab2 = new QLabel("Alpha Precision");
-	QLabel *lab3 = new QLabel("Max. Iterations");
-	QLabel *lab4 = new QLabel("Number of spanwise stations");
+	QLabel *lab1 = new QLabel(tr("Relax. factor"));
+	QLabel *lab2 = new QLabel(tr("Alpha Precision"));
+	QLabel *lab3 = new QLabel(tr("Max. Iterations"));
+	QLabel *lab4 = new QLabel(tr("Number of spanwise stations"));
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

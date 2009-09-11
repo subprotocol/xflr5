@@ -32,7 +32,7 @@
 
 WingScaleDlg::WingScaleDlg(void *pParent)
 {
-	setWindowTitle("Scale Wing Dlg");
+	setWindowTitle(tr("Scale Wing Dlg"));
 	m_pMainFrame = NULL;
 	m_bSweep = m_bSpan = m_bChord = m_bTwist = false;
 
@@ -45,10 +45,10 @@ WingScaleDlg::WingScaleDlg(void *pParent)
 void WingScaleDlg::SetupLayout()
 {
 	QGridLayout *ScaleLayout = new QGridLayout;
-	m_pctrlSpan  = new QCheckBox("Span Scaling");
-	m_pctrlChord = new QCheckBox("Chord Scaling");
-	m_pctrlSweep = new QCheckBox("Sweep Scaling");
-	m_pctrlTwist = new QCheckBox("Twist Scaling");
+	m_pctrlSpan  = new QCheckBox(tr("Span Scaling"));
+	m_pctrlChord = new QCheckBox(tr("Chord Scaling"));
+	m_pctrlSweep = new QCheckBox(tr("Sweep Scaling"));
+	m_pctrlTwist = new QCheckBox(tr("Twist Scaling"));
 
 	m_pctrlNewSpan  = new FloatEdit(0,3);
 	m_pctrlNewChord = new FloatEdit(0,3);
@@ -73,9 +73,9 @@ void WingScaleDlg::SetupLayout()
 	m_pctrlSweepRatio->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlTwistRatio->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-	QLabel *lab11 = new QLabel("Reference");
-	QLabel *lab12 = new QLabel("New");
-	QLabel *lab13 = new QLabel("Ratio");
+	QLabel *lab11 = new QLabel(tr("Reference"));
+	QLabel *lab12 = new QLabel(tr("New"));
+	QLabel *lab13 = new QLabel(tr("Ratio"));
 	lab11->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	lab12->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	lab13->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);

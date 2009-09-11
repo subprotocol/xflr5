@@ -32,7 +32,7 @@
 
 CtrlPolarDlg::CtrlPolarDlg()
 {
-	setWindowTitle("Control Polar Definition");
+	setWindowTitle(tr("Control Polar Definition"));
 	m_pMainFrame = NULL;
 	m_pMiarex    = NULL;
 
@@ -108,13 +108,13 @@ void CtrlPolarDlg::Connect()
 	m_pControlModel->setRowCount(10);//temporary
 	m_pControlModel->setColumnCount(4);
 
-	m_pControlModel->setHeaderData(0, Qt::Horizontal, "Control Name");
-	m_pControlModel->setHeaderData(1, Qt::Horizontal, "Active (1/0)");
-	m_pControlModel->setHeaderData(2, Qt::Horizontal, "Min");
-	m_pControlModel->setHeaderData(3, Qt::Horizontal, "Max");
+	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
+	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Active (1/0)"));
+	m_pControlModel->setHeaderData(2, Qt::Horizontal, tr("Min"));
+	m_pControlModel->setHeaderData(3, Qt::Horizontal, tr("Max"));
 
 	m_pctrlControlTable->setModel(m_pControlModel);
-	m_pctrlControlTable->setWindowTitle("Controls");
+	m_pctrlControlTable->setWindowTitle(tr("Controls"));
 }
 
 
@@ -130,7 +130,7 @@ void CtrlPolarDlg::FillControlList()
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
 
 	ind = m_pControlModel->index(0, 0, QModelIndex());
-	m_pControlModel->setData(ind, "XCmRef ("+str+")");
+	m_pControlModel->setData(ind, tr("XCmRef (")+str+")");
 
 	ind = m_pControlModel->index(0, 1, QModelIndex());
 	if(m_bActiveControl[0])	m_pControlModel->setData(ind, 1);
@@ -146,7 +146,7 @@ void CtrlPolarDlg::FillControlList()
 	if(m_pPlane)
 	{
 		ind = m_pControlModel->index(1, 0, QModelIndex());
-		m_pControlModel->setData(ind, "Wing Tilt (deg)");
+		m_pControlModel->setData(ind, tr("Wing Tilt (")+QString::fromUtf8("°")+")");
 
 		ind = m_pControlModel->index(1, 1, QModelIndex());
 		if(m_bActiveControl[1])	m_pControlModel->setData(ind, 1);
@@ -163,7 +163,7 @@ void CtrlPolarDlg::FillControlList()
 		if(m_pStab)
 		{
 			ind = m_pControlModel->index(2, 0, QModelIndex());
-			m_pControlModel->setData(ind, "Elevator Tilt (deg)");
+			m_pControlModel->setData(ind, tr("Elevator Tilt ")+QString::fromUtf8("(°)"));
 
 			ind = m_pControlModel->index(2, 1, QModelIndex());
 			if(m_bActiveControl[2])	m_pControlModel->setData(ind, 1);
@@ -182,7 +182,7 @@ void CtrlPolarDlg::FillControlList()
 	for(i=0; i<m_pWing->m_nFlaps; i++)
 	{
 		ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
-		strong = QString("Wing Flap angle %1 (deg)").arg(i+1);
+		strong = QString(tr("Wing Flap angle %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 		m_pControlModel->setData(ind, strong);
 		ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
 		if(m_bActiveControl[i+m_nControls]) m_pControlModel->setData(ind, 1);
@@ -202,7 +202,7 @@ void CtrlPolarDlg::FillControlList()
 		for(i=0; i<m_pStab->m_nFlaps; i++)
 		{
 			ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
-			strong = QString("Elevator Flap %1 (deg)").arg(i+1);
+			strong = QString(tr("Elevator Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
 			ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
@@ -383,8 +383,8 @@ void CtrlPolarDlg::OnOK()
 	}
 	if(!bActive)
 	{
-		strong = "No Active Control. Continue ?";
-		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+		strong = tr("No Active Control. Continue ?");
+		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 
 	CWPolar * pWPolarNew;
@@ -394,7 +394,7 @@ void CtrlPolarDlg::OnOK()
 
 	if(!LineLength)
 	{
-		QMessageBox::warning(this, tr("Warning"), "Must enter a name");
+		QMessageBox::warning(this, tr("Warning"), tr("Must enter a name"));
 		m_pctrlWPolarName->setFocus();
 		return;
 	}
@@ -406,7 +406,7 @@ void CtrlPolarDlg::OnOK()
 			pWPolarNew = (CWPolar*)m_poaXPolar->at(j);
 			if (pWPolarNew->m_PlrName == m_WPolarName && pWPolarNew->m_UFOName  == m_UFOName)
 			{
-				QMessageBox::warning(this,tr("Warning"),"The polar's name already exists");
+				QMessageBox::warning(this,tr("Warning"), tr("The polar's name already exists"));
 				return;
 			}
 		}
@@ -526,28 +526,28 @@ void CtrlPolarDlg::SetDensity()
 void CtrlPolarDlg::SetupLayout()
 {
 	QVBoxLayout *NameLayout = new QVBoxLayout;
-	m_pctrlUFOName = new QLabel("WingName");
-	m_pctrlAutoName = new QCheckBox("Auto Analysis Name");
-	m_pctrlWPolarName = new QLineEdit("Polar Name");
+	m_pctrlUFOName = new QLabel(tr("Wing Name"));
+	m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
+	m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
 	NameLayout->addWidget(m_pctrlUFOName);
 	NameLayout->addWidget(m_pctrlAutoName);
 	NameLayout->addWidget(m_pctrlWPolarName);
-	QGroupBox *NameGroup = new QGroupBox("Polar Name");
+	QGroupBox *NameGroup = new QGroupBox(tr("Polar Name"));
 	NameGroup->setLayout(NameLayout);
 
 	QVBoxLayout *TypeLayout = new QVBoxLayout;
-	m_pctrlType5 = new QRadioButton("Type 5 (Fixed Speed)");
-	m_pctrlType6 = new QRadioButton("Type 6 (Fixed Lift)");
-	m_pctrlViscous = new QCheckBox("Viscous");
+	m_pctrlType5 = new QRadioButton(tr("Type 5 (Fixed Speed)"));
+	m_pctrlType6 = new QRadioButton(tr("Type 6 (Fixed Lift)"));
+	m_pctrlViscous = new QCheckBox(tr("Viscous"));
 	TypeLayout->addWidget(m_pctrlType5);
 	TypeLayout->addWidget(m_pctrlType6);
 	TypeLayout->addWidget(m_pctrlViscous);
-	QGroupBox *TypeGroup = new QGroupBox("Polar Type");
+	QGroupBox *TypeGroup = new QGroupBox(tr("Polar Type"));
 	TypeGroup->setLayout(TypeLayout);
 
 	QGridLayout *PlaneLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel("Free Stream Speed");
-	QLabel *lab2 = new QLabel("Plane Weight");
+	QLabel *lab1 = new QLabel(tr("Free Stream Speed"));
+	QLabel *lab2 = new QLabel(tr("Plane Weight"));
 	m_pctrlQInf    = new FloatEdit(10.05);
 	m_pctrlWeight  = new FloatEdit(1.234);
 	m_pctrlSpeedUnit   = new QLabel("m/s");
@@ -558,13 +558,13 @@ void CtrlPolarDlg::SetupLayout()
 	PlaneLayout->addWidget(m_pctrlWeight,2,2);
 	PlaneLayout->addWidget(m_pctrlSpeedUnit ,1,3);
 	PlaneLayout->addWidget(m_pctrlWeightUnit ,2,3);
-	QGroupBox *PlaneGroup = new QGroupBox("Plane and Flight Data");
+	QGroupBox *PlaneGroup = new QGroupBox(tr("Plane and Flight Data"));
 	PlaneGroup->setLayout(PlaneLayout);
 
 	QGridLayout *AeroDataLayout = new QGridLayout;
-	QLabel *lab9 = new QLabel("Unit");
-	m_pctrlUnit1 = new QRadioButton("International");
-	m_pctrlUnit2 = new QRadioButton("Imperial");
+	QLabel *lab9 = new QLabel(tr("Unit"));
+	m_pctrlUnit1 = new QRadioButton(tr("International"));
+	m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 	m_pctrlRho           = new QLabel("r=");
 	m_pctrlDensity       = new FloatEdit(1.500e-5,3);
 	m_pctrlDensityUnit   = new QLabel("kg/m3");
@@ -583,15 +583,15 @@ void CtrlPolarDlg::SetupLayout()
 	AeroDataLayout->addWidget(m_pctrlNu,3,1);
 	AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
 	AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
-	QGroupBox *AeroDataGroup = new QGroupBox("Aerodynamic Data");
+	QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
 	AeroDataGroup->setLayout(AeroDataLayout);
 
 	QHBoxLayout *AreaOptions = new QHBoxLayout;
-	m_pctrlArea1 = new QRadioButton("Wing Planform Area");
-	m_pctrlArea2 = new QRadioButton("Wing Planform Area projected on xy plane");
+	m_pctrlArea1 = new QRadioButton(tr("Wing Planform Area"));
+	m_pctrlArea2 = new QRadioButton(tr("Wing Planform Area projected on xy plane"));
 	AreaOptions->addWidget(m_pctrlArea1);
 	AreaOptions->addWidget(m_pctrlArea2);
-	QGroupBox *AreaBox = new QGroupBox("Reference Area for Aero Coefficients");
+	QGroupBox *AreaBox = new QGroupBox(tr("Reference Area for Aero Coefficients"));
 	AreaBox->setLayout(AreaOptions);
 
 	QGridLayout *DataLayout = new QGridLayout;
@@ -622,9 +622,9 @@ void CtrlPolarDlg::SetupLayout()
 	m_pCtrlDelegate->m_Precision = precision;
 
 	QVBoxLayout *NoteLayout = new QVBoxLayout;
-	QLabel *lab10 = new QLabel("Note 1 : the analysis is necessarily of type VLM1");
-	QLabel *lab11 = new QLabel("Note 2 : if the control for XCmRef is inactive, then the minimal value will be used for the analysis");
-	QLabel *lab12 = new QLabel("Note 3 : the analysis may be of the vicous type only if all the flap controls are inactive");
+	QLabel *lab10 = new QLabel(tr("Note 1 : the analysis is necessarily of type VLM1"));
+	QLabel *lab11 = new QLabel(tr("Note 2 : if the control for XCmRef is inactive, then the minimal value will be used for the analysis"));
+	QLabel *lab12 = new QLabel(tr("Note 3 : the analysis may be of the vicous type only if all the flap controls are inactive"));
 	NoteLayout->addWidget(lab10);
 	NoteLayout->addWidget(lab11);
 	NoteLayout->addWidget(lab12);

@@ -29,6 +29,7 @@
 
 PertDlg::PertDlg(void *pParent)
 {
+	setWindowTitle(tr("Pertubation Dialog"));
 	m_pXInverse = pParent;
 	memset(m_cnr,   0, sizeof(m_cnr));
 	memset(m_cni,   0, sizeof(m_cni));

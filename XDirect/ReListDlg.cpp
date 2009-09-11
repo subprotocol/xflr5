@@ -29,6 +29,7 @@
 
 ReListDlg::ReListDlg()
 {
+	setWindowTitle(tr("Reynolds Number List"));
 	memset(m_ReList, 0, sizeof(m_ReList));
 	memset(m_MachList, 0, sizeof(m_MachList));
 	memset(m_NCritList, 0, sizeof(m_NCritList));
@@ -108,11 +109,11 @@ void ReListDlg::OnCellChanged(QWidget *FloatEdit)
 void ReListDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlInsert	= new QPushButton("Insert");
-	m_pctrlDelete	= new QPushButton("Delete");
+	m_pctrlInsert	= new QPushButton(tr("Insert"));
+	m_pctrlDelete	= new QPushButton(tr("Delete"));
 
-	OKButton        = new QPushButton("OK");
-	CancelButton    = new QPushButton("Cancel");
+	OKButton        = new QPushButton(tr("OK"));
+	CancelButton    = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(m_pctrlInsert);
 	CommandButtons->addWidget(m_pctrlDelete);

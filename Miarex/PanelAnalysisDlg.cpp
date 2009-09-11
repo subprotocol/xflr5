@@ -35,7 +35,7 @@ void *PanelAnalysisDlg::s_pMainFrame;
 
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
-	setWindowTitle("3D Panel Analysis");
+	setWindowTitle(tr("3D Panel Analysis"));
 	SetupLayout();
 
 	m_Alpha      = 0.0;
@@ -129,7 +129,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, tr("Warning"),"The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
 		nrhs = 100;
 	}
 
@@ -1681,7 +1681,7 @@ bool PanelAnalysisDlg::ReLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-		QMessageBox::warning(this, tr("Warning"),"The number of points to be calculated will be limited to 100");
+		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
 //		if(res ==IDCANCEL) return false;
 		nrhs = 100;
 	}
@@ -2723,7 +2723,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
-				QMessageBox::warning(this, tr("Warning"),"The number of points to be calculated will be limited to 100");
+				QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
 				nrhs = 100;
 		}
 

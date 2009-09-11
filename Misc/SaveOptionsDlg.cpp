@@ -27,7 +27,7 @@
 
 SaveOptionsDlg::SaveOptionsDlg()
 {
-	setWindowTitle("Save Options");
+	setWindowTitle(tr("Save Options"));
 	m_bOpps = false;
 	m_bWOpps = true;
 	SetupLayout();
@@ -35,14 +35,14 @@ SaveOptionsDlg::SaveOptionsDlg()
 
 void SaveOptionsDlg::SetupLayout()
 {
-	QLabel *label = new QLabel("Save:");
-	m_pctrlOpps  = new QCheckBox("Foil Operating Points");
-	m_pctrlWOpps = new QCheckBox("Wing and Plane Operating Points");
+	QLabel *label = new QLabel(tr("Save:"));
+	m_pctrlOpps  = new QCheckBox(tr("Foil Operating Points"));
+	m_pctrlWOpps = new QCheckBox(tr("Wing and Plane Operating Points"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton("OK");
+	QPushButton *OKButton = new QPushButton(tr("OK"));
 	OKButton->setAutoDefault(false);
-	QPushButton *CancelButton = new QPushButton("Cancel");
+	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setAutoDefault(false);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);

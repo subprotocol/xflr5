@@ -117,8 +117,6 @@ protected:
 	double *m_MachList;
 	double *m_NCritList;
 
-	double pi;
-
 	int m_NRe;
 
 	QFile *m_pXFile;

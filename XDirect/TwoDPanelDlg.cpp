@@ -37,14 +37,14 @@ TwoDPanelDlg::TwoDPanelDlg()
 
 void TwoDPanelDlg::SetupLayout()
 {
-	setWindowTitle("Global Panel Refinement");
+	setWindowTitle(tr("Global Panel Refinement"));
 	QGridLayout *InputData = new QGridLayout;
-	QLabel *l1 = new QLabel("Number of Panels");
-	QLabel *l2 = new QLabel("Panel Bunching Parameter");
-	QLabel *l3 = new QLabel("TE/LE Panel Density Ratio");
-	QLabel *l4 = new QLabel("Refined area/LE Panel Density Ratio");
-	QLabel *l5 = new QLabel("Top Side Refined Area x/c limits");
-	QLabel *l6 = new QLabel("Bottom Side Refined Area x/c limits");
+	QLabel *l1 = new QLabel(tr("Number of Panels"));
+	QLabel *l2 = new QLabel(tr("Panel Bunching Parameter"));
+	QLabel *l3 = new QLabel(tr("TE/LE Panel Density Ratio"));
+	QLabel *l4 = new QLabel(tr("Refined area/LE Panel Density Ratio"));
+	QLabel *l5 = new QLabel(tr("Top Side Refined Area x/c limits"));
+	QLabel *l6 = new QLabel(tr("Bottom Side Refined Area x/c limits"));
 
 	InputData->addWidget(l1,1,1);
 	InputData->addWidget(l2,2,1);
@@ -205,7 +205,7 @@ void TwoDPanelDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(this, tr("Warning"), "Unrecognized foil format");
+		QMessageBox::information(this, tr("Warning"), tr("Unrecognized foil format"));
 		return;
 	}
 

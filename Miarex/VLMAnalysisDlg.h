@@ -98,7 +98,6 @@ private:
 
 	QFile *m_pXFile;
 
-	double pi;
 	double *m_RHS;
 	double *m_aij;
 	double *m_Gamma;

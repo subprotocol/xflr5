@@ -24,6 +24,7 @@
 
 FoilPolarDlg::FoilPolarDlg(void *pParent)
 {
+	setWindowTitle(tr("Foil Polar Definition"));
 	m_pParent = pParent;
 	m_Type     = 1;
 	m_NCrit    = 9.0;
@@ -42,9 +43,9 @@ void FoilPolarDlg::SetupLayout()
 {
 	QVBoxLayout *Analysis = new QVBoxLayout;
 	QHBoxLayout *autoname = new QHBoxLayout;
-	m_pctrlAuto1 = new QRadioButton("Automatic");
-	m_pctrlAuto2 = new QRadioButton("User Defined");
-	m_pctrlAnalysisName = new QLineEdit("Analysis Name");
+	m_pctrlAuto1 = new QRadioButton(tr("Automatic"));
+	m_pctrlAuto2 = new QRadioButton(tr("User Defined"));
+	m_pctrlAnalysisName = new QLineEdit(tr("Analysis Name"));
 	autoname->addStretch(1);
 	autoname->addWidget(m_pctrlAuto1);
 	autoname->addStretch(1);
@@ -52,26 +53,26 @@ void FoilPolarDlg::SetupLayout()
 	autoname->addStretch(1);
 	Analysis->addLayout(autoname);
 	Analysis->addWidget(m_pctrlAnalysisName);
-	QGroupBox *NameGroup = new QGroupBox("Analysis Name");
+	QGroupBox *NameGroup = new QGroupBox(tr("Analysis Name"));
 	NameGroup->setLayout(Analysis);
 
 	QHBoxLayout *AnalysisType = new QHBoxLayout;
-	m_rbtype1 = new		QRadioButton("Type 1");
-	m_rbtype2 = new QRadioButton("Type 2");
-	m_rbtype3 = new QRadioButton("Type 3");
-	m_rbtype4 = new QRadioButton("Type 4");
+	m_rbtype1 = new		QRadioButton(tr("Type 1"));
+	m_rbtype2 = new QRadioButton(tr("Type 2"));
+	m_rbtype3 = new QRadioButton(tr("Type 3"));
+	m_rbtype4 = new QRadioButton(tr("Type 4"));
 	AnalysisType->addWidget(m_rbtype1);
 	AnalysisType->addWidget(m_rbtype2);
 	AnalysisType->addWidget(m_rbtype3);
 	AnalysisType->addWidget(m_rbtype4);
-	QGroupBox *TypeGroup = new QGroupBox("Analysis Type");
+	QGroupBox *TypeGroup = new QGroupBox(tr("Analysis Type"));
 	TypeGroup->setLayout(AnalysisType);
 
 
 	QHBoxLayout *AeroData = new QHBoxLayout;
-	m_pctrlReLabel   = new QLabel("  Re =");
+	m_pctrlReLabel   = new QLabel(tr("  Re ="));
 	m_pctrlReLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlMachLabel = new QLabel("Mach =");
+	m_pctrlMachLabel = new QLabel(tr("Mach ="));
 	m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlReynolds = new FloatEdit();
 	m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -81,7 +82,7 @@ void FoilPolarDlg::SetupLayout()
 	AeroData->addWidget(m_pctrlReynolds);
 	AeroData->addWidget(m_pctrlMachLabel);
 	AeroData->addWidget(m_pctrlMach);
-	QGroupBox *AeroGroup = new QGroupBox("Aerodynamic data");
+	QGroupBox *AeroGroup = new QGroupBox(tr("Aerodynamic data"));
 	AeroGroup->setLayout(AeroData);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -98,11 +99,11 @@ void FoilPolarDlg::SetupLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QGridLayout *Transitions = new QGridLayout;
-	QLabel *FreeTransLabel   = new QLabel("Free transitions (e^n) method");
-	QLabel *ForceTransLabel  = new QLabel("Forced transition:");
-	QLabel	*NCritLabel      = new QLabel("NCrit=");
-	QLabel *TopTripLabel     = new QLabel("TripLocation (top)");
-	QLabel *BotTripLabel     = new QLabel("TripLocation (bot)");
+	QLabel *FreeTransLabel   = new QLabel(tr("Free transitions (e^n) method"));
+	QLabel *ForceTransLabel  = new QLabel(tr("Forced transition:"));
+	QLabel	*NCritLabel      = new QLabel(tr("NCrit="));
+	QLabel *TopTripLabel     = new QLabel(tr("TripLocation (top)"));
+	QLabel *BotTripLabel     = new QLabel(tr("TripLocation (bot)"));
 	m_pctrlNCrit    = new FloatEdit();
 	m_pctrlTopTrans = new FloatEdit();
 	m_pctrlBotTrans = new FloatEdit();
@@ -118,7 +119,7 @@ void FoilPolarDlg::SetupLayout()
 	Transitions->addWidget(m_pctrlNCrit,     1,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
 	Transitions->addWidget(m_pctrlTopTrans,  2,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
 	Transitions->addWidget(m_pctrlBotTrans,  3,3, 1,1, Qt::AlignRight| Qt::AlignVCenter);
-	QGroupBox *TransGroup = new QGroupBox("Transition settings");
+	QGroupBox *TransGroup = new QGroupBox(tr("Transition settings"));
 	TransGroup->setLayout(Transitions);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -184,7 +185,7 @@ void FoilPolarDlg::InitDialog()
 
 	if(pXDirect && pXDirect->m_pCurFoil) m_FoilName = pXDirect->m_pCurFoil->m_FoilName;
 
-	QString str = "Analysis parameters for "+ m_FoilName;
+	QString str = tr("Analysis parameters for ")+ m_FoilName;
 	setWindowTitle(str);
 
 	m_pctrlReynolds->SetValue(m_Reynolds);
@@ -292,32 +293,32 @@ void FoilPolarDlg::OnPolarType()
 {
 	if(m_rbtype1->isChecked())
 	{
-		m_pctrlReLabel->setText("Reynolds =");
-		m_pctrlMachLabel->setText("Mach =");
+		m_pctrlReLabel->setText(tr("Reynolds ="));
+		m_pctrlMachLabel->setText(tr("Mach ="));
 		m_pctrlReynolds->SetPrecision(0);
 		m_pctrlReynolds->SetValue(m_Reynolds);
 		m_Type = 1;
 	}
 	else if(m_rbtype2->isChecked())
 	{
-		m_pctrlReLabel->setText("Re.sqrt(Cl) =");
-		m_pctrlMachLabel->setText("Ma.sqrt(Cl) =");
+		m_pctrlReLabel->setText(tr("Re.sqrt(Cl) ="));
+		m_pctrlMachLabel->setText(tr("Ma.sqrt(Cl) ="));
 		m_pctrlReynolds->SetPrecision(0);
 		m_pctrlReynolds->SetValue(m_Reynolds);
 		m_Type = 2;
 	}
 	else if(m_rbtype3->isChecked())
 	{
-		m_pctrlReLabel->setText("Re.Cl =");
-		m_pctrlMachLabel->setText("Mach =");
+		m_pctrlReLabel->setText(tr("Re.Cl ="));
+		m_pctrlMachLabel->setText(tr("Mach ="));
 		m_pctrlReynolds->SetPrecision(0);
 		m_pctrlReynolds->SetValue(m_Reynolds);
 		m_Type = 3;
 	}
 	else if(m_rbtype4->isChecked())
 	{
-		m_pctrlReLabel->setText("Alpha =");
-		m_pctrlMachLabel->setText("Mach =");
+		m_pctrlReLabel->setText(tr("Alpha ="));
+		m_pctrlMachLabel->setText(tr("Mach ="));
 		m_pctrlReynolds->SetPrecision(2);
 		m_pctrlReynolds->SetValue(m_ASpec);
 		m_Type = 4;

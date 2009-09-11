@@ -434,7 +434,7 @@ private:
 	double MatIn[4][4], MatOut[4][4];
 	double m_LegendMin, m_LegendMax;
 
-	double pi;
+
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_LiftScale, m_DragScale, m_VelocityScale;

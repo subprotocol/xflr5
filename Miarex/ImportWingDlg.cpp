@@ -26,10 +26,13 @@
 #include "../Objects/Wing.h"
 #include "ImportWingDlg.h"
 
+
 ImportWingDlg::ImportWingDlg()
 {
+	setWindowTitle(tr("Import Wing Dialog"));
 	SetupLayout();
 }
+
 
 void ImportWingDlg::InitDialog()
 {
@@ -41,6 +44,7 @@ void ImportWingDlg::InitDialog()
 	}
 }
 
+
 void ImportWingDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
@@ -50,7 +54,7 @@ void ImportWingDlg::SetupLayout()
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 
-	QLabel *lab = new QLabel("Select the wing to import");
+	QLabel *lab = new QLabel(tr("Select the wing to import"));
 
 	m_pctrlNameList = new QListWidget;
 	m_pctrlNameList->setMinimumHeight(300);

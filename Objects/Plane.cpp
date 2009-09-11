@@ -117,7 +117,7 @@ void CPlane::ComputePlane(void)
 		for (i=0;i<m_Stab.m_NPanel; i++)
 		{
 			ProjectedArea += m_Stab.m_TLength[i+1]*(m_Stab.m_TChord[i]+m_Stab.m_TChord[i+1])/2.0
-							*cos(m_Stab.m_TDihedral[i])*cos(m_Stab.m_TDihedral[i]);//m�
+							*cos(m_Stab.m_TDihedral[i]*PI/180.0)*cos(m_Stab.m_TDihedral[i]*PI/180.0);//m2
 		
 		}
 		ProjectedArea *=2.0;

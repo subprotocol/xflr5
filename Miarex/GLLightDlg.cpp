@@ -57,7 +57,7 @@ GLLightDlg::GLLightDlg()
 	m_YLight   =  0.02f;
 	m_ZLight   =  0.68f;
 	SetupLayout();
-	setWindowTitle("OpenGL Light Options");
+	setWindowTitle(tr("OpenGL Light Options"));
 
 	connect(m_pctrlClose, SIGNAL(clicked()),this, SLOT(accept()));
 	connect(m_pctrlDefaults, SIGNAL(clicked()), this, SLOT(OnDefaults()));
@@ -164,50 +164,50 @@ void GLLightDlg::SetupLayout()
 	m_pctrlZLight->setTickInterval(10);
 
 	QGridLayout *LightIntensity = new QGridLayout;
-	QLabel *lab1 = new QLabel("Diffuse");
-	QLabel *lab2 = new QLabel("Ambient");
-	QLabel *lab3 = new QLabel("Specular");
+	QLabel *lab1 = new QLabel(tr("Diffuse"));
+	QLabel *lab2 = new QLabel(tr("Ambient"));
+	QLabel *lab3 = new QLabel(tr("Specular"));
 	LightIntensity->addWidget(lab1,1,1);
 	LightIntensity->addWidget(lab2,2,1);
 	LightIntensity->addWidget(lab3,3,1);
 	LightIntensity->addWidget(m_pctrlDiffuse,1,2);
 	LightIntensity->addWidget(m_pctrlAmbient,2,2);
 	LightIntensity->addWidget(m_pctrlSpecular,3,2);
-	QGroupBox *LightIntensityBox = new QGroupBox("Light Intensity");
+	QGroupBox *LightIntensityBox = new QGroupBox(tr("Light Intensity"));
 	LightIntensityBox->setLayout(LightIntensity);
 
 	QGridLayout *LightColor = new QGridLayout;
-	QLabel *lab11 = new QLabel("Red");
-	QLabel *lab12 = new QLabel("Green");
-	QLabel *lab13 = new QLabel("Blue");
+	QLabel *lab11 = new QLabel(tr("Red"));
+	QLabel *lab12 = new QLabel(tr("Green"));
+	QLabel *lab13 = new QLabel(tr("Blue"));
 	LightColor->addWidget(lab11,1,1);
 	LightColor->addWidget(lab12,2,1);
 	LightColor->addWidget(lab13,3,1);
 	LightColor->addWidget(m_pctrlRed,1,2);
 	LightColor->addWidget(m_pctrlGreen,2,2);
 	LightColor->addWidget(m_pctrlBlue,3,2);
-	QGroupBox *LightColorBox = new QGroupBox("Light Color");
+	QGroupBox *LightColorBox = new QGroupBox(tr("Light Color"));
 	LightColorBox->setLayout(LightColor);
 
 	QGridLayout *LightPosition = new QGridLayout;
-	QLabel *lab21 = new QLabel("x");
-	QLabel *lab22 = new QLabel("y");
-	QLabel *lab23 = new QLabel("z");
+	QLabel *lab21 = new QLabel(tr("x"));
+	QLabel *lab22 = new QLabel(tr("y"));
+	QLabel *lab23 = new QLabel(tr("z"));
 	LightPosition->addWidget(lab21,1,1);
 	LightPosition->addWidget(lab22,2,1);
 	LightPosition->addWidget(lab23,3,1);
 	LightPosition->addWidget(m_pctrlXLight,1,2);
 	LightPosition->addWidget(m_pctrlYLight,2,2);
 	LightPosition->addWidget(m_pctrlZLight,3,2);
-	QGroupBox *LightPositionBox = new QGroupBox("Light Position");
+	QGroupBox *LightPositionBox = new QGroupBox(tr("Light Position"));
 	LightPositionBox->setLayout(LightPosition);
 
 	QGridLayout *MaterialData = new QGridLayout;
-	QLabel *lab31 = new QLabel("Diffuse");
-	QLabel *lab32 = new QLabel("Ambient");
-	QLabel *lab33 = new QLabel("Specular");
-	QLabel *lab34 = new QLabel("Emissions");
-	QLabel *lab35 = new QLabel("Shininess");
+	QLabel *lab31 = new QLabel(tr("Diffuse"));
+	QLabel *lab32 = new QLabel(tr("Ambient"));
+	QLabel *lab33 = new QLabel(tr("Specular"));
+	QLabel *lab34 = new QLabel(tr("Emissions"));
+	QLabel *lab35 = new QLabel(tr("Shininess"));
 	MaterialData->addWidget(lab31,1,1);
 	MaterialData->addWidget(lab32,2,1);
 	MaterialData->addWidget(lab33,3,1);
@@ -218,23 +218,23 @@ void GLLightDlg::SetupLayout()
 	MaterialData->addWidget(m_pctrlMatSpecular,3,2);
 	MaterialData->addWidget(m_pctrlMatEmission,4,2);
 	MaterialData->addWidget(m_pctrlMatShininess,5,2);
-	QGroupBox *MaterialDataBox = new QGroupBox("Material");
+	QGroupBox *MaterialDataBox = new QGroupBox(tr("Material"));
 	MaterialDataBox->setLayout(MaterialData);
 
 	QVBoxLayout *CheckLayout = new QVBoxLayout;
-	m_pctrlColorMaterial = new QCheckBox("Color Material");
-	m_pctrlCullFaces     = new QCheckBox("Cull Faces");
-	m_pctrlSmooth        = new QCheckBox("Smooth Quads");
-	m_pctrlDepthTest     = new QCheckBox("Depth Test");
-	m_pctrlShade         = new QCheckBox("Smooth Shading");
-	m_pctrlLocalView     = new QCheckBox("Local View");
+	m_pctrlColorMaterial = new QCheckBox(tr("Color Material"));
+	m_pctrlCullFaces     = new QCheckBox(tr("Cull Faces"));
+	m_pctrlSmooth        = new QCheckBox(tr("Smooth Quads"));
+	m_pctrlDepthTest     = new QCheckBox(tr("Depth Test"));
+	m_pctrlShade         = new QCheckBox(tr("Smooth Shading"));
+	m_pctrlLocalView     = new QCheckBox(tr("Local View"));
 	CheckLayout->addWidget(m_pctrlColorMaterial);
 	CheckLayout->addWidget(m_pctrlCullFaces);
 	CheckLayout->addWidget(m_pctrlSmooth);
 	CheckLayout->addWidget(m_pctrlDepthTest);
 	CheckLayout->addWidget(m_pctrlShade);
 	CheckLayout->addWidget(m_pctrlLocalView);
-	QGroupBox *CheckBoxes = new QGroupBox("Options");
+	QGroupBox *CheckBoxes = new QGroupBox(tr("Options"));
 	CheckBoxes->setLayout(CheckLayout);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;

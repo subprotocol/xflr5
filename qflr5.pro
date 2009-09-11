@@ -206,7 +206,9 @@ HEADERS += MainFrame.h \
     Misc/TranslatorDlg.h \
     QFLR5Application.h
 
-TRANSLATIONS = qflr5.ts
+TRANSLATIONS = qflr5.ts \
+			   qflr5_de.ts
+
 
 win32:RC_FILE = res/QFLR5.rc
 

@@ -26,7 +26,7 @@
 
 ModDlg::ModDlg()
 {
-	setWindowTitle("Modification Dlg");
+	setWindowTitle(tr("Modification"));
 	m_Question = "";
 	SetupLayout();
 }

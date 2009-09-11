@@ -112,7 +112,7 @@ QMiarex::QMiarex(QWidget *parent)
 	: QWidget(parent)
 {
 	//construct evrything
-	pi = 3.141592654;
+
 
 	m_pMainFrame  = NULL;
 	m_pXFile      = NULL;
@@ -4151,13 +4151,13 @@ double QMiarex::GetCl(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, dou
 	bError = false;
 
 	if(!pFoil0)
-		Cl0 = 2.0*pi*(Alpha*pi/180.0);
+		Cl0 = 2.0*PI*(Alpha*PI/180.0);
 	else
 		Cl0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 1, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 	if(!pFoil1)
-		Cl1 = 2.0*pi*(Alpha*pi/180.0);
+		Cl1 = 2.0*PI*(Alpha*PI/180.0);
 	else
 		Cl1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 1, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
@@ -4255,16 +4255,16 @@ double QMiarex::GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, dou
 	double Cd0, Cd1, Cl;
 	if(!pFoil0)
 	{
-		Cl = 2.0*pi*(Alpha*pi/180.0);
-		Cd0 = Cl*Cl/pi/AR;
+		Cl = 2.0*PI*(Alpha*PI/180.0);
+		Cd0 = Cl*Cl/PI/AR;
 	}
 	else Cd0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
 	if(IsError) bError = true;
 	if(!pFoil1)
 	{
-		Cl = 2.0*pi*(Alpha*pi/180.0);
-		Cd1 = Cl*Cl/pi/AR;
+		Cl = 2.0*PI*(Alpha*PI/180.0);
+		Cd1 = Cl*Cl/PI/AR;
 	}
 	else Cd1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha,2, IsOutRe, IsError);
 	if(IsOutRe) bOutRe = true;
@@ -5033,7 +5033,7 @@ void QMiarex::GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double
 	if(!pFoil0)
 	{
 		Alpha00 = 0.0;
-		Slope0 = 2.0 * pi *pi/180.0;
+		Slope0 = 2.0 * PI*PI/180.0;
 	}
 	else
 	{
@@ -5078,14 +5078,14 @@ void QMiarex::GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double
 		else
 		{
 			Alpha00 = 0.0;
-			Slope0  = 2.0 * pi *pi/180.0;
+			Slope0  = 2.0 * PI*PI/180.0;
 		}
 	}
 
 	if(!pFoil1)
 	{
 		Alpha01 = 0.0;
-		Slope1 = 2.0*pi *pi/180.0;
+		Slope1 = 2.0*PI*PI/180.0;
 	}
 	else
 	{
@@ -5128,7 +5128,7 @@ void QMiarex::GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double
 		}
 		else {
 			Alpha01 = 0.0;
-			Slope1 = 2.0*pi *pi/180.0;
+			Slope1 = 2.0*PI*PI/180.0;
 		}
 	}
 
@@ -6314,8 +6314,8 @@ void QMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List)
 	CVector C;
 	double factor, amp;
 
-	double sina = -sin(pWOpp->m_Alpha*pi/180.0);
-	double cosa =  cos(pWOpp->m_Alpha*pi/180.0);
+	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
+	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
 	double sign;
 
 	//DOWNWASH
@@ -6350,8 +6350,8 @@ void QMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List)
 					xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
 					pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
 
-					dih = -pWing->GetDihedral(yob)*pi/180.0;
-					amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*pi/180.0);
+					dih = -pWing->GetDihedral(yob)*PI/180.0;
+					amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
 					amp *= m_VelocityScale/2.0;
 					glBegin(GL_LINES);
 					{
@@ -6370,8 +6370,8 @@ void QMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List)
 						xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
 						pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
 
-						dih = -pWing->GetDihedral(yob)*pi/180.0;
-						amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*pi/180.0);
+						dih = -pWing->GetDihedral(yob)*PI/180.0;
+						amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
 						amp *= m_VelocityScale/2.0;
 
 						glVertex3d(xt + amp * cos(dih)* sina,
@@ -6450,8 +6450,8 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 	double Ir,Ig,Ib, Vr, Vg, Vb;
 	double amp, amp1, amp2;
 	double yob, xt, yt, zt, dih;
-	double cosa =  cos(pWOpp->m_Alpha * pi/180.0);
-	double sina = -sin(pWOpp->m_Alpha * pi/180.0);
+	double cosa =  cos(pWOpp->m_Alpha * PI/180.0);
+	double sina = -sin(pWOpp->m_Alpha * PI/180.0);
 
 	Icolor = m_IDragColor;
 	Istyle = m_IDragStyle;
@@ -6499,7 +6499,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 					xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
-					dih = pWing->GetDihedral(yob)*pi/180.0;
+					dih = pWing->GetDihedral(yob)*PI/180.0;
 					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
 					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
 					if(m_bICd)
@@ -6555,7 +6555,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
 							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 
-							dih = pWing->GetDihedral(yob)*pi/180.0;
+							dih = pWing->GetDihedral(yob)*PI/180.0;
 
 							amp  = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 							amp *= m_DragScale/coef;
@@ -6580,7 +6580,7 @@ void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
 							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
 							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 
-							dih = pWing->GetDihedral(yob)*pi/180.0;
+							dih = pWing->GetDihedral(yob)*PI/180.0;
 							amp=0.0;
 							if(m_bICd) amp+=pWOpp->m_ICd[i];
 							amp +=pWOpp->m_PCd[i];
@@ -6926,8 +6926,8 @@ void QMiarex::GLCreateLiftForce()
 
 		force *= m_LiftScale/500.0;
 
-		forcez =  force * cos(m_pCurWOpp->m_Alpha * pi/180.0);
-		forcex = -force * sin(m_pCurWOpp->m_Alpha * pi/180.0);
+		forcez =  force * cos(m_pCurWOpp->m_Alpha * PI/180.0);
+		forcex = -force * sin(m_pCurWOpp->m_Alpha * PI/180.0);
 
 		if (force>0.0) sign = 1.0; else sign = -1.0;
 		glLineStipple (1, 0xFFFF);// Solid
@@ -7010,7 +7010,7 @@ void QMiarex::GLCreateMoments()
 		{
 			for (i=0; i<=int(fabs(amp)); i++)
 			{
-				angle = sign*(double)i/500.0*pi;
+				angle = sign*(double)i/500.0*PI;
 				glVertex3d(radius*cos(angle),0.0,radius*sin(angle));
 			}
 		}
@@ -7053,7 +7053,7 @@ void QMiarex::GLCreateMoments()
 		glBegin(GL_LINE_STRIP);
 			for (i=0; i<=int(fabs(amp)); i++)
 			{
-				angle = sign*(double)i/500.0*pi;
+				angle = sign*(double)i/500.0*PI;
 				glVertex3d(0.0,radius*cos(angle),radius*sin(angle));
 			}
 		glEnd();
@@ -7092,7 +7092,7 @@ void QMiarex::GLCreateMoments()
 		{
 			for (i=0; i<=int(fabs(amp)); i++)
 			{
-				angle = sign*(double)i/500.0*pi;
+				angle = sign*(double)i/500.0*PI;
 				glVertex3d(-radius*cos(angle),-radius*sin(angle),0.0);
 			}
 		}
@@ -7137,8 +7137,8 @@ void QMiarex::GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List)
 	QColor color;
 
 	double amp, yob, xt, yt, zt, dih;
-	double cosa =  cos(pWOpp->m_Alpha * pi/180.0);
-	double sina = -sin(pWOpp->m_Alpha * pi/180.0);
+	double cosa =  cos(pWOpp->m_Alpha * PI/180.0);
+	double sina = -sin(pWOpp->m_Alpha * PI/180.0);
 
 	//LIFTLINE
 	glNewList(List,GL_COMPILE);
@@ -7171,7 +7171,7 @@ void QMiarex::GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List)
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 					xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i], yt, zt, 0);
-					dih = -pWing->GetDihedral(yob)*pi/180.0;
+					dih = -pWing->GetDihedral(yob)*PI/180.0;
 					amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 					amp *= m_LiftScale/1000.0;
 
@@ -7192,7 +7192,7 @@ void QMiarex::GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List)
 						xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = -pWing->GetDihedral(yob)*pi/180.0;
+						dih = -pWing->GetDihedral(yob)*PI/180.0;
 						amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 						amp *= m_LiftScale/1000.0;
 
@@ -7598,9 +7598,10 @@ void QMiarex::GLCreateSurfSpeeds()
 					sinT   = (ze-C.z)/length;
 					dlx     = 0.15*length;
 					dlz     = 0.07*length;
-					beta   = atan((ye-C.y)/length)*180.0/pi;
+					beta   = atan((ye-C.y)/length)*180.0/PI;
 				}
-				else {
+				else
+				{
 					cosT   = 0.0;
 					sinT   = 0.0;
 					dlx    = 0.0;
@@ -7685,7 +7686,7 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 						xt = pWing->GetOffset(yob) + pWOpp->m_XTrTop[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = pWing->GetDihedral(yob)*pi/180.0;
+						dih = pWing->GetDihedral(yob)*PI/180.0;
 						glVertex3d(xt,yt,zt);
 					}
 				}
@@ -7763,7 +7764,7 @@ void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
 						xt = pWing->GetOffset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = pWing->GetDihedral(yob)*pi/180.0;
+						dih = pWing->GetDihedral(yob)*PI/180.0;
 
 						glVertex3d(xt,yt, zt);
 					}
@@ -8011,7 +8012,7 @@ void QMiarex::GLCreateWingLegend()
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Tip Twist      = %1")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
+			Result = QString(tr("Tip Twist      = %1")+QString::fromUtf8("°")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
@@ -8023,7 +8024,7 @@ void QMiarex::GLCreateWingLegend()
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Root-Tip Sweep = %1")).arg(m_pCurWing->GetAverageSweep(),7,'f',2);
+			Result = QString(tr("Root-Tip Sweep = %1")+QString::fromUtf8("°")).arg(m_pCurWing->GetAverageSweep(),7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 		}
 
@@ -8091,7 +8092,7 @@ void QMiarex::GLCreateWOppLegend()
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/pi/m_pCurWing->m_AR;
+			double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/PI/m_pCurWing->m_AR;
 			Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
@@ -8309,22 +8310,22 @@ void QMiarex::GLDraw3D()
 			{
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr) * pi/180.0;
+					phi = (col * lon_incr) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = (row * lat_incr) * pi/180.0;
+						theta = (row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
 					}
 				}
 				glEnd();
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr ) * pi/180.0;
+					phi = (col * lon_incr ) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = -(row * lat_incr) * pi/180.0;
+						theta = -(row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
 					}
 				}
@@ -8337,7 +8338,7 @@ void QMiarex::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(phi) * cos(theta)*m_GLScale);
 				}
 			}
@@ -8348,7 +8349,7 @@ void QMiarex::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(-phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(-phi) * cos(theta)*m_GLScale);
 				}
 			}
@@ -8375,7 +8376,7 @@ void QMiarex::GLDraw3D()
 
 				for (row = -NumAngles; row < NumAngles; row++)
 				{
-					theta = (row * lat_incr) * pi/180.0;
+					theta = (row * lat_incr) * PI/180.0;
 					glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
 				}
 			}
@@ -8386,7 +8387,7 @@ void QMiarex::GLDraw3D()
 				theta = 0.;
 				for(col=-NumAngles; col<NumAngles; col++)
 				{
-					phi = (0.0 + (double)col*30.0/NumAngles) * pi/180.0;
+					phi = (0.0 + (double)col*30.0/NumAngles) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(phi) * cos(theta)*m_GLScale);
 				}
 			}
@@ -8898,13 +8899,13 @@ void QMiarex::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int Nu
 
 	for (col = 0; col < NumLongitudes; col++)
 	{
-		phi1 = (start_lon + col * lon_incr) * pi/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * pi/180.0;
+		phi1 = (start_lon + col * lon_incr) * PI/180.0;
+		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
 
 		for (row = 0; row < NumLatitudes; row++)
 		{
-			theta1 = (start_lat + row * lat_incr) * pi/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * pi/180.0;
+			theta1 = (start_lat + row * lat_incr) * PI/180.0;
+			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
 
 			u[0] = R * cos(phi1) * cos(theta1);//x
 			u[1] = R * sin(theta1);//y
@@ -9820,6 +9821,9 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Y:
 			m_bYPressed = true;
 			break;
+		case Qt::Key_L:
+			pMainFrame->OnLogFile();
+			break;
 		case Qt::Key_G:
 		{
 			if(m_pCurGraph)
@@ -10165,30 +10169,10 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 				if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
 				{
 					//zoom graph
+					m_pCurGraph->SetAuto(false);
+					if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.06);
+					else                            m_pCurGraph->Scale(1.0/1.06);
 
-	/*				if (shX & 0x8000)
-					{
-						//zoom x scale
-						m_pCurGraph->SetAutoX(false);
-						m_pCurGraph->SetAutoX(false);
-						if(point.x()-m_LastPoint.x()<0) m_pCurGraph->Scalex(1.04);
-						else                            m_pCurGraph->Scalex(1.0/1.04);
-					}
-					else if(shY & 0x8000)
-					{
-						//zoom y scale
-						m_pCurGraph->SetAutoY(false);
-						m_pCurGraph->SetAutoY(false);
-						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scaley(1.04);
-						else                            m_pCurGraph->Scaley(1.0/1.04);
-					}
-					else*/
-					{
-						//zoom both
-						m_pCurGraph->SetAuto(false);
-						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.06);
-						else                            m_pCurGraph->Scale(1.0/1.06);
-					}
 					UpdateView();
 				}
 				else if(m_pCurWing && m_iView==1)
@@ -10199,6 +10183,18 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 					UpdateView();
 				}
 			}
+		}
+		else if(m_pCurGraph)
+		{
+			MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+			double x1 = m_pCurGraph->ClientTox(event->x()) ;
+			double y1 = m_pCurGraph->ClientToy(event->y()) ;
+			pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(x1).arg(y1));
+		}
+		else
+		{
+			MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+			pMainFrame->statusBar()->clearMessage();
 		}
 	}
 	m_LastPoint = point;
@@ -10372,6 +10368,7 @@ void QMiarex::On3DView()
 	else m_pCurBody = NULL;
 
 	pMainFrame->SetCentralWidget();
+	pMainFrame->statusBar()->clearMessage();
 	m_pctrlMiddleControls->setCurrentIndex(0);
 	m_pctrBottomControls->setCurrentIndex(1);
 	UpdateView();
@@ -14206,7 +14203,7 @@ void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
 	painter.drawText(LeftPos, ZPos+D, Result);
 	D+=dheight;
 
-	str1 = QString(tr("TipTwist =   %1 deg")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
+	str1 = QString(tr("TipTwist =   %1")+QString::fromUtf8("°")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
@@ -14218,7 +14215,7 @@ void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Root-Tip Sweep = %1 deg")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
+	str1 = QString(tr("Root-Tip Sweep = %1")+QString::fromUtf8("°")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 
 	painter.restore();
@@ -14282,8 +14279,8 @@ void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		/*		oswald=CZ^2/CXi/pi/allongement;*/
-		double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/pi/m_pCurWing->m_AR;
+		/*		oswald=CZ^2/CXi/PI/allongement;*/
+		double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/PI/m_pCurWing->m_AR;
 		Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
@@ -14858,8 +14855,8 @@ QString QMiarex::RenameUFO(QString UFOName)
 void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-//	double cosa = cos(Angle*pi/180.0);
-//	double sina = sin(Angle*pi/180.0);
+//	double cosa = cos(Angle*PI/180.0);
+//	double sina = sin(Angle*PI/180.0);
 	int iLA, iLB, iTA, iTB;
 	CVector LATB, TALB, Pt, Ptr, Trans;
 
@@ -14926,8 +14923,8 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-//	double cosb = cos(Beta*pi/180.0);
-//	double sinb = sin(Beta*pi/180.0);
+//	double cosb = cos(Beta*PI/180.0);
+//	double sinb = sin(Beta*PI/180.0);
 	int iLA, iLB, iTA, iTB;
 	CVector LATB, TALB, Pt, Ptr, Trans;
 

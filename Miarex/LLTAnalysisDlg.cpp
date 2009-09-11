@@ -31,7 +31,7 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 	setWindowTitle(tr("LLT Analysis"));
 	SetupLayout();
 
-	m_IterGraph.SetXTitle("Iterations");
+	m_IterGraph.SetXTitle(tr("Iterations"));
 	m_IterGraph.SetYTitle("");
 
 	m_IterGraph.SetAuto(true);
@@ -45,7 +45,7 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 	m_IterGraph.SetYMax(1.0);
 	m_IterGraph.SetType(1);
 
-	m_IterGraph.SetXTitle("abs");
+	m_IterGraph.SetXTitle(tr("abs"));
 	m_IterGraph.SetYTitle("|Da|");
 
 	m_IterGraph.SetMargin(10);

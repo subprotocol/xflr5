@@ -63,14 +63,14 @@ void FoilGeomDlg::SetupLayout()
 	m_pctrlXCamberSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlXCamberSlide->setMinimumWidth(200);
 	m_pctrlXCamber = new FloatEdit;
-	QLabel *lab1 = new QLabel("Value");
-	QLabel *lab2 = new QLabel("%Chord");
-	QLabel *lab3 = new QLabel("0%");
-	QLabel *lab4 = new QLabel("10%");
-	QLabel *lab5 = new QLabel("Max x-pos");
-	QLabel *lab6 = new QLabel("%Chord");
-	QLabel *lab7 = new QLabel("0%");
-	QLabel *lab8 = new QLabel("100%");
+	QLabel *lab1 = new QLabel(tr("Value"));
+	QLabel *lab2 = new QLabel(tr("%Chord"));
+	QLabel *lab3 = new QLabel(tr("0%"));
+	QLabel *lab4 = new QLabel(tr("10%"));
+	QLabel *lab5 = new QLabel(tr("Max x-pos"));
+	QLabel *lab6 = new QLabel(tr("%Chord"));
+	QLabel *lab7 = new QLabel(tr("0%"));
+	QLabel *lab8 = new QLabel(tr("100%"));
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -105,7 +105,7 @@ void FoilGeomDlg::SetupLayout()
 	CamberData->addLayout(CambVal);
 	CamberData->addLayout(XCambVal);
 
-	QGroupBox *CamberGroup = new QGroupBox("Camber");
+	QGroupBox *CamberGroup = new QGroupBox(tr("Camber"));
 	CamberGroup->setLayout(CamberData);
 
 
@@ -120,12 +120,12 @@ void FoilGeomDlg::SetupLayout()
 	m_pctrlXThickSlide->setTickPosition(QSlider::TicksBelow);
 	m_pctrlXThickSlide->setMinimumWidth(200);
 	m_pctrlXThickness = new FloatEdit;
-	QLabel *lab11 = new QLabel("Value");
-	QLabel *lab12 = new QLabel("%Chord");
+	QLabel *lab11 = new QLabel(tr("Value"));
+	QLabel *lab12 = new QLabel(tr("%Chord"));
 	QLabel *lab13 = new QLabel("0%");
 	QLabel *lab14 = new QLabel("20%");
-	QLabel *lab15 = new QLabel("Max x-pos");
-	QLabel *lab16 = new QLabel("%Chord");
+	QLabel *lab15 = new QLabel(tr("Max x-pos"));
+	QLabel *lab16 = new QLabel(tr("%Chord"));
 	QLabel *lab17 = new QLabel("0%");
 	QLabel *lab18 = new QLabel("100%");
 
@@ -163,14 +163,14 @@ void FoilGeomDlg::SetupLayout()
 	ThicknessData->addLayout(ThickVal);
 	ThicknessData->addLayout(XThickVal);
 
-	QGroupBox *ThicknessGroup = new QGroupBox("Thickness");
+	QGroupBox *ThicknessGroup = new QGroupBox(tr("Thickness"));
 	ThicknessGroup->setLayout(ThicknessData);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));
 	CancelButton  = new QPushButton(tr("Cancel"));
-	RestoreButton  = new QPushButton("Restore");
+	RestoreButton  = new QPushButton(tr("Restore"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(RestoreButton);
 	CommandButtons->addStretch(1);
@@ -262,7 +262,7 @@ void FoilGeomDlg::Apply()
 
 	if(pXFoil->nb>IQX)
 	{
-		QMessageBox::information(window(), tr("Warning"), "Panel number cannot exceed 300");
+		QMessageBox::information(window(), tr("Warning"), tr("Panel number cannot exceed 300"));
 		//reset everything and retry
 		for (i=0; i< m_pMemFoil->nb; i++)
 		{

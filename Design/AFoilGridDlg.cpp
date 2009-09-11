@@ -28,7 +28,7 @@
 
 AFoilGridDlg::AFoilGridDlg(void *pParent)
 {
-	setWindowTitle("Grid Options");
+	setWindowTitle(tr("Grid Options"));
 	m_pAFoil = pParent;
 
 	m_bScale = false;
@@ -146,12 +146,12 @@ void AFoilGridDlg::InitDialog()
 void AFoilGridDlg::SetupLayout()
 {
 	QGridLayout *GridData = new QGridLayout;
-	m_pctrlNeutralShow = new QCheckBox("Neutral Line");
-	m_pctrlScale       = new QCheckBox("X-Scale");
-	m_pctrlXMajShow = new QCheckBox("X Major Grid");
-	m_pctrlYMajShow = new QCheckBox("Y Major Grid");
-	m_pctrlXMinShow = new QCheckBox("X Minor Grid");
-	m_pctrlYMinShow = new QCheckBox("Y Minor Grid");
+	m_pctrlNeutralShow = new QCheckBox(tr("Neutral Line"));
+	m_pctrlScale       = new QCheckBox(tr("X-Scale"));
+	m_pctrlXMajShow = new QCheckBox(tr("X Major Grid"));
+	m_pctrlYMajShow = new QCheckBox(tr("Y Major Grid"));
+	m_pctrlXMinShow = new QCheckBox(tr("X Minor Grid"));
+	m_pctrlYMinShow = new QCheckBox(tr("Y Minor Grid"));
 
 	m_pctrlNeutralStyle = new LineButton;
 	m_pctrlXMajStyle = new LineButton;

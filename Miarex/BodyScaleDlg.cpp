@@ -35,6 +35,7 @@
 
 BodyScaleDlg::BodyScaleDlg(void *pParent )
 {
+	setWindowTitle(tr("Body Scale Dialog"));
 	m_pGL3dBodyDlg = pParent;
 	m_XFactor = 1.0;
 	m_YFactor = 1.0;
@@ -84,8 +85,8 @@ void BodyScaleDlg::SetupLayout()
 //	move(r.width()/3, r.height()/6);
 
 	QGridLayout *TopLayout = new QGridLayout;
-	m_pctrlBody  = new QRadioButton("Whole Body");
-	m_pctrlFrame = new QRadioButton("Frame Only");
+	m_pctrlBody  = new QRadioButton(tr("Whole Body"));
+	m_pctrlFrame = new QRadioButton(tr("Frame Only"));
 	m_pctrlFrameID = new FloatEdit(10);
 	m_pctrlFrameID->SetPrecision(0);
 	TopLayout->addWidget(m_pctrlBody,1,1);
@@ -99,10 +100,10 @@ void BodyScaleDlg::SetupLayout()
 	m_pctrlXScaleFactor->SetPrecision(3);
 	m_pctrlYScaleFactor->SetPrecision(3);
 	m_pctrlZScaleFactor->SetPrecision(3);
-	QLabel *lab0 = new QLabel("Scale Factor");
-	QLabel *lab1 = new QLabel("X Scale");
-	QLabel *lab2 = new QLabel("Y Scale");
-	QLabel *lab3 = new QLabel("Z Scale");
+	QLabel *lab0 = new QLabel(tr("Scale Factor"));
+	QLabel *lab1 = new QLabel(tr("X Scale"));
+	QLabel *lab2 = new QLabel(tr("Y Scale"));
+	QLabel *lab3 = new QLabel(tr("Z Scale"));
 	ScaleLayout->addWidget(lab0,1,2);
 	ScaleLayout->addWidget(lab1,2,1);
 	ScaleLayout->addWidget(lab2,3,1);

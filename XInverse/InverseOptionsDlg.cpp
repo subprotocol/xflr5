@@ -25,7 +25,7 @@
 
 InverseOptionsDlg::InverseOptionsDlg()
 {
-	setWindowTitle("XInverse Style");
+	setWindowTitle(tr("XInverse Style"));
 	m_pXInverse = NULL;
 	SetupLayout();
 
@@ -38,10 +38,10 @@ void InverseOptionsDlg::SetupLayout()
 	m_pctrlSpline    = new LineButton;
 	m_pctrlReflected = new LineButton;
 
-	QLabel * lab1 = new QLabel("Reference Foil");
-	QLabel * lab2 = new QLabel("Modified Foil");
-	QLabel * lab3 = new QLabel("Spline");
-	QLabel * lab4 = new QLabel("Reflected Curve");
+	QLabel * lab1 = new QLabel(tr("Reference Foil"));
+	QLabel * lab2 = new QLabel(tr("Modified Foil"));
+	QLabel * lab3 = new QLabel(tr("Spline"));
+	QLabel * lab4 = new QLabel(tr("Reflected Curve"));
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -58,8 +58,8 @@ void InverseOptionsDlg::SetupLayout()
 	StyleLayout->addWidget(m_pctrlReflected,4,2);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton      = new QPushButton("OK");
-	QPushButton *CancelButton  = new QPushButton("Cancel");
+	QPushButton *OKButton      = new QPushButton(tr("OK"));
+	QPushButton *CancelButton  = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);

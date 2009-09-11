@@ -37,7 +37,7 @@ BatchDlg::BatchDlg(void *pParent)
 
 	m_IterRect.setRect(327,158,620-327,398-158);
 
-	m_RmsGraph.SetXTitle("Iter");
+	m_RmsGraph.SetXTitle(tr("Iter"));
 	m_RmsGraph.SetYTitle("");//Change from bl newton system solution
 
 	m_RmsGraph.SetAuto(true);
@@ -64,7 +64,6 @@ BatchDlg::BatchDlg(void *pParent)
 
 	m_pXFoil       = NULL;
 	m_Iterations = 0;
-	pi = 3.141592654;
 
 	SetLayout();
 	connect(m_pctrlClose, SIGNAL(clicked()), this, SLOT(OnClose()));
@@ -89,26 +88,26 @@ BatchDlg::BatchDlg(void *pParent)
 void BatchDlg::SetLayout()
 {
 	QHBoxLayout *AnalysisType = new QHBoxLayout;
-	m_rbtype1 = new	QRadioButton("Type 1");
-	m_rbtype2 = new QRadioButton("Type 2");
-	m_rbtype3 = new QRadioButton("Type 3");
-	m_rbtype4 = new QRadioButton("Type 4");
+	m_rbtype1 = new	QRadioButton(tr("Type 1"));
+	m_rbtype2 = new QRadioButton(tr("Type 2"));
+	m_rbtype3 = new QRadioButton(tr("Type 3"));
+	m_rbtype4 = new QRadioButton(tr("Type 4"));
 	AnalysisType->addWidget(m_rbtype1);
 	AnalysisType->addWidget(m_rbtype2);
 	AnalysisType->addWidget(m_rbtype3);
 	AnalysisType->addWidget(m_rbtype4);
 //	AnalysisType->setMaximumHeight(50);
-	QGroupBox *AnalysisTypeGroup = new QGroupBox("Analysis Type");
+	QGroupBox *AnalysisTypeGroup = new QGroupBox(tr("Analysis Type"));
 	AnalysisTypeGroup->setLayout(AnalysisType);
 //	AnalysisTypeGroup->setMaximumHeight(70);
 
 	QGridLayout *BatchVars = new QGridLayout;
-	m_rbRange1 = new QRadioButton("Range");
-	m_rbRange2 = new QRadioButton("Re List");
-	m_pctrlEditList = new QPushButton("Edit List");
-	QLabel *MinVal   = new QLabel("Min");
-	QLabel *MaxVal   = new QLabel("Max");
-	QLabel *DeltaVal = new QLabel("Increment");
+	m_rbRange1 = new QRadioButton(tr("Range"));
+	m_rbRange2 = new QRadioButton(tr("Re List"));
+	m_pctrlEditList = new QPushButton(tr("Edit List"));
+	QLabel *MinVal   = new QLabel(tr("Min"));
+	QLabel *MaxVal   = new QLabel(tr("Max"));
+	QLabel *DeltaVal = new QLabel(tr("Increment"));
 	MinVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	MaxVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	DeltaVal->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
@@ -131,22 +130,22 @@ void BatchDlg::SetLayout()
 	BatchVars->addWidget(m_pctrlReDelta, 3, 4);
 	BatchVars->addWidget(m_pctrlMaType, 4, 1);
 	BatchVars->addWidget(m_pctrlMach, 4, 2);
-	QGroupBox *BatchVarsGroup = new QGroupBox("Batch Variables");
+	QGroupBox *BatchVarsGroup = new QGroupBox(tr("Batch Variables"));
 	BatchVarsGroup->setLayout(BatchVars);
 
 
 	QGridLayout *RangeVars = new QGridLayout;
-	QLabel *Spec = new QLabel("Specify");
+	QLabel *Spec = new QLabel(tr("Specify"));
 	m_rbspec1 = new QRadioButton("Alpha");
 	m_rbspec2 = new QRadioButton("Cl");
-	m_pctrlFromZero   = new QCheckBox("From Zero");
-	QLabel *SpecMin   = new QLabel("Min");
-	QLabel *SpecMax   = new QLabel("Max");
-	QLabel *SpecDelta = new QLabel("Increment");
+	m_pctrlFromZero   = new QCheckBox(tr("From Zero"));
+	QLabel *SpecMin   = new QLabel(tr("Min"));
+	QLabel *SpecMax   = new QLabel(tr("Max"));
+	QLabel *SpecDelta = new QLabel(tr("Increment"));
 	SpecMin->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	SpecMax->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	SpecDelta->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-	m_pctrlSpecVar    = new QLabel("Spec =");
+	m_pctrlSpecVar    = new QLabel(tr("Spec ="));
 	m_pctrlSpecMin    = new FloatEdit(0.00);
 	m_pctrlSpecMax    = new FloatEdit(1.00);
 	m_pctrlSpecDelta  = new FloatEdit(0.50);
@@ -161,16 +160,16 @@ void BatchDlg::SetLayout()
 	RangeVars->addWidget(m_pctrlSpecMin, 3, 2);
 	RangeVars->addWidget(m_pctrlSpecMax, 3, 3);
 	RangeVars->addWidget(m_pctrlSpecDelta, 3, 4);
-	QGroupBox *RangeVarsGroup = new QGroupBox("Analysis Range");
+	QGroupBox *RangeVarsGroup = new QGroupBox(tr("Analysis Range"));
 	RangeVarsGroup->setLayout(RangeVars);
 
 
 	QGridLayout *TransVars = new QGridLayout;
-	QLabel *FreeTransMethod = new QLabel("Free transitions (e^n)");
-	QLabel *NCritLabel = new QLabel("NCrit=");
-	QLabel *ForcedTransMethod = new QLabel("Forced transitions");
-	QLabel *TopTransLabel = new QLabel("Trip Location (top)");
-	QLabel *BotTransLabel = new QLabel("Trip Location (bottom)");
+	QLabel *FreeTransMethod = new QLabel(tr("Free transitions (e^n)"));
+	QLabel *NCritLabel = new QLabel(tr("NCrit="));
+	QLabel *ForcedTransMethod = new QLabel(tr("Forced transitions"));
+	QLabel *TopTransLabel = new QLabel(tr("Trip Location (top)"));
+	QLabel *BotTransLabel = new QLabel(tr("Trip Location (bottom)"));
 	NCritLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	TopTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	BotTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
@@ -185,10 +184,10 @@ void BatchDlg::SetLayout()
 	TransVars->addWidget(m_pctrlXTopTr, 2, 3);
 	TransVars->addWidget(BotTransLabel, 3, 2);
 	TransVars->addWidget(m_pctrlXBotTr, 3, 3);
-	QGroupBox *TransVarsGroup = new QGroupBox("Transitions Data");
+	QGroupBox *TransVarsGroup = new QGroupBox(tr("Transitions Data"));
 	TransVarsGroup->setLayout(TransVars);
 
-	m_pctrlInitBL         = new QCheckBox("Initialize BLs between polars");
+	m_pctrlInitBL         = new QCheckBox(tr("Initialize BLs between polars"));
 
 	//_*_*_*_*_*_*_**_*_*_**_*_*_*_
 	m_pctrlTextOutput = new QTextEdit;
@@ -200,10 +199,10 @@ void BatchDlg::SetLayout()
 //	m_pctrlGraphOutput->setMinimumHeight(300);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	m_pctrlClose     = new QPushButton("Close");
+	m_pctrlClose     = new QPushButton(tr("Close"));
 	m_pctrlAnalyze   = new QPushButton(tr("Analyze"))	;
-	m_pctrlSkipOpp   = new QPushButton("Skip Opp");
-	m_pctrlSkipPolar = new QPushButton("Skip Polar");
+	m_pctrlSkipOpp   = new QPushButton(tr("Skip Opp"));
+	m_pctrlSkipPolar = new QPushButton(tr("Skip Polar"));
 	m_pctrlAnalyze->setAutoDefault(true);
 
 	CommandButtons->addStretch(1);
@@ -285,7 +284,7 @@ void BatchDlg::AlphaLoop()
 				// here we go !
 				if (!pXFoil->specal())
 				{
-					str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
+					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 					QMessageBox::information(this, tr("Warning"), str);
 					m_bCancel = true;
 					CleanUp();
@@ -393,7 +392,7 @@ void BatchDlg::CleanUp()
 	m_pctrlClose->setEnabled(true);
 	m_pctrlSkipOpp->setEnabled(false);
 	m_pctrlSkipPolar->setEnabled(false);
-	m_pctrlAnalyze->setText("Analyze");
+	m_pctrlAnalyze->setText(tr("Analyze"));
 	m_bIsRunning = false;
 	m_bCancel    = false;
 	m_bSkipPoint = false;
@@ -504,7 +503,7 @@ void BatchDlg::InitDialog()
 	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 
 	m_FoilName = pXDirect->m_pCurFoil->m_FoilName;
-	QString str = "Batch analysis for "+ m_FoilName;
+	QString str = tr("Batch analysis for ")+ m_FoilName;
 	setWindowTitle(str);
 
 	m_pctrlMach->SetPrecision(2);
@@ -643,7 +642,7 @@ bool BatchDlg::InitXFoil2()
 		if(!pXFoil->SetMach())
 		{
 			QString str;
-			str = "Invalid Analysis Settings\nCPCALC: local speed too large \n Compressibility corrections invalid ";
+			str = tr("Invalid Analysis Settings\nCPCALC: local speed too large \n Compressibility corrections invalid ");
 			QMessageBox::information(window(), tr("Warning"), str);
 		}
 	}
@@ -683,7 +682,7 @@ bool BatchDlg::Iterate()
 	if(!pXFoil->viscal())
 	{
 		pXFoil->lvconv = false;//point is unconverged
-		str ="CpCalc: local speed too large \r\n Compressibility corrections invalid";
+		str =tr("CpCalc: local speed too large \r\n Compressibility corrections invalid");
 		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
@@ -718,7 +717,7 @@ bool BatchDlg::Iterate()
 	if(!pXFoil->ViscalEnd())
 	{
 		pXFoil->lvconv = false;//point is unconverged
-		str ="CpCalc: local speed too large \r\n Compressibility corrections invalid";
+		str =tr("CpCalc: local speed too large \r\n Compressibility corrections invalid");
 		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
@@ -853,7 +852,7 @@ void BatchDlg::OnType1()
 		m_pctrlSpecMin->SetPrecision(0);
 		m_pctrlSpecMax->SetPrecision(0);
 		m_pctrlSpecDelta->SetPrecision(0);
-		m_pctrlSpecVar->setText("&Reynolds =");
+		m_pctrlSpecVar->setText("Reynolds =");
 		m_rbspec1->setEnabled(false);
 		m_rbspec2->setEnabled(false);
 
@@ -914,7 +913,7 @@ void BatchDlg::OnAnalyze()
 	pXFoil->lvisc = true;
 	pXFoil->m_bTrace = false;
 
-	m_pctrlAnalyze->setText("Cancel");
+	m_pctrlAnalyze->setText(tr("Cancel"));
 	m_pctrlSkipOpp->setEnabled(true);
 	m_pctrlSkipPolar->setEnabled(true);
 
@@ -1102,7 +1101,7 @@ void BatchDlg::ReLoop()
 					if(m_bAlpha)
 					{
 						alphadeg = SpMin+ia*SpInc;
-						pXFoil->alfa = alphadeg * pi/180.0;
+						pXFoil->alfa = alphadeg * PI/180.0;
 						pXFoil->lalfa = true;
 						pXFoil->qinf = 1.0;
 						str = QString("Alpha = %1").arg(alphadeg,9,'f',3);
@@ -1112,7 +1111,7 @@ void BatchDlg::ReLoop()
 						// here we go !
 						if (!pXFoil->specal())
 						{
-							str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
+							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
@@ -1130,7 +1129,7 @@ void BatchDlg::ReLoop()
 						UpdateOutput(str);
 						if(!pXFoil->speccl())
 						{
-							str ="Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ";
+							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
 							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
@@ -1266,11 +1265,11 @@ void BatchDlg::SetPlrName()
 
 void BatchDlg::StartAnalysis()
 {
-	m_pctrlAnalyze->setText("Cancel");
+	m_pctrlAnalyze->setText(tr("Cancel"));
 	if(m_Type !=4) 	ReLoop();
 	else            AlphaLoop();
 
-	QString strong = "Analysis completed";
+	QString strong = tr("Analysis completed");
 	UpdateOutput(strong);
 
 	CleanUp();
@@ -1284,7 +1283,7 @@ void BatchDlg::UpdateGraph(double Re, double Alpha)
 
 	if(Re>0.0)
 	{
-		QString strong = QString("Re=%1  /  Alpha=%2").arg(Re,8,'f',0).arg(Alpha*180.0/pi,5,'f',2);
+		QString strong = QString("Re=%1  /  Alpha=%2").arg(Re,8,'f',0).arg(Alpha*180.0/PI,5,'f',2);
 //		QPoint Place(int((BltRect.left+BltRect.right)/2), BltRect.top+10);
 //		dcMem.TextOut(Place.x, Place.y, strong);
 //		dcMem.SelectObject(pOldFont);

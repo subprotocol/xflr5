@@ -33,7 +33,7 @@
 
 EditPlrDlg::EditPlrDlg()
 {
-	setWindowTitle("Polar Points Edition");
+	setWindowTitle(tr("Polar Points Edition"));
 	m_pMiarex     = NULL;
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
@@ -179,10 +179,10 @@ void EditPlrDlg::OnDeleteAllPoints()
 void EditPlrDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlDeleteAllPoints= new QPushButton("Delete All Points");
-	m_pctrlDeletePoint	= new QPushButton("Delete Point");
-	OKButton            = new QPushButton("OK");
-	CancelButton        = new QPushButton("Cancel");
+	m_pctrlDeleteAllPoints= new QPushButton(tr("Delete All Points"));
+	m_pctrlDeletePoint	= new QPushButton(tr("Delete Point"));
+	OKButton            = new QPushButton(tr("OK"));
+	CancelButton        = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(m_pctrlDeleteAllPoints);
 	CommandButtons->addWidget(m_pctrlDeletePoint);

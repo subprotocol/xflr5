@@ -31,7 +31,7 @@ void *LEDlg::s_pXFoil;
 
 LEDlg::LEDlg()
 {
-	setWindowTitle("Leading Edge");
+	setWindowTitle(tr("Leading Edge"));
 	m_LErfac    = 1.0;
 	m_Blend     = 0.1;
 	m_pAFoil    = NULL;
@@ -52,10 +52,10 @@ LEDlg::LEDlg()
 void LEDlg::SetupLayout()
 {
 	QHBoxLayout *LEValue = new QHBoxLayout;
-	QLabel *lab1 = new QLabel("New approximate L.E. new/old ratio");
+	QLabel *lab1 = new QLabel(tr("New approximate L.E. new/old ratio"));
 	lab1->setMinimumWidth(200);
 	lab1->setAlignment(Qt::AlignRight);
-	QLabel *lab2 = new QLabel("ratio");
+	QLabel *lab2 = new QLabel(tr("ratio"));
 	lab2->setMinimumWidth(80);
 	m_pctrlLE = new FloatEdit;
 	LEValue->addWidget(lab1);
@@ -63,10 +63,10 @@ void LEDlg::SetupLayout()
 	LEValue->addWidget(lab2);
 
 	QHBoxLayout *BlendValue = new QHBoxLayout;
-	QLabel *lab3 = new QLabel("Blending Distance from L.E.");
+	QLabel *lab3 = new QLabel(tr("Blending Distance from L.E."));
 	lab3->setMinimumWidth(200);
 	lab3->setAlignment(Qt::AlignRight);
-	QLabel *lab4 = new QLabel("% chord");
+	QLabel *lab4 = new QLabel(tr("% chord"));
 	lab4->setMinimumWidth(80);
 	m_pctrlBlend = new FloatEdit;
 	BlendValue->addWidget(lab3);
@@ -181,7 +181,7 @@ void LEDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), tr("Warning"), "Unrecognized foil format");
+		QMessageBox::information(window(), tr("Warning"), tr("Unrecognized foil format"));
 		return;
 	}
 
@@ -192,7 +192,7 @@ void LEDlg::OnApply()
 
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(window(), tr("Warning"), "Panel number cannot exceed 300");
+		QMessageBox::information(window(), tr("Warning"), tr("Panel number cannot exceed 300"));
 		//reset everything and retry
 		for (i=0; i< m_pMemFoil->nb; i++)
 		{

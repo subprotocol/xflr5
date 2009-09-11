@@ -31,7 +31,7 @@ void *NacaFoilDlg::s_pXFoil;
 
 NacaFoilDlg::NacaFoilDlg()
 {
-	setWindowTitle("NACA Foils");
+	setWindowTitle(tr("NACA Foils"));
 	m_pAFoil = NULL;
 	m_pXDirect = NULL;
 	m_bApplied   = false;
@@ -45,8 +45,8 @@ void NacaFoilDlg::SetLayout()
 {
 
 	QGridLayout *MainGrid = new QGridLayout;
-	QLabel *NacaNumber   = new QLabel("4 or 5 digits");
-	QLabel *PanelNumber  = new QLabel("Number of Panels");
+	QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
+	QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
 	m_pctrlNumber = new QLineEdit("0000");
 	m_pctrlPanels = new QLineEdit("100");
@@ -69,9 +69,9 @@ void NacaFoilDlg::SetLayout()
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton = new QPushButton("OK");
+	OKButton = new QPushButton(tr("OK"));
 	OKButton->setAutoDefault(false);
-	CancelButton = new QPushButton("Cancel");
+	CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setAutoDefault(false);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
@@ -125,21 +125,21 @@ void NacaFoilDlg::GenerateFoil()
 		if(three!=210 && three !=220 && three !=230 && three !=240 && three !=250)
 		{
 			m_pctrlNumber->selectAll();
-			m_pctrlMessage->setText("Illegal NACA Number");
+			m_pctrlMessage->setText(tr("Illegal NACA Number"));
 			m_bGenerated = false;
 			return;
 		}
 		if(!pXFoil->naca5(m_Digits, panels))
 		{
 			m_bGenerated = false;
-			m_pctrlMessage->setText("Illegal NACA Number");
+			m_pctrlMessage->setText(tr("Illegal NACA Number"));
 			return;
 		}
 	}
 	else
 	{
 		m_pctrlNumber->selectAll();
-		m_pctrlMessage->setText("Illegal NACA Number");
+		m_pctrlMessage->setText(tr("Illegal NACA Number"));
 		m_bGenerated = false;
 		return;
 	}

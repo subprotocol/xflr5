@@ -29,7 +29,7 @@ void *TEGapDlg::s_pXFoil;
 
 TEGapDlg::TEGapDlg()
 {
-	setWindowTitle("T.E. Gap");
+	setWindowTitle(tr("T.E. Gap"));
 	m_Gap   = 0.0;
 	m_Blend = 0.8;
 	m_pAFoil   = NULL;
@@ -50,20 +50,20 @@ TEGapDlg::TEGapDlg()
 void TEGapDlg::SetupLayout()
 {
 	QHBoxLayout *GapValue = new QHBoxLayout;
-	QLabel *lab1 = new QLabel("T.E. Gap Value");
+	QLabel *lab1 = new QLabel(tr("T.E. Gap Value"));
 	lab1->setAlignment(Qt::AlignRight);
 	lab1->setMinimumWidth(150);
-	QLabel *lab2 = new QLabel("% chord");
+	QLabel *lab2 = new QLabel(tr("% chord"));
 	m_pctrlGap = new FloatEdit;
 	GapValue->addWidget(lab1);
 	GapValue->addWidget(m_pctrlGap);
 	GapValue->addWidget(lab2);
 
 	QHBoxLayout *BlendValue = new QHBoxLayout;
-	QLabel *lab3 = new QLabel("Blending Distance from L.E.");
+	QLabel *lab3 = new QLabel(tr("Blending Distance from L.E."));
 	lab3->setAlignment(Qt::AlignRight);
 	lab3->setMinimumWidth(150);
-	QLabel *lab4 = new QLabel("% chord");
+	QLabel *lab4 = new QLabel(tr("% chord"));
 	m_pctrlBlend = new FloatEdit;
 	BlendValue->addWidget(lab3);
 	BlendValue->addWidget(m_pctrlBlend);
@@ -183,7 +183,7 @@ void TEGapDlg::OnApply()
 	}
 	else
 	{
-		QMessageBox::information(window(), tr("Warning"), "Unrecognized foil format");
+		QMessageBox::information(window(), tr("Warning"), tr("Unrecognized foil format"));
 		return;
 	}
 
@@ -193,7 +193,7 @@ void TEGapDlg::OnApply()
 	pXFoil->tgap(m_Gap/100.0,m_Blend/100.0);
 	if(pXFoil->n>IQX)
 	{
-		QMessageBox::information(window(), tr("Warning"), "Panel number cannot exceed 300");
+		QMessageBox::information(window(), tr("Warning"), tr("Panel number cannot exceed 300"));
 		//reset everything and retry
 		for (i=0; i< m_pMemFoil->nb; i++)
 		{

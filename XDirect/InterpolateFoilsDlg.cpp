@@ -29,7 +29,7 @@ void *InterpolateFoilsDlg::s_pXFoil;
 
 InterpolateFoilsDlg::InterpolateFoilsDlg()
 {
-	setWindowTitle("Interpolate Foils");
+	setWindowTitle(tr("Interpolate Foils"));
 	m_pXDirect = NULL;
 	m_pAFoil = NULL;
 	m_pMainFrame = NULL;
@@ -70,11 +70,11 @@ void InterpolateFoilsDlg::SetupLayout()
 	LeftSide->addWidget(m_pctrlThick2);
 	LeftSide->addStretch(2);
 	QVBoxLayout *Foil3 = new QVBoxLayout;
-	m_pctrlNewFoilName = new QLineEdit("New Foil Name");
+	m_pctrlNewFoilName = new QLineEdit(tr("New Foil Name"));
 	Foil3->addWidget(m_pctrlNewFoilName);
 	Foil3->addWidget(m_pctrlCamb3);
 	Foil3->addWidget(m_pctrlThick3);
-	QGroupBox *Foil3Group = new QGroupBox("Interpolated Foil");
+	QGroupBox *Foil3Group = new QGroupBox(tr("Interpolated Foil"));
 	Foil3Group->setLayout(Foil3);
 	LeftSide->addWidget(Foil3Group);
 

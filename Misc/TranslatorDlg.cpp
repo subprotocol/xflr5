@@ -36,7 +36,6 @@ TranslatorDlg::TranslatorDlg(void *pParent)
 	QString LanguageName = tr("English");// will be translated in the ts & qm files and this will be used to fill the QListWidget
 
 	SetupLayout();
-	InitDialog();
 }
 
 
@@ -108,8 +107,8 @@ void TranslatorDlg::InitDialog()
 
 QStringList TranslatorDlg::findQmFiles()
 {
-	QDir dir;
-	dir.setPath( QDir::current().path()+"/translations");
+	QDir dir(m_TranslationDirPath);
+
 	if(!dir.exists())
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+dir.path()+tr("does not exist"));

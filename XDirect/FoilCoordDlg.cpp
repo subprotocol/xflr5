@@ -31,7 +31,7 @@
 
 FoilCoordDlg::FoilCoordDlg()
 {
-	setWindowTitle("Foil Coordinates");
+	setWindowTitle(tr("Foil Coordinates"));
 	m_pAFoil      = NULL;
 	m_pXDirect    = NULL;
 	m_pBufferFoil = NULL;
@@ -289,12 +289,12 @@ void FoilCoordDlg::SetSelection(int sel)
 void FoilCoordDlg::SetupLayout()
 {
 	QVBoxLayout *CommandButtons = new QVBoxLayout;
-	m_pctrlInsertPoint	= new QPushButton("Insert Point");
-	m_pctrlDeletePoint	= new QPushButton("Delete Point");
-	m_pctrlRestore      = new QPushButton("Restore");
+	m_pctrlInsertPoint	= new QPushButton(tr("Insert Point"));
+	m_pctrlDeletePoint	= new QPushButton(tr("Delete Point"));
+	m_pctrlRestore      = new QPushButton(tr("Restore"));
 	m_pctrlApply        = new QPushButton(tr("Apply"));
-	OKButton            = new QPushButton("OK");
-	CancelButton        = new QPushButton("Cancel");
+	OKButton            = new QPushButton(tr("OK"));
+	CancelButton        = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(m_pctrlInsertPoint);
 	CommandButtons->addWidget(m_pctrlDeletePoint);

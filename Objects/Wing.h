@@ -161,7 +161,7 @@ protected:
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
 	double m_FlapMoment[2*MAXPANELS];
 
-	double pi;		//
+	//
 	double m_Span;		// wing span
 	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord

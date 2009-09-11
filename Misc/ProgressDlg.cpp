@@ -52,14 +52,14 @@ void ProgressDlg::InitDialog(int min, int max)
 
 void ProgressDlg::SetupLayout()
 {
-	setWindowTitle("Progress");
+	setWindowTitle(tr("Progress"));
 	m_pctrlProgress = new QProgressBar;
 	m_pctrlProgress->setOrientation(Qt::Horizontal);
 	m_pctrlProgress->setMinimum(0);
 	m_pctrlProgress->setMaximum(100);
 	m_pctrlProgress->setValue(0);
 
-	CancelButton = new QPushButton("Cancel");
+	CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setDefault(true);
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 

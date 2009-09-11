@@ -72,7 +72,7 @@ QList <void*> *GL3dBodyDlg::s_poaBody;
 
 GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 {
-	setWindowTitle("Body Edition");
+	setWindowTitle(tr("Body Edition"));
 	setWindowFlags(Qt::Window);
 	setSizeGripEnabled(true);
 //	setAttribute(Qt::WA_QuitOnClose );
@@ -149,12 +149,12 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_ArcBall.m_pRect    = &m_rCltRect;
 
 
-	m_pInsertPoint      = new QAction("Insert", this);
-	m_pRemovePoint      = new QAction("Remove", this);
-	m_pScaleBody        = new QAction("Scale", this);
-	m_pGrid             = new QAction("Grid Setup", this);
-	m_pResetScales      = new QAction("Reset Scales", this);
-	m_pShowCurFrameOnly = new QAction("Show Current Frame Only", this);
+	m_pInsertPoint      = new QAction(tr("Insert"), this);
+	m_pRemovePoint      = new QAction(tr("Remove"), this);
+	m_pScaleBody        = new QAction(tr("Scale"), this);
+	m_pGrid             = new QAction(tr("Grid Setup"), this);
+	m_pResetScales      = new QAction(tr("Reset Scales"), this);
+	m_pShowCurFrameOnly = new QAction(tr("Show Current Frame Only"), this);
 	m_pShowCurFrameOnly->setCheckable(true);
 
 	m_pUndo= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
@@ -264,6 +264,7 @@ void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 		}
 	}
 }
+
 
 void GL3dBodyDlg::FillFrameDataTable()
 {
@@ -529,7 +530,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	if(nx*nh>=10000)
 	{
 		QString strong;
-		strong = QString("Resolution cannot exceed %1").arg(10000);
+		strong = QString(tr("Resolution cannot exceed %1")).arg(10000);
 		QMessageBox::warning(this, tr("Warning"), strong);
 		return;
 	}

@@ -1252,7 +1252,7 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -1270,6 +1270,9 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 			StopAnimate();
 			UpdateView();
+			break;
+		case Qt::Key_L:
+			pMainFrame->OnLogFile();
 			break;
 		case Qt::Key_X:
 			m_bXPressed = true;
@@ -1494,40 +1497,17 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 		m_PointDown = pt;
 	}
 
-	else if (m_pCurFoil &&
-			((event->buttons() & Qt::MidButton) || event->modifiers().testFlag(Qt::AltModifier)))
+	else if (m_pCurFoil && ((event->buttons() & Qt::MidButton) || event->modifiers().testFlag(Qt::AltModifier)))
 	{
 		// we zoom the graph or the foil		
 		if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt) && m_bCpGraph)
 		{ 
 			//zoom graph
 
-/*			SHORT shX = GetKeyState('X');
-			SHORT shY = GetKeyState('Y');
+			m_pCurGraph->SetAuto(false);
+			if(pt.y()-m_PointDown.y()<0) m_pCurGraph->Scale(1.06);
+			else                         m_pCurGraph->Scale(1.0/1.06);
 
-			if (shX & 0x8000)
-			{
-				//zoom x scale
-				m_pCurGraph->SetAutoX(false);
-				m_pCurGraph->SetAutoX(false);
-				if(pt.y()-m_PointDown().y<0) m_pCurGraph->Scalex(1.04);
-				else                         m_pCurGraph->Scalex(1.0/1.04);
-			}
-			else if(shY & 0x8000)
-			{
-				//zoom y scale
-				m_pCurGraph->SetAutoY(false);
-				m_pCurGraph->SetAutoY(false);
-				if(pt.y()-m_PointDown().y<0) m_pCurGraph->Scaley(1.04);
-				else                         m_pCurGraph->Scaley(1.0/1.04);
-			}
-			else*/
-			{
-				//zoom both
-				m_pCurGraph->SetAuto(false);
-				if(pt.y()-m_PointDown.y()<0) m_pCurGraph->Scale(1.06);
-				else                         m_pCurGraph->Scale(1.0/1.06);
-			}
 
 			if(!m_bAnimate) UpdateView();
 		}
@@ -1547,6 +1527,18 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 
 		}
 		m_PointDown = pt;
+	}
+	else if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt))
+	{
+		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+		double x1 = m_pCurGraph->ClientTox(event->x()) ;
+		double y1 = m_pCurGraph->ClientToy(event->y()) ;
+		pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(x1).arg(y1));
+	}
+	else
+	{
+		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+		pMainFrame->statusBar()->clearMessage();
 	}
 }
 

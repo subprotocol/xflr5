@@ -25,7 +25,7 @@
 
 RenameDlg::RenameDlg(void *pParent)
 {
-	setWindowTitle("Rename");
+	setWindowTitle(tr("Rename"));
 	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
 	SetupLayout();
@@ -109,7 +109,7 @@ void RenameDlg::InitDialog()
 	}
 	else
 	{
-		m_pctrlMessage->setText("Enter a name");
+		m_pctrlMessage->setText(tr("Enter a name"));
 	}
 	m_StartName = m_strName;
 	m_pctrlName->setText(m_StartName);
@@ -179,8 +179,8 @@ void RenameDlg::OnOK()
 		strong = m_pstrArray->at(l);
 		if(strong == m_strName)
 		{
-			QString str = "Do you wish to overwrite "+m_strName + " ?";
-			if (QMessageBox::Yes == QMessageBox::question(window(), "Question", str,
+			QString str = tr("Do you wish to overwrite ")+m_strName + " ?";
+			if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
 														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			{
 				done(10);

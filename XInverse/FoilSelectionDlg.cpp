@@ -27,7 +27,7 @@
 
 FoilSelectionDlg::FoilSelectionDlg()
 {
-	setWindowTitle("Foil Selection");
+	setWindowTitle(tr("Foil Selection"));
 	m_poaFoil = NULL;
 	m_FoilName = "";
 	SetupLayout();

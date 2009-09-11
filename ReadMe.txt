@@ -1,4 +1,4 @@
-﻿	
+	
 *******************************************************************************
 
 
@@ -47,6 +47,16 @@ Licence :
 
 
                        **************************
+
+QFLR5 v0.03 Beta
+	- Marked more sentences for translsation
+	- Corrected Tail volume calculation - was missing a PI/180 coefficient ; no impact on results
+	
+
+QFLR5 v0.02 Beta September 1st 2009
+	- Corrected many bugs
+	- Made a few minor enhancements
+
 
 QFLR5 v0.01 Beta July 4th 2009 - first release
 	QFLR5 is a re-write of XFLR5 using the Qt4 libraries. 

@@ -55,7 +55,7 @@ QList <void*> *GL3dWingDlg::s_poaFoil;
 
 GL3dWingDlg::GL3dWingDlg(void *pParent)
 {
-	setWindowTitle("Wing Edition");
+	setWindowTitle(tr("Wing Edition"));
 	setWindowFlags(Qt::Window);
 	setSizeGripEnabled(true);
 
@@ -119,13 +119,13 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pRect    = &m_rCltRect;
 
 
-//	m_pSetupLight    = new QAction("Light Setup", this);
-	m_pResetScales   = new QAction("Reset Scales", this);
-	m_pInsertBefore  = new QAction("Insert Before", this);
-	m_pInsertAfter   = new QAction("Insert after", this);
-	m_pDeleteSection = new QAction("Delete section", this);
+//	m_pSetupLight    = new QAction(tr("Light Setup"), this);
+	m_pResetScales   = new QAction(tr("Reset Scales"), this);
+	m_pInsertBefore  = new QAction(tr("Insert Before"), this);
+	m_pInsertAfter   = new QAction(tr("Insert after"), this);
+	m_pDeleteSection = new QAction(tr("Delete section"), this);
 
-	m_pContextMenu = new QMenu("Section",this);
+	m_pContextMenu = new QMenu(tr("Section"),this);
 	m_pContextMenu->addAction(m_pInsertBefore);
 	m_pContextMenu->addAction(m_pInsertAfter);
 	m_pContextMenu->addAction(m_pDeleteSection);
@@ -140,7 +140,7 @@ bool GL3dWingDlg::CheckWing()
 {
 	if(!m_pWing->m_WingName.length())
 	{
-		QMessageBox::warning(this, tr("Warning"), "Please enter a name for the wing");
+		QMessageBox::warning(this, tr("Warning"), tr("Please enter a name for the wing"));
 		m_pctrlWingName->setFocus();
 		return false;
 	}
@@ -155,14 +155,14 @@ bool GL3dWingDlg::CheckWing()
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, tr("Warning"), "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
 	}
 
 	if(m_pWing->m_nFlaps>=20)
 	{
-		QString strong = "Only 10 flaps x 2 will be handled";
-		if (QMessageBox::Ok != QMessageBox::question(window(), "Question", strong, QMessageBox::Ok|QMessageBox::Cancel))
+		QString strong = tr("Only 10 flaps x 2 will be handled");
+		if (QMessageBox::Ok != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Ok|QMessageBox::Cancel))
 		  return false;
 	}
 	return true;
@@ -1459,9 +1459,9 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingModel->setRowCount(30);//temporary
 	m_pWingModel->setColumnCount(10);
 
-	m_pWingModel->setHeaderData(0, Qt::Horizontal, "y ("+str+")");
-	m_pWingModel->setHeaderData(1, Qt::Horizontal, "chord ("+str+")");
-	m_pWingModel->setHeaderData(2, Qt::Horizontal, "offset ("+str+")");
+	m_pWingModel->setHeaderData(0, Qt::Horizontal, tr("y (")+str+")");
+	m_pWingModel->setHeaderData(1, Qt::Horizontal, tr("chord (")+str+")");
+	m_pWingModel->setHeaderData(2, Qt::Horizontal, tr("offset (")+str+")");
 	m_pWingModel->setHeaderData(3, Qt::Horizontal, QObject::tr("dihedral"));
 	m_pWingModel->setHeaderData(4, Qt::Horizontal, QObject::tr("twist"));
 	m_pWingModel->setHeaderData(5, Qt::Horizontal, QObject::tr("foil"));
@@ -1901,12 +1901,12 @@ void GL3dWingDlg::OnInsertBefore()
 
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, tr("Warning"), "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
 	}
 	if(m_iSection<=0)
 	{
-		QMessageBox::warning(this, tr("Warning"), "No insertion possible before the first section");
+		QMessageBox::warning(this, tr("Warning"), tr("No insertion possible before the first section"));
 		return;
 	}
 	int k,n,total, ny;
@@ -1958,7 +1958,7 @@ void GL3dWingDlg::OnInsertAfter()
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, tr("Warning"), "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
 	}
 	int k,n,ny,total;
@@ -2297,7 +2297,7 @@ void GL3dWingDlg::reject()
 	if(m_bChanged)
 	{
 		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, "Question", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			return;
 	}
 	m_bChanged = false;
@@ -2459,11 +2459,11 @@ void GL3dWingDlg::SetCurrentSection(int section)
 		m_pctrlDeleteSection->setEnabled(true);
 
 		QString str;
-		str = QString("Insert after section %1").arg(m_iSection+1);
+		str = QString(tr("Insert after section %1")).arg(m_iSection+1);
 		m_pctrlInsertAfter->setText(str);
-		str = QString("Insert before section %1").arg(m_iSection+1);
+		str = QString(tr("Insert before section %1")).arg(m_iSection+1);
 		m_pctrlInsertBefore->setText(str);
-		str = QString("Delete section %1").arg(m_iSection+1);
+		str = QString(tr("Delete section %1")).arg(m_iSection+1);
 		m_pctrlDeleteSection->setText(str);
 	}
 	m_bResetglSectionHighlight = true;
@@ -2642,13 +2642,13 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlVolumeUnit->setAlignment(Qt::AlignLeft);
 
 	QGridLayout *DataLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel("Wing Span");
-	QLabel *lab2 = new QLabel("Area");
-	QLabel *lab3 = new QLabel("Projected Span");
-	QLabel *lab4 = new QLabel("Projected Area");
-	QLabel *lab5 = new QLabel("Volume");
-	QLabel *lab13 = new QLabel("Total VLM Panels");
-	QLabel *lab14 = new QLabel("Number of 3D Panels");
+	QLabel *lab1 = new QLabel(tr("Wing Span"));
+	QLabel *lab2 = new QLabel(tr("Area"));
+	QLabel *lab3 = new QLabel(tr("Projected Span"));
+	QLabel *lab4 = new QLabel(tr("Projected Area"));
+	QLabel *lab5 = new QLabel(tr("Volume"));
+	QLabel *lab13 = new QLabel(tr("Total VLM Panels"));
+	QLabel *lab14 = new QLabel(tr("Number of 3D Panels"));
 	lab1->setAlignment(Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignRight);
 	lab3->setAlignment(Qt::AlignRight);
@@ -2690,21 +2690,21 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
-	QLabel *lab15 = new QLabel("Max is 1000");
+	QLabel *lab15 = new QLabel(tr("Max is 1000"));
 	lab13->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab15 ,13,3);
-	QLabel *lab16 = new QLabel("Max is 2000");
+	QLabel *lab16 = new QLabel(tr("Max is 2000"));
 	lab15->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab16, 14, 3);
 
 
-	QLabel *lab20 = new QLabel("Mean Geom. Chord");
-	QLabel *lab21 = new QLabel("Mean Aero Chord");
-	QLabel *lab22 = new QLabel("MAC Span Pos");
-	QLabel *lab23 = new QLabel("Aspect ratio");
-	QLabel *lab24 = new QLabel("Taper Ratio");
-	QLabel *lab25 = new QLabel("Root to Tip Sweep");
-	QLabel *lab26 = new QLabel("Number of Flaps");
+	QLabel *lab20 = new QLabel(tr("Mean Geom. Chord"));
+	QLabel *lab21 = new QLabel(tr("Mean Aero Chord"));
+	QLabel *lab22 = new QLabel(tr("MAC Span Pos"));
+	QLabel *lab23 = new QLabel(tr("Aspect ratio"));
+	QLabel *lab24 = new QLabel(tr("Taper Ratio"));
+	QLabel *lab25 = new QLabel(tr("Root to Tip Sweep"));
+	QLabel *lab26 = new QLabel(tr("Number of Flaps"));
 	lab20->setAlignment(Qt::AlignRight);
 	lab21->setAlignment(Qt::AlignRight);
 	lab22->setAlignment(Qt::AlignRight);
@@ -2744,7 +2744,7 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrlLength3, 6, 3);
 	DataLayout->addWidget(m_pctrlLength4, 7, 3);
 	DataLayout->addWidget(m_pctrlLength5, 8, 3);
-	QLabel *lab30 = new QLabel("deg");
+	QLabel *lab30 = new QLabel(QString::fromUtf8("°"));
 	lab30->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab30, 11, 3);
 
@@ -2752,7 +2752,7 @@ void GL3dWingDlg::SetupLayout()
 /*_____________End Top Right Layout Here______________*/
 
 	m_pctrlWingDescription = new QTextEdit();
-	m_pctrlWingDescription->setToolTip("Enter here a short description for the wing");
+	m_pctrlWingDescription->setToolTip(tr("Enter here a short description for the wing"));
 
 	QLabel *WingDescription = new QLabel(tr("Description:"));
 
@@ -2761,12 +2761,12 @@ void GL3dWingDlg::SetupLayout()
 	QVBoxLayout *RightLayout = new QVBoxLayout;
 
 	QGridLayout *ThreeDParams = new QGridLayout;
-	m_pctrlAxes       = new QCheckBox("Axes");
-	m_pctrlLight      = new QCheckBox("Light");
-	m_pctrlSurfaces   = new QCheckBox("Surfaces");
-	m_pctrlOutline    = new QCheckBox("Outline");
-	m_pctrlPanels     = new QCheckBox("Panels");
-	m_pctrlFoilNames  = new QCheckBox("Foil Names");
+	m_pctrlAxes       = new QCheckBox(tr("Axes"));
+	m_pctrlLight      = new QCheckBox(tr("Light"));
+	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
+	m_pctrlOutline    = new QCheckBox(tr("Outline"));
+	m_pctrlPanels     = new QCheckBox(tr("Panels"));
+	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
@@ -2779,12 +2779,12 @@ void GL3dWingDlg::SetupLayout()
 	ThreeDParams->addWidget(m_pctrlLight, 3,1);
 	ThreeDParams->addWidget(m_pctrlFoilNames, 3,2);
 
-	m_pctrlX          = new QPushButton("X");
-	m_pctrlY          = new QPushButton("Y");
-	m_pctrlZ          = new QPushButton("Z");
-	m_pctrlIso        = new QPushButton("Iso");
-	m_pctrlPickCenter = new QPushButton("Pick Center");
-	m_pctrlReset      = new QPushButton("Reset Scales");
+	m_pctrlX          = new QPushButton(tr("X"));
+	m_pctrlY          = new QPushButton(tr("Y"));
+	m_pctrlZ          = new QPushButton(tr("Z"));
+	m_pctrlIso        = new QPushButton(tr("Iso"));
+	m_pctrlPickCenter = new QPushButton(tr("Pick Center"));
+	m_pctrlReset      = new QPushButton(tr("Reset Scales"));
 	m_pctrlPickCenter->setSizePolicy(szPolicyMinimum);
 	m_pctrlPickCenter->setCheckable(true);
 	m_pctrlReset->setSizePolicy(szPolicyMinimum);
@@ -2811,7 +2811,7 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
 
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
-	QLabel *ClipLabel = new QLabel("Clip Plane");
+	QLabel *ClipLabel = new QLabel(tr("Clip Plane"));
 	ClipLabel->setSizePolicy(szPolicyMaximum);
 	ThreeDViewControls->addWidget(ClipLabel);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
@@ -2969,7 +2969,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, tr("Warning"), "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
 	}
 	return true;

@@ -29,6 +29,7 @@
 
 GL3DScales::GL3DScales(QWidget *parent)
 {
+	setWindowTitle(tr("3D Scales Settings"));
 	m_pMainFrame = NULL;
 	m_pMiarex = NULL;
 
@@ -67,13 +68,13 @@ void GL3DScales::SetupLayout()
 
 
 	QGridLayout *CpScaleLayout = new QGridLayout;
-	m_pctrlAutoCpScale = new QCheckBox("Auto Scales");
+	m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
 	m_pctrlLegendMin = new FloatEdit(61.234);
 	m_pctrlLegendMax = new FloatEdit(3.5555);
 	m_pctrlLegendMin->SetPrecision(2);
 	m_pctrlLegendMax->SetPrecision(2);
-	QLabel *lab0 = new QLabel("Min");
-	QLabel *lab1 = new QLabel("Max");
+	QLabel *lab0 = new QLabel(tr("Min"));
+	QLabel *lab1 = new QLabel(tr("Max"));
 	lab0->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 	lab1->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 	CpScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
@@ -81,7 +82,7 @@ void GL3DScales::SetupLayout()
 	CpScaleLayout->addWidget(m_pctrlLegendMin,2,2);
 	CpScaleLayout->addWidget(lab1,3,1);
 	CpScaleLayout->addWidget(m_pctrlLegendMax,3,2);
-	QGroupBox *CpScaleBox = new QGroupBox("Cp Scale");
+	QGroupBox *CpScaleBox = new QGroupBox(tr("Cp Scale"));
 	CpScaleBox->setLayout(CpScaleLayout);
 
 //_______________________3D Scales
@@ -110,9 +111,9 @@ void GL3DScales::SetupLayout()
 	SliderLayout->addWidget(m_pctrlVelocityScaleSlider);
 
 	QVBoxLayout *LabelLayout = new QVBoxLayout;
-	QLabel *lab2 = new QLabel("Lift ");
-	QLabel *lab3 = new QLabel("Drag ");
-	QLabel *lab4 = new QLabel("Velocity ");
+	QLabel *lab2 = new QLabel(tr("Lift "));
+	QLabel *lab3 = new QLabel(tr("Drag "));
+	QLabel *lab4 = new QLabel(tr("Velocity "));
 	LabelLayout->addWidget(lab2);
 	LabelLayout->addWidget(lab3);
 	LabelLayout->addWidget(lab4);
@@ -120,7 +121,7 @@ void GL3DScales::SetupLayout()
 	QHBoxLayout *ScaleLayout = new QHBoxLayout;
 	ScaleLayout->addLayout(LabelLayout);
 	ScaleLayout->addLayout(SliderLayout);
-	QGroupBox *ScaleBox = new QGroupBox("Vector Scales");
+	QGroupBox *ScaleBox = new QGroupBox(tr("Vector Scales"));
 	ScaleBox->setLayout(ScaleLayout);
 
 //__________________________________	Streamlines
@@ -133,14 +134,14 @@ void GL3DScales::SetupLayout()
 	m_pctrlLengthUnit1 = new QLabel("miles");
 	m_pctrlLengthUnit2 = new QLabel("km");
 	m_pctrlLengthUnit3 = new QLabel("m");
-	m_pctrlLE = new QRadioButton("L.E.");
-	m_pctrlTE = new QRadioButton("T.E.");
-	m_pctrlLine = new QRadioButton("Y-Line");
-	QLabel *lab5 = new QLabel("X-axis points");
-	QLabel *lab6 = new QLabel("1st segment");
-	QLabel *lab7 = new QLabel("X factor");
-	QLabel *lab8 = new QLabel("X-Offset");
-	QLabel *lab9 = new QLabel("Z-Offset");
+	m_pctrlLE = new QRadioButton(tr("L.E."));
+	m_pctrlTE = new QRadioButton(tr("T.E."));
+	m_pctrlLine = new QRadioButton(tr("Y-Line"));
+	QLabel *lab5 = new QLabel(tr("X-axis points"));
+	QLabel *lab6 = new QLabel(tr("1st segment"));
+	QLabel *lab7 = new QLabel(tr("X factor"));
+	QLabel *lab8 = new QLabel(tr("X-Offset"));
+	QLabel *lab9 = new QLabel(tr("Z-Offset"));
 	lab5->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 	lab6->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
 	lab7->setAlignment(Qt::AlignVCenter |Qt::AlignRight);
@@ -155,7 +156,7 @@ void GL3DScales::SetupLayout()
 	LengthLayout->addWidget(m_pctrlLengthUnit1, 2, 3);
 	LengthLayout->addWidget(lab7, 3, 1);
 	LengthLayout->addWidget(m_pctrlXFactor, 3, 2);
-	QGroupBox *LengthBox = new QGroupBox("Streamline length");
+	QGroupBox *LengthBox = new QGroupBox(tr("Streamline length"));
 	LengthBox->setLayout(LengthLayout);
 
 	QHBoxLayout *LineLayout = new QHBoxLayout;
@@ -172,7 +173,7 @@ void GL3DScales::SetupLayout()
 	QVBoxLayout *StartLayout = new QVBoxLayout;
 	StartLayout->addLayout(LineLayout);
 	StartLayout->addLayout(OffsetLayout);
-	QGroupBox *StartBox = new QGroupBox("Start Streamline at");
+	QGroupBox *StartBox = new QGroupBox(tr("Start Streamline at"));
 	StartBox->setLayout(StartLayout);
 
 	ApplyButton = new QPushButton(tr("Apply"));

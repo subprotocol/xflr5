@@ -26,7 +26,7 @@
 
 SplineCtrlsDlg::SplineCtrlsDlg()
 {
-	setWindowTitle("Spline Parameters");
+	setWindowTitle(tr("Spline Parameters"));
 	m_pSF = NULL;
 	m_pPF = NULL;
 	SetuLayout();
@@ -76,10 +76,10 @@ void SplineCtrlsDlg::InitDialog()
 void SplineCtrlsDlg::SetuLayout()
 {
 	QGridLayout *Layout = new QGridLayout;
-	QLabel *lab1 = new QLabel("Spline degree");
-	QLabel *lab2 = new QLabel("Output");
-	QLabel *lab3 = new QLabel("Upper Surface");
-	QLabel *lab4 = new QLabel("Lower Surface");
+	QLabel *lab1 = new QLabel(tr("Spline degree"));
+	QLabel *lab2 = new QLabel(tr("Output"));
+	QLabel *lab3 = new QLabel(tr("Upper Surface"));
+	QLabel *lab4 = new QLabel(tr("Lower Surface"));
 	m_pctrlDegIntrados = new QComboBox;
 	m_pctrlDegExtrados = new QComboBox;
 	m_pctrlOutExtrados = new FloatEdit;
@@ -98,8 +98,8 @@ void SplineCtrlsDlg::SetuLayout()
 	Layout->addWidget(m_pctrlOutIntrados, 3,3);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton        = new QPushButton("OK");
-	CancelButton    = new QPushButton("Cancel");
+	OKButton        = new QPushButton(tr("OK"));
+	CancelButton    = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addWidget(CancelButton);

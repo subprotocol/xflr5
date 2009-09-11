@@ -216,9 +216,9 @@ void LinePickerDlg::SetStyle(int style)
 void LinePickerDlg::SetupLayout()
 {
 	QGridLayout *StyleLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel("Style");
-	QLabel *lab2 = new QLabel("Width");
-	QLabel *lab3 = new QLabel("Color");
+	QLabel *lab1 = new QLabel(tr("Style"));
+	QLabel *lab2 = new QLabel(tr("Width"));
+	QLabel *lab3 = new QLabel(tr("Color"));
 	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);

@@ -31,7 +31,7 @@
  
 WPolarDlg::WPolarDlg()
 {
-	setWindowTitle("Analysis Definition");
+	setWindowTitle(tr("Analysis Definition"));
 	m_pMainFrame = NULL;
 	m_pWing      = NULL;
 	m_pPlane     = NULL;
@@ -670,7 +670,7 @@ void WPolarDlg::SetupLayout()
 	PlaneGroup->setLayout(PlaneLayout);
 
 	QVBoxLayout *FlightLayout = new QVBoxLayout;
-	m_pctrlWingLoad = new QLabel("Wing Loading = 0.033 kg/dm2");
+	m_pctrlWingLoad  = new QLabel("Wing Loading = 0.033 kg/dm2");
 	m_pctrlSRe       = new QLabel("SRe");
 	m_pctrlRRe       = new QLabel("RRe");
 	m_pctrlQInfCl    = new QLabel("QInfCl");

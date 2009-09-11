@@ -38,6 +38,7 @@ void *BodyGridDlg::s_pMainFrame;
 
 BodyGridDlg::BodyGridDlg()
 {
+	setWindowTitle(tr("Body Grid Dialog"));
 	m_bScale = false;
 
 	m_bGrid = false;
@@ -112,11 +113,11 @@ void BodyGridDlg::SetupLayout()
 //	setMinimumHeight(r.height()/3);
 //	move(r.width()/3, r.height()/6);
 
-	m_pctrlScales   = new QCheckBox("Show Scales");
-	m_pctrlGrid     = new QCheckBox("Main Grid");
-	m_pctrlGrid2    = new QCheckBox("Main Grid");
-	m_pctrlMinGrid  = new QCheckBox("Minor Grid");
-	m_pctrlMinGrid2 = new QCheckBox("Minor Grid");
+	m_pctrlScales   = new QCheckBox(tr("Show Scales"));
+	m_pctrlGrid     = new QCheckBox(tr("Main Grid"));
+	m_pctrlGrid2    = new QCheckBox(tr("Main Grid"));
+	m_pctrlMinGrid  = new QCheckBox(tr("Minor Grid"));
+	m_pctrlMinGrid2 = new QCheckBox(tr("Minor Grid"));
 
 	m_pctrlLine  = new LineButton;
 	m_pctrlLine2 = new LineButton;
@@ -145,7 +146,7 @@ void BodyGridDlg::SetupLayout()
 	BodyLayout->addWidget(m_pctrlMinUnit,2,3);
 	BodyLayout->addWidget(m_pctrlLength2, 2,4);
 
-	QGroupBox *BodyBox = new QGroupBox("Body Grid");
+	QGroupBox *BodyBox = new QGroupBox(tr("Body Grid"));
 	BodyBox->setLayout(BodyLayout);
 
 	m_pctrlLength3 = new QLabel("mm");
@@ -161,12 +162,12 @@ void BodyGridDlg::SetupLayout()
 	FrameLayout->addWidget(m_pctrlMinUnit2,2,3);
 	FrameLayout->addWidget(m_pctrlLength4, 2,4);
 
-	QGroupBox *FrameBox = new QGroupBox("Frame Grid");
+	QGroupBox *FrameBox = new QGroupBox(tr("Frame Grid"));
 	FrameBox->setLayout(FrameLayout);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	QPushButton *OKButton = new QPushButton("OK");
-	QPushButton *Cancel = new QPushButton("Cancel");
+	QPushButton *OKButton = new QPushButton(tr("OK"));
+	QPushButton *Cancel = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);

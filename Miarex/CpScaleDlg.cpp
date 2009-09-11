@@ -28,6 +28,7 @@
 
 CpScaleDlg::CpScaleDlg(void *pParent)
 {
+	setWindowTitle(tr("CpScale Settings"));
 	m_LegendMin = 0.0;
 	m_LegendMax = 1.0;
 	m_bAutoCpScale = true;
@@ -42,13 +43,13 @@ CpScaleDlg::CpScaleDlg(void *pParent)
 void CpScaleDlg::SetupLayout()
 {
 	QGridLayout *ScaleLayout = new QGridLayout;
-	m_pctrlAutoCpScale = new QCheckBox("Auto Scales");
+	m_pctrlAutoCpScale = new QCheckBox(tr("Auto Scales"));
 	m_pctrlLegendMin = new FloatEdit(61.234);
 	m_pctrlLegendMax = new FloatEdit(3.5555);
 	m_pctrlLegendMin->SetPrecision(2);
 	m_pctrlLegendMax->SetPrecision(2);
-	QLabel *lab0 = new QLabel("Min");
-	QLabel *lab1 = new QLabel("Max");
+	QLabel *lab0 = new QLabel(tr("Min"));
+	QLabel *lab1 = new QLabel(tr("Max"));
 	ScaleLayout->addWidget(m_pctrlAutoCpScale,1,2);
 	ScaleLayout->addWidget(lab0,2,1);
 	ScaleLayout->addWidget(m_pctrlLegendMin,2,2);
