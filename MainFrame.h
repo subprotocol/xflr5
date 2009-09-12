@@ -258,7 +258,7 @@ private:
 	QAction *AFoilSetTEGap, *AFoilSetLERadius, *AFoilSetFlap, *AFoilInterpolateFoils, *AFoilNacaFoils;
 	QAction *AFoilDerotateFoil, *AFoilNormalizeFoil, *AFoilRefineLocalFoil, *AFoilRefineGlobalFoil;
 	QAction *AFoilEditCoordsFoil, *AFoilScaleFoil;
-	QAction *AFoilLECircle;
+	QAction *AFoilLECircle, *m_pShowLegend;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;

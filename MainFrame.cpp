@@ -571,6 +571,10 @@ void MainFrame::CreateAFoilActions()
 	AFoilExport = new QAction(tr("Export..."), this);
 	connect(AFoilExport, SIGNAL(triggered()), pAFoil, SLOT(OnExportCurFoil()));
 
+	m_pShowLegend= new QAction(tr("Show Legend"), this);
+	m_pShowLegend->setCheckable(true);
+	connect(m_pShowLegend, SIGNAL(triggered()), pAFoil, SLOT(OnShowLegend()));
+
 	ShowCurrentFoil= new QAction(tr("Show Current Foil"), this);
 	connect(ShowCurrentFoil, SIGNAL(triggered()), pAFoil, SLOT(OnShowCurrentFoil()));
 
@@ -638,6 +642,8 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(ShowAllFoils);
 	AFoilViewMenu->addAction(HideAllFoils);
 	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(m_pShowLegend);
+	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(zoomInAct);
 	AFoilViewMenu->addAction(zoomLessAct);
 	AFoilViewMenu->addAction(ResetXScaleAct);
@@ -694,6 +700,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(ResetYScaleAct);
 	AFoilCtxMenu->addAction(ResetXYScaleAct);
 	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(m_pShowLegend);
 	AFoilCtxMenu->addAction(AFoilLECircle);
 	AFoilCtxMenu->addAction(AFoilGridAct);
 	AFoilCtxMenu->addSeparator();

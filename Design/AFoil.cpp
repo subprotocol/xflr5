@@ -154,6 +154,8 @@ void QAFoil::CheckButtons()
 	pMainFrame->AFoilSetFlap->setEnabled(m_pCurFoil);
 	pMainFrame->AFoilSetLERadius->setEnabled(m_pCurFoil);
 	pMainFrame->AFoilSetTEGap->setEnabled(m_pCurFoil);
+
+	pMainFrame->m_pShowLegend->setChecked(m_bShowLegend);
 }
 
 
@@ -2077,6 +2079,14 @@ void QAFoil::OnShowCurrentFoil()
 
 }
 
+
+
+void QAFoil::OnShowLegend()
+{
+	m_bShowLegend = !m_bShowLegend;
+	UpdateView();
+	CheckButtons();
+}
 
 
 

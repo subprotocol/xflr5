@@ -94,6 +94,7 @@ private slots:
 	void OnHideAllFoils();
 	void OnHideCurrentFoil();
 	void OnShowCurrentFoil();
+	void OnShowLegend();
 	void OnStoreSplines();
 	void OnZoomIn();
 	void OnZoomLess();
