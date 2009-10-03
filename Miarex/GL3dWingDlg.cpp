@@ -2110,7 +2110,7 @@ void GL3dWingDlg::OnScaleWing()
 {
 	WingScaleDlg dlg;
 	dlg.m_pMainFrame = s_pMainFrame;
-	dlg.InitDialog(m_pWing->m_Span, m_pWing->m_TChord[0], m_pWing->GetAverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
+	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->m_TChord[0], m_pWing->GetAverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -2477,7 +2477,7 @@ void GL3dWingDlg::SetWingScale()
 //if(m_bIs3DScaleSet) return;
 
 	//wing along X axis will take 3/4 of the screen
-	m_glScaled = (GLfloat)(3./4.*2.0/m_pWing->m_Span);
+	m_glScaled = (GLfloat)(3./4.*2.0/m_pWing->m_PlanformSpan);
 	m_glViewportTrans.x = 0.0;
 	m_glViewportTrans.y = 0.0;
 	m_glViewportTrans.z = 0.0;
@@ -2505,10 +2505,10 @@ void GL3dWingDlg::SetWingData()
 	str = QString("%1").arg(m_pWing->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
 	m_pctrlWingVolume->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_Area*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pWing->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	m_pctrlWingArea->setText(str);
 
-	str = QString("%1").arg(m_pWing->m_Span*pMainFrame->m_mtoUnit,5,'f',2);
+	str = QString("%1").arg(m_pWing->m_PlanformSpan*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
 
 	str = QString("%1").arg(m_pWing->m_ProjectedArea*pMainFrame->m_m2toUnit,7,'f',2);
@@ -2909,7 +2909,7 @@ int GL3dWingDlg::VLMGetPanelTotal()
 	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
 	double MinPanelSize;
 	if(pMiarex->m_MinPanelSize>0.0) MinPanelSize = pMiarex->m_MinPanelSize;
-	else                            MinPanelSize = m_pWing->m_Span/1000.0;
+	else                            MinPanelSize = m_pWing->m_PlanformSpan/1000.0;
 
 	int total = 0;
 	for (int i=0; i<m_pWing->m_NPanel; i++)
@@ -2958,7 +2958,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 //		d2 = 5./2./m_pWing->m_Span/m_pWing->m_Span/m_pWing->m_Span *8. * pow(m_pWing->m_TPos[i+1],3) + 0.5;
 //		m_pWing->m_NYPanels[i] = (int) (NYTotal * (0.8*d1+0.2*d2)* (m_pWing->m_TPos[i+1]-m_pWing->m_TPos[i])/m_pWing->m_Span);
 
-		m_pWing->m_NYPanels[i] = (int)(fabs(m_pWing->m_TPos[i+1] - m_pWing->m_TPos[i])* (double)NYTotal/m_pWing->m_Span);
+		m_pWing->m_NYPanels[i] = (int)(fabs(m_pWing->m_TPos[i+1] - m_pWing->m_TPos[i])* (double)NYTotal/m_pWing->m_PlanformSpan);
 
 		m_pWing->m_NXPanels[i] = (int) (size/NYTotal);
 		m_pWing->m_NXPanels[i] = qMin(m_pWing->m_NXPanels[i], MAXCHORDPANELS);

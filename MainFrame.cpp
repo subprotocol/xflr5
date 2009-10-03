@@ -1,21 +1,21 @@
 /****************************************************************************
 
-    MainFrame  Class
+	MainFrame  Class
 	Copyright (C) 2008-2009 Andre Deperrois xflr5@yahoo.com
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
 
@@ -34,7 +34,7 @@
 #include "Miarex/UFOTableDelegate.h"
 #include "Misc/AboutQ5.h"
 #include "Misc/DisplaySettingsDlg.h"
-#include "Misc/RenameDlg.h" 
+#include "Misc/RenameDlg.h"
 #include "Misc/LinePickerDlg.h"
 #include "Misc/UnitsDlg.h"
 #include "Misc/SaveOptionsDlg.h"
@@ -56,7 +56,7 @@
 
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
-    : QMainWindow(parent, flags)
+	: QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
 	m_VersionName = "QFLR5 v0.03 Beta";
@@ -202,23 +202,23 @@ void MainFrame::AddFoil(CFoil *pFoil)
 
 CPolar* MainFrame::AddPolar(CPolar *pPolar)
 {
-    if(!pPolar) return NULL;
-    bool bExists   = false;
-    bool bInserted = false;
-    bool bFound;
-    CPolar *pOldPlr;
-    CPolar *pOld2Plr;
-    QString strong;
-    int i,j,k,l,p;
+	if(!pPolar) return NULL;
+	bool bExists   = false;
+	bool bInserted = false;
+	bool bFound;
+	CPolar *pOldPlr;
+	CPolar *pOld2Plr;
+	QString strong;
+	int i,j,k,l,p;
 
-    for (i=0; i<m_oaPolar.size(); i++)
-    {
+	for (i=0; i<m_oaPolar.size(); i++)
+	{
 	pOldPlr = (CPolar*)m_oaPolar.at(i);
 	if (pOldPlr->m_PlrName  == pPolar->m_PlrName &&
 		pOldPlr->m_FoilName == pPolar->m_FoilName) bExists = true;
-    }
-    while(!bInserted)
-    {
+	}
+	while(!bInserted)
+	{
 		if(!bExists)
 		{
 			for (j=0; j<m_oaPolar.size(); j++)
@@ -304,8 +304,8 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 			}
 			bExists = false;
 		}
-    }
-    return NULL;
+	}
+	return NULL;
 }
 
 
@@ -447,7 +447,7 @@ void MainFrame::CreateActions()
 	connect(OnMiarexAct, SIGNAL(triggered()), this, SLOT(OnMiarex()));
 
 	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
- 	saveAct->setShortcut(tr("Ctrl+S"));
+	saveAct->setShortcut(tr("Ctrl+S"));
 	saveAct->setStatusTip(tr("Save the project to disk"));
 	connect(saveAct, SIGNAL(triggered()), this, SLOT(OnSaveProject()));
 
@@ -571,10 +571,6 @@ void MainFrame::CreateAFoilActions()
 	AFoilExport = new QAction(tr("Export..."), this);
 	connect(AFoilExport, SIGNAL(triggered()), pAFoil, SLOT(OnExportCurFoil()));
 
-	m_pShowLegend= new QAction(tr("Show Legend"), this);
-	m_pShowLegend->setCheckable(true);
-	connect(m_pShowLegend, SIGNAL(triggered()), pAFoil, SLOT(OnShowLegend()));
-
 	ShowCurrentFoil= new QAction(tr("Show Current Foil"), this);
 	connect(ShowCurrentFoil, SIGNAL(triggered()), pAFoil, SLOT(OnShowCurrentFoil()));
 
@@ -642,8 +638,6 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(ShowAllFoils);
 	AFoilViewMenu->addAction(HideAllFoils);
 	AFoilViewMenu->addSeparator();
-	AFoilViewMenu->addAction(m_pShowLegend);
-	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(zoomInAct);
 	AFoilViewMenu->addAction(zoomLessAct);
 	AFoilViewMenu->addAction(ResetXScaleAct);
@@ -700,7 +694,6 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(ResetYScaleAct);
 	AFoilCtxMenu->addAction(ResetXYScaleAct);
 	AFoilCtxMenu->addSeparator();
-	AFoilCtxMenu->addAction(m_pShowLegend);
 	AFoilCtxMenu->addAction(AFoilLECircle);
 	AFoilCtxMenu->addAction(AFoilGridAct);
 	AFoilCtxMenu->addSeparator();
@@ -1688,7 +1681,7 @@ void MainFrame::CreateXDirectActions()
 	defineBatch->setStatusTip(tr("Tip : you don't want to use that option..."));
 	connect(viewXFoilAdvanced, SIGNAL(triggered()), pXDirect, SLOT(OnXFoilAdvanced()));
 
-	viewLogFile = new QAction(tr("View Log File\t(L)"), this);
+	viewLogFile = new QAction(tr("View Log File")+"\t(L)", this);
 	connect(viewLogFile, SIGNAL(triggered()), this, SLOT(OnLogFile()));
 
 	DerotateFoil = new QAction(tr("De-rotate the Foil"), this);
@@ -2178,20 +2171,20 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	if(!pFoil || !pFoil->m_FoilName.length()) return false;
-    QString strong;
-    CFoil *pOldFoil;
-    OpPoint * pOpPoint;
-    CPolar* pPolar;
-    int j;
+	QString strong;
+	CFoil *pOldFoil;
+	OpPoint * pOpPoint;
+	CPolar* pPolar;
+	int j;
 
-    if(bAsk)
-    {
+	if(bAsk)
+	{
 		strong = tr("Are you sure you want to delete \n") + pFoil->m_FoilName ;
 		strong+= +"\n" + tr("and all associated OpPoints and Polars ?");
 
 		int resp = QMessageBox::question(this,tr("Question"), strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 		if(resp != QMessageBox::Yes) return false;
-    }
+	}
 
 	for (j= m_oaOpp.size()-1; j>=0; j--)
 	{
@@ -2268,16 +2261,24 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 				if(pWPolar == pMiarex->m_pCurWPolar)
 				{
 					pMiarex->m_pCurWPolar = NULL;
-	//				m_WOperDlgBar.EnableAnalysis(false);
 				}
 				delete pWPolar;
 			}
 			else
 			{
 				pWPolar->ResetWPlr();
-				pWPolar->m_WArea  = pMiarex->m_pCurWing->m_Area;
+				//results only... means that the areas and spans have been edited... update polar
+				if( pWPolar->m_RefAreaType==1)
+				{
+					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_PlanformArea;
+					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_PlanformSpan;
+				}
+				else
+				{
+					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_ProjectedArea;
+					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_ProjectedSpan;
+				}
 				pWPolar->m_WMAChord  = pMiarex->m_pCurWing->m_MAChord;
-				pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_Span;
 			}
 		}
 	}
@@ -2456,7 +2457,6 @@ void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 				m_oaWPolar.removeAt(i);
 				if(pWPolar == pMiarex->m_pCurWPolar)
 				{
-//					m_WOperDlgBar.EnableAnalysis(false);
 					pMiarex->m_pCurWPolar = NULL;
 				}
 				delete pWPolar;
@@ -2464,9 +2464,18 @@ void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 			else
 			{
 				pWPolar->ResetWPlr();
-				pWPolar->m_WArea     = pMiarex->m_pCurWing->m_Area;
+				//results only... means that the areas and spans have been edited... update polar
+				if( pWPolar->m_RefAreaType==1)
+				{
+					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_PlanformArea;
+					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_PlanformSpan;
+				}
+				else
+				{
+					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_ProjectedArea;
+					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_ProjectedSpan;
+				}
 				pWPolar->m_WMAChord  = pMiarex->m_pCurWing->m_MAChord;
-				pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_Span;
 			}
 		}
 	}
@@ -2681,9 +2690,9 @@ CPolar *MainFrame::GetPolar(QString m_FoilName, QString PolarName)
 		PolarName = m_pctrlPolar->itemText(0); //... and carry on
 	}
 
-    CPolar *pPolar;
-    for (int i=0; i<m_oaPolar.size(); i++)
-    {
+	CPolar *pPolar;
+	for (int i=0; i<m_oaPolar.size(); i++)
+	{
 		pPolar = (CPolar*) m_oaPolar.at(i);
 		if (pPolar->m_FoilName == m_FoilName &&  pPolar->m_PlrName == PolarName)
 		{
@@ -2695,13 +2704,13 @@ CPolar *MainFrame::GetPolar(QString m_FoilName, QString PolarName)
 
 OpPoint *MainFrame::GetOpp(double Alpha)
 {
-    OpPoint* pOpPoint;
+	OpPoint* pOpPoint;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	CPolar *pCurPolar = pXDirect->m_pCurPolar;
-    if(!pCurPolar) return NULL;
+	if(!pCurPolar) return NULL;
 
-    for (int i=0; i<m_oaOpp.size(); i++)
-    {
+	for (int i=0; i<m_oaOpp.size(); i++)
+	{
 		if(!pCurPolar) return NULL;
 		pOpPoint = (OpPoint*)m_oaOpp.at(i);
 		//since alphas are calculated at 1/100th
@@ -2725,8 +2734,8 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 				}
 			}
 		}
-    }
-    return NULL;// shouldn't ever get here, fortunately
+	}
+	return NULL;// shouldn't ever get here, fortunately
 }
 
 
@@ -2895,13 +2904,13 @@ void MainFrame::LoadSettings()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 
-        QString FileName;
+		QString FileName;
 
 #ifdef Q_WS_MAC
-        QSettings settings("QFLR5", "QFLR5");
-        FileName = settings.fileName();
+		QSettings settings("QFLR5", "QFLR5");
+		FileName = settings.fileName();
 #else
-        FileName   = QDir::tempPath() + "/QFLR5.set";
+		FileName   = QDir::tempPath() + "/QFLR5.set";
 #endif
 	QFile *pXFile = new QFile(FileName);
 
@@ -3201,14 +3210,14 @@ void MainFrame::OnExportCurGraph()
 
 void MainFrame::OnGuidelines()
 {
-        QDir dir(qApp->applicationDirPath());
+		QDir dir(qApp->applicationDirPath());
 #ifdef Q_WS_MAC
-        dir.cdUp();
-        dir.cdUp();
-        dir.cdUp();
-        QString FileName = dir.absoluteFilePath("Guidelines.pdf");
+		dir.cdUp();
+		dir.cdUp();
+		dir.cdUp();
+		QString FileName = dir.absoluteFilePath("Guidelines.pdf");
 #else
-        QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+		QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
@@ -3270,18 +3279,6 @@ void MainFrame::OnInsertProject()
 void MainFrame::OnLanguage()
 {
 	TranslatorDlg dlg;
-
-	QDir dir(qApp->applicationDirPath());
-#ifdef Q_WS_MAC
-		dir.cdUp();
-		dir.cdUp();
-		dir.cdUp();
-#else
-//        QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
-#endif
-	dlg.m_TranslationDirPath = dir.canonicalPath()+"/translations";
-
-	dlg.InitDialog();
 	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
@@ -3299,7 +3296,7 @@ void MainFrame::OnLoadFile()
 	pMiarex->m_bArcball = false;
 
 	PathName = QFileDialog::getOpenFileName(this, tr("Open File"),
-											m_LastDirName, 
+											m_LastDirName,
 											tr("XFLR5 file (*.dat *.plr *.wpa)"));
 	if(!PathName.length())		return;
 	int pos = PathName.lastIndexOf("/");
@@ -3710,19 +3707,15 @@ void MainFrame::OnRestoreToolbars()
 	}
 
 }
-
-
 void MainFrame::OnSaveOptions()
 {
 	SaveOptionsDlg dlg;
 	dlg.InitDialog(m_bSaveOpps, m_bSaveWOpps);
-	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
 		m_bSaveOpps  = dlg.m_bOpps;
 		m_bSaveWOpps = dlg.m_bWOpps;
 	}
-	m_DlgPos = dlg.pos();
 }
 
 
@@ -4033,7 +4026,7 @@ void MainFrame::OnSelChangeOpp(int i)
 	m_iApp = XFOILANALYSIS;
 
 	double Alpha;
- 	bool bOK;
+	bool bOK;
 	Alpha = strong.toFloat(&bOK);
 	if(bOK)
 	{
@@ -4529,10 +4522,10 @@ void MainFrame::SaveSettings()
 	QString FileName;
 
 #ifdef Q_WS_MAC
-        QSettings settings("QFLR5", "QFLR5");
-        FileName = settings.fileName();
+		QSettings settings("QFLR5", "QFLR5");
+		FileName = settings.fileName();
 #else
-        FileName   = QDir::tempPath() + "/QFLR5.set";
+		FileName   = QDir::tempPath() + "/QFLR5.set";
 #endif
 
 	QFile *pXFile = new QFile(FileName);
@@ -4547,8 +4540,8 @@ void MainFrame::SaveSettings()
 	ar << SETTINGSFORMAT;
 	ar << frameGeometry().x();
 	ar << frameGeometry().y();
-	ar << frameGeometry().width();
-	ar << frameGeometry().height();
+	ar << size().width();
+	ar << size().height();
 	ar << isMaximized();
 	ar << m_StyleName << m_LanguageFilePath;
 
@@ -4604,28 +4597,28 @@ void MainFrame::SetCentralWidget()
 
 bool MainFrame::SelectFoil(CFoil *pFoil)
 {
-    //Selects pFoil in the combobox and returns true
-    //On error, selects the first and returns false
-    return true;
-    if(!pFoil) return false;
-    int pos = m_pctrlFoil->findText(pFoil->m_FoilName);
-    if(pos>=0)
-    {
-	    m_pctrlFoil->setCurrentIndex(pos);
-	    return true;
-    }
-    return false;
+	//Selects pFoil in the combobox and returns true
+	//On error, selects the first and returns false
+	return true;
+	if(!pFoil) return false;
+	int pos = m_pctrlFoil->findText(pFoil->m_FoilName);
+	if(pos>=0)
+	{
+		m_pctrlFoil->setCurrentIndex(pos);
+		return true;
+	}
+	return false;
 }
 
 bool MainFrame::SelectPolar(CPolar *pPolar)
 {
-    //Selects pPolar in the combobox and returns true
-    //On error, selects the first and returns false
+	//Selects pPolar in the combobox and returns true
+	//On error, selects the first and returns false
 	if(!m_pCurFoil || !pPolar) return false;
 
-    CPolar *pOldPolar;
-    for(int i=0; i<m_pctrlPolar->count(); i++)
-    {
+	CPolar *pOldPolar;
+	for(int i=0; i<m_pctrlPolar->count(); i++)
+	{
 		pOldPolar = GetPolar(m_pCurFoil->m_FoilName, m_pctrlPolar->itemText(i));
 		if(pOldPolar && pPolar==pOldPolar)
 		{
@@ -4633,42 +4626,42 @@ bool MainFrame::SelectPolar(CPolar *pPolar)
 			m_pctrlPolar->setCurrentIndex(i);
 			return true;
 		}
-    }
-    return false;
+	}
+	return false;
 }
 
 bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 {
-    //Selects pOpp in the combobox and returns true
-    //On error, selects the first and returns false
+	//Selects pOpp in the combobox and returns true
+	//On error, selects the first and returns false
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	CPolar *pCurPlr    = pXDirect->m_pCurPolar;
-    if(!pOpp || !pCurPlr) return false;
-    QString strong;
-    double alpha, Re;
+	if(!pOpp || !pCurPlr) return false;
+	QString strong;
+	double alpha, Re;
 
-    for(int i=0; i<m_pctrlOpPoint->count(); i++)
-    {
-	    if(pCurPlr->m_Type !=4)
-	    {
-		    alpha = m_pctrlOpPoint->itemText(i).toDouble();
-		    if(fabs(alpha-pOpp->Alpha)<0.01)
-		    {
-			    m_pctrlOpPoint->setCurrentIndex(i);
-			    return true;
-		    }
-	    }
-	    else
-	    {
-		    Re = m_pctrlOpPoint->itemText(i).toDouble();
-		    if(fabs(Re-pOpp->Reynolds)<1.0)
-		    {
-			    m_pctrlOpPoint->setCurrentIndex(i);
-			    return true;
-		    }
-	    }
-    }
-    return false;
+	for(int i=0; i<m_pctrlOpPoint->count(); i++)
+	{
+		if(pCurPlr->m_Type !=4)
+		{
+			alpha = m_pctrlOpPoint->itemText(i).toDouble();
+			if(fabs(alpha-pOpp->Alpha)<0.01)
+			{
+				m_pctrlOpPoint->setCurrentIndex(i);
+				return true;
+			}
+		}
+		else
+		{
+			Re = m_pctrlOpPoint->itemText(i).toDouble();
+			if(fabs(Re-pOpp->Reynolds)<1.0)
+			{
+				m_pctrlOpPoint->setCurrentIndex(i);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
@@ -5645,7 +5638,7 @@ QString MainFrame::ShortenFileName(QString &PathName)
 
 void MainFrame::UpdateUFOs()
 {
-	// fills combobox with wing and plane names 
+	// fills combobox with wing and plane names
 	// then selects the current wing or plane, if any
 	// else selects the first, if any
 	// else disables the combobox
@@ -5675,7 +5668,7 @@ void MainFrame::UpdateUFOs()
 
 	if (m_pctrlUFO->count())
 	{
- 		m_pctrlUFO->setEnabled(true);
+		m_pctrlUFO->setEnabled(true);
 		//select the current Wing, if any...
 		if(pCurPlane)
 		{
@@ -5684,17 +5677,17 @@ void MainFrame::UpdateUFOs()
 			{
 				m_pctrlUFO->setCurrentIndex(pos);
 			}
-			else 
+			else
 			{
 				// if error, select the first
 				m_pctrlUFO->setCurrentIndex(0);
 				strong = m_pctrlUFO->itemText(0);
-			}		
+			}
 		}
 		else if(pCurWing)
 		{
 			int pos = m_pctrlUFO->findText(pCurWing->m_WingName);
-			if(pos>=0) 
+			if(pos>=0)
 			{
 				m_pctrlUFO->setCurrentIndex(pos);
 			}
@@ -5706,16 +5699,16 @@ void MainFrame::UpdateUFOs()
 			}
 		}
 		//... else select the first
-		else 
+		else
 		{
 			m_pctrlUFO->setCurrentIndex(0);
 			strong = m_pctrlUFO->itemText(0);
 		}
 	}
- 	else
+	else
 	{
 		m_pctrlUFO->clear();
- 		m_pctrlUFO->setEnabled(false);
+		m_pctrlUFO->setEnabled(false);
 
 		pMiarex->m_pCurPlane  = NULL;
 		pMiarex->m_pCurWing   = NULL;
@@ -6012,38 +6005,38 @@ void MainFrame::UpdateFoils()
 
 void MainFrame::UpdatePolars()
 {
-    // fills combobox with polar names associated to XDirect' current foil
-    // then selects XDirect current polar if any, else selects the first, if any
-    // else disables the combobox
-    // sets the polar in XDirect in all cases
+	// fills combobox with polar names associated to XDirect' current foil
+	// then selects XDirect current polar if any, else selects the first, if any
+	// else disables the combobox
+	// sets the polar in XDirect in all cases
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	int i, size, pos;
-    CPolar *pPolar;
-    QString strong;
-    m_pctrlPolar->clear();
+	CPolar *pPolar;
+	QString strong;
+	m_pctrlPolar->clear();
 
 	m_pCurFoil = pXDirect->m_pCurFoil;
 
-    if(!m_pCurFoil || !m_pCurFoil->m_FoilName.length())
-    {
+	if(!m_pCurFoil || !m_pCurFoil->m_FoilName.length())
+	{
 		m_pctrlPolar->setEnabled(false);
 		m_pctrlOpPoint->clear();
 		m_pctrlOpPoint->setEnabled(false);
 		return;
 	}
 
-    size = 0;
-    //count the number of polars associated to the current foil
-    for (i=0; i<m_oaPolar.size(); i++)
-    {
+	size = 0;
+	//count the number of polars associated to the current foil
+	for (i=0; i<m_oaPolar.size(); i++)
+	{
 		pPolar = (CPolar*)m_oaPolar[i];
 		if(pPolar->m_FoilName == m_pCurFoil->m_FoilName)
 		{
 			size++;
 		}
-    }
-    if (size)
-    {
+	}
+	if (size)
+	{
 
 		// if any
 		m_pctrlPolar->setEnabled(true);
@@ -6071,52 +6064,52 @@ void MainFrame::UpdatePolars()
 			m_pctrlPolar->setCurrentIndex(0);
 			strong = m_pctrlPolar->itemText(0);
 		}
-    }
-    else
-    {
+	}
+	else
+	{
 		// otherwise disable control
 		m_pctrlPolar->setEnabled(false);
-    }
+	}
 
-    UpdateOpps();
+	UpdateOpps();
 }
 
 
 void MainFrame::UpdateOpps()
 {
-    // fills the combobox with the Opp names associated to XDirect's current foil
-    // then selects XDirect current opp if any, else selects the first, if any
-    // else disables the combobox
+	// fills the combobox with the Opp names associated to XDirect's current foil
+	// then selects XDirect current opp if any, else selects the first, if any
+	// else disables the combobox
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	int i, pos;
-    OpPoint *pOpp;
-    QString strong, str;
-    m_pctrlOpPoint->clear();
+	OpPoint *pOpp;
+	QString strong, str;
+	m_pctrlOpPoint->clear();
 
 //	m_pCurFoil = pXDirect->m_pCurFoil;
 	CPolar *pCurPlr    = pXDirect->m_pCurPolar;
 
-    if (!m_pCurFoil || !m_pCurFoil->m_FoilName.length() || !pCurPlr  || !pCurPlr->m_PlrName.length())
-    {
+	if (!m_pCurFoil || !m_pCurFoil->m_FoilName.length() || !pCurPlr  || !pCurPlr->m_PlrName.length())
+	{
 		m_pctrlOpPoint->clear();
 		m_pctrlOpPoint->setEnabled(false);
 		return;
-    }
+	}
 
-    int size = 0;
-    //count the number of Opps associated to the current foil & polar
-    for (i=0; i<m_oaOpp.size(); i++)
-    {
+	int size = 0;
+	//count the number of Opps associated to the current foil & polar
+	for (i=0; i<m_oaOpp.size(); i++)
+	{
 		pOpp = (OpPoint*)m_oaOpp[i];
 		if (pOpp->m_strFoilName == m_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
 		{
 			size++;
 		}
-    }
+	}
 
-    if (size)
-    {
+	if (size)
+	{
 		// if any
 		m_pctrlOpPoint->setEnabled(true);
 		for (i=0; i<m_oaOpp.size(); i++)
@@ -6175,14 +6168,14 @@ void MainFrame::UpdateOpps()
 		}
 		if (m_pctrlOpPoint->count()) m_pctrlOpPoint->setEnabled(true);
 		else                         m_pctrlOpPoint->setEnabled(false);
-    }
-    else
-    {
+	}
+	else
+	{
 		// otherwise disable control
 		m_pctrlOpPoint->setEnabled(false);
 		pXDirect->m_pCurOpp = NULL;
 		m_pctrlOpPoint->clear();
-    }
+	}
 }
 
 

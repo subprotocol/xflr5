@@ -221,7 +221,7 @@ void ManageUFOsDlg::FillWingRow(int row)
 	if(pWing->m_WingDescription.length()) m_pUFOModel->setData(ind, pWing->m_WingDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_Span);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan);
 
 	ind = m_pUFOModel->index(row, 2, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_AR);
@@ -251,7 +251,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 	if(pPlane->m_PlaneDescription.length()) m_pUFOModel->setData(ind, pPlane->m_PlaneDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row+n, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_Span);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan);
 
 	ind = m_pUFOModel->index(row+n, 2, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_AR);

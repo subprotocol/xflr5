@@ -110,8 +110,8 @@ void CPlane::ComputePlane(void)
 	if(m_bStab)
 	{
 		double SLA = m_LEStab.x + m_Stab.m_TChord[0]/4.0 - m_Wing.m_TChord[0]/4.0;
-		double area = m_Wing.m_Area;
-		if(m_bBiplane) area += m_Wing2.m_Area;
+		double area = m_Wing.m_ProjectedArea;
+		if(m_bBiplane) area += m_Wing2.m_ProjectedArea;
 
 		double ProjectedArea = 0.0;
 		for (i=0;i<m_Stab.m_NPanel; i++)

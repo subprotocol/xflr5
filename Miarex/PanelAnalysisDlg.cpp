@@ -562,7 +562,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 
 	QString strong, strange;
 	int p, q, pp;
-	double Lift, alpha;
+	double alpha;
 	CVector PanelForce, WindNormal;
 
 	//______________________________________________________________________________________
@@ -599,21 +599,54 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 	if(m_pWPolar->m_Type==2)
 	{
 		AddString("      Calculating speeds to balance the weight\r\n");
+		int pos;
+		double *Mu, *Sigma;
+		double Lift, IDrag ,TempCl;
+
+		CVector Force;
 
 		for (q=0; q<nval;q++)
 		{
-
 			alpha = V0+q*VDelta;
 			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
 			Lift = 0.0;
 			p=0;
-			for (p=0; p<m_MatSize; p++)
+
+			Mu     = m_Mu    + q*m_MatSize;
+			Sigma  = m_Sigma + q*m_MatSize;
+			Force.Set(0.0, 0.0, 0.0);
+		
+			CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+			CWing::s_Density   = m_pWPolar->m_Density;
+			CWing::s_QInf      = 1.0;
+			CWing::s_Alpha     = alpha;
+			m_pWing->PanelTrefftz(m_Cp+q*m_MatSize,          Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom,
+								  m_pWPolar->m_bThinSurfaces, m_pWakePanel, m_pWakeNode);
+			pos = m_pWing->m_MatSize;
+
+			if(m_pWing2)
 			{
-				// for each panel, add the lift coef
-				PanelForce = m_pPanel[p].Normal * (-m_Cp[p+q*m_MatSize]) * m_pPanel[p].Area;
-				Lift += PanelForce.dot(WindNormal)*cos(alpha*pi/180.0);
+				m_pWing2->PanelTrefftz(m_Cp+q*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,
+									   m_pWPolar->m_bThinSurfaces, m_pWakePanel, m_pWakeNode);
+				pos += m_pWing2->m_MatSize;
 			}
 
+			if(m_pStab)
+			{
+				m_pStab->PanelTrefftz(m_Cp+q*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,
+									   m_pWPolar->m_bThinSurfaces, m_pWakePanel, m_pWakeNode);
+				pos += m_pStab->m_MatSize;
+			}
+
+			if(m_pFin)
+			{
+				m_pFin->PanelTrefftz(m_Cp+q*m_MatSize+pos,   Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,
+									 m_pWPolar->m_bThinSurfaces, m_pWakePanel, m_pWakeNode);
+				pos += m_pFin->m_MatSize;
+			}
+
+			Lift =  Force.dot(WindNormal) ;//N/q, for 1/ms
+			TempCl = Lift/m_pWPolar->m_WArea;
 			if(Lift<=0.0)
 			{
 				strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n").arg(V0+q*VDelta,7,'f',2);
@@ -624,9 +657,10 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 			}
 			else
 			{
-				m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/Lift);
-								strong = QString("      Alpha=%1   QInf = %2").arg(V0+q*VDelta,5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
-                                GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
+//				m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/Lift/m_pWPolar->m_WArea);
+				m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
+				strong = QString("      Alpha=%1   QInf = %2").arg(V0+q*VDelta,5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
+				GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 				strong+= strange + "\r\n";
 				AddString(strong);
 			}
@@ -643,9 +677,7 @@ bool PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 	// Scale RHS and Sigma i.a.w. speeds (so far we have unit doublet and source strengths)
 
 	double *SigmaRef = m_aij;//use existing reserved memory, do not re-allocate
-//	memcpy(m_RHSRef, m_RHS,   nval*m_MatSize*sizeof(double));
-//	memcpy(SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
-	
+
 	memcpy(SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
 	memcpy(m_RHSRef, m_Mu,   nval*m_MatSize*sizeof(double));
 
@@ -697,10 +729,13 @@ bool PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 		for (q=0; q<nrhs; q++)
 		{
 			if(m_bCancel) break;
-			if(!m_pWPolar->m_bTiltedGeom) str = QString("      Computing Plane for alpha=%1\r\n").arg(V0+q*VDelta,7,'f',2);
-			else                          str = QString("      Computing Plane for alpha=%1\r\n").arg(m_OpAlpha,7,'f',2);
-			AddString(str);
-			ComputePlane(V0+q*VDelta, q);
+			if(m_3DQInf[q]>0.0)
+			{
+				if(!m_pWPolar->m_bTiltedGeom) str = QString("      Computing Plane for alpha=%1\r\n").arg(V0+q*VDelta,7,'f',2);
+				else                          str = QString("      Computing Plane for alpha=%1\r\n").arg(m_OpAlpha,7,'f',2);
+				AddString(str);
+				ComputePlane(V0+q*VDelta, q);
+			}
 			SetProgress(5*nrhs,(double)(q)/(double)nrhs);
 		}
 	}
@@ -781,10 +816,10 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 
 		AddString("       Calculating aerodynamic coefficients...\r\n");
 		m_bPointOut          = false;
-		m_pWing->m_Alpha     = Alpha;
-		m_pWing->m_QInf      = QInf;
-		m_pWing->m_Viscosity = m_pWPolar->m_Viscosity;
-		m_pWing->m_Density   = m_pWPolar->m_Density;
+		CWing::s_Alpha     = Alpha;
+		CWing::s_QInf      = QInf;
+		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+		CWing::s_Density   = m_pWPolar->m_Density;
 		Lift   = 0.0;
 		IDrag  = 0.0;
 		VDrag  = 0.0;
@@ -808,13 +843,9 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 
 		if(m_pWing2) 
 		{
-			AddString("       Calculating elevator...\r\n");
-			m_pWing2->m_Alpha     = Alpha;
-			m_pWing2->m_QInf      = QInf;
-			m_pWing2->m_Viscosity = m_pWPolar->m_Viscosity;
-			m_pWing2->m_Density   = m_pWPolar->m_Density;
+			AddString("       Calculating second wing...\r\n");
 			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
-			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
+			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
 									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
@@ -828,10 +859,6 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pStab) 
 		{
 			AddString("       Calculating elevator...\r\n");
-			m_pStab->m_Alpha     = Alpha;
-			m_pStab->m_QInf      = QInf;
-			m_pStab->m_Viscosity = m_pWPolar->m_Viscosity;
-			m_pStab->m_Density   = m_pWPolar->m_Density;
 			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
 									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
@@ -848,10 +875,6 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pFin)
 		{
 			AddString("       Calculating fin...\r\n");
-			m_pFin->m_Alpha      = Alpha;
-			m_pFin->m_QInf       = QInf;
-			m_pFin->m_Viscosity  = m_pWPolar->m_Viscosity;
-			m_pFin->m_Density    = m_pWPolar->m_Density;
 			
 			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
@@ -880,24 +903,24 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, QInf, Lift, IDrag);
 		}
 
-		m_CL          =       Force.dot(WindNormal)    /m_pWing->m_Area;
-		m_CX          =       Force.dot(WindDirection) /m_pWing->m_Area;
-		m_CY          =       Force.dot(WindSide)      /m_pWing->m_Area;
+		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->m_WArea;
+		m_CX          =       Force.dot(WindDirection) /m_pWPolar->m_WArea;
+		m_CY          =       Force.dot(WindSide)      /m_pWPolar->m_WArea;
 
-		m_InducedDrag =  1.0*IDrag/m_pWing->m_Area;
-		m_ViscousDrag =  1.0*VDrag/m_pWing->m_Area;
+		m_InducedDrag =  1.0*IDrag/m_pWPolar->m_WArea;
+		m_ViscousDrag =  1.0*VDrag/m_pWPolar->m_WArea;
 
 		m_XCP         = XCP/Force.dot(WindNormal);
 		m_YCP         = YCP/Force.dot(WindNormal);
 
-		m_GCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord;
-		m_GRm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
-		m_GYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
+		m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+		m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+		m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
-		m_VCm *= 1.0 / m_pWing->m_Area /m_pWing->m_MAChord;
-		m_VYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
+		m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+		m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
-		m_IYm *= 1.0 / m_pWing->m_Area /m_pWing->m_Span;
+		m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
 		if(m_bPointOut) m_bWarning = true;
 
@@ -1455,6 +1478,7 @@ void PanelAnalysisDlg::InitDialog()
 		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
 	}
 
+	m_pctrlTextOutput->clear();
 
 	m_bPointOut = false;
 	m_bCancel   = false;

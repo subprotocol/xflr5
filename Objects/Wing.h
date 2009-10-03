@@ -1,21 +1,21 @@
 /****************************************************************************
 
-    Wing Class
+	Wing Class
 	Copyright (C) 2005-2008 Andre Deperrois xflr5@yahoo.com
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
 
@@ -33,7 +33,7 @@
 
 
 class CWing
-{ 
+{
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class CWPolar;
@@ -53,7 +53,7 @@ class CWing
 	// Construction
 public:
 
-    CWing();   // standard constructor
+	CWing();   // standard constructor
 
 // Implementation
 protected:
@@ -95,7 +95,7 @@ protected:
 	void ComputeGeometry();
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
-    void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
+	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
 	void SetSweep(double Sweep);
 	void SetTwist(double Twist);
 	void ScaleSpan(double NewSpan);
@@ -131,10 +131,14 @@ protected:
 	static double s_CvPrec;	// Precision required for LLT convergence
 	static double s_RelaxMax;	// relaxation factor for LLT convergence
 
-    QString m_WingName;	//the wing's name
+	static double s_Density, s_Viscosity; //fluid properties
+	static double s_QInf;		// Freestream speed
+	static double s_Alpha;		// angle of attack
 
-    QFile * m_pXFile;	// a pointer to the output .log file
-	
+	QString m_WingName;	//the wing's name
+
+	QFile * m_pXFile;	// a pointer to the output .log file
+
 	bool m_bInitCalc;	//
 	bool m_bVLMAutoMesh; 	// true if the mesh should be set automatically
 	bool m_bWingOut;	// true if the wing OpPoint is outside the flight envelope of the available Type1 polars
@@ -143,7 +147,7 @@ protected:
 	bool m_bSymetric;	// true if the wing's geometry is symmetric
 	bool m_bVLMSymetric;	// true if the vlm calculation is symmetric
 	bool m_bLLT;		// true if performing an LLT calculation, false if VLM
-	bool m_bTrans;		// true if the wing is being dragged 
+	bool m_bTrans;		// true if the wing is being dragged
 	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
 	bool m_bVLM1;		// true if classic, false if quad ring (K&P) method
 	bool m_bCancel;		// true if the calculation is to be aborted
@@ -152,7 +156,6 @@ protected:
 	int m_Type;		// the LLT analysis type
 	int m_NPanel;		// number of span panels in wing definition
 	int m_NStation;		// number of stations for wing calculation
-	int m_iSection;		// the currently selected section
 	int m_nNodes;		// the number of VLM panel nodes
 	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
 	int m_MatSize;	// Max Size for the VLMMatrix
@@ -161,14 +164,15 @@ protected:
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
 	double m_FlapMoment[2*MAXPANELS];
 
-	//
-	double m_Span;		// wing span
+	double m_QInf0;
+//	double m_Span;		// wing span
+	double m_Weight;    // Wing weight
+	double m_PlanformSpan;
 	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord
 	double m_MAChord;	// mean aerodynamic chord
 	double m_yMac;		// mean aerodynamic chord span position
-	double m_Density, m_Viscosity; //fluid properties
-	double m_Area;		// wing surface
+	double m_PlanformArea;		// wing surface projected on xy plane;
 	double m_ProjectedArea;		// wing surface projected on xy plane;
 	double m_Volume;	// for tentative wieght calculations
 	double m_AR;		// Aspect ratio
@@ -176,10 +180,6 @@ protected:
 	double m_CL;		//Lift
 	double m_InducedDrag, m_ViscousDrag;
 	double m_XCP, m_YCP;	// Centre of pressure's position
-	double m_QInf;		// Freestream speed
-	double m_QInf0;		// Freestream speed for initial Type 2 analysis
-	double m_Weight;	// For type 2 analysis
-	double m_Alpha;		// angle of attack
 	double m_Maxa; 		// Used in LLT
 	double m_VYm, m_VCm;
 	double m_IYm;		// Induced Yawing Moment
@@ -214,7 +214,7 @@ protected:
 	double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
 	double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
 	double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
-	double m_StripArea[MAXSTATIONS+1];		
+	double m_StripArea[MAXSTATIONS+1];
 	double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations
 	double m_SpanPos[MAXSTATIONS+1];	//span positions of LLT stations
 	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
@@ -222,15 +222,15 @@ protected:
 
 	QString m_WingDescription;
 
- 	CPanel *m_pPanel;			//pointer to the VLM Panel array
+	CPanel *m_pPanel;			//pointer to the VLM Panel array
 
-    QStringList m_RFoil;			// name of the right foils
-    QStringList m_LFoil;			// name of the left foils
+	QStringList m_RFoil;			// name of the right foils
+	QStringList m_LFoil;			// name of the left foils
 
 	CVector m_Vd[MAXSTATIONS];		// downwash vector at span stations
 	CVector m_F[MAXSTATIONS];		// lift vector at span stations
 
-    QColor m_WingColor;
+	QColor m_WingColor;
 };
 
 #endif

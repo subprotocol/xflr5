@@ -765,11 +765,11 @@ void WPolarDlg::SetupLayout()
 	DataLayout->addWidget(GroundGroup,4,2);
 
 	QHBoxLayout *AreaOptions = new QHBoxLayout;
-	m_pctrlArea1 = new QRadioButton(tr("Wing Planform Area"));
-	m_pctrlArea2 = new QRadioButton(tr("Wing Planform Area projected on xy plane"));
+	m_pctrlArea1 = new QRadioButton(tr("Wing Planform"));
+	m_pctrlArea2 = new QRadioButton(tr("Wing Planform projected on xy plane"));
 	AreaOptions->addWidget(m_pctrlArea1);
 	AreaOptions->addWidget(m_pctrlArea2);
-	QGroupBox *AreaBox = new QGroupBox(tr("Reference Area for Aero Coefficients"));
+	QGroupBox *AreaBox = new QGroupBox(tr("Reference Area and Span for Aero Coefficients"));
 	AreaBox->setLayout(AreaOptions);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -887,7 +887,10 @@ void WPolarDlg::SetReynolds()
 	}
 	else if (m_Type ==2)
 	{
-		double QCl =  sqrt(2.* 9.81 /m_Density* m_Weight /m_pWing->m_Area) * pMainFrame->m_mstoUnit;
+		double area;
+		if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
+		else area = m_pWing->m_ProjectedArea;
+		double QCl =  sqrt(2.* 9.81 /m_Density* m_Weight /area) * pMainFrame->m_mstoUnit;
 		str = QString("%1").arg(QCl,5,'f',2);
 		str += strUnit;
 		strange = tr("Qinf.sqrt(Cl) =");
@@ -920,7 +923,10 @@ void WPolarDlg::SetWingLoad()
 {
 	QString str,str1, str2;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	m_WingLoad = m_Weight/m_pWing->m_Area;//kg/dm2
+	double area;
+	if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
+	else area = m_pWing->m_ProjectedArea;
+	m_WingLoad = m_Weight/area;//kg/dm2
 
 	str = QString("%1").arg(m_WingLoad * pMainFrame->m_kgtoUnit / pMainFrame->m_m2toUnit,7,'f',3);
 

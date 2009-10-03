@@ -747,22 +747,22 @@ void PlaneDlg::SetResults()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str;
 
-	double area = m_pPlane->m_Wing.m_Area;
-	if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_Area;
+//	double area = m_pPlane->m_Wing.s_Area;
+//	if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_Area;
 
-	str = QString("%1").arg(area*pMainFrame->m_m2toUnit,7,'f',2);
+	str = QString("%1").arg(m_pPlane->m_Wing.m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	m_pctrlWingSurface->setText(str);
 
-	if(m_pPlane->m_bStab)   str = QString("%1").arg(m_pPlane->m_Stab.m_Area*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->m_bStab)   str = QString("%1").arg(m_pPlane->m_Stab.m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	else str = " ";
 	m_pctrlStabSurface->setText(str);
 
-	if(m_pPlane->m_bFin)    str = QString("%1").arg(m_pPlane->m_Fin.m_Area*pMainFrame->m_m2toUnit,7,'f',2);
+	if(m_pPlane->m_bFin)    str = QString("%1").arg(m_pPlane->m_Fin.m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	else str=" ";
 	m_pctrlFinSurface->setText(str);
 
-	double span = m_pPlane->m_Wing.m_Span;
-	if(m_pPlane->m_bBiplane) span = qMax(m_pPlane->m_Wing.m_Span, m_pPlane->m_Wing2.m_Span);
+	double span = m_pPlane->m_Wing.m_PlanformSpan;
+	if(m_pPlane->m_bBiplane) span = qMax(m_pPlane->m_Wing.m_PlanformSpan, m_pPlane->m_Wing2.m_PlanformSpan);
 	str = QString("%1").arg(span*pMainFrame->m_mtoUnit,5,'f',2);
 	m_pctrlWingSpan->setText(str);
 

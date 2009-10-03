@@ -87,7 +87,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 	QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 	int i,iter;
 
-	m_pWing->m_Alpha = m_AlphaMin;
+	CWing::s_Alpha = m_AlphaMin;
 
 	str = "Launching analysis....\r\n\r\n";
 	UpdateOutput(str);
@@ -127,7 +127,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		m_pWing->LLTInitCl();//with new angle...
 		if(m_pWing->m_bInitCalc) m_pWing->LLTSetLinearSolution();
 
-		str= QString("Calculating Alpha = %1... ").arg(m_pWing->m_Alpha,5,'f',2);
+		str= QString("Calculating Alpha = %1... ").arg(CWing::s_Alpha,5,'f',2);
 		UpdateOutput(str);
 		iter = Iterate();
 
@@ -166,7 +166,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
 		}
-		m_pWing->m_Alpha += m_AlphaDelta;
+		CWing::s_Alpha += m_AlphaDelta;
 	}
 
 	return true;
@@ -245,8 +245,8 @@ int LLTAnalysisDlg::Iterate()
 	}
 	if(m_bSkip)
 	{
-		if(m_pWPolar->m_Type!=4) str = QString("Alpha = %1, skipped after %2 iterations \r\n").arg(m_pWing->m_Alpha, 6,'f',2).arg(iter);
-		else                     str = QString("QInf = %1 skipped after %2 iterations \r\n"  ).arg(m_pWing->m_QInf,  8,'f',2).arg(iter);
+		if(m_pWPolar->m_Type!=4) str = QString("Alpha = %1, skipped after %2 iterations \r\n").arg(CWing::s_Alpha, 6,'f',2).arg(iter);
+		else                     str = QString("QInf = %1 skipped after %2 iterations \r\n"  ).arg(CWing::s_QInf,  8,'f',2).arg(iter);
 		UpdateOutput(str);
 	}
 	else if (resp<0)
@@ -407,8 +407,8 @@ void LLTAnalysisDlg::StartAnalysis()
 
 	if (m_pWPolar->m_Type!=4)
 	{
-		m_pWing->m_Viscosity = m_pWPolar->m_Viscosity;
-		m_pWing->m_QInf      = m_pWPolar->m_QInf;
+		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+		CWing::s_QInf      = m_pWPolar->m_QInf;
 		AlphaLoop() ;
 	}
 	else
@@ -466,7 +466,7 @@ bool LLTAnalysisDlg::ReLoop()
 	QMiarex* pMiarex = (QMiarex*)m_pMiarex;
 	CCurve *pCurve = m_IterGraph.GetCurve(0);
 
-	m_pWing->m_QInf = m_AlphaMin;
+	CWing::s_QInf = m_AlphaMin;
 	//Alpha has been set at CMiarex::SetWPlr
 
 	str = "Launching analysis....\r\n\r\n";
@@ -509,7 +509,7 @@ bool LLTAnalysisDlg::ReLoop()
 		if(m_pWing->m_bInitCalc)m_pWing->LLTSetLinearSolution();
 		m_pWing->LLTInitCl();//with new angle...
 		
-		str = QString("Calculating QInf = %1... ").arg(m_pWing->m_QInf,6,'f',2);
+		str = QString("Calculating QInf = %1... ").arg(CWing::s_QInf,6,'f',2);
 		UpdateOutput(str);
 		iter = Iterate();
 
@@ -550,7 +550,7 @@ bool LLTAnalysisDlg::ReLoop()
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
 		}
-		m_pWing->m_QInf+=m_AlphaDelta;
+		CWing::s_QInf+=m_AlphaDelta;
 
 	}
 	return true;

@@ -31,8 +31,8 @@
 #define IVX  302	//300 = number of nodes along bl on one side of airfoil and wake
 
 //----INVERSE
-#define ICX 257//   number of circle-plane points for complex mapping   ( 2^n  + 1 )
-#define IMX 64// number of complex mapping coefficients  Cn
+#define ICX 257 // number of circle-plane points for complex mapping   ( 2^n  + 1 )
+#define IMX 64  // number of complex mapping coefficients  Cn
 #define IMX4 16 // = IMX/4 added arcds
 
 #define SETTINGSFORMAT    100558
