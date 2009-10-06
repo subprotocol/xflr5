@@ -1214,12 +1214,12 @@ void BatchDlg::ResetCurves()
 void BatchDlg::SetFileHeader()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << "QFLR5 v001";
+	out << pMainFrame->m_VersionName;
 	out << "\n";
 	out << m_FoilName;
 	out << "\n";

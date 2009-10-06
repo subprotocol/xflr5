@@ -325,11 +325,12 @@ void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlph
 void LLTAnalysisDlg::SetFileHeader()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << "QFLR5 v001";
+	out << pMainFrame->m_VersionName;
 	out << "\n";
 	out << m_pWing->m_WingName;
 	out << "\n";

@@ -725,12 +725,12 @@ bool VLMAnalysisDlg::ReLoop()
 void VLMAnalysisDlg::SetFileHeader()
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
 	out << "\n";
-	out << "QFLR5 v001";
+	out << pMainFrame->m_VersionName;
 	out << "\n";
 	out << m_pWing->m_WingName;
 	out << "\n";

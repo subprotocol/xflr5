@@ -2720,8 +2720,8 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(lab25,11,1);
 	DataLayout->addWidget(lab26,12,1);
 
-	m_pctrlMAC          = new QLabel("150.0");
 	m_pctrlGeomChord    = new QLabel("170.0");
+	m_pctrlMAC          = new QLabel("150.0");
 	m_pctrlMACSpanPos   = new QLabel("466.00");
 	m_pctrlAspectRatio  = new QLabel("13.33");
 	m_pctrlTaperRatio   = new QLabel("1.50");
@@ -2734,8 +2734,8 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlTaperRatio->setAlignment(Qt::AlignRight);
 	m_pctrlSweep->setAlignment(Qt::AlignRight);
 	m_pctrlNFlaps->setAlignment(Qt::AlignRight);
-	DataLayout->addWidget(m_pctrlMAC,          6,2);
-	DataLayout->addWidget(m_pctrlGeomChord,    7,2);
+	DataLayout->addWidget(m_pctrlGeomChord,    6,2);
+	DataLayout->addWidget(m_pctrlMAC,          7,2);
 	DataLayout->addWidget(m_pctrlMACSpanPos,   8,2);
 	DataLayout->addWidget(m_pctrlAspectRatio,  9,2);
 	DataLayout->addWidget(m_pctrlTaperRatio,  10,2);
