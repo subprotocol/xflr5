@@ -3278,7 +3278,10 @@ void MainFrame::OnInsertProject()
 
 void MainFrame::OnLanguage()
 {
-	TranslatorDlg dlg;
+	TranslatorDlg dlg;	
+	QDir dir(qApp->applicationDirPath());
+	dlg.m_TranslationDirPath = dir.canonicalPath() + "/translations" ;
+	dlg.InitDialog();
 	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
