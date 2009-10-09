@@ -841,7 +841,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 
 		Station = m_pWing->m_NStation;
 
-		if(m_pWing2) 
+		if(m_pWing2)
 		{
 			AddString("       Calculating second wing...\r\n");
 			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
@@ -850,12 +850,10 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
 
-			m_pStab->VLMSetBending();
-			if(m_pStab->m_bWingOut) m_bPointOut = true;
+			if(m_pWing2->m_bWingOut) m_bPointOut = true;
 
-			Station += m_pStab->m_NStation;
+			Station += m_pWing2->m_NStation;
 		}
-
 		if(m_pStab) 
 		{
 			AddString("       Calculating elevator...\r\n");
@@ -936,6 +934,8 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		AddString("\r\n");
 	}
 	else m_bPointOut = true;
+
+
 	qApp->processEvents();
 
 	return true;

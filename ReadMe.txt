@@ -48,10 +48,12 @@ Licence :
 
                        **************************
 
+
 QFLR5 v0.03 Beta
 	- Marked more sentences for translsation
 	- Corrected Tail volume calculation - was missing a PI/180 coefficient ; no impact on results
-	
+	- Corrected lift calculation in Type 2 polars. The lift was calculated by two different methods in separate parts of the code leading to incorrect results
+	- Corrects bugs related to projected areas for aero coeff calculations
 
 QFLR5 v0.02 Beta September 1st 2009
 	- Corrected many bugs

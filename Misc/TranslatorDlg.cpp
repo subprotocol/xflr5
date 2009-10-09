@@ -108,7 +108,6 @@ void TranslatorDlg::InitDialog()
 QStringList TranslatorDlg::findQmFiles()
 {
 	QDir dir(m_TranslationDirPath);
-
 	if(!dir.exists())
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("The directory ")+dir.path()+tr("does not exist"));

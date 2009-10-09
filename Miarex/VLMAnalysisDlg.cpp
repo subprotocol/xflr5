@@ -1193,8 +1193,6 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		}
 		else m_bPointOut = true;
 	}
-//qDebug() << m_pWPolar->m_WArea <<m_pWPolar->m_WSpan;
-//qDebug() << m_CL << m_InducedDrag << m_ViscousDrag;
 }
 
 
@@ -1996,7 +1994,6 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 			m_Gamma[q*m_MatSize+pp] *= m_VLMQInf[q];
 		}
 	}
-//for (int uu=0; uu<m_MatSize; uu++) qDebug()<<m_Gamma[uu];
 	return  true;
 }
 
