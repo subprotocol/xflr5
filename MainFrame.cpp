@@ -619,6 +619,10 @@ void MainFrame::CreateAFoilActions()
 	AFoilLECircle = new QAction(tr("Show LE Circle"), this);
 	connect(AFoilLECircle, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilLECircle()));
 
+	m_pShowLegend = new QAction(tr("Show Legend"), this);
+	m_pShowLegend->setCheckable(true);
+	connect(m_pShowLegend, SIGNAL(triggered()), pAFoil, SLOT(OnShowLegend()));
+
 	AFoilSetFlap = new QAction(tr("Set Flap"), this);
 	connect(AFoilSetFlap, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetFlap()));
 
@@ -644,6 +648,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(ResetYScaleAct);
 	AFoilViewMenu->addAction(ResetXYScaleAct);
 	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(m_pShowLegend);
 	AFoilViewMenu->addAction(AFoilLECircle);
 	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
@@ -694,6 +699,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(ResetYScaleAct);
 	AFoilCtxMenu->addAction(ResetXYScaleAct);
 	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(m_pShowLegend);
 	AFoilCtxMenu->addAction(AFoilLECircle);
 	AFoilCtxMenu->addAction(AFoilGridAct);
 	AFoilCtxMenu->addSeparator();
