@@ -71,7 +71,7 @@ private slots:
 	void OnImportBodyDef() ;
 	void OnTranslateBody();
 	void OnGrid();
-//	void OnSetupLight();
+	void OnInertia();
 	void OnClipPlane(int pos);
 	void OnLight();
 	void OnSurfaces();
@@ -179,7 +179,7 @@ private:
 	LineButton *m_pctrlBodyStyle;
 	FloatEdit *m_pctrlNXPanels, *m_pctrlNHoopPanels;
 	QComboBox *m_pctrlXDegree, *m_pctrlHoopDegree;
-	QPushButton *MenuButton;
+	QPushButton *m_pctrlMenuButton;
 	QMenu *BodyMenu;
 
 	QTableView *m_pctrlFrameTable, *m_pctrlPointTable;
@@ -191,7 +191,7 @@ private:
 	QAction *m_pUndo, *m_pRedo;
 	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody;// *m_pSetupLight;
 	QAction *m_pGrid;
-
+	QAction *m_pInertia;
 
 	CBody m_TmpPic;
 	CBody m_UndoPic[20];
@@ -236,7 +236,7 @@ private:
 	bool m_bCurFrameOnly;
 
 	int m_GLList;
-	int m_iView;
+//	int m_iView;
 	int m_NXPoints, m_NHoopPoints;
 	int m_Precision[10];
 

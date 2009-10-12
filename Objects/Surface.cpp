@@ -251,20 +251,6 @@ void CSurface::GetC4(int k, CVector &Pt, double &tau)
 	tau = sqrt((Pt.y-m_LA.y)*(Pt.y-m_LA.y)+(Pt.z-m_LA.z)*(Pt.z-m_LA.z))/m_Length;
 }
 
-double CSurface::GetTwist(int const &k)
-{
-	GetPanel(k, 0, 0);
-	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
-	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
-}
-
-
-
-void CSurface::GetNormal(double yrel, CVector &N)
-{
-	N = NormalA * (1.0-yrel) + NormalB * yrel;
-	N.Normalize();
-}
 
 double CSurface::GetChord(int const &k)
 {
@@ -272,6 +258,7 @@ double CSurface::GetChord(int const &k)
 	GetyDist(k, y1, y2);
 	return GetChord((y1+y2)/2.0);
 }
+
 
 double CSurface::GetChord(double const &tau)
 {
@@ -282,9 +269,35 @@ double CSurface::GetChord(double const &tau)
 
 	double ChordA = V1.VAbs();
 	double ChordB = V2.VAbs();
-	
-    return ChordA + (ChordB-ChordA) * fabs(tau);
+
+	return ChordA + (ChordB-ChordA) * fabs(tau);
 }
+
+
+
+double CSurface::GetFoilArea(double const &tau)
+{
+	double area, chordA, chordB;
+	if(m_pFoilA && m_pFoilB)
+	{
+		chordA = GetChord(tau);
+		chordB = GetChord(1-tau);
+		area = m_pFoilA->GetArea()*chordA*chordA*tau + m_pFoilB->GetArea()*chordB*chordB*(1.0-tau);//m2
+		return area;
+	}
+	else
+		return 0.0;
+}
+
+
+
+void CSurface::GetNormal(double yrel, CVector &N)
+{
+	N = NormalA * (1.0-yrel) + NormalB * yrel;
+	N.Normalize();
+}
+
+
 
 
 void CSurface::GetLeadingPt(int k, CVector &C)
@@ -363,6 +376,11 @@ void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 }
 
 
+double CSurface::GetPanelWidth(int const &k)
+{
+	GetPanel(k, 0, 0);
+	return fabs(LA.y-LB.y);
+}
 
 void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos)
 {
@@ -402,16 +420,6 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 	Point.z = APt.z * (1.0-yrel)+  BPt.z * yrel ;
 }
 
-void CSurface::GetTrailingPt(int k, CVector &C)
-{
-	GetPanel(k,0,0);
-
-	C.x    = (TA.x+TB.x)/2.0;
-	C.y    = (TA.y+TB.y)/2.0;
-	C.z    = (TA.z+TB.z)/2.0;
-}
-
-
 double CSurface::GetStripSpanPos(int const &k)
 {
 	int  l;
@@ -434,6 +442,25 @@ double CSurface::GetStripSpanPos(int const &k)
 	ZPos -= (m_LA.z + m_TA.z)/2.0;
 
 	return sqrt(YPos*YPos+ZPos*ZPos);
+}
+
+
+void CSurface::GetTrailingPt(int k, CVector &C)
+{
+	GetPanel(k,0,0);
+
+	C.x    = (TA.x+TB.x)/2.0;
+	C.y    = (TA.y+TB.y)/2.0;
+	C.z    = (TA.z+TB.z)/2.0;
+}
+
+
+
+double CSurface::GetTwist(int const &k)
+{
+	GetPanel(k, 0, 0);
+	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
+	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
 }
 
 

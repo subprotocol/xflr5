@@ -68,6 +68,7 @@ void ManageBodiesDlg::SetupLayout()
 	setLayout(MainLayout);
 
 	connect(m_pctrlNameList,   SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(OnNameList(QListWidgetItem *)));
+	connect(m_pctrlNameList,   SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OnDoubleClickTable(const QModelIndex &)));
 	connect(m_pctrlNew,        SIGNAL(clicked()), this, SLOT(OnNew()));
 	connect(m_pctrlEdit,       SIGNAL(clicked()), this, SLOT(OnEdit()));
 	connect(m_pctrlRename,     SIGNAL(clicked()), this, SLOT(OnRename()));
@@ -153,6 +154,24 @@ void ManageBodiesDlg::OnDelete()
 
 	UpdateBodyList();
 	SetBody();
+}
+
+
+
+void ManageBodiesDlg::OnDoubleClickTable(const QModelIndex &index)
+{
+	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	if(index.row()>=0)
+	{
+		QListWidgetItem* pItem =  m_pctrlNameList->item(index.row());
+
+		CBody *pBody = pMiarex->GetBody(pItem->text());
+		if(pBody)
+		{
+			SetBody(pBody);
+			OnEdit();
+		}
+	}
 }
 
 
@@ -249,11 +268,12 @@ void ManageBodiesDlg::OnEdit()
 
 		if(m_pBody == pMiarex->m_pCurBody)
 		{
-			if(pMiarex->m_iView==2)		pMiarex->CreateWPolarCurves();
-			else if(pMiarex->m_iView==1)	pMiarex->CreateWOppCurves();
-			else if(pMiarex->m_iView==4)	pMiarex->CreateCpCurves();
-	
 			pMiarex->SetUFO();
+
+			if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
+			else if(pMiarex->m_iView==WOPPVIEW)	pMiarex->CreateWOppCurves();
+			else if(pMiarex->m_iView==WCPVIEW)	pMiarex->CreateCpCurves();
+
 			pMiarex->m_bResetglBody     = true;
 			pMiarex->m_bResetglBodyMesh = true;
 			pMiarex->m_bResetglGeom     = true;
@@ -293,7 +313,6 @@ void ManageBodiesDlg::OnNew()
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	CBody *pBody = new CBody;
-
 	pGL3dBodyDlg->SetBody(pBody);
 	if(pGL3dBodyDlg->exec() == QDialog::Accepted)
 	{
@@ -330,7 +349,7 @@ void ManageBodiesDlg::SetBody(CBody *pBody)
 	QListWidgetItem *pItem ;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 
-	if(!pBody) pBody = m_pBody;
+//	if(!pBody) pBody = m_pBody;
 	if(pBody)
 	{
 		for (i=0; i<m_pctrlNameList->count(); i++)

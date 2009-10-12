@@ -28,6 +28,7 @@
 #include "BodyScaleDlg.h"
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
+#include "InertiaDlg.h"
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -85,8 +86,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
 	m_HorizontalSplit = -0.45;
 	m_VerticalSplit   =  0.35;
-
-	m_iView = 3;
 
 	m_GLList = 0;
 
@@ -156,6 +155,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_pResetScales      = new QAction(tr("Reset Scales"), this);
 	m_pShowCurFrameOnly = new QAction(tr("Show Current Frame Only"), this);
 	m_pShowCurFrameOnly->setCheckable(true);
+	m_pInertia          = new QAction(tr("Inertia..."), this);
 
 	m_pUndo= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
 	m_pUndo->setStatusTip(tr("Cancels the last modifiction made to the body"));
@@ -178,12 +178,13 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pTranslateBody, SIGNAL(triggered()), this, SLOT(OnTranslateBody()));
 	SetupLayout();
 
-	connect(m_pInsertPoint, SIGNAL(triggered()), this, SLOT(OnInsert()));
-	connect(m_pRemovePoint, SIGNAL(triggered()), this, SLOT(OnRemove()));
-	connect(m_pScaleBody, SIGNAL(triggered()), this, SLOT(OnScaleBody()));
+	connect(m_pInsertPoint,      SIGNAL(triggered()), this, SLOT(OnInsert()));
+	connect(m_pRemovePoint,      SIGNAL(triggered()), this, SLOT(OnRemove()));
+	connect(m_pScaleBody,        SIGNAL(triggered()), this, SLOT(OnScaleBody()));
 	connect(m_pShowCurFrameOnly, SIGNAL(triggered()), this, SLOT(OnShowCurFrameOnly()));
-	connect(m_pResetScales, SIGNAL(triggered()), this, SLOT(OnResetScales()));
-	connect(m_pGrid, SIGNAL(triggered()),this, SLOT(OnGrid()));
+	connect(m_pResetScales,      SIGNAL(triggered()), this, SLOT(OnResetScales()));
+	connect(m_pGrid,             SIGNAL(triggered()), this, SLOT(OnGrid()));
+	connect(m_pInertia,          SIGNAL(triggered()), this, SLOT(OnInertia()));
 
 	connect(m_pctrlIso, SIGNAL(clicked()),this, SLOT(On3DIso()));
 	connect(m_pctrlX, SIGNAL(clicked()),this, SLOT(On3DFront()));
@@ -3735,8 +3736,8 @@ void GL3dBodyDlg::OnFrameCellChanged(QWidget *pWidget)
 	ReadFrameSectionData(m_pBody->m_iActiveFrame);
 
 	m_pBody->UpdateFramePos(n);
+	m_bResetglBody   = true;
 	m_bResetglBody2D = true;
-
 	UpdateView();
 }
 
@@ -3758,6 +3759,16 @@ void GL3dBodyDlg::OnGrid()
 	m_BodyGridDlg.exec();
 	m_bResetglBody2D = true;
 	UpdateView();
+}
+
+
+void GL3dBodyDlg::OnInertia()
+{
+	InertiaDlg dlg;
+	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.m_pBody = m_pBody;
+	dlg.InitDialog();
+	dlg.exec();
 }
 
 
@@ -4674,7 +4685,7 @@ void GL3dBodyDlg::SetupLayout()
 	QHBoxLayout *ActionButtons = new QHBoxLayout;
 	m_pctrlUndo = new QPushButton(QIcon(":/images/OnUndo.png"), tr("Undo"));
 	m_pctrlRedo = new QPushButton(QIcon(":/images/OnRedo.png"), tr("Redo"));
-	QPushButton *MenuButton = new QPushButton(tr("Other"));
+	m_pctrlMenuButton = new QPushButton(tr("Other"));
 
 	BodyMenu = new QMenu("Actions...",this);
 
@@ -4687,11 +4698,12 @@ void GL3dBodyDlg::SetupLayout()
 	BodyMenu->addAction(m_pTranslateBody);
 	BodyMenu->addAction(m_pScaleBody);
 	BodyMenu->addSeparator();
-	MenuButton->setMenu(BodyMenu);
+	BodyMenu->addAction(m_pInertia);
+	m_pctrlMenuButton->setMenu(BodyMenu);
 
 	ActionButtons->addWidget(m_pctrlUndo);
 	ActionButtons->addWidget(m_pctrlRedo);
-	ActionButtons->addWidget(MenuButton);
+	ActionButtons->addWidget(m_pctrlMenuButton);
 	connect(m_pctrlUndo, SIGNAL(clicked()),this, SLOT(OnUndo()));
 	connect(m_pctrlRedo, SIGNAL(clicked()),this, SLOT(OnRedo()));
 

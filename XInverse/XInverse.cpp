@@ -32,11 +32,14 @@
 #include "../Objects/Foil.h"
 #include "../Graph/GraphDlg.h"
 
+
+extern CFoil* g_pCurFoil;
+
+
 QXInverse::QXInverse(QWidget *parent)
 	: QWidget(parent)
 {
 	m_bFullInverse = false;
-	pi = 3.141592654;
 
 	m_pXFoil = NULL;
 
@@ -1518,7 +1521,7 @@ void QXInverse::OnSpecal()
 	{
 		m_pctrlSpecif->setText(tr("Alpha = "));
 		m_pctrlSpec->SetPrecision(2);
-		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/pi);
+		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/PI);
 	}
 	else
 	{
@@ -1536,7 +1539,7 @@ void QXInverse::OnSpecInv()
 
 	if(m_pctrlSpecAlpha->isChecked())
 	{
-		pXFoil->alqsp[1] = m_pctrlSpec->GetValue()*pi/180.0;
+		pXFoil->alqsp[1] = m_pctrlSpec->GetValue()*PI/180.0;
 		pXFoil->iacqsp = 1;
 		pXFoil->qspcir();
 	}
@@ -1946,8 +1949,8 @@ void QXInverse::SetFoil()
 		CreateQCurve();
 		CreateMCurve();
 
-		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/pi);
-		m_pctrlTAngle->SetValue(pXFoil->agte*180.0);//agte expressed in pi units:!?!?
+		m_pctrlSpec->SetValue(pXFoil->alqsp[1]*180.0/PI);
+		m_pctrlTAngle->SetValue(pXFoil->agte*180.0);//agte expressed in PI units:!?!?
 		m_pctrlTGapx->SetValue(real(pXFoil->dzte));
 		m_pctrlTGapy->SetValue(imag(pXFoil->dzte));
 	}
@@ -2049,9 +2052,9 @@ bool QXInverse::SetParams()
 
 	OnSpecal();
 	//is a foil set as current in the mainframe ?
-	if (pMainFrame->m_pCurFoil && pXFoil->m_FoilName==pMainFrame->m_pCurFoil->m_FoilName && pXFoil->lqspec)
+	if (g_pCurFoil && pXFoil->m_FoilName==g_pCurFoil->m_FoilName && pXFoil->lqspec)
 	{
-		m_pRefFoil->CopyFoil(pMainFrame->m_pCurFoil);
+		m_pRefFoil->CopyFoil(g_pCurFoil);
 		m_pRefFoil->m_FoilColor = m_pQCurve->GetColor();
 //		m_pXFoil->m_FoilName    = m_pRefFoil->m_FoilName ;
 //		InitXFoil(m_pRefFoil);

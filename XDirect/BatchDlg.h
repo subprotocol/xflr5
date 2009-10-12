@@ -124,13 +124,12 @@ protected:
 	void* m_pXDirect;
 	void * m_pMainFrame;
 	void* m_pXFoil;
-	CFoil *m_pCurFoil;
+	CFoil *m_pFoil;
 	CPolar *m_pCurPolar;
 
 	QFont m_RFont;
 	QFont m_TitleFont;
 
-	QString m_FoilName;
 	QString m_PlrName;
 
 	QGraph m_RmsGraph;

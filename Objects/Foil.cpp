@@ -34,7 +34,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-double CFoil::pi = 3.141592654;
+
 
 CFoil::CFoil()
 {
@@ -263,8 +263,8 @@ void CFoil::DrawFoil(QPainter &painter, double alpha, double scalex, double scal
 	FoilPen.setStyle(GetStyle(m_nFoilStyle));
 	painter.setPen(FoilPen);
 
-	cosa = cos(alpha*pi/180.0);
-	sina = sin(alpha*pi/180.0);
+	cosa = cos(alpha*PI/180.0);
+	sina = sin(alpha*PI/180.0);
 
 	xa = (x[0]-0.5)*cosa - y[0]*sina + 0.5;
 	ya = (x[0]-0.5)*sina + y[0]*cosa;
@@ -505,13 +505,11 @@ double CFoil::GetArea()
 {
 	int i,ip;
 	double area = 0.0;
-	for (i=0; i<nb; i++){
-		if(i==nb-1)	ip = 0;
-		else		ip = i+1;
-		area +=  0.5*(yb[i]+yb[ip]) * (xb[i]-xb[ip]);
+	for (i=0; i<nb-1; i++)
+	{
+		area +=  fabs((yb[i+1]+yb[i])/2.0 * (xb[i+1]-xb[i]));
 	}
-
-        return fabs(area);
+	return area;
 }
 
 
@@ -1116,10 +1114,8 @@ void CFoil::SetLEFlap()
 	bool bIntersect;
 	double cosa, sina;
 
-	double pi = 3.141592654;
-
-	cosa = cos(m_LEFlapAngle*pi/180.0);
-	sina = sin(m_LEFlapAngle*pi/180.0);
+	cosa = cos(m_LEFlapAngle*PI/180.0);
+	sina = sin(m_LEFlapAngle*PI/180.0);
 	//first convert xhinge and yhinge in absolute coordinates
 	xh = m_LEXHinge/100.0;
 	double ymin = GetBaseLowerY(xh);
@@ -1367,9 +1363,8 @@ void CFoil::SetTEFlap()
 	bool bIntersect;
 	double cosa, sina;
 
-	double pi = 3.141592654;
-	cosa = cos(m_TEFlapAngle*pi/180.0);
-	sina = sin(m_TEFlapAngle*pi/180.0);
+	cosa = cos(m_TEFlapAngle*PI/180.0);
+	sina = sin(m_TEFlapAngle*PI/180.0);
 	//first convert xhinge and yhinge in absolute coordinates
 	xh = m_TEXHinge/100.0;
 	double ymin = GetBaseLowerY(xh);

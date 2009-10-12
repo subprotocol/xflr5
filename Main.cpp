@@ -25,6 +25,8 @@
 #include "QFLR5Application.h"
 #include "MainFrame.h"
 
+CFoil *g_pCurFoil;	//make it common to all applications
+
 int main(int argc, char *argv[])
 {
 	QFLR5Application app(argc, argv);

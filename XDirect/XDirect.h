@@ -309,7 +309,6 @@ private:
 
 
 	CFoil m_BufferFoil;		// used for screen drawing and temporary geometric mods
-	CFoil *m_pCurFoil;		// pointer to the currently selected foil
 	CPolar* m_pCurPolar;	// pointer to the currently selected foil polar
 	OpPoint * m_pCurOpp;	// pointer to the currently selected foil operating point
 
@@ -347,8 +346,6 @@ private:
 	XFoilAnalysisDlg m_XFdlg;	// the dialog class which manages the xfoil calculation and display output
 
 	XFoil *m_pXFoil;		// a pointer to the XFoil object
-
-	double pi;		// no idea
 };
 
 

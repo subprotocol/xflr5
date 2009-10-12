@@ -156,13 +156,10 @@ private:
 
 	QList<void *> *m_poaFoil;
 
-	CFoil* m_pCurFoil;
 	CFoil* m_pRefFoil;
 	CFoil* m_pModFoil;
 
 	CSpline m_Spline;
-
-	double pi;
 
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 	bool m_bLoaded;

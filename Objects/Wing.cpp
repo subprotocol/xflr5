@@ -144,7 +144,6 @@ CWing::CWing()
 
 	m_AVLIndex = -987654;//improbable value...
 
-	m_Weight     = 0.0;
 	m_nNodes     = 0;
 	m_MatSize    = 0;
 
@@ -273,7 +272,9 @@ void CWing::ComputeGeometry()
 		m_ProjectedSpan += m_TLength[k+1]*cos(m_TDihedral[k]*PI/180.0);
 
 		if(pFoilA && pFoilB)
-			m_Volume  += m_TLength[k+1]*(pFoilA->GetArea()*m_TChord[k] + pFoilB->GetArea()*m_TChord[k+1])/2.0;//m3
+		{
+			m_Volume  += m_TLength[k+1]*(pFoilA->GetArea()*m_TChord[k]*m_TChord[k] + pFoilB->GetArea()*m_TChord[k+1]*m_TChord[k+1])/2.0;//m3
+		}
 		m_MAChord += IntegralC2(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 		m_yMac    += IntegralCy(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 	}
@@ -1657,13 +1658,14 @@ bool CWing::LLTSetLinearSolution()
 	return false;
 }
 
-bool CWing::LLTInitialize()
+
+bool CWing::LLTInitialize(double mass)
 {
 	double y ;
 	int k;
 
-	if(m_Type == 2)	m_QInf0 = sqrt(2.*m_Weight* 9.81 /s_Density/m_PlanformArea);
-	else m_QInf0 = 0.0;
+	if(m_Type == 2)	m_QInf0 = sqrt(2.*mass* 9.81 /s_Density/m_PlanformArea);
+	else            m_QInf0 = 0.0;
 
 	m_bConverged = true;
 	m_bWingOut = false;

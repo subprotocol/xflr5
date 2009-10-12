@@ -26,6 +26,7 @@
 #include "GL3dWingDlg.h"
 #include "GLLightDlg.h"
 #include "WingScaleDlg.h"
+#include "InertiaDlg.h"
 #include <QDesktopWidget>
 #include <QGridLayout>
 #include <QHBoxLayout>
@@ -61,9 +62,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 
 	m_pWing = NULL;
 
-	pi = 3.141592654;
 
-	m_iView      = 3;
 	m_iSection   = -1;
 //	m_yMAC       = 0.0;
 	m_GLList     = 0;
@@ -129,12 +128,15 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_pContextMenu->addAction(m_pInsertBefore);
 	m_pContextMenu->addAction(m_pInsertAfter);
 	m_pContextMenu->addAction(m_pDeleteSection);
+//	m_pContextMenu->addAction(m_pResetScales);
+//	m_pContextMenu->addAction(m_pInertia);
 
 	SetupLayout();
 	Connect();
 
 	setMouseTracking(true);
 }
+
 
 bool GL3dWingDlg::CheckWing()
 {
@@ -260,6 +262,7 @@ void GL3dWingDlg::Connect()
 	connect(m_pctrlSymetric, SIGNAL(clicked()),this, SLOT(OnSymetric()));
 	connect(m_pctrlRightSide, SIGNAL(clicked()),this, SLOT(OnSide()));
 	connect(m_pctrlLeftSide, SIGNAL(clicked()),this, SLOT(OnSide()));
+	connect(m_pctrlInertiaButton, SIGNAL(clicked()),this, SLOT(OnInertia()));
 }
 
 
@@ -290,7 +293,7 @@ void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *p
 		dl =  (double)l;
 		dl2 = (double)NXFlapA;
 		if(XDist==1)
-			xPointA[l] = 1.0 - (1.0-xHingeA)/2.0 * (1.0-cos(dl*pi /dl2));
+			xPointA[l] = 1.0 - (1.0-xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
 		else
 			xPointA[l] = 1.0 - (1.0-xHingeA) * (dl/dl2);
 	}
@@ -299,7 +302,7 @@ void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *p
 		dl =  (double)l;
 		dl2 = (double)NXLeadA;
 		if(XDist==1)
-			xPointA[l+NXFlapA] = xHingeA - (xHingeA)/2.0 * (1.0-cos(dl*pi /dl2));
+			xPointA[l+NXFlapA] = xHingeA - (xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
 		else
 			xPointA[l+NXFlapA] = xHingeA - (xHingeA) * (dl/dl2);
 	}
@@ -309,7 +312,7 @@ void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *p
 		dl =  (double)l;
 		dl2 = (double)NXFlapB;
 		if(XDist==1)
-			xPointB[l] = 1.0 - (1.0-xHingeB)/2.0 * (1.0-cos(dl*pi /dl2));
+			xPointB[l] = 1.0 - (1.0-xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
 		else
 			xPointB[l] = 1.0 - (1.0-xHingeB) * (dl/dl2);
 	}
@@ -318,7 +321,7 @@ void GL3dWingDlg::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *p
 		dl =  (double)l;
 		dl2 = (double)NXLeadB;
 		if(XDist==1)
-			xPointB[l+NXFlapB] = xHingeB - (xHingeB)/2.0 * (1.0-cos(dl*pi /dl2));
+			xPointB[l+NXFlapB] = xHingeB - (xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
 		else
 			xPointB[l+NXFlapB] = xHingeB - (xHingeB) * (dl/dl2);
 	}
@@ -862,22 +865,22 @@ void GL3dWingDlg::GLDraw3D()
 			{
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr) * pi/180.0;
+					phi = (col * lon_incr) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = (row * lat_incr) * pi/180.0;
+						theta = (row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 					}
 				}
 				glEnd();
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr ) * pi/180.0;
+					phi = (col * lon_incr ) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = -(row * lat_incr) * pi/180.0;
+						theta = -(row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 					}
 				}
@@ -890,7 +893,7 @@ void GL3dWingDlg::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
 				}
 			}
@@ -901,7 +904,7 @@ void GL3dWingDlg::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(-phi) * cos(theta), R * sin(theta), R * sin(-phi) * cos(theta));
 				}
 			}
@@ -928,7 +931,7 @@ void GL3dWingDlg::GLDraw3D()
 
 				for (row = -NumAngles; row < NumAngles; row++)
 				{
-					theta = (row * lat_incr) * pi/180.0;
+					theta = (row * lat_incr) * PI/180.0;
 					glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 				}
 			}
@@ -939,7 +942,7 @@ void GL3dWingDlg::GLDraw3D()
 				theta = 0.;
 				for(col=-NumAngles; col<NumAngles; col++)
 				{
-					phi = (0.0 + (double)col*30.0/NumAngles) * pi/180.0;
+					phi = (0.0 + (double)col*30.0/NumAngles) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
 				}
 			}
@@ -1137,13 +1140,13 @@ void GL3dWingDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 
 	for (col = 0; col < NumLongitudes; col++)
 	{
-		phi1 = (start_lon + col * lon_incr) * pi/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * pi/180.0;
+		phi1 = (start_lon + col * lon_incr) * PI/180.0;
+		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
 
 		for (row = 0; row < NumLatitudes; row++)
 		{
-			theta1 = (start_lat + row * lat_incr) * pi/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * pi/180.0;
+			theta1 = (start_lat + row * lat_incr) * PI/180.0;
+			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
 
 			u[0] = R * cos(phi1) * cos(theta1);//x
 			u[1] = R * sin(theta1);//y
@@ -1881,11 +1884,26 @@ void GL3dWingDlg::OnDeleteSection()
 	UpdateView();
 }
 
+
+
+
 void GL3dWingDlg::OnFoilNames()
 {
 	m_bFoilNames = m_pctrlFoilNames->isChecked();
 	UpdateView();
 }
+
+
+void GL3dWingDlg::OnInertia()
+{
+	InertiaDlg dlg;
+	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.m_pWing = m_pWing;
+	dlg.InitDialog();
+	dlg.exec();
+}
+
+
 
 void GL3dWingDlg::OnLight()
 {
@@ -2819,9 +2837,11 @@ void GL3dWingDlg::SetupLayout()
 	QHBoxLayout *WingModCommands = new QHBoxLayout;
 	m_pctrlResetMesh    = new QPushButton(tr("Reset Mesh"));
 	m_pctrlScaleWing    = new QPushButton(tr("Scale Wing"));
+	m_pctrlInertiaButton = new QPushButton(tr("Inertia..."));
 //	m_pctrlSetupLight   = new QPushButton("Setup Light");
 	WingModCommands->addWidget(m_pctrlResetMesh);
 	WingModCommands->addWidget(m_pctrlScaleWing);
+	WingModCommands->addWidget(m_pctrlInertiaButton);
 //	WingModCommands->addWidget(m_pctrlSetupLight);
 
 

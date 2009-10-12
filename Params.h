@@ -21,6 +21,14 @@
 
 #define MAXRECENTFILES      8
 
+#define MAXMASSES          20
+
+#define WOPPVIEW            1
+#define WPOLARVIEW          2
+#define W3DVIEW             3
+#define WCPVIEW             4
+#define WSTABVIEW          10
+
 #define IQX  302	//300 = number of surface panel nodes + 6
 #define IQX2 151	//IQX/2 added arcds
 #define IWX   50	// number of wake panel nodes

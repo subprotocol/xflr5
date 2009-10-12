@@ -39,6 +39,7 @@ class CSurface : public QObject
 	friend class CVLMDlg;
 	friend class GL3dWingDlg;
 	friend class VLMAnalysisDlg;
+	friend class InertiaDlg;
 
 public:
     void AddFlapPanel(CPanel *pPanel);
@@ -70,6 +71,8 @@ public:
 	double GetChord(double const &tau);
 	double GetOffset(double const &tau);
 	double GetStripSpanPos(int const &k);
+	double GetFoilArea(double const &tau);
+	double GetPanelWidth(int const &k);
 
 	CSurface();
 	virtual ~CSurface();

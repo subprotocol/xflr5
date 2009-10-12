@@ -73,6 +73,7 @@ class MainFrame : public QMainWindow
 	friend class DisplaySettingsDlg;
 	friend class ManageFoilsDlg;
 	friend class ManageUFOsDlg;
+	friend class InertiaDlg;
 
 	Q_OBJECT
 
@@ -329,7 +330,6 @@ private:
 
 	QStringList m_RecentFiles;
 
-	CFoil *m_pCurFoil;
 
 	QList <void *> m_oaFoil;
 	QList <void *> m_oaPolar;

@@ -51,6 +51,7 @@ private slots:
 	void OnNew();
 	void OnExportDefinition();
 	void OnExportGeometry();
+	void OnDoubleClickTable(const QModelIndex &index);
 
 private:
 	void SetBody(CBody *pBody = NULL);

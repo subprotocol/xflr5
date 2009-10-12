@@ -67,7 +67,6 @@ class CFoil
 
 
 public:
-	static double pi;
 	CFoil();
 	~CFoil();
 	void GetFoilName(QString &FoilName);

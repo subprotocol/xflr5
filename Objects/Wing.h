@@ -50,6 +50,7 @@ class CWing
 	friend class CtrlPolarDlg;
 	friend class GL3dWingDlg;
 	friend class ManageUFOsDlg;
+	friend class InertiaDlg;
 	// Construction
 public:
 
@@ -79,7 +80,7 @@ protected:
 	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 
-	bool LLTInitialize();
+	bool LLTInitialize(double mass);
 	bool LLTSetLinearSolution();
 	void LLTInitCl();
 	void LLTComputeWing();
@@ -166,7 +167,8 @@ protected:
 
 	double m_QInf0;
 //	double m_Span;		// wing span
-	double m_Weight;    // Wing weight
+//	double m_Weight;    // Wing weight - used to initialize LLT for type 2 analysis
+	double m_Mass;	    //for inertia calculations
 	double m_PlanformSpan;
 	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord

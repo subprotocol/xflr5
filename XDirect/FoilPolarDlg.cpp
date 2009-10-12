@@ -22,6 +22,8 @@
 #include "FoilPolarDlg.h"
 #include "XDirect.h"
 
+extern CFoil *g_pCurFoil;
+
 FoilPolarDlg::FoilPolarDlg(void *pParent)
 {
 	setWindowTitle(tr("Foil Polar Definition"));
@@ -183,7 +185,7 @@ void FoilPolarDlg::InitDialog()
 {
 	QXDirect* pXDirect = (QXDirect*)m_pParent;
 
-	if(pXDirect && pXDirect->m_pCurFoil) m_FoilName = pXDirect->m_pCurFoil->m_FoilName;
+	if(pXDirect && g_pCurFoil) m_FoilName = g_pCurFoil->m_FoilName;
 
 	QString str = tr("Analysis parameters for ")+ m_FoilName;
 	setWindowTitle(str);

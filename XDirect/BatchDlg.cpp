@@ -404,11 +404,11 @@ void BatchDlg::CleanUp()
 void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 {
 //	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	if(!m_pCurFoil) return;
+	if(!m_pFoil) return;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_pCurPolar = new CPolar;
-	m_pCurPolar->m_FoilName   = m_FoilName;
+	m_pCurPolar->m_FoilName   = m_pFoil->m_FoilName;
 	m_pCurPolar->m_bIsVisible = true;
 	m_pCurPolar->m_Type = m_Type;
 	switch (m_pCurPolar->m_Type)
@@ -450,7 +450,7 @@ void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 	m_pCurPolar->m_Color = pMainFrame->GetColor(1);
 
 	SetPlrName();
-	CPolar *pPolar = pMainFrame->GetPolar(m_pCurFoil->m_FoilName, m_pCurPolar->m_PlrName);
+	CPolar *pPolar = pMainFrame->GetPolar(m_pFoil->m_FoilName, m_pCurPolar->m_PlrName);
 
 	if(pPolar)
 	{
@@ -500,10 +500,11 @@ void BatchDlg::InitDialog()
 //	GetWindowRect(WndRect);
 //	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
 
+	if(!m_pFoil) return;
+
 	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
 
-	m_FoilName = pXDirect->m_pCurFoil->m_FoilName;
-	QString str = tr("Batch analysis for ")+ m_FoilName;
+	QString str = tr("Batch analysis for ")+ m_pFoil->m_FoilName;
 	setWindowTitle(str);
 
 	m_pctrlMach->SetPrecision(2);
@@ -647,12 +648,12 @@ bool BatchDlg::InitXFoil2()
 		}
 	}
 
-	for(int i =0; i<m_pCurFoil->n; i++)
+	for(int i =0; i<m_pFoil->n; i++)
 	{
-		pXFoil->xb[i+1] = m_pCurFoil->x[i];
-		pXFoil->yb[i+1] = m_pCurFoil->y[i];
+		pXFoil->xb[i+1] = m_pFoil->x[i];
+		pXFoil->yb[i+1] = m_pFoil->y[i];
 	}
-	pXFoil->nb     = m_pCurFoil->n;
+	pXFoil->nb     = m_pFoil->n;
 	pXFoil->lbflap = false;
 	pXFoil->ddef   = 0.0;
 	pXFoil->xbf    = 1.0;
@@ -1221,7 +1222,7 @@ void BatchDlg::SetFileHeader()
 	out << "\n";
 	out << pMainFrame->m_VersionName;
 	out << "\n";
-	out << m_FoilName;
+	out << m_pFoil->m_FoilName;
 	out << "\n";
 	if(pXDirect && pXDirect->m_pCurPolar)
 	{

@@ -53,6 +53,7 @@ public:
 	double GetLength();
 	double Getu(double x);
 	double Getv(double u, CVector r, bool bRight);
+	double GetSectionArcLength(double x);
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
@@ -90,7 +91,7 @@ public:
 	int m_BodyStyle, m_BodyWidth;
 
 	double m_Bunch;
-	double pi;
+	double m_Mass;	    //for inertia calculations
 
 	int m_np;
 	double  m_x[IBX], m_y[IBX];	// the point coordinates of the overlayed body

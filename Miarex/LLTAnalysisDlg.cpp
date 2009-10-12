@@ -105,7 +105,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 	if(!m_bSequence) ia = 0;
 
-	if(!m_pWing->LLTInitialize()) return false;
+	if(!m_pWing->LLTInitialize(m_pWPolar->m_Weight)) return false;
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
@@ -489,7 +489,7 @@ bool LLTAnalysisDlg::ReLoop()
 	str = "Initializing analysis...\r\n";
 	UpdateOutput(str);
 
-	if(!m_pWing->LLTInitialize()) return false;
+	if(!m_pWing->LLTInitialize(m_pWPolar->m_Weight)) return false;
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);

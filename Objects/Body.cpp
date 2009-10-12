@@ -40,7 +40,7 @@ QRect CBody::s_rViewRect;
 CBody::CBody()
 {
 	int i;
-	pi = 3.141592654;
+
 	m_BodyName = UnitsDlg::tr("BodyName");
 
 	m_BodyColor = QColor(210,240,240);
@@ -56,6 +56,8 @@ CBody::CBody()
 	m_FramePosition[6].Set(  0.63, 0.0,  0.0);
 
 	m_bClosedSurface = false;
+
+	m_Mass = 0.0;
 
 	m_NStations  = 7;
 	m_NSideLines = 5;
@@ -145,8 +147,8 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
 	CVector PanelForce, LeverArm, WindNormal, WindDirection;
 	CVector GeomMoment;
 
-	cosa = cos(Alpha*pi/180.0);
-	sina = sin(Alpha*pi/180.0);
+	cosa = cos(Alpha*PI/180.0);
+	sina = sin(Alpha*PI/180.0);
 
 
 	//   Define wind axis
@@ -447,10 +449,32 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 }
 
 
+double CBody::GetSectionArcLength(double x)
+{
+	//NURBS only
+	if(m_LineType==1) return 0.0;
+	// aproximate arc length, used for inertia estimations
+	double length = 0.0;
+	double v;
+	double ux = Getu(x);
+	CVector Pt, Pt1;
+	GetPoint(ux, 0.0, true, Pt1);
+
+	int NPoints = 10;//why not ?
+	for(int i=1; i<=NPoints; i++)
+	{
+		GetPoint(ux, (double)i/(double)NPoints, true, Pt);
+		length += sqrt((Pt.y-Pt1.y)*(Pt.y-Pt1.y) + (Pt.z-Pt1.z)*(Pt.z-Pt1.z));
+		Pt1.y = Pt.y;
+		Pt1.z = Pt.z;
+	}
+	return length*2.0; //to account for left side.
+}
+
 
 double CBody::Getu(double x)
 {
-	if(x<=m_FramePosition[0].x)            return 0.0;
+	if(x<=m_FramePosition[0].x)             return 0.0;
 	if(x>=m_FramePosition[m_NStations-1].x) return 1.0;
 	if(fabs(m_FramePosition[m_NStations-1].x-m_FramePosition[0].x)<0.0000001) return 0.0;
 
@@ -890,7 +914,7 @@ void CBody::InterpolateSurface()
 			t_r.Set(0.0, m_Frame[k].m_Point[i].y, m_Frame[k].m_Point[i].z);
 			t_r.Normalize();
 			if(t_r.VAbs()<1.0e-10) v[i] = 0.0;
-			else                   v[i] = acos(t_r.dot(t_R))/pi;
+			else                   v[i] = acos(t_r.dot(t_R))/PI;
 		}
 		v[m_NSideLines-1] = 0.9999999999;
 

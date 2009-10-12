@@ -86,7 +86,7 @@ private slots:
 	void OnDeleteSection();
 	void OnResetMesh();
 	void OnScaleWing();
-
+	void OnInertia();
 
 
 private:
@@ -171,9 +171,9 @@ private:
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 
-	QSlider *m_pctrlClipPlanePos;
+	QPushButton *m_pctrlInertiaButton;
 
-	QMenu *BodyMenu;
+	QSlider *m_pctrlClipPlanePos;
 
 	QAction *m_pResetScales;
 	QAction *m_pUndo, *m_pRedo;
@@ -206,10 +206,9 @@ private:
 	int m_iSection;
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	int m_GLList;
-	int m_iView;
+//	int m_iView;
 	int m_Precision[10];
 
-	double pi;
 //	double m_yMAC;
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
