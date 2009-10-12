@@ -104,8 +104,8 @@ SOURCES += MainFrame.cpp \
     Miarex/UFOTableDelegate.cpp \
     Misc/PolarFilterDlg.cpp \
     Misc/TranslatorDlg.cpp \
-    QFLR5Application.cpp
-
+    QFLR5Application.cpp \
+    Miarex/InertiaDlg.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -204,18 +204,13 @@ HEADERS += MainFrame.h \
     Miarex/UFOTableDelegate.h \
     Misc/PolarFilterDlg.h \
     Misc/TranslatorDlg.h \
-    QFLR5Application.h
-
+    QFLR5Application.h \
+    Miarex/InertiaDlg.h
 TRANSLATIONS = qflr5.ts \
-			   qflr5_de.ts
-
-
+    qflr5_de.ts
 win32:RC_FILE = res/QFLR5.rc
-
 RESOURCES += qflr5.qrc
-
 FORMS += 
-
 unix { 
     # VARIABLES
     isEmpty(PREFIX):PREFIX = /usr/local
