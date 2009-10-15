@@ -871,6 +871,8 @@ void MainFrame::CreateDockWindows()
 
 	CWPolar::s_pMainFrame  = this;
 
+	LLTAnalysisDlg::s_pMainFrame = this;
+	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
 	VLMAnalysisDlg::s_pMainFrame = this;
 	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;

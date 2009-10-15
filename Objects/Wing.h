@@ -94,6 +94,7 @@ protected:
 	void ComputeChords(int NStation=0);
 	void ComputeDihedrals();
 	void ComputeGeometry();
+	void ComputeInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);

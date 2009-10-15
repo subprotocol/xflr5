@@ -31,38 +31,63 @@
 
  QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
  {
-	 FloatEdit *editor = new FloatEdit(parent);
-	 editor->setAlignment(Qt::AlignRight);
-
-	 editor->SetPrecision(m_Precision[index.column()]);
-
-	 return editor;
+	 if(m_Precision[index.column()]>=0)
+	 {
+		 //we have a number
+		 FloatEdit *editor = new FloatEdit(parent);
+		 editor->setAlignment(Qt::AlignRight);
+		 editor->SetPrecision(m_Precision[index.column()]);
+		 return editor;
+	 }
+	 else
+	 {
+		 //we have a string
+		 QLineEdit *editor = new QLineEdit(parent);
+		 editor->setAlignment(Qt::AlignLeft);
+		 return editor;
+	 }
  }
 
- void FloatEditDelegate::setEditorData(QWidget *editor,
-									 const QModelIndex &index) const
- {
-	 double value = index.model()->data(index, Qt::EditRole).toDouble();
+void FloatEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+	if(m_Precision[index.column()]>=0)
+	{
+		double value = index.model()->data(index, Qt::EditRole).toDouble();
+		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		floatEdit->SetValue(value);
+	}
+	else
+	{
+		QLineEdit *pLine = static_cast<QLineEdit*>(editor);
+		pLine->setText(index.model()->data(index, Qt::EditRole).toString());
+	}
+}
 
-	 FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-	 floatEdit->SetValue(value);
- }
 
- void FloatEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-									const QModelIndex &index) const
- {
-	 FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
 
-	 double value = floatEdit->GetValue();
+void FloatEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+								const QModelIndex &index) const
+{
+	if(m_Precision[index.column()]>=0)
+	{
+		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
+		double value = floatEdit->GetValue();
+		model->setData(index, value, Qt::EditRole);
+	}
+	else
+	{
+		QLineEdit *pLine = static_cast<QLineEdit*>(editor);
+		model->setData(index, pLine->text(), Qt::EditRole);
+	}
+}
 
-	 model->setData(index, value, Qt::EditRole);
- }
 
- void FloatEditDelegate::updateEditorGeometry(QWidget *editor,
-	 const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
- {
-	 editor->setGeometry(option.rect);
- }
+void FloatEditDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+{
+	editor->setGeometry(option.rect);
+}
+
+
 
 void FloatEditDelegate::SetPrecision(int *PrecisionTable)
 {
@@ -75,8 +100,16 @@ void FloatEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 {
 	QString strong;
 	QStyleOptionViewItem myOption = option;
-	myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
-	strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(),0,'f', m_Precision[index.column()]);
+	if(m_Precision[index.column()]>=0)
+	{
+		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
+		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(),0,'f', m_Precision[index.column()]);
+	}
+	else
+	{
+		myOption.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
+		strong = index.model()->data(index, Qt::DisplayRole).toString();
+	}
 	drawDisplay(painter, myOption, myOption.rect, strong);
 	drawFocus(painter, myOption, myOption.rect);
 }

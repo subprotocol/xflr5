@@ -523,8 +523,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_ArcBall.m_pRect     = &m_rCltRect;
 
 	m_pLLTDlg = new LLTAnalysisDlg;
-	m_pLLTDlg->m_pMiarex    = this;
-	m_pLLTDlg->m_pMainFrame = m_pMainFrame;
 	CWing::s_pLLTDlg        = m_pLLTDlg;
 
 	m_pVLMDlg = new VLMAnalysisDlg;

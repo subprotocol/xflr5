@@ -57,7 +57,7 @@ CBody::CBody()
 
 	m_bClosedSurface = false;
 
-	m_Mass = 0.0;
+	m_Mass = 1.0;
 
 	m_NStations  = 7;
 	m_NSideLines = 5;
@@ -183,6 +183,225 @@ void CBody::ComputeCenterLine()
 		m_FramePosition[i].z=(m_Frame[i].m_Point[0].z + m_Frame[i].m_Point[m_NSideLines-1].z)/2.0;
 	}
 }
+
+
+void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+{
+	// Assume that the mass is distributed homogeneously in the body's skin
+	// Homogeneity is questionable, but is a rather handy assumption
+	// Mass in the body's skin is reasonable, given that the point masses
+	// are added manually
+
+	//evaluate roughly the Body's wetted area
+	int i,j,k;
+	double ux, rho;
+	double dj, dj1;
+	CVector Pt, LA, LB, TA,TB, LATB, TALB, N, PLA, PTA, PLB, PTB, Top, Bot;
+	double BodyArea = 0.0;
+	double SectionArea;
+	double xpos, dl;
+	CoG.Set(0.0, 0.0, 0.0);
+
+	if(m_LineType==1)
+	{
+		// we use the panel division
+		//first get the wetted area
+
+		for (i=0; i<m_NStations-1; i++)
+		{
+			for (k=0; k<m_NSideLines-1; k++)
+			{
+				//build the four corner points of the strips
+				PLA.x =  m_FramePosition[i].x     ;
+				PLA.y =  m_Frame[i].m_Point[k].y  ;
+				PLA.z =  m_Frame[i].m_Point[k].z  ;
+
+				PLB.x = m_FramePosition[i].x      ;
+				PLB.y = m_Frame[i].m_Point[k+1].y ;
+				PLB.z = m_Frame[i].m_Point[k+1].z ;
+
+				PTA.x = m_FramePosition[i+1].x    ;
+				PTA.y = m_Frame[i+1].m_Point[k].y ;
+				PTA.z = m_Frame[i+1].m_Point[k].z ;
+
+				PTB.x = m_FramePosition[i+1].x     ;
+				PTB.y = m_Frame[i+1].m_Point[k+1].y;
+				PTB.z = m_Frame[i+1].m_Point[k+1].z;
+
+				LATB = PTB - PLA;
+				TALB = PLB - PTA;
+				N = TALB * LATB;//panel area x2
+				BodyArea += N.VAbs() /2.0;
+			}
+		}
+
+		BodyArea *= 2.0;
+		rho = Mass/BodyArea;
+		//First get the CoG position
+		for (i=0; i<m_NStations-1; i++)
+		{
+			for (j=0; j<m_xPanels[i]; j++)
+			{
+				dj  = (double) j   /(double)(m_xPanels[i]);
+				dj1 = (double)(j+1)/(double)(m_xPanels[i]);
+				SectionArea = 0.0;
+
+				PLA.x = PLB.x = (1.0- dj) * m_FramePosition[i].x   +  dj * m_FramePosition[i+1].x;
+				PTA.x = PTB.x = (1.0-dj1) * m_FramePosition[i].x   + dj1 * m_FramePosition[i+1].x;
+
+				for (k=0; k<m_NSideLines-1; k++)
+				{
+					//build the four corner points of the strips
+					PLB.y = (1.0- dj) * m_Frame[i].m_Point[k].y   +  dj * m_Frame[i+1].m_Point[k].y;
+					PLB.z = (1.0- dj) * m_Frame[i].m_Point[k].z   +  dj * m_Frame[i+1].m_Point[k].z;
+
+					PTB.y = (1.0-dj1) * m_Frame[i].m_Point[k].y   + dj1 * m_Frame[i+1].m_Point[k].y;
+					PTB.z = (1.0-dj1) * m_Frame[i].m_Point[k].z   + dj1 * m_Frame[i+1].m_Point[k].z;
+
+					PLA.y = (1.0- dj) * m_Frame[i].m_Point[k+1].y +  dj * m_Frame[i+1].m_Point[k+1].y;
+					PLA.z = (1.0- dj) * m_Frame[i].m_Point[k+1].z +  dj * m_Frame[i+1].m_Point[k+1].z;
+
+					PTA.y = (1.0-dj1) * m_Frame[i].m_Point[k+1].y + dj1 * m_Frame[i+1].m_Point[k+1].y;
+					PTA.z = (1.0-dj1) * m_Frame[i].m_Point[k+1].z + dj1 * m_Frame[i+1].m_Point[k+1].z;
+
+					LATB = PTB - PLA;
+					TALB = PLB - PTA;
+					N = TALB * LATB;//panel area x2
+					SectionArea += N.VAbs() /2.0;
+				}
+				SectionArea *= 2.0;// to account for right side;
+
+				// get center point for this section
+				Pt.x = (PLA.x + PTA.x)/2.0;
+				Pt.y = 0.0;
+				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
+					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
+
+				CoG.x += SectionArea*rho * Pt.x;
+				CoG.y += SectionArea*rho * Pt.y;
+				CoG.z += SectionArea*rho * Pt.z;
+			}
+		}
+		if(Mass>1.e-30) CoG *= 1.0/ Mass;
+		else            CoG.Set(0.0, 0.0, 0.0);
+
+		//Then Get Inertias
+		// we could do it one calculation, for CG and inertia, by using Hyghens/steiner theorem
+		for (i=0; i<m_NStations-1; i++)
+		{
+			for (j=0; j<m_xPanels[i]; j++)
+			{
+				dj  = (double) j   /(double)(m_xPanels[i]);
+				dj1 = (double)(j+1)/(double)(m_xPanels[i]);
+				SectionArea = 0.0;
+
+				PLA.x = PLB.x = (1.0- dj) * m_FramePosition[i].x   +  dj * m_FramePosition[i+1].x;
+				PTA.x = PTB.x = (1.0-dj1) * m_FramePosition[i].x   + dj1 * m_FramePosition[i+1].x;
+
+				for (k=0; k<m_NSideLines-1; k++)
+				{
+					//build the four corner points of the strips
+					PLB.y = (1.0- dj) * m_Frame[i].m_Point[k].y   +  dj * m_Frame[i+1].m_Point[k].y;
+					PLB.z = (1.0- dj) * m_Frame[i].m_Point[k].z   +  dj * m_Frame[i+1].m_Point[k].z;
+
+					PTB.y = (1.0-dj1) * m_Frame[i].m_Point[k].y   + dj1 * m_Frame[i+1].m_Point[k].y;
+					PTB.z = (1.0-dj1) * m_Frame[i].m_Point[k].z   + dj1 * m_Frame[i+1].m_Point[k].z;
+
+					PLA.y = (1.0- dj) * m_Frame[i].m_Point[k+1].y +  dj * m_Frame[i+1].m_Point[k+1].y;
+					PLA.z = (1.0- dj) * m_Frame[i].m_Point[k+1].z +  dj * m_Frame[i+1].m_Point[k+1].z;
+
+					PTA.y = (1.0-dj1) * m_Frame[i].m_Point[k+1].y + dj1 * m_Frame[i+1].m_Point[k+1].y;
+					PTA.z = (1.0-dj1) * m_Frame[i].m_Point[k+1].z + dj1 * m_Frame[i+1].m_Point[k+1].z;
+
+					LATB = PTB - PLA;
+					TALB = PLB - PTA;
+					N = TALB * LATB;//panel area x2
+					SectionArea += N.VAbs() /2.0;
+				}
+				SectionArea *= 2.0;// to account for right side;
+
+				// get center point for this section
+				Pt.x = (PLA.x + PTA.x)/2.0;
+				Pt.y = 0.0;
+				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
+					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
+				//Add inertia contribution
+				Ixx += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+				Iyy += SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+				Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
+				Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
+
+				CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+				CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+				CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
+				CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+			}
+		}
+	}
+	else if(m_LineType==2)
+	{
+		int NSections = 20;//why not ?
+		xpos = m_FramePosition[0].x;
+
+		dl = GetLength()/(double)(NSections-1);
+
+		for (j=0; j<NSections-1; j++)
+		{
+			BodyArea += dl * (GetSectionArcLength(xpos)+ GetSectionArcLength(xpos+dl)) /2.0;
+			xpos += dl;
+		}
+
+		rho = Mass / BodyArea;
+
+		// First evaluate CoG, assuming each section is a point mass
+		xpos = m_FramePosition[0].x;
+		for (j=0; j<NSections-1; j++)
+		{
+			SectionArea = dl * (GetSectionArcLength(xpos)+ GetSectionArcLength(xpos+dl))/2.0;
+			Pt.x = xpos + dl/2.0;
+			Pt.y = 0.0;
+			ux = Getu(Pt.x);
+			GetPoint(ux, 0.0, true, Top);
+			GetPoint(ux, 1.0, true, Bot);
+			Pt.z = (Top.z + Bot.z)/2.0;
+			xpos += dl;
+
+			CoG.x += SectionArea*rho * Pt.x;
+			CoG.y += SectionArea*rho * Pt.y;
+			CoG.z += SectionArea*rho * Pt.z;
+		}
+		if(Mass>1.e-30) CoG *= 1.0/ Mass;
+		else            CoG.Set(0.0, 0.0, 0.0);
+
+		// Next evaluate inertia, assuming each section is a point mass
+		xpos = m_FramePosition[0].x;
+		for (j=0; j<NSections-1; j++)
+		{
+			SectionArea = dl * (GetSectionArcLength(xpos)+ GetSectionArcLength(xpos+dl))/2.0;
+			Pt.x = xpos + dl/2.0;
+			Pt.y = 0.0;
+			ux = Getu(Pt.x);
+			GetPoint(ux, 0.0, true, Top);
+			GetPoint(ux, 1.0, true, Bot);
+			Pt.z = (Top.z + Bot.z)/2.0;
+
+			Ixx += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+			Iyy += SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+			Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
+			Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
+
+			CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
+			CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+
+			xpos += dl;
+
+		}
+	}
+}
+
+
 
 
 void CBody::Duplicate(CBody *pBody)
@@ -455,7 +674,6 @@ double CBody::GetSectionArcLength(double x)
 	if(m_LineType==1) return 0.0;
 	// aproximate arc length, used for inertia estimations
 	double length = 0.0;
-	double v;
 	double ux = Getu(x);
 	CVector Pt, Pt1;
 	GetPoint(ux, 0.0, true, Pt1);
@@ -1185,7 +1403,7 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 	double theta[MAXSIDELINES];
 	double angle;
 	QByteArray textline;
-	const char *text;
+//	const char *text;
 	QString strong;
 	int i, j, k, res;
 	i = 0;
@@ -1542,7 +1760,6 @@ void CBody::UpdateFramePos(int iFrame)
 		m_Frame[iFrame].m_Point[i].z += z;
 	}
 }
-
 
 
 

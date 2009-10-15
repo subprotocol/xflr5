@@ -38,7 +38,6 @@ VLMAnalysisDlg::VLMAnalysisDlg()
 {
 	setWindowTitle("VLM Analysis");
 	SetupLayout();
-	pi = 3.141592654;
 
 	m_bSequence      = false;
 	m_bWarning       = false;
@@ -205,7 +204,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 //	Loop for each control value
 //     Update the geometry, design variables
-//     Get solutions for alpha = -pi/4 and alpha = +pi/4
+//     Get solutions for alpha = -PI/4 and alpha = +PI/4
 //     Interpolate to find alpha_0 such that Cm=0
 //	   Compute plane for alpha_0
 //	end loop
@@ -342,11 +341,11 @@ bool VLMAnalysisDlg::ControlLoop()
 		//start loop to find zero-pitching-moment alpha
 
 		iter = 0;
-		a0 = -pi/4.0;
-		a1 =  pi/4.0;
+		a0 = -PI/4.0;
+		a1 =  PI/4.0;
 		a = 0.0;
-		Cm0 = VLMComputeCm(a0*180.0/pi);
-		Cm1 = VLMComputeCm(a1*180.0/pi);
+		Cm0 = VLMComputeCm(a0*180.0/PI);
+		Cm1 = VLMComputeCm(a1*180.0/PI);
 
 		Cm = 1.0;
 
@@ -355,8 +354,8 @@ bool VLMAnalysisDlg::ControlLoop()
 		{
 			a0 *=0.9;
 			a1 *=0.9;
-			Cm0 = VLMComputeCm(a0*180.0/pi);
-			Cm1 = VLMComputeCm(a1*180.0/pi);
+			Cm0 = VLMComputeCm(a0*180.0/PI);
+			Cm1 = VLMComputeCm(a1*180.0/PI);
 			iter++;
 			if(m_bCancel) break;
 		}
@@ -376,14 +375,14 @@ bool VLMAnalysisDlg::ControlLoop()
 				tmp = Cm1;
 				Cm1 = Cm0;
 				Cm0 = tmp;
-				a0  =  pi/4.0;
-				a1  = -pi/4.0;
+				a0  =  PI/4.0;
+				a1  = -PI/4.0;
 			}
 
 			while (fabs(Cm)>eps && iter <100)
 			{
 				a = (a0+a1)/2.0;
-				Cm = VLMComputeCm(a*180.0/pi);
+				Cm = VLMComputeCm(a*180.0/PI);
 				if(Cm>0.0)
 				{
 					a1  = a;
@@ -400,12 +399,12 @@ bool VLMAnalysisDlg::ControlLoop()
 			if (m_bCancel) break;
 
 
-			Cm = VLMComputeCm(a*180.0/pi);
+			Cm = VLMComputeCm(a*180.0/PI);
 
 			if(fabs(Cm)<eps)
 			{
-				VLMSolveMultiple(a*180.0/pi, 0.0, 1);
-				VLMComputePlane(a*180.0/pi, m_ControlDelta, 1);
+				VLMSolveMultiple(a*180.0/PI, 0.0, 1);
+				VLMComputePlane(a*180.0/PI, m_ControlDelta, 1);
 			}
 			else
 			{
@@ -947,12 +946,12 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 
 double VLMAnalysisDlg::VLMComputeCm(double alpha)
 {
-	CVector V(cos(alpha*pi/180.0), 0.0, sin(alpha*pi/180.0));
+	CVector V(cos(alpha*PI/180.0), 0.0, sin(alpha*PI/180.0));
 	CVector Force, PanelLeverArm;
 	int p, Size;
 	double Cm = 0.0;
-	double cosa = cos(alpha*pi/180.0);
-	double sina = sin(alpha*pi/180.0);
+	double cosa = cos(alpha*PI/180.0);
+	double sina = sin(alpha*PI/180.0);
 
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
@@ -1052,8 +1051,8 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			}
 			m_OpAlpha = Alpha;
 			//   Define wind axis
-			cosa = cos(Alpha*pi/180.0);
-			sina = sin(Alpha*pi/180.0);
+			cosa = cos(Alpha*PI/180.0);
+			sina = sin(Alpha*PI/180.0);
 			WindNormal.Set(-sina, 0.0, cosa);
 			WindDirection.Set(cosa, 0.0, sina);
 		}
@@ -1447,9 +1446,9 @@ void VLMAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const 
 			Psi.z /= ftmp;
 
 			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/r1v - (r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/r2v;
-			V.x += Psi.x * Omega/4.0/pi;
-			V.y += Psi.y * Omega/4.0/pi;
-			V.z += Psi.z * Omega/4.0/pi;
+			V.x += Psi.x * Omega/4.0/PI;
+			V.y += Psi.y * Omega/4.0/PI;
+			V.z += Psi.z * Omega/4.0/PI;
 		}
 	}
 }
@@ -1515,9 +1514,9 @@ void VLMAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C
 			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
 				   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
-			V.x = Psi.x * Omega/4.0/pi;
-			V.y = Psi.y * Omega/4.0/pi;
-			V.z = Psi.z * Omega/4.0/pi;
+			V.x = Psi.x * Omega/4.0/PI;
+			V.y = Psi.y * Omega/4.0/PI;
+			V.z = Psi.z * Omega/4.0/PI;
 		}
 	}
 
@@ -1528,7 +1527,7 @@ void VLMAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C
 	// calculate left contribution
 	Far.x = A.x + m_pWing->m_PlanformSpan * 10000.0;
 	Far.y = A.y;
-	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*pi/180.0);
+	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*PI/180.0);
 
 	r0.x = A.x - Far.x;
 	r0.y = A.y - Far.y;
@@ -1566,15 +1565,15 @@ void VLMAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C
 		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
 				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
-		V.x += Psi.x * Omega/4.0/pi;
-		V.y += Psi.y * Omega/4.0/pi;
-		V.z += Psi.z * Omega/4.0/pi;
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
 	}
 
 	// calculate right vortex contribution
 	Far.x = B.x + m_pWing->m_PlanformSpan * 10000.0;
 	Far.y = B.y ;
-	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*pi/180.0);
+	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*PI/180.0);
 
 	r0.x = Far.x - B.x;
 	r0.y = Far.y - B.y;
@@ -1609,9 +1608,9 @@ void VLMAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C
 		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
 				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
-		V.x += Psi.x * Omega/4.0/pi;
-		V.y += Psi.y * Omega/4.0/pi;
-		V.z += Psi.z * Omega/4.0/pi;
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
 	}
 }
 
@@ -1639,7 +1638,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 				VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 				m_pWing->m_Vd[m] += V * Gamma[pp];
 			}
-			m_pWing->m_Ai[m] = atan2(m_pWing->m_Vd[m].z, m_OpQInf) * 180.0/pi;
+			m_pWing->m_Ai[m] = atan2(m_pWing->m_Vd[m].z, m_OpQInf) * 180.0/PI;
 			m++;
 		}
 	}
@@ -1658,7 +1657,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pWing2->m_Vd[m] += V * Gamma[pp];
 				}
-				m_pWing2->m_Ai[m] = atan2(m_pWing2->m_Vd[m].z, m_OpQInf) * 180.0/pi;
+				m_pWing2->m_Ai[m] = atan2(m_pWing2->m_Vd[m].z, m_OpQInf) * 180.0/PI;
 				m++;
 			}
 		}
@@ -1677,7 +1676,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pStab->m_Vd[m] += V * Gamma[pp];
 				}
-				m_pStab->m_Ai[m] = atan2(m_pStab->m_Vd[m].z, m_OpQInf) * 180.0/pi;
+				m_pStab->m_Ai[m] = atan2(m_pStab->m_Vd[m].z, m_OpQInf) * 180.0/PI;
 				m++;
 			}
 		}
@@ -1696,7 +1695,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
 					m_pFin->m_Vd[m] += V * Gamma[pp];
 				}
-				m_pFin->m_Ai[m] = atan2(m_pFin->m_Vd[m].z, m_OpQInf) * 180.0/pi;
+				m_pFin->m_Ai[m] = atan2(m_pFin->m_Vd[m].z, m_OpQInf) * 180.0/PI;
 				m++;
 			}
 		}
@@ -1714,8 +1713,8 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 	double Ai[4*MAXSTATIONS];
 	m=0;
 
-//	CVector K(   -sin(m_Alpha*pi/180.0), 0.0, cos(m_Alpha*pi/180.0));
-//	CVector QInf( cos(m_Alpha*pi/180.0), 0.0, sin(m_Alpha*pi/180.0));
+//	CVector K(   -sin(m_Alpha*PI/180.0), 0.0, cos(m_Alpha*PI/180.0));
+//	CVector QInf( cos(m_Alpha*PI/180.0), 0.0, sin(m_Alpha*PI/180.0));
 
 //	QInf.Set(1.0,0.0,0.0);
 
@@ -1740,7 +1739,7 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				Vt += V * Gamma[pp];
 			}
-			Ai[m] = atan2(Vt.z, m_OpQInf) * 180.0/pi; // TODO : factor 2 in excess when calculating in the Trefftz plane
+			Ai[m] = atan2(Vt.z, m_OpQInf) * 180.0/PI; // TODO : factor 2 in excess when calculating in the Trefftz plane
 			m++;
 		}
 	}
@@ -1783,6 +1782,7 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 
 	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
 	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
+
 
 	if(!Gauss(m_aij,Size, m_RHS, 2))
 	{
@@ -1834,8 +1834,8 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		for (q=0; q<nval;q++)
 		{
 			alpha = V0 + q * VDelta;
-			cosa = cos(alpha*pi/180.0);
-			sina = sin(alpha*pi/180.0);
+			cosa = cos(alpha*PI/180.0);
+			sina = sin(alpha*PI/180.0);
 			for(p=0; p<Size; p++)
 			{
 				m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
@@ -1845,8 +1845,8 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	}
 	else
 	{
-		cosa = cos(m_AlphaMin*pi/180.0);
-		sina = sin(m_AlphaMin*pi/180.0);
+		cosa = cos(m_AlphaMin*PI/180.0);
+		sina = sin(m_AlphaMin*PI/180.0);
 		for(p=0; p<Size; p++)
 		{
 			m_RHS[m] =   cosa * m_xRHS[p] + sina * m_zRHS[p];
@@ -1867,6 +1867,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 			else 						m_Gamma[q*Size+pp] = m_RHS[pp];
 		}
 	}
+
 	//______________________________________________________________________________________
 	//Reconstruct right side results
 
@@ -1921,8 +1922,8 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 		for (q=0; q<nval;q++)
 		{
 			alpha = V0+q*VDelta;
-			WindNormal.Set(-sin(alpha*pi/180.0),   0.0, cos(alpha*pi/180.0));
-			VInf.Set(cos(alpha*pi/180.0),  0.0, sin(alpha*pi/180.0));
+			WindNormal.Set(-sin(alpha*PI/180.0),   0.0, cos(alpha*PI/180.0));
+			VInf.Set(cos(alpha*PI/180.0),  0.0, sin(alpha*PI/180.0));
 //			memcpy(row, m_RHS+q*Size, sizeof(row));
 			Lift = 0.0;
 			p=0;

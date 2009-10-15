@@ -26,6 +26,9 @@
 #include "../MainFrame.h"
 
 
+void *LLTAnalysisDlg::s_pMainFrame;
+void *LLTAnalysisDlg::s_pMiarex;
+
 LLTAnalysisDlg::LLTAnalysisDlg()
 {
 	setWindowTitle(tr("LLT Analysis"));
@@ -72,8 +75,8 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 
 
 	m_pXFile       = NULL;
-	m_pMiarex      = NULL;
-	m_pMainFrame   = NULL;
+	s_pMiarex      = NULL;
+	s_pMainFrame   = NULL;
 }
 
 
@@ -84,7 +87,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 {
 	QString str;
 
-	QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	int i,iter;
 
 	CWing::s_Alpha = m_AlphaMin;
@@ -177,7 +180,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 void LLTAnalysisDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName = QDir::tempPath() + "/QFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
@@ -204,7 +207,6 @@ void LLTAnalysisDlg::InitDialog()
 	m_IterGraph.SetYMax(1.0);
 
 	m_IterGraph.SetMargin(40);
-
 	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
 }
 
@@ -324,11 +326,10 @@ void LLTAnalysisDlg::SetAlpha(double AlphaMin, double AlphaMax, double DeltaAlph
 
 void LLTAnalysisDlg::SetFileHeader()
 {
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
-
 	out << "\n";
 	out << pMainFrame->m_VersionName;
 	out << "\n";
@@ -464,7 +465,7 @@ bool LLTAnalysisDlg::ReLoop()
 	int i,iter;
 	QString str;
 
-	QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	CCurve *pCurve = m_IterGraph.GetCurve(0);
 
 	CWing::s_QInf = m_AlphaMin;

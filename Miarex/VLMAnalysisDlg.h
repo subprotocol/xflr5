@@ -150,7 +150,6 @@ private:
 	CVector h,t;
 	CVector Psi;
 
-	double pi;
 	double r1v, r2v;
 
 	bool m_bIsFinished;

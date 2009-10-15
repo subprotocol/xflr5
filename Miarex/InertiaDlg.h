@@ -49,8 +49,11 @@ private slots:
 	void OnOK();
 	void OnInputType();
 	void OnCellChanged(QWidget *pWidget=NULL);
+	void OnExportToAVL();
 
 private:
+	void resizeEvent(QResizeEvent *event);
+	void showEvent(QShowEvent *event);
 	void FillMassModel();
 	void ComputeInertia();
 	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
@@ -64,23 +67,28 @@ private:
 
 	QRadioButton *m_pctrlAuto, *m_pctrlMan;
 	QPushButton *OKButton;
-	QLabel *m_pctrlMassUnit, *m_pctrlLengthUnit;
+	QLabel *m_pctrlMassUnit, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
 	QLabel *m_pctrlObjectMassLabel;
-	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2, *m_pctrlInertiaUnit3, *m_pctrlInertiaUnit4;
+	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2;
 	QTableView *m_pctrlMassView;
 	QStandardItemModel *m_pMassModel;
 	FloatEditDelegate *m_pFloatDelegate;
 	FloatEdit *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
+	FloatEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
 	FloatEdit *m_pctrlXRef, *m_pctrlYRef, *m_pctrlZRef;
-
+	QLabel *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
 	FloatEdit *m_pctrlObjectMass;
 
-	double m_XRef, m_YRef, m_ZRef;
+	double m_Mass;
+	CVector m_CoG;
+
+	CVector m_PtRef;
+	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 	double m_Ixx, m_Iyy, m_Izz, m_Ixz;
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
+	QString m_MassTag[MAXMASSES];
 	int m_NMass;
-	int m_iSelection;
 };
 
 #endif // INERTIADLG_H

@@ -61,7 +61,6 @@ CPanel *CSurface::s_pPanel;
 
 CSurface::CSurface()
 {
-	pi = 3.141592654;
 	m_bTEFlap = false;
 
 	m_Dihedral = 0.0;
@@ -277,12 +276,11 @@ double CSurface::GetChord(double const &tau)
 
 double CSurface::GetFoilArea(double const &tau)
 {
-	double area, chordA, chordB;
+	double area, chord;
 	if(m_pFoilA && m_pFoilB)
 	{
-		chordA = GetChord(tau);
-		chordB = GetChord(1-tau);
-		area = m_pFoilA->GetArea()*chordA*chordA*tau + m_pFoilB->GetArea()*chordB*chordB*(1.0-tau);//m2
+		chord = GetChord(tau);
+		area = (m_pFoilA->GetArea() + m_pFoilB->GetArea())/2.0*chord*chord;//m2
 		return area;
 	}
 	else
@@ -476,20 +474,20 @@ void CSurface::GetyDist(int const &k, double &y1, double &y2)
 	if(m_YDistType==1)
 	{
 		//cosine case
-		y1  = 1.0/2.0*(1.0-cos( dk*pi   /YPanels));
-		y2  = 1.0/2.0*(1.0-cos((dk+1)*pi/YPanels));
+		y1  = 1.0/2.0*(1.0-cos( dk*PI   /YPanels));
+		y2  = 1.0/2.0*(1.0-cos((dk+1)*PI/YPanels));
 	}
 	else if(m_YDistType==-2)
 	{
 		//sine case
-		y1  = 1.0*(sin( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(sin((dk+1)*pi/2.0/YPanels));
+		y1  = 1.0*(sin( dk*PI   /2.0/YPanels));
+		y2  = 1.0*(sin((dk+1)*PI/2.0/YPanels));
 	}
 	else if(m_YDistType==2)
 	{
 		//-sine case
-		y1  = 1.0*(1.-cos( dk*pi   /2.0/YPanels));
-		y2  = 1.0*(1.-cos((dk+1)*pi/2.0/YPanels));
+		y1  = 1.0*(1.-cos( dk*PI   /2.0/YPanels));
+		y2  = 1.0*(1.-cos((dk+1)*PI/2.0/YPanels));
 	}
 	else
 	{
@@ -927,19 +925,19 @@ void CSurface::SetTwist_Old()
 	//"A" section first
 	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
 	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
-	m_LA.x = xc4 + (m_LA.x-xc4) * cos(m_TwistA *pi/180.0);
-	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *pi/180.0);
-	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *pi/180.0);
-	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *pi/180.0);
+	m_LA.x = xc4 + (m_LA.x-xc4) * cos(m_TwistA *PI/180.0);
+	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *PI/180.0);
+	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *PI/180.0);
+	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *PI/180.0);
 	NormalA.RotateY(O, m_TwistA);
 
 	//"B" Section next
 	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
 	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
-	m_LB.x = xc4 + (m_LB.x-xc4) * cos(m_TwistB *pi/180.0);
-	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *pi/180.0);
-	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *pi/180.0);
-	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *pi/180.0);
+	m_LB.x = xc4 + (m_LB.x-xc4) * cos(m_TwistB *PI/180.0);
+	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *PI/180.0);
+	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *PI/180.0);
+	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *PI/180.0);
 	NormalB.RotateY(O, m_TwistB);
 }
 

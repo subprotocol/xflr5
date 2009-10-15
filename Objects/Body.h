@@ -59,6 +59,7 @@ public:
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
 		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
 	void ComputeCenterLine();
+	void ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 	void Duplicate(CBody *pBody);
 	void ExportGeometry(int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);

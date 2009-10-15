@@ -37,6 +37,7 @@ class LLTAnalysisDlg : public QDialog
 {
 	Q_OBJECT
 
+	friend class MainFrame;
 	friend class QMiarex;
 	friend class CWing;
 
@@ -81,8 +82,8 @@ private:
 	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
 	double m_ReMin, m_ReMax, m_ReDelta;
 
-	void *m_pMiarex;
-	void *m_pMainFrame;
+	static void *s_pMiarex;
+	static void *s_pMainFrame;
 
 	QFile *m_pXFile;
 	QPoint m_LegendPlace;

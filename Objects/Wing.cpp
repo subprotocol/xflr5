@@ -55,6 +55,8 @@ double CWing::s_Alpha;		// angle of attack
 
 CWing::CWing()
 {
+	m_Mass = 1.0;
+
 	int i;
 	memset(m_Ai, 0, sizeof(m_Ai));
 	memset(m_Twist, 0, sizeof(m_Twist));
@@ -325,6 +327,70 @@ void CWing::ComputeGeometry()
 		}
 	}
 }
+
+
+void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+{
+	int j,k;
+	double rho, LocalSpan, LocalVolume, LocalArea, tau;
+	CVector Pt;
+	CoG.Set(0.0, 0.0, 0.0);
+	//we are evaluating a half-wing's inertia
+	//the mass density is assumed to be homogeneous
+	rho = Mass/m_Volume;
+
+	//the local weight is proportional to the chord x foil area
+	//the foil's area is interpolated
+
+	//we consider the whole wing, i.e. all surfaces
+	//note : in avl documentation, each wing is considered separately
+
+	//first get the CoG
+	double recalcMass = 0.0;
+	for (j=0; j<m_NSurfaces; j++)
+	{
+		//to make things simple, use Y-Panel mesh spacing for evaluation
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+			m_Surface[j].GetC4(k, Pt, tau);
+			LocalArea = m_Surface[j].GetFoilArea(tau);
+			LocalSpan = m_Surface[j].GetPanelWidth(k);
+			LocalVolume = LocalArea * LocalSpan;
+			CoG.x += LocalVolume*rho * Pt.x;
+			CoG.y += LocalVolume*rho * Pt.y;
+			CoG.z += LocalVolume*rho * Pt.z;
+			recalcMass += LocalVolume*rho;
+		}
+	}
+//qDebug("Recalc %10.4f   %10.4f", Mass, recalcMass);
+	if(m_Mass>1.e-30) CoG *= 1.0/ m_Mass;
+	else              CoG.Set(0.0, 0.0, 0.0);
+//qDebug("Recalc %10.4f   %10.4f   %10.4f", CoG.x, CoG.y, CoG.z);
+
+	//then get the Inertia in both reference frames
+	for (j=0; j<m_NSurfaces; j++)
+	{
+		//to make things simple, use Y-Panel mesh spacing for evaluation
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+			m_Surface[j].GetC4(k,Pt, tau);
+			LocalArea = m_Surface[j].GetFoilArea(tau);
+			LocalSpan = m_Surface[j].GetPanelWidth(k);
+			LocalVolume = LocalArea * LocalSpan;
+
+			Ixx += LocalVolume*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) + (Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+			Iyy += LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) + (Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
+			Izz += LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) + (Pt.y-PtRef.y)*(Pt.y-PtRef.y) );
+			Ixz -= LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
+
+			CoGIxx += LocalVolume*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIyy += LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIzz += LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
+			CoGIxz -= LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+		}
+	}
+}
+
 
 
 bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
@@ -2989,4 +3055,3 @@ void CWing::VLMCubicSplines(double *Gamma)
 		t += dt;
 	}
 }
-

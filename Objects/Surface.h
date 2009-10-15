@@ -108,7 +108,7 @@ private :
 	double chordA, chordB, zA, zB, Chord, Length;
 	double m_posATE, m_posBTE;//flap break positions at sides A and B
 	double m_xPointA[MAXCHORDPANELS], m_xPointB[MAXCHORDPANELS];	//chorwise position of VLM panels
-	double pi;
+
 
 	int m_XDistType;
 	int m_YDistType;

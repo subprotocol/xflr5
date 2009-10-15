@@ -26,8 +26,7 @@
 
 #include "Graph.h"
 #include <math.h>
-#include <QTextStream>
-#include <QtDebug>
+
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
