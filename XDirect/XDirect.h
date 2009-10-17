@@ -221,7 +221,7 @@ protected:
 	CPolar *SetPolar(QString PlrName);
 	OpPoint *SetOpp(double Alpha=-123456789.0);
 
-	OpPoint* AddOpPoint();
+	OpPoint* AddOpPoint(CPolar *pPolar = NULL);
 
 private:
 	QTimer *m_pAnimateTimer;

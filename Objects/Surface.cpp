@@ -288,6 +288,34 @@ double CSurface::GetFoilArea(double const &tau)
 }
 
 
+void CSurface::GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4)
+{
+	//explicit double calculations are much faster than vector algebra
+	LA.x = m_LA.x * (1.0-tau) + m_LB.x * tau;
+	LA.y = m_LA.y * (1.0-tau) + m_LB.y * tau;
+	LA.z = m_LA.z * (1.0-tau) + m_LB.z * tau;
+	TA.x = m_TA.x * (1.0-tau) + m_TB.x * tau;
+	TA.y = m_TA.y * (1.0-tau) + m_TB.y * tau;
+	TA.z = m_TA.z * (1.0-tau) + m_TB.z * tau;
+	PtC4.x = .75 * LA.x + .25 * TA.x;
+	PtC4.y = .75 * LA.y + .25 * TA.y;
+	PtC4.z = .75 * LA.z + .25 * TA.z;
+	
+	Chord = sqrt((LA.x-TA.x)*(LA.x-TA.x) + (LA.y-TA.y)*(LA.y-TA.y) + (LA.z-TA.z)*(LA.z-TA.z));
+
+//if(fabs(tau) < .00001)qDebug(" %10.4f   %10.4f   %10.4f   %10.4f   %10.4f   %10.4f   %10.4f", LA.x, LA.y, LA.z, TA.x, TA.y, TA.z, Chord);
+
+
+	if(m_pFoilA && m_pFoilB)
+	{
+		Area = (m_pFoilA->GetArea() * tau + m_pFoilB->GetArea() * (1.0-tau))*Chord*Chord;//m2
+	}
+	else
+	{
+		Area = 0.0;
+	}
+}
+
 
 void CSurface::GetNormal(double yrel, CVector &N)
 {

@@ -58,6 +58,10 @@ CBody::CBody()
 	m_bClosedSurface = false;
 
 	m_Mass = 1.0;
+	m_NMass = 0;
+	memset(m_MassValue,    0, sizeof(m_MassValue));
+	memset(m_MassPosition, 0, sizeof(m_MassPosition));
+	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString("Description %1").arg(i);
 
 	m_NStations  = 7;
 	m_NSideLines = 5;
@@ -185,7 +189,7 @@ void CBody::ComputeCenterLine()
 }
 
 
-void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
 {
 	// Assume that the mass is distributed homogeneously in the body's skin
 	// Homogeneity is questionable, but is a rather handy assumption
@@ -200,7 +204,7 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVect
 	double BodyArea = 0.0;
 	double SectionArea;
 	double xpos, dl;
-	CoG.Set(0.0, 0.0, 0.0);
+	m_CoG.Set(0.0, 0.0, 0.0);
 
 	if(m_LineType==1)
 	{
@@ -277,13 +281,13 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVect
 				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
 					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
 
-				CoG.x += SectionArea*rho * Pt.x;
-				CoG.y += SectionArea*rho * Pt.y;
-				CoG.z += SectionArea*rho * Pt.z;
+				m_CoG.x += SectionArea*rho * Pt.x;
+				m_CoG.y += SectionArea*rho * Pt.y;
+				m_CoG.z += SectionArea*rho * Pt.z;
 			}
 		}
-		if(Mass>1.e-30) CoG *= 1.0/ Mass;
-		else            CoG.Set(0.0, 0.0, 0.0);
+		if(Mass>0.0) m_CoG *= 1.0/ Mass;
+		else            m_CoG.Set(0.0, 0.0, 0.0);
 
 		//Then Get Inertias
 		// we could do it one calculation, for CG and inertia, by using Hyghens/steiner theorem
@@ -331,10 +335,10 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVect
 				Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
 				Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
 
-				CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-				CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-				CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
-				CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+				m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
+				m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
+				m_CoGIzz += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) );
+				m_CoGIxz -= SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.z-m_CoG.z) );
 			}
 		}
 	}
@@ -366,12 +370,12 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVect
 			Pt.z = (Top.z + Bot.z)/2.0;
 			xpos += dl;
 
-			CoG.x += SectionArea*rho * Pt.x;
-			CoG.y += SectionArea*rho * Pt.y;
-			CoG.z += SectionArea*rho * Pt.z;
+			m_CoG.x += SectionArea*rho * Pt.x;
+			m_CoG.y += SectionArea*rho * Pt.y;
+			m_CoG.z += SectionArea*rho * Pt.z;
 		}
-		if(Mass>1.e-30) CoG *= 1.0/ Mass;
-		else            CoG.Set(0.0, 0.0, 0.0);
+		if(Mass>1.e-30) m_CoG *= 1.0/ Mass;
+		else            m_CoG.Set(0.0, 0.0, 0.0);
 
 		// Next evaluate inertia, assuming each section is a point mass
 		xpos = m_FramePosition[0].x;
@@ -390,10 +394,10 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVect
 			Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
 			Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
 
-			CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-			CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-			CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
-			CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+			m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
+			m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
+			m_CoGIzz += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) );
+			m_CoGIxz -= SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.z-m_CoG.z) );
 
 			xpos += dl;
 
@@ -415,6 +419,20 @@ void CBody::Duplicate(CBody *pBody)
 	m_nhPanels       = pBody->m_nhPanels;
 	m_LineType       = pBody->m_LineType;
 	m_bClosedSurface = pBody->m_bClosedSurface;
+
+	m_Mass = pBody->m_Mass;
+	m_NMass = pBody->m_NMass;
+	for(int i=0; i<m_NMass;i++)
+	{
+		m_MassValue[i] = pBody->m_MassValue[i];
+		m_MassPosition[i].Copy(pBody->m_MassPosition[i]);
+		m_MassTag[i] = pBody->m_MassTag[i];
+	}
+	m_CoG.Copy(pBody->m_CoG);
+	m_CoGIxx = pBody->m_CoGIxx;
+	m_CoGIyy = pBody->m_CoGIyy;
+	m_CoGIzz = pBody->m_CoGIzz;
+	m_CoGIxz = pBody->m_CoGIzz;
 
 	for(int i=0; i<m_NStations; i++)
 	{
@@ -1529,13 +1547,14 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnl
 bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
-	int k;
-	float f;
+	int i,k;
+	float f,g,h;
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat==5)      ar << 1003;
+		if(ProjectFormat==5)      ar << 1004;
 		else if(ProjectFormat==4) ar << 1002;
+		//1004 : QFLRv0.03	: added mass properties for inertia calculations
 		//1003 : QFLR5 v0.02 : added body description field
 		//1002 : Added axial and hoop mesh panel numbers for linetype fuselage
 		//1001 : Added bunching parameter
@@ -1565,7 +1584,14 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (k=0; k<m_NStations;k++){
 			ar << (float)m_FramePosition[k].x << (float)m_FramePosition[k].z;
 		}
-
+		if(ProjectFormat==5)
+		{
+			ar << (float)m_Mass;
+			ar << m_NMass;
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
+		}
 		ar << 0.0f << 0.0f;
 	}
 	else
@@ -1613,6 +1639,24 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar >> f; m_FramePosition[k].x =f;
 			ar >> f; m_FramePosition[k].z =f;
+		}
+		if(ArchiveFormat>=1004)
+		{
+			ar >> f;  m_Mass = f;
+			ar >> m_NMass;
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f;
+				m_MassValue[i] = f;
+			}
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f >> g >> h;
+				m_MassPosition[i].x = f;
+				m_MassPosition[i].y = g;
+				m_MassPosition[i].z = h;
+			}
+			for(i=0; i<m_NMass; i++) ReadCString(ar, m_MassTag[i]);
 		}
 		ar >> f;
 		ar >> f;

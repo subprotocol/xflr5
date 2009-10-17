@@ -69,7 +69,6 @@ QXDirect::QXDirect(QWidget *parent)
 
 	FillComboBoxes(false);
 
-
 	m_bAnimate        = false;
 	m_bAnimatePlus    = false;
 	m_bAutoInitBL     = true;
@@ -138,6 +137,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCurPolar    = NULL;
 	m_pCurOpp      = NULL;
 
+	BatchDlg::s_bStoreOpp = false;
 
 	m_NCrit = 9.0;
 	m_XTopTr = 1.0;
@@ -296,9 +296,6 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 	// Adds result of the XFoil Calculation to the OpPoint object
 	int i, j, ibl, is, k;
 
-	pOpPoint->m_strFoilName = g_pCurFoil->m_FoilName;
-	pOpPoint->m_strPlrName  = m_pCurPolar->m_PlrName;
-
 	pOpPoint->n        = m_pXFoil->n;
 	pOpPoint->Cd       = m_pXFoil->cd;
 	pOpPoint->Cdp      = m_pXFoil->cdp;
@@ -417,11 +414,12 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 
 
 
-OpPoint* QXDirect::AddOpPoint()
+OpPoint* QXDirect::AddOpPoint(CPolar *pPolar)
 {
 	// adds an Operating Point to the array from XFoil results
-
 	MainFrame*pMainFrame = (MainFrame*)m_pMainFrame;
+
+	if(!pPolar) pPolar = m_pCurPolar;
 
 	OpPoint *pNewPoint = new OpPoint();
 	if(pNewPoint ==NULL)
@@ -438,6 +436,9 @@ OpPoint* QXDirect::AddOpPoint()
 		pNewPoint->m_pOperWidget = this;
 		pNewPoint->Alpha = m_pXFoil->alfa * 180/PI;
 		pNewPoint->m_Color = pMainFrame->GetColor(2);
+		pNewPoint->m_strFoilName = g_pCurFoil->m_FoilName;
+		pNewPoint->m_strPlrName  = pPolar->m_PlrName;
+
 		AddOpData(pNewPoint);
 		pMainFrame->SetSaveState(false);
 	}
@@ -450,18 +451,18 @@ OpPoint* QXDirect::AddOpPoint()
 
 	// Now insert OpPoint in the current CPolar object
 
-	if(m_pXFoil->lvconv && m_pCurPolar) 
+	if(m_pXFoil->lvconv && pPolar)
 	{
-		if(m_pCurPolar->m_Type ==2 || m_pCurPolar->m_Type ==3)
+		if(pPolar->m_Type ==2 || pPolar->m_Type ==3)
 		{
 			if(pNewPoint && pNewPoint->Reynolds<1.00e7)
 			{
-				m_pCurPolar->AddData(pNewPoint);
+				pPolar->AddData(pNewPoint);
 			}
 		}
 		else
 		{
-			m_pCurPolar->AddData(pNewPoint);
+			pPolar->AddData(pNewPoint);
 		}
 	}
 

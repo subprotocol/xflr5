@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-// Wing.cpp : implementation file
+//
 // This class is both the interface class associated to the wing definition dialog box
 // and the class which implements all calculation routines associated to the wing,
 // including LLT and VLM methods
@@ -55,8 +55,6 @@ double CWing::s_Alpha;		// angle of attack
 
 CWing::CWing()
 {
-	m_Mass = 1.0;
-
 	int i;
 	memset(m_Ai, 0, sizeof(m_Ai));
 	memset(m_Twist, 0, sizeof(m_Twist));
@@ -95,6 +93,14 @@ CWing::CWing()
 	memset(m_YPanelDist, 0, sizeof(m_YPanelDist));
 	memset(m_VLMQInf, 0, sizeof(m_VLMQInf));
 //	memset(m_GeomMoment, 0, sizeof(m_GeomMoment));
+
+	m_Mass = 1.0;
+	m_NMass = 0;
+	memset(m_MassValue,    0, sizeof(m_MassValue));
+	memset(m_MassPosition, 0, sizeof(m_MassPosition));
+	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString("Description %1").arg(i);
+	m_CoG.Set(0.0, 0.0, 0.0);
+	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -329,14 +335,21 @@ void CWing::ComputeGeometry()
 }
 
 
-void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
 {
 	int j,k;
-	double rho, LocalSpan, LocalVolume, LocalArea, tau;
-	CVector Pt;
-	CoG.Set(0.0, 0.0, 0.0);
-	//we are evaluating a half-wing's inertia
+	double rho, LocalSpan, LocalVolume, dl;
+	double LocalChord,  LocalArea,  tau;
+	double LocalChord1, LocalArea1, tau1;
+	CVector PtC4, Pt, Pt1;
+	m_CoG.Set(0.0, 0.0, 0.0);
+
+	//use 20 stations per wing panel to discretize the weight
+	//more than enough given the precision we are looking for
+	int NStations = 20;
+
 	//the mass density is assumed to be homogeneous
+	//m_Volume has been computed when the wing has been defined
 	rho = Mass/m_Volume;
 
 	//the local weight is proportional to the chord x foil area
@@ -345,50 +358,65 @@ void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, CVector &
 	//we consider the whole wing, i.e. all surfaces
 	//note : in avl documentation, each wing is considered separately
 
-	//first get the CoG
-	double recalcMass = 0.0;
+	//first get the CoG - necessary for future application of Hughens/Steiner theorem
+	double recalcMass = 0.0;//sanity check
+	double recalcVolume = 0.0;//sanity check
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		//to make things simple, use Y-Panel mesh spacing for evaluation
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		LocalSpan = m_Surface[j].m_Length/(double)NStations;
+
+		for (k=0; k<NStations; k++)
 		{
-			m_Surface[j].GetC4(k, Pt, tau);
-			LocalArea = m_Surface[j].GetFoilArea(tau);
-			LocalSpan = m_Surface[j].GetPanelWidth(k);
-			LocalVolume = LocalArea * LocalSpan;
-			CoG.x += LocalVolume*rho * Pt.x;
-			CoG.y += LocalVolume*rho * Pt.y;
-			CoG.z += LocalVolume*rho * Pt.z;
-			recalcMass += LocalVolume*rho;
+			tau  = (double)k     / (double)NStations;
+			tau1 = (double)(k+1) / (double)NStations;
+			m_Surface[j].GetSection(tau,  LocalChord,  LocalArea,  Pt);
+			m_Surface[j].GetSection(tau1, LocalChord1, LocalArea1, Pt1);
+			LocalVolume = (LocalArea+LocalArea1)/2.0 * LocalSpan;
+			PtC4.x = (Pt.x + Pt1.x)/2.0;
+			PtC4.y = (Pt.y + Pt1.y)/2.0;
+			PtC4.z = (Pt.z + Pt1.z)/2.0;
+
+			m_CoG.x += LocalVolume*rho * PtC4.x;
+			m_CoG.y += LocalVolume*rho * PtC4.y;
+			m_CoG.z += LocalVolume*rho * PtC4.z;
 		}
 	}
-//qDebug("Recalc %10.4f   %10.4f", Mass, recalcMass);
-	if(m_Mass>1.e-30) CoG *= 1.0/ m_Mass;
-	else              CoG.Set(0.0, 0.0, 0.0);
-//qDebug("Recalc %10.4f   %10.4f   %10.4f", CoG.x, CoG.y, CoG.z);
+	if(m_Mass>0.0) m_CoG *= 1.0/ m_Mass;
+	else           m_CoG.Set(0.0, 0.0, 0.0);
+
 
 	//then get the Inertia in both reference frames
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		//to make things simple, use Y-Panel mesh spacing for evaluation
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		LocalSpan = m_Surface[j].m_Length/(double)NStations;
+		for (k=0; k<NStations; k++)
 		{
-			m_Surface[j].GetC4(k,Pt, tau);
-			LocalArea = m_Surface[j].GetFoilArea(tau);
-			LocalSpan = m_Surface[j].GetPanelWidth(k);
-			LocalVolume = LocalArea * LocalSpan;
+			tau  = (double)k     / (double)NStations;
+			tau1 = (double)(k+1) / (double)NStations;
+			m_Surface[j].GetSection(tau,  LocalChord,  LocalArea,  Pt);
+			m_Surface[j].GetSection(tau1, LocalChord1, LocalArea1, Pt1);
 
-			Ixx += LocalVolume*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) + (Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-			Iyy += LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) + (Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-			Izz += LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) + (Pt.y-PtRef.y)*(Pt.y-PtRef.y) );
-			Ixz -= LocalVolume*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
+			LocalVolume = (LocalArea+LocalArea1)/2.0 * LocalSpan;
 
-			CoGIxx += LocalVolume*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-			CoGIyy += LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
-			CoGIzz += LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
-			CoGIxz -= LocalVolume*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+			PtC4.x = (Pt.x + Pt1.x)/2.0;
+			PtC4.y = (Pt.y + Pt1.y)/2.0;
+			PtC4.z = (Pt.z + Pt1.z)/2.0;
+
+			Ixx += LocalVolume*rho * ( (PtC4.y-PtRef.y)*(PtC4.y-PtRef.y) + (PtC4.z-PtRef.z)*(PtC4.z-PtRef.z) );
+			Iyy += LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.x-PtRef.x) + (PtC4.z-PtRef.z)*(PtC4.z-PtRef.z) );
+			Izz += LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.x-PtRef.x) + (PtC4.y-PtRef.y)*(PtC4.y-PtRef.y) );
+			Ixz -= LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.z-PtRef.z) );
+
+			m_CoGIxx += LocalVolume*rho * ( (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
+			m_CoGIyy += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
+			m_CoGIzz += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) );
+			m_CoGIxz -= LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.z-m_CoG.z) );
+			recalcMass += LocalVolume*rho;
+			recalcVolume +=LocalVolume;
 		}
 	}
+//qDebug("Recalc mass   %10.4f   %10.4f", Mass, recalcMass);
+//qDebug("Recalc volume %10.4f   %10.4f", m_Volume, recalcVolume);
 }
 
 
@@ -838,6 +866,23 @@ void CWing::Duplicate(CWing *pWing)
 	}
 
 	m_nFlaps = pWing->m_nFlaps;
+
+	m_Mass = pWing->m_Mass;
+	m_NMass = pWing->m_NMass;
+	for(i=0; i<m_NMass;i++)
+	{
+		m_MassValue[i] = pWing->m_MassValue[i];
+		m_MassPosition[i].Copy(pWing->m_MassPosition[i]);
+		m_MassTag[i] = pWing->m_MassTag[i];
+	}
+
+	m_CoG.Copy(pWing->m_CoG);
+	m_CoGIxx = pWing->m_CoGIxx;
+	m_CoGIyy = pWing->m_CoGIyy;
+	m_CoGIzz = pWing->m_CoGIzz;
+	m_CoGIxz = pWing->m_CoGIzz;
+
+
 }
 
 
@@ -2201,8 +2246,9 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{	// storing code
-		if(ProjectFormat==5)      ar << 1008;
+		if(ProjectFormat==5)      ar << 1009;
 		else if(ProjectFormat==4) ar << 1007;
+			//1009 : QFLR5 v0.03 : added mass properties for inertia calculations
 			//1008 : QFLR5 v0.02 : Added wing description field
 			//1007 : Changed length units to m
 			//1006 : Added Wing Color v2.99-15
@@ -2238,12 +2284,21 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (i=0; i<=m_NPanel; i++) ar << m_YPanelDist[i];
 
 		WriteCOLORREF(ar,m_WingColor);
+
+		if(ProjectFormat==5)
+		{
+			ar << (float)m_Mass;
+			ar << m_NMass;
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
+		}
 		return true;
 	}
 	else
 	{
 		// loading code
-		float f;
+		float f,g,h;
 		int k;
 		ar >> ArchiveFormat;
 		if (ArchiveFormat <1001 || ArchiveFormat>1100) {
@@ -2296,9 +2351,9 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (i=0; i<=m_NPanel; i++)
 		{
 			ar >> f; m_TPos[i]=f;
-			if (fabs(m_TPos[i]) <0.0) {
+			if (fabs(m_TPos[i]) <0.0)
+			{
 				m_WingName = "";
-
 				return false;
 			}
 		}
@@ -2307,7 +2362,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar >> f; m_TOffset[i]=f;
 		}
 
-		if(ArchiveFormat<1007){
+		if(ArchiveFormat<1007)
+		{
 			//convert mm to m
 			for (i=0; i<=m_NPanel; i++)
 			{
@@ -2401,6 +2457,26 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ReadCOLORREF(ar, m_WingColor);
 		}
+
+		if(ArchiveFormat>=1009)
+		{
+			ar >> f;  m_Mass = f;
+			ar >> m_NMass;
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f;
+				m_MassValue[i] = f;
+			}
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f >> g >> h;
+				m_MassPosition[i].x = f;
+				m_MassPosition[i].y = g;
+				m_MassPosition[i].z = h;
+			}
+			for(i=0; i<m_NMass; i++) ReadCString(ar, m_MassTag[i]);
+		}
+
 		return true;
 	}
 }
@@ -2823,7 +2899,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 	m_GYm *= -1.0/ q / Area /Span;
 	m_VYm *= -1.0/ q / Area /Span;
 	m_IYm *= -1.0/ q / Area /Span;
-
 }
 
 

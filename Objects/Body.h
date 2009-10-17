@@ -59,7 +59,7 @@ public:
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
 		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
 	void ComputeCenterLine();
-	void ComputeBodyInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
+	void ComputeBodyInertia(double const & Mass, CVector const & PtRef,double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void Duplicate(CBody *pBody);
 	void ExportGeometry(int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
@@ -93,6 +93,12 @@ public:
 
 	double m_Bunch;
 	double m_Mass;	    //for inertia calculations
+	double m_MassValue[MAXMASSES];
+	int m_NMass; //number of point mass values
+	CVector m_MassPosition[MAXMASSES];
+	QString m_MassTag[MAXMASSES];
+	CVector m_CoG;
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	int m_np;
 	double  m_x[IBX], m_y[IBX];	// the point coordinates of the overlayed body

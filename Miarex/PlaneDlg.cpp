@@ -23,6 +23,7 @@
 #include "Miarex.h"
 #include "PlaneDlg.h"
 #include "ImportWingDlg.h"
+#include "InertiaDlg.h"
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -62,6 +63,8 @@ PlaneDlg::PlaneDlg()
 	connect(m_pctrlDefineStab, SIGNAL(clicked()), this, SLOT(OnDefineStab()));
 	connect(m_pctrlDefineFin, SIGNAL(clicked()), this, SLOT(OnDefineFin()));
 	connect(m_pctrlEditBody, SIGNAL(clicked()), this, SLOT(OnEditBody()));
+
+	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnInertia()));
 
 	connect(OKButton,     SIGNAL(clicked()), this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -824,11 +827,12 @@ void PlaneDlg::SetupLayout()
 	m_pctrlPlaneDescription = new QTextEdit();
 	m_pctrlPlaneDescription->setToolTip(tr("Enter here a short description for the plane"));
 	QLabel *PlaneDescription = new QLabel(tr("Description:"));
-
+	m_pctrlPlaneInertia = new QPushButton("Plane Inertia");
 	NameLayout->addWidget(m_pctrlPlaneName);
 	NameLayout->addWidget(PlaneDescription);
 	NameLayout->addWidget(m_pctrlPlaneDescription);
-	QGroupBox *NameBox = new QGroupBox(tr("Plane Name"));
+	NameLayout->addWidget(m_pctrlPlaneInertia);
+	QGroupBox *NameBox = new QGroupBox(tr("Plane Description"));
 	NameBox->setLayout(NameLayout);
 
 	QGridLayout *MainWing = new QGridLayout;
@@ -1091,44 +1095,18 @@ void PlaneDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
+void PlaneDlg::OnInertia()
+{
+	if(!m_pPlane) return;
+	InertiaDlg dlg;
+	dlg.m_pBody = NULL;
+	dlg.m_pWing = NULL;
+	dlg.m_pPlane = m_pPlane;
+	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.InitDialog();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged = true;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 

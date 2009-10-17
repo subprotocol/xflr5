@@ -32,7 +32,7 @@
 #include "../Misc/FloatEditDelegate.h"
 #include "../Misc/FloatEdit.h"
 #include "../Objects/CVector.h"
-#include "../Objects/Wing.h"
+#include "../Objects/Plane.h"
 //#include "../Objects/Body.h"
 
 class InertiaDlg : public QDialog
@@ -40,6 +40,8 @@ class InertiaDlg : public QDialog
 	Q_OBJECT
 	friend class GL3dWingDlg;
 	friend class GL3dBodyDlg;
+	friend class PlaneDlg;
+	friend class QMiarex;
 
 public:
     InertiaDlg();
@@ -63,6 +65,7 @@ private:
 
 	CBody *m_pBody;
 	CWing *m_pWing;
+	CPlane *m_pPlane;
 	void *m_pMainFrame;
 
 	QRadioButton *m_pctrlAuto, *m_pctrlMan;

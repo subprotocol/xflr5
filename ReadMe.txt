@@ -51,7 +51,9 @@ Licence :
 
 QFLR5 v0.03 Beta
 	- Added a form to evaluate the CoG and inertia of wings and bodies
+	- Added an option to store oppoints in foil batch analysis
 	- Marked more sentences for translation
+	- Corrected a crash bug which occurred when trying to run a biplane analysis without an elevator
 	- Corrected Tail volume calculation - was missing a PI/180 coefficient ; no impact on results
 	- Corrected lift calculation in Type 2 polars. The lift was calculated by two different methods in separate parts of the code leading to incorrect results
 	- Corrects bugs related to projected areas for aero coeff calculations

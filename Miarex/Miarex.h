@@ -210,6 +210,8 @@ private slots:
 	void OnVelocityScale(int pos);
 	void OnGL3DScale();
 	void OnImportWPolar();
+	void OnWingInertia();
+	void OnBodyInertia();
 
 private:
 	void keyPressEvent(QKeyEvent *event);

@@ -39,6 +39,7 @@
 #include "WPolarDlg.h"
 #include "WingScaleDlg.h"
 #include "W3dPrefsDlg.h"
+#include "InertiaDlg.h"
 #include <math.h>
 
 #define PANELCP				1227
@@ -17591,3 +17592,33 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 	}
 }
+
+
+void QMiarex::OnWingInertia()
+{
+	if(!m_pCurWing) return;
+	InertiaDlg dlg;
+	dlg.m_pBody = NULL;
+	dlg.m_pMainFrame = m_pMainFrame;
+	dlg.m_pWing = m_pCurWing;
+	dlg.InitDialog();
+	dlg.exec();
+}
+
+
+void QMiarex::OnBodyInertia()
+{
+	if(!m_pCurBody) return;
+	InertiaDlg dlg;
+	dlg.m_pWing = NULL;
+	dlg.m_pMainFrame = m_pMainFrame;
+	dlg.m_pBody = m_pCurBody;
+	dlg.InitDialog();
+	dlg.exec();
+}
+
+
+
+
+
+

@@ -50,6 +50,7 @@ public:
 	void GetTrailingPt(int k, CVector &C);
 	void GetPanel(int const &k, int const &l, int const &pos);
 	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos=0);
+	void GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4);
 	void GetyDist(int const &k, double &y1, double &y2);
 	void Init();
 	void ResetFlap();

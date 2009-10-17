@@ -42,6 +42,7 @@ public:
 	void InitDialog();
 
 private:
+	void AddOpPoint();
 	void AlphaLoop();
 	void Analysis2();
 	void Analysis3();
@@ -85,11 +86,13 @@ protected:
 	FloatEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
 	QLabel *m_pctrlSpecVar;
 	QLabel *m_pctrlMaType, *m_pctrlReType;
-	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero;
+	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero, *m_pctrlStoreOpp;
 	QPushButton *m_pctrlSkipOpp, *m_pctrlSkipPolar;
 	QPushButton *m_pctrlClose, *m_pctrlAnalyze;
 	QTextEdit *m_pctrlTextOutput;
 	GraphWidget *m_pctrlGraphOutput;
+
+	static bool s_bStoreOpp;
 
 	double	m_Mach;
 

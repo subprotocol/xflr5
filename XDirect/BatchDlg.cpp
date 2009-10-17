@@ -24,6 +24,7 @@
 #include "ReListDlg.h"
 #include "../MainFrame.h"
 
+bool BatchDlg::s_bStoreOpp;
 
 BatchDlg::BatchDlg(void *pParent)
 {
@@ -188,6 +189,10 @@ void BatchDlg::SetLayout()
 	TransVarsGroup->setLayout(TransVars);
 
 	m_pctrlInitBL         = new QCheckBox(tr("Initialize BLs between polars"));
+	m_pctrlStoreOpp       = new QCheckBox(tr("Store OpPoints"));
+	QHBoxLayout *OptionsLayout = new QHBoxLayout;
+	OptionsLayout->addWidget(m_pctrlInitBL);
+	OptionsLayout->addWidget(m_pctrlStoreOpp);
 
 	//_*_*_*_*_*_*_**_*_*_**_*_*_*_
 	m_pctrlTextOutput = new QTextEdit;
@@ -222,7 +227,7 @@ void BatchDlg::SetLayout()
 	LeftSide->addWidget(TransVarsGroup);
 
 	QVBoxLayout *RightSide = new QVBoxLayout;
-	RightSide->addWidget(m_pctrlInitBL);
+	RightSide->addLayout(OptionsLayout);
 	RightSide->addWidget(m_pctrlTextOutput,1);
 	RightSide->addWidget(m_pctrlGraphOutput,2);
 	RightSide->addLayout(CommandButtons);
@@ -233,8 +238,21 @@ void BatchDlg::SetLayout()
 	mainLayout->addLayout(LeftSide);
 	mainLayout->addLayout(RightSide);
 	setLayout(mainLayout);
-
 }
+
+
+void BatchDlg::AddOpPoint()
+{
+	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	pXDirect->AddOpPoint(m_pCurPolar);
+	if(pXDirect->m_bPolar)
+	{
+		pXDirect->CreatePolarCurves();
+		pXDirect->UpdateView();
+	}
+	m_RmsGraph.ResetYLimits();
+}
+
 
 void BatchDlg::AlphaLoop()
 {
@@ -253,7 +271,7 @@ void BatchDlg::AlphaLoop()
 		if(m_bCancel) break;
 		
 		alphadeg = m_SpMin + iAlpha*m_SpInc;
-		pXFoil->alfa = alphadeg*3.141592654/180.0;
+		pXFoil->alfa = alphadeg*PI/180.0;
 		str = QString("Alpha = %1\r\n").arg(alphadeg,0,'f',2);
 		strong+= str;
 		UpdateOutput(str);
@@ -304,12 +322,14 @@ void BatchDlg::AlphaLoop()
 
 				while(!Iterate()){}
 
+
 				if(pXFoil->lvconv)
 				{
 					str =QString("   ...converged after %1 iterations\r\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
-					m_pCurPolar->AddData(pXFoil);
+					if(s_bStoreOpp) AddOpPoint();
+//					m_pCurPolar->AddData(pXFoil);
 				}
 				else if(m_bSkipPoint || m_bSkipPolar)
 				{
@@ -586,6 +606,8 @@ void BatchDlg::InitDialog()
 	else             m_pctrlFromZero->setChecked(false);
 
 	m_pctrlInitBL->setChecked(true);
+	m_pctrlStoreOpp->setChecked(s_bStoreOpp);
+
 	m_pctrlSkipOpp->setEnabled(false);
 	m_pctrlSkipPolar->setEnabled(false);
 
@@ -905,8 +927,8 @@ void BatchDlg::OnAnalyze()
 
 	ReadParams();
 	SetFileHeader();
-	if (m_pctrlInitBL->isChecked()) m_bInitBL = true;
-	else                           m_bInitBL = false;
+	m_bInitBL = m_pctrlInitBL->isChecked();
+	s_bStoreOpp = m_pctrlStoreOpp->isChecked();
 
 	if(m_Type!=4) Analysis2();
 	else          Analysis3();
@@ -1152,7 +1174,8 @@ void BatchDlg::ReLoop()
 						str = QString("   ...converged after %1 iterations\n").arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
-						m_pCurPolar->AddData(pXFoil);
+						if(s_bStoreOpp) AddOpPoint();
+//						m_pCurPolar->AddData(pXFoil);
 					}
 					else if(m_bSkipPoint || m_bSkipPolar)
 					{

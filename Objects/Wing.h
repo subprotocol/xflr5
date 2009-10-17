@@ -94,7 +94,7 @@ protected:
 	void ComputeChords(int NStation=0);
 	void ComputeDihedrals();
 	void ComputeGeometry();
-	void ComputeInertia(double const & Mass, CVector const & PtRef, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
+	void ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
@@ -169,7 +169,15 @@ protected:
 	double m_QInf0;
 //	double m_Span;		// wing span
 //	double m_Weight;    // Wing weight - used to initialize LLT for type 2 analysis
+
 	double m_Mass;	    //for inertia calculations
+	int m_NMass;
+	double m_MassValue[MAXMASSES];
+	CVector m_MassPosition[MAXMASSES];
+	QString m_MassTag[MAXMASSES];
+	CVector m_CoG;
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+
 	double m_PlanformSpan;
 	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord

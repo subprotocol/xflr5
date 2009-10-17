@@ -32,12 +32,12 @@ CPlane::CPlane()
 {
 	m_pBody   = NULL;
 
-	m_Wing.m_WingName   = "Wing";
+	m_Wing.m_WingName   = QObject::tr("Wing");
 	m_Wing.ComputeGeometry();
-	m_Wing2.m_WingName   = "2nd Wing";
+	m_Wing2.m_WingName   = QObject::tr("2nd Wing");
 	m_Wing2.ComputeGeometry();
 
-	m_Stab.m_WingName      = "Elevator";
+	m_Stab.m_WingName      = QObject::tr("Elevator");
 	m_Stab.m_bIsFin        = false;
 	m_Stab.m_TChord[0]     = 0.100;
 	m_Stab.m_TChord[1]     = 0.080;
@@ -53,7 +53,7 @@ CPlane::CPlane()
 	m_Stab.m_YPanelDist[0] = 1;
 	m_Stab.m_YPanelDist[0] = 0;
 	m_Stab.ComputeGeometry();
-	m_Fin.m_WingName      = "Fin";
+	m_Fin.m_WingName      = QObject::tr("Fin");
 	m_Fin.m_bIsFin        = true;
 	m_Fin.m_TChord[0]     = 0.100;
 	m_Fin.m_TChord[1]     = 0.060;
@@ -97,11 +97,70 @@ CPlane::CPlane()
 	m_bDoubleSymFin = true;
 	m_bBiplane      = false;
 
-	m_PlaneName  = "Plane Name";
+	m_NMass = 0;
+	memset(m_MassValue,    0, sizeof(m_MassValue));
+	memset(m_MassPosition, 0, sizeof(m_MassPosition));
+	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString("Description %1").arg(i);
+
+
+	m_PlaneName  = QObject::tr("Plane Name");
 }
 
 
+void CPlane::ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
+{
+	//calculation performed for user information only
+	//the analysis uses each object inertia individually
+	//the export to AVL format is done for each object individually
+	//we add the volume inertias of the wing and body, excluding point masses
+	//initialize
+	m_CoG.Set(0.0, 0.0, 0.0);
+	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
+	Ixx = Iyy = Izz = Ixz = 0.0;
 
+	double PlaneMass = 0.0;
+	//get the wings inertias
+
+	m_Wing.ComputeInertia(m_Wing.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+	m_CoG += m_Wing.m_CoG * m_Wing.m_Mass;
+	PlaneMass += m_Wing.m_Mass;
+
+	//add object contributions
+	// object CoGs and inertia in CoG frame will be computed at the same time
+	if(m_bBiplane)
+	{
+		m_Wing2.ComputeInertia(m_Wing2.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+		m_CoG += m_Wing2.m_CoG * m_Wing2.m_Mass;
+		PlaneMass += m_Wing2.m_Mass;
+	}
+	if(m_bStab)
+	{
+		m_Stab.ComputeInertia(m_Stab.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+		m_CoG += m_Stab.m_CoG * m_Stab.m_Mass;
+		PlaneMass += m_Stab.m_Mass;
+	}
+	if(m_bFin)
+	{
+		m_Fin.ComputeInertia(m_Stab.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+		m_CoG += m_Fin.m_CoG * m_Fin.m_Mass;
+		PlaneMass += m_Fin.m_Mass;
+	}
+	if(m_bBody)
+	{
+		m_pBody->ComputeBodyInertia(m_pBody->m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+		m_CoG += m_pBody->m_CoG * m_pBody->m_Mass;
+		PlaneMass += m_pBody->m_Mass;
+	}
+
+	if(PlaneMass>0.0) m_CoG *= 1.0/ PlaneMass;
+	else              m_CoG.Set(0.0, 0.0, 0.0);
+
+	//Deduce inertia tensor in plane CoG from Huyghens/Steiner theorem
+	m_CoGIxx = Ixx - PlaneMass * ((m_CoG.y-PtRef.y)*(m_CoG.y-PtRef.y)+(m_CoG.z-PtRef.z)*(m_CoG.z-PtRef.z));
+	m_CoGIyy = Iyy - PlaneMass * ((m_CoG.x-PtRef.x)*(m_CoG.x-PtRef.x)+(m_CoG.z-PtRef.z)*(m_CoG.z-PtRef.z));
+	m_CoGIzz = Izz - PlaneMass * ((m_CoG.x-PtRef.x)*(m_CoG.x-PtRef.x)+(m_CoG.y-PtRef.y)*(m_CoG.y-PtRef.y));
+	m_CoGIxz = Ixz + PlaneMass * ((m_CoG.y-PtRef.y)*(m_CoG.z-PtRef.z));
+}
 
 
 void CPlane::ComputePlane(void)
@@ -169,6 +228,14 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_Stab.m_WingColor  = pPlane->m_Stab.m_WingColor;
 	m_Fin.m_WingColor   = pPlane->m_Fin.m_WingColor;
 
+	m_NMass = pPlane->m_NMass;
+	for(int i=0; i<m_NMass;i++)
+	{
+		m_MassValue[i] = pPlane->m_MassValue[i];
+		m_MassPosition[i].Copy(pPlane->m_MassPosition[i]);
+		m_MassTag[i] = pPlane->m_MassTag[i];
+	}
+
 	m_bBody = pPlane->m_bBody ;
 	m_pBody = pPlane->m_pBody;
 }
@@ -179,14 +246,18 @@ void CPlane::Duplicate(CPlane *pPlane)
 bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-//	MainFrame *pFrame = (MainFrame*)s_pMainFrame;
+
+	int i;
+	float f,g,h;
+
 	QString strong = "Nobody";
 	int ArchiveFormat;// identifies the format of the file
 	if (bIsStoring)
 	{
 		// storing code
-		if(ProjectFormat==5)      ar << 1011;
+		if(ProjectFormat==5)      ar << 1012;
 		else if(ProjectFormat==4) ar << 1010;
+		//1012 : QFLR5 v0.03 : added mass properties for inertia calculations
 		//1011 : QFLR5 v0.02 : added Plane description field
 		//1010 : added body LE x and z position
 		//1009 : added Main wing LE x and z position
@@ -230,6 +301,13 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar << 0;
 			WriteCString(ar, strong);
+		}
+		if(ProjectFormat==5)
+		{
+			ar << m_NMass;
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
+			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
 		}
 		return true;
 	}
@@ -323,6 +401,25 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_pBody = pMiarex->GetBody(strong);
 		}
 		else m_pBody = NULL;
+
+		if(ArchiveFormat>=1012)
+		{
+			ar >> m_NMass;
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f;
+				m_MassValue[i] = f;
+			}
+			for(i=0; i<m_NMass; i++)
+			{
+				ar >> f >> g >> h;
+				m_MassPosition[i].x = f;
+				m_MassPosition[i].y = g;
+				m_MassPosition[i].z = h;
+			}
+			for(i=0; i<m_NMass; i++) ReadCString(ar, m_MassTag[i]);
+		}
+
 
 		ComputePlane();
 

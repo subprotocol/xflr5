@@ -40,7 +40,7 @@ class CPlane
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
 	friend class ManageUFOsDlg;
-
+	friend class InertiaDlg;
 // Construction
 public:
 	CPlane();   // standard constructor
@@ -66,6 +66,13 @@ protected:
 	double m_XCmRef;
 	double m_TailVolume;
 
+	int m_NMass;
+	double m_MassValue[MAXMASSES];
+	CVector m_MassPosition[MAXMASSES];
+	QString m_MassTag[MAXMASSES];
+	CVector m_CoG;
+	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
+
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	QString m_PlaneName;
 	QString m_PlaneDescription;
@@ -75,6 +82,8 @@ private:
 //	bool HasResults();
 	void Duplicate(CPlane *pPlane);
 	void ComputePlane(void);
+	void ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz);
+
 
 public:
 

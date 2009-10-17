@@ -61,6 +61,7 @@ private slots:
 	void OnImportWing2();
 	void OnExportWing2();
 	void OnEditBody();
+	void OnInertia();
 	void OnSelChangeBodyList(int pos = 0);
 
 private:
@@ -144,6 +145,7 @@ private:
 	QPushButton	*m_pctrlVTail;
 	QPushButton	*m_pctrlDefineStab;
 	QPushButton *m_pctrlEditBody;
+	QPushButton *m_pctrlPlaneInertia;
 	QPushButton *OKButton;
 	QPushButton *CancelButton;
 

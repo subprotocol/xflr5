@@ -289,7 +289,7 @@ private:
 	QAction *showEllipticCurve, *showXCmRefLocation, *showStabCurve, *showFinCurve, *showWing2Curve;
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QAction *ManageUFOs;
-	QAction *m_pImportWPolar;
+	QAction *m_pImportWPolar, *m_pWingInertia, *m_pBodyInertia;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
 
 

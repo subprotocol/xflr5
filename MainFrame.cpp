@@ -1049,6 +1049,12 @@ void MainFrame::CreateMiarexActions()
 	m_pImportWPolar = new QAction(tr("Import Polar"), this);
 	connect(m_pImportWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnImportWPolar()));
 
+	m_pWingInertia = new QAction(tr("Define Inertia"), this);
+	connect(m_pWingInertia, SIGNAL(triggered()), pMiarex, SLOT(OnWingInertia()));
+
+	m_pBodyInertia = new QAction(tr("Define Inertia"), this);
+	connect(m_pBodyInertia, SIGNAL(triggered()), pMiarex, SLOT(OnBodyInertia()));
+
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
 	showCurWOppOnly->setCheckable(true);
 	connect(showCurWOppOnly, SIGNAL(triggered()), pMiarex, SLOT(OnCurWOppOnly()));
@@ -1233,6 +1239,8 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(scaleWingAct);
 	currentUFOMenu->addSeparator();
+	currentUFOMenu->addAction(m_pWingInertia);
+	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(exporttoAVL);
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(hideUFOWPlrs);
@@ -1252,6 +1260,7 @@ void MainFrame::CreateMiarexMenus()
 	CurBodyMenu->addAction(EditCurBody);
 	CurBodyMenu->addAction(exportBodyDef);
 	CurBodyMenu->addAction(exportBodyGeom);
+	CurBodyMenu->addAction(m_pBodyInertia);
 	MiarexBodyMenu->addSeparator();
 	MiarexBodyMenu->addAction(ManageBodies);
 

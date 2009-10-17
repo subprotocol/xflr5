@@ -207,7 +207,8 @@ HEADERS += MainFrame.h \
     QFLR5Application.h \
     Miarex/InertiaDlg.h
 TRANSLATIONS = qflr5.ts \
-    qflr5_de.ts
+	qflr5_de.ts \
+	qflr5_fr.ts
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 
