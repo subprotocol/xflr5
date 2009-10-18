@@ -1064,7 +1064,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 		
-		ar << 1017; // identifies the format of the file
+		if(ProjectFormat==5) ar << 1017; // identifies the format of the file
+		else                 ar << 1016;
 					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
 					// 1016 : added lateral force coefficient
 					// 1015 : added lateral force coefficient
@@ -1115,7 +1116,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
 
-			ar << (float)m_GCm[i] << (float)m_VCm[i] << (float)m_ICm[i];
+			ar << (float)m_GCm[i];
+			if(ProjectFormat>=5) ar << (float)m_VCm[i] << (float)m_ICm[i];
 
 			ar << (float)m_GRm[i];
 
