@@ -3744,15 +3744,15 @@ void QMiarex::DuplicatePlane()
 	if(!SetModPlane(pNewPlane))
 	{
 		delete pNewPlane;
-		pMainFrame->UpdateUFOs();
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 		UpdateView();
 	}
 	else
 	{
 		m_pCurPlane = AddPlane(pNewPlane);
-		pMainFrame->UpdateUFOs();
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 		UpdateView();
 		EditCurPlane();
 	}
@@ -3816,8 +3816,12 @@ void QMiarex::EditCurPlane()
 				}
 				else if(Ans==20)
 				{
+					//save mods to a new plane object
 					CPlane* pNewPlane= new CPlane();
 					pNewPlane->Duplicate(m_pCurPlane);
+					//restore geometry for initial plane
+					m_pCurPlane->Duplicate(pSavePlane);
+
 					if(!SetModPlane(pNewPlane))
 					{
 						delete pNewPlane;
@@ -3826,8 +3830,8 @@ void QMiarex::EditCurPlane()
 					{
 						m_pCurPlane = AddPlane(pNewPlane);
 					}
-					pMainFrame->UpdateUFOs();
 					SetUFO();
+					pMainFrame->UpdateUFOs();
 					UpdateView();
 					delete pSavePlane; // clean up
 					return;
@@ -3845,8 +3849,8 @@ void QMiarex::EditCurPlane()
 			else if(m_iView==WCPVIEW)	CreateCpCurves();
 
 		}
-		pMainFrame->UpdateUFOs();
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 		m_bIs2DScaleSet = false;
 		SetScale();
 		OnAdjustToWing();
@@ -11478,8 +11482,8 @@ void QMiarex::OnDeleteCurUFO()
 	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
 	else            pMainFrame->DeleteWing(m_pCurWing, false);
 
-	pMainFrame->UpdateUFOs();
 	SetUFO();
+	pMainFrame->UpdateUFOs();
 	CreateWPolarCurves();
 	CheckButtons();
 	UpdateView();
@@ -11958,8 +11962,8 @@ void QMiarex::OnEditUFO()
 					{
 						m_pCurWing = AddWing(pNewWing);
 					}
-					pMainFrame->UpdateUFOs();
 					SetUFO();
+					pMainFrame->UpdateUFOs();
 					UpdateView();
 					return;
 				}
@@ -11980,8 +11984,8 @@ void QMiarex::OnEditUFO()
 				else if(m_iView==WCPVIEW)	CreateCpCurves();
 			}
 		}
-		pMainFrame->UpdateUFOs();
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 		m_bResetglStream = true;
 		m_bIs2DScaleSet = false;
 		SetScale();
@@ -12388,9 +12392,9 @@ void QMiarex::OnExporttoAVL()
 	out << ("\n");
 
 	strong = QString("%1   %2   %3  | Sref   Cref   Bref\n")
-			 .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_m2toUnit,8,'f',3)
-			 .arg(m_pCurWing->m_MAChord*pMainFrame->m_m2toUnit,8,'f',3)
-			 .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_m2toUnit,8,'f',3);
+			 .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_m2toUnit, 8, 'f', 3)
+			 .arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,       8, 'f', 3)
+			 .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
 	out << strong;
 
 	strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
@@ -13008,12 +13012,12 @@ void QMiarex::OnNewWing()
 		pMainFrame->SetSaveState(false);
 		m_pCurPlane = NULL;
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 		m_bIs2DScaleSet = false;
 		SetScale();
 		if(m_iView==WOPPVIEW)	OnAdjustToWing();
 		SetWGraphScale();
 
-		pMainFrame->UpdateUFOs();
 		UpdateView();
 	}
 	else
@@ -13069,8 +13073,8 @@ void QMiarex::OnNewPlane()
 		}
 
 		m_pCurPlane = AddPlane(pPlane);
-		pMainFrame->UpdateUFOs();
 		SetUFO();
+		pMainFrame->UpdateUFOs();
 	}
 	else
 	{
@@ -13457,9 +13461,9 @@ void QMiarex::OnScaleWing()
 				}
 				else
 					delete pNewWing;
-				pMainFrame->UpdateUFOs();
 			}
 			SetUFO();
+			pMainFrame->UpdateUFOs();
 		}
 		if(m_iView==WOPPVIEW)        CreateWOppCurves();
 		else if(m_iView==WPOLARVIEW) CreateWPolarCurves();
@@ -16180,7 +16184,6 @@ void QMiarex::SetUFO(QString UFOName)
 			}
 			else if(FirstPlaneName.length()) UFOName = FirstPlaneName;
 			else if(FirstWingName.length())  UFOName = FirstWingName;
-
 
 			if(!UFOName.size())
 			{

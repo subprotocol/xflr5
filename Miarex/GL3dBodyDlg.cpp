@@ -3768,7 +3768,8 @@ void GL3dBodyDlg::OnInertia()
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.m_pBody = m_pBody;
 	dlg.InitDialog();
-	if(dlg.exec()==QDialog::Accepted) m_bChanged = true;
+	dlg.exec();
+	m_bChanged = true;
 }
 
 

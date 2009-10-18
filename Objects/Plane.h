@@ -82,7 +82,7 @@ private:
 //	bool HasResults();
 	void Duplicate(CPlane *pPlane);
 	void ComputePlane(void);
-	void ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz);
+	void ComputeInertia(double const & Mass);
 
 
 public:

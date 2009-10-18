@@ -1900,7 +1900,8 @@ void GL3dWingDlg::OnInertia()
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.m_pWing = m_pWing;
 	dlg.InitDialog();
-	if(dlg.exec()==QDialog::Accepted) m_bChanged = true;
+	dlg.exec();
+	m_bChanged = true;
 }
 
 

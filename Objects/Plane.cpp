@@ -107,47 +107,47 @@ CPlane::CPlane()
 }
 
 
-void CPlane::ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
+void CPlane::ComputeInertia(double const & Mass)
 {
 	//calculation performed for user information only
 	//the analysis uses each object inertia individually
 	//the export to AVL format is done for each object individually
 	//we add the volume inertias of the wing and body, excluding point masses
 	//initialize
+	CVector Pt;
 	m_CoG.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
-	Ixx = Iyy = Izz = Ixz = 0.0;
 
 	double PlaneMass = 0.0;
 	//get the wings inertias
 
-	m_Wing.ComputeInertia(m_Wing.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
-	m_CoG += m_Wing.m_CoG * m_Wing.m_Mass;
+	m_Wing.ComputeInertia(m_Wing.m_Mass);
+	m_CoG += (m_Wing.m_CoG+m_LEWing) * m_Wing.m_Mass;
 	PlaneMass += m_Wing.m_Mass;
 
 	//add object contributions
 	// object CoGs and inertia in CoG frame will be computed at the same time
 	if(m_bBiplane)
 	{
-		m_Wing2.ComputeInertia(m_Wing2.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
-		m_CoG += m_Wing2.m_CoG * m_Wing2.m_Mass;
+		m_Wing2.ComputeInertia(m_Wing2.m_Mass);
+		m_CoG += (m_Wing2.m_CoG+m_LEWing2) * m_Wing2.m_Mass;
 		PlaneMass += m_Wing2.m_Mass;
 	}
 	if(m_bStab)
 	{
-		m_Stab.ComputeInertia(m_Stab.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
-		m_CoG += m_Stab.m_CoG * m_Stab.m_Mass;
+		m_Stab.ComputeInertia(m_Stab.m_Mass);
+		m_CoG += (m_Stab.m_CoG +m_LEStab)* m_Stab.m_Mass;
 		PlaneMass += m_Stab.m_Mass;
 	}
 	if(m_bFin)
 	{
-		m_Fin.ComputeInertia(m_Stab.m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
-		m_CoG += m_Fin.m_CoG * m_Fin.m_Mass;
+		m_Fin.ComputeInertia(m_Stab.m_Mass);
+		m_CoG += (m_Fin.m_CoG+m_LEFin) * m_Fin.m_Mass;
 		PlaneMass += m_Fin.m_Mass;
 	}
 	if(m_bBody)
 	{
-		m_pBody->ComputeBodyInertia(m_pBody->m_Mass, PtRef, Ixx, Iyy, Izz, Ixz);
+		m_pBody->ComputeBodyInertia(m_pBody->m_Mass);
 		m_CoG += m_pBody->m_CoG * m_pBody->m_Mass;
 		PlaneMass += m_pBody->m_Mass;
 	}
@@ -156,10 +156,43 @@ void CPlane::ComputeInertia(double const & Mass, CVector const & PtRef, double &
 	else              m_CoG.Set(0.0, 0.0, 0.0);
 
 	//Deduce inertia tensor in plane CoG from Huyghens/Steiner theorem
-	m_CoGIxx = Ixx - PlaneMass * ((m_CoG.y-PtRef.y)*(m_CoG.y-PtRef.y)+(m_CoG.z-PtRef.z)*(m_CoG.z-PtRef.z));
-	m_CoGIyy = Iyy - PlaneMass * ((m_CoG.x-PtRef.x)*(m_CoG.x-PtRef.x)+(m_CoG.z-PtRef.z)*(m_CoG.z-PtRef.z));
-	m_CoGIzz = Izz - PlaneMass * ((m_CoG.x-PtRef.x)*(m_CoG.x-PtRef.x)+(m_CoG.y-PtRef.y)*(m_CoG.y-PtRef.y));
-	m_CoGIxz = Ixz + PlaneMass * ((m_CoG.y-PtRef.y)*(m_CoG.z-PtRef.z));
+	Pt = m_Wing.m_CoG + m_LEWing;
+	m_CoGIxx = m_Wing.m_CoGIxx + m_Wing.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+	m_CoGIyy = m_Wing.m_CoGIyy + m_Wing.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+	m_CoGIzz = m_Wing.m_CoGIzz + m_Wing.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+	m_CoGIxz = m_Wing.m_CoGIxz - m_Wing.m_Mass *  Pt.x*Pt.z;
+
+	if(m_bBiplane)
+	{
+		Pt = m_Wing2.m_CoG + m_LEWing2;
+		m_CoGIxx = m_Wing2.m_CoGIxx + m_Wing2.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy = m_Wing2.m_CoGIyy + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz = m_Wing2.m_CoGIzz + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz = m_Wing2.m_CoGIxz - m_Wing2.m_Mass *  Pt.x*Pt.z;
+	}
+	if(m_bStab)
+	{
+		Pt = m_Stab.m_CoG + m_LEStab;
+		m_CoGIxx = m_Stab.m_CoGIxx + m_Stab.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy = m_Stab.m_CoGIyy + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz = m_Stab.m_CoGIzz + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz = m_Stab.m_CoGIxz - m_Stab.m_Mass *  Pt.x*Pt.z;
+	}
+	if(m_bFin)
+	{
+		Pt = m_Fin.m_CoG + m_LEFin;
+		m_CoGIxx = m_Fin.m_CoGIxx + m_Fin.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy = m_Fin.m_CoGIyy + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz = m_Fin.m_CoGIzz + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz = m_Fin.m_CoGIxz - m_Fin.m_Mass *  Pt.x*Pt.z;
+	}
+	if(m_bBody)
+	{
+		m_CoGIxx += m_pBody->m_CoGIxx + m_pBody->m_Mass * (m_pBody->m_CoG.y*m_pBody->m_CoG.y + m_pBody->m_CoG.z*m_pBody->m_CoG.z);
+		m_CoGIyy += m_pBody->m_CoGIyy + m_pBody->m_Mass * (m_pBody->m_CoG.x*m_pBody->m_CoG.x + m_pBody->m_CoG.z*m_pBody->m_CoG.z);
+		m_CoGIzz += m_pBody->m_CoGIzz + m_pBody->m_Mass * (m_pBody->m_CoG.x*m_pBody->m_CoG.x + m_pBody->m_CoG.y*m_pBody->m_CoG.y);
+		m_CoGIxz += m_pBody->m_CoGIxz - m_pBody->m_Mass *  m_pBody->m_CoG.x*m_pBody->m_CoG.z;
+	}
 }
 
 

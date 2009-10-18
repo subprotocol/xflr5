@@ -150,9 +150,8 @@ CWing::CWing()
 	s_Viscosity = 0.0;
 	s_Density   = 0.0;
 
-	m_AVLIndex = -987654;//improbable value...
+	m_AVLIndex = -(int)(qrand()/10000);//improbable value...
 
-	m_nNodes     = 0;
 	m_MatSize    = 0;
 
 	m_NSurfaces = 0;
@@ -335,7 +334,7 @@ void CWing::ComputeGeometry()
 }
 
 
-void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
+void CWing::ComputeInertia(double const & Mass)
 {
 	int j,k;
 	double rho, LocalSpan, LocalVolume, dl;
@@ -343,6 +342,7 @@ void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, double &I
 	double LocalChord1, LocalArea1, tau1;
 	CVector PtC4, Pt, Pt1;
 	m_CoG.Set(0.0, 0.0, 0.0);
+	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	//use 20 stations per wing panel to discretize the weight
 	//more than enough given the precision we are looking for
@@ -402,11 +402,6 @@ void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, double &I
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			Ixx += LocalVolume*rho * ( (PtC4.y-PtRef.y)*(PtC4.y-PtRef.y) + (PtC4.z-PtRef.z)*(PtC4.z-PtRef.z) );
-			Iyy += LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.x-PtRef.x) + (PtC4.z-PtRef.z)*(PtC4.z-PtRef.z) );
-			Izz += LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.x-PtRef.x) + (PtC4.y-PtRef.y)*(PtC4.y-PtRef.y) );
-			Ixz -= LocalVolume*rho * ( (PtC4.x-PtRef.x)*(PtC4.z-PtRef.z) );
-
 			m_CoGIxx += LocalVolume*rho * ( (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
 			m_CoGIyy += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
 			m_CoGIzz += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) );
@@ -415,8 +410,6 @@ void CWing::ComputeInertia(double const & Mass, CVector const & PtRef, double &I
 			recalcVolume +=LocalVolume;
 		}
 	}
-//qDebug("Recalc mass   %10.4f   %10.4f", Mass, recalcMass);
-//qDebug("Recalc volume %10.4f   %10.4f", m_Volume, recalcVolume);
 }
 
 

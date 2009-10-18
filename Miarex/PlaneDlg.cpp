@@ -814,7 +814,7 @@ void PlaneDlg::SetResults()
 	m_pctrlVLMTotalPanels->setText(str);
 
 	str = QString("%1").arg(m_pPlane->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
-	m_pctrlVolume->setText(str);
+	m_pctrlPlaneVolume->setText(str);
 }
 
 
@@ -1104,8 +1104,8 @@ void PlaneDlg::OnInertia()
 	dlg.m_pPlane = m_pPlane;
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.InitDialog();
-	if(dlg.exec()==QDialog::Accepted) m_bChanged = true;
-
+	dlg.exec();
+	m_bChanged = true;
 }
 
 

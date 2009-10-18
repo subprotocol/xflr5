@@ -37,7 +37,6 @@ InertiaDlg::InertiaDlg()
 	m_pWing = NULL;
 	m_pBody = NULL;
 
-	m_Ixx  = m_Iyy  = m_Izz  = m_Ixz = 0.0;
 	m_PtRef.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_NMass = 3;
@@ -60,7 +59,6 @@ void InertiaDlg::ComputeInertia()
 {
 	//assumes that the data has been read
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_Ixx    = m_Iyy    = m_Izz    = m_Ixz    = 0.0;
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_CoG.Set(0.0, 0.0, 0.0);
 	m_PtRef.Set(0.0, 0.0, 0.0);
@@ -70,54 +68,44 @@ void InertiaDlg::ComputeInertia()
 
 	if(m_pWing)
 	{
-		m_pWing->ComputeInertia(m_Mass, m_PtRef, m_Ixx, m_Iyy, m_Izz, m_Ixz);
+		m_pWing->ComputeInertia(m_Mass);
+		m_CoG.Copy(m_pWing->m_CoG);
+		m_CoGIxx = m_pWing->m_CoGIxx;
+		m_CoGIyy = m_pWing->m_CoGIyy;
+		m_CoGIzz = m_pWing->m_CoGIzz;
+		m_CoGIxz = m_pWing->m_CoGIxz;
 	}
 	else if(m_pBody)
 	{
-		m_pBody->ComputeBodyInertia(m_Mass, m_PtRef, m_Ixx, m_Iyy, m_Izz, m_Ixz);
+		m_pBody->ComputeBodyInertia(m_Mass);
+		m_CoG.Copy(m_pBody->m_CoG);
+		m_CoGIxx = m_pBody->m_CoGIxx;
+		m_CoGIyy = m_pBody->m_CoGIyy;
+		m_CoGIzz = m_pBody->m_CoGIzz;
+		m_CoGIxz = m_pBody->m_CoGIxz;
 	}
 	else if(m_pPlane)
 	{
-		m_pPlane->ComputeInertia(m_Mass, m_PtRef, m_Ixx, m_Iyy, m_Izz, m_Ixz);
+		m_pPlane->ComputeInertia(m_Mass);
+		m_CoG.Copy(m_pPlane->m_CoG);
+		m_CoGIxx = m_pPlane->m_CoGIxx;
+		m_CoGIyy = m_pPlane->m_CoGIyy;
+		m_CoGIzz = m_pPlane->m_CoGIzz;
+		m_CoGIxz = m_pPlane->m_CoGIxz;
 	}
 
-// check Huyghens / Steiner theorem
-//	CVector U;
-//	U = m_CoG-m_PtRef;
-//	qDebug() << m_Ixx << -m_CoGIxx - m_Mass * (U.y*U.y+U.z*U.z);
-//	qDebug() << m_Iyy << -m_CoGIyy - m_Mass * (U.x*U.x+U.z*U.z);
-//	qDebug() << m_Izz << -m_CoGIzz - m_Mass * (U.x*U.x+U.y*U.y);
-//	qDebug() << m_Ixz << -m_CoGIxz - m_Mass * ( - U.x * U.z);
-
-	//Keep the point mass contributions separate
-/*	for(i=0; i<MAXMASSES; i++)
-	{
-		m_Ixx += m_MassValue[i] * ((m_MassPosition[i].y*m_MassPosition[i].y) + (m_MassPosition[i].z*m_MassPosition[i].z));
-		m_Iyy += m_MassValue[i] * ((m_MassPosition[i].x*m_MassPosition[i].x) + (m_MassPosition[i].z*m_MassPosition[i].z));
-		m_Izz += m_MassValue[i] * ((m_MassPosition[i].x*m_MassPosition[i].x) + (m_MassPosition[i].y*m_MassPosition[i].y));
-		m_Ixz -= m_MassValue[i] * ( m_MassPosition[i].x*m_MassPosition[i].z);
-	}*/
 
 	//and display the results
 	double Unit = pMainFrame->m_mtoUnit * pMainFrame->m_mtoUnit * pMainFrame->m_kgtoUnit;
-	m_pctrlIxx->SetValue(m_Ixx*Unit);
-	m_pctrlIyy->SetValue(m_Iyy*Unit);
-	m_pctrlIzz->SetValue(m_Izz*Unit);
-	m_pctrlIxz->SetValue(m_Ixz*Unit);
 
-	QString strong;
-	strong = QString("%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,10,'f',3);
-	m_pctrlXCoG->setText(strong);
-	strong = QString("%1").arg(m_CoG.y*pMainFrame->m_mtoUnit,10,'f',3);
-	m_pctrlYCoG->setText(strong);
-	strong = QString("%1").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'f',3);
-	m_pctrlZCoG->setText(strong);
+	m_pctrlXCoG->SetValue(m_CoG.x*pMainFrame->m_mtoUnit);
+	m_pctrlYCoG->SetValue(m_CoG.y*pMainFrame->m_mtoUnit);
+	m_pctrlZCoG->SetValue(m_CoG.z*pMainFrame->m_mtoUnit);
 
 	m_pctrlCoGIxx->SetValue(m_CoGIxx*Unit);
 	m_pctrlCoGIyy->SetValue(m_CoGIyy*Unit);
 	m_pctrlCoGIzz->SetValue(m_CoGIzz*Unit);
 	m_pctrlCoGIxz->SetValue(m_CoGIxz*Unit);
-
 }
 
 
@@ -207,7 +195,7 @@ void InertiaDlg::InitDialog()
 	m_pctrlLengthUnit2->setText(str1);
 	strong = str+"."+str1+"2";
 	m_pctrlInertiaUnit1->setText(strong);
-	m_pctrlInertiaUnit2->setText(strong);
+//	m_pctrlInertiaUnit2->setText(strong);
 
 	if(m_pWing)
 	{
@@ -237,7 +225,12 @@ void InertiaDlg::InitDialog()
 	}
 	else if (m_pPlane)
 	{
-		m_Mass = 0.00;
+		m_Mass = m_pPlane->m_Wing.m_Mass;
+		if(m_pPlane->m_bBiplane) m_Mass += m_pPlane->m_Wing2.m_Mass;
+		if(m_pPlane->m_bStab)    m_Mass += m_pPlane->m_Stab.m_Mass;
+		if(m_pPlane->m_bFin)     m_Mass += m_pPlane->m_Fin.m_Mass;
+		if(m_pPlane->m_bBody && m_pPlane->m_pBody) m_Mass += m_pPlane->m_pBody->m_Mass;
+
 		m_NMass = m_pPlane->m_NMass;
 		for(int i=0; i<m_pPlane->m_NMass; i++)
 		{
@@ -245,13 +238,14 @@ void InertiaDlg::InitDialog()
 			m_MassPosition[i].Copy(m_pPlane->m_MassPosition[i]);
 			m_MassTag[i]   = m_pPlane->m_MassTag[i];
 		}
-		m_pctrlObjectMass->SetValue(0.0);
+
+		m_pctrlObjectMass->SetValue(m_Mass * pMainFrame->m_kgtoUnit);
 		m_pctrlObjectMassLabel->setText("Plane Mass:");
 		m_pctrlObjectMass->setEnabled(false);
 	}
 
-	m_pctrlAuto->setChecked(true);
-	OnInputType();
+//	m_pctrlAuto->setChecked(true);
+//	OnInputType();
 
 	FillMassModel();
 	ComputeInertia();
@@ -553,25 +547,6 @@ void InertiaDlg::OnExportToAVL()
 
 
 
-void InertiaDlg::OnInputType()
-{
-	bool bAuto = m_pctrlAuto->isChecked();
-	m_pctrlCoGIxx->setEnabled(!bAuto);
-	m_pctrlCoGIyy->setEnabled(!bAuto);
-	m_pctrlCoGIzz->setEnabled(!bAuto);
-	m_pctrlCoGIxz->setEnabled(!bAuto);
-
-	m_pctrlIxx->setEnabled(!bAuto);
-	m_pctrlIyy->setEnabled(!bAuto);
-	m_pctrlIzz->setEnabled(!bAuto);
-	m_pctrlIxz->setEnabled(!bAuto);
-
-	m_pctrlObjectMass->setEnabled(bAuto);
-	m_pctrlMassView->setEnabled(bAuto);
-	if(m_pPlane) m_pctrlObjectMass->setEnabled(false);
-}
-
-
 void InertiaDlg::OnOK()
 {
 	int i,j;
@@ -693,28 +668,19 @@ void InertiaDlg::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-	QString strange = tr("This is a calculation form for the inertia tensor. Refer to the Guidelines for explanations.") +"\r\n";
-	strange += tr("The results are used in stability calculations.");
-	QTextEdit *Message = new QTextEdit(strange);
-	Message->setReadOnly(true);
-
-	QGroupBox *InputType = new QGroupBox(tr("Input Type for Inertias"));
-	QHBoxLayout *InputLayout = new QHBoxLayout;
-	m_pctrlAuto = new QRadioButton(tr("XFLR5 ROM estimate"));
-	m_pctrlMan  = new QRadioButton(tr("User Input"));
-	InputLayout->addWidget(m_pctrlAuto);
-	InputLayout->addWidget(m_pctrlMan);
-	InputType->setLayout(InputLayout);
-
-	m_pctrlMan->setEnabled(false);
+	QVBoxLayout *MessageLayout = new QVBoxLayout;
+	QLabel *Label1 = new QLabel(tr("This is a calculation form for a rough order of magnitude for the inertia tensor. The results are used in stability calculations."));
+	QLabel *Label2 = new QLabel(tr("Refer to the Guidelines for explanations."));
+	MessageLayout->addWidget(Label1);
+	MessageLayout->addWidget(Label2);
 
 	QGroupBox *RefBox = new QGroupBox(tr("Reference Point"));
 	m_pctrlXRef = new FloatEdit(0.0);
 	m_pctrlYRef = new FloatEdit(0.0);
 	m_pctrlZRef = new FloatEdit(0.0);
-	QLabel *XLab = new QLabel("X=");
-	QLabel *YLab = new QLabel("Y=");
-	QLabel *ZLab = new QLabel("Z=");
+	QLabel *XLab = new QLabel("X");
+	QLabel *YLab = new QLabel("Y");
+	QLabel *ZLab = new QLabel("Z");
 	XLab->setAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
 	YLab->setAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
 	ZLab->setAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
@@ -742,12 +708,16 @@ void InertiaDlg::SetupLayout()
 	WingMassLayout->addStretch(1);
 	QGridLayout *CoGLayout = new QGridLayout;
 	QLabel *CoGLabel = new QLabel(tr("Center of gravity"));
+	CoGLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	QLabel *XCoGLab = new QLabel("X=");
 	QLabel *YCoGLab = new QLabel("Y=");
 	QLabel *ZCoGLab = new QLabel("Z=");
-	m_pctrlXCoG = new QLabel("0.00");
-	m_pctrlYCoG = new QLabel("0.00");
-	m_pctrlZCoG = new QLabel("0.00");
+	m_pctrlXCoG = new FloatEdit(0.00,3);
+	m_pctrlYCoG = new FloatEdit(0.00,3);
+	m_pctrlZCoG = new FloatEdit(0.00,3);
+	m_pctrlXCoG->setEnabled(false);
+	m_pctrlYCoG->setEnabled(false);
+	m_pctrlZCoG->setEnabled(false);
 	m_pctrlLengthUnit2 = new QLabel("m");
 	XCoGLab->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
 	YCoGLab->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
@@ -763,9 +733,55 @@ void InertiaDlg::SetupLayout()
 	CoGLayout->addWidget(m_pctrlYCoG,2,3);
 	CoGLayout->addWidget(m_pctrlZCoG,2,4);
 	CoGLayout->addWidget(m_pctrlLengthUnit2,2,5);
+	CoGLayout->setColumnStretch(1,2);
+	CoGLayout->setColumnStretch(2,1);
+	CoGLayout->setColumnStretch(3,1);
+	CoGLayout->setColumnStretch(4,1);
+	CoGLayout->setColumnStretch(5,2);
+
+
+//	QGroupBox *ResultsBox = new QGroupBox(tr("Inertias : Volume only, without point masses"));
+	QGridLayout *ResultsLayout = new QGridLayout;
+	m_pctrlCoGIxx = new FloatEdit(1.0,2);
+	m_pctrlCoGIyy = new FloatEdit(1.2,2);
+	m_pctrlCoGIzz = new FloatEdit(-1.5,2);
+	m_pctrlCoGIxz = new FloatEdit(4.2,2);
+	m_pctrlCoGIxx->setEnabled(false);
+	m_pctrlCoGIyy->setEnabled(false);
+	m_pctrlCoGIzz->setEnabled(false);
+	m_pctrlCoGIxz->setEnabled(false);
+	QLabel *LabIxx = new QLabel("Ixx");
+	QLabel *LabIyy = new QLabel("Iyy");
+	QLabel *LabIzz = new QLabel("Izz");
+	QLabel *LabIxz = new QLabel("Ixz");
+	LabIxx->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	LabIyy->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	LabIzz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	LabIxz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+	QLabel *LabInertiaObject = new QLabel("Inertia in CoG Frame");
+	LabInertiaObject->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	m_pctrlInertiaUnit1 = new QLabel("kg.m2");
+	ResultsLayout->addWidget(LabIxx,1,2);
+	ResultsLayout->addWidget(LabIyy,1,3);
+	ResultsLayout->addWidget(LabIzz,1,4);
+	ResultsLayout->addWidget(LabIxz,1,5);
+	ResultsLayout->addWidget(m_pctrlCoGIxx,2,2);
+	ResultsLayout->addWidget(m_pctrlCoGIyy,2,3);
+	ResultsLayout->addWidget(m_pctrlCoGIzz,2,4);
+	ResultsLayout->addWidget(m_pctrlCoGIxz,2,5);
+	ResultsLayout->addWidget(LabInertiaObject,2,1);
+	ResultsLayout->addWidget(m_pctrlInertiaUnit1,2,6);
+	ResultsLayout->setColumnStretch(1,2);
+	ResultsLayout->setColumnStretch(2,1);
+	ResultsLayout->setColumnStretch(3,1);
+	ResultsLayout->setColumnStretch(4,1);
+	ResultsLayout->setColumnStretch(5,1);
+	ResultsLayout->setColumnStretch(6,2);
+//	ResultsBox->setLayout(ResultsLayout);
 
 	ObjectMassLayout->addLayout(WingMassLayout);
 	ObjectMassLayout->addLayout(CoGLayout);
+	ObjectMassLayout->addLayout(ResultsLayout);
 	ObjectMassBox->setLayout(ObjectMassLayout);
 
 	QGroupBox *PointMassBox = new QGroupBox(tr("Additional Point Masses:"));
@@ -777,95 +793,41 @@ void InertiaDlg::SetupLayout()
 	MassLayout->addWidget(m_pctrlMassView);
 	PointMassBox->setLayout(MassLayout);
 
-	m_pctrlIxx = new FloatEdit(1.0,2);
-	m_pctrlIyy = new FloatEdit(1.2,2);
-	m_pctrlIzz = new FloatEdit(-1.5,2);
-	m_pctrlIxz = new FloatEdit(4.2,2);
-	m_pctrlCoGIxx = new FloatEdit(1.0,2);
-	m_pctrlCoGIyy = new FloatEdit(1.2,2);
-	m_pctrlCoGIzz = new FloatEdit(-1.5,2);
-	m_pctrlCoGIxz = new FloatEdit(4.2,2);
 
-	QLabel *LabIxx = new QLabel("Ixx");
-	QLabel *LabIyy = new QLabel("Iyy");
-	QLabel *LabIzz = new QLabel("Izz");
-	QLabel *LabIxz = new QLabel("Ixz");
-	LabIxx->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	LabIyy->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	LabIzz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	LabIxz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-	QLabel *LabInertiaObject = new QLabel("CoG Frame");
-	QLabel *LabInertiaTotal = new QLabel("Reference Frame");
-	LabInertiaObject->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	LabInertiaTotal->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-	m_pctrlInertiaUnit1 = new QLabel("kg.m2");
-	m_pctrlInertiaUnit2 = new QLabel("kg.m2");
-
-
-	QGroupBox *ResultsBox = new QGroupBox(tr("Inertias : Volume only, without point masses"));
-	QGridLayout *GridLayout = new QGridLayout;
-	GridLayout->addWidget(LabIxx,1,2);
-	GridLayout->addWidget(LabIyy,1,3);
-	GridLayout->addWidget(LabIzz,1,4);
-	GridLayout->addWidget(LabIxz,1,5);
-	GridLayout->addWidget(m_pctrlCoGIxx,2,2);
-	GridLayout->addWidget(m_pctrlCoGIyy,2,3);
-	GridLayout->addWidget(m_pctrlCoGIzz,2,4);
-	GridLayout->addWidget(m_pctrlCoGIxz,2,5);
-	GridLayout->addWidget(m_pctrlIxx,3,2);
-	GridLayout->addWidget(m_pctrlIyy,3,3);
-	GridLayout->addWidget(m_pctrlIzz,3,4);
-	GridLayout->addWidget(m_pctrlIxz,3,5);
-	GridLayout->addWidget(LabInertiaObject,2,1);
-	GridLayout->addWidget(LabInertiaTotal,3,1);
-	GridLayout->addWidget(m_pctrlInertiaUnit1,2,6);
-	GridLayout->addWidget(m_pctrlInertiaUnit2,3,6);
-//	GridLayout->setColumnStretch(2,1);
-//	GridLayout->setColumnStretch(5,1);
-	GridLayout->setColumnStretch(1,2);
-	GridLayout->setColumnStretch(2,1);
-	GridLayout->setColumnStretch(3,1);
-	GridLayout->setColumnStretch(4,1);
-	GridLayout->setColumnStretch(5,1);
-	GridLayout->setColumnStretch(6,2);
-	ResultsBox->setLayout(GridLayout);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *ExportAVLButton = new QPushButton(tr("Export to AVL"));
-	OKButton = new QPushButton(tr("OK"));
-	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+	OKButton = new QPushButton(tr("Close"));
+//	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ExportAVLButton);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+//	CommandButtons->addWidget(CancelButton);
+//	CommandButtons->addStretch(1);
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
 //	MainLayout->addWidget(FirstLine);
 	//MainLayout->addWidget(SecondLine);
 	//MainLayout->addWidget(ThirdLine);
 	MainLayout->addStretch(1);
-	MainLayout->addWidget(Message);
-	MainLayout->addWidget(InputType);
+	MainLayout->addLayout(MessageLayout);
 	MainLayout->addStretch(1);
 //	MainLayout->addWidget(RefBox);
 //	MainLayout->addStretch(1);
 	MainLayout->addWidget(ObjectMassBox);
-	MainLayout->addWidget(ResultsBox);
+//	MainLayout->addWidget(ResultsBox);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(PointMassBox);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
 
 	setLayout(MainLayout);
-	connect(m_pctrlAuto, SIGNAL(clicked()), this , SLOT(OnInputType()));
-	connect(m_pctrlMan, SIGNAL(clicked()), this , SLOT(OnInputType()));
+//	connect(m_pctrlAuto, SIGNAL(clicked()), this , SLOT(OnInputType()));
+//	connect(m_pctrlMan, SIGNAL(clicked()), this , SLOT(OnInputType()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+//	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(ExportAVLButton, SIGNAL(clicked()), this, SLOT(OnExportToAVL()));
 	connect(m_pctrlObjectMass, SIGNAL(editingFinished()), SLOT(OnCellChanged()));
 }

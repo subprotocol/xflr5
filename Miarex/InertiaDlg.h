@@ -49,7 +49,6 @@ public:
 
 private slots:
 	void OnOK();
-	void OnInputType();
 	void OnCellChanged(QWidget *pWidget=NULL);
 	void OnExportToAVL();
 
@@ -68,18 +67,17 @@ private:
 	CPlane *m_pPlane;
 	void *m_pMainFrame;
 
-	QRadioButton *m_pctrlAuto, *m_pctrlMan;
+//	QRadioButton *m_pctrlAuto, *m_pctrlMan;
 	QPushButton *OKButton;
 	QLabel *m_pctrlMassUnit, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
 	QLabel *m_pctrlObjectMassLabel;
-	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2;
+	QLabel *m_pctrlInertiaUnit1;
 	QTableView *m_pctrlMassView;
 	QStandardItemModel *m_pMassModel;
 	FloatEditDelegate *m_pFloatDelegate;
-	FloatEdit *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 	FloatEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
 	FloatEdit *m_pctrlXRef, *m_pctrlYRef, *m_pctrlZRef;
-	QLabel *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
+	FloatEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
 	FloatEdit *m_pctrlObjectMass;
 
 	double m_Mass;
@@ -87,7 +85,6 @@ private:
 
 	CVector m_PtRef;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
-	double m_Ixx, m_Iyy, m_Izz, m_Ixz;
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];

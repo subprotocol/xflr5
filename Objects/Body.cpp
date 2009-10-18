@@ -189,7 +189,7 @@ void CBody::ComputeCenterLine()
 }
 
 
-void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, double &Ixx, double &Iyy, double &Izz, double &Ixz)
+void CBody::ComputeBodyInertia(double const & Mass)
 {
 	// Assume that the mass is distributed homogeneously in the body's skin
 	// Homogeneity is questionable, but is a rather handy assumption
@@ -205,6 +205,7 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, doubl
 	double SectionArea;
 	double xpos, dl;
 	m_CoG.Set(0.0, 0.0, 0.0);
+	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	if(m_LineType==1)
 	{
@@ -329,11 +330,6 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, doubl
 				Pt.y = 0.0;
 				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
 					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
-				//Add inertia contribution
-				Ixx += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-				Iyy += SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-				Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
-				Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
 
 				m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
 				m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
@@ -389,18 +385,12 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector const & PtRef, doubl
 			GetPoint(ux, 1.0, true, Bot);
 			Pt.z = (Top.z + Bot.z)/2.0;
 
-			Ixx += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-			Iyy += SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.x-PtRef.x) +(Pt.z-PtRef.z)*(Pt.z-PtRef.z) );
-			Izz += SectionArea*rho * ( (Pt.y-PtRef.y)*(Pt.y-PtRef.y) +(Pt.x-PtRef.x)*(Pt.x-PtRef.x) );
-			Ixz -= SectionArea*rho * ( (Pt.x-PtRef.x)*(Pt.z-PtRef.z) );
-
 			m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
 			m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
 			m_CoGIzz += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) );
 			m_CoGIxz -= SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.z-m_CoG.z) );
 
 			xpos += dl;
-
 		}
 	}
 }

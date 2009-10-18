@@ -5673,7 +5673,6 @@ void MainFrame::UpdateUFOs()
 	pCurWing  = pMiarex->m_pCurWing;
 	pCurPlane = pMiarex->m_pCurPlane;
 
-
 	QStringList UFONames;
 	for (i=0; i<m_oaWing.size(); i++)
 	{
@@ -5741,6 +5740,8 @@ void MainFrame::UpdateUFOs()
 
 	UpdateWPolars();
 }
+
+
 
 void MainFrame::UpdateWPolars()
 {

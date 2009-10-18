@@ -303,9 +303,6 @@ void CSurface::GetSection(double const &tau, double &Chord, double &Area, CVecto
 	
 	Chord = sqrt((LA.x-TA.x)*(LA.x-TA.x) + (LA.y-TA.y)*(LA.y-TA.y) + (LA.z-TA.z)*(LA.z-TA.z));
 
-//if(fabs(tau) < .00001)qDebug(" %10.4f   %10.4f   %10.4f   %10.4f   %10.4f   %10.4f   %10.4f", LA.x, LA.y, LA.z, TA.x, TA.y, TA.z, Chord);
-
-
 	if(m_pFoilA && m_pFoilB)
 	{
 		Area = (m_pFoilA->GetArea() * tau + m_pFoilB->GetArea() * (1.0-tau))*Chord*Chord;//m2
