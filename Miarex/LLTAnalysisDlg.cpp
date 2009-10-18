@@ -151,7 +151,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 			//converged, 
 			str= QString("    ...converged after %1 iterations\r\n").arg(iter);
 			UpdateOutput(str);
-			m_pWing->LLTComputeWing();// generates wing results, 
+			m_pWing->LLTComputeWing();// generates wing results,
 			if (m_pWing->m_bWingOut) m_bWarning = true;
 			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
 /*			if(m_pWing->m_bWingOut)
@@ -346,7 +346,6 @@ void LLTAnalysisDlg::SetFileHeader()
 
 	out << str;
 	out << "\n___________________________________\n\n";
-
 }
 
 

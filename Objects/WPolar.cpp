@@ -1,7 +1,7 @@
 /****************************************************************************
 
     WPolar Class
-	Copyright (C) 2005-2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2005-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -73,8 +73,6 @@ CWPolar::CWPolar()
 	memset(m_MinControl, 0, sizeof(m_MinControl));
 	memset(m_MaxControl, 0, sizeof(m_MaxControl));
 	memset(m_bActiveControl, 0, sizeof(m_bActiveControl));
-
-	pi = 3.141592654;
 }
 
 
@@ -87,7 +85,8 @@ CWPolar::~CWPolar()
 
 
 void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double TCd,  double CY,
-					   double GCm,   double GRm, double GYm, double IYm, double QInf, double XCP)
+					   double GCm, double VCm, double ICm,
+					   double GRm, double GYm, double IYm, double QInf, double XCP)
 {
 	bool bInserted = false;
 	int i;
@@ -110,6 +109,8 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_TCd[i]        =  ICd+PCd;
 
 					m_GCm[i]        =  GCm;
+					m_VCm[i]        =  VCm;
+					m_ICm[i]        =  ICm;
 					m_GRm[i]        =  GRm;
 					m_GYm[i]        =  GYm;
 					m_VYm[i]        =  0.0;
@@ -134,6 +135,8 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_TCd.insert(i, ICd + PCd);
 
 					m_GCm.insert(i, GCm);
+					m_VCm.insert(i, VCm);
+					m_ICm.insert(i, ICm);
 					m_GRm.insert(i, GRm);
 					m_GYm.insert(i, GYm);
 					m_VYm.insert(i, 0.0);
@@ -178,6 +181,8 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 		m_TCd.append(ICd + PCd);
 
 		m_GCm.append(GCm);
+		m_VCm.append(VCm);
+		m_ICm.append(ICm);
 		m_GRm.append(GRm);
 		m_GYm.append(GYm);
 		m_VYm.append(0.0);
@@ -232,6 +237,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
+					m_VCm[i]        =  pWOpp->m_VCm;
+					m_ICm[i]        =  pWOpp->m_ICm;
 					m_GRm[i]        =  pWOpp->m_GRm;
 					m_GYm[i]        =  pWOpp->m_GYm;
 					m_VYm[i]        =  pWOpp->m_VYm;
@@ -256,6 +263,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
+					m_VCm.insert(i, pWOpp->m_VCm);
+					m_ICm.insert(i, pWOpp->m_ICm);
 					m_GRm.insert(i, pWOpp->m_GRm);
 					m_GYm.insert(i, pWOpp->m_GYm);
 					m_VYm.insert(i, pWOpp->m_VYm);
@@ -300,6 +309,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
+					m_VCm[i]        =  pWOpp->m_VCm;
+					m_ICm[i]        =  pWOpp->m_ICm;
 					m_GRm[i]        =  pWOpp->m_GRm;
 					m_GYm[i]        =  pWOpp->m_GYm;
 					m_VYm[i]        =  pWOpp->m_VYm;
@@ -325,6 +336,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
+					m_VCm.insert(i, pWOpp->m_VCm);
+					m_ICm.insert(i, pWOpp->m_ICm);
 					m_GRm.insert(i, pWOpp->m_GRm);
 					m_GYm.insert(i, pWOpp->m_GYm);
 					m_VYm.insert(i, pWOpp->m_VYm);
@@ -369,6 +382,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
+					m_VCm[i]        =  pWOpp->m_VCm;
+					m_ICm[i]        =  pWOpp->m_ICm;
 					m_GRm[i]        =  pWOpp->m_GRm;
 					m_GYm[i]        =  pWOpp->m_GYm;
 					m_VYm[i]        =  pWOpp->m_VYm;
@@ -394,6 +409,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
+					m_VCm.insert(i, pWOpp->m_VCm);
+					m_ICm.insert(i, pWOpp->m_ICm);
 					m_GRm.insert(i, pWOpp->m_GRm);
 					m_GYm.insert(i, pWOpp->m_GYm);
 					m_VYm.insert(i, pWOpp->m_VYm);
@@ -438,6 +455,8 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_TCd.append(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 		m_GCm.append(pWOpp->m_GCm);
+		m_VCm.append(pWOpp->m_VCm);
+		m_ICm.append(pWOpp->m_ICm);
 		m_GRm.append(pWOpp->m_GRm);
 		m_GYm.append(pWOpp->m_GYm);
 		m_VYm.append(pWOpp->m_VYm);
@@ -493,6 +512,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
+					m_VCm[i]        =  pWOpp->m_VCm;
+					m_ICm[i]        =  pWOpp->m_ICm;
 					m_GRm[i]        =  pWOpp->m_GRm;
 					m_GYm[i]        =  pWOpp->m_GYm;
 					m_VYm[i]        =  pWOpp->m_VYm;
@@ -517,6 +538,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd.insert(i,  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i,  pWOpp->m_GCm);
+					m_VCm.insert(i,  pWOpp->m_VCm);
+					m_ICm.insert(i,  pWOpp->m_ICm);
 					m_GRm.insert(i,  pWOpp->m_GRm);
 					m_GYm.insert(i,  pWOpp->m_GYm);
 					m_VYm.insert(i,  pWOpp->m_VYm);
@@ -560,6 +583,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        = pWOpp->m_GCm;
+					m_VCm[i]        = pWOpp->m_VCm;
+					m_ICm[i]        = pWOpp->m_ICm;
 					m_GRm[i]        = pWOpp->m_GRm;
 					m_GYm[i]        = pWOpp->m_GYm;
 					m_VYm[i]        = pWOpp->m_VYm;
@@ -584,6 +609,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd.insert(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i,       pWOpp->m_GCm);
+					m_VCm.insert(i,       pWOpp->m_VCm);
+					m_ICm.insert(i,       pWOpp->m_ICm);
 					m_GRm.insert(i,       pWOpp->m_GRm);
 					m_GYm.insert(i,       pWOpp->m_GYm);
 					m_VYm.insert(i,       pWOpp->m_VYm);
@@ -628,6 +655,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
 
 					m_GCm[i]        = pWOpp->m_GCm;
+					m_VCm[i]        = pWOpp->m_VCm;
+					m_ICm[i]        = pWOpp->m_ICm;
 					m_GRm[i]        = pWOpp->m_GRm;
 					m_GYm[i]        = pWOpp->m_GYm;
 					m_VYm[i]        = pWOpp->m_VYm;
@@ -652,6 +681,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_TCd.insert(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 					m_GCm.insert(i,       pWOpp->m_GCm);
+					m_VCm.insert(i,       pWOpp->m_VCm);
+					m_ICm.insert(i,       pWOpp->m_ICm);
 					m_GRm.insert(i,       pWOpp->m_GRm);
 					m_GYm.insert(i,       pWOpp->m_GYm);
 					m_VYm.insert(i,       pWOpp->m_VYm);
@@ -696,6 +727,8 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_TCd.append(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
 
 		m_GCm.append(pWOpp->m_GCm);
+		m_VCm.append(pWOpp->m_VCm);
+		m_ICm.append(pWOpp->m_ICm);
 		m_GRm.append(pWOpp->m_GRm);
 		m_GYm.append(pWOpp->m_GYm);
 		m_VYm.append(pWOpp->m_VYm);
@@ -744,10 +777,10 @@ void CWPolar::CalculatePoint(int i)
 		m_Cl32Cd[i] =  -(double)pow(-m_Cl[i],1.5)/m_TCd[i];
 	}
 
-	if(fabs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/pi;
+	if(fabs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
 	m_Vz[i] = (double)sqrt(2*m_Weight*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
-	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*pi/180.0);
+	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
 
 	//dynamic pressure
 	double q =  0.5 * m_Density * m_QInfinite[i]*m_QInfinite[i];
@@ -765,7 +798,7 @@ void CWPolar::CalculatePoint(int i)
 	double AR      = m_WSpan*m_WSpan/m_WArea;
 
 	if(m_ICd[i]==0.0)	m_Oswald[i] = 0.0;
-	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/pi/m_ICd[i]/AR;
+	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/PI/m_ICd[i]/AR;
 
 	m_SM[i]        = (m_XCP[i]-m_XCmRef)/m_WMAChord *100.00;
 }
@@ -806,6 +839,8 @@ void CWPolar::Copy(CWPolar *pWPolar)
 		m_TCd.insert(i,        pWPolar-> m_TCd[i]);
 
 		m_GCm.insert(i,        pWPolar-> m_GCm[i]);
+		m_VCm.insert(i,        pWPolar-> m_VCm[i]);
+		m_ICm.insert(i,        pWPolar-> m_ICm[i]);
 		m_GRm.insert(i,        pWPolar-> m_GRm[i]);
 		m_GYm.insert(i,        pWPolar-> m_GYm[i]);
 		m_VYm.insert(i,        pWPolar-> m_VYm[i]);
@@ -860,7 +895,7 @@ void CWPolar::Export(QTextStream &out, int FileType)
 		strong +=str;
 		out << strong;
 
-		Header = "   alpha      CL          ICd        PCd        TCd        CY        GCm         GRm        GYm       IYm       QInf        XCP\n";
+		Header = "   alpha      CL          ICd        PCd        TCd        CY        Cm         Rm         Ym       IYm       QInf        XCP\n";
 		out << Header;
 		Header = " _________  ________   ________  _________  _________  _________  _________  _________  _________  _________  _________  _________\n";
 		out << Header;
@@ -946,6 +981,8 @@ void CWPolar::Remove(int i)
 	m_TCd.removeAt(i);
 
 	m_GCm.removeAt(i);
+	m_VCm.removeAt(i);
+	m_ICm.removeAt(i);
 	m_GRm.removeAt(i);
 	m_GYm.removeAt(i);
 	m_VYm.removeAt(i);
@@ -985,6 +1022,8 @@ void CWPolar::ResetWPlr()
 	m_TCd.clear();
 
 	m_GCm.clear();
+	m_VCm.clear();
+	m_ICm.clear();
 	m_GRm.clear();
 	m_GYm.clear();
 	m_VYm.clear();
@@ -1015,7 +1054,7 @@ void CWPolar::ResetWPlr()
 }
 
 
-bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
+bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int n;
 	float f;
@@ -1025,7 +1064,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 	{
 		//write variables
 		
-		ar << 1016; // identifies the format of the file
+		ar << 1017; // identifies the format of the file
+					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
 					// 1016 : added lateral force coefficient
 					// 1015 : added lateral force coefficient
 					// 1014 : added control results
@@ -1075,7 +1115,11 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 		{
 			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
 
-			ar << (float)m_GCm[i] << (float)m_GRm[i] << (float)m_GYm[i] << 0.0f << (float)m_VYm[i] << (float)m_IYm[i];
+			ar << (float)m_GCm[i] << (float)m_VCm[i] << (float)m_ICm[i];
+
+			ar << (float)m_GRm[i];
+
+			ar << (float)m_GYm[i] << 0.0f << (float)m_VYm[i] << (float)m_IYm[i];
 
 			ar << (float)m_QInfinite[i];
 
@@ -1276,15 +1320,17 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 			m_XCmRef   /=1000.0;
 		}
 	
-		float Alpha,  Cl, CY=0.0, ICd, PCd, GCm, GRm, GYm, VCm, VYm, IYm, QInfinite, XCP, YCP, Ctrl;
-		float Cb = 0.0;
+		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb;
+		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = Ctrl = Cb =0.0;
 		bool bExists;
 		for (i=0; i< n; i++)
 		{
 			ar >> Alpha >> Cl;
 			if(ArchiveFormat>=1015) ar>>CY;
 			ar >> ICd >> PCd;
-			ar >> GCm >> GRm >> GYm >> VCm >> VYm >> IYm;
+			ar >> GCm;
+			if(ArchiveFormat>=1017) ar >> VCm >> ICm;
+			ar >> GRm >> GYm >> f >> VYm >> IYm;
 			if(ArchiveFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0;
 			ar >> QInfinite >> XCP >> YCP;
 			if(ArchiveFormat<1010)
@@ -1334,6 +1380,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring)
 				m_TCd.append(ICd+PCd);
 
 				m_GCm.append(GCm);
+				m_VCm.append(VCm);
+				m_ICm.append(ICm);
 				m_GRm.append(GRm);
 				m_GYm.append(GYm);
 				m_VYm.append(VYm);

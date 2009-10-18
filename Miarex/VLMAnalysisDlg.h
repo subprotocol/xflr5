@@ -114,9 +114,9 @@ private:
 	double ftmp;
 	double *m_pCoreSize;
 
-	double m_VCm,m_VYm; //Viscous moments
-	double m_IYm;		// Induced Yawing Moment
-	double m_GCm, m_GRm, m_GYm;		// Geometric Moments
+	double m_VCm, m_VYm; //Viscous moments
+	double m_ICm, m_IYm;		// Induced Moments, by pressure forces, or in Trefftz plane
+	double m_GCm, m_GRm, m_GYm;		// Total Moments
 
 	QString m_strOut;
 	QString m_VersionName;

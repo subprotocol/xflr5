@@ -826,12 +826,13 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		XCP = YCP = 0.0;
 		Force.Set(0.0, 0.0, 0.0);
 
-		m_GCm = m_GRm = m_GYm  = 0.0;
-		m_VCm = m_VYm = m_IYm  = 0.0;
+		m_GCm = m_VCm = m_ICm = 0.0;
+		m_GRm = 0.0;
+		m_GYm = m_VYm = m_IYm = 0.0;
 
 		AddString("       Calculating wing...\r\n");
 		m_pWing->PanelTrefftz(m_Cp+qrhs*m_MatSize, Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
-		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
+		m_pWing->PanelComputeWing(m_Cp+qrhs*m_MatSize, VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
 								  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 		m_pWing->PanelSetBending();
 
@@ -845,7 +846,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		{
 			AddString("       Calculating second wing...\r\n");
 			m_pWing2->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom,bThinSurf,m_pWakePanel, m_pWakeNode);
-			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
+			m_pWing2->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
 									   m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pWing2->PanelSetBending();
 			pos += m_pWing2->m_MatSize;
@@ -858,7 +859,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		{
 			AddString("       Calculating elevator...\r\n");
 			m_pStab->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
-			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm, 
+			m_pStab->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
 									  m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pStab->PanelSetBending();
 
@@ -875,7 +876,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			AddString("       Calculating fin...\r\n");
 			
 			m_pFin->PanelTrefftz(m_Cp+qrhs*m_MatSize+pos, Mu, Sigma, pos, Force, IDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
-			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_GRm, m_GYm, m_VCm, m_VYm, m_IYm,
+			m_pFin->PanelComputeWing(m_Cp+qrhs*m_MatSize+pos, VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
 									 m_pWPolar->m_bViscous, bThinSurf, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
 			m_pFin->PanelSetBending();
 			pos += m_pFin->m_MatSize;
@@ -912,12 +913,13 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		m_YCP         = YCP/Force.dot(WindNormal);
 
 		m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
-		m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
-		m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
-
 		m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
-		m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+		m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
 
+		m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+
+		m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+		m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 		m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
 		if(m_bPointOut) m_bWarning = true;

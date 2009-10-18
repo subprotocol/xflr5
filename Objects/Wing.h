@@ -68,10 +68,10 @@ protected:
 	void VLMSetBending();
 	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-						double &GCm, double &VCm, double &GRm, double &GYm, double &IYm, double &VYm, bool bViscous, bool bTilted, int RefAreaType);
+						double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, bool bViscous, bool bTilted, int RefAreaType);
 
 	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-						  double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType);
+						  double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType);
 	void PanelTrefftz(double *Cp, double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelSetBending();
 
@@ -82,6 +82,7 @@ protected:
 
 	bool LLTInitialize(double mass);
 	bool LLTSetLinearSolution();
+	void LLTSetBending();
 	void LLTInitCl();
 	void LLTComputeWing();
 	int  LLTIterate();
@@ -192,9 +193,9 @@ protected:
 	double m_InducedDrag, m_ViscousDrag;
 	double m_XCP, m_YCP;	// Centre of pressure's position
 	double m_Maxa; 		// Used in LLT
-	double m_VYm, m_VCm;
-	double m_IYm;		// Induced Yawing Moment
-	double m_GCm, m_GRm, m_GYm;		// Geometric Yawing Moment
+	double m_GCm, m_VCm, m_ICm; // Pitching Moment
+	double m_GYm, m_VYm, m_IYm;		// Induced Yawing Moment
+	double m_GRm;		// Geometric Rolling Moment
 
 	int m_NXPanels[MAXPANELS+1]; 		// VLM Panels along chord, for each Wing Panel
 	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
@@ -214,9 +215,8 @@ protected:
 	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
 	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
 	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_Cm[MAXSTATIONS+1];		//Pitching moment coefficient at stations
+	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
 	double m_CmAirf[MAXSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
-	double m_CmXRef[MAXSTATIONS+1];		//Geometric part of Pitching moment coefficient at stations
 	double m_XCPSpanRel[MAXSTATIONS+1];	//Center of Pressure pos at stations
 	double m_XCPSpanAbs[MAXSTATIONS+1];	//Center of Pressure pos at stations
 	double m_Re[MAXSTATIONS+1];		//Reynolds number at stations

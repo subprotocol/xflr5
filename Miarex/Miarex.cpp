@@ -289,7 +289,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph3.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetYMajGrid(true, QColor(120,120,120),2,1);
 	m_WPlrGraph3.SetXTitle(tr("Alpha"));
-	m_WPlrGraph3.SetYTitle(tr("GCm"));
+	m_WPlrGraph3.SetYTitle(tr("Cm"));
 	m_WPlrGraph3.SetXMin(-0.0);
 	m_WPlrGraph3.SetXMax( 0.1);
 	m_WPlrGraph3.SetYMin(-0.01);
@@ -850,6 +850,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_ViscousDrag    = m_pVLMDlg->m_ViscousDrag;
 
 			pWOpp->m_GCm                 = m_pVLMDlg->m_GCm;
+			pWOpp->m_VCm                 = m_pVLMDlg->m_VCm;
+			pWOpp->m_ICm                 = m_pVLMDlg->m_ICm;
 			pWOpp->m_GRm                 = m_pVLMDlg->m_GRm;
 			pWOpp->m_GYm                 = m_pVLMDlg->m_GYm;
 			pWOpp->m_VYm                 = m_pVLMDlg->m_VYm;
@@ -874,6 +876,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_ViscousDrag         = m_pPanelDlg->m_ViscousDrag;
 
 			pWOpp->m_GCm                 = m_pPanelDlg->m_GCm;
+			pWOpp->m_VCm                 = m_pPanelDlg->m_VCm;
+			pWOpp->m_ICm                 = m_pPanelDlg->m_ICm;
 			pWOpp->m_GRm                 = m_pPanelDlg->m_GRm;
 			pWOpp->m_GYm                 = m_pPanelDlg->m_GYm;
 			pWOpp->m_VYm                 = m_pPanelDlg->m_VYm;
@@ -1188,6 +1192,8 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_InducedDrag         = m_pCurWing->m_InducedDrag;
 
 			pNewPoint->m_GCm                 = m_pCurWing->m_GCm;
+			pNewPoint->m_VCm                 = m_pCurWing->m_VCm;
+			pNewPoint->m_ICm                 = m_pCurWing->m_ICm;
 			pNewPoint->m_GRm                 = m_pCurWing->m_GRm;
 			pNewPoint->m_GYm                 = m_pCurWing->m_GYm;
 			pNewPoint->m_VYm                 = m_pCurWing->m_VYm;
@@ -1207,7 +1213,6 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 				pNewPoint->m_ICd[l]           =  m_pCurWing->m_ICd[m_NStation-l];
 				pNewPoint->m_Cm[l]            =  m_pCurWing->m_Cm[m_NStation-l];
 				pNewPoint->m_CmAirf[l]        =  m_pCurWing->m_CmAirf[m_NStation-l];
-				pNewPoint->m_CmXRef[l]        =  m_pCurWing->m_CmXRef[m_NStation-l];
 				pNewPoint->m_XCPSpanRel[l]    =  m_pCurWing->m_XCPSpanRel[m_NStation-l];
 				pNewPoint->m_XCPSpanAbs[l]    =  m_pCurWing->m_XCPSpanAbs[m_NStation-l];
 				pNewPoint->m_Re[l]            =  m_pCurWing->m_Re[m_NStation-l];
@@ -1233,6 +1238,8 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_ViscousDrag         = m_pVLMDlg->m_ViscousDrag;
 
 			pNewPoint->m_GCm                 = m_pVLMDlg->m_GCm;
+			pNewPoint->m_VCm                 = m_pVLMDlg->m_VCm;
+			pNewPoint->m_ICm                 = m_pVLMDlg->m_ICm;
 			pNewPoint->m_GRm                 = m_pVLMDlg->m_GRm;
 			pNewPoint->m_GYm                 = m_pVLMDlg->m_GYm;
 			pNewPoint->m_VYm                 = m_pVLMDlg->m_VYm;
@@ -1256,7 +1263,6 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			memcpy(pNewPoint->m_PCd,        m_pCurWing->m_PCd,        sizeof(m_pCurWing->m_PCd));
 			memcpy(pNewPoint->m_Cm,         m_pCurWing->m_Cm,         sizeof(m_pCurWing->m_Cm));
 			memcpy(pNewPoint->m_CmAirf,     m_pCurWing->m_CmAirf,     sizeof(m_pCurWing->m_CmAirf));
-			memcpy(pNewPoint->m_CmXRef,     m_pCurWing->m_CmXRef,     sizeof(m_pCurWing->m_CmXRef));
 			memcpy(pNewPoint->m_XCPSpanRel, m_pCurWing->m_XCPSpanRel, sizeof(m_pCurWing->m_XCPSpanRel));
 			memcpy(pNewPoint->m_XCPSpanAbs, m_pCurWing->m_XCPSpanAbs, sizeof(m_pCurWing->m_XCPSpanAbs));
 			memcpy(pNewPoint->m_Re,         m_pCurWing->m_Re,         sizeof(m_pCurWing->m_Re));
@@ -1299,6 +1305,8 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_ViscousDrag         = m_pPanelDlg->m_ViscousDrag;
 
 			pNewPoint->m_GCm                 = m_pPanelDlg->m_GCm;
+			pNewPoint->m_VCm                 = m_pPanelDlg->m_VCm;
+			pNewPoint->m_ICm                 = m_pPanelDlg->m_ICm;
 			pNewPoint->m_GRm                 = m_pPanelDlg->m_GRm;
 			pNewPoint->m_GYm                 = m_pPanelDlg->m_GYm;
 			pNewPoint->m_VYm                 = m_pPanelDlg->m_VYm;
@@ -1319,7 +1327,6 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			memcpy(pNewPoint->m_PCd,           m_pCurWing->m_PCd, sizeof(m_pCurWing->m_PCd));
 			memcpy(pNewPoint->m_Cm,            m_pCurWing->m_Cm, sizeof(m_pCurWing->m_Cm));
 			memcpy(pNewPoint->m_CmAirf,        m_pCurWing->m_CmAirf, sizeof(m_pCurWing->m_CmAirf));
-			memcpy(pNewPoint->m_CmXRef,        m_pCurWing->m_CmXRef, sizeof(m_pCurWing->m_CmXRef));
 			memcpy(pNewPoint->m_XCPSpanRel,    m_pCurWing->m_XCPSpanRel, sizeof(m_pCurWing->m_XCPSpanRel));
 			memcpy(pNewPoint->m_XCPSpanAbs,    m_pCurWing->m_XCPSpanAbs, sizeof(m_pCurWing->m_XCPSpanAbs));
 			memcpy(pNewPoint->m_Re,            m_pCurWing->m_Re, sizeof(m_pCurWing->m_Re));
@@ -2714,6 +2721,8 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_ViscousDrag         = pWing->m_ViscousDrag;
 
 	pWOpp->m_GCm                 = pWing->m_GCm;
+	pWOpp->m_VCm                 = pWing->m_VCm;
+	pWOpp->m_ICm                 = pWing->m_ICm;
 	pWOpp->m_GRm                 = pWing->m_GRm;
 	pWOpp->m_GYm                 = pWing->m_GYm;
 	pWOpp->m_VYm                 = pWing->m_VYm;
@@ -2728,7 +2737,6 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	memcpy(pWOpp->m_ICd,           pWing->m_ICd,           sizeof(pWing->m_ICd));
 	memcpy(pWOpp->m_Cm,            pWing->m_Cm,            sizeof(pWing->m_Cm));
 	memcpy(pWOpp->m_CmAirf,        pWing->m_CmAirf,        sizeof(pWing->m_CmAirf));
-	memcpy(pWOpp->m_CmXRef,        pWing->m_CmXRef,        sizeof(pWing->m_CmXRef));
 	memcpy(pWOpp->m_XCPSpanRel,    pWing->m_XCPSpanRel,    sizeof(pWing->m_XCPSpanRel));
 	memcpy(pWOpp->m_XCPSpanAbs,    pWing->m_XCPSpanAbs,    sizeof(pWing->m_XCPSpanAbs));
 	memcpy(pWOpp->m_Re,            pWing->m_Re,            sizeof(pWing->m_Re));
@@ -4011,21 +4019,12 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_CmXRef[i]);
+				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cm[i]);
 			}
-			pGraph->SetYTitle(tr("Cm XRef"));
+			pGraph->SetYTitle(tr("Cm total"));
 			break;
 		}
 		case 10:
-		{
-			for (i=nStart; i<pWOpp->m_NStation; i++)
-			{
-				pCurve->AddPoint(pWOpp->m_SpanPos[i]*pMainFrame->m_mtoUnit, pWOpp->m_Cm[i]);
-			}
-			pGraph->SetYTitle(tr("Cm"));
-			break;
-		}
-		case 11:
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
@@ -4034,7 +4033,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			pGraph->SetYTitle(tr("Re"));
 			break;
 		}
-		case 12:
+		case 11:
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
@@ -4043,7 +4042,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			pGraph->SetYTitle(tr("Top Trans x-Pos %"));
 			break;
 		}
-		case 13:
+		case 12:
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
@@ -4052,7 +4051,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			pGraph->SetYTitle(tr("Bot Trans x-Pos %"));
 			break;
 		}
-		case 14:
+		case 13:
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
@@ -4061,7 +4060,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			pGraph->SetYTitle(tr("CP x-Pos %"));
 			break;
 		}
-		case 15:
+		case 14:
 		{
 			for (i=nStart; i<pWOpp->m_NStation; i++)
 			{
@@ -4104,22 +4103,22 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 		x = (*pX)[i];
 		y = (*pY)[i];
 
-		if((XVar==12 || XVar==15 || XVar==16) && x<0) bAdd = false;
-		if((YVar==12 || YVar==15 || YVar==16) && y<0) bAdd = false;
+		if((XVar==14 || XVar==17 || XVar==18) && x<0) bAdd = false;
+		if((YVar==14 || YVar==17 || YVar==18) && y<0) bAdd = false;
 
-		if(XVar==13 || XVar==14)              x *= pMainFrame->m_NtoUnit; //force
-		if(YVar==13 || YVar==14)              y *= pMainFrame->m_NtoUnit; //force
-		if(XVar==15 || XVar==16 || XVar==17)  x *= pMainFrame->m_mstoUnit;//speed
-		if(YVar==15 || YVar==16 || YVar==17)  y *= pMainFrame->m_mstoUnit;//speed
+		if(XVar==15 || XVar==16)              x *= pMainFrame->m_NtoUnit; //force
+		if(YVar==15 || YVar==16)              y *= pMainFrame->m_NtoUnit; //force
+		if(XVar==17 || XVar==18 || XVar==19)  x *= pMainFrame->m_mstoUnit;//speed
+		if(YVar==17 || YVar==18 || YVar==19)  y *= pMainFrame->m_mstoUnit;//speed
 
-		if(XVar==19 || XVar==20 || XVar==21)  x *= pMainFrame->m_NmtoUnit;//moment
-		if(YVar==19 || YVar==20 || YVar==21)  y *= pMainFrame->m_NmtoUnit;//moment
+		if(XVar==21 || XVar==22 || XVar==23)  x *= pMainFrame->m_NmtoUnit;//moment
+		if(YVar==21 || YVar==22 || YVar==23)  y *= pMainFrame->m_NmtoUnit;//moment
 
-		if(XVar==22 || XVar==23)              x *= pMainFrame->m_mtoUnit;//force
-		if(YVar==22 || YVar==23)              y *= pMainFrame->m_mtoUnit;//force
+		if(XVar==24 || XVar==25)              x *= pMainFrame->m_mtoUnit;//force
+		if(YVar==24 || YVar==25)              y *= pMainFrame->m_mtoUnit;//force
 
-		if(XVar==24)                          x *= pMainFrame->m_NmtoUnit;//moment
-		if(YVar==24)                          y *= pMainFrame->m_NmtoUnit;//moment
+		if(XVar==26)                          x *= pMainFrame->m_NmtoUnit;//moment
+		if(YVar==26)                          y *= pMainFrame->m_NmtoUnit;//moment
 
 		if(bAdd) pCurve->AddPoint(x,y);
 	}
@@ -5231,75 +5230,81 @@ void * QMiarex::GetUFOPlrVariable(CWPolar *pWPolar, int iVar)
 			pVar = &pWPolar->m_GCm;
 			break;
 		case 6:
-			pVar = &pWPolar->m_GRm;
+			pVar = &pWPolar->m_VCm;
 			break;
 		case 7:
-			pVar = &pWPolar->m_GYm;
+			pVar = &pWPolar->m_ICm;
 			break;
 		case 8:
-			pVar = &pWPolar->m_VYm;
+			pVar = &pWPolar->m_GRm;
 			break;
 		case 9:
-			pVar = &pWPolar->m_IYm;
+			pVar = &pWPolar->m_GYm;
 			break;
 		case 10:
-			pVar = &pWPolar->m_ClCd;
+			pVar = &pWPolar->m_VYm;
 			break;
 		case 11:
-			pVar = &pWPolar->m_Cl32Cd;
+			pVar = &pWPolar->m_IYm;
 			break;
 		case 12:
-			pVar = &pWPolar->m_Cl;
+			pVar = &pWPolar->m_ClCd;
 			break;
 		case 13:
-			pVar = &pWPolar->m_L;
+			pVar = &pWPolar->m_Cl32Cd;
 			break;
 		case 14:
-			pVar = &pWPolar->m_D;
+			pVar = &pWPolar->m_Cl;
 			break;
 		case 15:
-			pVar = &pWPolar->m_Vx;
+			pVar = &pWPolar->m_L;
 			break;
 		case 16:
-			pVar = &pWPolar->m_Vz;
+			pVar = &pWPolar->m_D;
 			break;
 		case 17:
-			pVar = &pWPolar->m_QInfinite;
+			pVar = &pWPolar->m_Vx;
 			break;
 		case 18:
-			pVar = &pWPolar->m_Gamma;
+			pVar = &pWPolar->m_Vz;
 			break;
 		case 19:
-			pVar = &pWPolar->m_Pm;
+			pVar = &pWPolar->m_QInfinite;
 			break;
 		case 20:
-			pVar = &pWPolar->m_Rm;
+			pVar = &pWPolar->m_Gamma;
 			break;
 		case 21:
-			pVar = &pWPolar->m_Ym;
+			pVar = &pWPolar->m_Pm;
 			break;
 		case 22:
-			pVar = &pWPolar->m_XCP;
+			pVar = &pWPolar->m_Rm;
 			break;
 		case 23:
-			pVar = &pWPolar->m_YCP;
+			pVar = &pWPolar->m_Ym;
 			break;
 		case 24:
-			pVar = &pWPolar->m_MaxBending;
+			pVar = &pWPolar->m_XCP;
 			break;
 		case 25:
-			pVar = &pWPolar->m_VertPower;
+			pVar = &pWPolar->m_YCP;
 			break;
 		case 26:
-			pVar = &pWPolar->m_Oswald;
+			pVar = &pWPolar->m_MaxBending;
 			break;
 		case 27:
-			pVar = &pWPolar->m_SM;
+			pVar = &pWPolar->m_VertPower;
 			break;
 		case 28:
-			pVar = &pWPolar->m_Ctrl;
+			pVar = &pWPolar->m_Oswald;
 			break;
 		case 29:
+			pVar = &pWPolar->m_SM;
+			break;
+		case 30:
+			pVar = &pWPolar->m_Ctrl;
+			break;
+		case 31:
 			pVar = &pWPolar->m_CY;
 			break;
 		default:
@@ -12833,7 +12838,7 @@ void QMiarex::OnImportWPolar()
 
 				if (res >0)
 				{
-					pWPolar->AddPoint(alpha, CL, ICd, PCd, TCd, CY, GCm, GRm, GYm, IYm, QInf, XCP);
+					pWPolar->AddPoint(alpha, CL, ICd, PCd, TCd, CY, GCm, 0.0, 0.0, GRm, GYm, IYm, QInf, XCP);
 				}
 				else
 				{
@@ -17097,80 +17102,86 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("Cd"));
 			break;
 		case 5:
-			pGraph->SetXTitle(tr("GCm"));// Total Pitching moment coef.
+			pGraph->SetXTitle(tr("Cm"));// Total Pitching moment coef.
 			break;
 		case 6:
-			pGraph->SetXTitle(tr("GRm"));// Total Rolling moment coef.
+			pGraph->SetXTitle(tr("VCm"));// Viscous Pitching moment coef.
 			break;
 		case 7:
-			pGraph->SetXTitle(tr("GYm"));// Total Yawing moment coef.
+			pGraph->SetXTitle(tr("ICm"));// Induced Pitching moment coef.
 			break;
 		case 8:
-			pGraph->SetXTitle(tr("VYm"));// Profile yawing moment
+			pGraph->SetXTitle(tr("Rm"));// Total Rolling moment coef.
 			break;
 		case 9:
-			pGraph->SetXTitle(tr("IYm"));// Induced yawing moment
+			pGraph->SetXTitle(tr("Ym"));// Total Yawing moment coef.
 			break;
 		case 10:
-			pGraph->SetXTitle(tr("Cl/Cd"));
+			pGraph->SetXTitle(tr("VYm"));// Profile yawing moment
 			break;
 		case 11:
-			pGraph->SetXTitle(tr("Cl^(3/2)/Cd"));
+			pGraph->SetXTitle(tr("IYm"));// Induced yawing moment
 			break;
 		case 12:
-			pGraph->SetXTitle(tr("1/Rt(Cl)"));
+			pGraph->SetXTitle(tr("Cl/Cd"));
 			break;
 		case 13:
+			pGraph->SetXTitle(tr("Cl^(3/2)/Cd"));
+			break;
+		case 14:
+			pGraph->SetXTitle(tr("1/Rt(Cl)"));
+			break;
+		case 15:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Lift (N)");
 			else pGraph->SetXTitle(tr("Lift (lbf)"));
 			break;
-		case 14:
+		case 16:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Drag (N)");
 			else pGraph->SetXTitle(tr("Drag (lbf)"));
 			break;
-		case 15:
+		case 17:
 			pGraph->SetXTitle(tr("Vx ")+StrSpeed);
 			break;
-		case 16:
+		case 18:
 			pGraph->SetXTitle(tr("Vz ")+StrSpeed);
 			break;
-		case 17:
+		case 19:
 			pGraph->SetXTitle(tr("V ")+StrSpeed);
 			break;
-		case 18:
+		case 20:
 			pGraph->SetXTitle(tr("Gamma"));
 			break;
-		case 19:
+		case 21:
 			pGraph->SetXTitle(tr("PM"));
 			break;
-		case 20:
+		case 22:
 			pGraph->SetXTitle(tr("RM"));
 			break;
-		case 21:
+		case 23:
 			pGraph->SetXTitle(tr("YM"));
 			break;
-		case 22:
+		case 24:
 			pGraph->SetXTitle(tr("XCP ")+ StrLength);
 			break;
-		case 23:
+		case 25:
 			pGraph->SetXTitle(tr("YCP ")+ StrLength);
 			break;
-		case 24:
+		case 26:
 			pGraph->SetXTitle(tr("BM ")+ StrMoment);
 			break;
-		case 25:
+		case 27:
 			pGraph->SetXTitle(tr("m.g.Vz (W)"));
 			break;
-		case 26:
+		case 28:
 			pGraph->SetXTitle(tr("Efficiency"));
 			break;
-		case 27:
+		case 29:
 			pGraph->SetXTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
-		case 28:
+		case 30:
 			pGraph->SetXTitle(tr("ctrl"));
 			break;
-		case 29:
+		case 31:
 			pGraph->SetXTitle(tr("CY"));
 			break;
 		default:
@@ -17196,80 +17207,86 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("Cd"));
 			break;
 		case 5:
-			pGraph->SetYTitle(tr("GCm"));// Total Pitching moment coef.
+			pGraph->SetYTitle(tr("Cm"));// Total Pitching moment coef.
 			break;
 		case 6:
-			pGraph->SetYTitle(tr("GRm"));// Total Rolling moment coef.
+			pGraph->SetYTitle(tr("VCm"));// Viscous Pitching moment coef.
 			break;
 		case 7:
-			pGraph->SetYTitle(tr("GYm"));// Total Yawing moment coef.
+			pGraph->SetYTitle(tr("ICm"));// Induced Pitching moment coef.
 			break;
 		case 8:
-			pGraph->SetYTitle(tr("VYm"));// Profile yawing moment
+			pGraph->SetYTitle(tr("Rm"));// Total Rolling moment coef.
 			break;
 		case 9:
-			pGraph->SetYTitle(tr("IYm"));// Induced yawing moment
+			pGraph->SetYTitle(tr("Ym"));// Total Yawing moment coef.
 			break;
 		case 10:
-			pGraph->SetYTitle(tr("Cl/Cd"));
+			pGraph->SetYTitle(tr("VYm"));// Profile yawing moment
 			break;
 		case 11:
-			pGraph->SetYTitle(tr("Cl^(3/2)/Cd"));
+			pGraph->SetYTitle(tr("IYm"));// Induced yawing moment
 			break;
 		case 12:
-			pGraph->SetYTitle(tr("1/Rt(Cl)"));
+			pGraph->SetYTitle(tr("Cl/Cd"));
 			break;
 		case 13:
+			pGraph->SetYTitle(tr("Cl^(3/2)/Cd"));
+			break;
+		case 14:
+			pGraph->SetYTitle(tr("1/Rt(Cl)"));
+			break;
+		case 15:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Lift (N)");
 			else pGraph->SetYTitle(tr("Lift (lbf)"));
 			break;
-		case 14:
+		case 16:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Drag (N)");
 			else pGraph->SetYTitle(tr("Drag (lbf)"));
 			break;
-		case 15:
+		case 17:
 			pGraph->SetYTitle(tr("Vx ")+StrSpeed);
 			break;
-		case 16:
+		case 18:
 			pGraph->SetYTitle(tr("Vz ")+StrSpeed);
 			break;
-		case 17:
+		case 19:
 			pGraph->SetYTitle(tr("V ")+StrSpeed);
 			break;
-		case 18:
+		case 20:
 			pGraph->SetYTitle(tr("Gamma"));
 			break;
-		case 19:
+		case 21:
 			pGraph->SetYTitle(tr("PM"));
 			break;
-		case 20:
+		case 22:
 			pGraph->SetYTitle(tr("RM"));
 			break;
-		case 21:
+		case 23:
 			pGraph->SetYTitle(tr("YM"));
 			break;
-		case 22:
+		case 24:
 			pGraph->SetYTitle(tr("XCP ")+ StrLength);
 			break;
-		case 23:
+		case 25:
 			pGraph->SetYTitle(tr("YCP ")+ StrLength);
 			break;
-		case 24:
+		case 26:
 			pGraph->SetYTitle(tr("BM ")+ StrMoment);
 			break;
-		case 25:
+		case 27:
 			pGraph->SetYTitle(tr("m.g.Vz (W)"));
 			break;
-		case 26:
+		case 28:
 			pGraph->SetYTitle(tr("Efficiency"));
 			break;
-		case 27:
+		case 29:
 			pGraph->SetYTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
-		case 28:
-			pGraph->SetYTitle(tr("ctrl var"));
+		case 30:
+			pGraph->SetYTitle(tr("ctrl"));
 			break;
-		case 29:
+		case 31:
 			pGraph->SetYTitle(tr("CY"));
 			break;
 		default:

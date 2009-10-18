@@ -4256,8 +4256,6 @@ void MainFrame::openRecentFile()
 	}
 	else if(m_iApp==MIAREX)
 	{
-//		UpdateUFOs();
-//		pMiarex->SetUFO();
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
 		OnMiarex();
@@ -4773,7 +4771,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	for (i=0; i<m_oaWPolar.size();i++)
 	{
 		pWPolar = (CWPolar*)m_oaWPolar.at(i);
-		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar, true);
+		if(pWPolar->m_UFOName == UFOName) pWPolar->SerializeWPlr(ar, true, ProjectFormat);
 	}
 
 	ar << 0;//no WOpps
@@ -5022,7 +5020,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		for (i=0; i<m_oaWPolar.size();i++)
 		{
 			pWPolar = (CWPolar*)m_oaWPolar.at(i);
-			pWPolar->SerializeWPlr(ar, bIsStoring);
+			pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 		}
 
 		// next store all the WOpps
@@ -5167,14 +5165,13 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			}
 		}
 
-
 		//THEN WPOLARS
 		ar >> n;// number of WPolars to load
 		bool bWPolarOK;
 		for (i=0;i<n; i++)
 		{
 			pWPolar = new CWPolar;
-			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring);
+			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 
 			if (!bWPolarOK)
 			{
@@ -5308,7 +5305,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				}
 			}
 			//and their pPolars
-
 			if(ArchiveFormat <100007)
 			{
 				ar >> n;// number of PPolars to load
@@ -5316,7 +5312,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				{
 					pWPolar = new CWPolar();
 
-					if (!pWPolar->SerializeWPlr(ar, bIsStoring))
+					if (!pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat))
 					{
 						if(pWPolar) delete pWPolar;
 						QApplication::restoreOverrideCursor();

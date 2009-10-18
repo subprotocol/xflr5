@@ -73,7 +73,6 @@ private:
 	// general aerodynamic data - specific to a polar
 	double m_Density  ;
 	double m_Viscosity;
-	double pi;
 	double m_WArea;//for lift and drag calculations
 	double m_WMAChord;// for moment calculations
 	double m_WSpan;//for moment calculations
@@ -93,11 +92,11 @@ private:
 	double m_TotalWakeLength;
 	double m_WakePanelFactor;
 
-	bool SerializeWPlr(QDataStream &ar, bool bIsStoring);
+	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 	void AddPoint(CWOpp* pWOpp);
 	void AddPoint(CPOpp* pPOpp);
-	void AddPoint(double alpha, double CL, double ICd, double PCd, double TCd, double CY, double GCm, double GRm, double GYm, double IYm, double QInf, double XCP);
+	void AddPoint(double alpha, double CL, double ICd, double PCd, double TCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
 	void CalculatePoint(int i);
 	void Copy(CWPolar *pWPolar);
 	void Export(QTextStream &out, int FileType);
@@ -112,6 +111,8 @@ private:
 	QList <double> m_PCd;   //profile drag coef.
 	QList <double> m_TCd;   //total drag coef.
 	QList <double> m_GCm;   //Total Pitching Moment coefficient
+	QList <double> m_VCm;   //Viscous Pitching Moment coefficient
+	QList <double> m_ICm;   //Induced Pitching Moment coefficient
 	QList <double> m_GRm;   //Total rolling moment
 	QList <double> m_GYm;   //Total yawing moment coefficient
 	QList <double> m_VYm;   //Profile yawing Moment coefficient

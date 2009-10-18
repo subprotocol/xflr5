@@ -86,9 +86,8 @@ private:
 	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
 	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
 	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_Cm[MAXSTATIONS+1];		//Pitching moment coefficient at stations
-	double m_CmAirf[MAXSTATIONS+1];		//Pitching moment coefficient at stations
-	double m_CmXRef[MAXSTATIONS+1];		//Pitching moment coefficient at stations
+	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
+	double m_CmAirf[MAXSTATIONS+1];		//airfoil Pitching moment coefficient at stations about 1/4 chord point
 	double m_XCPSpanRel[MAXSTATIONS+1];	//Centre of pressure position at stations
 	double m_XCPSpanAbs[MAXSTATIONS+1];	//Centre of pressure position at stations
 	double m_XTrTop[MAXSTATIONS+1];		// Transition location - top
@@ -104,6 +103,8 @@ private:
 	double m_ViscousDrag;			// wing viscous drag
 	double m_InducedDrag;			// wing induced drag
 	double m_GCm;		// wing pitching moment
+	double m_VCm;		// pitching moment induced by viscous drag forces
+	double m_ICm;		// pitching moment induced by pressure forces
 	double m_GRm;			// wing rolling moment
 	double m_GYm;			// geometric yawing moment
 	double m_VYm;		// wing viscous yawing moment

@@ -138,8 +138,8 @@ private:
 
 	double m_CL, m_CX, m_CY, m_ViscousDrag, m_InducedDrag;
 	double m_XCP, m_YCP;
-	double m_VCm,m_VYm; //Viscous moments
-	double m_IYm;		// Induced Yawing Moment
+	double m_VCm, m_VYm; //Viscous moments
+	double m_ICm, m_IYm;		//Induced moments
 	double m_GCm, m_GRm, m_GYm;		// Geometric Moments
 	double m_QInf, m_QInfMax, m_QInfDelta;
 	double eps;

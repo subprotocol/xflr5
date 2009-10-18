@@ -66,11 +66,7 @@ CWOpp::CWOpp()
 	m_CX                  = 0.0;
 	m_ViscousDrag         = 0.0;
 	m_InducedDrag         = 0.0;
-	m_GCm                 = 0.0;
-	m_GRm                 = 0.0;
-	m_GYm                 = 0.0;
-	m_VYm                 = 0.0;
-	m_IYm                 = 0.0;
+	m_GCm = m_VCm = m_ICm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 	m_XCP                 = 0.0;
 	m_YCP                 = 0.0;
 	m_Ctrl                = 0.0;
@@ -82,7 +78,6 @@ CWOpp::CWOpp()
 	memset(m_ICd,0,sizeof(m_ICd));
 	memset(m_Cm,0,sizeof(m_Cm));
 	memset(m_CmAirf,0,sizeof(m_CmAirf));
-	memset(m_CmXRef,0,sizeof(m_CmXRef));
 	memset(m_XCPSpanRel,0,sizeof(m_XCPSpanRel));
 	memset(m_XCPSpanAbs,0,sizeof(m_XCPSpanAbs));
 	memset(m_Chord,0,sizeof(m_Chord));
@@ -130,7 +125,7 @@ bool CWOpp::Export(QTextStream &out, int FileType)
 			.arg(m_Cl[k],9,'f',6)
 			.arg(m_PCd[k],9,'f',6)
 			.arg(m_ICd[k],9,'f',6)
-			.arg(m_CmXRef[k],9,'f',6)
+			.arg(m_Cm[k],9,'f',6)
 			.arg(m_CmAirf[k],9,'f',6)
 			.arg(m_XTrTop[k],7,'f',4)
 			.arg(m_XTrBot[k],7,'f',4)
@@ -223,7 +218,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		{
 			ar << (float)m_Re[k] << (float)m_Chord[k] << (float)m_Twist[k];
 			ar << (float)m_Ai[k] << (float)m_Cl[k] << (float)m_PCd[k] << (float)m_ICd[k];
-			ar << (float)m_Cm[k] << (float)m_CmAirf[k] << (float)m_CmXRef[k];
+			ar << (float)m_Cm[k] << (float)m_CmAirf[k] << 0.0f;
 			ar << (float)m_XCPSpanRel[k]<< (float)m_XCPSpanAbs[k];
 			ar << (float)m_XTrTop[k] << (float)m_XTrBot[k];
 			ar << (float)m_BendingMoment[k];
@@ -303,7 +298,6 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 
 		ar >> m_Style >> m_Width;
 		ReadCOLORREF(ar,m_Color);
-
 		ar >> m_Type >> m_NStation;
 		ar >> f; m_Alpha =f;
 		ar >> f; m_QInf =f;
@@ -345,7 +339,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 			ar >> f; m_ICd[k] =f;
 			ar >> f; m_Cm[k] =f;
 			ar >> f; m_CmAirf[k] =f;
-			ar >> f; m_CmXRef[k] =f;
+			ar >> f; //f=0.0;
 			ar >> f; m_XCPSpanRel[k] =f;
 			if(ArchiveFormat>=1007){ar >> f; m_XCPSpanAbs[k] =f;}
 			ar >> f; m_XTrTop[k] =f;
@@ -376,7 +370,6 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 				m_F[k].z = 0.0;
 			}
 		}
-
 
 		m_MaxBending = 0.0;
 		for (k=0; k<m_NStation; k++)

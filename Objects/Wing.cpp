@@ -63,7 +63,6 @@ CWing::CWing()
 	memset(m_ICd, 0, sizeof(m_ICd));
 	memset(m_Cm, 0, sizeof(m_Cm));
 	memset(m_CmAirf, 0, sizeof(m_CmAirf));
-	memset(m_CmXRef, 0, sizeof(m_CmXRef));
 	memset(m_XCPSpanAbs, 0, sizeof(m_XCPSpanAbs));
 	memset(m_XCPSpanRel, 0, sizeof(m_XCPSpanRel));
 	memset(m_Re, 0, sizeof(m_Re));
@@ -1532,10 +1531,12 @@ void CWing::LLTComputeWing()
 	double InducedYawingMoment = 0.0;
 	double ViscousYawingMoment = 0.0;
 	double PitchingMoment      = 0.0;
-	double PCm                 = 0.0;
-	double GCm                 = 0.0;
+	double VCm                 = 0.0;
+	double ICm                 = 0.0;
 	double eta, sigma;
 	double Cm0;
+	double ViscCm[MAXSTATIONS+1], InducedCm[MAXSTATIONS+1];
+
 	bool bOutRe, bError;
 	bool bPointOutRe, bPointOutAlpha;
 	m_bWingOut = false;
@@ -1590,8 +1591,9 @@ void CWing::LLTComputeWing()
 		c4   = GetC4(yob, pWPolar->m_XCmRef)/m_Chord[m];
 		zpos = GetZPos(yob*m_PlanformSpan/2.0)/m_Chord[m];
 
-		m_CmXRef[m] = - c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
-		m_Cm[m]     = m_CmAirf[m]+m_CmXRef[m];
+		m_Cm[m]      = m_CmAirf[m]- c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
+		ViscCm[m]    = (-c4 *sin(arad) + zpos*cos(arad))* m_PCd[m];
+		InducedCm[m] = m_CmAirf[m]- c4  * m_Cl[m]*cos(arad) - zpos* m_Cl[m]*sin(arad);
 
 		eta = Eta(m);
 		sigma = Sigma(m);
@@ -1602,9 +1604,9 @@ void CWing::LLTComputeWing()
 		ViscousDrag         += eta   * m_PCd[m] * m_Chord[m];
 		InducedYawingMoment += sigma * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
 		ViscousYawingMoment += sigma * m_PCd[m] * m_Chord[m];
-		PitchingMoment      += eta   * m_Cm[m]     * m_Chord[m] * m_Chord[m];
-		PCm                 += eta   * m_CmAirf[m] * m_Chord[m] * m_Chord[m];
-		GCm                 += eta   * m_CmXRef[m] * m_Chord[m] * m_Chord[m];
+		PitchingMoment      += eta   * m_Cm[m]      * m_Chord[m] * m_Chord[m];
+		VCm                 += eta   * ViscCm[m]    * m_Chord[m] * m_Chord[m];
+		ICm                 += eta   * InducedCm[m] * m_Chord[m] * m_Chord[m];
 
 		if(bPointOutAlpha)
 		{
@@ -1646,21 +1648,31 @@ void CWing::LLTComputeWing()
 	m_VYm = ViscousYawingMoment /m_GChord;
 	m_IYm = InducedYawingMoment /m_PlanformSpan * PI * m_AR /180.0;
 	m_GYm = m_VYm + m_IYm;
-	m_GCm = PitchingMoment / m_GChord / m_MAChord;
+//	m_GCm = PitchingMoment / m_GChord / m_MAChord;
+	m_VCm = VCm / m_GChord / m_MAChord;
+	m_ICm = ICm / m_GChord / m_MAChord;
+	m_GCm = m_VCm + m_ICm;
+
 	m_GRm = -Integral1   * m_AR /m_PlanformSpan;
-//	m_GCm = GCm / m_GChord / m_MAChord;
 
 	if(m_CL !=0.0)	m_XCP = Integral2 * m_AR /m_PlanformSpan/m_CL;
 	else            m_XCP = 0.0;
 	if(m_bSymetric) m_YCP = 0.0;
 	else            m_YCP = m_AR/m_CL * Integral1;
 
+	LLTSetBending();
+}
+
+
+void CWing::LLTSetBending()
+{
 	//bending moment
 
 	int j,jj;
-
 	double yj, yjm, yjp;
 	double dy;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
 
 	for (j=0; j<=s_NLLTStations; j++)		m_SpanPos[j] = m_PlanformSpan/2.0 * cos(j*PI/s_NLLTStations);
 
@@ -1792,7 +1804,7 @@ bool CWing::LLTInitialize(double mass)
 
 
 void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-							 double &GCm, double &GRm, double &GYm, double &VCm, double &VYm, double &IYm,
+							 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
 							 bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1825,8 +1837,9 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 	WindNormal.Set(   -sina, 0.0, cosa);
 	WindDirection.Set( cosa, 0.0, sina);
 
-	m_GRm = m_GCm = 0.0;
-	m_GYm = m_IYm = m_VCm = m_VYm = 0.0;
+	m_GRm =0.0;
+	m_GCm = m_VCm = m_ICm = 0.0;
+	m_GYm = m_VYm = m_IYm = 0.0;
 
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * s_QInf /s_Viscosity;
 
@@ -1949,18 +1962,18 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 			//global moments, in N.m/q
 			DragMoment = LeverArm * DragVector;
 
-			m_GCm += GeomMoment.y;
 			m_GRm += GeomMoment.dot(WindDirection);
-			m_GYm += GeomMoment.dot(WindNormal);
 
 			m_VCm += DragMoment.y;
+			m_ICm += GeomMoment.y;
+
 			m_VYm += DragMoment.dot(WindNormal);
-
 			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y ;
+//			m_GYm += GeomMoment.dot(WindNormal);
 
-			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m];//vectorial formulation
-			m_CmXRef[m]     = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m];
-			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
+			m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];//vectorial formulation
+			m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
+//			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
 
 			if(bPointOutCl)
 			{
@@ -1998,11 +2011,13 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 	}
 
 	//global plane dimensionless coefficients
-	GCm += m_GCm + m_VCm;
+	GCm += m_VCm + m_ICm;
+	VCm += m_VCm;
+	ICm += m_ICm;
 
 	//sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
-	GYm -= m_GYm;
+	GYm -= (m_VYm + m_IYm);
 	VYm -= m_VYm;
 	IYm -= m_IYm;
 
@@ -2014,6 +2029,8 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 	// wing dimensionless coefficients
 	m_GCm *=  1.0 / Area /m_MAChord;
 	m_VCm *=  1.0 / Area /m_MAChord;
+	m_ICm *=  1.0 / Area /m_MAChord;
+
 	//sign convention for rolling and yawing is opposite to algebric results
 	m_GRm *= -1.0 / Area /Span;
 	m_GYm *= -1.0 / Area /Span;
@@ -2654,8 +2671,8 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 
 
-void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XCP, double &YCP,
-						   double &GCm,   double &VCm, double &GRm,   double &GYm, double &IYm, double &VYm,
+void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
+						   double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm,
 						   bool bViscous, bool bTilted, int RefAreaType)
 {
 	//calculates :
@@ -2692,8 +2709,9 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 
 	VInf = WindDirection * s_QInf;
 
-	m_GRm = m_GCm = 0.0;
-	m_GYm = m_IYm = m_VCm = m_VYm = 0.0;
+	m_GRm = 0.0;
+	m_GCm = m_VCm = m_ICm = 0.0;
+	m_GYm = m_VYm = m_IYm = 0.0;
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * s_QInf /s_Viscosity;
 
 	bOutRe = bError = false;
@@ -2824,17 +2842,17 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 			// ______________Global moments, in N.m __________________
 			DragMoment = LeverArm * DragVector;
 
-			m_GCm += GeomMoment.y ;
 			m_GRm += GeomMoment.dot(WindDirection);
-			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
 
-			m_VCm += DragMoment.y;
+			m_VCm += DragMoment.y;	
 			m_VYm += DragMoment.dot(WindNormal);
-			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y / 2.0 * s_Density *s_QInf*s_QInf;
 
-			m_CmAirf[m]    *= 1.0/m_Chord[m]/m_StripArea[m]/q;
-			m_CmXRef[m]     = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m]/q;
-			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
+			m_ICm += GeomMoment.y ;
+			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y / 2.0 * s_Density *s_QInf*s_QInf;
+//			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
+
+			m_CmAirf[m]    *= 1.0                        /m_Chord[m]/m_StripArea[m]/q;
+			m_Cm[m]         = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m]/q;
 
 
 			if(bPointOutCl)
@@ -2872,10 +2890,12 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp,  double &VDrag, double &XC
 	}
 
 	//global plane dimensionless coefficients
-	GCm += m_GCm + m_VCm;
+	GCm += m_ICm + m_VCm;
+	VCm += m_VCm;
+	ICm += m_ICm;
 	 //sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
-	GYm -= m_GYm;
+	GYm -= (m_IYm+m_VYm);
 	VYm -= m_VYm;
 	IYm -= m_IYm;
 
