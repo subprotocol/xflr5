@@ -1,3 +1,9 @@
+qflr5 (0.02b-ubuntu2) jaunty; urgency=low
+
+  * Built latest trunk debian package
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Tue, 20 Oct 2009 10:51:41 +0300
+
 qflr5 (0.02b-ubuntu1) jaunty; urgency=low
 
   * 0.02 beta for Ubuntu
