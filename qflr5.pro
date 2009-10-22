@@ -4,6 +4,7 @@
 QT += opengl
 TARGET = QFLR5
 TEMPLATE = app
+QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.4u.sdk
 CONFIG += x86 \
     ppc
 SOURCES += MainFrame.cpp \
@@ -207,8 +208,8 @@ HEADERS += MainFrame.h \
     QFLR5Application.h \
     Miarex/InertiaDlg.h
 TRANSLATIONS = qflr5.ts \
-	qflr5_de.ts \
-	qflr5_fr.ts
+    qflr5_de.ts \
+    qflr5_fr.ts
 win32:RC_FILE = res/QFLR5.rc
 RESOURCES += qflr5.qrc
 FORMS += 
@@ -226,3 +227,4 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
+OTHER_FILES += mac/Info.plist
