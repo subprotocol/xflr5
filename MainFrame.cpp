@@ -41,6 +41,7 @@
 #include "Misc/TranslatorDlg.h"
 #include "Graph/GraphDlg.h"
 #include "XDirect/XDirect.h"
+#include "XDirect/BatchDlg.h"
 #include "XDirect/NacaFoilDlg.h"
 #include "XDirect/InterpolateFoilsDlg.h"
 #include "XDirect/CAddDlg.h"
@@ -891,6 +892,9 @@ void MainFrame::CreateDockWindows()
 	FoilGeomDlg::s_pXFoil         = pXDirect->m_pXFoil;
 	TEGapDlg::s_pXFoil            = pXDirect->m_pXFoil;
 	LEDlg::s_pXFoil               = pXDirect->m_pXFoil;
+	BatchDlg::s_pXFoil            = pXDirect->m_pXFoil;
+	BatchDlg::s_pMainFrame        = this;
+	BatchDlg::s_pXDirect          = m_pXDirect;
 
 	GraphDlg::s_pMainFrame = this;
 	GraphDlg::s_ActivePage = 0;
@@ -1092,12 +1096,12 @@ void MainFrame::CreateMiarexActions()
 	showWing2Curve->setCheckable(true);
 	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
-	defineWPolar = new QAction(tr("Define an Analysis"), this);
-	defineWPolar->setShortcut(tr("F6"));
+	defineWPolar = new QAction(tr("Define an Analysis \t(F6)"), this);
+//	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
-	defineCtrlPolar = new QAction(tr("Define a Control Analysis"), this);
-	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
+	defineCtrlPolar = new QAction(tr("Define a Control Analysis \t(Ctrl+F6)"), this);
+//	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
 	MiarexGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
@@ -1617,13 +1621,13 @@ void MainFrame::CreateXDirectActions()
 	deleteFoilOpps = new QAction(tr("Delete associated OpPoints"), this);
 	connect(deleteFoilOpps, SIGNAL(triggered()), pXDirect, SLOT(OnDeleteFoilOpps()));
 
-	definePolar = new QAction(tr("Define an Analysis"), this);
-	definePolar->setShortcut(tr("F6"));
+	definePolar = new QAction(tr("Define an Analysis \t(F6)"), this);
+//	definePolar->setShortcut(tr("F6"));
 	definePolar->setStatusTip(tr("Defines a single analysis/polar"));
 	connect(definePolar, SIGNAL(triggered()), pXDirect, SLOT(OnDefinePolar()));
 
-	defineBatch = new QAction(tr("Batch Analysis"), this);
-	defineBatch->setShortcut(tr("Shift+F6"));
+	defineBatch = new QAction(tr("Batch Analysis \t(Shift+F6)"), this);
+//	defineBatch->setShortcut(tr("Shift+F6"));
 	defineBatch->setStatusTip(tr("Launches a batch of analysis calculation for a specified range or list of Reynolds numbers"));
 	connect(defineBatch, SIGNAL(triggered()), pXDirect, SLOT(OnBatchAnalysis()));
 

@@ -34,6 +34,7 @@ class BatchDlg : public QDialog
 {
 	Q_OBJECT
 	friend class QXDirect;
+	friend class MainFrame;
 	friend class QReListDlg;
 public:
 	BatchDlg(void *pParent = NULL);
@@ -93,6 +94,9 @@ protected:
 	GraphWidget *m_pctrlGraphOutput;
 
 	static bool s_bStoreOpp;
+	static void* s_pXFoil;
+	static void* s_pXDirect;
+	static void * s_pMainFrame;
 
 	double	m_Mach;
 
@@ -124,9 +128,6 @@ protected:
 
 	QFile *m_pXFile;
 
-	void* m_pXDirect;
-	void * m_pMainFrame;
-	void* m_pXFoil;
 	CFoil *m_pFoil;
 	CPolar *m_pCurPolar;
 

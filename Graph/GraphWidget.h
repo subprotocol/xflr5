@@ -39,11 +39,14 @@ protected:
 	void paintEvent(QPaintEvent *event);
 	void resizeEvent (QResizeEvent *event);
 
-	QWidget *ScalePage;
+	void SetTitle(QString &Title, QPoint &Place);
+
+/*	QWidget *ScalePage;
 	QWidget *AxisPage;
 	QWidget *FontPage;
-	QWidget *BackPage;
-
+	QWidget *BackPage;*/
+	QPoint m_TitlePosition;
+	QString m_GraphTitle;
 	QGraph *m_pGraph;
 
 };

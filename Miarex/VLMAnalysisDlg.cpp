@@ -1201,8 +1201,8 @@ void VLMAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVe
 {
 	// calculates the the panel p's vortex influence at point C
 	// V is the resulting velocity
-	int lw, pw;
-	int p = pPanel->m_iElement;
+	static int lw, pw, p;
+	p = pPanel->m_iElement;
 	V.Set(0.0,0.0,0.0);
 
 	if(m_pWPolar->m_bVLM1)
@@ -1393,7 +1393,7 @@ void VLMAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const 
 	double CoreSize = 0.00000;
 	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
-	int i;
+	static int i;
 
 	V.x = 0.0;
 	V.y = 0.0;

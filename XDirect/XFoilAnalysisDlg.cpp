@@ -121,6 +121,7 @@ void XFoilAnalysisDlg::SetupLayout()
 
 void XFoilAnalysisDlg::reject()
 {
+	m_pXFoil->m_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
 	m_pXFile->close();
@@ -130,6 +131,7 @@ void XFoilAnalysisDlg::reject()
 
 void XFoilAnalysisDlg::accept()
 {
+	m_pXFoil->m_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
 	m_pXFile->close();
@@ -305,7 +307,7 @@ bool XFoilAnalysisDlg::Iterate()
 		WriteString(str);
 		m_bExit = true;
 		return true;// to exit loop
-		}
+	}
 
 	str="   Solving BL system ...\r\n";
 	WriteString(str);
@@ -384,6 +386,7 @@ void XFoilAnalysisDlg::OnCancelAnalysis()
 {
 	m_bSkip = true;
 	m_bExit = true;
+	m_pXFoil->m_bCancel = true;
 	if(m_bFinished) reject();
 }
 
@@ -534,6 +537,7 @@ void XFoilAnalysisDlg::StartAnalysis()
 	m_bSkip     = false;
 	m_bExit     = false;
 	m_bFinished = false;
+	m_pXFoil->m_bCancel = false;
 
 	//all set to launch the analysis
 	if (!m_bType4)

@@ -50,6 +50,8 @@ XFoil::XFoil()
 	m_bTrace = false;
 	m_bFullReport = false;
 	pi = 3.141592654;
+
+	m_bCancel = false;
 	
 	sccon = 5.6  ;
 	gacon = 6.70;
@@ -4194,7 +4196,8 @@ bool XFoil::mrchdu()
 	sens = 0.0;
 	sennew = 0.0;
 	
-	for (int is=1; is<= 2;is++){//2000
+	for (int is=1; is<= 2;is++)
+	{//2000
 		
 		//---- set forced transition arc length position
 		xifset(is);
@@ -4212,7 +4215,8 @@ bool XFoil::mrchdu()
 		turb = false;
 		itran[is] = iblte[is];
 		//---- march downstream
-		for(ibl=2;ibl<= nbl[is];ibl++){//1000
+		for(ibl=2;ibl<= nbl[is];ibl++)
+		{//1000
 			ibm = ibl-1;
 
 			simi = ibl==2;
@@ -4464,6 +4468,8 @@ stop110:
 			}
 
 			tran = false;
+			qApp->processEvents();
+			if(m_bCancel) return false;
 		}//1000 continue
 	}// 2000 continue
 	return true;
@@ -8699,7 +8705,7 @@ bool XFoil::trchek(){
 		
 		rlx = 1.0;
 		dxt = xt_a2*da2;
-		
+
 		if (rlx*fabs(dxt/(x2-x1)) > 0.05) rlx = 0.05*fabs((x2-x1)/dxt);
 
 		if(rlx*fabs(da2)         > 1.0)  rlx = 1.0 *fabs(   1.0 /da2);
@@ -8721,7 +8727,7 @@ bool XFoil::trchek(){
 	//TRACE("trchek2 - n2 convergence failed\n");
 	str = "trchek2 - n2 convergence failed\r\n";
 	WriteString(str, true);
-
+	if(m_bCancel) return false;
 stop101:
 
 	//---- test for free or forced transition

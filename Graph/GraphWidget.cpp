@@ -27,8 +27,16 @@
 
 GraphWidget::GraphWidget()
 {
+	m_TitlePosition.setX(0);
+	m_TitlePosition.setY(0);
+	m_GraphTitle = "";
 }
 
+void GraphWidget::SetTitle(QString &Title, QPoint &Place)
+{
+	m_GraphTitle = Title;
+	m_TitlePosition = Place;
+}
 
 void GraphWidget::paintEvent(QPaintEvent *  event )
 {
@@ -59,6 +67,8 @@ void GraphWidget::paintEvent(QPaintEvent *  event )
 	painter.setPen(BorderPen);
 	painter.setBrush(Qt::NoBrush);
 	painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
+
+	painter.drawText(m_TitlePosition, m_GraphTitle);
 
 	painter.restore();
 }

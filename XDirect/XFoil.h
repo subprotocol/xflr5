@@ -67,6 +67,8 @@ class XFoil
 	friend class TEGapDlg;
 	friend class LEDlg;
 	friend class NacaFoilDlg;
+	friend class XFoilAnalysisDlg;
+	friend class BatchDlg;
 
 //-----Specific Inverse MDES-------------------------------
 public:
@@ -358,6 +360,8 @@ private:
 //	QString oname, prefix;
 //	QString name, namepol, codepol, nameref;
 //	QString ispars;
+
+	bool m_bCancel;
 
 	bool m_bFullReport;
 //	bool lpacc,lqvdes,,lqrefl,lcpref,lforef,lpfile,lpfilx;

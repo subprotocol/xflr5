@@ -25,6 +25,9 @@
 #include "../MainFrame.h"
 
 bool BatchDlg::s_bStoreOpp;
+void * BatchDlg::s_pXFoil;
+void * BatchDlg::s_pMainFrame;
+void * BatchDlg::s_pXDirect;
 
 BatchDlg::BatchDlg(void *pParent)
 {
@@ -53,17 +56,17 @@ BatchDlg::BatchDlg(void *pParent)
 	m_RmsGraph.SetType(1);
 	m_RmsGraph.SetMargin(40);
 
-	m_pXDirect        = pParent;
 	m_bAlpha          = true;
 	m_bFromList       = false;
 	m_bFromZero       = false;
-	m_bCancel         = false;
 	m_bInitBL         = false;
 	m_bSkipPoint      = false;
 	m_bSkipPolar      = false;
 	m_bIsRunning      = false;
+	m_bCancel         = false;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	pXFoil->m_bCancel = false;
 
-	m_pXFoil       = NULL;
 	m_Iterations = 0;
 
 	SetLayout();
@@ -83,7 +86,8 @@ BatchDlg::BatchDlg(void *pParent)
 	connect(m_pctrlFromZero, SIGNAL(stateChanged(int)), this, SLOT(OnFromZero(int)));
 	connect(m_pctrlSpecMin, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
 	connect(m_pctrlSpecMax, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
-	connect(m_pctrlSpecDelta, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));}
+	connect(m_pctrlSpecDelta, SIGNAL(editingFinished()), this, SLOT(OnSpecChanged()));
+}
 
 
 void BatchDlg::SetLayout()
@@ -243,7 +247,7 @@ void BatchDlg::SetLayout()
 
 void BatchDlg::AddOpPoint()
 {
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	pXDirect->AddOpPoint(m_pCurPolar);
 	if(pXDirect->m_bPolar)
 	{
@@ -256,13 +260,14 @@ void BatchDlg::AddOpPoint()
 
 void BatchDlg::AlphaLoop()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-//	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
-	QString str;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+//	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
+	QString str, str2;
 	QString strong = "";
-	QString StrTmp;
 	int iRe, iAlpha, nAlpha;
 	double alphadeg;
+	QPoint Place(m_pctrlGraphOutput->rect().left()+m_RmsGraph.GetMargin()*2, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
+
 	nAlpha = (int)(fabs((m_SpMax-m_SpMin)*1.000/m_SpInc));//*1.0001 to make sure upper limit is included
 
 	for (iAlpha=0; iAlpha<=nAlpha; iAlpha++)
@@ -298,6 +303,12 @@ void BatchDlg::AlphaLoop()
 				str = QString("Re=%1   Ma=%2   Nc=%3\n").arg(pXFoil->reinf1,8,'f',0).arg(pXFoil->minf1,5,'f',3).arg(pXFoil->acrit,5,'f',2);
 				strong+=str;
 				UpdateOutput(str);
+
+				str = QString("Alpha=%1").arg(alphadeg,5,'f',2);
+				str += QString::fromUtf8("°");
+				str2 = QString(" / Re=%1").arg(pXFoil->reinf1,8,'f',0);
+				str += str2;
+				m_pctrlGraphOutput->SetTitle(str, Place);
 
 				// here we go !
 				if (!pXFoil->specal())
@@ -417,16 +428,18 @@ void BatchDlg::CleanUp()
 	m_bCancel    = false;
 	m_bSkipPoint = false;
 	m_bSkipPolar = false;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	pXFoil->m_bCancel = false;
 	m_pctrlClose->setFocus();
 }
 
 
 void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 {
-//	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+//	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	if(!m_pFoil) return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_pCurPolar = new CPolar;
 	m_pCurPolar->m_FoilName   = m_pFoil->m_FoilName;
 	m_pCurPolar->m_bIsVisible = true;
@@ -500,6 +513,9 @@ void BatchDlg::keyPressEvent(QKeyEvent *event)
 				m_bSkipPoint = true;
 				m_bSkipPolar = true;
 				m_bCancel    = true;
+				XFoil *pXFoil = (XFoil*)s_pXFoil;
+				pXFoil->m_bCancel = true;
+
 			}
 			else
 			{
@@ -522,7 +538,7 @@ void BatchDlg::InitDialog()
 
 	if(!m_pFoil) return;
 
-	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
+	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 
 	QString str = tr("Batch analysis for ")+ m_pFoil->m_FoilName;
 	setWindowTitle(str);
@@ -614,7 +630,7 @@ void BatchDlg::InitDialog()
 	m_Iterations = 0;
 	ResetCurves();
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(pMainFrame) m_RmsGraph.CopySettings(&pMainFrame->m_RefGraph, false);
 }
 
@@ -622,7 +638,7 @@ void BatchDlg::InitDialog()
 
 bool BatchDlg::InitXFoil2()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	pXFoil->Initialize();
 	pXFoil->pXFile = m_pXFile;
 
@@ -699,8 +715,8 @@ bool BatchDlg::InitXFoil2()
 bool BatchDlg::Iterate()
 {
 	QString str;
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 
 	if(!pXFoil->viscal())
 	{
@@ -891,7 +907,7 @@ void BatchDlg::OnType1()
 
 void BatchDlg::OutputIter(int iter, double Re, double Alpha)
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 	if(iter)
 	{
 		m_RmsGraph.GetCurve(0)->AddPoint(iter, pXFoil->rmsbl);
@@ -905,13 +921,15 @@ void BatchDlg::OnAnalyze()
 {
 	if(m_bIsRunning)
 	{
+		XFoil *pXFoil = (XFoil*)s_pXFoil;
+		pXFoil->m_bCancel = true;
 		m_bCancel = true;
 		return;
 	}
 	m_bCancel    = false;
 	m_bIsRunning = true;
 
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
 	m_pctrlTextOutput->setText("");
 
@@ -1058,14 +1076,16 @@ void BatchDlg::ReadParams()
 
 void BatchDlg::ReLoop()
 {
-	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	QXDirect* pXDirect = (QXDirect*)m_pXDirect;
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 	QString str;
 	QString strong = "";
-	QString StrTmp;
+
 	double alphadeg;
 	int ia, iRe, nRe, series, total, MaxSeries;
 	double SpMin, SpMax, SpInc;
+
+	QPoint Place(m_pctrlGraphOutput->rect().left()+m_RmsGraph.GetMargin()*2, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
 
 	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = m_NRe-1;
@@ -1130,6 +1150,11 @@ void BatchDlg::ReLoop()
 						str = QString("Alpha = %1").arg(alphadeg,9,'f',3);
 						strong+=str;
 						UpdateOutput(str);
+
+						str = QString("Re=%1  /  Alpha=%2").arg(pXFoil->reinf1,8,'f',0).arg(alphadeg,5,'f',2);
+						str += QString::fromUtf8("°");
+						m_pctrlGraphOutput->SetTitle(str, Place);
+
 
 						// here we go !
 						if (!pXFoil->specal())
@@ -1237,8 +1262,8 @@ void BatchDlg::ResetCurves()
 
 void BatchDlg::SetFileHeader()
 {
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QTextStream out(m_pXFile);
 
@@ -1303,15 +1328,6 @@ void BatchDlg::StartAnalysis()
 void BatchDlg::UpdateGraph(double Re, double Alpha)
 {
 	m_pctrlGraphOutput->update();
-//	repaint();
-
-	if(Re>0.0)
-	{
-		QString strong = QString("Re=%1  /  Alpha=%2").arg(Re,8,'f',0).arg(Alpha*180.0/PI,5,'f',2);
-//		QPoint Place(int((BltRect.left+BltRect.right)/2), BltRect.top+10);
-//		dcMem.TextOut(Place.x, Place.y, strong);
-//		dcMem.SelectObject(pOldFont);
-	}
 }
 
 

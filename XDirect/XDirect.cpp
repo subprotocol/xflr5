@@ -1825,13 +1825,9 @@ void QXDirect::OnBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!g_pCurFoil) 		return;
-
 	BatchDlg BDlg;
 	BDlg.move(pMainFrame->m_DlgPos);
-	BDlg.m_pXDirect = this;
-	BDlg.m_pMainFrame    = m_pMainFrame;
-	BDlg.m_pXFoil    = m_pXFoil;
-	BDlg.m_pFoil  = g_pCurFoil;
+	BDlg.m_pFoil     = g_pCurFoil;
 	BDlg.m_Mach      = 0.0;
 	BDlg.m_ReMin     = m_Reynolds;
 	BDlg.m_ReMax     = m_ReynoldsMax;
