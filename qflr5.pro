@@ -218,6 +218,7 @@ unix {
     isEmpty(PREFIX):PREFIX = /usr/local
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
+    
     # MAKE INSTALL
     INSTALLS += target
     target.path = $$BINDIR
@@ -226,3 +227,4 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
+OTHER_FILES += mac/Info.plist
