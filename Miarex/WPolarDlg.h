@@ -98,7 +98,7 @@ private:
 	double m_Height;
 
 	int m_NXWakePanels;
-	double m_TotalWakeLength;//% mac
+	double m_TotalWakeLength;//percent MAC
 	double m_WakePanelFactor;
 
 	int m_RefAreaType;

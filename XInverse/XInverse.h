@@ -31,7 +31,6 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QVBoxLayout>
-#include "XInverse.h"
 #include "../Misc/FloatEdit.h"
 #include "../XDirect/XFoil.h"
 #include "../Graph/QGraph.h"

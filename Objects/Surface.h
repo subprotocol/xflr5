@@ -33,6 +33,8 @@
 
 class CSurface : public QObject
 {
+	Q_OBJECT
+
 	friend class CWing;
 	friend class QMiarex;
 	friend class MainFrame;

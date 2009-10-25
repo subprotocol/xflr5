@@ -191,6 +191,10 @@ CPCALC: vitesse locale trop importante
         <translation>Type 4</translation>
     </message>
     <message>
+        <source>Store OpPoints</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>CpCalc: local speed too large 
  Compressibility corrections invalid</source>
         <translation type="unfinished"></translation>
@@ -1514,7 +1518,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Geom. Pitching moment coef.</source>
-        <translation>Coef moment tangage géométr.</translation>
+        <translation type="obsolete">Coef moment tangage géométr.</translation>
     </message>
     <message>
         <source>Total Pitching moment coef.</source>
@@ -1852,6 +1856,14 @@ Réduisez la taille du maillage</translation>
         <source>Auto Unit</source>
         <translation>Unités automatiques</translation>
     </message>
+    <message>
+        <source>Viscous pitching moment coef.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Induced pitching moment coef.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ImportWingDlg</name>
@@ -1900,23 +1912,23 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>This is a calculation form for the inertia tensor. Refer to the Guidelines for explanations.</source>
-        <translation type="unfinished">Ceci est un calcul du tenseur d’inertie. Veuillez vous référer au Guidelines pour les explications.</translation>
+        <translation type="obsolete">Ceci est un calcul du tenseur d’inertie. Veuillez vous référer au Guidelines pour les explications.</translation>
     </message>
     <message>
         <source>The results are used in stability calculations.</source>
-        <translation>Le résultat est utilisé pour les calculs de stabilité.</translation>
+        <translation type="obsolete">Le résultat est utilisé pour les calculs de stabilité.</translation>
     </message>
     <message>
         <source>Input Type for Inertias</source>
-        <translation>Entrer le type des inerties</translation>
+        <translation type="obsolete">Entrer le type des inerties</translation>
     </message>
     <message>
         <source>XFLR5 ROM estimate</source>
-        <translation type="unfinished">Rstimation XFLR5 ROM</translation>
+        <translation type="obsolete">Rstimation XFLR5 ROM</translation>
     </message>
     <message>
         <source>User Input</source>
-        <translation>Entrée utilisateur</translation>
+        <translation type="obsolete">Entrée utilisateur</translation>
     </message>
     <message>
         <source>Reference Point</source>
@@ -1940,7 +1952,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Inertias : Object only, without point masses</source>
-        <translation type="unfinished">Inerties : objet uniquement, sans masses ponctuelles</translation>
+        <translation type="obsolete">Inerties : objet uniquement, sans masses ponctuelles</translation>
     </message>
     <message>
         <source>Export to AVL</source>
@@ -1948,11 +1960,23 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation>Accepter</translation>
+        <translation type="obsolete">Accepter</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abandonner</translation>
+        <translation type="obsolete">Abandonner</translation>
+    </message>
+    <message>
+        <source>This is a calculation form for a rough order of magnitude for the inertia tensor. The results are used in stability calculations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refer to the Guidelines for explanations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
     </message>
 </context>
 <context>
@@ -2753,19 +2777,19 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Define an Analysis</source>
-        <translation>Définir une analyse</translation>
+        <translation type="obsolete">Définir une analyse</translation>
     </message>
     <message>
         <source>F6</source>
-        <translation>F6</translation>
+        <translation type="obsolete">F6</translation>
     </message>
     <message>
         <source>Define a Control Analysis</source>
-        <translation>Définir une analyse des contrôles</translation>
+        <translation type="obsolete">Définir une analyse des contrôles</translation>
     </message>
     <message>
         <source>Ctrl+F6</source>
-        <translation>Ctrl+F6</translation>
+        <translation type="obsolete">Ctrl+F6</translation>
     </message>
     <message>
         <source>Define Graph Settings	(G)</source>
@@ -3001,11 +3025,11 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Batch Analysis</source>
-        <translation>Analyse par lots</translation>
+        <translation type="obsolete">Analyse par lots</translation>
     </message>
     <message>
         <source>Shift+F6</source>
-        <translation>Shift+F6</translation>
+        <translation type="obsolete">Shift+F6</translation>
     </message>
     <message>
         <source>Launches a batch of analysis calculation for a specified range or list of Reynolds numbers</source>
@@ -3426,6 +3450,22 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>Show Elevator Curve</source>
         <translation>Afficher la courbe du stabilisateur horizontal</translation>
+    </message>
+    <message>
+        <source>Define Inertia</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Define an Analysis 	(F6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Define a Control Analysis 	(Ctrl+F6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Batch Analysis 	(Shift+F6)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>A foil of that name already exists
@@ -3876,6 +3916,10 @@ Il faut résuire le nombre de panneaux d’aile</translation>
         <source>Description:</source>
         <translation>Description :</translation>
     </message>
+    <message>
+        <source>Plane Description</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PolarFilterDlg</name>
@@ -3954,7 +3998,7 @@ Il faut résuire le nombre de panneaux d’aile</translation>
     </message>
     <message>
         <source>GCm</source>
-        <translation>GCm</translation>
+        <translation type="obsolete">GCm</translation>
     </message>
     <message>
         <source>Cl/Cd</source>
@@ -4027,10 +4071,6 @@ Pousuivre néanmoins ?</translation>
     <message>
         <source>Cm Airfoil</source>
         <translation>Cm du profil</translation>
-    </message>
-    <message>
-        <source>Cm XRef</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cm</source>
@@ -4607,14 +4647,6 @@ Poursuivre néanmoins ?</translation>
         <translation>ICx</translation>
     </message>
     <message>
-        <source>GRm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>GYm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>VYm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4699,10 +4731,6 @@ Poursuivre néanmoins ?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ctrl var</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot (yet ?) save 8 bit depth opengl screen images... Sorry</source>
         <translation>Il n&apos;est pas (encore) possible d&apos;enregistrer des images d&apos;écran opengl sur 8 bits. Désolé...</translation>
     </message>
@@ -4761,6 +4789,26 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Foil Names</source>
         <translation>Nom des profils</translation>
+    </message>
+    <message>
+        <source>Cm total</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ICm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ym</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4836,6 +4884,26 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Wing definition</source>
         <translation>Définition de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>Wing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2nd Wing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Elevator</source>
+        <translation type="unfinished">Stabilisateur horizontal</translation>
+    </message>
+    <message>
+        <source>Fin</source>
+        <translation type="unfinished">Dérive</translation>
+    </message>
+    <message>
+        <source>Plane Name</source>
+        <translation type="unfinished">Nom de l’avion</translation>
     </message>
 </context>
 <context>
