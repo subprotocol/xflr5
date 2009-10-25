@@ -43,7 +43,7 @@
 #define IMX 64  // number of complex mapping coefficients  Cn
 #define IMX4 16 // = IMX/4 added arcds
 
-#define SETTINGSFORMAT    100559
+#define SETTINGSFORMAT    100561
 
 #define QUESTION (BB || !BB) //Shakespeare
 

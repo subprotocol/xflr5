@@ -336,7 +336,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrGraph1.SetVariables(4,1);
 	m_WPlrGraph2.SetVariables(0,1);
 	m_WPlrGraph3.SetVariables(0,5);
-	m_WPlrGraph4.SetVariables(0,10);
+	m_WPlrGraph4.SetVariables(0,12);
 
 	m_iView = W3DVIEW;
 	m_iWingView = 1;

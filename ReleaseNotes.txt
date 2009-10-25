@@ -15,8 +15,9 @@
 *******************************************************************************
 
 
-QFLR5 v0.03 Beta
+QFLR5 v0.03 Beta October 25th, 2009
 	- Added a form to evaluate the CoG and inertia of wings and bodies
+	- Redefined the pitchnig moment and yawing moments for clarity - details in the guidelines § 5.16
 	- Added an option to store oppoints in foil batch analysis
 	- Marked more sentences for translation
 	- Corrected a crash bug which occurred when trying to run a biplane analysis without an elevator
