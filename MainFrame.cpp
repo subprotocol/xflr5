@@ -51,7 +51,9 @@
 #include "XDirect/TEGapDlg.h"
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
-#include <CoreFoundation/CoreFoundation.h>
+#ifdef Q_WS_MAC
+	#include <CoreFoundation/CoreFoundation.h>
+#endif
 
 extern CFoil *g_pCurFoil;
 
