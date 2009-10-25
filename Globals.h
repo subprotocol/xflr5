@@ -29,7 +29,9 @@
 #include <QString>
 #include <QTextStream>
 #include <QColor>
+#include <complex>
 #include "Params.h"
+using namespace std;
 
 
 bool IsEven(int n);
@@ -74,5 +76,17 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 			  double &NtoUnit, double &NmtoUnit);
 
 Qt::PenStyle GetStyle(int s);
+
+
+double Det44(double *aij);
+double Det33(double *aij);
+complex<double> Det33(complex<double> *aij);
+
+void CharacteristicPol(double m[][4], double p[5]);
+
+bool LinBairstow(double *p, complex<double> *root, int n);
+void TestEigen();
+bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V);
+
 
 #endif // FUNCTIONS_H

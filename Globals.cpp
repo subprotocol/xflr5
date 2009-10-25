@@ -544,7 +544,6 @@ void SetUnits(int LUnit, int AUnit, int SUnit, int WUnit, int FUnit, int MUnit,
 
 void Trace(int n)
 {
-//	if(!((CXFLR5App*)AfxGetApp())->bTrace) return;
 	QString FileName = QDir::tempPath() + "/Trace.log";
 	QFile *tf = new QFile(FileName);
 	if (!tf->open(QIODevice::ReadWrite | QIODevice::Text)) return;
@@ -556,7 +555,7 @@ void Trace(int n)
 
 	QDateTime dt = QDateTime::currentDateTime();
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
-	ts << str;
+	ts << str << n;
 
 	tf->close();
 
@@ -804,7 +803,7 @@ bool ludcmp(int n, double *a, int *indx)
 	bool bimaxok = false;
 	int imax = -1;
 	int i, j, k;
-	double vv[VLMMATSIZE];//use temporary global array
+	static double vv[VLMMATSIZE];//use temporary global array
 	double dum, sum, aamax;
 
 	if(n>IQX)
@@ -897,6 +896,478 @@ bool baksub(int n, double *a, int *indx, double *b)
 	}
 	return true;
 }
+
+double Det44(double *aij)
+{
+//	returns the determinant of a 4x4 matrix
+
+	int i,j,k,l,p,q;
+	double det = 0.0;
+	double a33[9];
+
+	for(i=0; i<4; i++)
+	{
+		for(j=0; j<4; j++)
+		{
+			p = 0;
+			for(k=0; k<4 && k!=i; k++)
+			{
+				q = 0;
+				for(l=0; l<4 && l!=j; l++)
+				{
+					*(a33+p*3+q) = *(aij+4*i+j);// could also do it by address, to be a little faster
+					q++;
+				}
+				p++;
+			}
+			det += pow(-1,i+j) * Det33(a33);
+		}
+	}
+	return det;
+}
+
+
+double Det33(double *aij)
+{
+	//returns the determinant of a 3x3 matrix
+	int n=3;
+	double det = 0.0;
+
+	det  = *(aij+0*n+0) * (*(aij+1*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+1*n+2));
+	det -= *(aij+0*n+1) * (*(aij+1*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+1*n+2));
+	det += *(aij+0*n+2) * (*(aij+1*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+1*n+1));
+
+	det -= *(aij+1*n+0) * (*(aij+0*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+0*n+2));
+	det += *(aij+1*n+1) * (*(aij+0*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+0*n+2));
+	det -= *(aij+1*n+2) * (*(aij+0*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+0*n+1));
+
+	det += *(aij+2*n+0) * (*(aij+0*n+1) * *(aij+1*n+2) - *(aij+1*n+1) * *(aij+0*n+2));
+	det -= *(aij+2*n+1) * (*(aij+0*n+0) * *(aij+1*n+2) - *(aij+1*n+0) * *(aij+0*n+2));
+	det += *(aij+2*n+2) * (*(aij+0*n+0) * *(aij+1*n+1) - *(aij+1*n+0) * *(aij+0*n+1));
+
+	return det;
+}
+
+
+
+complex<double> Det33(complex<double> *aij)
+{
+	//returns the determinant of a 3x3 matrix
+	int n=3;
+	complex<double> det(0.0, 0.0);
+
+	det  = *(aij+0*n+0) * (*(aij+1*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+1*n+2));
+	det -= *(aij+0*n+1) * (*(aij+1*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+1*n+2));
+	det += *(aij+0*n+2) * (*(aij+1*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+1*n+1));
+
+	det -= *(aij+1*n+0) * (*(aij+0*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+0*n+2));
+	det += *(aij+1*n+1) * (*(aij+0*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+0*n+2));
+	det -= *(aij+1*n+2) * (*(aij+0*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+0*n+1));
+
+	det += *(aij+2*n+0) * (*(aij+0*n+1) * *(aij+1*n+2) - *(aij+1*n+1) * *(aij+0*n+2));
+	det -= *(aij+2*n+1) * (*(aij+0*n+0) * *(aij+1*n+2) - *(aij+1*n+0) * *(aij+0*n+2));
+	det += *(aij+2*n+2) * (*(aij+0*n+0) * *(aij+1*n+1) - *(aij+1*n+0) * *(aij+0*n+1));
+
+	return det;
+}
+
+void CharacteristicPol(double m[][4], double p[5])
+{
+	// input : 4x4 matrix m[][]
+	// output : coefficients p[] of the matrix characteristic polynomial
+	// thanks mathlab !
+	// polynom can then be solved for complex roots using Bairstow's algorithm
+
+
+	// lambda^4
+	p[4] =  1;
+
+	// lambda^3
+	p[3] =  - m[0][0]- m[1][1]-m[2][2]- m[3][3];
+
+	// lambda^2
+	p[2] =
+		+ m[0][0] * m[1][1]
+		+ m[0][0] * m[2][2]
+		+ m[0][0] * m[3][3]
+		+ m[1][1] * m[3][3]
+		+ m[1][1] * m[2][2]
+		+ m[2][2] * m[3][3]
+		- m[1][0] * m[0][1]
+		- m[2][1] * m[1][2]
+		- m[2][0] * m[0][2]
+		- m[2][3] * m[3][2]
+		- m[3][1] * m[1][3]
+		- m[3][0] * m[0][3];
+
+	// lambda^1
+	p[1] =
+		+ m[2][1] * m[1][2] * m[3][3]
+		+ m[0][0] * m[2][1] * m[1][2]
+		- m[3][1] * m[1][2] * m[2][3]
+		+ m[3][1] * m[1][3] * m[2][2]
+		+ m[1][0] * m[0][1] * m[3][3]
+		+ m[1][0] * m[0][1] * m[2][2]
+		- m[2][0] * m[0][1] * m[1][2]
+		- m[1][0] * m[3][1] * m[0][3]
+		- m[1][0] * m[2][1] * m[0][2]
+		+ m[3][0] * m[1][1] * m[0][3]
+		- m[3][0] * m[0][1] * m[1][3]
+		+ m[2][0] * m[0][2] * m[3][3]
+		- m[2][0] * m[3][2] * m[0][3]
+		+ m[2][0] * m[1][1] * m[0][2]
+		- m[3][0] * m[0][2] * m[2][3]
+		+ m[3][0] * m[0][3] * m[2][2]
+		- m[2][1] * m[3][2] * m[1][3]
+		- m[0][0] * m[1][1] * m[2][2]
+		+ m[0][0] * m[2][3] * m[3][2]
+		+ m[1][1] * m[2][3] * m[3][2]
+		- m[0][0] * m[2][2] * m[3][3]
+		+ m[0][0] * m[3][1] * m[1][3]
+		- m[1][1] * m[2][2] * m[3][3]
+		- m[0][0] * m[1][1] * m[3][3];
+
+	// lambda^0
+	p[0] =
+		+ m[2][0] * m[0][1] * m[1][2] * m[3][3]
+		- m[2][0] * m[1][1] * m[0][2] * m[3][3]
+		+ m[2][0] * m[1][1] * m[3][2] * m[0][3]
+		- m[2][0] * m[0][1] * m[3][2] * m[1][3]
+		+ m[1][0] * m[3][1] * m[0][3] * m[2][2]
+		- m[1][0] * m[3][1] * m[0][2] * m[2][3]
+		+ m[1][0] * m[2][1] * m[0][2] * m[3][3]
+		- m[1][0] * m[2][1] * m[3][2] * m[0][3]
+		- m[3][0] * m[1][1] * m[0][3] * m[2][2]
+		+ m[3][0] * m[0][1] * m[1][3] * m[2][2]
+		- m[3][0] * m[0][1] * m[1][2] * m[2][3]
+		- m[2][0] * m[3][1] * m[1][2] * m[0][3]
+		+ m[2][0] * m[3][1] * m[0][2] * m[1][3]
+		- m[3][0] * m[2][1] * m[0][2] * m[1][3]
+		+ m[3][0] * m[1][1] * m[0][2] * m[2][3]
+		+ m[3][0] * m[2][1] * m[1][2] * m[0][3]
+		- m[0][0] * m[2][1] * m[1][2] * m[3][3]
+		+ m[0][0] * m[2][1] * m[3][2] * m[1][3]
+		- m[1][0] * m[0][1] * m[2][2] * m[3][3]
+		+ m[1][0] * m[0][1] * m[2][3] * m[3][2]
+		+ m[0][0] * m[3][1] * m[1][2] * m[2][3]
+		- m[0][0] * m[3][1] * m[1][3] * m[2][2]
+		+ m[0][0] * m[1][1] * m[2][2] * m[3][3]
+		- m[0][0] * m[1][1] * m[2][3] * m[3][2];
+}
+
+
+#define POLYNOMORDER    6
+#define TOLERANCE  0.00000001
+#define PRECISION  0.00000001
+
+
+void TestEigen()
+{
+	double A[4][4];
+	double p[5];
+/*	A[0][0] = -0.0069; 	A[1][0] =  0.0139; 	A[2][0] =   0.0;	A[3][0] = -9.81;
+	A[0][1] = -0.0905; 	A[1][1] = -0.3149; 	A[2][1] = 235.8928; A[3][1] =  0.0;
+	A[0][2] =  0.0004;	A[1][2] = -0.0034;	A[2][2] = -0.4282; 	A[3][2] = 0.0;
+	A[0][3] =  0.0000;	A[1][3] =  0.0000;	A[2][3] =  1.0;		A[3][3] = 0.0;*/
+
+	A[0][0] =-1.00; A[0][1] =  1.0;	A[0][2] =  1.0;	A[0][3] = -1.0;
+	A[1][0] = 1.00; A[1][1] =  1.0;	A[1][2] =  2.0; A[1][3] = -1.0;
+	A[2][0] = 3.00;	A[2][1] = -2.0;	A[2][2] =  1.0; A[2][3] =  1.0;
+	A[3][0] = 1.00;	A[3][1] =  1.0;	A[3][2] =  2.0;	A[3][3] =  1.0;
+	complex<double> AC[16];
+//	complex<double> V[4];
+	complex <double> lambda(2.0, 0.0);
+	for(int i=0; i<4; i++)
+	{
+		for(int j=0; j<4;j++)
+		{
+			AC[i*4+j] = complex<double>(A[i][j],0.0);
+		}
+	}
+
+	CharacteristicPol(A, p);
+
+qDebug() << "x4 - 2x3 + 5x -10";
+
+//
+//qDebug("Calculated   %10.5f   %10.5f   %10.5f   %10.5f", roots[0], roots[1], roots[2], roots[3]);
+qDebug() << "Mathlab -1.709975947,   2,  0.85498 +- 1.48088i";
+	complex<double> roots[POLYNOMORDER];
+
+	if(LinBairstow(p, roots, 4))
+	{
+		qDebug("%10.6f+i%10.6f    //    %10.6f+i %10.6f    //    %10.6f+i%10.6f    //     %10.6f+i%10.6f ",
+			   roots[0].real(), roots[0].imag(),
+			   roots[1].real(), roots[1].imag(),
+			   roots[2].real(), roots[2].imag(),
+			   roots[3].real(), roots[3].imag());
+	}
+	else
+	{
+//qDebug() << "No roots";
+	}
+/*
+qDebug() << "_______";
+	Eigenvector(AC, roots[0], V);
+qDebug() << "_______";
+	Eigenvector(AC, roots[1], V);
+qDebug() << "_______";
+	Eigenvector(AC, roots[2], V);
+qDebug() << "_______";
+	Eigenvector(AC, roots[3], V);
+*/
+/*
+//  check solution
+	complex<double> c(0,0);
+	for(int i=0; i<4; i++)
+	{
+		c += A[i][0]*V[0] + A[i][1]*V[1] + A[i][2]*V[2] + A[i][3]*V[3] - roots[3] * V[i];
+		qDebug("%d    %8.3e+%8.3ei", i, c.real(), c.imag());
+	}*/
+}
+
+
+bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
+{
+	//________________________________________________________________________
+	//Solves the system A.V = lambda.V for a 4x4 complex matrix
+	// in input :
+	//    - matrix A
+	//    - the array of complex eigenvalues
+	// in output
+	//    - the array of comple eigenvectors
+	//
+	// eigen vector is solved by direct matrix solution
+	// one of the vector's component is set to 1, to avoid the trivial solution V= 0;
+	//
+	// Andre Deperrois October 2009
+	//
+	//________________________________________________________________________
+
+	static complex<double> detm, detr;
+	static complex<double> r[9], m[9];
+	int ii, jj, i, j, kp;
+
+	// first find a pivot for which the  associated n-1 determinant is not zero
+	bool bFound = false;
+	kp=0;
+	do
+	{
+		V[kp] = 1.0;
+		ii= 0;
+		for(i=0;i<4 ; i++)
+		{
+			if(i!=kp)
+			{
+				jj=0;
+				for(j=0; j<4; j++)
+				{
+					if(j!=kp)
+					{
+						m[ii*3+jj] = a[i*4+j];
+						jj++;
+					}
+				}
+				m[ii*3+ii] -= lambda;
+				ii++;
+			}
+		}
+		detm = Det33(m);
+		bFound = std::abs(detm)>0.0;
+		if(bFound || kp>=3) break;
+		kp++;
+	}while(true);
+
+	if(!bFound) return false;
+
+	// at this point we have identified pivot kp
+	// with a non-zero subdeterminant.
+	// so solve for the other 3 eigenvector components.
+	// using Cramer's rule
+
+	//create rhs determinant
+
+	jj=0;
+	for(j=0; j<4; j++)
+	{
+		memcpy(r,m, 9*sizeof(complex<double>));
+		if(j!=kp)
+		{
+			ii= 0;
+			for(i=0; i<4; i++)
+			{
+				if(i!=kp)
+				{
+					r[ii*3+jj] = - a[i*4+kp];
+					ii++;
+				}
+			}
+			detr  = Det33(r);
+			V[j] = detr/detm;
+			jj++;
+		}
+	}
+
+//	for(jj=0; jj<4; jj++) qDebug("%d    %8.3f+%8.3fi", jj, V[jj].real(), V[jj].imag());
+	return true;
+}
+
+
+bool LinBairstow(double *p, complex<double> *root, int n)
+{
+	//________________________________________________________________________
+	//
+	// Finds the complex roots of a polynom P(x) using Lin-Bairstow's method
+	// P(x) = Sum p_i x^i	    i = 0..n;
+	// The polynoms coefficient are in array p
+	//
+	// Andre Deperrois October 2009
+	//
+	//________________________________________________________________________
+
+	double b[POLYNOMORDER], c[POLYNOMORDER];
+	int i, k, nn, iter;
+	double r,s,d0,d1,d2;
+	double Delta;
+
+	memset(b, 0, POLYNOMORDER*sizeof(double));
+	memset(c, 0, POLYNOMORDER*sizeof(double));
+
+	//T(x) = x2 -rx -s;
+	//R(x) = u(x-r)+v //remainder of deivision of by Q
+	//Q(x) = Sum b_i x^(i-2)
+
+	//P(x) = (x2-rx+s) Q(x) + u(x-r) +v
+
+	nn=n ;//initial order is polynom order
+
+	r=-2.0;//initial guesses
+	s=-1.0;
+
+	do
+	{
+		iter = 0;
+		do
+		{
+			//compute recursively the coefs b_i of polynom Q
+			b[nn]   = p[nn];
+			b[nn-1] = p[nn-1] + r * b[nn];
+			for(k=nn-2; k>=0; k--) b[k] = p[k] + r*b[k+1] + s*b[k+2];
+
+			//build the partial derivatives c_i
+			c[nn]   = b[nn];
+			c[nn-1] = b[nn-1] + r * c[nn];
+			for(k=nn-2; k>=1; k--) c[k] = b[k] + r*c[k+1] + s*c[k+2];
+
+			d0 = c[1]*c[3] - c[2]*c[2];
+			d1 = (-b[0]*c[3]+b[1]*c[2])/d0;
+			d2 = (-b[1]*c[1]+b[0]*c[2])/d0;
+			r+=d1;
+			s+=d2;
+		} while((std::abs(d1)> TOLERANCE || std::abs(d2)> TOLERANCE) && iter <10);
+
+		//we have a division
+		//so find the roots of the remainder R
+		Delta = r*r+4.0*s;
+		if(Delta<0.0)
+		{
+			//complex roots
+			root[nn-1] = complex<double>(r/2.0,  sqrt(fabs(Delta))/2.0);
+			root[nn-2] = complex<double>(r/2.0, -sqrt(fabs(Delta))/2.0);
+		}
+		else
+		{
+			//real roots
+			root[nn-1]   = complex<double>(r/2.0 + sqrt(Delta)/2.0, 0.0);
+			root[nn-2] = complex<double>(r/2.0 - sqrt(Delta)/2.0, 0.0);
+		}
+
+		//deflate polynom order
+		for(i=nn; i>=2; i--)
+		{
+			p[i-2] = b[i];
+		}
+		nn-=2;
+		if(nn==2)
+		{
+			//last two roots, solve directly
+			if(fabs(p[2])<PRECISION)
+			{
+				// one last root, but we should never get here
+				if(fabs(p[1])>PRECISION)
+				{
+					//last single root, real
+					root[0] = -p[0]/p[1];
+				}
+				else return false;
+			}
+			else
+			{
+				Delta = p[1]*p[1]-4.0*p[0]*p[2];
+				if(Delta<0)
+				{
+					//complex roots
+					root[nn-1] = complex<double>(-p[1]/2.0/p[2],  sqrt(fabs(Delta))/2.0/p[2]);
+					root[nn-2] = complex<double>(-p[1]/2.0/p[2], -sqrt(fabs(Delta))/2.0/p[2]);
+				}
+				else
+				{
+					//real roots
+					root[nn-1] = complex<double>((-p[1]+sqrt(Delta))/2.0/p[2],  0.0);
+					root[nn-2] = complex<double>((-p[1]-sqrt(Delta))/2.0/p[2],  0.0);
+				}
+			}
+			break;
+		}
+		if(nn==1)
+		{
+			if(fabs(p[1])>PRECISION)
+			{
+				//last single root, real
+				root[0] = -p[0]/p[1];
+			}
+			else return false;
+			break;
+		}
+
+	}while(nn>2);
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
