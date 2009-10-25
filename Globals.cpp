@@ -904,6 +904,7 @@ double Det44(double *aij)
 	int i,j,k,l,p,q;
 	double det = 0.0;
 	double a33[9];
+	double sign;
 
 	for(i=0; i<4; i++)
 	{
@@ -920,7 +921,8 @@ double Det44(double *aij)
 				}
 				p++;
 			}
-			det += pow(-1,i+j) * Det33(a33);
+			sign = pow(-1.0,i+j);
+			det += sign * Det33(a33);
 		}
 	}
 	return det;
