@@ -4,7 +4,7 @@
 QT += opengl
 TARGET = QFLR5
 TEMPLATE = app
-QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.4u.sdk
+QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
 CONFIG += x86 \
     ppc
 SOURCES += MainFrame.cpp \
@@ -218,7 +218,6 @@ unix {
     isEmpty(PREFIX):PREFIX = /usr/local
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
-    
     # MAKE INSTALL
     INSTALLS += target
     target.path = $$BINDIR
@@ -227,4 +226,3 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
-OTHER_FILES += mac/Info.plist

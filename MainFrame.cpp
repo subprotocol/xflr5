@@ -51,7 +51,7 @@
 #include "XDirect/TEGapDlg.h"
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
-
+#include <CoreFoundation/CoreFoundation.h>
 
 extern CFoil *g_pCurFoil;
 
@@ -3233,14 +3233,24 @@ void MainFrame::OnExportCurGraph()
 
 void MainFrame::OnGuidelines()
 {
-		QDir dir(qApp->applicationDirPath());
+
 #ifdef Q_WS_MAC
-		dir.cdUp();
-		dir.cdUp();
-		dir.cdUp();
-		QString FileName = dir.absoluteFilePath("Guidelines.pdf");
+
+     CFURLRef appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+     CFStringRef macPath = CFURLCopyFileSystemPath(appUrlRef,
+                                            kCFURLPOSIXPathStyle);
+     QString bundlePath(CFStringGetCStringPtr(macPath,
+                                            CFStringGetSystemEncoding()));
+     QFileInfo fileInfo(bundlePath);
+     QDir dir = fileInfo.dir();
+     QString FileName = dir.absoluteFilePath("Guidelines.pdf");
+     CFRelease(appUrlRef);
+     CFRelease(macPath);
+
+
 #else
-		QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+                QDir dir(qApp->applicationDirPath());
+                QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
