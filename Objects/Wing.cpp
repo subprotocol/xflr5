@@ -336,7 +336,7 @@ void CWing::ComputeGeometry()
 void CWing::ComputeInertia(double const & Mass)
 {
 	int j,k;
-	double rho, LocalSpan, LocalVolume, dl;
+	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
 	double LocalChord1, LocalArea1, tau1;
 	CVector PtC4, Pt, Pt1;

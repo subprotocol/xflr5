@@ -28,6 +28,7 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QLabel>
+#include <QSettings>
 #include "Miarex.h"
 #include "../Misc/FloatEdit.h"
 
@@ -36,7 +37,6 @@ class GL3DScales : public QWidget
 	Q_OBJECT
 	friend class MainFrame;
 	friend class QMiarex;
-
 
 public:
 	GL3DScales(QWidget *parent = NULL);
@@ -57,8 +57,8 @@ private:
 	void SetupLayout();
 	void ReadStreamParams();
 
-	bool LoadSettings(QDataStream &ar);
-	bool SaveSettings(QDataStream &ar);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 	QSlider *m_pctrlLiftScaleSlider, *m_pctrlDragScaleSlider, *m_pctrlVelocityScaleSlider;
 	QPushButton *ApplyButton;

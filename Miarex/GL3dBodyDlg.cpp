@@ -3182,16 +3182,37 @@ void GL3dBodyDlg::keyReleaseEvent(QKeyEvent *event)
 }
 
 
-bool GL3dBodyDlg::LoadSettings(QDataStream &ar)
+bool GL3dBodyDlg::LoadSettings(QSettings *pSettings)
 {
-	ar >> m_BodyGridDlg.m_bGrid >> m_BodyGridDlg.m_bMinGrid >> m_BodyGridDlg.m_bGrid2 >> m_BodyGridDlg.m_bMinGrid2;
-	ar >> m_BodyGridDlg.m_Style >> m_BodyGridDlg.m_MinStyle >> m_BodyGridDlg.m_Style2 >> m_BodyGridDlg.m_MinStyle2;
-	ar >> m_BodyGridDlg.m_Width >> m_BodyGridDlg.m_MinWidth >> m_BodyGridDlg.m_Width2 >> m_BodyGridDlg.m_MinWidth2;
-	ar >> m_BodyGridDlg.m_Color >> m_BodyGridDlg.m_MinColor >> m_BodyGridDlg.m_Color2 >> m_BodyGridDlg.m_MinColor2;
-	ar >> m_BodyGridDlg.m_Unit  >> m_BodyGridDlg.m_MinorUnit >> m_BodyGridDlg.m_Unit2  >> m_BodyGridDlg.m_MinorUnit2;
-	ar >> m_BodyGridDlg.m_bScale;
+	pSettings->beginGroup("GL3dBody");
+	{
+		m_BodyGridDlg.m_bGrid      = pSettings->value("Grid").toBool();
+		m_BodyGridDlg.m_bMinGrid   = pSettings->value("MinGrid").toBool();
+		m_BodyGridDlg.m_bGrid2     = pSettings->value("Grid2").toBool();
+		m_BodyGridDlg.m_bMinGrid2  = pSettings->value("MinGrid2").toBool();
+		m_BodyGridDlg.m_Style      = pSettings->value("Style").toInt();
+		m_BodyGridDlg.m_MinStyle   = pSettings->value("MinStyle").toInt();
+		m_BodyGridDlg.m_Style2     = pSettings->value("Style2").toInt();
+		m_BodyGridDlg.m_MinStyle2  = pSettings->value("MinStyle2").toInt();
+		m_BodyGridDlg.m_Width      = pSettings->value("Width").toInt();
+		m_BodyGridDlg.m_MinWidth   = pSettings->value("MinWidth").toInt();
+		m_BodyGridDlg.m_Width2     = pSettings->value("Width2").toInt();
+		m_BodyGridDlg.m_MinWidth2  = pSettings->value("MinWidth2").toInt();
+		m_BodyGridDlg.m_Color      = pSettings->value("Color").value<QColor>();
+		m_BodyGridDlg.m_MinColor   = pSettings->value("MinColor").value<QColor>();
+		m_BodyGridDlg.m_Color2     = pSettings->value("Color2").value<QColor>();
+		m_BodyGridDlg.m_MinColor2  = pSettings->value("MinColor2").value<QColor>();
+		m_BodyGridDlg.m_Unit       = pSettings->value("Unit").toDouble();
+		m_BodyGridDlg.m_MinorUnit  = pSettings->value("MinorUnit").toDouble();
+		m_BodyGridDlg.m_Unit2      = pSettings->value("Unit2").toDouble();
+		m_BodyGridDlg.m_MinorUnit2 = pSettings->value("MinorUnit2").toDouble();
+		m_BodyGridDlg.m_bScale     = pSettings->value("bScale").toBool();
+
+	}
+	pSettings->endGroup();
 	return true;
 }
+
 
 
 void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
@@ -4238,14 +4259,34 @@ void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 }
 
 
-bool GL3dBodyDlg::SaveSettings(QDataStream &ar)
+bool GL3dBodyDlg::SaveSettings(QSettings *pSettings)
 {
-	ar << m_BodyGridDlg.m_bGrid << m_BodyGridDlg.m_bMinGrid << m_BodyGridDlg.m_bGrid2 << m_BodyGridDlg.m_bMinGrid2;
-	ar << m_BodyGridDlg.m_Style << m_BodyGridDlg.m_MinStyle << m_BodyGridDlg.m_Style2 << m_BodyGridDlg.m_MinStyle2;
-	ar << m_BodyGridDlg.m_Width << m_BodyGridDlg.m_MinWidth << m_BodyGridDlg.m_Width2 << m_BodyGridDlg.m_MinWidth2;
-	ar << m_BodyGridDlg.m_Color << m_BodyGridDlg.m_MinColor << m_BodyGridDlg.m_Color2 << m_BodyGridDlg.m_MinColor2;
-	ar << m_BodyGridDlg.m_Unit  << m_BodyGridDlg.m_MinorUnit << m_BodyGridDlg.m_Unit2  << m_BodyGridDlg.m_MinorUnit2;
-	ar << m_BodyGridDlg.m_bScale;
+	pSettings->beginGroup("GL3dBody");
+	{
+		pSettings->setValue("Grid", m_BodyGridDlg.m_bGrid);
+		pSettings->setValue("MinGrid", m_BodyGridDlg.m_bMinGrid);
+		pSettings->setValue("Grid2", m_BodyGridDlg.m_bGrid2);
+		pSettings->setValue("MinGrid2", m_BodyGridDlg.m_bMinGrid2);
+		pSettings->setValue("Style", m_BodyGridDlg.m_Style);
+		pSettings->setValue("MinStyle", m_BodyGridDlg.m_MinStyle);
+		pSettings->setValue("Style2", m_BodyGridDlg.m_Style2);
+		pSettings->setValue("MinStyle2", m_BodyGridDlg.m_MinStyle2);
+		pSettings->setValue("Width", m_BodyGridDlg.m_Width);
+		pSettings->setValue("MinWidth", m_BodyGridDlg.m_MinWidth);
+		pSettings->setValue("Width2", m_BodyGridDlg.m_Width2);
+		pSettings->setValue("MinWidth2", m_BodyGridDlg.m_MinWidth2);
+		pSettings->setValue("Color", m_BodyGridDlg.m_Color);
+		pSettings->setValue("MinColor", m_BodyGridDlg.m_MinColor);
+		pSettings->setValue("Color2", m_BodyGridDlg.m_Color2);
+		pSettings->setValue("MinColor2", m_BodyGridDlg.m_MinColor2);
+		pSettings->setValue("Unit", m_BodyGridDlg.m_Unit);
+		pSettings->setValue("MinorUnit", m_BodyGridDlg.m_MinorUnit);
+		pSettings->setValue("Unit2", m_BodyGridDlg.m_Unit2);
+		pSettings->setValue("MinorUnit2", m_BodyGridDlg.m_MinorUnit2);
+		pSettings->setValue("bScale", m_BodyGridDlg.m_bScale);
+
+	}
+	pSettings->endGroup();
 	return true;
 }
 

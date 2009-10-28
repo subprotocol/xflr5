@@ -105,6 +105,7 @@ QXInverse::QXInverse(QWidget *parent)
 	m_QGraph.SetXMax(1.0);
 	m_QGraph.SetYMin(-0.1);
 	m_QGraph.SetYMax(0.1);
+	m_QGraph.SetGraphName("Q Graph");
 	m_pQCurve  = m_QGraph.AddCurve();
 	m_pMCurve  = m_QGraph.AddCurve();
 	m_pQVCurve = m_QGraph.AddCurve();
@@ -590,13 +591,24 @@ void QXInverse::keyReleaseEvent(QKeyEvent *event)
 
 
 
-void QXInverse::LoadSettings(QDataStream &ar)
+void QXInverse::LoadSettings(QSettings *pSettings)
 {
-	ar >> m_bFullInverse;
-	ar >> m_Spline.m_Color >> m_Spline.m_Style >> m_Spline.m_Width;
-	ar >> m_pRefFoil->m_FoilColor >> m_pRefFoil->m_nFoilStyle >> m_pRefFoil->m_nFoilWidth;
-	ar >> m_pModFoil->m_FoilColor >> m_pModFoil->m_nFoilStyle >> m_pModFoil->m_nFoilWidth;
-	m_QGraph.Serialize(ar, false);
+	pSettings->beginGroup("XInverse");
+	{
+		m_bFullInverse = pSettings->value("FullInverse").toBool();
+
+		m_Spline.m_Color = pSettings->value("SplineColor").value<QColor>();
+		m_Spline.m_Style = pSettings->value("SplineStyle").toInt();
+		m_Spline.m_Width = pSettings->value("SplineWdth").toInt();
+		m_pRefFoil->m_FoilColor  = pSettings->value("BaseFoilColor").value<QColor>();
+		m_pRefFoil->m_nFoilStyle = pSettings->value("BaseFoilStyle").toInt();
+		m_pRefFoil->m_nFoilWidth = pSettings->value("BaseFoilWidth").toInt();
+		m_pModFoil->m_FoilColor  = pSettings->value("ModFoilColor").value<QColor>();
+		m_pModFoil->m_nFoilStyle = pSettings->value("ModFoilStyle").toInt();
+		m_pModFoil->m_nFoilWidth = pSettings->value("ModFoilWidth").toInt();
+	}
+	pSettings->endGroup();
+	m_QGraph.LoadSettings(pSettings);
 }
 
 
@@ -1912,18 +1924,29 @@ void QXInverse::ResetScale()
 	m_ptOffset.rx() = m_rGraphRect.left() +(int)(1.0*m_QGraph.GetMargin());
 	m_fRefScale  = m_rGraphRect.width()-2.0*m_QGraph.GetMargin();
 
-	m_ptOffset.ry() = m_rCltRect.bottom()-h4/2.0;
+	m_ptOffset.ry() = m_rCltRect.bottom()-h4/2;
 	m_fScale = m_fRefScale;
 }
 
 
-void QXInverse::SaveSettings(QDataStream &ar)
+void QXInverse::SaveSettings(QSettings *pSettings)
 {
-	ar << m_bFullInverse;
-	ar << m_Spline.m_Color << m_Spline.m_Style << m_Spline.m_Width;
-	ar << m_pRefFoil->m_FoilColor << m_pRefFoil->m_nFoilStyle << m_pRefFoil->m_nFoilWidth;
-	ar << m_pModFoil->m_FoilColor << m_pModFoil->m_nFoilStyle << m_pModFoil->m_nFoilWidth;
-	m_QGraph.Serialize(ar, true);
+	pSettings->beginGroup("XInverse");
+	{
+		pSettings->setValue("FullInverse", m_bFullInverse);
+		pSettings->setValue("SplineColor", m_Spline.m_Color);
+		pSettings->setValue("SplineStyle", m_Spline.m_Style);
+		pSettings->setValue("SplineWdth", m_Spline.m_Width);
+		pSettings->setValue("BaseFoilColor", m_pRefFoil->m_FoilColor);
+		pSettings->setValue("BaseFoilStyle", m_pRefFoil->m_nFoilStyle);
+		pSettings->setValue("BaseFoilWidth", m_pRefFoil->m_nFoilWidth);
+		pSettings->setValue("ModFoilColor", m_pModFoil->m_FoilColor);
+		pSettings->setValue("ModFoilStyle", m_pModFoil->m_nFoilStyle);
+		pSettings->setValue("ModFoilWidth", m_pModFoil->m_nFoilWidth);
+	}
+	pSettings->endGroup();
+
+	m_QGraph.SaveSettings(pSettings);
 }
 
 

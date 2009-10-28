@@ -1563,7 +1563,7 @@ void GL3dWingDlg::keyReleaseEvent(QKeyEvent *event)
 }
 
 
-bool GL3dWingDlg::LoadSettings(QDataStream &ar)
+bool GL3dWingDlg::LoadSettings(QSettings *pSettings)
 {
 	return true;
 }
@@ -2348,7 +2348,7 @@ void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 }
 
 
-bool GL3dWingDlg::SaveSettings(QDataStream &ar)
+bool GL3dWingDlg::SaveSettings(QSettings *pSettings)
 {
 	return true;
 }

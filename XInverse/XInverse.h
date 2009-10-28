@@ -31,6 +31,7 @@
 #include <QLabel>
 #include <QStackedWidget>
 #include <QVBoxLayout>
+#include <QSettings>
 #include "../Misc/FloatEdit.h"
 #include "../XDirect/XFoil.h"
 #include "../Graph/QGraph.h"
@@ -116,10 +117,10 @@ private:
 	void SetFoil();
 	void SetTAngle(double a);
 	void SetTGap(double tr, double ti);
-//	void SetRect(QRect CltRect);
+
 	void ExecMDES();
-	void LoadSettings(QDataStream &ar);
-	void SaveSettings(QDataStream &ar);
+	void LoadSettings(QSettings *pSettings);
+	void SaveSettings(QSettings *pSettings);
 
 	bool ExecQDES();
 	bool SetParams();

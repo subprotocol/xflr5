@@ -32,6 +32,7 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
+#include <QSettings>
 #include "../GLWidget.h"
 #include "ArcBall.h"
 #include "BodyGridDlg.h"
@@ -148,8 +149,8 @@ private:
 	void SetBody(CBody *pBody);
 	void UpdateView();
 
-	bool LoadSettings(QDataStream &ar);
-	bool SaveSettings(QDataStream &ar);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 	void TakePicture();
 	void SetPicture();

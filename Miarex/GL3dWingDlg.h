@@ -28,6 +28,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QSlider>
+#include <QSettings>
 #include <QLabel>
 #include <QRadioButton>
 #include <QStandardItemModel>
@@ -138,8 +139,8 @@ private:
 	void SetWingScale();
 	void UpdateView();
 
-	bool LoadSettings(QDataStream &ar);
-	bool SaveSettings(QDataStream &ar);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 
 private:

@@ -101,6 +101,7 @@ private slots:
 	void OnLogFile();
 	void OnRenameCurFoil();
 	void OnResetCurGraphScales();
+	void OnResetSettings();
 	void OnRestoreToolbars();
 	void OnSaveOptions();
 	bool OnSaveProjectAs();
@@ -116,6 +117,8 @@ private slots:
 	void OnUnits();
 	void OnSaveUFOAsProject();
 	void openRecentFile();
+
+
 /*___________________________________________Methods_______________________________*/
 private:
 	void closeEvent (QCloseEvent * event);
@@ -145,11 +148,9 @@ private:
 	void DeletePlane(CPlane *pPlane, bool bResultsOnly = false);
 	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
 	void GLToClient(CVector const &real, QPoint &point);
-	void LoadSettings();
 	void RemoveOpPoint(bool bCurrent);
 	void SetCurrentFoil(CFoil* pFoil);
 	void SaveSettings();
-	bool SaveProject(QString PathName="");
 	void SetCentralWidget();
 	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
@@ -165,6 +166,8 @@ private:
 	void UpdateView();
 	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL, int ProjectFormat=5);
 
+	bool SaveProject(QString PathName="");
+	bool LoadSettings();
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
 	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat = 5);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
@@ -250,7 +253,7 @@ private:
 	QAction *aboutAct, *guidelinesAct;
 	QAction *recentFileActs[MAXRECENTFILES];
 	QAction *separatorAct;
-	QAction *saveViewToImageFileAct;
+	QAction *saveViewToImageFileAct, *resetSettingsAct;
 
 	//AFoil Actions
 	QAction *zoomInAct, *ResetXScaleAct, *ResetYScaleAct, *ResetXYScaleAct;
@@ -348,6 +351,7 @@ private:
 	bool m_bSaved;
 	bool m_bSaveOpps;
 	bool m_bSaveWOpps;
+	bool m_bSaveSettings;
 
 	double m_mtoUnit;
 	double m_mstoUnit;

@@ -33,34 +33,34 @@ int main(int argc, char *argv[])
 
 	QString StyleName = "Cleanlooks";
 	QString LanguagePath ="";
-	QString FileName;
 
-#ifdef Q_WS_MAC
-        QSettings settings("QFLR5", "QFLR5");
-        FileName = settings.fileName();
-#else
-        FileName   = QDir::tempPath() + "/QFLR5.set";
-#endif
-
-	QFile *pXFile = new QFile(FileName);
+	QString str;
 	int a,b,c,d,k;
 	a=b=50;
 	c=800;
 	d=500;
+
+	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
 	bool bMaximized = true;
- 
-	if (pXFile->open(QIODevice::ReadOnly))
+	bool bOK;
+	settings.beginGroup("MainFrame");
 	{
-		QDataStream ar(pXFile);
-		ar >> k;//format
-		if(k==SETTINGSFORMAT)
-		{
-			ar >> a >> b >> c >> d;
-			ar >> bMaximized;
-			ar >> StyleName >> LanguagePath;
-		}
-		pXFile->close();
+		k = settings.value("FrameGeometryx").toInt(&bOK);
+		if(bOK) a = k;
+		k = settings.value("FrameGeometryy").toInt(&bOK);
+		if(bOK) b = k;
+		k = settings.value("SizeWidth").toInt(&bOK);
+		if(bOK) c = k;
+		k = settings.value("SizeHeight").toInt(&bOK);
+		if(bOK) d = k;
+
+		bMaximized = settings.value("SizeMaximized").toBool();
+		str = settings.value("StyleName").toString();
+		if(str.length()) StyleName = str,
+		str = settings.value("LanguageFilePath").toString();
+		if(str.length()) LanguagePath = str;
 	}
+	settings.endGroup();
 
 	QTranslator qflr5Translator;
 
@@ -76,10 +76,9 @@ int main(int argc, char *argv[])
 
 	MainFrame w;
 	app.setQFLR5MainWindow(&w);
-
 	w.resize(sz);
 	w.move(pt);
-	if(w.m_bMaximized)	w.showMaximized();
+	if(bMaximized)	w.showMaximized();
 	else                w.show();
 
 	QString PathName, Extension;

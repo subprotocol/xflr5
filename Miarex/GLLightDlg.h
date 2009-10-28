@@ -28,7 +28,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QSlider>
-#include <QDataStream>
+#include <QSettings>
 
 class GLLightDlg : public QDialog
 {
@@ -44,8 +44,8 @@ public:
 	void Apply();
 	void ReadParams(void);
 	void SetParams(void);
-	bool LoadSettings(QDataStream &ar);
-	bool SaveSettings(QDataStream &ar);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 private:
 	void SetupLayout();

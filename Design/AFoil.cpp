@@ -583,29 +583,83 @@ CVector QAFoil::MousetoReal(QPoint &point)
 }
 
 
-void QAFoil::LoadSettings(QDataStream &ar)
+void QAFoil::LoadSettings(QSettings *pSettings)
 {
-	ar >> m_bSF;
-	ar >> m_bXGrid >>m_bYGrid >> m_bXMinGrid >> m_bYMinGrid >> m_XGridStyle >> m_YGridStyle;
-	ar >> m_XGridWidth >> m_YGridWidth >> m_XMinStyle >> m_YMinStyle >> m_XMinWidth >> m_YMinWidth;
-	ar >> m_XGridUnit >> m_YGridUnit >> m_XMinUnit >> m_YMinUnit;
-	ar >> m_XGridColor >>m_YGridColor >> m_XMinColor >>m_YMinColor;
-
-	ar >> m_NeutralStyle >> m_NeutralWidth >> m_NeutralColor;
-
+	int r,g,b;
 	int style, width;
 	QColor color;
-	ar >> style >> width >> color;
-	m_pSF->SetCurveParams(style, width, color);
-	ar >> style >> width >> color;
-	m_pPF->SetCurveParams(style, width, color);
-//	ar >> m_pSF->m_FoilStyle >> m_pSF->m_FoilWidth  >> m_pSF->m_FoilColor;
-//	ar >> m_pPF->m_FoilStyle >> m_pPF->m_FoilWidth  >> m_pPF->m_FoilColor;
-	ar >> m_pSF->m_bVisible  >> m_pSF->m_bOutPoints >> m_pSF->m_bCenterLine;
-	ar >> m_pPF->m_bVisible  >> m_pPF->m_bOutPoints >> m_pPF->m_bCenterLine;
 
-	ar >> m_bLECircle >> m_bNeutralLine >> m_bScale >> m_bShowLegend;
+	pSettings->beginGroup("DirectDesign");
+	{
+		m_bSF         = pSettings->value("ShowSF").toBool();
+		m_bXGrid      = pSettings->value("XMajGrid").toBool();
+		m_bYGrid      = pSettings->value("YMajGrid").toBool();
+		m_bXMinGrid   = pSettings->value("XMinGrid").toBool();
+		m_bYMinGrid   = pSettings->value("YMinGrid").toBool();
+		m_XGridStyle  = pSettings->value("XMajStyle").toInt();
+		m_YGridStyle  = pSettings->value("YMajStyle").toInt();
+		m_XGridWidth  = pSettings->value("XMajWidth").toInt();
+		m_YGridWidth  = pSettings->value("YMajWidth").toInt();
+		m_XMinStyle   = pSettings->value("XMinStyle").toInt();
+		m_YMinStyle   = pSettings->value("YMinStyle").toInt();
+		m_XMinWidth   = pSettings->value("XMinWidth").toInt();
+		m_YMinWidth   = pSettings->value("YMinWidth").toInt();
+		m_XGridUnit   = pSettings->value("XMajUnit").toDouble();
+		m_YGridUnit   = pSettings->value("YMajUnit").toDouble();
+		m_XMinUnit    = pSettings->value("XMinUnit").toDouble();
+		m_YMinUnit    = pSettings->value("YMinUnit").toDouble();
+		r = pSettings->value("XMajColorRed",34).toInt();
+		g = pSettings->value("XMajColorGreen",177).toInt();
+		b = pSettings->value("XMajColorBlue",234).toInt();
+		m_XGridColor = QColor(r,g,b);
+		r = pSettings->value("YMajColorRed").toInt();
+		g = pSettings->value("YMajColorGreen").toInt();
+		b = pSettings->value("YMajColorBlue").toInt();
+		m_YGridColor = QColor(r,g,b);
+		r = pSettings->value("XMinColorRed").toInt();
+		g = pSettings->value("XMinColorGreen").toInt();
+		b = pSettings->value("XMinColorBlue").toInt();
+		m_XMinColor = QColor(r,g,b);
+		r = pSettings->value("YMinColorRed").toInt();
+		g = pSettings->value("YMinColorGreen").toInt();
+		b = pSettings->value("YMinColorBlue").toInt();
+		m_YMinColor = QColor(r,g,b);
 
+		m_NeutralStyle  = pSettings->value("NeutralStyle").toInt();
+		m_NeutralWidth  = pSettings->value("NeutralWidth").toInt();
+		r = pSettings->value("NeutralColorRed").toInt();
+		g = pSettings->value("NeutralColorGreen").toInt();
+		b = pSettings->value("NeutralColorBlue").toInt();
+		m_NeutralColor = QColor(r,g,b);
+		m_bNeutralLine = pSettings->value("NeutralLine").toBool();
+		
+		style  = pSettings->value("SFStyle").toInt();
+		width  = pSettings->value("SFWidth").toInt();
+		r = pSettings->value("SFColorRed").toInt();
+		g = pSettings->value("SFColorGreen").toInt();
+		b = pSettings->value("SFColorBlue").toInt();
+		color = QColor(r,g,b);
+		m_pSF->SetCurveParams(style, width, color);
+
+		style  = pSettings->value("PFStyle").toInt();
+		width  = pSettings->value("PFWidth").toInt();
+		r = pSettings->value("PFColorRed").toInt();
+		g = pSettings->value("PFColorGreen").toInt();
+		b = pSettings->value("PFColorBlue").toInt();
+		color = QColor(r,g,b);
+		m_pPF->SetCurveParams(style, width, color);
+
+		m_pSF->m_bVisible    = pSettings->value("SFVisible").toBool();
+		m_pSF->m_bOutPoints  = pSettings->value("SFOutPoints").toBool();
+		m_pSF->m_bCenterLine = pSettings->value("SFCenterLine").toBool();
+		m_pPF->m_bVisible    = pSettings->value("PFVisible").toBool();
+		m_pPF->m_bOutPoints  = pSettings->value("PFOutPoints").toBool();
+		m_pPF->m_bCenterLine = pSettings->value("PFCenterLine").toBool();
+		m_bLECircle          = pSettings->value("LECircle").toBool();
+		m_bScale             = pSettings->value("Scale").toBool();
+		m_bShowLegend        = pSettings->value("Legend").toBool();
+	}
+	pSettings->endGroup();
 }
 
 
@@ -2700,25 +2754,73 @@ void QAFoil::ReleaseZoom()
 }
 
 
-void QAFoil::SaveSettings(QDataStream &ar)
+void QAFoil::SaveSettings(QSettings *pSettings)
 {
-	ar << m_bSF;
-	ar << m_bXGrid <<m_bYGrid << m_bXMinGrid << m_bYMinGrid << m_XGridStyle << m_YGridStyle;
-	ar << m_XGridWidth << m_YGridWidth << m_XMinStyle << m_YMinStyle << m_XMinWidth << m_YMinWidth;
-	ar << m_XGridUnit << m_YGridUnit << m_XMinUnit << m_YMinUnit;
-	ar << m_XGridColor <<m_YGridColor << m_XMinColor <<m_YMinColor;
+	pSettings->beginGroup("DirectDesign");
+	{
+		pSettings->setValue("ShowSF", m_bSF);
+		pSettings->setValue("XMajGrid", m_bXGrid);
+		pSettings->setValue("YMajGrid", m_bYGrid);
+		pSettings->setValue("XMinGrid", m_bXMinGrid);
+		pSettings->setValue("YMinGrid", m_bYMinGrid);
+		pSettings->setValue("XMajStyle", m_XGridStyle);
+		pSettings->setValue("YMajStyle", m_YGridStyle);
+		pSettings->setValue("XMajWidth", m_XGridWidth);
+		pSettings->setValue("YMajWidth", m_YGridWidth);
+		pSettings->setValue("XMinStyle", m_XMinStyle);
+		pSettings->setValue("YMinStyle", m_YMinStyle);
+		pSettings->setValue("XMinWidth", m_XMinWidth);
+		pSettings->setValue("YMinWidth", m_YMinWidth);
+		pSettings->setValue("XMajUnit", m_YGridUnit);
+		pSettings->setValue("YMajUnit", m_YGridUnit);
+		pSettings->setValue("XMinUnit", m_XMinUnit);
+		pSettings->setValue("YMinUnit", m_YMinUnit);
 
-	ar << m_NeutralStyle << m_NeutralWidth << m_NeutralColor;
+		pSettings->setValue("XMajColorRed",m_XGridColor.red());
+		pSettings->setValue("XMajColorGreen",m_XGridColor.green());
+		pSettings->setValue("XMajColorBlue",m_XGridColor.blue());
+		pSettings->setValue("YMajColorRed", m_YGridColor.red());
+		pSettings->setValue("YMajColorGreen", m_YGridColor.green());
+		pSettings->setValue("YMajColorBlue", m_YGridColor.blue());
 
-	ar << m_pSF->m_FoilStyle << m_pSF->m_FoilWidth << m_pSF->m_FoilColor;
-	ar << m_pPF->m_FoilStyle << m_pPF->m_FoilWidth << m_pPF->m_FoilColor;
-	ar << m_pSF->m_bVisible << m_pSF->m_bOutPoints << m_pSF->m_bCenterLine;
-	ar << m_pPF->m_bVisible << m_pPF->m_bOutPoints << m_pPF->m_bCenterLine;
+		pSettings->setValue("XMinColorRed", m_XMinColor.red());
+		pSettings->setValue("XMinColorGreen", m_XMinColor.green());
+		pSettings->setValue("XMinColorBlue", m_XMinColor.blue());
 
-	ar << m_bLECircle << m_bNeutralLine << m_bScale << m_bShowLegend;
+		pSettings->setValue("YMinColorRed", m_YMinColor.red());
+		pSettings->setValue("YMinColorGreen", m_YMinColor.green());
+		pSettings->setValue("YMinColorBlue", m_YMinColor.blue());
+
+		pSettings->setValue("NeutralStyle", m_NeutralStyle);
+		pSettings->setValue("NeutralWidth", m_NeutralWidth);
+		pSettings->setValue("NeutralColorRed", m_NeutralColor.red());
+		pSettings->setValue("NeutralColorGreen", m_NeutralColor.green());
+		pSettings->setValue("NeutralColorBlue", m_NeutralColor.blue());
+
+		pSettings->setValue("SFStyle", m_pSF->m_FoilStyle);
+		pSettings->setValue("SFWidth", m_pSF->m_FoilWidth);
+		pSettings->setValue("SFColorRed", m_pSF->m_FoilColor.red());
+		pSettings->setValue("SFColorGreen", m_pSF->m_FoilColor.green());
+		pSettings->setValue("SFColorBlue", m_pSF->m_FoilColor.blue());
+
+		pSettings->setValue("PFStyle", m_pPF->m_FoilStyle);
+		pSettings->setValue("PFWidth", m_pPF->m_FoilWidth);
+		pSettings->setValue("PFColorRed", m_pPF->m_FoilColor.red());
+		pSettings->setValue("PFColorGreen", m_pPF->m_FoilColor.green());
+		pSettings->setValue("PFColorBlue", m_pPF->m_FoilColor.blue());
+	
+		pSettings->setValue("SFVisible", m_pSF->m_bVisible);
+		pSettings->setValue("SFOutPoints", m_pSF->m_bOutPoints);
+		pSettings->setValue("SFCenterLine", m_pSF->m_bCenterLine);
+		pSettings->setValue("PFVisible", m_pPF->m_bVisible);
+		pSettings->setValue("PFOutPoints", m_pPF->m_bOutPoints);
+		pSettings->setValue("PFCenterLine", m_pPF->m_bCenterLine);
+		pSettings->setValue("LECircle", m_bLECircle);
+		pSettings->setValue("Scale", m_bScale);
+		pSettings->setValue("Legend", m_bShowLegend );
+	}
+	pSettings->endGroup();
 }
-
-
 
 
 void QAFoil::SetScale()

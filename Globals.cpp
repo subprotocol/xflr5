@@ -1089,20 +1089,20 @@ void TestEigen()
 
 	CharacteristicPol(A, p);
 
-qDebug() << "x4 - 2x3 + 5x -10";
+//qDebug() << "x4 - 2x3 + 5x -10";
 
 //
 //qDebug("Calculated   %10.5f   %10.5f   %10.5f   %10.5f", roots[0], roots[1], roots[2], roots[3]);
-qDebug() << "Mathlab -1.709975947,   2,  0.85498 +- 1.48088i";
+//qDebug() << "Mathlab -1.709975947,   2,  0.85498 +- 1.48088i";
 	complex<double> roots[POLYNOMORDER];
 
 	if(LinBairstow(p, roots, 4))
 	{
-		qDebug("%10.6f+i%10.6f    //    %10.6f+i %10.6f    //    %10.6f+i%10.6f    //     %10.6f+i%10.6f ",
+/*		qDebug("%10.6f+i%10.6f    //    %10.6f+i %10.6f    //    %10.6f+i%10.6f    //     %10.6f+i%10.6f ",
 			   roots[0].real(), roots[0].imag(),
 			   roots[1].real(), roots[1].imag(),
 			   roots[2].real(), roots[2].imag(),
-			   roots[3].real(), roots[3].imag());
+			   roots[3].real(), roots[3].imag());*/
 	}
 	else
 	{

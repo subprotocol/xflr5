@@ -51,6 +51,7 @@
 #include "XDirect/TEGapDlg.h"
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
+
 #ifdef Q_WS_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 #endif
@@ -63,7 +64,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	setWindowTitle("QFLR5");
-	m_VersionName = "QFLR5 v0.03 Beta";
+	m_VersionName = "QFLR5 v0.04 Beta";
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
@@ -84,6 +85,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_TextFont.setFamily(m_TextFont.defaultFamily());
 	m_TextFont.setPointSize(10);
 
+	m_RefGraph.SetGraphName("Reference Graph");
+
 	m_ImageFormat = 2;
 
 	m_mtoUnit   = 1.0;
@@ -95,6 +98,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
+	m_bSaveSettings = true;
 
 	m_StyleName = "Cleanlooks";
 
@@ -102,9 +106,27 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	QRect r = desktop.screenGeometry();
 	m_DlgPos = QPoint((int)(r.width()/3), (int)(r.height()/3));
 
-	LoadSettings();
+	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
+	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
+	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
+	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 
-	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	if(LoadSettings())
+	{
+
+		QSettings settings(QSettings::IniFormat, QSettings::UserScope, "QFLR5");
+
+		m_RefGraph.LoadSettings(&settings);
+
+		pAFoil->LoadSettings(&settings);
+		pXDirect->LoadSettings(&settings);
+		pMiarex->LoadSettings(&settings);
+		pXInverse->LoadSettings(&settings);
+
+		GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
+		p3DScales->LoadSettings(&settings);
+	}
+
 	pXDirect->SetAnalysisParams();
 	CreateActions();
 	CreateMenus();
@@ -478,6 +500,11 @@ void MainFrame::CreateActions()
 	saveViewToImageFileAct->setShortcut(tr("Ctrl+I"));
 	saveViewToImageFileAct->setStatusTip(tr("Saves the current view to a file on disk"));
 	connect(saveViewToImageFileAct, SIGNAL(triggered()), this, SLOT(OnSaveViewToImageFile()));
+
+	resetSettingsAct = new QAction(tr("Reset Default Settings"), this);
+	resetSettingsAct->setStatusTip(tr("will revert to default settings at the next session"));
+	connect(resetSettingsAct, SIGNAL(triggered()), this, SLOT(OnResetSettings()));
+
 
 
 	for (int i = 0; i < MAXRECENTFILES; ++i)
@@ -927,6 +954,8 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
 	fileMenu->addAction(languageAct);
+	separatorAct = fileMenu->addSeparator();
+	fileMenu->addAction(resetSettingsAct);
 	separatorAct = fileMenu->addSeparator();
 	for (int i = 0; i < MAXRECENTFILES; ++i)
 		fileMenu->addAction(recentFileActs[i]);
@@ -2922,99 +2951,91 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 }
 
 
-void MainFrame::LoadSettings()
+bool MainFrame::LoadSettings()
 {
-	QAFoil *pAFoil       = (QAFoil*)m_pAFoil;
-	QXDirect *pXDirect   = (QXDirect*)m_pXDirect;
-	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
-
-		QString FileName;
-
-#ifdef Q_WS_MAC
-		QSettings settings("QFLR5", "QFLR5");
-		FileName = settings.fileName();
-#else
-		FileName   = QDir::tempPath() + "/QFLR5.set";
-#endif
-	QFile *pXFile = new QFile(FileName);
-
-	if (!pXFile->open(QIODevice::ReadOnly)) return;
-
+	QString FileName;
+	QColor clr;
+	QPoint pt;
 	bool bFloat;
-	int k;
-	int a,b,c,d;
+	int a;
 	QString strange;
 
-	QDataStream ar(pXFile);
-	ar >> k;//format
-	if(k != SETTINGSFORMAT)
+	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "QFLR5");
+
+	settings.beginGroup("MainFrame");
 	{
-		pXFile->close();
-		return;
+		m_StyleName = settings.value("StyleName","").toString();
+		if(!m_StyleName.length())
+		{
+			m_StyleName = "Cleanlooks";
+			return false;
+		}
+		m_LanguageFilePath = settings.value("LanguageFilePath").toString();
+		bFloat  = settings.value("Miarex_Float").toBool();
+		pt.rx() = settings.value("Miarex_x").toInt();
+		pt.ry() = settings.value("Miarex_y").toInt();
+		m_pctrlMiarexWidget->setFloating(bFloat);
+		if(bFloat) m_pctrlMiarexWidget->move(pt);
+
+		bFloat  = settings.value("XDirect_Float").toBool();
+		pt.rx() = settings.value("XDirect_x").toInt();
+		pt.ry() = settings.value("XDirect_y").toInt();
+		m_pctrlXDirectWidget->setFloating(bFloat);
+		if(bFloat) m_pctrlXDirectWidget->move(pt);
+
+		bFloat  = settings.value("AFoil_Float").toBool();
+		pt.rx() = settings.value("AFoil_x").toInt();
+		pt.ry() = settings.value("AFoil_y").toInt();
+		m_pctrlAFoilWidget->setFloating(bFloat);
+		if(bFloat) m_pctrlAFoilWidget->move(pt);
+
+		bFloat  = settings.value("XInverse_Float").toBool();
+		pt.rx() = settings.value("XInverse_x").toInt();
+		pt.ry() = settings.value("XInverse_y").toInt();
+		m_pctrlXInverseWidget->setFloating(bFloat);
+		if(bFloat) m_pctrlXInverseWidget->move(pt);
+
+		m_LastDirName = settings.value("LastDirName").toString();
+		m_LengthUnit  = settings.value("LengthUnit").toInt();
+		m_AreaUnit    = settings.value("AreaUnit").toInt();
+		m_WeightUnit  = settings.value("WeightUnit").toInt();
+		m_SpeedUnit   = settings.value("SpeedUnit").toInt();
+		m_ForceUnit   = settings.value("ForceUnit").toInt();
+		m_MomentUnit  = settings.value("MomentUnit").toInt();
+		m_BackgroundColor.setRed(settings.value("BackgroundColorRed").toInt());
+		m_BackgroundColor.setGreen(settings.value("BackgroundColorGreen").toInt());
+		m_BackgroundColor.setBlue(settings.value("BackgroundColorBlue").toInt());
+		m_TextColor.setRed(settings.value("TextColorRed").toInt());
+		m_TextColor.setGreen(settings.value("TextColorGreen").toInt());
+		m_TextColor.setBlue(settings.value("TextColorBlue").toInt());
+
+		m_TextFont.setFamily(settings.value("TextFontFamily", "Courier").toString());
+		m_TextFont.setPointSize(settings.value("TextFontPointSize", 10).toInt());
+		m_ImageFormat = settings.value("ImageFormat").toInt();
+		m_bSaveOpps   = settings.value("SaveOpps").toBool();
+		m_bSaveWOpps  = settings.value("SaveWOpps").toBool();
+		m_DlgPos.rx() = settings.value("DlgPos_x").toInt();
+		m_DlgPos.ry() = settings.value("DlgPos_y").toInt();
+
+
+		a = settings.value("RecentFileSize").toInt();
+		QString RecentF,strange;
+		m_RecentFiles.clear();
+		int n=0;
+		do
+		{
+			RecentF = QString("RecentFile_%1").arg(n);
+			strange = settings.value(RecentF).toString();
+			if(strange.length())
+			{
+				m_RecentFiles.append(strange);
+				n++;
+			}
+			else break;
+		}while(n<MAXRECENTFILES);
 	}
-	ar >> a >> b >> c >> d;
-	QPoint pt(a,b);
-	QSize sz(c,d);
 
-	ar >> m_bMaximized;
-	ar >> m_StyleName >> m_LanguageFilePath;
-
-	ar >> bFloat >> pt.rx()>> pt.ry();
-	m_pctrlMiarexWidget->setFloating(bFloat);
-	if(bFloat) m_pctrlMiarexWidget->move(pt);
-
-	ar >> bFloat >> pt.rx()>> pt.ry();
-	m_pctrlXDirectWidget->setFloating(bFloat);
-	if(bFloat) m_pctrlXDirectWidget->move(pt);
-
-	ar >> bFloat >> pt.rx()>> pt.ry() >> sz.rwidth() >> sz.rheight();
-	m_pctrlAFoilWidget->setFloating(bFloat);
-	m_pctrlAFoilWidget->resize(sz);
-	if(bFloat) m_pctrlAFoilWidget->move(pt);
-
-	ar >> bFloat >> pt.rx()>> pt.ry();
-	m_pctrlXInverseWidget->setFloating(bFloat);
-	if(bFloat) m_pctrlXInverseWidget->move(pt);
-
-
-	ar >> m_LastDirName;
-	ar >> m_LengthUnit >> m_AreaUnit >> m_WeightUnit >> m_SpeedUnit >> m_ForceUnit >> m_MomentUnit;
-	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
-	ar >> m_BackgroundColor  >> m_TextColor;
-	ar >> m_TextFont;
-	ar >> m_ImageFormat;
-	ar >> m_bSaveOpps >> m_bSaveWOpps;
-	ar >> k; m_DlgPos.rx() = k;
-	ar >> k; m_DlgPos.ry() = k;
-
-	ar >> k;
-	if(k<0 || k> MAXRECENTFILES)
-	{
-		pXFile->close();
-		return;
-	}
-	m_RecentFiles.clear();
-	for(int i=0; i<k; i++)
-	{
-		ar >> strange;
-		m_RecentFiles.append(strange);
-	}
-	pAFoil->LoadSettings(ar);
-	pXDirect->LoadSettings(ar);
-	pMiarex->LoadSettings(ar);
-	pXInverse->LoadSettings(ar);
-
-	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
-	p3DScales->LoadSettings(ar);
-
-	m_RefGraph.Serialize(ar, false);
-
-	ar >> a>>b>>c>>d; //sanity check
-
-	pXFile->close();
-
+	return true;
 }
 
 
@@ -3324,6 +3345,7 @@ void MainFrame::OnLanguage()
 	}
 	m_DlgPos = dlg.pos();
 }
+
 
 
 void MainFrame::OnLoadFile()
@@ -3682,6 +3704,22 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 			// Cancel so exit
 			bNotFound = false;//exit loop
 		}
+	}
+}
+
+
+
+void MainFrame::OnResetSettings()
+{
+	int resp = QMessageBox::question(this, tr("Default Settings"), tr("Are you sure you want to reset the default settings ?"),
+									 QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes);
+	if(resp == QMessageBox::Yes)
+	{
+		QMessageBox::warning(this,tr("Default Settings"), tr("The settings will be reset at the next session"));
+		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+		settings.clear();
+		// do not save on exit
+		m_bSaveSettings = false;
 	}
 }
 
@@ -4557,63 +4595,72 @@ void MainFrame::SaveSettings()
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 	QString FileName;
 
-#ifdef Q_WS_MAC
-		QSettings settings("QFLR5", "QFLR5");
-		FileName = settings.fileName();
-#else
-		FileName   = QDir::tempPath() + "/QFLR5.set";
-#endif
+	if(!m_bSaveSettings) return;
 
-	QFile *pXFile = new QFile(FileName);
-
-	if (!pXFile->open(QIODevice::WriteOnly))
+	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+	settings.beginGroup("MainFrame");
 	{
-		QMessageBox::warning(window(), tr("Warning"), tr("could not write saved settings"));
-		return;
+		settings.setValue("FrameGeometryx", frameGeometry().x());
+		settings.setValue("FrameGeometryy", frameGeometry().y());
+		settings.setValue("SizeWidth", size().width());
+		settings.setValue("SizeHeight", size().height());
+		settings.setValue("SizeMaximized", isMaximized());
+		settings.setValue("StyleName", m_StyleName);
+		settings.setValue("LanguageFilePath", m_LanguageFilePath);
+		settings.setValue("Miarex_Float", m_pctrlMiarexWidget->isFloating());
+		settings.setValue("XDirect_Float", m_pctrlXDirectWidget->isFloating());
+		settings.setValue("AFoil_Float", m_pctrlAFoilWidget->isFloating());
+		settings.setValue("XInverse_Float", m_pctrlXInverseWidget->isFloating());
+		settings.setValue("Miarex_x", m_pctrlMiarexWidget->frameGeometry().x());
+		settings.setValue("Miarex_y", m_pctrlMiarexWidget->frameGeometry().y());
+		settings.setValue("XDirect_x", m_pctrlXDirectWidget->frameGeometry().x());
+		settings.setValue("XDirect_y", m_pctrlXDirectWidget->frameGeometry().y());
+		settings.setValue("AFoil_x", m_pctrlXDirectWidget->frameGeometry().x());
+		settings.setValue("AFoil_y", m_pctrlXDirectWidget->frameGeometry().y());
+		settings.setValue("XInverse_x", m_pctrlXInverseWidget->frameGeometry().x());
+		settings.setValue("XInverse_y", m_pctrlXInverseWidget->frameGeometry().y());
+		settings.setValue("LastDirName", m_LastDirName);
+		settings.setValue("LengthUnit", m_LengthUnit);
+		settings.setValue("AreaUnit", m_AreaUnit);
+		settings.setValue("WeightUnit", m_WeightUnit);
+		settings.setValue("SpeedUnit", m_SpeedUnit);
+		settings.setValue("ForceUnit", m_ForceUnit);
+		settings.setValue("MomentUnit", m_MomentUnit);
+		settings.setValue("BackgroundColorRed", m_BackgroundColor.red());
+		settings.setValue("BackgroundColorGreen", m_BackgroundColor.green());
+		settings.setValue("BackgroundColorBlue", m_BackgroundColor.blue());
+		settings.setValue("TextColorRed", m_TextColor.red());
+		settings.setValue("TextColorGreen", m_TextColor.green());
+		settings.setValue("TextColorBlue", m_TextColor.blue());
+		settings.setValue("TextFontFamily", m_TextFont.family());
+		settings.setValue("TextFontPointSize", m_TextFont.pointSize());
+		settings.setValue("ImageFormat", m_ImageFormat);
+		settings.setValue("SaveOpps", m_bSaveOpps);
+		settings.setValue("SaveWOpps", m_bSaveWOpps);
+		settings.setValue("DlgPos_x", m_DlgPos.x());
+		settings.setValue("DlgPos_y", m_DlgPos.y());
+		settings.setValue("RecentFileSize", m_RecentFiles.size());
+
+		QString RecentF;
+		for(int i=0; i<m_RecentFiles.size() && i<MAXRECENTFILES; i++)
+		{
+			RecentF = QString("RecentFile_%1").arg(i);
+			if(m_RecentFiles[i].length()) settings.setValue(RecentF, m_RecentFiles.at(i));
+			else                          settings.setValue(RecentF, "");
+		}
 	}
-
-	QDataStream ar(pXFile);
-	ar << SETTINGSFORMAT;
-	ar << frameGeometry().x();
-	ar << frameGeometry().y();
-	ar << size().width();
-	ar << size().height();
-	ar << isMaximized();
-	ar << m_StyleName << m_LanguageFilePath;
-
-	ar <<  m_pctrlMiarexWidget->isFloating() << m_pctrlMiarexWidget->frameGeometry().x() << m_pctrlMiarexWidget->frameGeometry().y();
-	ar <<  m_pctrlXDirectWidget->isFloating() << m_pctrlXDirectWidget->frameGeometry().x() << m_pctrlXDirectWidget->frameGeometry().y();
-	ar <<  m_pctrlAFoilWidget->isFloating() << m_pctrlAFoilWidget->frameGeometry().x() << m_pctrlAFoilWidget->frameGeometry().y();
-	ar <<  m_pctrlAFoilWidget->frameGeometry().width() <<  m_pctrlAFoilWidget->frameGeometry().height();
-	ar <<  m_pctrlXInverseWidget->isFloating() << m_pctrlXInverseWidget->frameGeometry().x() << m_pctrlXInverseWidget->frameGeometry().y();
+	settings.endGroup();
 
 
-	ar << m_LastDirName;
-
-	ar << m_LengthUnit << m_AreaUnit << m_WeightUnit << m_SpeedUnit << m_ForceUnit << m_MomentUnit;
-	ar << m_BackgroundColor <<  m_TextColor;
-	ar << m_TextFont ;
-	ar << m_ImageFormat;
-	ar << m_bSaveOpps << m_bSaveWOpps;
-	ar << m_DlgPos.x() << m_DlgPos.y();
-
-	ar << m_RecentFiles.size();
-	for(int i=0; i<m_RecentFiles.size(); i++)
-	{
-		ar << m_RecentFiles.at(i);
-	}
-
-	pAFoil->SaveSettings(ar);
-	pXDirect->SaveSettings(ar);
-	pMiarex->SaveSettings(ar);
-	pXInverse->SaveSettings(ar);
-
+	pAFoil->SaveSettings(&settings);
+	pXDirect->SaveSettings(&settings);
+	pMiarex->SaveSettings(&settings);
+	pXInverse->SaveSettings(&settings);
 	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
-	p3DScales->SaveSettings(ar);
+	p3DScales->SaveSettings(&settings);
+	m_RefGraph.SaveSettings(&settings);
 
-	m_RefGraph.Serialize(ar, true);
-	ar << 1 <<10 <<101 << 123456;
-	pXFile->close();
+
 }
 
 

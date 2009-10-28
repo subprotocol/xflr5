@@ -29,6 +29,7 @@
 #include <QCheckBox>
 #include <QStandardItemModel>
 #include <QRadioButton>
+#include <QSettings>
 
 #include "FoilTableDelegate.h"
 #include "../Misc/FloatEdit.h"
@@ -144,8 +145,8 @@ private:
 
 	void CheckButtons();
 
-	void LoadSettings(QDataStream &ar);
-	void SaveSettings(QDataStream &ar);
+	void LoadSettings(QSettings *pSettings);
+	void SaveSettings(QSettings *pSettings);
 
 	void TakePicture();
 	void SetPicture();

@@ -757,7 +757,7 @@ void Graph::SetGraphName(QString GraphName)
 void Graph::SetDefaults()
 {
 	m_BkColor = QColor(0,20,20);
-    m_BorderColor = QColor(200,200,200);
+	m_BorderColor = QColor(200,200,200);
 	m_BorderStyle = 0;
 	m_BorderWidth = 3;
 
@@ -768,18 +768,18 @@ void Graph::SetDefaults()
 
 	m_bYInverted = false;
 
-    QFont TmpFont;
+	QFont TmpFont;
 //	TmpFont.CreatePointFont(85, "Comic Sans MS");
 
-    SetTitleLogFont(&TmpFont);
-    SetLegendLogFont(&TmpFont);
+	SetTitleLogFont(&TmpFont);
+	SetLegendLogFont(&TmpFont);
 //	LgFt.lfHeight = - MulDiv(8, m_LogPixelsY, 72);
-    SetLabelLogFont(&TmpFont);
+	SetLabelLogFont(&TmpFont);
 
 	SetAxisColor(QColor(200,200,200));
-    SetTitleColor(QColor(255,255,255));
-    SetLabelColor(QColor(255,255,255));
-    SetLegendColor(QColor(255,255,255));
+	SetTitleColor(QColor(255,255,255));
+	SetLabelColor(QColor(255,255,255));
+	SetLegendColor(QColor(255,255,255));
 
 	m_bXMajGrid = true;
 	m_bYMajGrid = true;

@@ -23,7 +23,7 @@
 #define QXDIRECT_H
 
 #include <QPixmap>
-
+#include <QSettings>
 #include "../Misc/LineButton.h"
 #include "../Misc/LineCbBox.h"
 #include "../Misc/LineDelegate.h"
@@ -181,7 +181,7 @@ protected:
 	void FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar);
 	void FillOppCurve(OpPoint *pOpp, Graph *pGraph, CCurve *pCurve, bool bInviscid=false);
 	void InsertOpPoint(OpPoint *pNewPoint);
-	void LoadSettings(QDataStream &ar);
+	void LoadSettings(QSettings *pSettings);
 
 	void PaintBL(QPainter &painter, OpPoint* pOpPoint, double scale);
 	void PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale);
@@ -191,7 +191,7 @@ protected:
 	void PaintPolarGraphs(QPainter &painter);
 	void PaintView(QPainter &painter);
 	void ReadParams();
-	void SaveSettings(QDataStream &ar);
+	void SaveSettings(QSettings *pSettings);
 	void SetBufferFoil();
 	void SetCurveParams();
 	void SetFoilScale();

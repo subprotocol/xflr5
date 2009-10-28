@@ -311,22 +311,43 @@ void GL3DScales::ReadStreamParams()
 
 
 
-bool GL3DScales::LoadSettings(QDataStream &ar)
+bool GL3DScales::LoadSettings(QSettings *pSettings)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	ar >> pMiarex->m_bAutoCpScale >> pMiarex->m_LegendMin >> pMiarex->m_LegendMax;
-	ar >> m_pos >> m_NX;
-	ar >> m_DeltaL >> m_XFactor >> m_XOffset >> m_ZOffset;
+	pSettings->beginGroup("GL3DScales");
+	{
+		pMiarex->m_bAutoCpScale = pSettings->value("AutoCpScale").toBool();
+		pMiarex->m_LegendMin    = pSettings->value("LegendMin").toInt();
+		pMiarex->m_LegendMax    = pSettings->value("LegendMax").toInt();
+		m_pos     = pSettings->value("Position").toInt();
+		m_NX      = pSettings->value("NX").toInt();
+		m_DeltaL  = pSettings->value("DeltaL").toDouble();
+		m_XFactor = pSettings->value("XFactor").toDouble();
+		m_XOffset = pSettings->value("XOffset").toDouble();
+		m_ZOffset = pSettings->value("ZOffset").toDouble();
+	}
+	pSettings->endGroup();
+
 	return true;
 }
 
 
-bool GL3DScales::SaveSettings(QDataStream &ar)
+bool GL3DScales::SaveSettings(QSettings *pSettings)
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	ar << pMiarex->m_bAutoCpScale << pMiarex->m_LegendMin << pMiarex->m_LegendMax;
-	ar << m_pos << m_NX;
-	ar << m_DeltaL << m_XFactor << m_XOffset << m_ZOffset;
+	pSettings->beginGroup("GL3DScales");
+	{
+		pSettings->setValue("AutoCpScale", pMiarex->m_bAutoCpScale);
+		pSettings->setValue("LegendMin", pMiarex->m_LegendMin);
+		pSettings->setValue("LegendMax", pMiarex->m_LegendMax);
+		pSettings->setValue("Position", m_pos);
+		pSettings->setValue("NX", m_NX);
+		pSettings->setValue("DeltaL", m_DeltaL);
+		pSettings->setValue("XFactor", m_XFactor);
+		pSettings->setValue("XOffset", m_XOffset);
+		pSettings->setValue("ZOffset", m_ZOffset);
+	}
+	pSettings->endGroup();
 	return true;
 }
 

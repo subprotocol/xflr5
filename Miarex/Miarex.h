@@ -31,7 +31,7 @@
 #include <QList>
 #include <QDialog>
 #include <QDataStream>
-
+#include <QSettings>
 #include "ArcBall.h"
 #include "GL3dWingDlg.h"
 #include "GL3dBodyDlg.h"
@@ -351,8 +351,8 @@ private:
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
 	bool SetModBody(CBody *pModBody);
-	bool LoadSettings(QDataStream &ar);
-	bool SaveSettings(QDataStream &ar);
+	bool LoadSettings(QSettings *pSettings);
+	bool SaveSettings(QSettings *pSettings);
 
 
 	QString RenameUFO(QString UFOName);

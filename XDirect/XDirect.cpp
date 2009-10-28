@@ -157,7 +157,6 @@ QXDirect::QXDirect(QWidget *parent)
 	m_ASpec = 0.0;
 
 	m_pCpGraph    = new QGraph();
-
 	m_pPolarGraph = new QGraph();
 	m_pCmGraph    = new QGraph();
 	m_pCzGraph    = new QGraph();
@@ -183,6 +182,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCpGraph->SetBorderColor(QColor(200,200,200));
 	m_pCpGraph->SetBorder(true);
 	m_pCpGraph->SetBorderStyle(0);
+	m_pCpGraph->SetGraphName("Cp Graph");
 
 	m_pPolarGraph->SetXMin(0.0);
 	m_pPolarGraph->SetXMax(0.1);
@@ -194,6 +194,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pPolarGraph->SetBorderStyle(0);
 	m_pPolarGraph->SetBorderWidth(3);
 	m_pPolarGraph->SetMargin(50);
+	m_pPolarGraph->SetGraphName("Polar Graph");
 
 	m_pCmGraph->SetXMin(0.0);
 	m_pCmGraph->SetXMax(0.1);
@@ -205,6 +206,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCmGraph->SetBorderStyle(0);
 	m_pCmGraph->SetBorderWidth(3);
 	m_pCmGraph->SetMargin(50);
+	m_pCmGraph->SetGraphName("Cm Graph");
 
 	m_pCzGraph->SetXMin(0.0);
 	m_pCzGraph->SetXMax(0.1);
@@ -216,6 +218,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCzGraph->SetBorderStyle(0);
 	m_pCzGraph->SetBorderWidth(3);
 	m_pCzGraph->SetMargin(50);
+	m_pCzGraph->SetGraphName("Cz Graph");
 
 	m_pTrGraph->SetXMin(0.0);
 	m_pTrGraph->SetXMax(0.1);
@@ -227,6 +230,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pTrGraph->SetBorderStyle(0);
 	m_pTrGraph->SetBorderWidth(3);
 	m_pTrGraph->SetMargin(50);
+	m_pTrGraph->SetGraphName("Tr Graph");
 
 	m_pUserGraph->SetXMin(0.0);
 	m_pUserGraph->SetXMax(0.1);
@@ -238,6 +242,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pUserGraph->SetBorderStyle(0);
 	m_pUserGraph->SetBorderWidth(3);
 	m_pUserGraph->SetMargin(50);
+	m_pUserGraph->SetGraphName("User Graph");
 
 	SetGraphTitles(m_pPolarGraph);
 	SetGraphTitles(m_pCzGraph);
@@ -1381,23 +1386,97 @@ void QXDirect::keyReleaseEvent(QKeyEvent *event)
 }
 
 
-void QXDirect::LoadSettings(QDataStream &ar)
+void QXDirect::LoadSettings(QSettings *pSettings)
 {
-	if(ar.status() != QDataStream::Ok)
+	QString str1, str2, str3;
+	int r,g,b;
+
+	pSettings->beginGroup("XDirect");
 	{
-		QMessageBox::warning(window(), tr("Warning"), tr("Archive file is corrupted"));
-		return;
+		m_bAlpha          = pSettings->value("AlphaSpec").toBool();
+		m_bStoreOpp       = pSettings->value("StoreOpp").toBool();
+		m_bViscous        = pSettings->value("ViscousAnalysis").toBool();
+		m_bInitBL         = pSettings->value("InitBL").toBool();
+		m_bBL             = pSettings->value("BoundaryLayer").toBool();
+		m_bPressure       = pSettings->value("Pressure").toBool();
+		m_bPolar          = pSettings->value("PolarView").toBool();
+		m_bShowUserGraph  = pSettings->value("UserGraph").toBool();
+		m_bShowPanels     = pSettings->value("ShowPanels").toBool();
+		m_bType1          = pSettings->value("Type1").toBool();
+		m_bType2          = pSettings->value("Type2").toBool();
+		m_bType3          = pSettings->value("Type3").toBool();
+		m_bType4          = pSettings->value("Type4").toBool();
+		m_bAutoInitBL     = pSettings->value("AutoInitBL").toBool();
+		m_bFromList       = pSettings->value("FromList").toBool();
+		m_bFromZero       = pSettings->value("FromZero").toBool();
+		m_bShowTextOutput = pSettings->value("TextOutput").toBool();
+		m_bNeutralLine    = pSettings->value("NeutralLine").toBool();
+		m_bCurOppOnly     = pSettings->value("CurOppOnly").toBool();
+		m_bShowInviscid   = pSettings->value("ShowInviscid").toBool();
+		m_bCpGraph        = pSettings->value("ShowCpGraph").toBool();
+		m_bSequence       = pSettings->value("Sequence").toBool();
+
+		r = pSettings->value("BLColorRed").toInt();
+		g = pSettings->value("BLColorGreen").toInt();
+		b = pSettings->value("BLColorBlue").toInt();
+		m_crBLColor = QColor(r,g,b);
+		m_iBLStyle = pSettings->value("BLStyle").toInt();
+		m_iBLWidth = pSettings->value("BLWidth").toInt();
+		r = pSettings->value("PressureColorRed").toInt();
+		g = pSettings->value("PressureColorGreen").toInt();
+		b = pSettings->value("PressureColorBlue").toInt();
+		m_crPressureColor = QColor(r,g,b);
+		m_iPressureStyle = pSettings->value("PressureStyle").toInt();
+		m_iPressureWidth = pSettings->value("PressureWidth").toInt();
+		r = pSettings->value("NeutralColorRed").toInt();
+		g = pSettings->value("NeutralColorGreen").toInt();
+		b = pSettings->value("NeutralColorBlue").toInt();
+		m_crNeutralColor = QColor(r,g,b);
+		m_iNeutralStyle = pSettings->value("NeutralStyle").toInt();
+		m_iNeutralWidth = pSettings->value("NeutralWidth").toInt();
+
+		m_XFoilVar       = pSettings->value("XFoilVar").toInt();
+		m_IterLim        = pSettings->value("IterLim").toInt();
+		m_iPlrGraph      = pSettings->value("PlrGraph").toInt();
+		m_iPlrView       = pSettings->value("PlrView").toInt();
+		m_Alpha          = pSettings->value("AlphaMin").toDouble();
+		m_AlphaMax       = pSettings->value("AlphaMax").toDouble();
+		m_AlphaDelta     = pSettings->value("AlphaDelta").toDouble();
+		m_Cl             = pSettings->value("ClMin").toDouble();
+		m_ClMax          = pSettings->value("ClMax").toDouble();
+		m_ClDelta        = pSettings->value("ClDelta").toDouble();
+		m_Reynolds       = pSettings->value("ReynoldsMin").toDouble();
+		m_ReynoldsMax    = pSettings->value("ReynoldsMax").toDouble();
+		m_ReynoldsDelta  = pSettings->value("ReynolsDelta").toDouble();
+		m_NCrit          = pSettings->value("NCrit").toDouble();
+		m_XTopTr         = pSettings->value("XTopTr").toDouble();
+		m_XBotTr         = pSettings->value("XBotTr").toDouble();
+		m_Mach           = pSettings->value("Mach").toDouble();
+		m_ASpec          = pSettings->value("ASpec").toDouble();
+		m_Type           = pSettings->value("Type").toInt();
+		m_pXFoil->vaccel = pSettings->value("VAccel").toDouble();
+		m_bAutoInitBL    = pSettings->value("AutoInitBL").toBool();
+		m_NRe            = pSettings->value("NReynolds").toInt();
+		m_pXFoil->m_bFullReport = pSettings->value("FullReport").toBool();
+
+		for (int i=0; i<m_NRe; i++)
+		{
+			str1 = QString("ReList%1").arg(i);
+			str2 = QString("MaList%1").arg(i);
+			str3 = QString("NcList%1").arg(i);
+			m_ReList[i] = pSettings->value(str1).toDouble();
+			m_MachList[i] = pSettings->value(str2).toDouble();
+			m_NCritList[i] = pSettings->value(str3).toDouble();
+		}
 	}
+	pSettings->endGroup();
 
-	ar >> m_bAlpha >> m_bStoreOpp >> m_bViscous >> m_bInitBL >> m_bBL >> m_bPressure;
-	ar >> m_bPolar >> m_bShowUserGraph >> m_bShowPanels >> m_bType1 >> m_bType2 >> m_bType3 >> m_bType4;
-	ar >> m_bAutoInitBL >> m_bFromList >> m_bFromZero >> m_bShowTextOutput >> m_bNeutralLine >> m_bCurOppOnly;
-	ar >> m_bShowInviscid >> m_bCpGraph >> m_bSequence;
-	ar >> m_crBLColor       >> m_iBLStyle       >> m_iBLWidth;
-	ar >> m_crPressureColor >> m_iPressureStyle >> m_iPressureWidth;
-	ar >> m_crNeutralColor >> m_iNeutralStyle >> m_iNeutralWidth;
-
-	ar >> m_XFoilVar >> m_IterLim ;
+	m_pPolarGraph->LoadSettings(pSettings);
+	m_pCmGraph->LoadSettings(pSettings);
+	m_pCzGraph->LoadSettings(pSettings);
+	m_pTrGraph->LoadSettings(pSettings);
+	m_pUserGraph->LoadSettings(pSettings);
+	m_pCpGraph->LoadSettings(pSettings);
 
 	if(m_pCpGraph->GetYVariable() == 0 || m_pCpGraph->GetYVariable()>=2)
 	{
@@ -1409,27 +1488,6 @@ void QXDirect::LoadSettings(QDataStream &ar)
 		m_pCpGraph->SetYTitle(tr("Q"));
 		m_pCpGraph->SetInverted(false);
 	}
-
-
-	ar >> m_iPlrGraph >> m_iPlrView;
-	ar >> m_Alpha >> m_AlphaMax >> m_AlphaDelta;
-	ar >> m_Cl >> m_ClMax >> m_ClDelta;
-	ar >> m_Reynolds >> m_ReynoldsMax >> m_ReynoldsDelta;
-	ar >> m_NCrit >> m_XTopTr >> m_XBotTr;
-	ar >> m_Mach >> m_ASpec;
-	ar >> m_Type;
-	ar >> m_pXFoil->vaccel >> m_IterLim >> m_bAutoInitBL >> m_pXFoil->m_bFullReport  ;
-	ar >> m_NRe;
-	for (int i=0; i<m_NRe; i++) ar >> m_ReList[i] >> m_MachList[i] >> m_NCritList[i];
-
-
-	m_pPolarGraph->Serialize(ar, false);
-	m_pCmGraph->Serialize(ar, false);
-	m_pCzGraph->Serialize(ar, false);
-	m_pTrGraph->Serialize(ar, false);
-	m_pUserGraph->Serialize(ar, false);
-
-	m_pCpGraph->Serialize(ar, false);
 
 	SetGraphTitles(m_pPolarGraph);
 	SetGraphTitles(m_pCzGraph);
@@ -3459,7 +3517,7 @@ void QXDirect::OnImportJavaFoilPolar()
 	int NPolars = 0;
 	double Re;
 
-	double alpha,CL, CD, CM, Xt,  Xb;
+	double alpha, CL, CD, CM, Xt,  Xb;
 	bool bRead;
 
 	Line = 0;
@@ -5383,42 +5441,90 @@ void QXDirect::ReadParams()
 }
 
 
-void QXDirect::SaveSettings(QDataStream &ar)
+void QXDirect::SaveSettings(QSettings *pSettings)
 {
-	if(ar.status() != QDataStream::Ok)
+	QString str1, str2, str3;
+	pSettings->beginGroup("XDirect");
 	{
-		QMessageBox::warning(window(), tr("Warning"), tr("File is closed"));
-		return;
+		pSettings->setValue("AlphaSpec", m_bAlpha);
+		pSettings->setValue("StoreOpp", m_bStoreOpp);
+		pSettings->setValue("ViscousAnalysis", m_bViscous);
+		pSettings->setValue("InitBL", m_bInitBL);
+		pSettings->setValue("BoundaryLayer", m_bBL);
+		pSettings->setValue("Pressure", m_bPressure);
+		pSettings->setValue("PolarView", m_bPolar);
+		pSettings->setValue("UserGraph", m_bShowUserGraph);
+		pSettings->setValue("ShowPanels", m_bShowPanels);
+		pSettings->setValue("Type1", m_bType1);
+		pSettings->setValue("Type2", m_bType2);
+		pSettings->setValue("Type3", m_bType3);
+		pSettings->setValue("Type4", m_bType4);
+		pSettings->setValue("AutoInitBL", m_bAutoInitBL);
+		pSettings->setValue("FromList", m_bFromList);
+		pSettings->setValue("FromZero", m_bFromZero);
+		pSettings->setValue("TextOutput", m_bShowTextOutput);
+		pSettings->setValue("NeutralLine", m_bNeutralLine);
+		pSettings->setValue("CurOppOnly", m_bCurOppOnly);
+		pSettings->setValue("ShowInviscid", m_bShowInviscid);
+		pSettings->setValue("ShowCpGraph", m_bCpGraph);
+		pSettings->setValue("Sequence", m_bSequence);
+		pSettings->setValue("BLColorRed", m_crBLColor.red());
+		pSettings->setValue("BLColorGreen",m_crBLColor.green());
+		pSettings->setValue("BLColorBlue", m_crBLColor.blue());
+		pSettings->setValue("BLStyle", m_iBLStyle);
+		pSettings->setValue("BLWidth", m_iBLWidth);
+		pSettings->setValue("PressureColorRed", m_crPressureColor.red());
+		pSettings->setValue("PressureColorGreen",m_crPressureColor.green());
+		pSettings->setValue("PressureColorBlue", m_crPressureColor.blue());
+		pSettings->setValue("PressureStyle", m_iPressureStyle);
+		pSettings->setValue("PressureWidth", m_iPressureWidth);
+		pSettings->setValue("NeutralColorRed", m_crNeutralColor.red());
+		pSettings->setValue("NeutralColorGreen",m_crNeutralColor.green());
+		pSettings->setValue("NeutralColorBlue", m_crNeutralColor.blue());
+		pSettings->setValue("NeutralStyle", m_iNeutralStyle);
+		pSettings->setValue("NeutralWidth", m_iNeutralWidth);
+		pSettings->setValue("XFoilVar", m_XFoilVar);
+		pSettings->setValue("IterLim", m_IterLim);
+		pSettings->setValue("PlrGraph", m_iPlrGraph);
+		pSettings->setValue("PlrView", m_iPlrView);
+		pSettings->setValue("AlphaMin", m_Alpha);
+		pSettings->setValue("AlphaMax", m_AlphaMax);
+		pSettings->setValue("AlphaDelta", m_AlphaDelta);
+		pSettings->setValue("ClMin", m_Cl);
+		pSettings->setValue("ClMax", m_ClMax);
+		pSettings->setValue("ClDelta", m_ClDelta);
+		pSettings->setValue("ReynoldsMin", m_Reynolds);
+		pSettings->setValue("ReynoldsMax", m_ReynoldsMax);
+		pSettings->setValue("ReynolsDelta", m_ReynoldsDelta);
+		pSettings->setValue("NCrit", m_NCrit);
+		pSettings->setValue("XTopTr", m_XTopTr);
+		pSettings->setValue("XBotTr", m_XBotTr);
+		pSettings->setValue("Mach", m_Mach);
+		pSettings->setValue("ASpec", m_ASpec);
+		pSettings->setValue("Type", m_Type);
+		pSettings->setValue("VAccel", m_pXFoil->vaccel);
+		pSettings->setValue("AutoInitBL", m_bAutoInitBL);
+		pSettings->setValue("FullReport", m_pXFoil->m_bFullReport);
+		pSettings->setValue("NReynolds", m_NRe);
+
+		for (int i=0; i<m_NRe; i++)
+		{
+			str1 = QString("ReList%1").arg(i);
+			str2 = QString("MaList%1").arg(i);
+			str3 = QString("NcList%1").arg(i);
+			pSettings->setValue(str1, m_ReList[i]);
+			pSettings->setValue(str2, m_MachList[i]);
+			pSettings->setValue(str3, m_NCritList[i]);
+		}
 	}
-	ar << m_bAlpha << m_bStoreOpp << m_bViscous << m_bInitBL << m_bBL << m_bPressure;
-	ar << m_bPolar << m_bShowUserGraph << m_bShowPanels << m_bType1 << m_bType2 << m_bType3 << m_bType4;
-	ar << m_bAutoInitBL << m_bFromList << m_bFromZero << m_bShowTextOutput << m_bNeutralLine << m_bCurOppOnly;
-	ar << m_bShowInviscid << m_bCpGraph << m_bSequence;
+	pSettings->endGroup();
 
-	ar << m_crBLColor       << m_iBLStyle       << m_iBLWidth;
-	ar << m_crPressureColor << m_iPressureStyle << m_iPressureWidth;
-	ar << m_crNeutralColor << m_iNeutralStyle << m_iNeutralWidth;
-
-	ar << m_XFoilVar << m_IterLim;
-	ar << m_iPlrGraph << m_iPlrView;
-	ar << m_Alpha << m_AlphaMax << m_AlphaDelta;
-	ar << m_Cl << m_ClMax << m_ClDelta;
-	ar << m_Reynolds << m_ReynoldsMax << m_ReynoldsDelta;
-	ar << m_NCrit << m_XTopTr << m_XBotTr;
-	ar << m_Mach << m_ASpec;
-	ar << m_Type;
-	ar << m_pXFoil->vaccel <<  m_IterLim << m_bAutoInitBL << m_pXFoil->m_bFullReport ;
-
-	ar << m_NRe;
-	for (int i=0; i<m_NRe; i++) ar << m_ReList[i] << m_MachList[i] << m_NCritList[i];
-
-	m_pPolarGraph->Serialize(ar, true);
-	m_pCmGraph->Serialize(ar, true);
-	m_pCzGraph->Serialize(ar, true);
-	m_pTrGraph->Serialize(ar, true);
-	m_pUserGraph->Serialize(ar, true);
-
-	m_pCpGraph->Serialize(ar, true);
+	m_pPolarGraph->SaveSettings(pSettings);
+	m_pCmGraph->SaveSettings(pSettings);
+	m_pCzGraph->SaveSettings(pSettings);
+	m_pTrGraph->SaveSettings(pSettings);
+	m_pUserGraph->SaveSettings(pSettings);
+	m_pCpGraph->SaveSettings(pSettings);
 }
 
 

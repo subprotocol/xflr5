@@ -390,94 +390,65 @@ void GLLightDlg::SetParams(void)
 
 
 
-bool GLLightDlg::LoadSettings(QDataStream &ar)
+bool GLLightDlg::LoadSettings(QSettings *pSettings)
 {
-	int k;
+	pSettings->beginGroup("GLLight");
+	{
 	//  we're reading/loading
-
-	ar >> m_Ambient;
-	ar >> m_Diffuse;
-	ar >> m_Specular;
-	if (m_Ambient   <-100.0 || m_Ambient >100.0 ||
-		m_Diffuse   <-100.0 || m_Diffuse >100.0 ||
-		m_Specular  <-100.0 || m_Specular >100.0 )
-	{
-		return false;
+		m_Ambient= pSettings->value("Ambient").toDouble();
+		m_Diffuse= pSettings->value("Diffuse").toDouble();
+		m_Specular= pSettings->value("Specular").toDouble();
+		m_MatAmbient= pSettings->value("MatAmbient").toDouble();
+		m_MatDiffuse= pSettings->value("MatDiffuse").toDouble();
+		m_MatSpecular  = pSettings->value("MatSpecular").toDouble();
+		m_MatEmission= pSettings->value("MatEmission").toDouble();
+		m_iMatShininess= pSettings->value("MatShininess").toDouble();
+		m_XLight = pSettings->value("XLight").toDouble();
+		m_YLight = pSettings->value("YLight").toDouble();
+		m_ZLight= pSettings->value("ZLight").toDouble();
+		m_Red= pSettings->value("RedLight").toDouble();
+		m_Green = pSettings->value("GreenLight").toDouble();
+		m_Blue= pSettings->value("BlueLight").toDouble();
+		m_bCullFaces = pSettings->value("CullFaces").toBool();
+		m_bSmooth = pSettings->value("Smooth").toBool();
+		m_bShade = pSettings->value("Shade").toBool();
+		m_bLocalView = pSettings->value("LocalView").toBool();
+		m_bDepthTest = pSettings->value("DepthTest").toBool();
+		m_bColorMaterial = pSettings->value("ColorMaterial").toBool();
 	}
-	ar >> m_MatAmbient >> m_MatDiffuse >> m_MatSpecular  >> m_MatEmission;
-	ar >> m_iMatShininess;
-	if (m_MatAmbient   <-100.0 || m_MatAmbient >100.0 ||
-		m_MatDiffuse   <-100.0 || m_MatDiffuse >100.0 ||
-		m_MatSpecular  <-100.0 || m_MatSpecular >100.0 ||
-		m_iMatShininess <-100  || m_iMatShininess >200 ||
-		m_MatEmission  <-100.0 || m_MatEmission >100.0)
-	{
-		return false;
-	}
-
-	ar >> m_XLight >> m_YLight >> m_ZLight;
-	if (m_XLight <-100.0 || m_XLight >100.0 ||
-		m_YLight <-100.0 || m_YLight >100.0 ||
-		m_ZLight <-100.0 || m_ZLight >100.0){
-		return false;
-	}
-
-	ar >> m_Red >> m_Green >> m_Blue;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bCullFaces = true; else m_bCullFaces = false;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bSmooth = true; else m_bSmooth = false;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bShade = true; else m_bShade = false;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bLocalView = true; else m_bLocalView = false;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bDepthTest = true; else m_bDepthTest = false;
-
-	ar >>k;
-	if(k<0 || k>1){
-		return false;
-	}
-	if(k) m_bColorMaterial = true; else m_bColorMaterial = false;
+	pSettings->endGroup();
 	return true;
 
 }
 
 
-bool GLLightDlg::SaveSettings(QDataStream &ar)
+bool GLLightDlg::SaveSettings(QSettings *pSettings)
 {
-	ar << m_Ambient << m_Diffuse << m_Specular;
-	ar << m_MatAmbient << m_MatDiffuse << m_MatSpecular << m_MatEmission;
-	ar << m_iMatShininess;
-	ar << m_XLight << m_YLight << m_ZLight;
-	ar << m_Red << m_Green << m_Blue;
+	pSettings->beginGroup("GLLight");
+	{
+		pSettings->setValue("Ambient",m_Ambient);
+		pSettings->setValue("Diffuse",m_Diffuse);
+		pSettings->setValue("Specular",m_Specular);
+		pSettings->setValue("MatAmbient",m_MatAmbient);
+		pSettings->setValue("MatDiffuse",m_MatDiffuse);
+		pSettings->setValue("MatSpecular",m_MatSpecular );
+		pSettings->setValue("MatEmission",m_MatEmission);
+		pSettings->setValue("MatShininess",m_iMatShininess);
+		pSettings->setValue("XLight",m_XLight);
+		pSettings->setValue("YLight",m_YLight);
+		pSettings->setValue("ZLight",m_ZLight);
+		pSettings->setValue("RedLight",m_Red);
+		pSettings->setValue("GreenLight",m_Green);
+		pSettings->setValue("BlueLight",m_Blue);
+		pSettings->setValue("CullFaces",m_bCullFaces);
+		pSettings->setValue("Smooth",m_bSmooth);
+		pSettings->setValue("Shade",m_bShade);
+		pSettings->setValue("LocalView",m_bLocalView);
+		pSettings->setValue("DepthTest",m_bDepthTest);
+		pSettings->setValue("ColorMaterial",m_bColorMaterial);
+	}
+	pSettings->endGroup();
 
-	if(m_bCullFaces)		ar << 1; else ar << 0;
-	if(m_bSmooth)			ar << 1; else ar << 0;
-	if(m_bShade)			ar << 1; else ar << 0;
-	if(m_bLocalView)		ar << 1; else ar << 0;
-	if(m_bDepthTest)		ar << 1; else ar << 0;
-	if(m_bColorMaterial)	ar << 1; else ar << 0;
 	return true;
 }
 

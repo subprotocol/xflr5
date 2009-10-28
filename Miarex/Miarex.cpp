@@ -9944,85 +9944,195 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 }
 
 
-bool QMiarex::LoadSettings(QDataStream &ar)
+bool QMiarex::LoadSettings(QSettings *pSettings)
 {
 	int k;
-	if(!m_GLLightDlg.LoadSettings(ar)) return false;
+	int r,g,b;
+	QColor color;
 
-	ar >> m_bSequence;
-	ar >> m_AlphaMin   >> m_AlphaMax   >> m_AlphaDelta    >> m_QInfMin >> m_QInfMax >> m_QInfDelta;
-	ar >> m_ControlMin >> m_ControlMax >> m_ControlDelta;
+	pSettings->beginGroup("Miarex");
+	{
+		m_bXTop         = pSettings->value("bXTop").toBool();
+		m_bXBot         = pSettings->value("bXBot").toBool();
+		m_bXCP          = pSettings->value("bXCP").toBool();
+		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
+		m_bICd          = pSettings->value("bICd").toBool();
+		m_bVCd          = pSettings->value("bVCd").toBool();
+		m_bWakePanels   = pSettings->value("bWakePanels").toBool();
+		m_bSurfaces     = pSettings->value("bSurfaces").toBool();
+		m_bOutline      = pSettings->value("bOutline").toBool();
+		m_bVLMPanels    = pSettings->value("bVLMPanels").toBool();
+		m_bAxes         = pSettings->value("bAxes").toBool();
+		m_b3DCp         = pSettings->value("b3DCp").toBool();
+		m_bDownwash     = pSettings->value("bDownwash").toBool();
+		m_bMoments      = pSettings->value("bMoments").toBool();
+		m_bAutoCpScale  = pSettings->value("bAutoCpScale").toBool();
+		m_bShowCpScale  = pSettings->value("bShowCpScale").toBool();
+		m_bCurWOppOnly  = pSettings->value("CurWOppOnly").toBool();
+		m_bLogFile      = pSettings->value("LogFile").toBool();
+		m_bDirichlet    = pSettings->value("Dirichlet").toBool();
+		m_bTrefftz      = pSettings->value("Trefftz").toBool();
+		m_bKeepOutOpps  = pSettings->value("KeepOutOpps").toBool();
+		m_bResetWake    = pSettings->value("ResetWake").toBool();
+		m_bShowWing2    = pSettings->value("ShowWing2").toBool();
+		m_bShowStab     = pSettings->value("ShowStab").toBool();
+		m_bShowFin      = pSettings->value("ShowFin").toBool();
+		m_bStoreWOpp    = pSettings->value("StoreWOpp").toBool();
+		m_bSequence     = pSettings->value("Sequence").toBool();
 
-	ar >> m_3DAxisStyle >> m_3DAxisWidth >> m_3DAxisColor;
-	ar >> m_VLMStyle >> m_VLMWidth >> m_VLMColor;
-	ar >> m_OutlineStyle >> m_OutlineWidth >> m_OutlineColor;
-	ar >> m_XCPStyle >> m_XCPWidth >> m_XCPColor;
-	ar >> m_MomentStyle >> m_MomentWidth >> m_MomentColor;
-	ar >> m_IDragStyle >> m_IDragWidth >> m_IDragColor;
-	ar >> m_VDragStyle >> m_VDragWidth >> m_VDragColor;
-	ar >> m_XTopStyle >> m_XTopWidth >> m_XTopColor;
-	ar >> m_XBotStyle >> m_XBotWidth >> m_XBotColor;
-	ar >> m_DownwashStyle >> m_DownwashWidth >> m_DownwashColor;
-	ar >> m_WakeStyle >> m_WakeWidth >> m_WakeColor;
-	ar >> m_CpColor >> m_CpStyle >> m_CpWidth;
+		m_AlphaMin      = pSettings->value("AlphaMin").toDouble();
+		m_AlphaMax      = pSettings->value("AlphaMax").toDouble();
+		m_AlphaDelta    = pSettings->value("AlphaDelta").toDouble();
+		m_QInfMin       = pSettings->value("QInfMin").toDouble();
+		m_QInfMax       = pSettings->value("QInfMax").toDouble();
+		m_QInfDelta     = pSettings->value("QInfDelta").toDouble();
+		m_ControlMin    = pSettings->value("ControlMin").toDouble();
+		m_ControlMax    = pSettings->value("ControlMax").toDouble();
+		m_ControlDelta  = pSettings->value("ControlDelta").toDouble();
+		m_3DAxisStyle   = pSettings->value("3DAxisStyle").toInt();
+		m_3DAxisWidth   = pSettings->value("3DAXisWidth").toInt();
+		r = pSettings->value("3DAxisColorRed").toInt();
+		g = pSettings->value("3DAxisColorGreen").toInt();
+		b = pSettings->value("3DAxisColorBlue").toInt();
+		m_3DAxisColor   = QColor(r,g,b);
 
-	ar >> CWing::s_CvPrec >> CWing::s_RelaxMax >> CWing::s_NLLTStations;
+		m_VLMStyle = pSettings->value("VLMStyle").toInt();
+		m_VLMWidth = pSettings->value("VLMWidth").toInt();
+		r = pSettings->value("VLMColorRed").toInt();
+		g = pSettings->value("VLMColorGreen").toInt();
+		b = pSettings->value("VLMColorBlue").toInt();
+		m_VLMColor = QColor(r,g,b);
 
-	ar >> m_iView >> m_iWingView >> m_iWPlrView;
+		m_OutlineStyle = pSettings->value("OutlineStyle").toInt();
+		m_OutlineWidth = pSettings->value("OutlineWidth").toInt();
+		r = pSettings->value("OutlineColorRed").toInt();
+		g = pSettings->value("OutlineColorGreen").toInt();
+		b = pSettings->value("OutlineColorBlue").toInt();
+		m_OutlineColor = QColor(r,g,b);
 
-	ar >>k;
-	if     (k==1) m_pCurWingGraph = &m_WingGraph1;
-	else if(k==2) m_pCurWingGraph = &m_WingGraph2;
-	else if(k==3) m_pCurWingGraph = &m_WingGraph3;
-	else if(k==4) m_pCurWingGraph = &m_WingGraph4;
+		m_XCPStyle = pSettings->value("XCPStyle").toInt();
+		m_XCPWidth = pSettings->value("XCPWidth").toInt();
+		r = pSettings->value("XCPColorRed").toInt();
+		g = pSettings->value("XCPColorGreen").toInt();
+		b = pSettings->value("XCPColorBlue").toInt();
+		m_XCPColor = QColor(r,g,b);
 
-	ar >>k;
-	if     (k==1) m_pCurWPlrGraph = &m_WPlrGraph1;
-	else if(k==2) m_pCurWPlrGraph = &m_WPlrGraph2;
-	else if(k==3) m_pCurWPlrGraph = &m_WPlrGraph3;
-	else if(k==4) m_pCurWPlrGraph = &m_WPlrGraph4;
-	if(m_iView==WOPPVIEW)        m_pCurGraph=m_pCurWingGraph;
-	else if(m_iView==WPOLARVIEW) m_pCurGraph=m_pCurWPlrGraph;
+		m_MomentStyle = pSettings->value("MomentStyle").toInt();
+		m_MomentWidth = pSettings->value("MomentWidth").toInt();
+		r = pSettings->value("MomentColorRed").toInt();
+		g = pSettings->value("MomentColorGreen").toInt();
+		b = pSettings->value("MomentColorBlue").toInt();
+		m_MomentColor = QColor(r,g,b);
 
+		m_IDragStyle = pSettings->value("IDragStyle").toInt();
+		m_IDragWidth = pSettings->value("IDragWidth").toInt();
+		r = pSettings->value("IDragColorRed").toInt();
+		g = pSettings->value("IDragColorGreen").toInt();
+		b = pSettings->value("IDragColorBlue").toInt();
+		m_IDragColor = QColor(r,g,b);
 
-	ar >> m_Iter >> m_NStation ;
-	ar >> m_InducedDragPoint;
-	ar >> m_NHoopPoints >> m_NXPoints;
+		m_VDragStyle = pSettings->value("VDragStyle").toInt();
+		m_VDragWidth = pSettings->value("VDragWidth").toInt();
+		r = pSettings->value("VDragColorRed").toInt();
+		g = pSettings->value("VDragColorGreen").toInt();
+		b = pSettings->value("VDragColorBlue").toInt();
+		m_VDragColor = QColor(r,g,b);
 
-	m_WingGraph1.Serialize(ar, false);
-	m_WingGraph2.Serialize(ar, false);
-	m_WingGraph3.Serialize(ar, false);
-	m_WingGraph4.Serialize(ar, false);
-	m_WPlrGraph1.Serialize(ar, false);
-	m_WPlrGraph2.Serialize(ar, false);
-	m_WPlrGraph3.Serialize(ar, false);
-	m_WPlrGraph4.Serialize(ar, false);
+		m_XTopStyle = pSettings->value("XTopStyle").toInt();
+		m_XTopWidth = pSettings->value("XTopWidth").toInt();
+		r = pSettings->value("XTopColorRed").toInt();
+		g = pSettings->value("XTopColorGreen").toInt();
+		b = pSettings->value("XTopColorBlue").toInt();
+		m_XTopColor = QColor(r,g,b);
+
+		m_XBotStyle = pSettings->value("XBotStyle").toInt();
+		m_XBotWidth = pSettings->value("XBotWidth").toInt();
+		r = pSettings->value("XBotColorRed").toInt();
+		g = pSettings->value("XBotColorGreen").toInt();
+		b = pSettings->value("XBotColorBlue").toInt();
+		m_XBotColor = QColor(r,g,b);
+
+		m_DownwashStyle = pSettings->value("DownwashStyle").toInt();
+		m_DownwashWidth = pSettings->value("DownwashWidth").toInt();
+		r = pSettings->value("DownwashColorRed").toInt();
+		g = pSettings->value("DownwashColorGreen").toInt();
+		b = pSettings->value("DownwashColorBlue").toInt();
+		m_DownwashColor = QColor(r,g,b);
+
+		m_WakeStyle = pSettings->value("WakeStyle").toInt();
+		m_WakeWidth = pSettings->value("WakeWidth").toInt();
+		r = pSettings->value("WakeColorRed").toInt();
+		g = pSettings->value("WakeColorGreen").toInt();
+		b = pSettings->value("WakeColorBlue").toInt();
+		m_WakeColor = QColor(r,g,b);
+
+		m_CpStyle = pSettings->value("CpStyle").toInt();
+		m_CpWidth = pSettings->value("CpWidth").toInt();
+		r = pSettings->value("CpColorRed").toInt();
+		g = pSettings->value("CpColorGreen").toInt();
+		b = pSettings->value("CpColorBlue").toInt();
+		m_CpColor = QColor(r,g,b);
+
+		CWing::s_CvPrec       = pSettings->value("CvPrec").toDouble();
+		CWing::s_RelaxMax     = pSettings->value("RelaxMax").toDouble();
+		CWing::s_NLLTStations = pSettings->value("NLLTStations").toInt();
+		m_iView     = pSettings->value("iView").toInt();
+		m_iWingView = pSettings->value("iWingView").toInt();
+		m_iWPlrView = pSettings->value("iWPlrView").toInt();
+
+		k = pSettings->value("CurrentWingGraph").toInt();
+		if     (k==1) m_pCurWingGraph = &m_WingGraph1;
+		else if(k==2) m_pCurWingGraph = &m_WingGraph2;
+		else if(k==3) m_pCurWingGraph = &m_WingGraph3;
+		else if(k==4) m_pCurWingGraph = &m_WingGraph4;
+
+		k = pSettings->value("CurWPlrGraph").toInt();
+		if     (k==1) m_pCurWPlrGraph = &m_WPlrGraph1;
+		else if(k==2) m_pCurWPlrGraph = &m_WPlrGraph2;
+		else if(k==3) m_pCurWPlrGraph = &m_WPlrGraph3;
+		else if(k==4) m_pCurWPlrGraph = &m_WPlrGraph4;
+		if(m_iView==WOPPVIEW)        m_pCurGraph=m_pCurWingGraph;
+		else if(m_iView==WPOLARVIEW) m_pCurGraph=m_pCurWPlrGraph;
+
+		m_Iter         = pSettings->value("Iter").toInt();
+		m_NStation     = pSettings->value("NStation").toInt();
+		m_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
+		m_NXPoints     = pSettings->value("NXPoints").toInt();
+		m_InducedDragPoint  = pSettings->value("InducedDragPoint").toInt();
+
+		m_LiftScale     = pSettings->value("LiftScale").toDouble();
+		m_DragScale     = pSettings->value("DragScale").toDouble();
+		m_VelocityScale = pSettings->value("VelocityScale").toDouble();
+
+		m_WakeInterNodes    = pSettings->value("WakeInterNodes").toInt();
+		m_MaxWakeIter       = pSettings->value("MaxWakeIter").toInt();
+		CPanel::m_CtrlPos   = pSettings->value("CtrlPos").toDouble();
+		CPanel::m_VortexPos = pSettings->value("VortexPos").toDouble();
+		m_CoreSize          = pSettings->value("CoreSize").toDouble();
+		m_MinPanelSize      = pSettings->value("MinPanelSize").toDouble();
+ 	}
+	pSettings->endGroup();
+
+	m_GL3dBody.LoadSettings(pSettings);
+	m_GLLightDlg.LoadSettings(pSettings);
+
+	m_CpGraph.LoadSettings(pSettings);
+	m_WingGraph1.LoadSettings(pSettings);
+	m_WingGraph2.LoadSettings(pSettings);
+	m_WingGraph3.LoadSettings(pSettings);
+	m_WingGraph4.LoadSettings(pSettings);
+	m_WPlrGraph1.LoadSettings(pSettings);
+	m_WPlrGraph2.LoadSettings(pSettings);
+	m_WPlrGraph3.LoadSettings(pSettings);
+	m_WPlrGraph4.LoadSettings(pSettings);
 	SetWGraphTitles(&m_WPlrGraph1);
 	SetWGraphTitles(&m_WPlrGraph2);
 	SetWGraphTitles(&m_WPlrGraph3);
 	SetWGraphTitles(&m_WPlrGraph4);
 
-	m_CpGraph.Serialize(ar, false);
-
-	ar >> m_bXTop >> m_bXBot >> m_bXCP >> m_bXCmRef >> m_bICd >> m_bVCd;
-	ar >> m_bWakePanels >> m_bSurfaces >> m_bOutline >> m_bVLMPanels;
-	ar >> m_bAxes  >> m_b3DCp >> m_bDownwash >> m_bMoments;
-	ar >> m_bAutoCpScale >> m_bShowCpScale >> m_bXTop >> m_bXBot >> m_bXCP;
-	ar >> m_bCurWOppOnly;
-
-	ar >> m_LiftScale >> m_DragScale >> m_VelocityScale;
-
-	ar >> m_bLogFile >> m_bDirichlet >> m_bTrefftz >> m_bKeepOutOpps >> m_bResetWake;
-	ar >> m_Iter  >> m_WakeInterNodes >> m_MaxWakeIter >> m_InducedDragPoint;
-	ar >> CPanel::m_CtrlPos >> CPanel::m_VortexPos >> CWing::s_RelaxMax >> CWing::s_CvPrec >> CWing::s_NLLTStations;
-	ar >> m_CoreSize >> m_MinPanelSize;
-	ar >> m_bShowWing2 >> m_bShowStab >> m_bShowFin;
-	ar >> m_bStoreWOpp;
-
-	m_GL3dBody.LoadSettings(ar);
-
 	return true;
 }
+
 
 void QMiarex::mouseDoubleClickEvent ( QMouseEvent * event )
 {
@@ -15013,73 +15123,175 @@ void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 }
 
 
-bool QMiarex::SaveSettings(QDataStream &ar)
+bool QMiarex::SaveSettings(QSettings *pSettings)
 {
-	if(!m_GLLightDlg.SaveSettings(ar)) return false;
+	int k;
+	pSettings->beginGroup("Miarex");
+	{
+		pSettings->setValue("bXTop", m_bXTop);
+		pSettings->setValue("bXBot", m_bXBot  );
+		pSettings->setValue("bXCP", m_bXCP);
+		pSettings->setValue("bXCmRef", m_bXCmRef  );
+		pSettings->setValue("bICd", m_bICd  );
+		pSettings->setValue("bVCd", m_bVCd  );
+		pSettings->setValue("bWakePanels", m_bWakePanels  );
+		pSettings->setValue("bSurfaces", m_bSurfaces  );
+		pSettings->setValue("bOutline", m_bOutline  );
+		pSettings->setValue("bVLMPanels", m_bVLMPanels  );
+		pSettings->setValue("bAxes", m_bAxes   );
+		pSettings->setValue("b3DCp", m_b3DCp  );
+		pSettings->setValue("bDownwash", m_bDownwash  );
+		pSettings->setValue("bMoments", m_bMoments  );
+		pSettings->setValue("bAutoCpScale", m_bAutoCpScale  );
+		pSettings->setValue("bShowCpScale", m_bShowCpScale  );
+		pSettings->setValue("CurWOppOnly", m_bCurWOppOnly  );
+		pSettings->setValue("LogFile", m_bLogFile  );
+		pSettings->setValue("Dirichlet", m_bDirichlet  );
+		pSettings->setValue("Trefftz", m_bTrefftz  );
+		pSettings->setValue("KeepOutOpps", m_bKeepOutOpps  );
+		pSettings->setValue("ResetWake", m_bResetWake );
+		pSettings->setValue("ShowWing2", m_bShowWing2 );
+		pSettings->setValue("ShowStab", m_bShowStab  );
+		pSettings->setValue("ShowFin", m_bShowFin );
+		pSettings->setValue("StoreWOpp", m_bStoreWOpp );
+		pSettings->setValue("Sequence", m_bSequence );
 
-	ar << m_bSequence;
-	ar << m_AlphaMin << m_AlphaMax << m_AlphaDelta << m_QInfMin << m_QInfMax << m_QInfDelta;
-	ar << m_ControlMin << m_ControlMax << m_ControlDelta;
+		pSettings->setValue("AlphaMin", m_AlphaMin);
+		pSettings->setValue("AlphaMax", m_AlphaMax);
+		pSettings->setValue("AlphaDelta", m_AlphaDelta);
+		pSettings->setValue("QInfMin", m_QInfMin );
+		pSettings->setValue("QInfMax", m_QInfMax );
+		pSettings->setValue("QInfDelta", m_QInfDelta );
+		pSettings->setValue("ControlMin", m_ControlMin );
+		pSettings->setValue("ControlMax", m_ControlMax );
+		pSettings->setValue("ControlDelta", m_ControlDelta );
 
-	ar << m_3DAxisStyle << m_3DAxisWidth << m_3DAxisColor;
-	ar << m_VLMStyle << m_VLMWidth << m_VLMColor;
-	ar << m_OutlineStyle << m_OutlineWidth << m_OutlineColor;
-	ar << m_XCPStyle << m_XCPWidth << m_XCPColor;
-	ar << m_MomentStyle << m_MomentWidth << m_MomentColor;
-	ar << m_IDragStyle << m_IDragWidth << m_IDragColor;
-	ar << m_VDragStyle << m_VDragWidth << m_VDragColor;
-	ar << m_XTopStyle << m_XTopWidth << m_XTopColor;
-	ar << m_XBotStyle << m_XBotWidth << m_XBotColor;
-	ar << m_DownwashStyle << m_DownwashWidth << m_DownwashColor;
-	ar << m_WakeStyle << m_WakeWidth << m_WakeColor;
-	ar << m_CpColor << m_CpStyle << m_CpWidth;
+		pSettings->setValue("3DAxisStyle", m_3DAxisStyle );
+		pSettings->setValue("3DAXisWidth", m_3DAxisWidth );
+		pSettings->setValue("3DAxisColorRed", m_3DAxisColor.red());
+		pSettings->setValue("3DAxisColorGreen", m_3DAxisColor.green());
+		pSettings->setValue("3DAxisColorBlue", m_3DAxisColor.blue());
+	
+		pSettings->setValue("VLMStyle", m_VLMStyle );
+		pSettings->setValue("VLMWidth", m_VLMWidth );
+		pSettings->setValue("VLMColorRed", m_VLMColor.red());
+		pSettings->setValue("VLMColorGreen", m_VLMColor.green());
+		pSettings->setValue("VLMColorBlue", m_VLMColor.blue());
 
-	ar << CWing::s_CvPrec << CWing::s_RelaxMax << CWing::s_NLLTStations;
+		pSettings->setValue("OutlineStyle", m_OutlineStyle );
+		pSettings->setValue("OutlineWidth", m_OutlineWidth );
+		pSettings->setValue("OutlineColorRed", m_OutlineColor.red());
+		pSettings->setValue("OutlineColorGreen", m_OutlineColor.green());
+		pSettings->setValue("OutlineColorBlue", m_OutlineColor.blue());
 
-	ar << m_iView << m_iWingView << m_iWPlrView;
+		pSettings->setValue("XCPStyle", m_XCPStyle );
+		pSettings->setValue("XCPWidth", m_XCPWidth );
+		pSettings->setValue("XCPColorRed", m_XCPColor.red());
+		pSettings->setValue("XCPColorGreen", m_XCPColor.green() );
+		pSettings->setValue("XCPColorBlue", m_XCPColor.blue() );
 
-	if      (m_pCurWingGraph==&m_WingGraph1) ar <<1;
-	else if (m_pCurWingGraph==&m_WingGraph2) ar <<2;
-	else if (m_pCurWingGraph==&m_WingGraph3) ar <<3;
-	else if (m_pCurWingGraph==&m_WingGraph4) ar <<4;
+		pSettings->setValue("MomentStyle", m_MomentStyle );
+		pSettings->setValue("MomentWidth", m_MomentWidth );
+		pSettings->setValue("MomentColorRed", m_MomentColor.red() );
+		pSettings->setValue("MomentColorGreen", m_MomentColor.green() );
+		pSettings->setValue("MomentColorBlue", m_MomentColor.blue() );
+	
+		pSettings->setValue("IDragStyle", m_IDragStyle );
+		pSettings->setValue("IDragWidth", m_IDragWidth );
+		pSettings->setValue("IDragColorRed", m_IDragColor.red() );
+		pSettings->setValue("IDragColorGreen", m_IDragColor.green() );
+		pSettings->setValue("IDragColorBlue", m_IDragColor.blue() );
+	
+		pSettings->setValue("VDragStyle", m_VDragStyle );
+		pSettings->setValue("VDragWidth", m_VDragWidth );
+		pSettings->setValue("VDragColorRed", m_VDragColor.red() );
+		pSettings->setValue("VDragColorGreen", m_VDragColor.green() );
+		pSettings->setValue("VDragColorBlue", m_VDragColor.blue() );
+	
+		pSettings->setValue("XTopStyle", m_XTopStyle );
+		pSettings->setValue("XTopWidth", m_XTopWidth );
+		pSettings->setValue("XTopColorRed", m_XTopColor.red() );
+		pSettings->setValue("XTopColorGreen", m_XTopColor.green() );
+		pSettings->setValue("XTopColorBlue", m_XTopColor.blue() );
 
-	if      (m_pCurWPlrGraph==&m_WPlrGraph1) ar <<1;
-	else if (m_pCurWPlrGraph==&m_WPlrGraph2) ar <<2;
-	else if (m_pCurWPlrGraph==&m_WPlrGraph3) ar <<3;
-	else if (m_pCurWPlrGraph==&m_WPlrGraph4) ar <<4;
+		pSettings->setValue("XBotStyle", m_XBotStyle );
+		pSettings->setValue("XBotWidth", m_XBotWidth );
+		pSettings->setValue("XBotColorRed", m_XBotColor.red() );
+		pSettings->setValue("XBotColorGreen", m_XBotColor.green() );
+		pSettings->setValue("XBotColorBlue", m_XBotColor.blue() );
+		
+		pSettings->setValue("DownwashStyle", m_DownwashStyle );
+		pSettings->setValue("DownwashWidth", m_DownwashWidth );
+		pSettings->setValue("DownwashColorRed", m_DownwashColor.red() );
+		pSettings->setValue("DownwashColorGreen", m_DownwashColor.green() );
+		pSettings->setValue("DownwashColorBlue", m_DownwashColor.blue() );
 
-	ar << m_Iter << m_NStation ;
-	ar << m_InducedDragPoint;
-	ar << m_NHoopPoints << m_NXPoints;
+		pSettings->setValue("WakeStyle", m_WakeStyle );
+		pSettings->setValue("WakeWidth", m_WakeWidth );
+		pSettings->setValue("WakeColorRed", m_WakeColor.red() );
+		pSettings->setValue("WakeColorGreen", m_WakeColor.green() );
+		pSettings->setValue("WakeColorBlue", m_WakeColor.blue());
+	
+		pSettings->setValue("CpStyle", m_CpStyle );
+		pSettings->setValue("CpWidth", m_CpWidth );
+		pSettings->setValue("CpColorRed", m_CpColor.red() );
+		pSettings->setValue("CpColorGreen", m_CpColor.green() );
+		pSettings->setValue("CpColorBlue", m_CpColor.blue() );
+		
+		pSettings->setValue("CvPrec", CWing::s_CvPrec);
+		pSettings->setValue("RelaxMax", CWing::s_RelaxMax);
+		pSettings->setValue("NLLTStations", CWing::s_NLLTStations);
+		pSettings->setValue("iView", m_iView);
+		pSettings->setValue("iWingView", m_iWingView);
+		pSettings->setValue("iWPlrView", m_iWPlrView);
 
-	m_WingGraph1.Serialize(ar, true);			// the WOpp graphs
-	m_WingGraph2.Serialize(ar, true);
-	m_WingGraph3.Serialize(ar, true);
-	m_WingGraph4.Serialize(ar, true);
-	m_WPlrGraph1.Serialize(ar, true);			// the WPolar graphs
-	m_WPlrGraph2.Serialize(ar, true);
-	m_WPlrGraph3.Serialize(ar, true);
-	m_WPlrGraph4.Serialize(ar, true);
-	m_CpGraph.Serialize(ar, true);
+		if(m_pCurWingGraph==&m_WingGraph1)      k=1;
+		else if(m_pCurWingGraph==&m_WingGraph2) k=2;
+		else if(m_pCurWingGraph==&m_WingGraph3) k=3;
+		else if(m_pCurWingGraph==&m_WingGraph4) k=4;
+		pSettings->setValue("CurrentWingGraph", k);
 
-	ar << m_bXTop << m_bXBot << m_bXCP << m_bXCmRef << m_bICd << m_bVCd;
+		if(m_pCurWPlrGraph==&m_WPlrGraph1)      k=1;
+		else if(m_pCurWPlrGraph==&m_WPlrGraph2) k=2;
+		else if(m_pCurWPlrGraph==&m_WPlrGraph3) k=3;
+		else if(m_pCurWPlrGraph==&m_WPlrGraph4) k=4;
+		pSettings->setValue("CurWPlrGraph", k);
 
-	ar << m_bWakePanels << m_bSurfaces << m_bOutline << m_bVLMPanels;
-	ar << m_bAxes  << m_b3DCp << m_bDownwash << m_bMoments;
-	ar << m_bAutoCpScale << m_bShowCpScale << m_bXTop << m_bXBot << m_bXCP;
-	ar << m_bCurWOppOnly;
+		if(m_iView==WOPPVIEW)        m_pCurGraph=m_pCurWingGraph;
+		else if(m_iView==WPOLARVIEW) m_pCurGraph=m_pCurWPlrGraph;
 
-	ar << m_LiftScale << m_DragScale << m_VelocityScale;
+		pSettings->setValue("Iter", m_Iter);
+		pSettings->setValue("NStation", m_NStation);
+		pSettings->setValue("InducedDragPoint", m_InducedDragPoint);
+		pSettings->setValue("NHoopPoints", m_NHoopPoints);
+		pSettings->setValue("NXPoints", m_NXPoints);
 
-	ar << m_bLogFile << m_bDirichlet << m_bTrefftz << m_bKeepOutOpps << m_bResetWake;
-	ar << m_Iter  << m_WakeInterNodes << m_MaxWakeIter << m_InducedDragPoint;
-	ar << CPanel::m_CtrlPos << CPanel::m_VortexPos << CWing::s_RelaxMax << CWing::s_CvPrec << CWing::s_NLLTStations;
-	ar << m_CoreSize << m_MinPanelSize;
+		pSettings->setValue("LiftScale", m_LiftScale);
+		pSettings->setValue("DragScale", m_DragScale);
+		pSettings->setValue("VelocityScale", m_VelocityScale);
 
-	ar << m_bShowWing2 << m_bShowStab << m_bShowFin;
-	ar << m_bStoreWOpp;
+		pSettings->setValue("WakeInterNodes", m_WakeInterNodes);
+		pSettings->setValue("MaxWakeIter", m_MaxWakeIter);
+		pSettings->setValue("CtrlPos", CPanel::m_CtrlPos);
+		pSettings->setValue("VortexPos", CPanel::m_VortexPos);
+		pSettings->setValue("CoreSize", m_CoreSize);
+		pSettings->setValue("MinPanelSize", m_MinPanelSize);
+ 	}
+	pSettings->endGroup();
 
-	m_GL3dBody.SaveSettings(ar);
+
+	m_WingGraph1.SaveSettings(pSettings);			// the WOpp graphs
+	m_WingGraph2.SaveSettings(pSettings);
+	m_WingGraph3.SaveSettings(pSettings);
+	m_WingGraph4.SaveSettings(pSettings);
+	m_WPlrGraph1.SaveSettings(pSettings);			// the WPolar graphs
+	m_WPlrGraph2.SaveSettings(pSettings);
+	m_WPlrGraph3.SaveSettings(pSettings);
+	m_WPlrGraph4.SaveSettings(pSettings);
+	m_CpGraph.SaveSettings(pSettings);
+
+	m_GLLightDlg.SaveSettings(pSettings);
+	m_GL3dBody.SaveSettings(pSettings);
 
 	return true;
 }

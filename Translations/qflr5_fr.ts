@@ -116,7 +116,7 @@
     </message>
     <message>
         <source>NCrit=</source>
-        <translation type="unfinished">NCrit=</translation>
+        <translation>NCrit=</translation>
     </message>
     <message>
         <source>Forced transitions</source>
@@ -124,11 +124,11 @@
     </message>
     <message>
         <source>Trip Location (top)</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de transition (supérieur)</translation>
     </message>
     <message>
         <source>Trip Location (bottom)</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de transition (inférieur)</translation>
     </message>
     <message>
         <source>Initialize BLs between polars</source>
@@ -192,12 +192,13 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>Store OpPoints</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer les points de fonctionnement</translation>
     </message>
     <message>
         <source>CpCalc: local speed too large 
  Compressibility corrections invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">CpCalc: la vitesse locale est triop grande 
+ Correction de compressibilité non valable </translation>
     </message>
 </context>
 <context>
@@ -251,7 +252,7 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>Frame Only</source>
-        <translation type="unfinished">Seulement les cadres</translation>
+        <translation>Cadre uniquement</translation>
     </message>
     <message>
         <source>Scale Factor</source>
@@ -278,7 +279,7 @@ CPCALC: vitesse locale trop importante
     <name>BodyTransDlg</name>
     <message>
         <source>Frame Only</source>
-        <translation type="unfinished">Cadre seulement</translation>
+        <translation>Cadre uniquement</translation>
     </message>
     <message>
         <source>X Translation</source>
@@ -417,7 +418,7 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>CpScale Settings</source>
-        <translation type="unfinished">Paramètres de CpScale</translation>
+        <translation>Paramètres de CpScale</translation>
     </message>
     <message>
         <source>Auto Scales</source>
@@ -508,7 +509,7 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>Control Name</source>
-        <translation type="unfinished">Nom du contrôle</translation>
+        <translation>Nom du contrôle</translation>
     </message>
     <message>
         <source>Active (1/0)</source>
@@ -560,7 +561,7 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>XCmRef (</source>
-        <translation type="unfinished"></translation>
+        <translation>XCmRef (</translation>
     </message>
     <message>
         <source>Wing Tilt (</source>
@@ -866,11 +867,11 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>TripLocation (top)</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de transition (supérieur)</translation>
     </message>
     <message>
         <source>TripLocation (bot)</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de transition (inférieur)</translation>
     </message>
     <message>
         <source>Analysis parameters for </source>
@@ -1517,10 +1518,6 @@ Réduisez la taille du maillage</translation>
         <translation>Coef moment tangage profil</translation>
     </message>
     <message>
-        <source>Geom. Pitching moment coef.</source>
-        <translation type="obsolete">Coef moment tangage géométr.</translation>
-    </message>
-    <message>
         <source>Total Pitching moment coef.</source>
         <translation>Coef moment total tangage</translation>
     </message>
@@ -1858,11 +1855,11 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Viscous pitching moment coef.</source>
-        <translation type="unfinished"></translation>
+        <translation>Coefficient de moment de tangage visqueux</translation>
     </message>
     <message>
         <source>Induced pitching moment coef.</source>
-        <translation type="unfinished"></translation>
+        <translation>Coefficient de moment de tangage induit</translation>
     </message>
 </context>
 <context>
@@ -1911,26 +1908,6 @@ Réduisez la taille du maillage</translation>
         <translation>Description</translation>
     </message>
     <message>
-        <source>This is a calculation form for the inertia tensor. Refer to the Guidelines for explanations.</source>
-        <translation type="obsolete">Ceci est un calcul du tenseur d’inertie. Veuillez vous référer au Guidelines pour les explications.</translation>
-    </message>
-    <message>
-        <source>The results are used in stability calculations.</source>
-        <translation type="obsolete">Le résultat est utilisé pour les calculs de stabilité.</translation>
-    </message>
-    <message>
-        <source>Input Type for Inertias</source>
-        <translation type="obsolete">Entrer le type des inerties</translation>
-    </message>
-    <message>
-        <source>XFLR5 ROM estimate</source>
-        <translation type="obsolete">Rstimation XFLR5 ROM</translation>
-    </message>
-    <message>
-        <source>User Input</source>
-        <translation type="obsolete">Entrée utilisateur</translation>
-    </message>
-    <message>
         <source>Reference Point</source>
         <translation>Point de référence</translation>
     </message>
@@ -1948,35 +1925,23 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Additional Point Masses:</source>
-        <translation type="unfinished">Masse ponctuelles supplémentaires :</translation>
-    </message>
-    <message>
-        <source>Inertias : Object only, without point masses</source>
-        <translation type="obsolete">Inerties : objet uniquement, sans masses ponctuelles</translation>
+        <translation>Masses ponctuelles supplémentaires :</translation>
     </message>
     <message>
         <source>Export to AVL</source>
         <translation>Exporter ves AVL</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">Accepter</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Abandonner</translation>
-    </message>
-    <message>
         <source>This is a calculation form for a rough order of magnitude for the inertia tensor. The results are used in stability calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>C’est un formulaire de calcul pour un ordre de grandeur du tenseur d’inertie. Les résultats sont utilisés dans les calculs de stabilité.</translation>
     </message>
     <message>
         <source>Refer to the Guidelines for explanations.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vous référer que Guidelines pour des explications.</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
+        <translation>Fermer</translation>
     </message>
 </context>
 <context>
@@ -2092,7 +2057,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Blending Distance from L.E.</source>
-        <translation type="unfinished">Distance de mélange depuis le BA</translation>
+        <translation>Distance de transition depuis le BA</translation>
     </message>
     <message>
         <source>% chord</source>
@@ -2965,7 +2930,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Cl vs. Cd 	(1)</source>
-        <translation type="unfinished">Cz  en fonction de. Cx 	(1)</translation>
+        <translation>Cz  en fonction de. Cx 	(1)</translation>
     </message>
     <message>
         <source>Cl vs.Alpha 	(2)</source>
@@ -3401,7 +3366,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Kinematic Shape Parameter</source>
-        <translation type="unfinished">Paramètre cinématique de la forme</translation>
+        <translation type="unfinished">Paramètre cinématique de forme</translation>
     </message>
     <message>
         <source>Show Q-Spec</source>
@@ -3453,24 +3418,25 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Define Inertia</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Define an Analysis 	(F6)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Define a Control Analysis 	(Ctrl+F6)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Batch Analysis 	(Shift+F6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir l’inertie</translation>
     </message>
     <message>
         <source>A foil of that name already exists
 Please enter a new name</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Il existe déjà un profil portant ce nom
+Veuilez entrer un autre nom</translation>
+    </message>
+    <message>
+        <source>Define an Analysis 	(F6)</source>
+        <translation>Définir une analyse 	(F6)</translation>
+    </message>
+    <message>
+        <source>Define a Control Analysis 	(Ctrl+F6)</source>
+        <translation>Définir une analyse de contrôle 	(Ctrl+F6)</translation>
+    </message>
+    <message>
+        <source>Batch Analysis 	(Shift+F6)</source>
+        <translation>Analyse par lots 	(Shift+F6)</translation>
     </message>
 </context>
 <context>
@@ -3918,7 +3884,7 @@ Il faut résuire le nombre de panneaux d’aile</translation>
     </message>
     <message>
         <source>Plane Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Description de l’avion</translation>
     </message>
 </context>
 <context>
@@ -3995,10 +3961,6 @@ Il faut résuire le nombre de panneaux d’aile</translation>
     <message>
         <source>Alpha</source>
         <translation>Alpha</translation>
-    </message>
-    <message>
-        <source>GCm</source>
-        <translation type="obsolete">GCm</translation>
     </message>
     <message>
         <source>Cl/Cd</source>
@@ -4090,7 +4052,7 @@ Pousuivre néanmoins ?</translation>
     </message>
     <message>
         <source>CP x-Pos %</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pos x CP %</translation>
     </message>
     <message>
         <source>BM (</source>
@@ -4768,7 +4730,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Init LLT</source>
-        <translation type="unfinished"></translation>
+        <translation>Initialisation LLT</translation>
     </message>
     <message>
         <source>Style</source>
@@ -4792,7 +4754,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Cm total</source>
-        <translation type="unfinished"></translation>
+        <translation>Cm total</translation>
     </message>
     <message>
         <source>VCm</source>
@@ -4887,23 +4849,23 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Wing</source>
-        <translation type="unfinished"></translation>
+        <translation>Aile</translation>
     </message>
     <message>
         <source>2nd Wing</source>
-        <translation type="unfinished"></translation>
+        <translation>2ème aile</translation>
     </message>
     <message>
         <source>Elevator</source>
-        <translation type="unfinished">Stabilisateur horizontal</translation>
+        <translation>Stabilisateur horizontal</translation>
     </message>
     <message>
         <source>Fin</source>
-        <translation type="unfinished">Dérive</translation>
+        <translation>Dérive</translation>
     </message>
     <message>
         <source>Plane Name</source>
-        <translation type="unfinished">Nom de l’avion</translation>
+        <translation>Nom de l’avion</translation>
     </message>
 </context>
 <context>
@@ -4958,7 +4920,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Top Shear eq</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eq. cisaillement supérieur</translation>
     </message>
     <message>
         <source>Bot Shear</source>
@@ -4966,7 +4928,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Bot Shear eq</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eq. cisaillement inférieur</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the Operating Point 
@@ -5668,7 +5630,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Blending Distance from L.E.</source>
-        <translation type="unfinished">Distance de mélange depuis le BA</translation>
+        <translation>Distance de transition depuis le BA</translation>
     </message>
     <message>
         <source>Unrecognized foil format</source>
@@ -5746,11 +5708,11 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Panel Bunching Parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>Facteur de regroupement des panneaux</translation>
     </message>
     <message>
         <source>TE/LE Panel Density Ratio</source>
-        <translation type="unfinished">Rapport de densité des panneaux bord de fuite/bord d’attaque</translation>
+        <translation>Rapport de densité des panneaux BF / BA</translation>
     </message>
     <message>
         <source>Refined area/LE Panel Density Ratio</source>
@@ -5758,11 +5720,11 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Top Side Refined Area x/c limits</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limites x/c des surfaces améliorées de la partie supérieure </translation>
     </message>
     <message>
         <source>Bottom Side Refined Area x/c limits</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Limites x/c des surfaces améliorées de la partie inférieure</translation>
     </message>
     <message>
         <source>Unrecognized foil format</source>
@@ -6107,11 +6069,11 @@ Les cadres ont un nombre de points par face différent</translation>
     </message>
     <message>
         <source>Tilt. Geom.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angle d’inclinaison</translation>
     </message>
     <message>
         <source>Wake Roll-up</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbulence de sillage</translation>
     </message>
     <message>
         <source>Wake...</source>
