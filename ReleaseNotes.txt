@@ -1,4 +1,4 @@
-	
+﻿	
 *******************************************************************************
 
 
@@ -13,6 +13,10 @@
 
 
 *******************************************************************************
+
+
+QFLR5 v0.03b Beta October 28th, 2009
+	- Fixed a bug which prevented polars from being stored during a foil batch analysis
 
 
 QFLR5 v0.03 Beta October 25th, 2009
