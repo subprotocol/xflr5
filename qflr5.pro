@@ -227,4 +227,3 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
-OTHER_FILES += mac/Info.plist

@@ -113,8 +113,11 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	if(LoadSettings())
 	{
-
-		QSettings settings(QSettings::IniFormat, QSettings::UserScope, "QFLR5");
+#ifdef Q_WS_MAC
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+#else
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#endif
 
 		m_RefGraph.LoadSettings(&settings);
 
@@ -2960,8 +2963,11 @@ bool MainFrame::LoadSettings()
 	int a;
 	QString strange;
 
-	QSettings settings(QSettings::IniFormat, QSettings::UserScope, "QFLR5");
-
+#ifdef Q_WS_MAC
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+#else
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#endif
 	settings.beginGroup("MainFrame");
 	{
 		m_StyleName = settings.value("StyleName","").toString();
@@ -3716,7 +3722,11 @@ void MainFrame::OnResetSettings()
 	if(resp == QMessageBox::Yes)
 	{
 		QMessageBox::warning(this,tr("Default Settings"), tr("The settings will be reset at the next session"));
-		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#ifdef Q_WS_MAC
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+#else
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#endif
 		settings.clear();
 		// do not save on exit
 		m_bSaveSettings = false;
@@ -4596,8 +4606,11 @@ void MainFrame::SaveSettings()
 	QString FileName;
 
 	if(!m_bSaveSettings) return;
-
+#ifdef Q_WS_MAC
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+#else
 	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#endif
 	settings.beginGroup("MainFrame");
 	{
 		settings.setValue("FrameGeometryx", frameGeometry().x());
@@ -5895,7 +5908,7 @@ void MainFrame::UpdateWOpps()
 	CPOpp *pPOpp;
 	int i;
 	QString strong, str;
-	m_pctrlWOpp->clear();
+        m_pctrlWOpp->clear();
 
 	CPlane  *pCurPlane   = pMiarex->m_pCurPlane;
 	CWing   *pCurWing    = pMiarex->m_pCurWing;
