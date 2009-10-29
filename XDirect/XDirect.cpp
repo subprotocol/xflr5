@@ -87,7 +87,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_bType2          = true;
 	m_bType3          = true;
 	m_bType4          = true;
-	m_bPressure       = true;
+	m_bPressure       = false;
 	m_bBL             = false;
 	m_bFromList       = false;
 	m_bFromZero       = false;
@@ -419,7 +419,7 @@ void QXDirect::AddOpData(OpPoint *pOpPoint)
 
 
 
-OpPoint* QXDirect::AddOpPoint(CPolar *pPolar)
+OpPoint* QXDirect::AddOpPoint(CPolar *pPolar, bool bStoreOpp)
 {
 	// adds an Operating Point to the array from XFoil results
 	MainFrame*pMainFrame = (MainFrame*)m_pMainFrame;
@@ -448,7 +448,7 @@ OpPoint* QXDirect::AddOpPoint(CPolar *pPolar)
 		pMainFrame->SetSaveState(false);
 	}
 
-	if(m_bStoreOpp)
+	if(bStoreOpp)
 	{
 		//insert the OpPoint in the Operating points array
 		InsertOpPoint(pNewPoint);
@@ -1883,6 +1883,11 @@ void QXDirect::OnBatchAnalysis()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!g_pCurFoil) 		return;
+
+	m_bPolar = true;
+	OnPolars();
+	UpdateView();
+
 	BatchDlg BDlg;
 	BDlg.move(pMainFrame->m_DlgPos);
 	BDlg.m_pFoil     = g_pCurFoil;

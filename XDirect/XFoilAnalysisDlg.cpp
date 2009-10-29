@@ -142,7 +142,7 @@ void XFoilAnalysisDlg::accept()
 void XFoilAnalysisDlg::AddOpPoint()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	pXDirect->AddOpPoint();
+	pXDirect->AddOpPoint(NULL, pXDirect->m_bStoreOpp);
 	if(pXDirect->m_bPolar)
 	{
 		pXDirect->CreatePolarCurves();

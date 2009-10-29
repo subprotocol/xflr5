@@ -248,7 +248,9 @@ void BatchDlg::SetLayout()
 void BatchDlg::AddOpPoint()
 {
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	pXDirect->AddOpPoint(m_pCurPolar);
+	XFoil *pXFoil = (XFoil*)s_pXFoil;
+	if(s_bStoreOpp)	pXDirect->AddOpPoint(m_pCurPolar, true);
+	else            m_pCurPolar->AddData(pXFoil);
 	if(pXDirect->m_bPolar)
 	{
 		pXDirect->CreatePolarCurves();
@@ -339,7 +341,7 @@ void BatchDlg::AlphaLoop()
 					str =QString("   ...converged after %1 iterations\r\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
-					if(s_bStoreOpp) AddOpPoint();
+					AddOpPoint();
 //					m_pCurPolar->AddData(pXFoil);
 				}
 				else if(m_bSkipPoint || m_bSkipPolar)
@@ -1199,7 +1201,7 @@ void BatchDlg::ReLoop()
 						str = QString("   ...converged after %1 iterations\n").arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
-						if(s_bStoreOpp) AddOpPoint();
+						AddOpPoint();
 //						m_pCurPolar->AddData(pXFoil);
 					}
 					else if(m_bSkipPoint || m_bSkipPolar)
