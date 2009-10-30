@@ -40,8 +40,12 @@ int main(int argc, char *argv[])
 	c=800;
 	d=500;
 
-	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
-	bool bMaximized = true;
+#ifdef Q_WS_MAC
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+#else
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+#endif
+        bool bMaximized = true;
 	bool bOK;
 	settings.beginGroup("MainFrame");
 	{
