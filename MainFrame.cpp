@@ -1474,9 +1474,9 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlUFO->setMinimumWidth(200);
 	m_pctrlWPolar->setMinimumWidth(200);
 	m_pctrlWOpp->setMinimumWidth(30);
-	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
-	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
-	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
+//	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
+//	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
+//	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);
@@ -1535,6 +1535,9 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlFoil->setMinimumWidth(200);
 	m_pctrlPolar->setMinimumWidth(200);
 	m_pctrlOpPoint->setMinimumWidth(30);
+//	m_pctrlFoil->setInsertPolicy(QComboBox::InsertAlphabetically);
+//	m_pctrlPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
+//	m_pctrlOpPoint->setInsertPolicy(QComboBox::InsertAlphabetically);
 
 	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
 	m_pctrlXDirectToolBar->addAction(newProjectAct);
@@ -1551,7 +1554,6 @@ void MainFrame::CreateXDirectToolbar()
 	connect(m_pctrlFoil,    SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil(int)));
 	connect(m_pctrlPolar,   SIGNAL(activated(int)), this, SLOT(OnSelChangePolar(int)));
 	connect(m_pctrlOpPoint, SIGNAL(activated(int)), this, SLOT(OnSelChangeOpp(int)));
-
 }
 
 
@@ -1994,7 +1996,6 @@ void MainFrame::CreateXDirectMenus()
 	CurFoilCtxMenu->addAction(hideFoilOpps);
 	CurFoilCtxMenu->addAction(deleteFoilOpps);
 
-
 	OperFoilCtxMenu->addSeparator();//_______________
 	CurPolarCtxMenu = OperFoilCtxMenu->addMenu(tr("Current Polar"));
 	CurPolarCtxMenu->addAction(editCurPolar);
@@ -2047,6 +2048,9 @@ void MainFrame::CreateXDirectMenus()
 	CurFoilCtxMenu->addAction(deleteFoilPolars);
 	CurFoilCtxMenu->addAction(saveFoilPolars);
 	CurFoilCtxMenu->addSeparator();
+	CurFoilCtxMenu->addAction(showFoilOpps);
+	CurFoilCtxMenu->addAction(hideFoilOpps);
+	CurFoilCtxMenu->addAction(deleteFoilOpps);
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurPolarCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Polar"));
 	CurPolarCtxMenu->addAction(editCurPolar);
@@ -2054,6 +2058,10 @@ void MainFrame::CreateXDirectMenus()
 	CurPolarCtxMenu->addAction(deletePolar);
 	CurPolarCtxMenu->addAction(RenamePolarAct);
 	CurPolarCtxMenu->addAction(exportCurPolar);
+	CurPolarCtxMenu->addSeparator();
+	CurPolarCtxMenu->addAction(showPolarOpps);
+	CurPolarCtxMenu->addAction(hidePolarOpps);
+	CurPolarCtxMenu->addAction(deletePolarOpps);
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Graph"));
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
@@ -2777,7 +2785,7 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 			{
 				if(pCurPolar->m_Type !=4)
 				{
-					if(fabs(pOpPoint->Alpha - Alpha) <0.01)
+					if(fabs(pOpPoint->Alpha - Alpha) <0.001)
 					{
 						return pOpPoint;
 					}
@@ -4726,6 +4734,7 @@ bool MainFrame::SelectPolar(CPolar *pPolar)
 	return false;
 }
 
+
 bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 {
 	//Selects pOpp in the combobox and returns true
@@ -4741,7 +4750,7 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 		if(pCurPlr->m_Type !=4)
 		{
 			alpha = m_pctrlOpPoint->itemText(i).toDouble();
-			if(fabs(alpha-pOpp->Alpha)<0.01)
+			if(fabs(alpha-pOpp->Alpha)<0.001)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
 				return true;
@@ -4759,6 +4768,7 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 	}
 	return false;
 }
+
 
 bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 {
@@ -5934,7 +5944,9 @@ void MainFrame::UpdateWOpps()
 				size++;
 			}
 		}
-		if (size){// if any
+		if (size)
+		{
+			// if any
 			m_pctrlWOpp->setEnabled(true);
 			for (int i=0; i<m_oaPOpp.size(); i++)
 			{
@@ -6181,7 +6193,7 @@ void MainFrame::UpdateOpps()
 	QString strong, str;
 	m_pctrlOpPoint->clear();
 
-//	g_pCurFoil = g_pCurFoil;
+
 	CPolar *pCurPlr    = pXDirect->m_pCurPolar;
 
 	if (!g_pCurFoil || !g_pCurFoil->m_FoilName.length() || !pCurPlr  || !pCurPlr->m_PlrName.length())
@@ -6213,7 +6225,7 @@ void MainFrame::UpdateOpps()
 			{
 				if (pCurPlr->m_Type !=4)
 				{
-					if(fabs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
+//					if(fabs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
 					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
 					m_pctrlOpPoint->addItem(str);
 				}

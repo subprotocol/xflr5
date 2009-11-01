@@ -77,6 +77,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_bShowPanels     = false;
 	m_bShowUserGraph  = true;
 	m_bSequence       = false;
+	m_bHighlightOpp   = false;
 
 	m_bXPressed = m_bYPressed = false;
 
@@ -535,6 +536,7 @@ void QXDirect::CheckButtons()
 	m_pctrlShowBL->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlAnimate->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlAnimateSpeed->setEnabled(!m_bPolar && m_pCurOpp);
+	m_pctrlHighlightOpp->setEnabled(m_bPolar);
 
 	pMainFrame->currentFoilMenu->setEnabled(g_pCurFoil);
 	pMainFrame->CurFoilDesignMenu->setEnabled(g_pCurFoil);
@@ -597,6 +599,7 @@ void QXDirect::Connect()
 	connect(m_pctrlStoreOpp, SIGNAL(clicked()), this, SLOT(OnStoreOpp()));
 	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowPoints()));
 	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
+	connect(m_pctrlHighlightOpp, SIGNAL(clicked()), this, SLOT(OnHighlightOpp()));
 
 	connect(m_pctrlAnimate, SIGNAL(clicked(bool)), this, SLOT(OnAnimate(bool)));
 	connect(m_pctrlAnimateSpeed, SIGNAL(sliderMoved(int)), this, SLOT(OnAnimateSpeed(int)));
@@ -931,6 +934,8 @@ void QXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 	double fx = 1.0;
 	double fy = 1.0;
 
+	pCurve->SetSelected(-1);
+
 	if(XVar == 3) fx = 10000.0;
 	if(YVar == 3) fy = 10000.0;
 
@@ -964,6 +969,18 @@ void QXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 			else
 			{
 				pCurve->AddPoint((*pX)[i]*fx, (*pY)[i]*fy);
+			}
+		}
+		if(m_pCurOpp && m_bHighlightOpp)
+		{
+			if(fabs(pPolar->m_Alpha[i]-m_pCurOpp->Alpha)<0.0001)
+			{
+				if(pPolar->m_PlrName==m_pCurOpp->m_strPlrName
+				   && g_pCurFoil->m_FoilName==pPolar->m_FoilName)
+				{
+//qDebug() <<g_pCurFoil->m_FoilName<< m_pCurOpp->m_strPlrName;
+					pCurve->SetSelected(i);
+				}
 			}
 		}
 	}
@@ -1242,7 +1259,7 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 					bIsInserted = true;
 					i = m_poaOpp->size();// to break
 				}
-				else if (pNewPoint->Alpha < pOpPoint->Alpha)
+				else if (pNewPoint->Alpha > pOpPoint->Alpha)
 				{
 					//insert point
 					m_poaOpp->insert(i, pNewPoint);
@@ -1415,6 +1432,7 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_bShowInviscid   = pSettings->value("ShowInviscid").toBool();
 		m_bCpGraph        = pSettings->value("ShowCpGraph").toBool();
 		m_bSequence       = pSettings->value("Sequence").toBool();
+		m_bHighlightOpp   = pSettings->value("HighlightOpp").toBool();
 
 		r = pSettings->value("BLColorRed").toInt();
 		g = pSettings->value("BLColorGreen").toInt();
@@ -1845,6 +1863,9 @@ void QXDirect::OnAnalyze()
 
 	ReadParams();
 
+	bool bHigh = m_bHighlightOpp;
+	m_bHighlightOpp = false;
+
 	m_XFdlg.SetAlpha(m_Alpha, m_AlphaMax, m_AlphaDelta);
 	m_XFdlg.SetCl(m_Cl, m_ClMax, m_ClDelta);
 	m_XFdlg.SetRe(m_Reynolds, m_ReynoldsMax, m_ReynoldsDelta);
@@ -1871,6 +1892,8 @@ void QXDirect::OnAnalyze()
 	pMainFrame->UpdateOpps();
 
 	SetOpp();
+
+	m_bHighlightOpp = bHigh;
 
 	if(m_bPolar) CreatePolarCurves();
 
@@ -3166,6 +3189,21 @@ void QXDirect::OnGraphSettings()
 }
 
 
+void QXDirect::OnHighlightOpp()
+{
+	if(!m_bPolar) return;
+
+	m_bHighlightOpp = m_pctrlHighlightOpp->isChecked();
+	m_pPolarGraph->m_bHighlightPoint = m_bHighlightOpp;
+	m_pCmGraph->m_bHighlightPoint = m_bHighlightOpp;
+	m_pCzGraph->m_bHighlightPoint = m_bHighlightOpp;
+	m_pTrGraph->m_bHighlightPoint = m_bHighlightOpp;
+	m_pUserGraph->m_bHighlightPoint = m_bHighlightOpp;
+
+	CreatePolarCurves();
+	UpdateView();
+}
+
 
 void QXDirect::OnHPlot()
 {
@@ -4102,10 +4140,11 @@ void QXDirect::OnResetGraphLegend()
 void QXDirect::OnResetCurPolar()
 {
 	if(!m_pCurPolar) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_pCurPolar->ResetPolar();
 
 	OpPoint*pOpp;
-	for(int i=0; i< m_poaOpp->size();i++)
+	for(int i=m_poaOpp->size()-1;i>=0;i--)
 	{
 		pOpp = (OpPoint*)m_poaOpp->at(i);
 		if(pOpp->m_strFoilName==g_pCurFoil->m_FoilName && pOpp->m_strPlrName==m_pCurPolar->m_PlrName)
@@ -4116,11 +4155,13 @@ void QXDirect::OnResetCurPolar()
 	}
 	m_pCurOpp = NULL;
 
+	pMainFrame->UpdateOpps();
+
 	if(m_bPolar) CreatePolarCurves();
 	else         CreateOppCurves();
 	UpdateView();
-
 }
+
 
 void QXDirect::OnResetXFoil()
 {
@@ -5473,6 +5514,7 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("ShowInviscid", m_bShowInviscid);
 		pSettings->setValue("ShowCpGraph", m_bCpGraph);
 		pSettings->setValue("Sequence", m_bSequence);
+		pSettings->setValue("HighlightOpp",m_bHighlightOpp);
 		pSettings->setValue("BLColorRed", m_crBLColor.red());
 		pSettings->setValue("BLColorGreen",m_crBLColor.green());
 		pSettings->setValue("BLColorBlue", m_crBLColor.blue());
@@ -6021,7 +6063,7 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 	// else set the comboBox's first, if any
 	// else set it to NULL
 	OpPoint * pOpp = NULL;
-	MainFrame* pFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong;
 
 	if(!g_pCurFoil)  return NULL;
@@ -6033,33 +6075,38 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 		else
 		{
 			//try to get one from the combobox
-			if(pFrame->m_pctrlOpPoint->count())
+			if(pMainFrame->m_pctrlOpPoint->count())
 			{
 				QString strong;
 				bool bOK;
-				int sel = pFrame->m_pctrlOpPoint->currentIndex();
-				if (sel>=0) strong = pFrame->m_pctrlOpPoint->itemText(sel);
+				int sel = pMainFrame->m_pctrlOpPoint->currentIndex();
+				if (sel>=0) strong = pMainFrame->m_pctrlOpPoint->itemText(sel);
 				Alpha = strong.toFloat(&bOK);
 				if(!bOK) pOpp = NULL;
-				else     pOpp = pFrame->GetOpp(Alpha);
+				else     pOpp = pMainFrame->GetOpp(Alpha);
 			}
 			else pOpp = NULL;
 		}
 	}
 	else
 	{
-		pOpp = pFrame->GetOpp(Alpha);
+		pOpp = pMainFrame->GetOpp(Alpha);
 	}
 
 
 	if(pOpp) 
 	{
 		//set it
-		pFrame->SelectOpPoint(pOpp);//to Combobox
+		pMainFrame->SelectOpPoint(pOpp);//to Combobox
 	}
 	m_pCurOpp = pOpp;
 
 	if(!m_bPolar) CreateOppCurves();
+	else
+	{
+		if(m_bHighlightOpp) CreatePolarCurves();
+	}
+
 
 //	m_posAnimate = pFrame->m_pctrlOpp.GetCurSel(); //TODO
 	SetCurveParams();
@@ -6286,6 +6333,7 @@ void QXDirect::SetPolarLegendPos()
 
 void QXDirect::SetupLayout()
 {
+	setAttribute(Qt::WA_AlwaysShowToolTips);
 	QHBoxLayout *SpecVarsBox = new QHBoxLayout;
 
 	m_pctrlSpec1 = new QRadioButton("a");
@@ -6356,6 +6404,8 @@ void QXDirect::SetupLayout()
 	QVBoxLayout *DisplayGroup = new QVBoxLayout;
 	m_pctrlShowBL        = new QCheckBox(tr("Show BL"));
 	m_pctrlShowPressure  = new QCheckBox(tr("Show Pressure"));
+	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight Current OpPoint"));
+	m_pctrlHighlightOpp->setStatusTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
 	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
@@ -6367,6 +6417,7 @@ void QXDirect::SetupLayout()
 	DisplayGroup->addWidget(m_pctrlShowPressure);
 	DisplayGroup->addWidget(m_pctrlAnimate);
 	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
+	DisplayGroup->addWidget(m_pctrlHighlightOpp);
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(DisplayGroup);
 

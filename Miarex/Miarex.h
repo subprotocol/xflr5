@@ -114,6 +114,7 @@ private slots:
 	void OnCurveStyle(int index);
 	void OnCurveWidth(int index);
 	void OnCurveColor();
+	void OnHighlightOpp();
 	void OnShowPoints();
 	void OnShowCurve();
 	void OnSingleWPlrGraph1();
@@ -374,8 +375,9 @@ private:
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;
 
-	QCheckBox *m_pctrlHalfWing, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans,  *m_pctrlAnimate;
+	QCheckBox *m_pctrlHalfWing, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans, *m_pctrlAnimate;
 	QSlider *m_pctrlAnimateSpeed;
+	QCheckBox *m_pctrlHighlightOpp;
 	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
 
 	QCheckBox *m_pctrlShowCurve;
@@ -411,6 +413,7 @@ private:
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
 	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
+	bool m_bHighlightOpp;
 
 	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
 	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed

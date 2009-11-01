@@ -54,6 +54,7 @@ private:
 private slots:
 	void OnOK();
 	void OnArea();
+	void OnEditingFinished();
 	void OnViscous();
 	void OnType();
 	void OnUnit();

@@ -156,6 +156,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bSetNewWake     = true;
 	m_bSequence       = false;
 
+	m_bHighlightOpp = false;
+
 	m_nWakeNodes = 0;
 	m_WakeSize   = 0;
 	m_LastPoint.setX(0);
@@ -594,6 +596,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlDownwash, SIGNAL(clicked()), this, SLOT(OnDownwash()));
 	connect(m_pctrlStream, SIGNAL(clicked()), this, SLOT(OnStreamlines()));
 	connect(m_pctrlSurfVel, SIGNAL(clicked()), this, SLOT(OnSurfaceSpeeds()));
+	connect(m_pctrlHighlightOpp, SIGNAL(clicked()), this, SLOT(OnHighlightOpp()));
 
 	connect(m_pctrlAnimate, SIGNAL(clicked()), this, SLOT(OnAnimate()));
 	connect(m_pctrlAnimateSpeed, SIGNAL(sliderMoved(int)), this, SLOT(OnAnimateSpeed(int)));
@@ -1588,6 +1591,7 @@ void QMiarex::CheckButtons()
 	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
 	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
 	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
+	m_pctrlHighlightOpp->setEnabled(m_iView==WPOLARVIEW);
 
 	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
 	pMainFrame->EditCurBody->setEnabled(m_pCurBody);
@@ -1600,6 +1604,7 @@ void QMiarex::CheckButtons()
 	pMainFrame->currentUFOMenu->setEnabled(m_pCurWing);
 	pMainFrame->CurWPlrMenu->setEnabled(m_pCurWPolar);
 	pMainFrame->CurWOppMenu->setEnabled(m_pCurWOpp);
+
 }
 
 
@@ -4091,11 +4096,16 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 	bool bAdd;
 	int i;
 	double x,y;
+	static QString UFOName;
+	if(m_pCurPlane)     UFOName=m_pCurPlane->m_PlaneName;
+	else if(m_pCurWing) UFOName=m_pCurWing->m_WingName;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QList <double> *pX;
 	QList <double> *pY;
 	pX = (QList <double> *) GetUFOPlrVariable(pWPolar, XVar);
 	pY = (QList <double> *) GetUFOPlrVariable(pWPolar, YVar);
+
+	pCurve->SetSelected(-1);
 
 	for (i=0; i<pWPolar->m_Alpha.size(); i++)
 	{
@@ -4120,7 +4130,25 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 		if(XVar==26)                          x *= pMainFrame->m_NmtoUnit;//moment
 		if(YVar==26)                          y *= pMainFrame->m_NmtoUnit;//moment
 
-		if(bAdd) pCurve->AddPoint(x,y);
+		if(bAdd)
+		{
+			pCurve->AddPoint(x,y);
+			if(m_pCurWOpp && m_bHighlightOpp)
+			{
+				if(fabs(pWPolar->m_Alpha[i]-m_pCurWOpp->m_Alpha)<0.0001)
+				{
+					if(m_pCurPOpp && m_pCurPlane
+					   && pWPolar->m_UFOName==m_pCurPlane->m_PlaneName
+					   && m_pCurPOpp->m_PlrName ==pWPolar->m_PlrName)
+						pCurve->SetSelected(i);
+					else if(m_pCurWOpp && m_pCurWing
+							&& pWPolar->m_UFOName==m_pCurWing->m_WingName
+							&& m_pCurWOpp->m_PlrName ==pWPolar->m_PlrName)
+						pCurve->SetSelected(i);
+
+				}
+			}
+		}
 	}
 }
 
@@ -9861,7 +9889,9 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F6:
 		{
-			OnDefineWPolar();
+
+			if (event->modifiers().testFlag(Qt::ControlModifier)) OnDefineCtrlPolar();
+			else                                                  OnDefineWPolar();
 			break;
 		}
 		case Qt::Key_F8:
@@ -9979,6 +10009,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bShowFin      = pSettings->value("ShowFin").toBool();
 		m_bStoreWOpp    = pSettings->value("StoreWOpp").toBool();
 		m_bSequence     = pSettings->value("Sequence").toBool();
+		m_bHighlightOpp = pSettings->value("HighlightOpp").toBool();
 
 		m_AlphaMin      = pSettings->value("AlphaMin").toDouble();
 		m_AlphaMax      = pSettings->value("AlphaMax").toDouble();
@@ -10816,6 +10847,9 @@ void QMiarex::OnAnalyze()
 {
 	int l;
 	double V0, VMax, VDelta;
+	bool bHigh = m_bHighlightOpp;
+	m_bHighlightOpp = false;
+
 	if(!m_pCurWing)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Please define a wing or a plane object before running a calculation"));
@@ -10921,6 +10955,10 @@ void QMiarex::OnAnalyze()
 	{
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
+
+	m_bHighlightOpp = bHigh;
+	if(m_iView==WPOLARVIEW) CreateWPolarCurves();
+	UpdateView();
 	CheckButtons();
 }
 
@@ -12829,6 +12867,21 @@ void QMiarex::OnHideUFOWPolars()
 
 
 
+void QMiarex::OnHighlightOpp()
+{
+	if(m_iView!=WPOLARVIEW) return;
+	m_bHighlightOpp = m_pctrlHighlightOpp->isChecked();
+	m_WPlrGraph1.m_bHighlightPoint = m_bHighlightOpp;
+	m_WPlrGraph2.m_bHighlightPoint = m_bHighlightOpp;
+	m_WPlrGraph3.m_bHighlightPoint = m_bHighlightOpp;
+	m_WPlrGraph4.m_bHighlightPoint = m_bHighlightOpp;
+
+	CreateWPolarCurves();
+	UpdateView();
+}
+
+
+
 void QMiarex::OnImportBody()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -13468,9 +13521,6 @@ void QMiarex::OnRenameCurUFO()
 
 
 
-
-
-
 void QMiarex::OnResetCpSection()
 {
 	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
@@ -13483,17 +13533,53 @@ void QMiarex::OnResetCpSection()
 void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
 	QString strong = tr("Are you sure you want to reset the content of the polar :\n")+  m_pCurWPolar->m_PlrName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
 	m_pCurWPolar->ResetWPlr();
+
+	CPOpp *pPOpp;
+	CWOpp *pWOpp;
+	if(m_pCurPlane)
+	{
+		for(int i=m_poaPOpp->size()-1;i>=0;i--)
+		{
+			pPOpp = (CPOpp*)m_poaPOpp->at(i);
+			if(pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName && pPOpp->m_PlrName==m_pCurWPolar->m_PlrName)
+			{
+				m_poaPOpp->removeAt(i);
+				delete pPOpp;
+			}
+		}
+	}
+	else if(m_pCurWing)
+	{
+		for(int i=m_poaWOpp->size()-1;i>=0;i--)
+		{
+			pWOpp = (CWOpp*)m_poaWOpp->at(i);
+			if(pWOpp->m_WingName==m_pCurWing->m_WingName && pWOpp->m_PlrName==m_pCurWPolar->m_PlrName)
+			{
+				m_poaWOpp->removeAt(i);
+				delete pWOpp;
+			}
+		}
+	}
+	m_pCurPOpp = NULL;
+	m_pCurWOpp = NULL;
+
+	pMainFrame->UpdateWOpps();
+
 	if(m_iView==WPOLARVIEW)
 	{
 		CreateWPolarCurves();
-		UpdateView();
 	}
+	else         CreateWOppCurves();
+
+	UpdateView();
 }
 
 
@@ -13818,6 +13904,7 @@ void QMiarex::OnShowCurve()
 	pMainFrame->SetSaveState(false);
 	UpdateView();
 }
+
 
 void QMiarex::OnShowPoints()
 {
@@ -15155,6 +15242,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("ShowFin", m_bShowFin );
 		pSettings->setValue("StoreWOpp", m_bStoreWOpp );
 		pSettings->setValue("Sequence", m_bSequence );
+		pSettings->setValue("HighlightOpp", m_bHighlightOpp);
 
 		pSettings->setValue("AlphaMin", m_AlphaMin);
 		pSettings->setValue("AlphaMax", m_AlphaMax);
@@ -16647,6 +16735,8 @@ void QMiarex::SetupLayout()
 	m_pctrlSurfVel       = new QCheckBox(tr("Surf. Vel."));
 	m_pctrlStream        = new QCheckBox(tr("Stream"));
 	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
+	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight Current OpPoint"));
+	m_pctrlHighlightOpp->setStatusTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
 	m_pctrlAnimateSpeed->setMaximum(500);
@@ -16665,6 +16755,7 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
+	CheckDispLayout->addWidget(m_pctrlHighlightOpp,   7, 1,1,2);
 //	m_pctrl3DSettings =new QPushButton(tr("3D Scales"));
 //	m_pctrl3DSettings->setCheckable(true);
 //	QVBoxLayout *DisplayLayout = new QVBoxLayout;
@@ -17280,6 +17371,10 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 
 	if (m_iView==WOPPVIEW)    CreateWOppCurves();
 	else if(m_iView==WCPVIEW) CreateCpCurves();
+	else if(m_iView==WPOLARVIEW)
+	{
+		if(m_bHighlightOpp) CreateWPolarCurves();
+	}
 
 	if(!m_pCurWOpp) return false;
 	else            return true;

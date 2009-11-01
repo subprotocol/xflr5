@@ -44,6 +44,7 @@ public:
 	void SetVisible(bool bVisible);
 	void SetColor(QColor clr);
 	void SetStyle(int nStyle);
+	void SetSelected(int n);
 	void SetWidth(int nWidth);
 	void SetTitle(QString Title);
 	void GetBWStyle(QColor &color, int &style, int &width);
@@ -60,6 +61,7 @@ public:
 	int GetClosestPoint(double xs, double ys);
 	int GetStyle();
 	int GetWidth();
+	int GetSelected();
 
 	QColor  GetColor();
 
@@ -78,7 +80,7 @@ private:
 	QString m_strName;
 	int CurveStyle;
 	int CurveWidth;
-
+	int m_iSelected;
 	void *m_pParentGraph;
 };
 

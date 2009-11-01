@@ -108,6 +108,12 @@ void CtrlPolarDlg::Connect()
 	m_pControlModel->setRowCount(10);//temporary
 	m_pControlModel->setColumnCount(4);
 
+	connect(m_pctrlDensity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlViscosity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlWeight, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlQInf, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlWPolarName, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
 	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Active (1/0)"));
 	m_pControlModel->setHeaderData(2, Qt::Horizontal, tr("Min"));
@@ -344,6 +350,13 @@ void CtrlPolarDlg::OnArea()
 void CtrlPolarDlg::OnCellChanged(QWidget *pWidget)
 {
 	ReadCtrlData();
+	SetWPolarName();
+}
+
+
+void CtrlPolarDlg::OnEditingFinished()
+{
+	ReadParams();
 	SetWPolarName();
 }
 

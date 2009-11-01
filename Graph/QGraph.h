@@ -58,6 +58,7 @@ public:
 
 public:
 	void *m_pParent;
+	bool m_bHighlightPoint;
 };
 
 #endif

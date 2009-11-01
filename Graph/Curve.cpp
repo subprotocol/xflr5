@@ -43,6 +43,7 @@ CCurve::CCurve()
 	m_bShowPoints = false;
 	CurveWidth = 1;
     CurveStyle = Qt::SolidLine;
+	m_iSelected = -1;
 }
 
 CCurve::~CCurve()
@@ -268,4 +269,14 @@ CVector CCurve::GetClosestRealPoint(double xs)
 	r.y = y[ref];
 	
 	return r;
+}
+
+void CCurve::SetSelected(int n)
+{
+	m_iSelected = n;
+}
+
+int CCurve::GetSelected()
+{
+	return m_iSelected;
 }

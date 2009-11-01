@@ -142,6 +142,7 @@ private slots:
 	void OnManageFoils();
 	void OnRenamePolar();
 	void OnAnimateSingle();
+	void OnHighlightOpp();
 
 	void OnQGraph();
 	void OnCpGraph();
@@ -242,8 +243,7 @@ private:
 	QCheckBox *m_pctrlStoreOpp;
 	QPushButton *m_pctrlAnalyze;
 
-	QCheckBox *m_pctrlShowBL;
-	QCheckBox *m_pctrlShowPressure;
+	QCheckBox *m_pctrlShowBL, *m_pctrlShowPressure, *m_pctrlHighlightOpp;
 	QCheckBox* m_pctrlAnimate;
 	QSlider* m_pctrlAnimateSpeed ;
 
@@ -284,6 +284,7 @@ private:
 	bool m_bCpGraph;		// true if the Cp graph should be displayed
 	bool m_bSequence;		// true if a sequential analysis is to be performed
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
+	bool m_bHighlightOpp;
 
 	int m_posAnimate;		// the current aoa in the animation
 	int m_XFoilVar;			// defines the variable for current XFoil results

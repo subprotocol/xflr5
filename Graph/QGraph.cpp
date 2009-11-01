@@ -64,6 +64,7 @@ QGraph::QGraph()
 	m_bYAutoMinGrid = true;
 	m_bBorder       = true;
 	m_bIsPrinting   = false;
+	m_bHighlightPoint = false;
 
 	m_ptoffset.setX(0);
 	m_ptoffset.setY(0);
@@ -191,6 +192,19 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 		To.setX(int(pCurve->x[0]/m_scalex+m_ptoffset.x()));
 		To.setY(int(pCurve->y[0]/scaley  +m_ptoffset.y()));
 		painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
+	}
+	if(m_bHighlightPoint)
+	{
+		int point = pCurve->GetSelected();
+		if(point>=0)
+		{
+			//highlight
+			CurvePen.setWidth((int)pCurve->GetWidth()+1);
+			painter.setPen(CurvePen);
+			To.setX(int(pCurve->x[point]/m_scalex+m_ptoffset.x()));
+			To.setY(int(pCurve->y[point]/scaley  +m_ptoffset.y()));
+			painter.drawRect(To.x()-ptside,To.y()-ptside, 2*ptside,2*ptside);
+		}
 	}
 	painter.restore();
 }
@@ -676,6 +690,7 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 	}
 	XFile.close();
 }
+
 
 QPoint QGraph::GetOffset()
 {
