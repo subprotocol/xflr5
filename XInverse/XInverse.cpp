@@ -624,10 +624,11 @@ void QXInverse::mouseDoubleClickEvent ( QMouseEvent * event )
 void QXInverse::mouseMoveEvent(QMouseEvent *event)
 {
 	if(!hasFocus()) setFocus();//to catch keyboard input;
-	double x1,y1, xmin, xmax, ymin,  ymax, xpt, ypt, scale, ux, uy, unorm, vx, vy, vnorm, scal;
-	double xx0,xx1,xx2,yy0,yy1,yy2;
-	int a, n, ipt;
-	QPoint point = event->pos();
+	static double x1,y1, xmin, xmax, ymin,  ymax, xpt, ypt, scale, ux, uy, unorm, vx, vy, vnorm, scal;
+	static double xx0,xx1,xx2,yy0,yy1,yy2;
+	static int a, n, ipt;
+	static QPoint point;
+	point = event->pos();
 	if(m_bGetPos)
 	{
 //		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
@@ -845,15 +846,15 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 		{
 			//zoom graph
 			m_QGraph.SetAuto(false);
-			if(point.y()-m_PointDown.y()<0) m_QGraph.Scale(1.06);
-			else                            m_QGraph.Scale(1.0/1.06);
+			if(point.y()-m_PointDown.y()<0) m_QGraph.Scale(1.02);
+			else                            m_QGraph.Scale(1.0/1.02);
 		}
 		else
 		{
 			scale = m_fScale;
 
-			if(point.y()-m_PointDown.y()>0) m_fScale *= 1.06;
-			else                            m_fScale /= 1.06;
+			if(point.y()-m_PointDown.y()>0) m_fScale *= 1.02;
+			else                            m_fScale /= 1.02;
 
 			a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 			m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
@@ -877,7 +878,14 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 			UpdateView();
 		}
 	}
+	if(m_QGraph.IsInDrawRect(point))
+	{
+		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+		pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(m_QGraph.ClientTox(event->x())).arg(m_QGraph.ClientToy(event->y())));
+	}
 }
+
+
 
 
 void QXInverse::mousePressEvent(QMouseEvent *event)

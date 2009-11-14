@@ -5170,7 +5170,6 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 	{
 		if(m_iWingView==1)
 		{
-//			m_pCurWingGraph = m_pCurGraph;
 			return m_pCurWingGraph;
 		}
 		else if (m_iWingView==2)
@@ -5182,9 +5181,10 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 		else
 		{
 			if(m_WingGraph1.IsInDrawRect(pt)){return &m_WingGraph1;}
-			if(m_WingGraph2.IsInDrawRect(pt)){return &m_WingGraph2;}
-			if(m_WingGraph3.IsInDrawRect(pt)){return &m_WingGraph3;}
-			if(m_WingGraph4.IsInDrawRect(pt)){return &m_WingGraph4;}
+			else if(m_WingGraph2.IsInDrawRect(pt)){return &m_WingGraph2;}
+			else if(m_WingGraph3.IsInDrawRect(pt)){return &m_WingGraph3;}
+			else if(m_WingGraph4.IsInDrawRect(pt)){return &m_WingGraph4;}
+			else return NULL;
 		}
 	}
 	else if(m_iView==WPOLARVIEW)
@@ -9870,6 +9870,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
+			else if(m_iView= WOPPVIEW)
+			{
+				OnResetWingScale();
+			}
 			break;
 		}
 		case Qt::Key_F2:
@@ -10010,6 +10014,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bStoreWOpp    = pSettings->value("StoreWOpp").toBool();
 		m_bSequence     = pSettings->value("Sequence").toBool();
 		m_bHighlightOpp = pSettings->value("HighlightOpp").toBool();
+		m_bHighlightOpp = false;
 
 		m_AlphaMin      = pSettings->value("AlphaMin").toDouble();
 		m_AlphaMax      = pSettings->value("AlphaMax").toDouble();
@@ -10196,27 +10201,6 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 				m_ArcBall.Move(pt.x(), m_rCltRect.height()-pt.y());
 
 				UpdateView();
-
-				// Flush the event queue otherwise the display cannot follow the mouse movements
-				// Except for ctrl up and left button up messages
-	/*			MSG msg;
-				while (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
-				{
-	//				GetMessage(&msg, NULL, 0, 0);
-					if(msg.message == WM_KEYUP && msg.wParam == VK_CONTROL)
-					{
-						PreTranslateMessage(&msg);
-					}
-					else if(msg.message == WM_LBUTTONUP)
-					{
-						OnLButtonUp(nFlags, pt);
-					}
-					else
-					{
-	//					TranslateMessage(&msg);
-						DispatchMessage(&msg);
-					}
-				}*/
 			}
 			else if(m_bTrans)
 			{
@@ -10238,12 +10222,11 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 			if(m_pCurWing)
 			{	//zoom 3D wing
-				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.06;
-				else                         m_glScaled /= (GLfloat)1.06;
+				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.02;
+				else                         m_glScaled /= (GLfloat)1.02;
 
 				UpdateView();
 			}
-
 		}
 	}
 	else
@@ -10334,19 +10317,24 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 					{
 						//zoom both
 						m_pCurGraph->SetAuto(false);
-						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.06);
-						else                            m_pCurGraph->Scale(1.0/1.06);
+						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.02);
+						else                            m_pCurGraph->Scale(1.0/1.02);
 					}
 					UpdateView();
 				}
 				else if(m_pCurWing && m_iView==WOPPVIEW)
 				{
 					//zoom wing
-					if(point.y()-m_LastPoint.y()<0)  m_WingScale /=1.04;
-					else                             m_WingScale *= 1.04;
+					if(point.y()-m_LastPoint.y()<0)  m_WingScale /=1.02;
+					else                             m_WingScale *= 1.02;
 					UpdateView();
 				}
 			}
+		}
+		else if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
+		{
+			MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+			pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(m_pCurGraph->ClientTox(event->x())).arg(m_pCurGraph->ClientToy(event->y())));
 		}
 	}
 	m_LastPoint = point;
@@ -13521,6 +13509,9 @@ void QMiarex::OnRenameCurUFO()
 
 
 
+
+
+
 void QMiarex::OnResetCpSection()
 {
 	for(int i=m_CpGraph.GetCurveCount()-1; i>3 ;i--)	m_CpGraph.DeleteCurve(i);
@@ -13533,53 +13524,17 @@ void QMiarex::OnResetCpSection()
 void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
 	QString strong = tr("Are you sure you want to reset the content of the polar :\n")+  m_pCurWPolar->m_PlrName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 												  QMessageBox::Cancel)) return;
 
 	m_pCurWPolar->ResetWPlr();
-
-	CPOpp *pPOpp;
-	CWOpp *pWOpp;
-	if(m_pCurPlane)
-	{
-		for(int i=m_poaPOpp->size()-1;i>=0;i--)
-		{
-			pPOpp = (CPOpp*)m_poaPOpp->at(i);
-			if(pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName && pPOpp->m_PlrName==m_pCurWPolar->m_PlrName)
-			{
-				m_poaPOpp->removeAt(i);
-				delete pPOpp;
-			}
-		}
-	}
-	else if(m_pCurWing)
-	{
-		for(int i=m_poaWOpp->size()-1;i>=0;i--)
-		{
-			pWOpp = (CWOpp*)m_poaWOpp->at(i);
-			if(pWOpp->m_WingName==m_pCurWing->m_WingName && pWOpp->m_PlrName==m_pCurWPolar->m_PlrName)
-			{
-				m_poaWOpp->removeAt(i);
-				delete pWOpp;
-			}
-		}
-	}
-	m_pCurPOpp = NULL;
-	m_pCurWOpp = NULL;
-
-	pMainFrame->UpdateWOpps();
-
 	if(m_iView==WPOLARVIEW)
 	{
 		CreateWPolarCurves();
+		UpdateView();
 	}
-	else         CreateWOppCurves();
-
-	UpdateView();
 }
 
 
@@ -16735,8 +16690,7 @@ void QMiarex::SetupLayout()
 	m_pctrlSurfVel       = new QCheckBox(tr("Surf. Vel."));
 	m_pctrlStream        = new QCheckBox(tr("Stream"));
 	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
-	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight Current OpPoint"));
-	m_pctrlHighlightOpp->setStatusTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
+	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight OpPoint"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
 	m_pctrlAnimateSpeed->setMaximum(500);
@@ -16755,7 +16709,7 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
-	CheckDispLayout->addWidget(m_pctrlHighlightOpp,   7, 1,1,2);
+//	CheckDispLayout->addWidget(m_pctrlHighlightOpp,   7, 1,1,2);
 //	m_pctrl3DSettings =new QPushButton(tr("3D Scales"));
 //	m_pctrl3DSettings->setCheckable(true);
 //	QVBoxLayout *DisplayLayout = new QVBoxLayout;

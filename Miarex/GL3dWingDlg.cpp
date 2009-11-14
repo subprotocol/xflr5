@@ -2315,14 +2315,19 @@ void GL3dWingDlg::reject()
 {
 	if(m_bChanged)
 	{
-		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		QString strong = tr("Save the changes ?");
+		int Ans = QMessageBox::question(this, tr("Question"), strong,
+										QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		if (QMessageBox::Yes == Ans)
+		{
+			OnOK();
 			return;
+		}
+		else if(QMessageBox::Cancel == Ans) return;
 	}
-	m_bChanged = false;
+//	reject();
 	done(QDialog::Rejected);
 }
-
 
 
 void GL3dWingDlg::resizeEvent(QResizeEvent *event)

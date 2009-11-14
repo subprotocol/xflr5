@@ -535,6 +535,9 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 			OnStoreSplines();
 			break;
 		}
+		case Qt::Key_R:
+			OnResetScales();
+			break;
 		case Qt::Key_X:
 			m_bXDown = true;
 			break;
@@ -779,7 +782,8 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 			FillFoilTable();
 		}
 	}
-	else if (((event->modifiers() & Qt::ControlModifier) )  && !bCtrl)
+
+	else if ((event->buttons() & Qt::MidButton))
 	{
 		// user is zooming with mouse button down rather than with wheel
 		if(m_rCltRect.contains(point))
@@ -792,31 +796,31 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 				{
 					if(point.y()-m_PointDown.y()>0)
 					{
-						m_fScale  *= 1.06;
-						m_fScaleY /= 1.06;
+						m_fScale  *= 1.02;
+						m_fScaleY /= 1.02;
 					}
 					else 
 					{
-						m_fScale  /= 1.06;
-						m_fScaleY *= 1.06;
+						m_fScale  /= 1.02;
+						m_fScaleY *= 1.02;
 					}
 				}
 				else if (m_bYDown)
 				{
-					if(point.y()-m_PointDown.y()>0) m_fScaleY *= 1.06;
-					else                            m_fScaleY /= 1.06;
+					if(point.y()-m_PointDown.y()>0) m_fScaleY *= 1.02;
+					else                            m_fScaleY /= 1.02;
 				}
 				else
 				{
-					if(point.y()-m_PointDown.y()>0) m_fScale *= 1.06;
-					else		                    m_fScale /= 1.06;
+					if(point.y()-m_PointDown.y()>0) m_fScale *= 1.02;
+					else		                    m_fScale /= 1.02;
 				}
 
 			}
 			else
 			{
-				if(point.y()-m_PointDown.y()>0) m_fScaleY *= 1.06;
-				else                            m_fScaleY /= 1.06;
+				if(point.y()-m_PointDown.y()>0) m_fScaleY *= 1.02;
+				else                            m_fScaleY /= 1.02;
 			}
 
 			m_PointDown = point;

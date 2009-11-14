@@ -1102,11 +1102,18 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 	}
 	else
 	{
-		if(m_bCpGraph) return m_pCpGraph;
-		else           return NULL;
+		if(m_pCpGraph->IsInDrawRect(pt))
+		{
+			if(m_bCpGraph) return m_pCpGraph;
+			else           return NULL;
+		}
+		else return NULL;
 	}
 	return NULL;
 }
+
+
+
 
 bool QXDirect::InitXFoil()
 {
@@ -1359,6 +1366,7 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
+			else OnResetFoilScale();
 			break;
 		case Qt::Key_V:
 			if(m_bPolar && m_pCurGraph)
@@ -1433,6 +1441,7 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_bCpGraph        = pSettings->value("ShowCpGraph").toBool();
 		m_bSequence       = pSettings->value("Sequence").toBool();
 		m_bHighlightOpp   = pSettings->value("HighlightOpp").toBool();
+		m_bHighlightOpp = false;
 
 		r = pSettings->value("BLColorRed").toInt();
 		g = pSettings->value("BLColorGreen").toInt();
@@ -1582,8 +1591,8 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 			//zoom graph
 
 			m_pCurGraph->SetAuto(false);
-			if(pt.y()-m_PointDown.y()<0) m_pCurGraph->Scale(1.06);
-			else                         m_pCurGraph->Scale(1.0/1.06);
+			if(pt.y()-m_PointDown.y()<0) m_pCurGraph->Scale(1.02);
+			else                         m_pCurGraph->Scale(1.0/1.02);
 
 
 			if(!m_bAnimate) UpdateView();
@@ -1593,8 +1602,8 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 			//zoom the foil
 			double scale = m_fFoilScale;
 
-			if(pt.y()-m_PointDown.y()<0) m_fFoilScale *= 1.06;
-			else                         m_fFoilScale /= 1.06;
+			if(pt.y()-m_PointDown.y()<0) m_fFoilScale *= 1.02;
+			else                         m_fFoilScale /= 1.02;
 
 			int a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 
@@ -6417,7 +6426,7 @@ void QXDirect::SetupLayout()
 	DisplayGroup->addWidget(m_pctrlShowPressure);
 	DisplayGroup->addWidget(m_pctrlAnimate);
 	DisplayGroup->addWidget(m_pctrlAnimateSpeed);
-	DisplayGroup->addWidget(m_pctrlHighlightOpp);
+//	DisplayGroup->addWidget(m_pctrlHighlightOpp);
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(DisplayGroup);
 

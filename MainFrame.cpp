@@ -614,7 +614,7 @@ void MainFrame::CreateAFoilActions()
 	ResetYScaleAct= new QAction(tr("Reset Y Scale"), this);
 	connect(ResetYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetYScale()));
 
-	ResetXYScaleAct= new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset Scales"), this);
+	ResetXYScaleAct= new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset Scales\t(R)"), this);
 	ResetXYScaleAct->setStatusTip(tr("Resets the x and y scales to screen size"));
 	connect(ResetXYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetScales()));
 
