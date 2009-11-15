@@ -2100,7 +2100,7 @@ void MainFrame::CreateXInverseActions()
 	InverseStyles->setStatusTip(tr("Define the styles for this view"));
 	connect(InverseStyles, SIGNAL(triggered()), pXInverse, SLOT(OnInverseStyles()));
 
-	InverseResetScale = new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset foil scale"), this);
+	InverseResetScale = new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset foil scale\t(R)"), this);
 	InverseResetScale->setStatusTip(tr("Resets the scale to fit the screen size"));
 	connect(InverseResetScale, SIGNAL(triggered()), pXInverse, SLOT(OnResetFoilScale()));
 
@@ -2177,6 +2177,7 @@ void MainFrame::CreateXInverseMenus()
 	//Context Menu for XInverse Application
 	InverseContextMenu = new QMenu("Context Menu",this);
 	InverseContextMenu->addAction(InverseStyles);
+	InverseContextMenu->addAction(InverseResetScale);
 	InverseContextMenu->addAction(resetCurGraphScales);
 	InverseContextMenu->addAction(XInverseGraphDlg);
 	InverseContextMenu->addSeparator();

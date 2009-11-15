@@ -974,7 +974,6 @@ void GL3dWingDlg::GLDraw3D()
 		}
 		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->GLCreateGeom(m_pWing, WINGGEOMETRY);
-//		GLCreateGeometry();
 
 		if(glIsList(MESHPANELS))
 		{
@@ -2177,6 +2176,10 @@ void GL3dWingDlg::OnSymetric()
 		m_bRightSide          = true;
 		m_pctrlLeftSide->setEnabled(false);
 		m_pctrlRightSide->setChecked(true);
+		for(int i=0; i<m_pWing->m_NPanel; i++)
+		{
+			m_pWing->m_LFoil[i] = m_pWing->m_RFoil[i];
+		}
 	}
 	else
 	{
@@ -2185,6 +2188,8 @@ void GL3dWingDlg::OnSymetric()
 	}
 
 	m_bChanged = true;
+	ComputeGeometry();
+	m_bResetglWing             = true;
 	m_bResetglSectionHighlight = true;
 	UpdateView();
 }

@@ -16,7 +16,6 @@
 
 
 QFLR5 v0.04 Beta November xxx 2009
-	- Added an option to highlight selected OpPoints in polar curves
 	- Added some signal connections for wing control polars 
 	- Made a few corrections and enhancements
 

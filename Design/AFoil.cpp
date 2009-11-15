@@ -403,7 +403,7 @@ void QAFoil::FillFoilTable()
 	{
 		if(m_pSF) 
 		{
-			name = "Spline foil";
+			name = tr("Spline foil");
 			Thickness  = m_pSF->m_fThickness;
 			xThickness = m_pSF->m_fxThickMax;
 			Camber     = m_pSF->m_fCamber;
@@ -415,7 +415,7 @@ void QAFoil::FillFoilTable()
 	{
 		if(m_pPF) 
 		{
-			name = "Splined points foil";
+			name = tr("Splined points foil");
 			Thickness  = m_pPF->m_fThickness;
 			xThickness = m_pPF->m_fxThickMax;
 			Camber     = m_pPF->m_fCamber;
@@ -2991,19 +2991,18 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setRowCount(10);//temporary
 	m_pFoilModel->setColumnCount(12);
 
-	m_pFoilModel->setHeaderData(0, Qt::Horizontal, "Name");
-	m_pFoilModel->setHeaderData(1, Qt::Horizontal, "Thickness (%)");
-	m_pFoilModel->setHeaderData(2, Qt::Horizontal, "at (%)");
-	m_pFoilModel->setHeaderData(3, Qt::Horizontal, "Camber (%)");
-	m_pFoilModel->setHeaderData(4, Qt::Horizontal, "at (%)");
-	m_pFoilModel->setHeaderData(5, Qt::Horizontal, "Points");
-	m_pFoilModel->setHeaderData(6, Qt::Horizontal, QString::fromUtf8("TE Flap (°)"));
-	m_pFoilModel->setHeaderData(7, Qt::Horizontal, "TE XHinge");
-	m_pFoilModel->setHeaderData(8, Qt::Horizontal, "TE YHinge");
-	m_pFoilModel->setHeaderData(9, Qt::Horizontal, QString::fromUtf8("TE Flap (°)"));
-	m_pFoilModel->setHeaderData(10, Qt::Horizontal, "LE XHinge");
-	m_pFoilModel->setHeaderData(11, Qt::Horizontal, "LE YHinge");
-
+	m_pFoilModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
+	m_pFoilModel->setHeaderData(1, Qt::Horizontal, tr("Thickness (%)"));
+	m_pFoilModel->setHeaderData(2, Qt::Horizontal, tr("at (%)"));
+	m_pFoilModel->setHeaderData(3, Qt::Horizontal, tr("Camber (%)"));
+	m_pFoilModel->setHeaderData(4, Qt::Horizontal, tr("at (%)"));
+	m_pFoilModel->setHeaderData(5, Qt::Horizontal, tr("Points"));
+	m_pFoilModel->setHeaderData(6, Qt::Horizontal, tr("TE Flap (")+QString::fromUtf8("°")+")");
+	m_pFoilModel->setHeaderData(7, Qt::Horizontal, tr("TE XHinge"));
+	m_pFoilModel->setHeaderData(8, Qt::Horizontal, tr("TE YHinge"));
+	m_pFoilModel->setHeaderData(9, Qt::Horizontal, tr("LE Flap (")+QString::fromUtf8("°")+")");
+	m_pFoilModel->setHeaderData(10, Qt::Horizontal, tr("LE XHinge"));
+	m_pFoilModel->setHeaderData(11, Qt::Horizontal,tr( "LE YHinge"));
 	m_pctrlFoilTable->setModel(m_pFoilModel);
 	m_pctrlFoilTable->setWindowTitle("Foils");
 

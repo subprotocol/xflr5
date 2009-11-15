@@ -190,6 +190,7 @@ private:
 	QColor m_ReflectedClr;
 
 	QGraph m_QGraph;
+	QGraph *m_pCurGraph;//to check if the mouse is hovering over the graph
 	CCurve* m_pQCurve;
 	CCurve* m_pQVCurve;
 	CCurve* m_pMCurve;

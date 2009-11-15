@@ -42,6 +42,7 @@ QXInverse::QXInverse(QWidget *parent)
 	m_bFullInverse = false;
 
 	m_pXFoil = NULL;
+	m_pCurGraph = NULL;
 
 	m_bTransGraph    = false;
 	m_bLoaded        = false;
@@ -547,8 +548,12 @@ void QXInverse::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_R:
 		{
-			m_QGraph.SetAuto(true);
-			UpdateView();
+			if(m_pCurGraph)
+			{
+				m_QGraph.SetAuto(true);
+				UpdateView();
+			}
+			else OnResetFoilScale();
 			break;
 		}
 		default:
@@ -629,6 +634,7 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 	static int a, n, ipt;
 	static QPoint point;
 	point = event->pos();
+
 	if(m_bGetPos)
 	{
 //		m_tmpPos = m_pMCurve->GetClosestPoint(m_QGraph.ClientTox(point.x()));
@@ -882,7 +888,9 @@ void QXInverse::mouseMoveEvent(QMouseEvent *event)
 	{
 		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 		pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(m_QGraph.ClientTox(event->x())).arg(m_QGraph.ClientToy(event->y())));
+		m_pCurGraph = &m_QGraph;
 	}
+	else m_pCurGraph = NULL;
 }
 
 
