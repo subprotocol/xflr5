@@ -169,7 +169,7 @@ void CPF::ExportToFile(QTextStream &out)
 bool CPF::InitSplinedFoil()
 {
 	m_bModified   = false;
-	m_strFoilName = "Splined Points Foil";
+	m_strFoilName = QObject::tr("Splined Points Foil");
 	m_Extrados.m_iPoints = 0;
 	m_Extrados.InsertPoint(1.00,  0.0000);
 	m_Extrados.InsertPoint(0.887, 0.0173);

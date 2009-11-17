@@ -197,8 +197,56 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>CpCalc: local speed too large 
  Compressibility corrections invalid</source>
-        <translation type="obsolete">CpCalc: la vitesse locale est triop grande 
- Correction de compressibilité non valable </translation>
+        <translation type="obsolete">CpCalc : vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valables</translation>
+    </message>
+    <message>
+        <source>   ...converged after %1 iterations
+</source>
+        <translation>   ...convergeance après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>   ...skipped after %1 iterations
+</source>
+        <translation type="obsolete">   ...abandon après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>   ...unconverged after %1 iterations
+</source>
+        <translation type="obsolete">   ...pas de convergeance après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>Analysis interrupted
+</source>
+        <translation type="obsolete">Analyse interrompue
+</translation>
+    </message>
+    <message>
+        <source>Alpha =</source>
+        <translation>Alpha =</translation>
+    </message>
+    <message>
+        <source>Cl =</source>
+        <translation>Cz =</translation>
+    </message>
+    <message>
+        <source>Re.sqrt(Cl) =</source>
+        <translation>Re.sqrt(Cz) =</translation>
+    </message>
+    <message>
+        <source>Ma.sqrt(Cl) =</source>
+        <translation>Ma.sqrt(Cz) =</translation>
+    </message>
+    <message>
+        <source>Re.Cl =</source>
+        <translation>Re.Cz =</translation>
+    </message>
+    <message>
+        <source>Cl = %1</source>
+        <translation>Cz = %1</translation>
     </message>
 </context>
 <context>
@@ -398,6 +446,20 @@ CPCALC: vitesse locale trop importante
     </message>
 </context>
 <context>
+    <name>CPlane</name>
+    <message>
+        <source>Description %1</source>
+        <translation type="obsolete">Description %1</translation>
+    </message>
+</context>
+<context>
+    <name>CSF</name>
+    <message>
+        <source>Spline Foil</source>
+        <translation type="unfinished">Profile en spline</translation>
+    </message>
+</context>
+<context>
     <name>CSurface</name>
     <message>
         <source>Warning</source>
@@ -592,7 +654,7 @@ CPCALC: vitesse locale trop importante
     <name>DisplaySettingsDlg</name>
     <message>
         <source>General Display Settings</source>
-        <translation>PAramètres généraux d&apos;affichage</translation>
+        <translation>Paramètres généraux d&apos;affichage</translation>
     </message>
     <message>
         <source>All Graph Settings</source>
@@ -921,11 +983,11 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>Auto Scales</source>
-        <translation>Échelles automatique</translation>
+        <translation>Échelles automatiques</translation>
     </message>
     <message>
         <source>Cp Scale</source>
-        <translation type="unfinished">Échelle Cp</translation>
+        <translation>Échelle Cp</translation>
     </message>
     <message>
         <source>Lift </source>
@@ -1090,6 +1152,118 @@ CPCALC: vitesse locale trop importante
         <source>Inertia...</source>
         <translation>Inertie...</translation>
     </message>
+    <message>
+        <source>Frame %1</source>
+        <translation>Cadre %1</translation>
+    </message>
+    <message>
+        <source>Scale = %1</source>
+        <translation>Échelle = %1</translation>
+    </message>
+    <message>
+        <source>Body Dlg Exit</source>
+        <translation>Quitter le dialogue de fuselage</translation>
+    </message>
+    <message>
+        <source>Save the Body ?</source>
+        <translation>Enregistrer le fuselage ?</translation>
+    </message>
+    <message>
+        <source>Axes</source>
+        <translation>Axes</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Éclairage</translation>
+    </message>
+    <message>
+        <source>Surfaces</source>
+        <translation>Surfaces</translation>
+    </message>
+    <message>
+        <source>Outline</source>
+        <translation>Contour</translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation>Panneaux</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation>X</translation>
+    </message>
+    <message>
+        <source>Y</source>
+        <translation>Y</translation>
+    </message>
+    <message>
+        <source>Z</source>
+        <translation>Z</translation>
+    </message>
+    <message>
+        <source>Iso</source>
+        <translation>Iso</translation>
+    </message>
+    <message>
+        <source>Pick Center</source>
+        <translation>Choisir le centre</translation>
+    </message>
+    <message>
+        <source>Clip Plane</source>
+        <translation>Tronquer l&apos;avion</translation>
+    </message>
+    <message>
+        <source>Actions...</source>
+        <translation>Actions...</translation>
+    </message>
+    <message>
+        <source>Flat Panels</source>
+        <translation>Panneaux plats</translation>
+    </message>
+    <message>
+        <source>BSplines</source>
+        <translation>Splines B</translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation type="unfinished">x</translation>
+    </message>
+    <message>
+        <source>Hoop</source>
+        <translation>Coupe</translation>
+    </message>
+    <message>
+        <source>Degree</source>
+        <translation>Ordre</translation>
+    </message>
+    <message>
+        <source>BodyName</source>
+        <translation>NomFuselage</translation>
+    </message>
+    <message>
+        <source>Enter here a short description for the body</source>
+        <translation>Entrer ici une courte description pour le fuselage</translation>
+    </message>
+    <message>
+        <source>Frames</source>
+        <translation>Cadres</translation>
+    </message>
+    <message>
+        <source>Frame Positions</source>
+        <translation>Emplacement des cadres</translation>
+    </message>
+    <message>
+        <source>Points</source>
+        <translation>Points</translation>
+    </message>
+    <message>
+        <source>Current Frame Definition</source>
+        <translation>Définition du cadre sélectionné</translation>
+    </message>
+    <message>
+        <source>Context Menu</source>
+        <translation>Menu contextuel</translation>
+    </message>
 </context>
 <context>
     <name>GL3dWingDlg</name>
@@ -1104,10 +1278,6 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>The first section cannot be deleted</source>
         <translation>La première section ne peut pas être supprimée</translation>
-    </message>
-    <message>
-        <source>Discard the changes ?</source>
-        <translation>Abandonner les modifications ?</translation>
     </message>
     <message>
         <source>Symetric</source>
@@ -1269,7 +1439,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Root to Tip Sweep</source>
-        <translation>Flèche emplanture à l&apos;extrémité</translation>
+        <translation>Flèche de l&apos;emplanture à l&apos;extrémité</translation>
     </message>
     <message>
         <source>Number of Flaps</source>
@@ -1343,6 +1513,42 @@ Réduisez la taille du maillage</translation>
         <source>Inertia...</source>
         <translation>Inertie...</translation>
     </message>
+    <message>
+        <source>Save the changes ?</source>
+        <translation>Enregistrer les modifications ?</translation>
+    </message>
+    <message>
+        <source>Uniform</source>
+        <translation>Uniforme</translation>
+    </message>
+    <message>
+        <source>Cosine</source>
+        <translation>Cosinus</translation>
+    </message>
+    <message>
+        <source>Sine</source>
+        <translation>Sinus</translation>
+    </message>
+    <message>
+        <source>-Sine</source>
+        <translation>-Sinus</translation>
+    </message>
+    <message>
+        <source>Wing Description</source>
+        <translation>Description de l’aile</translation>
+    </message>
+    <message>
+        <source>Undefined</source>
+        <translation>Non défini</translation>
+    </message>
+    <message>
+        <source>WingName</source>
+        <translation>NomAile</translation>
+    </message>
+    <message>
+        <source>Context Menu</source>
+        <translation>Menu contextuel</translation>
+    </message>
 </context>
 <context>
     <name>GLLightDlg</name>
@@ -1384,11 +1590,11 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Diffuse</source>
-        <translation>Diffus</translation>
+        <translation>Diffuse</translation>
     </message>
     <message>
         <source>Ambient</source>
-        <translation>Ambiant</translation>
+        <translation>Ambiante</translation>
     </message>
     <message>
         <source>Specular</source>
@@ -1396,7 +1602,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Emissions</source>
-        <translation>Émissif</translation>
+        <translation>Émissive</translation>
     </message>
     <message>
         <source>Shininess</source>
@@ -1412,7 +1618,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Cull Faces</source>
-        <translation>Sélectionner les faces</translation>
+        <translation>Faces sékectionnées</translation>
     </message>
     <message>
         <source>Depth Test</source>
@@ -1571,7 +1777,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Power factor Cl^(3/2)/Cd</source>
-        <translation type="unfinished">Facteur de puissance Cz^(3/2)/Cx</translation>
+        <translation>Facteur de puissance Cz^(3/2)/Cx</translation>
     </message>
     <message>
         <source>1/Rt(Cl)</source>
@@ -1937,11 +2143,67 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Refer to the Guidelines for explanations.</source>
-        <translation type="unfinished">Vous référer que Guidelines pour des explications.</translation>
+        <translation>Vous référer aux instructions des explications.</translation>
     </message>
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Description %1</source>
+        <translation>Description %1</translation>
+    </message>
+    <message>
+        <source>Wing Mass:</source>
+        <translation>Masse de l&apos;aile :</translation>
+    </message>
+    <message>
+        <source>Body Mass:</source>
+        <translation>Masse du fuselage :</translation>
+    </message>
+    <message>
+        <source>Plane Mass:</source>
+        <translation>Masse de l’avion :</translation>
+    </message>
+    <message>
+        <source>Export Mass Properties</source>
+        <translation>Exporter les propriétés de masse</translation>
+    </message>
+    <message>
+        <source>AVL Mass File (*.mass)</source>
+        <translation>Fichier de masse AVL (*.mass)</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Inertia of both left and right wings</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie des ailes gauche et droite</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Body inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie du fuselage</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Main wing&apos;s inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie de l’aile principale</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Second wing&apos;s inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie de la deuxième aile</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Elevator&apos;s inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie du stabilisateur horizontal</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Fin&apos;s inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie de la dérive</translation>
+    </message>
+    <message>
+        <source>%1  %2  %3  %4  %5  %6  %7 ! Body&apos;s inertia</source>
+        <translation>%1  %2  %3  %4  %5  %6  %7 ! Inertie du fuselage</translation>
+    </message>
+    <message>
+        <source>Inertia in CoG Frame</source>
+        <translation type="unfinished">Inertie dans le cadre situé au centre de gravité</translation>
     </message>
 </context>
 <context>
@@ -2194,7 +2456,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>&amp;XFoil Mixed Inverse Design</source>
-        <translation type="unfinished">&amp;XFoil, conception mélangée inverse</translation>
+        <translation type="unfinished">Conception &amp;Xfoil mélangée inverse</translation>
     </message>
     <message>
         <source>Ctrl+4</source>
@@ -2362,7 +2624,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Zoom in</source>
-        <translation>Zommer</translation>
+        <translation>Zoomer</translation>
     </message>
     <message>
         <source>Zoom the view by drawing a rectangle in the client area</source>
@@ -2414,7 +2676,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Show Current Foil</source>
-        <translation>Affichier le profil actuel</translation>
+        <translation>Afficher le profil actuel</translation>
     </message>
     <message>
         <source>Hide Current Foil</source>
@@ -2423,10 +2685,6 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>Reset Y Scale</source>
         <translation>Réinitialiser l&apos;échelle Y</translation>
-    </message>
-    <message>
-        <source>Reset Scales</source>
-        <translation>Réinitialiser les échelles</translation>
     </message>
     <message>
         <source>Resets the x and y scales to screen size</source>
@@ -2741,22 +2999,6 @@ Réduisez la taille du maillage</translation>
         <translation>Afficher la courbe de la seconde aile</translation>
     </message>
     <message>
-        <source>Define an Analysis</source>
-        <translation type="obsolete">Définir une analyse</translation>
-    </message>
-    <message>
-        <source>F6</source>
-        <translation type="obsolete">F6</translation>
-    </message>
-    <message>
-        <source>Define a Control Analysis</source>
-        <translation type="obsolete">Définir une analyse des contrôles</translation>
-    </message>
-    <message>
-        <source>Ctrl+F6</source>
-        <translation type="obsolete">Ctrl+F6</translation>
-    </message>
-    <message>
         <source>Define Graph Settings	(G)</source>
         <translation>Définir les paramètres diu graphe	(G)</translation>
     </message>
@@ -2918,7 +3160,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Define Cp Graph Settings	(G)</source>
-        <translation>Définir les paramètres du graphes Cp	(G)</translation>
+        <translation>Définir les paramètres du graphe Cp	(G)</translation>
     </message>
     <message>
         <source>All Polar Graph Settings</source>
@@ -2987,14 +3229,6 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>Defines a single analysis/polar</source>
         <translation>Définir une analyse/polaire unique</translation>
-    </message>
-    <message>
-        <source>Batch Analysis</source>
-        <translation type="obsolete">Analyse par lots</translation>
-    </message>
-    <message>
-        <source>Shift+F6</source>
-        <translation type="obsolete">Shift+F6</translation>
     </message>
     <message>
         <source>Launches a batch of analysis calculation for a specified range or list of Reynolds numbers</source>
@@ -3209,10 +3443,6 @@ Réduisez la taille du maillage</translation>
         <translation>Définir les styles de cette vue</translation>
     </message>
     <message>
-        <source>Reset foil scale</source>
-        <translation>Réinitialiser les domensions du profil</translation>
-    </message>
-    <message>
         <source>Resets the scale to fit the screen size</source>
         <translation>Réinitialiser l&apos;échelle pour s&apos;adapter à la taille de l&apos;écran</translation>
     </message>
@@ -3353,10 +3583,6 @@ Réduisez la taille du maillage</translation>
         <translation>Format dépassé : lecture impossible</translation>
     </message>
     <message>
-        <source>could not write saved settings</source>
-        <translation>impossible d&apos;écrire les paramètres enregistrés</translation>
-    </message>
-    <message>
         <source>&amp;%1 %2</source>
         <translation>&amp;%1 %2</translation>
     </message>
@@ -3370,7 +3596,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Show Q-Spec</source>
-        <translation type="unfinished">Affichier Q-Spec</translation>
+        <translation type="unfinished">Afficher Q-Spec</translation>
     </message>
     <message>
         <source>Info</source>
@@ -3421,12 +3647,6 @@ Réduisez la taille du maillage</translation>
         <translation>Définir l’inertie</translation>
     </message>
     <message>
-        <source>A foil of that name already exists
-Please enter a new name</source>
-        <translation type="obsolete">Il existe déjà un profil portant ce nom
-Veuilez entrer un autre nom</translation>
-    </message>
-    <message>
         <source>Define an Analysis 	(F6)</source>
         <translation>Définir une analyse 	(F6)</translation>
     </message>
@@ -3437,6 +3657,44 @@ Veuilez entrer un autre nom</translation>
     <message>
         <source>Batch Analysis 	(Shift+F6)</source>
         <translation>Analyse par lots 	(Shift+F6)</translation>
+    </message>
+    <message>
+        <source>Reset Default Settings</source>
+        <translation>Paramètres par défaut</translation>
+    </message>
+    <message>
+        <source>will revert to default settings at the next session</source>
+        <translation>les paramètres seront réinitialisés à leur valeur par défaut lors de la prochaine session</translation>
+    </message>
+    <message>
+        <source>Default Settings</source>
+        <translation>Paramètres par défaut</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to reset the default settings ?</source>
+        <translation>Êtes-vous certain de vouloir réinitialiser les paramètres à leurs valeurs par défaut ?</translation>
+    </message>
+    <message>
+        <source>The settings will be reset at the next session</source>
+        <translation>Les paramètres seront réinitialisés lors de la prochaine session</translation>
+    </message>
+    <message>
+        <source>Reset Scales	(R)</source>
+        <translation>Réinitialiser les échelles	(R)</translation>
+    </message>
+    <message>
+        <source>Reset foil scale	(R)</source>
+        <translation>Réinitialiser l&apos;échelle du profil	(R)</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Quitter</translation>
+    </message>
+    <message>
+        <source>A foil of that name already exists
+Please enter a new name</source>
+        <translation type="obsolete">Il existe déjà un profil portant ce nom
+Veuillez choisir un autre nom</translation>
     </message>
 </context>
 <context>
@@ -3571,6 +3829,14 @@ Poursuivre cependant ?</translation>
     <message>
         <source>Foil File (*.dat)</source>
         <translation>Fichier de profil (*.dat)</translation>
+    </message>
+    <message>
+        <source>TE Flap (</source>
+        <translation>Volet de bord de fuite (</translation>
+    </message>
+    <message>
+        <source>LE Flap (</source>
+        <translation>Volet de bord d’attaque (</translation>
     </message>
 </context>
 <context>
@@ -3886,6 +4152,10 @@ Il faut résuire le nombre de panneaux d’aile</translation>
         <source>Plane Description</source>
         <translation>Description de l’avion</translation>
     </message>
+    <message>
+        <source>Plane Inertia</source>
+        <translation>Inertie de l&apos;avion</translation>
+    </message>
 </context>
 <context>
     <name>PolarFilterDlg</name>
@@ -3947,6 +4217,166 @@ Il faut résuire le nombre de panneaux d’aile</translation>
         <source>Warning</source>
         <translation>Attention</translation>
     </message>
+    <message>
+        <source>Spline foil</source>
+        <translation>Profile en spline</translation>
+    </message>
+    <message>
+        <source>Splined points foil</source>
+        <translation type="unfinished">Profil avec spline passant par les points</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Thickness (%)</source>
+        <translation>Épaisseur (%)</translation>
+    </message>
+    <message>
+        <source>at (%)</source>
+        <translation>à (%)</translation>
+    </message>
+    <message>
+        <source>Camber (%)</source>
+        <translation>Cambrure (%)</translation>
+    </message>
+    <message>
+        <source>Points</source>
+        <translation>Points</translation>
+    </message>
+    <message>
+        <source>TE Flap (</source>
+        <translation>Volet de bord de fuite (</translation>
+    </message>
+    <message>
+        <source>TE XHinge</source>
+        <translation>Position X articulation BF</translation>
+    </message>
+    <message>
+        <source>TE YHinge</source>
+        <translation>Position Y articulation BF</translation>
+    </message>
+    <message>
+        <source>LE Flap (</source>
+        <translation>Volet de bord d’attaque (</translation>
+    </message>
+    <message>
+        <source>LE XHinge</source>
+        <translation>Position X articulation BA</translation>
+    </message>
+    <message>
+        <source>LE YHinge</source>
+        <translation>Position Y articulation BA</translation>
+    </message>
+    <message>
+        <source>Foil has been de-rotated by %1 degrees</source>
+        <translation>Le profil a été pivoté de %1 degrés</translation>
+    </message>
+    <message>
+        <source>Foil has been normalized from %1  to 1.000</source>
+        <translation>Le profil a été normalisé de %1  à 1.000</translation>
+    </message>
+    <message>
+        <source>At least two foils are required</source>
+        <translation>Il faut au moins deux profils</translation>
+    </message>
+    <message>
+        <source>Export Foil</source>
+        <translation>Exporter le profil</translation>
+    </message>
+    <message>
+        <source>Foil File (*.dat)</source>
+        <translation>Fichier de profil (*.dat)</translation>
+    </message>
+    <message>
+        <source>Spline Foil</source>
+        <translation type="unfinished">Profile en spline</translation>
+    </message>
+    <message>
+        <source>Too many output points on upper surface
+ Max =%1</source>
+        <translation>Trop de points de sortie à la surface supérieure
+ Max = %1</translation>
+    </message>
+    <message>
+        <source>Too many output points on lower surface
+ Max =%1</source>
+        <translation>Trop de point de sortie à la surface inférieure
+ Max = %1</translation>
+    </message>
+    <message>
+        <source>Export Splines</source>
+        <translation>Exporter les splines</translation>
+    </message>
+    <message>
+        <source>Text File (*.dat)</source>
+        <translation>fichier texte (*.dat)</translation>
+    </message>
+    <message>
+        <source>X-Scale = %1</source>
+        <translation>Échelle X = %1</translation>
+    </message>
+    <message>
+        <source>Y-Scale = %1</source>
+        <translation>Échelle Y = %1</translation>
+    </message>
+    <message>
+        <source>x  = %1</source>
+        <translation>x  = %1</translation>
+    </message>
+    <message>
+        <source>y  = %1</source>
+        <translation>y  = %1</translation>
+    </message>
+    <message>
+        <source>Question</source>
+        <translation>Question</translation>
+    </message>
+    <message>
+        <source>Discard changes to Splines ?</source>
+        <translation>Abandonner les modifications des splines ?</translation>
+    </message>
+    <message>
+        <source>Show Foil</source>
+        <translation>Afficher le profil</translation>
+    </message>
+    <message>
+        <source>Show Centerline</source>
+        <translation>Afficher la ligne moyenne</translation>
+    </message>
+    <message>
+        <source>Show Points</source>
+        <translation>Afficher les points</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renommer</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Duplicate</source>
+        <translation>Dupliquer</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Exporter</translation>
+    </message>
+    <message>
+        <source>Splines</source>
+        <translation>Splines</translation>
+    </message>
+    <message>
+        <source>Splined points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Foils</source>
+        <translation>Profils</translation>
+    </message>
 </context>
 <context>
     <name>QMiarex</name>
@@ -3981,7 +4411,7 @@ Il faut résuire le nombre de panneaux d’aile</translation>
     <message>
         <source>Not enough memory to store the OpPoint
 </source>
-        <translation>OMémoire insuffisante pour enregistrer le point de fonctionnement
+        <translation>Mémoire insuffisante pour enregistrer le point de fonctionnement
 </translation>
     </message>
     <message>
@@ -4040,7 +4470,7 @@ Pousuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Re</source>
-        <translation></translation>
+        <translation>Re</translation>
     </message>
     <message>
         <source>Top Trans x-Pos %</source>
@@ -4052,7 +4482,7 @@ Pousuivre néanmoins ?</translation>
     </message>
     <message>
         <source>CP x-Pos %</source>
-        <translation type="unfinished">Pos x CP %</translation>
+        <translation>Pos x CP %</translation>
     </message>
     <message>
         <source>BM (</source>
@@ -4076,7 +4506,7 @@ Pousuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Plane Weight   = %1 </source>
-        <translation>Poids de l&apos;appareil		= %1 </translation>
+        <translation>Poids de l&apos;avion   = %1 </translation>
     </message>
     <message>
         <source>Wing Load      = %1 </source>
@@ -4772,6 +5202,10 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
         <source>Ym</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Highlight OpPoint</source>
+        <translation>Mettre en évidence le point de fonctionnement</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -4867,6 +5301,14 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
         <source>Plane Name</source>
         <translation>Nom de l’avion</translation>
     </message>
+    <message>
+        <source>Splined Points Foil</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spline Foil</source>
+        <translation type="unfinished">Profile en spline</translation>
+    </message>
 </context>
 <context>
     <name>QXDirect</name>
@@ -4897,10 +5339,6 @@ CpCalc: local speed too large
         <translation>... Paramètres d&apos;analyse non valables
 CpCalc: vitesse locale trop importante 
  Correction de compressibilité non valable </translation>
-    </message>
-    <message>
-        <source>Archive file is corrupted</source>
-        <translation>Le ficher actif est corrompu</translation>
     </message>
     <message>
         <source>Top</source>
@@ -5059,10 +5497,6 @@ CpCalc: vitesse locale trop importante
         <translation>Moment de l&apos;articulation de BF / envergure = %1</translation>
     </message>
     <message>
-        <source>File is closed</source>
-        <translation>Le fichier est fermé</translation>
-    </message>
-    <message>
         <source>Alpha</source>
         <translation>Alpha</translation>
     </message>
@@ -5084,7 +5518,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Cm</source>
-        <translation type="unfinished">Cm</translation>
+        <translation>Cm</translation>
     </message>
     <message>
         <source>Xtr1</source>
@@ -5236,7 +5670,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>XHinge     = %1</source>
-        <translation type="unfinished">X articulation      = %1</translation>
+        <translation>X articulation      = %1</translation>
     </message>
     <message>
         <source>YHinge     = %1</source>
@@ -5257,6 +5691,14 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Color</source>
         <translation>Couleur</translation>
+    </message>
+    <message>
+        <source>Highlight Current OpPoint</source>
+        <translation>Mettre en évidence le point de fonctionnement actuel</translation>
+    </message>
+    <message>
+        <source>Highlights the currently selected OpPoint, if any, on the currently selected polar curve</source>
+        <translation>Mettre en évidence le point de contrôle actuellement sélectionné, s’il existe, sur la courbe polaire actuellement selectionnée</translation>
     </message>
 </context>
 <context>
@@ -5468,6 +5910,10 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Smoothing</source>
         <translation>Lissage</translation>
+    </message>
+    <message>
+        <source>Q Graph</source>
+        <translation type="unfinished">Graphe Q</translation>
     </message>
 </context>
 <context>
@@ -5816,6 +6262,257 @@ Les cadres ont un nombre de points par face différent</translation>
         <source>Cancel</source>
         <translation>Abandonner</translation>
     </message>
+    <message>
+        <source>VLM Analysis</source>
+        <translation>Analyse VLM</translation>
+    </message>
+    <message>
+        <source>The number of points to be calculated will be limited to 100</source>
+        <translation>Le nombre de points à calculer sera limité à 100</translation>
+    </message>
+    <message>
+        <source>   Solving the problem... 
+
+</source>
+        <translation type="obsolete">   Résolution du problème... 
+
+</translation>
+    </message>
+    <message>
+        <source>
+
+Failed to create RHS....
+</source>
+        <translation type="obsolete">
+
+Échec lors de la créaton de RHS....
+</translation>
+    </message>
+    <message>
+        <source>
+Failed to create the matrix....
+</source>
+        <translation type="obsolete">
+Échec de la création de la matrice....
+</translation>
+    </message>
+    <message>
+        <source>
+
+Singular matrix - aborting....
+</source>
+        <translation type="obsolete">
+
+Matrice singulière- abandon....
+</translation>
+    </message>
+    <message>
+        <source>   Solving the problem... 
+</source>
+        <translation type="obsolete">   Résolution du problème... 
+</translation>
+    </message>
+    <message>
+        <source>      ...Control = %1
+</source>
+        <translation type="obsolete">      ...Contrôle = %1
+</translation>
+    </message>
+    <message>
+        <source>      Interpolation unsuccessful for Control=%1 - skipping.
+
+
+</source>
+        <translation type="obsolete">      Interpolation non couronnée de succès pour Control=%1 - abandon.
+
+
+</translation>
+    </message>
+    <message>
+        <source>     Sideslip is asymmetric
+</source>
+        <translation type="obsolete">     Le glissement latéral est asymétrique
+</translation>
+    </message>
+    <message>
+        <source>     Main wing is asymmetric
+</source>
+        <translation type="obsolete">     L’aile princpale est asymétrique
+</translation>
+    </message>
+    <message>
+        <source>     2nd wing is asymmetric
+</source>
+        <translation type="obsolete">... la deuxième aile est asymétrique
+</translation>
+    </message>
+    <message>
+        <source>     Elevator is asymmetric
+</source>
+        <translation type="obsolete">     Le stabilisateur horizontal est asymétrique
+</translation>
+    </message>
+    <message>
+        <source>     A fin is considered asymmetric
+</source>
+        <translation type="obsolete">     Une dérive est considérée comme étant asymétrique
+</translation>
+    </message>
+    <message>
+        <source>Perfoming symmetric calculation
+</source>
+        <translation type="obsolete">Réalisation des calculs symétriques
+</translation>
+    </message>
+    <message>
+        <source>Performing asymmetric calculation : 
+</source>
+        <translation type="obsolete">Exécution des calculs asymétriques : 
+</translation>
+    </message>
+    <message>
+        <source>Analysis Cancelled
+</source>
+        <translation>Analyse inerrompue
+</translation>
+    </message>
+    <message>
+        <source>
+
+Failed to create matrix....
+</source>
+        <translation type="obsolete">
+Échec de la création de la matrice....
+</translation>
+    </message>
+    <message>
+        <source>Launching VLM Analysis....
+
+</source>
+        <translation type="obsolete">Lancement de l’analyse VLM ....
+
+</translation>
+    </message>
+    <message>
+        <source>Type %1 Analysis
+
+</source>
+        <translation type="obsolete">Analyse de type %1
+
+</translation>
+    </message>
+    <message>
+        <source>
+VLM Analysis completed successfully
+</source>
+        <translation type="obsolete">
+Analyse VLM terminée avec succès
+</translation>
+    </message>
+    <message>
+        <source>
+VLM Analysis completed ... Errors encountered
+</source>
+        <translation type="obsolete">
+Analyse VLM terminée... Des erreurs ont été rencontrées
+</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>        ...Alpha = %1
+</source>
+        <translation type="obsolete">        ...Alpha = %1
+</translation>
+    </message>
+    <message>
+        <source>      Creating the influence matrix...
+</source>
+        <translation type="obsolete">      Création de la matrice d’influence...
+</translation>
+    </message>
+    <message>
+        <source>      ...Alpha=%1
+</source>
+        <translation type="obsolete">      ...Alpha=%1
+</translation>
+    </message>
+    <message>
+        <source>   ...QInf = %1 </source>
+        <translation>   ...QInf = %1 </translation>
+    </message>
+    <message>
+        <source>        Calculating aerodynamic coefficients...
+</source>
+        <translation type="obsolete">        Calcul des coefficients aérodynamiques ...
+</translation>
+    </message>
+    <message>
+        <source>         Calculating main wing...
+</source>
+        <translation type="obsolete">         Calcul de l’aile principale...
+</translation>
+    </message>
+    <message>
+        <source>       Calculating 2nd wing...
+</source>
+        <translation type="obsolete">       Calcul de la seconde aile...
+</translation>
+    </message>
+    <message>
+        <source>         Calculating elevator...
+</source>
+        <translation type="obsolete">         Calcul du stabilisateur horizontal...
+</translation>
+    </message>
+    <message>
+        <source>         Calculating fin...
+</source>
+        <translation type="obsolete">         Calcula de la dérive...
+</translation>
+    </message>
+    <message>
+        <source>        Calculating induced angles...
+</source>
+        <translation type="obsolete">        Calcul des angles induits...
+</translation>
+    </message>
+    <message>
+        <source>      Solving the linear system...
+</source>
+        <translation type="obsolete">      Résolution du système linéaire...
+</translation>
+    </message>
+    <message>
+        <source>      Singular Matrix.... Aborting calculation...
+</source>
+        <translation type="obsolete">      Matrice singulière.... Interruption des calculs...
+</translation>
+    </message>
+    <message>
+        <source>      Calculating the vortices circulations...
+</source>
+        <translation type="obsolete">      Calcul de la circulation des tourbillons...
+</translation>
+    </message>
+    <message>
+        <source>      Calculating speeds to balance the weight
+</source>
+        <translation type="obsolete">      Calcul des vitesses pour équilibrer le poids
+</translation>
+    </message>
+    <message>
+        <source>      Found a negative lift for Alpha=%1.... skipping the angle...
+</source>
+        <translation type="obsolete">      Portance négative trouvée pour Alpha=%1.... angle sauté...
+</translation>
+    </message>
+    <message>
+        <source>      Alpha=%1   QInf = %2</source>
+        <translation>      Alpha=%1   QInf = %2</translation>
+    </message>
 </context>
 <context>
     <name>W3dPrefsDlg</name>
@@ -5952,7 +6649,7 @@ Les cadres ont un nombre de points par face différent</translation>
     </message>
     <message>
         <source>Relax. factor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Facteur de réduction</translation>
     </message>
 </context>
 <context>
@@ -6069,7 +6766,7 @@ Les cadres ont un nombre de points par face différent</translation>
     </message>
     <message>
         <source>Tilt. Geom.</source>
-        <translation type="unfinished">Angle d’inclinaison</translation>
+        <translation type="unfinished">Angle de calage</translation>
     </message>
     <message>
         <source>Wake Roll-up</source>

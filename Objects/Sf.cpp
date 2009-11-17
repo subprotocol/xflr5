@@ -66,7 +66,7 @@ void CSF::SetCurveParams(int style, int width, QColor color)
 bool CSF::InitSplineFoil()
 {
 	m_bModified   = false;
-	m_strFoilName = "Spline Foil";
+	m_strFoilName = QObject::tr("Spline Foil");
 	
 	m_Extrados.m_Color = m_FoilColor;
 	m_Extrados.m_Style = m_FoilStyle;
@@ -240,7 +240,7 @@ bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
 		ar >> ArchiveFormat;
 		if(ArchiveFormat < 100000 || ArchiveFormat > 110000) return false;
 		ReadCString(ar, m_strFoilName);
-		m_strFoilName = "Spline Foil";
+		m_strFoilName = QObject::tr("Spline Foil");
 		ReadCOLORREF(ar, m_FoilColor);
 		ar >>m_FoilStyle >> m_FoilWidth;
 

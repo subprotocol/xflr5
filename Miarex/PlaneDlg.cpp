@@ -827,7 +827,7 @@ void PlaneDlg::SetupLayout()
 	m_pctrlPlaneDescription = new QTextEdit();
 	m_pctrlPlaneDescription->setToolTip(tr("Enter here a short description for the plane"));
 	QLabel *PlaneDescription = new QLabel(tr("Description:"));
-	m_pctrlPlaneInertia = new QPushButton("Plane Inertia");
+	m_pctrlPlaneInertia = new QPushButton(tr("Plane Inertia"));
 	NameLayout->addWidget(m_pctrlPlaneName);
 	NameLayout->addWidget(PlaneDescription);
 	NameLayout->addWidget(m_pctrlPlaneDescription);

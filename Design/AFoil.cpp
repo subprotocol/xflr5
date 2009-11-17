@@ -1175,7 +1175,7 @@ void QAFoil::OnAFoilDerotateFoil()
 	UpdateView();
 
 	double angle = m_pBufferFoil->DeRotate();
-	QString str = QString("Foil has been de-rotated by %1 degrees").arg(angle,6,'f',3);
+	QString str = QString(tr("Foil has been de-rotated by %1 degrees")).arg(angle,6,'f',3);
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->statusBar()->showMessage(str);
 
@@ -1209,7 +1209,7 @@ void QAFoil::OnAFoilNormalizeFoil()
 	if(!g_pCurFoil) return;
 	double length = g_pCurFoil->NormalizeGeometry();
 
-	QString str = QString("Foil has been normalized from %1  to 1.000").arg(length,7,'f',3);
+	QString str = QString(tr("Foil has been normalized from %1  to 1.000")).arg(length,7,'f',3);
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->statusBar()->showMessage(str);
@@ -1591,7 +1591,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox::warning(pMainFrame,tr("Warning"),"At least two foils are required");
+		QMessageBox::warning(pMainFrame,tr("Warning"), tr("At least two foils are required"));
 		return;
 	}
 
@@ -1787,9 +1787,9 @@ void QAFoil::OnExportCurFoil()
 	FileName = g_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, "Export Foil",
-											pMainFrame->m_LastDirName,
-											"Foil File (*.dat)");
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
+						pMainFrame->m_LastDirName,
+						tr("Foil File (*.dat)"));
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -1807,7 +1807,7 @@ void QAFoil::OnExportCurFoil()
 
 void QAFoil::OnExportSplinesToFile()
 {
-	QString FoilName = "Spline Foil";
+	QString FoilName = tr("Spline Foil");
 	QString FileName, strong;
 	QString strOut;
 
@@ -1824,13 +1824,13 @@ void QAFoil::OnExportSplinesToFile()
 	{
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
-			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
-			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
@@ -1840,14 +1840,14 @@ void QAFoil::OnExportSplinesToFile()
 		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
-			strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
-			strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
@@ -1856,8 +1856,9 @@ void QAFoil::OnExportSplinesToFile()
 	QFile DestFile;
 
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, "Export Splines", pMainFrame->m_LastDirName,
-											"Text File (*.dat)");
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Splines"), 
+				pMainFrame->m_LastDirName,
+				tr("Text File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos;
@@ -2157,13 +2158,13 @@ void QAFoil::OnStoreSplines()
 	{
 		if(m_pSF->m_Extrados.m_iRes>IQX2)
 		{
-			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QString strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
 		if(m_pSF->m_Intrados.m_iRes>IQX2)
 		{
-			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QString strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
@@ -2194,7 +2195,7 @@ void QAFoil::OnStoreSplines()
 		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
-			QString strong = QString("Too many output points on upper surface\n Max =%1").arg(IQX2);
+			QString strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
@@ -2202,7 +2203,7 @@ void QAFoil::OnStoreSplines()
 		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
 		if(size>IQX2)
 		{
-			QString strong = QString("Too many output points on lower surface\n Max =%1").arg(IQX2);
+			QString strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
@@ -2581,13 +2582,13 @@ void QAFoil::PaintView(QPainter &painter)
 
 	QString str;
 
-	str = QString("X-Scale = %1").arg(m_fScale/m_fRefScale,4,'f',1);
+	str = QString(tr("X-Scale = %1")).arg(m_fScale/m_fRefScale,4,'f',1);
 	painter.drawText(5,10, str);
-	str = QString("Y-Scale = %1").arg(m_fScaleY*m_fScale/m_fRefScale,4,'f',1);
+	str = QString(tr("Y-Scale = %1")).arg(m_fScaleY*m_fScale/m_fRefScale,4,'f',1);
 	painter.drawText(5,22, str);
-	str = QString("x  = %1").arg(m_MousePos.x,7,'f',4);
+	str = QString(tr("x  = %1")).arg(m_MousePos.x,7,'f',4);
 	painter.drawText(5,34, str);
-	str = QString("y  = %1").arg(m_MousePos.y,7,'f',4);
+	str = QString(tr("y  = %1")).arg(m_MousePos.y,7,'f',4);
 	painter.drawText(5,46, str);
 
 	painter.restore();
@@ -2735,7 +2736,7 @@ void QAFoil::PFNew()
 	bool bLoadNew = true;
 	if(m_pPF->m_bModified)
 	{
-		if (QMessageBox::Yes != QMessageBox::question(this, "Question", "Discard changes to Splines ?",
+		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
 													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 		{
 			bLoadNew = false;
@@ -2935,14 +2936,14 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setSizePolicy(szPolicyExpanding);
 
 	m_pctrlFoilStyle   = new LineButton;
-	m_pctrlVisible     = new QCheckBox("Show Foil");
-	m_pctrlCenterLine  = new QCheckBox("Show Centerline");
-	m_pctrlFoilPoints  = new QCheckBox("Show Points");
+	m_pctrlVisible     = new QCheckBox(tr("Show Foil"));
+	m_pctrlCenterLine  = new QCheckBox(tr("Show Centerline"));
+	m_pctrlFoilPoints  = new QCheckBox(tr("Show Points"));
 
-	m_pctrlRename      = new QPushButton("Rename");
-	m_pctrlDelete      = new QPushButton("Delete");
-	m_pctrlDuplicate   = new QPushButton("Duplicate");
-	m_pctrlExport      = new QPushButton("Export");
+	m_pctrlRename      = new QPushButton(tr("Rename"));
+	m_pctrlDelete      = new QPushButton(tr("Delete"));
+	m_pctrlDuplicate   = new QPushButton(tr("Duplicate"));
+	m_pctrlExport      = new QPushButton(tr("Export"));
 
 	QGridLayout *FoilCommands = new QGridLayout;
 	FoilCommands->addWidget(m_pctrlRename,1,1);
@@ -2951,8 +2952,8 @@ void QAFoil::SetupLayout()
 	FoilCommands->addWidget(m_pctrlExport,2,2);
 
 	QHBoxLayout *SplineOption = new QHBoxLayout;
-	m_pctrlSF = new QRadioButton("Splines");
-	m_pctrlPF = new QRadioButton("Splined points");
+	m_pctrlSF = new QRadioButton(tr("Splines"));
+	m_pctrlPF = new QRadioButton(tr("Splined points"));
 	SplineOption->addWidget(m_pctrlSF);
 	SplineOption->addWidget(m_pctrlPF);
 
@@ -3002,9 +3003,9 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setHeaderData(8, Qt::Horizontal, tr("TE YHinge"));
 	m_pFoilModel->setHeaderData(9, Qt::Horizontal, tr("LE Flap (")+QString::fromUtf8("°")+")");
 	m_pFoilModel->setHeaderData(10, Qt::Horizontal, tr("LE XHinge"));
-	m_pFoilModel->setHeaderData(11, Qt::Horizontal,tr( "LE YHinge"));
+	m_pFoilModel->setHeaderData(11, Qt::Horizontal, tr("LE YHinge"));
 	m_pctrlFoilTable->setModel(m_pFoilModel);
-	m_pctrlFoilTable->setWindowTitle("Foils");
+	m_pctrlFoilTable->setWindowTitle(tr("Foils"));
 
 	m_pFoilDelegate = new FoilTableDelegate;
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
@@ -3137,7 +3138,7 @@ void QAFoil::SFNew()
 	bool bLoadNew = true;
 	if(m_pSF->m_bModified)
 	{
-		if (QMessageBox::Yes != QMessageBox::question(this, "Question", "Discard changes to Splines ?",
+		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
 													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 		{
 			bLoadNew = false;

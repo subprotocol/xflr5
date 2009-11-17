@@ -2668,13 +2668,13 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 		QFontMetrics fm(pMainFrame->m_TextFont);
 		int dD = fm.height();
 
-		strong = QString("Frame %1").arg(m_pBody->m_iActiveFrame+1,2);
+		strong = QString(tr("Frame %1")).arg(m_pBody->m_iActiveFrame+1,2);
 		m_pglWidget->renderText(m_FrameRect.left() +dD ,dD,strong, pMainFrame->m_TextFont);
 
-		strong = QString("Scale = %1").arg(m_FrameScale/m_BodyRefScale,4,'f',2);
+		strong = QString(tr("Scale = %1")).arg(m_FrameScale/m_BodyRefScale,4,'f',2);
 		m_pglWidget->renderText(m_FrameRect.left() +dD ,2*dD,strong, pMainFrame->m_TextFont);
 
-		strong = QString("Scale = %1").arg(m_BodyScale/m_BodyRefScale,4,'f',2);
+		strong = QString(tr("Scale = %1")).arg(m_BodyScale/m_BodyRefScale,4,'f',2);
 		m_pglWidget->renderText(m_BodyLineRect.left() +dD ,dD,strong, pMainFrame->m_TextFont);
 
 		if(m_FrameRect.contains(m_MousePos))
@@ -4218,7 +4218,7 @@ void GL3dBodyDlg::reject()
 	{
 		m_pBody->m_BodyName = m_pctrlBodyName->text();
 
-		int res = QMessageBox::question(this, "Body Dlg Exit", "Save the Body ?", QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
+		int res = QMessageBox::question(this, tr("Body Dlg Exit"), tr("Save the Body ?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel);
 		if (QMessageBox::No == res)
 		{
 			m_pBody = NULL;
@@ -4672,11 +4672,11 @@ void GL3dBodyDlg::SetupLayout()
 	m_ArcBall.m_pGLWidget = m_pglWidget;
 
 	QGridLayout *ThreeDParams = new QGridLayout;
-	m_pctrlAxes       = new QCheckBox("Axes");
-	m_pctrlLight      = new QCheckBox("Light");
-	m_pctrlSurfaces   = new QCheckBox("Surfaces");
-	m_pctrlOutline    = new QCheckBox("Outline");
-	m_pctrlPanels     = new QCheckBox("Panels");
+	m_pctrlAxes       = new QCheckBox(tr("Axes"));
+	m_pctrlLight      = new QCheckBox(tr("Light"));
+	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
+	m_pctrlOutline    = new QCheckBox(tr("Outline"));
+	m_pctrlPanels     = new QCheckBox(tr("Panels"));
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
@@ -4688,12 +4688,12 @@ void GL3dBodyDlg::SetupLayout()
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
 	ThreeDParams->addWidget(m_pctrlPanels, 2,3);
 
-	m_pctrlX          = new QPushButton("X");
-	m_pctrlY          = new QPushButton("Y");
-	m_pctrlZ          = new QPushButton("Z");
-	m_pctrlIso        = new QPushButton("Iso");
-	m_pctrlPickCenter = new QPushButton("Pick Center");
-	m_pctrlReset      = new QPushButton("Reset Scales");
+	m_pctrlX          = new QPushButton(tr("X"));
+	m_pctrlY          = new QPushButton(tr("Y"));
+	m_pctrlZ          = new QPushButton(tr("Z"));
+	m_pctrlIso        = new QPushButton(tr("Iso"));
+	m_pctrlPickCenter = new QPushButton(tr("Pick Center"));
+	m_pctrlReset      = new QPushButton(tr("Reset Scales"));
 	m_pctrlPickCenter->setSizePolicy(szPolicyMinimum);
 	m_pctrlPickCenter->setCheckable(true);
 	m_pctrlReset->setSizePolicy(szPolicyMinimum);
@@ -4719,7 +4719,7 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
 
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
-	QLabel *ClipLabel = new QLabel("Clip Plane");
+	QLabel *ClipLabel = new QLabel(tr("Clip Plane"));
 	ClipLabel->setSizePolicy(szPolicyMaximum);
 	ThreeDViewControls->addWidget(ClipLabel);
 	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
@@ -4729,7 +4729,7 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlRedo = new QPushButton(QIcon(":/images/OnRedo.png"), tr("Redo"));
 	m_pctrlMenuButton = new QPushButton(tr("Other"));
 
-	BodyMenu = new QMenu("Actions...",this);
+	BodyMenu = new QMenu(tr("Actions..."),this);
 
 	BodyMenu->addAction(m_pGrid);
 	BodyMenu->addSeparator();
@@ -4775,18 +4775,18 @@ void GL3dBodyDlg::SetupLayout()
 	ControlsLayout->addLayout(CommandButtons);
 
 	QHBoxLayout *BodyType = new QHBoxLayout;
-	m_pctrlFlatPanels = new QRadioButton("Flat Panels");
-	m_pctrlBSplines = new QRadioButton("BSplines");
+	m_pctrlFlatPanels = new QRadioButton(tr("Flat Panels"));
+	m_pctrlBSplines = new QRadioButton(tr("BSplines"));
 	m_pctrlFlatPanels->setSizePolicy(szPolicyMinimum);
 	m_pctrlBSplines->setSizePolicy(szPolicyMinimum);
 	BodyType->addWidget(m_pctrlFlatPanels);
 	BodyType->addWidget(m_pctrlBSplines);
 
 	QGridLayout *Params = new QGridLayout;
-	QLabel *lab1 = new QLabel("x");
-	QLabel *lab2 = new QLabel("Hoop");
-	QLabel *lab3 = new QLabel("Degree");
-	QLabel *lab4 = new QLabel("Panels");
+	QLabel *lab1 = new QLabel(tr("x"));
+	QLabel *lab2 = new QLabel(tr("Hoop"));
+	QLabel *lab3 = new QLabel(tr("Degree"));
+	QLabel *lab4 = new QLabel(tr("Panels"));
 	m_pctrlXDegree = new QComboBox;
 	m_pctrlHoopDegree = new QComboBox;
 	m_pctrlNXPanels = new FloatEdit;
@@ -4814,14 +4814,14 @@ void GL3dBodyDlg::SetupLayout()
 	QVBoxLayout *BodyParams = new QVBoxLayout;
 
 	QHBoxLayout *BodyDef = new QHBoxLayout;
-	m_pctrlBodyName = new QLineEdit("BodyName");
+	m_pctrlBodyName = new QLineEdit(tr("BodyName"));
 	m_pctrlBodyStyle = new LineButton;
 	m_pctrlBodyStyle->setSizePolicy(szPolicyMinimum);
 	BodyDef->addWidget(m_pctrlBodyName);
 	BodyDef->addWidget(m_pctrlBodyStyle);
 
 	m_pctrlBodyDescription = new QTextEdit();
-	m_pctrlBodyDescription->setToolTip("Enter here a short description for the body");
+	m_pctrlBodyDescription->setToolTip(tr("Enter here a short description for the body"));
 	QLabel *BodyDes = new QLabel(tr("Description:"));
 	BodyParams->setStretchFactor(m_pctrlBodyDescription,1);
 
@@ -4836,8 +4836,8 @@ void GL3dBodyDlg::SetupLayout()
 	QVBoxLayout * FramePosLayout = new QVBoxLayout;
 	m_pctrlFrameTable = new QTableView;
 //	m_pctrlFrameTable->setSizePolicy(szPolicyMinimum);
-	m_pctrlFrameTable->setWindowTitle("Frames");
-	QLabel *LabelFrame = new QLabel("Frame Positions");
+	m_pctrlFrameTable->setWindowTitle(tr("Frames"));
+	QLabel *LabelFrame = new QLabel(tr("Frame Positions"));
 	LabelFrame->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	FramePosLayout->addWidget(LabelFrame);
 	FramePosLayout->addWidget(m_pctrlFrameTable);
@@ -4850,8 +4850,8 @@ void GL3dBodyDlg::SetupLayout()
 	QVBoxLayout * FramePointLayout = new QVBoxLayout;
 	m_pctrlPointTable = new QTableView;
 //	m_pctrlPointTable->setSizePolicy(szPolicyMinimum);
-	m_pctrlPointTable->setWindowTitle("Points");
-	QLabel *LabelPoints = new QLabel("Current Frame Definition");
+	m_pctrlPointTable->setWindowTitle(tr("Points"));
+	QLabel *LabelPoints = new QLabel(tr("Current Frame Definition"));
 	LabelPoints->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 	FramePointLayout->addWidget(LabelPoints);
 	FramePointLayout->addWidget(m_pctrlPointTable);
@@ -4948,7 +4948,7 @@ void GL3dBodyDlg::StorePicture()
 void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 {
 	m_pShowCurFrameOnly->setChecked(m_bCurFrameOnly);
-	QMenu *CtxMenu = new QMenu("Context Menu",this);
+	QMenu *CtxMenu = new QMenu(tr("Context Menu"),this);
 	CtxMenu->addAction(m_pInsertPoint);
 	CtxMenu->addAction(m_pRemovePoint);
 	CtxMenu->addSeparator();

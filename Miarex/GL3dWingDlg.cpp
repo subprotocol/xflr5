@@ -375,18 +375,18 @@ void GL3dWingDlg::FillTableRow(int row)
 		ind = m_pWingModel->index(row, 6, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NXPanels[row]);
 
-		if(m_pWing->m_XPanelDist[row]==0)      strong = "Uniform";
-		else if(m_pWing->m_XPanelDist[row]==1) strong = "Cosine";
+		if(m_pWing->m_XPanelDist[row]==0)      strong = tr("Uniform");
+		else if(m_pWing->m_XPanelDist[row]==1) strong = tr("Cosine");
 		ind = m_pWingModel->index(row, 7, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 
 		ind = m_pWingModel->index(row, 8, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NYPanels[row]);
 
-		if(m_pWing->m_YPanelDist[row]==0)       strong = "Uniform";
-		else if(m_pWing->m_YPanelDist[row]==1)  strong = "Cosine";
-		else if(m_pWing->m_YPanelDist[row]==2)  strong = "Sine";
-		else if(m_pWing->m_YPanelDist[row]==-2) strong = "-Sine";
+		if(m_pWing->m_YPanelDist[row]==0)       strong = tr("Uniform");
+		else if(m_pWing->m_YPanelDist[row]==1)  strong = tr("Cosine");
+		else if(m_pWing->m_YPanelDist[row]==2)  strong = tr("Sine");
+		else if(m_pWing->m_YPanelDist[row]==-2) strong = tr("-Sine");
 		ind = m_pWingModel->index(row, 9, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 	}
@@ -2215,7 +2215,7 @@ void GL3dWingDlg::ReadParams()
 {
 	m_pWing->m_WingName        = m_pctrlWingName->text();
 	QString strange = m_pctrlWingDescription->toPlainText();
-	if(strange == "Wing Description") strange="";
+	if(strange == tr("Wing Description")) strange="";
 	m_pWing->m_WingDescription = strange;
 
 	for (int i=0; i< m_pWingModel->rowCount();  i++)
@@ -2293,10 +2293,10 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");
-	if(strong=="Uniform")		m_pWing->m_XPanelDist[sel] = 0;
-	else if(strong=="Cosine")	m_pWing->m_XPanelDist[sel] = 1;
-	else if(strong=="Sine")		m_pWing->m_XPanelDist[sel] = 2;
-	else if(strong=="-Sine")	m_pWing->m_XPanelDist[sel] = -2;
+	if(strong==tr("Uniform"))		m_pWing->m_XPanelDist[sel] = 0;
+	else if(strong==tr("Cosine"))	m_pWing->m_XPanelDist[sel] = 1;
+	else if(strong==tr("Sine"))		m_pWing->m_XPanelDist[sel] = 2;
+	else if(strong==tr("-Sine"))	m_pWing->m_XPanelDist[sel] = -2;
 
 	pItem = m_pWingModel->item(sel,8);
 	strong =pItem->text();
@@ -2308,10 +2308,10 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 
-	if(strong=="Uniform")		m_pWing->m_YPanelDist[sel] = 0;
-	else if(strong=="Cosine")	m_pWing->m_YPanelDist[sel] = 1;
-	else if(strong=="Sine")		m_pWing->m_YPanelDist[sel] = 2;
-	else if(strong=="-Sine")	m_pWing->m_YPanelDist[sel] = -2;
+	if(strong==tr("Uniform"))		m_pWing->m_YPanelDist[sel] = 0;
+	else if(strong==tr("Cosine"))	m_pWing->m_YPanelDist[sel] = 1;
+	else if(strong==tr("Sine"))		m_pWing->m_YPanelDist[sel] = 2;
+	else if(strong==tr("-Sine"))	m_pWing->m_YPanelDist[sel] = -2;
 
 }
 
@@ -2559,7 +2559,7 @@ void GL3dWingDlg::SetWingData()
 	m_pctrlAspectRatio->setText(str);
 
 	if(m_pWing->m_TChord[m_pWing->m_NPanel]>0.0) str = QString("%1").arg(m_pWing->m_TR,0,'f',2);
-	else                                         str = "Undefined";
+	else                                         str = tr("Undefined");
 	m_pctrlTaperRatio->setText(str);
 
 	str = QString("%1").arg(m_pWing->GetAverageSweep(),5,'f',2);
@@ -2622,7 +2622,7 @@ void GL3dWingDlg::SetupLayout()
 	SymLayout->addWidget(m_pctrlDeleteSection);
 
 	QHBoxLayout *NameLayout = new QHBoxLayout;
-	m_pctrlWingName     = new QLineEdit("WingName");
+	m_pctrlWingName     = new QLineEdit(tr("WingName"));
 	m_pctrlWingColor    = new ColorButton;
 	NameLayout->addWidget(m_pctrlWingName);
 	NameLayout->addWidget(m_pctrlWingColor);
@@ -2896,7 +2896,7 @@ void GL3dWingDlg::SetupLayout()
 
 void GL3dWingDlg::ShowContextMenu(QContextMenuEvent * event)
 {
-	QMenu *CtxMenu = new QMenu("Context Menu",this);
+	QMenu *CtxMenu = new QMenu(tr("Context Menu"),this);
 //	CtxMenu->addAction(m_pInsertPoint);
 
 	QPoint CltPt = event->pos();

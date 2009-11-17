@@ -48,7 +48,7 @@ InertiaDlg::InertiaDlg()
 
 	for(int i=0; i< MAXMASSES; i++)
 	{
-		m_MassTag[i] = QString("Description %1").arg(i);
+		m_MassTag[i] = QString(tr("Description %1")).arg(i);
 	}
 
 	SetupLayout();
@@ -208,7 +208,7 @@ void InertiaDlg::InitDialog()
 			m_MassTag[i]   = m_pWing->m_MassTag[i];
 		}
 		m_pctrlObjectMass->SetValue(m_pWing->m_Mass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
-		m_pctrlObjectMassLabel->setText("Wing Mass:");
+		m_pctrlObjectMassLabel->setText(tr("Wing Mass:"));
 	}
 	else if (m_pBody)
 	{
@@ -221,7 +221,7 @@ void InertiaDlg::InitDialog()
 			m_MassTag[i]   = m_pBody->m_MassTag[i];
 		}
 		m_pctrlObjectMass->SetValue(m_pBody->m_Mass * pMainFrame->m_kgtoUnit);
-		m_pctrlObjectMassLabel->setText("Body Mass:");
+		m_pctrlObjectMassLabel->setText(tr("Body Mass:"));
 	}
 	else if (m_pPlane)
 	{
@@ -240,7 +240,7 @@ void InertiaDlg::InitDialog()
 		}
 
 		m_pctrlObjectMass->SetValue(m_Mass * pMainFrame->m_kgtoUnit);
-		m_pctrlObjectMassLabel->setText("Plane Mass:");
+		m_pctrlObjectMassLabel->setText(tr("Plane Mass:"));
 		m_pctrlObjectMass->setEnabled(false);
 	}
 
@@ -294,8 +294,8 @@ void InertiaDlg::OnExportToAVL()
 	else if(m_pBody) FileName = m_pBody->m_BodyName;
 	FileName.replace("/", " ");
 	FileName += ".mass";
-	FileName = QFileDialog::getSaveFileName(this, "Export Mass Properties",pMainFrame->m_LastDirName + "/"+FileName,
-	                                        "AVL Mass File (*.mass)", &filter);
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Mass Properties"),pMainFrame->m_LastDirName + "/"+FileName,
+	                                        tr("AVL Mass File (*.mass)"), &filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
@@ -353,7 +353,7 @@ void InertiaDlg::OnExportToAVL()
 		// we need to convert the inertia in the wing's CoG system
 		// by applying Huyghen/Steiner's theorem
 
-		strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Inertia of both left and right wings")
+		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Inertia of both left and right wings"))
 						.arg(m_Mass /Munit,  8, 'f', 2)
 						.arg(m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_CoG.y/Lunit, 8, 'f', 2)  //should be zero
@@ -363,7 +363,7 @@ void InertiaDlg::OnExportToAVL()
 	}
 	else if (m_pBody)
 	{
-		strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Body inertia")
+		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Body inertia"))
 						.arg(m_Mass /Munit, 8, 'f', 2)
 						.arg(m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_CoG.y/Lunit, 8, 'f', 2)
@@ -375,7 +375,7 @@ void InertiaDlg::OnExportToAVL()
 	{
 		// we write out each object contribution individually
 		// a plane has always a wing
-		strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Main wing's inertia")
+		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Main wing's inertia"))
 						.arg(m_pPlane->m_Wing.m_Mass /Munit, 8, 'f', 2)
 						.arg(m_pPlane->m_Wing.m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_pPlane->m_Wing.m_CoG.y/Lunit, 8, 'f', 2)
@@ -387,7 +387,7 @@ void InertiaDlg::OnExportToAVL()
 
 		if(m_pPlane->m_bBiplane)
 		{
-			strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Second wing's inertia")
+			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Second wing's inertia"))
 						.arg(m_pPlane->m_Wing2.m_Mass /Munit, 8, 'f', 2)
 						.arg(m_pPlane->m_Wing2.m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_pPlane->m_Wing2.m_CoG.y/Lunit, 8, 'f', 2)
@@ -399,7 +399,7 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bStab)
 		{
-			strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Elevator's inertia")
+			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Elevator's inertia"))
 						.arg(m_pPlane->m_Stab.m_Mass /Munit, 8, 'f', 2)
 						.arg(m_pPlane->m_Stab.m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_pPlane->m_Stab.m_CoG.y/Lunit, 8, 'f', 2)
@@ -411,7 +411,7 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bFin)
 		{
-			strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Fin's inertia")
+			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Fin's inertia"))
 						.arg(m_pPlane->m_Fin.m_Mass /Munit, 8, 'f', 2)
 						.arg(m_pPlane->m_Fin.m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_pPlane->m_Fin.m_CoG.y/Lunit, 8, 'f', 2)
@@ -423,7 +423,7 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bBody)
 		{
-			strong = QString("%1  %2  %3  %4  %5  %6  %7 ! Body's inertia")
+			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Body's inertia"))
 						.arg(m_pPlane->m_pBody->m_Mass /Munit, 8, 'f', 2)
 						.arg(m_pPlane->m_pBody->m_CoG.x/Lunit, 8, 'f', 2)
 						.arg(m_pPlane->m_pBody->m_CoG.y/Lunit, 8, 'f', 2)
@@ -758,7 +758,7 @@ void InertiaDlg::SetupLayout()
 	LabIyy->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	LabIzz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
 	LabIxz->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-	QLabel *LabInertiaObject = new QLabel("Inertia in CoG Frame");
+	QLabel *LabInertiaObject = new QLabel(tr("Inertia in CoG Frame"));
 	LabInertiaObject->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlInertiaUnit1 = new QLabel("kg.m2");
 	ResultsLayout->addWidget(LabIxx,1,2);

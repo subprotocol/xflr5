@@ -359,7 +359,7 @@ void MainFrame::closeEvent (QCloseEvent * event)
 
 	if(!m_bSaved)
 	{
-		int resp = QMessageBox::question(this, "Exit", tr("Save the project before exit ?"),
+		int resp = QMessageBox::question(this, tr("Exit"), tr("Save the project before exit ?"),
 										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
 										 QMessageBox::Yes);
 		if(resp == QMessageBox::Yes)
@@ -2175,7 +2175,7 @@ void MainFrame::CreateXInverseMenus()
 	InverseFoilMenu->addAction(InvQReflected);
 
 	//Context Menu for XInverse Application
-	InverseContextMenu = new QMenu("Context Menu",this);
+	InverseContextMenu = new QMenu(tr("Context Menu"),this);
 	InverseContextMenu->addAction(InverseStyles);
 	InverseContextMenu->addAction(InverseResetScale);
 	InverseContextMenu->addAction(resetCurGraphScales);
