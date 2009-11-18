@@ -1898,9 +1898,50 @@ void GL3dWingDlg::OnInertia()
 	InertiaDlg dlg;
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.m_pWing = m_pWing;
+
+	//save inertia properties
+	int NMass;
+	double MassValue[MAXMASSES];
+	CVector MassPosition[MAXMASSES];
+	QString MassTag[MAXMASSES];
+	CVector CoG;
+	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
+
+	NMass = m_pWing->m_NMass;
+	CoG = m_pWing->m_CoG;
+	CoGIxx = m_pWing->m_CoGIxx;
+	CoGIyy = m_pWing->m_CoGIyy;
+	CoGIzz = m_pWing->m_CoGIzz;
+	CoGIxz = m_pWing->m_CoGIxz;
+	for(int i=0; i< MAXMASSES; i++)
+	{
+		MassValue[i]    = m_pWing->m_MassValue[i];
+		MassPosition[i] = m_pWing->m_MassPosition[i];
+		MassTag[i]      = m_pWing->m_MassTag[i];
+	}
+
 	dlg.InitDialog();
-	dlg.exec();
-	m_bChanged = true;
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		if(dlg.m_bChanged) m_bChanged = true;
+	}
+	else
+	{
+		// restore saved inertia
+		m_pWing->m_NMass = NMass;
+		m_pWing->m_CoG = CoG;
+		m_pWing->m_CoGIxx = CoGIxx;
+		m_pWing->m_CoGIyy = CoGIyy;
+		m_pWing->m_CoGIzz = CoGIzz;
+		m_pWing->m_CoGIxz = CoGIxz;
+
+		for(int i=0; i< MAXMASSES; i++)
+		{
+			MassValue[i]    = m_pWing->m_MassValue[i];
+			MassPosition[i] = m_pWing->m_MassPosition[i];
+			MassTag[i]      = m_pWing->m_MassTag[i];
+		}
+	}
 }
 
 

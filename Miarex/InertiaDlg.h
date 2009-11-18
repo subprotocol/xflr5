@@ -89,6 +89,8 @@ private:
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
 	int m_NMass;
+
+	bool m_bChanged;
 };
 
 #endif // INERTIADLG_H

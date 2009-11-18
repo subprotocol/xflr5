@@ -44,19 +44,17 @@ public:
 	CSpline();
 	virtual ~CSpline();
 
-//	bool AddPoint(double x, double y);
+	void DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
+	void DrawCtrlPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
+	void DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset);
 
-	void DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset);
-	void DrawCtrlPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
-	void DrawOutputPoints(QPainter & painter,double scalex, double scaley, QPoint &Offset);
-
-	bool InsertPoint(double x, double y);
-	bool RemovePoint(int k);
-	int IsControlPoint(CVector Real);
-	int IsControlPoint(double x, double y, double zx, double zy);
-	int IsControlPoint(CVector Real, double ZoomFactor);
-	double SplineBlend(int i, int p, double t);
-	double GetY(double x);
+	bool InsertPoint(double const &x, double const &y);
+	bool RemovePoint(int const &k);
+	int IsControlPoint(CVector const &Real);
+	int IsControlPoint(double const &x, double const &y, double const &zx, double const &zy);
+	int IsControlPoint(CVector const &Real, double const &ZoomFactor);
+	double SplineBlend(int const &i, int const &p, double const &t);
+	double GetY(double const &x);
 
 	void Copy(CSpline *pSpline);
 	void Export(QTextStream &out, bool bExtrados);

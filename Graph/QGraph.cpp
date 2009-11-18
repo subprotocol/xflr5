@@ -95,7 +95,7 @@ void QGraph::DrawGraph(QRect const &rect, QPainter &painter)
 
 void QGraph::DrawGraph(QPainter &painter)
 {
-	QColor color;
+	static QColor color;
 	painter.save();
 
 //	Paint background
@@ -140,13 +140,17 @@ void QGraph::DrawGraph(QPainter &painter)
 void QGraph::DrawCurve(int nIndex,QPainter &painter)
 {
 	painter.save();
-	double scaley = m_scaley;
-	int i;
-	int ptside = 2;
+	static double scaley;
+	static int i, ptside;
+	static QColor color;
+	static QPoint From, To, Min, Max;
+	static QRect rViewRect;
+
+	ptside = 2;
 
 	CCurve* pCurve = GetCurve(nIndex);
 
-	QColor color;
+	scaley = m_scaley;
 
 	QBrush FillBrush(m_BkColor);
 	painter.setBrush(FillBrush);
@@ -156,10 +160,12 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 	CurvePen.setWidth((int)pCurve->GetWidth());
 	painter.setPen(CurvePen);
 
-	QPoint From, To;
-	QPoint Min(int(xmin/m_scalex) +m_ptoffset.x(), int(ymin/scaley) +m_ptoffset.y());
-	QPoint Max(int(xmax/m_scalex) +m_ptoffset.x(), int(ymax/scaley) +m_ptoffset.y());
-	QRect rViewRect(Min, Max);
+	Min.setX(int(xmin/m_scalex) +m_ptoffset.x());
+	Min.setY(int(ymin/scaley) +m_ptoffset.y());
+	Max.setX(int(xmax/m_scalex) +m_ptoffset.x());
+	Max.setY(int(ymax/scaley) +m_ptoffset.y());
+	rViewRect.setTopLeft(Min);
+	rViewRect.setBottomRight(Max);
 
 	if(pCurve->n>1 && pCurve->IsVisible())
 	{
@@ -212,17 +218,17 @@ void QGraph::DrawCurve(int nIndex,QPainter &painter)
 
 void QGraph::DrawAxes(QPainter &painter)
 {	
-	double scaley = m_scaley;
+	static double xp, yp, scaley;
+	static QPen AxesPen;
+	scaley = m_scaley;
 	painter.save();
 
-	QPen AxesPen(m_AxisColor);
+	AxesPen.setColor(m_AxisColor);
 	AxesPen.setStyle(GetStyle(m_AxisStyle));
 	AxesPen.setWidth(m_AxisWidth);
 	painter.setPen(AxesPen);
 
-
 	//vertical axis
-	double xp;
 	if(xo>=xmin && xo<=xmax) xp = xo;
 	else if(xo>xmax)         xp = xmax;
 	else                     xp = xmin;
@@ -231,7 +237,6 @@ void QGraph::DrawAxes(QPainter &painter)
 					 (int)(xp/m_scalex) + m_ptoffset.x(), (int)(ymax/scaley) + m_ptoffset.y());
 
 	//horizontal axis
-	double yp;
 	if(yo>=ymin && yo<=ymax)	yp = yo;
 	else if(yo>ymax)		yp = ymax;
 	else				yp = ymin;
@@ -246,23 +251,22 @@ void QGraph::DrawAxes(QPainter &painter)
 
 void QGraph::DrawTitles(QPainter &painter)
 {
-	double scaley = m_scaley;
 	//draws the x & y axis name
-	int XPosXTitle, YPosXTitle;
-	int XPosYTitle, YPosYTitle;
+	static double scaley;
+	static int XPosXTitle, YPosXTitle, XPosYTitle, YPosYTitle;
+	static double xp, yp;
 
+	scaley = m_scaley;
 	painter.save();
 	XPosXTitle = 5;
 	YPosXTitle = -10;
 	XPosYTitle = -5;
 	YPosYTitle =  5;
 
-	double xp;
 	if(xo>=xmin && xo<=xmax) xp = xo;
 	else if(xo>xmax)         xp = xmax;
 	else					 xp = xmin;
 
-	double yp;
 	if(yo>=ymin && yo<=ymax) yp = yo;
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
@@ -283,10 +287,13 @@ void QGraph::DrawTitles(QPainter &painter)
 
 void QGraph::DrawXTicks(QPainter &painter)
 {
-	double scaley = m_scaley;
+	static double main, scaley, xt, yp;
+	static int exp, TickSize, height, yExpOff, xMainOff, nx;
+
 	if(fabs(xunit)<0.00000001) return;
 	if(fabs(xmax-xmin)/xunit>30.0) return;
 
+	scaley = m_scaley;
 	painter.save();
 	QString strLabel, strLabelExp;
 
@@ -294,10 +301,6 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 	painter.setFont(m_LabelLogFont);
 
-	int exp;
-	double main;
-	int TickSize;
-	int height, yExpOff, xMainOff;
 
 	TickSize = 5;
 	height  = fm.height()/2;
@@ -309,11 +312,11 @@ void QGraph::DrawXTicks(QPainter &painter)
 	LabelPen.setStyle(GetStyle(m_AxisStyle));
 	LabelPen.setWidth(m_AxisWidth);
 	painter.setPen(LabelPen);
-	double xt = xo-(xo-xmin);//one tick at the origin
-	int  nx = (int)((xo-xmin)/xunit);
+	xt = xo-(xo-xmin);//one tick at the origin
+	nx = (int)((xo-xmin)/xunit);
 	xt = xo - nx*xunit;
 
-	double yp;
+
 	if(yo>=ymin && yo<=ymax) yp = yo;
 	else if(yo>ymax)         yp = ymax;
 	else                     yp = ymin;
@@ -364,16 +367,14 @@ void QGraph::DrawXTicks(QPainter &painter)
 
 void QGraph::DrawYTicks(QPainter &painter)
 {
-	double scaley = m_scaley;
+	static double scaley, xp, main, yt;
+	static int TickSize, xExpOff, fmheight, fmheight2, fmheight4, exp;
 	if(fabs(xunit)<0.00000001) return;
 	if(fabs(ymax-ymin)/yunit>30.0) return;
-
+	scaley = m_scaley;
 	painter.save();
 	QString strLabel, strLabelExp;
-	int exp = 0.0;
-	double main;
-	int TickSize;
-	int xExpOff, fmheight, fmheight2, fmheight4;
+	exp = 0.0;
 	QFontMetrics fm(m_LabelLogFont);
 
 	painter.setFont(m_LabelLogFont);
@@ -389,14 +390,12 @@ void QGraph::DrawYTicks(QPainter &painter)
 	LabelPen.setStyle(GetStyle(m_AxisStyle));
 	LabelPen.setWidth(m_AxisWidth);
 
-//	double yt = ymin;
-	double xp;
 
 	if(xo>=xmin && xo<=xmax) xp = xo;
 	else if(xo>xmax)         xp = xmax;
 	else                     xp = xmin;
 
-	double yt = yo-int((yo-ymin)*1.0001/yunit)*yunit;//one tick at the origin
+	yt = yo-int((yo-ymin)*1.0001/yunit)*yunit;//one tick at the origin
 
 	while(yt<=ymax*1.0001)
 	{
@@ -827,7 +826,7 @@ void QGraph::LoadSettings(QSettings *pSettings)
 	QColor cr, cr1, cr2;
 	QString str, FontName;
 	QFont lgft;
-	bool bOK, bs, ba;
+	bool bs, ba;
 	int s,w;
 	int r,g,b;
 	double f;

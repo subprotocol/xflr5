@@ -1,4 +1,4 @@
-	
+﻿	
 *******************************************************************************
 
 
@@ -17,6 +17,7 @@
 
 QFLR5 v0.04 Beta November xxx 2009
 	- Added some signal connections for wing control polars 
+	- Declared a bunch of local variables as static to speed things up by preventing repetitive memory allocations
 	- Made a few corrections and enhancements
 
 

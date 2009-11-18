@@ -41,7 +41,6 @@ PlaneDlg::PlaneDlg()
 	setWindowTitle(tr("Plane Editor"));
 	m_pPlane = NULL;
 
-	pi = 3.141592654;
 
 	m_bAcceptName    = true;
 	m_bChanged      = false;
@@ -101,7 +100,7 @@ void PlaneDlg::ComputePlane(void)
 		for (int i=0;i<m_pPlane->m_Stab.m_NPanel; i++)
 		{
 			ProjectedArea += m_pPlane->m_Stab.m_TLength[i+1]*(m_pPlane->m_Stab.m_TChord[i]+m_pPlane->m_Stab.m_TChord[i+1])/2.0
-							*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0)*cos(m_pPlane->m_Stab.m_TDihedral[i]*pi/180.0);
+							*cos(m_pPlane->m_Stab.m_TDihedral[i]*PI/180.0)*cos(m_pPlane->m_Stab.m_TDihedral[i]*PI/180.0);
 
 		}
 		ProjectedArea *=2.0;
@@ -423,6 +422,37 @@ void PlaneDlg::OnExportWing2()
 }
 
 
+void PlaneDlg::OnFin()
+{
+	m_bChanged = true;
+	if(m_pctrlFinCheck->isChecked())
+	{
+		m_pctrlSymFin->setEnabled(true);
+		m_pctrlDoubleFin->setEnabled(true);
+		m_pctrlFinTilt->setEnabled(true);
+		m_pctrlXLEFin->setEnabled(true);
+		if (m_pctrlDoubleFin->isChecked()) m_pctrlYLEFin->setEnabled(true);
+		else                               m_pctrlYLEFin->setEnabled(false);
+
+		m_pctrlZLEFin->setEnabled(true);
+		m_pctrlDefineFin->setEnabled(true);
+		m_pPlane->m_bFin = true;
+	}
+	else
+	{
+		m_pctrlSymFin->setEnabled(false);
+		m_pctrlDoubleFin->setEnabled(false);
+		m_pctrlFinTilt->setEnabled(false);
+		m_pctrlXLEFin->setEnabled(false);
+		m_pctrlYLEFin->setEnabled(false);
+		m_pctrlZLEFin->setEnabled(false);
+		m_pctrlDefineFin->setEnabled(false);
+		m_pPlane->m_bFin = false;
+	}
+	SetResults();
+}
+
+
 void PlaneDlg::OnImportWing()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -465,35 +495,60 @@ void PlaneDlg::OnImportWing2()
 }
 
 
-void PlaneDlg::OnFin()
-{
-	m_bChanged = true;
-	if(m_pctrlFinCheck->isChecked())
-	{
-		m_pctrlSymFin->setEnabled(true);
-		m_pctrlDoubleFin->setEnabled(true);
-		m_pctrlFinTilt->setEnabled(true);
-		m_pctrlXLEFin->setEnabled(true);
-		if (m_pctrlDoubleFin->isChecked()) m_pctrlYLEFin->setEnabled(true);
-		else                               m_pctrlYLEFin->setEnabled(false);
 
-		m_pctrlZLEFin->setEnabled(true);
-		m_pctrlDefineFin->setEnabled(true);
-		m_pPlane->m_bFin = true;
+void PlaneDlg::OnInertia()
+{
+	if(!m_pPlane) return;
+	InertiaDlg dlg;
+	dlg.m_pBody = NULL;
+	dlg.m_pWing = NULL;
+	dlg.m_pPlane = m_pPlane;
+	dlg.m_pMainFrame = s_pMainFrame;
+
+	//save inertia properties
+	int NMass;
+	double MassValue[MAXMASSES];
+	CVector MassPosition[MAXMASSES];
+	QString MassTag[MAXMASSES];
+	CVector CoG;
+	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
+
+	NMass = m_pPlane->m_NMass;
+	CoG = m_pPlane->m_CoG;
+	CoGIxx = m_pPlane->m_CoGIxx;
+	CoGIyy = m_pPlane->m_CoGIyy;
+	CoGIzz = m_pPlane->m_CoGIzz;
+	CoGIxz = m_pPlane->m_CoGIxz;
+	for(int i=0; i< MAXMASSES; i++)
+	{
+		MassValue[i]    = m_pPlane->m_MassValue[i];
+		MassPosition[i] = m_pPlane->m_MassPosition[i];
+		MassTag[i]      = m_pPlane->m_MassTag[i];
+	}
+
+	dlg.InitDialog();
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		if(dlg.m_bChanged) m_bChanged = true;
 	}
 	else
 	{
-		m_pctrlSymFin->setEnabled(false);
-		m_pctrlDoubleFin->setEnabled(false);
-		m_pctrlFinTilt->setEnabled(false);
-		m_pctrlXLEFin->setEnabled(false);
-		m_pctrlYLEFin->setEnabled(false);
-		m_pctrlZLEFin->setEnabled(false);
-		m_pctrlDefineFin->setEnabled(false);
-		m_pPlane->m_bFin = false;
+		m_pPlane->m_NMass = NMass;
+		m_pPlane->m_CoG = CoG;
+		m_pPlane->m_CoGIxx = CoGIxx;
+		m_pPlane->m_CoGIyy = CoGIyy;
+		m_pPlane->m_CoGIzz = CoGIzz;
+		m_pPlane->m_CoGIxz = CoGIxz;
+
+		for(int i=0; i< MAXMASSES; i++)
+		{
+			MassValue[i]    = m_pPlane->m_MassValue[i];
+			MassPosition[i] = m_pPlane->m_MassPosition[i];
+			MassTag[i]      = m_pPlane->m_MassTag[i];
+		}
 	}
-	SetResults();
 }
+
 
 
 
@@ -1095,18 +1150,6 @@ void PlaneDlg::SetupLayout()
 	setLayout(MainLayout);
 }
 
-void PlaneDlg::OnInertia()
-{
-	if(!m_pPlane) return;
-	InertiaDlg dlg;
-	dlg.m_pBody = NULL;
-	dlg.m_pWing = NULL;
-	dlg.m_pPlane = m_pPlane;
-	dlg.m_pMainFrame = s_pMainFrame;
-	dlg.InitDialog();
-	dlg.exec();
-	m_bChanged = true;
-}
 
 
 

@@ -23,14 +23,6 @@
 #include "../Globals.h"
 #include "Spline.h"
 #include "math.h"
-#include <QtDebug>
-
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 
 
 CSpline::CSpline()
@@ -57,19 +49,6 @@ CSpline::~CSpline()
 {
 }
 
-/*
-bool CSpline::AddPoint(double x, double y)
-{
-	if(m_iCtrlPoints>=SPLINECONTROLSIZE) 
-	{
-		return false;
-	}
-	m_Input[m_iCtrlPoints].x = x;
-	m_Input[m_iCtrlPoints].y = y;
-	m_iCtrlPoints++;
-	return true;
-}*/
-
 
 void CSpline::Copy(CSpline *pSpline)
 {
@@ -88,24 +67,23 @@ void CSpline::Copy(CSpline *pSpline)
 
 
 
-void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
 
-	QPoint pt;
-	int i, width;
+	static QPoint pt;
+	static int i, width;
 
-	scaley = -scaley;
 	width  = 3;
 
-	QPen PointPen;
+	static QPen PointPen;
 	PointPen.setWidth(1);
 
 	painter.setPen(PointPen);
 	for (i=0; i<m_iCtrlPoints; i++)
 	{
-		pt.rx() = (int)(m_Input[i].x*scalex + Offset.x());
-		pt.ry() = (int)(m_Input[i].y*scaley + Offset.y());
+		pt.rx() = (int)( m_Input[i].x*scalex + Offset.x());
+		pt.ry() = (int)(-m_Input[i].y*scaley + Offset.y());
 
 //		if(m_rViewRect.contains(pt))
 //		{
@@ -133,19 +111,22 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double scalex, double scaley, QP
 
 
 
-void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawOutputPoints(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
-	QPoint pt;
-	int width;
+
+	static QPoint pt;
+	static int i, width;
+	static QPen OutPen;
+
 	width = 2;
 
-	QPen OutPen(m_Color);
+	OutPen.setColor(m_Color);
 	OutPen.setStyle(Qt::SolidLine);
 	OutPen.setWidth(1);
 	painter.setPen(OutPen);
 
-	for (int i=0; i<m_iRes;i++)
+	for (i=0; i<m_iRes;i++)
 	{
 		pt.rx() = (int)( m_Output[i].x*scalex + Offset.x());
 		pt.ry() = (int)(-m_Output[i].y*scaley + Offset.y());
@@ -158,28 +139,29 @@ void CSpline::DrawOutputPoints(QPainter & painter, double scalex, double scaley,
 }
 
 
-void CSpline::DrawSpline(QPainter & painter, double scalex, double scaley, QPoint &Offset)
+void CSpline::DrawSpline(QPainter & painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	painter.save();
-	scaley = -scaley;
-	QPoint From, To;
 
-	QPen SplinePen(m_Color);
+	static QPoint From, To;
+	static int k;
+	static QPen SplinePen;
+
+	SplinePen.setColor(m_Color);
 	SplinePen.setStyle(GetStyle(m_Style));
 	SplinePen.setWidth(m_Width);
 	painter.setPen(SplinePen);
 
-	int k;
 
 	if(m_iCtrlPoints>0)
 	{ 
-		From.rx() = (int)(m_Output[0].x * scalex + Offset.x());
-		From.ry() = (int)(m_Output[0].y * scaley + Offset.y());
+		From.rx() = (int)( m_Output[0].x * scalex + Offset.x());
+		From.ry() = (int)(-m_Output[0].y * scaley + Offset.y());
 
 		for(k=1; k<m_iRes;k++) 
 		{
-			To.rx() = (int)(m_Output[k].x * scalex + Offset.x());
-			To.ry() = (int)(m_Output[k].y * scaley + Offset.y());
+			To.rx() = (int)( m_Output[k].x * scalex + Offset.x());
+			To.ry() = (int)(-m_Output[k].y * scaley + Offset.y());
 
 			painter.drawLine(From, To);
 
@@ -214,11 +196,12 @@ void CSpline::Export(QTextStream &out, bool bExtrados)
 }
 
 
-double CSpline::GetY(double x)
+double CSpline::GetY(double const &x)
 {
-        int i;
+        static int i;
+	static double y;
+
 	if(x<=0.0 || x>=1.0) return 0.0;
-	double y;
 
         for (i=0; i<m_iRes-1; i++)
         {
@@ -235,9 +218,9 @@ double CSpline::GetY(double x)
 
 
 
-bool CSpline::InsertPoint(double x, double y)
+bool CSpline::InsertPoint(double const &x, double const &y)
 {
-	int j,k;
+	static int j,k;
 	if(m_iCtrlPoints>=SPLINECONTROLSIZE) return false;
 	if (x>=0.0 && x<=1.0)
 	{ 
@@ -291,18 +274,21 @@ bool CSpline::InsertPoint(double x, double y)
 }
 
 
-int CSpline::IsControlPoint(CVector Real)
+int CSpline::IsControlPoint(CVector const &Real)
 {
-	for (int k=0; k<m_iCtrlPoints; k++)
+	static int k;
+	for (k=0; k<m_iCtrlPoints; k++)
 	{
                 if(fabs(Real.x-m_Input[k].x)<0.005 && fabs(Real.y-m_Input[k].y)<0.005) return k;
 	}
 	return -10;
 }
 
-int CSpline::IsControlPoint(CVector Real, double ZoomFactor)
+
+int CSpline::IsControlPoint(CVector const &Real, double const &ZoomFactor)
 {
-	for (int k=0; k<m_iCtrlPoints; k++)
+	static int k;
+	for (k=0; k<m_iCtrlPoints; k++)
 	{
                 if (fabs(Real.x-m_Input[k].x)<0.006/ZoomFactor && fabs(Real.y-m_Input[k].y)<0.006/ZoomFactor) return k;
 	}
@@ -310,9 +296,10 @@ int CSpline::IsControlPoint(CVector Real, double ZoomFactor)
 }
 
 
-int CSpline::IsControlPoint(double x, double y, double zx, double zy)
+int CSpline::IsControlPoint(double const &x, double const &y, double const &zx, double const &zy)
 {
-	for (int k=0; k<m_iCtrlPoints; k++)
+	static int k;
+	for (k=0; k<m_iCtrlPoints; k++)
 	{
                 if(fabs((x-m_Input[k].x)/zx)<4.0 && fabs((y-m_Input[k].y)/zy)<4.0) return k;
 	}
@@ -320,10 +307,13 @@ int CSpline::IsControlPoint(double x, double y, double zx, double zy)
 }
 
 
-bool CSpline::RemovePoint(int k)
+bool CSpline::RemovePoint(int const &k)
 {
-	if (k>0 && k<m_iCtrlPoints){
-		for (int j=k; j<m_iCtrlPoints; j++){
+	static int j;
+	if (k>0 && k<m_iCtrlPoints)
+	{
+		for (j=k; j<m_iCtrlPoints; j++)
+		{
 			m_Input[j] = m_Input[j+1];
 		}
 		m_iCtrlPoints--;
@@ -366,7 +356,7 @@ void CSpline::SetSplineParams(int style, int width, QColor color)
 
 
 
-double CSpline::SplineBlend(int i,  int p, double t)
+double CSpline::SplineBlend(int const &i,  int const &p, double const &t)
 {
 /*	Calculate the blending value, this is done recursively.
 	If the numerator and denominator are 0 the expression is 0.
@@ -377,37 +367,34 @@ double CSpline::SplineBlend(int i,  int p, double t)
 //	   t   is the spline parameter
 //
 
-	double value;
-	double pres = 1.e-10;
+	static double pres = 1.e-10; //same for all the recursive calls...
 
 	if (p == 0) 
 	{
-		if ((m_knots[i] <= t) && (t < m_knots[i+1]) )	value = 1.0;
-//		else if (fabs(m_knots[i]-m_knots[i+1])<pres)	    value = 0.0;
-		else 						                    value = 0.0;
+		if ((m_knots[i] <= t) && (t < m_knots[i+1]) )  return  1.0;
+//		else if (fabs(m_knots[i]-m_knots[i+1])<pres)   return  0.0;
+		else                                           return  0.0;
 	} 
 	else
 	{
                 if (fabs(m_knots[i+p] - m_knots[i])<pres && fabs(m_knots[i+p+1] - m_knots[i+1])<pres)
-			value = 0.0;
+			return  0.0;
                 else if (fabs(m_knots[i+p] - m_knots[i])<pres)
-			value = (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1, p-1, t);
+			return  (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1, p-1, t);
                 else if (fabs(m_knots[i+p+1]-m_knots[i+1])<pres)
-			value = (t - m_knots[i])   / (m_knots[i+p] - m_knots[i])   * SplineBlend(i,   p-1, t);
+			return  (t - m_knots[i])   / (m_knots[i+p] - m_knots[i])   * SplineBlend(i,   p-1, t);
 		else 
-			value = (t - m_knots[i])   / (m_knots[i+p]-m_knots[i])	   * SplineBlend(i,   p-1, t) + 
+			return  (t - m_knots[i])   / (m_knots[i+p]-m_knots[i])	   * SplineBlend(i,   p-1, t) + 
 			        (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1 ,p-1, t);
 	}
-	return value;
 }
 
 
 
 void CSpline::SplineCurve()
 {
-	double t, increment;
-	double b;
-	int i,j;
+	static double t, increment, b;
+	static int i,j;
 
 	if (m_iCtrlPoints>0)
 	{
@@ -434,9 +421,10 @@ void CSpline::SplineCurve()
 
 void CSpline::SplineKnots()
 {
-	double a,b;
-	int j;
-		int iDegree = qMin(m_iDegree, m_iCtrlPoints);
+	static double a,b;
+	static int j, iDegree;
+
+	iDegree = qMin(m_iDegree, m_iCtrlPoints);
 
 	m_iKnots  = iDegree + m_iCtrlPoints + 1;
 	for (j=0; j<m_iKnots; j++) 
@@ -449,7 +437,7 @@ void CSpline::SplineKnots()
 				a = (double)(j-iDegree);
 				b = (double)(m_iKnots-2*iDegree-1);
                                 if(fabs(b)>0.0) m_knots[j] = a/b;
-				else           m_knots[j] = 1.0; // added arcds
+				else            m_knots[j] = 1.0; // added arcds
 			}
 			else m_knots[j] = 1.0;	
 		}
@@ -459,14 +447,13 @@ void CSpline::SplineKnots()
 
 
 
-
-double Bernstein(int i, int n, double u)
+double Bernstein(int const &i, int const &n, double const &u)
 {
-	int k;
-        double pui, pu1i1;
+	static int k, fi, fni;
+        static double pui, pu1i1;
 
-	int fi  = 1;
-	int fni = 1;
+	fi  = 1;
+	fni = 1;
 
 	for(k=2; k<=i; k++)   fi  *=k;
 	for(k=i+1; k<=n; k++) fni *=k;
@@ -481,9 +468,9 @@ double Bernstein(int i, int n, double u)
 }
 
 
-double BezierBlend(int k,int n,double u)
+double BezierBlend(int const &k, int const &n, double const&u)
 {
-	int nn,kn,nkn;
+	static int nn,kn,nkn;
 	double blend=1.0;
 
 	nn = n;

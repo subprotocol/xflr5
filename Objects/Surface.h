@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CSurface Class
-	Copyright (C) 2005-2008 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2005-2009 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,11 +19,7 @@
 
 *****************************************************************************/
 
-//////////////////////////////////////////////////////////////////////
-//
-// Surface.h: interface for the CSurface class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #ifndef CSURFACE_H
 #define  CSURFACE_H
@@ -52,6 +48,7 @@ public:
 	void GetTrailingPt(int k, CVector &C);
 	void GetPanel(int const &k, int const &l, int const &pos);
 	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos=0);
+	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, CVector &PtNormal, int const &pos=0);
 	void GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4);
 	void GetyDist(int const &k, double &y1, double &y2);
 	void Init();

@@ -51,6 +51,8 @@ InertiaDlg::InertiaDlg()
 		m_MassTag[i] = QString(tr("Description %1")).arg(i);
 	}
 
+	m_bChanged = false;
+
 	SetupLayout();
 }
 
@@ -249,6 +251,7 @@ void InertiaDlg::InitDialog()
 
 	FillMassModel();
 	ComputeInertia();
+	setFocus();
 }
 
 
@@ -273,10 +276,12 @@ void InertiaDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
 void InertiaDlg::OnCellChanged(QWidget *pWidget)
 {
 	ReadData();
 	ComputeInertia();
+	m_bChanged = true;
 }
 
 
@@ -797,15 +802,15 @@ void InertiaDlg::SetupLayout()
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *ExportAVLButton = new QPushButton(tr("Export to AVL"));
-	OKButton = new QPushButton(tr("Close"));
-//	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
+	OKButton = new QPushButton(tr("OK"));
+	QPushButton *CancelButton = new QPushButton(tr("Cancel"));
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(ExportAVLButton);
 	CommandButtons->addStretch(1);
 	CommandButtons->addWidget(OKButton);
 	CommandButtons->addStretch(1);
-//	CommandButtons->addWidget(CancelButton);
-//	CommandButtons->addStretch(1);
+	CommandButtons->addWidget(CancelButton);
+	CommandButtons->addStretch(1);
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
 //	MainLayout->addWidget(FirstLine);
@@ -827,7 +832,7 @@ void InertiaDlg::SetupLayout()
 //	connect(m_pctrlAuto, SIGNAL(clicked()), this , SLOT(OnInputType()));
 //	connect(m_pctrlMan, SIGNAL(clicked()), this , SLOT(OnInputType()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
-//	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(ExportAVLButton, SIGNAL(clicked()), this, SLOT(OnExportToAVL()));
 	connect(m_pctrlObjectMass, SIGNAL(editingFinished()), SLOT(OnCellChanged()));
 }

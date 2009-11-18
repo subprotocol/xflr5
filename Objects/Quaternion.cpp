@@ -21,8 +21,8 @@
 
 #include "Quaternion.h"
 # include <math.h>
+#include "../Params.h"
 
-double Quaternion::pi = 3.141592654;
 double Quaternion::t1;
 double Quaternion::t2;
 double Quaternion::t3;
@@ -64,7 +64,7 @@ void Quaternion::Set(double const &real, double const &x, double const &y, doubl
 
 void Quaternion::Set(double const &Angle, CVector const &R)
 {	
-	theta = Angle*pi/180.0;
+	theta = Angle*PI/180.0;
 
 	a = cos(theta/2.0);
 	double sina = sin(theta/2.0);

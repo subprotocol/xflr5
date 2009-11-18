@@ -20,10 +20,16 @@ SOURCES += MainFrame.cpp \
     XDirect/ReListDlg.cpp \
     XDirect/NacaFoilDlg.cpp \
     XDirect/LEDlg.cpp \
+    XDirect/ManageFoilsDlg.cpp \
     XDirect/FoilCoordDlg.cpp \
     XDirect/FlapDlg.cpp \
     XDirect/CAddDlg.cpp \
     XDirect/BatchDlg.cpp \
+    XDirect/XDirectStyleDlg.cpp \
+    XInverse/XInverse.cpp \
+    XInverse/InverseOptionsDlg.cpp \
+    XInverse/FoilSelectionDlg.cpp \
+    XInverse/PertDlg.cpp \
     Objects/WPolar.cpp \
     Objects/WOpp.cpp \
     Objects/Wing.cpp \
@@ -42,6 +48,12 @@ SOURCES += MainFrame.cpp \
     Objects/CRectangle.cpp \
     Objects/Foil.cpp \
     Objects/Body.cpp \
+    Misc/EditPlrDlg.cpp \
+    Misc/ModDlg.cpp \
+    Misc/PolarFilterDlg.cpp \
+    Misc/TranslatorDlg.cpp \
+    Misc/SaveOptionsDlg.cpp \
+    Misc/ProgressDlg.cpp \
     Misc/UnitsDlg.cpp \
     Misc/RenameDlg.cpp \
     Misc/LinePickerDlg.cpp \
@@ -67,46 +79,34 @@ SOURCES += MainFrame.cpp \
     Miarex/ArcBall.cpp \
     Miarex/BodyGridDlg.cpp \
     Miarex/BodyScaleDlg.cpp \
+    Miarex/GL3dBodyDlg.cpp \
+    Miarex/ManageBodiesDlg.cpp \
+    Miarex/W3dPrefsDlg.cpp \
+    Miarex/CtrlPolarDlg.cpp \
+    Miarex/CtrlTableDelegate.cpp \
+    Miarex/WingScaleDlg.cpp \
+    Miarex/BodyTransDlg.cpp \
+    Miarex/ManageUFOsDlg.cpp \
+    Miarex/UFOTableDelegate.cpp \
+    Miarex/GL3DScales.cpp \
+    Miarex/WAdvancedDlg.cpp \
+    Miarex/GL3dWingDlg.cpp \
+    Miarex/InertiaDlg.cpp \
+    Design/FoilTableDelegate.cpp \
+    Design/AFoilGridDlg.cpp \
+    Design/SplineCtrlsDlg.cpp \
+    Design/AFoil.cpp \
+    Design/LECircleDlg.cpp \
     Graph/QGraph.cpp \
     Graph/GraphWidget.cpp \
     Graph/GraphDlg.cpp \
     Graph/Graph.cpp \
     Graph/Curve.cpp \
-    Design/AFoil.cpp \
     Main.cpp \
     Globals.cpp \
     TwoDWidget.cpp \
-    Miarex/GL3dBodyDlg.cpp \
-    Design/FoilTableDelegate.cpp \
-    XInverse/XInverse.cpp \
-    Design/AFoilGridDlg.cpp \
-    Miarex/GL3DScales.cpp \
     GLWidget.cpp \
-    XInverse/InverseOptionsDlg.cpp \
-    Miarex/ManageBodiesDlg.cpp \
-    Misc/EditPlrDlg.cpp \
-    Miarex/W3dPrefsDlg.cpp \
-    Miarex/CtrlPolarDlg.cpp \
-    Miarex/CtrlTableDelegate.cpp \
-    Design/SplineCtrlsDlg.cpp \
-    XDirect/XDirectStyleDlg.cpp \
-    Miarex/WingScaleDlg.cpp \
-    XInverse/FoilSelectionDlg.cpp \
-    Miarex/BodyTransDlg.cpp \
-    XInverse/PertDlg.cpp \
-    Misc/SaveOptionsDlg.cpp \
-    Miarex/WAdvancedDlg.cpp \
-    Miarex/GL3dWingDlg.cpp \
-    Misc/ProgressDlg.cpp \
-    Design/LECircleDlg.cpp \
-    Misc/ModDlg.cpp \
-    XDirect/ManageFoilsDlg.cpp \
-    Miarex/ManageUFOsDlg.cpp \
-    Miarex/UFOTableDelegate.cpp \
-    Misc/PolarFilterDlg.cpp \
-    Misc/TranslatorDlg.cpp \
-    QFLR5Application.cpp \
-    Miarex/InertiaDlg.cpp
+    QFLR5Application.cpp 
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -123,7 +123,13 @@ HEADERS += MainFrame.h \
     XDirect/FoilPolarDlg.h \
     XDirect/FlapDlg.h \
     XDirect/CAddDlg.h \
+    XDirect/XDirectStyleDlg.h \
+    XDirect/ManageFoilsDlg.h \
     XDirect/BatchDlg.h \
+    XInverse/XInverse.h \
+    XInverse/InverseOptionsDlg.h \
+    XInverse/FoilSelectionDlg.h \
+    XInverse/PertDlg.h \
     Objects/WPolar.h \
     Objects/WOpp.h \
     Objects/Wing.h \
@@ -153,6 +159,12 @@ HEADERS += MainFrame.h \
     Misc/LineButton.h \
     Misc/FloatEdit.h \
     Misc/AboutQ5.h \
+    Misc/EditPlrDlg.h \
+    Misc/SaveOptionsDlg.h \
+    Misc/ProgressDlg.h \
+    Misc/PolarFilterDlg.h \
+    Misc/TranslatorDlg.h \
+    Misc/ModDlg.h \
     Miarex/WPolarDlg.h \
     Miarex/WingDelegate.h \
     Miarex/VLMAnalysisDlg.h \
@@ -167,46 +179,34 @@ HEADERS += MainFrame.h \
     Miarex/BodyGridDlg.h \
     Miarex/BodyTableDelegate.h \
     Miarex/BodyScaleDlg.h \
+    Miarex/W3dPrefsDlg.h \
+    Miarex/CtrlPolarDlg.h \
+    Miarex/CtrlTableDelegate.h \
+    Miarex/GL3dBodyDlg.h \
+    Miarex/GL3DScales.h \
+    Miarex/ManageBodiesDlg.h \
+    Miarex/WingScaleDlg.h \
+    Miarex/BodyTransDlg.h \
+    Miarex/WAdvancedDlg.h \
+    Miarex/GL3dWingDlg.h \
+    Miarex/ManageUFOsDlg.h \
+    Miarex/UFOTableDelegate.h \
+    Miarex/InertiaDlg.h \
     Graph/GraphWidget.h \
     Graph/Graph.h \
     Graph/GraphDlg.h \
     Graph/Curve.h \
     Graph/QGraph.h \
     Design/AFoil.h \
+    Design/FoilTableDelegate.h \
+    Design/SplineCtrlsDlg.h \
+    Design/AFoilGridDlg.h \
+    Design/LECircleDlg.h \
     Globals.h \
     TwoDWidget.h \
-    Miarex/GL3dBodyDlg.h \
-    Design/FoilTableDelegate.h \
-    XInverse/XInverse.h \
-    Design/AFoilGridDlg.h \
-    Miarex/GL3DScales.h \
     GLWidget.h \
-    XInverse/InverseOptionsDlg.h \
-    Miarex/ManageBodiesDlg.h \
-    Misc/EditPlrDlg.h \
-    Miarex/W3dPrefsDlg.h \
-    Miarex/CtrlPolarDlg.h \
-    Miarex/CtrlTableDelegate.h \
-    Design/SplineCtrlsDlg.h \
-    XDirect/XDirectStyleDlg.h \
-    Miarex/WingScaleDlg.h \
-    XInverse/FoilSelectionDlg.h \
-    Miarex/BodyTransDlg.h \
-    XInverse/PertDlg.h \
-    Misc/SaveOptionsDlg.h \
-    Miarex/WAdvancedDlg.h \
-    Miarex/GL3dWingDlg.h \
-    Misc/ProgressDlg.h \
     Params.h \
-    Design/LECircleDlg.h \
-    Misc/ModDlg.h \
-    XDirect/ManageFoilsDlg.h \
-    Miarex/ManageUFOsDlg.h \
-    Miarex/UFOTableDelegate.h \
-    Misc/PolarFilterDlg.h \
-    Misc/TranslatorDlg.h \
-    QFLR5Application.h \
-    Miarex/InertiaDlg.h
+    QFLR5Application.h 
 TRANSLATIONS = Translations/qflr5.ts \
     Translations/qflr5_de.ts \
     Translations/qflr5_fr.ts

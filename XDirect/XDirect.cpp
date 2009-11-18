@@ -1538,7 +1538,14 @@ void QXDirect::mouseDoubleClickEvent ( QMouseEvent * event )
 
 void QXDirect::mouseMoveEvent(QMouseEvent *event)
 {
-	QPoint pt(event->x(), event->y()); //client coordinates 
+	static QPoint pt;
+	static double xu, yu, x1, y1, xmin, ymin, xmax, ymax, scale;
+	static int a;
+	static MainFrame* pMainFrame;
+	pMainFrame = (MainFrame*)m_pMainFrame;
+
+	pt.setX(event->x());
+	pt.setY(event->y()); //client coordinates
 	m_pCurGraph = GetGraph(pt);
 	if(!hasFocus()) setFocus();//to catch keyboard input;
 
@@ -1547,18 +1554,17 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 		if(m_pCurGraph && m_bTransGraph)
 		{
 			// we translate the curves inside the graph
-			double xu, yu;
 			m_pCurGraph->SetAuto(false);
-			double x1 =  m_pCurGraph->ClientTox(m_PointDown.x()) ;
-			double y1 =  m_pCurGraph->ClientToy(m_PointDown.y()) ;
+			x1 =  m_pCurGraph->ClientTox(m_PointDown.x()) ;
+			y1 =  m_pCurGraph->ClientToy(m_PointDown.y()) ;
 
 			xu = m_pCurGraph->ClientTox(pt.x());
 			yu = m_pCurGraph->ClientToy(pt.y());
 
-			double xmin = m_pCurGraph->GetXMin() - xu+x1;
-			double xmax = m_pCurGraph->GetXMax() - xu+x1;
-			double ymin = m_pCurGraph->GetYMin() - yu+y1;
-			double ymax = m_pCurGraph->GetYMax() - yu+y1;
+			xmin = m_pCurGraph->GetXMin() - xu+x1;
+			xmax = m_pCurGraph->GetXMax() - xu+x1;
+			ymin = m_pCurGraph->GetYMin() - yu+y1;
+			ymax = m_pCurGraph->GetYMax() - yu+y1;
 
 			m_pCurGraph->SetWindow(xmin, xmax, ymin, ymax);
 
@@ -1600,12 +1606,12 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 		else if(g_pCurFoil && !m_bPolar)
 		{
 			//zoom the foil
-			double scale = m_fFoilScale;
+			scale = m_fFoilScale;
 
 			if(pt.y()-m_PointDown.y()<0) m_fFoilScale *= 1.02;
 			else                         m_fFoilScale /= 1.02;
 
-			int a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
+			a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 
 			m_FoilOffset.rx() = a + (int)((m_FoilOffset.x()-a)/scale*m_fFoilScale);
 
@@ -1616,14 +1622,12 @@ void QXDirect::mouseMoveEvent(QMouseEvent *event)
 	}
 	else if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt))
 	{
-		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-		double x1 = m_pCurGraph->ClientTox(event->x()) ;
-		double y1 = m_pCurGraph->ClientToy(event->y()) ;
+		x1 = m_pCurGraph->ClientTox(event->x()) ;
+		y1 = m_pCurGraph->ClientToy(event->y()) ;
 		pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(x1).arg(y1));
 	}
 	else
 	{
-		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 		pMainFrame->statusBar()->clearMessage();
 	}
 }
@@ -4998,7 +5002,9 @@ void QXDirect::PaintCoupleGraphs(QPainter &painter)
 
 void QXDirect::PaintOpPoint(QPainter &painter)
 {
-	QColor color;
+	static QColor color;
+	static double Alpha, FoilScale;
+	FoilScale = m_fFoilScale;
 	QString Result, str, str1;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
@@ -5020,11 +5026,11 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(g_pCurFoil)
 	{
-		double Alpha = 0.0;
+		Alpha = 0.0;
 		if(m_pCurOpp) Alpha = m_pCurOpp->Alpha;
 
 		m_BufferFoil.m_bPoints = m_bShowPanels;
-		m_BufferFoil.DrawFoil(painter, -Alpha, m_fFoilScale, m_fFoilScale, m_FoilOffset);
+		m_BufferFoil.DrawFoil(painter, -Alpha, m_fFoilScale, FoilScale, m_FoilOffset);
 
 		if(m_bPressure && m_pCurOpp) PaintPressure(painter, m_pCurOpp, m_fFoilScale);
 		if(m_bBL && m_pCurOpp)       PaintBL(painter, m_pCurOpp, m_fFoilScale);

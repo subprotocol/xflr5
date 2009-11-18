@@ -3217,13 +3217,16 @@ bool GL3dBodyDlg::LoadSettings(QSettings *pSettings)
 
 void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 {
-	QPoint point(event->pos().x(), event->pos().y());
+	static int n;
+	static CVector Real;
+	static QPoint Delta, point;
+
+	point = event->pos();
 
 	m_MousePos = event->pos();
-	int n;
-	CVector Real;
 
-	QPoint Delta(point.x() - m_LastPoint.x(), point.y() - m_LastPoint.y());
+	Delta.setX(point.x() - m_LastPoint.x());
+	Delta.setY(point.y() - m_LastPoint.y());
 	ClientToGL(point, Real);
 
 	if(!m_pglWidget->hasFocus()) m_pglWidget->setFocus();
@@ -3788,9 +3791,50 @@ void GL3dBodyDlg::OnInertia()
 	InertiaDlg dlg;
 	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.m_pBody = m_pBody;
+
+	//save inertia properties
+	int NMass;
+	double MassValue[MAXMASSES];
+	CVector MassPosition[MAXMASSES];
+	QString MassTag[MAXMASSES];
+	CVector CoG;
+	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
+
+	NMass = m_pBody->m_NMass;
+	CoG = m_pBody->m_CoG;
+	CoGIxx = m_pBody->m_CoGIxx;
+	CoGIyy = m_pBody->m_CoGIyy;
+	CoGIzz = m_pBody->m_CoGIzz;
+	CoGIxz = m_pBody->m_CoGIxz;
+	for(int i=0; i< MAXMASSES; i++)
+	{
+		MassValue[i]    = m_pBody->m_MassValue[i];
+		MassPosition[i] = m_pBody->m_MassPosition[i];
+		MassTag[i]      = m_pBody->m_MassTag[i];
+	}
+
 	dlg.InitDialog();
-	dlg.exec();
-	m_bChanged = true;
+	if(dlg.exec() == QDialog::Accepted)
+	{
+		if(dlg.m_bChanged) m_bChanged = true;
+	}
+	else
+	{
+		// restore saved inertia
+		m_pBody->m_NMass = NMass;
+		m_pBody->m_CoG = CoG;
+		m_pBody->m_CoGIxx = CoGIxx;
+		m_pBody->m_CoGIyy = CoGIyy;
+		m_pBody->m_CoGIzz = CoGIzz;
+		m_pBody->m_CoGIxz = CoGIxz;
+
+		for(int i=0; i< MAXMASSES; i++)
+		{
+			MassValue[i]    = m_pBody->m_MassValue[i];
+			MassPosition[i] = m_pBody->m_MassPosition[i];
+			MassTag[i]      = m_pBody->m_MassTag[i];
+		}
+	}
 }
 
 

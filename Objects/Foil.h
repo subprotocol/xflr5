@@ -70,24 +70,27 @@ public:
 	CFoil();
 	~CFoil();
 	void GetFoilName(QString &FoilName);
-	int IsPoint(CVector Real);
-	void DrawFoil(QPainter &painter, double alpha, double scalex, double scaley,QPoint Offset);
-	void DrawPoints(QPainter &painter, double scalex, double scaley, QPoint Offset);
-	void DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset);
+	int IsPoint(CVector const &Real);
+	void DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset);
+	void DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset);
+	void DrawMidLine(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset);
+
+	void GetLowerY(double x, double &y, double &normx, double &normy);
+	void GetUpperY(double x, double &y, double &normx, double &normy);
 
 	double DeRotate();
-	double GetBaseUpperY(double x);
-	double GetBaseLowerY(double x);
-	double GetUpperY(double x);
+	double GetBaseUpperY(double const &x);
+	double GetBaseLowerY(double const &x);
+	double GetMidY(double const &x);
 	double GetLowerY(double x);
-	double GetMidY(double x);
-	double GetCamber(double x);
-	double GetCamberAngle(double x);
-	double GetCamberSlope(double x);
+	double GetUpperY(double x);
+	double GetCamber(double const &x);
+	double GetCamberAngle(double const &x);
+	double GetCamberSlope(double const &x);
 	double GetLength();
 	double GetArea();
-	double GetTopSlope(double x);
-	double GetBotSlope(double x);
+	double GetTopSlope(double const &x);
+	double GetBotSlope(double const &x);
 	double NormalizeGeometry();
 	bool CompMidLine(bool bParams);
 
@@ -96,9 +99,6 @@ public:
 	bool SetCamber(double f, double u);
 
 	void CopyFoil(CFoil *pSrcFoil);
-	void DrawFoil(double alpha, double scalex, double scaley, CVector const &Offset);
-	void DrawPoints(double scalex, double scaley, CVector Offset);
-	void DrawMidLine(double scalex, double scaley, CVector Offset);
 	void Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	void SetFlap();
 	void SetTEFlap();
@@ -107,15 +107,13 @@ public:
 	void SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
 	void SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angle);
 
-
-	bool Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M);
+	bool Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M);
 	bool IsBetween(int f, int f1, int f2);
 	bool IsBetween(int f, double f1, double f2);
 
 private:
-
 	QString m_FoilName;		// the foil's name...
-	QString m_FoilDescription;
+	QString m_FoilDescription;	// a description
 	QColor m_FoilColor;	//... and its color
 
 	bool m_bVisible;	//true if the foil is to be displayed
@@ -132,6 +130,7 @@ private:
 	int n;				// the number of points of the current foil
 	double  x[IBX],  y[IBX];	// the point coordinates of the current foil
 	double nx[IBX], ny[IBX];	// the normal vector coordinates of the current foil's points
+
 	//Base geometry;
 	int nb;				// the number of points of the base foil
 	double  xb[IBX],  yb[IBX];	// the point coordinates of the base foil
@@ -142,9 +141,6 @@ private:
 	double m_Gap;			// trailing edge gap
 	CVector m_LE, m_TE;		// leading edge and trailing edge points
 
-
-//	CRect m_rViewRect;
-
 	CVector m_rpBaseMid[1001];	//base mid camber line points
 	CVector m_BaseExtrados[IQX];	//base upper surface points
 	CVector m_BaseIntrados[IQX];	//base lower surface points
@@ -153,11 +149,12 @@ private:
 	CVector m_rpExtrados[IQX];	//upper surface points
 	CVector m_rpIntrados[IQX];	//lower surface points
 
-// Trailing edge flap  data
+	// Trailing edge flap  data
 	bool m_bTEFlap;
 	double m_TEFlapAngle;
 	double m_TEXHinge, m_TEYHinge;
-// Leading edge flap  data
+	
+	// Leading edge flap  data
 	bool m_bLEFlap;
 	double m_LEFlapAngle;
 	double m_LEXHinge, m_LEYHinge;

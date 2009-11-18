@@ -5170,7 +5170,8 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 	{
 		if(m_iWingView==1)
 		{
-			return m_pCurWingGraph;
+			if(m_pCurWingGraph->IsInDrawRect(pt)) return m_pCurWingGraph;
+			else return NULL;
 		}
 		else if (m_iWingView==2)
 		{
@@ -5944,12 +5945,11 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 {
 	if(!pWing) return;
 
-	int j,l;
-	int style, width;
-
-	CVector Pt, A, B, C, D, N, BD, AC, LATB, TALB;
-	QColor color;
-	CFoil * pFoilA, *pFoilB;
+	static int j, l, style, width;
+	static double x;
+	static CVector Pt, PtNormal, A, B, C, D, N, BD, AC, LATB, TALB;
+	static QColor color;
+	static CFoil * pFoilA, *pFoilB;
 
 	N.Set(0.0, 0.0, 0.0);
 	glNewList(List,GL_COMPILE);
@@ -5963,7 +5963,7 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 		glEnable(GL_DEPTH_TEST);
@@ -5971,71 +5971,44 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 		//top surface
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+			glBegin(GL_QUAD_STRIP);
 			{
-				glBegin(GL_QUADS);
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(0,l,1);
+					x = (double)l/100.0;
 
-					LATB = pWing->m_Surface[j].TB - pWing->m_Surface[j].LA;
-					TALB = pWing->m_Surface[j].LB - pWing->m_Surface[j].TA;
+					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
 
-					N = LATB *TALB;
-					N. Normalize();
+					glNormal3d(PtNormal.x, PtNormal.y, PtNormal.z);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 
-					glNormal3d(N.x, N.y, N.z);
-					glVertex3d(pWing->m_Surface[j].LA.x,
-							   pWing->m_Surface[j].LA.y,
-							   pWing->m_Surface[j].LA.z);
-					glVertex3d(pWing->m_Surface[j].TA.x,
-							   pWing->m_Surface[j].TA.y,
-							   pWing->m_Surface[j].TA.z);
-
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,l, 1);
-					glVertex3d(pWing->m_Surface[j].TB.x,
-							   pWing->m_Surface[j].TB.y,
-							   pWing->m_Surface[j].TB.z);
-					glVertex3d(pWing->m_Surface[j].LB.x,
-							   pWing->m_Surface[j].LB.y,
-							   pWing->m_Surface[j].LB.z);
+					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-				glEnd();
 			}
+			glEnd();
 		}
 
 		//bottom surface
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+			glBegin(GL_QUAD_STRIP);
 			{
-				glBegin(GL_QUADS);
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(0,l, -1);
+					x = (double)l/100.0;
 
-					LATB = pWing->m_Surface[j].TB - pWing->m_Surface[j].LA;
-					TALB = pWing->m_Surface[j].LB - pWing->m_Surface[j].TA;
+					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
 
-					N = TALB * LATB;
-					N. Normalize();
+					glNormal3d(PtNormal.x, PtNormal.y, PtNormal.z);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 
-					glNormal3d( N.x,  N.y,  N.z);
-					glVertex3d( pWing->m_Surface[j].TA.x,
-								pWing->m_Surface[j].TA.y,
-								pWing->m_Surface[j].TA.z);
-					glVertex3d( pWing->m_Surface[j].LA.x,
-								pWing->m_Surface[j].LA.y,
-								pWing->m_Surface[j].LA.z);
-
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,l, -1);
-					glVertex3d( pWing->m_Surface[j].LB.x,
-								pWing->m_Surface[j].LB.y,
-								pWing->m_Surface[j].LB.z);
-					glVertex3d( pWing->m_Surface[j].TB.x,
-								pWing->m_Surface[j].TB.y,
-								pWing->m_Surface[j].TB.z);
+					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-				glEnd();
 			}
+			glEnd();
+
 		}
 
 		for (j=0; j<pWing->m_NSurfaces; j++)
@@ -6059,19 +6032,16 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 					N.Normalize();
 					glNormal3d( N.x, N.y, N.z);
 
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(D.x, D.y, D.z);
-
-					for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+					for (l=0; l<=100; l++)
 					{
-						pWing->m_Surface[j].GetPanel(0,l,-1);
-						glVertex3d( pWing->m_Surface[0].LA.x,
-									pWing->m_Surface[0].LA.y,
-									pWing->m_Surface[0].LA.z);
-						pWing->m_Surface[j].GetPanel(0,l,1);
-						glVertex3d( pWing->m_Surface[0].LA.x,
-									pWing->m_Surface[0].LA.y,
-									pWing->m_Surface[0].LA.z);
+						x = (double)l/100.0;
+
+						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
+
+						glVertex3d(Pt.x, Pt.y, Pt.z);
+
+						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
+						glVertex3d(Pt.x, Pt.y, Pt.z);
 					}
 				}
 				glEnd();
@@ -6094,19 +6064,16 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 					N.Normalize();
 					glNormal3d( N.x,  N.y,  N.z);
 
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(D.x, D.y, D.z);
-
-					for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+					for (l=0; l<=100; l++)
 					{
-						pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1, l, 1);
-						glVertex3d(pWing->m_Surface[j].LB.x,
-								   pWing->m_Surface[j].LB.y,
-								   pWing->m_Surface[j].LB.z);
-						pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1, l, -1);
-						glVertex3d(pWing->m_Surface[j].LB.x,
-								   pWing->m_Surface[j].LB.y,
-								   pWing->m_Surface[j].LB.z);
+						x = (double)l/100.0;
+
+						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
+
+						glVertex3d(Pt.x, Pt.y, Pt.z);
+
+						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
+						glVertex3d(Pt.x, Pt.y, Pt.z);
 					}
 				}
 				glEnd();
@@ -6143,33 +6110,23 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 		{
 			glBegin(GL_LINE_STRIP);
 			{
-				for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(0, l, 1);
-					glVertex3d(pWing->m_Surface[j].TA.x,
-							   pWing->m_Surface[j].TA.y,
-							   pWing->m_Surface[j].TA.z);
+					x = (double)l/100.0;
+					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-
-				glVertex3d(pWing->m_Surface[j].LA.x,
-						   pWing->m_Surface[j].LA.y,
-						   pWing->m_Surface[j].LA.z);
 			}
 			glEnd();
 
 			glBegin(GL_LINE_STRIP);
 			{
-				for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1, l, 1);
-					glVertex3d(pWing->m_Surface[j].TB.x,
-							   pWing->m_Surface[j].TB.y,
-							   pWing->m_Surface[j].TB.z);
+					x = (double)l/100.0;
+					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-
-				glVertex3d(pWing->m_Surface[j].LB.x,
-						   pWing->m_Surface[j].LB.y,
-						   pWing->m_Surface[j].LB.z);
 			}
 			glEnd();
 		}
@@ -6179,33 +6136,26 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 		{
 			glBegin(GL_LINE_STRIP);
 			{
-				for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(0, l, -1);
-					glVertex3d(pWing->m_Surface[j].TA.x,
-							   pWing->m_Surface[j].TA.y,
-							   pWing->m_Surface[j].TA.z);
+					x = (double)l/100.0;
+					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-				glVertex3d(pWing->m_Surface[j].LA.x,
-						   pWing->m_Surface[j].LA.y,
-						   pWing->m_Surface[j].LA.z);
 			}
 			glEnd();
+
 			glBegin(GL_LINE_STRIP);
 			{
-				for (l=0; l<pWing->m_Surface[j].m_NXPanels; l++)
+				for (l=0; l<=100; l++)
 				{
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1, l, -1);
-					glVertex3d(pWing->m_Surface[j].TB.x,
-							   pWing->m_Surface[j].TB.y,
-							   pWing->m_Surface[j].TB.z);
+					x = (double)l/100.0;
+					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
+					glVertex3d(Pt.x, Pt.y, Pt.z);
 				}
-
-				glVertex3d(pWing->m_Surface[j].LB.x,
-						   pWing->m_Surface[j].LB.y,
-						   pWing->m_Surface[j].LB.z);
 			}
 			glEnd();
+
 		}
 		//WingContour
 		//Leading edge outline
@@ -8817,7 +8767,7 @@ void QMiarex::GLRenderView()
 {
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	GLdouble pts[4];
+	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
 	if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
@@ -8909,22 +8859,22 @@ void QMiarex::GLRenderView()
 
 void QMiarex::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes)
 {
+	static double start_lat, start_lon,lat_incr, lon_incr, R;
+	static double phi1, phi2, theta1, theta2;
+	static GLdouble u[3], v[3], w[3], n[3];
+	static int row, col;
+
 	glDisable(GL_TEXTURE_2D);
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glBegin(GL_TRIANGLES);
 	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
 
-	double start_lat = -90;
-	double start_lon = 0.0;
-	double R = radius;
+	start_lat = -90;
+	start_lon = 0.0;
+	R = radius;
 
-	double lat_incr = 180.0 / NumLatitudes;
-	double lon_incr = 360.0 / NumLongitudes;
-
-	double phi1, phi2, theta1, theta2;
-	GLdouble u[3], v[3], w[3], n[3];
-
-	int row, col;
+	lat_incr = 180.0 / NumLatitudes;
+	lon_incr = 360.0 / NumLongitudes;
 
 	for (col = 0; col < NumLongitudes; col++)
 	{
@@ -10181,11 +10131,15 @@ void QMiarex::mouseDoubleClickEvent ( QMouseEvent * event )
 void QMiarex::mouseMoveEvent(QMouseEvent *event)
 {
 	if(!hasFocus()) setFocus();
-	CVector Real;
-	QPoint Delta(event->pos().x() - m_LastPoint.x(), event->pos().y() - m_LastPoint.y());
-	QPoint point = event->pos();
+	static CVector Real;
+	static QPoint Delta, point;
+	static bool bCtrl;
+
+	Delta.setX(event->pos().x() - m_LastPoint.x());
+	Delta.setY(event->pos().y() - m_LastPoint.y());
+	point = event->pos();
 	m_pCurGraph = GetGraph(point);
-	bool bCtrl = false;
+	bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 
 	if(m_iView==W3DVIEW)
@@ -10296,30 +10250,10 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 				if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
 				{
 					//zoom graph
+					m_pCurGraph->SetAuto(false);
+					if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.02);
+					else                            m_pCurGraph->Scale(1.0/1.02);
 
-	/*				if (shX & 0x8000)
-					{
-						//zoom x scale
-						m_pCurGraph->SetAutoX(false);
-						m_pCurGraph->SetAutoX(false);
-						if(point.x()-m_LastPoint.x()<0) m_pCurGraph->Scalex(1.04);
-						else                            m_pCurGraph->Scalex(1.0/1.04);
-					}
-					else if(shY & 0x8000)
-					{
-						//zoom y scale
-						m_pCurGraph->SetAutoY(false);
-						m_pCurGraph->SetAutoY(false);
-						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scaley(1.04);
-						else                            m_pCurGraph->Scaley(1.0/1.04);
-					}
-					else*/
-					{
-						//zoom both
-						m_pCurGraph->SetAuto(false);
-						if(point.y()-m_LastPoint.y()<0) m_pCurGraph->Scale(1.02);
-						else                            m_pCurGraph->Scale(1.0/1.02);
-					}
 					UpdateView();
 				}
 				else if(m_pCurWing && m_iView==WOPPVIEW)
@@ -14257,15 +14191,14 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 	//Paint the current WOpp view
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-
-	if (m_pCurGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
+	if (m_pCurWingGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
 	{
 		if(m_rCltRect.width()<200 || m_rCltRect.height()<200)
 		{
 			painter.restore();
 			return;
 		}
-		m_pCurGraph->DrawGraph(m_rSingleRect, painter);
+		m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
 		QPoint Place(m_rCltRect.left()+10, m_rCltRect.top() +30);
 		DrawWOppLegend(painter, Place, m_rCltRect.bottom());
 	}
@@ -14561,10 +14494,10 @@ void QMiarex::PaintWing(QPainter &painter, QPoint ORef, double scale)
 {
 	//Draws the wing on the 2D WOpp view
 	if(!m_pCurWing)	return;
-	int i;
+	static int i;
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	double scalex, scaley;
+	static double scalex, scaley;
 
 	scalex  = scale;
 	scaley  = scale;
@@ -17624,7 +17557,7 @@ void QMiarex::SnapClient(QString const &FileName)
 		  default: break;
 	}
 
-	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
+	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB32);
 	QImage FlippedImaged;
 	FlippedImaged = Image.mirrored();	//flip vertically
 	FlippedImaged.save(FileName);

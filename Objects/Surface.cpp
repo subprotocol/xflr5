@@ -31,7 +31,7 @@
 //    - its left and right twist
 //    - its left and right foils
 //    - its Normal vector
-//    - its left and right normal vectors NormalA and NormalB equal to 
+//    - its left and right normal vectors NormalA and NormalB are 
 //      the average of the normals of two continuous surfaces ; used to
 //	define junction between panels
 //
@@ -45,11 +45,9 @@
 #include <QMessageBox>
 #include <math.h>
 #include "Surface.h"
+#include "../Objects/Quaternion.h"
 #include <QtDebug>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CVector CSurface::LA;//save time by preventing allocation & release of memory
 CVector CSurface::LB;
@@ -231,6 +229,7 @@ void CSurface::Copy(CSurface const &Surface)
 	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
 }
 
+
 void CSurface::GetC4(int k, CVector &Pt, double &tau)
 {
 	GetPanel(k,m_NXPanels-1,0);
@@ -253,7 +252,7 @@ void CSurface::GetC4(int k, CVector &Pt, double &tau)
 
 double CSurface::GetChord(int const &k)
 {
-	double y1, y2;
+	static double y1, y2;
 	GetyDist(k, y1, y2);
 	return GetChord((y1+y2)/2.0);
 }
@@ -262,12 +261,14 @@ double CSurface::GetChord(int const &k)
 double CSurface::GetChord(double const &tau)
 {
 	//assumes LA-TB have already been loaded
-	CVector V1, V2;
+	static CVector V1, V2;
+	static double ChordA, ChordB;
+
 	V1 = m_TA-m_LA;
 	V2 = m_TB-m_LB;
 
-	double ChordA = V1.VAbs();
-	double ChordB = V2.VAbs();
+	ChordA = V1.VAbs();
+	ChordB = V2.VAbs();
 
 	return ChordA + (ChordB-ChordA) * fabs(tau);
 }
@@ -336,8 +337,9 @@ void CSurface::GetLeadingPt(int k, CVector &C)
 double CSurface::GetOffset(double const &tau)
 {
 	//chord spacing
-    return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
+	return m_LA.x + (m_LB.x-m_LA.x) * fabs(tau);
 }
+
 
 void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 {
@@ -405,9 +407,11 @@ double CSurface::GetPanelWidth(int const &k)
 	return fabs(LA.y-LB.y);
 }
 
+
 void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos)
 {
-	CVector APt, BPt;
+	static CVector APt, BPt;
+	static double TopA, TopB, BotA, BotB;
 
 	APt.x = m_LA.x * (1.0-xArel) + m_TA.x * xArel;
 	APt.y = m_LA.y * (1.0-xArel) + m_TA.y * xArel;
@@ -418,8 +422,8 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 
 	if(pos==1 && m_pFoilA && m_pFoilB)
 	{
-		double TopA = m_pFoilA->GetUpperY(xArel)*GetChord(0.0);
-		double TopB = m_pFoilB->GetUpperY(xBrel)*GetChord(1.0);
+		TopA = m_pFoilA->GetUpperY(xArel)*GetChord(0.0);
+		TopB = m_pFoilB->GetUpperY(xBrel)*GetChord(1.0);
 		APt.x +=  Normal.x * TopA;
 		APt.y +=  Normal.y * TopA;
 		APt.z +=  Normal.z * TopA;
@@ -429,8 +433,8 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 	}
 	else if(pos==-1 && m_pFoilA && m_pFoilB)
 	{
-		double BotA = m_pFoilA->GetLowerY(xArel)*GetChord(0.0);
-		double BotB = m_pFoilB->GetLowerY(xBrel)*GetChord(1.0);
+		BotA = m_pFoilA->GetLowerY(xArel)*GetChord(0.0);
+		BotB = m_pFoilB->GetLowerY(xBrel)*GetChord(1.0);
 		APt.x +=  Normal.x * BotA;
 		APt.y +=  Normal.y * BotA;
 		APt.z +=  Normal.z * BotA;
@@ -442,6 +446,78 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 	Point.y = APt.y * (1.0-yrel)+  BPt.y * yrel ;
 	Point.z = APt.z * (1.0-yrel)+  BPt.z * yrel ;
 }
+
+
+
+void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, CVector &PtNormal, int const &pos)
+{
+	static CVector APt, BPt, Nc, u;
+	static double TopA, TopB, BotA, BotB, nxA, nxB, nyA, nyB, theta;
+	static Quaternion q;
+	
+	//define the strip's normal
+	GetNormal(yrel, Nc);
+
+	//define the quaternion to rotate the unit vector (0,0,1) to Nc
+	//use the dot product to get the rotation angle, and the crossproduct to get the rotation vector
+	theta = acos(Nc.z);
+	u.x = -Nc.y;
+	u.y =  Nc.x;
+	u.z =  0.0;
+	q.Set(theta, u);
+
+	APt.x = m_LA.x * (1.0-xArel) + m_TA.x * xArel;
+	APt.y = m_LA.y * (1.0-xArel) + m_TA.y * xArel;
+	APt.z = m_LA.z * (1.0-xArel) + m_TA.z * xArel;
+	BPt.x = m_LB.x * (1.0-xBrel) + m_TB.x * xBrel;
+	BPt.y = m_LB.y * (1.0-xBrel) + m_TB.y * xBrel;
+	BPt.z = m_LB.z * (1.0-xBrel) + m_TB.z * xBrel;
+
+	if(pos==1 && m_pFoilA && m_pFoilB)
+	{
+		m_pFoilA->GetUpperY(xArel, TopA, nxA, nyA);
+		m_pFoilB->GetUpperY(xBrel, TopB, nxB, nyB);
+		TopA *= GetChord(0.0);
+		TopB *= GetChord(1.0);
+
+		// rotate the point's normal vector i.a.w. dihedral and local washout
+		PtNormal.x = nxA * (1.0-yrel) + nxB * yrel;
+		PtNormal.y = 0.0;
+		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
+		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
+		
+		APt.x +=  PtNormal.x * TopA;
+		APt.y +=  PtNormal.y * TopA;
+		APt.z +=  PtNormal.z * TopA;
+		BPt.x +=  PtNormal.x * TopB;
+		BPt.y +=  PtNormal.y * TopB;
+		BPt.z +=  PtNormal.z * TopB;
+	}
+	else if(pos==-1 && m_pFoilA && m_pFoilB)
+	{
+		m_pFoilA->GetLowerY(xArel, BotA, nxA, nyA);
+		m_pFoilB->GetLowerY(xBrel, BotB, nxB, nyB);
+		BotA *= GetChord(0.0);
+		BotB *= GetChord(1.0);
+
+		// rotate the point's normal vector i.a.w. dihedral and local washout
+		PtNormal.x = -nxA * (1.0-yrel) - nxB * yrel;
+		PtNormal.y = 0.0;
+		PtNormal.z = -nyA * (1.0-yrel) - nyB * yrel;
+		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
+
+		APt.x +=  PtNormal.x * BotA;
+		APt.y +=  PtNormal.y * BotA;
+		APt.z +=  PtNormal.z * BotA;
+		BPt.x +=  PtNormal.x * BotB;
+		BPt.y +=  PtNormal.y * BotB;
+		BPt.z +=  PtNormal.z * BotB;
+	}
+	Point.x = APt.x * (1.0-yrel)+  BPt.x * yrel ;
+	Point.y = APt.y * (1.0-yrel)+  BPt.y * yrel ;
+	Point.z = APt.z * (1.0-yrel)+  BPt.z * yrel ;
+}
+
 
 double CSurface::GetStripSpanPos(int const &k)
 {
@@ -891,7 +967,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 
 void CSurface::SetNormal()
 {
-	CVector LATB, TALB;
+	static CVector LATB, TALB;
 	LATB = m_TB - m_LA;
 	TALB = m_LB - m_TA;
 	Normal = LATB * TALB;
@@ -899,17 +975,15 @@ void CSurface::SetNormal()
 }
 
 
-
 void CSurface::SetTwist()
 {
-	CVector A4, B4, L, U, T;
-	CVector O(0.0,0.0,0.0);
+	static CVector A4, B4, L, U, T, O;
+	O.Set(0.0,0.0,0.0);
 
 	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
 	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
 	L = B4 - A4;
 	L.Normalize();
-
 
 	// create a vector perpendicular to NormalA and x-axis
 	T.x = 0.0;
@@ -941,6 +1015,7 @@ void CSurface::SetTwist()
 
 	NormalB.Rotate(T, m_TwistB);
 }
+
 
 void CSurface::SetTwist_Old()
 {

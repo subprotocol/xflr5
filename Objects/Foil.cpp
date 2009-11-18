@@ -19,10 +19,7 @@
 
 *****************************************************************************/
 
- 
-// RefFoil.cpp: implementation of the CFoil class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #include "../MainFrame.h"
 #include "Foil.h"
@@ -31,16 +28,14 @@
 #include "../Globals.h"
 #include <QTextStream>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
 
 
 CFoil::CFoil()
 {
-    m_nFoilStyle = 0;
+	m_nFoilStyle = 0;
 	m_nFoilWidth = 1;
-    m_FoilColor  = QColor(255,0,0,127);
+	m_FoilColor  = QColor(255,0,0,127);
 
 	m_iHighLight = -1;
 
@@ -106,9 +101,11 @@ bool CFoil::CompMidLine(bool bParams)
 {
 	//  Calculates the foil's thickness and camber for the base foil
 
-        int l;
-	double xt, yex, yin;
-	if(bParams){
+	static int l;
+	static double xt, yex, yin, step;
+
+	if(bParams)
+	{
 		m_fThickness  = 0.0;
 		m_fCamber     = 0.0;
 		m_fXCamber    = 0.0;
@@ -119,10 +116,11 @@ bool CFoil::CompMidLine(bool bParams)
 	m_rpMid[0].y    = 0.0;
 	m_rpMid[1000].x = 1.0;
 	m_rpMid[1000].y = 0.0;
-//	double length = GetLength();
-	double step = (m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)/1000.0;
+	//	double length = GetLength();
+	step = (m_rpExtrados[m_iExt].x-m_rpExtrados[0].x)/1000.0;
 
-        for (l=0; l<1000; l++){
+	for (l=0; l<1000; l++)
+	{
 		xt = m_rpExtrados[0].x+l*step;
 		yex = GetUpperY((double)l*0.001);
 		yin = GetLowerY((double)l*0.001);
@@ -247,21 +245,24 @@ double CFoil::DeRotate()
 	
 	InitFoil();
 
-	return angle*180.0/3.141592654;
+	return angle*180.0/PI;
 }
 
 
-void CFoil::DrawFoil(QPainter &painter, double alpha, double scalex, double scaley, QPoint Offset)
+void CFoil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset)
 {
-	double xa, ya, sina, cosa;
-	QPoint pt, From, To;
-	QRect R;
-	int k;
-	QPen FoilPen(m_FoilColor);
+	static double xa, ya, sina, cosa;
+	static QPoint pt, From, To;
+	static QRect R;
+	static int k;
+	static QPen FoilPen, HighPen;
+
+	FoilPen.setColor(m_FoilColor);
 	FoilPen.setWidth(m_nFoilWidth);
-//	FoilPen.setStyle(0);
 	FoilPen.setStyle(GetStyle(m_nFoilStyle));
 	painter.setPen(FoilPen);
+
+	HighPen.setColor(QColor(255,0,0));
 
 	cosa = cos(alpha*PI/180.0);
 	sina = sin(alpha*PI/180.0);
@@ -281,7 +282,6 @@ void CFoil::DrawFoil(QPainter &painter, double alpha, double scalex, double scal
 	}
 	if(m_bPoints && m_iHighLight==0)
 	{
-                QPen HighPen(QColor(255,0,0));
 		HighPen.setWidth(2);
 		painter.setPen(HighPen);
 		painter.drawRect(R);
@@ -307,8 +307,7 @@ void CFoil::DrawFoil(QPainter &painter, double alpha, double scalex, double scal
 		}
 		if(m_bPoints && m_iHighLight==k)
 		{
-                        QPen HighPen(QColor(255,0,0));
-			HighPen.setWidth(2);
+ 			HighPen.setWidth(2);
 			painter.setPen(HighPen);
 			painter.drawRect(R);
 			painter.setPen(FoilPen);
@@ -319,42 +318,12 @@ void CFoil::DrawFoil(QPainter &painter, double alpha, double scalex, double scal
 }
 
 
-void CFoil::DrawFoil(double alpha, double scalex, double scaley, CVector const &Offset)
+void CFoil::DrawMidLine(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
-	double xa,ya,sina,cosa;
-	CVector From, To;
-	int k;
-
-	cosa = cos(alpha);
-	sina = sin(alpha);
-
-	xa = (x[0]-0.5)*cosa - y[0]*sina + 0.5;
-	ya = (x[0]-0.5)*sina + y[0]*cosa;
-	From.x = xa*scalex + Offset.x;
-	From.y = ya*scaley + Offset.y;
-
-	glBegin(GL_LINE_STRIP);
-	{
-		glVertex2d(From.x, From.y);
-		for (k=1; k<n; k++)
-		{
-			xa = (x[k]-0.5)*cosa - y[k]*sina+ 0.5;
-			ya = (x[k]-0.5)*sina + y[k]*cosa;
-			To.x = xa*scalex+Offset.x;
-			To.y = ya*scaley+Offset.y;
-
-			glVertex2d(To.x, To.y);
-		}
-	}
-	glEnd();
-}
-
-
-void CFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	QPoint From, To;
-
-	QPen FoilPen(m_FoilColor);
+	static QPoint From, To;
+	static int k;
+	static QPen FoilPen;
+	FoilPen.setColor(m_FoilColor);
 	FoilPen.setWidth(m_nFoilWidth);
 	FoilPen.setStyle(Qt::DashLine);
 	painter.setPen(FoilPen);
@@ -363,7 +332,7 @@ void CFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint 
 	From.ry() = (int)(-m_rpMid[0].y*scaley)  +Offset.y();
 
 
-	for (int k=1; k<=1000; k+=10)
+	for (k=1; k<=1000; k+=10)
 	{
 		To.rx() = (int)( m_rpMid[k].x*scalex)+Offset.x();
 		To.ry() = (int)(-m_rpMid[k].y*scaley)+Offset.y();
@@ -374,92 +343,23 @@ void CFoil::DrawMidLine(QPainter &painter, double scalex, double scaley, QPoint 
 }
 
 
-void CFoil::DrawMidLine(double scalex, double scaley, CVector Offset)
+
+
+
+void CFoil::DrawPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {
-	CVector From, To;
-	int k;
-
-	From.x = (m_rpMid[0].x*scalex)  +Offset.x;
-	From.y = (m_rpMid[0].y*scaley)  +Offset.y;
-
-	glBegin(GL_LINE_STRIP);
-	{
-		glVertex2d(From.x, From.y);
-		for (k=1; k<1000; k++)
-		{
-			To.x = m_rpMid[k].x*scalex + Offset.x;
-			To.y = m_rpMid[k].y*scaley + Offset.y;
-
-			glVertex2d(To.x, To.y);
-		}
-	}
-	glEnd();
-}
-
-
-
-void CFoil::DrawPoints(double scalex, double scaley, CVector Offset)
-{
-	int i;
-	double widthx, widthy;
-	CVector pt1, pt2;
-
-	widthx = 0.002*scalex;
-	widthy = 0.002*scaley;
-
-	for (i=0; i<n;i++)
-	{
-		pt1.x = x[i]*scalex+Offset.x-widthx;
-		pt1.y = y[i]*scaley+Offset.y-widthy;
-		pt2.x = x[i]*scalex+Offset.x+widthx;
-		pt2.y = y[i]*scaley+Offset.y+widthy;
-
-		glBegin(GL_LINE_STRIP);
-		{
-			glVertex2d(pt1.x, pt1.y);
-			glVertex2d(pt2.x, pt1.y);
-			glVertex2d(pt2.x, pt2.y);
-			glVertex2d(pt1.x, pt2.y);
-			glVertex2d(pt1.x, pt1.y);
-		}
-		glEnd();
-	}
-	if(m_iHighLight>=0)
-	{
-		glColor3d(1.0, 0.0, 0.0);
-		glLineWidth(2.0);
-		pt1.x = x[m_iHighLight]*scalex+Offset.x-widthx;
-		pt1.y = y[m_iHighLight]*scaley+Offset.y-widthy;
-		pt2.x = x[m_iHighLight]*scalex+Offset.x+widthx;
-		pt2.y = y[m_iHighLight]*scaley+Offset.y+widthy;
-
-		glBegin(GL_LINE_STRIP);
-		{
-			glVertex2d(pt1.x, pt1.y);
-			glVertex2d(pt2.x, pt1.y);
-			glVertex2d(pt2.x, pt2.y);
-			glVertex2d(pt1.x, pt2.y);
-			glVertex2d(pt1.x, pt1.y);
-		}
-		glEnd();
-	}
-
-	return;
-}
-
-
-
-void CFoil::DrawPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
-{
-	int width;
-	QPoint pt1;
+	static int width;
+	static QPoint pt1;
 
 	width = 2;
 
-	QPen FoilPen(m_FoilColor);
+	static QPen FoilPen, HighPen;
+	FoilPen.setColor(m_FoilColor);
 	FoilPen.setWidth(m_nFoilWidth);
 	FoilPen.setStyle(Qt::SolidLine);
 	painter.setPen(FoilPen);
+
+	HighPen.setColor(QColor(255,0,0));
 
 	for (int i=0; i<n;i++)
 	{
@@ -470,7 +370,6 @@ void CFoil::DrawPoints(QPainter &painter, double scalex, double scaley, QPoint O
 	}
 	if(m_iHighLight>=0)
 	{
-		QPen HighPen(QColor(255,0,0));
 		HighPen.setWidth(2);
 		painter.setPen(HighPen);
 
@@ -513,15 +412,16 @@ double CFoil::GetArea()
 }
 
 
-double CFoil::GetBaseLowerY(double x)
+double CFoil::GetBaseLowerY(double const &x)
 {
+	static int i;
+	static double y;
+
 	// Returns the y-coordinate on the base foil's lower surface at the x position
 //	x = x*(m_BaseIntrados[m_iInt].x-m_BaseIntrados[0].x);//in case there is a flap which reduces the length
-	double y;
-	for (int i=0; i<m_iBaseInt; i++)
+	for (i=0; i<m_iBaseInt; i++)
 	{
-		if (m_BaseIntrados[i].x <m_BaseIntrados[i+1].x  && 
-			m_BaseIntrados[i].x <= x && x<=m_BaseIntrados[i+1].x )
+		if (m_BaseIntrados[i].x <m_BaseIntrados[i+1].x  &&  m_BaseIntrados[i].x <= x && x<=m_BaseIntrados[i+1].x )
 		{
 			y = (m_BaseIntrados[i].y 	+ (m_BaseIntrados[i+1].y-m_BaseIntrados[i].y)
 							 /(m_BaseIntrados[i+1].x-m_BaseIntrados[i].x)*(x-m_BaseIntrados[i].x));
@@ -531,17 +431,18 @@ double CFoil::GetBaseLowerY(double x)
 	return 0.0;
 }
 
-double CFoil::GetBaseUpperY(double x)
+double CFoil::GetBaseUpperY(double const &x)
 {
+	static double y;
+	static int i;
+
 	// Returns the y-coordinate on the base foil's upper surface at the x position
 //	x = x*(m_BaseExtrados[m_iExt].x-m_BaseExtrados[0].x);//in case there is a flap which reduces the length
-	double y;
-	for (int i=0; i<m_iBaseExt; i++)
+	for (i=0; i<m_iBaseExt; i++)
 	{
-		if (m_BaseExtrados[i].x <m_BaseExtrados[i+1].x  && 
-			m_BaseExtrados[i].x <= x && x<=m_BaseExtrados[i+1].x )
+		if (m_BaseExtrados[i].x <m_BaseExtrados[i+1].x  &&  m_BaseExtrados[i].x <= x && x<=m_BaseExtrados[i+1].x )
 		{
-			y = (m_BaseExtrados[i].y 	+ (m_BaseExtrados[i+1].y-m_BaseExtrados[i].y)
+			y = (m_BaseExtrados[i].y  + (m_BaseExtrados[i+1].y-m_BaseExtrados[i].y)
 									 /(m_BaseExtrados[i+1].x-m_BaseExtrados[i].x)*(x-m_BaseExtrados[i].x));
 			return y;
 		}
@@ -550,53 +451,60 @@ double CFoil::GetBaseUpperY(double x)
 }
 
 
-double CFoil::GetBotSlope(double x)
+double CFoil::GetBotSlope(double const &x)
 {
 	//returns the bottom slope at position x
-
-	for (int i=0; i<m_iInt; i++){
-		if ((m_rpIntrados[i].x <= x) && (x < m_rpIntrados[i+1].x)){
-			double dx = m_rpIntrados[i+1].x-m_rpIntrados[i].x;
-			double dy = m_rpIntrados[i+1].y-m_rpIntrados[i].y;
+	static int i;
+	static double dx, dy;
+	for (i=0; i<m_iInt; i++)
+	{
+		if ((m_rpIntrados[i].x <= x) && (x < m_rpIntrados[i+1].x))
+		{
+			dx = m_rpIntrados[i+1].x-m_rpIntrados[i].x;
+			dy = m_rpIntrados[i+1].y-m_rpIntrados[i].y;
 			return -atan2(dy,dx);
 		}
 	}
 	return 0.0;
 }
 
-double CFoil::GetCamber(double x)
+
+double CFoil::GetCamber(double const &x)
 {
-    //returns the camber value at position x
-    for (int i=0; i<=1000; i++)
-    {
-        if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
-        {
-                return (m_rpMid[i+1].y+m_rpMid[i].y)/2.0;
-        }
-    }
-    return 0.0;
+	//returns the camber value at position x
+	for (int i=0; i<=1000; i++)
+	{
+		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
+		{
+			return (m_rpMid[i+1].y+m_rpMid[i].y)/2.0;
+		}
+	}
+	return 0.0;
 }
 
-double CFoil::GetCamberAngle(double x)
+double CFoil::GetCamberAngle(double const &x)
 {
 	//returns the camber angle at position x
-
-	for (int i=0; i<=1000; i++){
-		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
+	static int i;
+	for (i=0; i<=1000; i++)
+	{
+		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x))
+		{
 			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
 			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
-			double alpha = atan(dy/dx)*180.0/3.141592654;
+			double alpha = atan(dy/dx)*180.0/PI;
 			return alpha;
 		}
 	}
 	return 0.0;
 }
 
-double CFoil::GetCamberSlope(double x)
+
+double CFoil::GetCamberSlope(double const &x)
 {
 	//returns the camber slope at position x
-
-	for (int i=0; i<1000; i++){
+	static int i;
+	for (i=0; i<1000; i++){
 		if ((m_rpMid[i].x <= x) && (x < m_rpMid[i+1].x)){
 			double dx = m_rpMid[i+1].x-m_rpMid[i].x;
 			double dy = m_rpMid[i+1].y-m_rpMid[i].y;
@@ -612,6 +520,7 @@ double CFoil::GetCamberSlope(double x)
 	return 0.0;
 }
 
+
 void CFoil::GetFoilName(QString &FoilName)
 {
 	FoilName =  m_FoilName;
@@ -624,14 +533,15 @@ double CFoil::GetLength()
 		return qMax(m_rpExtrados[m_iExt].x, m_rpExtrados[m_iInt].x);
 }
 
+
 double CFoil::GetLowerY(double x)
 {
 	// Returns the y-coordinate on the current foil's lower surface at the x position
 	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
-	double y;
+	static double y;
 	for (int i=0; i<m_iInt; i++)
 	{
-		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  && 
+		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&
 			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
 		{
 			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
@@ -642,21 +552,44 @@ double CFoil::GetLowerY(double x)
 	return 0.0;
 }
 
-double CFoil::GetMidY(double x)
+
+void CFoil::GetLowerY(double x, double &y, double &normx, double &normy)
 {
-	//Returns current foil's mid position at the x position
-	double u = GetUpperY(x);
-	double l = GetLowerY(x);
-	return (u+l)/2.0;
+	// Returns the y-coordinate on the current foil's lower surface at the x position
+
+	static double nabs;
+	static int i;
+
+	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
+	for (i=0; i<m_iInt; i++)
+	{
+		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&  m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
+		{
+			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y) /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
+			nabs = sqrt(  (m_rpIntrados[i+1].x-m_rpIntrados[i].x) * (m_rpIntrados[i+1].x-m_rpIntrados[i].x) 
+                                    + (m_rpIntrados[i+1].y-m_rpIntrados[i].y) * (m_rpIntrados[i+1].y-m_rpIntrados[i].y));
+			normx = ( m_rpIntrados[i+1].y - m_rpIntrados[i].y)/nabs;
+			normy = (-m_rpIntrados[i+1].x + m_rpIntrados[i].x)/nabs;
+		}
+	}
 }
 
 
-double CFoil::GetTopSlope(double x)
+double CFoil::GetMidY(double const &x)
+{
+	//Returns the current foil's mid position at the x position
+	return (GetUpperY(x)+GetLowerY(x))/2.0;
+}
+
+
+double CFoil::GetTopSlope(double const &x)
 {
 	//returns the upper slope at position x
-
-	for (int i=0; i<m_iExt; i++){
-		if ((m_rpExtrados[i].x <= x) && (x < m_rpExtrados[i+1].x)){
+	static int i;
+	for (i=0; i<m_iExt; i++)
+	{
+		if ((m_rpExtrados[i].x <= x) && (x < m_rpExtrados[i+1].x))
+		{
 			double dx = m_rpExtrados[i+1].x-m_rpExtrados[i].x;
 			double dy = m_rpExtrados[i+1].y-m_rpExtrados[i].y;
 			return -atan2(dy,dx);
@@ -666,6 +599,7 @@ double CFoil::GetTopSlope(double x)
 }
 
 
+
 double CFoil::GetUpperY(double x)
 {
 	// Returns the y-coordinate on the current foil's upper surface at the x position
@@ -673,7 +607,7 @@ double CFoil::GetUpperY(double x)
 	double y;
 	for (int i=0; i<m_iExt; i++)
 	{
-		if (m_rpExtrados[i].x <m_rpExtrados[i+1].x  && 
+		if (m_rpExtrados[i].x <m_rpExtrados[i+1].x  &&
 			m_rpExtrados[i].x <= x && x<=m_rpExtrados[i+1].x )
 		{
 			y = (m_rpExtrados[i].y 	+ (m_rpExtrados[i+1].y-m_rpExtrados[i].y)
@@ -682,6 +616,28 @@ double CFoil::GetUpperY(double x)
 		}
 	}
 	return 0.0;
+}
+
+
+void CFoil::GetUpperY(double x, double &y, double &normx, double &normy)
+{
+	static double nabs;
+	static int i;
+
+	// Returns the y-coordinate on the current foil's upper surface at the x position
+	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x);//in case there is a flap which reduces the length
+
+	for (i=0; i<m_iExt; i++)
+	{
+		if (m_rpExtrados[i].x <m_rpExtrados[i+1].x  &&  m_rpExtrados[i].x <= x && x<=m_rpExtrados[i+1].x )
+		{
+			y = (m_rpExtrados[i].y 	+ (m_rpExtrados[i+1].y-m_rpExtrados[i].y) / (m_rpExtrados[i+1].x-m_rpExtrados[i].x)*(x-m_rpExtrados[i].x));
+			nabs = sqrt(  (m_rpExtrados[i+1].x-m_rpExtrados[i].x) * (m_rpExtrados[i+1].x-m_rpExtrados[i].x) 
+                                    + (m_rpExtrados[i+1].y-m_rpExtrados[i].y) * (m_rpExtrados[i+1].y-m_rpExtrados[i].y));
+			normx = (-m_rpExtrados[i+1].y + m_rpExtrados[i].y)/nabs;
+			normy = ( m_rpExtrados[i+1].x - m_rpExtrados[i].x)/nabs;
+		}
+	}
 }
 
 
@@ -700,14 +656,15 @@ bool CFoil::InitFoil()
 
 	//first time is to calculate the base foil's thickness and camber
 
-    if(nb<=0)
-    {
-        QMessageBox msgBox;
-        msgBox.setStandardButtons(QMessageBox::Ok);
+	if(nb<=0)
+	{
+		QMessageBox msgBox;
+		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(MainFrame::tr("Warning"));
 		msgBox.setText(MainFrame::tr("Foil Error : no points"));
-        msgBox.exec();
-    }
+		msgBox.exec();
+	}
+
 	while (k<nb)
 	{
 		if (xb[k+1] < xb[k]) 
@@ -794,73 +751,82 @@ bool CFoil::InitFoil()
 
 
 
-bool CFoil::Intersect(CVector A, CVector B, CVector C, CVector D, CVector *M)
+bool CFoil::Intersect(CVector const &A, CVector const &B, CVector const &C, CVector const &D, CVector *M)
 {
-    //ABCD are assumed to lie in the xy plane
-    //returns true and intersection point M if AB and CD intersect inside
-    //returns false and intersection point M if AB and CD intersect outside
-    M->x = 0.0;
-    M->y = 0.0;
-    M->z = 0.0;
-    CVector AB(B.x-A.x, B.y-A.y, B.z-A.z);
-    CVector CD(D.x-C.x, D.y-C.y, D.z-C.z);
+	//ABCD are assumed to lie in the xy plane
+	//returns true and intersection point M if AB and CD intersect inside
+	//returns false and intersection point M if AB and CD intersect outside
 
-    //Cramer's rule
+	static double Det, Det1, Det2, t, u;
+	static CVector AB, CD;
 
-    double Det  = -AB.x * CD.y + CD.x * AB.y;
-    if(Det==0.0)
-    {
-            //vectors are parallel, no intersection
-            return false;
-    }
-    double Det1 = -(C.x-A.x)*CD.y + (C.y-A.y)*CD.x;
-    double Det2 = -(C.x-A.x)*AB.y + (C.y-A.y)*AB.x;
+	M->x = 0.0;
+	M->y = 0.0;
+	M->z = 0.0;
+	AB.Set(B.x-A.x, B.y-A.y, B.z-A.z);
+	CD.Set(D.x-C.x, D.y-C.y, D.z-C.z);
 
-    double t = Det1/Det;
-    double u = Det2/Det;
+	//Cramer's rule
 
-    M->x = A.x + t*AB.x;
-    M->y = A.y + t*AB.y;
+	Det  = -AB.x * CD.y + CD.x * AB.y;
+	if(Det==0.0)
+	{
+		//vectors are parallel, no intersection
+		return false;
+	}
+	Det1 = -(C.x-A.x)*CD.y + (C.y-A.y)*CD.x;
+	Det2 = -(C.x-A.x)*AB.y + (C.y-A.y)*AB.x;
 
-    if (0.0<=t && t<=1.0 && 0.0<=u && u<=1.0)	return true;//M is between A and B
-    else					return false;//M is outside
+	t = Det1/Det;
+	u = Det2/Det;
+
+	M->x = A.x + t*AB.x;
+	M->y = A.y + t*AB.y;
+
+	if (0.0<=t && t<=1.0 && 0.0<=u && u<=1.0) return true;//M is between A and B
+	else                                      return false;//M is outside
 }
 
 
 
 bool CFoil::IsBetween(int f, int f1, int f2)
 {
-        if (f2 < f1){
-                int tmp = f2;
-                f2 = f1;
-                f1 = tmp;
-        }
-        if(f<f1) return false;
-        else if(f>f2) return false;
-        return true;
+	if (f2 < f1)
+	{
+		int tmp = f2;
+		f2 = f1;
+		f1 = tmp;
+	}
+	if(f<f1)      return false;
+	else if(f>f2) return false;
+	return true;
 }
+
 
 bool CFoil::IsBetween(int f, double f1, double f2)
 {
-        double ff = f;
-        if (f2 < f1){
-                double tmp = f2;
-                f2 = f1;
-                f1 = tmp;
-        }
-        if(ff<f1) return false;
-        else if(ff>f2) return false;
-        return true;
+	static double ff;
+	ff = f;
+	if (f2 < f1)
+	{
+		double tmp = f2;
+		f2 = f1;
+		f1 = tmp;
+	}
+	if(ff<f1) return false;
+	else if(ff>f2) return false;
+	return true;
 }
 
 
-int CFoil::IsPoint(CVector Real)
+int CFoil::IsPoint(CVector const &Real)
 {
 	// Returns the index of foil's point which coincides with the input point, if any
 	// Otherwise returns -10
-
-	for (int k=0; k<n; k++){
-                if(fabs(Real.x-x[k])<0.005 && fabs(Real.y-y[k])<0.005) return k;
+	static int k;
+	for (k=0; k<n; k++)
+	{
+		if(fabs(Real.x-x[k])<0.005 && fabs(Real.y-y[k])<0.005) return k;
 	}
 	return -10;
 }
@@ -874,10 +840,10 @@ double CFoil::NormalizeGeometry()
 	double xmin = 1.0;
 	double xmax = 0.0;
 
-        for (i=0; i<nb; i++)
-        {
-				xmin = qMin(xmin, xb[i]);
-				xmax = qMax(xmax, xb[i]);
+	for (i=0; i<nb; i++)
+	{
+		xmin = qMin(xmin, xb[i]);
+		xmax = qMax(xmax, xb[i]);
 	}
 	double length = xmax - xmin;
 
@@ -1085,7 +1051,7 @@ void  CFoil::SetTEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 {
 	// Sets a trailing edge flap properties
 	// x and y hinge are in relative % coordinates
-	// angle is in �
+	// angle is in degree
 
 	m_bTEFlap     = bFlap;
 	m_TEXHinge    = xhinge;
@@ -1098,7 +1064,7 @@ void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 {
 	// Sets a leading edge flap properties
 	// x and y hinge are in relative % coordinates
-	// angle is in �
+	// angle is in degree
 	m_bLEFlap     = bFlap;
 	m_LEXHinge    = xhinge;
 	m_LEYHinge    = yhinge;
@@ -1562,7 +1528,7 @@ void CFoil::SetTEFlap()
 		}
 		m_iExt = k+p-1;
 	}
-// trim lower surface next
+	// trim lower surface next
 
 	i1 = iLowerh;
 	i2 = iLowerh+1;

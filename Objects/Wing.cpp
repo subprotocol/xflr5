@@ -1322,6 +1322,7 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 {
 	double tau;
 	double twist, chord;
+	double z0, z1, nx, ny;
 	zv = 0.0;
 	yv = 0.0;
 	double fy = fabs(y);
@@ -1357,14 +1358,18 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 
 			if(pos==1)
 			{
-				double z0 = pFoil0->GetUpperY(xrel) * chord;
-				double z1 = pFoil1->GetUpperY(xrel) * chord;
+				pFoil0->GetUpperY(xrel, z0, nx, ny) ;
+				pFoil1->GetUpperY(xrel, z1, nx, ny) ;
+				z0 *= chord;
+				z1 *= chord;
 				zv += z0 + (z1-z0)*tau;
 			}
 			else if(pos==-1)
 			{
-				double z0 = pFoil0->GetLowerY(xrel) * chord;
-				double z1 = pFoil1->GetLowerY(xrel) * chord;
+				pFoil0->GetLowerY(xrel, z0, nx, ny);
+				pFoil1->GetLowerY(xrel, z1, nx, ny);
+				z0 *= chord;
+				z1 *= chord;
 				zv += z0 + (z1-z0)*tau;
 			}
 		}

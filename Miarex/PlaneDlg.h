@@ -83,8 +83,6 @@ private:
 	bool m_bChanged;
 	bool m_bAcceptName;
 	
-	double pi;
-
 private:
 	QLabel *m_pctrlSurf1;
 	QLabel *m_pctrlSurf2;
