@@ -8158,14 +8158,14 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//XLabel
-	pGLWidget->renderText( .8, 0.0, 0.0, "X", pMainFrame->m_TextFont);
+	pGLWidget->renderText( l, 0.0, 0.0, "X", pMainFrame->m_TextFont);
 
 
 // Y axis____________
 	glEnable (GL_LINE_STIPPLE);
 	glBegin(GL_LINES);
-		glVertex3d(0.0, -.8, 0.0);
-		glVertex3d(0.0,  .8, 0.0);
+		glVertex3d(0.0, -l, 0.0);
+		glVertex3d(0.0,  l, 0.0);
 	glEnd();
 
 	//Arrow
@@ -8179,16 +8179,15 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//Y Label
-	pGLWidget->renderText( 0.0, .8, 0.0, "Y", pMainFrame->m_TextFont);
+	pGLWidget->renderText( 0.0, l, 0.0, "Y", pMainFrame->m_TextFont);
+
 
 // Z axis____________
 	glEnable (GL_LINE_STIPPLE);
 	glBegin(GL_LINES);
-		glVertex3d(0.0, 0.0, -.8);
-		glVertex3d(0.0, 0.0,  .8);
+		glVertex3d(0.0, 0.0, -l);
+		glVertex3d(0.0, 0.0,  l);
 	glEnd();
-
-
 
 	//Arrow
 	glBegin(GL_LINES);
@@ -8201,7 +8200,7 @@ void QMiarex::GLDrawAxes()
 	glEnd();
 	glDisable (GL_LINE_STIPPLE);
 	//ZLabel
-	pGLWidget->renderText( 0.0, 0.0, .8, "Z", pMainFrame->m_TextFont);
+	pGLWidget->renderText( 0.0, 0.0, l, "Z", pMainFrame->m_TextFont);
 
 	glDisable (GL_LINE_STIPPLE);
 }

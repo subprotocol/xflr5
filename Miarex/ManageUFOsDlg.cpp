@@ -41,8 +41,8 @@ ManageUFOsDlg::ManageUFOsDlg()
 
 	connect(m_pctrlDelete, SIGNAL(clicked()),this, SLOT(OnDelete()));
 	connect(m_pctrlRename, SIGNAL(clicked()),this, SLOT(OnRename()));
-
 	connect(m_pctrlUFOTable, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OnDoubleClickTable(const QModelIndex &)));
+	connect(m_pctrlDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
 
 	connect(CloseButton, SIGNAL(clicked()),this, SLOT(accept()));
 }
@@ -139,7 +139,7 @@ void ManageUFOsDlg::SetupLayout()
 	m_pctrlUFOTable->setMinimumWidth(800);
 
 	m_pctrlDescription = new QTextEdit;
-	m_pctrlDescription->setEnabled(false);
+//	m_pctrlDescription->setEnabled(false);
 	QLabel *Description = new QLabel(tr("Description:"));
 
 	QVBoxLayout *LeftLayout = new QVBoxLayout;
@@ -326,6 +326,20 @@ void ManageUFOsDlg::OnDoubleClickTable(const QModelIndex &index)
 	if(index.row()>=0) accept();
 }
 
+
+void ManageUFOsDlg::OnDescriptionChanged()
+{
+	if(m_pPlane)
+	{
+		m_pPlane->m_PlaneDescription = m_pctrlDescription->toPlainText();
+	}
+	else
+	{
+		m_pWing->m_WingDescription = m_pctrlDescription->toPlainText();
+	}
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->SetSaveState(false);
+}
 
 
 void ManageUFOsDlg::OnUFOClicked(QModelIndex index)

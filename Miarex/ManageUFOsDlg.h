@@ -47,7 +47,7 @@ private slots:
 	void OnRename();
 	void OnUFOClicked(QModelIndex index);
 	void OnDoubleClickTable(const QModelIndex &index);
-
+	void OnDescriptionChanged();
 
 private:
 	void resizeEvent(QResizeEvent *event);

@@ -120,6 +120,8 @@ private slots:
 	void OnAFoilNacaFoils();
 
 private:
+	void CheckButtons();
+	void CheckFoilParams(CFoil* pFoil = NULL);
 	void DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawYGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
@@ -129,7 +131,6 @@ private:
 	void FillTableRow(int row);
 	void ShowFoil(CFoil* pFoil, bool bShow=true);
 	void SetParams();
-	void SetFoil(CFoil* pFoil = NULL);
 	void SelectFoil(CFoil* pFoil = NULL);
 	void UpdateFoil(int iFoil = -1);
 	void PaintGrids(QPainter &painter);
@@ -143,7 +144,6 @@ private:
 	void SFNew();
 	void ReleaseZoom();
 
-	void CheckButtons();
 
 	void LoadSettings(QSettings *pSettings);
 	void SaveSettings(QSettings *pSettings);

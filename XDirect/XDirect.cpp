@@ -978,7 +978,6 @@ void QXDirect::FillPolarCurve(CCurve *pCurve, CPolar *pPolar, int XVar, int YVar
 				if(pPolar->m_PlrName==m_pCurOpp->m_strPlrName
 				   && g_pCurFoil->m_FoilName==pPolar->m_FoilName)
 				{
-//qDebug() <<g_pCurFoil->m_FoilName<< m_pCurOpp->m_strPlrName;
 					pCurve->SetSelected(i);
 				}
 			}

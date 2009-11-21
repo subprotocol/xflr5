@@ -29,7 +29,7 @@
 #include <QDialog>
 #include <QListWidget>
 #include <QPushButton>
-
+#include <QTextEdit>
 
 class ManageBodiesDlg : public QDialog
 {
@@ -49,6 +49,7 @@ private slots:
 	void OnDuplicate();
 	void OnEdit();
 	void OnNew();
+	void OnDescriptionChanged();
 	void OnExportDefinition();
 	void OnExportGeometry();
 	void OnDoubleClickTable(const QModelIndex &index);
@@ -69,6 +70,7 @@ private:
 	QPushButton *m_pctrlNew, *m_pctrlEdit, *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate;
 	QPushButton *m_pctrlExportDef, *m_pctrlExportGeom;
 	QListWidget *m_pctrlNameList;
+	QTextEdit *m_pctrlDescription;
 };
 
 

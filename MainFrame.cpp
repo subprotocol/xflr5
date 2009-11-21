@@ -3104,7 +3104,6 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				g_pCurFoil = pXDirect->SetFoil(pFoil);
 				pXDirect->SetPolar();
 				QAFoil *pAFoil= (QAFoil*)m_pAFoil;
-				pAFoil->SetFoil(pFoil);
 				pAFoil->SelectFoil(pFoil);
 				XFile.close();
 				SetSaveState(false);
@@ -3341,7 +3340,7 @@ void MainFrame::OnInsertProject()
 	}
 	else if(m_iApp == DIRECTDESIGN)
 	{
-		pAFoil->SetFoil();
+		pAFoil->SelectFoil();
 	}
 	UpdateView();
 }
@@ -5450,7 +5449,7 @@ void MainFrame::SetCurrentFoil(CFoil* pFoil)
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QAFoil   *pAFoil = (QAFoil*)m_pAFoil;
 	pXDirect->SetFoil(pFoil);
-	pAFoil->SetFoil(pFoil);
+	pAFoil->SelectFoil(pFoil);
 	g_pCurFoil = pFoil;
 }
 

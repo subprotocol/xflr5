@@ -161,6 +161,35 @@ void QAFoil::CheckButtons()
 }
 
 
+void QAFoil::CheckFoilParams(CFoil* pFoil)
+{
+	if(!pFoil && !g_pCurFoil)
+	{
+		if(m_bSF)
+		{
+			m_pctrlVisible->setChecked(m_pSF->m_bVisible);
+			m_pctrlCenterLine->setChecked(m_pSF->m_bCenterLine);
+			m_pctrlFoilPoints->setChecked(m_pSF->m_bOutPoints);
+			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
+		}
+		else
+		{
+			m_pctrlVisible->setChecked(m_pPF->m_bVisible);
+			m_pctrlCenterLine->setChecked(m_pPF->m_bCenterLine);
+			m_pctrlFoilPoints->setChecked(m_pPF->m_bOutPoints);
+			m_pctrlFoilStyle->SetStyle(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
+		}
+	}
+	else
+	{
+		m_pctrlVisible->setChecked(pFoil->m_bVisible);
+		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
+		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
+		m_pctrlFoilStyle->SetStyle(g_pCurFoil->m_nFoilStyle, g_pCurFoil->m_nFoilWidth, g_pCurFoil->m_FoilColor);
+	}
+	CheckButtons();
+}
+
 
 void QAFoil::DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect)
 {
@@ -1104,61 +1133,6 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 }
 
 
-void QAFoil::OnAFoilSetFlap()
-{
-	if(!g_pCurFoil) return;
-
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
-	m_pBufferFoil->CopyFoil(g_pCurFoil);
-	m_pBufferFoil->m_bVisible = true;
-	m_pBufferFoil->m_FoilName = g_pCurFoil->m_FoilName;
-	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
-	m_pBufferFoil->m_nFoilStyle = 1;
-	m_pBufferFoil->m_nFoilWidth = 1;
-
-	UpdateView();
-
-	FlapDlg dlg;
-	dlg.m_pAFoil      = this;
-	dlg.m_pXDirect    = NULL;
-	dlg.m_pXFoil      = m_pXFoil;
-	dlg.m_pMemFoil    = g_pCurFoil;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.InitDialog();
-
-	if(QDialog::Accepted == dlg.exec())
-	{
-		//then duplicate the buffer foil and add it
-		CFoil *pNewFoil = new CFoil();
-		pNewFoil->CopyFoil(m_pBufferFoil);
-		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
-		pNewFoil->m_nFoilStyle = 0;
-		pNewFoil->m_nFoilWidth = 1;
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SetFoil(pNewFoil);
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
-	}
-	else
-	{
-		FillFoilTable();
-		SelectFoil(g_pCurFoil);
-		m_pXFoil->m_FoilName ="";
-	}
-	m_pBufferFoil->m_bVisible = false;
-	UpdateView();
-}
-
 
 
 void QAFoil::OnAFoilDerotateFoil()
@@ -1185,19 +1159,11 @@ void QAFoil::OnAFoilDerotateFoil()
 	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
 	pNewFoil->m_nFoilStyle = 0;
 	pNewFoil->m_nFoilWidth = 1;
-	if(pMainFrame->SetModFoil(pNewFoil))
-	{
-		g_pCurFoil = NULL;
-		FillFoilTable();
-		SetFoil(pNewFoil);
-		SelectFoil(pNewFoil);
-	}
-	else
-	{
-//			pNewFoil = NULL;
-		FillFoilTable();
-		SelectFoil(g_pCurFoil);
-	}
+
+	CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+	FillFoilTable();
+	SelectFoil(pFoil);
+
 	m_pBufferFoil->m_bVisible = false;
 
 	UpdateView();
@@ -1251,18 +1217,11 @@ void QAFoil::OnAFoilCadd()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 
 	else
@@ -1326,18 +1285,11 @@ void QAFoil::OnAFoilPanels()
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 
 	else
@@ -1386,18 +1338,10 @@ void QAFoil::OnAFoilFoilCoordinates()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_iHighLight = -1;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 	else
 	{
@@ -1443,18 +1387,10 @@ void QAFoil::OnAFoilFoilGeom()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 
 	else
@@ -1502,18 +1438,10 @@ void QAFoil::OnAFoilSetTEGap()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 	else
 	{
@@ -1561,18 +1489,11 @@ void QAFoil::OnAFoilSetLERadius()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 	else
 	{
@@ -1595,7 +1516,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 		return;
 	}
 
-	if(!g_pCurFoil) SetFoil();
+	if(!g_pCurFoil) SelectFoil();
 	if(!g_pCurFoil) return;
 	m_pBufferFoil->CopyFoil(g_pCurFoil);
 	m_pBufferFoil->m_FoilName  = g_pCurFoil->m_FoilName;
@@ -1626,18 +1547,10 @@ void QAFoil::OnAFoilInterpolateFoils()
 		pNewFoil->m_bPoints = false;
 		pNewFoil->m_FoilName = dlg.m_NewFoilName;
 
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 
 	else
@@ -1688,18 +1601,11 @@ void QAFoil::OnAFoilNacaFoils()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 		pNewFoil->m_FoilName   = str;
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-//			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil(g_pCurFoil);
-		}
+
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+
 	}
 
 	else
@@ -1713,6 +1619,52 @@ void QAFoil::OnAFoilNacaFoils()
 	UpdateView();
 }
 
+
+void QAFoil::OnAFoilSetFlap()
+{
+	if(!g_pCurFoil) return;
+
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_pBufferFoil->CopyFoil(g_pCurFoil);
+	m_pBufferFoil->m_bVisible = true;
+	m_pBufferFoil->m_FoilName = g_pCurFoil->m_FoilName;
+	m_pBufferFoil->m_FoilColor  = QColor(160,160,160);
+	m_pBufferFoil->m_nFoilStyle = 1;
+	m_pBufferFoil->m_nFoilWidth = 1;
+
+	UpdateView();
+
+	FlapDlg dlg;
+	dlg.m_pAFoil      = this;
+	dlg.m_pXDirect    = NULL;
+	dlg.m_pXFoil      = m_pXFoil;
+	dlg.m_pMemFoil    = g_pCurFoil;
+	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.InitDialog();
+
+	if(QDialog::Accepted == dlg.exec())
+	{
+		//then duplicate the buffer foil and add it
+		CFoil *pNewFoil = new CFoil();
+		pNewFoil->CopyFoil(m_pBufferFoil);
+		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+		pNewFoil->m_nFoilStyle = 0;
+		pNewFoil->m_nFoilWidth = 1;
+
+		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
+		FillFoilTable();
+		SelectFoil(pFoil);
+	}
+	else
+	{
+		FillFoilTable();
+		SelectFoil(g_pCurFoil);
+		m_pXFoil->m_FoilName ="";
+	}
+	m_pBufferFoil->m_bVisible = false;
+	UpdateView();
+}
 
 void QAFoil::OnCenterLine()
 {
@@ -1765,13 +1717,12 @@ void QAFoil::OnDuplicate()
 	if(pMainFrame->SetModFoil(pNewFoil))
 	{
 		FillFoilTable();
-		SetFoil(pNewFoil);
+		SelectFoil(pNewFoil);
 	}
 	else
 	{
-		pNewFoil = NULL;
 		FillFoilTable();
-		SetFoil(pNewFoil);
+		SelectFoil(NULL);
 	}
 }
 
@@ -1901,11 +1852,13 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 	if(index.row()>0)
 	{
 		CFoil *pFoil= pMainFrame->GetFoil(FoilName);
-		SetFoil(pFoil);
+		g_pCurFoil = pFoil;
+		CheckFoilParams(pFoil);
 	}
 	else if(index.row()==0)
 	{
-		SetFoil();
+		g_pCurFoil = NULL;
+		CheckFoilParams(NULL);
 	}
 	CheckButtons();
 }
@@ -2293,7 +2246,7 @@ void QAFoil::OnSplineControls()
 void QAFoil::OnSplineType()
 {
 	m_bSF = m_pctrlSF->isChecked();
-	SetFoil(NULL);
+	CheckFoilParams(NULL);
 	FillFoilTable();
 	UpdateView();
 }
@@ -3066,7 +3019,7 @@ void QAFoil::SelectFoil(CFoil* pFoil)
 	{
 		QModelIndex ind;
 		QString FoilName;
-		SetFoil(pFoil);
+		CheckFoilParams(pFoil);
 
 		for(i=0; i< m_pFoilModel->rowCount(); i++)
 		{
@@ -3082,41 +3035,10 @@ void QAFoil::SelectFoil(CFoil* pFoil)
 	}
 	else
 	{
-		SetFoil(NULL);
+		CheckFoilParams(NULL);
 		m_pctrlFoilTable->selectRow(0);
 	}
-}
-
-
-void QAFoil::SetFoil(CFoil *pFoil)
-{
 	g_pCurFoil = pFoil;
-
-	if(!pFoil)
-	{
-		if(m_bSF)
-		{
-			m_pctrlVisible->setChecked(m_pSF->m_bVisible);
-			m_pctrlCenterLine->setChecked(m_pSF->m_bCenterLine);
-			m_pctrlFoilPoints->setChecked(m_pSF->m_bOutPoints);
-			m_pctrlFoilStyle->SetStyle(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
-		}
-		else
-		{
-			m_pctrlVisible->setChecked(m_pPF->m_bVisible);
-			m_pctrlCenterLine->setChecked(m_pPF->m_bCenterLine);
-			m_pctrlFoilPoints->setChecked(m_pPF->m_bOutPoints);
-			m_pctrlFoilStyle->SetStyle(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
-		}
-	}
-	else
-	{
-		m_pctrlVisible->setChecked(pFoil->m_bVisible);
-		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
-		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
-		m_pctrlFoilStyle->SetStyle(g_pCurFoil->m_nFoilStyle, g_pCurFoil->m_nFoilWidth, g_pCurFoil->m_FoilColor);
-	}
-	CheckButtons();
 }
 
 
@@ -3154,9 +3076,10 @@ void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
 	if(!pFoil) return;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	g_pCurFoil->m_bVisible = bShow;
-	SetFoil(pFoil);
+	CheckFoilParams(pFoil);
 	pMainFrame->SetSaveState(false);
 }
+
 
 void QAFoil::StorePicture()
 {
@@ -3173,7 +3096,6 @@ void QAFoil::StorePicture()
 	m_bStored = true;
 	m_StackPos++;
 	m_StackSize = m_StackPos;
-
 }
 
 

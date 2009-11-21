@@ -181,8 +181,8 @@ bool VLMAnalysisDlg::ControlLoop()
 	int i, j, nrhs, iter, nCtrl;
 	QString str;
 	double eps = 1.e-7;
-	double t, Cm, angle;
-	double a, a0, a1, Cm0, Cm1, tmp;
+	double t, angle;
+	double a, a0, a1, Cm, Cm0, Cm1, tmp, p;
 	Quaternion Quat;
 	CWing *pWing, *pStab;
 
@@ -382,7 +382,9 @@ bool VLMAnalysisDlg::ControlLoop()
 
 			while (fabs(Cm)>eps && iter <100)
 			{
-				a = (a0+a1)/2.0;
+				p = (Cm1-Cm0)/(a1-a0);
+				a = a0-Cm0/p;
+//				a = (a0+a1)/2.0;
 				Cm = VLMComputeCm(a*180.0/PI);
 				if(Cm>0.0)
 				{
@@ -418,8 +420,6 @@ bool VLMAnalysisDlg::ControlLoop()
 		if(m_bCancel) break;
 	}
 
-	memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
-	memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
 	return true;
 }
 
@@ -801,6 +801,13 @@ void VLMAnalysisDlg::StartAnalysis()
 	if (!m_bCancel && !m_bWarning) strong = tr("\r\nVLM Analysis completed successfully\r\n");
 	else if (m_bWarning)           strong = tr("\r\nVLM Analysis completed ... Errors encountered\r\n");
 	AddString(strong);
+
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
+	{
+		//restore the panels and nodes;
+		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
+	}
 	m_bIsFinished = true;
 	m_pctrlCancel->setText(tr("Close"));
 }
@@ -820,7 +827,6 @@ bool VLMAnalysisDlg::UnitLoop()
 
 	nrhs  = (int)fabs((m_AlphaMax-m_AlphaMin)*1.0001/m_AlphaDelta) + 1;
 
-
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs>=100)
 	{
@@ -829,7 +835,7 @@ bool VLMAnalysisDlg::UnitLoop()
 	}
 
 	m_bTrace = true;
-	m_AlphaMin = 0.0;
+//	m_AlphaMin = 0.0;
 
 	str = QString(tr("   Solving the problem... \r\n"));
 	AddString(str);
@@ -838,15 +844,14 @@ bool VLMAnalysisDlg::UnitLoop()
 	{
 		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
 		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
+		m_OpAlpha = m_AlphaMin+i*m_AlphaDelta;
 
-		pMiarex->RotateGeomY(m_AlphaMin+i*m_AlphaDelta, O);
+		pMiarex->RotateGeomY(m_OpAlpha, O);
 
-		str = QString(tr("        ...Alpha = %1\r\n")).arg(m_AlphaMin+i*m_AlphaDelta,8,'f',2);
+		str = QString(tr("        ...Alpha = %1\r\n")).arg(m_OpAlpha,8,'f',2);
 		AddString(str);
 
 		if (m_bCancel) break;
-
-		m_OpAlpha = m_AlphaMin+i*m_AlphaDelta;
 
 		if(!VLMCreateRHS(0.0))
 		{
@@ -875,7 +880,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		if (m_bCancel) break;
 
-		VLMComputePlane(m_AlphaMin+i*m_AlphaDelta, m_AlphaDelta, 1);
+		VLMComputePlane(m_OpAlpha, m_AlphaDelta, 1);
 	}
 	return true;
 }
@@ -898,10 +903,10 @@ bool VLMAnalysisDlg::VLMCreateRHS(double V0)
 		m_yRHS[m] = - m_ppPanel[m]->Normal.y;
 		m_zRHS[m] = - m_ppPanel[m]->Normal.z;
 	}
-
 //double row[VLMMATSIZE]; memcpy(row, m_xRHS, Size*sizeof(double));
 	return true;
 }
+
 
 bool VLMAnalysisDlg::VLMCreateMatrix()
 {
