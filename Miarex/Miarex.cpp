@@ -367,17 +367,17 @@ QMiarex::QMiarex(QWidget *parent)
 	memset(m_RHS, 0, sizeof(m_RHS));
 	memset(m_RHSRef, 0, sizeof(m_RHSRef));
 
-	m_WingGraph1.SetGraphName("Wing Graph 1");
-	m_WingGraph2.SetGraphName("Wing Graph 2");
-	m_WingGraph3.SetGraphName("Wing Graph 3");
-	m_WingGraph4.SetGraphName("Wing Graph 4");
+	m_WingGraph1.SetGraphName(tr("Wing Graph 1"));
+	m_WingGraph2.SetGraphName(tr("Wing Graph 2"));
+	m_WingGraph3.SetGraphName(tr("Wing Graph 3"));
+	m_WingGraph4.SetGraphName(tr("Wing Graph 4"));
 
-	m_WPlrGraph1.SetGraphName("Wing Polar Graph 1");
-	m_WPlrGraph2.SetGraphName("Wing Polar Graph 2");
-	m_WPlrGraph3.SetGraphName("Wing Polar Graph 3");
-	m_WPlrGraph4.SetGraphName("Wing Polar Graph 4");
+	m_WPlrGraph1.SetGraphName(tr("Wing Polar Graph 1"));
+	m_WPlrGraph2.SetGraphName(tr("Wing Polar Graph 2"));
+	m_WPlrGraph3.SetGraphName(tr("Wing Polar Graph 3"));
+	m_WPlrGraph4.SetGraphName(tr("Wing Polar Graph 4"));
 
-	m_CpGraph.SetGraphName("Cp Graph");
+	m_CpGraph.SetGraphName(tr("Cp Graph"));
 
 	m_VLMStyle    = 0;
 	m_VLMWidth    = 1;
@@ -12184,7 +12184,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
 	out << strong;
 
-	out << (tr("Main Wing Data\n"));
+	out << tr("Main Wing Data\n");
 	for (l=0; l<m_pCurWOpp->m_nFlaps; l++)
 	{
 		strong = QString(tr("Flap ")+sep+"%1"+sep+tr(" moment = ")+sep+"%2").arg(l+1).arg(m_pCurWOpp->m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
@@ -12197,10 +12197,10 @@ void QMiarex::OnExportCurWOpp()
 
 	if(m_pCurWing2)
 	{
-		out << ("Secondary Wing Data\n");
+		out << tr("Secondary Wing Data\n");
 		for (l=0; l<m_pCurPOpp->m_Wing2WOpp.m_nFlaps; l++)
 		{
-			strong = QString("Flap "+sep+"%1"+sep+" moment = "+sep+"%2 ").arg(l+1,4).arg(m_pCurPOpp->m_Wing2WOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
+			strong = QString(tr("Flap ")+sep+"%1"+sep+" moment = "+sep+"%2 ").arg(l+1,4).arg(m_pCurPOpp->m_Wing2WOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
 			strong += str +"\n";
 			out << strong;
@@ -12211,10 +12211,10 @@ void QMiarex::OnExportCurWOpp()
 
 	if(m_pCurStab)
 	{
-		out << ("Elevator Data\n");
+		out << tr("Elevator Data\n");
 		for (l=0; l<m_pCurPOpp->m_StabWOpp.m_nFlaps; l++)
 		{
-			strong = QString("Flap "+sep+"%1"+sep+" moment = "+sep+"%2 ").arg(l+1,4).arg(m_pCurPOpp->m_StabWOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
+			strong = QString(tr("Flap ")+sep+"%1"+sep+" moment = "+sep+"%2 ").arg(l+1,4).arg(m_pCurPOpp->m_StabWOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
 			strong += str +"\n";
 			out << strong;
@@ -12225,10 +12225,10 @@ void QMiarex::OnExportCurWOpp()
 
 	if(m_pCurFin)
 	{
-		out << ("Fin Data\n");
+		out << tr("Fin Data\n");
 		for (l=0; l<m_pCurPOpp->m_FinWOpp.m_nFlaps; l++)
 		{
-			strong = QString("Flap "+sep+"%1"+sep+" moment ="+sep+" %2").arg(l+1).arg(m_pCurPOpp->m_FinWOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
+			strong = QString(tr("Flap ")+sep+"%1"+sep+" moment ="+sep+" %2").arg(l+1).arg(m_pCurPOpp->m_FinWOpp.m_FlapMoment[l]*pMainFrame->m_NmtoUnit, 9,'f',4);
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
 			strong += str +"\n";
 			out << strong;
@@ -12239,20 +12239,20 @@ void QMiarex::OnExportCurWOpp()
 
 	if(m_pCurWOpp->m_AnalysisType>=2)
 	{
-		if(m_pCurPOpp) out << ("Main Wing Cp Coefficients\n");
-		else           out << ("Wing Cp Coefficients\n");
+		if(m_pCurPOpp) out << tr("Main Wing Cp Coefficients\n");
+		else           out << tr("Wing Cp Coefficients\n");
 		coef = 1;
 
 		if(m_pCurWOpp->m_AnalysisType==2)
 		{
-			if(type==1) out << (" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-			else        out << ("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+			if(type==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+			else        out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
 		}
 		else if(m_pCurWOpp->m_AnalysisType==3)
 		{
 			coef = 2;
-			if(type==1) out << (" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-			else        out << ("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
+			if(type==1) out << tr(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
+			else        out << tr("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
 		}
 
 		if(type==1) Format = "%1     %2     %3     %4     %5\n";
@@ -12267,7 +12267,7 @@ void QMiarex::OnExportCurWOpp()
 			for(k=0; k<m_pCurWing->m_Surface[j].m_NYPanels; k++)
 			{
 				iStrip++;
-				strong = QString("Strip %1\n").arg(iStrip);
+				strong = QString(tr("Strip %1\n")).arg(iStrip);
 				out << strong;
 
 				for(l=0; l<m_pCurWing->m_Surface[j].m_NXPanels * coef; l++)
@@ -12289,7 +12289,7 @@ void QMiarex::OnExportCurWOpp()
 
 		if(m_pCurWing2)
 		{
-			out << ("Wing2 Cp Coefficients\n");
+			out << tr("Wing2 Cp Coefficients\n");
 			p=0;
 			iStrip = 0;
 			for (j=0; j<m_pCurWing2->m_NSurfaces; j++)
@@ -12299,7 +12299,7 @@ void QMiarex::OnExportCurWOpp()
 				for(k=0; k<m_pCurWing2->m_Surface[j].m_NYPanels; k++)
 				{
 					iStrip++;
-					strong = QString("Strip %1\n").arg(iStrip);
+					strong = QString(tr("Strip %1\n")).arg(iStrip);
 					out << strong;
 
 					for(l=0; l<m_pCurWing2->m_Surface[j].m_NXPanels * coef; l++)
@@ -12322,7 +12322,7 @@ void QMiarex::OnExportCurWOpp()
 
 		if(m_pCurStab)
 		{
-			out << ("Elevator Cp Coefficients\n");
+			out << tr("Elevator Cp Coefficients\n");
 			p=0;
 			iStrip = 0;
 			for (j=0; j<m_pCurStab->m_NSurfaces; j++)
@@ -12332,7 +12332,7 @@ void QMiarex::OnExportCurWOpp()
 				for(k=0; k<m_pCurStab->m_Surface[j].m_NYPanels; k++)
 				{
 					iStrip++;
-					strong = QString("Strip %1\n").arg(iStrip);
+					strong = QString(tr("Strip %1\n")).arg(iStrip);
 					out << strong;
 
 					for(l=0; l<m_pCurStab->m_Surface[j].m_NXPanels * coef; l++)
@@ -12354,7 +12354,7 @@ void QMiarex::OnExportCurWOpp()
 		out << ("\n\n");
 		if(m_pCurFin)
 		{
-			out << ("Fin Cp Coefficients\n");
+			out << tr("Fin Cp Coefficients\n");
 			p=0;
 			iStrip = 0;
 			for (j=0; j<m_pCurFin->m_NSurfaces; j++)
@@ -12364,7 +12364,7 @@ void QMiarex::OnExportCurWOpp()
 				for(k=0; k<m_pCurFin->m_Surface[j].m_NYPanels; k++)
 				{
 					iStrip++;
-					strong = QString("Strip %1\n").arg(iStrip);
+					strong = QString(tr("Strip %1\n")).arg(iStrip);
 					out << strong;
 
 					for(l=0; l<m_pCurFin->m_Surface[j].m_NXPanels * coef; l++)
@@ -12439,10 +12439,10 @@ void QMiarex::OnExporttoAVL()
 	if(m_pCurPlane) FileName = m_pCurPlane->m_PlaneName;
 	else            FileName = m_pCurWing->m_WingName;
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, "Export UFO",
-											pMainFrame->m_LastDirName + "/"+FileName,
-											"AVL Text File (*.avl)",
-											&filter);
+	FileName = QFileDialog::getSaveFileName(this, tr("Export UFO"),
+                                                        pMainFrame->m_LastDirName + "/"+FileName,
+							tr("AVL Text File (*.avl)"),
+							&filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
@@ -12457,7 +12457,7 @@ void QMiarex::OnExporttoAVL()
 	strong = pMainFrame->m_ProjectName;
 	int len = strong.length();
 	if (strong.right(1) == "*") strong = strong.left(len-1);
-	if(!strong.length()) out << "Project";
+	if(!strong.length()) out << tr("Project");
 	else out << strong;
 	out << "\n";
 	out << "0.0                          | Mach\n";
@@ -14361,10 +14361,10 @@ void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
 	{
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		int l = str.length();
-		if(l==2)      Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-		else if(l==3) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-		else if(l==4) Result = QString("QInf = %1 ").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
-		else          Result = "No unit defined for speed...";
+		if(l==2)      Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+		else if(l==3) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+		else if(l==4) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+		else          Result = tr("No unit defined for speed...");
 
 		Result += str;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
@@ -17325,11 +17325,11 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("1/Rt(Cl)"));
 			break;
 		case 15:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Lift (N)");
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Lift (N)"));
 			else pGraph->SetXTitle(tr("Lift (lbf)"));
 			break;
 		case 16:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle("Drag (N)");
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Drag (N)"));
 			else pGraph->SetXTitle(tr("Drag (lbf)"));
 			break;
 		case 17:
@@ -17430,11 +17430,11 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("1/Rt(Cl)"));
 			break;
 		case 15:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Lift (N)");
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Lift (N)"));
 			else pGraph->SetYTitle(tr("Lift (lbf)"));
 			break;
 		case 16:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle("Drag (N)");
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Drag (N)"));
 			else pGraph->SetYTitle(tr("Drag (lbf)"));
 			break;
 		case 17:

@@ -92,15 +92,15 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 	CWing::s_Alpha = m_AlphaMin;
 
-	str = "Launching analysis....\r\n\r\n";
+	str = tr("Launching analysis....")+"\r\n\r\n";
 	UpdateOutput(str);
-	str = QString("Max iterations     = %1\r\n").arg(m_IterLim);
+	str = QString(tr("Max iterations     = %1")+"\r\n").arg(m_IterLim);
 	UpdateOutput(str);
-	str = QString("Alpha precision    = %1 deg\r\n").arg(CWing::s_CvPrec,0,'f',6);
+	str = QString(tr("Alpha precision    = %1 deg")+"\r\n").arg(CWing::s_CvPrec,0,'f',6);
 	UpdateOutput(str);
-	str = QString("Relaxation factor  = %1\r\n").arg(CWing::s_RelaxMax,0,'f',1);
+	str = QString(tr("Relaxation factor  = %1")+"\r\n").arg(CWing::s_RelaxMax,0,'f',1);
 	UpdateOutput(str);
-	str = QString("Number of stations = %1\r\n\r\n").arg(CWing::s_NLLTStations);
+	str = QString(tr("Number of stations = %1")+"\r\n\r\n").arg(CWing::s_NLLTStations);
 	UpdateOutput(str);
 	
 	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -fabs(m_AlphaDelta);
@@ -118,7 +118,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 	{
 		if(m_bCancel) 
 		{
-			str = "Analysis cancelled on user request....\r\n";
+			str = tr("Analysis cancelled on user request....")+"\r\n";
 			UpdateOutput(str);
 			break;
 		}
@@ -130,7 +130,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		m_pWing->LLTInitCl();//with new angle...
 		if(m_pWing->m_bInitCalc) m_pWing->LLTSetLinearSolution();
 
-		str= QString("Calculating Alpha = %1... ").arg(CWing::s_Alpha,5,'f',2);
+		str= QString(tr("Calculating Alpha = %1... ")).arg(CWing::s_Alpha,5,'f',2);
 		UpdateOutput(str);
 		iter = Iterate();
 
@@ -141,7 +141,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		}
 		else if (iter==-1 && !m_bCancel)
 		{
-			str= QString("    ...negative Lift... Aborting\r\n");
+			str= QString(tr("    ...negative Lift... Aborting")+"\r\n");
 			m_bError = true;
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
@@ -149,7 +149,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		else if (iter<m_IterLim && !m_bCancel)
 		{
 			//converged, 
-			str= QString("    ...converged after %1 iterations\r\n").arg(iter);
+			str= QString(tr("    ...converged after %1 iterations")+"\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->LLTComputeWing();// generates wing results,
 			if (m_pWing->m_bWingOut) m_bWarning = true;
@@ -165,7 +165,7 @@ bool LLTAnalysisDlg::AlphaLoop()
 		{
 			if (m_pWing->m_bWingOut) m_bWarning = true;
 			m_bError = true;
-			str= QString("    ...unconverged after %2 iterations\r\n").arg(iter);
+			str= QString(tr("    ...unconverged after %2 iterations")+"\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
 		}
@@ -247,8 +247,8 @@ int LLTAnalysisDlg::Iterate()
 	}
 	if(m_bSkip)
 	{
-		if(m_pWPolar->m_Type!=4) str = QString("Alpha = %1, skipped after %2 iterations \r\n").arg(CWing::s_Alpha, 6,'f',2).arg(iter);
-		else                     str = QString("QInf = %1 skipped after %2 iterations \r\n"  ).arg(CWing::s_QInf,  8,'f',2).arg(iter);
+		if(m_pWPolar->m_Type!=4) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\r\n").arg(CWing::s_Alpha, 6,'f',2).arg(iter);
+		else                     str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\r\n"  ).arg(CWing::s_QInf,  8,'f',2).arg(iter);
 		UpdateOutput(str);
 	}
 	else if (resp<0)
@@ -418,14 +418,14 @@ void LLTAnalysisDlg::StartAnalysis()
 	}
 
 	m_bFinished = true;
-	QString strange = "\r\n_________\r\nAnalysis completed";
-	if(m_bWarning)      strange += " ...some points are outside the flight envelope";
-	else if(m_bError)	strange += " ...some points are unconverged";
+	QString strange = "\r\n_________\r\n"+tr("Analysis completed");
+	if(m_bWarning)      strange += tr(" ...some points are outside the flight envelope");
+	else if(m_bError)	strange += tr(" ...some points are unconverged");
 
 	strange+= "\r\n";
 
 	UpdateOutput(strange);
-	m_pctrlCancel->setText("Close");
+	m_pctrlCancel->setText(tr("Close"));
 	m_pctrlSkip->setEnabled(false);
 
 	m_bSkip   = false;
@@ -470,15 +470,15 @@ bool LLTAnalysisDlg::ReLoop()
 	CWing::s_QInf = m_AlphaMin;
 	//Alpha has been set at CMiarex::SetWPlr
 
-	str = "Launching analysis....\r\n\r\n";
+	str = tr("Launching analysis....")+"\r\n\r\n";
 	UpdateOutput(str);
-	str = QString("Max iterations     = %1\r\n").arg(m_IterLim);
+	str = QString(tr("Max iterations     = %1")+"\r\n").arg(m_IterLim);
 	UpdateOutput(str);
-	str = QString("Alpha precision    = %1 deg\r\n").arg(CWing::s_CvPrec,0,'f',6);
+	str = QString(tr("Alpha precision    = %1 deg")+"\r\n").arg(CWing::s_CvPrec,0,'f',6);
 	UpdateOutput(str);
-	str = QString("Relaxation factor  = %1\r\n").arg(CWing::s_RelaxMax,0,'f',1);
+	str = QString(tr("Relaxation factor  = %1")+"\r\n").arg(CWing::s_RelaxMax,0,'f',1);
 	UpdateOutput(str);
-	str = QString("Number of stations = %1\r\n\r\n").arg(CWing::s_NLLTStations);
+	str = QString(tr("Number of stations = %1")+"\r\n\r\n").arg(CWing::s_NLLTStations);
 	UpdateOutput(str);
 	
 	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -(double)fabs(m_AlphaDelta);
@@ -486,7 +486,7 @@ bool LLTAnalysisDlg::ReLoop()
 
 	if(!m_bSequence) ia = 0;
 
-	str = "Initializing analysis...\r\n";
+	str = tr("Initializing analysis...")+"\r\n";
 	UpdateOutput(str);
 
 	if(!m_pWing->LLTInitialize(m_pWPolar->m_Weight)) return false;
@@ -499,7 +499,7 @@ bool LLTAnalysisDlg::ReLoop()
 	{
 		if(m_bCancel) 
 		{
-			str = "Analysis cancelled on user request....\r\n";
+			str = tr("Analysis cancelled on user request....")+"\r\n";
 			UpdateOutput(str);
 			break;
 		}
@@ -510,7 +510,7 @@ bool LLTAnalysisDlg::ReLoop()
 		if(m_pWing->m_bInitCalc)m_pWing->LLTSetLinearSolution();
 		m_pWing->LLTInitCl();//with new angle...
 		
-		str = QString("Calculating QInf = %1... ").arg(CWing::s_QInf,6,'f',2);
+		str = QString(tr("Calculating QInf = %1... ")).arg(CWing::s_QInf,6,'f',2);
 		UpdateOutput(str);
 		iter = Iterate();
 
@@ -531,7 +531,7 @@ bool LLTAnalysisDlg::ReLoop()
 		else if (iter<m_IterLim  && !m_bCancel)
 		{
 			//converged, 
-			str = QString("    ...converged after %1 iterations\r\n").arg(iter);
+			str = QString(tr("    ...converged after %1 iterations")+"\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->LLTComputeWing();// generates wing results, 
 			if (m_pWing->m_bWingOut) m_bWarning = true;
@@ -547,7 +547,7 @@ bool LLTAnalysisDlg::ReLoop()
 		{
 			if (m_pWing->m_bWingOut) m_bWarning = true;
 			m_bError = true;
-			str = QString("    ...unconverged after %1 iterations\r\n").arg(iter);
+			str = QString(tr("    ...unconverged after %1 iterations")+"\r\n").arg(iter);
 			UpdateOutput(str);
 			m_pWing->m_bInitCalc = true;
 		}

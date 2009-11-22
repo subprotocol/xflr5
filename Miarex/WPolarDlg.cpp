@@ -670,12 +670,12 @@ void WPolarDlg::SetupLayout()
 	PlaneGroup->setLayout(PlaneLayout);
 
 	QVBoxLayout *FlightLayout = new QVBoxLayout;
-	m_pctrlWingLoad  = new QLabel("Wing Loading = 0.033 kg/dm2");
-	m_pctrlSRe       = new QLabel("SRe");
-	m_pctrlRRe       = new QLabel("RRe");
-	m_pctrlQInfCl    = new QLabel("QInfCl");
-	m_pctrlReRoot    = new QLabel("Re at Root = 100 000");
-	m_pctrlReTip     = new QLabel("Re at Tip = 70 000");
+	m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
+	m_pctrlSRe       = new QLabel(tr("SRe"));
+	m_pctrlRRe       = new QLabel(tr("RRe"));
+	m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
+	m_pctrlReRoot    = new QLabel(tr("Re at Root = 100 000"));
+	m_pctrlReTip     = new QLabel(tr("Re at Tip = 70 000"));
 	m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);

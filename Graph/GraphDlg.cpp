@@ -154,7 +154,7 @@ void GraphDlg::FillVariableList()
 	else if(m_iGraphType==61)
 	{
 		//wing graph variable
-		m_pctrlXSel->addItem("Y - span");
+		m_pctrlXSel->addItem(tr("Y - span"));
 
 		m_pctrlYSel->addItem(tr("Induced Angle"));						//0
 		m_pctrlYSel->addItem(tr("Total Angle"));						//1

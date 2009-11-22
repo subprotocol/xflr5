@@ -49,12 +49,12 @@ void InterpolateFoilsDlg::SetupLayout()
 	QVBoxLayout *LeftSide = new QVBoxLayout;
 	m_pctrlFoil1 = new QComboBox;
 	m_pctrlFoil2 = new QComboBox;
-	m_pctrlCamb1 = new QLabel("Camb1");
-	m_pctrlCamb2 = new QLabel("Camb2");
-	m_pctrlCamb3 = new QLabel("Camb3");
-	m_pctrlThick1 = new QLabel("Thick1");
-	m_pctrlThick2 = new QLabel("Thick2");
-	m_pctrlThick3 = new QLabel("Thick3");
+	m_pctrlCamb1 = new QLabel(tr("Camb1"));
+	m_pctrlCamb2 = new QLabel(tr("Camb2"));
+	m_pctrlCamb3 = new QLabel(tr("Camb3"));
+	m_pctrlThick1 = new QLabel(tr("Thick1"));
+	m_pctrlThick2 = new QLabel(tr("Thick2"));
+	m_pctrlThick3 = new QLabel(tr("Thick3"));
 	m_pctrlCamb1->setMinimumWidth(250);
 	m_pctrlCamb2->setMinimumWidth(250);
 	m_pctrlCamb3->setMinimumWidth(250);
@@ -179,16 +179,16 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 	if(pFoil)
 	{
 		QString str;
-		str = QString("Camb.=%1").arg(pFoil->m_fCamber*100,5,'f',2);
+		str = QString(tr("Camb.=%1")).arg(pFoil->m_fCamber*100,5,'f',2);
 		str += "%";
-		strong = QString(" at x=%1").arg(pFoil->m_fXCamber*100,5,'f',1);
+		strong = QString(tr(" at x=%1")).arg(pFoil->m_fXCamber*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlCamb1->setText(str);
 
-		str = QString("Thick.=%1").arg(pFoil->m_fThickness*100,5,'f',2);
+		str = QString(tr("Thick.=%1")).arg(pFoil->m_fThickness*100,5,'f',2);
 		str += "%";
-		strong = QString(" at x=%5.1f").arg(pFoil->m_fXThickness*100,5,'f',1);
+		strong = QString(tr(" at x=%5.1f")).arg(pFoil->m_fXThickness*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlThick1->setText(str);
@@ -208,16 +208,16 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 	if(pFoil)
 	{
 		QString str;
-		str = QString("Camb.=%1").arg(pFoil->m_fCamber*100,5,'f',2);
+		str = QString(tr("Camb.=%1")).arg(pFoil->m_fCamber*100,5,'f',2);
 		str += "%";
-		strong = QString(" at x=%1").arg(pFoil->m_fXCamber*100,5,'f',1);
+		strong = QString(tr(" at x=%1")).arg(pFoil->m_fXCamber*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlCamb2->setText(str);
 
-		str = QString("Thick.=%1").arg(pFoil->m_fThickness*100,5,'f',2);
+		str = QString(tr("Thick.=%1")).arg(pFoil->m_fThickness*100,5,'f',2);
 		str += "%";
-		strong = QString(" at x=%5.1f").arg(pFoil->m_fXThickness*100,5,'f',1);
+		strong = QString(tr(" at x=%5.1f")).arg(pFoil->m_fXThickness*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlThick2->setText(str);
@@ -259,16 +259,16 @@ void InterpolateFoilsDlg::Update()
 	m_pBufferFoil->InitFoil();
 
 	QString str;
-	str = QString("Camb.=%1").arg(m_pBufferFoil->m_fCamber*100,5,'f',2);
+	str = QString(tr("Camb.=%1")).arg(m_pBufferFoil->m_fCamber*100,5,'f',2);
 	str += "%";
-	strong = QString(" at x=%1").arg(m_pBufferFoil->m_fXCamber*100,5,'f',1);
+	strong = QString(tr(" at x=%1")).arg(m_pBufferFoil->m_fXCamber*100,5,'f',1);
 	strong += "%";
 	str+=strong;
 	m_pctrlCamb3->setText(str);
 
-	str = QString("Thick.=%1").arg(m_pBufferFoil->m_fThickness*100,5,'f',2);
+	str = QString(tr("Thick.=%1")).arg(m_pBufferFoil->m_fThickness*100,5,'f',2);
 	str += "%";
-	strong = QString(" at x=%5.1f").arg(m_pBufferFoil->m_fXThickness*100,5,'f',1);
+	strong = QString(tr(" at x=%5.1f")).arg(m_pBufferFoil->m_fXThickness*100,5,'f',1);
 	strong += "%";
 	str+=strong;
 	m_pctrlThick3->setText(str);

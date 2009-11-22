@@ -86,7 +86,7 @@ void WAdvancedDlg::SetupLayout()
 
 	QGroupBox *VLMPanelBox = new QGroupBox(tr("VLM and Panel Methods"));
 	QHBoxLayout *VLMPanelLayout = new QHBoxLayout;
-	QLabel *lab10 = new QLabel("Core Size");
+	QLabel *lab10 = new QLabel(tr("Core Size"));
 	lab10->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	VLMPanelLayout->addStretch(1);
 	VLMPanelLayout->addWidget(lab10);

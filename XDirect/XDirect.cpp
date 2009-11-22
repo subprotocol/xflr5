@@ -172,7 +172,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pTrGraph->SetVariables(6,1);
 	m_pUserGraph->SetVariables(0,10);
 
-	m_pCpGraph->SetXTitle("X");
+	m_pCpGraph->SetXTitle(tr("X"));
 	m_pCpGraph->SetYTitle(tr("Cp"));
 	m_pCpGraph->SetInverted(true);
 	m_pCpGraph->SetXMin(0.0);
@@ -183,7 +183,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCpGraph->SetBorderColor(QColor(200,200,200));
 	m_pCpGraph->SetBorder(true);
 	m_pCpGraph->SetBorderStyle(0);
-	m_pCpGraph->SetGraphName("Cp Graph");
+	m_pCpGraph->SetGraphName(tr("Cp Graph"));
 
 	m_pPolarGraph->SetXMin(0.0);
 	m_pPolarGraph->SetXMax(0.1);
@@ -195,7 +195,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pPolarGraph->SetBorderStyle(0);
 	m_pPolarGraph->SetBorderWidth(3);
 	m_pPolarGraph->SetMargin(50);
-	m_pPolarGraph->SetGraphName("Polar Graph");
+	m_pPolarGraph->SetGraphName(tr("Polar Graph"));
 
 	m_pCmGraph->SetXMin(0.0);
 	m_pCmGraph->SetXMax(0.1);
@@ -207,7 +207,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCmGraph->SetBorderStyle(0);
 	m_pCmGraph->SetBorderWidth(3);
 	m_pCmGraph->SetMargin(50);
-	m_pCmGraph->SetGraphName("Cm Graph");
+	m_pCmGraph->SetGraphName(tr("Cm Graph"));
 
 	m_pCzGraph->SetXMin(0.0);
 	m_pCzGraph->SetXMax(0.1);
@@ -219,7 +219,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pCzGraph->SetBorderStyle(0);
 	m_pCzGraph->SetBorderWidth(3);
 	m_pCzGraph->SetMargin(50);
-	m_pCzGraph->SetGraphName("Cz Graph");
+	m_pCzGraph->SetGraphName(tr("Cz Graph"));
 
 	m_pTrGraph->SetXMin(0.0);
 	m_pTrGraph->SetXMax(0.1);
@@ -231,7 +231,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pTrGraph->SetBorderStyle(0);
 	m_pTrGraph->SetBorderWidth(3);
 	m_pTrGraph->SetMargin(50);
-	m_pTrGraph->SetGraphName("Tr Graph");
+	m_pTrGraph->SetGraphName(tr("Tr Graph"));
 
 	m_pUserGraph->SetXMin(0.0);
 	m_pUserGraph->SetXMax(0.1);
@@ -243,7 +243,7 @@ QXDirect::QXDirect(QWidget *parent)
 	m_pUserGraph->SetBorderStyle(0);
 	m_pUserGraph->SetBorderWidth(3);
 	m_pUserGraph->SetMargin(50);
-	m_pUserGraph->SetGraphName("User Graph");
+	m_pUserGraph->SetGraphName(tr("User Graph"));
 
 	SetGraphTitles(m_pPolarGraph);
 	SetGraphTitles(m_pCzGraph);
@@ -2051,7 +2051,7 @@ void QXDirect::OnCfPlot()
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
 	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Cf");
+	m_pCpGraph->SetYTitle(tr("Cf"));
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
 	pTopCurve->SetTitle(tr("Top"));
@@ -2098,7 +2098,7 @@ void QXDirect::OnCdPlot()
 	m_pCpGraph->ResetLimits();
 	m_pCpGraph->SetAuto(true);
 	m_pCpGraph->SetInverted(false);
-	m_pCpGraph->SetYTitle("Cd'");
+	m_pCpGraph->SetYTitle(tr("Cd'"));
 	CCurve * pTopCurve = m_pCpGraph->AddCurve();
 	CCurve * pBotCurve = m_pCpGraph->AddCurve();
 	pTopCurve->SetTitle(tr("Top"));
@@ -2831,9 +2831,9 @@ void QXDirect::OnExportCurXFoilResults()
 		Theta[ibl][2] = m_pXFoil->thet[ibl][2];
 	}
 
-	out << ("\nTop Side\n");
-	if(type==1) OutString = QString("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n");
-	else        OutString = QString("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n");
+	out << tr("\nTop Side\n");
+	if(type==1) OutString = QString(tr("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n"));
+	else        OutString = QString(tr("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n"));
 	out << (OutString);
 	for (ibl=2; ibl<nside1; ibl++)
 	{
@@ -2861,9 +2861,9 @@ void QXDirect::OnExportCurXFoilResults()
 							.arg(m_pXFoil->ctq[ibl][1],8,'f',5);
 		out << (OutString);
 	}
-	out << ("\n\nBottom Side\n");
-	if(type==1) OutString = QString("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n");
-	else        OutString = QString("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n");
+	out << tr("\n\nBottom Side\n");
+	if(type==1) OutString = QString(tr("    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq\n"));
+	else        OutString = QString(tr("x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq\n"));
 	out << (OutString);
 	for (ibl=2; ibl<nside2; ibl++)
 	{
@@ -4015,7 +4015,7 @@ void QXDirect::OnRenamePolar()
 	RenameDlg RDlg(this);
 	RDlg.move(pMainFrame->m_DlgPos);
 	RDlg.m_pstrArray = & NameList;
-	RDlg.m_strQuestion = "Enter the new name for the foil polar :";
+	RDlg.m_strQuestion = tr("Enter the new name for the foil polar :");
 	RDlg.m_strName     = m_pCurPolar->m_PlrName;
 	RDlg.InitDialog();
 
@@ -5143,18 +5143,18 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		if(m_pCurPolar->m_Type ==2)
 		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
-			strong ="Re.sqrt(Cl) = " + strong;
+			strong = tr("Re.sqrt(Cl) = ") + strong;
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 
-			strong = QString("M.sqrt(Cl) = %1").arg(m_pCurPolar->m_Mach,9,'f',3);
+			strong = QString(tr("M.sqrt(Cl) = %1")).arg(m_pCurPolar->m_Mach,9,'f',3);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 		}
 		if(m_pCurPolar->m_Type ==3)
 		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
-			strong ="Re.sqrt(Cl) = " + strong;
+			strong = tr("Re.sqrt(Cl) = ") + strong;
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 

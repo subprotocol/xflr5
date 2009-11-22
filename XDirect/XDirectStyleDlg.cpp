@@ -27,7 +27,7 @@
 
 XDirectStyleDlg::XDirectStyleDlg()
 {
-	setWindowTitle("XDirect Styles");
+	setWindowTitle(tr("XDirect Styles"));
 	m_pXDirect = NULL;
 
 	SetupLayout();
@@ -41,9 +41,9 @@ void XDirectStyleDlg::SetupLayout()
 	m_pctrlNeutral  = new LineButton;
 	m_pctrlBL       = new LineButton;
 	m_pctrlPressure = new LineButton;
-	QLabel *lab1 = new QLabel("Neutral Line");
-	QLabel *lab2 = new QLabel("Boundary Layer");
-	QLabel *lab3 = new QLabel("Pressure");
+	QLabel *lab1 = new QLabel(tr("Neutral Line"));
+	QLabel *lab2 = new QLabel(tr("Boundary Layer"));
+	QLabel *lab3 = new QLabel(tr("Pressure"));
 	GridLayout->addWidget(lab1,1,1);
 	GridLayout->addWidget(lab2,2,1);
 	GridLayout->addWidget(lab3,3,1);

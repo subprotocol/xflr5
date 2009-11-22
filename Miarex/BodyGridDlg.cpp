@@ -107,7 +107,7 @@ void BodyGridDlg::InitDialog()
 
 void BodyGridDlg::SetupLayout()
 {
-	setWindowTitle("Grid Parameters");
+	setWindowTitle(tr("Grid Parameters"));
 //	QDesktopWidget desktop;
 //	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()/3);

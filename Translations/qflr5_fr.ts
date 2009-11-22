@@ -195,34 +195,28 @@ CPCALC: vitesse locale trop importante
         <translation>Enregistrer les points de fonctionnement</translation>
     </message>
     <message>
-        <source>CpCalc: local speed too large 
- Compressibility corrections invalid</source>
-        <translation type="obsolete">CpCalc : vitesse locale trop élevée 
- Les corrections de compressibilité ne sont pas valables</translation>
+        <source>Alpha</source>
+        <translation>Alpha</translation>
     </message>
     <message>
-        <source>   ...converged after %1 iterations
-</source>
-        <translation>   ...convergeance après %1 itérations
-</translation>
+        <source>Cl</source>
+        <translation>Cz</translation>
     </message>
     <message>
-        <source>   ...skipped after %1 iterations
-</source>
-        <translation type="obsolete">   ...abandon après %1 itérations
-</translation>
+        <source>   ...converged after %1 iterations</source>
+        <translation>   ...convergence après %1 itérations</translation>
     </message>
     <message>
-        <source>   ...unconverged after %1 iterations
-</source>
-        <translation type="obsolete">   ...pas de convergeance après %1 itérations
-</translation>
+        <source>   ...skipped after %1 iterations</source>
+        <translation>   ...sauté après %1 itérations</translation>
     </message>
     <message>
-        <source>Analysis interrupted
-</source>
-        <translation type="obsolete">Analyse interrompue
-</translation>
+        <source>   ...unconverged after %1 iterations</source>
+        <translation>   ...pas de convergence après %1 itérations</translation>
+    </message>
+    <message>
+        <source>Analysis interrupted</source>
+        <translation>Analyse interrompue</translation>
     </message>
     <message>
         <source>Alpha =</source>
@@ -231,6 +225,14 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>Cl =</source>
         <translation>Cz =</translation>
+    </message>
+    <message>
+        <source>Reynolds =</source>
+        <translation>Reynolds =</translation>
+    </message>
+    <message>
+        <source>Mach =</source>
+        <translation>Mach =</translation>
     </message>
     <message>
         <source>Re.sqrt(Cl) =</source>
@@ -247,6 +249,30 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>Cl = %1</source>
         <translation>Cz = %1</translation>
+    </message>
+    <message>
+        <source>   ...converged after %1 iterations
+</source>
+        <translation>   ...convergence après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>CpCalc: local speed too large 
+ Compressibility corrections invalid</source>
+        <translation>CpCalc : vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valables</translation>
+    </message>
+    <message>
+        <source>   ...skipped after %1 iterations
+</source>
+        <translation>   ...sauté aptès %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>   ...unconverged after %1 iterations
+</source>
+        <translation>   ...pas de convergence après %1 itérations
+</translation>
     </message>
 </context>
 <context>
@@ -282,6 +308,10 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>Body Grid Dialog</source>
         <translation>Dialogue de la grille de fuselage</translation>
+    </message>
+    <message>
+        <source>Grid Parameters</source>
+        <translation>Paramètres de la grille</translation>
     </message>
 </context>
 <context>
@@ -446,20 +476,6 @@ CPCALC: vitesse locale trop importante
     </message>
 </context>
 <context>
-    <name>CPlane</name>
-    <message>
-        <source>Description %1</source>
-        <translation type="obsolete">Description %1</translation>
-    </message>
-</context>
-<context>
-    <name>CSF</name>
-    <message>
-        <source>Spline Foil</source>
-        <translation type="unfinished">Profile en spline</translation>
-    </message>
-</context>
-<context>
     <name>CSurface</name>
     <message>
         <source>Warning</source>
@@ -470,6 +486,45 @@ CPCALC: vitesse locale trop importante
 </source>
         <translation>Les profils continus en surface n&apos;ont pas le même angle initial... Abandon
 </translation>
+    </message>
+</context>
+<context>
+    <name>CWing</name>
+    <message>
+        <source>Description %1</source>
+        <translation>Description %1</translation>
+    </message>
+    <message>
+        <source>Wing Name</source>
+        <translation>Nom de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>       Span pos = %1 </source>
+        <translation>       Position sur l&apos;nvergure = %1 </translation>
+    </message>
+    <message>
+        <source> ,  A+Ai+Twist = %1 could not be interpolated</source>
+        <translation> ,  A+Ai+Twist = %1 n&apos;a pas pu être interpolé</translation>
+    </message>
+    <message>
+        <source> ,  A+Ai+Twist = %1 is outside the flight envelope</source>
+        <translation> ,  A+Ai+Twist = %1 se trouve hors du domaine de vol</translation>
+    </message>
+    <message>
+        <source>,  Cl = %1 could not be interpolated</source>
+        <translation>,  Cz = %1 n&apos;a pas pu être interpolé</translation>
+    </message>
+    <message>
+        <source>,  Cl = %1 is outside the flight envelope</source>
+        <translation>,  Cz = %1 se trouve hors du domaine de vol</translation>
+    </message>
+    <message>
+        <source>          Span pos = %1 </source>
+        <translation>       Position sur l&apos;nvergure = %1 </translation>
+    </message>
+    <message>
+        <source>          Span pos = %1</source>
+        <translation>       Position sur l&apos;nvergure = %1 </translation>
     </message>
 </context>
 <context>
@@ -658,11 +713,11 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>All Graph Settings</source>
-        <translation>Paramètres pour tous les graphes</translation>
+        <translation>Paramètres pour tous les diagrammes</translation>
     </message>
     <message>
         <source>Graph Settings</source>
-        <translation>Paramètres des graphes</translation>
+        <translation>Paramètres du diagramme</translation>
     </message>
     <message>
         <source>Background Color</source>
@@ -851,6 +906,10 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>100%</source>
         <translation>100%</translation>
+    </message>
+    <message>
+        <source>Foil Geometry</source>
+        <translation>Géométrie du profil</translation>
     </message>
 </context>
 <context>
@@ -1226,7 +1285,7 @@ CPCALC: vitesse locale trop importante
     </message>
     <message>
         <source>x</source>
-        <translation type="unfinished">x</translation>
+        <translation>x</translation>
     </message>
     <message>
         <source>Hoop</source>
@@ -1650,7 +1709,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Smooth Quads</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisser les Quads</translation>
     </message>
 </context>
 <context>
@@ -1669,7 +1728,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Graph Settings</source>
-        <translation>Paramètres du graphe</translation>
+        <translation>Paramètres du diagramme</translation>
     </message>
     <message>
         <source>X - Chord</source>
@@ -1893,11 +1952,11 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Graph Background</source>
-        <translation>Arrière-plan du graphe</translation>
+        <translation>Arrière-plan du diagramme</translation>
     </message>
     <message>
         <source>Graph Border</source>
-        <translation>Bordure du graphe</translation>
+        <translation>Bordure du diagramme</translation>
     </message>
     <message>
         <source>BackGround</source>
@@ -2067,6 +2126,10 @@ Réduisez la taille du maillage</translation>
         <source>Induced pitching moment coef.</source>
         <translation>Coefficient de moment de tangage induit</translation>
     </message>
+    <message>
+        <source>Y - span</source>
+        <translation>Y - envergure</translation>
+    </message>
 </context>
 <context>
     <name>ImportWingDlg</name>
@@ -2146,10 +2209,6 @@ Réduisez la taille du maillage</translation>
         <translation>Vous référer aux instructions des explications.</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
         <source>Description %1</source>
         <translation>Description %1</translation>
     </message>
@@ -2205,6 +2264,14 @@ Réduisez la taille du maillage</translation>
         <source>Inertia in CoG Frame</source>
         <translation type="unfinished">Inertie dans le cadre situé au centre de gravité</translation>
     </message>
+    <message>
+        <source>OK</source>
+        <translation>Accepter</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abandonner</translation>
+    </message>
 </context>
 <context>
     <name>InterpolateFoilsDlg</name>
@@ -2227,6 +2294,46 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>Interpolated Foil</source>
         <translation>Profil interpolé</translation>
+    </message>
+    <message>
+        <source>Camb1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camb2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camb3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thick1</source>
+        <translation type="unfinished">Épais1</translation>
+    </message>
+    <message>
+        <source>Thick2</source>
+        <translation type="unfinished">Épais2</translation>
+    </message>
+    <message>
+        <source>Thick3</source>
+        <translation type="unfinished">Épais3</translation>
+    </message>
+    <message>
+        <source>Camb.=%1</source>
+        <translation type="unfinished">Camb.=%1</translation>
+    </message>
+    <message>
+        <source> at x=%1</source>
+        <translation> à x=%1</translation>
+    </message>
+    <message>
+        <source>Thick.=%1</source>
+        <translation>Épaiss.=%1</translation>
+    </message>
+    <message>
+        <source> at x=%5.1f</source>
+        <translation> à x=%5.1f</translation>
     </message>
 </context>
 <context>
@@ -2341,6 +2448,62 @@ Réduisez la taille du maillage</translation>
         <translation>Analyse de portance (lift)</translation>
     </message>
     <message>
+        <source>Iterations</source>
+        <translation>Itérations</translation>
+    </message>
+    <message>
+        <source>abs</source>
+        <translation>abs</translation>
+    </message>
+    <message>
+        <source>Launching analysis....</source>
+        <translation>Lancement de l&apos;analyse...</translation>
+    </message>
+    <message>
+        <source>Max iterations     = %1</source>
+        <translation>Nombre max d&apos;itération... = %1</translation>
+    </message>
+    <message>
+        <source>Alpha precision    = %1 deg</source>
+        <translation>Précision de Alpha    = %1 °</translation>
+    </message>
+    <message>
+        <source>Number of stations = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Relaxation factor  = %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analysis cancelled on user request....</source>
+        <translation>Analyse interrompue à le demande de l&apos;utilisateur...</translation>
+    </message>
+    <message>
+        <source>Calculating Alpha = %1... </source>
+        <translation>Calcull de Alpha = %1... </translation>
+    </message>
+    <message>
+        <source>    ...negative Lift... Aborting</source>
+        <translation>    ...portance négative... Interruption</translation>
+    </message>
+    <message>
+        <source>    ...converged after %1 iterations</source>
+        <translation>   ...convergence après %1 itérations</translation>
+    </message>
+    <message>
+        <source>    ...unconverged after %2 iterations</source>
+        <translation>   ...pas de convergence après %2 itérations</translation>
+    </message>
+    <message>
+        <source>QInf = %1 skipped after %2 iterations </source>
+        <translation>QInf = %1 sauté après %2 itérations </translation>
+    </message>
+    <message>
+        <source>Alpha = %1, skipped after %2 iterations </source>
+        <translation>Alpha = %1, sauté après %2 itérations </translation>
+    </message>
+    <message>
         <source>Skip</source>
         <translation>Sauter</translation>
     </message>
@@ -2349,12 +2512,32 @@ Réduisez la taille du maillage</translation>
         <translation>Abandonner</translation>
     </message>
     <message>
-        <source>Iterations</source>
-        <translation>Itérations</translation>
+        <source>Analysis completed</source>
+        <translation>Analyse terminée</translation>
     </message>
     <message>
-        <source>abs</source>
-        <translation>abs</translation>
+        <source> ...some points are outside the flight envelope</source>
+        <translation> ...certains points sont situés hors du domaine de voil</translation>
+    </message>
+    <message>
+        <source> ...some points are unconverged</source>
+        <translation> ...certains points n’ont ps convergé</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Initializing analysis...</source>
+        <translation>Initialisation de l’analyse...</translation>
+    </message>
+    <message>
+        <source>Calculating QInf = %1... </source>
+        <translation>Calcul de QInf = %1... </translation>
+    </message>
+    <message>
+        <source>    ...unconverged after %1 iterations</source>
+        <translation>   ...pas de convergence après %1 itérations</translation>
     </message>
 </context>
 <context>
@@ -2548,19 +2731,19 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Export Graph</source>
-        <translation>Exporter le graphe</translation>
+        <translation>Exporter le diagramme</translation>
     </message>
     <message>
         <source>Export the current graph data to a text file</source>
-        <translation>Exporter les données du graphe actuel dans un fichier texte</translation>
+        <translation>Exporter les données du diagramme actuel dans un fichier texte</translation>
     </message>
     <message>
         <source>Reset Graph Scales</source>
-        <translation>Réinitialiser les échelles du graphes</translation>
+        <translation>Réinitialiser les échelles du diagramme</translation>
     </message>
     <message>
         <source>Restores the graph&apos;s x and y scales</source>
-        <translation>Restaurer les échelles x et y du graphe</translation>
+        <translation>Restaurer les échelles x et y du diagramme</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
@@ -3000,63 +3183,63 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Define Graph Settings	(G)</source>
-        <translation>Définir les paramètres diu graphe	(G)</translation>
+        <translation>Définir les paramètres diu diagramme	(G)</translation>
     </message>
     <message>
         <source>Two OpPoint Graphs	(T)</source>
-        <translation>Graphes à deux points de fonctionnement	(T)</translation>
+        <translation>Diagrammes à deux points de fonctionnement	(T)</translation>
     </message>
     <message>
         <source>All OpPoint Graphs	(A)</source>
-        <translation>Graphes avec tous les points de focntionnement	(A)</translation>
+        <translation>Diagrammes avec tous les points de focntionnement	(A)</translation>
     </message>
     <message>
         <source>Wing Graph 1	(1)</source>
-        <translation>Graphe 1 de l&apos;aile	(1)</translation>
+        <translation>Diagramme 1 de l&apos;aile	(1)</translation>
     </message>
     <message>
         <source>Wing Graph 2	(2)</source>
-        <translation>Graphe 2 de l&apos;aile	(2)</translation>
+        <translation>Diagramme 2 de l&apos;aile	(2)</translation>
     </message>
     <message>
         <source>Wing Graph 3	(3)</source>
-        <translation>Graphe 3 de l&apos;aile	(3)</translation>
+        <translation>Diagramme 3 de l&apos;aile	(3)</translation>
     </message>
     <message>
         <source>Wing Graph 4	(4)</source>
-        <translation>Graphe 4 de l&apos;aile	(4)</translation>
+        <translation>Diagramme 4 de l&apos;aile	(4)</translation>
     </message>
     <message>
         <source>Two Polar Graphs	(T)</source>
-        <translation>Deux graphes polaires	(T)</translation>
+        <translation>Deux diagrammes polaires	(T)</translation>
     </message>
     <message>
         <source>All Polar Graphs	(A)</source>
-        <translation>Tous les graphes polaires	(A)</translation>
+        <translation>Tous les diagrammes polaires	(A)</translation>
     </message>
     <message>
         <source>Polar Graph 1	(1)</source>
-        <translation>Graphe polaire 1	(1)</translation>
+        <translation>Diagramme polaire 1	(1)</translation>
     </message>
     <message>
         <source>Polar Graph 2	(2)</source>
-        <translation>Graphe polaire 2	(2)</translation>
+        <translation>Diagramme polaire 2	(2)</translation>
     </message>
     <message>
         <source>Polar Graph 3	(3)</source>
-        <translation>Graphe polaire 3	(3)</translation>
+        <translation>Diagramme polaire 3	(3)</translation>
     </message>
     <message>
         <source>Polar Graph 4	(4)</source>
-        <translation>Graphe polaire 4	(4)</translation>
+        <translation>Diagramme polaire 4	(4)</translation>
     </message>
     <message>
         <source>Reset All Graph Scales</source>
-        <translation>Réinitialiser toutes les échelles de graphes</translation>
+        <translation>Réinitialiser toutes les échelles de diagrammes</translation>
     </message>
     <message>
         <source>All Graph Settings</source>
-        <translation>Tous les paramètres de graphe</translation>
+        <translation>Tous les paramètres du diagramme</translation>
     </message>
     <message>
         <source>Hide Associated Polars</source>
@@ -3136,7 +3319,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Graphs</source>
-        <translation>Graphes</translation>
+        <translation>Diagrammes</translation>
     </message>
     <message>
         <source>&amp;OpPoint</source>
@@ -3148,7 +3331,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Current Graph</source>
-        <translation>Graphe actuel</translation>
+        <translation>Diagramme actuel</translation>
     </message>
     <message>
         <source>UFO</source>
@@ -3160,15 +3343,15 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Define Cp Graph Settings	(G)</source>
-        <translation>Définir les paramètres du graphe Cp	(G)</translation>
+        <translation>Définir les paramètres du diagramme Cp	(G)</translation>
     </message>
     <message>
         <source>All Polar Graph Settings</source>
-        <translation>Paramètres de tous les graphes polaires</translation>
+        <translation>Paramètres de tous les diagrammes polaires</translation>
     </message>
     <message>
         <source>Reset All Polar Graph Scales</source>
-        <translation>Réinitialiser les échelles de tous les graphes polaires</translation>
+        <translation>Réinitialiser les échelles de tous les diagrammes polaires</translation>
     </message>
     <message>
         <source>Cl vs. Cd 	(1)</source>
@@ -3344,7 +3527,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Sets Cp vs. chord graph</source>
-        <translation>Définir le graphe de Cp en fonction de la corde</translation>
+        <translation>Définir le diagramme de Cp en fonction de la corde</translation>
     </message>
     <message>
         <source>Q Variable</source>
@@ -3352,7 +3535,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Sets Speed vs. chord graph</source>
-        <translation>Définir le graphe de la vitesse en fonction de la corde</translation>
+        <translation>Définir le diagramme de la vitesse en fonction de la corde</translation>
     </message>
     <message>
         <source>Export Cur. XFoil Results</source>
@@ -3404,7 +3587,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Polar Graphs</source>
-        <translation>Graphes polaires</translation>
+        <translation>Diagrammes polaires</translation>
     </message>
     <message>
         <source>Operating Points</source>
@@ -3412,7 +3595,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Cp Graph</source>
-        <translation>Graphe Cp</translation>
+        <translation>Diagramme Cp</translation>
     </message>
     <message>
         <source>Current XFoil Results</source>
@@ -3484,7 +3667,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>&amp;Graph</source>
-        <translation>&amp;Graphe</translation>
+        <translation>&amp;Diagramme</translation>
     </message>
     <message>
         <source>Full Inverse</source>
@@ -3604,7 +3787,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Reset Graph Scales 	(R)</source>
-        <translation>Réinitialiser les échelles des graphiques :	(R)</translation>
+        <translation>Réinitialiser les échelles des diagrammes :	(R)</translation>
     </message>
     <message>
         <source>Import Polar</source>
@@ -3693,8 +3876,8 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>A foil of that name already exists
 Please enter a new name</source>
-        <translation type="obsolete">Il existe déjà un profil portant ce nom
-Veuillez choisir un autre nom</translation>
+        <translation>Il existe déjà un profil portant ce nom
+Veuillez entrer un autre nom</translation>
     </message>
 </context>
 <context>
@@ -3762,6 +3945,10 @@ Veuillez choisir un autre nom</translation>
 Continue ?</source>
         <translation>La modification va effacer tous les résultats pour les avions utilisant ce fuselage.
 Poursuivre cependant ?</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Description :</translation>
     </message>
 </context>
 <context>
@@ -3959,16 +4146,188 @@ Poursuivre cependant ?</translation>
         <translation>Attention</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Abandonner</translation>
-    </message>
-    <message>
         <source>3D Panel Analysis</source>
         <translation>Analyse de panneaux 3D</translation>
     </message>
     <message>
         <source>The number of points to be calculated will be limited to 100</source>
         <translation>Le nombre de points à calculer sera limité à 100</translation>
+    </message>
+    <message>
+        <source>Failed to create RHS Vector....</source>
+        <translation>Échec de cration du vecteur RHS....</translation>
+    </message>
+    <message>
+        <source>Failed to add the wake contribution....</source>
+        <translation>Échec de l’ajout de la contribution du sillage...</translation>
+    </message>
+    <message>
+        <source>Failed to compute aerodynamics....</source>
+        <translation>Échec des calculs aérodynamiques....</translation>
+    </message>
+    <message>
+        <source>   Solving the problem... </source>
+        <translation>   Résolution du problème... </translation>
+    </message>
+    <message>
+        <source>Failed to create the matrix....</source>
+        <translation>Échec de cration de la matrice....</translation>
+    </message>
+    <message>
+        <source>Singular matrix - aborting....</source>
+        <translation>Matrice singulière - interruption....</translation>
+    </message>
+    <message>
+        <source>Failed to create doublet strengths....</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    Creating the influence matrix...</source>
+        <translation>    Création de la matrice d’influence...</translation>
+    </message>
+    <message>
+        <source>      Creating RHS vector...</source>
+        <translation>      Création du vecteur RHS...</translation>
+    </message>
+    <message>
+        <source>      Adding the wake&apos;s contribution...</source>
+        <translation>      Ajout de la contribution du sillage...</translation>
+    </message>
+    <message>
+        <source>      Computing On-Body Speeds...</source>
+        <translation type="unfinished">      Cacul des vitesse à la surface du fuselage...</translation>
+    </message>
+    <message>
+        <source>      Calculating speeds to balance the weight</source>
+        <translation>      Calcul des vitesses équilibrant le poids</translation>
+    </message>
+    <message>
+        <source>      Found a negative lift for Alpha=%1.... skipping the angle...</source>
+        <translation>      Une portance négative a été trouvée pour Alpha=%1.... angle sauté...</translation>
+    </message>
+    <message>
+        <source>      Alpha=%1   QInf = %2</source>
+        <translation>      Alpha=%1   QInf = %2</translation>
+    </message>
+    <message>
+        <source>      Computing Plane for alpha=%1</source>
+        <translation>      Calcul de l’avion pour alpha=%1</translation>
+    </message>
+    <message>
+        <source>      Computing Plane for QInf=%1</source>
+        <translation>      Calcul de l’avion pour Qinf=%1</translation>
+    </message>
+    <message>
+        <source>       Calculating aerodynamic coefficients...</source>
+        <translation>       Calcul des coefficients aérodynamiques...</translation>
+    </message>
+    <message>
+        <source>       Calculating wing...</source>
+        <translation>       Calcul de l’aile...</translation>
+    </message>
+    <message>
+        <source>       Calculating second wing...</source>
+        <translation>       Calcul de la seconde aile...</translation>
+    </message>
+    <message>
+        <source>       Calculating elevator...</source>
+        <translation>       Calcul su stabilisateur horizontal...</translation>
+    </message>
+    <message>
+        <source>       Calculating fin...</source>
+        <translation>       Calcul de la dérive...</translation>
+    </message>
+    <message>
+        <source>       Calculating body...</source>
+        <translation>       Calcul du fuselage...</translation>
+    </message>
+    <message>
+        <source>     Main wing is asymmetric</source>
+        <translation>     L’aile principale est asymétrique</translation>
+    </message>
+    <message>
+        <source>     Sideslip is asymmetric</source>
+        <translation>     Le dérapage est asymétrique</translation>
+    </message>
+    <message>
+        <source>     2nd wing is asymmetric</source>
+        <translation>     La seconde aile est asymétrique</translation>
+    </message>
+    <message>
+        <source>     Elevator is asymmetric</source>
+        <translation>     Le stabilisateur horizontal est asymétrique</translation>
+    </message>
+    <message>
+        <source>     A fin is considered asymmetric</source>
+        <translation>     Une dérive est considérée comme étant asymétrique</translation>
+    </message>
+    <message>
+        <source>Perfoming symmetric calculation</source>
+        <translation>Exécution des calculs symétriques</translation>
+    </message>
+    <message>
+        <source>Performing asymmetric calculation : </source>
+        <translation>Exécution des calculs asymétriques : </translation>
+    </message>
+    <message>
+        <source>Counted %1 panel elements</source>
+        <translation>%1 éléments de panneaux ont été dénombrés</translation>
+    </message>
+    <message>
+        <source>      Relaxing the wake...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create matrix....</source>
+        <translation>Échec de cration de la matrice....</translation>
+    </message>
+    <message>
+        <source>       Calculating induced angles...</source>
+        <translation>       Calcul des angles induits...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abandonner</translation>
+    </message>
+    <message>
+        <source>      Solving the linear system...</source>
+        <translation>      Résolution du système linéaire...</translation>
+    </message>
+    <message>
+        <source>      Singular Matrix.... Aborting calculation...</source>
+        <translation>      Matrice singulière.... Interuption du caclul...</translation>
+    </message>
+    <message>
+        <source>Launching 3D Panel Analysis....</source>
+        <translation>Lancement de l’analyse des Panneaux 3D....</translation>
+    </message>
+    <message>
+        <source>Type %1 Analysis</source>
+        <translation>Analyse de Type %1</translation>
+    </message>
+    <message>
+        <source>Panel Analysis completed successfully</source>
+        <translation>L’analyse des panneaux s&apos;est terminée avec succès</translation>
+    </message>
+    <message>
+        <source>Panel Analysis completed ... Errors encountered</source>
+        <translation>Analyse des panneaux terminée ... Des erreurs ont été rencontrées</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Processing Alpha= %1</source>
+        <translation>Traitement de Alpha= %1</translation>
+    </message>
+    <message>
+        <source>      Wake iteration %1</source>
+        <translation>      Itération de sllage %1</translation>
+    </message>
+    <message>
+        <source>Failed to compute aerodynamic coefficients....</source>
+        <translation>Échec du calcul des coefficients aérodynamiques....</translation>
     </message>
 </context>
 <context>
@@ -4506,7 +4865,7 @@ Pousuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Plane Weight   = %1 </source>
-        <translation>Poids de l&apos;avion   = %1 </translation>
+        <translation>Poids de l&apos;avion		= %1 </translation>
     </message>
     <message>
         <source>Wing Load      = %1 </source>
@@ -4747,8 +5106,161 @@ Poursuivre néanmoins ?</translation>
         <translation> moment = </translation>
     </message>
     <message>
+        <source>Cm total</source>
+        <translation>Cm total</translation>
+    </message>
+    <message>
+        <source>Wing Graph 1</source>
+        <translation>Diagramme 1 de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>Wing Graph 2</source>
+        <translation>Diagramme 2 de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>Wing Graph 3</source>
+        <translation>Diagramme 3 de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>Wing Graph 4</source>
+        <translation>Diagramme 4 de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>Wing Polar Graph 1</source>
+        <translation>Diagramme polaire 1 de l’aile</translation>
+    </message>
+    <message>
+        <source>Wing Polar Graph 2</source>
+        <translation>Diagramme polaire 2 de l’aile</translation>
+    </message>
+    <message>
+        <source>Wing Polar Graph 3</source>
+        <translation>Diagramme polaire 3 de l’aile</translation>
+    </message>
+    <message>
+        <source>Wing Polar Graph 4</source>
+        <translation>Diagramme polaire 4 de l’aile</translation>
+    </message>
+    <message>
+        <source>Cp Graph</source>
+        <translation>Diagramme Cp</translation>
+    </message>
+    <message>
+        <source>Secondary Wing Data
+</source>
+        <translation>Données de la deuxième aile
+</translation>
+    </message>
+    <message>
+        <source>Elevator Data
+</source>
+        <translation>Données du stabilisateur horizontal
+</translation>
+    </message>
+    <message>
+        <source>Fin Data
+</source>
+        <translation>Données de la dérive
+</translation>
+    </message>
+    <message>
+        <source>Main Wing Cp Coefficients
+</source>
+        <translation>Coefficients Cp de l’aile principale
+</translation>
+    </message>
+    <message>
+        <source>Wing Cp Coefficients
+</source>
+        <translation>Coefficients Cp de l’aile
+</translation>
+    </message>
+    <message>
+        <source> Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp
+</source>
+        <translation type="unfinished"> Panneau   CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp
+</translation>
+    </message>
+    <message>
+        <source>Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp
+</source>
+        <translation type="unfinished">Panneau,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp
+</translation>
+    </message>
+    <message>
+        <source> Panel     CollPt.x        CollPt.y        CollPt.z             Cp
+</source>
+        <translation type="unfinished"> Panneau   CollPt.x        CollPt.y        CollPt.z             Cp
+</translation>
+    </message>
+    <message>
+        <source>Panel,CollPt.x,CollPt.y,CollPt.z,Cp
+</source>
+        <translation type="unfinished">Panneau,CollPt.x,CollPt.y,CollPt.z,Cp
+</translation>
+    </message>
+    <message>
+        <source>Strip %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wing2 Cp Coefficients
+</source>
+        <translation>Coefficients Cp de la deuxième aile
+</translation>
+    </message>
+    <message>
+        <source>Elevator Cp Coefficients
+</source>
+        <translation>Coefficients Cp du stbilisateur horizontal
+</translation>
+    </message>
+    <message>
+        <source>Fin Cp Coefficients
+</source>
+        <translation>Coefficients Cp de la dérive
+</translation>
+    </message>
+    <message>
         <source>Export Polar</source>
         <translation>Exporter la polaire</translation>
+    </message>
+    <message>
+        <source>Export UFO</source>
+        <translation>Exporter l’OVNI</translation>
+    </message>
+    <message>
+        <source>AVL Text File (*.avl)</source>
+        <translation>Fichier texte AVL (*.avl)</translation>
+    </message>
+    <message>
+        <source>Project</source>
+        <translation>Projet</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>Ouvrir le fichier</translation>
+    </message>
+    <message>
+        <source>UFO Polar Format (*.*)</source>
+        <translation>Format de polaire d’OVNI (*.*)</translation>
+    </message>
+    <message>
+        <source>Could not read the file
+</source>
+        <translation>Impossible de lire le fichier
+</translation>
+    </message>
+    <message>
+        <source>No UFO with the name </source>
+        <translation>Aucun OVNI portant ce nom</translation>
+    </message>
+    <message>
+        <source>
+could be found. The polar(s) will not be stored</source>
+        <translation>
+n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation>
     </message>
     <message>
         <source>Enter the new name for the wing polar :</source>
@@ -4821,6 +5333,10 @@ Poursuivre néanmoins ?</translation>
         <translation>abcdefghijklmnopqrstuvwxyz01234567</translation>
     </message>
     <message>
+        <source>No unit defined for speed...</source>
+        <translation>Pas d’unité définie pour la vitesse...</translation>
+    </message>
+    <message>
         <source>Lift Coef. = %1 </source>
         <translation>Coef. de portance. = %1 </translation>
     </message>
@@ -4842,7 +5358,7 @@ Poursuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Flap %1 Moment =%2</source>
-        <translation>Moment du volet %1 =%2</translation>
+        <translation>Moment du volet %1 = %2</translation>
     </message>
     <message>
         <source>Top transition</source>
@@ -4862,23 +5378,23 @@ Poursuivre néanmoins ?</translation>
     </message>
     <message>
         <source>_Wing</source>
-        <translation>_Aile</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>_Wing2</source>
-        <translation>_Aile2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>_Elev</source>
-        <translation>_Stab</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>_Fin</source>
-        <translation>_Dérive</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter the new name for the Body :</source>
-        <translation>Entrez le nouveau nom du fuselage : </translation>
+        <translation>Entrez un nouveau nom pour le fuselage : </translation>
     </message>
     <message>
         <source>The body </source>
@@ -4919,6 +5435,10 @@ Poursuivre néanmoins ?</translation>
         <translation>D=</translation>
     </message>
     <message>
+        <source>Init LLT</source>
+        <translation>Initialisation LLT</translation>
+    </message>
+    <message>
         <source>Store OpPoint</source>
         <translation>Enregistrer le point de fonctionnement</translation>
     </message>
@@ -4948,7 +5468,7 @@ Poursuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Trans.</source>
-        <translation>Trans.</translation>
+        <translation>Transition</translation>
     </message>
     <message>
         <source>Moment</source>
@@ -4971,6 +5491,10 @@ Poursuivre néanmoins ?</translation>
         <translation>Animer</translation>
     </message>
     <message>
+        <source>Highlight OpPoint</source>
+        <translation>Mettre en évidence le point de fonctionnement</translation>
+    </message>
+    <message>
         <source>Display</source>
         <translation>Afficher</translation>
     </message>
@@ -4987,6 +5511,18 @@ Poursuivre néanmoins ?</translation>
         <translation>Élement</translation>
     </message>
     <message>
+        <source>Style</source>
+        <translation>Style</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation>Largeur</translation>
+    </message>
+    <message>
+        <source>Color</source>
+        <translation>Couleur</translation>
+    </message>
+    <message>
         <source>Curve settings</source>
         <translation>Paramètres de la courbe</translation>
     </message>
@@ -5001,6 +5537,10 @@ Poursuivre néanmoins ?</translation>
     <message>
         <source>Reset</source>
         <translation>Réinitialiser</translation>
+    </message>
+    <message>
+        <source>Cp Sections</source>
+        <translation type="unfinished">Sections Cp</translation>
     </message>
     <message>
         <source>Axes</source>
@@ -5023,12 +5563,16 @@ Poursuivre néanmoins ?</translation>
         <translation>Panneaux</translation>
     </message>
     <message>
+        <source>Foil Names</source>
+        <translation>Nom des profils</translation>
+    </message>
+    <message>
         <source>Vortices</source>
-        <translation>Vecteurs</translation>
+        <translation type="unfinished">Tourbillons</translation>
     </message>
     <message>
         <source>Pick Center</source>
-        <translation>Définir le centre</translation>
+        <translation>Choisir le centre</translation>
     </message>
     <message>
         <source>VCd</source>
@@ -5037,6 +5581,22 @@ Poursuivre néanmoins ?</translation>
     <message>
         <source>ICd</source>
         <translation>ICx</translation>
+    </message>
+    <message>
+        <source>VCm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ICm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ym</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>VYm</source>
@@ -5055,8 +5615,16 @@ Poursuivre néanmoins ?</translation>
         <translation>1/Rt(Cz)</translation>
     </message>
     <message>
+        <source>Lift (N)</source>
+        <translation>Portance (N)</translation>
+    </message>
+    <message>
         <source>Lift (lbf)</source>
         <translation>Portance (lbf)</translation>
+    </message>
+    <message>
+        <source>Drag (N)</source>
+        <translation>Trainée (N)</translation>
     </message>
     <message>
         <source>Drag (lbf)</source>
@@ -5116,7 +5684,7 @@ Poursuivre néanmoins ?</translation>
     </message>
     <message>
         <source>ctrl</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ctrl</translation>
     </message>
     <message>
         <source>CY</source>
@@ -5124,87 +5692,15 @@ Poursuivre néanmoins ?</translation>
     </message>
     <message>
         <source>Cannot (yet ?) save 8 bit depth opengl screen images... Sorry</source>
-        <translation>Il n&apos;est pas (encore) possible d&apos;enregistrer des images d&apos;écran opengl sur 8 bits. Désolé...</translation>
+        <translation>Il n&apos;est pas (encore) possible d&apos;enregistrer des recopies d&apos;écran opengl sur 8 bits. Désolé...</translation>
     </message>
     <message>
         <source>Cannot (yet ?) save 16 bit depth opengl screen images... Sorry</source>
-        <translation>Il n&apos;est pas (encore) possible d&apos;enregistrer des images d&apos;écran opengl sur 16 bits. Désolé...</translation>
+        <translation>Il n&apos;est pas (encore) possible d&apos;enregistrer des recopies d&apos;écran opengl sur 16 bits. Désolé...</translation>
     </message>
     <message>
         <source>Unidentified bit depth... Sorry</source>
         <translation>Profondeur de bits non iedentifiée. Désolé....</translation>
-    </message>
-    <message>
-        <source>Open File</source>
-        <translation>Ouvrir un fichier</translation>
-    </message>
-    <message>
-        <source>UFO Polar Format (*.*)</source>
-        <translation>Format de polaire de l&apos;UFO (*.*)</translation>
-    </message>
-    <message>
-        <source>Could not read the file
-</source>
-        <translation>Lecture du fichier impossible
-</translation>
-    </message>
-    <message>
-        <source>No UFO with the name </source>
-        <translation>Aucun UFO portant ce nom</translation>
-    </message>
-    <message>
-        <source>
-could be found. The polar(s) will not be stored</source>
-        <translation>
-n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation>
-    </message>
-    <message>
-        <source>Init LLT</source>
-        <translation>Initialisation LLT</translation>
-    </message>
-    <message>
-        <source>Style</source>
-        <translation>Style</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation>Largeur</translation>
-    </message>
-    <message>
-        <source>Color</source>
-        <translation>Couleur</translation>
-    </message>
-    <message>
-        <source>Cp Sections</source>
-        <translation type="unfinished">Sections Cp</translation>
-    </message>
-    <message>
-        <source>Foil Names</source>
-        <translation>Nom des profils</translation>
-    </message>
-    <message>
-        <source>Cm total</source>
-        <translation>Cm total</translation>
-    </message>
-    <message>
-        <source>VCm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ICm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rm</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ym</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlight OpPoint</source>
-        <translation>Mettre en évidence le point de fonctionnement</translation>
     </message>
 </context>
 <context>
@@ -5322,7 +5818,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>Cp</source>
-        <translation type="unfinished">Cp</translation>
+        <translation>Cp</translation>
     </message>
     <message>
         <source>Q</source>
@@ -5358,7 +5854,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Top Shear eq</source>
-        <translation type="unfinished">Eq. cisaillement supérieur</translation>
+        <translation>Eq. cisaillement supérieur</translation>
     </message>
     <message>
         <source>Bot Shear</source>
@@ -5366,7 +5862,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Bot Shear eq</source>
-        <translation type="unfinished">Eq. cisaillement inférieur</translation>
+        <translation>Eq. cisaillement inférieur</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the Operating Point 
@@ -5518,7 +6014,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Cm</source>
-        <translation>Cm</translation>
+        <translation type="unfinished">Cm</translation>
     </message>
     <message>
         <source>Xtr1</source>
@@ -5618,7 +6114,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Graph Curve Settings</source>
-        <translation>Paramètres de la courbe du graphique</translation>
+        <translation>Paramètres de la courbe du diagramme</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the polar :
@@ -5670,7 +6166,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>XHinge     = %1</source>
-        <translation>X articulation      = %1</translation>
+        <translation type="unfinished">X articulation      = %1</translation>
     </message>
     <message>
         <source>YHinge     = %1</source>
@@ -5699,6 +6195,82 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Highlights the currently selected OpPoint, if any, on the currently selected polar curve</source>
         <translation>Mettre en évidence le point de contrôle actuellement sélectionné, s’il existe, sur la courbe polaire actuellement selectionnée</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation type="unfinished">X</translation>
+    </message>
+    <message>
+        <source>Cp Graph</source>
+        <translation>Diagramme Cp</translation>
+    </message>
+    <message>
+        <source>Polar Graph</source>
+        <translation>Diagramme polaire</translation>
+    </message>
+    <message>
+        <source>Cm Graph</source>
+        <translation>Diagramme Cm</translation>
+    </message>
+    <message>
+        <source>Cz Graph</source>
+        <translation>Fiagramme Cz</translation>
+    </message>
+    <message>
+        <source>Tr Graph</source>
+        <translation>Diagramme Tr</translation>
+    </message>
+    <message>
+        <source>User Graph</source>
+        <translation>Diagramme utilisateur</translation>
+    </message>
+    <message>
+        <source>Cf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cd&apos;</source>
+        <translation type="unfinished">Cx&apos;</translation>
+    </message>
+    <message>
+        <source>
+Top Side
+</source>
+        <translation>
+Face supérieure
+</translation>
+    </message>
+    <message>
+        <source>    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+
+Bottom Side
+</source>
+        <translation>
+
+Face inférieure
+</translation>
+    </message>
+    <message>
+        <source>Enter the new name for the foil polar :</source>
+        <translation>Enter le nouveau nom pour la polaire du profil : </translation>
+    </message>
+    <message>
+        <source>Re.sqrt(Cl) = </source>
+        <translation>Re.sqrt(Cz) = </translation>
+    </message>
+    <message>
+        <source>M.sqrt(Cl) = %1</source>
+        <translation>M.sqrt(Cz) = %1</translation>
     </message>
 </context>
 <context>
@@ -5910,10 +6482,6 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <source>Smoothing</source>
         <translation>Lissage</translation>
-    </message>
-    <message>
-        <source>Q Graph</source>
-        <translation type="unfinished">Graphe Q</translation>
     </message>
 </context>
 <context>
@@ -6271,10 +6839,28 @@ Les cadres ont un nombre de points par face différent</translation>
         <translation>Le nombre de points à calculer sera limité à 100</translation>
     </message>
     <message>
+        <source>Analysis Cancelled
+</source>
+        <translation>Analyse inerrompue
+</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>   ...QInf = %1 </source>
+        <translation>   ...QInf = %1 </translation>
+    </message>
+    <message>
+        <source>      Alpha=%1   QInf = %2</source>
+        <translation>      Alpha=%1   QInf = %2</translation>
+    </message>
+    <message>
         <source>   Solving the problem... 
 
 </source>
-        <translation type="obsolete">   Résolution du problème... 
+        <translation>   Résolution du problème... 
 
 </translation>
     </message>
@@ -6283,17 +6869,17 @@ Les cadres ont un nombre de points par face différent</translation>
 
 Failed to create RHS....
 </source>
-        <translation type="obsolete">
+        <translation>
 
-Échec lors de la créaton de RHS....
+Échec de cration du vecteur RHS....
 </translation>
     </message>
     <message>
         <source>
 Failed to create the matrix....
 </source>
-        <translation type="obsolete">
-Échec de la création de la matrice....
+        <translation>
+Échec de cration de la matrice....
 </translation>
     </message>
     <message>
@@ -6301,21 +6887,21 @@ Failed to create the matrix....
 
 Singular matrix - aborting....
 </source>
-        <translation type="obsolete">
+        <translation>
 
-Matrice singulière- abandon....
+Matrice singulière - interruption....
 </translation>
     </message>
     <message>
         <source>   Solving the problem... 
 </source>
-        <translation type="obsolete">   Résolution du problème... 
+        <translation>   Résolution du problème... 
 </translation>
     </message>
     <message>
         <source>      ...Control = %1
 </source>
-        <translation type="obsolete">      ...Contrôle = %1
+        <translation>      ...Contrôle = %1
 </translation>
     </message>
     <message>
@@ -6323,7 +6909,7 @@ Matrice singulière- abandon....
 
 
 </source>
-        <translation type="obsolete">      Interpolation non couronnée de succès pour Control=%1 - abandon.
+        <translation>      Interpolation non couronnée de succès pour Contrôle=%1 - sauté.
 
 
 </translation>
@@ -6331,49 +6917,43 @@ Matrice singulière- abandon....
     <message>
         <source>     Sideslip is asymmetric
 </source>
-        <translation type="obsolete">     Le glissement latéral est asymétrique
+        <translation>     Le dérapage est asymétrique
 </translation>
     </message>
     <message>
         <source>     Main wing is asymmetric
 </source>
-        <translation type="obsolete">     L’aile princpale est asymétrique
+        <translation>     L’aile principale est asymétrique
 </translation>
     </message>
     <message>
         <source>     2nd wing is asymmetric
 </source>
-        <translation type="obsolete">... la deuxième aile est asymétrique
+        <translation>     La seconde aile est asymétrique
 </translation>
     </message>
     <message>
         <source>     Elevator is asymmetric
 </source>
-        <translation type="obsolete">     Le stabilisateur horizontal est asymétrique
+        <translation>     Le stabilisateur horizontal est asymétrique
 </translation>
     </message>
     <message>
         <source>     A fin is considered asymmetric
 </source>
-        <translation type="obsolete">     Une dérive est considérée comme étant asymétrique
+        <translation>     Une dérive est considérée comme étant asymétrique
 </translation>
     </message>
     <message>
         <source>Perfoming symmetric calculation
 </source>
-        <translation type="obsolete">Réalisation des calculs symétriques
+        <translation>Exécution des calculs symétriques
 </translation>
     </message>
     <message>
         <source>Performing asymmetric calculation : 
 </source>
-        <translation type="obsolete">Exécution des calculs asymétriques : 
-</translation>
-    </message>
-    <message>
-        <source>Analysis Cancelled
-</source>
-        <translation>Analyse inerrompue
+        <translation>Exécution des calculs asymétriques : 
 </translation>
     </message>
     <message>
@@ -6381,15 +6961,16 @@ Matrice singulière- abandon....
 
 Failed to create matrix....
 </source>
-        <translation type="obsolete">
-Échec de la création de la matrice....
+        <translation>
+
+Échec de cration de la matrice....
 </translation>
     </message>
     <message>
         <source>Launching VLM Analysis....
 
 </source>
-        <translation type="obsolete">Lancement de l’analyse VLM ....
+        <translation>Lancement de l&apos;analyse VLM...
 
 </translation>
     </message>
@@ -6397,7 +6978,7 @@ Failed to create matrix....
         <source>Type %1 Analysis
 
 </source>
-        <translation type="obsolete">Analyse de type %1
+        <translation>Analyse de Type %1
 
 </translation>
     </message>
@@ -6405,113 +6986,100 @@ Failed to create matrix....
         <source>
 VLM Analysis completed successfully
 </source>
-        <translation type="obsolete">
-Analyse VLM terminée avec succès
+        <translation>
+L’analyse VLM s&apos;est terminée avec succès
 </translation>
     </message>
     <message>
         <source>
 VLM Analysis completed ... Errors encountered
 </source>
-        <translation type="obsolete">
-Analyse VLM terminée... Des erreurs ont été rencontrées
+        <translation>
+Analyse VLM terminée ... Des erreurs ont été rencontrées
 </translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
     </message>
     <message>
         <source>        ...Alpha = %1
 </source>
-        <translation type="obsolete">        ...Alpha = %1
+        <translation>        ...Alpha = %1
 </translation>
     </message>
     <message>
         <source>      Creating the influence matrix...
 </source>
-        <translation type="obsolete">      Création de la matrice d’influence...
+        <translation>    Création de la matrice d’influence...
 </translation>
     </message>
     <message>
         <source>      ...Alpha=%1
 </source>
-        <translation type="obsolete">      ...Alpha=%1
+        <translation>       Alpha = %1 
 </translation>
-    </message>
-    <message>
-        <source>   ...QInf = %1 </source>
-        <translation>   ...QInf = %1 </translation>
     </message>
     <message>
         <source>        Calculating aerodynamic coefficients...
 </source>
-        <translation type="obsolete">        Calcul des coefficients aérodynamiques ...
+        <translation>       Calcul des coefficients aérodynamiques...
 </translation>
     </message>
     <message>
         <source>         Calculating main wing...
 </source>
-        <translation type="obsolete">         Calcul de l’aile principale...
+        <translation>       Calcul de l’aile principale...
 </translation>
     </message>
     <message>
         <source>       Calculating 2nd wing...
 </source>
-        <translation type="obsolete">       Calcul de la seconde aile...
+        <translation>       Calcul de la seconde aile...
 </translation>
     </message>
     <message>
         <source>         Calculating elevator...
 </source>
-        <translation type="obsolete">         Calcul du stabilisateur horizontal...
+        <translation>       Calcul su stabilisateur horizontal...
 </translation>
     </message>
     <message>
         <source>         Calculating fin...
 </source>
-        <translation type="obsolete">         Calcula de la dérive...
+        <translation>       Calcul de la dérive...
 </translation>
     </message>
     <message>
         <source>        Calculating induced angles...
 </source>
-        <translation type="obsolete">        Calcul des angles induits...
+        <translation>       Calcul des angles induits...
 </translation>
     </message>
     <message>
         <source>      Solving the linear system...
 </source>
-        <translation type="obsolete">      Résolution du système linéaire...
+        <translation>      Résolution du système linéaire...
 </translation>
     </message>
     <message>
         <source>      Singular Matrix.... Aborting calculation...
 </source>
-        <translation type="obsolete">      Matrice singulière.... Interruption des calculs...
+        <translation>      Matrice singulière.... Interuption du caclul...
 </translation>
     </message>
     <message>
         <source>      Calculating the vortices circulations...
 </source>
-        <translation type="obsolete">      Calcul de la circulation des tourbillons...
-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>      Calculating speeds to balance the weight
 </source>
-        <translation type="obsolete">      Calcul des vitesses pour équilibrer le poids
+        <translation>      Calcul des vitesses équilibrant le poids
 </translation>
     </message>
     <message>
         <source>      Found a negative lift for Alpha=%1.... skipping the angle...
 </source>
-        <translation type="obsolete">      Portance négative trouvée pour Alpha=%1.... angle sauté...
+        <translation>      Une portance négative a été trouvée pour Alpha=%1.... angle sauté...
 </translation>
-    </message>
-    <message>
-        <source>      Alpha=%1   QInf = %2</source>
-        <translation>      Alpha=%1   QInf = %2</translation>
     </message>
 </context>
 <context>
@@ -6651,6 +7219,10 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
         <source>Relax. factor</source>
         <translation type="unfinished">Facteur de réduction</translation>
     </message>
+    <message>
+        <source>Core Size</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>WPolarDlg</name>
@@ -6738,7 +7310,7 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     </message>
     <message>
         <source>VLM2 : Quads</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">VLM2 : Quads</translation>
     </message>
     <message>
         <source>3D Panels</source>
@@ -6766,7 +7338,7 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     </message>
     <message>
         <source>Tilt. Geom.</source>
-        <translation type="unfinished">Angle de calage</translation>
+        <translation type="unfinished">Angle d’inclinaison</translation>
     </message>
     <message>
         <source>Wake Roll-up</source>
@@ -6806,7 +7378,7 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     </message>
     <message>
         <source>Qinf.sqrt(Cl) =</source>
-        <translation type="unfinished"></translation>
+        <translation>Qinf.sqrt(Cz) =</translation>
     </message>
     <message>
         <source>Root Re.sqrt(Cl) =</source>
@@ -6835,6 +7407,49 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     <message>
         <source>Reference Area and Span for Aero Coefficients</source>
         <translation>Surface de référence et envergure pour les coefficients aérodynamiques</translation>
+    </message>
+    <message>
+        <source>Wing Loading = 0.033 kg/dm2</source>
+        <translation>Charge alaire = 0.033 kg/dm2</translation>
+    </message>
+    <message>
+        <source>SRe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RRe</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QInfCl</source>
+        <translation>QInfCz</translation>
+    </message>
+    <message>
+        <source>Re at Root = 100 000</source>
+        <translation>Re à l’emplanture = 100 000</translation>
+    </message>
+    <message>
+        <source>Re at Tip = 70 000</source>
+        <translation>Re au saumon = 70 000</translation>
+    </message>
+</context>
+<context>
+    <name>WingDelegate</name>
+    <message>
+        <source>Uniform</source>
+        <translation>Uniforme</translation>
+    </message>
+    <message>
+        <source>Cosine</source>
+        <translation>Cosinus</translation>
+    </message>
+    <message>
+        <source>Sine</source>
+        <translation>Sinus</translation>
+    </message>
+    <message>
+        <source>-Sine</source>
+        <translation>-Sinus</translation>
     </message>
 </context>
 <context>
@@ -6894,6 +7509,285 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
         <source>Cancel</source>
         <translation>Abandonner</translation>
     </message>
+    <message>
+        <source>XDirect Styles</source>
+        <translation>Styles XDirect</translation>
+    </message>
+    <message>
+        <source>Neutral Line</source>
+        <translation>Ligne neutre</translation>
+    </message>
+    <message>
+        <source>Boundary Layer</source>
+        <translation>Couche limite</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Pression</translation>
+    </message>
+</context>
+<context>
+    <name>XFoil</name>
+    <message>
+        <source>Try executing PANE at top level instead</source>
+        <translation type="unfinished">Essayez plutôt d’exécuter PANE au niveau le plus haut</translation>
+    </message>
+    <message>
+        <source>Warning: High does not work well on rotated foils
+</source>
+        <translation type="unfinished">Attention : High ne fonctionne pas bien avec les profils pivotés
+</translation>
+    </message>
+    <message>
+        <source>Current chordline angle: %1
+proceeding anyway...</source>
+        <translation>Angle actuel de la ligne de corde : %1
+Poursuite cependant...</translation>
+    </message>
+    <message>
+        <source>iblpan :  ***  bl array overflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>*** iblsys: bl system array overflow. ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop ludcmp: array overflow. Increase nvx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      artificially limiting mach to  0.99</source>
+        <translation>      limitation articdicielle du nombre de mach à 0.99</translation>
+    </message>
+    <message>
+        <source>PanGen: buffer airfoil not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panel: Too many panels. Increase IQX</source>
+        <translation>Panel: trop de panneaux, augmentez IQX</translation>
+    </message>
+    <message>
+        <source>Speccl:  cl convergence failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>splind: array overflow, increase nmax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>--------UNCONVERGED----------</source>
+        <translation>--------PAS DE CONVERGENCE----------</translation>
+    </message>
+    <message>
+        <source>----------CONVERGED----------</source>
+        <translation>----------CONVERGENCE----------</translation>
+    </message>
+    <message>
+        <source> XYWake: array size (IWX) too small.
+  Last wake point index reduced.</source>
+        <translation> XYWake : dimensions du tablea (IWX) trop faibles.
+  L’index du dernier point de sillage a été réduit.</translation>
+    </message>
+    <message>
+        <source>eiwset: Array overflow. Increase ICX.</source>
+        <translation>eiwset : débordement de tableau, augmentez ICX.</translation>
+    </message>
+    <message>
+        <source>zlefind: le location failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>qccalc: cl convergence failed.  dalpha =%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CNCALC: array overflow.</source>
+        <translation>CNCALC : débordement de tableau.</translation>
+    </message>
+    <message>
+        <source>TE gap,chord did not converge</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Target segment cannot include 
+stagnation point in mixed-inverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Illegal 5-digit designation
+</source>
+        <translation>Désignation sur 5 chiffres non valable
+</translation>
+    </message>
+    <message>
+        <source>first three digits must be 210, 220, ... 250</source>
+        <translation>les trois premiers chiffres devraient être  210, 220, ... 250</translation>
+    </message>
+    <message>
+        <source>Maximum number of panel nodes  : %1
+</source>
+        <translation>Nombre maximum de nœuds de panneau : %1
+</translation>
+    </message>
+    <message>
+        <source>Number of buffer airfoil points: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current airfoil cannot be set
+</source>
+        <translation>Le profil actuel ne peut pas être défini
+</translation>
+    </message>
+    <message>
+        <source> CpCalc: local speed too large 
+ Compressibility corrections invalid 
+</source>
+        <translation>CpCalc : vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valables</translation>
+    </message>
+    <message>
+        <source>   Calculating unit vorticity distributions ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase IVX to at least %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     mrchdu: convergence failed at %1 ,  side %2, res =%3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    Side %1 ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     mrchue: inverse mode at %1    hk =%2
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     mrchue: convergence failed at %1,  side %2, res = %3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    mrcl:  illegal Mach(cls) dependence trigger
+ Setting fixed Mach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mrcl: Cl too low for chosen Mach(Cl) dependence
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mrcl: cl too low for chosen Re(Cl) dependence
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      artificially limiting Re to %1
+</source>
+        <translation>      limitation articdicielle de Re à %1
+</translation>
+    </message>
+    <message>
+        <source>Paneling convergence failed.  Continuing anyway...
+</source>
+        <translation type="unfinished">Échec de la convergence de la mise en panneaux. Poursuite cependant...
+</translation>
+    </message>
+    <message>
+        <source>   Calculating source influence matrix ...
+</source>
+        <translation>    Création de la matrice source d’influence...
+</translation>
+    </message>
+    <message>
+        <source>   Initializing bl ...
+</source>
+        <translation type="unfinished">   Initialisation de bl ...
+</translation>
+    </message>
+    <message>
+        <source>setbl: xtr???  n1=%1 n2=%2: 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     Side %1, forced transition at x/c = %2 %3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     Side %1,  free  transition at x/c = %2 %3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>scheck:  bad value for small panels (stol &gt; 0.3)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>setexp: cannot fill array.  n too small
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setexp: Convergence failed.  Continuing anyway ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sinvrt: spline inversion failed, input value returned
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specal:  MInf convergence failed
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stfind: Stagnation point not found. Continuing ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>trchek2 - n2 convergence failed
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> ***  stagnation point is past trip on side %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   Calculating wake trajectory ...
+</source>
+        <translation>   Calcul de la trajectoire du sillage...
+</translation>
+    </message>
+    <message>
+        <source>sdouble:  Arrays will overflow.  No action taken.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XFoilAdvancedDlg</name>
@@ -6904,6 +7798,26 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     <message>
         <source>Cancel</source>
         <translation>Abandonner</translation>
+    </message>
+    <message>
+        <source>XFoil Settings</source>
+        <translation>Paramètres de XFoil</translation>
+    </message>
+    <message>
+        <source>VAccel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iteration Limit</source>
+        <translation>Limitation du nombre d&apos;itérations</translation>
+    </message>
+    <message>
+        <source>Re-initialize BLs after an unconverged iteration</source>
+        <translation type="unfinished">Réinitialiser BLs après une itération n’ayant pas convergé</translation>
+    </message>
+    <message>
+        <source>Show full log report for an XFoil analysis</source>
+        <translation type="unfinished">Afficher le journal complet pour une analyseXFoil</translation>
     </message>
 </context>
 <context>
@@ -6919,6 +7833,78 @@ Analyse VLM terminée... Des erreurs ont été rencontrées
     <message>
         <source>Cancel</source>
         <translation>Abandonner</translation>
+    </message>
+    <message>
+        <source>Iter</source>
+        <translation>Itér.</translation>
+    </message>
+    <message>
+        <source>Alfa = %1 ........ </source>
+        <translation>Alpha = %1 ........ </translation>
+    </message>
+    <message>
+        <source>Invalid Analysis Settings
+CpCalc: local speed too large 
+ Compressibility corrections invalid </source>
+        <translation>Paramètres d&apos;analyse non valables
+CpCalc: la vitesse locale est triop élevée 
+ Les corrections de compressibilité ne sont pas valables </translation>
+    </message>
+    <message>
+        <source>Cl = %1</source>
+        <translation>Cz = %1</translation>
+    </message>
+    <message>
+        <source>Cl = %1 ........ </source>
+        <translation>Cz = %1 ........ </translation>
+    </message>
+    <message>
+        <source>unconverged after %1 iterations
+</source>
+        <translation>pas de convergence après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>converged after %1 iterations
+</source>
+        <translation>convergence après %1 itérations
+</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>   Initializing viscous analysis ...
+</source>
+        <translation>Initialisation de l’analyse visqueuse...
+</translation>
+    </message>
+    <message>
+        <source>CpCalc: local speed too large 
+ Compressibility corrections invalid 
+</source>
+        <translation>CpCalc : vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valables
+</translation>
+    </message>
+    <message>
+        <source>   Solving BL system ...
+</source>
+        <translation>   Résolution du système BL...
+</translation>
+    </message>
+    <message>
+        <source>   Iteration %1 ... 
+</source>
+        <translation>   Itération %1 ... 
+</translation>
+    </message>
+    <message>
+        <source>--------- Unconverged -----------
+</source>
+        <translation>--------- Pas de convergence-----------
+</translation>
     </message>
 </context>
 </TS>

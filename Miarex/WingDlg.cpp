@@ -38,7 +38,7 @@ WingDlg::WingDlg()
 {
 	m_pWing = NULL;
 
-	setWindowTitle("Wing Edition");
+	setWindowTitle(tr("Wing Edition"));
 	SetupLayout();
 	QDesktopWidget desktop;
 	QRect r = desktop.rect();
@@ -61,14 +61,14 @@ WingDlg::WingDlg()
 
 	pi = 3.141592654;
 
-	m_pInsertBefore = new QAction("Insert Before", this);
-	m_pInsertAfter = new QAction("Insert after", this);
-	m_pDeleteSection = new QAction("Delete section", this);
+	m_pInsertBefore = new QAction(tr("Insert Before"), this);
+	m_pInsertAfter = new QAction(tr("Insert after"), this);
+	m_pDeleteSection = new QAction(tr("Delete section"), this);
 	connect(m_pInsertBefore, SIGNAL(triggered()), this, SLOT(OnInsertBefore()));
 	connect(m_pInsertAfter, SIGNAL(triggered()), this, SLOT(OnInsertAfter()));
 	connect(m_pDeleteSection, SIGNAL(triggered()), this, SLOT(OnDeleteSection()));
 
-	m_pContextMenu = new QMenu("Section",this);
+	m_pContextMenu = new QMenu(tr("Section"),this);
 	m_pContextMenu->addAction(m_pInsertBefore);
 	m_pContextMenu->addAction(m_pInsertAfter);
 	m_pContextMenu->addAction(m_pDeleteSection);
@@ -90,7 +90,7 @@ bool WingDlg::CheckWing()
 {
 	if(!m_pWing->m_WingName.length())
 	{
-		QMessageBox::warning(this, "Warning", "Please enter a name for the wing");
+		QMessageBox::warning(this, tr("Warning"), tr("Please enter a name for the wing"));
 		m_pctrlWingName->setFocus();
 		return false;
 	}
@@ -98,21 +98,21 @@ bool WingDlg::CheckWing()
 	{
 		if(m_pWing->m_TPos[k]*1.00001 < m_pWing->m_TPos[k-1])
 		{
-			QMessageBox::warning(this, "Warning", "Warning : Panel sequence is inconsistent");
+			QMessageBox::warning(this, tr("Warning"), tr("Warning : Panel sequence is inconsistent"));
 			return false;
 		}
 	}
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
 	}
 
 	if(m_pWing->m_nFlaps>=20)
 	{
-		QString strong = "Only 10 flaps x 2 will be handled";
-		if (QMessageBox::Ok != QMessageBox::question(window(), "Question", strong, QMessageBox::Ok|QMessageBox::Cancel))
+		QString strong = tr("Only 10 flaps x 2 will be handled");
+		if (QMessageBox::Ok != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Ok|QMessageBox::Cancel))
 		  return false;
 	}
 	return true;
@@ -790,18 +790,18 @@ void WingDlg::FillTableRow(int row)
 		ind = m_pWingModel->index(row, 6, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NXPanels[row]);
 
-		if(m_pWing->m_XPanelDist[row]==0)      strong = "Uniform";
-		else if(m_pWing->m_XPanelDist[row]==1) strong = "Cosine";
+		if(m_pWing->m_XPanelDist[row]==0)      strong = tr("Uniform");
+		else if(m_pWing->m_XPanelDist[row]==1) strong = tr("Cosine");
 		ind = m_pWingModel->index(row, 7, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 
 		ind = m_pWingModel->index(row, 8, QModelIndex());
 		m_pWingModel->setData(ind, m_pWing->m_NYPanels[row]);
 
-		if(m_pWing->m_YPanelDist[row]==0)       strong = "Uniform";
-		else if(m_pWing->m_YPanelDist[row]==1)  strong = "Cosine";
-		else if(m_pWing->m_YPanelDist[row]==2)  strong = "Sine";
-		else if(m_pWing->m_YPanelDist[row]==-2) strong = "-Sine";
+		if(m_pWing->m_YPanelDist[row]==0)       strong = tr("Uniform");
+		else if(m_pWing->m_YPanelDist[row]==1)  strong = tr("Cosine");
+		else if(m_pWing->m_YPanelDist[row]==2)  strong = tr("Sine");
+		else if(m_pWing->m_YPanelDist[row]==-2) strong = tr("-Sine");
 		ind = m_pWingModel->index(row, 9, QModelIndex());
 		m_pWingModel->setData(ind, strong);
 	}
@@ -1093,7 +1093,7 @@ void WingDlg::OnCancel()
 	if(m_bChanged)
 	{
 		QString strong = tr("Discard the changes ?");
-		if (QMessageBox::Yes != QMessageBox::question(this, "Warning", strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+		if (QMessageBox::Yes != QMessageBox::question(this, tr("Warning"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			return;
 	}
 //	reject();
@@ -1119,7 +1119,7 @@ void WingDlg::OnDeleteSection()
 
 	if(m_iSection==0)
 	{
-		QMessageBox::warning(this, "Warning","The first section cannot be deleted");
+		QMessageBox::warning(this, tr("Warning"), tr("The first section cannot be deleted"));
 		return;
 	}
 
@@ -1128,7 +1128,7 @@ void WingDlg::OnDeleteSection()
 	size = m_pWingModel->rowCount();
 	if(size<=2)
 	{
-		QMessageBox::warning(this, "Warning","Two panel sections at least are required... cannot delete");
+		QMessageBox::warning(this, tr("Warning"), tr("Two panel sections at least are required... cannot delete"));
 		return;
 	}
 	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
@@ -1168,12 +1168,12 @@ void WingDlg::OnInsertBefore()
 {
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
 	}
 	if(m_iSection<=0)
 	{
-		QMessageBox::warning(this, "Warning", "No insertion possible before the first section");
+		QMessageBox::warning(this, tr("Warning"), tr("No insertion possible before the first section"));
 		return;
 	}
 	int k,n,total, ny;
@@ -1225,7 +1225,7 @@ void WingDlg::OnInsertAfter()
 {
 	if (m_pWing->m_NPanel==MAXPANELS)
 	{
-		QMessageBox::warning(this, "Warning", "The maximum number of panels has been reached");
+		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
 	}
 
@@ -1484,10 +1484,10 @@ void WingDlg::ReadSectionData(int sel)
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");
-	if(strong=="Uniform")		m_pWing->m_XPanelDist[sel] = 0;
-	else if(strong=="Cosine")	m_pWing->m_XPanelDist[sel] = 1;
-	else if(strong=="Sine")		m_pWing->m_XPanelDist[sel] = 2;
-	else if(strong=="-Sine")	m_pWing->m_XPanelDist[sel] = -2;
+	if(strong==tr("Uniform"))		m_pWing->m_XPanelDist[sel] = 0;
+	else if(strong==tr("Cosine"))	m_pWing->m_XPanelDist[sel] = 1;
+	else if(strong==tr("Sine"))		m_pWing->m_XPanelDist[sel] = 2;
+	else if(strong==tr("-Sine"))	m_pWing->m_XPanelDist[sel] = -2;
 
 	pItem = m_pWingModel->item(sel,8);
 	strong =pItem->text();
@@ -1499,10 +1499,10 @@ void WingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 
-	if(strong=="Uniform")		m_pWing->m_YPanelDist[sel] = 0;
-	else if(strong=="Cosine")	m_pWing->m_YPanelDist[sel] = 1;
-	else if(strong=="Sine")		m_pWing->m_YPanelDist[sel] = 2;
-	else if(strong=="-Sine")	m_pWing->m_YPanelDist[sel] = -2;
+	if(strong==tr("Uniform"))		m_pWing->m_YPanelDist[sel] = 0;
+	else if(strong==tr("Cosine"))	m_pWing->m_YPanelDist[sel] = 1;
+	else if(strong==tr("Sine"))		m_pWing->m_YPanelDist[sel] = 2;
+	else if(strong==tr("-Sine"))	m_pWing->m_YPanelDist[sel] = -2;
 
 	//Update Geometry
 	m_pWing->ComputeGeometry();
@@ -1536,7 +1536,7 @@ void WingDlg::SetScale()
 void WingDlg::SetupLayout()
 {
 	QVBoxLayout *DefLayout = new QVBoxLayout;
-	m_pctrlWingName     = new QLineEdit("WingName");
+	m_pctrlWingName     = new QLineEdit(tr("WingName"));
 	QHBoxLayout *SymLayout = new QHBoxLayout;
 	m_pctrlSymetric     = new QCheckBox(tr("Symetric"));
 	m_pctrlRightSide    = new QRadioButton(tr("Right Side"));
@@ -1586,13 +1586,13 @@ void WingDlg::SetupLayout()
 
 	QGridLayout *DataLayout = new QGridLayout;
 
-	QLabel *lab1 = new QLabel("Wing Span");
-	QLabel *lab2 = new QLabel("Area");
-	QLabel *lab100 = new QLabel("Projected Span");
-	QLabel *lab200 = new QLabel("Projected Area");
-	QLabel *lab3 = new QLabel("Volume");
-	QLabel *lab4 = new QLabel("Total VLM Panels");
-	QLabel *lab12 = new QLabel("Number of 3D Panels");
+	QLabel *lab1 = new QLabel(tr("Wing Span"));
+	QLabel *lab2 = new QLabel(tr("Area"));
+	QLabel *lab100 = new QLabel(tr("Projected Span"));
+	QLabel *lab200 = new QLabel(tr("Projected Area"));
+	QLabel *lab3 = new QLabel(tr("Volume"));
+	QLabel *lab4 = new QLabel(tr("Total VLM Panels"));
+	QLabel *lab12 = new QLabel(tr("Number of 3D Panels"));
 	lab1->setAlignment(Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignRight);
 	lab100->setAlignment(Qt::AlignRight);
@@ -1634,23 +1634,23 @@ void WingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
-	QLabel *lab13 = new QLabel("Max is 1000");
+	QLabel *lab13 = new QLabel(tr("Max is 1000"));
 	lab13->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab13 ,6,3);
-	QLabel *lab15 = new QLabel("Max is 2000");
+	QLabel *lab15 = new QLabel(tr("Max is 2000"));
 	lab15->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab15, 7, 3);
 
 
 	QGridLayout *Data2Layout = new QGridLayout;
 
-	QLabel *lab5 = new QLabel("Mean Geom. Chord");
-	QLabel *lab6 = new QLabel("Mean Aero Chord");
-	QLabel *lab7 = new QLabel("MAC Span Pos");
-	QLabel *lab8 = new QLabel("Aspect ratio");
-	QLabel *lab9 = new QLabel("Taper Ratio");
-	QLabel *lab10 = new QLabel("Root to Tip Sweep");
-	QLabel *lab11 = new QLabel("Number of Flaps");
+	QLabel *lab5 = new QLabel(tr("Mean Geom. Chord"));
+	QLabel *lab6 = new QLabel(tr("Mean Aero Chord"));
+	QLabel *lab7 = new QLabel(tr("MAC Span Pos"));
+	QLabel *lab8 = new QLabel(tr("Aspect ratio"));
+	QLabel *lab9 = new QLabel(tr("Taper Ratio"));
+	QLabel *lab10 = new QLabel(tr("Root to Tip Sweep"));
+	QLabel *lab11 = new QLabel(tr("Number of Flaps"));
 	lab5->setAlignment(Qt::AlignRight);
 	lab6->setAlignment(Qt::AlignRight);
 	lab7->setAlignment(Qt::AlignRight);
@@ -1866,7 +1866,7 @@ bool WingDlg::VLMSetAutoMesh(int total)
 
 	if(VLMGetPanelTotal()>VLMMATSIZE/2)
 	{
-		QMessageBox::warning(this, "Warning", "Too many panels\nReduce the mesh size");
+		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
 	}
 	return true;

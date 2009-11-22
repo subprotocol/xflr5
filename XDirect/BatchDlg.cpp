@@ -141,8 +141,8 @@ void BatchDlg::SetLayout()
 
 	QGridLayout *RangeVars = new QGridLayout;
 	QLabel *Spec = new QLabel(tr("Specify"));
-	m_rbspec1 = new QRadioButton("Alpha");
-	m_rbspec2 = new QRadioButton("Cl");
+	m_rbspec1 = new QRadioButton(tr("Alpha"));
+	m_rbspec2 = new QRadioButton(tr("Cl"));
 	m_pctrlFromZero   = new QCheckBox(tr("From Zero"));
 	QLabel *SpecMin   = new QLabel(tr("Min"));
 	QLabel *SpecMax   = new QLabel(tr("Max"));
@@ -338,7 +338,7 @@ void BatchDlg::AlphaLoop()
 
 				if(pXFoil->lvconv)
 				{
-					str =QString("   ...converged after %1 iterations\r\n").arg(m_Iterations);
+					str =QString(tr("   ...converged after %1 iterations")+"\r\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 					AddOpPoint();
@@ -346,14 +346,14 @@ void BatchDlg::AlphaLoop()
 				}
 				else if(m_bSkipPoint || m_bSkipPolar)
 				{
-					str = QString("   ...skipped after %1 iterations\r\n").arg(m_Iterations);
+					str = QString(tr("   ...skipped after %1 iterations")+"\r\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 
 				}
 				else
 				{
-					str = QString("   ...unconverged after %1 iterations\r\n").arg(m_Iterations);
+					str = QString(tr("   ...unconverged after %1 iterations")+"\r\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 				}
@@ -366,7 +366,7 @@ void BatchDlg::AlphaLoop()
 		strong+="\r\n";
 		if(m_bCancel)
 		{
-			strong+="Analysis interrupted\r\n";
+			strong+=tr("Analysis interrupted")+"\r\n";
 			break;
 		}
 	}//end Re loop
@@ -799,7 +799,7 @@ void BatchDlg::OnAcl()
 	if(m_Type==4) return;
 	if(m_rbspec1->isChecked())
 	{
-		m_pctrlSpecVar->setText("Alpha =");
+		m_pctrlSpecVar->setText(tr("Alpha ="));
 		m_pctrlSpecMax->SetValue(1.0);
 		m_pctrlSpecDelta->SetValue(0.5);
 		m_bAlpha = true;
@@ -807,7 +807,7 @@ void BatchDlg::OnAcl()
 	}
 	else
 	{
-		m_pctrlSpecVar->setText("Cl =");
+		m_pctrlSpecVar->setText(tr("Cl ="));
 		m_pctrlSpecMax->SetValue(0.5);
 		m_pctrlSpecDelta->SetValue(0.1);
 		m_bAlpha = false;
@@ -837,29 +837,29 @@ void BatchDlg::OnType1()
 
 	if(m_rbtype1->isChecked())
 	{
-		m_pctrlReType->setText("Reynolds =");
-		m_pctrlMaType->setText("Mach =");
+		m_pctrlReType->setText(tr("Reynolds ="));
+		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(true);
 		m_Type = 1;
 	}
 	else if(m_rbtype2->isChecked())
 	{
-		m_pctrlReType->setText("Re.sqrt(Cl) =");
-		m_pctrlMaType->setText("Ma.sqrt(Cl) =");
+		m_pctrlReType->setText(tr("Re.sqrt(Cl) ="));
+		m_pctrlMaType->setText(tr("Ma.sqrt(Cl) ="));
 		m_pctrlEditList->setEnabled(true);
 		m_Type = 2;
 	}
 	else if(m_rbtype3->isChecked())
 	{
-		m_pctrlReType->setText("Re.Cl =");
-		m_pctrlMaType->setText("Mach =");
+		m_pctrlReType->setText(tr("Re.Cl ="));
+		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(true);
 		m_Type = 3;
 	}
 	else if(m_rbtype4->isChecked())
 	{
-		m_pctrlReType->setText("Alpha =");
-		m_pctrlMaType->setText("Mach =");
+		m_pctrlReType->setText(tr("Alpha ="));
+		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(false);
 		m_rbspec1->setChecked(true);
 		m_Type = 4;
@@ -893,7 +893,7 @@ void BatchDlg::OnType1()
 		m_pctrlSpecMin->SetPrecision(0);
 		m_pctrlSpecMax->SetPrecision(0);
 		m_pctrlSpecDelta->SetPrecision(0);
-		m_pctrlSpecVar->setText("Reynolds =");
+		m_pctrlSpecVar->setText(tr("Reynolds ="));
 		m_rbspec1->setEnabled(false);
 		m_rbspec2->setEnabled(false);
 
@@ -1174,7 +1174,7 @@ void BatchDlg::ReLoop()
 						pXFoil->alfa = 0.0;
 						pXFoil->qinf = 1.0;
 						pXFoil->clspec = SpMin+ia*SpInc;
-						str = QString("Cl = %1").arg(pXFoil->clspec,9,'f',3);
+						str = QString(tr("Cl = %1")).arg(pXFoil->clspec,9,'f',3);
 						strong+=str;
 						UpdateOutput(str);
 						if(!pXFoil->speccl())
@@ -1198,7 +1198,7 @@ void BatchDlg::ReLoop()
 
 					if(pXFoil->lvconv)
 					{
-						str = QString("   ...converged after %1 iterations\n").arg(m_Iterations);
+						str = QString(tr("   ...converged after %1 iterations\n")).arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
 						AddOpPoint();
@@ -1206,14 +1206,14 @@ void BatchDlg::ReLoop()
 					}
 					else if(m_bSkipPoint || m_bSkipPolar)
 					{
-						str = QString("   ...skipped after %1 iterations\r\n").arg(m_Iterations);
+						str = QString(tr("   ...skipped after %1 iterations\r\n")).arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
 
 					}
 					else
 					{
-						str = QString("   ...unconverged after %1 iterations\r\n").arg(m_Iterations);
+						str = QString(tr("   ...unconverged after %1 iterations\r\n")).arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
 					}

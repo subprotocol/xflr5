@@ -97,7 +97,7 @@ CWing::CWing()
 	m_NMass = 0;
 	memset(m_MassValue,    0, sizeof(m_MassValue));
 	memset(m_MassPosition, 0, sizeof(m_MassPosition));
-	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString("Description %1").arg(i);
+	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString(tr("Description %1")).arg(i);
 	m_CoG.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
@@ -118,7 +118,7 @@ CWing::CWing()
 	m_bVLMSymetric  = false;
 	m_bChanged      = false;
 
-	m_WingName        = "Wing Name";
+	m_WingName        = tr("Wing Name");
 	m_WingDescription = "";
 	m_WingColor =  QColor(203,222,222);
 
@@ -1616,13 +1616,13 @@ void CWing::LLTComputeWing()
 		if(bPointOutAlpha)
 		{
 			GetLengthUnit(string, pMainFrame->m_LengthUnit);
-			strong = QString("       Span pos = %1 ").arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
+			strong = QString(tr("       Span pos = %1 ")).arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
 			strong += string;
 			strong += ",  Re = ";
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(" ,  A+Ai+Twist = %1 could not be interpolated\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1632,13 +1632,13 @@ void CWing::LLTComputeWing()
 		else if(bPointOutRe)
 		{
 			GetLengthUnit(string, pMainFrame->m_LengthUnit);
-			strong = QString("       Span pos = %1 ").arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
+			strong = QString(tr("       Span pos = %1 ")).arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
 			strong += string;
 			strong += ",  Re = ";
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(" ,  A+Ai+Twist = %1 is outside the flight envelope\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1983,13 +1983,13 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 			if(bPointOutCl)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("       Span pos = %1 ").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
+				strong = QString(tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %1 could not be interpolated\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(tr(",  Cl = %1 could not be interpolated")+"\r\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
 				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
@@ -1998,13 +1998,13 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 			else if(bPointOutRe)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("       Span pos = %1 ").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString(tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %1 is outside the flight envelope\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(tr(",  Cl = %1 is outside the flight envelope")+"\r\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
 				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2863,13 +2863,13 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			if(bPointOutCl)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("          Span pos = %1 ").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString(tr("          Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %1 could not be interpolated\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(tr(",  Cl = %1 could not be interpolated")+"\r\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
 				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2878,13 +2878,13 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			else if(bPointOutRe)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString("          Span pos = %1").arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString(tr("          Span pos = %1")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(",  Cl = %1 is outside the flight envelope\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(tr(",  Cl = %1 is outside the flight envelope")+"\r\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
 				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;

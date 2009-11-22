@@ -24,7 +24,7 @@
 
 XFoilAdvancedDlg::XFoilAdvancedDlg()
 {
-	setWindowTitle("XFoil Settings");
+	setWindowTitle(tr("XFoil Settings"));
 	SetupLayout();
 
 	m_IterLimit = 100;
@@ -39,7 +39,7 @@ XFoilAdvancedDlg::XFoilAdvancedDlg()
 void XFoilAdvancedDlg::SetupLayout()
 {
 	QHBoxLayout *VAccelBox = new QHBoxLayout;
-	QLabel *lab1 = new QLabel("VAccel");
+	QLabel *lab1 = new QLabel(tr("VAccel"));
 	lab1->setAlignment(Qt::AlignRight);
 	m_pctrlVAccel = new FloatEdit;
 	m_pctrlVAccel->setAlignment(Qt::AlignRight);
@@ -48,7 +48,7 @@ void XFoilAdvancedDlg::SetupLayout()
 	VAccelBox->addWidget(m_pctrlVAccel);
 
 	QHBoxLayout *IterBox = new QHBoxLayout;
-	QLabel *lab2 = new QLabel("Iteration Limit");
+	QLabel *lab2 = new QLabel(tr("Iteration Limit"));
 	lab2->setAlignment(Qt::AlignRight);
 	m_pctrlIterLimit = new QLineEdit;
 	m_pctrlIterLimit->setAlignment(Qt::AlignRight);
@@ -58,8 +58,8 @@ void XFoilAdvancedDlg::SetupLayout()
 	IterBox->addWidget(lab2);
 	IterBox->addWidget(m_pctrlIterLimit);
 
-	m_pctrlInitBL = new QCheckBox("Re-initialize BLs after an unconverged iteration");
-	m_pctrlFullReport = new QCheckBox("Show full log report for an XFoil analysis");
+	m_pctrlInitBL = new QCheckBox(tr("Re-initialize BLs after an unconverged iteration"));
+	m_pctrlFullReport = new QCheckBox(tr("Show full log report for an XFoil analysis"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton      = new QPushButton(tr("OK"));

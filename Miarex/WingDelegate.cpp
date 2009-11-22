@@ -63,15 +63,15 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 		}
 		else if(index.column()==7)
 		{
-			editor->addItem("Uniform");
-			editor->addItem("Cosine");
+			editor->addItem(tr("Uniform"));
+			editor->addItem(tr("Cosine"));
 		}
 		else if(index.column()==9)
 		{
-			editor->addItem("Uniform");
-			editor->addItem("Cosine");
-			editor->addItem("Sine");
-			editor->addItem("-Sine");
+			editor->addItem(tr("Uniform"));
+			editor->addItem(tr("Cosine"));
+			editor->addItem(tr("Sine"));
+			editor->addItem(tr("-Sine"));
 		}
 		return editor;
 	}
