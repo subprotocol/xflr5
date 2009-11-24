@@ -1,4 +1,4 @@
-﻿	
+	
 *******************************************************************************
 
 
@@ -18,6 +18,9 @@
 QFLR5 v0.04 Beta November xxx 2009
 	- Added some signal connections for wing control polars 
 	- Declared a bunch of local variables as static to speed things up by preventing repetitive memory allocations
+	- Corrected the bug associated with tilted geometry calculations
+	- Corrected an error in the calculation of downwash for secondary wings and fins - main wing was OK
+	- Improved the 3D view of lift and drag for results with sideslip
 	- Made a few corrections and enhancements
 
 

@@ -464,7 +464,7 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 	u.x = -Nc.y;
 	u.y =  Nc.x;
 	u.z =  0.0;
-	q.Set(theta, u);
+	q.Set(theta*180.0/PI, u);
 
 	APt.x = m_LA.x * (1.0-xArel) + m_TA.x * xArel;
 	APt.y = m_LA.y * (1.0-xArel) + m_TA.y * xArel;
@@ -485,7 +485,7 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 		PtNormal.y = 0.0;
 		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
 		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
-		
+
 		APt.x +=  PtNormal.x * TopA;
 		APt.y +=  PtNormal.y * TopA;
 		APt.z +=  PtNormal.z * TopA;

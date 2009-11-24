@@ -110,10 +110,10 @@ bool XFoil::abcopy()
 	}
 	else if(nb>IQX-2) {
 		QString str1, str2;
-		str1 = QString(tr("Maximum number of panel nodes  : %1\r\n")).arg(IQX-2);
-		str2 = QString(tr("Number of buffer airfoil points: %1\r\n")).arg(nb);
-		str2 += tr("Current airfoil cannot be set\r\n");
-		str2 += tr("Try executing PANE at top level instead");
+		str1 = QString(QObject::tr("Maximum number of panel nodes  : %1\r\n")).arg(IQX-2);
+		str2 = QString(QObject::tr("Number of buffer airfoil points: %1\r\n")).arg(nb);
+		str2 += QObject::tr("Current airfoil cannot be set\r\n");
+		str2 += QObject::tr("Try executing PANE at top level instead");
 		str1+=str2;
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
@@ -1968,7 +1968,7 @@ bool XFoil::cpcalc(int n, double q[], double qinf, double minf, double cp[])
 	
 	if(denneg)
 	{
-		QString str(tr(" CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n"));
+		QString str(QObject::tr(" CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n"));
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
@@ -2914,7 +2914,7 @@ bool XFoil::ggcalc()
 	bwt = 0.1;
 	
 	//TRACE("calculating unit vorticity distributions ...\n");
-	QString str(tr("   Calculating unit vorticity distributions ...\r\n"));
+	QString str(QObject::tr("   Calculating unit vorticity distributions ...\r\n"));
 	WriteString(str);
 
 
@@ -3114,11 +3114,11 @@ void XFoil::hipnt(double chpnt, double thpnt)
 	if(fabs(arot)>1.0)
 	{
 		QString str, strong;
-		str  = tr("Warning: High does not work well on rotated foils\n");
-		strong = QString(tr("Current chordline angle: %1\nproceeding anyway...")).arg(arot,5,'f',2);
+		str  = QObject::tr("Warning: High does not work well on rotated foils\n");
+		strong = QString(QObject::tr("Current chordline angle: %1\nproceeding anyway...")).arg(arot,5,'f',2);
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle(QXDirect::tr("Warning"));
+		msgBox.setWindowTitle(QObject::tr("Warning"));
 		msgBox.setText(str+strong);
 		msgBox.exec();
 	}
@@ -3399,10 +3399,10 @@ bool XFoil::iblpan()
 	iblmax = qMax(iblte[1],iblte[2]) + nw;
 	if(iblmax>IVX)
 	{
-		QString str(tr("iblpan :  ***  bl array overflow"));
+		QString str(QObject::tr("iblpan :  ***  bl array overflow"));
 		WriteString(str, true);
 
-		str = QString(tr("Increase IVX to at least %1\r\n")).arg(iblmax);
+		str = QString(QObject::tr("Increase IVX to at least %1\r\n")).arg(iblmax);
 		WriteString(str, true);
 		return false;
 	}
@@ -3433,7 +3433,7 @@ bool XFoil::iblsys()
 	nsys = iv;
 	if(nsys>2*IVX)
 	{
-		QString str(tr("*** iblsys: bl system array overflow. ***"));
+		QString str(QObject::tr("*** iblsys: bl system array overflow. ***"));
 		WriteString(str, true);
 		return false;
 	}
@@ -4108,20 +4108,24 @@ bool XFoil::ludcmp(int n, double a[IQX][IQX], int indx[IQX])
 	int i, j, k;
 	double vv[IQX];
 	double dum, sum, aamax;
-	if(n>nvx) {
-		QString str(tr("Stop ludcmp: array overflow. Increase nvx"));
+	if(n>nvx)
+	{
+		QString str(QObject::tr("Stop ludcmp: array overflow. Increase nvx"));
 		WriteString(str, true);
 		return false;
 	}
 	
-	for (i=1; i<=n; i++){
+	for (i=1; i<=n; i++)
+	{
 		aamax = 0.0;
 		for (j=1; j<=n; j++) aamax = qMax(fabs(a[i][j]), aamax);
 		vv[i] = 1.0/aamax;
 	}
 	
-	for(j=1;j<= n;j++){
-		for(i=1; i<=j-1; i++){
+	for(j=1;j<= n;j++)
+	{
+		for(i=1; i<=j-1; i++)
+		{
 			sum = a[i][j];
 			for (k=1;k<= i-1;k++) sum = sum - a[i][k]*a[k][j];
 			a[i][j] = sum;
@@ -4526,22 +4530,26 @@ bool XFoil::mrchdu()
 			}
 
 			
-			str = QString(tr("     mrchdu: convergence failed at %1 ,  side %2, res =%3\r\n")).arg(ibl).arg(is).arg(dmax, 4, 'f', 3);
+			str = QString(QObject::tr("     mrchdu: convergence failed at %1 ,  side %2, res =%3\r\n")).arg(ibl).arg(is).arg(dmax, 4, 'f', 3);
 			WriteString(str, true);
 
 			if (dmax<= 0.1) goto stop109;			
 				//------ the current unconverged solution might still be reasonable...
 				
-			if(dmax > 0.1) {
+			if(dmax > 0.1)
+			{
 				//------- the current solution is garbage --> extrapolate values instead
-				if(ibl>3) {
-					if(ibl<=iblte[is]) {
+				if(ibl>3)
+				{
+					if(ibl<=iblte[is])
+					{
 						thi = thet[ibm][is] * sqrt(xssi[ibl][is]/xssi[ibm][is]);
 						dsi = dstr[ibm][is] * sqrt(xssi[ibl][is]/xssi[ibm][is]);
 						uei = uedg[ibm][is];
 					}
 					else{ 
-						if(ibl==iblte[is]+1) {
+						if(ibl==iblte[is]+1)
+						{
 							cti = cte;
 							thi = tte;
 							dsi = dte;
@@ -4649,7 +4657,7 @@ bool XFoil::mrchue()
 	for (is=1;is<= 2;is++)
 	{//2000
 		
-		QString str = QString(tr("    Side %1 ...\r\n")).arg(is);
+		QString str = QString(QObject::tr("    Side %1 ...\r\n")).arg(is);
 		WriteString(str);
 
 		//---- set forced transition arc length position
@@ -4678,7 +4686,8 @@ bool XFoil::mrchue()
 		itran[is] = iblte[is];
 		
 		//---- march downstream
-		for (ibl=2; ibl<=nbl[is];ibl++){// 1000
+		for (ibl=2; ibl<=nbl[is];ibl++)
+		{// 1000
 			ibm = ibl-1;
 			iw = ibl - iblte[is];
 			simi = (ibl==2);
@@ -4689,7 +4698,8 @@ bool XFoil::mrchue()
 			uei = uedg[ibl][is];
 
 		
-			if(wake) {
+			if(wake)
+			{
 				iw = ibl - iblte[is];
 				dswaki = wgap[iw];
 			}
@@ -4734,7 +4744,8 @@ bool XFoil::mrchue()
 				else 
 					blsys();
 				
-				if(direct) {
+				if(direct)
+				{
 					//--------- try direct mode (set due = 0 in currently empty 4th line)
 					vs2[4][1] = 0.0;
 					vs2[4][2] = 0.0;
@@ -4762,13 +4773,15 @@ bool XFoil::mrchue()
 						if(ibl>=itran[is]) hmax = htmax;
 						direct = (hktest<hmax);
 					}
-					if(direct) {
+					if(direct)
+					{
 						//---------- update as usual
 						if(ibl>=itran[is]) 	cti = cti + rlx*vsrez[1];
 						thi = thi + rlx*vsrez[2];
 						dsi = dsi + rlx*vsrez[3];
 					}
-					else{
+					else
+					{
 						//---------- set prescribed hk for inverse calculation at the current station
 						if(ibl<itran[is]) 
 							//----------- laminar case: relatively slow increase in hk downstream
@@ -4777,7 +4790,8 @@ bool XFoil::mrchue()
 							//----------- transition interval: weighted laminar and turbulent case
 							htarg = hk1 + (0.03*(xt-x1) - 0.15*(x2-xt))/t1;
 						}
-						else if(wake) {
+						else if(wake)
+						{
 							//----------- turbulent wake case:
 							//--          asymptotic wake behavior with approximate backward euler
 							cst = 0.03*(x2-x1)/t1;
@@ -4797,7 +4811,7 @@ bool XFoil::mrchue()
 						else htarg = qMax(htarg , hmax);
 						
 						QString str;
-						str = QString(tr("     mrchue: inverse mode at %1    hk =%2\r\n")).arg(ibl).arg(htarg,0,'f',3);
+						str = QString(QObject::tr("     mrchue: inverse mode at %1    hk =%2\r\n")).arg(ibl).arg(htarg,0,'f',3);
 						WriteString(str);
 
 
@@ -4806,7 +4820,8 @@ bool XFoil::mrchue()
 						goto stop100;
 					}
 				}
-				else{
+				else
+				{
 					//-------- inverse mode (force hk to prescribed value htarg)
 					vs2[4][1] = 0.0;
 					vs2[4][2] = hk2_t2;
@@ -4847,11 +4862,12 @@ stop100:
 
 
 			//TRACE(" mrchue: convergence failed at %d,  side %d, res = %f\n", ibl, is, dmax);
-			str = QString(tr("     mrchue: convergence failed at %1,  side %2, res = %3\r\n")).arg( ibl).arg( is).arg( dmax,0,'f',3);
+			str = QString(QObject::tr("     mrchue: convergence failed at %1,  side %2, res = %3\r\n")).arg( ibl).arg( is).arg( dmax,0,'f',3);
 			WriteString(str, true);
 
 			//------ the current unconverged solution might still be reasonable...
-			if(dmax > 0.1) {
+			if(dmax > 0.1)
+			{
 				
 				//------- the current solution is garbage --> extrapolate values instead
 				if(ibl>3) {
@@ -4949,13 +4965,13 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls)
 	cla = qMax(cls, 0.000001);
 	if(retyp<1 || retyp>3)
 	{
-		QString str(tr("    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re "));
+		QString str(QObject::tr("    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re "));
 		WriteString(str, true);
 		retyp = 1;
 	}
 	if(matyp<1 || matyp>3)
 	{
-		QString str(tr("    mrcl:  illegal Mach(cls) dependence trigger\r\n Setting fixed Mach"));
+		QString str(QObject::tr("    mrcl:  illegal Mach(cls) dependence trigger\r\n Setting fixed Mach"));
 		WriteString(str, true);
 		matyp = 1;
 	}
@@ -5007,9 +5023,9 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls)
 	if(minf >= 0.99)
 	{
 		//TRACE("      artificially limiting mach to  0.99\n");
-		QString str(tr("mrcl: Cl too low for chosen Mach(Cl) dependence\r\n"));
+		QString str(QObject::tr("mrcl: Cl too low for chosen Mach(Cl) dependence\r\n"));
 		WriteString(str, true);
-		str = tr("      artificially limiting mach to  0.99");
+		str = QObject::tr("      artificially limiting mach to  0.99");
 		WriteString(str, true);
 		minf = 0.99;
 		m_cls = 0.0;
@@ -5021,9 +5037,9 @@ bool XFoil::mrcl(double cls, double &m_cls, double &r_cls)
 	if(rrat > 100.0)
 	{
 		//TRACE("     artificially limiting re to %f\n",reinf1*100.0);
-		QString str(tr("mrcl: cl too low for chosen Re(Cl) dependence\r\n"));
+		QString str(QObject::tr("mrcl: cl too low for chosen Re(Cl) dependence\r\n"));
 		WriteString(str, true);
-		str = QString(tr("      artificially limiting Re to %1\r\n")).arg(reinf1*100.0,0,'f',0);
+		str = QString(QObject::tr("      artificially limiting Re to %1\r\n")).arg(reinf1*100.0,0,'f',0);
 		WriteString(str, true);
 		reinf = reinf1*100.0;
 		r_cls = 0.0;
@@ -5100,7 +5116,7 @@ void XFoil::pangen()
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("PanGen: buffer airfoil not available."));
+		msgBox.setText(QObject::tr("PanGen: buffer airfoil not available."));
 		msgBox.exec();
 		n = 0;
 		return;
@@ -5481,7 +5497,7 @@ stop51:
 	}
 
 	//TRACE("Paneling convergence failed.  Continuing anyway...\n");
-		str = tr("Paneling convergence failed.  Continuing anyway...\r\n");
+		str = QObject::tr("Paneling convergence failed.  Continuing anyway...\r\n");
 		WriteString(str, true);
 
 stop11:
@@ -5527,7 +5543,7 @@ stop11:
 				if(n > IQX-1)
 				{
 					//TRACE("panel: too many panels. increase iqx in xfoil.inc");
-					QString str = tr("Panel: Too many panels. Increase IQX");
+					QString str = QObject::tr("Panel: Too many panels. Increase IQX");
 					WriteString(str, true);
 					return;
 				}
@@ -6644,7 +6660,7 @@ bool XFoil::qdcalc()
 	static double bbb[IQX];
 	
 	//TRACE("calculating source influence matrix ...\n");
-	QString str = tr("   Calculating source influence matrix ...\r\n");
+	QString str = QObject::tr("   Calculating source influence matrix ...\r\n");
 	WriteString(str);
 
 
@@ -7228,7 +7244,7 @@ bool XFoil::setbl()
 //     coefficients are then incorporated into the global newton system.	
 //-------------------------------------------------
 
-	static int i, ibl,iv,iw, j, js, jv, jbl, is, icom;
+	static int i, ibl,iv,iw, j, js, jv, jbl, is;
 	static int ile1,ile2,ite1,ite2,jvte1,jvte2;
 	static double usav[IVX+1][ISX];
 	static double u1_m[2*IVX+1], u2_m[2*IVX+1];
@@ -7298,7 +7314,7 @@ bool XFoil::setbl()
 	{
 		//----- initialize bl by marching with ue (fudge at separation)
 		//TRACE(" initializing bl ...\n");
-		QString str = tr("   Initializing bl ...\r\n");
+		QString str = QObject::tr("   Initializing bl ...\r\n");
 		WriteString(str);
 
 		mrchue();
@@ -7449,7 +7465,7 @@ bool XFoil::setbl()
 			if(ibl==itran[is] && !tran)
 			{
 				//TRACE("setbl: xtr???  n1=%d n2=%d: \n", ampl1, ampl2);
-				QString str = QString(tr("setbl: xtr???  n1=%1 n2=%2: \r\n")).arg( ampl1).arg( ampl2);
+				QString str = QString(QObject::tr("setbl: xtr???  n1=%1 n2=%2: \r\n")).arg( ampl1).arg( ampl2);
 				WriteString(str);
 			}
 			
@@ -7677,7 +7693,7 @@ bool XFoil::setbl()
 		QString strOut;
 		if(tforce[is])
 		{
-			strOut = QString(tr("     Side %1, forced transition at x/c = %2 %3\r\n"))
+			strOut = QString(QObject::tr("     Side %1, forced transition at x/c = %2 %3\r\n"))
 					 .arg(is).arg(xoctr[is],0,'f',4).arg(itran[is]);
 			//TRACE(strOut);
 			WriteString(strOut);
@@ -7685,7 +7701,7 @@ bool XFoil::setbl()
 		}
 		else
 		{
-			strOut = QString(tr("     Side %1,  free  transition at x/c = %2 %3\r\n")).arg(is).arg(xoctr[is],0,'f',4).arg(itran[is]);
+			strOut = QString(QObject::tr("     Side %1,  free  transition at x/c = %2 %3\r\n")).arg(is).arg(xoctr[is],0,'f',4).arg(itran[is]);
 			//TRACE(strOut);
 			WriteString(strOut);
 		}
@@ -7725,7 +7741,7 @@ void XFoil::scheck(double x[], double y[], int *n, double stol, bool *lchange){
 	//--- check stol for sanity
 	if(stol>0.3)
 	{
-		QString str(tr("scheck:  bad value for small panels (stol > 0.3)\r\n"));
+		QString str(QObject::tr("scheck:  bad value for small panels (stol > 0.3)\r\n"));
 		WriteString(str, true);
 		return;
 	}
@@ -7807,7 +7823,7 @@ bool XFoil::setexp(double s[], double ds1, double smax, int nn)
 	
 	if(nex<=1)
 	{
-		QString str(tr("setexp: cannot fill array.  n too small\r\n"));
+		QString str(QObject::tr("setexp: cannot fill array.  n too small\r\n"));
 		WriteString(str, true);
 		return false;
 	}
@@ -7834,7 +7850,7 @@ bool XFoil::setexp(double s[], double ds1, double smax, int nn)
 	}
 
 
-	str = tr("Setexp: Convergence failed.  Continuing anyway ...\r\n");
+	str = QObject::tr("Setexp: Convergence failed.  Continuing anyway ...\r\n");
 	WriteString(str, true);
 
 
@@ -7877,7 +7893,7 @@ double XFoil::seval(double ss, double x[], double xs[], double s[], int n)
 	//------------------------------------------------------
 
 	static int ilow, i, imid;
-	static double ds, t, cx1, cx2, sv1;
+	static double ds, t, cx1, cx2;
 
 	ilow = 1;
 	i = n;	
@@ -7933,7 +7949,7 @@ bool XFoil::sinvrt(double &si, double xi, double x[], double xs[], double s[], i
 		if(fabs(ds/(s[n]-s[1]))< 1.0e-5) return true;
 	}
 	
-	QString str = tr("Sinvrt: spline inversion failed, input value returned\r\n");
+	QString str = QObject::tr("Sinvrt: spline inversion failed, input value returned\r\n");
 	WriteString(str, true);
 	si = sisav;
 
@@ -8011,7 +8027,7 @@ bool XFoil::specal()
 	}
 	if(!bConv)
 	{
-		QString str(tr("Specal:  MInf convergence failed\r\n"));
+		QString str(QObject::tr("Specal:  MInf convergence failed\r\n"));
 		WriteString(str, true);
 		return false;
 	}
@@ -8104,7 +8120,7 @@ bool XFoil::speccl(){
 	}
 	if(!bConv)
 	{
-		QString str = tr("Speccl:  cl convergence failed");
+		QString str = QObject::tr("Speccl:  cl convergence failed");
 		WriteString(str, true);
 		return false;
 	}
@@ -8208,11 +8224,11 @@ bool XFoil::splind(double x[], double xs[], double s[], int n, double xs1, doubl
 	//                                                       |
 	//-------------------------------------------------------
 
-	double dsm, dsp;
+	static double dsm, dsp;
 
 	if(n>nmax)
 	{
-		QString str = tr("splind: array overflow, increase nmax");
+		QString str = QObject::tr("splind: array overflow, increase nmax");
 		WriteString(str, true);
 		return false;
 	}
@@ -8535,7 +8551,7 @@ bool XFoil::stfind()
 
 	if(!bFound)
 	{
-		QString str = tr("stfind: Stagnation point not found. Continuing ...\r\n");
+		QString str = QObject::tr("stfind: Stagnation point not found. Continuing ...\r\n");
 		WriteString(str, true);
 		i = n/2;
 	}
@@ -8974,7 +8990,7 @@ bool XFoil::trchek()
 	}
 
 	//TRACE("trchek2 - n2 convergence failed\n");
-	str = tr("trchek2 - n2 convergence failed\r\n");
+	str = QObject::tr("trchek2 - n2 convergence failed\r\n");
 	WriteString(str, true);
 	if(m_bCancel) return false;
 stop101:
@@ -9467,7 +9483,7 @@ bool XFoil::uicalc()
 	//--------------------------------------------------------------
 	static int i,ibl,is;
  
-	for (int is=1; is<=2;is++)
+	for (is=1; is<=2;is++)
 	{
 		uinv  [1][is] = 0.0;
 		uinv_a[1][is] = 0.0;
@@ -9965,7 +9981,7 @@ bool XFoil::ViscousIter()
 	if(pos>0)
 	{
 		lvconv = false;
-		str = tr("--------UNCONVERGED----------")+"\r\n\r\n";
+		str = QObject::tr("--------UNCONVERGED----------")+"\r\n\r\n";
 		WriteString(str, true);
 		return false;
 	}
@@ -9975,7 +9991,7 @@ bool XFoil::ViscousIter()
 		lvconv = true;
 		avisc = alfa;	
 		mvisc = minf;
-		str = tr("----------CONVERGED----------")+"\r\n\r\n";
+		str = QObject::tr("----------CONVERGED----------")+"\r\n\r\n";
 		WriteString(str, true);
 	}
 
@@ -10108,7 +10124,7 @@ bool XFoil::xifset(int is)
 	
 	if(xiforc < 0.0) {
 		//TRACE(" ***  stagnation point is past trip on side %d\n", is);
-		QString str = QString(tr(" ***  stagnation point is past trip on side %1\r\n")).arg(is);
+		QString str = QString(QObject::tr(" ***  stagnation point is past trip on side %1\r\n")).arg(is);
 		WriteString(str);
 
 		xiforc = xssi[iblte[is]][is];
@@ -10130,14 +10146,14 @@ bool XFoil::xyWake()
 	static double ds, ds1, sx, sy, smod;
 	static double psi, psi_x,psi_y;
 //
-	QString str(tr("   Calculating wake trajectory ...\r\n"));
+	QString str(QObject::tr("   Calculating wake trajectory ...\r\n"));
 	WriteString(str, true);
 	//
 	//--- number of wake points
 	nw = n/8 + 2;
 	if(nw>IWX)
 	{
-		QString str(tr(" XYWake: array size (IWX) too small.\n  Last wake point index reduced."));
+		QString str(QObject::tr(" XYWake: array size (IWX) too small.\n  Last wake point index reduced."));
 		WriteString(str, true);
 		nw = IWX;
 	}
@@ -10298,7 +10314,7 @@ int XFoil::arefine(double x[],double y[], double s[], double xs[], double ys[],
 	return k;
 	
 stop90: 
-	QString str = tr("sdouble:  Arrays will overflow.  No action taken.\r\n");
+	QString str = QObject::tr("sdouble:  Arrays will overflow.  No action taken.\r\n");
 	WriteString(str, true);
 
 //	nnew = 0;
@@ -10786,7 +10802,7 @@ bool XFoil::eiwset(int nc1){
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("eiwset: Array overflow. Increase ICX."));
+		msgBox.setText(QObject::tr("eiwset: Array overflow. Increase ICX."));
 		msgBox.exec();
 		return false;
 	}
@@ -11202,7 +11218,7 @@ void XFoil::zlefind(complex<double>*zle,complex<double>zc[],double wc[],
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("zlefind: le location failed."));
+		msgBox.setText(QObject::tr("zlefind: le location failed."));
 		msgBox.exec();
 		wcle = wc[icle];
 	}
@@ -11365,7 +11381,7 @@ void XFoil::qccalc(int ispec,double *alfa, double *cl, double *cm,
 		}
 		
 	}
-	QString str = QString(tr("qccalc: cl convergence failed.  dalpha =%1")).arg(dalfa,0,'f',4);
+	QString str = QString(QObject::tr("qccalc: cl convergence failed.  dalpha =%1")).arg(dalfa,0,'f',4);
 
 	QMessageBox msgBox;
 	msgBox.setStandardButtons(QMessageBox::Ok);
@@ -11614,8 +11630,8 @@ void XFoil::cncalc(double qc[], bool lsymm)
 	{
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("CNCALC: array overflow."));
+		msgBox.setWindowTitle(QObject::tr("Warning"));
+		msgBox.setText(QObject::tr("CNCALC: array overflow."));
 		msgBox.exec();		return;
 	}
 	
@@ -12056,7 +12072,7 @@ void XFoil::pert_process(int kqsp)
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("TE gap,chord did not converge"));
+		msgBox.setText(QObject::tr("TE gap,chord did not converge"));
 		msgBox.exec();
 		return;
 	}
@@ -12526,7 +12542,7 @@ bool XFoil::ExecQDES()
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
 		msgBox.setWindowTitle(QXDirect::tr("Warning"));
-		msgBox.setText(tr("Target segment cannot include \nstagnation point in mixed-inverse"));
+		msgBox.setText(QObject::tr("Target segment cannot include \nstagnation point in mixed-inverse"));
 		msgBox.exec();
 
 		return false;
@@ -13203,38 +13219,44 @@ bool XFoil::naca5(int ides, int nside)
 	
 	n543 = 100*n5 + 10*n4 + n3;
 	
-	if (n543 == 210){
+	if (n543 == 210)
+	{
 		//     p = 0.05
 		m = 0.0580;
 		c = 361.4;
 	}
-	else if (n543 == 220) {
+	else if (n543 == 220)
+	{
 		//     p = 0.10
 		m = 0.1260;
 		c = 51.64;
 	}
-	else if (n543 == 230) {
+	else if (n543 == 230)
+	{
 		//     p = 0.15
 		m = 0.2025;
 		c = 15.957;
 	}
-	else if (n543 == 240) {
+	else if (n543 == 240)
+	{
 		//     p = 0.20
 		m = 0.2900;
 		c = 6.643;
 	}
-	else if (n543 == 250) {
+	else if (n543 == 250)
+	{
 		//     p = 0.25
 		m = 0.3910;
 		c = 3.230;
 	}
-	else{
-		QString str(tr("Illegal 5-digit designation\n"));
-		str += tr("first three digits must be 210, 220, ... 250");
+	else
+	{
+		QString str(QObject::tr("Illegal 5-digit designation\n"));
+		str += QObject::tr("first three digits must be 210, 220, ... 250");
 		ides = 0;
 		QMessageBox msgBox;
 		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setWindowTitle(QXDirect::tr("Warning"));
+		msgBox.setWindowTitle(QObject::tr("Warning"));
 		msgBox.setText(str);
 		msgBox.exec();
 
@@ -13244,30 +13266,32 @@ bool XFoil::naca5(int ides, int nside)
 	t = (double)(n2*10 + n1) / 100.0;
 	
 	anp = an + 1.0;
-	for(i=1; i<= nside; i++){
+	for(i=1; i<= nside; i++)
+	{
 		frac = (double)(i-1)/(double)(nside-1);
 		xx[i] = 1.0 - anp*frac*pow((1.0-frac),an) - pow((1.0-frac),anp);
 		yt[i] = ( 0.29690*sqrt(xx[i])
-			- 0.12600*xx[i]
-			- 0.35160*xx[i]*xx[i]
-			+ 0.28430*xx[i]*xx[i]*xx[i]
-			- 0.10150*xx[i]*xx[i]*xx[i]*xx[i]) * t / 0.20;
+				  - 0.12600*xx[i]
+				  - 0.35160*xx[i]*xx[i]
+				  + 0.28430*xx[i]*xx[i]*xx[i]
+				  - 0.10150*xx[i]*xx[i]*xx[i]*xx[i]) * t / 0.20;
 		if(xx[i]<m)
-			yc[i] = (c/6.0) * (xx[i]*xx[i]*xx[i] - 3.0*m*xx[i]*xx[i]
-			+ m*m*(3.0-m)*xx[i]);
+			yc[i] = (c/6.0) * (xx[i]*xx[i]*xx[i] - 3.0*m*xx[i]*xx[i] + m*m*(3.0-m)*xx[i]);
 		else
 			yc[i] = (c/6.0) * m*m*m * (1.0 - xx[i]);
 		
 	}
 	
 	ib = 0;
-	for(i=nside;i>=1;i--){
+	for(i=nside;i>=1;i--)
+	{
 		ib = ib + 1;
 		xb[ib] = xx[i];
 		yb[ib] = yc[i] + yt[i];
 	}
 	
-	for(i=2; i<= nside;i++){
+	for(i=2; i<= nside;i++)
+	{
 		ib = ib + 1;
 		xb[ib] = xx[i];
 		yb[ib] = yc[i] - yt[i];

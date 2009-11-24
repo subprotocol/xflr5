@@ -1640,7 +1640,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 	{
 		if(m_pWing->m_pPanel[p].m_bIsTrailing)
 		{
-			C = (m_pNode[m_pWing->m_pPanel[p].m_iTA] + m_pNode[m_pWing->m_pPanel[p].m_iTB])/2.0;
+			C = (m_pNode[m_pWing->m_pPanel[p].m_iTA] + m_pNode[m_pWing->m_pPanel[p].m_iTB])/2.0;			
 			for (pp=0; pp<m_MatSize; pp++)
 			{
 				VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
@@ -1654,6 +1654,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 
 	if(m_pWing2)
 	{
+		memset(m_pWing2->m_Vd, 0, sizeof(m_pWing2->m_Vd));
 		m=0;
 		for (p=0; p< m_pWing2->m_MatSize; p++)
 		{
@@ -1673,6 +1674,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 
 	if(m_pStab)
 	{
+		memset(m_pStab->m_Vd, 0, sizeof(m_pStab->m_Vd));
 		m=0;
 		for (p=0; p< m_pStab->m_MatSize; p++)
 		{
@@ -1692,6 +1694,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 
 	if(m_pFin)
 	{
+		memset(m_pFin->m_Vd, 0, sizeof(m_pFin->m_Vd));
 		m=0;
 		for (p=0; p< m_pFin->m_MatSize; p++)
 		{

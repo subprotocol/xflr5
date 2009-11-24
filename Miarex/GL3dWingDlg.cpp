@@ -2115,6 +2115,7 @@ void GL3dWingDlg::OnOK()
 
 	m_pWing->m_bVLMAutoMesh = false;
 
+
 	m_pWing->ComputeGeometry();
 
 	accept();

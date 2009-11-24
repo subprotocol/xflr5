@@ -59,7 +59,7 @@ struct blData
 
 
 
-class XFoil : public QObject
+class XFoil
 {
 	friend class QXDirect;
 	friend class QXInverse;
@@ -70,7 +70,6 @@ class XFoil : public QObject
 	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
 
-	Q_OBJECT
 
 //-----Specific Inverse MDES-------------------------------
 public:

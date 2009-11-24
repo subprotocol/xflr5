@@ -987,7 +987,7 @@ void PlaneDlg::SetupLayout()
 	m_pctrlFinCheck = new QCheckBox(tr("Fin"));
 	m_pctrlDefineFin = new QPushButton(tr("Define"));
 	m_pctrlDoubleFin = new QCheckBox(tr("Double Fin"));
-	m_pctrlSymFin = new QCheckBox(tr("Symetric Fin"));
+	m_pctrlSymFin = new QCheckBox(tr("Two-sided Fin"));
 	QLabel *lab31 = new QLabel(tr("x="));
 	QLabel *lab32 = new QLabel(tr("y="));
 	QLabel *lab33 = new QLabel(tr("z="));

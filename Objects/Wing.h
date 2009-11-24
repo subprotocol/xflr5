@@ -32,7 +32,7 @@
 // CWing dialog
 
 
-class CWing : public QObject
+class CWing
 {
 	friend class QMiarex;
 	friend class MainFrame;
@@ -52,7 +52,6 @@ class CWing : public QObject
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;
 
-	Q_OBJECT
 	// Construction
 public:
 
