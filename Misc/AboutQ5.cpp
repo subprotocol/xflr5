@@ -26,7 +26,7 @@
 
 AboutQ5::AboutQ5(void *parent)
 {
-	setWindowTitle("About QFLR5");
+	setWindowTitle(tr("About QFLR5"));
 
 	m_pMainFrame = parent;
 
@@ -54,17 +54,17 @@ void AboutQ5::SetupLayout()
 	LogoLayout->addStretch(4);
 
 
-	QLabel *lab2  = new QLabel("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94");
-	QLabel *lab3  = new QLabel("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00");
-	QLabel *lab4  = new QLabel("Copyright (C) Andre Deperrois 2003-2009");
-	QLabel *lab5  = new QLabel("This program is distributed in the hope that it will be useful,");
-	QLabel *lab6  = new QLabel("but WITHOUT ANY WARRANTY; without even the implied warranty of");
-	QLabel *lab7  = new QLabel("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
-	QLabel *lab8  = new QLabel("This program has been developped exclusively for the analysis of model aircraft");
-	QLabel *lab9  = new QLabel("Any other usage is strongly disapproved");
-	QLabel *lab10 = new QLabel("Program distributed  under the terms of the GNU General Public License");
+	QLabel *lab2  = new QLabel(tr("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94"));
+	QLabel *lab3  = new QLabel(tr("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00"));
+	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2009"));
+	QLabel *lab5  = new QLabel(tr("This program is distributed in the hope that it will be useful,"));
+	QLabel *lab6  = new QLabel(tr("but WITHOUT ANY WARRANTY; without even the implied warranty of"));
+	QLabel *lab7  = new QLabel(tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
+	QLabel *lab8  = new QLabel(tr("This program has been developped exclusively for the analysis of model aircraft"));
+	QLabel *lab9  = new QLabel(tr("Any other usage is strongly disapproved"));
+	QLabel *lab10 = new QLabel(tr("Program distributed  under the terms of the GNU General Public License"));
 
-	QPushButton *AboutQt = new QPushButton("About Qt");
+	QPushButton *AboutQt = new QPushButton(tr("About Qt"));
 	connect(AboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
 
 	m_pXFLR5Link = new QLabel;
@@ -77,7 +77,7 @@ void AboutQ5::SetupLayout()
 	LinkLayout->addStretch(1);
 	LinkLayout->addWidget(AboutQt);
 
-	OKButton = new QPushButton("OK");
+	OKButton = new QPushButton(tr("OK"));
 	QHBoxLayout *OKLayout = new QHBoxLayout;
 	OKLayout->addStretch(1);
 	OKLayout->addWidget(OKButton);

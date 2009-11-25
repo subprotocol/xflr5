@@ -67,19 +67,19 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 
 //	strong ="\n    " + pFrame->m_VersionName + "\n\n";
     out << "\n    QFLR5_v.0001\n\n";
-	strong =" Calculated polar for: ";
+	strong =tr(" Calculated polar for: ");
 	strong += m_FoilName + "\n\n";
     out << strong;
 	strong = QString(" %1 %2").arg(m_ReType).arg(m_MaType);
-	if(m_ReType==1) strong += " Reynolds number fixed       ";
-	else if(m_ReType==2) strong += " Reynolds number ~ 1/sqrt(CL)";
-	else if(m_ReType==3) strong += " Reynolds number ~ 1/CL      ";
-	if(m_MaType==1) strong += "   Mach number fixed         ";
-	else if(m_MaType==2) strong += "   Mach number ~ 1/sqrt(CL)  ";
-	else if(m_MaType==3) strong += "   Mach number ~ 1/CL        ";
+	if(m_ReType==1) strong += tr(" Reynolds number fixed       ");
+	else if(m_ReType==2) strong += tr(" Reynolds number ~ 1/sqrt(CL)");
+	else if(m_ReType==3) strong += tr(" Reynolds number ~ 1/CL      ");
+	if(m_MaType==1) strong += tr("   Mach number fixed         ");
+	else if(m_MaType==2) strong += tr("   Mach number ~ 1/sqrt(CL)  ");
+	else if(m_MaType==3) strong += tr("   Mach number ~ 1/CL        ");
 	strong +="\n\n";
     out << strong;
-	strong=QString(" xtrf =   %1 (top)        %2 (bottom)\n")
+	strong=QString(tr(" xtrf =   %1 (top)        %2 (bottom)\n"))
 					.arg(m_XTop,0,'f',3).arg(m_XBot,0,'f',3);
     out << strong;
 
@@ -89,8 +89,8 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 
 	if(m_Type != 4)
 	{
-        if(FileType==1)	Header = "  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n";
-        else            Header = "alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n";
+        if(FileType==1)	Header = tr("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+        else            Header = tr("alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
         out << Header;
 		if(FileType==1)
 		{
@@ -130,8 +130,8 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 	}
 	else 
 	{
-        if(FileType==1) Header=QString("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n");
-        else            Header=QString("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
+        if(FileType==1) Header=QString(tr("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
+        else            Header=QString(tr("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
         out << Header;
 		if(FileType==1)
 		{

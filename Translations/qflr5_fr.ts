@@ -45,6 +45,57 @@
     </message>
 </context>
 <context>
+    <name>AboutQ5</name>
+    <message>
+        <source>About QFLR5</source>
+        <translation>À propos de QFLR5</translation>
+    </message>
+    <message>
+        <source>Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94</source>
+        <translation>Copyright (C) M. Drela et H. Youngren 2000 - XFoil v6.94</translation>
+    </message>
+    <message>
+        <source>Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00</source>
+        <translation>Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00</translation>
+    </message>
+    <message>
+        <source>Copyright (C) Andre Deperrois 2003-2009</source>
+        <translation>Copyright (C) Andre Deperrois 2003-2009</translation>
+    </message>
+    <message>
+        <source>This program is distributed in the hope that it will be useful,</source>
+        <translation>Ce programme est distribué avec l&apos;espoir qu&apos;il sera utile,</translation>
+    </message>
+    <message>
+        <source>but WITHOUT ANY WARRANTY; without even the implied warranty of</source>
+        <translation>mais SANS AUCUNE GARANTIE,sans même la garantie implicite d&apos;une</translation>
+    </message>
+    <message>
+        <source>MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</source>
+        <translation>QUELCONQUE VALEUR MARCHANDE ou de l&apos;ADÉQUATION À UN BESOIN PARTICULIER.</translation>
+    </message>
+    <message>
+        <source>This program has been developped exclusively for the analysis of model aircraft</source>
+        <translation>Ce programma a été développé exclusivement pour l’analyse de moèles réduits</translation>
+    </message>
+    <message>
+        <source>Any other usage is strongly disapproved</source>
+        <translation>Toute autre utilisation est fortement déconseillée</translation>
+    </message>
+    <message>
+        <source>Program distributed  under the terms of the GNU General Public License</source>
+        <translation>Ce programme est distribué selon les termes de la Licence Publique Générale GNU (GPL)</translation>
+    </message>
+    <message>
+        <source>About Qt</source>
+        <translation>À propos de Qt</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Accepter</translation>
+    </message>
+</context>
+<context>
     <name>BatchDlg</name>
     <message>
         <source>Analyze</source>
@@ -259,13 +310,13 @@ CPCALC: vitesse locale trop importante
     <message>
         <source>CpCalc: local speed too large 
  Compressibility corrections invalid</source>
-        <translation>CpCalc : vitesse locale trop élevée 
- Les corrections de compressibilité ne sont pas valables</translation>
+        <translation>CpCalc: vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valabes</translation>
     </message>
     <message>
         <source>   ...skipped after %1 iterations
 </source>
-        <translation>   ...sauté aptès %1 itérations
+        <translation>   ...sauté après %1 iterations
 </translation>
     </message>
     <message>
@@ -476,6 +527,80 @@ CPCALC: vitesse locale trop importante
     </message>
 </context>
 <context>
+    <name>CBody</name>
+    <message>
+        <source>Right Surface Points
+</source>
+        <translation>Points à la surface supérieure
+</translation>
+    </message>
+    <message>
+        <source>  Cross Section </source>
+        <translation>  Coupe</translation>
+    </message>
+</context>
+<context>
+    <name>CPolar</name>
+    <message>
+        <source> Calculated polar for: </source>
+        <translation> Polaire calculée pour : </translation>
+    </message>
+    <message>
+        <source> Reynolds number fixed       </source>
+        <translation> Nombre de Reynolds corrigé       </translation>
+    </message>
+    <message>
+        <source> Reynolds number ~ 1/sqrt(CL)</source>
+        <translation> Nombre de Reynolds ~ 1/sqrt(CZ)</translation>
+    </message>
+    <message>
+        <source> Reynolds number ~ 1/CL      </source>
+        <translation> Nombre de Reynolds ~ 1/CZ      </translation>
+    </message>
+    <message>
+        <source>   Mach number fixed         </source>
+        <translation>   Nombre de Mach corrigé         </translation>
+    </message>
+    <message>
+        <source>   Mach number ~ 1/sqrt(CL)  </source>
+        <translation>   Nombre de Mach  ~ 1/sqrt(CZ)  </translation>
+    </message>
+    <message>
+        <source>   Mach number ~ 1/CL        </source>
+        <translation>   Nombre de Mach ~ 1/CZ        </translation>
+    </message>
+    <message>
+        <source> xtrf =   %1 (top)        %2 (bottom)
+</source>
+        <translation> xtrf =   %1 (dessus)        %2 (dessous)
+</translation>
+    </message>
+    <message>
+        <source>  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    
+</source>
+        <translation type="unfinished">  alpha     CZ        CX       CXp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    
+</translation>
+    </message>
+    <message>
+        <source>alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp
+</source>
+        <translation type="unfinished">alpha,CZ,CX,CXp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp
+</translation>
+    </message>
+    <message>
+        <source>  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    
+</source>
+        <translation type="unfinished">  alpha     Re      CZ        CX       CXp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    
+</translation>
+    </message>
+    <message>
+        <source>alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp
+</source>
+        <translation type="unfinished">alpha,Re,CZ,CX,CXp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp
+</translation>
+    </message>
+</context>
+<context>
     <name>CSurface</name>
     <message>
         <source>Warning</source>
@@ -486,45 +611,6 @@ CPCALC: vitesse locale trop importante
 </source>
         <translation>Les profils continus en surface n&apos;ont pas le même angle initial... Abandon
 </translation>
-    </message>
-</context>
-<context>
-    <name>CWing</name>
-    <message>
-        <source>Description %1</source>
-        <translation>Description %1</translation>
-    </message>
-    <message>
-        <source>Wing Name</source>
-        <translation>Nom de l&apos;aile</translation>
-    </message>
-    <message>
-        <source>       Span pos = %1 </source>
-        <translation>       Position sur l&apos;nvergure = %1 </translation>
-    </message>
-    <message>
-        <source> ,  A+Ai+Twist = %1 could not be interpolated</source>
-        <translation> ,  A+Ai+Twist = %1 n&apos;a pas pu être interpolé</translation>
-    </message>
-    <message>
-        <source> ,  A+Ai+Twist = %1 is outside the flight envelope</source>
-        <translation> ,  A+Ai+Twist = %1 se trouve hors du domaine de vol</translation>
-    </message>
-    <message>
-        <source>,  Cl = %1 could not be interpolated</source>
-        <translation>,  Cz = %1 n&apos;a pas pu être interpolé</translation>
-    </message>
-    <message>
-        <source>,  Cl = %1 is outside the flight envelope</source>
-        <translation>,  Cz = %1 se trouve hors du domaine de vol</translation>
-    </message>
-    <message>
-        <source>          Span pos = %1 </source>
-        <translation>       Position sur l&apos;nvergure = %1 </translation>
-    </message>
-    <message>
-        <source>          Span pos = %1</source>
-        <translation>       Position sur l&apos;nvergure = %1 </translation>
     </message>
 </context>
 <context>
@@ -2044,7 +2130,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>Cdp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cxp</translation>
     </message>
     <message>
         <source>Cm</source>
@@ -2562,6 +2648,10 @@ Réduisez la taille du maillage</translation>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
+    <message>
+        <source>Line Picker</source>
+        <translation>Sélection des lignes</translation>
+    </message>
 </context>
 <context>
     <name>MainFrame</name>
@@ -2759,7 +2849,7 @@ Réduisez la taille du maillage</translation>
     </message>
     <message>
         <source>&amp;Guidelines</source>
-        <translation>Lignes &amp;guides</translation>
+        <translation type="unfinished">&amp;Manuel utilisateur</translation>
     </message>
     <message>
         <source>Show the guidelines for some help</source>
@@ -3876,7 +3966,7 @@ Réduisez la taille du maillage</translation>
     <message>
         <source>A foil of that name already exists
 Please enter a new name</source>
-        <translation>Il existe déjà un profil portant ce nom
+        <translation>Il existre déjà un profil portant ce nom
 Veuillez entrer un autre nom</translation>
     </message>
 </context>
@@ -4440,10 +4530,6 @@ Il faut résuire le nombre de panneaux d’aile</translation>
         <translation>Double dérive</translation>
     </message>
     <message>
-        <source>Symetric Fin</source>
-        <translation>Dérive symétrique</translation>
-    </message>
-    <message>
         <source>Body</source>
         <translation>Fuselage</translation>
     </message>
@@ -4514,6 +4600,10 @@ Il faut résuire le nombre de panneaux d’aile</translation>
     <message>
         <source>Plane Inertia</source>
         <translation>Inertie de l&apos;avion</translation>
+    </message>
+    <message>
+        <source>Two-sided Fin</source>
+        <translation type="unfinished">Dérive à deux faces</translation>
     </message>
 </context>
 <context>
@@ -5805,6 +5895,313 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
         <source>Spline Foil</source>
         <translation type="unfinished">Profile en spline</translation>
     </message>
+    <message>
+        <source>Description %1</source>
+        <translation>Description %1</translation>
+    </message>
+    <message>
+        <source>Wing Name</source>
+        <translation>Nom de l&apos;aile</translation>
+    </message>
+    <message>
+        <source>       Span pos = %1 </source>
+        <translation>       Position sur l&apos;nvergure = %1 </translation>
+    </message>
+    <message>
+        <source> ,  A+Ai+Twist = %1 could not be interpolated</source>
+        <translation> ,  A+Ai+Twist = %1 n&apos;a pas pu être interpolé</translation>
+    </message>
+    <message>
+        <source> ,  A+Ai+Twist = %1 is outside the flight envelope</source>
+        <translation> ,  A+Ai+Twist = %1 se trouve hors du domaine de vol</translation>
+    </message>
+    <message>
+        <source>,  Cl = %1 could not be interpolated</source>
+        <translation>,  Cz = %1 n&apos;a pas pu être interpolé</translation>
+    </message>
+    <message>
+        <source>,  Cl = %1 is outside the flight envelope</source>
+        <translation>,  Cz = %1 se trouve hors du domaine de vol</translation>
+    </message>
+    <message>
+        <source>          Span pos = %1 </source>
+        <translation>       Position sur l&apos;envergure = %1 </translation>
+    </message>
+    <message>
+        <source>          Span pos = %1</source>
+        <translation>       Position sur l&apos;envergure = %1 </translation>
+    </message>
+    <message>
+        <source>Try executing PANE at top level instead</source>
+        <translation type="unfinished">Essayez plutôt d’exécuter PANE au niveau le plus haut</translation>
+    </message>
+    <message>
+        <source>Warning: High does not work well on rotated foils
+</source>
+        <translation type="unfinished">Attention : High ne fonctionne pas bien avec les profils pivotés
+</translation>
+    </message>
+    <message>
+        <source>Current chordline angle: %1
+proceeding anyway...</source>
+        <translation type="unfinished">Angle actuel de la ligne de corde : %1
+Poursuite cependant...</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Attention</translation>
+    </message>
+    <message>
+        <source>iblpan :  ***  bl array overflow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>*** iblsys: bl system array overflow. ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop ludcmp: array overflow. Increase nvx</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      artificially limiting mach to  0.99</source>
+        <translation>      limitation articdicielle du nombre de mach à 0.99</translation>
+    </message>
+    <message>
+        <source>PanGen: buffer airfoil not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panel: Too many panels. Increase IQX</source>
+        <translation>Panel: trop de panneaux, augmentez IQX</translation>
+    </message>
+    <message>
+        <source>Speccl:  cl convergence failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>splind: array overflow, increase nmax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>--------UNCONVERGED----------</source>
+        <translation>--------PAS DE CONVERGENCE----------</translation>
+    </message>
+    <message>
+        <source>----------CONVERGED----------</source>
+        <translation>----------CONVERGENCE----------</translation>
+    </message>
+    <message>
+        <source> XYWake: array size (IWX) too small.
+  Last wake point index reduced.</source>
+        <translation type="unfinished"> XYWake : dimensions du tablea (IWX) trop faibles.
+  L’index du dernier point de sillage a été réduit.</translation>
+    </message>
+    <message>
+        <source>eiwset: Array overflow. Increase ICX.</source>
+        <translation>eiwset : débordement de tableau, augmentez ICX.</translation>
+    </message>
+    <message>
+        <source>zlefind: le location failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>qccalc: cl convergence failed.  dalpha =%1</source>
+        <translation type="unfinished">qccalc: échec de la convergence de cz.  dalpha =%1</translation>
+    </message>
+    <message>
+        <source>CNCALC: array overflow.</source>
+        <translation>CNCALC : débordement de tableau.</translation>
+    </message>
+    <message>
+        <source>TE gap,chord did not converge</source>
+        <translation type="unfinished">Fente de BA, pas de convergence de la corde</translation>
+    </message>
+    <message>
+        <source>Target segment cannot include 
+stagnation point in mixed-inverse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Illegal 5-digit designation
+</source>
+        <translation>Désignation sur 5 chiffres non valable
+</translation>
+    </message>
+    <message>
+        <source>first three digits must be 210, 220, ... 250</source>
+        <translation>les trois premiers chiffres devraient être  210, 220, ... 250</translation>
+    </message>
+    <message>
+        <source>Maximum number of panel nodes  : %1
+</source>
+        <translation>Nombre maximum de nœuds de panneaux : %1
+</translation>
+    </message>
+    <message>
+        <source>Number of buffer airfoil points: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current airfoil cannot be set
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> CpCalc: local speed too large 
+ Compressibility corrections invalid 
+</source>
+        <translation>CpCalc: vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valabes
+</translation>
+    </message>
+    <message>
+        <source>   Calculating unit vorticity distributions ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase IVX to at least %1
+</source>
+        <translation>Augmenter IVX à au moins %1
+</translation>
+    </message>
+    <message>
+        <source>     mrchdu: convergence failed at %1 ,  side %2, res =%3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    Side %1 ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     mrchue: inverse mode at %1    hk =%2
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     mrchue: convergence failed at %1,  side %2, res = %3
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>    mrcl:  illegal Mach(cls) dependence trigger
+ Setting fixed Mach</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mrcl: Cl too low for chosen Mach(Cl) dependence
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mrcl: cl too low for chosen Re(Cl) dependence
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>      artificially limiting Re to %1
+</source>
+        <translation>      limitation artificielle de Re à %1
+</translation>
+    </message>
+    <message>
+        <source>Paneling convergence failed.  Continuing anyway...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   Calculating source influence matrix ...
+</source>
+        <translation>    Création de la matrice d’influence source...
+</translation>
+    </message>
+    <message>
+        <source>   Initializing bl ...
+</source>
+        <translation>   initialisation de bl ...
+</translation>
+    </message>
+    <message>
+        <source>setbl: xtr???  n1=%1 n2=%2: 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>     Side %1, forced transition at x/c = %2 %3
+</source>
+        <translation>     Face %1, transition forcée pour x/c = %2 %3
+</translation>
+    </message>
+    <message>
+        <source>     Side %1,  free  transition at x/c = %2 %3
+</source>
+        <translation>     Face %1,  transition libre pour x/c = %2 %3
+</translation>
+    </message>
+    <message>
+        <source>scheck:  bad value for small panels (stol &gt; 0.3)
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>setexp: cannot fill array.  n too small
+</source>
+        <translation>setexp: impossible de remplir le tableau : n est trop faible
+</translation>
+    </message>
+    <message>
+        <source>Setexp: Convergence failed.  Continuing anyway ...
+</source>
+        <translation>Setexp: Échec de convergence. Poursuite cependant ...
+</translation>
+    </message>
+    <message>
+        <source>Sinvrt: spline inversion failed, input value returned
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specal:  MInf convergence failed
+</source>
+        <translation>Specal:  échec de la convergence de MInf 
+</translation>
+    </message>
+    <message>
+        <source>stfind: Stagnation point not found. Continuing ...
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>trchek2 - n2 convergence failed
+</source>
+        <translation>trchek2 - échec de la convergence n2
+</translation>
+    </message>
+    <message>
+        <source> ***  stagnation point is past trip on side %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>   Calculating wake trajectory ...
+</source>
+        <translation>   Calculde la trajectoire du sillage...
+</translation>
+    </message>
+    <message>
+        <source>sdouble:  Arrays will overflow.  No action taken.
+</source>
+        <translation>sdouble:  les tableaux vont déborder.  Aucune action n&apos;a été prise.
+</translation>
+    </message>
 </context>
 <context>
     <name>QXDirect</name>
@@ -6010,7 +6407,7 @@ CpCalc: vitesse locale trop importante
     </message>
     <message>
         <source>Cdp</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cxp</translation>
     </message>
     <message>
         <source>Cm</source>
@@ -6198,7 +6595,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     </message>
     <message>
         <source>X</source>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <source>Cp Graph</source>
@@ -6243,12 +6640,14 @@ Face supérieure
     <message>
         <source>    x         Hk     Ue/Vinf      Cf        Cd     A/A0       D*       Theta      CTq
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">    x         Hk     Ue/Vinf      Cf        Cx     A/A0       D*       Theta      CTq
+</translation>
     </message>
     <message>
         <source>x,Hk,Ue/Vinf,Cf,Cd,A/A0,D*,Theta,CTq
 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">x,Hk,Ue/Vinf,Cf,Cx,A/A0,D*,Theta,CTq
+</translation>
     </message>
     <message>
         <source>
@@ -6309,7 +6708,7 @@ Face inférieure
     </message>
     <message>
         <source>Drag points to modify splines, Apply, and Execute to generate the new geometry</source>
-        <translation>Glissez les poinsts pour modifier les splines. Appliqer et Exécuter pour créer la nouvelle géométrie</translation>
+        <translation>Glissez les points pour modifier les splines. Appliqer et Exécuter pour créer la nouvelle géométrie</translation>
     </message>
     <message>
         <source>Mark target segment for modification</source>
@@ -6483,6 +6882,10 @@ Face inférieure
         <source>Smoothing</source>
         <translation>Lissage</translation>
     </message>
+    <message>
+        <source>Q Graph</source>
+        <translation type="unfinished">Diagramme Q</translation>
+    </message>
 </context>
 <context>
     <name>ReListDlg</name>
@@ -6552,6 +6955,10 @@ Face inférieure
     <message>
         <source>Enter a name</source>
         <translation>Entrer un nom</translation>
+    </message>
+    <message>
+        <source>Note : Overwrite will delete Opps and reset polars</source>
+        <translation>Note : écraser va dupprimer les points de fonctionnement er réinitialiser les polaires</translation>
     </message>
 </context>
 <context>
@@ -6819,6 +7226,42 @@ Les cadres ont un nombre de points par face différent</translation>
         <source>Cancel</source>
         <translation>Abandonner</translation>
     </message>
+    <message>
+        <source>Select units for this project :</source>
+        <translation>Sélection des unités pour ce projet :</translation>
+    </message>
+    <message>
+        <source>Units Dialog</source>
+        <translation>Dialogue des unités</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Longueur</translation>
+    </message>
+    <message>
+        <source>Area</source>
+        <translation>Surface</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Vitesse</translation>
+    </message>
+    <message>
+        <source>Weight</source>
+        <translation>Poids</translation>
+    </message>
+    <message>
+        <source>Force</source>
+        <translation>Force</translation>
+    </message>
+    <message>
+        <source>Moment</source>
+        <translation>Moment</translation>
+    </message>
+    <message>
+        <source>Define the project units</source>
+        <translation>Définir les unités du projet</translation>
+    </message>
 </context>
 <context>
     <name>VLMAnalysisDlg</name>
@@ -6871,7 +7314,7 @@ Failed to create RHS....
 </source>
         <translation>
 
-Échec de cration du vecteur RHS....
+Échec de cration de RHS....
 </translation>
     </message>
     <message>
@@ -6909,7 +7352,7 @@ Matrice singulière - interruption....
 
 
 </source>
-        <translation>      Interpolation non couronnée de succès pour Contrôle=%1 - sauté.
+        <translation>      Interpolation non couronnée de succès pour Contrôel=%1 - saut.
 
 
 </translation>
@@ -7001,7 +7444,7 @@ Analyse VLM terminée ... Des erreurs ont été rencontrées
     <message>
         <source>        ...Alpha = %1
 </source>
-        <translation>        ...Alpha = %1
+        <translation>       Alpha = %1 
 </translation>
     </message>
     <message>
@@ -7067,7 +7510,8 @@ Analyse VLM terminée ... Des erreurs ont été rencontrées
     <message>
         <source>      Calculating the vortices circulations...
 </source>
-        <translation type="unfinished"></translation>
+        <translation>      Calcula de la circulation des tourbillons...
+</translation>
     </message>
     <message>
         <source>      Calculating speeds to balance the weight
@@ -7266,7 +7710,7 @@ Analyse VLM terminée ... Des erreurs ont été rencontrées
     </message>
     <message>
         <source>Type 4 (Fixed aoa)</source>
-        <translation>Type 4 (anfgle d(attaque constant)</translation>
+        <translation>Type 4 (angle d&apos;attaque constant)</translation>
     </message>
     <message>
         <source>Polar Type</source>
@@ -7290,7 +7734,7 @@ Analyse VLM terminée ... Des erreurs ont été rencontrées
     </message>
     <message>
         <source>Side Slip</source>
-        <translation>Glissement latéral</translation>
+        <translation>Dérapage</translation>
     </message>
     <message>
         <source>Plane and Flight Data</source>
@@ -7527,269 +7971,6 @@ Analyse VLM terminée ... Des erreurs ont été rencontrées
     </message>
 </context>
 <context>
-    <name>XFoil</name>
-    <message>
-        <source>Try executing PANE at top level instead</source>
-        <translation type="unfinished">Essayez plutôt d’exécuter PANE au niveau le plus haut</translation>
-    </message>
-    <message>
-        <source>Warning: High does not work well on rotated foils
-</source>
-        <translation type="unfinished">Attention : High ne fonctionne pas bien avec les profils pivotés
-</translation>
-    </message>
-    <message>
-        <source>Current chordline angle: %1
-proceeding anyway...</source>
-        <translation>Angle actuel de la ligne de corde : %1
-Poursuite cependant...</translation>
-    </message>
-    <message>
-        <source>iblpan :  ***  bl array overflow</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>*** iblsys: bl system array overflow. ***</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop ludcmp: array overflow. Increase nvx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>    mrcl:  illegal Re(cls) dependence trigger, Setting fixed Re </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>      artificially limiting mach to  0.99</source>
-        <translation>      limitation articdicielle du nombre de mach à 0.99</translation>
-    </message>
-    <message>
-        <source>PanGen: buffer airfoil not available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Panel: Too many panels. Increase IQX</source>
-        <translation>Panel: trop de panneaux, augmentez IQX</translation>
-    </message>
-    <message>
-        <source>Speccl:  cl convergence failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>splind: array overflow, increase nmax</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>--------UNCONVERGED----------</source>
-        <translation>--------PAS DE CONVERGENCE----------</translation>
-    </message>
-    <message>
-        <source>----------CONVERGED----------</source>
-        <translation>----------CONVERGENCE----------</translation>
-    </message>
-    <message>
-        <source> XYWake: array size (IWX) too small.
-  Last wake point index reduced.</source>
-        <translation> XYWake : dimensions du tablea (IWX) trop faibles.
-  L’index du dernier point de sillage a été réduit.</translation>
-    </message>
-    <message>
-        <source>eiwset: Array overflow. Increase ICX.</source>
-        <translation>eiwset : débordement de tableau, augmentez ICX.</translation>
-    </message>
-    <message>
-        <source>zlefind: le location failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>qccalc: cl convergence failed.  dalpha =%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CNCALC: array overflow.</source>
-        <translation>CNCALC : débordement de tableau.</translation>
-    </message>
-    <message>
-        <source>TE gap,chord did not converge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Target segment cannot include 
-stagnation point in mixed-inverse</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Illegal 5-digit designation
-</source>
-        <translation>Désignation sur 5 chiffres non valable
-</translation>
-    </message>
-    <message>
-        <source>first three digits must be 210, 220, ... 250</source>
-        <translation>les trois premiers chiffres devraient être  210, 220, ... 250</translation>
-    </message>
-    <message>
-        <source>Maximum number of panel nodes  : %1
-</source>
-        <translation>Nombre maximum de nœuds de panneau : %1
-</translation>
-    </message>
-    <message>
-        <source>Number of buffer airfoil points: %1
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Current airfoil cannot be set
-</source>
-        <translation>Le profil actuel ne peut pas être défini
-</translation>
-    </message>
-    <message>
-        <source> CpCalc: local speed too large 
- Compressibility corrections invalid 
-</source>
-        <translation>CpCalc : vitesse locale trop élevée 
- Les corrections de compressibilité ne sont pas valables</translation>
-    </message>
-    <message>
-        <source>   Calculating unit vorticity distributions ...
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Increase IVX to at least %1
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>     mrchdu: convergence failed at %1 ,  side %2, res =%3
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>    Side %1 ...
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>     mrchue: inverse mode at %1    hk =%2
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>     mrchue: convergence failed at %1,  side %2, res = %3
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>    mrcl:  illegal Mach(cls) dependence trigger
- Setting fixed Mach</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>mrcl: Cl too low for chosen Mach(Cl) dependence
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>mrcl: cl too low for chosen Re(Cl) dependence
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>      artificially limiting Re to %1
-</source>
-        <translation>      limitation articdicielle de Re à %1
-</translation>
-    </message>
-    <message>
-        <source>Paneling convergence failed.  Continuing anyway...
-</source>
-        <translation type="unfinished">Échec de la convergence de la mise en panneaux. Poursuite cependant...
-</translation>
-    </message>
-    <message>
-        <source>   Calculating source influence matrix ...
-</source>
-        <translation>    Création de la matrice source d’influence...
-</translation>
-    </message>
-    <message>
-        <source>   Initializing bl ...
-</source>
-        <translation type="unfinished">   Initialisation de bl ...
-</translation>
-    </message>
-    <message>
-        <source>setbl: xtr???  n1=%1 n2=%2: 
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>     Side %1, forced transition at x/c = %2 %3
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>     Side %1,  free  transition at x/c = %2 %3
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>scheck:  bad value for small panels (stol &gt; 0.3)
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>setexp: cannot fill array.  n too small
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Setexp: Convergence failed.  Continuing anyway ...
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sinvrt: spline inversion failed, input value returned
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Specal:  MInf convergence failed
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>stfind: Stagnation point not found. Continuing ...
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>trchek2 - n2 convergence failed
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> ***  stagnation point is past trip on side %1
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>   Calculating wake trajectory ...
-</source>
-        <translation>   Calcul de la trajectoire du sillage...
-</translation>
-    </message>
-    <message>
-        <source>sdouble:  Arrays will overflow.  No action taken.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>XFoilAdvancedDlg</name>
     <message>
         <source>OK</source>
@@ -7817,7 +7998,7 @@ stagnation point in mixed-inverse</source>
     </message>
     <message>
         <source>Show full log report for an XFoil analysis</source>
-        <translation type="unfinished">Afficher le journal complet pour une analyseXFoil</translation>
+        <translation>Afficher le journal complet pour une analyseXFoil</translation>
     </message>
 </context>
 <context>
@@ -7877,15 +8058,15 @@ CpCalc: la vitesse locale est triop élevée
     <message>
         <source>   Initializing viscous analysis ...
 </source>
-        <translation>Initialisation de l’analyse visqueuse...
+        <translation>   Initialisation de l&apos;analyse visqueuse ...
 </translation>
     </message>
     <message>
         <source>CpCalc: local speed too large 
  Compressibility corrections invalid 
 </source>
-        <translation>CpCalc : vitesse locale trop élevée 
- Les corrections de compressibilité ne sont pas valables
+        <translation>CpCalc: vitesse locale trop élevée 
+ Les corrections de compressibilité ne sont pas valabes
 </translation>
     </message>
     <message>

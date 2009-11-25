@@ -106,7 +106,7 @@ QXInverse::QXInverse(QWidget *parent)
 	m_QGraph.SetXMax(1.0);
 	m_QGraph.SetYMin(-0.1);
 	m_QGraph.SetYMax(0.1);
-	m_QGraph.SetGraphName("Q Graph");
+	m_QGraph.SetGraphName(tr("Q Graph"));
 	m_pQCurve  = m_QGraph.AddCurve();
 	m_pMCurve  = m_QGraph.AddCurve();
 	m_pQVCurve = m_QGraph.AddCurve();

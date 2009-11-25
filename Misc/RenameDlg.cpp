@@ -67,7 +67,7 @@ void RenameDlg::SetupLayout()
 	connect(OverwriteButton, SIGNAL(clicked()), this, SLOT(OnOverwrite()));
 
 	QLabel *LabelNote = new QLabel;
-	LabelNote->setText("Note : Overwrite will delete Opps and reset polars");
+	LabelNote->setText(tr("Note : Overwrite will delete Opps and reset polars"));
 
 	MainLayout->setStretchFactor(m_pctrlMessage, 1);
 	MainLayout->setStretchFactor(m_pctrlName, 1);

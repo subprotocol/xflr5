@@ -531,14 +531,14 @@ void CBody::ExportGeometry(int nx, int nh)
 	out  << (m_BodyName);
 	out  << ("\n\n");
 
-	out  << ("Right Surface Points\n");
+	out  << (tr("Right Surface Points\n"));
 	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
 	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
 	out  << (strong);
 
 	for (k=0; k<nx; k++)
 	{
-		strong = QString("  Cross Section "+str+"%1\n").arg(k+1,3);
+		strong = QString(tr("  Cross Section ")+str+"%1\n").arg(k+1,3);
 		out  << (strong);
 
 		u = (double)k / (double)(nx-1);

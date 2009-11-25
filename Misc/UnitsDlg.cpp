@@ -32,9 +32,9 @@ UnitsDlg::UnitsDlg()
 	m_Speed   = 0;
 	m_Force   = 0;
 	m_bLengthOnly = false;
-	m_Question = "Select units for this project :";
+	m_Question = tr("Select units for this project :");
 
-	setWindowTitle("Units Dialog");
+	setWindowTitle(tr("Units Dialog"));
 	SetupLayout();
 }
 
@@ -42,12 +42,12 @@ void UnitsDlg::SetupLayout()
 {
 	QGridLayout *UnitsLayout = new QGridLayout;
 
-	QLabel *lab1 = new QLabel("Length");
-	QLabel *lab2 = new QLabel("Area");
-	QLabel *lab3 = new QLabel("Speed");
-	QLabel *lab4 = new QLabel("Weight");
-	QLabel *lab5 = new QLabel("Force");
-	QLabel *lab6 = new QLabel("Moment");
+	QLabel *lab1 = new QLabel(tr("Length"));
+	QLabel *lab2 = new QLabel(tr("Area"));
+	QLabel *lab3 = new QLabel(tr("Speed"));
+	QLabel *lab4 = new QLabel(tr("Weight"));
+	QLabel *lab5 = new QLabel(tr("Force"));
+	QLabel *lab6 = new QLabel(tr("Moment"));
 	UnitsLayout->addWidget(lab1, 1,1);
 	UnitsLayout->addWidget(lab2, 2,1);
 	UnitsLayout->addWidget(lab3, 3,1);
@@ -55,7 +55,7 @@ void UnitsDlg::SetupLayout()
 	UnitsLayout->addWidget(lab5, 5,1);
 	UnitsLayout->addWidget(lab6, 6,1);
 
-	m_pctrlQuestion = new QLabel("Define the project units");
+	m_pctrlQuestion = new QLabel(tr("Define the project units"));
 
 	m_pctrlLengthFactor = new QLabel(" ");
 	m_pctrlSurfaceFactor = new QLabel(" ");
