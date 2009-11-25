@@ -20,23 +20,15 @@
 *****************************************************************************/
 
 
-// Polar.cpp: implementation of the CPolar class.
-//
-//////////////////////////////////////////////////////////////////////
-
 
 #include "Polar.h"
 #include "../Globals.h"
 #include "../XDirect/XFoil.h"
 
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CPolar::CPolar()
 {
-	pi = 3.141592654;
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
 	m_Style = 0;// = PS_SOLID
@@ -67,19 +59,19 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 
 //	strong ="\n    " + pFrame->m_VersionName + "\n\n";
     out << "\n    QFLR5_v.0001\n\n";
-	strong =tr(" Calculated polar for: ");
+	strong =(" Calculated polar for: ");
 	strong += m_FoilName + "\n\n";
     out << strong;
 	strong = QString(" %1 %2").arg(m_ReType).arg(m_MaType);
-	if(m_ReType==1) strong += tr(" Reynolds number fixed       ");
-	else if(m_ReType==2) strong += tr(" Reynolds number ~ 1/sqrt(CL)");
-	else if(m_ReType==3) strong += tr(" Reynolds number ~ 1/CL      ");
-	if(m_MaType==1) strong += tr("   Mach number fixed         ");
-	else if(m_MaType==2) strong += tr("   Mach number ~ 1/sqrt(CL)  ");
-	else if(m_MaType==3) strong += tr("   Mach number ~ 1/CL        ");
+	if(m_ReType==1) strong += (" Reynolds number fixed       ");
+	else if(m_ReType==2) strong += (" Reynolds number ~ 1/sqrt(CL)");
+	else if(m_ReType==3) strong += (" Reynolds number ~ 1/CL      ");
+	if(m_MaType==1) strong += ("   Mach number fixed         ");
+	else if(m_MaType==2) strong += ("   Mach number ~ 1/sqrt(CL)  ");
+	else if(m_MaType==3) strong += ("   Mach number ~ 1/CL        ");
 	strong +="\n\n";
     out << strong;
-	strong=QString(tr(" xtrf =   %1 (top)        %2 (bottom)\n"))
+	strong=QString((" xtrf =   %1 (top)        %2 (bottom)\n"))
 					.arg(m_XTop,0,'f',3).arg(m_XBot,0,'f',3);
     out << strong;
 
@@ -89,8 +81,8 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 
 	if(m_Type != 4)
 	{
-        if(FileType==1)	Header = tr("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
-        else            Header = tr("alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
+		if(FileType==1)	Header = ("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+		else            Header = ("alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
         out << Header;
 		if(FileType==1)
 		{
@@ -130,8 +122,8 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 	}
 	else 
 	{
-        if(FileType==1) Header=QString(tr("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
-        else            Header=QString(tr("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
+		if(FileType==1) Header=QString(("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
+		else            Header=QString(("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
         out << Header;
 		if(FileType==1)
 		{
@@ -208,7 +200,7 @@ void CPolar::AddData(void* ptrXFoil)
 {
 	XFoil *pXFoil = (XFoil*)ptrXFoil;
 	if(!pXFoil->lvisc) return;
-	double alpha = pXFoil->alfa*180.0/pi;
+	double alpha = pXFoil->alfa*180.0/PI;
 	m_ACrit = pXFoil->acrit;
 
 	AddPoint(alpha, pXFoil->cd, pXFoil->cdp, pXFoil->cl, pXFoil->cm, pXFoil->xoctr[1],
@@ -698,7 +690,7 @@ void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
     if(n<=1)
     {
 		Alpha0 = 0.0;
-		slope = 2.0*pi*pi/180.0;
+		slope = 2.0*PI*PI/180.0;
 		return;
 	}
 
@@ -717,7 +709,7 @@ void CPolar::GetLinearizedCl(double &Alpha0, double &slope)
 	}
 	if(fn*sum4 == sum2*sum2 || fn*sum1 == sum2 * sum3) {//very improbable...
 		Alpha0 = 0.0;
-		slope = 2.0*pi*pi/180.0;
+		slope = 2.0*PI*PI/180.0;
 		return;
 	}
 

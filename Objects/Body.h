@@ -26,7 +26,7 @@
 #include "Frame.h"
 #include "../Params.h"
 
-class CBody : public QObject
+class CBody
 {
 public:
 	CBody();

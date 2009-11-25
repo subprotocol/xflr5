@@ -33,7 +33,7 @@
 #include <QList>
 
 
-class CPolar : public QObject
+class CPolar
 {
 	friend class MainFrame;
 	friend class QMiarex;
@@ -52,8 +52,6 @@ private:
 	double m_ACrit;
 	double m_XTop; 
 	double m_XBot;
-
-	double pi;
 
 	int m_Style;
 	int m_Width;
