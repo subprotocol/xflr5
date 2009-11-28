@@ -317,8 +317,8 @@ bool GL3DScales::LoadSettings(QSettings *pSettings)
 	pSettings->beginGroup("GL3DScales");
 	{
 		pMiarex->m_bAutoCpScale = pSettings->value("AutoCpScale").toBool();
-		pMiarex->m_LegendMin    = pSettings->value("LegendMin").toInt();
-		pMiarex->m_LegendMax    = pSettings->value("LegendMax").toInt();
+		pMiarex->m_LegendMin    = pSettings->value("LegendMin").toDouble();
+		pMiarex->m_LegendMax    = pSettings->value("LegendMax").toDouble();
 		m_pos     = pSettings->value("Position").toInt();
 		m_NX      = pSettings->value("NX").toInt();
 		m_DeltaL  = pSettings->value("DeltaL").toDouble();

@@ -21,6 +21,8 @@ QFLR5 v0.04 Beta November xxx 2009
 	- Corrected the bug associated with tilted geometry calculations
 	- Corrected an error in the calculation of downwash for secondary wings and fins - main wing was OK
 	- Improved the 3D view of lift and drag for results with sideslip
+	- Fixed the issues with animation in Miarex
+	- Fixed the issue with 3d Cp scale settings
 	- Made a few corrections and enhancements
 
 

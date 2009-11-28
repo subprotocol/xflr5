@@ -10879,22 +10879,42 @@ void QMiarex::OnAnimate()
 		m_bAnimate = false;
 		return;
 	}
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	CWOpp* pWOpp;
+	CPOpp*pPOpp;
 	int l;
 
 	if(m_pctrlAnimate->isChecked())
 	{
-		for (l=0; l< m_poaWOpp->size(); l++)
+		if(m_pCurPlane)
 		{
-			pWOpp = (CWOpp*)m_poaWOpp->at(l);
-
-			if (pWOpp &&
-				pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&
-				pWOpp->m_WingName == m_pCurWing->m_WingName)
+			for (l=0; l< m_poaPOpp->size(); l++)
 			{
-					if(m_pCurWOpp->m_Alpha - pWOpp->m_Alpha<0.0001)
-						m_posAnimate = l-1;
+				pPOpp = (CPOpp*)m_poaPOpp->at(l);
+
+				if (pPOpp &&
+					pPOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&
+					pPOpp->m_PlaneName == m_pCurPlane->m_PlaneName)
+				{
+						if(m_pCurPOpp->m_Alpha - pPOpp->m_Alpha<0.0001)
+							m_posAnimate = l;
+				}
+			}
+		}
+		else if(m_pCurWing)
+		{
+			for (l=0; l< m_poaWOpp->size(); l++)
+			{
+				pWOpp = (CWOpp*)m_poaWOpp->at(l);
+
+				if (pWOpp &&
+					pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&
+					pWOpp->m_WingName == m_pCurWing->m_WingName)
+				{
+						if(m_pCurWOpp->m_Alpha - pWOpp->m_Alpha<0.0001)
+							m_posAnimate = l;
+				}
 			}
 		}
 		m_bAnimate  = true;
@@ -10904,59 +10924,36 @@ void QMiarex::OnAnimate()
 	}
 	else
 	{
-		m_pAnimateTimer->stop();
-		m_bAnimate = false;
-		if(m_posAnimate<0 || m_posAnimate>=m_poaWOpp->size()) return;
-		CWOpp* pWOpp = (CWOpp*)m_poaWOpp->at(m_posAnimate);
-		if(pWOpp) SetWOpp(pWOpp->m_Alpha);
-//		UpdateView();
-		return;
+		StopAnimate();
 	}
+	QApplication::restoreOverrideCursor();
 }
 
 
 
 void QMiarex::OnAnimateSingle()
 {
+	static bool bIsValid, bSkipOne;
+	static int size;
+	static CPOpp *pPOpp;
+	static CWOpp *pWOpp;
 	//KickIdle
-	if(m_iView==WPOLARVIEW) return; //nothing to animate
+	if(m_iView!=W3DVIEW && m_iView !=WOPPVIEW) return; //nothing to animate
+	if(!m_pCurWing || !m_pCurWPolar) return;
 
-	if(m_bAnimate)
+	if(m_pCurPlane)	size = m_poaPOpp->size();
+	else            size = m_poaWOpp->size();
+	if(size<=1) return;
+
+	bIsValid = false;
+	bSkipOne = false;
+
+	while(!bIsValid)
 	{
-		bool IsValid;
-
-		if(!m_pCurWing || !m_pCurWPolar) return;
-
-		int size;
-		if(m_pCurPlane)	size = m_poaPOpp->size();
-		else            size = m_poaWOpp->size();
-
-		if(size<=1) return;
-
-		CPOpp* pPOpp = NULL;
-		CWOpp* pWOpp = NULL;
+		pPOpp = NULL;
+		pWOpp = NULL;
 		//Find the current position to display
 
-		if(m_bAnimatePlus)
-		{
-			m_posAnimate++;
-			if (m_posAnimate >= size)
-			{
-				m_posAnimate = size-2;
-				m_bAnimatePlus = false;
-			}
-		}
-		else
-		{
-			m_posAnimate--;
-			if (m_posAnimate <0)
-			{
-				m_posAnimate = 1;
-				m_bAnimatePlus = true;
-			}
-		}
-
-		if(m_posAnimate<0 || m_posAnimate>=size) return;
 		if(m_pCurPlane)
 		{
 			pPOpp = (CPOpp*)m_poaPOpp->at(m_posAnimate);
@@ -10967,15 +10964,15 @@ void QMiarex::OnAnimateSingle()
 			pWOpp = (CWOpp*)m_poaWOpp->at(m_posAnimate);
 			if(!pWOpp) return;
 		}
-
 		if(m_pCurPlane)
-			IsValid =(pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName && pPOpp->m_PlaneName == m_pCurPlane->m_PlaneName);
+			bIsValid =(pPOpp->m_PlrName==m_pCurWPolar->m_PlrName &&
+					  pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName);
 		else
-			IsValid =(pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName && pWOpp->m_WingName == m_pCurWing->m_WingName);
+			bIsValid =(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName &&
+					  pWOpp->m_WingName==m_pCurWing->m_WingName);
 
-		if (IsValid)
+		if (bIsValid && !bSkipOne)
 		{
-			m_pCurWOpp = pWOpp;
 			if(m_pCurPlane)
 			{
 				m_pCurPOpp = pPOpp;
@@ -11009,8 +11006,31 @@ void QMiarex::OnAnimateSingle()
 				CreateCpCurves();
 				UpdateView();
 			}
-
 		}
+		else if(bIsValid) bSkipOne = false;
+
+		if(m_bAnimatePlus)
+		{
+			m_posAnimate++;
+			if (m_posAnimate >= size)
+			{
+				m_posAnimate = size-1;
+				m_bAnimatePlus = false;
+				bSkipOne = true;
+			}
+		}
+		else
+		{
+			m_posAnimate--;
+			if (m_posAnimate <0)
+			{
+				m_posAnimate = 0;
+				m_bAnimatePlus = true;
+				bSkipOne = true;
+			}
+		}
+
+		if(m_posAnimate<0 || m_posAnimate>=size) return;
 	}
 }
 
@@ -17557,31 +17577,15 @@ void QMiarex::StopAnimate()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bAnimate = false;
 	m_pctrlAnimate->setChecked(false);
+	m_pAnimateTimer->stop();
 
-	if(m_posAnimate<0 || m_posAnimate>=m_poaWOpp->size()) return ;
-	CWOpp* pWOpp = (CWOpp*)m_poaWOpp->at(m_posAnimate);
-	if(!pWOpp) return;
-	SetWOpp(false, pWOpp->m_Alpha);
-
-	if(m_pCurWOpp)
+	if(m_pCurPlane)
 	{
-		QString str;
-		if(m_pCurWPolar->m_Type != 4) str = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
-		else                          str = QString("%1").arg(m_pCurWOpp->m_QInf, 8,'f',2);
-
-		int pos = pMainFrame->m_pctrlWOpp->findText(str);
-		if(pos >=0)
-		{
-			pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
-		}
-		else
-		{
-			pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
-		}
+		SetPOpp(true);
 	}
-	else
+	else if(m_pCurWing)
 	{
-		pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
+		SetWOpp(true);
 	}
 }
 
