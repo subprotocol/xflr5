@@ -12522,13 +12522,17 @@ void QMiarex::OnFoilNames()
 
 void QMiarex::OnFourWingGraphs()
 {
-	//The user has requested four wing graphs
 	m_iWingView = 4;
-	m_iView = WCPVIEW;
+	m_pCurGraph = &m_WingGraph1;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
 }
 
 
@@ -12536,12 +12540,20 @@ void QMiarex::OnFourWingGraphs()
 void QMiarex::OnFourWPlrGraphs()
 {
 	m_iWPlrView = 4;
+	m_pCurGraph = &m_WPlrGraph1;
+	m_pCurWPlrGraph = m_pCurGraph;
 
+	if(m_iView!=WPOLARVIEW) OnWPolars();
+	else
+	{
+		SetWPlrLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWPolarCurves();
-	SetWPlrLegendPos();
-	UpdateView();
 }
+
+
+
 
 
 void QMiarex::OnGL3DScale()
@@ -13923,55 +13935,67 @@ void QMiarex::OnSingleWPlrGraph4()
 
 void QMiarex::OnSingleWingGraph1()
 {
-	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph1;
-	m_pCurWingGraph = &m_WingGraph1;
-	m_iView = WOPPVIEW;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
 }
+
 
 void QMiarex::OnSingleWingGraph2()
 {
-	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph2;
-	m_pCurWingGraph = &m_WingGraph2;
-	m_iView = WOPPVIEW;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
 }
+
 
 void QMiarex::OnSingleWingGraph3()
 {
-	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph3;
-	m_pCurWingGraph = &m_WingGraph3;
-	m_iView = WOPPVIEW;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
+
 }
 
 
 void QMiarex::OnSingleWingGraph4()
 {
-	//The user has requested a single wing graph
 	m_iWingView = 1;
 	m_pCurGraph = &m_WingGraph4;
-	m_pCurWingGraph = &m_WingGraph4;
-	m_iView = WOPPVIEW;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
+
 }
 
 
@@ -14040,13 +14064,17 @@ void QMiarex::OnSetupLight()
 
 void QMiarex::OnTwoWingGraphs()
 {
-	//The user has requested two wing graphs
 	m_iWingView = 2;
-	m_iView = WOPPVIEW;
+	m_pCurGraph = &m_WingGraph1;
+	m_pCurWingGraph = m_pCurGraph;
+
+	if(m_iView!=WOPPVIEW) OnWOpps();
+	else
+	{
+		SetWingLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWOppCurves();
-	SetWingLegendPos();
-	UpdateView();
 }
 
 
@@ -14054,10 +14082,16 @@ void QMiarex::OnTwoWingGraphs()
 void QMiarex::OnTwoWPlrGraphs()
 {
 	m_iWPlrView = 2;
+	m_pCurGraph = &m_WPlrGraph1;
+	m_pCurWPlrGraph = m_pCurGraph;
+
+	if(m_iView!=WPOLARVIEW) OnWPolars();
+	else
+	{
+		SetWPlrLegendPos();
+		UpdateView();
+	}
 	CheckButtons();
-	CreateWPolarCurves();
-	SetWPlrLegendPos();
-	UpdateView();
 }
 
 
@@ -14098,7 +14132,7 @@ void QMiarex::OnWOpps()
 		return;
 	}
 
-	m_pCurGraph = m_pCurWingGraph;
+//	m_pCurGraph = m_pCurWingGraph;
 	m_iView=WOPPVIEW;
 
 	pMainFrame->SetCentralWidget();
@@ -14128,7 +14162,7 @@ void QMiarex::OnWPolars()
 	}
 
 	m_iView=WPOLARVIEW;
-	m_pCurGraph = &m_WPlrGraph1;
+//	m_pCurGraph = &m_WPlrGraph1;
 
 	pMainFrame->SetCentralWidget();
 	m_pctrlMiddleControls->setCurrentIndex(0);
