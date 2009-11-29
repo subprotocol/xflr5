@@ -380,8 +380,8 @@ void CWing::ComputeInertia(double const & Mass)
 			m_CoG.z += LocalVolume*rho * PtC4.z;
 		}
 	}
-	if(m_Mass>0.0) m_CoG *= 1.0/ m_Mass;
-	else           m_CoG.Set(0.0, 0.0, 0.0);
+	if(Mass>0.0) m_CoG *= 1.0/ Mass;
+	else         m_CoG.Set(0.0, 0.0, 0.0);
 
 
 	//then get the Inertia in both reference frames
