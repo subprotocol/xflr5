@@ -163,7 +163,7 @@ void QAFoil::CheckButtons()
 
 void QAFoil::CheckFoilParams(CFoil* pFoil)
 {
-	if(!pFoil && !g_pCurFoil)
+	if(!pFoil)
 	{
 		if(m_bSF)
 		{
@@ -185,7 +185,7 @@ void QAFoil::CheckFoilParams(CFoil* pFoil)
 		m_pctrlVisible->setChecked(pFoil->m_bVisible);
 		m_pctrlCenterLine->setChecked(pFoil->m_bCenterLine);
 		m_pctrlFoilPoints->setChecked(pFoil->m_bPoints);
-		m_pctrlFoilStyle->SetStyle(g_pCurFoil->m_nFoilStyle, g_pCurFoil->m_nFoilWidth, g_pCurFoil->m_FoilColor);
+		m_pctrlFoilStyle->SetStyle(pFoil->m_nFoilStyle, pFoil->m_nFoilWidth, pFoil->m_FoilColor);
 	}
 	CheckButtons();
 }
