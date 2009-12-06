@@ -4283,6 +4283,7 @@ void QXDirect::OnSavePolars()
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 
 	QDataStream ar(&XFile);
+	ar.setVersion(QDataStream::Qt_4_5);
 	ar.setByteOrder(QDataStream::LittleEndian);
 
 	pMainFrame->WritePolars(ar, g_pCurFoil);

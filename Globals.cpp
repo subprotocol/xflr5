@@ -24,6 +24,7 @@
 
 #include "Globals.h"
 #include <QPen>
+#include <QApplication>
 #include <QFile>
 #include <QTextStream>
 #include <QDir>
@@ -31,6 +32,7 @@
 #include <QByteArray>
 #include <math.h>
 #include <QtDebug>
+
 
 void ExpFormat(double &f, int &exp)
 {
@@ -49,6 +51,91 @@ void ExpFormat(double &f, int &exp)
 
 	f = f/pow(10.0,exp);
 
+}
+
+
+
+bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
+{
+	int row, i, j, pivot_row, k;
+	double max, dum, *pa, *pA, *A_pivot_row;
+	// for each variable find pivot row and perform forward substitution
+	pa = A;
+	for (row = 0; row < (n - 1); row++, pa += n)
+	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
+		//  find the pivot row
+		A_pivot_row = pa;
+		max = fabs(*(pa + row));
+		pA = pa + n;
+		pivot_row = row;
+		for (i=row+1; i < n; pA+=n, i++)
+		{
+			if ((dum = fabs(*(pA+row))) > max)
+			{
+				max = dum;
+				A_pivot_row = pA;
+				pivot_row = i;
+			}
+		}
+		if (max <= 0.0)
+		{
+			return false;                // the matrix A is singular
+		}
+			// and if it differs from the current row, interchange the two rows.
+
+		if (pivot_row != row)
+		{
+			for (i = row; i < n; i++)
+			{
+				dum = *(pa + i);
+				*(pa + i) = *(A_pivot_row + i);
+				*(A_pivot_row + i) = dum;
+			}
+			for(k=0; k<=m; k++)
+			{
+				dum = B[row+k*n];
+				B[row+k*n] = B[pivot_row+k*n];
+				B[pivot_row+k*n] = dum;
+			}
+		}
+
+		// Perform forward substitution
+		for (i = row+1; i<n; i++)
+		{
+			pA = A + i * n;
+			dum = - *(pA + row) / *(pa + row);
+			*(pA + row) = 0.0;
+			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
+			for (k=0; k<=m; k++)
+				B[i+k*n] += dum * B[row+k*n];
+		}
+	}
+	// Perform backward substitution
+
+	pa = A + (n - 1) * n;
+	for (row = n - 1; row >= 0; pa -= n, row--)
+	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
+
+		if ( *(pa + row) == 0.0 )
+		{
+			return false;           // matrix is singular
+		}
+		dum = 1.0 / *(pa + row);
+		for ( i = row + 1; i < n; i++) *(pa + i) *= dum;
+		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for ( i = 0, pA = A; i < row; pA += n, i++)
+		{
+			dum = *(pA + row);
+			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
+			for(k=0; k<=m; k++)
+				B[i+k*n] -= dum * B[row+k*n];
+		}
+	}
+	return true;
 }
 
 
@@ -639,6 +726,259 @@ void Trace(QString msg, double f)
 	tf->close();
 }
 
+void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
+{
+	//Quadrilateral VLM FORMULATION
+	// LA, LB, TA, TB are the vortex's four corners
+	// LA and LB are at the 3/4 point of panel nx
+	// TA and TB are at the 3/4 point of panel nx+1
+	//
+	//    LA__________LB               |
+	//    |           |                |
+	//    |           |                | freestream speed
+	//    |           |                |
+	//    |           |                \/
+	//    |           |
+	//    TA__________TB
+	//
+	//
+	//
+	// C is the point where the induced speed is calculated
+	// V is the resulting speed
+	//
+	// Vectorial operations are written explicitly to save computing times (4x more efficient)
+	//
+	double CoreSize = 0.000001;
+//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
+	static int i;
+	static CVector R[5];
+	static CVector r0, r1, r2, Psi, t;
+	static double r1v,r2v,ftmp, Omega;
+
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	R[0].x = LB.x;
+	R[0].y = LB.y;
+	R[0].z = LB.z;
+	R[1].x = TB.x;
+	R[1].y = TB.y;
+	R[1].z = TB.z;
+	R[2].x = TA.x;
+	R[2].y = TA.y;
+	R[2].z = TA.z;
+	R[3].x = LA.x;
+	R[3].y = LA.y;
+	R[3].z = LA.z;
+	R[4].x = LB.x;
+	R[4].y = LB.y;
+	R[4].z = LB.z;
+
+	for (i=0; i<4; i++)
+	{
+		r0.x = R[i+1].x - R[i].x;
+		r0.y = R[i+1].y - R[i].y;
+		r0.z = R[i+1].z - R[i].z;
+		r1.x = C.x - R[i].x;
+		r1.y = C.y - R[i].y;
+		r1.z = C.z - R[i].z;
+		r2.x = C.x - R[i+1].x;
+		r2.y = C.y - R[i+1].y;
+		r2.z = C.z - R[i+1].z;
+
+		Psi.x = r1.y*r2.z - r1.z*r2.y;
+		Psi.y =-r1.x*r2.z + r1.z*r2.x;
+		Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+		r1v = sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z));
+		r2v = sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		//get the distance of the TestPoint to the panel's side
+		t.x =  r1.y*r0.z - r1.z*r0.y;
+		t.y = -r1.x*r0.z + r1.z*r0.x;
+		t.z =  r1.x*r0.y - r1.y*r0.x;
+
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > CoreSize * CoreSize)
+		{
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
+
+			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/r1v - (r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/r2v;
+			V.x += Psi.x * Omega/4.0/PI;
+			V.y += Psi.y * Omega/4.0/PI;
+			V.z += Psi.z * Omega/4.0/PI;
+		}
+	}
+}
+
+
+
+void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool bAll)
+{
+	// CLASSIC VLM FORMULATION/
+	//
+	//    LA__________LB               |
+	//    |           |                |
+	//    |           |                | freestream speed
+	//    |           |                |
+	//    |           |                \/
+	//    |           |
+	//    \/          \/
+	//
+	// Note : the geometry has been rotated by sideslip, hence, there is no need to align the trailing vortices with sideslip
+	//
+	// V is the resulting speed at point C
+	//
+	// Vectorial operations are written inline to save computing times
+	// -->longer code, but 4x more efficient....
+
+	static CVector r0, r1, r2, Psi, t, h, Far;
+	static double  ftmp, Omega;
+	static double CoreSize = 0.000001;
+//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
+	V.Set(0.0,0.0,0.0);
+
+	if(bAll)
+	{
+		r0.x = B.x - A.x;
+		r0.y = B.y - A.y;
+		r0.z = B.z - A.z;
+
+		r1.x = C.x - A.x;
+		r1.y = C.y - A.y;
+		r1.z = C.z - A.z;
+
+		r2.x = C.x - B.x;
+		r2.y = C.y - B.y;
+		r2.z = C.z - B.z;
+
+		Psi.x = r1.y*r2.z - r1.z*r2.y;
+		Psi.y =-r1.x*r2.z + r1.z*r2.x;
+		Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+		//get the distance of the TestPoint to the panel's side
+		t.x =  r1.y*r0.z - r1.z*r0.y;
+		t.y = -r1.x*r0.z + r1.z*r0.x;
+		t.z =  r1.x*r0.y - r1.y*r0.x;
+
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) >CoreSize * CoreSize)
+		{
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
+
+			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+				   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+			V.x = Psi.x * Omega/4.0/PI;
+			V.y = Psi.y * Omega/4.0/PI;
+			V.z = Psi.z * Omega/4.0/PI;
+		}
+	}
+
+	// We create Far points to align the trailing vortices with the reference axis
+	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
+	// If this approximation is not valid, then the geometry should be tilted in the polar definition
+
+	// calculate left contribution
+	Far.x = A.x +  10000.0; //10 km... should be enough
+	Far.y = A.y;
+	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*PI/180.0);
+
+	r0.x = A.x - Far.x;
+	r0.y = A.y - Far.y;
+	r0.z = A.z - Far.z;
+
+	r1.x = C.x - A.x;
+	r1.y = C.y - A.y;
+	r1.z = C.z - A.z;
+
+	r2.x = C.x - Far.x;
+	r2.y = C.y - Far.y;
+	r2.z = C.z - Far.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+	t.x=1.0; t.y=0.0; t.z=0.0;
+
+	h.x =  r1.y*t.z - r1.z*t.y;
+	h.y = -r1.x*t.z + r1.z*t.x;
+	h.z =  r1.x*t.y - r1.y*t.x;
+
+	//Next add 'left' semi-infinite contribution
+	//eq.6-56
+
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
+	{
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
+
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
+	}
+
+	// calculate right vortex contribution
+	Far.x = B.x +  10000.0;
+	Far.y = B.y ;
+	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*PI/180.0);
+
+	r0.x = Far.x - B.x;
+	r0.y = Far.y - B.y;
+	r0.z = Far.z - B.z;
+
+	r1.x = C.x - Far.x;
+	r1.y = C.y - Far.y;
+	r1.z = C.z - Far.z;
+
+	r2.x = C.x - B.x;
+	r2.y = C.y - B.y;
+	r2.z = C.z - B.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+	//Last add 'right' semi-infinite contribution
+	//eq.6-57
+	h.x =  r2.y*t.z - r2.z*t.y;
+	h.y = -r2.x*t.z + r2.z*t.x;
+	h.z =  r2.x*t.y - r2.y*t.x;
+
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
+	{
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
+
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
+	}
+}
+
+
 
 void WriteCOLORREF(QDataStream &ar, QColor const &color)
 {
@@ -782,7 +1122,7 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 
 
 
-bool ludcmp(int n, double *a, int *indx)
+bool ludcmp(int n, double *a, int *indx, bool *pbCancel)
 {
 	//    *******************************************************
 	//    *                                                     *
@@ -822,6 +1162,8 @@ bool ludcmp(int n, double *a, int *indx)
 
 	for(j=1;j<= n;j++)
 	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
 		for(i=1; i<=j-1; i++)
 		{
 			sum = *(a+i*n+j);
@@ -869,18 +1211,20 @@ bool ludcmp(int n, double *a, int *indx)
 }
 
 
-bool baksub(int n, double *a, int *indx, double *b)
+bool baksub(int n, double *a, int *indx, double *b, bool *pbCancel)
 {
 	double sum;
 	int i, ii, ll, j;
 	ii = 0;
 	for (i=1;i<= n;i++)
 	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
 		ll = indx[i];
 		sum = b[ll];
 		b[ll] = b[i];
-		if(ii!=0)
-			for (j=ii;j<=i-1;j++) sum -= *(a+i*n+j) * b[j];
+		if(ii!=0)  
+			for (j=ii; j<=i-1; j++) sum -= *(a+i*n+j) * b[j];
 		else
 			if(sum!=0.0) ii = i;
 
@@ -889,23 +1233,68 @@ bool baksub(int n, double *a, int *indx, double *b)
 
 	for (i=n; i>=1; i--)
 	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
 		sum = b[i];
 		if(i<n)
-		for (j=i+1; j<= n; j++) sum -= *(a+i*n+j) * b[j];
+		for (j=i+1; j<=n; j++) sum -= *(a+i*n+j) * b[j];
 		b[i] = sum/ *(a+i*n+i);
 	}
 	return true;
 }
 
+
+bool baksub(int n, double *a, int *indx, double *RHS, int nb, bool *pbCancel)
+{
+	//same as baksub, except that we solve for nb RHS simultaneously
+
+	double sum;
+	int i, ii, ll, j, kb;
+	ii = 0;
+	for (i=1;i<= n;i++)
+	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
+		ll = indx[i];
+
+		for(kb=0; kb<nb; kb++)
+		{
+			sum = RHS[ll+kb*n];
+			RHS[ll+kb*n] = RHS[i+kb*n];
+			if(ii!=0)  
+				for (j=ii; j<=i-1; j++) sum -= *(a+i*n+j) * RHS[j+kb*n];
+			else
+				if(sum!=0.0) ii = i;
+
+			RHS[i+kb*n] = sum;
+		}
+	}
+
+	for (i=n; i>=1; i--)
+	{
+//		qApp->processEvents();
+		if(*pbCancel) return false;
+
+		for(kb=0; kb<nb; kb++)
+		{
+			sum = RHS[i+kb*n];
+			if(i<n)
+			for (j=i+1; j<=n; j++) sum -= *(a+i*n+j) * RHS[j+kb*n];
+			RHS[i+kb*n] = sum/ *(a+i*n+i);
+		}
+	}
+	return true;
+}
+
+
 double Det44(double *aij)
 {
 //	returns the determinant of a 4x4 matrix
 
-	int i,j,k,l,p,q;
-	double det = 0.0;
-	double a33[9];
-	double sign;
+	static int i,j,k,l,p,q;
+	static double det, sign, a33[9];
 
+	det = 0.0;
 	for(i=0; i<4; i++)
 	{
 		for(j=0; j<4; j++)
@@ -916,7 +1305,7 @@ double Det44(double *aij)
 				q = 0;
 				for(l=0; l<4 && l!=j; l++)
 				{
-					*(a33+p*3+q) = *(aij+4*i+j);// could also do it by address, to be a little faster
+					*(a33+p*3+q) = *(aij+4*k+l);// could also do it by address, to be a little faster
 					q++;
 				}
 				p++;
@@ -932,20 +1321,17 @@ double Det44(double *aij)
 double Det33(double *aij)
 {
 	//returns the determinant of a 3x3 matrix
-	int n=3;
-	double det = 0.0;
 
-	det  = *(aij+0*n+0) * (*(aij+1*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+1*n+2));
-	det -= *(aij+0*n+1) * (*(aij+1*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+1*n+2));
-	det += *(aij+0*n+2) * (*(aij+1*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+1*n+1));
+	double det;
 
-	det -= *(aij+1*n+0) * (*(aij+0*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+0*n+2));
-	det += *(aij+1*n+1) * (*(aij+0*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+0*n+2));
-	det -= *(aij+1*n+2) * (*(aij+0*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+0*n+1));
+	det  = aij[0]*aij[4]*aij[8];
+	det -= aij[0]*aij[5]*aij[7];
 
-	det += *(aij+2*n+0) * (*(aij+0*n+1) * *(aij+1*n+2) - *(aij+1*n+1) * *(aij+0*n+2));
-	det -= *(aij+2*n+1) * (*(aij+0*n+0) * *(aij+1*n+2) - *(aij+1*n+0) * *(aij+0*n+2));
-	det += *(aij+2*n+2) * (*(aij+0*n+0) * *(aij+1*n+1) - *(aij+1*n+0) * *(aij+0*n+1));
+	det -= aij[1]*aij[3]*aij[8];
+	det += aij[1]*aij[5]*aij[6];
+
+	det += aij[2]*aij[3]*aij[7];
+	det -= aij[2]*aij[4]*aij[6];
 
 	return det;
 }
@@ -955,23 +1341,127 @@ double Det33(double *aij)
 complex<double> Det33(complex<double> *aij)
 {
 	//returns the determinant of a 3x3 matrix
-	int n=3;
-	complex<double> det(0.0, 0.0);
+	complex<double> det;
 
-	det  = *(aij+0*n+0) * (*(aij+1*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+1*n+2));
-	det -= *(aij+0*n+1) * (*(aij+1*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+1*n+2));
-	det += *(aij+0*n+2) * (*(aij+1*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+1*n+1));
+	det  = aij[0]*aij[4]*aij[8];
+	det -= aij[0]*aij[5]*aij[7];
 
-	det -= *(aij+1*n+0) * (*(aij+0*n+1) * *(aij+2*n+2) - *(aij+2*n+1) * *(aij+0*n+2));
-	det += *(aij+1*n+1) * (*(aij+0*n+0) * *(aij+2*n+2) - *(aij+2*n+0) * *(aij+0*n+2));
-	det -= *(aij+1*n+2) * (*(aij+0*n+0) * *(aij+2*n+1) - *(aij+2*n+0) * *(aij+0*n+1));
+	det -= aij[1]*aij[3]*aij[8];
+	det += aij[1]*aij[5]*aij[6];
 
-	det += *(aij+2*n+0) * (*(aij+0*n+1) * *(aij+1*n+2) - *(aij+1*n+1) * *(aij+0*n+2));
-	det -= *(aij+2*n+1) * (*(aij+0*n+0) * *(aij+1*n+2) - *(aij+1*n+0) * *(aij+0*n+2));
-	det += *(aij+2*n+2) * (*(aij+0*n+0) * *(aij+1*n+1) - *(aij+1*n+0) * *(aij+0*n+1));
+	det += aij[2]*aij[3]*aij[7];
+	det -= aij[2]*aij[4]*aij[6];
 
 	return det;
 }
+
+
+complex<double> Cofactor44(complex<double> *aij, int &i, int &j)
+{
+	//returns the complex cofactor	of element i,j, in the 4x4 matrix aij
+	static int k,l,p,q;
+	static complex<double> a33[9];
+
+	p = 0;
+	for(k=0; k<4; k++)
+	{
+		if(k!=i)
+		{
+			q = 0;
+			for(l=0; l<4; l++)
+			{
+				if(l!=j)
+				{
+					a33[p*3+q] = *(aij+4*k+l);
+					q++;
+				}
+			}
+			p++;
+		}
+	}
+	return Det33(a33);
+}
+
+complex<double> Det44(complex<double> *aij)
+{
+//	returns the determinant of a 4x4 matrix
+
+	static int i,j,k,l,p,q;
+	static double sign;
+	static complex<double> det, a33[9];
+	det = 0.0;
+
+	i=0;
+	for(j=0; j<4; j++)
+	{
+		p = 0;
+		for(k=0; k<4; k++)
+		{
+			if(k!=i)
+			{
+				q = 0;
+				for(l=0; l<4; l++)
+				{
+					if(l!=j)
+					{
+						a33[p*3+q] = aij[4*k+l];
+						q++;
+					}
+				}
+				p++;
+			}
+		}
+		sign = pow(-1.0,i+j);
+		det += sign * aij[4*i+j] * Det33(a33);
+	}
+
+	return det;
+}
+
+
+bool Invert44(complex<double> *ain, complex<double> *aout)
+{
+	//small size, use the direct method
+	static int i,j;
+	static complex<double> det;
+	static double sign;
+	complex<double>nada;
+	det = Det44(ain);
+
+	if(abs(det)<PRECISION) return false;
+
+	for(i=0; i<4; i++)
+	{
+		for(j=0; j<4; j++)
+		{
+			sign = pow(-1.0,i+j);
+			aout[4*j+i] = sign * Cofactor44(ain, i, j)/det;
+		}
+	}
+	return true;
+}
+
+
+
+void TestInvert()
+{
+	complex<double> M[16], InvM[16];
+	for(int i=0; i<4; i++)
+		for(int j=0; j<4; j++)
+			M[4*i+j] = i-j;
+	M[0] = M[5] = M[10] = M[15] = 1.0;
+
+	for(int i=0; i<4; i++)	qDebug() << M[4*i+0].real() << M[4*i+1].real() << M[4*i+2].real() << M[4*i+3].real();
+
+	Invert44(M, InvM);
+
+	for(int i=0; i<4; i++)	qDebug() << InvM[4*i+0].real() << InvM[4*i+1].real() << InvM[4*i+2].real() << InvM[4*i+3].real();
+// qDebug() << "---------------";
+//	for(int i=0; i<4; i++)		qDebug() << InvM[4*i+0].imag() << InvM[4*i+1].imag() << InvM[4*i+2].imag() << InvM[4*i+3].imag();
+
+}
+
+
 
 void CharacteristicPol(double m[][4], double p[5])
 {
@@ -1059,8 +1549,6 @@ void CharacteristicPol(double m[][4], double p[5])
 
 
 #define POLYNOMORDER    6
-#define TOLERANCE  0.00000001
-#define PRECISION  0.00000001
 
 
 void TestEigen()
@@ -1089,47 +1577,18 @@ void TestEigen()
 
 	CharacteristicPol(A, p);
 
-//qDebug() << "x4 - 2x3 + 5x -10";
-
-//
-//qDebug("Calculated   %10.5f   %10.5f   %10.5f   %10.5f", roots[0], roots[1], roots[2], roots[3]);
-//qDebug() << "Mathlab -1.709975947,   2,  0.85498 +- 1.48088i";
 	complex<double> roots[POLYNOMORDER];
 
 	if(LinBairstow(p, roots, 4))
 	{
-/*		qDebug("%10.6f+i%10.6f    //    %10.6f+i %10.6f    //    %10.6f+i%10.6f    //     %10.6f+i%10.6f ",
-			   roots[0].real(), roots[0].imag(),
-			   roots[1].real(), roots[1].imag(),
-			   roots[2].real(), roots[2].imag(),
-			   roots[3].real(), roots[3].imag());*/
 	}
 	else
 	{
-//qDebug() << "No roots";
 	}
-/*
-qDebug() << "_______";
-	Eigenvector(AC, roots[0], V);
-qDebug() << "_______";
-	Eigenvector(AC, roots[1], V);
-qDebug() << "_______";
-	Eigenvector(AC, roots[2], V);
-qDebug() << "_______";
-	Eigenvector(AC, roots[3], V);
-*/
-/*
-//  check solution
-	complex<double> c(0,0);
-	for(int i=0; i<4; i++)
-	{
-		c += A[i][0]*V[0] + A[i][1]*V[1] + A[i][2]*V[2] + A[i][3]*V[3] - roots[3] * V[i];
-		qDebug("%d    %8.3e+%8.3ei", i, c.real(), c.imag());
-	}*/
 }
 
 
-bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
+bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V)
 {
 	//________________________________________________________________________
 	//Solves the system A.V = lambda.V for a 4x4 complex matrix
@@ -1137,10 +1596,10 @@ bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
 	//    - matrix A
 	//    - the array of complex eigenvalues
 	// in output
-	//    - the array of comple eigenvectors
+	//    - the array of complex eigenvectors
 	//
 	// eigen vector is solved by direct matrix solution
-	// one of the vector's component is set to 1, to avoid the trivial solution V= 0;
+	// one of the vector's component is set to 1, to avoid the trivial solution V=0;
 	//
 	// Andre Deperrois October 2009
 	//
@@ -1166,7 +1625,7 @@ bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
 				{
 					if(j!=kp)
 					{
-						m[ii*3+jj] = a[i*4+j];
+						m[ii*3+jj] = a[i][j];
 						jj++;
 					}
 				}
@@ -1188,7 +1647,6 @@ bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
 	// using Cramer's rule
 
 	//create rhs determinant
-
 	jj=0;
 	for(j=0; j<4; j++)
 	{
@@ -1200,7 +1658,7 @@ bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
 			{
 				if(i!=kp)
 				{
-					r[ii*3+jj] = - a[i*4+kp];
+					r[ii*3+jj] = - a[i][kp];
 					ii++;
 				}
 			}
@@ -1210,10 +1668,10 @@ bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V)
 		}
 	}
 
-//	for(jj=0; jj<4; jj++) qDebug("%d    %8.3f+%8.3fi", jj, V[jj].real(), V[jj].imag());
 	return true;
 }
 
+#define TOLERANCE   0.0000000001
 
 bool LinBairstow(double *p, complex<double> *root, int n)
 {
@@ -1335,40 +1793,6 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 	}while(nn>2);
 	return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -106,7 +106,7 @@ SOURCES += MainFrame.cpp \
     Globals.cpp \
     TwoDWidget.cpp \
     GLWidget.cpp \
-    QFLR5Application.cpp 
+    QFLR5Application.cpp
 HEADERS += MainFrame.h \
     XDirect/XFoil.h \
     XDirect/XFoilAnalysisDlg.h \
@@ -206,7 +206,7 @@ HEADERS += MainFrame.h \
     TwoDWidget.h \
     GLWidget.h \
     Params.h \
-    QFLR5Application.h 
+    QFLR5Application.h
 TRANSLATIONS = Translations/qflr5.ts \
     Translations/qflr5_de.ts \
     Translations/qflr5_fr.ts
@@ -227,3 +227,4 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
+OTHER_FILES += ReleaseNotes.txt

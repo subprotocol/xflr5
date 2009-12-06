@@ -45,6 +45,8 @@
 
 #define SETTINGSFORMAT    100562
 
+#define PRECISION     0.000000000001
+
 #define QUESTION (BB || !BB) //Shakespeare
 
 #endif // PARAMS_H

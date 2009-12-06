@@ -31,8 +31,10 @@
 #include <QColor>
 #include <complex>
 #include "Params.h"
-using namespace std;
+#include "Objects/CVector.h"
+#include "Objects/Foil.h"
 
+using namespace std;
 
 bool IsEven(int n);
 bool IsBetween(int f, int f1, int f2);
@@ -40,13 +42,17 @@ bool IsBetween(int f, double f1, double f2);
 bool ReadAVLString(QTextStream &in, int &Line, QString &strong);
 bool Rewind1Line(QTextStream &in, int &Line, QString &strong);
 
-bool ludcmp(int n, double *a, int *indx);
-bool baksub(int n, double *a, int *indx, double *b);
+bool ludcmp(int n, double *a, int *indx, bool *pbCancel=false);
+bool baksub(int n, double *a, int *indx, double *b,           bool *pbCancel=false);
+bool baksub(int n, double *a, int *indx, double *RHS, int nb, bool *pbCancel=false);
 
 void ReadValues(QString line, int &res, double &x, double &y, double &z);
 
 void ExpFormat(double &f, int &exp);
 void ReynoldsFormat(QString &str, double f);
+
+bool Gauss(double *A, int n, double *B, int m, bool *pbCancel);
+
 void GetSpeedUnit(QString &str, int unit);
 void GetWeightUnit(QString &str, int unit);
 void GetAreaUnit(QString &str, int unit);
@@ -65,6 +71,8 @@ void ReadCString(QDataStream &ar, QString &strong);
 void WriteCString(QDataStream &ar, QString const &strong);
 void ReadCOLORREF(QDataStream &ar, QColor &color);
 void WriteCOLORREF(QDataStream &ar, QColor const &color);
+void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V);
+void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool bAll=true);
 
 void Trace(int n);
 void Trace(QString msg);
@@ -81,12 +89,16 @@ Qt::PenStyle GetStyle(int s);
 double Det44(double *aij);
 double Det33(double *aij);
 complex<double> Det33(complex<double> *aij);
+complex<double> Det44(complex<double> *aij);
+complex<double> Cofactor44(complex<double> *aij, int &i, int &j);
+bool Invert44(complex<double> *ain, complex<double> *aout);
 
-void CharacteristicPol(double m[][4], double p[5]);
 
-bool LinBairstow(double *p, complex<double> *root, int n);
 void TestEigen();
-bool Eigenvector(complex<double> *a, complex<double> lambda, complex<double> *V);
+void CharacteristicPol(double m[][4], double p[5]);
+bool LinBairstow(double *p, complex<double> *root, int n);
+bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V);
 
+void TestInvert();
 
 #endif // FUNCTIONS_H

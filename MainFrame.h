@@ -124,6 +124,7 @@ private:
 	void closeEvent (QCloseEvent * event);
 	void contextMenuEvent (QContextMenuEvent * event) ;
 	void keyPressEvent(QKeyEvent *event);
+	void keyReleaseEvent(QKeyEvent *event);
 
 	void CreateDockWindows();
 	void CreateToolbars();

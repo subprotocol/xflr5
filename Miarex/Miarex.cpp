@@ -12577,6 +12577,7 @@ void QMiarex::OnGraphSettings()
 {
 	QGraph *pGraph = NULL;
 	GraphDlg dlg;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	pGraph = m_pCurGraph;
 	if(!pGraph) return;
@@ -12597,6 +12598,7 @@ void QMiarex::OnGraphSettings()
 	dlg.m_pMemGraph = &graph;
 	dlg.m_pGraph = pGraph;
 	dlg.SetParams();
+	dlg.move(pMainFrame->m_DlgPos);
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
@@ -12640,6 +12642,7 @@ void QMiarex::OnGraphSettings()
 	{
 		pGraph->CopySettings(&graph);
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	UpdateView();
 }
 
@@ -15681,21 +15684,28 @@ void QMiarex::SetCurveParams()
 			FillComboBoxes(false);
 		}
 	}
+
 	if(m_pCurWPolar)
 	{
-		if(m_pCurWPolar->m_Type!=4)
+		if(m_pCurWPolar->m_Type<4)
 		{
 			m_pctrlUnit1->setText(QString::fromUtf8("°"));
 			m_pctrlUnit2->setText(QString::fromUtf8("°"));
 			m_pctrlUnit3->setText(QString::fromUtf8("°"));
 		}
-		else
+		else if(m_pCurWPolar->m_Type==4)
 		{
 			QString str;
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 			m_pctrlUnit1->setText(str);
 			m_pctrlUnit2->setText(str);
 			m_pctrlUnit3->setText(str);
+		}
+		else
+		{
+			m_pctrlUnit1->setText("");
+			m_pctrlUnit2->setText("");
+			m_pctrlUnit3->setText("");
 		}
 	}
 }
@@ -17549,7 +17559,6 @@ void QMiarex::SnapClient(QString const &FileName)
 //	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
 	bitsPerPixel = 24;
 	int width = size.width();
-
 	switch(bitsPerPixel)
 	{
 		case 8:
@@ -17586,21 +17595,28 @@ void QMiarex::SnapClient(QString const &FileName)
 	glReadBuffer(GL_FRONT);
 	switch(bitsPerPixel)
 	{
-		  case 8: return;
-		  case 16: return;
-		  case 24:
+		case 8: return;
+		case 16: return;
+		case 24:
+		{
 			  glReadPixels(0,0,size.width(),size.height(),GL_RGB,GL_UNSIGNED_BYTE,pPixelData);
+			  QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
+			  QImage FlippedImaged;
+			  FlippedImaged = Image.mirrored();	//flip vertically
+			  FlippedImaged.save(FileName);
 			  break;
-		  case 32:
-			  glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
-			  break;
-		  default: break;
+		}
+		case 32:
+		{
+			glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
+			QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB32);
+			QImage FlippedImaged;
+			FlippedImaged = Image.mirrored();	//flip vertically
+			FlippedImaged.save(FileName);
+			break;
+		}
+		default: break;
 	}
-
-	QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB32);
-	QImage FlippedImaged;
-	FlippedImaged = Image.mirrored();	//flip vertically
-	FlippedImaged.save(FileName);
 }
 
 
@@ -17608,7 +17624,7 @@ void QMiarex::SnapClient(QString const &FileName)
 void QMiarex::StopAnimate()
 {
 	if(!m_bAnimate) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+//	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bAnimate = false;
 	m_pctrlAnimate->setChecked(false);
 	m_pAnimateTimer->stop();

@@ -15,7 +15,7 @@
 *******************************************************************************
 
 
-QFLR5 v0.04 Beta November xxx 2009
+QFLR5 v0.04 Beta December xxx 2009
 	- Added some signal connections for wing control polars 
 	- Declared a bunch of local variables as static to speed things up by preventing repetitive memory allocations
 	- Corrected the bug associated with tilted geometry calculations
@@ -23,6 +23,11 @@ QFLR5 v0.04 Beta November xxx 2009
 	- Improved the 3D view of lift and drag for results with sideslip
 	- Fixed the issues with animation in Miarex
 	- Fixed the issue with 3d Cp scale settings
+	- Corrected a bug in the estimation of the CoG for wings
+	- Forced the use of QPaintEngine::OpenGL, which seems to fix the font display issue
+	- Corrected a crash bug when selecting splines in Direct Design
+	- Corrected a crash bug when capturing the OpenGl view to an image file
+	- Adapted the code for Qt4.6.
 	- Made a few corrections and enhancements
 
 

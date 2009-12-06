@@ -2830,6 +2830,37 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 }
 
 
+void MainFrame::keyReleaseEvent(QKeyEvent *event)
+{
+	if(m_iApp == XFOILANALYSIS && m_pXDirect)
+	{
+		QXDirect* pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->keyReleaseEvent(event);
+	}
+	else if(m_iApp == MIAREX && m_pMiarex)
+	{
+		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+
+		if (event->key()==Qt::Key_Control)
+		{
+			pMiarex->m_bArcball = false;
+			UpdateView();
+		}
+		else pMiarex->keyPressEvent(event);
+	}
+	else if(m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->keyReleaseEvent(event);
+	}
+	else if(m_iApp == INVERSEDESIGN && m_pXInverse)
+	{
+		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
+		pXInverse->keyReleaseEvent(event);
+	}
+}
+
+
 bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 {
 	CFoil *pFoil;
@@ -3072,6 +3103,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	if(end==".plr")
 	{
 		QDataStream ar(&XFile);
+		ar.setVersion(QDataStream::Qt_4_5);
 		ar.setByteOrder(QDataStream::LittleEndian);
 		CFoil *pFoil = ReadPolarFile(ar);
 		pXDirect->m_bPolar = true;
@@ -3141,6 +3173,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 				QDataStream ar(&XFile);
 				ar.setByteOrder(QDataStream::LittleEndian);
+				ar.setVersion(QDataStream::Qt_4_5);
 
 				if(SerializeProject(ar, false, 1))
 				{
@@ -3317,6 +3350,7 @@ void MainFrame::OnInsertProject()
 		return;
 	}
 	QDataStream ar(&XFile);
+	ar.setVersion(QDataStream::Qt_4_5);
 	ar.setByteOrder(QDataStream::LittleEndian);
 
 	SerializeProject(ar, false, 1);
@@ -3884,6 +3918,7 @@ void MainFrame::OnSaveUFOAsProject()
 	}
 
 	QDataStream ar(&fp);
+	ar.setVersion(QDataStream::Qt_4_5);
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeUFOProject(ar,5);
 	m_FileName = PathName;
@@ -4595,6 +4630,7 @@ bool MainFrame::SaveProject(QString PathName)
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	QDataStream ar(&fp);
+	ar.setVersion(QDataStream::Qt_4_5);
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeProject(ar,true, Format);
 	m_FileName = PathName;
