@@ -9806,7 +9806,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
-			else if(m_iView= WOPPVIEW)
+			else if(m_iView==WOPPVIEW)
 			{
 				OnResetWingScale();
 			}
@@ -17554,9 +17554,15 @@ void QMiarex::SnapClient(QString const &FileName)
 	int NbBytes, bitsPerPixel;
 
 	QSize size(m_rCltRect.width(),m_rCltRect.height());
+	GLWidget * pGLWidget = (GLWidget*)m_pGLWidget;
+	QGLFormat GLFormat = pGLWidget->format();
 
-	// Lines have to be 32 bits aligned
-//	bitsPerPixel = pDC->GetDeviceCaps(BITSPIXEL);
+	if(!GLFormat.rgba())
+	{
+		QMessageBox::warning(this,tr("Warning"),tr("OpenGL color format is not recognized... Sorry"));
+		return;
+	}
+
 	bitsPerPixel = 24;
 	int width = size.width();
 	switch(bitsPerPixel)
@@ -17574,7 +17580,7 @@ void QMiarex::SnapClient(QString const &FileName)
 		}
 		case 24:
 		{
-			NbBytes = 3 * size.width() * size.height();//24 bits type BMP
+			NbBytes = 4 * size.width() * size.height();//24 bits type BMP
 //			size.setWidth(width - size.width() % 4);
 			break;
 		}
@@ -17608,8 +17614,8 @@ void QMiarex::SnapClient(QString const &FileName)
 		}
 		case 32:
 		{
-			glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
-			QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB32);
+			glReadPixels(0,0,size.width(),size.height(),GL_BGRA,GL_UNSIGNED_BYTE,pPixelData);
+			QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_ARGB32);
 			QImage FlippedImaged;
 			FlippedImaged = Image.mirrored();	//flip vertically
 			FlippedImaged.save(FileName);
