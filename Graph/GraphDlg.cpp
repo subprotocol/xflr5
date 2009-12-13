@@ -459,9 +459,11 @@ void GraphDlg::OnLabelFont()
 
 	if (ok)
 	{
-	   m_pctrlLabelButton->setFont(font);
-	   m_pctrlLabelButton->setText(font.family());
-	   m_pGraph->SetLabelLogFont(&font);
+		QString strange;
+		strange = QString(" %1").arg(font.pointSize());
+		m_pctrlLabelButton->setFont(font);
+		m_pctrlLabelButton->setText(font.family()+strange);
+		m_pGraph->SetLabelLogFont(&font);
 		SetApplied(false);
 	}
 }
@@ -499,9 +501,11 @@ void GraphDlg::OnLegendFont()
 
 	if (ok)
 	{
-	   m_pctrlLegendButton->setFont(font);
-	   m_pctrlLegendButton->setText(font.family());
-	   m_pGraph->SetLegendLogFont(&font);
+		QString strange;
+		strange = QString(" %1").arg(font.pointSize());
+		m_pctrlLegendButton->setFont(font);
+		m_pctrlLegendButton->setText(font.family()+strange);
+		m_pGraph->SetLegendLogFont(&font);
 		SetApplied(false);
 	}
 }
@@ -601,9 +605,11 @@ void GraphDlg::OnTitleFont()
 
 	if (ok)
 	{
-	   m_pctrlTitleButton->setFont(font);
-	   m_pctrlTitleButton->setText(font.family());
-	   m_pGraph->SetTitleLogFont(&font);
+		QString strange;
+		strange = QString(" %1").arg(font.pointSize());
+		m_pctrlTitleButton->setFont(font);
+		m_pctrlTitleButton->setText(font.family()+strange);
+		m_pGraph->SetTitleLogFont(&font);
 		SetApplied(false);
 	}
 }
@@ -795,16 +801,21 @@ void GraphDlg::SetParams()
 	SetButtonColors();
 
 	QFont font;
+	QString strange;
+
 	m_pGraph->GetLabelLogFont(&font);
-	m_pctrlLabelButton->setText(font.family());
+	strange = QString(" %1").arg(font.pointSize());
+	m_pctrlLabelButton->setText(font.family()+strange);
 	m_pctrlLabelButton->setFont(font);
 
 	m_pGraph->GetTitleLogFont(&font);
-	m_pctrlTitleButton->setText(font.family());
+	strange = QString(" %1").arg(font.pointSize());
+	m_pctrlTitleButton->setText(font.family()+strange);
 	m_pctrlTitleButton->setFont(font);
 
 	m_pGraph->GetLegendLogFont(&font);
-	m_pctrlLegendButton->setText(font.family());
+	strange = QString(" %1").arg(font.pointSize());
+	m_pctrlLegendButton->setText(font.family()+strange);
 	m_pctrlLegendButton->setFont(font);
 
 

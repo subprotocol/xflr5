@@ -217,7 +217,7 @@ int LLTAnalysisDlg::Iterate()
 	QString str;
 	CCurve *pCurve = m_IterGraph.GetCurve(0);
 
-	int resp;
+	int resp=0;
 	int   iter = 0;
 	bool  bConverged = false;
 

@@ -424,7 +424,7 @@ private:
 	double aij[IQX][IQX];
 	double bij[IQX][IZX],dij[IZX][IZX];
 	double cij[IWX][IQX];
-	double pi,hopi,qopi,dtor;
+	double hopi,qopi,dtor;
 
    
     double vs1[5][6],vs2[5][6],vsrez[5],vsr[5],vsm[5],vsx[5];

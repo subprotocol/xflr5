@@ -1102,7 +1102,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			AddString(tr("         Calculating main wing...\r\n"));
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 
-			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
+			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 
 			m_pWing->VLMSetBending();
 			if(m_pWing->m_bWingOut)  m_bPointOut = true;
@@ -1119,7 +1119,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
 										m_Cp+m_pWing->m_MatSize,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				IDrag += WingIDrag;
 
 				m_pWing2->VLMSetBending();
@@ -1138,7 +1138,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				IDrag += WingIDrag;
 
 				m_pStab->VLMSetBending();
@@ -1157,7 +1157,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
 										m_Cp+pos,
 										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom, m_pWPolar->m_RefAreaType);
+										m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 				if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
 				IDrag += WingIDrag;

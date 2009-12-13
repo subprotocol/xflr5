@@ -1365,7 +1365,15 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
-			else OnResetFoilScale();
+			else if(!m_bPolar)
+			{
+				OnResetFoilScale();
+			}
+			else
+			{
+				SetPolarLegendPos();
+				UpdateView();
+			}
 			break;
 		case Qt::Key_V:
 			if(m_bPolar && m_pCurGraph)

@@ -540,7 +540,7 @@ void BatchDlg::InitDialog()
 
 	if(!m_pFoil) return;
 
-	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
+//	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 
 	QString str = tr("Batch analysis for ")+ m_pFoil->m_FoilName;
 	setWindowTitle(str);
@@ -914,7 +914,7 @@ void BatchDlg::OutputIter(int iter, double Re, double Alpha)
 	{
 		m_RmsGraph.GetCurve(0)->AddPoint(iter, pXFoil->rmsbl);
 		m_RmsGraph.GetCurve(1)->AddPoint(iter, pXFoil->rmxbl);
-		UpdateGraph(Re, Alpha);
+		UpdateGraph();
 	}
 }
 
@@ -1327,7 +1327,7 @@ void BatchDlg::StartAnalysis()
 }
 
 
-void BatchDlg::UpdateGraph(double Re, double Alpha)
+void BatchDlg::UpdateGraph()
 {
 	m_pctrlGraphOutput->update();
 }

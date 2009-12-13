@@ -1810,7 +1810,7 @@ bool CWing::LLTInitialize(double mass)
 
 void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
 							 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-							 bool bViscous, bool bThinSurface, bool bTilted, int RefAreaType)
+							 bool bViscous, bool bThinSurface, bool bTilted)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
@@ -2598,11 +2598,9 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 	double *M;// size is 4 coefs x maxstations
 	double *RHS;
-//	CVLMDlg *pVLMDlg   = (CVLMDlg*)s_pVLMDlg;
-//	M = pVLMDlg->m_aij;
-//	RHS = pVLMDlg->m_RHS;
-
-
+	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
+	M = pVLMDlg->m_aij;
+	RHS = pVLMDlg->m_RHS;
 	memset(M, 0, 16*n*n*sizeof(double));
 	memset(RHS, 0, 4*n*sizeof(double));
 
@@ -2678,7 +2676,7 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
 						   double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm,
-						   bool bViscous, bool bTilted, int RefAreaType)
+						   bool bViscous, bool bTilted)
 {
 	//calculates :
 	// - the moments and the centre of pressure positions by summation over the apnels
@@ -2786,21 +2784,11 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 
 				Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /s_QInf/m_pPanel[p].Area/s_Density;
 
-//				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
 				if(m_Surface[j].m_bTEFlap)
 				{
-/*					//add hinge moment contribution
-					V1 = m_pPanel[p].VortexPos - HA;
-					HingeLeverArm = V1 - H * V1.dot(H);
-					if(HingeLeverArm.x>0.0)
-					{
-						HingeMoment = HingeLeverArm * PanelForce;//N.m
-						m_FlapMoment[nFlap] += HingeMoment.dot(H);
-					}*/
 					if(m_Surface[j].IsFlapPanel(p))
 					{
 						//then p is on the flap, so add its contribution
-
 						HingeLeverArm = m_pPanel[p].VortexPos - m_Surface[j].m_HingePoint;
 						HingeMoment = HingeLeverArm * PanelForce;//N.m
 						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector);
@@ -2839,7 +2827,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 				m_XTrTop[m]  = 1.0;
 				DragVector.x = 0.0;
 			}
-
 			//_______________Local Moment coefficients________________
 //			m_CmAirf[m]     = Cm4*2.0      /StripArea/s_QInf/100.0;//error up to v2.00, corrected in v2.01
 //			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/s_QInf;//up to v2.04

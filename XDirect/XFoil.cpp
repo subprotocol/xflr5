@@ -21,9 +21,6 @@
 *****************************************************************************/
  
 
-// XFoil.cpp: implementation of the XFoil class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include <QCoreApplication>
 #include "XDirect.h"
@@ -32,9 +29,6 @@
 #include <QMessageBox>
 #include <QDir>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 XFoil::XFoil()
 {
@@ -49,7 +43,6 @@ XFoil::XFoil()
 	// imx   number of complex mapping coefficients  cn
 	m_bTrace = false;
 	m_bFullReport = false;
-	pi = 3.141592654;
 	
 	sccon = 5.6  ;
 	gacon = 6.70;
@@ -1721,8 +1714,9 @@ bool XFoil::cang(double x[], double y[], int n, int &imax, double &amax)
 		
 		crossp = (dx2*dy1 - dy2*dx1)
 			/ sqrt((dx1*dx1 + dy1*dy1) * (dx2*dx2 + dy2*dy2));
-		angl = asin(crossp)*(180.0/pi);
-		if(fabs(angl) > fabs(amax)) {
+		angl = asin(crossp)*(180.0/PI);
+		if(fabs(angl) > fabs(amax))
+		{
 			amax = angl;
 			imax = i;
 		}
@@ -6186,7 +6180,7 @@ stop12:
 		if(dso == 0.0) goto stop20; // check - unsafe condition
 		dsio = 1.0 / dso;
 		////ccc   apan = apanel[jo]
-		apan = pi - apanel[jo] + 2.0*alfa;
+		apan = PI - apanel[jo] + 2.0*alfa;
 
 		xjo = x[jo] + 2.0*(yimage+y[jo])*sina;
 		yjo = y[jo] - 2.0*(yimage+y[jo])*cosa;
@@ -6222,10 +6216,10 @@ stop12:
 
 		//------ set log(r^2) and arctan(x/y), correcting for reflection if any
 		g1 = log(rs1);
-		t1 = atan2(sgn*x1,sgn*yy) + (0.5 - 0.5*sgn)*pi;
+		t1 = atan2(sgn*x1,sgn*yy) + (0.5 - 0.5*sgn)*PI;
 
 		g2 = log(rs2);
-		t2 = atan2(sgn*x2,sgn*yy) + (0.5 - 0.5*sgn)*pi;
+		t2 = atan2(sgn*x2,sgn*yy) + (0.5 - 0.5*sgn)*PI;
 
 		x1i = sx*nxi + sy*nyi;
 		x2i = sx*nxi + sy*nyi;
@@ -6255,7 +6249,7 @@ stop12:
 			x0 = 0.5*(x1+x2);
 			rs0 = x0*x0 + yy*yy;
 			g0 = log(rs0);
-			t0 = atan2(sgn*x0,sgn*yy) + (0.5 - 0.5*sgn)*pi;
+			t0 = atan2(sgn*x0,sgn*yy) + (0.5 - 0.5*sgn)*PI;
 
 			//------- calculate source contribution to psi	for  1-0  half-panel
 			dxinv = 1.0/(x1-x0);
@@ -6465,7 +6459,6 @@ stop21:
 			+ hopi*pgam*0.5*(qf2[jp]-qf2[jo])*sds;
 		z_qdof3 = z_qdof3 + hopi*psig*0.5*(qf3[jp]-qf3[jo])*scs
 			+ hopi*pgam*0.5*(qf3[jp]-qf3[jo])*sds;
-
 
 	}
 stop22:
@@ -10275,7 +10268,7 @@ int XFoil::arefine(double x[],double y[], double s[], double xs[], double ys[],
 	static double atolr, dxm, dym,  dxp, dyp, crsp, dotp, aseg, smid, xk, yk;
 	static int k, im, ip;
 	
-	atolr = atol * pi/180.0;
+	atolr = atol * PI/180.0;
 	
 	k = 1;
 	xnew[k] = x[1];
@@ -10396,7 +10389,8 @@ int XFoil::cadd(int ispl, double atol, double xrf1, double xrf2)
 }
 
 
-void XFoil::flap(){
+void XFoil::flap()
+{
 	//----------------------------------------------------
 	//     modifies buffer airfoil for a deflected flap.
 	//     points may be added/subtracted in the flap
@@ -10450,7 +10444,7 @@ void XFoil::flap(){
 	//      write(*,1050) xbf, ybf
 	//1050 format(/' flap hinge: x,y =', 29.5 )
 	
-	double rdef = ddef*pi/180.0;//ddef : flap deflection in degrees
+	double rdef = ddef*PI/180.0;//ddef : flap deflection in degrees
 	if(fabs(rdef) <= 0.001) return;
 	
 	if(insid) {
@@ -10819,7 +10813,7 @@ bool XFoil::eiwset(int nc1){
 //----------------------------------------------------
 	//      include 'circle.inc'
 	
-	//      pi = 4.0*atan(1.0)
+	//      PI = 4.0*atan(1.0)
 	int ic;
 	//---- set requested number of points in circle plane
 	nc  = nc1;
@@ -10836,7 +10830,7 @@ bool XFoil::eiwset(int nc1){
 		return false;
 	}
 	
-	dwc = 2.0*pi / double(nc-1);
+	dwc = 2.0*PI / double(nc-1);
 	
 	for (ic=1; ic<=nc; ic++)  wc[ic] = dwc*double(ic-1);
 	
@@ -10882,14 +10876,14 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 	
 	//---- set te angle parameter
 	agte = ( atan2(xp[n], -yp[n]) 
-			-atan2(xp[1], -yp[1]))/pi - 1.0;
+			-atan2(xp[1], -yp[1]))/PI - 1.0;
 	
 	//---- set surface angle at first point
 	ag0 = atan2( xp[1] , -yp[1] );
 	
-	//---- temporary offset qo to make  q(w)-qo = 0  at  w = 0 , 2 pi
+	//---- temporary offset qo to make  q(w)-qo = 0  at  w = 0 , 2 PI
 	//     --- avoids gibbs problems with q(w)'s fourier sine transform
-	qim0 = ag0 + 0.5*pi*(1.0+agte);
+	qim0 = ag0 + 0.5*PI*(1.0+agte);
 	
 	xle = seval(sle,x,xp,s,n);
 	yle = seval(sle,y,yp,s,n);
@@ -10920,14 +10914,14 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 	//---- set initial top surface s(w)
 	double wwt = 1.0 - 2.0*dsdwle/tops;
 	for (ic=1;ic<= (nc-1)/2+1;ic++)
-		sc[ic] = tops*(1.0 - cos(wwt*wc[ic]) ) /(1.0 - cos(wwt*pi    ) );
+		sc[ic] = tops*(1.0 - cos(wwt*wc[ic]) ) /(1.0 - cos(wwt*PI    ) );
 	
 	
 	//---- set initial bottom surface s(w)
 	wwt = 1.0 - 2.0*dsdwle/bots;
 	for(ic=(nc-1)/2+2; ic<=nc ; ic++)
 		sc[ic] =  1.0 - bots *(1.0 - cos(wwt*(wc[nc]-wc[ic])) )
-							  /(1.0 - cos(wwt* pi            ) );
+							  /(1.0 - cos(wwt* PI            ) );
 	
 
 	//---- iteration loop for s(w) array
@@ -10940,8 +10934,8 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 			dxds = deval(sic,x,xp,s,n);
 			dyds = deval(sic,y,yp,s,n);
 			
-			//------ set q(w) - qo   (qo defined so that q(w)-qo = 0  at  w = 0 , 2 pi)
-			qim = atan2(dxds, -dyds ) - 0.5*(wc[ic]-pi)*(1.0+agte)- qim0;
+			//------ set q(w) - qo   (qo defined so that q(w)-qo = 0  at  w = 0 , 2 PI)
+			qim = atan2(dxds, -dyds ) - 0.5*(wc[ic]-PI)*(1.0+agte)- qim0;
 			piq[ic] = complex<double>(0.0, qim );
 			
 		}
@@ -11004,7 +10998,7 @@ void XFoil::scinit(int n, double x[], double xp[], double y[], double yp[], doub
 		double sinwe = 0.0;
 		if(sinw>0.0) sinwe = pow(sinw,(1.0-agte));
 		
-		double hwc = 0.5*(wc[ic]-pi)*(1.0+agte) - 0.5*pi;
+		double hwc = 0.5*(wc[ic]-PI)*(1.0+agte) - 0.5*PI;
 		zcoldw[ic] = sinwe * exp( piq[ic] + complex<double>(0.0,hwc) );
 	}
 	
@@ -11024,7 +11018,7 @@ void XFoil::ftp(){
 		for(int ic=2; ic<= nc-1; ic++)
 			zsum = zsum + piq[ic]*eiw[ic][m];
 		
-		cn[m] = (0.5*(piq[1]*eiw[1][m] + piq[nc]*eiw[nc][m])+ zsum)*dwc / pi;
+		cn[m] = (0.5*(piq[1]*eiw[1][m] + piq[nc]*eiw[nc][m])+ zsum)*dwc / PI;
 	}
 	cn[0] = 0.5*cn[0];
 	
@@ -11032,7 +11026,8 @@ void XFoil::ftp(){
 }
 
 
-void XFoil::piqsum(){
+void XFoil::piqsum()
+{
 //---------------------------------------------
 //     inverse-transform to get back modified 
 //     speed function and its conjugate.
@@ -11050,13 +11045,15 @@ void XFoil::piqsum(){
 	return;
 }
 
-complex<double> XFoil::conjg(complex<double> cplx){
+complex<double> XFoil::conjg(complex<double> cplx)
+{
 	double a = real(cplx);
 	double b = imag(cplx);
 	return complex<double>(a, -b);
 }
 
-void XFoil::zcnorm(int mtest){
+void XFoil::zcnorm(int mtest)
+{
 //-----------------------------------------------
 //    normalizes the complex airfoil z(w) to
 //    the old chord and angle, and resets the
@@ -11119,7 +11116,7 @@ void XFoil::zccalc(int mtest){
 	double sinwe = 0.0;
 	if(sinw>0.0) sinwe = pow(sinw,(1.0-agte));
 	
-	double hwc = 0.5*(wc[ic]-pi)*(1.0+agte) - 0.5*pi;
+	double hwc = 0.5*(wc[ic]-PI)*(1.0+agte) - 0.5*PI;
 	dzdw1 = sinwe * exp( piq[ic] + complex<double>(0.0,hwc) );
 	
 	for (ic=2; ic<= nc; ic++){
@@ -11128,7 +11125,7 @@ void XFoil::zccalc(int mtest){
 		sinwe = 0.0;
 		if(sinw>0.0) sinwe = pow(sinw,(1.0-agte));
 		
-		hwc = 0.5*(wc[ic]-pi)*(1.0+agte) - 0.5*pi;
+		hwc = 0.5*(wc[ic]-PI)*(1.0+agte) - 0.5*PI;
 		dzdw2 = sinwe * exp( piq[ic] + complex<double>(0.0,hwc));
 		
 		zc[ic]  = 0.5*(dzdw1+dzdw2)*dwc + zc[ic-1];
@@ -11188,12 +11185,12 @@ void XFoil::zlefind(complex<double>*zle,complex<double>zc[],double wc[],
 	//---- set up derivatives at spline endpoints
 	double sinw = 2.0*sin(0.5*wc[ic1]);
 	double sinwe = pow(sinw,(1.0-agte));
-	double hwc = 0.5*(wc[ic1]-pi)*(1.0+agte) - 0.5*pi;
+	double hwc = 0.5*(wc[ic1]-PI)*(1.0+agte) - 0.5*PI;
 	dzdw1 = sinwe * exp( piq[ic1] + complex<double>(0.0,hwc));
 	
 	sinw = 2.0*sin(0.5*wc[ic2]);
 	sinwe = pow(sinw,(1.0-agte));
-	hwc = 0.5*(wc[ic2]-pi)*(1.0+agte) - 0.5*pi;
+	hwc = 0.5*(wc[ic2]-PI)*(1.0+agte) - 0.5*PI;
 	dzdw2 = sinwe * exp(piq[ic2] + complex<double>(0.0,hwc));
 	
 	//---- fill temporary x,y coordinate arrays
@@ -11439,7 +11436,7 @@ void XFoil::mapgen(int n, double x[],double y[])
 	//-    to the old airfoil's angle
 	dx = xcold[2] - xcold[1];
 	dy = ycold[2] - ycold[1];
-	qim0 = atan2( dx , -dy )  +  0.5*pi*(1.0+agte);
+	qim0 = atan2( dx , -dy )  +  0.5*PI*(1.0+agte);
 
 	qimoff = qim0 - imag(cn[0]);
 	cn[0] = cn[0] + complex<double>( 0.0 , qimoff );
@@ -11690,7 +11687,7 @@ void XFoil::cncalc(double qc[], bool lsymm)
 	sinvrt(wcle,0.0,qc,qcw,wc,nc);
 	
 	//---- set corresponding circle plane alpha
-	alfcir = 0.5*(wcle - pi);
+	alfcir = 0.5*(wcle - PI);
 	
 	//---- calculate real part of harmonic function  p(w) + iq(w)
 	for(ic=2;ic<= nc-1;ic++){
@@ -11989,7 +11986,7 @@ void XFoil::cnfilt(double ffilt)
 	
 	for(int m=0; m<= mc; m++){
 		freq = double(m)/double(mc);
-		cwt = 0.5*(1.0 + cos(pi*freq));
+		cwt = 0.5*(1.0 + cos(PI*freq));
 		cwtx = cwt;
 		if(ffilt>0.0) cwtx = pow(cwt,ffilt);
 		cn[m] = complex<double>(real(cn[m]) * cwtx, imag(cn[m]) * cwtx);
@@ -11998,7 +11995,8 @@ void XFoil::cnfilt(double ffilt)
 
 
 
-void XFoil::pert_init(int kqsp){
+void XFoil::pert_init(int kqsp)
+{
 	double dx,dy, qimoff;
 //---- calculate mapping coefficients for initial airfoil shape
 //      cncalc(qspec,false);
@@ -12008,7 +12006,7 @@ void XFoil::pert_init(int kqsp){
 //-    to the old airfoil's angle
 	dx = xcold[2] - xcold[1];
 	dy = ycold[2] - ycold[1];
-	qim0 = atan2(dx, -dy)  +  0.5*pi*(1.0+agte);
+	qim0 = atan2(dx, -dy)  +  0.5*PI*(1.0+agte);
 	qimoff = qim0 - imag(cn[0]);
 	cn[0] = cn[0] + complex<double>(0.0, qimoff);
 
@@ -12035,9 +12033,9 @@ void XFoil::pert_init(int kqsp){
 
 }
 
+
 void XFoil::pert_process(int kqsp)
 {
-
 	int m, ncn;
 //	double dx,dy,qimoff;
 	complex<double> qq[IMX/4+1][IMX/4+1],dcn[IMX/4+1];
@@ -12066,7 +12064,8 @@ void XFoil::pert_process(int kqsp)
 	
 //---- newton iteration loop for modified cn's
 	bool bConv = false;
-	for(int itercn=1; itercn<= 10; itercn++){
+	for(int itercn=1; itercn<= 10; itercn++)
+	{
 
 //------ fix te gap
 		m=1;
@@ -12109,9 +12108,9 @@ void XFoil::pert_process(int kqsp)
 	qspcir();
 }
 
+
 void XFoil::InitMDES()
 {
-
 //	double xsp[IBX], ysp[IBX][IPX], yspd[IBX][IPX];
 
 	int ntqspl;

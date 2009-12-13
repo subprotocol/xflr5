@@ -94,7 +94,7 @@ private:
 	void SetAi(int qrhs);
 	void SetupLayout();
 	void StartAnalysis();
-	void SumPanelForces(double *Cp, double Alpha, double QInf, double &Lift, double &Drag);
+	void SumPanelForces(double *Cp, double Alpha, double &Lift, double &Drag);
 	void UpdateView();
 	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
 	void WriteString(QString strong);

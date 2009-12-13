@@ -1627,7 +1627,7 @@ int QMiarex::CreateBodyElements()
 	int p = 0;
 
 	int InitialSize = m_MatSize;
-	int FullSize;
+	int FullSize = 0;
 
 	lnx = 0;
 
@@ -5192,6 +5192,7 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 			if(m_WPlrGraph2.IsInDrawRect(pt)){return &m_WPlrGraph2;}
 			if(m_WPlrGraph3.IsInDrawRect(pt)){return &m_WPlrGraph3;}
 			if(m_WPlrGraph4.IsInDrawRect(pt)){return &m_WPlrGraph4;}
+			return NULL;
 		}
 	}
 	else if(m_iView==WCPVIEW)
@@ -6941,7 +6942,7 @@ void QMiarex::GLCreateMoments()
 	QColor color;
 
 	double sign, amp, radius;
-	double angle;//radian
+	double angle = 0.0;//radian
 	double endx, endy, endz, dx, dy, dz,xae, yae, zae;
 	double factor = 10.0;
 
@@ -9494,6 +9495,7 @@ void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, in
 	//pl and pr are respectively the left surface's and the right surface's first panel index
 	int ls, lr, lclose, ppl, ppr;
 	double dist, x,y,z, mindist;
+	lclose =0;
 
 	CVector MidNormal = pLeftSurf->Normal + pRightSurf->Normal;
 	MidNormal.Normalize();
@@ -9808,8 +9810,19 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			}
 			else if(m_iView==WOPPVIEW)
 			{
-				OnResetWingScale();
+				if(m_iWingView==1) OnResetWingScale();
+				else
+				{
+					SetWingLegendPos();
+					UpdateView();
+				}
 			}
+			else if(m_iView==WPOLARVIEW)
+			{
+				SetWPlrLegendPos();
+				UpdateView();
+			}
+
 			break;
 		}
 		case Qt::Key_F2:
@@ -9852,8 +9865,8 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 
 		default:
-//			QWidget::keyPressEvent(event);
-			event->ignore();
+			QWidget::keyPressEvent(event);
+	//		event->ignore();
 	}
 }
 
@@ -10755,6 +10768,7 @@ void QMiarex::OnAnalyze()
 {
 	int l;
 	double V0, VMax, VDelta;
+	V0 = VMax = VDelta = 0.0;
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
 
@@ -13290,7 +13304,7 @@ void QMiarex::OnRenameCurWPolar()
 	if(!m_pCurWPolar) return;
 	if(!m_pCurWing) return;
 	int resp, k,l;
-	CWPolar* pWPolar;
+	CWPolar* pWPolar = NULL;
 	CPOpp * pPOpp;
 	CWOpp * pWOpp;
 	QString OldName = m_pCurWPolar->m_PlrName;
@@ -14269,14 +14283,14 @@ void QMiarex::PaintSingleWingGraph(QPainter &painter)
 			if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
 			if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
 		}
-		PaintWingLegend(painter, m_rCltRect);
-		if(m_pCurWOpp) PaintWOppLegend(painter, m_rCltRect);
+		PaintWingLegend(painter);
+		if(m_pCurWOpp) PaintWOppLegend(painter);
 	}
 	painter.restore();
 }
 
 
-void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
+void QMiarex::PaintWingLegend(QPainter &painter)
 {
 	if(!m_pCurWing) return;
 	painter.save();
@@ -14376,13 +14390,12 @@ void QMiarex::PaintWingLegend(QPainter &painter, QRect const & CltRect)
 }
 
 
-void QMiarex::PaintWOppLegend(QPainter &painter, QRect const & CltRect)
+void QMiarex::PaintWOppLegend(QPainter &painter)
 {
 	if(!m_pCurWOpp) return;
 	painter.save();
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString Result, str, strong;
-	QString str1;
+	QString Result, str;
 
 	int i;
 	int margin = 10;
@@ -15143,7 +15156,7 @@ void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 
 bool QMiarex::SaveSettings(QSettings *pSettings)
 {
-	int k;
+	int k=0;
 	pSettings->beginGroup("Miarex");
 	{
 		pSettings->setValue("bXTop", m_bXTop);

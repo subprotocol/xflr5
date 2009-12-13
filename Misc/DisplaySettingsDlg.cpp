@@ -123,9 +123,11 @@ void DisplaySettingsDlg::SetupLayout()
 
 void DisplaySettingsDlg::InitDialog()
 {
+	QString strong;
+	strong = QString(" %1").arg(m_TextFont.pointSize());
 	m_MemGraph.CopySettings(m_pRefGraph);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
-	m_pctrlTextFont->setText(m_TextFont.family());
+	m_pctrlTextFont->setText(m_TextFont.family()+strong);
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
 
 	QPalette palette = m_pctrlTextClr->palette();

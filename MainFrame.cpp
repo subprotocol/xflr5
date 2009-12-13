@@ -1588,7 +1588,7 @@ void MainFrame::CreateXDirectActions()
 	XDirectGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
 	connect(XDirectGraphDlg, SIGNAL(triggered()), pXDirect, SLOT(OnGraphSettings()));
 
-	resetGraphLegend = new QAction(tr("Reset Legend Position"), this);
+	resetGraphLegend = new QAction(tr("Reset Legend Position\t(R)"), this);
 	connect(resetGraphLegend, SIGNAL(triggered()), pXDirect, SLOT(OnResetGraphLegend()));
 
 	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs\t(T)"), this);
@@ -2846,7 +2846,7 @@ void MainFrame::keyReleaseEvent(QKeyEvent *event)
 			pMiarex->m_bArcball = false;
 			UpdateView();
 		}
-		else pMiarex->keyPressEvent(event);
+		else pMiarex->keyReleaseEvent(event);
 	}
 	else if(m_iApp == DIRECTDESIGN && m_pAFoil)
 	{
@@ -2994,19 +2994,20 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 }
 
 
+
 bool MainFrame::LoadSettings()
 {
-	QString FileName;
-	QColor clr;
 	QPoint pt;
 	bool bFloat;
 	int a;
-	QString strange;
+	QSize size;
+
+	if(SETTINGSFORMAT!=100603) return false;
 
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
 #else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
 #endif
 	settings.beginGroup("MainFrame");
 	{
@@ -3017,29 +3018,39 @@ bool MainFrame::LoadSettings()
 			return false;
 		}
 		m_LanguageFilePath = settings.value("LanguageFilePath").toString();
+
 		bFloat  = settings.value("Miarex_Float").toBool();
 		pt.rx() = settings.value("Miarex_x").toInt();
 		pt.ry() = settings.value("Miarex_y").toInt();
+		size    = settings.value("MiarexSize").toSize();
 		m_pctrlMiarexWidget->setFloating(bFloat);
 		if(bFloat) m_pctrlMiarexWidget->move(pt);
+		m_pctrlMiarexWidget->resize(size);
 
 		bFloat  = settings.value("XDirect_Float").toBool();
 		pt.rx() = settings.value("XDirect_x").toInt();
 		pt.ry() = settings.value("XDirect_y").toInt();
+		size    = settings.value("XDirectSize").toSize();
 		m_pctrlXDirectWidget->setFloating(bFloat);
 		if(bFloat) m_pctrlXDirectWidget->move(pt);
+		m_pctrlXDirectWidget->resize(size);
 
 		bFloat  = settings.value("AFoil_Float").toBool();
 		pt.rx() = settings.value("AFoil_x").toInt();
 		pt.ry() = settings.value("AFoil_y").toInt();
+		size    = settings.value("AFoilSize").toSize();
 		m_pctrlAFoilWidget->setFloating(bFloat);
 		if(bFloat) m_pctrlAFoilWidget->move(pt);
+		m_pctrlAFoilWidget->resize(size);
 
 		bFloat  = settings.value("XInverse_Float").toBool();
 		pt.rx() = settings.value("XInverse_x").toInt();
 		pt.ry() = settings.value("XInverse_y").toInt();
+		size    = settings.value("XInverseSize").toSize();
 		m_pctrlXInverseWidget->setFloating(bFloat);
 		if(bFloat) m_pctrlXInverseWidget->move(pt);
+		m_pctrlXInverseWidget->resize(size);
+
 
 		m_LastDirName = settings.value("LastDirName").toString();
 		m_LengthUnit  = settings.value("LengthUnit").toInt();
@@ -3062,7 +3073,6 @@ bool MainFrame::LoadSettings()
 		m_bSaveWOpps  = settings.value("SaveWOpps").toBool();
 		m_DlgPos.rx() = settings.value("DlgPos_x").toInt();
 		m_DlgPos.ry() = settings.value("DlgPos_y").toInt();
-
 
 		a = settings.value("RecentFileSize").toInt();
 		QString RecentF,strange;
@@ -4651,7 +4661,7 @@ void MainFrame::SaveSettings()
 
 	if(!m_bSaveSettings) return;
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
 #else
 	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
 #endif
@@ -4672,10 +4682,14 @@ void MainFrame::SaveSettings()
 		settings.setValue("Miarex_y", m_pctrlMiarexWidget->frameGeometry().y());
 		settings.setValue("XDirect_x", m_pctrlXDirectWidget->frameGeometry().x());
 		settings.setValue("XDirect_y", m_pctrlXDirectWidget->frameGeometry().y());
-		settings.setValue("AFoil_x", m_pctrlXDirectWidget->frameGeometry().x());
-		settings.setValue("AFoil_y", m_pctrlXDirectWidget->frameGeometry().y());
+		settings.setValue("AFoil_x", m_pctrlAFoilWidget->frameGeometry().x());
+		settings.setValue("AFoil_y", m_pctrlAFoilWidget->frameGeometry().y());
 		settings.setValue("XInverse_x", m_pctrlXInverseWidget->frameGeometry().x());
 		settings.setValue("XInverse_y", m_pctrlXInverseWidget->frameGeometry().y());
+		settings.setValue("XDirectSize", m_pctrlXDirectWidget->size());
+		settings.setValue("AFoilSize", m_pctrlAFoilWidget->size());
+		settings.setValue("XInverseSize", m_pctrlXInverseWidget->size());
+		settings.setValue("MiarexSize", m_pctrlMiarexWidget->size());
 		settings.setValue("LastDirName", m_LastDirName);
 		settings.setValue("LengthUnit", m_LengthUnit);
 		settings.setValue("AreaUnit", m_AreaUnit);
@@ -4708,7 +4722,6 @@ void MainFrame::SaveSettings()
 	}
 	settings.endGroup();
 
-
 	pAFoil->SaveSettings(&settings);
 	pXDirect->SaveSettings(&settings);
 	pMiarex->SaveSettings(&settings);
@@ -4716,9 +4729,9 @@ void MainFrame::SaveSettings()
 	GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
 	p3DScales->SaveSettings(&settings);
 	m_RefGraph.SaveSettings(&settings);
-
-
 }
+
+
 
 
 void MainFrame::SetCentralWidget()

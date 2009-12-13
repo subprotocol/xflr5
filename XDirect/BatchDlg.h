@@ -59,7 +59,7 @@ private:
 	void SetFileHeader();
 	void SetPlrName();
 	void StartAnalysis();
-	void UpdateGraph(double Re, double Alpha);
+	void UpdateGraph();
 	void UpdateOutput(QString &str);
 	void WriteString(QString &strong);
 
