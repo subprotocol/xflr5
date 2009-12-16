@@ -1205,6 +1205,7 @@ void QAFoil::OnAFoilCadd()
 	Adlg.m_pMemFoil    = g_pCurFoil;
 	Adlg.m_pXDirect    = NULL;
 	Adlg.m_pAFoil      = this;
+	Adlg.move(pMainFrame->m_DlgPos);
 	Adlg.InitDialog();
 
 	if(QDialog::Accepted == Adlg.exec())
@@ -1221,9 +1222,7 @@ void QAFoil::OnAFoilCadd()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
-
 	else
 	{
 		FillFoilTable();
@@ -1231,6 +1230,7 @@ void QAFoil::OnAFoilCadd()
 		m_pXFoil->m_FoilName ="";
 
 	}
+	pMainFrame->m_DlgPos = Adlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1238,10 +1238,12 @@ void QAFoil::OnAFoilCadd()
 
 void QAFoil::OnAFoilLECircle()
 {
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	LECircleDlg dlg;
 	dlg.m_Radius      = m_LERad;
 	dlg.m_bShowRadius = m_bLECircle;
 	dlg.m_pAFoil      = this;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog();
 
 	if(dlg.exec()==QDialog::Accepted)
@@ -1249,6 +1251,7 @@ void QAFoil::OnAFoilLECircle()
 		m_LERad = dlg.m_Radius;
 		m_bLECircle = dlg.m_bShowRadius;
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	UpdateView();
 }
 
@@ -1274,6 +1277,7 @@ void QAFoil::OnAFoilPanels()
 	Pdlg.m_pMemFoil    = g_pCurFoil;
 	Pdlg.m_pXDirect    = NULL;
 	Pdlg.m_pAFoil      = this;
+	Pdlg.move(pMainFrame->m_DlgPos);
 	Pdlg.InitDialog();
 
 	if(QDialog::Accepted == Pdlg.exec())
@@ -1289,9 +1293,7 @@ void QAFoil::OnAFoilPanels()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
-
 	else
 	{
 		FillFoilTable();
@@ -1299,6 +1301,8 @@ void QAFoil::OnAFoilPanels()
 //		m_pXFoil->m_FoilName ="";
 
 	}
+
+	pMainFrame->m_DlgPos = Pdlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1325,6 +1329,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pXDirect    = NULL;
 	dlg.m_pAFoil      = this;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1341,7 +1346,6 @@ void QAFoil::OnAFoilFoilCoordinates()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
 	else
 	{
@@ -1375,6 +1379,7 @@ void QAFoil::OnAFoilFoilGeom()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pAFoil      = this;
 	dlg.m_pXDirect    = NULL;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1390,15 +1395,14 @@ void QAFoil::OnAFoilFoilGeom()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
-
 	else
 	{
 		FillFoilTable();
 		SelectFoil(g_pCurFoil);
 //		m_pXFoil->m_FoilName ="";
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1426,6 +1430,7 @@ void QAFoil::OnAFoilSetTEGap()
 	Gdlg.m_pMemFoil    = g_pCurFoil;
 	Gdlg.m_pXDirect    = NULL;
 	Gdlg.m_pAFoil      = this;
+	Gdlg.move(pMainFrame->m_DlgPos);
 	Gdlg.InitDialog();
 
 	if(QDialog::Accepted == Gdlg.exec())
@@ -1451,6 +1456,8 @@ void QAFoil::OnAFoilSetTEGap()
 		//to un-initialize XFoil in case user switches to XInverse
 		//Thanks Jean-Marc !
 	}
+
+	pMainFrame->m_DlgPos = Gdlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1477,6 +1484,7 @@ void QAFoil::OnAFoilSetLERadius()
 	Ldlg.m_pMemFoil    = g_pCurFoil;
 	Ldlg.m_pXDirect    = NULL;
 	Ldlg.m_pAFoil      = this;
+	Ldlg.move(pMainFrame->m_DlgPos);
 	Ldlg.InitDialog();
 
 	if(QDialog::Accepted == Ldlg.exec())
@@ -1489,11 +1497,9 @@ void QAFoil::OnAFoilSetLERadius()
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints    = false;
 
-
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
 	else
 	{
@@ -1502,6 +1508,8 @@ void QAFoil::OnAFoilSetLERadius()
 //		m_pXFoil->m_FoilName ="";
 
 	}
+
+	pMainFrame->m_DlgPos = Ldlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1534,6 +1542,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.m_pXDirect  = NULL;
 	dlg.m_pAFoil    = this;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1560,6 +1569,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 //		dlg.m_pXFoil->m_FoilName ="";
 
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1582,6 +1592,7 @@ void QAFoil::OnAFoilNacaFoils()
 	dlg.m_pBufferFoil = m_pBufferFoil;
 	dlg.m_pXDirect = NULL;
 	dlg.m_pAFoil = this;
+	dlg.move(pMainFrame->m_DlgPos);
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -1605,9 +1616,7 @@ void QAFoil::OnAFoilNacaFoils()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
-
 	else
 	{
 		FillFoilTable();;
@@ -1615,6 +1624,8 @@ void QAFoil::OnAFoilNacaFoils()
 		m_pXFoil->m_FoilName ="";
 
 	}
+
+	pMainFrame->m_DlgPos = dlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1641,6 +1652,7 @@ void QAFoil::OnAFoilSetFlap()
 	dlg.m_pXFoil      = m_pXFoil;
 	dlg.m_pMemFoil    = g_pCurFoil;
 	dlg.m_pBufferFoil = m_pBufferFoil;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog();
 
 	if(QDialog::Accepted == dlg.exec())
@@ -1662,6 +1674,7 @@ void QAFoil::OnAFoilSetFlap()
 		SelectFoil(g_pCurFoil);
 		m_pXFoil->m_FoilName ="";
 	}
+	pMainFrame->m_DlgPos = dlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }

@@ -67,7 +67,7 @@ private:
 	bool UnitLoop();
 	bool ControlLoop();
 	bool Gauss(double *A, int n, double *B, int m);
-	bool VLMCreateRHS(double V0);
+	bool VLMCreateRHS();
 	bool VLMSolveDouble();
 	bool VLMCreateMatrix();
 	bool VLMSolveMultiple(double V0, double VDelta, int nval);

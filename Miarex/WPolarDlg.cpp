@@ -29,6 +29,8 @@
 #include <QGroupBox>
 #include <math.h>
  
+
+
 WPolarDlg::WPolarDlg()
 {
 	setWindowTitle(tr("Analysis Definition"));
@@ -42,7 +44,7 @@ WPolarDlg::WPolarDlg()
 
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 1.0;
-	m_XCmRef     = 0.0;
+//	m_XCmRef     = 0.0;
 	m_Alpha      = 0.0;
 	m_Beta       = 0.0;
 	m_Type       = 1;
@@ -53,6 +55,7 @@ WPolarDlg::WPolarDlg()
 	m_pWing	     = NULL;
 	m_pPlane     = NULL;
 
+	m_CoG.Set(0.0,0.0,0.0);
 	m_AnalysisType = 1;
 
 	m_bVLM1         = true;
@@ -96,6 +99,7 @@ void WPolarDlg::Connect()
 	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
 
 	connect(m_pctrlXCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
+	connect(m_pctrlZCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlDensity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlViscosity, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlAlpha, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
@@ -228,7 +232,9 @@ void WPolarDlg::InitDialog()
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
 	m_pctrlLengthUnit1->setText(str);
 	m_pctrlLengthUnit2->setText(str);
-	m_pctrlXCmRef->SetValue(m_XCmRef*pMainFrame->m_mtoUnit);
+	m_pctrlLengthUnit3->setText(str);
+	m_pctrlXCmRef->SetValue(m_CoG.x*pMainFrame->m_mtoUnit);
+	m_pctrlZCmRef->SetValue(m_CoG.z*pMainFrame->m_mtoUnit);
 
 	GetWeightUnit(str1, pMainFrame->m_WeightUnit);
 	m_pctrlWeightUnit->setText(str1);
@@ -548,7 +554,8 @@ void WPolarDlg::ReadValues()
 	m_Alpha     = m_pctrlAlpha->GetValue();
 	m_Beta      = m_pctrlBeta->GetValue();
 	m_Weight    = m_pctrlWeight->GetValue() / pMainFrame->m_kgtoUnit;
-	m_XCmRef    = m_pctrlXCmRef->GetValue() / pMainFrame->m_mtoUnit;
+	m_CoG.x     = m_pctrlXCmRef->GetValue() / pMainFrame->m_mtoUnit;
+	m_CoG.z     = m_pctrlZCmRef->GetValue() / pMainFrame->m_mtoUnit;
 	m_QInf      = m_pctrlQInf->GetValue() / pMainFrame->m_mstoUnit;
 	m_Height    = m_pctrlHeight->GetValue() / pMainFrame->m_mtoUnit;
 
@@ -635,37 +642,43 @@ void WPolarDlg::SetupLayout()
 	QGridLayout *PlaneLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel(tr("Free Stream Speed"));
 	QLabel *lab2 = new QLabel(tr("Plane Weight"));
-	QLabel *lab3 = new QLabel(tr("Mom. ref. location"));
-	QLabel *lab4 = new QLabel(tr("Angle of Attack"));
-	QLabel *lab5 = new QLabel(tr("Side Slip"));
+	QLabel *lab3 = new QLabel(tr("X_CoG"));
+	QLabel *lab4 = new QLabel(tr("Z_CoG"));
+	QLabel *lab5 = new QLabel(tr("Angle of Attack"));
+	QLabel *lab6 = new QLabel(tr("Side Slip"));
 	PlaneLayout->addWidget(lab1,1,1);
 	PlaneLayout->addWidget(lab2,2,1);
 	PlaneLayout->addWidget(lab3,3,1);
 	PlaneLayout->addWidget(lab4,4,1);
 	PlaneLayout->addWidget(lab5,5,1);
+	PlaneLayout->addWidget(lab6,6,1);
 	m_pctrlQInf    = new FloatEdit(10.05);
 	m_pctrlQInf->SetMin(0.0);
 	m_pctrlWeight  = new FloatEdit(1.234);
 	m_pctrlWeight->SetPrecision(3);
 	m_pctrlWeight->SetMin(0.0);
 	m_pctrlXCmRef  = new FloatEdit(100.00);
+	m_pctrlZCmRef  = new FloatEdit(100.00);
 	m_pctrlAlpha   = new FloatEdit(1.00);
 	m_pctrlBeta    = new FloatEdit(0.00);
 	PlaneLayout->addWidget(m_pctrlQInf,1,2);
 	PlaneLayout->addWidget(m_pctrlWeight,2,2);
 	PlaneLayout->addWidget(m_pctrlXCmRef,3,2);
-	PlaneLayout->addWidget(m_pctrlAlpha,4,2);
-	PlaneLayout->addWidget(m_pctrlBeta,5,2);
+	PlaneLayout->addWidget(m_pctrlZCmRef,4,2);
+	PlaneLayout->addWidget(m_pctrlAlpha,5,2);
+	PlaneLayout->addWidget(m_pctrlBeta,6,2);
 	m_pctrlSpeedUnit   = new QLabel("m/s");
 	m_pctrlWeightUnit  = new QLabel("kg");
 	m_pctrlLengthUnit1 = new QLabel("mm");
-	QLabel *lab6 = new QLabel(QString::fromUtf8("°"));
+	m_pctrlLengthUnit3 = new QLabel("mm");
 	QLabel *lab7 = new QLabel(QString::fromUtf8("°"));
+	QLabel *lab8 = new QLabel(QString::fromUtf8("°"));
 	PlaneLayout->addWidget(m_pctrlSpeedUnit ,1,3);
 	PlaneLayout->addWidget(m_pctrlWeightUnit ,2,3);
 	PlaneLayout->addWidget(m_pctrlLengthUnit1 ,3,3);
-	PlaneLayout->addWidget(lab6 ,4,3);
+	PlaneLayout->addWidget(m_pctrlLengthUnit3 ,4,3);
 	PlaneLayout->addWidget(lab7 ,5,3);
+	PlaneLayout->addWidget(lab8 ,6,3);
 	QGroupBox *PlaneGroup = new QGroupBox(tr("Plane and Flight Data"));
 	PlaneGroup->setLayout(PlaneLayout);
 
@@ -833,7 +846,7 @@ void WPolarDlg::SetWPolarName()
 	}*/
 
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	strong = QString("-%1").arg(m_XCmRef*pMainFrame->m_mtoUnit,6,'f',2);
+	strong = QString("-%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,6,'f',2);
 	m_WPolarName += strong + str;
 
 	if(fabs(m_Beta) > .001)

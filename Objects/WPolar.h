@@ -20,9 +20,6 @@
 *****************************************************************************/
 
 
-// WPolar.h: interface for the CWPolar class.
-//
-//////////////////////////////////////////////////////////////////////
 
 
 #ifndef WPOLAR_H
@@ -59,9 +56,11 @@ private:
 	double m_QInf;
 	double m_Weight;
 	double m_ASpec;
-	double m_XCmRef;
+//	double m_XCmRef;
 	double m_Beta;
 	double m_AMem;
+
+	CVector m_CoG;
 
 	int m_Style;
 	int m_Width;

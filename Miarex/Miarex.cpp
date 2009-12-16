@@ -926,7 +926,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		m_pCurWPolar->AddPoint(pPOpp);
 
-		m_pCurWOpp = &pPOpp->m_WingWOpp;
+//		m_pCurWOpp = &pPOpp->m_WingWOpp;
 		if(m_iView==WPOLARVIEW)
 		{
 			CreateWPolarCurves();
@@ -1023,8 +1023,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		pPOpp->m_Wing2WOpp.m_Width   = pPOpp->m_Width;
 		pPOpp->m_StabWOpp.m_Width    = pPOpp->m_Width;
 		pPOpp->m_FinWOpp.m_Width     = pPOpp->m_Width;
-		m_pCurPOpp = pPOpp;
-		m_pCurWOpp = &m_pCurPOpp->m_WingWOpp;
+//		m_pCurPOpp = pPOpp;
+//		m_pCurWOpp = &m_pCurPOpp->m_WingWOpp;
 	}
 	else
 	{
@@ -1427,7 +1427,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			}
 		}
 		if (!bIsInserted) 	m_poaWOpp->append(pNewPoint);
-		m_pCurWOpp = pNewPoint;
+//		m_pCurWOpp = pNewPoint;
 	}
 	else
 	{
@@ -11295,7 +11295,7 @@ void QMiarex::OnDefineCtrlPolar()
 		pCurWPolar->m_AnalysisType    = 2; //vlm
 		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
-		pCurWPolar->m_XCmRef          = 0.0;
+		pCurWPolar->m_CoG.Set(0.0,0.0,0.0);;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Beta            = 0.0;
 		pCurWPolar->m_Height          = 0.0;
@@ -11408,7 +11408,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_Type            = m_WngAnalysis.m_Type;
 		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
 		pNewWPolar->m_Weight          = m_WngAnalysis.m_Weight;
-		pNewWPolar->m_XCmRef          = m_WngAnalysis.m_XCmRef;
+		pNewWPolar->m_CoG             = m_WngAnalysis.m_CoG;
 		pNewWPolar->m_Beta            = m_WngAnalysis.m_Beta;
 		pNewWPolar->m_ASpec           = m_WngAnalysis.m_Alpha;
 		pNewWPolar->m_PlrName         = m_WngAnalysis.m_WPolarName;
@@ -14854,7 +14854,7 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 	painter.setPen(XCmRefPen);
 
 	int XCm = O.x() ;
-	int YCm = O.y() + (int)(m_pCurWPolar->m_XCmRef*scaley);
+	int YCm = O.y() + (int)(m_pCurWPolar->m_CoG.x*scaley);
 	int size = 3;
 	QRect CM(XCm-size, YCm-size, 2*size, 2*size);
 	painter.drawEllipse(CM);
@@ -14947,7 +14947,8 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
 	pMainFrame->UpdateWOpps();
-	SetWOpp(false, V0);
+	if(m_pCurPlane)     SetPOpp(false, V0);
+	else if(m_pCurWing) SetWOpp(false, V0);
 	if(m_iView==WPOLARVIEW) CreateWPolarCurves();
 
 //	m_pPanelDlg->hide();
@@ -17794,9 +17795,10 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	if(!m_bLogFile || !m_pVLMDlg->m_bWarning) m_pVLMDlg->hide();
 
 	pMainFrame->UpdateWOpps();
-	SetWOpp(false, V0);
-	if(m_iView==WPOLARVIEW) CreateWPolarCurves();
+	if(m_pCurPlane)     SetPOpp(false, V0);
+	else if(m_pCurWing) SetWOpp(false, V0);
 
+	if(m_iView==WPOLARVIEW) CreateWPolarCurves();
 
 	UpdateView();
 }

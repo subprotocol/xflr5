@@ -91,7 +91,7 @@ private:
 	bool m_bViscous;
 	bool m_bGround;
 
-	double m_QInf, m_Weight, m_Alpha, m_XCmRef;
+	double m_QInf, m_Weight, m_Alpha;
 	double m_Beta;
 	double m_Density, m_Viscosity;
 	double m_WingLoad;
@@ -103,7 +103,9 @@ private:
 
 	int m_RefAreaType;
 
-	FloatEdit *m_pctrlXCmRef;
+	CVector m_CoG;
+
+	FloatEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
 	FloatEdit *m_pctrlDensity;
 	FloatEdit *m_pctrlViscosity;
 	FloatEdit *m_pctrlAlpha;
@@ -137,7 +139,7 @@ private:
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
 
-	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2;
+	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3;
 
 	QPushButton *m_pctrlWakeParams;
 	QPushButton	*OKButton, *CancelButton;

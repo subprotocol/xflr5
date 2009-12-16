@@ -20,10 +20,9 @@
 *****************************************************************************/
 
 
-// WPolar.cpp: implementation of the CWPolar class.
 // The class for wing polars
-//
-//////////////////////////////////////////////////////////////////////
+
+
 
 #include "WPolar.h"
 #include "../MainFrame.h"
@@ -59,7 +58,6 @@ CWPolar::CWPolar()
 	m_Beta      = 0.0;
 	m_QInf      = 10.0;
 	m_Weight    = 1.0;
-	m_XCmRef    = 0.0;
 	m_ASpec     = 0.0;
 	m_WArea     = 0.0;
 	m_WMAChord  = 0.0;
@@ -68,6 +66,8 @@ CWPolar::CWPolar()
 	m_Height    = 0.0;
 	m_Density   = 1.225;
 	m_Viscosity = 1.5e-5;//m2/s
+
+	m_CoG.Set(0.0, 0.0, 0.0);
 
 	m_nControls = 0;
 	memset(m_MinControl, 0, sizeof(m_MinControl));
@@ -800,7 +800,7 @@ void CWPolar::CalculatePoint(int i)
 	if(m_ICd[i]==0.0)	m_Oswald[i] = 0.0;
 	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/PI/m_ICd[i]/AR;
 
-	m_SM[i]        = (m_XCP[i]-m_XCmRef)/m_WMAChord *100.00;
+	m_SM[i]        = (m_XCP[i]-m_CoG.x)/m_WMAChord *100.00;
 }
 
 
@@ -1064,8 +1064,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 		
-		if(ProjectFormat==5) ar << 1017; // identifies the format of the file
+		if(ProjectFormat==5) ar << 1018; // identifies the format of the file
 		else                 ar << 1016;
+					// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
 					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
 					// 1016 : added lateral force coefficient
 					// 1015 : added lateral force coefficient
@@ -1106,7 +1107,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << (float)m_Weight;
 		ar << (float)m_ASpec ;
 		ar << (float)m_Beta ;
-		ar << (float)m_XCmRef;
+		if(ProjectFormat<5) ar << (float)m_CoG.x;
+		else                ar << (float)m_CoG.x << (float)m_CoG.y << (float)m_CoG.z;
 		ar <<( float)m_Density << (float)m_Viscosity;
 
 		ar << m_RefAreaType;
@@ -1302,7 +1304,17 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar >> f;	m_ASpec = f;
 		if(ArchiveFormat>=1015) ar >> f;	m_Beta = f;
 
-		if(ArchiveFormat>=1002) ar >> f; m_XCmRef = f;
+		if(ArchiveFormat<1018 && ArchiveFormat>=1002)
+		{
+			ar >> f;			m_CoG.x = f;
+		}
+		else if(ArchiveFormat>=1018)
+		{
+			ar >> f;			m_CoG.x = f;
+			ar >> f;			m_CoG.y = f;
+			ar >> f;			m_CoG.z = f;
+		}
+//		if(ArchiveFormat>=1002) ar >> f; m_XCmRef = f;
 
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
@@ -1311,15 +1323,17 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		else                    m_RefAreaType = 1;
 
 		ar >> n;
-		if (n<0 || n> 100000){
+		if (n<0 || n> 100000)
+		{
 			m_PlrName ="";
 			return false;
 		}
-		if(ArchiveFormat<1010){
+		if(ArchiveFormat<1010)
+		{
 			m_WArea    /=100.0;
 			m_WMAChord /=1000.0;
 			m_WSpan    /=1000.0;
-			m_XCmRef   /=1000.0;
+			m_CoG.x   /=1000.0;
 		}
 	
 		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb;

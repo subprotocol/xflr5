@@ -144,7 +144,7 @@ CBody::CBody()
 
 
 void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
-						double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted)
+						double &GCm, double &GRm, double &GYm, double &Alpha, CVector const &CoG)
 {
 	int p;
 	double cosa, sina, PanelLift;
@@ -168,7 +168,8 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
 		PanelLift = PanelForce.dot(WindNormal);
 		XCP   += m_pPanel[p].CollPt.x * PanelLift;
 		YCP   += m_pPanel[p].CollPt.y * PanelLift;
-		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
+//		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
+		LeverArm = m_pPanel[p].CollPt - CoG;
 		GeomMoment = LeverArm * PanelForce;
 
 		GCm  += GeomMoment.y;

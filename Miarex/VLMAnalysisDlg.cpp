@@ -138,7 +138,7 @@ bool VLMAnalysisDlg::AlphaLoop()
 	str = tr("   Solving the problem... \r\n\r\n");
 	AddString(str);
 
-	if(!VLMCreateRHS(0.0))
+	if(!VLMCreateRHS())
 	{
 		AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
 
@@ -234,9 +234,9 @@ bool VLMAnalysisDlg::ControlLoop()
 		if(m_pWPolar->m_bActiveControl[0])
 		{
 			//XCmRef
-			m_pWPolar->m_XCmRef = m_pWPolar->m_MinControl[0] + t * (m_pWPolar->m_MaxControl[0] - m_pWPolar->m_MinControl[0]);
+			m_pWPolar->m_CoG.x = m_pWPolar->m_MinControl[0] + t * (m_pWPolar->m_MaxControl[0] - m_pWPolar->m_MinControl[0]);
 		}
-		else m_pWPolar->m_XCmRef = m_pWPolar->m_MinControl[0];
+		else m_pWPolar->m_CoG.x = m_pWPolar->m_MinControl[0];
 
 		nCtrl = 1;
 
@@ -315,7 +315,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 		m_OpAlpha = 0.0;
 
-		if(!VLMCreateRHS(0.0))
+		if(!VLMCreateRHS())
 		{
 			AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
 			m_bWarning = true;
@@ -693,7 +693,7 @@ bool VLMAnalysisDlg::ReLoop()
 		Alpha = m_AlphaMin;
 	}
 
-	if(!VLMCreateRHS(Alpha))
+	if(!VLMCreateRHS())
 	{
 		AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
 		m_bWarning = true;
@@ -853,7 +853,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		if (m_bCancel) break;
 
-		if(!VLMCreateRHS(0.0))
+		if(!VLMCreateRHS())
 		{
 			AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
 			m_bWarning = true;
@@ -887,7 +887,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 
 
-bool VLMAnalysisDlg::VLMCreateRHS(double V0)
+bool VLMAnalysisDlg::VLMCreateRHS()
 {
 	int m, Size;
 
@@ -966,7 +966,7 @@ double VLMAnalysisDlg::VLMComputeCm(double alpha)
 
 	for(p=0; p<Size; p++)
 	{
-		PanelLeverArm.Set(m_ppPanel[p]->VortexPos.x - m_pWPolar->m_XCmRef, m_ppPanel[p]->VortexPos.y, m_ppPanel[p]->VortexPos.z);
+		PanelLeverArm.Set(m_ppPanel[p]->VortexPos.x - m_pWPolar->m_CoG.x, m_ppPanel[p]->VortexPos.y, m_ppPanel[p]->VortexPos.z);
 		Force = V * m_ppPanel[p]->Vortex * (m_xRHS[p]*cosa + m_zRHS[p]*sina);         //Newtons/rho
 
 		if(!m_pWPolar->m_bVLM1 && !m_ppPanel[p]->m_bIsLeading)

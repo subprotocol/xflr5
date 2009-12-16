@@ -891,7 +891,7 @@ bool PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		{
 			AddString(tr("       Calculating body...")+"\r\n");
 
-			(*m_ppBody)->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_XCmRef, m_pWPolar->m_bTiltedGeom);
+			(*m_ppBody)->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
 
 			//the body does not shed any wake--> no induced lift or drag
 

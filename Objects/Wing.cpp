@@ -1153,14 +1153,17 @@ double CWing::GetAverageSweep()
 	return (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
 }
 
+
 double CWing::GetC4(double yob, double xRef)
 {
-	//returns the quarter-chord point xposition relative to XCmRef
-	double Chord, Offset, tau;
-	double C4 = 0.0;
-	double y = fabs(yob*m_PlanformSpan/2.0);
-	for(int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<= y && y <=m_TPos[i+1]){
+	//returns the quarter-chord point xposition
+	static double Chord, Offset, tau, C4, y;
+	C4 = 0.0;
+	y = fabs(yob*m_PlanformSpan/2.0);
+	for(int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]<= y && y <=m_TPos[i+1])
+		{
 			tau = (y - m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
 			Chord  = m_TChord[i]  + tau * (m_TChord[i+1] - m_TChord[i]);
 			Offset = m_TOffset[i] + tau * (m_TOffset[i+1] - m_TOffset[i]);
@@ -1168,19 +1171,20 @@ double CWing::GetC4(double yob, double xRef)
 			return C4;
 		}
 	}
-
 	return C4;
 }
 
+
 double CWing::GetChord(double yob)
 {
-	double Chord = 0.0;
-	double tau;
-	double y;
+	static double Chord, tau, y;
+	Chord = 0.0;
 
 	y= fabs(yob*m_PlanformSpan/2.0);//geometry is symetric
-	for(int i=0; i<m_NPanel; i++){
-		if(m_TPos[i]<=y && y <=m_TPos[i+1]){
+	for(int i=0; i<m_NPanel; i++)
+	{
+		if(m_TPos[i]<=y && y <=m_TPos[i+1])
+		{
 			tau = (y - m_TPos[i])/(m_TPos[i+1]-m_TPos[i]);
 			Chord = m_TChord[i] + tau * (m_TChord[i+1] - m_TChord[i]);
 			return Chord;
@@ -1593,7 +1597,7 @@ void CWing::LLTComputeWing()
 
 		arad = (s_Alpha+m_Ai[m]+m_Twist[m])*PI/180.0;
 //		arad = (s_Alpha-m_Ai[m])*PI/180.0;
-		c4   = GetC4(yob, pWPolar->m_XCmRef)/m_Chord[m];
+		c4   = GetC4(yob, pWPolar->m_CoG.x)/m_Chord[m];
 		zpos = GetZPos(yob*m_PlanformSpan/2.0)/m_Chord[m];
 
 		m_Cm[m]      = m_CmAirf[m]- c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
@@ -1880,8 +1884,8 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 			m_Surface[j].GetLeadingPt(k, PtLE);
 			m_Surface[j].GetC4(k, PtC4, tau);
 
-			LeverArm = PtC4;
-			LeverArm.x -= pWPolar->m_XCmRef;
+			LeverArm = PtC4 - pWPolar->m_CoG;
+//			LeverArm.x -= pWPolar->m_XCmRef;
 
 			GeomMoment.Set(0.0,0.0,0.0);
 
@@ -1896,9 +1900,9 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				Moment0 = LeverArmC4 * PanelForce;                                  // N.m/q
 				m_CmAirf[m]  += Moment0.y;                                          // N.m/q
 
-				PanelLeverArm.x = m_pPanel[p].CollPt.x - pWPolar->m_XCmRef;
-				PanelLeverArm.y = m_pPanel[p].CollPt.y;
-				PanelLeverArm.z = m_pPanel[p].CollPt.z;
+				PanelLeverArm.x = m_pPanel[p].CollPt.x - pWPolar->m_CoG.x;
+				PanelLeverArm.y = m_pPanel[p].CollPt.y - pWPolar->m_CoG.y;
+				PanelLeverArm.z = m_pPanel[p].CollPt.z - pWPolar->m_CoG.z;
 				GeomMoment += PanelLeverArm * PanelForce;
 
 				m_StripArea[m]    += m_pPanel[p].Area;
@@ -2693,9 +2697,9 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 	QString string, strong;
 	CFoil *pFoil0, *pFoil1;
 	CVector DragVector, VInf, WindNormal, WindDirection;
-	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PtC4, PtLE, PanelForce, StripForce, Moment0, Moment1;
-	CVector TotalMoment, DragMoment, GeomMoment;
-	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment;
+	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PtC4, PtLE, PanelForce, StripForce, Moment0;
+	CVector DragMoment, GeomMoment;
+	CVector H, HA, HB, HingeLeverArm, HingeMoment;
 
 	//dynamic pressure, kg/m3
 	q = 0.5 * s_Density * s_QInf * s_QInf;
@@ -2748,8 +2752,8 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			m_Surface[j].GetLeadingPt(k, PtLE);
 			m_Surface[j].GetC4(k, PtC4, tau);
 
-			LeverArm   = PtC4;
-			LeverArm.x -= pWPolar->m_XCmRef;
+			LeverArm   = PtC4 - pWPolar->m_CoG;
+//			LeverArm.x -= pWPolar->m_XCmRef;
 
 			m_StripArea[m] = 0.0;
 
@@ -2757,9 +2761,9 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			{
 				m_StripArea[m] += m_pPanel[p].Area;
 				LeverArmC4  = m_pPanel[p].VortexPos - PtC4;
-				PanelLeverArm.x = m_pPanel[p].VortexPos.x - pWPolar->m_XCmRef;
-				PanelLeverArm.y = m_pPanel[p].VortexPos.y;
-				PanelLeverArm.z = m_pPanel[p].VortexPos.z;
+				PanelLeverArm.x = m_pPanel[p].VortexPos.x - pWPolar->m_CoG.x;
+				PanelLeverArm.y = m_pPanel[p].VortexPos.y - pWPolar->m_CoG.y;
+				PanelLeverArm.z = m_pPanel[p].VortexPos.z - pWPolar->m_CoG.z;
 
 				// for each panel along the chord, add the lift coef
 				PanelForce  = VInf * m_pPanel[p].Vortex;

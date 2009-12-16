@@ -57,7 +57,7 @@ public:
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
-		             double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef, bool bTilted);
+					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector const &CoG);
 	void ComputeCenterLine();
 	void ComputeBodyInertia(double const & Mass);
 	void Duplicate(CBody *pBody);

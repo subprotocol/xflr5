@@ -4842,7 +4842,6 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	else       UFOName = pWing->m_WingName;
 
 	int i,j;
-	QString strong;
 
 	// storing code
 	ar << 100011;
@@ -4864,7 +4863,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << pMiarex->m_WngAnalysis.m_Type;
 	ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 	ar << (float)pMiarex->m_WngAnalysis.m_QInf;
-	ar << (float)pMiarex->m_WngAnalysis.m_XCmRef;
+	ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
 	ar << (float)pMiarex->m_WngAnalysis.m_Density;
 	ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 
@@ -5105,7 +5104,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 	if (bIsStoring)
 	{
 		// storing code
-		ar << 100012;
+		ar << 100013;
+		// 100013 : Added CoG serialization
 		// 100012 : Added sideslip
 		// 100011 : Added Body serialization
 		// 100010 : Converted to I.S. units
@@ -5126,7 +5126,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << pMiarex->m_WngAnalysis.m_Type;
 		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
-		ar << (float)pMiarex->m_WngAnalysis.m_XCmRef;
+		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
+		ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
+		ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
 		ar << (float)pMiarex->m_WngAnalysis.m_Density;
 		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
@@ -5241,8 +5243,19 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				ar >> pMiarex->m_WngAnalysis.m_Type;
 				ar >> f; pMiarex->m_WngAnalysis.m_Weight=f;
 				ar >> f; pMiarex->m_WngAnalysis.m_QInf=f;
-				ar >> f; pMiarex->m_WngAnalysis.m_XCmRef=f;
-				if(ArchiveFormat<100010) pMiarex->m_WngAnalysis.m_XCmRef=f/1000.0;
+				if(ArchiveFormat>=100013)
+				{
+					ar >> f; pMiarex->m_WngAnalysis.m_CoG.x=f;
+					ar >> f; pMiarex->m_WngAnalysis.m_CoG.y=f;
+					ar >> f; pMiarex->m_WngAnalysis.m_CoG.z=f;
+				}
+				else
+				{
+					ar >> f; pMiarex->m_WngAnalysis.m_CoG.x=f;
+					pMiarex->m_WngAnalysis.m_CoG.y=0;
+					pMiarex->m_WngAnalysis.m_CoG.z=0;
+				}
+				if(ArchiveFormat<100010) pMiarex->m_WngAnalysis.m_CoG.x=f/1000.0;
 				ar >> f; pMiarex->m_WngAnalysis.m_Density=f;
 				ar >> f; pMiarex->m_WngAnalysis.m_Viscosity=f;
 				ar >> f; pMiarex->m_WngAnalysis.m_Alpha=f;

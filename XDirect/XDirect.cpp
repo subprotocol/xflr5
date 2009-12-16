@@ -3006,6 +3006,7 @@ void QXDirect::OnFoilCoordinates()
 {
 	if(!g_pCurFoil)	return;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	StopAnimate();
 
 	bool bState = m_bShowPanels;//save current view setting
 
@@ -3750,7 +3751,7 @@ void QXDirect::OnManageFoils()
 void QXDirect::OnNacaFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
+	StopAnimate();
 	m_bPolar   = false;
 
 	void* ptr0 = g_pCurFoil;
@@ -3808,7 +3809,9 @@ void QXDirect::OnNormalizeFoil()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!g_pCurFoil) return;
-	QString str, str1;
+	QString str;
+	StopAnimate();
+
 
 	double length = g_pCurFoil->NormalizeGeometry();
 	InitXFoil();
