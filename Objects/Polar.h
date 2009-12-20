@@ -43,6 +43,8 @@ class CPolar
 	friend class EditPlrDlg;
 
 private:
+	static void *s_pMainFrame;
+
 	int m_Type;// the Polar format type - used for Serialize action
 	int m_ReType;// the reynolds type
 	int m_MaType;//the mach type

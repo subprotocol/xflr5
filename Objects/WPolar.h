@@ -85,7 +85,7 @@ private:
 	bool m_bWakeRollUp;
 	bool m_bTiltedGeom;
 	bool m_bViscous;
-	bool m_bPolar;//true if classic polar, false, if control polar
+//	bool m_bPolar;//true if classic polar, false, if control polar
 
 	int m_NXWakePanels;
 	double m_TotalWakeLength;

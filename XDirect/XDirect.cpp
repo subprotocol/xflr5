@@ -2157,6 +2157,7 @@ void QXDirect::OnCpGraph()
 	{
 //		m_pCpGraph->ResetLimits();
 		m_pCpGraph->SetAuto(true);
+		m_pCpGraph->SetYVariable(0);
 	}
 	m_pCpGraph->SetYVariable(0);
 	m_pCpGraph->SetInverted(true);
@@ -3991,6 +3992,7 @@ void QXDirect::OnQGraph()
 	{
 		m_pCpGraph->ResetLimits();
 		m_pCpGraph->SetAuto(true);
+		m_pCpGraph->SetYVariable(1);
 	}
 	m_pCpGraph->SetXVariable(1);
 	m_pCpGraph->SetInverted(false);

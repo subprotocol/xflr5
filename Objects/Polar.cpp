@@ -22,10 +22,11 @@
 
 
 #include "Polar.h"
+#include "../MainFrame.h"
 #include "../Globals.h"
 #include "../XDirect/XFoil.h"
 
-
+void *CPolar::s_pMainFrame;
 
 CPolar::CPolar()
 {
@@ -54,11 +55,12 @@ CPolar::~CPolar()
 
 void CPolar::ExportPolar(QTextStream &out, int FileType)
 {
-    QString strOut, Header, strong;
+	QString Header, strong;
 	int j;
 
-//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
-    out << "\n    QFLR5_v.0001\n\n";
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	strong =pMainFrame->m_VersionName + "\n\n";
+	out << strong;
 	strong =(" Calculated polar for: ");
 	strong += m_FoilName + "\n\n";
     out << strong;

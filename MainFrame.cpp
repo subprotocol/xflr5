@@ -931,7 +931,7 @@ void MainFrame::CreateDockWindows()
 	GraphDlg::s_pMainFrame = this;
 	GraphDlg::s_ActivePage = 0;
 
-
+	CPolar::s_pMainFrame = this;
 
 	UFOTableDelegate::s_pMiarex = m_pMiarex;
 }
@@ -5577,6 +5577,8 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 	// and initializes XFoil, comboboxes and everything.
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+
 	int j,k,l;
 	bool bExists = false;
 	bool bNotFound = true;
@@ -5710,8 +5712,12 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 		AddFoil(pNewFoil);
 		SetSaveState(false);
 	}
-	if(m_iApp == XFOILANALYSIS) pXDirect->SetFoil(pNewFoil);
+//	if(m_iApp == XFOILANALYSIS)
+
+	pAFoil->SelectFoil(pNewFoil);
+	pXDirect->SetFoil(pNewFoil);
 	g_pCurFoil = pNewFoil;
+
 	return pNewFoil;// foil added
 }
 

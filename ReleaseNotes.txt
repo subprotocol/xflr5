@@ -25,6 +25,7 @@ QFLR5 v0.04 Beta December xxx 2009
 	- Fixed the issues with animation in Miarex
 	- Fixed the issue with 3d Cp scale settings
 	- Corrected a bug in the estimation of the CoG for wings
+	- Corrected incorrect summation of a plane's inertia components
 	- Forced the use of QPaintEngine::OpenGL, which seems to fix the font display issue
 	- Corrected a crash bug when selecting splines in Direct Design
 	- Corrected a crash bug when capturing the OpenGl view to an image file

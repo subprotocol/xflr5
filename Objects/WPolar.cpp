@@ -41,7 +41,7 @@ CWPolar::CWPolar()
 	m_bWakeRollUp   = false;
 	m_bTiltedGeom   = false;
 	m_bViscous      = true;
-	m_bPolar        = true;
+//	m_bPolar        = true;
 	m_bGround       = false;
 
 	m_NXWakePanels = 1;
@@ -814,7 +814,7 @@ void CWPolar::Copy(CWPolar *pWPolar)
 {
 	int i;
 	m_bIsVisible    = pWPolar->m_bIsVisible;
-	m_bPolar        = pWPolar->m_bPolar;
+//	m_bPolar        = pWPolar->m_bPolar;
 	m_bShowPoints   = pWPolar->m_bShowPoints;
 	m_bTiltedGeom   = pWPolar->m_bTiltedGeom;
 	m_bViscous      = pWPolar->m_bViscous;
@@ -876,11 +876,10 @@ void CWPolar::Export(QTextStream &out, int FileType)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
-	QString strOut, Header, strong, str;
+	QString Header, strong, str;
 	if (FileType==1)
 	{
-	//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
-		strong = "QFLR5_v.0001\n\n";//TODO
+		strong ="\n    " + pMainFrame->m_VersionName + "\n\n";
 		out << strong;
 
 		strong ="Wing name :        "+ m_UFOName + "\n";
@@ -920,11 +919,7 @@ void CWPolar::Export(QTextStream &out, int FileType)
 	}
 	else if (FileType==2)
 	{
-		QString strOut;
-		QString Header, strong;
-
-	//	strong ="\n    " + pFrame->m_VersionName + "\n\n";
-		strong = "QFLR5_v.0001\n\n";//TODO
+		strong = pMainFrame->m_VersionName + "\n\n";
 		out << strong;
 
 		strong ="Wing name :, "+ m_UFOName + "\n";

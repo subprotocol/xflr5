@@ -11316,7 +11316,7 @@ void QMiarex::OnDefineCtrlPolar()
 			pCurWPolar->m_bActiveControl[i] = false;
 		}
 
-		pCurWPolar->m_bPolar = true;
+//		pCurWPolar->m_bPolar = true;
 
 		pCurWPolar->m_Color = pMainFrame->GetColor(4);
 		CWPolar *pWPolar;
@@ -11426,7 +11426,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
 		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
 
-		pNewWPolar->m_bPolar       = true;
+//		pNewWPolar->m_bPolar       = true;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		CWPolar *pWPolar;

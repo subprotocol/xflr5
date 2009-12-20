@@ -106,7 +106,6 @@ CPlane::CPlane()
 	m_PlaneName  = QObject::tr("Plane Name");
 }
 
-
 void CPlane::ComputeInertia(double const & Mass)
 {
 	//calculation performed for user information only
@@ -165,27 +164,30 @@ void CPlane::ComputeInertia(double const & Mass)
 	if(m_bBiplane)
 	{
 		Pt = m_Wing2.m_CoG + m_LEWing2;
-		m_CoGIxx = m_Wing2.m_CoGIxx + m_Wing2.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
-		m_CoGIyy = m_Wing2.m_CoGIyy + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
-		m_CoGIzz = m_Wing2.m_CoGIzz + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
-		m_CoGIxz = m_Wing2.m_CoGIxz - m_Wing2.m_Mass *  Pt.x*Pt.z;
+		m_CoGIxx += m_Wing2.m_CoGIxx + m_Wing2.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy += m_Wing2.m_CoGIyy + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz += m_Wing2.m_CoGIzz + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz += m_Wing2.m_CoGIxz - m_Wing2.m_Mass *  Pt.x*Pt.z;
 	}
+
 	if(m_bStab)
 	{
 		Pt = m_Stab.m_CoG + m_LEStab;
-		m_CoGIxx = m_Stab.m_CoGIxx + m_Stab.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
-		m_CoGIyy = m_Stab.m_CoGIyy + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
-		m_CoGIzz = m_Stab.m_CoGIzz + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
-		m_CoGIxz = m_Stab.m_CoGIxz - m_Stab.m_Mass *  Pt.x*Pt.z;
+		m_CoGIxx += m_Stab.m_CoGIxx + m_Stab.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy += m_Stab.m_CoGIyy + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz += m_Stab.m_CoGIzz + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz += m_Stab.m_CoGIxz - m_Stab.m_Mass *  Pt.x*Pt.z;
 	}
+
 	if(m_bFin)
 	{
 		Pt = m_Fin.m_CoG + m_LEFin;
-		m_CoGIxx = m_Fin.m_CoGIxx + m_Fin.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
-		m_CoGIyy = m_Fin.m_CoGIyy + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
-		m_CoGIzz = m_Fin.m_CoGIzz + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
-		m_CoGIxz = m_Fin.m_CoGIxz - m_Fin.m_Mass *  Pt.x*Pt.z;
+		m_CoGIxx += m_Fin.m_CoGIxx + m_Fin.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy += m_Fin.m_CoGIyy + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz += m_Fin.m_CoGIzz + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz += m_Fin.m_CoGIxz - m_Fin.m_Mass *  Pt.x*Pt.z;
 	}
+
 	if(m_bBody)
 	{
 		m_CoGIxx += m_pBody->m_CoGIxx + m_pBody->m_Mass * (m_pBody->m_CoG.y*m_pBody->m_CoG.y + m_pBody->m_CoG.z*m_pBody->m_CoG.z);
@@ -193,8 +195,9 @@ void CPlane::ComputeInertia(double const & Mass)
 		m_CoGIzz += m_pBody->m_CoGIzz + m_pBody->m_Mass * (m_pBody->m_CoG.x*m_pBody->m_CoG.x + m_pBody->m_CoG.y*m_pBody->m_CoG.y);
 		m_CoGIxz += m_pBody->m_CoGIxz - m_pBody->m_Mass *  m_pBody->m_CoG.x*m_pBody->m_CoG.z;
 	}
-}
 
+//	Mass = PlaneMass;
+}
 
 void CPlane::ComputePlane(void)
 {
