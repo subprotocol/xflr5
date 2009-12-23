@@ -4058,7 +4058,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 			}
 			QString str;
 			GetMomentUnit(str, pMainFrame->m_MomentUnit);
-			pGraph->SetYTitle(tr("BM (") + str + ")");
+			pGraph->SetYTitle(tr("BM") +" (" + str + ")");
 			break;
 		}
 		default:
@@ -12194,12 +12194,12 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("GRm   = ")+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 9,'f',4);
 	out << strong;
 
-	if(type==1) strong = QString(tr("IYm   = %1     PYm   = %2 \n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
+	if(type==1) strong = QString(tr("IYm   = %1     PYm   = %2\n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
 	else        strong = QString(tr("IYm=, %1,PYm=, %2\n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
 	out << strong;
 
-	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
-	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
+	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2\n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
+	else        strong = QString(tr("XCP=, %1, YCP=, %2\n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
 	out << strong;
 
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);

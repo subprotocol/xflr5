@@ -218,9 +218,9 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType)
     out<< strong;
     strong = m_strPlrName + "\n";
     out<< strong;
-	if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
+	if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4\n\n")
 								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
-	else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
+	else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4\n\n")
 								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
 	out<< strong;
 

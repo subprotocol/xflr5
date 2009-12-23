@@ -1626,7 +1626,7 @@ void CWing::LLTComputeWing()
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1642,7 +1642,7 @@ void CWing::LLTComputeWing()
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\r\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1993,7 +1993,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
 				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2008,7 +2008,7 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
 				if(m_bTrace) p3DPanelDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2860,7 +2860,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
 				strong+=string;
 				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;
@@ -2875,7 +2875,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 
-				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\r\n").arg(m_Cl[m],6,'f',2);
+				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
 				strong +=string;
 				if(m_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;

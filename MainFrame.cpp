@@ -2245,7 +2245,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 	if(bAsk)
 	{
-		strong = tr("Are you sure you want to delete \n") + pFoil->m_FoilName ;
+		strong = tr("Are you sure you want to delete\n") + pFoil->m_FoilName ;
 		strong+= +"\n" + tr("and all associated OpPoints and Polars ?");
 
 		int resp = QMessageBox::question(this,tr("Question"), strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
@@ -5622,7 +5622,7 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 			RenameDlg dlg(this);
 			dlg.move(m_DlgPos);
 			dlg.m_pstrArray = & NameList;
-			dlg.m_strQuestion = tr("A foil of that name already exists\r\nPlease enter a new name");
+			dlg.m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
 			dlg.m_strName = pNewFoil->m_FoilName;
 			dlg.InitDialog();
 

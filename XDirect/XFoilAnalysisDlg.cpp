@@ -188,7 +188,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 				m_pXFoil->alfa = alfa*pi/180.0;
 				m_pXFoil->lalfa = true;
 				m_pXFoil->qinf = 1.0;
-				str = QString("\r\n\r\nAlpha = %1\r\n").arg(alfa,5,'f',2);
+				str = QString("\n\n"+tr("Alpha = %1")+"\n").arg(alfa,5,'f',2);
 				WriteString(str);
 				strange = QString(tr("Alfa = %1 ........ ")).arg(m_pXFoil->alfa*180.0/pi,7,'f',2);
 				UpdateOutput(strange);
@@ -196,7 +196,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 				// here we go !
 				if (!m_pXFoil->specal())
 				{
-					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 					WriteString(str);
 					m_bExit = true;
 					return false;
@@ -208,7 +208,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 				m_pXFoil->alfa = 0.0;
 				m_pXFoil->qinf = 1.0;
 				m_pXFoil->clspec = m_ClMin+ia*m_DeltaCl;
-				str = QString("\r\n\r\n"+tr("Cl = %1")+"\r\n").arg(m_pXFoil->clspec, 10,'f',3);
+				str = QString("\n\n"+tr("Cl = %1")+"\n").arg(m_pXFoil->clspec, 10,'f',3);
 				WriteString(str);
 
 				strange = QString(tr("Cl = %1 ........ ")).arg(m_pXFoil->clspec,7,'f',2);
@@ -216,7 +216,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 
 				if(!m_pXFoil->speccl())
 				{
-					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 					WriteString(str);
 					m_bExit = true;
 					return false;
@@ -297,25 +297,25 @@ bool XFoilAnalysisDlg::Iterate()
 	CCurve *pCurve0 = m_RmsGraph.GetCurve(0);
 	CCurve *pCurve1 = m_RmsGraph.GetCurve(1);
 
-	str= tr("   Initializing viscous analysis ...\r\n");
+	str= tr("   Initializing viscous analysis ...\n");
 	WriteString(str);
 
 	if(!m_pXFoil->viscal())
 	{
 		m_pXFoil->lvconv = false;//point is unconverged
-		str = tr("CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
+		str = tr("CpCalc: local speed too large\n Compressibility corrections invalid")+"\n";
 		WriteString(str);
 		m_bExit = true;
 		return true;// to exit loop
 	}
 
-	str= tr("   Solving BL system ...\r\n");
+	str= tr("   Solving BL system ...\n");
 	WriteString(str);
 
 	while(m_Iterations<m_IterLim  && !m_pXFoil->lvconv && !m_bSkip)
 	{
 		qApp->processEvents();
-		str= QString(tr("   Iteration %1 ... \r\n")).arg(m_Iterations);
+		str= QString(tr("   Iteration %1 ...\n")).arg(m_Iterations);
 
 		WriteString(str);
 
@@ -342,7 +342,7 @@ bool XFoilAnalysisDlg::Iterate()
 	if(!m_pXFoil->ViscalEnd())
 	{
 		m_pXFoil->lvconv = false;//point is unconverged
-		str = tr("CpCalc: local speed too large \r\n Compressibility corrections invalid \r\n");
+		str = tr("CpCalc: local speed too large\n Compressibility corrections invalid")+"\n";
 		WriteString(str);
 		m_bExit = true;
 		m_pXFoil->lblini = false;
@@ -354,7 +354,7 @@ bool XFoilAnalysisDlg::Iterate()
 	{
 		strange = QString(tr("unconverged after %1 iterations\n")).arg(m_Iterations);
 		UpdateOutput(strange);
-		str = tr("--------- Unconverged -----------\r\n");
+		str = tr("--------- Unconverged -----------\n");
 		WriteString(str);
 		UpdateView();
 
@@ -425,14 +425,14 @@ bool XFoilAnalysisDlg::ReLoop()
 			m_pXFoil->reinf1 = Re;
 			m_pXFoil->lalfa = true;
 			m_pXFoil->qinf = 1.0;
-			str = QString("\r\n\r\nRe = %1\r\n").arg(Re,8,'f',0);
+			str = QString("\n\nRe = %1\n").arg(Re,8,'f',0);
 			WriteString(str);
 
 			// here we go !
 			if (!m_pXFoil->specal())
 			{
 				QString str;
-				str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+				str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 				WriteString(str);
 				m_bExit = true;
 				return false;

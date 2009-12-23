@@ -135,12 +135,12 @@ bool VLMAnalysisDlg::AlphaLoop()
 		nrhs = 100;
 	}
 //	m_bTrace = true;
-	str = tr("   Solving the problem... \r\n\r\n");
+	str = tr("   Solving the problem...")+"\n\n";
 	AddString(str);
 
 	if(!VLMCreateRHS())
 	{
-		AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
+		AddString("\n\n"+tr("Failed to create RHS....\n"));
 
 		m_bWarning = true;
 		return true;
@@ -149,7 +149,7 @@ bool VLMAnalysisDlg::AlphaLoop()
 
 	if (!VLMCreateMatrix())
 	{
-		AddString(tr("\r\nFailed to create the matrix....\r\n"));
+		AddString("\n"+tr("Failed to create the matrix....\n"));
 		m_bWarning = true;
 		return true;
 	}
@@ -158,7 +158,7 @@ bool VLMAnalysisDlg::AlphaLoop()
 
 	if (!VLMSolveDouble())
 	{
-		AddString(tr("\r\n\r\nSingular matrix - aborting....\r\n"));
+		AddString("\n\n"+tr("Singular matrix - aborting....")+"\n");
 		m_bWarning = true;
 		return true;
 	}
@@ -214,7 +214,7 @@ bool VLMAnalysisDlg::ControlLoop()
 	m_bTrace = true;
 	m_AlphaMin  = 0.0;
 
-	str = QString(tr("   Solving the problem... \r\n"));
+	str = QString(tr("   Solving the problem...\n"));
 	AddString(str);
 
 	m_VLMQInf[0] = 1.0;
@@ -308,7 +308,7 @@ bool VLMAnalysisDlg::ControlLoop()
 				}
 			}
 		}
-		str = QString(tr("      ...Control = %1\r\n")).arg(m_ControlMin+i*m_ControlDelta,8,'f',2);
+		str = QString(tr("      ...Control = %1\n")).arg(m_ControlMin+i*m_ControlDelta,8,'f',2);
 		AddString(str);
 
 		if (m_bCancel) break;
@@ -317,7 +317,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 		if(!VLMCreateRHS())
 		{
-			AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
+			AddString("\n\n"+tr("Failed to create RHS....\n"));
 			m_bWarning = true;
 			return true;
 		}
@@ -326,7 +326,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 		if (!VLMCreateMatrix())
 		{
-			AddString(tr("\r\nFailed to create the matrix....\r\n"));
+			AddString("\n"+tr("Failed to create the matrix....\n"));
 			m_bWarning = true;
 			return true;
 		}
@@ -334,7 +334,7 @@ bool VLMAnalysisDlg::ControlLoop()
 
 		if (!VLMSolveDouble())	//solve for sine and cos
 		{
-			AddString(tr("\r\n\r\nSingular matrix - aborting....\r\n"));
+			AddString("\n\n"+tr("Singular matrix - aborting....")+"\n");
 			m_bWarning = true;
 			return true;
 		}
@@ -364,7 +364,7 @@ bool VLMAnalysisDlg::ControlLoop()
 		if(iter>=100)
 		{
 			//no zero moment alpha
-			str = QString(tr("      Interpolation unsuccessful for Control=%1 - skipping.\r\n\r\n\r\n")).arg(t,10,'f',3);
+			str = QString(tr("      Interpolation unsuccessful for Control=%1 - skipping.")+"\n\n\n").arg(t,10,'f',3);
 			AddString(str);
 			m_bWarning = true;
 		}
@@ -412,7 +412,7 @@ bool VLMAnalysisDlg::ControlLoop()
 			else
 			{
 				//no zero moment alpha
-				str = QString(tr("      Interpolation unsuccessful for Control=%1 - skipping.\r\n\r\n\r\n")).arg(t,10,'f',3);
+				str = QString(tr("      Interpolation unsuccessful for Control=%1 - skipping.")+"\n\n\n").arg(t,10,'f',3);
 				AddString(str);
 				m_bWarning = true;
 			}
@@ -552,18 +552,18 @@ void VLMAnalysisDlg::InitDialog()
 
 	if(fabs(m_pWPolar->m_Beta)>0.001)
 	{
-		str += tr("     Sideslip is asymmetric\r\n");
+		str += tr("     Sideslip is asymmetric\n");
 		m_bVLMSymetric = false;
 	}
 
-	if(!m_pWing->m_bSymetric) str += tr("     Main wing is asymmetric\r\n");
+	if(!m_pWing->m_bSymetric) str += tr("     Main wing is asymmetric\n");
 
 	if(m_pWing2)
 	{
 		if(!m_pWing2->m_bSymetric)
 		{
 			m_bVLMSymetric = false;
-			str += tr("     2nd wing is asymmetric\r\n");
+			str += tr("     2nd wing is asymmetric\n");
 		}
 	}
 	if(m_pStab)
@@ -571,23 +571,23 @@ void VLMAnalysisDlg::InitDialog()
 		if(!m_pStab->m_bSymetric)
 		{
 			m_bVLMSymetric = false;
-			str += tr("     Elevator is asymmetric\r\n");
+			str += tr("     Elevator is asymmetric\n");
 		}
 	}
 
 	if(m_pFin)
 	{
 		m_bVLMSymetric = false;
-		str += tr("     A fin is considered asymmetric\r\n");
+		str += tr("     A fin is considered asymmetric\n");
 	}
 
-	if (m_bVLMSymetric) AddString(tr("Perfoming symmetric calculation\r\n"));
+	if (m_bVLMSymetric) AddString(tr("Perfoming symmetric calculation\n"));
 	else
 	{
-		str = tr("Performing asymmetric calculation : \r\n") + str;
+		str = tr("Performing asymmetric calculation :\n") + str;
 		AddString(str);
 	}
-	AddString("\r\n");
+	AddString("\n");
 
 	m_pWing->m_bVLMSymetric = m_bVLMSymetric;
 	if(m_pWing2)  m_pWing2->m_bVLMSymetric = m_bVLMSymetric;
@@ -695,13 +695,13 @@ bool VLMAnalysisDlg::ReLoop()
 
 	if(!VLMCreateRHS())
 	{
-		AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
+		AddString("\n\n"+tr("Failed to create RHS....\n"));
 		m_bWarning = true;
 		return true;
 	}
 	if(!VLMCreateMatrix())
 	{
-		AddString(tr("\r\n\r\nFailed to create matrix....\r\n"));
+		AddString("\n\n"+tr("Failed to create matrix....\n"));
 		m_bWarning = true;
 		return true;
 	}
@@ -709,7 +709,7 @@ bool VLMAnalysisDlg::ReLoop()
 //first solve for unit speed... calculation is linear
 	if (!VLMSolveDouble())
 	{
-		AddString(tr("\r\n\r\nSingular matrix - aborting....\r\n"));
+		AddString("\n\n"+tr("Singular matrix - aborting....")+"\n");
 		m_bWarning = true;
 		return true;
 	}
@@ -783,10 +783,10 @@ void VLMAnalysisDlg::StartAnalysis()
 	if(!m_pWPolar) return;
 	QString strong;
 	m_bIsFinished = false;
-	strong = tr("Launching VLM Analysis....\r\n\r\n");
+	strong = tr("Launching VLM Analysis....")+"\n\n";
 	AddString(strong);
 
-	strong = QString(tr("Type %1 Analysis\r\n\r\n")).arg(m_pWPolar->m_Type);
+	strong = QString(tr("Type %1 Analysis")+"\n\n").arg(m_pWPolar->m_Type);
 	AddString(strong);
 	m_bCancel = false;
 
@@ -798,8 +798,8 @@ void VLMAnalysisDlg::StartAnalysis()
 	else 	if(m_pWPolar->m_Type==4) ReLoop();
 	else 	if(m_pWPolar->m_Type==5 || m_pWPolar->m_Type==6) ControlLoop();
 
-	if (!m_bCancel && !m_bWarning) strong = tr("\r\nVLM Analysis completed successfully\r\n");
-	else if (m_bWarning)           strong = tr("\r\nVLM Analysis completed ... Errors encountered\r\n");
+	if (!m_bCancel && !m_bWarning) strong = "\n"+tr("VLM Analysis completed successfully")+"\n";
+	else if (m_bWarning)           strong = "\n"+tr("VLM Analysis completed ... Errors encountered")+"\n";
 	AddString(strong);
 
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_Type==5|| m_pWPolar->m_Type==6))
@@ -837,7 +837,7 @@ bool VLMAnalysisDlg::UnitLoop()
 	m_bTrace = true;
 //	m_AlphaMin = 0.0;
 
-	str = QString(tr("   Solving the problem... \r\n"));
+	str = QString(tr("   Solving the problem...\n"));
 	AddString(str);
 
 	for (i=0; i<nrhs; i++)
@@ -848,14 +848,14 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		pMiarex->RotateGeomY(m_OpAlpha, O);
 
-		str = QString(tr("        ...Alpha = %1\r\n")).arg(m_OpAlpha,8,'f',2);
+		str = QString(tr("        ...Alpha = %1\n")).arg(m_OpAlpha,8,'f',2);
 		AddString(str);
 
 		if (m_bCancel) break;
 
 		if(!VLMCreateRHS())
 		{
-			AddString(tr("\r\n\r\nFailed to create RHS....\r\n"));
+			AddString("\n\n"+tr("Failed to create RHS....\n"));
 			m_bWarning = true;
 			return true;
 		}
@@ -864,7 +864,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		if (!VLMCreateMatrix())
 		{
-			AddString(tr("\r\nFailed to create the matrix....\r\n"));
+			AddString("\n"+tr("Failed to create the matrix....\n"));
 			m_bWarning = true;
 			return true;
 		}
@@ -872,7 +872,7 @@ bool VLMAnalysisDlg::UnitLoop()
 
 		if (!VLMSolveDouble())
 		{
-			AddString(tr("\r\n\r\nSingular matrix - aborting....\r\n"));
+			AddString("\n\n"+tr("Singular matrix - aborting....")+"\n");
 			m_bWarning = true;
 			return true;
 		}
@@ -913,7 +913,7 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 	int p,pp, Size;
 
 	CVector  CC;
-	AddString(tr("      Creating the influence matrix...\r\n"));
+	AddString(tr("      Creating the influence matrix...\n"));
 
 	if(m_bVLMSymetric) Size = m_MatSize/2;
 	else               Size = m_MatSize;
@@ -1072,18 +1072,18 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		{
 			if(m_pWPolar->m_Type!=4 && !m_pWPolar->m_bTiltedGeom)
 			{
-				str = QString(tr("      ...Alpha=%1\r\n")).arg(m_OpAlpha,0,'f',2);
+				str = QString(tr("      ...Alpha=%1\n")).arg(m_OpAlpha,0,'f',2);
 				AddString(str);
 			}
 			else if (m_pWPolar->m_Type==4)
 			{
 				str = QString(tr("   ...QInf = %1 ")).arg(m_OpQInf*pMainFrame->m_mstoUnit,6,'f',2);
 				GetSpeedUnit(strong, pMainFrame->m_SpeedUnit);
-				str += strong + "\r\n";
+				str += strong + "\n";
 				AddString(str);
 			}
 
-			AddString(tr("        Calculating aerodynamic coefficients...\r\n"));
+			AddString(tr("        Calculating aerodynamic coefficients...\n"));
 			m_bPointOut          = false;
 			CWing::s_Alpha     = Alpha;
 			CWing::s_QInf      = m_OpQInf;
@@ -1099,7 +1099,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GRm                 = 0.0;
 			m_GCm = m_VCm = m_ICm = 0.0;
 			m_GYm = m_VYm = m_IYm = 0.0;
-			AddString(tr("         Calculating main wing...\r\n"));
+			AddString(tr("         Calculating main wing...\n"));
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
@@ -1112,7 +1112,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 			if(m_pWing2)
 			{
-				AddString(tr("       Calculating 2nd wing...\r\n"));
+				AddString(tr("       Calculating 2nd wing...\n"));
 				WingIDrag = 0.0;
 
 				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
@@ -1131,7 +1131,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 			if(m_pStab)
 			{
-				AddString(tr("         Calculating elevator...\r\n"));
+				AddString(tr("         Calculating elevator...\n"));
 				WingIDrag = 0.0;
 
 				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
@@ -1150,7 +1150,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 			if(m_pFin)
 			{
-				AddString(tr("         Calculating fin...\r\n"));
+				AddString(tr("         Calculating fin...\n"));
 				WingIDrag = 0.0;
 
 				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
@@ -1196,7 +1196,7 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				else
 					pMiarex->AddWOpp(m_bPointOut, m_Gamma+q*m_MatSize);
 			}
-			AddString("     \r\n");
+			AddString("\n");
 		}
 		else m_bPointOut = true;
 	}
@@ -1729,7 +1729,7 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 
 //	QInf.Set(1.0,0.0,0.0);
 
-	if(m_bTrace) AddString(tr("        Calculating induced angles...\r\n"));
+	if(m_bTrace) AddString(tr("        Calculating induced angles...\n"));
 
 	for (p=0; p<m_MatSize; p++)
 	{
@@ -1789,7 +1789,7 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 	//______________________________________________________________________________________
 	// Solve the system for unit vortex circulation
 
-	AddString(tr("      Solving the linear system...\r\n"));
+	AddString(tr("      Solving the linear system...\n"));
 
 	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
 	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
@@ -1797,7 +1797,7 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 
 	if(!Gauss(m_aij,Size, m_RHS, 2))
 	{
-		AddString(tr("      Singular Matrix.... Aborting calculation...\r\n"));
+		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
 		m_bConverged = false;
 		return false;
 	}
@@ -1919,13 +1919,13 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	//______________________________________________________________________________________
 	// Calculate speeds i.a.w. polar types
 
-	AddString(tr("      Calculating the vortices circulations...\r\n"));
+	AddString(tr("      Calculating the vortices circulations...\n"));
 
 	//so far we have a unit Vortex Strength
 	if(m_pWPolar->m_Type==2 || m_pWPolar->m_Type==6)
 	{
 		//type 2; find the speeds which will create a lift equal to the weight
-		AddString(tr("      Calculating speeds to balance the weight\r\n"));
+		AddString(tr("      Calculating speeds to balance the weight\n"));
 		CWing::s_QInf      = 1.0;
 		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 		CWing::s_Density   = m_pWPolar->m_Density;
@@ -1967,8 +1967,8 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 
 			if(Lift<=0.0)
 			{
-				strong = QString(tr("      Found a negative lift for Alpha=%1.... skipping the angle...\r\n")).arg(V0+q*VDelta,0,'f',2);
-				if(m_pWPolar->m_Type==6 && m_bTrace) AddString("\r\n");
+				strong = QString(tr("      Found a negative lift for Alpha=%1.... skipping the angle...\n")).arg(V0+q*VDelta,0,'f',2);
+				if(m_pWPolar->m_Type==6 && m_bTrace) AddString("\n");
 				if(m_bTrace) AddString(strong);
 				m_bPointOut = true;
 				m_bWarning = true;
@@ -1979,7 +1979,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 				m_VLMQInf[q] =  sqrt( 2.0* 9.81 * m_pWPolar->m_Weight /m_pWPolar->m_Density/m_pWPolar->m_WArea / TempCl );
 				strong = QString(tr("      Alpha=%1   QInf = %2")).arg(V0+q*VDelta,5,'f',2).arg(m_VLMQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
 				GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
-				strong+= strange + "\r\n";
+				strong+= strange + "\n";
 				if(m_bTrace) AddString(strong);
 			}
 		}

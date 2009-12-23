@@ -670,7 +670,7 @@ void QGraph::ExportToFile(QFile &XFile, int FileType)
 		{
 			pCurve->GetTitle(strong);
 
-			if(FileType==1)	out << "       x               "+strong+" \n";
+			if(FileType==1)	out << "       x               "+strong+"\n";
 			else            out << "x,"+strong+"\n";
 
 			for(j=0; j<pCurve->n; j++)

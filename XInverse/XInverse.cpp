@@ -392,10 +392,10 @@ bool QXInverse::ExecQDES()
 
 	QString str;
 	QString strong = "";
-	strong = "   dNMax       dGMax\r\n";
+	strong = "   dNMax       dGMax\n";
 	for(int l=1; l<=pXFoil->QMax; l++)
 	{
-		str = QString("%1e  %2\r\n").arg(pXFoil->dnTrace[l],7,'e',3).arg(pXFoil->dgTrace[l],7,'e',3);
+		str = QString("%1e  %2\n").arg(pXFoil->dnTrace[l],7,'e',3).arg(pXFoil->dgTrace[l],7,'e',3);
 		strong += str;
 	}
 

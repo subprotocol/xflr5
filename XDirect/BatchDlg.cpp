@@ -279,7 +279,7 @@ void BatchDlg::AlphaLoop()
 		
 		alphadeg = m_SpMin + iAlpha*m_SpInc;
 		pXFoil->alfa = alphadeg*PI/180.0;
-		str = QString("Alpha = %1\r\n").arg(alphadeg,0,'f',2);
+		str = QString("Alpha = %1\n").arg(alphadeg,0,'f',2);
 		strong+= str;
 		UpdateOutput(str);
 
@@ -315,7 +315,7 @@ void BatchDlg::AlphaLoop()
 				// here we go !
 				if (!pXFoil->specal())
 				{
-					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 					QMessageBox::information(this, tr("Warning"), str);
 					m_bCancel = true;
 					CleanUp();
@@ -338,7 +338,7 @@ void BatchDlg::AlphaLoop()
 
 				if(pXFoil->lvconv)
 				{
-					str =QString(tr("   ...converged after %1 iterations")+"\r\n").arg(m_Iterations);
+					str =QString(tr("   ...converged after %1 iterations")+"\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 					AddOpPoint();
@@ -346,14 +346,14 @@ void BatchDlg::AlphaLoop()
 				}
 				else if(m_bSkipPoint || m_bSkipPolar)
 				{
-					str = QString(tr("   ...skipped after %1 iterations")+"\r\n").arg(m_Iterations);
+					str = QString(tr("   ...skipped after %1 iterations")+"\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 
 				}
 				else
 				{
-					str = QString(tr("   ...unconverged after %1 iterations")+"\r\n").arg(m_Iterations);
+					str = QString(tr("   ...unconverged after %1 iterations")+"\n").arg(m_Iterations);
 					strong+= str;
 					UpdateOutput(str);
 				}
@@ -363,10 +363,10 @@ void BatchDlg::AlphaLoop()
 				break;
 			}
 		}// end Alpha or Cl loop
-		strong+="\r\n";
+		strong+="\n";
 		if(m_bCancel)
 		{
-			strong+=tr("Analysis interrupted")+"\r\n";
+			strong+=tr("Analysis interrupted")+"\n";
 			break;
 		}
 	}//end Re loop
@@ -683,7 +683,7 @@ bool BatchDlg::InitXFoil2()
 		if(!pXFoil->SetMach())
 		{
 			QString str;
-			str = tr("Invalid Analysis Settings\nCPCALC: local speed too large \n Compressibility corrections invalid ");
+			str = tr("Invalid Analysis Settings\nCPCALC: local speed too large\n Compressibility corrections invalid ");
 			QMessageBox::information(window(), tr("Warning"), str);
 		}
 	}
@@ -723,7 +723,7 @@ bool BatchDlg::Iterate()
 	if(!pXFoil->viscal())
 	{
 		pXFoil->lvconv = false;//point is unconverged
-		str =tr("CpCalc: local speed too large \r\n Compressibility corrections invalid");
+		str =tr("CpCalc: local speed too large\n Compressibility corrections invalid");
 		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
@@ -758,7 +758,7 @@ bool BatchDlg::Iterate()
 	if(!pXFoil->ViscalEnd())
 	{
 		pXFoil->lvconv = false;//point is unconverged
-		str =tr("CpCalc: local speed too large \r\n Compressibility corrections invalid");
+		str =tr("CpCalc: local speed too large\n Compressibility corrections invalid");
 		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
 		CleanUp();
@@ -1161,7 +1161,7 @@ void BatchDlg::ReLoop()
 						// here we go !
 						if (!pXFoil->specal())
 						{
-							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
@@ -1179,7 +1179,7 @@ void BatchDlg::ReLoop()
 						UpdateOutput(str);
 						if(!pXFoil->speccl())
 						{
-							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 							QMessageBox::information(this, tr("Warning"), str);
 							m_bCancel = true;
 							CleanUp();
@@ -1206,14 +1206,14 @@ void BatchDlg::ReLoop()
 					}
 					else if(m_bSkipPoint || m_bSkipPolar)
 					{
-						str = QString(tr("   ...skipped after %1 iterations\r\n")).arg(m_Iterations);
+						str = QString(tr("   ...skipped after %1 iterations\n")).arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
 
 					}
 					else
 					{
-						str = QString(tr("   ...unconverged after %1 iterations\r\n")).arg(m_Iterations);
+						str = QString(tr("   ...unconverged after %1 iterations\n")).arg(m_Iterations);
 						strong+= str;
 						UpdateOutput(str);
 					}
@@ -1232,7 +1232,7 @@ void BatchDlg::ReLoop()
 			SpMax = m_SpMin;
 			SpInc = -m_SpInc;
 		}
-//		strong+="\r\n";
+//		strong+="\n";
 		if(m_bCancel) break;
 
 	}//end Re loop

@@ -1213,7 +1213,7 @@ void QXDirect::InitXFoil2()
 		if(!m_pXFoil->SetMach())
 		{
 			QString str;
-			str = tr("... Invalid Analysis Settings\nCpCalc: local speed too large \n Compressibility corrections invalid ");
+			str = tr("... Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 			QMessageBox::warning(window(), tr("Warning"),str);
 
 		}
@@ -2404,7 +2404,7 @@ void QXDirect::OnDelCurOpp()
 
 	if (!pOpPoint) return;
 	QString strong,str;
-	strong = tr("Are you sure you want to delete the Operating Point \n");
+	strong = tr("Are you sure you want to delete the Operating Point\n");
 	if(m_pCurPolar->m_Type !=4) str = QString("Alpha = %1").arg(pOpPoint->Alpha,0,'f',2);
 	else str = QString("Reynolds = %1").arg(pOpPoint->Reynolds,0,'f',0);
 	strong += str;
@@ -2790,13 +2790,13 @@ void QXDirect::OnExportCurXFoilResults()
 	out << (strong);
 
 	if(type==1)
-		strong = QString("Alpha = %1,  Re = %2,  Ma= %3,  ACrit=%4 \n\n")
+		strong = QString("Alpha = %1,  Re = %2,  Ma= %3,  ACrit=%4\n\n")
 						 .arg(m_pXFoil->alfa*180./PI, 5, 'f',1)
 						 .arg(m_pXFoil->reinf1, 8, 'f',0)
 						 .arg(m_pXFoil->minf1, 6, 'f',4)
 						 .arg(m_pXFoil->acrit, 4, 'f',1);
 	else
-		strong = QString("Alpha =, %1,Re =, %3,Ma=, %3,ACrit =,%4 \n\n")
+		strong = QString("Alpha =, %1,Re =, %3,Ma=, %3,ACrit =,%4\n\n")
 						 .arg(m_pXFoil->alfa*180./PI, 5, 'f',1)
 						 .arg(m_pXFoil->reinf1, 8, 'f',0)
 						 .arg(m_pXFoil->minf1, 6, 'f',4)

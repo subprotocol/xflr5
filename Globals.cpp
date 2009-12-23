@@ -665,7 +665,7 @@ void Trace(QString msg)
 	QDateTime dt = QDateTime::currentDateTime();
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
 	str += msg;
-	str += "\r\n";
+	str += "\n";
 
 	ts << str;
 
@@ -693,7 +693,7 @@ void Trace(QString msg, int n)
 	QDateTime dt = QDateTime::currentDateTime();
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
 	str += strong;
-	str += "\r\n";
+	str += "\n";
 	ts << str;;
 	tf->close();
 }
@@ -719,7 +719,7 @@ void Trace(QString msg, double f)
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
 
 	str += strong;
-	str += "\r\n";
+	str += "\n";
 	ts << str;
 
 
