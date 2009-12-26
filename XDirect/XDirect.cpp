@@ -1084,7 +1084,17 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 	//pt is in client coordinates
 	if (m_bPolar)
 	{
-		if(m_iPlrView == 1) return m_pCurGraph;// no need for change
+		if(m_iPlrView == 1)
+		{
+			if(m_iPlrGraph==1)      m_pCurGraph = m_pPolarGraph;
+			else if(m_iPlrGraph==2) m_pCurGraph = m_pCzGraph;
+			else if(m_iPlrGraph==3) m_pCurGraph = m_pTrGraph;
+			else if(m_iPlrGraph==4) m_pCurGraph = m_pCmGraph;
+			else if(m_iPlrGraph==5) m_pCurGraph = m_pUserGraph;
+
+			if(m_pCurGraph->IsInDrawRect(pt)) return m_pCurGraph;
+			else return NULL;
+		}
 		if(m_iPlrView == 2)
 		{
 			if(m_pPolarGraph->IsInDrawRect(pt)){return m_pPolarGraph;}

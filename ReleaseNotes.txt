@@ -15,7 +15,7 @@
 *******************************************************************************
 
 
-QFLR5 v0.04 Beta December xxx 2009
+QFLR5 v0.04 Beta December 26th 2009
 	- Replaced the confusing term XCmRef by CoG; added z-position for CoG
 	- Added some signal connections for wing control polars 
 	- Declared a bunch of local variables as static to speed things up by preventing repetitive memory allocations

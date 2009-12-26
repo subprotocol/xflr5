@@ -1468,15 +1468,21 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView->setDefaultAction(CpViewAct);
 	m_pctrlCpView->setCheckable(true);
 
-	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlUFO->setMinimumWidth(200);
-	m_pctrlWPolar->setMinimumWidth(200);
-	m_pctrlWOpp->setMinimumWidth(30);
+//	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+//	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+//	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	QSizePolicy szPolicy;
+	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	m_pctrlUFO->setSizePolicy(szPolicy);
+	m_pctrlWPolar->setSizePolicy(szPolicy);
+
+	m_pctrlUFO->setMinimumWidth(150);
+	m_pctrlWPolar->setMinimumWidth(150);
+	m_pctrlWOpp->setMinimumWidth(80);
 //	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
 //	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
 //	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
+
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);
@@ -1529,15 +1535,14 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlOppView->setDefaultAction(OpPointsAct);
 	m_pctrlOppView->setCheckable(true);
 
-	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlFoil->setMinimumWidth(200);
-	m_pctrlPolar->setMinimumWidth(200);
-	m_pctrlOpPoint->setMinimumWidth(30);
-//	m_pctrlFoil->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlOpPoint->setInsertPolicy(QComboBox::InsertAlphabetically);
+	QSizePolicy szPolicy;
+	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	m_pctrlFoil->setSizePolicy(szPolicy);
+	m_pctrlPolar->setSizePolicy(szPolicy);
+
+	m_pctrlFoil->setMinimumWidth(150);
+	m_pctrlPolar->setMinimumWidth(150);
+	m_pctrlOpPoint->setMinimumWidth(80);
 
 	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
 	m_pctrlXDirectToolBar->addAction(newProjectAct);
@@ -2999,18 +3004,22 @@ bool MainFrame::LoadSettings()
 {
 	QPoint pt;
 	bool bFloat;
-	int a;
+	int a, SettingsFormat;
+	SettingsFormat = 0;
 	QSize size;
 
-	if(SETTINGSFORMAT!=100603) return false;
 
 #ifdef Q_WS_MAC
 		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
 #else
 		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
 #endif
+
 	settings.beginGroup("MainFrame");
 	{
+		SettingsFormat = settings.value("SettingsFormat").toInt();
+		if(SettingsFormat != SETTINGSFORMAT) return false;
+
 		m_StyleName = settings.value("StyleName","").toString();
 		if(!m_StyleName.length())
 		{
@@ -4657,7 +4666,6 @@ void MainFrame::SaveSettings()
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QString FileName;
 
 	if(!m_bSaveSettings) return;
 #ifdef Q_WS_MAC
@@ -4667,6 +4675,7 @@ void MainFrame::SaveSettings()
 #endif
 	settings.beginGroup("MainFrame");
 	{
+		settings.setValue("SettingsFormat", SETTINGSFORMAT);
 		settings.setValue("FrameGeometryx", frameGeometry().x());
 		settings.setValue("FrameGeometryy", frameGeometry().y());
 		settings.setValue("SizeWidth", size().width());
