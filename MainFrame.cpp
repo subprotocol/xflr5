@@ -431,12 +431,12 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 
 void MainFrame::CreateActions()
 {
-	newProjectAct = new QAction(QIcon(":/images/new.png"), tr("New Project"), this);
+	newProjectAct = new QAction(QIcon(":/images/new.png"), tr("&New Project"), this);
 	newProjectAct->setShortcut(tr("Ctrl+N"));
 	newProjectAct->setStatusTip(tr("Save and close the current project, create a new project"));
 	connect(newProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
 
-	closeProjectAct = new QAction(QIcon(":/images/new.png"), tr("Close the Project"), this);
+	closeProjectAct = new QAction(QIcon(":/images/new.png"), tr("&Close the Project"), this);
 	closeProjectAct->setShortcut(tr("Ctrl+W"));
 	closeProjectAct->setStatusTip(tr("Save and close the current project"));
 	connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
@@ -446,26 +446,26 @@ void MainFrame::CreateActions()
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(OnLoadFile()));
 
-	insertAct = new QAction(tr("&Insert Project..."), this);
+	insertAct = new QAction(tr("Insert Pro&ject..."), this);
 	insertAct->setStatusTip(tr("Insert an existing project in the current project"));
 	connect(insertAct, SIGNAL(triggered()), this, SLOT(OnInsertProject()));
 
-	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
+	OnAFoilAct = new QAction(tr("Direct &Foil Design"), this);
 	OnAFoilAct->setShortcut(tr("Ctrl+1"));
 	OnAFoilAct->setStatusTip(tr("Open Foil Design application"));
 	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
 
-	OnXInverseAct = new QAction(tr("&XFoil Inverse Design"), this);
+	OnXInverseAct = new QAction(tr("XFoil &Inverse Design"), this);
 	OnXInverseAct->setShortcut(tr("Ctrl+3"));
 	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
 	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
 
-	OnMixedInverseAct = new QAction(tr("&XFoil Mixed Inverse Design"), this);
+	OnMixedInverseAct = new QAction(tr("XFoil &Mixed Inverse Design"), this);
 	OnMixedInverseAct->setShortcut(tr("Ctrl+4"));
 	OnMixedInverseAct->setStatusTip(tr("Open XFoil Mixed Inverse analysis application"));
 	connect(OnMixedInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverseMixed()));
 
-	OnXDirectAct = new QAction(tr("&XFoil Direct Analysis"), this);
+	OnXDirectAct = new QAction(tr("XFoil &Direct Analysis"), this);
 	OnXDirectAct->setShortcut(tr("Ctrl+5"));
 	OnXDirectAct->setStatusTip(tr("Open XFoil direct analysis application"));
 	connect(OnXDirectAct, SIGNAL(triggered()), this, SLOT(OnXDirect()));
@@ -475,23 +475,23 @@ void MainFrame::CreateActions()
 	OnMiarexAct->setStatusTip(tr("Open Wing/plane design and analysis application"));
 	connect(OnMiarexAct, SIGNAL(triggered()), this, SLOT(OnMiarex()));
 
-	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
+	saveAct = new QAction(QIcon(":/images/save.png"), tr("&Save"), this);
 	saveAct->setShortcut(tr("Ctrl+S"));
 	saveAct->setStatusTip(tr("Save the project to disk"));
 	connect(saveAct, SIGNAL(triggered()), this, SLOT(OnSaveProject()));
 
-	saveProjectAsAct = new QAction(tr("Save Project As..."), this);
+	saveProjectAsAct = new QAction(tr("Save Project &As..."), this);
 	saveProjectAsAct->setStatusTip(tr("Save the current project under a new name"));
 	connect(saveProjectAsAct, SIGNAL(triggered()), this, SLOT(OnSaveProjectAs()));
 
-	saveOptionsAct = new QAction(tr("Save Options"), this);
+	saveOptionsAct = new QAction(tr("Save O&ptions"), this);
 	connect(saveOptionsAct, SIGNAL(triggered()), this, SLOT(OnSaveOptions()));
 
 	unitsAct = new QAction(tr("Define units..."), this);
 	unitsAct->setStatusTip(tr("Define the units for this project"));
 	connect(unitsAct, SIGNAL(triggered()), this, SLOT(OnUnits()));
 
-	languageAct = new QAction(tr("Language..."), this);
+	languageAct = new QAction(tr("&Language..."), this);
 	languageAct->setStatusTip(tr("Define the default language for the application"));
 	connect(languageAct, SIGNAL(triggered()), this, SLOT(OnLanguage()));
 
@@ -504,7 +504,7 @@ void MainFrame::CreateActions()
 	saveViewToImageFileAct->setStatusTip(tr("Saves the current view to a file on disk"));
 	connect(saveViewToImageFileAct, SIGNAL(triggered()), this, SLOT(OnSaveViewToImageFile()));
 
-	resetSettingsAct = new QAction(tr("Reset Default Settings"), this);
+	resetSettingsAct = new QAction(tr("&Reset Default Settings"), this);
 	resetSettingsAct->setStatusTip(tr("will revert to default settings at the next session"));
 	connect(resetSettingsAct, SIGNAL(triggered()), this, SLOT(OnResetSettings()));
 
@@ -690,7 +690,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(styleAct);
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
-	AFoilDesignMenu = menuBar()->addMenu(tr("&Foil Design"));
+	AFoilDesignMenu = menuBar()->addMenu(tr("Foil &Design"));
 	AFoilDesignMenu->addAction(AFoilNormalizeFoil);
 	AFoilDesignMenu->addAction(AFoilDerotateFoil);
 	AFoilDesignMenu->addAction(AFoilRefineLocalFoil);
@@ -1291,7 +1291,7 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(resetWingScale);
 
-	MiarexBodyMenu = menuBar()->addMenu(tr("Body"));
+	MiarexBodyMenu = menuBar()->addMenu(tr("&Body"));
 	MiarexBodyMenu->addAction(defineBody);
 	MiarexBodyMenu->addAction(importBody);
 	CurBodyMenu = MiarexBodyMenu->addMenu(tr("Current Body"));
@@ -1857,7 +1857,7 @@ void MainFrame::CreateXDirectMenus()
 	XDirectViewMenu->addAction(styleAct);
 	XDirectViewMenu->addAction(saveViewToImageFileAct);
 
-	FoilMenu = menuBar()->addMenu(tr("&Foil"));
+	FoilMenu = menuBar()->addMenu(tr("Foi&l"));
 	FoilMenu->addAction(ManageFoilsAct);
 	FoilMenu->addSeparator();
 	currentFoilMenu = FoilMenu->addMenu(tr("Current Foil"));
@@ -1931,7 +1931,7 @@ void MainFrame::CreateXDirectMenus()
 		GraphPolarMenu->addAction(PolarGraphAct[i]);
 	PolarMenu->addSeparator();
 
-	OpPointMenu = menuBar()->addMenu(tr("Operating Points"));
+	OpPointMenu = menuBar()->addMenu(tr("&Operating Points"));
 	currentOppMenu = OpPointMenu->addMenu(tr("Current OpPoint"));
 	currentOppMenu->addAction(exportCurOpp);
 	currentOppMenu->addAction(deleteCurOpp);
@@ -2168,7 +2168,7 @@ void MainFrame::CreateXInverseMenus()
 	InverseGraphMenu->addAction(resetCurGraphScales);
 	InverseGraphMenu->addAction(exportCurGraphAct);
 
-	InverseFoilMenu = menuBar()->addMenu(tr("&Foil"));
+	InverseFoilMenu = menuBar()->addMenu(tr("Foi&l"));
 	InverseFoilMenu->addAction(StoreFoil);
 	InverseFoilMenu->addAction(ExtractFoil);
 	InverseFoilMenu->addAction(InverseResetScale);
