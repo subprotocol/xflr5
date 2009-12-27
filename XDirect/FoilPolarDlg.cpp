@@ -326,8 +326,6 @@ void FoilPolarDlg::OnPolarType()
 		m_Type = 4;
 	}
 
-//	m_ctrlRetyp.Invalidate();
-//	m_ctrlMatyp.Invalidate();
 	SetPlrName();
 }
 
@@ -335,7 +333,6 @@ void FoilPolarDlg::OnPolarType()
 void FoilPolarDlg::SetPlrName()
 {
     ReadParams();
-    QString Name;
 
     if(m_bAutoName)
     {
@@ -343,7 +340,7 @@ void FoilPolarDlg::SetPlrName()
         {
                 double Re = m_Reynolds/1000000.;
 
-                m_PlrName=QString("T%1_Re%2_M%3").arg(m_Type).arg(Re,4,'f',2).arg(m_Mach,4,'f',2);
+				m_PlrName=QString("T%1_Re%2_M%3").arg(m_Type).arg(Re,4,'f',3).arg(m_Mach,4,'f',2);
         }
         else
         {

@@ -368,7 +368,7 @@ private:
 	int m_ForceUnit;
 	int m_MomentUnit;
 
-	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath;
+	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath, m_ImageDirName;
 	QColor m_crColors[30];
 
 	QGraph m_RefGraph;//Reference setttings

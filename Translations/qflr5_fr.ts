@@ -7142,7 +7142,11 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
     <message>
         <location filename="../Miarex/Miarex.cpp" line="16659"/>
         <source>Store OpPoint</source>
+<<<<<<< .mine
+        <translation type="unfinished">Enregistrer le point de fonct.</translation>
+=======
         <translation>Enregistrer l&apos;OpPoint</translation>
+>>>>>>> .r198
     </message>
     <message>
         <location filename="../Miarex/Miarex.cpp" line="16660"/>

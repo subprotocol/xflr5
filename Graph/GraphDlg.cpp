@@ -368,6 +368,7 @@ void GraphDlg::OnAutoY()
 	SetApplied(false);
 }
 
+
 void GraphDlg::OnAxisStyle()
 {
 	LinePickerDlg dlg;
@@ -382,6 +383,7 @@ void GraphDlg::OnAxisStyle()
 		SetApplied(false);
 	}
 }
+
 
 void GraphDlg::OnBorderStyle()
 {

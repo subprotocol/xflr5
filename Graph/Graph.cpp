@@ -1,7 +1,7 @@
 /****************************************************************************
 
     Graph Classes
-	Copyright (C) 2003-2008 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2003-2009 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,17 +20,11 @@
 *****************************************************************************/
 
 
-// Graph.cpp: implementation of the Graph class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "Graph.h"
 #include <math.h>
 
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 //static variables must be initialized in C++
 QColor Graph::m_CurveColors[10];
 
@@ -40,10 +34,10 @@ Graph::Graph()
 	//Type is used to determine automatic scales
 	m_Type = 1;
 
-	xmin         =  9999999.0;
-	xmax         = -9999999.0;
-	ymin         =  9999999.0;
-	ymax         = -9999999.0;
+	xmin         = .0;
+	xmax         = .10;
+	ymin         = .0;
+	ymax         = .10;
 	xunit        = 0.1;
 	yunit        = 0.1;
 	xo           = 0.0;

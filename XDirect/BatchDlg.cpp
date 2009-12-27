@@ -1297,7 +1297,7 @@ void BatchDlg::SetPlrName()
 		double R = m_pCurPolar->m_Reynolds/1000000.;
 		m_pCurPolar->m_PlrName = QString("T%1_Re%2_M%3")
 								 .arg(m_pCurPolar->m_Type)
-								 .arg(R,0,'f',2)
+								 .arg(R,0,'f',3)
 								 .arg( m_pCurPolar->m_Mach,0,'f',2);
 	}
 	else

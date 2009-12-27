@@ -556,7 +556,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 		glLineWidth(1.0);
 		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT,GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
 		//right side first;
 		p=0;
@@ -628,8 +628,6 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 			}
 			glEnd();
 		}
-
-		glDisable(GL_DEPTH_TEST);
 	}
 	glEndList();
 
@@ -1166,7 +1164,7 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 	QColor color;
 	int style, width;
 	CVector P1, P2, P3, P4, N, P1P3, P2P4, Tj, Tjp1;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	glNewList(BODYSURFACES,GL_COMPILE);
@@ -1174,7 +1172,7 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 		m_GLList++;
 
 		glDisable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		glPolygonMode(GL_FRONT,GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0,1.0);
 		glLineWidth(1.0);

@@ -18,6 +18,7 @@
 
 *****************************************************************************/
 
+
 #include <QGLWidget>
 #include <QAction>
 #include "Miarex.h"
@@ -5935,7 +5936,7 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 
 	static int j, l, style, width;
 	static double x;
-	static CVector Pt, PtNormal, A, B, C, D, N, BD, AC, LATB, TALB;
+	static CVector Pt, PtNormal, A, B, C, D, N, BD, AC;
 	static QColor color;
 	static CFoil * pFoilA, *pFoilB;
 
@@ -7267,7 +7268,7 @@ void QMiarex::GLCreateStreamLines()
 	double ds, *Gamma, *Mu, *Sigma;
 	QColor color;
 
-	CVector C, D, D1, V, V1, V2, VT, VInf;
+	CVector C, D, D1, V1, VT, VInf;
 //	CVector V1, V2;
 	CVector RefPoint(0.0,0.0,0.0);
 	CVector t;
@@ -9821,6 +9822,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			{
 				SetWPlrLegendPos();
 				UpdateView();
+			}
+			else if(m_iView==W3DVIEW)
+			{
+				On3DReset();
 			}
 
 			break;
@@ -16656,7 +16661,7 @@ void QMiarex::SetupLayout()
 	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
 
 	m_pctrlInitLLTCalc = new QCheckBox(tr("Init LLT"));
-	m_pctrlStoreWOpp    = new QCheckBox(tr("Store OpPoint"));
+	m_pctrlStoreWOpp   = new QCheckBox(tr("Store OpPoint"));
 	m_pctrlAnalyze     = new QPushButton(tr("Analyze"));
 
 
@@ -16688,6 +16693,18 @@ void QMiarex::SetupLayout()
 	m_pctrlStream        = new QCheckBox(tr("Stream"));
 	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight OpPoint"));
+	m_pctrlHalfWing->setSizePolicy(szPolicyMaximum);
+	m_pctrlLift->setSizePolicy(szPolicyMaximum);
+	m_pctrlIDrag->setSizePolicy(szPolicyMaximum);
+	m_pctrlVDrag->setSizePolicy(szPolicyMaximum);
+	m_pctrlTrans->setSizePolicy(szPolicyMaximum);
+	m_pctrlMoment->setSizePolicy(szPolicyMaximum);
+	m_pctrlDownwash->setSizePolicy(szPolicyMaximum);
+	m_pctrlCp->setSizePolicy(szPolicyMaximum);
+	m_pctrlSurfVel->setSizePolicy(szPolicyMaximum);
+	m_pctrlStream->setSizePolicy(szPolicyMaximum);
+	m_pctrlAnimate->setSizePolicy(szPolicyMaximum);
+	m_pctrlHighlightOpp->setSizePolicy(szPolicyMaximum);
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
 	m_pctrlAnimateSpeed->setMaximum(500);
@@ -16706,6 +16723,7 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateSpeed,6,2);
+
 //	CheckDispLayout->addWidget(m_pctrlHighlightOpp,   7, 1,1,2);
 //	m_pctrl3DSettings =new QPushButton(tr("3D Scales"));
 //	m_pctrl3DSettings->setCheckable(true);
@@ -16713,6 +16731,7 @@ void QMiarex::SetupLayout()
 //	DisplayLayout->addLayout(CheckDispLayout);
 //	DisplayLayout->addWidget(m_pctrl3DSettings);
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
+//	DisplayBox->setSizePolicy(szPolicyMaximum);
 	DisplayBox->setLayout(CheckDispLayout);
 
 
@@ -16793,13 +16812,13 @@ void QMiarex::SetupLayout()
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
 	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
 	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
-	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
-	m_pctrlLight->setSizePolicy(szPolicyMinimum);
-	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
-	m_pctrlOutline->setSizePolicy(szPolicyMinimum);
-	m_pctrlPanels->setSizePolicy(szPolicyMinimum);
-	m_pctrlVortices->setSizePolicy(szPolicyMinimum);
-	m_pctrlFoilNames->setSizePolicy(szPolicyMinimum);
+	m_pctrlAxes->setSizePolicy(szPolicyMaximum);
+	m_pctrlLight->setSizePolicy(szPolicyMaximum);
+	m_pctrlSurfaces->setSizePolicy(szPolicyMaximum);
+	m_pctrlOutline->setSizePolicy(szPolicyMaximum);
+	m_pctrlPanels->setSizePolicy(szPolicyMaximum);
+	m_pctrlVortices->setSizePolicy(szPolicyMaximum);
+	m_pctrlFoilNames->setSizePolicy(szPolicyMaximum);
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
 	ThreeDParams->addWidget(m_pctrlLight, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
@@ -16822,15 +16841,14 @@ void QMiarex::SetupLayout()
 	ThreeDView->addWidget(m_pctrlZ,2,1);
 	ThreeDView->addWidget(m_pctrlIso,2,2);
 
-	QGridLayout *ThreeDCtrls = new QGridLayout;
 	m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
 	m_pctrlReset          = new QPushButton(tr("Reset"));
 
 	m_pctrlPickCenter->setCheckable(true);
 	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
 	m_pctrlReset->setSizePolicy(szPolicyMaximum);
-	ThreeDCtrls->addWidget(m_pctrlReset,1,1);
-	ThreeDCtrls->addWidget(m_pctrlPickCenter,1,2);
+	ThreeDView->addWidget(m_pctrlReset,3,1);
+	ThreeDView->addWidget(m_pctrlPickCenter,3,2);
 
 	m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
 	m_pctrlClipPlanePos->setMinimum(-300);
@@ -16839,11 +16857,14 @@ void QMiarex::SetupLayout()
 	m_pctrlClipPlanePos->setTickInterval(30);
 	m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
 	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
+	QLabel *SliderLabel = new QLabel(tr("Clip:"));
+	QHBoxLayout *SliderLayout = new QHBoxLayout;
+	SliderLayout->addWidget(SliderLabel);
+	SliderLayout->addWidget(m_pctrlClipPlanePos,1);
 
 	ThreeDViewControls->addLayout(ThreeDParams);
 	ThreeDViewControls->addLayout(ThreeDView);
-	ThreeDViewControls->addLayout(ThreeDCtrls);
-	ThreeDViewControls->addWidget(m_pctrlClipPlanePos);
+	ThreeDViewControls->addLayout(SliderLayout);
 	ThreeDViewControls->addStretch(1);
 	QGroupBox *ThreeDViewBox = new QGroupBox;
 	ThreeDViewBox->setLayout(ThreeDViewControls);
@@ -17628,7 +17649,7 @@ void QMiarex::SnapClient(QString const &FileName)
 		}
 		case 32:
 		{
-			glReadPixels(0,0,size.width(),size.height(),GL_BGRA,GL_UNSIGNED_BYTE,pPixelData);
+			glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
 			QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_ARGB32);
 			QImage FlippedImaged;
 			FlippedImaged = Image.mirrored();	//flip vertically

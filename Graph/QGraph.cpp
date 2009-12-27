@@ -20,9 +20,6 @@
 *****************************************************************************/
 
 
-// Graph.cpp: implementation of the Graph class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "QGraph.h"
 #include "../Globals.h"
@@ -33,46 +30,9 @@
 
 QGraph::QGraph()
 {
-	//Type is used to determine automatic scales
-	m_Type = 1;
-
-	xmin         =  9999999.0;
-	xmax         = -9999999.0;
-	ymin         =  9999999.0;
-	ymax         = -9999999.0;
-	xunit        = 0.1;
-	yunit        = 0.1;
-	xo           = 0.0;
-	yo           = 0.0;
-	m_XMinorUnit = 0.01;
-	m_YMinorUnit = 0.01;
-
-	m_scalex     = 0.1;
-	m_scaley     = 0.1;
-	Cxmin        = 0.0;
-	Cxmax        = 1.0;
-	Cymin        = 0.0;
-	Cymax        = 1.0;
-
-	exp_x = 0;
-	exp_y = 0;
-
-	m_bYInverted  = false;
-	m_bAutoX        = true;
-	m_bAutoY        = true;
-	m_bXAutoMinGrid = true;
-	m_bYAutoMinGrid = true;
-	m_bBorder       = true;
-	m_bIsPrinting   = false;
 	m_bHighlightPoint = false;
 
-	m_ptoffset.setX(0);
-	m_ptoffset.setY(0);
-
 	m_iMargin = 10;
-	m_h       =  0;
-	m_w       =  0;
-	m_rDrawRect.SetRectEmpty();
 
 	m_rCltRect.setRect(0,0, 200, 300);
 

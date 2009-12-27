@@ -3062,6 +3062,7 @@ bool MainFrame::LoadSettings()
 
 
 		m_LastDirName = settings.value("LastDirName").toString();
+		m_ImageDirName = m_LastDirName;
 		m_LengthUnit  = settings.value("LengthUnit").toInt();
 		m_AreaUnit    = settings.value("AreaUnit").toInt();
 		m_WeightUnit  = settings.value("WeightUnit").toInt();
@@ -3975,10 +3976,13 @@ void MainFrame::OnSaveViewToImageFile()
 
 	}
 	FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
-											m_LastDirName,
+											m_ImageDirName,
 											"Windows Bitmap (*.bmp);;JPEG (*.jpg);;Portable Network Graphics (*.png)",
 											&Filter);
 	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) m_ImageDirName = FileName.left(pos);
 
 	if(Filter == "Windows Bitmap (*.bmp)")
 	{
