@@ -3329,6 +3329,7 @@ void MainFrame::OnGuidelines()
      CFURLRef appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
      CFStringRef macPath = CFURLCopyFileSystemPath(appUrlRef,
                                             kCFURLPOSIXPathStyle);
+
      QString bundlePath(CFStringGetCStringPtr(macPath,
                                             CFStringGetSystemEncoding()));
      QFileInfo fileInfo(bundlePath);

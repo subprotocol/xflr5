@@ -91,12 +91,12 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-        <string>0.03</string>
+        <string>0.04</string>
 	<key>CFBundleSignature</key>
 	<string>QFLR</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
 	<key>CFBundleVersion</key>
-        <string>166</string>
+        <string>200</string>
 </dict>
 </plist>

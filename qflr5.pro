@@ -3,10 +3,6 @@
 # -------------------------------------------------
 QT += opengl
 TARGET = QFLR5
-TEMPLATE = app
-QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
-CONFIG += x86 \
-    ppc
 SOURCES += MainFrame.cpp \
     XDirect/XFoil.cpp \
     XDirect/XFoilAnalysisDlg.cpp \
@@ -224,7 +220,15 @@ unix {
     target.path = $$BINDIR
 }
 mac { 
+    TEMPLATE = app
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
+    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
+    CONFIG += x86 \
+        ppc
+    OTHER_FILES += mac/Info.plist
+    LIBS += -framework \
+        CoreFoundation
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
-OTHER_FILES += ReleaseNotes.txt
+OTHER_FILES += ReleaseNotes.txti
