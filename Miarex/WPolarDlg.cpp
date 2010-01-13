@@ -376,6 +376,7 @@ void WPolarDlg::OnArea()
 void WPolarDlg::OnEditingFinished()
 {
 	ReadValues();
+	SetReynolds();
 	SetWPolarName();
 }
 

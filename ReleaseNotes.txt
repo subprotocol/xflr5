@@ -7,12 +7,16 @@
                      A tool for the design of Airfoils, Wings and Planes
                           operating at low Reynolds numbers
 
-                                Copyright (C) 2009
+                                Copyright (C) 2010
 
                                      Andre Deperrois
 
 
 *******************************************************************************
+
+
+QFLR5 v0.05 Beta January xxxth, 2010
+	- Made a few corrections and enhancements
 
 
 QFLR5 v0.04 Beta December 27th 2009

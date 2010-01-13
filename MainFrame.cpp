@@ -242,9 +242,9 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 
 	for (i=0; i<m_oaPolar.size(); i++)
 	{
-	pOldPlr = (CPolar*)m_oaPolar.at(i);
-	if (pOldPlr->m_PlrName  == pPolar->m_PlrName &&
-		pOldPlr->m_FoilName == pPolar->m_FoilName) bExists = true;
+		pOldPlr = (CPolar*)m_oaPolar.at(i);
+		if (pOldPlr->m_PlrName == pPolar->m_PlrName && pOldPlr->m_FoilName == pPolar->m_FoilName) 
+			bExists = true;
 	}
 	while(!bInserted)
 	{
@@ -253,14 +253,12 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 			for (j=0; j<m_oaPolar.size(); j++)
 			{
 				pOldPlr = (CPolar*)m_oaPolar.at(j);
-
 				if (pPolar->m_FoilName.compare(pOldPlr->m_FoilName, Qt::CaseInsensitive)<0)
 				{
 					m_oaPolar.insert(j, pPolar);
 					bInserted = true;
 					break;
 				}
-
 				else if (pPolar->m_FoilName == pOldPlr->m_FoilName)
 				{
 					if(pPolar->m_Type < pOldPlr->m_Type)
@@ -306,8 +304,7 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 			for (l=0; l<m_oaPolar.size(); l++)
 			{
 				pOldPlr = (CPolar*)m_oaPolar.at(l);
-				if (pOldPlr->m_FoilName == pPolar->m_FoilName &&
-					pOldPlr->m_PlrName  == pPolar->m_PlrName)
+				if (pOldPlr->m_FoilName == pPolar->m_FoilName && pOldPlr->m_PlrName == pPolar->m_PlrName)
 				{
 					p = 2;
 					bFound = true;
