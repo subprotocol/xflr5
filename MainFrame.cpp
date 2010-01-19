@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	MainFrame  Class
-	Copyright (C) 2008-2009 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2008-2010 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -3060,12 +3060,16 @@ bool MainFrame::LoadSettings()
 
 		m_LastDirName = settings.value("LastDirName").toString();
 		m_ImageDirName = m_LastDirName;
+
 		m_LengthUnit  = settings.value("LengthUnit").toInt();
 		m_AreaUnit    = settings.value("AreaUnit").toInt();
 		m_WeightUnit  = settings.value("WeightUnit").toInt();
 		m_SpeedUnit   = settings.value("SpeedUnit").toInt();
 		m_ForceUnit   = settings.value("ForceUnit").toInt();
 		m_MomentUnit  = settings.value("MomentUnit").toInt();
+		SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
+				     m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+
 		m_BackgroundColor.setRed(settings.value("BackgroundColorRed").toInt());
 		m_BackgroundColor.setGreen(settings.value("BackgroundColorGreen").toInt());
 		m_BackgroundColor.setBlue(settings.value("BackgroundColorBlue").toInt());
