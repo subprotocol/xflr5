@@ -486,12 +486,12 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
 		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
 
-		APt.x +=  PtNormal.x * TopA;
-		APt.y +=  PtNormal.y * TopA;
-		APt.z +=  PtNormal.z * TopA;
-		BPt.x +=  PtNormal.x * TopB;
-		BPt.y +=  PtNormal.y * TopB;
-		BPt.z +=  PtNormal.z * TopB;
+		APt.x +=  Normal.x * TopA;
+		APt.y +=  Normal.y * TopA;
+		APt.z +=  Normal.z * TopA;
+		BPt.x +=  Normal.x * TopB;
+		BPt.y +=  Normal.y * TopB;
+		BPt.z +=  Normal.z * TopB;
 	}
 	else if(pos==-1 && m_pFoilA && m_pFoilB)
 	{
@@ -501,17 +501,17 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 		BotB *= GetChord(1.0);
 
 		// rotate the point's normal vector i.a.w. dihedral and local washout
-		PtNormal.x = -nxA * (1.0-yrel) - nxB * yrel;
+		PtNormal.x = nxA * (1.0-yrel) + nxB * yrel;
 		PtNormal.y = 0.0;
-		PtNormal.z = -nyA * (1.0-yrel) - nyB * yrel;
+		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
 		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
 
-		APt.x +=  PtNormal.x * BotA;
-		APt.y +=  PtNormal.y * BotA;
-		APt.z +=  PtNormal.z * BotA;
-		BPt.x +=  PtNormal.x * BotB;
-		BPt.y +=  PtNormal.y * BotB;
-		BPt.z +=  PtNormal.z * BotB;
+		APt.x +=  Normal.x * BotA;
+		APt.y +=  Normal.y * BotA;
+		APt.z +=  Normal.z * BotA;
+		BPt.x +=  Normal.x * BotB;
+		BPt.y +=  Normal.y * BotB;
+		BPt.z +=  Normal.z * BotB;
 	}
 	Point.x = APt.x * (1.0-yrel)+  BPt.x * yrel ;
 	Point.y = APt.y * (1.0-yrel)+  BPt.y * yrel ;

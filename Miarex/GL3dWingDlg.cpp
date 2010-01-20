@@ -347,7 +347,7 @@ void GL3dWingDlg::FillDataTable()
 
 void GL3dWingDlg::FillTableRow(int row)
 {
-	QString str, strong;
+	QString strong;
 	QModelIndex ind;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 

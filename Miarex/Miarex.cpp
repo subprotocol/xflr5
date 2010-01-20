@@ -1590,6 +1590,23 @@ void QMiarex::CheckButtons()
 	pMainFrame->CurWPlrMenu->setEnabled(m_pCurWPolar);
 	pMainFrame->CurWOppMenu->setEnabled(m_pCurWOpp);
 
+	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlPanels->setChecked(m_bVLMPanels);
+	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlCp->setChecked(m_b3DCp);
+	m_pctrlDownwash->setChecked(m_bDownwash);
+	m_pctrlMoment->setChecked(m_bMoments);
+	m_pctrlTrans->setChecked(m_bXTop);
+	m_pctrlLift->setChecked(m_bXCP);
+	m_pctrlIDrag->setChecked(m_bICd);
+	m_pctrlVDrag->setChecked(m_bVCd);
+	m_pctrlAxes->setChecked(m_bAxes);
+	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlSurfaces->setChecked(m_bSurfaces);
+	m_pctrlOutline->setChecked(m_bOutline);
+	m_pctrlStream->setChecked(m_bStream);
+	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
+
 }
 
 
@@ -5996,12 +6013,10 @@ void QMiarex::GLCreateGeom(CWing *pWing, int List)
 				}
 			}
 			glEnd();
-
 		}
 
 		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			//All surfaces
 			//Left surface
 			if(pWing->m_Surface[j].m_bIsTipLeft)
 			{
@@ -15614,23 +15629,6 @@ void QMiarex::SetAnalysisParams()
 		m_pctrlAlphaMax->SetValue(m_ControlMax);
 		m_pctrlAlphaDelta->SetValue(m_ControlDelta);
 	}
-
-	m_pctrlOutline->setChecked(m_bOutline);
-	m_pctrlPanels->setChecked(m_bVLMPanels);
-	m_pctrlAxes->setChecked(m_bAxes);
-	m_pctrlCp->setChecked(m_b3DCp);
-	m_pctrlDownwash->setChecked(m_bDownwash);
-	m_pctrlMoment->setChecked(m_bMoments);
-	m_pctrlTrans->setChecked(m_bXTop);
-	m_pctrlLift->setChecked(m_bXCP);
-	m_pctrlIDrag->setChecked(m_bICd);
-	m_pctrlVDrag->setChecked(m_bVCd);
-	m_pctrlAxes->setChecked(m_bAxes);
-	m_pctrlLight->setChecked(m_bglLight);
-	m_pctrlSurfaces->setChecked(m_bSurfaces);
-	m_pctrlOutline->setChecked(m_bOutline);
-	m_pctrlStream->setChecked(m_bStream);
-	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
 }
 
 
@@ -15646,6 +15644,7 @@ void QMiarex::SetControls()
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
 }
+
 
 void QMiarex::SetCurveParams()
 {
@@ -16601,7 +16600,6 @@ void QMiarex::SetUFO(QString UFOName)
 	{
 		SetWPlr();
 	}
-//	pMainFrame->UpdateWPolars();
 
 	SetScale();
 	SetWGraphScale();
