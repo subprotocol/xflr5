@@ -231,4 +231,4 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
-OTHER_FILES += ReleaseNotes.txti
+OTHER_FILES += ReleaseNotes.txt
