@@ -3124,7 +3124,9 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	if(end==".plr")
 	{
 		QDataStream ar(&XFile);
+#if QT_VERSION >= 0x040500
 		ar.setVersion(QDataStream::Qt_4_5);
+#endif
 		ar.setByteOrder(QDataStream::LittleEndian);
 		CFoil *pFoil = ReadPolarFile(ar);
 		pXDirect->m_bPolar = true;
@@ -3194,8 +3196,9 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 				QDataStream ar(&XFile);
 				ar.setByteOrder(QDataStream::LittleEndian);
+#if QT_VERSION >= 0x040500
 				ar.setVersion(QDataStream::Qt_4_5);
-
+#endif
 				if(SerializeProject(ar, false, 1))
 				{
 					g_pCurFoil = pXDirect->SetFoil();
@@ -3372,7 +3375,9 @@ void MainFrame::OnInsertProject()
 		return;
 	}
 	QDataStream ar(&XFile);
+#if QT_VERSION >= 0x040500
 	ar.setVersion(QDataStream::Qt_4_5);
+#endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 
 	SerializeProject(ar, false, 1);
@@ -3940,7 +3945,9 @@ void MainFrame::OnSaveUFOAsProject()
 	}
 
 	QDataStream ar(&fp);
+#if QT_VERSION >= 0x040500
 	ar.setVersion(QDataStream::Qt_4_5);
+#endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeUFOProject(ar,5);
 	m_FileName = PathName;
@@ -4655,7 +4662,9 @@ bool MainFrame::SaveProject(QString PathName)
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	QDataStream ar(&fp);
+#if QT_VERSION >= 0x040500
 	ar.setVersion(QDataStream::Qt_4_5);
+#endif
 	ar.setByteOrder(QDataStream::LittleEndian);
 	SerializeProject(ar,true, Format);
 	m_FileName = PathName;

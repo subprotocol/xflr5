@@ -29,7 +29,9 @@ CFoil *g_pCurFoil;	//make it common to all applications
 
 int main(int argc, char *argv[])
 {
+#if QT_VERSION >= 0x040600
 	QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
+#endif
 	QFLR5Application app(argc, argv);
 
 	QString StyleName = "Cleanlooks";
