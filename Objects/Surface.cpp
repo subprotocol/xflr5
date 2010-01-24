@@ -486,12 +486,12 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
 		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
 
-		APt.x +=  Normal.x * TopA;
-		APt.y +=  Normal.y * TopA;
-		APt.z +=  Normal.z * TopA;
-		BPt.x +=  Normal.x * TopB;
-		BPt.y +=  Normal.y * TopB;
-		BPt.z +=  Normal.z * TopB;
+		APt.x +=  NormalA.x * TopA;
+		APt.y +=  NormalA.y * TopA;
+		APt.z +=  NormalA.z * TopA;
+		BPt.x +=  NormalB.x * TopB;
+		BPt.y +=  NormalB.y * TopB;
+		BPt.z +=  NormalB.z * TopB;
 	}
 	else if(pos==-1 && m_pFoilA && m_pFoilB)
 	{
@@ -506,12 +506,12 @@ void CSurface::GetPoint(double const &xArel, double const &xBrel, double const &
 		PtNormal.z = nyA * (1.0-yrel) + nyB * yrel;
 		q.Conjugate(PtNormal.x, PtNormal.y, PtNormal.z);
 
-		APt.x +=  Normal.x * BotA;
-		APt.y +=  Normal.y * BotA;
-		APt.z +=  Normal.z * BotA;
-		BPt.x +=  Normal.x * BotB;
-		BPt.y +=  Normal.y * BotB;
-		BPt.z +=  Normal.z * BotB;
+		APt.x +=  NormalA.x * BotA;
+		APt.y +=  NormalA.y * BotA;
+		APt.z +=  NormalA.z * BotA;
+		BPt.x +=  NormalB.x * BotB;
+		BPt.y +=  NormalB.y * BotB;
+		BPt.z +=  NormalB.z * BotB;
 	}
 	Point.x = APt.x * (1.0-yrel)+  BPt.x * yrel ;
 	Point.y = APt.y * (1.0-yrel)+  BPt.y * yrel ;
