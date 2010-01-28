@@ -2869,7 +2869,6 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	CPolar *pPolar = NULL;
 	CPolar *pOldPlr;
 	OpPoint *pOpp, *pOldOpp;
-	QString strong;
 	QXDirect *pXDirect =(QXDirect*)m_pXDirect;
 
 
@@ -5121,7 +5120,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 	CFoil *pFoil     = NULL;
 
 
-	QString str, strong;
+	QString str;
 	int i, n, j, k;
 	float f;
 

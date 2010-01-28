@@ -22,7 +22,6 @@
 #include "FloatEdit.h"
 #include <math.h>
 
-
 FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
@@ -73,7 +72,6 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 {
 	QString str;
 	double f = ReadValue();
-
 	if(IsInBounds(f))
 	{
 		m_Value = f;
@@ -180,15 +178,13 @@ void FloatEdit::SetValue(double f)
 
 void FloatEdit::FormatValue(double const &f, QString &str)
 {
-	QString str1;
-
-	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <1000000.0)
+	if ((f==0.0 || fabs(f)>=pow(10.0, -m_iPrecision)) && f <10000000.0)
 	{
 		str=QString("%1").arg(f,0,'f', m_iPrecision);
 	}
 	else
 	{
-		str=QString("%1").arg(f,0,'e',m_iPrecision);
+		str=QString("%1").arg(f,0,'g',3);
 	}
 }
 

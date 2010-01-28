@@ -11749,7 +11749,8 @@ void XFoil::qspcir()
 //     sets qspec arrays for all design alphas or cls
 //----------------------------------------------------
 
-	for(int kqsp=1; kqsp<= nqsp;kqsp++){
+	for(int kqsp=1; kqsp<= nqsp;kqsp++)
+	{
 		qccalc(iacqsp,&alqsp[kqsp],&clqsp[kqsp],&cmqsp[kqsp],minf,qinf,
 			  &nsp,w1,w2,w5,qspec[kqsp]);
 		splqsp(kqsp);
@@ -11959,7 +11960,8 @@ void XFoil::Filter(double cfilt)
 	
 //      write(*,1200) algam/dtor,clgam,cmgam
 	
-	for(int kqsp=1; kqsp<= nqsp; kqsp++){
+	for(int kqsp=1; kqsp<= nqsp; kqsp++)
+	{
 //		qspint(alqsp[kqsp],qspec[kqsp][1],qinf,minf,clq,cmqsp[kqsp]);
 		qspint(kqsp, clq);
 		

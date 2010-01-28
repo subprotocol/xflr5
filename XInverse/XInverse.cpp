@@ -1778,7 +1778,7 @@ void QXInverse::PaintFoil(QPainter &painter)
 
 //draw the reference and modified foils  
 	XFoil *pXFoil = (XFoil*)m_pXFoil;
-	double alpha = pXFoil->alqsp[1];
+	double alpha = pXFoil->alqsp[1]*180.0/PI;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QPen TextPen(pMainFrame->m_TextColor);
