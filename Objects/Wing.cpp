@@ -333,7 +333,7 @@ void CWing::ComputeGeometry()
 }
 
 
-void CWing::ComputeInertia(double const & Mass)
+void CWing::ComputeVolumeInertia(double const & Mass)
 {
 	int j,k;
 	double rho, LocalSpan, LocalVolume;

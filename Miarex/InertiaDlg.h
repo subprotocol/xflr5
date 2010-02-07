@@ -67,21 +67,23 @@ private:
 	CPlane *m_pPlane;
 	void *m_pMainFrame;
 
-//	QRadioButton *m_pctrlAuto, *m_pctrlMan;
 	QPushButton *OKButton;
-	QLabel *m_pctrlMassUnit, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
-	QLabel *m_pctrlObjectMassLabel;
-	QLabel *m_pctrlInertiaUnit1;
+	QLabel *m_pctrlMassUnit, *m_pctrlMassUnit2, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
+	QLabel *m_pctrlVolumeMassLabel, *m_pctrlTotalMassLabel;
+	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2;
 	QTableView *m_pctrlMassView;
 	QStandardItemModel *m_pMassModel;
 	FloatEditDelegate *m_pFloatDelegate;
 	FloatEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;
-	FloatEdit *m_pctrlXRef, *m_pctrlYRef, *m_pctrlZRef;
 	FloatEdit *m_pctrlXCoG,*m_pctrlYCoG,*m_pctrlZCoG;
-	FloatEdit *m_pctrlObjectMass;
+	FloatEdit *m_pctrlVolumeMass;
+	
+	FloatEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
+	FloatEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
+	FloatEdit *m_pctrlTotalMass;
 
 	double m_Mass;
-	CVector m_CoG;
+	CVector m_VolumeCoG;
 
 	CVector m_PtRef;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;

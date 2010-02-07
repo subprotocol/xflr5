@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CPlane Class
-	Copyright (C) 2006-2009 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2006-2010 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -106,7 +106,8 @@ CPlane::CPlane()
 	m_PlaneName  = QObject::tr("Plane Name");
 }
 
-void CPlane::ComputeInertia(double const & Mass)
+
+void CPlane::ComputeVolumeInertia(double & Mass)
 {
 	//calculation performed for user information only
 	//the analysis uses each object inertia individually
@@ -118,30 +119,30 @@ void CPlane::ComputeInertia(double const & Mass)
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	double PlaneMass = 0.0;
-	//get the wings inertias
 
-	m_Wing.ComputeInertia(m_Wing.m_Mass);
-	m_CoG += (m_Wing.m_CoG+m_LEWing) * m_Wing.m_Mass;
-	PlaneMass += m_Wing.m_Mass;
+	//get the main wing's inertias
+	m_Wing.ComputeVolumeInertia(m_Wing.m_Mass);
+	m_CoG += (m_Wing.m_CoG) * m_Wing.m_Mass;
+	PlaneMass = m_Wing.m_Mass;
 
-	//add object contributions
+	//add other object contributions
 	// object CoGs and inertia in CoG frame will be computed at the same time
 	if(m_bBiplane)
 	{
-		m_Wing2.ComputeInertia(m_Wing2.m_Mass);
-		m_CoG += (m_Wing2.m_CoG+m_LEWing2) * m_Wing2.m_Mass;
+		m_Wing2.ComputeVolumeInertia(m_Wing2.m_Mass);
+		m_CoG += (m_Wing2.m_CoG) * m_Wing2.m_Mass;
 		PlaneMass += m_Wing2.m_Mass;
 	}
 	if(m_bStab)
 	{
-		m_Stab.ComputeInertia(m_Stab.m_Mass);
-		m_CoG += (m_Stab.m_CoG +m_LEStab)* m_Stab.m_Mass;
+		m_Stab.ComputeVolumeInertia(m_Stab.m_Mass);
+		m_CoG += (m_Stab.m_CoG)* m_Stab.m_Mass;
 		PlaneMass += m_Stab.m_Mass;
 	}
 	if(m_bFin)
 	{
-		m_Fin.ComputeInertia(m_Stab.m_Mass);
-		m_CoG += (m_Fin.m_CoG+m_LEFin) * m_Fin.m_Mass;
+		m_Fin.ComputeVolumeInertia(m_Fin.m_Mass);
+		m_CoG += (m_Fin.m_CoG) * m_Fin.m_Mass;
 		PlaneMass += m_Fin.m_Mass;
 	}
 	if(m_bBody)
@@ -155,7 +156,7 @@ void CPlane::ComputeInertia(double const & Mass)
 	else              m_CoG.Set(0.0, 0.0, 0.0);
 
 	//Deduce inertia tensor in plane CoG from Huyghens/Steiner theorem
-	Pt = m_Wing.m_CoG + m_LEWing;
+	Pt = m_Wing.m_CoG - m_CoG;
 	m_CoGIxx = m_Wing.m_CoGIxx + m_Wing.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
 	m_CoGIyy = m_Wing.m_CoGIyy + m_Wing.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
 	m_CoGIzz = m_Wing.m_CoGIzz + m_Wing.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
@@ -163,7 +164,7 @@ void CPlane::ComputeInertia(double const & Mass)
 
 	if(m_bBiplane)
 	{
-		Pt = m_Wing2.m_CoG + m_LEWing2;
+		Pt = m_Wing2.m_CoG - m_CoG;
 		m_CoGIxx += m_Wing2.m_CoGIxx + m_Wing2.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
 		m_CoGIyy += m_Wing2.m_CoGIyy + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
 		m_CoGIzz += m_Wing2.m_CoGIzz + m_Wing2.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
@@ -172,7 +173,7 @@ void CPlane::ComputeInertia(double const & Mass)
 
 	if(m_bStab)
 	{
-		Pt = m_Stab.m_CoG + m_LEStab;
+		Pt = m_Stab.m_CoG - m_CoG;
 		m_CoGIxx += m_Stab.m_CoGIxx + m_Stab.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
 		m_CoGIyy += m_Stab.m_CoGIyy + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
 		m_CoGIzz += m_Stab.m_CoGIzz + m_Stab.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
@@ -181,7 +182,7 @@ void CPlane::ComputeInertia(double const & Mass)
 
 	if(m_bFin)
 	{
-		Pt = m_Fin.m_CoG + m_LEFin;
+		Pt = m_Fin.m_CoG - m_CoG;
 		m_CoGIxx += m_Fin.m_CoGIxx + m_Fin.m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
 		m_CoGIyy += m_Fin.m_CoGIyy + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
 		m_CoGIzz += m_Fin.m_CoGIzz + m_Fin.m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
@@ -190,14 +191,16 @@ void CPlane::ComputeInertia(double const & Mass)
 
 	if(m_bBody)
 	{
-		m_CoGIxx += m_pBody->m_CoGIxx + m_pBody->m_Mass * (m_pBody->m_CoG.y*m_pBody->m_CoG.y + m_pBody->m_CoG.z*m_pBody->m_CoG.z);
-		m_CoGIyy += m_pBody->m_CoGIyy + m_pBody->m_Mass * (m_pBody->m_CoG.x*m_pBody->m_CoG.x + m_pBody->m_CoG.z*m_pBody->m_CoG.z);
-		m_CoGIzz += m_pBody->m_CoGIzz + m_pBody->m_Mass * (m_pBody->m_CoG.x*m_pBody->m_CoG.x + m_pBody->m_CoG.y*m_pBody->m_CoG.y);
-		m_CoGIxz += m_pBody->m_CoGIxz - m_pBody->m_Mass *  m_pBody->m_CoG.x*m_pBody->m_CoG.z;
+		Pt = m_pBody->m_CoG - m_CoG;
+		m_CoGIxx += m_pBody->m_CoGIxx + m_pBody->m_Mass * (Pt.y*Pt.y + Pt.z*Pt.z);
+		m_CoGIyy += m_pBody->m_CoGIyy + m_pBody->m_Mass * (Pt.x*Pt.x + Pt.z*Pt.z);
+		m_CoGIzz += m_pBody->m_CoGIzz + m_pBody->m_Mass * (Pt.x*Pt.x + Pt.y*Pt.y);
+		m_CoGIxz += m_pBody->m_CoGIxz - m_pBody->m_Mass *  Pt.x*Pt.z;
 	}
 
-//	Mass = PlaneMass;
+	Mass = PlaneMass;
 }
+
 
 void CPlane::ComputePlane(void)
 {

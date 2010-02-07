@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CPlane Class
-	Copyright (C) 2006-2009 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2006-2010 Andre Deperrois xflr5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ private:
 //	bool HasResults();
 	void Duplicate(CPlane *pPlane);
 	void ComputePlane(void);
-	void ComputeInertia(double const & Mass);
+	void ComputeVolumeInertia(double & Mass);
 
 
 public:
