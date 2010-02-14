@@ -1,10 +1,8 @@
 <RCC>
-    <qresource prefix="/" >
+    <qresource prefix="/">
         <file>images/copy.png</file>
-        <file>images/cut.png</file>
         <file>images/new.png</file>
         <file>images/open.png</file>
-        <file>images/paste.png</file>
         <file>images/save.png</file>
         <file>images/On3DView.png</file>
         <file>images/OnBody.png</file>
