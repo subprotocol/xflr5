@@ -181,7 +181,7 @@ void InertiaDlg::ComputeInertia()
 								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
 	TotalIzz = m_CoGIzz + m_Mass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
 								   +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
-	TotalIxz = m_CoGIxz + m_Mass *  (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
+	TotalIxz = m_CoGIxz - m_Mass *  (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
 
 	for(i=0; i<m_NMass; i++)
 	{
@@ -191,7 +191,7 @@ void InertiaDlg::ComputeInertia()
 									  +(m_MassPosition[i].z-TotalCoG.z)*(m_MassPosition[i].z-TotalCoG.z));
 		TotalIzz  += m_MassValue[i] * ((m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].x-TotalCoG.x)
 									  +(m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y));
-		TotalIxz  += m_MassValue[i] *  (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].z-TotalCoG.z) ;
+		TotalIxz  -= m_MassValue[i] *  (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].z-TotalCoG.z) ;
 	}
 
 	if(m_pPlane)
@@ -206,7 +206,7 @@ void InertiaDlg::ComputeInertia()
 										+(MassPosition[i].z-TotalCoG.z)*(MassPosition[i].z-TotalCoG.z));
 			TotalIzz  += MassValue[i] * ((MassPosition[i].x-TotalCoG.x)*(MassPosition[i].x-TotalCoG.x)
 										+(MassPosition[i].y-TotalCoG.y)*(MassPosition[i].y-TotalCoG.y));
-			TotalIxz  += MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
+			TotalIxz  -= MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
 		}
 		if(m_pPlane->m_bBiplane)
 		{
@@ -220,7 +220,7 @@ void InertiaDlg::ComputeInertia()
 											+(MassPosition[i].z-TotalCoG.z)*(MassPosition[i].z-TotalCoG.z));
 				TotalIzz  += MassValue[i] * ((MassPosition[i].x-TotalCoG.x)*(MassPosition[i].x-TotalCoG.x)
 											+(MassPosition[i].y-TotalCoG.y)*(MassPosition[i].y-TotalCoG.y));
-				TotalIxz  += MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
+				TotalIxz  -= MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
 			}
 		}
 		if(m_pPlane->m_bStab)
@@ -235,7 +235,7 @@ void InertiaDlg::ComputeInertia()
 											+(MassPosition[i].z-TotalCoG.z)*(MassPosition[i].z-TotalCoG.z));
 				TotalIzz  += MassValue[i] * ((MassPosition[i].x-TotalCoG.x)*(MassPosition[i].x-TotalCoG.x)
 											+(MassPosition[i].y-TotalCoG.y)*(MassPosition[i].y-TotalCoG.y));
-				TotalIxz  += MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
+				TotalIxz  -= MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
 			}
 		}
 		if(m_pPlane->m_bFin)
@@ -250,7 +250,7 @@ void InertiaDlg::ComputeInertia()
 											+(MassPosition[i].z-TotalCoG.z)*(MassPosition[i].z-TotalCoG.z));
 				TotalIzz  += MassValue[i] * ((MassPosition[i].x-TotalCoG.x)*(MassPosition[i].x-TotalCoG.x)
 											+(MassPosition[i].y-TotalCoG.y)*(MassPosition[i].y-TotalCoG.y));
-				TotalIxz  += MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
+				TotalIxz  -= MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
 			}
 		}
 		if(m_pPlane->m_bBody)
@@ -265,7 +265,7 @@ void InertiaDlg::ComputeInertia()
 											+(MassPosition[i].z-TotalCoG.z)*(MassPosition[i].z-TotalCoG.z));
 				TotalIzz  += MassValue[i] * ((MassPosition[i].x-TotalCoG.x)*(MassPosition[i].x-TotalCoG.x)
 											+(MassPosition[i].y-TotalCoG.y)*(MassPosition[i].y-TotalCoG.y));
-				TotalIxz  += MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
+				TotalIxz  -= MassValue[i] *  (MassPosition[i].x-TotalCoG.x)*(MassPosition[i].z-TotalCoG.z) ;
 			}
 		}
 	}
@@ -281,7 +281,7 @@ void InertiaDlg::ComputeInertia()
 	m_pctrlTotalIzz->SetValue(TotalIzz*Unit);
 	m_pctrlTotalIxz->SetValue(TotalIxz*Unit);
 
-//qDebug("%14.7f, %14.7f, %14.7f",  TotalIxx, TotalIyy, TotalIzz);
+//qDebug("%14.7f, %14.7f, %14.7f, %14.7f",  TotalIxx, TotalIyy, TotalIzz, TotalIxz);
 }
 
 
@@ -463,8 +463,7 @@ void InertiaDlg::OnExportToAVL()
 	QString filter =".mass";
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString, strong;
-	QFile DestFile;
+	QString FileName, strong;
 
 	if(m_pPlane)     FileName = m_pPlane->m_PlaneName;
 	else if(m_pWing) FileName = m_pWing->m_WingName;
@@ -530,84 +529,84 @@ void InertiaDlg::OnExportToAVL()
 		// we need to convert the inertia in the wing's CoG system
 		// by applying Huyghen/Steiner's theorem
 
-		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Inertia of both left and right wings"))
-						.arg(m_Mass /Munit,  8, 'f', 6)
-						.arg(m_VolumeCoG.x/Lunit, 8, 'f', 6)
-						.arg(m_VolumeCoG.y/Lunit, 8, 'f', 6)  //should be zero
-						.arg(m_VolumeCoG.z/Lunit, 8, 'f', 6)
-						.arg(m_CoGIxx/Iunit,  8, 'e', 6).arg(m_CoGIyy/Iunit,  8, 'e', 6).arg(m_CoGIzz/Iunit,  8, 'e', 6);
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Inertia of both left and right wings"))
+						.arg(m_Mass /Munit,  10, 'g', 4)
+						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 4)
+						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 4)  //should be zero
+						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 4)
+						.arg(m_CoGIxx/Iunit,  10, 'g', 4).arg(m_CoGIyy/Iunit,  10, 'g', 4).arg(m_CoGIzz/Iunit,  10, 'g', 4);
 		out << strong+"\n";
 	}
 	else if (m_pBody)
 	{
-		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Body inertia"))
-						.arg(m_Mass /Munit, 8, 'f', 6)
-						.arg(m_VolumeCoG.x/Lunit, 8, 'f', 6)
-						.arg(m_VolumeCoG.y/Lunit, 8, 'f', 6)
-						.arg(m_VolumeCoG.z/Lunit, 8, 'f', 6)
-						.arg(m_CoGIxx/Iunit,  8, 'e', 6).arg(m_CoGIyy/Iunit,  8, 'e', 6).arg(m_CoGIzz/Iunit,  8, 'e', 6);
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Body inertia"))
+						.arg(m_Mass /Munit, 10, 'g', 4)
+						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 4)
+						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 4)
+						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 4)
+						.arg(m_CoGIxx/Iunit,  10, 'g', 4).arg(m_CoGIyy/Iunit,  10, 'g', 4).arg(m_CoGIzz/Iunit,  10, 'g', 4);
 		out << strong+"\n";
 	}
 	else if (m_pPlane)
 	{
 		// we write out each object contribution individually
 		// a plane has always a wing
-		strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Main wing's inertia"))
-						.arg(m_pPlane->m_Wing.m_Mass /Munit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing.m_CoG.x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing.m_CoG.y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing.m_CoG.z/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing.m_CoGIxx/Iunit,8, 'e', 6)
-						.arg(m_pPlane->m_Wing.m_CoGIyy/Iunit,8, 'e', 6)
-						.arg(m_pPlane->m_Wing.m_CoGIzz/Iunit,8, 'e', 6);
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Main wing's inertia"))
+						.arg(m_pPlane->m_Wing.m_Mass /Munit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoG.x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoG.y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoG.z/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoGIxx/Iunit,10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoGIyy/Iunit,10, 'g', 4)
+						.arg(m_pPlane->m_Wing.m_CoGIzz/Iunit,10, 'g', 4);
 		out << strong+"\n";
 
 		if(m_pPlane->m_bBiplane)
 		{
-			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Second wing's inertia"))
-						.arg(m_pPlane->m_Wing2.m_Mass /Munit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_CoG.x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_CoG.y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_CoG.z/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_CoGIxx/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Wing2.m_CoGIyy/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Wing2.m_CoGIzz/Iunit,  8, 'e', 6);
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Second wing's inertia"))
+						.arg(m_pPlane->m_Wing2.m_Mass /Munit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoG.x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoG.y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoG.z/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoGIxx/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoGIyy/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_CoGIzz/Iunit,  10, 'g', 4);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bStab)
 		{
-			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Elevator's inertia"))
-						.arg(m_pPlane->m_Stab.m_Mass /Munit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_CoG.x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_CoG.y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_CoG.z/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_CoGIxx/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Stab.m_CoGIyy/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Stab.m_CoGIzz/Iunit,  8, 'e', 6);
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Elevator's inertia"))
+						.arg(m_pPlane->m_Stab.m_Mass /Munit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoG.x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoG.y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoG.z/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoGIxx/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoGIyy/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_CoGIzz/Iunit,  10, 'g', 4);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bFin)
 		{
-			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Fin's inertia"))
-						.arg(m_pPlane->m_Fin.m_Mass /Munit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_CoG.x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_CoG.y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_CoG.z/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_CoGIxx/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Fin.m_CoGIyy/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_Fin.m_CoGIzz/Iunit,  8, 'e', 6);
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Fin's inertia"))
+						.arg(m_pPlane->m_Fin.m_Mass /Munit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoG.x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoG.y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoG.z/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoGIxx/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoGIyy/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_CoGIzz/Iunit,  10, 'g', 4);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bBody)
 		{
-			strong = QString(tr("%1  %2  %3  %4  %5  %6  %7 ! Body's inertia"))
-						.arg(m_pPlane->m_pBody->m_Mass /Munit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_CoG.x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_CoG.y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_CoG.z/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_CoGIxx/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_pBody->m_CoGIyy/Iunit,  8, 'e', 6)
-						.arg(m_pPlane->m_pBody->m_CoGIzz/Iunit,  8, 'e', 6);
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Body's inertia"))
+						.arg(m_pPlane->m_pBody->m_Mass /Munit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoG.x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoG.y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoG.z/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoGIxx/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoGIyy/Iunit,  10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_CoGIzz/Iunit,  10, 'g', 4);
 			out << strong+"\n";
 		}
 	}
@@ -616,12 +615,12 @@ void InertiaDlg::OnExportToAVL()
 	{
 		if(m_MassValue[i]>0.0)
 		{
-			strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-				.arg(m_MassValue[i] / Munit,    8, 'f', 6)
-				.arg(m_MassPosition[i].x/Lunit, 8, 'f', 6)
-				.arg(m_MassPosition[i].y/Lunit, 8, 'f', 6)
-				.arg(m_MassPosition[i].z/Lunit, 8, 'f', 6);
-			strong += "    ! " + m_MassTag[i];
+			strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+				.arg(m_MassValue[i] / Munit,    10, 'g', 4)
+				.arg(m_MassPosition[i].x/Lunit, 10, 'g', 4)
+				.arg(m_MassPosition[i].y/Lunit, 10, 'g', 4)
+				.arg(m_MassPosition[i].z/Lunit, 10, 'g', 4);
+			strong += " ! " + m_MassTag[i];
 			out << strong+"\n";
 		}
 	}
@@ -634,12 +633,12 @@ void InertiaDlg::OnExportToAVL()
 		{
 			if(m_pPlane->m_Wing.m_MassValue[i]>0.0)
 			{
-				strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-					.arg(m_pPlane->m_Wing.m_MassValue[i] / Munit,    8, 'f', 6)
-					.arg(m_pPlane->m_Wing.m_MassPosition[i].x/Lunit, 8, 'f', 6)
-					.arg(m_pPlane->m_Wing.m_MassPosition[i].y/Lunit, 8, 'f', 6)
-					.arg(m_pPlane->m_Wing.m_MassPosition[i].z/Lunit, 8, 'f', 6);
-				strong += "    ! " + m_pPlane->m_Wing.m_MassTag[i];
+				strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+					.arg(m_pPlane->m_Wing.m_MassValue[i] / Munit,    10, 'g', 4)
+					.arg(m_pPlane->m_Wing.m_MassPosition[i].x/Lunit, 10, 'g', 4)
+					.arg(m_pPlane->m_Wing.m_MassPosition[i].y/Lunit, 10, 'g', 4)
+					.arg(m_pPlane->m_Wing.m_MassPosition[i].z/Lunit, 10, 'g', 4);
+				strong += " ! " + m_pPlane->m_Wing.m_MassTag[i];
 				out << strong+"\n";
 			}
 		}
@@ -651,12 +650,12 @@ void InertiaDlg::OnExportToAVL()
 			{
 				if(m_pPlane->m_Wing.m_MassValue[i]>0.0)
 				{
-					strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-						.arg(m_pPlane->m_Wing2.m_MassValue[i] / Munit,    8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_MassPosition[i].x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_MassPosition[i].y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Wing2.m_MassPosition[i].z/Lunit, 8, 'f', 6);
-					strong += "    ! " + m_pPlane->m_Wing2.m_MassTag[i];
+					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+						.arg(m_pPlane->m_Wing2.m_MassValue[i] / Munit,    10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_MassPosition[i].x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_MassPosition[i].y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Wing2.m_MassPosition[i].z/Lunit, 10, 'g', 4);
+					strong += " ! " + m_pPlane->m_Wing2.m_MassTag[i];
 					out << strong+"\n";
 				}
 			}
@@ -669,12 +668,12 @@ void InertiaDlg::OnExportToAVL()
 			{
 				if(m_pPlane->m_Wing.m_MassValue[i]>0.0)
 				{
-					strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-						.arg(m_pPlane->m_Stab.m_MassValue[i] / Munit,    8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_MassPosition[i].x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_MassPosition[i].y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Stab.m_MassPosition[i].z/Lunit, 8, 'f', 6);
-					strong += "    ! " + m_pPlane->m_Stab.m_MassTag[i];
+					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+						.arg(m_pPlane->m_Stab.m_MassValue[i] / Munit,    10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_MassPosition[i].x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_MassPosition[i].y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Stab.m_MassPosition[i].z/Lunit, 10, 'g', 4);
+					strong += " ! " + m_pPlane->m_Stab.m_MassTag[i];
 					out << strong+"\n";
 				}
 			}
@@ -687,12 +686,12 @@ void InertiaDlg::OnExportToAVL()
 			{
 				if(m_pPlane->m_Fin.m_MassValue[i]>0.0)
 				{
-					strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-						.arg(m_pPlane->m_Fin.m_MassValue[i] / Munit,    8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_MassPosition[i].x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_MassPosition[i].y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_Fin.m_MassPosition[i].z/Lunit, 8, 'f', 6);
-					strong += "    ! " + m_pPlane->m_Fin.m_MassTag[i];
+					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+						.arg(m_pPlane->m_Fin.m_MassValue[i] / Munit,    10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_MassPosition[i].x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_MassPosition[i].y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_Fin.m_MassPosition[i].z/Lunit, 10, 'g', 4);
+					strong += " ! " + m_pPlane->m_Fin.m_MassTag[i];
 					out << strong+"\n";
 				}
 			}
@@ -704,20 +703,17 @@ void InertiaDlg::OnExportToAVL()
 			{
 				if(m_pPlane->m_Fin.m_MassValue[i]>0.0)
 				{
-					strong = QString("%1  %2  %3  %4     0.000     0.000     0.000")
-						.arg(m_pPlane->m_pBody->m_MassValue[i] / Munit,    8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].x/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].y/Lunit, 8, 'f', 6)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].z/Lunit, 8, 'f', 6);
-					strong += "    ! " + m_pPlane->m_pBody->m_MassTag[i];
+					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
+						.arg(m_pPlane->m_pBody->m_MassValue[i] / Munit,    10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_MassPosition[i].x/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_MassPosition[i].y/Lunit, 10, 'g', 4)
+						.arg(m_pPlane->m_pBody->m_MassPosition[i].z/Lunit, 10, 'g', 4);
+					strong += " ! " + m_pPlane->m_pBody->m_MassTag[i];
 					out << strong+"\n";
 				}
 			}
 		}
-
 	}
-
-
 
 	XFile.close();
 }
@@ -895,7 +891,7 @@ void InertiaDlg::SetupLayout()
 	QGroupBox *CoGBox = new QGroupBox(tr("Center of gravity"));
 	CoGBox->setLayout(CoGLayout);
 
-	QGroupBox *ResultsBox = new QGroupBox(tr("Inertias"));
+	QGroupBox *ResultsBox = new QGroupBox(tr("Inertia in CoG Frame"));
 	QGridLayout *ResultsLayout = new QGridLayout;
 	m_pctrlCoGIxx = new FloatEdit(1.0,2);
 	m_pctrlCoGIyy = new FloatEdit(1.2,2);
@@ -990,7 +986,7 @@ void InertiaDlg::SetupLayout()
 	QGroupBox *TotalCoGBox = new QGroupBox(tr("Center of gravity"));
 	TotalCoGBox->setLayout(TotalCoGLayout);
 
-	QGroupBox *TotalInertiaBox = new QGroupBox(tr("Inertias"));
+	QGroupBox *TotalInertiaBox = new QGroupBox(tr("Inertia in CoG Frame"));
 	QGridLayout *TotalInertiaLayout = new QGridLayout;
 	m_pctrlTotalIxx = new FloatEdit(1.0,2);
 	m_pctrlTotalIyy = new FloatEdit(1.2,2);

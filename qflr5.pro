@@ -232,3 +232,4 @@ mac {
     ICON = mac/qflr5.icns
 }
 OTHER_FILES += ReleaseNotes.txt
+
