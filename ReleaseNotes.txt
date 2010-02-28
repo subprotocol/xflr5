@@ -15,7 +15,7 @@
 *******************************************************************************
 
 
-QFLR5 v0.05 Beta January xxxth, 2010
+QFLR5 v0.05 Beta February xxxth, 2010
 	- Made a few corrections and enhancements
 
 

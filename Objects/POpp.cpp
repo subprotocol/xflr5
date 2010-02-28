@@ -36,7 +36,7 @@ CPOpp::CPOpp()
 	m_Style       = 0;
 	m_Width       = 1;
 	m_Type        = 1;
-	m_VLMType     = 1;
+//	m_VLMType     = 1;
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
@@ -102,7 +102,8 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		for (k=0; k<=m_NPanels; k++) ar << (float)m_G[k];
 		for (k=0; k<=m_NPanels; k++) ar << (float)m_Sigma[k];
 
-		ar << m_VLMType;
+//		ar << m_VLMType;
+		ar << 0;
 
 		m_WingWOpp.SerializeWOpp(ar, bIsStoring);
 		if(m_bBiplane)	m_Wing2WOpp.SerializeWOpp(ar, bIsStoring);
@@ -229,7 +230,8 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 			}
 		}
 
-		ar >> m_VLMType;
+//		ar >> m_VLMType;
+		ar >> k;
 
 		if (!m_WingWOpp.SerializeWOpp(ar, bIsStoring))
 		{

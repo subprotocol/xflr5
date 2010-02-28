@@ -60,7 +60,7 @@ private:
 	int m_NStation;			// unused
 	int m_NPanels;		// the number of VLM or 3D-panels
 	int m_Type;			// analysis type
-	int m_VLMType;			// for future use
+//	int m_VLMType;			// for future use
 
 	bool m_bBiplane; 		// if a biplane
 	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively

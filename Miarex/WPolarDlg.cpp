@@ -190,10 +190,6 @@ void WPolarDlg::InitDialog()
 			}
 	}
 
-	QFont SymbolFont("Symbol");
-	m_pctrlRho->setFont(SymbolFont);
-	m_pctrlNu->setFont(SymbolFont);
-
 	m_bAutoName = true;
 	m_pctrlAutoName->setChecked(true);
 
@@ -242,7 +238,6 @@ void WPolarDlg::InitDialog()
 	m_pctrlQInf->SetValue(m_QInf*pMainFrame->m_mstoUnit);
 	m_pctrlWeight->SetValue(m_Weight*pMainFrame->m_kgtoUnit);
 
-	m_pctrlBeta->SetPrecision(2);
 	m_pctrlBeta->SetValue(m_Beta);
 
 	m_pctrlAlpha->SetValue(m_Alpha);
@@ -615,10 +610,12 @@ void WPolarDlg::SetDensity()
 
 void WPolarDlg::SetupLayout()
 {
-	QDesktopWidget desktop;
-	QRect r = desktop.geometry();
+//	QDesktopWidget desktop;
+//	QRect r = desktop.geometry();
 //	setMinimumHeight(r.height()/3);
-	move(r.width()/3, r.height()/6);
+//	move(r.width()/3, r.height()/6);
+	
+	QFont SymbolFont("Symbol");
 
 	QVBoxLayout *NameLayout = new QVBoxLayout;
 	m_pctrlWingName = new QLabel(tr("Wing Name"));
@@ -641,12 +638,20 @@ void WPolarDlg::SetupLayout()
 	TypeGroup->setLayout(TypeLayout);
 
 	QGridLayout *PlaneLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel(tr("Free Stream Speed"));
-	QLabel *lab2 = new QLabel(tr("Plane Weight"));
-	QLabel *lab3 = new QLabel(tr("X_CoG"));
-	QLabel *lab4 = new QLabel(tr("Z_CoG"));
-	QLabel *lab5 = new QLabel(tr("Angle of Attack"));
-	QLabel *lab6 = new QLabel(tr("Side Slip"));
+	QLabel *lab1 = new QLabel(tr("Free Stream Speed ="));
+	QLabel *lab2 = new QLabel(tr("Plane Mass ="));
+	QLabel *lab3 = new QLabel(tr("X_CoG ="));
+	QLabel *lab4 = new QLabel(tr("Z_CoG ="));
+	QLabel *lab5 = new QLabel("a =");
+	QLabel *lab6 = new QLabel("b =");
+	lab5->setFont(SymbolFont);
+	lab6->setFont(SymbolFont);
+	lab1->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab4->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab5->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	lab6->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	PlaneLayout->addWidget(lab1,1,1);
 	PlaneLayout->addWidget(lab2,2,1);
 	PlaneLayout->addWidget(lab3,3,1);
@@ -658,10 +663,10 @@ void WPolarDlg::SetupLayout()
 	m_pctrlWeight  = new FloatEdit(1.234);
 	m_pctrlWeight->SetPrecision(3);
 	m_pctrlWeight->SetMin(0.0);
-	m_pctrlXCmRef  = new FloatEdit(100.00);
-	m_pctrlZCmRef  = new FloatEdit(100.00);
-	m_pctrlAlpha   = new FloatEdit(1.00);
-	m_pctrlBeta    = new FloatEdit(0.00);
+	m_pctrlXCmRef  = new FloatEdit(100.00,2);
+	m_pctrlZCmRef  = new FloatEdit(100.00,2);
+	m_pctrlAlpha   = new FloatEdit(1.00,2);
+	m_pctrlBeta    = new FloatEdit(0.00,2);
 	PlaneLayout->addWidget(m_pctrlQInf,1,2);
 	PlaneLayout->addWidget(m_pctrlWeight,2,2);
 	PlaneLayout->addWidget(m_pctrlXCmRef,3,2);
@@ -722,12 +727,16 @@ void WPolarDlg::SetupLayout()
 	QLabel *lab9 = new QLabel(tr("Unit"));
 	m_pctrlUnit1 = new QRadioButton(tr("International"));
 	m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
-	m_pctrlRho = new QLabel("r");
+	m_pctrlRho = new QLabel("r =");
 	m_pctrlDensity = new FloatEdit(1.500e-5,3);
 	m_pctrlDensityUnit = new QLabel("kg/m3");
-	m_pctrlNu = new QLabel("n");
+	m_pctrlNu = new QLabel("n =");
+	m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlViscosity = new FloatEdit(1.225,3);
 	m_pctrlViscosityUnit = new QLabel("m2/s");
+	m_pctrlRho->setFont(SymbolFont);
+	m_pctrlNu->setFont(SymbolFont);
 	m_pctrlDensity->SetPrecision(5);
 	m_pctrlViscosity->SetPrecision(3);
 	m_pctrlDensity->SetMin(0.0);

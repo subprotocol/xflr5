@@ -954,6 +954,7 @@ void MainFrame::CreateMenus()
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
 	fileMenu->addAction(languageAct);
+	fileMenu->addAction(unitsAct);
 	separatorAct = fileMenu->addSeparator();
 	fileMenu->addAction(resetSettingsAct);
 	separatorAct = fileMenu->addSeparator();
@@ -1251,7 +1252,6 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addAction(W3DAct);
 	MiarexViewMenu->addAction(CpViewAct);
 	MiarexViewMenu->addSeparator();
-	MiarexViewMenu->addAction(unitsAct);
 	MiarexViewMenu->addAction(W3DPrefsAct);
 	MiarexViewMenu->addAction(W3DScalesAct);
 	MiarexViewMenu->addAction(W3DLightAct);

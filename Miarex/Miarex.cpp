@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	Miarex    Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
+	Miarex    Copyright (C) 2008-2010 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -812,6 +812,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		pPOpp->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 		pPOpp->m_PlrName             = m_pCurWPolar->m_PlrName;
+		pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
+		pPOpp->m_Type                = m_pCurWPolar->m_Type;
 		pWOpp->m_Type                = m_pCurWPolar->m_Type;
 
 		pPOpp->m_NStation            = m_pCurWing->m_NStation;
@@ -834,6 +836,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_NPanels          = m_pVLMDlg->m_MatSize;
 			pPOpp->m_Alpha            = m_pVLMDlg->m_OpAlpha;
 			pPOpp->m_QInf             = m_pVLMDlg->m_OpQInf;
+
 			if(m_pCurWPolar->m_Type>=5)
 			{
 				pPOpp->m_Ctrl = m_pVLMDlg->m_Ctrl;
@@ -1024,8 +1027,6 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		pPOpp->m_Wing2WOpp.m_Width   = pPOpp->m_Width;
 		pPOpp->m_StabWOpp.m_Width    = pPOpp->m_Width;
 		pPOpp->m_FinWOpp.m_Width     = pPOpp->m_Width;
-//		m_pCurPOpp = pPOpp;
-//		m_pCurWOpp = &m_pCurPOpp->m_WingWOpp;
 	}
 	else
 	{
@@ -3354,10 +3355,9 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 	ny=0;
 
-	QString strong, str1, str2, str3, str4;
-
+	QString str1, str2, str3, str4, str5, str6;
 	LegendSize = 30;
-	LegendWidth = 260;
+	LegendWidth = 300;
 
 	QStringList str; // we need to make an inventory of wings
 	bool bFound;
@@ -3435,30 +3435,36 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 			painter.drawRect(x1-2, place.y() + (int)(1.*ypos*ny)-2, 4, 4);
 		}
 
-		str1 = QString("_V=%1").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
+		str1 = QString("V=%1").arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 		GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 		str3 = QString("_a=%1").arg(m_pCurWOpp->m_Alpha,5,'f',2);
+		
+		if(fabs(m_pCurWOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(m_pCurWOpp->m_Beta,5,'f',2);
+		else                             str4 ="";
+		if(m_pCurWOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(m_pCurWOpp->m_Ctrl,5,'f',2);
+		else                             str5 ="";
 
-		if(m_pCurWOpp->m_AnalysisType==1)  str4="_LLT";
+
+		if(m_pCurWOpp->m_AnalysisType==1)  str6="_LLT";
 		else if(m_pCurWOpp->m_AnalysisType==2)
 		{
-			if(m_pCurWOpp->m_bVLM1)	str4="_VLM1";
-			else 					str4="_VLM2";
+			if(m_pCurWOpp->m_bVLM1)	str6="_VLM1";
+			else 					str6="_VLM2";
 		}
 		else if(m_pCurWOpp->m_AnalysisType==3)
 		{
-			str4="_Panel";
-			if(m_pCurWOpp->m_bThinSurface) str4 += "_Thin";
+			str6="_Panel";
+			if(m_pCurWOpp->m_bThinSurface) str6 += "_Thin";
 		}
 
-		if(m_pCurWOpp->m_bTiltedGeom) str4 += "_TG";
+		if(m_pCurWOpp->m_bTiltedGeom) str6 += "_TG";
 
-		if(m_pCurWOpp->m_bOut) str4+=" (Out)";
+		if(m_pCurWOpp->m_bOut) str6+=" (Out)";
 
 		painter.setPen(TextPen);
 		painter.drawText(place.x() + (int)(3*LegendSize),
 						 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3),
-						 str1+str2+str3+str4);
+						 str1+str2+str3+str4+str5+str6);
 	}
 	else
 	{
@@ -3520,32 +3526,36 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 							painter.drawRect(x1-2, place.y() + (int)(1.*ypos*ny)-2, 4,4);
 						}
 
-						str1 = QString("_V=%1").arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
+						str1 = QString("V=%1").arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 						GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 						str3 = QString("_a=%1").arg(pWOpp->m_Alpha,5,'f',2);
+						
+						if(fabs(pWOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(pWOpp->m_Beta,5,'f',2);
+						else                        str4 ="";
+						if(pWOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pWOpp->m_Ctrl,5,'f',2);
+						else                        str5 ="";
 
-						if(pWOpp->m_AnalysisType==1) str4 ="_LLT";
+						if(pWOpp->m_AnalysisType==1) str6 ="_LLT";
 						else if(pWOpp->m_AnalysisType==2)
 						{
-							if(pWOpp->m_bVLM1)       str4 ="_VLM1";
-							else                     str4 ="_VLM2";
+							if(pWOpp->m_bVLM1)       str6 ="_VLM1";
+							else                     str6 ="_VLM2";
 						}
 						else if(pWOpp->m_AnalysisType==3)
 						{
-							str4="_Panel";
-							if(pWOpp->m_bThinSurface) str4 += "_Thin";
+							str6="_Panel";
+							if(pWOpp->m_bThinSurface) str6 += "_Thin";
 						}
 
-						if(pWOpp->m_bTiltedGeom) str4 += "_TG";
-						if(pWOpp->m_bOut)        str4+=" (Out)";
+						if(pWOpp->m_bTiltedGeom) str6 += "_TG";
+						if(pWOpp->m_bOut)        str6+=" (Out)";
 
 						painter.setPen(TextPen);
 						painter.drawText(place.x() + (int)(3*LegendSize),
-										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), str1+str2+str3+str4);
+										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), str1+str2+str3+str4+str5+str6);
 						ny++ ;
 					}
 				}
-
 				for (nc=0; nc < m_poaPOpp->size(); nc++)
 				{
 					pPOpp = (CPOpp*)m_poaPOpp->at(nc);
@@ -3575,23 +3585,28 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 						str3 = QString("_a=%1").arg(pPOpp->m_Alpha,5,'f',2);
 
+						if(fabs(pPOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(pPOpp->m_Beta,5,'f',2);
+						else                        str4 ="";
+						if(pPOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pPOpp->m_Ctrl,5,'f',2);
+						else                        str5 ="";
+						
 						if(pPOpp->m_WingWOpp.m_AnalysisType==2)
 						{
-							if(pPOpp->m_bVLM1)      str4 ="_VLM1";
-							else                    str4 ="_VLM2";
+							if(pPOpp->m_bVLM1)      str6 ="_VLM1";
+							else                    str6 ="_VLM2";
 						}
 						else if(pPOpp->m_WingWOpp.m_AnalysisType==3)
 						{
-							str4="_Panel";
+							str6="_Panel";
 							if(pPOpp->m_WingWOpp.m_bThinSurface) str4 += "_Thin";
 						}
 
-						if(pPOpp->m_WingWOpp.m_bTiltedGeom) str4 += "_TG";
-						if(pPOpp->m_WingWOpp.m_bOut)        str4+=" (Out)";
+						if(pPOpp->m_WingWOpp.m_bTiltedGeom) str6+= "_TG";
+						if(pPOpp->m_WingWOpp.m_bOut)        str6+=" (Out)";
 
 						painter.setPen(TextPen);
 						painter.drawText(place.x() + (int)(3*LegendSize),
-										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), str1+str2+str3+str4);
+										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), str1+str2+str3+str4+str5+str6);
 						ny++ ;
 					}
 				}
@@ -10902,6 +10917,7 @@ void QMiarex::OnAnalyze()
 	if(m_iView==WPOLARVIEW) CreateWPolarCurves();
 	UpdateView();
 	CheckButtons();
+	pMainFrame->setFocus();
 }
 
 
