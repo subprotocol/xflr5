@@ -3424,6 +3424,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 		painter.drawText(place.x() + (int)(1*LegendSize), place.y() + ypos*ny-(int)(ypos/2), m_pCurWing->m_WingName);
 
 		LegendPen.setColor(m_pCurWOpp->m_Color);
+		LegendPen.setStyle(GetStyle(m_pCurWOpp->m_Style));
+		LegendPen.setWidth(m_pCurWOpp->m_Width);
 		painter.setPen(LegendPen);
 
 		painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
@@ -3516,6 +3518,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						}
 
 						LegendPen.setColor(pWOpp->m_Color);
+						LegendPen.setStyle(GetStyle(pWOpp->m_Style));
+						LegendPen.setWidth(pWOpp->m_Width);
 						painter.setPen(LegendPen);
 						painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
 										 place.x() + (int)(2.5*LegendSize), place.y() + (int)(1.*ypos*ny));
@@ -3568,8 +3572,9 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 							ny=2;
 						}
 
-
 						LegendPen.setColor(pPOpp->m_Color);
+						LegendPen.setStyle(GetStyle(pPOpp->m_Style));
+						LegendPen.setWidth(pPOpp->m_Width);
 						painter.setPen(LegendPen);
 
 						painter.drawLine(place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny),
@@ -3584,7 +3589,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						str1 = QString("V=%1").arg(pPOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',2);
 						GetSpeedUnit(str2, pMainFrame->m_SpeedUnit);
 						str3 = QString("_a=%1").arg(pPOpp->m_Alpha,5,'f',2);
-
+						
 						if(fabs(pPOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(pPOpp->m_Beta,5,'f',2);
 						else                        str4 ="";
 						if(pPOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pPOpp->m_Ctrl,5,'f',2);
@@ -15685,10 +15690,20 @@ void QMiarex::SetCurveParams()
 	else if(m_iView==WOPPVIEW)
 	{
 		//set OpPoint params
-		if(m_pCurWOpp)
+		if(m_pCurPOpp)
 		{
-			if(m_pCurWOpp->m_bIsVisible)  m_pctrlShowCurve->setChecked(true);  else  m_pctrlShowCurve->setChecked(false);
-			if(m_pCurWOpp->m_bShowPoints) m_pctrlShowPoints->setChecked(true); else  m_pctrlShowPoints->setChecked(false);
+			m_pctrlShowCurve->setChecked(m_pCurPOpp->m_bIsVisible);
+			m_pctrlShowPoints->setChecked(m_pCurPOpp->m_bShowPoints);
+
+			m_CurveColor = m_pCurPOpp->m_Color;
+			m_CurveStyle = m_pCurPOpp->m_Style;
+			m_CurveWidth = m_pCurPOpp->m_Width;
+			FillComboBoxes();
+		}
+		else if(m_pCurWOpp)
+		{
+			m_pctrlShowCurve->setChecked(m_pCurWOpp->m_bIsVisible);
+			m_pctrlShowPoints->setChecked(m_pCurWOpp->m_bShowPoints);
 
 			m_CurveColor = m_pCurWOpp->m_Color;
 			m_CurveStyle = m_pCurWOpp->m_Style;
@@ -15702,7 +15717,6 @@ void QMiarex::SetCurveParams()
 	}
 	else if(m_iView==WCPVIEW)
 	{
-		//set Cp params
 		if(m_pCurWOpp)
 		{
 			m_pctrlShowCurve->setChecked(true);
@@ -15719,6 +15733,7 @@ void QMiarex::SetCurveParams()
 		}
 	}
 
+	
 	if(m_pCurWPolar)
 	{
 		if(m_pCurWPolar->m_Type<4)
@@ -15743,6 +15758,7 @@ void QMiarex::SetCurveParams()
 		}
 	}
 }
+
 
 
 
@@ -17707,11 +17723,20 @@ void QMiarex::UpdateCurve()
 		m_pCurWPolar->m_Width = (int)m_CurveWidth;
 		CreateWPolarCurves();
 	}
-	else if (m_iView==WOPPVIEW && m_pCurWOpp)
+	else if (m_iView==WOPPVIEW)
 	{
-		m_pCurWOpp->m_Color = m_CurveColor;
-		m_pCurWOpp->m_Style = m_CurveStyle;
-		m_pCurWOpp->m_Width = (int)m_CurveWidth;
+		if(m_pCurPOpp)
+		{
+			m_pCurPOpp->m_Color = m_CurveColor;
+			m_pCurPOpp->m_Style = m_CurveStyle;
+			m_pCurPOpp->m_Width = (int)m_CurveWidth;			
+		}
+		else if(m_pCurWOpp)
+		{
+			m_pCurWOpp->m_Color = m_CurveColor;
+			m_pCurWOpp->m_Style = m_CurveStyle;
+			m_pCurWOpp->m_Width = (int)m_CurveWidth;
+		}
 		CreateWOppCurves();
 	}
 	else if (m_iView==WCPVIEW && m_pCurWOpp)
