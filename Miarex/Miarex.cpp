@@ -9952,10 +9952,10 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	m_pLLTDlg->m_IterLim = m_Iter;
 
 	m_pLLTDlg->InitDialog();
-
+	m_pLLTDlg->move(pMainFrame->m_DlgPos);
 	m_pLLTDlg->show();
 	m_pLLTDlg->StartAnalysis();
-
+	pMainFrame->m_DlgPos = m_pLLTDlg->pos();
 	if(!m_bLogFile || !(m_pLLTDlg->m_bError || m_pLLTDlg->m_bWarning)) m_pLLTDlg->hide();
 
 	pMainFrame->UpdateWOpps();
@@ -12837,6 +12837,7 @@ void QMiarex::OnHideUFOWOpps()
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->SetSaveState(false);
+	SetCurveParams();
 	UpdateView();
 }
 
@@ -13676,6 +13677,7 @@ void QMiarex::OnShowUFOWOpps()
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	pMainFrame->SetSaveState(false);
+	SetCurveParams();
 	UpdateView();
 }
 
@@ -14980,9 +14982,10 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_NSurfaces  = m_NSurfaces;
 
 	m_pPanelDlg->InitDialog();
-
+	m_pPanelDlg->move(pMainFrame->m_DlgPos);
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
+	pMainFrame->m_DlgPos = m_pPanelDlg->pos();
 
 //	if(m_bLogFile && m_pPanelDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
@@ -17847,9 +17850,10 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->m_NSurfaces  = m_NSurfaces;
 
 	m_pVLMDlg->InitDialog();
-
+	m_pVLMDlg->move(pMainFrame->m_DlgPos);
 	m_pVLMDlg->show();
 	m_pVLMDlg->StartAnalysis();
+	pMainFrame->m_DlgPos = m_pVLMDlg->pos();
 
 //	if(m_bLogFile && m_pVLMDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pVLMDlg->m_bWarning) m_pVLMDlg->hide();

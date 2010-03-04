@@ -856,12 +856,12 @@ void WPolarDlg::SetWPolarName()
 	}*/
 
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	strong = QString("-%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,6,'f',2);
+	strong = QString("-%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
 	m_WPolarName += strong + str;
 
 	if(fabs(m_Beta) > .001)
 	{
-		strong = QString(QString::fromUtf8("-b%1°")).arg(m_Beta,0,'f',1);
+		strong = QString(QString::fromUtf8("-b%1°")).arg(m_Beta,0,'f',2);
 		m_WPolarName += strong;
 	}
 

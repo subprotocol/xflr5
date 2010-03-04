@@ -755,9 +755,12 @@ void VLMAnalysisDlg::SetupLayout()
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/2);
 	setMinimumWidth(r.width()/2);
-	move(r.width()/3, r.height()/6);
+//	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
+	QFont CourierFont = QFont("Courier",10);
+	CourierFont.setStyleHint(QFont::Courier);
+	m_pctrlTextOutput->setFont(CourierFont);
 	m_pctrlTextOutput->setReadOnly(true);
 	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
