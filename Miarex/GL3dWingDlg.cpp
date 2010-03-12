@@ -76,8 +76,6 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_glViewportTrans.z  = 0.0;
 	m_glScaled      = 1.0;
 
-	m_StackSize = 0; //the current stacksize
-	m_StackPos  = 0; //the current position of the stack
 
 	m_bResetglSectionHighlight = true;
 	m_bResetglWing             = true;
@@ -2622,10 +2620,8 @@ void GL3dWingDlg::SetWingData()
 
 void GL3dWingDlg::SetupLayout()
 {
-	QString str;
-
 	QDesktopWidget desktop;
-	QRect r = desktop.screenGeometry();
+//	QRect r = desktop.screenGeometry();
 //	setMaximumHeight(r.height());
 	setMinimumHeight(700);
 

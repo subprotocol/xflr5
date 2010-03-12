@@ -73,6 +73,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_SpeedUnit   = 0;
 	m_ForceUnit   = 0;
 	m_MomentUnit  = 0;
+	
 	CreateDockWindows();
 
 	m_ProjectName = "";
@@ -1433,9 +1434,6 @@ void MainFrame::CreateMiarexMenus()
 	W3DCtxMenu->addSeparator();
 	W3DCtxMenu->addMenu(CurWOppMenu);
 	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addAction(showCurWOppOnly);
-	W3DCtxMenu->addAction(showAllWOpps);
-	W3DCtxMenu->addAction(hideAllWOpps);
 	W3DCtxMenu->addAction(deleteAllWOpps);
 	W3DCtxMenu->addSeparator();
 	W3DCtxMenu->addAction(W3DScalesAct);

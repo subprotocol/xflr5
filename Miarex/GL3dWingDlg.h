@@ -205,7 +205,7 @@ private:
 	bool m_bFoilNames;
 
 	int m_iSection;
-	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
+//	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	int m_GLList;
 //	int m_iView;
 	int m_Precision[10];

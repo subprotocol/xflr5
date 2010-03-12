@@ -39,9 +39,10 @@ int main(int argc, char *argv[])
 
 	QString str;
 	int a,b,c,d,k;
-	a=b=50;
+	a=150;
+	b= 50;
 	c=800;
-	d=500;
+	d=700;
 
 
 #ifdef Q_WS_MAC
@@ -86,8 +87,9 @@ int main(int argc, char *argv[])
 	app.setQFLR5MainWindow(&w);
 	w.resize(sz);
 	w.move(pt);
+	
 	if(bMaximized)	w.showMaximized();
-	else                w.show();
+	else            w.show();
 
 	QString PathName, Extension;
 	PathName=argv[1];

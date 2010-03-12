@@ -130,8 +130,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pCurWOpp    = NULL;
 	m_pCurGraph   = &m_WingGraph1;
 
-	QRect r(100,100, 700, 600);
-
 	m_NSurfaces =   0;
 	m_NStation  =  20;
 	m_Iter      = 100;
@@ -14222,7 +14220,8 @@ void QMiarex::OnWPolars()
 	}
 
 	m_iView=WPOLARVIEW;
-//	m_pCurGraph = &m_WPlrGraph1;
+	if(!m_pCurWPlrGraph)	m_pCurGraph = NULL;
+	else                    m_pCurGraph = m_pCurWPlrGraph;
 
 	pMainFrame->SetCentralWidget();
 	m_pctrlMiddleControls->setCurrentIndex(0);
@@ -14665,7 +14664,8 @@ void QMiarex::PaintWSingleGraph(QPainter &painter)
 {
 	if(!m_pCurGraph)
 	{
-		m_pCurGraph = &m_WPlrGraph1;
+		m_pCurGraph     = &m_WPlrGraph1;
+		m_pCurWPlrGraph = &m_WPlrGraph1;
 //		return;
 	}
 
@@ -16658,7 +16658,7 @@ void QMiarex::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-	setSizePolicy(szPolicyMaximum);
+//	setSizePolicy(szPolicyMaximum);
 //_______________________Analysis
 	m_pctrlSequence = new QCheckBox(tr("Sequence"));
 	QGridLayout *SequenceGroup = new QGridLayout;

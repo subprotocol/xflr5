@@ -1745,14 +1745,13 @@ void QAFoil::OnExportCurFoil()
 	if(!g_pCurFoil)	return;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
+	QString FileName;
 
 	FileName = g_pCurFoil->m_FoilName;
 	FileName.replace("/", " ");
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
-						pMainFrame->m_LastDirName,
+						pMainFrame->m_LastDirName+"/"+FileName+".dat",
 						tr("Foil File (*.dat)"));
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
