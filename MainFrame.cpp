@@ -4410,10 +4410,12 @@ void MainFrame::openRecentFile()
 	}
 }
 
+#include <iostream>
 
 CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 {
 	QString Strong;
+	QString tempStr;
 	QString FoilName;
 	QString strx, stry;
 
@@ -4427,15 +4429,20 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 	pFoil = new CFoil();
 	if(!pFoil)	return NULL;
 
-	while(pos>=0 && !in.atEnd())
+	while(tempStr.length()==0 && !in.atEnd())
 	{
+		FoilName = Strong;
 		Strong = in.readLine();
 		pos = Strong.indexOf("#",0);
+		// ignore everything after # (including #)
+		if(pos>0)Strong.truncate(pos);
+		tempStr = Strong;
+		tempStr.remove(" ");
 	}
 
 	if(!in.atEnd())
 	{
-		FoilName = Strong;
+		// FoilName contains the last comment
 		ReadValues(Strong, res,x,y,z);
 		if(res==2)
 		{
@@ -4447,6 +4454,7 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 				pFoil->nb=1;
 			}
 		}
+		else FoilName = Strong;
 		// remove fore and aft spaces
 		FoilName = FoilName.trimmed();
 	}
@@ -4456,8 +4464,11 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 	{
 		Strong = in.readLine();
 		pos = Strong.indexOf("#",0);
-
-		if (!Strong.isNull() && bRead && pos<0)
+		// ignore everything after # (including #)
+		if(pos>0)Strong.truncate(pos);
+		tempStr = Strong;
+		tempStr.remove(" ");
+		if (!Strong.isNull() && bRead && tempStr.length())
 		{
 			ReadValues(Strong, res, x,y,z);
 			if(res==2)
