@@ -3795,15 +3795,9 @@ void GL3dBodyDlg::OnInertia()
 	double MassValue[MAXMASSES];
 	CVector MassPosition[MAXMASSES];
 	QString MassTag[MAXMASSES];
-	CVector CoG;
-	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
 
 	NMass = m_pBody->m_NMass;
-	CoG = m_pBody->m_CoG;
-	CoGIxx = m_pBody->m_CoGIxx;
-	CoGIyy = m_pBody->m_CoGIyy;
-	CoGIzz = m_pBody->m_CoGIzz;
-	CoGIxz = m_pBody->m_CoGIxz;
+
 	for(int i=0; i< MAXMASSES; i++)
 	{
 		MassValue[i]    = m_pBody->m_MassValue[i];
@@ -3820,11 +3814,6 @@ void GL3dBodyDlg::OnInertia()
 	{
 		// restore saved inertia
 		m_pBody->m_NMass = NMass;
-		m_pBody->m_CoG = CoG;
-		m_pBody->m_CoGIxx = CoGIxx;
-		m_pBody->m_CoGIyy = CoGIyy;
-		m_pBody->m_CoGIzz = CoGIzz;
-		m_pBody->m_CoGIxz = CoGIxz;
 
 		for(int i=0; i< MAXMASSES; i++)
 		{

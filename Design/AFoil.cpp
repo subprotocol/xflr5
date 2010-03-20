@@ -1069,7 +1069,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 {
 	m_bTrans = false;
 	QPoint point = event->pos();
-//	UpdateFoil(-10);
+
 	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
 	if(m_bZoomPlus && m_rCltRect.contains(point))
@@ -3150,12 +3150,6 @@ void QAFoil::TakePicture()
 		m_TmpPic.IntRearPt.x = m_pPF->m_Intrados.m_RearPoint.x;
 		m_TmpPic.IntRearPt.y = m_pPF->m_Intrados.m_RearPoint.y;
 	}
-}
-
-
-
-void QAFoil::UpdateFoil(int iFoil)
-{
 }
 
 

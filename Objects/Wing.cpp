@@ -98,8 +98,6 @@ CWing::CWing()
 	memset(m_MassValue,    0, sizeof(m_MassValue));
 	memset(m_MassPosition, 0, sizeof(m_MassPosition));
 	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString(QObject::tr("Description %1")).arg(i);
-	m_CoG.Set(0.0, 0.0, 0.0);
-	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -333,29 +331,30 @@ void CWing::ComputeGeometry()
 }
 
 
-void CWing::ComputeVolumeInertia(double const & Mass)
+
+void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	int j,k;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
 	double LocalChord1, LocalArea1, tau1;
 	CVector PtC4, Pt, Pt1;
-	m_CoG.Set(0.0, 0.0, 0.0);
-	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
+	CoG.Set(0.0, 0.0, 0.0);
+	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 
+	ComputeGeometry();
 	//use 20 stations per wing panel to discretize the weight
 	//more than enough given the precision we are looking for
 	int NStations = 20;
 
 	//the mass density is assumed to be homogeneous
-	//m_Volume has been computed when the wing has been defined
 	rho = Mass/m_Volume;
 
 	//the local weight is proportional to the chord x foil area
 	//the foil's area is interpolated
 
-	//we consider the whole wing, i.e. all surfaces
-	//note : in avl documentation, each wing is considered separately
+	//we consider the whole wing, i.e. all left and right surfaces
+	//note : in avl documentation, each side is considered separately
 
 	//first get the CoG - necessary for future application of Hughens/Steiner theorem
 	double recalcMass = 0.0;//sanity check
@@ -375,14 +374,13 @@ void CWing::ComputeVolumeInertia(double const & Mass)
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			m_CoG.x += LocalVolume*rho * PtC4.x;
-			m_CoG.y += LocalVolume*rho * PtC4.y;
-			m_CoG.z += LocalVolume*rho * PtC4.z;
+			CoG.x += LocalVolume*rho * PtC4.x;
+			CoG.y += LocalVolume*rho * PtC4.y;
+			CoG.z += LocalVolume*rho * PtC4.z;
 		}
 	}
-	if(Mass>0.0) m_CoG *= 1.0/ Mass;
-	else         m_CoG.Set(0.0, 0.0, 0.0);
-
+	if(Mass>0.0) CoG *= 1.0/ Mass;
+	else         CoG.Set(0.0, 0.0, 0.0);
 
 	//then get the Inertia in both reference frames
 	for (j=0; j<m_NSurfaces; j++)
@@ -401,10 +399,10 @@ void CWing::ComputeVolumeInertia(double const & Mass)
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			m_CoGIxx += LocalVolume*rho * ( (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
-			m_CoGIyy += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.z-m_CoG.z)*(PtC4.z-m_CoG.z) );
-			m_CoGIzz += LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.x-m_CoG.x) + (PtC4.y-m_CoG.y)*(PtC4.y-m_CoG.y) );
-			m_CoGIxz -= LocalVolume*rho * ( (PtC4.x-m_CoG.x)*(PtC4.z-m_CoG.z) );
+			CoGIxx += LocalVolume*rho * ( (PtC4.y-CoG.y)*(PtC4.y-CoG.y) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
+			CoGIyy += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
+			CoGIzz += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.y-CoG.y)*(PtC4.y-CoG.y) );
+			CoGIxz -= LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
 			recalcMass += LocalVolume*rho;
 			recalcVolume +=LocalVolume;
 		}
@@ -867,14 +865,6 @@ void CWing::Duplicate(CWing *pWing)
 		m_MassPosition[i].Copy(pWing->m_MassPosition[i]);
 		m_MassTag[i] = pWing->m_MassTag[i];
 	}
-
-	m_CoG.Copy(pWing->m_CoG);
-	m_CoGIxx = pWing->m_CoGIxx;
-	m_CoGIyy = pWing->m_CoGIyy;
-	m_CoGIzz = pWing->m_CoGIzz;
-	m_CoGIxz = pWing->m_CoGIzz;
-
-
 }
 
 

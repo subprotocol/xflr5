@@ -132,7 +132,6 @@ private:
 	void ShowFoil(CFoil* pFoil, bool bShow=true);
 	void SetParams();
 	void SelectFoil(CFoil* pFoil = NULL);
-	void UpdateFoil(int iFoil = -1);
 	void PaintGrids(QPainter &painter);
 	void PaintSplines(QPainter &painter);
 	void PaintFoils(QPainter &painter);

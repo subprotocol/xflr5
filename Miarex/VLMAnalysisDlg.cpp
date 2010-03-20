@@ -31,6 +31,8 @@
 #include "../Objects/CVector.h"
 #include "Miarex.h"
 
+#define CM_ITER_MAX 50
+
 void *VLMAnalysisDlg::s_pMiarex;
 void *VLMAnalysisDlg::s_pMainFrame;
 
@@ -187,7 +189,6 @@ bool VLMAnalysisDlg::ControlLoop()
 	CWing *pWing, *pStab;
 
 	CVector H(0.0, 1.0, 0.0);
-	CVector O(0.0, 0.0, 0.0);
 
 	pWing = m_pWing;
 	pStab = m_pStab;
@@ -351,7 +352,7 @@ bool VLMAnalysisDlg::ControlLoop()
 		Cm = 1.0;
 
 		//are there two intial values of opposite signs ?
-		while(Cm0*Cm1>0.0 && iter <100)
+		while(Cm0*Cm1>0.0 && iter <CM_ITER_MAX)
 		{
 			a0 *=0.9;
 			a1 *=0.9;
@@ -361,7 +362,7 @@ bool VLMAnalysisDlg::ControlLoop()
 			if(m_bCancel) break;
 		}
 		if(m_bCancel) break;
-		if(iter>=100)
+		if(iter>=CM_ITER_MAX)
 		{
 			//no zero moment alpha
 			str = QString(tr("      Interpolation unsuccessful for Control=%1 - skipping.")+"\n\n\n").arg(t,10,'f',3);
@@ -376,11 +377,14 @@ bool VLMAnalysisDlg::ControlLoop()
 				tmp = Cm1;
 				Cm1 = Cm0;
 				Cm0 = tmp;
-				a0  =  PI/4.0;
-				a1  = -PI/4.0;
+				tmp = a0;
+				a0  =  a1;
+				a1  =  tmp;
 			}
+			
+			iter = 0;
 
-			while (fabs(Cm)>eps && iter <100)
+			while (fabs(Cm)>eps && iter < CM_ITER_MAX)
 			{
 				p = (Cm1-Cm0)/(a1-a0);
 				a = a0-Cm0/p;

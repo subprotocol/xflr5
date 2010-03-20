@@ -1087,7 +1087,7 @@ void MainFrame::CreateMiarexActions()
 	connect(m_pImportWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnImportWPolar()));
 
 	m_pWingInertia = new QAction(tr("Define Inertia"), this);
-	connect(m_pWingInertia, SIGNAL(triggered()), pMiarex, SLOT(OnWingInertia()));
+	connect(m_pWingInertia, SIGNAL(triggered()), pMiarex, SLOT(OnUFOInertia()));
 
 	m_pBodyInertia = new QAction(tr("Define Inertia"), this);
 	connect(m_pBodyInertia, SIGNAL(triggered()), pMiarex, SLOT(OnBodyInertia()));
@@ -3117,6 +3117,8 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	QString end;
 	end = PathName.right(4);
 	end = end.toLower();
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) m_LastDirName = PathName.left(pos);
 
 	if(end==".plr")
 	{
@@ -3885,6 +3887,7 @@ void MainFrame::OnSaveProject()
 	}
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_bArcball = false;
+	pMiarex->UpdateView();
 }
 
 
@@ -4417,7 +4420,6 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 	QString Strong;
 	QString tempStr;
 	QString FoilName;
-	QString strx, stry;
 
 	CFoil* pFoil = NULL;
 	int pos, res, i, ip;
@@ -4866,7 +4868,6 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	CWing *pStab     = pMiarex->m_pCurStab;
 	CWing *pFin      = pMiarex->m_pCurFin;
 	CWPolar *pWPolar = NULL;
-//	CWOpp *pWOpp     = NULL;
 	CFoil *pFoil  = NULL;
 	CPolar * pPolar  = NULL;
 
@@ -4875,8 +4876,9 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 
 	int i,j;
 
-	// storing code
-	ar << 100011;
+	ar << 100013;
+	// 100013 : Added CoG serialization
+	// 100012 : Added sideslip;
 	// 100011 : Added Body serialization
 	// 100010 : Converted to I.S. units
 	// 100009 : added serialization of opps in numbered format
@@ -4892,20 +4894,19 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << m_SpeedUnit;
 	ar << m_ForceUnit;
 	ar << m_MomentUnit;
+	
 	ar << pMiarex->m_WngAnalysis.m_Type;
 	ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 	ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 	ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
+	ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
+	ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
 	ar << (float)pMiarex->m_WngAnalysis.m_Density;
 	ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
-
-//	pMiarex->m_CtrlDlg.m_QInf      = pMiarex->m_WngAnalysis.m_QInf;
-//	pMiarex->m_CtrlDlg.m_Weight    = pMiarex->m_WngAnalysis.m_Weight;
-//	pMiarex->m_CtrlDlg.m_Viscosity = pMiarex->m_WngAnalysis.m_Viscosity;
-//	pMiarex->m_CtrlDlg.m_Density   = pMiarex->m_WngAnalysis.m_Density;
-
 	ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
+	ar << (float)pMiarex->m_WngAnalysis.m_Beta;
 	ar << pMiarex->m_WngAnalysis.m_AnalysisType;
+
 
 	if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
 	else								  ar << 0;
@@ -5004,7 +5005,8 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 				bFound = false;
 				for(j=0;j<FoilList.size();j++)
 				{
-					if(pFoil->m_FoilName == FoilList.at(j)){
+					if(pFoil->m_FoilName == FoilList.at(j))
+					{
 						bFound = true;
 						break;
 					}

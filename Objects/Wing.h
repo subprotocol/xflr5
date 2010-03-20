@@ -96,7 +96,7 @@ protected:
 	void ComputeChords(int NStation=0);
 	void ComputeDihedrals();
 	void ComputeGeometry();
-	void ComputeVolumeInertia(double const & Mass);
+	void ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
@@ -177,8 +177,8 @@ protected:
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
-	CVector m_CoG;
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+//	CVector m_CoG;
+//	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	double m_PlanformSpan;
 	double m_ProjectedSpan;

@@ -22,12 +22,9 @@
 #ifndef CPLANE_H
 #define CPLANE_H
 
-// 
 #include "Wing.h"
 #include "Body.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CPlane dialog
 
 class CPlane
 {
@@ -70,8 +67,8 @@ protected:
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
-	CVector m_CoG;
-	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
+//	CVector m_CoG;
+//	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	QString m_PlaneName;
@@ -82,7 +79,7 @@ private:
 //	bool HasResults();
 	void Duplicate(CPlane *pPlane);
 	void ComputePlane(void);
-	void ComputeVolumeInertia(double & Mass);
+	void ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 
 
 public:

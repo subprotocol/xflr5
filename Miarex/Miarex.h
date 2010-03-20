@@ -86,7 +86,6 @@ class QMiarex : public QWidget
 public:
 
 	QMiarex(QWidget *parent = NULL);
-	~QMiarex();
 
 
 private slots:
@@ -211,7 +210,7 @@ private slots:
 	void OnVelocityScale(int pos);
 	void OnGL3DScale();
 	void OnImportWPolar();
-	void OnWingInertia();
+	void OnUFOInertia();
 	void OnBodyInertia();
 
 private:

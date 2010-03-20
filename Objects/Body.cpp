@@ -19,8 +19,6 @@
 
 *****************************************************************************/
 
-// Body.cpp
-//
 
 #include "../MainFrame.h"
 #include "Body.h"
@@ -190,7 +188,9 @@ void CBody::ComputeCenterLine()
 }
 
 
-void CBody::ComputeBodyInertia(double const & Mass)
+
+
+void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	// Assume that the mass is distributed homogeneously in the body's skin
 	// Homogeneity is questionable, but is a rather handy assumption
@@ -201,12 +201,12 @@ void CBody::ComputeBodyInertia(double const & Mass)
 	int i,j,k;
 	double ux, rho;
 	double dj, dj1;
-	CVector Pt, LA, LB, TA,TB, LATB, TALB, N, PLA, PTA, PLB, PTB, Top, Bot;
+	CVector Pt, LATB, TALB, N, PLA, PTA, PLB, PTB, Top, Bot;
 	double BodyArea = 0.0;
 	double SectionArea;
 	double xpos, dl;
-	m_CoG.Set(0.0, 0.0, 0.0);
-	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
+	CoG.Set(0.0, 0.0, 0.0);
+	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 
 	if(m_LineType==1)
 	{
@@ -283,13 +283,13 @@ void CBody::ComputeBodyInertia(double const & Mass)
 				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
 					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
 
-				m_CoG.x += SectionArea*rho * Pt.x;
-				m_CoG.y += SectionArea*rho * Pt.y;
-				m_CoG.z += SectionArea*rho * Pt.z;
+				CoG.x += SectionArea*rho * Pt.x;
+				CoG.y += SectionArea*rho * Pt.y;
+				CoG.z += SectionArea*rho * Pt.z;
 			}
 		}
-		if(Mass>0.0) m_CoG *= 1.0/ Mass;
-		else            m_CoG.Set(0.0, 0.0, 0.0);
+		if(Mass>0.0) CoG *= 1.0/ Mass;
+		else         CoG.Set(0.0, 0.0, 0.0);
 
 		//Then Get Inertias
 		// we could do it one calculation, for CG and inertia, by using Hyghens/steiner theorem
@@ -332,10 +332,10 @@ void CBody::ComputeBodyInertia(double const & Mass)
 				Pt.z = ((1.0-dj)  * m_FramePosition[i].z + dj  * m_FramePosition[i+1].z
 					   +(1.0-dj1) * m_FramePosition[i].z + dj1 * m_FramePosition[i+1].z)/2.0;
 
-				m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
-				m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
-				m_CoGIzz += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) );
-				m_CoGIxz -= SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.z-m_CoG.z) );
+				CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+				CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+				CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
+				CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
 			}
 		}
 	}
@@ -367,12 +367,12 @@ void CBody::ComputeBodyInertia(double const & Mass)
 			Pt.z = (Top.z + Bot.z)/2.0;
 			xpos += dl;
 
-			m_CoG.x += SectionArea*rho * Pt.x;
-			m_CoG.y += SectionArea*rho * Pt.y;
-			m_CoG.z += SectionArea*rho * Pt.z;
+			CoG.x += SectionArea*rho * Pt.x;
+			CoG.y += SectionArea*rho * Pt.y;
+			CoG.z += SectionArea*rho * Pt.z;
 		}
-		if(Mass>1.e-30) m_CoG *= 1.0/ Mass;
-		else            m_CoG.Set(0.0, 0.0, 0.0);
+		if(Mass>1.e-30) CoG *= 1.0/ Mass;
+		else            CoG.Set(0.0, 0.0, 0.0);
 
 		// Next evaluate inertia, assuming each section is a point mass
 		xpos = m_FramePosition[0].x;
@@ -386,10 +386,10 @@ void CBody::ComputeBodyInertia(double const & Mass)
 			GetPoint(ux, 1.0, true, Bot);
 			Pt.z = (Top.z + Bot.z)/2.0;
 
-			m_CoGIxx += SectionArea*rho * ( (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
-			m_CoGIyy += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.z-m_CoG.z)*(Pt.z-m_CoG.z) );
-			m_CoGIzz += SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.x-m_CoG.x) + (Pt.y-m_CoG.y)*(Pt.y-m_CoG.y) );
-			m_CoGIxz -= SectionArea*rho * ( (Pt.x-m_CoG.x)*(Pt.z-m_CoG.z) );
+			CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
+			CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
+			CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
 
 			xpos += dl;
 		}
@@ -419,11 +419,6 @@ void CBody::Duplicate(CBody *pBody)
 		m_MassPosition[i].Copy(pBody->m_MassPosition[i]);
 		m_MassTag[i] = pBody->m_MassTag[i];
 	}
-	m_CoG.Copy(pBody->m_CoG);
-	m_CoGIxx = pBody->m_CoGIxx;
-	m_CoGIyy = pBody->m_CoGIyy;
-	m_CoGIzz = pBody->m_CoGIzz;
-	m_CoGIxz = pBody->m_CoGIzz;
 
 	for(int i=0; i<m_NStations; i++)
 	{

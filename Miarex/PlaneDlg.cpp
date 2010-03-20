@@ -18,6 +18,8 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+
+
 #include "../Globals.h"
 #include "../MainFrame.h" 
 #include "Miarex.h"
@@ -27,6 +29,7 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
 
@@ -40,7 +43,6 @@ PlaneDlg::PlaneDlg()
 {
 	setWindowTitle(tr("Plane Editor"));
 	m_pPlane = NULL;
-
 
 	m_bAcceptName    = true;
 	m_bChanged      = false;
@@ -154,14 +156,8 @@ void PlaneDlg::InitDialog()
 
 	m_pctrlPlaneName->setText(m_pPlane->m_PlaneName);
 
-	if(m_pPlane->m_PlaneDescription.length())
-	{
-		m_pctrlPlaneDescription->setPlainText(m_pPlane->m_PlaneDescription);
-	}
-	else
-	{
-		m_pctrlPlaneDescription->setPlainText("");
-	}
+	if(m_pPlane->m_PlaneDescription.length()) m_pctrlPlaneDescription->setPlainText(m_pPlane->m_PlaneDescription);
+	else                                      m_pctrlPlaneDescription->setPlainText("");
 
 	SetParams();
 	SetResults();
@@ -279,7 +275,6 @@ void PlaneDlg::OnDefineWing()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing);
-//	GL3dWingDlg WingDlg;
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing);
@@ -290,6 +285,7 @@ void PlaneDlg::OnDefineWing()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing.Duplicate(&SaveWing);
+	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_LEWing, 0.0, m_pPlane->m_WingTilt);//necessary for eventual inertia calculations
 }
 
 
@@ -298,7 +294,6 @@ void PlaneDlg::OnDefineFin()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Fin);
-	GL3dWingDlg WingDlg;
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Fin);
@@ -310,6 +305,7 @@ void PlaneDlg::OnDefineFin()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Fin.Duplicate(&SaveWing);
+	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_LEFin, 0.0, m_pPlane->m_FinTilt);//necessary for eventual inertia calculations
 }
 
 
@@ -318,7 +314,6 @@ void PlaneDlg::OnDefineStab()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Stab);
-	GL3dWingDlg WingDlg;
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Stab);
@@ -329,6 +324,7 @@ void PlaneDlg::OnDefineStab()
 		m_bChanged = true;
 	}
 	else  m_pPlane->m_Stab.Duplicate(&SaveWing);
+	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_LEStab, 0.0, m_pPlane->m_StabTilt);//necessary for eventual inertia calculations
 }
 
 
@@ -338,7 +334,6 @@ void PlaneDlg::OnDefineWing2()
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	CWing SaveWing;
 	SaveWing.Duplicate(&m_pPlane->m_Wing2);
-	GL3dWingDlg WingDlg;
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing2);
@@ -349,6 +344,7 @@ void PlaneDlg::OnDefineWing2()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing2.Duplicate(&SaveWing);
+	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_LEWing2, 0.0, m_pPlane->m_WingTilt2);//necessary for eventual inertia calculations
 }
 
 
@@ -510,15 +506,11 @@ void PlaneDlg::OnInertia()
 	double MassValue[MAXMASSES];
 	CVector MassPosition[MAXMASSES];
 	QString MassTag[MAXMASSES];
-	CVector CoG;
-	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
-
+	
 	NMass = m_pPlane->m_NMass;
-	CoG = m_pPlane->m_CoG;
-	CoGIxx = m_pPlane->m_CoGIxx;
-	CoGIyy = m_pPlane->m_CoGIyy;
-	CoGIzz = m_pPlane->m_CoGIzz;
-	CoGIxz = m_pPlane->m_CoGIxz;
+	
+//qDebug("Main CoG %14.7f, %14.7f, %14.7f", m_pPlane->m_CoG.x, m_pPlane->m_CoG.y, m_pPlane->m_CoG.z);
+
 	for(int i=0; i< MAXMASSES; i++)
 	{
 		MassValue[i]    = m_pPlane->m_MassValue[i];
@@ -534,12 +526,7 @@ void PlaneDlg::OnInertia()
 	else
 	{
 		m_pPlane->m_NMass = NMass;
-		m_pPlane->m_CoG = CoG;
-		m_pPlane->m_CoGIxx = CoGIxx;
-		m_pPlane->m_CoGIyy = CoGIyy;
-		m_pPlane->m_CoGIzz = CoGIzz;
-		m_pPlane->m_CoGIxz = CoGIxz;
-
+	
 		for(int i=0; i< MAXMASSES; i++)
 		{
 			MassValue[i]    = m_pPlane->m_MassValue[i];

@@ -625,11 +625,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 
 
-QMiarex::~QMiarex()
-{
-}
-
-
 
 CBody* QMiarex::AddBody(CBody *pBody)
 {
@@ -639,7 +634,6 @@ CBody* QMiarex::AddBody(CBody *pBody)
 	bool bInserted = false;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CBody *pOldBody;
-	QString strong;
 	int i,j;
 
 
@@ -10213,9 +10207,10 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 			if(m_pCurWing)
 			{	//zoom 3D wing
-				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.02;
-				else                         m_glScaled /= (GLfloat)1.02;
-
+//				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.02;
+//				else                         m_glScaled /= (GLfloat)1.02;
+				
+				m_ArcBall.Move(point.x(), m_rCltRect.height()-point.y());
 				UpdateView();
 			}
 		}
@@ -10315,7 +10310,16 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 
 void QMiarex::mousePressEvent(QMouseEvent *event)
 {
-	if (event->buttons() & Qt::LeftButton)
+	if (event->buttons() & Qt::MidButton)
+	{
+		m_bArcball = true;
+		m_ArcBall.Start(event->pos().x(), m_rCltRect.height()-event->pos().y());
+		m_bCrossPoint = true;
+
+		Set3DRotationCenter();
+		UpdateView();
+	}
+	else if (event->buttons() & Qt::LeftButton)
 	{
 		QPoint point = event->pos();
 
@@ -10384,8 +10388,9 @@ void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 	if(m_iView==W3DVIEW)
 	{
 		QGLWidget* pGLWidget = (QGLWidget*)m_pGLWidget;
-		QPoint point(event->pos().x(), event->pos().y());
 		pGLWidget->setCursor(Qt::CrossCursor);
+		
+		m_bArcball = false;
 
 		m_bCrossPoint = false;
 		UpdateView();
@@ -11750,12 +11755,19 @@ void QMiarex::OnDeleteUFOWPolars()
 {
 	if(!m_pCurWing) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
+	
+	QString strong;
+	if(m_pCurPlane)	strong = tr("Are you sure you want to delete the plane's polars?\n");
+	else 	        strong = tr("Are you sure you want to delete the wing's polars?\n");
+	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
+												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+	
+	
 	QString Name;
 
 	if(m_pCurPlane) Name = m_pCurPlane->m_PlaneName;
-	else            Name = m_pCurWing->m_WingName;
-
+	else            Name = m_pCurWing->m_WingName;	
+	
 	CWPolar *pWPolar;
 	for(int i=m_poaWPolar->size()-1; i>=0; i--)
 	{
@@ -11768,6 +11780,7 @@ void QMiarex::OnDeleteUFOWPolars()
 	}
 	SetWPlr();
 	pMainFrame->UpdateWPolars();
+	pMainFrame->SetSaveState(false);
 	CheckButtons();
 	UpdateView();
 }
@@ -17933,16 +17946,21 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 }
 
 
-void QMiarex::OnWingInertia()
+
+void QMiarex::OnUFOInertia()
 {
 	if(!m_pCurWing) return;
 	InertiaDlg dlg;
-	dlg.m_pBody = NULL;
 	dlg.m_pMainFrame = m_pMainFrame;
-	dlg.m_pWing = m_pCurWing;
+	dlg.m_pPlane = NULL;
+	dlg.m_pWing  = NULL;
+	dlg.m_pBody  = NULL;
+	if(m_pCurPlane)     dlg.m_pPlane = m_pCurPlane;
+	else if(m_pCurWing) dlg.m_pWing  = m_pCurWing;
 	dlg.InitDialog();
 	dlg.exec();
 }
+
 
 
 void QMiarex::OnBodyInertia()
