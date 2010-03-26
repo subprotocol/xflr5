@@ -233,3 +233,6 @@ mac {
 }
 OTHER_FILES += ReleaseNotes.txt
 
+#QMAKE_CFLAGS+=-pg
+#QMAKE_CXXFLAGS+=-pg
+#QMAKE_LFLAGS+=-pg

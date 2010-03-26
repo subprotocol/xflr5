@@ -3007,7 +3007,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 //					C = m_pPanel[p].VortexPos;//Makes absolutely no difference on results
 					C.x = m_PlanformSpan * 100.0;
 
-					Wg  = pVLMDlg->GetSpeedVector(C, Gamma);
+					pVLMDlg->GetSpeedVector(C, Gamma, Wg);
 					Wg += VInf; //total speed vector
 
 					//induced force

@@ -80,7 +80,7 @@ private:
 	double VLMComputeCm(double alpha) ;
 	void pgmat(double const &mach, double const &alfa, double const &beta, double pg[3][3]);
 
-	CVector GetSpeedVector(CVector C, double *Gamma);
+	void GetSpeedVector(CVector C, double *Gamma, CVector &VTot);
 
 	QTextEdit *m_pctrlTextOutput;
 	QPushButton *m_pctrlCancel;

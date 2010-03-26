@@ -637,7 +637,7 @@ void CtrlPolarDlg::SetupLayout()
 	QVBoxLayout *NoteLayout = new QVBoxLayout;
 	QLabel *lab10 = new QLabel(tr("Note 1 : the analysis is necessarily of type VLM1"));
 	QLabel *lab11 = new QLabel(tr("Note 2 : if the control for XCmRef is inactive, then the minimal value will be used for the analysis"));
-	QLabel *lab12 = new QLabel(tr("Note 3 : the analysis may be of the vicous type only if all the flap controls are inactive"));
+	QLabel *lab12 = new QLabel(tr("Note 3 : the analysis may be of the viscous type only if all the flap controls are inactive"));
 	NoteLayout->addWidget(lab10);
 	NoteLayout->addWidget(lab11);
 	NoteLayout->addWidget(lab12);

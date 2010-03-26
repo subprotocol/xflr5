@@ -7382,7 +7382,7 @@ bool XFoil::setbl()
 	ule1_a = uinv_a[2][1];
 	ule2_a = uinv_a[2][2];
 
-	QString str1 = "\n";
+	QString str1 = " \n";
 	WriteString(str1);
 
 	//*** go over each boundary layer/wake
@@ -7478,8 +7478,8 @@ bool XFoil::setbl()
 
 			if(ibl==itran[is] && !tran)
 			{
-				//TRACE("setbl: xtr???  n1=%d n2=%d:\n", ampl1, ampl2);
-				QString str = QString(QObject::tr("setbl: xtr???  n1=%1 n2=%2:\n")).arg( ampl1).arg( ampl2);
+				//TRACE("setbl: xtr???  n1=%d n2=%d: \n", ampl1, ampl2);
+				QString str = QString(QObject::tr("setbl: xtr???  n1=%1 n2=%2: \n")).arg( ampl1).arg( ampl2);
 				WriteString(str);
 			}
 

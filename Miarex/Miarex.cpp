@@ -7432,7 +7432,7 @@ void QMiarex::GLCreateStreamLines()
 
 								for (i=1; i< p3DScales->m_NX ;i++)
 								{
-									if(m_pCurWPolar->m_AnalysisType==2)      VT = m_pVLMDlg->GetSpeedVector(C, Gamma);
+									if(m_pCurWPolar->m_AnalysisType==2)      m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
 									else if(m_pCurWPolar->m_AnalysisType==3) m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
 
 									VT += VInf;
@@ -7461,7 +7461,7 @@ void QMiarex::GLCreateStreamLines()
 
 							for (i=1; i< p3DScales->m_NX ;i++)
 							{
-								if(m_pCurWPolar->m_AnalysisType==2)		  VT = m_pVLMDlg->GetSpeedVector(D, Gamma);
+								if(m_pCurWPolar->m_AnalysisType==2)		  m_pVLMDlg->GetSpeedVector(D, Gamma, VT);
 								else if(m_pCurWPolar->m_AnalysisType==3)  m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
 
 								VT += VInf;
@@ -7567,7 +7567,7 @@ void QMiarex::GLCreateSurfSpeeds()
 				if(m_pCurWPolar->m_AnalysisType==2)
 				{
 					C.Copy(m_Panel[p].CtrlPt);
-					VT += m_pVLMDlg->GetSpeedVector(C, Gamma);
+					m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
 					VT *= m_VelocityScale/100.0;
 //					if(!m_pCurWPolar->m_bTiltedGeom)
 						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);

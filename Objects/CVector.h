@@ -20,9 +20,6 @@
 *****************************************************************************/
 
 
-// Vector.h: interface for the CVector class.
-//
-//////////////////////////////////////////////////////////////////////
 
 
 #ifndef CVector_H
@@ -32,7 +29,7 @@ class CVector
 {
 public: 
 	CVector();
-	CVector(double xi, double yi, double zi);
+	CVector(double const &xi, double const &yi, double const &zi);
 
 	bool IsSame(CVector const &V);
 	void Set(CVector const &V);
@@ -45,13 +42,13 @@ public:
 	void RotateY(double YTilt);
 	void Translate(CVector const &T);
 	bool operator ==(CVector const &V);
-	void operator =(CVector T);
+	void operator =(CVector const &T);
 	void operator+=(CVector const &T);
 	void operator-=(CVector const &T);
-	void operator*=(double d);
-	CVector operator *(double d);
+	void operator*=(double const &d);
+	CVector operator *(double const &d);
 	CVector operator *(CVector const &T);
-	CVector operator /(double d);
+	CVector operator /(double const &d);
 	CVector operator +(CVector const &V);
 	CVector operator -(CVector const &V);
 	void Normalize();

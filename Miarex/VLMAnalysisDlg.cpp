@@ -511,19 +511,18 @@ bool VLMAnalysisDlg::Gauss(double *A, int n, double *B, int m)
 }
 
 
-CVector VLMAnalysisDlg::GetSpeedVector(CVector C, double *Gamma)
+void VLMAnalysisDlg::GetSpeedVector(CVector C, double *Gamma, CVector &VTot)
 {
 	int pp;
-	CVector VTot;
 	VTot.Set(0.0,0.0,0.0);
 
 	for (pp=0; pp<m_MatSize;pp++)
 	{
 		VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
-		VTot += V * Gamma[pp];
+		VTot.x += V.x * Gamma[pp];
+		VTot.y += V.y * Gamma[pp];
+		VTot.z += V.z * Gamma[pp];
 	}
-
-	return VTot;
 }
 
 
@@ -1216,7 +1215,9 @@ void VLMAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVe
 	// V is the resulting velocity
 	static int lw, pw, p;
 	p = pPanel->m_iElement;
-	V.Set(0.0,0.0,0.0);
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
 
 	if(m_pWPolar->m_bVLM1)
 	{
@@ -1307,7 +1308,9 @@ void VLMAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVe
 					V.y += VG.y;
 					V.z -= VG.z;
 				}
-				V += VT;
+				V.x += VT.x;
+				V.y += VT.y;
+				V.z += VT.z;
 			}
 			else
 			{
@@ -1488,12 +1491,15 @@ void VLMAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C
 	//
 	// Vectorial operations are written inline to save computing times
 	// -->longer code, but 4x more efficient....
-	double CoreSize = 0.000000;
+	static double CoreSize;
+	CoreSize = 0.000000;
 	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
 
 	if(!m_pWing) return;
 
-	V.Set(0.0,0.0,0.0);
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
 
 	if(bAll)
 	{

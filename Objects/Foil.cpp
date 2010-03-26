@@ -538,15 +538,14 @@ double CFoil::GetLowerY(double x)
 {
 	// Returns the y-coordinate on the current foil's lower surface at the x position
 	x = m_rpIntrados[0].x + x*(m_rpIntrados[m_iInt].x-m_rpIntrados[0].x);//in case there is a flap which reduces the length
-	static double y;
+
 	for (int i=0; i<m_iInt; i++)
 	{
 		if (m_rpIntrados[i].x <m_rpIntrados[i+1].x  &&
 			m_rpIntrados[i].x <= x && x<=m_rpIntrados[i+1].x )
 		{
-			y = (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
+			return (m_rpIntrados[i].y 	+ (m_rpIntrados[i+1].y-m_rpIntrados[i].y)
 									 /(m_rpIntrados[i+1].x-m_rpIntrados[i].x)*(x-m_rpIntrados[i].x));
-			return y;
 		}
 	}
 	return 0.0;
@@ -570,6 +569,7 @@ void CFoil::GetLowerY(double x, double &y, double &normx, double &normy)
                                     + (m_rpIntrados[i+1].y-m_rpIntrados[i].y) * (m_rpIntrados[i+1].y-m_rpIntrados[i].y));
 			normx = ( m_rpIntrados[i+1].y - m_rpIntrados[i].y)/nabs;
 			normy = (-m_rpIntrados[i+1].x + m_rpIntrados[i].x)/nabs;
+			return;
 		}
 	}
 }
@@ -604,15 +604,15 @@ double CFoil::GetUpperY(double x)
 {
 	// Returns the y-coordinate on the current foil's upper surface at the x position
 	x = m_rpExtrados[0].x + x*(m_rpExtrados[m_iExt].x-m_rpExtrados[0].x);//in case there is a flap which reduces the length
-	double y;
+
 	for (int i=0; i<m_iExt; i++)
 	{
 		if (m_rpExtrados[i].x <m_rpExtrados[i+1].x  &&
 			m_rpExtrados[i].x <= x && x<=m_rpExtrados[i+1].x )
 		{
-			y = (m_rpExtrados[i].y 	+ (m_rpExtrados[i+1].y-m_rpExtrados[i].y)
+			return (m_rpExtrados[i].y 	+ (m_rpExtrados[i+1].y-m_rpExtrados[i].y)
 									 /(m_rpExtrados[i+1].x-m_rpExtrados[i].x)*(x-m_rpExtrados[i].x));
-			return y;
+
 		}
 	}
 	return 0.0;
@@ -636,6 +636,7 @@ void CFoil::GetUpperY(double x, double &y, double &normx, double &normy)
                                     + (m_rpExtrados[i+1].y-m_rpExtrados[i].y) * (m_rpExtrados[i+1].y-m_rpExtrados[i].y));
 			normx = (-m_rpExtrados[i+1].y + m_rpExtrados[i].y)/nabs;
 			normy = ( m_rpExtrados[i+1].x - m_rpExtrados[i].x)/nabs;
+			return;
 		}
 	}
 }

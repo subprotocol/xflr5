@@ -19,22 +19,15 @@
 
 *****************************************************************************/
 
-//////////////////////////////////////////////////////////////////////
-//
 // Vector.cpp: implementation of the CVector class.
 // Simple class implementing the usual properties and methods of a 3D Vector
-//
-//////////////////////////////////////////////////////////////////////
-
 
 
 #include <math.h>
 #include "CVector.h"
 #include "Quaternion.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
 
 CVector::CVector()
 {
@@ -42,7 +35,9 @@ CVector::CVector()
 	y  = 0.0;
 	z  = 0.0;
 }
-CVector::CVector(double xi, double yi, double zi)
+
+
+CVector::CVector(double const &xi, double const &yi, double const &zi)
 {
 	x  = xi;
 	y  = yi;
@@ -86,27 +81,16 @@ void CVector::Set(CVector const &V)
 	z = V.z;
 }
 
+
 double CVector::dot(CVector const &V)
 {	
 	return x*V.x + y*V.y + z*V.z;
 }
 
+
 bool CVector::IsSame(CVector const &V)
 {
-	double d2 = (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z) ;
-/*	double L = VAbs();
-	double L2 = L*L;
-	if(d2==0.0) return true;
-	if(d2/L2 < 1.0/1000000.0) 
-		return true;
-	else 
-		return false;*/
-
-	if(sqrt(d2)<0.00001) //less than 1/100 mm
-		return true;
-	else
-		return false;
-
+	return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
 }
 
 void CVector::Translate(CVector const &T)
@@ -133,30 +117,36 @@ bool CVector::operator ==(CVector const &V)
 		return false;
 }
 
-void CVector::operator =(CVector T)
+void CVector::operator =(CVector const &T)
 {
 	x = T.x;
 	y = T.y;
 	z = T.z;
 }
+
+
 void CVector::operator -=(CVector const &T)
 {
 	x -= T.x;
 	y -= T.y;
 	z -= T.z;
 }
-void CVector::operator *=(double d)
+
+
+void CVector::operator *=(double const &d)
 {
 	x *= d;
 	y *= d;
 	z *= d;
 }
 
-CVector CVector::operator *(double d)
+
+CVector CVector::operator *(double const &d)
 {
 	CVector T(x*d, y*d, z*d);
 	return T;
 }
+
 
 CVector CVector::operator *(CVector const &T)
 {
@@ -166,7 +156,9 @@ CVector CVector::operator *(CVector const &T)
 	C.z =  x*T.y - y*T.x;
 	return C;
 }
-CVector CVector::operator /(double d)
+
+
+CVector CVector::operator /(double const &d)
 {
 	CVector T(x/d, y/d, z/d);
 	return T;
