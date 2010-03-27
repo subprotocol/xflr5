@@ -190,7 +190,7 @@ void CPolar::ResetPolar()
 void CPolar::AddData(OpPoint *pOpPoint)
 {
 	//Adds the OpPoint data to the Polar object for further use
-	if(!pOpPoint->m_bVisc) return;
+//	if(!pOpPoint->m_bVisc) return;
 	m_ACrit = pOpPoint->ACrit;
 	AddPoint(pOpPoint->Alpha, pOpPoint->Cd, pOpPoint->Cdp, pOpPoint->Cl, pOpPoint->Cm,
 			 pOpPoint->Xtr1, pOpPoint->Xtr2, pOpPoint->m_TEHMom, pOpPoint->Cpmn, pOpPoint->Reynolds,

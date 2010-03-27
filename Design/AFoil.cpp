@@ -2910,11 +2910,13 @@ void QAFoil::SetupLayout()
 	m_pctrlDuplicate   = new QPushButton(tr("Duplicate"));
 	m_pctrlExport      = new QPushButton(tr("Export"));
 
+	m_pctrlMenuButton = new QPushButton(tr("Design..."));
+
 	QGridLayout *FoilCommands = new QGridLayout;
 	FoilCommands->addWidget(m_pctrlRename,1,1);
 	FoilCommands->addWidget(m_pctrlDelete,1,2);
 	FoilCommands->addWidget(m_pctrlDuplicate,2,1);
-	FoilCommands->addWidget(m_pctrlExport,2,2);
+	FoilCommands->addWidget(m_pctrlMenuButton,2,2);
 
 	QHBoxLayout *SplineOption = new QHBoxLayout;
 	m_pctrlSF = new QRadioButton(tr("Splines"));

@@ -509,8 +509,6 @@ void PlaneDlg::OnInertia()
 	
 	NMass = m_pPlane->m_NMass;
 	
-//qDebug("Main CoG %14.7f, %14.7f, %14.7f", m_pPlane->m_CoG.x, m_pPlane->m_CoG.y, m_pPlane->m_CoG.z);
-
 	for(int i=0; i< MAXMASSES; i++)
 	{
 		MassValue[i]    = m_pPlane->m_MassValue[i];

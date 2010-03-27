@@ -70,8 +70,7 @@ private slots:
 
 	void OnCpGraphSettings();
 	void OnPolarFilter();
-	void OnAlphaMinChanged();
-	void OnAlphaMaxChanged();
+	void OnInputChanged();
 	void OnAnalyze();
 	void OnAnimate(bool bChecked);
 	void OnAnimateSpeed(int val);
@@ -85,7 +84,6 @@ private slots:
 	void OnDelCurOpp();
 	void OnDeleteCurPolar();
 	void OnDeleteFoilPolars();
-	void OnDeltaAlphaChanged();
 	void OnDuplicateFoil();
 	void OnEditCurPolar();
 	void OnExportCurFoil();

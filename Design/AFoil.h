@@ -170,6 +170,7 @@ private:
 	QCheckBox *m_pctrlCenterLine;
 	QCheckBox *m_pctrlFoilPoints;
 	QPushButton *m_pctrlRename, *m_pctrlDelete, *m_pctrlDuplicate, *m_pctrlExport;
+	QPushButton *m_pctrlMenuButton;
 	QTableView *m_pctrlFoilTable;
 	QStandardItemModel *m_pFoilModel;
 	FoilTableDelegate *m_pFoilDelegate;

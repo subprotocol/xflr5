@@ -800,20 +800,23 @@ void BatchDlg::OnAcl()
 	if(m_rbspec1->isChecked())
 	{
 		m_pctrlSpecVar->setText(tr("Alpha ="));
-		m_pctrlSpecMax->SetValue(1.0);
-		m_pctrlSpecDelta->SetValue(0.5);
+		m_pctrlSpecMin->SetValue(m_AlphaMin);
+		m_pctrlSpecMax->SetValue(m_AlphaMax);
+		m_pctrlSpecDelta->SetValue(m_AlphaInc);
 		m_bAlpha = true;
 		m_pctrlFromZero->setEnabled(true);
 	}
 	else
 	{
 		m_pctrlSpecVar->setText(tr("Cl ="));
-		m_pctrlSpecMax->SetValue(0.5);
-		m_pctrlSpecDelta->SetValue(0.1);
+		m_pctrlSpecMin->SetValue(m_ClMin);
+		m_pctrlSpecMax->SetValue(m_ClMax);
+		m_pctrlSpecDelta->SetValue(m_ClInc);
 		m_bAlpha = false;
 		m_pctrlFromZero->setEnabled(false);
 	}
 }
+
 
 void BatchDlg::OnSpecChanged()
 {
@@ -831,6 +834,8 @@ void BatchDlg::OnSpecChanged()
 		m_ClInc = m_SpInc;
 	}
 }
+
+
 
 void BatchDlg::OnType1()
 {

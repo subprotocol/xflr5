@@ -702,6 +702,10 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addAction(AFoilInterpolateFoils);
 	AFoilDesignMenu->addAction(AFoilNacaFoils);
 
+	QAFoil* pAFoil = (QAFoil*)m_pAFoil;
+	pAFoil->m_pctrlMenuButton->setMenu(AFoilDesignMenu);	
+	
+	
 	AFoilSplineMenu = menuBar()->addMenu(tr("&Splines"));
 	AFoilSplineMenu->addAction(UndoAFoilAct);
 	AFoilSplineMenu->addAction(RedoAFoilAct);

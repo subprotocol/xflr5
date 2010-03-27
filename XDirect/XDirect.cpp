@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2010 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -586,13 +586,14 @@ void QXDirect::Connect()
 	connect(m_pctrlSpec2, SIGNAL(clicked()), this, SLOT(OnSpec()));
 	connect(m_pctrlSpec3, SIGNAL(clicked()), this, SLOT(OnSpec()));
 	connect(m_pctrlAnalyze, SIGNAL(clicked()), this, SLOT(OnAnalyze()));
-	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnAlphaMinChanged()));
-	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnAlphaMaxChanged()));
-	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnDeltaAlphaChanged()));
+	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnInputChanged()));
+	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnInputChanged()));
+	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnInputChanged()));
 	connect(m_pctrlCurveStyle, SIGNAL(activated(int)), this, SLOT(OnCurveStyle(int)));
 	connect(m_pctrlCurveWidth, SIGNAL(activated(int)), this, SLOT(OnCurveWidth(int)));
 	connect(m_pctrlCurveColor, SIGNAL(clicked()), this, SLOT(OnCurveColor()));
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
+	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
 	connect(m_pctrlInitBL, SIGNAL(clicked()), this, SLOT(OnInitBL()));
 	connect(m_pctrlShowBL, SIGNAL(clicked()), this, SLOT(OnShowBL()));
 	connect(m_pctrlShowPressure, SIGNAL(clicked()), this, SLOT(OnShowPressure()));
@@ -767,6 +768,7 @@ void QXDirect::CreatePolarCurves()
 	}
 }
 
+
 void QXDirect::DeleteFoil(bool bAsk)
 {
 	if(!g_pCurFoil || !g_pCurFoil->m_FoilName.length()) return;
@@ -804,7 +806,6 @@ void QXDirect::DeleteOpPoint(bool bCurrent)
 	}
 	else
 	{
-		// kill'em all
 		OpPoint* pOpPoint;
 		for (i=m_poaOpp->size()-1; i>=0;i--)
 		{
@@ -1728,62 +1729,12 @@ void QXDirect::OnAllPolarGraphsSetting()
 }
 
 
-void QXDirect::OnAlphaMinChanged()
+void QXDirect::OnInputChanged()
 {
-	QString str;
-
-	if(!m_pCurPolar) return;
-
-	if(m_pCurPolar->m_Type !=4)
-	{
-		if(m_bAlpha)
-		{
-			m_Alpha      = m_pctrlAlphaMin->GetValue();
-			m_pctrlAlphaMin->clear();
-			m_pctrlAlphaMin->insert(str.setNum(m_Alpha,'f',2));
-		}
-		else
-		{
-			m_Cl      = m_pctrlAlphaMin->GetValue();
-			m_pctrlAlphaMin->clear();
-			m_pctrlAlphaMin->insert(str.setNum(m_Cl,'f',2));
-		}
-	}
-	else
-	{
-			m_Reynolds      = m_pctrlAlphaMin->GetValue();
-			m_pctrlAlphaMin->clear();
-			m_pctrlAlphaMin->insert(str.setNum(m_Reynolds,'f',0));
-	}
+	ReadParams();
 }
 
 
-void QXDirect::OnAlphaMaxChanged()
-{
-	if(!m_pCurPolar) return;
-	QString str;
-	if(m_pCurPolar->m_Type !=4)
-	{
-		if(m_bAlpha)
-		{
-			m_AlphaMax      = m_pctrlAlphaMax->GetValue();
-			m_pctrlAlphaMax->clear();
-			m_pctrlAlphaMax->insert(str.setNum(m_AlphaMax,'f',2));
-		}
-		else
-		{
-			m_ClMax    = m_pctrlAlphaMax->GetValue();
-			m_pctrlAlphaMax->clear();
-			m_pctrlAlphaMax->insert(str.setNum(m_ClMax,'f',2));
-		}
-	}
-	else
-	{
-			m_ReynoldsMax      = m_pctrlAlphaMax->GetValue();
-			m_pctrlAlphaMax->clear();
-			m_pctrlAlphaMax->insert(str.setNum(m_ReynoldsMax,'f',0));
-	}
-}
 
 
 void QXDirect::OnAnimate(bool bChecked)
@@ -1833,7 +1784,6 @@ void QXDirect::OnAnimate(bool bChecked)
 void QXDirect::OnAnimateSingle()
 {
 	//KickIdle
-	QString strong;
 	int size = (int)m_poaOpp->size();
 	OpPoint* pOpPoint;
 
@@ -1889,7 +1839,7 @@ void QXDirect::OnAnalyze()
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	if(m_bViscous) m_pXFoil->lvisc = true;
+	m_pXFoil->lvisc = m_bViscous;
 
 	ReadParams();
 
@@ -2582,28 +2532,6 @@ void QXDirect::OnDeleteFoilPolars()
 
 	CheckButtons();
 	UpdateView();
-}
-
-
-void QXDirect::OnDeltaAlphaChanged()
-{
-	if(!m_pCurPolar) return;
-	QString str;
-	if(m_pCurPolar->m_Type !=4)
-	{
-		if(m_bAlpha)
-		{
-			m_AlphaDelta      = m_pctrlAlphaDelta->GetValue();
-		}
-		else
-		{
-			m_ClDelta    = m_pctrlAlphaDelta->GetValue();
-		}
-	}
-	else
-	{
-			m_ReynoldsDelta      = m_pctrlAlphaDelta->GetValue();
-	}
 }
 
 
@@ -5667,6 +5595,7 @@ void QXDirect::SetBufferFoil()
 	m_BufferFoil.m_nFoilWidth = g_pCurFoil->m_nFoilWidth;
 }
 
+
 void QXDirect::SetCurveParams()
 {
 	if(m_bPolar)
@@ -6226,11 +6155,6 @@ void QXDirect::SetOpPointSequence()
 		m_pctrlSpec3->setEnabled(false);
 	}
 }
-
-
-
-
-
 
 
 

@@ -99,6 +99,5 @@ void CharacteristicPol(double m[][4], double p[5]);
 bool LinBairstow(double *p, complex<double> *root, int n);
 bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V);
 
-void TestInvert();
 
 #endif // FUNCTIONS_H

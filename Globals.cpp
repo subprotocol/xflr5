@@ -1443,23 +1443,6 @@ bool Invert44(complex<double> *ain, complex<double> *aout)
 
 
 
-void TestInvert()
-{
-	complex<double> M[16], InvM[16];
-	for(int i=0; i<4; i++)
-		for(int j=0; j<4; j++)
-			M[4*i+j] = i-j;
-	M[0] = M[5] = M[10] = M[15] = 1.0;
-
-	for(int i=0; i<4; i++)	qDebug() << M[4*i+0].real() << M[4*i+1].real() << M[4*i+2].real() << M[4*i+3].real();
-
-	Invert44(M, InvM);
-
-	for(int i=0; i<4; i++)	qDebug() << InvM[4*i+0].real() << InvM[4*i+1].real() << InvM[4*i+2].real() << InvM[4*i+3].real();
-// qDebug() << "---------------";
-//	for(int i=0; i<4; i++)		qDebug() << InvM[4*i+0].imag() << InvM[4*i+1].imag() << InvM[4*i+2].imag() << InvM[4*i+3].imag();
-
-}
 
 
 

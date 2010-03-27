@@ -27,6 +27,7 @@
 
 void *InterpolateFoilsDlg::s_pXFoil;
 
+
 InterpolateFoilsDlg::InterpolateFoilsDlg()
 {
 	setWindowTitle(tr("Interpolate Foils"));
@@ -43,6 +44,7 @@ InterpolateFoilsDlg::InterpolateFoilsDlg()
 	connect(m_pctrlFrac,   SIGNAL(editingFinished()), this, SLOT(OnFrac()));
 	connect(m_pctrlSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnVScroll(int)));
 }
+
 
 void InterpolateFoilsDlg::SetupLayout()
 {
@@ -188,7 +190,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil1(int i)
 
 		str = QString(tr("Thick.=%1")).arg(pFoil->m_fThickness*100,5,'f',2);
 		str += "%";
-		strong = QString(tr(" at x=%5.1f")).arg(pFoil->m_fXThickness*100,5,'f',1);
+		strong = QString(tr(" at x=%1")).arg(pFoil->m_fXThickness*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlThick1->setText(str);
@@ -217,7 +219,7 @@ void InterpolateFoilsDlg::OnSelChangeFoil2(int i)
 
 		str = QString(tr("Thick.=%1")).arg(pFoil->m_fThickness*100,5,'f',2);
 		str += "%";
-		strong = QString(tr(" at x=%5.1f")).arg(pFoil->m_fXThickness*100,5,'f',1);
+		strong = QString(tr(" at x=%1")).arg(pFoil->m_fXThickness*100,5,'f',1);
 		strong += "%";
 		str+=strong;
 		m_pctrlThick2->setText(str);
@@ -268,7 +270,7 @@ void InterpolateFoilsDlg::Update()
 
 	str = QString(tr("Thick.=%1")).arg(m_pBufferFoil->m_fThickness*100,5,'f',2);
 	str += "%";
-	strong = QString(tr(" at x=%5.1f")).arg(m_pBufferFoil->m_fXThickness*100,5,'f',1);
+	strong = QString(tr(" at x=%1")).arg(m_pBufferFoil->m_fXThickness*100,5,'f',1);
 	strong += "%";
 	str+=strong;
 	m_pctrlThick3->setText(str);
