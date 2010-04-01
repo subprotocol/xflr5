@@ -3326,36 +3326,11 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			UpdateView();
 		}
 	}
-	else if ((event->buttons() & Qt::MidButton) && !bCtrl)
+	else if (event->buttons() & Qt::MidButton)
 	{
-		// we scale the body
-
-		if(m_BodyLineRect.contains(point))
-		{
-			if(point.y()-m_LastPoint.y()<0) m_BodyScale /= 1.04;
-			else                            m_BodyScale *= 1.04;
-			m_bResetglBody2D = true;
-			m_BodyScaledOffset.Set((1.0-m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
-								   (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-									0.0);
-			UpdateView();
-		}
-		else if(m_FrameRect.contains(point))
-		{
-			if(point.y()-m_LastPoint.y()<0) m_FrameScale /= 1.04;
-			else                            m_FrameScale *= 1.04;
-			m_bResetglBody2D = true;
-			m_FrameScaledOffset.Set((1.0-m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
-									(1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
-									 0.0);
-			UpdateView();
-		}
-		else if(m_pBody && m_BodyRect.contains(point))
-		{	//zoom 3D Body
-			if(point.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.04;
-			else                            m_glScaled /= (GLfloat)1.04;
-			UpdateView();
-		}
+		//rotate
+		m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+		UpdateView();
 	}
 	else 
 	{
@@ -3413,7 +3388,16 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 		m_bPickCenter = false;
 		m_pctrlPickCenter->setChecked(false);
 	}
-	else
+	if (event->buttons() & Qt::MidButton)
+	{
+		m_bArcball = true;
+		m_ArcBall.Start(event->pos().x(), m_pglWidget->m_rCltRect.height()-event->pos().y());
+		m_bCrossPoint = true;
+
+		Set3DRotationCenter();
+		UpdateView();
+	}
+	else if (event->buttons() & Qt::LeftButton)
 	{
 		m_bTrans=true;
 		if(m_pBody && m_BodyRect.contains(point))
@@ -3426,9 +3410,9 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 				m_bTrans = true;
 				m_pglWidget->setCursor(Qt::ClosedHandCursor);
 			}
-				UpdateView();
+			UpdateView();
 		}
-		if(m_pBody && m_BodyLineRect.contains(point))
+		else if(m_pBody && m_BodyLineRect.contains(point))
 		{
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
@@ -3468,7 +3452,6 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			}
 		}
 		if(m_bTrans && !bCtrl)	m_pglWidget->setCursor(Qt::ClosedHandCursor);
-
 	}
 	
 
@@ -3485,7 +3468,6 @@ void GL3dBodyDlg::mouseReleaseEvent(QMouseEvent *event)
 	QPoint point(event->pos().x(), event->pos().y());
 
 	m_pglWidget->setCursor(Qt::CrossCursor);
-
 
 	if(!m_bTrans)
 	{
@@ -3527,7 +3509,7 @@ void GL3dBodyDlg::mouseReleaseEvent(QMouseEvent *event)
 	m_bTrans = false;
 	m_bDragPoint  = false;
 
-	
+	m_bArcball    = false;
 	m_bCrossPoint = false;
 	UpdateView();
 

@@ -211,9 +211,9 @@ RESOURCES += qflr5.qrc
 FORMS += 
 unix { 
     # VARIABLES
-    isEmpty(PREFIX):PREFIX = /usr/local
-    BINDIR = $$PREFIX/bin
-    DATADIR = $$PREFIX/share
+    isEmpty(PREFIX):PREFIX = /home/windsoarer/Qt/rpmbuild
+    BINDIR = $$PREFIX/BUILDROOT/QFLR5-4.04-4.x86_64/usr/local/bin
+    DATADIR = $$PREFIX/BUILDROOT/DynaLay-4.04-4.x86_64/usr/local/share
     
     # MAKE INSTALL
     INSTALLS += target

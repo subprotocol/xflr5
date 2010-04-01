@@ -45,7 +45,7 @@ void UnitsDlg::SetupLayout()
 	QLabel *lab1 = new QLabel(tr("Length"));
 	QLabel *lab2 = new QLabel(tr("Area"));
 	QLabel *lab3 = new QLabel(tr("Speed"));
-	QLabel *lab4 = new QLabel(tr("Weight"));
+	QLabel *lab4 = new QLabel(tr("Mass"));
 	QLabel *lab5 = new QLabel(tr("Force"));
 	QLabel *lab6 = new QLabel(tr("Moment"));
 	UnitsLayout->addWidget(lab1, 1,1);

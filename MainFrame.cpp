@@ -73,7 +73,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_SpeedUnit   = 0;
 	m_ForceUnit   = 0;
 	m_MomentUnit  = 0;
-	
+	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
+				 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
+
 	CreateDockWindows();
 
 	m_ProjectName = "";
@@ -89,13 +91,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_RefGraph.SetGraphName("Reference Graph");
 
 	m_ImageFormat = 2;
-
-	m_mtoUnit   = 1.0;
-	m_m2toUnit  = 1.0;
-	m_kgtoUnit  = 1.0;
-	m_mstoUnit  = 1.0;
-	m_NtoUnit   = 1.0;
-	m_NmtoUnit  = 1.0;
 
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
@@ -688,7 +683,14 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(styleAct);
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
-	AFoilDesignMenu = menuBar()->addMenu(tr("Foil &Design"));
+	AFoilDesignMenu = menuBar()->addMenu(tr("F&oil"));
+	AFoilDesignMenu->addAction(AFoilRename);
+	AFoilDesignMenu->addAction(AFoilDelete);
+	AFoilDesignMenu->addAction(AFoilExport);
+	AFoilDesignMenu->addSeparator();
+	AFoilDesignMenu->addAction(HideAllFoils);
+	AFoilDesignMenu->addAction(ShowAllFoils);
+	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(AFoilNormalizeFoil);
 	AFoilDesignMenu->addAction(AFoilDerotateFoil);
 	AFoilDesignMenu->addAction(AFoilRefineLocalFoil);

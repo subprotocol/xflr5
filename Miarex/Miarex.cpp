@@ -11355,7 +11355,7 @@ void QMiarex::OnDefineCtrlPolar()
 			pCurWPolar->m_MaxControl[i]     = m_CtrlPolarDlg.m_MaxControl[i];
 		}
 
-		for(int i=m_CtrlPolarDlg.m_nControls; i<MAXCONTROLS; i++)
+		for(int i=m_CtrlPolarDlg.m_nControls; i<4*MAXCONTROLS; i++)
 		{
 			pCurWPolar->m_bActiveControl[i] = false;
 		}

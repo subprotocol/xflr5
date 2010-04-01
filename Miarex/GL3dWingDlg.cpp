@@ -115,8 +115,6 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
 	m_ArcBall.m_pRect    = &m_rCltRect;
 
-
-//	m_pSetupLight    = new QAction(tr("Light Setup"), this);
 	m_pResetScales   = new QAction(tr("Reset Scales"), this);
 	m_pInsertBefore  = new QAction(tr("Insert Before"), this);
 	m_pInsertAfter   = new QAction(tr("Insert after"), this);
@@ -126,8 +124,6 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_pContextMenu->addAction(m_pInsertBefore);
 	m_pContextMenu->addAction(m_pInsertAfter);
 	m_pContextMenu->addAction(m_pDeleteSection);
-//	m_pContextMenu->addAction(m_pResetScales);
-//	m_pContextMenu->addAction(m_pInertia);
 
 	SetupLayout();
 	Connect();
@@ -1605,16 +1601,13 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 				UpdateView();
 			}
 		}
-
 	}
-	else if ((event->buttons() & Qt::MidButton) && !bCtrl)
-	{
-		// we scale the wing
 
-		if(m_pWing && m_3DWingRect.contains(glPoint))
-		{	//zoom 3D Wing
-			if(point.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.04;
-			else                            m_glScaled /= (GLfloat)1.04;
+	else if (event->buttons() & Qt::MidButton)
+	{
+		if(m_pWing)
+		{		
+			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
 			UpdateView();
 		}
 	}
@@ -1639,31 +1632,42 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 	ClientToGL(point, Real);
 
 	if(m_3DWingRect.contains(glPoint)) m_pglWidget->setFocus();
-
-	if(m_bPickCenter)
-	{
-		Set3DRotationCenter(point);
-		m_bPickCenter = false;
-		m_pctrlPickCenter->setChecked(false);
-	}
-	else
-	{
-		m_bTrans=true;
-
-		if(m_pWing && m_3DWingRect.contains(glPoint))
-		{
-			m_ArcBall.Start(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
-			m_bCrossPoint = true;
-			Set3DRotationCenter();
-			if (!bCtrl)
-			{
-				m_bTrans = true;
-				m_pglWidget->setCursor(Qt::ClosedHandCursor);
-
-			}
-				UpdateView();
-		}
 	
+	if (event->buttons() & Qt::MidButton)
+	{
+		m_bArcball = true;
+		m_ArcBall.Start(event->pos().x(), m_pglWidget->m_rCltRect.height()-event->pos().y());
+		m_bCrossPoint = true;
+
+		Set3DRotationCenter();
+		UpdateView();
+	}
+	else if (event->buttons() & Qt::LeftButton)
+	{
+		if(m_bPickCenter)
+		{
+			Set3DRotationCenter(point);
+			m_bPickCenter = false;
+			m_pctrlPickCenter->setChecked(false);
+		}
+		else
+		{
+			m_bTrans=true;
+	
+			if(m_pWing && m_3DWingRect.contains(glPoint))
+			{
+				m_ArcBall.Start(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+				m_bCrossPoint = true;
+				Set3DRotationCenter();
+				if (!bCtrl)
+				{
+					m_bTrans = true;
+					m_pglWidget->setCursor(Qt::ClosedHandCursor);
+	
+				}
+					UpdateView();
+			}
+		}
 	}
 
 	m_bPickCenter = false;
@@ -1676,14 +1680,12 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 
 void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 {
-	QPoint point(event->pos().x(), event->pos().y());
-
 	m_pglWidget->setCursor(Qt::CrossCursor);
-
 	
 	m_bTrans = false;
 	m_bDragPoint  = false;
 
+	m_bArcball = false;
 	m_bCrossPoint = false;
 	UpdateView();
 
