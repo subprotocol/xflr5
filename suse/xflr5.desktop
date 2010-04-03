@@ -1,0 +1,12 @@
+[Desktop Entry]
+X-SuSE-translate=true
+Version=5.00
+Name=xflr5
+Exec=xflr5 %u
+GenericName=XFLR5 v5
+Terminal=false
+Type=Application
+Icon=xflr5.png
+Categories=Engineering
+StartupNotify=true
+Comment=XFLR5 is an analysis tool for airfoils, wings and planes operating at low Reynolds numbers
