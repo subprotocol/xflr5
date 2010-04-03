@@ -60,15 +60,18 @@ Compilation instructions
           go to the directory, type dpkg-buildpackage -rfakeroot.
 
         - To compile manually on any Linux distro, please follow the following steps:
-          1. qmake
-          2. make
-          3. sudo make install 
+	    1. Get the libqt4-devel (OpenSuse) or qt-devel (Fedora), and Mesa-devel packages
+	    2. cd into the xflr5-5.xx directory 
+	    3. type 
+               - qmake
+               - make
+               - sudo make install 
 
         - To compile on MacOSX, please follow the following steps:
-          1. qmake -makefile
-          2. qmake -spec macx-g++
-          3. make -j3
-          4. ./mac/makedist	
+	    1. qmake -makefile
+	    2. qmake -spec macx-g++
+	    3. make -j3
+	    4. ./mac/makedist	
 
 	- To compile on Windows, the easiest way is to download QtCreator from Trolltech.
 	  QtCreator comes with the MinGW compiler.
