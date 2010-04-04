@@ -1059,7 +1059,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 		
-		if(ProjectFormat==5) ar << 1018; // identifies the format of the file
+		if(ProjectFormat>=5) ar << 1018; // identifies the format of the file
 		else                 ar << 1016;
 					// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
 					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments

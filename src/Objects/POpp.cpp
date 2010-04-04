@@ -56,9 +56,6 @@ CPOpp::CPOpp()
 	memset(m_G,  0, sizeof(m_G));
 }
 
-CPOpp::~CPOpp()
-{
-}
 
 
 bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)

@@ -574,10 +574,12 @@ void MainFrame::CreateAFoilActions()
 	connect(ResetXScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetXScale()));
 
 	UndoAFoilAct= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
+	UndoAFoilAct->setShortcut(tr("Ctrl+Z"));
 	UndoAFoilAct->setStatusTip(tr("Cancels the last modifiction made to the splines"));
 	connect(UndoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnUndo()));
 
 	RedoAFoilAct= new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
+	RedoAFoilAct->setShortcut(tr("Ctrl+Y"));
 	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
 	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
 
@@ -4663,7 +4665,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 												m_LastDirName+"/"+FileName,
-												tr("QFLR5 v5.00 Project File (*.wpa);;XFLR5 v4.00 Project File (*.wpa)"),
+												tr("XFLR5 v5.00 Project File (*.wpa);;XFLR5 v4.00 Project File (*.wpa)"),
 												&Filter);
 		if(!PathName.length()) return false;//nothing more to do
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
@@ -4673,8 +4675,7 @@ bool MainFrame::SaveProject(QString PathName)
 	}
 
 	if(Filter=="XFLR5 v4.00 Project File (*.wpa)")      Format = 4;// readable by XFLR5 v4
-	else if(Filter=="QFLR5 v5.00 Project File (*.wpa)") Format = 5;// foil, wing and plane descriptions shall be saved
-	QString strong;
+	else if(Filter=="XFLR5 v5.00 Project File (*.wpa)") Format = 5;// foil, wing and plane descriptions shall be saved
 	QFile fp(PathName);
 
 	if (!fp.open(QIODevice::WriteOnly))
@@ -5152,7 +5153,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 	if (bIsStoring)
 	{
 		// storing code
-		ar << 100013;
+		if(ProjectFormat>=5) ar << 100013;
+		else                 ar << 100012;
 		// 100013 : Added CoG serialization
 		// 100012 : Added sideslip
 		// 100011 : Added Body serialization
@@ -5175,8 +5177,11 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
-		ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
-		ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
+		if(ProjectFormat>=5)
+		{
+			ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
+			ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
+		}
 		ar << (float)pMiarex->m_WngAnalysis.m_Density;
 		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
@@ -6459,7 +6464,8 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 	int i;
 	if(!pFoil)
 	{
-		ar << 100003;
+		if(ProjectFormat>=5) ar << 100003;
+		else                 ar << 100002;
 		//100003 : added foil comment
 		//100002 : means we are serializings opps in the new numbered format
 		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
@@ -6494,7 +6500,8 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 	}
 	else
 	{
-		ar << 100003;
+		if(ProjectFormat>=5) ar << 100003;
+		else                 ar << 100002;
 		//100003 : added foil comment
 		//100002 : means we are serializings opps in the new numbered format
 		//100001 : transferred NCrit, XTopTr, XBotTr to polar file

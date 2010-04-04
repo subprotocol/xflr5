@@ -44,18 +44,10 @@
 extern CFoil *g_pCurFoil;
 
 
-QAFoil::~QAFoil()
-{
-//	delete m_pctrlFoilTable;
-//	delete m_pFoilDelegate;
-//	delete m_pFoilModel;
-}
-
 
 QAFoil::QAFoil(QWidget *parent)
 	: QWidget(parent)
 {
-	m_hcArrow = QCursor(Qt::ArrowCursor);
 	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 
@@ -84,6 +76,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bXDown = m_bYDown = m_bZDown = false;
 
 	memset(&m_TmpPic,0, sizeof(Picture));
+	memset(m_UndoPic, 0, MAXPICTURESIZE * sizeof(Picture));
 
 	m_LERad   = 1.0;
 
@@ -794,7 +787,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 						m_pPF->m_Extrados.m_RearPoint.y = m_MousePos.y;
 						m_pPF->m_bModified = true;
 						pMainFrame->SetSaveState(false);
-						m_pPF->Update(true);
+						m_pPF->Update();
 					}
 					else if(m_pPF->m_Intrados.m_iSelect == -1)
 					{
@@ -803,7 +796,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 						m_pPF->m_Intrados.m_RearPoint.y = m_MousePos.y;
 						m_pPF->m_bModified = true;
 						pMainFrame->SetSaveState(false);
-						m_pPF->Update(false);
+						m_pPF->Update();
 					}
 				}
 				m_pPF->CompMidLine();
@@ -1013,13 +1006,13 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 				if (n>=0) 
 				{
 					m_pPF->m_Extrados.RemovePoint(n);
-					m_pPF->Update(true);
+					m_pPF->Update();
 				}
 				else 
 				{
 					int n=m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 					if (n>=0) m_pPF->m_Intrados.RemovePoint(n);
-					m_pPF->Update(false);
+					m_pPF->Update();
 				}
 			}
 			else if (event->modifiers() & Qt::ControlModifier) 
@@ -1030,12 +1023,12 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 				if(Real.y>=0) 
 				{
 					m_pPF->m_Extrados.InsertPoint(Real.x, Real.y);
-					m_pPF->Update(true);
+					m_pPF->Update();
 				}
 				else 
 				{
 					m_pPF->m_Intrados.InsertPoint(Real.x, Real.y);
-					m_pPF->Update(false);
+					m_pPF->Update();
 				}
 				
 			}
@@ -2019,8 +2012,35 @@ void QAFoil::OnHideCurrentFoil()
 void QAFoil::OnNewSplines()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_bSF) SFNew();
-	else      PFNew();
+	if(m_bSF) 
+	{
+		if(m_pSF->m_bModified)
+		{
+			if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
+														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			{
+				return;
+			}
+		}
+		m_pSF->InitSplineFoil();
+		TakePicture();
+		StorePicture();
+	}
+	else      
+	{
+		if(m_pPF->m_bModified)
+		{
+			if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
+														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			{
+				return;
+			}
+		}
+		m_pPF->InitSplinedFoil();
+		TakePicture();
+		StorePicture();
+	}
+	
 
 	m_StackPos  = 0;
 	m_StackSize = 0;
@@ -2065,9 +2085,6 @@ void QAFoil::OnRedo()
 	{
 		m_StackPos++;
 		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		pTB->EnableButton(IDT_UNDO, true);
-//		if(m_StackPos==m_StackSize-1) pTB->EnableButton(IDT_REDO, false);
 	}
 }
 
@@ -2258,6 +2275,10 @@ void QAFoil::OnSplineControls()
 void QAFoil::OnSplineType()
 {
 	m_bSF = m_pctrlSF->isChecked();
+	m_StackSize = 0;
+	m_StackPos = 0;
+	TakePicture();
+	StorePicture();
 	CheckFoilParams(NULL);
 	FillFoilTable();
 	UpdateView();
@@ -2278,9 +2299,6 @@ void QAFoil::OnUndo()
 		}
 		m_StackPos--;
 		SetPicture();
-//		CToolBarCtrl *pTB = &(m_pAFoilBar->GetToolBarCtrl());
-//		if(m_StackPos==0) pTB->EnableButton(IDT_UNDO, false);
-//		pTB->EnableButton(IDT_REDO, true);
 	}
 	else
 	{
@@ -2696,20 +2714,6 @@ void QAFoil::PaintFoils(QPainter &painter)
 }
 
 
-void QAFoil::PFNew()
-{
-	bool bLoadNew = true;
-	if(m_pPF->m_bModified)
-	{
-		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
-													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-		{
-			bLoadNew = false;
-		}
-	}
-	if(bLoadNew) m_pPF->InitSplinedFoil();
-}
-
 
 void QAFoil::ReleaseZoom()
 {
@@ -2823,16 +2827,15 @@ void QAFoil::SetScale(QRect CltRect)
 	SetScale();
 }
 
+
 void QAFoil::SetPicture()
 {
-	double gap;
+//	double gap;
 	int i;
-
 	if(m_bSF)
 	{
 		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
 		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
-
 		for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
 		{
 			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
@@ -2844,8 +2847,8 @@ void QAFoil::SetPicture()
 			m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_StackPos].yInt[i];
 		}
 
-		gap =   m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
-			  - m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y;
+//		gap =   m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
+//			  - m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y;
 
 		m_pSF->UpdateKnots();
 		m_pSF->Update(true);
@@ -2871,11 +2874,11 @@ void QAFoil::SetPicture()
 			m_pPF->m_Intrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xInt[i];
 			m_pPF->m_Intrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yInt[i];
 		}
-		gap =   m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y
-			  - m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y;
+//		gap =   m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y
+//			  - m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y;
 
-		m_pPF->Update(true);
-		m_pPF->Update(false);
+		m_pPF->Update();
+		m_pPF->Update();
 	}
 //	SetGap(gap);
 	UpdateView();
@@ -3069,19 +3072,6 @@ void QAFoil::SetParams()
 }
 
 
-void QAFoil::SFNew()
-{
-	bool bLoadNew = true;
-	if(m_pSF->m_bModified)
-	{
-		if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
-													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-		{
-			bLoadNew = false;
-		}
-	}
-	if(bLoadNew) m_pSF->InitSplineFoil();
-}
 
 
 

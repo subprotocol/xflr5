@@ -447,7 +447,7 @@ void InertiaDlg::OnExportToAVL()
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString FileName, strong;
-	double Mass, CoGIxx, CoGIyy, CoGIzz, CoGIxz;
+	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
 	CVector CoG;
 
 	if(m_pPlane)     FileName = m_pPlane->m_PlaneName;

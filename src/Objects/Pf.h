@@ -96,7 +96,7 @@ private:
 	void ExportToFile(QTextStream &out);
 	void SetOutPoints(bool state);
 	void SetViewRect(QRect rc);
-	void Update(bool bExtrados);
+	void Update();
 	void SetCurveParams(int style, int width, QColor color);
 
 	bool m_bModified;

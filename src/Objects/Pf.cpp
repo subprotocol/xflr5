@@ -280,7 +280,7 @@ bool CPF::Serialize(QDataStream &ar, bool bIsStoring)
 		if(k !=0 && k !=1) return false;
 		if(k) m_bCenterLine = true; else m_bCenterLine = false;
 
-		Update(true);
+		Update();
 		m_bModified = false;
 		return true;
 	}
@@ -313,7 +313,7 @@ void CPF::SetViewRect(QRect rc)
 
 
 
-void CPF::Update(bool bExtrados)
+void CPF::Update()
 {
 	m_Extrados.CompSlopes();
 	m_Intrados.CompSlopes();

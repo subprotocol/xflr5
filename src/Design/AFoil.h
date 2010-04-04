@@ -31,6 +31,7 @@
 #include <QRadioButton>
 #include <QSettings>
 
+#include "../Params.h"
 #include "FoilTableDelegate.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
@@ -72,7 +73,6 @@ class QAFoil : public QWidget
 
 public:
 	QAFoil(QWidget *parent = NULL);
-	virtual ~QAFoil();
 	void SetupLayout();
 	void InitDialog();
  
@@ -139,8 +139,6 @@ private:
 	void PaintView(QPainter &painter);
 	void SetScale();
 	void SetScale(QRect CltRect);
-	void PFNew();
-	void SFNew();
 	void ReleaseZoom();
 
 
@@ -228,12 +226,11 @@ private:
 	CFoil *m_pBufferFoil;
 
 
-	QCursor m_hcArrow;
 	QCursor m_hcMove;
 	QCursor m_hcCross;
 
 	Picture m_TmpPic;
-	Picture m_UndoPic[50];
+	Picture m_UndoPic[MAXPICTURESIZE];
 };
 
 #endif // QAFOIL_H

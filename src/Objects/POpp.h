@@ -19,9 +19,6 @@
 
 *****************************************************************************/
 
-// POpp.h: interface for the CPOpp class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #ifndef POPP_H
 #define POPP_H
@@ -38,7 +35,6 @@ class CPOpp
 
 public:
 	CPOpp();
-	virtual ~CPOpp();
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring);
 
 private:

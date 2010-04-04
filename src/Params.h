@@ -16,6 +16,7 @@
 #define VLMHALF          1000
 #define MAXCONTROLS        10 //max controls per wing section
 #define SPLINECONTROLSIZE  50 //maximum number of control points
+#define MAXPICTURESIZE     40 //maximum number of undo operations in direct design
 #define MAXBODYFRAMES      30
 #define MAXSIDELINES       20
 

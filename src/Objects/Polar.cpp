@@ -48,11 +48,6 @@ CPolar::CPolar()
 }
 
 
-CPolar::~CPolar()
-{
-}
-
-
 void CPolar::ExportPolar(QTextStream &out, int FileType)
 {
 	QString Header, strong;

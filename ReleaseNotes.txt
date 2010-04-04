@@ -15,8 +15,17 @@
 *******************************************************************************
 
 
-QFLR5 v0.05 Beta March xxxth, 2010
-	- Made a few corrections and enhancements
+XFLR5 v5.00 April xxxth, 2010
+	- changed the executable target name from QFLR5 to xflr5
+	- changed and reorganized drastically the file system
+	- changed the icon images from Q5 to X5
+	- changed the unix directory for translated files to /usr/share/translations
+	- added the spec file for the creation of rpm packages
+	- corrected the bugs linked to undo/redo of spline modifications in direct design
+	- corrected a bug linked to a potential incorrect type in WPolar Dlg
+	- correctd the option to save in v4.00 format
+	- made some code optimization for increased speed
+	- made other minor improvements and corrections
 
 
 QFLR5 v0.04 Beta December 27th 2009
