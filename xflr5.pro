@@ -216,9 +216,9 @@ win32 {
 unix { 
     TARGET = xflr5
     # VARIABLES
-    isEmpty(PREFIX):PREFIX = /home/windsoarer/Qt/rpmbuild
-    BINDIR = $$PREFIX/BUILDROOT/xflr5-5.00-5.x86_64/usr/bin
-    DATADIR = $$PREFIX/BUILDROOT/xflr5-5.00-5.x86_64/usr/share
+    isEmpty(PREFIX):PREFIX = /usr/local
+    BINDIR = $$PREFIX/bin
+    DATADIR = $$PREFIX/share
     
     # MAKE INSTALL
     INSTALLS += target
