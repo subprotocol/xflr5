@@ -130,16 +130,16 @@ void WPolarDlg::EnableControls()
 		case 2:
 		{
 			m_pctrlQInf->setEnabled(false);
-			m_pctrlRRe->setText(" ");
-			m_pctrlSRe->setText(" ");
+			m_pctrlReRoot->setText(" ");
+			m_pctrlReTip->setText(" ");
 			m_pctrlAlpha->setEnabled(false);
 			break;
 		}
 		case 4:
 		{
 			m_pctrlQInf->setEnabled(false);
-			m_pctrlRRe->setText(" ");
-			m_pctrlSRe->setText(" ");
+			m_pctrlReRoot->setText(" ");
+			m_pctrlReTip->setText(" ");
 			m_pctrlAlpha->setEnabled(true);
 			break;
 		}
@@ -221,8 +221,6 @@ void WPolarDlg::InitDialog()
 
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 	m_pctrlSpeedUnit->setText(str);
-
-	SetWingLoad();
 
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
 	m_pctrlLengthUnit1->setText(str);
@@ -687,24 +685,19 @@ void WPolarDlg::SetupLayout()
 	PlaneGroup->setLayout(PlaneLayout);
 
 	QVBoxLayout *FlightLayout = new QVBoxLayout;
-	m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
-	m_pctrlSRe       = new QLabel(tr("SRe"));
-	m_pctrlRRe       = new QLabel(tr("RRe"));
-	m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
-	m_pctrlReRoot    = new QLabel(tr("Re at Root = 100 000"));
-	m_pctrlReTip     = new QLabel(tr("Re at Tip = 70 000"));
+	m_pctrlWingLoad  = new QLabel("Wing Loading =");
+	m_pctrlReTip     = new QLabel("Tip Reynolds =");
+	m_pctrlReRoot    = new QLabel("Root Reynolds =");
+	m_pctrlQInfCl    = new QLabel("QInfCl =");
 	m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlReTip->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlReRoot->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	FlightLayout->addWidget(m_pctrlWingLoad);
-	FlightLayout->addWidget(m_pctrlSRe);
-	FlightLayout->addWidget(m_pctrlRRe);
-	FlightLayout->addWidget(m_pctrlQInfCl);
 	FlightLayout->addWidget(m_pctrlReRoot);
 	FlightLayout->addWidget(m_pctrlReTip);
+	FlightLayout->addWidget(m_pctrlQInfCl);
+	FlightLayout->addStretch(1);
 	QGroupBox *FlightGroup = new  QGroupBox(tr("Flight Characteristics"));
 	FlightGroup->setLayout(FlightLayout);
 
@@ -898,12 +891,12 @@ void WPolarDlg::SetReynolds()
 		double RRe = m_pWing->m_TChord[0] * m_QInf/m_Viscosity;
 		ReynoldsFormat(str, RRe);
 		strange = tr("Root Re =");
-		m_pctrlRRe->setText(strange+str);
+		m_pctrlReRoot->setText(strange+str);
 
 		double SRe = m_pWing->m_TChord[m_pWing->m_NPanel] * m_QInf/m_Viscosity;
 		ReynoldsFormat(str, SRe);
 		strange = tr("Tip Re =");
-		m_pctrlSRe->setText(strange+str);
+		m_pctrlReTip->setText(strange+str);
 
 		m_pctrlQInfCl->setText(" ");
 	}
@@ -921,18 +914,16 @@ void WPolarDlg::SetReynolds()
 		double RRe = m_pWing->m_TChord[0] * QCl/m_Viscosity;
 		ReynoldsFormat(str, RRe);
 		strange = tr("Root Re.sqrt(Cl) =");
-		m_pctrlRRe->setText(strange+str);
+		m_pctrlReRoot->setText(strange+str);
 
 		double SRe = m_pWing->m_TChord[m_pWing->m_NPanel] * QCl/m_Viscosity;
 		ReynoldsFormat(str, SRe);
 		strange = tr("Tip Re.sqrt(Cl) =");
-		m_pctrlSRe->setText(strange+str);
+		m_pctrlReTip->setText(strange+str);
 	}
 	else if (m_Type ==4)
 	{
 		m_pctrlQInfCl->setText(" ");
-		m_pctrlRRe->setText(" ");
-		m_pctrlSRe->setText(" ");
 		m_pctrlReRoot->setText(" ");
 		m_pctrlReTip->setText(" ");
 	}
@@ -954,7 +945,7 @@ void WPolarDlg::SetWingLoad()
 
 	GetWeightUnit(str1, pMainFrame->m_WeightUnit);
 	GetAreaUnit(str2, pMainFrame->m_AreaUnit);
-	m_pctrlWingLoad->setText(tr("Wing Loading = ")+str+str1+"/"+str2);
+	m_pctrlWingLoad->setText(tr("Wing Loading = ")+str+str1+"/ "+str2);
 }
 
 

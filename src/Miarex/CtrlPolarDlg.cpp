@@ -560,7 +560,7 @@ void CtrlPolarDlg::SetupLayout()
 
 	QGridLayout *PlaneLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel(tr("Free Stream Speed"));
-	QLabel *lab2 = new QLabel(tr("Plane Weight"));
+	QLabel *lab2 = new QLabel(tr("Plane Mass"));
 	m_pctrlQInf    = new FloatEdit(10.05);
 	m_pctrlWeight  = new FloatEdit(1.234);
 	m_pctrlSpeedUnit   = new QLabel("m/s");

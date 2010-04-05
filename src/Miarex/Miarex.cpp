@@ -1568,7 +1568,7 @@ void QMiarex::CheckButtons()
 	m_pctrlMoment->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
 	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
-	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
+	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1 && m_pCurWPolar->m_AnalysisType==3);
 	m_pctrlHighlightOpp->setEnabled(m_iView==WPOLARVIEW);
 
 	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
@@ -7957,22 +7957,22 @@ void QMiarex::GLCreateWingLegend()
 
 			ZPos +=dD;
 
-			str1 = QString(tr("Wing Span      = %1 ")).arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit, 8,'f',3);
+			str1 = QString(tr("Wing Span =      %1 ")).arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit, 8,'f',3);
 			strong = str1 + length;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(tr("XYProj. Span   = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
+			str1 = QString(tr("XYProj. Span =   %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
 			str1 += length;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(tr("Wing Area      = %1 ")).arg(m_pCurWing->m_PlanformArea * pMainFrame->m_m2toUnit, 8,'f',3);
+			str1 = QString(tr("Wing Area =      %1 ")).arg(m_pCurWing->m_PlanformArea * pMainFrame->m_m2toUnit, 8,'f',3);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(tr("XYProj. Area   = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
+			str1 = QString(tr("XYProj. Area =   %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
 			strong = str1+surface;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
@@ -7980,13 +7980,13 @@ void QMiarex::GLCreateWingLegend()
 			if(m_pCurWPolar)
 			{
 				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				str1 = QString(tr("Plane Weight   = %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit,7,'f',2);
+				str1 = QString(tr("Plane Mass =     %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit,8,'f',3);
 				Result = str1 + str;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 				ZPos +=dD;
 				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				str1 = QString(tr("Wing Load      = %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit/m_pCurWPolar->m_WArea/pMainFrame->m_m2toUnit, 8,'f',3);
+				str1 = QString(tr("Wing Load =      %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit/m_pCurWPolar->m_WArea/pMainFrame->m_m2toUnit, 8,'f',3);
 				Result = str1 + str+"/" + strong;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
@@ -7994,32 +7994,32 @@ void QMiarex::GLCreateWingLegend()
 
 			if(m_pCurPlane && m_pCurStab)
 			{
-				Result = QString(tr("Tail Volume    = %1")).arg(m_pCurPlane->m_TailVolume,7,'f',2);
+				Result = QString(tr("Tail Volume =    %1")).arg(m_pCurPlane->m_TailVolume,8,'f',3);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
 			}
 
-			Result = QString(tr("Root Chord     = %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(tr("Root Chord =     %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit,8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("M.A.C.         = %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(tr("M.A.C. =         %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Tip Twist      = %1")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
+			Result = QString(tr("Tip Twist =      %1 ")+QString::fromUtf8("°")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Aspect Ratio   = %1")).arg(m_pCurWing->m_AR,7,'f',2);
+			Result = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Taper Ratio    = %1")).arg(m_pCurWing->m_TR,7,'f',2);
+			Result = QString(tr("Taper Ratio =    %1")).arg(m_pCurWing->m_TR,8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(tr("Root-Tip Sweep = %1")).arg(m_pCurWing->GetAverageSweep(),7,'f',2);
+			Result = QString(tr("Root-Tip Sweep = %1 ")+QString::fromUtf8("°")).arg(m_pCurWing->GetAverageSweep(),8,'f',3);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 		}
 
@@ -8032,6 +8032,7 @@ void QMiarex::GLCreateWingLegend()
 		glEnable(GL_LIGHT0);
 	}
 }
+
 
 void QMiarex::GLCreateWOppLegend()
 {
@@ -14374,22 +14375,22 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 	GetLengthUnit(length, pMainFrame->m_LengthUnit);
 	GetAreaUnit(surface,  pMainFrame->m_AreaUnit);
 
-	str1 = QString(tr("Wing Span =   %1 ")).arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,12,'f',3);
+	str1 = QString(tr("Wing Span =      %1 ")).arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,8,'f',3);
 	str1 += length;
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("xyProj. Span = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,11,'f',3);
+	str1 = QString(tr("xyProj. Span =   %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
 	str1 += length;
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Wing Area =  %1 ")).arg(m_pCurWing->m_PlanformArea * pMainFrame->m_m2toUnit,13,'f',3);
+	str1 = QString(tr("Wing Area =      %1 ")).arg(m_pCurWing->m_PlanformArea * pMainFrame->m_m2toUnit,8,'f',3);
 	str1 += surface;
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("xyProj. Area = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,11,'f',3);
+	str1 = QString(tr("xyProj. Area =   %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
 	str1 += surface;
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D+=dheight;
@@ -14397,13 +14398,13 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 	if(m_pCurWPolar)
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		Result = QString(tr("Plane Weight =  %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
+		Result = QString(tr("Plane Mass =     %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit,8,'f',3);
 		Result += str;
 		painter.drawText(LeftPos, ZPos+D, Result);
 		D+=dheight;
 
 		GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-		Result = QString(tr("Wing Load =  %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit/m_pCurWPolar->m_WArea/pMainFrame->m_m2toUnit,13,'f',3);
+		Result = QString(tr("Wing Load =      %1 ")).arg(m_pCurWPolar->m_Weight*pMainFrame->m_kgtoUnit/m_pCurWPolar->m_WArea/pMainFrame->m_m2toUnit,8,'f',3);
 		Result += str + "/" + strong;
 		painter.drawText(LeftPos, ZPos+D, Result);
 		D+=dheight;
@@ -14411,34 +14412,34 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 
 	if(m_pCurPlane && m_pCurStab)
 	{
-		str1 = QString(tr("Tail Volume =      %1")).arg(m_pCurPlane->m_TailVolume,7,'f',3);
+		str1 = QString(tr("Tail Volume =    %1")).arg(m_pCurPlane->m_TailVolume,8,'f',3);
 		painter.drawText(LeftPos, ZPos+D, str1);
 		D+=dheight;
 	}
 
-	str1 = QString(tr("Root Chord =   %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 11,'f', 3);
+	str1 = QString(tr("Root Chord =     %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit, 8,'f', 3);
 	Result = str1+length;
 	painter.drawText(LeftPos, ZPos+D, Result);
 	D+=dheight;
 
-	str1 = QString(tr("MAC =          %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 11,'f', 3);
+	str1 = QString(tr("MAC =            %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit, 8,'f', 3);
 	Result = str1+length;
 	painter.drawText(LeftPos, ZPos+D, Result);
 	D+=dheight;
 
-	str1 = QString(tr("TipTwist =   %1 deg")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 13,'f', 3);
+	str1 = QString(tr("Tip Twist =      %1 ")+QString::fromUtf8("°")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel], 8,'f', 3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,9,'f',3);
+	str1 = QString(tr("Aspect Ratio =   %1")).arg(m_pCurWing->m_AR,8,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Taper Ratio =   %1")).arg(m_pCurWing->m_TR,10,'f',3);
+	str1 = QString(tr("Taper Ratio =    %1")).arg(m_pCurWing->m_TR,8,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 	D+=dheight;
 
-	str1 = QString(tr("Root-Tip Sweep = %1 deg")).arg(m_pCurWing->GetAverageSweep(), 9,'f',3);
+	str1 = QString(tr("Root-Tip Sweep = %1 ")+QString::fromUtf8("°")).arg(m_pCurWing->GetAverageSweep(), 8,'f',3);
 	painter.drawText(LeftPos, ZPos+D, str1);
 
 	painter.restore();

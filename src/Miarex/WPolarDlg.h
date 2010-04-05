@@ -126,11 +126,10 @@ private:
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 
-	QLabel *m_pctrlSRe;
-	QLabel *m_pctrlRRe;
-	QLabel *m_pctrlQInfCl;
-	QLabel *m_pctrlReTip;
 	QLabel *m_pctrlReRoot;
+	QLabel *m_pctrlReTip;
+
+	QLabel *m_pctrlQInfCl;
 	QLabel *m_pctrlWingName;
 	QLabel *m_pctrlWingLoad;
 	QLabel *m_pctrlSpeedUnit;
