@@ -1,16 +1,16 @@
 # This is a spec file for the installation of XFLR5 v5
 %define name xflr5
-%define release 5
+%define release 1
 %define version 5.00
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-build
+BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
 License: GPL
 Name: %{name}
 Version: %{version}
 Release: %{release}
 Source: %{name}-%{version}.tar.gz
-Packager: Windsoarer
+Packager: x-andre
 Group: Applications/Engineering
 %if 0%{?fedora_version}  
 BuildRequires: qt-devel >= 4.4.3 gcc-c++  , Mesa-devel
@@ -30,7 +30,8 @@ XFLR5 v5 is a re-write of XFLR5 v4 using Qt4 libraries instead of Microsoft's MF
 #%{_docdir}      = /usr/share/doc/packages
 #%{_datadir}     = /usr/share
 #%{_bindir}      = /usr/bin
-#%{buildroot}    = /home/windsoarer/Qt/rpmbuild/BUILDROOT/xflr5-5.00-5.x86_64
+#%{_tmppath}    = /home/windsoarer/Qt/rpmbuild/tmp
+#%{buildroot}    = /home/windsoarer/Qt/rpmbuild/BUILDROOT/xflr5-5.00-1.x86_64
 
 %setup -q
 
@@ -45,23 +46,23 @@ qmake 'target.path = %{buildroot}%{_bindir}'
 
 make 
 
+echo $RPM_BUILD_ROOT 
+ 
 %install
-%__mkdir -p %{buildroot}/%{_bindir} %{buildroot}/usr/share/{%{name}/translations,applications,pixmaps} %{buildroot}/%{_docdir}/%{name}  
-make install DESTDIR=$RPM_BUILD_ROOT $INSTALL_TARGET  
+%__mkdir -p %{buildroot}%{_bindir} 
+%__mkdir -p %{buildroot}/usr/share/%{name}/translations 
+%__mkdir -p %{buildroot}/usr/share/applications
+%__mkdir -p %{buildroot}/usr/share/pixmaps 
+%__mkdir -p %{buildroot}%{_docdir}/%{name}  
+make install DESTDIR=$RPM_BUILD_ROOT $INSTALL_TARGET 
+#make install  DESTDIR=%{buildroot}%{_bindir} $INSTALL_TARGET
 %__install -m 644 images/%{name}.png %{buildroot}%{_datadir}/pixmaps/%{name}.png  
 %__install -m 644 suse/%{name}.desktop %{buildroot}%{_datadir}/applications  
-%__install -m 644  translations/*.qm   %{buildroot}/usr/share/%{name}/translations 
-
-
-%clean
-%{__rm} -rf $RPM_BUILD_ROOT  
+%__install -m 644 translations/*.qm   %{buildroot}/usr/share/%{name}/translations 
 
 
 %files
 %defattr(-,root,root)
-%doc License.txt
-%{_bindir}/%{name} 
-
   
 #%if 0%{suse_version} > 1110 || 0%{fedora_version} || 0%{mandriva_version}  
 %{_datadir}/applications/%{name}.desktop  
@@ -70,6 +71,14 @@ make install DESTDIR=$RPM_BUILD_ROOT $INSTALL_TARGET
 %{_datadir}/pixmaps/%{name}.png  
 %{_datadir}/%{name}  
 %docdir %{buildroot}/usr/share/%{name}/translations
+
+%doc License.txt
+%{_bindir}/%{name} 
+
+%clean
+%{__rm} -rf $RPM_BUILD_ROOT 
+
+echo %{_bindir}/%{name} 
 
 
 %changelog

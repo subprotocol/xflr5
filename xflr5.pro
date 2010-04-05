@@ -216,13 +216,13 @@ win32 {
 unix { 
     TARGET = xflr5
     # VARIABLES
-    isEmpty(PREFIX):PREFIX = /usr/local
+    isEmpty(PREFIX):PREFIX = /usr
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
     
     # MAKE INSTALL
     INSTALLS += target
-    target.path = $$BINDIR
+#    target.path = $$BINDIR
 }
 mac { 
     TARGET = XFLR5
