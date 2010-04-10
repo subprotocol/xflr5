@@ -6203,8 +6203,8 @@ A reduction of the number of wing panels is required</source>
     <name>QMiarex</name>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="270"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17427"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17532"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17428"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17533"/>
         <source>Cd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6212,8 +6212,8 @@ A reduction of the number of wing panels is required</source>
         <location filename="../src/Miarex/Miarex.cpp" line="271"/>
         <location filename="../src/Miarex/Miarex.cpp" line="282"/>
         <location filename="../src/Miarex/Miarex.cpp" line="3980"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17418"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17523"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17419"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17524"/>
         <source>Cl</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6221,17 +6221,17 @@ A reduction of the number of wing panels is required</source>
         <location filename="../src/Miarex/Miarex.cpp" line="281"/>
         <location filename="../src/Miarex/Miarex.cpp" line="292"/>
         <location filename="../src/Miarex/Miarex.cpp" line="303"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17415"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17513"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17520"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17618"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17416"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17514"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17521"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17619"/>
         <source>Alpha</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="304"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17451"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17556"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17452"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17557"/>
         <source>Cl/Cd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6243,27 +6243,27 @@ A reduction of the number of wing panels is required</source>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="315"/>
         <location filename="../src/Miarex/Miarex.cpp" line="5930"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="16737"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16738"/>
         <source>Cp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="1119"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="9075"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10820"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10825"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10864"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10871"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10883"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10890"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10904"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12961"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12983"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="16293"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17643"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17653"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17658"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17675"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="9076"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10821"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10826"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10865"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10872"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10884"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10891"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10905"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12962"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12984"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16294"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17644"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17654"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17659"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17676"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6337,8 +6337,8 @@ Continue ?</source>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="293"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17430"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17535"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17431"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17536"/>
         <source>Cm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6368,338 +6368,338 @@ Continue ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8065"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14490"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8066"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14491"/>
         <source>Point is out of the flight envelope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8071"/>
         <location filename="../src/Miarex/Miarex.cpp" line="8072"/>
         <location filename="../src/Miarex/Miarex.cpp" line="8073"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14476"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8074"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14477"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14478"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14479"/>
         <source>QInf = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8078"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14484"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8079"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14485"/>
         <source>Alpha = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8082"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8083"/>
         <source>CL = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8086"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8087"/>
         <source>CD = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8091"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14506"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8092"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14507"/>
         <source>Efficiency = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8095"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14510"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8096"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14511"/>
         <source>Cl/Cd = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8099"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14514"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8100"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14515"/>
         <source>GCm = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8103"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8104"/>
         <source>Rolling Moment = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8107"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8108"/>
         <source>Induced Moment = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8111"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8112"/>
         <source>Airfoil Yawing Moment = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8117"/>
         <location filename="../src/Miarex/Miarex.cpp" line="8118"/>
         <location filename="../src/Miarex/Miarex.cpp" line="8119"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14534"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8120"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14535"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14536"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14537"/>
         <source>XCP = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8126"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="8127"/>
         <source>Flap Moment[%1] = %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="9034"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="9035"/>
         <source>Creating Elements... please Wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="9073"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="9074"/>
         <source>The total number of panels is %1
  The Max Number is %2
 A reduction of the number of panels is required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10820"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10821"/>
         <source>Please define a wing or a plane object before running a calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10825"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10826"/>
         <source>Please define an analysis/polar before running a calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10863"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10870"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10864"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10871"/>
         <source>Could not find the wing&apos;s foil </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10863"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10870"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10882"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10889"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10903"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10864"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10871"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10883"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10890"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10904"/>
         <source>...
 Aborting Calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10882"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="10889"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10883"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10890"/>
         <source>Could not find the elevator&apos;s foil </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="10903"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="10904"/>
         <source>Could not find the fin&apos;s foil </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11616"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11617"/>
         <source>Are you sure you want to delete the plane :
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11617"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11618"/>
         <source>Are you sure you want to delete the wing :
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11618"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="11762"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="11804"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="13550"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="15877"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11619"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11763"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11805"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="13551"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15878"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11803"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11804"/>
         <source>Are you sure you want to delete the polar :
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11945"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11946"/>
         <source>The modification will erase all results for the planes using this body.
 Continue ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12085"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12086"/>
         <source>The modification will erase all results associated to this Wing.
 Continue ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12190"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12191"/>
         <source>Export Wing OpPoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12192"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12482"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12193"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12483"/>
         <source>Text File (*.txt);;Comma Separated Values (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12219"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12220"/>
         <source>QInf  =</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12224"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12225"/>
         <source>Alpha = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12227"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12228"/>
         <source>Cl    = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12230"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12231"/>
         <source>Cy    = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12233"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12234"/>
         <source>Cd    = %1     ICd   = %2     PCd   = %3
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12237"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12238"/>
         <source>Cd=,%1,ICd=, %2,PCd=, %3
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12243"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12244"/>
         <source>GCm   =</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12246"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12247"/>
         <source>GRm   = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12250"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12251"/>
         <source>IYm=, %1,PYm=, %2
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12257"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12258"/>
         <source>Bend. =</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12260"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12261"/>
         <source>Main Wing Data
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12263"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12276"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12290"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12304"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12264"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12277"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12291"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12305"/>
         <source>Flap </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12263"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12264"/>
         <source> moment = </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12480"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12481"/>
         <source>Export Polar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12950"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12951"/>
         <source>Open File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12952"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12953"/>
         <source>UFO Polar Format (*.*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12960"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12961"/>
         <source>Could not read the file
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12980"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12981"/>
         <source>No UFO with the name </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12981"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12982"/>
         <source>
 could be found. The polar(s) will not be stored</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="13379"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="13380"/>
         <source>Enter the new name for the wing polar :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="13549"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="13550"/>
         <source>Are you sure you want to reset the content of the polar :
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14327"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14362"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14461"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14328"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14363"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14462"/>
         <source>abcdefghijklmnopqrstuvwxyz012345678</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16741"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16742"/>
         <source>Highlight OpPoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17433"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17538"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17434"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17539"/>
         <source>VCm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17436"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17541"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17437"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17542"/>
         <source>ICm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17439"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17544"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17440"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17545"/>
         <source>Rm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17442"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17547"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17443"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17548"/>
         <source>Ym</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="8014"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14433"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14434"/>
         <source>Aspect Ratio =   %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6754,134 +6754,134 @@ could be found. The polar(s) will not be stored</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11760"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11761"/>
         <source>Are you sure you want to delete the plane&apos;s polars?
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="11761"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11762"/>
         <source>Are you sure you want to delete the wing&apos;s polars?
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12249"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12250"/>
         <source>IYm   = %1     PYm   = %2
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12253"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12254"/>
         <source>XCP   = %1     YCP   = %2
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12254"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12255"/>
         <source>XCP=, %1, YCP=, %2
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12273"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12274"/>
         <source>Secondary Wing Data
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12287"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12288"/>
         <source>Elevator Data
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12301"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12302"/>
         <source>Fin Data
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12315"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12316"/>
         <source>Main Wing Cp Coefficients
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12316"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12317"/>
         <source>Wing Cp Coefficients
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12321"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12322"/>
         <source> Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12322"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12323"/>
         <source>Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12327"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12328"/>
         <source> Panel     CollPt.x        CollPt.y        CollPt.z             Cp
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12328"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12329"/>
         <source>Panel,CollPt.x,CollPt.y,CollPt.z,Cp
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12343"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12375"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12408"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="12440"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12344"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12376"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12409"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12441"/>
         <source>Strip %1
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12365"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12366"/>
         <source>Wing2 Cp Coefficients
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12398"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12399"/>
         <source>Elevator Cp Coefficients
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12430"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12431"/>
         <source>Fin Cp Coefficients
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12515"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12516"/>
         <source>Export UFO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12517"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12518"/>
         <source>AVL Text File (*.avl)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="12533"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="12534"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7960"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14377"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14378"/>
         <source>Wing Span =      %1 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6892,7 +6892,7 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7970"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14387"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14388"/>
         <source>Wing Area =      %1 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6903,25 +6903,25 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7983"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14400"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14401"/>
         <source>Plane Mass =     %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7989"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14406"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14407"/>
         <source>Wing Load =      %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7997"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14414"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14415"/>
         <source>Tail Volume =    %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="8002"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14419"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14420"/>
         <source>Root Chord =     %1 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6932,512 +6932,507 @@ could be found. The polar(s) will not be stored</source>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="8010"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14429"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14430"/>
         <source>Tip Twist =      %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="8018"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14437"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14438"/>
         <source>Taper Ratio =    %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="8022"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14441"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14442"/>
         <source>Root-Tip Sweep = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14382"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14383"/>
         <source>xyProj. Span =   %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14392"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14393"/>
         <source>xyProj. Area =   %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14424"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14425"/>
         <source>MAC =            %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14467"/>
-        <source>abcdefghijklmnopqrstuvwxyz01234567</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14479"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14480"/>
         <source>No unit defined for speed...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14495"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14496"/>
         <source>Lift Coef. = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14500"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14501"/>
         <source>Drag Coef. = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14519"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14520"/>
         <source>Rolling Moment Coef. = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14524"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14525"/>
         <source>Induced Moment Coef = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14528"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14529"/>
         <source>Profile Yawing Moment = %1 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14543"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14544"/>
         <source>Flap %1 Moment =%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14800"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14801"/>
         <source>Top transition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14828"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14829"/>
         <source>Bottom transition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14886"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14887"/>
         <source>Centre of Pressure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14918"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14919"/>
         <source>Moment ref. location</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15033"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15034"/>
         <source>_Wing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15034"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15035"/>
         <source>_Wing2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15035"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15036"/>
         <source>_Elev</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15036"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15037"/>
         <source>_Fin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15802"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15803"/>
         <source>Enter the new name for the Body :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15876"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15877"/>
         <source>The body </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15876"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15877"/>
         <source> is used by one or more planes.
  Overwrite anyway ? (Results will be lost)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="15956"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="15957"/>
         <source>Enter the new name for the Plane :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16178"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16179"/>
         <source>Enter the new name for the wing :</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16293"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16294"/>
         <source>Cannot overwrite current plane</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16676"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16677"/>
         <source>Sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16678"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16679"/>
         <source>Start=</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16679"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16680"/>
         <source>End=</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16680"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16681"/>
         <source>D=</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16709"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16710"/>
         <source>Init LLT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16710"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16711"/>
         <source>Store OpPoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16711"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16712"/>
         <source>Analyze</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16725"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16726"/>
         <source>Analysis settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16730"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16731"/>
         <source>1/2 wing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16731"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16732"/>
         <source>Lift</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16732"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16733"/>
         <source>Ind. Drag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16733"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16734"/>
         <source>Visc. Drag</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16734"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16735"/>
         <source>Trans.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16735"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16736"/>
         <source>Moment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16736"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16737"/>
         <source>Downw.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16738"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16739"/>
         <source>Surf. Vel.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16739"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16740"/>
         <source>Stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16740"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16741"/>
         <source>Animate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16779"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16780"/>
         <source>Display</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16786"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16787"/>
         <source>Curve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16787"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16788"/>
         <source>Points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16793"/>
         <location filename="../src/Miarex/Miarex.cpp" line="16794"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16795"/>
         <source>item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16806"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16807"/>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16807"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16808"/>
         <source>Width</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16808"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16809"/>
         <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16823"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16824"/>
         <source>Curve settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16835"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16836"/>
         <source>Span Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16840"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16841"/>
         <source>Keep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16841"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="16891"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16842"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16892"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16848"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16849"/>
         <source>Cp Sections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16854"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16855"/>
         <source>Axes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16855"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16856"/>
         <source>Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16856"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16857"/>
         <source>Surfaces</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16857"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16858"/>
         <source>Outline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16858"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16859"/>
         <source>Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16859"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16860"/>
         <source>Foil Names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16860"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16861"/>
         <source>Vortices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16890"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16891"/>
         <source>Pick Center</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="16906"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="16907"/>
         <source>Clip:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17421"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17526"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17422"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17527"/>
         <source>VCd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17424"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17529"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17425"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17530"/>
         <source>ICd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17445"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17550"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17446"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17551"/>
         <source>VYm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17448"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17553"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17449"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17554"/>
         <source>IYm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17454"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17559"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17455"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17560"/>
         <source>Cl^(3/2)/Cd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17457"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17562"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17458"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17563"/>
         <source>1/Rt(Cl)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17460"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17565"/>
-        <source>Lift (N)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="17461"/>
         <location filename="../src/Miarex/Miarex.cpp" line="17566"/>
-        <source>Lift (lbf)</source>
+        <source>Lift (N)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17464"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17569"/>
-        <source>Drag (N)</source>
+        <location filename="../src/Miarex/Miarex.cpp" line="17462"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17567"/>
+        <source>Lift (lbf)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="17465"/>
         <location filename="../src/Miarex/Miarex.cpp" line="17570"/>
+        <source>Drag (N)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="17466"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17571"/>
         <source>Drag (lbf)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17468"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17573"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17469"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17574"/>
         <source>Vx </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17471"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17576"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17472"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17577"/>
         <source>Vz </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17474"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17579"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17475"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17580"/>
         <source>V </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17477"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17582"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17478"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17583"/>
         <source>Gamma</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17480"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17585"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17481"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17586"/>
         <source>PM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17483"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17588"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17484"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17589"/>
         <source>RM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17486"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17591"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17487"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17592"/>
         <source>YM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17489"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17594"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17490"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17595"/>
         <source>XCP </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17492"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17597"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17493"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17598"/>
         <source>YCP </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17495"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17600"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17496"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17601"/>
         <source>BM </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17498"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17603"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17499"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17604"/>
         <source>m.g.Vz (W)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17501"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17606"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17502"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17607"/>
         <source>Efficiency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17504"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17609"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17505"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17610"/>
         <source>(XCp-XCG)/MAC(%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17507"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17612"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17508"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17613"/>
         <source>ctrl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17510"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="17615"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17511"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17616"/>
         <source>CY</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17643"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17644"/>
         <source>OpenGL color format is not recognized... Sorry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17653"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17654"/>
         <source>Cannot (yet ?) save 8 bit depth opengl screen images... Sorry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17658"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17659"/>
         <source>Cannot (yet ?) save 16 bit depth opengl screen images... Sorry</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="17675"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="17676"/>
         <source>Unidentified bit depth... Sorry</source>
         <translation type="unfinished"></translation>
     </message>

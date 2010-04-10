@@ -26,7 +26,7 @@
 
 AboutQ5::AboutQ5(void *parent)
 {
-	setWindowTitle(tr("About QFLR5"));
+	setWindowTitle(tr("About XFLR5"));
 
 	m_pMainFrame = parent;
 

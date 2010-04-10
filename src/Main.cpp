@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 
 
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 	bool bMaximized = true;
 	bool bOK;

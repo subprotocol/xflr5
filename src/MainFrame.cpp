@@ -110,9 +110,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	if(LoadSettings())
 	{
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 
 		m_RefGraph.LoadSettings(&settings);
@@ -530,7 +530,7 @@ void MainFrame::CreateActions()
 	connect(guidelinesAct, SIGNAL(triggered()), this, SLOT(OnGuidelines()));
 
 	aboutAct = new QAction(tr("&About"), this);
-	aboutAct->setStatusTip(tr("QFLR5"));
+	aboutAct->setStatusTip("XFLR5");
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
 
@@ -3010,9 +3010,9 @@ bool MainFrame::LoadSettings()
 
 
 #ifdef Q_WS_MAC
-		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 
 	settings.beginGroup("MainFrame");
@@ -3335,22 +3335,27 @@ void MainFrame::OnGuidelines()
 
 #ifdef Q_WS_MAC
 
-     CFURLRef appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-     CFStringRef macPath = CFURLCopyFileSystemPath(appUrlRef,
-                                            kCFURLPOSIXPathStyle);
+	CFURLRef appUrlRef = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFStringRef macPath = CFURLCopyFileSystemPath(appUrlRef,
+										kCFURLPOSIXPathStyle);
+	
+	QString bundlePath(CFStringGetCStringPtr(macPath,
+										CFStringGetSystemEncoding()));
+	QFileInfo fileInfo(bundlePath);
+	QDir dir = fileInfo.dir();
+	QString FileName = dir.absoluteFilePath("Guidelines.pdf");
+	CFRelease(appUrlRef);
+	CFRelease(macPath);
 
-     QString bundlePath(CFStringGetCStringPtr(macPath,
-                                            CFStringGetSystemEncoding()));
-     QFileInfo fileInfo(bundlePath);
-     QDir dir = fileInfo.dir();
-     QString FileName = dir.absoluteFilePath("Guidelines.pdf");
-     CFRelease(appUrlRef);
-     CFRelease(macPath);
-
-
-#else
-                QDir dir(qApp->applicationDirPath());
-                QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
+	
+#ifdef Q_WS_WIN
+	QDir dir(qApp->applicationDirPath());
+	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
+	
+#ifdef Q_WS_X11
+	QString FileName = "/usr/share/xflr5/Guidelines.pdf" ;
 #endif
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
@@ -3504,7 +3509,7 @@ void MainFrame::OnLoadFile()
 
 void MainFrame::OnLogFile()
 {
-	QString FileName = QDir::tempPath() + "/QFLR5.log";
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	// 20090605 Francesco Meschia
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
@@ -3807,9 +3812,9 @@ void MainFrame::OnResetSettings()
 	{
 		QMessageBox::warning(this,tr("Default Settings"), tr("The settings will be reset at the next session"));
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 		settings.clear();
 		// do not save on exit
@@ -4709,9 +4714,9 @@ void MainFrame::SaveSettings()
 
 	if(!m_bSaveSettings) return;
 #ifdef Q_WS_MAC
-		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+		QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 	settings.beginGroup("MainFrame");
 	{

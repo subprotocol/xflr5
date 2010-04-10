@@ -14465,7 +14465,7 @@ void QMiarex::PaintWOppLegend(QPainter &painter)
 
 
 	D = 0;
-	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
+	int RightPos = m_rCltRect.right()-margin-fm.width("abcdefghijklmnopqrstuvwxyz01234567");
 	ZPos	 = m_rCltRect.height()-11*dheight;
 	if(m_pCurWOpp && m_pCurWOpp->m_bOut) ZPos -= dheight;
 	if(m_pCurWOpp) ZPos -= dheight*m_pCurWOpp->m_nFlaps;

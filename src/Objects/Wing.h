@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Wing Class
-	Copyright (C) 2005-2008 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2005-2010 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -22,15 +22,9 @@
 #ifndef CWING_H
 #define CWING_H
 
-// Wing.h : header file
-//
 
 #include "Surface.h"
 #include "Panel.h"
-
-/////////////////////////////////////////////////////////////////////////////
-// CWing dialog
-
 
 class CWing
 {

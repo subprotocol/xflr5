@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Wing Class
-	Copyright (C) 2005-2009 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2005-2010 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,12 +18,6 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
-//
-// This class is both the interface class associated to the wing definition dialog box
-// and the class which implements all calculation routines associated to the wing,
-// including LLT and VLM methods
-//
 
 
 #include  <math.h>
@@ -2318,7 +2312,6 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 
 		ReadCString(ar,m_WingName);
-		if (m_WingName.length() ==0) return false;
 
 		if (ArchiveFormat >=1008)
 		{
@@ -2342,7 +2335,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 		ar >> m_NPanel;
-		if(m_NPanel <=0 || m_NPanel>=100)
+		if(m_NPanel <=0 || m_NPanel>MAXPANELS)
 		{
 			m_WingName = "";
 			return false;
@@ -2352,21 +2345,11 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (i=0; i<=m_NPanel; i++)
 		{
 			ar >> f; m_TChord[i]=f;
-			if (fabs(m_TChord[i]) <0.0)
-			{
-				m_WingName = "";
-				return false;
-			}
 		}
 
 		for (i=0; i<=m_NPanel; i++)
 		{
 			ar >> f; m_TPos[i]=f;
-			if (fabs(m_TPos[i]) <0.0)
-			{
-				m_WingName = "";
-				return false;
-			}
 		}
 		for (i=0; i<=m_NPanel; i++)
 		{

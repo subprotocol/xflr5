@@ -254,7 +254,7 @@ bool XFoilAnalysisDlg::AlphaLoop()
 void XFoilAnalysisDlg::InitDialog()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName = QDir::tempPath() + "/QFLR5.log";
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 

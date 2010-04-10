@@ -943,7 +943,7 @@ void BatchDlg::OnAnalyze()
 	m_pctrlClose->setEnabled(false);
 	QString str;
 
-	QString FileName = QDir::tempPath() + "/QFLR5.log";
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 
@@ -1115,15 +1115,14 @@ void BatchDlg::ReLoop()
 			MaxSeries = 2;
 			SpMin = 0.0;
 			SpMax = m_SpMax;
-			SpInc = m_SpInc;
 		}
 		else
 		{
 			MaxSeries = 1;
 			SpMin = m_SpMin;
 			SpMax = m_SpMax;
-			SpInc = m_SpInc;
 		}
+		SpInc = fabs(m_SpInc);
 
 		if(SpMin > SpMax) SpInc = -fabs(SpInc);
 
@@ -1137,6 +1136,7 @@ void BatchDlg::ReLoop()
 			total = (int)fabs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 
 			CreatePolar(pXFoil->reinf1, pXFoil->minf1, pXFoil->acrit);
+			
 			if (m_bInitBL)
 			{
 				pXFoil->lblini = false;
@@ -1235,7 +1235,7 @@ void BatchDlg::ReLoop()
 			}// end Alpha or Cl loop
 			SpMin = 0;
 			SpMax = m_SpMin;
-			SpInc = -m_SpInc;
+			SpInc = -SpInc;
 		}
 //		strong+="\n";
 		if(m_bCancel) break;

@@ -12181,7 +12181,7 @@ bool XFoil::InitQDES()
 	int ntqspl, kqtarg;
 	double chx, chy, chsq;
 
-	QString FileName = QDir::tempPath() + "/QFLR5.log";
+	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	QFile XFile(FileName);
 	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
 
