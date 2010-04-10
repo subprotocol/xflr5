@@ -19,6 +19,7 @@
 
 *****************************************************************************/
   
+#include "../Params.h"
 #include "../MainFrame.h"
 #include "../GLWidget.h"
 #include "../Globals.h"
@@ -36,33 +37,16 @@
 
 #include <math.h>
 
-#define VLMCTRLPTS          1250
-
-#define MESHPANELS			1272
-#define MESHBACK			1273
-
-//3D
-#define BODYGEOM            1302
-#define BODYSURFACES        1303
 //2D
-#define BODYAXIALLINES      1304
-#define BODYFRAME		    1305
-#define BODYFRAME3D         1306
-#define BODYFRAMEGRID		1307
-#define BODYLINEGRID		1308
+#define BODYAXIALLINES      3304
+#define BODYFRAME		    3305
+#define BODYFRAME3D         3306
+#define BODYFRAMEGRID		3307
+#define BODYLINEGRID		3308
 
-#define BODYPOINTS			1309
-#define FRAMEPOINTS			1310
-#define BODYOVERLAY			1311
-
-#define BODYMESHPANELS		1313
-#define BODYMESHBACK		1314
-
-#define BODYFRAMESCALES		1316
-#define BODYLINESCALES		1317
-
-#define ARCBALL             1320
-#define ARCPOINT            1321
+#define BODYPOINTS			3309
+#define FRAMEPOINTS			3310
+#define BODYOVERLAY			3311
 
 void* GL3dBodyDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dBodyDlg::s_pMiarex;	//pointer to the Miarex Application window
@@ -79,8 +63,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 //	setAttribute(Qt::WA_QuitOnClose );
 
 	m_pBody = NULL;
-
-	pi = 3.141592654;
 
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
@@ -2493,22 +2475,22 @@ void GL3dBodyDlg::GLDraw3D()
 			{
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr) * pi/180.0;
+					phi = (col * lon_incr) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = (row * lat_incr) * pi/180.0;
+						theta = (row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 					}
 				}
 				glEnd();
 				glBegin(GL_LINE_STRIP);
 				{
-					phi = (col * lon_incr ) * pi/180.0;
+					phi = (col * lon_incr ) * PI/180.0;
 
 					for (row = 1; row < NumAngles-1; row++)
 					{
-						theta = -(row * lat_incr) * pi/180.0;
+						theta = -(row * lat_incr) * PI/180.0;
 						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 					}
 				}
@@ -2521,7 +2503,7 @@ void GL3dBodyDlg::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
 				}
 			}
@@ -2532,7 +2514,7 @@ void GL3dBodyDlg::GLDraw3D()
 				theta = 0.;
 				for(col=1; col<35; col++)
 				{
-					phi = (0.0 + (double)col*360.0/72.0) * pi/180.0;
+					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
 					glVertex3d(R * cos(-phi) * cos(theta), R * sin(theta), R * sin(-phi) * cos(theta));
 				}
 			}
@@ -2559,7 +2541,7 @@ void GL3dBodyDlg::GLDraw3D()
 
 				for (row = -NumAngles; row < NumAngles; row++)
 				{
-					theta = (row * lat_incr) * pi/180.0;
+					theta = (row * lat_incr) * PI/180.0;
 					glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
 				}
 			}
@@ -2570,7 +2552,7 @@ void GL3dBodyDlg::GLDraw3D()
 				theta = 0.;
 				for(col=-NumAngles; col<NumAngles; col++)
 				{
-					phi = (0.0 + (double)col*30.0/NumAngles) * pi/180.0;
+					phi = (0.0 + (double)col*30.0/NumAngles) * PI/180.0;
 					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
 				}
 			}
@@ -2918,13 +2900,13 @@ void GL3dBodyDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, in
 
 	for (col = 0; col < NumLongitudes; col++)
 	{
-		phi1 = (start_lon + col * lon_incr) * pi/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * pi/180.0;
+		phi1 = (start_lon + col * lon_incr) * PI/180.0;
+		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
 
 		for (row = 0; row < NumLatitudes; row++)
 		{
-			theta1 = (start_lat + row * lat_incr) * pi/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * pi/180.0;
+			theta1 = (start_lat + row * lat_incr) * PI/180.0;
+			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
 
 			u[0] = R * cos(phi1) * cos(theta1);//x
 			u[1] = R * sin(theta1);//y

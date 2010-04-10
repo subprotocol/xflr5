@@ -43,71 +43,7 @@
 #include "InertiaDlg.h"
 #include <math.h>
 
-#define PANELCP				1227
 
-#define VLMWINGLIFT			1230
-#define LIFTFORCE			1231
-#define VLMMOMENTS			1232
-
-#define VLMWING2LIFT		1233
-#define VLMSTABLIFT			1234
-#define VLMFINLIFT			1235
-
-#define VLMWINGDRAG			1236
-#define VLMWING2DRAG		1237
-#define VLMSTABDRAG			1238
-#define VLMFINDRAG			1239
-
-#define VLMWINGWASH			1241
-#define VLMWING2WASH		1242
-#define VLMSTABWASH			1243
-#define VLMFINWASH			1244
-
-#define VLMCTRLPTS			1250
-#define VLMVORTICES			1251
-
-#define VLMSTREAMLINES		1255
-#define SURFACESPEEDS		1256
-
-#define WINGSURFACES		1258
-#define WINGOUTLINE			1259
-
-#define WING2SURFACES		1260
-#define WING2OUTLINE		1261
-
-#define STABSURFACES		1265
-#define STABOUTLINE			1266
-
-#define FINSURFACES 		1270
-#define FINOUTLINE			1271
-
-#define MESHPANELS			1272
-#define MESHBACK			1273
-
-#define WINGLEGEND			1276
-#define WOPPLEGEND			1277
-#define WOPPCPLEGENDCLR		1278
-#define WOPPCPLEGENDTXT		1279
-
-#define WINGWAKEPANELS		1283
-
-#define VLMWINGTOPTRANS     1293
-#define VLMWINGBOTTRANS     1294
-#define VLMWING2TOPTRANS    1295
-#define VLMWING2BOTTRANS    1296
-#define VLMSTABTOPTRANS     1297
-#define VLMSTABBOTTRANS     1298
-#define VLMFINTOPTRANS      1299
-#define VLMFINBOTTRANS      1300
-
-//3D
-#define BODYGEOM            1302
-#define BODYSURFACES        1303
-#define BODYMESHPANELS		1312
-#define BODYMESHBACK		1313
-
-#define ARCBALL             1314
-#define ARCPOINT            1315
 
 
 QMiarex::QMiarex(QWidget *parent)

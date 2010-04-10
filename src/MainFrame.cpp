@@ -3352,6 +3352,7 @@ void MainFrame::OnGuidelines()
 #ifdef Q_WS_WIN
 	QDir dir(qApp->applicationDirPath());
 	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+qDebug() <<FileName;
 #endif
 	
 #ifdef Q_WS_X11

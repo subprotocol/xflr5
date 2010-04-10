@@ -246,7 +246,6 @@ private:
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
-	double pi;
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
 	double m_glScaled;//zoom factor for UFO
 	double m_BodyScale, m_FrameScale, m_BodyRefScale, m_FrameRefScale;			// scale for 3D display

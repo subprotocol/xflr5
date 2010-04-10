@@ -35,15 +35,7 @@
 #include <math.h>
 
 #define WINGGEOMETRY        1400
-#define WINGOUTLINE         1401
 #define SECTIONHIGHLIGHT    1402
-
-#define MESHPANELS			1410
-#define MESHBACK			1411
-
-
-#define ARCBALL             1430
-#define ARCPOINT            1431
 
 
 void* GL3dWingDlg::s_pMainFrame;		//pointer to the Frame window
