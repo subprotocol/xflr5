@@ -500,7 +500,6 @@ void MainFrame::CreateActions()
 	connect(resetSettingsAct, SIGNAL(triggered()), this, SLOT(OnResetSettings()));
 
 
-
 	for (int i = 0; i < MAXRECENTFILES; ++i)
 	{
 		recentFileActs[i] = new QAction(this);
@@ -529,10 +528,13 @@ void MainFrame::CreateActions()
 	guidelinesAct->setStatusTip(tr("Show the guidelines for some help"));
 	connect(guidelinesAct, SIGNAL(triggered()), this, SLOT(OnGuidelines()));
 
-	aboutAct = new QAction(tr("&About"), this);
+	aboutAct = new QAction(tr("&About XFLR5"), this);
 	aboutAct->setStatusTip("XFLR5");
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
+	aboutQtAct = new QAction(tr("About Qt"), this);
+	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+	
 
 	CreateAFoilActions();
 	CreateXDirectActions();
@@ -972,6 +974,8 @@ void MainFrame::CreateMenus()
 	updateRecentFileActions();
 
 	helpMenu = menuBar()->addMenu(tr("&?"));
+	helpMenu->addAction(aboutQtAct);
+	helpMenu->addSeparator();
 	helpMenu->addAction(guidelinesAct);
 	helpMenu->addAction(aboutAct);
 
