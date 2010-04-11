@@ -15,7 +15,7 @@
 *******************************************************************************
 
 
-XFLR5 v5.00 April xxxth, 2010
+XFLR5 v5.00 April 11th, 2010
 	- changed the executable target name from QFLR5 to xflr5
 	- changed and reorganized drastically the file system
 	- changed the icon images from Q5 to X5
