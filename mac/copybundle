@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ ! -e QFLR5.app/Contents/MacOS/translations ]
+if [ ! -e XFLR5.app/Contents/MacOS/translations ]
 then
-	mkdir QFLR5.app/Contents/MacOS/translations
+	mkdir XFLR5.app/Contents/MacOS/translations
 fi
-cp Translations/*.qm QFLR5.app/Contents/MacOS/translations
+cp Translations/*.qm XFLR5.app/Contents/MacOS/translations
 	

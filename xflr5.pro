@@ -235,7 +235,7 @@ mac {
     LIBS += -framework \
         CoreFoundation
     QMAKE_INFO_PLIST = mac/Info.plist
-    ICON = mac/qflr5.icns
+    ICON = mac/xflr5.icns
 }
 
 OTHER_FILES += ReleaseNotes.txt

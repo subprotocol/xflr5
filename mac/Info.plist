@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>QFLR5</string>
+        <string>XFLR5</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -13,12 +13,12 @@
 				<string>WPA</string>
 			</array>
 			<key>CFBundleTypeName</key>
-			<string>QFLR5 Project</string>
+                        <string>XFLR5 Project</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
                         <key>LSItemContentTypes</key>
                         <array>
-                            <string>wpa.qflr5.sourceforge.net</string>
+                            <string>wpa.xflr5.sourceforge.net</string>
                         </array>
                         <key>LSIsAppleDefaultForType</key>
                         <true/>
@@ -30,12 +30,12 @@
                                 <string>PLR</string>
                         </array>
                         <key>CFBundleTypeName</key>
-                        <string>QFLR5 Polar File</string>
+                        <string>XFLR5 Polar File</string>
                         <key>CFBundleTypeRole</key>
                         <string>Editor</string>
                         <key>LSItemContentTypes</key>
                         <array>
-                            <string>plr.qflr5.sourceforge.net</string>
+                            <string>plr.xflr5.sourceforge.net</string>
                         </array>
                         <key>LSIsAppleDefaultForType</key>
                         <true/>
@@ -46,9 +46,9 @@
         <array>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>wpa.qflr5.sourceforge.net</string>
+                <string>wpa.xflr5.sourceforge.net</string>
                 <key>UTTypeDescription</key>
-                <string>QFLR5 Project</string>
+                <string>XFLR5 Project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -64,9 +64,9 @@
             </dict>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>plr.qflr5.sourceforge.net</string>
+                <string>plr.xflr5.sourceforge.net</string>
                 <key>UTTypeDescription</key>
-                <string>QFLR5 Polar File</string>
+                <string>XFLR5 Polar File</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -83,20 +83,20 @@
         </array>
 
 	<key>CFBundleIconFile</key>
-	<string>qflr5.icns</string>
+        <string>xflr5.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>qflr5.sourceforge.net</string>
+        <string>xflr5.sourceforge.net</string>
 	<key>CFBundleName</key>
-	<string>QFLR5</string>
+        <string>XFLR5</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-        <string>0.04</string>
+        <string>5.00</string>
 	<key>CFBundleSignature</key>
-	<string>QFLR</string>
+        <string>XFLR</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
 	<key>CFBundleVersion</key>
-        <string>200</string>
+        <string>259</string>
 </dict>
 </plist>
