@@ -1,0 +1,8 @@
+#!/bin/sh
+
+macdeployqt QFLR5.app
+rm -r mac_release/QFLR5/QFLR5.app
+mv QFLR5.app mac_release/QFLR5/
+rm mac_release/QFLR5.dmg
+hdiutil create mac_release/QFLR5.dmg -srcfolder mac_release/QFLR5
+hdiutil internet-enable -yes mac_release/QFLR5.dmg
