@@ -55,7 +55,6 @@ protected:
 	CWing m_Fin;
 	bool m_bBody;
 	bool m_bActive;
-	bool m_bFin, m_bStab;
 	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
 	bool m_bBiplane;
 	double m_StabTilt;
@@ -63,7 +62,6 @@ protected:
 	double m_WingTilt, m_WingTilt2;
 	double m_Volume;
 	double m_XCmRef;
-	double m_TailVolume;
 
 	int m_NMass;
 	double m_MassValue[MAXMASSES];
@@ -73,7 +71,6 @@ protected:
 //	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
-	QString m_PlaneName;
 	QString m_PlaneDescription;
 
 private:
@@ -82,11 +79,14 @@ private:
 	void ComputePlane(void);
 	
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
-	double GetTotalMass();
 
 
 public:
+	QString m_PlaneName;
+	bool m_bFin, m_bStab;
+	double m_TailVolume;
 
+	double GetTotalMass();
 };
 
 #endif

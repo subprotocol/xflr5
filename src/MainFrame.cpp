@@ -484,6 +484,7 @@ void MainFrame::CreateActions()
 	connect(saveProjectAsAct, SIGNAL(triggered()), this, SLOT(OnSaveProjectAs()));
 
 	saveOptionsAct = new QAction(tr("Save Options"), this);
+	saveOptionsAct->setStatusTip(tr("Define the save options for operating points"));
 	connect(saveOptionsAct, SIGNAL(triggered()), this, SLOT(OnSaveOptions()));
 
 	unitsAct = new QAction(tr("Define units..."), this);
@@ -517,6 +518,7 @@ void MainFrame::CreateActions()
 	}
 
 	styleAct = new QAction(tr("General Display Settings"), this);
+	styleAct->setStatusTip(tr("Define the color and font options for all views and graphs"));
 	connect(styleAct, SIGNAL(triggered()), this, SLOT(OnStyle()));
 
 
@@ -538,6 +540,7 @@ void MainFrame::CreateActions()
 	connect(guidelinesAct, SIGNAL(triggered()), this, SLOT(OnGuidelines()));
 
 	aboutAct = new QAction(tr("&About"), this);
+	aboutAct->setStatusTip(tr("More information about XFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
 
@@ -736,13 +739,6 @@ void MainFrame::CreateAFoilMenus()
 
 	//AFoil Context Menu
 	AFoilCtxMenu = new QMenu(tr("Context Menu"),this);
-	AFoilCurrentFoilMenu = AFoilCtxMenu->addMenu(tr("Current Foil"));
-	AFoilCurrentFoilMenu->addAction(AFoilRename);
-	AFoilCurrentFoilMenu->addAction(AFoilDelete);
-	AFoilCurrentFoilMenu->addAction(AFoilExport);
-	AFoilCurrentFoilMenu->addAction(ShowCurrentFoil);
-	AFoilCurrentFoilMenu->addAction(HideCurrentFoil);
-	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilDesignMenu);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addMenu(AFoilSplineMenu);
@@ -1045,45 +1041,49 @@ void MainFrame::CreateMiarexActions()
 
 	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint View"), this);
 	WOppAct->setCheckable(true);
-	WOppAct->setStatusTip(tr("Show Operating point view"));
+	WOppAct->setStatusTip(tr("Switch to the Operating point view"));
 	WOppAct->setShortcut(tr("F5"));
 	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
 
 	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar View"), this);
 	WPolarAct->setCheckable(true);
-	WPolarAct->setStatusTip(tr("Show Polar view"));
+	WPolarAct->setStatusTip(tr("Switch to the Polar view"));
 	WPolarAct->setShortcut(tr("F8"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
 	StabPolarAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability View"), this);
 	StabPolarAct->setCheckable(true);
-	StabPolarAct->setStatusTip(tr("Show stability analysis results"));
+	StabPolarAct->setStatusTip(tr("Switch to the stability analysis results"));
 	StabPolarAct->setShortcut(tr("Shift+F8"));
 	connect(StabPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnStabilityView()));
 
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View"), this);
 	W3DAct->setCheckable(true);
-	W3DAct->setStatusTip(tr("Show 3D view"));
+	W3DAct->setStatusTip(tr("Switch to the 3D view"));
 	W3DAct->setShortcut(tr("F4"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
 	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("Cp View"), this);
 	CpViewAct->setCheckable(true);
-	CpViewAct->setStatusTip(tr("Show Cp view"));
+	CpViewAct->setStatusTip(tr("Switch to the Cp view"));
 	CpViewAct->setShortcut(tr("F9"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
 	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
+	W3DPrefsAct->setStatusTip(tr("Define the style and color preferences for the 3D view"));
 	connect(W3DPrefsAct, SIGNAL(triggered()), pMiarex, SLOT(On3DPrefs()));
 
 	MiarexPolarFilter = new QAction(tr("Polar Filter"), this);
+	MiarexPolarFilter->setStatusTip(tr("Define which type of polars should be shown or hidden"));
 	connect(MiarexPolarFilter, SIGNAL(triggered()), pMiarex, SLOT(OnPolarFilter()));
 
 	W3DScalesAct = new QAction(tr("3D Scales"), this);
+	W3DScalesAct->setStatusTip(tr("Define the scales for the 3D display of lift, moment, drag, and downwash"));
 	W3DScalesAct->setCheckable(true);
 	connect(W3DScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnGL3DScale()));
 
 	W3DLightAct = new QAction(tr("3D Light Options"), this);
+	W3DLightAct->setStatusTip(tr("Define the light options in 3D view"));
 	connect(W3DLightAct, SIGNAL(triggered()), pMiarex, SLOT(OnSetupLight()));
 
 	DefineWingAct = new QAction(tr("Define a New Wing"), this);
@@ -1107,6 +1107,7 @@ void MainFrame::CreateMiarexActions()
 	connect(defineBody, SIGNAL(triggered()), pMiarex, SLOT(OnNewBody()));
 
 	EditCurBody = new QAction(tr("Edit Current"), this);
+	EditCurBody->setStatusTip(tr("Edit the body of the currently selected plane"));
 	EditCurBody->setShortcut(tr("Shift+F10"));
 	connect(EditCurBody, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
 
@@ -1129,188 +1130,271 @@ void MainFrame::CreateMiarexActions()
 
 
 	exporttoAVL = new QAction(tr("Export to AVL..."), this);
+	exporttoAVL->setStatusTip(tr("Export the current plane or wing to a text file in the format required by AVL"));
 	connect(exporttoAVL, SIGNAL(triggered()), pMiarex, SLOT(OnExporttoAVL()));
 
 	exportCurWOpp = new QAction(tr("Export..."), this);
+	exportCurWOpp->setStatusTip(tr("Export the current operating point to a text or csv file"));
 	connect(exportCurWOpp, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWOpp()));
 
 	resetWOppLegend = new QAction(tr("Reset Legend Position"), this);
+	resetWOppLegend->setStatusTip(tr("Reset the legend position to its default value"));
 	connect(resetWOppLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWOppLegend()));
 
 	resetWPlrLegend = new QAction(tr("Reset Legend Position"), this);
+	resetWPlrLegend->setStatusTip(tr("Reset the legend position to its default value"));
 	connect(resetWPlrLegend, SIGNAL(triggered()), pMiarex, SLOT(OnResetWPlrLegend()));
 
 	resetWingScale = new QAction(tr("Reset Wing Scale"), this);
+	resetWingScale ->setStatusTip(tr("Reset the wing scale to its default value"));
 	connect(resetWingScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingScale()));
 
 	scaleWingAct = new QAction(tr("Scale Wing"), this);
+	scaleWingAct->setStatusTip(tr("Scale the dimensions of the currently selected wing"));
 	connect(scaleWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnScaleWing()));
 
 	ManageUFOs = new QAction(tr("Manage UFOs"), this);
+	ManageUFOs->setStatusTip(tr("Rename or delete the planes and wings stored in the database"));
 	ManageUFOs->setShortcut(tr("F7"));
 	connect(ManageUFOs, SIGNAL(triggered()), pMiarex, SLOT(OnManageUFOs()));
 
 	m_pImportWPolar = new QAction(tr("Import Polar"), this);
+	m_pImportWPolar->setStatusTip(tr("Import a polar from a text file"));
 	connect(m_pImportWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnImportWPolar()));
 
 	m_pUFOInertia = new QAction(tr("Define Inertia"), this);
+	m_pUFOInertia->setStatusTip(tr("Define the inertia for the current plane or wing"));
 	connect(m_pUFOInertia, SIGNAL(triggered()), pMiarex, SLOT(OnUFOInertia()));
 
 	m_pBodyInertia = new QAction(tr("Define Inertia"), this);
+	m_pBodyInertia->setStatusTip(tr("Define the inertia for the current body"));
 	connect(m_pBodyInertia, SIGNAL(triggered()), pMiarex, SLOT(OnBodyInertia()));
 
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
+	showCurWOppOnly->setStatusTip(tr("Hide all the curves except for the one corresponding to the currently selected operating point"));
 	showCurWOppOnly->setCheckable(true);
 	connect(showCurWOppOnly, SIGNAL(triggered()), pMiarex, SLOT(OnCurWOppOnly()));
+
 	showAllWOpps = new QAction(tr("Show All OpPoints"), this);
+	showAllWOpps->setStatusTip(tr("Show the graph curves of all operating points"));
 	connect(showAllWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWOpps()));
+
 	hideAllWOpps = new QAction(tr("Hide All OpPoints"), this);
+	hideAllWOpps->setStatusTip(tr("Hide the graph curves of all operating points"));
 	connect(hideAllWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnHideAllWOpps()));
+
 	deleteAllWOpps = new QAction(tr("Delete All OpPoints"), this);
+	deleteAllWOpps->setStatusTip(tr("Delete all the operating points of all planes and polars"));
 	connect(deleteAllWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteAllWOpps()));
 
 	showAllWPlrOpps = new QAction(tr("Show Associated OpPoints"), this);
+	showAllWPlrOpps->setStatusTip(tr("Show the curves of all the operating points of the currently selected polar"));
 	connect(showAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWPlrOpps()));
+	
 	hideAllWPlrOpps = new QAction(tr("Hide Associated OpPoints"), this);
+	hideAllWPlrOpps->setStatusTip(tr("Hide the curves of all the operating points of the currently selected polar"));
 	connect(hideAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnHideAllWPlrOpps()));
+	
 	deleteAllWPlrOpps = new QAction(tr("Delete Associated OpPoints"), this);
+	deleteAllWPlrOpps->setStatusTip(tr("Delete all the operating points of the currently selected polar"));
 	connect(deleteAllWPlrOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteAllWPlrOpps()));
 
 	showEllipticCurve = new QAction(tr("Show Elliptic Curve"), this);
+	showEllipticCurve->setStatusTip(tr("Show the theoretical optimal elliptic lift curve on all graphs for which the selected variable is the local lift"));
 	showEllipticCurve->setCheckable(true);
 	connect(showEllipticCurve, SIGNAL(triggered()), pMiarex, SLOT(OnShowEllipticCurve()));
 
-	showXCmRefLocation = new QAction(tr("Show XCmRef location"), this);
+	showXCmRefLocation = new QAction(tr("Show XCG location"), this);
+	showXCmRefLocation->setStatusTip(tr("Show the position of the center of gravity defined in the analysis"));
 	showXCmRefLocation->setCheckable(true);
 	connect(showXCmRefLocation, SIGNAL(triggered()), pMiarex, SLOT(OnShowXCmRef()));
 
 	showStabCurve = new QAction(tr("Show Elevator Curve"), this);
+	showStabCurve->setStatusTip(tr("Show the graph curves for the elevator"));
 	showStabCurve->setCheckable(true);
 	connect(showStabCurve, SIGNAL(triggered()), pMiarex, SLOT(OnStabCurve()));
 
 	showFinCurve = new QAction(tr("Show Fin Curve"), this);
+	showFinCurve->setStatusTip(tr("Show the graph curves for the fin"));
 	showFinCurve->setCheckable(true);
 	connect(showFinCurve, SIGNAL(triggered()), pMiarex, SLOT(OnFinCurve()));
 
 	showWing2Curve = new QAction(tr("Show Second Wing Curve"), this);
+	showWing2Curve->setStatusTip(tr("Show the graph curves for the second wing"));
 	showWing2Curve->setCheckable(true);
 	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
 	defineWPolar = new QAction(tr("Define an Analysis \t(F6)"), this);
+	defineWPolar->setStatusTip(tr("Define an analysis for the current wing or plane"));
 //	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
 	defineCtrlPolar = new QAction(tr("Define a Control Analysis\t(Ctrl+F6)"), this);
+	defineCtrlPolar->setStatusTip(tr("Define a control analysis for the current wing or plane"));
 //	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
 	defineStabPolar = new QAction(tr("Define a Stability Analysis\t(Shift+F6)"), this);
+	defineStabPolar->setStatusTip(tr("Define a stability analysis for the current wing or plane"));
 //	defineStabPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineStabPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineStabPolar()));
 
 	MiarexGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	MiarexGraphDlg->setStatusTip(tr("Define the settings for the selected graph"));
 	connect(MiarexGraphDlg, SIGNAL(triggered()), pMiarex, SLOT(OnGraphSettings()));
 
 	twoWingGraphs = new QAction(tr("Two OpPoint Graphs\t(T)"), this);
+	twoWingGraphs->setStatusTip(tr("Display the first two operating point graphs"));
 	twoWingGraphs->setCheckable(true);
 	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
+	
 	fourWingGraphs = new QAction(tr("All OpPoint Graphs\t(A)"), this);
+	fourWingGraphs->setStatusTip(tr("Display all four operating point graphs"));
 	fourWingGraphs->setCheckable(true);
 	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
+
 	WingGraph1 = new QAction(tr("Wing Graph 1\t(1)"), this);
+	WingGraph1->setStatusTip(tr("Display only the first operating point graph"));
 	WingGraph1->setCheckable(true);
 	connect(WingGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph1()));
+	
 	WingGraph2 = new QAction(tr("Wing Graph 2\t(2)"), this);
+	WingGraph2->setStatusTip(tr("Display only the second operating point graph"));
 	WingGraph2->setCheckable(true);
 	connect(WingGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph2()));
+	
 	WingGraph3 = new QAction(tr("Wing Graph 3\t(3)"), this);
+	WingGraph3->setStatusTip(tr("Display only the third operating point graph"));
 	WingGraph3->setCheckable(true);
 	connect(WingGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph3()));
+
 	WingGraph4 = new QAction(tr("Wing Graph 4\t(4)"), this);
+	WingGraph4->setStatusTip(tr("Display only the fourth operating point graph"));
 	WingGraph4->setCheckable(true);
 	connect(WingGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph4()));
 
 	twoWPlrGraphs = new QAction(tr("Two Polar Graphs\t(T)"), this);
+	twoWPlrGraphs->setStatusTip(tr("Display the first two polar graphs"));
 	twoWPlrGraphs->setCheckable(true);
 	connect(twoWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWPlrGraphs()));
+	
 	allWPlrGraphs = new QAction(tr("All Polar Graphs\t(A)"), this);
+	allWPlrGraphs->setStatusTip(tr("Display all four polar graphs"));
 	allWPlrGraphs->setCheckable(true);
 	connect(allWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWPlrGraphs()));
+	
 	WPlrGraph1 = new QAction(tr("Polar Graph 1\t(1)"), this);
+	WPlrGraph1->setStatusTip(tr("Display only the first polar graph"));
 	WPlrGraph1->setCheckable(true);
 	connect(WPlrGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph1()));
 	WPlrGraph2 = new QAction(tr("Polar Graph 2\t(2)"), this);
+	WPlrGraph2->setStatusTip(tr("Display only the second polar graph"));
 	WPlrGraph2->setCheckable(true);
 	connect(WPlrGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph2()));
 	WPlrGraph3 = new QAction(tr("Polar Graph 3\t(3)"), this);
+	WPlrGraph3->setStatusTip(tr("Display only the third polar graph"));
 	WPlrGraph3->setCheckable(true);
 	connect(WPlrGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph3()));
 	WPlrGraph4 = new QAction(tr("Polar Graph 4\t(4)"), this);
+	WPlrGraph4->setStatusTip(tr("Display only the fourth polar graph"));
 	WPlrGraph4->setCheckable(true);
 	connect(WPlrGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph4()));
 
 	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales"), this);
+	ResetWingGraphScale->setStatusTip(tr("Reset the scale of the current operating point graph"));
 	connect(ResetWingGraphScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingGraphScale()));
 
 	allWingGraphsScalesAct = new QAction(tr("Reset All Graph Scales"), this);
+	allWingGraphsScalesAct->setStatusTip(tr("Reset the scales of all four operating point graphs"));
 	connect(allWingGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWingGraphScales()));
 
 	allWPolarGraphsScalesAct = new QAction(tr("Reset All Graph Scales"), this);
+	allWPolarGraphsScalesAct->setStatusTip(tr("Reset the scales of all four polar graphs"));
 	connect(allWPolarGraphsScalesAct, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphScales()));
 
 	allWingGraphsSettings = new QAction(tr("All Graph Settings"), this);
+	allWingGraphsSettings->setStatusTip(tr("Define the settings of all four operating point graphs"));
 	connect(allWingGraphsSettings, SIGNAL(triggered()), pMiarex, SLOT(OnAllWingGraphSettings()));
 
 	allWPolarGraphsSettings = new QAction(tr("All Graph Settings"), this);
+	allWPolarGraphsSettings->setStatusTip(tr("Define the settings of all four polar graphs"));
 	connect(allWPolarGraphsSettings, SIGNAL(triggered()), pMiarex, SLOT(OnAllWPolarGraphSettings()));
 
 	hideUFOWPlrs = new QAction(tr("Hide Associated Polars"), this);
+	hideUFOWPlrs->setStatusTip(tr("Hide all the polar curves associated to the currently selected wing or plane"));
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
+	
 	showUFOWPlrs = new QAction(tr("Show Associated Polars"), this);
+	showUFOWPlrs->setStatusTip(tr("Show all the polar curves associated to the currently selected wing or plane"));
 	connect(showUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWPolars()));
+
 	deleteUFOWPlrs = new QAction(tr("Delete Associated Polars"), this);
+	deleteUFOWPlrs->setStatusTip(tr("Delete all the polars associated to the currently selected wing or plane"));
 	connect(deleteUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWPolars()));
 
 	hideAllWPlrs = new QAction(tr("Hide All Polars"), this);
+	hideAllWPlrs->setStatusTip(tr("Hide all the polar curves of all wings and planes"));
 	connect(hideAllWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideAllWPolars()));
+	
 	showAllWPlrs = new QAction(tr("Show All Polars"), this);
+	showAllWPlrs->setStatusTip(tr("Show all the polar curves of all wings and planes"));
 	connect(showAllWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnShowAllWPolars()));
 
 	hideUFOWOpps = new QAction(tr("Hide Associated OpPoints"), this);
+	hideUFOWOpps->setStatusTip(tr("Hide all the operating point curves of the currently selected wing or plane"));
 	connect(hideUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWOpps()));
+	
 	showUFOWOpps = new QAction(tr("Show Associated OpPoints"), this);
+	showUFOWOpps->setStatusTip(tr("Show all the operating point curves of the currently selected wing or plane"));
 	connect(showUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWOpps()));
+	
 	deleteUFOWOpps = new QAction(tr("Delete Associated OpPoints"), this);
+	deleteUFOWOpps->setStatusTip(tr("Delete all the operating points of the currently selected wing or plane"));
 	connect(deleteUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWOpps()));
 
 	renameCurUFO = new QAction(tr("Rename..."), this);
+	renameCurUFO->setStatusTip(tr("Rename the currently selected wing or plane"));
 	renameCurUFO->setShortcut(tr("F2"));
 	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
 
 	deleteCurUFO = new QAction(tr("Delete..."), this);
+	deleteCurUFO->setStatusTip(tr("Delete the currently selected wing or plane"));
 	connect(deleteCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurUFO()));
 
 	duplicateCurUFO = new QAction(tr("Duplicate..."), this);
+	duplicateCurUFO->setStatusTip(tr("Duplicate the currently selected wing or plane"));
 	connect(duplicateCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnDuplicateCurUFO()));
 
 	SaveUFOAsProject = new QAction(tr("Save as Project..."), this);
+	SaveUFOAsProject->setStatusTip(tr("Save the currently selected wing or plane as a new separate project"));
 	connect(SaveUFOAsProject, SIGNAL(triggered()), this, SLOT(OnSaveUFOAsProject()));
 
 	renameCurWPolar = new QAction(tr("Rename..."), this);
+	renameCurWPolar->setStatusTip(tr("Rename the currently selected polar"));
 	connect(renameCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurWPolar()));
+
 	editCurWPolar = new QAction(tr("Edit ..."), this);
+	editCurWPolar->setStatusTip(tr("Edit the points of the currently selected polar"));
 	connect(editCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWPolar()));
+
 	exportCurWPolar = new QAction(tr("Export ..."), this);
+	exportCurWPolar->setStatusTip(tr("Export the currently selected polar to a text or csv file"));
 	connect(exportCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWPolar()));
+
 	resetCurWPolar = new QAction(tr("Reset ..."), this);
+	resetCurWPolar->setStatusTip(tr("Delete all the points of the currently selected polar, but keep the analysis settings"));
 	connect(resetCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnResetCurWPolar()));
+
 	deleteCurWPolar = new QAction(tr("Delete ..."), this);
+	deleteCurWPolar->setStatusTip(tr("Delete the currently selected polar"));
 	connect(deleteCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurWPolar()));
 
 	deleteCurWOpp = new QAction(tr("Delete..."), this);
+	deleteCurWOpp->setStatusTip(tr("Delete the currently selected operating point"));
 	connect(deleteCurWOpp, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteCurWOpp()));
 
 	advancedSettings = new QAction(tr("Advanced Settings..."), this);
+	advancedSettings->setStatusTip(tr("Define the settings for LLT, VLM and Panel analysis"));
 	connect(advancedSettings, SIGNAL(triggered()), pMiarex, SLOT(OnAdvancedSettings()));
 }
 
@@ -3805,11 +3889,13 @@ void MainFrame::OnSaveOptions()
 {
 	SaveOptionsDlg dlg;
 	dlg.InitDialog(m_bSaveOpps, m_bSaveWOpps);
+	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
 	{
 		m_bSaveOpps  = dlg.m_bOpps;
 		m_bSaveWOpps = dlg.m_bWOpps;
 	}
+	m_DlgPos = dlg.pos();
 }
 
 
@@ -4818,7 +4904,6 @@ void MainFrame::SaveSettings()
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-	QString FileName;
 
 	if(!m_bSaveSettings) return;
 #ifdef Q_WS_MAC
@@ -6653,9 +6738,5 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 	}
 }
-
-
-
-
 
 

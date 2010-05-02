@@ -31,6 +31,7 @@
 #include "../Misc/EditPlrDlg.h"
 #include "../Misc/PolarFilterDlg.h"
 #include "../Graph/GraphDlg.h"
+#include "GLCreateLists.h"
 #include "WAdvancedDlg.h"
 #include "ManageBodiesDlg.h"
 #include "ManageUFOsDlg.h"
@@ -691,11 +692,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 }
 
-
-
-QMiarex::~QMiarex()
-{
-}
 
 
 
@@ -4471,7 +4467,6 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 								 (pWPolar->m_Type == 7 && m_bType7)))
 
 			{
-				if((m_iView!=WSTABVIEW && pWPolar->m_Type!=7) || (m_iView==WSTABVIEW && pWPolar->m_Type==7))
 					UFOPlrs++;
 
 			}
@@ -4506,26 +4501,24 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 						(pWPolar->m_Type == 6 && m_bType6) ||
 						(pWPolar->m_Type == 7 && m_bType7)))
 					{
-						if((m_iView!=WSTABVIEW && pWPolar->m_Type!=7) || (m_iView==WSTABVIEW && pWPolar->m_Type==7))
+
+						LegendPen.setColor(pWPolar->m_Color);
+						LegendPen.setStyle(GetStyle(pWPolar->m_Style));
+						LegendPen.setWidth(pWPolar->m_Width);
+						painter.setPen(LegendPen);
+
+						painter.drawLine(place.x() + (int)(0.5*LegendSize), place.y() + (int)(1.*ypos*ny),
+										 place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny));
+
+						if(pWPolar->m_bShowPoints)
 						{
-							LegendPen.setColor(pWPolar->m_Color);
-							LegendPen.setStyle(GetStyle(pWPolar->m_Style));
-							LegendPen.setWidth(pWPolar->m_Width);
-							painter.setPen(LegendPen);
-
-							painter.drawLine(place.x() + (int)(0.5*LegendSize), place.y() + (int)(1.*ypos*ny),
-											 place.x() + (int)(1.5*LegendSize), place.y() + (int)(1.*ypos*ny));
-
-							if(pWPolar->m_bShowPoints)
-							{
-								x1 = place.x() + (int)(1.0*LegendSize);
-								painter.drawRect(x1-2, place.y()-2 + (int)(1.*ypos*ny), 4, 4);
-							}
-							painter.setPen(TextPen);
-							painter.drawText(place.x() + (int)(2.0*LegendSize),
-											 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->m_PlrName);
-							ny++ ;
+							x1 = place.x() + (int)(1.0*LegendSize);
+							painter.drawRect(x1-2, place.y()-2 + (int)(1.*ypos*ny), 4, 4);
 						}
+						painter.setPen(TextPen);
+						painter.drawText(place.x() + (int)(2.0*LegendSize),
+										 place.y() + (int)(1.*ypos*ny)+(int)(ypos/3), pWPolar->m_PlrName);
+						ny++ ;
 					}
 				}
 			}
@@ -4991,212 +4984,6 @@ CBody * QMiarex::GetBody(QString BodyName)
 
 
 
-double QMiarex::GetCl(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
-{
-	double Cl0, Cl1;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil0)
-		Cl0 = 2.0*PI*(Alpha*PI/180.0);
-	else
-		Cl0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 1, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	if(!pFoil1)
-		Cl1 = 2.0*PI*(Alpha*PI/180.0);
-	else
-		Cl1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 1, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	return ((1-Tau) * Cl0 + Tau * Cl1);
-}
-
-
-
-double QMiarex::GetCm0(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
-{
-	//Find 0-lift angle for local foil
-	double Alpha;
-	double Cm0, Cm1;
-	double Cl0 = 1.0;
-	double Cl1;
-	bOutRe = false;
-	bError = false;
-	bool IsOutRe;
-	bool IsError;
-
-	bOutRe = false;
-	for (int i=-10; i<10; i++)
-	{
-		Alpha = (double)i;
-		Cl1 = GetCl(pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
-		if(Cl1>0.0)
-		{
-			if(IsOutRe) bOutRe = true;
-			if(IsError) bError = true;
-			break;
-		}
-		Cl0 = Cl1;
-	}
-	if(Cl0>0.0)
-	{
-		return 0.0;
-	}
-	Cm0 = GetCm(pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	Cm1 = GetCm(pFoil0, pFoil1, Re, Alpha,     Tau, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	double Res = Cm0 + (Cm1-Cm0)*(0.0-Cl0)/(Cl1-Cl0);
-
-	return Res;
-}
-
-
-double QMiarex::GetCm(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
-{
-	double Cm0, Cm1;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil0)
-		Cm0 = 0.0;
-	else
-		Cm0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 4, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if(!pFoil1)
-		Cm1 = 0.0;
-	else
-		Cm1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 4, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-	return ((1-Tau) * Cm0 + Tau * Cm1);
-}
-
-double QMiarex::GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
-{
-	//For LLT calculations
-	//returns the interpolated viscous drag
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	double Cd0, Cd1, Cl;
-	if(!pFoil0)
-	{
-		Cl = 2.0*PI*(Alpha*PI/180.0);
-		Cd0 = Cl*Cl/PI/AR;
-	}
-	else Cd0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha,2, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	if(!pFoil1)
-	{
-		Cl = 2.0*PI*(Alpha*PI/180.0);
-		Cd1 = Cl*Cl/PI/AR;
-	}
-	else Cd1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha,2, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-	return ((1-Tau) * Cd0 + Tau * Cd1);
-}
-
-
-double QMiarex::GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
-{
-	//For LLT calculations
-	//returns the interpolated center of pressure position
-
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	double XCp0, XCp1;
-
-	if(!pFoil0) return 0.0;
-	else XCp0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 11, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if(!pFoil1) return 0.0;
-	else XCp1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 11, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	return ((1-Tau) * XCp0 + Tau * XCp1);
-}
-
-double QMiarex::GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
-{
-	//For LLT calculations
-	//returns the interpolated position of the transition on the  surface specified by bTop
-
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-
-	double Tr0, Tr1;
-	if(!pFoil0)
-	{
-		Tr0 = 1.0;
-	}
-	else
-	{
-		if(bTop) Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr0 = GetPlrPointFromAlpha(pFoil0, Re, Alpha, 6, IsOutRe, IsError);
-	}
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-	if(!pFoil1)
-	{
-		Tr1 = 1.0;
-	}
-	else
-	{
-		if(bTop) Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 5, IsOutRe, IsError);
-		else     Tr1 = GetPlrPointFromAlpha(pFoil1, Re, Alpha, 6, IsOutRe, IsError);
-	}
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-	return ((1-Tau) * Tr0 + Tau * Tr1);
-}
-
-
 CPOpp * QMiarex::GetPOpp(double Alpha)
 {
 	// returns a pointer to the WOpp corresponding to aoa Alpha,
@@ -5217,772 +5004,6 @@ CPOpp * QMiarex::GetPOpp(double Alpha)
 		}
 	}
 	return NULL;
-}
-
-
-void * QMiarex::GetPlrVariable(CPolar *pPolar, int iVar)
-{
-	// returns a pointer to the variable array defined by its index iVar
-
-	void * pVar;
-	switch (iVar)
-	{
-		case 0:
-			pVar = &pPolar->m_Alpha;
-			break;
-		case 1:
-			pVar = &pPolar->m_Cl;
-			break;
-		case 2:
-			pVar = &pPolar->m_Cd;
-			break;
-		case 3:
-			pVar = &pPolar->m_Cdp;
-			break;
-		case 4:
-			pVar = &pPolar->m_Cm;
-			break;
-		case 5:
-			pVar = &pPolar->m_XTr1;
-			break;
-		case 6:
-			pVar = &pPolar->m_XTr2;
-			break;
-		case 7:
-			pVar = &pPolar->m_HMom;
-			break;
-		case 8:
-			pVar = &pPolar->m_Cpmn;
-			break;
-		case 9:
-			pVar = &pPolar->m_ClCd;
-			break;
-		case 10:
-			pVar = &pPolar->m_Cl32Cd;
-			break;
-		case 11:
-			pVar = &pPolar->m_XCp;
-			break;
-		default:
-			pVar = &pPolar->m_Alpha;
-			break;
-	}
-	return pVar;
-}
-
-
-double QMiarex::GetPlrPointFromAlpha(CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
-{
-/*	Var
-	0 =	m_Alpha;
-	1 = m_Cl;
-	2 = m_Cd;
-	3 = m_Cdp;
-	4 = m_Cm;
-	5, 6 = m_XTr1, m_XTr2;
-	7, 8 = m_HMom, m_Cpmn;
-	9,10 = m_ClCd, m_Cl32Cd;
-	11 = m_XCp
-*/
-
-	QList <double> *pX;
-	double amin, amax;
-	double Var1, Var2, u;
-	amin = amax = Var1 = Var2 = u = 0.0;
-	int i;
-	CPolar *pPolar;
-
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil)
-	{
-		bOutRe = true;
-		bError = true;
-		return 0.000;
-	}
-
-
-	int size;
-	int n = 0;
-
-	// Are there any Type 1 polars available for this foil ?
-	for (i = 0; i< m_poaPolar->size(); i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
-		{
-			n++;
-			if(n>=2) break;
-		}
-	}
-
-//more than one polar - interpolate between  - tough job
-
-	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
-	int nPolars = (int)m_poaPolar->size();
-	//Type 1 Polars are sorted by crescending Re Number
-
-	//if Re is less than that of the first polar, use this one
-	for (i=0; i< nPolars; i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
-		{
-			// we have found the first type 1 polar for this foil
-			if (Re < pPolar->m_Reynolds)
-			{
-				bOutRe = true;
-				//interpolate Alpha on this polar
-				pX = (QList <double> *) GetPlrVariable(pPolar, PlrVar);
-				size = (int)pPolar->m_Alpha.size();
-				if(Alpha < pPolar->m_Alpha[0])
-				{
-					return (*pX)[0];
-				}
-				if(Alpha > pPolar->m_Alpha[size-1])
-				{
-					return (*pX)[size-1];
-				}
-				for (i=0; i<size-1; i++)
-				{
-					if(pPolar->m_Alpha[i] <= Alpha && Alpha < pPolar->m_Alpha[i+1])
-					{
-						//interpolate
-						if(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i] < 0.00001)//do not divide by zero
-							return (*pX)[i];
-						else
-						{
-							u = (Alpha - pPolar->m_Alpha[i])
-									 /(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i]);
-							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-						}
-					}
-				}
-				break;
-			}
-			break;
-		}
-	}
-
-	// if not Find the two polars
-	for (i=0; i< nPolars; i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
-		{
-			// we have found the first type 1 polar for this foil
-			pPolar->GetAlphaLimits(amin, amax);
-			if (pPolar->m_Reynolds <= Re)
-			{
-				if(amin <= Alpha && Alpha <= amax)
-				{
-					pPolar1 = pPolar;
-				}
-			}
-			else {
-				if(amin <= Alpha && Alpha <= amax)
-				{
-					pPolar2 = pPolar;
-					break;
-				}
-			}
-		}
-	}
-
-	if (!pPolar2)
-	{
-		//then Re is greater than that of any polar
-		// so use last polar and interpolate alphas on this polar
-		bOutRe = true;
-		if(!pPolar1)
-		{
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Alpha.size();
-		if(!size)
-		{
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Alpha < pPolar1->m_Alpha[0])	     return (*pX)[0];
-		if(Alpha > pPolar1->m_Alpha[size-1]) return (*pX)[size-1];
-		for (i=0; i<size-1; i++)
-		{
-			if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1])
-			{
-				//interpolate
-				if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001){//do not divide by zero
-					return (*pX)[i];
-				}
-				else
-				{
-					u = (Alpha - pPolar1->m_Alpha[i])
-							 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
-					return (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-				}
-			}
-		}
-		//Out in Re, out in alpha...
-		return (*pX)[size-1] ;
-
-	}
-	else
-	{
-		// Re is between that of polars 1 and 2
-		// so interpolate alphas for each
-
-		if(!pPolar1)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Alpha.size();
-		if(!size) {
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Alpha < pPolar1->m_Alpha[0])	          Var1 = (*pX)[0];
-		else if(Alpha > pPolar1->m_Alpha[size-1]) Var1 = (*pX)[size-1];
-		else
-		{
-			for (i=0; i<size-1; i++)
-			{
-				if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1]){
-					//interpolate
-					if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001)//do not divide by zero
-						Var1 = (*pX)[i];
-					else
-					{
-						u = (Alpha - pPolar1->m_Alpha[i])
-								 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
-						Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-					}
-				}
-			}
-		}
-
-		size = (int)pPolar2->m_Alpha.size();
-		if(!size)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
-		if(Alpha < pPolar2->m_Alpha[0])
-		{
-			bOutRe = true;
-			bError = true;
-			Var2 = (*pX)[0];
-		}
-		else if(Alpha > pPolar2->m_Alpha[size-1])
-		{
-			bOutRe = true;
-			bError = true;
-			Var2 = (*pX)[size-1];
-		}
-		else{
-			for (i=0; i<size-1; i++)
-			{
-				if(pPolar2->m_Alpha[i] <= Alpha && Alpha < pPolar2->m_Alpha[i+1])
-				{
-					//interpolate
-					pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
-					if(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i] < 0.00001)//do not divide by zero
-						Var2 = (*pX)[i];
-					else{
-						u = (Alpha - pPolar2->m_Alpha[i])
-								 /(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i]);
-						Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-					}
-				}
-			}
-		}
-		// then interpolate Variable
-
-		double v =   (Re - pPolar1->m_Reynolds)
-				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
-		double Var = Var1 + v * (Var2-Var1);
-		return Var;
-	}
-
-//	AfxMessageBox("Error interpolating", MB_OK);
-//	bOutRe = true;
-//	bError = true;
-//	return 0.000;// we missed something somewhere...
-}
-
-
-double QMiarex::GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
-{
-	//TODO : check this GetPlrPoint duplicate with CMAinFrame
-/*	Var
-	0 =	m_Alpha;
-	1 = m_Cl;
-	2 = m_Cd;
-	3 = m_Cdp;
-	4 = m_Cm;
-	5, 6 = m_XTr1, m_XTr2;
-	7, 8 = m_HMom, m_Cpmn;
-	9,10 = m_ClCd, m_Cl32Cd;
-*/
-	QList <double> *pX;
-	double Clmin, Clmax;
-	CPolar *pPolar;
-	double Var1, Var2, u, dist;
-	Var1 = Var2 = u = dist = 0.0;
-	int pt;
-	int size;
-	int n, i;
-
-	bOutRe = false;
-	bError = false;
-
-	if(!pFoil)
-	{
-		bOutRe = true;
-		bError = true;
-		return 0.000;
-	}
-
-		n=0;
-	// Are there any Type 1 polars available for this foil ?
-	for (i = 0; i< m_poaPolar->size(); i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
-		{
-			n++;
-			if(n>=2) break;
-		}
-	}
-
-//more than one polar - interpolate between  - tough job
-
-	//First Find the two polars with Reynolds number surrounding wanted Re
-	CPolar * pPolar1 = NULL;
-	CPolar * pPolar2 = NULL;
-	int nPolars = m_poaPolar->size();
-	//Type 1 Polars are sorted by crescending Re Number
-
-	//if Re is less than that of the first polar, use this one
-	for (i=0; i< nPolars; i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
-		{
-			// we have found the first type 1 polar for this foil
-			if (Re < pPolar->m_Reynolds)
-			{
-				bOutRe = true;
-				//interpolate Cl on this polar
-				pX = (QList <double> *) GetPlrVariable(pPolar, PlrVar);
-				size = (int)pPolar->m_Cl.size();
-				if(Cl < pPolar->m_Cl[0])
-				{
-					return (*pX)[0];
-				}
-				if(Cl > pPolar->m_Cl[size-1])
-				{
-					return (*pX)[size-1];
-				}
-				for (i=0; i<size-1; i++)
-				{
-					if(pPolar->m_Cl[i] <= Cl && Cl < pPolar->m_Cl[i+1])
-					{
-					//interpolate
-						if(pPolar->m_Cl[i+1]-pPolar->m_Cl[i] < 0.00001)//do not divide by zero
-							return (*pX)[i];
-						else {
-							u = (Cl - pPolar->m_Cl[i])
-									 /(pPolar->m_Cl[i+1]-pPolar->m_Cl[i]);
-							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-						}
-					}
-				}
-				break;
-			}
-			break;
-		}
-	}
-
-	// if not Find the two polars
-	for (i=0; i< nPolars; i++)
-	{
-		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
-		{
-			// we have found the first type 1 polar for this foil
-			pPolar->GetClLimits(Clmin, Clmax);
-			if (pPolar->m_Reynolds <= Re)
-			{
-				if(Clmin <= Cl && Cl <= Clmax)
-				{
-					pPolar1 = pPolar;
-				}
-			}
-			else
-			{
-				if(Clmin <= Cl && Cl <= Clmax)
-				{
-					pPolar2 = pPolar;
-					break;
-				}
-			}
-		}
-	}
-
-	if (!pPolar2)
-	{
-		//then Re is greater than that of any polar
-		// so use last polar and interpolate Cls on this polar
-		bOutRe = true;
-		if(!pPolar1)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Cl.size();
-		if(!size)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
-		if(Cl < pPolar1->m_Cl[0])	   return (*pX)[0];
-		if(Cl > pPolar1->m_Cl[size-1]) return (*pX)[size-1];
-		for (i=0; i<size-1; i++)
-		{
-			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1])
-			{
-				//interpolate
-				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001)
-				{//do not divide by zero
-					return (*pX)[i];
-				}
-				else
-				{
-					u = (Cl - pPolar1->m_Cl[i])
-							 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
-					return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
-				}
-			}
-		}
-		//Out in Re, out in Cl...
-		return (*pX)[size-1];
-	}
-	else
-	{
-		// Re is between that of polars 1 and 2
-		// so interpolate Cls for each
-		if(!pPolar1)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-		size = (int)pPolar1->m_Cl.size();
-		if(!size)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
-		pPolar1->GetClLimits(Clmin, Clmax);
-		if(Cl < Clmin)
-		{
-			Var1 = (*pX)[0];
-			bOutRe = true;
-		}
-		else if(Cl > Clmax)
-		{
-			Var1 = (*pX)[size-1];
-			bOutRe = true;
-		}
-		else
-		{
-			//first Find the point closest to Cl=0
-			pt = 0;
-			dist = fabs(pPolar1->m_Cl[0]);
-			for (i=1; i<size;i++)
-			{
-				if (fabs(pPolar1->m_Cl[i])< dist)
-				{
-					dist = fabs(pPolar1->m_Cl[i]);
-					pt = i;
-				}
-			}
-			if(Cl<pPolar1->m_Cl[pt])
-			{
-				for (i=pt; i>0; i--)
-				{
-					if(Cl<= pPolar1->m_Cl[i] && Cl > pPolar1->m_Cl[i-1])
-					{
-						//interpolate
-						if(fabs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001)
-						{
-							//do not divide by zero
-							Var1 = (*pX)[i];
-							break;
-						}
-						else
-						{
-							u = (Cl - pPolar1->m_Cl[i-1])
-									 /(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]);
-							Var1 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				for (i=pt; i<size-1; i++)
-				{
-					if(pPolar1->m_Cl[i] <=Cl && Cl < pPolar1->m_Cl[i+1])
-					{
-						//interpolate
-						if(fabs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
-							Var1 = (*pX)[i];
-							break;
-						}
-						else
-						{
-							u = (Cl - pPolar1->m_Cl[i])
-									 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
-							Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-							break;
-						}
-					}
-				}
-			}
-		}
-		size = (int)pPolar2->m_Cl.size();
-		if(!size)
-		{
-			bOutRe = true;
-			bError = true;
-			return 0.000;
-		}
-
-		pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
-		pPolar2->GetClLimits(Clmin, Clmax);
-
-		if(Cl < Clmin)
-		{
-			Var2 = (*pX)[0];
-			bOutRe = true;
-		}
-		else if(Cl > Clmax)
-		{
-			Var2 = (*pX)[size-1];
-			bOutRe = true;
-		}
-		else
-		{
-			//first Find the point closest to Cl=0
-			pt = 0;
-			dist = fabs(pPolar2->m_Cl[0]);
-			for (i=1; i<size;i++)
-			{
-				if (fabs(pPolar2->m_Cl[i])< dist)
-				{
-					dist = fabs(pPolar2->m_Cl[i]);
-					pt = i;
-				}
-			}
-			if(Cl<pPolar2->m_Cl[pt])
-			{
-				for (i=pt; i>0; i--)
-				{
-					if(Cl<= pPolar2->m_Cl[i] && Cl > pPolar2->m_Cl[i-1])
-					{
-						//interpolate
-						if(fabs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001)
-						{//do not divide by zero
-							Var2 = (*pX)[i];
-							break;
-						}
-						else
-						{
-							u = (Cl - pPolar2->m_Cl[i-1])
-									 /(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]);
-							Var2 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				for (i=pt; i<size-1; i++)
-				{
-					if(pPolar2->m_Cl[i] <=Cl && Cl < pPolar2->m_Cl[i+1])
-					{
-						//interpolate
-						if(fabs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001)
-						{
-							//do not divide by zero
-							Var2 = (*pX)[i];
-							break;
-						}
-						else
-						{
-							u = (Cl - pPolar2->m_Cl[i])
-									 /(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]);
-							Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		// then interpolate Variable
-
-		double v =   (Re - pPolar1->m_Reynolds) / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
-		double Var = Var1 + v * (Var2-Var1);
-		return Var;
-	}
-
-//	AfxMessageBox("Error interpolating", MB_OK);
-//	bOutRe = true;
-//	bError = true;
-//	return 0.000;// we missed something somewhere...
-}
-
-
-void QMiarex::GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
-{
-	//returns the 0-lift angle of the foil, at Reynolds=Re
-	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
-	double Alpha00, Alpha01;
-	double Slope0, Slope1;
-	double AlphaTemp1, AlphaTemp2, SlopeTemp1, SlopeTemp2;
-	int i;
-
-//Find the two polars which enclose Reynolds
-	int size = 0;
-	CPolar *pPolar, *pPolar1, *pPolar2;
-
-	if(!pFoil0)
-	{
-		Alpha00 = 0.0;
-		Slope0 = 2.0 * PI *PI/180.0;
-	}
-	else
-	{
-		pPolar1 = NULL;
-		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
-		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
-			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
-		}
-		if(size){
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil0->m_FoilName)
-				{
-					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
-				}
-			}
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil0->m_FoilName)
-				{
-					if(pPolar->m_Reynolds > Re)
-					{
-						pPolar2 = pPolar;
-						break;
-					}
-				}
-			}
-		}
-		if(pPolar1 && pPolar2)
-		{
-			pPolar1->GetLinearizedCl(AlphaTemp1, SlopeTemp1);
-			pPolar2->GetLinearizedCl(AlphaTemp2, SlopeTemp2);
-			Alpha00 = AlphaTemp1 +
-					 (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-			Slope0  = SlopeTemp1 +
-					 (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-		}
-		else
-		{
-			Alpha00 = 0.0;
-			Slope0  = 2.0 * PI *PI/180.0;
-		}
-	}
-
-	if(!pFoil1)
-	{
-		Alpha01 = 0.0;
-		Slope1 = 2.0*PI *PI/180.0;
-	}
-	else
-	{
-		pPolar1 = NULL;
-		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
-		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
-			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
-		}
-		if(size){
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil1->m_FoilName)
-				{
-					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
-				}
-			}
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil1->m_FoilName)
-				{
-					if(pPolar->m_Reynolds > Re)
-					{
-						pPolar2 = pPolar;
-						break;
-					}
-				}
-			}
-		}
-		if(pPolar1 && pPolar2){
-			pPolar1->GetLinearizedCl(AlphaTemp1, SlopeTemp1);
-			pPolar2->GetLinearizedCl(AlphaTemp2, SlopeTemp2);
-			Alpha01 = AlphaTemp1 +
-					 (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-			Slope1  = SlopeTemp1 +
-					 (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-		}
-		else {
-			Alpha01 = 0.0;
-			Slope1 = 2.0*PI *PI/180.0;
-		}
-	}
-
-	Alpha0 = ((1-Tau) * Alpha00 + Tau * Alpha01);
-	Slope  = ((1-Tau) * Slope0  + Tau * Slope1);
 }
 
 
@@ -6074,136 +5095,6 @@ CPlane * QMiarex::GetPlane(QString PlaneName)
 }
 
 
-double QMiarex::GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau)
-{
-	//returns the 0-lift angle of the foil, at Reynolds=Re
-	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
-	double a01, a02;
-	double Alpha00, Alpha01;
-	int i;
-	//Find the two polars which enclose Reynolds
-	int size = 0;
-	CPolar *pPolar, *pPolar1, *pPolar2;
-
-	if(!pFoil0) Alpha00 = 0.0;
-	else
-	{
-		pPolar1 = NULL;
-		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
-		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
-			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
-		}
-		if(size)
-		{
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil0->m_FoilName)
-				{
-					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
-				}
-			}
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil0->m_FoilName)
-				{
-					if(pPolar->m_Reynolds > Re)
-					{
-						pPolar2 = pPolar;
-						break;
-					}
-				}
-			}
-		}
-		if(pPolar1 && pPolar2)
-		{
-			a01 = pPolar1->GetZeroLiftAngle();
-			a02 = pPolar2->GetZeroLiftAngle();
-			Alpha00 = a01 + (a02-a01) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-		}
-		else Alpha00 = 0.0;
-	}
-
-	if(!pFoil1) Alpha01 = 0.0;
-	else
-	{
-		pPolar1 = NULL;
-		pPolar2 = NULL;
-		for (i=0; i<m_poaPolar->size(); i++)
-		{
-			pPolar = (CPolar*)m_poaPolar->at(i);
-			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
-		}
-		if(size)
-		{
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil1->m_FoilName)
-				{
-					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
-				}
-			}
-			for (i=0; i<m_poaPolar->size(); i++)
-			{
-				pPolar = (CPolar*)m_poaPolar->at(i);
-				if(pPolar->m_FoilName == pFoil1->m_FoilName)
-				{
-					if(pPolar->m_Reynolds > Re)
-					{
-						pPolar2 = pPolar;
-						break;
-					}
-				}
-			}
-		}
-		if(pPolar1 && pPolar2)
-		{
-			a01 = pPolar1->GetZeroLiftAngle();
-			a02 = pPolar2->GetZeroLiftAngle();
-			Alpha01 = a01 + (a02-a01) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-		}
-		else Alpha01 = 0.0;
-	}
-
-	return ((1-Tau) * Alpha00 + Tau * Alpha01);
-}
-
-
-double QMiarex::GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
-{
-	bool IsOutRe = false;
-	bool IsError  = false;
-	bOutRe = false;
-	bError = false;
-	double Var0, Var1;
-	if(!pFoil0)
-	{
-		Cl = 0.0;
-		Var0 = 0.0;
-	}
-	else Var0 = GetPlrPointFromCl(pFoil0, Re, Cl,nVar, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-
-	if(!pFoil1)
-	{
-		Cl = 0.0;
-		Var1 = 0.0;
-	}
-	else Var1 = GetPlrPointFromCl(pFoil1, Re, Cl,nVar, IsOutRe, IsError);
-	if(IsOutRe) bOutRe = true;
-	if(IsError) bError = true;
-
-	if (Tau<0.0) Tau = 0.0;
-	if (Tau>1.0) Tau = 1.0;
-
-	return ((1-Tau) * Var0 + Tau * Var1);
-}
 
 
 CWing * QMiarex::GetWing(QString WingName)
@@ -6466,2590 +5357,6 @@ void QMiarex::GLCallViewLists()
 }
 
 
-void QMiarex::GLCreateCp()
-{
-	if(!m_pCurWOpp)
-	{
-		glNewList(PANELCP,GL_COMPILE);
-		glEndList();
-		return;
-	}
-
-	int p, pp, n, averageInf, averageSup, average100;
-	int nPanels;
-	double color;
-	double lmin, lmax, range;
-	double *tab;
-	double CpInf[2*VLMMATSIZE], CpSup[2*VLMMATSIZE], Cp100[2*VLMMATSIZE];
-	CVector LA,LB,TA,TB;
-
-	glNewList(PANELCP,GL_COMPILE);
-	{
-		m_GLList++;
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-
-		if(m_pCurPOpp)
-		{
-			tab = m_pCurPOpp->m_Cp;
-			nPanels = m_pCurPOpp->m_NPanels;
-		}
-		else
-		{
-			tab = m_pCurWOpp->m_Cp;
-			nPanels = m_pCurWOpp->m_NVLMPanels;
-		}
-
-		lmin = 10000.0;
-		lmax = -10000.0;
-		// find min and max Cp for scale set
-		for (n=0; n<m_nNodes; n++)
-		{
-			averageInf = 0; averageSup = 0; average100 = 0;
-			CpInf[n] = 0.0; CpSup[n] = 0.0; Cp100[n] = 0.0;
-			for (pp=0; pp< nPanels; pp++)
-			{
-				if (m_Node[m_Panel[pp].m_iLA].IsSame(m_Node[n]) || m_Node[m_Panel[pp].m_iTA].IsSame(m_Node[n]) ||
-					m_Node[m_Panel[pp].m_iTB].IsSame(m_Node[n]) || m_Node[m_Panel[pp].m_iLB].IsSame(m_Node[n]))
-				{
-					if(m_Panel[pp].m_iPos==1)
-					{
-						CpSup[n] +=tab[pp];
-						averageSup++;
-					}
-					else if(m_Panel[pp].m_iPos<=0)
-					{
-						CpInf[n] +=tab[pp];
-						averageInf++;
-					}
-					else if(m_Panel[pp].m_iPos==100)
-					{
-						Cp100[n] +=tab[pp];
-						average100++;
-					}
-				}
-			}
-			if(averageSup>0)
-			{
-				CpSup[n] /= averageSup;
-				if(CpSup[n]<lmin) lmin = CpSup[n];
-				if(lmax<CpSup[n]) lmax = CpSup[n];
-			}
-			if(averageInf>0)
-			{
-				CpInf[n] /= averageInf;
-				if(CpInf[n]<lmin) lmin = CpInf[n];
-				if(lmax<CpInf[n]) lmax = CpInf[n];
-			}
-			if(average100>0)
-			{
-				Cp100[n] /= average100;
-				if(Cp100[n]<lmin) lmin = Cp100[n];
-				if(lmax<Cp100[n]) lmax = Cp100[n];
-			}
-		}
-
-		if(m_bAutoCpScale)
-		{
-			m_LegendMin = lmin;
-			m_LegendMax = lmax;
-		}
-		else
-		{
-			lmin = m_LegendMin;
-			lmax = m_LegendMax;
-		}
-
-		range = lmax - lmin;
-
-		glLineWidth(1.0);
-		for (p=0; p<m_MatSize; p++)
-		{
-			glBegin(GL_QUADS);
-			{
-				TA.Copy(m_Node[m_Panel[p].m_iTA]);
-				TB.Copy(m_Node[m_Panel[p].m_iTB]);
-				LA.Copy(m_Node[m_Panel[p].m_iLA]);
-				LB.Copy(m_Node[m_Panel[p].m_iLB]);
-
-				if(m_Panel[p].m_iPos==1) color = (CpSup[m_Panel[p].m_iLA]-lmin)/range;
-				else if(m_Panel[p].m_iPos<=0) color = (CpInf[m_Panel[p].m_iLA]-lmin)/range;
-				else                           color = (Cp100[m_Panel[p].m_iLA]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(LA.x, LA.y, LA.z);
-
-				if(m_Panel[p].m_iPos==1) color = (CpSup[m_Panel[p].m_iTA]-lmin)/range;
-				else if(m_Panel[p].m_iPos<=0) color = (CpInf[m_Panel[p].m_iTA]-lmin)/range;
-				else                           color = (Cp100[m_Panel[p].m_iTA]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(TA.x, TA.y, TA.z);
-
-				if(m_Panel[p].m_iPos==1) color = (CpSup[m_Panel[p].m_iTB]-lmin)/range;
-				else if(m_Panel[p].m_iPos<=0) color = (CpInf[m_Panel[p].m_iTB]-lmin)/range;
-				else                           color = (Cp100[m_Panel[p].m_iTB]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(TB.x, TB.y, TB.z);
-
-				if(m_Panel[p].m_iPos==1) color = (CpSup[m_Panel[p].m_iLB]-lmin)/range;
-				else if(m_Panel[p].m_iPos<=0) color = (CpInf[m_Panel[p].m_iLB]-lmin)/range;
-				else                           color = (Cp100[m_Panel[p].m_iLB]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(LB.x, LB.y, LB.z);
-
-			}
-			glEnd();
-		}
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-	glEndList();
-
-}
-
-
-void QMiarex::GLCreateCpLegend()
-{
-	int i;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	QString strong;
-
-	double labellength, ClientToGL;
-
-	double f, fi,dD, ZPos,dz,Right1, Right2;
-	double color = 0.0;
-	double range, delta;
-
-	QFontMetrics fm(pMainFrame->m_TextFont);
-
-	double w = (double)m_rCltRect.width();
-	double h = (double)m_rCltRect.height();
-	double XPos;
-
-	if(w>h)
-	{
-		XPos  = 1.0;
-//		ZPos  = h/w * (-1.0 + 2.0/3.0);
-		dz    = h/w*1.0/20.0;
-		ZPos  = h/w - 23.0*dz;
-		ClientToGL = 2.0/w;
-	}
-	else
-	{
-		XPos = w/h;
-//		ZPos  = (-1.0 + 2.0/3.0);
-		dz    = 1.0/20.0;
-		ZPos  = 1.0 - 23.0*dz;
-		ClientToGL = 2.0/h;
-	}
-
-	dD      = 12.0/w*2.0;
-
-	Right1  = .94*XPos;
-	Right2  = .98*XPos;
-
-	range = (m_LegendMax - m_LegendMin);
-	delta = range / 20;
-
-
-	glNewList(WOPPCPLEGENDTXT,GL_COMPILE);
-	{
-		m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-//		glBegin(GL_LINES);
-//		glVertex3d(-1.0, h/w, 0.0);
-//		glVertex3d(0.0, 0.0, 0.0);
-//		glEnd();
-
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-		// Draw the labels
-		for (i=0; i<=20; i ++)
-		{
-			f = m_LegendMin + (double)i * delta;
-			fi = (double)i*dz;
-			strong = QString("%1").arg(f, 5,'f',2);
-			labellength = (fm.width(strong)+5) * ClientToGL;
-			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
-		}
-		strong = tr("Cp");
-		labellength = (fm.width(strong)+5) * ClientToGL;
-		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong, pMainFrame->m_TextFont);
-	}
-	glEndList();
-
-	glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
-	{
-		m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-		glPolygonMode(GL_FRONT,GL_FILL);
-
-		glBegin(GL_QUAD_STRIP);
-		{
-			for (i=0; i<=20; i++)
-			{
-				fi = (double)i*dz;
-				color += 0.05;
-
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(Right1, ZPos+fi, 0.0);
-				glVertex3d(Right2, ZPos+fi, 0.0);
-			}
-		}
-		glEnd();
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateGeom(CWing *pWing, int List)
-{
-	if(!pWing) return;
-
-	static int j, l, style, width;
-	static double x;
-	static CVector Pt, PtNormal, A, B, C, D, N, BD, AC, LATB, TALB;
-	static QColor color;
-	static CFoil * pFoilA, *pFoilB;
-
-	N.Set(0.0, 0.0, 0.0);
-	glNewList(List,GL_COMPILE);
-	{
-		m_GLList++;
-		glLineWidth(1.0);
-
-		color = pWing->m_WingColor;
-		style = 0;
-		width = 0;
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-		glEnable(GL_DEPTH_TEST);
-
-		//top surface
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-
-					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
-					glNormal3d(PtNormal.x, PtNormal.y, PtNormal.z);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-		}
-
-		//bottom surface
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_QUAD_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-
-					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
-
-					glNormal3d(PtNormal.x, PtNormal.y, PtNormal.z);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-
-		}
-
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			//All surfaces
-			//Left surface
-			if(pWing->m_Surface[j].m_bIsTipLeft)
-			{
-				glBegin(GL_QUAD_STRIP);
-				{
-					pWing->m_Surface[j].GetPanel(0, 0, -1);
-					C. Copy(pWing->m_Surface[0].LA);
-					D. Copy(pWing->m_Surface[0].TA);
-					pWing->m_Surface[j].GetPanel(0, 0, 1);
-					A. Copy(pWing->m_Surface[0].TA);
-					B. Copy(pWing->m_Surface[0].LA);
-
-					BD = D-B;
-					AC = C-A;
-					N  = AC*BD;
-					N.Normalize();
-					glNormal3d( N.x, N.y, N.z);
-
-					for (l=0; l<=100; l++)
-					{
-						x = (double)l/100.0;
-
-						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
-
-						glVertex3d(Pt.x, Pt.y, Pt.z);
-
-						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
-						glVertex3d(Pt.x, Pt.y, Pt.z);
-					}
-				}
-				glEnd();
-			}
-			if(pWing->m_Surface[j].m_bIsTipRight)
-			{
-				//right surface
-				glBegin(GL_QUAD_STRIP);
-				{
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, 1);
-					A. Copy(pWing->m_Surface[0].TB);
-					B. Copy(pWing->m_Surface[0].LB);
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, -1);
-					C. Copy(pWing->m_Surface[0].LB);
-					D. Copy(pWing->m_Surface[0].TB);
-
-					BD = D-B;
-					AC = C-A;
-					N  = BD * AC;
-					N.Normalize();
-					glNormal3d( N.x,  N.y,  N.z);
-
-					for (l=0; l<=100; l++)
-					{
-						x = (double)l/100.0;
-
-						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
-
-						glVertex3d(Pt.x, Pt.y, Pt.z);
-
-						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
-						glVertex3d(Pt.x, Pt.y, Pt.z);
-					}
-				}
-				glEnd();
-			}
-		}
-		glDisable(GL_POLYGON_OFFSET_FILL);
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-
-	//OUTLINE
-	glNewList(List+1,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glEnable (GL_LINE_STIPPLE);
-		glLineWidth((GLfloat)m_OutlineWidth);
-
-		color = m_OutlineColor;
-		style = m_OutlineStyle;
-		width = m_OutlineWidth;
-
-		if     (style == 1) 	glLineStipple (1, 0x1111);
-		else if(style == 2) 	glLineStipple (1, 0x0F0F);
-		else if(style == 3) 	glLineStipple (1, 0x1C47);
-		else					glLineStipple (1, 0xFFFF);
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-		glLineWidth((GLfloat)width);
-
-		//TOP outline
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_LINE_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-		}
-
-		//BOTTOM outline
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_LINE_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-					pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,-1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				for (l=0; l<=100; l++)
-				{
-					x = (double)l/100.0;
-					pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,-1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-			}
-			glEnd();
-
-		}
-		//WingContour
-		//Leading edge outline
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_LINES);
-			{
-				pWing->m_Surface[j].GetPanel(0,pWing->m_Surface[j].m_NXPanels-1, 0);
-				glVertex3d(pWing->m_Surface[j].LA.x,
-						   pWing->m_Surface[j].LA.y,
-						   pWing->m_Surface[j].LA.z);
-				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1,pWing->m_Surface[j].m_NXPanels-1, 0);
-				glVertex3d(pWing->m_Surface[j].LB.x,
-						   pWing->m_Surface[j].LB.y,
-						   pWing->m_Surface[j].LB.z);
-			}
-			glEnd();
-		}
-		//Trailing edge outline
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			glBegin(GL_LINES);
-			{
-				pWing->m_Surface[j].GetPanel(0,0, 0);
-				glVertex3d(pWing->m_Surface[j].TA.x,
-						   pWing->m_Surface[j].TA.y,
-						   pWing->m_Surface[j].TA.z);
-				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1, 0, 0);
-				glVertex3d(pWing->m_Surface[j].TB.x,
-						   pWing->m_Surface[j].TB.y,
-						   pWing->m_Surface[j].TB.z);
-			}
-			glEnd();
-		}
-		//flap outline....
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			pFoilA = pWing->m_Surface[j].m_pFoilA;
-			pFoilB = pWing->m_Surface[j].m_pFoilB;
-			if(pFoilA && pFoilB && pFoilA->m_bTEFlap && pFoilB->m_bTEFlap)
-			{
-				glBegin(GL_LINES);
-				{
-					if(pFoilA->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 0.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, 1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					if(pFoilB->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 1.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, 1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-				glEnd();
-				glBegin(GL_LINES);
-				{
-					if(pFoilA->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_TEXHinge/100.0,
-													 0.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, -1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					if(pFoilB->m_bTEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_TEXHinge/100.0,
-													 1.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, -1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-				glEnd();
-			}
-		}
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			pFoilA = pWing->m_Surface[j].m_pFoilA;
-			pFoilB = pWing->m_Surface[j].m_pFoilB;
-			if(pFoilA && pFoilB && pFoilA->m_bLEFlap && pFoilB->m_bLEFlap)
-			{
-				glBegin(GL_LINES);
-				{
-					if(pFoilA->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 0.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, 1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					if(pFoilB->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 1.0, Pt, 1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, 1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-				glEnd();
-				glBegin(GL_LINES);
-				{
-					if(pFoilA->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilA->m_LEXHinge/100.0,
-													 0.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 0.0, Pt, -1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-
-					if(pFoilB->m_bLEFlap)
-						pWing->m_Surface[j].GetPoint(pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 pWing->m_Surface[j].m_pFoilB->m_LEXHinge/100.0,
-													 1.0, Pt, -1);
-					else 	pWing->m_Surface[j].GetPoint(1.0, 1.0, 1.0, Pt, -1);
-					glVertex3d(Pt.x, Pt.y, Pt.z);
-				}
-				glEnd();
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-
-}
-
-
-void QMiarex::GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List)
-{
-	// pWing is either the Wing, the stab, or the fin
-	// pWOpp is related to the pWing
-
-	QColor color;
-	int style, width;
-	int i,j,k,p;
-	double dih, xt, yt, zt, yob;
-	double y1, y2, z1, z2, xs, ys, zs;
-	CVector C;
-	double factor, amp;
-
-	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
-	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
-	double sign;
-
-	//DOWNWASH
-	glNewList(List,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		color = m_DownwashColor;
-		style = m_DownwashStyle;
-		width = m_DownwashWidth;
-
-		glColor3d(color.redF(), color.greenF(), color.blueF());
-
-		glLineWidth((GLfloat)width);
-
-		if     (style == 1) 	glLineStipple (1, 0x1111);
-		else if(style == 2) 	glLineStipple (1, 0x0F0F);
-		else if(style == 3) 	glLineStipple (1, 0x1C47);
-		else					glLineStipple (1, 0xFFFF);
-
-		if(pWOpp)
-		{
-			if(pWOpp->m_AnalysisType==1)
-			{
-				for (i=1; i<pWOpp->m_NStation; i++)
-				{
-					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
-					pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
-
-					dih = -pWing->GetDihedral(yob)*PI/180.0;
-					amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
-					amp *= m_VelocityScale/2.0;
-					glBegin(GL_LINES);
-					{
-						glVertex3d(xt, yt, zt);
-						glVertex3d(xt + amp * cos(dih)* sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)* cosa);
-					}
-					glEnd();
-				}
-				glBegin(GL_LINE_STRIP);
-				{
-					for (i=1; i<pWOpp->m_NStation; i++)
-					{
-						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
-						pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
-
-						dih = -pWing->GetDihedral(yob)*PI/180.0;
-						amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
-						amp *= m_VelocityScale/2.0;
-
-						glVertex3d(xt + amp * cos(dih)* sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)* cosa);
-					}
-				}
-				glEnd();
-			}
-			else
-			{
-				factor = m_VelocityScale/2.0;
-
-				p = 0;
-				i = 0;
-				for (j=0; j<pWing->m_NSurfaces; j++)
-				{
-					for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-					{
-//						m_pSurface[j+surf0]->GetTrailingPt(k, C);
-						pWing->m_Surface[j].GetTrailingPt(k, C);
-						if (pWOpp->m_Vd[i].z>0) sign = 1.0; else sign = -1.0;
-						glBegin(GL_LINES);
-						{
-							glVertex3d(C.x, C.y, C.z);
-							glVertex3d(C.x+factor*pWOpp->m_Vd[i].z * sina,
-									   C.y+factor*pWOpp->m_Vd[i].y,
-									   C.z+factor*pWOpp->m_Vd[i].z * cosa);
-						}
-						glEnd();
-						xs = C.x+factor*pWOpp->m_Vd[i].z*sina;
-						ys = C.y+factor*pWOpp->m_Vd[i].y;
-						zs = C.z+factor*pWOpp->m_Vd[i].z*cosa;
-						y1 = ys - 0.085*factor*pWOpp->m_Vd[i].y      + 0.05*factor*pWOpp->m_Vd[i].z*cosa;
-						z1 = zs - 0.085*factor*pWOpp->m_Vd[i].z*cosa - 0.05*factor*pWOpp->m_Vd[i].y;
-						y2 = ys - 0.085*factor*pWOpp->m_Vd[i].y      - 0.05*factor*pWOpp->m_Vd[i].z*cosa;
-						z2 = zs - 0.085*factor*pWOpp->m_Vd[i].z*cosa + 0.05*factor*pWOpp->m_Vd[i].y;
-
-						glBegin(GL_LINES);
-						{
-							glVertex3d(xs, ys, zs);
-							glVertex3d(xs, y1, z1);
-						}
-						glEnd();
-						glBegin(GL_LINES);
-						{
-							glVertex3d(xs, ys, zs);
-							glVertex3d(xs, y2, z2);
-						}
-						glEnd();
-
-						i++;
-					}
-					p++;
-				}
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List)
-{
-	if(!pWing || !pWOpp) return;
-	CVector C;
-	int i,j,k;
-	int Istyle, Iwidth, Vstyle, Vwidth;
-	QColor Icolor, Vcolor;
-
-	double coef = 5.0;
-
-	GLushort IDash, VDash;
-
-	static double Ir,Ig,Ib, Vr, Vg, Vb;
-	static double amp, amp1, amp2;
-	static double yob, xt, yt, zt, dih;
-	static double cosa, cosb, sina, sinb;
-	cosa =  cos(pWOpp->m_Alpha * PI/180.0);
-	sina = -sin(pWOpp->m_Alpha * PI/180.0);
-	cosb =  cos(m_pCurWPolar->m_Beta*PI/180.0);
-	sinb =  sin(m_pCurWPolar->m_Beta*PI/180.0);
-
-	Icolor = m_IDragColor;
-	Istyle = m_IDragStyle;
-	Iwidth = m_IDragWidth;
-
-	Vcolor = m_VDragColor;
-	Vstyle = m_VDragStyle;
-	Vwidth = m_VDragWidth;
-
-	if(Istyle == 1)			IDash = 0x1111;
-	else if(Istyle == 2)	IDash = 0x0F0F;
-	else if(Istyle == 3) 	IDash = 0x1C47;
-	else					IDash = 0xFFFF;// Solid
-
-	if(Vstyle == 1)			VDash = 0x1111;
-	else if(Vstyle == 2)	VDash = 0x0F0F;
-	else if(Vstyle == 3)	VDash = 0x1C47;
-	else					VDash = 0xFFFF;// Solid
-
-	Ir = Icolor.redF();
-	Ig = Icolor.greenF();
-	Ib = Icolor.blueF();
-	Vr = Vcolor.redF();
-	Vg = Vcolor.greenF();
-	Vb = Vcolor.blueF();
-
-	glLineStipple (1, IDash);// Solid
-	glLineWidth((GLfloat)(Iwidth));
-
-	//DRAGLINE
-	glNewList(List,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		double q0 = 0.5*m_pCurWPolar->m_Density * m_pCurWPolar->m_WArea*pWOpp->m_QInf*pWOpp->m_QInf;
-
-		if(pWOpp)
-		{
-			if(pWOpp->m_AnalysisType==1)
-			{
-				for (i=1; i<pWOpp->m_NStation; i++)
-				{
-					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
-					pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
-					dih = pWing->GetDihedral(yob)*PI/180.0;
-					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
-					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*m_DragScale/coef;
-					if(m_bICd)
-					{
-						glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
-						glLineStipple (1, IDash);// Solid
-						glLineWidth((GLfloat)(Iwidth));
-						glBegin(GL_LINES);
-						{
-							glVertex3d(xt, yt, zt);
-							glVertex3d(	xt + amp1 * cos(dih)*cosa,
-										yt,
-										zt - amp1 * cos(dih)*sina);
-						}
-						glEnd();
-					}
-					if(m_bVCd)
-					{
-						glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
-						glLineStipple (1, VDash);// Solid
-						glLineWidth((GLfloat)(Vwidth));
-						glBegin(GL_LINES);
-						{
-							if(!m_bICd)
-							{
-								glVertex3d(xt, yt,zt);
-								glVertex3d(xt + amp2 * cos(dih)*cosa,
-										   yt,
-										   zt - amp2 * cos(dih)*sina);
-							}
-							else {
-								glVertex3d(xt + amp1 * cos(dih)*cosa,
-										   yt,
-										   zt - amp1 * cos(dih)*sina);
-								glVertex3d(xt + (amp1+amp2) * cos(dih)*cosa,
-										   yt,
-										   zt - (amp1+amp2) * cos(dih)*sina);
-							}
-						}
-						glEnd();
-					}
-				}
-				if(m_bICd)
-				{
-					glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
-					glLineStipple (1, IDash);// Solid
-					glLineWidth((GLfloat)(Iwidth));
-					glBegin(GL_LINE_STRIP);
-					{
-						for (i=1; i<pWOpp->m_NStation; i++)
-						{
-							yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
-							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
-
-							dih = pWing->GetDihedral(yob)*PI/180.0;
-
-							amp  = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-							amp *= m_DragScale/coef;
-
-							glVertex3d(xt + amp * cos(dih)*cosa,
-									   yt,
-									   zt - amp * cos(dih)*sina);
-						}
-					}
-					glEnd();
-				}
-				if(m_bVCd)
-				{
-					glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
-					glLineStipple (1, VDash);// Solid
-					glLineWidth((GLfloat)(Vwidth));
-					glBegin(GL_LINE_STRIP);
-					{
-						for (i=1; i<pWOpp->m_NStation; i++)
-						{
-							yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
-							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
-
-							dih = pWing->GetDihedral(yob)*PI/180.0;
-							amp=0.0;
-							if(m_bICd) amp+=pWOpp->m_ICd[i];
-							amp +=pWOpp->m_PCd[i];
-							amp *= q0*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-							amp *= m_DragScale/coef;
-
-							glVertex3d( xt + amp * cos(dih)*cosa,
-										yt ,
-										zt - amp * cos(dih)*sina);
-						}
-					}
-					glEnd();
-				}
-			}
-			else
-			{
-				//VLM type drag
-				i = 0;
-				for (j=0; j<pWing->m_NSurfaces; j++)
-				{
-					//All surfaces
-					for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-					{
-						pWing->m_Surface[j].GetTrailingPt(k, C);
-						amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/coef;
-						amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord*m_DragScale/coef;
-						if(m_bICd)
-						{
-							glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
-							glLineStipple (1, IDash);// Solid
-							glLineWidth((GLfloat)(Iwidth));
-							glBegin(GL_LINES);
-							{
-								glVertex3d(C.x, C.y, C.z);
-								glVertex3d(C.x + amp1*cosa * cosb,
-										   C.y + amp1*cosa * sinb,
-										   C.z - amp1*sina);
-							}
-							glEnd();
-						}
-						if(m_bVCd)
-						{
-							glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
-							glLineStipple (1, VDash);// Solid
-							glLineWidth((GLfloat)(Vwidth));
-							glBegin(GL_LINES);
-							{
-								if(!m_bICd)
-								{
-									glVertex3d(C.x, C.y, C.z);
-									glVertex3d(C.x + amp2*cosa*cosb,
-											   C.y + amp2*cosa*sinb,
-											   C.z - amp2*sina);
-								}
-								else
-								{
-									glVertex3d(C.x + amp1*cosa*cosb,
-											   C.y + amp1*cosa*sinb,
-											   C.z - amp1*sina);
-									glVertex3d(C.x + (amp1+amp2)*cosa*cosb,
-											   C.y + (amp1+amp2)*cosa*sinb,
-											   C.z - (amp1+amp2)*sina);
-								}
-							}
-							glEnd();
-						}
-
-						i++;
-					}
-				}
-				if(!pWing->m_bIsFin)
-				{
-					if(m_bICd)
-					{
-						glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
-						glLineStipple (1, IDash);// Solid
-						glLineWidth((GLfloat)(Iwidth));
-						glBegin(GL_LINE_STRIP);
-						{
-							i = 0;
-							for (j=0; j<pWing->m_NSurfaces; j++)
-							{
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-								{
-									pWing->m_Surface[j].GetTrailingPt(k, C);
-									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/coef;
-									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
-									i++;
-								}
-							}
-						}
-						glEnd();
-					}
-					if(m_bVCd)
-					{
-						glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
-						glLineStipple (1, VDash);// Solid
-						glLineWidth((GLfloat)(Vwidth));
-						glBegin(GL_LINE_STRIP);
-						{
-							i = 0;
-							for (j=0; j<pWing->m_NSurfaces; j++)
-							{
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-								{
-									pWing->m_Surface[j].GetTrailingPt(k, C);
-									amp=0.0;
-									if(m_bICd) amp+=pWOpp->m_ICd[i];
-									amp +=pWOpp->m_PCd[i];
-									amp *= q0*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/coef;
-
-									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
-									i++;
-								}
-							}
-						}
-						glEnd();
-					}
-				}
-				else
-				{
-					if(m_bICd)
-					{
-						glColor3f((GLfloat)Ir,(GLfloat)Ig,(GLfloat)Ib);
-						glLineStipple (1, IDash);// Solid
-						glLineWidth((GLfloat)Iwidth);
-						i = 0;
-						for (j=0; j<pWing->m_NSurfaces; j++)
-						{
-							glBegin(GL_LINE_STRIP);
-							{
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-								{
-									pWing->m_Surface[j].GetTrailingPt(k, C);
-									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/coef;
-									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
-									i++;
-								}
-							}
-							glEnd();
-						}
-					}
-					if(m_bVCd)
-					{
-						glColor3f((GLfloat)Vr,(GLfloat)Vg,(GLfloat)Vb);
-						glLineStipple (1, VDash);// Solid
-						glLineWidth((GLfloat)Vwidth);
-						i = 0;
-						for (j=0; j<pWing->m_NSurfaces; j++)
-						{
-							glBegin(GL_LINE_STRIP);
-							{
-								for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-								{
-									pWing->m_Surface[j].GetTrailingPt(k, C);
-									amp=0.0;
-									if(m_bICd) amp+=pWOpp->m_ICd[i];
-									amp +=pWOpp->m_PCd[i];
-									amp *= q0*pWOpp->m_Chord[i]/(m_pCurWing)->m_MAChord;
-									amp *= m_DragScale/coef;
-
-									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
-									i++;
-								}
-							}
-							glEnd();
-						}
-					}
-				}
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateMesh()
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	QColor color;
-	int iLA, iLB, iTA, iTB;
-	int style, width, p;
-	CVector A, B, N;
-	N.Set(0.0, 0.0, 0.0);
-
-	glNewList(MESHPANELS,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//		glEnable(GL_POLYGON_OFFSET_FILL);
-//		glPolygonOffset(1.0, 1.0);
-
-		color = m_VLMColor;
-		style = m_VLMStyle;
-		width = m_VLMWidth;
-
-		glLineWidth(1.0);
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		for (p=0; p<m_MatSize; p++)
-		{
-				glBegin(GL_QUADS);
-				{
-					iLA = m_Panel[p].m_iLA;
-					iLB = m_Panel[p].m_iLB;
-					iTA = m_Panel[p].m_iTA;
-					iTB = m_Panel[p].m_iTB;
-
-					glNormal3d(m_Panel[p].Normal.x, m_Panel[p].Normal.y, m_Panel[p].Normal.z);
-					glVertex3d(m_Node[iLA].x, m_Node[iLA].y, m_Node[iLA].z);
-					glVertex3d(m_Node[iTA].x, m_Node[iTA].y, m_Node[iTA].z);
-					glVertex3d(m_Node[iTB].x, m_Node[iTB].y, m_Node[iTB].z);
-					glVertex3d(m_Node[iLB].x, m_Node[iLB].y, m_Node[iLB].z);
-				}
-				glEnd();
-		}
-	}
-	glEndList();
-
-	glNewList(MESHBACK,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0, 1.0);
-
-		color = pMainFrame->m_BackgroundColor;
-		style = m_VLMStyle;
-		width = m_VLMWidth;
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		glLineWidth(1.0);
-		glDisable (GL_LINE_STIPPLE);
-
-		for (p=0; p<m_MatSize; p++)
-		{
-				glBegin(GL_QUADS);
-				{
-					iLA = m_Panel[p].m_iLA;
-					iLB = m_Panel[p].m_iLB;
-					iTA = m_Panel[p].m_iTA;
-					iTB = m_Panel[p].m_iTB;
-
-					glVertex3d(m_Node[iLA].x, m_Node[iLA].y, m_Node[iLA].z);
-					glVertex3d(m_Node[iTA].x, m_Node[iTA].y, m_Node[iTA].z);
-					glVertex3d(m_Node[iTB].x, m_Node[iTB].y, m_Node[iTB].z);
-					glVertex3d(m_Node[iLB].x, m_Node[iLB].y, m_Node[iLB].z);
-					glNormal3d(m_Panel[p].Normal.x, m_Panel[p].Normal.y, m_Panel[p].Normal.z);
-				}
-				glEnd();
-		}
-
-		glDisable(GL_POLYGON_OFFSET_FILL);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateCtrlPts()
-{
-	glNewList(VLMCTRLPTS,GL_COMPILE);
-	{
-		m_GLList++;
-//		glPolygonMode(GL_FRONT,GL_FILL);
-		glLineWidth(1.0);
-		glColor3d(0.0,1.0,0.0);
-		for (int p=0; p<m_MatSize; p++)
-		{
-			//All panels
-			glBegin(GL_LINES);
-			{
-				glVertex3d(m_Panel[p].CtrlPt.x, m_Panel[p].CtrlPt.y, m_Panel[p].CtrlPt.z);
-				glVertex3d((m_Panel[p].CtrlPt.x + m_Panel[p].Normal.x * 0.04),
-						   (m_Panel[p].CtrlPt.y + m_Panel[p].Normal.y * 0.04),
-						   (m_Panel[p].CtrlPt.z + m_Panel[p].Normal.z * 0.04));
-/*				glVertex3d(m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z);
-				glVertex3d(m_Panel[p].CollPt.x+m_Panel[p].Normal.x *0.01,
-						   m_Panel[p].CollPt.y+m_Panel[p].Normal.y *0.01,
-						   m_Panel[p].CollPt.z+m_Panel[p].Normal.z *0.01);
-				glVertex3d(m_Panel[p].CollPt.x, m_Panel[p].CollPt.y, m_Panel[p].CollPt.z);
-				glVertex3d(m_Panel[p].CollPt.x+m_Panel[p].l.x *0.01,
-						   m_Panel[p].CollPt.y+m_Panel[p].l.y *0.01,
-						   m_Panel[p].CollPt.z+m_Panel[p].l.z *0.01);*/
-			}
-			glEnd();
-		}
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateLiftForce()
-{
-	int style, width;
-	QColor color;
-	double forcez,forcex,glx, gly;
-
-	double sign;
-
-
-	glNewList(LIFTFORCE, GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		color = m_XCPColor;
-		style = m_XCPStyle;
-		width = m_XCPWidth;
-
-		if     (style == 1) 	glLineStipple (1, 0x1111);
-		else if(style == 2) 	glLineStipple (1, 0x0F0F);
-		else if(style == 3) 	glLineStipple (1, 0x1C47);
-		else					glLineStipple (1, 0xFFFF);
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		glLineWidth((GLfloat)m_XCPWidth);
-
-		//Resulting force vector
-		glLineWidth((GLfloat)(width * 2.0));
-
-		double force = 0.5*m_pCurWPolar->m_Density * m_pCurWPolar->m_WArea
-						  *m_pCurWOpp->m_QInf*m_pCurWOpp->m_QInf
-						  *m_pCurWOpp->m_CL;
-
-		force *= m_LiftScale/500.0;
-
-		forcez =  force * cos(m_pCurWOpp->m_Alpha * PI/180.0);
-		forcex = -force * sin(m_pCurWOpp->m_Alpha * PI/180.0);
-
-		if (force>0.0) sign = 1.0; else sign = -1.0;
-		glLineStipple (1, 0xFFFF);// Solid
-		glLineWidth(3.0);
-
-		glx = (GLfloat)m_pCurWOpp->m_XCP;
-		gly = (GLfloat)m_pCurWOpp->m_YCP;
-
-		glBegin(GL_LINES);
-			glVertex3d(glx,gly,0.0);
-			glVertex3d(glx+forcex,gly,forcez);
-
-		glEnd();
-
-		glBegin(GL_LINES);
-			glVertex3d(glx+forcex, gly, forcez);
-			glVertex3d(glx+forcex+0.008, gly+0.008, forcez-0.012*sign/m_glScaled);
-		glEnd();
-
-		glBegin(GL_LINES);
-			glVertex3d(glx+forcex, gly, forcez);
-			glVertex3d(glx+forcex-0.008, gly-0.008, forcez-0.012*sign/m_glScaled);
-		glEnd();
-
-		glDisable (GL_LINE_STIPPLE);
-
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateMoments()
-{
-//	The most common aeronautical convention defines
-//	- the roll as acting about the longitudinal axis, positive with the starboard wing down.
-//	- The yaw is about the vertical body axis, positive with the nose to starboard.
-//	- Pitch is about an axis perpendicular to the longitudinal plane of symmetry, positive nose up.
-//	-- Wikipedia flight dynamics --
-
-	int i;
-	int style, width;
-	QColor color;
-
-	double sign, amp, radius;
-	double angle=0.0;//radian
-	double endx, endy, endz, dx, dy, dz,xae, yae, zae;
-	double factor = 10.0;
-
-
-	glNewList(VLMMOMENTS, GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		color = m_MomentColor;
-		style = m_MomentStyle;
-		width = m_MomentWidth;
-
-		if     (style == 1) 	glLineStipple (1, 0x1111);
-		else if(style == 2) 	glLineStipple (1, 0x0F0F);
-		else if(style == 3) 	glLineStipple (1, 0x1C47);
-		else					glLineStipple (1, 0xFFFF);
-
-
-		glColor3d(color.redF(),color.greenF(),color.blueF());
-
-		glLineWidth((GLfloat)(width*2.0));
-
-		amp = 0.5*m_pCurWPolar->m_Density * m_pCurWPolar->m_WArea
-			  *m_pCurWOpp->m_QInf*m_pCurWOpp->m_QInf	*m_pCurWOpp->m_GCm/3.0;
-
-		amp *= m_LiftScale*factor;
-
-		radius= m_pCurWing->m_PlanformSpan/4.0;
-
-		if (amp>0.0) sign = -1.0; else sign = 1.0;
-
-		glBegin(GL_LINE_STRIP);
-		{
-			for (i=0; i<=int(fabs(amp)); i++)
-			{
-				angle = sign*(double)i/500.0*PI;
-				glVertex3d(radius*cos(angle),0.0,radius*sin(angle));
-			}
-		}
-		glEnd();
-
-		endx = radius*cos(angle);
-		endz = radius*sin(angle);
-
-		dx = 0.03;
-		dz = 0.03*sign;
-
-		xae = (radius-dx)*cos(angle) +dz *sin(angle);
-		zae = (radius-dx)*sin(angle) -dz *cos(angle);
-		glBegin(GL_LINES);
-		{
-			glVertex3d(endx, 0.0, endz);
-			glVertex3d(xae,  0.0, zae);
-		}
-		glEnd();
-
-		xae = (radius+dx)*cos(angle) +dz *sin(angle);
-		zae = (radius+dx)*sin(angle) -dz *cos(angle);
-		glBegin(GL_LINES);
-		{
-			glVertex3d(endx, 0.0, endz);
-			glVertex3d(xae,  0.0, zae);
-		}
-		glEnd();
-
-		//Resulting Rolling Moment Arc vector
-
-		amp = 0.5*m_pCurWPolar->m_Density * m_pCurWPolar->m_WArea
-						*m_pCurWOpp->m_QInf*m_pCurWOpp->m_QInf
-						*m_pCurWOpp->m_GRm/3.0;
-
-		amp *= m_LiftScale*factor;
-
-		if (amp>0.0) sign = -1.0; else sign = 1.0;
-
-		glBegin(GL_LINE_STRIP);
-			for (i=0; i<=int(fabs(amp)); i++)
-			{
-				angle = sign*(double)i/500.0*PI;
-				glVertex3d(0.0,radius*cos(angle),radius*sin(angle));
-			}
-		glEnd();
-
-		endy = radius*cos(angle);
-		endz = radius*sin(angle);
-
-		dy = 0.03;
-		dz = 0.03*sign;
-
-		yae = (radius-dy)*cos(angle) +dz *sin(angle);
-		zae = (radius-dy)*sin(angle) -dz *cos(angle);
-		glBegin(GL_LINES);
-			glVertex3d(0.0, endy, endz);
-			glVertex3d(0.0, yae,  zae);
-		glEnd();
-
-		yae = (radius+dy)*cos(angle) +dz *sin(angle);
-		zae = (radius+dy)*sin(angle) -dz *cos(angle);
-		glBegin(GL_LINES);
-			glVertex3d(0.0, endy, endz);
-			glVertex3d(0.0, yae,  zae);
-		glEnd();
-
-		//Resulting Yawing Moment Arc vector
-
-		amp = 0.5*m_pCurWPolar->m_Density * m_pCurWPolar->m_WArea
-						*m_pCurWOpp->m_QInf*m_pCurWOpp->m_QInf
-						*(m_pCurWOpp->m_GYm)/3.0;
-
-		amp *= m_LiftScale*factor;
-
-		if (amp>0.0) sign = -1.0; else sign = +1.0;
-
-		glBegin(GL_LINE_STRIP);
-		{
-			for (i=0; i<=int(fabs(amp)); i++)
-			{
-				angle = sign*(double)i/500.0*PI;
-				glVertex3d(-radius*cos(angle),-radius*sin(angle),0.0);
-			}
-		}
-		glEnd();
-
-		endx = -radius*cos(angle);
-		endy = -radius*sin(angle);
-
-		dx =   0.03;
-		dy =  -0.03*sign;
-
-		xae = (-radius+dx)*cos(angle) +dy *sin(angle);
-		yae = (-radius+dx)*sin(angle) -dy *cos(angle);
-		glBegin(GL_LINES);
-		{
-			glVertex3d(endx, endy, 0.0);
-			glVertex3d(xae,  yae, 0.0);
-		}
-		glEnd();
-
-		xae = (-radius-dx)*cos(angle) +dy *sin(angle);
-		yae = (-radius-dx)*sin(angle) -dy *cos(angle);
-		glBegin(GL_LINES);
-		{
-			glVertex3d(endx, endy, 0.0);
-			glVertex3d(xae,  yae, 0.0);
-		}
-		glEnd();
-
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List)
-{
-	int i,j,k;
-	int style, width;
-	CVector C, CL;
-
-	QColor color;
-
-	double amp, yob, xt, yt, zt, dih;
-	double cosa =  cos(pWOpp->m_Alpha * PI/180.0);
-	double sina = -sin(pWOpp->m_Alpha * PI/180.0);
-
-	//LIFTLINE
-	glNewList(List,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		color = m_XCPColor;
-		style = m_XCPStyle;
-		width = m_XCPWidth;
-
-		if     (style == 1) 	glLineStipple (1, 0x1111);
-		else if(style == 2) 	glLineStipple (1, 0x0F0F);
-		else if(style == 3) 	glLineStipple (1, 0x1C47);
-		else					glLineStipple (1, 0xFFFF);
-
-		glColor3d(color.redF(), color.greenF(), color.blueF());
-		glLineWidth((GLfloat)width);
-
-		//dynamic pressure x area
-		double q0 = 0.5 * m_pCurWPolar->m_Density * pWOpp->m_QInf * pWOpp->m_QInf;
-
-		if(pWOpp)
-		{
-			if(pWOpp->m_AnalysisType==1)
-			{
-				for (i=1; i<pWOpp->m_NStation; i++)
-				{
-					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
-					pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i], yt, zt, 0);
-					dih = -pWing->GetDihedral(yob)*PI/180.0;
-					amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-					amp *= m_LiftScale/1000.0;
-
-					glBegin(GL_LINES);
-					{
-						glVertex3d(xt, yt, zt);
-						glVertex3d((xt + amp * cos(dih)*sina),
-									yt + amp * sin(dih),
-									zt + amp * cos(dih)*cosa);
-					}
-					glEnd();
-				}
-				glBegin(GL_LINE_STRIP);
-				{
-					for (i=1; i<pWOpp->m_NStation; i++)
-					{
-						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
-						pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i],yt,zt,0);
-
-						dih = -pWing->GetDihedral(yob)*PI/180.0;
-						amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
-						amp *= m_LiftScale/1000.0;
-
-						glVertex3d(xt + amp * cos(dih)*sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)*cosa);
-					}
-				}
-				glEnd();
-			}
-			else
-			{
-				i = 0;
-				for (j=0; j<pWing->m_NSurfaces; j++)
-				{
-					for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-					{
-						pWing->m_Surface[j].GetLeadingPt(k, C);
-						amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / m_pCurWing->m_MAChord * m_LiftScale/1000.0;
-						C.x = pWOpp->m_XCPSpanAbs[i];
-
-						glBegin(GL_LINES);
-						{
-							glVertex3d(C.x, C.y, C.z);
-							glVertex3d(C.x + pWOpp->m_F[i].x*amp,//F is in Body axes
-									   C.y + pWOpp->m_F[i].y*amp,
-									   C.z + pWOpp->m_F[i].z*amp);
-						}
-						glEnd();
-						i++;
-					}
-				}
-
-				//Lift strip on each surface
-				i = 0;
-				for (j=0; j<pWing->m_NSurfaces; j++)
-				{
-					if(j>0 && pWing->m_Surface[j-1].m_bJoinRight)
-					{
-						//then connect strip to previous surface's last point
-						glBegin(GL_LINES);
-						{
-							glVertex3d(CL.x, CL.y, CL.z);
-
-							k=0;
-							pWing->m_Surface[j].GetLeadingPt(k, C);
-							amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / m_pCurWing->m_MAChord * m_LiftScale/1000.0;
-							C.x = pWOpp->m_XCPSpanAbs[i];
-							glVertex3d(C.x + pWOpp->m_F[i].x*amp,
-									   C.y + pWOpp->m_F[i].y*amp,
-									   C.z + pWOpp->m_F[i].z*amp);
-
-						}
-						glEnd();
-					}
-					glBegin(GL_LINE_STRIP);
-					{
-						for (k=0; k< pWing->m_Surface[j].m_NYPanels; k++)
-						{
-							pWing->m_Surface[j].GetLeadingPt(k, C);
-							amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / m_pCurWing->m_MAChord * m_LiftScale/1000.0;
-							C.x = pWOpp->m_XCPSpanAbs[i];
-							CL.x = C.x + pWOpp->m_F[i].x*amp;
-							CL.y = C.y + pWOpp->m_F[i].y*amp;
-							CL.z = C.z + pWOpp->m_F[i].z*amp;
-							glVertex3d(CL.x, CL.y, CL.z);
-							i++;
-						}
-					}
-					glEnd();
-				}
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateStreamLines()
-{
-	if(!m_pCurWing || !m_pCurWOpp || !m_pCurWPolar || m_pCurWPolar->m_AnalysisType==1)
-	{
-		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
-		m_GLList++;
-		return;
-	}
-
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	ProgressDlg dlg;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.InitDialog(0, m_MatSize);
-	dlg.setWindowModality(Qt::WindowModal);
-	dlg.SetValue(0);
-	dlg.show();
-
-	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
-	bool bFound;
-	int i;
-	int m, p, style, width, iWing;
-	double ds, *Gamma, *Mu, *Sigma;
-	QColor color;
-
-	CVector C, D, D1, V1, VT, VInf;
-	CVector RefPoint(0.0,0.0,0.0);
-
-	D1.Set(987654321.0, 0.0, 0.0);
-
-	CWing *Wing[4], *pWing;
-	Wing[0] = m_pCurWing;
-	Wing[1] = m_pCurWing2;
-	Wing[2] = m_pCurStab;
-	Wing[3] = m_pCurFin;
-
-	if(m_pCurPOpp)
-	{
-		Gamma = m_pCurPOpp->m_G;
-		Mu    = m_pCurPOpp->m_G;
-		Sigma = m_pCurPOpp->m_Sigma;
-	}
-	else if (m_pCurWOpp)
-	{
-		Gamma = m_pCurWOpp->m_G;
-		Mu    = m_pCurWOpp->m_G;
-		Sigma = m_pCurWOpp->m_Sigma;
-	}
-	else
-	{
-		Gamma = NULL;
-		Mu    = NULL;
-		Sigma = NULL;
-	}
-
-
-	m_pVLMDlg->m_pWing     = m_pCurWing;
-	m_pPanelDlg->m_pWing   = m_pCurWing;
-
-	//back-up the current geometry, before it is tilted for streamlines calculation
-	memcpy(m_MemPanel, m_Panel, m_MatSize * sizeof(CPanel));
-	memcpy(m_MemNode,  m_Node,  m_nNodes * sizeof(CVector));
-	memcpy(m_RefWakePanel, m_WakePanel, m_WakeSize * sizeof(CPanel));
-	memcpy(m_RefWakeNode,  m_WakeNode,  m_nWakeNodes * sizeof(CVector));
-
-	//Tilt the geometry w.r.t. aoa
-	RotateGeomY(m_pCurWOpp->m_Alpha, RefPoint);
-
-	glNewList(VLMSTREAMLINES,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glEnable (GL_LINE_STIPPLE);
-
-		color = QColor(100,255,190);
-		style = m_WakeStyle;
-		width = m_WakeWidth;
-
-		glLineWidth(m_WakeWidth);
-
-		if(m_WakeStyle == 1)     glLineStipple (1, 0x1111);
-		else if(m_WakeStyle== 2) glLineStipple (1, 0x0F0F);
-		else if(m_WakeStyle== 3) glLineStipple (1, 0x1C47);
-		else                     glLineStipple (1, 0xFFFF);// Solid
-
-		glColor3d(color.redF(), color.greenF(), color.blueF());
-
-		VInf.Set(m_pCurWOpp->m_QInf,0.0,0.0);
-
-		m = 0;
-
-		for (iWing=0; iWing<4; iWing++)
-		{
-			if(Wing[iWing])
-			{
-				pWing = Wing[iWing];
-
-				for (p=0; p<pWing->m_MatSize; p++)
-				{
-					bFound = false;
-
-					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
-					{
-						C.Set(m_Node[pWing->m_pPanel[p].m_iLA]);
-						D.Set(m_Node[pWing->m_pPanel[p].m_iLB]);
-						bFound = true;
-					}
-					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_iPos<=0)
-					{
-						C.Set(m_Node[pWing->m_pPanel[p].m_iTA]);
-						D.Set(m_Node[pWing->m_pPanel[p].m_iTB]);
-						bFound = true;
-					}
-					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
-					{
-						C.Set(0.0, m_Node[pWing->m_pPanel[p].m_iLA].y, 0.0);
-						D.Set(0.0, m_Node[pWing->m_pPanel[p].m_iLB].y, 0.0);
-						bFound = true;
-					}
-
-					if(bFound)
-					{
-						if(!C.IsSame(D1))
-						{
-							C.x += p3DScales->m_XOffset;
-							C.z += p3DScales->m_ZOffset;
-							ds = p3DScales->m_DeltaL;
-
-/*							// One very special case is where we initiate the streamlines exactly at the T.E.
-							// without offset either in X ou Z directions
-							if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
-							{
-								//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-								V1.Set(m_Node[pWing->m_pPanel[p].m_iTA] - m_Node[pWing->m_pPanel[p].m_iLA]);
-								V1. Normalize();
-
-								if(pWing->m_pPanel[p].m_iPos ==-1)
-								{
-									//corresponding upper panel is the next one coming up
-									for (i=p; i<pWing->m_MatSize;i++)
-										if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
-									V2 = m_Node[pWing->m_pPanel[i].m_iTA] - m_Node[pWing->m_pPanel[i].m_iLA];
-									V2.Normalize();
-									V1 = V1+V2;
-									V1.Normalize();//V1 is parallel to the bisector angle
-								}
-							}*/
-							V1.Set(0.0,0.0,0.0);
-							glBegin(GL_LINE_STRIP);
-							{
-								glVertex3d(C.x, C.y, C.z);
-								C   += V1* ds;
-								glVertex3d(C.x, C.y, C.z);
-								ds *= p3DScales->m_XFactor;
-
-								for (i=1; i< p3DScales->m_NX ;i++)
-								{
-									if(m_pCurWPolar->m_AnalysisType==2 )     m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
-									else if(m_pCurWPolar->m_AnalysisType==4) VT = m_pStabDlg->GetSpeedVector(C, Gamma);
-									else if(m_pCurWPolar->m_AnalysisType==3) m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
-
-									VT += VInf;
-									VT.Normalize();
-									C   += VT* ds;
-									glVertex3d(C.x, C.y, C.z);
-									ds *= p3DScales->m_XFactor;
-								}
-							}
-							glEnd();
-						}
-
-						D1 = D;
-						D.x += p3DScales->m_XOffset;
-						D.z += p3DScales->m_ZOffset;
-						ds = p3DScales->m_DeltaL;
-
-						V1.Set(0.0,0.0,0.0);
-
-						glBegin(GL_LINE_STRIP);
-						{
-							glVertex3d(D.x, D.y, D.z);
-							D   += V1* ds;
-							glVertex3d(D.x, D.y, D.z);
-							ds *= p3DScales->m_XFactor;
-
-							for (i=1; i< p3DScales->m_NX ;i++)
-							{
-								if(m_pCurWPolar->m_AnalysisType==2)      m_pVLMDlg->GetSpeedVector(D, Gamma, VT);
-								else if(m_pCurWPolar->m_AnalysisType==4) VT = m_pStabDlg->GetSpeedVector(D, Gamma);
-								else if(m_pCurWPolar->m_AnalysisType==3) m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
-
-								VT += VInf;
-								VT.Normalize();
-								D   += VT* ds;
-								glVertex3d(D.x, D.y, D.z);
-								ds *= p3DScales->m_XFactor;
-							}
-						}
-						glEnd();
-					}
-
-					dlg.SetValue(m);
-					m++;
-
-					if(dlg.IsCanceled()) break;
-				}
-				if(dlg.IsCanceled()) break;
-			}
-		}
-
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-
-	//restore the initial geometry
-	memcpy(m_Panel, m_MemPanel, m_MatSize * sizeof(CPanel));
-	memcpy(m_Node,  m_MemNode,  m_nNodes  * sizeof(CVector));
-	memcpy(m_WakePanel, m_RefWakePanel,  m_WakeSize   * sizeof(CPanel));
-	memcpy(m_WakeNode,  m_RefWakeNode,   m_nWakeNodes * sizeof(CVector));
-}
-
-
-
-
-void QMiarex::GLCreateSurfSpeeds()
-{
-	if(!m_pCurWOpp || m_pCurWOpp->m_AnalysisType==1)
-	{
-		glNewList(SURFACESPEEDS, GL_COMPILE);
-		m_GLList++;
-		glEndList();
-		return;
-	}
-
-	ProgressDlg dlg;
-	dlg.InitDialog(0, m_MatSize);
-	dlg.setModal(true);
-	dlg.SetValue(0);
-	dlg.show();
-
-	QColor color;
-	int p;
-	double factor;
-	double length, sinT, cosT, beta, *Gamma, *Mu, *Sigma;
-	double x1, x2, y1, y2, z1, z2, xe, ye, ze, dlx, dlz;
-	CVector C, V, VT;
-	CVector RefPoint(0.0,0.0,0.0);
-
-	factor = 0.2;
-	if(m_pCurPOpp)
-	{
-		Gamma = m_pCurPOpp->m_G;
-		Mu    = m_pCurPOpp->m_G;
-		Sigma = m_pCurPOpp->m_Sigma;
-	}
-	else if (m_pCurWOpp)
-	{
-		Gamma = m_pCurWOpp->m_G;
-		Mu    = m_pCurWOpp->m_G;
-		Sigma = m_pCurWOpp->m_Sigma;
-	}
-	else
-	{
-		Gamma = NULL;
-		Mu    = NULL;
-		Sigma = NULL;
-	}
-
-	glNewList(SURFACESPEEDS, GL_COMPILE);
-	{
-		m_GLList++;
-
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-
-		glLineWidth(m_WakeWidth);
-
-		if(m_WakeStyle == 1)     glLineStipple (1, 0x1111);
-		else if(m_WakeStyle== 2) glLineStipple (1, 0x0F0F);
-		else if(m_WakeStyle== 3) glLineStipple (1, 0x1C47);
-		else                     glLineStipple (1, 0xFFFF);// Solid
-
-
-		glColor3d(m_WakeColor.redF(),m_WakeColor.greenF(),m_WakeColor.blueF());
-
-		if(Gamma)
-		{
-			for (p=0; p<m_MatSize; p++)
-			{
-				VT.Set(m_pCurWOpp->m_QInf,0.0,0.0);
-
-				if(m_pCurWPolar->m_AnalysisType==2)
-				{
-					C.Copy(m_Panel[p].CtrlPt);
-					m_pVLMDlg->GetSpeedVector(C, Gamma, V);
-					VT += V;
-					VT *= m_VelocityScale/100.0;
-//					if(!m_pCurWPolar->m_bTiltedGeom)
-						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
-						//Tilt the geometry w.r.t. sideslip
-//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
-				}
-				else if(m_pCurWPolar->m_AnalysisType==3)
-				{
-					C.Copy(m_Panel[p].CollPt);
-					m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
-					VT += V;
-					VT *= m_VelocityScale/100.0;
-//					if(!m_pCurWPolar->m_bTiltedGeom)
-						C.RotateY(RefPoint, m_pCurWOpp->m_Alpha);
-						//Tilt the geometry w.r.t. sideslip
-//						C.RotateZ(RefPoint, -m_pCurWOpp->m_Beta);
-				}
-
-				length = VT.VAbs()*factor;
-				xe     = C.x+factor*VT.x;
-				ye     = C.y+factor*VT.y;
-				ze     = C.z+factor*VT.z;
-				if(length>0.0)
-				{
-					cosT   = (xe-C.x)/length;
-					sinT   = (ze-C.z)/length;
-					dlx     = 0.15*length;
-					dlz     = 0.07*length;
-					beta   = atan((ye-C.y)/length)*180.0/PI;
-				}
-				else {
-					cosT   = 0.0;
-					sinT   = 0.0;
-					dlx    = 0.0;
-					dlz    = 0.0;
-				}
-
-				x1 = xe -dlx*cosT - dlz*sinT;
-				y1 = ye;
-				z1 = ze -dlx*sinT + dlz*cosT;
-
-				x2 = xe -dlx*cosT + dlz*sinT;
-				y2 = ye;
-				z2 = ze -dlx*sinT - dlz*cosT;
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(C.x, C.y, C.z);
-					glVertex3d(xe,ye,ze);
-				}
-				glEnd();
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(xe, ye, ze);
-					glVertex3d(x1, y1, z1);
-				}
-				glEnd();
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(xe, ye, ze);
-					glVertex3d(x2, y2, z2);
-				}
-				glEnd();
-
-				dlg.SetValue(p);
-				if(dlg.IsCanceled()) break;
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-
-	dlg.hide();
-}
-
-
-
-void QMiarex::GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List)
-{
-	int i,j,k,m;
-	double yrel, xt, yt, zt, yob, dih;
-	CVector A,B, Pt;
-	CVector C,N;
-
-	//TOP TRANSITION
-	glNewList(List,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glLineWidth((GLfloat)m_XTopWidth);
-
-		if(m_XTopStyle == 1)     glLineStipple (1, 0x1111);
-		else if(m_XTopStyle== 2) glLineStipple (1, 0x0F0F);
-		else if(m_XTopStyle== 3) glLineStipple (1, 0x1C47);
-		else	                 glLineStipple (1, 0xFFFF);// Solid
-
-		glColor3d(m_XTopColor.redF(),m_XTopColor.greenF(),m_XTopColor.blueF());
-
-		glLineWidth((GLfloat)m_XTopWidth);
-		if(pWOpp)
-		{
-			if(pWOpp->m_AnalysisType==1)
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					for (i=1; i<pWOpp->m_NStation; i++)
-					{
-						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XTrTop[i]*pWOpp->m_Chord[i];
-						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
-
-						dih = pWing->GetDihedral(yob)*PI/180.0;
-						glVertex3d(xt,yt,zt);
-					}
-				}
-				glEnd();
-			}
-			else
-			{
-				if(!pWing->m_bIsFin)
-				{
-					glBegin(GL_LINE_STRIP);
-					{
-						m = 0;
-						for(j=0; j<pWing->m_NSurfaces; j++)
-						{
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
-							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
-								glVertex3d(Pt.x, Pt.y, Pt.z);
-								m++;
-							}
-						}
-					}
-					glEnd();
-				}
-				else
-				{
-					m = 0;
-					for(j=0; j<pWing->m_NSurfaces; j++)
-					{
-						glBegin(GL_LINE_STRIP);
-						{
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++){
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
-								glVertex3d(Pt.x, Pt.y, Pt.z);
-
-								m++;
-							}
-						}
-						glEnd();
-					}
-				}
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-
-	//BOTTOM TRANSITION
-	glNewList(List+1,GL_COMPILE);
-	{
-		m_GLList++;
-		glEnable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glLineWidth((GLfloat)m_XBotWidth);
-
-		if(m_XBotStyle == 1)     glLineStipple (1, 0x1111);
-		else if(m_XBotStyle== 2) glLineStipple (1, 0x0F0F);
-		else if(m_XBotStyle== 3) glLineStipple (1, 0x1C47);
-		else	                 glLineStipple (1, 0xFFFF);// Solid
-
-		glColor3d(m_XBotColor.redF(),m_XBotColor.greenF(),m_XBotColor.blueF());
-
-		glLineWidth((GLfloat)m_XBotWidth);
-		if(pWOpp)
-		{
-			if(pWOpp->m_AnalysisType==1)
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					for (i=1; i<pWOpp->m_NStation; i++)
-					{
-						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
-						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
-
-						dih = pWing->GetDihedral(yob)*PI/180.0;
-
-						glVertex3d(xt,yt, zt);
-					}
-				}
-				glEnd();
-			}
-			else
-			{
-				if(!pWing->m_bIsFin)
-				{
-					glBegin(GL_LINE_STRIP);
-					{
-						int m = 0;
-						for(j=0; j<pWing->m_NSurfaces; j++)
-						{
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
-							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
-								glVertex3d(Pt.x, Pt.y, Pt.z);
-								m++;
-							}
-						}
-					}
-					glEnd();
-				}
-				else
-				{
-					int m = 0;
-					for(j=0; j<pWing->m_NSurfaces; j++)
-					{
-						glBegin(GL_LINE_STRIP);
-						{
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
-							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
-								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
-								glVertex3d(Pt.x, Pt.y, Pt.z);
-								m++;
-							}
-						}
-						glEnd();
-					}
-				}
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateVortices()
-{
-	int p;
-	CVector A, B, C, D, AC, BD;
-	glEnable (GL_LINE_STIPPLE);
-	glLineStipple (1, 0xFFFF);
-
-	glNewList(VLMVORTICES,GL_COMPILE);
-	{
-		m_GLList++;
-
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glLineWidth(1.0);
-		glColor3d(0.7,0.0,0.0);
-		for (p=0; p<m_MatSize; p++)
-		{
-			if(!m_Panel[p].m_bIsTrailing)
-			{
-				if(m_Panel[p].m_iPos<=0)
-				{
-					A = m_Panel[p].A;
-					B = m_Panel[p].B;
-					C = m_Panel[p-1].B;
-					D = m_Panel[p-1].A;
-				}
-				else
-				{
-					A = m_Panel[p].A;
-					B = m_Panel[p].B;
-					C = m_Panel[p+1].B;
-					D = m_Panel[p+1].A;
-				}
-			}
-			else
-			{
-				A = m_Panel[p].A;
-				B = m_Panel[p].B;
-				// we define point AA=A+1 and BB=B+1
-				C.x =  m_Node[m_Panel[p].m_iTB].x
-					+ (m_Node[m_Panel[p].m_iTB].x-m_Panel[p].B.x)/3.0;
-				C.y =  m_Node[m_Panel[p].m_iTB].y;
-				C.z =  m_Node[m_Panel[p].m_iTB].z;
-				D.x =  m_Node[m_Panel[p].m_iTA].x
-					+ (m_Node[m_Panel[p].m_iTA].x-m_Panel[p].A.x)/3.0;
-				D.y =  m_Node[m_Panel[p].m_iTA].y;
-				D.z =  m_Node[m_Panel[p].m_iTA].z;
-			}
-
-			//next we "shrink" the points to avoid confusion with panels sides
-			AC = C-A;
-			BD = D-B;
-
-			AC *= 0.03;
-			A  += AC;
-			C  -= AC;
-			BD *= 0.03;
-			B  += BD;
-			D  -= BD;
-
-
-			if(m_pCurWPolar && m_pCurWPolar->m_bVLM1)
-			{
-				glLineStipple (1, 0xFFFF);
-				glBegin(GL_LINES);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(B.x, B.y, B.z);
-				}
-				glEnd();
-				glLineStipple (1, 0x0F0F);
-				glBegin(GL_LINES);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(D.x, D.y, D.z);
-				}
-				glEnd();
-				glBegin(GL_LINES);
-				{
-					glVertex3d(B.x, B.y, B.z);
-					glVertex3d(C.x, C.y, C.z);
-				}
-				glEnd();
-			}
-			else if(!m_pCurWPolar || (m_pCurWPolar && !m_pCurWPolar->m_bVLM1))
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(B.x, B.y, B.z);
-					glVertex3d(C.x, C.y, C.z);
-					glVertex3d(D.x, D.y, D.z);
-					glVertex3d(A.x, A.y, A.z);
-				}
-				glEnd();
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-void QMiarex::GLCreateModeLegend()
-{
-	if(!m_pCurWing || !m_pCurWOpp) return;
-	if(m_pCurWOpp->m_AnalysisType!=4) return;
-	if(!m_bResetglModeLegend) return;
-	m_bResetglModeLegend = false;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	static int dD, ZPos, LeftPos;
-	static complex<double> c, angle;
-	static double OmegaN, Omega1, Dsi, Sigma1, sum, prod, u0, mac, span;
-	QString strange, str;
-
-	QFontMetrics fm(pMainFrame->m_TextFont);
-	dD = fm.height();//pixels
-
-	//
-	u0   = m_pCurWOpp->m_QInf;
-	mac  = m_pCurWing->m_MAChord;
-	span = m_pCurWing->m_PlanformSpan;
-
-	c = m_pCurWOpp->m_EigenValue[pStabView->m_iCurrentMode];
-	sum  = c.real() * 2.0;                         // is a real number
-	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-	OmegaN = abs(c.imag());
-	Omega1 = sqrt(prod);
-	Sigma1 = sum /2.0;
-	if(prod > PRECISION) Dsi = -Sigma1/Omega1;
-	else                 Dsi = 0.0;
-
-
-	ZPos = m_rCltRect.bottom()- 14 * dD ;
-	LeftPos = m_rCltRect.left() +15;
-	glNewList(MODELEGEND,GL_COMPILE);
-	{
-		m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-		strange = QString(tr("Control position = %1 ")).arg(m_pCurWOpp->m_Ctrl, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Angle of Attack  = %1 ")).arg(m_pCurWOpp->m_Alpha, 8,'f',3);
-		strange += QString::fromUtf8("°");
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-		
-		strange = QString(tr("Sideslip         = %1 ")).arg(m_pCurWOpp->m_Beta, 8,'f',3);
-		strange += QString::fromUtf8("°");
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Bank             = %1 ")).arg(m_pCurWOpp->m_Phi, 8,'f',3);
-		strange += QString::fromUtf8("°");
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Speed            = %1 ")).arg(m_pCurWOpp->m_QInf, 8,'f',3);
-		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-		strange += str;		
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Undamped Natural Frequency = %1 Hz")).arg(OmegaN/2.0/PI, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Damped Natural Frequency   = %1 Hz")).arg(Omega1/2.0/PI, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Damping Constant           = %1 s-1")).arg(Sigma1, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		strange = QString(tr("Damping Ratio              = %1 ")).arg(Dsi, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		if(c.imag()>=0.0) strange = QString("Eigenvalue     = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-		else              strange = QString("Eigenvalue     = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
-		if(m_bLongitudinal && m_pCurWOpp)
-		{
-			angle = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][0]/u0;
-			if(c.imag()>=0.0) strange = QString("u/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("u/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][1]/u0;
-			if(c.imag()>=0.0) strange = QString("w/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("w/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][2]/(2.0*u0/mac);
-			if(c.imag()>=0.0) strange = QString("q/(2.u0.MAC) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("q/(2.u0.MAC) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3]/angle;
-			if(c.imag()>=0.0) strange = QString("theta(rad)   = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("theta(rad)   = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-		}
-		else if(!m_bLongitudinal && m_pCurWOpp)
-		{
-			angle = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][0]/u0;
-			if(c.imag()>=0.0) strange = QString("v/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("v/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][1]/(2.0*u0/span);
-			if(c.imag()>=0.0) strange = QString("p/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("p/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][2]/(2.0*u0/span);
-			if(c.imag()>=0.0) strange = QString("r/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("r/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-
-			c = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3]/angle;
-			if(c.imag()>=0.0) strange = QString("phi(rad)      = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("phi(rad)      = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
-			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-			ZPos +=dD;
-		}
-	}
-	glEndList();
-	if(m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}
-}
-
-
-
-void QMiarex::GLCreateWingLegend()
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	static int dD, ZPos, LeftPos, total;
-	static double Mass;
-	QString Result, str, strong, str1;
-	QString length, surface;
-	QString UFOName;
-
-	QFontMetrics fm(pMainFrame->m_TextFont);
-	dD = fm.height();//pixels
-
-// Write wing data
-
-	total = 11;
-	if(m_pCurWPolar) total +=2;
-	if(m_pCurPlane && m_pCurStab)  total ++;
-	ZPos = m_rCltRect.bottom()- total * dD ;
-	LeftPos = m_rCltRect.left() +15;
-
-	glNewList(WINGLEGEND,GL_COMPILE);
-	{
-		m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-		if(m_pCurWing)
-		{
-			GetLengthUnit(length,pMainFrame->m_LengthUnit);
-			GetAreaUnit(surface,pMainFrame->m_AreaUnit);
-			if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
-			else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
-
-			pGLWidget->renderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-
-			str1 = QString(tr("Wing Span      = %1 ")).arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit, 8,'f',3);
-			strong = str1 + length;
-			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			str1 = QString(tr("XYProj. Span   = %1 ")).arg(m_pCurWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
-			str1 += length;
-			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			str1 = QString(tr("Wing Area      = %1 ")).arg(m_pCurWing->m_PlanformArea * pMainFrame->m_m2toUnit, 8,'f',3);
-			str1 +=surface;
-			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			str1 = QString(tr("XYProj. Area   = %1 ")).arg(m_pCurWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
-			strong = str1+surface;
-			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			if(m_pCurWPolar)
-			{
-				if(m_pCurWPolar->m_Type!=7)  Mass = m_pCurWPolar->m_Weight;
-				else
-				{
-					if(m_pCurPlane)
-					{
-						Mass = m_pCurPlane->GetTotalMass();
-					}
-					else if(m_pCurWing)
-					{
-						Mass = m_pCurWing->GetTotalMass();				
-					}
-				}
-				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				str1 = QString(tr("Plane Mass     = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit,7,'f',2);
-				Result = str1 + str;
-				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-
-				ZPos +=dD;
-				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				str1 = QString(tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/m_pCurWPolar->m_WArea/pMainFrame->m_m2toUnit, 8,'f',3);
-				Result = str1 + str+"/" + strong;
-				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-				ZPos +=dD;
-			}
-
-			if(m_pCurPlane && m_pCurStab)
-			{
-				Result = QString(tr("Tail Volume    = %1")).arg(m_pCurPlane->m_TailVolume,7,'f',2);
-				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-				ZPos +=dD;
-			}
-
-			Result = QString(tr("Root Chord     = %1 ")).arg(m_pCurWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			Result = QString(tr("M.A.C.         = %1 ")).arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			Result = QString(tr("Tip Twist      = %1")).arg(m_pCurWing->m_TTwist[m_pCurWing->m_NPanel],7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			Result = QString(tr("Aspect Ratio   = %1")).arg(m_pCurWing->m_AR,7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			Result = QString(tr("Taper Ratio    = %1")).arg(m_pCurWing->m_TR,7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-
-			ZPos +=dD;
-			Result = QString(tr("Root-Tip Sweep = %1")).arg(m_pCurWing->GetAverageSweep(),7,'f',2);
-			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
-		}
-
-		//END Write wing data
-	}
-	glEndList();
-	if(m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}
-}
-
-
-
-void QMiarex::GLCreateWOppLegend()
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	int dD, YPos, XPos;
-	QString Result, str;
-	int i,l;
-
-	QFontMetrics fm(pMainFrame->m_TextFont);
-	dD = fm.height();//pixels
-
-	YPos = m_rCltRect.bottom()- 12 * dD;
-	YPos -= m_pCurWOpp->m_nFlaps * dD;
-	XPos = m_rCltRect.right() - 10 ;
-
-	glNewList(WOPPLEGEND,GL_COMPILE);
-	{
-		m_GLList++;
-
-//		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-		if(m_pCurWOpp)
-		{
-			if(m_pCurWOpp->m_bOut)
-			{
-				YPos -=dD;
-				Result = tr("Point is out of the flight envelope");
-				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-			}
-
-			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-			l = str.length();
-			if     (l==2) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-			else if(l==3) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-			else if(l==4) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
-			Result += str;
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("Alpha = %1 ")).arg(m_pCurWOpp->m_Alpha,9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("CL = %1 ")).arg(m_pCurWOpp->m_CL, 9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("CD = %1 ")).arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag,9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/PI/m_pCurWing->m_AR;
-			Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag,9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("Cl/Cd = %1 ")).arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag),9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("GCm = %1 ")).arg(m_pCurWOpp->m_GCm,9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("Rolling Moment = %1 ")).arg(m_pCurWOpp->m_GRm, 9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("Induced Moment = %1 ")).arg(m_pCurWOpp->m_IYm, 9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(tr("Airfoil Yawing Moment = %1 ")).arg(m_pCurWOpp->m_GYm, 9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			GetLengthUnit(str, pMainFrame->m_LengthUnit);
-			l = str.length();
-			if (l==1)     Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
-			else if(l==2) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			else if(l>=3) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			Result += str;
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			for(i=0; i<m_pCurWOpp->m_nFlaps; i++)
-			{
-				Result = QString(tr("Flap Moment[%1] = %2")).arg(i+1).arg(m_pCurWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
-				GetMomentUnit(str, pMainFrame->m_MomentUnit);
-				Result += str;
-				YPos += dD;
-				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-			}
-		}
-	}
-	glEndList();
-
-	if(m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}
-}
-
 
 void QMiarex::GLDrawAxes()
 {
@@ -9309,7 +5616,8 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(WINGSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurWing,WINGSURFACES);
+//			GLCreateGeom(m_pCurWing,WINGSURFACES);
+			GLCreateGeom(this, m_pCurWing, WINGSURFACES);
 		}
 
 		if(m_pCurWing2)
@@ -9319,7 +5627,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(WING2SURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurWing2,WING2SURFACES);
+			GLCreateGeom(this, m_pCurWing2,WING2SURFACES);
 		}
 
 		if(m_pCurStab)
@@ -9329,7 +5637,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(STABSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurStab,STABSURFACES);
+			GLCreateGeom(this, m_pCurStab,STABSURFACES);
 		}
 
 		if(m_pCurFin)
@@ -9339,7 +5647,7 @@ void QMiarex::GLDraw3D()
 				glDeleteLists(FINSURFACES,2);
 				m_GLList-=2;
 			}
-			GLCreateGeom(m_pCurFin,FINSURFACES);
+			GLCreateGeom(this, m_pCurFin,FINSURFACES);
 		}
 
 		m_bResetglGeom = false;
@@ -9352,19 +5660,19 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(MESHPANELS,2);
 			m_GLList-=2;
 		}
-		GLCreateMesh();
+		GLCreateMesh(this, m_Node, m_Panel);
 		if(glIsList(VLMCTRLPTS))
 		{
 			glDeleteLists(VLMCTRLPTS,1);
 			m_GLList-=1;
 		}
-		GLCreateCtrlPts();
+		GLCreateCtrlPts(this, m_Panel);
 		if(glIsList(VLMVORTICES))
 		{
 			glDeleteLists(VLMVORTICES,1);
 			m_GLList-=1;
 		}
-		GLCreateVortices();
+		GLCreateVortices(this, m_Panel, m_Node, m_pCurWPolar);
 		m_bResetglMesh = false;
 	}
 
@@ -9432,31 +5740,31 @@ void QMiarex::GLDraw3D()
 		}
 				if ((m_pCurWing && m_pCurWOpp) || (m_pCurPOpp &&m_pCurWOpp) )
 		{
-			GLCreateLiftStrip(m_pCurWing, m_pCurWOpp, VLMWINGLIFT);
-			GLCreateTrans(m_pCurWing, m_pCurWOpp, VLMWINGTOPTRANS);
+			GLCreateLiftStrip(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp, VLMWINGLIFT);
+			GLCreateTrans(this, m_pCurWing, m_pCurWOpp, VLMWINGTOPTRANS);
 			int surf = (m_pCurWing)->m_NSurfaces;
 			if(m_pCurPOpp)
 			{
 				if(m_pCurWing2)
 				{
-					GLCreateLiftStrip(m_pCurWing2, & (m_pCurPOpp)->m_Wing2WOpp, VLMWING2LIFT);
-					GLCreateTrans(m_pCurWing2, &(m_pCurPOpp)->m_Wing2WOpp, VLMWING2TOPTRANS);
+					GLCreateLiftStrip(this, m_pCurWing2, m_pCurWPolar, & (m_pCurPOpp)->m_Wing2WOpp, VLMWING2LIFT);
+					GLCreateTrans(this, m_pCurWing2, &(m_pCurPOpp)->m_Wing2WOpp, VLMWING2TOPTRANS);
 					surf += (m_pCurWing2)->m_NSurfaces;
 				}
 				if(m_pCurStab)
 				{
-					GLCreateLiftStrip(m_pCurStab, &(m_pCurPOpp)->m_StabWOpp, VLMSTABLIFT);
-					GLCreateTrans(m_pCurStab, &(m_pCurPOpp)->m_StabWOpp, VLMSTABTOPTRANS);
+					GLCreateLiftStrip(this, m_pCurStab, m_pCurWPolar, &(m_pCurPOpp)->m_StabWOpp, VLMSTABLIFT);
+					GLCreateTrans(this, m_pCurStab, &(m_pCurPOpp)->m_StabWOpp, VLMSTABTOPTRANS);
 					surf += (m_pCurStab)->m_NSurfaces;
 				}
 				if(m_pCurFin)
 				{
-					GLCreateLiftStrip(m_pCurFin, &(m_pCurPOpp)->m_FinWOpp, VLMFINLIFT);
-					GLCreateTrans(m_pCurFin, &(m_pCurPOpp)->m_FinWOpp, VLMFINTOPTRANS);
+					GLCreateLiftStrip(this, m_pCurFin, m_pCurWPolar, &(m_pCurPOpp)->m_FinWOpp, VLMFINLIFT);
+					GLCreateTrans(this, m_pCurFin, &(m_pCurPOpp)->m_FinWOpp, VLMFINTOPTRANS);
 				}
 			}
-			GLCreateLiftForce();
-			GLCreateMoments();
+			GLCreateLiftForce(this, m_pCurWPolar, m_pCurWOpp);
+			GLCreateMoments(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp);
 		}
 		m_bResetglLift = false;
 	}
@@ -9486,23 +5794,23 @@ void QMiarex::GLDraw3D()
 
 				if ((m_pCurWing && m_pCurWOpp) || (m_pCurPOpp && m_pCurWOpp))
 		{
-			GLCreateDrag(m_pCurWing, m_pCurWOpp, VLMWINGDRAG);
+			GLCreateDrag(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp, VLMWINGDRAG);
 			int surf = (m_pCurWing)->m_NSurfaces;
 			if(m_pCurPOpp)
 			{
 				if(m_pCurWing2)
 				{
-					GLCreateDrag(m_pCurWing2, &(m_pCurPOpp)->m_Wing2WOpp, VLMWING2DRAG);
+					GLCreateDrag(this, m_pCurWing2, m_pCurWPolar, &(m_pCurPOpp)->m_Wing2WOpp, VLMWING2DRAG);
 					surf += (m_pCurWing2)->m_NSurfaces;
 				}
 				if(m_pCurStab)
 				{
-					GLCreateDrag(m_pCurStab, &(m_pCurPOpp)->m_StabWOpp, VLMSTABDRAG);
+					GLCreateDrag(this, m_pCurStab, m_pCurWPolar, &(m_pCurPOpp)->m_StabWOpp, VLMSTABDRAG);
 					surf += (m_pCurStab)->m_NSurfaces;
 				}
 				if(m_pCurFin)
 				{
-					GLCreateDrag(m_pCurFin, &(m_pCurPOpp)->m_FinWOpp, VLMFINDRAG);
+					GLCreateDrag(this, m_pCurFin, m_pCurWPolar, &(m_pCurPOpp)->m_FinWOpp, VLMFINDRAG);
 				}
 			}
 		}
@@ -9533,21 +5841,21 @@ void QMiarex::GLDraw3D()
 		}
 		if (m_pCurWing && m_pCurWOpp)
 		{
-			GLCreateDownwash(m_pCurWing, m_pCurWOpp, VLMWINGWASH);
+			GLCreateDownwash(this, m_pCurWing, m_pCurWOpp, VLMWINGWASH);
 			int surf = m_pCurWing->m_NSurfaces;
 			if(m_pCurPOpp)
 			{
 				if(m_pCurWing2)
 				{
-					GLCreateDownwash(m_pCurWing2, &(m_pCurPOpp->m_Wing2WOpp), VLMWING2WASH);
+					GLCreateDownwash(this, m_pCurWing2, &(m_pCurPOpp->m_Wing2WOpp), VLMWING2WASH);
 					surf += m_pCurWing2->m_NSurfaces;
 				}
 				if(m_pCurStab)
 				{
-					GLCreateDownwash(m_pCurStab, &(m_pCurPOpp->m_StabWOpp), VLMSTABWASH);
+					GLCreateDownwash(this, m_pCurStab, &(m_pCurPOpp->m_StabWOpp), VLMSTABWASH);
 					surf += m_pCurStab->m_NSurfaces;
 				}
-				if(m_pCurFin)		GLCreateDownwash(m_pCurFin, &(m_pCurPOpp->m_FinWOpp), VLMFINWASH);
+				if(m_pCurFin) GLCreateDownwash(this, m_pCurFin, &(m_pCurPOpp->m_FinWOpp), VLMFINWASH);
 			}
 		}
 		m_bResetglDownwash = false;
@@ -9563,7 +5871,7 @@ void QMiarex::GLDraw3D()
 				m_GLList--;
 			}
 
-			GLCreateCp();
+			GLCreateCp(this, m_Node, m_Panel, m_pCurWOpp, m_pCurPOpp);
 		}
 
 		m_bResetglOpp = false;
@@ -9576,14 +5884,14 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(WINGLEGEND,1);
 			m_GLList -= 1;
 		}
-		GLCreateWingLegend();
+		GLCreateWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar);
 
 		if(m_pCurWOpp)
 		{
 			glDeleteLists(WOPPLEGEND,3);
 			m_GLList -= 3;
-			GLCreateWOppLegend();
-			GLCreateCpLegend();
+			GLCreateWOppLegend(this, m_pCurWing, m_pCurWOpp);
+			GLCreateCpLegend(this);
 		}
 		m_bResetglLegend = false;
 	}
@@ -9602,7 +5910,22 @@ void QMiarex::GLDraw3D()
 					glDeleteLists(VLMSTREAMLINES,1);
 					m_GLList -=1;
 				}
-				GLCreateStreamLines();
+				CWing *Wing[4];
+				Wing[0] = m_pCurWing;
+				Wing[1] = m_pCurWing2;
+				Wing[2] = m_pCurStab;
+				Wing[3] = m_pCurFin;
+				//back-up the current geometry, before it is tilted for streamlines calculation
+				memcpy(m_MemPanel, m_Panel, m_MatSize * sizeof(CPanel));
+				memcpy(m_MemNode,  m_Node,  m_nNodes * sizeof(CVector));
+				memcpy(m_RefWakePanel, m_WakePanel, m_WakeSize * sizeof(CPanel));
+				memcpy(m_RefWakeNode,  m_WakeNode,  m_nWakeNodes * sizeof(CVector));
+				GLCreateStreamLines(this, Wing, m_Panel, m_Node, m_pCurWPolar, m_pCurWOpp);
+				//restore the initial geometry
+				memcpy(m_Panel, m_MemPanel, m_MatSize * sizeof(CPanel));
+				memcpy(m_Node,  m_MemNode,  m_nNodes  * sizeof(CVector));
+				memcpy(m_WakePanel, m_RefWakePanel, m_WakeSize   * sizeof(CPanel));
+				memcpy(m_WakeNode,  m_RefWakeNode,  m_nWakeNodes * sizeof(CVector));				
 				m_bResetglStream = false;
 			}
 		}
@@ -9619,13 +5942,12 @@ void QMiarex::GLDraw3D()
 					glDeleteLists(SURFACESPEEDS,1);
 					m_GLList -=1;
 				}
-				GLCreateSurfSpeeds();
+				GLCreateSurfSpeeds(this, m_Panel, m_pCurWPolar, m_pCurWOpp);
 				m_bResetglFlow = false;
 			}
 		}
 	}
 }
-
 
 
 void QMiarex::GLDrawFoils()
@@ -9689,6 +6011,9 @@ void QMiarex::GLRenderMode()
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	QString strong = QString("Time =%1s").arg(m_ModeTime,6,'f',3);
+
+	GLCreateModeLegend(this, m_pCurWing, m_pCurWOpp, m_pCurPOpp);
+
 	glDisable(GL_CLIP_PLANE1);
 
 	// Clear the viewport
@@ -10954,13 +7279,14 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 
 	m_pLLTDlg->m_IterLim = m_Iter;
 
+	m_pLLTDlg->move(pMainFrame->m_DlgPos);
 	m_pLLTDlg->InitDialog();
-
 	m_pLLTDlg->show();
 	m_pLLTDlg->StartAnalysis();
 
 	if(!m_bLogFile || !(m_pLLTDlg->m_bError || m_pLLTDlg->m_bWarning)) m_pLLTDlg->hide();
 
+	pMainFrame->m_DlgPos= m_pLLTDlg->pos();
 	pMainFrame->UpdateWOpps();
 	SetWOpp(false, V0);
 
@@ -10977,12 +7303,12 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 	pSettings->beginGroup("Miarex");
 	{
-		m_bXTop         = pSettings->value("bXTop").toBool();
-		m_bXBot         = pSettings->value("bXBot").toBool();
-		m_bXCP          = pSettings->value("bXCP").toBool();
+		m_bXTop         = pSettings->value("bXTop", false).toBool();
+		m_bXBot         = pSettings->value("bXBot", false).toBool();
+		m_bXCP          = pSettings->value("bXCP", true).toBool();
 		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
-		m_bICd          = pSettings->value("bICd").toBool();
-		m_bVCd          = pSettings->value("bVCd").toBool();
+		m_bICd          = pSettings->value("bICd", true).toBool();
+		m_bVCd          = pSettings->value("bVCd", true).toBool();
 		m_bWakePanels   = pSettings->value("bWakePanels").toBool();
 		m_bSurfaces     = pSettings->value("bSurfaces").toBool();
 		m_bOutline      = pSettings->value("bOutline").toBool();
@@ -11145,15 +7471,14 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_CoreSize          = pSettings->value("CoreSize").toDouble();
 		m_MinPanelSize      = pSettings->value("MinPanelSize").toDouble();
 
-		m_TotalTime         = pSettings->value("TotalTime",11.0).toDouble();
-		m_Deltat            = pSettings->value("Delta_t",0.02).toDouble();
+		m_TotalTime         = pSettings->value("TotalTime",10.0).toDouble();
+		m_Deltat            = pSettings->value("Delta_t",0.01).toDouble();
 		m_TimeInput[0]      = pSettings->value("TimeIn0",0.0).toDouble();
 		m_TimeInput[1]      = pSettings->value("TimeIn1",0.0).toDouble();
 		m_TimeInput[2]      = pSettings->value("TimeIn2",0.0).toDouble();
 		m_TimeInput[3]      = pSettings->value("TimeIn3",0.0).toDouble();
 		m_bForcedResponse   = pSettings->value("ForcedResponse").toBool();
 		m_bLongitudinal     = pSettings->value("DynamicsMode").toBool();
-qDebug()<<m_TotalTime<<m_Deltat;
 		m_iStabTimeView     = pSettings->value("StabTimeView",4).toInt();
 		k = pSettings->value("TimeGraph").toInt();
 		if(k==1)m_pCurTimeGraph = &m_TimeGraph1;
@@ -12682,9 +9007,11 @@ void QMiarex::OnDefineStabPolar()
 
 		//Then add WPolar to array
 		pCurWPolar->m_Weight          = m_StabPolarDlg.m_Mass;
+
+		pCurWPolar->m_bAutoInertia    = m_StabPolarDlg.m_bAutoInertia;
 		pCurWPolar->m_CoG.x           = m_StabPolarDlg.m_CoG.x;
 		pCurWPolar->m_CoG.z           = m_StabPolarDlg.m_CoG.z;
-		pCurWPolar->m_bAutoInertia    = m_StabPolarDlg.m_bAutoInertia;
+
 		pCurWPolar->m_CoGIxx          = m_StabPolarDlg.m_CoGIxx;
 		pCurWPolar->m_CoGIyy          = m_StabPolarDlg.m_CoGIyy;
 		pCurWPolar->m_CoGIzz          = m_StabPolarDlg.m_CoGIzz;
@@ -13194,6 +9521,7 @@ void QMiarex::OnDeleteCurWPolar()
 			delete pWOpp;
 		}
 	}
+
 	//next remove all the POpps associated to the Wing Polar
 	CPOpp * pPOpp;
 	for (i=m_poaPOpp->size()-1; i>=0; i--)
@@ -13207,7 +9535,7 @@ void QMiarex::OnDeleteCurWPolar()
 	}
 	//next remove the WPolar
 	CWPolar* pWPolar;
-	for (i=(int)m_poaWPolar->size()-1;i>=0; i--)
+	for (i=m_poaWPolar->size()-1;i>=0; i--)
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
 		if (pWPolar == m_pCurWPolar)
@@ -13217,6 +9545,7 @@ void QMiarex::OnDeleteCurWPolar()
 			break;
 		}
 	}
+
 	m_pCurPOpp = NULL;
 	m_pCurWOpp = NULL;
 	m_pCurWPolar = NULL;
@@ -15998,261 +12327,208 @@ void QMiarex::OnWPolars()
 }
 
 
-void QMiarex::PaintFourTimeGraph(QPainter &painter)
-{
-	//Paint a four graph time view
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-//	int h34 = (int)(3*h/4);
-	int h38 = (int)(3*h/8);
-	int w2 = (int)(w/2);
-	int w3 = (int)(w/3);
-
-	if(w3>150 && h>250)
-	{
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-
-		DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-//		DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-
-		QRect Rect1(0,0,w2,h38);
-		QRect Rect2(w2,0,w2,h38);
-		QRect Rect3(0,h38,w2,h38);
-		QRect Rect4(w2,h38,w2,h38);
-		m_TimeGraph1.DrawGraph(Rect1, painter);
-		m_TimeGraph2.DrawGraph(Rect2, painter);
-		m_TimeGraph3.DrawGraph(Rect3, painter);
-		m_TimeGraph4.DrawGraph(Rect4, painter);
-
-	}
-}
-
-
-void QMiarex::PaintFourWingGraph(QPainter &painter)
-{
-	//Paint a four graph WOpp view
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-//	int h34 = (int)(3*h/4);
-	int h38 = (int)(3*h/8);
-	int w2 = (int)(w/2);
-	int w3 = (int)(w/3);
-
-	if(w3>150 && h>250)
-	{
-
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-
-		DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-
-		QRect Rect1(0,0,w2,h38);
-		QRect Rect2(w2,0,w2,h38);
-		QRect Rect3(0,h38,w2,h38);
-		QRect Rect4(w2,h38,w2,h38);
-		m_WingGraph1.DrawGraph(Rect1, painter);
-		m_WingGraph2.DrawGraph(Rect2, painter);
-		m_WingGraph3.DrawGraph(Rect3, painter);
-		m_WingGraph4.DrawGraph(Rect4, painter);
-
-	}
-}
-
-void QMiarex::PaintCp(QPainter &painter)
-{
-	painter.save();
-
-	int h = m_rCltRect.height();
-	int h34  = (int)(3*h/4);
-
-	if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-	m_CpGraph.DrawGraph(painter);
-	QPoint Place(50, h34+20);
-	DrawCpLegend(painter, Place, m_rCltRect.bottom());
-
-	painter.restore();
-}
-
-
-void QMiarex::PaintRLStabGraphs(QPainter &painter)
-{
-	static int h,w,w2,h23,w3,w23;
-	static QRect Rect1, Rect2;
-	static QPoint Place;
-	QPen TextPen;
-	QString GraphName;
-	painter.save();
-	h   = m_rCltRect.height();
-	w   = m_rCltRect.width();
-	w2  = (int)(w/2);
-	h23 = (int)(2*h/3);
-	w3  = (int)(0.35*w);
-	w23 = 2*w3;
-
-	if(m_iStabilityView==1)
-	{
-		if(m_pCurRLStabGraph)
-		{
-			Rect1.setRect(0,0,w23,m_rCltRect.bottom()-00);
-			if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;//too small to paint
-			m_pCurRLStabGraph->DrawGraph(Rect1, painter);
-			Place.setX((int)(w23/3));
-			Place.setY(m_pCurRLStabGraph->GetMargin()/2);
-			m_pCurRLStabGraph->GetGraphName(GraphName);
-			TextPen.setColor(m_pCurRLStabGraph->GetTitleColor());
-			painter.setPen(TextPen);
-			painter.drawText(Place, GraphName);
-			Place.setX(w23+10);
-			Place.setY(10);
-			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
-		}
-	}
-
-
-	painter.restore();
-}
-
-
-
-
-void QMiarex::PaintSingleWingGraph(QPainter &painter)
-{
-	painter.save();
-	//Paint the current WOpp view
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	if (m_pCurWingGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
-	{
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200)
-		{
-			painter.restore();
-			return;
-		}
-		m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
-		QPoint Place(m_rCltRect.left()+10, m_rCltRect.top() +30);
-		DrawWOppLegend(painter, Place, m_rCltRect.bottom());
-	}
-
-	painter.setFont(pMainFrame->m_TextFont);
-
-	QPen TextPen(pMainFrame->m_TextColor);
-	TextPen.setWidth(1);
-	painter.setPen(TextPen);
-
-	int dwidth, dheight;
-	QFontMetrics fm(pMainFrame->m_TextFont);
-	dheight = fm.height();
-	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
-
-	if(m_pCurWing)
-	{
-		PaintWing(painter, m_ptOffset, m_WingScale);
-		if(m_pCurWOpp && m_pCurWOpp->m_bIsVisible)
-		{
-			QPoint PtLegend;
-			PtLegend.rx() = (int)(m_rCltRect.width()/2);
-			PtLegend.ry() = m_rCltRect.bottom();
-			PaintXTr(painter, m_ptOffset, m_WingScale);
-			if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
-			if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
-		}
-		PaintWingLegend(painter);
-		if(m_pCurWOpp) PaintWOppLegend(painter);
-	}
-	painter.restore();
-}
-
-
-
-void QMiarex::PaintSingleTimeGraph(QPainter &painter)
-{
-	static int w,h,h34;
-	static QRect Rect1;
-	static QPoint Place;
-	QPen TextPen;
-	QString GraphName;
-
-	if(!m_pCurTimeGraph) m_pCurTimeGraph = &m_TimeGraph1;
-
-	painter.save();
-	w   = m_rCltRect.width();
-	h  = m_rCltRect.height();
-	h34 = (int)(3*h/4);
-
-	Rect1.setRect(0,0,w,h34);
-	if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;//too small to paint
-	m_pCurTimeGraph->DrawGraph(Rect1, painter);
-	Place.setX((int)(w*2/5));
-	Place.setY(m_pCurTimeGraph->GetMargin()/2);
-	m_pCurTimeGraph->GetGraphName(GraphName);
-	TextPen.setColor(m_pCurTimeGraph->GetTitleColor());
-	painter.setPen(TextPen);
-	painter.drawText(Place, GraphName);
-
-//	Place.setX(m_pCurTimeGraph->GetMargin()/2);
-//	Place.setY(h23+m_pCurTimeGraph->GetMargin()/2);
-	DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-//	DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-	painter.restore();
-}
-
-
-
-void QMiarex::PaintTwoWingGraph(QPainter &painter)
-{
-	//Paint a double graph WOpp view
-	int h   = m_rCltRect.height();
-	int w   = m_rCltRect.width();
-	int w2  = (int)(w/2);
-	int w3  = (int)(w/3);
-	int h23 = (int)(2*h/3);
-
-
-	if(w3>150 && h>250)
-	{
-
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-
-		DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-
-		QRect Rect1(m_rCltRect.left(),   m_rCltRect.top(), w2, h23);
-		QRect Rect2(w2, m_rCltRect.top(),                  w2, h23);
-		m_WingGraph1.DrawGraph(Rect1, painter);
-		m_WingGraph2.DrawGraph(Rect2, painter);
-
-	}
-}
 
 void QMiarex::PaintView(QPainter &painter)
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
+	static int h,w,w2,h2, h23,h34, h38,w3,w23;
+	static QRect Rect1, Rect2, Rect3, Rect4;
+	static QPoint Place;
+	QPen TextPen;
+	QString GraphName;
+	painter.save();
+	w   = m_rCltRect.width();
+	w2  = (int)(w/2);
+	w3  = (int)(0.35*w);
+	w23 = 2*w3;
+	h   = m_rCltRect.height();
+	h2  = (int)(h/2);
+	h23 = (int)(2*h/3);
+	h34 = (int)(3*h/4);
+	h38 = (int)(3*h/8);
 	//Refresh the active view
-//	if(m_bAnimateWOpp)	return;// painting is performed elsewhere
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+
+	if(m_rCltRect.width()<200 || m_rCltRect.height()<200) 
+	{
+		painter.restore();
+		return;//too small to paint
+	}
 
 	if (m_iView==WPOLARVIEW)
 	{
-		if     (m_iWPlrView == 1) PaintWSingleGraph(painter);
-		else if(m_iWPlrView == 2) PaintWCoupleGraphs(painter);
-		else if(m_iWPlrView == 4) PaintWFourGraphs(painter);
+		if (m_iWPlrView == 1)
+		{
+//			PaintWSingleGraph(painter);
+			if(!m_pCurGraph)
+			{
+				m_pCurGraph     = &m_WPlrGraph1;
+				m_pCurWPlrGraph = &m_WPlrGraph1;
+			}
+				
+			Rect1.setRect(0,0,w23,m_rCltRect.bottom()-00);
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
+			m_pCurGraph->DrawGraph(Rect1, painter);
+		}
+		else if(m_iWPlrView == 2)
+		{
+//			PaintWCoupleGraphs(painter);
+			Rect1.setRect(0,0,w2,h23);
+			Rect2.setRect(w2,0,w2,h23);
+	
+			m_WPlrGraph1.DrawGraph(Rect1, painter);
+			m_WPlrGraph2.DrawGraph(Rect2, painter);
+	
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
+		}
+		else if(m_iWPlrView == 4)
+		{
+//			PaintWFourGraphs(painter);
+			Rect1.setRect(0,0,w3,h2);
+			Rect2.setRect(w3,0,w3,h2);
+			Rect3.setRect(0,h2,w3,h2);
+			Rect4.setRect(w3,h2,w3,h2);
+	
+			m_WPlrGraph1.DrawGraph(Rect1, painter);
+			m_WPlrGraph2.DrawGraph(Rect2, painter);
+			m_WPlrGraph3.DrawGraph(Rect3, painter);
+			m_WPlrGraph4.DrawGraph(Rect4, painter);
+	
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());	
+		}
 	}
 	else if (m_iView==WOPPVIEW)
 	{
-		PaintWOpp(painter);
+		if (m_iWingView == 1 && m_pCurWing)  
+		{
+//			PaintSingleWingGraph(painter);
+			if (m_pCurWingGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
+			{
+
+				m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
+				QPoint Place(m_rCltRect.left()+10, m_rCltRect.top() +30);
+				DrawWOppLegend(painter, Place, m_rCltRect.bottom());
+			}
+		
+			painter.setFont(pMainFrame->m_TextFont);
+		
+			QPen TextPen(pMainFrame->m_TextColor);
+			TextPen.setWidth(1);
+			painter.setPen(TextPen);
+		
+			int dwidth, dheight;
+			QFontMetrics fm(pMainFrame->m_TextFont);
+			dheight = fm.height();
+			dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
+		
+			if(m_pCurWing)
+			{
+				PaintWing(painter, m_ptOffset, m_WingScale);
+				if(m_pCurWOpp && m_pCurWOpp->m_bIsVisible)
+				{
+					QPoint PtLegend;
+					PtLegend.rx() = (int)(m_rCltRect.width()/2);
+					PtLegend.ry() = m_rCltRect.bottom();
+					PaintXTr(painter, m_ptOffset, m_WingScale);
+					if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
+					if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
+				}
+				PaintWingLegend(painter);
+				if(m_pCurWOpp) PaintCurWOppLegend(painter);
+			}
+		}
+		else if (m_iWingView == 2 && m_pCurWing) 
+		{
+//			PaintTwoWingGraph(painter);
+			DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+	
+			Rect1.setRect(m_rCltRect.left(),   m_rCltRect.top(), w2, h23);
+			Rect2.setRect(w2, m_rCltRect.top(),                  w2, h23);
+			m_WingGraph1.DrawGraph(Rect1, painter);
+			m_WingGraph2.DrawGraph(Rect2, painter);
+		}
+		else if (m_iWingView == 4 && m_pCurWing) 
+		{
+//			PaintFourWingGraph(painter);
+			DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+		
+			Rect1.setRect(0,0,w2,h38);
+			Rect2.setRect(w2,0,w2,h38);
+			Rect3.setRect(0,h38,w2,h38);
+			Rect4.setRect(w2,h38,w2,h38);
+			m_WingGraph1.DrawGraph(Rect1, painter);
+			m_WingGraph2.DrawGraph(Rect2, painter);
+			m_WingGraph3.DrawGraph(Rect3, painter);
+			m_WingGraph4.DrawGraph(Rect4, painter);
+		}
 	}
 	else if (m_iView==WCPVIEW)
 	{
-		PaintCp(painter);
+//		PaintCp(painter);
+		m_CpGraph.DrawGraph(painter);
+		QPoint Place(50, h34+20);
+		DrawCpLegend(painter, Place, m_rCltRect.bottom());
 	}
 	else if (m_iView==WSTABVIEW)
 	{
 		if(m_iStabilityView==0)
 		{
-			if(m_iStabTimeView==1)      PaintSingleTimeGraph(painter);
-			else if(m_iStabTimeView==4) PaintFourTimeGraph(painter);
+			if(m_iStabTimeView==1) 
+			{
+//				PaintSingleTimeGraph(painter);
+				if(!m_pCurTimeGraph) m_pCurTimeGraph = &m_TimeGraph1;
+		
+				Rect1.setRect(0,0,w,h34);
+				m_pCurTimeGraph->DrawGraph(Rect1, painter);
+				Place.setX((int)(w*2/5));
+				Place.setY(m_pCurTimeGraph->GetMargin()/2);
+				m_pCurTimeGraph->GetGraphName(GraphName);
+				TextPen.setColor(m_pCurTimeGraph->GetTitleColor());
+				painter.setPen(TextPen);
+				painter.drawText(Place, GraphName);
+
+				DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+				painter.restore();
+			}
+			else if(m_iStabTimeView==4)
+			{
+//				PaintFourTimeGraph(painter);
+				//Paint a four graph time view			
+				DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+				Rect1.setRect(0,0,w2,h38);
+				Rect2.setRect(w2,0,w2,h38);
+				Rect3.setRect(0,h38,w2,h38);
+				Rect4.setRect(w2,h38,w2,h38);
+				m_TimeGraph1.DrawGraph(Rect1, painter);
+				m_TimeGraph2.DrawGraph(Rect2, painter);
+				m_TimeGraph3.DrawGraph(Rect3, painter);
+				m_TimeGraph4.DrawGraph(Rect4, painter);
+			
+			}
 		}
-		else PaintRLStabGraphs(painter);
+		else 
+		{
+//			PaintRLStabGraphs(painter);
+			if(m_iStabilityView==1)
+			{
+				if(m_pCurRLStabGraph)
+				{
+					Rect1.setRect(0,0,w23,m_rCltRect.bottom()-00);
+					m_pCurRLStabGraph->DrawGraph(Rect1, painter);
+					Place.setX((int)(w23/3));
+					Place.setY(m_pCurRLStabGraph->GetMargin()/2);
+					m_pCurRLStabGraph->GetGraphName(GraphName);
+					TextPen.setColor(m_pCurRLStabGraph->GetTitleColor());
+					painter.setPen(TextPen);
+					painter.drawText(Place, GraphName);
+					Place.setX(w23+10);
+					Place.setY(10);
+					DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
+				}
+			}
+		}
 	}
+	painter.restore();
 }
 
 
@@ -16440,24 +12716,22 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 }
 
 
-void QMiarex::PaintWOppLegend(QPainter &painter)
+void QMiarex::PaintCurWOppLegend(QPainter &painter)
 {
 	if(!m_pCurWOpp) return;
 	painter.save();
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString Result, str, strong;
-	QString str1;
+	QString Result, str;
 
 	int i;
 	int margin = 10;
-
 	int dwidth, dheight;
+	
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dheight = fm.height();
 	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
 	int ZPos    = m_rCltRect.height()-11*dheight;
-
 
 	D = 0;
 	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
@@ -16544,81 +12818,6 @@ void QMiarex::PaintWOppLegend(QPainter &painter)
 		}
 	}
 	painter.restore();
-}
-
-
-void QMiarex::PaintWSingleGraph(QPainter &painter)
-{
-	if(!m_pCurGraph)
-	{
-		m_pCurGraph     = &m_WPlrGraph1;
-		m_pCurWPlrGraph = &m_WPlrGraph1;
-//		return;
-	}
-
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-	int w2 = (int)(w/2);
-
-	int w3 = (int)(0.35*w);
-	int w23 = 2*w3;
-
-	QRect Rect1(0,0,w23,m_rCltRect.bottom()-00);
-	if(w2>200 && h>250)
-	{
-		DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;//too small to paint
-		m_pCurGraph->DrawGraph(Rect1, painter);
-	}
-}
-
-
-
-void QMiarex::PaintWCoupleGraphs(QPainter &painter)
-{
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-	int w2  = (int)(w/2);
-	int h23 = (int)(2*h/3);
-
-	if(w2>200 && h>250)
-	{
-
-		QRect Rect1(0,0,w2,h23);
-		QRect Rect2(w2,0,w2,h23);
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-
-		m_WPlrGraph1.DrawGraph(Rect1, painter);
-		m_WPlrGraph2.DrawGraph(Rect2, painter);
-
-		DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
-	}
-}
-
-
-void QMiarex::PaintWFourGraphs(QPainter &painter)
-{
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
-	int h2 = (int)(h/2);
-	int w3 = (int)(0.35*w);
-//	int w23 = 2*w3;
-
-	if(w3>150 && h>250)
-	{
-		QRect Rect1(0,0,w3,h2);
-		QRect Rect2(w3,0,w3,h2);
-		QRect Rect3(0,h2,w3,h2);
-		QRect Rect4(w3,h2,w3,h2);
-		if(m_rCltRect.width()<200 || m_rCltRect.height()<200) return;
-
-		m_WPlrGraph1.DrawGraph(Rect1, painter);
-		m_WPlrGraph2.DrawGraph(Rect2, painter);
-		m_WPlrGraph3.DrawGraph(Rect3, painter);
-		m_WPlrGraph4.DrawGraph(Rect4, painter);
-
-		DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
-	}
 }
 
 
@@ -16795,21 +12994,11 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 }
 
 
-void QMiarex::PaintWOpp(QPainter &painter)
-{
-	//Paint the current WOpp view
-	if (m_iWingView == 1 && m_pCurWing)      PaintSingleWingGraph(painter);
-	else if (m_iWingView == 2 && m_pCurWing) PaintTwoWingGraph(painter);
-	else if (m_iWingView == 4 && m_pCurWing) PaintFourWingGraph(painter);
-}
-
-
 void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 {
 	if(!m_pCurWing || !m_pCurWPolar) return;
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
 	int i,pl, pr;
 
 	m_pPanelDlg->m_ppBody        = & m_pCurBody;
@@ -16868,14 +13057,16 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_nNodes     = m_nNodes;
 	m_pPanelDlg->m_NSurfaces  = m_NSurfaces;
 
+	m_pPanelDlg->move(pMainFrame->m_DlgPos);
 	m_pPanelDlg->InitDialog();
-
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
 
 //	if(m_bLogFile && m_pPanelDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
+	pMainFrame->m_DlgPos = m_pPanelDlg->pos();
+	
 	pMainFrame->UpdateWOpps();
 
 	if(m_pCurPlane)     SetPOpp(false, V0);
@@ -16951,13 +13142,13 @@ QString QMiarex::RenameUFO(QString UFOName)
 	return "";
 }
 
+
 void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-//	double cosa = cos(Angle*PI/180.0);
-//	double sina = sin(Angle*PI/180.0);
+
 	int iLA, iLB, iTA, iTB;
-	CVector LATB, TALB, Pt, Ptr, Trans;
+	CVector LATB, TALB, Pt, Trans;
 
 	for (n=0; n< m_nNodes; n++)
 		m_Node[n].RotateY(P, Angle);
@@ -19260,9 +15451,10 @@ void QMiarex::SetWPlrLegendPos()
 
 bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 {
-	if(!m_pCurWPolar)
+	if(!m_pCurWing || !m_pCurWPolar)
 	{
 		m_pCurWOpp = NULL;
+		m_pCurPOpp = NULL;
 		SetCurveParams();
 		return false;
 	}
@@ -19272,12 +15464,6 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 	// else set it to NULL
 	QString strong;
 
-	if(!m_pCurWing || !m_pCurWPolar)
-	{
-		m_pCurWOpp = NULL;
-		m_pCurPOpp = NULL;
-		return false;
-	}
 	if(m_pCurPlane)	  return SetPOpp(bCurrent, Alpha);
 
 	CWOpp *pWOpp = NULL;
@@ -19714,8 +15900,8 @@ void QMiarex::StabAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pStabDlg->m_nNodes     = m_nNodes;
 	m_pStabDlg->m_NSurfaces  = m_NSurfaces;
 
-	m_pStabDlg->InitDialog();
 	m_pStabDlg->move(pMainFrame->m_DlgPos);
+	m_pStabDlg->InitDialog();
 	m_pStabDlg->show();
 	m_pStabDlg->StartAnalysis();
 
@@ -19927,14 +16113,15 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->m_nNodes     = m_nNodes;
 	m_pVLMDlg->m_NSurfaces  = m_NSurfaces;
 
+	m_pVLMDlg->move(pMainFrame->m_DlgPos);
 	m_pVLMDlg->InitDialog();
-
 	m_pVLMDlg->show();
 	m_pVLMDlg->StartAnalysis();
 
 //	if(m_bLogFile && m_pVLMDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pVLMDlg->m_bWarning) m_pVLMDlg->hide();
 
+	pMainFrame->m_DlgPos = m_pVLMDlg->pos();
 	pMainFrame->UpdateWOpps();
 	if(m_pCurPlane)     SetPOpp(false, V0);
 	else if(m_pCurWing) SetWOpp(false, V0);

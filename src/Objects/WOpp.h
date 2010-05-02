@@ -50,7 +50,6 @@ private:
 
 	bool m_bIsVisible;	// true if the curves should be displayed in the WOpp graphs
 	bool m_bShowPoints;	// true if the curve' points should be displayed in the WOpp graphs
-	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
 	bool m_bVLM1;		// true if the WOpp is the result to a classic VLM calculation
 	bool m_bThinSurface;// true if the WOpp is the results of a calculation on the middle surface
 	bool m_bTiltedGeom;	// true if the WOpp is the results of a calculation on the tilted geometry
@@ -59,62 +58,25 @@ private:
 	int m_Width;
 	QColor m_Color;
 
-	int m_AnalysisType;	//1=LLT, 2=VLM, 3=3D Panels
 	int m_WingType;		//0 for wing, 1 for elevator, 2 for fin
 	int m_Type;		// Polar Analysis Type
-	int m_NStation;		// number of stations along wing span
-	int m_NVLMPanels;	// number of VLMpanels
 	int m_nWakeNodes;	// number of wake nodes 
 	int m_NXWakePanels;	// 
-	int m_nFlaps;		// number of flaps
 	int m_nControls;	// number of controls associated to the WOpp
 
 	double m_FirstWakePanel;
 	double m_WakeFactor;
-	double m_Alpha, m_Beta, m_Phi;
-	double m_QInf;
-	double m_Ctrl;		//control variable - converged value
 	double m_Weight;
-	double m_Span;
-	double m_MAChord;
-	double m_Chord[MAXSTATIONS+1];		// chord at stations
-	double m_SpanPos[MAXSTATIONS+1];	// station spanwise positions
-	double m_StripArea[MAXSTATIONS+1];	
 	double m_Twist[MAXSTATIONS+1];		// twist at span stations
 
 	//RESULTS
 	double m_Re[MAXSTATIONS+1];		// Reynolds number at stations
-	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
-	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
-	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
 	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
 	double m_CmAirf[MAXSTATIONS+1];		//airfoil Pitching moment coefficient at stations about 1/4 chord point
-	double m_XCPSpanRel[MAXSTATIONS+1];	//Centre of pressure position at stations
-	double m_XCPSpanAbs[MAXSTATIONS+1];	//Centre of pressure position at stations
-	double m_XTrTop[MAXSTATIONS+1];		// Transition location - top
-	double m_XTrBot[MAXSTATIONS+1];		// Transition location - bottom
 	double m_BendingMoment[MAXSTATIONS+1];
-	double m_Cp[VLMMATSIZE];		// lift coeffs for each panel
-	double m_G[VLMMATSIZE];			// vortice or doublet strengths
-	double m_Sigma[VLMMATSIZE];		// source strengths
-	double m_FlapMoment[20]; 		// flap hinge moments
 
-	double m_CL;				// Wing lift coefficient
 	double m_CY, m_CX;			//Side force, drag coefficients
-	double m_ViscousDrag;			// wing viscous drag
-	double m_InducedDrag;			// wing induced drag
-	double m_GCm;		// wing pitching moment
-	double m_VCm;		// pitching moment induced by viscous drag forces
-	double m_ICm;		// pitching moment induced by pressure forces
-	double m_GRm;			// wing rolling moment
-	double m_GYm;			// geometric yawing moment
-	double m_VYm;		// wing viscous yawing moment
-	double m_IYm;		// wing induced yawing moment
 	double m_MaxBending;		// max bending moment along the span
-	double m_XCP, m_YCP;		// centre of pressure position relative to the wing's XCref
-	complex<double> m_EigenValue[8]; //four longitudinal and four lateral modes
-	complex<double> m_EigenVector[8][4]; // (4 longitudinal + 4 lateral) x 4 components
 
 	//non dimensional stability derivatives
 	double CLa, CLq, Cma, Cmq, CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
@@ -127,13 +89,56 @@ private:
 	double m_BLong[MAXCONTROLS][4];
 	double m_BLat[MAXCONTROLS][4];
 	
-	CVector m_F[MAXSTATIONS];		// Stripforce
-	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge
-
 //________________METHODS____________________________________
 	bool SerializeWOpp(QDataStream &ar, bool bIsStoring);
 	bool Export(QTextStream &out, int FileType);
 	void GetBWStyle(QColor &color, int &style, int &width);
 	double GetMaxLift();
+
+public:
+	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
+
+	int m_NVLMPanels;	// number of VLMpanels
+	int m_AnalysisType;	//1=LLT, 2=VLM, 3=3D Panels
+	int m_NStation;		// number of stations along wing span
+	int m_nFlaps;		// number of flaps
+
+	double m_Span;
+	double m_MAChord;
+	double m_QInf;
+	double m_Cp[VLMMATSIZE];		// lift coeffs for each panel
+	double m_G[VLMMATSIZE];			// vortice or doublet strengths
+	double m_Sigma[VLMMATSIZE];		// source strengths
+	double m_Alpha, m_Beta, m_Phi;
+	double m_SpanPos[MAXSTATIONS+1];	// station spanwise positions
+	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
+	double m_Chord[MAXSTATIONS+1];		// chord at stations
+	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
+	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
+	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
+	double m_XCPSpanRel[MAXSTATIONS+1];	//Centre of pressure position at stations
+	double m_XCPSpanAbs[MAXSTATIONS+1];	//Centre of pressure position at stations
+	double m_StripArea[MAXSTATIONS+1];	
+	double m_XTrTop[MAXSTATIONS+1];		// Transition location - top
+	double m_XTrBot[MAXSTATIONS+1];		// Transition location - bottom
+	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge
+	CVector m_F[MAXSTATIONS];		// Stripforce
+	double m_FlapMoment[MAXPANELS]; 		// flap hinge moments
+
+	double m_ViscousDrag;			// wing viscous drag
+	double m_InducedDrag;			// wing induced drag
+	double m_XCP, m_YCP;		// centre of pressure position relative to the wing's XCref
+	double m_GCm;		// wing pitching moment
+	double m_CL;				// Wing lift coefficient
+	double m_GRm;			// wing rolling moment
+	double m_VCm;		// pitching moment induced by viscous drag forces
+	double m_ICm;		// pitching moment induced by pressure forces
+	double m_GYm;			// geometric yawing moment
+	double m_VYm;		// wing viscous yawing moment
+	double m_IYm;		// wing induced yawing moment
+	double m_Ctrl;		//control variable - converged value
+	
+	complex<double> m_EigenValue[8]; //four longitudinal and four lateral modes
+	complex<double> m_EigenVector[8][4]; // (4 longitudinal + 4 lateral) x 4 components
 };
 #endif

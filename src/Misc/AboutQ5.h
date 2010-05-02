@@ -31,15 +31,10 @@ class AboutQ5 : public QDialog
 
 public:
 	explicit AboutQ5(void *parent = 0);
-    virtual ~AboutQ5();
 
 
 private:
 	void SetupLayout();
-
-	QPushButton *OKButton;
-	QLabel * m_pXFLR5Link;
-	QLabel *m_IconQ5;
 
 	void *m_pMainFrame;
 };

@@ -40,10 +40,8 @@ class CPolar
 private:
 	static void *s_pMainFrame;
 
-	int m_Type;// the Polar format type - used for Serialize action
 	int m_ReType;// the reynolds type
 	int m_MaType;//the mach type
-	double m_Reynolds;
 	double m_ASpec;//type 4 polars
 	double m_Mach;
 	double m_ACrit;
@@ -54,7 +52,6 @@ private:
 	int m_Width;
     QColor m_Color;
 	// a polar is identified by the name of the Airfoil, and its own
-    QString m_FoilName;
     QString m_PlrName;
 
 	//we need to know if user wants it visible	
@@ -64,17 +61,7 @@ private:
 	//flap data
 //	bool m_bFlap;
 	// the rest is litterature
-    QList <double> m_Alpha;
-    QList <double> m_Cl;
-    QList <double> m_XCp;
-    QList <double> m_Cd;
-    QList <double> m_Cdp;
-    QList <double> m_Cm;
-    QList <double> m_XTr1, m_XTr2;
-    QList <double> m_HMom, m_Cpmn;
-    QList <double> m_ClCd, m_Cl32Cd;
-    QList <double> m_RtCl;
-    QList <double> m_Re;//type 4 polars
+
 
 
 	void AddData(OpPoint* pOpPoint);
@@ -92,15 +79,31 @@ private:
 	void Copy(CPolar *pPolar);
 
 protected:
-	void GetLinearizedCl(double &Alpha0, double &slope);
-	void GetAlphaLimits(double &amin, double &amax);
-	void GetClLimits(double &Clmin, double &Clmax);
 	void Remove(int i);
 	void Insert(int i);
 	double GetCm0();
 	void GetBWStyle(QColor &color, int &style, int &width);
 public:
 	double GetZeroLiftAngle();
+	void GetAlphaLimits(double &amin, double &amax);
+	void GetClLimits(double &Clmin, double &Clmax);
+	void GetLinearizedCl(double &Alpha0, double &slope);
+
+	int m_Type;// the Polar format type - used for Serialize action
+	double m_Reynolds;
+    QString m_FoilName;
+	QList <double> m_Alpha;
+	QList <double> m_Cl;
+	QList <double> m_XCp;
+	QList <double> m_Cd;
+	QList <double> m_Cdp;
+	QList <double> m_Cm;
+	QList <double> m_XTr1, m_XTr2;
+	QList <double> m_HMom, m_Cpmn;
+	QList <double> m_ClCd, m_Cl32Cd;
+	QList <double> m_RtCl;
+	QList <double> m_Re;//type 4 polars
+
 };
 
 #endif

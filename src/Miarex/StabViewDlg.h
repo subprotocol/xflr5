@@ -102,10 +102,11 @@ private:
 	QStandardItemModel *m_pControlModel;
 	CtrlTableDelegate *m_pCtrlDelegate;	
 
-	int m_iCurrentMode;
 	double m_ModeAmplitude;
 	double m_vabs[4], m_phi[4];
-	
+
+public:
+	int m_iCurrentMode;	
 };
 
 #endif // STABVIEWDLG_H

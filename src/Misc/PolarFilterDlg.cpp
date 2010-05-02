@@ -31,7 +31,6 @@ PolarFilterDlg::PolarFilterDlg(void *pParent)
 	m_bType1 = m_bType2 = m_bType3 = m_bType4 = m_bType5 = m_bType6 = m_bType7 = true;
 
 	m_bMiarex = false;
-
 	SetupLayout();
 }
 
@@ -48,7 +47,7 @@ void PolarFilterDlg::SetupLayout()
 	m_pctrlType4 = new QCheckBox(tr("Type 4"));
 	m_pctrlType5 = new QCheckBox(tr("Type 5"));
 	m_pctrlType6 = new QCheckBox(tr("Type 6"));
-	m_pctrlType6 = new QCheckBox(tr("Type 7"));
+	m_pctrlType7 = new QCheckBox(tr("Type 7"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));

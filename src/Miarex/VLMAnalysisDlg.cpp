@@ -43,6 +43,7 @@ void *VLMAnalysisDlg::s_pMainFrame;
 VLMAnalysisDlg::VLMAnalysisDlg()
 {
 	setWindowTitle(tr("VLM Analysis"));
+
 	SetupLayout();
 
 	m_bSequence      = false;
@@ -591,7 +592,6 @@ void VLMAnalysisDlg::pgmat(double const &mach, double const &alfa, double const 
 
 bool VLMAnalysisDlg::ReLoop()
 {
-	QString str;
 	int nrhs;
 	double Alpha = 0.0;
 
@@ -687,7 +687,6 @@ void VLMAnalysisDlg::SetupLayout()
 	QRect r = desktop.geometry();
 	setMinimumHeight(r.height()/2);
 	setMinimumWidth(r.width()/2);
-	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	QFont CourierFont = QFont("Courier",10);
@@ -718,6 +717,7 @@ void VLMAnalysisDlg::StartAnalysis()
 	if(!m_pWPolar) return;
 	QString strong;
 	m_bIsFinished = false;
+	m_pctrlCancel->setText(tr("Cancel"));
 	strong = tr("Launching VLM Analysis....\n\n");
 	AddString(strong);
 

@@ -46,7 +46,6 @@ class CWPolar
 
 public:
 	CWPolar();
-	virtual ~CWPolar();
 
 	static void* s_pMainFrame;
 
@@ -65,13 +64,9 @@ private:
 
 	void *GetUFOPlrVariable(int iVar);
 
-	int m_AnalysisType;
-	int m_Type;
 	int m_RefAreaType;
 	double m_QInf;
-	double m_Weight;
 	double m_ASpec;
-	double m_Beta;
 	double m_AMem;
 
 	int m_Style;
@@ -82,9 +77,7 @@ private:
 	QString m_PlrName;
 
 	// general aerodynamic data - specific to a polar
-	double m_Density  ;
 	double m_Viscosity;
-	double m_WArea;//for lift and drag calculations
 	double m_WMAChord;// for moment calculations
 	double m_WSpan;//for moment calculations
 	double m_Height;//for ground effect
@@ -92,7 +85,6 @@ private:
 
 	bool m_bIsVisible;
 	bool m_bShowPoints;
-	bool m_bVLM1;
 	bool m_bThinSurfaces;
 	bool m_bGround;
 	bool m_bWakeRollUp;
@@ -148,10 +140,18 @@ private:
 
 	//control data - Type 5-6-7 polars
 	int m_nControls;
-	double m_MinControl[MAXCONTROLS], m_MaxControl[MAXCONTROLS];
-	bool   m_bActiveControl[MAXCONTROLS];
+	double m_MinControl[4*MAXCONTROLS], m_MaxControl[4*MAXCONTROLS];
+	bool   m_bActiveControl[4*MAXCONTROLS];
 
+public:
+	int m_AnalysisType;
+	double m_Beta;
+	double m_Density  ;
+	double m_WArea;//for lift and drag calculations
+	int m_Type;
+	double m_Weight;
 
+	bool m_bVLM1;
 };
 
 #endif

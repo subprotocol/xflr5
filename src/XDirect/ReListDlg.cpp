@@ -22,6 +22,7 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QHeaderView>
 #include <QStringList>
 #include "XDirect.h"
 #include "ReListDlg.h"
@@ -58,9 +59,13 @@ void ReListDlg::InitDialog()
 	m_pReModel->setHeaderData(2, Qt::Horizontal, QObject::tr("NCrit"));
 
 	m_pctrlReView->setModel(m_pReModel);
-	m_pctrlReView->setColumnWidth(0,90);
-	m_pctrlReView->setColumnWidth(1,70);
-	m_pctrlReView->setColumnWidth(2,70);
+	
+	int w = m_pctrlReView->width();
+	m_pctrlReView->setColumnWidth(0,(int)(w/3));
+	m_pctrlReView->setColumnWidth(1,(int)(w/3));
+	m_pctrlReView->setColumnWidth(2,(int)(w/3));
+	QHeaderView *HorizontalHeader = m_pctrlReView->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
 
 	m_pFloatDelegate = new FloatEditDelegate;
 	m_pctrlReView->setItemDelegate(m_pFloatDelegate);
@@ -125,7 +130,7 @@ void ReListDlg::SetupLayout()
 	m_pctrlReView = new QTableView(this);
 
 	m_pctrlReView->setMinimumHeight(500);
-	m_pctrlReView->setMinimumWidth(350);
+	m_pctrlReView->setMinimumWidth(250);
 	m_pctrlReView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);

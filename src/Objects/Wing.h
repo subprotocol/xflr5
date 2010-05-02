@@ -57,7 +57,6 @@ public:
 
 // Implementation
 protected:
-	CSurface m_Surface[2*MAXPANELS];
 	double m_VLMQInf[100];
 
 	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
@@ -95,7 +94,6 @@ protected:
 	void ComputeGeometry();
 	void ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
 
-	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
 	void SetSweep(double Sweep);
 	void SetTwist(double Twist);
@@ -105,15 +103,9 @@ protected:
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
-	double GetAverageSweep();
-	double GetChord(double yob);
 	double GetC4(double yob, double xRef);
-	double GetDihedral(double yob);
-	double GetOffset(double yob);
 	double GetTwist(double y);
 	double GetZPos(double y);
-	double Getyrel(double SpanPos);
-	double GetTotalMass();
 	double Beta(int m, int k);
 
 //	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
@@ -140,8 +132,6 @@ protected:
 
 	static bool s_bCancel;
 
-	QString m_WingName;	//the wing's name
-
 	QFile * m_pXFile;	// a pointer to the output .log file
 
 	static bool s_bVLM1;		// true if classic, false if quad ring (K&P) method
@@ -155,15 +145,11 @@ protected:
 	bool m_bSymetric;	// true if the wing's geometry is symmetric
 	bool m_bLLT;		// true if performing an LLT calculation, false if VLM
 	bool m_bTrans;		// true if the wing is being dragged
-	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
 	bool m_bChanged;	// true if the user has made changes to the wing's definition
 
 	int m_Type;		// the LLT analysis type
-	int m_NPanel;		// number of span panels in wing definition
 	int m_NStation;		// number of stations for wing calculation
 	int m_nNodes;		// the number of VLM panel nodes
-	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
-	int m_MatSize;	// Max Size for the VLMMatrix
 	int m_AVLIndex;		// need to export to AVL
 
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
@@ -181,16 +167,9 @@ protected:
 //	CVector m_CoG;
 //	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
-	double m_PlanformSpan;
-	double m_ProjectedSpan;
 	double m_GChord;	// mean geometric chord
-	double m_MAChord;	// mean aerodynamic chord
 	double m_yMac;		// mean aerodynamic chord span position
-	double m_PlanformArea;		// wing surface projected on xy plane;
-	double m_ProjectedArea;		// wing surface projected on xy plane;
 	double m_Volume;	// for tentative wieght calculations
-	double m_AR;		// Aspect ratio
-	double m_TR;		// Taper ratio
 	double m_CL;		//Lift
 	double m_InducedDrag, m_ViscousDrag;
 	double m_XCP, m_YCP;	// Centre of pressure's position
@@ -203,14 +182,6 @@ protected:
 	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
 	int m_XPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
 	int m_YPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
-	double m_TChord[MAXPANELS+1];		// Chord length at each panel side
-	double m_TLength[MAXPANELS+1];		// the length of each panel
-	double m_TPos[MAXPANELS+1];		// b-position of each panel end on developed surface
-	double m_TYProj[MAXPANELS+1];		// b-position of each panel end projected on horizontal surface
-	double m_TOffset[MAXPANELS+1];		// b-position of each panel end
-	double m_TDihedral[MAXPANELS+1];	// b-position of each panel end
-	double m_TZPos[MAXPANELS+1];		// vertical offset - calculation result only
-	double m_TTwist[MAXPANELS+1];		//Twist value of each foil (measured to the wing root)
 
 	// Span Coefficients  resulting from VLM or LLT calculation
 	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
@@ -235,7 +206,6 @@ protected:
 
 	QString m_WingDescription;
 
-	CPanel *m_pPanel;			//pointer to the VLM Panel array
 
 	QStringList m_RFoil;			// name of the right foils
 	QStringList m_LFoil;			// name of the left foils
@@ -243,7 +213,46 @@ protected:
 	CVector m_Vd[MAXSTATIONS];		// downwash vector at span stations
 	CVector m_F[MAXSTATIONS];		// lift vector at span stations
 
+public:	
+	QString m_WingName;	//the wing's name
+
 	QColor m_WingColor;
+	
+	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
+	int m_NPanel;		// number of span panels in wing definition
+
+	CSurface m_Surface[2*MAXPANELS];
+
+	double m_TChord[MAXPANELS+1];		// Chord length at each panel side
+	double m_TLength[MAXPANELS+1];		// the length of each panel
+	double m_TPos[MAXPANELS+1];		// b-position of each panel end on developed surface
+	double m_TYProj[MAXPANELS+1];		// b-position of each panel end projected on horizontal surface
+	double m_TOffset[MAXPANELS+1];		// b-position of each panel end
+	double m_TDihedral[MAXPANELS+1];	// b-position of each panel end
+	double m_TZPos[MAXPANELS+1];		// vertical offset - calculation result only
+	double m_TTwist[MAXPANELS+1];		//Twist value of each foil (measured to the wing root)
+	
+	bool m_bIsFin, m_bDoubleFin, m_bSymFin, m_bDoubleSymFin; //fin flags
+	double m_MAChord;	// mean aerodynamic chord
+	double m_PlanformSpan;
+	double m_ProjectedSpan;
+	double m_PlanformArea;		// wing surface projected on xy plane;
+	double m_ProjectedArea;		// wing surface projected on xy plane;
+	double m_AR;		// Aspect ratio
+	double m_TR;		// Taper ratio
+	
+	int m_MatSize;	// Max Size for the VLMMatrix
+	CPanel *m_pPanel;			//pointer to the VLM Panel array
+
+	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
+	double GetOffset(double yob);
+	double GetChord(double yob);
+	double Getyrel(double SpanPos);
+	double GetDihedral(double yob);
+	double GetTotalMass();
+	double GetAverageSweep();
+
+
 };
 
 #endif

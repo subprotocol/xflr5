@@ -36,6 +36,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+#include <QHeaderView>
 #include <math.h>
 
 
@@ -3067,7 +3068,21 @@ void GL3dBodyDlg::InitDialog()
 	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
 	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
 	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
-
+	
+/*	int w3 = (int)(m_pctrlFrameTable->width()/3);
+	m_pctrlFrameTable->setColumnWidth(0,w3);
+	m_pctrlFrameTable->setColumnWidth(1,w3);
+	m_pctrlFrameTable->setColumnWidth(2,w3);
+	w3 = (int)(m_pctrlPointTable->width()/3);
+	m_pctrlPointTable->setColumnWidth(0,w3);
+	m_pctrlPointTable->setColumnWidth(1,w3);
+	m_pctrlPointTable->setColumnWidth(2,w3);*/
+	
+	QHeaderView *HorizontalHeader = m_pctrlFrameTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
+	HorizontalHeader = m_pctrlPointTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
+	
 	m_pctrlBodyName->setText(m_pBody->m_BodyName);
 	m_pctrlBodyName->setEnabled(m_bEnableName);
 	m_pctrlBodyDescription->setPlainText(m_pBody->m_BodyDescription);
@@ -3081,18 +3096,8 @@ void GL3dBodyDlg::InitDialog()
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
 	m_pctrlSurfaces->setChecked(m_bSurfaces);
 
-	int w4 = m_pctrlFrameTable->width()/4;
-	m_pctrlFrameTable->setColumnWidth(0,w4);
-	m_pctrlFrameTable->setColumnWidth(1,w4);
-	m_pctrlFrameTable->setColumnWidth(2,w4);
-	w4 = m_pctrlPointTable->width()/4;
-	m_pctrlPointTable->setColumnWidth(0,w4);
-	m_pctrlPointTable->setColumnWidth(1,w4);
-	m_pctrlPointTable->setColumnWidth(2,w4);
-
 	m_pctrlUndo->setEnabled(false);
 	m_pctrlRedo->setEnabled(false);
-
 }
 
 
@@ -4247,17 +4252,14 @@ void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 	m_bResetglBody2D = true;
 	SetBodyScale();
 
-	int w4 = m_pctrlFrameTable->width()/4;
+	int w4 = (int)(m_pctrlFrameTable->width()/4);
 	m_pctrlFrameTable->setColumnWidth(0,w4);
 	m_pctrlFrameTable->setColumnWidth(1,w4);
 	m_pctrlFrameTable->setColumnWidth(2,w4);
-	w4 = m_pctrlPointTable->width()/4;
+	w4 = (int)(m_pctrlPointTable->width()/4);
 	m_pctrlPointTable->setColumnWidth(0,w4);
 	m_pctrlPointTable->setColumnWidth(1,w4);
 	m_pctrlPointTable->setColumnWidth(2,w4);
-
-
-//	UpdateView();
 }
 
 

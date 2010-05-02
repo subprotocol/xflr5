@@ -4820,7 +4820,6 @@ void QXDirect::PaintPressure(QPainter &painter, OpPoint* pOpPoint, double scale)
 	double sina = sin(alpha);
 	double x, y ,xs, ys, xe, ye, dx, dy, x1, x2, y1, y2, r2;
 	double cp;
-	QPoint From, To;
 	QPoint offset = m_FoilOffset;
 
 	QPen CpvPen(m_crPressureColor);

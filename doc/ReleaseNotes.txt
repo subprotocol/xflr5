@@ -19,6 +19,7 @@ xflr5 v6.00 May xxx, 2010
 	- added Stability and control analysis
 	- changed the foil list table in XDirect
 	- added an option to run polar batch calculations on a list of airfoil
+	- corrected the display bug for stippled lines in 3D view
 	
 
 

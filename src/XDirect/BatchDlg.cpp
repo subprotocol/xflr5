@@ -1045,12 +1045,12 @@ void BatchDlg::OnFoilList()
 	dlg.m_FoilName = m_pFoil->m_FoilName;
 	dlg.InitDialog();
 
+	m_FoilList.clear();
 	if(QDialog::Accepted == dlg.exec())
 	{
 		CFoil *pFoil;
 		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
 
-		m_FoilList.clear();
 		for(int i=0; i<dlg.m_FoilList.count();i++)
 		{
 			m_FoilList.append(dlg.m_FoilList.at(i));
@@ -1387,6 +1387,7 @@ void BatchDlg::StartAnalysis()
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CFoil *pFoil;
+	QString strong;
 
 	m_pctrlAnalyze->setText(tr("Cancel"));
 	if(s_bCurrentFoil)
@@ -1404,13 +1405,16 @@ void BatchDlg::StartAnalysis()
 			XFoil *pXFoil = (XFoil*)s_pXFoil;
 			pXFoil->lvisc=true;
 
-			
+			strong = tr("Analyzing ")+pFoil->m_FoilName+("\n");
+			UpdateOutput(strong);
 			if(m_Type !=4) 	ReLoop();
 			else            AlphaLoop();
+			strong = "\n\n";
+			UpdateOutput(strong);
 		}
 	}
 
-	QString strong = tr("Analysis completed");
+	strong = tr("Analysis completed");
 	UpdateOutput(strong);
 
 	CleanUp();

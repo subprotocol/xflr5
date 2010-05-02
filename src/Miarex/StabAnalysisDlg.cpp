@@ -1611,7 +1611,7 @@ void StabAnalysisDlg::Forces(double *Gamma, double *VInf, CVector &Force, CVecto
 				m_ppSurface[j]->GetC4(k, PtC4, tau);
 				Re = m_ppSurface[j]->GetChord(tau) * QInf /m_pWPolar->m_Viscosity;
 				Cl = Fd.dot(WindNormal)*m_pWPolar->m_Density/qdyn/StripArea;
-				PCd    = pMiarex->GetVar(2, m_ppSurface[j]->m_pFoilA, m_ppSurface[j]->m_pFoilB, Re, Cl, tau, bOutRe, bError);
+				PCd    = GetVar(pMiarex->m_poaPolar, 2, m_ppSurface[j]->m_pFoilA, m_ppSurface[j]->m_pFoilB, Re, Cl, tau, bOutRe, bError);
 				PCd   *= StripArea * 1/2*QInf*QInf;              // Newtons/rho
 				bOut = bOut || bOutRe || bError;
 				ViscousDrag += PCd ;                             // Newtons/rho
@@ -2048,6 +2048,8 @@ void StabAnalysisDlg::StartAnalysis()
 	if(!m_pPlane && !m_pWing) return;
 	if(!m_pWPolar) return;
 	if(m_pWPolar->m_Type !=7) return;
+	
+	m_pctrlCancel->setText("Cancel");
 
 	QString strong;
 	m_bIsFinished = false;
@@ -2065,9 +2067,17 @@ void StabAnalysisDlg::StartAnalysis()
 	AddString(strong);
 	m_bCancel = false;
 
-	if(m_pWPolar->m_bAutoInertia)	ComputeBodyAxisInertia();
+	if(m_pWPolar->m_bAutoInertia)	
+	{
+		strong = tr("Using automatic inertia evaluation");
+		AddString(strong);
+		ComputeBodyAxisInertia();
+		m_pWPolar->m_CoG = m_CoG;
+	}
 	else
 	{
+		strong = tr("Using manual inertia evaluation");
+		AddString(strong);
 		m_Mass = m_pWPolar->m_Weight;
 		m_CoG.Set(m_pWPolar->m_CoG);
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
@@ -2076,6 +2086,7 @@ void StabAnalysisDlg::StartAnalysis()
 		m_Ib[0][2] = m_Ib[2][0] = m_pWPolar->m_CoGIxz;
 		m_Ib[1][0] = m_Ib[1][2] = m_Ib[0][1] = m_Ib[2][1] = 0.0;	
 	}
+	AddString("\n\n");
 
 	if(m_pWPolar->m_Type==7) ControlLoop();
 

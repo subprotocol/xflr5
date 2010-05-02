@@ -85,17 +85,14 @@ private :
 	CVector SideB_T[MAXCHORDPANELS];	 
 	CVector SideA_B[MAXCHORDPANELS];	 
 	CVector SideB_B[MAXCHORDPANELS];	 
-	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
 	static CVector VTemp;
 	static CPanel *s_pPanel;
 	static CVector *s_pNode;
 
 	bool m_bIsInSymPlane;
 	bool m_bTEFlap;
-	bool m_bIsTipLeft, m_bIsTipRight;
 	bool m_bIsLeftSurf, m_bIsRightSurf;
 	bool m_bIsCenterSurf;//true if is either left or right center surface... need to connect to body
-	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only
 
 	CVector m_LA, m_LB, m_TA, m_TB;
 	CVector Normal, NormalA, NormalB;
@@ -113,9 +110,7 @@ private :
 
 	int m_XDistType;
 	int m_YDistType;
-	int m_NXPanels;
 	int m_NXLead, m_NXFlap;//number of panels before and after the break
-	int m_NYPanels;
 	int m_NElements;
 
 	int m_nFlapNodes, m_nFlapPanels;
@@ -125,8 +120,13 @@ private :
 	CVector m_HingePoint;
 	CVector m_HingeVector;
 
-	CFoil *m_pFoilA, *m_pFoilB; //Left and right foils
-
 public:
+	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only
+	bool m_bIsTipLeft, m_bIsTipRight;
+	static CVector LA, LB, TA, TB;//leading and trailing corners of strip k
+	int m_NYPanels;
+	int m_NXPanels;	
+	CFoil *m_pFoilA, *m_pFoilB; //Left and right foils
+	
 };
 #endif

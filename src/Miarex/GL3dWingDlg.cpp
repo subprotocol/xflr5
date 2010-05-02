@@ -21,6 +21,7 @@
   
 #include "../MainFrame.h" 
 #include "../Globals.h" 
+#include "../Miarex/GLCreateLists.h" 
 #include "../GLWidget.h"
 #include "Miarex.h"
 #include "GL3dWingDlg.h"
@@ -964,7 +965,7 @@ void GL3dWingDlg::GLDraw3D()
 			m_GLList-=2;
 		}
 		QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-		pMiarex->GLCreateGeom(m_pWing, WINGGEOMETRY);
+		GLCreateGeom(pMiarex, m_pWing, WINGGEOMETRY);
 
 		if(glIsList(MESHPANELS))
 		{
@@ -1464,6 +1465,8 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingModel->setHeaderData(9, Qt::Horizontal, QObject::tr("Y-dist"));
 
 	m_pctrlWingTable->setModel(m_pWingModel);
+	QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
 
 	QItemSelectionModel *selectionModel = new QItemSelectionModel(m_pWingModel);
 	m_pctrlWingTable->setSelectionModel(selectionModel);

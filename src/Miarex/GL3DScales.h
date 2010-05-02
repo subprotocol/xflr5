@@ -74,6 +74,8 @@ private:
 	void *m_pMiarex;
 	void *m_pMainFrame;
 
+	
+public:
 	int m_pos;
 	int m_NX;
 	double m_DeltaL;

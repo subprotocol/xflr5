@@ -28,6 +28,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHeaderView>
 #include <QMessageBox>
 #include <math.h>
 #include <QtDebug>
@@ -70,6 +71,8 @@ StabPolarDlg::StabPolarDlg()
 	m_SideSlip  = 0.0;
 	m_BankAngle = 0.0;
 
+	m_nControls = 0;
+	
 	m_bActiveControl[0] = false;
 	m_MinControl[0] = 0.0;
 	m_MaxControl[0] = 0.0;
@@ -436,7 +439,7 @@ void StabPolarDlg::OnOK()
 		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}
 
-	for(i=m_nControls; i<MAXCONTROLS; i++) m_bActiveControl[i] = false;
+	for(i=m_nControls; i<4*MAXCONTROLS; i++) m_bActiveControl[i] = false;
 
 	CWPolar * pWPolarNew;
 	m_WPolarName = m_pctrlWPolarName->text();
@@ -666,6 +669,9 @@ void StabPolarDlg::SetupLayout()
 	m_pctrlControlTable->setMinimumHeight(200);
 	m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	QHeaderView *HorizontalHeader = m_pctrlControlTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
+	
 	m_pCtrlDelegate = new CtrlTableDelegate;
 	m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
 	m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;

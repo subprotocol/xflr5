@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	AboutQ5 Class
-	Copyright (C) 2008-2009 Andre Deperrois xflr5@yahoo.com
+	Global Functions 
+	Copyright (C) 2008-2010 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,12 +19,11 @@
 
 *****************************************************************************/
 
-//Global functions
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <Qt> 
+//#include <Qt> 
 #include <QFile>
 #include <QString>
 #include <QTextStream>
@@ -33,6 +32,8 @@
 #include "Params.h"
 #include "Objects/CVector.h"
 #include "Objects/Foil.h"
+#include "Objects/Polar.h"
+#include <QList>
 
 using namespace std;
 
@@ -99,5 +100,18 @@ bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V);
 bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int n);
 bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n);
 
+
+void *GetPlrVariable(CPolar *pPolar, int iVar);
+double GetVar(QList<void*>*m_poaPolar, int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
+double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
+double GetCl(QList<void*>*m_poaPolar, CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+double GetCm(QList<void*>*m_poaPolar, CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
+double GetCm0(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
+double GetCd(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
+double GetXCp(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau,  bool &bOutRe, bool &bError);
+double GetXTr(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
+double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError);
+double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
+void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
 
 #endif // FUNCTIONS_H

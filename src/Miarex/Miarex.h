@@ -91,7 +91,6 @@ class QMiarex : public QWidget
 public:
 
 	QMiarex(QWidget *parent = NULL);
-	~QMiarex();
 
 
 private slots:
@@ -239,23 +238,7 @@ private:
 
 	void ClientToGL(QPoint const &point, CVector &real);
 	void GLToClient(CVector const &real, QPoint &point);
-	void GLCreateGeom(CWing *pWing, int List);
-	void GLCreateMesh();
-	void GLCreateCtrlPts();
-	void GLCreateVortices();
-	void GLCreateLiftForce();
-	void GLCreateMoments();
-	void GLCreateStreamLines();
-	void GLCreateSurfSpeeds();
-	void GLCreateCp();
-	void GLCreateCpLegend();
-	void GLCreateModeLegend();
-	void GLCreateWingLegend();
-	void GLCreateWOppLegend();
-	void GLCreateDownwash(CWing *pWing, CWOpp *pWOpp, int List);
-	void GLCreateLiftStrip(CWing *pWing, CWOpp *pWOpp, int List);
-	void GLCreateDrag(CWing *pWing, CWOpp *pWOpp, int List);
-	void GLCreateTrans(CWing *pWing, CWOpp *pWOpp, int List);
+
 	void GLDrawFoils();
 	void GLInverseMatrix();
 	void GLRenderMode();
@@ -318,20 +301,9 @@ private:
 	void DrawWOppLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawWPolarLegend(QPainter &painter, QPoint place, int bottom);
 	void DrawStabTimeLegend(QPainter &painter, QPoint place, int bottom);
-	void PaintWSingleGraph(QPainter &painter);
-	void PaintWCoupleGraphs(QPainter &painter);
-	void PaintWFourGraphs(QPainter &painter);
-	void PaintWOpp(QPainter &painter);
 	void PaintXCmRef(QPainter &painter, QPoint ORef, double scale);
 	void PaintXCP(QPainter &painter, QPoint ORef, double scale);
 	void PaintXTr(QPainter &painter, QPoint ORef, double scale);
-	void PaintCp(QPainter &painter);
-	void PaintSingleTimeGraph(QPainter &painter);
-	void PaintFourTimeGraph(QPainter &painter);
-	void PaintRLStabGraphs(QPainter &painter);
-	void PaintFourWingGraph(QPainter &painter);
-	void PaintTwoWingGraph(QPainter &painter);
-	void PaintSingleWingGraph(QPainter &painter);
 	void PaintView(QPainter &painter);
 	void FillComboBoxes(bool bEnable = true);
 	void SetAnalysisParams();
@@ -344,30 +316,21 @@ private:
 	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void StabAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence);
-	void RotateGeomY(double const &Angle, CVector const &P);
 	void RotateGeomZ(double const &Beta, CVector const &P);
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void EditCurPlane();
 	void PaintWingLegend(QPainter &painter);
-	void PaintWOppLegend(QPainter &painter);
+	void PaintCurWOppLegend(QPainter &painter);
 
 	int CreateBodyElements();
 	int CreateElements(CSurface *pSurface);
 	int IsWakeNode(CVector &Pt);
 	int IsNode(CVector &Pt);
 
-	double GetCl(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-	double GetCm(CFoil  *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError);
-	double GetCm0(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError);
-	double GetCd(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError);
-	double GetXCp(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau,  bool &bOutRe, bool &bError);
-	double GetXTr(CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError);
-	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
-	double GetPlrPointFromAlpha(CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
-	double GetPlrPointFromCl(CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError);
-	double GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
-	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
-	void * GetPlrVariable(CPolar *pPolar, int iVar);
+//	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
+//	double GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
+//	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
+//	void * GetPlrVariable(CPolar *pPolar, int iVar);
 
 	bool InitializePanels();
 	bool CreateWakeElems(int PanelIndex);
@@ -443,27 +406,14 @@ private:
 	CtrlPolarDlg m_CtrlPolarDlg;
 	StabPolarDlg m_StabPolarDlg;
 
-	LLTAnalysisDlg *m_pLLTDlg;
-	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
-	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
-	StabAnalysisDlg *m_pStabDlg;
-	void* m_pMainFrame ;			// a pointer to the frame class
-	void *m_p2DWidget;
-	void *m_pGLWidget;
 
 private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 protected:
 	CPanel m_Panel[VLMMATSIZE];		// the panel array for the currently loaded UFO
-	CPanel m_WakePanel[VLMMATSIZE];	// the reference current wake panel array
-	CPanel m_MemPanel[VLMMATSIZE];		// used if the analysis should be performed on the tilted geometry
-	CPanel m_RefWakePanel[VLMMATSIZE]; 	// the reference wake panel array if wake needs to be reset
 	CPanel *m_pPanel[VLMMATSIZE];		// an array to the re-ordered VLM panels for a calculation
 
 	CVector m_Node[2*VLMMATSIZE];		// the node array for the currently loaded UFO
-	CVector m_MemNode[2*VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
-	CVector m_WakeNode[2*VLMMATSIZE];	// the reference current wake node array
-	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
 	CVector m_TempWakeNode[2*VLMMATSIZE];	// the temporary wake node array during relaxation calc
 
 	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
@@ -488,12 +438,10 @@ protected:
 
 	bool m_bDragPoint;
 	bool m_bArcball;			//true if the arcball is to be displayed
-	bool m_bglLight;
 	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
 	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
 	bool m_b3DCp, m_bDownwash; 	// defines whether the corresponding data should be displayed
 	bool m_bMoments;							// defines whether the corresponfing data should be displayed
-	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 	bool m_bFoilNames;
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
@@ -509,17 +457,14 @@ protected:
 	bool m_bResetglBody;
 	bool m_bResetglBodyMesh;
 	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
-	bool m_bResetglModeLegend;		// true if the mode properties need to be refreshed
 	bool m_bWakePanels;
 	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
-	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bIs2DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
 	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
 	bool m_bShowLight;			// true if the virtual light is to be displayed
 	bool m_bAutoScales;
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
-	bool m_bLongitudinal;
 
 	bool m_bTrans;				// the view is being dragged
 	bool m_bType1, m_bType2, m_bType4, m_bType5, m_bType6, m_bType7;	// polar types to be displayed
@@ -548,8 +493,6 @@ protected:
 	bool m_bForcedResponse;     // true if the time graph view is the forced response, false if initial conditions response
 
 	int m_NSurfaces;
-	int m_nNodes;				// the current number of nodes for the currently loaded UFO
-	int m_MatSize;			// the matrix size
 	int m_iWingView;			// defines how many graphs will be displayed in WOpp view
 	int m_iWPlrView;			// defines how many graphs will be displayed in WPolar view
 	int m_iStabilityView;			// defines which, and how many, graphs will be displayed in Stability view
@@ -559,8 +502,6 @@ protected:
 	int m_NStation ;			// the number of stations for LLT
 	int m_posAnimateWOpp;			// the current animation aoa index for WOpp animation
 	int m_posAnimateMode;			// the current animation aoa index for Mode animation
-	int m_nWakeNodes;			// Size of the node array if there is a wake
-	int m_WakeSize;				// Size of the Matrix if there is a wake
 	int m_NWakeColumn;			// number of wake columns
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
@@ -568,18 +509,14 @@ protected:
 	int m_NHoopPoints;			//hoop resolution for NURBS bodies
 	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
 
-	int m_GLList;
 	int m_iView;
 
 
 	double m_ClipPlanePos;
 	double MatIn[4][4], MatOut[4][4];
-	double m_LegendMin, m_LegendMax;
 
 
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view
-	double m_glScaled;//zoom factor for UFO
-	double m_LiftScale, m_DragScale, m_VelocityScale;
 	double m_GLScale;	// the OpenGl scale for the view frustrum with respect to the windows device context
 						// this is not the scale to display the model in the OpenGL view
 
@@ -601,6 +538,50 @@ protected:
 	double m_TimeInput[4];
 	double m_TotalTime, m_Deltat;
 
+
+	QFile* m_pXFile;			// a pointer to the output .log file
+
+	QPoint m_ptOffset;			// client offset position for wing display
+	QPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
+	QPoint m_WingLegendOffset;		// client offset position for WOPP polar legend
+	QPoint m_ptPopUp;
+	CVector m_RealPopUp;
+
+	QRect m_rSingleRect;
+
+	QGraph m_WingGraph1;			// the WOpp graphs
+	QGraph m_WingGraph2;
+	QGraph m_WingGraph3;
+	QGraph m_WingGraph4;
+	QGraph m_WPlrGraph1;			// the WPolar graphs
+	QGraph m_WPlrGraph2;
+	QGraph m_WPlrGraph3;
+	QGraph m_WPlrGraph4;
+	QGraph m_CpGraph;			// cross flow Cp Graph in 3D panel analysis
+	QGraph m_LongRLGraph;			// root locus graph for Longitudinal modes
+	QGraph m_LatRLGraph;			// root locus graph for Longitudinal modes
+	QGraph m_TimeGraph1,m_TimeGraph2,m_TimeGraph3,m_TimeGraph4;				//
+	QGraph* m_pCurGraph;			// currently active graph
+	QGraph* m_pCurWPlrGraph;			// currently active WPolar graph
+	QGraph* m_pCurWingGraph;			// currently active WOpp graph
+	QGraph* m_pCurRLStabGraph;      // currently active Root Locus Graph
+	QGraph* m_pCurTimeGraph;			// currently active time graph
+
+	CWing *m_pCurWing;			// the currently selected wing
+	CWing * m_pCurWing2;			// the currently selected Plane's 2nd wing, if any
+	CWing * m_pCurStab;			// the currently selected Plane's elevator
+	CWing * m_pCurFin;			// the currently selected Plane's fin
+	CWPolar * m_pCurWPolar;			// the currently selected WPolar
+	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
+	CPlane * m_pCurPlane;			// the currently selected Plane
+	CBody *m_pCurBody;
+
+	QColor m_WingColor, m_StabColor, m_FinColor;
+
+	CVector P,W,V,T;
+	
+public:
+	int m_GLList;
 	int m_3DAxisStyle, m_3DAxisWidth;
 	QColor m_3DAxisColor;
 
@@ -637,50 +618,40 @@ protected:
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;
 	bool m_bShowCp, m_bShowCpPoints;
+	bool m_bglLight;
+	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
+	bool m_bLongitudinal;
+	bool m_bResetglModeLegend;		// true if the mode properties need to be refreshed
+	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 
+	void* m_pMainFrame ;			// a pointer to the frame class
+	void *m_p2DWidget;
+	void *m_pGLWidget;
 
-	QFile* m_pXFile;			// a pointer to the output .log file
+	int m_MatSize;			    // the matrix size
+	int m_WakeSize;				// Size of the Matrix if there is a wake
+	int m_nNodes;				// the current number of nodes for the currently loaded UFO
+	int m_nWakeNodes;			// Size of the node array if there is a wake
 
-	QPoint m_ptOffset;			// client offset position for wing display
-	QPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
-	QPoint m_WingLegendOffset;		// client offset position for WOPP polar legend
-	QPoint m_ptPopUp;
-	CVector m_RealPopUp;
+	double m_LegendMin, m_LegendMax;
+	double m_LiftScale, m_DragScale, m_VelocityScale;
+	double m_glScaled;//zoom factor for UFO
 
 	QRect m_rCltRect; // the client and drawing rectangles
-	QRect m_rSingleRect;
-
-	QGraph m_WingGraph1;			// the WOpp graphs
-	QGraph m_WingGraph2;
-	QGraph m_WingGraph3;
-	QGraph m_WingGraph4;
-	QGraph m_WPlrGraph1;			// the WPolar graphs
-	QGraph m_WPlrGraph2;
-	QGraph m_WPlrGraph3;
-	QGraph m_WPlrGraph4;
-	QGraph m_CpGraph;			// cross flow Cp Graph in 3D panel analysis
-	QGraph m_LongRLGraph;			// root locus graph for Longitudinal modes
-	QGraph m_LatRLGraph;			// root locus graph for Longitudinal modes
-	QGraph m_TimeGraph1,m_TimeGraph2,m_TimeGraph3,m_TimeGraph4;				//
-	QGraph* m_pCurGraph;			// currently active graph
-	QGraph* m_pCurWPlrGraph;			// currently active WPolar graph
-	QGraph* m_pCurWingGraph;			// currently active WOpp graph
-	QGraph* m_pCurRLStabGraph;      // currently active Root Locus Graph
-	QGraph* m_pCurTimeGraph;			// currently active time graph
-
-	CWing *m_pCurWing;			// the currently selected wing
-	CWing * m_pCurWing2;			// the currently selected Plane's 2nd wing, if any
-	CWing * m_pCurStab;			// the currently selected Plane's elevator
-	CWing * m_pCurFin;			// the currently selected Plane's fin
-	CWPolar * m_pCurWPolar;			// the currently selected WPolar
-	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
-	CPlane * m_pCurPlane;			// the currently selected Plane
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
-	CBody *m_pCurBody;
+	LLTAnalysisDlg *m_pLLTDlg;
+	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
+	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
+	StabAnalysisDlg *m_pStabDlg;
+	CVector m_MemNode[2*VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
+	CVector m_WakeNode[2*VLMMATSIZE];	// the reference current wake node array
+	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
+	CPanel m_MemPanel[VLMMATSIZE];		// used if the analysis should be performed on the tilted geometry
+	CPanel m_WakePanel[VLMMATSIZE];	// the reference current wake panel array
+	CPanel m_RefWakePanel[VLMMATSIZE]; 	// the reference wake panel array if wake needs to be reset
 
-	QColor m_WingColor, m_StabColor, m_FinColor;
-
-	CVector P,W,V,T;
+	void RotateGeomY(double const &Angle, CVector const &P);
+	
 };
 
 #endif // QMIAREX_H

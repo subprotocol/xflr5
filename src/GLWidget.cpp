@@ -200,7 +200,6 @@ void GLWidget::paintGL()
 		if(pMiarex->m_iView==W3DVIEW)        pMiarex->GLRenderView();
 		else if(pMiarex->m_iView==WSTABVIEW)
 		{
-			pMiarex->GLCreateModeLegend();
 			pMiarex->GLRenderMode();
 		}
 	}

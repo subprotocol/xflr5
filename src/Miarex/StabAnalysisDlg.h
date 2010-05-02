@@ -58,38 +58,35 @@ private slots:
 private:
 	void keyPressEvent(QKeyEvent *event);
 
+	void AddString(QString strong);
+	void BuildControlRHS(double const & DeltaAngle);
+	void BuildRHS();
+	void BuildRotationMatrix();
+	void BuildStateMatrices();
+	void ComputeBodyAxisInertia();
+	void ComputeControlDerivatives();
+	void ComputeResults();
+	void ComputeStabilityDerivatives();
+	void ComputeStabilityInertia();
+	bool ComputeTrimmedConditions();
+	bool ControlLoop();
+	void Forces(double *Gamma,double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace = false);
+	void GetNDStabDerivatives(CWOpp *pNewPoint);
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
+	void SetControlPositions(double t);
 	void SetFileHeader();
 	void SetupLayout();
+	bool SolveEigenvalues();
 	void StartAnalysis();
 	void UpdateView();
-	void AddString(QString strong);
 	void WriteString(QString strong);
-	void BuildRHS();
-	void BuildControlRHS(double const & DeltaAngle);
-	void ComputeBodyAxisInertia();
-	void ComputeResults();
-	void Forces(double *Gamma,double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace = false);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 	void VLMSetDownwash(double *Gamma);
 	void VLMSetAi(double *Gamma);
-	bool ControlLoop();
-	bool SolveUnitSpeeds();
 	bool BuildInfluenceMatrix();
-	bool ComputeTrimmedConditions();
+	bool SolveUnitSpeeds();
 	double VLMComputeCm(double alpha) ;
-	void GetNDStabDerivatives(CWOpp *pNewPoint);
 	
-	CVector GetSpeedVector(CVector C, double *Gamma);
-
-	void BuildRotationMatrix();
-	void ComputeStabilityInertia();
-	void ComputeControlDerivatives();
-	void ComputeStabilityDerivatives();
-	void BuildStateMatrices();
-	void SetControlPositions(double t);
-	bool SolveEigenvalues();
-
 	QTextEdit *m_pctrlTextOutput;
 	QPushButton *m_pctrlCancel;
 
@@ -192,7 +189,8 @@ private:
 	complex<double> m_rLong[4],  m_rLat[4]; // complex eigenvalues
 	complex<double> m_vLong[16], m_vLat[16];// complex eigenvecctors
 
-
+public:
+	CVector GetSpeedVector(CVector C, double *Gamma);
 };
 
 #endif // STABANALYSISDLG_H

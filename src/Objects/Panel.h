@@ -55,27 +55,19 @@ public:
 	double GetWidth();
 
 protected:	
-	bool m_bIsLeading;
-	bool m_bIsTrailing;
 	bool m_bIsInSymPlane;
 	bool m_bIsWakePanel;
 //	bool m_bIsThinSurface;
 
 	int m_iElement; // panel identification number ; used when panel array is re-arranged in non sequential order
-	int m_iLA, m_iLB, m_iTA, m_iTB;//Corner Node numbers
 	int m_iPL, m_iPR, m_iPU, m_iPD;//Panels left, rigth; upstream, downstream
-	int m_iPos;//-1 is bottom surface, 0 is middle, 1 is top;
 	int m_iWake;//-1 if not followed by a wake panel, else equal to wake panel number
 	int m_iWakeColumn;
 
 	//Local frame of refernce
-	CVector Normal;
 	CVector VortexPos;
 	CVector Vortex;
-	CVector CtrlPt;
-	CVector CollPt;
 	CVector P1, P2, P3, P4;//point's local coordinates
-	CVector A, B;
 	CVector m, l;
 
 	double dl;
@@ -93,6 +85,13 @@ protected:
 	static double mat[9];
 
 public:
+	bool m_bIsLeading, m_bIsTrailing;
+	int m_iLA, m_iLB, m_iTA, m_iTB;//Corner Node numbers
+	int m_iPos;//-1 is bottom surface, 0 is middle, 1 is top;
+	CVector Normal;
+	CVector CtrlPt;
+	CVector CollPt;
+	CVector A, B;
 };
 
 #endif

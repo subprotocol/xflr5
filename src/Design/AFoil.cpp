@@ -127,7 +127,7 @@ void QAFoil::CheckButtons()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	pMainFrame->AFoilCurrentFoilMenu->setEnabled(g_pCurFoil);
+//	pMainFrame->AFoilCurrentFoilMenu->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilDelete->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilRename->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilExport->setEnabled(g_pCurFoil);
@@ -2952,6 +2952,8 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setHeaderData(15, Qt::Horizontal, tr("Style"));
 	m_pctrlFoilTable->setModel(m_pFoilModel);
 	m_pctrlFoilTable->setWindowTitle(tr("Foils"));
+	QHeaderView *HorizontalHeader = m_pctrlFoilTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
 
 	m_pFoilDelegate = new FoilTableDelegate;
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);

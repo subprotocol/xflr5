@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QDateTime>
+#include <QDesktopWidget>
 #include <QDir>
 #include <math.h>
 #include "PanelAnalysisDlg.h"
@@ -39,6 +40,7 @@ void *PanelAnalysisDlg::s_pMainFrame;
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
 	setWindowTitle(tr("3D Panel Analysis"));
+
 	SetupLayout();
 
 	m_Alpha      = 0.0;
@@ -51,7 +53,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_pWPolar = NULL;
 	RFF = 10.0;
 	eps = 1.e-7;
-
+	
 	m_bSequence      = false;
 	m_bIsFinished      = false;
 	m_b3DSymetric    = false;
@@ -1534,7 +1536,6 @@ void PanelAnalysisDlg::InitDialog()
 }
 
 
-
 void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 {
 	switch (event->key())
@@ -1550,14 +1551,15 @@ void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 	}
 }
 
+
 void PanelAnalysisDlg::OnCancelAnalysis()
 {
 	if(m_pXFile->isOpen()) m_pXFile->close();
+	CWing::s_bCancel        = true;
+	m_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
 	if(m_bIsFinished) done(1);
-
-	CWing::s_bCancel        = true;
 }
 
 
@@ -2513,8 +2515,6 @@ void PanelAnalysisDlg::SetFileHeader()
 }
 
 
-
-
 void PanelAnalysisDlg::SetProgress(int TaskSize, double TaskProgress)
 {
 	m_pctrlProgress->setValue(m_Progress+ (int)((double)TaskSize * TaskProgress));
@@ -2523,11 +2523,10 @@ void PanelAnalysisDlg::SetProgress(int TaskSize, double TaskProgress)
 
 void PanelAnalysisDlg::SetupLayout()
 {
-//	QDesktopWidget desktop;
-//	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/2);
-//	setMinimumWidth(r.width()/2);
-//	move(r.width()/3, r.height()/6);
+	QDesktopWidget desktop;
+	QRect r = desktop.geometry();
+	setMinimumHeight(r.height()/2);
+	setMinimumWidth(r.width()/2);
 
 	m_pctrlTextOutput = new QTextEdit;
 	QFont CourierFont = QFont("Courier",10);
@@ -2680,6 +2679,7 @@ void PanelAnalysisDlg::StartAnalysis()
 {
 	if(!m_pWPolar) return;
 	QString strong;
+	m_pctrlCancel->setText(tr("Cancel"));
 	m_bIsFinished = false;
 	strong = tr("Launching 3D Panel Analysis....")+"\n\n";
 	AddString(strong);
@@ -2867,7 +2867,6 @@ void PanelAnalysisDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CV
 	//
 	// V is the resulting speed
 	//
-
 
 	int i;
 

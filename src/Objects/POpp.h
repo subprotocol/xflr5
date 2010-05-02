@@ -36,7 +36,6 @@ class CPOpp
 
 public:
 	CPOpp();
-	virtual ~CPOpp();
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring);
 
 private:
@@ -54,11 +53,7 @@ private:
 	double m_Ctrl;			//Control Variable
 //	double m_Weight;		// the plane's weight
 	
-	double m_Cp[VLMMATSIZE];	// the Cp array
-	double m_G[VLMMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
-	double m_Sigma[VLMMATSIZE];		// the panel's source strengths
 	int m_NStation;			// unused
-	int m_NPanels;		// the number of VLM or 3D-panels
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
@@ -74,5 +69,9 @@ private:
 	QColor m_Color;
 
 public:
+	double m_G[VLMMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
+	double m_Sigma[VLMMATSIZE];		// the panel's source strengths
+	double m_Cp[VLMMATSIZE];	// the Cp array
+	int m_NPanels;		// the number of VLM or 3D-panels
 };
 #endif

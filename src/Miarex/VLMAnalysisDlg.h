@@ -77,7 +77,6 @@ private:
 	double VLMComputeCm(double alpha) ;
 	void pgmat(double const &mach, double const &alfa, double const &beta, double pg[3][3]);
 
-	void GetSpeedVector(CVector const &C, double *Gamma, CVector &VTot);
 
 	QTextEdit *m_pctrlTextOutput;
 	QPushButton *m_pctrlCancel;
@@ -118,7 +117,6 @@ private:
 	QString m_strOut;
 	QString m_VersionName;
 
-
 	CPanel *m_pMemPanel;//pointer to the reference panels array created in Miarex
 
 	CPanel *m_pPanel; 	// the original array of panels
@@ -135,7 +133,6 @@ private:
 
 
 	CPlane *m_pPlane;
-	CWing  *m_pWing;
 	CWing *m_pWing2;//pointer to the second wing if Biplane
 	CWing *m_pStab;
 	CWing *m_pFin;
@@ -166,6 +163,9 @@ private:
 	int m_nWakeNodes;
 	int m_WakeSize;// Max Size for the VLMMatrix
 	int m_NWakeColumn;
+public:
+	CWing  *m_pWing;
+	void GetSpeedVector(CVector const &C, double *Gamma, CVector &VTot);
 };
 
 #endif // VLMANALYSISDLG_H

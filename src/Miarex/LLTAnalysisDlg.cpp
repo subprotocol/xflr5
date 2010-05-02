@@ -353,9 +353,8 @@ void LLTAnalysisDlg::SetupLayout()
 {
 	QDesktopWidget desktop;
 	QRect r = desktop.geometry();
-	setMinimumHeight(r.height()/2);
+	setMinimumHeight(r.height()*2/3);
 	setMinimumWidth(r.width()/2);
-	move(r.width()/3, r.height()/6);
 
 	m_pctrlTextOutput = new QTextEdit;
 	QFont CourierFont = QFont("Courier",10);
@@ -366,8 +365,8 @@ void LLTAnalysisDlg::SetupLayout()
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
 
 	m_pGraphWidget = new GraphWidget;
-	m_pGraphWidget->setMinimumHeight(r.height()/4);
-	m_pGraphWidget->setMinimumWidth(r.width()/4);
+//	m_pGraphWidget->setMinimumHeight(r.height()/4);
+//	m_pGraphWidget->setMinimumWidth(r.width()/4);
 	m_pGraphWidget->m_pGraph = &m_IterGraph;
 
 //	QHBoxLayout *GraphLayout = new QHBoxLayout;
@@ -388,7 +387,7 @@ void LLTAnalysisDlg::SetupLayout()
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlTextOutput);
-	mainLayout->addWidget(m_pGraphWidget,1);
+	mainLayout->addWidget(m_pGraphWidget,2);
 	mainLayout->addLayout(buttonsLayout);
 	setLayout(mainLayout);
 }
@@ -400,6 +399,7 @@ void LLTAnalysisDlg::StartAnalysis()
 	//all set to launch the analysis
 	if(!m_pWPolar || !m_pWing) return;
 
+	m_pctrlCancel->setText(tr("Cancel"));
 	m_bSkip       = false;
 	m_bExit       = false;
 	m_bCancel     = false;

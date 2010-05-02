@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
 
 
 #ifdef Q_WS_MAC
-        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::NativeFormat,QSettings::UserScope,"XFLR5");
 #else
-        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"QFLR5");
+        QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
 	bool bMaximized = true;
 	bool bOK;
@@ -63,7 +63,6 @@ int main(int argc, char *argv[])
 		if(bOK) c = k;
 		k = settings.value("SizeHeight").toInt(&bOK);
 		if(bOK) d = k;
-
 		bMaximized = settings.value("SizeMaximized").toBool();
 		str = settings.value("StyleName").toString();
 		if(str.length()) StyleName = str,

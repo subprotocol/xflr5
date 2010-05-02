@@ -27,6 +27,7 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QHeaderView>
 #include <QtDebug>
 #include <QTimer>
 #include <complex>
@@ -91,6 +92,8 @@ void StabViewDlg::Connect()
 	m_pctrlControlTable->setColumnWidth(0,75);
 	m_pctrlControlTable->setColumnWidth(1,60);
 //	m_pctrlControlTable->setColumnWidth(2,60);
+	QHeaderView *HorizontalHeader = m_pctrlControlTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);	
 }
 
 
@@ -614,7 +617,7 @@ void StabViewDlg::SetupLayout()
 	m_pctrlControlTable = new QTableView(this);
 //	m_pctrlControlTable->setMinimumWidth(200);
 	m_pctrlControlTable->setMinimumHeight(200);
-	m_pctrlControlTable->setSizePolicy(szPolicyMaximum);
+//	m_pctrlControlTable->setSizePolicy(szPolicyMaximum);
 	m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pCtrlDelegate = new CtrlTableDelegate;
@@ -635,7 +638,7 @@ void StabViewDlg::SetupLayout()
 	m_pctrlDeltat    = new FloatEdit(.01,3);
 	m_pctrlRampTime  = new FloatEdit(0.1,3);
 	
-	
+
 	QGridLayout *DtLayout  = new QGridLayout;
 	QLabel *DtLabel        = new QLabel("dt=");
 	QLabel *TotalTimeLabel = new QLabel(tr("Total Time="));

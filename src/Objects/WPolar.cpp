@@ -80,14 +80,6 @@ CWPolar::CWPolar()
 }
 
 
-
-
-CWPolar::~CWPolar()
-{
-	ResetWPlr();
-}
-
-
 void CWPolar::AddPoint(CPOpp *pPOpp)
 {
 	bool bInserted = false;

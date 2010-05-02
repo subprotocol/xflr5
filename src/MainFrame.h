@@ -200,6 +200,7 @@ private:
 	OpPoint *GetOpp(double Alpha);
 	QColor GetColor(int type);
 
+
 	//recent file
 	QString ShortenFileName(QString &PathName);
 	void AddRecentFile(const QString &PathNAme);
@@ -216,8 +217,7 @@ private:
 	void *m_pXDirect;
 	void *m_pMiarex;
 	void *m_pAFoil;
-	void *m_pGL3DScales;
-	void *m_pStabView;
+
 	TwoDWidget *m_p2DWidget;
 	QStackedWidget *m_pctrlCentralWidget;
 	GLWidget   *m_pGLWidget;
@@ -359,7 +359,6 @@ private:
 	QList <void *> m_oaPOpp;
 	QList <void *> m_oaBody;
 
-	QPoint m_DlgPos;//preferred position for dialog boxes
 
 	int m_iApp;
 
@@ -368,13 +367,27 @@ private:
 	bool m_bSaveWOpps;
 	bool m_bSaveSettings;
 
+
+	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath, m_ImageDirName;
+	QColor m_crColors[30];
+
+	QGraph m_RefGraph;//Reference setttings
+	QColor m_BorderClr;
+
+	int m_ImageFormat;
+
+public:
+ 	QFont m_TextFont;
+	QColor m_TextColor;
+	QColor m_BackgroundColor;
+	QPoint m_DlgPos;//preferred position for dialog boxes
+	void *m_pGL3DScales;
 	double m_mtoUnit;
 	double m_mstoUnit;
 	double m_m2toUnit;
 	double m_kgtoUnit;
 	double m_NtoUnit;
 	double m_NmtoUnit;
-
 	int m_LengthUnit;
 	int m_AreaUnit;
 	int m_WeightUnit;
@@ -382,16 +395,8 @@ private:
 	int m_ForceUnit;
 	int m_MomentUnit;
 
-	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath, m_ImageDirName;
-	QColor m_crColors[30];
+	void *m_pStabView;
 
-	QGraph m_RefGraph;//Reference setttings
-	QColor m_BackgroundColor;
-	QColor m_TextColor;
-	QColor m_BorderClr;
-	QFont m_TextFont;
-
-	int m_ImageFormat;
 };
 
 #endif // MAINFRAME_H

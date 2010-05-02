@@ -2,15 +2,45 @@
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
 QT += opengl
-
 TEMPLATE = app
-
 SOURCES += src/MainFrame.cpp \
     src/Main.cpp \
     src/Globals.cpp \
     src/TwoDWidget.cpp \
     src/GLWidget.cpp \
     src/QFLR5Application.cpp \
+    src/Miarex/Miarex.cpp \
+    src/Miarex/GLCreateLists.cpp \
+    src/Miarex/WPolarDlg.cpp \
+    src/Miarex/WingDelegate.cpp \
+    src/Miarex/VLMAnalysisDlg.cpp \
+    src/Miarex/PlaneDlg.cpp \
+    src/Miarex/PanelAnalysisDlg.cpp \
+    src/Miarex/LLTAnalysisDlg.cpp \
+    src/Miarex/ImportWingDlg.cpp \
+    src/Miarex/GLLightDlg.cpp \
+    src/Miarex/CpScaleDlg.cpp \
+    src/Miarex/BodyTableDelegate.cpp \
+    src/Miarex/ArcBall.cpp \
+    src/Miarex/BodyGridDlg.cpp \
+    src/Miarex/BodyScaleDlg.cpp \
+    src/Miarex/StabViewDlg.cpp \
+    src/Miarex/InertiaDlg.cpp \
+    src/Miarex/StabPolarDlg.cpp \
+    src/Miarex/StabAnalysisDlg.cpp \
+    src/Miarex/ManualInertiaDlg.cpp \
+    src/Miarex/GL3dBodyDlg.cpp \
+    src/Miarex/ManageBodiesDlg.cpp \
+    src/Miarex/W3dPrefsDlg.cpp \
+    src/Miarex/CtrlPolarDlg.cpp \
+    src/Miarex/CtrlTableDelegate.cpp \
+    src/Miarex/WingScaleDlg.cpp \
+    src/Miarex/BodyTransDlg.cpp \
+    src/Miarex/WAdvancedDlg.cpp \
+    src/Miarex/GL3dWingDlg.cpp \
+    src/Miarex/ManageUFOsDlg.cpp \
+    src/Miarex/UFOTableDelegate.cpp \
+    src/Miarex/GL3DScales.cpp \
     src/XDirect/XFoil.cpp \
     src/XDirect/XFoilAnalysisDlg.cpp \
     src/XDirect/XFoilAdvancedDlg.cpp \
@@ -64,37 +94,6 @@ SOURCES += src/MainFrame.cpp \
     src/Misc/ColorButton.cpp \
     src/Misc/FloatEdit.cpp \
     src/Misc/AboutQ5.cpp \
-    src/Miarex/WPolarDlg.cpp \
-    src/Miarex/WingDelegate.cpp \
-    src/Miarex/VLMAnalysisDlg.cpp \
-    src/Miarex/PlaneDlg.cpp \
-    src/Miarex/PanelAnalysisDlg.cpp \
-    src/Miarex/LLTAnalysisDlg.cpp \
-    src/Miarex/ImportWingDlg.cpp \
-    src/Miarex/GLLightDlg.cpp \
-    src/Miarex/CpScaleDlg.cpp \
-    src/Miarex/BodyTableDelegate.cpp \
-    src/Miarex/Miarex.cpp \
-    src/Miarex/ArcBall.cpp \
-    src/Miarex/BodyGridDlg.cpp \
-    src/Miarex/BodyScaleDlg.cpp \
-    src/Miarex/StabViewDlg.cpp \
-    src/Miarex/InertiaDlg.cpp \
-    src/Miarex/StabPolarDlg.cpp \
-    src/Miarex/StabAnalysisDlg.cpp \
-    src/Miarex/ManualInertiaDlg.cpp \
-    src/Miarex/GL3dBodyDlg.cpp \
-    src/Miarex/ManageBodiesDlg.cpp \
-    src/Miarex/W3dPrefsDlg.cpp \
-    src/Miarex/CtrlPolarDlg.cpp \
-    src/Miarex/CtrlTableDelegate.cpp \
-    src/Miarex/WingScaleDlg.cpp \
-    src/Miarex/BodyTransDlg.cpp \
-    src/Miarex/WAdvancedDlg.cpp \
-    src/Miarex/GL3dWingDlg.cpp \
-    src/Miarex/ManageUFOsDlg.cpp \
-    src/Miarex/UFOTableDelegate.cpp \
-    src/Miarex/GL3DScales.cpp \
     src/Graph/QGraph.cpp \
     src/Graph/GraphWidget.cpp \
     src/Graph/GraphDlg.cpp \
@@ -108,7 +107,7 @@ SOURCES += src/MainFrame.cpp \
     src/Design/AFoilGridDlg.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
-    src/Design/SplineCtrlsDlg.cpp
+    src/Design/SplineCtrlsDlg.cpp 
 
 HEADERS += src/MainFrame.h \
     src/Params.h \
@@ -116,6 +115,38 @@ HEADERS += src/MainFrame.h \
     src/Globals.h \
     src/TwoDWidget.h \
     src/GLWidget.h \
+    src/Miarex/Miarex.h \
+    src/Miarex/W3dPrefsDlg.h \
+    src/Miarex/GLCreateLists.h \
+    src/Miarex/WingScaleDlg.h \
+    src/Miarex/CtrlPolarDlg.h \
+    src/Miarex/CtrlTableDelegate.h \
+    src/Miarex/ManageBodiesDlg.h \
+    src/Miarex/WPolarDlg.h \
+    src/Miarex/WingDelegate.h \
+    src/Miarex/VLMAnalysisDlg.h \
+    src/Miarex/PlaneDlg.h \
+    src/Miarex/PanelAnalysisDlg.h \
+    src/Miarex/ManageUFOsDlg.h \
+    src/Miarex/UFOTableDelegate.h \
+    src/Miarex/StabViewDlg.h \
+    src/Miarex/InertiaDlg.h \
+    src/Miarex/StabPolarDlg.h \
+    src/Miarex/StabAnalysisDlg.h \
+    src/Miarex/ManualInertiaDlg.h \
+    src/Miarex/LLTAnalysisDlg.h \
+    src/Miarex/ImportWingDlg.h \
+    src/Miarex/GLLightDlg.h \
+    src/Miarex/CpScaleDlg.h \
+    src/Miarex/ArcBall.h \
+    src/Miarex/BodyGridDlg.h \
+    src/Miarex/BodyTableDelegate.h \
+    src/Miarex/BodyScaleDlg.h \
+    src/Miarex/WAdvancedDlg.h \
+    src/Miarex/GL3dWingDlg.h \
+    src/Miarex/BodyTransDlg.h \
+    src/Miarex/GL3DScales.h \
+    src/Miarex/GL3dBodyDlg.h \
     src/XDirect/XFoil.h \
     src/XDirect/XFoilAnalysisDlg.h \
     src/XDirect/XFoilAdvancedDlg.h \
@@ -173,37 +204,6 @@ HEADERS += src/MainFrame.h \
     src/Misc/AboutQ5.h \
     src/Misc/FloatEdit.h \
     src/Misc/ProgressDlg.h \
-    src/Miarex/W3dPrefsDlg.h \
-    src/Miarex/WingScaleDlg.h \
-    src/Miarex/CtrlPolarDlg.h \
-    src/Miarex/CtrlTableDelegate.h \
-    src/Miarex/ManageBodiesDlg.h \
-    src/Miarex/WPolarDlg.h \
-    src/Miarex/WingDelegate.h \
-    src/Miarex/VLMAnalysisDlg.h \
-    src/Miarex/PlaneDlg.h \
-    src/Miarex/PanelAnalysisDlg.h \
-    src/Miarex/ManageUFOsDlg.h \
-    src/Miarex/UFOTableDelegate.h \
-    src/Miarex/StabViewDlg.h \
-    src/Miarex/InertiaDlg.h \
-    src/Miarex/StabPolarDlg.h \
-    src/Miarex/StabAnalysisDlg.h \
-    src/Miarex/ManualInertiaDlg.h \
-    src/Miarex/LLTAnalysisDlg.h \
-    src/Miarex/ImportWingDlg.h \
-    src/Miarex/GLLightDlg.h \
-    src/Miarex/CpScaleDlg.h \
-    src/Miarex/Miarex.h \
-    src/Miarex/ArcBall.h \
-    src/Miarex/BodyGridDlg.h \
-    src/Miarex/BodyTableDelegate.h \
-    src/Miarex/BodyScaleDlg.h \
-    src/Miarex/WAdvancedDlg.h \
-    src/Miarex/GL3dWingDlg.h \
-    src/Miarex/BodyTransDlg.h \
-    src/Miarex/GL3DScales.h \
-    src/Miarex/GL3dBodyDlg.h \
     src/Graph/GraphWidget.h \
     src/Graph/Graph.h \
     src/Graph/GraphDlg.h \
@@ -214,11 +214,9 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h
-
 TRANSLATIONS = translations/xflr5.ts \
     translations/xflr5_de.ts \
     translations/xflr5_fr.ts
-
 win32 { 
     TARGET = XFLR6
     RC_FILE = win/xflr5.rc
@@ -226,6 +224,7 @@ win32 {
 RESOURCES += xflr5.qrc
 unix { 
     TARGET = xflr6
+    
     # VARIABLES
     isEmpty(PREFIX):PREFIX = /usr
     BINDIR = $$PREFIX/bin
@@ -233,8 +232,9 @@ unix {
     
     # MAKE INSTALL
     INSTALLS += target
-#    target.path = $$BINDIR
 }
+
+# target.path = $$BINDIR
 mac { 
     TARGET = XFLR6
     TEMPLATE = app
@@ -248,9 +248,8 @@ mac {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/qflr5.icns
 }
-
 OTHER_FILES += doc/ReleaseNotes.txt
 
-#QMAKE_CFLAGS+=-pg
-#QMAKE_CXXFLAGS+=-pg
-#QMAKE_LFLAGS+=-pg
+QMAKE_CFLAGS+=-pg
+QMAKE_CXXFLAGS+=-pg
+QMAKE_LFLAGS+=-pg

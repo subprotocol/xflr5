@@ -1812,6 +1812,1104 @@ bool LinBairstow(double *p, complex<double> *root, int n)
 
 
 
+double GetVar(QList<void*>*m_poaPolar, int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError)
+{
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+	double Var0, Var1;
+	if(!pFoil0)
+	{
+		Cl = 0.0;
+		Var0 = 0.0;
+	}
+	else Var0 = GetPlrPointFromCl(m_poaPolar, pFoil0, Re, Cl,nVar, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+
+	if(!pFoil1)
+	{
+		Cl = 0.0;
+		Var1 = 0.0;
+	}
+	else Var1 = GetPlrPointFromCl(m_poaPolar, pFoil1, Re, Cl,nVar, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	return ((1-Tau) * Var0 + Tau * Var1);
+}
+
+
+void * GetPlrVariable(CPolar *pPolar, int iVar)
+{
+	// returns a pointer to the variable array defined by its index iVar
+
+	void * pVar;
+	switch (iVar)
+	{
+		case 0:
+			pVar = &pPolar->m_Alpha;
+			break;
+		case 1:
+			pVar = &pPolar->m_Cl;
+			break;
+		case 2:
+			pVar = &pPolar->m_Cd;
+			break;
+		case 3:
+			pVar = &pPolar->m_Cdp;
+			break;
+		case 4:
+			pVar = &pPolar->m_Cm;
+			break;
+		case 5:
+			pVar = &pPolar->m_XTr1;
+			break;
+		case 6:
+			pVar = &pPolar->m_XTr2;
+			break;
+		case 7:
+			pVar = &pPolar->m_HMom;
+			break;
+		case 8:
+			pVar = &pPolar->m_Cpmn;
+			break;
+		case 9:
+			pVar = &pPolar->m_ClCd;
+			break;
+		case 10:
+			pVar = &pPolar->m_Cl32Cd;
+			break;
+		case 11:
+			pVar = &pPolar->m_XCp;
+			break;
+		default:
+			pVar = &pPolar->m_Alpha;
+			break;
+	}
+	return pVar;
+}
+
+
+double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError)
+{
+/*	Var
+	0 =	m_Alpha;
+	1 = m_Cl;
+	2 = m_Cd;
+	3 = m_Cdp;
+	4 = m_Cm;
+	5, 6 = m_XTr1, m_XTr2;
+	7, 8 = m_HMom, m_Cpmn;
+	9,10 = m_ClCd, m_Cl32Cd;
+	11 = m_XCp
+*/
+
+	QList <double> *pX;
+	double amin, amax;
+	double Var1, Var2, u;
+	amin = amax = Var1 = Var2 = u = 0.0;
+	int i;
+	CPolar *pPolar;
+
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil)
+	{
+		bOutRe = true;
+		bError = true;
+		return 0.000;
+	}
+
+
+	int size;
+	int n = 0;
+
+	// Are there any Type 1 polars available for this foil ?
+	for (i = 0; i< m_poaPolar->size(); i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			n++;
+			if(n>=2) break;
+		}
+	}
+
+//more than one polar - interpolate between  - tough job
+
+	//First Find the two polars with Reynolds number surrounding wanted Re
+	CPolar * pPolar1 = NULL;
+	CPolar * pPolar2 = NULL;
+	int nPolars = m_poaPolar->size();
+	//Type 1 Polars are sorted by crescending Re Number
+
+	//if Re is less than that of the first polar, use this one
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			// we have found the first type 1 polar for this foil
+			if (Re < pPolar->m_Reynolds)
+			{
+				bOutRe = true;
+				//interpolate Alpha on this polar
+				pX = (QList <double> *) GetPlrVariable(pPolar, PlrVar);
+				size = (int)pPolar->m_Alpha.size();
+				if(Alpha < pPolar->m_Alpha[0])
+				{
+					return (*pX)[0];
+				}
+				if(Alpha > pPolar->m_Alpha[size-1])
+				{
+					return (*pX)[size-1];
+				}
+				for (i=0; i<size-1; i++)
+				{
+					if(pPolar->m_Alpha[i] <= Alpha && Alpha < pPolar->m_Alpha[i+1])
+					{
+						//interpolate
+						if(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i] < 0.00001)//do not divide by zero
+							return (*pX)[i];
+						else
+						{
+							u = (Alpha - pPolar->m_Alpha[i])
+									 /(pPolar->m_Alpha[i+1]-pPolar->m_Alpha[i]);
+							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+						}
+					}
+				}
+				break;
+			}
+			break;
+		}
+	}
+
+	// if not Find the two polars
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			// we have found the first type 1 polar for this foil
+			pPolar->GetAlphaLimits(amin, amax);
+			if (pPolar->m_Reynolds <= Re)
+			{
+				if(amin <= Alpha && Alpha <= amax)
+				{
+					pPolar1 = pPolar;
+				}
+			}
+			else {
+				if(amin <= Alpha && Alpha <= amax)
+				{
+					pPolar2 = pPolar;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!pPolar2)
+	{
+		//then Re is greater than that of any polar
+		// so use last polar and interpolate alphas on this polar
+		bOutRe = true;
+		if(!pPolar1)
+		{
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Alpha.size();
+		if(!size)
+		{
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Alpha < pPolar1->m_Alpha[0])	     return (*pX)[0];
+		if(Alpha > pPolar1->m_Alpha[size-1]) return (*pX)[size-1];
+		for (i=0; i<size-1; i++)
+		{
+			if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1])
+			{
+				//interpolate
+				if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001){//do not divide by zero
+					return (*pX)[i];
+				}
+				else
+				{
+					u = (Alpha - pPolar1->m_Alpha[i])
+							 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
+					return (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+				}
+			}
+		}
+		//Out in Re, out in alpha...
+		return (*pX)[size-1] ;
+
+	}
+	else
+	{
+		// Re is between that of polars 1 and 2
+		// so interpolate alphas for each
+
+		if(!pPolar1)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Alpha.size();
+		if(!size) {
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Alpha < pPolar1->m_Alpha[0])	          Var1 = (*pX)[0];
+		else if(Alpha > pPolar1->m_Alpha[size-1]) Var1 = (*pX)[size-1];
+		else
+		{
+			for (i=0; i<size-1; i++)
+			{
+				if(pPolar1->m_Alpha[i] <= Alpha && Alpha < pPolar1->m_Alpha[i+1]){
+					//interpolate
+					if(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i] < 0.00001)//do not divide by zero
+						Var1 = (*pX)[i];
+					else
+					{
+						u = (Alpha - pPolar1->m_Alpha[i])
+								 /(pPolar1->m_Alpha[i+1]-pPolar1->m_Alpha[i]);
+						Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+					}
+				}
+			}
+		}
+
+		size = (int)pPolar2->m_Alpha.size();
+		if(!size)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
+		if(Alpha < pPolar2->m_Alpha[0])
+		{
+			bOutRe = true;
+			bError = true;
+			Var2 = (*pX)[0];
+		}
+		else if(Alpha > pPolar2->m_Alpha[size-1])
+		{
+			bOutRe = true;
+			bError = true;
+			Var2 = (*pX)[size-1];
+		}
+		else{
+			for (i=0; i<size-1; i++)
+			{
+				if(pPolar2->m_Alpha[i] <= Alpha && Alpha < pPolar2->m_Alpha[i+1])
+				{
+					//interpolate
+					pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
+					if(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i] < 0.00001)//do not divide by zero
+						Var2 = (*pX)[i];
+					else{
+						u = (Alpha - pPolar2->m_Alpha[i])
+								 /(pPolar2->m_Alpha[i+1]-pPolar2->m_Alpha[i]);
+						Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+					}
+				}
+			}
+		}
+		// then interpolate Variable
+
+		double v =   (Re - pPolar1->m_Reynolds)
+				  / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
+		double Var = Var1 + v * (Var2-Var1);
+		return Var;
+	}
+
+//	AfxMessageBox("Error interpolating", MB_OK);
+//	bOutRe = true;
+//	bError = true;
+//	return 0.000;// we missed something somewhere...
+}
+
+
+double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
+{
+	//TODO : check this GetPlrPoint duplicate with CMAinFrame
+/*	Var
+	0 =	m_Alpha;
+	1 = m_Cl;
+	2 = m_Cd;
+	3 = m_Cdp;
+	4 = m_Cm;
+	5, 6 = m_XTr1, m_XTr2;
+	7, 8 = m_HMom, m_Cpmn;
+	9,10 = m_ClCd, m_Cl32Cd;
+*/
+	QList <double> *pX;
+	double Clmin, Clmax;
+	CPolar *pPolar;
+	double Var1, Var2, u, dist;
+	Var1 = Var2 = u = dist = 0.0;
+	int pt;
+	int size;
+	int n, i;
+
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil)
+	{
+		bOutRe = true;
+		bError = true;
+		return 0.000;
+	}
+
+		n=0;
+	// Are there any Type 1 polars available for this foil ?
+	for (i = 0; i< m_poaPolar->size(); i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		{
+			n++;
+			if(n>=2) break;
+		}
+	}
+
+//more than one polar - interpolate between  - tough job
+
+	//First Find the two polars with Reynolds number surrounding wanted Re
+	CPolar * pPolar1 = NULL;
+	CPolar * pPolar2 = NULL;
+	int nPolars = m_poaPolar->size();
+	//Type 1 Polars are sorted by crescending Re Number
+
+	//if Re is less than that of the first polar, use this one
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
+		{
+			// we have found the first type 1 polar for this foil
+			if (Re < pPolar->m_Reynolds)
+			{
+				bOutRe = true;
+				//interpolate Cl on this polar
+				pX = (QList <double> *) GetPlrVariable(pPolar, PlrVar);
+				size = (int)pPolar->m_Cl.size();
+				if(Cl < pPolar->m_Cl[0])
+				{
+					return (*pX)[0];
+				}
+				if(Cl > pPolar->m_Cl[size-1])
+				{
+					return (*pX)[size-1];
+				}
+				for (i=0; i<size-1; i++)
+				{
+					if(pPolar->m_Cl[i] <= Cl && Cl < pPolar->m_Cl[i+1])
+					{
+					//interpolate
+						if(pPolar->m_Cl[i+1]-pPolar->m_Cl[i] < 0.00001)//do not divide by zero
+							return (*pX)[i];
+						else {
+							u = (Cl - pPolar->m_Cl[i])
+									 /(pPolar->m_Cl[i+1]-pPolar->m_Cl[i]);
+							return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+						}
+					}
+				}
+				break;
+			}
+			break;
+		}
+	}
+
+	// if not Find the two polars
+	for (i=0; i< nPolars; i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
+		{
+			// we have found the first type 1 polar for this foil
+			pPolar->GetClLimits(Clmin, Clmax);
+			if (pPolar->m_Reynolds <= Re)
+			{
+				if(Clmin <= Cl && Cl <= Clmax)
+				{
+					pPolar1 = pPolar;
+				}
+			}
+			else
+			{
+				if(Clmin <= Cl && Cl <= Clmax)
+				{
+					pPolar2 = pPolar;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!pPolar2)
+	{
+		//then Re is greater than that of any polar
+		// so use last polar and interpolate Cls on this polar
+		bOutRe = true;
+		if(!pPolar1)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Cl.size();
+		if(!size)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
+		if(Cl < pPolar1->m_Cl[0])	   return (*pX)[0];
+		if(Cl > pPolar1->m_Cl[size-1]) return (*pX)[size-1];
+		for (i=0; i<size-1; i++)
+		{
+			if(pPolar1->m_Cl[i] <= Cl && Cl < pPolar1->m_Cl[i+1])
+			{
+				//interpolate
+				if(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i] < 0.00001)
+				{//do not divide by zero
+					return (*pX)[i];
+				}
+				else
+				{
+					u = (Cl - pPolar1->m_Cl[i])
+							 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
+					return ((*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]));
+				}
+			}
+		}
+		//Out in Re, out in Cl...
+		return (*pX)[size-1];
+	}
+	else
+	{
+		// Re is between that of polars 1 and 2
+		// so interpolate Cls for each
+		if(!pPolar1)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+		size = (int)pPolar1->m_Cl.size();
+		if(!size)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (QList <double> *) GetPlrVariable(pPolar1, PlrVar);
+		pPolar1->GetClLimits(Clmin, Clmax);
+		if(Cl < Clmin)
+		{
+			Var1 = (*pX)[0];
+			bOutRe = true;
+		}
+		else if(Cl > Clmax)
+		{
+			Var1 = (*pX)[size-1];
+			bOutRe = true;
+		}
+		else
+		{
+			//first Find the point closest to Cl=0
+			pt = 0;
+			dist = fabs(pPolar1->m_Cl[0]);
+			for (i=1; i<size;i++)
+			{
+				if (fabs(pPolar1->m_Cl[i])< dist)
+				{
+					dist = fabs(pPolar1->m_Cl[i]);
+					pt = i;
+				}
+			}
+			if(Cl<pPolar1->m_Cl[pt])
+			{
+				for (i=pt; i>0; i--)
+				{
+					if(Cl<= pPolar1->m_Cl[i] && Cl > pPolar1->m_Cl[i-1])
+					{
+						//interpolate
+						if(fabs(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]) < 0.00001)
+						{
+							//do not divide by zero
+							Var1 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar1->m_Cl[i-1])
+									 /(pPolar1->m_Cl[i]-pPolar1->m_Cl[i-1]);
+							Var1 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				for (i=pt; i<size-1; i++)
+				{
+					if(pPolar1->m_Cl[i] <=Cl && Cl < pPolar1->m_Cl[i+1])
+					{
+						//interpolate
+						if(fabs(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]) < 0.00001){//do not divide by zero
+							Var1 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar1->m_Cl[i])
+									 /(pPolar1->m_Cl[i+1]-pPolar1->m_Cl[i]);
+							Var1 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+							break;
+						}
+					}
+				}
+			}
+		}
+		size = (int)pPolar2->m_Cl.size();
+		if(!size)
+		{
+			bOutRe = true;
+			bError = true;
+			return 0.000;
+		}
+
+		pX = (QList <double> *) GetPlrVariable(pPolar2, PlrVar);
+		pPolar2->GetClLimits(Clmin, Clmax);
+
+		if(Cl < Clmin)
+		{
+			Var2 = (*pX)[0];
+			bOutRe = true;
+		}
+		else if(Cl > Clmax)
+		{
+			Var2 = (*pX)[size-1];
+			bOutRe = true;
+		}
+		else
+		{
+			//first Find the point closest to Cl=0
+			pt = 0;
+			dist = fabs(pPolar2->m_Cl[0]);
+			for (i=1; i<size;i++)
+			{
+				if (fabs(pPolar2->m_Cl[i])< dist)
+				{
+					dist = fabs(pPolar2->m_Cl[i]);
+					pt = i;
+				}
+			}
+			if(Cl<pPolar2->m_Cl[pt])
+			{
+				for (i=pt; i>0; i--)
+				{
+					if(Cl<= pPolar2->m_Cl[i] && Cl > pPolar2->m_Cl[i-1])
+					{
+						//interpolate
+						if(fabs(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]) < 0.00001)
+						{//do not divide by zero
+							Var2 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar2->m_Cl[i-1])
+									 /(pPolar2->m_Cl[i]-pPolar2->m_Cl[i-1]);
+							Var2 = (*pX)[i-1] + u * ((*pX)[i]-(*pX)[i-1]);
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				for (i=pt; i<size-1; i++)
+				{
+					if(pPolar2->m_Cl[i] <=Cl && Cl < pPolar2->m_Cl[i+1])
+					{
+						//interpolate
+						if(fabs(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]) < 0.00001)
+						{
+							//do not divide by zero
+							Var2 = (*pX)[i];
+							break;
+						}
+						else
+						{
+							u = (Cl - pPolar2->m_Cl[i])
+									 /(pPolar2->m_Cl[i+1]-pPolar2->m_Cl[i]);
+							Var2 = (*pX)[i] + u * ((*pX)[i+1]-(*pX)[i]);
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// then interpolate Variable
+
+		double v =   (Re - pPolar1->m_Reynolds) / (pPolar2->m_Reynolds - pPolar1->m_Reynolds);
+		double Var = Var1 + v * (Var2-Var1);
+		return Var;
+	}
+}
+
+
+double GetCl(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+{
+	double Cl0, Cl1;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil0)
+		Cl0 = 2.0*PI*(Alpha*PI/180.0);
+	else
+		Cl0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 1, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	if(!pFoil1)
+		Cl1 = 2.0*PI*(Alpha*PI/180.0);
+	else
+		Cl1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 1, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	return ((1-Tau) * Cl0 + Tau * Cl1);
+}
+
+
+double GetCm0(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, bool &bOutRe, bool &bError)
+{
+	//Find 0-lift angle for local foil
+	double Alpha;
+	double Cm0, Cm1;
+	double Cl0 = 1.0;
+	double Cl1;
+	bOutRe = false;
+	bError = false;
+	bool IsOutRe;
+	bool IsError;
+
+	bOutRe = false;
+	for (int i=-10; i<10; i++)
+	{
+		Alpha = (double)i;
+		Cl1 = GetCl(m_poaPolar, pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
+		if(Cl1>0.0)
+		{
+			if(IsOutRe) bOutRe = true;
+			if(IsError) bError = true;
+			break;
+		}
+		Cl0 = Cl1;
+	}
+	if(Cl0>0.0)
+	{
+		return 0.0;
+	}
+	Cm0 = GetCm(m_poaPolar, pFoil0, pFoil1, Re, Alpha-1.0, Tau, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	Cm1 = GetCm(m_poaPolar, pFoil0, pFoil1, Re, Alpha, Tau, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	double Res = Cm0 + (Cm1-Cm0)*(0.0-Cl0)/(Cl1-Cl0);
+
+	return Res;
+}
+
+
+double GetCm(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+{
+	double Cm0, Cm1;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	if(!pFoil0)
+		Cm0 = 0.0;
+	else
+		Cm0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 4, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if(!pFoil1)
+		Cm1 = 0.0;
+	else
+		Cm1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 4, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+	return ((1-Tau) * Cm0 + Tau * Cm1);
+}
+
+
+double GetCd(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, double AR, bool &bOutRe, bool &bError)
+{
+	//For LLT calculations
+	//returns the interpolated viscous drag
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	double Cd0, Cd1, Cl;
+	if(!pFoil0)
+	{
+		Cl = 2.0*PI*(Alpha*PI/180.0);
+		Cd0 = Cl*Cl/PI/AR;
+	}
+	else Cd0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha,2, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	if(!pFoil1)
+	{
+		Cl = 2.0*PI*(Alpha*PI/180.0);
+		Cd1 = Cl*Cl/PI/AR;
+	}
+	else Cd1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha,2, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+	return ((1-Tau) * Cd0 + Tau * Cd1);
+}
+
+
+double GetXCp(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool &bOutRe, bool &bError)
+{
+	//For LLT calculations
+	//returns the interpolated center of pressure position
+
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	double XCp0, XCp1;
+
+	if(!pFoil0) return 0.0;
+	else XCp0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 11, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if(!pFoil1) return 0.0;
+	else XCp1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 11, IsOutRe, IsError);
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+
+	return ((1-Tau) * XCp0 + Tau * XCp1);
+}
+
+
+double GetXTr(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Alpha, double Tau, bool bTop, bool &bOutRe, bool &bError)
+{
+	//For LLT calculations
+	//returns the interpolated position of the transition on the  surface specified by bTop
+
+//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	bool IsOutRe = false;
+	bool IsError  = false;
+	bOutRe = false;
+	bError = false;
+
+	double Tr0, Tr1;
+	if(!pFoil0)
+	{
+		Tr0 = 1.0;
+	}
+	else
+	{
+		if(bTop) Tr0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr0 = GetPlrPointFromAlpha(m_poaPolar, pFoil0, Re, Alpha, 6, IsOutRe, IsError);
+	}
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+	if(!pFoil1)
+	{
+		Tr1 = 1.0;
+	}
+	else
+	{
+		if(bTop) Tr1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 5, IsOutRe, IsError);
+		else     Tr1 = GetPlrPointFromAlpha(m_poaPolar, pFoil1, Re, Alpha, 6, IsOutRe, IsError);
+	}
+	if(IsOutRe) bOutRe = true;
+	if(IsError) bError = true;
+
+	if (Tau<0.0) Tau = 0.0;
+	if (Tau>1.0) Tau = 1.0;
+	return ((1-Tau) * Tr0 + Tau * Tr1);
+}
+
+
+double GetZeroLiftAngle(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau)
+{
+	//returns the 0-lift angle of the foil, at Reynolds=Re
+	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
+	double a01, a02;
+	double Alpha00, Alpha01;
+	int i;
+	//Find the two polars which enclose Reynolds
+	int size = 0;
+	CPolar *pPolar, *pPolar1, *pPolar2;
+
+	if(!pFoil0) Alpha00 = 0.0;
+	else
+	{
+		pPolar1 = NULL;
+		pPolar2 = NULL;
+		for (i=0; i<m_poaPolar->size(); i++)
+		{
+			pPolar = (CPolar*)m_poaPolar->at(i);
+			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
+		}
+		if(size)
+		{
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil0->m_FoilName)
+				{
+					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
+				}
+			}
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil0->m_FoilName)
+				{
+					if(pPolar->m_Reynolds > Re)
+					{
+						pPolar2 = pPolar;
+						break;
+					}
+				}
+			}
+		}
+		if(pPolar1 && pPolar2)
+		{
+			a01 = pPolar1->GetZeroLiftAngle();
+			a02 = pPolar2->GetZeroLiftAngle();
+			Alpha00 = a01 + (a02-a01) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+		}
+		else Alpha00 = 0.0;
+	}
+
+	if(!pFoil1) Alpha01 = 0.0;
+	else
+	{
+		pPolar1 = NULL;
+		pPolar2 = NULL;
+		for (i=0; i<m_poaPolar->size(); i++)
+		{
+			pPolar = (CPolar*)m_poaPolar->at(i);
+			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
+		}
+		if(size)
+		{
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil1->m_FoilName)
+				{
+					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
+				}
+			}
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil1->m_FoilName)
+				{
+					if(pPolar->m_Reynolds > Re)
+					{
+						pPolar2 = pPolar;
+						break;
+					}
+				}
+			}
+		}
+		if(pPolar1 && pPolar2)
+		{
+			a01 = pPolar1->GetZeroLiftAngle();
+			a02 = pPolar2->GetZeroLiftAngle();
+			Alpha01 = a01 + (a02-a01) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+		}
+		else Alpha01 = 0.0;
+	}
+
+	return ((1-Tau) * Alpha00 + Tau * Alpha01);
+}
+
+
+void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope)
+{
+	//returns the 0-lift angle of the foil, at Reynolds=Re
+	//if the polar doesn't reach to 0-lift, returns Alpha0 = 0;
+	double Alpha00, Alpha01;
+	double Slope0, Slope1;
+	double AlphaTemp1, AlphaTemp2, SlopeTemp1, SlopeTemp2;
+	int i;
+
+//Find the two polars which enclose Reynolds
+	int size = 0;
+	CPolar *pPolar, *pPolar1, *pPolar2;
+
+	if(!pFoil0)
+	{
+		Alpha00 = 0.0;
+		Slope0 = 2.0 * PI *PI/180.0;
+	}
+	else
+	{
+		pPolar1 = NULL;
+		pPolar2 = NULL;
+		for (i=0; i<m_poaPolar->size(); i++)
+		{
+			pPolar = (CPolar*)m_poaPolar->at(i);
+			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
+		}
+		if(size){
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil0->m_FoilName)
+				{
+					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
+				}
+			}
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil0->m_FoilName)
+				{
+					if(pPolar->m_Reynolds > Re)
+					{
+						pPolar2 = pPolar;
+						break;
+					}
+				}
+			}
+		}
+		if(pPolar1 && pPolar2)
+		{
+			pPolar1->GetLinearizedCl(AlphaTemp1, SlopeTemp1);
+			pPolar2->GetLinearizedCl(AlphaTemp2, SlopeTemp2);
+			Alpha00 = AlphaTemp1 +
+					 (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+			Slope0  = SlopeTemp1 +
+					 (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+		}
+		else
+		{
+			Alpha00 = 0.0;
+			Slope0  = 2.0 * PI *PI/180.0;
+		}
+	}
+
+	if(!pFoil1)
+	{
+		Alpha01 = 0.0;
+		Slope1 = 2.0*PI *PI/180.0;
+	}
+	else
+	{
+		pPolar1 = NULL;
+		pPolar2 = NULL;
+		for (i=0; i<m_poaPolar->size(); i++)
+		{
+			pPolar = (CPolar*)m_poaPolar->at(i);
+			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
+		}
+		if(size){
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil1->m_FoilName)
+				{
+					if(pPolar->m_Reynolds < Re) pPolar1 = pPolar;
+				}
+			}
+			for (i=0; i<m_poaPolar->size(); i++)
+			{
+				pPolar = (CPolar*)m_poaPolar->at(i);
+				if(pPolar->m_FoilName == pFoil1->m_FoilName)
+				{
+					if(pPolar->m_Reynolds > Re)
+					{
+						pPolar2 = pPolar;
+						break;
+					}
+				}
+			}
+		}
+		if(pPolar1 && pPolar2){
+			pPolar1->GetLinearizedCl(AlphaTemp1, SlopeTemp1);
+			pPolar2->GetLinearizedCl(AlphaTemp2, SlopeTemp2);
+			Alpha01 = AlphaTemp1 +
+					 (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+			Slope1  = SlopeTemp1 +
+					 (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+		}
+		else {
+			Alpha01 = 0.0;
+			Slope1 = 2.0*PI *PI/180.0;
+		}
+	}
+
+	Alpha0 = ((1-Tau) * Alpha00 + Tau * Alpha01);
+	Slope  = ((1-Tau) * Slope0  + Tau * Slope1);
+}
 
 
 

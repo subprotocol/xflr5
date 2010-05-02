@@ -24,60 +24,51 @@
 #include "../MainFrame.h"
 #include <QBitmap>
 
+
 AboutQ5::AboutQ5(void *parent)
 {
-	setWindowTitle(tr("About QFLR5"));
-
+	setWindowTitle(tr("About XFLR5"));
 	m_pMainFrame = parent;
-
 	SetupLayout();
-	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 }
 
-AboutQ5::~AboutQ5()
-{
-}
 
 void AboutQ5::SetupLayout()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QHBoxLayout *LogoLayout = new QHBoxLayout;
-	m_IconQ5 = new QLabel;
-	m_IconQ5->setObjectName("iconQ5");
-	m_IconQ5->setGeometry(QRect(20, 0, 61, 71));
-	m_IconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/Q5.png")));
+	QGridLayout *LogoLayout = new QGridLayout;
+	QLabel *LabIconQ5 = new QLabel;
+	LabIconQ5->setObjectName("iconXFLR5"); 
+//	LabIconQ5->setGeometry(QRect(20, 0, 61, 71));
+	LabIconQ5->setPixmap(QPixmap(QString::fromUtf8(":/images/xflr5_64.png")));
 	QLabel *lab1  = new QLabel(pMainFrame->m_VersionName);
-	lab1->setAlignment(Qt::AlignLeft);
-	LogoLayout->addWidget(m_IconQ5);
-	LogoLayout->addStretch(1);
-	LogoLayout->addWidget(lab1);
-	LogoLayout->addStretch(4);
+	lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
+	QLabel *XFLR5Link = new QLabel;
+	XFLR5Link->setText("<a href=http://xflr5.sourceforge.net/xflr5.htm>http://xflr5.sourceforge.net/xflr5.htm</a>");
+	XFLR5Link->setOpenExternalLinks(true);
+	XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+	XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 
+	LogoLayout->setColumnStretch(1,1);
+	LogoLayout->setColumnStretch(2,2);
+	LogoLayout->addWidget(LabIconQ5,1,1,2,1);
+	LogoLayout->addWidget(lab1,1,2);
+	LogoLayout->addWidget(XFLR5Link,2,2);
 
 	QLabel *lab2  = new QLabel(tr("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94"));
 	QLabel *lab3  = new QLabel(tr("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00"));
-	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2009"));
+	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2010"));
 	QLabel *lab5  = new QLabel(tr("This program is distributed in the hope that it will be useful,"));
 	QLabel *lab6  = new QLabel(tr("but WITHOUT ANY WARRANTY; without even the implied warranty of"));
 	QLabel *lab7  = new QLabel(tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
 	QLabel *lab8  = new QLabel(tr("This program has been developped exclusively for the analysis of model aircraft"));
 	QLabel *lab9  = new QLabel(tr("Any other usage is strongly disapproved"));
 	QLabel *lab10 = new QLabel(tr("Program distributed  under the terms of the GNU General Public License"));
+	QLabel *lab11 = new QLabel(tr("German translation by Martin Willner (mjw@mjw.co.at)"));
+	QLabel *lab12 = new QLabel(tr("French translation by Jean-Luc Coulon"));
 
-	QPushButton *AboutQt = new QPushButton(tr("About Qt"));
-	connect(AboutQt, SIGNAL(clicked()), qApp, SLOT(aboutQt()));
-
-	m_pXFLR5Link = new QLabel;
-	m_pXFLR5Link->setText("<a href=http://xflr5.sourceforge.net/xflr5.htm>http://xflr5.sourceforge.net/xflr5.htm</a>");
-	m_pXFLR5Link->setOpenExternalLinks(true);
-	m_pXFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
-
-	QHBoxLayout *LinkLayout = new QHBoxLayout;
-	LinkLayout->addWidget(m_pXFLR5Link);
-	LinkLayout->addStretch(1);
-	LinkLayout->addWidget(AboutQt);
-
-	OKButton = new QPushButton(tr("OK"));
+	QPushButton *OKButton = new QPushButton(tr("OK"));
+	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 	QHBoxLayout *OKLayout = new QHBoxLayout;
 	OKLayout->addStretch(1);
 	OKLayout->addWidget(OKButton);
@@ -90,6 +81,9 @@ void AboutQ5::SetupLayout()
 	MainLayout->addWidget(lab3);
 	MainLayout->addWidget(lab4);
 	MainLayout->addStretch(1);
+	MainLayout->addWidget(lab11);
+	MainLayout->addWidget(lab12);
+	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab5);
 	MainLayout->addWidget(lab6);
 	MainLayout->addWidget(lab7);
@@ -98,8 +92,6 @@ void AboutQ5::SetupLayout()
 	MainLayout->addWidget(lab9);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab10);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(LinkLayout);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(OKLayout);
 	setLayout(MainLayout);

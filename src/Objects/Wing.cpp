@@ -1437,7 +1437,7 @@ void CWing::LLTInitCl()
 		yob   = cos(k*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
 		m_Re[k] = m_Chord[k] * s_QInf /s_Viscosity;
-		m_Cl[k] = pMiarex->GetCl(pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
+		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
 	}
 	if(m_Type == 2)
 	{
@@ -1482,7 +1482,7 @@ int CWing::LLTIterate()
 	{
 		yob     = cos(k*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		m_Cl[k] = pMiarex->GetCl(pFoil0, pFoil1, m_Re[k],
+		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k],
 								 s_Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 		if (m_Type == 2)
 		{
@@ -1504,7 +1504,7 @@ int CWing::LLTIterate()
 			m_Re[k] = m_Chord[k] * s_QInf /s_Viscosity;
 			yob     = cos(k*PI/s_NLLTStations);
 			GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-			m_Cl[k] = pMiarex->GetCl(pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
+			m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 		}
 	}
 
@@ -1558,37 +1558,37 @@ void CWing::LLTComputeWing()
 		yob   = cos((double)m*PI/(double)s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
 
-		m_Cl[m]     = pMiarex->GetCl(pFoil0, pFoil1, m_Re[m],
+		m_Cl[m]     = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],
 									s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError)
 			bPointOutAlpha = true;
 
-		m_PCd[m]    = pMiarex->GetCd(pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
+		m_PCd[m]    = GetCd(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
 		m_ICd[m]    = -m_Cl[m] * (m_Ai[m]* PI/180.0);
 
-		m_XTrTop[m] = pMiarex->GetXTr(pFoil0, pFoil1, m_Re[m],
+		m_XTrTop[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],
 									s_Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XTrBot[m] = pMiarex->GetXTr(pFoil0, pFoil1, m_Re[m],s_Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
+		m_XTrBot[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],s_Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_CmAirf[m] = pMiarex->GetCm(pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_CmAirf[m] = GetCm(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XCPSpanRel[m]  = pMiarex->GetXCp(pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_XCPSpanRel[m] = GetXCp(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
 		if(fabs(m_XCPSpanRel[m])<0.000001)
 		{
 			//plr mesh was generated prior to v3.15, i.e., without XCp calculations
-			Cm0 = pMiarex->GetCm0(pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
+			Cm0 = GetCm0(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
 			if(m_Cl[m]!=0.0) m_XCPSpanRel[m] = 0.25 - Cm0/m_Cl[m];
 			else             m_XCPSpanRel[m] = 0.25;
 //			bError = false;
@@ -1756,7 +1756,7 @@ bool CWing::LLTSetLinearSolution()
 		}
 		yob   = cos(i*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		a0 = pMiarex->GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);
+		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);
 		rhs[i] = c/cs * (s_Alpha-a0+m_Twist[i])/180.0*PI;
 	}
 
@@ -1774,8 +1774,8 @@ bool CWing::LLTSetLinearSolution()
 			}
 			yob   = cos(i*PI/s_NLLTStations);
 			GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-			pMiarex->GetLinearizedPolar(pFoil0, pFoil1, m_Re[i], tau, a0, slope);
-			a0 = pMiarex->GetZeroLiftAngle(pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
+			GetLinearizedPolar(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
+			a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
 			m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
 			m_Ai[i]  = -(s_Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
 		}
@@ -1943,15 +1943,15 @@ void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP
 
 			if(bViscous)
 			{
-				m_PCd[m]    = pMiarex->GetVar(2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 
-				m_XTrTop[m] = pMiarex->GetVar(5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 
-				m_XTrBot[m] = pMiarex->GetVar(6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 
 								if(bError) bPointOutCl = true;
@@ -2693,16 +2693,15 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
 	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
 	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
-
 	int  j, k, l, p, m, nFlap;
 	bool bOutRe, bError, bPointOutRe, bPointOutCl;
 	double CPStrip, tau, NForce, q, Alpha, cosa, sina;
 	QString string, strong;
 	CFoil *pFoil0, *pFoil1;
 	CVector DragVector, VInf, WindNormal, WindDirection;
-	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PtC4, PtLE, PanelForce, StripForce, Moment0, Moment1;
-	CVector DragMoment, GeomMoment;
-	CVector H, HA, HB, HingeLeverArm, HingeMoment;
+	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PtC4, PtLE, PanelForce, StripForce;
+	CVector DragMoment, GeomMoment, Moment0;
+	CVector HingeLeverArm, HingeMoment;
 
 	//dynamic pressure, kg/m3
 	q = 0.5 * s_Density * s_QInf * s_QInf;
@@ -2807,15 +2806,15 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 
 			if(bViscous)
 			{
-				m_PCd[m]    = pMiarex->GetVar(2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 
-				m_XTrTop[m] = pMiarex->GetVar(5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 
-				m_XTrBot[m] = pMiarex->GetVar(6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+				m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 				bPointOutRe = bOutRe || bPointOutRe;
 				if(bError) bPointOutCl = true;
 				m_ViscousDrag  = m_PCd[m] * m_StripArea[m];

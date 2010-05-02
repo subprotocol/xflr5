@@ -32,11 +32,9 @@ WingDelegate::WingDelegate(QObject *parent)
 	m_pWingDlg = parent;
 }
 
+
 QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
 {
-//	GL3dWingDlg *pWingDlg = (GL3dWingDlg*)m_pWingDlg;
-//	pWingDlg->SetCurrentSection(index.row());
-//	pWingDlg->UpdateView();
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		FloatEdit *editor = new FloatEdit(parent);
@@ -78,6 +76,7 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 	return NULL;
 }
 
+
 void WingDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
@@ -96,6 +95,7 @@ void WingDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
 	}
 }
 
+
 void WingDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
@@ -113,6 +113,7 @@ void WingDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 		model->setData(index, strong, Qt::EditRole);
 	}
 }
+
 
 void WingDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -143,6 +144,7 @@ void WingDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewI
 {
 	editor->setGeometry(option.rect);
 }
+
 
 void WingDelegate::SetPointers(int *PrecisionTable, int *pNPanels)
 {

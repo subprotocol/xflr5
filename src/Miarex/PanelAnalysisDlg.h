@@ -84,7 +84,6 @@ private:
 	void EndSequence();
 	void GetDoubletInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void GetSourceInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi);
-	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT);
 	void RelaxWake();
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
 	void SetProgress(int TaskSize,double TaskProgress);
@@ -167,8 +166,7 @@ private:
 
 	QString m_strOut;
 	QString m_VersionName;
-
-
+	
 	CPanel **m_ppPanel;//the sorted array of panel pointers
 	CPanel *m_pPanel; //the original array of panels
 	CPanel *m_pWakePanel;// the current working wake panel array
@@ -183,10 +181,6 @@ private:
 
 	
 	CWPolar *m_pWPolar;
-	CWing *m_pWing; //pointer to the geometry class of the wing 
-	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
-	CWing *m_pStab;
-	CWing *m_pFin;
 
 	CBody **m_ppBody;
 
@@ -197,6 +191,13 @@ private:
 	CVector VG, CG;
 	double phiG;
 	CPanel m_SymPanel;
+	
+public:
+	CWing *m_pWing; //pointer to the geometry class of the wing 
+	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
+	CWing *m_pStab;
+	CWing *m_pFin;
+	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT);
 };
 
 #endif // PANELANALYSISDLG_H

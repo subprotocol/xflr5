@@ -112,7 +112,6 @@ public:
 	bool IsBetween(int f, double f1, double f2);
 
 private:
-	QString m_FoilName;		// the foil's name...
 	QString m_FoilDescription;	// a description
 	QColor m_FoilColor;	//... and its color
 
@@ -148,6 +147,9 @@ private:
 	CVector m_rpMid[1001];		//mid camber line points
 	CVector m_rpExtrados[IQX];	//upper surface points
 	CVector m_rpIntrados[IQX];	//lower surface points
+
+public:
+	QString m_FoilName;		// the foil's name...
 
 	// Trailing edge flap  data
 	bool m_bTEFlap;
