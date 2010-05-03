@@ -235,8 +235,8 @@ unix {
 }
 
 # target.path = $$BINDIR
-mac { 
-    TARGET = XFLR6
+macx {
+    TARGET = XFLR5
     TEMPLATE = app
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
     QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
@@ -246,7 +246,7 @@ mac {
     LIBS += -framework \
         CoreFoundation
     QMAKE_INFO_PLIST = mac/Info.plist
-    ICON = mac/qflr5.icns
+    ICON = mac/xflr5.icns
 }
 OTHER_FILES += doc/ReleaseNotes.txt
 

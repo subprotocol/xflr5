@@ -1,8 +1,12 @@
 #!/bin/sh
 
-macdeployqt QFLR5.app
-rm -r mac_release/QFLR5/QFLR5.app
-mv QFLR5.app mac_release/QFLR5/
-rm mac_release/QFLR5.dmg
-hdiutil create mac_release/QFLR5.dmg -srcfolder mac_release/QFLR5
-hdiutil internet-enable -yes mac_release/QFLR5.dmg
+macdeployqt XFLR5.app
+rm -r mac_release/XFLR5/*
+mv XFLR5.app mac_release/XFLR5/
+cp License.txt mac_release/XFLR5/
+cp ReadMe.txt mac_release/XFLR5/
+cp ReleaseNotes.txt mac_release/XFLR5/
+cp Guidelines.pdf mac_release/XFLR5/
+rm mac_release/XFLR5.dmg
+hdiutil create mac_release/XFLR5.dmg -srcfolder mac_release/XFLR5
+hdiutil internet-enable -yes mac_release/XFLR5.dmg

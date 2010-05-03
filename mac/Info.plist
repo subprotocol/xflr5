@@ -2,27 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string>QFLR5</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>wpa</string>
-				<string>WPA</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>QFLR5 Project</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
+        <key>CFBundleDisplayName</key>
+        <string>XFLR5</string>
+        <key>CFBundleDocumentTypes</key>
+        <array>
+                <dict>
+                        <key>CFBundleTypeExtensions</key>
+                        <array>
+                                <string>wpa</string>
+                                <string>WPA</string>
+                        </array>
+                        <key>CFBundleTypeName</key>
+                        <string>XFLR5 Project</string>
+                        <key>CFBundleTypeRole</key>
+                        <string>Editor</string>
                         <key>LSItemContentTypes</key>
                         <array>
-                            <string>wpa.qflr5.sourceforge.net</string>
+                            <string>wpa.xflr5.sourceforge.net</string>
                         </array>
                         <key>LSIsAppleDefaultForType</key>
                         <true/>
-		</dict>
+                </dict>
                  <dict>
                         <key>CFBundleTypeExtensions</key>
                         <array>
@@ -30,25 +30,25 @@
                                 <string>PLR</string>
                         </array>
                         <key>CFBundleTypeName</key>
-                        <string>QFLR5 Polar File</string>
+                        <string>XFLR5 Polar File</string>
                         <key>CFBundleTypeRole</key>
                         <string>Editor</string>
                         <key>LSItemContentTypes</key>
                         <array>
-                            <string>plr.qflr5.sourceforge.net</string>
+                            <string>plr.xflr5.sourceforge.net</string>
                         </array>
                         <key>LSIsAppleDefaultForType</key>
                         <true/>
                 </dict>
-	</array>
+        </array>
 
         <key>UTExportedTypeDeclarations</key>
         <array>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>wpa.qflr5.sourceforge.net</string>
+                <string>wpa.xflr5.sourceforge.net</string>
                 <key>UTTypeDescription</key>
-                <string>QFLR5 Project</string>
+                <string>XFLR5 Project</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -64,9 +64,9 @@
             </dict>
             <dict>
                 <key>UTTypeIdentifier</key>
-                <string>plr.qflr5.sourceforge.net</string>
+                <string>plr.xflr5.sourceforge.net</string>
                 <key>UTTypeDescription</key>
-                <string>QFLR5 Polar File</string>
+                <string>XFLR5 Polar File</string>
                 <key>UTTypeConformsTo</key>
                 <array>
                     <string>public.data</string>
@@ -82,21 +82,21 @@
             </dict>
         </array>
 
-	<key>CFBundleIconFile</key>
-	<string>qflr5.icns</string>
-	<key>CFBundleIdentifier</key>
-	<string>qflr5.sourceforge.net</string>
-	<key>CFBundleName</key>
-	<string>QFLR5</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-        <string>0.03</string>
-	<key>CFBundleSignature</key>
-	<string>QFLR</string>
+        <key>CFBundleIconFile</key>
+        <string>xflr5.icns</string>
+        <key>CFBundleIdentifier</key>
+        <string>xflr5.sourceforge.net</string>
+        <key>CFBundleName</key>
+        <string>XFLR5</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>5.00</string>
+        <key>CFBundleSignature</key>
+        <string>XFLR</string>
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
-	<key>CFBundleVersion</key>
-        <string>166</string>
+        <key>CFBundleVersion</key>
+        <string>259</string>
 </dict>
 </plist>
