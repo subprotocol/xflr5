@@ -3028,6 +3028,27 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 		QXInverse *pXInverse= (QXInverse*)m_pXInverse;
 		pXInverse->keyPressEvent(event);
 	}
+	else
+	{
+		switch (event->key())
+		{
+			
+			case Qt::Key_L:
+			{
+				OnLogFile();
+				break;
+			}
+			case Qt::Key_Control:
+			{
+				QMiarex* pMiarex = (QMiarex*)m_pMiarex;
+				pMiarex->m_bArcball = true;
+				UpdateView();
+				break;
+			}	
+			default:
+				event->ignore();
+		}
+	}
 }
 
 

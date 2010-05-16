@@ -77,7 +77,6 @@ StabAnalysisDlg::StabAnalysisDlg()
 	m_pPlane  = NULL;
 	m_ppSurface = NULL;
 
-	m_pPanel       = NULL;
 	m_pPanel        = NULL;
 	m_pMemPanel     = NULL;
 	m_pNode         = NULL;
@@ -184,7 +183,6 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 	}
 
 	// flap controls
-	
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		if(m_ppSurface[j]->m_bTEFlap)
@@ -246,7 +244,7 @@ void StabAnalysisDlg::BuildStateMatrices()
 	// Creates the longitudinal and lateral state matrices
 	// from the derivatives and inertias calculated previously
 	//
-	// Creates the control state matrix from tje control derivatives
+	// Creates the control state matrix from the control derivatives
 	//
 	static int i;
 	static double Ipxx, Ipzz, Ipzx;
@@ -377,8 +375,8 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 	//  - add the volume inertia AND the point masses of all components
 	//  - the body axis is the frame in which all the geometry has been defined
 	//  - the origin=BodyFrame;
-	//  - the center of gravity is (XCmRef,0,0) as defined in the polar,
-	//    it is NOT the CoG calculated from component masses...
+	//  - the center of gravity is calculated from component masses and is NOT the CoG defined in the polar
+
 	int i, NWing;
 	CVector LA, CoG;
 	CWing *pWing[4];
@@ -473,6 +471,8 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 	}
 	m_CoG = CoG/m_Mass;
 
+	// The CoG position is now available, so calculate the inertia w.r.t the CoG
+
 	if(m_pPlane)
 	{
 		for(i=0; i<m_pPlane->m_NMass; i++)
@@ -556,9 +556,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 
 void StabAnalysisDlg::ComputeResults()
 {
-	// Calculates the various wing coefficients by interpolating
-	// the adequate variable, from Cl, on the XFoil polar mesh
-	// at each span station
+	// Calculates the various wing coefficients at each span station
 
 	static int pos, Station;
 	static double Lift, IDrag, VDrag, WingIDrag,XCP, YCP, qdyn;
@@ -612,7 +610,7 @@ void StabAnalysisDlg::ComputeResults()
 
 	m_pWing->VLMTrefftz(m_Gamma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 	m_pWing->VLMComputeWing(m_Gamma, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-							m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+							m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 
 	m_pWing->VLMSetBending();
 	if(m_pWing->m_bWingOut)  m_bPointOut = true;
@@ -628,7 +626,7 @@ void StabAnalysisDlg::ComputeResults()
 		m_pWing2->VLMComputeWing(m_Gamma+m_pWing->m_MatSize,
 								 m_Cp+m_pWing->m_MatSize,
 								 VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								 m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+								 m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 		IDrag += WingIDrag;
 
 		m_pWing2->VLMSetBending();
@@ -647,7 +645,7 @@ void StabAnalysisDlg::ComputeResults()
 		m_pStab->VLMComputeWing(m_Gamma+pos,
 								m_Cp+pos,
 								VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+								m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 		IDrag += WingIDrag;
 
 		m_pStab->VLMSetBending();
@@ -665,7 +663,7 @@ void StabAnalysisDlg::ComputeResults()
 		m_pFin->VLMComputeWing( m_Gamma+pos,
 								m_Cp+pos,
 								VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+								m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
 		if(m_pFin->m_bWingOut)  m_bPointOut = true;
 
 		IDrag += WingIDrag;
@@ -686,7 +684,6 @@ void StabAnalysisDlg::ComputeResults()
 	m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
 	m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
 	m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-
 	m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
 
 	m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
@@ -697,8 +694,6 @@ void StabAnalysisDlg::ComputeResults()
 
 	if(m_bPointOut) m_bWarning = true;
 }
-
-
 
 
 void StabAnalysisDlg::ComputeControlDerivatives()
@@ -729,8 +724,8 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 
-	DeltaAngle = 1.0; //°
-	BuildControlRHS(DeltaAngle);
+	DeltaAngle = 0.001; //rad
+	BuildControlRHS(DeltaAngle*180.0/PI);
 
 	for(ic=0; ic<m_NCtrls; ic++)
 	{
@@ -738,7 +733,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	}
 
 //	baksub(Size, m_aij, m_Index, m_cRHS, m_NCtrls, &m_bCancel);
-	memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));// we'll need it later for stability derivatives
+	memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
 	Gauss(m_aij, m_MatSize, m_cRHS, m_NCtrls, &m_bCancel);
 
 	str = "\n   ___Control derivatives____\n";
@@ -824,17 +819,17 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		{
 			str = QString("    Derivatives w.r.t. Wing Flap %1\n").arg(nFlap);
 			AddString(str);
-			str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],10,'g',5);
+			str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
 			AddString(str);
-			str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],10,'g',5);
+			str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
 			AddString(str);
-			str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],10,'g',5);
+			str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
 			AddString(str);
-			str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],10,'g',5);
+			str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
 			AddString(str);
-			str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],10,'g',5);
+			str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
 			AddString(str);
-			str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],10,'g',5);
+			str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
 			AddString(str);
 			nCtrl++;
 			nFlap++;
@@ -850,17 +845,17 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 			{
 				str = QString("    Derivatives w.r.t. Elevator Flap %1\n").arg(nFlap);
 				AddString(str);
-				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],10,'g',5);
+				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],10,'g',5);
+				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],10,'g',5);
+				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],10,'g',5);
+				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],10,'g',5);
+				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],10,'g',5);
+				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
 				AddString(str);
 				
 				nCtrl++;
@@ -877,17 +872,17 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 			{
 				str = QString("    Derivatives w.r.t. Fin Flap %1\n").arg(nFlap);
 				AddString(str);
-				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],10,'g',5);
+				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],10,'g',5);
+				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],10,'g',5);
+				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],10,'g',5);
+				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],10,'g',5);
+				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
 				AddString(str);
-				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],10,'g',5);
+				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
 				AddString(str);
 				
 				nCtrl++;
@@ -904,18 +899,16 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 
 void StabAnalysisDlg::ComputeStabilityDerivatives()
 {
-	//
-	// Stability derivatives are estimated by forward difference at U=(U0,0,0).
-	// The reference condition has been saved during the calculation of 
-	// the trimmed condition
-	//
-	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk;
+	// The stability derivatives are estimated by forward difference at U=(U0,0,0).
+	// The reference condition has been saved during the calculation of the trimmed condition
+	
+	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk, Ris, Rjs, Rks;
 	static int p;
 	static double sina, cosa, deltaspeed, deltarotation, q, S, mac, b;
 	QString str;
 
-	deltaspeed    = 0.01;        //  m/s   for central difference estimation
-	deltarotation = 0.001;       //  rad/s for central difference estimation
+	deltaspeed    = 0.01;        //  m/s   for forward difference estimation
+	deltarotation = 0.001;       //  rad/s for forward difference estimation
 
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
@@ -952,7 +945,6 @@ void StabAnalysisDlg::ComputeStabilityDerivatives()
 	//______________________________________________________________________________
 	// RHS for unit rotation vectors around Stability axis
 	// stability axis origin is CoG
-	CVector Ris, Rjs, Rks;
 	for (p=0; p<m_MatSize; p++)
 	{
 		CGM = m_pPanel[p].VortexPos - m_CoG;
@@ -1532,7 +1524,7 @@ bool StabAnalysisDlg::ControlLoop()
 void StabAnalysisDlg::Forces(double *Gamma, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace)
 {
 	// Calculates the forces using a farfield method
-	// Calculates the moments by a near filed method, i.e. direct summation on the panels
+	// Calculates the moments by a near field method, i.e. direct summation on the panels
 	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
 	//
 	if(!m_pPanel||!m_pWPolar) return;
@@ -1563,6 +1555,7 @@ void StabAnalysisDlg::Forces(double *Gamma, double *VInf, CVector &Force, CVecto
 	Force.Set( 0.0, 0.0, 0.0);
 	Moment.Set(0.0, 0.0, 0.0);
 	ViscousDrag = 0.0;
+
 	for(j=0; j<m_NSurfaces; j++)
 	{
 		for(k=0; k<m_ppSurface[j]->m_NYPanels; k++)
@@ -1599,9 +1592,9 @@ void StabAnalysisDlg::Forces(double *Gamma, double *VInf, CVector &Force, CVecto
 				PanelLeverArm = m_pPanel[p].VortexPos - m_CoG;
 				dFM  = Velocity * m_pPanel[p].Vortex * Gamma[p];      // Newtons/rho
 				Moment += dFM * PanelLeverArm;                    // N.m/rho
-
 				p++;
 			}
+
 			if(m_pWPolar->m_bViscous)
 			{
 				//add the viscous drag component to force and moment
@@ -2067,17 +2060,9 @@ void StabAnalysisDlg::StartAnalysis()
 	AddString(strong);
 	m_bCancel = false;
 
-	if(m_pWPolar->m_bAutoInertia)	
-	{
-		strong = tr("Using automatic inertia evaluation");
-		AddString(strong);
-		ComputeBodyAxisInertia();
-		m_pWPolar->m_CoG = m_CoG;
-	}
+	if(m_pWPolar->m_bAutoInertia)	ComputeBodyAxisInertia();
 	else
 	{
-		strong = tr("Using manual inertia evaluation");
-		AddString(strong);
 		m_Mass = m_pWPolar->m_Weight;
 		m_CoG.Set(m_pWPolar->m_CoG);
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
@@ -2086,7 +2071,6 @@ void StabAnalysisDlg::StartAnalysis()
 		m_Ib[0][2] = m_Ib[2][0] = m_pWPolar->m_CoGIxz;
 		m_Ib[1][0] = m_Ib[1][2] = m_Ib[0][1] = m_Ib[2][1] = 0.0;	
 	}
-	AddString("\n\n");
 
 	if(m_pWPolar->m_Type==7) ControlLoop();
 

@@ -65,7 +65,7 @@ protected:
 	void VLMSetBending();
 	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
 	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-						double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, bool bViscous, bool bTilted);
+						double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, CVector &CoG, bool bViscous, bool bTilted);
 
 	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
 						  double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);

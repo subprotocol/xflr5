@@ -115,15 +115,15 @@ QMiarex::QMiarex(QWidget *parent)
 	m_CurSpanPos    = 0.0;
 	m_WingScale     = 1.0;
 
-	m_AlphaMin = 0.0;
-	m_AlphaMax = 1.0;
-	m_AlphaDelta = 0.5;
-	m_QInfMin = 10.0;
-	m_QInfMax = 50.0;
-	m_QInfDelta = 10.0;
-	m_ControlMin = 0.0;
-	m_ControlMax = 1.0;
-	m_ControlDelta = 0.1;
+	m_AlphaMin     =  0.0;
+	m_AlphaMax     =  1.0;
+	m_AlphaDelta   =  0.5;
+	m_QInfMin      = 10.0;
+	m_QInfMax      = 50.0;
+	m_QInfDelta    = 10.0;
+	m_ControlMin   =  0.0;
+	m_ControlMax   =  1.0;
+	m_ControlDelta =  0.1;
 
 	m_ModeNorm = 1.0;
 	m_ModeTime = 0.0;
@@ -15848,20 +15848,24 @@ void QMiarex::SnapClient(QString const &FileName)
 		case 16: return;
 		case 24:
 		{
+#if QT_VERSION >= 0x040400
 			  glReadPixels(0,0,size.width(),size.height(),GL_RGB,GL_UNSIGNED_BYTE,pPixelData);
-			  QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_RGB888);
+			  QImage Image(pPixelData, size.width(),size.height(), QImage::Format_RGB888);
 			  QImage FlippedImaged;
 			  FlippedImaged = Image.mirrored();	//flip vertically
 			  FlippedImaged.save(FileName);
+#else
+			  QMessageBox::warning(this,tr("Warning"),"The version of Qt used to compile the code is older than 4.4 and does not support 24 bit images... Sorry");
+#endif
 			  break;
 		}
 		case 32:
 		{
 			glReadPixels(0,0,size.width(),size.height(),GL_RGBA,GL_UNSIGNED_BYTE,pPixelData);
-			QImage Image(pPixelData, size.width(),size.height(),  QImage::Format_ARGB32);
+			QImage Image(pPixelData, size.width(),size.height(), QImage::Format_ARGB32);
 			QImage FlippedImaged;
 			FlippedImaged = Image.mirrored();	//flip vertically
-			FlippedImaged.save(FileName);
+			FlippedImaged.save(FileName);	
 			break;
 		}
 		default: break;

@@ -2683,7 +2683,7 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
 						   double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm,
-						   bool bViscous, bool bTilted)
+						   CVector &CoG, bool bViscous, bool bTilted)
 {
 	//calculates :
 	// - the moments and the centre of pressure positions by summation over the apnels
@@ -2692,7 +2692,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
 	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
-	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
 	int  j, k, l, p, m, nFlap;
 	bool bOutRe, bError, bPointOutRe, bPointOutCl;
 	double CPStrip, tau, NForce, q, Alpha, cosa, sina;
@@ -2749,7 +2748,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			m_Surface[j].GetLeadingPt(k, PtLE);
 			m_Surface[j].GetC4(k, PtC4, tau);
 
-			LeverArm   = PtC4 - pWPolar->m_CoG;
+			LeverArm   = PtC4 - CoG;
 
 			m_StripArea[m] = 0.0;
 
@@ -2757,9 +2756,9 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			{
 				m_StripArea[m] += m_pPanel[p].Area;
 				LeverArmC4  = m_pPanel[p].VortexPos - PtC4;
-				PanelLeverArm.x = m_pPanel[p].VortexPos.x - pWPolar->m_CoG.x;
-				PanelLeverArm.y = m_pPanel[p].VortexPos.y - pWPolar->m_CoG.y;
-				PanelLeverArm.z = m_pPanel[p].VortexPos.z - pWPolar->m_CoG.z;
+				PanelLeverArm.x = m_pPanel[p].VortexPos.x - CoG.x;
+				PanelLeverArm.y = m_pPanel[p].VortexPos.y - CoG.y;
+				PanelLeverArm.z = m_pPanel[p].VortexPos.z - CoG.z;
 
 				// for each panel along the chord, add the lift coef
 				PanelForce  = VInf * m_pPanel[p].Vortex;
@@ -2862,7 +2861,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 				strong+=string;
 				if(s_bTrace) pVLMDlg->AddString(strong);
 				m_bWingOut = true;
-
 			}
 			else if(bPointOutRe)
 			{
@@ -2887,6 +2885,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 	GCm += m_ICm + m_VCm;
 	VCm += m_VCm;
 	ICm += m_ICm;
+	
 	 //sign convention for rolling and yawing is opposite to algebric results
 	GRm -= m_GRm;
 	GYm -= (m_IYm+m_VYm);

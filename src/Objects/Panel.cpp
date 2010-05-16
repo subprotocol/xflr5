@@ -19,9 +19,7 @@
 
 *****************************************************************************/
 
-// Panel.cpp: implementation of the CPanel class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #include <QtCore>
 #include "Panel.h"
@@ -37,10 +35,6 @@ CVector CPanel::ILA, CPanel::ILB, CPanel::ITA, CPanel::ITB, CPanel::T, CPanel::V
 CVector CPanel::P;
 CVector CPanel::LATB, CPanel::TALB;
 
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CPanel::CPanel()
 {

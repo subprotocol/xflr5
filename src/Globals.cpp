@@ -23,6 +23,7 @@
 
 
 #include "Globals.h"
+#include <QVector3D>
 #include <QPen>
 #include <QApplication>
 #include <QFile>
@@ -725,6 +726,98 @@ void Trace(QString msg, double f)
 
 	tf->close();
 }
+
+
+/*
+void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
+{
+	//Quadrilateral VLM FORMULATION
+	// LA, LB, TA, TB are the vortex's four corners
+	// LA and LB are at the 3/4 point of panel nx
+	// TA and TB are at the 3/4 point of panel nx+1
+	//
+	//    LA__________LB               |
+	//    |           |                |
+	//    |           |                | freestream speed
+	//    |           |                |
+	//    |           |                \/
+	//    |           |
+	//    TA__________TB
+	//
+	//
+	//
+	// C is the point where the induced speed is calculated
+	// V is the resulting speed
+	//
+	// Vectorial operations are written explicitly to save computing times (4x more efficient)
+	//
+	double CoreSize = 0.000001;
+//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
+	static int i;
+	static QVector3D R[5];
+	static QVector3D r0, r1, r2, Psi, t;
+	static double r1v,r2v,ftmp, Omega;
+
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	R[0].setX(LB.x);
+	R[0].setY(LB.y);
+	R[0].setZ(LB.z);
+	R[1].setX(TB.x);
+	R[1].setY(TB.y);
+	R[1].setZ(TB.z);
+	R[2].setX(TA.x);
+	R[2].setY(TA.y);
+	R[2].setZ(TA.z);
+	R[3].setX(LA.x);
+	R[3].setY(LA.y);
+	R[3].setZ(LA.z);
+	R[4].setX(LB.x);
+	R[4].setY(LB.y);
+	R[4].setZ(LB.z);
+
+	for (i=0; i<4; i++)
+	{
+		r0.setX(R[i+1].x() - R[i].x());
+		r0.setY(R[i+1].y() - R[i].y());
+		r0.setZ(R[i+1].z() - R[i].z());
+
+		r1.setX(C.x - R[i].x());
+		r1.setY(C.y - R[i].y());
+		r1.setZ(C.z - R[i].z());
+		r2.setX(C.x - R[i+1].x());
+		r2.setY(C.y - R[i+1].y());
+		r2.setZ(C.z - R[i+1].z());
+
+		Psi.setX( r1.y()*r2.z() - r1.z()*r2.y());
+		Psi.setY(-r1.x()*r2.z() + r1.z()*r2.x());
+		Psi.setZ( r1.x()*r2.y() - r1.y()*r2.x());
+
+		ftmp = Psi.x()*Psi.x() + Psi.y()*Psi.y() + Psi.z()*Psi.z();
+
+		r1v = sqrt((r1.x()*r1.x() + r1.y()*r1.y() + r1.z()*r1.z()));
+		r2v = sqrt((r2.x()*r2.x() + r2.y()*r2.y() + r2.z()*r2.z()));
+
+		//get the distance of the TestPoint to the panel's side
+		t.setX( r1.y()*r0.z() - r1.z()*r0.y());
+		t.setY(-r1.x()*r0.z() + r1.z()*r0.x());
+		t.setZ( r1.x()*r0.y() - r1.y()*r0.x());
+
+		if ((t.x()*t.x()+t.y()*t.y()+t.z()*t.z())/(r0.x()*r0.x()+r0.y()*r0.y()+r0.z()*r0.z()) > CoreSize * CoreSize)
+		{
+			Psi /= ftmp;
+
+			Omega = (r0.x()*r1.x() + r0.y()*r1.y() + r0.z()*r1.z())/r1v - (r0.x()*r2.x() + r0.y()*r2.y() + r0.z()*r2.z())/r2v;
+			V.x += Psi.x() * Omega/4.0/PI;
+			V.y += Psi.y() * Omega/4.0/PI;
+			V.z += Psi.z() * Omega/4.0/PI;
+		}
+	}
+}*/
+
 
 void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
 {
