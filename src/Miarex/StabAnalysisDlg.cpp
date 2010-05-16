@@ -134,7 +134,7 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 	static CVector is, js, ks;
 	static CVector H, RN, VInf;
 	static double sina, cosa;
-	static int p, j, nCtrl;
+	static int p, j, nCtrl, pos;
 
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
@@ -152,6 +152,8 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 		m_uRHS[p] = VInf.dot(m_pPanel[p].Normal);
 	}
 
+	pos = 0;
+	
 	if(m_pPlane)
 	{
 		H.Set(0.0, 1.0, 0.0);
@@ -164,6 +166,7 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 			Quat.Conjugate(m_pWing->m_pPanel[j].Normal, RN);
 			m_cRHS[nCtrl*m_MatSize+j] = VInf.dot(RN);
 		}
+		pos = m_pWing->m_MatSize;
 		
 		nCtrl=1;
 
@@ -176,9 +179,9 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 			for(j=0; j<m_pStab->m_MatSize; j++)
 			{
 				Quat.Conjugate(m_pStab->m_pPanel[j].Normal, RN);
-				m_cRHS[nCtrl*m_MatSize+j] = VInf.dot(RN);
+				m_cRHS[nCtrl*m_MatSize+pos+j] = VInf.dot(RN);
 			}
-			nCtrl = 2;
+			nCtrl++;
 		}
 	}
 
@@ -279,6 +282,8 @@ void StabAnalysisDlg::BuildStateMatrices()
 	m_ALong[3][3] = 0.0;
 
 
+	strange = tr("   _____State matrices__________\n");
+	AddString(strange);
 	strange = tr("       Longitudinal state matrix\n");
 	AddString(strange);
 	for (i=0; i<4; i++)
@@ -764,25 +769,43 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	}
 	
 	
+/*	CXdi = Xdi  /(q.S);
+	CYdi = Ydi  /(q.S);
+	CZdi = Zdi  /(q.S);
+	CLdi = Ldi  /(q.S.b);
+	CMdi = Mdi  /(q.S.mac);
+	CNdi = Ndi  /(q.S.b);*/
+	
+	double q = 1./2. * m_pWPolar->m_Density * u0 * u0;
+	double b   = m_pWPolar->m_WSpan;
+	double S   = m_pWPolar->m_WArea;
+	double mac = m_pWing->m_MAChord;
+	
 	int nCtrl=0;
 	if(m_pPlane)
 	{
 		//wing incidence
 
-		str = "    Derivatives w.r.t. wing incidence\n";
+		str = tr("    Derivatives w.r.t. wing incidence")+"\n";
 		AddString(str);
-		str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],10,'g',5);
+		str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],10,'g',5);
+		str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],10,'g',5);
+		str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],10,'g',5);
+		str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 		AddString(str);
-		str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],10,'g',5);
+		str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 		AddString(str);
-		str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],10,'g',5);
-		AddString(str);
+		str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+		                                              .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
+		AddString(str+"\n");
 		
 		nCtrl=1;
 
@@ -790,20 +813,26 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		{
 			//elevator incidence
 
-			str = "    Derivatives w.r.t. elevator incidence\n";
+			str = tr("    Derivatives w.r.t. elevator incidence")+"\n";
 			AddString(str);
-			str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],10,'g',5);
+			str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],10,'g',5);
+			str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],10,'g',5);
+			str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],10,'g',5);
+			str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 			AddString(str);
-			str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],10,'g',5);
+			str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 			AddString(str);
-			str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],10,'g',5);
-			AddString(str);
+			str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
+			AddString(str+"\n");
 			
 			nCtrl = 2;
 		}
@@ -817,20 +846,27 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	{
 		if(m_pWing->m_Surface[j].m_bTEFlap)
 		{
-			str = QString("    Derivatives w.r.t. Wing Flap %1\n").arg(nFlap);
+			str = QString(tr("    Derivatives w.r.t. wing flap %1")+"\n").arg(nFlap);
 			AddString(str);
-			str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
+			str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
+			str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
+			str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 			AddString(str);
-			str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
+			str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 			AddString(str);
-			str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
+			str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 			AddString(str);
-			str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
-			AddString(str);
+			str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+														  .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
+			AddString(str+"\n");
+
 			nCtrl++;
 			nFlap++;
 		}
@@ -843,20 +879,25 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		{
 			if(m_pStab->m_Surface[j].m_bTEFlap)
 			{
-				str = QString("    Derivatives w.r.t. Elevator Flap %1\n").arg(nFlap);
+				str = QString(tr("    Derivatives w.r.t. elevator flap %1")+"\n").arg(nFlap);
+				str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
+				str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
+				str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
+				str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 				AddString(str);
-				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
+				str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 				AddString(str);
-				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
-				AddString(str);
-				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
-				AddString(str);
+				str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
+				AddString(str+"\n");
 				
 				nCtrl++;
 				nFlap++;
@@ -870,21 +911,27 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		{
 			if(m_pFin->m_Surface[j].m_bTEFlap)
 			{
-				str = QString("    Derivatives w.r.t. Fin Flap %1\n").arg(nFlap);
+				str = QString(tr("    Derivatives w.r.t. fin flap %1")+"\n").arg(nFlap);
 				AddString(str);
-				str = QString("    Xde%1=%2 \n").arg(nCtrl).arg(Xde[nCtrl],14,'g',5);
+				str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Yde%1=%2 \n").arg(nCtrl).arg(Yde[nCtrl],14,'g',5);
+				str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Zde%1=%2 \n").arg(nCtrl).arg(Zde[nCtrl],14,'g',5);
+				str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 				AddString(str);
-				str = QString("    Lde%1=%2 \n").arg(nCtrl).arg(Lde[nCtrl],14,'g',5);
+				str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 				AddString(str);
-				str = QString("    Mde%1=%2 \n").arg(nCtrl).arg(Mde[nCtrl],14,'g',5);
+				str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 				AddString(str);
-				str = QString("    Nde%1=%2 \n\n").arg(nCtrl).arg(Nde[nCtrl],14,'g',5);
-				AddString(str);
-				
+				str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+															  .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
+				AddString(str+"\n");
+			
 				nCtrl++;
 				nFlap++;
 			}
@@ -1225,7 +1272,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 
 	while (fabs(Cm)>eps && iter<=CM_ITER_MAX)
 	{
-	a = a0 - (a1-a0) * Cm0/(Cm1-Cm0);
+		a = a0 - (a1-a0) * Cm0/(Cm1-Cm0);
 		Cm = VLMComputeCm(a*180.0/PI);
 		if(Cm>0.0)
 		{
@@ -1971,7 +2018,7 @@ bool StabAnalysisDlg::SolveEigenvalues()
 	}
 
 	
-	str = "\n\n   Lateral modes____\n\n";
+	str = "\n\n   ___Lateral modes____\n\n";
 	AddString(str);
 
 	str = QString("      Eigenvalue:  %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
@@ -2049,6 +2096,8 @@ void StabAnalysisDlg::StartAnalysis()
 	m_bCancel = false;
 	strong = "Launching VLM Analysis....\n\n";
 	AddString(strong);
+
+	
 	strong = QString("Total VLM panels = %1\n\n").arg(m_MatSize);
 	AddString(strong);
 

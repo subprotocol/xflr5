@@ -34,6 +34,7 @@ class CPlane
 	friend class CWing;
 	friend class PlaneDlg;
 	friend class VLMAnalysisDlg;
+	friend class PanelAnalysisDlg;
 	friend class StabAnalysisDlg;
 	friend class ManageBodiesDlg;
 	friend class CtrlPolarDlg;
@@ -67,8 +68,6 @@ protected:
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
-//	CVector m_CoG;
-//	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	QString m_PlaneDescription;

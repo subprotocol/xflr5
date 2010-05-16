@@ -2441,6 +2441,15 @@ void QMiarex::CreateCpCurves()
 
 int QMiarex::CreateElements(CSurface *pSurface)
 {
+	// Creates the panel elements that will be used either by the VLM or the Panel method.
+	// The panels are created from left to right on a surface
+	// The panels are created depending on the current WPolar:
+	// No WPolar --> panel elements on top & bottom surfaces, just for cosmetics
+	// VLM       --> panel elements on mid camber line from T.E. to L.E.
+	// 3D Panels --> panel elements on left tip surface
+	//               panel elements on each strip, starting on the bottom T.E. to the L.E back to the opt T.E
+	//               panel elements on right tip surface
+	
 	//TODO : for  a gap at the wing's center, need to separate m_iPL and m_iPR at the tips;
 	bool bNoJoinFlap ;
 	int k,l;
@@ -4381,7 +4390,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 {
-	//draws the WPolar legend to the device context,
+	// draws the WPolar legend usin the selected painter
 	// bottom is the lower limit not to exceed for the legend
 
 	painter.save();
@@ -4389,7 +4398,6 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int LegendSize, LegendWidth, ypos;
 	int i,j,k,l, ny, x1;
-
 
 	LegendSize = 30;
 	LegendWidth = 280;
@@ -4455,22 +4463,23 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 		for (l=0; l < m_poaWPolar->size(); l++)
 		{
 			pWPolar = (CWPolar*)m_poaWPolar->at(l);
+
 			if (pWPolar->m_Alpha.size() &&
 				pWPolar->m_PlrName.length() &&
 				pWPolar->m_bIsVisible &&
+				((pWPolar->m_AnalysisType==4 && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 				pWPolar->m_UFOName == str.at(k) &&
-								((pWPolar->m_Type == 1 && m_bType1) ||
-								 (pWPolar->m_Type == 2 && m_bType2) ||
-								 (pWPolar->m_Type == 4 && m_bType4) ||
-								 (pWPolar->m_Type == 5 && m_bType5) ||
-								 (pWPolar->m_Type == 6 && m_bType6) ||
-								 (pWPolar->m_Type == 7 && m_bType7)))
-
+				((pWPolar->m_Type == 1 && m_bType1) ||
+				 (pWPolar->m_Type == 2 && m_bType2) ||
+				 (pWPolar->m_Type == 4 && m_bType4) ||
+				 (pWPolar->m_Type == 5 && m_bType5) ||
+				 (pWPolar->m_Type == 6 && m_bType6) ||
+				 (pWPolar->m_Type == 7 && m_bType7)))
 			{
 					UFOPlrs++;
-
 			}
 		}
+
 		if (UFOPlrs)
 		{
 			int YPos = place.y() + (ny+UFOPlrs+2) * ypos;// bottom line of this foil's legend
@@ -4493,13 +4502,17 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 				pWPolar = (CWPolar*)m_poaWPolar->at(nc);
 				if(str.at(k) == pWPolar->m_UFOName)
 				{
-					if ( pWPolar->m_Alpha.size() &&	pWPolar->m_PlrName.length() &&	pWPolar->m_bIsVisible &&
-					   ((pWPolar->m_Type == 1 && m_bType1) ||
-						(pWPolar->m_Type == 2 && m_bType2) ||
-						(pWPolar->m_Type == 4 && m_bType4) ||
-						(pWPolar->m_Type == 5 && m_bType5) ||
-						(pWPolar->m_Type == 6 && m_bType6) ||
-						(pWPolar->m_Type == 7 && m_bType7)))
+					if (pWPolar->m_Alpha.size() &&
+						pWPolar->m_PlrName.length() &&
+						pWPolar->m_bIsVisible &&
+						((pWPolar->m_AnalysisType==4 && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+						pWPolar->m_UFOName == str.at(k) &&
+						((pWPolar->m_Type == 1 && m_bType1) ||
+						 (pWPolar->m_Type == 2 && m_bType2) ||
+						 (pWPolar->m_Type == 4 && m_bType4) ||
+						 (pWPolar->m_Type == 5 && m_bType5) ||
+						 (pWPolar->m_Type == 6 && m_bType6) ||
+						 (pWPolar->m_Type == 7 && m_bType7)))
 					{
 
 						LegendPen.setColor(pWPolar->m_Color);
@@ -6316,8 +6329,26 @@ void QMiarex::GLSetupLight()
 
 bool QMiarex::InitializePanels()
 {
+	//
+	// Following the selection of a wing or plane, this subroutine creates the panels
+	// associated to the surface objects.
+	//
+	// The surface objects have already been created in CWing::CreateSurfaces,
+	//
+	// m_Panel is the array of panels in the following order
+	//         main wing left side, main wing right side
+	//         elevator 
+	//         fin
+	//         body
+	// m_pPanel is an array of pointers to panels, re-arranged to enable symmetric calculations
+	// --> creates unnecessary complications, will be dropped in a future version
+	// --> stability analysis does not use symmetry arrangements
+	
 	if(!m_pCurWing) return false;
 	int j,k,l;
+	int p, pp;
+	int Nel;
+
 	QProgressDialog dlg(this);
 	dlg.setLabelText(tr("Creating Elements... please Wait"));
 	dlg.setMinimum(0);
@@ -6325,8 +6356,8 @@ bool QMiarex::InitializePanels()
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.setValue(0);
 
-	int p, pp;
-	int Nel;
+	// first check that the total number of panels that will be created does not exceed
+	// the limit set by the parameter VLMMATSIZE
 	m_MatSize = 0;
 
 	for (j=0; j<m_NSurfaces; j++)
@@ -6366,6 +6397,8 @@ bool QMiarex::InitializePanels()
 		return false;
 	}
 
+	// all set to create the panels
+	
 	m_MatSize     = 0;
 	m_nNodes      = 0;
 	m_NWakeColumn = 0;
@@ -14685,6 +14718,7 @@ void QMiarex::SetUFO(QString UFOName)
 		m_pCurBody->SetKnots();
 		m_pCurBody->SetPanelPos();
 	}
+	
 	if(m_pCurWing)
 	{
 		if(m_pCurPlane)	m_pCurWing->CreateSurfaces(m_pCurPlane->m_LEWing, 0.0, WingTilt);

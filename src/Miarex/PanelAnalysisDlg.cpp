@@ -2683,12 +2683,28 @@ void PanelAnalysisDlg::StartAnalysis()
 	m_bIsFinished = false;
 	strong = tr("Launching 3D Panel Analysis....")+"\n\n";
 	AddString(strong);
+	
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	if(m_pPlane)
+	{
+		QString len, str;
+		GetLengthUnit(len, pMainFrame->m_LengthUnit);
+		if(fabs(m_pPlane->m_LEWing.z-m_pPlane->m_LEStab.z)<.0001)
+		{	
+			str = QString("%1 ").arg(m_pPlane->m_LEWing.z*pMainFrame->m_mtoUnit, 7, 'g', 3);
+			strong = tr("Warning: The wing and elevator lie in the same plane z=")+str+len+"\n";
+			AddString(strong);
+			strong = tr("It is recommended to slightly offset the wing or the elevator to avoid numerical instabilities")+"\n\n";
+			AddString(strong);
+			
+		}
+	}
 
 	strong = QString(tr("Type %1 Analysis")+"\n\n").arg(m_pWPolar->m_Type);
 	AddString(strong);
 	m_bCancel = false;
 
-		if(m_pWPolar->m_Type<3)
+	if(m_pWPolar->m_Type<3)
 	{
 		if(m_pWPolar->m_bTiltedGeom) UnitLoop();
 		else                         AlphaLoop();

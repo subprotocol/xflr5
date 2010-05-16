@@ -724,6 +724,7 @@ void VLMAnalysisDlg::StartAnalysis()
 	strong = QString(tr("Type %1 Analysis\n\n")).arg(m_pWPolar->m_Type);
 	AddString(strong);
 	m_bCancel = false;
+	
 
 	if(m_pWPolar->m_Type<3)
 	{
