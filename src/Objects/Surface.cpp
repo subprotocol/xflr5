@@ -652,7 +652,7 @@ bool CSurface::RotateFlap(double const &Angle)
 	int k,l,p, iFlap;
 	double alpha0;
 	Quaternion Quat;
-	CVector H, HA, HB, R, S;
+	CVector R, S;
 	iFlap = 0;
 	p     = 0;
 

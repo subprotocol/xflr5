@@ -70,19 +70,12 @@ void Quaternion::Set(double const &Angle, CVector const &R)
 	a = cos(theta/2.0);
 	double sina = sin(theta/2.0);
 
-	if(Angle>=0.0)
-	{
-	}
-	else
-	{
-		qx = -R.x*sina;
-		qy = -R.y*sina;
-		qz = -R.z*sina;
-	}
-		qx = R.x*sina;
-		qy = R.y*sina;
-		qz = R.z*sina;
+	qx = R.x*sina;
+	qy = R.y*sina;
+	qz = R.z*sina;
 }
+
+
 
 void Quaternion::Conjugate(CVector const &Vin, CVector &Vout)
 {
@@ -100,6 +93,7 @@ void Quaternion::Conjugate(CVector const &Vin, CVector &Vout)
 	Vout.y = 2.0*( (t4 +  t6)*Vin.x + (t5 + t10)*Vin.y + (t9 - t2)*Vin.z ) + Vin.y;
 	Vout.z = 2.0*( (t7 -  t3)*Vin.x + (t2 +  t9)*Vin.y + (t5 + t8)*Vin.z ) + Vin.z;
 }
+
 
 void Quaternion::Conjugate(double &x, double &y, double &z)
 {
@@ -176,6 +170,7 @@ void Quaternion::QuattoMat(double m[][4])
 
 }	
 
+
 void Quaternion::operator *=(Quaternion Q)
 {
 	double t1,t2,t3,t4;
@@ -191,6 +186,7 @@ void Quaternion::operator *=(Quaternion Q)
 	qz = t4;
 }
 
+
 Quaternion Quaternion::operator *(Quaternion Q)
 {
 	Quaternion prod;
@@ -203,6 +199,7 @@ Quaternion Quaternion::operator *(Quaternion Q)
 
 	return prod;
 }
+
 
 void Quaternion::operator =(Quaternion Q)
 {

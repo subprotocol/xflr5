@@ -94,7 +94,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 				*(pa + i) = *(A_pivot_row + i);
 				*(A_pivot_row + i) = dum;
 			}
-			for(k=0; k<=m; k++)
+			for(k=0; k<m; k++)
 			{
 				dum = B[row+k*n];
 				B[row+k*n] = B[pivot_row+k*n];
@@ -109,7 +109,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 			dum = - *(pA + row) / *(pa + row);
 			*(pA + row) = 0.0;
 			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
-			for (k=0; k<=m; k++)
+			for (k=0; k<m; k++)
 				B[i+k*n] += dum * B[row+k*n];
 		}
 	}
@@ -127,12 +127,12 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 		}
 		dum = 1.0 / *(pa + row);
 		for ( i = row + 1; i < n; i++) *(pa + i) *= dum;
-		for(k=0; k<=m; k++) B[row+k*n] *= dum;
+		for(k=0; k<m; k++) B[row+k*n] *= dum;
 		for ( i = 0, pA = A; i < row; pA += n, i++)
 		{
 			dum = *(pA + row);
 			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
-			for(k=0; k<=m; k++)
+			for(k=0; k<m; k++)
 				B[i+k*n] -= dum * B[row+k*n];
 		}
 	}

@@ -407,7 +407,7 @@ void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGI
 			CoGIxx += LocalVolume*rho * ( (PtC4.y-CoG.y)*(PtC4.y-CoG.y) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
 			CoGIyy += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
 			CoGIzz += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.y-CoG.y)*(PtC4.y-CoG.y) );
-			CoGIxz -= LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
+			CoGIxz += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
 			recalcMass += LocalVolume*rho;
 			recalcVolume +=LocalVolume;
 		}

@@ -5546,7 +5546,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				{
 					ar >>f; pMiarex->m_WngAnalysis.m_Beta=f;
 				}
-
 				ar >> pMiarex->m_WngAnalysis.m_AnalysisType;
 			}
 			if(ArchiveFormat>=100006)
@@ -5573,7 +5572,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			// and read n again
 			ar >> n;
 		}
-
 		// WINGS FIRST
 		for (i=0;i<n; i++)
 		{
@@ -5598,12 +5596,14 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		//THEN WPOLARS
 		
 		ar >> n;// number of WPolars to load
+qDebug() << "WPolars"<<n;
 		bool bWPolarOK;
 		for (i=0;i<n; i++)
 		{
 			pWPolar = new CWPolar;
 			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 
+qDebug()<< pWPolar->m_PlrName;
 			if (!bWPolarOK)
 			{
 				if(pWPolar) delete pWPolar;
@@ -5677,7 +5677,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				return false;
 			}
 		}
-
 		if(n==100000)
 		{
 			for (j=0; j<m_oaPolar.size(); j++)

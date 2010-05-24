@@ -65,6 +65,7 @@ private:
 	void BuildStateMatrices();
 	void ComputeBodyAxisInertia();
 	void ComputeControlDerivatives();
+	void SolveCtrlDer(int ic, double const & DeltaAngle, double *Xd, double *d, double *Zd, double *Ld, double *Md, double *Nd);
 	void ComputeResults();
 	void ComputeStabilityDerivatives();
 	void ComputeStabilityInertia();

@@ -32,6 +32,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
+#include <QtDebug>
 
 QList <void*> *PlaneDlg::s_poaWing;
 QList <void*> *PlaneDlg::s_poaBody;
@@ -49,9 +50,9 @@ PlaneDlg::PlaneDlg()
 	m_bChanged      = false;
 	SetupLayout();
 
-	connect(m_pctrlBiplane, SIGNAL(clicked()), this, SLOT(OnBiplane()));
-	connect(m_pctrlStabCheck,     SIGNAL(clicked()), this, SLOT(OnStab()));
-	connect(m_pctrlFinCheck,     SIGNAL(clicked()), this, SLOT(OnFin()));
+	connect(m_pctrlBiplane,   SIGNAL(clicked()), this, SLOT(OnBiplane()));
+	connect(m_pctrlStabCheck, SIGNAL(clicked()), this, SLOT(OnStab()));
+	connect(m_pctrlFinCheck,  SIGNAL(clicked()), this, SLOT(OnFin()));
 
 	connect(m_pctrlSymFin,    SIGNAL(clicked()), this, SLOT(OnSymFin()));
 	connect(m_pctrlDoubleFin, SIGNAL(clicked()), this, SLOT(OnDoubleFin()));
@@ -62,9 +63,9 @@ PlaneDlg::PlaneDlg()
 	connect(m_pctrlDefineWing2, SIGNAL(clicked()), this, SLOT(OnDefineWing2()));
 	connect(m_pctrlImportWing2, SIGNAL(clicked()), this, SLOT(OnImportWing2()));
 	connect(m_pctrlExportWing2, SIGNAL(clicked()), this, SLOT(OnExportWing2()));
-	connect(m_pctrlDefineStab, SIGNAL(clicked()), this, SLOT(OnDefineStab()));
-	connect(m_pctrlDefineFin, SIGNAL(clicked()), this, SLOT(OnDefineFin()));
-	connect(m_pctrlEditBody, SIGNAL(clicked()), this, SLOT(OnEditBody()));
+	connect(m_pctrlDefineStab,  SIGNAL(clicked()), this, SLOT(OnDefineStab()));
+	connect(m_pctrlDefineFin,   SIGNAL(clicked()), this, SLOT(OnDefineFin()));
+	connect(m_pctrlEditBody,    SIGNAL(clicked()), this, SLOT(OnEditBody()));
 
 	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnInertia()));
 
@@ -127,10 +128,6 @@ void PlaneDlg::ComputePlane(void)
 void PlaneDlg::InitDialog()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	m_pctrlWingTilt->SetPrecision(1);
-	m_pctrlStabTilt->SetPrecision(1);
-	m_pctrlFinTilt->SetPrecision(1);
-
 	QString len, surf;
 	GetLengthUnit(len, pMainFrame->m_LengthUnit);
 	GetAreaUnit(surf,  pMainFrame->m_AreaUnit);
@@ -888,7 +885,7 @@ void PlaneDlg::SetupLayout()
 	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEWing = new FloatEdit(0.00);
 	m_pctrlZLEWing = new FloatEdit(0.00);
-	m_pctrlWingTilt = new FloatEdit(0.0);
+	m_pctrlWingTilt = new FloatEdit(0.0,2);
 	m_pctrlLen1 = new QLabel("mm");
 	m_pctrlLen2 = new QLabel("mm");
 	QLabel *lab4 = new QLabel(QString::fromUtf8("°"));
@@ -921,7 +918,7 @@ void PlaneDlg::SetupLayout()
 	lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEWing2 = new FloatEdit(0.00);
 	m_pctrlZLEWing2 = new FloatEdit(0.00);
-	m_pctrlWingTilt2 = new FloatEdit(0.0);
+	m_pctrlWingTilt2 = new FloatEdit(0.0,2);
 	m_pctrlLen3 = new QLabel("mm");
 	m_pctrlLen4 = new QLabel("mm");
 	QLabel *lab14 = new QLabel(QString::fromUtf8("°"));
@@ -951,7 +948,7 @@ void PlaneDlg::SetupLayout()
 	lab23->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlXLEStab = new FloatEdit(550.00);
 	m_pctrlZLEStab = new FloatEdit(550.00);
-	m_pctrlStabTilt = new FloatEdit(0.0);
+	m_pctrlStabTilt = new FloatEdit(0.0,1);
 	m_pctrlLen5 = new QLabel("mm");
 	m_pctrlLen6 = new QLabel("mm");
 	QLabel *lab24 = new QLabel(QString::fromUtf8("°"));
@@ -985,7 +982,7 @@ void PlaneDlg::SetupLayout()
 	m_pctrlXLEFin = new FloatEdit(600.00);
 	m_pctrlYLEFin = new FloatEdit(0.00);
 	m_pctrlZLEFin = new FloatEdit(50.00);
-	m_pctrlFinTilt = new FloatEdit(0.0);
+	m_pctrlFinTilt = new FloatEdit(0.0,2);
 	m_pctrlLen7= new QLabel("mm");
 	m_pctrlLen8 = new QLabel("mm");
 	m_pctrlLen9 = new QLabel("mm");

@@ -129,7 +129,6 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 	// We have an equilibrium position defined by AlphaEq
 	// We just rotate the normals, we do not modify the geometry
 	//
-	
 	static Quaternion Quat;
 	static CVector is, js, ks;
 	static CVector H, RN, VInf;
@@ -143,13 +142,12 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 	
-
 	VInf.Set(u0*cos(m_AlphaEq*PI/180.0), 0.0, u0*sin(m_AlphaEq*PI/180));
 	nCtrl = 0;
-	
+
 	for(p=0; p<m_MatSize;p++)
 	{
-		m_uRHS[p] = VInf.dot(m_pPanel[p].Normal);
+		m_uRHS[p] = -VInf.dot(m_pPanel[p].Normal);
 	}
 
 	pos = 0;
@@ -164,7 +162,7 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 		for(j=0; j<m_pWing->m_MatSize; j++)
 		{
 			Quat.Conjugate(m_pWing->m_pPanel[j].Normal, RN);
-			m_cRHS[nCtrl*m_MatSize+j] = VInf.dot(RN);
+			m_cRHS[nCtrl*m_MatSize+j] = -VInf.dot(RN);
 		}
 		pos = m_pWing->m_MatSize;
 		
@@ -176,10 +174,10 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 			memcpy(m_cRHS+nCtrl*m_MatSize, m_uRHS, m_MatSize*sizeof(double));
 			Quat.Set(DeltaAngle, H);
 	
-			for(j=0; j<m_pStab->m_MatSize; j++)
+			for(p=0; p<m_pStab->m_MatSize; p++)
 			{
-				Quat.Conjugate(m_pStab->m_pPanel[j].Normal, RN);
-				m_cRHS[nCtrl*m_MatSize+pos+j] = VInf.dot(RN);
+				Quat.Conjugate(m_pStab->m_pPanel[p].Normal, RN);
+				m_cRHS[nCtrl*m_MatSize+pos+p] = -VInf.dot(RN);
 			}
 			nCtrl++;
 		}
@@ -200,7 +198,7 @@ void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
 				if(m_ppSurface[j]->IsFlapPanel(p))
 				{
 					Quat.Conjugate(m_pPanel[p].Normal, RN);
-					m_cRHS[nCtrl*m_MatSize+p] = VInf.dot(RN);
+					m_cRHS[nCtrl*m_MatSize+p] = -VInf.dot(RN);
 				}
 //				else m_cRHS[nCtrl*m_MatSize+p] = VInf.dot(m_pPanel[p].Normal);
 			}
@@ -217,7 +215,7 @@ bool StabAnalysisDlg::BuildInfluenceMatrix()
 	// which give the influence of vortex pp on the panel p
 	//
 	static int p, pp;
-	static CVector V, VS, CC;
+	static CVector V;
 
 	AddString("      Creating the influence matrix...\n");
 
@@ -226,8 +224,6 @@ bool StabAnalysisDlg::BuildInfluenceMatrix()
 		qApp->processEvents();
 
 		if(m_bCancel) break;
-		CC = m_pPanel[p].CtrlPt;
-		CC.y = -CC.y;
 
 		for(pp=0; pp<m_MatSize; pp++)
 		{
@@ -486,7 +482,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 			Ixx += m_pPlane->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 			Iyy += m_pPlane->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 			Izz += m_pPlane->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= m_pPlane->m_MassValue[i] * (LA.x*LA.z);
+			Ixz += m_pPlane->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
 
@@ -497,7 +493,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 		Ixx += m_pWing->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 		Iyy += m_pWing->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 		Izz += m_pWing->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz -= m_pWing->m_MassValue[i] * (LA.x*LA.z);
+		Ixz += m_pWing->m_MassValue[i] * (LA.x*LA.z);
 	}
 
 	if(m_pWing2)
@@ -508,7 +504,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 			Ixx += m_pWing2->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 			Iyy += m_pWing2->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 			Izz += m_pWing2->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= m_pWing2->m_MassValue[i] * (LA.x*LA.z);
+			Ixz += m_pWing2->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
 	if(m_pStab)
@@ -519,7 +515,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 			Ixx += m_pStab->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 			Iyy += m_pStab->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 			Izz += m_pStab->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= m_pStab->m_MassValue[i] * (LA.x*LA.z);
+			Ixz += m_pStab->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
 
@@ -531,7 +527,7 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 			Ixx += m_pFin->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 			Iyy += m_pFin->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 			Izz += m_pFin->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= m_pFin->m_MassValue[i] * (LA.x*LA.z);
+			Ixz += m_pFin->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
 
@@ -545,14 +541,14 @@ void StabAnalysisDlg::ComputeBodyAxisInertia()
 			Ixx += pBody->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 			Iyy += pBody->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 			Izz += pBody->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= pBody->m_MassValue[i] * (LA.x*LA.z);
+			Ixz += pBody->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
 
 	m_Ib[0][0] = Ixx;
 	m_Ib[1][1] = Iyy;
 	m_Ib[2][2] = Izz;
-	m_Ib[0][2] = m_Ib[2][0] = Ixz;
+	m_Ib[0][2] = m_Ib[2][0] = -Ixz;
 	m_Ib[1][0] = m_Ib[1][2] = m_Ib[0][1] = m_Ib[2][1] = 0.0;
 }
 
@@ -701,6 +697,44 @@ void StabAnalysisDlg::ComputeResults()
 }
 
 
+
+void StabAnalysisDlg::SolveCtrlDer(int ic, double const & DeltaAngle,
+								   double *Xd, double *Yd, double *Zd, double *Ld, double *Md, double *Nd)
+{
+	CVector Force, Moment, is, js, ks;
+	double cosa, sina;
+	
+	cosa = cos(m_AlphaEq*PI/180);
+	sina = sin(m_AlphaEq*PI/180);
+	
+	is.Set(-cosa, 0.0, -sina);
+	js.Set(  0.0, 1.0,   0.0);
+	ks.Set( sina, 0.0, -cosa);
+	
+	QString strong = QString("     Solving the linear system for control %1\n").arg(ic);
+	AddString(strong); 
+	
+	Gauss(m_aij, m_MatSize, m_cRHS+ic*m_MatSize, 1, &m_bCancel);
+	
+	strong = "     Calculating the control derivatives\n\n";
+	AddString(strong);
+	
+	Forces(m_cRHS+ic*m_MatSize, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	
+	// make the difference with nominal results
+	// which gives the stability derivative for a rotation of control ic
+	
+	qDebug("%d   %12.5g    %12.5g  ",ic,Force.dot(ks),Force0.dot(ks));
+	
+	*Xd = (Force-Force0).dot(is)/DeltaAngle;
+	*Yd = (Force-Force0).dot(js)/DeltaAngle;
+	*Zd = (Force-Force0).dot(ks)/DeltaAngle;
+	*Ld = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
+	*Md = (Moment - Moment0).dot(js) /DeltaAngle;
+	*Nd = (Moment - Moment0).dot(ks) /DeltaAngle;
+}
+
+
 void StabAnalysisDlg::ComputeControlDerivatives()
 {
 	//
@@ -711,23 +745,30 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	//
 	// Two options :
 	//    1. Keep it simple, just change the normal vector of the rotated panels
-	//       Advantage : the influence matrix is unchanged
+	//       Advantage : only the RHS and a few columns of the influence matrix need to be changed
 	//    2. A bit more complicated, regenerate the geometry.
 	//       Advantage : More representative
 	// Since we consider only small perturbations, use option 1
 	//
-
-	static CVector  Force, Moment, V0, is, js, ks;
-	static int ic;
+	static CVector  V0, H, RN, V, C, H0;
+	static int j, ic, p, pp;
 	static double sina, cosa, DeltaAngle;
 	QString str;
+	Quaternion Quat;
+
+	cosa = cos(m_AlphaEq*PI/180);
+	sina = sin(m_AlphaEq*PI/180);
+	
+	V0.Set(u0*cosa, 0.0, u0*sina);
+
+	double q = 1./2. * m_pWPolar->m_Density * u0 * u0;
+	double b   = m_pWPolar->m_WSpan;
+	double S   = m_pWPolar->m_WArea;
+	double mac = m_pWing->m_MAChord;
 
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
-	is.Set(-cosa, 0.0, -sina);
-	js.Set(  0.0, 1.0,   0.0);
-	ks.Set( sina, 0.0, -cosa);
 
 	DeltaAngle = 0.001; //rad
 	BuildControlRHS(DeltaAngle*180.0/PI);
@@ -736,50 +777,109 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	{
 		Xde[ic] = Yde[ic] =  Zde[ic] = Lde[ic] = Mde[ic] = Nde[ic] = 0.0;
 	}
-
-//	baksub(Size, m_aij, m_Index, m_cRHS, m_NCtrls, &m_bCancel);
-	memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-	Gauss(m_aij, m_MatSize, m_cRHS, m_NCtrls, &m_bCancel);
-
+	
 	str = "\n   ___Control derivatives____\n";
 	AddString(str);
-
-	//For each control, compute the stability derivative
-	//  Longitudinal control derivatives : Xde/Zde/Mde
-	//  Lateral stability derivatives :    Yde/Lde/Zde
-	V0 = is * u0;
+	
+	
+	// set the freestream veolocity field
 	for (int p=0; p<m_MatSize; p++)
 	{
 		m_RHS[50*m_MatSize+p] = V0.x;
 		m_RHS[51*m_MatSize+p] = V0.y;
 		m_RHS[52*m_MatSize+p] = V0.z;	
 	}
-	for(ic=0; ic<m_NCtrls; ic++)
-	{
-		Forces(m_cRHS+ic*m_MatSize, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	
+	//For each control, compute the stability derivative
+	//  Longitudinal control derivatives : Xde/Zde/Mde
+	//  Lateral stability derivatives :    Yde/Lde/Zde
+	
+	
+	ic = 0;
 
-		// make the difference with nominal results
-		// which gives the stability derivative for a unit angle rotation of control ic
-		Xde[ic] = (Force.dot(is)  - Force0.dot(is))  /DeltaAngle;
-		Yde[ic] = (Force.dot(js)  - Force0.dot(js))  /DeltaAngle;
-		Zde[ic] = (Force.dot(ks)  - Force0.dot(ks))  /DeltaAngle;
-		Lde[ic] = (Moment.dot(is) - Moment0.dot(is)) /DeltaAngle;
-		Mde[ic] = (Moment.dot(js) - Moment0.dot(js)) /DeltaAngle;
-		Nde[ic] = (Moment.dot(ks) - Moment0.dot(ks)) /DeltaAngle;
+	if(m_pPlane && ic==0)
+	{
+		// reload the base influence matrix
+		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+		//Wing tilt
+		H0 = m_pPlane->m_LEWing;//hinge origin
+		H.Set(0.0, 1.0, 0.0);
+		Quat.Set(DeltaAngle*180.0/PI, H);
+		// if panel p is on the modified control surface, then change 
+		// the influence coefficient of all panels pp at ctrl point p
+		str = "    Changing the influence matrix and RHS for wing tilt control\n";
+		AddString(str);
+		for(p=0; p<m_pWing->m_MatSize; p++)
+		{
+			Quat.Conjugate(m_pWing->m_pPanel[p].Normal, RN);
+			for(pp=0; pp<m_MatSize; pp++)
+			{
+				C = m_pPanel[p].CtrlPt;
+				C.RotateY(H0, DeltaAngle*180.0/PI);
+				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
+				m_aij[p*m_MatSize+pp] = V.dot(RN);
+			}
+		}
+		SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+		ic=1;
+	}
+	if(m_pPlane && m_pStab && ic==1)
+	{
+		str = "    Changing the influence matrix and RHS for elevator tilt control\n";
+		AddString(str);
+		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+		//Elevator tilt
+		H0 = m_pPlane->m_LEStab;//hinge origin
+		H.Set(0.0, 1.0, 0.0);
+		Quat.Set(DeltaAngle*180.0/PI, H);
+		int pos = m_pWing->m_MatSize;
+
+		//change the influence of each panel of the plane at each of the elevator's ctrl points
+		for(p=0; p<m_pStab->m_MatSize; p++)
+		{
+			Quat.Conjugate(m_pPanel[p+pos].Normal, RN);
+			for(pp=0; pp<m_MatSize; pp++)
+			{
+				C= m_pPanel[p+pos].CtrlPt;
+				C.RotateY(H0, DeltaAngle*180.0/PI);
+				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
+				m_aij[(p+pos)*m_MatSize+pp] = V.dot(RN);
+			}
+		}
+		SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+		ic++;
+	}
+
+	//flap tilt
+	for (j=0; j<m_NSurfaces; j++)
+	{				
+		if(m_ppSurface[j]->m_bTEFlap)
+		{					
+			str = QString("    Changing the influence matrix and RHS for flap control %1\n").arg(ic);
+			AddString(str);
+			memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+			Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
+		
+			for(p=0; p<m_MatSize; p++)
+			{
+				if(m_ppSurface[j]->IsFlapPanel(p))
+				{
+					Quat.Conjugate(m_pPanel[p].Normal, RN);
+
+					for(pp=0; pp<m_MatSize; pp++)
+					{
+						C.Copy(m_pPanel[p].CtrlPt);
+						C.RotateY(m_ppSurface[j]->m_HingePoint, DeltaAngle*180.0/PI);
+						VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
+						m_aij[p*m_MatSize+pp] = V.dot(RN);
+					}
+				}
+			}
+			SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+			ic++;
+		}
 	}
 	
-	
-/*	CXdi = Xdi  /(q.S);
-	CYdi = Ydi  /(q.S);
-	CZdi = Zdi  /(q.S);
-	CLdi = Ldi  /(q.S.b);
-	CMdi = Mdi  /(q.S.mac);
-	CNdi = Ndi  /(q.S.b);*/
-	
-	double q = 1./2. * m_pWPolar->m_Density * u0 * u0;
-	double b   = m_pWPolar->m_WSpan;
-	double S   = m_pWPolar->m_WArea;
-	double mac = m_pWing->m_MAChord;
 	
 	int nCtrl=0;
 	if(m_pPlane)
@@ -788,22 +888,22 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 
 		str = tr("    Derivatives w.r.t. wing incidence")+"\n";
 		AddString(str);
-		str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],12,'g',5)
+		str = QString("    Xd%1=%2        CXd%3=%4\n").arg(nCtrl).arg(Xde[nCtrl],      12,'g',5)
 		                                              .arg(nCtrl).arg(Xde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],12,'g',5)
+		str = QString("    Yd%1=%2        CYd%3=%4\n").arg(nCtrl).arg(Yde[nCtrl],      12,'g',5)
 		                                              .arg(nCtrl).arg(Yde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],12,'g',5)
+		str = QString("    Zd%1=%2        CZd%3=%4\n").arg(nCtrl).arg(Zde[nCtrl],      12,'g',5)
 		                                              .arg(nCtrl).arg(Zde[nCtrl]/(q*S),12,'g',5);
 		AddString(str);
-		str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],12,'g',5)
+		str = QString("    Ld%1=%2        CLd%3=%4\n").arg(nCtrl).arg(Lde[nCtrl],        12,'g',5)
 		                                              .arg(nCtrl).arg(Lde[nCtrl]/(q*S*b),12,'g',5);
 		AddString(str);
-		str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],12,'g',5)
+		str = QString("    Md%1=%2        CMd%3=%4\n").arg(nCtrl).arg(Mde[nCtrl],          12,'g',5)
 		                                              .arg(nCtrl).arg(Mde[nCtrl]/(q*S*mac),12,'g',5);
 		AddString(str);
-		str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],12,'g',5)
+		str = QString("    Nd%1=%2        CNd%3=%4\n").arg(nCtrl).arg(Nde[nCtrl],        12,'g',5)
 		                                              .arg(nCtrl).arg(Nde[nCtrl]/(q*S*b),12,'g',5);
 		AddString(str+"\n");
 		
@@ -840,7 +940,6 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 
 	// flap controls
 	//wing first
-	int j;
 	int nFlap = 0;
 	for (j=0; j<m_pWing->m_NSurfaces; j++)
 	{
@@ -1084,42 +1183,42 @@ void StabAnalysisDlg::ComputeStabilityDerivatives()
 
 	str = "   ___Longitudinal derivatives____\n";
 	AddString(str);
-	str = QString("    Xu=%1 \n").arg(Xu,10,'f',5);
+	str = QString("    Xu=%1 \n").arg(Xu,12,'g',5);
 	AddString(str);
-	str = QString("    Xw=%1 \n").arg(Xw,10,'f',5);
+	str = QString("    Xw=%1 \n").arg(Xw,12,'g',5);
 	AddString(str);
-	str = QString("    Zu=%1 \n").arg(Zu,10,'f',5);
+	str = QString("    Zu=%1 \n").arg(Zu,12,'g',5);
 	AddString(str);
-	str = QString("    Zw=%1      CLa=%2\n").arg(Zw,10,'f',5).arg(Zw*   u0      /(q*S),10,'g',5);
+	str = QString("    Zw=%1      CLa=%2\n").arg(Zw,12,'g',5).arg(Zw*   u0      /(q*S),12,'g',5);
 	AddString(str);
-	str = QString("    Zq=%1      CLq=%2\n").arg(Zq,10,'f',5).arg(Zq* 2.*u0     /(q*S*mac),10,'g',5);
+	str = QString("    Zq=%1      CLq=%2\n").arg(Zq,12,'g',5).arg(Zq* 2.*u0     /(q*S*mac),12,'g',5);
 	AddString(str);
-	str = QString("    Mu=%1 \n").arg(Mu,10,'f',5);
+	str = QString("    Mu=%1 \n").arg(Mu,12,'g',5);
 	AddString(str);
-	str = QString("    Mw=%1      Cma=%2\n").arg(Mw,10,'f',5).arg(Mw*    u0     /(q*S*mac),10,'g',5);
+	str = QString("    Mw=%1      Cma=%2\n").arg(Mw,12,'g',5).arg(Mw*    u0     /(q*S*mac),12,'g',5);
 	AddString(str);
-	str = QString("    Mq=%1      Cmq=%2\n").arg(Mq,10,'f',5).arg(Mq*(2.*u0/mac)/(q*S*mac),10,'g',5);
+	str = QString("    Mq=%1      Cmq=%2\n").arg(Mq,12,'g',5).arg(Mq*(2.*u0/mac)/(q*S*mac),12,'g',5);
 	AddString(str);
 
 	str = "\n   ___Lateral derivatives____\n";
 	AddString(str);
-	str = QString("    Yv=%1      CYb=%2\n").arg(Yv,10,'f',5).arg(  Yv*    u0   /(q*S),10,'g',5);
+	str = QString("    Yv=%1      CYb=%2\n").arg(Yv,12,'g',5).arg(  Yv*    u0   /(q*S),12,'g',5);
 	AddString(str);
-	str = QString("    Yp=%1      CYp=%2\n").arg(Yp,10,'f',5).arg(  Yp* 2.*u0   /(q*S*b),10,'g',5);
+	str = QString("    Yp=%1      CYp=%2\n").arg(Yp,12,'g',5).arg(  Yp* 2.*u0   /(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Yr=%1      CYr=%2\n").arg(Yr,10,'f',5).arg(  Yr* 2.*u0   /(q*S*b),10,'g',5);
+	str = QString("    Yr=%1      CYr=%2\n").arg(Yr,12,'g',5).arg(  Yr* 2.*u0   /(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Lv=%1      Clb=%2\n").arg(Lv,10,'f',5).arg(  Lv*    u0   /(q*S*b),10,'g',5);
+	str = QString("    Lv=%1      Clb=%2\n").arg(Lv,12,'g',5).arg(  Lv*    u0   /(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Lp=%1      Clp=%2\n").arg(Lp,10,'f',5).arg(  Lp*(2.*u0/b)/(q*S*b),10,'g',5);
+	str = QString("    Lp=%1      Clp=%2\n").arg(Lp,12,'g',5).arg(  Lp*(2.*u0/b)/(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Lr=%1      Clr=%2\n").arg(Lr,10,'f',5).arg(  Lr*(2.*u0/b)/(q*S*b),10,'g',5);
+	str = QString("    Lr=%1      Clr=%2\n").arg(Lr,12,'g',5).arg(  Lr*(2.*u0/b)/(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Nv=%1      Cnb=%2\n").arg(Nv,10,'f',5).arg(  Nv*    u0   /(q*S*b),10,'g',5);
+	str = QString("    Nv=%1      Cnb=%2\n").arg(Nv,12,'g',5).arg(  Nv*    u0   /(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Np=%1      Cnp=%2\n").arg(Np,10,'f',5).arg(  Np*(2.*u0/b)/(q*S*b),10,'g',5);
+	str = QString("    Np=%1      Cnp=%2\n").arg(Np,12,'g',5).arg(  Np*(2.*u0/b)/(q*S*b),12,'g',5);
 	AddString(str);
-	str = QString("    Nr=%1      Cnr=%2\n\n").arg(Nr,10,'f',5).arg(Nr*(2.*u0/b)/(q*S*b),10,'g',5);
+	str = QString("    Nr=%1      Cnr=%2\n\n").arg(Nr,12,'g',5).arg(Nr*(2.*u0/b)/(q*S*b),12,'g',5);
 	AddString(str);
 
 	/*
@@ -1140,7 +1239,6 @@ void StabAnalysisDlg::ComputeStabilityDerivatives()
 	Zw = -Zw;
 	Zu = -Zu;
 }
-
 
 
 
@@ -1499,37 +1597,37 @@ bool StabAnalysisDlg::ControlLoop()
 			// Compute inertia in stability axes
 			ComputeStabilityInertia();
 
-			str = QString("      Mass=%1\n").arg(m_Mass, 10,'f',5);
+			str = QString("      Mass=%1\n").arg(m_Mass, 12,'g',5);
 			AddString(str);
 
 			str = "\n   ___Center of Gravity Position - Body axis____\n";
 			AddString(str);
-			str = QString("    CoG_x=%1\n").arg(m_CoG.x, 10,'f',5);
+			str = QString("    CoG_x=%1\n").arg(m_CoG.x, 12,'g',5);
 			AddString(str);
-			str = QString("    CoG_y=%1\n").arg(m_CoG.y, 10,'f',5);
+			str = QString("    CoG_y=%1\n").arg(m_CoG.y, 12,'g',5);
 			AddString(str);
-			str = QString("    CoG_z=%1\n").arg(m_CoG.z, 10,'f',5);
+			str = QString("    CoG_z=%1\n").arg(m_CoG.z, 12,'g',5);
 			AddString(str);
 
 			str = "\n   ___Inertia - Body Axis - CoG Origin____\n";
 			AddString(str);
-			str = QString("    Ibxx=%1\n").arg(m_Ib[0][0], 10,'f',5);
+			str = QString("    Ibxx=%1\n").arg(m_Ib[0][0], 12,'g',5);
 			AddString(str);
-			str = QString("    Ibyy=%1\n").arg(m_Ib[1][1], 10,'f',5);
+			str = QString("    Ibyy=%1\n").arg(m_Ib[1][1], 12,'g',5);
 			AddString(str);
-			str = QString("    Ibzz=%1\n").arg(m_Ib[2][2], 10,'f',5);
+			str = QString("    Ibzz=%1\n").arg(m_Ib[2][2], 12,'g',5);
 			AddString(str);
-			str = QString("    Ibxz=%1\n").arg(m_Ib[0][2], 10,'f',5);
+			str = QString("    Ibxz=%1\n").arg(m_Ib[0][2], 12,'g',5);
 			AddString(str);
 			str = "\n   ___Inertia - Stability Axis - CoG Origin____\n";
 			AddString(str);
-			str = QString("    Isxx=%1\n").arg(m_Is[0][0], 10,'f',5);
+			str = QString("    Isxx=%1\n").arg(m_Is[0][0], 12,'g',5);
 			AddString(str);
-			str = QString("    Isyy=%1\n").arg(m_Is[1][1], 10,'f',5);
+			str = QString("    Isyy=%1\n").arg(m_Is[1][1], 12,'g',5);
 			AddString(str);
-			str = QString("    Iszz=%1\n").arg(m_Is[2][2], 10,'f',5);
+			str = QString("    Iszz=%1\n").arg(m_Is[2][2], 12,'g',5);
 			AddString(str);
-			str = QString("    Isxz=%1\n").arg(m_Is[0][2], 10,'f',5);
+			str = QString("    Isxz=%1\n").arg(m_Is[0][2], 12,'g',5);
 			AddString(str);
 			AddString("\n");
 
@@ -2117,7 +2215,7 @@ void StabAnalysisDlg::StartAnalysis()
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
 		m_Ib[1][1] = m_pWPolar->m_CoGIyy;
 		m_Ib[2][2] = m_pWPolar->m_CoGIzz;
-		m_Ib[0][2] = m_Ib[2][0] = m_pWPolar->m_CoGIxz;
+		m_Ib[0][2] = m_Ib[2][0] = -m_pWPolar->m_CoGIxz;
 		m_Ib[1][0] = m_Ib[1][2] = m_Ib[0][1] = m_Ib[2][1] = 0.0;	
 	}
 

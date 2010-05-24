@@ -508,7 +508,7 @@ void InertiaDlg::OnExportToAVL()
 	out << "#  x,y,z system here must be exactly the same one used in the .avl input file\n";
 	out << "#     (same orientation, same origin location, same length units)\n";
 	out << "#\n";
-	out << "#     mass          x          y          z        Ixx        Iyy        Izz      [  Ixy   Ixz   Iyz ]\n";
+	out << "#     mass          x          y          z        Ixx        Iyy        Izz        Ixy        Ixz        Iyz \n";
 
 	if(m_pWing)
 	{
@@ -516,22 +516,30 @@ void InertiaDlg::OnExportToAVL()
 		// we need to convert the inertia in the wing's CoG system
 		// by applying Huyghen/Steiner's theorem
 
-		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Inertia of both left and right wings"))
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10! Inertia of both left and right wings"))
 						.arg(m_Mass /Munit,  10, 'g', 3)
 						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 3)  //should be zero
 						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 3)
-						.arg(m_CoGIxx/Iunit,  10, 'g', 3).arg(m_CoGIyy/Iunit,  10, 'g', 3).arg(m_CoGIzz/Iunit,  10, 'g', 3);
+						.arg(m_CoGIxx/Iunit,  10, 'g', 3)
+						.arg(m_CoGIyy/Iunit,  10, 'g', 3)
+						.arg(m_CoGIzz/Iunit,  10, 'g', 3)
+						.arg(0.0,  10, 'g', 3).arg(m_CoGIxz/Iunit,  10, 'g', 3).arg(0.0,  10, 'g', 3);
 		out << strong+"\n";
 	}
 	else if (m_pBody)
 	{
-		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Body inertia"))
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body inertia"))
 						.arg(m_Mass /Munit, 10, 'g', 3)
 						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 3)
-						.arg(m_CoGIxx/Iunit,  10, 'g', 3).arg(m_CoGIyy/Iunit,  10, 'g', 3).arg(m_CoGIzz/Iunit,  10, 'g', 3);
+						.arg(m_CoGIxx/Iunit,  10, 'g', 3)
+						.arg(m_CoGIyy/Iunit,  10, 'g', 3)
+						.arg(m_CoGIzz/Iunit,  10, 'g', 3)
+						.arg(0.0,10, 'g', 3)
+						.arg(CoGIxz/Iunit,10, 'g', 3)
+						.arg(0.0,10, 'g', 3);
 		out << strong+"\n";
 	}
 	else if (m_pPlane)
@@ -539,66 +547,81 @@ void InertiaDlg::OnExportToAVL()
 		// we write out each object contribution individually
 		// a plane has always a wing
 		m_pPlane->m_Wing.ComputeVolumeInertia(m_pPlane->m_Wing.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
-		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Main wing's inertia"))
+		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Main wing's inertia"))
 						.arg(m_pPlane->m_Wing.m_Mass /Munit, 10, 'g', 3)
 						.arg(CoG.x/Lunit, 10, 'g', 3)
 						.arg(CoG.y/Lunit, 10, 'g', 3)
 						.arg(CoG.z/Lunit, 10, 'g', 3)
 						.arg(CoGIxx/Iunit,10, 'g', 3)
 						.arg(CoGIyy/Iunit,10, 'g', 3)
-						.arg(CoGIzz/Iunit,10, 'g', 3);
+						.arg(CoGIzz/Iunit,10, 'g', 3)
+						.arg(0.0,10, 'g', 3)
+						.arg(CoGIxz/Iunit,10, 'g', 3)
+						.arg(0.0,10, 'g', 3);
 		out << strong+"\n";
 
 		if(m_pPlane->m_bBiplane)
 		{
 			m_pPlane->m_Wing2.ComputeVolumeInertia(m_pPlane->m_Wing2.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
-			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Second wing's inertia"))
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Second wing's inertia"))
 						 .arg(m_pPlane->m_Wing2.m_Mass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
 						 .arg(CoGIxx/Iunit,10, 'g', 3)
 						 .arg(CoGIyy/Iunit,10, 'g', 3)
-						 .arg(CoGIzz/Iunit,10, 'g', 3);
+						 .arg(CoGIzz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3)
+			             .arg(CoGIxz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bStab)
 		{
 			m_pPlane->m_Stab.ComputeVolumeInertia(m_pPlane->m_Stab.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
-			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Elevator's inertia"))
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Elevator's inertia"))
 						 .arg(m_pPlane->m_Stab.m_Mass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
 						 .arg(CoGIxx/Iunit,10, 'g', 3)
 						 .arg(CoGIyy/Iunit,10, 'g', 3)
-						 .arg(CoGIzz/Iunit,10, 'g', 3);
+						 .arg(CoGIzz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3)
+			             .arg(CoGIxz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bFin)
 		{
 			m_pPlane->m_Fin.ComputeVolumeInertia(m_pPlane->m_Fin.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
-			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Fin's inertia"))
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Fin's inertia"))
 						 .arg(m_pPlane->m_Fin.m_Mass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
 						 .arg(CoGIxx/Iunit,10, 'g', 3)
 						 .arg(CoGIyy/Iunit,10, 'g', 3)
-						 .arg(CoGIzz/Iunit,10, 'g', 3);
+						 .arg(CoGIzz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3)
+			             .arg(CoGIxz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
 		if(m_pPlane->m_bBody)
 		{
 			m_pPlane->m_pBody->ComputeBodyInertia(m_pPlane->m_pBody->m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
-			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 ! Body's inertia"))
+			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body's inertia"))
 						 .arg(m_pPlane->m_pBody->m_Mass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
 						 .arg(CoGIxx/Iunit,10, 'g', 3)
 						 .arg(CoGIyy/Iunit,10, 'g', 3)
-						 .arg(CoGIzz/Iunit,10, 'g', 3);
+						 .arg(CoGIzz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3)
+			             .arg(CoGIxz/Iunit,10, 'g', 3)
+			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
 	}

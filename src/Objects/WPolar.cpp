@@ -1326,12 +1326,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			if(m_bActiveControl[i])	ar<<1 ; else ar <<0;
 		}
-		for(i=0; i< (int)m_Alpha.size(); i++)
+		for(i=0; i<m_Alpha.size(); i++)
 		{
-			ar <<(float)m_EigenValue[0][i].real()<<(float)m_EigenValue[1][i].real()<<(float)m_EigenValue[2][i].real()<<(float)m_EigenValue[3][i].real();
-			ar <<(float)m_EigenValue[0][i].imag()<<(float)m_EigenValue[1][i].imag()<<(float)m_EigenValue[2][i].imag()<<(float)m_EigenValue[3][i].imag();
-			ar <<(float)m_EigenValue[4][i].real()<<(float)m_EigenValue[5][i].real()<<(float)m_EigenValue[6][i].real()<<(float)m_EigenValue[7][i].real(); 
-			ar <<(float)m_EigenValue[4][i].imag()<<(float)m_EigenValue[5][i].imag()<<(float)m_EigenValue[6][i].imag()<<(float)m_EigenValue[7][i].imag();
+			ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
+			ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
+			ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real(); 
+			ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
 		}
 
 		if(m_bAutoInertia) ar<<1; else ar<<0;
@@ -1350,7 +1350,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		ReadCString(ar, m_UFOName);
 		ReadCString(ar, m_PlrName);
-
 		ar>> f;
 		m_WArea = f;
 		if (m_WArea<0){
@@ -1371,7 +1370,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_PlrName ="";
 			return false;
 		}
-
 		ar >> m_Style  >> m_Width;
 		if (m_Style<0 || m_Style> 10){
 			m_PlrName ="";
@@ -1390,7 +1388,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			return false;
 		}
 		if(m_AnalysisType==0) m_AnalysisType=2;
-
+		
 		if(ArchiveFormat>=1005)
 		{
 			ar >> n;
@@ -1439,7 +1437,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			}
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
-
 
 		if(ArchiveFormat>=1010)
 		{
@@ -1530,7 +1527,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_WSpan    /=1000.0;
 			m_CoG.x   /=1000.0;
 		}
-
 		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb;
 		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = Ctrl = Cb =0.0;
 		bool bExists;
@@ -1544,6 +1540,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar >> GRm >> GYm >> f >> VYm >> IYm;
 			if(ArchiveFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0;
 			ar >> QInfinite >> XCP >> YCP;
+
 			if(ArchiveFormat<1010)
 			{
 				XCP   /=1000.0;
@@ -1557,7 +1554,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			if (ArchiveFormat>=1014) ar >> Ctrl;
 			else					 Ctrl = 0.0;
-
 			bExists = false;
 			if(m_Type!=4)
 			{
@@ -1656,6 +1652,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_EigenValue[3][i] = complex<double>(r3,i3);
 				ar>>r0>>r1>>r2>>r3;
 				ar>>i0>>i1>>i2>>i3;
+//qDebug("%12.6g  %12.6g  %12.6g  %12.6g  ", r0,r1,r2,r3);
+//qDebug("%12.6g  %12.6g  %12.6g  %12.6g  ", i0,i1,i2,i3);
 				m_EigenValue[4][i] = complex<double>(r0,i0);
 				m_EigenValue[5][i] = complex<double>(r1,i1);
 				m_EigenValue[6][i] = complex<double>(r2,i2);
