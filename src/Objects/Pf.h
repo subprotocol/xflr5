@@ -20,11 +20,6 @@
 *****************************************************************************/
 
 
-
-// PF.h: interface for the CPF class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef CSPLINEDPOINTS_H
 #define CSPLINEDPOINTS_H
 
@@ -54,7 +49,6 @@ public:
 	void ExportToBuffer(CFoil *pFoil, bool bExtrados);
 
 	CSplinedPoints();
-	virtual ~CSplinedPoints();
 
 	bool m_bOutPts;
 	int m_iHighlight;
@@ -81,7 +75,6 @@ class CPF
 
 public:
 	CPF();
-	virtual ~CPF();
 
 private:
 	bool CompMidLine(bool first = false);

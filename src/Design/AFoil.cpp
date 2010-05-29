@@ -2614,8 +2614,6 @@ void QAFoil::PaintSplines(QPainter &painter)
 	}
 	else if(m_pPF->m_bVisible)
 	{
-
-
 		SplinePen.setStyle(GetStyle(m_pPF->m_FoilStyle));
 		SplinePen.setWidth(m_pPF->m_FoilWidth);
 		SplinePen.setColor(m_pPF->m_FoilColor);

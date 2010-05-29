@@ -19,17 +19,12 @@
 
 *****************************************************************************/
 
-// PF.cpp: implementation of the CPF class.
-//
-//////////////////////////////////////////////////////////////////////
+
 #include "../Globals.h"
 #include "Pf.h"
 #include "math.h"
 #include "Spline.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CPF::CPF()
 {
@@ -44,10 +39,6 @@ CPF::CPF()
 	memset(m_rpMid, 0, sizeof(m_rpMid));
 }
 
-
-CPF::~CPF()
-{
-}
 
 
 bool CPF::CompMidLine(bool first)
@@ -330,8 +321,6 @@ int CSplinedPoints::IsRearPoint(CVector Real, double ZoomFactor)
 
 
 
-
-
 CSplinedPoints::CSplinedPoints()
 {
 	m_Style = 0;
@@ -348,11 +337,6 @@ CSplinedPoints::CSplinedPoints()
 	memset(m_Outy, 0, sizeof(m_Outy));
 	memset(m_ctrlPoint, 0, sizeof(m_ctrlPoint));
 	memset(m_Slope, 0, sizeof(m_Slope));
-}
-
-
-CSplinedPoints::~CSplinedPoints()
-{
 }
 
 
@@ -397,6 +381,7 @@ bool CSplinedPoints::CompSlopes()
 	}
 	return true;
 }
+
 
 void CSplinedPoints::DrawControlPoints(QPainter &painter, double scalex, double scaley, QPoint Offset)
 {

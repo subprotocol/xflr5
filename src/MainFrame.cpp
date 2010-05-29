@@ -63,7 +63,7 @@ extern CFoil *g_pCurFoil;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = "XFLR5 v5.00";
+	m_VersionName = "XFLR5 v5.01";
 	setWindowTitle(m_VersionName);
 
 	m_bMaximized = true;
@@ -3356,7 +3356,6 @@ void MainFrame::OnGuidelines()
 #ifdef Q_WS_WIN
 	QDir dir(qApp->applicationDirPath());
 	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
-qDebug() <<FileName;
 #endif
 	
 #ifdef Q_WS_X11

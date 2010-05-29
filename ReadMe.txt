@@ -60,7 +60,7 @@ Compilation instructions
           go to the directory, type dpkg-buildpackage -rfakeroot.
 
         - To compile manually on any Linux distro, please follow the following steps:
-	    1. Get the libqt4-devel (OpenSuse) or qt-devel (Fedora), and Mesa-devel packages
+	    1. Get the libqt4-devel (OpenSuse) or qt-devel (Fedora), make, gcc-c++, and Mesa-devel packages
 	    2. cd into the xflr5-5.xx directory 
 	    3. type 
                - qmake

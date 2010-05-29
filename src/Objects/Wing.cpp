@@ -2698,6 +2698,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 
 	bOutRe = bError = false;
 	m = p = nFlap = 0;
+//	qDebug() << "Polar CoG" <<pWPolar->m_CoG.x << pWPolar->m_CoG.y << pWPolar->m_CoG.z;
 
 	for (j=0; j<m_NSurfaces; j++)
 	{
@@ -2713,7 +2714,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			H.Normalize();
 			m_FlapMoment[nFlap] = 0.0;
 		}
-
 		SurfaceNormal = m_Surface[j].Normal;
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
@@ -2728,7 +2728,6 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 			m_Surface[j].GetC4(k, PtC4, tau);
 
 			LeverArm   = PtC4 - pWPolar->m_CoG;
-//			LeverArm.x -= pWPolar->m_XCmRef;
 
 			m_StripArea[m] = 0.0;
 
@@ -2775,6 +2774,7 @@ void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP
 				}
 				p++;
 			}
+//qDebug("%14.6g", GeomMoment.y);
 
 			NForce = StripForce.dot(SurfaceNormal);
 
