@@ -1016,6 +1016,12 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GCm = m_VCm = m_ICm = 0.0;
 			m_GYm = m_VYm = m_IYm = 0.0;
 			AddString(tr("         Calculating main wing...\n"));
+			
+/*			CVector Force, Moment;
+			Forces(m_Gamma, WindDirection, Force, Moment, false, false);
+qDebug("VLMANalysis %12.5g    %12.5g    %12.5g",Force.x,Force.y, Force.z);*/
+
+			
 			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
 
 			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
@@ -1700,6 +1706,114 @@ void VLMAnalysisDlg::WriteString(QString strong)
 }
 
 
+
+
+void VLMAnalysisDlg::Forces(double *Gamma, CVector &VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace)
+{
+	// Calculates the forces using a farfield method
+	// Calculates the moments by a near field method, i.e. direct summation on the panels
+	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
+	//
+	if(!m_pPanel||!m_pWPolar) return;
+
+	static bool bOutRe, bError, bOut, bOutCl;
+	static int j, k, l,  p,  m;
+	static double alpha, cosa, sina, Re, PCd, Cl, tau, StripArea, ViscousDrag;
+	static double QInf, qdyn;
+	static CVector  C, PtC4, LeverArm, dF, WindDirection, WindNormal, PanelLeverArm, Wg, Fd, dFM;
+	static CVector Velocity;
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
+
+	bOut = bOutCl = bError = false;
+
+	if(!bTilted) alpha = m_OpAlpha;
+	else         alpha = 0.0;
+
+	cosa = cos(alpha*PI/180.0);
+	sina = sin(alpha*PI/180.0);
+
+	//   Define the wind axis
+	WindNormal.Set(   -sina, 0.0, cosa);
+	WindDirection.Set( cosa, 0.0, sina);
+
+	p=m=0;
+
+	Fd.Set(0.0, 0.0, 0.0);
+	Force.Set( 0.0, 0.0, 0.0);
+	Moment.Set(0.0, 0.0, 0.0);
+	ViscousDrag = 0.0;
+
+	for(j=0; j<m_NSurfaces; j++)
+	{
+		for(k=0; k<m_ppSurface[j]->m_NYPanels; k++)
+		{
+			StripArea = 0.0;
+			
+			for(l=0; l<m_ppSurface[j]->m_NXPanels; l++)
+			{
+/*				Velocity.x = *(VInf               +p);
+				Velocity.y = *(VInf +   m_MatSize +p);
+				Velocity.z = *(VInf + 2*m_MatSize +p);*/
+				Velocity = VInf;
+				
+				StripArea += m_pPanel[p].Area;
+				// get the far-field force
+				if(m_pWPolar->m_bVLM1 || m_pPanel[p].m_bIsTrailing)
+				{
+					C = m_pPanel[p].CtrlPt;
+					C.x = m_pWing->m_PlanformSpan * 100.0;
+
+					GetSpeedVector(C, Gamma,Wg);
+					Wg += Velocity; //total speed vector
+
+					//induced force
+					dF  = Wg * m_pPanel[p].Vortex;
+					dF.x *= 1.    * Gamma[p];  // N/rho
+					dF.y *=         Gamma[p];  // N/rho
+					dF.z *=         Gamma[p];  // N/rho
+
+					Force += dF;        // N/rho
+					Fd += dF;
+				}
+
+				// for the moments, get the direct summation on the panels
+				PanelLeverArm = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
+				dFM  = Velocity * m_pPanel[p].Vortex * Gamma[p];      // Newtons/rho
+				Moment += dFM * PanelLeverArm;                    // N.m/rho
+				p++;
+			}
+
+			if(m_pWPolar->m_bViscous)
+			{
+				//add the viscous drag component to force and moment
+				QInf = Velocity.VAbs();
+				
+				qdyn = 0.5 * m_pWPolar->m_Density * QInf * QInf;
+				m_ppSurface[j]->GetC4(k, PtC4, tau);
+				Re = m_ppSurface[j]->GetChord(tau) * QInf /m_pWPolar->m_Viscosity;
+				Cl = Fd.dot(WindNormal)*m_pWPolar->m_Density/qdyn/StripArea;
+				PCd    = GetVar(pMiarex->m_poaPolar, 2, m_ppSurface[j]->m_pFoilA, m_ppSurface[j]->m_pFoilB, Re, Cl, tau, bOutRe, bError);
+				PCd   *= StripArea * 1/2*QInf*QInf;              // Newtons/rho
+				bOut = bOut || bOutRe || bError;
+				ViscousDrag += PCd ;                             // Newtons/rho
+
+				LeverArm   = PtC4 - m_pWPolar->m_CoG;
+//				Moment += (WindDirection*LeverArm)*PCd;                                        // N.m/rho
+				Moment.x += PCd * (WindDirection.y*LeverArm.z - WindDirection.z*LeverArm.y);   // N.m/rho
+				Moment.y += PCd * (WindDirection.z*LeverArm.x - WindDirection.x*LeverArm.z);
+				Moment.z += PCd * (WindDirection.x*LeverArm.y - WindDirection.y*LeverArm.x);
+			}
+			Fd.Set(0.0,0.0,0.0);
+			m++;
+		}
+	}
+	Force -= WindDirection*Force.dot(WindDirection)/2.0;
+
+	if(m_pWPolar->m_bViscous) Force += WindDirection * ViscousDrag;
+
+	Force  *= m_pWPolar->m_Density;                          // N
+	Moment *= m_pWPolar->m_Density;                          // N.m
+}
 
 
 

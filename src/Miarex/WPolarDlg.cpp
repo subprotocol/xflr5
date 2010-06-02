@@ -857,9 +857,15 @@ void WPolarDlg::SetWPolarName()
 	}*/
 
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	strong = QString("-%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
+	strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
 	m_WPolarName += strong + str;
-
+	
+	if(fabs(m_CoG.z)>=.000001)
+	{
+		strong = QString("-z%1").arg(m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+		m_WPolarName += strong + str;
+	}
+	
 	if(fabs(m_Beta) > .001)
 	{
 		strong = QString(QString::fromUtf8("-b%1°")).arg(m_Beta,0,'f',2);

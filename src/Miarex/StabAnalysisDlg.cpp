@@ -724,7 +724,7 @@ void StabAnalysisDlg::SolveCtrlDer(int ic, double const & DeltaAngle,
 	// make the difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
 	
-	qDebug("%d   %12.5g    %12.5g  ",ic,Force.dot(ks),Force0.dot(ks));
+//qDebug("StabAnalysis, control %d   %12.5g    %12.5g    %12.5g",ic,Force.x,Force.y, Force.z);
 	
 	*Xd = (Force-Force0).dot(is)/DeltaAngle;
 	*Yd = (Force-Force0).dot(js)/DeltaAngle;
@@ -770,7 +770,8 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
 
-	DeltaAngle = 0.001; //rad
+//	DeltaAngle = 0.001; //rad
+	DeltaAngle = -7.*PI/180.0;
 	BuildControlRHS(DeltaAngle*180.0/PI);
 
 	for(ic=0; ic<m_NCtrls; ic++)
@@ -823,6 +824,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
 		ic=1;
 	}
+	
 	if(m_pPlane && m_pStab && ic==1)
 	{
 		str = "    Changing the influence matrix and RHS for elevator tilt control\n";

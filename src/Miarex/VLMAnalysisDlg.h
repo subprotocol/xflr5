@@ -165,7 +165,9 @@ private:
 	int m_NWakeColumn;
 public:
 	CWing  *m_pWing;
+	CSurface **m_ppSurface;
 	void GetSpeedVector(CVector const &C, double *Gamma, CVector &VTot);
+	void Forces(double *Gamma, CVector &VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace);
 };
 
 #endif // VLMANALYSISDLG_H

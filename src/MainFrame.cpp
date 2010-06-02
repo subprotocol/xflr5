@@ -1940,7 +1940,7 @@ void MainFrame::CreateXDirectActions()
 	viewXFoilAdvanced = new QAction(tr("XFoil Advanced Settings"), this);
 	defineBatch->setStatusTip(tr("Tip : you don't want to use that option..."));
 	connect(viewXFoilAdvanced, SIGNAL(triggered()), pXDirect, SLOT(OnXFoilAdvanced()));
-
+ 
 	viewLogFile = new QAction(tr("View Log File")+"\t(L)", this);
 	connect(viewLogFile, SIGNAL(triggered()), this, SLOT(OnLogFile()));
 
@@ -4882,7 +4882,7 @@ bool MainFrame::SaveProject(QString PathName)
 
 		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 												m_LastDirName+"/"+FileName,
-												tr("XFLR5 v5.00 Project File (*.wpa);;XFLR5 v4.00 Project File (*.wpa)"),
+												tr("XFLR5 v6.00 Project File (*.wpa);;XFLR5 v5.00 Project File (*.wpa)"),
 												&Filter);
 		if(!PathName.length()) return false;//nothing more to do
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
@@ -4891,8 +4891,8 @@ bool MainFrame::SaveProject(QString PathName)
 		if(pos>0) m_LastDirName = PathName.left(pos);
 	}
 
-	if(Filter=="XFLR5 v4.00 Project File (*.wpa)")      Format = 4;// readable by XFLR5 v4
-	else if(Filter=="XFLR5 v5.00 Project File (*.wpa)") Format = 5;// foil, wing and plane descriptions shall be saved
+	if(Filter=="XFLR5 v5.00 Project File (*.wpa)")      Format = 5;// readable by XFLR5 v4
+	else if(Filter=="XFLR5 v6.00 Project File (*.wpa)") Format = 6;// foil, wing and plane descriptions shall be saved
 
 	QFile fp(PathName);
 
@@ -5409,11 +5409,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
-		if(ProjectFormat>=5)
-		{
-			ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
-			ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
-		}
+		ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
+		ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
+		
 		ar << (float)pMiarex->m_WngAnalysis.m_Density;
 		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
@@ -5421,13 +5419,13 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << pMiarex->m_WngAnalysis.m_AnalysisType;
 
 		if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
-		else								ar << 0;
+		else								  ar << 0;
 //		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
 		ar <<1;
 		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
-		else									ar << 0;
+		else                                      ar << 0;
 		if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
-		else									ar << 0;
+		else                                      ar << 0;
 
 		ar << (int)m_oaWing.size() ;//number of wings
 		// Store the wings
@@ -5456,7 +5454,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		else ar << 0;
 
 		// then the foils,  polars and Opps
-				WritePolars(ar, NULL, ProjectFormat);
+		WritePolars(ar, NULL, ProjectFormat);
 
 		// next the bodies
 		ar << (int)m_oaBody.size();
@@ -5596,14 +5594,13 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		//THEN WPOLARS
 		
 		ar >> n;// number of WPolars to load
-qDebug() << "WPolars"<<n;
 		bool bWPolarOK;
+
 		for (i=0;i<n; i++)
 		{
 			pWPolar = new CWPolar;
 			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 
-qDebug()<< pWPolar->m_PlrName;
 			if (!bWPolarOK)
 			{
 				if(pWPolar) delete pWPolar;

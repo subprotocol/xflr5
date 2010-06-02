@@ -96,7 +96,6 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 			{
 				if (fabs(pPOpp->m_Alpha - m_Alpha[i]) < 0.001)
 				{
-
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
 					m_QInfinite[i]  =  pWOpp->m_QInf;
@@ -274,8 +273,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				}
 				else if (pPOpp->m_Ctrl < m_Ctrl[i])
 				{
-
-										// sort by crescending control values
+					// sort by crescending control values
 					m_Alpha.insert(i,     pWOpp->m_Alpha);
 					m_Cl.insert(i,        pWOpp->m_CL);
 					m_CY.insert(i,        pWOpp->m_CY);
@@ -394,7 +392,6 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	int l;
 	int i=0;
 	int size = (int)m_Alpha.size();
-
 	if(size)
 	{
 		for (i=0; i<size; i++)
@@ -1326,17 +1323,19 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			if(m_bActiveControl[i])	ar<<1 ; else ar <<0;
 		}
-		for(i=0; i<m_Alpha.size(); i++)
+		if(ProjectFormat>5)
 		{
-			ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
-			ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
-			ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real(); 
-			ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
+			for(i=0; i<m_Alpha.size(); i++)
+			{
+				ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
+				ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
+				ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real(); 
+				ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
+			}
+	
+			if(m_bAutoInertia) ar<<1; else ar<<0;
+			ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
 		}
-
-		if(m_bAutoInertia) ar<<1; else ar<<0;
-		ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
-
 		return true;
 	}
 	else
@@ -1577,8 +1576,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 					}
 				}
 			}
-			if(!bExists)
-			{
+//			if(!bExists)
+//			{
 				m_Alpha.append(Alpha);
 				m_Cl.append(Cl);
 				m_CY.append(CY);
@@ -1617,7 +1616,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_SM.append(0.0);
 
 				CalculatePoint((int)m_Alpha.size()-1);
-			}
+//			}
 		}
 		if(ArchiveFormat>1012)
 		{
@@ -1642,7 +1641,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ArchiveFormat>=1019)
 		{
-			for(i=0; i< m_Alpha.size(); i++)
+			n = m_Alpha.size();
+//			if(m_AnalysisType==4) n++;
+			for(i=0; i< n; i++)
 			{
 				ar>>r0>>r1>>r2>>r3;
 				ar>>i0>>i1>>i2>>i3;
@@ -1652,8 +1653,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_EigenValue[3][i] = complex<double>(r3,i3);
 				ar>>r0>>r1>>r2>>r3;
 				ar>>i0>>i1>>i2>>i3;
-//qDebug("%12.6g  %12.6g  %12.6g  %12.6g  ", r0,r1,r2,r3);
-//qDebug("%12.6g  %12.6g  %12.6g  %12.6g  ", i0,i1,i2,i3);
 				m_EigenValue[4][i] = complex<double>(r0,i0);
 				m_EigenValue[5][i] = complex<double>(r1,i1);
 				m_EigenValue[6][i] = complex<double>(r2,i2);

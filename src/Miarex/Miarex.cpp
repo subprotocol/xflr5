@@ -16150,6 +16150,7 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 	m_pVLMDlg->m_MatSize    = m_MatSize;
 	m_pVLMDlg->m_nNodes     = m_nNodes;
 	m_pVLMDlg->m_NSurfaces  = m_NSurfaces;
+	m_pVLMDlg->m_ppSurface  = m_pSurface;
 
 	m_pVLMDlg->move(pMainFrame->m_DlgPos);
 	m_pVLMDlg->InitDialog();
@@ -16168,6 +16169,7 @@ void QMiarex::VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence)
 
 	UpdateView();
 }
+
 
 bool QMiarex::VLMIsSameSide(int p, int pp)
 {
