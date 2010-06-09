@@ -2266,7 +2266,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{	// storing code
-		if(ProjectFormat==5)      ar << 1009;
+		if(ProjectFormat>=5)      ar << 1009;
 		else if(ProjectFormat==4) ar << 1007;
 			//1009 : QFLR5 v0.03 : added mass properties for inertia calculations
 			//1008 : QFLR5 v0.02 : Added wing description field
@@ -2278,7 +2278,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			//1002 : save VLM Mesh (v1.99-12)
 			//1001 : initial format
 		WriteCString(ar, m_WingName);
-		if(ProjectFormat==5) WriteCString(ar, m_WingDescription);
+		if(ProjectFormat>=5) WriteCString(ar, m_WingDescription);
 
 		ar << 0; //non elliptic...
 
@@ -2306,7 +2306,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		WriteCOLORREF(ar,m_WingColor);
 
-		if(ProjectFormat==5)
+		if(ProjectFormat>=5)
 		{
 			ar << (float)m_Mass;
 			ar << m_NMass;

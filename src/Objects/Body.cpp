@@ -1538,7 +1538,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat==5)      ar << 1004;
+		if(ProjectFormat>=5)      ar << 1004;
 		else if(ProjectFormat==4) ar << 1002;
 		//1004 : QFLRv0.03	: added mass properties for inertia calculations
 		//1003 : QFLR5 v0.02 : added body description field
@@ -1546,7 +1546,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		//1001 : Added bunching parameter
 		//1000 : first format
 		WriteCString(ar, m_BodyName);
-		if(ProjectFormat==5) WriteCString(ar, m_BodyDescription);
+		if(ProjectFormat>=5) WriteCString(ar, m_BodyDescription);
 
 		WriteCOLORREF(ar, m_BodyColor);
 		ar << m_LineType;
@@ -1570,7 +1570,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (k=0; k<m_NStations;k++){
 			ar << (float)m_FramePosition[k].x << (float)m_FramePosition[k].z;
 		}
-		if(ProjectFormat==5)
+		if(ProjectFormat>=5)
 		{
 			ar << (float)m_Mass;
 			ar << m_NMass;

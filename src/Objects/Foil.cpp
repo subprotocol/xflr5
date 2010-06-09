@@ -28,6 +28,7 @@
 #include "../Globals.h"
 #include <QTextStream>
 #include <QMessageBox>
+#include <QtDebug>
 
 
 
@@ -873,7 +874,7 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	// saves or loads the foil to the archive ar
 
 	int ArchiveFormat;
-	if(ProjectFormat==5)      ArchiveFormat = 1006;
+	if(ProjectFormat>=5)      ArchiveFormat = 1006;
 	else if(ProjectFormat==4) ArchiveFormat = 1005;
 	// 1006 : QFLR5 v0.02 : added Foil description
 	// 1005 : added LE Flap data
@@ -888,7 +889,7 @@ void CFoil::Serialize(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		ar << ArchiveFormat;
 		WriteCString(ar, m_FoilName);
-		if(ProjectFormat==5) WriteCString(ar, m_FoilDescription);
+		if(ProjectFormat>=5) WriteCString(ar, m_FoilDescription);
 		ar << m_nFoilStyle << m_nFoilWidth;
 		WriteCOLORREF(ar, m_FoilColor);
 		if (m_bVisible)		ar << 1; else ar << 0;

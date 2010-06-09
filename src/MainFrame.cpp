@@ -3094,6 +3094,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	//first read all available foils
 	int i,l,n;
 	ar>>n;
+
 	for (i=0;i<n; i++)
 	{
 		pFoil = new CFoil();
@@ -4871,9 +4872,9 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 
 bool MainFrame::SaveProject(QString PathName)
 {
-	QString Filter = ".wpa";
+	QString Filter = "XFLR5 v6.00 Project File (*.wpa)";
 	QString FileName = m_ProjectName;
-	int Format = 5;
+	int Format = 6;
 
 	if(!PathName.length())
 	{

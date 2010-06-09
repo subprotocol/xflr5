@@ -240,7 +240,6 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				// Control or stability analysis, sort by control value
 				if (fabs(pPOpp->m_Ctrl - m_Ctrl[i]) < 0.001)
 				{
-
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
 					m_Cl[i]         = pWOpp->m_CL;
@@ -1244,7 +1243,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 
-		if(ProjectFormat==5) ar << 1020; // identifies the format of the file
+		if(ProjectFormat>=5) ar << 1020; // identifies the format of the file
 		else                 ar << 1016;
 					// 1020 : QFLR6 v0.00 - added inertia tensor values
 					// 1019 : QFLR6 v0.00 - added eigenvalues
@@ -1458,7 +1457,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				return false;
 			}
 		}
-
 		if(ArchiveFormat>=1011)
 		{
 			ar >> f; 			m_TotalWakeLength  = f;
@@ -1489,12 +1487,10 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			return false;
 		}
 		m_Type = n;
-
 		ar >> f;	m_QInf = f;
 		ar >> f;	m_Weight = f;
 		ar >> f;	m_ASpec = f;
 		if(ArchiveFormat>=1015) ar >> f;	m_Beta = f;
-
 		if(ArchiveFormat<1018 && ArchiveFormat>=1002)
 		{
 			ar >> f;			m_CoG.x = f;
@@ -1506,7 +1502,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar >> f;			m_CoG.z = f;
 		}
 //		if(ArchiveFormat>=1002) ar >> f; m_XCmRef = f;
-
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
 
@@ -1642,11 +1637,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1019)
 		{
 			n = m_Alpha.size();
-//			if(m_AnalysisType==4) n++;
+
+			//			if(m_AnalysisType==4) n++;
 			for(i=0; i< n; i++)
 			{
 				ar>>r0>>r1>>r2>>r3;
 				ar>>i0>>i1>>i2>>i3;
+
 				m_EigenValue[0][i] = complex<double>(r0,i0);
 				m_EigenValue[1][i] = complex<double>(r1,i1);
 				m_EigenValue[2][i] = complex<double>(r2,i2);

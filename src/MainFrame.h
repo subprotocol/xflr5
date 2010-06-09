@@ -175,12 +175,12 @@ private:
 	void UpdateWOpps();
 
 	void UpdateView();
-	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL, int ProjectFormat=5);
+	void WritePolars(QDataStream &ar, CFoil *pFoil=NULL, int ProjectFormat=6);
 
 	bool SaveProject(QString PathName="");
 	bool LoadSettings();
 	bool LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
-	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat = 5);
+	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
 	bool SelectFoil(CFoil *pFoil);

@@ -329,7 +329,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	if (bIsStoring)
 	{
 		// storing code
-		if(ProjectFormat==5)      ar << 1012;
+		if(ProjectFormat>=5)      ar << 1012;
 		else if(ProjectFormat==4) ar << 1010;
 		//1012 : QFLR5 v0.03 : added mass properties for inertia calculations
 		//1011 : QFLR5 v0.02 : added Plane description field
@@ -343,7 +343,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		//1003 : Added fin tilt;
 		//1002 : Added doublefin;
 		WriteCString(ar, m_PlaneName);
-		if(ProjectFormat==5)      WriteCString(ar, m_PlaneDescription);
+		if(ProjectFormat>=5)      WriteCString(ar, m_PlaneDescription);
 
 		m_Wing.SerializeWing(ar, true, ProjectFormat);
 		m_Wing2.SerializeWing(ar, true, ProjectFormat);
@@ -376,7 +376,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar << 0;
 			WriteCString(ar, strong);
 		}
-		if(ProjectFormat==5)
+		if(ProjectFormat>=5)
 		{
 			ar << m_NMass;
 			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
