@@ -3633,10 +3633,10 @@ void QMiarex::CreateStabTimeCurves()
 		for(i=1; i<TotalPoints; i++)
 		{
 			t = (double)i * dt;
-			q[0] = q0[0] * exp(m_pCurWOpp->m_EigenValue[0]*t);
-			q[1] = q0[1] * exp(m_pCurWOpp->m_EigenValue[1]*t);
-			q[2] = q0[2] * exp(m_pCurWOpp->m_EigenValue[2]*t);
-			q[3] = q0[3] * exp(m_pCurWOpp->m_EigenValue[3]*t);
+			q[0] = q0[0] * exp(m_pCurWOpp->m_EigenValue[0+k*4]*t);
+			q[1] = q0[1] * exp(m_pCurWOpp->m_EigenValue[1+k*4]*t);
+			q[2] = q0[2] * exp(m_pCurWOpp->m_EigenValue[2+k*4]*t);
+			q[3] = q0[3] * exp(m_pCurWOpp->m_EigenValue[3+k*4]*t);
 			y[0] = *(M+4*0+0) * q[0] +*(M+4*0+1) * q[1] +*(M+4*0+2) * q[2] +*(M+4*0+3) * q[3];
 			y[1] = *(M+4*1+0) * q[0] +*(M+4*1+1) * q[1] +*(M+4*1+2) * q[2] +*(M+4*1+3) * q[3];
 			y[2] = *(M+4*2+0) * q[0] +*(M+4*2+1) * q[1] +*(M+4*2+2) * q[2] +*(M+4*2+3) * q[3];
