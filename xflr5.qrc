@@ -22,5 +22,7 @@
         <file>images/OnZoomYScale.png</file>
         <file>images/OnStabView.png</file>
         <file>images/xflr5_64.png</file>
+        <file>images/OnRootLocus.png</file>
+        <file>images/On3DModes.png</file>
     </qresource>
 </RCC>

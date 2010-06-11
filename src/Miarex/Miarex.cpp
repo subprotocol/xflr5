@@ -686,10 +686,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 	connect(m_pctrlLongDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
 	connect(m_pctrlLatDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
-	connect(m_pctrlTimeView, SIGNAL(clicked()), this, SLOT(OnStabilityViewType()));
-	connect(m_pctrlRLView,   SIGNAL(clicked()), this, SLOT(OnStabilityViewType()));
-	connect(m_pctrl3DView,   SIGNAL(clicked()), this, SLOT(OnStabilityViewType()));
-
 }
 
 
@@ -1769,18 +1765,27 @@ void QMiarex::SetControls()
 	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
 	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
-	if(m_iView==WSTABVIEW)
-	{
-		m_pctrlTimeView->setChecked(m_iStabilityView==0);
-		m_pctrlRLView->setChecked(m_iStabilityView==1);
-		m_pctrl3DView->setChecked(m_iStabilityView==3);
-	}
 
+	if(m_pCurWPolar && m_pCurWPolar->m_Type==7)
+	{
+		pMainFrame->StabPolarAct->setEnabled(true);
+		pMainFrame->RootLocusAct->setEnabled(true);
+		pMainFrame->ModalViewAct->setEnabled(true);
+	}
+	else
+	{
+		pMainFrame->StabPolarAct->setEnabled(false);
+		pMainFrame->RootLocusAct->setEnabled(false);
+		pMainFrame->ModalViewAct->setEnabled(false);
+	}
+	
 	pMainFrame->m_pctrlWOppView->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
 	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
-	pMainFrame->m_pctrlStabViewButton->setChecked(m_iView==WSTABVIEW);
+	pMainFrame->m_pctrlStabViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
+	pMainFrame->m_pctrlRootLocusButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==1);
+	pMainFrame->m_pctrlModalViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==3);
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
@@ -12073,30 +12078,6 @@ void QMiarex::OnStabilityDirection()
 
 
 
-void QMiarex::OnStabilityGraph()
-{
-	//the user has clicked either the time response or the root locus graph
-	//so update the view accordingly
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-//	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-//	pStabView->SetControls();
-	if(m_pctrlTimeView->isChecked())
-	{
-		m_pCurGraph = &m_TimeGraph1;
-		m_iStabilityView = 0;
-		CreateStabilityCurves();
-	}
-	else if(m_pctrlRLView->isChecked())
-	{
-		m_iStabilityView = 1;
-		CreateStabilityCurves();
-	}
-	SetCurveParams();
-	UpdateView();
-}
-
-
-
 void QMiarex::OnStabilityView()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -12124,28 +12105,30 @@ void QMiarex::OnStabilityView()
 }
 
 
-void QMiarex::OnStabilityViewType()
+void QMiarex::OnTimeView()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 
-	if(m_pctrlTimeView->isChecked())
-	{
-		m_iStabilityView = 0;
-		pStabView->SetControls();
-		SetWingLegendPos();
-		CreateStabilityCurves();
-	}
-	else if(m_pctrlRLView->isChecked())
-	{
-		m_iStabilityView = 1;
-		SetWPlrLegendPos();
-		CreateStabilityCurves();
-	}
-	else if(m_pctrl3DView->isChecked())
-	{
-		m_iStabilityView = 3;
-	}
+	m_iView = WSTABVIEW;
+	m_iStabilityView = 0;
+	pStabView->SetControls();
+	SetWingLegendPos();
+	CreateStabilityCurves();
+	
+	pMainFrame->SetCentralWidget();
+	SetCurveParams();
+	SetControls();
+	UpdateView();
+}
+
+
+void QMiarex::OnModalView()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_iView = WSTABVIEW;
+	m_iStabilityView = 3;
 
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
@@ -12153,6 +12136,19 @@ void QMiarex::OnStabilityViewType()
 	UpdateView();
 }
 
+void QMiarex::OnRootLocusView()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
+	m_iView = WSTABVIEW;
+	m_iStabilityView = 1;
+	SetWPlrLegendPos();
+	CreateStabilityCurves();
+	pMainFrame->SetCentralWidget();
+	SetCurveParams();
+	SetControls();
+	UpdateView();
+}
 
 void QMiarex::OnStreamlines()
 {
@@ -14976,40 +14972,17 @@ void QMiarex::SetupLayout()
 	CpBox->setLayout(CpParams);
 
 //_______________________Stability Params
-	QVBoxLayout	 *StabParams = new QVBoxLayout;
 	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
 	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
 	m_pctrlLongDynamics->setSizePolicy(szPolicyMaximum);
 	m_pctrlLatDynamics->setSizePolicy(szPolicyMaximum);
 	m_pctrlLongDynamics->setMinimumHeight(10);
 	m_pctrlLatDynamics->setMinimumHeight(10);
-	StabParams->addWidget(m_pctrlLongDynamics);
-	StabParams->addWidget(m_pctrlLatDynamics);
-	StabParams->addStretch(1);
-	QGroupBox *StabBox = new QGroupBox(tr("Stability"));
-	StabBox->setLayout(StabParams);
-
-	QVBoxLayout *StabViewTypeLayout = new QVBoxLayout;
-	m_pctrlTimeView = new QRadioButton(tr("Time Response"));
-	m_pctrlRLView   = new QRadioButton(tr("Root Locus"));
-	m_pctrl3DView   = new QRadioButton(tr("3D Mode"));
-	m_pctrlTimeView->setSizePolicy(szPolicyMaximum);
-	m_pctrlRLView->setSizePolicy(szPolicyMaximum);
-	m_pctrl3DView->setSizePolicy(szPolicyMaximum);
-	m_pctrlTimeView->setMinimumHeight(10);
-	m_pctrlRLView->setMinimumHeight(10);
-	m_pctrl3DView->setMinimumHeight(10);
-
-	StabViewTypeLayout->addWidget(m_pctrlTimeView);
-	StabViewTypeLayout->addWidget(m_pctrlRLView);
-	StabViewTypeLayout->addWidget(m_pctrl3DView);
-	QGroupBox *StabViewTypeBox = new QGroupBox(tr("View Type"));
-	StabViewTypeBox->setLayout(StabViewTypeLayout);
 	QVBoxLayout *StabilityLayout = new QVBoxLayout;
-	StabilityLayout->addWidget(StabBox);
-	StabilityLayout->addWidget(StabViewTypeBox);
+	StabilityLayout->addWidget(m_pctrlLongDynamics);
+	StabilityLayout->addWidget(m_pctrlLatDynamics);
 	StabilityLayout->addStretch(1);
-	QGroupBox *StabilityBox = new QGroupBox(tr("Stability Params"));
+	QGroupBox *StabilityBox = new QGroupBox(tr("Stability Direction"));
 	StabilityBox->setLayout(StabilityLayout);
 
 //_______________________3D view controls

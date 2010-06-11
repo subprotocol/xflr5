@@ -1055,7 +1055,17 @@ void MainFrame::CreateMiarexActions()
 	StabPolarAct->setCheckable(true);
 	StabPolarAct->setStatusTip(tr("Switch to the stability analysis results"));
 	StabPolarAct->setShortcut(tr("Shift+F8"));
-	connect(StabPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnStabilityView()));
+	connect(StabPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnTimeView()));
+
+	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View"), this);
+	RootLocusAct->setCheckable(true);
+	RootLocusAct->setStatusTip(tr("Switch to the root locus view"));
+	connect(RootLocusAct, SIGNAL(triggered()), pMiarex, SLOT(OnRootLocusView()));
+
+	ModalViewAct = new QAction(QIcon(":/images/On3DModes.png"),tr("Modal View"), this);
+	ModalViewAct->setCheckable(true);
+	ModalViewAct->setStatusTip(tr("Switch to the 3D Modal view"));
+	connect(ModalViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnModalView()));
 
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View"), this);
 	W3DAct->setCheckable(true);
@@ -1659,10 +1669,18 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView = new QToolButton;
 	m_pctrlCpView->setDefaultAction(CpViewAct);
 	m_pctrlCpView->setCheckable(true);
+	
 	m_pctrlStabViewButton = new QToolButton;
 	m_pctrlStabViewButton->setDefaultAction(StabPolarAct);
 	m_pctrlStabViewButton->setCheckable(true);
 
+	m_pctrlRootLocusButton = new QToolButton;
+	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
+	m_pctrlRootLocusButton->setCheckable(true);
+
+	m_pctrlModalViewButton = new QToolButton;
+	m_pctrlModalViewButton->setDefaultAction(ModalViewAct);
+	m_pctrlModalViewButton->setCheckable(true);
 //	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 //	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 //	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
@@ -1687,7 +1705,10 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolarView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
+	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlStabViewButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlModalViewButton);
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolar);

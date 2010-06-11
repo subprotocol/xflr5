@@ -222,9 +222,10 @@ private slots:
 	void OnBodyInertia();
 
 	void OnTimeGraph();
-	void OnStabilityGraph();
 	void OnStabilityView();
-	void OnStabilityViewType();
+	void OnRootLocusView();
+	void OnModalView();
+	void OnTimeView();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -381,7 +382,6 @@ private:
 
 	//stability widgets
 	QRadioButton *m_pctrlLongDynamics, *m_pctrlLatDynamics;
-	QRadioButton *m_pctrlTimeView,*m_pctrlRLView,*m_pctrl3DView;
 
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 

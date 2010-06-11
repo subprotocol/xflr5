@@ -282,7 +282,7 @@ private:
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabPolarAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabPolarAct, *RootLocusAct, *ModalViewAct;
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
@@ -308,7 +308,8 @@ private:
 	QAction *exporttoAVL, *resetWingScale, *scaleWingAct;
 	QAction *ManageUFOs;
 	QAction *m_pImportWPolar, *m_pUFOInertia, *m_pBodyInertia;
-	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView, *m_pctrlStabViewButton;
+	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
+	QToolButton *m_pctrlStabViewButton, *m_pctrlRootLocusButton, *m_pctrlModalViewButton;
 
 
 	//XDirect Actions
