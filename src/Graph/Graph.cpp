@@ -1335,11 +1335,11 @@ void Graph::GetClosestPoint(const double &x, const double &y, CCurve *pCurveSel,
 bool Graph::SelectPoint(QString const &CurveName, int sel)
 {
 	QString str;
-	CCurve *pCurve;
+	CCurve *pCurve = NULL;
 	
 	if(sel<0) 
 	{
-		pCurve->SetSelected(-1);
+//		pCurve->SetSelected(-1);
 		return false;				
 	}		
 	
@@ -1361,7 +1361,7 @@ bool Graph::SelectPoint(QString const &CurveName, int sel)
 			}
 		}
 	}
-	pCurve->SetSelected(-1);
+//	pCurve->SetSelected(-1);
 	return false;
 }
 

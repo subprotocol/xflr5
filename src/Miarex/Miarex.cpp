@@ -7014,7 +7014,8 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_Escape:
 		{
-			if(m_iView!=WSTABVIEW) StopAnimate();
+			StopAnimate();
+
 			if(m_pCurGraph) m_pCurGraph->DeselectPoint();
 			
 			if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
@@ -12109,7 +12110,7 @@ void QMiarex::OnTimeView()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-
+	StopAnimate();
 	m_iView = WSTABVIEW;
 	m_iStabilityView = 0;
 	pStabView->SetControls();
@@ -12139,7 +12140,7 @@ void QMiarex::OnModalView()
 void QMiarex::OnRootLocusView()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
+	StopAnimate();
 	m_iView = WSTABVIEW;
 	m_iStabilityView = 1;
 	SetWPlrLegendPos();

@@ -2467,8 +2467,8 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp, CPOpp *pPOpp)
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		if(c.imag()>=0.0) strange = QString("Eigenvalue   = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-		else              strange = QString("Eigenvalue   = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+		if(c.imag()>=0.0) strange = QString("Eigenvalue     = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+		else              strange = QString("Eigenvalue     = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
@@ -2476,26 +2476,26 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp, CPOpp *pPOpp)
 		{
 			angle = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][0]/u0;
-			if(c.imag()>=0.0) strange = QString("u/u0         = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("u/u0         = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("u/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("u/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][1]/u0;
-			if(c.imag()>=0.0) strange = QString("w/u0         = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("w/u0         = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("w/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("w/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][2]/(2.0*u0/mac);
-			if(c.imag()>=0.0) strange = QString("q/(2.u0.MAC) = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("q/(2.u0.MAC) = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("q/(2.u0.MAC) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("q/(2.u0.MAC) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3]/angle;
-			if(c.imag()>=0.0) strange = QString("theta(rad)   = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("theta(rad)   = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("theta(rad)   = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("theta(rad)   = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 		}
@@ -2504,26 +2504,26 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp, CPOpp *pPOpp)
 			angle = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][0]/u0;
-			if(c.imag()>=0.0) strange = QString("v/u0          = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("v/u0          = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("v/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("v/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][1]/(2.0*u0/span);
-			if(c.imag()>=0.0) strange = QString("p/(2.u0.Span) = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("p/(2.u0.Span) = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("p/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("p/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][2]/(2.0*u0/span);
-			if(c.imag()>=0.0) strange = QString("r/(2.u0.Span) = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("r/(2.u0.Span) = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("r/(2.u0.Span) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("r/(2.u0.Span) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3]/angle;
-			if(c.imag()>=0.0) strange = QString("phi(rad)      = %1 +%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("phi(rad)      = %1 -%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("phi(rad)      = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("phi(rad)      = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 		}
