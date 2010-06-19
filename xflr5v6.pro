@@ -107,8 +107,8 @@ SOURCES += src/MainFrame.cpp \
     src/Design/AFoilGridDlg.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
-    src/Design/SplineCtrlsDlg.cpp 
-
+    src/Design/SplineCtrlsDlg.cpp \
+    src/Miarex/ManageCurvesDlg.cpp
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/QFLR5Application.h \
@@ -213,7 +213,8 @@ HEADERS += src/MainFrame.h \
     src/Design/AFoilGridDlg.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
-    src/Design/FoilTableDelegate.h
+    src/Design/FoilTableDelegate.h \
+    src/Miarex/ManageCurvesDlg.h
 TRANSLATIONS = translations/xflr5.ts \
     translations/xflr5_de.ts \
     translations/xflr5_fr.ts
@@ -235,7 +236,7 @@ unix {
 }
 
 # target.path = $$BINDIR
-macx {
+macx { 
     TARGET = XFLR5
     TEMPLATE = app
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
@@ -249,7 +250,6 @@ macx {
     ICON = mac/xflr5.icns
 }
 OTHER_FILES += doc/ReleaseNotes.txt
-
-QMAKE_CFLAGS+=-pg
-QMAKE_CXXFLAGS+=-pg
-QMAKE_LFLAGS+=-pg
+QMAKE_CFLAGS += -pg
+QMAKE_CXXFLAGS += -pg
+QMAKE_LFLAGS += -pg

@@ -59,7 +59,7 @@ private slots:
 	void OnReadData();
 	void OnResponseType();
 	void OnKeepCurve();
-	void OnResetCurve();
+	void OnManageCurve();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -87,7 +87,7 @@ private:
 	FloatEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
 	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat, *m_pctrlRampTime;
 	QPushButton *m_pctrlPlotStabGraph;
-	QPushButton *m_pctrlKeepCurve, *m_pctrlResetCurve;
+	QPushButton *m_pctrlKeepCurve, *m_pctrlManageCurve;
 	QLineEdit *m_pctrlCurveTitle;
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;

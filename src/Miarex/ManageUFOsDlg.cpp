@@ -213,7 +213,7 @@ void ManageUFOsDlg::FillUFOTable()
 void ManageUFOsDlg::FillWingRow(int row)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString str, strong;
+
 	QModelIndex ind;
 	CWing *pWing = (CWing*)pMainFrame->m_oaWing.at(row);
 

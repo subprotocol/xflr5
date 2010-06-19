@@ -22,6 +22,7 @@
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "StabViewDlg.h"
+#include "ManageCurvesDlg.h"
 #include "Miarex.h"
 #include <QGridLayout>
 #include <QGroupBox>
@@ -78,7 +79,7 @@ void StabViewDlg::Connect()
 	connect(m_pctrlForcedResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
 	
 	connect(m_pctrlKeepCurve, SIGNAL(clicked()), this, SLOT(OnKeepCurve()));
-	connect(m_pctrlResetCurve, SIGNAL(clicked()), this, SLOT(OnResetCurve()));
+	connect(m_pctrlManageCurve, SIGNAL(clicked()), this, SLOT(OnManageCurve()));
 	
 	m_pControlModel = new QStandardItemModel;
 	m_pControlModel->setRowCount(5);//temporary
@@ -437,25 +438,31 @@ void StabViewDlg::OnKeepCurve()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QColor CurveColor = pMainFrame->m_crColors[(pMiarex->m_TimeGraph1.GetCurveCount()+1)%24];
 
+	QString title = m_pctrlCurveTitle->text();
+	
 	pCurve = pMiarex->m_TimeGraph1.GetCurve(0);
 	pNewCurve = pMiarex->m_TimeGraph1.AddCurve();
 	pNewCurve->Copy(pCurve);
 	pNewCurve->SetColor(CurveColor);
+	pNewCurve->SetTitle(title);
 
 	pCurve = pMiarex->m_TimeGraph2.GetCurve(0);
 	pNewCurve = pMiarex->m_TimeGraph2.AddCurve();
 	pNewCurve->Copy(pCurve);
 	pNewCurve->SetColor(CurveColor);
+	pNewCurve->SetTitle(title);
 
 	pCurve = pMiarex->m_TimeGraph3.GetCurve(0);
 	pNewCurve = pMiarex->m_TimeGraph3.AddCurve();
 	pNewCurve->Copy(pCurve);
 	pNewCurve->SetColor(CurveColor);
+	pNewCurve->SetTitle(title);
 
 	pCurve = pMiarex->m_TimeGraph4.GetCurve(0);
 	pNewCurve = pMiarex->m_TimeGraph4.AddCurve();
 	pNewCurve->Copy(pCurve);
 	pNewCurve->SetColor(CurveColor);
+	pNewCurve->SetTitle(title);
 
 	QString str = QString( "%1").arg(pMiarex->m_TimeGraph1.GetCurveCount());
 	str = tr("Curve ") + str;
@@ -467,16 +474,42 @@ void StabViewDlg::OnKeepCurve()
 }
 
 
-void StabViewDlg::OnResetCurve()
+void StabViewDlg::OnManageCurve()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	for(int i=pMiarex->m_TimeGraph1.GetCurveCount()-1; i>0 ; i--)
+	QString strong;
+	
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	ManageCurvesDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
+	dlg.m_pMiarex = this;
+	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.m_pGraph[0] = &pMiarex->m_TimeGraph1;
+	dlg.m_pGraph[1] = &pMiarex->m_TimeGraph2;
+	dlg.m_pGraph[2] = &pMiarex->m_TimeGraph3;
+	dlg.m_pGraph[3] = &pMiarex->m_TimeGraph4;
+	dlg.m_NGraph = 4;
+	dlg.InitDialog();
+	dlg.exec();
+	pMainFrame->m_DlgPos = dlg.pos();
+	
+	CCurve *pCurve2, *pCurve3, *pCurve4;
+	CCurve *pCurve = pMiarex->m_TimeGraph1.GetCurve(0);
+	pCurve->GetTitle(strong);
+	m_pctrlCurveTitle->setText(strong);
+	
+	for(int i=0; i<pMiarex->m_TimeGraph1.GetCurveCount(); i++)
 	{
-		pMiarex->m_TimeGraph1.DeleteCurve(i);
-		pMiarex->m_TimeGraph2.DeleteCurve(i);
-		pMiarex->m_TimeGraph3.DeleteCurve(i);
-		pMiarex->m_TimeGraph4.DeleteCurve(i);
+		pCurve = pMiarex->m_TimeGraph1.GetCurve(i);
+		pCurve->GetTitle(strong);
+		pCurve2 = pMiarex->m_TimeGraph2.GetCurve(i);
+		pCurve3 = pMiarex->m_TimeGraph3.GetCurve(i);
+		pCurve4 = pMiarex->m_TimeGraph4.GetCurve(i);
+		pCurve2->SetTitle(strong);
+		pCurve3->SetTitle(strong);
+		pCurve4->SetTitle(strong);
 	}
+	
 	pMiarex->SetCurveParams();
 	pMiarex->CreateStabilityCurves();
 	pMiarex->UpdateView();
@@ -662,10 +695,10 @@ void StabViewDlg::SetupLayout()
 	m_pctrlPlotStabGraph = new QPushButton(tr("Plot"));
 	QHBoxLayout *KeepCurve = new QHBoxLayout;
 	m_pctrlKeepCurve  = new QPushButton(tr("Keep"));
-	m_pctrlResetCurve = new QPushButton(tr("Reset"));
+	m_pctrlManageCurve = new QPushButton(tr("Manage"));
 	m_pctrlCurveTitle = new QLineEdit(tr("Curve")+" 1");
 	KeepCurve->addWidget(m_pctrlKeepCurve);
-	KeepCurve->addWidget(m_pctrlResetCurve);
+	KeepCurve->addWidget(m_pctrlManageCurve);
 	TimeParams->addLayout(ResponseTypeLayout);
 	TimeParams->addWidget(InitCondResponse);
 	TimeParams->addStretch(1);
