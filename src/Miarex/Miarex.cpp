@@ -285,7 +285,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_TimeGraph1.SetMargin(50);
 	m_TimeGraph1.SetInverted(false);
 	m_TimeGraph1.SetGraphName("Time Response");
-	m_TimeGraph1.AddCurve();//1 curve undeletable for current POpp/WOpp
 
 	m_TimeGraph2.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_TimeGraph2.SetYMajGrid(true, QColor(120,120,120),2,1);
@@ -298,7 +297,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_TimeGraph2.SetMargin(50);
 	m_TimeGraph2.SetInverted(false);
 	m_TimeGraph2.SetGraphName("Time Response");
-	m_TimeGraph2.AddCurve();//1 curve undeletable for current POpp/WOpp
 
 	m_TimeGraph3.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_TimeGraph3.SetYMajGrid(true, QColor(120,120,120),2,1);
@@ -311,7 +309,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_TimeGraph3.SetMargin(50);
 	m_TimeGraph3.SetInverted(false);
 	m_TimeGraph3.SetGraphName("Time Response");
-	m_TimeGraph3.AddCurve();//1 curve undeletable for current POpp/WOpp
 
 	m_TimeGraph4.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_TimeGraph4.SetYMajGrid(true, QColor(120,120,120),2,1);
@@ -324,7 +321,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_TimeGraph4.SetMargin(50);
 	m_TimeGraph4.SetInverted(false);
 	m_TimeGraph4.SetGraphName("Time Response");
-	m_TimeGraph4.AddCurve();//1 curve undeletable for current POpp/WOpp
 
 	if(m_bLongitudinal)
 	{
@@ -3549,20 +3545,26 @@ void QMiarex::CreateStabTimeCurves()
 	static double *in;
 	static complex<double> q[4],q0[4],y[4];//the part of each mode in the solution
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
-	QString strong;
+	QString strong, CurveTitle;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+	CurveTitle = pStabView->m_pctrlCurveList->currentText();
 	
-	pCurve0 = m_TimeGraph1.GetCurve(0);
+	pCurve0 = m_TimeGraph1.GetCurve(CurveTitle);
+//	qDebug()<<"creating 1"	<<CurveTitle<<pCurve0;
 	if(pCurve0) pCurve0->ResetCurve();
-	pCurve1 = m_TimeGraph2.GetCurve(0);
+	else return;
+	pCurve1 = m_TimeGraph2.GetCurve(CurveTitle);
 	if(pCurve1) pCurve1->ResetCurve();
-	pCurve2 = m_TimeGraph3.GetCurve(0);
+	else return;
+	pCurve2 = m_TimeGraph3.GetCurve(CurveTitle);
 	if(pCurve2) pCurve2->ResetCurve();
-	pCurve3 = m_TimeGraph4.GetCurve(0);
+	else return;
+	pCurve3 = m_TimeGraph4.GetCurve(CurveTitle);
 	if(pCurve3) pCurve3->ResetCurve();
-
-	strong = pStabView->m_pctrlCurveTitle->text();
+	else return;
+	
+	strong = pStabView->m_pctrlCurveList->currentText();
 
 	m_Deltat = pStabView->m_pctrlDeltat->GetValue();
 	m_TotalTime = pStabView->m_pctrlTotalTime->GetValue();
@@ -3578,10 +3580,9 @@ void QMiarex::CreateStabTimeCurves()
 	m_TimeInput[3] = 0.0;//we start with an initial 0.0 value for pitch or bank angles
 	in = m_TimeInput;
 
-
 	if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
 
-	pCurve0->SetColor(m_pCurWOpp->m_Color);
+/*	pCurve0->SetColor(m_pCurWOpp->m_Color);
 	pCurve1->SetColor(m_pCurWOpp->m_Color);
 	pCurve2->SetColor(m_pCurWOpp->m_Color);
 	pCurve3->SetColor(m_pCurWOpp->m_Color);
@@ -3611,7 +3612,7 @@ void QMiarex::CreateStabTimeCurves()
 		pCurve1->SetTitle(strong);
 		pCurve2->SetTitle(strong);
 		pCurve3->SetTitle(strong);
-	}	
+	}*/
 	
 	//fill the modal matrix
 	if(m_bLongitudinal) k=0; else k=1;
@@ -3651,6 +3652,7 @@ void QMiarex::CreateStabTimeCurves()
 			pCurve1->AddPoint(t, y[1].real());
 			pCurve2->AddPoint(t, y[2].real());
 			pCurve3->AddPoint(t, y[3].real()*180.0/PI);
+//if(i%50==0) qDebug() << i << y[0].real() <<y[1].real() << y[2].real() <<y[3].real();
 		}
 	}
 }
@@ -3673,19 +3675,23 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	static double A[4][4], B[MAXCONTROLS][4];
 	static double m[5][4];
 	static double y[4], yp[4];
-	QString strong;
+	QString strong, CurveTitle;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-
-	pCurve0 = m_TimeGraph1.GetCurve(0);
+	CurveTitle = pStabView->m_pctrlCurveList->currentText();
+	pCurve0 = m_TimeGraph1.GetCurve(CurveTitle);
 	if(pCurve0) pCurve0->ResetCurve();
-	pCurve1 = m_TimeGraph2.GetCurve(0);
+	else return;
+	pCurve1 = m_TimeGraph2.GetCurve(CurveTitle);
 	if(pCurve1) pCurve1->ResetCurve();
-	pCurve2 = m_TimeGraph3.GetCurve(0);
+	else return;
+	pCurve2 = m_TimeGraph3.GetCurve(CurveTitle);
 	if(pCurve2) pCurve2->ResetCurve();
-	pCurve3 = m_TimeGraph4.GetCurve(0);
+	else return;
+	pCurve3 = m_TimeGraph4.GetCurve(CurveTitle);
 	if(pCurve3) pCurve3->ResetCurve();
+	else return;
 
 	//We need a WOpp
 	if(!m_pCurWOpp) return;//nothing to plot
@@ -3724,7 +3730,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	pCurve2->ShowPoints(m_pCurWOpp->m_bShowPoints);
 	pCurve3->ShowPoints(m_pCurWOpp->m_bShowPoints);
 
-	strong = pStabView->m_pctrlCurveTitle->text();
+	strong = pStabView->m_pctrlCurveList->currentText();
 	if(m_bLongitudinal)
 	{
 		pCurve0->SetTitle(strong);
@@ -12054,10 +12060,10 @@ void QMiarex::OnStabilityDirection()
 		m_TimeGraph4.SetYTitle("phi");
 	}
 	
-	m_TimeGraph1.ResetCurves();
-	m_TimeGraph2.ResetCurves();
-	m_TimeGraph3.ResetCurves();
-	m_TimeGraph4.ResetCurves();
+	m_TimeGraph1.DeleteCurves();
+	m_TimeGraph2.DeleteCurves();
+	m_TimeGraph3.DeleteCurves();
+	m_TimeGraph4.DeleteCurves();
 
 	if(m_bLongitudinal) m_pCurRLStabGraph = &m_LongRLGraph;
 	else                m_pCurRLStabGraph = &m_LatRLGraph;
@@ -13817,7 +13823,19 @@ void QMiarex::SetCurveParams()
 			FillComboBoxes(false);
 		}
 	}
-	else if(m_iView==WOPPVIEW || (m_iView==WSTABVIEW&& m_iStabilityView==0))
+	else if(m_iView==WSTABVIEW&& m_iStabilityView==0)
+	{
+		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+		if(pStabView->m_pCurve)
+		{
+			m_CurveColor = pStabView->m_pCurve->GetColor();
+			m_CurveStyle = pStabView->m_pCurve->GetStyle();
+			m_CurveWidth = pStabView->m_pCurve->GetWidth();
+//qDebug()<<"CurveColor"<<m_CurveColor.red()<<m_CurveColor.green()<<m_CurveColor.blue();
+			FillComboBoxes();
+		}		
+	}
+	else if(m_iView==WOPPVIEW)
 	{
 		//set OpPoint params
 		if(m_pCurPOpp)
@@ -15978,7 +15996,7 @@ void QMiarex::UpdateCurve()
 	{
 		if(m_iStabilityView==0)
 		{
-			if(m_pCurPOpp)
+/*			if(m_pCurPOpp)
 			{
 				m_pCurPOpp->m_Color = m_CurveColor;
 				m_pCurPOpp->m_Style = m_CurveStyle;
@@ -15989,6 +16007,14 @@ void QMiarex::UpdateCurve()
 				m_pCurWOpp->m_Color = m_CurveColor;
 				m_pCurWOpp->m_Style = m_CurveStyle;
 				m_pCurWOpp->m_Width = m_CurveWidth;
+			}*/
+			StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
+			pStabView->SetTimeCurveStyle(m_CurveColor, m_CurveStyle, m_CurveWidth);
+			if(pStabView->m_pCurve)
+			{
+				pStabView->m_pCurve->SetColor(m_CurveColor);
+				pStabView->m_pCurve->SetStyle(m_CurveStyle);
+				pStabView->m_pCurve->SetWidth(m_CurveWidth);
 			}
 		}
 		else if(m_iStabilityView==1)

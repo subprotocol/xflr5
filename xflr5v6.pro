@@ -108,7 +108,7 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-    src/Miarex/ManageCurvesDlg.cpp
+    src/Misc/NewNameDlg.cpp
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/QFLR5Application.h \
@@ -214,7 +214,7 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
-    src/Miarex/ManageCurvesDlg.h
+    src/Misc/NewNameDlg.h
 TRANSLATIONS = translations/xflr5.ts \
     translations/xflr5_de.ts \
     translations/xflr5_fr.ts

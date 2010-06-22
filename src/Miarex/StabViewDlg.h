@@ -30,11 +30,13 @@
 #include <QDial>
 #include <QRadioButton>
 #include <QPushButton>
+#include <QComboBox>
 #include <QStackedWidget>
 #include <QGroupBox>
 #include <QTableView>
 #include <QStandardItemModel>
 #include "../Misc/FloatEdit.h"
+#include "../Graph/Curve.h"
 #include "CtrlTableDelegate.h"
 
 
@@ -58,21 +60,28 @@ private slots:
 	void OnPlotStabilityGraph();
 	void OnReadData();
 	void OnResponseType();
-	void OnKeepCurve();
-	void OnManageCurve();
-
+	void OnAddCurve();
+	void OnDeleteCurve();
+	void OnRenameCurve();
+	void OnSelChangeCurve(int sel);
+	
 private:
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent(QShowEvent *event);
 	
+	void AddCurve();
 	void Connect();
 	void FillControlNames();
 	void FillEigenThings();
+	void FillCurveList();
 	void ReadForcedInput(double *in);
 	void SetMode(int iMode=-1);
 	void SetupLayout();
 	void SetControls();
-
+	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width);
+	
+	
+	
 	static void *s_pMiarex, *s_pMainFrame;
 
 	QRadioButton *m_pctrlRLMode1,*m_pctrlRLMode2,*m_pctrlRLMode3,*m_pctrlRLMode4;
@@ -87,8 +96,8 @@ private:
 	FloatEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
 	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat, *m_pctrlRampTime;
 	QPushButton *m_pctrlPlotStabGraph;
-	QPushButton *m_pctrlKeepCurve, *m_pctrlManageCurve;
-	QLineEdit *m_pctrlCurveTitle;
+	QPushButton *m_pctrlAddCurve, *m_pctrlDeleteCurve, *m_pctrlRenameCurve;
+	QComboBox *m_pctrlCurveList;
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlSigma1, *m_pctrlDsi;
@@ -107,6 +116,7 @@ private:
 
 public:
 	int m_iCurrentMode;	
+	CCurve *m_pCurve;
 };
 
 #endif // STABVIEWDLG_H

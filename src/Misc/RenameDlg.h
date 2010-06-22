@@ -34,6 +34,7 @@ class RenameDlg : public QDialog
 	friend class QXDirect;
 	friend class QAFoil;
 	friend class QMiarex;
+	friend class StabViewDlg;
 
 private:
 	void InitDialog();

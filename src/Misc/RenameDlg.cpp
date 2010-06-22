@@ -28,6 +28,7 @@ RenameDlg::RenameDlg(void *pParent)
 	setWindowTitle(tr("Rename"));
 	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
+	m_pstrArray = NULL;
 	SetupLayout();
 }
 
@@ -92,7 +93,6 @@ void RenameDlg::SetupLayout()
 	MainLayout->setStretchFactor(CommandButtons, 1);
 	MainLayout->setStretchFactor(LabelNote, 1);
 
-
 	setLayout(MainLayout);
 }
 
@@ -116,9 +116,17 @@ void RenameDlg::InitDialog()
 	m_pctrlName->setFocus();
 	m_pctrlName->selectAll();
 
-	for (int i=0; i<m_pstrArray->size(); i++)
+	if(m_pstrArray)
 	{
-		m_pctrlNameList->addItem(m_pstrArray->at(i));
+		for (int i=0; i<m_pstrArray->size(); i++)
+		{
+			m_pctrlNameList->addItem(m_pstrArray->at(i));
+		}
+	}
+	else
+	{
+		m_pctrlNameList->setEnabled(false);
+		OverwriteButton->setEnabled(false);
 	}
 }
 
@@ -174,19 +182,22 @@ void RenameDlg::OnOK()
 	QString strong;
 
 	//exists ?
-	for (int l=0; l<m_pstrArray->size(); l++)
+	if(m_pstrArray)
 	{
-		strong = m_pstrArray->at(l);
-		if(strong == m_strName)
+		for (int l=0; l<m_pstrArray->size(); l++)
 		{
-			QString str = tr("Do you wish to overwrite ")+m_strName + " ?";
-			if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
-														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+			strong = m_pstrArray->at(l);
+			if(strong == m_strName)
 			{
-				done(10);
-				return;
+				QString str = tr("Do you wish to overwrite ")+m_strName + " ?";
+				if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
+															  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
+				{
+					done(10);
+					return;
+				}
+				else return;
 			}
-			else return;
 		}
 	}
 

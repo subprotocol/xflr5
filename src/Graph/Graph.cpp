@@ -99,7 +99,7 @@ CCurve* Graph::AddCurve()
 	{
         int nIndex = m_oaCurves.size();
 		pCurve->SetColor(m_CurveColors[nIndex%10]);
-        pCurve->SetStyle(Qt::SolidLine);
+        pCurve->SetStyle(0);
 		pCurve->m_pParentGraph = this;
         m_oaCurves.append(pCurve);
 	}
@@ -206,6 +206,22 @@ void Graph::DeleteCurve(CCurve *pCurve)
 		{
 			m_oaCurves.removeAt(i);
 			delete pCurve;
+			return;
+		}
+	}
+}
+
+
+void Graph::DeleteCurve(QString CurveTitle)
+{
+	CCurve *pOldCurve = NULL;
+	for(int i=0; i<m_oaCurves.size(); i++)
+	{
+		pOldCurve = (CCurve*)m_oaCurves.at(i);
+		if(pOldCurve->m_strName==CurveTitle)
+		{
+			m_oaCurves.removeAt(i);
+			delete pOldCurve;
 			return;
 		}
 	}
@@ -321,6 +337,23 @@ CCurve* Graph::GetCurve(int nIndex)
     if(m_oaCurves.size()>nIndex)
 		return (CCurve*)m_oaCurves[nIndex];
 	else return NULL;
+}
+
+
+CCurve* Graph::GetCurve(QString CurveTitle)
+{
+	QString strong;
+	CCurve * pCurve;
+	for(int i=0; i<m_oaCurves.size(); i++)
+	{
+		pCurve = (CCurve*)m_oaCurves.at(i);
+		if(pCurve)
+		{
+			pCurve->GetTitle(strong);
+			if(strong==CurveTitle) return pCurve;
+		}
+	}
+	return NULL;
 }
 
 

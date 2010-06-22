@@ -1,7 +1,7 @@
 /****************************************************************************
 
-	ManageCurvesDlg  Classes
-	Copyright (C) 2010 Andre Deperrois xflr5@yahoo.com
+	NewNameDlg Classes
+        Copyright (C) 2010 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,35 +19,36 @@
 
 *****************************************************************************/
 
-#ifndef MANAGECURVESDLG_H
-#define MANAGECURVESDLG_H
+#ifndef NEWNAMEDLG_H
+#define NEWNAMEDLG_H
 
-#include "../Graph/QGraph.h"
 #include <QDialog>
+#include <QLineEdit>
 #include <QPushButton>
-#include <QTableWidget>
+#include <QKeyEvent>
 
-class ManageCurvesDlg : public QDialog
+
+class NewNameDlg : public QDialog
 {
+	friend class StabViewDlg;
 	Q_OBJECT
-	
 public:
-    ManageCurvesDlg();
+    NewNameDlg();
 	void InitDialog();
-	void SetupLayout();
-	void FillCurveTable();
-	void *m_pMainFrame, *m_pMiarex;
-	QGraph *m_pGraph[10];
-	int m_NGraph;
+	void keyPressEvent(QKeyEvent *event);
 	
-	QPushButton *m_pctrlDelete;
-
-	QTableWidget *m_pctrlCurveList;
-
+private:
+	void SetupLayout();
 	
 private slots:
 	void OnOK();
-	void OnDelete();
+	
+private:
+	QPushButton *OKButton;
+	QLineEdit *m_pctrlName;
+	QString m_OldName;
+	QString m_NewName;
+	
 };
 
-#endif // MANAGECURVESDLG_H
+#endif // NEWNAMEDLG_H

@@ -175,9 +175,11 @@ public:
 	void GetClosestPoint(const double &x, const double &y, CCurve *pCurveSel, double &xSel, double &ySel);
 	
 	CCurve* GetCurve(int nIndex);
+	CCurve* GetCurve(QString CurveTitle);
 	CCurve* AddCurve();
 	void DeleteCurve(int index);
 	void DeleteCurve(CCurve *pCurve);
+	void DeleteCurve(QString CurveTitle);
 	void DeleteCurves();
 	void ResetXLimits();
 	void ResetYLimits();

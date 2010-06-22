@@ -51,6 +51,8 @@ public:
 	void ResetCurve();
 	void GetClosestPoint(double const &xs, double const &ys, double &xsel, double &ysel, double &dist);
 
+	QString GetTitle();
+	
 	double GetxMin();
 	double GetxMax();
 	double GetyMin();
