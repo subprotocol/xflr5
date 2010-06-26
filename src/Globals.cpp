@@ -1274,11 +1274,11 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 
-bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
+bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel)
 {
    int i, j, k;
    double *p_k, *p_row, *p_col;
-   double max;
+   double max=0.0;
 
    p_col = NULL;
 
@@ -1287,12 +1287,13 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
 	{
 //  find the pivot row
 		pivot[k] = k;
+		p_col = p_k+k;
 		max = fabs( *(p_k + k) );
-		for (j = k + 1, p_row = p_k + n; j < n; j++, p_row += n)
+		for (j=k+1, p_row=p_k+n; j<n; j++, p_row+=n)
 		{
-			if (max<fabs(*(p_row + k)))
+			if (max<fabs(*(p_row+k)))
 			{
-				max = fabs(*(p_row + k));
+				max = fabs(*(p_row+k));
 				pivot[k] = j;
 				p_col = p_row;
 			}
@@ -1302,7 +1303,7 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
 //     and if the pivot row differs from the current row, then
 //     interchange the two rows.
 		if (pivot[k] != k)
-			for (j = 0; j < n; j++)
+			for (j=0; j<n; j++)
 			{
 				max = *(p_k + j);
 				*(p_k + j) = *(p_col + j);
@@ -1311,6 +1312,7 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
 
 //                and if the matrix is singular, return error
 		if ( *(p_k + k) == 0.0 ) return false;
+		
 
 //      otherwise find the upper triangular matrix elements for row k.
 		for (j = k+1; j < n; j++) *(p_k + j) /= *(p_k + k);
@@ -1319,6 +1321,8 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
 //      update remaining matrix
 		for (i = k+1, p_row = p_k + n; i < n; p_row += n, i++)
 			for (j = k+1; j < n; j++) *(p_row + j) -= *(p_row + k) * *(p_k + j);
+
+		if(*pbCancel) return false;		
    }
    return true;
 }
@@ -1371,7 +1375,7 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n)
 //     }                                                                      //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
-bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int Size)
+bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
 {
    int i, k;
    double *p_k;
@@ -1389,6 +1393,8 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 		x[k] = B[k];
 		for (i=0; i<k; i++) x[k]-=x[i] * *(p_k+i);
 		x[k] /= *(p_k+k);
+		
+		if(*pbCancel) return false;
 	}
 
 //  Solve the linear equation Ux = y, where y is the solution
@@ -1402,8 +1408,14 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 			dum=B[k]; B[k]=B[pivot[k]]; B[pivot[k]]=dum;
 		}
 
-		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(p_k + i);
-		if (*(p_k+k)==0.0) return false;
+		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(p_k+i);
+		if (*(p_k+k)==0.0)
+		{
+qDebug() <<"Returning false";
+			return false;
+		}
+		
+		if(*pbCancel) return false;
 	}
 
    return true;

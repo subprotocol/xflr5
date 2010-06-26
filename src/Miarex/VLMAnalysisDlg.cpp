@@ -1461,7 +1461,7 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 bool VLMAnalysisDlg::VLMSolveDouble()
 {
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-//	static int index[VLMMATSIZE];
+	static int index[VLMMATSIZE];
 
 	int Size;
 	if(m_bVLMSymetric) Size = m_MatSize/2;
@@ -1477,9 +1477,9 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
 
 
-	if(!Gauss(m_aij,Size, m_RHS, 2, &m_bCancel))
+//	if(!Gauss(m_aij,Size, m_RHS, 2, &m_bCancel))
 
-//	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, index, Size))
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, index, Size, &m_bCancel))
 	{
 		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
 		m_bConverged = false;
@@ -1487,8 +1487,9 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 	}
 	else m_bConverged = true;
 
-//	Crout_LU_with_Pivoting_Solve(m_aij, m_xRHS, index, m_RHS,      Size);
-//	Crout_LU_with_Pivoting_Solve(m_aij, m_zRHS, index, m_RHS+Size, Size);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_xRHS, index, m_RHS,      Size, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_zRHS, index, m_RHS+Size, Size, &m_bCancel);
+
 	memcpy(m_xRHS, m_RHS,      Size * sizeof(double));
 	memcpy(m_zRHS, m_RHS+Size, Size * sizeof(double));
 

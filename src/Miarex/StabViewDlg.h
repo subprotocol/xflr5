@@ -78,13 +78,14 @@ private:
 	void SetMode(int iMode=-1);
 	void SetupLayout();
 	void SetControls();
-	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width);
+	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width, bool const& bCurve, bool const& bPoints);
 	
 	
 	
 	static void *s_pMiarex, *s_pMainFrame;
 
 	QRadioButton *m_pctrlRLMode1,*m_pctrlRLMode2,*m_pctrlRLMode3,*m_pctrlRLMode4;
+	QRadioButton *m_pctrlTimeMode1,*m_pctrlTimeMode2,*m_pctrlTimeMode3,*m_pctrlTimeMode4;
 	QLineEdit *m_pctrlEigenValue, *m_pctrlEigenVector1, *m_pctrlEigenVector2, *m_pctrlEigenVector3, *m_pctrlEigenVector4;
 
 //	QSlider *m_pctrlAnimationSpeed, *m_pctrlAnimationAmplitude;
@@ -101,11 +102,11 @@ private:
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlSigma1, *m_pctrlDsi;
-	QStackedWidget *m_pctrlStackWidget;
+	QStackedWidget *m_pctrlStackWidget, *m_pctrlInitialConditionsWidget;
 	
 	QGroupBox *m_pctrlAnimationBox;
 
-	QRadioButton *m_pctrlInitCondResponse, *m_pctrlForcedResponse;
+	QRadioButton *m_pctrlModalResponse, *m_pctrlInitCondResponse, *m_pctrlForcedResponse;
 
 	QTableView *m_pctrlControlTable;
 	QStandardItemModel *m_pControlModel;

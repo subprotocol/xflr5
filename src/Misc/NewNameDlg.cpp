@@ -35,6 +35,7 @@ NewNameDlg::NewNameDlg()
 void NewNameDlg::InitDialog()
 {
 	m_pctrlName->setText(m_OldName);
+	m_pctrlName->selectAll();
 }
 
 void NewNameDlg::SetupLayout()

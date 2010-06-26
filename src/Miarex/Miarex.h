@@ -398,6 +398,7 @@ private:
 
 	int m_CurveStyle, m_CurveWidth;
 	QColor m_CurveColor;
+	bool m_bCurveVisible, m_bCurvePoints;
 
 	GL3dWingDlg  m_WingDlg;
 	GL3dBodyDlg  m_GL3dBody;
@@ -490,7 +491,8 @@ protected:
 	bool m_bXCmRef; 	// defines whether the corresponfing data should be displayed
 	bool m_bSequence;
 	bool m_bInitLLTCalc;
-	bool m_bForcedResponse;     // true if the time graph view is the forced response, false if initial conditions response
+//	bool m_bForcedResponse;     // true if the time graph view is the forced response, false if initial conditions response
+	int m_StabilityResponseType; //0 = initial conditions, 1=forced response, 2=modal response
 
 	int m_NSurfaces;
 	int m_iWingView;			// defines how many graphs will be displayed in WOpp view

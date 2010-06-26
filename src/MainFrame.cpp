@@ -1670,9 +1670,9 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView->setDefaultAction(CpViewAct);
 	m_pctrlCpView->setCheckable(true);
 	
-	m_pctrlStabViewButton = new QToolButton;
-	m_pctrlStabViewButton->setDefaultAction(StabPolarAct);
-	m_pctrlStabViewButton->setCheckable(true);
+	m_pctrlStabTimeViewButton = new QToolButton;
+	m_pctrlStabTimeViewButton->setDefaultAction(StabPolarAct);
+	m_pctrlStabTimeViewButton->setCheckable(true);
 
 	m_pctrlRootLocusButton = new QToolButton;
 	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
@@ -1706,7 +1706,7 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
 	m_pctrlMiarexToolBar->addSeparator();
-	m_pctrlMiarexToolBar->addWidget(m_pctrlStabViewButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlStabTimeViewButton);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlModalViewButton);
 	m_pctrlMiarexToolBar->addSeparator();

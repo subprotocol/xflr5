@@ -86,6 +86,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_CurveStyle = 0;
 	m_CurveWidth = 1;
 	m_CurveColor = QColor(127, 255, 70);
+	m_bCurveVisible = true;
+	m_bCurvePoints  = false;
 
 	m_CoreSize        = 0.000001;
 	m_MaxWakeIter     = 5;
@@ -549,7 +551,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bShowLight         = false;
 	m_bIs2DScaleSet      = false;
 	m_bIs3DScaleSet      = false;
-	m_bForcedResponse    = true;
+//	m_bForcedResponse    = true;
+	m_StabilityResponseType = 0;
 	
 	m_LastPoint.setX(0);
 	m_LastPoint.setY(0);
@@ -1779,7 +1782,7 @@ void QMiarex::SetControls()
 	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
 	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
-	pMainFrame->m_pctrlStabViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
+	pMainFrame->m_pctrlStabTimeViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
 	pMainFrame->m_pctrlRootLocusButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==1);
 	pMainFrame->m_pctrlModalViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==3);
 
@@ -3522,8 +3525,8 @@ void QMiarex::CreateStabilityCurves()
 	{
 //		MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 //		StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-		if(m_bForcedResponse) CreateStabRungeKuttaCurves();
-		else                  CreateStabTimeCurves();
+		if(m_StabilityResponseType==1)  CreateStabRungeKuttaCurves();
+		else                            CreateStabTimeCurves();
 	}
 	else
 	{
@@ -3540,10 +3543,10 @@ void QMiarex::CreateStabTimeCurves()
 
 	static complex<double> M[16];// the modal matrix
 	static complex<double> InvM[16];// the inverse of the modal matrix
+	static complex<double> q[4],q0[4],y[4];//the part of each mode in the solution
 	static int i,j,k;
 	static double t, dt, TotalPoints; // the input load
-	static double *in;
-	static complex<double> q[4],q0[4],y[4];//the part of each mode in the solution
+	static complex<double> in[4];
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	QString strong, CurveTitle;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -3551,7 +3554,6 @@ void QMiarex::CreateStabTimeCurves()
 	CurveTitle = pStabView->m_pctrlCurveList->currentText();
 	
 	pCurve0 = m_TimeGraph1.GetCurve(CurveTitle);
-//	qDebug()<<"creating 1"	<<CurveTitle<<pCurve0;
 	if(pCurve0) pCurve0->ResetCurve();
 	else return;
 	pCurve1 = m_TimeGraph2.GetCurve(CurveTitle);
@@ -3578,41 +3580,24 @@ void QMiarex::CreateStabTimeCurves()
 	m_TimeInput[1] = pStabView->m_pctrlStabVar2->GetValue();
 	m_TimeInput[2] = pStabView->m_pctrlStabVar3->GetValue();
 	m_TimeInput[3] = 0.0;//we start with an initial 0.0 value for pitch or bank angles
-	in = m_TimeInput;
-
+	if(m_StabilityResponseType==0)
+	{
+		//start with user input initial conditions
+		in[0] = complex<double>(m_TimeInput[0], 0.0);
+		in[1] = complex<double>(m_TimeInput[1], 0.0);
+		in[2] = complex<double>(m_TimeInput[2], 0.0);
+		in[3] = complex<double>(m_TimeInput[3], 0.0);
+	}
+	else if(m_StabilityResponseType==2)
+	{
+		//start with initial conditions which will excite only the requested mode
+		in[0] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][0];
+		in[1] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][1];
+		in[2] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][2];
+		in[3] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
+	}	
 	if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
 
-/*	pCurve0->SetColor(m_pCurWOpp->m_Color);
-	pCurve1->SetColor(m_pCurWOpp->m_Color);
-	pCurve2->SetColor(m_pCurWOpp->m_Color);
-	pCurve3->SetColor(m_pCurWOpp->m_Color);
-	pCurve0->SetStyle(m_pCurWOpp->m_Style);
-	pCurve1->SetStyle(m_pCurWOpp->m_Style);
-	pCurve2->SetStyle(m_pCurWOpp->m_Style);
-	pCurve3->SetStyle(m_pCurWOpp->m_Style);
-	pCurve0->SetWidth(m_pCurWOpp->m_Width);
-	pCurve1->SetWidth(m_pCurWOpp->m_Width);
-	pCurve2->SetWidth(m_pCurWOpp->m_Width);
-	pCurve3->SetWidth(m_pCurWOpp->m_Width);
-	pCurve0->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve1->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve2->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve3->ShowPoints(m_pCurWOpp->m_bShowPoints);
-
-	if(m_bLongitudinal)
-	{ 
-		pCurve0->SetTitle(strong);
-		pCurve1->SetTitle(strong);
-		pCurve2->SetTitle(strong);
-		pCurve3->SetTitle(strong);
-	}
-	else
-	{
-		pCurve0->SetTitle(strong);
-		pCurve1->SetTitle(strong);
-		pCurve2->SetTitle(strong);
-		pCurve3->SetTitle(strong);
-	}*/
 	
 	//fill the modal matrix
 	if(m_bLongitudinal) k=0; else k=1;
@@ -3652,10 +3637,10 @@ void QMiarex::CreateStabTimeCurves()
 			pCurve1->AddPoint(t, y[1].real());
 			pCurve2->AddPoint(t, y[2].real());
 			pCurve3->AddPoint(t, y[3].real()*180.0/PI);
-//if(i%50==0) qDebug() << i << y[0].real() <<y[1].real() << y[2].real() <<y[3].real();
 		}
 	}
 }
+
 
 
 void QMiarex::CreateStabRungeKuttaCurves()
@@ -3712,39 +3697,6 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	// Rebuild the Forced Response matrix
 	//read the initial step condition
 	pStabView->ReadForcedInput(in);
-	
-	pCurve0->SetColor(m_pCurWOpp->m_Color);
-	pCurve1->SetColor(m_pCurWOpp->m_Color);
-	pCurve2->SetColor(m_pCurWOpp->m_Color);
-	pCurve3->SetColor(m_pCurWOpp->m_Color);
-	pCurve0->SetStyle(m_pCurWOpp->m_Style);
-	pCurve1->SetStyle(m_pCurWOpp->m_Style);
-	pCurve2->SetStyle(m_pCurWOpp->m_Style);
-	pCurve3->SetStyle(m_pCurWOpp->m_Style);
-	pCurve0->SetWidth(m_pCurWOpp->m_Width);
-	pCurve1->SetWidth(m_pCurWOpp->m_Width);
-	pCurve2->SetWidth(m_pCurWOpp->m_Width);
-	pCurve3->SetWidth(m_pCurWOpp->m_Width);
-	pCurve0->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve1->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve2->ShowPoints(m_pCurWOpp->m_bShowPoints);
-	pCurve3->ShowPoints(m_pCurWOpp->m_bShowPoints);
-
-	strong = pStabView->m_pctrlCurveList->currentText();
-	if(m_bLongitudinal)
-	{
-		pCurve0->SetTitle(strong);
-		pCurve1->SetTitle(strong);
-		pCurve2->SetTitle(strong);
-		pCurve3->SetTitle(strong);
-	}
-	else
-	{
-		pCurve0->SetTitle(strong);
-		pCurve1->SetTitle(strong);
-		pCurve2->SetTitle(strong);
-		pCurve3->SetTitle(strong);
-	}
 	
 	RampTime    = pStabView->m_pctrlRampTime->GetValue();           //s
 	m_Deltat    = pStabView->m_pctrlDeltat->GetValue();
@@ -7522,9 +7474,10 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_TimeInput[1]      = pSettings->value("TimeIn1",0.0).toDouble();
 		m_TimeInput[2]      = pSettings->value("TimeIn2",0.0).toDouble();
 		m_TimeInput[3]      = pSettings->value("TimeIn3",0.0).toDouble();
-		m_bForcedResponse   = pSettings->value("ForcedResponse").toBool();
+//		m_bForcedResponse   = pSettings->value("ForcedResponse").toBool();
 		m_bLongitudinal     = pSettings->value("DynamicsMode").toBool();
 		m_iStabTimeView     = pSettings->value("StabTimeView",4).toInt();
+		m_StabilityResponseType = pSettings->value("StabCurveType",0).toInt();
 		k = pSettings->value("TimeGraph").toInt();
 		if(k==1)m_pCurTimeGraph = &m_TimeGraph1;
 		else if(k==2)m_pCurTimeGraph = &m_TimeGraph2;
@@ -11459,6 +11412,7 @@ void QMiarex::OnResetCpSection()
 void QMiarex::OnResetCurWPolar()
 {
 	if (!m_pCurWPolar) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString strong = tr("Are you sure you want to reset the content of the polar :\n")+  m_pCurWPolar->m_PlrName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
@@ -11471,6 +11425,7 @@ void QMiarex::OnResetCurWPolar()
 	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
 	else if(m_iView==WCPVIEW)	CreateCpCurves();
 
+	pMainFrame->SetSaveState(false);
 	UpdateView();
 
 }
@@ -11774,92 +11729,19 @@ void QMiarex::OnShowTransitions()
 	}
 }
 
+
 void QMiarex::OnShowCurve()
 {
-	//user has toggled visible switch
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	if(m_iView==WPOLARVIEW)
-	{
-		if (m_pCurWPolar)
-		{
-			m_pCurWPolar->m_bIsVisible = m_pctrlShowCurve->isChecked();
-		}
-		CreateWPolarCurves();
-	}
-	else if(m_iView==WSTABVIEW)
-	{
-		if (m_pCurWPolar)
-		{
-			m_pCurWPolar->m_bIsVisible = m_pctrlShowCurve->isChecked();
-		}
-		CreateStabilityCurves();
-	}
-	else if (m_pCurWOpp)
-	{
-		if(m_iView==WOPPVIEW)
-		{
-			m_pCurWOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
-			if(m_pCurPOpp) m_pCurPOpp->m_bIsVisible = m_pctrlShowCurve->isChecked();
-			CreateWOppCurves();
-		}
-		else if (m_iView==WCPVIEW)
-		{
-			m_bShowCp = m_pctrlShowCurve->isChecked();
-			CreateCpCurves();
-		}
-	}
-	pMainFrame->SetSaveState(false);
-	UpdateView();
+	m_bCurveVisible = m_pctrlShowCurve->isChecked();
+	UpdateCurve();
+	
 }
 
 
 void QMiarex::OnShowPoints()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-
-	if(m_iView ==WPOLARVIEW)
-	{
-		if (m_pCurWPolar)
-		{
-			m_pCurWPolar->m_bShowPoints = m_pctrlShowPoints->isChecked();
-		}
-		CreateWPolarCurves();
-	}
-	if(m_iView ==WSTABVIEW)
-	{
-		if (m_iStabilityView==1 && m_pCurWPolar)
-		{
-			m_pCurWPolar->m_bShowPoints = m_pctrlShowPoints->isChecked();
-		}
-		else if(m_iStabilityView==0 && m_pCurWOpp)
-		{
-			if(m_pCurPOpp) 
-			{
-				m_pCurPOpp->m_bShowPoints            = m_pctrlShowPoints->isChecked();
-				m_pCurPOpp->m_WingWOpp.m_bShowPoints = m_pctrlShowPoints->isChecked();
-			}
-			else if(m_pCurWOpp)
-			{
-				m_pCurWOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
-			}
-		}
-		CreateStabilityCurves();
-	}
-	else if (m_iView==WOPPVIEW && m_pCurWOpp)
-	{
-		m_pCurWOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
-		if(m_pCurPOpp) m_pCurPOpp->m_bShowPoints = m_pctrlShowPoints->isChecked();
-		CreateWOppCurves();
-	}
-	else if (m_iView==WCPVIEW && m_pCurWOpp)
-	{
-		m_bShowCpPoints = m_pctrlShowPoints->isChecked();
-		CreateCpCurves();
-	}
-
-	pMainFrame->SetSaveState(false);
-	UpdateView();
+	m_bCurvePoints = m_pctrlShowPoints->isChecked();
+	UpdateCurve();
 }
 
 
@@ -13480,7 +13362,9 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("TimeIn2", m_TimeInput[2]);
 		pSettings->setValue("TimeIn3", m_TimeInput[3]);
 		pSettings->setValue("DynamicsMode", m_bLongitudinal);
-		pSettings->setValue("ForcedResponse", m_bForcedResponse);
+//		pSettings->setValue("ForcedResponse", m_bForcedResponse);
+		pSettings->setValue("StabCurveType",m_StabilityResponseType);
+		
 
 		pSettings->setValue("StabTimeView", m_iStabTimeView);
 		if(m_pCurTimeGraph == &m_TimeGraph1)      k=1;
@@ -13810,8 +13694,8 @@ void QMiarex::SetCurveParams()
 	{
 		if(m_pCurWPolar)
 		{
-			if(m_pCurWPolar->m_bIsVisible)  m_pctrlShowCurve->setChecked(true);  else  m_pctrlShowCurve->setChecked(false);
-			if(m_pCurWPolar->m_bShowPoints) m_pctrlShowPoints->setChecked(true); else  m_pctrlShowPoints->setChecked(false);
+			m_pctrlShowCurve->setChecked(m_pCurWPolar->m_bIsVisible);
+			m_pctrlShowPoints->setChecked(m_pCurWPolar->m_bShowPoints);
 
 			m_CurveColor = m_pCurWPolar->m_Color;
 			m_CurveStyle = m_pCurWPolar->m_Style;
@@ -13832,6 +13716,8 @@ void QMiarex::SetCurveParams()
 			m_CurveStyle = pStabView->m_pCurve->GetStyle();
 			m_CurveWidth = pStabView->m_pCurve->GetWidth();
 //qDebug()<<"CurveColor"<<m_CurveColor.red()<<m_CurveColor.green()<<m_CurveColor.blue();
+			m_pctrlShowCurve->setChecked(pStabView->m_pCurve->IsVisible());
+			m_pctrlShowPoints->setChecked(pStabView->m_pCurve->PointsVisible());
 			FillComboBoxes();
 		}		
 	}
@@ -15989,41 +15875,27 @@ void QMiarex::UpdateCurve()
 	{
 		m_pCurWPolar->m_Color = m_CurveColor;
 		m_pCurWPolar->m_Style = m_CurveStyle;
-		m_pCurWPolar->m_Width = (int)m_CurveWidth;
+		m_pCurWPolar->m_Width = m_CurveWidth;
+		m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
+		m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
 		CreateWPolarCurves();
 	}
-	if(m_iView==WSTABVIEW && m_pCurWPolar)
+	else if(m_iView==WSTABVIEW && m_pCurWPolar)
 	{
 		if(m_iStabilityView==0)
 		{
-/*			if(m_pCurPOpp)
-			{
-				m_pCurPOpp->m_Color = m_CurveColor;
-				m_pCurPOpp->m_Style = m_CurveStyle;
-				m_pCurPOpp->m_Width = m_CurveWidth;			
-			}
-			if(m_pCurWOpp)
-			{
-				m_pCurWOpp->m_Color = m_CurveColor;
-				m_pCurWOpp->m_Style = m_CurveStyle;
-				m_pCurWOpp->m_Width = m_CurveWidth;
-			}*/
 			StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
-			pStabView->SetTimeCurveStyle(m_CurveColor, m_CurveStyle, m_CurveWidth);
-			if(pStabView->m_pCurve)
-			{
-				pStabView->m_pCurve->SetColor(m_CurveColor);
-				pStabView->m_pCurve->SetStyle(m_CurveStyle);
-				pStabView->m_pCurve->SetWidth(m_CurveWidth);
-			}
+			pStabView->SetTimeCurveStyle(m_CurveColor, m_CurveStyle, m_CurveWidth, m_bCurveVisible, m_bCurvePoints);
 		}
 		else if(m_iStabilityView==1)
 		{
 			m_pCurWPolar->m_Color = m_CurveColor;
 			m_pCurWPolar->m_Style = m_CurveStyle;
 			m_pCurWPolar->m_Width = m_CurveWidth;
+			m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
+			m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
+			CreateStabilityCurves();
 		}
-		CreateStabilityCurves();
 	}
 	else if (m_iView==WOPPVIEW)
 	{
@@ -16032,12 +15904,21 @@ void QMiarex::UpdateCurve()
 			m_pCurPOpp->m_Color = m_CurveColor;
 			m_pCurPOpp->m_Style = m_CurveStyle;
 			m_pCurPOpp->m_Width = m_CurveWidth;			
+			m_pCurPOpp->m_bIsVisible  = m_bCurveVisible;
+			m_pCurPOpp->m_bShowPoints = m_bCurvePoints;
+			m_pCurWOpp->m_Color = m_CurveColor;
+			m_pCurWOpp->m_Style = m_CurveStyle;
+			m_pCurWOpp->m_Width = m_CurveWidth;
+			m_pCurWOpp->m_bIsVisible  = m_bCurveVisible;
+			m_pCurWOpp->m_bShowPoints = m_bCurvePoints;
 		}
 		else if(m_pCurWOpp)
 		{
 			m_pCurWOpp->m_Color = m_CurveColor;
 			m_pCurWOpp->m_Style = m_CurveStyle;
 			m_pCurWOpp->m_Width = m_CurveWidth;
+			m_pCurWOpp->m_bIsVisible  = m_bCurveVisible;
+			m_pCurWOpp->m_bShowPoints = m_bCurvePoints;
 		}
 		CreateWOppCurves();
 	}
@@ -16046,6 +15927,8 @@ void QMiarex::UpdateCurve()
 		m_CpColor = m_CurveColor;
 		m_CpStyle = m_CurveStyle;
 		m_CpWidth = m_CurveWidth;
+		m_bShowCp       = m_bCurveVisible;
+		m_bShowCpPoints = m_bCurvePoints;
 		CreateCpCurves();
 	}
 	UpdateView();

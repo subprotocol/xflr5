@@ -97,8 +97,8 @@ bool LinBairstow(double *p, complex<double> *root, int n);
 bool Eigenvector(double a[][4], complex<double> lambda, complex<double> *V);
 
 
-bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int n);
-bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n);
+bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int n, bool *pbCancel);
+bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel);
 
 
 void *GetPlrVariable(CPolar *pPolar, int iVar);

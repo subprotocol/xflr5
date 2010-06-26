@@ -1114,22 +1114,28 @@ void StabAnalysisDlg::ComputeStabilityDerivatives()
 	}
 
 	// The influence matrix is unchanged, so baksubstitute for unit vortex circulations
-	memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-	memcpy(m_RHS,        m_uRHS, m_MatSize * sizeof(double));
+/*	memcpy(m_RHS,             m_uRHS, m_MatSize * sizeof(double));
 	memcpy(m_RHS+m_MatSize,   m_vRHS, m_MatSize * sizeof(double));
 	memcpy(m_RHS+2*m_MatSize, m_wRHS, m_MatSize * sizeof(double));
 	memcpy(m_RHS+3*m_MatSize, m_pRHS, m_MatSize * sizeof(double));
 	memcpy(m_RHS+4*m_MatSize, m_qRHS, m_MatSize * sizeof(double));
-	memcpy(m_RHS+5*m_MatSize, m_rRHS, m_MatSize * sizeof(double));
+	memcpy(m_RHS+5*m_MatSize, m_rRHS, m_MatSize * sizeof(double));*/
 
-	Gauss(m_aij, m_MatSize, m_RHS, 6, &m_bCancel);
+//	memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+//	Gauss(m_aij, m_MatSize, m_RHS, 6, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_vRHS, m_Index, m_RHS+m_MatSize,   m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+2*m_MatSize, m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_pRHS, m_Index, m_RHS+3*m_MatSize, m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_qRHS, m_Index, m_RHS+4*m_MatSize, m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_rRHS, m_Index, m_RHS+5*m_MatSize, m_MatSize, &m_bCancel);
 
-	memcpy(m_uRHS, m_RHS,        m_MatSize * sizeof(double));
+/*	memcpy(m_uRHS, m_RHS,             m_MatSize * sizeof(double));
 	memcpy(m_vRHS, m_RHS+m_MatSize,   m_MatSize * sizeof(double));
 	memcpy(m_wRHS, m_RHS+2*m_MatSize, m_MatSize * sizeof(double));
 	memcpy(m_pRHS, m_RHS+3*m_MatSize, m_MatSize * sizeof(double));
 	memcpy(m_qRHS, m_RHS+4*m_MatSize, m_MatSize * sizeof(double));
-	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize * sizeof(double));
+	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize * sizeof(double));*/
 
 
 	// Compute stabiliy and control derivatives
@@ -1140,37 +1146,37 @@ void StabAnalysisDlg::ComputeStabilityDerivatives()
 	// 1st ORDER STABILITY DERIVATIVES
 
 	// x-derivatives________________________
-	Forces(m_uRHS, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Xu = (Force-Force0).dot(is)/deltaspeed;
 	Zu = (Force-Force0).dot(ks)/deltaspeed;
 	Mu = 0.0;
 //	Mu = (Moment-Moment0).dot(js)/deltaspeed;
 
 	// y-derivatives________________________
-	Forces(m_vRHS, m_RHS+53*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS+m_MatSize, m_RHS+53*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Yv = (Force-Force0).dot(js)/deltaspeed;
 	Lv = (Moment-Moment0).dot(is)/deltaspeed;
 	Nv = (Moment-Moment0).dot(ks)/deltaspeed;
 
 	// z-derivatives________________________
-	Forces(m_wRHS, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS+2*m_MatSize, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Xw = (Force-Force0).dot(is)/deltaspeed;
 	Zw = (Force-Force0).dot(ks)/deltaspeed;  
 	Mw = (Moment-Moment0).dot(js)/deltaspeed;
 
 	// p-derivatives
-	Forces(m_pRHS, m_RHS+59*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS+3*m_MatSize, m_RHS+59*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Yp = (Force-Force0).dot(js)/deltarotation;
 	Lp = (Moment-Moment0).dot(is)/deltarotation;
 	Np = (Moment-Moment0).dot(ks)/deltarotation;
 
 	// q-derivatives
-	Forces(m_qRHS, m_RHS+62*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS+4*m_MatSize, m_RHS+62*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Zq = (Force-Force0).dot(ks)  /deltarotation;
 	Mq = (Moment-Moment0).dot(js)/deltarotation;
 
 	// r-derivatives
-	Forces(m_rRHS, m_RHS+65*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_RHS+5*m_MatSize, m_RHS+65*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Yr = (Force-Force0).dot(js)/deltarotation;
 	Lr = (Moment-Moment0).dot(is)/deltarotation;
 	Nr = (Moment-Moment0).dot(ks)/deltarotation;
@@ -2165,7 +2171,8 @@ bool StabAnalysisDlg::SolveUnitSpeeds()
 	memcpy(m_RHS+m_MatSize, m_wRHS, m_MatSize * sizeof(double));
 	memcpy(m_aijRef, m_aij, m_MatSize*m_MatSize*sizeof(double));// we'll need it later for stability derivatives
 
-	if(!Gauss(m_aij,m_MatSize, m_RHS, 2, &m_bCancel))
+//	if(!Gauss(m_aij,m_MatSize, m_RHS, 2, &m_bCancel))
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, m_MatSize, &m_bCancel))
 	{
 		AddString("      Singular Matrix.... Aborting calculation...\n");
 		m_bConverged = false;
@@ -2173,6 +2180,9 @@ bool StabAnalysisDlg::SolveUnitSpeeds()
 	}
 	else m_bConverged = true;
 
+	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,           m_MatSize, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+m_MatSize, m_MatSize, &m_bCancel);
+	
 	memcpy(m_uRHS, m_RHS,           m_MatSize * sizeof(double));
 	memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize * sizeof(double));
 

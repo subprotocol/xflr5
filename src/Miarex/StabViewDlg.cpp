@@ -68,6 +68,11 @@ void StabViewDlg::Connect()
 	connect(m_pctrlRLMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlRLMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlRLMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlTimeMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlTimeMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlTimeMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrlTimeMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	
 	connect(m_pctrlAnimate ,SIGNAL(clicked()), this, SLOT(OnAnimate()));
 	connect(m_pctrlAnimationSpeed ,SIGNAL(sliderMoved(int)), this, SLOT(OnAnimationSpeed(int)));
 	connect(m_pctrlAnimationAmplitude ,SIGNAL(sliderMoved(int)), this, SLOT(OnAnimationAmplitude(int)));
@@ -78,6 +83,7 @@ void StabViewDlg::Connect()
 
 	connect(m_pctrlInitCondResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
 	connect(m_pctrlForcedResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
+	connect(m_pctrlModalResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
 	
 	connect(m_pctrlAddCurve, SIGNAL(clicked()), this, SLOT(OnAddCurve()));
 	connect(m_pctrlDeleteCurve, SIGNAL(clicked()), this, SLOT(OnDeleteCurve()));
@@ -353,20 +359,6 @@ void StabViewDlg::OnAnimateRestart()
 	o2 = omega*omega;
 	maxso  = qMax(fabs(sigma), fabs(omega));
 
-//	if(abs(omega)>PRECISION)  Period =  2.0*PI/abs(omega);
-//	else if(sigma>0.0)        Period =  1.0/abs(sigma);
-//	else                      Period =  1.0/abs(sigma);
-//	pMiarex->m_Modedt = Period/MODEPOINTS;
-
-	m_vabs[0] = abs(pWOpp->m_EigenVector[m_iCurrentMode][0]);
-	m_vabs[1] = abs(pWOpp->m_EigenVector[m_iCurrentMode][1]);
-	m_vabs[2] = abs(pWOpp->m_EigenVector[m_iCurrentMode][2]);
-	m_vabs[3] = abs(pWOpp->m_EigenVector[m_iCurrentMode][3]);
-	m_phi[0]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][0]);
-	m_phi[1]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][1]);
-	m_phi[2]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][2]);
-	m_phi[3]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][3]);
-
 	//calculate state at t=0 for normalization
 	if(pMiarex->m_bLongitudinal)
 	{
@@ -424,8 +416,6 @@ void StabViewDlg::OnAnimateRestart()
 
 	//set initial mode positions, i.e. t=0
 	pMiarex->OnAnimateModeSingle(false);
-//	pMiarex->m_ModeTime = 0.0;
-//	pMiarex->UpdateView();
 }
 
 
@@ -441,8 +431,8 @@ void StabViewDlg::OnPlotStabilityGraph()
 	if(!pMiarex->m_TimeGraph1.GetCurveCount())
 	{
 		//we don't have a curve yet
-		//so create one and use it for plotting
-		AddCurve();
+		// so return
+		return;
 	}
 	
 	pMiarex->CreateStabilityCurves();
@@ -454,11 +444,20 @@ void StabViewDlg::OnPlotStabilityGraph()
 void StabViewDlg::OnModeSelection()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	if(m_pctrlRLMode1->isChecked())      m_iCurrentMode = 0;
-	else if(m_pctrlRLMode2->isChecked()) m_iCurrentMode = 1;
-	else if(m_pctrlRLMode3->isChecked()) m_iCurrentMode = 2;
-	else if(m_pctrlRLMode4->isChecked()) m_iCurrentMode = 3;
-
+	if(pMiarex->m_iStabilityView==0)
+	{
+		if(m_pctrlTimeMode1->isChecked())      m_iCurrentMode = 0;
+		else if(m_pctrlTimeMode2->isChecked()) m_iCurrentMode = 1;
+		else if(m_pctrlTimeMode3->isChecked()) m_iCurrentMode = 2;
+		else if(m_pctrlTimeMode4->isChecked()) m_iCurrentMode = 3;
+	}
+	else
+	{
+		if(m_pctrlRLMode1->isChecked())      m_iCurrentMode = 0;
+		else if(m_pctrlRLMode2->isChecked()) m_iCurrentMode = 1;
+		else if(m_pctrlRLMode3->isChecked()) m_iCurrentMode = 2;
+		else if(m_pctrlRLMode4->isChecked()) m_iCurrentMode = 3;
+	}
 	if(!pMiarex->m_bLongitudinal) m_iCurrentMode +=4;
 	SetMode(m_iCurrentMode);
 }
@@ -475,10 +474,18 @@ void StabViewDlg::OnReadData()
 
 void StabViewDlg::OnResponseType()
 {
+	int type=0;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	pMiarex->m_bForcedResponse = m_pctrlForcedResponse->isChecked();
+	
+	if(m_pctrlInitCondResponse->isChecked())    type=0;
+	else if(m_pctrlForcedResponse->isChecked()) type=1;
+	else if(m_pctrlModalResponse->isChecked())  type=2;
+	
+	if(type==pMiarex->m_StabilityResponseType) return;
+	
+	pMiarex->m_StabilityResponseType=type;
 	SetControls();
-	pMiarex->CreateStabilityCurves();
+//	pMiarex->CreateStabilityCurves();
 	pMiarex->UpdateView();
 	
 }
@@ -502,11 +509,6 @@ void StabViewDlg::SetMode(int iMode)
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	if(iMode>=0) m_iCurrentMode = iMode%4;
-	else       
-	{
-//		m_iCurrentMode = 0;
-	}
-	
 	if(!pMiarex->m_bLongitudinal) m_iCurrentMode += 4;
 	
 	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
@@ -515,14 +517,22 @@ void StabViewDlg::SetMode(int iMode)
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
 
 	FillEigenThings();
+	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
+
+	m_vabs[0] = abs(pWOpp->m_EigenVector[m_iCurrentMode][0]);
+	m_vabs[1] = abs(pWOpp->m_EigenVector[m_iCurrentMode][1]);
+	m_vabs[2] = abs(pWOpp->m_EigenVector[m_iCurrentMode][2]);
+	m_vabs[3] = abs(pWOpp->m_EigenVector[m_iCurrentMode][3]);
+	m_phi[0]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][0]);
+	m_phi[1]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][1]);
+	m_phi[2]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][2]);
+	m_phi[3]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][3]);
+
 	pMiarex->m_bResetglModeLegend = true;
 
 	if(pMiarex->m_pCurRLStabGraph && pMiarex->m_pCurWPolar)
 	{
 		pMiarex->m_pCurRLStabGraph->DeselectPoint();
-//		suffix = QString("_Mode_%1").arg(m_iCurrentMode+1);
-//		str = pMiarex->m_pCurWPolar->m_PlrName+suffix;
-//		bool bRes = pMiarex->m_pCurRLStabGraph->SelectPoint(str, m_iCurrentMode);
 	}
 
 	OnAnimateRestart();
@@ -540,10 +550,12 @@ void StabViewDlg::SetupLayout()
 
 	//_______________________Time view Parameters
 	QVBoxLayout *ResponseTypeLayout = new QVBoxLayout;
+	m_pctrlModalResponse = new QRadioButton(tr("Modal Response"));
 	m_pctrlInitCondResponse = new QRadioButton(tr("Initial Conditions Response"));
 	m_pctrlForcedResponse = new QRadioButton(tr("Forced Response"));
 	ResponseTypeLayout->addWidget(m_pctrlInitCondResponse);
 	ResponseTypeLayout->addWidget(m_pctrlForcedResponse);
+	ResponseTypeLayout->addWidget(m_pctrlModalResponse);
 	
 	QVBoxLayout	 *TimeParams = new QVBoxLayout;
 	m_pctrlStabLabel1 = new QLabel("u0__");
@@ -571,8 +583,11 @@ void StabViewDlg::SetupLayout()
 	VarParams->addWidget(m_pctrlUnit1,1,3);
 	VarParams->addWidget(m_pctrlUnit2,2,3);
 	VarParams->addWidget(m_pctrlUnit3,3,3);
+	QVBoxLayout *InitCondResponseLayout = new QVBoxLayout;
+	InitCondResponseLayout ->addLayout(VarParams);
+	InitCondResponseLayout->addStretch(1);
 	QGroupBox *InitCondResponse = new QGroupBox(tr("Initial conditions"));
-	InitCondResponse->setLayout(VarParams);
+	InitCondResponse->setLayout(InitCondResponseLayout);
 	
 	QGroupBox *ForcedResponseBox = new QGroupBox(tr("Forced Response"));
 	QVBoxLayout *ForcedResponse = new QVBoxLayout;
@@ -593,6 +608,25 @@ void StabViewDlg::SetupLayout()
 	m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
 	ForcedResponse->addWidget(m_pctrlControlTable);
 	ForcedResponseBox->setLayout(ForcedResponse);
+	
+	QGroupBox *ModalTimeBox = new QGroupBox("Modal response");
+	QVBoxLayout *ModalTimeLayout = new QVBoxLayout;
+	m_pctrlTimeMode1 = new QRadioButton("Mode 1");
+	m_pctrlTimeMode2 = new QRadioButton("Mode 2");
+	m_pctrlTimeMode3 = new QRadioButton("Mode 3");
+	m_pctrlTimeMode4 = new QRadioButton("Mode 4");
+	ModalTimeLayout->addWidget(m_pctrlTimeMode1);
+	ModalTimeLayout->addWidget(m_pctrlTimeMode2);
+	ModalTimeLayout->addWidget(m_pctrlTimeMode3);
+	ModalTimeLayout->addWidget(m_pctrlTimeMode4);
+	ModalTimeLayout->addStretch(1);
+	ModalTimeBox->setLayout(ModalTimeLayout);
+	
+	m_pctrlInitialConditionsWidget = new QStackedWidget;
+	m_pctrlInitialConditionsWidget->addWidget(InitCondResponse);
+	m_pctrlInitialConditionsWidget->addWidget(ForcedResponseBox);
+	m_pctrlInitialConditionsWidget->addWidget(ModalTimeBox);
+	m_pctrlInitialConditionsWidget->setCurrentIndex(0);
 
 	m_pctrlTotalTime = new FloatEdit(5,3);
 	m_pctrlDeltat    = new FloatEdit(.01,3);
@@ -616,21 +650,21 @@ void StabViewDlg::SetupLayout()
 	DtLayout->addWidget(m_pctrlRampTime,3,2);
 	DtLayout->addWidget(TimeLab3,3,3);
 
-	m_pctrlPlotStabGraph = new QPushButton(tr("Plot"));
 	QHBoxLayout *PlotCurveLayout = new QHBoxLayout;
 	QHBoxLayout *RenameCurveLayout = new QHBoxLayout;
 	QHBoxLayout *AddCurveLayout = new QHBoxLayout;
 	QHBoxLayout *DeleteCurveLayout = new QHBoxLayout;
+	m_pctrlPlotStabGraph = new QPushButton(tr("Recalc Curve"));
 	m_pctrlAddCurve  = new QPushButton(tr("Add New Curve"));
 	m_pctrlRenameCurve  = new QPushButton(tr("Rename Selected Curve"));
 	m_pctrlDeleteCurve  = new QPushButton(tr("Delete Selected Curve"));
 	m_pctrlCurveList = new QComboBox();
-	PlotCurveLayout->addStretch(1);
-	PlotCurveLayout->addWidget(m_pctrlPlotStabGraph);
-	PlotCurveLayout->addStretch(1);
 	AddCurveLayout->addStretch(1);
 	AddCurveLayout->addWidget(m_pctrlAddCurve);
 	AddCurveLayout->addStretch(1);
+	PlotCurveLayout->addStretch(1);
+	PlotCurveLayout->addWidget(m_pctrlPlotStabGraph);
+	PlotCurveLayout->addStretch(1);
 	RenameCurveLayout->addStretch(1);
 	RenameCurveLayout->addWidget(m_pctrlRenameCurve);
 	RenameCurveLayout->addStretch(1);
@@ -638,14 +672,12 @@ void StabViewDlg::SetupLayout()
 	DeleteCurveLayout->addWidget(m_pctrlDeleteCurve);
 	DeleteCurveLayout->addStretch(1);
 	TimeParams->addLayout(ResponseTypeLayout);
-	TimeParams->addWidget(InitCondResponse);
-	TimeParams->addStretch(1);
-	TimeParams->addWidget(ForcedResponseBox);
-	TimeParams->addStretch(1);
+//	TimeParams->addLayout(InitialConditionsLayout);
+	TimeParams->addWidget(m_pctrlInitialConditionsWidget);
 	TimeParams->addLayout(DtLayout);
 	TimeParams->addWidget(m_pctrlCurveList);
-	TimeParams->addLayout(PlotCurveLayout);
 	TimeParams->addLayout(AddCurveLayout);
+	TimeParams->addLayout(PlotCurveLayout);
 	TimeParams->addLayout(RenameCurveLayout);
 	TimeParams->addLayout(DeleteCurveLayout);
 	TimeParams->addStretch(5);
@@ -820,6 +852,10 @@ void StabViewDlg::SetControls()
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 
+	m_pctrlTimeMode1->setChecked(m_iCurrentMode%4==0);
+	m_pctrlTimeMode2->setChecked(m_iCurrentMode%4==1);
+	m_pctrlTimeMode3->setChecked(m_iCurrentMode%4==2);
+	m_pctrlTimeMode4->setChecked(m_iCurrentMode%4==3);
 	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
 	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
@@ -832,13 +868,16 @@ void StabViewDlg::SetControls()
 	if(pMiarex->m_iStabilityView==0)
 	{
 		m_pctrlStackWidget->setCurrentIndex(0);
-		m_pctrlForcedResponse->setChecked(pMiarex->m_bForcedResponse);
-		m_pctrlInitCondResponse->setChecked(!pMiarex->m_bForcedResponse);
-		m_pctrlStabVar1->setEnabled(!pMiarex->m_bForcedResponse);
-		m_pctrlStabVar2->setEnabled(!pMiarex->m_bForcedResponse);
-		m_pctrlStabVar3->setEnabled(!pMiarex->m_bForcedResponse);
-		m_pctrlControlTable->setEnabled(pMiarex->m_bForcedResponse);
-		m_pctrlRampTime->setEnabled(pMiarex->m_bForcedResponse);
+		m_pctrlInitialConditionsWidget->setCurrentIndex(pMiarex->m_StabilityResponseType);
+		
+		m_pctrlInitCondResponse->setChecked(pMiarex->m_StabilityResponseType==0);
+		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
+		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
+//		m_pctrlStabVar1->setEnabled(!pMiarex->m_bForcedResponse);
+//		m_pctrlStabVar2->setEnabled(!pMiarex->m_bForcedResponse);
+//		m_pctrlStabVar3->setEnabled(!pMiarex->m_bForcedResponse);
+//		m_pctrlControlTable->setEnabled(pMiarex->m_bForcedResponse);
+		m_pctrlRampTime->setEnabled(pMiarex->m_StabilityResponseType==1);
 	}
 	else if(pMiarex->m_iStabilityView==1 || pMiarex->m_iStabilityView==3 || pMiarex->m_iView==2)
 	{
@@ -886,7 +925,7 @@ void StabViewDlg::SetControls()
 
 
 
-void StabViewDlg::SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width)
+void StabViewDlg::SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width, bool const& bCurve, bool const& bPoints)
 {
 	if(!m_pCurve) return;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
@@ -899,21 +938,29 @@ void StabViewDlg::SetTimeCurveStyle(QColor const &Color, int const&Style, int co
 			pCurve->SetColor(Color);
 			pCurve->SetStyle(Style);
 			pCurve->SetWidth(Width);
+			pCurve->SetVisible(bCurve);
+			pCurve->ShowPoints(bPoints);
 			
 			pCurve = pMiarex->m_TimeGraph2.GetCurve(i);
 			pCurve->SetColor(Color);
 			pCurve->SetStyle(Style);
 			pCurve->SetWidth(Width);
+			pCurve->SetVisible(bCurve);
+			pCurve->ShowPoints(bPoints);
 			
 			pCurve = pMiarex->m_TimeGraph3.GetCurve(i);
 			pCurve->SetColor(Color);
 			pCurve->SetStyle(Style);
 			pCurve->SetWidth(Width);
+			pCurve->SetVisible(bCurve);
+			pCurve->ShowPoints(bPoints);
 			
 			pCurve = pMiarex->m_TimeGraph4.GetCurve(i);
 			pCurve->SetColor(Color);
 			pCurve->SetStyle(Style);
 			pCurve->SetWidth(Width);
+			pCurve->SetVisible(bCurve);
+			pCurve->ShowPoints(bPoints);
 			
 			return;
 		}

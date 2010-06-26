@@ -309,7 +309,7 @@ private:
 	QAction *ManageUFOs;
 	QAction *m_pImportWPolar, *m_pUFOInertia, *m_pBodyInertia;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
-	QToolButton *m_pctrlStabViewButton, *m_pctrlRootLocusButton, *m_pctrlModalViewButton;
+	QToolButton *m_pctrlStabTimeViewButton, *m_pctrlRootLocusButton, *m_pctrlModalViewButton;
 
 
 	//XDirect Actions
