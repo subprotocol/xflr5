@@ -2883,11 +2883,13 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	//first read all available foils
 	int i,l,n;
 	ar>>n;
+
 	for (i=0;i<n; i++)
 	{
 		pFoil = new CFoil();
 
 		pFoil->Serialize(ar, bIsStoring);
+
 		if (!pFoil->m_FoilName.length())
 		{
 			delete pFoil;
@@ -5197,16 +5199,16 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Beta;
 		ar << pMiarex->m_WngAnalysis.m_AnalysisType;
 
-		if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
-		else								ar << 0;
+		if (pMiarex->m_WngAnalysis.m_bVLM1) ar << 1;
+		else                                ar << 0;
 //		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
 		ar <<1;
 		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
-		else									ar << 0;
+		else                                      ar << 0;
 		if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
-		else									ar << 0;
+		else                                      ar << 0;
 
-		ar << (int)m_oaWing.size() ;//number of wings
+		ar << m_oaWing.size() ;//number of wings
 		// Store the wings
 		for (i=0; i<m_oaWing.size();i++)
 		{
@@ -5215,7 +5217,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		}
 
 		// now store all the WPolars
-		ar << (int)m_oaWPolar.size();
+		ar << m_oaWPolar.size();
 		for (i=0; i<m_oaWPolar.size();i++)
 		{
 			pWPolar = (CWPolar*)m_oaWPolar.at(i);
@@ -5235,7 +5237,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		else ar << 0;
 
 		// then the foils,  polars and Opps
-				WritePolars(ar, NULL, ProjectFormat);
+		WritePolars(ar, NULL, ProjectFormat);
 
 		// next the bodies
 		ar << (int)m_oaBody.size();
@@ -5352,7 +5354,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			// and read n again
 			ar >> n;
 		}
-
 		// WINGS FIRST
 		for (i=0;i<n; i++)
 		{
@@ -5495,6 +5496,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		if(ArchiveFormat>=100006)
 		{ //read the planes
 			ar >> n;
+
 			// last read the planes
 			for (i=0; i<n;i++)
 			{
@@ -6488,7 +6490,7 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 
 		//then write polars
-		ar << (int)m_oaPolar.size();
+		ar << m_oaPolar.size();
 		CPolar * pPolar ;
 		for (i=0; i<m_oaPolar.size();i++)
 		{
@@ -6497,7 +6499,7 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 		if(m_bSaveOpps)
 		{
-			ar << (int)m_oaOpp.size();
+			ar << m_oaOpp.size();
 			OpPoint * pOpp ;
 			for (i=0; i<m_oaOpp.size();i++)
 			{

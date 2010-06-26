@@ -17673,7 +17673,7 @@ void QMiarex::UpdateCurve()
 	{
 		m_pCurWPolar->m_Color = m_CurveColor;
 		m_pCurWPolar->m_Style = m_CurveStyle;
-		m_pCurWPolar->m_Width = (int)m_CurveWidth;
+		m_pCurWPolar->m_Width = m_CurveWidth;
 		CreateWPolarCurves();
 	}
 	else if (m_iView==WOPPVIEW)
@@ -17682,13 +17682,16 @@ void QMiarex::UpdateCurve()
 		{
 			m_pCurPOpp->m_Color = m_CurveColor;
 			m_pCurPOpp->m_Style = m_CurveStyle;
-			m_pCurPOpp->m_Width = (int)m_CurveWidth;			
+			m_pCurPOpp->m_Width = m_CurveWidth;			
+			m_pCurWOpp->m_Color = m_CurveColor;
+			m_pCurWOpp->m_Style = m_CurveStyle;
+			m_pCurWOpp->m_Width = m_CurveWidth;
 		}
 		else if(m_pCurWOpp)
 		{
 			m_pCurWOpp->m_Color = m_CurveColor;
 			m_pCurWOpp->m_Style = m_CurveStyle;
-			m_pCurWOpp->m_Width = (int)m_CurveWidth;
+			m_pCurWOpp->m_Width = m_CurveWidth;
 		}
 		CreateWOppCurves();
 	}
@@ -17696,7 +17699,7 @@ void QMiarex::UpdateCurve()
 	{
 		m_CpColor = m_CurveColor;
 		m_CpStyle = m_CurveStyle;
-		m_CpWidth = (int)m_CurveWidth;
+		m_CpWidth = m_CurveWidth;
 		CreateCpCurves();
 	}
 	UpdateView();

@@ -775,7 +775,6 @@ bool CBody::ImportDefinition()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	int res, i, j, Line, NSideLines;
-	QString strong, FileName;
 	bool bRead;
 
 	double mtoUnit,xo,yo,zo;
@@ -794,6 +793,7 @@ bool CBody::ImportDefinition()
 	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
 	Dlg.m_Question = UnitsDlg::tr("Choose the length unit to read this file :");
 	Dlg.InitDialog();
+	Dlg.move(pMainFrame->m_DlgPos);
 
 	if(Dlg.exec() == QDialog::Accepted)
 	{
@@ -831,7 +831,8 @@ bool CBody::ImportDefinition()
 	}
 	else return false;
 
-	QString PathName;
+	pMainFrame->m_DlgPos = Dlg.pos();
+	QString PathName, strong;
 	bool bOK;
 	QByteArray textline;
 	const char *text;
@@ -857,11 +858,12 @@ bool CBody::ImportDefinition()
 	bRead  = ReadAVLString(in, Line, strong);
 	m_BodyName = strong.trimmed();
 	//Header data
-
+qDebug()<< "Reading definition";
 	bRead = true;
 	while (bRead)
 	{
 		bRead  = ReadAVLString(in, Line, strong);
+
 		if(!bRead) break;
 		if (strong.indexOf("BODYTYPE") >=0)
 		{

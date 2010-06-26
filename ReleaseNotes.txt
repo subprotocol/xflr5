@@ -15,6 +15,10 @@
 *******************************************************************************
 
 
+XFLR5 v5.01 June xxxth, 2010
+	- corrected the bug related to curve style not taken into account for a plane in Operating Point view
+	
+
 XFLR5 v5.00 April 11th, 2010
 	- changed the executable target name from QFLR5 to xflr5
 	- changed and reorganized drastically the file system

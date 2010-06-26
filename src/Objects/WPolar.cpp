@@ -1240,7 +1240,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
 
-
 		if(ArchiveFormat>=1010)
 		{
 			ar >> n; 
@@ -1381,6 +1380,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 					}
 				}
 			}
+
 			if(!bExists)
 			{
 				m_Alpha.append(Alpha);
@@ -1435,6 +1435,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(i=0; i<m_nControls; i++)
 			{
 				ar >> n; 
+
 				if (n!=0 && n!=1){
 					m_PlrName ="";
 					return false;
