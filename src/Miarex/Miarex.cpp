@@ -1767,13 +1767,13 @@ void QMiarex::SetControls()
 
 	if(m_pCurWPolar && m_pCurWPolar->m_Type==7)
 	{
-		pMainFrame->StabPolarAct->setEnabled(true);
+		pMainFrame->TimeGraphsAct->setEnabled(true);
 		pMainFrame->RootLocusAct->setEnabled(true);
 		pMainFrame->ModalViewAct->setEnabled(true);
 	}
 	else
 	{
-		pMainFrame->StabPolarAct->setEnabled(false);
+		pMainFrame->TimeGraphsAct->setEnabled(false);
 		pMainFrame->RootLocusAct->setEnabled(false);
 		pMainFrame->ModalViewAct->setEnabled(false);
 	}
@@ -1790,7 +1790,6 @@ void QMiarex::SetControls()
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW);
 	pMainFrame->CpViewAct->setChecked(m_iView==WCPVIEW);
-	pMainFrame->StabPolarAct->setChecked(m_iView==WSTABVIEW);
 
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
 	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
@@ -3707,10 +3706,9 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	TotalPoints  = qMin(1000, (int)(m_TotalTime/dt));
 	PlotInterval = qMax(1,(int)(TotalPoints/200));
 
-	t           = 0.0;
-	
 	//we are considering forced response from initial steady state, so set
 	// initial conditions to 0
+	t = 0.0;
 	y[0] = y[1] = y[2] = y[3] = 0.0;
 	pCurve0->AddPoint(0.0, y[0]);
 	pCurve1->AddPoint(0.0, y[1]);
@@ -4539,7 +4537,6 @@ void QMiarex::EditCurPlane()
 	CWPolar *pWPolar;
 	CPOpp* pPOpp;
 	bool bHasResults = false;
-
 	for (i=0; i< m_poaWPolar->size(); i++)
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
@@ -4579,6 +4576,7 @@ void QMiarex::EditCurPlane()
 				dlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
 				dlg.InitDialog();
 				int Ans = dlg.exec();
+
 				if (Ans == QDialog::Rejected)
 				{
 					//restore geometry
@@ -4609,7 +4607,6 @@ void QMiarex::EditCurPlane()
 					return;
 				}
 			}
-
 
 			//then modifications are automatically recorded
 			pMainFrame->DeletePlane(m_pCurPlane, true);// will also set new surface and Aerochord in WPolars
@@ -13715,7 +13712,6 @@ void QMiarex::SetCurveParams()
 			m_CurveColor = pStabView->m_pCurve->GetColor();
 			m_CurveStyle = pStabView->m_pCurve->GetStyle();
 			m_CurveWidth = pStabView->m_pCurve->GetWidth();
-//qDebug()<<"CurveColor"<<m_CurveColor.red()<<m_CurveColor.green()<<m_CurveColor.blue();
 			m_pctrlShowCurve->setChecked(pStabView->m_pCurve->IsVisible());
 			m_pctrlShowPoints->setChecked(pStabView->m_pCurve->PointsVisible());
 			FillComboBoxes();
@@ -15054,7 +15050,6 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else return;
 
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
 	if(bCurrent) pWPolar = m_pCurWPolar;
 	else
 	{
@@ -15277,6 +15272,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	m_pPanelDlg->m_nNodes      = m_nNodes;
 	m_pPanelDlg->m_NSurfaces   = m_NSurfaces;
 	m_pPanelDlg->m_NWakeColumn = m_NWakeColumn;
+	
 	QApplication::restoreOverrideCursor();
 }
 
@@ -15375,7 +15371,6 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 	// else set the comboBox's first, if any
 	// else set it to NULL
 	QString strong;
-
 	if(m_pCurPlane)	  return SetPOpp(bCurrent, Alpha);
 
 	CWOpp *pWOpp = NULL;

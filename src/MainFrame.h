@@ -282,7 +282,7 @@ private:
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabPolarAct, *RootLocusAct, *ModalViewAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *TimeGraphsAct, *RootLocusAct, *ModalViewAct;
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;

@@ -176,7 +176,6 @@ void StabViewDlg::FillEigenThings()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	FillControlNames();
-	
 	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_AnalysisType==4)
 	{
 		complex<double> c;
@@ -519,14 +518,22 @@ void StabViewDlg::SetMode(int iMode)
 	FillEigenThings();
 	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
 
-	m_vabs[0] = abs(pWOpp->m_EigenVector[m_iCurrentMode][0]);
-	m_vabs[1] = abs(pWOpp->m_EigenVector[m_iCurrentMode][1]);
-	m_vabs[2] = abs(pWOpp->m_EigenVector[m_iCurrentMode][2]);
-	m_vabs[3] = abs(pWOpp->m_EigenVector[m_iCurrentMode][3]);
-	m_phi[0]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][0]);
-	m_phi[1]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][1]);
-	m_phi[2]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][2]);
-	m_phi[3]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][3]);
+	if(pWOpp)
+	{
+		m_vabs[0] = abs(pWOpp->m_EigenVector[m_iCurrentMode][0]);
+		m_vabs[1] = abs(pWOpp->m_EigenVector[m_iCurrentMode][1]);
+		m_vabs[2] = abs(pWOpp->m_EigenVector[m_iCurrentMode][2]);
+		m_vabs[3] = abs(pWOpp->m_EigenVector[m_iCurrentMode][3]);
+		m_phi[0]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][0]);
+		m_phi[1]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][1]);
+		m_phi[2]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][2]);
+		m_phi[3]  = arg(pWOpp->m_EigenVector[m_iCurrentMode][3]);
+	}
+	else
+	{
+		m_vabs[0] = m_vabs[1] = m_vabs[2] = m_vabs[3] = 0.0;
+		m_phi[0] = m_phi[1] = m_phi[2] = m_phi[3] = 0.0;
+	}
 
 	pMiarex->m_bResetglModeLegend = true;
 
@@ -551,8 +558,11 @@ void StabViewDlg::SetupLayout()
 	//_______________________Time view Parameters
 	QVBoxLayout *ResponseTypeLayout = new QVBoxLayout;
 	m_pctrlModalResponse = new QRadioButton(tr("Modal Response"));
+	m_pctrlModalResponse->setToolTip("Display the time response on a specific mode with normalized amplitude and random initial phase");
 	m_pctrlInitCondResponse = new QRadioButton(tr("Initial Conditions Response"));
+	m_pctrlInitCondResponse->setToolTip("Display the time response for specific initial conditions");
 	m_pctrlForcedResponse = new QRadioButton(tr("Forced Response"));
+	m_pctrlForcedResponse->setToolTip("Display the time response for a given control actuation in the form of a user-specified ramp");
 	ResponseTypeLayout->addWidget(m_pctrlInitCondResponse);
 	ResponseTypeLayout->addWidget(m_pctrlForcedResponse);
 	ResponseTypeLayout->addWidget(m_pctrlModalResponse);
@@ -629,9 +639,11 @@ void StabViewDlg::SetupLayout()
 	m_pctrlInitialConditionsWidget->setCurrentIndex(0);
 
 	m_pctrlTotalTime = new FloatEdit(5,3);
+	m_pctrlTotalTime->setToolTip(tr("Define the total time range for the graphs"));
 	m_pctrlDeltat    = new FloatEdit(.01,3);
+	m_pctrlDeltat->setToolTip(tr("Define the time step for the resolution of the differential equations"));
 	m_pctrlRampTime  = new FloatEdit(0.1,3);
-	
+	m_pctrlRampTime->setToolTip(tr("Define the total time in which the controls will be actuated"));
 
 	QGridLayout *DtLayout  = new QGridLayout;
 	QLabel *DtLabel        = new QLabel("dt=");
@@ -655,9 +667,13 @@ void StabViewDlg::SetupLayout()
 	QHBoxLayout *AddCurveLayout = new QHBoxLayout;
 	QHBoxLayout *DeleteCurveLayout = new QHBoxLayout;
 	m_pctrlPlotStabGraph = new QPushButton(tr("Recalc Curve"));
+	m_pctrlPlotStabGraph->setToolTip(tr("Re-calculate the currently selected curve with the user-specified input data"));
 	m_pctrlAddCurve  = new QPushButton(tr("Add New Curve"));
+	m_pctrlAddCurve->setToolTip(tr("Add a new curve to the graphs, using the current user-specified input"));
 	m_pctrlRenameCurve  = new QPushButton(tr("Rename Selected Curve"));
+	m_pctrlRenameCurve->setToolTip(tr("Rename the currently selected curve"));
 	m_pctrlDeleteCurve  = new QPushButton(tr("Delete Selected Curve"));
+	m_pctrlDeleteCurve->setToolTip(tr("Delete the currently selected curve"));
 	m_pctrlCurveList = new QComboBox();
 	AddCurveLayout->addStretch(1);
 	AddCurveLayout->addWidget(m_pctrlAddCurve);
@@ -873,10 +889,7 @@ void StabViewDlg::SetControls()
 		m_pctrlInitCondResponse->setChecked(pMiarex->m_StabilityResponseType==0);
 		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
 		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
-//		m_pctrlStabVar1->setEnabled(!pMiarex->m_bForcedResponse);
-//		m_pctrlStabVar2->setEnabled(!pMiarex->m_bForcedResponse);
-//		m_pctrlStabVar3->setEnabled(!pMiarex->m_bForcedResponse);
-//		m_pctrlControlTable->setEnabled(pMiarex->m_bForcedResponse);
+
 		m_pctrlRampTime->setEnabled(pMiarex->m_StabilityResponseType==1);
 	}
 	else if(pMiarex->m_iStabilityView==1 || pMiarex->m_iStabilityView==3 || pMiarex->m_iView==2)

@@ -1051,11 +1051,11 @@ void MainFrame::CreateMiarexActions()
 	WPolarAct->setShortcut(tr("F8"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
-	StabPolarAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability View"), this);
-	StabPolarAct->setCheckable(true);
-	StabPolarAct->setStatusTip(tr("Switch to the stability analysis results"));
-	StabPolarAct->setShortcut(tr("Shift+F8"));
-	connect(StabPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnTimeView()));
+	TimeGraphsAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Time graphs"), this);
+	TimeGraphsAct->setCheckable(true);
+	TimeGraphsAct->setStatusTip(tr("Switch to the time graphs view"));
+	TimeGraphsAct->setShortcut(tr("Shift+F8"));
+	connect(TimeGraphsAct, SIGNAL(triggered()), pMiarex, SLOT(OnTimeView()));
 
 	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View"), this);
 	RootLocusAct->setCheckable(true);
@@ -1137,7 +1137,6 @@ void MainFrame::CreateMiarexActions()
 	ManageBodies->setShortcut(Qt::Key_F11);
 	ManageBodies->setStatusTip(tr("Manage the body list : Rename, Duplicate, Delete"));
 	connect(ManageBodies, SIGNAL(triggered()), pMiarex, SLOT(OnManageBodies()));
-
 
 	exporttoAVL = new QAction(tr("Export to AVL..."), this);
 	exporttoAVL->setStatusTip(tr("Export the current plane or wing to a text file in the format required by AVL"));
@@ -1415,7 +1414,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu = menuBar()->addMenu(tr("&View"));
 	MiarexViewMenu->addAction(WOppAct);
 	MiarexViewMenu->addAction(WPolarAct);
-	MiarexViewMenu->addAction(StabPolarAct);
+	MiarexViewMenu->addAction(TimeGraphsAct);
 	MiarexViewMenu->addAction(W3DAct);
 	MiarexViewMenu->addAction(CpViewAct);
 	MiarexViewMenu->addSeparator();
@@ -1671,7 +1670,7 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView->setCheckable(true);
 	
 	m_pctrlStabTimeViewButton = new QToolButton;
-	m_pctrlStabTimeViewButton->setDefaultAction(StabPolarAct);
+	m_pctrlStabTimeViewButton->setDefaultAction(TimeGraphsAct);
 	m_pctrlStabTimeViewButton->setCheckable(true);
 
 	m_pctrlRootLocusButton = new QToolButton;
@@ -1681,9 +1680,7 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlModalViewButton = new QToolButton;
 	m_pctrlModalViewButton->setDefaultAction(ModalViewAct);
 	m_pctrlModalViewButton->setCheckable(true);
-//	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-//	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-//	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
 	QSizePolicy szPolicy;
 	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
 	m_pctrlUFO->setSizePolicy(szPolicy);
@@ -1692,9 +1689,6 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlUFO->setMinimumWidth(150);
 	m_pctrlWPolar->setMinimumWidth(150);
 	m_pctrlWOpp->setMinimumWidth(80);
-//	m_pctrlUFO->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlWPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlWOpp->setInsertPolicy(QComboBox::InsertAlphabetically);
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);

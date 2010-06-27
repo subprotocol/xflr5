@@ -720,12 +720,13 @@ void StabAnalysisDlg::SolveCtrlDer(int ic, double const & DeltaAngle,
 	AddString(strong);
 	
 	Forces(m_cRHS+ic*m_MatSize, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	
+/*qDebug("%d,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g",
+	   ic, Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
+qDebug("%d,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g",
+	   ic, Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);*/
 	// make the difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
-	
-//qDebug("StabAnalysis, control %d   %12.5g    %12.5g    %12.5g",ic,Force.x,Force.y, Force.z);
-	
+		
 	*Xd = (Force-Force0).dot(is)/DeltaAngle;
 	*Yd = (Force-Force0).dot(js)/DeltaAngle;
 	*Zd = (Force-Force0).dot(ks)/DeltaAngle;
