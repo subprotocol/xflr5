@@ -1411,7 +1411,6 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 		for (i=k+1; i<Size; i++) x[k]-=x[i] * *(p_k+i);
 		if (*(p_k+k)==0.0)
 		{
-qDebug() <<"Returning false";
 			return false;
 		}
 		

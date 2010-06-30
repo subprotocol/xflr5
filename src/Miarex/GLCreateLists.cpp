@@ -2381,16 +2381,19 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 
 
-void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 {
-	
-	if(!pWing || !pWOpp) return;
-	if(pWOpp->m_AnalysisType!=4) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-	
+
+	if(!pWing || !pWOpp || pWOpp->m_AnalysisType!=4 ) 
+	{
+		glNewList(MODELEGEND,GL_COMPILE);
+		{}
+		glEndList();
+		return;
+	}
 	if(!pMiarex->m_bResetglModeLegend) return;
 	pMiarex->m_bResetglModeLegend = false;
-	
 	
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;

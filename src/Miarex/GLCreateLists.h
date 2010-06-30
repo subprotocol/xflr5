@@ -44,6 +44,6 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);		
 void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
-void GLCreateModeLegend(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, CPOpp *pPOpp);
+void GLCreateModeLegend(void *pQMiarex, CWing *pWing, CWOpp *pWOpp);
 
 #endif // GLCREATELISTS_H

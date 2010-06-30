@@ -507,14 +507,17 @@ void StabViewDlg::ReadForcedInput(double *in)
 void StabViewDlg::SetMode(int iMode)
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	if(iMode>=0) m_iCurrentMode = iMode%4;
-	if(!pMiarex->m_bLongitudinal) m_iCurrentMode += 4;
+	if(iMode>=0)
+	{
+		m_iCurrentMode = iMode%4;
+		if(!pMiarex->m_bLongitudinal) m_iCurrentMode += 4;
+	}
+	else if(m_iCurrentMode<0) m_iCurrentMode=0;
 	
 	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
 	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
-
 	FillEigenThings();
 	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
 

@@ -5985,7 +5985,7 @@ void QMiarex::GLRenderMode()
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	QString strong = QString("Time =%1s").arg(m_ModeTime,6,'f',3);
 
-	GLCreateModeLegend(this, m_pCurWing, m_pCurWOpp, m_pCurPOpp);
+	GLCreateModeLegend(this, m_pCurWing, m_pCurWOpp);
 
 	glDisable(GL_CLIP_PLANE1);
 
@@ -6035,7 +6035,6 @@ void QMiarex::GLRenderMode()
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
 		if(m_bAxes)  GLDrawAxes();
-
 		glTranslated(m_ModeState[0], m_ModeState[1], m_ModeState[2]);
 		glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
 		glRotated(m_ModeState[4]*180.0/PI, 0.0, 1.0 ,0.0);
@@ -15840,6 +15839,7 @@ void QMiarex::StopAnimate()
 	m_bAnimateWOpp = false;
 	m_pctrlWOppAnimate->setChecked(false);
 	m_pTimerWOpp->stop();
+	m_pTimerMode->stop();
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
