@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 
-
+#include <math.h>
 
 #ifndef CVector_H
 #define CVector_H
@@ -28,37 +28,142 @@
 class CVector  
 {
 public: 
+	double x;
+	double y;
+	double z;
+
 	CVector();
 	CVector(double const &xi, double const &yi, double const &zi);
 
-	bool IsSame(CVector const &V);
-	void Set(CVector const &V);
-	void Set(double const &x0, double const &y0, double const &z0);
-	void Copy(CVector const &V);
+
 	void Rotate(CVector const &R, double Angle);
+	void Rotate(CVector &O, CVector const &R, double Angle);
 	void RotateX(CVector const &O, double XTilt);
 	void RotateY(CVector const &O, double YTilt);
 	void RotateZ(CVector const &O, double ZTilt);
 	void RotateY(double YTilt);
-	void Translate(CVector const &T);
-	bool operator ==(CVector const &V);
-	void operator =(CVector const &T);
-	void operator+=(CVector const &T);
-	void operator-=(CVector const &T);
-	void operator*=(double const &d);
-	CVector operator *(double const &d);
-	CVector operator *(CVector const &T);
-	CVector operator /(double const &d);
-	CVector operator +(CVector const &V);
-	CVector operator -(CVector const &V);
-	void Normalize();
-	double VAbs();
-	double dot(CVector const &V);
 
-	double x;
-	double y;
-	double z;
  
+	//inline operators
+	bool operator ==(CVector const &V)
+	{
+		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
+	};		
+	
+	void operator =(CVector const &T)
+	{
+		x = T.x;
+		y = T.y;
+		z = T.z;
+	};
+	
+	void operator+=(CVector const &T)
+	{
+	   x += T.x;
+	   y += T.y;
+	   z += T.z;
+	};
+	
+	void operator-=(CVector const &T)
+	{
+		x -= T.x;
+		y -= T.y;
+		z -= T.z;
+	};
+
+	void operator*=(double const &d)
+	{
+		x *= d;
+		y *= d;
+		z *= d;
+	};
+				   
+	CVector operator *(double const &d)
+	{
+		CVector T(x*d, y*d, z*d);
+		return T;
+	};
+	
+	CVector operator *(CVector const &T)
+	{
+		CVector C;
+		C.x =  y*T.z - z*T.y;
+		C.y = -x*T.z + z*T.x;
+		C.z =  x*T.y - y*T.x;
+		return C;
+	};
+	
+	CVector operator /(double const &d)
+	{
+		CVector T(x/d, y/d, z/d);
+		return T;
+	};
+	
+	CVector operator +(CVector const &V)
+	{
+		CVector T(x+V.x, y+V.y, z+V.z);
+		return T;
+	};
+	
+	CVector operator -(CVector const &V)
+	{
+		CVector T(x-V.x, y-V.y, z-V.z);
+		return T;
+	};
+
+	
+	//inline methods
+	void Copy(CVector const &V)
+	{	
+		x = V.x;
+		y = V.y;
+		z = V.z;
+	};
+	
+	void Set(double const &x0, double const &y0, double const &z0)
+	{	
+		x = x0;
+		y = y0;
+		z = z0;
+	};
+	
+	void Set(CVector const &V)
+	{	
+		x = V.x;
+		y = V.y;
+		z = V.z;
+	};
+
+	void Normalize()
+	{
+		double abs = VAbs();
+		if(abs< 1.e-10) return;
+		x/=abs;
+		y/=abs;
+		z/=abs;
+	};
+		
+	double VAbs()
+	{
+		return sqrt(x*x+y*y+z*z);
+	};
+	
+	double dot(CVector const &V)
+	{	
+		return x*V.x + y*V.y + z*V.z;
+	};
+	
+	bool IsSame(CVector const &V)
+	{
+		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
+	};
+
+	void Translate(CVector const &T)
+	{
+		x += T.x;
+		y += T.y;
+		z += T.z;
+	};
 };
 
 #endif

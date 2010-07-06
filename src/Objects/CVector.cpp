@@ -45,147 +45,35 @@ CVector::CVector(double const &xi, double const &yi, double const &zi)
 }
 
 
-void CVector::Normalize()
-{
-	double abs = VAbs();
-	if(abs< 1.e-10) return;
-	x/=abs;
-	y/=abs;
-	z/=abs;
-}
-
-
-double CVector::VAbs()
-{
-	return sqrt(x*x+y*y+z*z);
-}
-
-void CVector::Copy(CVector const &V)
-{	
-	x = V.x;
-	y = V.y;
-	z = V.z;
-}
-
-void CVector::Set(double const &x0, double const &y0, double const &z0)
-{	
-	x = x0;
-	y = y0;
-	z = z0;
-}
-
-void CVector::Set(CVector const &V)
-{	
-	x = V.x;
-	y = V.y;
-	z = V.z;
-}
-
-
-double CVector::dot(CVector const &V)
-{	
-	return x*V.x + y*V.y + z*V.z;
-}
-
-
-bool CVector::IsSame(CVector const &V)
-{
-	return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
-}
-
-void CVector::Translate(CVector const &T)
-{
-	x += T.x;
-	y += T.y;
-	z += T.z;
-}
-
-void CVector::operator +=(CVector const &T)
-{
-	x += T.x;
-	y += T.y;
-	z += T.z;
-}
-
-bool CVector::operator ==(CVector const &V)
-{
-	double d = sqrt((V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z));
-
-	if(d<=0.000001) //1 micron... for distances only, not Forces, Moments etc...
-		return true;
-	else 
-		return false;
-}
-
-void CVector::operator =(CVector const &T)
-{
-	x = T.x;
-	y = T.y;
-	z = T.z;
-}
-
-
-void CVector::operator -=(CVector const &T)
-{
-	x -= T.x;
-	y -= T.y;
-	z -= T.z;
-}
-
-
-void CVector::operator *=(double const &d)
-{
-	x *= d;
-	y *= d;
-	z *= d;
-}
-
-
-CVector CVector::operator *(double const &d)
-{
-	CVector T(x*d, y*d, z*d);
-	return T;
-}
-
-
-CVector CVector::operator *(CVector const &T)
-{
-	CVector C;
-	C.x =  y*T.z - z*T.y;
-	C.y = -x*T.z + z*T.x;
-	C.z =  x*T.y - y*T.x;
-	return C;
-}
-
-
-CVector CVector::operator /(double const &d)
-{
-	CVector T(x/d, y/d, z/d);
-	return T;
-}
-
-CVector CVector::operator +(CVector const &V)
-{
-	CVector T(x+V.x, y+V.y, z+V.z);
-	return T;
-}
-
-CVector CVector::operator -(CVector const &V)
-{
-	CVector T(x-V.x, y-V.y, z-V.z);
-	return T;
-}
-
 void CVector::Rotate(CVector const &R, double Angle)
 {
+	//rotate the vector around R with an angle Angle
 	Quaternion Qt;
 	Qt.Set(Angle, R);
 	Qt.Conjugate(x,y,z);
-
 }
+
+
+
+void CVector::Rotate(CVector &O, CVector const &R, double Angle)
+{
+	//rotate the point defined by the vector around origin O, rotation vector R and angle Angle
+	Quaternion Qt;
+	Qt.Set(Angle, R);
+	CVector OP;
+	OP.x = x-O.x;
+	OP.y = y-O.y;
+	OP.z = z-O.z;
+	Qt.Conjugate(OP);
+	x = O.x + OP.x;
+	y = O.y + OP.y;
+	z = O.z + OP.z;
+}
+
 
 void CVector::RotateX(CVector const &O, double XTilt)
 {
+	//Rotate the vector around the X-axis, by an angle XTilt
 	CVector OP;
 	OP.x = x-O.x;
 	OP.y = y-O.y;
@@ -198,6 +86,7 @@ void CVector::RotateX(CVector const &O, double XTilt)
 
 void CVector::RotateY(CVector const &O, double YTilt)
 {
+	//Rotate the vector around the Y-axis, by an angle YTilt
 	CVector OP;
 	OP.x = x-O.x;
 	OP.y = y-O.y;
@@ -212,6 +101,7 @@ void CVector::RotateY(CVector const &O, double YTilt)
 
 void CVector::RotateZ(CVector const &O, double ZTilt)
 {
+	//Rotate the vector around the Z-axis, by an angle ZTilt
 	CVector OP;
 	OP.x = x-O.x;
 	OP.y = y-O.y;

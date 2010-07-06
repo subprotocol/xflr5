@@ -218,11 +218,13 @@ HEADERS += src/MainFrame.h \
 TRANSLATIONS = translations/xflr5.ts \
     translations/xflr5_de.ts \
     translations/xflr5_fr.ts
+
+RESOURCES += xflr5.qrc
+
 win32 { 
     TARGET = XFLR6
     RC_FILE = win/xflr5.rc
 }
-RESOURCES += xflr5.qrc
 unix { 
     TARGET = xflr6
     
@@ -249,7 +251,9 @@ macx {
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/xflr5.icns
 }
+
 OTHER_FILES += doc/ReleaseNotes.txt
-QMAKE_CFLAGS += -pg
-QMAKE_CXXFLAGS += -pg
-QMAKE_LFLAGS += -pg
+
+#QMAKE_CFLAGS += -pg
+#QMAKE_CXXFLAGS += -pg
+#QMAKE_LFLAGS += -pg

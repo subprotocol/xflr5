@@ -23,34 +23,20 @@
 # include <math.h>
 #include "../Params.h"
 
-double Quaternion::t1;
-double Quaternion::t2;
-double Quaternion::t3;
-double Quaternion::t4;
-double Quaternion::t5;
-double Quaternion::t6;
-double Quaternion::t7;
-double Quaternion::t8;
-double Quaternion::t9;
-double Quaternion::t10;
-double Quaternion::t11;
-double Quaternion::t12;
-double Quaternion::t15;
-double Quaternion::t19;
-double Quaternion::t20;
-double Quaternion::t24;
-CVector Quaternion::R;	
 
 Quaternion::Quaternion(void)
 {
 	a=0.0; qx= 0.0; qy=0.0; qz = 0.0;
 	theta = 0.0;
+	Settxx();
 }
+
 
 Quaternion::Quaternion(double const &t, double const &x, double const &y, double const &z)
 {
 	a=t; qx= x; qy=y; qz = z;
 	theta = 2.0*acos(t);
+	Settxx();
 }
 
 
@@ -60,26 +46,29 @@ void Quaternion::Set(double const &real, double const &x, double const &y, doubl
 	qx = x;
 	qy = y;
 	qz = z;
+	Settxx();
 }
 
 
 void Quaternion::Set(double const &Angle, CVector const &R)
 {	
+	CVector N;
+	N = R;
+	N.Normalize();
 	theta = Angle*PI/180.0;
 
 	a = cos(theta/2.0);
 	double sina = sin(theta/2.0);
 
-	qx = R.x*sina;
-	qy = R.y*sina;
-	qz = R.z*sina;
+	qx = N.x*sina;
+	qy = N.y*sina;
+	qz = N.z*sina;
+	Settxx();
 }
 
 
-
-void Quaternion::Conjugate(CVector const &Vin, CVector &Vout)
+void Quaternion::Settxx()
 {
-	//todo : set txx variables only at each quaternion update
 	t2 =   a*qx;
 	t3 =   a*qy;
 	t4 =   a*qz;
@@ -88,61 +77,14 @@ void Quaternion::Conjugate(CVector const &Vin, CVector &Vout)
 	t7 =   qx*qz;
 	t8 =  -qy*qy;
 	t9 =   qy*qz;
-	t10 = -qz*qz;
-	Vout.x = 2.0*( (t8 + t10)*Vin.x + (t6 -  t4)*Vin.y + (t3 + t7)*Vin.z ) + Vin.x;
-	Vout.y = 2.0*( (t4 +  t6)*Vin.x + (t5 + t10)*Vin.y + (t9 - t2)*Vin.z ) + Vin.y;
-	Vout.z = 2.0*( (t7 -  t3)*Vin.x + (t2 +  t9)*Vin.y + (t5 + t8)*Vin.z ) + Vin.z;
+	t10 = -qz*qz;	
 }
 
-
-void Quaternion::Conjugate(double &x, double &y, double &z)
-{
-	R.x = x;
-	R.y = y;
-	R.z = z;
-	//todo : set txx variables only at each quaternion update
-	t2 =   a*qx;
-	t3 =   a*qy;
-	t4 =   a*qz;
-	t5 =  -qx*qx;
-	t6 =   qx*qy;
-	t7 =   qx*qz;
-	t8 =  -qy*qy;
-	t9 =   qy*qz;
-	t10 = -qz*qz;
-	x = 2.0*( (t8 + t10)*R.x + (t6 -  t4)*R.y + (t3 + t7)*R.z ) + R.x;
-	y = 2.0*( (t4 +  t6)*R.x + (t5 + t10)*R.y + (t9 - t2)*R.z ) + R.y;
-	z = 2.0*( (t7 -  t3)*R.x + (t2 +  t9)*R.y + (t5 + t8)*R.z ) + R.z;
-}
-
-
-
-void Quaternion::Conjugate(CVector &V)
-{
-	R.x = V.x;
-	R.y = V.y;
-	R.z = V.z;
-	//todo : set txx variables only at each quaternion update
-	t2 =   a*qx;
-	t3 =   a*qy;
-	t4 =   a*qz;
-	t5 =  -qx*qx;
-	t6 =   qx*qy;
-	t7 =   qx*qz;
-	t8 =  -qy*qy;
-	t9 =   qy*qz;
-	t10 = -qz*qz;
-	V.x = 2.0*( (t8 + t10)*R.x + (t6 -  t4)*R.y + (t3 + t7)*R.z ) + R.x;
-	V.y = 2.0*( (t4 +  t6)*R.x + (t5 + t10)*R.y + (t9 - t2)*R.z ) + R.y;
-	V.z = 2.0*( (t7 -  t3)*R.x + (t2 +  t9)*R.y + (t5 + t8)*R.z ) + R.z;
-}
 
 
 void Quaternion::QuattoMat(double m[][4])
 {
-	//Pseudo-code for creating an angle/axis matrix where the unit axis is (v1, v2, v3) and the angle is theta:
-
-        if(fabs(a)<=1.0)  theta = 2.0 * acos(a);
+	if(fabs(a)<=1.0) theta = 2.0 * acos(a);
 	else             theta = 0.0;
 
 	t1 =  cos(theta);
@@ -184,6 +126,7 @@ void Quaternion::operator *=(Quaternion Q)
 	qx = t2;
 	qy = t3;
 	qz = t4;
+	Settxx();
 }
 
 
@@ -196,6 +139,7 @@ Quaternion Quaternion::operator *(Quaternion Q)
 	prod.qx = a*Q.qx + qx*Q.a  + qy*Q.qz - qz*Q.qy ;
 	prod.qy = a*Q.qy + qy*Q.a  + qz*Q.qx - qx*Q.qz ;
 	prod.qz = a*Q.qz + qz*Q.a  + qx*Q.qy - qy*Q.qx ;
+	prod.Settxx();
 
 	return prod;
 }
@@ -203,11 +147,11 @@ Quaternion Quaternion::operator *(Quaternion Q)
 
 void Quaternion::operator =(Quaternion Q)
 {
-
 	a  = Q.a;
 	qx = Q.qx;
 	qy = Q.qy;
 	qz = Q.qz;
+	Settxx();
 }
 
 
@@ -216,6 +160,7 @@ void Quaternion::operator ~()
 	qx = -qx;
 	qy = -qy;
 	qz = -qz;
+	Settxx();
 }
 
 
@@ -237,6 +182,7 @@ void Quaternion::Normalize()
 		qy *= 1/norm;
 		qz *= 1/norm;
 	}
+	Settxx();
 }
 
 

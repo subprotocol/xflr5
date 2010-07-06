@@ -2371,11 +2371,6 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 		//END Write wing data
 	}
 	glEndList();
-/*	if(pMiarex->m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}*/
 }
 
 

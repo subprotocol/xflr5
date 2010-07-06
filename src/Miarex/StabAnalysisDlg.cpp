@@ -120,95 +120,6 @@ void StabAnalysisDlg::BuildRHS()
 }
 
 
-void StabAnalysisDlg::BuildControlRHS(double const & DeltaAngle)
-{
-	//______________________________________________________________________________
-	// Constructs RHS for unit control rotations
-	//
-	// At this stage, the control surfaces have already been set at the specified positions;
-	// We have an equilibrium position defined by AlphaEq
-	// We just rotate the normals, we do not modify the geometry
-	//
-	static Quaternion Quat;
-	static CVector is, js, ks;
-	static CVector H, RN, VInf;
-	static double sina, cosa;
-	static int p, j, nCtrl, pos;
-
-	// Define the stability axes
-	cosa = cos(m_AlphaEq*PI/180);
-	sina = sin(m_AlphaEq*PI/180);
-	is.Set(-cosa, 0.0, -sina);
-	js.Set(  0.0, 1.0,   0.0);
-	ks.Set( sina, 0.0, -cosa);
-	
-	VInf.Set(u0*cos(m_AlphaEq*PI/180.0), 0.0, u0*sin(m_AlphaEq*PI/180));
-	nCtrl = 0;
-
-	for(p=0; p<m_MatSize;p++)
-	{
-		m_uRHS[p] = -VInf.dot(m_pPanel[p].Normal);
-	}
-
-	pos = 0;
-	
-	if(m_pPlane)
-	{
-		H.Set(0.0, 1.0, 0.0);
-		//wing tilt
-		memcpy(m_cRHS+nCtrl*m_MatSize, m_uRHS, m_MatSize*sizeof(double));
-
-		Quat.Set(DeltaAngle, H);
-		for(j=0; j<m_pWing->m_MatSize; j++)
-		{
-			Quat.Conjugate(m_pWing->m_pPanel[j].Normal, RN);
-			m_cRHS[nCtrl*m_MatSize+j] = -VInf.dot(RN);
-		}
-		pos = m_pWing->m_MatSize;
-		
-		nCtrl=1;
-
-		if(m_pStab)
-		{
-			//Elevator tilt
-			memcpy(m_cRHS+nCtrl*m_MatSize, m_uRHS, m_MatSize*sizeof(double));
-			Quat.Set(DeltaAngle, H);
-	
-			for(p=0; p<m_pStab->m_MatSize; p++)
-			{
-				Quat.Conjugate(m_pStab->m_pPanel[p].Normal, RN);
-				m_cRHS[nCtrl*m_MatSize+pos+p] = -VInf.dot(RN);
-			}
-			nCtrl++;
-		}
-	}
-
-	// flap controls
-	for (j=0; j<m_NSurfaces; j++)
-	{
-		if(m_ppSurface[j]->m_bTEFlap)
-		{
-			memcpy(m_cRHS+nCtrl*m_MatSize, m_uRHS, m_MatSize*sizeof(double));
-			H.Set(m_ppSurface[j]->m_HingeVector);
-
-			Quat.Set(DeltaAngle, m_ppSurface[j]->m_HingeVector);
-
-			for(p=0;p<m_MatSize; p++)
-			{
-				if(m_ppSurface[j]->IsFlapPanel(p))
-				{
-					Quat.Conjugate(m_pPanel[p].Normal, RN);
-					m_cRHS[nCtrl*m_MatSize+p] = -VInf.dot(RN);
-				}
-//				else m_cRHS[nCtrl*m_MatSize+p] = VInf.dot(m_pPanel[p].Normal);
-			}
-			nCtrl++;
-		}
-	}
-}
-
-
-
 bool StabAnalysisDlg::BuildInfluenceMatrix()
 {
 	// Builds the influence matrix a[p,pp]
@@ -276,7 +187,6 @@ void StabAnalysisDlg::BuildStateMatrices()
 	m_ALong[3][1] = 0.0;
 	m_ALong[3][2] = 1.0;
 	m_ALong[3][3] = 0.0;
-
 
 	strange = tr("   _____State matrices__________\n");
 	AddString(strange);
@@ -698,8 +608,7 @@ void StabAnalysisDlg::ComputeResults()
 
 
 
-void StabAnalysisDlg::SolveCtrlDer(int ic, double const & DeltaAngle,
-								   double *Xd, double *Yd, double *Zd, double *Ld, double *Md, double *Nd)
+void StabAnalysisDlg::SolveCtrlDer(double const & DeltaAngle, double *Xd, double *Yd, double *Zd, double *Ld, double *Md, double *Nd)
 {
 	CVector Force, Moment, is, js, ks;
 	double cosa, sina;
@@ -711,20 +620,21 @@ void StabAnalysisDlg::SolveCtrlDer(int ic, double const & DeltaAngle,
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 	
-	QString strong = QString("     Solving the linear system for control %1\n").arg(ic);
+	QString strong = QString("     Solving the linear system for the control derivative\n");
 	AddString(strong); 
 	
-	Gauss(m_aij, m_MatSize, m_cRHS+ic*m_MatSize, 1, &m_bCancel);
+	Gauss(m_aij, m_MatSize, m_cRHS, 1, &m_bCancel);
+//for(int p=0; p<m_MatSize;p++)qDebug("%15.8g", m_cRHS[p]);
 	
 	strong = "     Calculating the control derivatives\n\n";
 	AddString(strong);
 	
-	Forces(m_cRHS+ic*m_MatSize, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-/*qDebug("%d,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g",
-	   ic, Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
-qDebug("%d,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g",
-	   ic, Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);*/
-	// make the difference with nominal results
+	Forces(m_cRHS, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+
+qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
+qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);
+qDebug()<<"__________";
+	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
 		
 	*Xd = (Force-Force0).dot(is)/DeltaAngle;
@@ -744,73 +654,77 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	// The geometry has been previously modified to set the control in the position 
 	// defined for this iteration of the analysis
 	//
-	// Two options :
-	//    1. Keep it simple, just change the normal vector of the rotated panels
-	//       Advantage : only the RHS and a few columns of the influence matrix need to be changed
-	//    2. A bit more complicated, regenerate the geometry.
-	//       Advantage : More representative
-	// Since we consider only small perturbations, use option 1
-	//
+	// The problem is not linear, since we take into account viscous forces
+	// Therefore to get the derivative, we need to make the difference between two states
+	// We use forward differences between the reference state corresponding to the trimmed conditions
+	// and the same state + application of a delta angle to the control
+	// The corresponding terms of the state matrix and RHS vector are modfied i.a.w. the rotation of the control
+	// We therefore need to solve as many problems as there are controls to study
+	// AVL ignores the modification of the matrix terms and therefore only a 
+	// single LU decomposition throughout the problem
+	// 
+
 	static CVector  V0, H, RN, V, C, H0;
-	static int j, ic, p, pp;
-	static double sina, cosa, DeltaAngle;
+	static int j, p, pp, pos, ic;
+	static double sina, cosa, DeltaAngle,q,S,b,mac;
 	QString str;
 	Quaternion Quat;
 
-	cosa = cos(m_AlphaEq*PI/180);
-	sina = sin(m_AlphaEq*PI/180);
 	
-	V0.Set(u0*cosa, 0.0, u0*sina);
-
-	double q = 1./2. * m_pWPolar->m_Density * u0 * u0;
-	double b   = m_pWPolar->m_WSpan;
-	double S   = m_pWPolar->m_WArea;
-	double mac = m_pWing->m_MAChord;
-
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
+	V0.Set(u0*cosa, 0.0, u0*sina);
 
-//	DeltaAngle = 0.001; //rad
-	DeltaAngle = -7.*PI/180.0;
-	BuildControlRHS(DeltaAngle*180.0/PI);
+	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
+	b   = m_pWPolar->m_WSpan;
+	S   = m_pWPolar->m_WArea;
+	mac = m_pWing->m_MAChord;
 
+	DeltaAngle = 1.*PI/180.0;
+	DeltaAngle = 0.001;
 	for(ic=0; ic<m_NCtrls; ic++)
 	{
 		Xde[ic] = Yde[ic] =  Zde[ic] = Lde[ic] = Mde[ic] = Nde[ic] = 0.0;
 	}
 	
+	for(p=0; p<m_MatSize; p++)
+	{
+		m_RHS[70*VLMMATSIZE+p] =   -m_pPanel[p].Normal.dot(V0);
+	}
+	
 	str = "\n   ___Control derivatives____\n";
 	AddString(str);
 	
-	
 	// set the freestream veolocity field
-	for (int p=0; p<m_MatSize; p++)
+	for (p=0; p<m_MatSize; p++)
 	{
 		m_RHS[50*m_MatSize+p] = V0.x;
 		m_RHS[51*m_MatSize+p] = V0.y;
 		m_RHS[52*m_MatSize+p] = V0.z;	
 	}
 	
-	//For each control, compute the stability derivative
-	//  Longitudinal control derivatives : Xde/Zde/Mde
-	//  Lateral stability derivatives :    Yde/Lde/Zde
-	
-	
+	pos = 0;
 	ic = 0;
 
-	if(m_pPlane && ic==0)
+	if(m_pPlane)
 	{
-		// reload the base influence matrix
+		// reload the base influence matrix and RHS
 		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+		memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
+
 		//Wing tilt
 		H0 = m_pPlane->m_LEWing;//hinge origin
 		H.Set(0.0, 1.0, 0.0);
 		Quat.Set(DeltaAngle*180.0/PI, H);
+
+		// Modify the influence matrix where applicable :
 		// if panel p is on the modified control surface, then change 
 		// the influence coefficient of all panels pp at ctrl point p
+
 		str = "    Changing the influence matrix and RHS for wing tilt control\n";
 		AddString(str);
+
 		for(p=0; p<m_pWing->m_MatSize; p++)
 		{
 			Quat.Conjugate(m_pWing->m_pPanel[p].Normal, RN);
@@ -821,23 +735,29 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				m_aij[p*m_MatSize+pp] = V.dot(RN);
 			}
+			m_cRHS[p] = -V0.dot(RN);
 		}
-		SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+
+		SolveCtrlDer(DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+
+		pos = m_pWing->m_MatSize;
 		ic=1;
 	}
-	
+
 	if(m_pPlane && m_pStab && ic==1)
 	{
 		str = "    Changing the influence matrix and RHS for elevator tilt control\n";
 		AddString(str);
+		
+		// reload the base influence matrix and RHS
 		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+		memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
+
 		//Elevator tilt
 		H0 = m_pPlane->m_LEStab;//hinge origin
 		H.Set(0.0, 1.0, 0.0);
 		Quat.Set(DeltaAngle*180.0/PI, H);
-		int pos = m_pWing->m_MatSize;
 
-		//change the influence of each panel of the plane at each of the elevator's ctrl points
 		for(p=0; p<m_pStab->m_MatSize; p++)
 		{
 			Quat.Conjugate(m_pPanel[p+pos].Normal, RN);
@@ -848,8 +768,12 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				m_aij[(p+pos)*m_MatSize+pp] = V.dot(RN);
 			}
+			m_cRHS[p+pos] = -V0.dot(RN);
 		}
-		SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+
+		SolveCtrlDer(DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+
+		pos += m_pStab->m_MatSize;		
 		ic++;
 	}
 
@@ -860,7 +784,10 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		{					
 			str = QString("    Changing the influence matrix and RHS for flap control %1\n").arg(ic);
 			AddString(str);
+			
+			// reload the base influence matrix and RHS
 			memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+			memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
 			Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 		
 			for(p=0; p<m_MatSize; p++)
@@ -872,18 +799,20 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 					for(pp=0; pp<m_MatSize; pp++)
 					{
 						C.Copy(m_pPanel[p].CtrlPt);
-						C.RotateY(m_ppSurface[j]->m_HingePoint, DeltaAngle*180.0/PI);
+						C.Rotate(m_ppSurface[j]->m_HingePoint, m_ppSurface[j]->m_HingeVector, DeltaAngle*180.0/PI);
 						VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 						m_aij[p*m_MatSize+pp] = V.dot(RN);
 					}
+					m_cRHS[p] = -V0.dot(RN);
 				}
 			}
-			SolveCtrlDer(ic, DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
+			
+			SolveCtrlDer(DeltaAngle, Xde+ic, Yde+ic, Zde+ic, Lde+ic, Mde+ic, Nde+ic);
 			ic++;
 		}
 	}
-	
-	
+
+	//output control derivatives
 	int nCtrl=0;
 	if(m_pPlane)
 	{
@@ -1316,7 +1245,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange;
 
-	static int p, m, iter;
+	static int p, iter;
 	static double a, a0, a1, Cm, Cm0, Cm1, tmp;
 	static double eps = 1.e-7;
 	static double Lift, cosa, sina, phi;
@@ -1402,16 +1331,12 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	Cm = VLMComputeCm(m_AlphaEq);// for information only, should be zero
 
 	//reconstruct all results from cosine and sine unit vectors
-	m=0;
-
 	cosa = cos(m_AlphaEq*PI/180.0);
 	sina = sin(m_AlphaEq*PI/180.0);
 	for(p=0; p<m_MatSize; p++)
 	{
-		m_Gamma[m] =   cosa * m_uRHS[p] + sina * m_wRHS[p];
-		m++;
+		m_Gamma[p] =   cosa * m_uRHS[p] + sina * m_wRHS[p];
 	}
-
 	qApp->processEvents();
 	if(m_bCancel) return false;
 
@@ -1509,7 +1434,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	//______________________________________________________________________________________
 	// Scale circulations to speeds
 	for(p=0; p<m_MatSize; p++)	m_Gamma[p] *= u0;
-
+//for(p=0; p<m_MatSize;p++)qDebug("%15.8g", m_Gamma[p]);
 	// Store the force and moment acting on the surfaces
 	// Will be of use later for stability control derivatives
 	Force0  = Force*u0*u0;
@@ -2170,7 +2095,7 @@ bool StabAnalysisDlg::SolveUnitSpeeds()
 
 	memcpy(m_RHS,           m_uRHS, m_MatSize * sizeof(double));
 	memcpy(m_RHS+m_MatSize, m_wRHS, m_MatSize * sizeof(double));
-	memcpy(m_aijRef, m_aij, m_MatSize*m_MatSize*sizeof(double));// we'll need it later for stability derivatives
+	memcpy(m_aijRef, m_aij, m_MatSize*m_MatSize*sizeof(double));// we'll need it later for control derivatives
 
 //	if(!Gauss(m_aij,m_MatSize, m_RHS, 2, &m_bCancel))
 	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, m_MatSize, &m_bCancel))
@@ -2264,12 +2189,10 @@ double StabAnalysisDlg::VLMComputeCm(double alpha)
 	for(p=0; p<m_MatSize; p++)
 	{
 		//write vector operations in-line, more efficient
-//		PanelLeverArm = m_pPanel[p].VortexPos - m_CoG;
 		PanelLeverArm.x = m_pPanel[p].VortexPos.x - m_CoG.x;
 		PanelLeverArm.y = m_pPanel[p].VortexPos.y - m_CoG.y;
 		PanelLeverArm.z = m_pPanel[p].VortexPos.z - m_CoG.z;
 
-//		Force  = V * m_pPanel[p].Vortex * (m_uRHS[p]*cosa + m_wRHS[p]*sina);         //Newtons/rho
 		Force.x  = (V.y*m_pPanel[p].Vortex.z - V.z*m_pPanel[p].Vortex.y) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho
 		Force.y  = (V.z*m_pPanel[p].Vortex.x - V.x*m_pPanel[p].Vortex.z) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho
 		Force.z  = (V.x*m_pPanel[p].Vortex.y - V.y*m_pPanel[p].Vortex.x) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho

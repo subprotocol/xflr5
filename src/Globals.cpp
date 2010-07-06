@@ -64,7 +64,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 	pa = A;
 	for (row = 0; row < (n - 1); row++, pa += n)
 	{
-//		qApp->processEvents();
+		qApp->processEvents();
 		if(*pbCancel) return false;
 		//  find the pivot row
 		A_pivot_row = pa;
@@ -118,7 +118,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 	pa = A + (n - 1) * n;
 	for (row = n - 1; row >= 0; pa -= n, row--)
 	{
-//		qApp->processEvents();
+		qApp->processEvents();
 		if(*pbCancel) return false;
 
 		if ( *(pa + row) == 0.0 )
@@ -1276,16 +1276,16 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 
 bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel)
 {
-   int i, j, k;
-   double *p_k, *p_row, *p_col;
-   double max=0.0;
+	int i, j, k;
+	double *p_k, *p_row, *p_col;
+	double max=0.0;
 
-   p_col = NULL;
+	p_col = NULL;
 
-//  For each row and column, k = 0, ..., n-1,
+	//  For each row and column, k = 0, ..., n-1,
 	for (k=0, p_k=A; k<n; p_k+=n, k++)
 	{
-//  find the pivot row
+	//  find the pivot row
 		pivot[k] = k;
 		p_col = p_k+k;
 		max = fabs( *(p_k + k) );
@@ -1300,31 +1300,32 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 		}
 		if(!p_col) return false;
 
-//     and if the pivot row differs from the current row, then
-//     interchange the two rows.
+		// and if the pivot row differs from the current row, then
+		// interchange the two rows.
 		if (pivot[k] != k)
+		{
 			for (j=0; j<n; j++)
 			{
 				max = *(p_k + j);
 				*(p_k + j) = *(p_col + j);
 				*(p_col + j) = max;
 			}
+		}
 
-//                and if the matrix is singular, return error
+		// and if the matrix is singular, return error
 		if ( *(p_k + k) == 0.0 ) return false;
-		
 
-//      otherwise find the upper triangular matrix elements for row k.
+		// otherwise find the upper triangular matrix elements for row k.
 		for (j = k+1; j < n; j++) *(p_k + j) /= *(p_k + k);
 
-
-//      update remaining matrix
+		// update remaining matrix
 		for (i = k+1, p_row = p_k + n; i < n; p_row += n, i++)
 			for (j = k+1; j < n; j++) *(p_row + j) -= *(p_row + k) * *(p_k + j);
 
+		qApp->processEvents();
 		if(*pbCancel) return false;		
-   }
-   return true;
+	}
+	return true;
 }
 
 
@@ -1377,12 +1378,11 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 //                                                                            //
 bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
 {
-   int i, k;
-   double *p_k;
-   double dum;
+	int i, k;
+	double *p_k;
+	double dum;
 
-//  Solve the linear equation Lx = B for x, where L is a lower
-//  triangular matrix.
+	//  Solve the linear equation Lx = B for x, where L is a lower triangular matrix.
 	for (k=0, p_k=LU; k<Size; p_k+=Size, k++)
 	{
 		if (pivot[k] != k)
@@ -1394,13 +1394,14 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 		for (i=0; i<k; i++) x[k]-=x[i] * *(p_k+i);
 		x[k] /= *(p_k+k);
 		
+		qApp->processEvents();
 		if(*pbCancel) return false;
 	}
 
-//  Solve the linear equation Ux = y, where y is the solution
-//  obtained above of Lx = B and U is an upper triangular matrix.
-//  The diagonal part of the upper triangular part of the matrix is
-//  assumed to be 1.0.
+	//  Solve the linear equation Ux = y, where y is the solution
+	//  obtained above of Lx = B and U is an upper triangular matrix.
+	//  The diagonal part of the upper triangular part of the matrix is
+	//  assumed to be 1.0.
 	for (k=Size-1, p_k=LU+Size*(Size-1); k>=0; k--, p_k-=Size)
 	{
 		if (pivot[k] != k)
@@ -1414,10 +1415,11 @@ bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[
 			return false;
 		}
 		
+		qApp->processEvents();
 		if(*pbCancel) return false;
 	}
 
-   return true;
+	return true;
 }
 
 

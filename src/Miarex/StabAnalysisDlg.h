@@ -59,13 +59,12 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 
 	void AddString(QString strong);
-	void BuildControlRHS(double const & DeltaAngle);
 	void BuildRHS();
 	void BuildRotationMatrix();
 	void BuildStateMatrices();
 	void ComputeBodyAxisInertia();
 	void ComputeControlDerivatives();
-	void SolveCtrlDer(int ic, double const & DeltaAngle, double *Xd, double *d, double *Zd, double *Ld, double *Md, double *Nd);
+	void SolveCtrlDer(double const & DeltaAngle, double *Xd, double *d, double *Zd, double *Ld, double *Md, double *Nd);
 	void ComputeResults();
 	void ComputeStabilityDerivatives();
 	void ComputeStabilityInertia();
@@ -108,7 +107,7 @@ private:
 	double *m_Gamma;
 	double m_uRHS[VLMMATSIZE], m_vRHS[VLMMATSIZE], m_wRHS[VLMMATSIZE];
 	double m_pRHS[VLMMATSIZE], m_qRHS[VLMMATSIZE], m_rRHS[VLMMATSIZE];
-	double m_cRHS[VLMMATSIZE*MAXCONTROLS];
+	double m_cRHS[VLMMATSIZE];
 	double m_Cp[VLMMATSIZE];//lift coef per panel
 
 	double m_AlphaEq, m_Ctrl;
