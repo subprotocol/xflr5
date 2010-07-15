@@ -69,6 +69,7 @@ private slots:
 	void OnEditingFinished();
 
 private:
+	static bool s_b3DPanelEnable;
 
 	void *m_pMainFrame;
 

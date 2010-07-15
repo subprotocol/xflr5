@@ -64,6 +64,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 {
 	m_VersionName = "XFLR5 v6 Beta";
 	setWindowTitle(m_VersionName);
+	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
 	m_bMaximized = true;
 	m_LengthUnit  = 0;

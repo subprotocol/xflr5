@@ -466,7 +466,6 @@ protected:
 	bool m_bAutoScales;
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
-
 	bool m_bTrans;				// the view is being dragged
 	bool m_bType1, m_bType2, m_bType4, m_bType5, m_bType6, m_bType7;	// polar types to be displayed
 	bool m_bShowElliptic;			// true if the elliptic loading should be displayed in the local lift graph

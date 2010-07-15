@@ -892,6 +892,12 @@ void StabViewDlg::SetControls()
 		m_pctrlInitCondResponse->setChecked(pMiarex->m_StabilityResponseType==0);
 		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
 		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
+		
+		m_pctrlAddCurve->setEnabled(pMiarex->m_pCurWOpp);
+		m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+		m_pctrlPlotStabGraph->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+		m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+		m_pctrlCurveList->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 
 		m_pctrlRampTime->setEnabled(pMiarex->m_StabilityResponseType==1);
 	}
@@ -934,6 +940,7 @@ void StabViewDlg::SetControls()
 	m_pctrlRLMode4->setEnabled(pMiarex->m_iStabilityView>0);
 	
 	m_pctrlModeStep->SetValue(pMiarex->m_Modedt);
+
 	FillEigenThings();
 }
 
@@ -1059,8 +1066,14 @@ void StabViewDlg::OnDeleteCurve()
 	pMiarex->m_TimeGraph2.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph3.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph4.DeleteCurve(CurveTitle);
+
 	FillCurveList();
 	m_pctrlCurveList->setCurrentIndex(0);
+	m_pctrlPlotStabGraph->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlCurveList->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	
 	m_pCurve = pMiarex->m_TimeGraph1.GetCurve(m_pctrlCurveList->itemText(0));
 	pMiarex->SetCurveParams();
 	pMiarex->CreateStabilityCurves();
@@ -1074,6 +1087,7 @@ void StabViewDlg::AddCurve()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	int nCurves = pMiarex->m_TimeGraph1.GetCurveCount();
 	QString strong = tr("New curve") + QString(" %1").arg(nCurves);
+
 	CCurve *pCurve;
 	m_pCurve = pMiarex->m_TimeGraph1.AddCurve();
 	m_pCurve->SetTitle(strong);
@@ -1083,7 +1097,13 @@ void StabViewDlg::AddCurve()
 	pCurve->SetTitle(strong);
 	pCurve = pMiarex->m_TimeGraph4.AddCurve();
 	pCurve->SetTitle(strong);
+
 	m_pctrlCurveList->addItem(pCurve->GetTitle());
+	m_pctrlPlotStabGraph->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+	m_pctrlCurveList->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
+
 	pMiarex->SetCurveParams();
 }
 
@@ -1104,8 +1124,6 @@ void StabViewDlg::FillCurveList()
 		m_pctrlCurveList->setCurrentIndex(sel);
 	}
 }
-
-
 
 
 

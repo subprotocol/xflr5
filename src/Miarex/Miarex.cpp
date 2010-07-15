@@ -98,7 +98,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_bHighlightOpp = false;
 
-
+	
 	m_nWakeNodes = 0;
 	m_WakeSize   = 0;
 	m_LastPoint.setX(0);
@@ -2520,8 +2520,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 			m_Panel[m_MatSize].m_iPD = m_MatSize-1;
 			m_Panel[m_MatSize].m_iPU = m_MatSize+1;
-			if(l==0)						m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
-			if(l==pSurface->m_NXPanels-1)	m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
+			if(l==0)                      m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
+			if(l==pSurface->m_NXPanels-1) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
 			m_Panel[m_MatSize].m_iPL = -1;
 			m_Panel[m_MatSize].m_iPR = -1;
 
@@ -2551,8 +2551,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 			n2 = IsNode(pSurface->LB);
 			n3 = IsNode(pSurface->TB);
 
-			if(l==0)						m_Panel[m_MatSize].m_bIsTrailing = true;
-			if(l==pSurface->m_NXPanels-1) 	m_Panel[m_MatSize].m_bIsLeading  = true;
+			if(l==0)                      m_Panel[m_MatSize].m_bIsTrailing = true;
+			if(l==pSurface->m_NXPanels-1) m_Panel[m_MatSize].m_bIsLeading  = true;
 			m_Panel[m_MatSize].m_bIsWakePanel   = false;
 			m_Panel[m_MatSize].m_bIsInSymPlane  = pSurface->m_bIsInSymPlane;
 
@@ -2603,7 +2603,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 			m_Panel[m_MatSize].m_iPos = side;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 
-			if(side==0)			m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
+			if(side==0)         m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
 			else if (side==-1)  m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
 
 			// set neighbour panels
@@ -2611,8 +2611,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 			// we are on the bottom or middle surface
 			m_Panel[m_MatSize].m_iPD = m_MatSize-1;
 			m_Panel[m_MatSize].m_iPU = m_MatSize+1;
-			if(l==0)						            m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
-			if(l==pSurface->m_NXPanels-1 && side==0)	m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
+			if(l==0)                                 m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
+			if(l==pSurface->m_NXPanels-1 && side==0) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
 
 			if(side !=0)
 			{
@@ -2666,7 +2666,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 				n2 = IsNode(pSurface->LB);
 				n3 = IsNode(pSurface->TB);
 
-				if(l==0)					  m_Panel[m_MatSize].m_bIsTrailing = true;
+				if(l==0)                      m_Panel[m_MatSize].m_bIsTrailing = true;
 				if(l==pSurface->m_NXPanels-1) m_Panel[m_MatSize].m_bIsLeading  = true;
 				m_Panel[m_MatSize].m_bIsWakePanel   = false;
 				m_Panel[m_MatSize].m_bIsInSymPlane  = pSurface->m_bIsInSymPlane;
@@ -2713,8 +2713,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 				// we are on the top surface
 				m_Panel[m_MatSize].m_iPD = m_MatSize+1;
 				m_Panel[m_MatSize].m_iPU = m_MatSize-1;
-				if(l==0)						m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
-//				if(l==pSurface->m_NXPanels-1)	m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
+				if(l==0)                      m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
+//				if(l==pSurface->m_NXPanels-1) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
 
 				m_Panel[m_MatSize].m_iPL = m_MatSize - 2*pSurface->m_NXPanels;//assuming all wing panels have same chordwise distribution
 				m_Panel[m_MatSize].m_iPR = m_MatSize + 2*pSurface->m_NXPanels;//assuming all wing panels have same chordwise distribution
@@ -2792,8 +2792,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 			m_Panel[m_MatSize].m_iPD = m_MatSize-1;
 			m_Panel[m_MatSize].m_iPU = m_MatSize+1;
-			if(l==0)						m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
-			if(l==pSurface->m_NXPanels-1)	m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
+			if(l==0)                      m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
+			if(l==pSurface->m_NXPanels-1) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
 			m_Panel[m_MatSize].m_iPL = -1;
 			m_Panel[m_MatSize].m_iPR = -1;
 
@@ -3547,6 +3547,7 @@ void QMiarex::CreateStabTimeCurves()
 	static double t, dt, TotalPoints; // the input load
 	static complex<double> in[4];
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
+	
 	QString strong, CurveTitle;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -3565,6 +3566,8 @@ void QMiarex::CreateStabTimeCurves()
 	if(pCurve3) pCurve3->ResetCurve();
 	else return;
 	
+	if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
+
 	strong = pStabView->m_pctrlCurveList->currentText();
 
 	m_Deltat = pStabView->m_pctrlDeltat->GetValue();
@@ -3579,9 +3582,10 @@ void QMiarex::CreateStabTimeCurves()
 	m_TimeInput[1] = pStabView->m_pctrlStabVar2->GetValue();
 	m_TimeInput[2] = pStabView->m_pctrlStabVar3->GetValue();
 	m_TimeInput[3] = 0.0;//we start with an initial 0.0 value for pitch or bank angles
+
 	if(m_StabilityResponseType==0)
 	{
-		//start with user input initial conditions
+		//start with the user input initial conditions
 		in[0] = complex<double>(m_TimeInput[0], 0.0);
 		in[1] = complex<double>(m_TimeInput[1], 0.0);
 		in[2] = complex<double>(m_TimeInput[2], 0.0);
@@ -3589,14 +3593,12 @@ void QMiarex::CreateStabTimeCurves()
 	}
 	else if(m_StabilityResponseType==2)
 	{
-		//start with initial conditions which will excite only the requested mode
+		//start with the initial conditions which will excite only the requested mode
 		in[0] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][0];
 		in[1] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][1];
 		in[2] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][2];
 		in[3] = m_pCurWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
 	}	
-	if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
-
 	
 	//fill the modal matrix
 	if(m_bLongitudinal) k=0; else k=1;
@@ -3620,7 +3622,7 @@ void QMiarex::CreateStabTimeCurves()
 		q0[2] = InvM[8] * in[0] + InvM[9] * in[1] + InvM[10]* in[2] + InvM[11]* in[3];
 		q0[3] = InvM[12]* in[0] + InvM[13]* in[1] + InvM[14]* in[2] + InvM[15]* in[3];
 		
-		for(i=1; i<TotalPoints; i++)
+		for(i=0; i<TotalPoints; i++)
 		{
 			t = (double)i * dt;
 			q[0] = q0[0] * exp(m_pCurWOpp->m_EigenValue[0+k*4]*t);
@@ -5031,10 +5033,17 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 	{
 		if(m_iStabilityView==0)
 		{
-			if(m_TimeGraph1.IsInDrawRect(pt))      return &m_TimeGraph1;
-			else if(m_TimeGraph2.IsInDrawRect(pt)) return &m_TimeGraph2;
-			else if(m_TimeGraph3.IsInDrawRect(pt)) return &m_TimeGraph3;
-			else if(m_TimeGraph4.IsInDrawRect(pt)) return &m_TimeGraph4;
+			if(m_iStabTimeView==1) 
+			{
+				return m_pCurTimeGraph;
+			}
+			else
+			{
+				if(m_TimeGraph1.IsInDrawRect(pt))      return &m_TimeGraph1;
+				else if(m_TimeGraph2.IsInDrawRect(pt)) return &m_TimeGraph2;
+				else if(m_TimeGraph3.IsInDrawRect(pt)) return &m_TimeGraph3;
+				else if(m_TimeGraph4.IsInDrawRect(pt)) return &m_TimeGraph4;
+			}
 			return NULL;
 		}
 		else if(m_iStabilityView==1)
@@ -6779,7 +6788,11 @@ int QMiarex::IsWakeNode(CVector &Pt)
 int QMiarex::IsNode(CVector &Pt)
 {
 	int in;
-	for (in=0; in<m_nNodes; in++)
+//	for (in=0; in<m_nNodes; in++)
+	// explore in reverse order, since we have better chance of 
+	// finding the node close to the last point when creating elements
+	// 
+	for (in=m_nNodes-1; in>=0; in--)
 	{
 		if(Pt.IsSame(m_Node[in])) return in;
 	}
@@ -8457,12 +8470,26 @@ void QMiarex::OnAnimateWOpp()
 
 void QMiarex::OnAnimateModeSingle(bool bStep)
 {
-	if(m_iView!=WSTABVIEW) return; //nothing to animate
-	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_Type==7) return;
-	if(!m_pCurWOpp) return;
-
 	static double t, sigma, s2, omega, o2, theta_sum, psi_sum, norm;
 	double *vabs, *phi;
+
+	if(m_iView!=WSTABVIEW) 
+	{
+		m_pTimerMode->stop();
+		return; //nothing to animate
+	}
+	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_Type==7 || !m_pCurWOpp) 
+	{
+		m_pTimerMode->stop();
+		return; //nothing to animate
+	}
+	
+	if(m_iStabilityView!=3)
+	{
+		m_pTimerMode->stop();
+		return; //nothing to animate
+	}
+
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -8677,6 +8704,7 @@ void QMiarex::OnAdvancedSettings()
 	dlg.m_bTrefftz        = m_bTrefftz;
 	dlg.m_bKeepOutOpps    = m_bKeepOutOpps;
 	dlg.m_bLogFile        = m_bLogFile;
+	dlg.m_bPanelEnable    = WPolarDlg::s_b3DPanelEnable;
 	dlg.m_MinPanelSize    = m_MinPanelSize;
 	dlg.m_ControlPos      = CPanel::m_CtrlPos;
 	dlg.m_VortexPos       = CPanel::m_VortexPos;
@@ -8686,6 +8714,7 @@ void QMiarex::OnAdvancedSettings()
 	dlg.InitDialog();
 	if(dlg.exec() == QDialog::Accepted)
 	{
+		WPolarDlg::s_b3DPanelEnable = dlg.m_bPanelEnable;
 		CWing::s_CvPrec        = dlg.m_AlphaPrec;
 		CWing::s_RelaxMax      = dlg.m_Relax;
 		CWing::s_NLLTStations  = dlg.m_NStation;
@@ -8749,6 +8778,7 @@ void QMiarex::OnCpPosition()
 	CreateCpCurves();
 	UpdateView();
 }
+
 
 void QMiarex::OnCpView()
 {
@@ -11913,15 +11943,13 @@ void QMiarex::OnStabCurve()
 }
 
 
-
-
 void QMiarex::OnStabilityDirection()
 {
 	//the user has clicked either the longitudinal or lateral mode display
 	//so update the view accordingly
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-
+	
 	m_bLongitudinal = m_pctrlLongDynamics->isChecked();
 	if(m_bLongitudinal)
 	{
@@ -11943,6 +11971,9 @@ void QMiarex::OnStabilityDirection()
 	m_TimeGraph3.DeleteCurves();
 	m_TimeGraph4.DeleteCurves();
 
+	pStabView->m_pCurve = NULL;
+	pStabView->FillCurveList();
+	
 	if(m_bLongitudinal) m_pCurRLStabGraph = &m_LongRLGraph;
 	else                m_pCurRLStabGraph = &m_LatRLGraph;
 	if(m_iStabilityView==1)
@@ -12273,7 +12304,6 @@ void QMiarex::PaintView(QPainter &painter)
 	{
 		if (m_iWPlrView == 1)
 		{
-//			PaintWSingleGraph(painter);
 			if(!m_pCurGraph)
 			{
 				m_pCurGraph     = &m_WPlrGraph1;
@@ -12402,7 +12432,6 @@ void QMiarex::PaintView(QPainter &painter)
 				painter.drawText(Place, GraphName);
 
 				DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
-				painter.restore();
 			}
 			else if(m_iStabTimeView==4)
 			{
@@ -12417,7 +12446,6 @@ void QMiarex::PaintView(QPainter &painter)
 				m_TimeGraph2.DrawGraph(Rect2, painter);
 				m_TimeGraph3.DrawGraph(Rect3, painter);
 				m_TimeGraph4.DrawGraph(Rect4, painter);
-			
 			}
 		}
 		else 

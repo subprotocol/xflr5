@@ -624,16 +624,15 @@ void StabAnalysisDlg::SolveCtrlDer(double const & DeltaAngle, double *Xd, double
 	AddString(strong); 
 	
 	Gauss(m_aij, m_MatSize, m_cRHS, 1, &m_bCancel);
-//for(int p=0; p<m_MatSize;p++)qDebug("%15.8g", m_cRHS[p]);
 	
 	strong = "     Calculating the control derivatives\n\n";
 	AddString(strong);
 	
 	Forces(m_cRHS, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 
-qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
-qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);
-qDebug()<<"__________";
+//qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
+//qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);
+//qDebug()<<"__________";
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
 		
@@ -660,7 +659,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	// and the same state + application of a delta angle to the control
 	// The corresponding terms of the state matrix and RHS vector are modfied i.a.w. the rotation of the control
 	// We therefore need to solve as many problems as there are controls to study
-	// AVL ignores the modification of the matrix terms and therefore only a 
+	// AVL ignores the modification of the matrix terms and therefore requires only a 
 	// single LU decomposition throughout the problem
 	// 
 
@@ -670,7 +669,6 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	QString str;
 	Quaternion Quat;
 
-	
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
@@ -683,11 +681,14 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 
 	DeltaAngle = 1.*PI/180.0;
 	DeltaAngle = 0.001;
+
 	for(ic=0; ic<m_NCtrls; ic++)
 	{
 		Xde[ic] = Yde[ic] =  Zde[ic] = Lde[ic] = Mde[ic] = Nde[ic] = 0.0;
 	}
-	
+
+	//create the reference RHS 
+	//will be modidied for each control derivative
 	for(p=0; p<m_MatSize; p++)
 	{
 		m_RHS[70*VLMMATSIZE+p] =   -m_pPanel[p].Normal.dot(V0);
@@ -696,7 +697,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	str = "\n   ___Control derivatives____\n";
 	AddString(str);
 	
-	// set the freestream veolocity field
+	// set the freestream velocity field
 	for (p=0; p<m_MatSize; p++)
 	{
 		m_RHS[50*m_MatSize+p] = V0.x;
@@ -718,7 +719,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		H.Set(0.0, 1.0, 0.0);
 		Quat.Set(DeltaAngle*180.0/PI, H);
 
-		// Modify the influence matrix where applicable :
+		// Modify the influence matrix and RHS where applicable :
 		// if panel p is on the modified control surface, then change 
 		// the influence coefficient of all panels pp at ctrl point p
 
@@ -1251,7 +1252,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	static double Lift, cosa, sina, phi;
 	static double VerticalCl;
 	static CVector VInf, Force, Moment, WindNormal;
-
+double nada;
 	// find aoa such that Cm=0;
 
 	//Build the unit RHS vectors along x and z in Body Axis
@@ -1327,7 +1328,6 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	if(iter>=CM_ITER_MAX || m_bCancel) return false;
 
 	m_AlphaEq = a*180.0/PI;
-
 	Cm = VLMComputeCm(m_AlphaEq);// for information only, should be zero
 
 	//reconstruct all results from cosine and sine unit vectors
@@ -1377,8 +1377,8 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 		p=0;
 
 		u0 = 1.0;
+nada = Cm;
 		Forces(m_Gamma, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-
 		phi = m_pWPolar->m_BankAngle *PI/180.0;
 
 		Lift   = Force.dot(WindNormal);		//N/rho ; bank effect not included
@@ -1434,7 +1434,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	//______________________________________________________________________________________
 	// Scale circulations to speeds
 	for(p=0; p<m_MatSize; p++)	m_Gamma[p] *= u0;
-//for(p=0; p<m_MatSize;p++)qDebug("%15.8g", m_Gamma[p]);
+
 	// Store the force and moment acting on the surfaces
 	// Will be of use later for stability control derivatives
 	Force0  = Force*u0*u0;
@@ -1448,7 +1448,10 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 		m_RHS[52*m_MatSize+p] = VInf.z;
 	}
 
-	Forces(m_Gamma, m_RHS+50*m_MatSize, Force0, Moment0, m_pWPolar->m_bTiltedGeom);
+	Forces(m_Gamma, m_RHS+50*m_MatSize, Force0, Moment0, m_pWPolar->m_bTiltedGeom); 
+// qDebug("%14.7g    %14.7g    %14.7g", nada, Moment0.y/(.5*m_pWPolar->m_Density*m_pWPolar->m_WArea*u0*u0), Moment.y/(.5*m_pWPolar->m_Density*m_pWPolar->m_WArea*23.397*23.397));
+// qDebug("%14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g,   %14.7g", Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);
+// qDebug()<<"******************";
 	return  true;
 }
 

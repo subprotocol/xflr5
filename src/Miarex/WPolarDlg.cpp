@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	WPolarDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2009-2010 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <math.h>
  
-
+bool WPolarDlg::s_b3DPanelEnable;
 
 WPolarDlg::WPolarDlg()
 {
@@ -42,7 +42,7 @@ WPolarDlg::WPolarDlg()
 	m_WPolarName = "WPolar Name";
 
 	m_bAutoName = true;
-
+	
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 1.0;
 //	m_XCmRef     = 0.0;
@@ -169,8 +169,7 @@ void WPolarDlg::EnableControls()
 void WPolarDlg::InitDialog()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	QString str;
-	QString str1,str2;
+	QString str, str1;
 
 	int i;
 
@@ -194,6 +193,16 @@ void WPolarDlg::InitDialog()
 	m_bAutoName = true;
 	m_pctrlAutoName->setChecked(true);
 
+	m_pctrlMethod4->setEnabled(s_b3DPanelEnable);
+	if(s_b3DPanelEnable)
+	{
+		m_pctrlMethod4->setText(tr("3D Panels"));
+	}
+	else
+	{
+		m_pctrlMethod4->setText(tr("3D Panel method is disabled"));
+	}
+	
 	m_pctrlQInf->SetValue(m_QInf);
 	m_pctrlWeight->SetValue(m_Weight);
 
@@ -716,6 +725,7 @@ void WPolarDlg::SetupLayout()
 	m_pctrlMethod2 = new QRadioButton(tr("VLM1 : Classic"));
 	m_pctrlMethod3 = new QRadioButton(tr("VLM2 : Quads"));
 	m_pctrlMethod4 = new QRadioButton(tr("3D Panels"));
+	m_pctrlMethod4->setEnabled(s_b3DPanelEnable);
 	MethodLayout->addWidget(m_pctrlMethod1);
 	MethodLayout->addWidget(m_pctrlMethod2);
 	MethodLayout->addWidget(m_pctrlMethod3);

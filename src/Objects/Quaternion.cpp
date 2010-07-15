@@ -21,64 +21,6 @@
 
 #include "Quaternion.h"
 # include <math.h>
-#include "../Params.h"
-
-
-Quaternion::Quaternion(void)
-{
-	a=0.0; qx= 0.0; qy=0.0; qz = 0.0;
-	theta = 0.0;
-	Settxx();
-}
-
-
-Quaternion::Quaternion(double const &t, double const &x, double const &y, double const &z)
-{
-	a=t; qx= x; qy=y; qz = z;
-	theta = 2.0*acos(t);
-	Settxx();
-}
-
-
-void Quaternion::Set(double const &real, double const &x, double const &y, double const &z)
-{	
-	a = real;
-	qx = x;
-	qy = y;
-	qz = z;
-	Settxx();
-}
-
-
-void Quaternion::Set(double const &Angle, CVector const &R)
-{	
-	CVector N;
-	N = R;
-	N.Normalize();
-	theta = Angle*PI/180.0;
-
-	a = cos(theta/2.0);
-	double sina = sin(theta/2.0);
-
-	qx = N.x*sina;
-	qy = N.y*sina;
-	qz = N.z*sina;
-	Settxx();
-}
-
-
-void Quaternion::Settxx()
-{
-	t2 =   a*qx;
-	t3 =   a*qy;
-	t4 =   a*qz;
-	t5 =  -qx*qx;
-	t6 =   qx*qy;
-	t7 =   qx*qz;
-	t8 =  -qy*qy;
-	t9 =   qy*qz;
-	t10 = -qz*qz;	
-}
 
 
 
@@ -109,7 +51,6 @@ void Quaternion::QuattoMat(double m[][4])
 	m[2][0] = t11 - t12;
 	m[2][1] = t19 + t20;
 	m[2][2] = t1 + t2*t24;
-
 }	
 
 

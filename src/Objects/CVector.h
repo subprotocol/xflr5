@@ -32,21 +32,25 @@ public:
 	double y;
 	double z;
 
-	CVector();
-	CVector(double const &xi, double const &yi, double const &zi);
+	//inline costructors
+	CVector()
+	{
+		x  = 0.0;
+		y  = 0.0;
+		z  = 0.0;
+	};
 
+	CVector(double const &xi, double const &yi, double const &zi)
+	{
+		x  = xi;
+		y  = yi;
+		z  = zi;
+	};
 
-	void Rotate(CVector const &R, double Angle);
-	void Rotate(CVector &O, CVector const &R, double Angle);
-	void RotateX(CVector const &O, double XTilt);
-	void RotateY(CVector const &O, double YTilt);
-	void RotateZ(CVector const &O, double ZTilt);
-	void RotateY(double YTilt);
-
- 
 	//inline operators
 	bool operator ==(CVector const &V)
 	{
+		//used only to compare point positions
 		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
 	};		
 	
@@ -59,9 +63,9 @@ public:
 	
 	void operator+=(CVector const &T)
 	{
-	   x += T.x;
-	   y += T.y;
-	   z += T.z;
+		x += T.x;
+		y += T.y;
+		z += T.z;
 	};
 	
 	void operator-=(CVector const &T)
@@ -155,6 +159,7 @@ public:
 	
 	bool IsSame(CVector const &V)
 	{
+		//used only to compare point positions
 		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
 	};
 
@@ -164,6 +169,16 @@ public:
 		y += T.y;
 		z += T.z;
 	};
+
+	//other methods
+	void Rotate(CVector const &R, double Angle);
+	void Rotate(CVector &O, CVector const &R, double Angle);
+	void RotateX(CVector const &O, double XTilt);
+	void RotateY(CVector const &O, double YTilt);
+	void RotateZ(CVector const &O, double ZTilt);
+	void RotateY(double YTilt);
+
+ 
 };
 
 #endif

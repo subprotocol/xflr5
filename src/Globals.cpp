@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 
 	Globals Class
 	Copyright (C) 2008-2010 Andre Deperrois xflr5@yahoo.com
@@ -1065,7 +1065,7 @@ void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bo
 		Psi.z /= ftmp;
 
 		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+			-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
 		V.x += Psi.x * Omega/4.0/PI;
 		V.y += Psi.y * Omega/4.0/PI;
@@ -1110,6 +1110,7 @@ double GLGetRed(double tau)
 	else				  return 0.0;
 }
 
+
 double GLGetGreen(double tau)
 {
 	if(tau<0.f || tau>1.0) 	return 0.0;
@@ -1117,6 +1118,7 @@ double GLGetGreen(double tau)
 	else if(tau>3.0/4.0) 	return (1.0-4.0*(tau-3.0/4.0));
 	else					return 1.0;
 }
+
 
 double GLGetBlue(double tau)
 {
@@ -1260,17 +1262,6 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 //     0  Success                                                             //
 //    -1  Failure - The matrix A is singular.                                 //
 //                                                                            //
-//  Example:                                                                  //
-//     #define N                                                              //
-//     double A[N][N];                                                        //
-//     int    pivot[N];                                                       //
-//                                                                            //
-//     (your code to intialize the matrix A)                                  //
-//                                                                            //
-//     err = Crout_LU_Decomposition_with_Pivoting(&A[0][0], pivot, N);        //
-//     if (err < 0) printf(" Matrix A is singular\n");                        //
-//     else { printf(" The LU decomposition of A is \n");                     //
-//           ...                                                              //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 
@@ -1357,23 +1348,9 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 //     int     n       The number of rows or columns of the matrix LU.        //
 //                                                                            //
 //  Return Values:                                                            //
-//     0  Success                                                             //
-//    -1  Failure - The matrix A is singular.                                 //
+//     true  : Success                                                        //
+//     false : Failure - The matrix A is singular.                            //
 //                                                                            //
-//  Example:                                                                  //
-//     #define N                                                              //
-//     double A[N][N], B[N], x[N];                                            //
-//     int    pivot[N];                                                       //
-//                                                                            //
-//     (your code to create matrix A and column vector B)                     //
-//     err = Crout_LU_Decomposition_with_Pivoting(&A[0][0], pivot, N);        //
-//     if (err < 0) printf(" Matrix A is singular\n");                        //
-//     else {                                                                 //
-//        err = Crout_LU_with_Pivoting_Solve(&A[0][0], B, pivot, x, n);       //
-//        if (err < 0) printf(" Matrix A is singular\n");                     //
-//        else printf(" The solution is \n");                                 //
-//           ...                                                              //
-//     }                                                                      //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 bool Crout_LU_with_Pivoting_Solve(double *LU, double B[], int pivot[], double x[], int Size, bool *pbCancel)
@@ -1518,6 +1495,7 @@ complex<double> Cofactor44(complex<double> *aij, int &i, int &j)
 	return Det33(a33);
 }
 
+
 complex<double> Det44(complex<double> *aij)
 {
 //	returns the determinant of a 4x4 matrix
@@ -1586,7 +1564,7 @@ void CharacteristicPol(double m[][4], double p[5])
 {
 	// input : 4x4 matrix m[][]
 	// output : coefficients p[] of the matrix characteristic polynomial
-	// thanks mathlab !
+	// thanks Mapple !
 	// polynom can then be solved for complex roots using Bairstow's algorithm
 
 

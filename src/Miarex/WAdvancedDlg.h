@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	WAdvancedDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2009-2010 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ public:
 private slots:
 	void OnOK();
 	void OnResetDefaults();
+	void OnPanelEnable();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -53,6 +54,7 @@ private:
 	QCheckBox *m_pctrlLogFile;
 	QCheckBox *m_pctrlResetWake;
 	QCheckBox *m_pctrlKeepOutOpps;
+	QCheckBox *m_pctrlPanelEnable;
 	FloatEdit *m_pctrlInterNodes;
 	FloatEdit *m_pctrlRelax;
 	FloatEdit *m_pctrlAlphaPrec;
@@ -69,6 +71,7 @@ private:
 	bool m_bTrefftz;
 	bool m_bKeepOutOpps;
 	bool m_bResetWake;
+	bool m_bPanelEnable;
 
 	int m_Iter;
 	int m_NStation;

@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-// Vector.cpp: implementation of the CVector class.
 // Simple class implementing the usual properties and methods of a 3D Vector
 
 
@@ -27,22 +26,6 @@
 #include "CVector.h"
 #include "Quaternion.h"
 #include "../Globals.h"
-
-
-CVector::CVector()
-{
-	x  = 0.0;
-	y  = 0.0;
-	z  = 0.0;
-}
-
-
-CVector::CVector(double const &xi, double const &yi, double const &zi)
-{
-	x  = xi;
-	y  = yi;
-	z  = zi;
-}
 
 
 void CVector::Rotate(CVector const &R, double Angle)
