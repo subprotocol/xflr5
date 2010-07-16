@@ -3633,7 +3633,7 @@ void QMiarex::CreateStabTimeCurves()
 			y[1] = *(M+4*1+0) * q[0] +*(M+4*1+1) * q[1] +*(M+4*1+2) * q[2] +*(M+4*1+3) * q[3];
 			y[2] = *(M+4*2+0) * q[0] +*(M+4*2+1) * q[1] +*(M+4*2+2) * q[2] +*(M+4*2+3) * q[3];
 			y[3] = *(M+4*3+0) * q[0] +*(M+4*3+1) * q[1] +*(M+4*3+2) * q[2] +*(M+4*3+3) * q[3];
-	
+
 			pCurve0->AddPoint(t, y[0].real());
 			pCurve1->AddPoint(t, y[1].real());
 			pCurve2->AddPoint(t, y[2].real());
@@ -11518,14 +11518,26 @@ void QMiarex::OnScaleWing()
 		{
 			if(m_pCurPlane)
 			{
-				if(dlg.m_bSpan)  m_pCurWing->ScaleSpan(dlg.m_NewSpan);
-				if(dlg.m_bChord) m_pCurWing->ScaleChord(dlg.m_NewChord);
-				if(dlg.m_bSweep) m_pCurWing->SetSweep(dlg.m_NewSweep);
-				if(dlg.m_bTwist) m_pCurWing->SetTwist(dlg.m_NewTwist);
+				CPlane *pNewPlane = new CPlane; 
+				pNewPlane->Duplicate(m_pCurPlane);
+				if(dlg.m_bSpan)  pNewPlane->m_Wing.ScaleSpan(dlg.m_NewSpan);
+				if(dlg.m_bChord) pNewPlane->m_Wing.ScaleChord(dlg.m_NewChord);
+				if(dlg.m_bSweep) pNewPlane->m_Wing.SetSweep(dlg.m_NewSweep);
+				if(dlg.m_bTwist) pNewPlane->m_Wing.SetTwist(dlg.m_NewTwist);
+				pNewPlane->ComputePlane();
+				if(SetModPlane(pNewPlane))
+				{
+					m_pCurPlane = AddPlane(pNewPlane);
+					m_pCurWPolar = NULL;
+					m_pCurPOpp = NULL;
+					m_pCurWOpp = NULL;
+				}
+				else
+					delete pNewPlane;
 			}
 			else
 			{
-				CWing* pNewWing= new CWing;
+				CWing* pNewWing = new CWing;
 				pNewWing->Duplicate(m_pCurWing);
 				if(dlg.m_bSpan)  pNewWing->ScaleSpan(dlg.m_NewSpan);
 				if(dlg.m_bChord) pNewWing->ScaleChord(dlg.m_NewChord);

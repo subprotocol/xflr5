@@ -78,7 +78,7 @@ StabPolarDlg::StabPolarDlg()
 	m_MaxControl[0] = 0.0;
 
 	m_bActiveControl[1] = true;
-	m_MinControl[1] =  -1.0;//stab tilt
+	m_MinControl[1] =   0.0;//stab tilt
 	m_MaxControl[1] =   0.0;
 
 
@@ -433,11 +433,11 @@ void StabPolarDlg::OnOK()
 		bActive = bActive || m_bActiveControl[i];
 		if(bActive) break;
 	}
-	if(!bActive)
+/*	if(!bActive)
 	{
 		strong = tr("No Active Control. Continue ?");
 		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
-	}
+	}*/
 
 	for(i=m_nControls; i<4*MAXCONTROLS; i++) m_bActiveControl[i] = false;
 
