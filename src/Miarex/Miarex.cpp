@@ -685,9 +685,10 @@ QMiarex::QMiarex(QWidget *parent)
 
 	connect(m_pctrlLongDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
 	connect(m_pctrlLatDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
+	connect(m_pctrlTimeView, SIGNAL(clicked()), SLOT(OnTimeView()));
+	connect(m_pctrlRootLocus, SIGNAL(clicked()), SLOT(OnRootLocusView()));
+	connect(m_pctrl3DMode, SIGNAL(clicked()), SLOT(OnModalView()));
 }
-
-
 
 
 CBody* QMiarex::AddBody(CBody *pBody)
@@ -1765,26 +1766,27 @@ void QMiarex::SetControls()
 	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
 
-	if(m_pCurWPolar && m_pCurWPolar->m_Type==7)
+	if(m_pCurWPolar)
 	{
-		pMainFrame->TimeGraphsAct->setEnabled(true);
-		pMainFrame->RootLocusAct->setEnabled(true);
-		pMainFrame->ModalViewAct->setEnabled(true);
+		pMainFrame->StabilityAct->setEnabled(true);
+//		pMainFrame->RootLocusAct->setEnabled(true);
+//		pMainFrame->ModalViewAct->setEnabled(true);
 	}
 	else
 	{
-		pMainFrame->TimeGraphsAct->setEnabled(false);
-		pMainFrame->RootLocusAct->setEnabled(false);
-		pMainFrame->ModalViewAct->setEnabled(false);
+		pMainFrame->StabilityAct->setEnabled(false);
+//		pMainFrame->RootLocusAct->setEnabled(false);
+//		pMainFrame->ModalViewAct->setEnabled(false);
 	}
 	
 	pMainFrame->m_pctrlWOppView->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
 	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
-	pMainFrame->m_pctrlStabTimeViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
-	pMainFrame->m_pctrlRootLocusButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==1);
-	pMainFrame->m_pctrlModalViewButton->setChecked(m_iView==WSTABVIEW && m_iStabilityView==3);
+	pMainFrame->m_pctrlStabilityButton->setChecked(m_iView==WSTABVIEW);
+	m_pctrlTimeView->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
+	m_pctrlRootLocus->setChecked(m_iView==WSTABVIEW && m_iStabilityView==1);
+	m_pctrl3DMode->setChecked(m_iView==WSTABVIEW && m_iStabilityView==3);
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
@@ -14912,19 +14914,36 @@ void QMiarex::SetupLayout()
 	CpBox->setLayout(CpParams);
 
 //_______________________Stability Params
+	
+	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
+	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
+	m_pctrlTimeView = new QRadioButton(tr("Time View"));
+	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
+	m_pctrl3DMode = new QRadioButton(tr("3D View"));
+	StabilityTypeLayout->addWidget(m_pctrlTimeView);
+	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
+	StabilityTypeLayout->addWidget(m_pctrl3DMode);
+	StabilityTypeBox->setLayout(StabilityTypeLayout);
+	
 	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
 	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
 	m_pctrlLongDynamics->setSizePolicy(szPolicyMaximum);
 	m_pctrlLatDynamics->setSizePolicy(szPolicyMaximum);
 	m_pctrlLongDynamics->setMinimumHeight(10);
 	m_pctrlLatDynamics->setMinimumHeight(10);
-	QVBoxLayout *StabilityLayout = new QVBoxLayout;
-	StabilityLayout->addWidget(m_pctrlLongDynamics);
-	StabilityLayout->addWidget(m_pctrlLatDynamics);
-	StabilityLayout->addStretch(1);
-	QGroupBox *StabilityBox = new QGroupBox(tr("Stability Direction"));
-	StabilityBox->setLayout(StabilityLayout);
+	QVBoxLayout *StabilityDirLayout = new QVBoxLayout;
+	StabilityDirLayout->addWidget(m_pctrlLongDynamics);
+	StabilityDirLayout->addWidget(m_pctrlLatDynamics);
+	StabilityDirLayout->addStretch(1);
+	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
+	StabilityDirBox->setLayout(StabilityDirLayout);
 
+	QGroupBox *StabilityBox = new QGroupBox(tr("Stability analysis"));
+	QVBoxLayout *StabilityLayout = new QVBoxLayout;
+	StabilityLayout->addWidget(StabilityTypeBox);
+	StabilityLayout->addWidget(StabilityDirBox);
+	StabilityBox->setLayout(StabilityLayout);
+	
 //_______________________3D view controls
 	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
 	QGridLayout *ThreeDParams = new QGridLayout;

@@ -382,6 +382,7 @@ private:
 
 	//stability widgets
 	QRadioButton *m_pctrlLongDynamics, *m_pctrlLatDynamics;
+	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
 
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 

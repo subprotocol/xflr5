@@ -1052,13 +1052,13 @@ void MainFrame::CreateMiarexActions()
 	WPolarAct->setShortcut(tr("F8"));
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
-	TimeGraphsAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Time graphs"), this);
-	TimeGraphsAct->setCheckable(true);
-	TimeGraphsAct->setStatusTip(tr("Switch to the time graphs view"));
-	TimeGraphsAct->setShortcut(tr("Shift+F8"));
-	connect(TimeGraphsAct, SIGNAL(triggered()), pMiarex, SLOT(OnTimeView()));
+	StabilityAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability Analysis"), this);
+	StabilityAct->setCheckable(true);
+	StabilityAct->setStatusTip(tr("Switch to stability analysis post-processing"));
+	StabilityAct->setShortcut(tr("Shift+F8"));
+	connect(StabilityAct, SIGNAL(triggered()), pMiarex, SLOT(OnStabilityView()));
 
-	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View"), this);
+/*	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View"), this);
 	RootLocusAct->setCheckable(true);
 	RootLocusAct->setStatusTip(tr("Switch to the root locus view"));
 	connect(RootLocusAct, SIGNAL(triggered()), pMiarex, SLOT(OnRootLocusView()));
@@ -1067,7 +1067,7 @@ void MainFrame::CreateMiarexActions()
 	ModalViewAct->setCheckable(true);
 	ModalViewAct->setStatusTip(tr("Switch to the 3D Modal view"));
 	connect(ModalViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnModalView()));
-
+*/
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View"), this);
 	W3DAct->setCheckable(true);
 	W3DAct->setStatusTip(tr("Switch to the 3D view"));
@@ -1415,7 +1415,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu = menuBar()->addMenu(tr("&View"));
 	MiarexViewMenu->addAction(WOppAct);
 	MiarexViewMenu->addAction(WPolarAct);
-	MiarexViewMenu->addAction(TimeGraphsAct);
+	MiarexViewMenu->addAction(StabilityAct);
 	MiarexViewMenu->addAction(W3DAct);
 	MiarexViewMenu->addAction(CpViewAct);
 	MiarexViewMenu->addSeparator();
@@ -1670,17 +1670,17 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView->setDefaultAction(CpViewAct);
 	m_pctrlCpView->setCheckable(true);
 	
-	m_pctrlStabTimeViewButton = new QToolButton;
-	m_pctrlStabTimeViewButton->setDefaultAction(TimeGraphsAct);
-	m_pctrlStabTimeViewButton->setCheckable(true);
+	m_pctrlStabilityButton = new QToolButton;
+	m_pctrlStabilityButton->setDefaultAction(StabilityAct);
+	m_pctrlStabilityButton->setCheckable(true);
 
-	m_pctrlRootLocusButton = new QToolButton;
+/*	m_pctrlRootLocusButton = new QToolButton;
 	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
 	m_pctrlRootLocusButton->setCheckable(true);
 
 	m_pctrlModalViewButton = new QToolButton;
 	m_pctrlModalViewButton->setDefaultAction(ModalViewAct);
-	m_pctrlModalViewButton->setCheckable(true);
+	m_pctrlModalViewButton->setCheckable(true);*/
 
 	QSizePolicy szPolicy;
 	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
@@ -1700,10 +1700,8 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolarView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
-	m_pctrlMiarexToolBar->addSeparator();
-	m_pctrlMiarexToolBar->addWidget(m_pctrlStabTimeViewButton);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlModalViewButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlStabilityButton);
+
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolar);

@@ -871,15 +871,6 @@ void StabViewDlg::SetControls()
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 
-	m_pctrlTimeMode1->setChecked(m_iCurrentMode%4==0);
-	m_pctrlTimeMode2->setChecked(m_iCurrentMode%4==1);
-	m_pctrlTimeMode3->setChecked(m_iCurrentMode%4==2);
-	m_pctrlTimeMode4->setChecked(m_iCurrentMode%4==3);
-	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
-	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
-	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
-	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
-
 	if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->m_Type!=7)
 	{
 		m_pControlModel->setRowCount(0);		
@@ -934,10 +925,23 @@ void StabViewDlg::SetControls()
 	m_pctrlTotalTime->SetValue(pMiarex->m_TotalTime);
 	m_pctrlDeltat->SetValue(pMiarex->m_Deltat);
 
-	m_pctrlRLMode1->setEnabled(pMiarex->m_iStabilityView>0);
-	m_pctrlRLMode2->setEnabled(pMiarex->m_iStabilityView>0);
-	m_pctrlRLMode3->setEnabled(pMiarex->m_iStabilityView>0);
-	m_pctrlRLMode4->setEnabled(pMiarex->m_iStabilityView>0);
+	m_pctrlTimeMode1->setChecked(m_iCurrentMode%4==0);
+	m_pctrlTimeMode2->setChecked(m_iCurrentMode%4==1);
+	m_pctrlTimeMode3->setChecked(m_iCurrentMode%4==2);
+	m_pctrlTimeMode4->setChecked(m_iCurrentMode%4==3);
+	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
+	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
+	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
+	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
+	
+	m_pctrlTimeMode1->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
+	m_pctrlTimeMode2->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
+	m_pctrlTimeMode3->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
+	m_pctrlTimeMode4->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
+	m_pctrlRLMode1->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlRLMode2->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlRLMode3->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlRLMode4->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 	
 	m_pctrlModeStep->SetValue(pMiarex->m_Modedt);
 
