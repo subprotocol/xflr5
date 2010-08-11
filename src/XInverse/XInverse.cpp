@@ -2412,29 +2412,40 @@ void QXInverse::UpdateView()
 void QXInverse::wheelEvent(QWheelEvent *event)
 {
 	ReleaseZoom();
-	QPoint pttmp(event->pos().x(), event->pos().y());
+
+	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	static double ZoomFactor;
+	if(event->delta()>0)
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		else                           ZoomFactor = 1.06;
+	}
+	else
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		else                           ZoomFactor = 1./1.06;
+	}
+
+	QPoint pttmp(event->pos());
 	if(m_QGraph.IsInDrawRect(pttmp))
 	{
 		if (m_bXPressed || m_bZoomXOnly)
 		{
 			//zoom x scale
 			m_QGraph.SetAutoX(false);
-			if(event->delta()>0) m_QGraph.Scalex(1.06);
-			else                 m_QGraph.Scalex(1.0/1.06);
+			m_QGraph.Scalex(1.0/ZoomFactor);
 		}
 		else if(m_bYPressed || m_bZoomYOnly)
 		{
 			//zoom y scale
 			m_QGraph.SetAutoY(false);
-			if(event->delta()>0) m_QGraph.Scaley(1.06);
-			else                 m_QGraph.Scaley(1.0/1.06);
+			m_QGraph.Scaley(1.0/ZoomFactor);
 		}
 		else
 		{
 			//zoom both
 			m_QGraph.SetAuto(false);
-			if(event->delta()>0) m_QGraph.Scale(1.06);
-			else                 m_QGraph.Scale(1.0/1.06);
+			m_QGraph.Scale(1.0/ZoomFactor);
 		}
 		m_QGraph.SetAutoXUnit();
 		m_QGraph.SetAutoYUnit();

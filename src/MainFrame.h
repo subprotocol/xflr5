@@ -211,6 +211,7 @@ public:
 	bool m_bMaximized;
 	QString m_StyleName;
 	QString m_VersionName;
+	QString m_GraphExportFilter;
 
 private:
 	void *m_pXInverse;
@@ -367,9 +368,11 @@ private:
 	bool m_bSaveOpps;
 	bool m_bSaveWOpps;
 	bool m_bSaveSettings;
+        bool m_bReverseZoom;                    // true if the rolling forward zooms in
 
 
-	QString m_ProjectName, m_FileName, m_LastDirName, m_LanguageFilePath, m_ImageDirName;
+	QString m_ProjectName, m_FileName, m_LanguageFilePath;
+	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
 	QColor m_crColors[30];
 
 	QGraph m_RefGraph;//Reference setttings

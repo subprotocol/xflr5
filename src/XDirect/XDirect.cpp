@@ -6509,7 +6509,20 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 //	point is in client coordinates
 //	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 
+	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QPoint pt(event->x(), event->y()); //client coordinates
+	static double ZoomFactor;
+	if(event->delta()>0)
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		else                           ZoomFactor = 1.06;
+	}
+	else
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		else                           ZoomFactor = 1./1.06;
+	}
+
 	m_pCurGraph = GetGraph(pt);
 
 	if(m_pCurGraph && m_pCurGraph->IsInDrawRect(pt) && m_bCpGraph)
@@ -6518,22 +6531,19 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 		{
 			//zoom x scale
 			m_pCurGraph->SetAutoX(false);
-			if(event->delta()>0) m_pCurGraph->Scalex(1.06);
-			else                 m_pCurGraph->Scalex(1.0/1.06);
+			m_pCurGraph->Scalex(1./ZoomFactor);
 		}
 		else if(m_bYPressed)
 		{
 			//zoom y scale
 			m_pCurGraph->SetAutoY(false);
-			if(event->delta()>0) m_pCurGraph->Scaley(1.06);
-			else                 m_pCurGraph->Scaley(1.0/1.06);
+			m_pCurGraph->Scaley(1./ZoomFactor);
 		}
 		else
 		{
 			//zoom both
 			m_pCurGraph->SetAuto(false);
-			if(event->delta()>0) m_pCurGraph->Scale(1.06);
-			else                 m_pCurGraph->Scale(1.0/1.06);
+			m_pCurGraph->Scale(1./ZoomFactor);
 		}
 
 		m_pCurGraph->SetAutoXUnit();
@@ -6545,8 +6555,7 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 	{
 		double scale = m_fFoilScale;
 
-		if(event->delta()>0) m_fFoilScale /= 1.06;
-		else                 m_fFoilScale *= 1.06;
+		m_fFoilScale *= ZoomFactor;
 
 		int a = (int)((m_rCltRect.right()+m_rCltRect.left())/2);
 

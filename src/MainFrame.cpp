@@ -92,12 +92,14 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_ImageFormat = 2;
 
+	m_bReverseZoom = false;
 
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
 	m_bSaveSettings = true;
 
 	m_StyleName = "Cleanlooks";
+	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
 	QDesktopWidget desktop;
 	QRect r = desktop.screenGeometry();
@@ -3242,6 +3244,7 @@ bool MainFrame::LoadSettings()
 #else
         QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
+
 	settings.beginGroup("MainFrame");
 	{
 		SettingsFormat = settings.value("SettingsFormat").toInt();
@@ -3253,6 +3256,9 @@ bool MainFrame::LoadSettings()
 			m_StyleName = "Cleanlooks";
 			return false;
 		}
+
+		m_GraphExportFilter = settings.value("GraphExportFilter",".csv").toString();
+
 		m_LanguageFilePath = settings.value("LanguageFilePath").toString();
 
 		bFloat  = settings.value("Miarex_Float").toBool();
@@ -3296,6 +3302,8 @@ bool MainFrame::LoadSettings()
 		m_pctrlStabViewWidget->resize(size);
 
 		m_LastDirName = settings.value("LastDirName").toString();
+		m_ImageDirName = settings.value("ImageDirName").toString();
+		m_ExportLastDirName = settings.value("ExportLastDirName").toString();
 		m_LengthUnit  = settings.value("LengthUnit").toInt();
 		m_AreaUnit    = settings.value("AreaUnit").toInt();
 		m_WeightUnit  = settings.value("WeightUnit").toInt();
@@ -3332,6 +3340,8 @@ bool MainFrame::LoadSettings()
 			}
 			else break;
 		}while(n<MAXRECENTFILES);
+
+                m_bReverseZoom = settings.value("ReverseZoom").toBool();
 	}
 
 	return true;
@@ -3531,21 +3541,17 @@ void MainFrame::OnExportCurGraph()
 
 	QFile DestFile;
 	QString FileName;
-	QString SelectedFilter;
-	QFileDialog::Options options;
-//	options |= QFileDialog::DontUseNativeDialog;
 
 	pGraph->GetGraphName(FileName);
 	FileName.replace("/", " ");
-	FileName = QFileDialog::getSaveFileName(this, tr("Export Graph"), m_LastDirName,
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Graph"), m_ExportLastDirName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&SelectedFilter, options);
-
+											&m_GraphExportFilter);
 	if(!FileName.length()) return;
 
 	int pos, type;
 	pos = FileName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = FileName.left(pos);
+	if(pos>0) m_ExportLastDirName = FileName.left(pos);
 
 	QFile XFile(FileName);
 
@@ -4025,8 +4031,8 @@ void MainFrame::OnSaveViewToImageFile()
 	QSize sz(m_p2DWidget->geometry().width(), m_p2DWidget->geometry().height());
 	QImage img(sz, QImage::Format_RGB32);
 	QPainter painter(&img);
-	QString FileName;
-	QString Filter;
+	QString FileName, Filter;
+
 	switch(m_ImageFormat)
 	{
 		case 0 :
@@ -4046,10 +4052,12 @@ void MainFrame::OnSaveViewToImageFile()
 		}
 
 	}
+
 	FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
-											m_LastDirName,
+											m_ImageDirName,
 											"Windows Bitmap (*.bmp);;JPEG (*.jpg);;Portable Network Graphics (*.png)",
 											&Filter);
+
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
@@ -4108,6 +4116,7 @@ void MainFrame::OnSaveViewToImageFile()
 		}
 	}
 	img.save(FileName);
+	qDebug()<<"image after"<<m_ImageFormat;
 }
 
 
@@ -4279,6 +4288,7 @@ void MainFrame::OnStyle()
 	dlg.m_TextFont        = m_TextFont;
 	dlg.m_pRefGraph       = &m_RefGraph;
 	dlg.m_StyleName       = m_StyleName;
+	dlg.m_bReverseZoom    = m_bReverseZoom;
 
 	dlg.InitDialog();
 
@@ -4288,6 +4298,7 @@ void MainFrame::OnStyle()
 		m_TextColor       = dlg.m_TextColor;
 		m_TextFont        = dlg.m_TextFont;
 		m_StyleName       = dlg.m_StyleName;
+		m_bReverseZoom    = dlg.m_pctrlReverseZoom->isChecked();
 
 		pMiarex->m_bResetglLegend = true;
 
@@ -4956,6 +4967,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("SizeHeight", size().height());
 		settings.setValue("SizeMaximized", isMaximized());
 		settings.setValue("StyleName", m_StyleName);
+		settings.setValue("GraphExportFilter", m_GraphExportFilter);
 		settings.setValue("LanguageFilePath", m_LanguageFilePath);
 		settings.setValue("Miarex_Float", m_pctrlMiarexWidget->isFloating());
 		settings.setValue("XDirect_Float", m_pctrlXDirectWidget->isFloating());
@@ -4978,6 +4990,8 @@ void MainFrame::SaveSettings()
 		settings.setValue("MiarexSize", m_pctrlMiarexWidget->size());
 		settings.setValue("StabSize", m_pctrlStabViewWidget->size());
 		settings.setValue("LastDirName", m_LastDirName);
+		settings.setValue("ImageDirName", m_ImageDirName);
+		settings.setValue("ExportLastDirName", m_ExportLastDirName);
 		settings.setValue("LengthUnit", m_LengthUnit);
 		settings.setValue("AreaUnit", m_AreaUnit);
 		settings.setValue("WeightUnit", m_WeightUnit);
@@ -4998,6 +5012,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("DlgPos_x", m_DlgPos.x());
 		settings.setValue("DlgPos_y", m_DlgPos.y());
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
+                settings.setValue("ReverseZoom", m_bReverseZoom);
 
 		QString RecentF;
 		for(int i=0; i<m_RecentFiles.size() && i<MAXRECENTFILES; i++)
@@ -5040,6 +5055,9 @@ void MainFrame::SetCentralWidget()
 			if(pMiarex->m_iStabilityView==0 || pMiarex->m_iStabilityView==1) m_pctrlCentralWidget->setCurrentIndex(0);
 			else                                                             m_pctrlCentralWidget->setCurrentIndex(1);
 		}
+
+/*		if(m_pctrlCentralWidget->currentIndex()==0) pMiarex->Set2DScale();
+		else                                        pMiarex->Set3DScale();*/
 	}
 }
 

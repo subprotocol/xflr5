@@ -192,6 +192,8 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 	QAFoil    *pAFoil    = (QAFoil*)m_pAFoil;
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
+//	m_rCltRect = rect();
+
 	if(m_pXDirect)
 	{
 		pXDirect->SetFoilScale(rect());
@@ -200,7 +202,7 @@ void TwoDWidget::resizeEvent(QResizeEvent *event)
 	if(m_pMiarex)
 	{
 		pMiarex->m_bIs2DScaleSet = false;
-		pMiarex->SetScale(rect());
+		pMiarex->Set2DScale();
 		if(pMiarex->m_iView==WOPPVIEW)   pMiarex->SetWingLegendPos();
 		if(pMiarex->m_iView==WPOLARVIEW) pMiarex->SetWPlrLegendPos();
 	}

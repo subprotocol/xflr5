@@ -34,6 +34,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 	setWindowTitle(tr("General Display Settings"));
 	m_pMainFrame = pParent;
 	m_bIsGraphModified = false;
+	m_bReverseZoom = false;
 
 	SetupLayout();
 
@@ -93,6 +94,8 @@ void DisplaySettingsDlg::SetupLayout()
 	QGroupBox *FontBox = new QGroupBox(tr("Font"));
 	FontBox->setLayout(FontLayout);
 
+	m_pctrlReverseZoom = new QCheckBox("Reverse zoom direction using mouse wheel");
+
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
 	OKButton->setAutoDefault(false);
@@ -112,6 +115,8 @@ void DisplaySettingsDlg::SetupLayout()
 	MainLayout->addWidget(FontBox);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(GraphBox);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(m_pctrlReverseZoom);
 	MainLayout->addSpacing(20);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
@@ -127,6 +132,7 @@ void DisplaySettingsDlg::InitDialog()
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
 	m_pctrlTextFont->setText(m_TextFont.family());
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
+	m_pctrlReverseZoom->setChecked(m_bReverseZoom);
 
 	QPalette palette = m_pctrlTextClr->palette();
 	QColor listColor = palette.color(QPalette::Button);
@@ -168,6 +174,7 @@ void DisplaySettingsDlg::OnBackgroundColor()
 		m_pctrlTextClr->setPalette(palette);
 	}
 }
+
 
 void DisplaySettingsDlg::reject()
 {

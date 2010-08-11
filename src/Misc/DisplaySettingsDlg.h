@@ -25,7 +25,10 @@
 #define DISPLAYSETTINGSDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLabel>
 #include "ColorButton.h"
 #include "../Graph/QGraph.h"
 
@@ -51,11 +54,11 @@ private:
 	void SetupLayout();
 
 	ColorButton *m_pctrlBackColor;
-//	ColorButton *m_pctrlTextColor;
 	QPushButton *m_pctrlTextClr;
 	QPushButton *m_pctrlTextFont;
 	QPushButton *m_pctrlGraphSettings;
 	QPushButton *OKButton, *CancelButton;
+	QCheckBox *m_pctrlReverseZoom;
 
 	QComboBox *m_pctrlStyles;
 	QString m_StyleName;
@@ -68,6 +71,7 @@ private:
 	QGraph *m_pRefGraph;
 	QGraph m_MemGraph;
 	bool m_bIsGraphModified;
+	bool m_bReverseZoom;
 
 };
 

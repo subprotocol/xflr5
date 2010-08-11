@@ -530,8 +530,8 @@ void GLCreateCpLegend(void *pQMiarex)
 
 	QFontMetrics fm(pMainFrame->m_TextFont);
 
-	double w = (double)pMiarex->m_rCltRect.width();
-	double h = (double)pMiarex->m_rCltRect.height();
+	double w = (double)pMiarex->m_r3DCltRect.width();
+	double h = (double)pMiarex->m_r3DCltRect.height();
 	double XPos;
 
 	if(w>h)
@@ -2270,8 +2270,8 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 	total = 11;
 	if(pWPolar) total +=2;
 	if(pPlane && pPlane->m_bStab)  total ++;
-	ZPos = pMiarex->m_rCltRect.bottom()- total * dD ;
-	LeftPos = pMiarex->m_rCltRect.left() +15;
+	ZPos = pMiarex->m_r3DCltRect.bottom()- total * dD ;
+	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 
 	glNewList(WINGLEGEND,GL_COMPILE);
 	{
@@ -2416,8 +2416,8 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 	else                 Dsi = 0.0;
 
 
-	ZPos = pMiarex->m_rCltRect.bottom()- 14 * dD ;
-	LeftPos = pMiarex->m_rCltRect.left() +15;
+	ZPos = pMiarex->m_r3DCltRect.bottom()- 14 * dD ;
+	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 	glNewList(MODELEGEND,GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
@@ -2549,9 +2549,9 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dD = fm.height();//pixels
 
-	YPos = pMiarex->m_rCltRect.bottom()- 12 * dD;
+	YPos = pMiarex->m_r3DCltRect.bottom()- 12 * dD;
 	YPos -= pWOpp->m_nFlaps * dD;
-	XPos = pMiarex->m_rCltRect.right() - 10 ;
+	XPos = pMiarex->m_r3DCltRect.right() - 10 ;
 
 	glNewList(WOPPLEGEND,GL_COMPILE);
 	{

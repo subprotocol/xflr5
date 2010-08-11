@@ -28,7 +28,7 @@ protected:
 	void mouseDoubleClickEvent ( QMouseEvent * event );
  
 private:
-	QRect m_rCltRect;          // The client window rectangle
+//	QRect m_rCltRect;          // The client window rectangle
 	void * m_pXDirect, *m_pMiarex, *m_pAFoil, *m_pXInverse;
 	void *m_pMainFrame;
 

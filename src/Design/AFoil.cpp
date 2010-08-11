@@ -714,7 +714,7 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		for(int i=0; i<16; i++)
 		{
 			str = QString("Column_%1").arg(i);
-			m_pctrlFoilTable->setColumnWidth(i, pSettings->value(str,20).toInt());
+			m_pctrlFoilTable->setColumnWidth(i, pSettings->value(str,40).toInt());
 		}
 	}
 	pSettings->endGroup();
@@ -3113,39 +3113,41 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 	m_ZoomRect.setBottomRight(m_ZoomRect.topLeft());
 	ReleaseZoom();
-	double scale = m_fScale;
+
+	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	static double ZoomFactor, scale;
+	if(event->delta()>0)
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		else                           ZoomFactor = 1.06;
+	}
+	else
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		else                           ZoomFactor = 1./1.06;
+	}
+
+	scale = m_fScale;
 
 	if(!m_bZoomYOnly)
 	{
 		if (m_bXDown)
 		{
-			if(event->delta()<0)
-			{
-				m_fScale  *= 1.06;
-				m_fScaleY /= 1.06;
-			}
-			else
-			{
-				m_fScale  /= 1.06;
-				m_fScaleY *= 1.06;
-			}
+			m_fScale  *= ZoomFactor;
+			m_fScaleY *= 1/ZoomFactor;
 		}
 		else if (m_bYDown)
 		{
-			if(event->delta()<0) m_fScaleY *= 1.06;
-			else                 m_fScaleY /= 1.06;
+			m_fScaleY *= ZoomFactor;
 		}
 		else 
 		{
-			if(event->delta()<0) m_fScale *= 1.06;
-			else                 m_fScale /= 1.06;
+			m_fScale *= ZoomFactor;
 		}
 	}
 	else
 	{
-
-		if(event->delta()<0) m_fScaleY *= 1.06;
-		else                 m_fScaleY /= 1.06;
+		m_fScaleY *= ZoomFactor;
 	}
 
 	int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);

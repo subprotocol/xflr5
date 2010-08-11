@@ -295,7 +295,7 @@ private:
 	void FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode);
 	void JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr);
 	void SetScale();
-	void SetScale(QRect CltRect);
+//	void SetScale(QRect CltRect);
 	void Set2DScale();
 	void Set3DScale();
 	void DrawCpLegend(QPainter &painter, QPoint place, int bottom);
@@ -639,7 +639,7 @@ public:
 	double m_LiftScale, m_DragScale, m_VelocityScale;
 	double m_glScaled;//zoom factor for UFO
 
-	QRect m_rCltRect; // the client and drawing rectangles
+	QRect m_r2DCltRect, m_r3DCltRect; // the client and drawing rectangle
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
 	LLTAnalysisDlg *m_pLLTDlg;
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations

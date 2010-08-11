@@ -106,8 +106,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WPlrLegendOffset.setX(0);
 	m_WPlrLegendOffset.setY(0);
 
-	m_rCltRect.setWidth(0);
-	m_rCltRect.setHeight(0);
+	m_r2DCltRect.setWidth(0);
+	m_r2DCltRect.setHeight(0);
+	m_r3DCltRect.setWidth(0);
+	m_r3DCltRect.setHeight(0);
 	m_rSingleRect.setWidth(0);
 	m_rSingleRect.setHeight(0);
 
@@ -566,7 +568,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_ArcBall.m_pOffy     = &m_UFOOffset.y;
 	m_ArcBall.m_pTransx   = &m_glViewportTrans.x;
 	m_ArcBall.m_pTransy   = &m_glViewportTrans.y;
-	m_ArcBall.m_pRect     = &m_rCltRect;
+	m_ArcBall.m_pRect     = &m_r3DCltRect;
 
 	m_pLLTDlg = new LLTAnalysisDlg;
 	CWing::s_pLLTDlg        = m_pLLTDlg;
@@ -1769,14 +1771,10 @@ void QMiarex::SetControls()
 	if(m_pCurWPolar)
 	{
 		pMainFrame->StabilityAct->setEnabled(true);
-//		pMainFrame->RootLocusAct->setEnabled(true);
-//		pMainFrame->ModalViewAct->setEnabled(true);
 	}
 	else
 	{
 		pMainFrame->StabilityAct->setEnabled(false);
-//		pMainFrame->RootLocusAct->setEnabled(false);
-//		pMainFrame->ModalViewAct->setEnabled(false);
 	}
 	
 	pMainFrame->m_pctrlWOppView->setChecked(m_iView==WOPPVIEW);
@@ -1816,7 +1814,25 @@ void QMiarex::SetControls()
 	pMainFrame->allWPlrGraphs->setChecked(m_iWPlrView==4);
 
 
+	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW);
+	pMainFrame->hideAllWPlrs->setEnabled(m_iView==WPOLARVIEW);
+	pMainFrame->showAllWPlrs->setEnabled(m_iView==WPOLARVIEW);
+
+
 	m_pctrlHalfWing->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showCurWOppOnly->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showAllWOpps->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->hideAllWOpps->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showEllipticCurve->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showXCmRefLocation->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showWing2Curve->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showStabCurve->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showFinCurve->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->WOppGraphMenu->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->WOppCurGraphMenu->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->showAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
+	pMainFrame->hideAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
+
 	m_pctrlLift->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlTrans->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
@@ -1858,8 +1874,8 @@ void QMiarex::SetControls()
 void QMiarex::ClientToGL(QPoint const &point, CVector &real)
 {
 	static double h2, w2;
-	h2 = (double)m_rCltRect.height() /2.0;
-	w2 = (double)m_rCltRect.width()  /2.0;
+	h2 = (double)m_r3DCltRect.height() /2.0;
+	w2 = (double)m_r3DCltRect.width()  /2.0;
 
 	if(w2>h2)
 	{
@@ -5149,8 +5165,8 @@ void QMiarex::GLToClient(CVector const &real, QPoint &point)
 	dx =  real.x + w2;
 	dy = -real.y + h2;
 
-	point.setX((int)(dx * m_rCltRect.width()));
-	point.setY((int)(dy * m_rCltRect.height()));
+	point.setX((int)(dx * m_r3DCltRect.width()));
+	point.setY((int)(dy * m_r3DCltRect.height()));
 }
 
 
@@ -6013,7 +6029,7 @@ void QMiarex::GLRenderMode()
 
 		glCallList(MODELEGEND);
 
-//		pGLWidget->renderText(m_rCltRect.left(), m_rCltRect.top(), strong, pMainFrame->m_TextFont);
+//		pGLWidget->renderText(m_r3DCltRect.left(), m_r3DCltRect.top(), strong, pMainFrame->m_TextFont);
 		pGLWidget->renderText(15, 15, strong, pMainFrame->m_TextFont);
 
 		glLoadIdentity();
@@ -7569,14 +7585,14 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 		{
 			if(bCtrl)//rotate
 			{
-				m_ArcBall.Move(point.x(), m_rCltRect.height()-point.y());
+				m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
 				UpdateView();
 			}
 			else if(m_bTrans)
 			{
 				//translate
-				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0*m_GLScale/m_glScaled/m_rCltRect.width());
-				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0*m_GLScale/m_glScaled/m_rCltRect.width());
+				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0*m_GLScale/m_glScaled/m_r3DCltRect.width());
+				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0*m_GLScale/m_glScaled/m_r3DCltRect.width());
 
 				m_glRotCenter.x = MatOut[0][0]*m_glViewportTrans.x + MatOut[0][1]*(-m_glViewportTrans.y) + MatOut[0][2]*m_glViewportTrans.z;
 				m_glRotCenter.y = MatOut[1][0]*m_glViewportTrans.x + MatOut[1][1]*(-m_glViewportTrans.y) + MatOut[1][2]*m_glViewportTrans.z;
@@ -7595,7 +7611,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 //				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.02;
 //				else                         m_glScaled /= (GLfloat)1.02;
 
-				m_ArcBall.Move(point.x(), m_rCltRect.height()-point.y());
+				m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
 				UpdateView();
 			}
 		}
@@ -7722,7 +7738,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 	if (event->buttons() & Qt::MidButton)
 	{
 		m_bArcball = true;
-		m_ArcBall.Start(event->pos().x(), m_rCltRect.height()-event->pos().y());
+		m_ArcBall.Start(event->pos().x(), m_r3DCltRect.height()-event->pos().y());
 		m_bCrossPoint = true;
 
 		Set3DRotationCenter();
@@ -7742,7 +7758,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 
 			ClientToGL(point, Real);
-			if(m_rCltRect.contains(point)) pGLWidget->setFocus();
+			if(m_r3DCltRect.contains(point)) pGLWidget->setFocus();
 
 			if(m_bPickCenter)
 			{
@@ -7752,7 +7768,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			}
 			else
 			{
-				m_ArcBall.Start(point.x(), m_rCltRect.height()-point.y());
+				m_ArcBall.Start(point.x(), m_r3DCltRect.height()-point.y());
 				m_bCrossPoint = true;
 
 				Set3DRotationCenter();
@@ -7772,7 +7788,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 		{
 			TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
 			m_pCurGraph = GetGraph(point);
-			if(m_rCltRect.contains(point)) p2DWidget->setFocus();
+			if(m_r2DCltRect.contains(point)) p2DWidget->setFocus();
 			
 			if(m_pCurGraph && m_iView==WSTABVIEW && (m_iStabilityView==1)
 			   && m_pCurWPolar && m_pCurWPolar->m_AnalysisType==4)
@@ -9497,7 +9513,6 @@ void QMiarex::OnDeleteUFOWPolars()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QString Name;
-
 	if(m_pCurPlane) Name = m_pCurPlane->m_PlaneName;
 	else            Name = m_pCurWing->m_WingName;
 
@@ -9511,6 +9526,7 @@ void QMiarex::OnDeleteUFOWPolars()
 			delete pWPolar;
 		}
 	}
+	m_pCurWPolar = NULL;
 	SetWPlr();
 	pMainFrame->UpdateWPolars();
 	SetControls();
@@ -12296,19 +12312,19 @@ void QMiarex::PaintView(QPainter &painter)
 	QPen TextPen;
 	QString GraphName;
 	painter.save();
-	w   = m_rCltRect.width();
+	w   = m_r2DCltRect.width();
 	w2  = (int)(w/2);
 	w3  = (int)(0.35*w);
 	w23 = 2*w3;
-	h   = m_rCltRect.height();
+	h   = m_r2DCltRect.height();
 	h2  = (int)(h/2);
 	h23 = (int)(2*h/3);
 	h34 = (int)(3*h/4);
 	h38 = (int)(3*h/8);
 	//Refresh the active view
-	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+	painter.fillRect(m_r2DCltRect, pMainFrame->m_BackgroundColor);
 
-	if(m_rCltRect.width()<200 || m_rCltRect.height()<200) 
+	if(m_r2DCltRect.width()<200 || m_r2DCltRect.height()<200)
 	{
 		painter.restore();
 		return;//too small to paint
@@ -12323,8 +12339,7 @@ void QMiarex::PaintView(QPainter &painter)
 				m_pCurGraph     = &m_WPlrGraph1;
 				m_pCurWPlrGraph = &m_WPlrGraph1;
 			}
-				
-			Rect1.setRect(0,0,w23,m_rCltRect.bottom()-00);
+			Rect1.setRect(0,0,w23,m_r2DCltRect.bottom()-00);
 			DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
 			m_pCurGraph->DrawGraph(Rect1, painter);
 		}
@@ -12337,7 +12352,7 @@ void QMiarex::PaintView(QPainter &painter)
 			m_WPlrGraph1.DrawGraph(Rect1, painter);
 			m_WPlrGraph2.DrawGraph(Rect2, painter);
 	
-			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
 		}
 		else if(m_iWPlrView == 4)
 		{
@@ -12352,7 +12367,7 @@ void QMiarex::PaintView(QPainter &painter)
 			m_WPlrGraph3.DrawGraph(Rect3, painter);
 			m_WPlrGraph4.DrawGraph(Rect4, painter);
 	
-			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());	
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
 		}
 	}
 	else if (m_iView==WOPPVIEW)
@@ -12360,12 +12375,12 @@ void QMiarex::PaintView(QPainter &painter)
 		if (m_iWingView == 1 && m_pCurWing)  
 		{
 //			PaintSingleWingGraph(painter);
-			if (m_pCurWingGraph && m_pCurWing && m_rCltRect.width()/2>200 && m_rCltRect.height()>250)
+			if (m_pCurWingGraph && m_pCurWing && m_r2DCltRect.width()/2>200 && m_r2DCltRect.height()>250)
 			{
 
 				m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
-				QPoint Place(m_rCltRect.left()+10, m_rCltRect.top() +30);
-				DrawWOppLegend(painter, Place, m_rCltRect.bottom());
+				QPoint Place(m_r2DCltRect.left()+10, m_r2DCltRect.top() +30);
+				DrawWOppLegend(painter, Place, m_r2DCltRect.bottom());
 			}
 		
 			painter.setFont(pMainFrame->m_TextFont);
@@ -12385,8 +12400,8 @@ void QMiarex::PaintView(QPainter &painter)
 				if(m_pCurWOpp && m_pCurWOpp->m_bIsVisible)
 				{
 					QPoint PtLegend;
-					PtLegend.rx() = (int)(m_rCltRect.width()/2);
-					PtLegend.ry() = m_rCltRect.bottom();
+					PtLegend.rx() = (int)(m_r2DCltRect.width()/2);
+					PtLegend.ry() = m_r2DCltRect.bottom();
 					PaintXTr(painter, m_ptOffset, m_WingScale);
 					if (m_bXCP)    PaintXCP(painter, m_ptOffset, m_WingScale);
 					if (m_bXCmRef) PaintXCmRef(painter, m_ptOffset, m_WingScale);
@@ -12398,17 +12413,17 @@ void QMiarex::PaintView(QPainter &painter)
 		else if (m_iWingView == 2 && m_pCurWing) 
 		{
 //			PaintTwoWingGraph(painter);
-			DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+			DrawWOppLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
 	
-			Rect1.setRect(m_rCltRect.left(),   m_rCltRect.top(), w2, h23);
-			Rect2.setRect(w2, m_rCltRect.top(),                  w2, h23);
+			Rect1.setRect(m_r2DCltRect.left(),   m_r2DCltRect.top(), w2, h23);
+			Rect2.setRect(w2, m_r2DCltRect.top(),                  w2, h23);
 			m_WingGraph1.DrawGraph(Rect1, painter);
 			m_WingGraph2.DrawGraph(Rect2, painter);
 		}
 		else if (m_iWingView == 4 && m_pCurWing) 
 		{
 //			PaintFourWingGraph(painter);
-			DrawWOppLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+			DrawWOppLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
 		
 			Rect1.setRect(0,0,w2,h38);
 			Rect2.setRect(w2,0,w2,h38);
@@ -12425,7 +12440,7 @@ void QMiarex::PaintView(QPainter &painter)
 //		PaintCp(painter);
 		m_CpGraph.DrawGraph(painter);
 		QPoint Place(50, h34+20);
-		DrawCpLegend(painter, Place, m_rCltRect.bottom());
+		DrawCpLegend(painter, Place, m_r2DCltRect.bottom());
 	}
 	else if (m_iView==WSTABVIEW)
 	{
@@ -12445,13 +12460,13 @@ void QMiarex::PaintView(QPainter &painter)
 				painter.setPen(TextPen);
 				painter.drawText(Place, GraphName);
 
-				DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+				DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
 			}
 			else if(m_iStabTimeView==4)
 			{
 //				PaintFourTimeGraph(painter);
 				//Paint a four graph time view			
-				DrawStabTimeLegend(painter, m_WingLegendOffset, m_rCltRect.bottom());
+				DrawStabTimeLegend(painter, m_WingLegendOffset, m_r2DCltRect.bottom());
 				Rect1.setRect(0,0,w2,h38);
 				Rect2.setRect(w2,0,w2,h38);
 				Rect3.setRect(0,h38,w2,h38);
@@ -12469,7 +12484,7 @@ void QMiarex::PaintView(QPainter &painter)
 			{
 				if(m_pCurRLStabGraph)
 				{
-					Rect1.setRect(0,0,w23,m_rCltRect.bottom()-00);
+					Rect1.setRect(0,0,w23,m_r2DCltRect.bottom()-00);
 					m_pCurRLStabGraph->DrawGraph(Rect1, painter);
 					Place.setX((int)(w23/3));
 					Place.setY(m_pCurRLStabGraph->GetMargin()/2);
@@ -12479,7 +12494,7 @@ void QMiarex::PaintView(QPainter &painter)
 					painter.drawText(Place, GraphName);
 					Place.setX(w23+10);
 					Place.setY(10);
-					DrawWPolarLegend(painter, m_WPlrLegendOffset, m_rCltRect.bottom());
+					DrawWPolarLegend(painter, m_WPlrLegendOffset, m_r2DCltRect.bottom());
 				}
 			}
 		}
@@ -12577,7 +12592,7 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
 	int LeftPos = margin;
-	int ZPos    = m_rCltRect.height()-11*dheight;
+	int ZPos    = m_r2DCltRect.height()-11*dheight;
 
 //	double area = m_pCurWing->s_RefArea;
 	if(m_pCurPlane && m_pCurStab) ZPos -= dheight;
@@ -12687,11 +12702,11 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 	dheight = fm.height();
 	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
-	int ZPos    = m_rCltRect.height()-11*dheight;
+	int ZPos    = m_r2DCltRect.height()-11*dheight;
 
 	D = 0;
-	int RightPos = m_rCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
-	ZPos	 = m_rCltRect.height()-11*dheight;
+	int RightPos = m_r2DCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
+	ZPos	 = m_r2DCltRect.height()-11*dheight;
 	if(m_pCurWOpp && m_pCurWOpp->m_bOut) ZPos -= dheight;
 	if(m_pCurWOpp) ZPos -= dheight*m_pCurWOpp->m_nFlaps;
 
@@ -12823,8 +12838,8 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 		}
 
 
-		int x = (int)(m_rCltRect.width()/2);
-		int y = m_rCltRect.bottom();
+		int x = (int)(m_r2DCltRect.width()/2);
+		int y = m_r2DCltRect.bottom();
 		painter.drawLine(x-60,  y - 50, x-40,  y - 50);
 		painter.drawText(x-35, y - 48, tr("Top transition"));
 
@@ -12851,8 +12866,8 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 		}
 
 
-		int x = (int)(m_rCltRect.width()/2);
-		int y = m_rCltRect.bottom();
+		int x = (int)(m_r2DCltRect.width()/2);
+		int y = m_r2DCltRect.bottom();
 		painter.drawLine(x-60,  y - 35, x-40,  y - 35);
 		painter.drawText(x-35, y - 33, tr("Bottom transition"));
 
@@ -12909,8 +12924,8 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 		From = To;
 	}
 
-	int x = (int)(m_rCltRect.width()/2);
-	int y1 = m_rCltRect.bottom();
+	int x = (int)(m_r2DCltRect.width()/2);
+	int y1 = m_r2DCltRect.bottom();
 	painter.drawLine(x-60,  y1- 20, x-40,  y1 - 20);
 	painter.drawText(x-35, y1 - 18, tr("Centre of Pressure"));
 	painter.restore();
@@ -13444,8 +13459,13 @@ void QMiarex::Set2DScale()
 
 	int w,h;
 
-	h = m_rCltRect.height();
-	w = m_rCltRect.width();
+	TwoDWidget *p2DWidget = (TwoDWidget*) m_p2DWidget;
+	m_r2DCltRect = p2DWidget->geometry();
+//	m_rSingleRect.setRect(m_r2DCltRect.x(), m_r2DCltRect.y(), m_r2DCltRect.width(), m_r2DCltRect.height());
+	m_rSingleRect = m_r2DCltRect;
+
+	h = m_r2DCltRect.height();
+	w = m_r2DCltRect.width();
 	int w2  = (int)(w/2);
 //	int w3  = (int)(w/3);
 //	int h23 = (int)(2*h/3);
@@ -13459,10 +13479,10 @@ void QMiarex::Set2DScale()
 	m_LatRLGraph.SetDrawRect(CpRect);
 
 	if(m_bHalfWing) m_ptOffset.rx() = m_rSingleRect.left() + m_WingGraph1.GetMargin();
-	else            m_ptOffset.rx() = (int)(m_rCltRect.width()/2.0);
-	m_ptOffset.ry() = m_rCltRect.bottom()-185;
+	else            m_ptOffset.rx() = (int)(m_r2DCltRect.width()/2.0);
+	m_ptOffset.ry() = m_r2DCltRect.bottom()-185;
 
-	m_rSingleRect.setRect(40,10,m_rCltRect.right()-80,m_rCltRect.bottom()-230);
+	m_rSingleRect.setRect(40,10,m_r2DCltRect.right()-80,m_r2DCltRect.bottom()-230);
 
 	QRect Rect1(0,0,w2,h38);
 	QRect Rect2(w2,0,w2,h38);
@@ -13612,8 +13632,12 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 
 void QMiarex::Set3DScale()
 {
+	if(m_iView!=W3DVIEW && (m_iView!=WSTABVIEW || m_iStabilityView!=3)) return;
 	if(m_iView==W3DVIEW) m_bResetglLegend = true;
 	if(m_bIs3DScaleSet && !m_bAutoScales) return;
+
+	GLWidget* pGLWidget = (GLWidget*)m_pGLWidget;
+	m_r3DCltRect = pGLWidget->geometry();
 
 	if(m_pCurWing)
 	{
@@ -13634,7 +13658,7 @@ void QMiarex::Set3DScale()
 	}
 	else //(m_iView==3)
 	{
-		double gh = (double)m_rCltRect.height()/(double)m_rCltRect.width() ;
+		double gh = (double)m_r3DCltRect.height()/(double)m_r3DCltRect.width() ;
 		if(gh<1.0)
 		{
 			m_UFOOffset.x = 0.0;
@@ -14502,22 +14526,9 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 
 void QMiarex::SetScale()
 {
-	Set2DScale();
-	Set3DScale();
+	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&& m_iStabilityView==3)) Set3DScale();
+	else                                                               Set2DScale();
 }
-
-void QMiarex::SetScale(QRect CltRect)
-{
-	m_rCltRect = CltRect;
-//	m_rCltRect.setRect(CltRect.x(), CltRect.y(), CltRect.width(), CltRect.height());
-	m_rSingleRect.setRect(CltRect.x(), CltRect.y(), CltRect.width(), CltRect.height());
-
-//	m_rSingleRect.adjust(60,20,-60,-600);
-//	SetBodyScale();
-	Set2DScale();
-	Set3DScale();
-}
-
 
 
 void QMiarex::SetUFO(QString UFOName)
@@ -15127,7 +15138,6 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else
 	{
 		m_bResetglMesh = true;
-
 		if(!m_pCurWing)
 		{
 			pWPolar = NULL;
@@ -15338,7 +15348,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 
 void QMiarex::SetWingLegendPos()
 {
-	int h  = m_rCltRect.height();
+	int h  = m_r2DCltRect.height();
 	int h23 = (int)(2*h/3);
 	int h34 = (int)(3*h/4);
 
@@ -15347,7 +15357,7 @@ void QMiarex::SetWingLegendPos()
 	{
 		if(m_iWingView == 1)
 		{
-			m_WingLegendOffset.rx() = m_rCltRect.right()-300+margin;
+			m_WingLegendOffset.rx() = m_r2DCltRect.right()-300+margin;
 			m_WingLegendOffset.ry() = 0;
 		}
 		else if(m_iWingView == 2)
@@ -15379,8 +15389,8 @@ void QMiarex::SetWingLegendPos()
 
 void QMiarex::SetWPlrLegendPos()
 {
-	int h  = m_rCltRect.height();
-	int w  = m_rCltRect.width();
+	int h  = m_r2DCltRect.height();
+	int w  = m_r2DCltRect.width();
 	int h23 = (int)(2*h/3);
 
 	int margin = 10;
@@ -15761,7 +15771,7 @@ void QMiarex::SnapClient(QString const &FileName)
 {
 	int NbBytes, bitsPerPixel;
 
-	QSize size(m_rCltRect.width(),m_rCltRect.height());
+	QSize size(m_r3DCltRect.width(),m_r3DCltRect.height());
 	GLWidget * pGLWidget = (GLWidget*)m_pGLWidget;
 	QGLFormat GLFormat = pGLWidget->format();
 
@@ -16119,15 +16129,26 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 {
 	//The mouse button has been wheeled
 	//Process the message
+	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	QPoint pt(event->x(), event->y()); //client coordinates
+	static double ZoomFactor;
+	if(event->delta()>0)
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		else                           ZoomFactor = 1.06;
+	}
+	else
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		else                           ZoomFactor = 1./1.06;
+	}
 
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&&m_iStabilityView==3))
 	{
 		if(m_pCurWing)
 		{
 			//zoom wing
-			if(event->delta()>0) m_glScaled /= (GLfloat)1.06;
-			else                 m_glScaled *= (GLfloat)1.06;
+			m_glScaled *= ZoomFactor;
 			UpdateView();
 		}
 	}
@@ -16140,22 +16161,19 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 			{
 				//zoom x scale
 				m_pCurGraph->SetAutoX(false);
-				if(event->delta()>0) m_pCurGraph->Scalex(1.06);
-				else                 m_pCurGraph->Scalex(1.0/1.06);
+				m_pCurGraph->Scalex(1./ZoomFactor);
 			}
 			else if(m_bYPressed)
 			{
 				//zoom y scale
 				m_pCurGraph->SetAutoY(false);
-				if(event->delta()>0) m_pCurGraph->Scaley(1.06);
-				else                 m_pCurGraph->Scaley(1.0/1.06);
+				m_pCurGraph->Scaley(1./ZoomFactor);
 			}
 			else
 			{
 				//zoom both
 				m_pCurGraph->SetAuto(false);
-				if(event->delta()>0) m_pCurGraph->Scale(1.06);
-				else                 m_pCurGraph->Scale(1.0/1.06);
+				m_pCurGraph->Scale(1./ZoomFactor);
 			}
 
 			m_pCurGraph->SetAutoXUnit();
@@ -16165,8 +16183,7 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 		else if(m_pCurWing && m_iView==WOPPVIEW)
 		{
-			if(event->delta()<0) m_WingScale *= 1.06;
-			else                 m_WingScale /= 1.06;
+			m_WingScale *= ZoomFactor;
 			UpdateView();
 		}
 	}
