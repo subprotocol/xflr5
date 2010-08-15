@@ -126,6 +126,7 @@ private slots:
 	void OnStyle();
 	void OnUnits();
 	void OnSaveUFOAsProject();
+	void OnPolarProps();
 	void openRecentFile();
 
 
@@ -240,7 +241,7 @@ private:
 
 	//  XFoilAnalysis Menus
 	QMenu * XDirectViewMenu;
-	QMenu *FoilMenu, *CurFoilCtxMenu, *CurPolarCtxMenu, *CurGraphCtxMenu, *CurFoilDesignMenu, *CurOppCtxMenu;
+	QMenu *FoilMenu, *CurGraphCtxMenu, *CurOppCtxMenu;
 	QMenu *currentFoilMenu;
 	QMenu *DesignMenu;
 	QMenu *OpPointMenu, *CpGraphMenu, *currentOppMenu;
@@ -288,11 +289,11 @@ private:
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
 	QAction *renameCurWPolar, *editCurWPolar,*exportCurWPolar, *resetCurWPolar;
+	QAction *ShowPolarProps;
 	QAction *deleteCurWPolar, *deleteCurWOpp;
-	QAction *twoWingGraphs, *fourWingGraphs;
-	QAction *WingGraph1,*WingGraph2,*WingGraph3,*WingGraph4;
-	QAction *WPlrGraph1,*WPlrGraph2,*WPlrGraph3,*WPlrGraph4;
-	QAction *twoWPlrGraphs, *allWPlrGraphs, *MiarexGraphDlg;
+	QAction *twoGraphs, *fourGraphs;
+	QAction *Graph1,*Graph2,*Graph3,*Graph4;
+	QAction *MiarexGraphDlg;
 
 	QAction *ResetWingGraphScale;
 	QAction *MiarexPolarFilter;

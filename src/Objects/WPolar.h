@@ -41,6 +41,7 @@ class CWPolar
 	friend class StabAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class EditPlrDlg;
+	friend class PolarPropsDlg;
 	friend class StabViewDlg;
 	friend class ManageBodiesDlg;
 

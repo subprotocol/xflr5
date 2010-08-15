@@ -503,6 +503,7 @@ void WPolarDlg::OnOK()
 	accept();
 }
 
+
 void WPolarDlg::OnUnit()
 {
 	if(m_pctrlUnit1->isChecked())

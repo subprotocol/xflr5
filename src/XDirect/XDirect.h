@@ -159,7 +159,7 @@ private slots:
 	void OnUePlot();
 	void OnHPlot();
 
-signals:
+	void OnPolarProps();
 
 
 protected:

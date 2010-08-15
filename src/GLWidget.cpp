@@ -248,6 +248,7 @@ void GLWidget::resizeGL(int width, int height)
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->m_ArcBall.GetMatrix();
 //		pMiarex->SetScale(m_rCltRect);
+		pMiarex->m_bIs3DScaleSet = false;
 		pMiarex->Set3DScale();
 	}
 	else if(m_iView == 7)

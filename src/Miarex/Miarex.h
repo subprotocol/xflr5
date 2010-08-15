@@ -122,21 +122,15 @@ private slots:
 	void OnHighlightOpp();
 	void OnShowPoints();
 	void OnShowCurve();
-	void OnSingleWPlrGraph1();
-	void OnSingleWPlrGraph2();
-	void OnSingleWPlrGraph3();
-	void OnSingleWPlrGraph4();
-	void OnTwoWPlrGraphs();
-	void OnFourWPlrGraphs();
 	void OnDefineCtrlPolar();
 	void OnHideAllWPolars();
 	void OnShowAllWPolars();
-	void OnSingleWingGraph1();
-	void OnSingleWingGraph2();
-	void OnSingleWingGraph3();
-	void OnSingleWingGraph4();
-	void OnTwoWingGraphs();
-	void OnFourWingGraphs();
+	void OnSingleGraph1();
+	void OnSingleGraph2();
+	void OnSingleGraph3();
+	void OnSingleGraph4();
+	void OnTwoGraphs();
+	void OnFourGraphs();
 	void OnExportCurWOpp();
 	void OnCurWOppOnly();
 	void OnDeleteAllWPlrOpps();
@@ -220,6 +214,7 @@ private slots:
 	void OnImportWPolar();
 	void OnUFOInertia();
 	void OnBodyInertia();
+	void OnWPolarProps();
 
 	void OnTimeGraph();
 	void OnStabilityView();

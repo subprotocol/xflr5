@@ -19,7 +19,6 @@ SOURCES += src/MainFrame.cpp \
     src/Miarex/LLTAnalysisDlg.cpp \
     src/Miarex/ImportWingDlg.cpp \
     src/Miarex/GLLightDlg.cpp \
-    src/Miarex/CpScaleDlg.cpp \
     src/Miarex/BodyTableDelegate.cpp \
     src/Miarex/ArcBall.cpp \
     src/Miarex/BodyGridDlg.cpp \
@@ -108,7 +107,8 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-    src/Misc/NewNameDlg.cpp
+    src/Misc/NewNameDlg.cpp \
+    src/Misc/PolarPropsDlg.cpp
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/QFLR5Application.h \
@@ -137,7 +137,6 @@ HEADERS += src/MainFrame.h \
     src/Miarex/LLTAnalysisDlg.h \
     src/Miarex/ImportWingDlg.h \
     src/Miarex/GLLightDlg.h \
-    src/Miarex/CpScaleDlg.h \
     src/Miarex/ArcBall.h \
     src/Miarex/BodyGridDlg.h \
     src/Miarex/BodyTableDelegate.h \
@@ -214,7 +213,8 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
-    src/Misc/NewNameDlg.h
+    src/Misc/NewNameDlg.h \
+    src/Misc/PolarPropsDlg.h
 TRANSLATIONS = translations/xflr5.ts \
     translations/xflr5_de.ts \
     translations/xflr5_fr.ts

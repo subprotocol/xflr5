@@ -27,6 +27,7 @@
 #include "../MainFrame.h"
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
+#include "../Misc/PolarPropsDlg.h"
 #include "../Misc/PolarFilterDlg.h"
 #include "../Misc/RenameDlg.h"
 #include "XDirect.h"
@@ -536,12 +537,11 @@ void QXDirect::CheckButtons()
 	m_pctrlAnimate->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlAnimateSpeed->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlHighlightOpp->setEnabled(m_bPolar);
-
 	pMainFrame->currentFoilMenu->setEnabled(g_pCurFoil);
-	pMainFrame->CurFoilDesignMenu->setEnabled(g_pCurFoil);
-	pMainFrame->CurFoilCtxMenu->setEnabled(g_pCurFoil);
+//	pMainFrame->CurFoilDesignMenu->setEnabled(g_pCurFoil);
+//	pMainFrame->CurFoilCtxMenu->setEnabled(g_pCurFoil);
 
-	pMainFrame->CurPolarCtxMenu->setEnabled(m_pCurPolar);
+//	pMainFrame->CurPolarCtxMenu->setEnabled(m_pCurPolar);
 	pMainFrame->currentPolarMenu->setEnabled(m_pCurPolar);
 
 	pMainFrame->renameCurFoil->setEnabled(g_pCurFoil);
@@ -1298,6 +1298,12 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 	switch (event->key())
 	{
 		case Qt::Key_Return:
+			if (event->modifiers().testFlag(Qt::AltModifier))
+			{
+				OnPolarProps();
+				break;
+			}
+
 			ReadParams();
 			if(m_pctrlAnalyze->hasFocus())  OnAnalyze();
 			else
@@ -6563,4 +6569,20 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 
 		if(!m_bAnimate) UpdateView();
 	}
+}
+
+
+
+
+void QXDirect::OnPolarProps()
+{
+	if(!m_pCurPolar) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	PolarPropsDlg dlg;
+	dlg.m_pXDirect = this;
+	dlg.m_pPolar = m_pCurPolar;
+	dlg.InitDialog();
+	dlg.move(pMainFrame->m_DlgPos);
+	dlg.exec();
+	pMainFrame->m_DlgPos = dlg.pos();
 }

@@ -130,7 +130,8 @@ void DisplaySettingsDlg::InitDialog()
 {
 	m_MemGraph.CopySettings(m_pRefGraph);
 	m_pctrlBackColor->SetColor(m_BackgroundColor);
-	m_pctrlTextFont->setText(m_TextFont.family());
+	QString FontName = m_TextFont.family() + QString(" %1").arg(m_TextFont.pointSize());
+	m_pctrlTextFont->setText(FontName);
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
 	m_pctrlReverseZoom->setChecked(m_bReverseZoom);
 

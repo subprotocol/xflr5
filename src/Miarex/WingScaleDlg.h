@@ -62,4 +62,4 @@ public:
 	double m_RefSweep, m_RefChord, m_RefTwist, m_RefSpan;
 };
 
-#endif // CPSCALEDLG_H
+#endif // WINGSCALEDLG_H

@@ -36,6 +36,7 @@ class CPolar
 	friend class BatchDlg;
 	friend class XFoilAnalysisDlg;
 	friend class EditPlrDlg;
+	friend class PolarPropsDlg;
 
 private:
 	static void *s_pMainFrame;

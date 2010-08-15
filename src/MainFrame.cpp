@@ -33,6 +33,7 @@
 #include "Miarex/UFOTableDelegate.h"
 #include "Miarex/ManualInertiaDlg.h"
 #include "Misc/AboutQ5.h"
+#include "Misc/PolarPropsDlg.h"
 #include "Misc/DisplaySettingsDlg.h"
 #include "Misc/RenameDlg.h"
 #include "Misc/LinePickerDlg.h"
@@ -512,7 +513,6 @@ void MainFrame::CreateActions()
 	connect(resetSettingsAct, SIGNAL(triggered()), this, SLOT(OnResetSettings()));
 
 
-
 	for (int i = 0; i < MAXRECENTFILES; ++i)
 	{
 		recentFileActs[i] = new QAction(this);
@@ -546,6 +546,11 @@ void MainFrame::CreateActions()
 	aboutAct->setStatusTip(tr("More information about XFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
+
+	ShowPolarProps = new QAction(tr("Properties"), this);
+	ShowPolarProps->setStatusTip(tr("Show the properties of the currently selected polar"));
+	ShowPolarProps->setShortcut(Qt::ALT + Qt::Key_Return);
+	connect(ShowPolarProps, SIGNAL(triggered()), this, SLOT(OnPolarProps()));
 
 	CreateAFoilActions();
 	CreateXDirectActions();
@@ -950,7 +955,8 @@ void MainFrame::CreateDockWindows()
 	CWing::s_pMainFrame    = this;
 	CWing::s_pMiarex       = m_pMiarex;
 
-	CPolar::s_pMainFrame   = this;
+	CPolar::s_pMainFrame     = this;
+	PolarPropsDlg::s_pMainFrame = this;
 
 	pGL3DScales->m_pMainFrame    = this;
 	pGL3DScales->m_pMiarex       = m_pMiarex;
@@ -1255,62 +1261,36 @@ void MainFrame::CreateMiarexActions()
 	MiarexGraphDlg->setStatusTip(tr("Define the settings for the selected graph"));
 	connect(MiarexGraphDlg, SIGNAL(triggered()), pMiarex, SLOT(OnGraphSettings()));
 
-	twoWingGraphs = new QAction(tr("Two OpPoint Graphs\t(T)"), this);
-	twoWingGraphs->setStatusTip(tr("Display the first two operating point graphs"));
-	twoWingGraphs->setCheckable(true);
-	connect(twoWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWingGraphs()));
+	twoGraphs = new QAction(tr("Two Graphs\t(T)"), this);
+	twoGraphs->setStatusTip(tr("Display the first two operating point graphs"));
+	twoGraphs->setCheckable(true);
+	connect(twoGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoGraphs()));
 	
-	fourWingGraphs = new QAction(tr("All OpPoint Graphs\t(A)"), this);
-	fourWingGraphs->setStatusTip(tr("Display all four operating point graphs"));
-	fourWingGraphs->setCheckable(true);
-	connect(fourWingGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWingGraphs()));
+	fourGraphs = new QAction(tr("All Graphs\t(A)"), this);
+	fourGraphs->setStatusTip(tr("Display all four operating point graphs"));
+	fourGraphs->setCheckable(true);
+	connect(fourGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourGraphs()));
 
-	WingGraph1 = new QAction(tr("Wing Graph 1\t(1)"), this);
-	WingGraph1->setStatusTip(tr("Display only the first operating point graph"));
-	WingGraph1->setCheckable(true);
-	connect(WingGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph1()));
+	Graph1 = new QAction(tr("Graph 1\t(1)"), this);
+	Graph1->setStatusTip(tr("Display only the first graph"));
+	Graph1->setCheckable(true);
+	connect(Graph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph1()));
 	
-	WingGraph2 = new QAction(tr("Wing Graph 2\t(2)"), this);
-	WingGraph2->setStatusTip(tr("Display only the second operating point graph"));
-	WingGraph2->setCheckable(true);
-	connect(WingGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph2()));
+	Graph2 = new QAction(tr("Graph 2\t(2)"), this);
+	Graph2->setStatusTip(tr("Display only the second graph"));
+	Graph2->setCheckable(true);
+	connect(Graph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph2()));
 	
-	WingGraph3 = new QAction(tr("Wing Graph 3\t(3)"), this);
-	WingGraph3->setStatusTip(tr("Display only the third operating point graph"));
-	WingGraph3->setCheckable(true);
-	connect(WingGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph3()));
+	Graph3 = new QAction(tr("Graph 3\t(3)"), this);
+	Graph3->setStatusTip(tr("Display only the third graph"));
+	Graph3->setCheckable(true);
+	connect(Graph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph3()));
 
-	WingGraph4 = new QAction(tr("Wing Graph 4\t(4)"), this);
-	WingGraph4->setStatusTip(tr("Display only the fourth operating point graph"));
-	WingGraph4->setCheckable(true);
-	connect(WingGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWingGraph4()));
+	Graph4 = new QAction(tr("Graph 4\t(4)"), this);
+	Graph4->setStatusTip(tr("Display only the fourth graph"));
+	Graph4->setCheckable(true);
+	connect(Graph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph4()));
 
-	twoWPlrGraphs = new QAction(tr("Two Polar Graphs\t(T)"), this);
-	twoWPlrGraphs->setStatusTip(tr("Display the first two polar graphs"));
-	twoWPlrGraphs->setCheckable(true);
-	connect(twoWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoWPlrGraphs()));
-	
-	allWPlrGraphs = new QAction(tr("All Polar Graphs\t(A)"), this);
-	allWPlrGraphs->setStatusTip(tr("Display all four polar graphs"));
-	allWPlrGraphs->setCheckable(true);
-	connect(allWPlrGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourWPlrGraphs()));
-	
-	WPlrGraph1 = new QAction(tr("Polar Graph 1\t(1)"), this);
-	WPlrGraph1->setStatusTip(tr("Display only the first polar graph"));
-	WPlrGraph1->setCheckable(true);
-	connect(WPlrGraph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph1()));
-	WPlrGraph2 = new QAction(tr("Polar Graph 2\t(2)"), this);
-	WPlrGraph2->setStatusTip(tr("Display only the second polar graph"));
-	WPlrGraph2->setCheckable(true);
-	connect(WPlrGraph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph2()));
-	WPlrGraph3 = new QAction(tr("Polar Graph 3\t(3)"), this);
-	WPlrGraph3->setStatusTip(tr("Display only the third polar graph"));
-	WPlrGraph3->setCheckable(true);
-	connect(WPlrGraph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph3()));
-	WPlrGraph4 = new QAction(tr("Polar Graph 4\t(4)"), this);
-	WPlrGraph4->setStatusTip(tr("Display only the fourth polar graph"));
-	WPlrGraph4->setCheckable(true);
-	connect(WPlrGraph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleWPlrGraph4()));
 
 	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales"), this);
 	ResetWingGraphScale->setStatusTip(tr("Reset the scale of the current operating point graph"));
@@ -1473,6 +1453,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWPlrMenu->addAction(defineStabPolar);
 //	MiarexWPlrMenu->addAction(defineCtrlPolar);
 	CurWPlrMenu = MiarexWPlrMenu->addMenu(tr("Current Polar"));
+	CurWPlrMenu->addAction(ShowPolarProps);
 	CurWPlrMenu->addAction(editCurWPolar);
 	CurWPlrMenu->addAction(renameCurWPolar);
 	CurWPlrMenu->addAction(deleteCurWPolar);
@@ -1491,13 +1472,13 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWPlrMenu->addAction(showAllWPlrs);
 	MiarexWPlrMenu->addSeparator();
 	WPlrGraphMenu = MiarexWPlrMenu->addMenu(tr("Graphs"));
-	WPlrGraphMenu->addAction(WPlrGraph1);
-	WPlrGraphMenu->addAction(WPlrGraph2);
-	WPlrGraphMenu->addAction(WPlrGraph3);
-	WPlrGraphMenu->addAction(WPlrGraph4);
+	WPlrGraphMenu->addAction(Graph1);
+	WPlrGraphMenu->addAction(Graph2);
+	WPlrGraphMenu->addAction(Graph3);
+	WPlrGraphMenu->addAction(Graph4);
 	WPlrGraphMenu->addSeparator();
-	WPlrGraphMenu->addAction(twoWPlrGraphs);
-	WPlrGraphMenu->addAction(allWPlrGraphs);
+	WPlrGraphMenu->addAction(twoGraphs);
+	WPlrGraphMenu->addAction(fourGraphs);
 	WPlrGraphMenu->addSeparator();
 	WPlrGraphMenu->addAction(allWPolarGraphsSettings);
 	WPlrGraphMenu->addAction(allWPolarGraphsScalesAct);
@@ -1524,13 +1505,13 @@ void MainFrame::CreateMiarexMenus()
 	WOppCurGraphMenu->addAction(exportCurGraphAct);
 
 	WOppGraphMenu = MiarexWOppMenu->addMenu(tr("Graphs"));
-	WOppGraphMenu->addAction(WingGraph1);
-	WOppGraphMenu->addAction(WingGraph2);
-	WOppGraphMenu->addAction(WingGraph3);
-	WOppGraphMenu->addAction(WingGraph4);
+	WOppGraphMenu->addAction(Graph1);
+	WOppGraphMenu->addAction(Graph2);
+	WOppGraphMenu->addAction(Graph3);
+	WOppGraphMenu->addAction(Graph4);
 	WOppGraphMenu->addSeparator();
-	WOppGraphMenu->addAction(twoWingGraphs);
-	WOppGraphMenu->addAction(fourWingGraphs);
+	WOppGraphMenu->addAction(twoGraphs);
+	WOppGraphMenu->addAction(fourGraphs);
 	WOppGraphMenu->addSeparator();
 	WOppGraphMenu->addAction(allWingGraphsSettings);
 	WOppGraphMenu->addAction(allWingGraphsScalesAct);
@@ -2113,6 +2094,7 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addAction(defineBatch);
 	PolarMenu->addSeparator();
 	currentPolarMenu = PolarMenu->addMenu(tr("Current Polar"));
+	currentPolarMenu->addAction(ShowPolarProps);
 	currentPolarMenu->addAction(editCurPolar);
 	currentPolarMenu->addAction(resetCurPolar);
 	currentPolarMenu->addAction(deletePolar);
@@ -2182,49 +2164,11 @@ void MainFrame::CreateXDirectMenus()
 
 	//XDirect foil Context Menu
 	OperFoilCtxMenu = new QMenu(tr("Context Menu"),this);
-	CurFoilCtxMenu = OperFoilCtxMenu->addMenu(tr("Current Foil"));
-	CurFoilCtxMenu->addAction(setCurFoilStyle);
-	CurFoilCtxMenu->addSeparator();
-	CurFoilCtxMenu->addAction(DuplicateFoil);
-	CurFoilCtxMenu->addAction(renameCurFoil);
-	CurFoilCtxMenu->addAction(deleteCurFoil);
-	CurFoilCtxMenu->addAction(exportCurFoil);
-	CurFoilCtxMenu->addSeparator();
-	CurFoilDesignMenu = CurFoilCtxMenu->addMenu(tr("Design Operations"));
-	CurFoilDesignMenu->addAction(NormalizeFoil);
-	CurFoilDesignMenu->addAction(DerotateFoil);
-	CurFoilDesignMenu->addAction(RefineLocalFoil);
-	CurFoilDesignMenu->addAction(RefineGlobalFoil);
-	CurFoilDesignMenu->addAction(EditCoordsFoil);
-	CurFoilDesignMenu->addAction(ScaleFoil);
-	CurFoilDesignMenu->addAction(SetTEGap);
-	CurFoilDesignMenu->addAction(SetLERadius);
-	CurFoilDesignMenu->addAction(SetFlap);
-	CurFoilDesignMenu->addSeparator();
-	CurFoilDesignMenu->addAction(InterpolateFoils);
-	CurFoilDesignMenu->addAction(NacaFoils);
-	CurFoilCtxMenu->addSeparator();//_______________
-	CurFoilCtxMenu->addAction(deleteFoilPolars);
-	CurFoilCtxMenu->addAction(showFoilPolars);
-	CurFoilCtxMenu->addAction(hideFoilPolars);
-	CurFoilCtxMenu->addAction(saveFoilPolars);
-	CurFoilCtxMenu->addSeparator();
-	CurFoilCtxMenu->addAction(showFoilOpps);
-	CurFoilCtxMenu->addAction(hideFoilOpps);
-	CurFoilCtxMenu->addAction(deleteFoilOpps);
-
+	OperFoilCtxMenu->addMenu(currentFoilMenu);
 	OperFoilCtxMenu->addSeparator();//_______________
-	CurPolarCtxMenu = OperFoilCtxMenu->addMenu(tr("Current Polar"));
-	CurPolarCtxMenu->addAction(editCurPolar);
-	CurPolarCtxMenu->addAction(resetCurPolar);
-	CurPolarCtxMenu->addAction(deletePolar);
-	CurPolarCtxMenu->addAction(RenamePolarAct);
-	CurPolarCtxMenu->addAction(exportCurPolar);
-	CurPolarCtxMenu->addSeparator();
-	CurPolarCtxMenu->addAction(showPolarOpps);
-	CurPolarCtxMenu->addAction(hidePolarOpps);
-	CurPolarCtxMenu->addAction(deletePolarOpps);
-
+	OperFoilCtxMenu->addMenu(currentPolarMenu);
+	OperFoilCtxMenu->addSeparator();//_______________
+	OperFoilCtxMenu->addMenu(DesignMenu);
 	OperFoilCtxMenu->addSeparator();//_______________
 	CurOppCtxMenu = OperFoilCtxMenu->addMenu(tr("Current OpPoint"));
 	CurOppCtxMenu->addAction(exportCurOpp);
@@ -2255,30 +2199,8 @@ void MainFrame::CreateXDirectMenus()
 
 	//XDirect polar Context Menu
 	OperPolarCtxMenu = new QMenu(tr("Context Menu"),this);
-	CurFoilCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Foil"));
-	CurFoilCtxMenu->addAction(renameCurFoil);
-	CurFoilCtxMenu->addAction(deleteCurFoil);
-	CurFoilCtxMenu->addAction(exportCurFoil);
-	CurFoilCtxMenu->addSeparator();//_______________
-	CurFoilCtxMenu->addAction(showFoilPolars);
-	CurFoilCtxMenu->addAction(hideFoilPolars);
-	CurFoilCtxMenu->addAction(deleteFoilPolars);
-	CurFoilCtxMenu->addAction(saveFoilPolars);
-	CurFoilCtxMenu->addSeparator();
-	CurFoilCtxMenu->addAction(showFoilOpps);
-	CurFoilCtxMenu->addAction(hideFoilOpps);
-	CurFoilCtxMenu->addAction(deleteFoilOpps);
-	OperPolarCtxMenu->addSeparator();//_______________
-	CurPolarCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Polar"));
-	CurPolarCtxMenu->addAction(editCurPolar);
-	CurPolarCtxMenu->addAction(resetCurPolar);
-	CurPolarCtxMenu->addAction(deletePolar);
-	CurPolarCtxMenu->addAction(RenamePolarAct);
-	CurPolarCtxMenu->addAction(exportCurPolar);
-	CurPolarCtxMenu->addSeparator();
-	CurPolarCtxMenu->addAction(showPolarOpps);
-	CurPolarCtxMenu->addAction(hidePolarOpps);
-	CurPolarCtxMenu->addAction(deletePolarOpps);
+	OperPolarCtxMenu->addMenu(currentFoilMenu);
+	OperPolarCtxMenu->addMenu(currentPolarMenu);
 	OperPolarCtxMenu->addSeparator();//_______________
 	CurGraphCtxMenu = OperPolarCtxMenu->addMenu(tr("Current Graph"));
 	CurGraphCtxMenu->addAction(resetCurGraphScales);
@@ -3434,7 +3356,6 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				}
 
 				QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
 				DeleteProject();
 
 				QDataStream ar(&XFile);
@@ -3502,6 +3423,7 @@ void MainFrame::OnCurFoilStyle()
 
 	LinePickerDlg dlg;
 	dlg.InitDialog(g_pCurFoil->m_nFoilStyle, g_pCurFoil->m_nFoilWidth, g_pCurFoil->m_FoilColor);
+	dlg.move(m_DlgPos);
 
 	if(QDialog::Accepted==dlg.exec())
 	{
@@ -3514,6 +3436,7 @@ void MainFrame::OnCurFoilStyle()
 		pXDirect->m_BufferFoil.m_nFoilWidth = g_pCurFoil->m_nFoilWidth;
 		SetSaveState(false);
 	}
+	m_DlgPos = dlg.pos();
 	UpdateView();
 }
 
@@ -4116,7 +4039,6 @@ void MainFrame::OnSaveViewToImageFile()
 		}
 	}
 	img.save(FileName);
-	qDebug()<<"image after"<<m_ImageFormat;
 }
 
 
@@ -4446,7 +4368,6 @@ void MainFrame::openRecentFile()
 	QXDirect *pXDirect = (QXDirect*) m_pXDirect;
 	QMiarex *pMiarex = (QMiarex*) m_pMiarex;
 	
-
 	int App = LoadXFLR5File(action->data().toString());
 	if(m_iApp==0) m_iApp = App;
 
@@ -4478,7 +4399,6 @@ void MainFrame::openRecentFile()
 		OnMiarex();
 
 		UpdateView();
-
 	}
 	else if(m_iApp==DIRECTDESIGN)
 	{
@@ -6790,3 +6710,16 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 }
 
 
+void MainFrame::OnPolarProps()
+{
+	if(m_iApp==XFOILANALYSIS)
+	{
+		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->OnPolarProps();
+	}
+	else if(m_iApp==MIAREX)
+	{
+		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->OnWPolarProps();
+	}
+}

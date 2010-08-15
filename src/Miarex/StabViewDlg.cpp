@@ -851,7 +851,6 @@ void StabViewDlg::SetupLayout()
 	QGroupBox *RLBox = new QGroupBox(tr("Mode"));
 	RLBox->setLayout(RLLayout);
 
-
 	m_pctrlStackWidget = new QStackedWidget;
 	m_pctrlStackWidget->addWidget(TimeBox);
 	m_pctrlStackWidget->addWidget(RLBox);
@@ -884,7 +883,7 @@ void StabViewDlg::SetControls()
 		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
 		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
 		
-		m_pctrlAddCurve->setEnabled(pMiarex->m_pCurWOpp);
+		m_pctrlAddCurve->setEnabled(pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_Type==7);
 		m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 		m_pctrlPlotStabGraph->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 		m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
@@ -1066,10 +1065,12 @@ void StabViewDlg::OnDeleteCurve()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	if(!m_pCurve) return;
 	QString CurveTitle = m_pCurve->GetTitle();
+	qDebug() << "OK0";
 	pMiarex->m_TimeGraph1.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph2.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph3.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph4.DeleteCurve(CurveTitle);
+	m_pCurve = NULL;
 
 	FillCurveList();
 	m_pctrlCurveList->setCurrentIndex(0);
@@ -1077,8 +1078,10 @@ void StabViewDlg::OnDeleteCurve()
 	m_pctrlRenameCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 	m_pctrlDeleteCurve->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 	m_pctrlCurveList->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
-	
-	m_pCurve = pMiarex->m_TimeGraph1.GetCurve(m_pctrlCurveList->itemText(0));
+
+	if(m_pctrlCurveList->count()) m_pCurve = pMiarex->m_TimeGraph1.GetCurve(m_pctrlCurveList->itemText(0));
+	else                          m_pCurve = NULL;
+
 	pMiarex->SetCurveParams();
 	pMiarex->CreateStabilityCurves();
 	pMiarex->UpdateView();

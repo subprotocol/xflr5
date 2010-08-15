@@ -180,6 +180,7 @@ void GL3DScales::SetupLayout()
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addWidget(ScaleBox);
+	MainLayout->addStretch();
 	MainLayout->addWidget(CpScaleBox);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(LengthBox);
