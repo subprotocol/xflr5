@@ -435,17 +435,17 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 void MainFrame::CreateActions()
 {
 	newProjectAct = new QAction(QIcon(":/images/new.png"), tr("New Project"), this);
-	newProjectAct->setShortcut(tr("Ctrl+N"));
+	newProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
 	newProjectAct->setStatusTip(tr("Save and close the current project, create a new project"));
 	connect(newProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
 
 	closeProjectAct = new QAction(QIcon(":/images/new.png"), tr("Close the Project"), this);
-	closeProjectAct->setShortcut(tr("Ctrl+W"));
+	closeProjectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_W));
 	closeProjectAct->setStatusTip(tr("Save and close the current project"));
 	connect(closeProjectAct, SIGNAL(triggered()), this, SLOT(OnNewProject()));
 
 	openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
-	openAct->setShortcut(tr("Ctrl+O"));
+	openAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(OnLoadFile()));
 
@@ -454,32 +454,32 @@ void MainFrame::CreateActions()
 	connect(insertAct, SIGNAL(triggered()), this, SLOT(OnInsertProject()));
 
 	OnAFoilAct = new QAction(tr("&Direct Foil Design"), this);
-	OnAFoilAct->setShortcut(tr("Ctrl+1"));
+	OnAFoilAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
 	OnAFoilAct->setStatusTip(tr("Open Foil Design application"));
 	connect(OnAFoilAct, SIGNAL(triggered()), this, SLOT(OnAFoil()));
 
 	OnXInverseAct = new QAction(tr("&XFoil Inverse Design"), this);
-	OnXInverseAct->setShortcut(tr("Ctrl+3"));
+	OnXInverseAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
 	OnXInverseAct->setStatusTip(tr("Open XFoil inverse analysis application"));
 	connect(OnXInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverse()));
 
 	OnMixedInverseAct = new QAction(tr("&XFoil Mixed Inverse Design"), this);
-	OnMixedInverseAct->setShortcut(tr("Ctrl+4"));
+	OnMixedInverseAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
 	OnMixedInverseAct->setStatusTip(tr("Open XFoil Mixed Inverse analysis application"));
 	connect(OnMixedInverseAct, SIGNAL(triggered()), this, SLOT(OnXInverseMixed()));
 
 	OnXDirectAct = new QAction(tr("&XFoil Direct Analysis"), this);
-	OnXDirectAct->setShortcut(tr("Ctrl+5"));
+	OnXDirectAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
 	OnXDirectAct->setStatusTip(tr("Open XFoil direct analysis application"));
 	connect(OnXDirectAct, SIGNAL(triggered()), this, SLOT(OnXDirect()));
 
 	OnMiarexAct = new QAction(tr("&Wing and Plane Design"), this);
-	OnMiarexAct->setShortcut(tr("Ctrl+6"));
+	OnMiarexAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
 	OnMiarexAct->setStatusTip(tr("Open Wing/plane design and analysis application"));
 	connect(OnMiarexAct, SIGNAL(triggered()), this, SLOT(OnMiarex()));
 
 	saveAct = new QAction(QIcon(":/images/save.png"), tr("Save"), this);
-	saveAct->setShortcut(tr("Ctrl+S"));
+	saveAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
 	saveAct->setStatusTip(tr("Save the project to disk"));
 	connect(saveAct, SIGNAL(triggered()), this, SLOT(OnSaveProject()));
 
@@ -504,7 +504,7 @@ void MainFrame::CreateActions()
 	connect(restoreToolbarsAct, SIGNAL(triggered()), this, SLOT(OnRestoreToolbars()));
 
 	saveViewToImageFileAct = new QAction(tr("Save View to Image File"), this);
-	saveViewToImageFileAct->setShortcut(tr("Ctrl+I"));
+	saveViewToImageFileAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_I));
 	saveViewToImageFileAct->setStatusTip(tr("Saves the current view to a file on disk"));
 	connect(saveViewToImageFileAct, SIGNAL(triggered()), this, SLOT(OnSaveViewToImageFile()));
 
@@ -534,7 +534,7 @@ void MainFrame::CreateActions()
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
 	exitAct = new QAction(tr("E&xit"), this);
-	exitAct->setShortcut(tr("Ctrl+Q"));
+	exitAct->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
 	exitAct->setStatusTip(tr("Exit the application"));
 	connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -546,10 +546,9 @@ void MainFrame::CreateActions()
 	aboutAct->setStatusTip(tr("More information about XFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
 
-
 	ShowPolarProps = new QAction(tr("Properties"), this);
 	ShowPolarProps->setStatusTip(tr("Show the properties of the currently selected polar"));
-	ShowPolarProps->setShortcut(Qt::ALT + Qt::Key_Return);
+	ShowPolarProps->setShortcut(QKeySequence(Qt::ALT + Qt::Key_Return));
 	connect(ShowPolarProps, SIGNAL(triggered()), this, SLOT(OnPolarProps()));
 
 	CreateAFoilActions();
@@ -602,12 +601,12 @@ void MainFrame::CreateAFoilActions()
 	connect(ResetXScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetXScale()));
 
 	UndoAFoilAct= new QAction(QIcon(":/images/OnUndo.png"), tr("Undo"), this);
-	UndoAFoilAct->setShortcut(tr("Ctrl+Z"));
+	UndoAFoilAct->setShortcut(Qt::CTRL + Qt::Key_Z);
 	UndoAFoilAct->setStatusTip(tr("Cancels the last modifiction made to the splines"));
 	connect(UndoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnUndo()));
 
 	RedoAFoilAct= new QAction(QIcon(":/images/OnRedo.png"), tr("Redo"), this);
-	RedoAFoilAct->setShortcut(tr("Ctrl+Y"));
+	RedoAFoilAct->setShortcut(Qt::CTRL + Qt::Key_Y);
 	RedoAFoilAct->setStatusTip(tr("Restores the last cancelled modifiction made to the splines"));
 	connect(RedoAFoilAct, SIGNAL(triggered()), pAFoil, SLOT(OnRedo()));
 
@@ -1048,44 +1047,32 @@ void MainFrame::CreateMiarexActions()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
-	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint View"), this);
+	WOppAct = new QAction(QIcon(":/images/OnWOppView.png"), tr("OpPoint View")+"\tF5", this);
 	WOppAct->setCheckable(true);
 	WOppAct->setStatusTip(tr("Switch to the Operating point view"));
-	WOppAct->setShortcut(tr("F5"));
+//	WOppAct->setShortcut(Qt::Key_F5);
 	connect(WOppAct, SIGNAL(triggered()), pMiarex, SLOT(OnWOpps()));
 
-	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar View"), this);
+	WPolarAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar View")+"\tF8", this);
 	WPolarAct->setCheckable(true);
 	WPolarAct->setStatusTip(tr("Switch to the Polar view"));
-	WPolarAct->setShortcut(tr("F8"));
+//	WPolarAct->setShortcut(Qt::Key_F8);
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
-	StabilityAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability Analysis"), this);
+	StabilityAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability Analysis")+"\tShift+F8", this);
 	StabilityAct->setCheckable(true);
 	StabilityAct->setStatusTip(tr("Switch to stability analysis post-processing"));
-	StabilityAct->setShortcut(tr("Shift+F8"));
+//	StabilityAct->setShortcut(tr("Shift+F8"));
 	connect(StabilityAct, SIGNAL(triggered()), pMiarex, SLOT(OnStabilityView()));
 
-/*	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View"), this);
-	RootLocusAct->setCheckable(true);
-	RootLocusAct->setStatusTip(tr("Switch to the root locus view"));
-	connect(RootLocusAct, SIGNAL(triggered()), pMiarex, SLOT(OnRootLocusView()));
-
-	ModalViewAct = new QAction(QIcon(":/images/On3DModes.png"),tr("Modal View"), this);
-	ModalViewAct->setCheckable(true);
-	ModalViewAct->setStatusTip(tr("Switch to the 3D Modal view"));
-	connect(ModalViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnModalView()));
-*/
-	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View"), this);
+	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View")+"\tF4", this);
 	W3DAct->setCheckable(true);
 	W3DAct->setStatusTip(tr("Switch to the 3D view"));
-	W3DAct->setShortcut(tr("F4"));
 	connect(W3DAct, SIGNAL(triggered()), pMiarex, SLOT(On3DView()));
 
-	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("Cp View"), this);
+	CpViewAct = new QAction(QIcon(":/images/OnCpView.png"), tr("Cp View")+"\tF9", this);
 	CpViewAct->setCheckable(true);
 	CpViewAct->setStatusTip(tr("Switch to the Cp view"));
-	CpViewAct->setShortcut(tr("F9"));
 	connect(CpViewAct, SIGNAL(triggered()), pMiarex, SLOT(OnCpView()));
 
 	W3DPrefsAct = new QAction(tr("3D Color Preferences"), this);
@@ -1105,20 +1092,21 @@ void MainFrame::CreateMiarexActions()
 	W3DLightAct->setStatusTip(tr("Define the light options in 3D view"));
 	connect(W3DLightAct, SIGNAL(triggered()), pMiarex, SLOT(OnSetupLight()));
 
-	DefineWingAct = new QAction(tr("Define a New Wing"), this);
+	DefineWingAct = new QAction(tr("Define a New Wing")+"\tF3", this);
 	DefineWingAct->setStatusTip(tr("Shows a dialogbox for editing a new wing definition"));
-	DefineWingAct->setShortcut(tr("F3"));
 	connect(DefineWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewWing()));
 
-	DefinePlaneAct = new QAction(tr("Define a New Plane"), this);
+	DefinePlaneAct = new QAction(tr("Define a New Plane")+"\tCtrl+F3", this);
 	DefinePlaneAct->setStatusTip(tr("Shows a dialogbox to create a new plane definition"));
-	DefinePlaneAct->setShortcut(tr("Ctrl+F3"));
 	connect(DefinePlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewPlane()));
 
-	EditUFOAct = new QAction(tr("Edit..."), this);
+	EditUFOAct = new QAction(tr("Edit...")+"\tShift+F3", this);
 	EditUFOAct->setStatusTip(tr("Shows a dialogbox to edit the currently selected wing or plane"));
-	EditUFOAct->setShortcut(tr("Shift+F3"));
 	connect(EditUFOAct, SIGNAL(triggered()), pMiarex, SLOT(OnEditUFO()));
+
+	renameCurUFO = new QAction(tr("Rename...")+"\tF2", this);
+	renameCurUFO->setStatusTip(tr("Rename the currently selected object"));
+	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
 
 	defineBody = new QAction(tr("Define a New Body"), this);
 	defineBody->setStatusTip(tr("Shows a dialogbox for editing a new body definition"));
@@ -1127,7 +1115,7 @@ void MainFrame::CreateMiarexActions()
 
 	EditCurBody = new QAction(tr("Edit Current"), this);
 	EditCurBody->setStatusTip(tr("Edit the body of the currently selected plane"));
-	EditCurBody->setShortcut(tr("Shift+F10"));
+	EditCurBody->setShortcut(QKeySequence(Qt::SHIFT+Qt::Key_F10));
 	connect(EditCurBody, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurBody()));
 
 	exportBodyDef = new QAction(tr("Export Body Definition"), this);
@@ -1173,7 +1161,7 @@ void MainFrame::CreateMiarexActions()
 
 	ManageUFOs = new QAction(tr("Manage UFOs"), this);
 	ManageUFOs->setStatusTip(tr("Rename or delete the planes and wings stored in the database"));
-	ManageUFOs->setShortcut(tr("F7"));
+	ManageUFOs->setShortcut(Qt::Key_F7);
 	connect(ManageUFOs, SIGNAL(triggered()), pMiarex, SLOT(OnManageUFOs()));
 
 	m_pImportWPolar = new QAction(tr("Import Polar"), this);
@@ -1343,11 +1331,6 @@ void MainFrame::CreateMiarexActions()
 	deleteUFOWOpps = new QAction(tr("Delete Associated OpPoints"), this);
 	deleteUFOWOpps->setStatusTip(tr("Delete all the operating points of the currently selected wing or plane"));
 	connect(deleteUFOWOpps, SIGNAL(triggered()), pMiarex, SLOT(OnDeleteUFOWOpps()));
-
-	renameCurUFO = new QAction(tr("Rename..."), this);
-	renameCurUFO->setStatusTip(tr("Rename the currently selected wing or plane"));
-	renameCurUFO->setShortcut(tr("F2"));
-	connect(renameCurUFO, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurUFO()));
 
 	deleteCurUFO = new QAction(tr("Delete..."), this);
 	deleteCurUFO->setStatusTip(tr("Delete the currently selected wing or plane"));
@@ -1760,12 +1743,12 @@ void MainFrame::CreateXDirectActions()
 {
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 
-	OpPointsAct = new QAction(QIcon(":/images/OnCpView.png"), tr("OpPoint view"), this);
+	OpPointsAct = new QAction(QIcon(":/images/OnCpView.png"), tr("OpPoint view")+"\tF5", this);
 	OpPointsAct->setCheckable(true);
 	OpPointsAct->setStatusTip(tr("Show Operating point view"));
 	connect(OpPointsAct, SIGNAL(triggered()), pXDirect, SLOT(OnOpPoints()));
 
-	PolarsAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view"), this);
+	PolarsAct = new QAction(QIcon(":/images/OnPolarView.png"), tr("Polar view")+"\tF8", this);
 	PolarsAct->setCheckable(true);
 	PolarsAct->setStatusTip(tr("Show Polar view"));
 	connect(PolarsAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolars()));
@@ -1814,8 +1797,7 @@ void MainFrame::CreateXDirectActions()
 	deleteCurFoil = new QAction(tr("Delete..."), this);
 	connect(deleteCurFoil, SIGNAL(triggered()), pXDirect, SLOT(OnDeleteCurFoil()));
 
-	renameCurFoil = new QAction(tr("Rename..."), this);
-	renameCurFoil->setShortcut(tr("F2"));
+	renameCurFoil = new QAction(tr("Rename...")+"\tF2", this);
 	connect(renameCurFoil, SIGNAL(triggered()), this, SLOT(OnRenameCurFoil()));
 
 	exportCurFoil = new QAction(tr("Export..."), this);
@@ -1855,13 +1837,11 @@ void MainFrame::CreateXDirectActions()
 	deleteFoilOpps = new QAction(tr("Delete associated OpPoints"), this);
 	connect(deleteFoilOpps, SIGNAL(triggered()), pXDirect, SLOT(OnDeleteFoilOpps()));
 
-	definePolar = new QAction(tr("Define an Analysis \t(F6)"), this);
-//	definePolar->setShortcut(tr("F6"));
+	definePolar = new QAction(tr("Define an Analysis")+"\tF6", this);
 	definePolar->setStatusTip(tr("Defines a single analysis/polar"));
 	connect(definePolar, SIGNAL(triggered()), pXDirect, SLOT(OnDefinePolar()));
 
-	defineBatch = new QAction(tr("Batch Analysis \t(Shift+F6)"), this);
-//	defineBatch->setShortcut(tr("Shift+F6"));
+	defineBatch = new QAction(tr("Batch Analysis")+"Shift+F6", this);
 	defineBatch->setStatusTip(tr("Launches a batch of analysis calculation for a specified range or list of Reynolds numbers"));
 	connect(defineBatch, SIGNAL(triggered()), pXDirect, SLOT(OnBatchAnalysis()));
 
@@ -1885,7 +1865,7 @@ void MainFrame::CreateXDirectActions()
 	connect(XDirectStyleAct, SIGNAL(triggered()), pXDirect, SLOT(OnXDirectStyle()));
 
 	ManageFoilsAct = new QAction(tr("Manage Foils"), this);
-	ManageFoilsAct->setShortcut(tr("F7"));
+	ManageFoilsAct->setShortcut(Qt::Key_F7);
 	connect(ManageFoilsAct, SIGNAL(triggered()), pXDirect, SLOT(OnManageFoils()));
 
 	RenamePolarAct = new QAction(tr("Rename"), this);
@@ -2970,7 +2950,6 @@ void MainFrame::keyPressEvent(QKeyEvent *event)
 	{
 		switch (event->key())
 		{
-			
 			case Qt::Key_L:
 			{
 				OnLogFile();
@@ -3754,17 +3733,16 @@ void MainFrame::OnResetCurGraphScales()
 }
 
 
+
 void MainFrame::OnRenameCurFoil()
 {
 	if(!g_pCurFoil) return;
 	RenameFoil(g_pCurFoil);
-
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->SetFoil(g_pCurFoil);
 	UpdateFoils();
 	UpdateView();
 }
-
 
 
 void MainFrame::OnResetSettings()

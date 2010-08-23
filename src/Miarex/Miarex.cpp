@@ -7246,6 +7246,13 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 			OnRenameCurUFO();
 			break;
 		}
+		case Qt::Key_F3:
+		{
+			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnEditUFO();
+			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnNewPlane();
+			else                                                       OnNewWing();
+			break;
+		}
 		case Qt::Key_F4:
 		{
 			On3DView();
@@ -8747,7 +8754,6 @@ void QMiarex::OnAdvancedSettings()
 	dlg.m_bTrefftz        = m_bTrefftz;
 	dlg.m_bKeepOutOpps    = m_bKeepOutOpps;
 	dlg.m_bLogFile        = m_bLogFile;
-	dlg.m_bPanelEnable    = WPolarDlg::s_b3DPanelEnable;
 	dlg.m_MinPanelSize    = m_MinPanelSize;
 	dlg.m_ControlPos      = CPanel::m_CtrlPos;
 	dlg.m_VortexPos       = CPanel::m_VortexPos;
@@ -8757,7 +8763,6 @@ void QMiarex::OnAdvancedSettings()
 	dlg.InitDialog();
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		WPolarDlg::s_b3DPanelEnable = dlg.m_bPanelEnable;
 		CWing::s_CvPrec        = dlg.m_AlphaPrec;
 		CWing::s_RelaxMax      = dlg.m_Relax;
 		CWing::s_NLLTStations  = dlg.m_NStation;
@@ -9235,6 +9240,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
 		pNewWPolar->m_AnalysisType    = m_WngAnalysis.m_AnalysisType;
 		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
+//		pNewWPolar->m_bThinSurfaces   = true;
 		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
 		pNewWPolar->m_Height          = m_WngAnalysis.m_Height;
 		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;

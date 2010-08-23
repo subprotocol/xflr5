@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <math.h>
  
-bool WPolarDlg::s_b3DPanelEnable;
+
 
 WPolarDlg::WPolarDlg()
 {
@@ -150,7 +150,8 @@ void WPolarDlg::EnableControls()
 			break;
 		}
 	}
-	if(!m_pPlane) m_pctrlMethod1->setEnabled(true);
+	m_pctrlMethod1->setEnabled(!m_pPlane);
+//	m_pctrlMethod4->setEnabled(!m_pPlane);
 
 	if (m_pctrlMethod1->isChecked())
 	{
@@ -192,16 +193,6 @@ void WPolarDlg::InitDialog()
 
 	m_bAutoName = true;
 	m_pctrlAutoName->setChecked(true);
-
-	m_pctrlMethod4->setEnabled(s_b3DPanelEnable);
-	if(s_b3DPanelEnable)
-	{
-		m_pctrlMethod4->setText(tr("3D Panels"));
-	}
-	else
-	{
-		m_pctrlMethod4->setText(tr("3D Panel method is disabled"));
-	}
 	
 	m_pctrlQInf->SetValue(m_QInf);
 	m_pctrlWeight->SetValue(m_Weight);
@@ -726,7 +717,6 @@ void WPolarDlg::SetupLayout()
 	m_pctrlMethod2 = new QRadioButton(tr("VLM1 : Classic"));
 	m_pctrlMethod3 = new QRadioButton(tr("VLM2 : Quads"));
 	m_pctrlMethod4 = new QRadioButton(tr("3D Panels"));
-	m_pctrlMethod4->setEnabled(s_b3DPanelEnable);
 	MethodLayout->addWidget(m_pctrlMethod1);
 	MethodLayout->addWidget(m_pctrlMethod2);
 	MethodLayout->addWidget(m_pctrlMethod3);

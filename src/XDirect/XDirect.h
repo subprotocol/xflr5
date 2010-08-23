@@ -160,6 +160,7 @@ private slots:
 	void OnHPlot();
 
 	void OnPolarProps();
+	void OnRenameFoil();
 
 
 protected:

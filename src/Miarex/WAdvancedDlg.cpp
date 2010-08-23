@@ -68,7 +68,6 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlLogFile     = new QCheckBox(tr("View Log File after errors"));
 	m_pctrlResetWake   = new QCheckBox(tr("Reset Wake between each angle"));
 	m_pctrlKeepOutOpps = new QCheckBox(tr("Store points outside the polar mesh"));
-	m_pctrlPanelEnable = new QCheckBox(tr("Enable 3D-Panel analysis"));
  
 	m_pctrlInterNodes   = new FloatEdit();
 	m_pctrlRelax        = new FloatEdit(20,1);
@@ -85,7 +84,6 @@ void WAdvancedDlg::SetupLayout()
 	QVBoxLayout *AllLayout = new QVBoxLayout;
 	AllLayout->addWidget(m_pctrlLogFile);
 	AllLayout->addWidget(m_pctrlKeepOutOpps);
-	AllLayout->addWidget(m_pctrlPanelEnable);
 	AllBox->setLayout(AllLayout);
 
 	QGroupBox *VLMPanelBox = new QGroupBox(tr("VLM and Panel Methods"));
@@ -174,24 +172,10 @@ void WAdvancedDlg::SetupLayout()
 	MainLayout->addLayout(CommandButtons);
 	setLayout(MainLayout);
 
-	connect(m_pctrlPanelEnable, SIGNAL(clicked()), SLOT(OnPanelEnable()));
 //	connect(m_pctrlResetWake, SIGNAL(clicked()), SLOT(OnResetWake()));
 //	connect(m_pctrlKeepOutOpps, SIGNAL(clicked()), SLOT(OnKeepOutOpps()));
 }
 
-
-void WAdvancedDlg::OnPanelEnable()
-{
-	if(m_pctrlPanelEnable->isChecked())
-	{					  
-		QString strong = tr("Warning: The 3D panel method is not recommended.\nRefer to the guidelines for explanations.\nActivate nonetheless ?");
-		if (QMessageBox::Yes != QMessageBox::question(window(), "Question", strong, QMessageBox::Yes|QMessageBox::No))
-		{
-			m_pctrlPanelEnable->setChecked(false);
-			return;
-		}
-	}
-}
 
 
 void WAdvancedDlg::keyPressEvent(QKeyEvent *event)
@@ -262,7 +246,6 @@ void WAdvancedDlg::OnResetDefaults()
 	m_bResetWake       = true;
 	m_bTrefftz         = true;
 	m_bKeepOutOpps     = false;
-	m_pctrlPanelEnable = false;
 	SetParams();
 }
 
@@ -285,7 +268,6 @@ void WAdvancedDlg::ReadParams()
 	m_bResetWake      = m_pctrlResetWake->isChecked();
 	m_bKeepOutOpps    = m_pctrlKeepOutOpps->isChecked();
 	m_bLogFile        = m_pctrlLogFile->isChecked();
-	m_bPanelEnable    = m_pctrlPanelEnable->isChecked();
 }
 
 
@@ -306,7 +288,6 @@ void WAdvancedDlg::SetParams()
 	m_pctrlResetWake->setChecked(m_bResetWake);
 	m_pctrlLogFile->setChecked(m_bLogFile);
 	m_pctrlKeepOutOpps->setChecked(m_bKeepOutOpps);
-	m_pctrlPanelEnable->setChecked(m_bPanelEnable);
 /*	if(m_bDirichlet) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
 	else			 CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
 

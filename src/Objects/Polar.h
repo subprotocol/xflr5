@@ -52,17 +52,11 @@ private:
 	int m_Style;
 	int m_Width;
     QColor m_Color;
-	// a polar is identified by the name of the Airfoil, and its own
+
     QString m_PlrName;
 
-	//we need to know if user wants it visible	
 	bool m_bIsVisible;
 	bool m_bShowPoints;
-
-	//flap data
-//	bool m_bFlap;
-	// the rest is litterature
-
 
 
 	void AddData(OpPoint* pOpPoint);
@@ -73,7 +67,6 @@ private:
 	CPolar();
 
 	void Serialize(QDataStream &ar, bool bIsStoring);
-//	virtual void Serialize(CArchive &ar);
 
 	void AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 				  double Xtr1, double Xtr2, double HMom, double Cpmn, double Reynolds, double XCp);
@@ -84,15 +77,17 @@ protected:
 	void Insert(int i);
 	double GetCm0();
 	void GetBWStyle(QColor &color, int &style, int &width);
+
 public:
 	double GetZeroLiftAngle();
 	void GetAlphaLimits(double &amin, double &amax);
 	void GetClLimits(double &Clmin, double &Clmax);
 	void GetLinearizedCl(double &Alpha0, double &slope);
 
-	int m_Type;// the Polar format type - used for Serialize action
+	QString m_FoilName;
 	double m_Reynolds;
-    QString m_FoilName;
+	int m_Type;// the Polar format type - used for Serialize action
+
 	QList <double> m_Alpha;
 	QList <double> m_Cl;
 	QList <double> m_XCp;

@@ -161,7 +161,8 @@ private:
 
 	CVector m_Speed[VLMMATSIZE];
 
-	CVector R[5], r0, r1, r2, Psi, t;
+	CVector *m_pR[5];
+	CVector r0, r1, r2, Psi, t;
 	CVector PJK, a, b, s, T1, T2, T, h;
 
 	QString m_strOut;

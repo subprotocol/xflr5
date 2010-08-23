@@ -1137,6 +1137,7 @@ bool PanelAnalysisDlg::ControlLoop()
 
 
 
+
 void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake)
 {
 	// VSAERO theory Manual
@@ -1176,52 +1177,32 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 
 	if(pPanel->m_iPos>=0)
 	{
-		R[0].x = pNode[pPanel->m_iLA].x;
-		R[0].y = pNode[pPanel->m_iLA].y;
-		R[0].z = pNode[pPanel->m_iLA].z;
-		R[1].x = pNode[pPanel->m_iTA].x;
-		R[1].y = pNode[pPanel->m_iTA].y;
-		R[1].z = pNode[pPanel->m_iTA].z;
-		R[2].x = pNode[pPanel->m_iTB].x;
-		R[2].y = pNode[pPanel->m_iTB].y;
-		R[2].z = pNode[pPanel->m_iTB].z;
-		R[3].x = pNode[pPanel->m_iLB].x;
-		R[3].y = pNode[pPanel->m_iLB].y;
-		R[3].z = pNode[pPanel->m_iLB].z;
-		R[4].x = pNode[pPanel->m_iLA].x;
-		R[4].y = pNode[pPanel->m_iLA].y;
-		R[4].z = pNode[pPanel->m_iLA].z;
+		m_pR[0] = pNode + pPanel->m_iLA;
+		m_pR[1] = pNode + pPanel->m_iTA;
+		m_pR[2] = pNode + pPanel->m_iTB;
+		m_pR[3] = pNode + pPanel->m_iLB;
+		m_pR[4] = pNode + pPanel->m_iLA;
 	}
 	else
 	{
-		R[0].x = pNode[pPanel->m_iLB].x;
-		R[0].y = pNode[pPanel->m_iLB].y;
-		R[0].z = pNode[pPanel->m_iLB].z;
-		R[1].x = pNode[pPanel->m_iTB].x;
-		R[1].y = pNode[pPanel->m_iTB].y;
-		R[1].z = pNode[pPanel->m_iTB].z;
-		R[2].x = pNode[pPanel->m_iTA].x;
-		R[2].y = pNode[pPanel->m_iTA].y;
-		R[2].z = pNode[pPanel->m_iTA].z;
-		R[3].x = pNode[pPanel->m_iLA].x;
-		R[3].y = pNode[pPanel->m_iLA].y;
-		R[3].z = pNode[pPanel->m_iLA].z;
-		R[4].x = pNode[pPanel->m_iLB].x;
-		R[4].y = pNode[pPanel->m_iLB].y;
-		R[4].z = pNode[pPanel->m_iLB].z;
+		m_pR[0] = pNode + pPanel->m_iLB;
+		m_pR[1] = pNode + pPanel->m_iTB;
+		m_pR[2] = pNode + pPanel->m_iTA;
+		m_pR[3] = pNode + pPanel->m_iLA;
+		m_pR[4] = pNode + pPanel->m_iLB;
 	}
 
 	for (i=0; i<4; i++)
 	{
-		a.x  = C.x - R[i].x;
-		a.y  = C.y - R[i].y;
-		a.z  = C.z - R[i].z;
-		b.x  = C.x - R[i+1].x;
-		b.y  = C.y - R[i+1].y;
-		b.z  = C.z - R[i+1].z;
-		s.x  = R[i+1].x - R[i].x;
-		s.y  = R[i+1].y - R[i].y;
-		s.z  = R[i+1].z - R[i].z;
+		a.x  = C.x - m_pR[i]->x;
+		a.y  = C.y - m_pR[i]->y;
+		a.z  = C.z - m_pR[i]->z;
+		b.x  = C.x - m_pR[i+1]->x;
+		b.y  = C.y - m_pR[i+1]->y;
+		b.z  = C.z - m_pR[i+1]->z;
+		s.x  = m_pR[i+1]->x - m_pR[i]->x;
+		s.y  = m_pR[i+1]->y - m_pR[i]->y;
+		s.z  = m_pR[i+1]->z - m_pR[i]->z;
 		A    = sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
 		B    = sqrt(b.x*b.x + b.y*b.y + b.z*b.z);
 		SM   = s.x*pPanel->m.x + s.y*pPanel->m.y + s.z*pPanel->m.z;
@@ -1238,7 +1219,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 		h.z =  a.x*s.y - a.y*s.x;
 
 		//first the potential
-		if(R[i].IsSame(R[i+1]))
+		if(m_pR[i]->IsSame(*m_pR[i+1]))
 		{
 			CJKi = 0.0;
 			//no contribution to speed either
@@ -1291,7 +1272,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 		 +(C.y-pPanel->CollPt.y)*(C.y-pPanel->CollPt.y)
 		 +(C.z-pPanel->CollPt.z)*(C.z-pPanel->CollPt.z))<1.e-10)
 	{
-//		if(R[0].IsSame(R[1]) || R[1].IsSame(R[2]) || R[2].IsSame(R[3]) || R[3].IsSame(R[0]))
+//		if(m_R[0]->IsSame(*m_R[1]) || m_R[1]->IsSame(*m_R[2]) || m_R[2]->IsSame(*m_R[3]) || m_R[3]->IsSame(*m_R[0]))
 //			phi = -3.0*pi/2.0;
 //		else
 			phi  = -2.0*PI;
@@ -1824,53 +1805,34 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector 
 
 	if(pPanel->m_iPos>=0)
 	{
-		R[0].x = m_pNode[pPanel->m_iLA].x;
-		R[0].y = m_pNode[pPanel->m_iLA].y;
-		R[0].z = m_pNode[pPanel->m_iLA].z;
-		R[1].x = m_pNode[pPanel->m_iTA].x;
-		R[1].y = m_pNode[pPanel->m_iTA].y;
-		R[1].z = m_pNode[pPanel->m_iTA].z;
-		R[2].x = m_pNode[pPanel->m_iTB].x;
-		R[2].y = m_pNode[pPanel->m_iTB].y;
-		R[2].z = m_pNode[pPanel->m_iTB].z;
-		R[3].x = m_pNode[pPanel->m_iLB].x;
-		R[3].y = m_pNode[pPanel->m_iLB].y;
-		R[3].z = m_pNode[pPanel->m_iLB].z;
-		R[4].x = m_pNode[pPanel->m_iLA].x;	
-		R[4].y = m_pNode[pPanel->m_iLA].y;	
-		R[4].z = m_pNode[pPanel->m_iLA].z;	
+		m_pR[0] = m_pNode + pPanel->m_iLA;
+		m_pR[1] = m_pNode + pPanel->m_iTA;
+		m_pR[2] = m_pNode + pPanel->m_iTB;
+		m_pR[3] = m_pNode + pPanel->m_iLB;
+		m_pR[4] = m_pNode + pPanel->m_iLA;
 	}
-	else{
-		R[0].x = m_pNode[pPanel->m_iLB].x;
-		R[0].y = m_pNode[pPanel->m_iLB].y;
-		R[0].z = m_pNode[pPanel->m_iLB].z;
-		R[1].x = m_pNode[pPanel->m_iTB].x;
-		R[1].y = m_pNode[pPanel->m_iTB].y;
-		R[1].z = m_pNode[pPanel->m_iTB].z;
-		R[2].x = m_pNode[pPanel->m_iTA].x;
-		R[2].y = m_pNode[pPanel->m_iTA].y;
-		R[2].z = m_pNode[pPanel->m_iTA].z;
-		R[3].x = m_pNode[pPanel->m_iLA].x;
-		R[3].y = m_pNode[pPanel->m_iLA].y;
-		R[3].z = m_pNode[pPanel->m_iLA].z;
-		R[4].x = m_pNode[pPanel->m_iLB].x;	
-		R[4].y = m_pNode[pPanel->m_iLB].y;	
-		R[4].z = m_pNode[pPanel->m_iLB].z;	
+	else
+	{
+		m_pR[0] = m_pNode + pPanel->m_iLB;
+		m_pR[1] = m_pNode + pPanel->m_iTB;
+		m_pR[2] = m_pNode + pPanel->m_iTA;
+		m_pR[3] = m_pNode + pPanel->m_iLA;
+		m_pR[4] = m_pNode + pPanel->m_iLB;
 	}
 
 	for (i=0; i<4; i++)
 	{
-		a.x  = C.x - R[i].x;
-		a.y  = C.y - R[i].y;
-		a.z  = C.z - R[i].z;
+		a.x  = C.x - m_pR[i]->x;
+		a.y  = C.y - m_pR[i]->y;
+		a.z  = C.z - m_pR[i]->z;
 
-		b.x  = C.x - R[i+1].x;
-		b.y  = C.y - R[i+1].y;
-		b.z  = C.z - R[i+1].z;
+		b.x  = C.x - m_pR[i+1]->x;
+		b.y  = C.y - m_pR[i+1]->y;
+		b.z  = C.z - m_pR[i+1]->z;
 
-		s.x  = R[i+1].x - R[i].x;
-		s.y  = R[i+1].y - R[i].y;
-		s.z  = R[i+1].z - R[i].z;
+		s.x  = m_pR[i+1]->x - m_pR[i]->x;
+		s.y  = m_pR[i+1]->y - m_pR[i]->y;
+		s.z  = m_pR[i+1]->z - m_pR[i]->z;
 
 		A    = sqrt(a.x*a.x + a.y*a.y + a.z*a.z);
 		B    = sqrt(b.x*b.x + b.y*b.y + b.z*b.z);
@@ -1888,7 +1850,7 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector 
 		h.y = -a.x*s.z + a.z*s.x;
 		h.z =  a.x*s.y - a.y*s.x;
 	
-		if(R[i].IsSame(R[i+1]))
+		if(m_pR[i]->IsSame(*m_pR[i+1]))
 		{
 			//no contribution from this side
 			CJKi = 0.0;
@@ -2890,33 +2852,23 @@ void PanelAnalysisDlg::VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CV
 	V.y = 0.0;
 	V.z = 0.0;
 
-	R[0].x = LB.x;
-	R[0].y = LB.y;
-	R[0].z = LB.z;
-	R[1].x = TB.x;
-	R[1].y = TB.y;
-	R[1].z = TB.z;
-	R[2].x = TA.x;
-	R[2].y = TA.y;
-	R[2].z = TA.z;
-	R[3].x = LA.x;
-	R[3].y = LA.y;
-	R[3].z = LA.z;
-	R[4].x = LB.x;
-	R[4].y = LB.y;
-	R[4].z = LB.z;
+	m_pR[0] = &LB;
+	m_pR[1] = &TB;
+	m_pR[2] = &TA;
+	m_pR[3] = &LA;
+	m_pR[4] = &LB;
 
 	for (i=0; i<4; i++)
 	{
-		r0.x = R[i+1].x - R[i].x;
-		r0.y = R[i+1].y - R[i].y;
-		r0.z = R[i+1].z - R[i].z;
-		r1.x = C.x - R[i].x;
-		r1.y = C.y - R[i].y;
-		r1.z = C.z - R[i].z;
-		r2.x = C.x - R[i+1].x;
-		r2.y = C.y - R[i+1].y;
-		r2.z = C.z - R[i+1].z;
+		r0.x = m_pR[i+1]->x - m_pR[i]->x;
+		r0.y = m_pR[i+1]->y - m_pR[i]->y;
+		r0.z = m_pR[i+1]->z - m_pR[i]->z;
+		r1.x = C.x - m_pR[i]->x;
+		r1.y = C.y - m_pR[i]->y;
+		r1.z = C.z - m_pR[i]->z;
+		r2.x = C.x - m_pR[i+1]->x;
+		r2.y = C.y - m_pR[i+1]->y;
+		r2.z = C.z - m_pR[i+1]->z;
 
 		Psi.x = r1.y*r2.z - r1.z*r2.y;
 		Psi.y =-r1.x*r2.z + r1.z*r2.x;

@@ -1401,6 +1401,11 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 				OnGraphSettings();
 			}
 			break;
+		case Qt::Key_F2:
+		{
+			OnRenameFoil();
+			break;
+		}
 		case Qt::Key_F5:
 			if(!m_bPolar) return;
 			OnOpPoints();
@@ -6586,3 +6591,15 @@ void QXDirect::OnPolarProps()
 	dlg.exec();
 	pMainFrame->m_DlgPos = dlg.pos();
 }
+
+
+
+
+void QXDirect::OnRenameFoil()
+{
+	if(!g_pCurFoil) return;
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->OnRenameCurFoil();
+}
+
+

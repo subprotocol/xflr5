@@ -41,7 +41,6 @@ public:
 private slots:
 	void OnOK();
 	void OnResetDefaults();
-	void OnPanelEnable();
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -54,7 +53,6 @@ private:
 	QCheckBox *m_pctrlLogFile;
 	QCheckBox *m_pctrlResetWake;
 	QCheckBox *m_pctrlKeepOutOpps;
-	QCheckBox *m_pctrlPanelEnable;
 	FloatEdit *m_pctrlInterNodes;
 	FloatEdit *m_pctrlRelax;
 	FloatEdit *m_pctrlAlphaPrec;
@@ -71,7 +69,6 @@ private:
 	bool m_bTrefftz;
 	bool m_bKeepOutOpps;
 	bool m_bResetWake;
-	bool m_bPanelEnable;
 
 	int m_Iter;
 	int m_NStation;
