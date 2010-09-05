@@ -176,7 +176,7 @@ void StabViewDlg::FillEigenThings()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	FillControlNames();
-	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_AnalysisType==4)
+	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_AnalysisMethod==4)
 	{
 		complex<double> c;
 		double OmegaN, Omega1, Dsi, Sigma1;
@@ -1065,7 +1065,6 @@ void StabViewDlg::OnDeleteCurve()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	if(!m_pCurve) return;
 	QString CurveTitle = m_pCurve->GetTitle();
-	qDebug() << "OK0";
 	pMiarex->m_TimeGraph1.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph2.DeleteCurve(CurveTitle);
 	pMiarex->m_TimeGraph3.DeleteCurve(CurveTitle);

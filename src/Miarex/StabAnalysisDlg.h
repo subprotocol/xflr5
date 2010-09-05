@@ -101,14 +101,14 @@ private:
 
 	QFile *m_pXFile;
 
-	int m_Index[VLMMATSIZE];
+	int m_Index[VLMMAXMATSIZE];
 	double *m_RHS;
 	double *m_aij, *m_aijRef;
 	double *m_Gamma;
-	double m_uRHS[VLMMATSIZE], m_vRHS[VLMMATSIZE], m_wRHS[VLMMATSIZE];
-	double m_pRHS[VLMMATSIZE], m_qRHS[VLMMATSIZE], m_rRHS[VLMMATSIZE];
-	double m_cRHS[VLMMATSIZE];
-	double m_Cp[VLMMATSIZE];//lift coef per panel
+	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
+	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
+	double m_cRHS[VLMMAXMATSIZE];
+	double m_Cp[VLMMAXMATSIZE];//lift coef per panel
 
 	double m_AlphaEq, m_Ctrl;
 
@@ -133,6 +133,7 @@ private:
 	CVector *m_pMemNode;    // a copy of the reference node array for tilted calcs
 
 	CPlane *m_pPlane;
+	CWing *m_pWingList[4];
 	CWing  *m_pWing;
 	CWing  *m_pWing2;//pointer to the second wing if Biplane
 	CWing  *m_pStab;

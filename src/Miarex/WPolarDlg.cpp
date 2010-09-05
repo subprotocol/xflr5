@@ -45,7 +45,6 @@ WPolarDlg::WPolarDlg()
 	
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 1.0;
-//	m_XCmRef     = 0.0;
 	m_Alpha      = 0.0;
 	m_Beta       = 0.0;
 	m_Type       = 1;
@@ -57,7 +56,7 @@ WPolarDlg::WPolarDlg()
 	m_pPlane     = NULL;
 
 	m_CoG.Set(0.0,0.0,0.0);
-	m_AnalysisType = 1;
+	m_AnalysisMethod = 1;
 
 	m_bVLM1         = true;
 	m_bThinSurfaces = true;
@@ -176,7 +175,7 @@ void WPolarDlg::InitDialog()
 
 	if(m_pPlane)
 	{
-		if(m_AnalysisType==0 || m_AnalysisType==1) m_AnalysisType=2;
+		if(m_AnalysisMethod==0 || m_AnalysisMethod==1) m_AnalysisMethod=2;
 		m_pctrlMethod1->setEnabled(false);
 	}
 
@@ -249,7 +248,7 @@ void WPolarDlg::InitDialog()
 	if(bWarning)
 	{
 		m_pctrlMethod4->setEnabled(false);
-		if(m_AnalysisType==3) m_AnalysisType=2;
+		if(m_AnalysisMethod==3) m_AnalysisMethod=2;
 	}
 
 	if(m_bViscous)		m_pctrlViscous->setChecked(true);
@@ -258,8 +257,8 @@ void WPolarDlg::InitDialog()
 
 	OnTiltedGeom();
 
-	if(m_AnalysisType==0) m_AnalysisType=2;//former m_bLLT=false;
-	if(m_AnalysisType==1)
+	if(m_AnalysisMethod==0) m_AnalysisMethod=2;//former m_bLLT=false;
+	if(m_AnalysisMethod==1)
 	{
 		m_pctrlMethod1->setChecked(true);
 		m_pctrlViscous->setChecked(true);
@@ -267,7 +266,7 @@ void WPolarDlg::InitDialog()
 		m_pctrlWakeRollUp->setChecked(false);
 		m_pctrlWakeParams->setEnabled(false);
 	}
-	else if(m_AnalysisType==2)
+	else if(m_AnalysisMethod==2)
 	{
 		m_pctrlWakeRollUp->setEnabled(false);
 		m_pctrlWakeParams->setEnabled(false);
@@ -276,7 +275,7 @@ void WPolarDlg::InitDialog()
 		else        m_pctrlMethod3->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
-	else if(m_AnalysisType==3)
+	else if(m_AnalysisMethod==3)
 	{
 		m_pctrlWakeRollUp->setEnabled(true);
 		m_pctrlWakeParams->setEnabled(true);
@@ -285,9 +284,9 @@ void WPolarDlg::InitDialog()
 		m_pctrlViscous->setEnabled(true);
 	}
 
+	m_pctrlWakeParams->setEnabled(false);
+	m_pctrlWakeRollUp->setEnabled(false);
 
-//	m_pctrlWakeParams->setEnabled(false);
-//	m_pctrlWakeRollUp->setEnabled(false);
 	m_bWakeRollUp = false;
 
 	if(m_RefAreaType==1)
@@ -415,7 +414,7 @@ void WPolarDlg::OnMethod()
 		m_bThinSurfaces = true;
 		m_bWakeRollUp   = false;
 		m_bTiltedGeom   = false;
-		m_AnalysisType  = 1;
+		m_AnalysisMethod  = 1;
 		m_pctrlWakeRollUp->setChecked(false);
 		m_pctrlTiltGeom->setChecked(false);
 		m_pctrlTiltGeom->setEnabled(false);
@@ -431,7 +430,7 @@ void WPolarDlg::OnMethod()
 	else if (m_pctrlMethod2->isChecked() || m_pctrlMethod3->isChecked())
 	{
 		m_bThinSurfaces = true;
-		m_AnalysisType=2;
+		m_AnalysisMethod=2;
 		m_pctrlTiltGeom->setEnabled(true);
 		m_pctrlBeta->setEnabled(true);
 		m_pctrlWakeRollUp->setEnabled(false);
@@ -442,7 +441,7 @@ void WPolarDlg::OnMethod()
 	}
 	else if (m_pctrlMethod4->isChecked())
 	{
-		m_AnalysisType=3;
+		m_AnalysisMethod=3;
 		m_pctrlTiltGeom->setEnabled(true);
 		m_bThinSurfaces = false;
 		m_pctrlBeta->setEnabled(true);
@@ -486,11 +485,14 @@ void WPolarDlg::OnOK()
 		}
 	}
 /* TODO : restore
-	if(!m_bWakeRollUp && m_AnalysisType==3)
+	if(!m_bWakeRollUp && m_AnalysisMethod==3)
 	{
 		m_TotalWakeLength = 100.0;
 		m_NXWakePanels    = 1;
 	}*/
+
+	if(m_pPlane && m_AnalysisMethod==3) m_bThinSurfaces = true;
+
 	accept();
 }
 
@@ -612,11 +614,6 @@ void WPolarDlg::SetDensity()
 
 void WPolarDlg::SetupLayout()
 {
-//	QDesktopWidget desktop;
-//	QRect r = desktop.geometry();
-//	setMinimumHeight(r.height()/3);
-//	move(r.width()/3, r.height()/6);
-	
 	QFont SymbolFont("Symbol");
 
 	QVBoxLayout *NameLayout = new QVBoxLayout;
@@ -844,15 +841,15 @@ void WPolarDlg::SetWPolarName()
 		m_WPolarName = QString(QString::fromUtf8("T4-%1°")).arg(m_Alpha,0,'f',3);
 	}
 
-	if(m_AnalysisType==1) m_WPolarName += "-LLT";
-	else if(m_AnalysisType==2)
+	if(m_AnalysisMethod==LLTMETHOD) m_WPolarName += "-LLT";
+	else if(m_AnalysisMethod==VLMMETHOD)
 	{
 		if(m_bVLM1)	m_WPolarName += "-VLM1";
 		else		m_WPolarName += "-VLM2";
 	}
-	else if(m_AnalysisType==3) m_WPolarName += "-Panel";
+	else if(m_AnalysisMethod==PANELMETHOD) m_WPolarName += "-Panel";
 
-/*	if(m_bThinSurfaces && m_AnalysisType==3)
+/*	if(m_bThinSurfaces && m_AnalysisMethod==3)
 	{
 		m_WPolarName += "-Thin";
 	}*/
@@ -889,7 +886,7 @@ void WPolarDlg::SetWPolarName()
 		strong = QString("%1").arg(m_Height,0,'f',2),
 		m_WPolarName += "-G"+strong;
 	}
-	if(m_AnalysisType!=1 && m_RefAreaType==2) m_WPolarName += "-proj_area";
+	if(m_AnalysisMethod!=1 && m_RefAreaType==2) m_WPolarName += "-proj_area";
 
 	m_pctrlWPolarName->setText(m_WPolarName);
 }

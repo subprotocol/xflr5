@@ -386,7 +386,7 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 	double color;
 	double lmin, lmax, range;
 	double *tab;
-	double CpInf[2*VLMMATSIZE], CpSup[2*VLMMATSIZE], Cp100[2*VLMMATSIZE];
+	double CpInf[2*VLMMAXMATSIZE], CpSup[2*VLMMAXMATSIZE], Cp100[2*VLMMAXMATSIZE];
 	CVector LA,LB,TA,TB;
 
 	glNewList(PANELCP, GL_COMPILE);
@@ -659,7 +659,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisType==1)
+			if(pWOpp->m_AnalysisMethod==1)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -816,7 +816,7 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisType==1)
+			if(pWOpp->m_AnalysisMethod==1)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -1499,7 +1499,7 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisType==1)
+			if(pWOpp->m_AnalysisMethod==1)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -1611,7 +1611,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
-	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisType==1)
+	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==1)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
 		pMiarex->m_GLList++;
@@ -1760,9 +1760,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 								for (i=1; i< p3DScales->m_NX ;i++)
 								{
-									if(pWPolar->m_AnalysisType==2 )     pMiarex->m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
-									else if(pWPolar->m_AnalysisType==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(C, Gamma);
-									else if(pWPolar->m_AnalysisType==3) pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
+									if(pWPolar->m_AnalysisMethod==2 )     pMiarex->m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
+									else if(pWPolar->m_AnalysisMethod==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(C, Gamma);
+									else if(pWPolar->m_AnalysisMethod==3) pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
 
 									VT += VInf;
 									VT.Normalize();
@@ -1790,9 +1790,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 							for (i=1; i< p3DScales->m_NX ;i++)
 							{
-								if(pWPolar->m_AnalysisType==2)      pMiarex->m_pVLMDlg->GetSpeedVector(D, Gamma, VT);
-								else if(pWPolar->m_AnalysisType==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(D, Gamma);
-								else if(pWPolar->m_AnalysisType==3) pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
+								if(pWPolar->m_AnalysisMethod==2)      pMiarex->m_pVLMDlg->GetSpeedVector(D, Gamma, VT);
+								else if(pWPolar->m_AnalysisMethod==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(D, Gamma);
+								else if(pWPolar->m_AnalysisMethod==3) pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
 
 								VT += VInf;
 								VT.Normalize();
@@ -1822,9 +1822,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
 
-	if(!pWOpp || pWOpp->m_AnalysisType==1)
+	if(!pWOpp || pWOpp->m_AnalysisMethod==1)
 	{
 		glNewList(SURFACESPEEDS, GL_COMPILE);
 		pMiarex->m_GLList++;
@@ -1833,6 +1833,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 	}
 	
 	ProgressDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setModal(true);
 	dlg.SetValue(0);
@@ -1890,7 +1891,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 			{
 				VT.Set(pWOpp->m_QInf,0.0,0.0);
 
-				if(pWPolar->m_AnalysisType==2)
+				if(pWPolar->m_AnalysisMethod==2)
 				{
 					C.Copy(pPanel[p].CtrlPt);
 					pMiarex->m_pVLMDlg->GetSpeedVector(C, Gamma, V);
@@ -1901,10 +1902,12 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 						//Tilt the geometry w.r.t. sideslip
 //						C.RotateZ(RefPoint, -pWOpp->m_Beta);
 				}
-				else if(pWPolar->m_AnalysisType==3)
+				else if(pWPolar->m_AnalysisMethod==3)
 				{
-					C.Copy(pPanel[p].CollPt);
+					if(pPanel[p].m_iPos==0) C.Copy(pPanel[p].CtrlPt);
+					else                    C.Copy(pPanel[p].CollPt);
 					pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
+
 					VT += V;
 					VT *= pMiarex->m_VelocityScale/100.0;
 //					if(!pWPolar->m_bTiltedGeom)
@@ -2002,7 +2005,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 		glLineWidth((GLfloat)pMiarex->m_XTopWidth);
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisType==1)
+			if(pWOpp->m_AnalysisMethod==1)
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -2082,7 +2085,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 		glLineWidth((GLfloat)pMiarex->m_XBotWidth);
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisType==1)
+			if(pWOpp->m_AnalysisMethod==1)
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -2380,7 +2383,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 
-	if(!pWing || !pWOpp || pWOpp->m_AnalysisType!=4 ) 
+	if(!pWing || !pWOpp || pWOpp->m_AnalysisMethod!=4 )
 	{
 		glNewList(MODELEGEND,GL_COMPILE);
 		{}

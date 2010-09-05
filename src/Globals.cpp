@@ -1,4 +1,4 @@
-﻿/****************************************************************************
+/****************************************************************************
 
 	Globals Class
 	Copyright (C) 2008-2010 Andre Deperrois xflr5@yahoo.com
@@ -1265,7 +1265,7 @@ void ReadValues(QString line, int &res, double &x, double &y, double &z)
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
 
-bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel)
+bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *pbCancel, double TaskSize, double &Progress)
 {
 	int i, j, k;
 	double *p_k, *p_row, *p_col;
@@ -1313,6 +1313,7 @@ bool Crout_LU_Decomposition_with_Pivoting(double *A, int pivot[], int n, bool *p
 		for (i = k+1, p_row = p_k + n; i < n; p_row += n, i++)
 			for (j = k+1; j < n; j++) *(p_row + j) -= *(p_row + k) * *(p_k + j);
 
+		Progress += TaskSize/(double)(n);
 		qApp->processEvents();
 		if(*pbCancel) return false;		
 	}

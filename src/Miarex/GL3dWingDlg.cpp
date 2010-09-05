@@ -147,7 +147,7 @@ bool GL3dWingDlg::CheckWing()
 		}
 	}
 
-	if(VLMGetPanelTotal()>VLMMATSIZE/2)
+	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
@@ -2745,10 +2745,12 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
 	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
-	QLabel *lab15 = new QLabel(tr("Max is 1000"));
+	QString strong = QString("%1").arg(VLMMAXMATSIZE/2);
+	QLabel *lab15 = new QLabel(tr("Max is ")+strong);
 	lab13->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab15 ,13,3);
-	QLabel *lab16 = new QLabel(tr("Max is 2000"));
+	strong = QString("%1").arg(VLMMAXMATSIZE);
+	QLabel *lab16 = new QLabel(tr("Max is ")+strong);
 	lab15->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab16, 14, 3);
 
@@ -2993,7 +2995,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 	if(!total)
 	{
-		size = (int)(VLMMATSIZE/4);//why not ? Too much refinement isn't worthwile
+		size = (int)(2000/4);//why not ? Too much refinement isn't worthwile
 		NYTotal = 22;
 	}
 	else
@@ -3021,7 +3023,7 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 		if(m_pWing->m_NXPanels[i]==0) m_pWing->m_NXPanels[i] = 1;
 	}
 
-	if(VLMGetPanelTotal()>VLMMATSIZE/2)
+	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Too many panels\nReduce the mesh size"));
 		return false;
@@ -3046,7 +3048,6 @@ void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 	}
 
 	UpdateView();
-
 }
 
 

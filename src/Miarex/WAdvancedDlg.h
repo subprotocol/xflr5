@@ -24,6 +24,7 @@
 
 #include <QDialog>
 #include <QCheckBox>
+#include <QRadioButton>
 #include <QPushButton>
 #include <QLabel>
 #include "../Misc/FloatEdit.h"
@@ -53,6 +54,7 @@ private:
 	QCheckBox *m_pctrlLogFile;
 	QCheckBox *m_pctrlResetWake;
 	QCheckBox *m_pctrlKeepOutOpps;
+	QRadioButton *m_pctrlDirichlet, *m_pCtrlNeumann;
 	FloatEdit *m_pctrlInterNodes;
 	FloatEdit *m_pctrlRelax;
 	FloatEdit *m_pctrlAlphaPrec;

@@ -69,9 +69,9 @@ private:
 	QColor m_Color;
 
 public:
-	double m_G[VLMMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
-	double m_Sigma[VLMMATSIZE];		// the panel's source strengths
-	double m_Cp[VLMMATSIZE];	// the Cp array
+	double m_G[VLMMAXMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
+	double m_Sigma[VLMMAXMATSIZE];		// the panel's source strengths
+	double m_Cp[VLMMAXMATSIZE];	// the Cp array
 	int m_NPanels;		// the number of VLM or 3D-panels
 };
 #endif

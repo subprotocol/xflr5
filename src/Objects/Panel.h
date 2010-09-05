@@ -55,7 +55,6 @@ public:
 protected:	
 	bool m_bIsInSymPlane;
 	bool m_bIsWakePanel;
-//	bool m_bIsThinSurface;
 
 	int m_iElement; // panel identification number ; used when panel array is re-arranged in non sequential order
 	int m_iPL, m_iPR, m_iPU, m_iPD;//Panels left, rigth; upstream, downstream

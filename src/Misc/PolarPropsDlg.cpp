@@ -169,12 +169,12 @@ void PolarPropsDlg::InitDialog()
 		strange += strong +QString::fromUtf8("°")+"\n";
 
 		strange += tr("Analysis method")+" = ";
-		if(m_pWPolar->m_AnalysisType==1) strange +="LLT\n";
-		else if(m_pWPolar->m_AnalysisType==2 && m_pWPolar->m_bVLM1)  strange +="VLM1\n";
-		else if(m_pWPolar->m_AnalysisType==2 && !m_pWPolar->m_bVLM1) strange +="VLM2\n";
-		else if(m_pWPolar->m_AnalysisType==3) strange +="3D-Panels\n";
-		else if(m_pWPolar->m_AnalysisType==4) strange +="VLM1\n";
-		else                                  strange +="\n";
+		if(m_pWPolar->m_AnalysisMethod==1) strange +="LLT\n";
+		else if(m_pWPolar->m_AnalysisMethod==2 && m_pWPolar->m_bVLM1)  strange +="VLM1\n";
+		else if(m_pWPolar->m_AnalysisMethod==2 && !m_pWPolar->m_bVLM1) strange +="VLM2\n";
+		else if(m_pWPolar->m_AnalysisMethod==3) strange +="3D-Panels\n";
+		else if(m_pWPolar->m_AnalysisMethod==4) strange +="VLM1\n";
+		else                                    strange +="\n";
 
 		if(m_pWPolar->m_bViscous) strange += tr("Viscous analysis")+"\n";
 		else                      strange += tr("Inviscid analysis")+"\n";

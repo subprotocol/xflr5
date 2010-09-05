@@ -491,7 +491,7 @@ void MainFrame::CreateActions()
 	saveOptionsAct->setStatusTip(tr("Define the save options for operating points"));
 	connect(saveOptionsAct, SIGNAL(triggered()), this, SLOT(OnSaveOptions()));
 
-	unitsAct = new QAction(tr("Define units..."), this);
+	unitsAct = new QAction(tr("Units..."), this);
 	unitsAct->setStatusTip(tr("Define the units for this project"));
 	connect(unitsAct, SIGNAL(triggered()), this, SLOT(OnUnits()));
 
@@ -706,8 +706,6 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(AFoilLECircle);
 	AFoilViewMenu->addAction(AFoilGridAct);
 	AFoilViewMenu->addSeparator();
-	AFoilViewMenu->addAction(restoreToolbarsAct);
-	AFoilViewMenu->addAction(styleAct);
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
 	AFoilDesignMenu = menuBar()->addMenu(tr("F&oil"));
@@ -1012,23 +1010,30 @@ void MainFrame::CreateMenus()
 	fileMenu->addSeparator();
 	fileMenu->addAction(saveAct);
 	fileMenu->addAction(saveProjectAsAct);
-	fileMenu->addAction(saveOptionsAct);
 	fileMenu->addSeparator();
 	fileMenu->addAction(OnAFoilAct);
 	fileMenu->addAction(OnXInverseAct);
 	fileMenu->addAction(OnXDirectAct);
 	fileMenu->addAction(OnMiarexAct);
 	separatorAct = fileMenu->addSeparator();
-	fileMenu->addAction(languageAct);
-	fileMenu->addAction(unitsAct);
-	separatorAct = fileMenu->addSeparator();
-	fileMenu->addAction(resetSettingsAct);
-	separatorAct = fileMenu->addSeparator();
 	for (int i = 0; i < MAXRECENTFILES; ++i)
 		fileMenu->addAction(recentFileActs[i]);
 	fileMenu->addSeparator();
 	fileMenu->addAction(exitAct);
 	updateRecentFileActions();
+
+	optionsMenu = menuBar()->addMenu(tr("Options"));
+	optionsMenu->addSeparator();
+	optionsMenu->addAction(languageAct);
+	optionsMenu->addSeparator();
+	optionsMenu->addAction(unitsAct);
+	optionsMenu->addSeparator();
+	optionsMenu->addAction(styleAct);
+	optionsMenu->addSeparator();
+	optionsMenu->addAction(saveOptionsAct);
+	optionsMenu->addSeparator();
+	optionsMenu->addAction(restoreToolbarsAct);
+	optionsMenu->addAction(resetSettingsAct);
 
 	helpMenu = menuBar()->addMenu(tr("&?"));
 	helpMenu->addAction(guidelinesAct);
@@ -1388,8 +1393,6 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addAction(W3DScalesAct);
 	MiarexViewMenu->addAction(W3DLightAct);
 	MiarexViewMenu->addSeparator();
-	MiarexViewMenu->addAction(restoreToolbarsAct);
-	MiarexViewMenu->addAction(styleAct);
 	MiarexViewMenu->addAction(saveViewToImageFileAct);
 
 
@@ -1420,7 +1423,7 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addSeparator();
 	currentUFOMenu->addAction(resetWingScale);
 
-	MiarexBodyMenu = menuBar()->addMenu(tr("Body"));
+	MiarexBodyMenu = menuBar()->addMenu(tr("&Body"));
 	MiarexBodyMenu->addAction(defineBody);
 	MiarexBodyMenu->addAction(importBody);
 	CurBodyMenu = MiarexBodyMenu->addMenu(tr("Current Body"));
@@ -1487,6 +1490,11 @@ void MainFrame::CreateMiarexMenus()
 	WOppCurGraphMenu->addAction(MiarexGraphDlg);
 	WOppCurGraphMenu->addAction(exportCurGraphAct);
 
+	MiarexAnalysisMenu  = menuBar()->addMenu(tr("&Analysis"));
+	MiarexAnalysisMenu->addAction(viewLogFile);
+	MiarexAnalysisMenu->addAction(advancedSettings);
+
+
 	WOppGraphMenu = MiarexWOppMenu->addMenu(tr("Graphs"));
 	WOppGraphMenu->addAction(Graph1);
 	WOppGraphMenu->addAction(Graph2);
@@ -1500,9 +1508,6 @@ void MainFrame::CreateMiarexMenus()
 	WOppGraphMenu->addAction(allWingGraphsScalesAct);
 	WOppGraphMenu->addAction(resetWOppLegend);
 
-	MiarexWOppMenu->addSeparator();
-	MiarexWOppMenu->addAction(advancedSettings);
-	MiarexWOppMenu->addAction(viewLogFile);
 
 	//WOpp View Context Menu
 	WOppCtxMenu = new QMenu(tr("Context Menu"),this);
@@ -1531,7 +1536,6 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addAction(resetWingScale);
 	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addAction(advancedSettings);
 	WOppCtxMenu->addAction(viewLogFile);
 	WOppCtxMenu->addAction(saveViewToImageFileAct);
 
@@ -1553,7 +1557,6 @@ void MainFrame::CreateMiarexMenus()
 	WTimeCtxMenu->addMenu(WOppCurGraphMenu);
 	WTimeCtxMenu->addMenu(WOppGraphMenu);
 	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addAction(advancedSettings);
 	WTimeCtxMenu->addAction(viewLogFile);
 	WTimeCtxMenu->addAction(saveViewToImageFileAct);
 
@@ -1575,7 +1578,6 @@ void MainFrame::CreateMiarexMenus()
 	WPlrCtxMenu->addAction(hideAllWPlrs);
 	WPlrCtxMenu->addAction(showAllWPlrs);
 	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addAction(advancedSettings);
 	WPlrCtxMenu->addAction(viewLogFile);
 	WPlrCtxMenu->addAction(saveViewToImageFileAct);
 
@@ -1591,7 +1593,6 @@ void MainFrame::CreateMiarexMenus()
 	W3DStabCtxMenu->addSeparator();
 	W3DStabCtxMenu->addAction(W3DLightAct);
 	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addAction(advancedSettings);
 	W3DStabCtxMenu->addAction(viewLogFile);
 	W3DStabCtxMenu->addAction(saveViewToImageFileAct);
 
@@ -1610,7 +1611,6 @@ void MainFrame::CreateMiarexMenus()
 	W3DCtxMenu->addAction(W3DScalesAct);
 	W3DCtxMenu->addAction(W3DLightAct);
 	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addAction(advancedSettings);
 	W3DCtxMenu->addAction(viewLogFile);
 	W3DCtxMenu->addAction(saveViewToImageFileAct);
 }
@@ -2026,8 +2026,6 @@ void MainFrame::CreateXDirectMenus()
 	XDirectViewMenu->addAction(OpPointsAct);
 	XDirectViewMenu->addAction(PolarsAct);
 	XDirectViewMenu->addSeparator();
-	XDirectViewMenu->addAction(restoreToolbarsAct);
-	XDirectViewMenu->addAction(styleAct);
 	XDirectViewMenu->addAction(saveViewToImageFileAct);
 
 	FoilMenu = menuBar()->addMenu(tr("&Foil"));
@@ -2136,11 +2134,11 @@ void MainFrame::CreateXDirectMenus()
 	OpPointMenu->addAction(showCurOppOnly);
 	OpPointMenu->addAction(hideAllOpPoints);
 	OpPointMenu->addAction(showAllOpPoints);
-	OpPointMenu->addSeparator();
-	OpPointMenu->addAction(resetXFoil);
-	OpPointMenu->addAction(viewXFoilAdvanced);
-	OpPointMenu->addAction(viewLogFile);
 
+	XFoilAnalysisMenu = menuBar()->addMenu(tr("Analysis"));
+	XFoilAnalysisMenu->addAction(resetXFoil);
+	XFoilAnalysisMenu->addAction(viewXFoilAdvanced);
+	XFoilAnalysisMenu->addAction(viewLogFile);
 
 	//XDirect foil Context Menu
 	OperFoilCtxMenu = new QMenu(tr("Context Menu"),this);
@@ -2273,8 +2271,6 @@ void MainFrame::CreateXInverseMenus()
 	XInverseViewMenu->addAction(InverseStyles);
 	XInverseViewMenu->addAction(XInverseGraphDlg);
 	XInverseViewMenu->addSeparator();
-	XInverseViewMenu->addAction(restoreToolbarsAct);
-	XInverseViewMenu->addAction(styleAct);
 	XInverseViewMenu->addAction(saveViewToImageFileAct);
 
 	InverseGraphMenu = menuBar()->addMenu(tr("&Graph"));
@@ -3441,7 +3437,6 @@ void MainFrame::OnExportCurGraph()
 	}
 	if(!pGraph) return;
 
-	QFile DestFile;
 	QString FileName;
 
 	pGraph->GetGraphName(FileName);
@@ -3971,7 +3966,7 @@ void MainFrame::OnSaveViewToImageFile()
 	}
 	else if(Filter == "JPEG (*.jpg)")
 	{
-		if(FileName.right(4)!=".jpg") FileName+= ".jpg";
+		if(FileName.right(4)!=".jpg") FileName+= ".jpeg";
 		m_ImageFormat = 1;
 	}
 	else if(Filter == "Portable Network Graphics (*.png)")
@@ -3979,7 +3974,6 @@ void MainFrame::OnSaveViewToImageFile()
 		if(FileName.right(4)!=".png") FileName+= ".png";
 		m_ImageFormat = 2;
 	}
-
 
 	switch(m_iApp)
 	{
@@ -4795,7 +4789,7 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 
 bool MainFrame::SaveProject(QString PathName)
 {
-	QString Filter = "XFLR5 v6.00 Project File (*.wpa)";
+	QString Filter = "XFLR5 v6 Project File (*.wpa)";
 	QString FileName = m_ProjectName;
 	int Format = 6;
 
@@ -4804,19 +4798,22 @@ bool MainFrame::SaveProject(QString PathName)
 		if(FileName.right(1)=="*") 	FileName = FileName.left(FileName.length()-1);
 		FileName.replace("/", " ");
 
+
 		PathName = QFileDialog::getSaveFileName(this, tr("Save the Project File"),
 												m_LastDirName+"/"+FileName,
-												tr("XFLR5 v6.00 Project File (*.wpa);;XFLR5 v5.00 Project File (*.wpa)"),
+												tr("XFLR5 v6 Project File (*.wpa);;XFLR5 v5 Project File (*.*)"),
 												&Filter);
+
 		if(!PathName.length()) return false;//nothing more to do
 		int pos = PathName.indexOf(".wpa", Qt::CaseInsensitive);
 		if(pos<0) PathName += ".wpa";
 		pos = PathName.lastIndexOf("/");
 		if(pos>0) m_LastDirName = PathName.left(pos);
 	}
-
-	if(Filter=="XFLR5 v5.00 Project File (*.wpa)")      Format = 5;// readable by XFLR5 v4
-	else if(Filter=="XFLR5 v6.00 Project File (*.wpa)") Format = 6;// foil, wing and plane descriptions shall be saved
+//	int x = QString::compare(Filter, "XFLR5 v5 Project File (*.wpa)", Qt::CaseInsensitive);
+//	x = QString::compare(Filter, "XFLR5 v6 Project File (*.wpa)", Qt::CaseInsensitive);
+	if(Filter=="XFLR5 v5 Project File (*.*)")       Format = 5;
+	else if(Filter=="XFLR5 v6 Project File (*.wpa") Format = 6;
 
 	QFile fp(PathName);
 
@@ -5087,7 +5084,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 	ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
 	ar << (float)pMiarex->m_WngAnalysis.m_Beta;
-	ar << pMiarex->m_WngAnalysis.m_AnalysisType;
+	ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
 
 	if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
 	else								  ar << 0;
@@ -5347,12 +5344,12 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
 		ar << (float)pMiarex->m_WngAnalysis.m_Beta;
-		ar << pMiarex->m_WngAnalysis.m_AnalysisType;
+		ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
 
 		if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
-		else								  ar << 0;
+		else                                  ar << 0;
 //		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
-		ar <<1;
+		ar <<123;
 		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
 		else                                      ar << 0;
 		if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
@@ -5475,7 +5472,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				{
 					ar >>f; pMiarex->m_WngAnalysis.m_Beta=f;
 				}
-				ar >> pMiarex->m_WngAnalysis.m_AnalysisType;
+				ar >> pMiarex->m_WngAnalysis.m_AnalysisMethod;
 			}
 			if(ArchiveFormat>=100006)
 			{
@@ -5538,7 +5535,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				QApplication::restoreOverrideCursor();
 				return false;
 			}
-			if(!pWPolar->m_AnalysisType==1 && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
+			if(!pWPolar->m_AnalysisMethod==1 && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
 
 			pWPolar = pMiarex->AddWPolar(pWPolar);
 		}
@@ -5571,7 +5568,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				return false;
 			}
 
-			if(pWOpp->m_AnalysisType==1 || ArchiveFormat >=100006)//former VLM version was flawed
+			if(pWOpp->m_AnalysisMethod==1 || ArchiveFormat >=100006)//former VLM version was flawed
 				pMiarex->InsertWOpp(pWOpp);
 
 			else delete pWOpp;
@@ -5676,7 +5673,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 						QApplication::restoreOverrideCursor();
 						return false;
 					}
-					if(!pWPolar->m_AnalysisType==1 && ArchiveFormat <100003)
+					if(!pWPolar->m_AnalysisMethod==1 && ArchiveFormat <100003)
 						pWPolar->ResetWPlr();
 					pMiarex->AddWPolar(pWPolar);
 				}
@@ -5735,6 +5732,7 @@ void MainFrame::SetMenus()
 	{
 		menuBar()->clear();
 		menuBar()->addMenu(fileMenu);
+		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp==XFOILANALYSIS)
@@ -5746,6 +5744,8 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(DesignMenu);
 		menuBar()->addMenu(PolarMenu);
 		menuBar()->addMenu(OpPointMenu);
+		menuBar()->addMenu(XFoilAnalysisMenu);
+		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp==INVERSEDESIGN)
@@ -5754,6 +5754,7 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(fileMenu);
 		menuBar()->addMenu(XInverseViewMenu);
 		menuBar()->addMenu(InverseFoilMenu);
+		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp==DIRECTDESIGN)
@@ -5763,6 +5764,7 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(AFoilViewMenu);
 		menuBar()->addMenu(AFoilDesignMenu);
 		menuBar()->addMenu(AFoilSplineMenu);
+		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 	else if(m_iApp== MIAREX)
@@ -5775,6 +5777,8 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(MiarexBodyMenu);
 		menuBar()->addMenu(MiarexWPlrMenu);
 		menuBar()->addMenu(MiarexWOppMenu);
+		menuBar()->addMenu(MiarexAnalysisMenu);
+		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
 }

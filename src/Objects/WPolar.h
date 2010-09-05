@@ -145,7 +145,7 @@ private:
 	bool   m_bActiveControl[4*MAXCONTROLS];
 
 public:
-	int m_AnalysisType;
+	int m_AnalysisMethod;
 	double m_Beta;
 	double m_Density  ;
 	double m_WArea;//for lift and drag calculations

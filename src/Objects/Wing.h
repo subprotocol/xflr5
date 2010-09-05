@@ -63,14 +63,16 @@ protected:
 
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
-	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
-	void VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-						double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, CVector &CoG, bool bViscous, bool bTilted);
 
-	void PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-						  double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm, bool bViscous, bool bThinSurface, bool bTilted);
+	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
+
 	void PanelTrefftz(double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
-	void PanelSetBending();
+	void PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
+						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
+						 bool bViscous, bool bThinSurface);
+
+	void PanelComputeViscous(double QInf, double &WingVDrag, QString &OutString);
+	void PanelSetBending(bool bThinSurface);
 
 	void VLMCubicSplines(double *Gamma);
 	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);

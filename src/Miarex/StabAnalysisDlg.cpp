@@ -470,10 +470,10 @@ void StabAnalysisDlg::ComputeResults()
 	// Calculates the various wing coefficients at each span station
 
 	static int pos, Station;
-	static double Lift, IDrag, VDrag, WingIDrag,XCP, YCP, qdyn;
+	static double Lift, IDrag, VDrag, XCP, YCP, qdyn, WingIDrag, WingVDrag;
 	static double cosa, sina;
 	static CVector Force, WindNormal, WindDirection, WindSide;
-	QString strange;
+	QString strange, OutString;
 
 	CWing::s_bTrace   = false;
 	CWing::s_bVLM1    = m_pWPolar->m_bVLM1;
@@ -517,89 +517,55 @@ void StabAnalysisDlg::ComputeResults()
 	m_GRm                 = 0.0;
 	m_GCm = m_VCm = m_ICm = 0.0;
 	m_GYm = m_VYm = m_IYm = 0.0;
-	AddString("         Calculating main wing...\n");
 
-	m_pWing->VLMTrefftz(m_Gamma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
-	m_pWing->VLMComputeWing(m_Gamma, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-							m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
+	pos = 0;
+	Station = 0;
+	IDrag = 0.0;
+	VDrag = 0.0;
 
-	m_pWing->VLMSetBending();
-	if(m_pWing->m_bWingOut)  m_bPointOut = true;
-	pos = m_pWing->m_MatSize;
-
-	Station = m_pWing->m_NStation;
-
-	if(m_pWing2)
+	for(int i=0; i<4; i++)
 	{
-		AddString("       Calculating 2nd wing...\n");
-		WingIDrag = 0.0;
-		m_pWing2->VLMTrefftz(m_Gamma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-		m_pWing2->VLMComputeWing(m_Gamma+m_pWing->m_MatSize,
-								 m_Cp+m_pWing->m_MatSize,
-								 VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								 m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-		IDrag += WingIDrag;
+		if(m_pWingList[i])
+		{
+			AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-		m_pWing2->VLMSetBending();
-		if(m_pWing2->m_bWingOut) m_bPointOut = true;
+			m_pWingList[i]->VLMTrefftz(m_Gamma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+			IDrag += WingIDrag;
 
-		Station += m_pWing2->m_NStation;
-		pos += m_pWing2->m_MatSize;
+			m_pWingList[i]->PanelComputeViscous(u0, WingVDrag, OutString);
+			VDrag += WingVDrag;
+			if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
+			AddString(OutString);
+
+			m_pWingList[i]->PanelComputeOnBody(u0, m_AlphaEq, m_Cp+pos, m_Gamma+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, true);
+
+			m_pWingList[i]->PanelSetBending(true);
+
+			pos     += m_pWingList[i]->m_MatSize;
+			Station += m_pWingList[i]->m_NStation;
+
+		}
 	}
 
-	if(m_pStab)
-	{
-		AddString("         Calculating elevator...\n");
-		WingIDrag = 0.0;
-
-		m_pStab->VLMTrefftz(m_Gamma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-		m_pStab->VLMComputeWing(m_Gamma+pos,
-								m_Cp+pos,
-								VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-		IDrag += WingIDrag;
-
-		m_pStab->VLMSetBending();
-		if(m_pStab->m_bWingOut) m_bPointOut = true;
-
-		Station += m_pStab->m_NStation;
-		pos += m_pStab->m_MatSize;
-	}
-
-	if(m_pFin)
-	{
-		AddString("         Calculating fin...\n");
-		WingIDrag = 0.0;
-		m_pFin->VLMTrefftz(m_Gamma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-		m_pFin->VLMComputeWing( m_Gamma+pos,
-								m_Cp+pos,
-								VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-								m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-		if(m_pFin->m_bWingOut)  m_bPointOut = true;
-
-		IDrag += WingIDrag;
-		m_pFin->VLMSetBending();
-	}
-
-//	m_CL          =  2.0*Lift /u0/u0/m_pWing->m_Area;
 	m_CL          =  2.0*Force.dot(WindNormal)    /u0/u0/m_pWPolar->m_WArea;
 	m_CX          =  2.0*Force.dot(WindDirection) /u0/u0/m_pWPolar->m_WArea;
 	m_CY          =  2.0*Force.dot(WindSide)      /u0/u0/m_pWPolar->m_WArea;
 	m_InducedDrag =  1.0*IDrag                    /u0/u0/m_pWPolar->m_WArea;
 
-	m_ViscousDrag = VDrag / m_pWPolar->m_WArea;
+	m_ViscousDrag =  VDrag/m_pWPolar->m_WArea;
 
-	m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
-	m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
+	m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density*qdyn;
+	m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density*qdyn;
 
-	m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-	m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-	m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-	m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
+	m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+	m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+	m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
 
-	m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
-	m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
-	m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
+	m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+
+	m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+	m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+	m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
 	VLMSetDownwash(m_Gamma);
 
@@ -623,7 +589,10 @@ void StabAnalysisDlg::SolveCtrlDer(double const & DeltaAngle, double *Xd, double
 	QString strong = QString("     Solving the linear system for the control derivative\n");
 	AddString(strong); 
 	
-	Gauss(m_aij, m_MatSize, m_cRHS, 1, &m_bCancel);
+//	Gauss(m_aij, m_MatSize, m_cRHS, 1, &m_bCancel);
+//	Gauss(m_aij, m_MatSize, m_RHS, 6, &m_bCancel);
+	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
+	memcpy(m_RHS, m_cRHS, m_MatSize*sizeof(double));
 	
 	strong = "     Calculating the control derivatives\n\n";
 	AddString(strong);
@@ -691,7 +660,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	//will be modidied for each control derivative
 	for(p=0; p<m_MatSize; p++)
 	{
-		m_RHS[70*VLMMATSIZE+p] =   -m_pPanel[p].Normal.dot(V0);
+		m_RHS[70*VLMMAXMATSIZE+p] =   -m_pPanel[p].Normal.dot(V0);
 	}
 	
 	str = "\n   ___Control derivatives____\n";
@@ -712,7 +681,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 	{
 		// reload the base influence matrix and RHS
 		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-		memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
+		memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 
 		//Wing tilt
 		H0 = m_pPlane->m_LEWing;//hinge origin
@@ -752,7 +721,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 		
 		// reload the base influence matrix and RHS
 		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-		memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
+		memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 
 		//Elevator tilt
 		H0 = m_pPlane->m_LEStab;//hinge origin
@@ -788,7 +757,7 @@ void StabAnalysisDlg::ComputeControlDerivatives()
 			
 			// reload the base influence matrix and RHS
 			memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-			memcpy(m_cRHS, m_RHS+70*VLMMATSIZE, m_MatSize*sizeof(double));
+			memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 			Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 		
 			for(p=0; p<m_MatSize; p++)
@@ -2101,7 +2070,9 @@ bool StabAnalysisDlg::SolveUnitSpeeds()
 	memcpy(m_aijRef, m_aij, m_MatSize*m_MatSize*sizeof(double));// we'll need it later for control derivatives
 
 //	if(!Gauss(m_aij,m_MatSize, m_RHS, 2, &m_bCancel))
-	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, m_MatSize, &m_bCancel))
+	double progress = 0.0;
+	double TaskSize = 0.0;
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, m_MatSize, &m_bCancel, TaskSize, progress))
 	{
 		AddString("      Singular Matrix.... Aborting calculation...\n");
 		m_bConverged = false;
@@ -2136,7 +2107,11 @@ void StabAnalysisDlg::StartAnalysis()
 	strong = "Launching VLM Analysis....\n\n";
 	AddString(strong);
 
-	
+	m_pWingList[0] = m_pWing;
+	m_pWingList[1] = m_pWing2;
+	m_pWingList[2] = m_pStab;
+	m_pWingList[3] = m_pFin;
+
 	strong = QString("Total VLM panels = %1\n\n").arg(m_MatSize);
 	AddString(strong);
 

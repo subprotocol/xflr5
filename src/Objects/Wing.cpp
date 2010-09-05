@@ -1813,246 +1813,8 @@ bool CWing::LLTInitialize(double mass)
 
 
 
-void CWing::PanelComputeWing(double *Cp, double &VDrag, double &XCP, double &YCP,
-							 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-							 bool bViscous, bool bThinSurface, bool bTilted)
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
-	PanelAnalysisDlg *p3DPanelDlg = (PanelAnalysisDlg*)s_p3DPanelDlg;
-	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
-
-	// calculates the lift coefficients from the vortices strengths
-	int  j, k, l, p, m, nFlap, coef;
-
-	bool bPointOutRe, bPointOutCl, bOutRe, bError;
-	QString string, strong;
-	CFoil *pFoil0, *pFoil1;
-	CVector H, HA, HB, V1, HingeLeverArm, HingeMoment, DragMoment, GeomMoment, PtC4, PtLE, DragVector;
-	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PanelForce, StripForce, Moment0, WindNormal, WindDirection;
-	double CPStrip, tau, NForce, Alpha, cosa, sina;
-
-	bOutRe = bError = false;
-	coef = 2;
-	if(bThinSurface) coef = 1;
-
-	if(!bTilted) Alpha = s_Alpha;
-	else         Alpha = 0.0;
-
-	cosa = cos(Alpha*PI/180.0);
-	sina = sin(Alpha*PI/180.0);
-
-	//   Define wind axis
-	WindNormal.Set(   -sina, 0.0, cosa);
-	WindDirection.Set( cosa, 0.0, sina);
-
-	m_GRm =0.0;
-	m_GCm = m_VCm = m_ICm = 0.0;
-	m_GYm = m_VYm = m_IYm = 0.0;
-
-	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * s_QInf /s_Viscosity;
-
-	m = p = nFlap = 0;
-
-	for (j=0; j<m_NSurfaces; j++)//All surfaces
-	{
-		if(!bThinSurface && m_Surface[j].m_bIsTipLeft) p += m_Surface[j].m_NXPanels;//do not consider left tip patch
-
-		pFoil0 = m_Surface[j].m_pFoilA;
-		pFoil1 = m_Surface[j].m_pFoilB;
-
-		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
-		{
-			//create a hinge unit vector and initialize hinge moment
-//			m_Surface[j].GetPoint(m_Surface[j].m_posATE, m_Surface[j].m_posBTE, 0.0, HA, 0);
-//			m_Surface[j].GetPoint(m_Surface[j].m_posATE, m_Surface[j].m_posBTE, 1.0, HB, 0);
-//			H = HB-HA;
-//			H.Normalize();
-			m_FlapMoment[nFlap] = 0.0;
-		}
-
-		SurfaceNormal = m_Surface[j].Normal;
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
-		{
-			bPointOutRe = false;
-			bPointOutCl = false;
-			StripForce.Set(0.0,0.0,0.0);//sum lift of all panels along chord
-			m_StripArea[m] = 0.0;
-			CPStrip        = 0.0;
-			m_CmAirf[m]    = 0.0;
-
-			m_Surface[j].GetLeadingPt(k, PtLE);
-			m_Surface[j].GetC4(k, PtC4, tau);
-
-			LeverArm = PtC4 - pWPolar->m_CoG;
-
-			GeomMoment.Set(0.0,0.0,0.0);
-
-			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
-			{
-				PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
-				StripForce += PanelForce;                                           // Newtons/q
-				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
-
-				LeverArmC4 = m_pPanel[p].CollPt- PtC4;
-
-				Moment0 = LeverArmC4 * PanelForce;                                  // N.m/q
-				m_CmAirf[m]  += Moment0.y;                                          // N.m/q
-
-				PanelLeverArm.x = m_pPanel[p].CollPt.x - pWPolar->m_CoG.x;
-				PanelLeverArm.y = m_pPanel[p].CollPt.y - pWPolar->m_CoG.y;
-				PanelLeverArm.z = m_pPanel[p].CollPt.z - pWPolar->m_CoG.z;
-				GeomMoment += PanelLeverArm * PanelForce;
-
-				m_StripArea[m]    += m_pPanel[p].Area;
-
-				XCP       += m_pPanel[p].CollPt.x * PanelForce.dot(WindNormal); //global center of pressure
-				YCP       += m_pPanel[p].CollPt.y * PanelForce.dot(WindNormal);
-				CPStrip   += m_pPanel[p].CollPt.x * NForce;
-
-/*				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
-				{
-					//add hinge moment contribution
-					V1 = m_pPanel[p].VortexPos - HA;
-					HingeLeverArm = V1 - H * V1.dot(H);
-					if(HingeLeverArm.x>0.0)
-					{
-						HingeMoment = HingeLeverArm * PanelForce;				// N.m/q
-						m_FlapMoment[nFlap] += HingeMoment.dot(H) * s_Density * s_QInf * s_QInf/2.0;//N
-					}
-				}*/
-				if(m_Surface[j].m_bTEFlap)
-				{
-					if(m_Surface[j].IsFlapPanel(p))
-					{
-						//then p is on the flap, so add its contribution
-						HingeLeverArm = m_pPanel[p].CollPt - m_Surface[j].m_HingePoint;
-						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
-						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* s_Density * s_QInf * s_QInf/2.0;//N
-					}
-				}
-				p++;
-			}
-
-			m_StripArea[m] /=(double)coef; //average over top and bottom
-
-			NForce = StripForce.dot(SurfaceNormal);
-
-			m_XCPSpanRel[m]    = (CPStrip/NForce - PtLE.x)/m_Chord[m];
-			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
-
-			if(bViscous)
-			{
-				m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-				if(bError) bPointOutCl = true;
-
-				m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-				if(bError) bPointOutCl = true;
-
-				m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-
-								if(bError) bPointOutCl = true;
-				m_ViscousDrag = m_PCd[m] * m_StripArea[m];
-				VDrag         += m_PCd[m] * m_StripArea[m];
-				DragVector.x = m_PCd[m]*m_StripArea[m];// N/q
-			}
-			else
-			{
-				m_PCd[m]     = 0.0;
-				m_XTrBot[m]  = 1.0;
-				m_XTrTop[m]  = 1.0;
-				DragVector.x = 0.0;
-			}
-
-			//global moments, in N.m/q
-			DragMoment = LeverArm * DragVector;
-
-			m_GRm += GeomMoment.dot(WindDirection);
-
-			m_VCm += DragMoment.y;
-
-			m_ICm += GeomMoment.y;
-
-			m_VYm += DragMoment.dot(WindNormal);
-			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y ;
-//			m_GYm += GeomMoment.dot(WindNormal);
-
-			m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];//vectorial formulation
-			m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
-//			m_Cm[m]         = m_CmAirf[m]+m_CmXRef[m];
-
-			if(bPointOutCl)
-			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
-				strong += string;
-				strong += ",  Re = ";
-				ReynoldsFormat(string, m_Re[m]);
-				strong += string;
-
-				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
-				strong+=string;
-				if(s_bTrace) p3DPanelDlg->AddString(strong);
-				m_bWingOut = true;
-
-			}
-			else if(bPointOutRe)
-			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
-				strong += string;
-				strong += ",  Re = ";
-				ReynoldsFormat(string, m_Re[m]);
-				strong += string;
-
-				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
-				strong +=string;
-				if(s_bTrace) p3DPanelDlg->AddString(strong);
-				m_bWingOut = true;
-			}
-
-			m++;
-		}
-		if(!bThinSurface && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;//do not consider right tip patch
-		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
-	}
-
-	//global plane dimensionless coefficients
-	GCm += m_VCm + m_ICm;
-	VCm += m_VCm;
-	ICm += m_ICm;
-
-	//sign convention for rolling and yawing is opposite to algebric results
-	GRm -= m_GRm;
-	GYm -= (m_VYm + m_IYm);
-	VYm -= m_VYm;
-	IYm -= m_IYm;
-
-
-	//Note : the following results are unused,for information only
-	double Area, Span;
-	Area = pMiarex->m_pCurWPolar->m_WArea;
-	Span = pMiarex->m_pCurWPolar->m_WSpan;
-	// wing dimensionless coefficients
-	m_GCm *=  1.0 / Area /m_MAChord;
-	m_VCm *=  1.0 / Area /m_MAChord;
-	m_ICm *=  1.0 / Area /m_MAChord;
-
-	//sign convention for rolling and yawing is opposite to algebric results
-	m_GRm *= -1.0 / Area /Span;
-	m_GYm *= -1.0 / Area /Span;
-	m_VYm *= -1.0 / Area /Span;
-	m_IYm *= -1.0 / Area /Span;
-
-}
-
-
-
-void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, double &Drag,
-						 bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode)
+void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
+                         bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode)
 {
 	// calculates the induced lift and drag from the vortices or wake panels strength
 	// using a farfield method
@@ -2062,9 +1824,9 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 
 	int nw, iTA, iTB;
 	int j, k, l, p, pp, m;
-	double StripArea, InducedAngle, IYm, cosa, sina;
+	double InducedAngle, IYm, cosa, sina;
 	double GammaStrip[MAXSTATIONS];
-	CVector C, V, Wg, StripForce, dF, WindDirection, WindNormal, VInf;
+	static CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
 
 	if(bTilted)
 	{
@@ -2086,9 +1848,9 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 	//dynamic pressure, kg/m3
 	double q = 0.5 * s_Density * s_QInf * s_QInf;
 
-	m_CL          = 0.0;
-	m_InducedDrag = 0.0;
-	IYm           = 0.0;
+	m_CL      = 0.0;
+	WingIDrag = 0.0;
+	IYm       = 0.0;
 
 	int coef = 2;
 	if (bThinSurf) coef = 1;
@@ -2101,65 +1863,93 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
-			nw  = m_pPanel[p].m_iWake;
-			iTA = pWakePanel[nw].m_iTA;
-			iTB = pWakePanel[nw].m_iTB;
-			C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
 			pp = p;
-			StripArea = 0.0;
+			m_StripArea[m] = 0.0;
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
-				StripArea  += m_pPanel[pp].Area;
+				m_StripArea[m]  += m_pPanel[pp].Area;
 				pp++;
 			}
-			StripArea /= (double)coef;
+			m_StripArea[m] /= (double)coef;
 
-			// ____________________________
-			// Downwash calculation
-			//
-			// Since we place the trailing point at the end of the wake panels, it sees only the effect
-			// of the upstream part of the wake because the downstream part isn't modelled.
-			// If we were to model the downstream part, the total induced speed would be twice larger,
-			// so just add a factor 2 to account for this.
 
-			pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
-			InducedAngle = atan2(Wg.dot(WindNormal), s_QInf);
-			m_Ai[m]      = 2.0 * InducedAngle*180/PI;
-
-			// ____________________________
-			// Lift calculation
-			//
-			// Method 1 : Sum panel pressure forces over the top and bottom strip.
-			// The induced drag is calculated by projection of the strip force on the wind direction
-			// General experience in published literature shows this isn't such a good idea
-
-/*			StripForce.Set(0.0, 0.0, 0.0);
-			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
+			if(!bThinSurf)
 			{
-				StripForce += m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;  // N/q
-				p++;
-			}*/
+				// ____________________________
+				// Downwash calculation
+				//
+				// Since we place the trailing point at the end of the wake panels, it sees only the effect
+				// of the upstream part of the wake because the downstream part isn't modelled.
+				// If we were to model the downstream part, the total induced speed would be twice larger,
+				// so just add a factor 2 to account for this.
+				nw  = m_pPanel[p].m_iWake;
+				iTA = pWakePanel[nw].m_iTA;
+				iTB = pWakePanel[nw].m_iTB;
+				C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
 
-			// Method 2 : Far-field plane integration
-			// This is the method generally recommended
+				pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
+				InducedAngle = atan2(Wg.dot(WindNormal), s_QInf);
+				m_Ai[m]      = 2.0 * InducedAngle*180/PI;
 
-			GammaStrip[m] = (-Mu[pos+p+coef*m_Surface[j].m_NXPanels-1] + Mu[pos+p]) *4.0*PI;
-			Wg += VInf;
 
-			StripForce  = m_pPanel[p].Vortex * Wg;
-			StripForce *= GammaStrip[m] * s_Density / q;  // N/q
+				// ____________________________
+				// Lift calculation
+				//
+				// Method 1 : Sum panel pressure forces over the top and bottom strip.
+				// The induced drag is calculated by projection of the strip force on the wind direction
+				// General experience in published literature shows this isn't such a good idea
 
+				/*
+				StripForce.Set(0.0, 0.0, 0.0);
+				for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
+				{
+					StripForce += m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;  // N/q
+					p++;
+				}*/
+
+				// Method 2 : Far-field plane integration
+				// This is the method generally recommended
+				GammaStrip[m] = (-Mu[pos+p+coef*m_Surface[j].m_NXPanels-1] + Mu[pos+p]) *4.0*PI;
+				Wg += VInf;
+
+				StripForce  = m_pPanel[p].Vortex * Wg;
+				StripForce *= GammaStrip[m] * s_Density / q;  // N/q
+				//____________________________
+				// Project on wind axes
+				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
+				m_ICd[m]   = StripForce.dot(WindDirection)/m_StripArea[m];
+				WingIDrag += StripForce.dot(WindDirection);          // N/q
+			}
+			else
+			{
+				pp=p;
+				for(l=0; l<m_Surface[j].m_NXPanels; l++)
+				{
+					if(s_bVLM1 || m_pPanel[p].m_bIsTrailing)
+					{
+						C = m_pPanel[pp].CtrlPt;
+						C.x = m_PlanformSpan * 100.0;
+
+						pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
+						Wg += VInf; //total speed vector
+
+						//induced force
+						dF  = Wg * m_pPanel[pp].Vortex;
+						dF *= Mu[pp+pos];			// N/rho
+
+						StripForce += dF;       // N/rho
+					}
+					pp++;
+				}
+				StripForce *= 2./s_QInf/s_QInf; //N/q
+				//____________________________
+				// Project on wind axes
+				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
+				m_ICd[m]   = StripForce.dot(WindDirection)/m_StripArea[m]/2.;
+				m_CL      += StripForce.dot(WindNormal);                // N/q
+				WingIDrag += StripForce.dot(WindDirection)/2.;          // N/q
+			}
 			p  += coef*m_Surface[j].m_NXPanels;
-			//____________________________
-			//
-			// The results are given in wind axis, whether the geom is tilted or not,
-			// so project on wind axes
-
-			m_Cl[m]        = StripForce.dot(WindNormal)   /StripArea;
-			m_ICd[m]       = StripForce.dot(WindDirection)/StripArea;
-
-			m_CL          += StripForce.dot(WindNormal);                // N/q
-			m_InducedDrag += StripForce.dot(WindDirection);             // N/q
 
 			// Calculate resulting vector force
 			Force         += StripForce;                                // N/q
@@ -2172,33 +1962,48 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 		if(m_Surface[j].m_bIsTipRight && !bThinSurf) p+=m_Surface[j].m_NXPanels;//tip patch panels
 	}
 
-	Drag      += m_InducedDrag;
-
-//	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-//	m_CL          *=  1.0       /pMiarex->m_pCurWPolar->m_WArea;  // unused
-//	m_InducedDrag *= -2.0       /pMiarex->m_pCurWPolar->m_WArea;   // unused
+	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
 }
 
 
 
-void CWing::PanelSetBending()
+void CWing::PanelSetBending(bool bThinSurface)
 {
 	double ypos[MAXSTATIONS+1], zpos[MAXSTATIONS+1];
-	int j,k,jj;
+	int j,k,jj,coef,p;
 	double bm;
 	CVector Dist(0.0,0.0,0.0);
 	CVector Moment;
 	int m =0;
-	int p= m_Surface[0].m_NXPanels;
+
+
+	if(bThinSurface)
+	{
+		coef = 1;
+		p    = 0;
+	}
+	else
+	{
+		coef = 2;
+		p= m_Surface[0].m_NXPanels;
+	}
 
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
-			ypos[m] = m_pPanel[p].CollPt.y;
-			zpos[m] = m_pPanel[p].CollPt.z;
+			if(!bThinSurface)
+			{
+				ypos[m] = m_pPanel[p].CollPt.y;
+				zpos[m] = m_pPanel[p].CollPt.z;
+ 			}
+			else
+			{
+				ypos[m] = m_pPanel[p].VortexPos.y;
+				zpos[m] = m_pPanel[p].Vortex.z;
+ 			}
 
-			p += 2*m_Surface[j].m_NXPanels;
+			p += coef*m_Surface[j].m_NXPanels;
 			m++;
 		}
 	}
@@ -2229,7 +2034,6 @@ void CWing::PanelSetBending()
 		m_BendingMoment[j] = bm;
 	}
 }
-
 
 
 void CWing::ScaleChord(double NewChord)
@@ -2681,284 +2485,9 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 
 
-void CWing::VLMComputeWing(double *Gamma, double *Cp, double &VDrag, double &XCP, double &YCP,
-						   double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm, double &IYm,
-						   CVector &CoG, bool bViscous, bool bTilted)
-{
-	//calculates :
-	// - the moments and the centre of pressure positions by summation over the apnels
-	// - the viscous characteristics by interpolation
-	//
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
-	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
-	int  j, k, l, p, m, nFlap;
-	bool bOutRe, bError, bPointOutRe, bPointOutCl;
-	double CPStrip, tau, NForce, q, Alpha, cosa, sina;
-	QString string, strong;
-	CFoil *pFoil0, *pFoil1;
-	CVector DragVector, VInf, WindNormal, WindDirection;
-	CVector Force, SurfaceNormal, LeverArm, LeverArmC4, PanelLeverArm, PtC4, PtLE, PanelForce, StripForce;
-	CVector DragMoment, GeomMoment, Moment0;
-	CVector HingeLeverArm, HingeMoment;
-
-	//dynamic pressure, kg/m3
-	q = 0.5 * s_Density * s_QInf * s_QInf;
-
-	if(!bTilted) Alpha = s_Alpha;
-	else         Alpha = 0.0;
-
-	cosa = cos(Alpha*PI/180.0);
-	sina = sin(Alpha*PI/180.0);
-
-	//   Define wind axis
-	WindNormal.Set(   -sina, 0.0, cosa);
-	WindDirection.Set( cosa, 0.0, sina);
-
-	VInf = WindDirection * s_QInf;
-
-	m_GRm = 0.0;
-	m_GCm = m_VCm = m_ICm = 0.0;
-	m_GYm = m_VYm = m_IYm = 0.0;
-	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * s_QInf /s_Viscosity;
-
-	bOutRe = bError = false;
-	m = p = nFlap = 0;
-
-	for (j=0; j<m_NSurfaces; j++)
-	{
-		pFoil0 = m_Surface[j].m_pFoilA;
-		pFoil1 = m_Surface[j].m_pFoilB;
-
-		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
-		{
-			m_FlapMoment[nFlap] = 0.0;
-		}
-
-		SurfaceNormal = m_Surface[j].Normal;
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
-		{
-			bPointOutRe = false;
-			bPointOutCl = false;
-			StripForce.Set(0.0,0.0,0.0);//sum lift of all panels along chord
-			CPStrip        = 0.0;
-			m_CmAirf[m]    = 0.0;
-			GeomMoment.Set(0.0,0.0,0.0);
-
-			m_Surface[j].GetLeadingPt(k, PtLE);
-			m_Surface[j].GetC4(k, PtC4, tau);
-
-			LeverArm   = PtC4 - CoG;
-
-			m_StripArea[m] = 0.0;
-
-			for (l=0; l<m_Surface[j].m_NXPanels; l++)
-			{
-				m_StripArea[m] += m_pPanel[p].Area;
-				LeverArmC4  = m_pPanel[p].VortexPos - PtC4;
-				PanelLeverArm.x = m_pPanel[p].VortexPos.x - CoG.x;
-				PanelLeverArm.y = m_pPanel[p].VortexPos.y - CoG.y;
-				PanelLeverArm.z = m_pPanel[p].VortexPos.z - CoG.z;
-
-				// for each panel along the chord, add the lift coef
-				PanelForce  = VInf * m_pPanel[p].Vortex;
-				PanelForce *= Gamma[p] * s_Density;                 //Newtons
-
-				if(!s_bVLM1 && !m_pPanel[p].m_bIsLeading)
-				{
-					Force       = VInf* m_pPanel[p].Vortex;
-					Force      *= Gamma[p+1] * s_Density;       //Newtons
-					PanelForce -= Force;
-				}
-				Moment0 = LeverArmC4 * PanelForce;
-				m_CmAirf[m]  += Moment0.y;                          //N.m
-				GeomMoment   += PanelLeverArm * PanelForce;         //N.m
-
-				StripForce += PanelForce;
-				NForce = PanelForce.dot(SurfaceNormal);
-
-				XCP       += m_pPanel[p].VortexPos.x * PanelForce.dot(WindNormal); //global center of pressure (N.m)
-				YCP       += m_pPanel[p].VortexPos.y * PanelForce.dot(WindNormal);
-				CPStrip   += m_pPanel[p].VortexPos.x * NForce;
-
-				Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal) /s_QInf/m_pPanel[p].Area/s_Density;
-
-//				if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap)
-				if(m_Surface[j].m_bTEFlap)
-				{
-					if(m_Surface[j].IsFlapPanel(p))
-					{
-						//then p is on the flap, so add its contribution
-						HingeLeverArm = m_pPanel[p].VortexPos - m_Surface[j].m_HingePoint;
-						HingeMoment = HingeLeverArm * PanelForce;//N.m
-						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector);
-					}
-				}
-				p++;
-			}
-
-			NForce = StripForce.dot(SurfaceNormal);
-
-			m_XCPSpanRel[m]    = (CPStrip/NForce - PtLE.x)/m_Chord[m];
-			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
 
-			if(bViscous)
-			{
-				m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-				if(bError) bPointOutCl = true;
-
-				m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-				if(bError) bPointOutCl = true;
-
-				m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, pFoil0, pFoil1, m_Re[m], m_Cl[m], tau, bOutRe, bError);
-				bPointOutRe = bOutRe || bPointOutRe;
-				if(bError) bPointOutCl = true;
-				m_ViscousDrag  = m_PCd[m] * m_StripArea[m];
-				VDrag         += m_PCd[m] * m_StripArea[m];
-				DragVector.x   = m_PCd[m] * m_StripArea[m] * q;//Newtons
-			}
-			else
-			{
-				m_PCd[m]     = 0.0;
-				m_XTrBot[m]  = 1.0;
-				m_XTrTop[m]  = 1.0;
-				DragVector.x = 0.0;
-			}
-
-			//_______________Local Moment coefficients________________
-//			m_CmAirf[m]     = Cm4*2.0      /StripArea/s_QInf/100.0;//error up to v2.00, corrected in v2.01
-//			m_CmAirf[m]     = Cm4*2.0/chord/StripArea/s_QInf;//up to v2.04
-
-			// ______________Global moments, in N.m __________________
-			DragMoment = LeverArm * DragVector;
-
-			m_GRm += GeomMoment.dot(WindDirection);
-
-			m_VCm += DragMoment.y;	
-			m_VYm += DragMoment.dot(WindNormal);
-
-			m_ICm += GeomMoment.y ;
-			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4.y / 2.0 * s_Density *s_QInf*s_QInf;
-//			m_GYm += GeomMoment.dot(WindNormal);// This is necessarily zero i.a.w. Kutta Jukowski's theorem
-
-			m_CmAirf[m]    *= 1.0                        /m_Chord[m]/m_StripArea[m]/q;
-			m_Cm[m]         = (GeomMoment.y+DragMoment.y)/m_Chord[m]/m_StripArea[m]/q;
-
-
-			if(bPointOutCl)
-			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("          Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
-				strong += string;
-				strong += ",  Re = ";
-				ReynoldsFormat(string, m_Re[m]);
-				strong += string;
-
-				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
-				strong+=string;
-				if(s_bTrace) pVLMDlg->AddString(strong);
-				m_bWingOut = true;
-			}
-			else if(bPointOutRe)
-			{
-				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("          Span pos = %1")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
-				strong += string;
-				strong += ",  Re = ";
-				ReynoldsFormat(string, m_Re[m]);
-				strong += string;
-
-				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
-				strong +=string;
-				if(s_bTrace) pVLMDlg->AddString(strong);
-				m_bWingOut = true;
-			}
-			m++;
-		}
-		if(pFoil0->m_bTEFlap && pFoil1->m_bTEFlap) nFlap++;
-	}
-
-	//global plane dimensionless coefficients
-	GCm += m_ICm + m_VCm;
-	VCm += m_VCm;
-	ICm += m_ICm;
-	
-	 //sign convention for rolling and yawing is opposite to algebric results
-	GRm -= m_GRm;
-	GYm -= (m_IYm+m_VYm);
-	VYm -= m_VYm;
-	IYm -= m_IYm;
-
-	//Note : the following results are unused, for information only
-	double Area, Span;
-	Area = pMiarex->m_pCurWPolar->m_WArea;
-	Span = pMiarex->m_pCurWPolar->m_WSpan;
-
-	// wing dimensionless coefficients
-	m_GCm *=  1.0/ q / Area /m_MAChord;
-	m_VCm *=  1.0/ q / Area /m_MAChord;
-	 //sign convention for rolling and yawing is opposite to algebric results
-	m_GRm *= -1.0/ q / Area /Span;
-	m_GYm *= -1.0/ q / Area /Span;
-	m_VYm *= -1.0/ q / Area /Span;
-	m_IYm *= -1.0/ q / Area /Span;
-}
-
-
-
-void CWing::VLMSetBending()
-{
-	double ypos[MAXSTATIONS+1], zpos[MAXSTATIONS+1];
-	int j,k,jj;
-	double bm;
-	CVector Dist(0.0,0.0,0.0);
-	CVector Moment;
-	int m = 0;
-	int p = 0;
-
-	for (j=0; j<m_NSurfaces; j++){//All surfaces
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
-		{
-			ypos[m] = m_pPanel[p].CollPt.y;
-			zpos[m] = m_pPanel[p].CollPt.z;
-
-			p+=m_Surface[j].m_NXPanels;
-			m++;
-		}
-	}
-
-	for (j=0; j<m_NStation; j++)
-	{
-		bm = 0.0;
-		if (ypos[j]<=0)
-		{
-			for (jj=0; jj<j; jj++)
-			{
-				Dist.y =  -ypos[jj]+ypos[j];
-				Dist.z =  -zpos[jj]+zpos[j];
-				Moment = Dist * m_F[jj];
-				bm += Moment.x ;
-			}
-		}
-		else
-		{
-			for (jj=j+1; jj<m_NStation; jj++)
-			{
-				Dist.y =  ypos[jj]-ypos[j];
-				Dist.z =  zpos[jj]-zpos[j];
-				Moment = Dist * m_F[jj];
-				bm += Moment.x ;
-			}
-		}
-		m_BendingMoment[j] = bm;
-	}
-}
-
-
-void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted)
+void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bool bTilted)
 {
 	if(!m_pPanel) return;
 	// calculates the lift and induced drag from the vortices strengths
@@ -2989,7 +2518,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 	VInf = WindDirection * s_QInf;
 
 	m_CL = 0.0;
-	m_InducedDrag = 0.0;
+	IDrag = 0.0;
 
 	p=0;
 	m=0;
@@ -3024,7 +2553,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 					m_Cl[m]       += dF.dot(WindNormal);
 					m_CL          += dF.dot(WindNormal);
 					m_ICd[m]      += dF.dot(WindDirection);
-					m_InducedDrag += dF.dot(WindDirection);
+					IDrag += dF.dot(WindDirection);
 
 					StripForce += dF;       // N/rho
 
@@ -3043,7 +2572,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bo
 		}
 	}
 
-	Drag       +=  m_InducedDrag;
+	m_InducedDrag = IDrag;
 }
 
 
@@ -3089,5 +2618,257 @@ void CWing::VLMCubicSplines(double *Gamma)
 	{
 		res = GetInterpolation(t, m_SpanPos, m_NStation, a,b,c,d);
 		t += dt;
+	}
+}
+
+
+void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
+                             double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
+                             bool bViscous, bool bThinSurface)
+{
+	//  Calculates the wing aero coefficients
+	//  Uses Cp distribution in input for thick surfaces
+	//  Uses Gamma distribution in input for VLM method
+	//
+	//  Input data:
+	//    Freestream speed Qinf
+	//    Angle of attack Alpha
+	//    Cp dstribution
+	//    Mu or Gamma distribution, depending on the analysis type
+	//    Type of surface :
+	//        - Thin Surface, i.e. VLM type surfaces, with vortex distribution
+	//        - Thick Surfaces;, i.e. 3D Panels with source+doublet distribution on panels
+	//    Type of analysis : viscous or inviscid
+	//
+	//  Output
+	//    centre of pressure position (XCP, YCP)
+	//    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
+	//
+
+	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
+	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
+
+	int  j, k, l, p, m, nFlap, coef;
+	double CPStrip, tau, NForce, cosa, sina;
+	CVector HingeLeverArm,  PtC4Strip, PtLEStrip, ForcePt, SurfaceNormal, LeverArmC4CoG, LeverArmPanelC4, LeverArmPanelCoG;
+	CVector Force, PanelForce, StripForce, DragVector, Moment0, HingeMoment, DragMoment, GeomMoment;
+	CVector WindNormal, WindDirection;
+
+	//initialize
+	m_GRm =0.0;
+	m_GCm = m_VCm = m_ICm = 0.0;
+	m_GYm = m_VYm = m_IYm = 0.0;
+
+	// Define the number of panels to consider on each strip
+	if(bThinSurface) coef = 1;    // only mid-surface
+	else             coef = 2;    // top and bottom surfaces
+
+	// Define the wind axis
+	cosa = cos(Alpha*PI/180.0);
+	sina = sin(Alpha*PI/180.0);
+	WindNormal.Set(   -sina, 0.0, cosa);
+	WindDirection.Set( cosa, 0.0, sina);
+
+	// Calculate the Reynolds number on each strip
+	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
+
+	m = p = nFlap = 0;
+
+	// For each of the wing's surfaces, calculate the coefficients on each strip
+	// and sum them up to get the wing's overall coefficients
+	for (j=0; j<m_NSurfaces; j++)
+	{
+		//do not consider left tip patch, if any
+		if(!bThinSurface && m_Surface[j].m_bIsTipLeft) p += m_Surface[j].m_NXPanels;
+
+		if(m_Surface[j].m_bTEFlap) m_FlapMoment[nFlap] = 0.0;
+
+		SurfaceNormal = m_Surface[j].Normal;
+
+		// consider each strip in turn
+		for (k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+			//initialize
+			StripForce.Set(0.0,0.0,0.0);
+			m_CmAirf[m]    = 0.0;
+			CPStrip        = 0.0;
+
+			m_Surface[j].GetLeadingPt(k, PtLEStrip);
+			m_Surface[j].GetC4(k, PtC4Strip, tau);
+
+			LeverArmC4CoG = PtC4Strip - pWPolar->m_CoG;
+
+			GeomMoment.Set(0.0,0.0,0.0);
+
+			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
+			{
+				// Get the force acting on the panel
+				if(!bThinSurface)
+				{
+					ForcePt = m_pPanel[p].CollPt;
+					PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
+				}
+				else
+				{
+					// for each panel along the chord, add the lift coef
+					ForcePt = m_pPanel[p].VortexPos;
+					PanelForce  = WindDirection * m_pPanel[p].Vortex;
+					PanelForce *= 2.0 * Gamma[p] /QInf;                                       //Newtons/q
+					Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;
+
+					if(!s_bVLM1 && !m_pPanel[p].m_bIsLeading)
+					{
+						Force       = WindDirection * m_pPanel[p].Vortex;
+						Force      *= 2.0 * Gamma[p+1] /QInf;       //Newtons/q
+						PanelForce -= Force;
+					}
+				}
+				StripForce += PanelForce;                                           // Newtons/q
+				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
+
+				LeverArmPanelC4    = ForcePt - PtC4Strip;                           // m
+				LeverArmPanelCoG   = ForcePt - pWPolar->m_CoG;                      // m
+
+				Moment0 = LeverArmPanelC4 * PanelForce;                             // N.m/q
+				m_CmAirf[m]  += Moment0.y;                                          // N.m/q
+
+				GeomMoment += LeverArmPanelCoG * PanelForce;                        // N.m/q
+
+				XCP       += ForcePt.x * PanelForce.dot(WindNormal); //global center of pressure
+				YCP       += ForcePt.y * PanelForce.dot(WindNormal);
+				CPStrip   += ForcePt.x * NForce;
+
+				if(m_Surface[j].m_bTEFlap)
+				{
+					if(m_Surface[j].IsFlapPanel(p))
+					{
+						//then p is on the flap, so add its contribution
+						HingeLeverArm = ForcePt - m_Surface[j].m_HingePoint;
+						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
+						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* s_Density * s_QInf * s_QInf/2.0;  //N.m
+					}
+				}
+				p++;
+			}
+
+			// calculate center of pressure position
+			NForce = StripForce.dot(SurfaceNormal);
+			m_XCPSpanRel[m]    = (CPStrip/NForce - PtLEStrip.x)/m_Chord[m];
+			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
+
+			// add viscous properties, if required
+			if(bViscous) DragVector.x   = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
+			else         DragVector.x = 0.0;
+
+			// global moments, in N.m/q
+			DragMoment =  LeverArmC4CoG * DragVector;
+
+			m_GRm += GeomMoment.dot(WindDirection);
+
+			m_VYm += DragMoment.dot(WindNormal);
+			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4Strip.y ;
+
+			m_VCm += DragMoment.y;
+			m_ICm += GeomMoment.y;
+			m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];
+			m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
+			m++;
+		}
+		//do not consider right tip patch
+		if(!bThinSurface && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;
+		if(m_Surface[j].m_bTEFlap) nFlap++;
+	}
+
+	//global plane dimensionless coefficients
+	GCm += m_VCm + m_ICm;
+	VCm += m_VCm;
+	ICm += m_ICm;
+
+	//sign convention for rolling and yawing is opposite to algebric results
+	GRm -= m_GRm;
+	GYm -= (m_VYm + m_IYm);
+	VYm -= m_VYm;
+	IYm -= m_IYm;
+}
+
+
+void CWing::PanelComputeViscous(double QInf, double &WingVDrag, QString &OutString)
+{
+	// In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
+	// In output, returns for each span station
+	// 	- The Reynolds number m_Re[]
+	//	- The viscous drag coefficient m_PCd[]
+	//      - The top and bottom transition points m_XTrtop[] and m_XTrBot[]
+	//
+	QString string, strong, strLength;
+	int m;
+	bool bPointOutRe, bPointOutCl, bOutRe, bError;
+	double tau = 0.0;
+
+	WingVDrag = 0.0;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+
+	bOutRe = bError = bPointOutRe = bPointOutCl = false;
+
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+
+	// Calculate the Reynolds number on each strip
+	for (m=0; m<m_NStation; m++)    m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
+
+	//Interpolate the viscous properties from the foil's type 1 polar mesh
+	m=0;
+	for (int j=0; j<m_NSurfaces; j++)
+	{
+		for(int k=0; k<m_Surface[j].m_NYPanels; k++)
+		{
+			bOutRe = bPointOutRe = false;
+			bPointOutCl = false;
+
+			m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+			bPointOutRe = bOutRe || bPointOutRe;
+			if(bError) bPointOutCl = true;
+			m_XTrTop[m] = GetVar(pMiarex->m_poaPolar, 5, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+			bPointOutRe = bOutRe || bPointOutRe;
+			if(bError) bPointOutCl = true;
+			m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
+			bPointOutRe = bOutRe || bPointOutRe;
+			if(bError) bPointOutCl = true;
+
+			if(bPointOutCl)
+			{
+				GetLengthUnit(string, pMainFrame->m_LengthUnit);
+				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
+				strong += string;
+				strong += ",  Re = ";
+				ReynoldsFormat(string, m_Re[m]);
+				strong += string;
+
+				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
+				strong+= string;
+				OutString = strong;
+
+				m_bWingOut = true;
+			}
+			else if(bPointOutRe)
+			{
+				GetLengthUnit(string, pMainFrame->m_LengthUnit);
+				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong += string;
+				strong += ",  Re = ";
+				ReynoldsFormat(string, m_Re[m]);
+				strong += string;
+				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
+				strong += string;
+				OutString = strong;
+
+				m_bWingOut = true;
+			}
+
+			// Sum the total viscous drag of this wing
+			WingVDrag  += m_PCd[m] * m_StripArea[m];
+			m++;
+		}
 	}
 }

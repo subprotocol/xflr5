@@ -99,16 +99,16 @@ public:
 	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
 
 	int m_NVLMPanels;	// number of VLMpanels
-	int m_AnalysisType;	//1=LLT, 2=VLM, 3=3D Panels
+	int m_AnalysisMethod;	//1=LLT, 2=VLM, 3=3D Panels
 	int m_NStation;		// number of stations along wing span
 	int m_nFlaps;		// number of flaps
 
 	double m_Span;
 	double m_MAChord;
 	double m_QInf;
-	double m_Cp[VLMMATSIZE];		// lift coeffs for each panel
-	double m_G[VLMMATSIZE];			// vortice or doublet strengths
-	double m_Sigma[VLMMATSIZE];		// source strengths
+	double m_Cp[VLMMAXMATSIZE];		// lift coeffs for each panel
+	double m_G[VLMMAXMATSIZE];			// vortice or doublet strengths
+	double m_Sigma[VLMMAXMATSIZE];		// source strengths
 	double m_Alpha, m_Beta, m_Phi;
 	double m_SpanPos[MAXSTATIONS+1];	// station spanwise positions
 	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees

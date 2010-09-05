@@ -233,7 +233,7 @@ private:
 
 	//Common Menus
 	QMenu * MainMenu;
-	QMenu *fileMenu, *helpMenu;
+	QMenu *fileMenu, *optionsMenu, *helpMenu;
 
 	//AFoilMenus
 	QMenu *AFoilViewMenu, *AFoilDesignMenu, *AFoilSplineMenu;
@@ -244,6 +244,7 @@ private:
 	QMenu *FoilMenu, *CurGraphCtxMenu, *CurOppCtxMenu;
 	QMenu *currentFoilMenu;
 	QMenu *DesignMenu;
+	QMenu *XFoilAnalysisMenu;
 	QMenu *OpPointMenu, *CpGraphMenu, *currentOppMenu;
 	QMenu *PolarMenu, *currentPolarMenu, *GraphPolarMenu, *CurPolarGraphMenu;
 	QMenu *OperFoilCtxMenu, *OperPolarCtxMenu, *CurXFoilResults;
@@ -253,6 +254,7 @@ private:
 
 	//Miarex Menus
 	QMenu *MiarexViewMenu;
+	QMenu *MiarexAnalysisMenu;
 	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu, *CurBodyMenu;
 	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
 	QMenu *WPlrGraphMenu,*WPlrCurGraphMenu, *WOppGraphMenu, *WOppCurGraphMenu;

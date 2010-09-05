@@ -97,8 +97,8 @@ private:
 	double *m_RHS;
 	double *m_aij;
 	double *m_Gamma;
-	double m_xRHS[VLMMATSIZE], m_yRHS[VLMMATSIZE], m_zRHS[VLMMATSIZE];
-	double m_Cp[VLMMATSIZE];//lift coef per panel
+	double m_xRHS[VLMMAXMATSIZE], m_yRHS[VLMMAXMATSIZE], m_zRHS[VLMMAXMATSIZE];
+	double m_Cp[VLMMAXMATSIZE];//lift coef per panel
 	double m_VLMQInf[100];
 	double m_OpAlpha, m_OpQInf, m_Ctrl;
 	double m_QInfMin, m_QInfMax, m_QInfDelta;
@@ -133,6 +133,7 @@ private:
 
 
 	CPlane *m_pPlane;
+	CWing *m_pWingList[4];
 	CWing *m_pWing2;//pointer to the second wing if Biplane
 	CWing *m_pStab;
 	CWing *m_pFin;
@@ -164,7 +165,7 @@ private:
 	int m_WakeSize;// Max Size for the VLMMatrix
 	int m_NWakeColumn;
 public:
-	CWing  *m_pWing;
+	CWing *m_pWing;
 	CSurface **m_ppSurface;
 	void GetSpeedVector(CVector const &C, double *Gamma, CVector &VTot);
 	void Forces(double *Gamma, CVector &VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace);

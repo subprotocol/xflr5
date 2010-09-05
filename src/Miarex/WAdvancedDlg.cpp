@@ -68,7 +68,10 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlLogFile     = new QCheckBox(tr("View Log File after errors"));
 	m_pctrlResetWake   = new QCheckBox(tr("Reset Wake between each angle"));
 	m_pctrlKeepOutOpps = new QCheckBox(tr("Store points outside the polar mesh"));
- 
+
+	m_pctrlDirichlet = new QRadioButton("Dirichlet");
+	m_pCtrlNeumann = new QRadioButton("Neumann");
+
 	m_pctrlInterNodes   = new FloatEdit();
 	m_pctrlRelax        = new FloatEdit(20,1);
 	m_pctrlAlphaPrec    = new FloatEdit(.01, 4);
@@ -139,6 +142,12 @@ void WAdvancedDlg::SetupLayout()
 	LLTLayout->addWidget(m_pctrlNStation,4,2);
 	LLTBox->setLayout(LLTLayout);
 
+	QGroupBox *PanelBCBox = new QGroupBox(tr("3D Panel boundary conditions"));
+	QVBoxLayout *PanelBCLayout = new QVBoxLayout;
+	PanelBCLayout->addWidget(m_pctrlDirichlet);
+	PanelBCLayout->addWidget(m_pCtrlNeumann);
+	PanelBCBox->setLayout((PanelBCLayout));
+
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
 	CancelButton = new QPushButton(tr("Cancel"));
@@ -158,9 +167,10 @@ void WAdvancedDlg::SetupLayout()
 	QVBoxLayout *RightSide = new QVBoxLayout;
 	QHBoxLayout *BothSides = new QHBoxLayout;
 	LeftSide->addWidget(LLTBox);
-	LeftSide->addWidget(VLMPanelBox);
 	LeftSide->addStretch(1);
+	LeftSide->addWidget(PanelBCBox);
 	RightSide->addWidget(VLMBox);
+	RightSide->addWidget(VLMPanelBox);
 	RightSide->addWidget(AllBox);
 	RightSide->addStretch(1);
 	BothSides->addLayout(LeftSide);
@@ -219,6 +229,8 @@ void WAdvancedDlg::InitDialog()
 
 	m_pctrlVortexPos->setEnabled(false);
 	m_pctrlControlPos->setEnabled(false);
+	m_pctrlDirichlet->setChecked(m_bDirichlet);
+	m_pCtrlNeumann->setChecked(!m_bDirichlet);
 }
 
 
@@ -263,7 +275,7 @@ void WAdvancedDlg::ReadParams()
 	m_WakeInterNodes  = (int)m_pctrlInterNodes->GetValue();
 	m_Iter            = (int)m_pctrlIterMax->GetValue();;
 	m_NStation        = (int)m_pctrlNStation->GetValue();
-	m_bDirichlet      = true;
+	m_bDirichlet      = m_pctrlDirichlet->isChecked();
 	m_bTrefftz        = true;
 	m_bResetWake      = m_pctrlResetWake->isChecked();
 	m_bKeepOutOpps    = m_pctrlKeepOutOpps->isChecked();

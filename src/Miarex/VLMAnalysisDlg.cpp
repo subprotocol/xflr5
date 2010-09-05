@@ -90,6 +90,7 @@ VLMAnalysisDlg::VLMAnalysisDlg()
 
 	m_strOut = "";
 
+	m_pWingList[0] = m_pWingList[1] = m_pWingList[2] = m_pWingList[3] = NULL;
 	m_pWing   = NULL;
 	m_pWing2  = NULL;
 	m_pStab   = NULL;
@@ -725,6 +726,11 @@ void VLMAnalysisDlg::StartAnalysis()
 	AddString(strong);
 	m_bCancel = false;
 	
+	m_pWingList[0] = m_pWing;
+	m_pWingList[1] = m_pWing2;
+	m_pWingList[2] = m_pStab;
+	m_pWingList[3] = m_pFin;
+
 
 	if(m_pWPolar->m_Type<3)
 	{
@@ -881,7 +887,6 @@ bool VLMAnalysisDlg::VLMCreateMatrix()
 			m_aij[p*Size+pp] = V.dot(m_ppPanel[p]->Normal);
 		}
 	}
-
 	return true;
 }
 
@@ -929,13 +934,11 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	int q, pos, Station;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	double Lift, IDrag, VDrag ,XCP, YCP, qdyn;
-	double WingIDrag, Alpha;
-	double cosa, sina;
-	QString str, strong;
+	double Lift, IDrag, VDrag, WingIDrag, WingVDrag, XCP, YCP, qdyn;
+	double Alpha, cosa, sina;
+	QString str, strong, OutString;
 	CVector Force, WindNormal, WindDirection, WindSide;
 
-//	CWing::s_bTrace   = false;
 	CWing::s_bTrace   = true;
 	CWing::s_bVLM1    = m_pWPolar->m_bVLM1;
 	m_pWing->m_pWakeNode  = m_pWakeNode;
@@ -950,9 +953,9 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		Force.Set(0.0, 0.0, 0.0);
 
 		m_pWing->m_bWingOut = false;
-		if(m_pWing2)	m_pWing2->m_bWingOut = false;
-		if(m_pStab)		m_pStab->m_bWingOut  = false;
-		if(m_pFin)		m_pFin->m_bWingOut   = false;
+		if(m_pWing2) m_pWing2->m_bWingOut = false;
+		if(m_pStab)  m_pStab->m_bWingOut  = false;
+		if(m_pFin)   m_pFin->m_bWingOut   = false;
 
 		if(m_pWPolar->m_bTiltedGeom)
 		{
@@ -963,15 +966,11 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 		}
 		else
 		{
-			if(m_pWPolar->m_Type!=4)
-			{
-				Alpha = V0+q*VDelta;
-			}
-			else if(m_pWPolar->m_Type==4)
-			{
-				Alpha = m_pWPolar->m_ASpec;
-			}
+			if(m_pWPolar->m_Type!=4)      Alpha = V0+q*VDelta;
+			else if(m_pWPolar->m_Type==4) Alpha = m_pWPolar->m_ASpec;
+
 			m_OpAlpha = Alpha;
+
 			//   Define wind axis
 			cosa = cos(Alpha*PI/180.0);
 			sina = sin(Alpha*PI/180.0);
@@ -1015,79 +1014,34 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 			m_GRm                 = 0.0;
 			m_GCm = m_VCm = m_ICm = 0.0;
 			m_GYm = m_VYm = m_IYm = 0.0;
-			AddString(tr("         Calculating main wing...\n"));
 			
-/*			CVector Force, Moment;
-			Forces(m_Gamma, WindDirection, Force, Moment, false, false);
-qDebug("VLMANalysis %12.5g    %12.5g    %12.5g",Force.x,Force.y, Force.z);*/
+			pos = Station = 0;
+			IDrag = 0.0;
+			VDrag = 0.0;
 
-			
-			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom);
-
-			m_pWing->VLMComputeWing(m_Gamma+q*m_MatSize, m_Cp,VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-
-			m_pWing->VLMSetBending();
-			if(m_pWing->m_bWingOut)  m_bPointOut = true;
-			pos = m_pWing->m_MatSize;
-
-			Station = m_pWing->m_NStation;
-
-			if(m_pWing2)
+			for(int i=0; i<4; i++)
 			{
-				AddString(tr("       Calculating 2nd wing...\n"));
-				WingIDrag = 0.0;
+				if(m_pWingList[i])
+				{
+					AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-				m_pWing2->VLMComputeWing(m_Gamma+q*m_MatSize+m_pWing->m_MatSize,
-										m_Cp+m_pWing->m_MatSize,
-										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-				IDrag += WingIDrag;
+					m_pWingList[i]->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+					IDrag += WingIDrag;
 
-				m_pWing2->VLMSetBending();
-				if(m_pWing2->m_bWingOut) m_bPointOut = true;
+					m_pWingList[i]->PanelComputeViscous(m_OpQInf, WingVDrag, OutString);
+					VDrag += WingVDrag;
+					if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
+					AddString(OutString);
 
-				Station += m_pWing2->m_NStation;
-				pos += m_pWing2->m_MatSize;
+					m_pWingList[i]->PanelComputeOnBody(m_OpQInf, Alpha, m_Cp+pos, m_Gamma+q*m_MatSize+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, true);
+
+					m_pWingList[i]->PanelSetBending(true);
+
+					pos     += m_pWingList[i]->m_MatSize;
+					Station += m_pWingList[i]->m_NStation;
+				}
 			}
 
-			if(m_pStab)
-			{
-				AddString(tr("         Calculating elevator...\n"));
-				WingIDrag = 0.0;
-
-				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-				m_pStab->VLMComputeWing(m_Gamma+q*m_MatSize+pos,
-										m_Cp+pos,
-										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-				IDrag += WingIDrag;
-
-				m_pStab->VLMSetBending();
-				if(m_pStab->m_bWingOut) m_bPointOut = true;
-
-				Station += m_pStab->m_NStation;
-				pos += m_pStab->m_MatSize;
-			}
-
-			if(m_pFin)
-			{
-				AddString(tr("         Calculating fin...\n"));
-				WingIDrag = 0.0;
-
-				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
-				m_pFin->VLMComputeWing( m_Gamma+q*m_MatSize+pos,
-										m_Cp+pos,
-										VDrag, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-										m_pWPolar->m_CoG, m_pWPolar->m_bViscous, m_pWPolar->m_bTiltedGeom);
-				if(m_pFin->m_bWingOut)  m_bPointOut = true;
-
-				IDrag += WingIDrag;
-
-				m_pFin->VLMSetBending();
-			}
-
-//			m_CL          =  2.0*Lift /m_OpQInf/m_OpQInf/m_pWing->m_Area;
 			m_CL          =  2.0*Force.dot(WindNormal)    /m_OpQInf/m_OpQInf/m_pWPolar->m_WArea;
 			m_CX          =  2.0*Force.dot(WindDirection) /m_OpQInf/m_OpQInf/m_pWPolar->m_WArea;
 			m_CY          =  2.0*Force.dot(WindSide)      /m_OpQInf/m_OpQInf/m_pWPolar->m_WArea;
@@ -1095,28 +1049,26 @@ qDebug("VLMANalysis %12.5g    %12.5g    %12.5g",Force.x,Force.y, Force.z);*/
 
 			m_ViscousDrag =  VDrag/m_pWPolar->m_WArea;
 
-			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
-			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density;
+			m_XCP         = XCP/Force.dot(WindNormal)/m_pWPolar->m_Density*qdyn;
+			m_YCP         = YCP/Force.dot(WindNormal)/m_pWPolar->m_Density*qdyn;
 
-			m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-			m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
-			m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord    /qdyn;
+			m_GCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+			m_VCm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
+			m_ICm *= 1.0 / m_pWPolar->m_WArea /m_pWing->m_MAChord;
 
-			m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
+			m_GRm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
-			m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
-			m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
-			m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan    /qdyn;
+			m_GYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+			m_VYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
+			m_IYm *= 1.0 / m_pWPolar->m_WArea /m_pWPolar->m_WSpan;
 
 			VLMSetDownwash(m_Gamma+q*m_MatSize);
 
 			if(m_bPointOut) m_bWarning = true;
 			if(m_bConverged)
 			{
-				if(m_pPlane)
-					pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Gamma+q*m_MatSize);
-				else
-					pMiarex->AddWOpp(m_bPointOut, m_Gamma+q*m_MatSize);
+				if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Gamma+q*m_MatSize);
+				else         pMiarex->AddWOpp(m_bPointOut, m_Gamma+q*m_MatSize);
 			}
 			AddString("     \n");
 		}
@@ -1305,88 +1257,31 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 	int p, pp, m, nSurf;
 	CVector C;
 
-	m=0;
-	nSurf = 0;
 	//wing first
 	memset(m_pWing->m_Vd, 0, sizeof(m_pWing->m_Vd));
 
-	m=0;
-	for (p=0; p< m_pWing->m_MatSize; p++)
-	{
-		if(m_pWing->m_pPanel[p].m_bIsTrailing)
-		{
-			C.x = (m_pNode[m_pWing->m_pPanel[p].m_iTA].x + m_pNode[m_pWing->m_pPanel[p].m_iTB].x)/2.0;
-			C.y = (m_pNode[m_pWing->m_pPanel[p].m_iTA].y + m_pNode[m_pWing->m_pPanel[p].m_iTB].y)/2.0;
-			C.z = (m_pNode[m_pWing->m_pPanel[p].m_iTA].z + m_pNode[m_pWing->m_pPanel[p].m_iTB].z)/2.0;
-			for (pp=0; pp<m_MatSize; pp++)
-			{
-				VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
-				m_pWing->m_Vd[m].x += V.x * Gamma[pp];
-				m_pWing->m_Vd[m].y += V.y * Gamma[pp];
-				m_pWing->m_Vd[m].z += V.z * Gamma[pp];
-			}
-			m_pWing->m_Ai[m] = atan2(m_pWing->m_Vd[m].z, m_OpQInf) * 180.0/PI;
-			m++;
-		}
-	}
+	nSurf = 0;
 
-
-	if(m_pWing2)
+	for(int i=0; i<4; i++)
 	{
-		memset(m_pWing2->m_Vd, 0, sizeof(m_pWing2->m_Vd));
-		m=0;
-		for (p=0; p< m_pWing2->m_MatSize; p++)
+		if(m_pWingList[i])
 		{
-			if(m_pWing2->m_pPanel[p].m_bIsTrailing)
+			memset(m_pWingList[i]->m_Vd, 0, sizeof(m_pWing2->m_Vd));
+			m=0;
+			for (p=0; p<m_pWingList[i]->m_MatSize; p++)
 			{
-				C = (m_pNode[m_pWing2->m_pPanel[p].m_iTA] + m_pNode[m_pWing2->m_pPanel[p].m_iTB])/2.0;
-				for (pp=0; pp<m_MatSize; pp++)
+				if(m_pWingList[i]->m_pPanel[p].m_bIsTrailing)
 				{
-					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
-					m_pWing2->m_Vd[m] += V * Gamma[pp];
-				}
-				m_pWing2->m_Ai[m] = atan2(m_pWing2->m_Vd[m].z, m_OpQInf) * 180.0/PI;
-				m++;
-			}
-		}
-	}
+					C = (m_pNode[m_pWingList[i]->m_pPanel[p].m_iTA] + m_pNode[m_pWingList[i]->m_pPanel[p].m_iTB])/2.0;
 
-	if(m_pStab)
-	{
-		memset(m_pStab->m_Vd, 0, sizeof(m_pStab->m_Vd));
-		m=0;
-		for (p=0; p< m_pStab->m_MatSize; p++)
-		{
-			if(m_pStab->m_pPanel[p].m_bIsTrailing)
-			{
-				C = (m_pNode[m_pStab->m_pPanel[p].m_iTA] + m_pNode[m_pStab->m_pPanel[p].m_iTB])/2.0;
-				for (pp=0; pp<m_MatSize; pp++)
-				{
-					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
-					m_pStab->m_Vd[m] += V * Gamma[pp];
+					for (pp=0; pp<m_MatSize; pp++)
+					{
+						VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
+						m_pWingList[i]->m_Vd[m] += V * Gamma[pp];
+					}
+					m_pWingList[i]->m_Ai[m] = atan2(m_pWingList[i]->m_Vd[m].z, m_OpQInf) * 180.0/PI;
+					m++;
 				}
-				m_pStab->m_Ai[m] = atan2(m_pStab->m_Vd[m].z, m_OpQInf) * 180.0/PI;
-				m++;
-			}
-		}
-	}
-
-	if(m_pFin)
-	{
-		memset(m_pFin->m_Vd, 0, sizeof(m_pFin->m_Vd));
-		m=0;
-		for (p=0; p< m_pFin->m_MatSize; p++)
-		{
-			if(m_pFin->m_pPanel[p].m_bIsTrailing)
-			{
-				C = (m_pNode[m_pFin->m_pPanel[p].m_iTA] + m_pNode[m_pFin->m_pPanel[p].m_iTB])/2.0;
-				for (pp=0; pp<m_MatSize; pp++)
-				{
-					VLMGetVortexInfluence(m_pPanel+pp,C,V,false);
-					m_pFin->m_Vd[m] += V * Gamma[pp];
-				}
-				m_pFin->m_Ai[m] = atan2(m_pFin->m_Vd[m].z, m_OpQInf) * 180.0/PI;
-				m++;
 			}
 		}
 	}
@@ -1397,8 +1292,7 @@ void VLMAnalysisDlg::VLMSetDownwash(double *Gamma)
 void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 {
 	// calculates the induced angles from the vortices strengths
-	CVector C, CG;
-	CVector Vt;
+	CVector C, CG, Vt;
 	int p, pp, m;
 	double Ai[4*MAXSTATIONS];
 	m=0;
@@ -1414,9 +1308,7 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 	{
 		if(m_pPanel[p].m_bIsTrailing)
 		{
-			C.x = (m_pNode[m_pPanel[p].m_iTA].x + m_pNode[m_pPanel[p].m_iTB].x)/2.0;
-			C.y = (m_pNode[m_pPanel[p].m_iTA].y + m_pNode[m_pPanel[p].m_iTB].y)/2.0;
-			C.z = (m_pNode[m_pPanel[p].m_iTA].z + m_pNode[m_pPanel[p].m_iTB].z)/2.0;
+			C    = (m_pNode[m_pPanel[p].m_iTA] + m_pNode[m_pPanel[p].m_iTB])/2.0;
 			C.x  = 100.0*m_pWing->m_PlanformSpan;
 
 			CG.x = C.x;
@@ -1437,21 +1329,13 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 		}
 	}
 	int pos = 0;
-	for (m=0; m<m_pWing->m_NStation; m++)	    m_pWing->m_Ai[m] = Ai[m];
-	pos += m_pWing->m_NStation;
-	if(m_pWing2)
+	for(int i=0; i<4; i++)
 	{
-		for (m=0; m<m_pWing2->m_NStation; m++)	m_pWing2->m_Ai[m] = Ai[m+pos];
-		pos += m_pWing2->m_NStation;
-	}
-	if(m_pStab)
-	{
-		for (m=0; m<m_pStab->m_NStation; m++)	m_pStab->m_Ai[m] = Ai[m+pos];
-		pos += m_pStab->m_NStation;
-	}
-	if(m_pFin)
-	{
-		for (m=0; m<m_pFin->m_NStation; m++)	m_pFin->m_Ai[m] = Ai[m+pos];
+		if(m_pWingList[i])
+		{
+			for (m=0; m<m_pWing->m_NStation; m++)	    m_pWingList[i]->m_Ai[m] = Ai[m];
+			pos += m_pWingList[i]->m_NStation;
+		}
 	}
 }
 
@@ -1461,7 +1345,7 @@ void VLMAnalysisDlg::VLMSetAi(double *Gamma)
 bool VLMAnalysisDlg::VLMSolveDouble()
 {
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	static int index[VLMMATSIZE];
+	static int index[VLMMAXMATSIZE];
 
 	int Size;
 	if(m_bVLMSymetric) Size = m_MatSize/2;
@@ -1476,10 +1360,11 @@ bool VLMAnalysisDlg::VLMSolveDouble()
 	memcpy(m_RHS,      m_xRHS, Size * sizeof(double));
 	memcpy(m_RHS+Size, m_zRHS, Size * sizeof(double));
 
-
 //	if(!Gauss(m_aij,Size, m_RHS, 2, &m_bCancel))
 
-	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, index, Size, &m_bCancel))
+	double progress = 0.0;
+	double TaskSize = 0.0;
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, index, Size, &m_bCancel, TaskSize, progress))
 	{
 		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
 		m_bConverged = false;
@@ -1516,7 +1401,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	int n, o, o1, nel, m;
 
 	double Lift, alpha, cosa, sina;
-	double row[VLMMATSIZE];memset(row, 0, sizeof(row));
+//	double row[VLMMAXMATSIZE];memset(row, 0, sizeof(row));
 	double WingIDrag, TempCl;
 
 	CVector Force, WindNormal;

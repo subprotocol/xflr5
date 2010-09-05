@@ -15,13 +15,16 @@
 *******************************************************************************
 
 
-xflr5 v6.00 Beta August xxx, 2010
+xflr5 v6.00 Beta September xxx, 2010
+	- doubled the maximum acceptable size for mesh definitions, i.e;. new value is 5000 panels max.
 	- added Stability and control analysis
 	- changed the foil list table in XDirect
 	- added an option to run polar batch calculations on a list of airfoil
 	- corrected the display bug for stippled lines in 3D view
 	- disabled the 3D-panel method by default
 	- added an option to reverse the zoom direction with the mouse wheel
+	- made some code cleaning in VLM and 3D-Panel analysis
+	- changed the 3D-panel method for planes from full 3D to mixed thin/thick surfaces
 
 
 XFLR5 v5.00 April 11th, 2010

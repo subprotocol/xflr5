@@ -50,7 +50,7 @@ CWOpp::CWOpp()
 	m_NVLMPanels   = 0;
 	m_nFlaps       = 0;
 	m_nControls    = 0;
-	m_AnalysisType = 0;
+	m_AnalysisMethod = 0;
 
 	m_Alpha               = 0.0;
 	m_Beta                = 0.0;
@@ -120,7 +120,7 @@ bool CWOpp::Export(QTextStream &out, int FileType)
 	out << Header;
 
 	int nStart;
-	if(m_AnalysisType==1) nStart = 1;	
+	if(m_AnalysisMethod==1) nStart = 1;
 	else                  nStart = 0;
 
 	if(FileType==1) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
@@ -152,7 +152,7 @@ bool CWOpp::Export(QTextStream &out, int FileType)
 double CWOpp::GetMaxLift()
 {
 	int i,nStart;
-	if(m_AnalysisType==1) nStart = 1;	
+	if(m_AnalysisMethod==1) nStart = 1;
 	else nStart = 0;
 	double maxlift = 0.0;
 	for (i=nStart; i<m_NStation; i++)
@@ -209,7 +209,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		if(m_bIsVisible)   ar << 1; else ar<<0;
 		if(m_bShowPoints)  ar << 1; else ar<<0;
 		if(m_bOut)         ar << 1; else ar<<0;
-		ar << m_AnalysisType;
+		ar << m_AnalysisMethod;
 		if(m_bVLM1)        ar << 1; else ar<<0;
 		if(m_bThinSurface) ar << 1; else ar<<0;
 		if(m_bTiltedGeom)  ar << 1; else ar<<0;
@@ -243,7 +243,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		ar << m_NVLMPanels;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
-		if(m_AnalysisType==3)
+		if(m_AnalysisMethod==3)
 		{
 			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
 		}
@@ -307,12 +307,12 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(a) m_bOut = true; else m_bOut = false;
 
-		ar >> m_AnalysisType;
+		ar >> m_AnalysisMethod;
 		if (a<=0 && a>=10)
 		{
 			return false;
 		}
-		if(m_AnalysisType==0) m_AnalysisType=2;
+		if(m_AnalysisMethod==0) m_AnalysisMethod=2;
 
 		if(ArchiveFormat>=1005)
 		{
@@ -356,7 +356,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		ar >> f; m_VYm =f;
 		ar >> f; m_IYm =f;
 
-		if(ArchiveFormat<1014 && m_AnalysisType>1)
+		if(ArchiveFormat<1014 && m_AnalysisMethod>1)
 		{
 			m_GCm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 		}
@@ -415,7 +415,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		for (k=0; k<=m_NStation; k++)
 		{
 			ar >> f1;
-			if(m_AnalysisType==1  && ArchiveFormat<=1004) m_SpanPos[k] = -f1;
+			if(m_AnalysisMethod==1  && ArchiveFormat<=1004) m_SpanPos[k] = -f1;
 			else                                          m_SpanPos[k] =  f1;
 			if(ArchiveFormat>=1012)
 			{
@@ -444,7 +444,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(ArchiveFormat>1010)
 		{
-			if(m_AnalysisType==3){
+			if(m_AnalysisMethod==3){
 				for (p=0; p<m_NVLMPanels;p++)
 				{
 					ar >> f; m_Sigma[p] = f;

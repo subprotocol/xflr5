@@ -47,7 +47,7 @@ CWPolar::CWPolar()
 	m_TotalWakeLength = 1.0;
 	m_WakePanelFactor =1.1;
 
-	m_AnalysisType = 0;
+	m_AnalysisMethod = 0;
 	m_Type   = 1;
 	m_RefAreaType = 1;
 	m_Style  = 0;
@@ -869,7 +869,7 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	m_bViscous      = pWPolar->m_bViscous;
 	m_bVLM1         = pWPolar->m_bVLM1;
 	m_bWakeRollUp   = pWPolar->m_bWakeRollUp;
-	m_AnalysisType  = pWPolar->m_AnalysisType;
+	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
 	m_bThinSurfaces = pWPolar->m_bThinSurfaces;
 	m_nControls     = pWPolar->m_nControls;
 
@@ -1270,7 +1270,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
 		ar << m_Style  << m_Width;
 		WriteCOLORREF(ar, m_Color);
-		ar << m_AnalysisType;
+		ar << m_AnalysisMethod;
 		if (m_bVLM1)         ar << 1; else ar << 0;
 		if (m_bThinSurfaces) ar << 1; else ar << 0;
 		if (m_bTiltedGeom)   ar << 1; else ar << 0;
@@ -1379,13 +1379,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		ReadCOLORREF(ar, m_Color);
 
-		ar >> m_AnalysisType;
-		if (m_AnalysisType<0 || m_AnalysisType>10)
+		ar >> m_AnalysisMethod;
+		if (m_AnalysisMethod<0 || m_AnalysisMethod>10)
 		{
 			m_PlrName ="";
 			return false;
 		}
-		if(m_AnalysisType==0) m_AnalysisType=2;
+		if(m_AnalysisMethod==0) m_AnalysisMethod=2;
 		
 		if(ArchiveFormat>=1005)
 		{
@@ -1638,7 +1638,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			n = m_Alpha.size();
 
-			//			if(m_AnalysisType==4) n++;
+			//			if(m_AnalysisMethod==4) n++;
 			for(i=0; i< n; i++)
 			{
 				ar>>r0>>r1>>r2>>r3;

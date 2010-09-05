@@ -559,9 +559,9 @@ void PlaneDlg::OnOK()
 	n = m_pPlane->m_Wing.VLMGetPanelTotal();
 	if(m_pPlane->m_bStab) n+= m_pPlane->m_Stab.VLMGetPanelTotal();
 	if(m_pPlane->m_bFin)  n+= m_pPlane->m_Fin.VLMGetPanelTotal();
-	if(n>VLMMATSIZE)
+	if(n>VLMMAXMATSIZE)
 	{
-		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(n).arg(VLMMATSIZE);
+		strong = QString(tr("Total number of VLM panels =%1\n Max Number =%2\nA reduction of the number of VLM panels is required")).arg(n).arg(VLMMAXMATSIZE);
 		QMessageBox::warning(this, tr("Warning"),strong);
 		return ;
 	}

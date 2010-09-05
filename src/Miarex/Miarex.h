@@ -407,16 +407,16 @@ private:
 private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 protected:
-	CPanel m_Panel[VLMMATSIZE];		// the panel array for the currently loaded UFO
-	CPanel *m_pPanel[VLMMATSIZE];		// an array to the re-ordered VLM panels for a calculation
+	CPanel m_Panel[VLMMAXMATSIZE];		// the panel array for the currently loaded UFO
+	CPanel *m_pPanel[VLMMAXMATSIZE];		// an array to the re-ordered VLM panels for a calculation
 
-	CVector m_Node[2*VLMMATSIZE];		// the node array for the currently loaded UFO
-	CVector m_TempWakeNode[2*VLMMATSIZE];	// the temporary wake node array during relaxation calc
+	CVector m_Node[2*VLMMAXMATSIZE];		// the node array for the currently loaded UFO
+	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	// the temporary wake node array during relaxation calc
 
-	double m_aij[VLMMATSIZE*VLMMATSIZE];    // coefficient matrix
-	double m_aijRef[VLMMATSIZE*VLMMATSIZE]; // coefficient matrix
-	double m_RHS[VLMMATSIZE*100];			// RHS vector
-	double m_RHSRef[VLMMATSIZE*100];		// RHS vector
+	double m_aij[VLMMAXMATSIZE*VLMMAXMATSIZE];    // coefficient matrix
+	double m_aijRef[VLMMAXMATSIZE*VLMMAXMATSIZE]; // coefficient matrix
+	double m_RHS[VLMMAXMATSIZE*VLMMAXRHS];			// RHS vector
+	double m_RHSRef[VLMMAXMATSIZE*VLMMAXRHS];		// RHS vector
 
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
@@ -640,12 +640,12 @@ public:
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
 	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 	StabAnalysisDlg *m_pStabDlg;
-	CVector m_MemNode[2*VLMMATSIZE];	// used if the analysis should be performed on the tilted geometry
-	CVector m_WakeNode[2*VLMMATSIZE];	// the reference current wake node array
-	CVector m_RefWakeNode[2*VLMMATSIZE]; 	// the reference wake node array if wake needs to be reset
-	CPanel m_MemPanel[VLMMATSIZE];		// used if the analysis should be performed on the tilted geometry
-	CPanel m_WakePanel[VLMMATSIZE];	// the reference current wake panel array
-	CPanel m_RefWakePanel[VLMMATSIZE]; 	// the reference wake panel array if wake needs to be reset
+	CVector m_MemNode[2*VLMMAXMATSIZE];	// used if the analysis should be performed on the tilted geometry
+	CVector m_WakeNode[2*VLMMAXMATSIZE];	// the reference current wake node array
+	CVector m_RefWakeNode[2*VLMMAXMATSIZE]; 	// the reference wake node array if wake needs to be reset
+	CPanel m_MemPanel[VLMMAXMATSIZE];		// used if the analysis should be performed on the tilted geometry
+	CPanel m_WakePanel[VLMMAXMATSIZE];	// the reference current wake panel array
+	CPanel m_RefWakePanel[VLMMAXMATSIZE]; 	// the reference wake panel array if wake needs to be reset
 
 	void RotateGeomY(double const &Angle, CVector const &P);
 	

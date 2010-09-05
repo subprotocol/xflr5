@@ -51,6 +51,7 @@ public:
 
 private slots:
 	void OnCancelAnalysis();
+	void OnProgress();
 
 
 private:
@@ -61,42 +62,40 @@ private:
 
 	void keyPressEvent(QKeyEvent *event);
 
-	bool ComputeAeroCoefs(double V0, double VDelta, int nrhs);
-	bool ComputeOnBody(int q, double Alpha);
-	bool ComputePlane(double Alpha, int qrhs);
-	bool ComputeSurfSpeeds(double *Mu, double *Sigma);
-	bool CreateDoubletStrength(double V0, double VDelta, int nval);
-	bool CreateMatrix();
-	bool CreateRHS(double V0, double VDelta, int nval);
-	bool CreateWakeContribution();
 	bool StartPanelThread();
 	bool SolveMultiple(double V0, double VDelta, int nval);
 
 	bool AlphaLoop();
 	bool ReLoop();
 	bool UnitLoop();
-	bool ControlLoop();
-	bool Gauss(double *A, int n, double *B, int m, int TaskSize);
 
 	void AddString(QString strong);
-	void CheckSolution();
+	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
+	void ComputeOnBody(int qrhs, double Alpha);
+	void ComputePlane(double Alpha, int qrhs);
+	void ComputeSurfSpeeds(double *Mu, double *Sigma);
+	void CreateDoubletStrength(double V0, double VDelta, int nval);
+	void CreateMatrix();
+	void CreateRHS(double V0, double VDelta, int nval);
+	void CreateWakeContribution();
 	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void EndSequence();
-	void GetDoubletInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
-	void GetSourceInfluence(CVector const &TestPt, CPanel *pPanel, CVector &V, double &phi);
+	void GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
+	void GetSourceInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
 	void RelaxWake();
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
-	void SetProgress(int TaskSize,double TaskProgress);
 	void SetFileHeader();
 	void SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
-	void SetDownwash(double *Mu, double *Sigma);
 	void SetAi(int qrhs);
 	void SetupLayout();
 	void StartAnalysis();
 	void SumPanelForces(double *Cp, double Alpha, double &Lift, double &Drag);
 	void UpdateView();
-	void VLMQmn(CVector LA, CVector LB, CVector TA, CVector TB, CVector C, CVector &V);
 	void WriteString(QString strong);
+	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
+
+	void GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const Alpha, double const &QInf, CVector &VInf);
+	void GetVortexCp(const int &p, double *Gamma, double *Cp, double const Alpha, CVector &VInf);
 
 	CVector GetSpeedVector(CVector C, double *Gamma);
 
@@ -119,7 +118,6 @@ private:
 	bool m_bWakeRollUp;
 
 	int m_State;
-	int m_Progress;
 	int m_nNodes;
 	int m_MatSize;
 	int m_NSurfaces;
@@ -129,6 +127,7 @@ private:
 	int m_WakeInterNodes;
 	int m_MaxWakeIter;
 
+	double m_Progress;
 
 	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
 	double m_Alpha;//Angle of Attack in degree
@@ -152,14 +151,13 @@ private:
 	double *m_aij, *m_aijRef;
 	double *m_RHS, *m_RHSRef;
 
-	double m_row[VLMMATSIZE];
-	double m_cosRHS[VLMMATSIZE], m_sinRHS[VLMMATSIZE];
-	double m_Sigma[VLMMATSIZE*100];			// Source strengths
-	double m_Mu[VLMMATSIZE*100];			// Doublet strengths
-	double m_Cp[VLMMATSIZE*100];			// lift coef per panel
-	double m_3DQInf[100];
+	double m_cosRHS[VLMMAXMATSIZE], m_sinRHS[VLMMAXMATSIZE];
+	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];			// Source strengths
+	double m_Mu[VLMMAXMATSIZE*VLMMAXRHS];			// Doublet strengths, or vortex circulations if panel is located on a thin surface
+	double m_Cp[VLMMAXMATSIZE*VLMMAXRHS];			// lift coef per panel
+	double m_3DQInf[VLMMAXRHS];
 
-	CVector m_Speed[VLMMATSIZE];
+	CVector m_Speed[VLMMAXMATSIZE];
 
 	CVector *m_pR[5];
 	CVector r0, r1, r2, Psi, t;
@@ -194,11 +192,12 @@ private:
 	CPanel m_SymPanel;
 	
 public:
-	CWing *m_pWing; //pointer to the geometry class of the wing 
+	CWing * m_pWingList[4];
+	CWing *m_pWing; //pointer to the geometry class of the wing
 	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
 	CWing *m_pStab;
 	CWing *m_pFin;
-	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT);
+	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
 };
 
 #endif // PANELANALYSISDLG_H

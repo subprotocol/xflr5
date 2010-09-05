@@ -889,7 +889,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		pWOpp->m_MaxBending = Cb;
 
-		if(m_pCurWPolar->m_AnalysisType==2 && m_pVLMDlg)
+		if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD && m_pVLMDlg)
 		{
 			pPOpp->m_NPanels          = m_pVLMDlg->m_MatSize;
 			pPOpp->m_Alpha            = m_pVLMDlg->m_OpAlpha;
@@ -935,7 +935,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta	             = m_pCurWPolar->m_Beta;
 		}
-		else if(m_pCurWPolar->m_AnalysisType==3 && m_pPanelDlg)
+		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
 		{
 			pPOpp->m_NPanels             = m_pPanelDlg->m_MatSize;
 			pPOpp->m_Alpha               = m_pPanelDlg->m_OpAlpha;
@@ -962,7 +962,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
 		}
-		else if(m_pCurWPolar->m_AnalysisType==4 && m_pStabDlg)
+		else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pStabDlg)
 		{
 			pPOpp->m_NPanels          = m_pStabDlg->m_MatSize;
 			pPOpp->m_Alpha            = m_pStabDlg->m_AlphaEq;
@@ -1291,7 +1291,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 		pNewPoint->m_NStation            = m_pCurWing->m_NStation;
 
 		pNewPoint->m_PlrName             = m_pCurWPolar->m_PlrName;
-		pNewPoint->m_AnalysisType        = m_pCurWPolar->m_AnalysisType;
+		pNewPoint->m_AnalysisMethod        = m_pCurWPolar->m_AnalysisMethod;
 		pNewPoint->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 		pNewPoint->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 		pNewPoint->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
@@ -1301,7 +1301,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 		double Cb =0.0;
 
-		if(m_pCurWPolar->m_AnalysisType==1)
+		if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 		{
 			pNewPoint->m_Alpha               = CWing::s_Alpha;
 			pNewPoint->m_QInf                = CWing::s_QInf;
@@ -1346,7 +1346,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 				if(fabs(m_pCurWing->m_BendingMoment[l])>fabs(Cb))	Cb = m_pCurWing->m_BendingMoment[l];
 			}
 		}
-		else if(m_pCurWPolar->m_AnalysisType==2 && m_pVLMDlg)
+		else if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD && m_pVLMDlg)
 		{
 			pNewPoint->m_Alpha               = m_pVLMDlg->m_OpAlpha;
 			pNewPoint->m_QInf                = m_pVLMDlg->m_OpQInf;
@@ -1413,7 +1413,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_nFlaps = m_pCurWing->m_nFlaps;
 		}
-		else if(m_pCurWPolar->m_AnalysisType==3 && m_pPanelDlg)
+		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
 		{
 			pNewPoint->m_Alpha               = m_pPanelDlg->m_OpAlpha;
 			pNewPoint->m_QInf                = m_pPanelDlg->m_QInf;
@@ -1484,7 +1484,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_nFlaps = m_pCurWing->m_nFlaps;
 		}
-		else if(m_pCurWPolar->m_AnalysisType==4 && m_pCurWPolar->m_Type==7 && m_pStabDlg)
+		else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pCurWPolar->m_Type==7 && m_pStabDlg)
 		{
 			pNewPoint->m_Alpha               = m_pStabDlg->m_AlphaEq;
 			pNewPoint->m_Beta                = m_pCurWPolar->m_Beta;
@@ -1777,7 +1777,9 @@ void QMiarex::SetControls()
 	{
 		pMainFrame->StabilityAct->setEnabled(false);
 	}
-	
+
+	m_pctrlInitLLTCalc->setEnabled(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==LLTMETHOD);
+
 	pMainFrame->m_pctrlWOppView->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
@@ -1856,9 +1858,9 @@ void QMiarex::SetControls()
 	m_pctrlDownwash->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVortices->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlMoment->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
-	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
-	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
-	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisType!=1);
+	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
+	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
+	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
 	m_pctrlHighlightOpp->setEnabled(m_iView==WPOLARVIEW);
 
 	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
@@ -2285,7 +2287,7 @@ void QMiarex::CreateCpCurves()
 
 	int coef = 2;
 	bool b2Sides = true;
-	if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces)
+	if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces)
 	{
 		b2Sides = false;
 		coef = 1;
@@ -2303,7 +2305,7 @@ void QMiarex::CreateCpCurves()
 	{
 		p=0;
 		bFound = false;
-		if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
+		if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
 
 		SpanInc = -m_pCurWing->m_PlanformSpan/2.0;
 		for (p=0; p<m_pCurWing->m_MatSize; p++)
@@ -2364,7 +2366,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurWing2->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurWing2->m_MatSize; p++)
@@ -2400,7 +2402,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurStab->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurStab->m_MatSize; p++)
@@ -2437,7 +2439,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurFin->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurFin->m_MatSize; p++)
@@ -2495,7 +2497,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 	CVector LA, LB, TA, TB;
 
 	if ((!m_pCurWPolar && pSurface->m_bIsTipLeft) ||
-		( m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && pSurface->m_bIsTipLeft && !m_pCurWPolar->m_bThinSurfaces))
+		( m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && pSurface->m_bIsTipLeft && !m_pCurWPolar->m_bThinSurfaces))
 	{
 		//then left tip surface, add side panels
 		for (l=0; l< pSurface->m_NXPanels; l++)
@@ -2565,12 +2567,12 @@ int QMiarex::CreateElements(CSurface *pSurface)
 	{
 		//add "horizontal" panels, mid side, or following a strip from bot to top if 3D Panel
 		if(!m_pCurWPolar)                        side = -1;
-		else if(m_pCurWPolar->m_AnalysisType==1) side =  0;
+		else if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD) side =  0;
 		else
 		{
-			if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_AnalysisType==4 || m_pCurWPolar->m_bThinSurfaces)
+			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD || m_pCurWPolar->m_bThinSurfaces)
 				side = 0;
-			else if (m_pCurWPolar->m_AnalysisType==3)
+			else if (m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 				side =-1; //start with lower surf, as recommended by K&P
 		}
 		//from T.E. to L.E.
@@ -2668,11 +2670,11 @@ int QMiarex::CreateElements(CSurface *pSurface)
 			if(k==0)                      m_Panel[m_MatSize].m_iPR = -1;
 			if(k==pSurface->m_NYPanels-1) m_Panel[m_MatSize].m_iPL = -1;
 
-			if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisType>=2)
+			if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisMethod>=2)
 			{
 				m_Panel[m_MatSize].m_iWake = m_WakeSize;//next wake element
 				m_Panel[m_MatSize].m_iWakeColumn = m_NWakeColumn;
-				if(m_pCurWPolar->m_AnalysisType==2 || m_pCurWPolar->m_AnalysisType==4 || m_pCurWPolar->m_bThinSurfaces)
+				if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD || m_pCurWPolar->m_bThinSurfaces)
 				{
 					CreateWakeElems(m_MatSize);
 					m_NWakeColumn++;
@@ -2685,7 +2687,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 		}
 
 		if (!m_pCurWPolar ||
-			(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && !m_pCurWPolar->m_bThinSurfaces))
+			(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bThinSurfaces))
 		{ //add top side if 3D Panels
 
 			side = 1; //next upper surf, as recommended by K&P
@@ -2759,7 +2761,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 				if(k==pSurface->m_NYPanels-1) m_Panel[m_MatSize].m_iPR = -1;
 
 
-				if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisType==3)
+				if(m_pCurWPolar && m_Panel[m_MatSize].m_bIsTrailing && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 				{
 					m_Panel[m_MatSize].m_iWake = m_WakeSize;//next wake element
 					m_Panel[m_MatSize].m_iWakeColumn = m_NWakeColumn;
@@ -2774,7 +2776,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 	}
 
 	if ((!m_pCurWPolar && pSurface->m_bIsTipRight) ||
-		( m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && pSurface->m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces))
+		( m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && pSurface->m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces))
 	{	//right tip surface
 		k = pSurface->m_NYPanels-1;
 		for (l=0; l< pSurface->m_NXPanels; l++){
@@ -2991,21 +2993,21 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 	pWOpp->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 	pWOpp->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
-	pWOpp->m_AnalysisType        = m_pCurWPolar->m_AnalysisType;
+	pWOpp->m_AnalysisMethod        = m_pCurWPolar->m_AnalysisMethod;
 
-	if(m_pCurWPolar->m_AnalysisType==2 && m_pVLMDlg)
+	if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD && m_pVLMDlg)
 	{
 		pWOpp->m_bOut                = m_pVLMDlg->m_bPointOut;
 		pWOpp->m_Alpha               = m_pVLMDlg->m_AlphaMin;
 		pWOpp->m_QInf                = m_pVLMDlg->m_OpQInf;
 	}
-	else if(m_pCurWPolar->m_AnalysisType==3 && m_pPanelDlg)
+	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
 	{
 		pWOpp->m_bOut                = m_pPanelDlg->m_bPointOut;
 		pWOpp->m_Alpha               = m_pPanelDlg->m_Alpha;
 		pWOpp->m_QInf                = m_pPanelDlg->m_QInf;
 	}
-	else if(m_pCurWPolar->m_AnalysisType==4 && m_pStabDlg)
+	else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pStabDlg)
 	{
 		pWOpp->m_bOut                = m_pStabDlg->m_bPointOut;
 		pWOpp->m_Alpha               = m_pStabDlg->m_AlphaEq;
@@ -3429,12 +3431,13 @@ void QMiarex::CreateWOppCurves()
 			}
 		}
 	}
+
 	if(m_bShowElliptic && m_pCurWOpp)
 	{
 		double maxlift, x, y;
 		maxlift = m_pCurWOpp->GetMaxLift();
 		int nStart;
-		if(m_pCurWOpp->m_AnalysisType==1) nStart = 1;
+		if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1;
 		else nStart = 0;
 		if(m_WingGraph1.GetYVariable()==3)
 		{
@@ -4205,13 +4208,13 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 		else                             str5 ="";
 
 
-		if(m_pCurWOpp->m_AnalysisType==1)  str6="_LLT";
-		else if(m_pCurWOpp->m_AnalysisType==2)
+		if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD)  str6="_LLT";
+		else if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD)
 		{
 			if(m_pCurWOpp->m_bVLM1)	str6="_VLM1";
 			else 					str6="_VLM2";
 		}
-		else if(m_pCurWOpp->m_AnalysisType==3)
+		else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 		{
 			str6="_Panel";
 			if(m_pCurWOpp->m_bThinSurface) str6 += "_Thin";
@@ -4297,13 +4300,13 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						if(pWOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pWOpp->m_Ctrl,5,'f',2);
 						else                        str5 ="";
 
-						if(pWOpp->m_AnalysisType==1) str6 ="_LLT";
-						else if(pWOpp->m_AnalysisType==2)
+						if(pWOpp->m_AnalysisMethod==LLTMETHOD) str6 ="_LLT";
+						else if(pWOpp->m_AnalysisMethod==VLMMETHOD)
 						{
 							if(pWOpp->m_bVLM1)       str6 ="_VLM1";
 							else                     str6 ="_VLM2";
 						}
-						else if(pWOpp->m_AnalysisType==3)
+						else if(pWOpp->m_AnalysisMethod==PANELMETHOD)
 						{
 							str6="_Panel";
 							if(pWOpp->m_bThinSurface) str6 += "_Thin";
@@ -4353,12 +4356,12 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						if(pPOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pPOpp->m_Ctrl,5,'f',2);
 						else                        str5 ="";
 						
-						if(pPOpp->m_WingWOpp.m_AnalysisType==2)
+						if(pPOpp->m_WingWOpp.m_AnalysisMethod==VLMMETHOD)
 						{
 							if(pPOpp->m_bVLM1)      str6 ="_VLM1";
 							else                    str6 ="_VLM2";
 						}
-						else if(pPOpp->m_WingWOpp.m_AnalysisType==3)
+						else if(pPOpp->m_WingWOpp.m_AnalysisMethod==PANELMETHOD)
 						{
 							str6="_Panel";
 							if(pPOpp->m_WingWOpp.m_bThinSurface) str4 += "_Thin";
@@ -4462,8 +4465,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			if (pWPolar->m_Alpha.size() &&
 				pWPolar->m_PlrName.length() &&
 				pWPolar->m_bIsVisible &&
-				((pWPolar->m_AnalysisType==4 && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
-				pWPolar->m_UFOName == str.at(k) &&
+				((pWPolar->m_AnalysisMethod==STABILITYMETHOD && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+				  pWPolar->m_UFOName == str.at(k) &&
 				((pWPolar->m_Type == 1 && m_bType1) ||
 				 (pWPolar->m_Type == 2 && m_bType2) ||
 				 (pWPolar->m_Type == 4 && m_bType4) ||
@@ -4500,8 +4503,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					if (pWPolar->m_Alpha.size() &&
 						pWPolar->m_PlrName.length() &&
 						pWPolar->m_bIsVisible &&
-						((pWPolar->m_AnalysisType==4 && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
-						pWPolar->m_UFOName == str.at(k) &&
+						((pWPolar->m_AnalysisMethod==STABILITYMETHOD && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+						  pWPolar->m_UFOName == str.at(k) &&
 						((pWPolar->m_Type == 1 && m_bType1) ||
 						 (pWPolar->m_Type == 2 && m_bType2) ||
 						 (pWPolar->m_Type == 4 && m_bType4) ||
@@ -4530,7 +4533,7 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 					}
 				}
 			}
-			if (UFOPlrs) ny++;
+			if(UFOPlrs) ny++;
 		}
 	}
 	painter.restore();
@@ -4724,7 +4727,7 @@ void QMiarex::FillWOppCurve(CWOpp *pWOpp, Graph *pGraph, CCurve *pCurve)
 	int Var = pGraph->GetYVariable();
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	int nStart, i;
-	if(pWOpp->m_AnalysisType==1) nStart = 1;
+	if(pWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1;
 	else nStart = 0;
 
 	switch(Var)
@@ -5234,23 +5237,23 @@ void QMiarex::GLCallViewLists()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod ==3 && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
 
 	if(m_bMoments && m_pCurWOpp)			glCallList(VLMMOMENTS);
 
-	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisType>=2 && !m_bResetglStream)
+	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglStream)
 		glCallList(VLMSTREAMLINES);//streamlines are not rotated
 
-	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisType>=2 && !m_bResetglFlow)
+	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglFlow)
 		glCallList(SURFACESPEEDS);
 
 
 	if (m_pCurWOpp)                                      glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType ==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod ==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
 	if(m_bVLMPanels && m_pCurWing)
@@ -5258,7 +5261,7 @@ void QMiarex::GLCallViewLists()
 		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
 		glCallList(MESHPANELS);
 	}
-	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
+	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 	{
 		glCallList(PANELCP);
 	}
@@ -5697,7 +5700,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(WINGWAKEPANELS,1);
 			m_GLList-=1;
 		}
-		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3)
+		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
 //			GLCreateWakePanels(WINGWAKEPANELS);
 		}
@@ -5917,7 +5920,7 @@ void QMiarex::GLDraw3D()
 		if(m_bStream)
 		{
 			//no need to recalculate if not showing
-			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
+			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 			{
 				if(glIsList(VLMSTREAMLINES))
 				{
@@ -5949,7 +5952,7 @@ void QMiarex::GLDraw3D()
 	{
 		if(m_bSpeeds)
 		{
-			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2)
+			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 			{
 				if(glIsList(SURFACESPEEDS))
 				{
@@ -6103,7 +6106,7 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
-		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisType>=2 )
+		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
 			glCallList(WOPPCPLEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
@@ -6357,7 +6360,7 @@ bool QMiarex::InitializePanels()
 	dlg.setValue(0);
 
 	// first check that the total number of panels that will be created does not exceed
-	// the limit set by the parameter VLMMATSIZE
+	// the limit set by the parameter VLMMAXMATSIZE
 	m_MatSize = 0;
 
 	for (j=0; j<m_NSurfaces; j++)
@@ -6365,7 +6368,7 @@ bool QMiarex::InitializePanels()
 		m_MatSize += m_pSurface[j]->m_NXPanels * m_pSurface[j]->m_NYPanels ;
 	}
 
-	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && !m_pCurWPolar->m_bThinSurfaces)
+	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bThinSurfaces)
 	{
 		m_MatSize *= 2;
 		for (j=0; j<m_NSurfaces; j++)
@@ -6382,15 +6385,15 @@ bool QMiarex::InitializePanels()
 
 		//create the body elements only if there is a body, and the analysis is not of the VLM Type
 		if(!m_pCurWPolar)                         bBodyEl = true;//no risk...
-		else if(m_pCurWPolar->m_AnalysisType==3)  bBodyEl = true;
+		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)  bBodyEl = true;
 		else                                      bBodyEl = false;
 	}
 
-	if(m_MatSize>VLMMATSIZE)
+	if(m_MatSize>VLMMAXMATSIZE)
 	{
 		QString strong;
 		strong = QString(tr("The total number of panels is %1\n The Max Number is %2\nA reduction of the number of panels is required"))
-						  .arg(m_MatSize).arg(VLMMATSIZE);
+						  .arg(m_MatSize).arg(VLMMAXMATSIZE);
 		QMessageBox::warning(this,tr("Warning"),strong);
 		m_MatSize = 0;
 		m_nNodes  = 0;
@@ -6487,7 +6490,7 @@ bool QMiarex::InitializePanels()
 	// we reference the right side panels in reverse order, from right to left, for symmetry purposes
 
 	int coef=1;
-	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 &&!m_pCurWPolar->m_bThinSurfaces) coef = 2;
+	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD &&!m_pCurWPolar->m_bThinSurfaces) coef = 2;
 
 	if(bBodyEl)
 	{
@@ -6512,7 +6515,7 @@ bool QMiarex::InitializePanels()
 			if(m_pCurFin->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurFin->m_Surface[j].m_NElements;
 			else
 			{
-				if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && m_pCurFin->m_Surface[j].m_bIsTipLeft)
+				if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pCurFin->m_Surface[j].m_bIsTipLeft)
 				{
 					// process left tip patch
 					for (l=m_pCurFin->m_Surface[j].m_NXPanels-1;l>=0; l--)
@@ -6533,7 +6536,7 @@ bool QMiarex::InitializePanels()
 					ptr += m_pCurFin->m_Surface[j].m_NXPanels * coef;
 				}
 
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3
+				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
 					&& m_pCurFin->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
 				{
 					// process right tip patch
@@ -6567,7 +6570,7 @@ bool QMiarex::InitializePanels()
 					ptr += m_pCurStab->m_Surface[j].m_NXPanels * coef;
 				}
 
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3
+				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
 					&& m_pCurStab->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
 				{
 					// process right tip patch
@@ -6601,7 +6604,7 @@ bool QMiarex::InitializePanels()
 					ptr += m_pCurWing2->m_Surface[j].m_NXPanels * coef;
 				}
 
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3
+				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
 					&& m_pCurWing2->m_Surface[j].m_bIsTipRight&& !m_pCurWPolar->m_bThinSurfaces)
 				{
 					// process right tip patch
@@ -6636,7 +6639,7 @@ bool QMiarex::InitializePanels()
 					ptr += m_pCurWing->m_Surface[j].m_NXPanels * coef;
 				}
 
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3
+				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
 					&& m_pCurWing->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
 				{
 					// process right tip patch
@@ -6835,7 +6838,7 @@ int QMiarex::IsNode(CVector &Pt)
 
 void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, int pr)
 {
-	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisType!=3) return;//panel analysis only
+	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisMethod!=3) return;//panel analysis only
 
 	// In the case where the number of chordwise panels is different between two adjacent surfaces,
 	// We need to correct the ideal connection that was set in the CreateElements() method.
@@ -6852,7 +6855,7 @@ void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, in
 	MidNormal.Normalize();
 
 	int coef = 1;
-	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisType==3 && !m_pCurWPolar->m_bThinSurfaces) coef = 2;
+	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bThinSurfaces) coef = 2;
 
 	//left surface's right side
 	ppl = pl;
@@ -7823,7 +7826,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			if(m_r2DCltRect.contains(point)) p2DWidget->setFocus();
 			
 			if(m_pCurGraph && m_iView==WSTABVIEW && (m_iStabilityView==1)
-			   && m_pCurWPolar && m_pCurWPolar->m_AnalysisType==4)
+			   && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD)
 			{
 				//first we try to see if the user intended to select a mode;
 				//if not, then we initiate the graph translation
@@ -8433,19 +8436,19 @@ void QMiarex::OnAnalyze()
 		}
 	}
 
-	if(m_pCurWPolar->m_AnalysisType==1)
+	if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
 	}
-	else if(m_pCurWPolar->m_AnalysisType==2)
+	else if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD)
 	{
 		VLMAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
-	else if(m_pCurWPolar->m_AnalysisType==3)
+	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 	{
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
-	else if(m_pCurWPolar->m_AnalysisType==4)
+	else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD)
 	{
 		StabAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
@@ -8965,7 +8968,7 @@ void QMiarex::OnDefineCtrlPolar()
 		pCurWPolar->m_bVLM1           = true;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
-		pCurWPolar->m_AnalysisType    = 2; //vlm
+		pCurWPolar->m_AnalysisMethod    = 2; //vlm
 		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_CoG.x          = 0.0;
@@ -9111,7 +9114,7 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_bVLM1           = true;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
-		pCurWPolar->m_AnalysisType    = 4; //Stability analysis
+		pCurWPolar->m_AnalysisMethod    = 4; //Stability analysis
 		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
@@ -9238,7 +9241,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_bTiltedGeom     = m_WngAnalysis.m_bTiltedGeom;
 		pNewWPolar->m_bWakeRollUp     = m_WngAnalysis.m_bWakeRollUp;
 		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
-		pNewWPolar->m_AnalysisType    = m_WngAnalysis.m_AnalysisType;
+		pNewWPolar->m_AnalysisMethod    = m_WngAnalysis.m_AnalysisMethod;
 		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
 //		pNewWPolar->m_bThinSurfaces   = true;
 		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
@@ -9246,8 +9249,6 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
 		pNewWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
 		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
-
-//		pNewWPolar->m_bPolar       = true;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		CWPolar *pWPolar;
@@ -10058,7 +10059,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
 	out << strong;
 
-	if(m_pCurWOpp->m_AnalysisType==4)
+	if(m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 	{
 		//export non dimensional stability derivatives
 		if(type==1) 
@@ -10238,18 +10239,18 @@ void QMiarex::OnExportCurWOpp()
 		m_pCurPOpp->m_FinWOpp.Export(out, type);
 	}
 
-	if(m_pCurWOpp->m_AnalysisType>=2)
+	if(m_pCurWOpp->m_AnalysisMethod>=2)
 	{
 		if(m_pCurPOpp) out << tr("Main Wing Cp Coefficients\n");
 		else           out << tr("Wing Cp Coefficients\n");
 		coef = 1;
 
-		if(m_pCurWOpp->m_AnalysisType==2 || m_pCurWOpp->m_AnalysisType==4)
+		if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 		{
 			if(type==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
 			else        out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
 		}
-		else if(m_pCurWOpp->m_AnalysisType==3)
+		else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 		{
 			coef = 2;
 			if(type==1) out << tr(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
@@ -10273,11 +10274,11 @@ void QMiarex::OnExportCurWOpp()
 
 				for(l=0; l<m_pCurWing->m_Surface[j].m_NXPanels * coef; l++)
 				{
-					if(m_pCurWOpp->m_AnalysisType==2 || m_pCurWOpp->m_AnalysisType==4)
+					if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 					{
 						strong = QString(Format).arg(p,4).arg(m_Panel[p].CtrlPt.x,11,'e',3).arg(m_Panel[p].CtrlPt.y,11,'e',3).arg(m_Panel[p].CtrlPt.z,11,'e',3).arg(m_pCurWOpp->m_Cp[p],11,'f',4);
 					}
-					else if(m_pCurWOpp->m_AnalysisType==3)
+					else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 					{
 						strong = QString(Format).arg(p,4).arg(m_Panel[p].CollPt.x,11,'e',3).arg(m_Panel[p].CollPt.y,11,'e',3).arg(m_Panel[p].CollPt.z,11,'e',3).arg(m_pCurWOpp->m_Cp[p],11,'f',4);
 					}
@@ -10305,11 +10306,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurWing2->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2 || m_pCurWOpp->m_AnalysisType==4)
+						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurWing2->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_Wing2WOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisType==3)
+						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurWing2->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_Wing2WOpp.m_Cp[p],11,'f',4);
 						}
@@ -10338,11 +10339,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurStab->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2 || m_pCurWOpp->m_AnalysisType==4)
+						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurStab->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurStab->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurStab->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_StabWOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisType==3)
+						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurStab->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurStab->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurStab->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_StabWOpp.m_Cp[p],11,'f',4);
 						}
@@ -10370,11 +10371,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurFin->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisType==2 || m_pCurWOpp->m_AnalysisType==4)
+						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurFin->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurFin->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurFin->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_FinWOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisType==3)
+						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurFin->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurFin->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurFin->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_FinWOpp.m_Cp[p],11,'f',4);
 						}
@@ -12655,7 +12656,7 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 
 	if(m_pCurWPolar)
 	{
-		if(m_pCurWPolar->m_AnalysisType!=4)  Mass = m_pCurWPolar->m_Weight;
+		if(m_pCurWPolar->m_AnalysisMethod!=4)  Mass = m_pCurWPolar->m_Weight;
 		else
 		{
 			if(m_pCurPlane)
@@ -12830,7 +12831,7 @@ void QMiarex::PaintXTr(QPainter & painter, QPoint ORef, double scale)
 //	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	double y;
 	int m,nStart;
-	if(m_pCurWOpp->m_AnalysisType==1) nStart = 1; else nStart = 0;
+	if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1; else nStart = 0;
 	if(m_bHalfWing) nStart = m_pCurWOpp->m_NStation/2;
 	QPoint O(ORef);
 	QPoint offset, From, To;
@@ -12915,7 +12916,7 @@ void QMiarex::PaintXCP(QPainter & painter, QPoint ORef, double scale)
 	double y;
 	int nStart;
 	double offLE;
-	if(m_pCurWOpp->m_AnalysisType==1) nStart = 1; else nStart = 0;
+	if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1; else nStart = 0;
 	if(m_bHalfWing) nStart = m_pCurWOpp->m_NStation/2;
 
 	QPoint O(ORef);
@@ -15217,7 +15218,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		CWing::s_bVLM1        = m_pCurWPolar->m_bVLM1;
 //		m_pCurWing->m_bVLMSymetric = m_pCurWing->m_bSymetric;
 
-		if(m_pCurWPolar->m_AnalysisType>1)
+		if(m_pCurWPolar->m_AnalysisMethod>1)
 		{
 			NStation = 0;
 			m=0;
@@ -15306,7 +15307,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 //				for(m=0; m<NStation/2; m++) m_pCurFin->m_SpanPos[m] = -m_pCurFin->m_SpanPos[NStation-m-1];
 			}
 		}
-		else if(m_pCurWPolar->m_AnalysisType==1)
+		else if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 		{
 //			m_pCurWing->m_NStation  = m_NStation;
 			m_pCurWing->m_bLLT      = true;

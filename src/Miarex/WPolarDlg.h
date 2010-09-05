@@ -80,7 +80,7 @@ private:
 
 	int m_Type;
 	int m_UnitType;//1= International, 2= English
-	int m_AnalysisType; //0=LLT;1=VLM;2=Panel
+	int m_AnalysisMethod; //0=LLT;1=VLM;2=Panel
 
 	bool m_bAutoName;
 	bool m_bVLM1; //true if Classic, false if Quendez
