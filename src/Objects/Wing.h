@@ -101,7 +101,6 @@ protected:
 	void SetTwist(double Twist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
-	bool Gauss(double *A, int n, double *B, int m);
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
@@ -171,7 +170,6 @@ protected:
 
 	double m_GChord;	// mean geometric chord
 	double m_yMac;		// mean aerodynamic chord span position
-	double m_Volume;	// for tentative wieght calculations
 	double m_CL;		//Lift
 	double m_InducedDrag, m_ViscousDrag;
 	double m_XCP, m_YCP;	// Centre of pressure's position

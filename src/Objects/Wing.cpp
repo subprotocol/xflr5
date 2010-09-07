@@ -20,9 +20,10 @@
 *****************************************************************************/
 
 //
-// This class is both the interface class associated to the wing definition dialog box
-// and the class which implements all calculation routines associated to the wing,
-// including LLT and VLM methods
+// This class :
+//	- defines the wing object
+//	- provides the methods for the calculation of the wing geometric properties
+//	- provides methods for LLT, VLM and Panel methods
 //
 
 
@@ -160,7 +161,7 @@ CWing::CWing()
 	m_NSurfaces = 0;
 
 	s_Alpha      = 0.0;
-	m_Volume     = 0.0;
+
 	m_AR         = 0.0;// Aspect ratio
 	m_TR         = 0.0;// Taper ratio
 	m_GChord     = 0.0;// mean geometric chord
@@ -251,6 +252,7 @@ void CWing::ComputeDihedrals()
 void CWing::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
+	//
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
 	QMiarex    *pMiarex = (QMiarex*)   s_pMiarex;
 	CFoil *pFoilA, *pFoilB;
@@ -272,7 +274,7 @@ void CWing::ComputeGeometry()
 	m_ProjectedSpan = 0.0;
 	m_MAChord = 0.0;
 	m_yMac    = 0.0;
-	m_Volume  = 0.0;
+
 	for (k=0; k<m_NPanel; k++)
 	{
 		pFoilA = pMainFrame->GetFoil(m_RFoil[k]);
@@ -281,10 +283,6 @@ void CWing::ComputeGeometry()
 		xysurface += (m_TLength[k+1]*(m_TChord[k]+m_TChord[k+1])/2.0)*cos(m_TDihedral[k]*PI/180.0);
 		m_ProjectedSpan += m_TLength[k+1]*cos(m_TDihedral[k]*PI/180.0);
 
-		if(pFoilA && pFoilB)
-		{
-			m_Volume  += m_TLength[k+1]*(pFoilA->GetArea()*m_TChord[k]*m_TChord[k] + pFoilB->GetArea()*m_TChord[k+1]*m_TChord[k+1])/2.0;//m3
-		}
 		m_MAChord += IntegralC2(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 		m_yMac    += IntegralCy(m_TPos[k], m_TPos[k+1], m_TChord[k], m_TChord[k+1]);
 	}
@@ -294,7 +292,6 @@ void CWing::ComputeGeometry()
 	{
 		m_PlanformArea    = 2.0 * surface;
 		m_ProjectedArea = 2.0 * xysurface;
-		m_Volume *= 2.0;
 		m_MAChord = m_MAChord * 2.0 / m_PlanformArea;
 		m_yMac    = m_yMac    * 2.0 / m_PlanformArea;
 
@@ -339,21 +336,41 @@ void CWing::ComputeGeometry()
 
 void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
-	int j,k;
+	// Returns the inertia properties of the structuure based on the imput mass and on the existing geometry
+	//   in input:
+	//     Mass = mass of the wing, excluding point masses
+	//   in output:
+	//     CoG  = center of gravity position
+	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
+	//
+	static double ElemVolume[10*20*MAXPANELS];
+	static CVector PtVolume[10*20*MAXPANELS];
+	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
 	double LocalChord1, LocalArea1, tau1;
+	double xrel, xrel1, yrel, ElemArea;
+	CVector ATop, ABot, CTop, CBot, PointNormal, Diag1, Diag2;
 	CVector PtC4, Pt, Pt1;
 	CoG.Set(0.0, 0.0, 0.0);
 	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 
+	//sanity check
+	CVector CoGCheck(0.0,0.0,0.0);
+	double CoGIxxCheck, CoGIyyCheck, CoGIzzCheck, CoGIxzCheck;
+	CoGIxxCheck = CoGIyyCheck = CoGIzzCheck = CoGIxzCheck = 0.0;
+	double recalcMass = 0.0;
+	double recalcVolume = 0.0;
+	double checkVolume = 0.0;
+
+	//use 20 spanwise stations per wing panel to discretize the weight
+	//and 10 stations in the x direction
+	int NYStations = 40;
+	int NXStations = 20;
+
 	ComputeGeometry();
-	//use 20 stations per wing panel to discretize the weight
-	//more than enough given the precision we are looking for
-	int NStations = 20;
 
 	//the mass density is assumed to be homogeneous
-	rho = Mass/m_Volume;
 
 	//the local weight is proportional to the chord x foil area
 	//the foil's area is interpolated
@@ -361,17 +378,17 @@ void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGI
 	//we consider the whole wing, i.e. all left and right surfaces
 	//note : in avl documentation, each side is considered separately
 
-	//first get the CoG - necessary for future application of Hughens/Steiner theorem
-	double recalcMass = 0.0;//sanity check
-	double recalcVolume = 0.0;//sanity check
-	
+	//first get the CoG - necessary for future application of Huyghens/Steiner theorem
+	int p = 0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		LocalSpan = m_Surface[j].m_Length/(double)NStations;
-		for (k=0; k<NStations; k++)
+		LocalSpan = m_Surface[j].m_Length/(double)NYStations;
+		for (k=0; k<NYStations; k++)
 		{
-			tau  = (double)k     / (double)NStations;
-			tau1 = (double)(k+1) / (double)NStations;
+			tau  = (double)k     / (double)NYStations;
+			tau1 = (double)(k+1) / (double)NYStations;
+			yrel = (tau+tau1)/2.0;
+
 			m_Surface[j].GetSection(tau,  LocalChord,  LocalArea,  Pt);
 			m_Surface[j].GetSection(tau1, LocalChord1, LocalArea1, Pt1);
 			LocalVolume = (LocalArea+LocalArea1)/2.0 * LocalSpan;
@@ -379,22 +396,57 @@ void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGI
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			CoG.x += LocalVolume*rho * PtC4.x;
-			CoG.y += LocalVolume*rho * PtC4.y;
-			CoG.z += LocalVolume*rho * PtC4.z;
+			CoGCheck.x += LocalVolume * PtC4.x;
+			CoGCheck.y += LocalVolume * PtC4.y;
+			CoGCheck.z += LocalVolume * PtC4.z;
+
+			for(l=0; l<NXStations; l++)
+			{
+				//browse mid-section
+//				xrel = (double)l/(double)NXStations;
+//				xrel1 = (double)(l+1)/(double)NXStations;
+
+				xrel  = 1.0 - 1.0/2.0 * (1.0-cos((double) l   *PI /(double)NXStations));
+				xrel1 = 1.0 - 1.0/2.0 * (1.0-cos((double)(l+1)*PI /(double)NXStations));
+
+				m_Surface[j].GetPoint(xrel, xrel, yrel, ATop,  1);
+				m_Surface[j].GetPoint(xrel, xrel, yrel, ABot, -1);
+				m_Surface[j].GetPoint(xrel1, xrel1, yrel, CTop,  1);
+				m_Surface[j].GetPoint(xrel1, xrel1, yrel, CBot, -1);
+				PtVolume[p] = (ATop+ABot+CTop+CBot)/4.0;
+				Diag1 = ATop - CBot;
+				Diag2 = ABot - CTop;
+				PointNormal = Diag1 * Diag2;
+
+				ElemArea = PointNormal.VAbs()/2.0;
+				ElemVolume[p] = ElemArea * LocalSpan;
+				checkVolume += ElemVolume[p];
+				CoG.x += ElemVolume[p] * PtVolume[p].x;
+				CoG.y += ElemVolume[p] * PtVolume[p].y;
+				CoG.z += ElemVolume[p] * PtVolume[p].z;
+				p++;
+			}
 		}
 	}
-	if(Mass>0.0) CoG *= 1.0/ Mass;
+	rho = Mass/checkVolume;
+	if(Mass>0.0) CoG *= 1/ checkVolume;
 	else         CoG.Set(0.0, 0.0, 0.0);
 
+/*
+CoGCheck *= 1.0/checkVolume;
+qDebug("%16.8f    %16.8f    %16.8f    ", CoG.x, CoG.y, CoG.z);
+qDebug("%16.8f    %16.8f    %16.8f    ", CoGCheck.x, CoGCheck.y, CoGCheck.z);
+*/
+
 	//then get the Inertia in both reference frames
+	p=0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		LocalSpan = m_Surface[j].m_Length/(double)NStations;
-		for (k=0; k<NStations; k++)
+		LocalSpan = m_Surface[j].m_Length/(double)NYStations;
+		for (k=0; k<NYStations; k++)
 		{
-			tau  = (double)k     / (double)NStations;
-			tau1 = (double)(k+1) / (double)NStations;
+			tau  = (double)k     / (double)NYStations;
+			tau1 = (double)(k+1) / (double)NYStations;
 			m_Surface[j].GetSection(tau,  LocalChord,  LocalArea,  Pt);
 			m_Surface[j].GetSection(tau1, LocalChord1, LocalArea1, Pt1);
 
@@ -404,21 +456,45 @@ void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGI
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			CoGIxx += LocalVolume*rho * ( (PtC4.y-CoG.y)*(PtC4.y-CoG.y) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
-			CoGIyy += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
-			CoGIzz += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.y-CoG.y)*(PtC4.y-CoG.y) );
-			CoGIxz += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
-			recalcMass += LocalVolume*rho;
-			recalcVolume +=LocalVolume;
+			CoGIxxCheck += LocalVolume*rho * ( (PtC4.y-CoG.y)*(PtC4.y-CoG.y) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
+			CoGIyyCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
+			CoGIzzCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.y-CoG.y)*(PtC4.y-CoG.y) );
+			CoGIxzCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
+
+			recalcMass   += LocalVolume*rho;
+			recalcVolume += LocalVolume;
+
+			for(l=0; l<NXStations; l++)
+			{
+				//browse mid-section
+				CoGIxx += ElemVolume[p]*rho * ((PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
+				CoGIyy += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
+				CoGIzz += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y));
+				CoGIxz += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].z-CoG.z) );
+				p++;
+			}
 		}
 	}
+/*
+qDebug(" %16.8f    %16.8f ", checkVolume, recalcVolume);
+qDebug() <<"____________";
+qDebug("Mass=%16.8f    recalcMass=%16.8f",  checkVolume*rho, recalcMass);
+qDebug() <<"____________";
+qDebug("%16.8f    %16.8f    %16.8f    %16.8f", CoGIxx,      CoGIyy,      CoGIzz,      CoGIxz);
+qDebug("%16.8f    %16.8f    %16.8f    %16.8f", CoGIxxCheck, CoGIyyCheck, CoGIzzCheck, CoGIxzCheck);*/
 }
+
+
 
 
 
 bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
-	//generic surface, LLT, VLM or Panel
+	//
+	// Constructs the surface objects based on the input data
+	// The surfaces are constructed from port to starboard
+	// One surface object for each of the wing's panels
+	//
 	int j, nSurf;
 	CFoil *pFoilA, *pFoilB;
 	CVector PLA, PTA, PLB, PTB, Offset, T1;
@@ -524,10 +600,10 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	m_Surface[m_NSurfaces-1].m_bIsCenterSurf = true;//previous left center surface
 	m_Surface[m_NSurfaces].m_bIsCenterSurf   = true;//next right center surface
 
-	//we need a right wing only in the following cases
-	// if its an 'ordinary wing'
-	// if its a fin, symetrical about the fuselage x-axis
-	// if its a symetrical double fin
+	// we only need a right wing in the following cases
+	//   - if its an 'ordinary wing'
+	//   - if its a fin, symetrical about the fuselage x-axis
+	//   - if its a symetrical double fin
 	if(!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin))
 	{
 		for (j=0; j<m_NPanel; j++)
@@ -670,7 +746,11 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 bool CWing::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap)
 {
-	// the chordwise panel distribution is set i.a.w. with the flap hinges;
+	//
+	// Creates the points at the surfaces two end sections
+	// The points will be used later to create the mesh
+	// the chordwise panel distribution is set i.a.w. with the flap hinges, if any;
+	//
 	int l;
 	int NXFlapA, NXFlapB, NXLeadA, NXLeadB;
 	double dl, dl2;
@@ -741,7 +821,9 @@ bool CWing::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
 
 void CWing::ComputeChords(int NStation)
 {
-	//Calculates the chord lengths for NStation in LLT calculations
+	//
+	// Calculates the chord lengths at each position of the NStation in LLT calculations
+	//
 	int j,k,l,m;
 	double y, yob, tau;
 	double x0,y0,y1,y2;
@@ -819,7 +901,9 @@ void CWing::ComputeChords(int NStation)
 
 void CWing::Duplicate(CWing *pWing)
 {
-	//Copies the wing data froman existing wing
+	//
+	// Copies the wing data from an existing wing
+	//
 	int i;
 	s_pMainFrame		= pWing->s_pMainFrame;
 	s_pMiarex       = pWing->s_pMiarex;
@@ -1014,7 +1098,7 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 				 .arg(ASurface.m_LB.y          *pMainFrame->m_mtoUnit,9,'f',4)
 				 .arg(ASurface.m_LB.z          *pMainFrame->m_mtoUnit,9,'f',4)
 				 .arg(ASurface.GetChord(1.0)   *pMainFrame->m_mtoUnit,9,'f',4)
-				 .arg(m_Surface[j].m_TwistB,7,'f',3)
+				 .arg(m_Surface[j-1].m_TwistB,7,'f',3)
 				 .arg(ASurface.m_NYPanels,3)
 				 .arg(ASurface.m_YDistType,3);
 
@@ -1037,104 +1121,6 @@ double CWing::Eta(int m)
 	//Auxiliary calculation of the Eta factor in LLT
 
 	return PI/2.0/(double)m_NStation * sin((double)m*PI/(double)m_NStation) ;
-}
-
-
-
-bool CWing::Gauss(double *A, int n, double *B, int m)
-{
-////////////////////////////////////////////////////////////////////////////////
-//  int Gaussian_Elimination(double *A, int n, double *B)                     //
-//                                                                            //
-//     Solve the linear system of equations AX=B where A is an n x n matrix   //
-//     B is an n-dimensional column vector (n x 1 matrix) for the             //
-//     n-dimensional column vector (n x 1 matrix) X.                          //
-//                                                                            //
-//     This routine performs partial pivoting and the elements of A are       //
-//     modified during computation.  The result X is returned in B.           //
-//     If the matrix A is singular, the return value of the function call is  //
-//     false. If the solution was found, the function return value is true    //
-//                                                                            //
-//  Arguments:                                                                //
-//     double *A      On input, the pointer to the first element of the       //
-//                    matrix A[n][n].  On output, the matrix A is destroyed.  //
-//     int     n      The number of rows and columns of the matrix A and the  //
-//                    dimension of B.                                         //
-//     double *B      On input, the pointer to the first element of the       //
-//                    vector B[n].  On output, the vector B is replaced by the//
-//                    vector X, the solution of AX = B.                       //
-//     int m          The number of right hand side vectors                   //
-//                    The default is m=0                                      //
-//                                                                            //
-//  Return Values:                                                            //
-//     true :  Success                                                        //
-//     false :  Failure - The matrix A is singular.                           //
-//                                                                            //
-////////////////////////////////////////////////////////////////////////////////
-//                                                                            //
-	int row, i, j, pivot_row, k;
-	double max, dum, *pa, *pA, *A_pivot_row;
-	// for each variable find pivot row and perform forward substitution
-	pa = A;
-	for (row = 0; row < (n - 1); row++, pa += n) {
-		//  find the pivot row
-		A_pivot_row = pa;
-		max = fabs(*(pa + row));
-		pA = pa + n;
-		pivot_row = row;
-		for (i=row+1; i < n; pA+=n, i++)
-			if ((dum = fabs(*(pA+row))) > max) {
-				max = dum;
-				A_pivot_row = pA;
-				pivot_row = i;
-			}
-		if (max <= 0.0)
-			return false;                // the matrix A is singular
-
-			// and if it differs from the current row, interchange the two rows.
-
-		if (pivot_row != row) {
-			for (i = row; i < n; i++) {
-				dum = *(pa + i);
-				*(pa + i) = *(A_pivot_row + i);
-				*(A_pivot_row + i) = dum;
-			}
-			for(k=0; k<=m; k++){
-				dum = B[row+k*n];
-				B[row+k*n] = B[pivot_row+k*n];
-				B[pivot_row+k*n] = dum;
-			}
-		}
-
-		// Perform forward substitution
-
-		for (i = row+1; i<n; i++) {
-			pA = A + i * n;
-			dum = - *(pA + row) / *(pa + row);
-			*(pA + row) = 0.0;
-			for (j=row+1; j<n; j++) *(pA+j) += dum * *(pa + j);
-			for (k=0; k<=m; k++)
-				B[i+k*n] += dum * B[row+k*n];
-		}
-	}
-
-	// Perform backward substitution
-
-	pa = A + (n - 1) * n;
-	for (row = n - 1; row >= 0; pa -= n, row--) {
-		if ( *(pa + row) == 0.0 )
-			return false;           // matrix is singular
-		dum = 1.0 / *(pa + row);
-		for ( i = row + 1; i < n; i++) *(pa + i) *= dum;
-		for(k=0; k<=m; k++) B[row+k*n] *= dum;
-		for ( i = 0, pA = A; i < row; pA += n, i++) {
-			dum = *(pA + row);
-			for ( j = row + 1; j < n; j++) *(pA + j) -= dum * *(pa + j);
-			for(k=0; k<=m; k++)
-				B[i+k*n] -= dum * B[row+k*n];
-		}
-	}
-	return true;
 }
 
 
@@ -1759,35 +1745,38 @@ bool CWing::LLTSetLinearSolution()
 		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);
 		rhs[i] = c/cs * (s_Alpha-a0+m_Twist[i])/180.0*PI;
 	}
+	
+	bool bCancel = false;
+	if(!Gauss(aij,s_NLLTStations-1, rhs+1,0,&bCancel)) return false;
 
-	if(Gauss(aij,s_NLLTStations-1, rhs+1,0))
+
+	for (i=1; i<s_NLLTStations; i++)
 	{
-		for (i=1; i<s_NLLTStations; i++)
+		t0  = i * PI/fr;
+		m_Cl[i] = 0.0;
+		for (j=1; j<s_NLLTStations; j++)
 		{
-			t0  = i * PI/fr;
-			m_Cl[i] = 0.0;
-			for (j=1; j<s_NLLTStations; j++)
-			{
-				fj = double(j);
-				snt0 = sin(fj*t0);
-				m_Cl[i] += rhs[j]* snt0;
-			}
-			yob   = cos(i*PI/s_NLLTStations);
-			GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-			GetLinearizedPolar(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
-			a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
-			m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
-			m_Ai[i]  = -(s_Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
+			fj = double(j);
+			snt0 = sin(fj*t0);
+			m_Cl[i] += rhs[j]* snt0;
 		}
-		return true;
+		yob   = cos(i*PI/s_NLLTStations);
+		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
+		GetLinearizedPolar(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
+		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
+		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
+		m_Ai[i]  = -(s_Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
 	}
-	return false;
+	return true;
 }
 
 
 bool CWing::LLTInitialize(double mass)
 {
-	double y ;
+	//
+	// Initializes the LLT calculation
+	//
+	double y;
 	int k;
 
 	if(m_Type == 2)	m_QInf0 = sqrt(2.*mass* 9.81 /s_Density/m_PlanformArea);
@@ -2038,7 +2027,7 @@ void CWing::PanelSetBending(bool bThinSurface)
 
 void CWing::ScaleChord(double NewChord)
 {
-	// Scales the wing chord-wise so that the root chord reaches the NewChord value
+	// Scales the wing chord-wise so that the root chord is set to the NewChord value
 
 	double ratio = NewChord/m_TChord[0];
 	for (int i=0; i<=MAXPANELS; i++){
@@ -2052,6 +2041,7 @@ void CWing::ScaleChord(double NewChord)
 void CWing::ScaleSpan(double NewSpan)
 {
 	// Scales the wing span-wise to the NewSpan value
+
 	for (int i=0; i<=MAXPANELS; i++){
 		m_TPos[i]      *= NewSpan/m_PlanformSpan;
 		m_TLength[i]   *= NewSpan/m_PlanformSpan;
@@ -2311,8 +2301,10 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 void CWing::SetSweep(double Sweep)
 {
+	//
+	// Sets the average sweep measured at the quarter-chord to the new value Sweep
+	//
 	int i;
-//	double CurrentSweep = GetAverageSweep();
 	double OldTipOffset = m_TOffset[m_NPanel];
 	double NewTipOffset = m_TChord[0]/4.0
 						 + tan(Sweep*PI/180.0)*m_PlanformSpan/2.0
@@ -2340,6 +2332,9 @@ void CWing::SetSweep(double Sweep)
 
 void CWing::SetTwist(double Twist)
 {
+	//
+	// Sets the twist to the new value
+	//
 	if(fabs(m_TTwist[m_NPanel])>0.0001)
 	{
 		//scale each panel's twist
@@ -2363,7 +2358,6 @@ void CWing::SetTwist(double Twist)
 double CWing::Sigma(int m)
 {
 	//Auxiliary calculation of the sigma factor in LLT
-
 	return PI/8.0/(double)m_NStation * sin(2.*(double)m*PI/(double)m_NStation) ;
 }
 
@@ -2469,8 +2463,8 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 	M[3*n*size + size-3]   = 2.0;
 	RHS[3*n+1]             = 0.0;
 
-	if(!Gauss(M, 4*n, RHS, 1))
-		return false;
+	bool bCancel = false;
+	if(!Gauss(M, 4*n, RHS, 1, &bCancel)) return false;
 
 	for(i=0; i<n; i++)
 	{
@@ -2489,14 +2483,14 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bool bTilted)
 {
-	if(!m_pPanel) return;
+	//
 	// calculates the lift and induced drag from the vortices strengths
 	// using a farfield method
 	// Downwash is evaluated at a distance 10 times the span downstream (i.e. infinite)
 	//
+	if(!m_pPanel) return;
 
 	VLMAnalysisDlg *pVLMDlg = (VLMAnalysisDlg*)s_pVLMDlg;
-//	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	int j , k, l,  p,  m;
 	double alpha, cosa, sina;
@@ -2599,7 +2593,6 @@ int CWing::VLMGetPanelTotal()
 
 void CWing::VLMCubicSplines(double *Gamma)
 {
-//	CVLMDlg *pVLMDlg = (CVLMDlg*)s_pVLMDlg;
 	CVector C, Wg;
 	int m,p,j;
 
@@ -2633,7 +2626,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	//  Input data:
 	//    Freestream speed Qinf
 	//    Angle of attack Alpha
-	//    Cp dstribution
+	//    Cp dstribution for thick wings
 	//    Mu or Gamma distribution, depending on the analysis type
 	//    Type of surface :
 	//        - Thin Surface, i.e. VLM type surfaces, with vortex distribution

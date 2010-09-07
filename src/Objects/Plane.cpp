@@ -246,14 +246,6 @@ void CPlane::ComputePlane(void)
 	
 	m_Fin.m_bDoubleFin = m_bDoubleFin;
 	m_Fin.m_bSymFin    = m_bSymFin;
-	m_Volume = m_Wing.m_Volume;
-	if(m_bBiplane)	m_Volume += m_Wing2.m_Volume;
-	if(m_bStab)		m_Volume += m_Stab.m_Volume;
-	if(m_bFin)	
-	{
-		m_Volume += m_Fin.m_Volume;
-		if(m_bDoubleFin || m_bSymFin) m_Volume += m_Fin.m_Volume;
-	}
 }
 
 

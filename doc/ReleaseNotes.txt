@@ -25,6 +25,7 @@ xflr5 v6.00 Beta September xxx, 2010
 	- added an option to reverse the zoom direction with the mouse wheel
 	- made some code cleaning in VLM and 3D-Panel analysis
 	- changed the 3D-panel method for planes from full 3D to mixed thin/thick surfaces
+	- refined the inertia evaluation for wings by considering mass distribution in the spanwise direction
 
 
 XFLR5 v5.00 April 11th, 2010

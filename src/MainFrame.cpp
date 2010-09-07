@@ -397,6 +397,7 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 			pMiarex->m_pCurGraph = pMiarex->GetGraph(CltPt);
 			if(pMiarex->m_iView==WOPPVIEW)         WOppCtxMenu->exec(ScreenPt);
 			else if (pMiarex->m_iView==WPOLARVIEW) WPlrCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==WCPVIEW)    WCpCtxMenu->exec(ScreenPt);
 			else if(pMiarex->m_iView==WSTABVIEW)
 			{
 				if(pMiarex->m_iStabilityView==0)      WTimeCtxMenu->exec(ScreenPt);
@@ -1285,7 +1286,7 @@ void MainFrame::CreateMiarexActions()
 	connect(Graph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph4()));
 
 
-	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales"), this);
+	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales\t(R)"), this);
 	ResetWingGraphScale->setStatusTip(tr("Reset the scale of the current operating point graph"));
 	connect(ResetWingGraphScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingGraphScale()));
 
@@ -1486,15 +1487,6 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWOppMenu->addAction(showStabCurve);
 	MiarexWOppMenu->addAction(showFinCurve);
 	MiarexWOppMenu->addSeparator();
-	WOppCurGraphMenu = MiarexWOppMenu->addMenu(tr("Current Graph"));
-	WOppCurGraphMenu->addAction(MiarexGraphDlg);
-	WOppCurGraphMenu->addAction(exportCurGraphAct);
-
-	MiarexAnalysisMenu  = menuBar()->addMenu(tr("&Analysis"));
-	MiarexAnalysisMenu->addAction(viewLogFile);
-	MiarexAnalysisMenu->addAction(advancedSettings);
-
-
 	WOppGraphMenu = MiarexWOppMenu->addMenu(tr("Graphs"));
 	WOppGraphMenu->addAction(Graph1);
 	WOppGraphMenu->addAction(Graph2);
@@ -1507,6 +1499,11 @@ void MainFrame::CreateMiarexMenus()
 	WOppGraphMenu->addAction(allWingGraphsSettings);
 	WOppGraphMenu->addAction(allWingGraphsScalesAct);
 	WOppGraphMenu->addAction(resetWOppLegend);
+
+	//Miarex Analysis Menu
+	MiarexAnalysisMenu  = menuBar()->addMenu(tr("&Analysis"));
+	MiarexAnalysisMenu->addAction(viewLogFile);
+	MiarexAnalysisMenu->addAction(advancedSettings);
 
 
 	//WOpp View Context Menu
@@ -1524,6 +1521,9 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addAction(hideAllWOpps);
 	WOppCtxMenu->addAction(deleteAllWOpps);
 	WOppCtxMenu->addSeparator();
+	WOppCurGraphMenu = WOppCtxMenu->addMenu(tr("Current Graph"));
+	WOppCurGraphMenu->addAction(MiarexGraphDlg);
+	WOppCurGraphMenu->addAction(exportCurGraphAct);
 	WOppCtxMenu->addMenu(WOppCurGraphMenu);
 	WOppCtxMenu->addMenu(WOppGraphMenu);
 	WOppCtxMenu->addAction(ResetWingGraphScale);
@@ -1538,6 +1538,26 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addSeparator();
 	WOppCtxMenu->addAction(viewLogFile);
 	WOppCtxMenu->addAction(saveViewToImageFileAct);
+
+	//WOpp View Context Menu
+	WCpCtxMenu = new QMenu(tr("Context Menu"),this);
+	WCpCtxMenu->addMenu(currentUFOMenu);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addMenu(CurBodyMenu);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addMenu(CurWPlrMenu);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addMenu(CurWOppMenu);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addMenu(WOppCurGraphMenu);
+	WCpCtxMenu->addAction(ResetWingGraphScale);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addAction(showWing2Curve);
+	WCpCtxMenu->addAction(showStabCurve);
+	WCpCtxMenu->addAction(showFinCurve);
+	WCpCtxMenu->addSeparator();
+	WCpCtxMenu->addAction(viewLogFile);
+	WCpCtxMenu->addAction(saveViewToImageFileAct);
 
 	//WTime View Context Menu
 	WTimeCtxMenu = new QMenu(tr("Context Menu"),this);
@@ -3933,7 +3953,7 @@ void MainFrame::OnSaveViewToImageFile()
 	{
 		case 0 :
 		{
-			Filter = "Windows Bitmap (*.bmp)";
+			Filter = "Portable Network Graphics (*.png)";
 			break;
 		}
 		case 1 :
@@ -3943,35 +3963,35 @@ void MainFrame::OnSaveViewToImageFile()
 		}
 		case 2 :
 		{
-			Filter = "Portable Network Graphics (*.png)";
+			Filter = "Windows Bitmap (*.bmp)";
 			break;
 		}
-
 	}
+
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
 											m_ImageDirName,
-											"Windows Bitmap (*.bmp);;JPEG (*.jpg);;Portable Network Graphics (*.png)",
-											&Filter);
+											"Portable Network Graphics (*.png);;JPEG (*.jpg);;Windows Bitmap (*.bmp)",
+											&Filter, QFileDialog::DontUseNativeDialog);
 
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) m_ImageDirName = FileName.left(pos);
 
-	if(Filter == "Windows Bitmap (*.bmp)")
+	if(Filter == "Portable Network Graphics (*.png)")
 	{
-		if(FileName.right(4)!=".bmp") FileName+= ".bmp";
+		if(FileName.right(4)!=".png") FileName+= ".png";
 		m_ImageFormat = 0;
 	}
 	else if(Filter == "JPEG (*.jpg)")
 	{
-		if(FileName.right(4)!=".jpg") FileName+= ".jpeg";
+		if(FileName.right(4)!=".jpg") FileName+= ".jpg";
 		m_ImageFormat = 1;
 	}
-	else if(Filter == "Portable Network Graphics (*.png)")
+	else if(Filter == "Windows Bitmap (*.bmp)")
 	{
-		if(FileName.right(4)!=".png") FileName+= ".png";
+		if(FileName.right(4)!=".bmp") FileName+= ".bmp";
 		m_ImageFormat = 2;
 	}
 

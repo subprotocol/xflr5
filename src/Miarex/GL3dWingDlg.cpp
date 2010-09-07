@@ -2559,9 +2559,6 @@ void GL3dWingDlg::SetWingData()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str;
 
-	str = QString("%1").arg(m_pWing->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
-	m_pctrlWingVolume->setText(str);
-
 	str = QString("%1").arg(m_pWing->m_PlanformArea*pMainFrame->m_m2toUnit,7,'f',2);
 	m_pctrlWingArea->setText(str);
 
@@ -2686,7 +2683,6 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlLength5    = new QLabel("mm");
 	m_pctrlAreaUnit1  = new QLabel("mm2");
 	m_pctrlAreaUnit2  = new QLabel("mm2");
-	m_pctrlVolumeUnit = new QLabel("mm3");
 	m_pctrlLength1->setAlignment(Qt::AlignLeft);
 	m_pctrlLength2->setAlignment(Qt::AlignLeft);
 	m_pctrlLength3->setAlignment(Qt::AlignLeft);
@@ -2694,49 +2690,42 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlLength5->setAlignment(Qt::AlignLeft);
 	m_pctrlAreaUnit1->setAlignment(Qt::AlignLeft);
 	m_pctrlAreaUnit2->setAlignment(Qt::AlignLeft);
-	m_pctrlVolumeUnit->setAlignment(Qt::AlignLeft);
 
 	QGridLayout *DataLayout = new QGridLayout;
 	QLabel *lab1 = new QLabel(tr("Wing Span"));
 	QLabel *lab2 = new QLabel(tr("Area"));
 	QLabel *lab3 = new QLabel(tr("Projected Span"));
 	QLabel *lab4 = new QLabel(tr("Projected Area"));
-	QLabel *lab5 = new QLabel(tr("Volume"));
 	QLabel *lab13 = new QLabel(tr("Total VLM Panels"));
 	QLabel *lab14 = new QLabel(tr("Number of 3D Panels"));
 	lab1->setAlignment(Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignRight);
 	lab3->setAlignment(Qt::AlignRight);
 	lab4->setAlignment(Qt::AlignRight);
-	lab5->setAlignment(Qt::AlignRight);
 	lab13->setAlignment(Qt::AlignRight);
 	lab14->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(lab1,1,1);
 	DataLayout->addWidget(lab2,2,1);
 	DataLayout->addWidget(lab3,3,1);
 	DataLayout->addWidget(lab4,4,1);
-	DataLayout->addWidget(lab5,5,1);
 	DataLayout->addWidget(lab13,13,1);
 	DataLayout->addWidget(lab14,14,1);
 	m_pctrlWingSpan      = new QLabel("2000.00");
 	m_pctrlWingArea      = new QLabel("30.0");
 	m_pctrlProjectedArea = new QLabel("25.0");
 	m_pctrlProjectedSpan = new QLabel("1900.0");;
-	m_pctrlWingVolume    = new QLabel("000.0e+03");
 	m_pctrlVLMPanels     = new QLabel("500");
 	m_pctrl3DPanels      = new QLabel("1000");
 	m_pctrlWingSpan->setAlignment(Qt::AlignRight);
 	m_pctrlWingArea->setAlignment(Qt::AlignRight);
 	m_pctrlProjectedSpan->setAlignment(Qt::AlignRight);
 	m_pctrlProjectedArea->setAlignment(Qt::AlignRight);
-	m_pctrlWingVolume->setAlignment(Qt::AlignRight);
 	m_pctrlVLMPanels->setAlignment(Qt::AlignRight);
 	m_pctrl3DPanels->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(m_pctrlWingSpan,   1,2);
 	DataLayout->addWidget(m_pctrlWingArea,   2,2);
 	DataLayout->addWidget(m_pctrlProjectedSpan,   3,2);
 	DataLayout->addWidget(m_pctrlProjectedArea,   4,2);
-	DataLayout->addWidget(m_pctrlWingVolume, 5,2);
 	DataLayout->addWidget(m_pctrlVLMPanels, 13,2);
 	DataLayout->addWidget(m_pctrl3DPanels,  14,2);
 
@@ -2744,7 +2733,6 @@ void GL3dWingDlg::SetupLayout()
 	DataLayout->addWidget(m_pctrlAreaUnit1,2,3);
 	DataLayout->addWidget(m_pctrlLength2,3,3);
 	DataLayout->addWidget(m_pctrlAreaUnit2,4,3);
-	DataLayout->addWidget(m_pctrlVolumeUnit,5,3);
 	QString strong = QString("%1").arg(VLMMAXMATSIZE/2);
 	QLabel *lab15 = new QLabel(tr("Max is ")+strong);
 	lab13->setAlignment(Qt::AlignLeft);

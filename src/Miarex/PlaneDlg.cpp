@@ -114,14 +114,6 @@ void PlaneDlg::ComputePlane(void)
 
 	m_pPlane->m_Fin.m_bDoubleFin = m_pPlane->m_bDoubleFin;
 	m_pPlane->m_Fin.m_bSymFin    = m_pPlane->m_bSymFin;
-	m_pPlane->m_Volume = m_pPlane->m_Wing.m_Volume;
-	if(m_pPlane->m_bBiplane)	m_pPlane->m_Volume += m_pPlane->m_Wing2.m_Volume;
-	if(m_pPlane->m_bStab)		m_pPlane->m_Volume += m_pPlane->m_Stab.m_Volume;
-	if(m_pPlane->m_bFin)
-	{
-		m_pPlane->m_Volume += m_pPlane->m_Fin.m_Volume;
-		if(m_pPlane->m_bDoubleFin || m_pPlane->m_bSymFin) m_pPlane->m_Volume += m_pPlane->m_Fin.m_Volume;
-	}
 }
 
 

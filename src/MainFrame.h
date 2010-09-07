@@ -258,7 +258,7 @@ private:
 	QMenu *UFOMenu, *currentUFOMenu, *CurWPlrMenu, *CurWOppMenu, *CurBodyMenu;
 	QMenu *MiarexBodyMenu, *MiarexWPlrMenu, *MiarexWOppMenu;
 	QMenu *WPlrGraphMenu,*WPlrCurGraphMenu, *WOppGraphMenu, *WOppCurGraphMenu;
-	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu, *WTimeCtxMenu, *W3DStabCtxMenu;
+	QMenu *WPlrCtxMenu, *WOppCtxMenu, *W3DCtxMenu, *WCpCtxMenu, *WTimeCtxMenu, *W3DStabCtxMenu;
 
 	//MainFrame actions
 	QAction *OnXDirectAct, *OnMiarexAct, *OnAFoilAct, *OnXInverseAct, *OnMixedInverseAct;
