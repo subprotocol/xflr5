@@ -215,9 +215,11 @@ HEADERS += src/MainFrame.h \
     src/Design/FoilTableDelegate.h \
     src/Misc/NewNameDlg.h \
     src/Misc/PolarPropsDlg.h
-TRANSLATIONS = translations/xflr5.ts \
-    translations/xflr5_de.ts \
-    translations/xflr5_fr.ts
+
+
+TRANSLATIONS = translations/xflr5v6.ts \
+    translations/xflr5v6_de.ts \
+    translations/xflr5v6_fr.ts
 
 RESOURCES += xflr5.qrc
 

@@ -530,7 +530,7 @@ void MainFrame::CreateActions()
 	exportCurGraphAct->setStatusTip(tr("Export the current graph data to a text file"));
 	connect(exportCurGraphAct, SIGNAL(triggered()), this, SLOT(OnExportCurGraph()));
 
-	resetCurGraphScales = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales \t(R)"), this);
+	resetCurGraphScales = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales")+"\t(R)", this);
 	resetCurGraphScales->setStatusTip(tr("Restores the graph's x and y scales"));
 	connect(resetCurGraphScales, SIGNAL(triggered()), this, SLOT(OnResetCurGraphScales()));
 
@@ -635,7 +635,7 @@ void MainFrame::CreateAFoilActions()
 	ResetYScaleAct= new QAction(tr("Reset Y Scale"), this);
 	connect(ResetYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetYScale()));
 
-	ResetXYScaleAct= new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset Scales\t(R)"), this);
+	ResetXYScaleAct= new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset Scales")+"\t(R)", this);
 	ResetXYScaleAct->setStatusTip(tr("Resets the x and y scales to screen size"));
 	connect(ResetXYScaleAct, SIGNAL(triggered()), pAFoil, SLOT(OnResetScales()));
 
@@ -1236,57 +1236,57 @@ void MainFrame::CreateMiarexActions()
 	showWing2Curve->setCheckable(true);
 	connect(showWing2Curve, SIGNAL(triggered()), pMiarex, SLOT(OnWing2Curve()));
 
-	defineWPolar = new QAction(tr("Define an Analysis \t(F6)"), this);
+	defineWPolar = new QAction(tr("Define an Analysis")+" \t(F6)", this);
 	defineWPolar->setStatusTip(tr("Define an analysis for the current wing or plane"));
 //	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
-	defineCtrlPolar = new QAction(tr("Define a Control Analysis\t(Ctrl+F6)"), this);
+	defineCtrlPolar = new QAction(tr("Define a Control Analysis")+"\t(Ctrl+F6)", this);
 	defineCtrlPolar->setStatusTip(tr("Define a control analysis for the current wing or plane"));
 //	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
 
-	defineStabPolar = new QAction(tr("Define a Stability Analysis\t(Shift+F6)"), this);
+	defineStabPolar = new QAction(tr("Define a Stability Analysis")+"\t(Shift+F6)", this);
 	defineStabPolar->setStatusTip(tr("Define a stability analysis for the current wing or plane"));
 //	defineStabPolar->setShortcut(tr("Ctrl+F6"));
 	connect(defineStabPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineStabPolar()));
 
-	MiarexGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	MiarexGraphDlg = new QAction(tr("Define Graph Settings")+"\t(G)", this);
 	MiarexGraphDlg->setStatusTip(tr("Define the settings for the selected graph"));
 	connect(MiarexGraphDlg, SIGNAL(triggered()), pMiarex, SLOT(OnGraphSettings()));
 
-	twoGraphs = new QAction(tr("Two Graphs\t(T)"), this);
+	twoGraphs = new QAction(tr("Two Graphs")+"\t(T)", this);
 	twoGraphs->setStatusTip(tr("Display the first two operating point graphs"));
 	twoGraphs->setCheckable(true);
 	connect(twoGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoGraphs()));
 	
-	fourGraphs = new QAction(tr("All Graphs\t(A)"), this);
+	fourGraphs = new QAction(tr("All Graphs")+"\t(A)", this);
 	fourGraphs->setStatusTip(tr("Display all four operating point graphs"));
 	fourGraphs->setCheckable(true);
 	connect(fourGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourGraphs()));
 
-	Graph1 = new QAction(tr("Graph 1\t(1)"), this);
+	Graph1 = new QAction(tr("Graph 1")+"\t(1)", this);
 	Graph1->setStatusTip(tr("Display only the first graph"));
 	Graph1->setCheckable(true);
 	connect(Graph1, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph1()));
 	
-	Graph2 = new QAction(tr("Graph 2\t(2)"), this);
+	Graph2 = new QAction(tr("Graph 2")+"\t(2)", this);
 	Graph2->setStatusTip(tr("Display only the second graph"));
 	Graph2->setCheckable(true);
 	connect(Graph2, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph2()));
 	
-	Graph3 = new QAction(tr("Graph 3\t(3)"), this);
+	Graph3 = new QAction(tr("Graph 3")+"\t(3)", this);
 	Graph3->setStatusTip(tr("Display only the third graph"));
 	Graph3->setCheckable(true);
 	connect(Graph3, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph3()));
 
-	Graph4 = new QAction(tr("Graph 4\t(4)"), this);
+	Graph4 = new QAction(tr("Graph 4")+"\t(4)", this);
 	Graph4->setStatusTip(tr("Display only the fourth graph"));
 	Graph4->setCheckable(true);
 	connect(Graph4, SIGNAL(triggered()), pMiarex, SLOT(OnSingleGraph4()));
 
 
-	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales\t(R)"), this);
+	ResetWingGraphScale = new QAction(QIcon(":/images/OnResetGraphScale.png"), tr("Reset Graph Scales")+"\t(R)", this);
 	ResetWingGraphScale->setStatusTip(tr("Reset the scale of the current operating point graph"));
 	connect(ResetWingGraphScale, SIGNAL(triggered()), pMiarex, SLOT(OnResetWingGraphScale()));
 
@@ -1773,7 +1773,7 @@ void MainFrame::CreateXDirectActions()
 	PolarsAct->setStatusTip(tr("Show Polar view"));
 	connect(PolarsAct, SIGNAL(triggered()), pXDirect, SLOT(OnPolars()));
 
-	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings\t(G)"), this);
+	defineCpGraphSettings = new QAction(tr("Define Cp Graph Settings")+"\t(G)", this);
 	connect(defineCpGraphSettings, SIGNAL(triggered()), pXDirect, SLOT(OnCpGraphSettings()));
 
 	XDirectPolarFilter = new QAction(tr("Polar Filter"), this);
@@ -1786,17 +1786,17 @@ void MainFrame::CreateXDirectActions()
 	allPolarGraphsScales = new QAction(tr("Reset All Polar Graph Scales"), this);
 	connect(allPolarGraphsScales, SIGNAL(triggered()), pXDirect, SLOT(OnResetAllPolarGraphsScales()));
 
-	XDirectGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	XDirectGraphDlg = new QAction(tr("Define Graph Settings")+"\t(G)", this);
 	connect(XDirectGraphDlg, SIGNAL(triggered()), pXDirect, SLOT(OnGraphSettings()));
 
 	resetGraphLegend = new QAction(tr("Reset Legend Position"), this);
 	connect(resetGraphLegend, SIGNAL(triggered()), pXDirect, SLOT(OnResetGraphLegend()));
 
-	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs\t(T)"), this);
+	TwoPolarGraphsAct = new QAction(tr("Two Polar Graphs")+"\t(T)", this);
 	TwoPolarGraphsAct->setCheckable(true);
 	connect(TwoPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnCouplePolarGraphs()));
 
-	AllPolarGraphsAct = new QAction(tr("All Polar Graphs\t(A)"), this);
+	AllPolarGraphsAct = new QAction(tr("All Polar Graphs")+"\t(A)", this);
 	AllPolarGraphsAct->setCheckable(true);
 	connect(AllPolarGraphsAct, SIGNAL(triggered()), pXDirect, SLOT(OnAllPolarGraphs()));
 
@@ -1807,11 +1807,11 @@ void MainFrame::CreateXDirectActions()
 		PolarGraphAct[i]->setCheckable(true);
 		connect(PolarGraphAct[i], SIGNAL(triggered()), pXDirect, SLOT(OnSinglePolarGraph()));
 	}
-	PolarGraphAct[0]->setText(tr("Cl vs. Cd \t(1)"));
-	PolarGraphAct[1]->setText(tr("Cl vs.Alpha \t(2)"));
-	PolarGraphAct[2]->setText(tr("Cl vs. Xtr. \t(3)"));
-	PolarGraphAct[3]->setText(tr("Cm vs.Alpha \t(4)"));
-	PolarGraphAct[4]->setText(tr("Glide ratio vs. alpha \t(5)"));
+	PolarGraphAct[0]->setText(tr("Cl vs. Cd") +"\t(1)");
+	PolarGraphAct[1]->setText(tr("Cl vs.Alpha")+ "\t(2)");
+	PolarGraphAct[2]->setText(tr("Cl vs. Xtr.")+ "\t(3)");
+	PolarGraphAct[3]->setText(tr("Cm vs.Alpha")+ "\t(4)");
+	PolarGraphAct[4]->setText(tr("Glide ratio vs. alpha")+ "\t(5)");
 
 
 	deleteCurFoil = new QAction(tr("Delete..."), this);
@@ -2237,7 +2237,7 @@ void MainFrame::CreateXInverseActions()
 	InverseStyles->setStatusTip(tr("Define the styles for this view"));
 	connect(InverseStyles, SIGNAL(triggered()), pXInverse, SLOT(OnInverseStyles()));
 
-	InverseResetScale = new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset foil scale\t(R)"), this);
+	InverseResetScale = new QAction(QIcon(":/images/OnResetFoilScale.png"), tr("Reset foil scale")+"\t(R)", this);
 	InverseResetScale->setStatusTip(tr("Resets the scale to fit the screen size"));
 	connect(InverseResetScale, SIGNAL(triggered()), pXInverse, SLOT(OnResetFoilScale()));
 
@@ -2267,7 +2267,7 @@ void MainFrame::CreateXInverseActions()
 	InvQReflected->setCheckable(true);
 
 	connect(InvQReflected, SIGNAL(triggered()), pXInverse, SLOT(OnQReflected()));
-	XInverseGraphDlg = new QAction(tr("Define Graph Settings\t(G)"), this);
+	XInverseGraphDlg = new QAction(tr("Define Graph Settings")+"\t(G)", this);
 	connect(XInverseGraphDlg, SIGNAL(triggered()), pXInverse, SLOT(OnGraphSettings()));
 
 	InverseZoomIn = new QAction(QIcon(":/images/OnZoomIn.png"), tr("Zoom in"), this);

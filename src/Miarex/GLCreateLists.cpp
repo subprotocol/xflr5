@@ -2293,22 +2293,22 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 			ZPos +=dD;
 
-			str1 = QString(pMainFrame->tr("Wing Span      = %1 ")).arg(pWing->m_PlanformSpan*pMainFrame->m_mtoUnit, 8,'f',3);
+			str1 = QString(QObject::tr("Wing Span      = %1 ")).arg(pWing->m_PlanformSpan*pMainFrame->m_mtoUnit, 8,'f',3);
 			strong = str1 + length;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(pMainFrame->tr("XYProj. Span   = %1 ")).arg(pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
+			str1 = QString(QObject::tr("XYProj. Span   = %1 ")).arg(pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,8,'f',3);
 			str1 += length;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(pMainFrame->tr("Wing Area      = %1 ")).arg(pWing->m_PlanformArea * pMainFrame->m_m2toUnit, 8,'f',3);
+			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(pWing->m_PlanformArea * pMainFrame->m_m2toUnit, 8,'f',3);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(pMainFrame->tr("XYProj. Area   = %1 ")).arg(pWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
+			str1 = QString(QObject::tr("XYProj. Area   = %1 ")).arg(pWing->m_ProjectedArea * pMainFrame->m_m2toUnit,8,'f',3);
 			strong = str1+surface;
 			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
 
@@ -2328,13 +2328,13 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 					}
 				}
 				GetWeightUnit(str, pMainFrame->m_WeightUnit);
-				str1 = QString(pMainFrame->tr("Plane Mass     = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit,7,'f',2);
+				str1 = QString(QObject::tr("Plane Mass     = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit,7,'f',2);
 				Result = str1 + str;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 				ZPos +=dD;
 				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				str1 = QString(pMainFrame->tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/pWPolar->m_WArea/pMainFrame->m_m2toUnit, 8,'f',3);
+				str1 = QString(QObject::tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/pWPolar->m_WArea/pMainFrame->m_m2toUnit, 8,'f',3);
 				Result = str1 + str+"/" + strong;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
@@ -2342,32 +2342,32 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 			if(pPlane && pPlane->m_bStab)
 			{
-				Result = QString(pMainFrame->tr("Tail Volume    = %1")).arg(pPlane->m_TailVolume,7,'f',2);
+				Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->m_TailVolume,7,'f',2);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
 			}
 
-			Result = QString(pMainFrame->tr("Root Chord     = %1 ")).arg(pWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(QObject::tr("Root Chord     = %1 ")).arg(pWing->m_TChord[0]*pMainFrame->m_mtoUnit,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(pMainFrame->tr("M.A.C.         = %1 ")).arg(pWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
+			Result = QString(QObject::tr("M.A.C.         = %1 ")).arg(pWing->m_MAChord*pMainFrame->m_mtoUnit,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(pMainFrame->tr("Tip Twist      = %1")).arg(pWing->m_TTwist[pWing->m_NPanel],7,'f',2);
+			Result = QString(QObject::tr("Tip Twist      = %1")).arg(pWing->m_TTwist[pWing->m_NPanel],7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(pMainFrame->tr("Aspect Ratio   = %1")).arg(pWing->m_AR,7,'f',2);
+			Result = QString(QObject::tr("Aspect Ratio   = %1")).arg(pWing->m_AR,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(pMainFrame->tr("Taper Ratio    = %1")).arg(pWing->m_TR,7,'f',2);
+			Result = QString(QObject::tr("Taper Ratio    = %1")).arg(pWing->m_TR,7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			Result = QString(pMainFrame->tr("Root-Tip Sweep = %1")).arg(pWing->GetAverageSweep(),7,'f',2);
+			Result = QString(QObject::tr("Root-Tip Sweep = %1")).arg(pWing->GetAverageSweep(),7,'f',2);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 		}
 
@@ -2427,44 +2427,44 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		strange = QString(pMainFrame->tr("Control position = %1 ")).arg(pWOpp->m_Ctrl, 8,'f',3);
+		strange = QString(QObject::tr("Control position = %1 ")).arg(pWOpp->m_Ctrl, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Angle of Attack  = %1 ")).arg(pWOpp->m_Alpha, 8,'f',3);
+		strange = QString(QObject::tr("Angle of Attack  = %1 ")).arg(pWOpp->m_Alpha, 8,'f',3);
 		strange += QString::fromUtf8("°");
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 		
-		strange = QString(pMainFrame->tr("Sideslip         = %1 ")).arg(pWOpp->m_Beta, 8,'f',3);
+		strange = QString(QObject::tr("Sideslip         = %1 ")).arg(pWOpp->m_Beta, 8,'f',3);
 		strange += QString::fromUtf8("°");
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Bank             = %1 ")).arg(pWOpp->m_Phi, 8,'f',3);
+		strange = QString(QObject::tr("Bank             = %1 ")).arg(pWOpp->m_Phi, 8,'f',3);
 		strange += QString::fromUtf8("°");
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Speed            = %1 ")).arg(pWOpp->m_QInf, 8,'f',3);
+		strange = QString(QObject::tr("Speed            = %1 ")).arg(pWOpp->m_QInf, 8,'f',3);
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		strange += str;		
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Undamped Natural Frequency = %1 Hz")).arg(OmegaN/2.0/PI, 8,'f',3);
+		strange = QString(QObject::tr("Undamped Natural Frequency = %1 Hz")).arg(OmegaN/2.0/PI, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Damped Natural Frequency   = %1 Hz")).arg(Omega1/2.0/PI, 8,'f',3);
+		strange = QString(QObject::tr("Damped Natural Frequency   = %1 Hz")).arg(Omega1/2.0/PI, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Damping Constant           = %1 s-1")).arg(Sigma1, 8,'f',3);
+		strange = QString(QObject::tr("Damping Constant           = %1 s-1")).arg(Sigma1, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(pMainFrame->tr("Damping Ratio              = %1 ")).arg(Dsi, 8,'f',3);
+		strange = QString(QObject::tr("Damping Ratio              = %1 ")).arg(Dsi, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
@@ -2569,68 +2569,68 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 			if(pWOpp->m_bOut)
 			{
 				YPos -=dD;
-				Result = pMainFrame->tr("Point is out of the flight envelope");
+				Result = QObject::tr("Point is out of the flight envelope");
 				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 			}
 
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 			l = str.length();
-			if     (l==2) Result = QString(pMainFrame->tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-			else if(l==3) Result = QString(pMainFrame->tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-			else if(l==4) Result = QString(pMainFrame->tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+			if     (l==2) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+			else if(l==3) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+			else if(l==4) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("Alpha = %1 ")).arg(pWOpp->m_Alpha,9,'f',4);
+			Result = QString(QObject::tr("Alpha = %1 ")).arg(pWOpp->m_Alpha,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("CL = %1 ")).arg(pWOpp->m_CL, 9,'f',4);
+			Result = QString(QObject::tr("CL = %1 ")).arg(pWOpp->m_CL, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("CD = %1 ")).arg(pWOpp->m_ViscousDrag+pWOpp->m_InducedDrag,9,'f',4);
+			Result = QString(QObject::tr("CD = %1 ")).arg(pWOpp->m_ViscousDrag+pWOpp->m_InducedDrag,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			double cxielli=pWOpp->m_CL*pWOpp->m_CL/PI/pWing->m_AR;
-			Result = QString(pMainFrame->tr("Efficiency = %1 ")).arg(cxielli/pWOpp->m_InducedDrag,9,'f',4);
+			Result = QString(QObject::tr("Efficiency = %1 ")).arg(cxielli/pWOpp->m_InducedDrag,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("Cl/Cd = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
+			Result = QString(QObject::tr("Cl/Cd = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("GCm = %1 ")).arg(pWOpp->m_GCm,9,'f',4);
+			Result = QString(QObject::tr("GCm = %1 ")).arg(pWOpp->m_GCm,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("Rolling Moment = %1 ")).arg(pWOpp->m_GRm, 9,'f',4);
+			Result = QString(QObject::tr("Rolling Moment = %1 ")).arg(pWOpp->m_GRm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("Induced Moment = %1 ")).arg(pWOpp->m_IYm, 9,'f',4);
+			Result = QString(QObject::tr("Induced Moment = %1 ")).arg(pWOpp->m_IYm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(pMainFrame->tr("Airfoil Yawing Moment = %1 ")).arg(pWOpp->m_GYm, 9,'f',4);
+			Result = QString(QObject::tr("Airfoil Yawing Moment = %1 ")).arg(pWOpp->m_GYm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			GetLengthUnit(str, pMainFrame->m_LengthUnit);
 			l = str.length();
-			if (l==1)     Result = QString(pMainFrame->tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
-			else if(l==2) Result = QString(pMainFrame->tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			else if(l>=3) Result = QString(pMainFrame->tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			if (l==1)     Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
+			else if(l==2) Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			else if(l>=3) Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			for(i=0; i<pWOpp->m_nFlaps; i++)
 			{
-				Result = QString(pMainFrame->tr("Flap Moment[%1] = %2")).arg(i+1).arg(pWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
+				Result = QString(QObject::tr("Flap Moment[%1] = %2")).arg(i+1).arg(pWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
 				GetMomentUnit(str, pMainFrame->m_MomentUnit);
 				Result += str;
 				YPos += dD;

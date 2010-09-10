@@ -57,7 +57,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	eps = 1.e-7;
 	
 	m_bSequence      = false;
-	m_bIsFinished      = false;
+	m_bIsFinished    = false;
 	m_b3DSymetric    = false;
 	m_bSequence      = false;
 	m_bWarning       = false;
@@ -771,7 +771,8 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			{
 				AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-				m_pWingList[i]->PanelTrefftz(Mu, Sigma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
+				m_pWingList[i]->PanelTrefftz(Mu, Sigma, pos, Force, WingIDrag,
+											 m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
 				IDrag += WingIDrag;
 
 				m_pWingList[i]->PanelComputeViscous(QInf, WingVDrag, OutString);
@@ -779,7 +780,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 				AddString(OutString);
 				if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
 
-				m_pWingList[i]->PanelComputeOnBody(m_QInf, m_Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
+				m_pWingList[i]->PanelComputeOnBody(m_QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
 				                                   m_pWPolar->m_bViscous, bThinSurf);
 
@@ -1531,11 +1532,10 @@ bool PanelAnalysisDlg::ReLoop()
 	else if(nrhs>=100)
 	{
 		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
-//		if(res ==IDCANCEL) return false;
 		nrhs = 100;
 	}
 
-	int MaxWakeIter = 1;
+//	int MaxWakeIter = 1;
 	int Size;
 	if(m_b3DSymetric) Size = m_MatSize/2;
 	else              Size = m_MatSize;

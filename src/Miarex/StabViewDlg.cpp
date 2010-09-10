@@ -622,7 +622,7 @@ void StabViewDlg::SetupLayout()
 	ForcedResponse->addWidget(m_pctrlControlTable);
 	ForcedResponseBox->setLayout(ForcedResponse);
 	
-	QGroupBox *ModalTimeBox = new QGroupBox("Modal response");
+	QGroupBox *ModalTimeBox = new QGroupBox(tr("Modal response"));
 	QVBoxLayout *ModalTimeLayout = new QVBoxLayout;
 	m_pctrlTimeMode1 = new QRadioButton("Mode 1");
 	m_pctrlTimeMode2 = new QRadioButton("Mode 2");

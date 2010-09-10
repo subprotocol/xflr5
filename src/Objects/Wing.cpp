@@ -1854,13 +1854,13 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 		{
 			pp = p;
 			m_StripArea[m] = 0.0;
+			StripForce.Set(0.0,0.0,0.0);
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
 				m_StripArea[m]  += m_pPanel[pp].Area;
 				pp++;
 			}
 			m_StripArea[m] /= (double)coef;
-
 
 			if(!bThinSurf)
 			{
@@ -1931,6 +1931,7 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 					pp++;
 				}
 				StripForce *= 2./s_QInf/s_QInf; //N/q
+
 				//____________________________
 				// Project on wind axes
 				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
@@ -2638,8 +2639,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	//    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
 	//
 
-	QMiarex *pMiarex   = (QMiarex*)s_pMiarex;
-	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
 
 	int  j, k, l, p, m, nFlap, coef;
 	double CPStrip, tau, NForce, cosa, sina;
@@ -2682,7 +2683,10 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
 			//initialize
+			DragVector.Set(0.0,0.0,0.0);
 			StripForce.Set(0.0,0.0,0.0);
+			GeomMoment.Set(0.0,0.0,0.0);
+
 			m_CmAirf[m]    = 0.0;
 			CPStrip        = 0.0;
 
@@ -2690,8 +2694,6 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_Surface[j].GetC4(k, PtC4Strip, tau);
 
 			LeverArmC4CoG = PtC4Strip - pWPolar->m_CoG;
-
-			GeomMoment.Set(0.0,0.0,0.0);
 
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{

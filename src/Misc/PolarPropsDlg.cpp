@@ -94,9 +94,9 @@ void PolarPropsDlg::InitDialog()
 		}
 		else if(m_pPolar->m_Type==2)
 		{
-			strong = QString(tr("Re.sqrt(Cl)")+" = %1\n").arg(m_pPolar->m_Reynolds,0,'f',0);
+			strong = QString("Re.sqrt(Cl) = %1\n").arg(m_pPolar->m_Reynolds,0,'f',0);
 			strange += strong;
-			strong = QString(tr("Ma.sqrt(Cl)") + " = %1\n").arg(m_pPolar->m_Mach,5,'f',2);
+			strong = QString("Ma.sqrt(Cl) = %1\n").arg(m_pPolar->m_Mach,5,'f',2);
 			strange += strong;
 		}
 		else if(m_pPolar->m_Type==3)
