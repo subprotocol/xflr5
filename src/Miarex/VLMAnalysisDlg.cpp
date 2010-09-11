@@ -940,10 +940,9 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 	CVector Force, WindNormal, WindDirection, WindSide;
 
 	CWing::s_bTrace   = true;
-	CWing::s_bVLM1    = m_pWPolar->m_bVLM1;
+
 	m_pWing->m_pWakeNode  = m_pWakeNode;
 	m_pWing->m_pWakePanel = m_pWakePanel;
-
 
 	for(q=0; q<nrhs; q++)
 	{
@@ -1000,8 +999,8 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 
 			AddString(tr("        Calculating aerodynamic coefficients...")+"\n");
 			m_bPointOut          = false;
-			CWing::s_Alpha     = Alpha;
-			CWing::s_QInf      = m_OpQInf;
+//			CWing::s_Alpha     = Alpha;
+//			CWing::s_QInf      = m_OpQInf;
 			CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 			CWing::s_Density   = m_pWPolar->m_Density;
 
@@ -1025,16 +1024,15 @@ void VLMAnalysisDlg::VLMComputePlane(double V0, double VDelta, int nrhs)
 				{
 					AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-					m_pWingList[i]->VLMTrefftz(m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+					m_pWingList[i]->VLMTrefftz(m_OpQInf, Alpha, m_Gamma+q*m_MatSize, pos, Force, WingIDrag, m_pWPolar);
 					IDrag += WingIDrag;
-//		for(int ll=0; ll<m_pWingList[i]->m_NStation;ll++) qDebug("%14.7f    %14.7f    ", m_pWingList[i]->m_Cl[ll], m_pWingList[i]->m_ICd[ll]);
 
-					m_pWingList[i]->PanelComputeViscous(m_OpQInf, WingVDrag, OutString);
+					m_pWingList[i]->PanelComputeViscous(m_OpQInf, Alpha, WingVDrag, m_pWPolar->m_bViscous, OutString);
 					VDrag += WingVDrag;
 					if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
 					AddString(OutString);
 
-					m_pWingList[i]->PanelComputeOnBody(m_OpQInf, Alpha, m_Cp+pos, m_Gamma+q*m_MatSize+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, true);
+					m_pWingList[i]->PanelComputeOnBody(m_OpQInf, Alpha, m_Cp+pos, m_Gamma+q*m_MatSize+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar);
 
 					m_pWingList[i]->PanelSetBending(true);
 
@@ -1499,7 +1497,7 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 	{
 		//type 2; find the speeds which will create a lift equal to the weight
 		AddString(tr("      Calculating speeds to balance the weight")+"\n");
-		CWing::s_QInf      = 1.0;
+//		CWing::s_QInf      = 1.0;
 		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 		CWing::s_Density   = m_pWPolar->m_Density;
 
@@ -1514,23 +1512,23 @@ bool VLMAnalysisDlg::VLMSolveMultiple(double V0, double VDelta, int nval)
 			position = 0;
 
 			Force.Set(0.0,0.0,0.0);
-			CWing::s_Alpha     = alpha;
-			m_pWing->VLMTrefftz(m_Gamma+q*m_MatSize, 0, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+//			CWing::s_Alpha     = alpha;
+			m_pWing->VLMTrefftz(1.0, alpha, m_Gamma+q*m_MatSize, 0, Force, WingIDrag, m_pWPolar);
 			position = m_pWing->m_MatSize;
 
 			if(m_pWing2)
 			{
-				m_pWing2->VLMTrefftz(m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pWing2->VLMTrefftz(1.0, alpha, m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar);
 				position += m_pWing2->m_MatSize;
 			}
 			if(m_pStab)
 			{
-				m_pStab->VLMTrefftz(m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pStab->VLMTrefftz(1.0, alpha, m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar);
 				position += m_pStab->m_MatSize;
 			}
 			if(m_pFin)
 			{
-				m_pFin->VLMTrefftz(m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+				m_pFin->VLMTrefftz(1.0, alpha, m_Gamma+q*m_MatSize, position, Force, WingIDrag, m_pWPolar);
 				position += m_pFin->m_MatSize;
 			}
 

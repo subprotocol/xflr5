@@ -22,7 +22,7 @@
 #ifndef CWING_H
 #define CWING_H
 
-
+#include "WPolar.h"
 #include "Surface.h"
 #include "Panel.h"
 
@@ -64,14 +64,15 @@ protected:
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
 
-	void VLMTrefftz(double *Gamma, int pos, CVector &Force, double & Drag, bool bTilted);
+	void VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double & Drag, CWPolar *pWPolar);
 
-	void PanelTrefftz(double *Mu, double *Sigma, int pos,  CVector &Force, double &Drag, bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode);
+	void PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
+							 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-						 bool bViscous, bool bThinSurface);
+						 CWPolar *pWPolar);
 
-	void PanelComputeViscous(double QInf, double &WingVDrag, QString &OutString);
+	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
 
 	void VLMCubicSplines(double *Gamma);
@@ -128,14 +129,13 @@ protected:
 	static double s_RelaxMax;	// relaxation factor for LLT convergence
 
 	static double s_Density, s_Viscosity; //fluid properties
-	static double s_QInf;		// Freestream speed
-	static double s_Alpha;		// angle of attack
+	static double s_QInfLLT;		// Freestream speed
+	static double s_AlphaLLT;		// angle of attack
 
 	static bool s_bCancel;
 
 	QFile * m_pXFile;	// a pointer to the output .log file
 
-	static bool s_bVLM1;		// true if classic, false if quad ring (K&P) method
 	static bool s_bTrace;		// true if the messages need to be traces
 	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
 

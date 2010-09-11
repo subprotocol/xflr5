@@ -476,7 +476,6 @@ void StabAnalysisDlg::ComputeResults()
 	QString strange, OutString;
 
 	CWing::s_bTrace   = false;
-	CWing::s_bVLM1    = m_pWPolar->m_bVLM1;
 
 	Force.Set(0.0, 0.0, 0.0);
 
@@ -503,8 +502,8 @@ void StabAnalysisDlg::ComputeResults()
 	AddString("        Calculating aerodynamic coefficients...\n");
 	m_bPointOut        = false;
 
-	CWing::s_Alpha     = m_AlphaEq;
-	CWing::s_QInf      = u0;
+//	CWing::s_Alpha     = m_AlphaEq;
+//	CWing::s_QInf      = u0;
 	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 	CWing::s_Density   = m_pWPolar->m_Density;
 
@@ -529,15 +528,15 @@ void StabAnalysisDlg::ComputeResults()
 		{
 			AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-			m_pWingList[i]->VLMTrefftz(m_Gamma, pos, Force, WingIDrag, m_pWPolar->m_bTiltedGeom);
+			m_pWingList[i]->VLMTrefftz(u0, m_AlphaEq, m_Gamma, pos, Force, WingIDrag, m_pWPolar);
 			IDrag += WingIDrag;
 
-			m_pWingList[i]->PanelComputeViscous(u0, WingVDrag, OutString);
+			m_pWingList[i]->PanelComputeViscous(u0, m_AlphaEq, WingVDrag, m_pWPolar->m_bViscous, OutString);
 			VDrag += WingVDrag;
 			if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
 			AddString(OutString);
 
-			m_pWingList[i]->PanelComputeOnBody(u0, m_AlphaEq, m_Cp+pos, m_Gamma+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar->m_bViscous, true);
+			m_pWingList[i]->PanelComputeOnBody(u0, m_AlphaEq, m_Cp+pos, m_Gamma+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar);
 
 			m_pWingList[i]->PanelSetBending(true);
 
@@ -1328,8 +1327,8 @@ double nada;
 		// find the speeds which will create a lift equal to the weight
 
 		AddString("      Calculating speed to balance the weight\n");
-		CWing::s_QInf      = 1.0;
-		CWing::s_Alpha     = m_AlphaEq;
+//		CWing::s_QInf      = 1.0;
+//		CWing::s_Alpha     = m_AlphaEq;
 		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 		CWing::s_Density   = m_pWPolar->m_Density;
 
@@ -1346,7 +1345,7 @@ double nada;
 		p=0;
 
 		u0 = 1.0;
-nada = Cm;
+
 		Forces(m_Gamma, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 		phi = m_pWPolar->m_BankAngle *PI/180.0;
 

@@ -1341,8 +1341,8 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 		if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)
 		{
-			pNewPoint->m_Alpha               = CWing::s_Alpha;
-			pNewPoint->m_QInf                = CWing::s_QInf;
+			pNewPoint->m_Alpha               = CWing::s_AlphaLLT;
+			pNewPoint->m_QInf                = CWing::s_QInfLLT;
 			pNewPoint->m_NVLMPanels          = m_pCurWing->m_MatSize;
 			pNewPoint->m_bOut                = m_pCurWing->m_bWingOut;
 			pNewPoint->m_CL                  = m_pCurWing->m_CL;
@@ -9384,7 +9384,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_bTiltedGeom     = m_WngAnalysis.m_bTiltedGeom;
 		pNewWPolar->m_bWakeRollUp     = m_WngAnalysis.m_bWakeRollUp;
 		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
-		pNewWPolar->m_AnalysisMethod    = m_WngAnalysis.m_AnalysisMethod;
+		pNewWPolar->m_AnalysisMethod  = m_WngAnalysis.m_AnalysisMethod;
 		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
 //		pNewWPolar->m_bThinSurfaces   = true;
 		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
@@ -15357,11 +15357,11 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	{
 		m_pCurWing->ComputeChords();
 		m_pCurWing->m_Type = m_pCurWPolar->m_Type;
-		CWing::s_Alpha        = m_pCurWPolar->m_ASpec;//in case its a Type 4 polar
-		CWing::s_QInf         = m_pCurWPolar->m_QInf;
+		CWing::s_AlphaLLT     = m_pCurWPolar->m_ASpec;//in case its a Type 4 polar
+		CWing::s_QInfLLT      = m_pCurWPolar->m_QInf;
 		CWing::s_Density      = m_pCurWPolar->m_Density;
 		CWing::s_Viscosity    = m_pCurWPolar->m_Viscosity;
-		CWing::s_bVLM1        = m_pCurWPolar->m_bVLM1;
+//		CWing::s_bVLM1        = m_pCurWPolar->m_bVLM1;
 //		m_pCurWing->m_bVLMSymetric = m_pCurWing->m_bSymetric;
 
 		if(m_pCurWPolar->m_AnalysisMethod>1)

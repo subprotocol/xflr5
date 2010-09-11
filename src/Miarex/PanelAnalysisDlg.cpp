@@ -175,10 +175,8 @@ bool PanelAnalysisDlg::AlphaLoop()
 	if (m_bCancel) return true;
 
 	if(!m_pWPolar->m_bThinSurfaces) CreateWakeContribution();
-	else
-	{
-		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-	}
+	else                            memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+
 	if (m_bCancel) return true;
 
 	if (!SolveMultiple(m_Alpha, m_AlphaDelta, nrhs))
@@ -271,7 +269,7 @@ void PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 	int p, pp, q, m, Size;
 	double alpha, phi, phiSym;
 	CVector V, VS, C, CC;
-	CVector QInf[100];
+	CVector QInf[VLMMAXRHS];
 
 	if(m_b3DSymetric) Size = m_MatSize/2;
 	else              Size = m_MatSize;
@@ -309,7 +307,6 @@ void PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 			m_cosRHS[m] = 0.0;
 			m_sinRHS[m] = 0.0;
 		}
-
 
 		if(m_ppPanel[p]->m_iPos!=0)
 		{
@@ -553,16 +550,15 @@ void PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 			Sigma  = m_Sigma + q*m_MatSize;
 			Force.Set(0.0, 0.0, 0.0);
 		
-			CWing::s_QInf      = 1.0;
-			CWing::s_Alpha     = alpha;
+//			CWing::s_QInf      = 1.0;
+//			CWing::s_Alpha     = alpha;
 
 			pos = 0;
 			for(int i=0; i<4; i++)
 			{
 				if(m_pWingList[i])
 				{
-					m_pWingList[i]->PanelTrefftz(Mu, Sigma, 0, Force, IDrag, m_pWPolar->m_bTiltedGeom,
-										  m_pWPolar->m_bThinSurfaces, m_pWakePanel, m_pWakeNode);
+					m_pWingList[i]->PanelTrefftz(1.0, alpha, Mu, Sigma, 0, Force, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 					pos += m_pWingList[i]->m_MatSize;
 				}
 			}
@@ -743,14 +739,15 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	if(m_pStab) m_pStab->m_bWingOut    = false;
 	if(m_pFin)  m_pFin->m_bWingOut     = false;
 
+
 	if(QInf >0.0) 
 	{
 		SetAi(qrhs);
 
 		AddString(tr("       Calculating aerodynamic coefficients...")+"\n");
 		m_bPointOut = false;
-		CWing::s_Alpha     = Alpha;
-		CWing::s_QInf      = QInf;
+//		CWing::s_Alpha     = Alpha;
+//		CWing::s_QInf      = QInf;
 		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 		CWing::s_Density   = m_pWPolar->m_Density;
 		Lift   = 0.0;
@@ -771,18 +768,17 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 			{
 				AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
 
-				m_pWingList[i]->PanelTrefftz(Mu, Sigma, pos, Force, WingIDrag,
-											 m_pWPolar->m_bTiltedGeom, bThinSurf, m_pWakePanel, m_pWakeNode);
+				m_pWingList[i]->PanelTrefftz(QInf, Alpha, Mu, Sigma, pos, Force, WingIDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 				IDrag += WingIDrag;
 
-				m_pWingList[i]->PanelComputeViscous(QInf, WingVDrag, OutString);
+				m_pWingList[i]->PanelComputeViscous(QInf, Alpha, WingVDrag, m_pWPolar->m_bViscous, OutString);
 				VDrag += WingVDrag;
 				AddString(OutString);
 				if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
 
-				m_pWingList[i]->PanelComputeOnBody(m_QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
+				m_pWingList[i]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-				                                   m_pWPolar->m_bViscous, bThinSurf);
+												   m_pWPolar);
 
 				m_pWingList[i]->PanelSetBending(bThinSurf);
 
@@ -1321,7 +1317,6 @@ void PanelAnalysisDlg::InitDialog()
 
 	SetFileHeader();
 
-
 	QString str = "";
 	m_b3DSymetric = m_pWing->m_bSymetric;
 	if(!m_pWing->m_bSymetric) str += tr("     Main wing is asymmetric")+"\n";
@@ -1331,7 +1326,6 @@ void PanelAnalysisDlg::InitDialog()
 		str += tr("     Sideslip is asymmetric")+"\n";
 		m_b3DSymetric = false;
 	}
-
 
 	if(m_pWing2)
 	{
@@ -1583,10 +1577,12 @@ bool PanelAnalysisDlg::ReLoop()
 	CreateMatrix();
 	if (m_bCancel) return true;
 
-        CreateRHS(m_Alpha, m_AlphaDelta, nrhs);
+	CreateRHS(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
 
 	if(!m_pWPolar->m_bThinSurfaces) CreateWakeContribution();
+	else memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+
 	if (m_bCancel) return true;
 
 	if (!SolveMultiple(Alpha, m_AlphaDelta, 1))
@@ -2305,24 +2301,17 @@ bool PanelAnalysisDlg::SolveMultiple(double V0, double VDelta, int nval)
 		memcpy(m_RHSRef, m_RHS,   2*Size*sizeof(double));
 		memcpy(SigmaRef, m_Sigma, 2*Size*sizeof(double));
 
-//		n  =  q    * Size;
-//		o  =  q    * m_MatSize;
-//		o1 = (q+1) * m_MatSize;
 		//cosine
 		for (p=0; p<m_MatSize/2; p++)
 		{
 			m_cosRHS[p]             = m_RHSRef[p];
 			m_cosRHS[m_MatSize-1-p] = m_RHSRef[p];
-//			m_Sigma[o+p]    = SigmaRef[n+p];
-//			m_Sigma[o1-1-p] = SigmaRef[n+p];
 		}
 		//sine
 		for (p=0; p<m_MatSize/2; p++)
 		{
 			m_sinRHS[p]             = m_RHSRef[Size+p];
 			m_sinRHS[m_MatSize-1-p] = m_RHSRef[Size+p];
-//			m_Sigma[o+p]    = SigmaRef[n+p];
-//			m_Sigma[o1-1-p] = SigmaRef[n+p];
 		}
 	}
 
@@ -2414,7 +2403,7 @@ void PanelAnalysisDlg::StartAnalysis()
 			
 		}
 
-		m_pWPolar->m_bVLM1 = true; // for thin surfaces
+		m_pWPolar->m_bVLM1 = false; // for thin surfaces
 	}
 
 	strong = QString(tr("Type %1 Analysis")+"\n\n").arg(m_pWPolar->m_Type);
@@ -2444,6 +2433,15 @@ void PanelAnalysisDlg::StartAnalysis()
 	else if (m_bWarning)           strong = "\n"+tr("Panel Analysis completed ... Errors encountered")+"\n";
 	AddString(strong);
 	pTimer->stop();
+
+	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
+	{
+		//restore the panels and nodes;
+		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
+		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(CPanel));
+		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
+	}
 	m_bIsFinished = true;
 	m_pctrlCancel->setText(tr("Close"));
 }
@@ -2472,7 +2470,6 @@ bool PanelAnalysisDlg::UnitLoop()
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int n, nrhs, nWakeIter, MaxWakeIter, TotalTime;
-	double Alpha;
 
 	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
 	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
@@ -2516,8 +2513,8 @@ bool PanelAnalysisDlg::UnitLoop()
 
 	for (n=0; n<nrhs; n++)
 	{
-		Alpha = m_Alpha + n * m_AlphaDelta;
-		str = QString("      \n    "+tr("Processing Alpha= %1")+"\n").arg(Alpha,7,'f',2);
+		m_OpAlpha = m_Alpha+n*m_AlphaDelta;
+		str = QString("      \n    "+tr("Processing Alpha= %1")+"\n").arg(m_OpAlpha,7,'f',2);
 		AddString(str);
 
 		//reset the initial geometry before a new angle is processed
@@ -2527,17 +2524,15 @@ bool PanelAnalysisDlg::UnitLoop()
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 
 		// Rotate the wing panels and translate the wake to the new T.E. position
-				pMiarex->RotateGeomY(m_Alpha+n*m_AlphaDelta, O);
+		pMiarex->RotateGeomY(m_OpAlpha, O);
+
 		CreateMatrix();
 		if (m_bCancel) return true;
 
 		// The calculation will be performed at AOA=0.0 because the geometry is tilted...
-		Alpha    = 0.0;
-
 		// ... but the operating angle is different :
-		m_OpAlpha = m_Alpha+n*m_AlphaDelta;
 
-		CreateRHS(Alpha, m_AlphaDelta, 1);
+		CreateRHS(0.0, m_AlphaDelta, 1);
 		if (m_bCancel) return true;
 
 		for (nWakeIter = 0; nWakeIter<MaxWakeIter; nWakeIter++)
@@ -2551,27 +2546,27 @@ bool PanelAnalysisDlg::UnitLoop()
 			if (m_bCancel) return true;
 
 			if(!m_pWPolar->m_bThinSurfaces) CreateWakeContribution();
+			else                            memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+
 			if (m_bCancel) return true;
 
-			if (!SolveMultiple(Alpha, m_AlphaDelta, 1))
+			if (!SolveMultiple(0.0, m_AlphaDelta, 1))
 			{
 				AddString("\n\n"+tr("Singular matrix - aborting....")+"\n");
 				m_bWarning = true;
 				return true;
 			}
-
 			if (m_bCancel) return true;
 
-			CreateDoubletStrength(Alpha, m_AlphaDelta, 1);
+			CreateDoubletStrength(0.0, m_AlphaDelta, 1);
 			if (m_bCancel) return true;
 
 			if(MaxWakeIter>0 && m_pWPolar->m_bWakeRollUp) RelaxWake();
-
 		}
 
 		AddString("\n");
 
-		ComputeAeroCoefs(Alpha, m_AlphaDelta, 1);
+		ComputeAeroCoefs(0.0, m_AlphaDelta, 1);
 	}
 
 	return true;

@@ -47,7 +47,6 @@ void* CWing::s_pVLMDlg;	//pointer to the VLM analysis dialog class
 void* CWing::s_pLLTDlg;	//pointer to the LLT analysis dialog class
 void* CWing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 bool CWing::s_bCancel;
-bool CWing::s_bVLM1;
 bool CWing::s_bVLMSymetric;
 bool CWing::s_bTrace;
 int CWing::s_NLLTStations;//pointer to the 3DPanel analysis dialog class
@@ -55,8 +54,8 @@ double CWing::s_CvPrec;	// Precision required for LLT convergence
 double CWing::s_RelaxMax;	// relaxation factor for LLT convergence
 double CWing::s_Density;
 double CWing::s_Viscosity; //fluid properties
-double CWing::s_QInf;		// Freestream speed
-double CWing::s_Alpha;		// angle of attack
+double CWing::s_QInfLLT;		// Freestream speed
+double CWing::s_AlphaLLT;		// angle of attack
 
 
 CWing::CWing()
@@ -107,7 +106,6 @@ CWing::CWing()
 //	m_CoG.Set(0.0, 0.0, 0.0);
 //	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 
-	s_bVLM1         = true;
 	s_bTrace        = true;
 
 	m_bIsFin        = false;
@@ -128,7 +126,7 @@ CWing::CWing()
 	m_WingColor =  QColor(203,222,222);
 
 	m_QInf0    = 0.0;
-	s_QInf     = 0.0;
+	s_QInfLLT     = 0.0;
 	m_Maxa     = 0.0;
 
 	m_pXFile     = NULL;
@@ -160,7 +158,7 @@ CWing::CWing()
 
 	m_NSurfaces = 0;
 
-	s_Alpha      = 0.0;
+	s_AlphaLLT   = 0.0;
 
 	m_AR         = 0.0;// Aspect ratio
 	m_TR         = 0.0;// Taper ratio
@@ -432,11 +430,6 @@ void CWing::ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGI
 	if(Mass>0.0) CoG *= 1/ checkVolume;
 	else         CoG.Set(0.0, 0.0, 0.0);
 
-/*
-CoGCheck *= 1.0/checkVolume;
-qDebug("%16.8f    %16.8f    %16.8f    ", CoG.x, CoG.y, CoG.z);
-qDebug("%16.8f    %16.8f    %16.8f    ", CoGCheck.x, CoGCheck.y, CoGCheck.z);
-*/
 
 	//then get the Inertia in both reference frames
 	p=0;
@@ -475,13 +468,6 @@ qDebug("%16.8f    %16.8f    %16.8f    ", CoGCheck.x, CoGCheck.y, CoGCheck.z);
 			}
 		}
 	}
-/*
-qDebug(" %16.8f    %16.8f ", checkVolume, recalcVolume);
-qDebug() <<"____________";
-qDebug("Mass=%16.8f    recalcMass=%16.8f",  checkVolume*rho, recalcMass);
-qDebug() <<"____________";
-qDebug("%16.8f    %16.8f    %16.8f    %16.8f", CoGIxx,      CoGIyy,      CoGIzz,      CoGIxz);
-qDebug("%16.8f    %16.8f    %16.8f    %16.8f", CoGIxxCheck, CoGIyyCheck, CoGIzzCheck, CoGIxzCheck);*/
 }
 
 
@@ -1422,8 +1408,8 @@ void CWing::LLTInitCl()
 	{
 		yob   = cos(k*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		m_Re[k] = m_Chord[k] * s_QInf /s_Viscosity;
-		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
+		m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
+		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_AlphaLLT + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
 	}
 	if(m_Type == 2)
 	{
@@ -1433,10 +1419,10 @@ void CWing::LLTInitCl()
 			Lift += Eta(k) * m_Cl[k] * m_Chord[k] /m_PlanformSpan;
 		}
 		if(Lift<=0.0) return;
-		s_QInf  = m_QInf0 / sqrt(Lift);
+		s_QInfLLT  = m_QInf0 / sqrt(Lift);
 		for (k=1; k<s_NLLTStations; k++)
 		{
-			m_Re[k] = m_Chord[k] * s_QInf /s_Viscosity;
+			m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
 		}
 	}
 }
@@ -1469,7 +1455,7 @@ int CWing::LLTIterate()
 		yob     = cos(k*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
 		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k],
-								 s_Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
+								 s_AlphaLLT + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 		if (m_Type == 2)
 		{
 			Lift += Eta(k) * m_Cl[k] * m_Chord[k];
@@ -1483,14 +1469,14 @@ int CWing::LLTIterate()
 		{
 			return -1;
 		}
-		s_QInf  = m_QInf0 / sqrt(Lift);
+		s_QInfLLT  = m_QInf0 / sqrt(Lift);
 
 		for (k=1; k<s_NLLTStations; k++)
 		{
-			m_Re[k] = m_Chord[k] * s_QInf /s_Viscosity;
+			m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
 			yob     = cos(k*PI/s_NLLTStations);
 			GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-			m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
+			m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_AlphaLLT + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
 		}
 	}
 
@@ -1545,31 +1531,30 @@ void CWing::LLTComputeWing()
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
 
 		m_Cl[m]     = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],
-									s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+							s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError)
 			bPointOutAlpha = true;
 
-		m_PCd[m]    = GetCd(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
+		m_PCd[m]    = GetCd(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
 		m_ICd[m]    = -m_Cl[m] * (m_Ai[m]* PI/180.0);
 
-		m_XTrTop[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],
-									s_Alpha+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
+		m_XTrTop[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XTrBot[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],s_Alpha+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
+		m_XTrBot[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_CmAirf[m] = GetCm(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_CmAirf[m] = GetCm(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		m_XCPSpanRel[m] = GetXCp(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_Alpha+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
+		m_XCPSpanRel[m] = GetXCp(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
 
 		if(fabs(m_XCPSpanRel[m])<0.000001)
 		{
@@ -1582,7 +1567,7 @@ void CWing::LLTComputeWing()
 		if(bOutRe) bPointOutRe = true;
 		if(bError) bPointOutAlpha = true;
 
-		arad = (s_Alpha+m_Ai[m]+m_Twist[m])*PI/180.0;
+		arad = (s_AlphaLLT+m_Ai[m]+m_Twist[m])*PI/180.0;
 //		arad = (s_Alpha-m_Ai[m])*PI/180.0;
 		c4   = GetC4(yob, pWPolar->m_CoG.x)/m_Chord[m];
 		zpos = GetZPos(yob*m_PlanformSpan/2.0)/m_Chord[m];
@@ -1613,7 +1598,7 @@ void CWing::LLTComputeWing()
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\n").arg(s_AlphaLLT+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1629,7 +1614,7 @@ void CWing::LLTComputeWing()
 			ReynoldsFormat(string, m_Re[m]);
 			strong += string;
 
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\n").arg(s_Alpha+m_Ai[m] + m_Twist[m],6,'f',1);
+			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\n").arg(s_AlphaLLT+m_Ai[m] + m_Twist[m],6,'f',1);
 			strong+=string;
 
 			pLLTDlg->UpdateOutput(strong);
@@ -1684,7 +1669,7 @@ void CWing::LLTSetBending()
 	}
 
 	//dynamic pressure, kg/m3
-	double q = 0.5*pWPolar->m_Density * s_QInf * s_QInf;
+	double q = 0.5*pWPolar->m_Density * s_QInfLLT * s_QInfLLT;
 
 	double bm;
 	double y, yy;
@@ -1743,7 +1728,7 @@ bool CWing::LLTSetLinearSolution()
 		yob   = cos(i*PI/s_NLLTStations);
 		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
 		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);
-		rhs[i] = c/cs * (s_Alpha-a0+m_Twist[i])/180.0*PI;
+		rhs[i] = c/cs * (s_AlphaLLT-a0+m_Twist[i])/180.0*PI;
 	}
 	
 	bool bCancel = false;
@@ -1765,7 +1750,7 @@ bool CWing::LLTSetLinearSolution()
 		GetLinearizedPolar(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
 		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
 		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
-		m_Ai[i]  = -(s_Alpha-a0+m_Twist[i]) + m_Cl[i]/slope;
+		m_Ai[i]  = -(s_AlphaLLT-a0+m_Twist[i]) + m_Cl[i]/slope;
 	}
 	return true;
 }
@@ -1794,7 +1779,7 @@ bool CWing::LLTInitialize(double mass)
 
 	for (k=0; k<=s_NLLTStations; k++)
 	{
-		m_Re[k] = m_Chord[k] * s_QInf/s_Viscosity;
+		m_Re[k] = m_Chord[k] * s_QInfLLT/s_Viscosity;
 	}
 
 	return true;
@@ -1802,8 +1787,8 @@ bool CWing::LLTInitialize(double mass)
 
 
 
-void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-                         bool bTilted, bool bThinSurf, CPanel *pWakePanel, CVector *pWakeNode)
+void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
+						 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
 {
 	// calculates the induced lift and drag from the vortices or wake panels strength
 	// using a farfield method
@@ -1817,38 +1802,38 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 	double GammaStrip[MAXSTATIONS];
 	static CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
 
-	if(bTilted)
+	if(pWPolar->m_bTiltedGeom)
 	{
 		cosa = 1.0;
 		sina = 0.0;
 	}
 	else
 	{
-		cosa = cos(s_Alpha*PI/180.0);
-		sina = sin(s_Alpha*PI/180.0);
+		cosa = cos(Alpha*PI/180.0);
+		sina = sin(Alpha*PI/180.0);
 	}
 
 	//   Define wind axis
 	WindNormal.Set(   -sina, 0.0, cosa);
 	WindDirection.Set( cosa, 0.0, sina);
 
-	VInf = WindDirection * s_QInf;
+	VInf = WindDirection * QInf;
 
 	//dynamic pressure, kg/m3
-	double q = 0.5 * s_Density * s_QInf * s_QInf;
+	double q = 0.5 * s_Density * QInf * QInf;
 
 	m_CL      = 0.0;
 	WingIDrag = 0.0;
 	IYm       = 0.0;
 
 	int coef = 2;
-	if (bThinSurf) coef = 1;
+	if (pWPolar->m_bThinSurfaces) coef = 1;
 
 	p=0;
 	m=0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
-		if(m_Surface[j].m_bIsTipLeft && !bThinSurf) p+=m_Surface[j].m_NXPanels;//tip patch panels
+		if(m_Surface[j].m_bIsTipLeft && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
 
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
 		{
@@ -1862,7 +1847,7 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 			}
 			m_StripArea[m] /= (double)coef;
 
-			if(!bThinSurf)
+			if(!pWPolar->m_bThinSurfaces)
 			{
 				// ____________________________
 				// Downwash calculation
@@ -1877,7 +1862,7 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 				C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
 
 				pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
-				InducedAngle = atan2(Wg.dot(WindNormal), s_QInf);
+				InducedAngle = atan2(Wg.dot(WindNormal), QInf);
 				m_Ai[m]      = 2.0 * InducedAngle*180/PI;
 
 
@@ -1914,7 +1899,7 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 				pp=p;
 				for(l=0; l<m_Surface[j].m_NXPanels; l++)
 				{
-					if(s_bVLM1 || m_pPanel[p].m_bIsTrailing)
+					if(pWPolar->m_bVLM1 || m_pPanel[pp].m_bIsTrailing)
 					{
 						C = m_pPanel[pp].CtrlPt;
 						C.x = m_PlanformSpan * 100.0;
@@ -1930,7 +1915,7 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 					}
 					pp++;
 				}
-				StripForce *= 2./s_QInf/s_QInf; //N/q
+				StripForce *= 2./QInf/QInf; //N/q
 
 				//____________________________
 				// Project on wind axes
@@ -1945,11 +1930,11 @@ void CWing::PanelTrefftz(double *Mu, double *Sigma, int pos, CVector &Force, dou
 			Force         += StripForce;                                // N/q
 			m_F[m]         = StripForce * q;	                        //Newtons
 
-			if(bTilted) m_F[m].RotateY(-s_Alpha);
+			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
 
 			m++;
 		}
-		if(m_Surface[j].m_bIsTipRight && !bThinSurf) p+=m_Surface[j].m_NXPanels;//tip patch panels
+		if(m_Surface[j].m_bIsTipRight && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
 	}
 
 	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
@@ -2482,7 +2467,7 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 
 
-void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bool bTilted)
+void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double &IDrag, CWPolar *pWPolar)
 {
 	//
 	// calculates the lift and induced drag from the vortices strengths
@@ -2500,8 +2485,8 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bo
 	CVector VInf;
 	double GamShed[MAXSTATIONS];
 
-	if(!bTilted) alpha = s_Alpha;
-	else         alpha = 0.0;
+	if(!pWPolar->m_bTiltedGeom) alpha = Alpha;
+	else                        alpha = 0.0;
 
 	cosa = cos(alpha*PI/180.0);
 	sina = sin(alpha*PI/180.0);
@@ -2510,7 +2495,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bo
 	WindNormal.Set(   -sina, 0.0, cosa);
 	WindDirection.Set( cosa, 0.0, sina);
 
-	VInf = WindDirection * s_QInf;
+	VInf = WindDirection * QInf;
 
 	m_CL = 0.0;
 	IDrag = 0.0;
@@ -2531,7 +2516,7 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bo
 			for(l=0; l<m_Surface[j].m_NXPanels; l++)
 			{
 				m_StripArea[m]+= m_pPanel[p].Area;
-				if(s_bVLM1 || m_pPanel[p].m_bIsTrailing)
+				if(pWPolar->m_bVLM1 || m_pPanel[p].m_bIsTrailing)
 				{
 					C = m_pPanel[p].CtrlPt;
 //					C = m_pPanel[p].VortexPos;//Makes absolutely no difference on results
@@ -2556,13 +2541,13 @@ void CWing::VLMTrefftz(double *Gamma, int pos, CVector &Force, double &IDrag, bo
 				}
 				p++;
 			}
- 
-			m_Cl[m]  *= 2.0/m_StripArea[m] /s_QInf/s_QInf;
-			m_ICd[m] *= 1.0/m_StripArea[m] /s_QInf/s_QInf;
+
+			m_Cl[m]  *= 2.0/m_StripArea[m] /QInf/QInf;
+			m_ICd[m] *= 1.0/m_StripArea[m] /QInf/QInf;
 
 			Force += StripForce;                    //N/rho
 			m_F[m] = StripForce * s_Density;		//Newtons : F = rho * (V x Gamma) Kutta_Joukowski
-			if(bTilted) m_F[m].RotateY(-s_Alpha);
+			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
 			m++;
 		}
 	}
@@ -2618,7 +2603,7 @@ void CWing::VLMCubicSplines(double *Gamma)
 
 void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
                              double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-                             bool bViscous, bool bThinSurface)
+							 CWPolar *pWPolar)
 {
 	//  Calculates the wing aero coefficients
 	//  Uses Cp distribution in input for thick surfaces
@@ -2639,8 +2624,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	//    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
 	//
 
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
+//	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+//	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
 
 	int  j, k, l, p, m, nFlap, coef;
 	double CPStrip, tau, NForce, cosa, sina;
@@ -2654,8 +2639,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	m_GYm = m_VYm = m_IYm = 0.0;
 
 	// Define the number of panels to consider on each strip
-	if(bThinSurface) coef = 1;    // only mid-surface
-	else             coef = 2;    // top and bottom surfaces
+	if(pWPolar->m_bThinSurfaces) coef = 1;    // only mid-surface
+	else                         coef = 2;    // top and bottom surfaces
 
 	// Define the wind axis
 	cosa = cos(Alpha*PI/180.0);
@@ -2673,7 +2658,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		//do not consider left tip patch, if any
-		if(!bThinSurface && m_Surface[j].m_bIsTipLeft) p += m_Surface[j].m_NXPanels;
+		if(!pWPolar->m_bThinSurfaces && m_Surface[j].m_bIsTipLeft) p += m_Surface[j].m_NXPanels;
 
 		if(m_Surface[j].m_bTEFlap) m_FlapMoment[nFlap] = 0.0;
 
@@ -2698,7 +2683,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
 				// Get the force acting on the panel
-				if(!bThinSurface)
+				if(!pWPolar->m_bThinSurfaces)
 				{
 					ForcePt = m_pPanel[p].CollPt;
 					PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
@@ -2711,7 +2696,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 					PanelForce *= 2.0 * Gamma[p] /QInf;                                       //Newtons/q
 					Cp[p]  = -2.0 * PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;
 
-					if(!s_bVLM1 && !m_pPanel[p].m_bIsLeading)
+					if(!pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 					{
 						Force       = WindDirection * m_pPanel[p].Vortex;
 						Force      *= 2.0 * Gamma[p+1] /QInf;       //Newtons/q
@@ -2740,7 +2725,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 						//then p is on the flap, so add its contribution
 						HingeLeverArm = ForcePt - m_Surface[j].m_HingePoint;
 						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
-						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* s_Density * s_QInf * s_QInf/2.0;  //N.m
+						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* s_Density * QInf * QInf/2.0;  //N.m
 					}
 				}
 				p++;
@@ -2752,8 +2737,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
 			// add viscous properties, if required
-			if(bViscous) DragVector.x   = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
-			else         DragVector.x = 0.0;
+			if(pWPolar->m_bViscous) DragVector.x   = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
+			else                    DragVector.x = 0.0;
 
 			// global moments, in N.m/q
 			DragMoment =  LeverArmC4CoG * DragVector;
@@ -2770,7 +2755,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m++;
 		}
 		//do not consider right tip patch
-		if(!bThinSurface && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;
+		if(!pWPolar->m_bThinSurfaces && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;
 		if(m_Surface[j].m_bTEFlap) nFlap++;
 	}
 
@@ -2787,7 +2772,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 }
 
 
-void CWing::PanelComputeViscous(double QInf, double &WingVDrag, QString &OutString)
+void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString)
 {
 	// In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
 	// In output, returns for each span station
@@ -2812,6 +2797,14 @@ void CWing::PanelComputeViscous(double QInf, double &WingVDrag, QString &OutStri
 	// Calculate the Reynolds number on each strip
 	for (m=0; m<m_NStation; m++)    m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
 
+	if(!bViscous)
+	{
+		for(m=0; m <m_NStation; m++)
+		{
+			m_PCd[m] = m_XTrTop[m] = m_XTrBot[m] = 0.0;
+		}
+		return;
+	}
 	//Interpolate the viscous properties from the foil's type 1 polar mesh
 	m=0;
 	for (int j=0; j<m_NSurfaces; j++)
