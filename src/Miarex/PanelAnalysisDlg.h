@@ -97,8 +97,6 @@ private:
 	void GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const Alpha, double const &QInf, CVector &VInf);
 	void GetVortexCp(const int &p, double *Gamma, double *Cp, double const Alpha, CVector &VInf);
 
-	CVector GetSpeedVector(CVector C, double *Gamma);
-
 
 	static void *s_pMiarex;
 	static void *s_pMainFrame;

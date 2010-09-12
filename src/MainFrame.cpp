@@ -965,8 +965,8 @@ void MainFrame::CreateDockWindows()
 
 	LLTAnalysisDlg::s_pMainFrame = this;
 	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
-	VLMAnalysisDlg::s_pMainFrame = this;
-	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
+//	VLMAnalysisDlg::s_pMainFrame = this;
+//	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
 	StabAnalysisDlg::s_pMainFrame = this;
 	StabAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;
@@ -4518,8 +4518,6 @@ CFoil* MainFrame::ReadFoilFile(QTextStream &in)
 
 CFoil * MainFrame::ReadPolarFile(QDataStream &ar)
 {
-//	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-	QString FoilName;
 	CFoil* pFoil = NULL;
 	CPolar *pPolar = NULL;
 	CPolar * pOldPolar;
@@ -5094,7 +5092,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << m_ForceUnit;
 	ar << m_MomentUnit;
 
-	ar << pMiarex->m_WngAnalysis.m_Type;
+	ar << pMiarex->m_WngAnalysis.m_PolarType;
 	ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 	ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 	ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
@@ -5353,7 +5351,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << m_ForceUnit;
 		ar << m_MomentUnit;
 
-		ar << pMiarex->m_WngAnalysis.m_Type;
+		ar << pMiarex->m_WngAnalysis.m_PolarType;
 		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
@@ -5469,7 +5467,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 
 			if(ArchiveFormat>=100004)
 			{
-				ar >> pMiarex->m_WngAnalysis.m_Type;
+				ar >> pMiarex->m_WngAnalysis.m_PolarType;
 				ar >> f; pMiarex->m_WngAnalysis.m_Weight=f;
 				ar >> f; pMiarex->m_WngAnalysis.m_QInf=f;
 				if(ArchiveFormat>=100013)

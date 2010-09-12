@@ -497,9 +497,10 @@ void StabAnalysisDlg::ComputeResults()
 		m_bPointOut = true;
 		return;
 	}
-	strange = QString("\n\n      ...Alpha=%1\n").arg(m_AlphaEq,0,'f',2);
+	strange =QString("\n        Calculating aerodynamic coefficients for Alpha=%1").arg(m_AlphaEq,7,'f',2);
+	strange += QString::fromUtf8("°\n");
 	AddString(strange);
-	AddString("        Calculating aerodynamic coefficients...\n");
+
 	m_bPointOut        = false;
 
 //	CWing::s_Alpha     = m_AlphaEq;
@@ -1220,7 +1221,7 @@ bool StabAnalysisDlg::ComputeTrimmedConditions()
 	static double Lift, cosa, sina, phi;
 	static double VerticalCl;
 	static CVector VInf, Force, Moment, WindNormal;
-double nada;
+
 	// find aoa such that Cm=0;
 
 	//Build the unit RHS vectors along x and z in Body Axis
@@ -1356,10 +1357,10 @@ double nada;
 		{
 			u0 = -100.0;
 			strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\n").arg(m_AlphaEq,0,'f',2);
-			if(m_bTrace) AddString("\n");
 			if(m_bTrace) AddString(strong);
 			m_bPointOut = true;
 			m_bWarning = true;
+			return false;
 		}
 		else
 		{
@@ -1483,6 +1484,9 @@ bool StabAnalysisDlg::ControlLoop()
 
 		//define the control position for this iteration
 		t = m_ControlMin +(double)i *m_ControlDelta;
+		str = QString("      Calculation for control position %1\n").arg(t,5,'f',2);
+		AddString(str);
+
 		SetControlPositions(t);
 		if(m_bCancel) break;
 
@@ -1490,7 +1494,7 @@ bool StabAnalysisDlg::ControlLoop()
 		if(!ComputeTrimmedConditions())
 		{
 			//no zero moment alpha
-			str = QString("      Unsuccessfull attempt to trim the model for Control=%1 - skipping.\n\n\n").arg(t,10,'f',3);
+			str = QString("      Unsuccessfull attempt to trim the model for control position=%1 - skipping.\n\n\n").arg(t,5,'f',2);
 			AddString(str);
 			m_bWarning = true;
 		}
@@ -1562,7 +1566,7 @@ bool StabAnalysisDlg::ControlLoop()
 					else         pMiarex->AddWOpp(m_bPointOut, m_Gamma);
 				}
 			}
-			AddString("     \n");
+			AddString("     ______\n\n\n");
 		}
 		if(m_bCancel) break;
 	}
@@ -1781,8 +1785,9 @@ void StabAnalysisDlg::SetControlPositions(double t)
 	// Modifies the geometry by setting the control positions to the specified position t
 	// The panels are rotated as a whole, i.e. both the panel's boundary point position and the panel's normal
 
+	QString strange;
 	Quaternion Quat;
-	int j;
+	int j, nFlap;
 	double angle;
 	CWing *pWing, *pStab, *pFin;
 	CVector HingeVector(0.0, 1.0, 0.0);
@@ -1808,6 +1813,11 @@ void StabAnalysisDlg::SetControlPositions(double t)
 		{
 			//wing tilt
 			angle = m_pWPolar->m_MinControl[0] + t * (m_pWPolar->m_MaxControl[0] - m_pWPolar->m_MinControl[0]);
+
+			strange = QString("      Setting the wing tilt to %1").arg(angle, 9, 'f',2);
+			strange += QString::fromUtf8("°\n");
+			AddString(strange);
+
 			angle -= m_pPlane->m_WingTilt;
 			Quat.Set(angle, HingeVector);
 
@@ -1825,8 +1835,12 @@ void StabAnalysisDlg::SetControlPositions(double t)
 			{
 				//Elevator tilt
 				angle = m_pWPolar->m_MinControl[1] + t * (m_pWPolar->m_MaxControl[1] - m_pWPolar->m_MinControl[1]);
-				angle -= m_pPlane->m_StabTilt;
 
+				strange = QString("      Setting the elevator tilt to %1").arg(angle, 9, 'f',2);
+				strange += QString::fromUtf8("°\n");
+				AddString(strange);
+
+				angle -= m_pPlane->m_StabTilt;
 				Quat.Set(angle, HingeVector);
 
 				for(j=0; j<m_pStab->m_MatSize; j++)
@@ -1840,6 +1854,7 @@ void StabAnalysisDlg::SetControlPositions(double t)
 
 	// flap controls
 	//wing first
+	nFlap = 0;
 	for (j=0; j<pWing->m_NSurfaces; j++)
 	{
 		if(pWing->m_Surface[j].m_bTEFlap)
@@ -1847,12 +1862,20 @@ void StabAnalysisDlg::SetControlPositions(double t)
 			if(m_pWPolar->m_bActiveControl[m_NCtrls])
 			{
 				angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
+
+				strange = QString("      Setting the main wing flap %1 angle to %2").arg(nFlap).arg(angle, 9, 'f',2);
+				strange += QString::fromUtf8("°\n");
+				AddString(strange);
+
+
 				if(!pWing->m_Surface[j].RotateFlap(angle))  return;
 			}
+			nFlap++;
 			m_NCtrls++;
 		}
 	}
 	//elevator next and last
+	nFlap = 0;
 	if(pStab)
 	{
 		for (j=0; j<pStab->m_NSurfaces; j++)
@@ -1862,12 +1885,18 @@ void StabAnalysisDlg::SetControlPositions(double t)
 				if(m_pWPolar->m_bActiveControl[m_NCtrls])
 				{
 					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
+					strange = QString("           Setting the elevator flap %1 angle to %2\n").arg(nFlap).arg(angle, 9, 'f',2);
+					strange += QString::fromUtf8("°");
+					AddString(strange);
 					if(!pStab->m_Surface[j].RotateFlap(angle)) return;
 				}
+				nFlap++;
 				m_NCtrls++;
 			}
 		}
 	}
+
+	nFlap = 0;
 	if(pFin)
 	{
 		for (j=0; j<pFin->m_NSurfaces; j++)
@@ -1877,8 +1906,12 @@ void StabAnalysisDlg::SetControlPositions(double t)
 				if(m_pWPolar->m_bActiveControl[m_NCtrls])
 				{
 					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
+					strange = QString("           Setting the fin flap %1 angle to %2").arg(nFlap).arg(angle, 9, 'f',2);
+					strange += QString::fromUtf8("°");
+					AddString(strange);
 					if(!pFin->m_Surface[j].RotateFlap(angle)) return;
 				}
+				nFlap++;
 				m_NCtrls++;
 			}
 		}

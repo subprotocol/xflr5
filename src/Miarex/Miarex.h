@@ -44,7 +44,6 @@
 #include "StabAnalysisDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
-#include "VLMAnalysisDlg.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
 #include "../Misc/LineCbBox.h"
@@ -311,7 +310,6 @@ private:
 	void PaintWing(QPainter &painter, QPoint ORef, double scale);
 	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void StabAnalyze(double V0, double VMax, double VDelta, bool bSequence);
-	void VLMAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void RotateGeomZ(double const &Beta, CVector const &P);
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void EditCurPlane();
@@ -638,7 +636,7 @@ public:
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
 	LLTAnalysisDlg *m_pLLTDlg;
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
-	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
+//	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 	StabAnalysisDlg *m_pStabDlg;
 	CVector m_MemNode[2*VLMMAXMATSIZE];	// used if the analysis should be performed on the tilted geometry
 	CVector m_WakeNode[2*VLMMAXMATSIZE];	// the reference current wake node array

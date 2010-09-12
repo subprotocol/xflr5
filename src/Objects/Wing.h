@@ -64,7 +64,7 @@ protected:
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
 
-	void VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double & Drag, CWPolar *pWPolar);
+	void VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double &IDrag, CWPolar *pWPolar);
 
 	void PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
 							 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode);

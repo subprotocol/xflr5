@@ -1385,8 +1385,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_PlrName ="";
 			return false;
 		}
-		if(m_AnalysisMethod==0) m_AnalysisMethod=2;
-		
+
+		if(m_AnalysisMethod==0 || m_AnalysisMethod==VLMMETHOD)
+		{
+			m_AnalysisMethod=PANELMETHOD;
+			m_bThinSurfaces = true;
+		}
+
 		if(ArchiveFormat>=1005)
 		{
 			ar >> n;
@@ -1487,6 +1492,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			return false;
 		}
 		m_Type = n;
+
 		ar >> f;	m_QInf = f;
 		ar >> f;	m_Weight = f;
 		ar >> f;	m_ASpec = f;

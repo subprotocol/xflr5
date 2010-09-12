@@ -47,7 +47,7 @@ WPolarDlg::WPolarDlg()
 	m_Weight     = 1.0;
 	m_Alpha      = 0.0;
 	m_Beta       = 0.0;
-	m_Type       = 1;
+	m_PolarType       = 1;
 	m_WingLoad   = 1.0;
 	m_Density    = 1.225;
 	m_Viscosity  = 1.5e-5;
@@ -80,20 +80,22 @@ WPolarDlg::WPolarDlg()
 
 void WPolarDlg::Connect()
 {
-	connect(m_pctrlMethod1, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
-	connect(m_pctrlMethod2, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
-	connect(m_pctrlMethod3, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
-	connect(m_pctrlMethod4, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlWingMethod1, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlWingMethod2, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
+	connect(m_pctrlWingMethod3, SIGNAL(toggled(bool)), this, SLOT(OnMethod()));
 
 	connect(m_pctrlUnit1, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
 	connect(m_pctrlUnit2, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
+
+	connect(m_pctrlVLM1, SIGNAL(toggled(bool)), this, SLOT(OnVLMMethod()));
+	connect(m_pctrlVLM2, SIGNAL(toggled(bool)), this, SLOT(OnVLMMethod()));
 
 	connect(m_pctrlType1, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 	connect(m_pctrlType2, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 	connect(m_pctrlType4, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 
 	connect(m_pctrlAutoName, SIGNAL(clicked()), this, SLOT(OnAutoName()));
-	connect(m_pctrlWakeRollUp, SIGNAL(clicked()), this, SLOT(OnWakeRollUp()));
+//	connect(m_pctrlWakeRollUp, SIGNAL(clicked()), this, SLOT(OnWakeRollUp()));
 	connect(m_pctrlTiltGeom, SIGNAL(clicked()), this, SLOT(OnTiltedGeom()));
 	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
 	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
@@ -117,9 +119,10 @@ void WPolarDlg::Connect()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 }
 
+
 void WPolarDlg::EnableControls()
 {
-	switch (m_Type)
+	switch (m_PolarType)
 	{
 		case 1:
 		{
@@ -149,22 +152,18 @@ void WPolarDlg::EnableControls()
 			break;
 		}
 	}
-	m_pctrlMethod1->setEnabled(!m_pPlane);
-//	m_pctrlMethod4->setEnabled(!m_pPlane);
 
-	if (m_pctrlMethod1->isChecked())
-	{
-		m_pctrlViscous->setEnabled(false);
-	}
-	else if (m_pctrlMethod2->isChecked() || m_pctrlMethod3->isChecked())
-	{
-		m_pctrlViscous->setEnabled(true);
-	}
-	else if (m_pctrlMethod4->isChecked())
-	{
-		m_pctrlViscous->setEnabled(true);
-	}
+	m_pctrlViscous->setEnabled(m_AnalysisMethod>=VLMMETHOD);
+	m_pctrlTiltGeom->setEnabled(m_AnalysisMethod>=VLMMETHOD);
+	m_pctrlBeta->setEnabled(m_AnalysisMethod>=VLMMETHOD);
+	m_pctrlGroundEffect->setEnabled(m_AnalysisMethod>=VLMMETHOD);
+	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && m_AnalysisMethod>=VLMMETHOD);
+
+	m_pctrlVLM1->setEnabled(m_pPlane || (m_pWing && m_AnalysisMethod==PANELMETHOD && m_bThinSurfaces));
+	m_pctrlVLM2->setEnabled(m_pPlane || (m_pWing && m_AnalysisMethod==PANELMETHOD && m_bThinSurfaces));
 }
+
+
 
 void WPolarDlg::InitDialog()
 {
@@ -175,9 +174,11 @@ void WPolarDlg::InitDialog()
 
 	if(m_pPlane)
 	{
-		if(m_AnalysisMethod==0 || m_AnalysisMethod==1) m_AnalysisMethod=2;
-		m_pctrlMethod1->setEnabled(false);
+		if(m_AnalysisMethod==0 || m_AnalysisMethod==1) m_AnalysisMethod=VLMMETHOD;
+//		m_pctrlWingMethod1->setEnabled(false);
+		m_pctrlAnalysisControls->setCurrentIndex(1);
 	}
+	else m_pctrlAnalysisControls->setCurrentIndex(0);
 
 	bool bWarning = false;
 	for (i=0; i<m_pWing->m_NPanel-1; i++)
@@ -200,9 +201,9 @@ void WPolarDlg::InitDialog()
 	if(m_UnitType==1) m_pctrlUnit1->setChecked(true);
 	else              m_pctrlUnit2->setChecked(true);
 
-	if(m_Type==1) m_pctrlType1->setChecked(true);
-	else if(m_Type==2) m_pctrlType2->setChecked(true);
-	else if(m_Type==4) m_pctrlType4->setChecked(true);
+	if(m_PolarType==1) m_pctrlType1->setChecked(true);
+	else if(m_PolarType==2) m_pctrlType2->setChecked(true);
+	else if(m_PolarType==4) m_pctrlType4->setChecked(true);
 
 
 	OnUnit();
@@ -247,56 +248,51 @@ void WPolarDlg::InitDialog()
 
 	if(bWarning)
 	{
-		m_pctrlMethod4->setEnabled(false);
+//		m_pctrlWingMethod4->setEnabled(false);
 		if(m_AnalysisMethod==3) m_AnalysisMethod=2;
 	}
 
 	if(m_bViscous)		m_pctrlViscous->setChecked(true);
 	if(m_bTiltedGeom)	m_pctrlTiltGeom->setChecked(true);
-	if(m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
+//	if(m_bWakeRollUp) 	m_pctrlWakeRollUp->setChecked(true);
 
 	OnTiltedGeom();
 
-	if(m_AnalysisMethod==0) m_AnalysisMethod=2;//former m_bLLT=false;
-	if(m_AnalysisMethod==1)
+	if(m_AnalysisMethod==0) m_AnalysisMethod=VLMMETHOD;//former m_bLLT=false;
+	if(m_AnalysisMethod==LLTMETHOD)
 	{
-		m_pctrlMethod1->setChecked(true);
+		m_pctrlWingMethod1->setChecked(true);
 		m_pctrlViscous->setChecked(true);
 		m_pctrlViscous->setEnabled(false);
-		m_pctrlWakeRollUp->setChecked(false);
-		m_pctrlWakeParams->setEnabled(false);
 	}
-	else if(m_AnalysisMethod==2)
+	else if(m_AnalysisMethod==VLMMETHOD)
 	{
-		m_pctrlWakeRollUp->setEnabled(false);
-		m_pctrlWakeParams->setEnabled(false);
-
-		if(m_bVLM1) m_pctrlMethod2->setChecked(true);
-		else        m_pctrlMethod3->setChecked(true);
+		m_pctrlWingMethod2->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
-	else if(m_AnalysisMethod==3)
+	else if(m_AnalysisMethod==PANELMETHOD)
 	{
-		m_pctrlWakeRollUp->setEnabled(true);
-		m_pctrlWakeParams->setEnabled(true);
-
-		m_pctrlMethod4->setChecked(true);
+		if(!m_pPlane)
+		{
+			if(m_bThinSurfaces)  m_pctrlWingMethod2->setChecked(true);
+			else                 m_pctrlWingMethod3->setChecked(true);
+		}
+		m_pctrlPanelMethod->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
 
-	m_pctrlWakeParams->setEnabled(false);
-	m_pctrlWakeRollUp->setEnabled(false);
+	if(m_pPlane) m_bThinSurfaces = true;
+
+	m_pctrlPanelMethod->setChecked(m_pPlane);
+
+	m_pctrlVLM1->setChecked( m_bVLM1);
+	m_pctrlVLM2->setChecked(!m_bVLM1);
+
+	m_pctrlArea1->setChecked(m_RefAreaType==1);
+	m_pctrlArea2->setChecked(m_RefAreaType==2);
 
 	m_bWakeRollUp = false;
 
-	if(m_RefAreaType==1)
-	{
-		m_pctrlArea1->setChecked(true);
-	}
-	else if(m_RefAreaType==2)
-	{
-		m_pctrlArea2->setChecked(true);
-	}
 
 	SetWPolarName();
 
@@ -408,51 +404,28 @@ void WPolarDlg::OnGroundEffect()
 
 void WPolarDlg::OnMethod()
 {
-	if (m_pctrlMethod1->isChecked())
+	if (m_pctrlWingMethod1->isChecked())
 	{
 		m_bViscous      = true;
 		m_bThinSurfaces = true;
 		m_bWakeRollUp   = false;
 		m_bTiltedGeom   = false;
-		m_AnalysisMethod  = 1;
-		m_pctrlWakeRollUp->setChecked(false);
+		m_AnalysisMethod  = LLTMETHOD;
 		m_pctrlTiltGeom->setChecked(false);
-		m_pctrlTiltGeom->setEnabled(false);
-		m_pctrlBeta->setEnabled(false);
-		m_pctrlGroundEffect->setEnabled(false);
-		m_pctrlHeight->setEnabled(false);
-//		m_pctrlThinSurfaces.SetCheck(true);
-//		m_pctrlThinSurfaces.setEnabled(false);
-
-		m_pctrlWakeRollUp->setEnabled(false);
-		m_pctrlWakeParams->setEnabled(false);
 	}
-	else if (m_pctrlMethod2->isChecked() || m_pctrlMethod3->isChecked())
+	else if (m_pctrlWingMethod2->isChecked())
 	{
 		m_bThinSurfaces = true;
-		m_AnalysisMethod=2;
-		m_pctrlTiltGeom->setEnabled(true);
-		m_pctrlBeta->setEnabled(true);
-		m_pctrlWakeRollUp->setEnabled(false);
-		m_pctrlWakeParams->setEnabled(false);
-		m_bVLM1 = m_pctrlMethod2->isChecked();
-		m_pctrlGroundEffect->setEnabled(true);
-		m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked());
+		m_AnalysisMethod = PANELMETHOD;
+		m_bVLM1 = m_pctrlVLM1->isChecked();
 	}
-	else if (m_pctrlMethod4->isChecked())
+	else if (m_pctrlWingMethod3->isChecked())
 	{
-		m_AnalysisMethod=3;
-		m_pctrlTiltGeom->setEnabled(true);
 		m_bThinSurfaces = false;
-		m_pctrlBeta->setEnabled(true);
-		m_pctrlGroundEffect->setEnabled(true);
-		m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked());
-
-//		m_pctrlWakeRollUp.setEnabled(true);
-//		if(m_bWakeRollUp)	m_pctrlWakeParams.setEnabled(true);
-//		else				m_pctrlWakeParams.setEnabled(false);
-
+		m_AnalysisMethod = PANELMETHOD;
+		m_bVLM1 = m_pctrlVLM1->isChecked();
 	}
+
 	EnableControls();
 	SetWPolarName();
 }
@@ -484,12 +457,7 @@ void WPolarDlg::OnOK()
 			}
 		}
 	}
-/* TODO : restore
-	if(!m_bWakeRollUp && m_AnalysisMethod==3)
-	{
-		m_TotalWakeLength = 100.0;
-		m_NXWakePanels    = 1;
-	}*/
+
 
 	if(m_pPlane && m_AnalysisMethod==3) m_bThinSurfaces = true;
 
@@ -517,9 +485,13 @@ void WPolarDlg::OnUnit()
 }
 
 
-void WPolarDlg::OnWakeRollUp()
+void WPolarDlg::OnVLMMethod()
 {
+	m_bVLM1 = m_pctrlVLM1->isChecked();
+	SetWPolarName();
 }
+
+
 
 
 void WPolarDlg::OnWPolarName()
@@ -528,19 +500,21 @@ void WPolarDlg::OnWPolarName()
 	m_pctrlAutoName->setChecked(false);
 }
 
+
+
 void WPolarDlg::OnWPolarType()
 {
 	if (m_pctrlType1->isChecked())
 	{
-		m_Type = 1;
+		m_PolarType = 1;
 	}
 	else if(m_pctrlType2->isChecked())
 	{
-		m_Type = 2;
+		m_PolarType = 2;
 	}
 	else if(m_pctrlType4->isChecked())
 	{
-		m_Type = 4;
+		m_PolarType = 4;
 	}
 	EnableControls();
 	SetReynolds();
@@ -709,17 +683,28 @@ void WPolarDlg::SetupLayout()
 	QGroupBox *FlightGroup = new  QGroupBox(tr("Flight Characteristics"));
 	FlightGroup->setLayout(FlightLayout);
 
-	QVBoxLayout *MethodLayout = new QVBoxLayout;
-	m_pctrlMethod1 = new QRadioButton(tr("LLT"));
-	m_pctrlMethod2 = new QRadioButton(tr("VLM1 : Classic"));
-	m_pctrlMethod3 = new QRadioButton(tr("VLM2 : Quads"));
-	m_pctrlMethod4 = new QRadioButton(tr("3D Panels"));
-	MethodLayout->addWidget(m_pctrlMethod1);
-	MethodLayout->addWidget(m_pctrlMethod2);
-	MethodLayout->addWidget(m_pctrlMethod3);
-	MethodLayout->addWidget(m_pctrlMethod4);
-	QGroupBox *MethodGroup = new QGroupBox;
-	MethodGroup->setLayout(MethodLayout);
+
+//_________________________Main Layout
+	m_pctrlAnalysisControls = new QStackedWidget;
+	QVBoxLayout *WingMethodLayout = new QVBoxLayout;
+	m_pctrlWingMethod1 = new QRadioButton(tr("LLT"));
+	m_pctrlWingMethod2 = new QRadioButton(tr("VLM"));
+	m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
+
+	WingMethodLayout->addWidget(m_pctrlWingMethod1);
+	WingMethodLayout->addWidget(m_pctrlWingMethod2);
+	WingMethodLayout->addWidget(m_pctrlWingMethod3);
+	QGroupBox *WingMethodBox = new QGroupBox("Wing analysis methods");
+	WingMethodBox->setLayout(WingMethodLayout);
+
+	m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
+	QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
+	PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
+	QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
+	PlaneMethodBox->setLayout(PlaneMethodLayout);
+
+	m_pctrlAnalysisControls->addWidget(WingMethodBox);
+	m_pctrlAnalysisControls->addWidget(PlaneMethodBox);
 
 
 	QGridLayout *AeroDataLayout = new QGridLayout;
@@ -755,12 +740,14 @@ void WPolarDlg::SetupLayout()
 	QGridLayout *OptionsLayout = new QGridLayout;
 	m_pctrlViscous = new QCheckBox(tr("Viscous"));
 	m_pctrlTiltGeom = new QCheckBox(tr("Tilt. Geom."));
-	m_pctrlWakeRollUp = new QCheckBox(tr("Wake Roll-up"));
-	m_pctrlWakeParams = new QPushButton(tr("Wake..."));
+	QHBoxLayout *VLMMethodLayout = new QHBoxLayout;
+	m_pctrlVLM1 = new QRadioButton("Horseshoe vortex");
+	m_pctrlVLM2 = new QRadioButton("Quad vortex");
+	VLMMethodLayout->addWidget(m_pctrlVLM1);
+	VLMMethodLayout->addWidget(m_pctrlVLM2);
 	OptionsLayout->addWidget(m_pctrlViscous,1,1);
 	OptionsLayout->addWidget(m_pctrlTiltGeom,1,2);
-	OptionsLayout->addWidget(m_pctrlWakeRollUp,2,1);
-	OptionsLayout->addWidget(m_pctrlWakeParams,2,2);
+	OptionsLayout->addLayout(VLMMethodLayout,2,1,1,2);
 	QGroupBox *OptionsGroup = new QGroupBox(tr("Options"));
 	OptionsGroup->setLayout(OptionsLayout);
 
@@ -781,7 +768,7 @@ void WPolarDlg::SetupLayout()
 	DataLayout->addWidget(TypeGroup, 1,2);
 	DataLayout->addWidget(PlaneGroup,2,1);
 	DataLayout->addWidget(FlightGroup,2,2);
-	DataLayout->addWidget(MethodGroup,3,1);
+	DataLayout->addWidget(m_pctrlAnalysisControls,3,1);
 	DataLayout->addWidget(AeroDataGroup,3,2);
 	DataLayout->addWidget(OptionsGroup,4,1);
 	DataLayout->addWidget(GroundGroup,4,2);
@@ -811,8 +798,6 @@ void WPolarDlg::SetupLayout()
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
 	setLayout(MainLayout);
-
-	m_pctrlWakeParams->setEnabled(false);
 }
 
 
@@ -824,19 +809,19 @@ void WPolarDlg::SetWPolarName()
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
-	if (m_Type==1)
+	if (m_PolarType==FIXEDSPEEDPOLAR)
 	{
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		m_WPolarName = QString("T1-%1 ").arg(m_QInf * pMainFrame->m_mstoUnit,0,'f',1);
 		m_WPolarName += str;
 	}
-	else if(m_Type==2)
+	else if(m_PolarType==FIXEDLIFTPOLAR)
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
 		m_WPolarName = QString("T2-%1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
 		m_WPolarName += str;
 	}
-	else if(m_Type==4)
+	else if(m_PolarType==FIXEDAOAPOLAR)
 	{
 		m_WPolarName = QString(QString::fromUtf8("T4-%1°")).arg(m_Alpha,0,'f',3);
 	}
@@ -844,10 +829,16 @@ void WPolarDlg::SetWPolarName()
 	if(m_AnalysisMethod==LLTMETHOD) m_WPolarName += "-LLT";
 	else if(m_AnalysisMethod==VLMMETHOD)
 	{
-		if(m_bVLM1)	m_WPolarName += "-VLM1";
-		else		m_WPolarName += "-VLM2";
 	}
-	else if(m_AnalysisMethod==PANELMETHOD) m_WPolarName += "-Panel";
+	else if(m_AnalysisMethod==PANELMETHOD)
+	{
+		if(m_pPlane || !m_bThinSurfaces) m_WPolarName += "-Panel";
+		if(m_bThinSurfaces)
+		{
+			if(m_bVLM1)	m_WPolarName += "-VLM1";
+			else		m_WPolarName += "-VLM2";
+		}
+	}
 
 /*	if(m_bThinSurfaces && m_AnalysisMethod==3)
 	{
@@ -886,7 +877,7 @@ void WPolarDlg::SetWPolarName()
 		strong = QString("%1").arg(m_Height,0,'f',2),
 		m_WPolarName += "-G"+strong;
 	}
-	if(m_AnalysisMethod!=1 && m_RefAreaType==2) m_WPolarName += "-proj_area";
+	if(m_AnalysisMethod!=1 && m_RefAreaType==PROJECTEDAREA) m_WPolarName += "-proj_area";
 
 	m_pctrlWPolarName->setText(m_WPolarName);
 }
@@ -899,7 +890,7 @@ void WPolarDlg::SetReynolds()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	GetSpeedUnit(strUnit, pMainFrame->m_SpeedUnit);
 
-	if (m_Type ==1)
+	if (m_PolarType ==1)
 	{
 		double RRe = m_pWing->m_TChord[0] * m_QInf/m_Viscosity;
 		ReynoldsFormat(str, RRe);
@@ -913,7 +904,7 @@ void WPolarDlg::SetReynolds()
 
 		m_pctrlQInfCl->setText(" ");
 	}
-	else if (m_Type ==2)
+	else if (m_PolarType ==2)
 	{
 		double area;
 		if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
@@ -934,7 +925,7 @@ void WPolarDlg::SetReynolds()
 		strange = tr("Tip Re.sqrt(Cl) =");
 		m_pctrlSRe->setText(strange+str);
 	}
-	else if (m_Type ==4)
+	else if (m_PolarType ==4)
 	{
 		m_pctrlQInfCl->setText(" ");
 		m_pctrlRRe->setText(" ");
@@ -962,11 +953,6 @@ void WPolarDlg::SetWingLoad()
 	GetAreaUnit(str2, pMainFrame->m_AreaUnit);
 	m_pctrlWingLoad->setText(tr("Wing Loading = ")+str+str1+"/"+str2);
 }
-
-
-
-
-
 
 
 

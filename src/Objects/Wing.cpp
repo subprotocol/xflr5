@@ -33,7 +33,6 @@
 #include "../Globals.h"
 #include "../Miarex/Miarex.h"
 #include "../Miarex/LLTAnalysisDlg.h"
-#include "../Miarex/VLMAnalysisDlg.h"
 #include <QtDebug>
 
 
@@ -2389,9 +2388,9 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 	double *M;// size is 4 coefs x maxstations
 	double *RHS;
-	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
-	M = pVLMDlg->m_aij;
-	RHS = pVLMDlg->m_RHS;
+//	VLMAnalysisDlg *pVLMDlg   = (VLMAnalysisDlg*)s_pVLMDlg;
+//	M = pVLMDlg->m_aij;
+//	RHS = pVLMDlg->m_RHS;
 	memset(M, 0, 16*n*n*sizeof(double));
 	memset(RHS, 0, 4*n*sizeof(double));
 
@@ -2465,8 +2464,6 @@ bool CWing::SplineInterpolation(int n, double *x, double *y, double *a, double *
 
 
 
-
-
 void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double &IDrag, CWPolar *pWPolar)
 {
 	//
@@ -2476,7 +2473,8 @@ void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVecto
 	//
 	if(!m_pPanel) return;
 
-	VLMAnalysisDlg *pVLMDlg = (VLMAnalysisDlg*)s_pVLMDlg;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	StabAnalysisDlg *pStabDlg = (StabAnalysisDlg*)pMiarex->m_pStabDlg;
 
 	int j , k, l,  p,  m;
 	double alpha, cosa, sina;
@@ -2503,7 +2501,7 @@ void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVecto
 	p=0;
 	m=0;
 
-	
+
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		for (k=0; k<m_Surface[j].m_NYPanels; k++)
@@ -2522,7 +2520,7 @@ void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVecto
 //					C = m_pPanel[p].VortexPos;//Makes absolutely no difference on results
 					C.x = m_PlanformSpan * 100.0;
 
-					pVLMDlg->GetSpeedVector(C, Gamma, Wg);
+					Wg = pStabDlg->GetSpeedVector(C, Gamma);
 					Wg += VInf; //total speed vector
 
 					//induced force
@@ -2554,6 +2552,7 @@ void CWing::VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVecto
 
 	m_InducedDrag = IDrag;
 }
+
 
 
 

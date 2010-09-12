@@ -13,7 +13,6 @@ SOURCES += src/MainFrame.cpp \
     src/Miarex/GLCreateLists.cpp \
     src/Miarex/WPolarDlg.cpp \
     src/Miarex/WingDelegate.cpp \
-    src/Miarex/VLMAnalysisDlg.cpp \
     src/Miarex/PlaneDlg.cpp \
     src/Miarex/PanelAnalysisDlg.cpp \
     src/Miarex/LLTAnalysisDlg.cpp \
@@ -124,7 +123,6 @@ HEADERS += src/MainFrame.h \
     src/Miarex/ManageBodiesDlg.h \
     src/Miarex/WPolarDlg.h \
     src/Miarex/WingDelegate.h \
-    src/Miarex/VLMAnalysisDlg.h \
     src/Miarex/PlaneDlg.h \
     src/Miarex/PanelAnalysisDlg.h \
     src/Miarex/ManageUFOsDlg.h \

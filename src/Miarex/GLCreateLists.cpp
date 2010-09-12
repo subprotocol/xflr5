@@ -1661,7 +1661,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 	}
 
 
-	pMiarex->m_pVLMDlg->m_pWing     = Wing[0];
+//	pMiarex->m_pVLMDlg->m_pWing     = Wing[0];
 	pMiarex->m_pPanelDlg->m_pWing   = Wing[0];
 
 
@@ -1760,9 +1760,8 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 								for (i=1; i< p3DScales->m_NX ;i++)
 								{
-									if(pWPolar->m_AnalysisMethod==2 )     pMiarex->m_pVLMDlg->GetSpeedVector(C, Gamma, VT);
-									else if(pWPolar->m_AnalysisMethod==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(C, Gamma);
-									else if(pWPolar->m_AnalysisMethod==3) pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
+									if(pWPolar->m_AnalysisMethod==STABILITYMETHOD) VT = pMiarex->m_pStabDlg->GetSpeedVector(C, Gamma);
+									else if(pWPolar->m_AnalysisMethod==PANELMETHOD) pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
 
 									VT += VInf;
 									VT.Normalize();
@@ -1790,9 +1789,8 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 							for (i=1; i< p3DScales->m_NX ;i++)
 							{
-								if(pWPolar->m_AnalysisMethod==2)      pMiarex->m_pVLMDlg->GetSpeedVector(D, Gamma, VT);
-								else if(pWPolar->m_AnalysisMethod==4) VT = pMiarex->m_pStabDlg->GetSpeedVector(D, Gamma);
-								else if(pWPolar->m_AnalysisMethod==3) pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
+								if(pWPolar->m_AnalysisMethod==STABILITYMETHOD) VT = pMiarex->m_pStabDlg->GetSpeedVector(D, Gamma);
+								else if(pWPolar->m_AnalysisMethod==PANELMETHOD) pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
 
 								VT += VInf;
 								VT.Normalize();
@@ -1891,18 +1889,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 			{
 				VT.Set(pWOpp->m_QInf,0.0,0.0);
 
-				if(pWPolar->m_AnalysisMethod==2)
-				{
-					C.Copy(pPanel[p].CtrlPt);
-					pMiarex->m_pVLMDlg->GetSpeedVector(C, Gamma, V);
-					VT += V;
-					VT *= pMiarex->m_VelocityScale/100.0;
-//					if(!pWPolar->m_bTiltedGeom)
-						C.RotateY(RefPoint, pWOpp->m_Alpha);
-						//Tilt the geometry w.r.t. sideslip
-//						C.RotateZ(RefPoint, -pWOpp->m_Beta);
-				}
-				else if(pWPolar->m_AnalysisMethod==3)
+				if(pWPolar->m_AnalysisMethod==PANELMETHOD)
 				{
 					if(pPanel[p].m_iPos==0) C.Copy(pPanel[p].CtrlPt);
 					else                    C.Copy(pPanel[p].CollPt);

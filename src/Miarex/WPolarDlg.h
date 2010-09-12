@@ -27,6 +27,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QLabel>
+#include <QStackedWidget>
 #include <QRadioButton>
 #include "../Misc/FloatEdit.h"
 #include "../Objects/Plane.h"
@@ -61,12 +62,12 @@ private slots:
 	void OnMethod();
 	void OnWPolarName();
 	void OnAutoName();
-	void OnWakeRollUp();
 	void OnTiltedGeom();
 	void OnViscous();
 	void OnGroundEffect();
 	void OnWPolarType();
 	void OnEditingFinished();
+	void OnVLMMethod();
 
 private:
 	void *m_pMainFrame;
@@ -78,9 +79,9 @@ private:
 	QString m_WPolarName;
 	QString m_UFOName;
 
-	int m_Type;
+	int m_PolarType; // fixed speed, fixed lift, fixed aoa
 	int m_UnitType;//1= International, 2= English
-	int m_AnalysisMethod; //0=LLT;1=VLM;2=Panel
+	int m_AnalysisMethod; //0=LLT; 1=VLM1; 2=VLM2; 3=Panels
 
 	bool m_bAutoName;
 	bool m_bVLM1; //true if Classic, false if Quendez
@@ -104,6 +105,8 @@ private:
 
 	CVector m_CoG;
 
+	QStackedWidget *m_pctrlAnalysisControls;
+
 	FloatEdit *m_pctrlXCmRef, *m_pctrlZCmRef;
 	FloatEdit *m_pctrlDensity;
 	FloatEdit *m_pctrlViscosity;
@@ -117,11 +120,12 @@ private:
 	QCheckBox *m_pctrlGroundEffect;
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlTiltGeom;
-	QCheckBox *m_pctrlWakeRollUp;
 	QCheckBox *m_pctrlAutoName;
 
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4;
-	QRadioButton *m_pctrlMethod1, *m_pctrlMethod2, *m_pctrlMethod3, *m_pctrlMethod4;
+	QRadioButton *m_pctrlWingMethod1, *m_pctrlWingMethod2, *m_pctrlWingMethod3;
+	QRadioButton *m_pctrlPanelMethod;
+	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 
@@ -140,7 +144,6 @@ private:
 
 	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlLengthUnit3;
 
-	QPushButton *m_pctrlWakeParams;
 	QPushButton	*OKButton, *CancelButton;
 };
 

@@ -627,9 +627,7 @@ void PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 		}
 	}
 
-
 	//______________________________________________________________________________________
-
 	AddString(tr("      Computing On-Body Speeds...")+"\n");
 
 	if(m_pWPolar->m_Type !=4 )
@@ -676,8 +674,9 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 			if(m_bCancel) return;
 			if(m_3DQInf[q]>0.0)
 			{
-				if(!m_pWPolar->m_bTiltedGeom) str = QString(tr("      Computing Plane for alpha=%1")+"\n").arg(V0+q*VDelta,7,'f',2);
-				else                          str = QString(tr("      Computing Plane for alpha=%1")+"\n").arg(m_OpAlpha,7,'f',2);
+				if(!m_pWPolar->m_bTiltedGeom) str = QString(tr("      Computing Plane for alpha=%1")).arg(V0+q*VDelta,7,'f',2);
+				else                          str = QString(tr("      Computing Plane for alpha=%1")).arg(m_OpAlpha,7,'f',2);
+				str += QString::fromUtf8("°\n");
 				AddString(str);
 				ComputePlane(V0+q*VDelta, q);
 			}
@@ -739,6 +738,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	if(m_pStab) m_pStab->m_bWingOut    = false;
 	if(m_pFin)  m_pFin->m_bWingOut     = false;
 
+//for(int ll=120; ll<137; ll++) qDebug("%17.8f", m_Mu[ll]);
 
 	if(QInf >0.0) 
 	{

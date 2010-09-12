@@ -21,7 +21,18 @@
 #define WCPVIEW             4
 #define WSTABVIEW          10
 
-// 3D Analalysis methods
+//Polar types
+#define FIXEDSPEEDPOLAR     1
+#define FIXEDLIFTPOLAR      2
+#define RUBBERCHORDPOLAR    3
+#define FIXEDAOAPOLAR       4
+#define STABILITYPOLAR      7
+
+//Polar reference area and span
+#define PLANFORMAREA        1
+#define PROJECTEDAREA       2
+
+// 3D Analysis methods
 #define LLTMETHOD           1
 #define VLMMETHOD           2
 #define PANELMETHOD         3
