@@ -3972,7 +3972,7 @@ void MainFrame::OnSaveViewToImageFile()
 	FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
 											m_ImageDirName,
 											"Portable Network Graphics (*.png);;JPEG (*.jpg);;Windows Bitmap (*.bmp)",
-											&Filter, QFileDialog::DontUseNativeDialog);
+											&Filter);
 
 	if(!FileName.length()) return;
 

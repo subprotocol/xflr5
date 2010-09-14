@@ -142,8 +142,6 @@ void PlaneDlg::InitDialog()
 	m_pctrlSurf2->setText(surf);
 	m_pctrlSurf3->setText(surf);
 
-	m_pctrlVolume->setText(len+"3");
-
 	m_pctrlPlaneName->setText(m_pPlane->m_PlaneName);
 
 	if(m_pPlane->m_PlaneDescription.length()) m_pctrlPlaneDescription->setPlainText(m_pPlane->m_PlaneDescription);
@@ -838,9 +836,6 @@ void PlaneDlg::SetResults()
 
 	str = QString("%1").arg(total);
 	m_pctrlVLMTotalPanels->setText(str);
-
-	str = QString("%1").arg(m_pPlane->m_Volume*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit,5,'e',2);
-	m_pctrlPlaneVolume->setText(str);
 }
 
 
@@ -1031,7 +1026,6 @@ void PlaneDlg::SetupLayout()
 	QLabel *lab104 = new QLabel(tr("Elev. Lever Arm = "));
 	QLabel *lab105 = new QLabel(tr("Fin Area = "));
 	QLabel *lab106 = new QLabel(tr("TailVolume = "));
-	QLabel *lab107 = new QLabel(tr("Plane Volume = "));
 	QLabel *lab108 = new QLabel(tr("Total Panels = "));
 	lab101->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab102->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -1039,7 +1033,6 @@ void PlaneDlg::SetupLayout()
 	lab104->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab105->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab106->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab107->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab108->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlWingSurface    = new QLabel("1.00");
 	m_pctrlStabSurface    = new QLabel("2.00");
@@ -1047,7 +1040,6 @@ void PlaneDlg::SetupLayout()
 	m_pctrlStabLeverArm   = new QLabel("4.00");
 	m_pctrlFinSurface     = new QLabel("5.00");
 	m_pctrlStabVolume     = new QLabel("6.00");
-	m_pctrlPlaneVolume    = new QLabel("7.00");
 	m_pctrlVLMTotalPanels = new QLabel("1234");
 	m_pctrlWingSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlStabSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -1055,7 +1047,6 @@ void PlaneDlg::SetupLayout()
 	m_pctrlStabLeverArm->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlFinSurface->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlStabVolume->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlPlaneVolume->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlVLMTotalPanels->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
 	m_pctrlSurf1 = new QLabel("dm2");
@@ -1081,13 +1072,10 @@ void PlaneDlg::SetupLayout()
 	Data2Layout->addWidget(lab105, 1, 1);
 	Data2Layout->addWidget(m_pctrlFinSurface, 1, 2);
 	Data2Layout->addWidget(m_pctrlSurf3, 1, 3);
-	Data2Layout->addWidget(lab107, 2, 1);
-	Data2Layout->addWidget(m_pctrlPlaneVolume, 2, 2);
-	Data2Layout->addWidget(m_pctrlVolume, 2, 3);
-	Data2Layout->addWidget(lab106, 3, 1);
-	Data2Layout->addWidget(m_pctrlStabVolume, 3, 2);
-	Data2Layout->addWidget(lab108, 4, 1);
-	Data2Layout->addWidget(m_pctrlVLMTotalPanels, 4, 2);
+	Data2Layout->addWidget(lab106, 2, 1);
+	Data2Layout->addWidget(m_pctrlStabVolume, 2, 2);
+	Data2Layout->addWidget(lab108, 3, 1);
+	Data2Layout->addWidget(m_pctrlVLMTotalPanels, 3, 2);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;

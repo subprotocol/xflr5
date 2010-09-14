@@ -85,7 +85,6 @@ CPlane::CPlane()
 	
 	m_BodyPos.Set(0.0, 0.0, 0.0);
 
-	m_Volume        =   0.0;
 
 	m_bActive       = false;
 	m_bBody         = false;

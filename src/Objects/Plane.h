@@ -61,7 +61,6 @@ protected:
 	double m_StabTilt;
 	double m_FinTilt;
 	double m_WingTilt, m_WingTilt2;
-	double m_Volume;
 	double m_XCmRef;
 
 	int m_NMass;

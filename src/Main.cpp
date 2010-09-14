@@ -36,11 +36,11 @@ int main(int argc, char *argv[])
 #endif
         QFLR5Application app(argc, argv);
 
-/*	QPixmap pixmap;
+	QPixmap pixmap;
 	qDebug() << pixmap.load(":/images/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.setWindowFlags(Qt::SplashScreen);
-	splash.show();*/
+	splash.show();
 
 	QString StyleName = "Cleanlooks";
 	QString LanguagePath ="";
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 		else if (iApp == XFOILANALYSIS) w.OnXDirect();
 	}
 
-//	splash.finish(&w);
+	splash.finish(&w);
 
 	return app.exec();
 }
