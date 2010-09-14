@@ -57,8 +57,6 @@ public:
 
 // Implementation
 protected:
-	double m_VLMQInf[100];
-
 	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
 	int  VLMGetPanelTotal(void);
@@ -182,6 +180,7 @@ protected:
 	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
 	int m_XPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
 	int m_YPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
+
 
 	// Span Coefficients  resulting from VLM or LLT calculation
 	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees

@@ -55,6 +55,7 @@ private:
 	QCheckBox *m_pctrlResetWake;
 	QCheckBox *m_pctrlKeepOutOpps;
 	QRadioButton *m_pctrlDirichlet, *m_pCtrlNeumann;
+	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
 	FloatEdit *m_pctrlInterNodes;
 	FloatEdit *m_pctrlRelax;
 	FloatEdit *m_pctrlAlphaPrec;
@@ -71,6 +72,7 @@ private:
 	bool m_bTrefftz;
 	bool m_bKeepOutOpps;
 	bool m_bResetWake;
+	bool m_bVLM1;
 
 	int m_Iter;
 	int m_NStation;

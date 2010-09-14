@@ -38,7 +38,7 @@ QList <void*> *PlaneDlg::s_poaWing;
 QList <void*> *PlaneDlg::s_poaBody;
 void *PlaneDlg::s_pMiarex;
 void *PlaneDlg::s_pMainFrame;
-
+CWing PlaneDlg::s_SaveWing;
 
 PlaneDlg::PlaneDlg()
 {
@@ -263,8 +263,7 @@ void PlaneDlg::OnChanged()
 void PlaneDlg::OnDefineWing()
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	CWing SaveWing;
-	SaveWing.Duplicate(&m_pPlane->m_Wing);
+	s_SaveWing.Duplicate(&m_pPlane->m_Wing);
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing);
@@ -274,7 +273,7 @@ void PlaneDlg::OnDefineWing()
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->m_Wing.Duplicate(&SaveWing);
+	else   m_pPlane->m_Wing.Duplicate(&s_SaveWing);
 	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_LEWing, 0.0, m_pPlane->m_WingTilt);//necessary for eventual inertia calculations
 }
 
@@ -282,8 +281,7 @@ void PlaneDlg::OnDefineWing()
 void PlaneDlg::OnDefineFin() 
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	CWing SaveWing;
-	SaveWing.Duplicate(&m_pPlane->m_Fin);
+	s_SaveWing.Duplicate(&m_pPlane->m_Fin);
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Fin);
@@ -294,7 +292,7 @@ void PlaneDlg::OnDefineFin()
 		SetResults();	
 		m_bChanged = true;
 	}
-	else   m_pPlane->m_Fin.Duplicate(&SaveWing);
+	else   m_pPlane->m_Fin.Duplicate(&s_SaveWing);
 	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_LEFin, -90.0, m_pPlane->m_FinTilt);//necessary for eventual inertia calculations
 }
 
@@ -302,8 +300,7 @@ void PlaneDlg::OnDefineFin()
 void PlaneDlg::OnDefineStab() 
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	CWing SaveWing;
-	SaveWing.Duplicate(&m_pPlane->m_Stab);
+	s_SaveWing.Duplicate(&m_pPlane->m_Stab);
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Stab);
@@ -313,7 +310,7 @@ void PlaneDlg::OnDefineStab()
 		SetResults();	
 		m_bChanged = true;
 	}
-	else  m_pPlane->m_Stab.Duplicate(&SaveWing);
+	else  m_pPlane->m_Stab.Duplicate(&s_SaveWing);
 	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_LEStab, 0.0, m_pPlane->m_StabTilt);//necessary for eventual inertia calculations
 }
 
@@ -322,8 +319,7 @@ void PlaneDlg::OnDefineStab()
 void PlaneDlg::OnDefineWing2()
 {
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	CWing SaveWing;
-	SaveWing.Duplicate(&m_pPlane->m_Wing2);
+	s_SaveWing.Duplicate(&m_pPlane->m_Wing2);
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
 	pMiarex->m_WingDlg.InitDialog(&m_pPlane->m_Wing2);
@@ -333,7 +329,7 @@ void PlaneDlg::OnDefineWing2()
 		SetResults();
 		m_bChanged = true;
 	}
-	else   m_pPlane->m_Wing2.Duplicate(&SaveWing);
+	else   m_pPlane->m_Wing2.Duplicate(&s_SaveWing);
 	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_LEWing2, 0.0, m_pPlane->m_WingTilt2);//necessary for eventual inertia calculations
 }
 

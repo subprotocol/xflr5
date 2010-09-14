@@ -24,6 +24,7 @@
 #include <QtGui/QApplication>
 #include "QFLR5Application.h"
 #include "MainFrame.h"
+#include <QSplashScreen>
 #include <QtDebug>
 
 CFoil *g_pCurFoil;	//make it common to all applications
@@ -34,6 +35,12 @@ int main(int argc, char *argv[])
         QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
 #endif
         QFLR5Application app(argc, argv);
+
+/*	QPixmap pixmap;
+	qDebug() << pixmap.load(":/images/splash.png");
+	QSplashScreen splash(pixmap);
+	splash.setWindowFlags(Qt::SplashScreen);
+	splash.show();*/
 
 	QString StyleName = "Cleanlooks";
 	QString LanguagePath ="";
@@ -102,6 +109,8 @@ int main(int argc, char *argv[])
 		if (iApp == MIAREX)             w.OnMiarex();
 		else if (iApp == XFOILANALYSIS) w.OnXDirect();
 	}
+
+//	splash.finish(&w);
 
 	return app.exec();
 }

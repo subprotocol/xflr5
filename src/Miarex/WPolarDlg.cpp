@@ -23,19 +23,22 @@
 #include "../Globals.h"
 #include "../Objects/WPolar.h"
 #include "WPolarDlg.h"
+#include "Miarex.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
- 
+
 
 
 WPolarDlg::WPolarDlg()
 {
 	setWindowTitle(tr("Analysis Definition"));
 	m_pMainFrame = NULL;
+	m_pMiarex    = NULL;
+
 	m_pWing      = NULL;
 	m_pPlane     = NULL;
 
@@ -58,7 +61,6 @@ WPolarDlg::WPolarDlg()
 	m_CoG.Set(0.0,0.0,0.0);
 	m_AnalysisMethod = 1;
 
-	m_bVLM1         = true;
 	m_bThinSurfaces = true;
 	m_bTiltedGeom   = false;
 	m_bWakeRollUp   = false;
@@ -86,9 +88,6 @@ void WPolarDlg::Connect()
 
 	connect(m_pctrlUnit1, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
 	connect(m_pctrlUnit2, SIGNAL(toggled(bool)), this, SLOT(OnUnit()));
-
-	connect(m_pctrlVLM1, SIGNAL(toggled(bool)), this, SLOT(OnVLMMethod()));
-	connect(m_pctrlVLM2, SIGNAL(toggled(bool)), this, SLOT(OnVLMMethod()));
 
 	connect(m_pctrlType1, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
 	connect(m_pctrlType2, SIGNAL(toggled(bool)), this, SLOT(OnWPolarType()));
@@ -159,8 +158,6 @@ void WPolarDlg::EnableControls()
 	m_pctrlGroundEffect->setEnabled(m_AnalysisMethod>=VLMMETHOD);
 	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && m_AnalysisMethod>=VLMMETHOD);
 
-	m_pctrlVLM1->setEnabled(m_pPlane || (m_pWing && m_AnalysisMethod==PANELMETHOD && m_bThinSurfaces));
-	m_pctrlVLM2->setEnabled(m_pPlane || (m_pWing && m_AnalysisMethod==PANELMETHOD && m_bThinSurfaces));
 }
 
 
@@ -284,9 +281,6 @@ void WPolarDlg::InitDialog()
 	if(m_pPlane) m_bThinSurfaces = true;
 
 	m_pctrlPanelMethod->setChecked(m_pPlane);
-
-	m_pctrlVLM1->setChecked( m_bVLM1);
-	m_pctrlVLM2->setChecked(!m_bVLM1);
 
 	m_pctrlArea1->setChecked(m_RefAreaType==1);
 	m_pctrlArea2->setChecked(m_RefAreaType==2);
@@ -417,13 +411,11 @@ void WPolarDlg::OnMethod()
 	{
 		m_bThinSurfaces = true;
 		m_AnalysisMethod = PANELMETHOD;
-		m_bVLM1 = m_pctrlVLM1->isChecked();
 	}
 	else if (m_pctrlWingMethod3->isChecked())
 	{
 		m_bThinSurfaces = false;
 		m_AnalysisMethod = PANELMETHOD;
-		m_bVLM1 = m_pctrlVLM1->isChecked();
 	}
 
 	EnableControls();
@@ -484,12 +476,6 @@ void WPolarDlg::OnUnit()
 	SetDensity();
 }
 
-
-void WPolarDlg::OnVLMMethod()
-{
-	m_bVLM1 = m_pctrlVLM1->isChecked();
-	SetWPolarName();
-}
 
 
 
@@ -737,17 +723,11 @@ void WPolarDlg::SetupLayout()
 	QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
 	AeroDataGroup->setLayout(AeroDataLayout);
 
-	QGridLayout *OptionsLayout = new QGridLayout;
+	QVBoxLayout *OptionsLayout = new QVBoxLayout;
 	m_pctrlViscous = new QCheckBox(tr("Viscous"));
 	m_pctrlTiltGeom = new QCheckBox(tr("Tilt. Geom."));
-	QHBoxLayout *VLMMethodLayout = new QHBoxLayout;
-	m_pctrlVLM1 = new QRadioButton("Horseshoe vortex");
-	m_pctrlVLM2 = new QRadioButton("Quad vortex");
-	VLMMethodLayout->addWidget(m_pctrlVLM1);
-	VLMMethodLayout->addWidget(m_pctrlVLM2);
-	OptionsLayout->addWidget(m_pctrlViscous,1,1);
-	OptionsLayout->addWidget(m_pctrlTiltGeom,1,2);
-	OptionsLayout->addLayout(VLMMethodLayout,2,1,1,2);
+	OptionsLayout->addWidget(m_pctrlViscous);
+	OptionsLayout->addWidget(m_pctrlTiltGeom);
 	QGroupBox *OptionsGroup = new QGroupBox(tr("Options"));
 	OptionsGroup->setLayout(OptionsLayout);
 
@@ -806,6 +786,7 @@ void WPolarDlg::SetWPolarName()
 {
 	if(!m_bAutoName) return;
 	QString str, strong;
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -835,8 +816,8 @@ void WPolarDlg::SetWPolarName()
 		if(m_pPlane || !m_bThinSurfaces) m_WPolarName += "-Panel";
 		if(m_bThinSurfaces)
 		{
-			if(m_bVLM1)	m_WPolarName += "-VLM1";
-			else		m_WPolarName += "-VLM2";
+			if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
+			else		         m_WPolarName += "-VLM2";
 		}
 	}
 

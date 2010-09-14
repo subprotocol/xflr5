@@ -94,7 +94,6 @@ CWing::CWing()
 	memset(m_NYPanels, 0, sizeof(m_NYPanels));
 	memset(m_XPanelDist, 0, sizeof(m_XPanelDist));
 	memset(m_YPanelDist, 0, sizeof(m_YPanelDist));
-	memset(m_VLMQInf, 0, sizeof(m_VLMQInf));
 //	memset(m_GeomMoment, 0, sizeof(m_GeomMoment));
 
 	m_Mass = 1.0;

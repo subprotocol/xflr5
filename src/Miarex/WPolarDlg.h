@@ -67,10 +67,9 @@ private slots:
 	void OnGroundEffect();
 	void OnWPolarType();
 	void OnEditingFinished();
-	void OnVLMMethod();
 
 private:
-	void *m_pMainFrame;
+	void *m_pMainFrame, *m_pMiarex;
 
 	QList <void *> *m_poaWPolar;
 	CPlane *m_pPlane;
@@ -84,7 +83,6 @@ private:
 	int m_AnalysisMethod; //0=LLT; 1=VLM1; 2=VLM2; 3=Panels
 
 	bool m_bAutoName;
-	bool m_bVLM1; //true if Classic, false if Quendez
 	bool m_bThinSurfaces;//true if Plane Panel calculation on middle surface, false if on top & bottom
 	bool m_bWakeRollUp;//true if wake roll up is to be taken into account in calculation
 	bool m_bTiltedGeom;//true if calculation is performed on the tilted geometry, at alpha=0.0
@@ -125,7 +123,6 @@ private:
 	QRadioButton *m_pctrlType1,*m_pctrlType2,*m_pctrlType4;
 	QRadioButton *m_pctrlWingMethod1, *m_pctrlWingMethod2, *m_pctrlWingMethod3;
 	QRadioButton *m_pctrlPanelMethod;
-	QRadioButton *m_pctrlVLM1, *m_pctrlVLM2;
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 

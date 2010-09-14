@@ -79,6 +79,9 @@ private:
 
 	static void * s_pMiarex;
 	static void * s_pMainFrame;
+
+	static CWing s_SaveWing;
+
 	CPlane * m_pPlane;
 	bool m_bChanged;
 	bool m_bAcceptName;

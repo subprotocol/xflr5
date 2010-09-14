@@ -1241,10 +1241,10 @@ void MainFrame::CreateMiarexActions()
 //	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
 
-	defineCtrlPolar = new QAction(tr("Define a Control Analysis")+"\t(Ctrl+F6)", this);
+/*	defineCtrlPolar = new QAction(tr("Define a Control Analysis")+"\t(Ctrl+F6)", this);
 	defineCtrlPolar->setStatusTip(tr("Define a control analysis for the current wing or plane"));
 //	defineCtrlPolar->setShortcut(tr("Ctrl+F6"));
-	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));
+	connect(defineCtrlPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineCtrlPolar()));*/
 
 	defineStabPolar = new QAction(tr("Define a Stability Analysis")+"\t(Shift+F6)", this);
 	defineStabPolar->setStatusTip(tr("Define a stability analysis for the current wing or plane"));
@@ -5104,8 +5104,8 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << (float)pMiarex->m_WngAnalysis.m_Beta;
 	ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
 
-	if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
-	else								  ar << 0;
+	if (pMiarex->m_bVLM1)  ar << 1;
+	else				 ar << 0;
 //		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
 	ar <<1;
 	if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
@@ -5364,8 +5364,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Beta;
 		ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
 
-		if (pMiarex->m_WngAnalysis.m_bVLM1)   ar << 1;
-		else                                  ar << 0;
+		if (pMiarex->m_bVLM1)   ar << 1;
+		else                    ar << 0;
 //		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
 		ar <<123;
 		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
@@ -5495,8 +5495,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			if(ArchiveFormat>=100006)
 			{
 				ar >> k;
-				if (k) pMiarex->m_WngAnalysis.m_bVLM1 = true;
-				else   pMiarex->m_WngAnalysis.m_bVLM1 = false;
+				if (k) pMiarex->m_bVLM1 = true;
+				else   pMiarex->m_bVLM1 = false;
 
 				ar >> k;
 //					if (k) pMiarex->m_WngAnalysis.m_bMiddle = true;

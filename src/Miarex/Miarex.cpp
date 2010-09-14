@@ -493,6 +493,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_bXPressed = m_bYPressed = false;
 
+	m_bVLM1              = true;
 	m_bDirichlet         = true;
 	m_bTrefftz           = true;
 
@@ -1288,7 +1289,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 		pNewPoint->m_NStation            = m_pCurWing->m_NStation;
 
 		pNewPoint->m_PlrName             = m_pCurWPolar->m_PlrName;
-		pNewPoint->m_AnalysisMethod        = m_pCurWPolar->m_AnalysisMethod;
+		pNewPoint->m_AnalysisMethod      = m_pCurWPolar->m_AnalysisMethod;
 		pNewPoint->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 		pNewPoint->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 		pNewPoint->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
@@ -2956,7 +2957,7 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 	pWOpp->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 	pWOpp->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
-	pWOpp->m_AnalysisMethod        = m_pCurWPolar->m_AnalysisMethod;
+	pWOpp->m_AnalysisMethod      = m_pCurWPolar->m_AnalysisMethod;
 
 	if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
 	{
@@ -7299,7 +7300,6 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_F6:
 		{
 			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnDefineStabPolar();
-//			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnDefineCtrlPolar();
 			else                                                       OnDefineWPolar();
 			break;
 		}
@@ -7414,6 +7414,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bCurWOppOnly  = pSettings->value("CurWOppOnly").toBool();
 		m_bLogFile      = pSettings->value("LogFile").toBool();
 		m_bDirichlet    = pSettings->value("Dirichlet").toBool();
+		m_bVLM1         = pSettings->value("bVLM1").toBool();
 		m_bTrefftz      = pSettings->value("Trefftz").toBool();
 		m_bKeepOutOpps  = pSettings->value("KeepOutOpps").toBool();
 		m_bResetWake    = pSettings->value("ResetWake").toBool();
@@ -8798,6 +8799,7 @@ void QMiarex::OnAdvancedSettings()
 	dlg.m_ControlPos      = CPanel::m_CtrlPos;
 	dlg.m_VortexPos       = CPanel::m_VortexPos;
 	dlg.m_WakeInterNodes  = m_WakeInterNodes;
+	dlg.m_bVLM1           = m_bVLM1;
 	dlg.m_pMainFrame = m_pMainFrame;
 
 	dlg.InitDialog();
@@ -8815,7 +8817,7 @@ void QMiarex::OnAdvancedSettings()
 		m_bKeepOutOpps         = dlg.m_bKeepOutOpps;
 		m_WakeInterNodes       = dlg.m_WakeInterNodes;
 		m_MinPanelSize         = dlg.m_MinPanelSize;
-
+		m_bVLM1                = dlg.m_bVLM1;
 		m_InducedDragPoint     = dlg.m_InducedDragPoint;
 
 		CPanel::m_CtrlPos      = dlg.m_ControlPos;
@@ -8942,145 +8944,6 @@ void QMiarex::OnCurveWidth(int index)
 	UpdateCurve();
 }
 
-
-
-void QMiarex::OnDefineCtrlPolar()
-{
-	m_bArcball = false;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_CtrlPolarDlg.m_QInf          = m_WngAnalysis.m_QInf;
-	m_CtrlPolarDlg.m_Mass          = m_WngAnalysis.m_Weight;
-	m_CtrlPolarDlg.m_Viscosity     = m_WngAnalysis.m_Viscosity;
-	m_CtrlPolarDlg.m_Density       = m_WngAnalysis.m_Density;
-	m_CtrlPolarDlg.m_RefAreaType   = m_WngAnalysis.m_RefAreaType;
-
-
-	m_CtrlPolarDlg.m_pPlane = m_pCurPlane;
-	m_CtrlPolarDlg.m_pWing  = m_pCurWing;
-	m_CtrlPolarDlg.m_pWing2 = m_pCurWing;
-	m_CtrlPolarDlg.m_pStab  = m_pCurStab;
-	m_CtrlPolarDlg.m_pFin   = m_pCurFin;
-	m_CtrlPolarDlg.m_pMainFrame = m_pMainFrame;
-	m_CtrlPolarDlg.m_poaXPolar  = m_poaWPolar;
-
-
-	CWPolar* pCurWPolar       = new CWPolar;
-	if (m_pCurPlane) pCurWPolar->m_UFOName = m_pCurPlane->m_PlaneName;
-	else             pCurWPolar->m_UFOName = m_pCurWing->m_WingName;
-
-	pCurWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
-
-	m_CtrlPolarDlg.InitDialog();
-	m_CtrlPolarDlg.move(pMainFrame->m_DlgPos);
-	int res = m_CtrlPolarDlg.exec();
-	pMainFrame->m_DlgPos = m_CtrlPolarDlg.pos();
-	if(res == QDialog::Accepted)
-	{
-		m_WngAnalysis.m_QInf          = m_CtrlPolarDlg.m_QInf;
-		m_WngAnalysis.m_Weight        = m_CtrlPolarDlg.m_Mass;
-		m_WngAnalysis.m_Viscosity     = m_CtrlPolarDlg.m_Viscosity;
-		m_WngAnalysis.m_Density       = m_CtrlPolarDlg.m_Density;
-		m_WngAnalysis.m_RefAreaType   = m_CtrlPolarDlg.m_RefAreaType;
-
-		//Then add WPolar to array
-		pCurWPolar->m_Type            = m_CtrlPolarDlg.m_Type;
-		pCurWPolar->m_QInf            = m_CtrlPolarDlg.m_QInf;
-		pCurWPolar->m_Weight          = m_CtrlPolarDlg.m_Mass;
-		pCurWPolar->m_PlrName         = m_CtrlPolarDlg.m_WPolarName;
-		pCurWPolar->m_Density         = m_CtrlPolarDlg.m_Density;
-		pCurWPolar->m_Viscosity       = m_CtrlPolarDlg.m_Viscosity;
-		pCurWPolar->m_bViscous        = m_CtrlPolarDlg.m_bViscous;
-
-		pCurWPolar->m_RefAreaType     = m_CtrlPolarDlg.m_RefAreaType;
-		if(pCurWPolar->m_RefAreaType==PLANFORMAREA)
-		{
-			pCurWPolar->m_WArea        = m_pCurWing->m_PlanformArea;
-			pCurWPolar->m_WSpan        = m_pCurWing->m_PlanformSpan;
-		}
-		else
-		{
-			pCurWPolar->m_WArea        = m_pCurWing->m_ProjectedArea;
-			pCurWPolar->m_WSpan        = m_pCurWing->m_ProjectedSpan;
-		}
-		pCurWPolar->m_bVLM1           = true;
-		pCurWPolar->m_bTiltedGeom     = false;
-		pCurWPolar->m_bWakeRollUp     = false;
-		pCurWPolar->m_AnalysisMethod    = 2; //vlm
-		pCurWPolar->m_bThinSurfaces   = false;
-		pCurWPolar->m_bGround         = false;
-		pCurWPolar->m_CoG.x          = 0.0;
-		pCurWPolar->m_ASpec           = 0.0;
-		pCurWPolar->m_Beta            = 0.0;
-		pCurWPolar->m_Height          = 0.0;
-		pCurWPolar->m_TotalWakeLength = 10.0;
-		pCurWPolar->m_WakePanelFactor = 1.1;
-		pCurWPolar->m_NXWakePanels    = 1;
-
-		pCurWPolar->m_nControls = m_CtrlPolarDlg.m_nControls;
-		for(int i=0; i<m_CtrlPolarDlg.m_nControls; i++)
-		{
-			pCurWPolar->m_bActiveControl[i] = m_CtrlPolarDlg.m_bActiveControl[i];
-			pCurWPolar->m_MinControl[i]     = m_CtrlPolarDlg.m_MinControl[i];
-			pCurWPolar->m_MaxControl[i]     = m_CtrlPolarDlg.m_MaxControl[i];
-		}
-
-		for(int i=m_CtrlPolarDlg.m_nControls; i<4*MAXCONTROLS; i++)
-		{
-			pCurWPolar->m_bActiveControl[i] = false;
-		}
-
-//		pCurWPolar->m_bPolar = true;
-
-		pCurWPolar->m_Color = pMainFrame->GetColor(4);
-		CWPolar *pWPolar;
-		bool bFound;
-		for(int i=0; i<30;i++)
-		{
-			bFound = false;
-			for (int j=0; j<m_poaWPolar->size();j++)
-			{
-				pWPolar = (CWPolar*)m_poaWPolar->at(j);
-				if(pWPolar->m_Color == pMainFrame->m_crColors[i]) bFound = true;
-			}
-			if(!bFound)
-			{
-				pCurWPolar->m_Color = pMainFrame->m_crColors[i];
-				break;
-			}
-		}
-		pCurWPolar->m_bIsVisible = true;
-
-		pWPolar = GetWPolar(pCurWPolar->m_PlrName);
-		pMainFrame->SetSaveState(false);
-		if(pWPolar)
-		{
-			QString strange = tr("The polar already exists");
-			QMessageBox::warning(pMainFrame, tr("Warning"), strange);
-			delete pCurWPolar;
-			m_pCurWPolar = pWPolar;
-		}
-		else
-		{
-			m_pCurWPolar = AddWPolar(pCurWPolar);
-		}
-		m_pCurPOpp = NULL;
-		m_pCurWOpp = NULL;
-
-		m_bResetglGeom = true;
-		m_bResetglOpp  = true;
-		m_bResetglMesh = true;
-		m_bResetglWake = true;
-
-		SetWPlr();
-		pMainFrame->UpdateWPolars();
-		UpdateView();
-	}
-	else
-	{
-		delete pCurWPolar;
-	}
-	SetControls();
-}
 
 
 void QMiarex::OnDefineStabPolar()
@@ -9240,7 +9103,8 @@ void QMiarex::OnDefineWPolar()
 
 	pNewWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
 
-	m_WngAnalysis.m_pMainFrame = m_pMainFrame;
+	m_WngAnalysis.m_pMainFrame  = m_pMainFrame;
+	m_WngAnalysis.m_pMiarex     = this;
 	m_WngAnalysis.m_pWing       = m_pCurWing;
 	m_WngAnalysis.m_pPlane      = m_pCurPlane;
 	m_WngAnalysis.m_pMainFrame  = m_pMainFrame;
@@ -9274,7 +9138,6 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_PlrName         = m_WngAnalysis.m_WPolarName;
 		pNewWPolar->m_Density         = m_WngAnalysis.m_Density;
 		pNewWPolar->m_Viscosity       = m_WngAnalysis.m_Viscosity;
-		pNewWPolar->m_bVLM1           = m_WngAnalysis.m_bVLM1;
 		pNewWPolar->m_bTiltedGeom     = m_WngAnalysis.m_bTiltedGeom;
 		pNewWPolar->m_bWakeRollUp     = m_WngAnalysis.m_bWakeRollUp;
 		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
@@ -9286,6 +9149,8 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
 		pNewWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
 		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
+
+		pNewWPolar->m_bVLM1           = m_bVLM1;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		CWPolar *pWPolar;
@@ -13101,6 +12966,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_nNodes     = m_nNodes;
 	m_pPanelDlg->m_NSurfaces  = m_NSurfaces;
 
+
 	m_pPanelDlg->move(pMainFrame->m_DlgPos);
 	m_pPanelDlg->InitDialog();
 	m_pPanelDlg->show();
@@ -13345,6 +13211,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("bShowCpScale", m_bShowCpScale  );
 		pSettings->setValue("CurWOppOnly", m_bCurWOppOnly  );
 		pSettings->setValue("LogFile", m_bLogFile  );
+		pSettings->setValue("bVLM1", m_bVLM1);
 		pSettings->setValue("Dirichlet", m_bDirichlet  );
 		pSettings->setValue("Trefftz", m_bTrefftz  );
 		pSettings->setValue("KeepOutOpps", m_bKeepOutOpps  );
@@ -16031,7 +15898,6 @@ void QMiarex::UpdateCurve()
 		m_pCurWPolar->m_Width = m_CurveWidth;
 		m_pCurWPolar->m_bIsVisible  = m_bCurveVisible;
 		m_pCurWPolar->m_bShowPoints = m_bCurvePoints;
-//qDebug()<<"updating curve"<<m_bCurveVisible<<m_bCurvePoints;
 		CreateWPolarCurves();
 	}
 	else if(m_iView==WSTABVIEW && m_pCurWPolar)

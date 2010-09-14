@@ -33,6 +33,8 @@
 WAdvancedDlg::WAdvancedDlg()
 {
 	setWindowTitle(tr("Wing Analysis Advanced Settings"));
+	m_pMainFrame  = NULL;
+
 	m_NStation  = 20;
 	m_AlphaPrec = 0.01;
 	m_Relax     = 20.;
@@ -50,10 +52,10 @@ WAdvancedDlg::WAdvancedDlg()
 	m_bLogFile        = true;
 	m_bKeepOutOpps    = true;
 
-
-	m_pMainFrame  = NULL;
 	m_ControlPos = 0.75;
 	m_VortexPos  = 0.25;
+
+	m_bVLM1 = true;
 
 	SetupLayout();
 }
@@ -61,6 +63,14 @@ WAdvancedDlg::WAdvancedDlg()
 
 void WAdvancedDlg::SetupLayout()
 {
+	QSizePolicy szPolicyMaximum;
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+	QSizePolicy szPolicyMinimum;
+	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
+	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
+
 	m_pctrlAStat   = new QLabel("");
 	m_pctrlLength  = new QLabel("");
 	m_pctrlLength2 = new QLabel("");
@@ -68,9 +78,19 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlLogFile     = new QCheckBox(tr("View Log File after errors"));
 	m_pctrlResetWake   = new QCheckBox(tr("Reset Wake between each angle"));
 	m_pctrlKeepOutOpps = new QCheckBox(tr("Store points outside the polar mesh"));
+	m_pctrlLogFile->setSizePolicy(szPolicyMinimum);
+	m_pctrlResetWake->setSizePolicy(szPolicyMinimum);
+	m_pctrlKeepOutOpps->setSizePolicy(szPolicyMinimum);
 
 	m_pctrlDirichlet = new QRadioButton("Dirichlet");
 	m_pCtrlNeumann = new QRadioButton("Neumann");
+	m_pctrlDirichlet->setSizePolicy(szPolicyMinimum);
+	m_pCtrlNeumann->setSizePolicy(szPolicyMinimum);
+
+	m_pctrlVLM1 = new QRadioButton(tr("Horseshoe vortex"));
+	m_pctrlVLM2 = new QRadioButton(tr("Ring vortex"));
+	m_pctrlVLM1->setSizePolicy(szPolicyMinimum);
+	m_pctrlVLM2->setSizePolicy(szPolicyMinimum);
 
 	m_pctrlInterNodes   = new FloatEdit();
 	m_pctrlRelax        = new FloatEdit(20,1);
@@ -82,44 +102,63 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlCoreSize     = new FloatEdit(.0001, 4);
 	m_pctrlVortexPos    = new FloatEdit(25.0, 2);
 	m_pctrlControlPos   = new FloatEdit(75.0, 2);
+	m_pctrlInterNodes->setSizePolicy(szPolicyMaximum);
+	m_pctrlRelax->setSizePolicy(szPolicyMaximum);
+	m_pctrlAlphaPrec->setSizePolicy(szPolicyMaximum);
+	m_pctrlMinPanelSize->setSizePolicy(szPolicyMaximum);
+	m_pctrlNStation->setSizePolicy(szPolicyMaximum);
+	m_pctrlIterMax->setSizePolicy(szPolicyMaximum);
+	m_pctrlMaxWakeIter->setSizePolicy(szPolicyMaximum);
+	m_pctrlCoreSize->setSizePolicy(szPolicyMaximum);
+	m_pctrlVortexPos->setSizePolicy(szPolicyMaximum);
+	m_pctrlControlPos->setSizePolicy(szPolicyMaximum);
 
 	QGroupBox *AllBox = new QGroupBox(tr("All Analysis"));
-	QVBoxLayout *AllLayout = new QVBoxLayout;
+	QHBoxLayout *AllLayout = new QHBoxLayout;
 	AllLayout->addWidget(m_pctrlLogFile);
 	AllLayout->addWidget(m_pctrlKeepOutOpps);
 	AllBox->setLayout(AllLayout);
 
 	QGroupBox *VLMPanelBox = new QGroupBox(tr("VLM and Panel Methods"));
-	QHBoxLayout *VLMPanelLayout = new QHBoxLayout;
+	QHBoxLayout *WingPanelLayout = new QHBoxLayout;
+	QLabel *lab5 = new QLabel(tr("Ignore wing panels with span <"));
+	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	WingPanelLayout->addStretch(1);
+	WingPanelLayout->addWidget(lab5);
+	WingPanelLayout->addWidget(m_pctrlMinPanelSize);
+	WingPanelLayout->addWidget(m_pctrlLength);
+	QHBoxLayout *CoreSizeLayout = new QHBoxLayout;
 	QLabel *lab10 = new QLabel(tr("Core Size"));
 	lab10->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	VLMPanelLayout->addStretch(1);
-	VLMPanelLayout->addWidget(lab10);
-	VLMPanelLayout->addWidget(m_pctrlCoreSize);
-	VLMPanelLayout->addWidget(m_pctrlLength2);
+	CoreSizeLayout->addStretch(1);
+	CoreSizeLayout->addWidget(lab10);
+	CoreSizeLayout->addWidget(m_pctrlCoreSize);
+	CoreSizeLayout->addWidget(m_pctrlLength2);
+	QVBoxLayout *VLMPanelLayout = new QVBoxLayout;
+	VLMPanelLayout->addLayout(WingPanelLayout);
+	VLMPanelLayout->addLayout(CoreSizeLayout);
 	VLMPanelBox->setLayout(VLMPanelLayout);
 
 	QGroupBox *VLMBox = new QGroupBox(tr("VLM Method"));
 	QGridLayout *VLMLayout = new QGridLayout;
-	QLabel *lab5 = new QLabel(tr("Ignore wing panels with span <"));
 	QLabel *lab6 = new QLabel(tr("Vortex Position"));
 	QLabel *lab7 = new QLabel(tr("Control Point Position"));
 	QLabel *lab8 = new QLabel("%");
 	QLabel *lab9 = new QLabel("%");
-	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	QHBoxLayout *VLMMethodLayout = new QHBoxLayout;
+	VLMMethodLayout->addWidget(m_pctrlVLM1);
+	VLMMethodLayout->addWidget(m_pctrlVLM2);
 	lab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab8->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lab9->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	VLMLayout->addWidget(lab5,1,1);
-	VLMLayout->addWidget(lab6,2,1);
-	VLMLayout->addWidget(lab7,3,1);
-	VLMLayout->addWidget(m_pctrlMinPanelSize,1,2);
-	VLMLayout->addWidget(m_pctrlVortexPos,2,2);
-	VLMLayout->addWidget(m_pctrlControlPos,3,2);
-	VLMLayout->addWidget(m_pctrlLength,1,3);
-	VLMLayout->addWidget(lab8,2,3);
-	VLMLayout->addWidget(lab9,3,3);
+	VLMLayout->addWidget(lab6,1,1);
+	VLMLayout->addWidget(lab7,2,1);
+	VLMLayout->addWidget(m_pctrlVortexPos,1,2);
+	VLMLayout->addWidget(m_pctrlControlPos,2,2);
+	VLMLayout->addWidget(lab8,1,3);
+	VLMLayout->addWidget(lab9,2,3);
+	VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignVCenter);
 	VLMBox->setLayout(VLMLayout);
 
 	QGroupBox *LLTBox = new QGroupBox(tr("Lifting Line Method"));
@@ -169,9 +208,10 @@ void WAdvancedDlg::SetupLayout()
 	LeftSide->addWidget(LLTBox);
 	LeftSide->addStretch(1);
 	LeftSide->addWidget(PanelBCBox);
+	LeftSide->addStretch(1);
 	RightSide->addWidget(VLMBox);
+	RightSide->addStretch(1);
 	RightSide->addWidget(VLMPanelBox);
-	RightSide->addWidget(AllBox);
 	RightSide->addStretch(1);
 	BothSides->addLayout(LeftSide);
 	BothSides->addLayout(RightSide);
@@ -179,7 +219,13 @@ void WAdvancedDlg::SetupLayout()
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addLayout(BothSides);
 	MainLayout->addStretch(1);
+	MainLayout->addWidget(AllBox);
+	MainLayout->addStretch(1);
+	MainLayout->addSpacing(30);
 	MainLayout->addLayout(CommandButtons);
+
+	setSizePolicy(szPolicyMaximum);
+
 	setLayout(MainLayout);
 
 //	connect(m_pctrlResetWake, SIGNAL(clicked()), SLOT(OnResetWake()));
@@ -231,6 +277,8 @@ void WAdvancedDlg::InitDialog()
 	m_pctrlControlPos->setEnabled(false);
 	m_pctrlDirichlet->setChecked(m_bDirichlet);
 	m_pCtrlNeumann->setChecked(!m_bDirichlet);
+	m_pctrlVLM1->setChecked( m_bVLM1);
+	m_pctrlVLM2->setChecked(!m_bVLM1);
 }
 
 
@@ -258,6 +306,7 @@ void WAdvancedDlg::OnResetDefaults()
 	m_bResetWake       = true;
 	m_bTrefftz         = true;
 	m_bKeepOutOpps     = false;
+	m_bVLM1            = true;
 	SetParams();
 }
 
@@ -280,6 +329,7 @@ void WAdvancedDlg::ReadParams()
 	m_bResetWake      = m_pctrlResetWake->isChecked();
 	m_bKeepOutOpps    = m_pctrlKeepOutOpps->isChecked();
 	m_bLogFile        = m_pctrlLogFile->isChecked();
+	m_bVLM1           = m_pctrlVLM1->isChecked();
 }
 
 
@@ -300,18 +350,10 @@ void WAdvancedDlg::SetParams()
 	m_pctrlResetWake->setChecked(m_bResetWake);
 	m_pctrlLogFile->setChecked(m_bLogFile);
 	m_pctrlKeepOutOpps->setChecked(m_bKeepOutOpps);
-/*	if(m_bDirichlet) CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO1);
-	else			 CheckRadioButton(IDC_RADIO1, IDC_RADIO2, IDC_RADIO2);
-
-	if(m_bTrefftz)   CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO3);
-	else			 CheckRadioButton(IDC_RADIO3, IDC_RADIO4, IDC_RADIO4);
-
-	if(m_InducedDragPoint==0)
-					CheckRadioButton(IDC_RADIO5, IDC_RADIO6, IDC_RADIO5);
-	else			CheckRadioButton(IDC_RADIO5, IDC_RADIO6, IDC_RADIO6);*/
 
 	m_pctrlControlPos->SetValue(m_ControlPos*100.0);
 	m_pctrlVortexPos->SetValue(m_VortexPos*100.0);
+	m_pctrlVLM1->setChecked(m_bVLM1);
 }
 
 

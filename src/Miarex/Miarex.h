@@ -84,6 +84,8 @@ class QMiarex : public QWidget
 	friend class GL3dWingDlg;
 	friend class DisplaySettingsDlg;
 	friend class UFOTableDelegate;
+	friend class WPolarDlg;
+
 	Q_OBJECT
 
 
@@ -121,7 +123,6 @@ private slots:
 	void OnHighlightOpp();
 	void OnShowPoints();
 	void OnShowCurve();
-	void OnDefineCtrlPolar();
 	void OnHideAllWPolars();
 	void OnShowAllWPolars();
 	void OnSingleGraph1();
@@ -460,6 +461,7 @@ protected:
 	bool m_bAutoScales;
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
+	bool m_bVLM1;
 	bool m_bTrans;				// the view is being dragged
 	bool m_bType1, m_bType2, m_bType4, m_bType5, m_bType6, m_bType7;	// polar types to be displayed
 	bool m_bShowElliptic;			// true if the elliptic loading should be displayed in the local lift graph

@@ -2387,7 +2387,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	m_bIsFinished = false;
 	strong = tr("Launching 3D Panel Analysis....")+"\n\n";
 	AddString(strong);
-	
+
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_pPlane)
 	{
@@ -2402,8 +2402,6 @@ void PanelAnalysisDlg::StartAnalysis()
 			AddString(strong);
 			
 		}
-
-		m_pWPolar->m_bVLM1 = false; // for thin surfaces
 	}
 
 	strong = QString(tr("Type %1 Analysis")+"\n\n").arg(m_pWPolar->m_Type);
