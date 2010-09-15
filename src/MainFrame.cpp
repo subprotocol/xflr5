@@ -82,7 +82,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_ProjectName = "";
 
 	m_BorderClr       = QColor(200,200,200);
-	m_BackgroundColor = QColor(0, 10, 10);
+	m_BackgroundColor = QColor(0, 5, 10);
 	m_TextColor       = QColor(220,220,220);
 
 	m_TextFont.setStyleHint(QFont::TypeWriter);

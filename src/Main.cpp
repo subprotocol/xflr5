@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
         QFLR5Application app(argc, argv);
 
 	QPixmap pixmap;
-	qDebug() << pixmap.load(":/images/splash.png");
+	pixmap.load(":/images/splash.png");
 	QSplashScreen splash(pixmap);
 	splash.setWindowFlags(Qt::SplashScreen);
 	splash.show();

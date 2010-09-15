@@ -6453,6 +6453,7 @@ bool QMiarex::InitializePanels()
 	}
 	dlg.setValue(95);
 
+
 	if(bBodyEl)
 	{
 		Nel = CreateBodyElements();
@@ -6534,7 +6535,8 @@ bool QMiarex::InitializePanels()
 			if(m_pCurFin->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurFin->m_Surface[j].m_NElements;
 			else
 			{
-				if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pCurFin->m_Surface[j].m_bIsTipLeft)
+				if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
+				   && m_pCurFin->m_Surface[j].m_bIsTipLeft && !m_pCurWPolar->m_bThinSurfaces)
 				{
 					// process left tip patch
 					for (l=m_pCurFin->m_Surface[j].m_NXPanels-1;l>=0; l--)
@@ -6569,6 +6571,7 @@ bool QMiarex::InitializePanels()
 			}
 		}
 	}
+
 
 	if(m_pCurStab)
 	{
@@ -6672,6 +6675,8 @@ bool QMiarex::InitializePanels()
 			}
 		}
 	}
+//	for(int ll=0; ll<m_MatSize; ll++)	qDebug("%16.8f   %16.8f   %16.8f   ", m_pPanel[ll]->CtrlPt.x, m_pPanel[ll]->CtrlPt.y, m_pPanel[ll]->CtrlPt.z);
+
 	dlg.setValue(100);
 	return true;
 }
