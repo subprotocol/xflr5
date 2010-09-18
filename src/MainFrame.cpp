@@ -417,8 +417,8 @@ void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 		}
 		case DIRECTDESIGN:
 		{
-			QRect rr = QRect(m_pctrlCentralWidget->x()+pos().x(),                      m_pctrlCentralWidget->y()+pos().y(),
-							 m_pctrlCentralWidget->x()+pos().x()+m_p2DWidget->width(), m_pctrlCentralWidget->y()+pos().y()+m_p2DWidget->height());
+			QRect rr = QRect(m_pctrlCentralWidget->x()+pos().x(), m_pctrlCentralWidget->y()+pos().y(),
+			                 m_pctrlCentralWidget->x()+pos().x()+m_p2DWidget->width(), m_pctrlCentralWidget->y()+pos().y()+m_p2DWidget->height());
 			if(rr.contains(ScreenPt))	AFoilCtxMenu->exec(ScreenPt);
 //			else we have the customContextMenuRequested signal for the foil table
 			break;
@@ -687,7 +687,10 @@ void MainFrame::CreateAFoilActions()
 	AFoilNacaFoils = new QAction(tr("Naca Foils"), this);
 	connect(AFoilNacaFoils, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilNacaFoils()));
 
+	AFoilTableColumns = new QAction(tr("Set Table Columns"), this);
+	connect(AFoilTableColumns, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilTableColumns()));
 }
+
 
 void MainFrame::CreateAFoilMenus()
 {
@@ -761,7 +764,9 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(AFoilGridAct);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(saveViewToImageFileAct);
-	
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(AFoilTableColumns);
+
 	//Context menu to be displayed when user right clicks on a foil in the table
 	AFoilTableCtxMenu = new QMenu(tr("Foil Actions"),this);
 	AFoilTableCtxMenu->addAction(AFoilRename);
@@ -777,6 +782,8 @@ void MainFrame::CreateAFoilMenus()
 	AFoilTableCtxMenu->addAction(AFoilSetTEGap);
 	AFoilTableCtxMenu->addAction(AFoilSetLERadius);
 	AFoilTableCtxMenu->addAction(AFoilSetFlap);
+	AFoilTableCtxMenu->addSeparator();
+	AFoilTableCtxMenu->addAction(AFoilTableColumns);
 }
 
 
@@ -2031,8 +2038,8 @@ void MainFrame::CreateXDirectActions()
 	CurXFoilHPlot->setCheckable(true);
 	connect(CurXFoilHPlot, SIGNAL(triggered()), pXDirect, SLOT(OnHPlot()));
 
-	m_pImportJavaFoilPolar = new QAction(tr("Import JavaFoil Polar"), this);
-	connect(m_pImportJavaFoilPolar, SIGNAL(triggered()), pXDirect, SLOT(OnImportJavaFoilPolar()));
+//	m_pImportJavaFoilPolar = new QAction(tr("Import JavaFoil Polar"), this);
+//	connect(m_pImportJavaFoilPolar, SIGNAL(triggered()), pXDirect, SLOT(OnImportJavaFoilPolar()));
 
 	m_pImportXFoilPolar = new QAction(tr("Import XFoil Polar"), this);
 	connect(m_pImportXFoilPolar, SIGNAL(triggered()), pXDirect, SLOT(OnImportXFoilPolar()));
@@ -2104,7 +2111,7 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu->addAction(deletePolarOpps);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(m_pImportXFoilPolar);
-	PolarMenu->addAction(m_pImportJavaFoilPolar);
+//	PolarMenu->addAction(m_pImportJavaFoilPolar);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(XDirectPolarFilter);
 	PolarMenu->addSeparator();

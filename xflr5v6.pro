@@ -107,7 +107,8 @@ SOURCES += src/MainFrame.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
     src/Misc/NewNameDlg.cpp \
-    src/Misc/PolarPropsDlg.cpp
+    src/Misc/PolarPropsDlg.cpp \
+    src/Design/AFoilTableDlg.cpp
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/QFLR5Application.h \
@@ -212,7 +213,8 @@ HEADERS += src/MainFrame.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
     src/Misc/NewNameDlg.h \
-    src/Misc/PolarPropsDlg.h
+    src/Misc/PolarPropsDlg.h \
+    src/Design/AFoilTableDlg.h
 
 
 TRANSLATIONS = translations/xflr5v6.ts \

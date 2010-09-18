@@ -1,4 +1,4 @@
-/****************************************************************************
+﻿/****************************************************************************
 
 	StabAnalysisDlg Class
         Copyright (C) 2010 Andre Deperrois XFLR5@yahoo.com
@@ -1456,8 +1456,30 @@ bool StabAnalysisDlg::ControlLoop()
 	int i, nrhs;
 	double t;
 	QString str;
-
 	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
+
+	str = QString("      Mass=%1\n").arg(m_Mass, 12,'g',5);
+	AddString(str);
+
+	str = "\n   ___Center of Gravity Position - Body axis____\n";
+	AddString(str);
+	str = QString("    CoG_x=%1\n").arg(m_CoG.x, 12,'g',5);
+	AddString(str);
+	str = QString("    CoG_y=%1\n").arg(m_CoG.y, 12,'g',5);
+	AddString(str);
+	str = QString("    CoG_z=%1\n").arg(m_CoG.z, 12,'g',5);
+	AddString(str);
+
+	str = "\n   ___Inertia - Body Axis - CoG Origin____\n";
+	AddString(str);
+	str = QString("    Ibxx=%1\n").arg(m_Ib[0][0], 12,'g',5);
+	AddString(str);
+	str = QString("    Ibyy=%1\n").arg(m_Ib[1][1], 12,'g',5);
+	AddString(str);
+	str = QString("    Ibzz=%1\n").arg(m_Ib[2][2], 12,'g',5);
+	AddString(str);
+	str = QString("    Ibxz=%1\n").arg(m_Ib[0][2], 12,'g',5);
+	AddString(str);
 
 	if(m_ControlMax<m_ControlMin) m_ControlDelta = -fabs(m_ControlDelta);
 
@@ -1506,28 +1528,6 @@ bool StabAnalysisDlg::ControlLoop()
 			// Compute inertia in stability axes
 			ComputeStabilityInertia();
 
-			str = QString("      Mass=%1\n").arg(m_Mass, 12,'g',5);
-			AddString(str);
-
-			str = "\n   ___Center of Gravity Position - Body axis____\n";
-			AddString(str);
-			str = QString("    CoG_x=%1\n").arg(m_CoG.x, 12,'g',5);
-			AddString(str);
-			str = QString("    CoG_y=%1\n").arg(m_CoG.y, 12,'g',5);
-			AddString(str);
-			str = QString("    CoG_z=%1\n").arg(m_CoG.z, 12,'g',5);
-			AddString(str);
-
-			str = "\n   ___Inertia - Body Axis - CoG Origin____\n";
-			AddString(str);
-			str = QString("    Ibxx=%1\n").arg(m_Ib[0][0], 12,'g',5);
-			AddString(str);
-			str = QString("    Ibyy=%1\n").arg(m_Ib[1][1], 12,'g',5);
-			AddString(str);
-			str = QString("    Ibzz=%1\n").arg(m_Ib[2][2], 12,'g',5);
-			AddString(str);
-			str = QString("    Ibxz=%1\n").arg(m_Ib[0][2], 12,'g',5);
-			AddString(str);
 			str = "\n   ___Inertia - Stability Axis - CoG Origin____\n";
 			AddString(str);
 			str = QString("    Isxx=%1\n").arg(m_Is[0][0], 12,'g',5);

@@ -60,6 +60,7 @@ class QAFoil : public QWidget
 	friend class FoilTableDelegate;
 	friend class TwoDWidget;
 	friend class AFoilGridDlg;
+	friend class AFoilTableDlg;
 	friend class FlapDlg;
 	friend class NacaFoilDlg;
 	friend class InterpolateFoilsDlg;
@@ -117,8 +118,10 @@ private slots:
 	void OnAFoilInterpolateFoils();
 	void OnAFoilNacaFoils();
 	void OnFoilTableCtxMenu(const QPoint & position);
+	void OnAFoilTableColumns();
 
 private:
+
 	void CheckButtons();
 	void DrawScale(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
 	void DrawXGrid(QPainter &painter, double scalex, double scaley, QPoint Offset, QRect dRect);
@@ -138,7 +141,6 @@ private:
 	void SetScale();
 	void SetScale(QRect CltRect);
 	void ReleaseZoom();
-
 	void FoilVisibleClicked(const QModelIndex& index);
 
 	void LoadSettings(QSettings *pSettings);
@@ -155,7 +157,6 @@ private:
 	void mouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-//	void resizeEvent(QResizeEvent *event);
 
 	CVector MousetoReal(QPoint &point);
 
@@ -225,6 +226,8 @@ private:
 
 	Picture m_TmpPic;
 	Picture m_UndoPic[MAXPICTURESIZE];
+
+	int m_CurrentColumn;
 };
 
 #endif // QAFOIL_H

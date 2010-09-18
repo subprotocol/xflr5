@@ -283,6 +283,7 @@ private:
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *SplinesAct, *SplinedPointsAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
+	QAction *AFoilTableColumns;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions

@@ -38,6 +38,7 @@
 #include "../Misc/LinePickerDlg.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
+#include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
 #include "LECircleDlg.h"
 
@@ -55,6 +56,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_MousePos.y = 0.0;
 
 	m_poaFoil  = NULL;
+	m_pctrlFoilTable = NULL;
 
 	m_pSF = new CSF();
 	m_pSF->m_bModified = false;
@@ -116,6 +118,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_ptOffset.ry() = 0;
 
 	m_pBufferFoil = new CFoil();
+
+	m_CurrentColumn = -1;
 
 	SetupLayout();
 
@@ -715,6 +719,7 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		{
 			str = QString("Column_%1").arg(i);
 			m_pctrlFoilTable->setColumnWidth(i, pSettings->value(str,40).toInt());
+			if(pSettings->value(str+"_hidden", false).toBool()) m_pctrlFoilTable->hideColumn(i);
 		}
 	}
 	pSettings->endGroup();
@@ -2803,6 +2808,12 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 			str = QString("Column_%1").arg(i);
 			pSettings->setValue(str,m_pctrlFoilTable->columnWidth(i));
 		}
+		for(int i=0; i<16; i++)
+		{
+			str = QString("Column_%1").arg(i);
+			pSettings->setValue(str+"_hidden", m_pctrlFoilTable->isColumnHidden(i));
+		}
+
 	}
 	pSettings->endGroup();
 }
@@ -2895,12 +2906,14 @@ void QAFoil::SetPicture()
 	UpdateView();
 }
 
+
 void QAFoil::OnFoilTableCtxMenu(const QPoint & position)
 {
+	m_CurrentColumn = m_pctrlFoilTable->columnAt(position.x());
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-//	QPoint posGlobal = m_pctrlFoilTable->mapToGlobal(position);
 	pMainFrame->AFoilTableCtxMenu->exec(cursor().pos());
 }
+
 
 void QAFoil::SetupLayout()
 {
@@ -2952,15 +2965,15 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setHeaderData(15, Qt::Horizontal, tr("Style"));
 	m_pctrlFoilTable->setModel(m_pFoilModel);
 	m_pctrlFoilTable->setWindowTitle(tr("Foils"));
-	QHeaderView *HorizontalHeader = m_pctrlFoilTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);
+	m_pctrlFoilTable->horizontalHeader()->setStretchLastSection(true);
 
 	m_pFoilDelegate = new FoilTableDelegate;
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
-//	QHeaderView *pHeader = new QHeaderView(Qt::Horizontal);
-//	m_pctrlFoilTable->setHorizontalHeader(pHeader);
+	m_pctrlFoilTable->setColumnWidth(0, 150);
+	for(int i=1; i<15; i++)		m_pctrlFoilTable->setColumnWidth(i, 40);
+;
 
 	int  *precision = new int[16];
 	precision[0]  = 2;
@@ -3017,7 +3030,6 @@ void QAFoil::SelectFoil(CFoil* pFoil)
 void QAFoil::SetParams()
 {
 	FillFoilTable();
-//	m_pctrlFoilTable->adjustSize();
 
 	SelectFoil(g_pCurFoil);
 	CheckButtons();
@@ -3158,6 +3170,45 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 
 
 
+
+void QAFoil::OnAFoilTableColumns()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	AFoilTableDlg dlg;
+	dlg.move(pMainFrame->m_DlgPos);
+
+	dlg.m_bFoilName    = !m_pctrlFoilTable->isColumnHidden(0);
+	dlg.m_bThickness   = !m_pctrlFoilTable->isColumnHidden(1);
+	dlg.m_bThicknessAt = !m_pctrlFoilTable->isColumnHidden(2);
+	dlg.m_bCamber      = !m_pctrlFoilTable->isColumnHidden(3);
+	dlg.m_bCamberAt    = !m_pctrlFoilTable->isColumnHidden(4);
+	dlg.m_bPoints      = !m_pctrlFoilTable->isColumnHidden(5);
+	dlg.m_bTEFlapAngle = !m_pctrlFoilTable->isColumnHidden(6);
+	dlg.m_bTEXHinge    = !m_pctrlFoilTable->isColumnHidden(7);
+	dlg.m_bTEYHinge    = !m_pctrlFoilTable->isColumnHidden(8);
+	dlg.m_bLEFlapAngle = !m_pctrlFoilTable->isColumnHidden(9);
+	dlg.m_bLEXHinge    = !m_pctrlFoilTable->isColumnHidden(10);
+	dlg.m_bLEYHinge    = !m_pctrlFoilTable->isColumnHidden(11);
+
+	dlg.InitDialog();
+
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		m_pctrlFoilTable->setColumnHidden(0,  !dlg.m_bFoilName);
+		m_pctrlFoilTable->setColumnHidden(1,  !dlg.m_bThickness);
+		m_pctrlFoilTable->setColumnHidden(2,  !dlg.m_bThicknessAt);
+		m_pctrlFoilTable->setColumnHidden(3,  !dlg.m_bCamber);
+		m_pctrlFoilTable->setColumnHidden(4,  !dlg.m_bCamberAt);
+		m_pctrlFoilTable->setColumnHidden(5,  !dlg.m_bPoints);
+		m_pctrlFoilTable->setColumnHidden(6,  !dlg.m_bTEFlapAngle);
+		m_pctrlFoilTable->setColumnHidden(7,  !dlg.m_bTEXHinge);
+		m_pctrlFoilTable->setColumnHidden(8,  !dlg.m_bTEYHinge);
+		m_pctrlFoilTable->setColumnHidden(9,  !dlg.m_bLEFlapAngle);
+		m_pctrlFoilTable->setColumnHidden(10, !dlg.m_bLEXHinge);
+		m_pctrlFoilTable->setColumnHidden(11, !dlg.m_bLEYHinge);
+	}
+	pMainFrame->m_DlgPos = dlg.pos();
+}
 
 
 
