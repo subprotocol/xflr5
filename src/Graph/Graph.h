@@ -108,10 +108,8 @@ public:
 	void SetAxisWidth(int Width);
 	void SetTitleColor(QColor crColor);
 	void SetLabelColor(QColor crColor);
-	void SetLegendColor(QColor crColor);
 	void SetTitleLogFont(QFont *plgft);
 	void SetLabelLogFont(QFont *plgft);
-	void SetLegendLogFont(QFont *plgft);
 	void SetWindow(double x1, double x2, double y1, double y2);
 
 	QColor GetAxisColor();
@@ -119,7 +117,6 @@ public:
 	QColor GetBackColor();
 	QColor GetTitleColor();
 	QColor GetLabelColor();
-	QColor GetLegendColor();
 
 	int GetBorderStyle();
 	int GetCurveCount();
@@ -165,7 +162,6 @@ public:
 
 	void GetTitleLogFont(QFont *plgft);
 	void GetLabelLogFont(QFont *plgft);
-	void GetLegendLogFont(QFont *plgft);
 	void GetClientRect(QRect &Rect);
 
 	void SetDefaults();
@@ -238,11 +234,9 @@ private:
 
 	QFont m_TitleLogFont;
 	QFont m_LabelLogFont;
-	QFont m_LegendLogFont;
 
 	QColor m_TitleColor;
 	QColor m_LabelColor;
-	QColor m_LegendColor;
 
 	QColor m_BkColor;
 	QColor m_BorderColor;

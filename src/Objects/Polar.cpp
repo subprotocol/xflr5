@@ -727,3 +727,63 @@ void CPolar::GetBWStyle(QColor &color, int &style, int &width)
 	width = m_Width;
 //	GetBWColor(color, style, width);
 }
+
+
+void CPolar::GetPolarProperties(QString &PolarProperties)
+{
+	QString strong;
+	PolarProperties = m_PlrName +"\n\n";
+
+//	PolarProperties += QObject::tr("Parent foil")+" = "+ m_FoilName+"\n";
+
+//	strong = QString(QObject::tr("Analysis Type")+" = %1\n").arg(m_Type);
+	PolarProperties.clear();
+
+	strong = QString(QObject::tr("Type")+" = %1").arg(m_Type);
+	if(m_Type==FIXEDSPEEDPOLAR)      strong += " ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_Type==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_Type==FIXEDAOAPOLAR) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
+	PolarProperties += strong;
+
+	if(m_Type==FIXEDSPEEDPOLAR)
+	{
+		strong = QString(QObject::tr("Reynolds number")+" = %1\n").arg(m_Reynolds,0,'f',0);
+		PolarProperties += strong;
+		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		PolarProperties += strong;
+	}
+	else if(m_Type==FIXEDLIFTPOLAR)
+	{
+		strong = QString("Re.sqrt(Cl) = %1\n").arg(m_Reynolds,0,'f',0);
+		PolarProperties += strong;
+		strong = QString("Ma.sqrt(Cl) = %1\n").arg(m_Mach,5,'f',2);
+		PolarProperties += strong;
+	}
+	else if(m_Type==3)
+	{
+		strong = QString(QObject::tr("Re.Cl")+" = %1\n").arg(m_Reynolds,0,'f',0);
+		PolarProperties += strong;
+		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		PolarProperties += strong;
+	}
+	else if(m_Type==FIXEDAOAPOLAR)
+	{
+		strong = QString(QObject::tr("Alpha")+" = %1"+QString::fromUtf8("°")+"\n").arg(m_ASpec,7,'f',2);
+		PolarProperties += strong;
+		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
+		PolarProperties += strong;
+	}
+
+
+	strong = QString(QObject::tr("NCrit") + " = %1\n").arg(m_ACrit,6,'f',2);
+	PolarProperties += strong;
+
+	strong = QString(QObject::tr("Forced top trans.") + " = %1\n").arg(m_XTop,6,'f',2);
+	PolarProperties += strong;
+
+	strong = QString(QObject::tr("Forced bottom trans.") + " = %1\n").arg(m_XBot,6,'f',2);
+	PolarProperties += strong;
+
+	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha	.size());
+	PolarProperties += strong;
+}

@@ -48,7 +48,7 @@ GraphDlg::GraphDlg()
 	m_XSel = 0;
 	m_YSel = 1;
 
-	m_pTitleFont = m_pLegendFont = m_pLabelFont = NULL;
+	m_pTitleFont = m_pLabelFont = NULL;
 
 	SetupLayout();
 	Connect();
@@ -59,11 +59,9 @@ void GraphDlg::Connect()
 {
 	connect(m_pctrlTitleClr, SIGNAL(clicked()),  this, SLOT(OnTitleColor()));
 	connect(m_pctrlLabelClr, SIGNAL(clicked()),  this, SLOT(OnLabelColor()));
-	connect(m_pctrlLegendClr, SIGNAL(clicked()), this, SLOT(OnLegendColor()));
 
 	connect(m_pctrlTitleButton, SIGNAL(clicked()),  this, SLOT(OnTitleFont()));
 	connect(m_pctrlLabelButton, SIGNAL(clicked()),  this, SLOT(OnLabelFont()));
-	connect(m_pctrlLegendButton, SIGNAL(clicked()), this, SLOT(OnLegendFont()));
 
 	connect(m_pctrlXAuto, SIGNAL(clicked()), this, SLOT(OnAutoX()));
 	connect(m_pctrlYAuto, SIGNAL(clicked()), this, SLOT(OnAutoY()));
@@ -472,46 +470,6 @@ void GraphDlg::OnLabelFont()
 
 
 
-void GraphDlg::OnLegendColor()
-{
-	QColor color = m_pGraph->GetLegendColor();
-	m_pGraph->SetLegendColor(QColorDialog::getRgba(color.rgba()));
-
-	QPalette palette = m_pctrlLegendClr->palette();
-	QColor listColor = palette.color(QPalette::Button);
-	if(listColor.isValid())
-	{
-//		palette.setColor(QPalette::Background, m_pGraph->GetBackColor());
-		palette.setColor(QPalette::Button, m_pGraph->GetBackColor());
-		palette.setColor(QPalette::ButtonText, m_pGraph->GetLegendColor());
-		m_pctrlLegendClr->setPalette(palette);
-//		m_pctrlLegendClr->setAutoFillBackground(true);
-	}
-
-	SetApplied(false);
-}
-
-
-
-void GraphDlg::OnLegendFont()
-{
-	bool ok;
-	QFont LegendFont("Comic Sans MS");
-	m_pGraph->GetLegendLogFont(&LegendFont);
-
-	QFont font = QFontDialog::getFont(&ok, LegendFont, this);
-
-	if (ok)
-	{
-	   m_pctrlLegendButton->setFont(font);
-	   m_pctrlLegendButton->setText(font.family());
-	   m_pGraph->SetLegendLogFont(&font);
-		SetApplied(false);
-	}
-}
-
-
-
 
 void GraphDlg::OnOK()
 {
@@ -768,9 +726,6 @@ void GraphDlg::SetButtonColors()
 		palette.setColor(QPalette::ButtonText, m_pGraph->GetTitleColor());
 		m_pctrlTitleClr->setPalette(palette);
 
-		palette.setColor(QPalette::ButtonText, m_pGraph->GetLegendColor());
-		m_pctrlLegendClr->setPalette(palette);
-
 		palette.setColor(QPalette::ButtonText, m_pGraph->GetLabelColor());
 		m_pctrlLabelClr->setPalette(palette);
 	}
@@ -779,8 +734,6 @@ void GraphDlg::SetButtonColors()
 
 void GraphDlg::SetParams()
 {
-	QString strong;
-
 	m_pctrlXAuto->setChecked(m_pGraph->GetAutoX());
 	m_pctrlYAuto->setChecked(m_pGraph->GetAutoY());
 
@@ -806,10 +759,6 @@ void GraphDlg::SetParams()
 	m_pGraph->GetTitleLogFont(&font);
 	m_pctrlTitleButton->setText(font.family());
 	m_pctrlTitleButton->setFont(font);
-
-	m_pGraph->GetLegendLogFont(&font);
-	m_pctrlLegendButton->setText(font.family());
-	m_pctrlLegendButton->setFont(font);
 
 
 	bool bState, bAuto;
@@ -949,37 +898,29 @@ void GraphDlg::SetupLayout()
 
 	QLabel *lab1  = new QLabel(tr("Title"));
 	QLabel *lab2  = new QLabel(tr("Label"));
-	QLabel *lab3 = new QLabel(tr("Legend"));
 	QLabel *lab402  = new QLabel(tr("Font"));
 	QLabel *lab403  = new QLabel(tr("Color"));
 	lab1->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 	lab2->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
-	lab3->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
 	lab402->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
 	lab403->setAlignment(Qt::AlignCenter|Qt::AlignVCenter);
 	FontButtons->addWidget(lab402,1,2);
 	FontButtons->addWidget(lab403,1,3);
 	FontButtons->addWidget(lab1,2,1);
 	FontButtons->addWidget(lab2,3,1);
-	FontButtons->addWidget(lab3,4,1);
 
 	m_pctrlTitleButton  = new QPushButton(tr("Set Title Font"));
 	m_pctrlLabelButton  = new QPushButton(tr("Set Label Font"));
-	m_pctrlLegendButton = new QPushButton(tr("Set Legend Font"));
 	FontButtons->addWidget(m_pctrlTitleButton,2,2);
 	FontButtons->addWidget(m_pctrlLabelButton,3,2);
-	FontButtons->addWidget(m_pctrlLegendButton,4,2);
 
 	m_pctrlTitleClr  = new QPushButton(tr("Title Color"));
 	m_pctrlLabelClr  = new QPushButton(tr("Label Color"));
-	m_pctrlLegendClr = new QPushButton(tr("Legend Color"));
 //	m_pctrlTitleClr->setAutoFillBackground(true);
-//	m_pctrlLegendClr->setAutoFillBackground(true);
 //	m_pctrlLabelClr->setAutoFillBackground(true);
 
 	FontButtons->addWidget(m_pctrlTitleClr,2,3);
 	FontButtons->addWidget(m_pctrlLabelClr,3,3);
-	FontButtons->addWidget(m_pctrlLegendClr,4,3);
 
 	QGroupBox *FontBox = new QGroupBox(tr("Fonts"));
 	FontBox->setLayout(FontButtons);

@@ -541,20 +541,20 @@ void QGraph::DrawYMinGrid(QPainter &painter)
 }
 
 
-void QGraph::DrawLegend(QPainter &painter, QPoint &Place)
+void QGraph::DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QColor &LegendColor)
 {
 	painter.save();
 	int LegendSize, ypos;
-	QString strong, strLabel;
+	QString strong;
 
 	LegendSize = 30;
 	ypos = 12;
 
-	painter.setFont(m_LegendLogFont);
+	painter.setFont(LegendFont);
 
 	CCurve* pCurve;
 
-	QPen TextPen(m_LegendColor);
+	QPen TextPen(LegendColor);
 	QPen LegendPen(Qt::gray);
 
 	int npos = 0;
@@ -696,11 +696,6 @@ void QGraph::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("LabelColorGreen",clr.green());
 		pSettings->setValue("LabelColorBlue", clr.blue());
 
-		clr = GetLegendColor();
-		pSettings->setValue("LegendColorRed", clr.red());
-		pSettings->setValue("LegendColorGreen",clr.green());
-		pSettings->setValue("LegendColorBlue", clr.blue());
-
 		GetTitleLogFont(&lgft);
 		pSettings->setValue("TitleFontName", lgft.family());
 		pSettings->setValue("TitleFontSize", lgft.pointSize());
@@ -708,10 +703,6 @@ void QGraph::SaveSettings(QSettings *pSettings)
 		GetLabelLogFont(&lgft);
 		pSettings->setValue("LabelFontName", lgft.family());
 		pSettings->setValue("LabelFontSize", lgft.pointSize());
-
-		GetLegendLogFont(&lgft);
-		pSettings->setValue("LegendFontName", lgft.family());
-		pSettings->setValue("LegendFontSize", lgft.pointSize());
 
 		GetXMajGrid(bs,clr,s,w);
 		pSettings->setValue("XMajGridColorRed", clr.red());
@@ -805,10 +796,6 @@ void QGraph::LoadSettings(QSettings *pSettings)
 		g = pSettings->value("LabelColorGreen",255).toInt();
 		b = pSettings->value("LabelColorBlue",255).toInt();
 		SetLabelColor(QColor(r,g,b));
-		r = pSettings->value("LegendColorRed",255).toInt();
-		g = pSettings->value("LegendColorGreen",255).toInt();
-		b = pSettings->value("LegendColorBlue",255).toInt();
-		SetLegendColor(QColor(r,g,b));
 
 		FontName = pSettings->value("TitleFontName","Comic Sans MS").toString();
 		lgft.setFamily(FontName);
@@ -820,10 +807,6 @@ void QGraph::LoadSettings(QSettings *pSettings)
 		lgft.setPointSize(pSettings->value("LabelFontSize",8).toInt());
 		SetLabelLogFont(&lgft);
 
-		FontName = pSettings->value("LegendFontName","Comic Sans MS").toString();
-		lgft.setFamily(FontName);
-		lgft.setPointSize(pSettings->value("LegendFontSize",8).toInt());
-		SetLegendLogFont(&lgft);
 
 		r  = pSettings->value("XMajGridColorRed",90).toInt();
 		g  = pSettings->value("XMajGridColorGreen",90).toInt();

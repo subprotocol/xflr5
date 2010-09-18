@@ -692,12 +692,6 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlIso, SIGNAL(clicked()), SLOT(On3DIso()));
 	connect(m_pctrlReset, SIGNAL(clicked()), SLOT(On3DReset()));
 	connect(m_pctrlPickCenter, SIGNAL(clicked()), SLOT(On3DPickCenter()));
-
-	connect(m_pctrlLongDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
-	connect(m_pctrlLatDynamics, SIGNAL(clicked()), SLOT(OnStabilityDirection()));
-	connect(m_pctrlTimeView, SIGNAL(clicked()), SLOT(OnTimeView()));
-	connect(m_pctrlRootLocus, SIGNAL(clicked()), SLOT(OnRootLocusView()));
-	connect(m_pctrl3DMode, SIGNAL(clicked()), SLOT(OnModalView()));
 }
 
 
@@ -1702,8 +1696,9 @@ void QMiarex::SetControls()
 	}
 	else						m_pctrBottomControls->setCurrentIndex(0);
 
-	if(m_iView==WCPVIEW)        m_pctrlMiddleControls->setCurrentIndex(1);
-	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(2);
+	if(m_iView==WPOLARVIEW)     m_pctrlMiddleControls->setCurrentIndex(1);
+	else if(m_iView==WCPVIEW)        m_pctrlMiddleControls->setCurrentIndex(2);
+	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(3);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
 	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
@@ -1726,14 +1721,12 @@ void QMiarex::SetControls()
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
 	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
 	pMainFrame->m_pctrlStabilityButton->setChecked(m_iView==WSTABVIEW);
-	m_pctrlTimeView->setChecked(m_iView==WSTABVIEW && m_iStabilityView==0);
-	m_pctrlRootLocus->setChecked(m_iView==WSTABVIEW && m_iStabilityView==1);
-	m_pctrl3DMode->setChecked(m_iView==WSTABVIEW && m_iStabilityView==3);
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW);
 	pMainFrame->CpViewAct->setChecked(m_iView==WCPVIEW);
+	pMainFrame->StabilityAct->setChecked(m_iView==WSTABVIEW);
 
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
 	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
@@ -1821,8 +1814,6 @@ void QMiarex::SetControls()
 	pMainFrame->CurWPlrMenu->setEnabled(m_pCurWPolar);
 	pMainFrame->CurWOppMenu->setEnabled(m_pCurWOpp);
 
-	m_pctrlLongDynamics->setChecked(m_bLongitudinal);
-	m_pctrlLatDynamics->setChecked(!m_bLongitudinal);
 
 	StabViewDlg *pStabView = (StabViewDlg*)pMainFrame->m_pStabView;
 	pStabView->SetControls();
@@ -4119,14 +4110,12 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 	painter.setBackgroundMode(Qt::TransparentMode);
 
-	QFont TextFont;
-	m_WingGraph1.GetLegendLogFont(&TextFont);
-	painter.setFont(TextFont);
+	painter.setFont(pMainFrame->m_TextFont);
 
-	QFontMetrics fm(TextFont);
+	QFontMetrics fm(pMainFrame->m_TextFont);
 	ypos = fm.height();
 
-	QPen TextPen(m_WingGraph1.GetLegendColor());
+	QPen TextPen(pMainFrame->m_TextColor);
 	painter.setPen(TextPen);
 	TextPen.setWidth(1);
 
@@ -4365,14 +4354,12 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 	LegendSize = 30;
 	LegendWidth = 280;
 
-	QFont TextFont;
-	m_WPlrGraph1.GetLegendLogFont(&TextFont);
-	painter.setFont(TextFont);
+	painter.setFont(pMainFrame->m_TextFont);
 
-	QFontMetrics fm(TextFont);
+	QFontMetrics fm(pMainFrame->m_TextFont);
 	ypos = fm.height();
 
-	QPen TextPen(m_WPlrGraph1.GetLegendColor());
+	QPen TextPen(pMainFrame->m_TextColor);
 	painter.setPen(TextPen);
 	TextPen.setWidth(1);
 
@@ -7272,11 +7259,10 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 				m_pCurGraph->SetAuto(true);
 				UpdateView();
 			}
-			else if(m_iView== WOPPVIEW)
-			{
-				OnResetWingScale();
-			}
-			else if(m_iView==W3DVIEW) On3DReset();
+			else if(m_iView==WOPPVIEW)   OnResetWingScale();
+			else if(m_iView==WPOLARVIEW) OnResetWPlrLegend();
+			else if(m_iView==WSTABVIEW)  OnResetWPlrLegend();
+			else if(m_iView==W3DVIEW)    On3DReset();
 
 			break;
 		}
@@ -8022,8 +8008,6 @@ void QMiarex::On3DView()
 	m_bArcball = false;
 	if(m_iView==W3DVIEW)
 	{
-//		m_pctrlMiddleControls->setCurrentIndex(0);
-//		m_pctrBottomControls->setCurrentIndex(1);
 		SetControls();
 		UpdateView();
 		return;
@@ -8049,8 +8033,7 @@ void QMiarex::On3DView()
 	else m_pCurBody = NULL;
 
 	pMainFrame->SetCentralWidget();
-//	m_pctrlMiddleControls->setCurrentIndex(0);
-//	m_pctrBottomControls->setCurrentIndex(1);
+
 	SetControls();
 	UpdateView();
 }
@@ -8892,9 +8875,6 @@ void QMiarex::OnCpView()
 
 //	SetWPlrLegendPos();
 	m_pCurGraph = &m_CpGraph;
-
-//	m_pctrlMiddleControls->setCurrentIndex(1);
-//	m_pctrBottomControls->setCurrentIndex(0);
 
 	CreateCpCurves();
 	SetCurveParams();
@@ -11882,7 +11862,7 @@ void QMiarex::OnStabilityDirection()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	
-	m_bLongitudinal = m_pctrlLongDynamics->isChecked();
+	m_bLongitudinal = pStabView->m_pctrlLongDynamics->isChecked();
 	if(m_bLongitudinal)
 	{
 		m_TimeGraph1.SetYTitle("u");
@@ -12194,8 +12174,6 @@ void QMiarex::OnWOpps()
 	m_iView=WOPPVIEW;
 
 	pMainFrame->SetCentralWidget();
-//	m_pctrlMiddleControls->setCurrentIndex(0);
-//	m_pctrBottomControls->setCurrentIndex(0);
 
 	m_bIs2DScaleSet = false;
 	Set2DScale();
@@ -12224,8 +12202,6 @@ void QMiarex::OnWPolars()
 	else                    m_pCurGraph = m_pCurWPlrGraph;
 
 	pMainFrame->SetCentralWidget();
-//	m_pctrlMiddleControls->setCurrentIndex(0);
-//	m_pctrBottomControls->setCurrentIndex(0);
 
 	SetWPlrLegendPos();
 	CreateWPolarCurves();
@@ -14795,15 +14771,17 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
 	CheckDispLayout->addWidget(m_pctrlWOppAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateWOppSpeed,6,2);
-//	CheckDispLayout->addWidget(m_pctrlHighlightOpp,   7, 1,1,2);
-//	m_pctrl3DSettings =new QPushButton(tr("3D Scales"));
-//	m_pctrl3DSettings->setCheckable(true);
-//	QVBoxLayout *DisplayLayout = new QVBoxLayout;
-//	DisplayLayout->addLayout(CheckDispLayout);
-//	DisplayLayout->addWidget(m_pctrl3DSettings);
+
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(CheckDispLayout);
 
+	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properies"));
+	m_pctrlPolarProps1 = new QLabel;
+//	m_pctrlPolarProps1->setReadOnly(true);
+//	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);
+	QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
+	PolarPropsLayout->addWidget(m_pctrlPolarProps1);
+	PolarPropsBox->setLayout(PolarPropsLayout);
 
 //_______________________Curve params
 	QVBoxLayout *CurveGroup = new QVBoxLayout;
@@ -14876,35 +14854,16 @@ void QMiarex::SetupLayout()
 
 //_______________________Stability Params
 	
-	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
-	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
-	m_pctrlTimeView = new QRadioButton(tr("Time View"));
-	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
-	m_pctrl3DMode = new QRadioButton(tr("3D View"));
-	StabilityTypeLayout->addWidget(m_pctrlTimeView);
-	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
-	StabilityTypeLayout->addWidget(m_pctrl3DMode);
-	StabilityTypeBox->setLayout(StabilityTypeLayout);
 	
-	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
-	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
-	m_pctrlLongDynamics->setSizePolicy(szPolicyMaximum);
-	m_pctrlLatDynamics->setSizePolicy(szPolicyMaximum);
-	m_pctrlLongDynamics->setMinimumHeight(10);
-	m_pctrlLatDynamics->setMinimumHeight(10);
-	QVBoxLayout *StabilityDirLayout = new QVBoxLayout;
-	StabilityDirLayout->addWidget(m_pctrlLongDynamics);
-	StabilityDirLayout->addWidget(m_pctrlLatDynamics);
-	StabilityDirLayout->addStretch(1);
-	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
-	StabilityDirBox->setLayout(StabilityDirLayout);
+	m_pctrlPolarProps = new QLabel;
+//	m_pctrlPolarProps->setReadOnly(true);
+//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
 
 	QGroupBox *StabilityBox = new QGroupBox(tr("Stability analysis"));
 	QVBoxLayout *StabilityLayout = new QVBoxLayout;
-	StabilityLayout->addWidget(StabilityTypeBox);
-	StabilityLayout->addWidget(StabilityDirBox);
+	StabilityLayout->addWidget(m_pctrlPolarProps);
 	StabilityBox->setLayout(StabilityLayout);
-	
+
 //_______________________3D view controls
 	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
 	QGridLayout *ThreeDParams = new QGridLayout;
@@ -14980,6 +14939,7 @@ void QMiarex::SetupLayout()
 //_________________________Main Layout
 	m_pctrlMiddleControls = new QStackedWidget;
 	m_pctrlMiddleControls->addWidget(DisplayBox);
+	m_pctrlMiddleControls->addWidget(PolarPropsBox);
 	m_pctrlMiddleControls->addWidget(CpBox);
 	m_pctrlMiddleControls->addWidget(StabilityBox);
 
@@ -15063,6 +15023,8 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 
 	int i,j,k,m, NStation;
 	double SpanPos;
+
+	m_pctrlPolarProps->setText("");
 
 	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
@@ -15280,15 +15242,14 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
 	else if(m_iView==WCPVIEW)	CreateCpCurves();
 
+	QString PolarProps;
+	m_pCurWPolar->GetPolarProperties(PolarProps);
+	m_pctrlPolarProps->setText(PolarProps);
+	m_pctrlPolarProps1->setText(PolarProps);
 
 	SetAnalysisParams();
 	SetCurveParams();
 	m_bResetglLegend = true;
-
-/*	m_pVLMDlg->m_pWPolar       = m_pCurWPolar;
-	m_pVLMDlg->m_MatSize       = m_MatSize;
-	m_pVLMDlg->m_nNodes        = m_nNodes;
-	m_pVLMDlg->m_NSurfaces     = m_NSurfaces;*/
 
 	m_pPanelDlg->m_pWPolar     = m_pCurWPolar;
 	m_pPanelDlg->m_MatSize     = m_MatSize;

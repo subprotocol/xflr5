@@ -2947,16 +2947,16 @@ void QAFoil::SetupLayout()
 	m_pFoilModel->setRowCount(10);//temporary
 	m_pFoilModel->setColumnCount(16);
 
-	m_pFoilModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
-	m_pFoilModel->setHeaderData(1, Qt::Horizontal, tr("Thickness (%)"));
-	m_pFoilModel->setHeaderData(2, Qt::Horizontal, tr("at (%)"));
-	m_pFoilModel->setHeaderData(3, Qt::Horizontal, tr("Camber (%)"));
-	m_pFoilModel->setHeaderData(4, Qt::Horizontal, tr("at (%)"));
-	m_pFoilModel->setHeaderData(5, Qt::Horizontal, tr("Points"));
-	m_pFoilModel->setHeaderData(6, Qt::Horizontal, tr("TE Flap (")+QString::fromUtf8("°")+")");
-	m_pFoilModel->setHeaderData(7, Qt::Horizontal, tr("TE XHinge"));
-	m_pFoilModel->setHeaderData(8, Qt::Horizontal, tr("TE YHinge"));
-	m_pFoilModel->setHeaderData(9, Qt::Horizontal, tr("LE Flap (")+QString::fromUtf8("°")+")");
+	m_pFoilModel->setHeaderData(0,  Qt::Horizontal, tr("Name"));
+	m_pFoilModel->setHeaderData(1,  Qt::Horizontal, tr("Thickness (%)"));
+	m_pFoilModel->setHeaderData(2,  Qt::Horizontal, tr("at (%)"));
+	m_pFoilModel->setHeaderData(3,  Qt::Horizontal, tr("Camber (%)"));
+	m_pFoilModel->setHeaderData(4,  Qt::Horizontal, tr("at (%)"));
+	m_pFoilModel->setHeaderData(5,  Qt::Horizontal, tr("Points"));
+	m_pFoilModel->setHeaderData(6,  Qt::Horizontal, tr("TE Flap (")+QString::fromUtf8("°")+")");
+	m_pFoilModel->setHeaderData(7,  Qt::Horizontal, tr("TE XHinge"));
+	m_pFoilModel->setHeaderData(8,  Qt::Horizontal, tr("TE YHinge"));
+	m_pFoilModel->setHeaderData(9,  Qt::Horizontal, tr("LE Flap (")+QString::fromUtf8("°")+")");
 	m_pFoilModel->setHeaderData(10, Qt::Horizontal, tr("LE XHinge"));
 	m_pFoilModel->setHeaderData(11, Qt::Horizontal, tr("LE YHinge"));
 	m_pFoilModel->setHeaderData(12, Qt::Horizontal, tr("Show"));
@@ -2973,7 +2973,9 @@ void QAFoil::SetupLayout()
 
 	m_pctrlFoilTable->setColumnWidth(0, 150);
 	for(int i=1; i<15; i++)		m_pctrlFoilTable->setColumnWidth(i, 40);
-;
+	m_pctrlFoilTable->setColumnHidden(9, true);
+	m_pctrlFoilTable->setColumnHidden(10, true);
+	m_pctrlFoilTable->setColumnHidden(11, true);
 
 	int  *precision = new int[16];
 	precision[0]  = 2;

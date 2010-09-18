@@ -872,6 +872,8 @@ void MainFrame::CreateDockWindows()
 	m_pctrl3DScalesWidget->setVisible(false);
 	m_pctrl3DScalesWidget->setFloating(true);
 
+	StabViewDlg::s_pMainFrame = this;
+	StabViewDlg::s_pMiarex = m_pMiarex;
 	m_pStabView = new StabViewDlg(this);
 	StabViewDlg * pStabView = (StabViewDlg*)m_pStabView;
 	pStabView->setAttribute(Qt::WA_DeleteOnClose, false);
@@ -978,8 +980,8 @@ void MainFrame::CreateDockWindows()
 	StabAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;
 	PanelAnalysisDlg::s_pMiarex    = m_pMiarex;
-	StabViewDlg::s_pMiarex    = m_pMiarex;
-	StabViewDlg::s_pMainFrame = this;
+//	StabViewDlg::s_pMiarex    = m_pMiarex;
+//	StabViewDlg::s_pMainFrame = this;
 	ManualInertiaDlg::s_pMainFrame = this;
 
 	CPlane::s_pMainFrame   = this;
@@ -2427,7 +2429,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 	pXDirect->m_pCurOpp = NULL;
 	pXDirect->m_pCurPolar = NULL;
 	g_pCurFoil = NULL;
-	pXDirect->CheckButtons();
+	pXDirect->SetControls();
 	SetSaveState(false);
 
 	return true;
@@ -3306,7 +3308,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 
 		AddRecentFile(PathName);
 		SetSaveState(false);
-		pXDirect->CheckButtons();
+		pXDirect->SetControls();
 		return XFOILANALYSIS;
 	}
 	else
@@ -3330,7 +3332,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				XFile.close();
 				SetSaveState(false);
 				AddRecentFile(PathName);
-				pXDirect->CheckButtons();
+				pXDirect->SetControls();
 				return XFOILANALYSIS;
 			}
 		}
@@ -3378,7 +3380,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				XFile.close();
 				QApplication::restoreOverrideCursor();
 
-				pXDirect->CheckButtons();
+				pXDirect->SetControls();
 
 				if(m_oaPlane.size() || m_oaWing.size()) return MIAREX;
 				else                                    return XFOILANALYSIS;
@@ -4144,7 +4146,7 @@ void MainFrame::OnSelChangeFoil(int i)
 	pXDirect->SetPolar();
 	m_iApp = XFOILANALYSIS;
 	UpdatePolars();
-	pXDirect->CheckButtons();
+	pXDirect->SetControls();
 	UpdateView();
 }
 
@@ -4162,7 +4164,7 @@ void MainFrame::OnSelChangePolar(int i)
 	m_iApp = XFOILANALYSIS;
 	pXDirect->SetPolar(strong);
 	UpdateOpps();
-	pXDirect->CheckButtons();
+	pXDirect->SetControls();
 	UpdateView();
 }
 
@@ -4296,7 +4298,7 @@ void MainFrame::OnXDirect()
 	SetCentralWidget();
 	SetMenus();
 	pXDirect->SetPolarLegendPos();
-	pXDirect->CheckButtons();
+	pXDirect->SetControls();
 	pXDirect->UpdateView();
 }
 

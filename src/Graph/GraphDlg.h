@@ -47,10 +47,8 @@ private slots:
 	void OnOK();
 	void OnApply();
 	void OnTitleFont();
-	void OnLegendFont();
 	void OnLabelFont();
 	void OnTitleColor();
-	void OnLegendColor();
 	void OnLabelColor();
 	void OnRestoreParams();
 	void OnAutoX();
@@ -88,9 +86,9 @@ private:
 	QListWidget *m_pctrlXSel, *m_pctrlYSel;
 
 	QPushButton *OKButton,*CancelButton, *RestoreButton, *ApplyButton;
-	QPushButton *m_pctrlTitleButton, * m_pctrlLegendButton, *m_pctrlLabelButton;
-	QPushButton*m_pctrlTitleClr, *m_pctrlLabelClr, *m_pctrlLegendClr;
-	QLabel *m_pctrlTitleLabel, *m_pctrlLabelLabel, *m_pctrlLegendLabel;
+	QPushButton *m_pctrlTitleButton, *m_pctrlLabelButton;
+	QPushButton*m_pctrlTitleClr, *m_pctrlLabelClr;
+	QLabel *m_pctrlTitleLabel, *m_pctrlLabelLabel;
 
 	QCheckBox *m_pctrlXAuto, *m_pctrlYAuto, *m_pctrlYInverted;
 	FloatEdit *m_pctrlXMin, *m_pctrlXMax, *m_pctrlXOrigin,*m_pctrlXUnit;
@@ -105,7 +103,7 @@ private:
 	ColorButton *m_pctrlGraphBack;
 	LineButton *m_pctrlBorderStyle;
 
-	QFont *m_pTitleFont, *m_pLegendFont, *m_pLabelFont;
+	QFont *m_pTitleFont, *m_pLabelFont;
 
 	bool m_bApplied;
 

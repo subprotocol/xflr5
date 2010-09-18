@@ -156,8 +156,6 @@ void Graph::CopySettings(Graph *pGraph, bool bScales)
 	m_BorderWidth   = pGraph->m_BorderWidth;
 	m_LabelColor    = pGraph->m_LabelColor;
 	m_LabelLogFont  = pGraph->m_LabelLogFont;
-	m_LegendColor   = pGraph->m_LegendColor;
-	m_LegendLogFont = pGraph->m_LegendLogFont;
 	m_TitleColor    = pGraph->m_TitleColor;
 	m_TitleLogFont  = pGraph->m_TitleLogFont;
 	m_AxisStyle     = pGraph->m_AxisStyle;
@@ -381,16 +379,6 @@ void Graph::GetTitleLogFont(QFont *plgft)
 void Graph::GetLabelLogFont(QFont *plgft)
 {
 	*plgft = m_LabelLogFont;
-}
-
-void Graph::GetLegendLogFont(QFont *plgft)
-{
-	*plgft = m_LegendLogFont;
-}
-
-QColor Graph::GetLegendColor()
-{
-	return m_LegendColor;
 }
 
 
@@ -828,14 +816,11 @@ void Graph::SetDefaults()
 //	TmpFont.CreatePointFont(85, "Comic Sans MS");
 
 	SetTitleLogFont(&TmpFont);
-	SetLegendLogFont(&TmpFont);
-//	LgFt.lfHeight = - MulDiv(8, m_LogPixelsY, 72);
 	SetLabelLogFont(&TmpFont);
 
 	SetAxisColor(QColor(200,200,200));
 	SetTitleColor(QColor(255,255,255));
 	SetLabelColor(QColor(255,255,255));
-	SetLegendColor(QColor(255,255,255));
 
 	m_bXMajGrid = true;
 	m_bYMajGrid = true;
@@ -866,10 +851,6 @@ void Graph::SetLabelLogFont(QFont *plgft)
 	m_LabelLogFont = *plgft;
 }
 
-void Graph::SetLegendLogFont(QFont *plgft)
-{
-	m_LegendLogFont = * plgft;
-}
 
 
 void Graph::SetLabelColor(QColor crColor)
@@ -877,11 +858,6 @@ void Graph::SetLabelColor(QColor crColor)
 	m_LabelColor = crColor;
 }
 
-
-void Graph::SetLegendColor(QColor crColor)
-{
-	m_LegendColor = crColor;
-}
 
 void Graph::SetInverted(bool bInverted)
 {

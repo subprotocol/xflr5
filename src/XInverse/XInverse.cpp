@@ -1690,6 +1690,7 @@ void QXInverse::OnTangentSpline()
 
 void QXInverse::PaintGraph(QPainter &painter)
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	painter.save();
 
 //  draw  the graph	
@@ -1697,7 +1698,7 @@ void QXInverse::PaintGraph(QPainter &painter)
 	{
 		m_QGraph.DrawGraph(painter);
 		QPoint Place((int)(m_rGraphRect.right()-300), m_rGraphRect.top()+12);
-		m_QGraph.DrawLegend(painter, Place);
+		m_QGraph.DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);
 	}
 
 // draw the zoom rectangle, if relevant

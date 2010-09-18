@@ -375,9 +375,7 @@ private:
 	QSlider *m_pctrlClipPlanePos;
 
 	//stability widgets
-	QRadioButton *m_pctrlLongDynamics, *m_pctrlLatDynamics;
-	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
-
+	QLabel *m_pctrlPolarProps, *m_pctrlPolarProps1;
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 
 

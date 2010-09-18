@@ -39,7 +39,7 @@ public:
 	void DrawGraph(QPainter &painter);
 	void DrawAxes(QPainter &painter);
 	void DrawCurve(int nIndex, QPainter &painter);
-	void DrawLegend(QPainter &painter, QPoint &Place);
+	void DrawLegend(QPainter &painter, QPoint &Place, QFont &LegendFont, QColor &LegendColor);
 	void DrawTitles(QPainter &painter);
 	void DrawXMinGrid(QPainter &painter);
 	void DrawYMinGrid(QPainter &painter);

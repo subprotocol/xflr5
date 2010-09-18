@@ -62,6 +62,15 @@ void StabViewDlg::showEvent(QShowEvent *event)
 
 void StabViewDlg::Connect()
 {
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
+
+	connect(m_pctrlTimeView, SIGNAL(clicked()), pMiarex, SLOT(OnTimeView()));
+	connect(m_pctrlRootLocus, SIGNAL(clicked()), pMiarex, SLOT(OnRootLocusView()));
+	connect(m_pctrl3DMode, SIGNAL(clicked()), pMiarex, SLOT(OnModalView()));
+
+	connect(m_pctrlLongDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
+	connect(m_pctrlLatDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
+
 	connect(m_pctrlPlotStabGraph, SIGNAL(clicked()), this , SLOT(OnPlotStabilityGraph()));
 
 	connect(m_pctrlRLMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
@@ -207,6 +216,10 @@ void StabViewDlg::FillEigenThings()
 		m_pctrlFreq1->SetValue(Omega1/2.0/PI);
 		m_pctrlSigma1->SetValue(Sigma1);
 		m_pctrlDsi->SetValue(Dsi);
+		m_pctrlFreqN3D->SetValue(OmegaN/2.0/PI);
+		m_pctrlFreq13D->SetValue(Omega1/2.0/PI);
+		m_pctrlSigma13D->SetValue(Sigma1);
+		m_pctrlDsi3D->SetValue(Dsi);
 
 		if(pMiarex->m_bLongitudinal && pMiarex->m_pCurWOpp)
 		{
@@ -263,6 +276,11 @@ void StabViewDlg::FillEigenThings()
 		m_pctrlEigenVector2->setText("");
 		m_pctrlEigenVector3->setText("");
 		m_pctrlEigenVector4->setText("");
+		m_pctrlFreqN->setText("");
+		m_pctrlFreq1->setText("");
+		m_pctrlSigma1->setText("");
+		m_pctrlDsi->setText("");
+
 	}
 }
 
@@ -518,6 +536,10 @@ void StabViewDlg::SetMode(int iMode)
 	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
+	m_pctrl3DMode1->setChecked(m_iCurrentMode%4==0);
+	m_pctrl3DMode2->setChecked(m_iCurrentMode%4==1);
+	m_pctrl3DMode3->setChecked(m_iCurrentMode%4==2);
+	m_pctrl3DMode4->setChecked(m_iCurrentMode%4==3);
 	FillEigenThings();
 	CWOpp *pWOpp = pMiarex->m_pCurWOpp;
 
@@ -557,6 +579,36 @@ void StabViewDlg::SetupLayout()
 	QSizePolicy szPolicyMaximum;
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
+
+
+	//____________Stability view______________________
+	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
+	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
+	m_pctrlTimeView = new QRadioButton(tr("Time View"));
+	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
+	m_pctrl3DMode = new QRadioButton(tr("3D View"));
+	StabilityTypeLayout->addWidget(m_pctrlTimeView);
+	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
+	StabilityTypeLayout->addWidget(m_pctrl3DMode);
+	StabilityTypeLayout->addStretch(1);
+	StabilityTypeBox->setLayout(StabilityTypeLayout);
+
+
+	//____________Stability direction__________
+	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
+	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
+//	m_pctrlLongDynamics->setSizePolicy(szPolicyMaximum);
+//	m_pctrlLatDynamics->setSizePolicy(szPolicyMaximum);
+//	m_pctrlLongDynamics->setMinimumHeight(10);
+//	m_pctrlLatDynamics->setMinimumHeight(10);
+	QHBoxLayout *StabilityDirLayout = new QHBoxLayout;
+	StabilityDirLayout->addStretch(1);
+	StabilityDirLayout->addWidget(m_pctrlLongDynamics);
+	StabilityDirLayout->addStretch(1);
+	StabilityDirLayout->addWidget(m_pctrlLatDynamics);
+	StabilityDirLayout->addStretch(1);
+	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
+	StabilityDirBox->setLayout(StabilityDirLayout);
 
 	//_______________________Time view Parameters
 	QVBoxLayout *ResponseTypeLayout = new QVBoxLayout;
@@ -665,43 +717,31 @@ void StabViewDlg::SetupLayout()
 	DtLayout->addWidget(m_pctrlRampTime,3,2);
 	DtLayout->addWidget(TimeLab3,3,3);
 
-	QHBoxLayout *PlotCurveLayout = new QHBoxLayout;
-	QHBoxLayout *RenameCurveLayout = new QHBoxLayout;
-	QHBoxLayout *AddCurveLayout = new QHBoxLayout;
-	QHBoxLayout *DeleteCurveLayout = new QHBoxLayout;
-	m_pctrlPlotStabGraph = new QPushButton(tr("Recalc Curve"));
+	QGridLayout *CurveLayout = new QGridLayout;
+	m_pctrlPlotStabGraph = new QPushButton(tr("Recalc."));
 	m_pctrlPlotStabGraph->setToolTip(tr("Re-calculate the currently selected curve with the user-specified input data"));
-	m_pctrlAddCurve  = new QPushButton(tr("Add New Curve"));
+	m_pctrlAddCurve  = new QPushButton(tr("Add"));
 	m_pctrlAddCurve->setToolTip(tr("Add a new curve to the graphs, using the current user-specified input"));
-	m_pctrlRenameCurve  = new QPushButton(tr("Rename Selected Curve"));
+	m_pctrlRenameCurve  = new QPushButton(tr("Rename"));
 	m_pctrlRenameCurve->setToolTip(tr("Rename the currently selected curve"));
-	m_pctrlDeleteCurve  = new QPushButton(tr("Delete Selected Curve"));
+	m_pctrlDeleteCurve  = new QPushButton(tr("Delete"));
 	m_pctrlDeleteCurve->setToolTip(tr("Delete the currently selected curve"));
 	m_pctrlCurveList = new QComboBox();
-	AddCurveLayout->addStretch(1);
-	AddCurveLayout->addWidget(m_pctrlAddCurve);
-	AddCurveLayout->addStretch(1);
-	PlotCurveLayout->addStretch(1);
-	PlotCurveLayout->addWidget(m_pctrlPlotStabGraph);
-	PlotCurveLayout->addStretch(1);
-	RenameCurveLayout->addStretch(1);
-	RenameCurveLayout->addWidget(m_pctrlRenameCurve);
-	RenameCurveLayout->addStretch(1);
-	DeleteCurveLayout->addStretch(1);
-	DeleteCurveLayout->addWidget(m_pctrlDeleteCurve);
-	DeleteCurveLayout->addStretch(1);
+	CurveLayout->addWidget(m_pctrlAddCurve,1,1);
+	CurveLayout->addWidget(m_pctrlPlotStabGraph,1,2);
+	CurveLayout->addWidget(m_pctrlRenameCurve,2,1);
+	CurveLayout->addWidget(m_pctrlDeleteCurve,2,2);
+
 	TimeParams->addLayout(ResponseTypeLayout);
 //	TimeParams->addLayout(InitialConditionsLayout);
 	TimeParams->addWidget(m_pctrlInitialConditionsWidget);
 	TimeParams->addLayout(DtLayout);
 	TimeParams->addWidget(m_pctrlCurveList);
-	TimeParams->addLayout(AddCurveLayout);
-	TimeParams->addLayout(PlotCurveLayout);
-	TimeParams->addLayout(RenameCurveLayout);
-	TimeParams->addLayout(DeleteCurveLayout);
+	TimeParams->addLayout(CurveLayout);
 	TimeParams->addStretch(5);
 	QGroupBox *TimeBox = new QGroupBox(tr("Time Graph Params"));
 	TimeBox->setLayout(TimeParams);
+
 	//_______________________Root Locus View Parameters
 	QVBoxLayout *RLLayout = new QVBoxLayout;
 	QHBoxLayout *RLModeLayout = new QHBoxLayout;
@@ -716,7 +756,6 @@ void StabViewDlg::SetupLayout()
 	QGroupBox *RLModeBox = new QGroupBox(tr("Mode Selection"));
 	RLModeBox->setLayout(RLModeLayout);
 
-	QGroupBox * EigenBox = new QGroupBox(tr("Eigenvalues"));
 	QGridLayout *EigenLayout = new QGridLayout;
 	QLabel *LabValue = new QLabel("l=");
 	QFont SymbolFont("Symbol");
@@ -750,6 +789,9 @@ void StabViewDlg::SetupLayout()
 	EigenLayout->addWidget(m_pctrlEigenVector2,3,2);
 	EigenLayout->addWidget(m_pctrlEigenVector3,4,2);
 	EigenLayout->addWidget(m_pctrlEigenVector4,5,2);
+	QGroupBox *EigenBox = new QGroupBox(tr("Eigenvalues"));
+	EigenBox->setLayout(EigenLayout);
+
 	QLabel *FreqNLab = new QLabel("F =");
 	QLabel *Freq1Lab = new QLabel(tr("F1 ="));
 	QLabel *SigmaLab = new QLabel(tr("s1 ="));
@@ -787,6 +829,57 @@ void StabViewDlg::SetupLayout()
 	QGroupBox *FreakBox = new QGroupBox(tr("Mode properties"));
 	FreakBox->setLayout(FreakLayout);
 
+	RLLayout->addWidget(RLModeBox);
+	RLLayout->addWidget(EigenBox);
+	RLLayout->addWidget(FreakBox);
+	RLLayout->addStretch(1);
+	QGroupBox *RLBox = new QGroupBox(tr("Mode"));
+	RLBox->setLayout(RLLayout);
+
+//	___________3D View parameters_________
+	QHBoxLayout *Mode3DSelLayout = new QHBoxLayout;
+	m_pctrl3DMode1 = new QRadioButton("1");
+	m_pctrl3DMode2 = new QRadioButton("2");
+	m_pctrl3DMode3 = new QRadioButton("3");
+	m_pctrl3DMode4 = new QRadioButton("4");
+	Mode3DSelLayout->addWidget(m_pctrl3DMode1);
+	Mode3DSelLayout->addWidget(m_pctrl3DMode2);
+	Mode3DSelLayout->addWidget(m_pctrl3DMode3);
+	Mode3DSelLayout->addWidget(m_pctrl3DMode4);
+	QGroupBox *Mode3DSelBox = new QGroupBox(tr("Mode Selection"));
+	Mode3DSelBox->setLayout(Mode3DSelLayout);
+
+	QGridLayout *Freak3DLayout = new QGridLayout;
+
+	QLabel *FreqNLab3D = new QLabel("F =");
+	QLabel *Freq1Lab3D = new QLabel(tr("F1 ="));
+	QLabel *SigmaLab3D = new QLabel(tr("s1 ="));
+	QLabel *DsiLab3D   = new QLabel(tr("z ="));
+	QLabel *FreqUnit3 = new QLabel("Hz");
+	QLabel *FreqUnit4 = new QLabel("Hz");
+	QLabel *DampUnit2 = new QLabel("s-1");
+	m_pctrlFreqN3D  = new FloatEdit(0.0,3);
+	m_pctrlFreq13D  = new FloatEdit(0.0,3);
+	m_pctrlSigma13D = new FloatEdit(0.0,3);
+	m_pctrlDsi3D    = new FloatEdit(0.0,3);
+	m_pctrlFreqN3D->setEnabled(false);
+	m_pctrlFreq13D->setEnabled(false);
+	m_pctrlSigma13D->setEnabled(false);
+	m_pctrlDsi3D->setEnabled(false);
+
+	Freak3DLayout->addWidget(FreqNLab3D,1,1);
+	Freak3DLayout->addWidget(Freq1Lab3D,2,1);
+	Freak3DLayout->addWidget(SigmaLab3D,3,1);
+	Freak3DLayout->addWidget(DsiLab3D,4,1);
+	Freak3DLayout->addWidget(m_pctrlFreqN3D,1,2);
+	Freak3DLayout->addWidget(m_pctrlFreq13D,2,2);
+	Freak3DLayout->addWidget(m_pctrlSigma13D,3,2);
+	Freak3DLayout->addWidget(m_pctrlDsi3D,4,2);
+	Freak3DLayout->addWidget(FreqUnit3,1,3);
+	Freak3DLayout->addWidget(FreqUnit4,2,3);
+	Freak3DLayout->addWidget(DampUnit2,3,3);
+	QGroupBox *Freak3DBox = new QGroupBox(tr("Mode properties"));
+	Freak3DBox->setLayout(Freak3DLayout);
 
 	QVBoxLayout *AnimationLayout = new QVBoxLayout;
 
@@ -825,38 +918,48 @@ void StabViewDlg::SetupLayout()
 	m_pctrlModeStep = new FloatEdit(0.01,3);
 	QLabel *StepLabel = new QLabel(tr("Time Step ="));
 	QLabel *StepUnit  = new QLabel(tr("s"));
+
+	QHBoxLayout *AnimationCommandsLayout = new QHBoxLayout;
+	AnimationCommandsLayout->addWidget(m_pctrlAnimateRestart);
+	AnimationCommandsLayout->addStretch(1);
+	AnimationCommandsLayout->addWidget(m_pctrlAnimate);
+
 	QHBoxLayout *StepLayout = new  QHBoxLayout;
 	StepLayout->addWidget(StepLabel);
 	StepLayout->addWidget(m_pctrlModeStep);
 	StepLayout->addWidget(StepUnit);
 	AnimationLayout->addLayout(StepLayout);
+
 	AnimationLayout->addStretch(1);
 	AnimationLayout->addLayout(AnimSpeedLayout);
 //	AnimationLayout->addLayout(AnimAmplitudeLayout);
+//	AnimationLayout->addSpacing(15);
 	AnimationLayout->addStretch(1);
-	AnimationLayout->addWidget(m_pctrlAnimateRestart);
+	AnimationLayout->addLayout(AnimationCommandsLayout);
 	AnimationLayout->addStretch(1);
-	AnimationLayout->addWidget(m_pctrlAnimate);
-	AnimationLayout->addStretch(3);
 	m_pctrlAnimationBox = new QGroupBox(tr("Animation"));
 	m_pctrlAnimationBox->setLayout(AnimationLayout);
 
+	QVBoxLayout *Mode3DLayout = new QVBoxLayout;
+	Mode3DLayout->addWidget(Mode3DSelBox);
+	Mode3DLayout->addWidget(Freak3DBox);
+	Mode3DLayout->addWidget(m_pctrlAnimationBox);
 
-	EigenBox->setLayout(EigenLayout);
-	RLLayout->addWidget(RLModeBox);
-	RLLayout->addWidget(EigenBox);
-	RLLayout->addWidget(FreakBox);
-	RLLayout->addWidget(m_pctrlAnimationBox);
-	RLLayout->addStretch(1);
-	QGroupBox *RLBox = new QGroupBox(tr("Mode"));
-	RLBox->setLayout(RLLayout);
+	QGroupBox *Mode3DBox = new QGroupBox("3D Params");
+	Mode3DBox->setLayout(Mode3DLayout);
 
+	//___________________Main Layout____________
 	m_pctrlStackWidget = new QStackedWidget;
 	m_pctrlStackWidget->addWidget(TimeBox);
 	m_pctrlStackWidget->addWidget(RLBox);
+	m_pctrlStackWidget->addWidget(Mode3DBox);
 	m_pctrlStackWidget->setCurrentIndex(1);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	MainLayout->addWidget(StabilityTypeBox);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(StabilityDirBox);
+	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlStackWidget);
 	MainLayout->addStretch(1);
 	setLayout(MainLayout);
@@ -869,6 +972,13 @@ void StabViewDlg::SetControls()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+
+	m_pctrlTimeView->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==0);
+	m_pctrlRootLocus->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==1);
+	m_pctrl3DMode->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==3);
+
+	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
+	m_pctrlLatDynamics->setChecked(!pMiarex->m_bLongitudinal);
 
 	if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->m_Type!=7)
 	{
@@ -891,11 +1001,14 @@ void StabViewDlg::SetControls()
 
 		m_pctrlRampTime->setEnabled(pMiarex->m_StabilityResponseType==1);
 	}
-	else if(pMiarex->m_iStabilityView==1 || pMiarex->m_iStabilityView==3 || pMiarex->m_iView==2)
+	else if(pMiarex->m_iStabilityView==1 || pMiarex->m_iView==2)
 	{
 		m_pctrlStackWidget->setCurrentIndex(1);
-		if(pMiarex->m_iStabilityView==3) m_pctrlAnimationBox->show();
-		else                             m_pctrlAnimationBox->hide();
+		SetMode(m_iCurrentMode);
+	}
+	else if(pMiarex->m_iStabilityView==3)
+	{
+		m_pctrlStackWidget->setCurrentIndex(2);
 		SetMode(m_iCurrentMode);
 	}
 

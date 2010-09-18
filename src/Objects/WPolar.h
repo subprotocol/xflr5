@@ -60,6 +60,7 @@ private:
 	void CalculatePoint(int i);
 	void Copy(CWPolar *pWPolar);
 	void Export(QTextStream &out, int FileType);
+	void GetPolarProperties(QString &Properties);
 	void Remove(int i);
 	void ResetWPlr();
 

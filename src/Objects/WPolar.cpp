@@ -1677,3 +1677,77 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	return true;
 }
 
+void CWPolar::GetPolarProperties(QString &PolarProperties)
+{
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strong, lenunit, massunit, speedunit;
+	GetLengthUnit(lenunit, pMainFrame->m_LengthUnit);
+	GetWeightUnit(massunit, pMainFrame->m_WeightUnit);
+	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
+
+	PolarProperties.clear();
+
+//	PolarProperties += QObject::tr("Parent object") +" = "+ m_UFOName+"\n";
+
+	strong = QString(QObject::tr("Type")+" = %1").arg(m_Type);
+	if(m_Type==1)      strong += " ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_Type==2) strong += " ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_Type==4) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
+	else if(m_Type==7) strong += " ("+QObject::tr("Stability analysis") +")\n";
+	PolarProperties += strong;
+
+	if(m_Type==1)
+	{
+		strong  = QString(QObject::tr("VInf =")+"%1").arg(m_QInf,10,'g',2);
+		PolarProperties += strong + speedunit+"\n";
+	}
+	else if(m_Type==4)
+	{
+		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_ASpec,7,'f',2);
+		PolarProperties += strong +QString::fromUtf8("°")+"\n";
+	}
+
+	strong  = QString(QObject::tr("Mass")+" = %1").arg(m_Weight*pMainFrame->m_kgtoUnit,12,'g',4);
+	PolarProperties += strong + massunit + "\n";
+
+	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,12,'g',4);
+	PolarProperties += strong + lenunit + "\n";
+
+	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,12,'g',4);
+	PolarProperties += strong + lenunit + "\n";
+
+	strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
+	PolarProperties += strong +QString::fromUtf8("°")+"\n";
+
+	PolarProperties += QObject::tr("Analysis method")+" = ";
+	if(m_AnalysisMethod==1) PolarProperties +="LLT\n";
+	else if(m_AnalysisMethod==2 && m_bVLM1)  PolarProperties +="VLM1\n";
+	else if(m_AnalysisMethod==2 && !m_bVLM1) PolarProperties +="VLM2\n";
+	else if(m_AnalysisMethod==3) PolarProperties +="3D-Panels\n";
+	else if(m_AnalysisMethod==4) PolarProperties +="VLM1\n";
+	else                                    PolarProperties +="\n";
+
+	if(m_bViscous) PolarProperties += QObject::tr("Viscous analysis")+"\n";
+	else                      PolarProperties += QObject::tr("Inviscid analysis")+"\n";
+
+	PolarProperties += QObject::tr("Reference Area = ");
+	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";
+	else                            PolarProperties += QObject::tr("Projected area")+"\n";
+
+	if(m_bTiltedGeom) PolarProperties += QObject::tr("Tilted geometry")+"\n";
+
+	if(m_bGround)
+	{
+		strong = QString(QObject::tr("Ground height")+" = %1").arg(m_Height*pMainFrame->m_mtoUnit)+lenunit+"\n";
+		PolarProperties += strong;
+	}
+
+	strong  = QString(QObject::tr("Density =")+"%1 kg/m3\n").arg(m_Density,12,'g',4);
+	PolarProperties += strong;
+
+	strong  = QString(QObject::tr("Viscosity =")+"%1 m2/s\n").arg(m_Viscosity,12,'g',4);
+	PolarProperties += strong;
+
+	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha.size());
+	PolarProperties += strong;
+}

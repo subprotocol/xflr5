@@ -87,8 +87,8 @@ void WAdvancedDlg::SetupLayout()
 	m_pctrlDirichlet->setSizePolicy(szPolicyMinimum);
 	m_pCtrlNeumann->setSizePolicy(szPolicyMinimum);
 
-	m_pctrlVLM1 = new QRadioButton(tr("Horseshoe vortex"));
-	m_pctrlVLM2 = new QRadioButton(tr("Ring vortex"));
+	m_pctrlVLM1 = new QRadioButton(tr("Horseshoe vortex")+" (VLM1)");
+	m_pctrlVLM2 = new QRadioButton(tr("Ring vortex")+" (VLM2)");
 	m_pctrlVLM1->setSizePolicy(szPolicyMinimum);
 	m_pctrlVLM2->setSizePolicy(szPolicyMinimum);
 

@@ -27,6 +27,7 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QCheckBox>
+#include <QStackedWidget>
 #include "../Misc/LineButton.h"
 #include "../Misc/LineCbBox.h"
 #include "../Misc/LineDelegate.h"
@@ -173,7 +174,7 @@ protected:
 	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	void AddOpData(OpPoint *pNewPoint);
-	void CheckButtons();
+	void SetControls();
 	void Connect();
 	void CreateOppCurves(OpPoint *pOpp= NULL);
 	void CreatePolarCurves();
@@ -227,6 +228,9 @@ protected:
 	OpPoint* AddOpPoint(CPolar *pPolar = NULL, bool bStoreOpp=false);
 
 private:
+
+	QStackedWidget *m_pctrlMiddleControls;
+
 	QTimer *m_pAnimateTimer;
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
@@ -248,6 +252,8 @@ private:
 	QCheckBox *m_pctrlShowBL, *m_pctrlShowPressure, *m_pctrlHighlightOpp;
 	QCheckBox* m_pctrlAnimate;
 	QSlider* m_pctrlAnimateSpeed ;
+
+	QLabel *m_pctrlPolarProps;
 
 	QCheckBox *m_pctrlShowCurve;
 	QCheckBox *m_pctrlShowPoints;
