@@ -6027,7 +6027,7 @@ void QMiarex::GLRenderMode()
 	//
 	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	QString strong = QString("Time =%1s").arg(m_ModeTime,6,'f',3);
+	QString strong = QString(tr("Time =")+"%1s").arg(m_ModeTime,6,'f',3);
 
 	GLCreateModeLegend(this, m_pCurWing, m_pCurWOpp);
 
@@ -15242,10 +15242,13 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
 	else if(m_iView==WCPVIEW)	CreateCpCurves();
 
-	QString PolarProps;
-	m_pCurWPolar->GetPolarProperties(PolarProps);
-	m_pctrlPolarProps->setText(PolarProps);
-	m_pctrlPolarProps1->setText(PolarProps);
+	if(m_pCurWPolar)
+	{
+		QString PolarProps;
+		m_pCurWPolar->GetPolarProperties(PolarProps);
+		m_pctrlPolarProps->setText(PolarProps);
+		m_pctrlPolarProps1->setText(PolarProps);
+	}
 
 	SetAnalysisParams();
 	SetCurveParams();
