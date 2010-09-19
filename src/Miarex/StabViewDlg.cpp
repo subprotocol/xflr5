@@ -77,6 +77,10 @@ void StabViewDlg::Connect()
 	connect(m_pctrlRLMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlRLMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlRLMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrl3DMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrl3DMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrl3DMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
+	connect(m_pctrl3DMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode1, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode2, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	connect(m_pctrlTimeMode3, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
@@ -468,12 +472,19 @@ void StabViewDlg::OnModeSelection()
 		else if(m_pctrlTimeMode3->isChecked()) m_iCurrentMode = 2;
 		else if(m_pctrlTimeMode4->isChecked()) m_iCurrentMode = 3;
 	}
-	else
+	else if(pMiarex->m_iStabilityView==1)
 	{
 		if(m_pctrlRLMode1->isChecked())      m_iCurrentMode = 0;
 		else if(m_pctrlRLMode2->isChecked()) m_iCurrentMode = 1;
 		else if(m_pctrlRLMode3->isChecked()) m_iCurrentMode = 2;
 		else if(m_pctrlRLMode4->isChecked()) m_iCurrentMode = 3;
+	}
+	else if(pMiarex->m_iStabilityView==3)
+	{
+		if(m_pctrl3DMode1->isChecked())      m_iCurrentMode = 0;
+		else if(m_pctrl3DMode2->isChecked()) m_iCurrentMode = 1;
+		else if(m_pctrl3DMode3->isChecked()) m_iCurrentMode = 2;
+		else if(m_pctrl3DMode4->isChecked()) m_iCurrentMode = 3;
 	}
 	if(!pMiarex->m_bLongitudinal) m_iCurrentMode +=4;
 	SetMode(m_iCurrentMode);
@@ -1045,7 +1056,11 @@ void StabViewDlg::SetControls()
 	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
 	m_pctrlRLMode4->setChecked(m_iCurrentMode%4==3);
-	
+	m_pctrl3DMode1->setChecked(m_iCurrentMode%4==0);
+	m_pctrl3DMode2->setChecked(m_iCurrentMode%4==1);
+	m_pctrl3DMode3->setChecked(m_iCurrentMode%4==2);
+	m_pctrl3DMode4->setChecked(m_iCurrentMode%4==3);
+
 	m_pctrlTimeMode1->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
 	m_pctrlTimeMode2->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
 	m_pctrlTimeMode3->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
@@ -1054,7 +1069,11 @@ void StabViewDlg::SetControls()
 	m_pctrlRLMode2->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 	m_pctrlRLMode3->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 	m_pctrlRLMode4->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
-	
+	m_pctrl3DMode1->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrl3DMode2->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrl3DMode3->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrl3DMode4->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+
 	m_pctrlModeStep->SetValue(pMiarex->m_Modedt);
 
 	FillEigenThings();

@@ -150,12 +150,12 @@ bool PanelAnalysisDlg::AlphaLoop()
 //CreateMatrix :		   10 *Size/400
 //CreateRHS :			   10
 //CreateWakeContribution :  1
-//SolveMultiple :		   30 *Size/400
+//SolveMultiple :		   40 *Size/400
 //CreateDoubletStrength : 	1 x nrhs
 //RelaxWake :			 20 x nrhs x MaxWakeIter *
 //ComputeAeroCoefs :		5 x nrhs
 	
-	TotalTime = 10*Size/400 + 10 + 1 + 30*Size/400 + 1*nrhs + 5*nrhs;
+	TotalTime = 10*Size/400 + 10 + 1 + 40*Size/400 + 1*nrhs + 5*nrhs;
 
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*nrhs*MaxWakeIter;
 //	if(!m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
@@ -738,7 +738,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	if(m_pStab) m_pStab->m_bWingOut    = false;
 	if(m_pFin)  m_pFin->m_bWingOut     = false;
 
-//for(int ll=120; ll<137; ll++) qDebug("%17.8f", m_Mu[ll]);
 
 	if(QInf >0.0) 
 	{
@@ -1417,7 +1416,7 @@ void PanelAnalysisDlg::RelaxWake()
 	// Andre's method : fit the wake panels on the streamlines
 	// we have the computing power to do it
 
-	CVector LATB, TALB, Trans, PP;
+	CVector LATB, TALB;
 	CVector WLA, WLB,WTA,WTB, WTemp;//wake panel's leading corner points
 
 	dx0 = 0.05;
@@ -2496,7 +2495,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	//RelaxWake :			 20 x nrhs x MaxWakeIter *
 	//ComputeAeroCoefs :		5 x nrhs
 
-	TotalTime = 10*Size/400*nrhs + 10*nrhs + 1*nrhs + 30*Size/400*nrhs + 1*nrhs + 5*nrhs;
+	TotalTime = 10*Size/400*nrhs + 10*nrhs + 1*nrhs + 40*Size/400*nrhs + 1*nrhs + 5*nrhs;
 
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20 * nrhs * MaxWakeIter;
 //	if(!m_b3DSymetric) TotalTime+=30*nrhs;//Solve multiple is 4x longer

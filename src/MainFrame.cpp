@@ -3508,10 +3508,14 @@ void MainFrame::OnGuidelines()
      CFRelease(macPath);
 
 
-#else
-
-                QDir dir(qApp->applicationDirPath());
-                QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
+#ifdef Q_WS_WIN
+	QDir dir(qApp->applicationDirPath());
+	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
+#endif
+#ifdef Q_WS_X11
+	QDir dir("/usr/share/xflr5");
+	QString FileName = dir.canonicalPath() + "/Guidelines.pdf" ;
 #endif
 	QDesktopServices::openUrl(QUrl::fromLocalFile(FileName));
 }
@@ -3574,11 +3578,22 @@ void MainFrame::OnInsertProject()
 }
 
 
+
 void MainFrame::OnLanguage()
 {
-	TranslatorDlg dlg;	
-	QDir dir(qApp->applicationDirPath());
-	dlg.m_TranslationDirPath = dir.canonicalPath() + "/translations" ;
+	TranslatorDlg dlg;
+	QDir TranslationsDir;
+#ifdef Q_WS_MAC
+	TranslationsDir.setPath(qApp->applicationDirPath());
+#endif
+#ifdef Q_WS_WIN
+	TranslationsDir.setPath(qApp->applicationDirPath());
+#endif
+#ifdef Q_WS_X11
+	TranslationsDir.setPath("/usr/share/xflr5");
+#endif
+
+	dlg.m_TranslationDirPath = TranslationsDir.canonicalPath() + "/translations" ;
 	dlg.InitDialog();
 	dlg.move(m_DlgPos);
 	if(dlg.exec()==QDialog::Accepted)
@@ -3587,6 +3602,8 @@ void MainFrame::OnLanguage()
 	}
 	m_DlgPos = dlg.pos();
 }
+
+
 
 
 

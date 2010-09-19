@@ -6662,7 +6662,6 @@ bool QMiarex::InitializePanels()
 			}
 		}
 	}
-//	for(int ll=0; ll<m_MatSize; ll++)	qDebug("%16.8f   %16.8f   %16.8f   ", m_pPanel[ll]->CtrlPt.x, m_pPanel[ll]->CtrlPt.y, m_pPanel[ll]->CtrlPt.z);
 
 	dlg.setValue(100);
 	return true;
@@ -8581,6 +8580,7 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	s2 = sigma*sigma;
 	o2 = omega*omega;
 	t=m_ModeTime;
+	if(t>=50.*m_Modedt) StopAnimate();
 
 	if(m_bLongitudinal)
 	{
@@ -9065,7 +9065,7 @@ void QMiarex::OnDefineStabPolar()
 
 		SetWPlr();
 		pMainFrame->UpdateWPolars();
-		m_iView = WSTABVIEW;
+//		m_iView = WSTABVIEW;
 		UpdateView();
 	}
 	else
@@ -15834,7 +15834,7 @@ void QMiarex::StopAnimate()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	m_bAnimateMode = false;
-	m_pTimerMode->stop();
+
 	pStabView->m_pctrlAnimate->setChecked(false);
 
 	if(!m_bAnimateWOpp) return;
