@@ -58,7 +58,7 @@ CPOpp::CPOpp()
 
 
 
-bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
+bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int a, k;
@@ -101,10 +101,10 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		ar << m_VLMType;
 
-		m_WingWOpp.SerializeWOpp(ar, bIsStoring);
-		if(m_bBiplane)	m_Wing2WOpp.SerializeWOpp(ar, bIsStoring);
-		if(m_bStab)		m_StabWOpp.SerializeWOpp(ar, bIsStoring);
-		if(m_bFin)		m_FinWOpp.SerializeWOpp(ar, bIsStoring);
+		m_WingWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
+		if(m_bBiplane)	m_Wing2WOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
+		if(m_bStab)		m_StabWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
+		if(m_bFin)		m_FinWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
 	}
 	else
 	{
@@ -228,7 +228,7 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 
 		ar >> m_VLMType;
 
-		if (!m_WingWOpp.SerializeWOpp(ar, bIsStoring))
+		if (!m_WingWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
 		{
 			return false;
 		}
@@ -237,7 +237,7 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		{
 			if(m_bBiplane)
 			{
-				if (!m_Wing2WOpp.SerializeWOpp(ar, bIsStoring))
+				if (!m_Wing2WOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
 				{
 					return false;
 				}
@@ -245,7 +245,7 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(m_bStab)
 		{
-			if (!m_StabWOpp.SerializeWOpp(ar, bIsStoring))
+			if (!m_StabWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
 				{
 					return false;
 				}
@@ -253,7 +253,7 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring)
 		}
 		if(m_bFin)
 		{
-			if (!m_FinWOpp.SerializeWOpp(ar, bIsStoring))
+			if (!m_FinWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
 			{
 				return false;
 			}

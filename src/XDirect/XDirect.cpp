@@ -5959,9 +5959,12 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 	SetAnalysisParams();
 	SetOpp();
 
-	QString PolarProps;
-	m_pCurPolar->GetPolarProperties(PolarProps);
-	m_pctrlPolarProps->setText(PolarProps);
+	if(m_pCurPolar)
+	{
+		QString PolarProps;
+		m_pCurPolar->GetPolarProperties(PolarProps);
+		m_pctrlPolarProps->setText(PolarProps);
+	}
 	return m_pCurPolar;
 }
 
@@ -6404,7 +6407,7 @@ void QXDirect::SetupLayout()
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(DisplayGroup);
 
-	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properies"));
+	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
 	m_pctrlPolarProps = new QLabel;
 //	m_pctrlPolarProps->setReadOnly(true);
 //	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);

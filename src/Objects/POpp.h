@@ -36,7 +36,7 @@ class CPOpp
 
 public:
 	CPOpp();
-	bool SerializePOpp(QDataStream &ar, bool bIsStoring);
+	bool SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 private:
 	CWOpp m_WingWOpp;		// the wing's operating point

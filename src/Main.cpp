@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
 	splash.setWindowFlags(Qt::SplashScreen);
 	splash.show();
 
-	QString StyleName = "Cleanlooks";
+//	QString StyleName = "Cleanlooks";
+	QString StyleName;
 	QString LanguagePath ="";
 
 	QString str;
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
 #else
         QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
+
 	bool bMaximized = true;
 	bool bOK;
 	settings.beginGroup("MainFrame");
@@ -70,11 +72,14 @@ int main(int argc, char *argv[])
 		if(bOK) c = k;
 		k = settings.value("SizeHeight").toInt(&bOK);
 		if(bOK) d = k;
+
 		bMaximized = settings.value("SizeMaximized").toBool();
-		str = settings.value("StyleName").toString();
-		if(str.length()) StyleName = str,
+
 		str = settings.value("LanguageFilePath").toString();
 		if(str.length()) LanguagePath = str;
+
+		str = settings.value("StyleName").toString();
+		if(str.length()) StyleName = str;
 	}
 	settings.endGroup();
 

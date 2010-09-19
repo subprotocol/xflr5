@@ -176,7 +176,7 @@ void CWOpp::GetBWStyle(QColor &color, int &style, int &width)
 
 
 
-bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
+bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int ArchiveFormat;
 	int a,p,k,l;
@@ -184,7 +184,8 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 
 	if(bIsStoring)
 	{
-		ar << 1018;
+		if(ProjectFormat>=6) ar << 1018;
+		else                 ar << 1015;
 		//1018 : added non dimensional stability control derivatives
 		//1017 : added non dimensional stability derivatives
 		//1016 : added eigenthings
@@ -255,28 +256,31 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring)
 		{
 			ar << (float)m_FlapMoment[k];
 		}
-		for(k=0; k<8;k++)
+		if(ProjectFormat>=6)
 		{
-			ar << (float)(m_EigenValue[k].real()) << (float)(m_EigenValue[k].imag());
-			for(l=0; l<4; l++)
+			for(k=0; k<8;k++)
 			{
-				ar << (float)(m_EigenVector[k][l].real()) << (float)(m_EigenVector[k][l].imag());
+				ar << (float)(m_EigenValue[k].real()) << (float)(m_EigenValue[k].imag());
+				for(l=0; l<4; l++)
+				{
+					ar << (float)(m_EigenVector[k][l].real()) << (float)(m_EigenVector[k][l].imag());
+				}
 			}
-		}
-		ar << (float)CLa << (float)CLq << (float)Cma << (float)Cmq;
-		ar << (float)CYb << (float)CYp << (float)CYr << (float)Clb << (float)Clp << (float)Clr << (float)Cnb << (float)Cnp << (float)Cnr;
-		ar << m_nControls;
-		for(k=0; k<m_nControls; k++)
-		{
-			ar<<(float)CXe[k]<<(float)CYe[k]<<(float)CZe[k];
-			ar<<(float)CLe[k]<<(float)CMe[k]<<(float)CNe[k];
-			ar << (float)m_BLat[k][0] << (float)m_BLat[k][1] << (float)m_BLat[k][2] << (float)m_BLat[k][3];
-			ar << (float)m_BLong[k][0]<< (float)m_BLong[k][1]<< (float)m_BLong[k][2]<< (float)m_BLong[k][3];
-		}
-		for(k=0; k<4; k++)
-		{	
-			ar << (float)m_ALong[k][0]<< (float)m_ALong[k][1]<< (float)m_ALong[k][2]<< (float)m_ALong[k][3];
-			ar << (float)m_ALat[k][0] << (float)m_ALat[k][1] << (float)m_ALat[k][2] << (float)m_ALat[k][3];
+			ar << (float)CLa << (float)CLq << (float)Cma << (float)Cmq;
+			ar << (float)CYb << (float)CYp << (float)CYr << (float)Clb << (float)Clp << (float)Clr << (float)Cnb << (float)Cnp << (float)Cnr;
+			ar << m_nControls;
+			for(k=0; k<m_nControls; k++)
+			{
+				ar<<(float)CXe[k]<<(float)CYe[k]<<(float)CZe[k];
+				ar<<(float)CLe[k]<<(float)CMe[k]<<(float)CNe[k];
+				ar << (float)m_BLat[k][0] << (float)m_BLat[k][1] << (float)m_BLat[k][2] << (float)m_BLat[k][3];
+				ar << (float)m_BLong[k][0]<< (float)m_BLong[k][1]<< (float)m_BLong[k][2]<< (float)m_BLong[k][3];
+			}
+			for(k=0; k<4; k++)
+			{
+				ar << (float)m_ALong[k][0]<< (float)m_ALong[k][1]<< (float)m_ALong[k][2]<< (float)m_ALong[k][3];
+				ar << (float)m_ALat[k][0] << (float)m_ALat[k][1] << (float)m_ALat[k][2] << (float)m_ALat[k][3];
+			}
 		}
 	}
 	else

@@ -99,7 +99,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_bSaveWOpps = true;
 	m_bSaveSettings = true;
 
-	m_StyleName = "Cleanlooks";
+	m_StyleName.clear();
 	m_GraphExportFilter = "Comma Separated Values (*.csv)";
 
 	QDesktopWidget desktop;
@@ -546,6 +546,9 @@ void MainFrame::CreateActions()
 	aboutAct = new QAction(tr("&About"), this);
 	aboutAct->setStatusTip(tr("More information about XFLR5"));
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(AboutQFLR5()));
+
+	aboutQtAct = new QAction(tr("About Qt"), this);
+	connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 	ShowPolarProps = new QAction(tr("Properties"), this);
 	ShowPolarProps->setStatusTip(tr("Show the properties of the currently selected polar"));
@@ -1043,10 +1046,12 @@ void MainFrame::CreateMenus()
 	optionsMenu->addAction(saveOptionsAct);
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(restoreToolbarsAct);
+	optionsMenu->addSeparator();
 	optionsMenu->addAction(resetSettingsAct);
 
 	helpMenu = menuBar()->addMenu(tr("&?"));
 	helpMenu->addAction(guidelinesAct);
+	helpMenu->addAction(aboutQtAct);
 	helpMenu->addAction(aboutAct);
 
 	//Create Application-Specific Menus
@@ -3177,11 +3182,7 @@ bool MainFrame::LoadSettings()
 		if(SettingsFormat != SETTINGSFORMAT) return false;
 
 		m_StyleName = settings.value("StyleName","").toString();
-		if(!m_StyleName.length())
-		{
-			m_StyleName = "Cleanlooks";
-			return false;
-		}
+//		if(!m_StyleName.length()) return false;
 
 		m_GraphExportFilter = settings.value("GraphExportFilter",".csv").toString();
 
@@ -5403,7 +5404,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			for (i=0; i<m_oaWOpp.size();i++)
 			{
 				pWOpp = (CWOpp*)m_oaWOpp.at(i);
-				pWOpp->SerializeWOpp(ar, bIsStoring);
+				pWOpp->SerializeWOpp(ar, bIsStoring, ProjectFormat);
 			}
 		}
 		else ar << 0;
@@ -5434,7 +5435,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			for (i=0; i<m_oaPOpp.size();i++)
 			{
 				pPOpp = (CPOpp*)m_oaPOpp.at(i);
-				pPOpp->SerializePOpp(ar, bIsStoring);
+				pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat);
 			}
 		}
 		else ar << 0;
@@ -5580,7 +5581,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			}
 			else
 			{
-				bWOppOK = pWOpp->SerializeWOpp(ar, bIsStoring);
+				bWOppOK = pWOpp->SerializeWOpp(ar, bIsStoring, ProjectFormat);
 				if(pWOpp && bWOppOK)
 				{
 					pWing = pMiarex->GetWing(pWOpp->m_WingName);
@@ -5711,7 +5712,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pPOpp = new CPOpp();
 
-				if (!pPOpp->SerializePOpp(ar, bIsStoring))
+				if (!pPOpp->SerializePOpp(ar, bIsStoring, ProjectFormat))
 				{
 					if(pPOpp) delete pPOpp;
 					QApplication::restoreOverrideCursor();

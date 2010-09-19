@@ -90,7 +90,7 @@ private:
 	double m_BLat[MAXCONTROLS][4];
 	
 //________________METHODS____________________________________
-	bool SerializeWOpp(QDataStream &ar, bool bIsStoring);
+	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	bool Export(QTextStream &out, int FileType);
 	void GetBWStyle(QColor &color, int &style, int &width);
 	double GetMaxLift();

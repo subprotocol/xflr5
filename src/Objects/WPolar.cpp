@@ -1698,7 +1698,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 
 	if(m_Type==1)
 	{
-		strong  = QString(QObject::tr("VInf =")+"%1").arg(m_QInf,10,'g',2);
+		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf,10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
 	else if(m_Type==4)
@@ -1707,13 +1707,13 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
-	strong  = QString(QObject::tr("Mass")+" = %1").arg(m_Weight*pMainFrame->m_kgtoUnit,12,'g',4);
+	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'g',4);
 	PolarProperties += strong + massunit + "\n";
 
-	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,12,'g',4);
+	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
-	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,12,'g',4);
+	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
 	strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
@@ -1727,8 +1727,9 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	else if(m_AnalysisMethod==4) PolarProperties +="VLM1\n";
 	else                                    PolarProperties +="\n";
 
-	if(m_bViscous) PolarProperties += QObject::tr("Viscous analysis")+"\n";
-	else                      PolarProperties += QObject::tr("Inviscid analysis")+"\n";
+	PolarProperties += QObject::tr("Analysis type")+" = ";
+	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
+	else           PolarProperties += QObject::tr("Inviscid")+"\n";
 
 	PolarProperties += QObject::tr("Reference Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";

@@ -800,7 +800,7 @@ void Graph::SetGraphName(QString GraphName)
 
 void Graph::SetDefaults()
 {
-	m_BkColor = QColor(0,20,20);
+	m_BkColor = QColor(0,10,20);
 	m_BorderColor = QColor(200,200,200);
 	m_BorderStyle = 0;
 	m_BorderWidth = 3;

@@ -4,7 +4,7 @@
 //General
 #define PI             3.14159265358979
 #define MAXRECENTFILES         8
-#define SETTINGSFORMAT    100619
+#define SETTINGSFORMAT    100623
 #define PRECISION  0.00000000001 //values are assumed 0 if less than this value
 
 // Applications

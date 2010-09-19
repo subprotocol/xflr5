@@ -267,7 +267,7 @@ private:
 	QAction *unitsAct;
 	QAction *languageAct;
 	QAction *exitAct;
-	QAction *aboutAct, *guidelinesAct;
+	QAction *aboutAct, *guidelinesAct, *aboutQtAct;
 	QAction *recentFileActs[MAXRECENTFILES];
 	QAction *separatorAct;
 	QAction *saveViewToImageFileAct, *resetSettingsAct;

@@ -653,7 +653,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlCurveStyle, SIGNAL(activated(int)), this, SLOT(OnCurveStyle(int)));
 	connect(m_pctrlCurveWidth, SIGNAL(activated(int)), this, SLOT(OnCurveWidth(int)));
 	connect(m_pctrlCurveColor, SIGNAL(clicked()), this, SLOT(OnCurveColor()));
-	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowPoints()));
+	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 
 	connect(m_pctrlHalfWing, SIGNAL(clicked()), this, SLOT(OnHalfWing()));
@@ -11678,16 +11678,12 @@ void QMiarex::OnShowTransitions()
 void QMiarex::OnShowCurve()
 {
 	m_bCurveVisible = m_pctrlShowCurve->isChecked();
+	m_bCurvePoints = m_pctrlShowPoints->isChecked();
 	UpdateCurve();
 	
 }
 
 
-void QMiarex::OnShowPoints()
-{
-	m_bCurvePoints = m_pctrlShowPoints->isChecked();
-	UpdateCurve();
-}
 
 
 
@@ -14692,9 +14688,9 @@ void QMiarex::SetupLayout()
 	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
 	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
 
-	m_pctrlAlphaMin->setMinimumHeight(20);
+/*	m_pctrlAlphaMin->setMinimumHeight(20);
 	m_pctrlAlphaMax->setMinimumHeight(20);
-	m_pctrlAlphaDelta->setMinimumHeight(20);
+	m_pctrlAlphaDelta->setMinimumHeight(20);*/
 	m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
 	m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
 	m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
@@ -14740,7 +14736,7 @@ void QMiarex::SetupLayout()
 	m_pctrlStream        = new QCheckBox(tr("Stream"));
 	m_pctrlWOppAnimate   = new QCheckBox(tr("Animate"));
 	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight OpPoint"));
-	m_pctrlHalfWing->setSizePolicy(szPolicyMaximum);
+/*	m_pctrlHalfWing->setSizePolicy(szPolicyMaximum);
 	m_pctrlLift->setSizePolicy(szPolicyMaximum);
 	m_pctrlIDrag->setSizePolicy(szPolicyMaximum);
 	m_pctrlVDrag->setSizePolicy(szPolicyMaximum);
@@ -14751,7 +14747,7 @@ void QMiarex::SetupLayout()
 	m_pctrlSurfVel->setSizePolicy(szPolicyMaximum);
 	m_pctrlStream->setSizePolicy(szPolicyMaximum);
 	m_pctrlWOppAnimate->setSizePolicy(szPolicyMaximum);
-	m_pctrlHighlightOpp->setSizePolicy(szPolicyMaximum);
+	m_pctrlHighlightOpp->setSizePolicy(szPolicyMaximum);*/
 
 	m_pctrlAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateWOppSpeed->setMinimum(0);
@@ -14787,8 +14783,8 @@ void QMiarex::SetupLayout()
 	QVBoxLayout *CurveGroup = new QVBoxLayout;
 	m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
 	m_pctrlShowPoints = new QCheckBox(tr("Points"));
-	m_pctrlShowCurve->setMinimumHeight(10);
-	m_pctrlShowPoints->setMinimumHeight(10);
+//	m_pctrlShowCurve->setMinimumHeight(10);
+//	m_pctrlShowPoints->setMinimumHeight(10);
 	m_pctrlCurveStyle = new LineCbBox();
 	m_pctrlCurveWidth = new LineCbBox();
 	m_pctrlCurveColor = new LineButton;
@@ -14874,7 +14870,7 @@ void QMiarex::SetupLayout()
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
 	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
 	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
-	m_pctrlAxes->setMinimumHeight(10);
+/*	m_pctrlAxes->setMinimumHeight(10);
 	m_pctrlLight->setMinimumHeight(10);
 	m_pctrlSurfaces->setMinimumHeight(10);
 	m_pctrlOutline->setMinimumHeight(10);
@@ -14886,7 +14882,7 @@ void QMiarex::SetupLayout()
 	m_pctrlOutline->setSizePolicy(szPolicyMaximum);
 	m_pctrlPanels->setSizePolicy(szPolicyMaximum);
 	m_pctrlVortices->setSizePolicy(szPolicyMaximum);
-	m_pctrlFoilNames->setSizePolicy(szPolicyMaximum);
+	m_pctrlFoilNames->setSizePolicy(szPolicyMaximum);*/
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
 	ThreeDParams->addWidget(m_pctrlLight, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
@@ -14899,10 +14895,10 @@ void QMiarex::SetupLayout()
 	m_pctrlY          = new QPushButton("Y");
 	m_pctrlZ          = new QPushButton("Z");
 	m_pctrlIso        = new QPushButton("Iso");
-	m_pctrlX->setSizePolicy(szPolicyMaximum);
+/*	m_pctrlX->setSizePolicy(szPolicyMaximum);
 	m_pctrlY->setSizePolicy(szPolicyMaximum);
 	m_pctrlZ->setSizePolicy(szPolicyMaximum);
-	m_pctrlIso->setSizePolicy(szPolicyMaximum);
+	m_pctrlIso->setSizePolicy(szPolicyMaximum);*/
 
 	ThreeDView->addWidget(m_pctrlX,1,1);
 	ThreeDView->addWidget(m_pctrlY,1,2);
@@ -14911,9 +14907,9 @@ void QMiarex::SetupLayout()
 
 	m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
 	m_pctrlReset          = new QPushButton(tr("Reset"));
-	m_pctrlReset->setSizePolicy(szPolicyMaximum);
+//	m_pctrlReset->setSizePolicy(szPolicyMaximum);
 	m_pctrlPickCenter->setCheckable(true);
-	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
+//	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
 	ThreeDView->addWidget(m_pctrlReset,3,1);
 	ThreeDView->addWidget(m_pctrlPickCenter,3,2);
 
@@ -14925,7 +14921,7 @@ void QMiarex::SetupLayout()
 	m_pctrlClipPlanePos->setSliderPosition(0);
 	m_pctrlClipPlanePos->setTickInterval(30);
 	m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
-	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
+//	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
 	ClipLayout->addWidget(ClipLabel);
 	ClipLayout->addWidget(m_pctrlClipPlanePos,1);
 

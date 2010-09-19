@@ -121,7 +121,6 @@ private slots:
 	void OnCurveWidth(int index);
 	void OnCurveColor();
 	void OnHighlightOpp();
-	void OnShowPoints();
 	void OnShowCurve();
 	void OnHideAllWPolars();
 	void OnShowAllWPolars();
