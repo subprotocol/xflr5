@@ -34,7 +34,6 @@ class CWPolar
 	friend class QMiarex;
 	friend class MainFrame;
 	friend class WPolarDlg;
-	friend class CtrlPolarDlg;
 	friend class StabPolarDlg;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;

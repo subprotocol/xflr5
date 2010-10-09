@@ -39,7 +39,6 @@
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
 #include "WPolarDlg.h"
-#include "CtrlPolarDlg.h"
 #include "StabPolarDlg.h"
 #include "StabAnalysisDlg.h"
 #include "PanelAnalysisDlg.h"
@@ -396,7 +395,6 @@ private:
 	GL3dBodyDlg  m_GL3dBody;
 	GLLightDlg   m_GLLightDlg;
 	WPolarDlg    m_WngAnalysis;
-	CtrlPolarDlg m_CtrlPolarDlg;
 	StabPolarDlg m_StabPolarDlg;
 
 

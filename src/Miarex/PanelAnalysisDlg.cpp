@@ -558,7 +558,7 @@ void PanelAnalysisDlg::CreateDoubletStrength(double V0, double VDelta, int nval)
 			{
 				if(m_pWingList[i])
 				{
-					m_pWingList[i]->PanelTrefftz(1.0, alpha, Mu, Sigma, 0, Force, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
+					m_pWingList[i]->PanelTrefftz(1.0, alpha, Mu, Sigma, pos, Force, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 					pos += m_pWingList[i]->m_MatSize;
 				}
 			}

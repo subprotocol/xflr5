@@ -37,7 +37,6 @@ class CPlane
 	friend class PanelAnalysisDlg;
 	friend class StabAnalysisDlg;
 	friend class ManageBodiesDlg;
-	friend class CtrlPolarDlg;
 	friend class StabPolarDlg;
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;

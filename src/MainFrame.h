@@ -71,7 +71,6 @@ class MainFrame : public QMainWindow
 	friend class GL3dBodyDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
-	friend class CtrlPolarDlg;
 	friend class WingScaleDlg;
 	friend class BodyTransDlg;
 	friend class GLWidget;

@@ -15,6 +15,10 @@
 *******************************************************************************
 
 
+xflr5 v6.01 Beta October xxxth, 2010
+	- Corrected the incorrect balance speed in 3D type 2 polars
+
+
 xflr5 v6.00 Beta September 19th, 2010
 	- added Stability and control analysis
 	- changed the 3D-panel method for planes from full 3D to mixed thin/thick surfaces

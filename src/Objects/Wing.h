@@ -43,7 +43,6 @@ class CWing
 	friend class PlaneDlg;
 	friend class ImportWingDlg;
 	friend class WPolarDlg;
-	friend class CtrlPolarDlg;
 	friend class StabPolarDlg;
 	friend class GL3dWingDlg;
 	friend class ManageUFOsDlg;
