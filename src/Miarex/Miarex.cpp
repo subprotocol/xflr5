@@ -8580,7 +8580,7 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	s2 = sigma*sigma;
 	o2 = omega*omega;
 	t=m_ModeTime;
-	if(t>=50.*m_Modedt) StopAnimate();
+	if(t>=1000.*m_Modedt) StopAnimate();
 
 	if(m_bLongitudinal)
 	{
