@@ -738,7 +738,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 	if(m_pStab) m_pStab->m_bWingOut    = false;
 	if(m_pFin)  m_pFin->m_bWingOut     = false;
 
-
 	if(QInf >0.0) 
 	{
 		SetAi(qrhs);
@@ -777,7 +776,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 
 				m_pWingList[i]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
-												   m_pWPolar);
+                                                                   m_pWPolar, m_pWPolar->m_CoG);
 
 				m_pWingList[i]->PanelSetBending(bThinSurf);
 

@@ -537,7 +537,9 @@ void StabAnalysisDlg::ComputeResults()
 			if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
 			AddString(OutString);
 
-			m_pWingList[i]->PanelComputeOnBody(u0, m_AlphaEq, m_Cp+pos, m_Gamma+pos, XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, m_pWPolar);
+                        m_pWingList[i]->PanelComputeOnBody(u0, m_AlphaEq, m_Cp+pos, m_Gamma+pos, XCP, YCP,
+                                                           m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
+                                                           m_pWPolar, m_CoG);
 
 			m_pWingList[i]->PanelSetBending(true);
 
@@ -1566,7 +1568,7 @@ bool StabAnalysisDlg::ControlLoop()
 
 				if(m_bConverged)
 				{
-					//store results
+                                        //store results
 					if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Gamma);
 					else         pMiarex->AddWOpp(m_bPointOut, m_Gamma);
 				}

@@ -625,7 +625,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pPanelDlg->m_pRefWakeNode  = m_RefWakeNode;
 	m_pPanelDlg->m_pRefWakePanel = m_RefWakePanel;
 	m_pPanelDlg->m_aij           = m_aij;
-	m_pPanelDlg->m_aijRef        = m_aijRef;
+        m_pPanelDlg->m_aijRef        = m_aijRef;
 	m_pPanelDlg->m_RHS           = m_RHS;
 	m_pPanelDlg->m_RHSRef        = m_RHSRef;
 	m_pPanelDlg->m_pCoreSize     = &m_CoreSize;
@@ -9000,7 +9000,7 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
 		pCurWPolar->m_AnalysisMethod    = 4; //Stability analysis
-		pCurWPolar->m_bThinSurfaces   = false;
+                pCurWPolar->m_bThinSurfaces   = true;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Height          = 0.0;

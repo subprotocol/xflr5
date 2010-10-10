@@ -2600,8 +2600,8 @@ void CWing::VLMCubicSplines(double *Gamma)
 
 
 void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
-                             double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-							 CWPolar *pWPolar)
+                               double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
+                               CWPolar *pWPolar, CVector CoG)
 {
 	//  Calculates the wing aero coefficients
 	//  Uses Cp distribution in input for thick surfaces
@@ -2676,7 +2676,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_Surface[j].GetLeadingPt(k, PtLEStrip);
 			m_Surface[j].GetC4(k, PtC4Strip, tau);
 
-			LeverArmC4CoG = PtC4Strip - pWPolar->m_CoG;
+                        LeverArmC4CoG = PtC4Strip - CoG;
 
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
@@ -2705,7 +2705,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
 
 				LeverArmPanelC4    = ForcePt - PtC4Strip;                           // m
-				LeverArmPanelCoG   = ForcePt - pWPolar->m_CoG;                      // m
+                                LeverArmPanelCoG   = ForcePt - CoG;                      // m
 
 				Moment0 = LeverArmPanelC4 * PanelForce;                             // N.m/q
 				m_CmAirf[m]  += Moment0.y;                                          // N.m/q

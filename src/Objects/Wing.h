@@ -67,7 +67,7 @@ protected:
 							 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-						 CWPolar *pWPolar);
+                                                 CWPolar *pWPolar, CVector CoG);
 
 	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);

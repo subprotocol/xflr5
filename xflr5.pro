@@ -91,9 +91,9 @@ SOURCES += src/MainFrame.cpp \
     src/Misc/ColorButton.cpp \
     src/Misc/FloatEdit.cpp \
     src/Misc/AboutQ5.cpp \
-	src/Misc/NewNameDlg.cpp \
-	src/Misc/PolarPropsDlg.cpp \
-	src/Graph/QGraph.cpp \
+    src/Misc/NewNameDlg.cpp \
+    src/Misc/PolarPropsDlg.cpp \
+    src/Graph/QGraph.cpp \
     src/Graph/GraphWidget.cpp \
     src/Graph/GraphDlg.cpp \
     src/Graph/Graph.cpp \
@@ -107,7 +107,7 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-	src/Design/AFoilTableDlg.cpp
+    src/Design/AFoilTableDlg.cpp
 
 HEADERS += src/MainFrame.h \
     src/Params.h \
@@ -201,9 +201,9 @@ HEADERS += src/MainFrame.h \
     src/Misc/AboutQ5.h \
     src/Misc/FloatEdit.h \
     src/Misc/ProgressDlg.h \
-	src/Misc/NewNameDlg.h \
-	src/Misc/PolarPropsDlg.h \
-	src/Graph/GraphWidget.h \
+    src/Misc/NewNameDlg.h \
+    src/Misc/PolarPropsDlg.h \
+    src/Graph/GraphWidget.h \
     src/Graph/Graph.h \
     src/Graph/GraphDlg.h \
     src/Graph/Curve.h \

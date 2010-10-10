@@ -63,7 +63,7 @@ extern CFoil* g_pCurFoil;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = "XFLR5 v6 Beta";
+        m_VersionName = "XFLR5 v6.01 Beta";
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
@@ -76,7 +76,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_MomentUnit  = 0;
 	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
-	
 	
 	CreateDockWindows();
 	m_ProjectName = "";
@@ -5580,7 +5579,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				QApplication::restoreOverrideCursor();
 				return false;
 			}
-			if(!pWPolar->m_AnalysisMethod==1 && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
+                        if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
+                        if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
 			pWPolar = pMiarex->AddWPolar(pWPolar);
 		}
