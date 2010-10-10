@@ -30,7 +30,6 @@ SOURCES += src/MainFrame.cpp \
     src/Miarex/GL3dBodyDlg.cpp \
     src/Miarex/ManageBodiesDlg.cpp \
     src/Miarex/W3dPrefsDlg.cpp \
-    src/Miarex/CtrlPolarDlg.cpp \
     src/Miarex/CtrlTableDelegate.cpp \
     src/Miarex/WingScaleDlg.cpp \
     src/Miarex/BodyTransDlg.cpp \
@@ -120,7 +119,6 @@ HEADERS += src/MainFrame.h \
     src/Miarex/W3dPrefsDlg.h \
     src/Miarex/GLCreateLists.h \
     src/Miarex/WingScaleDlg.h \
-    src/Miarex/CtrlPolarDlg.h \
     src/Miarex/CtrlTableDelegate.h \
     src/Miarex/ManageBodiesDlg.h \
     src/Miarex/WPolarDlg.h \
