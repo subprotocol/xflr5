@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	QXDirect Class
-	Copyright (C) 2008-2009 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2008-2010 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -500,6 +500,14 @@ void QXDirect::SetControls()
 	if(m_bPolar) m_pctrlMiddleControls->setCurrentIndex(1);
 	else         m_pctrlMiddleControls->setCurrentIndex(0);
 
+	if(m_pCurPolar)
+	{
+		QString PolarProps;
+		m_pCurPolar->GetPolarProperties(PolarProps);
+		m_pctrlPolarProps->setText(PolarProps);
+	}
+	else m_pctrlPolarProps->clear();
+
 	pMainFrame->m_pctrlOppView->setChecked(!m_bPolar);
 	pMainFrame->m_pctrlPolarView->setChecked(m_bPolar);
 
@@ -540,11 +548,8 @@ void QXDirect::SetControls()
 	m_pctrlAnimate->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlAnimateSpeed->setEnabled(!m_bPolar && m_pCurOpp);
 	m_pctrlHighlightOpp->setEnabled(m_bPolar);
-	pMainFrame->currentFoilMenu->setEnabled(g_pCurFoil);
-//	pMainFrame->CurFoilDesignMenu->setEnabled(g_pCurFoil);
-//	pMainFrame->CurFoilCtxMenu->setEnabled(g_pCurFoil);
 
-//	pMainFrame->CurPolarCtxMenu->setEnabled(m_pCurPolar);
+	pMainFrame->currentFoilMenu->setEnabled(g_pCurFoil);
 	pMainFrame->currentPolarMenu->setEnabled(m_pCurPolar);
 
 	pMainFrame->renameCurFoil->setEnabled(g_pCurFoil);
@@ -579,6 +584,7 @@ void QXDirect::SetControls()
 	pMainFrame->currentOppMenu->setEnabled(m_pCurOpp);
 	pMainFrame->deleteCurOpp->setEnabled(m_pCurOpp);
 	pMainFrame->exportCurOpp->setEnabled(m_pCurOpp);
+
 }
 
 
@@ -5899,7 +5905,6 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 	// and initializes XFoil
 	StopAnimate();
 
-	m_pctrlPolarProps->clear();
 
 	if(!g_pCurFoil|| !g_pCurFoil->m_FoilName.length())
 	{
@@ -5959,12 +5964,6 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 	SetAnalysisParams();
 	SetOpp();
 
-	if(m_pCurPolar)
-	{
-		QString PolarProps;
-		m_pCurPolar->GetPolarProperties(PolarProps);
-		m_pctrlPolarProps->setText(PolarProps);
-	}
 	return m_pCurPolar;
 }
 
@@ -6039,7 +6038,6 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 	}
 
 	SetAnalysisParams();
-
 	SetOpp();
 
 	return m_pCurPolar;

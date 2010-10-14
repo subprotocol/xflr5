@@ -372,6 +372,7 @@ void PanelAnalysisDlg::CreateRHS(double V0, double VDelta, int nval)
 		m_Progress += 10.0/(double)Size;
 		qApp->processEvents();
 	}
+
 }
 
 

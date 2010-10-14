@@ -625,7 +625,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pPanelDlg->m_pRefWakeNode  = m_RefWakeNode;
 	m_pPanelDlg->m_pRefWakePanel = m_RefWakePanel;
 	m_pPanelDlg->m_aij           = m_aij;
-        m_pPanelDlg->m_aijRef        = m_aijRef;
+	m_pPanelDlg->m_aijRef        = m_aijRef;
 	m_pPanelDlg->m_RHS           = m_RHS;
 	m_pPanelDlg->m_RHSRef        = m_RHSRef;
 	m_pPanelDlg->m_pCoreSize     = &m_CoreSize;
@@ -1694,10 +1694,10 @@ void QMiarex::SetControls()
 		if(m_iStabilityView == 3) m_pctrBottomControls->setCurrentIndex(1);
 		else                      m_pctrBottomControls->setCurrentIndex(0);
 	}
-	else						m_pctrBottomControls->setCurrentIndex(0);
+	else                          m_pctrBottomControls->setCurrentIndex(0);
 
 	if(m_iView==WPOLARVIEW)     m_pctrlMiddleControls->setCurrentIndex(1);
-	else if(m_iView==WCPVIEW)        m_pctrlMiddleControls->setCurrentIndex(2);
+	else if(m_iView==WCPVIEW)   m_pctrlMiddleControls->setCurrentIndex(2);
 	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(3);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
@@ -1705,13 +1705,20 @@ void QMiarex::SetControls()
 	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
 
+	if(m_pCurWPolar) pMainFrame->StabilityAct->setEnabled(true);
+	else             pMainFrame->StabilityAct->setEnabled(false);
+
 	if(m_pCurWPolar)
 	{
-		pMainFrame->StabilityAct->setEnabled(true);
+		QString PolarProps;
+		m_pCurWPolar->GetPolarProperties(PolarProps);
+		m_pctrlPolarProps->setText(PolarProps);
+		m_pctrlPolarProps1->setText(PolarProps);
 	}
 	else
 	{
-		pMainFrame->StabilityAct->setEnabled(false);
+		m_pctrlPolarProps->clear();
+		m_pctrlPolarProps1->clear();
 	}
 
 	m_pctrlInitLLTCalc->setEnabled(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==LLTMETHOD);
@@ -1780,11 +1787,11 @@ void QMiarex::SetControls()
 	pMainFrame->showEllipticCurve->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->showXCmRefLocation->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->showWing2Curve->setEnabled(m_pCurWing2 && (m_iView==WOPPVIEW || m_iView==WCPVIEW));
-	pMainFrame->showStabCurve->setEnabled(m_pCurStab && (m_iView==WOPPVIEW || m_iView==WCPVIEW));
-	pMainFrame->showFinCurve->setEnabled(m_pCurFin&& (m_iView==WOPPVIEW || m_iView==WCPVIEW));
+	pMainFrame->showStabCurve->setEnabled( m_pCurStab  && (m_iView==WOPPVIEW || m_iView==WCPVIEW));
+	pMainFrame->showFinCurve->setEnabled(  m_pCurFin   && (m_iView==WOPPVIEW || m_iView==WCPVIEW));
 	pMainFrame->showAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->hideAllWPlrOpps->setEnabled(m_iView==WOPPVIEW);
-	pMainFrame->WOppGraphMenu->setEnabled(m_iView==WOPPVIEW || m_iView==WSTABVIEW);
+	pMainFrame->WOppGraphMenu->setEnabled(   m_iView==WOPPVIEW || m_iView==WSTABVIEW);
 	pMainFrame->WOppCurGraphMenu->setEnabled(m_iView==WOPPVIEW || m_iView==WCPVIEW || m_iView==WSTABVIEW);
 
 	m_pctrlLift->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
@@ -1806,7 +1813,6 @@ void QMiarex::SetControls()
 	pMainFrame->exportBodyDef->setEnabled(m_pCurBody);
 	pMainFrame->exportBodyGeom->setEnabled(m_pCurBody);
 
-//	pMainFrame->defineCtrlPolar->setEnabled(m_pCurWing);
 	pMainFrame->defineWPolar->setEnabled(m_pCurWing);
 	pMainFrame->defineStabPolar->setEnabled(m_pCurWing);
 
@@ -1820,6 +1826,8 @@ void QMiarex::SetControls()
 
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
+
+	SetCurveParams();
 }
 
 
@@ -2204,6 +2212,7 @@ int QMiarex::CreateBodyElements()
 	m_pCurBody->m_NElements = m_MatSize-InitialSize;
 	return m_pCurBody->m_NElements;
 }
+
 
 void QMiarex::CreateCpCurves()
 {
@@ -9000,7 +9009,7 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
 		pCurWPolar->m_AnalysisMethod    = 4; //Stability analysis
-                pCurWPolar->m_bThinSurfaces   = true;
+		pCurWPolar->m_bThinSurfaces   = false;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Height          = 0.0;
@@ -15020,11 +15029,11 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	int i,j,k,m, NStation;
 	double SpanPos;
 
-	m_pctrlPolarProps->setText("");
 
 	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 	else return;
+	
 
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	if(bCurrent) pWPolar = m_pCurWPolar;
@@ -15191,20 +15200,13 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 			m_pCurWing->m_bLLT      = true;
 		}
 
-		SetAnalysisParams();
 		pMainFrame->UpdateWOpps();
 
 		double Alpha = 0.0;
 		if(m_pCurWOpp) Alpha = m_pCurWOpp->m_Alpha;
 
-		if(m_pCurPlane)
-		{
-			SetPOpp(false, Alpha);
-		}
-		else if(m_pCurWing)
-		{
-			SetWOpp(false, Alpha);
-		}
+		if(m_pCurPlane)     SetPOpp(false, Alpha);
+		else if(m_pCurWing) SetWOpp(false, Alpha);
 
 /*		if (m_pCurPOpp){
 			// try to set the same as the existing WOpp... Special for Marc
@@ -15238,13 +15240,6 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
 	else if(m_iView==WCPVIEW)	CreateCpCurves();
 
-	if(m_pCurWPolar)
-	{
-		QString PolarProps;
-		m_pCurWPolar->GetPolarProperties(PolarProps);
-		m_pctrlPolarProps->setText(PolarProps);
-		m_pctrlPolarProps1->setText(PolarProps);
-	}
 
 	SetAnalysisParams();
 	SetCurveParams();

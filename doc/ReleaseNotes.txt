@@ -15,10 +15,10 @@
 *******************************************************************************
 
 
-xflr5 v6.01 Beta October xxxth, 2010
-	- Corrected the incorrect balance speed in 3D type 2 polars
-        - Corrected the final moment calculation in stab analysis
-        - Corrected the incorrect lift calculation in stab analysis
+xflr5 v6.01 Beta October 14th, 2010
+	- Corrected the incorrect balance speed in 3D type 2 polars for planes
+	- Corrected the final moment calculation in stability analysis
+	- Corrected the incorrect lift calculation in stability analysis
 
 
 xflr5 v6.00 Beta September 19th, 2010

@@ -44,7 +44,6 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List)
 	{
 		pMiarex->m_GLList++;
 		glLineWidth(1.0);
-
 		color = pWing->m_WingColor;
 		style = 0;
 		width = 0;
@@ -2455,7 +2454,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		if(c.imag()>=0.0) strange = QString("Eigenvalue     = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+		if(c.imag()>=0.0) strange = QString("Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 		else              strange = QString("Eigenvalue     = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
