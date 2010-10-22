@@ -1,7 +1,7 @@
 # This is a spec file for the installation of XFLR5 v6
 %define name xflr5
 %define release 1
-%define version 6.00
+%define version 6.01
 
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
@@ -88,6 +88,10 @@ echo %{_bindir}/%{name}
 
 
 %changelog
+*Thu Oct 14 2010 A. Deperrois
+XFLR5v6.01 beta rpm release
+Corrected some important bugs - see Release notes for details
+
 *Sat Sep 19 2010 A. Deperrois
 XFLR5v6.00 beta rpm release
 

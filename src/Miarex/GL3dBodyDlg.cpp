@@ -195,9 +195,19 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pctrlBodyStyle,  SIGNAL(clicked()), this, SLOT(OnBodyStyle()));
 
 	connect(m_pctrlBodyName,   SIGNAL(editingFinished()), this, SLOT(OnBodyName()));
-
+	connect(m_pctrlNHoopPanels,SIGNAL(editingFinished()), this, SLOT(OnNURBSPanels()));
+	connect(m_pctrlNXPanels,   SIGNAL(editingFinished()), this, SLOT(OnNURBSPanels()));
 	connect(m_pctrlXDegree,    SIGNAL(activated(int)), this, SLOT(OnSelChangeXDegree(int)));
-	connect(m_pctrlHoopDegree,    SIGNAL(activated(int)), this, SLOT(OnSelChangeHoopDegree(int)));
+	connect(m_pctrlHoopDegree, SIGNAL(activated(int)), this, SLOT(OnSelChangeHoopDegree(int)));
+
+	connect(m_pctrlUndo, SIGNAL(clicked()),this, SLOT(OnUndo()));
+	connect(m_pctrlRedo, SIGNAL(clicked()),this, SLOT(OnRedo()));
+	connect(m_pFrameDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnFrameCellChanged(QWidget *)));
+	connect(m_pPointDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnPointCellChanged(QWidget *)));
+	connect(m_pctrlOK, SIGNAL(clicked()),this, SLOT(OnOK()));
+	connect(m_pctrlCancel, SIGNAL(clicked()),this, SLOT(reject()));
+
+
 	setMouseTracking(true);
 }
 
@@ -226,7 +236,7 @@ void GL3dBodyDlg::ClientToGL(QPoint const &point, CVector &real)
 void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 {
 	MainFrame *pMainFrame = (MainFrame*)(s_pMainFrame);
-	QString strong;
+
 	QModelIndex ind;
 
 	switch (iSubItem)
@@ -717,7 +727,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 	int i,j,k,l;
 	int p, style, width, nx, nh;
 	double uk, v, dj, dj1, dl1;
-	CVector Point, N, LATB, TALB, LA, LB, TA, TB;
+	CVector N, LATB, TALB, LA, LB, TA, TB;
 	CVector PLA, PLB, PTA, PTB;
 	QColor color;
 
@@ -3732,10 +3742,10 @@ void GL3dBodyDlg::OnFrameCellChanged(QWidget *pWidget)
 	m_bChanged = true;
 	int n = m_pBody->m_iActiveFrame;
 	ReadFrameSectionData(m_pBody->m_iActiveFrame);
-
 	m_pBody->UpdateFramePos(n);
 	m_bResetglBody   = true;
 	m_bResetglBody2D = true;
+	m_bResetglBodyMesh = true;
 	UpdateView();
 }
 
@@ -3918,6 +3928,7 @@ void GL3dBodyDlg::OnPointCellChanged(QWidget *pWidget)
 	m_bResetglBodyPoints = true;
 	m_bResetglBody       = true;
 	m_bResetglBody2D     = true;
+	m_bResetglBodyMesh   = true;
 	UpdateView();
 }
 
@@ -4095,6 +4106,23 @@ void GL3dBodyDlg::OnSelChangeHoopDegree(int sel)
 	UpdateView();
 }
 
+void GL3dBodyDlg::OnNURBSPanels()
+{
+	if(!m_pBody) return;
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	pMainFrame->SetSaveState(false);
+
+	TakePicture();
+	StorePicture();
+
+	m_pBody->m_nhPanels = m_pctrlNHoopPanels->GetValue();
+	m_pBody->m_nxPanels = m_pctrlNXPanels->GetValue();
+//	m_pBody->SetKnots();
+	m_bResetglBody   = true;
+	m_bResetglBody2D = true;
+	UpdateView();
+}
 /*
 void GL3dBodyDlg::OnSetupLight()
 {
@@ -4750,8 +4778,6 @@ void GL3dBodyDlg::SetupLayout()
 	ActionButtons->addWidget(m_pctrlUndo);
 	ActionButtons->addWidget(m_pctrlRedo);
 	ActionButtons->addWidget(m_pctrlMenuButton);
-	connect(m_pctrlUndo, SIGNAL(clicked()),this, SLOT(OnUndo()));
-	connect(m_pctrlRedo, SIGNAL(clicked()),this, SLOT(OnRedo()));
 
 
 
@@ -4762,8 +4788,6 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlCancel->setAutoDefault(false);
 	CommandButtons->addWidget(m_pctrlOK);
 	CommandButtons->addWidget(m_pctrlCancel);
-	connect(m_pctrlOK, SIGNAL(clicked()),this, SLOT(OnOK()));
-	connect(m_pctrlCancel, SIGNAL(clicked()),this, SLOT(reject()));
 
 
 	QVBoxLayout *ControlsLayout = new QVBoxLayout;
@@ -4901,12 +4925,8 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlFrameTable->setModel(m_pFrameModel);
 	QItemSelectionModel *selectionModelFrame = new QItemSelectionModel(m_pFrameModel);
 	m_pctrlFrameTable->setSelectionModel(selectionModelFrame);
-	connect(selectionModelFrame, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnFrameItemClicked(QModelIndex)));
 	m_pFrameDelegate = new BodyTableDelegate;
 	m_pctrlFrameTable->setItemDelegate(m_pFrameDelegate);
-	connect(m_pFrameDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnFrameCellChanged(QWidget *)));
-//	connect(m_pctrlFrameTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
-//	connect(m_pctrlFrameTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnFrameItemClicked(const QModelIndex&)));
 
 	m_pPointModel = new QStandardItemModel;
 	m_pPointModel->setRowCount(10);//temporary
@@ -4914,12 +4934,11 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlPointTable->setModel(m_pPointModel);
 	QItemSelectionModel *selectionModelPoint = new QItemSelectionModel(m_pPointModel);
 	m_pctrlPointTable->setSelectionModel(selectionModelPoint);
-	connect(selectionModelPoint, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnPointItemClicked(QModelIndex)));
 	m_pPointDelegate = new BodyTableDelegate;
 	m_pctrlPointTable->setItemDelegate(m_pPointDelegate);
-	connect(m_pPointDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnPointCellChanged(QWidget *)));
-//	connect(m_pctrlPointTable, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
-//	connect(m_pctrlPointTable, SIGNAL(pressed(const QModelIndex &)), this, SLOT(OnPointItemClicked(const QModelIndex&)));
+
+	connect(selectionModelPoint, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnPointItemClicked(QModelIndex)));
+	connect(selectionModelFrame, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnFrameItemClicked(QModelIndex)));
 
 	m_Precision[0] = 3;//five digits for x and y coordinates
 	m_Precision[1] = 3;

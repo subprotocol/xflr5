@@ -420,18 +420,18 @@ void PanelAnalysisDlg::CreateWakeContribution()
 			//each wake column has m_NXWakePanels
 			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
 			{
-				GetDoubletInfluence(C,  m_pWakePanel+pw, V, phi, true, true);
+				GetDoubletInfluence(C, m_pWakePanel+pw, V, phi, true, true);
 				PHC[kw] += phi;
 				VHC[kw] += V;
 
 				if(m_b3DSymetric && !m_pWakePanel[pw].m_bIsInSymPlane) // add right wing contribution
 				{
 					GetDoubletInfluence(CC,  m_pWakePanel+pw, VS, phiSym, true,true);
-
 					PHC[kw]    +=  phiSym;
 					VHC[kw].x  +=  VS.x;
 					VHC[kw].y  -=  VS.y;
 					VHC[kw].z  +=  VS.z;
+
 				}
 				pw++;
 			}
@@ -2281,12 +2281,15 @@ bool PanelAnalysisDlg::SolveMultiple(double V0, double VDelta, int nval)
 	}
 	else m_bConverged = true;
 
+
 	AddString("      Solving LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cosRHS, index, m_RHS,      Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_sinRHS, index, m_RHS+Size, Size, &m_bCancel);
 
+
 	memcpy(m_cosRHS, m_RHS,      Size * sizeof(double));
 	memcpy(m_sinRHS, m_RHS+Size, Size * sizeof(double));
+
 
 	AddString("      Constructing results...\n");
 
@@ -2347,7 +2350,7 @@ bool PanelAnalysisDlg::SolveMultiple(double V0, double VDelta, int nval)
 			m_Sigma[o+nel]    = SigmaRef[o+p];
 		}
 	}
-
+//for(p=0; p<m_MatSize; p++) qDebug("%17.7f", m_Mu[p]);
 	return true;
 }
 

@@ -79,6 +79,7 @@ private slots:
 	void OnOutline();
 	void OnPanels();
 	void OnLineType();
+	void OnNURBSPanels();
 	void OnInsert();
 	void OnResetScales();
 	void OnShowCurFrameOnly();
