@@ -222,7 +222,7 @@ unix {
     
     # MAKE INSTALL
     INSTALLS += target
-#    target.path = $$BINDIR
+    target.path = $$BINDIR
 }
 mac { 
     TARGET = XFLR5
