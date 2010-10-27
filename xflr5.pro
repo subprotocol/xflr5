@@ -234,6 +234,8 @@ unix {
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
     
+    target.path = $$BINDIR
+
     # MAKE INSTALL
     INSTALLS += target
 }

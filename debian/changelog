@@ -1,7 +1,11 @@
 xflr5 (6.01-1-ubuntu1) maverick; urgency=low
 
-  * Fixed debian files
   * First release for Ubuntu 10.10
+  * Fixed debian files. Somebody had magically renamed them to .txt files! 
+    Renamed all the files in debian folder and fixed errors in them.
+  * Fixed xflr5.pro. Install target was missing and the package was not installable. 
+  * Package now builds and installs on Ubuntu 10.10
+  * Verified that binary can be found from /usr/bin after installation.
 
  -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Tue, 26 Oct 2010 17:22:39 +0300
 
