@@ -5384,7 +5384,6 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 	QRect Rect2(2*w3, 0, w-2*w3,h);
 	painter.fillRect(Rect2, pMainFrame->m_BackgroundColor);
 
-	PaintPolarLegend(m_PolarLegendOffset, h, painter);
 	switch (m_iPlrGraph)
 	{
 		case 1:
@@ -5415,6 +5414,7 @@ void QXDirect::PaintSingleGraph(QPainter &painter)
 	}
 
 	if (m_pCurGraph) m_pCurGraph->DrawGraph(Rect1, painter);
+	PaintPolarLegend(m_PolarLegendOffset, h, painter);
 }
 
 

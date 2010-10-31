@@ -82,7 +82,6 @@ class MainFrame : public QMainWindow
 	friend class ManageFoilsDlg;
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;
-	friend class ManualInertiaDlg;
 
 	Q_OBJECT
 
@@ -371,11 +370,12 @@ private:
 	bool m_bSaveOpps;
 	bool m_bSaveWOpps;
 	bool m_bSaveSettings;
-        bool m_bReverseZoom;                    // true if the rolling forward zooms in
+	bool m_bReverseZoom;                    // true if the rolling forward zooms in
 
 
 	QString m_ProjectName, m_FileName, m_LanguageFilePath;
 	QString m_LastDirName, m_ExportLastDirName, m_ImageDirName;
+	QString m_UFOType;
 	QColor m_crColors[30];
 
 	QGraph m_RefGraph;//Reference setttings

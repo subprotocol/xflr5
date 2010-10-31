@@ -1350,43 +1350,27 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ReadCString(ar, m_PlrName);
 		ar>> f;
 		m_WArea = f;
-		if (m_WArea<0){
-			m_PlrName ="";
-			return false;
-		}
+		if (m_WArea<0) return false;
 
 		ar>> f;
 		m_WMAChord = f;
-		if (m_WMAChord<0){
-			m_PlrName ="";
-			return false;
-		}
+		if (m_WMAChord<0) return false;
 
 		ar>> f;
 		m_WSpan = f;
-		if (m_WSpan<0){
-			m_PlrName ="";
-			return false;
-		}
+		if (m_WSpan<0) return false;
+
 		ar >> m_Style  >> m_Width;
-		if (m_Style<0 || m_Style> 10){
-			m_PlrName ="";
-			return false;
-		}
-		if (m_Width<0 || m_Width> 10){
-			m_PlrName ="";
-			return false;
-		}
+		if (m_Style<0 || m_Style> 10) return false;
+
+		if (m_Width<0 || m_Width> 10) return false;
+
 		ReadCOLORREF(ar, m_Color);
 
 		ar >> m_AnalysisMethod;
-		if (m_AnalysisMethod<0 || m_AnalysisMethod>10)
-		{
-			m_PlrName ="";
-			return false;
-		}
+		if (m_AnalysisMethod<0 || m_AnalysisMethod>10) return false;
 
-		if(m_AnalysisMethod==0 || m_AnalysisMethod==VLMMETHOD)
+		if(m_AnalysisMethod==0 || m_AnalysisMethod==2)
 		{
 			m_AnalysisMethod=PANELMETHOD;
 			m_bThinSurfaces = true;
@@ -1395,60 +1379,42 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1005)
 		{
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bVLM1 =true; else m_bVLM1 = false;
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bThinSurfaces =true; else m_bThinSurfaces = false;
 		}
 		if(ArchiveFormat>=1008)
 		{
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bTiltedGeom =true; else m_bTiltedGeom = false;
 		}
 
 		if(ArchiveFormat>=1006)
 		{
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bWakeRollUp =true; else m_bWakeRollUp = false;
 		}
 		if(ArchiveFormat>=1009)
 		{
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
 
 		if(ArchiveFormat>=1010)
 		{
 			ar >> n;
-			if (n!=0 && n!=1)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (n!=0 && n!=1) return false;
+
 			if(n) m_bGround =true; else m_bGround = false;
 			ar >> f; m_Height = f;
 		}
@@ -1456,11 +1422,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1007)
 		{
 			ar >> m_NXWakePanels;
-			if (m_NXWakePanels<0 || m_NXWakePanels>1000)
-			{
-				m_PlrName ="";
-				return false;
-			}
+			if (m_NXWakePanels<0 || m_NXWakePanels>1000) return false;
 		}
 		if(ArchiveFormat>=1011)
 		{
@@ -1469,28 +1431,18 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 
 		ar >> n;
-		if (n!=0 && n!=1)
-		{
-			m_PlrName ="";
-			return false;
-		}
+		if (n!=0 && n!=1) return false;
 		else {
 			if(n) m_bIsVisible =true; else m_bIsVisible = false;
 		}
 		ar >> n;
-		if (n!=0 && n!=1){
-			m_PlrName ="";
-			return false;
-		}
+		if (n!=0 && n!=1) return false;
 		else {
 			if(n) m_bShowPoints =true; else m_bShowPoints = false;
 		}
 
 		ar >> n;
-		if (n<1 || n>10){
-			m_PlrName ="";
-			return false;
-		}
+		if (n<1 || n>10) return false;
 		m_Type = n;
 
 		ar >> f;	m_QInf = f;
@@ -1515,11 +1467,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		else                    m_RefAreaType = 1;
 
 		ar >> n;
-		if (n<0 || n> 100000)
-		{
-			m_PlrName ="";
-			return false;
-		}
+		if (n<0 || n> 100000) return false;
+
 		if(ArchiveFormat<1010)
 		{
 			m_WArea    /=100.0;
@@ -1631,10 +1580,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(i=0; i<m_nControls; i++)
 			{
 				ar >> n;
-				if (n!=0 && n!=1){
-					m_PlrName ="";
-					return false;
-				}
+				if (n!=0 && n!=1) return false;
 				else {
 					if(n) m_bActiveControl[i] =true; else m_bActiveControl[i] = false;
 				}
@@ -1677,6 +1623,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	return true;
 }
 
+
 void CWPolar::GetPolarProperties(QString &PolarProperties)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1685,9 +1632,9 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	GetWeightUnit(massunit, pMainFrame->m_WeightUnit);
 	GetSpeedUnit(speedunit, pMainFrame->m_SpeedUnit);
 
-	PolarProperties.clear();
+	QString inertiaunit = massunit+"."+lenunit+QString::fromUtf8("²");
 
-//	PolarProperties += QObject::tr("Parent object") +" = "+ m_UFOName+"\n";
+	PolarProperties.clear();
 
 	strong = QString(QObject::tr("Type")+" = %1").arg(m_Type);
 	if(m_Type==1)      strong += " ("+QObject::tr("Fixed speed") +")\n";
@@ -1707,7 +1654,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
-	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'g',4);
+	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
 	PolarProperties += strong + massunit + "\n";
 
 	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,10,'g',4);
@@ -1716,16 +1663,25 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
+	strong  = QString("Ixx = %1 ").arg(m_CoGIxx*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+	PolarProperties += strong + inertiaunit + "\n";
+	strong  = QString("Iyy = %1 ").arg(m_CoGIyy*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+	PolarProperties += strong + inertiaunit + "\n";
+	strong  = QString("Izz = %1 ").arg(m_CoGIzz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+	PolarProperties += strong + inertiaunit + "\n";
+	strong  = QString("Ixz = %1 ").arg(m_CoGIxz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+	PolarProperties += strong + inertiaunit + "\n";
+
 	strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
 	PolarProperties += strong +QString::fromUtf8("°")+"\n";
 
 	PolarProperties += QObject::tr("Analysis method")+" = ";
-	if(m_AnalysisMethod==1) PolarProperties +="LLT\n";
+	if(m_AnalysisMethod==1)                  PolarProperties +="LLT\n";
 	else if(m_AnalysisMethod==2 && m_bVLM1)  PolarProperties +="VLM1\n";
 	else if(m_AnalysisMethod==2 && !m_bVLM1) PolarProperties +="VLM2\n";
-	else if(m_AnalysisMethod==3) PolarProperties +="3D-Panels\n";
-	else if(m_AnalysisMethod==4) PolarProperties +="VLM1\n";
-	else                                    PolarProperties +="\n";
+	else if(m_AnalysisMethod==3)             PolarProperties +="3D-Panels\n";
+	else if(m_AnalysisMethod==4)             PolarProperties +="VLM1\n";
+	else                                     PolarProperties +="\n";
 
 	PolarProperties += QObject::tr("Analysis type")+" = ";
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";

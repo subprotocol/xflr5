@@ -270,13 +270,14 @@ void ManageFoilsDlg::OnExport()
 	if(!m_pFoil)	return;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
+	QString FileName;
 
 	FileName = m_pFoil->m_FoilName;
 	FileName.replace("/", " ");
 
-	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"), pMainFrame->m_LastDirName, tr("Foil File (*.dat)"));
+	FileName = QFileDialog::getSaveFileName(this, tr("Export Foil"),
+											pMainFrame->m_LastDirName+"/"+FileName+".dat",
+											tr("Foil File (*.dat)"));
 
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");

@@ -60,14 +60,13 @@ private slots:
 	void OnViscous();
 	void OnUnit();
 	void OnCellChanged(QWidget *pWidget);
-	void OnAutoInertia();
-	void OnDefineInertia();
 
 private:
 	void resizeEvent(QResizeEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void ReadCtrlData();
 	void FillControlList();
+	void FillUFOInertia();
 	void ReadParams();
 	void SetDensity();
 	void SetWPolarName();
@@ -84,8 +83,6 @@ private:
 
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlAutoName;
-	QCheckBox *m_pctrlAutoInertia;
-	QPushButton *m_pctrlDefineInertia;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
@@ -94,17 +91,19 @@ private:
 
 	QLabel *m_pctrlRho, *m_pctrlNu;
 	QLabel *m_pctrlDensityUnit, *m_pctrlViscosityUnit;
+	QLabel *m_pctrlLab299,*m_pctrlLab300,*m_pctrlLab301,*m_pctrlLab302,*m_pctrlLab303,*m_pctrlLab304,*m_pctrlLab305;
 
+	FloatEdit *m_pctrlMass, *m_pctrlCoGx,*m_pctrlCoGz, *m_pctrlIxx, *m_pctrlIyy, *m_pctrlIzz, *m_pctrlIxz;
 
 	QPushButton *OKButton, *CancelButton;
 
-	void *m_pMainFrame;
-	void *m_pMiarex;
+	static void *s_pMainFrame;
 
 	QList <void*> *m_poaXPolar;
 
 	QString m_WPolarName, m_UFOName;
 	bool m_bAutoName;
+	bool m_bThinSurfaces;
 
 	double m_Density, m_Viscosity;
 	double m_SideSlip, m_BankAngle;

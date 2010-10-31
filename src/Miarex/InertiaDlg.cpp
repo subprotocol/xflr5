@@ -29,9 +29,9 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QHeaderView>
 #include <QTextStream>
 #include <QFileDialog>
-#include <QtDebug>
 
 
 
@@ -47,7 +47,7 @@ InertiaDlg::InertiaDlg()
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_NMass = 3;
 
-	m_Mass = 1.0;
+	m_VolumeMass = 0.0;
 
 	memset(m_MassValue,    0, sizeof(m_MassValue));
 	memset(m_MassPosition, 0, sizeof(m_MassPosition));
@@ -82,15 +82,17 @@ void InertiaDlg::ComputeInertia()
 
 	if(m_pWing)
 	{
-		m_pWing->ComputeVolumeInertia(m_Mass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
+		m_pWing->m_VolumeMass = m_VolumeMass;
+		m_pWing->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 	else if(m_pBody)
 	{
-		m_pBody->ComputeBodyInertia(m_Mass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
+		m_pBody->m_VolumeMass = m_VolumeMass;
+		m_pBody->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 	else if(m_pPlane)
 	{
-		m_pPlane->ComputeVolumeInertia(m_Mass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
+		m_pPlane->ComputeVolumeInertia(m_VolumeMass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 
 	//and display the results
@@ -109,8 +111,8 @@ void InertiaDlg::ComputeInertia()
 	//_______________________________________________
 	//Total masses = volume + point masses of all elements part of the object
 	
-	TotalCoG.Set(m_Mass*m_VolumeCoG.x, m_Mass*m_VolumeCoG.y, m_Mass*m_VolumeCoG.z);
-	TotalMass = m_Mass;
+	TotalCoG.Set(m_VolumeMass*m_VolumeCoG.x, m_VolumeMass*m_VolumeCoG.y, m_VolumeMass*m_VolumeCoG.z);
+	TotalMass = m_VolumeMass;
 	TotalIxx = TotalIyy = TotalIzz = TotalIxz = 0.0;
 //
 	for(i=0; i<m_NMass; i++)
@@ -161,13 +163,13 @@ void InertiaDlg::ComputeInertia()
 	TotalCoG *= 1.0/TotalMass;
 
 	//total inertia in CoG referential
-	TotalIxx = m_CoGIxx + m_Mass * ((m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
-								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
-	TotalIyy = m_CoGIyy + m_Mass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
-								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
-	TotalIzz = m_CoGIzz + m_Mass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
-								   +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
-	TotalIxz = m_CoGIxz - m_Mass *  (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
+	TotalIxx = m_CoGIxx + m_VolumeMass * ((m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
+										 +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
+	TotalIyy = m_CoGIyy + m_VolumeMass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
+										 +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
+	TotalIzz = m_CoGIzz + m_VolumeMass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
+										 +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
+	TotalIxz = m_CoGIxz - m_VolumeMass *  (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
 
 	for(i=0; i<m_NMass; i++)
 	{
@@ -331,11 +333,11 @@ void InertiaDlg::InitDialog()
 	m_pMassModel->setHeaderData(4, Qt::Horizontal, tr("Description"));
 
 	m_pctrlMassView->setModel(m_pMassModel);
-	m_pctrlMassView->setColumnWidth(0,90);
-	m_pctrlMassView->setColumnWidth(1,70);
-	m_pctrlMassView->setColumnWidth(2,70);
-	m_pctrlMassView->setColumnWidth(3,70);
-	m_pctrlMassView->setColumnWidth(4,150);
+	m_pctrlMassView->setColumnWidth(0,70);
+	m_pctrlMassView->setColumnWidth(1,55);
+	m_pctrlMassView->setColumnWidth(2,55);
+	m_pctrlMassView->setColumnWidth(3,55);
+	m_pctrlMassView->setColumnWidth(4,70);
 
 	m_pFloatDelegate = new FloatEditDelegate;
 	m_pctrlMassView->setItemDelegate(m_pFloatDelegate);
@@ -361,7 +363,7 @@ void InertiaDlg::InitDialog()
 
 	if(m_pWing)
 	{
-		m_Mass = m_pWing->m_Mass;
+		m_VolumeMass = m_pWing->m_VolumeMass;
 		m_NMass = m_pWing->m_NMass;
 		for(int i=0; i<m_pWing->m_NMass; i++)
 		{
@@ -369,12 +371,12 @@ void InertiaDlg::InitDialog()
 			m_MassPosition[i].Copy(m_pWing->m_MassPosition[i]);
 			m_MassTag[i]   = m_pWing->m_MassTag[i];
 		}
-		m_pctrlVolumeMass->SetValue(m_pWing->m_Mass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
+		m_pctrlVolumeMass->SetValue(m_pWing->m_VolumeMass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
 		m_pctrlVolumeMassLabel->setText(tr("Wing Mass:"));
 	}
 	else if (m_pBody)
 	{
-		m_Mass = m_pBody->m_Mass;
+		m_VolumeMass = m_pBody->m_VolumeMass;
 		m_NMass = m_pBody->m_NMass;
 		for(int i=0; i<m_pBody->m_NMass; i++)
 		{
@@ -382,16 +384,16 @@ void InertiaDlg::InitDialog()
 			m_MassPosition[i].Copy(m_pBody->m_MassPosition[i]);
 			m_MassTag[i]   = m_pBody->m_MassTag[i];
 		}
-		m_pctrlVolumeMass->SetValue(m_pBody->m_Mass * pMainFrame->m_kgtoUnit);
+		m_pctrlVolumeMass->SetValue(m_pBody->m_VolumeMass * pMainFrame->m_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Body Mass:"));
 	}
 	else if (m_pPlane)
 	{
-		m_Mass = m_pPlane->m_Wing.m_Mass;
-		if(m_pPlane->m_bBiplane) m_Mass += m_pPlane->m_Wing2.m_Mass;
-		if(m_pPlane->m_bStab)    m_Mass += m_pPlane->m_Stab.m_Mass;
-		if(m_pPlane->m_bFin)     m_Mass += m_pPlane->m_Fin.m_Mass;
-		if(m_pPlane->m_bBody && m_pPlane->m_pBody) m_Mass += m_pPlane->m_pBody->m_Mass;
+		m_VolumeMass = m_pPlane->m_Wing.m_VolumeMass;
+		if(m_pPlane->m_bBiplane) m_VolumeMass += m_pPlane->m_Wing2.m_VolumeMass;
+		if(m_pPlane->m_bStab)    m_VolumeMass += m_pPlane->m_Stab.m_VolumeMass;
+		if(m_pPlane->m_bFin)     m_VolumeMass += m_pPlane->m_Fin.m_VolumeMass;
+		if(m_pPlane->m_bBody && m_pPlane->m_pBody) m_VolumeMass += m_pPlane->m_pBody->m_VolumeMass;
 
 		m_NMass = m_pPlane->m_NMass;
 		for(int i=0; i<m_pPlane->m_NMass; i++)
@@ -401,7 +403,7 @@ void InertiaDlg::InitDialog()
 			m_MassTag[i]   = m_pPlane->m_MassTag[i];
 		}
 
-		m_pctrlVolumeMass->SetValue(m_Mass * pMainFrame->m_kgtoUnit);
+		m_pctrlVolumeMass->SetValue(m_VolumeMass * pMainFrame->m_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Volume Mass:"));
 		m_pctrlVolumeMass->setEnabled(false);
 	}
@@ -517,7 +519,7 @@ void InertiaDlg::OnExportToAVL()
 		// by applying Huyghen/Steiner's theorem
 
 		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10! Inertia of both left and right wings"))
-						.arg(m_Mass /Munit,  10, 'g', 3)
+						.arg(m_VolumeMass /Munit, 10, 'g', 3)
 						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 3)  //should be zero
 						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 3)
@@ -530,7 +532,7 @@ void InertiaDlg::OnExportToAVL()
 	else if (m_pBody)
 	{
 		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body inertia"))
-						.arg(m_Mass /Munit, 10, 'g', 3)
+						.arg(m_VolumeMass /Munit, 10, 'g', 3)
 						.arg(m_VolumeCoG.x/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.y/Lunit, 10, 'g', 3)
 						.arg(m_VolumeCoG.z/Lunit, 10, 'g', 3)
@@ -546,9 +548,9 @@ void InertiaDlg::OnExportToAVL()
 	{
 		// we write out each object contribution individually
 		// a plane has always a wing
-		m_pPlane->m_Wing.ComputeVolumeInertia(m_pPlane->m_Wing.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
+		m_pPlane->m_Wing.ComputeVolumeInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 		strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Main wing's inertia"))
-						.arg(m_pPlane->m_Wing.m_Mass /Munit, 10, 'g', 3)
+						.arg(m_pPlane->m_Wing.m_VolumeMass /Munit, 10, 'g', 3)
 						.arg(CoG.x/Lunit, 10, 'g', 3)
 						.arg(CoG.y/Lunit, 10, 'g', 3)
 						.arg(CoG.z/Lunit, 10, 'g', 3)
@@ -562,9 +564,9 @@ void InertiaDlg::OnExportToAVL()
 
 		if(m_pPlane->m_bBiplane)
 		{
-			m_pPlane->m_Wing2.ComputeVolumeInertia(m_pPlane->m_Wing2.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
+			m_pPlane->m_Wing2.ComputeVolumeInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Second wing's inertia"))
-						 .arg(m_pPlane->m_Wing2.m_Mass /Munit, 10, 'g', 3)
+						 .arg(m_pPlane->m_Wing2.m_VolumeMass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
@@ -578,9 +580,9 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bStab)
 		{
-			m_pPlane->m_Stab.ComputeVolumeInertia(m_pPlane->m_Stab.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
+			m_pPlane->m_Stab.ComputeVolumeInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Elevator's inertia"))
-						 .arg(m_pPlane->m_Stab.m_Mass /Munit, 10, 'g', 3)
+						 .arg(m_pPlane->m_Stab.m_VolumeMass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
@@ -594,9 +596,9 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bFin)
 		{
-			m_pPlane->m_Fin.ComputeVolumeInertia(m_pPlane->m_Fin.m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
+			m_pPlane->m_Fin.ComputeVolumeInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Fin's inertia"))
-						 .arg(m_pPlane->m_Fin.m_Mass /Munit, 10, 'g', 3)
+						 .arg(m_pPlane->m_Fin.m_VolumeMass /Munit, 10, 'g', 3)
 						 .arg(CoG.x/Lunit, 10, 'g', 3)
 						 .arg(CoG.y/Lunit, 10, 'g', 3)
 						 .arg(CoG.z/Lunit, 10, 'g', 3)
@@ -610,17 +612,17 @@ void InertiaDlg::OnExportToAVL()
 		}
 		if(m_pPlane->m_bBody)
 		{
-			m_pPlane->m_pBody->ComputeBodyInertia(m_pPlane->m_pBody->m_Mass, CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
+//			m_pPlane->m_pBody->ComputeBodyInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body's inertia"))
-						 .arg(m_pPlane->m_pBody->m_Mass /Munit, 10, 'g', 3)
-						 .arg(CoG.x/Lunit, 10, 'g', 3)
-						 .arg(CoG.y/Lunit, 10, 'g', 3)
-						 .arg(CoG.z/Lunit, 10, 'g', 3)
-						 .arg(CoGIxx/Iunit,10, 'g', 3)
-						 .arg(CoGIyy/Iunit,10, 'g', 3)
-						 .arg(CoGIzz/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_VolumeMass /Munit, 10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoG.x/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoG.y/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoG.z/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoGIxx/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoGIyy/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoGIzz/Iunit,10, 'g', 3)
 			             .arg(0.0,10, 'g', 3)
-			             .arg(CoGIxz/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->m_pBody->m_CoGIxz/Iunit,10, 'g', 3)
 			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
@@ -743,7 +745,7 @@ void InertiaDlg::OnOK()
 	if(m_pWing)
 	{
 		j=0;
-		m_pWing->m_Mass = m_Mass;
+		m_pWing->m_VolumeMass = m_VolumeMass;
 		for(i=0; i< MAXMASSES; i++)
 		{
 			if(m_MassValue[i]>1.0e-30)
@@ -759,7 +761,7 @@ void InertiaDlg::OnOK()
 	else if(m_pBody)
 	{
 		j=0;
-		m_pBody->m_Mass = m_Mass;
+		m_pBody->m_VolumeMass = m_VolumeMass;
 		for(i=0; i< MAXMASSES; i++)
 		{
 			if(m_MassValue[i]>1.0e-30)
@@ -824,21 +826,21 @@ void InertiaDlg::ReadData()
 	}
 	m_NMass = i;
 
-	m_Mass = m_pctrlVolumeMass->GetValue() / pMainFrame->m_kgtoUnit;
+	m_VolumeMass = m_pctrlVolumeMass->GetValue() / pMainFrame->m_kgtoUnit;
 }
 
 
 
 void InertiaDlg::resizeEvent(QResizeEvent *event)
 {
-	double w = (double)m_pctrlMassView->width()*.97;
+/*	double w = (double)m_pctrlMassView->width()*.97;
 	int w6  = (int)(w/6.);
 
 	m_pctrlMassView->setColumnWidth(0, w6);
 	m_pctrlMassView->setColumnWidth(1, w6);
 	m_pctrlMassView->setColumnWidth(2, w6);
 	m_pctrlMassView->setColumnWidth(3, w6);
-	m_pctrlMassView->setColumnWidth(4, w-4*w6);
+	m_pctrlMassView->setColumnWidth(4, w-4*w6);*/
 }
 
 
@@ -951,8 +953,9 @@ void InertiaDlg::SetupLayout()
 	QVBoxLayout *MassLayout = new QVBoxLayout;
 	m_pctrlMassView = new QTableView(this);
 	m_pctrlMassView->setMinimumHeight(150);
-	m_pctrlMassView->setMinimumWidth(350);
+//	m_pctrlMassView->setMinimumWidth(350);
 	m_pctrlMassView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_pctrlMassView->horizontalHeader()->setStretchLastSection(true);
 	MassLayout->addWidget(m_pctrlMassView);
 	PointMassBox->setLayout(MassLayout);
 

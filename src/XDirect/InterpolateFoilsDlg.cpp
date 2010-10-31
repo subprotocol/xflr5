@@ -39,10 +39,10 @@ InterpolateFoilsDlg::InterpolateFoilsDlg()
 
 	SetupLayout();
 
-	connect(m_pctrlFoil1,  SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil1(int)));
-	connect(m_pctrlFoil2,  SIGNAL(activated(int)), this, SLOT(OnSelChangeFoil2(int)));
+	connect(m_pctrlFoil1,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeFoil1(int)));
+	connect(m_pctrlFoil2,  SIGNAL(activated(int)),    this, SLOT(OnSelChangeFoil2(int)));
 	connect(m_pctrlFrac,   SIGNAL(editingFinished()), this, SLOT(OnFrac()));
-	connect(m_pctrlSlider, SIGNAL(sliderMoved(int)), this, SLOT(OnVScroll(int)));
+	connect(m_pctrlSlider, SIGNAL(sliderMoved(int)),  this, SLOT(OnVScroll(int)));
 }
 
 
@@ -93,7 +93,6 @@ void InterpolateFoilsDlg::SetupLayout()
 	RightSide->addWidget(m_pctrlFrac);
 	RightSide->addStretch(1);
 
-
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
 	CancelButton = new QPushButton(tr("Cancel"));
@@ -117,6 +116,7 @@ void InterpolateFoilsDlg::SetupLayout()
 	setMinimumHeight(400);
 }
 
+
 void InterpolateFoilsDlg::InitDialog()
 {
 
@@ -133,7 +133,9 @@ void InterpolateFoilsDlg::InitDialog()
 	}
 	m_pctrlFoil1->setCurrentIndex(0);
 	m_pctrlFoil2->setCurrentIndex(1);
+
 	m_Frac = 0.0;
+	m_pctrlFrac->SetValue(100.0-m_Frac);
 
 	OnSelChangeFoil1(0);
 	OnSelChangeFoil2(1);
@@ -284,6 +286,7 @@ void InterpolateFoilsDlg::OnFrac()
 {
 	if(m_pctrlFrac->GetValue()>100.0) m_pctrlFrac->SetValue(100.0);
 	if(m_pctrlFrac->GetValue()<0.0)   m_pctrlFrac->SetValue(0.0);
+qDebug()<<m_Frac;
 	m_Frac = m_pctrlFrac->GetValue();
 	m_pctrlSlider->setSliderPosition((int)m_Frac);
 	Update();
@@ -303,7 +306,7 @@ void InterpolateFoilsDlg::OnVScroll(int val)
 {
 	val = m_pctrlSlider->sliderPosition();
 	m_Frac = 100.0 - (double)val;
-	m_pctrlFrac->SetValue(m_Frac);
+	m_pctrlFrac->SetValue(val);
 	Update();
 }
 

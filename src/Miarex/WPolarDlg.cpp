@@ -152,11 +152,11 @@ void WPolarDlg::EnableControls()
 		}
 	}
 
-	m_pctrlViscous->setEnabled(m_AnalysisMethod>=VLMMETHOD);
-	m_pctrlTiltGeom->setEnabled(m_AnalysisMethod>=VLMMETHOD);
-	m_pctrlBeta->setEnabled(m_AnalysisMethod>=VLMMETHOD);
-	m_pctrlGroundEffect->setEnabled(m_AnalysisMethod>=VLMMETHOD);
-	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && m_AnalysisMethod>=VLMMETHOD);
+	m_pctrlViscous->setEnabled(m_AnalysisMethod==PANELMETHOD);
+	m_pctrlTiltGeom->setEnabled(m_AnalysisMethod==PANELMETHOD);
+	m_pctrlBeta->setEnabled(m_AnalysisMethod==PANELMETHOD);
+	m_pctrlGroundEffect->setEnabled(m_AnalysisMethod==PANELMETHOD);
+	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && m_AnalysisMethod==PANELMETHOD);
 
 }
 

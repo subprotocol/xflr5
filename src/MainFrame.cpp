@@ -31,7 +31,6 @@
 #include "Miarex/PlaneDlg.h"
 #include "Miarex/StabViewDlg.h"
 #include "Miarex/UFOTableDelegate.h"
-#include "Miarex/ManualInertiaDlg.h"
 #include "Misc/AboutQ5.h"
 #include "Misc/PolarPropsDlg.h"
 #include "Misc/DisplaySettingsDlg.h"
@@ -63,7 +62,8 @@ extern CFoil* g_pCurFoil;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-        m_VersionName = "XFLR5 v6.01 Beta";
+	m_VersionName = "XFLR5 v6.02 Beta";
+
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
 
@@ -176,6 +176,8 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_crColors[29] = QColor(255,255,255),
 
 	g_pCurFoil = NULL;
+
+	m_UFOType = "";
 
 	m_bSaved     = true;
 
@@ -978,16 +980,15 @@ void MainFrame::CreateDockWindows()
 	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
 //	VLMAnalysisDlg::s_pMainFrame = this;
 //	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
-	StabAnalysisDlg::s_pMainFrame = this;
-	StabAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;
 	PanelAnalysisDlg::s_pMiarex    = m_pMiarex;
 //	StabViewDlg::s_pMiarex    = m_pMiarex;
 //	StabViewDlg::s_pMainFrame = this;
-	ManualInertiaDlg::s_pMainFrame = this;
 
 	CPlane::s_pMainFrame   = this;
 	CPlane::s_pMiarex      = m_pMiarex;
+
+	StabPolarDlg::s_pMainFrame = this;
 
 	XFoilAnalysisDlg::s_pMainFrame  = this;
 	XFoilAnalysisDlg::s_pXDirect = m_pXDirect;
@@ -1178,7 +1179,7 @@ void MainFrame::CreateMiarexActions()
 	scaleWingAct->setStatusTip(tr("Scale the dimensions of the currently selected wing"));
 	connect(scaleWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnScaleWing()));
 
-	ManageUFOs = new QAction(tr("Manage UFOs"), this);
+	ManageUFOs = new QAction(tr("Manage objects"), this);
 	ManageUFOs->setStatusTip(tr("Rename or delete the planes and wings stored in the database"));
 	ManageUFOs->setShortcut(Qt::Key_F7);
 	connect(ManageUFOs, SIGNAL(triggered()), pMiarex, SLOT(OnManageUFOs()));
@@ -1686,9 +1687,9 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlUFO->setSizePolicy(szPolicy);
 	m_pctrlWPolar->setSizePolicy(szPolicy);
 
-	m_pctrlUFO->setMinimumWidth(150);
+/*	m_pctrlUFO->setMinimumWidth(150);
 	m_pctrlWPolar->setMinimumWidth(150);
-	m_pctrlWOpp->setMinimumWidth(80);
+	m_pctrlWOpp->setMinimumWidth(80);*/
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);
@@ -1743,15 +1744,14 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlOppView->setDefaultAction(OpPointsAct);
 	m_pctrlOppView->setCheckable(true);
 
-	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-	m_pctrlFoil->setMinimumWidth(200);
-	m_pctrlPolar->setMinimumWidth(200);
-	m_pctrlOpPoint->setMinimumWidth(30);
-//	m_pctrlFoil->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlPolar->setInsertPolicy(QComboBox::InsertAlphabetically);
-//	m_pctrlOpPoint->setInsertPolicy(QComboBox::InsertAlphabetically);
+	QSizePolicy szPolicy;
+	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
+	m_pctrlFoil->setSizePolicy(szPolicy);
+	m_pctrlPolar->setSizePolicy(szPolicy);
+
+/*	m_pctrlFoil->setMinimumWidth(150);
+	m_pctrlPolar->setMinimumWidth(150);
+	m_pctrlOpPoint->setMinimumWidth(80);*/
 
 	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
 	m_pctrlXDirectToolBar->addAction(newProjectAct);
@@ -2393,8 +2393,8 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 	if(bAsk)
 	{
-		strong = tr("Are you sure you want to delete \n") + pFoil->m_FoilName ;
-		strong+= +"\n" + tr("and all associated OpPoints and Polars ?");
+		strong = tr("Are you sure you want to delete")  +"\n"+ pFoil->m_FoilName +"\n";
+		strong+= tr("and all associated OpPoints and Polars ?");
 
 		int resp = QMessageBox::question(this,tr("Question"), strong,  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 		if(resp != QMessageBox::Yes) return false;
@@ -2678,7 +2678,7 @@ void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 			else
 			{
 				pWPolar->ResetWPlr();
-				//results only... means that the areas and spans have been edited... update polar
+				//results only... means that the geometry have been edited... update polar
 				if( pWPolar->m_RefAreaType==1)
 				{
 					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_PlanformArea;
@@ -5572,6 +5572,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		{
 			pWPolar = new CWPolar;
 			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
+			//force compatibilty
+			if(pWPolar->m_AnalysisMethod==4 && pWPolar->m_Type==7) pWPolar->m_bThinSurfaces = true;
 
 			if (!bWPolarOK)
 			{

@@ -82,7 +82,7 @@ private:
 	FloatEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
 	FloatEdit *m_pctrlTotalMass;
 
-	double m_Mass;
+	double m_VolumeMass;
 	CVector m_VolumeCoG;
 
 	CVector m_PtRef;

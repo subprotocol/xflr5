@@ -61,13 +61,12 @@ protected:
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
 
-	void VLMTrefftz(double QInf, double Alpha, double *Gamma, int pos, CVector &Force, double &IDrag, CWPolar *pWPolar);
-
 	void PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
 							 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode);
 	void PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
 						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-                                                 CWPolar *pWPolar, CVector CoG);
+						 CWPolar *pWPolar, CVector CoG);
+
 
 	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
@@ -92,7 +91,8 @@ protected:
 	void ComputeChords(int NStation=0);
 	void ComputeDihedrals();
 	void ComputeGeometry();
-	void ComputeVolumeInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
+	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
+	void ComputeBodyAxisInertia();
 
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
 	void SetSweep(double Sweep);
@@ -115,8 +115,6 @@ protected:
 
 	static void* s_pMainFrame;		//pointer to the Frame window
 	static void* s_pMiarex;	//pointer to the Miarex Application window
-	static void* s_pStabDlg;	//pointer to the Stability analysis dialog class
-	static void* s_pVLMDlg;	//pointer to the VLM analysis dialog class
 	static void* s_pLLTDlg;	//pointer to the VLM analysis dialog class
 	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
@@ -157,13 +155,13 @@ protected:
 //	double m_Span;		// wing span
 //	double m_Weight;    // Wing weight - used to initialize LLT for type 2 analysis
 
-	double m_Mass;	    //for inertia calculations
+	double m_VolumeMass, m_TotalMass;    //for inertia calculations
 	int m_NMass;
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
-//	CVector m_CoG;
-//	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+	CVector m_CoG;
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	double m_GChord;	// mean geometric chord
 	double m_yMac;		// mean aerodynamic chord span position

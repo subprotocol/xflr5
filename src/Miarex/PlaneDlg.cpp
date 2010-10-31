@@ -362,6 +362,7 @@ void PlaneDlg::OnEditBody()
 	pMiarex->m_GL3dBody.SetBody(m_pPlane->m_pBody);
 	pMiarex->m_GL3dBody.m_bEnableName = false;
 	pMiarex->m_GL3dBody.InitDialog();
+	pMiarex->m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 	if(pMiarex->m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -587,6 +588,7 @@ void PlaneDlg::OnOK()
 		return ;
 	}
 
+	m_pPlane->ComputeBodyAxisInertia();
 	accept();
 }
 

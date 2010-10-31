@@ -2103,6 +2103,7 @@ void GL3dWingDlg::OnOK()
 	}
 
 	m_pWing->ComputeGeometry();
+	m_pWing->ComputeBodyAxisInertia();
 
 	accept();
 }

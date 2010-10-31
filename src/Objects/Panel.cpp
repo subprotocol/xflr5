@@ -52,9 +52,11 @@ void CPanel::Reset()
 	m_bIsLeading     = false;
 	m_bIsTrailing    = false;
 	m_bIsInSymPlane  = false;
+	m_bIsLeftPanel   = false;
 	m_bIsWakePanel   = false;
 
 	m_iElement    = -1;
+	m_iSym        = -1;
 	m_iPos        =  0;
 	m_iLA         =  0;
 	m_iLB         =  0;

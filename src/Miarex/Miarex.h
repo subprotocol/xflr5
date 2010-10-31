@@ -40,7 +40,6 @@
 #include "GLLightDlg.h"
 #include "WPolarDlg.h"
 #include "StabPolarDlg.h"
-#include "StabAnalysisDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
 #include "../Misc/FloatEdit.h"
@@ -72,7 +71,6 @@ class QMiarex : public QWidget
 	friend class CWing;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
 	friend class CPlane;
@@ -308,7 +306,6 @@ private:
 	void UpdateCurve();
 	void PaintWing(QPainter &painter, QPoint ORef, double scale);
 	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence);
-	void StabAnalyze(double V0, double VMax, double VDelta, bool bSequence);
 	void RotateGeomZ(double const &Beta, CVector const &P);
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void EditCurPlane();
@@ -373,7 +370,7 @@ private:
 	QSlider *m_pctrlClipPlanePos;
 
 	//stability widgets
-	QLabel *m_pctrlPolarProps, *m_pctrlPolarProps1;
+	QTextEdit *m_pctrlPolarProps, *m_pctrlPolarProps1;
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 
 
@@ -402,7 +399,6 @@ private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 protected:
 	CPanel m_Panel[VLMMAXMATSIZE];		// the panel array for the currently loaded UFO
-	CPanel *m_pPanel[VLMMAXMATSIZE];		// an array to the re-ordered VLM panels for a calculation
 
 	CVector m_Node[2*VLMMAXMATSIZE];		// the node array for the currently loaded UFO
 	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	// the temporary wake node array during relaxation calc
@@ -568,6 +564,8 @@ protected:
 	CPlane * m_pCurPlane;			// the currently selected Plane
 	CBody *m_pCurBody;
 
+	CWing *m_pWingList[4];
+
 	QColor m_WingColor, m_StabColor, m_FinColor;
 
 	CVector P,W,V,T;
@@ -634,7 +632,6 @@ public:
 	LLTAnalysisDlg *m_pLLTDlg;
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
 //	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
-	StabAnalysisDlg *m_pStabDlg;
 	CVector m_MemNode[2*VLMMAXMATSIZE];	// used if the analysis should be performed on the tilted geometry
 	CVector m_WakeNode[2*VLMMAXMATSIZE];	// the reference current wake node array
 	CVector m_RefWakeNode[2*VLMMAXMATSIZE]; 	// the reference wake node array if wake needs to be reset

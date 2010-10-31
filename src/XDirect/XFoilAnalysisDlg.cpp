@@ -286,6 +286,8 @@ void XFoilAnalysisDlg::InitDialog()
 	m_RmsGraph.SetMargin(40);
 
 	if(pMainFrame) m_RmsGraph.CopySettings(&pMainFrame->m_RefGraph, false);
+
+	m_pctrlTextOutput->clear();
 }
 
 

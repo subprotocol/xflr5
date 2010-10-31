@@ -38,6 +38,7 @@ class CSurface : public QObject
 	friend class GL3dWingDlg;
 	friend class VLMAnalysisDlg;
 	friend class StabAnalysisDlg;
+	friend class PanelAnalysisDlg;
 	friend class InertiaDlg;
 
 public:

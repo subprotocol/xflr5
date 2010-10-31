@@ -54,9 +54,11 @@ public:
 
 protected:	
 	bool m_bIsInSymPlane;
+	bool m_bIsLeftPanel;
 	bool m_bIsWakePanel;
 
 	int m_iElement; // panel identification number ; used when panel array is re-arranged in non sequential order
+	int m_iSym; //reference of the symetric panel, or -1 if none
 	int m_iPL, m_iPR, m_iPU, m_iPD;//Panels left, rigth; upstream, downstream
 	int m_iWake;//-1 if not followed by a wake panel, else equal to wake panel number
 	int m_iWakeColumn;

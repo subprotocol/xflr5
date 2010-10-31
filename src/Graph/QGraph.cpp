@@ -611,37 +611,52 @@ void QGraph::ExpFormat(double &f, int &exp)
 
 void QGraph::ExportToFile(QFile &XFile, int FileType)
 {
-	int i,j;
+	int i,j, maxpoints;
 	CCurve *pCurve;
-	QString strong;
+	QString strong, xTitle;
 	QTextStream out(&XFile);
 
-	for(i=0; i<(int)m_oaCurves.size(); i++)
+	maxpoints = 0;
+	for(i=0; i<m_oaCurves.size(); i++)
 	{
 		pCurve = GetCurve(i);
-		if(pCurve && pCurve->n>0)
+		if(pCurve) 
 		{
+			maxpoints = qMax(maxpoints,pCurve->n); 
+
 			pCurve->GetTitle(strong);
+			if(FileType==1)	out << "     "<<m_XTitle<<"       "<< strong <<"    ";
+			else            out << m_XTitle<<","<< strong << ", , ";
 
-			if(FileType==1)	out << "       x               "+strong+"\n";
-			else            out << "x,"+strong+"\n";
-
-			for(j=0; j<pCurve->n; j++)
-			{
-				if(FileType==1)	strong= QString("%1     %2\n")
-												.arg(pCurve->x[j],14,'e',5)
-												.arg(pCurve->y[j],14,'e',5);
-				else            strong= QString("%1, %2\n")
-												.arg(pCurve->x[j],14,'e',5)
-												.arg(pCurve->y[j],14,'e',5);
-
-				out << strong;
-			}
-			out << "\n\n";
 		}
 	}
+	out<<"\n"; //end of title line
+
+	for(j=0; j<maxpoints; j++)
+	{
+		for(i=0; i<m_oaCurves.size(); i++)
+		{
+			pCurve = GetCurve(i);
+			if(pCurve && j<pCurve->n)
+			{
+				if(FileType==1)	strong= QString("%1     %2  ")
+												.arg(pCurve->x[j],13,'g',7).arg(pCurve->y[j],13,'g',7);
+				else            strong= QString("%1, %2, , ")
+												.arg(pCurve->x[j],13,'g',7).arg(pCurve->y[j],13,'g',7);
+			}
+			else
+			{
+				if(FileType==1)	strong= "                                 ";
+				else            strong= ", , , ";
+			}
+			out << strong;
+		}
+		out<<"\n"; //end of data line
+	}
+	out<<"\n"; //end of file
 	XFile.close();
 }
+
 
 
 QPoint QGraph::GetOffset()

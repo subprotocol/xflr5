@@ -63,30 +63,37 @@ private:
 	void keyPressEvent(QKeyEvent *event);
 
 	bool StartPanelThread();
-	bool SolveMultiple(double V0, double VDelta, int nval);
+	bool SolveUnitRHS();
 
 	bool AlphaLoop();
 	bool ReLoop();
 	bool UnitLoop();
+	bool ControlLoop();
+
+	bool GetZeroMomentAngle();
 
 	void AddString(QString strong);
+	void BuildInfluenceMatrix();
+
 	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
-	void ComputeOnBody(int qrhs, double Alpha);
+	void ComputeOnBodyCp(double V0, double VDelta, int nval);
 	void ComputePlane(double Alpha, int qrhs);
 	void ComputeSurfSpeeds(double *Mu, double *Sigma);
-	void CreateDoubletStrength(double V0, double VDelta, int nval);
-	void CreateMatrix();
-	void CreateRHS(double V0, double VDelta, int nval);
+	void ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval);
+	void ComputeBalanceSpeeds(double Alpha, int q);
+	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
+	void CreateSourceStrength(double Alpha0, double AlphaDelta, int nval);
+	void CreateRHS(double *RHS, CVector VInf, CVector Omega, double Rotation);
+	void CreateUnitRHS();
 	void CreateWakeContribution();
 	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
-	void EndSequence();
 	void GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
 	void GetSourceInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
 	void RelaxWake();
+	void ScaleResultstoSpeed(int nval);
 	void SetAlpha(double AlphaMin, double AlphaMax, double AlphaDelta);
 	void SetFileHeader();
 	void SourceNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
-	void SetAi(int qrhs);
 	void SetupLayout();
 	void StartAnalysis();
 	void SumPanelForces(double *Cp, double Alpha, double &Lift, double &Drag);
@@ -94,8 +101,21 @@ private:
 	void WriteString(QString strong);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 
-	void GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const Alpha, double const &QInf, CVector &VInf);
-	void GetVortexCp(const int &p, double *Gamma, double *Cp, double const Alpha, CVector &VInf);
+	void GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const &QInf, CVector &VInf);
+	void GetVortexCp(const int &p, double *Gamma, double *Cp, CVector &VInf);
+
+	void ComputeStabilityDerivatives();
+	void ComputeStabilityInertia();
+	bool ComputeTrimmedConditions();
+	void SetControlPositions(double t);
+	bool SolveEigenvalues();
+	void BuildRotationMatrix();
+	void BuildStateMatrices();
+	void ComputeControlDerivatives();
+	void SolveCtrlDer(double const & DeltaAngle, double *Xd, double *d, double *Zd, double *Ld, double *Md, double *Nd);
+	void ComputeResults();
+	void GetNDStabDerivatives(CWOpp *pNewPoint);
+	void Forces(double *Mu, double *Sigma, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace=false);
 
 
 	static void *s_pMiarex;
@@ -118,6 +138,7 @@ private:
 	int m_State;
 	int m_nNodes;
 	int m_MatSize;
+	int m_SymSize; // the size of the matrix, excluding symetric elements
 	int m_NSurfaces;
 	int m_nWakeNodes;
 	int m_WakeSize;	
@@ -149,11 +170,16 @@ private:
 	double *m_aij, *m_aijRef;
 	double *m_RHS, *m_RHSRef;
 
-	double m_cosRHS[VLMMAXMATSIZE], m_sinRHS[VLMMAXMATSIZE];
+	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
+	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
+	double m_cRHS[VLMMAXMATSIZE];
+
 	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];			// Source strengths
 	double m_Mu[VLMMAXMATSIZE*VLMMAXRHS];			// Doublet strengths, or vortex circulations if panel is located on a thin surface
 	double m_Cp[VLMMAXMATSIZE*VLMMAXRHS];			// lift coef per panel
 	double m_3DQInf[VLMMAXRHS];
+
+	int m_Index[VLMMAXMATSIZE];
 
 	CVector m_Speed[VLMMAXMATSIZE];
 
@@ -164,7 +190,7 @@ private:
 	QString m_strOut;
 	QString m_VersionName;
 	
-	CPanel **m_ppPanel;//the sorted array of panel pointers
+//	CPanel **m_ppPanel;//the sorted array of panel pointers
 	CPanel *m_pPanel; //the original array of panels
 	CPanel *m_pWakePanel;// the current working wake panel array
 	CPanel *m_pRefWakePanel;// a copy of the reference wake node array if wake needs to be reset
@@ -191,11 +217,80 @@ private:
 	
 public:
 	CWing * m_pWingList[4];
+	double m_Ai[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
+	double m_Cl[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
+	double m_ICd[4*VLMMAXRHS * MAXSTATIONS];
+	CVector m_F[ 4*VLMMAXRHS * MAXSTATIONS];
+	CVector m_Vd[ 4*VLMMAXRHS * MAXSTATIONS];
+	CVector m_WingForce[4*VLMMAXRHS];
+	double m_WingIDrag[4*VLMMAXRHS];
 	CWing *m_pWing; //pointer to the geometry class of the wing
 	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
 	CWing *m_pStab;
 	CWing *m_pFin;
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
+
+public://stability analysis method and variables
+
+	int m_NCtrls;
+	//Equilibrium Forces and moments
+	CVector Force0, Moment0;
+
+	// longitudinal stability derivatives
+	double Xu, Xw, Zu, Zw, Zq, Mu, Mw, Mq;//first order
+	double Zwp, Mwp;                  //second order
+
+	// latal stability derivatives
+	double Yv, Yp, Yr, Lv, Lp, Lr, Nv, Np, Nr;//first order
+
+	//stability control derivatives
+	double Xde[MAXCONTROLS], Yde[MAXCONTROLS], Zde[MAXCONTROLS];
+	double Lde[MAXCONTROLS], Mde[MAXCONTROLS], Nde[MAXCONTROLS];
+
+	double u0;     //steady state x-velocity
+	double Theta0; //steady state pitch angle
+//	double m_BankAngle;
+	double m_ALong[4][4];	//Longitudinal State Matrix
+	double m_ALat[4][4];	//Lateral State Matrix
+	double m_BLong[MAXCONTROLS][4];
+	double m_BLat[MAXCONTROLS][4];
+	double m_R[3][3];	//Rotation matrix
+
+	//COG position in Body axis
+	CVector m_CoG;
+	double m_Mass;
+
+	double m_Ib[3][3];	//Inertia tensor in body axis
+	double m_Is[3][3];	//Inertia tensor in stability axis
+
+	complex<double> m_rLong[4],  m_rLat[4]; // complex eigenvalues
+	complex<double> m_vLong[16], m_vLat[16];// complex eigenvecctors
+
+	double m_AlphaEq, m_Ctrl;
+	double m_ControlMin, m_ControlMax, m_ControlDelta;
+
+	CSurface **m_ppSurface;
+	double m_radius, m_W, m_p, m_q, m_r; //trimmed flight data
+
+	bool m_bTrace;
+
+
+
+	double ComputeCm(double Alpha);
 };
 
 #endif // PANELANALYSISDLG_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+

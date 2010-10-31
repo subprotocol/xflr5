@@ -1620,10 +1620,11 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 	CWing *pWing;
 
 	ProgressDlg dlg;
-	dlg.move(pMainFrame->m_DlgPos);
+	dlg.setWindowTitle("Streamines calculation");
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);
+	dlg.move(pMainFrame->m_DlgPos);
 	dlg.show();
 
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
@@ -1759,8 +1760,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 								for (i=1; i< p3DScales->m_NX ;i++)
 								{
-									if(pWPolar->m_AnalysisMethod==STABILITYMETHOD) VT = pMiarex->m_pStabDlg->GetSpeedVector(C, Gamma);
-									else if(pWPolar->m_AnalysisMethod==PANELMETHOD) pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
+									pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, VT);
 
 									VT += VInf;
 									VT.Normalize();
@@ -1788,8 +1788,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector
 
 							for (i=1; i< p3DScales->m_NX ;i++)
 							{
-								if(pWPolar->m_AnalysisMethod==STABILITYMETHOD) VT = pMiarex->m_pStabDlg->GetSpeedVector(D, Gamma);
-								else if(pWPolar->m_AnalysisMethod==PANELMETHOD) pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
+								pMiarex->m_pPanelDlg->GetSpeedVector(D, Mu, Sigma, VT);
 
 								VT += VInf;
 								VT.Normalize();

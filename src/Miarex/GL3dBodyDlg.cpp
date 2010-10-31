@@ -4170,6 +4170,9 @@ void GL3dBodyDlg::OnTranslateBody()
 		TakePicture();
 		StorePicture();
 		m_pBody->Translate(dlg.m_XTrans, dlg.m_YTrans, dlg.m_ZTrans, dlg.m_bFrameOnly, dlg.m_FrameID);
+		FillFrameDataTable();
+		FillPointDataTable();
+
 		m_bResetglBody     = true;
 		m_bResetglBodyMesh = true;
 		m_bResetglBody2D   = true;

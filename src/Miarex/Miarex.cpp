@@ -60,7 +60,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pMainFrame  = NULL;
 	m_pXFile      = NULL;
 	m_pPanelDlg   = NULL;
-	m_pStabDlg    = NULL;
 //	m_pVLMDlg     = NULL;
 	m_pLLTDlg     = NULL;
 	m_pCurPlane   = NULL;
@@ -413,7 +412,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_poaWOpp    = NULL;
 	m_poaPOpp    = NULL;
 
-	memset(m_pPanel, 0, sizeof(m_pPanel));
+//	memset(m_pPanel, 0, sizeof(m_pPanel));
 	memset(m_aij, 0, sizeof(m_aij));
 	memset(m_aijRef, 0, sizeof(m_aijRef));
 	memset(m_RHS, 0, sizeof(m_RHS));
@@ -598,24 +597,12 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pVLMDlg->m_aij           = m_aij;
 	m_pVLMDlg->m_pCoreSize     = &m_CoreSize;*/
 
-	m_pStabDlg = new StabAnalysisDlg;
-	CWing::s_pStabDlg     = m_pStabDlg;
-	m_pStabDlg->m_pNode         = m_Node;
-	m_pStabDlg->m_pPanel        = m_Panel;
-//	m_pStabDlg->m_ppPanel       = m_pPanel;
-	m_pStabDlg->m_pMemNode      = m_MemNode;
-	m_pStabDlg->m_pMemPanel     = m_MemPanel;
-	m_pStabDlg->m_RHS           = m_RHS;
-	m_pStabDlg->m_Gamma         = m_RHSRef;
-	m_pStabDlg->m_aij           = m_aij;
-	m_pStabDlg->m_aijRef        = m_aijRef;
-	m_pStabDlg->m_pCoreSize     = &m_CoreSize;
 
 
 	m_pPanelDlg = new PanelAnalysisDlg;
 	CWing::s_p3DPanelDlg = m_pPanelDlg;  //pointer to the 3DPanel analysis dialog class
 	m_pPanelDlg->m_pPanel        = m_Panel;
-	m_pPanelDlg->m_ppPanel       = m_pPanel;
+//	m_pPanelDlg->m_ppPanel       = m_pPanel;
 	m_pPanelDlg->m_pNode         = m_Node;
 	m_pPanelDlg->m_pWakePanel    = m_WakePanel;
 	m_pPanelDlg->m_pWakeNode     = m_WakeNode;
@@ -679,6 +666,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
+	connect(m_pctrlLight, SIGNAL(clicked()), SLOT(OnLight()));
 
 	connect(m_pctrlKeepCpSection,  SIGNAL(clicked()), this, SLOT(OnKeepCpSection()));
 	connect(m_pctrlResetCpSection, SIGNAL(clicked()), this, SLOT(OnResetCpSection()));
@@ -940,16 +928,49 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
-		}
-		else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pStabDlg)
-		{
-			pPOpp->m_NPanels          = m_pStabDlg->m_MatSize;
-			pPOpp->m_Alpha            = m_pStabDlg->m_AlphaEq;
-			pPOpp->m_QInf             = m_pStabDlg->u0;
-			if(m_pCurWPolar->m_Type==7)
+			if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 			{
-				pPOpp->m_Ctrl = m_pStabDlg->m_Ctrl;
-				pWOpp->m_Ctrl = m_pStabDlg->m_Ctrl;
+				pPOpp->m_Alpha            = m_pPanelDlg->m_AlphaEq;
+				pPOpp->m_QInf             = m_pPanelDlg->u0;
+				pPOpp->m_Ctrl = m_pPanelDlg->m_Ctrl;
+				pWOpp->m_Ctrl = m_pPanelDlg->m_Ctrl;
+				pWOpp->m_Alpha          = m_pPanelDlg->m_AlphaEq;
+				pWOpp->m_QInf           = m_pPanelDlg->u0;
+				pWOpp->m_CL             = m_pPanelDlg->m_CL;
+				pWOpp->m_CX             = m_pPanelDlg->m_CX;
+				pWOpp->m_CY             = m_pPanelDlg->m_CY;
+				pWOpp->m_InducedDrag    = m_pPanelDlg->m_InducedDrag;
+				pWOpp->m_ViscousDrag    = m_pPanelDlg->m_ViscousDrag;
+
+				pWOpp->m_GCm            = m_pPanelDlg->m_GCm;
+				pWOpp->m_VCm            = m_pPanelDlg->m_VCm;
+				pWOpp->m_ICm            = m_pPanelDlg->m_ICm;
+				pWOpp->m_GRm            = m_pPanelDlg->m_GRm;
+				pWOpp->m_GYm            = m_pPanelDlg->m_GYm;
+				pWOpp->m_VYm            = m_pPanelDlg->m_VYm;
+				pWOpp->m_IYm            = m_pPanelDlg->m_IYm;
+
+				pWOpp->m_XCP            = m_pPanelDlg->m_XCP;
+				pWOpp->m_YCP            = m_pPanelDlg->m_YCP;
+
+				pPOpp->m_Beta           = m_pCurWPolar->m_Beta;
+				pWOpp->m_Beta	        = m_pCurWPolar->m_Beta;
+
+				for(i=0; i<4; i++)
+				{
+					pWOpp->m_EigenValue[i]   = m_pPanelDlg->m_rLong[i];
+					pWOpp->m_EigenValue[i+4] = m_pPanelDlg->m_rLat[i];
+					for(l=0;l<4; l++)
+					{
+						pWOpp->m_EigenVector[i][l]   = m_pPanelDlg->m_vLong[4*i+l];
+						pWOpp->m_EigenVector[i+4][l] = m_pPanelDlg->m_vLat[4*i+l];
+					}
+				}
+				m_pPanelDlg->GetNDStabDerivatives(&pPOpp->m_WingWOpp);
+				memcpy(pWOpp->m_ALong, m_pPanelDlg->m_ALong, 16*sizeof(double));
+				memcpy(pWOpp->m_ALat,  m_pPanelDlg->m_ALat,  16*sizeof(double));
+				memcpy(pWOpp->m_BLong, m_pPanelDlg->m_BLong, MAXCONTROLS * 4*sizeof(double));
+				memcpy(pWOpp->m_BLat , m_pPanelDlg->m_BLat,  MAXCONTROLS * 4*sizeof(double));
 			}
 			else
 			{
@@ -957,43 +978,6 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 				pWOpp->m_Ctrl = 0.0;
 			}
 
-			pWOpp->m_Alpha          = m_pStabDlg->m_AlphaEq;
-			pWOpp->m_QInf           = m_pStabDlg->u0;
-			pWOpp->m_CL             = m_pStabDlg->m_CL;
-			pWOpp->m_CX             = m_pStabDlg->m_CX;
-			pWOpp->m_CY             = m_pStabDlg->m_CY;
-			pWOpp->m_InducedDrag    = m_pStabDlg->m_InducedDrag;
-			pWOpp->m_ViscousDrag    = m_pStabDlg->m_ViscousDrag;
-
-			pWOpp->m_GCm            = m_pStabDlg->m_GCm;
-			pWOpp->m_VCm            = m_pStabDlg->m_VCm;
-			pWOpp->m_ICm            = m_pStabDlg->m_ICm;
-			pWOpp->m_GRm            = m_pStabDlg->m_GRm;
-			pWOpp->m_GYm            = m_pStabDlg->m_GYm;
-			pWOpp->m_VYm            = m_pStabDlg->m_VYm;
-			pWOpp->m_IYm            = m_pStabDlg->m_IYm;
-
-			pWOpp->m_XCP            = m_pStabDlg->m_XCP;
-			pWOpp->m_YCP            = m_pStabDlg->m_YCP;
-
-			pPOpp->m_Beta           = m_pCurWPolar->m_Beta;
-			pWOpp->m_Beta	        = m_pCurWPolar->m_Beta;
-			
-			for(i=0; i<4; i++)
-			{
-				pWOpp->m_EigenValue[i]   = m_pStabDlg->m_rLong[i];
-				pWOpp->m_EigenValue[i+4] = m_pStabDlg->m_rLat[i];
-				for(l=0;l<4; l++)
-				{
-					pWOpp->m_EigenVector[i][l]   = m_pStabDlg->m_vLong[4*i+l];
-					pWOpp->m_EigenVector[i+4][l] = m_pStabDlg->m_vLat[4*i+l];
-				}
-			}
-			m_pStabDlg->GetNDStabDerivatives(&pPOpp->m_WingWOpp);
-			memcpy(pWOpp->m_ALong, m_pStabDlg->m_ALong, 16*sizeof(double));
-			memcpy(pWOpp->m_ALat,  m_pStabDlg->m_ALat,  16*sizeof(double));
-			memcpy(pWOpp->m_BLong, m_pStabDlg->m_BLong, MAXCONTROLS * 4*sizeof(double));
-			memcpy(pWOpp->m_BLat , m_pStabDlg->m_BLat,  MAXCONTROLS * 4*sizeof(double));
 		}
 
 		pPOpp->m_Wing2WOpp.m_Alpha = pPOpp->m_Alpha;
@@ -1412,90 +1396,25 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 				pNewPoint->m_FlapMoment[i] = m_pCurWing->m_FlapMoment[i];
 
 			pNewPoint->m_nFlaps = m_pCurWing->m_nFlaps;
-		}
-		else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pCurWPolar->m_Type==7 && m_pStabDlg)
-		{
-			pNewPoint->m_Alpha               = m_pStabDlg->m_AlphaEq;
-			pNewPoint->m_Beta                = m_pCurWPolar->m_Beta;
-			pNewPoint->m_Phi                 = m_pCurWPolar->m_BankAngle;
-			pNewPoint->m_QInf                = m_pStabDlg->u0;
-			pNewPoint->m_NVLMPanels          = m_pStabDlg->m_MatSize;
-			pNewPoint->m_bOut                = m_pStabDlg->m_bPointOut;
-			pNewPoint->m_CL                  = m_pStabDlg->m_CL;
-			pNewPoint->m_CY                  = m_pStabDlg->m_CY;
-			pNewPoint->m_CX                  = m_pStabDlg->m_CX;
-			pNewPoint->m_InducedDrag         = m_pStabDlg->m_InducedDrag;
-			pNewPoint->m_ViscousDrag         = m_pStabDlg->m_ViscousDrag;
 
-			pNewPoint->m_GCm                 = m_pStabDlg->m_GCm;
-			pNewPoint->m_VCm                 = m_pStabDlg->m_VCm;
-			pNewPoint->m_ICm                 = m_pStabDlg->m_ICm;
-			pNewPoint->m_GRm                 = m_pStabDlg->m_GRm;
-			pNewPoint->m_GYm                 = m_pStabDlg->m_GYm;
-			pNewPoint->m_VYm                 = m_pStabDlg->m_VYm;
-			pNewPoint->m_IYm                 = m_pStabDlg->m_IYm;
-
-			pNewPoint->m_XCP                 = m_pStabDlg->m_XCP;
-			pNewPoint->m_YCP                 = m_pStabDlg->m_YCP;
-
-			if(m_pCurWPolar->m_Type==7) pNewPoint->m_Ctrl = m_pStabDlg->m_Ctrl;
-			else                        pNewPoint->m_Ctrl = 0.0;
-
-			for (l=0; l<m_pCurWing->m_NStation; l++)
-			{
-				pNewPoint->m_SpanPos[l]   = m_pCurWing->m_SpanPos[l];
-				pNewPoint->m_StripArea[l] = m_pCurWing->m_StripArea[l];
-				if(fabs(m_pCurWing->m_BendingMoment[l])>fabs(Cb))	Cb = m_pCurWing->m_BendingMoment[l];
-			}
-			memcpy(pNewPoint->m_Cl,         m_pCurWing->m_Cl,         sizeof(m_pCurWing->m_Cl));
-			memcpy(pNewPoint->m_PCd,        m_pCurWing->m_PCd,        sizeof(m_pCurWing->m_PCd));
-			memcpy(pNewPoint->m_Cm,         m_pCurWing->m_Cm,         sizeof(m_pCurWing->m_Cm));
-			memcpy(pNewPoint->m_CmAirf,     m_pCurWing->m_CmAirf,     sizeof(m_pCurWing->m_CmAirf));
-			memcpy(pNewPoint->m_XCPSpanRel, m_pCurWing->m_XCPSpanRel, sizeof(m_pCurWing->m_XCPSpanRel));
-			memcpy(pNewPoint->m_XCPSpanAbs, m_pCurWing->m_XCPSpanAbs, sizeof(m_pCurWing->m_XCPSpanAbs));
-			memcpy(pNewPoint->m_Re,         m_pCurWing->m_Re,         sizeof(m_pCurWing->m_Re));
-			memcpy(pNewPoint->m_Chord,      m_pCurWing->m_Chord,      sizeof(m_pCurWing->m_Chord));
-			memcpy(pNewPoint->m_Twist,      m_pCurWing->m_Twist,      sizeof(m_pCurWing->m_Twist));
-			memcpy(pNewPoint->m_XTrTop,     m_pCurWing->m_XTrTop,     sizeof(m_pCurWing->m_XTrTop));
-			memcpy(pNewPoint->m_XTrBot,     m_pCurWing->m_XTrBot,     sizeof(m_pCurWing->m_XTrBot));
-			memcpy(pNewPoint->m_Vd,         m_pCurWing->m_Vd,         sizeof(pNewPoint->m_Vd));
-			memcpy(pNewPoint->m_F,          m_pCurWing->m_F,          sizeof(pNewPoint->m_F));
-			memcpy(pNewPoint->m_BendingMoment, m_pCurWing->m_BendingMoment, sizeof(m_pCurWing->m_BendingMoment));
-			memcpy(pNewPoint->m_ICd,        m_pCurWing->m_ICd, sizeof(pNewPoint->m_ICd));
-			memcpy(pNewPoint->m_Ai,         m_pCurWing->m_Ai,  sizeof(pNewPoint->m_Ai));
-
-			memcpy(pNewPoint->m_Cp,         m_pStabDlg->m_Cp,  sizeof(pNewPoint->m_Cp));
-
-			memcpy(pNewPoint->m_G, Gamma, sizeof(pNewPoint->m_G));
-
-			if(m_pCurWPolar->m_bWakeRollUp)
-			{
-				pNewPoint->m_nWakeNodes     = m_nWakeNodes;
-				pNewPoint->m_NXWakePanels   = m_pCurWPolar->m_NXWakePanels;
-				pNewPoint->m_FirstWakePanel = m_pCurWPolar->m_TotalWakeLength;
-				pNewPoint->m_WakeFactor     = m_pCurWPolar->m_WakePanelFactor;
-			}
-			for (i=0; i<m_pCurWing->m_nFlaps; i++)
-				pNewPoint->m_FlapMoment[i] = m_pCurWing->m_FlapMoment[i];
-
-			pNewPoint->m_nFlaps = m_pCurWing->m_nFlaps;
 			for(i=0; i<4; i++)
 			{
-				pNewPoint->m_EigenValue[i]   = m_pStabDlg->m_rLong[i];
-				pNewPoint->m_EigenValue[i+4] = m_pStabDlg->m_rLat[i];
+				pNewPoint->m_EigenValue[i]   = m_pPanelDlg->m_rLong[i];
+				pNewPoint->m_EigenValue[i+4] = m_pPanelDlg->m_rLat[i];
 				for(l=0;l<4; l++)
 				{
-					pNewPoint->m_EigenVector[i][l]   = m_pStabDlg->m_vLong[4*i+l];
-					pNewPoint->m_EigenVector[i+4][l] = m_pStabDlg->m_vLat[4*i+l];
+					pNewPoint->m_EigenVector[i][l]   = m_pPanelDlg->m_vLong[4*i+l];
+					pNewPoint->m_EigenVector[i+4][l] = m_pPanelDlg->m_vLat[4*i+l];
 				}
 			}
-			m_pStabDlg->GetNDStabDerivatives(pNewPoint);
+			m_pPanelDlg->GetNDStabDerivatives(pNewPoint);
 
-			memcpy(pNewPoint->m_ALong, m_pStabDlg->m_ALong, 16*sizeof(double));
-			memcpy(pNewPoint->m_ALat,  m_pStabDlg->m_ALat,  16*sizeof(double));
-			memcpy(pNewPoint->m_BLong, m_pStabDlg->m_BLong, MAXCONTROLS * 4*sizeof(double));
-			memcpy(pNewPoint->m_BLat , m_pStabDlg->m_BLat,  MAXCONTROLS * 4*sizeof(double));
+			memcpy(pNewPoint->m_ALong, m_pPanelDlg->m_ALong, 16*sizeof(double));
+			memcpy(pNewPoint->m_ALat,  m_pPanelDlg->m_ALat,  16*sizeof(double));
+			memcpy(pNewPoint->m_BLong, m_pPanelDlg->m_BLong, MAXCONTROLS * 4*sizeof(double));
+			memcpy(pNewPoint->m_BLat , m_pPanelDlg->m_BLat,  MAXCONTROLS * 4*sizeof(double));
 		}
+
 		pNewPoint->m_MaxBending = Cb;
 	}
 
@@ -1688,6 +1607,7 @@ void QMiarex::SetControls()
 	// depending on the currently selected objects
 	//
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	pMainFrame->currentUFOMenu->setTitle("Current "+pMainFrame->m_UFOType);
 	if(m_iView==W3DVIEW)        m_pctrBottomControls->setCurrentIndex(1);
 	else if(m_iView==WSTABVIEW)
 	{
@@ -1771,12 +1691,14 @@ void QMiarex::SetControls()
 		pMainFrame->fourGraphs->setChecked(m_iWPlrView==4);
 	}
 
-	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW);
-	pMainFrame->hideAllWPlrs->setEnabled(m_iView==WPOLARVIEW);
-	pMainFrame->showAllWPlrs->setEnabled(m_iView==WPOLARVIEW);
+	pMainFrame->WPlrGraphMenu->setEnabled(m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
+	pMainFrame->hideAllWPlrs->setEnabled(m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
+	pMainFrame->showAllWPlrs->setEnabled(m_iView==WPOLARVIEW || m_iView==WSTABVIEW);
 
 	m_pctrlAnalyze->setEnabled(m_pCurWPolar);
 	m_pctrlAlphaMin->setEnabled(m_pCurWPolar);
+	m_pctrlAlphaMax->setEnabled(m_pCurWPolar && m_bSequence);
+	m_pctrlAlphaDelta->setEnabled(m_pCurWPolar && m_bSequence);
 	m_pctrlSequence->setEnabled(m_pCurWPolar);
 	m_pctrlStoreWOpp->setEnabled(m_pCurWPolar);
 
@@ -1982,8 +1904,10 @@ int QMiarex::CreateBodyElements()
 						m_Panel[m_MatSize].m_bIsInSymPlane  = false;
 						m_Panel[m_MatSize].m_bIsLeading     = false;
 						m_Panel[m_MatSize].m_bIsTrailing    = false;
-						m_Panel[m_MatSize].m_iPos = 100;
+						m_Panel[m_MatSize].m_iPos     = 100;
 						m_Panel[m_MatSize].m_iElement = m_MatSize;
+						m_Panel[m_MatSize].m_iSym     = -1;
+						m_Panel[m_MatSize].m_bIsLeftPanel  = true;
 						m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 
 						// set neighbour panels
@@ -2090,8 +2014,10 @@ int QMiarex::CreateBodyElements()
 				m_Panel[m_MatSize].m_bIsInSymPlane  = false;
 				m_Panel[m_MatSize].m_bIsLeading     = false;
 				m_Panel[m_MatSize].m_bIsTrailing    = false;
-				m_Panel[m_MatSize].m_iPos = 100;
+				m_Panel[m_MatSize].m_iPos     = 100;
 				m_Panel[m_MatSize].m_iElement = m_MatSize;
+				m_Panel[m_MatSize].m_iSym     = -1;
+				m_Panel[m_MatSize].m_bIsLeftPanel  = true;
 				m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 
 				// set neighbour panels
@@ -2186,6 +2112,8 @@ int QMiarex::CreateBodyElements()
 			m_Panel[m_MatSize].m_bIsTrailing    = false;
 			m_Panel[m_MatSize].m_iPos = 100;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
+			m_Panel[m_MatSize].m_iSym = -1;
+			m_Panel[m_MatSize].m_bIsLeftPanel  = false;
 			m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 
 			// set neighbour panels
@@ -2243,7 +2171,7 @@ void QMiarex::CreateCpCurves()
 
 	int coef = 2;
 	bool b2Sides = true;
-	if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces)
+	if(m_pCurWPolar->m_bThinSurfaces)
 	{
 		b2Sides = false;
 		coef = 1;
@@ -2261,7 +2189,7 @@ void QMiarex::CreateCpCurves()
 	{
 		p=0;
 		bFound = false;
-		if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
+		if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
 
 		SpanInc = -m_pCurWing->m_PlanformSpan/2.0;
 		for (p=0; p<m_pCurWing->m_MatSize; p++)
@@ -2322,7 +2250,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurWing2->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurWing2->m_MatSize; p++)
@@ -2358,7 +2286,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurStab->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurStab->m_MatSize; p++)
@@ -2395,7 +2323,7 @@ void QMiarex::CreateCpCurves()
 		{
 			p=0;
 			bFound = false;
-			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
 
 			SpanInc = -m_pCurFin->m_PlanformSpan/2.0;
 			for (p=0; p<m_pCurFin->m_MatSize; p++)
@@ -2506,6 +2434,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 			m_Panel[m_MatSize].m_iPos = 50;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
+			m_Panel[m_MatSize].m_iSym  = -1;
+			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 			m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 			m_Panel[m_MatSize].m_iWake = -1;
 
@@ -2527,7 +2457,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 		else if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD) side =  0;
 		else
 		{
-			if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD || m_pCurWPolar->m_bThinSurfaces)
+			if(m_pCurWPolar->m_bThinSurfaces)
 				side = 0;
 			else if (m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 				side =-1; //start with lower surf, as recommended by K&P
@@ -2593,6 +2523,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 			m_Panel[m_MatSize].m_iPos = side;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
+			m_Panel[m_MatSize].m_iSym  = -1;
+			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 
 			if(side==0)         m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
 			else if (side==-1)  m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
@@ -2631,7 +2563,7 @@ int QMiarex::CreateElements(CSurface *pSurface)
 			{
 				m_Panel[m_MatSize].m_iWake = m_WakeSize;//next wake element
 				m_Panel[m_MatSize].m_iWakeColumn = m_NWakeColumn;
-				if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD || m_pCurWPolar->m_bThinSurfaces)
+				if(m_pCurWPolar->m_bThinSurfaces)
 				{
 					CreateWakeElems(m_MatSize);
 					m_NWakeColumn++;
@@ -2696,6 +2628,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 				m_Panel[m_MatSize].m_iPos = side;
 				m_Panel[m_MatSize].m_iElement = m_MatSize;
+				m_Panel[m_MatSize].m_iSym  = -1;
+				m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 
 				m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
 
@@ -2790,6 +2724,8 @@ int QMiarex::CreateElements(CSurface *pSurface)
 
 			m_Panel[m_MatSize].m_iPos = 50;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
+			m_Panel[m_MatSize].m_iSym  = -1;
+			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 			m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 			m_Panel[m_MatSize].m_iWake = -1;
 			m_MatSize++;
@@ -2822,7 +2758,6 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 //	double slope = m_pSurface[0]->m_pFoilA->GetCamberSlope(1.0);
 //	CVector TE(1.0,0.0,slope);
 //	TE.Normalize();
-
 
 	NXWakePanels    = m_pCurWPolar->m_NXWakePanels;
 	WakePanelFactor = m_pCurWPolar->m_WakePanelFactor;
@@ -2906,6 +2841,8 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 		m_WakePanel[mw].Area =  m_WakePanel[mw].Normal.VAbs()/2.0;
 		m_WakePanel[mw].Normal.Normalize();
 		m_WakePanel[mw].SetFrame(LA,LB, TA, TB);
+		m_WakePanel[mw].m_iSym     = -1;
+		m_WakePanel[mw].m_bIsLeftPanel  = false;
 
 		if(l==0)					m_WakePanel[mw].m_iPD = -1;// no panel downstream
 		else if(l==NXWakePanels)	m_WakePanel[mw].m_iPU = -1;// no panel upstream
@@ -2965,12 +2902,7 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 		pWOpp->m_Alpha               = m_pPanelDlg->m_Alpha;
 		pWOpp->m_QInf                = m_pPanelDlg->m_QInf;
 	}
-	else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD && m_pStabDlg)
-	{
-		pWOpp->m_bOut                = m_pStabDlg->m_bPointOut;
-		pWOpp->m_Alpha               = m_pStabDlg->m_AlphaEq;
-		pWOpp->m_QInf                = m_pStabDlg->u0;
-	}
+
 	pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
 	pWOpp->m_Phi                 = m_pCurWPolar->m_BankAngle;
 
@@ -4171,7 +4103,7 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 
 
 		if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD)  str6="_LLT";
-		else if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD)
+		else if(m_pCurWPolar->m_bThinSurfaces)
 		{
 			if(m_pCurWOpp->m_bVLM1)	str6="_VLM1";
 			else 					str6="_VLM2";
@@ -4424,9 +4356,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			pWPolar = (CWPolar*)m_poaWPolar->at(l);
 
 			if (pWPolar->m_Alpha.size() &&
-				pWPolar->m_PlrName.length() &&
-				pWPolar->m_bIsVisible &&
-				((pWPolar->m_AnalysisMethod==STABILITYMETHOD && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+				(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_Type==STABILITYPOLAR)) &&
+				((pWPolar->m_Type==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 				  pWPolar->m_UFOName == str.at(k) &&
 				((pWPolar->m_Type == 1 && m_bType1) ||
 				 (pWPolar->m_Type == 2 && m_bType2) ||
@@ -4462,9 +4393,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 				if(str.at(k) == pWPolar->m_UFOName)
 				{
 					if (pWPolar->m_Alpha.size() &&
-						pWPolar->m_PlrName.length() &&
-						pWPolar->m_bIsVisible &&
-						((pWPolar->m_AnalysisMethod==STABILITYMETHOD && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+						(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_Type==STABILITYPOLAR)) &&
+						((pWPolar->m_Type==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 						  pWPolar->m_UFOName == str.at(k) &&
 						((pWPolar->m_Type == 1 && m_bType1) ||
 						 (pWPolar->m_Type == 2 && m_bType2) ||
@@ -5323,7 +5253,6 @@ void QMiarex::GLCallViewLists()
 		glCallList(VLMCTRLPTS);
 		glCallList(VLMVORTICES);
 	}
-
 
 
 	if((m_bICd || m_bVCd) && m_pCurWOpp )
@@ -6361,11 +6290,8 @@ bool QMiarex::InitializePanels()
 	// m_pPanel is an array of pointers to panels, re-arranged to enable symmetric calculations
 	// --> creates unnecessary complications, will be dropped in a future version
 	// --> stability analysis does not use symmetry arrangements
-	
 	if(!m_pCurWing) return false;
-	int j,k,l;
-	int p, pp;
-	int Nel;
+	int j, k, l, Nel, p, pp, HalfSize;
 
 	QProgressDialog dlg(this);
 	dlg.setLabelText(tr("Creating Elements... please Wait"));
@@ -6399,9 +6325,9 @@ bool QMiarex::InitializePanels()
 		m_MatSize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
 
 		//create the body elements only if there is a body, and the analysis is not of the VLM Type
-		if(!m_pCurWPolar)                         bBodyEl = true;//no risk...
+		if(!m_pCurWPolar)                                     bBodyEl = true;//no risk...
 		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)  bBodyEl = true;
-		else                                      bBodyEl = false;
+		else                                                  bBodyEl = false;
 	}
 
 	if(m_MatSize>VLMMAXMATSIZE)
@@ -6426,251 +6352,90 @@ bool QMiarex::InitializePanels()
 	memset(m_Panel, 0, sizeof(m_Panel));
 	memset(m_Node,  0, sizeof(m_Node));
 
-	p = 0;
 	CPanel *ptr = m_Panel;
 
 	dlg.setValue(5);
-	for (j=0; j<m_NSurfaces; j++)
-	{
-		m_pSurface[j]->ResetFlap();
+	int NXWakePanels;
+	if(m_pCurWPolar)	NXWakePanels = m_pCurWPolar->m_NXWakePanels;
+	else                NXWakePanels = 1;
 
-		Nel = CreateElements(*(m_pSurface+j));
-		//reference in pPanel array the left side panels for all surfaces
-		if((*(m_pSurface+j))->m_bIsLeftSurf)
+	int coef = 1;
+	if(m_pCurWPolar)
+	{
+		if(m_pCurWPolar->m_bThinSurfaces) coef = 1;
+		else                              coef = 2;
+	}
+
+	for(int i=0; i<4; i++)
+	{
+		if(m_pWingList[i])
 		{
-			for(pp=0; pp<m_pSurface[j]->m_NElements; pp++)
+			m_pWingList[i]->m_MatSize = 0;
+			for(j=0; j<m_pWingList[i]->m_NSurfaces;j++)
 			{
-				m_pPanel[p] = ptr + pp;
-				p++;
+				m_pWingList[i]->m_Surface[j].ResetFlap();
+				Nel = CreateElements(m_pWingList[i]->m_Surface+j);
+				m_pWingList[i]->m_MatSize += Nel;
+			}
+			m_pWingList[i]->m_pPanel = ptr;
+			ptr += m_pWingList[i]->m_MatSize;
+
+			//create symetry properties between panels
+			if((m_pWingList[i]->m_bIsFin && !m_pWingList[i]->m_bDoubleFin)
+				|| !m_pWingList[i]->m_bSymetric)
+			{
+				for(p=0; p<m_pWingList[i]->m_MatSize; p++) m_pWingList[i]->m_pPanel[p].m_iSym=-1;
+			}
+
+
+			HalfSize = m_pWingList[i]->m_MatSize/2;
+			p  = HalfSize-1;
+			pp = HalfSize;
+			for(j=0; j<m_pWingList[i]->m_NSurfaces; j++)
+			{
+				if(m_pWingList[i]->m_Surface[j].m_bIsRightSurf)
+				{
+					for(k=0; k<m_pWingList[i]->m_Surface[j].m_NYPanels; k++)
+					{
+						for(l=0; l<m_pWingList[i]->m_Surface[j].m_NXPanels*coef; l++)
+						{
+							m_pWingList[i]->m_pPanel[p].m_iSym    = m_pWingList[i]->m_pPanel[pp+m_pWingList[i]->m_Surface[j].m_NXPanels*coef-l-1].m_iElement;
+							p--;
+						}
+						pp += m_pWingList[i]->m_Surface[j].m_NXPanels*coef;
+					}
+					if(m_pWingList[i]->m_Surface[j].m_bIsTipRight && (m_pCurWPolar && !m_pCurWPolar->m_bThinSurfaces))
+					{
+						for(l=0; l<m_pWingList[i]->m_Surface[j].m_NXPanels; l++)
+						{
+							m_pWingList[i]->m_pPanel[p].m_iSym    = m_pWingList[i]->m_pPanel[pp+m_pWingList[i]->m_Surface[j].m_NXPanels-l-1].m_iElement;
+							p--;
+						}
+					}
+				}
 			}
 		}
-		ptr += Nel;
-		dlg.setValue(5+j*90/m_NSurfaces);
 	}
-	dlg.setValue(95);
-
-
 	if(bBodyEl)
 	{
 		Nel = CreateBodyElements();
-		for(pp=0; pp<m_pCurBody->m_NElements/2; pp++)
-		{
-			m_pPanel[p] = ptr + pp;
-			p++;
-		}
-	}
-
-	ptr = m_Panel;
-
-	//initialize the MatSize and the pointer to the first panel for each wing or body
-	if(m_pCurWing)
-	{
-		m_pCurWing->m_MatSize = 0;
-		for(j=0; j<m_pCurWing->m_NSurfaces;j++) m_pCurWing->m_MatSize += m_pCurWing->m_Surface[j].m_NElements;
-		m_pCurWing->m_pPanel = ptr ;
-		ptr += m_pCurWing->m_MatSize;
-	}
-
-	if(m_pCurWing2)
-	{
-		m_pCurWing2->m_MatSize = 0;
-		for(j=0; j<m_pCurWing2->m_NSurfaces;j++) m_pCurWing2->m_MatSize += m_pCurWing2->m_Surface[j].m_NElements;
-		m_pCurWing2->m_pPanel = ptr ;
-		ptr += m_pCurWing2->m_MatSize;
-	}
-
-	if(m_pCurStab)
-	{
-		m_pCurStab->m_MatSize = 0;
-		for(j=0; j<m_pCurStab->m_NSurfaces;j++)  m_pCurStab->m_MatSize  += m_pCurStab->m_Surface[j].m_NElements;
-		m_pCurStab->m_pPanel = ptr ;
-		ptr += m_pCurStab->m_MatSize;
-	}
-
-	if(m_pCurFin)
-	{
-		m_pCurFin->m_MatSize = 0;
-		for(j=0; j<m_pCurFin->m_NSurfaces;j++)   m_pCurFin->m_MatSize   += m_pCurFin->m_Surface[j].m_NElements;
-		m_pCurFin->m_pPanel = ptr ;
-		ptr += m_pCurFin->m_MatSize;
-	}
-
-	if(bBodyEl)
-	{
 		m_pCurBody->m_pPanel = ptr;
-		ptr +=  2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
-	}
+		HalfSize = m_pCurBody->m_NElements/2;
+		p  = HalfSize-1;
+		pp = HalfSize;
 
-	// at this point, ptr points to the last+1 panel of the full array
-
-	// we reference the right side panels in reverse order, from right to left, for symmetry purposes
-
-	int coef=1;
-	if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD &&!m_pCurWPolar->m_bThinSurfaces) coef = 2;
-
-	if(bBodyEl)
-	{
-		ptr = m_pCurBody->m_pPanel + m_pCurBody->m_nxPanels*m_pCurBody->m_nhPanels;
-		for (k = m_pCurBody->m_nxPanels-1; k>=0; k--)
+		for(k=0; k<m_pCurBody->m_nxPanels; k++)
 		{
-			// the body's rigth side panels have been generated in reverse order... so just copy
-			for (l=0; l<m_pCurBody->m_nhPanels; l++)
+			for(l=0; l<m_pCurBody->m_nhPanels; l++)
 			{
-				m_pPanel[p] = ptr+l;
-				p++;
+				m_pCurBody->m_pPanel[p].m_iSym    = m_pCurBody->m_pPanel[pp+m_pCurBody->m_nhPanels-l-1].m_iElement;
+
+				p--;
 			}
-			ptr += m_pCurBody->m_nhPanels;
+			pp += m_pCurBody->m_nhPanels;
 		}
 	}
-
-	if(m_pCurFin)
-	{
-		ptr = m_pCurFin->m_pPanel;
-		for (j=0; j<m_pCurFin->m_NSurfaces; j++)
-		{
-			if(m_pCurFin->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurFin->m_Surface[j].m_NElements;
-			else
-			{
-				if(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
-				   && m_pCurFin->m_Surface[j].m_bIsTipLeft && !m_pCurWPolar->m_bThinSurfaces)
-				{
-					// process left tip patch
-					for (l=m_pCurFin->m_Surface[j].m_NXPanels-1;l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurFin->m_Surface[j].m_NXPanels;
-				}
-				for (k=0; k<m_pCurFin->m_Surface[j].m_NYPanels; k++)
-				{
-					// process the surface's "horizontal" panels
-					for (l=m_pCurFin->m_Surface[j].m_NXPanels*coef-1; l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurFin->m_Surface[j].m_NXPanels * coef;
-				}
-
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
-					&& m_pCurFin->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
-				{
-					// process right tip patch
-					for (l=m_pCurFin->m_Surface[j].m_NXPanels-1;l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurFin->m_Surface[j].m_NXPanels;
-				}
-			}
-		}
-	}
-
-
-	if(m_pCurStab)
-	{
-		ptr = m_pCurStab->m_pPanel;
-		for (j=0; j<m_pCurStab->m_NSurfaces; j++)
-		{
-			if(m_pCurStab->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurStab->m_Surface[j].m_NElements;
-			else
-			{
-				for (k=0; k<m_pCurStab->m_Surface[j].m_NYPanels; k++)
-				{
-					// process the surface's "horizontal" panels
-					for (l=m_pCurStab->m_Surface[j].m_NXPanels*coef-1; l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurStab->m_Surface[j].m_NXPanels * coef;
-				}
-
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
-					&& m_pCurStab->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
-				{
-					// process right tip patch
-					for (l=m_pCurStab->m_Surface[j].m_NXPanels-1;l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurStab->m_Surface[j].m_NXPanels;
-				}
-			}
-		}
-	}
-
-	if(m_pCurWing2)
-	{
-		ptr = m_pCurWing2->m_pPanel;
-		for (j=0; j<m_pCurWing2->m_NSurfaces; j++)
-		{
-			if(m_pCurWing2->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurWing2->m_Surface[j].m_NElements;
-			else
-			{
-				for (k=0; k<m_pCurWing2->m_Surface[j].m_NYPanels; k++)
-				{
-					// process the surface's "horizontal" panels
-					for (l=m_pCurWing2->m_Surface[j].m_NXPanels*coef-1; l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurWing2->m_Surface[j].m_NXPanels * coef;
-				}
-
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
-					&& m_pCurWing2->m_Surface[j].m_bIsTipRight&& !m_pCurWPolar->m_bThinSurfaces)
-				{
-					// process right tip patch
-					for (l=m_pCurWing2->m_Surface[j].m_NXPanels-1;l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurWing2->m_Surface[j].m_NXPanels;
-				}
-			}
-		}
-	}
-
-
-	if(m_pCurWing)
-	{
-		ptr = m_pCurWing->m_pPanel;
-		for (j=0; j<m_pCurWing->m_NSurfaces; j++)
-		{
-			if(m_pCurWing->m_Surface[j].m_bIsLeftSurf)  ptr += m_pCurWing->m_Surface[j].m_NElements;
-			else
-			{
-				for (k=0; k<m_pCurWing->m_Surface[j].m_NYPanels; k++)
-				{
-					// process the surface's "horizontal" panels
-					for (l=m_pCurWing->m_Surface[j].m_NXPanels*coef-1; l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurWing->m_Surface[j].m_NXPanels * coef;
-				}
-
-				if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD
-					&& m_pCurWing->m_Surface[j].m_bIsTipRight && !m_pCurWPolar->m_bThinSurfaces)
-				{
-					// process right tip patch
-					for (l=m_pCurWing->m_Surface[j].m_NXPanels-1;l>=0; l--)
-					{
-						m_pPanel[p] = ptr+l;
-						p++;
-					}
-					ptr += m_pCurWing->m_Surface[j].m_NXPanels;
-				}
-			}
-		}
-	}
+//for(p=0; p<m_MatSize; p++)	qDebug(" %3d    %3d   %3d   ", p, m_Panel[p].m_iSym, m_Panel[p].m_iPos);
 
 	dlg.setValue(100);
 	return true;
@@ -7859,7 +7624,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			if(m_r2DCltRect.contains(point)) p2DWidget->setFocus();
 			
 			if(m_pCurGraph && m_iView==WSTABVIEW && (m_iStabilityView==1)
-			   && m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD)
+			   && m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 			{
 				//first we try to see if the user intended to select a mode;
 				//if not, then we initiate the graph translation
@@ -8470,7 +8235,7 @@ void QMiarex::OnAnalyze()
 	{
 		LLTAnalyze(V0, VMax, VDelta, m_bSequence, m_bInitLLTCalc);
 	}
-	else if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD || m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
+	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 	{
 		if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
 		{
@@ -8482,9 +8247,10 @@ void QMiarex::OnAnalyze()
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
 //		VLMAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
-	else if(m_pCurWPolar->m_AnalysisMethod==STABILITYMETHOD)
+	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
-		StabAnalyze(V0, VMax, VDelta, m_bSequence);
+		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
+//		StabAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
 
 	m_bHighlightOpp = bHigh;
@@ -8589,7 +8355,9 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	s2 = sigma*sigma;
 	o2 = omega*omega;
 	t=m_ModeTime;
-	if(t>=5000.*m_Modedt) StopAnimate();
+
+	if(t>=100) StopAnimate();
+
 
 	if(m_bLongitudinal)
 	{
@@ -8954,7 +8722,6 @@ void QMiarex::OnDefineStabPolar()
 	m_StabPolarDlg.m_pWing2 = m_pCurWing;
 	m_StabPolarDlg.m_pStab  = m_pCurStab;
 	m_StabPolarDlg.m_pFin   = m_pCurFin;
-	m_StabPolarDlg.m_pMainFrame = m_pMainFrame;
 	m_StabPolarDlg.m_poaXPolar  = m_poaWPolar;
 
 	CWPolar* pCurWPolar       = new CWPolar;
@@ -8993,8 +8760,9 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_Density         = m_StabPolarDlg.m_Density;
 		pCurWPolar->m_Viscosity       = m_StabPolarDlg.m_Viscosity;
 		pCurWPolar->m_bViscous        = m_StabPolarDlg.m_bViscous;
-
 		pCurWPolar->m_RefAreaType     = m_StabPolarDlg.m_RefAreaType;
+		pCurWPolar->m_bThinSurfaces   = m_StabPolarDlg.m_bThinSurfaces;
+
 		if(pCurWPolar->m_RefAreaType==PLANFORMAREA)
 		{
 			pCurWPolar->m_WArea        = m_pCurWing->m_PlanformArea;
@@ -9008,8 +8776,8 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_bVLM1           = true;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
-		pCurWPolar->m_AnalysisMethod    = 4; //Stability analysis
-		pCurWPolar->m_bThinSurfaces   = false;
+//		pCurWPolar->m_AnalysisMethod  = STABILITYMETHOD; //Stability analysis
+		pCurWPolar->m_AnalysisMethod  = PANELMETHOD; //Stability analysis
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Height          = 0.0;
@@ -9105,6 +8873,7 @@ void QMiarex::OnDefineWPolar()
 	m_WngAnalysis.m_poaWPolar   = m_poaWPolar;
 	if(m_pCurPlane)	m_WngAnalysis.m_UFOName   = m_pCurPlane->m_PlaneName;
 	else            m_WngAnalysis.m_UFOName   = m_pCurWing->m_WingName;
+
 	m_WngAnalysis.InitDialog();
 	m_WngAnalysis.move(pMainFrame->m_DlgPos);
 	int res = m_WngAnalysis.exec();
@@ -9612,8 +9381,8 @@ void QMiarex::OnEditCurBody()
 	memBody.Duplicate(m_pCurBody);
 	m_GL3dBody.SetBody(m_pCurBody);
 	m_GL3dBody.m_bEnableName = false;
-	m_GL3dBody.setWindowState(Qt::WindowMaximized);
 	m_GL3dBody.InitDialog();
+	m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -9955,7 +9724,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
 	out << strong;
 
-	if(m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
+	if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		//export non dimensional stability derivatives
 		if(type==1) 
@@ -10141,17 +9910,12 @@ void QMiarex::OnExportCurWOpp()
 		else           out << tr("Wing Cp Coefficients\n");
 		coef = 1;
 
-		if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
-		{
-			if(type==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-			else        out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
-		}
-		else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
+		if(!m_pCurWPolar->m_bThinSurfaces)
 		{
 			coef = 2;
-			if(type==1) out << tr(" Panel     CollPt.x        CollPt.y        CollPt.z             Cp\n");
-			else        out << tr("Panel,CollPt.x,CollPt.y,CollPt.z,Cp\n");
 		}
+		if(type==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+		else        out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
 
 		if(type==1) Format = "%1     %2     %3     %4     %5\n";
 		else        Format = "%1,%2,%3,%4,%5\n";
@@ -10170,11 +9934,11 @@ void QMiarex::OnExportCurWOpp()
 
 				for(l=0; l<m_pCurWing->m_Surface[j].m_NXPanels * coef; l++)
 				{
-					if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
+					if(m_Panel[p].m_iPos==0)
 					{
 						strong = QString(Format).arg(p,4).arg(m_Panel[p].CtrlPt.x,11,'e',3).arg(m_Panel[p].CtrlPt.y,11,'e',3).arg(m_Panel[p].CtrlPt.z,11,'e',3).arg(m_pCurWOpp->m_Cp[p],11,'f',4);
 					}
-					else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
+					else
 					{
 						strong = QString(Format).arg(p,4).arg(m_Panel[p].CollPt.x,11,'e',3).arg(m_Panel[p].CollPt.y,11,'e',3).arg(m_Panel[p].CollPt.z,11,'e',3).arg(m_pCurWOpp->m_Cp[p],11,'f',4);
 					}
@@ -10202,11 +9966,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurWing2->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
+						if(m_pCurWing2->m_pPanel[p].m_iPos==0)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurWing2->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_Wing2WOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
+						else
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurWing2->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurWing2->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_Wing2WOpp.m_Cp[p],11,'f',4);
 						}
@@ -10235,11 +9999,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurStab->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
+						if(m_pCurStab->m_pPanel[p].m_iPos==0)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurStab->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurStab->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurStab->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_StabWOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
+						else
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurStab->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurStab->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurStab->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_StabWOpp.m_Cp[p],11,'f',4);
 						}
@@ -10267,11 +10031,11 @@ void QMiarex::OnExportCurWOpp()
 
 					for(l=0; l<m_pCurFin->m_Surface[j].m_NXPanels * coef; l++)
 					{
-						if(m_pCurWOpp->m_AnalysisMethod==VLMMETHOD || m_pCurWOpp->m_AnalysisMethod==STABILITYMETHOD)
+						if(m_pCurFin->m_pPanel[p].m_iPos==0)
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurFin->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pCurFin->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pCurFin->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pCurPOpp->m_FinWOpp.m_Cp[p],11,'f',4);
 						}
-						else if(m_pCurWOpp->m_AnalysisMethod==PANELMETHOD)
+						else
 						{
 							strong = QString(Format).arg(p,4).arg(m_pCurFin->m_pPanel[p].CollPt.x,11,'e',3).arg(m_pCurFin->m_pPanel[p].CollPt.y,11,'e',3).arg(m_pCurFin->m_pPanel[p].CollPt.z,11,'e',3).arg(m_pCurPOpp->m_FinWOpp.m_Cp[p],11,'f',4);
 						}
@@ -10293,11 +10057,10 @@ void QMiarex::OnExportCurWOpp()
 void QMiarex::OnExportCurWPolar()
 {
 	if (!m_pCurWPolar) return;
-	QString filter =".csv";
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
+	QString FileName;
+
 	int type = 1;
 
 	FileName = m_pCurWPolar->m_PlrName;
@@ -10305,7 +10068,7 @@ void QMiarex::OnExportCurWPolar()
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Polar"),
 											pMainFrame->m_LastDirName + "/"+FileName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&filter);
+											&pMainFrame->m_GraphExportFilter);
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
@@ -10534,6 +10297,7 @@ void QMiarex::OnHideAllWPolars()
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
 		pWPolar->m_bIsVisible = false;
+		if(pWPolar->m_Type==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
 	}
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
@@ -10880,6 +10644,7 @@ void QMiarex::OnLiftScale(int pos)
 void QMiarex::OnLight()
 {
 	m_bglLight = m_pctrlLight->isChecked();
+//	m_bResetglGeom = true;
 	UpdateView();
 }
 
@@ -12255,8 +12020,8 @@ void QMiarex::PaintView(QPainter &painter)
 				m_pCurWPlrGraph = &m_WPlrGraph1;
 			}
 			Rect1.setRect(0,0,w23,m_r2DCltRect.bottom()-00);
-			DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
 			m_pCurGraph->DrawGraph(Rect1, painter);
+			DrawWPolarLegend(painter, m_WPlrLegendOffset, Rect1.bottom());
 		}
 		else if(m_iWPlrView == 2)
 		{
@@ -12292,10 +12057,9 @@ void QMiarex::PaintView(QPainter &painter)
 //			PaintSingleWingGraph(painter);
 			if (m_pCurWingGraph && m_pCurWing && m_r2DCltRect.width()/2>200 && m_r2DCltRect.height()>250)
 			{
-
-				m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
 				QPoint Place(m_r2DCltRect.left()+10, m_r2DCltRect.top() +30);
 				DrawWOppLegend(painter, Place, m_r2DCltRect.bottom());
+				m_pCurWingGraph->DrawGraph(m_rSingleRect, painter);
 			}
 		
 			painter.setFont(pMainFrame->m_TextFont);
@@ -12919,38 +12683,40 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_nWakeNodes     = m_nWakeNodes;
 	m_pPanelDlg->m_WakeSize       = m_WakeSize;
 	m_pPanelDlg->m_bTrefftz       = m_bTrefftz;
+	m_pPanelDlg->m_nNodes         = m_nNodes;
+	m_pPanelDlg->m_NSurfaces      = m_NSurfaces;
+	m_pPanelDlg->m_ppSurface      = m_pSurface;
+	m_pPanelDlg->m_pWing          = m_pCurWing;
+	m_pPanelDlg->m_pWing2         = m_pCurWing2;
+	m_pPanelDlg->m_pStab          = m_pCurStab;
+	m_pPanelDlg->m_pFin           = m_pCurFin;
+	m_pPanelDlg->m_pPlane         = m_pCurPlane;
+	m_pPanelDlg->m_MatSize        = m_MatSize;
+	m_pPanelDlg->m_NWakeColumn    = m_NWakeColumn;
+	m_pPanelDlg->m_bDirichlet     = m_bDirichlet;
 
-	if(m_pCurWPolar->m_Type!=4)
-	{
-		m_pPanelDlg->m_QInf       = m_pCurWPolar->m_QInf;
-		m_pPanelDlg->m_Alpha      = V0;
-		m_pPanelDlg->m_AlphaMax   = VMax;
-		m_pPanelDlg->m_AlphaDelta = VDelta;
-	}
-	else
+	if(m_pCurWPolar->m_Type==4)
 	{
 		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 		m_pPanelDlg->m_QInf       = V0;
 		m_pPanelDlg->m_QInfMax    = VMax;
 		m_pPanelDlg->m_QInfDelta  = VDelta;
 	}
+	else if(m_pCurWPolar->m_Type==7)
+	{
+		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 
-	m_pPanelDlg->m_pWing   = m_pCurWing;
-	m_pPanelDlg->m_pWing2  = m_pCurWing2;
-	m_pPanelDlg->m_pStab   = m_pCurStab;
-	m_pPanelDlg->m_pFin    = m_pCurFin;
-	m_pPanelDlg->m_pPlane  = m_pCurPlane;
-	m_pPanelDlg->m_MatSize = m_MatSize;
-	m_pPanelDlg->m_NWakeColumn  = m_NWakeColumn;
-	m_pPanelDlg->m_bDirichlet   = m_bDirichlet;
-
-
-	m_pPanelDlg->m_AlphaMin   = V0;
-	m_pPanelDlg->m_AlphaMax   = VMax;
-	m_pPanelDlg->m_AlphaDelta = VDelta;
-
-	m_pPanelDlg->m_nNodes     = m_nNodes;
-	m_pPanelDlg->m_NSurfaces  = m_NSurfaces;
+		m_pPanelDlg->m_ControlMin    = V0;
+		m_pPanelDlg->m_ControlMax    = VMax;
+		m_pPanelDlg->m_ControlDelta  = VDelta;
+	}
+	else
+	{
+		m_pPanelDlg->m_QInf       = m_pCurWPolar->m_QInf;
+		m_pPanelDlg->m_Alpha      = V0;
+		m_pPanelDlg->m_AlphaMax   = VMax;
+		m_pPanelDlg->m_AlphaDelta = VDelta;
+	}
 
 
 	m_pPanelDlg->move(pMainFrame->m_DlgPos);
@@ -14468,7 +14234,7 @@ void QMiarex::SetUFO(QString UFOName)
 	int i;
 	CWing *pWing;
 	CPlane *pPlane;
-//	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	if(!UFOName.length())
 	{
@@ -14500,6 +14266,7 @@ void QMiarex::SetUFO(QString UFOName)
 
 			if(!UFOName.size())
 			{
+				for(int i=0; i<4; i++) m_pWingList[i] = NULL;
 				m_pCurPlane = NULL;
 				m_pCurBody  = NULL;
 				m_pCurWing  = NULL;
@@ -14525,6 +14292,8 @@ void QMiarex::SetUFO(QString UFOName)
 
 	if(!m_pCurWing && !m_pCurPlane)
 	{
+		pMainFrame->m_UFOType = "";
+		for(int i=0; i<4; i++) m_pWingList[i] = NULL;
 		m_pCurBody  = NULL;
 		m_pCurWing2 = NULL;
 		m_pCurStab  = NULL;
@@ -14538,6 +14307,7 @@ void QMiarex::SetUFO(QString UFOName)
 
 	if(m_pCurPlane)
 	{
+		pMainFrame->m_UFOType = "Plane";
 		m_pCurWing = &m_pCurPlane->m_Wing;
 		if(m_pCurPlane->m_bBody)    m_pCurBody  = m_pCurPlane->m_pBody;
 		else						m_pCurBody  = NULL;
@@ -14555,12 +14325,18 @@ void QMiarex::SetUFO(QString UFOName)
 	}
 	else
 	{
+		pMainFrame->m_UFOType = "Wing";
 		m_pCurPOpp  = NULL;
 		m_pCurBody  = NULL;
 		m_pCurWing2 = NULL;
 		m_pCurStab  = NULL;
 		m_pCurFin   = NULL;
 	}
+
+	m_pWingList[0] = m_pCurWing;
+	m_pWingList[1] = m_pCurWing2;
+	m_pWingList[2] = m_pCurStab;
+	m_pWingList[3] = m_pCurFin;
 
 	m_bResetglGeom   = true;
 	if(m_pCurBody)
@@ -14609,6 +14385,7 @@ void QMiarex::SetUFO(QString UFOName)
 			m_pSurface[m_NSurfaces] = &m_pCurWing->m_Surface[i];
 			m_NSurfaces++;
 		}
+		m_pCurWing->ComputeBodyAxisInertia();
 	}
 
 	if(m_pCurWing2)
@@ -14620,6 +14397,7 @@ void QMiarex::SetUFO(QString UFOName)
 			m_pSurface[m_NSurfaces] = &m_pCurWing2->m_Surface[i];
 			m_NSurfaces++;
 		}
+		m_pCurWing2->ComputeBodyAxisInertia();
 	}
 
 	if(m_pCurStab)
@@ -14631,6 +14409,7 @@ void QMiarex::SetUFO(QString UFOName)
 			m_pSurface[m_NSurfaces] = &m_pCurStab->m_Surface[i];
 			m_NSurfaces++;
 		}
+		m_pCurStab->ComputeBodyAxisInertia();
 	}
 
 	if(m_pCurFin)
@@ -14642,7 +14421,47 @@ void QMiarex::SetUFO(QString UFOName)
 			m_pSurface[m_NSurfaces] = &m_pCurFin->m_Surface[i];
 			m_NSurfaces++;
 		}
+		m_pCurFin->ComputeBodyAxisInertia();
 	}
+	if(m_pCurBody)  m_pCurBody->ComputeBodyAxisInertia();
+	if(m_pCurPlane) m_pCurPlane->ComputeBodyAxisInertia();
+
+	CWPolar *pWPolar;
+	for(i=0; i<m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		if(pWPolar->m_Type==STABILITYPOLAR)
+		{
+			pWPolar->m_AnalysisMethod=PANELMETHOD;
+			if(fabs(pWPolar->m_Weight)<PRECISION)
+			{
+				//very special case, the polar was generated by v600 or v601
+				// need to reload inertia data from plane inertia
+				pWing  = GetWing(pWPolar->m_UFOName);
+				pPlane = GetPlane(pWPolar->m_UFOName);
+//	qDebug()<<pWPolar->m_UFOName<<pWPolar->m_PlrName<<pWPolar->m_Weight;
+				if(pWing)
+				{
+					pWPolar->m_Weight = pWing->m_TotalMass;
+					pWPolar->m_CoG    = pWing->m_CoG;
+					pWPolar->m_CoGIxx = pWing->m_CoGIxx;
+					pWPolar->m_CoGIyy = pWing->m_CoGIyy;
+					pWPolar->m_CoGIzz = pWing->m_CoGIzz;
+					pWPolar->m_CoGIxz = pWing->m_CoGIxz;
+				}
+				else if(pPlane)
+				{
+					pWPolar->m_Weight = pPlane->m_TotalMass;
+					pWPolar->m_CoG    = pPlane->m_CoG;
+					pWPolar->m_CoGIxx = pPlane->m_CoGIxx;
+					pWPolar->m_CoGIyy = pPlane->m_CoGIyy;
+					pWPolar->m_CoGIzz = pPlane->m_CoGIzz;
+					pWPolar->m_CoGIxz = pPlane->m_CoGIxz;
+				}
+			}
+		}
+	}
+
 
 	if (m_pCurWPolar)
 	{
@@ -14678,7 +14497,7 @@ void QMiarex::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-//	setSizePolicy(szPolicyMaximum);
+	setSizePolicy(szPolicyMaximum);
 //_______________________Analysis
 	m_pctrlSequence = new QCheckBox(tr("Sequence"));
 	QGridLayout *SequenceGroup = new QGridLayout;
@@ -14745,18 +14564,7 @@ void QMiarex::SetupLayout()
 	m_pctrlStream        = new QCheckBox(tr("Stream"));
 	m_pctrlWOppAnimate   = new QCheckBox(tr("Animate"));
 	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight OpPoint"));
-/*	m_pctrlHalfWing->setSizePolicy(szPolicyMaximum);
-	m_pctrlLift->setSizePolicy(szPolicyMaximum);
-	m_pctrlIDrag->setSizePolicy(szPolicyMaximum);
-	m_pctrlVDrag->setSizePolicy(szPolicyMaximum);
-	m_pctrlTrans->setSizePolicy(szPolicyMaximum);
-	m_pctrlMoment->setSizePolicy(szPolicyMaximum);
-	m_pctrlDownwash->setSizePolicy(szPolicyMaximum);
-	m_pctrlCp->setSizePolicy(szPolicyMaximum);
-	m_pctrlSurfVel->setSizePolicy(szPolicyMaximum);
-	m_pctrlStream->setSizePolicy(szPolicyMaximum);
-	m_pctrlWOppAnimate->setSizePolicy(szPolicyMaximum);
-	m_pctrlHighlightOpp->setSizePolicy(szPolicyMaximum);*/
+
 
 	m_pctrlAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateWOppSpeed->setMinimum(0);
@@ -14781,11 +14589,12 @@ void QMiarex::SetupLayout()
 	DisplayBox->setLayout(CheckDispLayout);
 
 	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properies"));
-	m_pctrlPolarProps1 = new QLabel;
-//	m_pctrlPolarProps1->setReadOnly(true);
+	m_pctrlPolarProps1 = new QTextEdit;
+	m_pctrlPolarProps1->setReadOnly(true);
 //	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);
 	QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
 	PolarPropsLayout->addWidget(m_pctrlPolarProps1);
+	PolarPropsLayout->addStretch(1);
 	PolarPropsBox->setLayout(PolarPropsLayout);
 
 //_______________________Curve params
@@ -14860,8 +14669,8 @@ void QMiarex::SetupLayout()
 //_______________________Stability Params
 	
 	
-	m_pctrlPolarProps = new QLabel;
-//	m_pctrlPolarProps->setReadOnly(true);
+	m_pctrlPolarProps = new QTextEdit;
+	m_pctrlPolarProps->setReadOnly(true);
 //	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
 
 	QGroupBox *StabilityBox = new QGroupBox(tr("Stability analysis"));
@@ -14879,19 +14688,7 @@ void QMiarex::SetupLayout()
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
 	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
 	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
-/*	m_pctrlAxes->setMinimumHeight(10);
-	m_pctrlLight->setMinimumHeight(10);
-	m_pctrlSurfaces->setMinimumHeight(10);
-	m_pctrlOutline->setMinimumHeight(10);
-	m_pctrlPanels->setMinimumHeight(10);
-	m_pctrlFoilNames->setMinimumHeight(10);
-	m_pctrlVortices->setMinimumHeight(10);
-	m_pctrlLight->setSizePolicy(szPolicyMaximum);
-	m_pctrlSurfaces->setSizePolicy(szPolicyMaximum);
-	m_pctrlOutline->setSizePolicy(szPolicyMaximum);
-	m_pctrlPanels->setSizePolicy(szPolicyMaximum);
-	m_pctrlVortices->setSizePolicy(szPolicyMaximum);
-	m_pctrlFoilNames->setSizePolicy(szPolicyMaximum);*/
+
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
 	ThreeDParams->addWidget(m_pctrlLight, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
@@ -14904,10 +14701,7 @@ void QMiarex::SetupLayout()
 	m_pctrlY          = new QPushButton("Y");
 	m_pctrlZ          = new QPushButton("Z");
 	m_pctrlIso        = new QPushButton("Iso");
-/*	m_pctrlX->setSizePolicy(szPolicyMaximum);
-	m_pctrlY->setSizePolicy(szPolicyMaximum);
-	m_pctrlZ->setSizePolicy(szPolicyMaximum);
-	m_pctrlIso->setSizePolicy(szPolicyMaximum);*/
+
 
 	ThreeDView->addWidget(m_pctrlX,1,1);
 	ThreeDView->addWidget(m_pctrlY,1,2);
@@ -14916,9 +14710,8 @@ void QMiarex::SetupLayout()
 
 	m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
 	m_pctrlReset          = new QPushButton(tr("Reset"));
-//	m_pctrlReset->setSizePolicy(szPolicyMaximum);
 	m_pctrlPickCenter->setCheckable(true);
-//	m_pctrlPickCenter->setSizePolicy(szPolicyMaximum);
+
 	ThreeDView->addWidget(m_pctrlReset,3,1);
 	ThreeDView->addWidget(m_pctrlPickCenter,3,2);
 
@@ -14930,7 +14723,6 @@ void QMiarex::SetupLayout()
 	m_pctrlClipPlanePos->setSliderPosition(0);
 	m_pctrlClipPlanePos->setTickInterval(30);
 	m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
-//	m_pctrlClipPlanePos->setSizePolicy(szPolicyMinimum);
 	ClipLayout->addWidget(ClipLabel);
 	ClipLayout->addWidget(m_pctrlClipPlanePos,1);
 
@@ -15765,58 +15557,6 @@ void QMiarex::SnapClient(QString const &FileName)
 
 
 
-
-void QMiarex::StabAnalyze(double V0, double VMax, double VDelta, bool bSequence)
-{
-	if(!m_pCurWing || !m_pCurWPolar) return;
-	if(m_pCurWPolar->m_Type<7)       return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-
-	m_pStabDlg->m_pWPolar    = m_pCurWPolar;
-	m_pStabDlg->m_MatSize    = m_MatSize;
-	m_pStabDlg->m_nNodes     = m_nNodes;
-	m_pStabDlg->m_NSurfaces  = m_NSurfaces;
-	m_pStabDlg->m_ppSurface  = m_pSurface;
-
-	m_pStabDlg->m_pPlane     = m_pCurPlane;
-	m_pStabDlg->m_pWing      = m_pCurWing;
-	m_pStabDlg->m_pWing2     = m_pCurWing2;
-	m_pStabDlg->m_pStab      = m_pCurStab;
-	m_pStabDlg->m_pFin       = m_pCurFin;
-	m_pStabDlg->m_pWPolar    = m_pCurWPolar;
-	m_pStabDlg->m_bSequence  = bSequence;
-	m_pStabDlg->m_bTrefftz   = m_bTrefftz;
-
-	m_pStabDlg->m_ControlMin    = V0;
-	m_pStabDlg->m_ControlMax    = VMax;
-	m_pStabDlg->m_ControlDelta  = VDelta;
-
-	m_pStabDlg->m_MatSize    = m_MatSize;
-	m_pStabDlg->m_nNodes     = m_nNodes;
-	m_pStabDlg->m_NSurfaces  = m_NSurfaces;
-
-	m_pStabDlg->move(pMainFrame->m_DlgPos);
-	m_pStabDlg->InitDialog();
-	m_pStabDlg->show();
-	m_pStabDlg->StartAnalysis();
-
-	if(!m_bLogFile || !m_pStabDlg->m_bWarning) m_pStabDlg->hide();
-
-	pMainFrame->UpdateWOpps();
-	if(m_pCurPlane)     SetPOpp(false, V0);
-	else if(m_pCurWing) SetWOpp(false, V0);
-
-	if(m_iView==WPOLARVIEW)      CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)  CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)   CreateWOppCurves();
-	else if(m_iView==WCPVIEW)    CreateCpCurves();
-
-	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-	pStabView->SetControls();
-	pStabView->SetMode();
-
-	UpdateView();
-}
 
 
 void QMiarex::StopAnimate()

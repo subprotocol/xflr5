@@ -36,7 +36,6 @@
 #define LLTMETHOD           1
 #define VLMMETHOD           2
 #define PANELMETHOD         3
-#define STABILITYMETHOD     4
 
 //3D analysis parameters
 #define MAXPANELS          50 // max number of sections on a half wing

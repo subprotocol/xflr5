@@ -44,7 +44,7 @@ CAddDlg::CAddDlg()
 void CAddDlg::SetupLayout()
 {
 	QGridLayout *RefineGrid =new QGridLayout;
-	QLabel *lab1 = new QLabel(tr("Angle Criterion ")+QString::fromUtf8("°)"));
+	QLabel *lab1 = new QLabel(tr("Angle Criterion ")+QString::fromUtf8("(°)"));
 	QLabel *lab2 = new QLabel(tr("Type of Spline"));
 	QLabel *lab3 = new QLabel(tr("Refinement X Limits"));
 	QLabel *lab4 = new QLabel(tr("From"));

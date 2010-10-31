@@ -876,20 +876,20 @@ void GraphDlg::SetupLayout()
 	QHBoxLayout *VariableBox = new QHBoxLayout;
 	m_pctrlXSel = new QListWidget;
 	m_pctrlYSel = new QListWidget;
-	m_pctrlXSel->setMinimumWidth(30);
+/*	m_pctrlXSel->setMinimumWidth(30);
 	m_pctrlYSel->setMinimumWidth(30);
 	m_pctrlXSel->setMinimumHeight(200);
-	m_pctrlYSel->setMinimumHeight(200);
-	VariableBox->addStretch(1);
+	m_pctrlYSel->setMinimumHeight(200);*/
+//	VariableBox->addStretch(1);
 	VariableBox->addWidget(m_pctrlYSel);
-	VariableBox->addStretch(1);
+//	VariableBox->addStretch(1);
 	VariableBox->addWidget(m_pctrlXSel);
-	VariableBox->addStretch(1);
+//	VariableBox->addStretch(1);
 
 	QVBoxLayout *VariableLayout = new QVBoxLayout(this);
 	VariableLayout->addLayout(AxisNames);
 	VariableLayout->addLayout(VariableBox);
-	VariableLayout->addStretch(1);
+//	VariableLayout->addStretch(1);
 
 	VariablePage->setLayout(VariableLayout);
 

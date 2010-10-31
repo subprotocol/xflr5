@@ -91,7 +91,6 @@ private:
 	bool m_bWakeRollUp;
 	bool m_bTiltedGeom;
 	bool m_bViscous;
-//	bool m_bPolar;//true if classic polar, false, if control polar
 
 	int m_NXWakePanels;
 	double m_TotalWakeLength;
@@ -99,7 +98,7 @@ private:
 
 	CVector m_CoG;
 	
-	//Inertia properties in case the user selects the option to input manually the values
+	//Inertia properties
 	bool m_bAutoInertia;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 

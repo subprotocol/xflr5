@@ -67,6 +67,10 @@ protected:
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
 
+	CVector m_CoG;
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+	double m_VolumeMass, m_TotalMass;
+
 	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
 	QString m_PlaneDescription;
 
@@ -76,6 +80,7 @@ private:
 	void ComputePlane(void);
 	
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
+	void ComputeBodyAxisInertia();
 
 
 public:

@@ -21,7 +21,6 @@
 
 #include <QVBoxLayout>
 #include "ProgressDlg.h"
-#include <QtDebug>
 
 ProgressDlg::ProgressDlg()
 {
@@ -59,13 +58,19 @@ void ProgressDlg::SetupLayout()
 	m_pctrlProgress->setMaximum(100);
 	m_pctrlProgress->setValue(0);
 
+	QHBoxLayout *CancelLayout = new QHBoxLayout;
 	CancelButton = new QPushButton(tr("Cancel"));
 	CancelButton->setDefault(true);
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
+	CancelLayout->addStretch(1);
+	CancelLayout->addWidget(CancelButton);
+	CancelLayout->addStretch(1);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addWidget(m_pctrlProgress);
-	mainLayout->addWidget(CancelButton);
+	mainLayout->addStretch(1);
+	mainLayout->addLayout(CancelLayout);
+
 	setLayout(mainLayout);
 }
 

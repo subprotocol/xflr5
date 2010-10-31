@@ -58,7 +58,9 @@ CBody::CBody()
 
 	m_bClosedSurface = false;
 
-	m_Mass = 1.0;
+	m_CoG.Set(0.0,0.0,0.0);
+	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
+	m_VolumeMass = m_TotalMass = 0.0;
 	m_NMass = 0;
 	memset(m_MassValue,    0, sizeof(m_MassValue));
 	memset(m_MassPosition, 0, sizeof(m_MassPosition));
@@ -189,8 +191,52 @@ void CBody::ComputeCenterLine()
 	}
 }
 
+void CBody::ComputeBodyAxisInertia()
+{
+	// Calculates the inertia tensor in geometrical (body) axis :
+	//  - adds the volume inertia AND the point masses of all components
+	//  - the body axis is the frame in which all the geometry has been defined
+	//  - the origin=BodyFrame;
+	//  - the center of gravity is calculated from component masses and is NOT the CoG defined in the polar
 
-void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
+	int i;
+	CVector LA, VolumeCoG, TotalCoG;
+	double Ixx, Iyy, Izz, Ixz,  VolumeMass, TotalMass;
+	Ixx = Iyy = Izz = Ixz = TotalMass = VolumeMass = 0.0;
+
+	ComputeVolumeInertia(VolumeCoG, Ixx, Iyy, Izz, Ixz);
+	TotalMass = m_VolumeMass;
+
+	TotalCoG = VolumeCoG *m_VolumeMass;
+
+	// add point masses
+	for(i=0; i<m_NMass; i++)
+	{
+		TotalMass += m_MassValue[i];
+		TotalCoG += m_MassPosition[i] * m_MassValue[i];
+	}
+
+	TotalCoG = TotalCoG/TotalMass;
+
+	// The CoG position is now available, so calculate the inertia w.r.t the CoG
+	for(i=0; i<m_NMass; i++)
+	{
+		LA = m_MassPosition[i] - TotalCoG;
+		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+		Ixz += m_MassValue[i] * (LA.x*LA.z);
+	}
+
+	m_TotalMass = TotalMass;
+	m_CoG = TotalCoG;
+	m_CoGIxx =  Ixx;
+	m_CoGIyy =  Iyy;
+	m_CoGIzz =  Izz;
+	m_CoGIxz = -Ixz;
+}
+
+void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
 	// Assume that the mass is distributed homogeneously in the body's skin
 	// Homogeneity is questionable, but is a rather handy assumption
@@ -242,7 +288,7 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx
 		}
 
 		BodyArea *= 2.0;
-		rho = Mass/BodyArea;
+		rho = m_VolumeMass/BodyArea;
 		//First get the CoG position
 		for (i=0; i<m_NStations-1; i++)
 		{
@@ -288,8 +334,8 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx
 				CoG.z += SectionArea*rho * Pt.z;
 			}
 		}
-		if(Mass>0.0) CoG *= 1.0/ Mass;
-		else         CoG.Set(0.0, 0.0, 0.0);
+		if(m_VolumeMass>PRECISION) CoG *= 1.0/ m_VolumeMass;
+		else                       CoG.Set(0.0, 0.0, 0.0);
 
 		//Then Get Inertias
 		// we could do it one calculation, for CG and inertia, by using Hyghens/steiner theorem
@@ -352,7 +398,7 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx
 			xpos += dl;
 		}
 
-		rho = Mass / BodyArea;
+		rho = m_VolumeMass / BodyArea;
 
 		// First evaluate CoG, assuming each section is a point mass
 		xpos = m_FramePosition[0].x;
@@ -371,8 +417,8 @@ void CBody::ComputeBodyInertia(double const & Mass, CVector &CoG, double &CoGIxx
 			CoG.y += SectionArea*rho * Pt.y;
 			CoG.z += SectionArea*rho * Pt.z;
 		}
-		if(Mass>1.e-30) CoG *= 1.0/ Mass;
-		else            CoG.Set(0.0, 0.0, 0.0);
+		if(m_VolumeMass>PRECISION) CoG *= 1.0/ m_VolumeMass;
+		else                       CoG.Set(0.0, 0.0, 0.0);
 
 		// Next evaluate inertia, assuming each section is a point mass
 		xpos = m_FramePosition[0].x;
@@ -411,7 +457,14 @@ void CBody::Duplicate(CBody *pBody)
 	m_LineType       = pBody->m_LineType;
 	m_bClosedSurface = pBody->m_bClosedSurface;
 
-	m_Mass = pBody->m_Mass;
+	m_VolumeMass = pBody->m_VolumeMass;
+	m_TotalMass  = pBody->m_TotalMass;
+	m_CoG = pBody->m_CoG;
+	m_CoGIxx = pBody->m_CoGIxx;
+	m_CoGIyy = pBody->m_CoGIyy;
+	m_CoGIzz = pBody->m_CoGIzz;
+	m_CoGIxz = pBody->m_CoGIxz;
+
 	m_NMass = pBody->m_NMass;
 	for(int i=0; i<m_NMass;i++)
 	{
@@ -1572,7 +1625,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ProjectFormat>=5)
 		{
-			ar << (float)m_Mass;
+			ar << (float)m_VolumeMass;
 			ar << m_NMass;
 			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
 			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
@@ -1628,7 +1681,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ArchiveFormat>=1004)
 		{
-			ar >> f;  m_Mass = f;
+			ar >> f;  m_VolumeMass = f;
 			ar >> m_NMass;
 			for(i=0; i<m_NMass; i++)
 			{

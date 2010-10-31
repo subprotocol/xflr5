@@ -588,9 +588,9 @@ void StabViewDlg::SetupLayout()
 	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
 	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 	QSizePolicy szPolicyMaximum;
-	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
-	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
-
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Expanding);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Expanding);
+	setSizePolicy(szPolicyMaximum);
 
 	//____________Stability view______________________
 	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
@@ -608,10 +608,6 @@ void StabViewDlg::SetupLayout()
 	//____________Stability direction__________
 	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
 	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
-//	m_pctrlLongDynamics->setSizePolicy(szPolicyMaximum);
-//	m_pctrlLatDynamics->setSizePolicy(szPolicyMaximum);
-//	m_pctrlLongDynamics->setMinimumHeight(10);
-//	m_pctrlLatDynamics->setMinimumHeight(10);
 	QHBoxLayout *StabilityDirLayout = new QHBoxLayout;
 	StabilityDirLayout->addStretch(1);
 	StabilityDirLayout->addWidget(m_pctrlLongDynamics);
@@ -905,7 +901,6 @@ void StabViewDlg::SetupLayout()
 	m_pctrlAnimationSpeed->setSingleStep(20);
 //	m_pctrlAnimationSpeed->setTickInterval(50);
 //	m_pctrlAnimationSpeed->setTickPosition(QSlider::TicksBelow);
-//	m_pctrlAnimationSpeed->setSizePolicy(szPolicyMinimum);
 	AnimSpeedLayout->addWidget(m_pctrlAnimationSpeed,1,1);
 	AnimSpeedLayout->addWidget(LabSpeed,2,1);
 
@@ -919,7 +914,6 @@ void StabViewDlg::SetupLayout()
 	m_pctrlAnimationAmplitude->setSingleStep(20);
 //	m_pctrlAnimationAmplitude->setTickInterval(50);
 //	m_pctrlAnimationAmplitude->setTickPosition(QSlider::TicksBelow);
-//	m_pctrlAnimationAmplitude->setSizePolicy(szPolicyMinimum);
 	AnimSpeedLayout->addWidget(m_pctrlAnimationAmplitude,1,2);
 	AnimSpeedLayout->addWidget(LabAmplitude,2,2);
 
@@ -1073,6 +1067,12 @@ void StabViewDlg::SetControls()
 	m_pctrl3DMode2->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 	m_pctrl3DMode3->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 	m_pctrl3DMode4->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+
+	m_pctrlAddCurve->setEnabled(pMiarex->m_iStabilityView==0 && pMiarex->m_pCurWOpp);
+	m_pctrlAnimate->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlAnimateRestart->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlAnimationAmplitude->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
+	m_pctrlAnimationSpeed->setEnabled(pMiarex->m_iStabilityView>0 && pMiarex->m_pCurWOpp);
 
 	m_pctrlModeStep->SetValue(pMiarex->m_Modedt);
 

@@ -38,6 +38,7 @@ class CWOpp
 	friend class CWPolar;
 	friend class CPOpp;
 	friend class StabViewDlg;
+	friend class PanelAnalysisDlg;
 	friend class StabAnalysisDlg;
 
 public:
