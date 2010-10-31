@@ -9,71 +9,69 @@ SOURCES += src/MainFrame.cpp \
     src/TwoDWidget.cpp \
     src/GLWidget.cpp \
     src/QFLR5Application.cpp \
-    src/Miarex/Miarex.cpp \
-    src/Miarex/GLCreateLists.cpp \
-    src/Miarex/WPolarDlg.cpp \
-    src/Miarex/WingDelegate.cpp \
-    src/Miarex/PlaneDlg.cpp \
-    src/Miarex/PanelAnalysisDlg.cpp \
-    src/Miarex/LLTAnalysisDlg.cpp \
-    src/Miarex/ImportWingDlg.cpp \
-    src/Miarex/GLLightDlg.cpp \
-    src/Miarex/BodyTableDelegate.cpp \
     src/Miarex/ArcBall.cpp \
     src/Miarex/BodyGridDlg.cpp \
     src/Miarex/BodyScaleDlg.cpp \
-    src/Miarex/StabViewDlg.cpp \
-    src/Miarex/InertiaDlg.cpp \
-    src/Miarex/StabPolarDlg.cpp \
-    src/Miarex/StabAnalysisDlg.cpp \
-    src/Miarex/ManualInertiaDlg.cpp \
-    src/Miarex/GL3dBodyDlg.cpp \
-    src/Miarex/ManageBodiesDlg.cpp \
-    src/Miarex/W3dPrefsDlg.cpp \
-    src/Miarex/CtrlTableDelegate.cpp \
-    src/Miarex/WingScaleDlg.cpp \
+    src/Miarex/BodyTableDelegate.cpp \
     src/Miarex/BodyTransDlg.cpp \
-    src/Miarex/WAdvancedDlg.cpp \
+    src/Miarex/CtrlTableDelegate.cpp \
+    src/Miarex/GLCreateLists.cpp \
     src/Miarex/GL3dWingDlg.cpp \
-    src/Miarex/ManageUFOsDlg.cpp \
-    src/Miarex/UFOTableDelegate.cpp \
     src/Miarex/GL3DScales.cpp \
+    src/Miarex/GL3dBodyDlg.cpp \
+    src/Miarex/GLLightDlg.cpp \
+    src/Miarex/LLTAnalysisDlg.cpp \
+    src/Miarex/ImportWingDlg.cpp \
+    src/Miarex/InertiaDlg.cpp \
+    src/Miarex/Miarex.cpp \
+    src/Miarex/ManageBodiesDlg.cpp \
+    src/Miarex/ManageUFOsDlg.cpp \
+    src/Miarex/PlaneDlg.cpp \
+    src/Miarex/PanelAnalysisDlg.cpp \
+    src/Miarex/StabPolarDlg.cpp \
+    src/Miarex/StabViewDlg.cpp \
+    src/Miarex/UFOTableDelegate.cpp \
+    src/Miarex/W3dPrefsDlg.cpp \
+    src/Miarex/WAdvancedDlg.cpp \
+    src/Miarex/WingDelegate.cpp \
+    src/Miarex/WingScaleDlg.cpp \
+    src/Miarex/WPolarDlg.cpp \
+    src/XDirect/BatchDlg.cpp \
+    src/XDirect/CAddDlg.cpp \
+    src/XDirect/FoilCoordDlg.cpp \
+    src/XDirect/FoilGeomDlg.cpp \
+    src/XDirect/FoilPolarDlg.cpp \
+    src/XDirect/FlapDlg.cpp \
+    src/XDirect/InterpolateFoilsDlg.cpp \
+    src/XDirect/LEDlg.cpp \
+    src/XDirect/ManageFoilsDlg.cpp \
+    src/XDirect/NacaFoilDlg.cpp \
+    src/XDirect/ReListDlg.cpp \
+    src/XDirect/TEGapDlg.cpp \
+    src/XDirect/TwoDPanelDlg.cpp \
+    src/XDirect/XDirectStyleDlg.cpp \
     src/XDirect/XFoil.cpp \
     src/XDirect/XFoilAnalysisDlg.cpp \
     src/XDirect/XFoilAdvancedDlg.cpp \
     src/XDirect/XDirect.cpp \
-    src/XDirect/TwoDPanelDlg.cpp \
-    src/XDirect/InterpolateFoilsDlg.cpp \
-    src/XDirect/FoilPolarDlg.cpp \
-    src/XDirect/FoilGeomDlg.cpp \
-    src/XDirect/TEGapDlg.cpp \
-    src/XDirect/ReListDlg.cpp \
-    src/XDirect/NacaFoilDlg.cpp \
-    src/XDirect/LEDlg.cpp \
-    src/XDirect/FoilCoordDlg.cpp \
-    src/XDirect/FlapDlg.cpp \
-    src/XDirect/CAddDlg.cpp \
-    src/XDirect/BatchDlg.cpp \
-    src/XDirect/XDirectStyleDlg.cpp \
-    src/XDirect/ManageFoilsDlg.cpp \
+    src/Objects/Body.cpp \
+    src/Objects/CRectangle.cpp \
+    src/Objects/CVector.cpp \
+    src/Objects/Foil.cpp \
+    src/Objects/Frame.cpp \
+    src/Objects/OpPoint.cpp \
+    src/Objects/Panel.cpp \
+    src/Objects/Pf.cpp \
+    src/Objects/Plane.cpp \
+    src/Objects/Polar.cpp \
+    src/Objects/POpp.cpp \
+    src/Objects/Quaternion.cpp \
+    src/Objects/Sf.cpp \
+    src/Objects/Spline.cpp \
+    src/Objects/Surface.cpp \
     src/Objects/WPolar.cpp \
     src/Objects/WOpp.cpp \
     src/Objects/Wing.cpp \
-    src/Objects/Surface.cpp \
-    src/Objects/Spline.cpp \
-    src/Objects/Panel.cpp \
-    src/Objects/Sf.cpp \
-    src/Objects/Quaternion.cpp \
-    src/Objects/OpPoint.cpp \
-    src/Objects/Frame.cpp \
-    src/Objects/POpp.cpp \
-    src/Objects/Polar.cpp \
-    src/Objects/CVector.cpp \
-    src/Objects/Plane.cpp \
-    src/Objects/Pf.cpp \
-    src/Objects/CRectangle.cpp \
-    src/Objects/Foil.cpp \
-    src/Objects/Body.cpp \
     src/Misc/SaveOptionsDlg.cpp \
     src/Misc/ProgressDlg.cpp \
     src/Misc/ModDlg.cpp \
@@ -130,8 +128,6 @@ HEADERS += src/MainFrame.h \
     src/Miarex/StabViewDlg.h \
     src/Miarex/InertiaDlg.h \
     src/Miarex/StabPolarDlg.h \
-    src/Miarex/StabAnalysisDlg.h \
-    src/Miarex/ManualInertiaDlg.h \
     src/Miarex/LLTAnalysisDlg.h \
     src/Miarex/ImportWingDlg.h \
     src/Miarex/GLLightDlg.h \
@@ -238,9 +234,10 @@ unix {
 
     # MAKE INSTALL
     INSTALLS += target
+	target.path = $$BINDIR
 }
 
-# target.path = $$BINDIR
+
 macx { 
     TARGET = XFLR5
     TEMPLATE = app
