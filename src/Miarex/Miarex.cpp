@@ -14475,7 +14475,6 @@ void QMiarex::SetUFO(QString UFOName)
 	{
 		SetWPlr();
 	}
-//	pMainFrame->UpdateWPolars();
 
 	SetScale();
 	SetWGraphScale();
@@ -14830,7 +14829,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	else return;
 	
 
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+//	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	if(bCurrent) pWPolar = m_pCurWPolar;
 	else
 	{

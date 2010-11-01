@@ -806,6 +806,7 @@ void InertiaDlg::OnOK()
 			}
 		}
 		m_pPlane->m_NMass = j;
+		m_pPlane->ComputeBodyAxisInertia();
 	}
 	accept();
 }

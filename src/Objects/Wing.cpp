@@ -328,6 +328,8 @@ void CWing::ComputeGeometry()
 	}
 }
 
+#define NXSTATIONS 20
+#define NYSTATIONS 40
 
 void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
@@ -338,8 +340,8 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	//     CoG  = center of gravity position
 	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
 	//
-	static double ElemVolume[10*20*MAXPANELS];
-	static CVector PtVolume[10*20*MAXPANELS];
+	static double ElemVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
+	static CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
 	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
@@ -360,8 +362,8 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 
 	//use 20 spanwise stations per wing panel to discretize the weight
 	//and 10 stations in the x direction
-	int NYStations = 40;
-	int NXStations = 20;
+	int NYStations = NYSTATIONS;
+	int NXStations = NXSTATIONS;
 
 	ComputeGeometry();
 

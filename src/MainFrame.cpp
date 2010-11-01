@@ -4451,7 +4451,6 @@ void MainFrame::openRecentFile()
 	{
 		pMiarex->m_bIs2DScaleSet = false;
 		pMiarex->Set2DScale();
-
 		OnMiarex();
 
 		UpdateView();

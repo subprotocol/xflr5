@@ -411,7 +411,7 @@ protected:
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
-	CSurface *m_pSurface[2*MAXPANELS];	// An array with the pointers to the wings surfaces
+	CSurface *m_pSurface[8*MAXPANELS];	// An array with the pointers to the wings surfaces
 
 	QList<void *> *m_poaFoil;			// a pointer to the foil array
 	QList<void *> *m_poaPolar;			// a pointer to the foil polar array
