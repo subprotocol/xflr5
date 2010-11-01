@@ -14748,13 +14748,13 @@ void QMiarex::SetupLayout()
 	m_pctrBottomControls->addWidget(ThreeDViewBox);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mainLayout->addStretch(1);
+        //mainLayout->addStretch(1);
 	mainLayout->addWidget(AnalysisBox);
-	mainLayout->addStretch(1);
+        //mainLayout->addStretch(1);
 	mainLayout->addWidget(m_pctrlMiddleControls);
-	mainLayout->addStretch(1);
+        //mainLayout->addStretch(1);
 	mainLayout->addWidget(m_pctrBottomControls);
-	mainLayout->addStretch(1);
+        //mainLayout->addStretch(1);
 
 	setLayout(mainLayout);
 }

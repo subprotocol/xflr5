@@ -664,7 +664,7 @@ void StabViewDlg::SetupLayout()
 	QGroupBox *ForcedResponseBox = new QGroupBox(tr("Forced Response"));
 	QVBoxLayout *ForcedResponse = new QVBoxLayout;
 	m_pctrlControlTable = new QTableView(this);
-	m_pctrlControlTable->setMinimumHeight(200);
+        m_pctrlControlTable->setMinimumHeight(150);
 	m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pCtrlDelegate = new CtrlTableDelegate;
@@ -926,7 +926,7 @@ void StabViewDlg::SetupLayout()
 
 	QHBoxLayout *AnimationCommandsLayout = new QHBoxLayout;
 	AnimationCommandsLayout->addWidget(m_pctrlAnimateRestart);
-	AnimationCommandsLayout->addStretch(1);
+        //AnimationCommandsLayout->addStretch(1);
 	AnimationCommandsLayout->addWidget(m_pctrlAnimate);
 
 	QHBoxLayout *StepLayout = new  QHBoxLayout;
@@ -935,13 +935,13 @@ void StabViewDlg::SetupLayout()
 	StepLayout->addWidget(StepUnit);
 	AnimationLayout->addLayout(StepLayout);
 
-	AnimationLayout->addStretch(1);
+        //AnimationLayout->addStretch(1);
 	AnimationLayout->addLayout(AnimSpeedLayout);
 //	AnimationLayout->addLayout(AnimAmplitudeLayout);
 //	AnimationLayout->addSpacing(15);
-	AnimationLayout->addStretch(1);
+        //AnimationLayout->addStretch(1);
 	AnimationLayout->addLayout(AnimationCommandsLayout);
-	AnimationLayout->addStretch(1);
+        //AnimationLayout->addStretch(1);
 	m_pctrlAnimationBox = new QGroupBox(tr("Animation"));
 	m_pctrlAnimationBox->setLayout(AnimationLayout);
 
@@ -962,11 +962,11 @@ void StabViewDlg::SetupLayout()
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addWidget(StabilityTypeBox);
-	MainLayout->addStretch(1);
+        //MainLayout->addStretch(1);
 	MainLayout->addWidget(StabilityDirBox);
-	MainLayout->addStretch(1);
+        //MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlStackWidget);
-	MainLayout->addStretch(1);
+        //MainLayout->addStretch(1);
 	setLayout(MainLayout);
 }
 
