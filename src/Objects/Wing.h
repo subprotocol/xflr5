@@ -38,7 +38,6 @@ class CWing
 	friend class WingDlg;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class PlaneDlg;
 	friend class ImportWingDlg;

@@ -64,7 +64,6 @@ class CFoil
 	friend class AFoil;
 	friend class FoilSelectionDlg;
 	friend class ManageFoilsDlg;
-	friend class StabAnalysisDlg;
 	friend class FoilTableDelegate;
 	
 public:

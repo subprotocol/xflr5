@@ -1896,7 +1896,7 @@ void GL3dWingDlg::OnFoilNames()
 void GL3dWingDlg::OnInertia()
 {
 	InertiaDlg dlg;
-	dlg.m_pMainFrame = s_pMainFrame;
+	dlg.s_pMainFrame = s_pMainFrame;
 	dlg.m_pWing = m_pWing;
 
 	//save inertia properties

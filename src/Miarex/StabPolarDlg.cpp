@@ -121,7 +121,6 @@ void StabPolarDlg::FillUFOInertia()
 
 	if(m_pPlane)
 	{
-//	  m_pPlane->ComputeBodyAxisInertia();
 		m_Mass = m_pPlane->m_TotalMass;
 		m_CoG = m_pPlane->m_CoG;
 		m_CoGIxx = m_pPlane->m_CoGIxx;
@@ -131,7 +130,6 @@ void StabPolarDlg::FillUFOInertia()
 	}
 	else if(m_pWing)
 	{
-//		m_pWing->ComputeBodyAxisInertia(m_Mass, m_CoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 		m_Mass = m_pWing->m_TotalMass;
 		m_CoG = m_pWing->m_CoG;
 		m_CoGIxx = m_pWing->m_CoGIxx;

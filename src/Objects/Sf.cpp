@@ -39,6 +39,7 @@ CSF::CSF()
 	m_bCenterLine  = false;
 	m_Intrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
 	m_Extrados.SetSplineParams(m_FoilStyle, m_FoilWidth, m_FoilColor);
+	m_bSymetric = false;
 }
 
 
@@ -152,6 +153,7 @@ void CSF::Copy(CSF* pSF)
 	m_fThickness = pSF->m_fThickness;
 	m_fxCambMax  = pSF->m_fxCambMax; 
 	m_fxThickMax = pSF->m_fxThickMax;
+	m_bSymetric  = pSF->m_bSymetric;
 }
 
 
@@ -289,6 +291,8 @@ bool CSF::Serialize(QDataStream &ar, bool bIsStoring)
 		return true;
 	}
 }
+
+
 void CSF::Update(bool bExtrados)
 {
 	if(bExtrados)

@@ -62,6 +62,8 @@ private:
 
 	bool m_bModified;
 	bool m_bVisible, m_bOutPoints, m_bCenterLine;
+
+	bool m_bSymetric;
 	
 	int m_OutPoints;
 	int	m_FoilStyle;

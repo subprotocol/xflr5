@@ -38,6 +38,9 @@ public:
 
 	void SetCurveParams(int style, int width, QColor color);
 
+	void Copy(CSplinedPoints *pSplinedPoints);
+	void CopySymetric(CSplinedPoints *pSplinedPoints);
+
 	int InsertPoint(double x, double y);
 	int IsControlPoint(CVector Real, double ZoomFactor);
 	int IsControlPoint(double x, double y, double Zoom);
@@ -97,6 +100,7 @@ private:
 
 	bool m_bModified;
 	bool m_bVisible, m_bOutPoints, m_bCenterLine;
+	bool m_bSymetric;
 
 	int m_OutPoints;
 

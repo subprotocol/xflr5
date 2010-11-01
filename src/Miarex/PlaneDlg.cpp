@@ -154,6 +154,10 @@ void PlaneDlg::InitDialog()
 	m_bChanged = false;
 
 	m_pPlane->m_bDoubleSymFin = true;
+	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_LEWing, 0.0, m_pPlane->m_WingTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_LEWing2, 0.0, m_pPlane->m_WingTilt2);//necessary for eventual inertia calculations
+	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_LEStab, 0.0, m_pPlane->m_StabTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_LEFin, -90.0, m_pPlane->m_FinTilt);//necessary for eventual inertia calculations
 }
 
 
@@ -484,7 +488,6 @@ void PlaneDlg::OnInertia()
 	dlg.m_pBody = NULL;
 	dlg.m_pWing = NULL;
 	dlg.m_pPlane = m_pPlane;
-	dlg.m_pMainFrame = s_pMainFrame;
 
 	//save inertia properties
 	int NMass;

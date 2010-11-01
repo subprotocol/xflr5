@@ -56,7 +56,7 @@ StabViewDlg::StabViewDlg(QWidget *parent)
 
 void StabViewDlg::showEvent(QShowEvent *event)
 {
-	SetControls();
+//	SetControls();
 }
 
 
@@ -189,7 +189,7 @@ void StabViewDlg::FillEigenThings()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	FillControlNames();
-	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_AnalysisMethod==4)
+	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		complex<double> c;
 		double OmegaN, Omega1, Dsi, Sigma1;

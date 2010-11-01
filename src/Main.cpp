@@ -25,7 +25,8 @@
 #include "QFLR5Application.h"
 #include "MainFrame.h"
 #include <QSplashScreen>
-#include <QtDebug>
+
+
 
 CFoil *g_pCurFoil;	//make it common to all applications
 

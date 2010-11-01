@@ -1806,8 +1806,11 @@ void QXDirect::OnAnimate(bool bChecked)
 
 void QXDirect::OnAnimateSingle()
 {
+	static int pos, size;
+	static QString str;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	//KickIdle
-	int size = (int)m_poaOpp->size();
+	size = (int)m_poaOpp->size();
 	OpPoint* pOpPoint;
 
 	if(size<=1) return;
@@ -1842,6 +1845,13 @@ void QXDirect::OnAnimateSingle()
 	{
 			CreateOppCurves(pOpPoint);
 			m_pCurOpp = pOpPoint;
+
+			//select current OpPoint in Combobox
+			if(m_pCurPolar->m_Type != 4) str = QString("%1").arg(m_pCurOpp->Alpha,8,'f',2);
+			else                         str = QString("%1").arg(m_pCurOpp->Reynolds,8,'f',2);
+			pos = pMainFrame->m_pctrlOpPoint->findText(str);
+			if(pos>=0) pMainFrame->m_pctrlOpPoint->setCurrentIndex(pos);
+
 			UpdateView();
 	}
 }

@@ -66,6 +66,32 @@ void CSpline::Copy(CSpline *pSpline)
 }
 
 
+void CSpline::CopySymetric(CSpline *pSpline)
+{
+	m_iCtrlPoints = pSpline->m_iCtrlPoints;
+	m_iDegree     = pSpline->m_iDegree;
+	m_iHighlight  = pSpline->m_iHighlight;
+	m_iKnots      = pSpline->m_iKnots;
+	m_iRes        = pSpline->m_iRes;
+	m_iSelect     = pSpline->m_iSelect;
+	for(int i=0; i<m_iCtrlPoints; i++)
+	{
+		m_Input[i].x =  pSpline->m_Input[i].x;
+		m_Input[i].y = -pSpline->m_Input[i].y;
+		m_Input[i].z =  pSpline->m_Input[i].z;
+	}
+	for(int i=0; i<m_iRes; i++)
+	{
+		m_Output[i].x =  pSpline->m_Output[i].x;
+		m_Output[i].y = -pSpline->m_Output[i].y;
+		m_Output[i].z =  pSpline->m_Output[i].z;
+	}
+	for(int i=0; i<m_iKnots; i++)
+	{
+		m_knots[i] = pSpline->m_knots[i];
+	}
+}
+
 
 void CSpline::DrawCtrlPoints(QPainter &painter, double const &scalex, double const &scaley, QPoint const &Offset)
 {

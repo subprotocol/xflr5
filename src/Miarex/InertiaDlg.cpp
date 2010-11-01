@@ -33,7 +33,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 
-
+void *InertiaDlg::s_pMainFrame;
 
 InertiaDlg::InertiaDlg()
 {
@@ -66,7 +66,7 @@ InertiaDlg::InertiaDlg()
 void InertiaDlg::ComputeInertia()
 {
 	//assumes that the data has been read
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
 	double TotalMass, TotalIxx, TotalIyy, TotalIzz, TotalIxz;
 	double Unit = pMainFrame->m_mtoUnit * pMainFrame->m_mtoUnit * pMainFrame->m_kgtoUnit;
@@ -83,12 +83,12 @@ void InertiaDlg::ComputeInertia()
 	if(m_pWing)
 	{
 		m_pWing->m_VolumeMass = m_VolumeMass;
-		m_pWing->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
+		if(m_pWing->m_VolumeMass>PRECISION) m_pWing->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 	else if(m_pBody)
 	{
 		m_pBody->m_VolumeMass = m_VolumeMass;
-		m_pBody->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
+		if(m_pBody->m_VolumeMass>PRECISION) m_pBody->ComputeVolumeInertia(m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 	else if(m_pPlane)
 	{
@@ -160,7 +160,8 @@ void InertiaDlg::ComputeInertia()
 			}
 		}
 	}
-	TotalCoG *= 1.0/TotalMass;
+	if(TotalMass>PRECISION) TotalCoG *= 1.0/TotalMass;
+	else                    TotalCoG.Set(0.0,0.0,0.0);
 
 	//total inertia in CoG referential
 	TotalIxx = m_CoGIxx + m_VolumeMass * ((m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
@@ -274,7 +275,7 @@ void InertiaDlg::ComputeInertia()
 
 void InertiaDlg::FillMassModel()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	
 	m_pMassModel->setRowCount(MAXMASSES);
@@ -317,7 +318,7 @@ void InertiaDlg::FillMassModel()
 
 void InertiaDlg::InitDialog()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str, str1, strong;
 
 	m_pMassModel = new QStandardItemModel;
@@ -361,6 +362,11 @@ void InertiaDlg::InitDialog()
 	m_pctrlInertiaUnit1->setText(strong);
 	m_pctrlInertiaUnit2->setText(strong);
 
+	m_pctrlWingInertia->setEnabled(false);
+	m_pctrlWing2Inertia->setEnabled(false);
+	m_pctrlStabInertia->setEnabled(false);
+	m_pctrlFinInertia->setEnabled(false);
+	m_pctrlBodyInertia->setEnabled(false);
 	if(m_pWing)
 	{
 		m_VolumeMass = m_pWing->m_VolumeMass;
@@ -373,6 +379,8 @@ void InertiaDlg::InitDialog()
 		}
 		m_pctrlVolumeMass->SetValue(m_pWing->m_VolumeMass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
 		m_pctrlVolumeMassLabel->setText(tr("Wing Mass:"));
+		m_pctrlWingInertia->setEnabled(true);
+		setWindowTitle(tr("Inertia properties for ")+m_pWing->m_WingName);
 	}
 	else if (m_pBody)
 	{
@@ -386,6 +394,8 @@ void InertiaDlg::InitDialog()
 		}
 		m_pctrlVolumeMass->SetValue(m_pBody->m_VolumeMass * pMainFrame->m_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Body Mass:"));
+		m_pctrlBodyInertia->setEnabled(true);
+		setWindowTitle(tr("Inertia properties for ")+m_pBody->m_BodyName);
 	}
 	else if (m_pPlane)
 	{
@@ -406,7 +416,15 @@ void InertiaDlg::InitDialog()
 		m_pctrlVolumeMass->SetValue(m_VolumeMass * pMainFrame->m_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Volume Mass:"));
 		m_pctrlVolumeMass->setEnabled(false);
+		m_pctrlWingInertia->setEnabled(true);
+		if(m_pPlane->m_bBiplane) m_pctrlWing2Inertia->setEnabled(true);
+		if(m_pPlane->m_bStab)    m_pctrlStabInertia->setEnabled(true);
+		if(m_pPlane->m_bFin)     m_pctrlFinInertia->setEnabled(true);
+		if(m_pPlane->m_bBody)    m_pctrlBodyInertia->setEnabled(true);
+		setWindowTitle(tr("Inertia properties for ")+m_pPlane->m_PlaneName);
 	}
+	if(m_pPlane) m_pctrlTopStack->setCurrentIndex(1);
+	else         m_pctrlTopStack->setCurrentIndex(0);
 
 	FillMassModel();
 	ComputeInertia();
@@ -449,7 +467,7 @@ void InertiaDlg::OnExportToAVL()
 	if (!m_pWing && !m_pBody && !m_pPlane) return;
 	QString filter =".mass";
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString FileName, strong;
 	double CoGIxx, CoGIyy, CoGIzz, CoGIxz;
 	CVector CoG;
@@ -795,7 +813,7 @@ void InertiaDlg::OnOK()
 
 void InertiaDlg::ReadData()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index ;
 	bool bOK;
 	double val;
@@ -865,6 +883,8 @@ void InertiaDlg::SetupLayout()
 	MessageLayout->addWidget(Label2);
 
 	//___________Volume Mass, Center of gravity, and inertias__________
+	m_pctrlTopStack = new QStackedWidget;
+
 	QGroupBox *ObjectMassBox = new QGroupBox(tr("Object Mass - Volume only, excluding point masses"));
 	QHBoxLayout *ObjectMassLayout = new QHBoxLayout;
 	m_pctrlVolumeMassLabel  = new QLabel(tr("Wing Mass="));
@@ -947,6 +967,24 @@ void InertiaDlg::SetupLayout()
 	ObjectMassLayout->addWidget(CoGBox);
 	ObjectMassLayout->addWidget(ResultsBox);
 	ObjectMassBox->setLayout(ObjectMassLayout);
+
+	QGroupBox *ObjectSelectionBox = new QGroupBox(tr("Component inertias"));
+	QVBoxLayout *ObjectLayout = new QVBoxLayout;
+	m_pctrlWingInertia  = new QPushButton(tr("Main Wing"));
+	m_pctrlWing2Inertia = new QPushButton(tr("Second Wing"));
+	m_pctrlStabInertia  = new QPushButton(tr("Elevator"));
+	m_pctrlFinInertia   = new QPushButton(tr("Fin"));
+	m_pctrlBodyInertia   = new QPushButton(tr("Body"));
+	ObjectLayout->addWidget(m_pctrlWingInertia);
+	ObjectLayout->addWidget(m_pctrlWing2Inertia);
+	ObjectLayout->addWidget(m_pctrlStabInertia);
+	ObjectLayout->addWidget(m_pctrlFinInertia);
+	ObjectLayout->addWidget(m_pctrlBodyInertia);
+	ObjectLayout->addStretch(1);
+	ObjectSelectionBox->setLayout(ObjectLayout);
+
+	m_pctrlTopStack->addWidget(ObjectMassBox);
+	m_pctrlTopStack->addWidget(ObjectSelectionBox);
 
 	//___________________Point Masses__________________________
 	QGroupBox *PointMassBox = new QGroupBox(tr("Additional Point Masses:"));
@@ -1062,7 +1100,7 @@ void InertiaDlg::SetupLayout()
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(MessageLayout);
 	MainLayout->addStretch(1);
-	MainLayout->addWidget(ObjectMassBox);
+	MainLayout->addWidget(m_pctrlTopStack);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(PointMassBox);
 	MainLayout->addStretch(1);
@@ -1071,6 +1109,11 @@ void InertiaDlg::SetupLayout()
 	MainLayout->addLayout(CommandButtons);
 
 	setLayout(MainLayout);
+	connect(m_pctrlWingInertia, SIGNAL(clicked()), this, SLOT(OnWingInertia()));
+	connect(m_pctrlWing2Inertia, SIGNAL(clicked()), this, SLOT(OnWing2Inertia()));
+	connect(m_pctrlStabInertia, SIGNAL(clicked()), this, SLOT(OnStabInertia()));
+	connect(m_pctrlFinInertia, SIGNAL(clicked()), this, SLOT(OnFinInertia()));
+	connect(m_pctrlBodyInertia, SIGNAL(clicked()), this, SLOT(OnBodyInertia()));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 	connect(ExportAVLButton, SIGNAL(clicked()), this, SLOT(OnExportToAVL()));
@@ -1081,4 +1124,64 @@ void InertiaDlg::SetupLayout()
 void InertiaDlg::showEvent(QShowEvent *event)
 {
 	resizeEvent(NULL);
+}
+
+
+void InertiaDlg::OnWingInertia()
+{
+	InertiaDlg dlg;
+	dlg.m_pWing  = &m_pPlane->m_Wing;
+	dlg.m_pPlane = NULL;
+	dlg.m_pBody  = NULL;
+	dlg.InitDialog();
+	dlg.exec();
+	ComputeInertia();
+}
+
+void InertiaDlg::OnWing2Inertia()
+{
+	if(!m_pPlane->m_bBiplane) return;
+	InertiaDlg dlg;
+	dlg.m_pWing  = &m_pPlane->m_Wing2;
+	dlg.m_pPlane = NULL;
+	dlg.m_pBody  = NULL;
+	dlg.InitDialog();
+	dlg.exec();
+	ComputeInertia();
+}
+
+void InertiaDlg::OnStabInertia()
+{
+	if(!m_pPlane->m_bStab) return;
+	InertiaDlg dlg;
+	dlg.m_pWing  = &m_pPlane->m_Stab;
+	dlg.m_pPlane = NULL;
+	dlg.m_pBody  = NULL;
+	dlg.InitDialog();
+	dlg.exec();
+	ComputeInertia();
+}
+
+void InertiaDlg::OnFinInertia()
+{
+	if(!m_pPlane->m_bFin) return;
+	InertiaDlg dlg;
+	dlg.m_pWing  = &m_pPlane->m_Fin;
+	dlg.m_pPlane = NULL;
+	dlg.m_pBody  = NULL;
+	dlg.InitDialog();
+	dlg.exec();
+	ComputeInertia();
+}
+
+void InertiaDlg::OnBodyInertia()
+{
+	if(!m_pPlane->m_bBody) return;
+	InertiaDlg dlg;
+	dlg.m_pBody  = m_pPlane->m_pBody;
+	dlg.m_pPlane = NULL;
+	dlg.m_pWing  = NULL;
+	dlg.InitDialog();
+	dlg.exec();
+	ComputeInertia();
 }

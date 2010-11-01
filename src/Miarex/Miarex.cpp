@@ -6435,7 +6435,6 @@ bool QMiarex::InitializePanels()
 			pp += m_pCurBody->m_nhPanels;
 		}
 	}
-//for(p=0; p<m_MatSize; p++)	qDebug(" %3d    %3d   %3d   ", p, m_Panel[p].m_iSym, m_Panel[p].m_iPos);
 
 	dlg.setValue(100);
 	return true;
@@ -8325,6 +8324,8 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 {
 	static double t, sigma, s2, omega, o2, theta_sum, psi_sum, norm;
 	double *vabs, *phi;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 
 	if(m_iView!=WSTABVIEW) 
 	{
@@ -8344,8 +8345,6 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	}
 
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	norm = m_ModeNorm * pStabView->m_ModeAmplitude;
 	vabs = pStabView->m_vabs;
 	phi  = pStabView->m_phi;
@@ -8409,9 +8408,11 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 void QMiarex::OnAnimateWOppSingle()
 {
 	static bool bIsValid, bSkipOne;
-	static int size;
+	static int size, pos;
 	static CPOpp *pPOpp;
 	static CWOpp *pWOpp;
+	static QString str;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	//KickIdle
 	if(m_iView!=W3DVIEW && m_iView !=WOPPVIEW) return; //nothing to animate
 	if(!m_pCurWing || !m_pCurWPolar) return;
@@ -8440,11 +8441,9 @@ void QMiarex::OnAnimateWOppSingle()
 			if(!pWOpp) return;
 		}
 		if(m_pCurPlane)
-			bIsValid =(pPOpp->m_PlrName==m_pCurWPolar->m_PlrName &&
-					  pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName);
+			bIsValid =(pPOpp->m_PlrName==m_pCurWPolar->m_PlrName  &&  pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName);
 		else
-			bIsValid =(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName &&
-					  pWOpp->m_WingName==m_pCurWing->m_WingName);
+			bIsValid =(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName  &&  pWOpp->m_WingName==m_pCurWing->m_WingName);
 
 		if (bIsValid && !bSkipOne)
 		{
@@ -8481,6 +8480,12 @@ void QMiarex::OnAnimateWOppSingle()
 				CreateCpCurves();
 				UpdateView();
 			}
+
+			//select current WOpp in Combobox
+			if(m_pCurWPolar->m_Type != 4) str = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
+			else                          str = QString("%1").arg(m_pCurWOpp->m_QInf,8,'f',2);
+			pos = pMainFrame->m_pctrlWOpp->findText(str);
+			if(pos>=0) pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
 		}
 		else if(bIsValid) bSkipOne = false;
 
@@ -8601,7 +8606,6 @@ void QMiarex::OnBodyInertia()
 	if(!m_pCurBody) return;
 	InertiaDlg dlg;
 	dlg.m_pWing = NULL;
-	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.m_pBody = m_pCurBody;
 	dlg.InitDialog();
 	dlg.exec();
@@ -11916,7 +11920,6 @@ void QMiarex::OnUFOInertia()
 	if(!m_pCurWing) return;
 	InertiaDlg dlg;
 	dlg.move(pMainFrame->m_DlgPos);
-	dlg.m_pMainFrame = m_pMainFrame;
 	dlg.m_pPlane = NULL;
 	dlg.m_pWing  = NULL;
 	dlg.m_pBody  = NULL;
@@ -12731,8 +12734,8 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	
 	pMainFrame->UpdateWOpps();
 
-	if(m_pCurPlane)     SetPOpp(false, V0);
-	else if(m_pCurWing) SetWOpp(false, V0);
+	if(m_pCurPlane)     SetPOpp(false, m_pPanelDlg->m_Alpha);
+	else if(m_pCurWing) SetWOpp(false, m_pPanelDlg->m_Alpha);
 
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
@@ -14439,7 +14442,7 @@ void QMiarex::SetUFO(QString UFOName)
 				// need to reload inertia data from plane inertia
 				pWing  = GetWing(pWPolar->m_UFOName);
 				pPlane = GetPlane(pWPolar->m_UFOName);
-//	qDebug()<<pWPolar->m_UFOName<<pWPolar->m_PlrName<<pWPolar->m_Weight;
+
 				if(pWing)
 				{
 					pWPolar->m_Weight = pWing->m_TotalMass;
@@ -14667,8 +14670,8 @@ void QMiarex::SetupLayout()
 	CpBox->setLayout(CpParams);
 
 //_______________________Stability Params
-	
-	
+
+
 	m_pctrlPolarProps = new QTextEdit;
 	m_pctrlPolarProps->setReadOnly(true);
 //	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);

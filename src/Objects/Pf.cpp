@@ -35,6 +35,7 @@ CPF::CPF()
 	m_bVisible     = true;
 	m_bOutPoints   = false;
 	m_bCenterLine  = false;
+	m_bSymetric    = false;
 	memset(m_rpMid, 0, sizeof(m_rpMid));
 }
 
@@ -103,6 +104,7 @@ void CPF::Copy(CPF* pPF)
 	m_FoilColor  = pPF->m_FoilColor;
 	m_FoilStyle  = pPF->m_FoilStyle;
 	m_FoilWidth  = pPF->m_FoilWidth;
+	m_bSymetric  = pPF->m_bSymetric;
 }
 
 
@@ -193,7 +195,7 @@ bool CPF::InitSplinedFoil()
 
 	m_Extrados.CompSlopes();
 	m_Intrados.CompSlopes();
-	CompMidLine();
+	CompMidLine(true);
 	m_OutPoints = m_Extrados.m_iPoints + m_Intrados.m_iPoints;
 	return true;
 }
@@ -756,6 +758,34 @@ void CSplinedPoints::SetCurveParams(int style, int width, QColor color)
 }
 
 
+void CSplinedPoints::Copy(CSplinedPoints *pSplinedPoints)
+{
+	memcpy(this, pSplinedPoints, sizeof(pSplinedPoints));
+}
+
+
+void CSplinedPoints::CopySymetric(CSplinedPoints *pSplinedPoints)
+{
+	m_iPoints = pSplinedPoints->m_iPoints;
+	m_Freq = pSplinedPoints->m_Freq;
+
+	m_RearPoint.x =  pSplinedPoints->m_RearPoint.x;
+	m_RearPoint.y = -pSplinedPoints->m_RearPoint.y;
+	m_RearPoint.z =  pSplinedPoints->m_RearPoint.z;
+
+	for(int i=0; i<m_iPoints; i++)
+	{
+		m_ctrlPoint[i].x =  pSplinedPoints->m_ctrlPoint[i].x;
+		m_ctrlPoint[i].y = -pSplinedPoints->m_ctrlPoint[i].y;
+		m_ctrlPoint[i].z =  pSplinedPoints->m_ctrlPoint[i].z;
+	}
+	for(int i=0; i<m_iPoints; i++)
+	{
+		m_Slope[i].x =  pSplinedPoints->m_Slope[i].x;
+		m_Slope[i].y = -pSplinedPoints->m_Slope[i].y;
+		m_Slope[i].z =  pSplinedPoints->m_Slope[i].z;
+	}
+}
 
 
 

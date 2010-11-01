@@ -24,6 +24,7 @@
 
 #include <QDialog>
 #include <QLabel>
+#include <QStackedWidget>
 #include <QRadioButton>
 #include <QPushButton>
 #include <QTableView>
@@ -42,6 +43,7 @@ class InertiaDlg : public QDialog
 	friend class GL3dBodyDlg;
 	friend class PlaneDlg;
 	friend class QMiarex;
+	friend class MainFrame;
 
 public:
     InertiaDlg();
@@ -49,6 +51,11 @@ public:
 
 private slots:
 	void OnOK();
+	void OnBodyInertia();
+	void OnWingInertia();
+	void OnWing2Inertia();
+	void OnStabInertia();
+	void OnFinInertia();
 	void OnCellChanged(QWidget *pWidget=NULL);
 	void OnExportToAVL();
 
@@ -65,8 +72,10 @@ private:
 	CBody *m_pBody;
 	CWing *m_pWing;
 	CPlane *m_pPlane;
-	void *m_pMainFrame;
+	static void *s_pMainFrame;
 
+	QStackedWidget *m_pctrlTopStack;
+	QPushButton *m_pctrlWingInertia, *m_pctrlWing2Inertia, *m_pctrlStabInertia, *m_pctrlFinInertia, *m_pctrlBodyInertia;
 	QPushButton *OKButton;
 	QLabel *m_pctrlMassUnit, *m_pctrlMassUnit2, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
 	QLabel *m_pctrlVolumeMassLabel, *m_pctrlTotalMassLabel;

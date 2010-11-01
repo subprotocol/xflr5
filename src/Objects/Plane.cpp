@@ -124,7 +124,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	double PlaneMass = 0.0;
 
 	//get the main wing's inertias
-	m_Wing.ComputeVolumeInertia(CoGWing, Ixx, Iyy, Izz, Ixz);
+	if(m_Wing.m_VolumeMass>PRECISION) m_Wing.ComputeVolumeInertia(CoGWing, Ixx, Iyy, Izz, Ixz);
 	CoG += CoGWing * m_Wing.m_VolumeMass;
 	PlaneMass = m_Wing.m_VolumeMass;
 	CoGIxx = Ixx;
@@ -136,7 +136,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	// object CoGs and inertia in CoG frame will be computed at the same time
 	if(m_bBiplane)
 	{
-		m_Wing2.ComputeVolumeInertia(CoGWing2, Ixx, Iyy, Izz, Ixz);
+		if(m_Wing2.m_VolumeMass>PRECISION) m_Wing2.ComputeVolumeInertia(CoGWing2, Ixx, Iyy, Izz, Ixz);
 		CoG += (CoGWing2) * m_Wing2.m_VolumeMass;
 		PlaneMass += m_Wing2.m_VolumeMass;
 		CoGIxx += Ixx;
@@ -146,7 +146,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	}
 	if(m_bStab)
 	{
-		m_Stab.ComputeVolumeInertia(CoGStab, Ixx, Iyy, Izz, Ixz);
+		if(m_Stab.m_VolumeMass>PRECISION) m_Stab.ComputeVolumeInertia(CoGStab, Ixx, Iyy, Izz, Ixz);
 		CoG += CoGStab * m_Stab.m_VolumeMass;
 		PlaneMass += m_Stab.m_VolumeMass;
 		CoGIxx += Ixx;
@@ -156,7 +156,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	}
 	if(m_bFin)
 	{
-		m_Fin.ComputeVolumeInertia(CoGFin, Ixx, Iyy, Izz, Ixz);
+		if(m_Fin.m_VolumeMass>PRECISION) m_Fin.ComputeVolumeInertia(CoGFin, Ixx, Iyy, Izz, Ixz);
 		CoG += CoGFin * m_Fin.m_VolumeMass;
 		PlaneMass += m_Fin.m_VolumeMass;
 		CoGIxx += Ixx;
@@ -166,7 +166,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	}
 	if(m_bBody)
 	{
-		m_pBody->ComputeVolumeInertia(CoGBody, Ixx, Iyy, Izz, Ixz);
+		if(m_pBody->m_VolumeMass>PRECISION) m_pBody->ComputeVolumeInertia(CoGBody, Ixx, Iyy, Izz, Ixz);
 		CoG += CoGBody * m_pBody->m_VolumeMass;
 		PlaneMass += m_pBody->m_VolumeMass;
 		CoGIxx += Ixx;
@@ -220,7 +220,6 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		CoGIzz += m_pBody->m_VolumeMass * (Pt.x*Pt.x + Pt.y*Pt.y);
 		CoGIxz += m_pBody->m_VolumeMass *  Pt.x*Pt.z;
 	}
-
 	Mass = PlaneMass;
 }
 

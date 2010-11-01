@@ -37,7 +37,6 @@ class CWPolar
 	friend class StabPolarDlg;
 	friend class LLTAnalysisDlg;
 	friend class VLMAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class EditPlrDlg;
 	friend class PolarPropsDlg;

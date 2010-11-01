@@ -351,7 +351,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 
 	//sanity check
-	CVector CoGCheck(0.0,0.0,0.0);
+//	CVector CoGCheck(0.0,0.0,0.0);
 	double CoGIxxCheck, CoGIyyCheck, CoGIzzCheck, CoGIxzCheck;
 	CoGIxxCheck = CoGIyyCheck = CoGIzzCheck = CoGIxzCheck = 0.0;
 	double recalcMass = 0.0;
@@ -391,16 +391,11 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			PtC4.y = (Pt.y + Pt1.y)/2.0;
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
-			CoGCheck.x += LocalVolume * PtC4.x;
-			CoGCheck.y += LocalVolume * PtC4.y;
-			CoGCheck.z += LocalVolume * PtC4.z;
+//			CoGCheck += LocalVolume * PtC4;
 
 			for(l=0; l<NXStations; l++)
 			{
 				//browse mid-section
-//				xrel = (double)l/(double)NXStations;
-//				xrel1 = (double)(l+1)/(double)NXStations;
-
 				xrel  = 1.0 - 1.0/2.0 * (1.0-cos((double) l   *PI /(double)NXStations));
 				xrel1 = 1.0 - 1.0/2.0 * (1.0-cos((double)(l+1)*PI /(double)NXStations));
 
@@ -414,7 +409,14 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 				PointNormal = Diag1 * Diag2;
 
 				ElemArea = PointNormal.VAbs()/2.0;
-				ElemVolume[p] = ElemArea * LocalSpan;
+				if(ElemArea>PRECISION)	ElemVolume[p] = ElemArea * LocalSpan;
+				else
+				{
+					//no area, means that the foils have not yet been defined for this surface
+					// so just count a unit volume, temporary
+					ElemVolume[p] = 1.0;
+
+				}
 				checkVolume += ElemVolume[p];
 				CoG.x += ElemVolume[p] * PtVolume[p].x;
 				CoG.y += ElemVolume[p] * PtVolume[p].y;
@@ -423,9 +425,11 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			}
 		}
 	}
-	rho = m_VolumeMass/checkVolume;
-	if(m_VolumeMass>0.0) CoG *= 1/ checkVolume;
-	else         CoG.Set(0.0, 0.0, 0.0);
+	if(checkVolume>PRECISION) rho = m_VolumeMass/checkVolume;
+	else                      rho = 0.0;
+
+	if(checkVolume>0.0)  CoG *= 1.0/ checkVolume;
+	else                 CoG.Set(0.0, 0.0, 0.0);
 
 
 	//then get the Inertia in both reference frames

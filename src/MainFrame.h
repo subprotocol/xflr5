@@ -67,7 +67,6 @@ class MainFrame : public QMainWindow
 	friend class PlaneDlg;
 	friend class PanelAnalysisDlg;
 	friend class VLMAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class GL3dBodyDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
@@ -281,7 +280,7 @@ private:
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *SplinesAct, *SplinedPointsAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
-	QAction *AFoilTableColumns;
+	QAction *AFoilTableColumns, *AFoilTableColumnWidths;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions

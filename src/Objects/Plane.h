@@ -35,7 +35,6 @@ class CPlane
 	friend class PlaneDlg;
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class ManageBodiesDlg;
 	friend class StabPolarDlg;
 	friend class ManageUFOsDlg;

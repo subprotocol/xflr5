@@ -39,7 +39,6 @@ class CWOpp
 	friend class CPOpp;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
-	friend class StabAnalysisDlg;
 
 public:
 	CWOpp();

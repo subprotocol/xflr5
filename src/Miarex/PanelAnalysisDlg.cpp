@@ -902,6 +902,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp+qrhs*m_MatSize, Mu, Sigma);
 		else         pMiarex->AddWOpp(m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
 
+		if(m_pWPolar->m_Type==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
 		AddString("\n");
 	}
 	else m_bPointOut = true;
@@ -3859,9 +3860,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	memcpy(m_pRHS, m_RHS+3*m_MatSize, m_MatSize*sizeof(double));
 	memcpy(m_qRHS, m_RHS+4*m_MatSize, m_MatSize*sizeof(double));
 	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize*sizeof(double));
-//for(p=0; p<m_MatSize; p++) qDebug("%13.7f", m_uRHS[p]);
-
-//qDebug("%13.7f   %13.7f   %13.7f   %13.7f   %13.7f   %13.7f", Force0.x, Force0.y, Force0.z, Moment0.x, Moment0.y, Moment0.z);
 
 	// Compute stabiliy and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
@@ -3872,7 +3870,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	// 1st ORDER STABILITY DERIVATIVES
 	// x-derivatives________________________
 	Forces(m_uRHS, m_Sigma, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-//qDebug("%13.7f   %13.7f   %13.7f   %13.7f   %13.7f   %13.7f", Force.x, Force.y, Force.z, Moment.x, Moment.y, Moment.z);
 	Xu = (Force-Force0).dot(is)/deltaspeed;
 	Zu = (Force-Force0).dot(ks)/deltaspeed;
 	Mu = 0.0;

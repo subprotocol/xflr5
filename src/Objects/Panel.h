@@ -35,7 +35,6 @@ class CPanel
 	friend class QMiarex;
 	friend class CBody;
 	friend class VLMAnalysisDlg;
-	friend class StabAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class GL3dBodyDlg;
 	friend class GL3dWingDlg;

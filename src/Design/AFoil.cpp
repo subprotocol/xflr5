@@ -120,7 +120,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_pBufferFoil = new CFoil();
 
 	m_CurrentColumn = -1;
-
+	m_StackPos = 0;
+	m_StackSize = 0;
 	SetupLayout();
 
 	FoilTableDelegate::s_pAFoil = this;
@@ -771,10 +772,15 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 //					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
 					m_pSF->m_Extrados.m_Input[n].x = m_MousePos.x;
 					m_pSF->m_Extrados.m_Input[n].y = m_MousePos.y;
-//					m_pSF->m_Extrados.SplineCurve();
+					m_pSF->Update(true);
+					if(m_pSF->m_bSymetric)
+					{
+						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
+						m_pSF->m_Intrados.m_Input[n].y = -m_MousePos.y;
+						m_pSF->Update(false);
+					}
 					m_pSF->m_bModified = true;
 					pMainFrame->SetSaveState(false);
-					m_pSF->Update(true);
 				}
 				else
 				{
@@ -782,13 +788,19 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 					if (n>=0 && n<=m_pSF->m_Intrados.m_iCtrlPoints)
 					{
 						if(!m_bStored) StorePicture();//save for undo only the first time
-//						if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
+
 						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
 						m_pSF->m_Intrados.m_Input[n].y = m_MousePos.y;
-//						m_pSF->m_Intrados.SplineCurve();
+						m_pSF->Update(false);
+
+						if(m_pSF->m_bSymetric)
+						{
+							m_pSF->m_Extrados.m_Input[n].x =  m_MousePos.x;
+							m_pSF->m_Extrados.m_Input[n].y = -m_MousePos.y;
+							m_pSF->Update(true);
+						}
 						m_pSF->m_bModified = true;
 						pMainFrame->SetSaveState(false);
-						m_pSF->Update(false);
 					}
 				}
 			}
@@ -800,19 +812,29 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 					if(!m_bStored) StorePicture();//save for undo only the first time
 					m_pPF->m_Extrados.m_ctrlPoint[n].x = m_MousePos.x;
 					m_pPF->m_Extrados.m_ctrlPoint[n].y = m_MousePos.y;
+					if(m_pPF->m_bSymetric)
+					{
+						m_pPF->m_Intrados.m_ctrlPoint[n].x =  m_MousePos.x;
+						m_pPF->m_Intrados.m_ctrlPoint[n].y = -m_MousePos.y;
+					}
 					m_pPF->m_bModified = true;
 					pMainFrame->SetSaveState(false);
 				}
 				else
 				{
 					n = m_pPF->m_Intrados.m_iSelect;
-					if (n>=0 && n<m_pPF->m_Intrados.m_iPoints) 
+					if (n>=0 && n<m_pPF->m_Intrados.m_iPoints)
 					{
 						if(!m_bStored) StorePicture();//save for undo only the first time
 						m_pPF->m_Intrados.m_ctrlPoint[n].x = m_MousePos.x;
 						m_pPF->m_Intrados.m_ctrlPoint[n].y = m_MousePos.y;
 						m_pPF->m_bModified = true;
 						pMainFrame->SetSaveState(false);
+						if(m_pPF->m_bSymetric)
+						{
+							m_pPF->m_Extrados.m_ctrlPoint[n].x =  m_MousePos.x;
+							m_pPF->m_Extrados.m_ctrlPoint[n].y = -m_MousePos.y;
+						}
 					}
 				}
 				if(n<0) 
@@ -823,6 +845,11 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 						if(!m_bStored) StorePicture();//save for undo only the first time
 						m_pPF->m_Extrados.m_RearPoint.x = m_MousePos.x;
 						m_pPF->m_Extrados.m_RearPoint.y = m_MousePos.y;
+						if(m_pPF->m_bSymetric)
+						{
+							m_pPF->m_Intrados.m_RearPoint.x =  m_MousePos.x;
+							m_pPF->m_Intrados.m_RearPoint.y = -m_MousePos.y;
+						}
 						m_pPF->m_bModified = true;
 						pMainFrame->SetSaveState(false);
 						m_pPF->Update();
@@ -833,7 +860,12 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 						m_pPF->m_Intrados.m_RearPoint.x = m_MousePos.x;
 						m_pPF->m_Intrados.m_RearPoint.y = m_MousePos.y;
 						m_pPF->m_bModified = true;
-						pMainFrame->SetSaveState(false);
+						if(m_pPF->m_bSymetric)
+						{
+							m_pPF->m_Extrados.m_RearPoint.x =  m_MousePos.x;
+							m_pPF->m_Extrados.m_RearPoint.y = -m_MousePos.y;
+						}
+												pMainFrame->SetSaveState(false);
 						m_pPF->Update();
 					}
 				}
@@ -2214,7 +2246,6 @@ void QAFoil::OnStoreSplines()
 			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
 			return;
 		}
-//		Trace("m_iPts_Int=",size);
 
 		CFoil *pNewFoil = new CFoil();
 		m_pPF->ExportToBuffer(pNewFoil);
@@ -2229,13 +2260,13 @@ void QAFoil::OnStoreSplines()
 			FillFoilTable();
 			SelectFoil(pNewFoil);
 		}
-		else
+/*		else
 		{
 			delete pNewFoil;
 			pNewFoil = NULL;
 			FillFoilTable();
 			SelectFoil();
-		}
+		}*/
 	}
 	UpdateView();
 }
@@ -2274,24 +2305,11 @@ void QAFoil::OnSplineControls()
 
 	if(dlg.exec() == QDialog::Accepted)
 	{
-		if(m_bSF)
-		{
-			m_pSF->m_Extrados.m_iDegree = dlg.m_pctrlDegExtrados->currentIndex()+2;
-			m_pSF->m_Intrados.m_iDegree = dlg.m_pctrlDegIntrados->currentIndex()+2;
-		}
-		if(m_bSF)
-		{
-			int n = dlg.m_pctrlOutExtrados->GetValue();
-			if(n<1) dlg.m_pctrlOutExtrados->SetValue(1);
-			if(n>IQX2-10) dlg.m_pctrlOutExtrados->SetValue(IQX2-10);
-			m_pSF->m_Extrados.m_iRes = dlg.m_pctrlOutExtrados->GetValue();
-			m_pSF->Update(true);
-		}
-		else
-		{
-			m_pPF->m_Extrados.m_Freq = dlg.m_pctrlOutExtrados->GetValue();
-			m_pPF->m_Intrados.m_Freq = dlg.m_pctrlOutIntrados->GetValue();
-		}
+		TakePicture();
+		StorePicture();
+
+		if(m_bSF) m_pSF->Copy(&dlg.m_SF);
+		else      m_pPF->Copy(&dlg.m_PF);
 	}
 }
 
@@ -2915,6 +2933,7 @@ void QAFoil::OnFoilTableCtxMenu(const QPoint & position)
 }
 
 
+
 void QAFoil::SetupLayout()
 {
 	QDesktopWidget desktop;
@@ -2971,11 +2990,13 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
-	m_pctrlFoilTable->setColumnWidth(0, 150);
-	for(int i=1; i<15; i++)		m_pctrlFoilTable->setColumnWidth(i, 40);
+	int unitwidth = (int)(800.0/16.0);
+	m_pctrlFoilTable->setColumnWidth(0, 3*unitwidth);
+	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);
 	m_pctrlFoilTable->setColumnHidden(9, true);
 	m_pctrlFoilTable->setColumnHidden(10, true);
 	m_pctrlFoilTable->setColumnHidden(11, true);
+
 
 	int  *precision = new int[16];
 	precision[0]  = 2;
@@ -3171,6 +3192,16 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 }
 
 
+
+void QAFoil::OnColumnWidths()
+{
+	int unitwidth = (int)((double)m_pctrlFoilTable->width()/16.0);
+	m_pctrlFoilTable->setColumnWidth(0, 3*unitwidth);
+	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);
+	m_pctrlFoilTable->setColumnHidden(9, true);
+	m_pctrlFoilTable->setColumnHidden(10, true);
+	m_pctrlFoilTable->setColumnHidden(11, true);
+}
 
 
 void QAFoil::OnAFoilTableColumns()

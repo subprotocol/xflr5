@@ -28,7 +28,10 @@
 #include "../Misc/FloatEdit.h"
 #include "../Objects/Sf.h"
 #include "../Objects/Pf.h"
-
+#include <QTableView>
+#include <QStandardItemModel>
+#include <QCheckBox>
+#include "../Misc/FloatEditDelegate.h"
 
 class SplineCtrlsDlg : public QDialog
 {
@@ -39,23 +42,39 @@ public:
     SplineCtrlsDlg();
 	void InitDialog();
 
+private slots:
+	void OnUpperCellChanged(QWidget *FloatEdit);
+	void OnLowerCellChanged(QWidget *FloatEdit);
+	void OnOK();
+	void OnSymetric();
+	void OnSelChangeDegree();
+	void OnEditingFinished();
+
 private:
 	void SetuLayout();
+	void showEvent(QShowEvent *event);
+	void FillPointLists();
+	void ReadData();
 
 	FloatEdit	*m_pctrlOutExtrados;
 	FloatEdit	*m_pctrlOutIntrados;
 	QComboBox	*m_pctrlDegExtrados;
 	QComboBox	*m_pctrlDegIntrados;
 	QPushButton *OKButton, *CancelButton;
-//	QButton *m_pctrlOutText;
+	QCheckBox *m_pctrlSymetric;
 
+	QTableView *m_pctrlUpperList, *m_pctrlLowerList;
+	QStandardItemModel *m_pUpperListModel,*m_pLowerListModel;
+	FloatEditDelegate *m_pUpperFloatDelegate, *m_pLowerFloatDelegate;
 
 protected:
-
 	bool m_bSF;
+	bool m_bSymetric;
 	CSF *m_pSF;
 	CPF *m_pPF;
 
+	CSF m_SF; //work splines
+	CPF m_PF;
 };
 
 #endif // SPLINECTRLSDLG_H

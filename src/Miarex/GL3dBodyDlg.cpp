@@ -3773,7 +3773,6 @@ void GL3dBodyDlg::OnGrid()
 void GL3dBodyDlg::OnInertia()
 {
 	InertiaDlg dlg;
-	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.m_pBody = m_pBody;
 
 	//save inertia properties

@@ -23,6 +23,7 @@
 #include "Globals.h"
 #include "Design/AFoil.h"
 #include "Miarex/Miarex.h"
+#include "Miarex/InertiaDlg.h"
 #include "Miarex/GL3dWingDlg.h"
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
@@ -63,6 +64,31 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
 	m_VersionName = "XFLR5 v6.02 Beta";
+	QString jpegPluginPath;
+
+	//Jpeg format requires a specific plugin to be loaded dynmically at run time
+#ifdef Q_WS_MAC
+	//TODO : work for Francesco !
+#endif
+#ifdef Q_WS_WIN
+	QDir dir(qApp->applicationDirPath());
+	jpegPluginPath = dir.canonicalPath() + "/imageformats/qjpeg4.dll";
+#endif
+#ifdef Q_WS_X11
+	QDir dir(qApp->applicationDirPath());
+	jpegPluginPath = dir.canonicalPath() + "/imageformats/libqjpeg.so";
+#endif
+
+	if (dir.exists(jpegPluginPath))
+	{
+		QPluginLoader jpegPluginLoad(jpegPluginPath);
+		jpegPluginLoad.load();
+		if (!jpegPluginLoad.isLoaded())
+		{
+			QString errorMessage = jpegPluginLoad.errorString() + " : " +jpegPluginPath;
+			QMessageBox::information(window(), tr("Info"), errorMessage);
+		}
+	}
 
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
@@ -693,6 +719,9 @@ void MainFrame::CreateAFoilActions()
 
 	AFoilTableColumns = new QAction(tr("Set Table Columns"), this);
 	connect(AFoilTableColumns, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilTableColumns()));
+
+	AFoilTableColumnWidths = new QAction(tr("Reset column widths"), this);
+	connect(AFoilTableColumnWidths, SIGNAL(triggered()), pAFoil, SLOT(OnColumnWidths()));
 }
 
 
@@ -770,6 +799,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(saveViewToImageFileAct);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(AFoilTableColumns);
+	AFoilCtxMenu->addAction(AFoilTableColumnWidths);
 
 	//Context menu to be displayed when user right clicks on a foil in the table
 	AFoilTableCtxMenu = new QMenu(tr("Foil Actions"),this);
@@ -788,6 +818,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilTableCtxMenu->addAction(AFoilSetFlap);
 	AFoilTableCtxMenu->addSeparator();
 	AFoilTableCtxMenu->addAction(AFoilTableColumns);
+	AFoilTableCtxMenu->addAction(AFoilTableColumnWidths);
 }
 
 
@@ -990,6 +1021,7 @@ void MainFrame::CreateDockWindows()
 
 	StabPolarDlg::s_pMainFrame = this;
 
+	InertiaDlg::s_pMainFrame = this;
 	XFoilAnalysisDlg::s_pMainFrame  = this;
 	XFoilAnalysisDlg::s_pXDirect = m_pXDirect;
 	BodyGridDlg::s_pMainFrame = this;
@@ -3994,7 +4026,6 @@ void MainFrame::OnSaveViewToImageFile()
 		}
 	}
 
-
 	FileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
 											m_ImageDirName,
 											"Portable Network Graphics (*.png);;JPEG (*.jpg);;Windows Bitmap (*.bmp)",
@@ -6302,18 +6333,10 @@ void MainFrame::UpdateWOpps()
 					else                      str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
-				if(pos >=0)
-				{
-					m_pctrlWOpp->setCurrentIndex(pos);
-				}
-				else {
-					m_pctrlWOpp->setCurrentIndex(0);
-				}
+				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
+				else        m_pctrlWOpp->setCurrentIndex(0);
 			}
-			else{
-				m_pctrlWOpp->setCurrentIndex(0);
-			}
-
+			else m_pctrlWOpp->setCurrentIndex(0);
 		}
 		else
 		{

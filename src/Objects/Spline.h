@@ -57,6 +57,7 @@ public:
 	double GetY(double const &x);
 
 	void Copy(CSpline *pSpline);
+	void CopySymetric(CSpline *pSpline);
 	void Export(QTextStream &out, bool bExtrados);
 	void SplineCurve();
 	void SplineKnots();

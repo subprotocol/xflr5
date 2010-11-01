@@ -119,6 +119,7 @@ private slots:
 	void OnAFoilNacaFoils();
 	void OnFoilTableCtxMenu(const QPoint & position);
 	void OnAFoilTableColumns();
+	void OnColumnWidths();
 
 private:
 
