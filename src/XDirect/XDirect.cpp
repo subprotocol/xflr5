@@ -5054,23 +5054,23 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	D = 0;
 	str = "%";
-	str1 = QString(tr("Thickness        = %1")).arg(m_BufferFoil.m_fThickness*100.0, 6, 'f', 2);
+	str1 = QString(tr("Thickness         = %1")).arg(m_BufferFoil.m_fThickness*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString(tr("Max.Thick.pos.   = %1")).arg(m_BufferFoil.m_fXThickness*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max. Thick.pos.   = %1")).arg(m_BufferFoil.m_fXThickness*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString(tr("Max. Camber      = %1")).arg( m_BufferFoil.m_fCamber*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max. Camber       = %1")).arg( m_BufferFoil.m_fCamber*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString(tr("Max.Thick.pos.   = %1")).arg(m_BufferFoil.m_fXCamber*100.0, 6, 'f', 2);
+	str1 = QString(tr("Max. Camber pos.  = %1")).arg(m_BufferFoil.m_fXCamber*100.0, 6, 'f', 2);
 	painter.drawText(LeftPos,ZPos+D, str1+str);
 	D += dD;
 
-	str1 = QString(tr("Number of Panels =  %1")).arg( m_BufferFoil.n);
+	str1 = QString(tr("Number of Panels  =  %1")).arg( m_BufferFoil.n);
 	painter.drawText(LeftPos,ZPos+D, str1);
 	D += dD;
 

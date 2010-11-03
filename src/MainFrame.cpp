@@ -1231,9 +1231,6 @@ void MainFrame::CreateMiarexActions()
 	m_pUFOInertia->setStatusTip(tr("Define the inertia for the current plane or wing"));
 	connect(m_pUFOInertia, SIGNAL(triggered()), pMiarex, SLOT(OnUFOInertia()));
 
-	m_pBodyInertia = new QAction(tr("Define Inertia"), this);
-	m_pBodyInertia->setStatusTip(tr("Define the inertia for the current body"));
-	connect(m_pBodyInertia, SIGNAL(triggered()), pMiarex, SLOT(OnBodyInertia()));
 
 	showCurWOppOnly = new QAction(tr("Show Current OpPoint Only"), this);
 	showCurWOppOnly->setStatusTip(tr("Hide all the curves except for the one corresponding to the currently selected operating point"));
@@ -1484,7 +1481,7 @@ void MainFrame::CreateMiarexMenus()
 	CurBodyMenu->addAction(EditCurBody);
 	CurBodyMenu->addAction(exportBodyDef);
 	CurBodyMenu->addAction(exportBodyGeom);
-	CurBodyMenu->addAction(m_pBodyInertia);
+//	CurBodyMenu->addAction(m_pBodyInertia);
 	MiarexBodyMenu->addSeparator();
 	MiarexBodyMenu->addAction(ManageBodies);
 
@@ -4988,7 +4985,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("DlgPos_x", m_DlgPos.x());
 		settings.setValue("DlgPos_y", m_DlgPos.y());
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
-                settings.setValue("ReverseZoom", m_bReverseZoom);
+		settings.setValue("ReverseZoom", m_bReverseZoom);
 
 		QString RecentF;
 		for(int i=0; i<m_RecentFiles.size() && i<MAXRECENTFILES; i++)
@@ -4996,6 +4993,11 @@ void MainFrame::SaveSettings()
 			RecentF = QString("RecentFile_%1").arg(i);
 			if(m_RecentFiles[i].length()) settings.setValue(RecentF, m_RecentFiles.at(i));
 			else                          settings.setValue(RecentF, "");
+		}
+		for(int i=m_RecentFiles.size(); i<MAXRECENTFILES; i++)
+		{
+			RecentF = QString("RecentFile_%1").arg(i);
+			settings.setValue(RecentF, "");
 		}
 	}
 	settings.endGroup();

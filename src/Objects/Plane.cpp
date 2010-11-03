@@ -53,6 +53,7 @@ CPlane::CPlane()
 	m_Stab.m_YPanelDist[0] = 1;
 	m_Stab.m_YPanelDist[0] = 0;
 	m_Stab.ComputeGeometry();
+
 	m_Fin.m_WingName      = QObject::tr("Fin");
 	m_Fin.m_bIsFin        = true;
 	m_Fin.m_TChord[0]     = 0.100;
@@ -124,55 +125,73 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	double PlaneMass = 0.0;
 
 	//get the main wing's inertias
-	if(m_Wing.m_VolumeMass>PRECISION) m_Wing.ComputeVolumeInertia(CoGWing, Ixx, Iyy, Izz, Ixz);
-	CoG += CoGWing * m_Wing.m_VolumeMass;
-	PlaneMass = m_Wing.m_VolumeMass;
-	CoGIxx = Ixx;
-	CoGIyy = Iyy;
-	CoGIzz = Izz;
-	CoGIxz = Ixz;
+	if(m_Wing.m_VolumeMass>PRECISION)
+	{
+		m_Wing.ComputeVolumeInertia(CoGWing, Ixx, Iyy, Izz, Ixz);
+		CoG += CoGWing * m_Wing.m_VolumeMass;
+		PlaneMass = m_Wing.m_VolumeMass;
+		CoGIxx = Ixx;
+		CoGIyy = Iyy;
+		CoGIzz = Izz;
+		CoGIxz = Ixz;
+	}
 
 	// add other object contributions
 	// object CoGs and inertia in CoG frame will be computed at the same time
 	if(m_bBiplane)
 	{
-		if(m_Wing2.m_VolumeMass>PRECISION) m_Wing2.ComputeVolumeInertia(CoGWing2, Ixx, Iyy, Izz, Ixz);
-		CoG += (CoGWing2) * m_Wing2.m_VolumeMass;
-		PlaneMass += m_Wing2.m_VolumeMass;
-		CoGIxx += Ixx;
-		CoGIyy += Iyy;
-		CoGIzz += Izz;
-		CoGIxz += Ixz;
+		if(m_Wing2.m_VolumeMass>PRECISION)
+		{
+			m_Wing2.ComputeVolumeInertia(CoGWing2, Ixx, Iyy, Izz, Ixz);
+			CoG += (CoGWing2) * m_Wing2.m_VolumeMass;
+			PlaneMass += m_Wing2.m_VolumeMass;
+			CoGIxx += Ixx;
+			CoGIyy += Iyy;
+			CoGIzz += Izz;
+			CoGIxz += Ixz;
+		}
 	}
+
 	if(m_bStab)
 	{
-		if(m_Stab.m_VolumeMass>PRECISION) m_Stab.ComputeVolumeInertia(CoGStab, Ixx, Iyy, Izz, Ixz);
-		CoG += CoGStab * m_Stab.m_VolumeMass;
-		PlaneMass += m_Stab.m_VolumeMass;
-		CoGIxx += Ixx;
-		CoGIyy += Iyy;
-		CoGIzz += Izz;
-		CoGIxz += Ixz;
+		if(m_Stab.m_VolumeMass>PRECISION)
+		{
+			m_Stab.ComputeVolumeInertia(CoGStab, Ixx, Iyy, Izz, Ixz);
+			CoG += CoGStab * m_Stab.m_VolumeMass;
+			PlaneMass += m_Stab.m_VolumeMass;
+			CoGIxx += Ixx;
+			CoGIyy += Iyy;
+			CoGIzz += Izz;
+			CoGIxz += Ixz;
+		}
 	}
+
 	if(m_bFin)
 	{
-		if(m_Fin.m_VolumeMass>PRECISION) m_Fin.ComputeVolumeInertia(CoGFin, Ixx, Iyy, Izz, Ixz);
-		CoG += CoGFin * m_Fin.m_VolumeMass;
-		PlaneMass += m_Fin.m_VolumeMass;
-		CoGIxx += Ixx;
-		CoGIyy += Iyy;
-		CoGIzz += Izz;
-		CoGIxz += Ixz;
+		if(m_Fin.m_VolumeMass>PRECISION)
+		{
+			m_Fin.ComputeVolumeInertia(CoGFin, Ixx, Iyy, Izz, Ixz);
+			CoG += CoGFin * m_Fin.m_VolumeMass;
+			PlaneMass += m_Fin.m_VolumeMass;
+			CoGIxx += Ixx;
+			CoGIyy += Iyy;
+			CoGIzz += Izz;
+			CoGIxz += Ixz;
+		}
 	}
+
 	if(m_bBody)
 	{
-		if(m_pBody->m_VolumeMass>PRECISION) m_pBody->ComputeVolumeInertia(CoGBody, Ixx, Iyy, Izz, Ixz);
-		CoG += CoGBody * m_pBody->m_VolumeMass;
-		PlaneMass += m_pBody->m_VolumeMass;
-		CoGIxx += Ixx;
-		CoGIyy += Iyy;
-		CoGIzz += Izz;
-		CoGIxz += Ixz;
+		if(m_pBody->m_VolumeMass>PRECISION)
+		{
+			m_pBody->ComputeVolumeInertia(CoGBody, Ixx, Iyy, Izz, Ixz);
+			CoG += CoGBody * m_pBody->m_VolumeMass;
+			PlaneMass += m_pBody->m_VolumeMass;
+			CoGIxx += Ixx;
+			CoGIyy += Iyy;
+			CoGIzz += Izz;
+			CoGIxz += Ixz;
+		}
 	}
 
 	if(PlaneMass>0.0) CoG *= 1.0/ PlaneMass;

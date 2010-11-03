@@ -4914,8 +4914,8 @@ CPOpp * QMiarex::GetPOpp(double Alpha)
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
 		if ((pPOpp->m_PlaneName == m_pCurPlane->m_PlaneName) &&	(pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pPOpp->m_QInf - Alpha)<0.01)	return pPOpp;
-			else if(fabs(pPOpp->m_Alpha - Alpha)<0.01)	                    return pPOpp;
+			if(m_pCurWPolar->m_Type==4 && fabs(pPOpp->m_QInf - Alpha)<0.001)  return pPOpp;
+			else if(fabs(pPOpp->m_Alpha - Alpha)<0.001)	                      return pPOpp;
 		}
 	}
 	return NULL;
@@ -5055,8 +5055,8 @@ CWOpp* QMiarex::GetWOpp(double Alpha)
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
 		if ((pWOpp->m_WingName == m_pCurWing->m_WingName) &&(pWOpp->m_PlrName == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pWOpp->m_QInf - Alpha)<0.01)  return pWOpp;
-			else if(fabs(pWOpp->m_Alpha - Alpha)<0.01)                       return pWOpp;
+			if(m_pCurWPolar->m_Type==4 && fabs(pWOpp->m_QInf - Alpha)<0.001) return pWOpp;
+			else if(fabs(pWOpp->m_Alpha - Alpha)<0.001)                      return pWOpp;
 		}
 	}
 	return NULL;
@@ -6047,6 +6047,7 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
+		glDisable(GL_CLIP_PLANE1);
 		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
 			glCallList(WOPPCPLEGENDTXT);
@@ -6055,7 +6056,8 @@ void QMiarex::GLRenderView()
 
 		if(m_pCurWing)			glCallList(WINGLEGEND);
 		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
-
+		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
+		else						glEnable(GL_CLIP_PLANE1);
 
 		GLSetupLight();
 		glDisable(GL_LIGHTING);
@@ -7175,6 +7177,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bAutoCpScale  = pSettings->value("bAutoCpScale").toBool();
 		m_bShowCpScale  = pSettings->value("bShowCpScale").toBool();
 		m_bCurWOppOnly  = pSettings->value("CurWOppOnly").toBool();
+		m_bShowElliptic = pSettings->value("bShowElliptic").toBool();
 		m_bLogFile      = pSettings->value("LogFile").toBool();
 		m_bDirichlet    = pSettings->value("Dirichlet").toBool();
 		m_bVLM1         = pSettings->value("bVLM1").toBool();
@@ -7980,8 +7983,7 @@ void QMiarex::On3DPrefs()
 
 void QMiarex::On3DPickCenter()
 {
-	m_bPickCenter = true;
-	m_pctrlPickCenter->setChecked(true);
+	m_bPickCenter = m_pctrlPickCenter->isChecked();
 }
 
 
@@ -8598,17 +8600,6 @@ void QMiarex::OnAdvancedSettings()
 		UpdateView();
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
-}
-
-
-void QMiarex::OnBodyInertia()
-{
-	if(!m_pCurBody) return;
-	InertiaDlg dlg;
-	dlg.m_pWing = NULL;
-	dlg.m_pBody = m_pCurBody;
-	dlg.InitDialog();
-	dlg.exec();
 }
 
 
@@ -11923,10 +11914,107 @@ void QMiarex::OnUFOInertia()
 	dlg.m_pPlane = NULL;
 	dlg.m_pWing  = NULL;
 	dlg.m_pBody  = NULL;
-	if(m_pCurPlane)     dlg.m_pPlane = m_pCurPlane;
-	else if(m_pCurWing) dlg.m_pWing  = m_pCurWing;
+
+	CPlane *pSavePlane = new CPlane;
+	CWing *pSaveWing = new CWing;
+	CWPolar *pWPolar;
+	QString UFOName;
+	bool bHasResults = false;
+
+	if(m_pCurPlane)
+	{
+		UFOName = m_pCurPlane->m_PlaneName;
+		pSavePlane->Duplicate(m_pCurPlane);
+		dlg.m_pPlane = m_pCurPlane;
+	}
+	else if(m_pCurWing)
+	{
+		UFOName = m_pCurWing->m_WingName;
+		pSaveWing->Duplicate(m_pCurWing);
+		dlg.m_pWing  = m_pCurWing;
+	}
+
+	for (int i=0; i< m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		if(pWPolar->m_Alpha.size() && pWPolar->m_UFOName==UFOName)
+		{
+			if(pWPolar->m_Type==STABILITYPOLAR) bHasResults = true;
+			break;
+		}
+	}
+
 	dlg.InitDialog();
-	dlg.exec();
+
+	if(dlg.exec()==QDialog::Accepted)
+	{
+		if(bHasResults)
+		{
+			ModDlg dlg;
+			dlg.m_Question = tr("The modification will erase all Type 7 results associated to this Plane.\nContinue ?");
+			dlg.InitDialog();
+			int Ans = dlg.exec();
+
+			if (Ans == QDialog::Rejected)
+			{
+				//restore saved UFO
+				if(m_pCurPlane)    m_pCurPlane->Duplicate(pSavePlane);
+				else if(m_pCurWing) m_pCurWing->Duplicate(pSaveWing);
+				return;
+			}
+			else if(Ans==20)
+			{
+				if(m_pCurPlane)
+				{
+					//save mods to a new plane object
+					CPlane* pNewPlane= new CPlane;
+					pNewPlane->Duplicate(m_pCurPlane);
+					//restore geometry for initial plane
+					m_pCurPlane->Duplicate(pSavePlane);
+
+					if(!SetModPlane(pNewPlane)) delete pNewPlane;
+					else                        m_pCurPlane = AddPlane(pNewPlane);
+				}
+				else if(m_pCurWing)
+				{
+					//save mods to a new wing object
+					CWing* pNewWing= new CWing;
+					pNewWing->Duplicate(m_pCurWing);
+					//restore geometry for initial plane
+					m_pCurWing->Duplicate(pSaveWing);
+
+					if(!SetModWing(pNewWing)) delete pNewWing;
+					else                      m_pCurWing = AddWing(pNewWing);
+
+				}
+				SetUFO();
+				pMainFrame->UpdateUFOs();
+				UpdateView();
+				return;
+			}
+
+			//last case, user wants to overwrite, so reset all type 7 polars
+			for (int i=0; i< m_poaWPolar->size(); i++)
+			{
+				pWPolar = (CWPolar*)m_poaWPolar->at(i);
+				if(pWPolar->m_Type==STABILITYPOLAR && pWPolar->m_UFOName==UFOName)
+				{
+					pWPolar->ResetWPlr();
+					if(m_pCurPlane)     pWPolar->SetInertia(m_pCurPlane, true);
+					else if(m_pCurWing) pWPolar->SetInertia(m_pCurWing, false);
+				}
+			}
+
+		}
+	}
+	else
+	{
+		//restore saved UFO
+		if(m_pCurPlane)    m_pCurPlane->Duplicate(pSavePlane);
+		else if(m_pCurWing) m_pCurWing->Duplicate(pSaveWing);
+	}
+	delete pSavePlane;
+	delete pSaveWing;
 	pMainFrame->m_DlgPos = dlg.pos();
 }
 
@@ -12965,6 +13053,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("bAutoCpScale", m_bAutoCpScale  );
 		pSettings->setValue("bShowCpScale", m_bShowCpScale  );
 		pSettings->setValue("CurWOppOnly", m_bCurWOppOnly  );
+		pSettings->setValue("bShowElliptic", m_bShowElliptic);
 		pSettings->setValue("LogFile", m_bLogFile  );
 		pSettings->setValue("bVLM1", m_bVLM1);
 		pSettings->setValue("Dirichlet", m_bDirichlet  );
@@ -14590,7 +14679,7 @@ void QMiarex::SetupLayout()
 	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
 	DisplayBox->setLayout(CheckDispLayout);
 
-	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properies"));
+	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
 	m_pctrlPolarProps1 = new QTextEdit;
 	m_pctrlPolarProps1->setReadOnly(true);
 //	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);

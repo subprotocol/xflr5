@@ -32,6 +32,7 @@ class CPlane
 	friend class MainFrame;
 	friend class CBody;
 	friend class CWing;
+	friend class CWPolar;
 	friend class PlaneDlg;
 	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;

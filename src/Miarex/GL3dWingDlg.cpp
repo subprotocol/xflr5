@@ -1572,7 +1572,7 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 	QPoint Delta(point.x() - m_LastPoint.x(), point.y() - m_LastPoint.y());
 	ClientToGL(point, Real);
 
-	if(!m_pglWidget->hasFocus()) m_pglWidget->setFocus();
+//	if(!m_pglWidget->hasFocus()) m_pglWidget->setFocus();
 
 	bool bCtrl = false;
 

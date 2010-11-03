@@ -61,7 +61,7 @@ private:
 	void GetPolarProperties(QString &Properties);
 	void Remove(int i);
 	void ResetWPlr();
-
+	void SetInertia(void *ptr, bool bPlane);
 	void *GetUFOPlrVariable(int iVar);
 
 	int m_RefAreaType;

@@ -1708,3 +1708,36 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha.size());
 	PolarProperties += strong;
 }
+
+
+void CWPolar::SetInertia(void *ptr, bool bPlane)
+{
+	CPlane *pPlane = NULL;
+	CWing *pWing = NULL;
+	if(bPlane)
+	{
+		pPlane = (CPlane*)ptr;
+		m_Weight = pPlane->m_TotalMass;
+		m_CoG = pPlane->m_CoG;
+		m_CoGIxx = pPlane->m_CoGIxx;
+		m_CoGIyy = pPlane->m_CoGIyy;
+		m_CoGIzz = pPlane->m_CoGIzz;
+		m_CoGIxz = pPlane->m_CoGIxz;
+	}
+	else
+	{
+		pWing  = (CWing*)ptr;
+		m_Weight = pWing->m_TotalMass;
+		m_CoG = pWing->m_CoG;
+		m_CoGIxx = pWing->m_CoGIxx;
+		m_CoGIyy = pWing->m_CoGIyy;
+		m_CoGIzz = pWing->m_CoGIzz;
+		m_CoGIxz = pWing->m_CoGIxz;
+	}
+	ResetWPlr();
+}
+
+
+
+
+

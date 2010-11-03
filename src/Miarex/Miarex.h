@@ -209,7 +209,6 @@ private slots:
 	void OnGL3DScale();
 	void OnImportWPolar();
 	void OnUFOInertia();
-	void OnBodyInertia();
 	void OnWPolarProps();
 
 	void OnTimeGraph();

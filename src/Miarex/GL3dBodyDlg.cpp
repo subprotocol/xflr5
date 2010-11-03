@@ -2726,8 +2726,6 @@ void GL3dBodyDlg::GLRenderBody()
 {
 	int width;
 
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-
 
 	GLdouble pts[4];
 
@@ -2743,7 +2741,7 @@ void GL3dBodyDlg::GLRenderBody()
 	pts[0]=0.0; pts[1]=-1.0; pts[2]=0.0; pts[3]=m_HorizontalSplit;	//y=m_HorizontalSplit
 	glClipPlane(GL_CLIP_PLANE4, pts);
 
-	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;				//x=m_VerticalSplit
+	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;
 	glClipPlane(GL_CLIP_PLANE5, pts);
 
 	width = m_rCltRect.width();
@@ -2757,21 +2755,19 @@ void GL3dBodyDlg::GLRenderBody()
 //Display 2D View
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-		GLDrawBodyLegend();
 
 		glDisable(GL_CLIP_PLANE1);
 		glDisable(GL_CLIP_PLANE2);
 		glDisable(GL_CLIP_PLANE3);
 		glDisable(GL_CLIP_PLANE4);
 		glDisable(GL_CLIP_PLANE5);
+		GLDrawBodyLegend();
 
 		if(m_BodyGridDlg.m_bScale) GLDrawBodyLineScale();
 
 		glEnable(GL_CLIP_PLANE3);
 		glEnable(GL_CLIP_PLANE2);
 
-		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE5);
-		else						glEnable(GL_CLIP_PLANE5);
 
 		glPushMatrix();
 		{
@@ -2819,6 +2815,8 @@ void GL3dBodyDlg::GLRenderBody()
 
 		glEnable(GL_CLIP_PLANE3);
 		glEnable(GL_CLIP_PLANE4);
+		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE5);
+		else						glEnable(GL_CLIP_PLANE5);
 
 		glPushMatrix();
 		{

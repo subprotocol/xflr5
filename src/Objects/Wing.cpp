@@ -2789,7 +2789,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
 
 	m = p = nFlap = 0;
-
+double nada;
 	// For each of the wing's surfaces, calculate the coefficients on each strip
 	// and sum them up to get the wing's overall coefficients
 	for (j=0; j<m_NSurfaces; j++)
@@ -2840,6 +2840,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 						Force      *= 2.0 * Gamma[p+1] /QInf;       //Newtons/q
 						PanelForce -= Force;
 					}
+					Cp[p] = -2.0 * PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;
+
 				}
 				StripForce += PanelForce;                                           // Newtons/q
 				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q
@@ -2923,6 +2925,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 	int m;
 	bool bPointOutRe, bPointOutCl, bOutRe, bError;
 	double tau = 0.0;
+	CVector PtC4;
 
 	WingVDrag = 0.0;
 
@@ -2952,6 +2955,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 		{
 			bOutRe = bPointOutRe = false;
 			bPointOutCl = false;
+			m_Surface[j].GetC4(k, PtC4, tau);
 
 			m_PCd[m]    = GetVar(pMiarex->m_poaPolar, 2, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
@@ -2962,7 +2966,6 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 			m_XTrBot[m] = GetVar(pMiarex->m_poaPolar, 6, m_Surface[j].m_pFoilA, m_Surface[j].m_pFoilB, m_Re[m], m_Cl[m], tau, bOutRe, bError);
 			bPointOutRe = bOutRe || bPointOutRe;
 			if(bError) bPointOutCl = true;
-
 			if(bPointOutCl)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);

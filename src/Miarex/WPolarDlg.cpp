@@ -47,11 +47,11 @@ WPolarDlg::WPolarDlg()
 	m_bAutoName = true;
 	
 	m_QInf       = 10.0;//m/s
-	m_Weight     = 1.0;
+	m_Weight     = 0.0;
 	m_Alpha      = 0.0;
 	m_Beta       = 0.0;
-	m_PolarType       = 1;
-	m_WingLoad   = 1.0;
+	m_PolarType  = FIXEDSPEEDPOLAR;
+	m_WingLoad   = 0.0;
 	m_Density    = 1.225;
 	m_Viscosity  = 1.5e-5;
 	m_Height     = 0.0;
@@ -59,7 +59,7 @@ WPolarDlg::WPolarDlg()
 	m_pPlane     = NULL;
 
 	m_CoG.Set(0.0,0.0,0.0);
-	m_AnalysisMethod = 1;
+	m_AnalysisMethod = LLTMETHOD;
 
 	m_bThinSurfaces = true;
 	m_bTiltedGeom   = false;
