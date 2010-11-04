@@ -4159,7 +4159,6 @@ void MainFrame::OnSelChangeWOpp(int i)
 		m_pctrlWOpp->setCurrentIndex(0);
 		strong = m_pctrlWOpp->itemText(0);
 	}
-
 	if(strong.length())
 	{
 		bool bOK;

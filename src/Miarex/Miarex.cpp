@@ -4803,6 +4803,8 @@ void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 	{
 		x = pWPolar->m_EigenValue[iMode][i].real();
 		y = pWPolar->m_EigenValue[iMode][i].imag()/2./PI;
+
+
 		pCurve->AddPoint(x, y);
 		if(m_pCurWOpp && m_bHighlightOpp)
 		{
@@ -4915,8 +4917,8 @@ CPOpp * QMiarex::GetPOpp(double Alpha)
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
 		if ((pPOpp->m_PlaneName == m_pCurPlane->m_PlaneName) &&	(pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pPOpp->m_QInf - Alpha)<0.001)  return pPOpp;
-			else if(fabs(pPOpp->m_Alpha - Alpha)<0.001)	                      return pPOpp;
+			if(m_pCurWPolar->m_Type==4 && fabs(pPOpp->m_QInf - Alpha)<0.005)  return pPOpp;
+			else if(fabs(pPOpp->m_Alpha - Alpha)<0.005)	                      return pPOpp;
 		}
 	}
 	return NULL;
@@ -5056,8 +5058,8 @@ CWOpp* QMiarex::GetWOpp(double Alpha)
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
 		if ((pWOpp->m_WingName == m_pCurWing->m_WingName) &&(pWOpp->m_PlrName == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pWOpp->m_QInf - Alpha)<0.001) return pWOpp;
-			else if(fabs(pWOpp->m_Alpha - Alpha)<0.001)                      return pWOpp;
+			if(m_pCurWPolar->m_Type==4 && fabs(pWOpp->m_QInf - Alpha)<0.005) return pWOpp;
+			else if(fabs(pWOpp->m_Alpha - Alpha)<0.005)                      return pWOpp;
 		}
 	}
 	return NULL;
@@ -15235,7 +15237,6 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 	// else set it to NULL
 	QString strong;
 	if(m_pCurPlane)	  return SetPOpp(bCurrent, Alpha);
-
 	CWOpp *pWOpp = NULL;
 	if(bCurrent)
 	{

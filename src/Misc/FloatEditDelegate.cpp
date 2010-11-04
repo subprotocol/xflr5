@@ -31,7 +31,7 @@
 
  QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
  {
-/*	 if(m_Precision[index.column()]>=0)
+	 if(m_Precision[index.column()]>=0)
 	 {
 		 //we have a number
 		FloatEdit *editor = new FloatEdit(parent);
@@ -41,7 +41,7 @@
 		editor->DefineValue(value);
 		return editor;
 	 }
-	 else*/
+	 else
 	 {
 		 //we have a string
 		QLineEdit *editor = new QLineEdit(parent);

@@ -569,7 +569,10 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					if(m_Type==7)
 					{
 						//store the eigenthings
-						for(l=0; l<8; l++) m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
+						for(l=0; l<8; l++)
+						{
+							m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
+						}
 					}
 					bInserted = true;
 					break;
@@ -620,7 +623,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 								m_EigenValue[l][j] = m_EigenValue[l][j-1];
 						//store the eigenthings
 						for(l=0; l<8; l++)
+						{
 							m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
+						}
 					}
 
 					bInserted = true;
@@ -674,7 +679,10 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 			int size = m_Alpha.size();
 			if(size>=MAXPOLARPOINTS) return;
 			//store the eigenthings
-			for(l=0; l<8; l++) m_EigenValue[l][size] = pWOpp->m_EigenValue[l];
+			for(l=0; l<8; l++)
+			{
+				m_EigenValue[l][size-1] = pWOpp->m_EigenValue[l];
+			}
 		}
 		CalculatePoint(size);
 	}
