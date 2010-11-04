@@ -775,6 +775,7 @@ void InertiaDlg::OnOK()
 			}			
 		}
 		m_pWing->m_NMass = j;
+		m_pWing->ComputeBodyAxisInertia();
 	}
 	else if(m_pBody)
 	{
@@ -993,10 +994,15 @@ void InertiaDlg::SetupLayout()
 	m_pctrlMassView = new QTableView(this);
 	m_pctrlMassView->setMinimumHeight(150);
 //	m_pctrlMassView->setMinimumWidth(350);
-	m_pctrlMassView->setSelectionBehavior(QAbstractItemView::SelectRows);
+//	m_pctrlMassView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlMassView->horizontalHeader()->setStretchLastSection(true);
 	MassLayout->addWidget(m_pctrlMassView);
 	PointMassBox->setLayout(MassLayout);
+	m_pctrlMassView->setEditTriggers(QAbstractItemView::CurrentChanged |
+									 QAbstractItemView::DoubleClicked |
+									 QAbstractItemView::SelectedClicked |
+									 QAbstractItemView::EditKeyPressed |
+									 QAbstractItemView::AnyKeyPressed);
 
 	//________________Total Mass, Center of gravity, and inertias__________
 	QGroupBox *TotalMassBox = new QGroupBox(tr("Total Mass = Volume + point masses"));

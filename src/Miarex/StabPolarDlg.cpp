@@ -294,9 +294,6 @@ void StabPolarDlg::InitDialog()
 
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-//	m_pctrlSpeedUnit->setText(str);
-//	m_pctrlQInf->SetValue(m_QInf*pMainFrame->m_mstoUnit);
-
 
 	if(m_UnitType==1) m_pctrlUnit1->setChecked(true);
 	else              m_pctrlUnit2->setChecked(true);

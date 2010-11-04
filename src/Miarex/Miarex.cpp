@@ -932,8 +932,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			{
 				pPOpp->m_Alpha            = m_pPanelDlg->m_AlphaEq;
 				pPOpp->m_QInf             = m_pPanelDlg->u0;
-				pPOpp->m_Ctrl = m_pPanelDlg->m_Ctrl;
-				pWOpp->m_Ctrl = m_pPanelDlg->m_Ctrl;
+				pPOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
+				pWOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
 				pWOpp->m_Alpha          = m_pPanelDlg->m_AlphaEq;
 				pWOpp->m_QInf           = m_pPanelDlg->u0;
 				pWOpp->m_CL             = m_pPanelDlg->m_CL;
@@ -1330,6 +1330,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 		{
 			pNewPoint->m_Alpha               = m_pPanelDlg->m_OpAlpha;
 			pNewPoint->m_QInf                = m_pPanelDlg->m_QInf;
+			pNewPoint->m_Ctrl                = m_pPanelDlg->m_Ctrl;
 			pNewPoint->m_NVLMPanels          = m_pPanelDlg->m_MatSize;
 			pNewPoint->m_bOut                = m_pPanelDlg->m_bPointOut;
 			pNewPoint->m_CL                  = m_pPanelDlg->m_CL;
@@ -11958,7 +11959,7 @@ void QMiarex::OnUFOInertia()
 			if (Ans == QDialog::Rejected)
 			{
 				//restore saved UFO
-				if(m_pCurPlane)    m_pCurPlane->Duplicate(pSavePlane);
+				if(m_pCurPlane)     m_pCurPlane->Duplicate(pSavePlane);
 				else if(m_pCurWing) m_pCurWing->Duplicate(pSaveWing);
 				return;
 			}
@@ -12004,8 +12005,8 @@ void QMiarex::OnUFOInertia()
 					else if(m_pCurWing) pWPolar->SetInertia(m_pCurWing, false);
 				}
 			}
-
 		}
+		pMainFrame->SetSaveState(false);
 	}
 	else
 	{

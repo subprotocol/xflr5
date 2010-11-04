@@ -4872,7 +4872,10 @@ void GL3dBodyDlg::SetupLayout()
 //	FramePosLayout->addStretch(1);
 	m_pctrlFrameTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlFrameTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::AnyKeyPressed);
+	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									   QAbstractItemView::DoubleClicked |
+									   QAbstractItemView::SelectedClicked |
+									   QAbstractItemView::EditKeyPressed);
 
 
 	QVBoxLayout * FramePointLayout = new QVBoxLayout;
@@ -4886,7 +4889,10 @@ void GL3dBodyDlg::SetupLayout()
 //	FramePointLayout->addStretch(1);
 	m_pctrlPointTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlPointTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-	m_pctrlPointTable->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | QAbstractItemView::AnyKeyPressed);
+	m_pctrlPointTable->setEditTriggers(QAbstractItemView::CurrentChanged |
+									   QAbstractItemView::DoubleClicked |
+									   QAbstractItemView::SelectedClicked |
+									   QAbstractItemView::EditKeyPressed);
 
 
 	QHBoxLayout *AllControls = new QHBoxLayout;

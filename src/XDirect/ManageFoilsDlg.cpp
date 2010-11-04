@@ -21,6 +21,7 @@
   
  
 #include <QHBoxLayout>
+#include <QHeaderView>
 #include <QVBoxLayout>
 #include <QFileDialog>
 #include <QStringList>
@@ -124,9 +125,9 @@ void ManageFoilsDlg::SetupLayout()
 	CommandButtons->addStretch(1);
 
 	m_pctrlFoilTable   = new QTableView(this);
-
 	m_pctrlFoilTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlFoilTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_pctrlFoilTable->horizontalHeader()->setStretchLastSection(true);
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);

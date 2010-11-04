@@ -61,13 +61,6 @@ bool FloatEdit::IsInBounds(double f)
 
 
 
-void FloatEdit::focusInEvent ( QFocusEvent * event )
-{
-	QLineEdit::focusInEvent(event);
-	if(m_bFocusSelect) selectAll();
-}
-
-
 void FloatEdit::focusOutEvent ( QFocusEvent * event )
 {
 	QString str;
@@ -172,6 +165,10 @@ void FloatEdit::SetMax(double f)
 	v->setTop(f);
 }
 
+void FloatEdit::DefineValue(double f)
+{
+	m_Value = f;
+}
 
 void FloatEdit::SetValue(double f)
 {
@@ -201,9 +198,9 @@ void FloatEdit::FormatValue(double const &f, QString &str)
 
 void FloatEdit::showEvent ( QShowEvent * event )
 {
-	QString str;
+/*	QString str;
 	FormatValue(m_Value, str);
-	setText(str);
+	setText(str);*/
 }
 
 

@@ -739,7 +739,6 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 {
 	// Calculates the viscous and inviscid wing coefficients 
-
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int q;
 	QString str, strong;
@@ -3005,12 +3004,12 @@ bool PanelAnalysisDlg::ControlLoop()
 				ComputeAeroCoefs(m_AlphaEq, 0.0, 1);
 				if (m_bCancel) return true;
 
-				if(m_bConverged)
+/*				if(m_bConverged)
 				{
 					//store results
 					if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Mu);
 					else         pMiarex->AddWOpp(m_bPointOut, m_Mu, m_Sigma, m_Cp);
-				}
+				}*/
 			}
 			AddString("\n     ______Finished operating point calculation________\n\n\n\n\n");
 		}

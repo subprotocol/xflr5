@@ -772,8 +772,9 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(AFoilInterpolateFoils);
 	AFoilDesignMenu->addAction(AFoilNacaFoils);
-	
-	
+	AFoilDesignMenu->addAction(ManageFoilsAct);
+
+
 	AFoilSplineMenu = menuBar()->addMenu(tr("&Splines"));
 	AFoilSplineMenu->addAction(SplinesAct);
 	AFoilSplineMenu->addAction(SplinedPointsAct);

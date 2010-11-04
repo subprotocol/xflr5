@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 
- #include <QtGui>
+ //#include <QtGui>
 
  #include "FloatEditDelegate.h"
 
@@ -31,32 +31,34 @@
 
  QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
  {
-	 if(m_Precision[index.column()]>=0)
+/*	 if(m_Precision[index.column()]>=0)
 	 {
 		 //we have a number
-		 FloatEdit *editor = new FloatEdit(parent);
-		 editor->setAlignment(Qt::AlignRight);
-		 editor->SetPrecision(m_Precision[index.column()]);
-		 return editor;
+		FloatEdit *editor = new FloatEdit(parent);
+//		editor->setAlignment(Qt::AlignRight);
+		editor->SetPrecision(m_Precision[index.column()]);
+		double value = index.model()->data(index, Qt::EditRole).toDouble();
+		editor->DefineValue(value);
+		return editor;
 	 }
-	 else
+	 else*/
 	 {
 		 //we have a string
-		 QLineEdit *editor = new QLineEdit(parent);
-		 editor->setAlignment(Qt::AlignLeft);
-		 return editor;
+		QLineEdit *editor = new QLineEdit(parent);
+		editor->setAlignment(Qt::AlignLeft);
+		return editor;
 	 }
  }
 
 void FloatEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-	if(m_Precision[index.column()]>=0)
+/*	if(m_Precision[index.column()]>=0)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		floatEdit->SetValue(value);
+		floatEdit->DefineValue(value);
 	}
-	else
+	else*/
 	{
 		QLineEdit *pLine = static_cast<QLineEdit*>(editor);
 		pLine->setText(index.model()->data(index, Qt::EditRole).toString());
