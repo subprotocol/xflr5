@@ -28,6 +28,7 @@ RenameDlg::RenameDlg(void *pParent)
 	setWindowTitle(tr("Rename"));
 	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
+	m_bExists = true;
 	m_pstrArray = NULL;
 	SetupLayout();
 }
@@ -45,7 +46,7 @@ void RenameDlg::SetupLayout()
 	m_pctrlName = new QLineEdit("");
 	QLabel* NameListLabel = new QLabel(tr("Existing Names:"));
 	m_pctrlNameList = new QListWidget;
-//	m_pctrlNameList->setMinimumHeight(300);
+
 	connect(m_pctrlNameList, SIGNAL(currentRowChanged(int)), this, SLOT(OnSelChangeList(int)));
 	connect(m_pctrlNameList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnDoubleClickList(QListWidgetItem *)));
 
@@ -164,6 +165,7 @@ void RenameDlg::keyPressEvent(QKeyEvent *event)
 
 void RenameDlg::OnOverwrite()
 {
+	m_bExists = true;
 	m_strName = m_pctrlName->text();
 	done(10);
 }
@@ -182,6 +184,7 @@ void RenameDlg::OnOK()
 	QString strong;
 
 	//exists ?
+	m_bExists = false;
 	if(m_pstrArray)
 	{
 		for (int l=0; l<m_pstrArray->size(); l++)
@@ -193,6 +196,7 @@ void RenameDlg::OnOK()
 				if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
 															  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 				{
+					m_bExists = true;
 					done(10);
 					return;
 				}

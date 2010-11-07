@@ -344,7 +344,6 @@ void ManageUFOsDlg::OnDescriptionChanged()
 	}
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
-qDebug("Description");
 }
 
 

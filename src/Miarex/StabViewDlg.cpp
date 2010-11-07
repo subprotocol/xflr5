@@ -574,18 +574,6 @@ void StabViewDlg::SetupLayout()
 
 	QFont SymbolFont("Symbol");
 
-	//____________Stability view______________________
-	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
-	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
-	m_pctrlTimeView = new QRadioButton(tr("Time View"));
-	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
-	m_pctrl3DMode = new QRadioButton(tr("3D Mode Animation"));
-	StabilityTypeLayout->addWidget(m_pctrlTimeView);
-	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
-	StabilityTypeLayout->addWidget(m_pctrl3DMode);
-	StabilityTypeLayout->addStretch(1);
-	StabilityTypeBox->setLayout(StabilityTypeLayout);
-
 
 	//____________Stability direction__________
 	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
@@ -598,6 +586,20 @@ void StabViewDlg::SetupLayout()
 	StabilityDirLayout->addStretch(1);
 	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
 	StabilityDirBox->setLayout(StabilityDirLayout);
+
+
+		//____________Stability view______________________
+	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
+	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
+	m_pctrlTimeView = new QRadioButton(tr("Time View"));
+	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
+	m_pctrl3DMode = new QRadioButton(tr("3D Mode Animation"));
+	StabilityTypeLayout->addWidget(m_pctrlTimeView);
+	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
+	StabilityTypeLayout->addWidget(m_pctrl3DMode);
+	StabilityTypeLayout->addStretch(1);
+	StabilityTypeBox->setLayout(StabilityTypeLayout);
+
 
 	//_______________________Time view Parameters
 	QGroupBox *TimeBox = new QGroupBox(tr("Time Graph Params"));
@@ -909,12 +911,9 @@ void StabViewDlg::SetupLayout()
 	m_pctrlStackWidget->setCurrentIndex(0);
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(StabilityTypeBox);
-        //MainLayout->addStretch(1);
 	MainLayout->addWidget(StabilityDirBox);
-        //MainLayout->addStretch(1);
+	MainLayout->addWidget(StabilityTypeBox);
 	MainLayout->addWidget(m_pctrlStackWidget);
-        //MainLayout->addStretch(1);
 	setLayout(MainLayout);
 }
 

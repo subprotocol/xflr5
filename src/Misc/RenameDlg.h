@@ -64,6 +64,7 @@ public:
 	QString m_strQuestion;
 	QString m_Note;
 	bool m_bEnableOverwrite;
+	bool m_bExists;
 
 	void *m_pMainFrame;
 	void *m_pXDirect;

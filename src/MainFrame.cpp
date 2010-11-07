@@ -3418,11 +3418,7 @@ int MainFrame::LoadXFLR5File(QString PathName)
 				QApplication::restoreOverrideCursor();
 
 				pXDirect->SetControls();
-/*	for(int j=0; j<m_oaWPolar.size(); j++)
-	{
-		CWPolar *pWPolar = (CWPolar*)m_oaWPolar.at(j);
-qDebug()<<pWPolar->m_PlrName<<pWPolar->m_AnalysisMethod<<pWPolar->m_Type;
-	}*/
+
 				if(m_oaPlane.size() || m_oaWing.size()) return MIAREX;
 				else                                    return XFOILANALYSIS;
 			}

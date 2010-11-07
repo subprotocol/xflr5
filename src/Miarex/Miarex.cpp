@@ -4506,7 +4506,6 @@ void QMiarex::EditCurPlane()
 		{
 			if(bHasResults)
 			{
-//				SetModPlane(m_pCurPlane);
 				ModDlg dlg;
 				dlg.m_Question = tr("The modification will erase all results associated to this Plane.\nContinue ?");
 				dlg.InitDialog();
@@ -12008,7 +12007,6 @@ void QMiarex::OnUFOInertia()
 			}
 		}
 		pMainFrame->SetSaveState(false);
-qDebug()<<"Miarex"<<m_pCurWing->m_NMass;
 	}
 	else
 	{
@@ -13900,11 +13898,7 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 							if (pWPolar->m_UFOName == pPlane->m_PlaneName)
 							{
 								m_poaWPolar->removeAt(l);
-								if(pWPolar==m_pCurWPolar)
-								{
-									m_pCurWPolar = NULL;
-//									pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
-								}
+								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
 								delete pWPolar;
 							}
 						}
@@ -13940,13 +13934,10 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 						for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
 						{
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
-							if (pWPolar->m_UFOName == pWing->m_WingName){
+							if (pWPolar->m_UFOName == pWing->m_WingName)
+							{
 								m_poaWPolar->removeAt(l);
-								if(pWPolar==m_pCurWPolar)
-								{
-									m_pCurWPolar = NULL;
-//									pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
-								}
+								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
 								delete pWPolar;
 							}
 						}
@@ -13956,10 +13947,7 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 							if (pWOpp->m_WingName == pWing->m_WingName)
 							{
 								m_poaWOpp->removeAt(l);
-								if(pWOpp==m_pCurWOpp)
-								{
-									m_pCurWOpp = NULL;
-								}
+								if(pWOpp==m_pCurWOpp) m_pCurWOpp = NULL;
 								delete pWOpp;
 							}
 						}
@@ -14014,15 +14002,19 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 }
 
 
+
+
 bool QMiarex::SetModWing(CWing *pModWing)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!pModWing) pModWing = m_pCurWing;
-	CWing * pWing, *pOldWing;
-	CPlane *pPlane, *pOldPlane;
+	CWing * pWing;
+	CPlane *pPlane;
 	CWPolar* pWPolar;
 	CWOpp * pWOpp;
 	CPOpp * pPOpp;
+	QString OldName = pModWing->m_WingName;
+
 	bool bExists = true;
 	int resp, k, l;
 
@@ -14043,7 +14035,6 @@ bool QMiarex::SetModWing(CWing *pModWing)
 	RDlg.m_strQuestion = tr("Enter the new name for the wing :");
 	RDlg.m_strName = pModWing->m_WingName;
 	RDlg.InitDialog();
-
 	while (bExists)
 	{
 		resp = RDlg.exec();
@@ -14106,111 +14097,113 @@ bool QMiarex::SetModWing(CWing *pModWing)
 		}
 		else if(resp ==10)
 		{
-			//user wants to overwrite
-			pOldWing  = GetWing(RDlg.m_strName);
-			pOldPlane = GetPlane(RDlg.m_strName);
-			if(pOldWing)
+			//user wants to overwrite the old plane/wing
+			if (OldName == RDlg.m_strName) return true;//don't bother to overwrite itself
+			if(GetPlane(RDlg.m_strName))
 			{
+				for (k=0; k<m_poaPlane->size(); k++)
+				{
+					pPlane = (CPlane*)m_poaPlane->at(k);
+					if (pPlane->m_PlaneName == RDlg.m_strName)
+					{
+						for (l=m_poaWPolar->size()-1;l>=0; l--)
+						{
+							pWPolar = (CWPolar*)m_poaWPolar->at(l);
+							if (pWPolar->m_UFOName == pPlane->m_PlaneName)
+							{
+								m_poaWPolar->removeAt(l);
+								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
+								delete pWPolar;
+							}
+						}
+						for (l=m_poaPOpp->size()-1;l>=0; l--)
+						{
+							pPOpp = (CPOpp*)m_poaPOpp->at(l);
+							if (pPOpp->m_PlaneName == pPlane->m_PlaneName)
+							{
+								m_poaPOpp->removeAt(l);
+								if(pPOpp==m_pCurPOpp)
+								{
+									m_pCurPOpp = NULL;
+									m_pCurWOpp = NULL;
+								}
+								delete pPOpp;
+							}
+						}
+						m_poaPlane->removeAt(k);
+						if(pPlane==m_pCurPlane) m_pCurPlane = NULL;
+						delete pPlane;
+
+					}
+				}
+			}
+			else if (GetWing(RDlg.m_strName))
+			{
+				//delete the wing the user wants to overwrite
 				for (k=0; k<m_poaWing->size(); k++)
 				{
 					pWing = (CWing*)m_poaWing->at(k);
 					if (pWing->m_WingName == RDlg.m_strName)
 					{
-						for (l=m_poaWPolar->size()-1;l>=0; l--)
+						for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
 						{
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
-							if (pWPolar->m_UFOName == pWing->m_WingName)
-							{
+							if (pWPolar->m_UFOName == pWing->m_WingName){
 								m_poaWPolar->removeAt(l);
-								if(pWPolar==m_pCurWPolar)
-								{
-									m_pCurWPolar = NULL;
-									m_pCurPOpp   = NULL;
-									m_pCurWOpp   = NULL;
-//									pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
-								}
+								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
 								delete pWPolar;
 							}
 						}
-						for (l=m_poaWOpp->size()-1;l>=0; l--)
+						for (l=(int)m_poaWOpp->size()-1;l>=0; l--)
 						{
 							pWOpp = (CWOpp*)m_poaWOpp->at(l);
 							if (pWOpp->m_WingName == pWing->m_WingName)
 							{
 								m_poaWOpp->removeAt(l);
-								if(pWOpp==m_pCurWOpp){
-									m_pCurWOpp = NULL;
-									m_pCurPOpp = NULL;
-								}
+								if(pWOpp==m_pCurWOpp) m_pCurWOpp = NULL;
 								delete pWOpp;
 							}
 						}
 						m_poaWing->removeAt(k);
 						if(pWing==m_pCurWing) m_pCurWing = NULL;
 						delete pWing;
-						bExists = false;
-						break;
 					}
 				}
 			}
-			else if(pOldPlane)
-			{
-				if(pOldPlane->m_bActive) QMessageBox::warning(window(), tr("Warning"),tr("Cannot overwrite current plane"));
-				else
-				{
-					for (k=0; k<m_poaPlane->size(); k++)
-					{
-						pPlane = (CPlane*)m_poaPlane->at(k);
-						if (pPlane->m_PlaneName == RDlg.m_strName)
-						{
-							for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
-							{
-								pWPolar = (CWPolar*)m_poaWPolar->at(l);
-								if (pWPolar->m_UFOName == pPlane->m_PlaneName)
-								{
-									m_poaWPolar->removeAt(l);
-									if(pWPolar==m_pCurWPolar)
-									{
-										m_pCurWPolar = NULL;
-										m_pCurPOpp   = NULL;
-										m_pCurWOpp   = NULL;
-//										pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
-									}
-									delete pWPolar;
-								}
-							}
-							for (l=(int)m_poaPOpp->size()-1;l>=0; l--)
-							{
-								pPOpp = (CPOpp*)m_poaPOpp->at(l);
-								if (pPOpp->m_PlaneName == pPlane->m_PlaneName)
-								{
-									m_poaPOpp->removeAt(l);
-									if(pPOpp==m_pCurPOpp)
-									{
-										m_pCurPOpp = NULL;
-										m_pCurPOpp = NULL;
-									}
-									delete pPOpp;
-								}
-							}
-							m_poaPlane->removeAt(k);
-							delete pPlane;
-							bExists = false;
-							break;
-						}
-					}
-				}
-			}
-			pModWing->m_WingName = RDlg.m_strName;
-//			m_pCurWing = pModWing;
 
+			pModWing->m_WingName = RDlg.m_strName;
+
+			//place the Wing in alphabetical order in the array
+			//remove the current Plane from the array
+			for (l=0; l<m_poaPlane->size();l++)
+			{
+				pWing = (CWing*)m_poaWing->at(l);
+				if(pWing == m_pCurWing)
+				{
+					m_poaWing->removeAt(l);
+					// but don't delete it !
+					break;
+				}
+			}
+			//and re-insert it
+			bool bInserted = false;
+			for (l=0; l<m_poaWing->size();l++)
+			{
+				pWing = (CWing*)m_poaWing->at(l);
+				if(pWing->m_WingName.compare(m_pCurWing->m_WingName, Qt::CaseInsensitive) <0)
+				{
+					//then insert before
+					m_poaWing->insert(l, m_pCurWing);
+					bInserted = true;
+					break;
+				}
+			}
+			if(!bInserted) m_poaWing->append(m_pCurWing);
+			bExists = false;
 			pMainFrame->SetSaveState(false);
-			return true;
 		}
-		else
-		{
-			return false;//cancelled
-		}
+		else return false;//cancelled
+
 	}
 	return false ;//useless...
 }

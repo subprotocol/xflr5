@@ -80,7 +80,7 @@ private:
 	void SetControls();
 	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width, bool const& bCurve, bool const& bPoints);
 	
-	
+
 	static void *s_pMiarex, *s_pMainFrame;
 
 	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
