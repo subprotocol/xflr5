@@ -70,9 +70,6 @@ protected:
 	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
 
-	void VLMCubicSplines(double *Gamma);
-	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
-	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 
 	bool LLTInitialize(double mass);

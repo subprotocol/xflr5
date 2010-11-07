@@ -114,4 +114,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Alpha, int PlrVar, bool &bOutRe, bool &bError);
 void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
 
+bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
+double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
+
 #endif // FUNCTIONS_H

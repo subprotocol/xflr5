@@ -13387,7 +13387,6 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 		}
 	}
 
-
 	if(bIntersect)
 	{
 		if(m_pCurWOpp)

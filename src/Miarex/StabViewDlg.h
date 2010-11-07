@@ -86,7 +86,6 @@ private:
 	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
 
 	QRadioButton *m_pctrlLongDynamics,*m_pctrlLatDynamics;
-	QRadioButton *m_pctrl3DMode1,*m_pctrl3DMode2,*m_pctrl3DMode3,*m_pctrl3DMode4;
 	QRadioButton *m_pctrlRLMode1,*m_pctrlRLMode2,*m_pctrlRLMode3,*m_pctrlRLMode4;
 	QRadioButton *m_pctrlTimeMode1,*m_pctrlTimeMode2,*m_pctrlTimeMode3,*m_pctrlTimeMode4;
 	QLineEdit *m_pctrlEigenValue, *m_pctrlEigenVector1, *m_pctrlEigenVector2, *m_pctrlEigenVector3, *m_pctrlEigenVector4;
@@ -105,10 +104,8 @@ private:
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlSigma1, *m_pctrlDsi;
-	FloatEdit *m_pctrlFreqN3D, *m_pctrlFreq13D, *m_pctrlSigma13D, *m_pctrlDsi3D;
-	QStackedWidget *m_pctrlStackWidget, *m_pctrlInitialConditionsWidget;
-	
-	QGroupBox *m_pctrlAnimationBox;
+	QStackedWidget *m_pctrlStackWidget, *m_pctrlInitialConditionsWidget, *m_pctrlModeViewType;
+
 
 	QRadioButton *m_pctrlModalResponse, *m_pctrlInitCondResponse, *m_pctrlForcedResponse;
 

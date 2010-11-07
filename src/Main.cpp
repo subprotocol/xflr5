@@ -25,8 +25,7 @@
 #include "QFLR5Application.h"
 #include "MainFrame.h"
 #include <QSplashScreen>
-
-
+#include <QMessageBox>
 
 CFoil *g_pCurFoil;	//make it common to all applications
 
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
 #if QT_VERSION >= 0x040600
         QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
 #endif
-        QFLR5Application app(argc, argv);
+	QFLR5Application app(argc, argv);
 
 	QPixmap pixmap;
 	pixmap.load(":/images/splash.png");
