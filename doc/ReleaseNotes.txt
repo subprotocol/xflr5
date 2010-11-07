@@ -23,6 +23,10 @@ xflr5 v6.02 Beta October xxxth, 2010
 	- changed the export format for graphs
 	- implemented stability method for mixed panel/vlm method
 	- set the estimation of inertia properties at the time of polar definition instead of evaluating at the time of analysis
+	- fixed the bug which could cause a crash when dragging a point in splines design
+	- corrected the asymetric transition location for symetric wings
+	- corrected the Cp 3D color display for VLM2 analysis
+	- corrected various minor bugs
 
 
 xflr5 v6.01 Beta October 14th, 2010

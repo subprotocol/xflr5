@@ -31,6 +31,7 @@
 #include "Miarex/StabViewDlg.h"
 #include "Miarex/PlaneDlg.h"
 #include "Miarex/StabViewDlg.h"
+#include "Miarex/ManageUFOsDlg.h"
 #include "Miarex/UFOTableDelegate.h"
 #include "Misc/AboutQ5.h"
 #include "Misc/PolarPropsDlg.h"
@@ -1021,8 +1022,8 @@ void MainFrame::CreateDockWindows()
 //	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
 	PanelAnalysisDlg::s_pMainFrame = this;
 	PanelAnalysisDlg::s_pMiarex    = m_pMiarex;
-//	StabViewDlg::s_pMiarex    = m_pMiarex;
-//	StabViewDlg::s_pMainFrame = this;
+	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
+	ManageUFOsDlg::s_pMainFrame = this;
 
 	CPlane::s_pMainFrame   = this;
 	CPlane::s_pMiarex      = m_pMiarex;
@@ -2637,33 +2638,25 @@ void MainFrame::DeleteProject()
 	pXDirect->m_pCurOpp   = NULL;
 	pXDirect->SetFoil();
 
-	if(m_iApp == MIAREX)
-	{
-		UpdateUFOs();
-		pMiarex->SetUFO();
-		if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
-		else if(pMiarex->m_iView==WOPPVIEW)	pMiarex->CreateWOppCurves();
-		else if(pMiarex->m_iView==WCPVIEW)	pMiarex->CreateCpCurves();
-		pMiarex->SetControls();
-//		pMiarex->SetBody();
-	}
-	else if (m_iApp==XFOILANALYSIS)
-	{
-		UpdateFoils();
-		if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
-		else                   pXDirect->CreateOppCurves();
-	}
-	else if (m_iApp==DIRECTDESIGN)
-	{
-		QAFoil *pAFoil = (QAFoil*)m_pAFoil;
-		pAFoil->FillFoilTable();
-		pAFoil->SelectFoil();
-	}
-	else if(m_iApp==INVERSEDESIGN)
-	{
-		QXInverse *pXInverse =(QXInverse*)m_pXInverse;
-		pXInverse->Clear();
-	}
+	UpdateUFOs();
+	pMiarex->SetUFO();
+	if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
+	else if(pMiarex->m_iView==WOPPVIEW)	pMiarex->CreateWOppCurves();
+	else if(pMiarex->m_iView==WCPVIEW)	pMiarex->CreateCpCurves();
+	pMiarex->SetControls();
+
+	UpdateFoils();
+	if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
+	else                   pXDirect->CreateOppCurves();
+
+	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
+	pAFoil->FillFoilTable();
+	pAFoil->SelectFoil();
+
+
+	QXInverse *pXInverse =(QXInverse*)m_pXInverse;
+	pXInverse->Clear();
+
 	SetProjectName("");
 	SetSaveState(true);
 }
@@ -3410,6 +3403,8 @@ int MainFrame::LoadXFLR5File(QString PathName)
 					UpdateFoils();
 					UpdateView();
 				}
+				else DeleteProject();
+
 				AddRecentFile(PathName);
 				SetSaveState(true);
 				SetProjectName(PathName);
@@ -3996,7 +3991,7 @@ void MainFrame::OnSaveUFOAsProject()
 	ar.setVersion(QDataStream::Qt_4_5);
 #endif
 	ar.setByteOrder(QDataStream::LittleEndian);
-	SerializeUFOProject(ar,5);
+	SerializeUFOProject(ar, 6);
 	m_FileName = PathName;
 	fp.close();
 
@@ -5620,8 +5615,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				QApplication::restoreOverrideCursor();
 				return false;
 			}
-                        if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
-                        if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
+			if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
+			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
 			pWPolar = pMiarex->AddWPolar(pWPolar);
 		}

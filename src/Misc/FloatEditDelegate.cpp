@@ -20,48 +20,50 @@
 *****************************************************************************/
 
 
- //#include <QtGui>
-
+#include <QtDebug>
  #include "FloatEditDelegate.h"
 
- FloatEditDelegate::FloatEditDelegate(QObject *parent)
-	 : QItemDelegate(parent)
- {
- }
+FloatEditDelegate::FloatEditDelegate(QObject *parent)
+: QItemDelegate(parent)
+{
+}
 
- QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
- {
-	 if(m_Precision[index.column()]>=0)
-	 {
-		 //we have a number
+QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex & index ) const
+{
+	if(m_Precision[index.column()]>=0)
+	{
+		//we have a number
 		FloatEdit *editor = new FloatEdit(parent);
-//		editor->setAlignment(Qt::AlignRight);
 		editor->SetPrecision(m_Precision[index.column()]);
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
-		editor->DefineValue(value);
+		editor->SetValue(value);
+//qDebug("Creating float editor");
 		return editor;
-	 }
-	 else
-	 {
-		 //we have a string
+	}
+	else
+	{
+		//we have a string
 		QLineEdit *editor = new QLineEdit(parent);
 		editor->setAlignment(Qt::AlignLeft);
+//qDebug("Creating text editor");
 		return editor;
-	 }
- }
+	}
+}
 
 void FloatEditDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-/*	if(m_Precision[index.column()]>=0)
+	if(m_Precision[index.column()]>=0)
 	{
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
 		floatEdit->DefineValue(value);
+//qDebug()<<"Setting Float edit"<<value;
 	}
-	else*/
+	else
 	{
 		QLineEdit *pLine = static_cast<QLineEdit*>(editor);
 		pLine->setText(index.model()->data(index, Qt::EditRole).toString());
+//qDebug()<<"Setting editor data"<<index.model()->data(index, Qt::EditRole).toString();
 	}
 }
 
@@ -106,12 +108,30 @@ void FloatEditDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
 		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(),0,'f', m_Precision[index.column()]);
+//qDebug()<<"Painting row"<< index.row()<<"Column" <<index.column()<<strong;
+
 	}
 	else
 	{
 		myOption.displayAlignment = Qt::AlignLeft | Qt::AlignVCenter;
 		strong = index.model()->data(index, Qt::DisplayRole).toString();
+//qDebug()<<"Painting text"<<index.row()<< index.column()<<strong;
 	}
 	drawDisplay(painter, myOption, myOption.rect, strong);
 	drawFocus(painter, myOption, myOption.rect);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

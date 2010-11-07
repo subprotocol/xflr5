@@ -810,7 +810,7 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_bActiveControl[0] && m_pPlane)
 		{
-			strong = QString(QString::fromUtf8("Wing(%2°/%3°)"))
+			strong = QString(QString::fromUtf8("-Wing(%2°/%3°)"))
 							   .arg(m_MinControl[0],0,'f',1)
 							   .arg(m_MaxControl[0],0,'f',1);
 			m_WPolarName += strong;

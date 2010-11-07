@@ -6353,6 +6353,7 @@ void QXDirect::SetupLayout()
 	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
 	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
 
+
 	m_pctrlAlphaMin     = new FloatEdit();
 	m_pctrlAlphaMax     = new FloatEdit();
 	m_pctrlAlphaDelta   = new FloatEdit();

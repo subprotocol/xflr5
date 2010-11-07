@@ -24,7 +24,6 @@
 // It dispatches user commands towards object definition, analysis and post-processing
 //
 
-
 #include <QGLWidget>
 #include <QAction>
 #include "Miarex.h"
@@ -1701,6 +1700,7 @@ void QMiarex::SetControls()
 	m_pctrlAlphaMax->setEnabled(m_pCurWPolar && m_bSequence);
 	m_pctrlAlphaDelta->setEnabled(m_pCurWPolar && m_bSequence);
 	m_pctrlSequence->setEnabled(m_pCurWPolar);
+
 	m_pctrlStoreWOpp->setEnabled(m_pCurWPolar);
 
 	m_pctrlHalfWing->setEnabled(m_iView==WOPPVIEW);
@@ -4614,7 +4614,6 @@ void QMiarex::FillComboBoxes(bool bEnable)
 
 	m_pctrlCurveStyle->setCurrentIndex(m_CurveStyle);
 	m_pctrlCurveWidth->setCurrentIndex((int)m_CurveWidth-1);
-
 }
 
 
@@ -7593,7 +7592,11 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 
 			CVector Real;
 			bool bCtrl = false;
-			if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+			if(event->modifiers() & Qt::ControlModifier)
+			{
+				m_bArcball = true;
+				bCtrl =true;
+			}
 
 			ClientToGL(point, Real);
 			if(m_r3DCltRect.contains(point)) pGLWidget->setFocus();
@@ -10666,8 +10669,6 @@ void QMiarex::OnManageUFOs()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	ManageUFOsDlg dlg;
-	dlg.m_pMainFrame = m_pMainFrame;
-	dlg.m_pMiarex    = this;
 
 	QString UFOName = "";
 	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
@@ -10682,7 +10683,6 @@ void QMiarex::OnManageUFOs()
 
 	pMainFrame->UpdateUFOs();
 	SetControls();
-//	pMainFrame->SetSaveState(false);
 
 	m_bResetglGeom = true;
 	m_bResetglMesh = true;
@@ -11450,9 +11450,8 @@ void QMiarex::OnShowTransitions()
 void QMiarex::OnShowCurve()
 {
 	m_bCurveVisible = m_pctrlShowCurve->isChecked();
-	m_bCurvePoints = m_pctrlShowPoints->isChecked();
+	m_bCurvePoints  = m_pctrlShowPoints->isChecked();
 	UpdateCurve();
-	
 }
 
 
@@ -12009,6 +12008,7 @@ void QMiarex::OnUFOInertia()
 			}
 		}
 		pMainFrame->SetSaveState(false);
+qDebug()<<"Miarex"<<m_pCurWing->m_NMass;
 	}
 	else
 	{
@@ -14117,7 +14117,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 					pWing = (CWing*)m_poaWing->at(k);
 					if (pWing->m_WingName == RDlg.m_strName)
 					{
-						for (l=(int)m_poaWPolar->size()-1;l>=0; l--)
+						for (l=m_poaWPolar->size()-1;l>=0; l--)
 						{
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
 							if (pWPolar->m_UFOName == pWing->m_WingName)
@@ -14133,7 +14133,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 								delete pWPolar;
 							}
 						}
-						for (l=(int)m_poaWOpp->size()-1;l>=0; l--)
+						for (l=m_poaWOpp->size()-1;l>=0; l--)
 						{
 							pWOpp = (CWOpp*)m_poaWOpp->at(l);
 							if (pWOpp->m_WingName == pWing->m_WingName)
@@ -14307,7 +14307,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 	}
 
 	if(!m_pCurPOpp) return false;
-	else
+	else if(m_iView==WOPPVIEW)
 	{
 		m_bCurveVisible = m_pCurPOpp->m_bIsVisible;
 		m_bCurvePoints  = m_pCurPOpp->m_bShowPoints;
@@ -15118,7 +15118,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	if(m_pCurWPolar)
 	{
 		m_bCurveVisible = m_pCurWPolar->m_bIsVisible;
-		m_bCurvePoints = m_pCurWPolar->m_bShowPoints;
+		m_bCurvePoints  = m_pCurWPolar->m_bShowPoints;
 	}
 
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
@@ -15137,7 +15137,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	m_pPanelDlg->m_nNodes      = m_nNodes;
 	m_pPanelDlg->m_NSurfaces   = m_NSurfaces;
 	m_pPanelDlg->m_NWakeColumn = m_NWakeColumn;
-	
+
 	QApplication::restoreOverrideCursor();
 }
 
@@ -15328,10 +15328,10 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 
 
 	if(!m_pCurWOpp) return false;
-	else
+	else  if(m_iView==WOPPVIEW)
 	{
 		m_bCurveVisible = m_pCurWOpp->m_bIsVisible;
-		m_bCurvePoints = m_pCurWOpp->m_bShowPoints;
+		m_bCurvePoints  = m_pCurWOpp->m_bShowPoints;
 	}
 	return true;
 }

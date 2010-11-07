@@ -377,7 +377,6 @@ private:
 
 	QPoint m_LastPoint, m_PointDown;
 
-
 	CVector m_UFOOffset;
 	CVector m_glViewportTrans;// the translation vector in gl viewport coordinates
 	CVector m_glRotCenter;    // the center of rotation in object coordinates... is also the opposite of the translation vector

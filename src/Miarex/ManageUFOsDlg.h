@@ -32,6 +32,7 @@
 #include "../Objects/Plane.h"
 
 
+
 class ManageUFOsDlg : public QDialog
 {
 	Q_OBJECT
@@ -70,7 +71,7 @@ private:
 
 	CWing *m_pWing;
 	CPlane *m_pPlane;
-	void *m_pMainFrame, *m_pMiarex;
+	static void *s_pMainFrame, *s_pMiarex;
 };
 
 #endif // MANAGEUFOSDLG_H

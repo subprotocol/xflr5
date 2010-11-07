@@ -19,7 +19,7 @@
 
 *****************************************************************************/
   
-
+#include <QHeaderView>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
@@ -29,12 +29,14 @@
 #include "ManageUFOsDlg.h"
 
 
+void *ManageUFOsDlg::s_pMainFrame;
+void *ManageUFOsDlg::s_pMiarex;
+
+
 ManageUFOsDlg::ManageUFOsDlg()
 {
 	setWindowTitle(tr("UFO Management"));
 
-	m_pMainFrame = NULL;
-	m_pMiarex    = NULL;
 	m_pWing      = NULL;
 	m_pPlane     = NULL;
 
@@ -44,7 +46,6 @@ ManageUFOsDlg::ManageUFOsDlg()
 	connect(m_pctrlRename, SIGNAL(clicked()),this, SLOT(OnRename()));
 	connect(m_pctrlUFOTable, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(OnDoubleClickTable(const QModelIndex &)));
 	connect(m_pctrlDescription, SIGNAL(textChanged()), this, SLOT(OnDescriptionChanged()));
-
 	connect(CloseButton, SIGNAL(clicked()),this, SLOT(accept()));
 }
 
@@ -53,7 +54,7 @@ ManageUFOsDlg::ManageUFOsDlg()
 void ManageUFOsDlg::InitDialog(QString &UFOName)
 {
 	FillUFOTable();
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
 
@@ -78,7 +79,8 @@ void ManageUFOsDlg::InitDialog(QString &UFOName)
 		{
 			m_pctrlUFOTable->selectRow(0);
 			QStandardItem *pItem = m_pUFOModel->item(0,0);
-			UFOName = pItem->text();
+			if(pItem) UFOName = pItem->text();
+			else      UFOName.clear();
 		}
 		m_pWing = pMiarex->GetWing(UFOName);
 		if(m_pWing) m_pPlane = NULL;
@@ -132,6 +134,7 @@ void ManageUFOsDlg::SetupLayout()
 	m_pctrlUFOTable   = new QTableView(this);
 	m_pctrlUFOTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlUFOTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_pctrlUFOTable->horizontalHeader()->setStretchLastSection(true);
 
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
@@ -194,7 +197,7 @@ void ManageUFOsDlg::SetupLayout()
 
 void ManageUFOsDlg::FillUFOTable()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i,n;
 	m_pUFOModel->setRowCount(pMainFrame->m_oaWing.size() + pMainFrame->m_oaPlane.size());
 
@@ -212,7 +215,7 @@ void ManageUFOsDlg::FillUFOTable()
 
 void ManageUFOsDlg::FillWingRow(int row)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	QModelIndex ind;
 	CWing *pWing = (CWing*)pMainFrame->m_oaWing.at(row);
@@ -240,8 +243,7 @@ void ManageUFOsDlg::FillWingRow(int row)
 
 void ManageUFOsDlg::FillPlaneRow(int row, int n)
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString str, strong;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex ind;
 
 	CPlane *pPlane = (CPlane*)pMainFrame->m_oaPlane.at(row);
@@ -270,8 +272,8 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 void ManageUFOsDlg::OnRename()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	if(m_pPlane)      pMiarex->RenameUFO(m_pPlane->m_PlaneName);
 	else if (m_pWing) pMiarex->RenameUFO(m_pWing->m_WingName);
@@ -285,8 +287,8 @@ void ManageUFOsDlg::OnDelete()
 {
 	if(!m_pWing && !m_pPlane) return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
 	if(m_pPlane) strong = tr("Are you sure you want to delete the plane :\n") +  m_pPlane->m_PlaneName +"?\n";
@@ -306,9 +308,11 @@ void ManageUFOsDlg::OnDelete()
 	if(m_pUFOModel->rowCount()>0)
 	{
 		m_pctrlUFOTable->selectRow(sel);
+		QString UFOName;
 
 		QStandardItem *pItem = m_pUFOModel->item(sel,0);
-		QString UFOName = pItem->text();
+		if(pItem) UFOName = pItem->text();
+		else      UFOName.clear();
 
 		m_pWing = pMiarex->GetWing(UFOName);
 		if(m_pWing) m_pPlane = NULL; //not necessary...
@@ -334,21 +338,24 @@ void ManageUFOsDlg::OnDescriptionChanged()
 	{
 		m_pPlane->m_PlaneDescription = m_pctrlDescription->toPlainText();
 	}
-	else
+	else if(m_pWing)
 	{
 		m_pWing->m_WingDescription = m_pctrlDescription->toPlainText();
 	}
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
+qDebug("Description");
 }
 
 
 void ManageUFOsDlg::OnUFOClicked(QModelIndex index)
 {
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QStandardItem *pItem = m_pUFOModel->item(index.row(),0);
-	QString UFOName = pItem->text();
+	QString UFOName;
+	if(pItem) UFOName = pItem->text();
+	else      UFOName.clear();
 
 	m_pWing = pMiarex->GetWing(UFOName);
 	if(m_pWing)

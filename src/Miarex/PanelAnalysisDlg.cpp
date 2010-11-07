@@ -1,4 +1,4 @@
-	/****************************************************************************
+/****************************************************************************
 
 	PanelAnalysisDlg Class
 	Copyright (C) 2009-2010 Andre Deperrois XFLR5@yahoo.com
@@ -153,7 +153,7 @@ void PanelAnalysisDlg::AddString(QString strong)
 bool PanelAnalysisDlg::AlphaLoop()
 {
 	QString str;
-	int nrhs, TotalTime;
+	int nrhs;
 
 	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
 	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
@@ -171,21 +171,28 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
-	//BuildInfluenceMatrix :     10 x Size/400
+	//BuildInfluenceMatrix :     10 x MatSize/400
 	//CreateRHS :                10
 	//CreateWakeContribution :    1
-	//SolveUnitRHS :             30 x Size/400
+	//SolveUnitRHS :             30 x MatSize/400
 	//ComputeFarField :          10 x MatSize/400x nrhs
 	//ComputeOnBodyCp :           1 x nrhs
 	//RelaxWake :                20 x nrhs x MaxWakeIter *
 	//ComputeAeroCoefs :          5 x nrhs
 	
-	TotalTime = 10*Size/400 + 10 + 1 + 30*Size/400 + 10*m_MatSize/400*nrhs  + 1*nrhs + 5*nrhs ;
+	double TotalTime = 10.0*(double)m_MatSize/400.
+					 + 10.
+					 + 30.*(double)m_MatSize/400.
+					 + 10*(double)m_MatSize/400*(double)nrhs
+					 + 1*(double)nrhs
+					 + 5*(double)nrhs ;
+
+	if(!m_pWPolar->m_bThinSurfaces) TotalTime +=1.0; //for wake contribution
 
 	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20*nrhs*MaxWakeIter;
-	
+
 	m_pctrlProgress->setMinimum(0);
-	m_pctrlProgress->setMaximum(TotalTime);
+	m_pctrlProgress->setMaximum((int)TotalTime);
 	m_Progress = 0.0;
 	qApp->processEvents();
 
@@ -202,11 +209,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	if (m_bCancel) return true;
 
 	if(!m_pWPolar->m_bThinSurfaces) CreateWakeContribution();
-	else
-	{
-		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
-		m_Progress += 1.0;
-	}
+	else memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
 	if (m_bCancel) return true;
 
 	if (!SolveUnitRHS())
@@ -224,7 +227,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	for(int q=0; q<nrhs; q++)
 		ComputeBalanceSpeeds(m_Alpha+q*m_AlphaDelta, q);
- 
+
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
 
@@ -400,7 +403,7 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, CVector Omega, doubl
 			}
 			m++;
 		}
-		m_Progress += 10.0/(double)m_MatSize;
+		m_Progress += 5.0/(double)m_MatSize;
 		qApp->processEvents();
 	}
 }
@@ -770,7 +773,7 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 			str += strong+"\n";
 			AddString(str);
 			ComputePlane(m_Alpha, q);
-			m_Progress += 5.0 /(double)nrhs;
+			m_Progress += 5.0*(double)nrhs /(double)nrhs;
 			qApp->processEvents();
 		}
 	}
@@ -1147,15 +1150,15 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 				else                      GetVortexCp(p, Mu, Cp, Qp);
 			}
 
-			for (q=1; q<nval; q++)
+			m_Progress += 1.0  *(double)nval/(double)nval;
+			qApp->processEvents();
+		}
+		for (q=1; q<nval; q++)
+		{
+			if(m_bCancel) return;
+			for (p=0; p<m_MatSize; p++)
 			{
-				if(m_bCancel) return;
-				for (p=0; p<m_MatSize; p++)
-				{
-					m_Cp[p+q*m_MatSize] = m_Cp[p];
-				}
-				m_Progress += 1.0  *(double)nval/(double)nval;
-				qApp->processEvents();
+				m_Cp[p+q*m_MatSize] = m_Cp[p];
 			}
 		}
 	}
@@ -1643,7 +1646,7 @@ void PanelAnalysisDlg::RelaxWake()
 bool PanelAnalysisDlg::ReLoop()
 {
 	QString str;
-	int nrhs, TotalTime, Size;
+	int nrhs, Size;
 	double Alpha = 0.0;
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
@@ -1665,21 +1668,26 @@ bool PanelAnalysisDlg::ReLoop()
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
-	//BuildInfluenceMatrix :		   10 *Size/400
-	//CreateRHS :			   10
-	//CreateWakeContribution :  1
-	//SolveMultiple :		   30 *Size/400
-	//ComputeFarField : 	1 x nrhs
-	//RelaxWake :			 20 x nrhs x MaxWakeIter *
-	//ComputeAeroCoefs :		5 x nrhs
+	//BuildInfluenceMatrix :     10 x m_MatSize/400
+	//CreateRHS :                10
+	//CreateWakeContribution :    1
+	//SolveUnitRHS :             30 x MatSize/400
+	//ComputeFarField :          10 x MatSize/400x 1
+	//ComputeOnBodyCp :           1 x nrhs
+	//RelaxWake :                20 x nrhs x MaxWakeIter *
+	//ComputeAeroCoefs :          5 x nrhs
 
-	TotalTime = 10*Size/400 + 10 + 1 + 30*Size/400 + 1*nrhs + 5*nrhs;
+	double TotalTime = 10.0*(double)m_MatSize/400.
+					 + 10.
+					 + 30.*(double)m_MatSize/400.
+					 + 10*(double)m_MatSize/400*1.
+					 + 1*(double)nrhs
+					 + 5*(double)nrhs ;
 
-
-	if(!m_b3DSymetric) TotalTime+=30;//Solve multiple is 4x longer
+	if(!m_pWPolar->m_bThinSurfaces) TotalTime +=1.0; //for wake contribution
 
 	m_pctrlProgress->setMinimum(0);
-	m_pctrlProgress->setMaximum(TotalTime);
+	m_pctrlProgress->setMaximum((int)TotalTime);
 
 	m_Progress = 0.0;
 	qApp->processEvents();
@@ -2302,7 +2310,7 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	AddString("      Performing LU Matrix decomposition...\n");
 
 
-	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &m_bCancel, 30.0*Size/400.0, m_Progress))
+	if(!Crout_LU_Decomposition_with_Pivoting(m_aij, m_Index, Size, &m_bCancel, 30.0*(double)m_MatSize/400.0, m_Progress))
 	{
 		AddString(tr("      Singular Matrix.... Aborting calculation...\n"));
 		m_bConverged = false;
@@ -2531,7 +2539,7 @@ bool PanelAnalysisDlg::UnitLoop()
 	CVector O(0.0,0.0,0.0);
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	int n, nrhs, nWakeIter, MaxWakeIter, TotalTime;
+	int n, nrhs, nWakeIter, MaxWakeIter;
 
 	if(m_AlphaMax<m_Alpha) m_AlphaDelta = -fabs(m_AlphaDelta);
 	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
@@ -2551,21 +2559,27 @@ bool PanelAnalysisDlg::UnitLoop()
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
-	//BuildInfluenceMatrix :		   10 *Size/400 * nrhs
-	//CreateRHS :			   10 *nrhs
-	//CreateWakeContribution :  1*nrhs
-	//SolveMultiple :		   30 *Size/400
-	//ComputeFarField : 	1 x nrhs
-	//RelaxWake :			 20 x nrhs x MaxWakeIter *
-	//ComputeAeroCoefs :		5 x nrhs
+	//BuildInfluenceMatrix :     10 x MatSize/400
+	//CreateRHS :                10
+	//CreateWakeContribution :    1
+	//SolveUnitRHS :             30 x MatSize/400
+	//ComputeFarField :          10 x MatSize/400x nrhs
+	//ComputeOnBodyCp :           1 x nrhs
+	//RelaxWake :                20 x nrhs x MaxWakeIter *
+	//ComputeAeroCoefs :          5 x nrhs
 
-	TotalTime = 10*Size/400*nrhs + 10*nrhs + 1*nrhs + 40*Size/400*nrhs + 1*nrhs + 5*nrhs;
+	double TotalTime = 10.0*(double)m_MatSize/400.*(double)nrhs
+					 + 10.*(double)nrhs
+					 + 30.*(double)m_MatSize/400.*(double)nrhs
+					 + 10*(double)m_MatSize/400*(double)nrhs
+					 + 1*(double)nrhs
+					 + 5*(double)nrhs ;
 
-	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20 * nrhs * MaxWakeIter;
-	if(!m_b3DSymetric) TotalTime+=30*nrhs;//Solve multiple is 4x longer
+
+//	if(m_pWPolar->m_bWakeRollUp) TotalTime += 20.0 * (double)nrhs * (double)MaxWakeIter;
 
 	m_pctrlProgress->setMinimum(0);
-	m_pctrlProgress->setMaximum(TotalTime);
+	m_pctrlProgress->setMaximum((int)TotalTime);
 	m_Progress = 0.0;
 	qApp->processEvents();
 
@@ -2641,7 +2655,6 @@ bool PanelAnalysisDlg::UnitLoop()
 
 		ComputeAeroCoefs(0.0, m_AlphaDelta, 1);
 	}
-
 	return true;
 }
 
@@ -2872,7 +2885,6 @@ bool PanelAnalysisDlg::ControlLoop()
 	int i, nrhs;
 	double t;
 	QString str, strlen, strmass, strInertia;
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	GetLengthUnit(strlen, pMainFrame->m_LengthUnit);
@@ -2915,6 +2927,20 @@ bool PanelAnalysisDlg::ControlLoop()
 		nrhs = 100;
 	}
 
+	double TotalTime = 10.0*(double)m_MatSize/400.      //BuildInfluenceMatrix
+					 + 10.                               //CreateRHS
+					 + 30.*(double)m_MatSize/400.        //SolveUnitRHS
+					 + 10*(double)m_MatSize/400          //ComputeFarField
+					 + 2+5*6                                 //ComputeStabDer
+					 + 1                                 //ComputeOnBodyCp
+					 + 5;                                //ComputeAeroCoefs
+	TotalTime *= (double)nrhs;
+
+	m_pctrlProgress->setMinimum(0);
+	m_pctrlProgress->setMaximum((int)TotalTime);
+	m_Progress = 0.0;
+	qApp->processEvents();
+
 	m_bTrace = true;
 
 	str = QString("   Solving the problem... \n\n");
@@ -2947,10 +2973,6 @@ bool PanelAnalysisDlg::ControlLoop()
 		{
 			m_3DQInf[i] = u0;
 			m_QInf      = u0;
-
-//			ScaleResultstoSpeed(nrhs);
-//			Force0  *= m_3DQInf[i] * m_3DQInf[i];
-//			Moment0 *= m_3DQInf[i] * m_3DQInf[i];
 
 			if (m_bCancel) return true;
 
@@ -3003,13 +3025,6 @@ bool PanelAnalysisDlg::ControlLoop()
 
 				ComputeAeroCoefs(m_AlphaEq, 0.0, 1);
 				if (m_bCancel) return true;
-
-/*				if(m_bConverged)
-				{
-					//store results
-					if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp, m_Mu);
-					else         pMiarex->AddWOpp(m_bPointOut, m_Mu, m_Sigma, m_Cp);
-				}*/
 			}
 			AddString("\n     ______Finished operating point calculation________\n\n\n\n\n");
 		}
@@ -3886,6 +3901,9 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	Zw = (Force-Force0).dot(ks)/deltaspeed;
 	Mw = (Moment-Moment0).dot(js)/deltaspeed;
 
+	m_Progress +=1;
+	qApp->processEvents();
+
 	// p-derivatives
 	Forces(m_pRHS, m_Sigma+3*m_MatSize, m_RHS+59*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Yp = (Force-Force0).dot(js)/deltarotation;
@@ -3902,6 +3920,9 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	Yr = (Force-Force0).dot(js)/deltarotation;
 	Lr = (Moment-Moment0).dot(is)/deltarotation;
 	Nr = (Moment-Moment0).dot(ks)/deltarotation;
+
+	m_Progress +=1;
+	qApp->processEvents();
 
 	//________________________________________________
 	// 2nd ORDER STABILITY DERIVATIVES

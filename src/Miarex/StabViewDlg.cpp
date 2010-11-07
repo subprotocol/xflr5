@@ -87,8 +87,8 @@ void StabViewDlg::Connect()
 	connect(m_pctrlTimeMode4, SIGNAL(clicked()), this, SLOT(OnModeSelection()));
 	
 	connect(m_pctrlAnimate ,SIGNAL(clicked()), this, SLOT(OnAnimate()));
-	connect(m_pctrlAnimationSpeed ,SIGNAL(sliderMoved(int)), this, SLOT(OnAnimationSpeed(int)));
-	connect(m_pctrlAnimationAmplitude ,SIGNAL(sliderMoved(int)), this, SLOT(OnAnimationAmplitude(int)));
+	connect(m_pctrlAnimationSpeed ,SIGNAL(valueChanged(int)), this, SLOT(OnAnimationSpeed(int)));
+	connect(m_pctrlAnimationAmplitude ,SIGNAL(valueChanged(int)), this, SLOT(OnAnimationAmplitude(int)));
 	connect(m_pctrlAnimateRestart ,SIGNAL(clicked()), this, SLOT(OnAnimateRestart()));
 	connect(m_pctrlDeltat, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 	connect(m_pctrlModeStep, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
@@ -284,6 +284,10 @@ void StabViewDlg::FillEigenThings()
 		m_pctrlFreq1->setText("");
 		m_pctrlSigma1->setText("");
 		m_pctrlDsi->setText("");
+		m_pctrlFreqN3D->setText("");
+		m_pctrlFreq13D->setText("");
+		m_pctrlSigma13D->setText("");
+		m_pctrlDsi3D->setText("");
 
 	}
 }

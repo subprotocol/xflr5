@@ -52,6 +52,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_hcCross = QCursor(Qt::CrossCursor);
 	m_hcMove  = QCursor(Qt::ClosedHandCursor);
 
+	m_StackPos = m_StackSize = 0;
+
 	m_MousePos.x = 0.0;
 	m_MousePos.y = 0.0;
 
@@ -132,7 +134,6 @@ void QAFoil::CheckButtons()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-//	pMainFrame->AFoilCurrentFoilMenu->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilDelete->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilRename->setEnabled(g_pCurFoil);
 	pMainFrame->AFoilExport->setEnabled(g_pCurFoil);

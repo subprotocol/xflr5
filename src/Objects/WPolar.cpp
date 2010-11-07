@@ -1251,9 +1251,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 
-		if(ProjectFormat>=5) ar << 1020; // identifies the format of the file
-		else                 ar << 1016;
-					// 1020 : QFLR6 v0.00 - added inertia tensor values
+		if(ProjectFormat>5) ar << 1020; // identifies the format of the file
+		else                ar << 1016;
+					// 1020 b: QFLR6 v0.00 - added inertia tensor values
 					// 1019 : QFLR6 v0.00 - added eigenvalues
 					// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
 					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
