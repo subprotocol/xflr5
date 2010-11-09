@@ -113,8 +113,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_SpeedUnit   = 0;
 	m_ForceUnit   = 0;
 	m_MomentUnit  = 0;
-	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
-			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 	
 	CreateDockWindows();
 	m_ProjectName = "";
@@ -130,7 +128,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_RefGraph.SetGraphName("Reference Graph");
 
 	m_ImageFormat = 2;
-
+	m_ExportFileType = 1;
 	m_bReverseZoom = false;
 
 	m_bSaveOpps  = false;
@@ -167,6 +165,9 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 		GL3DScales *p3DScales = (GL3DScales *)m_pGL3DScales;
 		p3DScales->LoadSettings(&settings);
 	}
+
+	SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
+			 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
 	pXDirect->SetAnalysisParams();
 	CreateActions();
@@ -226,6 +227,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_pctrlXInverseToolBar->hide();
 	m_pctrlMiarexToolBar->hide();
 	m_pctrlStabViewWidget->hide();
+
 	SetMenus();
 }
 
@@ -1023,8 +1025,7 @@ void MainFrame::CreateDockWindows()
 
 	LLTAnalysisDlg::s_pMainFrame = this;
 	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
-//	VLMAnalysisDlg::s_pMainFrame = this;
-//	VLMAnalysisDlg::s_pMiarex    = m_pMiarex;
+
 	PanelAnalysisDlg::s_pMainFrame = this;
 	PanelAnalysisDlg::s_pMiarex    = m_pMiarex;
 	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
@@ -1034,6 +1035,7 @@ void MainFrame::CreateDockWindows()
 	CPlane::s_pMiarex      = m_pMiarex;
 
 	StabPolarDlg::s_pMainFrame = this;
+	StabPolarDlg::s_pMiarex = m_pMiarex;
 
 	InertiaDlg::s_pMainFrame = this;
 	XFoilAnalysisDlg::s_pMainFrame  = this;

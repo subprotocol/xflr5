@@ -2661,7 +2661,8 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
 									  QAbstractItemView::DoubleClicked |
 									  QAbstractItemView::SelectedClicked |
-									  QAbstractItemView::EditKeyPressed);
+									  QAbstractItemView::EditKeyPressed |
+									  QAbstractItemView::AnyKeyPressed);
 
 //	m_pctrlWingTable->setSizePolicy(szPolicyMaximum);
 //	m_pctrlWingTable->setCornerButtonEnabled (false);

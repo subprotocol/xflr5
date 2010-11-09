@@ -101,7 +101,7 @@ private:
 	void WriteString(QString strong);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 
-	void GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const &QInf, CVector &VInf);
+	void GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VTotl, double const &QInf, CVector &VInf);
 	void GetVortexCp(const int &p, double *Gamma, double *Cp, CVector &VInf);
 
 	void ComputeStabilityDerivatives();
@@ -116,6 +116,7 @@ private:
 	void ComputeResults();
 	void GetNDStabDerivatives(CWOpp *pNewPoint);
 	void Forces(double *Mu, double *Sigma, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace=false);
+	double ComputeCm(double Alpha);
 
 
 	static void *s_pMiarex;
@@ -170,14 +171,15 @@ private:
 	double *m_aij, *m_aijRef;
 	double *m_RHS, *m_RHSRef;
 
-	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
-	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
-	double m_cRHS[VLMMAXMATSIZE];
-
 	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];			// Source strengths
 	double m_Mu[VLMMAXMATSIZE*VLMMAXRHS];			// Doublet strengths, or vortex circulations if panel is located on a thin surface
 	double m_Cp[VLMMAXMATSIZE*VLMMAXRHS];			// lift coef per panel
 	double m_3DQInf[VLMMAXRHS];
+
+	CVector m_uVl[VLMMAXMATSIZE],m_wVl[VLMMAXMATSIZE];
+	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
+	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
+	double m_cRHS[VLMMAXMATSIZE];
 
 	int m_Index[VLMMAXMATSIZE];
 
@@ -276,7 +278,6 @@ public://stability analysis method and variables
 
 
 
-	double ComputeCm(double Alpha);
 };
 
 #endif // PANELANALYSISDLG_H

@@ -1684,12 +1684,11 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	PolarProperties += strong +QString::fromUtf8("°")+"\n";
 
 	PolarProperties += QObject::tr("Analysis method")+" = ";
-	if(m_AnalysisMethod==1)                  PolarProperties +="LLT\n";
-	else if(m_AnalysisMethod==2 && m_bVLM1)  PolarProperties +="VLM1\n";
-	else if(m_AnalysisMethod==2 && !m_bVLM1) PolarProperties +="VLM2\n";
-	else if(m_AnalysisMethod==3)             PolarProperties +="3D-Panels\n";
-	else if(m_AnalysisMethod==4)             PolarProperties +="VLM1\n";
-	else                                     PolarProperties +="\n";
+	if(m_AnalysisMethod==LLTMETHOD)                              PolarProperties +="LLT\n";
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurfaces)   PolarProperties +="3D-Panels\n";
+	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)            PolarProperties +="3D-Panels/VLM1\n";
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)           PolarProperties +="3D-Panels/VLM2\n";
+	else                                                         PolarProperties +="\n";
 
 	PolarProperties += QObject::tr("Analysis type")+" = ";
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";

@@ -70,7 +70,7 @@ class QMiarex : public QWidget
 	friend class WingDlg;
 	friend class CWing;
 	friend class LLTAnalysisDlg;
-	friend class VLMAnalysisDlg;
+	friend class StabPolarDlg;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
 	friend class CPlane;
@@ -629,7 +629,6 @@ public:
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
 	LLTAnalysisDlg *m_pLLTDlg;
 	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
-//	VLMAnalysisDlg   *m_pVLMDlg;			// the dialog class which manages the VLM calculations
 	CVector m_MemNode[2*VLMMAXMATSIZE];	// used if the analysis should be performed on the tilted geometry
 	CVector m_WakeNode[2*VLMMAXMATSIZE];	// the reference current wake node array
 	CVector m_RefWakeNode[2*VLMMAXMATSIZE]; 	// the reference wake node array if wake needs to be reset

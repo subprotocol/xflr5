@@ -38,6 +38,7 @@
 void *PanelAnalysisDlg::s_pMiarex;
 void *PanelAnalysisDlg::s_pMainFrame;
 
+bool g_bTrace = false;
 
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
@@ -138,6 +139,9 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	memset(m_pRHS, 0, sizeof(m_pRHS));
 	memset(m_qRHS, 0, sizeof(m_qRHS));
 	memset(m_rRHS, 0, sizeof(m_rRHS));
+
+	memset(m_uVl, 0, sizeof(m_uVl));
+	memset(m_wVl, 0, sizeof(m_wVl));
 }
 
 
@@ -319,8 +323,8 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 	CVector QInf[VLMMAXRHS];
 
 	AddString(tr("      Creating source strengths...")+"\n");
-	p=0;
 
+	p=0;
 	for (q=0; q<nval;q++)
 	{
 		alpha = Alpha0+q*AlphaDelta;
@@ -931,11 +935,11 @@ void PanelAnalysisDlg::GetVortexCp(const int &p, double *Gamma, double *Cp, CVec
 }
 
 
-void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double * Sigma, double *Cp, double const &QInf, CVector &VInf)
+void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VLocal, double const &QInf, CVector &VInf)
 {
 	static int PL,PR, PU, PD;
 	static double DELQ, DELP;
-	static CVector Vl, VInfl;//local panel speed
+	static CVector VTot;//total local panel speed
 	static CVector S2, Sl2;
 	static double mu0,mu1,mu2;
 	static double x0,x1,x2;
@@ -1074,19 +1078,19 @@ void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double * S
 	S2 = (m_pNode[m_pPanel[p].m_iTA] + m_pNode[m_pPanel[p].m_iTB])/2.0 - m_pPanel[p].CollPt;
 	//convert to local coordinates
 	Sl2   = m_pPanel[p].GlobalToLocal(S2);
-	VInfl = m_pPanel[p].GlobalToLocal(VInf);
+	VTot  = m_pPanel[p].GlobalToLocal(VInf);
 
 	//in panel referential
-	Vl.x = -4.0*PI*(m_pPanel[p].SMP*DELP - Sl2.y*DELQ)/Sl2.x;
-	Vl.y = -4.0*PI*DELQ;
-	Vl.z =  4.0*PI*Sigma[p];
+	VLocal.x = -4.0*PI*(m_pPanel[p].SMP*DELP - Sl2.y*DELQ)/Sl2.x;
+	VLocal.y = -4.0*PI*DELQ;
+//	Vl.z =  4.0*PI*Sigma[p];
 
-	VInfl +=Vl;
+	VTot +=VLocal;
+	VTot.z = 0.0;
 
-	Speed2 = VInfl.x*VInfl.x + VInfl.y*VInfl.y + VInfl.z*VInfl.z;
+	Speed2 = VTot.x*VTot.x + VTot.y*VTot.y;
 
-	Cp[p]  = 1.0-Speed2/QInf/QInf;
-//	m_Speed[p] = m_pPanel[p].LocalToGlobal(QInfl) * m_3DQInf[q];
+	Cp  = 1.0-Speed2/QInf/QInf;
 }
 
 
@@ -1097,9 +1101,8 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 	//the on-body tangential perturbation speed is the derivative of the doublet strength
 	int p, q;
 	static double Alpha, *Mu, * Sigma, *Cp;
-	static CVector Qp, VInf;
-
-
+	static CVector Qp, VInf, VLocal;
+	double Speed2, cosa, sina;
 	//______________________________________________________________________________________
 	AddString(tr("      Computing On-Body Speeds...")+"\n");
 
@@ -1109,20 +1112,28 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 		{
 			//   Define wind axis
 			Alpha = V0 + (double)q * VDelta;
-			Qp.Set(cos(Alpha*PI/180.0), 0.0, sin(Alpha*PI/180.0));
+			cosa = cos(Alpha*PI/180.0);
+			sina = sin(Alpha*PI/180.0);
+			Qp.Set(cosa, 0.0, sina);
 			VInf = Qp * m_3DQInf[q];
 
 			Mu     = m_Mu    + q * m_MatSize;
 			Sigma  = m_Sigma + q * m_MatSize;
 			Cp     = m_Cp    + q * m_MatSize;
 
-
 			for (p=0; p<m_MatSize; p++)
 			{
 				if(m_bCancel) return;
 
-				if(m_pPanel[p].m_iPos!=0) GetDoubletDerivative(p, Mu, Sigma, Cp, m_3DQInf[q], VInf);
-				else                      GetVortexCp(p, Mu, Cp, Qp);
+				if(m_pPanel[p].m_iPos!=0)
+				{
+//					GetDoubletDerivative(p, Mu, Cp[p], VLocal, m_3DQInf[q], VInf);
+					VLocal  = m_pPanel[p].GlobalToLocal(VInf);
+					VLocal += m_uVl[p]*cosa*m_3DQInf[q] + m_wVl[p]*sina*m_3DQInf[q];
+					Speed2 = VLocal.x*VLocal.x + VLocal.y*VLocal.y;
+					Cp[p]  = 1.0-Speed2/m_3DQInf[q]/m_3DQInf[q];
+				}
+				else GetVortexCp(p, Mu, Cp, Qp);
 			}
 
 			if(m_bCancel) return;
@@ -1146,7 +1157,7 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			{
 				if(m_bCancel) break;
 
-				if(m_pPanel[p].m_iPos!=0) GetDoubletDerivative(p, Mu, Sigma, Cp, m_3DQInf[q], VInf);
+				if(m_pPanel[p].m_iPos!=0) GetDoubletDerivative(p, Mu, Cp[p], VLocal, m_3DQInf[q], VInf);
 				else                      GetVortexCp(p, Mu, Cp, Qp);
 			}
 
@@ -2323,9 +2334,6 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+Size, Size, &m_bCancel);
 
-	AddString("      Constructing results...\n");
-
-
 	//______________________________________________________________________________________
 	//Reconstruct right side results if calculation was symetric
 	int m,p;
@@ -2355,6 +2363,23 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 		memcpy(m_uRHS, m_RHS,           m_MatSize*sizeof(double));
 		memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize*sizeof(double));
 	}
+
+	//   Define unit Cp, necessary for moment calculations in stability analysis of 3D panels
+	CVector u(1.0, 0.0, 0.0);
+	CVector w(1.0, 0.0, 0.0);
+	double Cp;
+	for (p=0; p<m_MatSize; p++)
+	{
+		if(m_bCancel) return false;
+
+		if(m_pPanel[p].m_iPos!=0)
+		{
+			GetDoubletDerivative(p, m_uRHS, Cp, m_uVl[p], 1.0, u);
+			GetDoubletDerivative(p, m_wRHS, Cp, m_wVl[p], 1.0, w);
+		}
+//		else GetVortexCp(p, Mu, Cp, Qp);
+	}
+
 	return true;
 }
 
@@ -3441,6 +3466,7 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	static double a, a0, a1, Cm, Cm0, Cm1, tmp;
 	static double eps = 1.e-7;
 
+	AddString("      Searching for zero-moment angle\n");
 	iter = 0;
 	a0 = -PI/4.0;
 	a1 =  PI/4.0;
@@ -3462,6 +3488,7 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	}
 	if(iter>=100 || m_bCancel) return false;
 
+
 	iter = 0;
 
 	//Cm0 and Cm1 are of opposite sign
@@ -3479,7 +3506,6 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	{
 		a = a0 - (a1-a0) * Cm0/(Cm1-Cm0);
 		Cm = ComputeCm(a*180.0/PI);
-
 		if(Cm>0.0)
 		{
 			a1  = a;
@@ -4403,21 +4429,29 @@ double PanelAnalysisDlg::ComputeCm(double Alpha)
 
 	static int p;
 	static double Cm, cosa, sina, Mu, Mup1;
-	static CVector V, Force, PanelLeverArm, ForcePt, PanelForce, WindNormal, WindDirection;
-
+	static CVector VInf, Force, PanelLeverArm, ForcePt, PanelForce, WindNormal, WindDirection, VLocal;
+	double Speed2;
 	Cm = 0.0;
 	// Define the wind axis
 	cosa = cos(Alpha*PI/180.0);
 	sina = sin(Alpha*PI/180.0);
 	WindNormal.Set(   -sina, 0.0, cosa);
 	WindDirection.Set( cosa, 0.0, sina);
-	V.Set(cosa, 0.0, sina);
+	VInf.Set(cosa, 0.0, sina);
+
 
 	for(p=0; p<m_MatSize; p++)
 	{
 		//write vector operations in-line, more efficient
 		if(m_pPanel[p].m_iPos!=0)
 		{
+			//first calculate Cp for this angle
+			VLocal  = m_pPanel[p].GlobalToLocal(VInf);
+			VLocal += m_uVl[p]*cosa + m_wVl[p]*sina;
+			Speed2 = VLocal.x*VLocal.x + VLocal.y*VLocal.y;
+			m_Cp[p]  = 1.0-Speed2/1.0/1.0;
+
+			//next calculate the force acting on the panel
 			ForcePt = m_pPanel[p].CollPt;
 			PanelForce = m_pPanel[p].Normal * (-m_Cp[p]) * m_pPanel[p].Area;      // Newtons/q
 		}

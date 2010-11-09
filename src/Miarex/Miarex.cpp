@@ -579,22 +579,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pLLTDlg = new LLTAnalysisDlg;
 	CWing::s_pLLTDlg        = m_pLLTDlg;
 
-/*	m_pVLMDlg = new VLMAnalysisDlg;
-	CWing::s_pVLMDlg     = m_pVLMDlg;
-	m_pVLMDlg->m_pNode         = m_Node;
-	m_pVLMDlg->m_pPanel        = m_Panel;
-	m_pVLMDlg->m_ppPanel       = m_pPanel;
-	m_pVLMDlg->m_pWakeNode     = m_WakeNode;
-	m_pVLMDlg->m_pWakePanel    = m_WakePanel;
-	m_pVLMDlg->m_pMemNode      = m_MemNode;
-	m_pVLMDlg->m_pMemPanel     = m_MemPanel;
-	m_pVLMDlg->m_pTempWakeNode = m_TempWakeNode;
-	m_pVLMDlg->m_pRefWakeNode  = m_RefWakeNode;
-	m_pVLMDlg->m_pRefWakePanel = m_RefWakePanel;
-	m_pVLMDlg->m_RHS           = m_RHS;
-	m_pVLMDlg->m_Gamma         = m_RHSRef;
-	m_pVLMDlg->m_aij           = m_aij;
-	m_pVLMDlg->m_pCoreSize     = &m_CoreSize;*/
+
 
 
 
@@ -820,7 +805,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 	//   - the array of Cp distribution
 	//   - the array of circulation or doublet strengths Gamma
 	//   - the array of source strengths Sigma
-	//   - the data stored in the PanelAnalysisDlg or VLMAnalysisDlg current instances
+	//   - the data stored in the PanelAnalysisDlg current instances
 	//
 	// In output, fills the pPOpp object and returns the pointer
 	// 
@@ -1216,7 +1201,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 	//   - the array of Cp distribution
 	//   - the array of circulation or doublet strengths Gamma
 	//   - the array of source strengths Sigma
-	//   - the data stored in the LLTAnalysisDlg, PanelAnalysisDlg or VLMAnalysisDlg current instances
+	//   - the data stored in the LLTAnalysisDlg or PanelAnalysisDlg current instances
 	//
 	// In output, fills the pWOpp object and returns the pointer
 	// 
@@ -8716,6 +8701,7 @@ void QMiarex::OnDefineStabPolar()
 	m_StabPolarDlg.m_Viscosity     = m_WngAnalysis.m_Viscosity;
 	m_StabPolarDlg.m_Density       = m_WngAnalysis.m_Density;
 	m_StabPolarDlg.m_RefAreaType   = m_WngAnalysis.m_RefAreaType;
+	m_StabPolarDlg.m_bThinSurfaces = m_WngAnalysis.m_bThinSurfaces;
 
 	m_StabPolarDlg.m_pPlane = m_pCurPlane;
 	m_StabPolarDlg.m_pWing  = m_pCurWing;
@@ -8737,9 +8723,10 @@ void QMiarex::OnDefineStabPolar()
 
 	if(res == QDialog::Accepted)
 	{
-		m_WngAnalysis.m_Viscosity     = m_StabPolarDlg.m_Viscosity;
-		m_WngAnalysis.m_Density       = m_StabPolarDlg.m_Density;
-		m_WngAnalysis.m_RefAreaType   = m_StabPolarDlg.m_RefAreaType;
+		m_WngAnalysis.m_Viscosity       = m_StabPolarDlg.m_Viscosity;
+		m_WngAnalysis.m_Density         = m_StabPolarDlg.m_Density;
+		m_WngAnalysis.m_RefAreaType     = m_StabPolarDlg.m_RefAreaType;
+		m_WngAnalysis.m_bThinSurfaces   = m_StabPolarDlg.m_bThinSurfaces;
 
 		//Then add WPolar to array
 		pCurWPolar->m_Weight          = m_StabPolarDlg.m_Mass;
@@ -8773,11 +8760,10 @@ void QMiarex::OnDefineStabPolar()
 			pCurWPolar->m_WArea        = m_pCurWing->m_ProjectedArea;
 			pCurWPolar->m_WSpan        = m_pCurWing->m_ProjectedSpan;
 		}
-		pCurWPolar->m_bVLM1           = true;
+		pCurWPolar->m_bVLM1           = m_bVLM1;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
-//		pCurWPolar->m_AnalysisMethod  = STABILITYMETHOD; //Stability analysis
-		pCurWPolar->m_AnalysisMethod  = PANELMETHOD; //Stability analysis
+		pCurWPolar->m_AnalysisMethod  = PANELMETHOD;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Height          = 0.0;
@@ -9633,10 +9619,13 @@ void QMiarex::OnExportCurWOpp()
 	if(!m_pCurWOpp)return ;// is there anything to export ?
 
 	int iStrip,j,k,l,p, coef;
+	int type;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString filter =".csv";
+	QString filter;
+	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
+	else                                filter = "Comma Separated Values (*.csv)";
+
 	QString FileName, sep, str, strong, Format;
-	int type = 1;
 
 	strong = QString("a=%1_v=%2").arg(m_pCurWOpp->m_Alpha, 5,'f',2).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',2);
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
@@ -9653,7 +9642,10 @@ void QMiarex::OnExportCurWOpp()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
+	if (pos>0) pMainFrame->m_ExportFileType = 2;
+	else       pMainFrame->m_ExportFileType = 1;
+	type = pMainFrame->m_ExportFileType;
+
 
 	QFile XFile(FileName);
 
@@ -10059,28 +10051,31 @@ void QMiarex::OnExportCurWPolar()
 	if (!m_pCurWPolar) return;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName;
+	QString FileName, filter;
 
-	int type = 1;
+	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
+	else                                filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurWPolar->m_PlrName;
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Polar"),
 											pMainFrame->m_LastDirName + "/"+FileName,
 											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&pMainFrame->m_GraphExportFilter);
+											&filter);
+
 	if(!FileName.length()) return;
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
+	if (pos>0) pMainFrame->m_ExportFileType = 2;
+	else       pMainFrame->m_ExportFileType = 1;
 
 	QFile XFile(FileName);
 
 	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
 
 	QTextStream out(&XFile);
-	m_pCurWPolar->Export(out, type);
+	m_pCurWPolar->Export(out, pMainFrame->m_ExportFileType);
 	XFile.close();
 
 	UpdateView();
@@ -10094,8 +10089,8 @@ void QMiarex::OnExporttoAVL()
 	QString filter =".avl";
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString, strong;
-	QFile DestFile;
+	QString FileName, strong;
+
 
 	if(m_pCurPlane) FileName = m_pCurPlane->m_PlaneName;
 	else            FileName = m_pCurWing->m_WingName;

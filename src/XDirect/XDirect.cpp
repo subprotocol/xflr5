@@ -2911,12 +2911,13 @@ void QXDirect::OnExportCurOpp()
 {
 	if(!g_pCurFoil || !m_pCurPolar || !m_pCurOpp)	return;
 
-	QString filter =".csv";
+	QString filter;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
-	int type = 1;
+	QString FileName;
+
+	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
+	else                                filter = "Comma Separated Values (*.csv)";
 
 	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
 											pMainFrame->m_LastDirName ,
@@ -2927,7 +2928,8 @@ void QXDirect::OnExportCurOpp()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
+	if (pos>0) pMainFrame->m_ExportFileType = 2;
+	else       pMainFrame->m_ExportFileType = 1;
 
 	QFile XFile(FileName);
 
@@ -2935,7 +2937,7 @@ void QXDirect::OnExportCurOpp()
 
 	QTextStream out(&XFile);
 
-	m_pCurOpp->ExportOpp(out, pMainFrame->m_VersionName, type);
+	m_pCurOpp->ExportOpp(out, pMainFrame->m_VersionName, pMainFrame->m_ExportFileType);
 	XFile.close();
 }
 
@@ -2944,12 +2946,11 @@ void QXDirect::OnExportCurPolar()
 {
 	if(!g_pCurFoil || !m_pCurPolar)	return;
 
-	QString filter =".csv";
-
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QString FileName, DestFileName, OutString;
-	QFile DestFile;
-	int type = 1;
+	QString FileName, filter;
+
+	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
+	else                                filter = "Comma Separated Values (*.csv)";
 
 	FileName = m_pCurPolar->m_PlrName;
 	FileName.replace("/", " ");
@@ -2962,7 +2963,8 @@ void QXDirect::OnExportCurPolar()
 	int pos = FileName.lastIndexOf("/");
 	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
 	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
+	if (pos>0) pMainFrame->m_ExportFileType = 2;
+	else       pMainFrame->m_ExportFileType = 1;
 
 	QFile XFile(FileName);
 
@@ -2970,7 +2972,7 @@ void QXDirect::OnExportCurPolar()
 
 	QTextStream out(&XFile);
 
-	m_pCurPolar->ExportPolar(out, type);
+	m_pCurPolar->ExportPolar(out, pMainFrame->m_ExportFileType);
 	XFile.close();
 }
 

@@ -66,7 +66,6 @@ class MainFrame : public QMainWindow
 	friend class StabViewDlg;
 	friend class PlaneDlg;
 	friend class PanelAnalysisDlg;
-	friend class VLMAnalysisDlg;
 	friend class GL3dBodyDlg;
 	friend class GL3DScales;
 	friend class ManageBodiesDlg;
@@ -381,6 +380,7 @@ private:
 	QColor m_BorderClr;
 
 	int m_ImageFormat;
+	int m_ExportFileType;
 
 public:
  	QFont m_TextFont;

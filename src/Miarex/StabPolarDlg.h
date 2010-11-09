@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QRadioButton>
+#include <QStackedWidget>
 #include <QTableView>
 #include <QStandardItemModel>
 #include "CtrlTableDelegate.h"
@@ -60,6 +61,7 @@ private slots:
 	void OnViscous();
 	void OnUnit();
 	void OnCellChanged(QWidget *pWidget);
+	void OnMethod();
 
 private:
 	void resizeEvent(QResizeEvent *event);
@@ -87,6 +89,11 @@ private:
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
 
+
+	QStackedWidget *m_pctrlAnalysisControls;
+	QRadioButton *m_pctrlWingMethod2, *m_pctrlWingMethod3;
+	QRadioButton *m_pctrlPanelMethod;
+
 	QLabel *m_pctrlUFOName;
 
 	QLabel *m_pctrlRho, *m_pctrlNu;
@@ -98,6 +105,7 @@ private:
 	QPushButton *OKButton, *CancelButton;
 
 	static void *s_pMainFrame;
+	static void *s_pMiarex;
 
 	QList <void*> *m_poaXPolar;
 

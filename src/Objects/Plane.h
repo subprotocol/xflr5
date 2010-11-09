@@ -34,7 +34,6 @@ class CPlane
 	friend class CWing;
 	friend class CWPolar;
 	friend class PlaneDlg;
-	friend class VLMAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class ManageBodiesDlg;
 	friend class StabPolarDlg;
