@@ -217,8 +217,11 @@ void ManageUFOsDlg::FillWingRow(int row)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
+	if(row>=pMainFrame->m_oaWing.size()) return;
+
 	QModelIndex ind;
 	CWing *pWing = (CWing*)pMainFrame->m_oaWing.at(row);
+	if(!pWing) return;
 
 	ind = m_pUFOModel->index(row, 0, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_WingName);
@@ -245,8 +248,10 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex ind;
+	if(row>=pMainFrame->m_oaPlane.size()) return;
 
 	CPlane *pPlane = (CPlane*)pMainFrame->m_oaPlane.at(row);
+	if(!pPlane) return;
 	CWing *pWing = &pPlane->m_Wing;
 
 	ind = m_pUFOModel->index(row+n, 0, QModelIndex());
