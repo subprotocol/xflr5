@@ -38,7 +38,7 @@ void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel);
 void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp, int List);
 void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp);
 void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp);
-void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp);
+void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp);
 void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp);
 void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar);
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);

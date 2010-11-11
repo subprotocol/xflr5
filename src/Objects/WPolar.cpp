@@ -25,7 +25,6 @@
 #include "../MainFrame.h"
 #include <math.h>
 #include <QMessageBox>
-#include <QtDebug>
 
 
 void *CWPolar::s_pMainFrame;

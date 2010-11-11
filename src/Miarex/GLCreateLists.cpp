@@ -1606,7 +1606,7 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 }
 
 
-void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CPanel *pPanel, CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;

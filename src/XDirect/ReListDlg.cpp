@@ -135,7 +135,8 @@ void ReListDlg::SetupLayout()
 	m_pctrlReView->setEditTriggers(QAbstractItemView::CurrentChanged |
 								   QAbstractItemView::DoubleClicked |
 								   QAbstractItemView::SelectedClicked |
-								   QAbstractItemView::EditKeyPressed);
+								   QAbstractItemView::EditKeyPressed |
+								   QAbstractItemView::AnyKeyPressed);
 
 	QHBoxLayout * MainLayout = new QHBoxLayout(this);
 	MainLayout->addWidget(m_pctrlReView);

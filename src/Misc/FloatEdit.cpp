@@ -21,6 +21,7 @@
 
 #include "FloatEdit.h"
 #include <math.h>
+#include <QtDebug>
 
 FloatEdit::FloatEdit(QWidget *pParent)
 {
@@ -49,14 +50,14 @@ FloatEdit::FloatEdit(double d, int precision)
 }
 
 
-bool FloatEdit::IsInBounds(double f)
+bool FloatEdit::IsInBounds()
 {
 	int pos = 0;
 	QString strange = text();
 	strange.replace(" ", "");
 
 	if (v->validate(strange, pos)==QValidator::Acceptable) return true;
-	else                                                  return false;
+	else                                                   return false;
 }
 
 
@@ -65,19 +66,33 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 {
 	QString str;
 	double f = ReadValue();
-	if(IsInBounds(f))
+
+	if(IsInBounds())
 	{
 		m_Value = f;
 		FormatValue(m_Value, str);
 		setText(str);
 		emit(editingFinished());
 	}
-    else
-    {
+	else
+	{
 		FormatValue(m_Value, str);
 		setText(str);
 	}
 	QLineEdit::focusOutEvent(event);
+}
+
+
+void FloatEdit::focusInEvent ( QFocusEvent * event )
+{
+	QString str;
+	str = QString("%1").arg(m_Value,'g');
+	str = str.trimmed();
+	int pos = str.indexOf('.');
+	int digits = str.length()-pos;
+//qDebug()<<str<<pos<<digits;
+	setText(str);
+	QLineEdit::focusInEvent(event);
 }
 
 
@@ -113,7 +128,7 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Return:
 		{
 			double f = ReadValue();
-			if(IsInBounds(f))
+			if(IsInBounds())
 			{
 				m_Value = f;
 			}
@@ -135,7 +150,7 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 		{
 			QLineEdit::keyPressEvent(event);
 			double f = ReadValue();
-			if(IsInBounds(f)) m_Value = f;
+			if(IsInBounds()) m_Value = f;
 			break;
 		}
     }
@@ -196,11 +211,5 @@ void FloatEdit::FormatValue(double const &f, QString &str)
 }
 
 
-void FloatEdit::showEvent ( QShowEvent * event )
-{
-/*	QString str;
-	FormatValue(m_Value, str);
-	setText(str);*/
-}
 
 

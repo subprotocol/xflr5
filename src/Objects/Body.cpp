@@ -19,8 +19,6 @@
 
 *****************************************************************************/
 
-// Body.cpp
-//
 
 #include "../MainFrame.h"
 #include "Body.h"
@@ -29,6 +27,7 @@
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QtDebug>
 
 void *CBody::s_pMainFrame;
 double CBody::s_xKnots[MAXBODYFRAMES*2];
@@ -147,7 +146,7 @@ CBody::CBody()
 
 
 void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
-						double &GCm, double &GRm, double &GYm, double &Alpha, double &XCmRef)
+						double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG)
 {
 	int p;
 	double cosa, sina, PanelLift;
@@ -166,13 +165,14 @@ void CBody::ComputeAero(double *Cp, double &XCP, double &YCP,
 	{
 		PanelForce.x = m_pPanel[p].Normal.x * (-Cp[p]) * m_pPanel[p].Area;
 		PanelForce.y = m_pPanel[p].Normal.y * (-Cp[p]) * m_pPanel[p].Area;
-		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area;
+		PanelForce.z = m_pPanel[p].Normal.z * (-Cp[p]) * m_pPanel[p].Area; // N/q
 
 		PanelLift = PanelForce.dot(WindNormal);
 		XCP   += m_pPanel[p].CollPt.x * PanelLift;
 		YCP   += m_pPanel[p].CollPt.y * PanelLift;
-		LeverArm.Set(m_pPanel[p].CollPt.x - XCmRef, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
-		GeomMoment = LeverArm * PanelForce;
+
+		LeverArm.Set(m_pPanel[p].CollPt.x - CoG.x, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z-CoG.z);
+		GeomMoment = LeverArm * PanelForce; // N.m/q
 
 		GCm  += GeomMoment.y;
 		GRm  += GeomMoment.dot(WindDirection);
@@ -492,8 +492,7 @@ bool CBody::ExportDefinition()
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, j;
-	QString strong,  FileName, DestFileName, OutString;
-	QFile DestFile;
+	QString strong,  FileName;
 
 	FileName = m_BodyName;
 	FileName.replace("/", " ");
@@ -1645,7 +1644,6 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar >> m_LineType;
 		ar >> m_NSideLines;
 		ar >> m_NStations;
-
 		ar >> m_iRes;
 		ar >> m_nxDegree >> m_nhDegree;
 		ar >> m_nxPanels >> m_nhPanels;

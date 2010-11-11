@@ -40,6 +40,7 @@ void *PanelAnalysisDlg::s_pMainFrame;
 
 bool g_bTrace = false;
 
+
 PanelAnalysisDlg::PanelAnalysisDlg()
 {
 	setWindowTitle(tr("3D Panel Analysis"));
@@ -90,7 +91,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_strOut = "";
 
 	m_pWingList[0] = m_pWingList[1] = m_pWingList[2] = m_pWingList[3] = NULL;
-	m_ppBody  = NULL;
+	m_pBody  = NULL;
 
 	m_pWing   = m_pWing2 = m_pStab = m_pFin = NULL;
 	m_pWPolar = NULL;
@@ -340,11 +341,13 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 	}
 }
 
-void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, CVector Omega, double Rotation)
+void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, CVector Omega, double Angle)
 {
-	//Creates the two RHS for unit speeds along x and z
+	//Creates the RHS vector for
+	//  free stream velocity VInf,
+	//	rotation Angle around vector Omega
 	int m, p, pp;
-	double  phi;
+	double  phi, sigmapp;
 	CVector V, C, CGM, VPanel;
 
 	m = 0;
@@ -353,56 +356,49 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, CVector Omega, doubl
 	{
 		if(m_bCancel) return;
 		VPanel = VInf;
-		if(fabs(Rotation)>PRECISION)
+		if(fabs(Angle)>PRECISION)
 		{
 			if(m_pPanel[p].m_iPos==0) CGM = m_pPanel[p].VortexPos - m_CoG;
 			else                      CGM = m_pPanel[p].CollPt    - m_CoG;
-			VPanel += Omega*CGM *Rotation;
-//			m_pRHS[p] = - m_pPanel[p].Normal.dot(Ris);
+			VPanel += Omega*CGM *Angle;
 		}
 
 		if(!m_b3DSymetric || m_pPanel[p].m_bIsLeftPanel)
 		{
 			if(!m_bDirichlet || m_pPanel[p].m_iPos==0)
 			{
-				//sigma = -V.n  with unit velocity
+				// first term of RHS is -V.n  
 				RHS[m] = - m_pPanel[p].Normal.dot(VPanel);
 			}
-			else if(m_bDirichlet)
-			{
-				RHS[m] = 0.0;
-			}
+			else if(m_bDirichlet) RHS[m] = 0.0;
 
-			if(m_pPanel[p].m_iPos!=0)
-			{
-				//Thick surfaces, 3D-panel type BC, use collocation point
-				C    = m_pPanel[p].CollPt;
-			}
-			else
-			{
-				//Thin surface, VLM type BC, use control point
-				C    = m_pPanel[p].CtrlPt;
-			}
+			if(m_pPanel[p].m_iPos!=0) C = m_pPanel[p].CollPt;
+			else                      C = m_pPanel[p].CtrlPt;
 
 			for (pp=0; pp<m_MatSize; pp++)
 			{
-				if(m_pPanel[pp].m_iPos!=0) GetSourceInfluence(C, m_pPanel+pp, V, phi);
-				else
+				// Consider only the panels positioned on thick surfaces, 
+				// since the source strength is zero on thin surfaces
+				if(m_pPanel[pp].m_iPos!=0)
 				{
-					//sigma is zero on a thin surface, no need to compute the influence of this panel
-					V.Set(0.0, 0.0, 0.0);
-					phi = 0.0;
-				}
+					// Define the source strength on panel pp
+					sigmapp = -1.0/4.0/PI * m_pPanel[pp].Normal.dot(VPanel);
 
-				if(!m_bDirichlet || m_pPanel[p].m_iPos==0)
-				{
-					// V is zero anyway ???
-//					m_uRHS[m] -= V.dot(m_pPanel[p].Normal) * m_pPanel[pp].Normal.x * -1.0/4.0/PI;
-//					m_wRHS[m] -= V.dot(m_pPanel[p].Normal) * m_pPanel[pp].Normal.z * -1.0/4.0/PI;
-				}
-				else if(m_bDirichlet)
-				{
-					RHS[m] -= phi * m_pPanel[pp].Normal.dot(VPanel) * -1.0/4.0/PI;
+					// Add to RHS the source influence of panel pp on panel p
+					GetSourceInfluence(C, m_pPanel+pp, V, phi);
+	
+					if(!m_bDirichlet || m_pPanel[p].m_iPos==0)
+					{
+						// Apply Neumann B.C.
+						// NASA4023 eq. (22) and (23)
+						// The RHS term is sigma[pp]*DJK = nj.Vjk
+						RHS[m] -= V.dot(m_pPanel[p].Normal) * sigmapp;
+					}
+					else if(m_bDirichlet)
+					{
+						//NASA4023 eq. (20)
+						RHS[m] -= (phi * sigmapp);
+					}
 				}
 			}
 			m++;
@@ -412,10 +408,13 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, CVector Omega, doubl
 	}
 }
 
+
+
 void PanelAnalysisDlg::CreateUnitRHS()
 {
 	//Creates the two RHS for unit speeds along x and z
 	CVector VInf, Omega;
+	Omega.Set(0.0, 1.0, 0.0);
 	VInf.Set(1.0, 0.0, 0.0);
 	CreateRHS(m_uRHS,  VInf, Omega, 0.0);
 	VInf.Set(0.0, 0.0, 1.0);
@@ -835,7 +834,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 		{
 			if(m_pWingList[i])
 			{
-				AddString(tr("         Calculating wing...")+m_pWingList[i]->m_WingName+"\n");
+				AddString(tr("         Calculating wing...") + m_pWingList[i]->m_WingName+"\n");
 				//restore the saved FF results
 				Force += m_WingForce[qrhs*4+i];
 				IDrag += m_WingIDrag[qrhs*4+i];
@@ -856,21 +855,24 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, 
 				                                   m_pWPolar, m_CoG);
 
-
 				m_pWingList[i]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
 
 				pos += m_pWingList[i]->m_MatSize;
 			}
 		}
 
-
-		if(*m_ppBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
+		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
 			AddString(tr("       Calculating body...")+"\n");
-			(*m_ppBody)->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, m_GCm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG.x);
+			double ICm = 0.0;
+			m_pBody->ComputeAero(m_Cp+qrhs*m_MatSize+pos, XCP, YCP, ICm, m_GRm, m_GYm, Alpha, m_pWPolar->m_CoG);
+			m_ICm += ICm;
+			m_GCm += ICm;
 
 			//the body does not shed any wake --> no induced lift or drag
 		}
+
+//for(int i=0; i<m_MatSize; i++)qDebug("  %4d   %4d     %13.7f     %13.7f ",i, m_pPanel[i].m_iPos, m_Cp[i], m_Mu[i]);
 
 		if(!m_bTrefftz) SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, Lift, IDrag);
 
@@ -905,10 +907,10 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, int qrhs)
 
 		if(m_bPointOut) m_bWarning = true;
 
+		if(m_pWPolar->m_Type==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
 		if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp+qrhs*m_MatSize, Mu, Sigma);
 		else         pMiarex->AddWOpp(m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
 
-		if(m_pWPolar->m_Type==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
 		AddString("\n");
 	}
 	else m_bPointOut = true;
@@ -938,12 +940,9 @@ void PanelAnalysisDlg::GetVortexCp(const int &p, double *Gamma, double *Cp, CVec
 void PanelAnalysisDlg::GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VLocal, double const &QInf, CVector &VInf)
 {
 	static int PL,PR, PU, PD;
-	static double DELQ, DELP;
+	static double DELQ, DELP, mu0,mu1,mu2, x0,x1,x2, Speed2;
 	static CVector VTot;//total local panel speed
 	static CVector S2, Sl2;
-	static double mu0,mu1,mu2;
-	static double x0,x1,x2;
-	static double Speed2;
 
 	PL = m_pPanel[p].m_iPL;
 	PR = m_pPanel[p].m_iPR;
@@ -3524,6 +3523,7 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 
 	m_AlphaEq = a*180.0/PI;
 	Cm = ComputeCm(m_AlphaEq);// for information only, should be zero
+//for(int i=0; i<m_MatSize; i++)qDebug("  %4d   %4d     %13.7f ",i, m_pPanel[i].m_iPos, m_Cp[i]);
 	return true;
 }
 
@@ -4067,14 +4067,15 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	// Therefore to get the derivative, we need to make the difference between two states
 	// We use forward differences between the reference state corresponding to the trimmed conditions
 	// and the same state + application of a delta angle to the control
-	// The corresponding terms of the state matrix and RHS vector are modfied i.a.w. the rotation of the control
+	// The corresponding terms of the RHS vector are modfied i.a.w. the rotation of the control
 	// We therefore need to solve as many problems as there are controls to study
 	// AVL ignores the modification of the matrix terms and therefore requires only a
-	// single LU decomposition throughout the problem
+	// single LU decomposition throughout the problem. 
+	// The same method is applied, the influence matrix is not updated
 	//
 
 	static CVector  V0, H, RN, V, C, H0;
-	static int j, p, pp, pos, ic;
+	static int j, p, pos, ic;
 	static double sina, cosa, DeltaAngle,q,S,b,mac;
 	QString str;
 	Quaternion Quat;
@@ -4121,7 +4122,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	if(m_pPlane)
 	{
 		// reload the base influence matrix and RHS
-		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+//		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
 		memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 
 		//Wing tilt
@@ -4129,23 +4130,19 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 		H.Set(0.0, 1.0, 0.0);
 		Quat.Set(DeltaAngle*180.0/PI, H);
 
-		// Modify the influence matrix and RHS where applicable :
-		// if panel p is on the modified control surface, then change
-		// the influence coefficient of all panels pp at ctrl point p
-
 		str = "      Changing the influence matrix and RHS for wing tilt control\n";
 		AddString(str);
 
 		for(p=0; p<m_pWing->m_MatSize; p++)
 		{
 			Quat.Conjugate(m_pWing->m_pPanel[p].Normal, RN);
-			for(pp=0; pp<m_MatSize; pp++)
+/*			for(pp=0; pp<m_MatSize; pp++)
 			{
 				C = m_pPanel[p].CtrlPt;
 				C.RotateY(H0, DeltaAngle*180.0/PI);
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				m_aij[p*m_MatSize+pp] = V.dot(RN);
-			}
+			}*/
 			m_cRHS[p] = -V0.dot(RN);
 		}
 
@@ -4161,7 +4158,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 		AddString(str);
 
 		// reload the base influence matrix and RHS
-		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+//		memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
 		memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 
 		//Elevator tilt
@@ -4172,13 +4169,13 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 		for(p=0; p<m_pStab->m_MatSize; p++)
 		{
 			Quat.Conjugate(m_pPanel[p+pos].Normal, RN);
-			for(pp=0; pp<m_MatSize; pp++)
+/*			for(pp=0; pp<m_MatSize; pp++)
 			{
 				C= m_pPanel[p+pos].CtrlPt;
 				C.RotateY(H0, DeltaAngle*180.0/PI);
 				VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 				m_aij[(p+pos)*m_MatSize+pp] = V.dot(RN);
-			}
+			}*/
 			m_cRHS[p+pos] = -V0.dot(RN);
 		}
 
@@ -4197,7 +4194,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			AddString(str);
 
 			// reload the base influence matrix and RHS
-			memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
+//			memcpy(m_aij, m_aijRef, m_MatSize*m_MatSize*sizeof(double));
 			memcpy(m_cRHS, m_RHS+70*VLMMAXMATSIZE, m_MatSize*sizeof(double));
 			Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 
@@ -4207,13 +4204,13 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 				{
 					Quat.Conjugate(m_pPanel[p].Normal, RN);
 
-					for(pp=0; pp<m_MatSize; pp++)
+/*					for(pp=0; pp<m_MatSize; pp++)
 					{
 						C.Copy(m_pPanel[p].CtrlPt);
 						C.Rotate(m_ppSurface[j]->m_HingePoint, m_ppSurface[j]->m_HingeVector, DeltaAngle*180.0/PI);
 						VLMGetVortexInfluence(m_pPanel+pp, C, V, true);
 						m_aij[p*m_MatSize+pp] = V.dot(RN);
-					}
+					}*/
 					m_cRHS[p] = -V0.dot(RN);
 				}
 			}
@@ -4428,9 +4425,9 @@ double PanelAnalysisDlg::ComputeCm(double Alpha)
 	// The effect of the viscous drag is not included
 
 	static int p;
-	static double Cm, cosa, sina, Mu, Mup1;
+	static double Cm, cosa, sina, Gamma, Gammap1;
 	static CVector VInf, Force, PanelLeverArm, ForcePt, PanelForce, WindNormal, WindDirection, VLocal;
-	double Speed2;
+	double Speed2, Cp;
 	Cm = 0.0;
 	// Define the wind axis
 	cosa = cos(Alpha*PI/180.0);
@@ -4449,35 +4446,34 @@ double PanelAnalysisDlg::ComputeCm(double Alpha)
 			VLocal  = m_pPanel[p].GlobalToLocal(VInf);
 			VLocal += m_uVl[p]*cosa + m_wVl[p]*sina;
 			Speed2 = VLocal.x*VLocal.x + VLocal.y*VLocal.y;
-			m_Cp[p]  = 1.0-Speed2/1.0/1.0;
+			Cp  = 1.0-Speed2; // QInf=unit, /1.0/1.0;
+			m_Cp[p] = Cp; //todo : remove, for information only
 
 			//next calculate the force acting on the panel
 			ForcePt = m_pPanel[p].CollPt;
-			PanelForce = m_pPanel[p].Normal * (-m_Cp[p]) * m_pPanel[p].Area;      // Newtons/q
+			PanelForce = m_pPanel[p].Normal * (-Cp) * m_pPanel[p].Area;      // Newtons/q
 		}
 		else
 		{
 			// for each panel along the chord, add the lift coef
-			Mu   = m_uRHS[p]  *cosa + m_wRHS[p]  *sina;
-			Mup1 = m_uRHS[p+1]*cosa + m_wRHS[p+1]*sina;
+			Gamma   = m_uRHS[p]  *cosa + m_wRHS[p]  *sina;
+			Gammap1 = m_uRHS[p+1]*cosa + m_wRHS[p+1]*sina;
 			ForcePt = m_pPanel[p].VortexPos;
+
 			PanelForce  = WindDirection * m_pPanel[p].Vortex;
-			PanelForce *= 2.0 * Mu ;                                       //Newtons/q/QInf (QInf = unit)
+			PanelForce *= 2.0 * Gamma ;                                       //Newtons/q/QInf (QInf = unit)
 
 			if(!m_pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 			{
 				Force       = WindDirection * m_pPanel[p].Vortex;
-				Force      *= 2.0 * Mup1;       //Newtons/q/QInf
+				Force      *= 2.0 * Gammap1;       //Newtons/q/QInf
 				PanelForce -= Force;
 			}
+			m_Cp[p] = PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area; //todo : remove, for information only
 		}
 		PanelLeverArm.x = ForcePt.x - m_CoG.x;
 		PanelLeverArm.y = ForcePt.y - m_CoG.y;
 		PanelLeverArm.z = ForcePt.z - m_CoG.z;
-
-//		Force.x  = (V.y*m_pPanel[p].Vortex.z - V.z*m_pPanel[p].Vortex.y) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho
-//		Force.y  = (V.z*m_pPanel[p].Vortex.x - V.x*m_pPanel[p].Vortex.z) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho
-//		Force.z  = (V.x*m_pPanel[p].Vortex.y - V.y*m_pPanel[p].Vortex.x) * (m_uRHS[p]*cosa + m_wRHS[p]*sina);  //Newtons/rho
 
 		Cm += -PanelLeverArm.x * PanelForce.z + PanelLeverArm.z*PanelForce.x; //N.m/rho
 	}

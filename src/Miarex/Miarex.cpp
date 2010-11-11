@@ -891,6 +891,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_NPanels             = m_pPanelDlg->m_MatSize;
 			pPOpp->m_Alpha               = m_pPanelDlg->m_OpAlpha;
 			pPOpp->m_QInf                = m_pPanelDlg->m_QInf;
+
 			pWOpp->m_Alpha               = m_pPanelDlg->m_OpAlpha;
 			pWOpp->m_QInf                = m_pPanelDlg->m_QInf;
 			pWOpp->m_CL                  = m_pPanelDlg->m_CL;
@@ -912,33 +913,16 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
+
 			if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 			{
 				pPOpp->m_Alpha            = m_pPanelDlg->m_AlphaEq;
 				pPOpp->m_QInf             = m_pPanelDlg->u0;
 				pPOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
+
 				pWOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
-				pWOpp->m_Alpha          = m_pPanelDlg->m_AlphaEq;
-				pWOpp->m_QInf           = m_pPanelDlg->u0;
-				pWOpp->m_CL             = m_pPanelDlg->m_CL;
-				pWOpp->m_CX             = m_pPanelDlg->m_CX;
-				pWOpp->m_CY             = m_pPanelDlg->m_CY;
-				pWOpp->m_InducedDrag    = m_pPanelDlg->m_InducedDrag;
-				pWOpp->m_ViscousDrag    = m_pPanelDlg->m_ViscousDrag;
-
-				pWOpp->m_GCm            = m_pPanelDlg->m_GCm;
-				pWOpp->m_VCm            = m_pPanelDlg->m_VCm;
-				pWOpp->m_ICm            = m_pPanelDlg->m_ICm;
-				pWOpp->m_GRm            = m_pPanelDlg->m_GRm;
-				pWOpp->m_GYm            = m_pPanelDlg->m_GYm;
-				pWOpp->m_VYm            = m_pPanelDlg->m_VYm;
-				pWOpp->m_IYm            = m_pPanelDlg->m_IYm;
-
-				pWOpp->m_XCP            = m_pPanelDlg->m_XCP;
-				pWOpp->m_YCP            = m_pPanelDlg->m_YCP;
-
-				pPOpp->m_Beta           = m_pCurWPolar->m_Beta;
-				pWOpp->m_Beta	        = m_pCurWPolar->m_Beta;
+				pWOpp->m_QInf            = m_pPanelDlg->u0;
+				pWOpp->m_Alpha           = m_pPanelDlg->m_AlphaEq;
 
 				for(i=0; i<4; i++)
 				{
@@ -960,6 +944,12 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			{
 				pPOpp->m_Ctrl = 0.0;
 				pWOpp->m_Ctrl = 0.0;
+				memset(pWOpp->m_EigenValue, 0, sizeof(pWOpp->m_EigenValue));
+				memset(pWOpp->m_EigenVector, 0, sizeof(pWOpp->m_EigenVector));
+				memset(pWOpp->m_ALong, 0, 16*sizeof(double));
+				memset(pWOpp->m_ALat,  0,  16*sizeof(double));
+				memset(pWOpp->m_BLong, 0, MAXCONTROLS * 4*sizeof(double));
+				memset(pWOpp->m_BLat , 0,  MAXCONTROLS * 4*sizeof(double));
 			}
 
 		}
@@ -2099,6 +2089,7 @@ int QMiarex::CreateBodyElements()
 			m_Panel[m_MatSize].m_iPos = 100;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 			m_Panel[m_MatSize].m_iSym = -1;
+			m_Panel[i].m_iSym = m_MatSize;
 			m_Panel[m_MatSize].m_bIsLeftPanel  = false;
 			m_Panel[m_MatSize].SetFrame(LA, LB, TA, TB);
 
@@ -5854,7 +5845,7 @@ void QMiarex::GLDraw3D()
 				memcpy(m_MemNode,  m_Node,  m_nNodes * sizeof(CVector));
 				memcpy(m_RefWakePanel, m_WakePanel, m_WakeSize * sizeof(CPanel));
 				memcpy(m_RefWakeNode,  m_WakeNode,  m_nWakeNodes * sizeof(CVector));
-				GLCreateStreamLines(this, Wing, m_Panel, m_Node, m_pCurWPolar, m_pCurWOpp);
+				GLCreateStreamLines(this, Wing, m_Node, m_pCurWPolar, m_pCurWOpp);
 				//restore the initial geometry
 				memcpy(m_Panel, m_MemPanel, m_MatSize * sizeof(CPanel));
 				memcpy(m_Node,  m_MemNode,  m_nNodes  * sizeof(CVector));
@@ -6033,15 +6024,6 @@ void QMiarex::GLRenderView()
 
 	glPushMatrix();
 	{
-		glDisable(GL_CLIP_PLANE1);
-		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
-		{
-			glCallList(WOPPCPLEGENDTXT);
-			glCallList(WOPPCPLEGENDCLR);
-		}
-
-		if(m_pCurWing)			glCallList(WINGLEGEND);
-		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
 		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
 		else						glEnable(GL_CLIP_PLANE1);
 
@@ -6099,6 +6081,16 @@ void QMiarex::GLRenderView()
 
 		GLCallViewLists();
 		if(m_bFoilNames) GLDrawFoils();
+
+		glLoadIdentity();
+		glDisable(GL_CLIP_PLANE1);
+		if(m_pCurWing)			glCallList(WINGLEGEND);
+		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
+		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
+		{
+			glCallList(WOPPCPLEGENDTXT);
+			glCallList(WOPPCPLEGENDCLR);
+		}
 	}
 	glPopMatrix();
 	glDisable(GL_CLIP_PLANE1);
@@ -6407,8 +6399,9 @@ bool QMiarex::InitializePanels()
 	if(bBodyEl)
 	{
 		Nel = CreateBodyElements();
+
 		m_pCurBody->m_pPanel = ptr;
-		HalfSize = m_pCurBody->m_NElements/2;
+/*		HalfSize = m_pCurBody->m_NElements/2;
 		p  = HalfSize-1;
 		pp = HalfSize;
 
@@ -6417,11 +6410,10 @@ bool QMiarex::InitializePanels()
 			for(l=0; l<m_pCurBody->m_nhPanels; l++)
 			{
 				m_pCurBody->m_pPanel[p].m_iSym    = m_pCurBody->m_pPanel[pp+m_pCurBody->m_nhPanels-l-1].m_iElement;
-
 				p--;
 			}
 			pp += m_pCurBody->m_nhPanels;
-		}
+		}*/
 	}
 
 	dlg.setValue(100);
@@ -12747,7 +12739,6 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	int i,pl, pr;
 
-	m_pPanelDlg->m_ppBody        = & m_pCurBody;
 
 	//Join surfaces together
 	pl = 0;
@@ -12778,6 +12769,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_pStab          = m_pCurStab;
 	m_pPanelDlg->m_pFin           = m_pCurFin;
 	m_pPanelDlg->m_pPlane         = m_pCurPlane;
+	m_pPanelDlg->m_pBody          = m_pCurBody;
 	m_pPanelDlg->m_MatSize        = m_MatSize;
 	m_pPanelDlg->m_NWakeColumn    = m_NWakeColumn;
 	m_pPanelDlg->m_bDirichlet     = m_bDirichlet;

@@ -2664,7 +2664,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
 				// Get the force acting on the panel
-				if(!pWPolar->m_bThinSurfaces)
+				if(m_pPanel[p].m_iPos!=0)
 				{
 					ForcePt = m_pPanel[p].CollPt;
 					PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q
@@ -2674,16 +2674,15 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 					// for each panel along the chord, add the lift coef
 					ForcePt = m_pPanel[p].VortexPos;
 					PanelForce  = WindDirection * m_pPanel[p].Vortex;
-					PanelForce *= 2.0 * Gamma[p] /QInf;                                       //Newtons/q
+					PanelForce *= 2.0 * Gamma[p] /QInf;                                 //Newtons/q
 
 					if(!pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 					{
 						Force       = WindDirection * m_pPanel[p].Vortex;
-						Force      *= 2.0 * Gamma[p+1] /QInf;       //Newtons/q
+						Force      *= 2.0 * Gamma[p+1] /QInf;                          //Newtons/q
 						PanelForce -= Force;
 					}
-					Cp[p] = -2.0 * PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;
-
+					Cp[p] = PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area;    //
 				}
 				StripForce += PanelForce;                                           // Newtons/q
 				NForce = PanelForce.dot(SurfaceNormal);                             // Newtons/q

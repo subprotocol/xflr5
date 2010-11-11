@@ -45,11 +45,13 @@ public:
 	void SetFocusSelect(bool bFocusSelect);
 	
 private:
-	bool IsInBounds(double f);
+	bool IsInBounds();
 	void FormatValue(double const &f, QString &str);
+
+	void focusInEvent ( QFocusEvent * event );
 	void focusOutEvent ( QFocusEvent * event );
 	void keyPressEvent(QKeyEvent *event);
-	void showEvent ( QShowEvent * event );
+
 	double ReadValue();
 
 	QDoubleValidator *v;

@@ -83,7 +83,7 @@ private:
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
 	void CreateSourceStrength(double Alpha0, double AlphaDelta, int nval);
-	void CreateRHS(double *RHS, CVector VInf, CVector Omega, double Rotation);
+	void CreateRHS(double *RHS, CVector VInf, CVector Omega, double Angle);
 	void CreateUnitRHS();
 	void CreateWakeContribution();
 	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
@@ -207,7 +207,7 @@ private:
 	
 	CWPolar *m_pWPolar;
 
-	CBody **m_ppBody;
+	CBody *m_pBody;
 
 
 	CPlane *m_pPlane;
