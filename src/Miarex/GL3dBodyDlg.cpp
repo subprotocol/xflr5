@@ -4517,8 +4517,8 @@ void GL3dBodyDlg::SetBody(CBody *pBody)
 	m_pctrlBodyStyle->SetWidth(m_pBody->m_BodyWidth);
 	m_pctrlBodyStyle->SetColor(m_pBody->m_BodyColor);
 
-	m_pctrlNXPanels->SetValue(m_pBody->m_NStations);
-	m_pctrlNHoopPanels->SetValue(m_pBody->m_NSideLines);
+	m_pctrlNXPanels->SetValue(m_pBody->m_nxPanels);
+	m_pctrlNHoopPanels->SetValue(m_pBody->m_nhPanels);
 
 	m_pctrlXDegree->setCurrentIndex(m_pBody->m_nxDegree-1);
 	m_pctrlHoopDegree->setCurrentIndex(m_pBody->m_nhDegree-1);
@@ -4875,7 +4875,8 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlFrameTable->setEditTriggers(QAbstractItemView::CurrentChanged |
 									   QAbstractItemView::DoubleClicked |
 									   QAbstractItemView::SelectedClicked |
-									   QAbstractItemView::EditKeyPressed);
+									   QAbstractItemView::EditKeyPressed |
+									   QAbstractItemView::AnyKeyPressed);
 
 
 	QVBoxLayout * FramePointLayout = new QVBoxLayout;
@@ -4892,7 +4893,8 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlPointTable->setEditTriggers(QAbstractItemView::CurrentChanged |
 									   QAbstractItemView::DoubleClicked |
 									   QAbstractItemView::SelectedClicked |
-									   QAbstractItemView::EditKeyPressed);
+									   QAbstractItemView::EditKeyPressed |
+									   QAbstractItemView::AnyKeyPressed);
 
 
 	QHBoxLayout *AllControls = new QHBoxLayout;
