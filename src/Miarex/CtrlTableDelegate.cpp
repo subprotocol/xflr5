@@ -46,7 +46,6 @@ QWidget *CtrlTableDelegate::createEditor(QWidget *parent, const QStyleOptionView
 		FloatEdit *editor = new FloatEdit(parent);
 		editor->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		editor->SetPrecision(m_Precision[index.column()]);
-//		editor->SetFocusSelect(false);
 		return editor;
 	}
 

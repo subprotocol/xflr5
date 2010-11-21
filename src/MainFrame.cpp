@@ -5042,41 +5042,6 @@ void MainFrame::SetCentralWidget()
 }
 
 
-bool MainFrame::SelectFoil(CFoil *pFoil)
-{
-	//Selects pFoil in the combobox and returns true
-	//On error, selects the first and returns false
-	return true;
-	if(!pFoil) return false;
-	int pos = m_pctrlFoil->findText(pFoil->m_FoilName);
-	if(pos>=0)
-	{
-		m_pctrlFoil->setCurrentIndex(pos);
-		return true;
-	}
-	return false;
-}
-
-bool MainFrame::SelectPolar(CPolar *pPolar)
-{
-	//Selects pPolar in the combobox and returns true
-	//On error, selects the first and returns false
-	if(!g_pCurFoil || !pPolar) return false;
-
-	CPolar *pOldPolar;
-	for(int i=0; i<m_pctrlPolar->count(); i++)
-	{
-		pOldPolar = GetPolar(g_pCurFoil->m_FoilName, m_pctrlPolar->itemText(i));
-		if(pOldPolar && pPolar==pOldPolar)
-		{
-			//TODO : check if this activates the Selchange signal
-			m_pctrlPolar->setCurrentIndex(i);
-			return true;
-		}
-	}
-	return false;
-}
-
 
 bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 {
@@ -5085,7 +5050,7 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	CPolar *pCurPlr    = pXDirect->m_pCurPolar;
 	if(!pOpp || !pCurPlr) return false;
-	QString strong;
+
 	double alpha, Re;
 
 	for(int i=0; i<m_pctrlOpPoint->count(); i++)
@@ -5433,7 +5398,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 
 		if (pMiarex->m_bVLM1)   ar << 1;
 		else                    ar << 0;
-//		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+
 		ar <<123;
 		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
 		else                                      ar << 0;
@@ -5623,7 +5588,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				return false;
 			}
 			if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
-			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
+//			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
 			pWPolar = pMiarex->AddWPolar(pWPolar);
 		}

@@ -810,6 +810,8 @@ void WPolarDlg::SetWPolarName()
 	if(m_AnalysisMethod==LLTMETHOD) m_WPolarName += "-LLT";
 	else if(m_AnalysisMethod==VLMMETHOD)
 	{
+		if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
+		else		         m_WPolarName += "-VLM2";
 	}
 	else if(m_AnalysisMethod==PANELMETHOD)
 	{
@@ -871,7 +873,7 @@ void WPolarDlg::SetReynolds()
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	GetSpeedUnit(strUnit, pMainFrame->m_SpeedUnit);
 
-	if (m_PolarType ==1)
+	if (m_PolarType ==FIXEDSPEEDPOLAR)
 	{
 		double RRe = m_pWing->m_TChord[0] * m_QInf/m_Viscosity;
 		ReynoldsFormat(str, RRe);
@@ -885,7 +887,7 @@ void WPolarDlg::SetReynolds()
 
 		m_pctrlQInfCl->setText(" ");
 	}
-	else if (m_PolarType ==2)
+	else if (m_PolarType ==FIXEDLIFTPOLAR)
 	{
 		double area;
 		if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
@@ -906,7 +908,7 @@ void WPolarDlg::SetReynolds()
 		strange = tr("Tip Re.sqrt(Cl) =");
 		m_pctrlSRe->setText(strange+str);
 	}
-	else if (m_PolarType ==4)
+	else if (m_PolarType ==FIXEDAOAPOLAR)
 	{
 		m_pctrlQInfCl->setText(" ");
 		m_pctrlRRe->setText(" ");

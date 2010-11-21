@@ -47,6 +47,7 @@ public:
 	bool Intersect(CVector const &A, CVector const &U, CVector &I, double &dist);
 	bool Invert33(double *l);
 	CVector GlobalToLocal(CVector const &V);
+	CVector GlobalToLocal(double const &Vx, double const &Vy, double const &Vz);
 	CVector LocalToGlobal(CVector const &V);
 	double GetWidth();
 

@@ -231,6 +231,7 @@ a(ei-fh) - b(di-fg) + c(dh-eg)      (dh-eg)   (bg-ah)   (ae-bd)*/
 	return true;
 }
 
+
 CVector CPanel::GlobalToLocal(CVector const &V)
 {
 	CVector L;
@@ -239,6 +240,17 @@ CVector CPanel::GlobalToLocal(CVector const &V)
 	L.z = lij[6]*V.x +lij[7]*V.y +lij[8]*V.z;
 	return L;
 }
+
+
+CVector CPanel::GlobalToLocal(double const &Vx, double const &Vy, double const &Vz)
+{
+	CVector L;
+	L.x = lij[0]*Vx +lij[1]*Vy +lij[2]*Vz;
+	L.y = lij[3]*Vx +lij[4]*Vy +lij[5]*Vz;
+	L.z = lij[6]*Vx +lij[7]*Vy +lij[8]*Vz;
+	return L;
+}
+
 
 CVector CPanel::LocalToGlobal(CVector const &V)
 {
@@ -379,8 +391,6 @@ void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
 	B.x = W.x + HA.x;
 	B.y = W.y + HA.y;
 	B.z = W.z + HA.z;
-
-
 }
 
 

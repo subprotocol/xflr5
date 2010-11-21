@@ -39,7 +39,7 @@
 
 //3D analysis parameters
 #define MAXPANELS          50 // max number of sections on a half wing
-#define MAXSTATIONS       200 // max number of stations for LLT or VLM analysis
+#define MAXSTATIONS       500 // max number of stations for LLT or VLM analysis
 #define MAXCHORDPANELS	  100
 #define VLMMAXMATSIZE    5000
 #define VLMHALF          2500

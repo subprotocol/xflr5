@@ -21,7 +21,10 @@ xflr5 v6.02 Beta November xxxth, 2010
 	- optimized the panel method for increased speed of execution
 	- corrected the mesh edition for NURBS bodies
 	- changed the export format for graphs
-	- implemented stability method for mixed panel/vlm method
+	- implemented the stability method for mixed panel/vlm method
+	- implemented the stability method for full 3D panel method
+	- corrected the bug which lead to incorrect results in 3D panel with Neumann B.C.
+	- corrected the error in the jump in potential at the wing's trailing edage in full 3d panel method
 	- set the estimation of inertia properties at the time of polar definition instead of evaluating at the time of analysis
 	- fixed the bug which could cause a crash when dragging a point in splines design
 	- corrected the asymetric transition location for symetric wings

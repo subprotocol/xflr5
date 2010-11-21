@@ -64,7 +64,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 	pa = A;
 	for (row = 0; row < (n - 1); row++, pa += n)
 	{
-		qApp->processEvents();
+//		qApp->processEvents();
 		if(*pbCancel) return false;
 		//  find the pivot row
 		A_pivot_row = pa;
@@ -118,7 +118,7 @@ bool Gauss(double *A, int n, double *B, int m, bool *pbCancel)
 	pa = A + (n - 1) * n;
 	for (row = n - 1; row >= 0; pa -= n, row--)
 	{
-		qApp->processEvents();
+//		qApp->processEvents();
 		if(*pbCancel) return false;
 
 		if ( *(pa + row) == 0.0 )

@@ -1072,7 +1072,8 @@ void  CFoil::SetLEFlapData(bool bFlap, double xhinge, double yhinge, double angl
 
 void CFoil::SetLEFlap()
 {
-	int i, j, k, l, p, i1, i2;//TODO : k used uninitialized
+	int i, j, k, l, p, i1, i2;
+	i=j=k=l=p=i1=i2=0;
 	double xh, yh, dx, dy;
 	CVector M;
 	bool bIntersect;

@@ -180,8 +180,6 @@ private:
 	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
-	bool SelectFoil(CFoil *pFoil);
-	bool SelectPolar(CPolar *pPolar);
 	bool SelectOpPoint(OpPoint *pOpp);
 
 	void AddFoil(CFoil *pFoil);

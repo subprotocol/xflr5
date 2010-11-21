@@ -77,15 +77,16 @@ private:
 
 	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	void ComputeOnBodyCp(double V0, double VDelta, int nval);
-	void ComputePlane(double Alpha, int qrhs);
+	void ComputePlane(double Alpha, double QInf, int qrhs);
 	void ComputeSurfSpeeds(double *Mu, double *Sigma);
 	void ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval);
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
 	void CreateSourceStrength(double Alpha0, double AlphaDelta, int nval);
-	void CreateRHS(double *RHS, CVector VInf, CVector Omega, double Angle);
+	void CreateRHS(double *RHS, CVector VInf, double *VField = NULL);
 	void CreateUnitRHS();
 	void CreateWakeContribution();
+	void CreateWakeContribution(double *pWakeContrib, CVector WindDirection);
 	void DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false);
 	void GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake=false, bool bAll=true);
 	void GetSourceInfluence(CVector const &C, CPanel *pPanel, CVector &V, double &phi);
@@ -101,7 +102,7 @@ private:
 	void WriteString(QString strong);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
 
-	void GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VTotl, double const &QInf, CVector &VInf);
+	void GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VTotl, double const &QInf, double Vx, double Vy, double Vz);
 	void GetVortexCp(const int &p, double *Gamma, double *Cp, CVector &VInf);
 
 	void ComputeStabilityDerivatives();
@@ -112,11 +113,10 @@ private:
 	void BuildRotationMatrix();
 	void BuildStateMatrices();
 	void ComputeControlDerivatives();
-	void SolveCtrlDer(double const & DeltaAngle, double *Xd, double *d, double *Zd, double *Ld, double *Md, double *Nd);
 	void ComputeResults();
 	void GetNDStabDerivatives(CWOpp *pNewPoint);
-	void Forces(double *Mu, double *Sigma, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace=false);
-	double ComputeCm(double Alpha);
+	void Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace=false);
+	double ComputeCm(double Alpha, bool bTrace=false);
 
 
 	static void *s_pMiarex;
@@ -130,7 +130,7 @@ private:
 	bool m_b3DSymetric;
 	bool m_bPointOut;
 	bool m_bConverged;
-	bool m_bDirichlet;// true if Dirichlet boundary conditions, false if Neumann
+//	bool m_bDirichlet;// true if Dirichlet boundary conditions, false if Neumann
 	bool m_bTrefftz;
 	bool m_bSequence;
 	bool m_bSkip, m_bExit, m_bCancel, m_bWarning;
@@ -168,7 +168,7 @@ private:
 	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
 	double ftmp, Omega, r1v, r2v;
 
-	double *m_aij, *m_aijRef;
+	double *m_aij, *m_aijWake;
 	double *m_RHS, *m_RHSRef;
 
 	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];			// Source strengths
@@ -180,6 +180,7 @@ private:
 	double m_uRHS[VLMMAXMATSIZE], m_vRHS[VLMMAXMATSIZE], m_wRHS[VLMMAXMATSIZE];
 	double m_pRHS[VLMMAXMATSIZE], m_qRHS[VLMMAXMATSIZE], m_rRHS[VLMMAXMATSIZE];
 	double m_cRHS[VLMMAXMATSIZE];
+	double m_uWake[VLMMAXMATSIZE], m_wWake[VLMMAXMATSIZE];
 
 	int m_Index[VLMMAXMATSIZE];
 

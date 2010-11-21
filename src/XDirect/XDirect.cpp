@@ -6109,7 +6109,6 @@ OpPoint * QXDirect::SetOpp(double Alpha)
 	}
 
 
-//	m_posAnimate = pFrame->m_pctrlOpp.GetCurSel(); //TODO
 	SetCurveParams();
 
 	return m_pCurOpp;

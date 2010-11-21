@@ -363,28 +363,6 @@ void ManageFoilsDlg::resizeEvent(QResizeEvent *event)
 }
 
 
-void ManageFoilsDlg::SelectFoil(CFoil* pFoil)
-{
-	int i;
-
-	if(pFoil)
-	{
-		QModelIndex ind;
-		QString FoilName;
-
-		for(i=0; i< m_pFoilModel->rowCount(); i++)
-		{
-			ind = m_pFoilModel->index(i, 0, QModelIndex());
-			FoilName = ind.model()->data(ind, Qt::EditRole).toString();
-
-			if(FoilName == pFoil->m_FoilName)
-			{
-				m_pctrlFoilTable->selectRow(i);
-				break;
-			}
-		}
-	}
-}
 
 
 

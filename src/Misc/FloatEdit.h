@@ -42,7 +42,6 @@ public:
 	void SetValue(double f);
 	void SetValueNoFormat(double f);
 	void SetPrecision(int i);
-	void SetFocusSelect(bool bFocusSelect);
 	
 private:
 	bool IsInBounds();
@@ -56,7 +55,6 @@ private:
 
 	QDoubleValidator *v;
 
-	bool m_bFocusSelect;
 	double m_Value;
 	int m_iPrecision;
 };

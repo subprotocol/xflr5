@@ -37,6 +37,7 @@ QWidget *FloatEditDelegate::createEditor(QWidget *parent, const QStyleOptionView
 		editor->SetPrecision(m_Precision[index.column()]);
 		double value = index.model()->data(index, Qt::EditRole).toDouble();
 		editor->SetValue(value);
+
 		return editor;
 	}
 	else

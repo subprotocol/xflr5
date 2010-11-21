@@ -8178,7 +8178,7 @@ void XFoil::splina(double x[], double xs[], double s[], int n)
 //      dimension x(n),xs(n),s(n)
 	bool lend;
 	double ds, dx, xs1, xs2;
-	xs1 = xs2 = 0.0;//TODO : xs1 and 2 used uninitialized
+	xs1 = xs2 = 0.0;
 //-------------------------------------------------------
 //     calculates spline coefficients for x(s).          |
 //     a simple averaging of adjacent segment slopes     |

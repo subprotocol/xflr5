@@ -27,7 +27,6 @@ FloatEdit::FloatEdit(QWidget *pParent)
 {
 	setParent(pParent);
 	m_Value = 0.0;
-	m_bFocusSelect = true;
 	m_iPrecision = 2;
 	v = new QDoubleValidator(this);
 	v->setRange(-1.e10, 1.e10, 1000);
@@ -83,15 +82,18 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 }
 
 
-void FloatEdit::focusInEvent ( QFocusEvent * event )
+void FloatEdit::focusInEvent(QFocusEvent * event)
 {
-	QString str;
+/*s	QString str;
 	str = QString("%1").arg(m_Value,'g');
 	str = str.trimmed();
-	int pos = str.indexOf('.');
-	int digits = str.length()-pos;
-//qDebug()<<str<<pos<<digits;
-	setText(str);
+	int ind = str.indexOf('.');
+	if(ind<0 || str.right(str.length()-ind-1).length() < 2)
+	{
+		FormatValue(m_Value, str);
+	}
+	setText(str);*/
+
 	QLineEdit::focusInEvent(event);
 }
 
@@ -102,6 +104,7 @@ double FloatEdit::ReadValue()
 	QString strange = text();
 	strange.replace(" ", "");
 	double f = strange.toDouble(&bOK);
+
 	if(bOK) return f;
 	else    return m_Value;
 }
@@ -128,13 +131,11 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Return:
 		{
 			double f = ReadValue();
-			if(IsInBounds())
-			{
-				m_Value = f;
-			}
+			if(IsInBounds()) m_Value = f;
+
 			FormatValue(m_Value, str);
 			setText(str);
-//			emit(editingFinished());
+
 			QLineEdit::keyPressEvent(event);
 
 			break;
@@ -149,23 +150,17 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 		default:
 		{
 			QLineEdit::keyPressEvent(event);
-			double f = ReadValue();
-			if(IsInBounds()) m_Value = f;
+//			double f = ReadValue();
+//			if(IsInBounds()) m_Value = f;
 			break;
 		}
     }
 }
 
 
-void FloatEdit::SetFocusSelect(bool bFocusSelect)
-{
-	m_bFocusSelect = bFocusSelect;
-}
-
-
 void FloatEdit::SetPrecision(int i)
 {
-    m_iPrecision = i;
+	m_iPrecision = i;
 }
 
 

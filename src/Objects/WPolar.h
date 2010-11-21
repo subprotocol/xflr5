@@ -87,6 +87,7 @@ private:
 	bool m_bThinSurfaces;
 	bool m_bGround;
 	bool m_bWakeRollUp;
+	bool m_bDirichlet;
 	bool m_bTiltedGeom;
 	bool m_bViscous;
 

@@ -59,7 +59,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pMainFrame  = NULL;
 	m_pXFile      = NULL;
 	m_pPanelDlg   = NULL;
-//	m_pVLMDlg     = NULL;
 	m_pLLTDlg     = NULL;
 	m_pCurPlane   = NULL;
 	m_pCurWing    = NULL;
@@ -71,8 +70,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pCurWPolar  = NULL;
 	m_pCurWOpp    = NULL;
 	m_pCurGraph   = &m_WingGraph1;
-
-	QRect r(100,100, 700, 600);
 
 	m_NSurfaces =   0;
 	m_NStation  =  20;
@@ -103,6 +100,7 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_bHighlightOpp = false;
 
+	m_bDirichlet = true;
 	
 	m_nWakeNodes = 0;
 	m_WakeSize   = 0;
@@ -492,7 +490,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bXPressed = m_bYPressed = false;
 
 	m_bVLM1              = true;
-	m_bDirichlet         = true;
 	m_bTrefftz           = true;
 
 	m_b3DCp              = false;
@@ -596,7 +593,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pPanelDlg->m_pRefWakeNode  = m_RefWakeNode;
 	m_pPanelDlg->m_pRefWakePanel = m_RefWakePanel;
 	m_pPanelDlg->m_aij           = m_aij;
-	m_pPanelDlg->m_aijRef        = m_aijRef;
+	m_pPanelDlg->m_aijWake       = m_aijRef;
 	m_pPanelDlg->m_RHS           = m_RHS;
 	m_pPanelDlg->m_RHSRef        = m_RHSRef;
 	m_pPanelDlg->m_pCoreSize     = &m_CoreSize;
@@ -613,9 +610,9 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlLift->setChecked(m_bXCP);
 
-	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+/*	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
-	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));*/
 
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
 	connect(m_pctrlStoreWOpp, SIGNAL(clicked()), this, SLOT(OnStoreWOpp()));
@@ -1752,6 +1749,224 @@ void QMiarex::ClientToGL(QPoint const &point, CVector &real)
 }
 
 
+void QMiarex::CreateCpCurves()
+{
+	//
+	// Creates the curves of the Cp graph at the selected span positions
+	//
+	//
+	int p,pp,i;
+	bool bFound;
+	double SpanPos, SpanInc;
+
+	CVector N;
+	CCurve *pCurve = NULL;
+	QString str1, str2, str3;
+
+	for (i=0; i<4; i++)
+	{
+		// the first four curves are necessarily the current opPoint's main wing, second wing, elevator and fin
+		// the next are those the user has chosen to keep for display --> don't reset them
+		pCurve = m_CpGraph.GetCurve(i);
+		if(pCurve) pCurve->ResetCurve();
+	}
+
+	if(!m_pCurWOpp || !m_bShowCp)
+	{
+		return;
+	}
+
+	int coef = 2;
+	bool b2Sides = true;
+	if(m_pCurWPolar->m_bThinSurfaces)
+	{
+		b2Sides = false;
+		coef = 1;
+	}
+
+	m_CurSpanPos = qMax(-1.0, m_CurSpanPos);
+	m_CurSpanPos = qMin( 1.0, m_CurSpanPos);
+	SpanPos = m_CurSpanPos*m_pCurWOpp->m_Span/2.000001;
+
+	str1 = m_pCurWing->m_WingName;
+	str2 = QString(" a=%1").arg(m_pCurWOpp->m_Alpha,5,'f',2);
+	str3 = QString(" x/c=%1").arg(m_CurSpanPos,5,'f',2);
+
+//	if(m_bCurWOppOnly)
+	{
+		p=0;
+		bFound = false;
+		if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
+
+		SpanInc = -m_pCurWing->m_PlanformSpan/2.0;
+		for (p=0; p<m_pCurWing->m_MatSize; p++)
+		{
+			if(m_pCurWing->m_pPanel[p].m_bIsTrailing && m_pCurWing->m_pPanel[p].m_iPos<=0)
+			{
+				SpanInc += m_pCurWing->m_pPanel[p].GetWidth();
+				if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing->m_PlanformSpan<0.001)
+				{
+					bFound = true;
+					break;
+				}
+			}
+		}
+
+/*		for (p=0; p<m_pCurWing->m_MatSize; p++)
+		{
+			iTA = m_pCurWing->m_pPanel[p].m_iTA;
+			iTB = m_pCurWing->m_pPanel[p].m_iTB;
+
+			if(m_Node[iTA].y<=SpanPos && SpanPos<=m_Node[iTB].y)
+			{
+				bFound = true;
+				break;
+			}
+		}*/
+
+		if(bFound)
+		{
+			pCurve = m_CpGraph.GetCurve(0);
+			if(m_pCurPOpp)
+			{
+				pCurve->SetColor(m_pCurPOpp->m_Color);
+				pCurve->SetStyle(m_pCurPOpp->m_Style);
+				pCurve->SetWidth(m_pCurPOpp->m_Width);
+				pCurve->ShowPoints(m_pCurPOpp->m_bShowPoints);
+			}
+			else
+			{
+				pCurve->SetColor(m_pCurWOpp->m_Color);
+				pCurve->SetStyle(m_pCurWOpp->m_Style);
+				pCurve->SetWidth(m_pCurWOpp->m_Width);
+				pCurve->ShowPoints(m_pCurWOpp->m_bShowPoints);
+			}
+			pCurve->SetColor(m_CpColor);
+			pCurve->SetStyle(m_CpStyle);
+			pCurve->SetWidth(m_CpWidth);
+			pCurve->ShowPoints(m_bShowCpPoints);
+
+			pCurve->SetTitle(str1+str2+str3);
+			for (pp=p; pp<p+coef*m_pCurWing->m_Surface[0].m_NXPanels; pp++)
+			{
+				pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurWOpp->m_Cp[pp]);
+			}
+		}
+
+		if(m_pCurWing2 && m_bShowWing2)
+		{
+			p=0;
+			bFound = false;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
+
+			SpanInc = -m_pCurWing2->m_PlanformSpan/2.0;
+			for (p=0; p<m_pCurWing2->m_MatSize; p++)
+			{
+				if(m_pCurWing2->m_pPanel[p].m_bIsTrailing && m_pCurWing2->m_pPanel[p].m_iPos<=0)
+				{
+					SpanInc += m_pCurWing2->m_pPanel[p].GetWidth();
+					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing2->m_PlanformSpan<0.001)
+					{
+						bFound = true;
+						break;
+					}
+				}
+			}
+
+			if(bFound)
+			{
+				pCurve = m_CpGraph.GetCurve(1);
+				pCurve->SetColor(m_CpColor);
+				pCurve->SetStyle(m_CpStyle);
+				pCurve->SetWidth(m_CpWidth);
+				pCurve->ShowPoints(m_bShowCpPoints);
+				pCurve->SetTitle(tr("Wing2_")+str2+str3);
+
+				for (pp=p; pp<p+coef*m_pCurWing2->m_Surface[0].m_NXPanels; pp++)
+				{
+					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_Wing2WOpp.m_Cp[pp]);
+				}
+			}
+		}
+
+		if(m_pCurStab && m_bShowStab)
+		{
+			p=0;
+			bFound = false;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
+
+			SpanInc = -m_pCurStab->m_PlanformSpan/2.0;
+			for (p=0; p<m_pCurStab->m_MatSize; p++)
+			{
+				if(m_pCurStab->m_pPanel[p].m_bIsTrailing && m_pCurStab->m_pPanel[p].m_iPos<=0)
+				{
+					SpanInc += m_pCurStab->m_pPanel[p].GetWidth();
+					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurStab->m_PlanformSpan<0.001)
+					{
+						bFound = true;
+						break;
+					}
+				}
+			}
+
+
+			if(bFound)
+			{
+				pCurve = m_CpGraph.GetCurve(2);
+				pCurve->SetColor(m_CpColor);
+				pCurve->SetStyle(m_CpStyle);
+				pCurve->SetWidth(m_CpWidth);
+				pCurve->ShowPoints(m_bShowCpPoints);
+				pCurve->SetTitle(tr("Elevator_")+str2+str3);
+
+				for (pp=p; pp<p+coef*m_pCurStab->m_Surface[0].m_NXPanels; pp++)
+				{
+					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_StabWOpp.m_Cp[pp]);
+				}
+			}
+
+		}
+		if(m_pCurFin && m_bShowFin)
+		{
+			p=0;
+			bFound = false;
+			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
+
+			SpanInc = -m_pCurFin->m_PlanformSpan/2.0;
+			for (p=0; p<m_pCurFin->m_MatSize; p++)
+			{
+				if(m_pCurFin->m_pPanel[p].m_bIsTrailing && m_pCurFin->m_pPanel[p].m_iPos<=0)
+				{
+					SpanInc += m_pCurFin->m_pPanel[p].GetWidth();
+					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurFin->m_PlanformSpan<0.001)
+					{
+						bFound = true;
+						break;
+					}
+				}
+			}
+
+
+
+			if(bFound)
+			{
+				pCurve = m_CpGraph.GetCurve(3);
+				pCurve->SetColor(m_CpColor);
+				pCurve->SetStyle(m_CpStyle);
+				pCurve->SetWidth(m_CpWidth);
+				pCurve->ShowPoints(m_bShowCpPoints);
+				pCurve->SetTitle(tr("Fin_")+str2+str3);
+
+				for (pp=p; pp<p+coef*m_pCurFin->m_Surface[0].m_NXPanels; pp++)
+				{
+					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_FinWOpp.m_Cp[pp]);
+				}
+			}
+		}
+	}
+}
+
+
 
 int QMiarex::CreateBodyElements()
 {
@@ -2116,224 +2331,6 @@ int QMiarex::CreateBodyElements()
 	}
 	m_pCurBody->m_NElements = m_MatSize-InitialSize;
 	return m_pCurBody->m_NElements;
-}
-
-
-void QMiarex::CreateCpCurves()
-{
-	//
-	// Creates the curves of the Cp graph at the selected span positions
-	//
-	//
-	int p,pp,i;
-	bool bFound;
-	double SpanPos, SpanInc;
-
-	CVector N;
-	CCurve *pCurve = NULL;
-	QString str1, str2, str3;
-
-	for (i=0; i<4; i++)
-	{
-		// the first four curves are necessarily the current opPoint's main wing, second wing, elevator and fin
-		// the next are those the user has chosen to keep for display --> don't reset them
-		pCurve = m_CpGraph.GetCurve(i);
-		if(pCurve) pCurve->ResetCurve();
-	}
-
-	if(!m_pCurWOpp || !m_bShowCp)
-	{
-		return;
-	}
-
-	int coef = 2;
-	bool b2Sides = true;
-	if(m_pCurWPolar->m_bThinSurfaces)
-	{
-		b2Sides = false;
-		coef = 1;
-	}
-
-	m_CurSpanPos = qMax(-1.0, m_CurSpanPos);
-	m_CurSpanPos = qMin( 1.0, m_CurSpanPos);
-	SpanPos = m_CurSpanPos*m_pCurWOpp->m_Span/2.000001;
-
-	str1 = m_pCurWing->m_WingName;
-	str2 = QString(" a=%1").arg(m_pCurWOpp->m_Alpha,5,'f',2);
-	str3 = QString(" x/c=%1").arg(m_CurSpanPos,5,'f',2);
-
-//	if(m_bCurWOppOnly)
-	{
-		p=0;
-		bFound = false;
-		if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing->m_Surface[0].m_NXPanels;
-
-		SpanInc = -m_pCurWing->m_PlanformSpan/2.0;
-		for (p=0; p<m_pCurWing->m_MatSize; p++)
-		{
-			if(m_pCurWing->m_pPanel[p].m_bIsTrailing && m_pCurWing->m_pPanel[p].m_iPos<=0)
-			{
-				SpanInc += m_pCurWing->m_pPanel[p].GetWidth();
-				if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing->m_PlanformSpan<0.001)
-				{
-					bFound = true;
-					break;
-				}
-			}
-		}
-
-/*		for (p=0; p<m_pCurWing->m_MatSize; p++)
-		{
-			iTA = m_pCurWing->m_pPanel[p].m_iTA;
-			iTB = m_pCurWing->m_pPanel[p].m_iTB;
-
-			if(m_Node[iTA].y<=SpanPos && SpanPos<=m_Node[iTB].y)
-			{
-				bFound = true;
-				break;
-			}
-		}*/
-
-		if(bFound)
-		{
-			pCurve = m_CpGraph.GetCurve(0);
-			if(m_pCurPOpp)
-			{
-				pCurve->SetColor(m_pCurPOpp->m_Color);
-				pCurve->SetStyle(m_pCurPOpp->m_Style);
-				pCurve->SetWidth(m_pCurPOpp->m_Width);
-				pCurve->ShowPoints(m_pCurPOpp->m_bShowPoints);
-			}
-			else
-			{
-				pCurve->SetColor(m_pCurWOpp->m_Color);
-				pCurve->SetStyle(m_pCurWOpp->m_Style);
-				pCurve->SetWidth(m_pCurWOpp->m_Width);
-				pCurve->ShowPoints(m_pCurWOpp->m_bShowPoints);
-			}
-			pCurve->SetColor(m_CpColor);
-			pCurve->SetStyle(m_CpStyle);
-			pCurve->SetWidth(m_CpWidth);
-			pCurve->ShowPoints(m_bShowCpPoints);
-
-			pCurve->SetTitle(str1+str2+str3);
-			for (pp=p; pp<p+coef*m_pCurWing->m_Surface[0].m_NXPanels; pp++)
-			{
-				pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurWOpp->m_Cp[pp]);
-			}
-		}
-
-		if(m_pCurWing2 && m_bShowWing2)
-		{
-			p=0;
-			bFound = false;
-			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurWing2->m_Surface[0].m_NXPanels;
-
-			SpanInc = -m_pCurWing2->m_PlanformSpan/2.0;
-			for (p=0; p<m_pCurWing2->m_MatSize; p++)
-			{
-				if(m_pCurWing2->m_pPanel[p].m_bIsTrailing && m_pCurWing2->m_pPanel[p].m_iPos<=0)
-				{
-					SpanInc += m_pCurWing2->m_pPanel[p].GetWidth();
-					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing2->m_PlanformSpan<0.001)
-					{
-						bFound = true;
-						break;
-					}
-				}
-			}
-
-			if(bFound)
-			{
-				pCurve = m_CpGraph.GetCurve(1);
-				pCurve->SetColor(m_CpColor);
-				pCurve->SetStyle(m_CpStyle);
-				pCurve->SetWidth(m_CpWidth);
-				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle(tr("Wing2_")+str2+str3);
-
-				for (pp=p; pp<p+coef*m_pCurWing2->m_Surface[0].m_NXPanels; pp++)
-				{
-					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_Wing2WOpp.m_Cp[pp]);
-				}
-			}
-		}
-
-		if(m_pCurStab && m_bShowStab)
-		{
-			p=0;
-			bFound = false;
-			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurStab->m_Surface[0].m_NXPanels;
-
-			SpanInc = -m_pCurStab->m_PlanformSpan/2.0;
-			for (p=0; p<m_pCurStab->m_MatSize; p++)
-			{
-				if(m_pCurStab->m_pPanel[p].m_bIsTrailing && m_pCurStab->m_pPanel[p].m_iPos<=0)
-				{
-					SpanInc += m_pCurStab->m_pPanel[p].GetWidth();
-					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurStab->m_PlanformSpan<0.001)
-					{
-						bFound = true;
-						break;
-					}
-				}
-			}
-
-
-			if(bFound)
-			{
-				pCurve = m_CpGraph.GetCurve(2);
-				pCurve->SetColor(m_CpColor);
-				pCurve->SetStyle(m_CpStyle);
-				pCurve->SetWidth(m_CpWidth);
-				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle(tr("Elevator_")+str2+str3);
-
-				for (pp=p; pp<p+coef*m_pCurStab->m_Surface[0].m_NXPanels; pp++)
-				{
-					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_StabWOpp.m_Cp[pp]);
-				}
-			}
-
-		}
-		if(m_pCurFin && m_bShowFin)
-		{
-			p=0;
-			bFound = false;
-			if(m_pCurWPolar->m_bThinSurfaces) p+=m_pCurFin->m_Surface[0].m_NXPanels;
-
-			SpanInc = -m_pCurFin->m_PlanformSpan/2.0;
-			for (p=0; p<m_pCurFin->m_MatSize; p++)
-			{
-				if(m_pCurFin->m_pPanel[p].m_bIsTrailing && m_pCurFin->m_pPanel[p].m_iPos<=0)
-				{
-					SpanInc += m_pCurFin->m_pPanel[p].GetWidth();
-					if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurFin->m_PlanformSpan<0.001)
-					{
-						bFound = true;
-						break;
-					}
-				}
-			}
-
-
-
-			if(bFound)
-			{
-				pCurve = m_CpGraph.GetCurve(3);
-				pCurve->SetColor(m_CpColor);
-				pCurve->SetStyle(m_CpStyle);
-				pCurve->SetWidth(m_CpWidth);
-				pCurve->ShowPoints(m_bShowCpPoints);
-				pCurve->SetTitle(tr("Fin_")+str2+str3);
-
-				for (pp=p; pp<p+coef*m_pCurFin->m_Surface[0].m_NXPanels; pp++)
-				{
-					pCurve->AddPoint(m_Panel[pp].CollPt.x, m_pCurPOpp->m_FinWOpp.m_Cp[pp]);
-				}
-			}
-		}
-	}
 }
 
 
@@ -7108,7 +7105,7 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	m_pLLTDlg->m_pWPolar    = m_pCurWPolar;
 	m_pLLTDlg->m_bSequence  = bSequence;
 
-	m_pLLTDlg->m_AlphaMin      = V0;
+	m_pLLTDlg->m_AlphaMin   = V0;
 	m_pLLTDlg->m_AlphaMax   = VMax;
 	m_pLLTDlg->m_AlphaDelta = VDelta;
 
@@ -8118,7 +8115,7 @@ void QMiarex::OnAnalyze()
 	bool bHigh = m_bHighlightOpp;
 	m_bHighlightOpp = false;
 
-		if(!m_pCurWing)
+	if(!m_pCurWing)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Please define a wing or a plane object before running a calculation"));
 		return;
@@ -8133,8 +8130,8 @@ void QMiarex::OnAnalyze()
 	m_pctrlStream->setChecked(false);
 	m_pctrlSurfVel->setChecked(false);
 
-//	Read Analysis Params;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	ReadAnalysisData();
 
 	if(m_pCurWPolar->m_Type <4)
 	{
@@ -8753,15 +8750,17 @@ void QMiarex::OnDefineStabPolar()
 			pCurWPolar->m_WSpan        = m_pCurWing->m_ProjectedSpan;
 		}
 		pCurWPolar->m_bVLM1           = m_bVLM1;
+		pCurWPolar->m_bDirichlet      = m_bDirichlet;
 		pCurWPolar->m_bTiltedGeom     = false;
 		pCurWPolar->m_bWakeRollUp     = false;
 		pCurWPolar->m_AnalysisMethod  = PANELMETHOD;
 		pCurWPolar->m_bGround         = false;
 		pCurWPolar->m_ASpec           = 0.0;
 		pCurWPolar->m_Height          = 0.0;
-		pCurWPolar->m_TotalWakeLength = 10.0;
-		pCurWPolar->m_WakePanelFactor = 1.1;
-		pCurWPolar->m_NXWakePanels    = 1;
+
+		pCurWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
+		pCurWPolar->m_WakePanelFactor = m_WngAnalysis.m_WakePanelFactor;
+		pCurWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
 
 		pCurWPolar->m_nControls = m_StabPolarDlg.m_nControls;
 		for(int i=0; i<m_StabPolarDlg.m_nControls; i++)
@@ -8892,6 +8891,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_NXWakePanels    = m_WngAnalysis.m_NXWakePanels;
 
 		pNewWPolar->m_bVLM1           = m_bVLM1;
+		pNewWPolar->m_bDirichlet      = m_bDirichlet;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		CWPolar *pWPolar;
@@ -10831,7 +10831,7 @@ void QMiarex::OnPanels()
 }
 
 
-void QMiarex::OnReadAnalysisData()
+void QMiarex::ReadAnalysisData()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -10843,6 +10843,7 @@ void QMiarex::OnReadAnalysisData()
 		m_AlphaMin   = m_pctrlAlphaMin->GetValue();
 		m_AlphaMax   = m_pctrlAlphaMax->GetValue();
 		m_AlphaDelta = fabs(m_pctrlAlphaDelta->GetValue());
+
 		if(fabs(m_AlphaDelta)<0.01)
 		{
 			m_AlphaDelta = 0.01;
@@ -11110,11 +11111,40 @@ void QMiarex::OnResetCurWPolar()
 												  QMessageBox::Cancel)) return;
 
 	m_pCurWPolar->ResetWPlr();
+	CPOpp *pPOpp;
+	CWOpp *pWOpp;
+	if(m_pCurWing)
+	{
+		for(int i=m_poaWOpp->size()-1; i>=0; --i)
+		{
+			pWOpp = (CWOpp*) m_poaWOpp->at(i);
+			if(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName && pWOpp->m_WingName==m_pCurWing->m_WingName)
+			{
+				m_poaWOpp->removeAt(i);
+				delete pWOpp;
+			}
+		}
+	}
+	if(m_pCurPlane)
+	{
+		for(int i=m_poaPOpp->size()-1; i>=0; --i)
+		{
+			pPOpp = (CPOpp*) m_poaPOpp->at(i);
+			if(pPOpp->m_PlrName==m_pCurWPolar->m_PlrName && pPOpp->m_PlaneName==m_pCurPlane->m_PlaneName)
+			{
+				m_poaPOpp->removeAt(i);
+				delete pPOpp;
+			}
+		}
+	}
+	pMainFrame->UpdateWOpps();
+	m_pCurWOpp = NULL;
+	m_pCurPOpp = NULL;
 
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-	else if(m_iView==WOPPVIEW)	CreateWOppCurves();
-	else if(m_iView==WCPVIEW)	CreateCpCurves();
+	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
+	else if(m_iView==WOPPVIEW)  CreateWOppCurves();
+	else if(m_iView==WCPVIEW)   CreateCpCurves();
 
 	pMainFrame->SetSaveState(false);
 	UpdateView();
@@ -12772,7 +12802,6 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_pBody          = m_pCurBody;
 	m_pPanelDlg->m_MatSize        = m_MatSize;
 	m_pPanelDlg->m_NWakeColumn    = m_NWakeColumn;
-	m_pPanelDlg->m_bDirichlet     = m_bDirichlet;
 
 	if(m_pCurWPolar->m_Type==4)
 	{
@@ -13054,7 +13083,6 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("StoreWOpp", m_bStoreWOpp );
 		pSettings->setValue("Sequence", m_bSequence );
 		pSettings->setValue("HighlightOpp", m_bHighlightOpp);
-
 		pSettings->setValue("AlphaMin", m_AlphaMin);
 		pSettings->setValue("AlphaMax", m_AlphaMax);
 		pSettings->setValue("AlphaDelta", m_AlphaDelta);

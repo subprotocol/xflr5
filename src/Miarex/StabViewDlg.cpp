@@ -745,7 +745,7 @@ void StabViewDlg::SetupLayout()
 	}
 
 	//_______________________Root Locus View and 3D animation Parameters
-	QGroupBox *ModeBox = new QGroupBox(tr("Mode View"));
+	QGroupBox *ModeBox = new QGroupBox(tr("Operating point modes"));
 	{
 		QVBoxLayout *RLLayout = new QVBoxLayout;
 		QHBoxLayout *RLModeLayout = new QHBoxLayout;

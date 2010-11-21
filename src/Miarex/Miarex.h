@@ -97,7 +97,6 @@ private slots:
 	void OnAllWingGraphSettings();
 	void OnAllWPolarGraphSettings();
 	void OnResetWingGraphScale();
-	void OnReadAnalysisData();
 	void On3DPrefs();
 	void OnShowEllipticCurve();
 	void OnWing2Curve();
@@ -261,6 +260,7 @@ private:
 	void SetUFO(QString UFOName="");
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
+	void ReadAnalysisData();
 	void SnapClient(QString const &FileName);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);

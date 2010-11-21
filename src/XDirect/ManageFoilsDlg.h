@@ -57,7 +57,6 @@ private:
 	void FillTableRow(int row);
 
 	void SetupLayout();
-	void SelectFoil(CFoil* pFoil = NULL);
 
 private:
 	QPushButton *CloseButton;

@@ -25,7 +25,7 @@
 #include "../MainFrame.h"
 #include <math.h>
 #include <QMessageBox>
-
+#include <QtDebug>
 
 void *CWPolar::s_pMainFrame;
 
@@ -41,6 +41,7 @@ CWPolar::CWPolar()
 	m_bViscous      = true;
 //	m_bPolar        = true;
 	m_bGround       = false;
+	m_bDirichlet    = true;
 
 	m_NXWakePanels = 1;
 	m_TotalWakeLength = 1.0;
@@ -1281,7 +1282,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if (m_bVLM1)         ar << 1; else ar << 0;
 		if (m_bThinSurfaces) ar << 1; else ar << 0;
 		if (m_bTiltedGeom)   ar << 1; else ar << 0;
-		if (m_bWakeRollUp)   ar << 1; else ar << 0;
+		if (m_bDirichlet)    ar << 0; else ar << 1;
 		if (m_bViscous)      ar << 1; else ar << 0;
 		if (m_bGround)       ar << 1; else ar << 0;
 		ar << (float)m_Height;
@@ -1398,7 +1399,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
-
 			if(n) m_bTiltedGeom =true; else m_bTiltedGeom = false;
 		}
 
@@ -1406,14 +1406,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
-
-			if(n) m_bWakeRollUp =true; else m_bWakeRollUp = false;
+			if(n) m_bDirichlet = false; else m_bDirichlet = true;
 		}
 		if(ArchiveFormat>=1009)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
-
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
 
@@ -1661,6 +1659,25 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
+	if(m_Beta>PRECISION)
+	{
+		strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
+		PolarProperties += strong +QString::fromUtf8("°")+"\n";
+	}
+
+	PolarProperties += QObject::tr("Method")+" = ";
+	if(m_AnalysisMethod==LLTMETHOD)                              PolarProperties +=QObject::tr("LLT");
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurfaces)   PolarProperties +=QObject::tr("3D-Panels");
+	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)            PolarProperties +=QObject::tr("3D-Panels/VLM1");
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)           PolarProperties +=QObject::tr("3D-Panels/VLM2");
+	PolarProperties +="\n";
+
+	if(m_AnalysisMethod !=LLTMETHOD)
+	{
+		if(m_bDirichlet)  strong  = QObject::tr("Boundary conditions = Dirichlet");
+		else              strong  = QObject::tr("Boundary conditions = Neumann");
+		PolarProperties += strong +"\n";
+	}
 	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
 	PolarProperties += strong + massunit + "\n";
 
@@ -1670,24 +1687,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
-	strong  = QString("Ixx = %1 ").arg(m_CoGIxx*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
-	PolarProperties += strong + inertiaunit + "\n";
-	strong  = QString("Iyy = %1 ").arg(m_CoGIyy*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
-	PolarProperties += strong + inertiaunit + "\n";
-	strong  = QString("Izz = %1 ").arg(m_CoGIzz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
-	PolarProperties += strong + inertiaunit + "\n";
-	strong  = QString("Ixz = %1 ").arg(m_CoGIxz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
-	PolarProperties += strong + inertiaunit + "\n";
+	if(m_Type==STABILITYPOLAR)
+	{
+		strong  = QString("Ixx = %1 ").arg(m_CoGIxx*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		PolarProperties += strong + inertiaunit + "\n";
+		strong  = QString("Iyy = %1 ").arg(m_CoGIyy*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		PolarProperties += strong + inertiaunit + "\n";
+		strong  = QString("Izz = %1 ").arg(m_CoGIzz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		PolarProperties += strong + inertiaunit + "\n";
+		strong  = QString("Ixz = %1 ").arg(m_CoGIxz*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
+		PolarProperties += strong + inertiaunit + "\n";
+	}
 
-	strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
-	PolarProperties += strong +QString::fromUtf8("°")+"\n";
-
-	PolarProperties += QObject::tr("Analysis method")+" = ";
-	if(m_AnalysisMethod==LLTMETHOD)                              PolarProperties +="LLT\n";
-	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurfaces)   PolarProperties +="3D-Panels\n";
-	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)            PolarProperties +="3D-Panels/VLM1\n";
-	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)           PolarProperties +="3D-Panels/VLM2\n";
-	else                                                         PolarProperties +="\n";
 
 	PolarProperties += QObject::tr("Analysis type")+" = ";
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";

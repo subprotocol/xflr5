@@ -1917,6 +1917,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 
 				StripForce  = m_pPanel[p].Vortex * Wg;
 				StripForce *= GammaStrip[m] * s_Density / q;  // N/q
+
 				//____________________________
 				// Project on wind axes
 				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
@@ -1968,6 +1969,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 
 			// Calculate resulting vector force
 			Force     += StripForce;                            // N/q
+//qDebug("%3d  %11.7f   %11.7f   %11.7f   %11.7f   %11.7f   %11.7f   %11.7f   ",p, Force.x, Force.y, Force.z);
 			m_F[m]     = StripForce * q;	                    // Newtons
 			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
 
@@ -2603,8 +2605,6 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	//    moment coefficients GCm, VCm, ICm, GRm, GYm, VYm, IYm
 	//
 
-//	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-//	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
 
 	int  j, k, l, p, m, nFlap, coef;
 	double CPStrip, tau, NForce, cosa, sina;
@@ -2740,6 +2740,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 		if(!pWPolar->m_bThinSurfaces && m_Surface[j].m_bIsTipRight) p += m_Surface[j].m_NXPanels;
 		if(m_Surface[j].m_bTEFlap) nFlap++;
 	}
+//qDebug("Moment_w  = %11.7f   %11.7g   %11.7f     Cm=%13.7g\n", GeomMoment.x, GeomMoment.y, GeomMoment.z, GeomMoment.y*2.0/QInf/QInf);
 
 	//global plane dimensionless coefficients
 	GCm += m_VCm + m_ICm;
