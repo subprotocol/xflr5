@@ -84,7 +84,7 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 
 void FloatEdit::focusInEvent(QFocusEvent * event)
 {
-/*s	QString str;
+/*	QString str;
 	str = QString("%1").arg(m_Value,'g');
 	str = str.trimmed();
 	int ind = str.indexOf('.');
@@ -127,7 +127,7 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 {
 	QString str;
 	switch (event->key())
-    {
+	{
 		case Qt::Key_Return:
 		{
 			double f = ReadValue();
@@ -150,11 +150,11 @@ void FloatEdit::keyPressEvent(QKeyEvent *event)
 		default:
 		{
 			QLineEdit::keyPressEvent(event);
-//			double f = ReadValue();
-//			if(IsInBounds()) m_Value = f;
+			double f = ReadValue();
+			if(IsInBounds()) m_Value = f;
 			break;
 		}
-    }
+	}
 }
 
 

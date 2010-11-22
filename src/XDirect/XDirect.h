@@ -93,6 +93,7 @@ private slots:
 	void OnExportCurFoil();
 	void OnExportCurOpp();
 	void OnExportCurPolar();
+	void OnExportAllPolars();
 	void OnHideAllOpps();
 	void OnHideAllPolars();
 	void OnHideFoilPolars();

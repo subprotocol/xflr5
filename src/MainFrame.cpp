@@ -1938,6 +1938,9 @@ void MainFrame::CreateXDirectActions()
 	exportCurPolar = new QAction(tr("Export"), this);
 	connect(exportCurPolar, SIGNAL(triggered()), pXDirect, SLOT(OnExportCurPolar()));
 
+	exportAllPolars = new QAction(tr("Export all polars"), this);
+	connect(exportAllPolars, SIGNAL(triggered()), pXDirect, SLOT(OnExportAllPolars()));
+
 	XDirectStyleAct = new QAction(tr("Define Styles"), this);
 	XDirectStyleAct->setStatusTip(tr("Define the style for the boundary layer and the pressure arrows"));
 	connect(XDirectStyleAct, SIGNAL(triggered()), pXDirect, SLOT(OnXDirectStyle()));
@@ -2148,6 +2151,7 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu = menuBar()->addMenu(tr("&Polars"));
 	PolarMenu->addAction(definePolar);
 	PolarMenu->addAction(defineBatch);
+	PolarMenu->addAction(exportAllPolars);
 	PolarMenu->addSeparator();
 	currentPolarMenu = PolarMenu->addMenu(tr("Current Polar"));
 	currentPolarMenu->addAction(ShowPolarProps);

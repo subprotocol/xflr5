@@ -234,7 +234,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 	}
 	if (m_bCancel) return true;
 
-
 	CreateSourceStrength(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
 
@@ -1278,7 +1277,6 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 					VLocal += m_uVl[p]*cosa*m_3DQInf[q] + m_wVl[p]*sina*m_3DQInf[q];
 					Speed2 = VLocal.x*VLocal.x + VLocal.y*VLocal.y;
 					Cp[p]  = 1.0-Speed2/m_3DQInf[q]/m_3DQInf[q];
- //qDebug("%11.7g  %11.7g  %11.7g ", Cp[p], VInf.x, VInf.z);
 				}
 				else GetVortexCp(p, Mu, Cp, Qp);
 
@@ -3561,7 +3559,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 
 	static bool bOutRe, bError, bOut, bOutCl;
 	static int j, k, l, p, pp, m, nw, iTA, iTB;
-	static double cosa, sina, Re, PCd, Cl, tau, StripArea, ViscousDrag;
+	static double cosa, sina, Re, PCd, Cl, Cp, tau, StripArea, ViscousDrag;
 	static double QInf, QInfStrip, qdyn, GammaStrip;
 	static CVector  C, PtC4, LeverArm, WindDirection, WindNormal, PanelLeverArm, Wg;
 	static CVector Velocity, StripForce, ViscousMoment, dF, PanelForce, PanelForcep1;
@@ -3694,7 +3692,6 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 		}
 	}
 
-	double  Speed2, Cp;
 	CVector VLocal;
 	if(!m_pWPolar->m_bThinSurfaces)
 	{

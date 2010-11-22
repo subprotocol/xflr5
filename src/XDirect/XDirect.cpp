@@ -2878,6 +2878,35 @@ void QXDirect::OnExportCurXFoilResults()
 
 
 
+void QXDirect::OnExportAllPolars()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString FileName, DirName;
+	QFile XFile;
+	QTextStream out(&XFile);
+
+	//select the directory for output
+	DirName = QFileDialog::getExistingDirectory(this,  tr("Export Directory"), pMainFrame->m_LastDirName);
+
+	CPolar *pPolar;
+	for(int l=0; l<m_poaPolar->size(); l++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(l);
+		FileName = DirName + "/" + pPolar->m_FoilName + "_" + pPolar->m_PlrName;
+		if(pMainFrame->m_ExportFileType==1) FileName += ".txt";
+		else                                FileName += ".csv";
+
+		XFile.setFileName(FileName);
+		if (XFile.open(QIODevice::WriteOnly | QIODevice::Text))
+		{
+			pPolar->ExportPolar(out, pMainFrame->m_ExportFileType);
+			XFile.close();
+		}
+	}
+}
+
+
+
 void QXDirect::OnExportCurFoil()
 {
 	if(!g_pCurFoil)	return;

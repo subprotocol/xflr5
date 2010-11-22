@@ -314,7 +314,7 @@ private:
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch, *resetCurPolar;
 	QAction *restoreToolbarsAct;
-	QAction *exportCurPolar, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
+	QAction *exportCurPolar, *exportAllPolars, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
 	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;
 	QAction *hideFoilOpps, *showFoilOpps, *deleteFoilOpps;
 	QAction *hidePolarOpps, *showPolarOpps, *deletePolarOpps;
