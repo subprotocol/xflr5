@@ -66,6 +66,7 @@ WPolarDlg::WPolarDlg()
 	m_bWakeRollUp   = false;
 	m_bViscous      = true;
 	m_bGround       = false;
+	m_bPlaneInertia = false;
 
 	m_NXWakePanels    = 1;
 	m_TotalWakeLength = 100.0;//x mac
@@ -98,6 +99,7 @@ void WPolarDlg::Connect()
 	connect(m_pctrlTiltGeom, SIGNAL(clicked()), this, SLOT(OnTiltedGeom()));
 	connect(m_pctrlViscous, SIGNAL(clicked()), this, SLOT(OnViscous()));
 	connect(m_pctrlGroundEffect, SIGNAL(clicked()), this, SLOT(OnGroundEffect()));
+	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnPlaneInertia()));
 
 	connect(m_pctrlXCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlZCmRef, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
@@ -158,6 +160,9 @@ void WPolarDlg::EnableControls()
 	m_pctrlGroundEffect->setEnabled(m_AnalysisMethod==PANELMETHOD);
 	m_pctrlHeight->setEnabled(m_pctrlGroundEffect->isChecked() && m_AnalysisMethod==PANELMETHOD);
 
+	m_pctrlWeight->setEnabled(!m_bPlaneInertia);
+	m_pctrlXCmRef->setEnabled(!m_bPlaneInertia);
+	m_pctrlZCmRef->setEnabled(!m_bPlaneInertia);
 }
 
 
@@ -372,9 +377,46 @@ void WPolarDlg::OnAutoName()
 	if(m_bAutoName) SetWPolarName();
 }
 
+
 void WPolarDlg::OnTiltedGeom()
 {
 	m_bTiltedGeom = m_pctrlTiltGeom->isChecked();
+	SetWPolarName();
+	EnableControls();
+}
+
+
+void WPolarDlg::OnPlaneInertia()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	if(m_pctrlPlaneInertia->isChecked())
+	{
+		if(m_pPlane)
+		{
+			m_pctrlWeight->SetValue(m_pPlane->GetTotalMass() * pMainFrame->m_kgtoUnit);
+			m_pctrlXCmRef->SetValue(m_pPlane->m_CoG.x * pMainFrame->m_mtoUnit);
+			m_pctrlZCmRef->SetValue(m_pPlane->m_CoG.z * pMainFrame->m_mtoUnit);
+			m_Weight    = m_pPlane->GetTotalMass();
+			m_CoG.x     = m_pPlane->m_CoG.x;
+			m_CoG.z     = m_pPlane->m_CoG.z;
+		}
+		else if(m_pWing)
+		{
+			m_pctrlWeight->SetValue(m_pWing->GetTotalMass() * pMainFrame->m_kgtoUnit);
+			m_pctrlXCmRef->SetValue(m_pWing->m_CoG.x * pMainFrame->m_mtoUnit);
+			m_pctrlZCmRef->SetValue(m_pWing->m_CoG.z * pMainFrame->m_mtoUnit);
+			m_Weight    = m_pWing->GetTotalMass();
+			m_CoG.x     = m_pWing->m_CoG.x;
+			m_CoG.z     = m_pWing->m_CoG.z;
+		}
+	}
+	else
+	{
+		m_Weight    = m_pctrlWeight->GetValue() / pMainFrame->m_kgtoUnit;
+		m_CoG.x     = m_pctrlXCmRef->GetValue() / pMainFrame->m_mtoUnit;
+		m_CoG.z     = m_pctrlZCmRef->GetValue() / pMainFrame->m_mtoUnit;
+	}
+	m_bPlaneInertia = m_pctrlPlaneInertia->isChecked();
 	SetWPolarName();
 	EnableControls();
 }
@@ -576,190 +618,215 @@ void WPolarDlg::SetupLayout()
 {
 	QFont SymbolFont("Symbol");
 
-	QVBoxLayout *NameLayout = new QVBoxLayout;
-	m_pctrlWingName = new QLabel(tr("Wing Name"));
-	m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
-	m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
-	NameLayout->addWidget(m_pctrlWingName);
-	NameLayout->addWidget(m_pctrlAutoName);
-	NameLayout->addWidget(m_pctrlWPolarName);
 	QGroupBox *NameGroup = new QGroupBox(tr("Polar Name"));
-	NameGroup->setLayout(NameLayout);
+	{
+		QVBoxLayout *NameLayout = new QVBoxLayout;
+		m_pctrlWingName = new QLabel(tr("Wing Name"));
+		m_pctrlAutoName = new QCheckBox(tr("Auto Analysis Name"));
+		m_pctrlWPolarName = new QLineEdit(tr("Polar Name"));
+		NameLayout->addWidget(m_pctrlWingName);
+		NameLayout->addWidget(m_pctrlAutoName);
+		NameLayout->addWidget(m_pctrlWPolarName);
+		NameGroup->setLayout(NameLayout);
+	}
 
-	QVBoxLayout *TypeLayout = new QVBoxLayout;
-	m_pctrlType1 = new QRadioButton(tr("Type 1 (Fixed Speed)"));
-	m_pctrlType2 = new QRadioButton(tr("Type 2 (Fixed Lift)"));
-	m_pctrlType4 = new QRadioButton(tr("Type 4 (Fixed aoa)"));
-	TypeLayout->addWidget(m_pctrlType1);
-	TypeLayout->addWidget(m_pctrlType2);
-	TypeLayout->addWidget(m_pctrlType4);
 	QGroupBox *TypeGroup = new QGroupBox(tr("Polar Type"));
-	TypeGroup->setLayout(TypeLayout);
+	{
+		QVBoxLayout *TypeLayout = new QVBoxLayout;
+		m_pctrlType1 = new QRadioButton(tr("Type 1 (Fixed Speed)"));
+		m_pctrlType2 = new QRadioButton(tr("Type 2 (Fixed Lift)"));
+		m_pctrlType4 = new QRadioButton(tr("Type 4 (Fixed aoa)"));
+		TypeLayout->addWidget(m_pctrlType1);
+		TypeLayout->addWidget(m_pctrlType2);
+		TypeLayout->addWidget(m_pctrlType4);
+		TypeGroup->setLayout(TypeLayout);
+	}
 
-	QGridLayout *PlaneLayout = new QGridLayout;
-	QLabel *lab1 = new QLabel(tr("Free Stream Speed ="));
-	QLabel *lab2 = new QLabel(tr("Plane Mass ="));
-	QLabel *lab3 = new QLabel(tr("X_CoG ="));
-	QLabel *lab4 = new QLabel(tr("Z_CoG ="));
-	QLabel *lab5 = new QLabel("a =");
-	QLabel *lab6 = new QLabel("b =");
-	lab5->setFont(SymbolFont);
-	lab6->setFont(SymbolFont);
-	lab1->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab4->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab5->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	lab6->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	PlaneLayout->addWidget(lab1,1,1);
-	PlaneLayout->addWidget(lab2,2,1);
-	PlaneLayout->addWidget(lab3,3,1);
-	PlaneLayout->addWidget(lab4,4,1);
-	PlaneLayout->addWidget(lab5,5,1);
-	PlaneLayout->addWidget(lab6,6,1);
-	m_pctrlQInf    = new FloatEdit(10.05);
-	m_pctrlQInf->SetMin(0.0);
-	m_pctrlWeight  = new FloatEdit(1.234);
-	m_pctrlWeight->SetPrecision(3);
-	m_pctrlWeight->SetMin(0.0);
-	m_pctrlXCmRef  = new FloatEdit(100.00,2);
-	m_pctrlZCmRef  = new FloatEdit(100.00,2);
-	m_pctrlAlpha   = new FloatEdit(1.00,2);
-	m_pctrlBeta    = new FloatEdit(0.00,2);
-	PlaneLayout->addWidget(m_pctrlQInf,1,2);
-	PlaneLayout->addWidget(m_pctrlWeight,2,2);
-	PlaneLayout->addWidget(m_pctrlXCmRef,3,2);
-	PlaneLayout->addWidget(m_pctrlZCmRef,4,2);
-	PlaneLayout->addWidget(m_pctrlAlpha,5,2);
-	PlaneLayout->addWidget(m_pctrlBeta,6,2);
-	m_pctrlSpeedUnit   = new QLabel("m/s");
-	m_pctrlWeightUnit  = new QLabel("kg");
-	m_pctrlLengthUnit1 = new QLabel("mm");
-	m_pctrlLengthUnit3 = new QLabel("mm");
-	QLabel *lab7 = new QLabel(QString::fromUtf8("°"));
-	QLabel *lab8 = new QLabel(QString::fromUtf8("°"));
-	PlaneLayout->addWidget(m_pctrlSpeedUnit ,1,3);
-	PlaneLayout->addWidget(m_pctrlWeightUnit ,2,3);
-	PlaneLayout->addWidget(m_pctrlLengthUnit1 ,3,3);
-	PlaneLayout->addWidget(m_pctrlLengthUnit3 ,4,3);
-	PlaneLayout->addWidget(lab7 ,5,3);
-	PlaneLayout->addWidget(lab8 ,6,3);
-	QGroupBox *PlaneGroup = new QGroupBox(tr("Plane and Flight Data"));
-	PlaneGroup->setLayout(PlaneLayout);
+	QGroupBox *FlightDataBox = new QGroupBox(tr("Plane and Flight Data"));
+	{
+		QGridLayout *PlaneLayout = new QGridLayout;
+		QLabel *lab1 = new QLabel(tr("Free Stream Speed ="));
+		QLabel *lab5 = new QLabel("a =");
+		QLabel *lab6 = new QLabel("b =");
+		lab5->setFont(SymbolFont);
+		lab6->setFont(SymbolFont);
+		lab1->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		lab5->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		lab6->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		PlaneLayout->addWidget(lab1,1,1);
+		PlaneLayout->addWidget(lab5,2,1);
+		PlaneLayout->addWidget(lab6,3,1);
+		m_pctrlQInf    = new FloatEdit(10.05);
+		m_pctrlQInf->SetMin(0.0);
+		m_pctrlAlpha   = new FloatEdit(1.00,2);
+		m_pctrlBeta    = new FloatEdit(0.00,2);
+		PlaneLayout->addWidget(m_pctrlQInf,1,2);
+		PlaneLayout->addWidget(m_pctrlAlpha,2,2);
+		PlaneLayout->addWidget(m_pctrlBeta,3,2);
+		m_pctrlSpeedUnit   = new QLabel("m/s");
+		QLabel *lab7 = new QLabel(QString::fromUtf8("°"));
+		QLabel *lab8 = new QLabel(QString::fromUtf8("°"));
+		PlaneLayout->addWidget(m_pctrlSpeedUnit ,1,3);
+		PlaneLayout->addWidget(lab7 ,2,3);
+		PlaneLayout->addWidget(lab8 ,3,3);
+		FlightDataBox->setLayout(PlaneLayout);
+	}
 
-	QVBoxLayout *FlightLayout = new QVBoxLayout;
-	m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
-	m_pctrlSRe       = new QLabel(tr("SRe"));
-	m_pctrlRRe       = new QLabel(tr("RRe"));
-	m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
-	m_pctrlReRoot    = new QLabel(tr("Re at Root = 100 000"));
-	m_pctrlReTip     = new QLabel(tr("Re at Tip = 70 000"));
-	m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlReTip->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlReRoot->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	FlightLayout->addWidget(m_pctrlWingLoad);
-	FlightLayout->addWidget(m_pctrlSRe);
-	FlightLayout->addWidget(m_pctrlRRe);
-	FlightLayout->addWidget(m_pctrlQInfCl);
-	FlightLayout->addWidget(m_pctrlReRoot);
-	FlightLayout->addWidget(m_pctrlReTip);
+	QGroupBox *InertiaBox = new QGroupBox(tr("Inertia properties"));
+	{
+		m_pctrlPlaneInertia = new QCheckBox(tr("Use plane inertia"));
+		QGridLayout *InertiaDataLayout = new QGridLayout;
+		QLabel *lab2 = new QLabel(tr("Plane Mass ="));
+		QLabel *lab3 = new QLabel(tr("X_CoG ="));
+		QLabel *lab4 = new QLabel(tr("Z_CoG ="));
+		lab2->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		lab3->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		lab4->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		InertiaDataLayout->addWidget(lab2,1,1);
+		InertiaDataLayout->addWidget(lab3,2,1);
+		InertiaDataLayout->addWidget(lab4,3,1);
+		m_pctrlWeight  = new FloatEdit(1.234);
+		m_pctrlWeight->SetPrecision(3);
+		m_pctrlWeight->SetMin(0.0);
+		m_pctrlXCmRef  = new FloatEdit(100.00,2);
+		m_pctrlZCmRef  = new FloatEdit(100.00,2);
+		InertiaDataLayout->addWidget(m_pctrlWeight,1,2);
+		InertiaDataLayout->addWidget(m_pctrlXCmRef,2,2);
+		InertiaDataLayout->addWidget(m_pctrlZCmRef,3,2);
+		m_pctrlWeightUnit  = new QLabel("kg");
+		m_pctrlLengthUnit1 = new QLabel("mm");
+		m_pctrlLengthUnit3 = new QLabel("mm");
+		InertiaDataLayout->addWidget(m_pctrlWeightUnit ,1,3);
+		InertiaDataLayout->addWidget(m_pctrlLengthUnit1 ,2,3);
+		InertiaDataLayout->addWidget(m_pctrlLengthUnit3 ,3,3);
+		QVBoxLayout *InertiaLayout = new QVBoxLayout;
+		InertiaLayout->addWidget(m_pctrlPlaneInertia);
+		InertiaLayout->addLayout(InertiaDataLayout);
+		InertiaBox->setLayout(InertiaLayout);
+	}
+
 	QGroupBox *FlightGroup = new  QGroupBox(tr("Flight Characteristics"));
-	FlightGroup->setLayout(FlightLayout);
+	{
+		QVBoxLayout *FlightLayout = new QVBoxLayout;
+		m_pctrlWingLoad  = new QLabel(tr("Wing Loading = 0.033 kg/dm2"));
+		m_pctrlSRe       = new QLabel(tr("SRe"));
+		m_pctrlRRe       = new QLabel(tr("RRe"));
+		m_pctrlQInfCl    = new QLabel(tr("QInfCl"));
+		m_pctrlWingLoad->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		m_pctrlSRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		m_pctrlRRe->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		m_pctrlQInfCl->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		FlightLayout->addWidget(m_pctrlWingLoad);
+		FlightLayout->addWidget(m_pctrlSRe);
+		FlightLayout->addWidget(m_pctrlRRe);
+		FlightLayout->addWidget(m_pctrlQInfCl);
 
+		FlightGroup->setLayout(FlightLayout);
+	}
 
 //_________________________Main Layout
 	m_pctrlAnalysisControls = new QStackedWidget;
-	QVBoxLayout *WingMethodLayout = new QVBoxLayout;
-	m_pctrlWingMethod1 = new QRadioButton(tr("LLT"));
-	m_pctrlWingMethod2 = new QRadioButton(tr("VLM"));
-	m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
+	{
+		QVBoxLayout *WingMethodLayout = new QVBoxLayout;
+		m_pctrlWingMethod1 = new QRadioButton(tr("LLT"));
+		m_pctrlWingMethod2 = new QRadioButton(tr("VLM"));
+		m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
 
-	WingMethodLayout->addWidget(m_pctrlWingMethod1);
-	WingMethodLayout->addWidget(m_pctrlWingMethod2);
-	WingMethodLayout->addWidget(m_pctrlWingMethod3);
-	QGroupBox *WingMethodBox = new QGroupBox("Wing analysis methods");
-	WingMethodBox->setLayout(WingMethodLayout);
+		WingMethodLayout->addWidget(m_pctrlWingMethod1);
+		WingMethodLayout->addWidget(m_pctrlWingMethod2);
+		WingMethodLayout->addWidget(m_pctrlWingMethod3);
+		QGroupBox *WingMethodBox = new QGroupBox("Wing analysis methods");
+		WingMethodBox->setLayout(WingMethodLayout);
 
-	m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
-	QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
-	PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
-	QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
-	PlaneMethodBox->setLayout(PlaneMethodLayout);
+		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
+		QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
+		PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
+		QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
+		PlaneMethodBox->setLayout(PlaneMethodLayout);
 
-	m_pctrlAnalysisControls->addWidget(WingMethodBox);
-	m_pctrlAnalysisControls->addWidget(PlaneMethodBox);
+		m_pctrlAnalysisControls->addWidget(WingMethodBox);
+		m_pctrlAnalysisControls->addWidget(PlaneMethodBox);
+	}
 
-
-	QGridLayout *AeroDataLayout = new QGridLayout;
-	QLabel *lab9 = new QLabel(tr("Unit"));
-	m_pctrlUnit1 = new QRadioButton(tr("International"));
-	m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
-	m_pctrlRho = new QLabel("r =");
-	m_pctrlDensity = new FloatEdit(1.500e-5,3);
-	m_pctrlDensityUnit = new QLabel("kg/m3");
-	m_pctrlNu = new QLabel("n =");
-	m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-	m_pctrlViscosity = new FloatEdit(1.225,3);
-	m_pctrlViscosityUnit = new QLabel("m2/s");
-	m_pctrlRho->setFont(SymbolFont);
-	m_pctrlNu->setFont(SymbolFont);
-	m_pctrlDensity->SetPrecision(5);
-	m_pctrlViscosity->SetPrecision(3);
-	m_pctrlDensity->SetMin(0.0);
-	m_pctrlViscosity->SetMin(0.0);
-	AeroDataLayout->addWidget(lab9,1,1);
-	AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
-	AeroDataLayout->addWidget(m_pctrlUnit2,1,3);
-	AeroDataLayout->addWidget(m_pctrlRho,2,1);
-	AeroDataLayout->addWidget(m_pctrlDensity,2,2);
-	AeroDataLayout->addWidget(m_pctrlDensityUnit,2,3);
-	AeroDataLayout->addWidget(m_pctrlNu,3,1);
-	AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
-	AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
 	QGroupBox *AeroDataGroup = new QGroupBox(tr("Aerodynamic Data"));
-	AeroDataGroup->setLayout(AeroDataLayout);
+	{
+		QGridLayout *AeroDataLayout = new QGridLayout;
+		QLabel *lab9 = new QLabel(tr("Unit"));
+		m_pctrlUnit1 = new QRadioButton(tr("International"));
+		m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
+		m_pctrlRho = new QLabel("r =");
+		m_pctrlDensity = new FloatEdit(1.500e-5,3);
+		m_pctrlDensityUnit = new QLabel("kg/m3");
+		m_pctrlNu = new QLabel("n =");
+		m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+		m_pctrlViscosity = new FloatEdit(1.225,3);
+		m_pctrlViscosityUnit = new QLabel("m2/s");
+		m_pctrlRho->setFont(SymbolFont);
+		m_pctrlNu->setFont(SymbolFont);
+		m_pctrlDensity->SetPrecision(5);
+		m_pctrlViscosity->SetPrecision(3);
+		m_pctrlDensity->SetMin(0.0);
+		m_pctrlViscosity->SetMin(0.0);
+		AeroDataLayout->addWidget(lab9,1,1);
+		AeroDataLayout->addWidget(m_pctrlUnit1,1,2);
+		AeroDataLayout->addWidget(m_pctrlUnit2,1,3);
+		AeroDataLayout->addWidget(m_pctrlRho,2,1);
+		AeroDataLayout->addWidget(m_pctrlDensity,2,2);
+		AeroDataLayout->addWidget(m_pctrlDensityUnit,2,3);
+		AeroDataLayout->addWidget(m_pctrlNu,3,1);
+		AeroDataLayout->addWidget(m_pctrlViscosity,3,2);
+		AeroDataLayout->addWidget(m_pctrlViscosityUnit,3,3);
+		AeroDataGroup->setLayout(AeroDataLayout);
+	}
 
-	QVBoxLayout *OptionsLayout = new QVBoxLayout;
-	m_pctrlViscous = new QCheckBox(tr("Viscous"));
-	m_pctrlTiltGeom = new QCheckBox(tr("Tilt. Geom."));
-	OptionsLayout->addWidget(m_pctrlViscous);
-	OptionsLayout->addWidget(m_pctrlTiltGeom);
 	QGroupBox *OptionsGroup = new QGroupBox(tr("Options"));
-	OptionsGroup->setLayout(OptionsLayout);
+	{
+		QVBoxLayout *OptionsLayout = new QVBoxLayout;
+		m_pctrlViscous = new QCheckBox(tr("Viscous"));
+		m_pctrlTiltGeom = new QCheckBox(tr("Tilt. Geom."));
+		OptionsLayout->addWidget(m_pctrlViscous);
+		OptionsLayout->addWidget(m_pctrlTiltGeom);
+		OptionsGroup->setLayout(OptionsLayout);
+	}
 
-	QGridLayout * GroundLayout =new QGridLayout;
-	m_pctrlGroundEffect = new QCheckBox(tr("Ground Effect"));
-	QLabel *lab10 = new QLabel(tr("Height ="));
-	m_pctrlHeight = new FloatEdit(0.00,2);
-	m_pctrlLengthUnit2 = new QLabel("mm");
-	GroundLayout->addWidget(m_pctrlGroundEffect,1,1);
-	GroundLayout->addWidget(lab10,2,1);
-	GroundLayout->addWidget(m_pctrlHeight,2,2);
-	GroundLayout->addWidget(m_pctrlLengthUnit2,2,3);
 	QGroupBox *GroundGroup =  new QGroupBox(tr("Ground Effect"));
-	GroundGroup->setLayout(GroundLayout);
+	{
+		QGridLayout * GroundLayout =new QGridLayout;
+		m_pctrlGroundEffect = new QCheckBox(tr("Ground Effect"));
+		QLabel *lab10 = new QLabel(tr("Height ="));
+		m_pctrlHeight = new FloatEdit(0.00,2);
+		m_pctrlLengthUnit2 = new QLabel("mm");
+		GroundLayout->addWidget(m_pctrlGroundEffect,1,1);
+		GroundLayout->addWidget(lab10,2,1);
+		GroundLayout->addWidget(m_pctrlHeight,2,2);
+		GroundLayout->addWidget(m_pctrlLengthUnit2,2,3);
+		GroundGroup->setLayout(GroundLayout);
+	}
+
+
+	QGroupBox *AreaBox = new QGroupBox(tr("Reference Area and Span for Aero Coefficients"));
+	{
+		QVBoxLayout *AreaOptions = new QVBoxLayout;
+		m_pctrlArea1 = new QRadioButton(tr("Wing Planform"));
+		m_pctrlArea2 = new QRadioButton(tr("Wing Planform projected on xy plane"));
+		AreaOptions->addWidget(m_pctrlArea1);
+		AreaOptions->addWidget(m_pctrlArea2);
+		AreaBox->setLayout(AreaOptions);
+	}
 
 	QGridLayout *DataLayout = new QGridLayout;
 	DataLayout->addWidget(NameGroup,1,1);
+	DataLayout->addWidget(FlightDataBox,2,1);
+	DataLayout->addWidget(InertiaBox,3,1);
+	DataLayout->addWidget(m_pctrlAnalysisControls,4,1);
+	DataLayout->addWidget(OptionsGroup,5,1);
 	DataLayout->addWidget(TypeGroup, 1,2);
-	DataLayout->addWidget(PlaneGroup,2,1);
 	DataLayout->addWidget(FlightGroup,2,2);
-	DataLayout->addWidget(m_pctrlAnalysisControls,3,1);
 	DataLayout->addWidget(AeroDataGroup,3,2);
-	DataLayout->addWidget(OptionsGroup,4,1);
 	DataLayout->addWidget(GroundGroup,4,2);
+	DataLayout->addWidget(AreaBox,5,2);
 
-	QHBoxLayout *AreaOptions = new QHBoxLayout;
-	m_pctrlArea1 = new QRadioButton(tr("Wing Planform"));
-	m_pctrlArea2 = new QRadioButton(tr("Wing Planform projected on xy plane"));
-	AreaOptions->addWidget(m_pctrlArea1);
-	AreaOptions->addWidget(m_pctrlArea2);
-	QGroupBox *AreaBox = new QGroupBox(tr("Reference Area and Span for Aero Coefficients"));
-	AreaBox->setLayout(AreaOptions);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
@@ -773,7 +840,6 @@ void WPolarDlg::SetupLayout()
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
 	MainLayout->addLayout(DataLayout);
-	MainLayout->addWidget(AreaBox);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
@@ -913,8 +979,6 @@ void WPolarDlg::SetReynolds()
 		m_pctrlQInfCl->setText(" ");
 		m_pctrlRRe->setText(" ");
 		m_pctrlSRe->setText(" ");
-		m_pctrlReRoot->setText(" ");
-		m_pctrlReTip->setText(" ");
 	}
 }
 

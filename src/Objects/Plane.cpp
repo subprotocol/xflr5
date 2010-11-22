@@ -433,11 +433,11 @@ double CPlane::GetTotalMass()
 {
 	static double Mass;
 	
-	Mass = m_Wing.m_VolumeMass;
-	if(m_bBiplane) Mass += m_Wing2.m_VolumeMass;
-	if(m_bStab)    Mass += m_Stab.m_VolumeMass;
-	if(m_bFin)     Mass += m_Fin.m_VolumeMass;
-	if(m_bBody && m_pBody)    Mass += m_pBody->m_VolumeMass;
+	Mass = m_Wing.GetTotalMass();
+	if(m_bBiplane) Mass += m_Wing2.GetTotalMass();
+	if(m_bStab)    Mass += m_Stab.GetTotalMass();
+	if(m_bFin)     Mass += m_Fin.GetTotalMass();
+	if(m_bBody && m_pBody)    Mass += m_pBody->GetTotalMass();
 	
 	for(int i=0; i<m_NMass; i++)
 		Mass += m_MassValue[i];

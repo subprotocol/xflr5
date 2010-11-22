@@ -55,6 +55,7 @@ public:
 	double Getv(double u, CVector r, bool bRight);
 	double GetSectionArcLength(double x);
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
+	double GetTotalMass();
 
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);

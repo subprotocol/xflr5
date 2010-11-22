@@ -67,6 +67,7 @@ private slots:
 	void OnGroundEffect();
 	void OnWPolarType();
 	void OnEditingFinished();
+	void OnPlaneInertia();
 
 private:
 	void *m_pMainFrame, *m_pMiarex;
@@ -88,6 +89,7 @@ private:
 	bool m_bTiltedGeom;//true if calculation is performed on the tilted geometry, at alpha=0.0
 	bool m_bViscous;
 	bool m_bGround;
+	bool m_bPlaneInertia;
 
 	double m_QInf, m_Weight, m_Alpha;
 	double m_Beta;
@@ -115,6 +117,7 @@ private:
 	FloatEdit *m_pctrlHeight;
 	QLineEdit *m_pctrlWPolarName;
 
+	QCheckBox *m_pctrlPlaneInertia;
 	QCheckBox *m_pctrlGroundEffect;
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlTiltGeom;
@@ -129,8 +132,6 @@ private:
 	QLabel *m_pctrlSRe;
 	QLabel *m_pctrlRRe;
 	QLabel *m_pctrlQInfCl;
-	QLabel *m_pctrlReTip;
-	QLabel *m_pctrlReRoot;
 	QLabel *m_pctrlWingName;
 	QLabel *m_pctrlWingLoad;
 	QLabel *m_pctrlSpeedUnit;

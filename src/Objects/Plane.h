@@ -39,9 +39,11 @@ class CPlane
 	friend class StabPolarDlg;
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;
-// Construction
+	friend class WPolarDlg;
+
+
 public:
-	CPlane();   // standard constructor
+	CPlane();
 
 
 protected:

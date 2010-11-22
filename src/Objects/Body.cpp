@@ -1842,7 +1842,13 @@ void CBody::UpdateFramePos(int iFrame)
 	}
 }
 
-
+double CBody::GetTotalMass()
+{
+	double TotalMass = m_VolumeMass;
+	for(int i=0; i<m_NMass; i++)
+		TotalMass += m_MassValue[i];
+	return TotalMass;
+}
 
 
 

@@ -9204,6 +9204,7 @@ void QMiarex::OnDeleteUFOWPolars()
 	m_pCurWPolar = NULL;
 	SetWPlr();
 	pMainFrame->UpdateWPolars();
+	pMainFrame->SetSaveState(false);
 	SetControls();
 	UpdateView();
 }

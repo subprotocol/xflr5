@@ -1268,7 +1268,11 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 
 double CWing::GetTotalMass()
 {
-	return m_TotalMass;
+	double TotalMass = m_VolumeMass;
+	for(int i=0; i<m_NMass; i++)
+		TotalMass += m_MassValue[i];
+	return TotalMass;
+//	return m_TotalMass;
 }
 
 
