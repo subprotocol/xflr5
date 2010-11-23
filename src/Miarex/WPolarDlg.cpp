@@ -302,6 +302,8 @@ void WPolarDlg::InitDialog()
 
 	OnMethod();
 
+	m_pctrlPlaneInertia->setChecked(m_bPlaneInertia);
+	OnPlaneInertia();
 
 //	m_pctrlThinSurfaces->setEnabled(false);
 //	if(m_bThinSurfaces)	m_pctrlThinSurfaces.SetCheck(true);

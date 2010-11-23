@@ -432,6 +432,7 @@ protected:
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
 	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
 	bool m_bHighlightOpp;
+	bool m_bBreak;
 
 	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
 	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed

@@ -632,6 +632,7 @@ bool CSurface::IsFlapPanel(int const &p)
 	return false;
 }
 
+
 void CSurface::ResetFlap()
 {
 	int i;
@@ -643,6 +644,7 @@ void CSurface::ResetFlap()
 	m_nFlapPanels = 0;
 	m_nFlapNodes = 0;
 }
+
 
 bool CSurface::RotateFlap(double const &Angle)
 {
@@ -672,7 +674,6 @@ bool CSurface::RotateFlap(double const &Angle)
 		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
 
 		Quat.Set(Angle-alpha0, m_HingeVector);
-
 		for (k=0; k<m_nFlapNodes; k++)
 		{
 			R.x = s_pNode[m_FlapNode[k]].x - m_HingePoint.x;
@@ -687,11 +688,23 @@ bool CSurface::RotateFlap(double const &Angle)
 
 		for(l=0; l<m_nFlapPanels; l++)
 		{
-			s_pPanel[m_FlapPanel[l]].SetFrame(
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLA],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iLB],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTA],
-				s_pNode[s_pPanel[m_FlapPanel[l]].m_iTB]);
+			k = m_FlapPanel[l];
+			if(s_pPanel[k].m_iPos==-1)
+			{
+				s_pPanel[k].SetFrame(
+					s_pNode[s_pPanel[k].m_iLB],
+					s_pNode[s_pPanel[k].m_iLA],
+					s_pNode[s_pPanel[k].m_iTB],
+					s_pNode[s_pPanel[k].m_iTA]);
+			}
+			else
+			{
+				s_pPanel[k].SetFrame(
+					s_pNode[s_pPanel[k].m_iLA],
+					s_pNode[s_pPanel[k].m_iLB],
+					s_pNode[s_pPanel[k].m_iTA],
+					s_pNode[s_pPanel[k].m_iTB]);
+			}
 		}
 		++iFlap;
 	}

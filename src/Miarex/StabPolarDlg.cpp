@@ -258,13 +258,26 @@ void StabPolarDlg::FillControlList()
 		}
 		m_nControls += m_pFin->m_nFlaps;
 	}
+}
 
 
+void StabPolarDlg::SetViscous()
+{
 	bool bViscous=true;
-	for(i=3; i<m_nControls; i++)
+	int nCtrl = 0;
+
+	if(m_pPlane) nCtrl++;
+	if(m_pPlane && m_pStab) nCtrl++;
+
+	for(int i=nCtrl; i<m_nControls; i++)
 	{
-		if(m_bActiveControl[i]) bViscous = false;
+		if(m_bActiveControl[i])
+		{
+			bViscous = false;
+			break;
+		}
 	}
+
 	if(!bViscous)
 	{
 		m_pctrlViscous->setChecked(false);
@@ -503,8 +516,6 @@ void StabPolarDlg::OnViscous()
 
 
 
-
-
 void StabPolarDlg::OnWPolarName()
 {
 	m_pctrlAutoName->setChecked(false);
@@ -515,8 +526,6 @@ void StabPolarDlg::OnWPolarName()
 void StabPolarDlg::ReadCtrlData()
 {
 	int i, k;
-
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	for(i=0; i<m_nControls; i++)
 	{
@@ -529,6 +538,9 @@ void StabPolarDlg::ReadCtrlData()
 	}
 
 	for(i=m_nControls; i<4*MAXCONTROLS; i++) m_bActiveControl[i]=false;
+
+	SetViscous();
+
 }
 
 

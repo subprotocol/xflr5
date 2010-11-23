@@ -67,8 +67,8 @@ ArcBall::ArcBall(void)
 	ab_zoom  = 1.0;
 	ab_zoom2 = 1.0;
 	// the radius of the arcball
-	ab_sphere  = 1.0;
-	ab_sphere2 = 1.0;
+	ab_sphere  = 3.0;
+	ab_sphere2 = 9.0;
 	// the distance from the origin of the plane that intersects
 	// the edge of the visible sphere (tangent to a ray from the eye)
 	ab_edge = 1.0;

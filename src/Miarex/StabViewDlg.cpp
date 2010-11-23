@@ -282,6 +282,7 @@ void StabViewDlg::FillEigenThings()
 
 void StabViewDlg::keyPressEvent(QKeyEvent *event)
 {
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -291,14 +292,17 @@ void StabViewDlg::keyPressEvent(QKeyEvent *event)
 			 
 			break;
 		}
-		 case Qt::Key_Escape:
-		 {
-			 if(m_pctrlAnimate->isChecked()) m_pctrlAnimate->setChecked(false);
-			 OnAnimate();
-			 break;
-		 }
+		case Qt::Key_Escape:
+		{
+			if(m_pctrlAnimate->isChecked()) m_pctrlAnimate->setChecked(false);
+			OnAnimate();
+			break;
+		}
 		default:
-			event->ignore();
+		{
+			pMiarex->keyPressEvent(event);
+		}
+//			event->ignore();
 	}
 }
 

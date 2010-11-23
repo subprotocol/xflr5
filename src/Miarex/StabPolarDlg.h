@@ -72,6 +72,7 @@ private:
 	void ReadParams();
 	void SetDensity();
 	void SetWPolarName();
+	void SetViscous();
 
 	QTableView *m_pctrlControlTable;
 	QStandardItemModel *m_pControlModel;

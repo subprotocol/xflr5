@@ -97,6 +97,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bResetWake      = true;
 	m_bSetNewWake     = true;
 	m_bSequence       = false;
+	m_bBreak          = false;
 
 	m_bHighlightOpp = false;
 
@@ -3447,8 +3448,9 @@ void QMiarex::CreateStabTimeCurves()
 	static double t, dt, TotalPoints; // the input load
 	static complex<double> in[4];
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
-	
+	m_bBreak = false;
 	QString strong, CurveTitle;
+
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	CurveTitle = pStabView->m_pctrlCurveList->currentText();
@@ -3561,7 +3563,8 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	static double A[4][4], B[MAXCONTROLS][4];
 	static double m[5][4];
 	static double y[4], yp[4];
-	QString strong, CurveTitle;
+	QString CurveTitle;
+	m_bBreak = false;
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
@@ -3717,7 +3720,6 @@ void QMiarex::CreateStabRungeKuttaCurves()
 			pCurve2->AddPoint(t, y[2]);
 			pCurve3->AddPoint(t, y[3]);
 		}
-
 	}
 	pCurve0->SetVisible(true);
 	pCurve1->SetVisible(true);
@@ -5386,7 +5388,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pCurBody->m_LineType==1)	   m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
+		if(m_pCurBody->m_LineType==1)	     m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
 		else if(m_pCurBody->m_LineType==2) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
 
 		m_bResetglBody = false;
@@ -6034,8 +6036,8 @@ void QMiarex::GLRenderView()
 			glPushMatrix();
 			{
 				glTranslated(( m_GLLightDlg.m_XLight+ m_UFOOffset.x)*m_GLScale,
-							 ( m_GLLightDlg.m_YLight+ m_UFOOffset.y)*m_GLScale,
-							   m_GLLightDlg.m_ZLight*m_GLScale);
+								 ( m_GLLightDlg.m_YLight+ m_UFOOffset.y)*m_GLScale,
+									m_GLLightDlg.m_ZLight*m_GLScale);
 				double radius = (m_GLLightDlg.m_ZLight+2.0)/40.0*m_GLScale;
 				QColor color;
 				color = QColor((int)(m_GLLightDlg.m_Red  *255),
@@ -6794,7 +6796,7 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Escape:
 		{
 			StopAnimate();
-
+			m_bBreak = true;
 			if(m_pCurGraph) m_pCurGraph->DeselectPoint();
 			
 			if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
@@ -10173,7 +10175,7 @@ void QMiarex::OnGL3DScale()
 	}
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(pMainFrame->m_pctrl3DScalesWidget->isVisible())	pMainFrame->m_pctrl3DScalesWidget->hide();
-	else                                               	pMainFrame->m_pctrl3DScalesWidget->show();
+	else                                               pMainFrame->m_pctrl3DScalesWidget->show();
 
 	pMainFrame->W3DScalesAct->setChecked(pMainFrame->m_pctrl3DScalesWidget->isVisible());
 //	if(m_pctrl3DSettings->isChecked()) pMainFrame->m_pctrl3DScalesWidget->show();

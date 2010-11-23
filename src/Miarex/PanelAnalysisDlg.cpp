@@ -387,7 +387,6 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 				RHS[m] = - m_pPanel[p].Normal.dot(VPanel);
 			}
 			else if(m_pWPolar->m_bDirichlet) RHS[m] = 0.0;
-
 			if(m_pPanel[p].m_iPos!=0) C = m_pPanel[p].CollPt;
 			else                      C = m_pPanel[p].CtrlPt;
 
@@ -402,7 +401,7 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 
 					// Add to RHS the source influence of panel pp on panel p
 					GetSourceInfluence(C, m_pPanel+pp, V, phi);
-	
+
 					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
 					{
 						// Apply Neumann B.C.
@@ -3346,8 +3345,10 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 				strange += QString::fromUtf8("°\n");
 				AddString(strange);
 
-
-				if(!pWing->m_Surface[j].RotateFlap(angle))  return;
+				if(fabs(angle)>PRECISION)
+				{
+					if(!pWing->m_Surface[j].RotateFlap(angle))  return;
+				}
 			}
 			nFlap++;
 			m_NCtrls++;
@@ -3951,7 +3952,6 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	//Build the unit RHS vectors along x and z in Body Axis
 	CreateUnitRHS();
 	if (m_bCancel) return false;
-
 
 	// build the influence matrix in Body Axis
 	BuildInfluenceMatrix();
