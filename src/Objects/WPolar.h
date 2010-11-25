@@ -63,6 +63,8 @@ private:
 	void SetInertia(void *ptr, bool bPlane);
 	void *GetUFOPlrVariable(int iVar);
 
+
+	int m_PolarFormat;
 	int m_RefAreaType;
 	double m_QInf;
 	double m_ASpec;

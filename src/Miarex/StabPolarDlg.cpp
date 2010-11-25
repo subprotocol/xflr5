@@ -102,6 +102,8 @@ void StabPolarDlg::Connect()
 	connect(m_pctrlWPolarName, SIGNAL(editingFinished()), this, SLOT(OnWPolarName()));
 	connect(m_pctrlAutoName, SIGNAL(clicked()), this, SLOT(OnAutoName()));
 
+	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnAutoInertia()));
+
 	connect(OKButton,     SIGNAL(clicked()), this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -126,7 +128,7 @@ void StabPolarDlg::FillUFOInertia()
 
 	if(m_pPlane)
 	{
-		m_Mass = m_pPlane->m_TotalMass;
+		m_Mass = m_pPlane->GetTotalMass();
 		m_CoG = m_pPlane->m_CoG;
 		m_CoGIxx = m_pPlane->m_CoGIxx;
 		m_CoGIyy = m_pPlane->m_CoGIyy;
@@ -135,7 +137,7 @@ void StabPolarDlg::FillUFOInertia()
 	}
 	else if(m_pWing)
 	{
-		m_Mass = m_pWing->m_TotalMass;
+		m_Mass = m_pWing->GetTotalMass();
 		m_CoG = m_pWing->m_CoG;
 		m_CoGIxx = m_pWing->m_CoGIxx;
 		m_CoGIyy = m_pWing->m_CoGIyy;
@@ -355,9 +357,10 @@ void StabPolarDlg::InitDialog()
 	m_pctrlWingMethod3->setChecked(!m_bThinSurfaces);
 	if(m_pPlane) m_pctrlPanelMethod->setChecked(true);
 
+	m_pctrlPlaneInertia->setChecked(m_bAutoInertia);
+
 	FillControlList();
-	FillUFOInertia();
-	SetWPolarName();
+	OnAutoInertia();
 	m_pctrlControlTable->setFocus();
 }
 
@@ -706,9 +709,8 @@ void StabPolarDlg::SetupLayout()
 	QGroupBox *InertiaBox = new QGroupBox("Inertia");
 	{
 		QVBoxLayout *InertiaLayout = new QVBoxLayout;
-		QLabel *InertiaNote = new QLabel;
-		InertiaNote->setText(tr("Note : The following estimation is based on the\nmass properties defined for the wing or plane.\nModify the estimation as required."));
-	//	m_pctrlEstimation = new QPushButton(tr("Estimate Inertia"));
+		m_pctrlPlaneInertia = new QCheckBox(tr("Use plane inertia"));
+		m_pctrlPlaneInertia->setToolTip("Activate this checbox for the polar to use dynamically the plane's inertia properties for each analysis");
 
 		QGridLayout *InertiaData = new QGridLayout;
 		QLabel *Lab099 = new QLabel("Mass=");
@@ -762,7 +764,7 @@ void StabPolarDlg::SetupLayout()
 		InertiaData->addWidget(m_pctrlLab304,6,3);
 		InertiaData->addWidget(m_pctrlLab305,7,3);
 
-		InertiaLayout->addWidget(InertiaNote);
+		InertiaLayout->addWidget(m_pctrlPlaneInertia);
 	//	InertiaLayout->addWidget(m_pctrlEstimation);
 		InertiaLayout->addLayout(InertiaData);
 		InertiaLayout->addStretch(1);
@@ -794,7 +796,6 @@ void StabPolarDlg::SetupLayout()
 	QVBoxLayout *RightSideLayout = new QVBoxLayout;
 	RightSideLayout->addWidget(InertiaBox);
 	RightSideLayout->addWidget(m_pctrlAnalysisControls);
-
 
 	QHBoxLayout *DataLayout = new QHBoxLayout;
 	DataLayout->addLayout(LeftSideLayout);
@@ -938,6 +939,11 @@ void StabPolarDlg::SetWPolarName()
 		m_WPolarName += strong;
 	}
 
+	if(m_bAutoInertia)
+	{
+		m_WPolarName += "-Plane_Inertia";
+	}
+
 	if(!m_bViscous)
 	{
 		m_WPolarName += "-Inviscid";
@@ -967,5 +973,22 @@ void StabPolarDlg::OnMethod()
 
 
 
-
-
+void StabPolarDlg::OnAutoInertia()
+{
+//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
+	if(m_pctrlPlaneInertia->isChecked())
+	{
+		FillUFOInertia();
+	}
+	m_pctrlMass->setEnabled(!m_bAutoInertia);
+	m_pctrlCoGx->setEnabled(!m_bAutoInertia);
+	m_pctrlCoGz->setEnabled(!m_bAutoInertia);
+	m_pctrlIxx->setEnabled(!m_bAutoInertia);
+	m_pctrlIxx->setEnabled(!m_bAutoInertia);
+	m_pctrlIyy->setEnabled(!m_bAutoInertia);
+	m_pctrlIzz->setEnabled(!m_bAutoInertia);
+	m_pctrlIxz->setEnabled(!m_bAutoInertia);
+	SetWPolarName();
+//	EnableControls();
+}

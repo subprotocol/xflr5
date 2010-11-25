@@ -1140,64 +1140,64 @@ void Graph::SetYUnit(double f){
 
 bool Graph::SetYScale()
 {
-    int nc;
-    CCurve *pCurve;
+	int nc;
+	CCurve *pCurve;
 
-    if(m_bAutoY)
-    {
+	if(m_bAutoY)
+	{
 		bool bCurve = false;
-        if (m_oaCurves.size())
-        {
-            //init only if we have a curve
-            for (nc=0; nc < m_oaCurves.size(); nc++)
-            {
+		if (m_oaCurves.size())
+		{
+			//init only if we have a curve
+			for (nc=0; nc < m_oaCurves.size(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
-                if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
-                {
-					bCurve = true;
-					break;
-				}
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+					{
+						bCurve = true;
+						break;
+					}
 			}
 		}
-        if(bCurve)
-        {
+		if(bCurve)
+		{
 			Cymin =  9999999.0;
 			Cymax = -9999999.0;
-            for (nc=0; nc < m_oaCurves.size(); nc++)
-            {
+			for (nc=0; nc < m_oaCurves.size(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
-                if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->n>0)
-                {
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible()) && pCurve->n>0)
+				{
 					Cymin = qMin(Cymin, pCurve->GetyMin());
 					Cymax = qMax(Cymax, pCurve->GetyMax());
 				}
 			}
-            if(Cymax<=Cymin)
-            {
+			if(Cymax<=Cymin)
+			{
 				Cymax = (Cymin+1.0)*2.0;
 			}
 
-            if(m_Type == 1)
-            {
+			if(m_Type == 1)
+			{
 				ymin = qMin(ymin, Cymin);
 				ymax = qMax(ymax, Cymax);
 			}
-            else
-            {
+			else
+			{
 				ymin = Cymin;
 				ymax = Cymax;
 			}
 			if(Cymin>=0.0) ymin = 0.0;
 			if(Cymax<=0.0) ymax = 0.0;
 		}
-        else
-        {
-            // until things are made clear
-            for (int nc=0; nc < m_oaCurves.size(); nc++)
-            {
+		else
+		{
+			// until things are made clear
+			for (int nc=0; nc < m_oaCurves.size(); nc++)
+			{
 				pCurve = (CCurve*)m_oaCurves[nc];
-                if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
-                {
+				if ((pCurve->IsVisible() ||pCurve->PointsVisible())  && pCurve->n>0)
+				{
 					ymin = qMin(ymin, pCurve->y[0]);
 					ymax = qMax(ymax, pCurve->y[0]);
 				}
@@ -1205,14 +1205,14 @@ bool Graph::SetYScale()
 		}
 		yo=0.0;
 
-        if (fabs((ymin-ymax)/ymin)<0.001)
-        {
-            if(fabs(ymin)<0.00001) ymax = 1.0;
-            else
-            {
+		if (fabs((ymin-ymax)/ymin)<0.001)
+		{
+			if(fabs(ymin)<0.00001) ymax = 1.0;
+			else
+			{
 				ymax = 2.0 * ymin;
-                if(ymax < ymin)
-                {
+				if(ymax < ymin)
+				{
 					double tmp = ymax;
 					ymax = ymin;
 					ymin = tmp;

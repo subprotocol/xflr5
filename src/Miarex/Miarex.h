@@ -369,7 +369,7 @@ private:
 	QSlider *m_pctrlClipPlanePos;
 
 	//stability widgets
-	QTextEdit *m_pctrlPolarProps, *m_pctrlPolarProps1;
+	QTextEdit *m_pctrlPolarProps1;
 	QStackedWidget *m_pctrBottomControls, *m_pctrlMiddleControls;
 
 

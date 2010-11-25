@@ -41,7 +41,7 @@ class CPanel
 public:
 	CPanel();
 
-	void Rotate(CVector const &HA, Quaternion & Qt, double const&Angle);
+	void RotateBC(CVector const &HA, Quaternion & Qt);
 	void Reset();
 	void SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB);
 	bool Intersect(CVector const &A, CVector const &U, CVector &I, double &dist);

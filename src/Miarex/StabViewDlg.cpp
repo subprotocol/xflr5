@@ -1189,6 +1189,7 @@ void StabViewDlg::AddCurve()
 	m_pctrlCurveList->setEnabled(pMiarex->m_pCurWOpp && m_pctrlCurveList->count());
 
 	pMiarex->SetCurveParams();
+
 }
 
 

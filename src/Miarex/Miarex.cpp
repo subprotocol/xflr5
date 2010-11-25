@@ -504,7 +504,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bXBot              = false;
 
 	m_bXCmRef            = true;
-	m_bLogFile           = false;
+	m_bLogFile           = true;
 	m_bHalfWing          = false;
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
@@ -1591,7 +1591,7 @@ void QMiarex::SetControls()
 
 	if(m_iView==WPOLARVIEW)     m_pctrlMiddleControls->setCurrentIndex(1);
 	else if(m_iView==WCPVIEW)   m_pctrlMiddleControls->setCurrentIndex(2);
-	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(3);
+	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
 	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
@@ -1605,12 +1605,10 @@ void QMiarex::SetControls()
 	{
 		QString PolarProps;
 		m_pCurWPolar->GetPolarProperties(PolarProps);
-		m_pctrlPolarProps->setText(PolarProps);
 		m_pctrlPolarProps1->setText(PolarProps);
 	}
 	else
 	{
-		m_pctrlPolarProps->clear();
 		m_pctrlPolarProps1->clear();
 	}
 
@@ -3478,7 +3476,6 @@ void QMiarex::CreateStabTimeCurves()
 	if(dt<m_Deltat) dt = m_Deltat;
 
 	TotalPoints = qMin(1000, (int)(m_TotalTime/dt));
-
 	//read the initial state condition
 	m_TimeInput[0] = pStabView->m_pctrlStabVar1->GetValue();
 	m_TimeInput[1] = pStabView->m_pctrlStabVar2->GetValue();
@@ -3535,6 +3532,7 @@ void QMiarex::CreateStabTimeCurves()
 			y[1] = *(M+4*1+0) * q[0] +*(M+4*1+1) * q[1] +*(M+4*1+2) * q[2] +*(M+4*1+3) * q[3];
 			y[2] = *(M+4*2+0) * q[0] +*(M+4*2+1) * q[1] +*(M+4*2+2) * q[2] +*(M+4*2+3) * q[3];
 			y[3] = *(M+4*3+0) * q[0] +*(M+4*3+1) * q[1] +*(M+4*3+2) * q[2] +*(M+4*3+3) * q[3];
+			if(abs(q[0])>1.e10 || abs(q[1])>1.e10 || abs(q[2])>1.e10  || abs(q[3])>1.e10 ) break;
 
 			pCurve0->AddPoint(t, y[0].real());
 			pCurve1->AddPoint(t, y[1].real());
@@ -3712,6 +3710,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		y[2] += m[4][2] * dt;
 		y[3] += m[4][3] * dt;
 		t +=dt;
+		if(fabs(y[0])>1.e10 || fabs(y[1])>1.e10 || fabs(y[2])>1.e10  || fabs(y[3])>1.e10 ) break;
 
 		if(i%PlotInterval==0)
 		{
@@ -8044,6 +8043,21 @@ void QMiarex::OnAllWPolarGraphScales()
 		m_CpGraph.ResetYLimits();
 		m_CpGraph.SetInverted(true);
 	}
+	else if(m_iView==WSTABVIEW)
+	{
+		m_TimeGraph1.SetAuto(true);
+		m_TimeGraph1.ResetXLimits();
+		m_TimeGraph1.ResetYLimits();
+		m_TimeGraph2.SetAuto(true);
+		m_TimeGraph2.ResetXLimits();
+		m_TimeGraph2.ResetYLimits();
+		m_TimeGraph3.SetAuto(true);
+		m_TimeGraph3.ResetXLimits();
+		m_TimeGraph3.ResetYLimits();
+		m_TimeGraph4.SetAuto(true);
+		m_TimeGraph4.ResetXLimits();
+		m_TimeGraph4.ResetYLimits();
+	}
 	UpdateView();
 }
 
@@ -8885,7 +8899,7 @@ void QMiarex::OnDefineWPolar()
 		pNewWPolar->m_bViscous        = m_WngAnalysis.m_bViscous;
 		pNewWPolar->m_AnalysisMethod  = m_WngAnalysis.m_AnalysisMethod;
 		pNewWPolar->m_bThinSurfaces   = m_WngAnalysis.m_bThinSurfaces;
-//		pNewWPolar->m_bThinSurfaces   = true;
+		pNewWPolar->m_bAutoInertia    = m_WngAnalysis.m_bPlaneInertia;
 		pNewWPolar->m_bGround         = m_WngAnalysis.m_bGround;
 		pNewWPolar->m_Height          = m_WngAnalysis.m_Height;
 		pNewWPolar->m_TotalWakeLength = m_WngAnalysis.m_TotalWakeLength;
@@ -12026,6 +12040,7 @@ void QMiarex::OnUFOInertia()
 				}
 			}
 		}
+		SetWPlr();
 		pMainFrame->SetSaveState(false);
 	}
 	else
@@ -12834,7 +12849,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->InitDialog();
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
-
+m_bResetglMesh = true;//TODO remove
 //	if(m_bLogFile && m_pPanelDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
@@ -14770,17 +14785,6 @@ void QMiarex::SetupLayout()
 	QGroupBox *CpBox = new QGroupBox(tr("Cp Sections"));
 	CpBox->setLayout(CpParams);
 
-//_______________________Stability Params
-
-
-	m_pctrlPolarProps = new QTextEdit;
-	m_pctrlPolarProps->setReadOnly(true);
-//	m_pctrlPolarProps->setWordWrapMode(QTextOption::NoWrap);
-
-	QGroupBox *StabilityBox = new QGroupBox(tr("Stability analysis"));
-	QVBoxLayout *StabilityLayout = new QVBoxLayout;
-	StabilityLayout->addWidget(m_pctrlPolarProps);
-	StabilityBox->setLayout(StabilityLayout);
 
 //_______________________3D view controls
 	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
@@ -14842,7 +14846,6 @@ void QMiarex::SetupLayout()
 	m_pctrlMiddleControls->addWidget(DisplayBox);
 	m_pctrlMiddleControls->addWidget(PolarPropsBox);
 	m_pctrlMiddleControls->addWidget(CpBox);
-	m_pctrlMiddleControls->addWidget(StabilityBox);
 
 	m_pctrBottomControls = new QStackedWidget;
 	m_pctrBottomControls->addWidget(CurveBox);
@@ -15129,7 +15132,35 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	{
 		m_bCurveVisible = m_pCurWPolar->m_bIsVisible;
 		m_bCurvePoints  = m_pCurWPolar->m_bShowPoints;
+
+		if(m_pCurWPolar->m_bAutoInertia)
+		{
+			if(m_pCurPlane)
+			{
+				m_pCurWPolar->m_Weight = m_pCurPlane->GetTotalMass();
+				m_pCurWPolar->m_CoG    = m_pCurPlane->m_CoG;
+				m_pCurWPolar->m_CoGIxx = m_pCurPlane->m_CoGIxx;
+				m_pCurWPolar->m_CoGIyy = m_pCurPlane->m_CoGIyy;
+				m_pCurWPolar->m_CoGIzz = m_pCurPlane->m_CoGIzz;
+				m_pCurWPolar->m_CoGIxz = m_pCurPlane->m_CoGIxz;
+			}
+			else if(m_pCurWing)
+			{
+				m_pCurWPolar->m_Weight = m_pCurWing->GetTotalMass();
+				m_pCurWPolar->m_CoG    = m_pCurWing->m_CoG;
+				m_pCurWPolar->m_CoGIxx = m_pCurWing->m_CoGIxx;
+				m_pCurWPolar->m_CoGIyy = m_pCurWing->m_CoGIyy;
+				m_pCurWPolar->m_CoGIzz = m_pCurWing->m_CoGIzz;
+				m_pCurWPolar->m_CoGIxz = m_pCurWing->m_CoGIxz;
+
+			}
+
+			QString PolarProps;
+			m_pCurWPolar->GetPolarProperties(PolarProps);
+			m_pctrlPolarProps1->setText(PolarProps);
+		}
 	}
+	else m_pctrlPolarProps1->clear();
 
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();

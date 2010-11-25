@@ -343,14 +343,10 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 
 
 
-void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
+void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
-	// HA is a point on the rotation axis
-	// for a VLM analysis, we need to rotate :
-	//     - the control point
-	//     - the vortice vector
-	//     - the vortice's end points
-
+	// HA is the rotation center
+	//rotates the panels properties which are used in control analysis
 	W.x = VortexPos.x - HA.x;
 	W.y = VortexPos.y - HA.y;
 	W.z = VortexPos.z - HA.z;
@@ -367,30 +363,16 @@ void CPanel::Rotate(CVector const &HA, Quaternion &Qt, double const &angle)
 	CtrlPt.y = W.y + HA.y;
 	CtrlPt.z = W.z + HA.z;
 
+	W.x = CollPt.x - HA.x;
+	W.y = CollPt.y - HA.y;
+	W.z = CollPt.z - HA.z;
+	Qt.Conjugate(W);
+	CollPt.x = W.x + HA.x;
+	CollPt.y = W.y + HA.y;
+	CollPt.z = W.z + HA.z;
+
 	Qt.Conjugate(Vortex);
-
-	Normal.RotateY(angle);
-
-	//TODO ; remove ? 
-	// What's the point of A and B anyway?
-	// are they used anywhere
-
-	W.x = A.x - HA.x;
-	W.y = A.y - HA.y;
-	W.z = A.z - HA.z;
-	Qt.Conjugate(W);
-	A.x = W.x + HA.x;
-	A.y = W.y + HA.y;
-	A.z = W.z + HA.z;
-
-
-	W.x = B.x - HA.x;
-	W.y = B.y - HA.y;
-	W.z = B.z - HA.z;
-	Qt.Conjugate(W);
-	B.x = W.x + HA.x;
-	B.y = W.y + HA.y;
-	B.z = W.z + HA.z;
+	Qt.Conjugate(Normal);
 }
 
 

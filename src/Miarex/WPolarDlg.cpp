@@ -30,8 +30,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
-
-
+#include <QtDebug>
 
 WPolarDlg::WPolarDlg()
 {
@@ -677,6 +676,7 @@ void WPolarDlg::SetupLayout()
 	QGroupBox *InertiaBox = new QGroupBox(tr("Inertia properties"));
 	{
 		m_pctrlPlaneInertia = new QCheckBox(tr("Use plane inertia"));
+		m_pctrlPlaneInertia->setToolTip("Activate this checbox for the polar to use dynamically the plane's inertia properties for each analysis");
 		QGridLayout *InertiaDataLayout = new QGridLayout;
 		QLabel *lab2 = new QLabel(tr("Plane Mass ="));
 		QLabel *lab3 = new QLabel(tr("X_CoG ="));
@@ -866,9 +866,7 @@ void WPolarDlg::SetWPolarName()
 	}
 	else if(m_PolarType==FIXEDLIFTPOLAR)
 	{
-		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		m_WPolarName = QString("T2-%1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
-		m_WPolarName += str;
+		m_WPolarName = QString("T2");
 	}
 	else if(m_PolarType==FIXEDAOAPOLAR)
 	{
@@ -896,16 +894,26 @@ void WPolarDlg::SetWPolarName()
 		m_WPolarName += "-Thin";
 	}*/
 
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
-	m_WPolarName += strong + str;
-	
-	if(fabs(m_CoG.z)>=.000001)
+	if(!m_bPlaneInertia)
 	{
-		strong = QString("-z%1").arg(m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+		GetWeightUnit(str, pMainFrame->m_WeightUnit);
+		strong = QString("-%1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
+		m_WPolarName += strong+str;
+		GetLengthUnit(str, pMainFrame->m_LengthUnit);
+		strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
 		m_WPolarName += strong + str;
+
+		if(fabs(m_CoG.z)>=.000001)
+		{
+			strong = QString("-z%1").arg(m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+			m_WPolarName += strong + str;
+		}
 	}
-	
+	else
+	{
+		m_WPolarName += "-Plane_Inertia";
+	}
+
 	if(fabs(m_Beta) > .001)
 	{
 		strong = QString(QString::fromUtf8("-b%1°")).arg(m_Beta,0,'f',2);

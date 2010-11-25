@@ -62,6 +62,7 @@ private slots:
 	void OnUnit();
 	void OnCellChanged(QWidget *pWidget);
 	void OnMethod();
+	void OnAutoInertia();
 
 private:
 	void resizeEvent(QResizeEvent *event);
@@ -86,6 +87,7 @@ private:
 
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlAutoName;
+	QCheckBox *m_pctrlPlaneInertia;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;

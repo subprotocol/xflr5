@@ -145,7 +145,7 @@ void WAdvancedDlg::SetupLayout()
 	QLabel *lab7 = new QLabel(tr("Control Point Position"));
 	QLabel *lab8 = new QLabel("%");
 	QLabel *lab9 = new QLabel("%");
-	QHBoxLayout *VLMMethodLayout = new QHBoxLayout;
+	QVBoxLayout *VLMMethodLayout = new QVBoxLayout;
 	VLMMethodLayout->addWidget(m_pctrlVLM1);
 	VLMMethodLayout->addWidget(m_pctrlVLM2);
 	lab6->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -158,7 +158,7 @@ void WAdvancedDlg::SetupLayout()
 	VLMLayout->addWidget(m_pctrlControlPos,2,2);
 	VLMLayout->addWidget(lab8,1,3);
 	VLMLayout->addWidget(lab9,2,3);
-	VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignVCenter);
+	VLMLayout->addLayout(VLMMethodLayout,4,1,1,2, Qt::AlignLeft);
 	VLMBox->setLayout(VLMLayout);
 
 	QGroupBox *LLTBox = new QGroupBox(tr("Lifting Line Method"));

@@ -1634,7 +1634,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 	double ds, *Gamma, *Mu, *Sigma;
 	QColor color;
 
-	CVector C, D, D1, V1, VT, VInf;
+	CVector C, D, D1, V1, VT, VInf, dF;
 	CVector RefPoint(0.0,0.0,0.0);
 
 	D1.Set(987654321.0, 0.0, 0.0);
@@ -1729,6 +1729,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 						{
 							C.x += p3DScales->m_XOffset;
 							C.z += p3DScales->m_ZOffset;
+
 							ds = p3DScales->m_DeltaL;
 
 /*							// One very special case is where we initiate the streamlines exactly at the T.E.
@@ -1775,6 +1776,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 						D1 = D;
 						D.x += p3DScales->m_XOffset;
 						D.z += p3DScales->m_ZOffset;
+
 						ds = p3DScales->m_DeltaL;
 
 						V1.Set(0.0,0.0,0.0);

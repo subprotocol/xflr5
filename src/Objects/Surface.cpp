@@ -1055,6 +1055,7 @@ void CSurface::Translate(CVector const &T)
 	m_LB.Translate(T);
 	m_TA.Translate(T);
 	m_TB.Translate(T);
+	m_HingePoint.Translate(T);
 }
 
 

@@ -1245,15 +1245,18 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int n;
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
-	int i, j, ArchiveFormat;// identifies the format of the file
-	//Call Base class function
+	int i, j;
+
+	m_PolarFormat = 1021;
+
 	if(bIsStoring)
 	{
 		//write variables
 
-		if(ProjectFormat>5) ar << 1020; // identifies the format of the file
+		if(ProjectFormat>5) ar << m_PolarFormat; // identifies the format of the file
 		else                ar << 1016;
-					// 1020 b: QFLR6 v0.00 - added inertia tensor values
+					// 1021 : XFLR5 v6.02 - deleted autoinertia for older format polars
+					// 1020 : QFLR6 v0.00 - added inertia tensor values
 					// 1019 : QFLR6 v0.00 - added eigenvalues
 					// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
 					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
@@ -1348,8 +1351,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	else
 	{
 		//read variables
-		ar >> ArchiveFormat;
-		if (ArchiveFormat <=1000 || ArchiveFormat>1100)
+		ar >> m_PolarFormat;
+		if (m_PolarFormat <=1000 || m_PolarFormat>1100)
 		{
 			m_PlrName ="";
 			return false;
@@ -1384,7 +1387,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_bThinSurfaces = true;
 		}
 
-		if(ArchiveFormat>=1005)
+		if(m_PolarFormat>=1005)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
@@ -1395,27 +1398,27 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			if(n) m_bThinSurfaces =true; else m_bThinSurfaces = false;
 		}
-		if(ArchiveFormat>=1008)
+		if(m_PolarFormat>=1008)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
 			if(n) m_bTiltedGeom =true; else m_bTiltedGeom = false;
 		}
 
-		if(ArchiveFormat>=1006)
+		if(m_PolarFormat>=1006)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
 			if(n) m_bDirichlet = false; else m_bDirichlet = true;
 		}
-		if(ArchiveFormat>=1009)
+		if(m_PolarFormat>=1009)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
 			if(n) m_bViscous =true; else m_bViscous = false;
 		}
 
-		if(ArchiveFormat>=1010)
+		if(m_PolarFormat>=1010)
 		{
 			ar >> n;
 			if (n!=0 && n!=1) return false;
@@ -1424,12 +1427,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar >> f; m_Height = f;
 		}
 
-		if(ArchiveFormat>=1007)
+		if(m_PolarFormat>=1007)
 		{
 			ar >> m_NXWakePanels;
 			if (m_NXWakePanels<0 || m_NXWakePanels>1000) return false;
 		}
-		if(ArchiveFormat>=1011)
+		if(m_PolarFormat>=1011)
 		{
 			ar >> f; 			m_TotalWakeLength  = f;
 			ar >> f; 			m_WakePanelFactor = f;
@@ -1453,28 +1456,28 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar >> f;	m_QInf = f;
 		ar >> f;	m_Weight = f;
 		ar >> f;	m_ASpec = f;
-		if(ArchiveFormat>=1015) ar >> f;	m_Beta = f;
-		if(ArchiveFormat<1018 && ArchiveFormat>=1002)
+		if(m_PolarFormat>=1015) ar >> f;	m_Beta = f;
+		if(m_PolarFormat<1018 && m_PolarFormat>=1002)
 		{
 			ar >> f;			m_CoG.x = f;
 		}
-		else if(ArchiveFormat>=1018)
+		else if(m_PolarFormat>=1018)
 		{
 			ar >> f;			m_CoG.x = f;
 			ar >> f;			m_CoG.y = f;
 			ar >> f;			m_CoG.z = f;
 		}
-//		if(ArchiveFormat>=1002) ar >> f; m_XCmRef = f;
+//		if(m_PolarFormat>=1002) ar >> f; m_XCmRef = f;
 		ar >> f;	m_Density=f;
 		ar >> f;	m_Viscosity=f;
 
-		if(ArchiveFormat>=1016) ar >> m_RefAreaType;
+		if(m_PolarFormat>=1016) ar >> m_RefAreaType;
 		else                    m_RefAreaType = 1;
 
 		ar >> n;
 		if (n<0 || n> 100000) return false;
 
-		if(ArchiveFormat<1010)
+		if(m_PolarFormat<1010)
 		{
 			m_WArea    /=100.0;
 			m_WMAChord /=1000.0;
@@ -1487,26 +1490,26 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		for (i=0; i< n; i++)
 		{
 			ar >> Alpha >> Cl;
-			if(ArchiveFormat>=1015) ar>>CY;
+			if(m_PolarFormat>=1015) ar>>CY;
 			ar >> ICd >> PCd;
 			ar >> GCm;
-			if(ArchiveFormat>=1017) ar >> VCm >> ICm;
+			if(m_PolarFormat>=1017) ar >> VCm >> ICm;
 			ar >> GRm >> GYm >> f >> VYm >> IYm;
-			if(ArchiveFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0;
+			if(m_PolarFormat<1012) GCm = GRm = GYm = VCm = VYm = IYm = 0.0;
 			ar >> QInfinite >> XCP >> YCP;
 
-			if(ArchiveFormat<1010)
+			if(m_PolarFormat<1010)
 			{
 				XCP   /=1000.0;
 				YCP   /=1000.0;
 			}
 
-			if (ArchiveFormat>=1003)
+			if (m_PolarFormat>=1003)
 				ar >> Cb;
 			else
 				Cb = 0.0;
 
-			if (ArchiveFormat>=1014) ar >> Ctrl;
+			if (m_PolarFormat>=1014) ar >> Ctrl;
 			else					 Ctrl = 0.0;
 			bExists = false;
 			if(m_Type!=4)
@@ -1573,7 +1576,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				CalculatePoint((int)m_Alpha.size()-1);
 //			}
 		}
-		if(ArchiveFormat>1012)
+		if(m_PolarFormat>1012)
 		{
 			ar >> m_nControls;
 			if(abs(m_nControls)>1000) m_nControls = 0;
@@ -1591,7 +1594,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				}
 			}
 		}
-		if(ArchiveFormat>=1019)
+		if(m_PolarFormat>=1019)
 		{
 			n = m_Alpha.size();
 
@@ -1613,15 +1616,20 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_EigenValue[7][i] = complex<double>(r3,i3);
 			}
 		}
-		if(ArchiveFormat>=1020)
+		if(m_PolarFormat>=1020)
 		{
 			ar >> n;
-			if(n) m_bAutoInertia =true; else m_bAutoInertia = false;
+			if(n && m_PolarFormat>1020) m_bAutoInertia =true; else m_bAutoInertia = false;
 			ar>>r0>>r1>>r2>>r3;
 			m_CoGIxx = r0;
 			m_CoGIyy = r1;
 			m_CoGIzz = r2;
 			m_CoGIxz = r3;
+		}
+		else
+		{
+			m_bAutoInertia = false;
+			m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 		}
 	}
 
@@ -1674,10 +1682,16 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 
 	if(m_AnalysisMethod !=LLTMETHOD)
 	{
-		if(m_bDirichlet)  strong  = QObject::tr("Boundary conditions = Dirichlet");
-		else              strong  = QObject::tr("Boundary conditions = Neumann");
+		if(m_bDirichlet)  strong  = QObject::tr("B.C. = Dirichlet");
+		else              strong  = QObject::tr("B.C. = Neumann");
 		PolarProperties += strong +"\n";
 	}
+
+	if(m_bAutoInertia)
+	{
+		PolarProperties += "Using plane inertia\n";
+	}
+
 	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
 	PolarProperties += strong + massunit + "\n";
 
@@ -1704,7 +1718,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
 	else           PolarProperties += QObject::tr("Inviscid")+"\n";
 
-	PolarProperties += QObject::tr("Reference Area = ");
+	PolarProperties += QObject::tr("Ref. Area = ");
 	if(m_RefAreaType==1) PolarProperties += QObject::tr("Planform area")+"\n";
 	else                            PolarProperties += QObject::tr("Projected area")+"\n";
 
@@ -1722,7 +1736,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong  = QString(QObject::tr("Viscosity =")+"%1 m2/s\n").arg(m_Viscosity,12,'g',4);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha.size());
+	strong = QString(QObject::tr("Data points") +" = %1").arg(m_Alpha.size());
 	PolarProperties += strong;
 }
 

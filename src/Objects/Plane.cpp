@@ -300,7 +300,8 @@ void CPlane::ComputeBodyAxisInertia()
 			TotalCoG += pBody->m_MassPosition[i] * pBody->m_MassValue[i];
 		}
 	}
-	TotalCoG = TotalCoG/TotalMass;
+	if(TotalMass>PRECISION)	TotalCoG = TotalCoG/TotalMass;
+	else                    TotalCoG.Set(0.0,0.0,0.0);
 
 	// The CoG position is now available, so calculate the inertia w.r.t the CoG
 

@@ -3301,7 +3301,7 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 
 			for(j=0; j<m_pWing->m_MatSize; j++)
 			{
-				(m_pWing->m_pPanel+j)->Rotate(m_pPlane->m_LEWing, Quat, angle);
+				(m_pWing->m_pPanel+j)->RotateBC(m_pPlane->m_LEWing, Quat);
 			}
 		}
 		m_NCtrls=1;
@@ -3314,7 +3314,7 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 				//Elevator tilt
 				angle = m_pWPolar->m_MinControl[1] + t * (m_pWPolar->m_MaxControl[1] - m_pWPolar->m_MinControl[1]);
 
-				strange = QString("      Setting the elevator tilt to %1").arg(angle, 9, 'f',2);
+				strange = QString("      Setting the elevator tilt to %1").arg(angle, 5, 'f',2);
 				strange += QString::fromUtf8("°\n");
 				AddString(strange);
 
@@ -3323,7 +3323,7 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 
 				for(j=0; j<m_pStab->m_MatSize; j++)
 				{
-					(m_pStab->m_pPanel+j)->Rotate(m_pPlane->m_LEStab, Quat, angle);
+					(m_pStab->m_pPanel+j)->RotateBC(m_pPlane->m_LEStab, Quat);
 				}
 			}
 			m_NCtrls = 2;
@@ -3341,7 +3341,7 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 			{
 				angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
 
-				strange = QString("      Setting the main wing flap %1 angle to %2").arg(nFlap).arg(angle, 9, 'f',2);
+				strange = QString("      Setting the main wing flap %1 angle to %2").arg(nFlap).arg(angle, 5, 'f',2);
 				strange += QString::fromUtf8("°\n");
 				AddString(strange);
 
@@ -3365,8 +3365,8 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 				if(m_pWPolar->m_bActiveControl[m_NCtrls])
 				{
 					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
-					strange = QString("           Setting the elevator flap %1 angle to %2\n").arg(nFlap).arg(angle, 9, 'f',2);
-					strange += QString::fromUtf8("°");
+					strange = QString("           Setting the elevator flap %1 angle to %2").arg(nFlap).arg(angle, 5, 'f',2);
+					strange += QString::fromUtf8("°\n");
 					AddString(strange);
 					if(!pStab->m_Surface[j].RotateFlap(angle)) return;
 				}
@@ -3387,7 +3387,7 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 				{
 					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
 					strange = QString("           Setting the fin flap %1 angle to %2").arg(nFlap).arg(angle, 9, 'f',2);
-					strange += QString::fromUtf8("°");
+					strange += QString::fromUtf8("°\n");
 					AddString(strange);
 					if(!pFin->m_Surface[j].RotateFlap(angle)) return;
 				}
@@ -4112,7 +4112,11 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	int Size= m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
 
-	deltaspeed    = 0.1;        //  m/s   for forward difference estimation
+	str = "\n      ___Stability derivatives____\n\n";
+	AddString(str);
+
+
+	deltaspeed    = 0.01;        //  m/s   for forward difference estimation
 	deltarotation = 0.001;       //  rad/s for forward difference estimation
 
 	// Define the stability axes
@@ -4203,6 +4207,10 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 		}
 	}
 
+	QString strong = QString("      Solving the linear system for the stability derivative\n");
+	AddString(strong);
+
+
 	// The LU matrix is unchanged, so baksubstitute for unit vortex circulations
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_vRHS, m_Index, m_RHS+  m_MatSize, Size, &m_bCancel);
@@ -4230,6 +4238,8 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 		if(m_bCancel) return;
 	}
 */
+	strong = "      Calculating the stability derivatives\n\n";
+	AddString(strong);
 
 	// Compute stabiliy and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
@@ -4291,7 +4301,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
 
-	str = "      ___Longitudinal derivatives____\n";
+	str = "      Longitudinal derivatives\n";
 	AddString(str);
 	str = QString("      Xu=%1 \n").arg(Xu,12,'g',5);
 	AddString(str);
@@ -4310,7 +4320,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	str = QString("      Mq=%1      Cmq=%2\n").arg(Mq,12,'g',5).arg(Mq*(2.*u0/mac)/(q*S*mac),12,'g',5);
 	AddString(str);
 
-	str = "\n      ___Lateral derivatives____\n";
+	str = "\n      Lateral derivatives\n";
 	AddString(str);
 	str = QString("      Yv=%1      CYb=%2\n").arg(Yv,12,'g',5).arg(  Yv*    u0   /(q*S),12,'g',5);
 	AddString(str);
@@ -4415,6 +4425,18 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	QString str;
 	Quaternion Quat;
 
+	bool bActive = false;
+	for(int c=0; c<m_NCtrls; c++)
+	{
+		if(m_pWPolar->m_bActiveControl[c]) bActive = true;
+	}
+	if(!bActive)
+	{
+		str = "\n      No active control - skipping control derivatives\n\n\n";
+		AddString(str);
+		return;
+	}
+
 	// Define the stability axes and the freestream velocity field
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
@@ -4424,18 +4446,16 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 
-
 	str = "\n      ___Control derivatives____\n";
 	AddString(str);
 
-	is.Set(0.0,1.0,0.0);//doesn't matter, dummy variable
 	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
 	b   = m_pWPolar->m_WSpan;
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
 
-
 	DeltaAngle = 0.001;
+//	DeltaAngle = 45*PI/180;
 
 	pos = 0;
 	Xde[0] = Yde[0] =  Zde[0] = Lde[0] = Mde[0] = Nde[0] = 0.0;
@@ -4453,7 +4473,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
-				(m_pWing->m_pPanel+p)->Rotate(m_pPlane->m_LEWing, Quat, DeltaAngle*180.0/PI);
+				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->m_LEWing, Quat);
 			}
 		}
 		pos = m_pWing->m_MatSize;
@@ -4470,7 +4490,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pStab->m_MatSize; p++)
 			{
-				(m_pStab->m_pPanel+p)->Rotate(m_pPlane->m_LEStab, Quat, DeltaAngle*180.0/PI);
+				(m_pStab->m_pPanel+p)->RotateBC(m_pPlane->m_LEStab, Quat);
 			}
 		}
 		pos += m_pStab->m_MatSize;
@@ -4487,12 +4507,13 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
 				Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
+
 				for(p=0; p<m_MatSize;p++)
 				{
 					if(m_ppSurface[j]->IsFlapPanel(p))
 					{
 //						m_ppSurface[j]->RotateFlapPanel(DeltaAngle*180.0/PI, m_pPanel+p);
-						m_pPanel[p].Rotate(m_ppSurface[j]->m_HingePoint, Quat, DeltaAngle*180./PI);
+						m_pPanel[p].RotateBC(m_ppSurface[j]->m_HingePoint, Quat);
 					}
 				}
 			}
@@ -4536,6 +4557,9 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	Lde[0] = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
 	Mde[0] = (Moment - Moment0).dot(js) /DeltaAngle;
 	Nde[0] = (Moment - Moment0).dot(ks) /DeltaAngle;
+qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
+qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
+
 
 	//output control derivatives
 
