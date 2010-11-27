@@ -249,6 +249,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
+//for(int p=0; p<m_MatSize; p++) qDebug("Alphaloop     %13.9g", m_Mu[p]);
 
 	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
@@ -1009,7 +1010,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				pos += m_pWingList[i]->m_MatSize;
 			}
 		}
-
+qDebug("q.ICm=           %13.7f", m_ICm*1/2*m_pWPolar->m_Density*QInf*QInf);
 		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
 			AddString(tr("       Calculating body...")+"\n");
@@ -1022,7 +1023,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		}
 
 		if(!m_bTrefftz) SumPanelForces(m_Cp+qrhs*m_MatSize, Alpha, Lift, IDrag);
-
 
 		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->m_WArea;
 		m_CX          =       Force.dot(WindDirection) /m_pWPolar->m_WArea;
@@ -3298,6 +3298,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 			}
 			else
 			{
+				//iPos=0, VLM type panel
 				StripForce.Set(0.0,0.0,0.0);
 				for(l=0; l<m_ppSurface[j]->m_NXPanels; l++)
 				{
@@ -3933,7 +3934,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 
 	// z-derivatives________________________
 	alpha = atan2(Vk.z, Vk.x) * 180.0/PI;
-	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom, true);
+	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 	Xw = (Force-Force0).dot(is)/deltaspeed;
 	Zw = (Force-Force0).dot(ks)/deltaspeed;
 	Mw = (Moment-Moment0).dot(js)/deltaspeed;
@@ -4124,7 +4125,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	mac = m_pWing->m_MAChord;
 
 //	DeltaAngle = 0.001;
-DeltaAngle = 10.*PI/180.;
+DeltaAngle = 1.*PI/180.;
 
 	pos = 0;
 	Xde[0] = Yde[0] =  Zde[0] = Lde[0] = Mde[0] = Nde[0] = 0.0;
@@ -4212,11 +4213,12 @@ DeltaAngle = 10.*PI/180.;
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
+//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_cRHS[p]);
 
 	strong = "      Calculating the control derivatives\n\n";
 	AddString(strong);
 
-	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom, true);
 
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
@@ -4226,8 +4228,8 @@ DeltaAngle = 10.*PI/180.;
 	Lde[0] = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
 	Mde[0] = (Moment - Moment0).dot(js) /DeltaAngle;
 	Nde[0] = (Moment - Moment0).dot(ks) /DeltaAngle;
-//qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
-//qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
+qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
+qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
 
 
 	//output control derivatives

@@ -499,7 +499,8 @@ void CWing::ComputeBodyAxisInertia()
 		TotalCoG += m_MassPosition[i] * m_MassValue[i];
 	}
 
-	TotalCoG = TotalCoG/TotalMass;
+	if(TotalMass>0.0) TotalCoG = TotalCoG/TotalMass;
+	else              TotalCoG.Set(0.0,0.0,0.0);
 
 	// The CoG position is now available, so calculate the inertia w.r.t the CoG
 	for(i=0; i<m_NMass; i++)

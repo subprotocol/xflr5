@@ -898,7 +898,7 @@ void WPolarDlg::SetWPolarName()
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
 		strong = QString("-%1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
-		m_WPolarName += strong+str;
+		if(m_PolarType==FIXEDLIFTPOLAR)   m_WPolarName += strong+str;
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
 		strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
 		m_WPolarName += strong + str;
