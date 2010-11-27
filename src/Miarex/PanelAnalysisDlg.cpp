@@ -209,6 +209,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 	CreateUnitRHS();
 	if (m_bCancel) return true;
 
+
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//compute wake contribution
@@ -357,7 +358,7 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 
 
 
-void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
+void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField, bool bTrace)
 {
 	//Creates the RHS vector for
 	//  free stream velocity VInf,
@@ -378,6 +379,7 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 			VPanel.z = *(VField+2*m_MatSize +p);
 		}
 		else VPanel = VInf;
+
 
 		if(!m_b3DSymetric || m_pPanel[p].m_bIsLeftPanel)
 		{
@@ -425,15 +427,13 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField)
 
 
 
-
-
 void PanelAnalysisDlg::CreateUnitRHS()
 {
 	//Creates the two RHS for unit speeds along x and z
-	CVector VInf, Omega;
-	Omega.Set(0.0, 1.0, 0.0);
+	CVector VInf;
+
 	VInf.Set(1.0, 0.0, 0.0);
-	CreateRHS(m_uRHS,  VInf);
+	CreateRHS(m_uRHS,  VInf, NULL, true);
 	VInf.Set(0.0, 0.0, 1.0);
 	CreateRHS(m_wRHS, VInf);
 }
@@ -2064,335 +2064,6 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector 
 		}
 	}
 }
-/*
-void PanelAnalysisDlg::SourceNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi)
-{
-	//VSAERO theory Manual
-	//Influence of panel pp at coll pt of panel p
-	int i;
-	
-	phi = 0.0;
-	V.Set(0.0,0.0,0.0);
-
-	PJK = TestPt - pPanel->CollPt;
-	PN  = PJK.dot(pPanel->Normal);
-	pjk = PJK.VAbs();
-
-	if(pjk> RFF*pPanel->Size)
-	{
-		// use far-field formula
-		phi = pPanel->Area /pjk;
-		V = PJK * pPanel->Area/pjk/pjk/pjk;
-		return;
-	}
-	
-	if(pPanel->m_iPos>=0){
-		R[0] = m_pNode[pPanel->m_iLA];
-		R[1] = m_pNode[pPanel->m_iTA];
-		R[2] = m_pNode[pPanel->m_iTB];
-		R[3] = m_pNode[pPanel->m_iLB];
-		R[4] = m_pNode[pPanel->m_iLA];	
-	}
-	else{
-		R[0] = m_pNode[pPanel->m_iLB];
-		R[1] = m_pNode[pPanel->m_iTB];
-		R[2] = m_pNode[pPanel->m_iTA];
-		R[3] = m_pNode[pPanel->m_iLA];
-		R[4] = m_pNode[pPanel->m_iLB];	
-	}
-	for (i=0; i<4; i++){
-		a  = TestPt - R[i]; 
-		b  = TestPt - R[i+1];
-		s    = R[i+1] - R[i];
-		A    = a.VAbs();
-		B    = b.VAbs();
-		S    = s.VAbs();
-		SM   = s.dot(pPanel->m);
-		SL   = s.dot(pPanel->l);
-		AM   = a.dot(pPanel->m);
-		AL   = a.dot(pPanel->l);
-		Al   = AM*SL - AL*SM;
-		PA   = PN*PN * SL + Al*AM;
-		PB   = PA - Al*SM;
-
-		if(R[i].IsSame(R[i+1])){
-			//no contribution from this side
-			CJKi = 0.0;
-		}
-		else
-		{
-
-		//first the potential
-			if(A+B-S>0.0)	GL = 1.0/S * log((A+B+S)/(A+B-S));
-			RNUM = SM*PN * (B*PA-A*PB);
-			DNOM = PA*PB + PN*PN*A*B*SM*SM;
-
-			if(fabs(PN)<eps)
-			{
-				side = pPanel->Normal.dot(a * s); // Positive if on the panel's right side
-				if(side >=0.0) sign = 1.0; else sign = -1.0;
-				if(DNOM<0.0)
-				{
-					if(PN>0.0)	CJKi =  PI * sign;
-					else		CJKi = -PI * sign;
-				}
-				else if(DNOM == 0.0)
-				{
-					if(PN>0.0)	CJKi =  PI/2.0 * sign;
-					else		CJKi = -PI/2.0 * sign;
-				}
-				else
-					CJKi = 0.0;
-			}
-
-			else 
-			{
-				CJKi = atan2(RNUM, DNOM);
-			}
-
-			phi += Al*GL - PN*CJKi;
-
-	// next the induced velocity
-			T1   = pPanel->l      * SM*GL;
-			T2   = pPanel->m      * SL*GL;
-			T    = pPanel->Normal * CJKi;
-			V   += T + T1 - T2;
-		}
-	}
-}
-*/
-/*
-void PanelAnalysisDlg::DoubletNASA4023(CVector TestPt, CPanel *pPanel, CVector &V, double &phi, bool bWake)
-{
-	//VSAERO theory Manual
-	//Influence of panel pp at coll pt of panel p
-	int i;
-	double CoreSize = 0.000001;
-	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
-	CVector *pNode;
-	if(bWake)	pNode = m_pWakeNode;
-	else		pNode = m_pNode;
-
-	phi = 0.0;
-	V.Set(0.0,0.0,0.0);
-
-	PJK = TestPt - pPanel->CollPt;
-	PN  = PJK.dot(pPanel->Normal);
-	pjk = PJK.VAbs();
-
-	if(pjk> RFF*pPanel->Size)
-	{ // use far-field formula
-		phi = PN * pPanel->Area /pjk/pjk/pjk;
-		V   = (PJK*3.0*PN - pPanel->Normal*pjk*pjk)*pPanel->Area /pjk/pjk/pjk/pjk/pjk;
-		return;
-	}
-	
-	phi = 0.0;
-	V.Set(0.0,0.0,0.0);
-
-	if(pPanel->m_iPos>=0)
-	{
-		R[0] = pNode[pPanel->m_iLA];
-		R[1] = pNode[pPanel->m_iTA];
-		R[2] = pNode[pPanel->m_iTB];
-		R[3] = pNode[pPanel->m_iLB];
-		R[4] = pNode[pPanel->m_iLA];	
-	}
-	else
-	{
-		R[0] = pNode[pPanel->m_iLB];
-		R[1] = pNode[pPanel->m_iTB];
-		R[2] = pNode[pPanel->m_iTA];
-		R[3] = pNode[pPanel->m_iLA];
-		R[4] = pNode[pPanel->m_iLB];	
-	}
-	for (i=0; i<4; i++)
-	{
-		a  = TestPt - R[i];
-		b  = TestPt - R[i+1];
-		s    = R[i+1] - R[i];
-		A    = a.VAbs();
-		B    = b.VAbs();
-		SM   = s.dot(pPanel->m);
-		SL   = s.dot(pPanel->l);
-		AM   = a.dot(pPanel->m);
-		AL   = a.dot(pPanel->l);
-		Al   = AM*SL - AL*SM;
-		PA   = PN*PN*SL + Al*AM;
-		PB   = PA - Al*SM; //try alternative PB   = PN*PN*SL + Al*BM;
-
-		//get the distance of the TestPoint to the panel's side
-		h = a * s;
-		
-		//first the potential
-		if(R[i].IsSame(R[i+1])) 
-		{
-			CJKi = 0.0;
-			//no contribution to speed either
-		}
-		else if (h.VAbs()/s.VAbs() <= CoreSize && a.dot(s)>=0.0 && b.dot(s)<=0.0) 
-		{
-			CJKi = 0.0;//speed is singular on panel edge, value of potential is unknown
-		}
-		else
-		{
-			RNUM = SM*PN * (B*PA-A*PB);
-			DNOM = PA*PB + PN*PN*A*B*SM*SM;
-			if(fabs(PN)<eps)
-			{
-				side = pPanel->Normal.dot(a * s); // Positive if on the panel's right side
-				if(side >=0.0) sign = 1.0; else sign = -1.0;
-				if(DNOM<0.0){
-					if(PN>0.0)	CJKi =  PI * sign;
-					else		CJKi = -PI * sign;
-				}
-				else if(DNOM == 0.0){
-					if(PN>0.0)	CJKi =  PI/2.0 * sign;
-					else		CJKi = -PI/2.0 * sign;
-				}
-				else
-					CJKi = 0.0;
-			}
-			else 
-			{
-				CJKi = atan2(RNUM,DNOM);
-			}
-			// next the induced velocity
-			V += (a * b) * ((A+B) /A/B/ (A*B + a.dot(b)));
-		}
-		phi += CJKi;
-
-	}
-	if(TestPt == pPanel->CollPt)
-	{
-//		if(R[0].IsSame(R[1]) || R[1].IsSame(R[2]) || R[2].IsSame(R[3]) || R[3].IsSame(R[0]))
-//			phi = -3.0*PI/2.0;
-//		else 
-			phi  = -2.0*PI;
-	}
-}
-*/
-
-/*
-void PanelAnalysisDlg::RelaxWake()
-{
-	CMiarex *pMiarex = (CMiarex*)s_pMiarex;
-	CVector V, VL, VT;
-	int mw, kw, lw, llw;
-	double t, dx;
-	double damping = 1.0;
-	double *Mu    = m_Mu   ;
-	double *Sigma = m_Sigma;
-
-	//Since the wake roll-up is performed on the tilted geometry,
-	// we define a speed vector parallel to the x-axis
-	CVector QInf(m_QInf, 0.0, 0.0);
-
-	// VSAERO method
-	// calculates the induced velocity at the wake panel points 
-	// and realigns the panel's sides with the local flow vector
-	// we move all the wake nodes except for the leading nodes which remain at the wing's T.E.
-	CVector LATB, TALB, Trans, PP;
-	CVector WLA, WLB,WTA,WTB, WTemp;//wake panel's leading corner points
-
-	AddString("      Relaxing the wake...\n");
-
-	memcpy(m_pTempWakeNode, m_pWakeNode, m_nWakeNodes * sizeof(CVector));
-
-	for (lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
-	{
-		if(m_bCancel) break;
-		for (kw=0; kw<m_NWakeColumn; kw++)
-		{
-			if(m_bCancel) break;
-
-			mw = kw * m_pWPolar->m_NXWakePanels + lw;
-			//left point
-			WLA.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iLA]);
-			WTA.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iTA]);
-			WTemp.Copy(WLA);
-
-			VL = GetSpeedVector(WLA, Mu, Sigma);
-			VT = GetSpeedVector(WTA, Mu, Sigma);
-			VL += QInf;
-			VT += QInf;
-			V = (VL + VT)/2.0;
-	
-			dx  = (WTA.x-WLA.x);
-			t = dx/V.x;
-			WTemp.x += dx;
-			WTemp.y += V.y * t;
-			WTemp.z += V.z * t;
-
-			//define the translation vector
-			Trans = (WTemp - WLA) / damping;
-
-			//and move all the nodes downstream, i.e. all panels left nodes
-			for (llw=0; llw <m_pWPolar->m_NXWakePanels-lw; llw++)
-			{
-				m_pTempWakeNode[m_pWakePanel[mw+llw].m_iTA].y += Trans.y;
-				m_pTempWakeNode[m_pWakePanel[mw+llw].m_iTA].z += Trans.z;
-			}
-		}
-		//finally do the same for the right side of the last right column
-
-		WLB.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iLB]);
-		WTB.Copy(m_pTempWakeNode[m_pWakePanel[mw].m_iTB]);
-		WTemp.Copy(WLB);
-
-		VL = GetSpeedVector(WLB, Mu, Sigma);
-		VT = GetSpeedVector(WTB, Mu, Sigma);
-		VL += QInf;
-		VT += QInf;
-		V = (VL + VT)/2.0;
-
-		dx  = (WTB.x-WLB.x);
-		t = dx/V.x;
-		WTemp.x += dx;
-		WTemp.y += V.y * t;
-		WTemp.z += V.z * t;
-
-		//define the translation vector
-		Trans = (WTemp - WLB) / damping;
-
-		//and move all the nodes downstream, i.e. all panels left nodes
-		for (llw=0; llw <m_pWPolar->m_NXWakePanels-lw; llw++)
-		{
-			m_pTempWakeNode[m_pWakePanel[mw+llw].m_iTB].y += Trans.y;
-			m_pTempWakeNode[m_pWakePanel[mw+llw].m_iTB].z += Trans.z;
-		}
-	}
-
-	// Paste the new wake nodes back into the wake node array
-	memcpy(m_pWakeNode, m_pTempWakeNode, m_nWakeNodes * sizeof(CVector));
-
-	// Re-create the wake panels
-	mw=0;
-	for (mw=0; mw<pMiarex->m_WakeSize; mw++)
-	{
-		if(m_bCancel) break;
-
-		WLA.Copy(m_pWakeNode[m_pWakePanel[mw].m_iLA]);
-		WLB.Copy(m_pWakeNode[m_pWakePanel[mw].m_iLB]);
-		WTA.Copy(m_pWakeNode[m_pWakePanel[mw].m_iTA]);
-		WTB.Copy(m_pWakeNode[m_pWakePanel[mw].m_iTB]);
-		LATB.x = WTB.x - WLA.x;
-		LATB.y = WTB.y - WLA.y;
-		LATB.z = WTB.z - WLA.z;
-		TALB.x = WLB.x - WTA.x;
-		TALB.y = WLB.y - WTA.y;
-		TALB.z = WLB.z - WTA.z;
-
-		m_pWakePanel[mw].Normal = LATB * TALB;
-		m_pWakePanel[mw].Area =  m_pWakePanel[mw].Normal.VAbs()/2.0;
-		m_pWakePanel[mw].Normal.Normalize();
-		m_pWakePanel[mw].SetFrame(WLA, WLB, WTA, WTB);
-	}
-
-	//Udpdate the view
-	pMiarex->m_bResetglWake = true;
-	pMiarex->UpdateView();
-}*/
 
 
 void PanelAnalysisDlg::SetFileHeader()
@@ -2491,7 +2162,6 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	AddString("      Solving LU system...\n");
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,      Size, &m_bCancel);
 	Crout_LU_with_Pivoting_Solve(m_aij, m_wRHS, m_Index, m_RHS+Size, Size, &m_bCancel);
-
 	//______________________________________________________________________________________
 	//Reconstruct right side results if calculation was symetric
 	int m,p;
@@ -2502,14 +2172,11 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 		{
 			if(m_pPanel[p].m_bIsLeftPanel)
 			{
+				m_uRHS[p] = m_RHS[m];
+				m_wRHS[p] = m_RHS[m+Size];
 				if(m_pPanel[p].m_iSym>=0)
 				{
-					//cosine
-					m_uRHS[p]                  = m_RHS[m];
 					m_uRHS[m_pPanel[p].m_iSym] = m_RHS[m];
-
-					//sine
-					m_wRHS[p]                  = m_RHS[m+Size];
 					m_wRHS[m_pPanel[p].m_iSym] = m_RHS[m+Size];
 				}
 				m++;
@@ -2521,6 +2188,7 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 		memcpy(m_uRHS, m_RHS,           m_MatSize*sizeof(double));
 		memcpy(m_wRHS, m_RHS+m_MatSize, m_MatSize*sizeof(double));
 	}
+
 
 	//   Define unit local velocity vectore, necessary for moment calculations in stability analysis of 3D panels
 	CVector u(1.0, 0.0, 0.0);
@@ -2535,6 +2203,7 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 		}
 		if(m_bCancel) return false;
 	}
+
 
 	return true;
 }
@@ -4454,8 +4123,8 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
 
-	DeltaAngle = 0.001;
-//	DeltaAngle = 45*PI/180;
+//	DeltaAngle = 0.001;
+DeltaAngle = 10.*PI/180.;
 
 	pos = 0;
 	Xde[0] = Yde[0] =  Zde[0] = Lde[0] = Mde[0] = Nde[0] = 0.0;
@@ -4512,7 +4181,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 				{
 					if(m_ppSurface[j]->IsFlapPanel(p))
 					{
-//						m_ppSurface[j]->RotateFlapPanel(DeltaAngle*180.0/PI, m_pPanel+p);
 						m_pPanel[p].RotateBC(m_ppSurface[j]->m_HingePoint, Quat);
 					}
 				}
@@ -4544,6 +4212,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
+
 	strong = "      Calculating the control derivatives\n\n";
 	AddString(strong);
 
@@ -4557,8 +4226,8 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	Lde[0] = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
 	Mde[0] = (Moment - Moment0).dot(js) /DeltaAngle;
 	Nde[0] = (Moment - Moment0).dot(ks) /DeltaAngle;
-qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
-qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
+//qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
+//qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
 
 
 	//output control derivatives

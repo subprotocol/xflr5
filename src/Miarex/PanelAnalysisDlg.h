@@ -83,7 +83,7 @@ private:
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
 	void CreateSourceStrength(double Alpha0, double AlphaDelta, int nval);
-	void CreateRHS(double *RHS, CVector VInf, double *VField = NULL);
+	void CreateRHS(double *RHS, CVector VInf, double *VField = NULL, bool bTrace=false);
 	void CreateUnitRHS();
 	void CreateWakeContribution();
 	void CreateWakeContribution(double *pWakeContrib, CVector WindDirection);
