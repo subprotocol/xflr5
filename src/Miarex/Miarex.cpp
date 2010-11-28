@@ -611,9 +611,9 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlLift->setChecked(m_bXCP);
 
-/*	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
-	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));*/
+	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
 	connect(m_pctrlStoreWOpp, SIGNAL(clicked()), this, SLOT(OnStoreWOpp()));
@@ -728,6 +728,14 @@ CBody* QMiarex::AddBody(CBody *pBody)
 		}
 	}
 	return NULL;
+}
+
+
+void QMiarex::OnReadAnalysisData()
+{
+	m_AlphaMin   = m_pctrlAlphaMin->GetValue();
+	m_AlphaMax   = m_pctrlAlphaMax->GetValue();
+	m_AlphaDelta = m_pctrlAlphaDelta->GetValue();
 }
 
 
@@ -12849,7 +12857,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->InitDialog();
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
-m_bResetglMesh = true;//TODO remove
+//m_bResetglMesh = true;//TODO remove
 //	if(m_bLogFile && m_pPanelDlg->m_bWarning) pMainFrame->OnLogFile();
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
@@ -14624,7 +14632,7 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 2);
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 5);
 	m_pctrlAlphaMax     = new FloatEdit(1., 2);
 	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
 

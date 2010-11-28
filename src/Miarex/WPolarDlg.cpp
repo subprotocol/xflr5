@@ -507,14 +507,14 @@ void WPolarDlg::OnUnit()
 		m_UnitType   = 1;
 		m_pctrlViscosity->SetValue(m_Viscosity);
 		m_pctrlDensityUnit->setText("kg/m3");
-		m_pctrlViscosityUnit->setText("m2/s");
+		m_pctrlViscosityUnit->setText("m"+QString::fromUtf8("²")+"/s");
 	}
 	else
 	{
 		m_UnitType   = 2;
 		m_pctrlViscosity->SetValue(m_Viscosity* 10.7182881);
 		m_pctrlDensityUnit->setText("slugs/ft3");
-		m_pctrlViscosityUnit->setText("ft2/s");
+		m_pctrlViscosityUnit->setText("ft"+QString::fromUtf8("²")+"/s");
 	}
 	SetDensity();
 }

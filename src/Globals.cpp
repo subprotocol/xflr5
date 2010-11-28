@@ -147,32 +147,32 @@ void GetAreaUnit(QString &str, int unit)
 	{
 		case 0:
 		{
-			str="mm2";
+			str="mm"+QString::fromUtf8("²");
 			break;
 		}
 		case 1:
 		{
-			str="cm2";
+			str="cm"+QString::fromUtf8("²");
 			break;
 		}
 		case 2:
 		{
-			str="dm2";
+			str="dm"+QString::fromUtf8("²");
 			break;
 		}
 		case 3:
 		{
-			str="m2";
+			str="m"+QString::fromUtf8("²");
 			break;
 		}
 		case 4:
 		{
-			str="in2";
+			str="in"+QString::fromUtf8("²");
 			break;
 		}
 		case 5:
 		{
-			str="ft2";
+			str="ft"+QString::fromUtf8("²");
 			break;
 		}
 		default:
@@ -182,6 +182,9 @@ void GetAreaUnit(QString &str, int unit)
 		}
 	}
 }
+
+
+
 void GetLengthUnit(QString &str, int unit)
 {
 	switch(unit)

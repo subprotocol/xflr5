@@ -208,7 +208,9 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
-
+//double cosa = cos(0.3017*PI/180.0);
+//double sina = sin(0.3017*PI/180.0);
+//for(int p=0; p<m_MatSize; p++) qDebug("Alphaloop     %15.9f", (cosa*m_uRHS[p]+sina*m_wRHS[p])*28.2);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -249,7 +251,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
-//for(int p=0; p<m_MatSize; p++) qDebug("Alphaloop     %13.9g", m_Mu[p]);
 
 	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
@@ -1010,7 +1011,12 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				pos += m_pWingList[i]->m_MatSize;
 			}
 		}
-qDebug("q.ICm=           %13.7f", m_ICm*1/2*m_pWPolar->m_Density*QInf*QInf);
+//double q =  0.5 * m_pWPolar->m_Density * QInf*QInf;
+//qDebug("Alpha=%7.4f  QInf=%6.3f  q.S.mac.ICm=%13.7f", Alpha, QInf, q*m_pWPolar->m_WArea*m_pWPolar->m_WMAChord*m_ICm);
+
+
+
+
 		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
 			AddString(tr("       Calculating body...")+"\n");
@@ -3765,6 +3771,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	}
 
 	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force0, Moment0, m_pWPolar->m_bTiltedGeom);
+qDebug("Moment0=   %13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
 
 	return true;
 }
@@ -4124,8 +4131,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
 
-//	DeltaAngle = 0.001;
-DeltaAngle = 1.*PI/180.;
+	DeltaAngle = 0.001;
 
 	pos = 0;
 	Xde[0] = Yde[0] =  Zde[0] = Lde[0] = Mde[0] = Nde[0] = 0.0;
@@ -4192,6 +4198,7 @@ DeltaAngle = 1.*PI/180.;
 
 	//create the RHS
 	CreateRHS(m_cRHS, V0);
+//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_cRHS[p]);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -4213,7 +4220,6 @@ DeltaAngle = 1.*PI/180.;
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
-//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_cRHS[p]);
 
 	strong = "      Calculating the control derivatives\n\n";
 	AddString(strong);
@@ -4228,8 +4234,7 @@ DeltaAngle = 1.*PI/180.;
 	Lde[0] = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
 	Mde[0] = (Moment - Moment0).dot(js) /DeltaAngle;
 	Nde[0] = (Moment - Moment0).dot(ks) /DeltaAngle;
-qDebug("%13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
-qDebug("%13.7f  %13.7f  %13.7f  ", Moment.x, Moment.y, Moment.z)	;
+//qDebug("Moment=    %13.7f  %13.7f  %13.7f  ", Moment.x,  Moment.y,  Moment.z)	;
 
 
 	//output control derivatives

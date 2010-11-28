@@ -209,6 +209,7 @@ private slots:
 	void OnImportWPolar();
 	void OnUFOInertia();
 	void OnWPolarProps();
+	void OnReadAnalysisData();
 
 	void OnTimeGraph();
 	void OnStabilityView();
