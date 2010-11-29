@@ -1081,8 +1081,9 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 			strong = m_WingName;
 			strong.replace(" ", "_");
 			strong += str;
-			str = QString("%1  ")
-				  .arg(2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle),5,'f',2);
+			double mean_angle = (ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle)/2.0;
+			if(fabs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
+			else                     str = "1.0   ";
 			strong += str;
 			str = QString("%1  %2  %3  %4  -1.0  ")
 				  .arg(ASurface.m_pFoilA->m_TEXHinge/100.0,5,'f',3)
@@ -1115,8 +1116,11 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 			strong = m_WingName;
 			strong.replace(" ", "_");
 			strong += str;
-			str = QString("%1  ").arg(2.0/(ASurface.m_pFoilA->m_TEFlapAngle + ASurface.m_pFoilB->m_TEFlapAngle),5,'f',2);
+
+			if(fabs(mean_angle)>0.0) str = QString("%1  ").arg(1.0/mean_angle,5,'f',2);
+			else                     str = "1.0   ";
 			strong += str;
+
 			str = QString("%1  %2  %3  %4  -1.0  ")
 				  .arg(ASurface.m_pFoilB->m_TEXHinge/100.0,5,'f',3)
 				  .arg(ASurface.m_HingeVector.x,10,'f',4)
@@ -2733,7 +2737,8 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_GRm += GeomMoment.dot(WindDirection);
 
 			m_VYm += DragMoment.dot(WindNormal);
-			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4Strip.y ;
+//			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4Strip.y ;
+			m_IYm += -GeomMoment.dot(WindNormal);
 
 			m_VCm += DragMoment.y;
 			m_ICm += GeomMoment.y;

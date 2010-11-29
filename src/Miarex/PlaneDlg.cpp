@@ -440,7 +440,7 @@ void PlaneDlg::OnFin()
 
 void PlaneDlg::OnImportWing()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	ImportWingDlg dlg;
 	dlg.m_WingName = m_pPlane->m_Wing.m_WingName;
 	dlg.m_poaWing = s_poaWing;
@@ -449,7 +449,7 @@ void PlaneDlg::OnImportWing()
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		CWing *pWing = pMainFrame->GetWing(dlg.m_WingName);
+		CWing *pWing = pMiarex->GetWing(dlg.m_WingName);
 		if(pWing)
 		{
 			m_pPlane->m_Wing.Duplicate(pWing);
@@ -461,7 +461,7 @@ void PlaneDlg::OnImportWing()
 
 void PlaneDlg::OnImportWing2() 
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	ImportWingDlg dlg;
 	dlg.m_WingName = m_pPlane->m_Wing.m_WingName;
 	dlg.m_poaWing = s_poaWing;
@@ -470,7 +470,7 @@ void PlaneDlg::OnImportWing2()
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		m_bChanged = true;
-		CWing *pWing = pMainFrame->GetWing(dlg.m_WingName);
+		CWing *pWing = pMiarex->GetWing(dlg.m_WingName);
 		if(pWing)
 		{
 			m_pPlane->m_Wing2.Duplicate(pWing);

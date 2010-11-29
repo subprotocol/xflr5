@@ -38,6 +38,7 @@ class CSurface : public QObject
 	friend class GL3dWingDlg;
 	friend class PanelAnalysisDlg;
 	friend class InertiaDlg;
+	friend class CWPolar;
 
 public:
     void AddFlapPanel(CPanel *pPanel);

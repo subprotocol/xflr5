@@ -185,7 +185,6 @@ private:
 	void AddFoil(CFoil *pFoil);
 	void RenameFoil(CFoil *pFoil);
 
-	CWing *GetWing(QString WingName);
 	CFoil* GetFoil(QString strFoilName);
 	CFoil* ReadFoilFile(QTextStream &ar);
 	CFoil* ReadPolarFile(QDataStream &ar);

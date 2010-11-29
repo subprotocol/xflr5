@@ -690,8 +690,8 @@ void WPolarDlg::SetupLayout()
 		m_pctrlWeight  = new FloatEdit(1.234);
 		m_pctrlWeight->SetPrecision(3);
 		m_pctrlWeight->SetMin(0.0);
-		m_pctrlXCmRef  = new FloatEdit(100.00,2);
-		m_pctrlZCmRef  = new FloatEdit(100.00,2);
+		m_pctrlXCmRef  = new FloatEdit(100.00,3);
+		m_pctrlZCmRef  = new FloatEdit(100.00,3);
 		InertiaDataLayout->addWidget(m_pctrlWeight,1,2);
 		InertiaDataLayout->addWidget(m_pctrlXCmRef,2,2);
 		InertiaDataLayout->addWidget(m_pctrlZCmRef,3,2);

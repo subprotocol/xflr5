@@ -82,6 +82,7 @@ class QMiarex : public QWidget
 	friend class DisplaySettingsDlg;
 	friend class UFOTableDelegate;
 	friend class WPolarDlg;
+	friend class CWPolar;
 
 	Q_OBJECT
 

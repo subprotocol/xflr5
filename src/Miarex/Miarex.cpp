@@ -5012,6 +5012,8 @@ CWing * QMiarex::GetWing(QString WingName)
 	//
 	// returns a pointer to the wing with the name WingName
 	//
+	if(!WingName.length()) return NULL;
+
 	int i;
 	CWing* pWing;
 	for (i=0; i<m_poaWing->size(); i++)

@@ -1022,6 +1022,7 @@ void MainFrame::CreateDockWindows()
 	CBody::s_pMainFrame    = this;
 
 	CWPolar::s_pMainFrame  = this;
+	CWPolar::s_pMiarex  = m_pMiarex;
 
 	LLTAnalysisDlg::s_pMainFrame = this;
 	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
@@ -2900,23 +2901,6 @@ QColor MainFrame::GetColor(int type)
 }
 
 
-CWing* MainFrame::GetWing(QString WingName)
-{
-	//returns a pointer to the foil with the corresponding name
-	// returns NULL if not found
-	if(!WingName.length()) return NULL;
-	CWing* pWing;
-	for (int i=0; i<m_oaWing.size(); i++)
-	{
-		pWing = (CWing*)m_oaWing.at(i);
-		if (pWing->m_WingName == WingName)
-		{
-			return pWing;
-		}
-	}
-
-	return NULL;
-}
 
 CFoil* MainFrame::GetFoil(QString strFoilName)
 {

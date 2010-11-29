@@ -2310,7 +2310,6 @@ void PanelAnalysisDlg::StartAnalysis()
 			AddString(strong);
 			strong = tr("It is recommended to slightly offset the wing or the elevator to avoid numerical instabilities")+"\n\n";
 			AddString(strong);
-			
 		}
 	}
 
@@ -3996,6 +3995,15 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	AddString(str);
 	str = QString("      Mq=%1      Cmq=%2\n").arg(Mq,12,'g',5).arg(Mq*(2.*u0/mac)/(q*S*mac),12,'g',5);
 	AddString(str);
+
+/*	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strLength;
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	double hn = m_pWPolar->m_CoG.x - Mw/mac/Zw;
+	str = QString("      Neutral Point position=%1").arg(hn*pMainFrame->m_mtoUnit, 10,'f',5);
+	str += strLength;
+	str +="\n\n";
+	AddString(str);*/
 
 	str = "\n      Lateral derivatives\n";
 	AddString(str);

@@ -46,6 +46,7 @@ public:
 	CWPolar();
 
 	static void* s_pMainFrame;
+	static void* s_pMiarex;
 
 private:
 

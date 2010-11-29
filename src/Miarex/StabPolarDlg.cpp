@@ -913,7 +913,8 @@ void StabPolarDlg::SetWPolarName()
 			}
 		}
 	}
-	
+	nCtrl += m_pStab->m_nFlaps;
+
 	if(m_pPlane && m_pFin)
 	{
 		for(i=0; i<m_pFin->m_nFlaps; i++)

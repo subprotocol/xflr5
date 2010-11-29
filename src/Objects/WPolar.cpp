@@ -23,11 +23,13 @@
 #include "WPolar.h"
 #include "../Globals.h"
 #include "../MainFrame.h"
+#include "../Miarex/Miarex.h"
 #include <math.h>
 #include <QMessageBox>
 #include <QtDebug>
 
 void *CWPolar::s_pMainFrame;
+void *CWPolar::s_pMiarex;
 
 CWPolar::CWPolar()
 {
@@ -1736,8 +1738,112 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong  = QString(QObject::tr("Viscosity =")+"%1 m2/s\n").arg(m_Viscosity,12,'g',4);
 	PolarProperties += strong;
 
-	strong = QString(QObject::tr("Data points") +" = %1").arg(m_Alpha.size());
+	strong = QString(QObject::tr("Data points") +" = %1\n").arg(m_Alpha.size());
 	PolarProperties += strong;
+
+
+	//Control data
+	int j;
+	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
+	CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
+	int iCtrl = 0;
+	if(pPlane)
+	{
+		if(m_bActiveControl[iCtrl])
+		{
+			strong = QString("Wing Tilt : Min=%1 Max=%2\n")
+							.arg(m_MinControl[iCtrl],5,'f',2)
+							.arg(m_MaxControl[iCtrl],5,'f',2);
+			PolarProperties +=strong;
+		}
+		iCtrl=1;
+		if(pPlane->m_bStab)
+		{
+			if(m_bActiveControl[iCtrl])
+			{
+				strong = QString("Elevator Tilt : Min=%1 Max=%2\n")
+								.arg(m_MinControl[iCtrl],5,'f',2)
+								.arg(m_MaxControl[iCtrl],5,'f',2);
+				PolarProperties +=strong;
+			}
+			iCtrl=2;
+		}
+	}
+
+	CWing *pStab, *pFin, *pWing;
+	if(pPlane)
+	{
+		pWing = &pPlane->m_Wing;
+		if(pPlane->m_bStab) pStab=&pPlane->m_Stab; else pStab=NULL;
+		if(pPlane->m_bFin)  pFin=&pPlane->m_Fin; else pFin=NULL;
+	}
+	else pWing = pMiarex->GetWing(m_UFOName);
+
+	// flap controls
+	//wing first
+	int nFlap = 0;
+	if(pWing)
+	{
+		for (j=0; j<pWing->m_NSurfaces; j++)
+		{
+			if(pWing->m_Surface[j].m_bTEFlap)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Wing Flap %1 : Min=%2 Max=%3\n")
+									.arg(nFlap)
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				nFlap++;
+				iCtrl++;
+			}
+		}
+	}
+
+	//elevator next and last
+	nFlap = 0;
+	if(pStab)
+	{
+		for (j=0; j<pStab->m_NSurfaces; j++)
+		{
+			if(pStab->m_Surface[j].m_bTEFlap)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Elev. Flap %1 : Min=%2 Max=%3\n")
+									.arg(nFlap+1)
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				nFlap++;
+				iCtrl++;
+			}
+		}
+	}
+
+	nFlap = 0;
+	if(pFin)
+	{
+		for (j=0; j<pFin->m_NSurfaces; j++)
+		{
+			if(pFin->m_Surface[j].m_bTEFlap)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Fin Flap %1 : Min=%2 Max=%3\n")
+									.arg(nFlap+1)
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				nFlap++;
+				iCtrl++;
+			}
+		}
+	}
 }
 
 
