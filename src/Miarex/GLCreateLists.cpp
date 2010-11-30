@@ -1416,7 +1416,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 
 		amp *= pMiarex->m_LiftScale*factor;
 
-		if (amp>0.0) sign = -1.0; else sign = +1.0;
+		if (amp>0.0) sign = 1.0; else sign = -1.0;
 
 		glBegin(GL_LINE_STRIP);
 		{

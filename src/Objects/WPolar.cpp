@@ -1771,6 +1771,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	}
 
 	CWing *pStab, *pFin, *pWing;
+	pStab = pFin = pWing = NULL;
 	if(pPlane)
 	{
 		pWing = &pPlane->m_Wing;
