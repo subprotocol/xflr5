@@ -59,7 +59,6 @@ private:
 	QColor m_Color;
 
 	int m_WingType;		//0 for wing, 1 for elevator, 2 for fin
-	int m_Type;		// Polar Analysis Type
 	int m_nWakeNodes;	// number of wake nodes 
 	int m_NXWakePanels;	// 
 	int m_nControls;	// number of controls associated to the WOpp
@@ -100,6 +99,7 @@ public:
 
 	int m_NVLMPanels;	// number of VLMpanels
 	int m_AnalysisMethod;	//1=LLT, 2=VLM, 3=3D Panels
+	int m_Type;		// Polar Analysis Type
 	int m_NStation;		// number of stations along wing span
 	int m_nFlaps;		// number of flaps
 

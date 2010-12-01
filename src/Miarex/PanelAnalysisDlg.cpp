@@ -3770,7 +3770,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	}
 
 	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force0, Moment0, m_pWPolar->m_bTiltedGeom);
-qDebug("Moment0=   %13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
+//qDebug("Moment0=   %13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
 
 	return true;
 }

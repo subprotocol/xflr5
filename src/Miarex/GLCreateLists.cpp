@@ -2369,8 +2369,15 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+	static int dD, ZPos, LeftPos;
+	static complex<double> c, angle;
+	static double OmegaN, Omega1, Dsi, Sigma1, sum, prod, u0, mac, span;
+	QString strange, str;
 
-	if(!pWing || !pWOpp || pWOpp->m_AnalysisMethod!=4 )
+	if(!pWing || !pWOpp || pWOpp->m_Type!=STABILITYPOLAR )
 	{
 		glNewList(MODELEGEND,GL_COMPILE);
 		{}
@@ -2380,13 +2387,6 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 	if(!pMiarex->m_bResetglModeLegend) return;
 	pMiarex->m_bResetglModeLegend = false;
 	
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
-	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
-	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
-	static int dD, ZPos, LeftPos;
-	static complex<double> c, angle;
-	static double OmegaN, Omega1, Dsi, Sigma1, sum, prod, u0, mac, span;
-	QString strange, str;
 
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dD = fm.height();//pixels
@@ -2413,6 +2413,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		pMiarex->m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
+		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 
 		strange = QString(QObject::tr("Control position = %1 ")).arg(pWOpp->m_Ctrl, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
@@ -2547,7 +2548,6 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 	{
 		pMiarex->m_GLList++;
 
-//		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 

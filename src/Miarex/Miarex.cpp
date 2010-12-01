@@ -5428,7 +5428,7 @@ void QMiarex::GLDraw3D()
 		m_ArcBall.GetMatrix();
 		CVector eye(0.0,0.0,1.0);
 		CVector up(0.0,1.0,0.0);
-		m_ArcBall.SetZoom(0.3,eye,up);
+		m_ArcBall.SetZoom(0.45,eye,up);
 
 		if(glIsList(ARCBALL))
 		{
@@ -5967,7 +5967,6 @@ void QMiarex::GLRenderMode()
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		glCallList(MODELEGEND);
 
 //		pGLWidget->renderText(m_r3DCltRect.left(), m_r3DCltRect.top(), strong, pMainFrame->m_TextFont);
 		pGLWidget->renderText(15, 15, strong, pMainFrame->m_TextFont);
@@ -6009,7 +6008,9 @@ void QMiarex::GLRenderMode()
 		if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 
 		GLCallModeLists();
+		glCallList(MODELEGEND);
 	}
+
 	glPopMatrix();
 }
 
