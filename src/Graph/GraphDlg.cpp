@@ -211,6 +211,7 @@ void GraphDlg::FillVariableList()
 		m_pctrlXSel->addItem(tr("(XCp-Xcg)/MAC"));				//29
 		m_pctrlXSel->addItem(tr("Control Variable"));			//30
 		m_pctrlXSel->addItem(tr("Cy - Lateral force coef."));	//31
+		m_pctrlXSel->addItem(tr("Neutral Point x-position"));	//32
 
 		m_pctrlYSel->addItem(tr("Alpha"));						//0
 		m_pctrlYSel->addItem(tr("Lift coef."));					//1
@@ -246,6 +247,7 @@ void GraphDlg::FillVariableList()
 		m_pctrlYSel->addItem(tr("(XCp-Xcg)/MAC"));				//29
 		m_pctrlYSel->addItem(tr("Control Variable"));			//30
 		m_pctrlYSel->addItem(tr("Cy - Lateral force coef."));	//31
+		m_pctrlYSel->addItem(tr("Neutral Point x-position"));	//32
 	}
 	else if(m_iGraphType == 64)
 	{

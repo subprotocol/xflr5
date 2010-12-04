@@ -114,7 +114,7 @@ private:
 	void BuildStateMatrices();
 	void ComputeControlDerivatives();
 	void ComputeResults();
-	void GetNDStabDerivatives(CWOpp *pNewPoint);
+	void ComputeNDStabDerivatives();
 	void Forces(double *Mu, double *Sigma, double alpha, double *VInf, CVector &Force, CVector &Moment, bool bTilted, bool bTrace=false);
 	double ComputeCm(double Alpha, bool bTrace=false);
 
@@ -168,10 +168,15 @@ private:
 	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
 	double ftmp, Omega, r1v, r2v;
 
+	double XNP;//Neutral point x-position resulting from stability analysis
+	double CXu, CZu, Cmu, CXq, CZq, Cmq, CXa, CZa, Cma; // Non dimensional stability derivatives
+	double CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
+	double CXe, CYe, CZe, Cle, Cme, Cne;
+
 	double *m_aij, *m_aijWake;
 	double *m_RHS, *m_RHSRef;
 
-	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];			// Source strengths
+	double m_Sigma[VLMMAXMATSIZE*VLMMAXRHS];		// Source strengths
 	double m_Mu[VLMMAXMATSIZE*VLMMAXRHS];			// Doublet strengths, or vortex circulations if panel is located on a thin surface
 	double m_Cp[VLMMAXMATSIZE*VLMMAXRHS];			// lift coef per panel
 	double m_3DQInf[VLMMAXRHS];
@@ -240,23 +245,22 @@ public://stability analysis method and variables
 	CVector Force0, Moment0;
 
 	// longitudinal stability derivatives
-	double Xu, Xw, Zu, Zw, Zq, Mu, Mw, Mq;//first order
+	double Xu, Xw, Zu, Zw, Xq, Zq, Mu, Mw, Mq;//first order
 	double Zwp, Mwp;                  //second order
 
 	// latal stability derivatives
 	double Yv, Yp, Yr, Lv, Lp, Lr, Nv, Np, Nr;//first order
 
 	//stability control derivatives
-	double Xde[MAXCONTROLS], Yde[MAXCONTROLS], Zde[MAXCONTROLS];
-	double Lde[MAXCONTROLS], Mde[MAXCONTROLS], Nde[MAXCONTROLS];
+	double Xde, Yde, Zde, Lde, Mde, Nde;
 
 	double u0;     //steady state x-velocity
 	double Theta0; //steady state pitch angle
 //	double m_BankAngle;
 	double m_ALong[4][4];	//Longitudinal State Matrix
 	double m_ALat[4][4];	//Lateral State Matrix
-	double m_BLong[MAXCONTROLS][4];
-	double m_BLat[MAXCONTROLS][4];
+	double m_BLong[4];
+	double m_BLat[4];
 	double m_R[3][3];	//Rotation matrix
 
 	//COG position in Body axis

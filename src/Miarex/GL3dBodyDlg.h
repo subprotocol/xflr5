@@ -239,7 +239,8 @@ private:
 
 	int m_GLList;
 //	int m_iView;
-	int m_NXPoints, m_NHoopPoints;
+	int m_NHoopPoints;			//hoop resolution for NURBS bodies
+	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
 	int m_Precision[10];
 
 	double m_ClipPlanePos;

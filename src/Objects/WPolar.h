@@ -137,6 +137,7 @@ private:
 	QList <double> m_Oswald;
 	QList <double> m_SM;//pseudo Static Margin = (XCP-XCmRef)/m.a.c;
 	QList <double> m_Ctrl;//Ctrl variable
+	QList <double> m_XNP;
 
 	complex<double> m_EigenValue[8][MAXPOLARPOINTS]; //until we have a QList<complex<double>> ?
 

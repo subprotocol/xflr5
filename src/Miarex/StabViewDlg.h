@@ -71,7 +71,7 @@ private:
 	
 	void AddCurve();
 	void Connect();
-	void FillControlNames();
+//	void FillControlNames();
 	void FillEigenThings();
 	void FillCurveList();
 	void ReadForcedInput(double *in);
@@ -97,7 +97,7 @@ private:
 	
 	QLabel *m_pctrlStabLabel1, *m_pctrlStabLabel2, *m_pctrlStabLabel3;
 	FloatEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
-	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat, *m_pctrlRampTime;
+	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat, *m_pctrlRampTime, *m_pctrlRampAmplitude;
 	QPushButton *m_pctrlPlotStabGraph;
 	QPushButton *m_pctrlAddCurve, *m_pctrlDeleteCurve, *m_pctrlRenameCurve;
 	QComboBox *m_pctrlCurveList;
@@ -109,9 +109,9 @@ private:
 
 	QRadioButton *m_pctrlModalResponse, *m_pctrlInitCondResponse, *m_pctrlForcedResponse;
 
-	QTableView *m_pctrlControlTable;
-	QStandardItemModel *m_pControlModel;
-	CtrlTableDelegate *m_pCtrlDelegate;	
+//	QTableView *m_pctrlControlTable;
+//	QStandardItemModel *m_pControlModel;
+//	CtrlTableDelegate *m_pCtrlDelegate;
 
 	double m_ModeAmplitude;
 	double m_vabs[4], m_phi[4];

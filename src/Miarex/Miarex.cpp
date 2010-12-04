@@ -138,10 +138,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_Modedt   = 0.01;
 
 
-	m_NXPoints    = 30;
-	m_NHoopPoints = 20;
-
-
 	m_ptOffset.rx() = 0;
 	m_ptOffset.ry() = 0;
 
@@ -166,6 +162,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_TimeInput[0] = m_TimeInput[1] = m_TimeInput[2] = m_TimeInput[3];
 	m_TotalTime = 10;//s
 	m_Deltat    = 0.1;//s
+
+	m_RampTime = .1;//s
+	m_RampAmplitude = 1.;//CtrlUnit;
+
 
 	m_pCurWingGraph = &m_WingGraph1;
 	m_pCurWPlrGraph = &m_WPlrGraph1;
@@ -940,7 +940,32 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 						pWOpp->m_EigenVector[i+4][l] = m_pPanelDlg->m_vLat[4*i+l];
 					}
 				}
-				m_pPanelDlg->GetNDStabDerivatives(&pPOpp->m_WingWOpp);
+
+				pPOpp->m_WingWOpp.m_XNP = m_pPanelDlg->XNP;
+
+				pPOpp->m_WingWOpp.CLa = -m_pPanelDlg->CZa;
+				pPOpp->m_WingWOpp.CLq = -m_pPanelDlg->CZq;
+				pPOpp->m_WingWOpp.Cma =  m_pPanelDlg->Cma;
+				pPOpp->m_WingWOpp.Cmq =  m_pPanelDlg->Cmq;
+				pPOpp->m_WingWOpp.CYb =  m_pPanelDlg->CYb;
+				pPOpp->m_WingWOpp.CYp =  m_pPanelDlg->CYp;
+				pPOpp->m_WingWOpp.CYr =  m_pPanelDlg->CYr;
+				pPOpp->m_WingWOpp.Clb =  m_pPanelDlg->Clb;
+				pPOpp->m_WingWOpp.Clp =  m_pPanelDlg->Clp;
+				pPOpp->m_WingWOpp.Clr =  m_pPanelDlg->Clr;
+				pPOpp->m_WingWOpp.Cnb =  m_pPanelDlg->Cnb;
+				pPOpp->m_WingWOpp.Cnp =  m_pPanelDlg->Cnp;
+				pPOpp->m_WingWOpp.Cnr =  m_pPanelDlg->Cnr;
+				//Only one control derivative for all the controls of the polar
+				pPOpp->m_WingWOpp.m_nControls = 1;
+				pPOpp->m_WingWOpp.CXe[0] = m_pPanelDlg->CXe;
+				pPOpp->m_WingWOpp.CYe[0] = m_pPanelDlg->CYe;
+				pPOpp->m_WingWOpp.CZe[0] = m_pPanelDlg->CZe;
+				pPOpp->m_WingWOpp.CLe[0] = m_pPanelDlg->Cle;
+				pPOpp->m_WingWOpp.CMe[0] = m_pPanelDlg->Cme;
+				pPOpp->m_WingWOpp.CNe[0] = m_pPanelDlg->Cne;
+
+
 				memcpy(pWOpp->m_ALong, m_pPanelDlg->m_ALong, 16*sizeof(double));
 				memcpy(pWOpp->m_ALat,  m_pPanelDlg->m_ALat,  16*sizeof(double));
 				memcpy(pWOpp->m_BLong, m_pPanelDlg->m_BLong, MAXCONTROLS * 4*sizeof(double));
@@ -1388,7 +1413,30 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 					pNewPoint->m_EigenVector[i+4][l] = m_pPanelDlg->m_vLat[4*i+l];
 				}
 			}
-			m_pPanelDlg->GetNDStabDerivatives(pNewPoint);
+
+			pNewPoint->m_XNP = m_pPanelDlg->XNP;
+
+			pNewPoint->CLa = -m_pPanelDlg->CZa;
+			pNewPoint->CLq = -m_pPanelDlg->CZq;
+			pNewPoint->Cma = m_pPanelDlg->Cma;
+			pNewPoint->Cmq = m_pPanelDlg->Cmq;
+			pNewPoint->CYb = m_pPanelDlg->CYb;
+			pNewPoint->CYp = m_pPanelDlg->CYp;
+			pNewPoint->CYr = m_pPanelDlg->CYr;
+			pNewPoint->Clb = m_pPanelDlg->Clb;
+			pNewPoint->Clp = m_pPanelDlg->Clp;
+			pNewPoint->Clr = m_pPanelDlg->Clr;
+			pNewPoint->Cnb = m_pPanelDlg->Cnb;
+			pNewPoint->Cnp = m_pPanelDlg->Cnp;
+			pNewPoint->Cnr = m_pPanelDlg->Cnr;
+			//Only one control derivative for all the controls of the polar
+			pNewPoint->m_nControls = 1;
+			pNewPoint->CXe[0] = m_pPanelDlg->CXe;
+			pNewPoint->CYe[0] = m_pPanelDlg->CYe;
+			pNewPoint->CZe[0] = m_pPanelDlg->CZe;
+			pNewPoint->CLe[0] = m_pPanelDlg->Cle;
+			pNewPoint->CMe[0] = m_pPanelDlg->Cme;
+			pNewPoint->CNe[0] = m_pPanelDlg->Cne;
 
 			memcpy(pNewPoint->m_ALong, m_pPanelDlg->m_ALong, 16*sizeof(double));
 			memcpy(pNewPoint->m_ALat,  m_pPanelDlg->m_ALat,  16*sizeof(double));
@@ -3564,7 +3612,8 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	//	with t>0
 
 	static int i, j, TotalPoints, PlotInterval;
-	static double in[MAXCONTROLS], t, dt, RampTime, u_t;
+//	static double in[MAXCONTROLS];
+	static double t, dt, RampTime, RampAmp, u_t;
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	static double A[4][4], B[MAXCONTROLS][4];
 	static double m[5][4];
@@ -3606,8 +3655,8 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 	// Rebuild the Forced Response matrix
 	//read the initial step condition
-	pStabView->ReadForcedInput(in);
-	
+//	pStabView->ReadForcedInput(in);
+	RampAmp     = pStabView->m_pctrlRampAmplitude->GetValue();           //ControlUNit
 	RampTime    = pStabView->m_pctrlRampTime->GetValue();           //s
 	m_Deltat    = pStabView->m_pctrlDeltat->GetValue();
 	m_TotalTime = pStabView->m_pctrlTotalTime->GetValue();
@@ -3637,14 +3686,18 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		if(RampTime<=0.0) u_t = 1.0;
 		else              u_t = qMin(1.0, t/RampTime);
-		for(j=0; j<m_pCurWPolar->m_nControls; j++)
+/*		for(j=0; j<m_pCurWPolar->m_nControls; j++)
 		{
 			m[0][0] += B[j][0] * in[j]*u_t;
 			m[0][1] += B[j][1] * in[j]*u_t;
 			m[0][2] += B[j][2] * in[j]*u_t;
 			m[0][3] += B[j][3] * in[j]*u_t;
-		}
-		
+		}*/
+		m[0][0] += B[j][0] * RampAmp*u_t;
+		m[0][1] += B[j][1] * RampAmp*u_t;
+		m[0][2] += B[j][2] * RampAmp*u_t;
+		m[0][3] += B[j][3] * RampAmp*u_t;
+
 		//middle point m2
 		yp[0] = y[0] + dt/2.0 * m[0][0];
 		yp[1] = y[1] + dt/2.0 * m[0][1];
@@ -3658,13 +3711,18 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		if(RampTime<=0.0) u_t = 1.0;
 		else              u_t = qMin(1.0, (t+dt/2.0)/RampTime);
-		for(j=0; j<m_pCurWPolar->m_nControls; j++)
+/*		for(j=0; j<m_pCurWPolar->m_nControls; j++)
 		{
 			m[1][0] += B[j][0] * in[j]*u_t;
 			m[1][1] += B[j][1] * in[j]*u_t;
 			m[1][2] += B[j][2] * in[j]*u_t;
 			m[1][3] += B[j][3] * in[j]*u_t;
-		}
+		}*/
+		m[1][0] += B[j][0] * RampAmp*u_t;
+		m[1][1] += B[j][1] * RampAmp*u_t;
+		m[1][2] += B[j][2] * RampAmp*u_t;
+		m[1][3] += B[j][3] * RampAmp*u_t;
+
 		//second point m3
 		yp[0] = y[0] + dt/2.0 * m[1][0];
 		yp[1] = y[1] + dt/2.0 * m[1][1];
@@ -3678,13 +3736,17 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		if(RampTime<=0.0) u_t = 1.0;
 		else              u_t = qMin(1.0, (t+dt/2.0)/RampTime);
-		for(j=0; j<m_pCurWPolar->m_nControls; j++)
+/*		for(j=0; j<m_pCurWPolar->m_nControls; j++)
 		{
 			m[2][0] += B[j][0] * in[j]*u_t;
 			m[2][1] += B[j][1] * in[j]*u_t;
 			m[2][2] += B[j][2] * in[j]*u_t;
 			m[2][3] += B[j][3] * in[j]*u_t;
-		}
+		}*/
+		m[2][0] += B[j][0] * RampAmp*u_t;
+		m[2][1] += B[j][1] * RampAmp*u_t;
+		m[2][2] += B[j][2] * RampAmp*u_t;
+		m[2][3] += B[j][3] * RampAmp*u_t;
 
 		//third point m4
 		yp[0] = y[0] + dt * m[2][0];
@@ -3699,13 +3761,17 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		if(RampTime<=0.0) u_t = 1.0;
 		else              u_t = qMin(1.0, (t+dt)/RampTime);
-		for(j=0; j<m_pCurWPolar->m_nControls; j++)
+/*		for(j=0; j<m_pCurWPolar->m_nControls; j++)
 		{
 			m[3][0] += B[j][0] * in[j]*u_t;
 			m[3][1] += B[j][1] * in[j]*u_t;
 			m[3][2] += B[j][2] * in[j]*u_t;
 			m[3][3] += B[j][3] * in[j]*u_t;
-		}
+		}*/
+		m[3][0] += B[j][0] * RampAmp*u_t;
+		m[3][1] += B[j][1] * RampAmp*u_t;
+		m[3][2] += B[j][2] * RampAmp*u_t;
+		m[3][3] += B[j][3] * RampAmp*u_t;
 
 		//final slope m5
 		m[4][0] = 1./6. * (m[0][0] + 2.0*m[1][0] + 2.0*m[2][0] + m[3][0]);
@@ -4840,6 +4906,9 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 
 		if(XVar==26)                          x *= pMainFrame->m_NmtoUnit;//moment
 		if(YVar==26)                          y *= pMainFrame->m_NmtoUnit;//moment
+
+		if(XVar==32)                          x *= pMainFrame->m_mtoUnit;//length
+		if(YVar==32)                          y *= pMainFrame->m_mtoUnit;//length
 
 		if(bAdd)
 		{
@@ -7302,8 +7371,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 		m_Iter         = pSettings->value("Iter").toInt();
 		m_NStation     = pSettings->value("NStation").toInt();
-		m_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
-		m_NXPoints     = pSettings->value("NXPoints").toInt();
+		m_GL3dBody.m_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
+		m_GL3dBody.m_NXPoints     = pSettings->value("NXPoints").toInt();
 		m_InducedDragPoint  = pSettings->value("InducedDragPoint").toInt();
 
 		m_LiftScale     = pSettings->value("LiftScale").toDouble();
@@ -7317,8 +7386,12 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_CoreSize          = pSettings->value("CoreSize").toDouble();
 		m_MinPanelSize      = pSettings->value("MinPanelSize").toDouble();
 
+		m_RampTime      = pSettings->value("RampTime", 0.1).toDouble();
+		m_RampAmplitude = pSettings->value("RampAmplitude", 1.0).toDouble();
+
 		m_TotalTime         = pSettings->value("TotalTime",10.0).toDouble();
 		m_Deltat            = pSettings->value("Delta_t",0.01).toDouble();
+
 		m_TimeInput[0]      = pSettings->value("TimeIn0",0.0).toDouble();
 		m_TimeInput[1]      = pSettings->value("TimeIn1",0.0).toDouble();
 		m_TimeInput[2]      = pSettings->value("TimeIn2",0.0).toDouble();
@@ -9684,12 +9757,12 @@ void QMiarex::OnExportCurWOpp()
 
 	strong = m_pCurWOpp->m_PlrName + "\n";
 	out << strong;
-	strong = QString("QInf  ="+sep+" %1 "+sep).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,9,'f',4);
+	strong = QString("QInf  ="+sep+" %1 "+sep).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,11, 'f', 6);
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 	strong+=str+"\n";
 	out << strong;
 
-	strong = QString("Alpha = "+sep+"%1\n").arg(m_pCurWOpp->m_Alpha,9,'f',4);
+	strong = QString("Alpha = "+sep+"%1\n").arg(m_pCurWOpp->m_Alpha,11, 'f', 6);
 	out << strong;
 
 	strong = QString("Beta  = "+sep+"%1").arg(m_pCurWOpp->m_Beta, 8,'f',3);
@@ -9703,37 +9776,36 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString("Ctrl  = "+sep+"%1\n").arg(m_pCurWOpp->m_Ctrl, 8,'f',3);
 	out << strong;
 
-	strong = QString("Cl    = "+sep+"%1\n").arg(m_pCurWOpp->m_CL,9,'f',4);
+	strong = QString("CL    = "+sep+"%1\n").arg(m_pCurWOpp->m_CL,11, 'f', 6);
 	out << strong;
 
-	strong = QString("Cy    = "+sep+"%1\n").arg(m_pCurWOpp->m_CY,9,'f',4);
+	strong = QString("Cy    = "+sep+"%1\n").arg(m_pCurWOpp->m_CY,11, 'f', 6);
 	out << strong;
 
 	if(type==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
-		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,9,'f',4)
-		.arg(m_pCurWOpp->m_InducedDrag,9,'f',4)
-		.arg(m_pCurWOpp->m_ViscousDrag,9,'f',4);
+		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,11, 'f', 6)
+		.arg(m_pCurWOpp->m_InducedDrag,11, 'f', 6)
+		.arg(m_pCurWOpp->m_ViscousDrag,11, 'f', 6);
 	else        strong = QString(tr("Cd=,%1,ICd=, %2,PCd=, %3\n"))
-		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,9,'f',4)
-		.arg(m_pCurWOpp->m_InducedDrag,9,'f',4)
-		.arg(m_pCurWOpp->m_ViscousDrag,9,'f',4);
+		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,11, 'f', 6)
+		.arg(m_pCurWOpp->m_InducedDrag,11, 'f', 6)
+		.arg(m_pCurWOpp->m_ViscousDrag,11, 'f', 6);
 	out << strong;
 
-	strong = QString(tr("GCm   =")+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 9,'g',4);
+	strong = QString(tr("Cl   = ")+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 11,'g',6);
+	out << strong;
+	strong = QString(tr("Cm   =")+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 11,'g',6);
 	out << strong;
 
-	strong = QString(tr("GRm   = ")+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 9,'g',4);
+	if(type==1) strong = QString(tr("ICn   = %1     PCn   = %2 \n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
+	else        strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("IYm   = %1     PYm   = %2 \n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
-	else        strong = QString(tr("IYm=, %1,PYm=, %2\n")).arg(m_pCurWOpp->m_IYm, 9,'f',4).arg(m_pCurWOpp->m_GYm, 9,'f',4);
+	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
+	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
-	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 9,'f',4).arg(m_pCurWOpp->m_YCP, 9,'f',4);
-	out << strong;
-
-	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 9,'f',4);
+	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 11, 'f', 6);
 	out << strong;
 
 	if(m_pCurWPolar->m_Type==STABILITYPOLAR)
@@ -9829,35 +9901,53 @@ void QMiarex::OnExportCurWOpp()
 			out << strong;
 			
 
-			strong = QString("CLa   =%1\n").arg(m_pCurWOpp->CLa, 10, 'f', 4);		out << strong;
-			strong = QString("CLq   =%1\n").arg(m_pCurWOpp->CLq, 10, 'f', 4);		out << strong;
-			strong = QString("Cma   =%1\n").arg(m_pCurWOpp->Cma, 10, 'f', 4);		out << strong;
-			strong = QString("Cmq   =%1\n").arg(m_pCurWOpp->Cmq, 10, 'f', 4);		out << strong;
-			strong = QString("CYb   =%1\n").arg(m_pCurWOpp->CYb, 10, 'f', 4);		out << strong;
-			strong = QString("CYp   =%1\n").arg(m_pCurWOpp->CYp, 10, 'f', 4);		out << strong;
-			strong = QString("CYr   =%1\n").arg(m_pCurWOpp->CYr, 10, 'f', 4);		out << strong;
-			strong = QString("Clb   =%1\n").arg(m_pCurWOpp->Clb, 10, 'f', 4);		out << strong;
-			strong = QString("Clp   =%1\n").arg(m_pCurWOpp->Clp, 10, 'f', 4);		out << strong;
-			strong = QString("Clr   =%1\n").arg(m_pCurWOpp->Clr, 10, 'f', 4);		out << strong;
-			strong = QString("Cnb   =%1\n").arg(m_pCurWOpp->Cnb, 10, 'f', 4);		out << strong;
-			strong = QString("Cnp   =%1\n").arg(m_pCurWOpp->Cnp, 10, 'f', 4);		out << strong;
-			strong = QString("Cnr   =%1\n").arg(m_pCurWOpp->Cnr, 10, 'f', 4);		out << strong;
+			strong = QString("CLa = %1\n").arg(m_pCurWOpp->CLa, 11, 'f', 6);		out << strong;
+			strong = QString("CLq = %1\n").arg(m_pCurWOpp->CLq, 11, 'f', 6);		out << strong;
+			strong = QString("Cma = %1\n").arg(m_pCurWOpp->Cma, 11, 'f', 6);		out << strong;
+			strong = QString("Cmq = %1\n").arg(m_pCurWOpp->Cmq, 11, 'f', 6);		out << strong;
+			strong = QString("CYb = %1\n").arg(m_pCurWOpp->CYb, 11, 'f', 6);		out << strong;
+			strong = QString("CYp = %1\n").arg(m_pCurWOpp->CYp, 11, 'f', 6);		out << strong;
+			strong = QString("CYr = %1\n").arg(m_pCurWOpp->CYr, 11, 'f', 6);		out << strong;
+			strong = QString("Clb = %1\n").arg(m_pCurWOpp->Clb, 11, 'f', 6);		out << strong;
+			strong = QString("Clp = %1\n").arg(m_pCurWOpp->Clp, 11, 'f', 6);		out << strong;
+			strong = QString("Clr = %1\n").arg(m_pCurWOpp->Clr, 11, 'f', 6);		out << strong;
+			strong = QString("Cnb = %1\n").arg(m_pCurWOpp->Cnb, 11, 'f', 6);		out << strong;
+			strong = QString("Cnp = %1\n").arg(m_pCurWOpp->Cnp, 11, 'f', 6);		out << strong;
+			strong = QString("Cnr = %1\n").arg(m_pCurWOpp->Cnr, 11, 'f', 6);		out << strong;
+			if(m_pCurWOpp->m_nControls>0)
+			{
+				strong = QString("CXe = %1\n").arg(m_pCurWOpp->CXe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CYe = %1\n").arg(m_pCurWOpp->CYe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CZe = %1\n").arg(m_pCurWOpp->CZe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CLe = %1\n").arg(m_pCurWOpp->CLe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CMe = %1\n").arg(m_pCurWOpp->CMe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CNe = %1\n").arg(m_pCurWOpp->CNe[0], 11, 'f', 6);		out << strong;
+			}
 		}
 		else
 		{
-			strong = QString("CLa =,%1\n").arg(m_pCurWOpp->CLa, 10, 'f', 4);		out << strong;
-			strong = QString("CLq =,%1\n").arg(m_pCurWOpp->CLq, 10, 'f', 4);		out << strong;
-			strong = QString("Cma =,%1\n").arg(m_pCurWOpp->Cma, 10, 'f', 4);		out << strong;
-			strong = QString("Cmq =,%1\n").arg(m_pCurWOpp->Cmq, 10, 'f', 4);		out << strong;
-			strong = QString("CYb =,%1\n").arg(m_pCurWOpp->CYb, 10, 'f', 4);		out << strong;
-			strong = QString("CYp =,%1\n").arg(m_pCurWOpp->CYp, 10, 'f', 4);		out << strong;
-			strong = QString("CYr =,%1\n").arg(m_pCurWOpp->CYr, 10, 'f', 4);		out << strong;
-			strong = QString("Clb =,%1\n").arg(m_pCurWOpp->Clb, 10, 'f', 4);		out << strong;
-			strong = QString("Clp =,%1\n").arg(m_pCurWOpp->Clp, 10, 'f', 4);		out << strong;
-			strong = QString("Clr =,%1\n").arg(m_pCurWOpp->Clr, 10, 'f', 4);		out << strong;
-			strong = QString("Cnb =,%1\n").arg(m_pCurWOpp->Cnb, 10, 'f', 4);		out << strong;
-			strong = QString("Cnp =,%1\n").arg(m_pCurWOpp->Cnp, 10, 'f', 4);		out << strong;
-			strong = QString("Cnr =,%1\n").arg(m_pCurWOpp->Cnr, 10, 'f', 4);		out << strong;			
+			strong = QString("CLa =,%1\n").arg(m_pCurWOpp->CLa, 11, 'f', 6);		out << strong;
+			strong = QString("CLq =,%1\n").arg(m_pCurWOpp->CLq, 11, 'f', 6);		out << strong;
+			strong = QString("Cma =,%1\n").arg(m_pCurWOpp->Cma, 11, 'f', 6);		out << strong;
+			strong = QString("Cmq =,%1\n").arg(m_pCurWOpp->Cmq, 11, 'f', 6);		out << strong;
+			strong = QString("CYb =,%1\n").arg(m_pCurWOpp->CYb, 11, 'f', 6);		out << strong;
+			strong = QString("CYp =,%1\n").arg(m_pCurWOpp->CYp, 11, 'f', 6);		out << strong;
+			strong = QString("CYr =,%1\n").arg(m_pCurWOpp->CYr, 11, 'f', 6);		out << strong;
+			strong = QString("Clb =,%1\n").arg(m_pCurWOpp->Clb, 11, 'f', 6);		out << strong;
+			strong = QString("Clp =,%1\n").arg(m_pCurWOpp->Clp, 11, 'f', 6);		out << strong;
+			strong = QString("Clr =,%1\n").arg(m_pCurWOpp->Clr, 11, 'f', 6);		out << strong;
+			strong = QString("Cnb =,%1\n").arg(m_pCurWOpp->Cnb, 11, 'f', 6);		out << strong;
+			strong = QString("Cnp =,%1\n").arg(m_pCurWOpp->Cnp, 11, 'f', 6);		out << strong;
+			strong = QString("Cnr =,%1\n").arg(m_pCurWOpp->Cnr, 11, 'f', 6);		out << strong;
+			if(m_pCurWOpp->m_nControls>0)
+			{
+				strong = QString("CXe =, %1\n").arg(m_pCurWOpp->CXe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CYe =, %1\n").arg(m_pCurWOpp->CYe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CZe =, %1\n").arg(m_pCurWOpp->CZe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CLe =, %1\n").arg(m_pCurWOpp->CLe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CMe =, %1\n").arg(m_pCurWOpp->CMe[0], 11, 'f', 6);		out << strong;
+				strong = QString("CNe =, %1\n").arg(m_pCurWOpp->CNe[0], 11, 'f', 6);		out << strong;
+			}
 		}
 		out << "\n\n";
 	}
@@ -13224,8 +13314,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("Iter", m_Iter);
 		pSettings->setValue("NStation", m_NStation);
 		pSettings->setValue("InducedDragPoint", m_InducedDragPoint);
-		pSettings->setValue("NHoopPoints", m_NHoopPoints);
-		pSettings->setValue("NXPoints", m_NXPoints);
+		pSettings->setValue("NHoopPoints", m_GL3dBody.m_NHoopPoints);
+		pSettings->setValue("NXPoints", m_GL3dBody.m_NXPoints);
 
 		pSettings->setValue("LiftScale", m_LiftScale);
 		pSettings->setValue("DragScale", m_DragScale);
@@ -13239,6 +13329,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("MinPanelSize", m_MinPanelSize);
 		pSettings->setValue("TotalTime", m_TotalTime);
 		pSettings->setValue("Delta_t", m_Deltat);
+		pSettings->setValue("RampTime", m_RampTime);
+		pSettings->setValue("RampAmplitude", m_RampAmplitude);
 		pSettings->setValue("TimeIn0", m_TimeInput[0]);
 		pSettings->setValue("TimeIn1", m_TimeInput[1]);
 		pSettings->setValue("TimeIn2", m_TimeInput[2]);
@@ -15402,7 +15494,7 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetXTitle(tr("Cl"));
+			pGraph->SetXTitle(tr("CL"));
 			break;
 		case 2:
 			pGraph->SetXTitle(tr("VCd"));
@@ -15423,16 +15515,16 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("ICm"));// Induced Pitching moment coef.
 			break;
 		case 8:
-			pGraph->SetXTitle(tr("Rm"));// Total Rolling moment coef.
+			pGraph->SetXTitle(tr("Cl"));// Total Rolling moment coef.
 			break;
 		case 9:
-			pGraph->SetXTitle(tr("Ym"));// Total Yawing moment coef.
+			pGraph->SetXTitle(tr("Cn"));// Total Yawing moment coef.
 			break;
 		case 10:
-			pGraph->SetXTitle(tr("VYm"));// Profile yawing moment
+			pGraph->SetXTitle(tr("VCn"));// Profile yawing moment
 			break;
 		case 11:
-			pGraph->SetXTitle(tr("IYm"));// Induced yawing moment
+			pGraph->SetXTitle(tr("ICn"));// Induced yawing moment
 			break;
 		case 12:
 			pGraph->SetXTitle(tr("Cl/Cd"));
@@ -15464,13 +15556,13 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("Gamma"));
 			break;
 		case 21:
-			pGraph->SetXTitle(tr("PM"));
+			pGraph->SetXTitle(tr("Pitching Moment"));
 			break;
 		case 22:
-			pGraph->SetXTitle(tr("RM"));
+			pGraph->SetXTitle(tr("Rolling Moment"));
 			break;
 		case 23:
-			pGraph->SetXTitle(tr("YM"));
+			pGraph->SetXTitle(tr("Yawing Moment"));
 			break;
 		case 24:
 			pGraph->SetXTitle(tr("XCP ")+ StrLength);
@@ -15496,6 +15588,9 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 		case 31:
 			pGraph->SetXTitle(tr("CY"));
 			break;
+		case 32:
+			pGraph->SetXTitle(tr("XNP"));
+			break;
 		default:
 			pGraph->SetXTitle(tr("Alpha"));
 			break;
@@ -15507,7 +15602,7 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("Alpha"));
 			break;
 		case 1:
-			pGraph->SetYTitle(tr("Cl"));
+			pGraph->SetYTitle(tr("CL"));
 			break;
 		case 2:
 			pGraph->SetYTitle(tr("VCd"));
@@ -15528,16 +15623,16 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("ICm"));// Induced Pitching moment coef.
 			break;
 		case 8:
-			pGraph->SetYTitle(tr("Rm"));// Total Rolling moment coef.
+			pGraph->SetYTitle(tr("Cl"));// Total Rolling moment coef.
 			break;
 		case 9:
-			pGraph->SetYTitle(tr("Ym"));// Total Yawing moment coef.
+			pGraph->SetYTitle(tr("Cn"));// Total Yawing moment coef.
 			break;
 		case 10:
-			pGraph->SetYTitle(tr("VYm"));// Profile yawing moment
+			pGraph->SetYTitle(tr("VCn"));// Profile yawing moment
 			break;
 		case 11:
-			pGraph->SetYTitle(tr("IYm"));// Induced yawing moment
+			pGraph->SetYTitle(tr("ICn"));// Induced yawing moment
 			break;
 		case 12:
 			pGraph->SetYTitle(tr("Cl/Cd"));
@@ -15569,13 +15664,13 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("Gamma"));
 			break;
 		case 21:
-			pGraph->SetYTitle(tr("PM"));
+			pGraph->SetYTitle(tr("Pitching Moment"));
 			break;
 		case 22:
-			pGraph->SetYTitle(tr("RM"));
+			pGraph->SetYTitle(tr("Rolling Moment"));
 			break;
 		case 23:
-			pGraph->SetYTitle(tr("YM"));
+			pGraph->SetYTitle(tr("Yawing Moment"));
 			break;
 		case 24:
 			pGraph->SetYTitle(tr("XCP ")+ StrLength);
@@ -15600,6 +15695,9 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			break;
 		case 31:
 			pGraph->SetYTitle(tr("CY"));
+			break;
+		case 32:
+			pGraph->SetYTitle(tr("XNP"));
 			break;
 		default:
 			pGraph->SetYTitle(tr("Alpha"));
@@ -15824,6 +15922,7 @@ void QMiarex::UpdateUnits()
 		}
 		else if(m_iView==WCPVIEW) CreateCpCurves();
 		else if(m_iView==W3DVIEW) m_bResetglLegend = true;
+		else if(m_iView==WSTABVIEW) m_bResetglModeLegend = true;
 	}
 	SetCurveParams();
 	UpdateView();

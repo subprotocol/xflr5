@@ -495,8 +495,6 @@ protected:
 	int m_MaxWakeIter;			// wake roll-up iteration limit
 	int m_WakeInterNodes;		// number of intermediate nodes between wake panels
 	int m_InducedDragPoint;		// 0 if dwonwash is at panel's centroid, 1 if averaged over panel length //used in CWing::VLMTrefftz
-	int m_NHoopPoints;			//hoop resolution for NURBS bodies
-	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
 
 	int m_iView;
 
@@ -526,6 +524,7 @@ protected:
 	// time curve data
 	double m_TimeInput[4];
 	double m_TotalTime, m_Deltat;
+	double m_RampTime, m_RampAmplitude;
 
 
 	QFile* m_pXFile;			// a pointer to the output .log file

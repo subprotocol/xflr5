@@ -119,6 +119,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP[i]        =  pWOpp->m_YCP;
 					m_MaxBending[i] =  pWOpp->m_MaxBending;
 					m_Ctrl[i]       =  pWOpp->m_Ctrl;
+					m_XNP[i]        =  pWOpp->m_XNP;
 					bInserted = true;
 					break;
 				}
@@ -145,6 +146,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP.insert(i,  pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
+					m_XNP.insert(i, pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -191,6 +193,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP[i]        = pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
+					m_XNP[i]        = pWOpp->m_XNP;
 					bInserted = true;
 					break;
 				}
@@ -217,6 +220,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP.insert(i,       pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
+					m_XNP.insert(i,       pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -263,7 +267,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP[i]        = pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
-
+					m_XNP[i]        = pWOpp->m_XNP;
 					if(m_Type==7)
 					{
 						//store the eigenthings
@@ -295,6 +299,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_YCP.insert(i,       pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
+					m_XNP.insert(i,       pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -362,6 +367,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_YCP.append(pWOpp->m_YCP);
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
+		m_XNP.append(pWOpp->m_XNP);
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
 		m_Cl32Cd.append(0.0);
@@ -422,6 +428,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP[i]        =  pWOpp->m_YCP;
 					m_MaxBending[i] =  pWOpp->m_MaxBending;
 					m_Ctrl[i]       =  pWOpp->m_Ctrl;
+					m_XNP[i]        =  pWOpp->m_XNP;
 					bInserted = true;
 					break;
 				}
@@ -448,6 +455,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP.insert(i,  pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
+					m_XNP.insert(i,  pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -494,6 +502,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP[i]        = pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
+					m_XNP[i]        = pWOpp->m_XNP;
 
 					bInserted = true;
 					break;
@@ -521,6 +530,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP.insert(i,  pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
+					m_XNP.insert(i,  pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -567,6 +577,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP[i]        = pWOpp->m_YCP;
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
+					m_XNP[i]        = pWOpp->m_XNP;
 
 					if(m_Type==7)
 					{
@@ -601,6 +612,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_YCP.insert(i,  pWOpp->m_YCP);
 					m_MaxBending.insert(i, pWOpp->m_MaxBending);
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
+					m_XNP.insert(i, pWOpp->m_XNP);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -660,6 +672,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_YCP.append(pWOpp->m_YCP);
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
+		m_XNP.append(pWOpp->m_XNP);
 
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
@@ -727,6 +740,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_YCP[i]        =  0.0;
 					m_MaxBending[i] =  0.0;
 					m_Ctrl[i]       =  0.0;
+					m_XNP[i]        =  0.0;
 					bInserted = true;
 					break;
 				}
@@ -753,6 +767,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_YCP.insert(i,  0.0);
 					m_MaxBending.insert(i, 0.0);
 					m_Ctrl.insert(i, 0.0);
+					m_XNP.insert(i, 0.0);
 
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
@@ -799,7 +814,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 		m_YCP.append(0.0);
 		m_MaxBending.append(0.0);
 		m_Ctrl.append(0.0);
-
+		m_XNP.append(0.0);
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
 		m_Cl32Cd.append(0.0);
@@ -920,6 +935,8 @@ void CWPolar::Copy(CWPolar *pWPolar)
 		m_Oswald.insert(i,     pWPolar-> m_Oswald[i]);
 		m_SM.insert(i,         pWPolar-> m_SM[i]);
 		m_Ctrl.insert(i,       pWPolar-> m_Ctrl[i]);
+		m_XNP.insert(i,        pWPolar->m_XNP[i]);
+
 		m_L.insert(i,          pWPolar-> m_L[i]);
 		m_D.insert(i,          pWPolar-> m_D[i]);
 		m_Vx.insert(i,         pWPolar-> m_Vx[i]);
@@ -1138,6 +1155,9 @@ void * CWPolar::GetUFOPlrVariable(int iVar)
 		case 31:
 			pVar = &m_CY;
 			break;
+		case 32:
+			pVar = &m_XNP;
+			break;
 		default:
 			pVar = &m_Alpha;
 			break;
@@ -1171,6 +1191,7 @@ void CWPolar::Remove(int i)
 	m_Oswald.removeAt(i);
 	m_SM.removeAt(i);
 	m_Ctrl.removeAt(i);
+	m_XNP.removeAt(i);
 	m_ClCd.removeAt(i);
 	m_1Cl.removeAt(i);
 	m_Cl32Cd.removeAt(i);
@@ -1221,6 +1242,7 @@ void CWPolar::ResetWPlr()
 	m_Oswald.clear();
 	m_SM.clear();
 	m_Ctrl.clear();
+	m_XNP.clear();
 	m_ClCd.clear();
 	m_1Cl.clear();
 	m_Cl32Cd.clear();
@@ -1249,35 +1271,35 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
 	int i, j;
 
-	m_PolarFormat = 1021;
+	m_PolarFormat = 1022;
+	// 1022 : added XNP position and provision for 50 more variables
+	// 1021 : XFLR5 v6.02 - deleted autoinertia for older format polars
+	// 1020 : QFLR6 v0.00 - added inertia tensor values
+	// 1019 : QFLR6 v0.00 - added eigenvalues
+	// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
+	// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
+	// 1016 : added lateral force coefficient
+	// 1015 : added lateral force coefficient
+	// 1014 : added control results
+	// 1013 : added control variables
+	// 1012 : redefined the moment coefficients
+	// 1011 : added wake roll-up parameters
+	// 1010 : added ground effect variables langth changed length unit to m
+	// 1009 : added viscous flag
+	// 1008 : added Tilted Geometry flag
+	// 1007 : added NXWakePanels
+	// 1006 : added Wake Roll Up flag
+	// 1005 : added VLM method types
+	// 1004 : with corrected PCd calculation
+	// 1003 : added bending moment V18
+	// 1002 : added XCmRef
+	// 1001 : v0.00
 
 	if(bIsStoring)
 	{
 		//write variables
-
 		if(ProjectFormat>5) ar << m_PolarFormat; // identifies the format of the file
 		else                ar << 1016;
-					// 1021 : XFLR5 v6.02 - deleted autoinertia for older format polars
-					// 1020 : QFLR6 v0.00 - added inertia tensor values
-					// 1019 : QFLR6 v0.00 - added eigenvalues
-					// 1018 : QFLR5 v0.04 - replaced m_XcmRef by m_Cog
-					// 1017 : QFLR5 v0.03 - added viscous and induced pitching moments
-					// 1016 : added lateral force coefficient
-					// 1015 : added lateral force coefficient
-					// 1014 : added control results
-					// 1013 : added control variables
-					// 1012 : redefined the moment coefficients
-					// 1011 : added wake roll-up parameters
-					// 1010 : added ground effect variables langth changed length unit to m
-					// 1009 : added viscous flag
-					// 1008 : added Tilted Geometry flag
-					// 1007 : added NXWakePanels
-					// 1006 : added Wake Roll Up flag
-					// 1005 : added VLM method types
-					// 1004 : with corrected PCd calculation
-					// 1003 : added bending moment V18
-					// 1002 : added XCmRef
-					// 1001 : v0.00
 		WriteCString(ar,m_UFOName);
 		WriteCString(ar,m_PlrName);
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
@@ -1324,6 +1346,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar << (float)m_XCP[i] << (float)m_YCP[i] << (float)m_MaxBending[i];
 
 			ar << (float)m_Ctrl[i];
+			if(ProjectFormat>5) ar<<(float)m_XNP[i];
 		}
 
 		ar << m_nControls;
@@ -1348,6 +1371,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if(m_bAutoInertia) ar<<1; else ar<<0;
 			ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
 		}
+		if(ProjectFormat>=5)
+		{
+			//provision
+			for(int i=0; i<20; i++) ar<<(float)i;
+			for(int i=0; i<20; i++) ar<<i;
+		}
+
 		return true;
 	}
 	else
@@ -1486,7 +1516,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_WSpan    /=1000.0;
 			m_CoG.x   /=1000.0;
 		}
-		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb;
+		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb, XNP;
 		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = Ctrl = Cb =0.0;
 		bool bExists;
 		for (i=0; i< n; i++)
@@ -1513,6 +1543,10 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			if (m_PolarFormat>=1014) ar >> Ctrl;
 			else					 Ctrl = 0.0;
+
+			if (m_PolarFormat>=1022) ar >> XNP;
+			else					 XNP = 0.0;
+
 			bExists = false;
 			if(m_Type!=4)
 			{
@@ -1559,6 +1593,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_YCP.append(YCP);
 				m_MaxBending.append(Cb);
 				m_Ctrl.append(Ctrl);
+				m_XNP.append(XNP);
 
 				m_1Cl.append(0.0);
 				m_ClCd.append(0.0);
@@ -1633,6 +1668,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_bAutoInertia = false;
 			m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 		}
+		if(m_PolarFormat>=1022)
+		{
+			//provision
+			for(int i=0; i<20; i++) ar>>f;
+			for(int i=0; i<20; i++) ar>>n;
+		}
 	}
 
 	return true;
@@ -1682,12 +1723,114 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)           PolarProperties +=QObject::tr("3D-Panels/VLM2");
 	PolarProperties +="\n";
 
-	if(m_AnalysisMethod !=LLTMETHOD)
+
+	//Control data
+	if(m_Type==STABILITYPOLAR)
 	{
-		if(m_bDirichlet)  strong  = QObject::tr("B.C. = Dirichlet");
-		else              strong  = QObject::tr("B.C. = Neumann");
-		PolarProperties += strong +"\n";
+		int j;
+		QMiarex *pMiarex= (QMiarex*)s_pMiarex;
+		CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
+		int iCtrl = 0;
+		if(pPlane)
+		{
+			if(m_bActiveControl[iCtrl])
+			{
+				strong = QString("Wing Tilt : %1/%2\n")
+								.arg(m_MinControl[iCtrl],5,'f',2)
+								.arg(m_MaxControl[iCtrl],5,'f',2);
+				PolarProperties +=strong;
+			}
+			iCtrl=1;
+			if(pPlane->m_bStab)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Elevator Tilt : %1/%2\n")
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				iCtrl=2;
+			}
+		}
+
+		CWing *pStab, *pFin, *pWing;
+		pStab = pFin = pWing = NULL;
+		if(pPlane)
+		{
+			pWing = &pPlane->m_Wing;
+			if(pPlane->m_bStab) pStab=&pPlane->m_Stab; else pStab=NULL;
+			if(pPlane->m_bFin)  pFin=&pPlane->m_Fin; else pFin=NULL;
+		}
+		else pWing = pMiarex->GetWing(m_UFOName);
+
+		// flap controls
+		//wing first
+		int nFlap = 0;
+		if(pWing)
+	{
+		for (j=0; j<pWing->m_NSurfaces; j++)
+		{
+			if(pWing->m_Surface[j].m_bTEFlap)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Wing Flap %1 : %2/%3\n")
+									.arg(nFlap)
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				nFlap++;
+				iCtrl++;
+			}
+		}
 	}
+
+		//elevator next and last
+		nFlap = 0;
+		if(pStab)
+	{
+		for (j=0; j<pStab->m_NSurfaces; j++)
+		{
+			if(pStab->m_Surface[j].m_bTEFlap)
+			{
+				if(m_bActiveControl[iCtrl])
+				{
+					strong = QString("Elev. Flap %1 : %2/%3\n")
+									.arg(nFlap+1)
+									.arg(m_MinControl[iCtrl],5,'f',2)
+									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				nFlap++;
+				iCtrl++;
+			}
+		}
+	}
+
+		nFlap = 0;
+		if(pFin)
+		{
+			for (j=0; j<pFin->m_NSurfaces; j++)
+			{
+				if(pFin->m_Surface[j].m_bTEFlap)
+				{
+					if(m_bActiveControl[iCtrl])
+					{
+						strong = QString("Fin Flap %1 : %2/%3\n")
+										.arg(nFlap+1)
+										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					nFlap++;
+					iCtrl++;
+				}
+			}
+		}
+	}
+
 
 	if(m_bAutoInertia)
 	{
@@ -1715,6 +1858,12 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		PolarProperties += strong + inertiaunit + "\n";
 	}
 
+	if(m_AnalysisMethod !=LLTMETHOD)
+	{
+		if(m_bDirichlet)  strong  = QObject::tr("B.C. = Dirichlet");
+		else              strong  = QObject::tr("B.C. = Neumann");
+		PolarProperties += strong +"\n";
+	}
 
 	PolarProperties += QObject::tr("Analysis type")+" = ";
 	if(m_bViscous) PolarProperties += QObject::tr("Viscous")+"\n";
@@ -1735,116 +1884,13 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	strong  = QString(QObject::tr("Density =")+"%1 kg/m3\n").arg(m_Density,12,'g',4);
 	PolarProperties += strong;
 
-	strong  = QString(QObject::tr("Viscosity =")+"%1 m2/s\n").arg(m_Viscosity,12,'g',4);
+	strong  = QString(QObject::tr("Viscosity =")+"%1").arg(m_Viscosity,12,'g',4);
+	strong +=  "m"+QString::fromUtf8("²")+"/s\n";
 	PolarProperties += strong;
 
 	strong = QString(QObject::tr("Data points") +" = %1\n").arg(m_Alpha.size());
 	PolarProperties += strong;
 
-
-	//Control data
-	int j;
-	QMiarex *pMiarex= (QMiarex*)s_pMiarex;
-	CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
-	int iCtrl = 0;
-	if(pPlane)
-	{
-		if(m_bActiveControl[iCtrl])
-		{
-			strong = QString("Wing Tilt : Min=%1 Max=%2\n")
-							.arg(m_MinControl[iCtrl],5,'f',2)
-							.arg(m_MaxControl[iCtrl],5,'f',2);
-			PolarProperties +=strong;
-		}
-		iCtrl=1;
-		if(pPlane->m_bStab)
-		{
-			if(m_bActiveControl[iCtrl])
-			{
-				strong = QString("Elevator Tilt : Min=%1 Max=%2\n")
-								.arg(m_MinControl[iCtrl],5,'f',2)
-								.arg(m_MaxControl[iCtrl],5,'f',2);
-				PolarProperties +=strong;
-			}
-			iCtrl=2;
-		}
-	}
-
-	CWing *pStab, *pFin, *pWing;
-	pStab = pFin = pWing = NULL;
-	if(pPlane)
-	{
-		pWing = &pPlane->m_Wing;
-		if(pPlane->m_bStab) pStab=&pPlane->m_Stab; else pStab=NULL;
-		if(pPlane->m_bFin)  pFin=&pPlane->m_Fin; else pFin=NULL;
-	}
-	else pWing = pMiarex->GetWing(m_UFOName);
-
-	// flap controls
-	//wing first
-	int nFlap = 0;
-	if(pWing)
-	{
-		for (j=0; j<pWing->m_NSurfaces; j++)
-		{
-			if(pWing->m_Surface[j].m_bTEFlap)
-			{
-				if(m_bActiveControl[iCtrl])
-				{
-					strong = QString("Wing Flap %1 : Min=%2 Max=%3\n")
-									.arg(nFlap)
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
-				}
-				nFlap++;
-				iCtrl++;
-			}
-		}
-	}
-
-	//elevator next and last
-	nFlap = 0;
-	if(pStab)
-	{
-		for (j=0; j<pStab->m_NSurfaces; j++)
-		{
-			if(pStab->m_Surface[j].m_bTEFlap)
-			{
-				if(m_bActiveControl[iCtrl])
-				{
-					strong = QString("Elev. Flap %1 : Min=%2 Max=%3\n")
-									.arg(nFlap+1)
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
-				}
-				nFlap++;
-				iCtrl++;
-			}
-		}
-	}
-
-	nFlap = 0;
-	if(pFin)
-	{
-		for (j=0; j<pFin->m_NSurfaces; j++)
-		{
-			if(pFin->m_Surface[j].m_bTEFlap)
-			{
-				if(m_bActiveControl[iCtrl])
-				{
-					strong = QString("Fin Flap %1 : Min=%2 Max=%3\n")
-									.arg(nFlap+1)
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
-				}
-				nFlap++;
-				iCtrl++;
-			}
-		}
-	}
 }
 
 

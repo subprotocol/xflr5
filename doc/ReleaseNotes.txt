@@ -31,6 +31,7 @@ xflr5 v6.02 Beta November xxxth, 2010
 	- corrected the source strength influence of thick panels on thin surfaces, with impact on results for planes with body
 	- corrected the Cp 3D color display for VLM2 analysis
 	- added the influence of pressure forces acting on the body to induced pitching moment coefficient
+	- added calculation of neutral point position based on Cma/Cza ratio
 	- corrected various minor bugs
 	- made several minor enhancements
 

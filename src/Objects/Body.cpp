@@ -541,7 +541,7 @@ bool CBody::ExportDefinition()
 
 void CBody::ExportGeometry(int nx, int nh)
 {
-	QString Header, strong, LengthUnit,str, FileName, DestFileName, OutString;
+	QString strong, LengthUnit,str, FileName;
 	int k,l;
 	double u, v;
 	CVector Point;

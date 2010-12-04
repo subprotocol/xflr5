@@ -2375,7 +2375,9 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 	static int dD, ZPos, LeftPos;
 	static complex<double> c, angle;
 	static double OmegaN, Omega1, Dsi, Sigma1, sum, prod, u0, mac, span;
-	QString strange, str;
+	QString strange, strLen, strSpeed;
+	GetSpeedUnit(strSpeed, pMainFrame->m_SpeedUnit);
+	GetLengthUnit(strLen, pMainFrame->m_LengthUnit);
 
 	if(!pWing || !pWOpp || pWOpp->m_Type!=STABILITYPOLAR )
 	{
@@ -2406,7 +2408,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 	else                 Dsi = 0.0;
 
 
-	ZPos = pMiarex->m_r3DCltRect.bottom()- 14 * dD ;
+	ZPos = pMiarex->m_r3DCltRect.bottom()- 15 * dD ;
 	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 	glNewList(MODELEGEND,GL_COMPILE);
 	{
@@ -2434,9 +2436,13 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(QObject::tr("Speed            = %1 ")).arg(pWOpp->m_QInf, 8,'f',3);
-		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-		strange += str;		
+		strange = QString(QObject::tr("Speed            = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit, 8,'f',3);
+		strange += strSpeed;
+		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
+		ZPos +=dD;
+
+		strange = QString(QObject::tr("NP X-position    = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 8,'f',3);
+		strange += strLen;
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 

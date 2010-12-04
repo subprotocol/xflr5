@@ -77,6 +77,7 @@ private:
 	double m_CY, m_CX;			//Side force, drag coefficients
 	double m_MaxBending;		// max bending moment along the span
 
+
 	//non dimensional stability derivatives
 	double CLa, CLq, Cma, Cmq, CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
 	//non-dimensional control derivatives
@@ -137,7 +138,8 @@ public:
 	double m_VYm;		// wing viscous yawing moment
 	double m_IYm;		// wing induced yawing moment
 	double m_Ctrl;		//control variable - converged value
-	
+	double m_XNP;       //Neutral point position resulting from stability calculations
+
 	complex<double> m_EigenValue[8]; //four longitudinal and four lateral modes
 	complex<double> m_EigenVector[8][4]; // (4 longitudinal + 4 lateral) x 4 components
 };

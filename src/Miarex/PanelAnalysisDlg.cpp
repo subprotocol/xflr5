@@ -124,8 +124,16 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	Theta0 = 0.0;
 	u0     = 0.0;
 	m_Mass = 0.0;
+
+	//Dimensional stability derivatives
 	Xu = Xw = Zu = Zw = Zq = Mu = Mw = Mq = Zwp = Mwp = 0.0;
 	Yv = Yp = Yr = Lv = Lp = Lr = Nv = Np = Nr = 0.0;
+
+	// Non dimensional stability derivatives
+	CXu = CZu = Cmu = CXq = CZq = Cmq = CXa = CZa = Cma = 0.0;
+	CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
+	CXe = CYe = CZe = Cle = Cme = Cne = 0.0;
+
 	memset(m_ALong, 0, 16*sizeof(double));
 	memset(m_ALat,  0, 16*sizeof(double));
 	memset(m_R,     0,  9*sizeof(double));
@@ -2228,7 +2236,7 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 	int Size = m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
 
-	AddString("      Constructing results...\n");
+	AddString("      Calculating doublet strength...\n");
 	if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) nrhs = nval;
 	else                                 nrhs = 0;
 
@@ -2893,6 +2901,8 @@ bool PanelAnalysisDlg::ControlLoop()
 			ComputeControlDerivatives(); //single derivative, wrt the polar's control variable
 			if(m_bCancel) break;
 
+			ComputeNDStabDerivatives();
+
 			// Construct the state matrices - longitudinal and lateral
 			BuildStateMatrices();
 
@@ -3185,41 +3195,129 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 }
 
 
-
-
-void PanelAnalysisDlg::GetNDStabDerivatives(CWOpp *pNewPoint)
+void PanelAnalysisDlg::ComputeNDStabDerivatives()
 {
-	double b, S, mac, q;
+	QString str;
+	double b, S, mac, q, theta0, Cw0, Cx0, Cz0;
+	double mass = m_pWPolar->m_Weight;
+	double rho = m_pWPolar->m_Density;
 
 	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
 	b   = m_pWPolar->m_WSpan;
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
+	theta0 = 0.0;//steady level flight only ?
 
-	pNewPoint->CLa = Zw*    u0     /(q*S);
-	pNewPoint->CLq = Zq* 2.*u0     /(q*S*mac);
-	pNewPoint->Cma = Mw*    u0     /(q*S*mac);
-	pNewPoint->Cmq = Mq*(2.*u0/mac)/(q*S*mac);
-	pNewPoint->CYb = Yv*    u0     /(q*S);
-	pNewPoint->CYp = Yp* 2.*u0     /(q*S*b);
-	pNewPoint->CYr = Yr* 2.*u0     /(q*S*b);
-	pNewPoint->Clb = Lv*    u0     /(q*S*b);
-	pNewPoint->Clp = Lp*(2.*u0/b)  /(q*S*b);
-	pNewPoint->Clr = Lr*(2.*u0/b)  /(q*S*b);
-	pNewPoint->Cnb = Nv*    u0     /(q*S*b);
-	pNewPoint->Cnp = Np*(2.*u0/b)  /(q*S*b);
-	pNewPoint->Cnr = Nr*(2.*u0/b)  /(q*S*b);
+	Cw0 = mass * 9.81/q/S; //E&R p.127
+	Cx0 =  Cw0 * sin(theta0); //E&R p.119
+	Cz0 = -Cw0 * cos(theta0); //E&R p.118
 
-	pNewPoint->m_nControls = m_pWPolar->m_nControls;
-	for(int i=0; i<m_pWPolar->m_nControls; i++)
-	{
-		pNewPoint->CXe[i] = Xde[i]/(q*S);
-		pNewPoint->CYe[i] = Yde[i]/(q*S);
-		pNewPoint->CZe[i] = Zde[i]/(q*S);
-		pNewPoint->CLe[i] = Lde[i]/(q*S*b);
-		pNewPoint->CMe[i] = Mde[i]/(q*S*b);
-		pNewPoint->CNe[i] = Nde[i]/(q*S*b);
-   }
+	//E&R p. 118, table 4.4
+	CXu = (Xu - rho * u0*S*Cw0*sin(theta0))/(0.5*rho*u0*S);
+	CZu = (Zu + rho * u0*S*Cw0*cos(theta0))/(0.5*rho*u0*S);
+	Cmu = Mu /(0.5*rho*u0*mac*S);
+	CXa = Xw /(0.5*rho*u0*S);
+	CZa = Zw /(0.5*rho*u0*S);
+	Cma = Mw /(0.5*rho*u0*mac*S);
+	CXq = Xq /(.25*rho*u0*mac*S);
+	CZq = Zq /(.25*rho*u0*mac*S);
+	Cmq = Mq /(.25*rho*u0*mac*mac*S);
+
+	XNP = m_pWPolar->m_CoG.x + Cma/CZa * mac; //E&R (eq. 2.3.5 p.29)
+
+	CYb = Yv*    u0     /(q*S);
+	CYp = Yp* 2.*u0     /(q*S*b);
+	CYr = Yr* 2.*u0     /(q*S*b);
+	Clb = Lv*    u0     /(q*S*b);
+	Clp = Lp*(2.*u0/b)  /(q*S*b);
+	Clr = Lr*(2.*u0/b)  /(q*S*b);
+	Cnb = Nv*    u0     /(q*S*b);
+	Cnp = Np*(2.*u0/b)  /(q*S*b);
+	Cnr = Nr*(2.*u0/b)  /(q*S*b);
+
+	CXe = Xde/(q*S);
+	CYe = Yde/(q*S);
+	CZe = Zde/(q*S);
+	Cle = Lde/(q*S*b);
+	Cme = Mde/(q*S*mac);
+	Cne = Nde/(q*S*b);
+
+	// no OpPoint, we output the data to the log file
+	str = "      Longitudinal derivatives\n";
+	AddString(str);
+	str = QString("      Xu=%1         Cxu=%2\n").arg(Xu,12,'g',5).arg(CXu, 12, 'g', 5);
+	AddString(str);
+	str = QString("      Xw=%1         Cxa=%2\n").arg(Xw,12,'g',5).arg(CXa, 12, 'g', 5);
+	AddString(str);
+	str = QString("      Zu=%1         Czu=%2\n").arg(Zu,12,'g',5).arg(CZu, 12, 'g', 5);
+	AddString(str);
+	str = QString("      Zw=%1         CLa=%2\n").arg(Zw,12,'g',5).arg(-CZa,12, 'g', 5);
+	AddString(str);
+	str = QString("      Zq=%1         CLq=%2\n").arg(Zq,12,'g',5).arg(-CZq,12, 'g', 5);
+	AddString(str);
+	str = QString("      Mu=%1         Cmu=%2\n").arg(Mu,12,'g',5).arg(Cmu, 12, 'g', 5);
+	AddString(str);
+	str = QString("      Mw=%1         Cma=%2\n").arg(Mw,12,'g',5).arg(Cma, 12, 'g', 5);
+	AddString(str);
+	str = QString("      Mq=%1         Cmq=%2\n").arg(Mq,12,'g',5).arg(Cmq, 12, 'g', 5);
+	AddString(str);
+
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strLength;
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	str = QString("      Neutral Point position=%1").arg(XNP*pMainFrame->m_mtoUnit, 10,'f',5);
+	str += strLength;
+	str +="\n\n";
+	AddString(str);
+
+	str = "\n      Lateral derivatives\n";
+	AddString(str);
+	str = QString("      Yv=%1         CYb=%2\n").arg(Yv,12,'g',5).arg(CYb,12,'g',5);
+	AddString(str);
+	str = QString("      Yp=%1         CYp=%2\n").arg(Yp,12,'g',5).arg(CYp,12,'g',5);
+	AddString(str);
+	str = QString("      Yr=%1         CYr=%2\n").arg(Yr,12,'g',5).arg(CYr,12,'g',5);
+	AddString(str);
+	str = QString("      Lv=%1         Clb=%2\n").arg(Lv,12,'g',5).arg(Clb,12,'g',5);
+	AddString(str);
+	str = QString("      Lp=%1         Clp=%2\n").arg(Lp,12,'g',5).arg(Clp,12,'g',5);
+	AddString(str);
+	str = QString("      Lr=%1         Clr=%2\n").arg(Lr,12,'g',5).arg(Clr,12,'g',5);
+	AddString(str);
+	str = QString("      Nv=%1         Cnb=%2\n").arg(Nv,12,'g',5).arg(Cnb,12,'g',5);
+	AddString(str);
+	str = QString("      Np=%1         Cnp=%2\n").arg(Np,12,'g',5).arg(Cnp,12,'g',5);
+	AddString(str);
+	str = QString("      Nr=%1         Cnr=%2\n\n").arg(Nr,12,'g',5).arg(Cnr,12,'g',5);
+	AddString(str);
+
+
+	//output control derivatives
+
+	str = QString("      Control derivatives \n");
+	AddString(str);
+
+	str = QString("      Xde=%1        CXde=%2\n").arg(Xde,12,'g',5).arg(Xde/(q*S),12,'g',5);
+	AddString(str);
+
+	str = QString("      Yde=%1        CYde=%2\n").arg(Yde,12,'g',5).arg(Yde/(q*S),12,'g',5);
+	AddString(str);
+
+	str = QString("      Zde=%1        CZde=%2\n").arg(Zde,12,'g',5).arg(Zde/(q*S),12,'g',5);
+	AddString(str);
+
+	str = QString("      Lde=%1        CLde=%2\n").arg(Lde,12,'g',5).arg(Lde/(q*S*b),12,'g',5);
+	AddString(str);
+
+	str = QString("      Mde=%1        CMde=%2\n").arg(Mde,12,'g',5).arg(Mde/(q*S*mac),12,'g',5);
+	AddString(str);
+
+	str = QString("      Nde=%1        CNde=%2\n").arg(Nde,12,'g',5).arg(Nde/(q*S*b),12,'g',5);
+	AddString(str+"\n");
+
+	str ="\n";
+	AddString(str);
+
 }
 
 
@@ -3410,7 +3508,6 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	static double a, a0, a1, Cm, Cm0, Cm1, tmp;
 	static double eps = 1.e-7;
 
-	AddString("      Searching for zero-moment angle\n");
 	iter = 0;
 	a0 = -PI/4.0;
 	a1 =  PI/4.0;
@@ -3572,16 +3669,39 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	//build the control matrix
 	for(i=0; i<m_pWPolar->m_nControls; i++)
 	{
-		m_BLong[i][0] = Xde[i]/m_Mass;
-		m_BLong[i][1] = Zde[i]/m_Mass;
-		m_BLong[i][2] = Mde[i]/Iyy;
-		m_BLong[i][3] = 0.0;
+		m_BLong[0] = Xde/m_Mass;
+		m_BLong[1] = Zde/m_Mass;
+		m_BLong[2] = Mde/Iyy;
+		m_BLong[3] = 0.0;
 //
-		m_BLat[i][0] = Yde[i]/m_Mass;
-		m_BLat[i][1] = Lde[i]/Ipxx+Nde[i]*Ipzx;
-		m_BLat[i][2] = Lde[i]*Ipzx+Nde[i]/Ipzz;
-		m_BLat[i][3] = 0.0;
+		m_BLat[0] = Yde/m_Mass;
+		m_BLat[1] = Lde/Ipxx+Nde*Ipzx;
+		m_BLat[2] = Lde*Ipzx+Nde/Ipzz;
+		m_BLat[3] = 0.0;
 	}
+
+	strange = "      _____Control Matrices__________\n";
+	AddString(strange);
+	strange = "       Longitudinal control matrix\n";
+	AddString(strange);
+
+	strange = QString("        %1\n      %2\n      %3\n      %4\n\n")
+				.arg(m_BLong[0], 14, 'g', 6)
+				.arg(m_BLong[1], 14, 'g', 6)
+				.arg(m_BLong[2], 14, 'g', 6)
+				.arg(m_BLong[3], 14, 'g', 6);
+	AddString(strange);
+	strange = "       Lateral control matrix\n";
+	AddString(strange);
+
+	strange = QString("        %1\n      %2\n      %3\n      %4\n\n")
+				.arg(m_BLat[0], 14, 'g', 6)
+				.arg(m_BLat[1], 14, 'g', 6)
+				.arg(m_BLat[2], 14, 'g', 6)
+				.arg(m_BLat[3], 14, 'g', 6);
+	AddString(strange);
+
+
 }
 
 
@@ -3655,7 +3775,15 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 		return false;
 	}
 
-	if(!GetZeroMomentAngle()) return false;
+	strong ="      Searching for zero-moment angle... ";
+	if(!GetZeroMomentAngle())
+	{
+		strong += "none found\n";
+		AddString(strong);
+		return false;
+	}
+	strong += QString("Alpha=%1").arg(m_AlphaEq,0,'f',5) + QString::fromUtf8("°") +"\n";
+	AddString(strong);
 
 	CreateSourceStrength(m_AlphaEq, 0.0, 1);
 	if (m_bCancel) return true;
@@ -3678,7 +3806,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	//so far we have a unit Vortex Strength
 	// find the speeds which will create a lift equal to the weight
 
-	AddString("      Calculating speed to balance the weight\n");
+	AddString("      Calculating speed to balance the weight...");
 
 	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 	CWing::s_Density   = m_pWPolar->m_Density;
@@ -3705,7 +3833,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	if(Lift<=0.0)
 	{
 		u0 = -100.0;
-		strong = QString("      Found a negative lift for Alpha=%1.... skipping the angle...\n").arg(m_AlphaEq,0,'f',5);
+		strong = QString("  Found a negative lift for Alpha=%1.... skipping the angle...\n").arg(m_AlphaEq,0,'f',5);
 		if(m_bTrace) AddString(strong);
 		m_bPointOut = true;
 		m_bWarning = true;
@@ -3714,7 +3842,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	else
 	{
 		u0 =  sqrt( 2.0* 9.81 * m_Mass /m_pWPolar->m_Density/m_pWPolar->m_WArea / VerticalCl );
-		strong = QString("      Alpha=%1   QInf = %2").arg(m_AlphaEq,0,'f',5).arg(u0*pMainFrame->m_mstoUnit,0,'f',5);
+		strong = QString("VInf = %2").arg(u0*pMainFrame->m_mstoUnit,0,'f',5);
 		GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 		strong+= strange + "\n";
 		if(m_bTrace) AddString(strong);
@@ -3784,13 +3912,12 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk, Ris, Rjs, Rks, WindDirection;
 	static int p;
 	static double alpha, sina, cosa, deltaspeed, deltarotation, q, S, mac, b;
-	QString str;
+	QString strong;
 	int Size= m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
 
-	str = "\n      ___Stability derivatives____\n\n";
-	AddString(str);
-
+	strong = "      Calculating the stability derivatives\n";
+	AddString(strong);
 
 	deltaspeed    = 0.01;        //  m/s   for forward difference estimation
 	deltarotation = 0.001;       //  rad/s for forward difference estimation
@@ -3883,9 +4010,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 		}
 	}
 
-	QString strong = QString("      Solving the linear system for the stability derivative\n");
-	AddString(strong);
-
 
 	// The LU matrix is unchanged, so baksubstitute for unit vortex circulations
 	Crout_LU_with_Pivoting_Solve(m_aij, m_uRHS, m_Index, m_RHS,             Size, &m_bCancel);
@@ -3914,8 +4038,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 		if(m_bCancel) return;
 	}
 */
-	strong = "      Calculating the stability derivatives\n\n";
-	AddString(strong);
 
 	// Compute stabiliy and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
@@ -3957,6 +4079,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 
 	// q-derivatives
 	Forces(m_qRHS, m_Sigma+4*m_MatSize, m_AlphaEq, m_RHS+62*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
+	Xq = (Force-Force0).dot(is)  /deltarotation;
 	Zq = (Force-Force0).dot(ks)  /deltarotation;
 	Mq = (Moment-Moment0).dot(js)/deltarotation;
 
@@ -3976,55 +4099,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	b   = m_pWPolar->m_WSpan;
 	S   = m_pWPolar->m_WArea;
 	mac = m_pWing->m_MAChord;
-
-	str = "      Longitudinal derivatives\n";
-	AddString(str);
-	str = QString("      Xu=%1 \n").arg(Xu,12,'g',5);
-	AddString(str);
-	str = QString("      Xw=%1 \n").arg(Xw,12,'g',5);
-	AddString(str);
-	str = QString("      Zu=%1 \n").arg(Zu,12,'g',5);
-	AddString(str);
-	str = QString("      Zw=%1      CLa=%2\n").arg(Zw,12,'g',5).arg(Zw*   u0      /(q*S),12,'g',5);
-	AddString(str);
-	str = QString("      Zq=%1      CLq=%2\n").arg(Zq,12,'g',5).arg(Zq* 2.*u0     /(q*S*mac),12,'g',5);
-	AddString(str);
-	str = QString("      Mu=%1 \n").arg(Mu,12,'g',5);
-	AddString(str);
-	str = QString("      Mw=%1      Cma=%2\n").arg(Mw,12,'g',5).arg(Mw*    u0     /(q*S*mac),12,'g',5);
-	AddString(str);
-	str = QString("      Mq=%1      Cmq=%2\n").arg(Mq,12,'g',5).arg(Mq*(2.*u0/mac)/(q*S*mac),12,'g',5);
-	AddString(str);
-
-/*	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString strLength;
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
-	double hn = m_pWPolar->m_CoG.x - Mw/mac/Zw;
-	str = QString("      Neutral Point position=%1").arg(hn*pMainFrame->m_mtoUnit, 10,'f',5);
-	str += strLength;
-	str +="\n\n";
-	AddString(str);*/
-
-	str = "\n      Lateral derivatives\n";
-	AddString(str);
-	str = QString("      Yv=%1      CYb=%2\n").arg(Yv,12,'g',5).arg(  Yv*    u0   /(q*S),12,'g',5);
-	AddString(str);
-	str = QString("      Yp=%1      CYp=%2\n").arg(Yp,12,'g',5).arg(  Yp* 2.*u0   /(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Yr=%1      CYr=%2\n").arg(Yr,12,'g',5).arg(  Yr* 2.*u0   /(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Lv=%1      Clb=%2\n").arg(Lv,12,'g',5).arg(  Lv*    u0   /(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Lp=%1      Clp=%2\n").arg(Lp,12,'g',5).arg(  Lp*(2.*u0/b)/(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Lr=%1      Clr=%2\n").arg(Lr,12,'g',5).arg(  Lr*(2.*u0/b)/(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Nv=%1      Cnb=%2\n").arg(Nv,12,'g',5).arg(  Nv*    u0   /(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Np=%1      Cnp=%2\n").arg(Np,12,'g',5).arg(  Np*(2.*u0/b)/(q*S*b),12,'g',5);
-	AddString(str);
-	str = QString("      Nr=%1      Cnr=%2\n\n").arg(Nr,12,'g',5).arg(Nr*(2.*u0/b)/(q*S*b),12,'g',5);
-	AddString(str);
 
 	Zq = -Zq;
 	Zw = -Zw;
@@ -4131,9 +4205,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 
-	str = "\n      ___Control derivatives____\n";
-	AddString(str);
-
 	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
 	b   = m_pWPolar->m_WSpan;
 	S   = m_pWPolar->m_WArea;
@@ -4142,7 +4213,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	DeltaAngle = 0.001;
 
 	pos = 0;
-	Xde[0] = Yde[0] =  Zde[0] = Lde[0] = Mde[0] = Nde[0] = 0.0;
+	Xde = Yde =  Zde = Lde = Mde = Nde= 0.0;
 	
 	NCtrls = 0;
 
@@ -4206,7 +4277,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 	//create the RHS
 	CreateRHS(m_cRHS, V0);
-//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_cRHS[p]);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -4222,54 +4292,25 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 		m_RHS[52*m_MatSize+p] = V0.z;
 	}
 
-	QString strong = QString("      Solving the linear system for the control derivative\n");
+	QString strong = "      Calculating the control derivatives\n\n";
 	AddString(strong);
 
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
 
-	strong = "      Calculating the control derivatives\n\n";
-	AddString(strong);
 
 	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom, true);
 
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
-	Xde[0] = (Force-Force0).dot(is)/DeltaAngle;
-	Yde[0] = (Force-Force0).dot(js)/DeltaAngle;
-	Zde[0] = (Force-Force0).dot(ks)/DeltaAngle;
-	Lde[0] = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
-	Mde[0] = (Moment - Moment0).dot(js) /DeltaAngle;
-	Nde[0] = (Moment - Moment0).dot(ks) /DeltaAngle;
+	Xde = (Force-Force0).dot(is)/DeltaAngle;
+	Yde = (Force-Force0).dot(js)/DeltaAngle;
+	Zde = (Force-Force0).dot(ks)/DeltaAngle;
+	Lde = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
+	Mde = (Moment - Moment0).dot(js) /DeltaAngle;
+	Nde = (Moment - Moment0).dot(ks) /DeltaAngle;
 //qDebug("Moment=    %13.7f  %13.7f  %13.7f  ", Moment.x,  Moment.y,  Moment.z)	;
-
-
-	//output control derivatives
-
-	str = QString("      Control derivatives \n");
-	AddString(str);
-
-	str = QString("      Xde=%1        CXde=%2\n").arg(Xde[0],12,'g',5).arg(Xde[0]/(q*S),12,'g',5);
-	AddString(str);
-
-	str = QString("      Yde=%1        CYde=%2\n").arg(Yde[0],12,'g',5).arg(Yde[0]/(q*S),12,'g',5);
-	AddString(str);
-
-	str = QString("      Zde=%1        CZde=%2\n").arg(Zde[0],12,'g',5).arg(Zde[0]/(q*S),12,'g',5);
-	AddString(str);
-
-	str = QString("      Lde=%1        CLde=%2\n").arg(Lde[0],12,'g',5).arg(Lde[0]/(q*S*b),12,'g',5);
-	AddString(str);
-
-	str = QString("      Mde=%1        CMde=%2\n").arg(Mde[0],12,'g',5).arg(Mde[0]/(q*S*mac),12,'g',5);
-	AddString(str);
-
-	str = QString("      Nde=%1        CNde=%2\n").arg(Nde[0],12,'g',5).arg(Nde[0]/(q*S*b),12,'g',5);
-	AddString(str+"\n");
-
-	str ="\n";
-	AddString(str);
 }
 
 

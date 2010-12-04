@@ -88,7 +88,7 @@ void StabViewDlg::Connect()
 	connect(m_pctrlAnimateRestart ,SIGNAL(clicked()), this, SLOT(OnAnimateRestart()));
 	connect(m_pctrlDeltat, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 	connect(m_pctrlModeStep, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
-	connect(m_pCtrlDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
+//	connect(m_pCtrlDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	connect(m_pctrlInitCondResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
 	connect(m_pctrlForcedResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
@@ -99,7 +99,7 @@ void StabViewDlg::Connect()
 	connect(m_pctrlRenameCurve, SIGNAL(clicked()), this, SLOT(OnRenameCurve()));
 	connect(m_pctrlCurveList,   SIGNAL(activated(int)), this, SLOT(OnSelChangeCurve(int)));
 	
-	m_pControlModel = new QStandardItemModel;
+/*	m_pControlModel = new QStandardItemModel;
 	m_pControlModel->setRowCount(5);//temporary
 	m_pControlModel->setColumnCount(2);
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
@@ -112,10 +112,10 @@ void StabViewDlg::Connect()
 	m_pctrlControlTable->setColumnWidth(1,60);
 //	m_pctrlControlTable->setColumnWidth(2,60);
 	QHeaderView *HorizontalHeader = m_pctrlControlTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);	
+	HorizontalHeader->setStretchLastSection(true);	*/
 }
 
-
+/*
 void StabViewDlg::FillControlNames()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
@@ -178,13 +178,13 @@ void StabViewDlg::FillControlNames()
 		}
 		nControls += pFin->m_nFlaps;
 	}
-}
+}*/
 
 
 void StabViewDlg::FillEigenThings()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	FillControlNames();
+//	FillControlNames();
 	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		complex<double> c;
@@ -515,7 +515,7 @@ void StabViewDlg::ReadForcedInput(double *in)
 
 	for(i=0; i<pWPolar->m_nControls; i++)
 	{
-		in[i]    = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble();
+//		in[i]    = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble();
 	}
 }
 
@@ -658,7 +658,7 @@ void StabViewDlg::SetupLayout()
 		QGroupBox *ForcedResponseBox = new QGroupBox(tr("Forced Response"));
 		{
 			QVBoxLayout *ForcedResponse = new QVBoxLayout;
-			m_pctrlControlTable = new QTableView(this);
+/*			m_pctrlControlTable = new QTableView(this);
 			m_pctrlControlTable->setMinimumHeight(150);
 			m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 			m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -672,8 +672,29 @@ void StabViewDlg::SetupLayout()
 			precision[5]  = 3;
 			m_pCtrlDelegate->m_Precision = precision;
 			m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
-			m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
-			ForcedResponse->addWidget(m_pctrlControlTable);
+			m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;*/
+			QGridLayout *RampLayout = new QGridLayout;
+			{
+				QLabel *RampTimeLabel   = new QLabel(tr("Ramp Time")+"=");
+				QLabel *RampAmpLabel  = new QLabel(tr("Ramp Amp.")+"=");
+				QLabel *AmpLab         = new QLabel(tr("Ctrl Unit"));
+				QLabel *TimeLab3       = new QLabel("s");
+				m_pctrlRampTime  = new FloatEdit(0.1,3);
+				m_pctrlRampTime->setToolTip(tr("Define the total time in which the controls will be actuated"));
+				m_pctrlRampTime->setAlignment(Qt::AlignRight);
+				m_pctrlRampAmplitude  = new FloatEdit(0.0,2);
+				m_pctrlRampAmplitude->setToolTip(tr("Define the value of control actuation"));
+				m_pctrlRampAmplitude->setAlignment(Qt::AlignRight);
+				RampLayout->addWidget(RampAmpLabel,1,1);
+				RampLayout->addWidget(m_pctrlRampAmplitude,1,2);
+				RampLayout->addWidget(AmpLab,1,3);
+				RampLayout->addWidget(RampTimeLabel,2,1);
+				RampLayout->addWidget(m_pctrlRampTime,2,2);
+				RampLayout->addWidget(TimeLab3,2,3);
+			}
+//			ForcedResponse->addWidget(m_pctrlControlTable);
+			ForcedResponse->addLayout(RampLayout);
+			ForcedResponse->addStretch(1);
 			ForcedResponseBox->setLayout(ForcedResponse);
 		}
 
@@ -702,25 +723,18 @@ void StabViewDlg::SetupLayout()
 		m_pctrlTotalTime->setToolTip(tr("Define the total time range for the graphs"));
 		m_pctrlDeltat    = new FloatEdit(.01,3);
 		m_pctrlDeltat->setToolTip(tr("Define the time step for the resolution of the differential equations"));
-		m_pctrlRampTime  = new FloatEdit(0.1,3);
-		m_pctrlRampTime->setToolTip(tr("Define the total time in which the controls will be actuated"));
 
 		QGridLayout *DtLayout  = new QGridLayout;
 		QLabel *DtLabel        = new QLabel("dt=");
-		QLabel *TotalTimeLabel = new QLabel(tr("Total Time="));
-		QLabel *RampTimeLabel  = new QLabel(tr("Ramp Time="));
+		QLabel *TotalTimeLabel = new QLabel(tr("Total Time")+"=");
 		QLabel *TimeLab1       = new QLabel("s");
 		QLabel *TimeLab2       = new QLabel("s");
-		QLabel *TimeLab3       = new QLabel("s");
 		DtLayout->addWidget(DtLabel,1,1);
 		DtLayout->addWidget(m_pctrlDeltat,1,2);
 		DtLayout->addWidget(TimeLab1,1,3);
 		DtLayout->addWidget(TotalTimeLabel,2,1);
 		DtLayout->addWidget(m_pctrlTotalTime,2,2);
 		DtLayout->addWidget(TimeLab2,2,3);
-		DtLayout->addWidget(RampTimeLabel,3,1);
-		DtLayout->addWidget(m_pctrlRampTime,3,2);
-		DtLayout->addWidget(TimeLab3,3,3);
 
 		QGridLayout *CurveLayout = new QGridLayout;
 		m_pctrlPlotStabGraph = new QPushButton(tr("Recalc."));
@@ -939,7 +953,7 @@ void StabViewDlg::SetControls()
 
 	if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->m_Type!=7)
 	{
-		m_pControlModel->setRowCount(0);		
+//		m_pControlModel->setRowCount(0);
 	}
 	if(pMiarex->m_iStabilityView==0)
 	{
@@ -989,6 +1003,9 @@ void StabViewDlg::SetControls()
 		m_pctrlUnit2->setText("rad/s");
 		m_pctrlUnit3->setText("rad/s");
 	}
+
+	m_pctrlRampTime->SetValue(pMiarex->m_RampTime);
+	m_pctrlRampAmplitude->SetValue(pMiarex->m_RampAmplitude);
 
 	m_pctrlStabVar1->SetValue(pMiarex->m_TimeInput[0]);
 	m_pctrlStabVar2->SetValue(pMiarex->m_TimeInput[1]);

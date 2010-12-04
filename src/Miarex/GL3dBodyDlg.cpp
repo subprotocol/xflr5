@@ -4387,8 +4387,8 @@ void GL3dBodyDlg::Set3DRotationCenter(QPoint point)
 
 	if(m_pBody->m_LineType==2)
 	{
-		nx = qMin(500, pMiarex->m_NXPoints);
-		nh = qMax(pMiarex->m_NHoopPoints, 3);
+		nx = qMin(500, m_NXPoints);
+		nh = qMax(m_NHoopPoints, 3);
 
 		//right side
 		p = 0;

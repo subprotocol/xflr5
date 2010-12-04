@@ -64,7 +64,8 @@ CWOpp::CWOpp()
 	m_GCm = m_VCm = m_ICm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 	m_XCP                 = 0.0;
 	m_YCP                 = 0.0;
-	
+	m_XNP	              = 0.0;
+
 	CLa = CLq = Cma = Cmq = CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
 
 	memset(m_ALong, 0, 16*sizeof(double));	
@@ -113,15 +114,14 @@ bool CWOpp::Export(QTextStream &out, int FileType)
 {
 	QString Header, strong, Format;
 	int k;
-	
-	
+
 	if(FileType==1) Header = "  y-span        Chord      Ai         Cl        PCd          ICd        CmGeom      CmAirf      XTrtop    XTrBot      XCP       BM\n";
 	else            Header = "  y-span,Chord,Ai,Cl,PCd,ICd,CmGeom,CmAirf,XTrtop,XTrBot,XCP,BM\n";
 	out << Header;
 
 	int nStart;
 	if(m_AnalysisMethod==1) nStart = 1;
-	else                  nStart = 0;
+	else                    nStart = 0;
 
 	if(FileType==1) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
 	else            Format = "%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12\n";
@@ -184,8 +184,9 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat>=6) ar << 1018;
+		if(ProjectFormat>=6) ar << 1019;
 		else                 ar << 1015;
+		//1019 : added Neutral point position + Provision for more int and float saves
 		//1018 : added non dimensional stability control derivatives
 		//1017 : added non dimensional stability derivatives
 		//1016 : added eigenthings
@@ -281,6 +282,13 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				ar << (float)m_ALong[k][0]<< (float)m_ALong[k][1]<< (float)m_ALong[k][2]<< (float)m_ALong[k][3];
 				ar << (float)m_ALat[k][0] << (float)m_ALat[k][1] << (float)m_ALat[k][2] << (float)m_ALat[k][3];
 			}
+		}
+		if(ProjectFormat>5)	{f = m_XNP; ar <<f;}
+		if(ArchiveFormat>5)
+		{
+			//provision
+			for(int i=0; i<20; i++) ar<<(float)i;
+			for(int i=0; i<20; i++) ar<<i;
 		}
 	}
 	else
@@ -541,6 +549,14 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				ar >>f0>>f1>>f2>>f3;
 				m_ALat[k][0] = f0; m_ALat[k][1] = f1; m_ALat[k][2] = f2; m_ALat[k][3] = f3; 
 			}
+		}
+		if(ArchiveFormat>=1019)	{ar>>f; m_XNP = f;}
+		else m_XNP = 0.0;
+		if(ArchiveFormat>=1019)
+		{
+			//provision
+			for(int i=0; i<20; i++) ar>>f;
+			for(int i=0; i<20; i++) ar>>k;
 		}
 	}
 	return true;
