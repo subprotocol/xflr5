@@ -300,30 +300,22 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ReadCString(ar, m_PlrName);
 
 		ar >> a;
-		if (a!=0 && a!=1)
-		{
-			return false;
-		}
+		if (a!=0 && a!=1) return false;
+
 		if(a) m_bIsVisible = true; else m_bIsVisible = false;
 		ar >> a;
-		if (a!=0 && a!=1)
-		{
-			return false;
-		}
+		if (a!=0 && a!=1) return false;
+
 		if(a) m_bShowPoints = true; else m_bShowPoints = false;
 
 		ar >> a;
-		if (a!=0 && a!=1)
-		{
-			return false;
-		}
+		if (a!=0 && a!=1) return false;
+
 		if(a) m_bOut = true; else m_bOut = false;
 
 		ar >> m_AnalysisMethod;
-		if (a<=0 && a>=10)
-		{
-			return false;
-		}
+		if (a<=0 && a>=10) return false;
+
 		if(m_AnalysisMethod==0) m_AnalysisMethod=2;
 
 		if(ArchiveFormat>=1005)
@@ -550,13 +542,23 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_ALat[k][0] = f0; m_ALat[k][1] = f1; m_ALat[k][2] = f2; m_ALat[k][3] = f3; 
 			}
 		}
-		if(ArchiveFormat>=1019)	{ar>>f; m_XNP = f;}
+		if(ArchiveFormat>=1019)
+		{
+			ar>>f;
+			m_XNP = f;
+		}
 		else m_XNP = 0.0;
 		if(ArchiveFormat>=1019)
 		{
 			//provision
-			for(int i=0; i<20; i++) ar>>f;
-			for(int i=0; i<20; i++) ar>>k;
+			for(int i=0; i<20; i++)
+			{
+				ar>>f;
+			}
+			for(int i=0; i<20; i++)
+			{
+				ar>>k;
+			}
 		}
 	}
 	return true;

@@ -213,6 +213,9 @@ void GraphDlg::FillVariableList()
 		m_pctrlXSel->addItem(tr("Cy - Lateral force coef."));	//31
 		m_pctrlXSel->addItem(tr("Neutral Point x-position"));	//32
 
+
+		//Y variable
+
 		m_pctrlYSel->addItem(tr("Alpha"));						//0
 		m_pctrlYSel->addItem(tr("Lift coef."));					//1
 		m_pctrlYSel->addItem(tr("Viscous drag coef."));			//2

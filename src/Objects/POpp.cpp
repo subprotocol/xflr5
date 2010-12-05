@@ -246,9 +246,9 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(m_bStab)
 		{
 			if (!m_StabWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
-				{
-					return false;
-				}
+			{
+				return false;
+			}
 
 		}
 		if(m_bFin)

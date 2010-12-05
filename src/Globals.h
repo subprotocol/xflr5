@@ -117,4 +117,7 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
 double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
+int Compare(complex<double> a, complex<double>b);
+void ComplexSort(complex<double>*array, int ub);
+
 #endif // FUNCTIONS_H

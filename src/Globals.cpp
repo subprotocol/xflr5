@@ -3129,3 +3129,47 @@ double GetInterpolation(double t, double *y, int m, double *a, double *b, double
 
 
 
+int Compare(complex<double> a, complex<double>b)
+{
+	if(a.real()>b.real())         return  1;
+	else if (a.real()<b.real()) return -1;
+	else
+	{	//same real part
+		if(a.imag()>b.imag()) return  1;
+		else if (a.imag()<b.imag())   return -1;
+		else return 0;
+	}
+	return 0;
+}
+
+
+void ComplexSort(complex<double>*array, int ub)
+{
+	// bubble sort
+	// derived from http://www.concentric.net/~ttwang/sort/sort.htm
+	//
+	int indx, indx2;
+	complex<double> temp, temp2;
+	int flipped;
+
+	if (ub <= 1) return;
+
+	indx = 1;
+	do
+	{
+		flipped = 0;
+		for (indx2 = ub - 1; indx2 >= indx; --indx2)
+		{
+			temp  = array[indx2];
+			temp2 = array[indx2 - 1];
+			if (Compare(temp2, temp) > 0)
+			{
+				array[indx2 - 1] = temp;
+				array[indx2] = temp2;
+				flipped = 1;
+			}
+		}
+	} while ((++indx < ub) && flipped);
+}
+
+

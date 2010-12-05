@@ -271,6 +271,7 @@ private:
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
 	void UpdateUnits();
 	void SetWGraphTitles(Graph* pGraph);
+	void SetStabGraphTitles();
 	void SetWingLegendPos();
 	void SetupLayout();
 	void SetControls();

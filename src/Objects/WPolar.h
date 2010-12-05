@@ -64,7 +64,6 @@ private:
 	void SetInertia(void *ptr, bool bPlane);
 	void *GetUFOPlrVariable(int iVar);
 
-
 	int m_PolarFormat;
 	int m_RefAreaType;
 	double m_QInf;
@@ -138,6 +137,10 @@ private:
 	QList <double> m_SM;//pseudo Static Margin = (XCP-XCmRef)/m.a.c;
 	QList <double> m_Ctrl;//Ctrl variable
 	QList <double> m_XNP;
+	QList <double> m_PhugoidFrequency;
+	QList <double> m_PhugoidDamping;
+	QList <double> m_ShortPeriodFrequency;
+	QList <double> m_ShortPeriodDamping;
 
 	complex<double> m_EigenValue[8][MAXPOLARPOINTS]; //until we have a QList<complex<double>> ?
 

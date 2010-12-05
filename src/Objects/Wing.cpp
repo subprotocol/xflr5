@@ -1962,7 +1962,6 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 						StripForce += dF;       // N/rho
 					}
 
-
 					pp++;
 				}
 				StripForce *= 2./QInf/QInf; //N/q
@@ -1999,6 +1998,8 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 					m_Vd[mm].x =  m_Vd[m].x;
 					m_Vd[mm].y = -m_Vd[m].y;
 					m_Vd[mm].z =  m_Vd[m].z;
+					StripForce.y = -StripForce.y;
+
 					// add to global force
 					Force += StripForce;
 					m_CL      += StripForce.dot(WindNormal);                // N/q
@@ -2010,6 +2011,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 //		if(s_bVLMSymetric) p+=m_Surface[j].m_NXPanels * m_Surface[j].m_NYPanels;
 		if(m_Surface[j].m_bIsTipRight && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
 	}
+
 	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
 }
 

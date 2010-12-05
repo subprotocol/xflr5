@@ -1922,6 +1922,3 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 }
 
 
-
-
-

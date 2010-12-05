@@ -216,9 +216,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
-//double cosa = cos(0.3017*PI/180.0);
-//double sina = sin(0.3017*PI/180.0);
-//for(int p=0; p<m_MatSize; p++) qDebug("Alphaloop     %15.9f", (cosa*m_uRHS[p]+sina*m_wRHS[p])*28.2);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -778,7 +775,6 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 				m_pWingList[i]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 				m_WingForce[q*4+i] = WingForce;
 				Force             += WingForce;
-
 				//save the results... will save another FF calculation when computing operating point
 				m_WingIDrag[q*4+i] = IDrag;
 
@@ -995,6 +991,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				//restore the saved FF results
 				Force += m_WingForce[qrhs*4+i];
 				IDrag += m_WingIDrag[qrhs*4+i];
+
 				memcpy(m_pWingList[i]->m_Cl,  m_Cl  + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
 				memcpy(m_pWingList[i]->m_ICd, m_ICd + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
 				memcpy(m_pWingList[i]->m_Ai,  m_Ai  + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
@@ -1019,11 +1016,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				pos += m_pWingList[i]->m_MatSize;
 			}
 		}
-//double q =  0.5 * m_pWPolar->m_Density * QInf*QInf;
-//qDebug("Alpha=%7.4f  QInf=%6.3f  q.S.mac.ICm=%13.7f", Alpha, QInf, q*m_pWPolar->m_WArea*m_pWPolar->m_WMAChord*m_ICm);
-
-
-
 
 		if(m_pBody && m_pWPolar->m_AnalysisMethod==PANELMETHOD)
 		{
@@ -1041,7 +1033,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->m_WArea;
 		m_CX          =       Force.dot(WindDirection) /m_pWPolar->m_WArea;
 		m_CY          =       Force.dot(WindSide)      /m_pWPolar->m_WArea;
-
 		m_InducedDrag =  1.0*IDrag/m_pWPolar->m_WArea;
 		m_ViscousDrag =  1.0*VDrag/m_pWPolar->m_WArea;
 
@@ -3086,12 +3077,9 @@ void PanelAnalysisDlg::SetControlPositions(double t)
 
 
 
-
-
 bool PanelAnalysisDlg::SolveEigenvalues()
 {
 	// Finds the eigenvalues and eigenvectors of the state matrices ALong and ALat
-
 	static double pLong[5], pLat[5];//the coefficients of the characteristic polynomial
 	static int i;
 	QString str;
@@ -3103,6 +3091,9 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 		AddString("\n       Error extracting longitudinal eigenvalues\n");
 		return false;
 	}
+
+	//sort them
+	ComplexSort(m_rLong, 4);
 
 	for(i=0; i<4; i++)
 	{
@@ -3150,6 +3141,9 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 		AddString("\n       Error extracting lateral eigenvalues\n");
 		return false;
 	}
+
+	//sort them
+	ComplexSort(m_rLat, 4);
 
 	for(i=0; i<4; i++)
 	{
@@ -3426,7 +3420,6 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 						Force += dF;        // N/rho
 						StripForce += dF;
 					}
-
 					//On-Body moment
 					PanelForce  = Velocity * m_pPanel[p].Vortex;
 					PanelForce *= Mu[p];                                 //Newtons/rho
@@ -3443,6 +3436,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 					Moment += PanelForce * PanelLeverArm;                     // N.m/rho
 					p++;
 				}
+
 			}
 			if(m_pWPolar->m_bViscous)
 			{
@@ -3466,11 +3460,11 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 		}
 	}
 
-	CVector VLocal;
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//On-Body moment
 		// same as before, except that we take into account tip patches
+		CVector VLocal;
 		Moment.Set(0.0,0.0,0.0);
 		for(p=0; p<m_MatSize; p++)
 		{
@@ -3669,11 +3663,12 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	//build the control matrix
 	for(i=0; i<m_pWPolar->m_nControls; i++)
 	{
+		// per radian
 		m_BLong[0] = Xde/m_Mass;
 		m_BLong[1] = Zde/m_Mass;
 		m_BLong[2] = Mde/Iyy;
 		m_BLong[3] = 0.0;
-//
+
 		m_BLat[0] = Yde/m_Mass;
 		m_BLat[1] = Lde/Ipxx+Nde*Ipzx;
 		m_BLat[2] = Lde*Ipzx+Nde/Ipzz;
@@ -3686,22 +3681,20 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	AddString(strange);
 
 	strange = QString("        %1\n      %2\n      %3\n      %4\n\n")
-				.arg(m_BLong[0], 14, 'g', 6)
-				.arg(m_BLong[1], 14, 'g', 6)
-				.arg(m_BLong[2], 14, 'g', 6)
-				.arg(m_BLong[3], 14, 'g', 6);
+				.arg(m_BLong[0], 13, 'g', 7)
+				.arg(m_BLong[1], 13, 'g', 7)
+				.arg(m_BLong[2], 13, 'g', 7)
+				.arg(m_BLong[3], 13, 'g', 7);
 	AddString(strange);
 	strange = "       Lateral control matrix\n";
 	AddString(strange);
 
 	strange = QString("        %1\n      %2\n      %3\n      %4\n\n")
-				.arg(m_BLat[0], 14, 'g', 6)
-				.arg(m_BLat[1], 14, 'g', 6)
-				.arg(m_BLat[2], 14, 'g', 6)
-				.arg(m_BLat[3], 14, 'g', 6);
+				.arg(m_BLat[0], 13, 'g', 7)
+				.arg(m_BLat[1], 13, 'g', 7)
+				.arg(m_BLat[2], 13, 'g', 7)
+				.arg(m_BLat[3], 13, 'g', 7);
 	AddString(strange);
-
-
 }
 
 
@@ -3898,7 +3891,6 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	}
 
 	Forces(m_Mu, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force0, Moment0, m_pWPolar->m_bTiltedGeom);
-//qDebug("Moment0=   %13.7f  %13.7f  %13.7f  ", Moment0.x, Moment0.y, Moment0.z)	;
 
 	return true;
 }
@@ -3909,9 +3901,9 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	// The stability derivatives are estimated by forward difference at U=(U0,0,0).
 	// The reference condition has been saved during the calculation of the trimmed condition
 
-	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk, Ris, Rjs, Rks, WindDirection;
+	static CVector V0, Force, Moment, CGM, is, js, ks, Vi, Vj, Vk, Ris, Rjs, Rks, WindDirection, WindNormal;
 	static int p;
-	static double alpha, sina, cosa, deltaspeed, deltarotation, q, S, mac, b;
+	static double alpha, sina, cosa, deltaspeed, deltarotation;
 	QString strong;
 	int Size= m_MatSize;
 	if(m_b3DSymetric) Size = m_SymSize;
@@ -3919,20 +3911,20 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	strong = "      Calculating the stability derivatives\n";
 	AddString(strong);
 
-	deltaspeed    = 0.01;        //  m/s   for forward difference estimation
+	deltaspeed    = 0.01;         //  m/s   for forward difference estimation
 	deltarotation = 0.001;       //  rad/s for forward difference estimation
 
 	// Define the stability axes
 	cosa = cos(m_AlphaEq*PI/180);
 	sina = sin(m_AlphaEq*PI/180);
 	WindDirection.Set(cosa, 0.0, sina);
+	WindNormal.Set(-sina, 0.0, cosa);
+
 	is.Set(-cosa, 0.0, -sina);
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 
 	V0 = WindDirection * u0; //is the steady state velocity vector, if no sideslip
-
-	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
 
 	//______________________________________________________________________________
 	// RHS for unit speed vectors
@@ -4026,18 +4018,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	memcpy(m_qRHS, m_RHS+4*m_MatSize, m_MatSize*sizeof(double));
 	memcpy(m_rRHS, m_RHS+5*m_MatSize, m_MatSize*sizeof(double));
 
-/*
-	CVector VLocal;
-	for (p=0; p<m_MatSize; p++)
-	{
-		if(m_pPanel[p].m_iPos!=0)
-		{
-			//Cp from unit rotations may not be deduced by linear combinations
-			GetDoubletDerivative(p, m_pRHS, m_Cp[p], VLocal, u0, m_RHS[59*m_MatSize+p], m_RHS[60*m_MatSize+p], m_RHS[61*m_MatSize+p]);
-		}
-		if(m_bCancel) return;
-	}
-*/
 
 	// Compute stabiliy and control derivatives
 	Xu = Xw = Zu = Zw = Mu = Mw = Mq = Zwp = Mwp = 0.0;
@@ -4046,27 +4026,40 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	//________________________________________________
 	// 1st ORDER STABILITY DERIVATIVES
 	// x-derivatives________________________
-	alpha = atan2(Vi.z, Vi.x) * 180.0/PI;
+	alpha = atan2(Vi.z, Vi.x);
+	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
+	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
+	alpha *= 180.0/PI;
 	Forces(m_uRHS, m_Sigma, alpha, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Xu = (Force-Force0).dot(is)/deltaspeed;
-	Zu = (Force-Force0).dot(ks)/deltaspeed;
+	Xu = (Force.dot(WindDirection)-Force0.dot(is))/deltaspeed;
+	Zu = (Force.dot(WindNormal)   -Force0.dot(ks))/deltaspeed;
 	Mu = 0.0;
-//	Mu = (Moment-Moment0).dot(js)/deltaspeed;
+	Mu = (Moment-Moment0).dot(js)/deltaspeed;
 
 	// y-derivatives________________________
-	alpha = atan2(Vj.z, Vj.x) * 180.0/PI;
+	alpha = atan2(Vj.z, Vj.x);
+	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
+	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
+	alpha *= 180.0/PI;
 	Forces(m_vRHS, m_Sigma+m_MatSize, alpha, m_RHS+53*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Yv = (Force-Force0).dot(js)/deltaspeed;
-	Lv = (Moment-Moment0).dot(is)/deltaspeed;
-	Nv = (Moment-Moment0).dot(ks)/deltaspeed;
+	Yv = (Force.dot(js)-Force0.dot(js))/deltaspeed;
+	Lv = (Moment.dot(WindDirection)-Moment0.dot(is))/deltaspeed;
+	Nv = (Moment.dot(WindNormal)-Moment0.dot(ks))/deltaspeed;
 
 	// z-derivatives________________________
-	alpha = atan2(Vk.z, Vk.x) * 180.0/PI;
+	alpha = atan2(Vk.z, Vk.x);
+	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
+	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
+	alpha *= 180.0/PI;
 	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Xw = (Force-Force0).dot(is)/deltaspeed;
-	Zw = (Force-Force0).dot(ks)/deltaspeed;
-	Mw = (Moment-Moment0).dot(js)/deltaspeed;
+	Xw = (Force.dot(WindDirection)-Force0.dot(is))/deltaspeed;
+	Zw = (Force.dot(WindNormal)   -Force0.dot(ks))/deltaspeed;
+	Mw = (Moment.dot(js)-Moment0.dot(js))/deltaspeed;
 
+//double q = .5 * m_pWPolar->m_Density * u0* u0;
+//qDebug("AlphaEq = %13.7f     Alpha = %13.7f ", m_AlphaEq, alpha);
+//qDebug(" ICd0=%13.7f,  ICd=%13.7f",Force0.dot(is)/q/m_pWPolar->m_WArea, Force.dot(WindDirection)/q/m_pWPolar->m_WArea);
+//qDebug("  CL0=%13.7f,   CL=%13.7f",-Force0.dot(ks)/q/m_pWPolar->m_WArea, -Force.dot(ks)/q/m_pWPolar->m_WArea);
 
 	m_Progress +=1;
 	qApp->processEvents();
@@ -4096,15 +4089,11 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	// 2nd ORDER STABILITY DERIVATIVES
 	// Zwp & Mwp ... ?
 
-	b   = m_pWPolar->m_WSpan;
-	S   = m_pWPolar->m_WArea;
-	mac = m_pWing->m_MAChord;
-
-	Zq = -Zq;
-	Zw = -Zw;
+	// not sure why, but z signs are inverted
 	Zu = -Zu;
+	Zw = -Zw;
+	Zq = -Zq;
 }
-
 
 
 void PanelAnalysisDlg::ComputeStabilityInertia()
@@ -4300,7 +4289,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 
 
-	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom, true);
+	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
 
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
@@ -4310,7 +4299,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	Lde = (Moment - Moment0).dot(is) /DeltaAngle;  // N.m/rad
 	Mde = (Moment - Moment0).dot(js) /DeltaAngle;
 	Nde = (Moment - Moment0).dot(ks) /DeltaAngle;
-//qDebug("Moment=    %13.7f  %13.7f  %13.7f  ", Moment.x,  Moment.y,  Moment.z)	;
 }
 
 

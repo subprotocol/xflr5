@@ -332,19 +332,18 @@ QMiarex::QMiarex(QWidget *parent)
 
 	if(m_bLongitudinal)
 	{
-		m_TimeGraph1.SetYTitle("u");
-		m_TimeGraph2.SetYTitle("w");
-		m_TimeGraph3.SetYTitle("q");
-		m_TimeGraph4.SetYTitle("theta");
+		m_TimeGraph1.SetYTitle("u (m/s)");
+		m_TimeGraph2.SetYTitle("w (m/s)");
+		m_TimeGraph3.SetYTitle("q ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph4.SetYTitle("theta ("+QString::fromUtf8("°") +"/s)");
 	}
 	else
 	{
-		m_TimeGraph1.SetYTitle("v");
-		m_TimeGraph2.SetYTitle("p");
-		m_TimeGraph3.SetYTitle("r");
-		m_TimeGraph4.SetYTitle("phi");
+		m_TimeGraph1.SetYTitle("v (m/s)");
+		m_TimeGraph2.SetYTitle("p ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph3.SetYTitle("r ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph4.SetYTitle("phi ("+QString::fromUtf8("°") +"/s)");
 	}
-
 
 	m_LongRLGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_LongRLGraph.SetYMajGrid(true, QColor(120,120,120),2,1);
@@ -3656,7 +3655,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	// Rebuild the Forced Response matrix
 	//read the initial step condition
 //	pStabView->ReadForcedInput(in);
-	RampAmp     = pStabView->m_pctrlRampAmplitude->GetValue();           //ControlUNit
+	RampAmp     = pStabView->m_pctrlRampAmplitude->GetValue();           //ControlUnit
 	RampTime    = pStabView->m_pctrlRampTime->GetValue();           //s
 	m_Deltat    = pStabView->m_pctrlDeltat->GetValue();
 	m_TotalTime = pStabView->m_pctrlTotalTime->GetValue();
@@ -3788,10 +3787,20 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 		if(i%PlotInterval==0)
 		{
-			pCurve0->AddPoint(t, y[0]);
-			pCurve1->AddPoint(t, y[1]);
-			pCurve2->AddPoint(t, y[2]);
-			pCurve3->AddPoint(t, y[3]);
+			if(m_bLongitudinal)
+			{
+				pCurve0->AddPoint(t, y[0]*pMainFrame->m_mstoUnit);
+				pCurve1->AddPoint(t, y[1]*pMainFrame->m_mstoUnit);
+				pCurve2->AddPoint(t, y[2]*180.0/PI);//deg/s
+				pCurve3->AddPoint(t, y[3]*180.0/PI);//deg
+			}
+			else
+			{
+				pCurve0->AddPoint(t, y[0]*pMainFrame->m_mstoUnit);
+				pCurve1->AddPoint(t, y[1]*180.0/PI);//deg/s
+				pCurve2->AddPoint(t, y[2]*180.0/PI);//deg/s
+				pCurve3->AddPoint(t, y[3]*180.0/PI);//deg
+			}
 		}
 	}
 	pCurve0->SetVisible(true);
@@ -4887,12 +4896,14 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 	for (i=0; i<pWPolar->m_Alpha.size(); i++)
 	{
 		bAdd = true;
+
 		x = (*pX)[i];
 		y = (*pY)[i];
 
 		if((XVar==14 || XVar==17 || XVar==18) && x<0) bAdd = false;
 		if((YVar==14 || YVar==17 || YVar==18) && y<0) bAdd = false;
 
+		//Set user units
 		if(XVar==15 || XVar==16)              x *= pMainFrame->m_NtoUnit; //force
 		if(YVar==15 || YVar==16)              y *= pMainFrame->m_NtoUnit; //force
 		if(XVar==17 || XVar==18 || XVar==19)  x *= pMainFrame->m_mstoUnit;//speed
@@ -4909,6 +4920,7 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 
 		if(XVar==32)                          x *= pMainFrame->m_mtoUnit;//length
 		if(YVar==32)                          y *= pMainFrame->m_mtoUnit;//length
+
 
 		if(bAdd)
 		{
@@ -7405,21 +7417,6 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		else if(k==2)m_pCurTimeGraph = &m_TimeGraph2;
 		else if(k==3)m_pCurTimeGraph = &m_TimeGraph3;
 		else if(k==4)m_pCurTimeGraph = &m_TimeGraph4;
-		
-		if(m_bLongitudinal)
-		{
-			m_TimeGraph1.SetYTitle("u");
-			m_TimeGraph2.SetYTitle("w");
-			m_TimeGraph3.SetYTitle("q");
-			m_TimeGraph4.SetYTitle("theta");
-		}
-		else
-		{
-			m_TimeGraph1.SetYTitle("v");
-			m_TimeGraph2.SetYTitle("p");
-			m_TimeGraph3.SetYTitle("r");
-			m_TimeGraph4.SetYTitle("phi");
-		}
  	}
 	pSettings->endGroup();
 
@@ -7445,6 +7442,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 	SetWGraphTitles(&m_WPlrGraph2);
 	SetWGraphTitles(&m_WPlrGraph3);
 	SetWGraphTitles(&m_WPlrGraph4);
+	SetStabGraphTitles();
+
 
 	return true;
 }
@@ -9805,6 +9804,11 @@ void QMiarex::OnExportCurWOpp()
 	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
 	out << strong;
 
+	if(type==1) strong = QString(tr("XNP   = %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	else        strong = QString(tr("XNP=, %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	out << strong;
+
+
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 11, 'f', 6);
 	out << strong;
 
@@ -10365,6 +10369,7 @@ void QMiarex::OnGraphSettings()
 		else if(m_iView==WSTABVIEW)
 		{
 			CreateStabilityCurves();
+			SetStabGraphTitles();
 		}
 	}
 	else
@@ -11764,20 +11769,7 @@ void QMiarex::OnStabilityDirection()
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	
 	m_bLongitudinal = pStabView->m_pctrlLongDynamics->isChecked();
-	if(m_bLongitudinal)
-	{
-		m_TimeGraph1.SetYTitle("u");
-		m_TimeGraph2.SetYTitle("w");
-		m_TimeGraph3.SetYTitle("q");
-		m_TimeGraph4.SetYTitle("theta");
-	}
-	else
-	{
-		m_TimeGraph1.SetYTitle("v");
-		m_TimeGraph2.SetYTitle("p");
-		m_TimeGraph3.SetYTitle("r");
-		m_TimeGraph4.SetYTitle("phi");
-	}
+
 	
 	m_TimeGraph1.DeleteCurves();
 	m_TimeGraph2.DeleteCurves();
@@ -11796,6 +11788,7 @@ void QMiarex::OnStabilityDirection()
 
 	pStabView->SetMode();
 	pStabView->SetControls();
+	SetStabGraphTitles();
 	SetWPlrLegendPos();
 	CreateStabilityCurves();
 	SetCurveParams();
@@ -15478,6 +15471,29 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 }
 
 
+void QMiarex::SetStabGraphTitles()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QString strLength;
+	GetSpeedUnit(strLength, pMainFrame->m_SpeedUnit);
+
+	if(m_bLongitudinal)
+	{
+		m_TimeGraph1.SetYTitle("u ("+strLength+")");
+		m_TimeGraph2.SetYTitle("w ("+strLength+")");
+		m_TimeGraph3.SetYTitle("q ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph4.SetYTitle("theta "+QString::fromUtf8("(°)"));
+	}
+	else
+	{
+		m_TimeGraph1.SetYTitle("v ("+strLength+")");
+		m_TimeGraph2.SetYTitle("p ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph3.SetYTitle("r ("+QString::fromUtf8("°") +"/s)");
+		m_TimeGraph4.SetYTitle("phi "+QString::fromUtf8("(°)"));
+	}
+}
+
+
 void QMiarex::SetWGraphTitles(Graph* pGraph)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -15907,10 +15923,12 @@ void QMiarex::UpdateUnits()
 		SetWGraphTitles(&m_WPlrGraph2);
 		SetWGraphTitles(&m_WPlrGraph3);
 		SetWGraphTitles(&m_WPlrGraph4);
+
 	}
 	else if(m_iView==WSTABVIEW)
 	{
 		CreateStabilityCurves();
+		SetStabGraphTitles();
 	}
 	else
 	{
