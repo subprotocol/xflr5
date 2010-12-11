@@ -103,7 +103,7 @@ private:
 	QComboBox *m_pctrlCurveList;
 
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
-	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlSigma1, *m_pctrlDsi;
+	FloatEdit *m_pctrlFreqN, *m_pctrlFreq1, *m_pctrlDsi;
 	QStackedWidget *m_pctrlStackWidget, *m_pctrlInitialConditionsWidget, *m_pctrlModeViewType;
 
 

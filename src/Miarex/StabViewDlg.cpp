@@ -88,6 +88,8 @@ void StabViewDlg::Connect()
 	connect(m_pctrlAnimateRestart ,SIGNAL(clicked()), this, SLOT(OnAnimateRestart()));
 	connect(m_pctrlDeltat, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 	connect(m_pctrlModeStep, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
+	connect(m_pctrlRampAmplitude, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
+	connect(m_pctrlRampTime, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 //	connect(m_pCtrlDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	connect(m_pctrlInitCondResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
@@ -206,15 +208,15 @@ void StabViewDlg::FillEigenThings()
 
 		sum  = c.real() * 2.0;                          // is a real number
 		prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-		OmegaN = abs(c.imag());
-		Omega1 = sqrt(prod);
+		OmegaN = fabs(c.imag());
+		if(OmegaN>PRECISION) Omega1 = sqrt(prod);
+		else                 Omega1 = 0.0;
 		Sigma1 = sum /2.0;
-		if(prod > PRECISION) Dsi = -Sigma1/Omega1;
-		else                 Dsi = 0.0;
+		if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
+		else                   Dsi = 0.0;
 
 		m_pctrlFreqN->SetValue(OmegaN/2.0/PI);
 		m_pctrlFreq1->SetValue(Omega1/2.0/PI);
-		m_pctrlSigma1->SetValue(Sigma1);
 		m_pctrlDsi->SetValue(Dsi);
 
 		if(pMiarex->m_bLongitudinal && pMiarex->m_pCurWOpp)
@@ -274,7 +276,6 @@ void StabViewDlg::FillEigenThings()
 		m_pctrlEigenVector4->setText("");
 		m_pctrlFreqN->setText("");
 		m_pctrlFreq1->setText("");
-		m_pctrlSigma1->setText("");
 		m_pctrlDsi->setText("");
 	}
 }
@@ -302,7 +303,7 @@ void StabViewDlg::keyPressEvent(QKeyEvent *event)
 		{
 			pMiarex->keyPressEvent(event);
 		}
-//			event->ignore();
+//		event->ignore();
 	}
 }
 
@@ -484,6 +485,8 @@ void StabViewDlg::OnReadData()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	pMiarex->m_Modedt = m_pctrlModeStep->GetValue();
 	pMiarex->m_Deltat = m_pctrlDeltat->GetValue();
+	pMiarex->m_RampAmplitude = m_pctrlRampAmplitude->GetValue();
+	pMiarex->m_RampTime = m_pctrlRampTime->GetValue();
 }
 
 
@@ -677,7 +680,7 @@ void StabViewDlg::SetupLayout()
 			{
 				QLabel *RampTimeLabel   = new QLabel(tr("Ramp Time")+"=");
 				QLabel *RampAmpLabel  = new QLabel(tr("Ramp Amp.")+"=");
-				QLabel *AmpLab         = new QLabel(tr("Ctrl Unit"));
+				QLabel *AmpLab         = new QLabel(QString::fromUtf8("°"));
 				QLabel *TimeLab3       = new QLabel("s");
 				m_pctrlRampTime  = new FloatEdit(0.1,3);
 				m_pctrlRampTime->setToolTip(tr("Define the total time in which the controls will be actuated"));
@@ -783,38 +786,30 @@ void StabViewDlg::SetupLayout()
 		{
 			QLabel *FreqNLab = new QLabel("F =");
 			QLabel *Freq1Lab = new QLabel(tr("F1 ="));
-			QLabel *SigmaLab = new QLabel(tr("s1 ="));
 			QLabel *DsiLab   = new QLabel(tr("z ="));
 			FreqNLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 			Freq1Lab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			SigmaLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 			DsiLab->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-			SigmaLab->setFont(SymbolFont);
 			DsiLab->setFont(SymbolFont);
 
 			m_pctrlFreqN  = new FloatEdit(0.0,3);
 			m_pctrlFreq1  = new FloatEdit(0.0,3);
-			m_pctrlSigma1 = new FloatEdit(0.0,3);
 			m_pctrlDsi    = new FloatEdit(0.0,3);
 			m_pctrlFreqN->setEnabled(false);
 			m_pctrlFreq1->setEnabled(false);
-			m_pctrlSigma1->setEnabled(false);
 			m_pctrlDsi->setEnabled(false);
 			QLabel *FreqUnit1 = new QLabel("Hz");
 			QLabel *FreqUnit2 = new QLabel("Hz");
-			QLabel *DampUnit1 = new QLabel("s-1");
 			QGridLayout *FreakLayout = new QGridLayout;
 			FreakLayout->addWidget(FreqNLab,1,1);
 			FreakLayout->addWidget(Freq1Lab,2,1);
-			FreakLayout->addWidget(SigmaLab,3,1);
-			FreakLayout->addWidget(DsiLab,4,1);
+			FreakLayout->addWidget(DsiLab,3,1);
 			FreakLayout->addWidget(m_pctrlFreqN,1,2);
 			FreakLayout->addWidget(m_pctrlFreq1,2,2);
-			FreakLayout->addWidget(m_pctrlSigma1,3,2);
-			FreakLayout->addWidget(m_pctrlDsi,4,2);
+			FreakLayout->addWidget(m_pctrlDsi,3,2);
 			FreakLayout->addWidget(FreqUnit1,1,3);
 			FreakLayout->addWidget(FreqUnit2,2,3);
-			FreakLayout->addWidget(DampUnit1,3,3);
+
 			FreakBox->setLayout(FreakLayout);
 		}
 

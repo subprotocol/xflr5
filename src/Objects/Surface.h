@@ -65,7 +65,8 @@ public:
 	void Translate(CVector const &T);
 
 	bool IsFlapPanel(int const &p);
-	bool RotateFlap(double const &Angle);
+	bool IsFlapNode(int const &nNode);
+	bool RotateFlap(double const &Angle, bool bBCOnly=false);
 //	bool RotateFlap(double const &Angle, CPanel *pPanel, CVector *pNode);
 	double GetTwist(int const &k);
 	double GetChord(int const &k);

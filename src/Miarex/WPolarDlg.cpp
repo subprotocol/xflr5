@@ -881,7 +881,8 @@ void WPolarDlg::SetWPolarName()
 	}
 	else if(m_AnalysisMethod==PANELMETHOD)
 	{
-		if(m_pPlane || !m_bThinSurfaces) m_WPolarName += "-Panel";
+		if(!m_pPlane && !m_bThinSurfaces) m_WPolarName += "-Panel";
+//		if(m_pPlane || !m_bThinSurfaces) m_WPolarName += "-Panel";
 		if(m_bThinSurfaces)
 		{
 			if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
@@ -909,10 +910,8 @@ void WPolarDlg::SetWPolarName()
 			m_WPolarName += strong + str;
 		}
 	}
-	else
-	{
-		m_WPolarName += "-Plane_Inertia";
-	}
+//	else m_WPolarName += "-Plane_Inertia";
+
 
 	if(fabs(m_Beta) > .001)
 	{

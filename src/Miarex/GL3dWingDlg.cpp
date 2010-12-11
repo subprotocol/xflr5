@@ -39,6 +39,7 @@
 #include <QColorDialog>
 #include <math.h>
 
+
 #define WINGGEOMETRY        1400
 #define SECTIONHIGHLIGHT    1402
 
@@ -111,7 +112,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
 	m_ArcBall.m_pTransx  = &m_glViewportTrans.x;
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
-	m_ArcBall.m_pRect    = &m_rCltRect;
+	m_ArcBall.m_pRect    = &m_pglWidget->m_rCltRect;
 
 	m_pResetScales   = new QAction(tr("Reset Scales"), this);
 	m_pInsertBefore  = new QAction(tr("Insert Before"), this);
@@ -1457,7 +1458,7 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingModel->setHeaderData(1, Qt::Horizontal, tr("chord (")+str+")");
 	m_pWingModel->setHeaderData(2, Qt::Horizontal, tr("offset (")+str+")");
 	m_pWingModel->setHeaderData(3, Qt::Horizontal, QObject::tr("dihedral"));
-	m_pWingModel->setHeaderData(4, Qt::Horizontal, QObject::tr("twist"));
+	m_pWingModel->setHeaderData(4, Qt::Horizontal, QObject::tr("twist")+QString::fromUtf8("(°)"));
 	m_pWingModel->setHeaderData(5, Qt::Horizontal, QObject::tr("foil"));
 	m_pWingModel->setHeaderData(6, Qt::Horizontal, QObject::tr("X-panels"));
 	m_pWingModel->setHeaderData(7, Qt::Horizontal, QObject::tr("X-dist"));
@@ -1465,8 +1466,6 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pWingModel->setHeaderData(9, Qt::Horizontal, QObject::tr("Y-dist"));
 
 	m_pctrlWingTable->setModel(m_pWingModel);
-	QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);
 
 	QItemSelectionModel *selectionModel = new QItemSelectionModel(m_pWingModel);
 	m_pctrlWingTable->setSelectionModel(selectionModel);
@@ -1490,8 +1489,6 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	precision[9] = 0;
 	m_pWingDelegate->SetPointers(precision,&m_pWing->m_NPanel);
 	m_pWingDelegate->m_poaFoil = s_poaFoil;
-
-
 	FillDataTable();
 	SetWingData();
 	m_pctrlWingTable->selectRow(m_iSection);
@@ -1562,6 +1559,17 @@ bool GL3dWingDlg::LoadSettings(QSettings *pSettings)
 }
 
 
+void GL3dWingDlg::MouseDoubleClickEvent(QMouseEvent *event)
+{
+	QPoint point(event->pos().x(), event->pos().y());
+
+	Set3DRotationCenter(point);
+	m_bPickCenter = false;
+	m_pctrlPickCenter->setChecked(false);
+
+}
+
+
 void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 {
 	QPoint point(event->pos().x(), event->pos().y());
@@ -1580,7 +1588,7 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 
 	if (event->buttons()   & Qt::LeftButton)
 	{
-		if(bCtrl&& m_3DWingRect.contains(glPoint))
+		if(bCtrl&& m_pglWidget->geometry().contains(glPoint))
 		{
 			//rotate
 			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
@@ -1589,7 +1597,7 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 		else if(m_bTrans)
 		{
 			//translate
-			if(m_3DWingRect.contains(glPoint))
+			if(m_pglWidget->geometry().contains(glPoint))
 			{
 				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
 				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
@@ -1631,7 +1639,7 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 
 	ClientToGL(point, Real);
 
-	if(m_3DWingRect.contains(glPoint)) m_pglWidget->setFocus();
+	if(m_pglWidget->geometry().contains(glPoint)) m_pglWidget->setFocus();
 	
 	if (event->buttons() & Qt::MidButton)
 	{
@@ -1654,7 +1662,7 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 		{
 			m_bTrans=true;
 	
-			if(m_pWing && m_3DWingRect.contains(glPoint))
+			if(m_pWing && m_pglWidget->geometry().contains(glPoint))
 			{
 				m_ArcBall.Start(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
 				m_bCrossPoint = true;
@@ -2366,7 +2374,7 @@ void GL3dWingDlg::reject()
 
 void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 {
-	m_3DWingRect = m_pglWidget->geometry();
+/*	m_3DWingRect = m_pglWidget->geometry();
 //	SetWingScale();
 
 	double w = (double)m_pctrlWingTable->width()*.97;
@@ -2383,7 +2391,7 @@ void GL3dWingDlg::resizeEvent(QResizeEvent *event)
 	m_pctrlWingTable->setColumnWidth(6, w12);
 	m_pctrlWingTable->setColumnWidth(7, w8);
 	m_pctrlWingTable->setColumnWidth(8, w12);
-	m_pctrlWingTable->setColumnWidth(9, w8);
+	m_pctrlWingTable->setColumnWidth(9, w8);*/
 }
 
 
@@ -2663,7 +2671,9 @@ void GL3dWingDlg::SetupLayout()
 									  QAbstractItemView::SelectedClicked |
 									  QAbstractItemView::EditKeyPressed |
 									  QAbstractItemView::AnyKeyPressed);
-
+	QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
+//	HorizontalHeader->setResizeMode(QHeaderView::Stretch);
 //	m_pctrlWingTable->setSizePolicy(szPolicyMaximum);
 //	m_pctrlWingTable->setCornerButtonEnabled (false);
 
@@ -2935,11 +2945,27 @@ void GL3dWingDlg::ShowContextMenu(QContextMenuEvent * event)
 void GL3dWingDlg::showEvent(QShowEvent *event)
 {
 //	InitDialog();
-	resizeEvent(NULL);
+//	resizeEvent(NULL);
 	m_bChanged = false;
 	m_bResetglWing = true;
 	SetWingScale();
-	m_3DWingRect = m_pglWidget->geometry();
+//	m_3DWingRect = m_pglWidget->geometry();
+
+	double w = (double)m_pctrlWingTable->width()*.97;
+	int w6  = (int)(w/6.);
+	int w8  = (int)(w/8.);
+	int w12 = (int)(w/12.);
+
+	m_pctrlWingTable->setColumnWidth(0, w12);
+	m_pctrlWingTable->setColumnWidth(1, w12);
+	m_pctrlWingTable->setColumnWidth(2, w12);
+	m_pctrlWingTable->setColumnWidth(3, w12);
+	m_pctrlWingTable->setColumnWidth(4, w12);
+	m_pctrlWingTable->setColumnWidth(5, w6);
+	m_pctrlWingTable->setColumnWidth(6, w12);
+	m_pctrlWingTable->setColumnWidth(7, w8);
+	m_pctrlWingTable->setColumnWidth(8, w12);
+	m_pctrlWingTable->setColumnWidth(9, w8);
 
 	UpdateView();
 }
@@ -3025,13 +3051,12 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 {
-	QPoint point(event->pos().x(), event->pos().y());
 	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
 
-	if(m_3DWingRect.contains(glPoint)) m_pglWidget->setFocus();	//The mouse button has been wheeled
+	if(m_pglWidget->geometry().contains(glPoint)) m_pglWidget->setFocus();	//The mouse button has been wheeled
 	//Process the message
 //	point is in client coordinates
-	if(m_3DWingRect.contains(glPoint))
+	if(m_pglWidget->geometry().contains(glPoint))
 	{
 		if(event->delta()<0) m_glScaled *= (GLfloat)1.06;
 		else                 m_glScaled /= (GLfloat)1.06;

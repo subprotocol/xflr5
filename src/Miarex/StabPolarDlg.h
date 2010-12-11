@@ -65,7 +65,6 @@ private slots:
 	void OnAutoInertia();
 
 private:
-	void resizeEvent(QResizeEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void ReadCtrlData();
 	void FillControlList();
@@ -135,7 +134,7 @@ private:
 	
 	int m_UnitType;//1= International, 2= Imperial
 	int m_nControls;
-	int m_Type;
+	int m_PolarType;
 	int m_RefAreaType;
 
 	double m_MinControl[4*MAXCONTROLS], m_MaxControl[4*MAXCONTROLS];//4 wings altogether, MAXCONTROLS on each

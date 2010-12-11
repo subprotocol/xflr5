@@ -74,6 +74,15 @@ void CPanel::Reset()
 }
 
 
+
+void CPanel::SetFrame()
+{
+	//set the boundary conditions from existing nodes
+	SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
+}
+
+
+
 void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB)
 {
 	LATB.x = TB.x - LA.x;
@@ -342,6 +351,12 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 }
 
 
+double CPanel::GetWidth()
+{
+	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
+				+(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
+}
+
 
 void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
@@ -376,18 +391,47 @@ void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 }
 
 
-double CPanel::GetWidth()
+
+void CPanel::RotatePanel(CVector const &O, Quaternion &Qt)
 {
-	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
-		        +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
+	// Caution : do not use, the end nodes are rotated multiple times if part of more than one panel
+	// O is the rotation center
+	// Rotates the panel's corner points and resets the local fram
+	W.x = s_pNode[m_iLA].x - O.x;
+	W.y = s_pNode[m_iLA].y - O.y;
+	W.z = s_pNode[m_iLA].z - O.z;
+	Qt.Conjugate(W);
+	s_pNode[m_iLA].x = W.x + O.x;
+	s_pNode[m_iLA].y = W.y + O.y;
+	s_pNode[m_iLA].z = W.z + O.z;
+
+	W.x = s_pNode[m_iLB].x - O.x;
+	W.y = s_pNode[m_iLB].y - O.y;
+	W.z = s_pNode[m_iLB].z - O.z;
+	Qt.Conjugate(W);
+	s_pNode[m_iLB].x = W.x + O.x;
+	s_pNode[m_iLB].y = W.y + O.y;
+	s_pNode[m_iLB].z = W.z + O.z;
+
+	W.x = s_pNode[m_iTA].x - O.x;
+	W.y = s_pNode[m_iTA].y - O.y;
+	W.z = s_pNode[m_iTA].z - O.z;
+	Qt.Conjugate(W);
+	s_pNode[m_iTA].x = W.x + O.x;
+	s_pNode[m_iTA].y = W.y + O.y;
+	s_pNode[m_iTA].z = W.z + O.z;
+
+	W.x = s_pNode[m_iTB].x - O.x;
+	W.y = s_pNode[m_iTB].y - O.y;
+	W.z = s_pNode[m_iTB].z - O.z;
+	Qt.Conjugate(W);
+	s_pNode[m_iTB].x = W.x + O.x;
+	s_pNode[m_iTB].y = W.y + O.y;
+	s_pNode[m_iTB].z = W.z + O.z;
+
+	if(m_iPos==-1) SetFrame(s_pNode[m_iLB], s_pNode[m_iLA], s_pNode[m_iTB], s_pNode[m_iTA]);
+	else           SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
 }
-
-
-
-
-
-
-
 
 
 

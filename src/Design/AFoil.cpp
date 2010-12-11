@@ -2991,7 +2991,7 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
-	int unitwidth = (int)(800.0/16.0);
+	int unitwidth = (int)(750.0/16.0);
 	m_pctrlFoilTable->setColumnWidth(0, 3*unitwidth);
 	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);
 	m_pctrlFoilTable->setColumnHidden(9, true);

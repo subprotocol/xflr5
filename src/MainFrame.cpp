@@ -2655,7 +2655,7 @@ void MainFrame::DeleteProject()
 	if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
 	else if(pMiarex->m_iView==WOPPVIEW)	pMiarex->CreateWOppCurves();
 	else if(pMiarex->m_iView==WCPVIEW)	pMiarex->CreateCpCurves();
-	pMiarex->SetControls();
+	if(m_iApp==MIAREX) pMiarex->SetControls();
 
 	UpdateFoils();
 	if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
@@ -5921,7 +5921,6 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 						pNewFoil->m_bPoints    = pOldFoil->m_bPoints;
 						m_oaFoil.removeAt(l);
 						delete pOldFoil;
-						if(g_pCurFoil == pOldFoil)           g_pCurFoil = NULL;
 						if(g_pCurFoil == pOldFoil) g_pCurFoil = NULL;
 					}
 				}

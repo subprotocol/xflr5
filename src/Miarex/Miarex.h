@@ -266,6 +266,7 @@ private:
 	void SnapClient(QString const &FileName);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
+	void SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly=true);
 
 	void DuplicatePlane();
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);

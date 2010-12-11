@@ -633,6 +633,20 @@ bool CSurface::IsFlapPanel(int const &p)
 }
 
 
+bool CSurface::IsFlapNode(int const &nNode)
+{
+	int pp;
+	for(pp=0; pp<m_nFlapPanels; pp++)
+	{
+		if(nNode==s_pPanel[m_FlapPanel[pp]].m_iLA) return true;
+		if(nNode==s_pPanel[m_FlapPanel[pp]].m_iLB) return true;
+		if(nNode==s_pPanel[m_FlapPanel[pp]].m_iTA) return true;
+		if(nNode==s_pPanel[m_FlapPanel[pp]].m_iTB) return true;
+	}
+	return false;
+}
+
+
 void CSurface::ResetFlap()
 {
 	int i;
@@ -646,16 +660,16 @@ void CSurface::ResetFlap()
 }
 
 
-bool CSurface::RotateFlap(double const &Angle)
+bool CSurface::RotateFlap(double const &Angle, bool bBCOnly)
 {
 	//The average angle between the two tip foil is cancelled
-	//Instead, the Panels are rotated by Angle
+	//Instead, the Panels are rotated by Angle around the hinge point and hinge vector
 
-	int k,l,p, iFlap;
+	int k,l,p;
 	double alpha0;
 	Quaternion Quat;
 	CVector R, S;
-	iFlap = 0;
+	
 	p     = 0;
 
 	if(m_pFoilA && m_pFoilB)
@@ -674,6 +688,14 @@ bool CSurface::RotateFlap(double const &Angle)
 		alpha0 = (m_pFoilA->m_TEFlapAngle + m_pFoilB->m_TEFlapAngle)/2.0;
 
 		Quat.Set(Angle-alpha0, m_HingeVector);
+
+/*		for(l=0; l<m_nFlapPanels; l++)
+		{
+			k = m_FlapPanel[l];
+			if(bBCOnly) s_pPanel[k].RotateBC(m_HingePoint, Quat);
+			else        s_pPanel[k].RotatePanel(m_HingePoint, Quat);
+		}*/
+
 		for (k=0; k<m_nFlapNodes; k++)
 		{
 			R.x = s_pNode[m_FlapNode[k]].x - m_HingePoint.x;
@@ -706,7 +728,6 @@ bool CSurface::RotateFlap(double const &Angle)
 					s_pNode[s_pPanel[k].m_iTB]);
 			}
 		}
-		++iFlap;
 	}
 	else p+= m_NYPanels * m_NXPanels;
 
@@ -720,11 +741,13 @@ void CSurface::RotateX(CVector const&O, double XTilt)
 	m_LB.RotateX(O, XTilt);
 	m_TA.RotateX(O, XTilt);
 	m_TB.RotateX(O, XTilt);
+	m_HingePoint.RotateX(O, XTilt);
 
 	CVector Origin(0.0,0.0,0.0);
 	Normal.RotateX(Origin, XTilt);
 	NormalA.RotateX(Origin, XTilt);
 	NormalB.RotateX(Origin, XTilt);
+	m_HingeVector.RotateX(Origin, XTilt);
 }
 
 void CSurface::RotateY(CVector const &O, double YTilt)
@@ -733,11 +756,13 @@ void CSurface::RotateY(CVector const &O, double YTilt)
 	m_LB.RotateY(O, YTilt);
 	m_TA.RotateY(O, YTilt);
 	m_TB.RotateY(O, YTilt);
+	m_HingePoint.RotateY(O, YTilt);
 
 	CVector Origin(0.0,0.0,0.0);
 	Normal.RotateY(Origin, YTilt);
 	NormalA.RotateY(Origin, YTilt);
 	NormalB.RotateY(Origin, YTilt);
+	m_HingeVector.RotateY(Origin, YTilt);
 }
 
 
@@ -747,11 +772,13 @@ void CSurface::RotateZ(CVector const &O, double ZTilt)
 	m_LB.RotateZ(O, ZTilt);
 	m_TA.RotateZ(O, ZTilt);
 	m_TB.RotateZ(O, ZTilt);
+	m_HingePoint.RotateZ(O, ZTilt);
 
 	CVector Origin(0.0,0.0,0.0);
 	Normal.RotateZ(Origin, ZTilt);
 	NormalA.RotateZ(Origin, ZTilt);
 	NormalB.RotateZ(Origin, ZTilt);
+	m_HingeVector.RotateZ(Origin, ZTilt);
 }
 
 

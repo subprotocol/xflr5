@@ -216,6 +216,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
+//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_uRHS[p]);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -259,7 +260,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
-
 
 	ComputeAeroCoefs(m_Alpha, m_AlphaDelta, nrhs);
 
@@ -983,37 +983,37 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		pos = 0;
 
-		for(int i=0; i<4; i++)
+		for(int iw=0; iw<4; iw++)
 		{
-			if(m_pWingList[i])
+			if(m_pWingList[iw])
 			{
-				AddString(tr("         Calculating wing...") + m_pWingList[i]->m_WingName+"\n");
+				AddString(tr("         Calculating wing...") + m_pWingList[iw]->m_WingName+"\n");
 				//restore the saved FF results
-				Force += m_WingForce[qrhs*4+i];
-				IDrag += m_WingIDrag[qrhs*4+i];
+				Force += m_WingForce[qrhs*4+iw];
+				IDrag += m_WingIDrag[qrhs*4+iw];
 
-				memcpy(m_pWingList[i]->m_Cl,  m_Cl  + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[i]->m_ICd, m_ICd + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[i]->m_Ai,  m_Ai  + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[i]->m_F,   m_F   + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(CVector));
-				memcpy(m_pWingList[i]->m_Vd,  m_Vd  + qrhs*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
 
 				//Get viscous interpolations
-				m_pWingList[i]->PanelComputeViscous(QInf, Alpha, WingVDrag, m_pWPolar->m_bViscous, OutString);
+				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, WingVDrag, m_pWPolar->m_bViscous, OutString);
 				VDrag += WingVDrag;
 
 				AddString(OutString);
-				if(m_pWingList[i]->m_bWingOut)  m_bPointOut = true;
+				if(m_pWingList[iw]->m_bWingOut)  m_bPointOut = true;
 
 				//Compute moment coefficients
-				m_pWingList[i]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
+				m_pWingList[iw]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, 
 				                                   m_pWPolar, m_CoG);
 
 
-				m_pWingList[i]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
+				m_pWingList[iw]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
 
-				pos += m_pWingList[i]->m_MatSize;
+				pos += m_pWingList[iw]->m_MatSize;
 			}
 		}
 
@@ -2336,13 +2336,6 @@ void PanelAnalysisDlg::StartAnalysis()
 		if(m_pPanel[p].m_iSym>=0) PlusSize++;
 	}
 
-
-	//back-up the current geometry
-	memcpy(m_pMemPanel, m_pPanel, m_MatSize* sizeof(CPanel));
-	memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
-	memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
-	memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
-
 	QTimer *pTimer = new QTimer;
 	connect(pTimer, SIGNAL(timeout()), this, SLOT(OnProgress()));
 	pTimer->setInterval(100);
@@ -2772,9 +2765,9 @@ bool PanelAnalysisDlg::ControlLoop()
 	//	end loop
 	//
 	int i, nrhs;
-	double t;
-	QString str, strlen, strmass, strInertia;
+	QString str, strlen, strmass, strInertia, outString;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex *pMiarex  = (QMiarex*)s_pMiarex;
 
 	GetLengthUnit(strlen, pMainFrame->m_LengthUnit);
 	GetWeightUnit(strmass, pMainFrame->m_WeightUnit);
@@ -2842,11 +2835,14 @@ bool PanelAnalysisDlg::ControlLoop()
 		memcpy(m_pNode,  m_pMemNode,  m_nNodes  * sizeof(CVector));
 
 		//define the control position for this iteration
-		t = m_ControlMin +(double)i *m_ControlDelta;
-		str = QString("      Calculation for control position %1\n").arg(t,5,'f',2);
+		m_Ctrl = m_ControlMin +(double)i *m_ControlDelta;
+		str = QString("      Calculation for control position %1\n").arg(m_Ctrl ,5,'f',2);
 		AddString(str);
+		outString.clear();
 
-		SetControlPositions(t);
+		pMiarex->SetControlPositions(m_pPanel, m_pNode, m_Ctrl, m_NCtrls, outString, true);
+
+		AddString(outString);
 		if(m_bCancel) break;
 
 		// next find the balanced and trimmed conditions
@@ -2854,7 +2850,7 @@ bool PanelAnalysisDlg::ControlLoop()
 		{
 			if(m_bCancel) break;
 			//no zero moment alpha
-			str = QString("      Unsuccessfull attempt to trim the model for control position=%1 - skipping.\n\n\n").arg(t,5,'f',2);
+			str = QString("      Unsuccessfull attempt to trim the model for control position=%1 - skipping.\n\n\n").arg(m_Ctrl,5,'f',2);
 			AddString(str);
 			m_bWarning = true;
 		}
@@ -2897,11 +2893,10 @@ bool PanelAnalysisDlg::ControlLoop()
 			// Construct the state matrices - longitudinal and lateral
 			BuildStateMatrices();
 
-
 			// Solve for eigenvalues
 			if(!SolveEigenvalues())
 			{
-				str = QString("      Unsuccessfull attempt to compute eigenvalues for Control=%1 - skipping.\n\n\n").arg(t,10,'f',3);
+				str = QString("      Unsuccessfull attempt to compute eigenvalues for Control=%1 - skipping.\n\n\n").arg(m_Ctrl,10,'f',3);
 				AddString(str);
 				m_bWarning = true;
 			}
@@ -2922,7 +2917,7 @@ bool PanelAnalysisDlg::ControlLoop()
 
 				if (m_bCancel) return true;
 			}
-			str = QString("\n     ______Finished operating point calculation for control position %1________\n\n\n\n\n").arg(t, 5,'f',2);
+			str = QString("\n     ______Finished operating point calculation for control position %1________\n\n\n\n\n").arg(m_Ctrl, 5,'f',2);
 			AddString(str);
 		}
 		if(m_bCancel) break;
@@ -2930,150 +2925,6 @@ bool PanelAnalysisDlg::ControlLoop()
 	return true;
 }
 
-
-
-
-void PanelAnalysisDlg::SetControlPositions(double t)
-{
-	// Modifies the geometry by setting the control positions to the specified position t
-	// The panels are rotated as a whole, i.e. both the panel's boundary point position and the panel's normal
-
-	QString strange;
-	Quaternion Quat;
-	int j, nFlap;
-	double angle;
-	CWing *pWing, *pStab, *pFin;
-	CVector HingeVector(0.0, 1.0, 0.0);
-
-	pWing = m_pWing;
-	pStab = m_pStab;
-	pFin  = m_pFin;
-
-	m_Ctrl = t;
-
-	// update the variables & geometry
-	// if plane : WingTilt, elevator Tilt
-	// if flaps : wing flaps, elevator flaps
-
-	//the CG position is fixed for this analysis
-
-	m_NCtrls = 0;
-
-	if(m_pPlane)
-	{
-		//wing incidence
-		if(m_pWPolar->m_bActiveControl[0])
-		{
-			//wing tilt
-			angle = m_pWPolar->m_MinControl[0] + t * (m_pWPolar->m_MaxControl[0] - m_pWPolar->m_MinControl[0]);
-
-			strange = QString("      Setting the wing tilt to %1").arg(angle, 9, 'f',2);
-			strange += QString::fromUtf8("°\n");
-			AddString(strange);
-
-			angle -= m_pPlane->m_WingTilt;
-			Quat.Set(angle, HingeVector);
-
-			for(j=0; j<m_pWing->m_MatSize; j++)
-			{
-				(m_pWing->m_pPanel+j)->RotateBC(m_pPlane->m_LEWing, Quat);
-			}
-		}
-		m_NCtrls=1;
-
-		if(m_pStab)
-		{
-			//elevator incidence
-			if(m_pWPolar->m_bActiveControl[1] )
-			{
-				//Elevator tilt
-				angle = m_pWPolar->m_MinControl[1] + t * (m_pWPolar->m_MaxControl[1] - m_pWPolar->m_MinControl[1]);
-
-				strange = QString("      Setting the elevator tilt to %1").arg(angle, 5, 'f',2);
-				strange += QString::fromUtf8("°\n");
-				AddString(strange);
-
-				angle -= m_pPlane->m_StabTilt;
-				Quat.Set(angle, HingeVector);
-
-				for(j=0; j<m_pStab->m_MatSize; j++)
-				{
-					(m_pStab->m_pPanel+j)->RotateBC(m_pPlane->m_LEStab, Quat);
-				}
-			}
-			m_NCtrls = 2;
-		}
-	}
-
-	// flap controls
-	//wing first
-	nFlap = 0;
-	for (j=0; j<pWing->m_NSurfaces; j++)
-	{
-		if(pWing->m_Surface[j].m_bTEFlap)
-		{
-			if(m_pWPolar->m_bActiveControl[m_NCtrls])
-			{
-				angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
-
-				strange = QString("      Setting the main wing flap %1 angle to %2").arg(nFlap).arg(angle, 5, 'f',2);
-				strange += QString::fromUtf8("°\n");
-				AddString(strange);
-
-				if(fabs(angle)>PRECISION)
-				{
-					if(!pWing->m_Surface[j].RotateFlap(angle))  return;
-				}
-			}
-			nFlap++;
-			m_NCtrls++;
-		}
-	}
-	//elevator next and last
-	nFlap = 0;
-	if(pStab)
-	{
-		for (j=0; j<pStab->m_NSurfaces; j++)
-		{
-			if(pStab->m_Surface[j].m_bTEFlap)
-			{
-				if(m_pWPolar->m_bActiveControl[m_NCtrls])
-				{
-					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
-					strange = QString("           Setting the elevator flap %1 angle to %2").arg(nFlap).arg(angle, 5, 'f',2);
-					strange += QString::fromUtf8("°\n");
-					AddString(strange);
-					if(!pStab->m_Surface[j].RotateFlap(angle)) return;
-				}
-				nFlap++;
-				m_NCtrls++;
-			}
-		}
-	}
-
-	nFlap = 0;
-	if(pFin)
-	{
-		for (j=0; j<pFin->m_NSurfaces; j++)
-		{
-			if(pFin->m_Surface[j].m_bTEFlap)
-			{
-				if(m_pWPolar->m_bActiveControl[m_NCtrls])
-				{
-					angle = m_pWPolar->m_MinControl[m_NCtrls] + t * (m_pWPolar->m_MaxControl[m_NCtrls] - m_pWPolar->m_MinControl[m_NCtrls]);
-					strange = QString("           Setting the fin flap %1 angle to %2").arg(nFlap).arg(angle, 9, 'f',2);
-					strange += QString::fromUtf8("°\n");
-					AddString(strange);
-					if(!pFin->m_Surface[j].RotateFlap(angle)) return;
-				}
-				nFlap++;
-				m_NCtrls++;
-			}
-		}
-	}
-//	str = QString("      ...Control = %1\n").arg(m_ControlMin+i*m_ControlDelta,8,'f',2);
-//	AddString(str);
-}
 
 
 
@@ -3661,7 +3512,7 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	AddString(strange);
 
 	//build the control matrix
-	for(i=0; i<m_pWPolar->m_nControls; i++)
+//	for(i=0; i<m_pWPolar->m_nControls; i++)
 	{
 		// per radian
 		m_BLong[0] = Xde/m_Mass;
@@ -3740,7 +3591,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	//Build the unit RHS vectors along x and z in Body Axis
 	CreateUnitRHS();
 	if (m_bCancel) return false;
-
+//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_uRHS[p]);
 	// build the influence matrix in Body Axis
 	BuildInfluenceMatrix();
 	if (m_bCancel) return false;
@@ -4056,11 +3907,6 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	Zw = (Force.dot(WindNormal)   -Force0.dot(ks))/deltaspeed;
 	Mw = (Moment.dot(js)-Moment0.dot(js))/deltaspeed;
 
-//double q = .5 * m_pWPolar->m_Density * u0* u0;
-//qDebug("AlphaEq = %13.7f     Alpha = %13.7f ", m_AlphaEq, alpha);
-//qDebug(" ICd0=%13.7f,  ICd=%13.7f",Force0.dot(is)/q/m_pWPolar->m_WArea, Force.dot(WindDirection)/q/m_pWPolar->m_WArea);
-//qDebug("  CL0=%13.7f,   CL=%13.7f",-Force0.dot(ks)/q/m_pWPolar->m_WArea, -Force.dot(ks)/q/m_pWPolar->m_WArea);
-
 	m_Progress +=1;
 	qApp->processEvents();
 
@@ -4251,12 +4097,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
 				Quat.Set(DeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
-
 				for(p=0; p<m_MatSize;p++)
 				{
 					if(m_ppSurface[j]->IsFlapPanel(p))
 					{
 						m_pPanel[p].RotateBC(m_ppSurface[j]->m_HingePoint, Quat);
+//						m_pPanel[p].RotatePanel(m_ppSurface[j]->m_HingePoint, Quat);
 					}
 				}
 			}
@@ -4287,10 +4133,11 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	Crout_LU_with_Pivoting_Solve(m_aij, m_cRHS, m_Index, m_RHS, m_MatSize, &m_bCancel);
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
-
-
 	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-
+//qDebug("Force0    %13.7f   %13.7f   %13.7f   ", Force0.x, Force0.y, Force0.z);
+//qDebug("Force     %13.7f   %13.7f   %13.7f   ", Force.x, Force.y, Force.z);
+//qDebug("Moment0   %13.7f   %13.7f   %13.7f   ", Moment0.x, Moment0.y, Moment0.z);
+//qDebug("Moment    %13.7f   %13.7f   %13.7f   ", Moment.x, Moment.y, Moment.z);
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
 	Xde = (Force-Force0).dot(is)/DeltaAngle;

@@ -434,7 +434,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	else                 CoG.Set(0.0, 0.0, 0.0);
 
 
-	//then get the Inertia in both reference frames
+	// CoG is the new origin for inertia calculation
 	p=0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
@@ -455,7 +455,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			CoGIxxCheck += LocalVolume*rho * ( (PtC4.y-CoG.y)*(PtC4.y-CoG.y) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
 			CoGIyyCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.z-CoG.z)*(PtC4.z-CoG.z) );
 			CoGIzzCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.x-CoG.x) + (PtC4.y-CoG.y)*(PtC4.y-CoG.y) );
-			CoGIxzCheck += LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
+			CoGIxzCheck -= LocalVolume*rho * ( (PtC4.x-CoG.x)*(PtC4.z-CoG.z) );
 
 			recalcMass   += LocalVolume*rho;
 			recalcVolume += LocalVolume;
@@ -463,10 +463,10 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			for(l=0; l<NXStations; l++)
 			{
 				//browse mid-section
-				CoGIxx += ElemVolume[p]*rho * ((PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
-				CoGIyy += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
-				CoGIzz += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y));
-				CoGIxz += ElemVolume[p]*rho * ((PtVolume[p].x-CoG.x)*(PtVolume[p].z-CoG.z) );
+				CoGIxx += ElemVolume[p]*rho * ( (PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
+				CoGIyy += ElemVolume[p]*rho * ( (PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].z-CoG.z)*(PtVolume[p].z-CoG.z));
+				CoGIzz += ElemVolume[p]*rho * ( (PtVolume[p].x-CoG.x)*(PtVolume[p].x-CoG.x) + (PtVolume[p].y-CoG.y)*(PtVolume[p].y-CoG.y));
+				CoGIxz -= ElemVolume[p]*rho * ( (PtVolume[p].x-CoG.x)*(PtVolume[p].z-CoG.z) );
 				p++;
 			}
 		}
@@ -496,7 +496,7 @@ void CWing::ComputeBodyAxisInertia()
 	for(i=0; i<m_NMass; i++)
 	{
 		TotalMass += m_MassValue[i];
-		TotalCoG += m_MassPosition[i] * m_MassValue[i];
+		TotalCoG  += m_MassPosition[i] * m_MassValue[i];
 	}
 
 	if(TotalMass>0.0) TotalCoG = TotalCoG/TotalMass;
@@ -509,7 +509,7 @@ void CWing::ComputeBodyAxisInertia()
 		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz += m_MassValue[i] * (LA.x*LA.z);
+		Ixz -= m_MassValue[i] * (LA.x*LA.z);
 	}
 
 	m_TotalMass = TotalMass;
@@ -517,7 +517,7 @@ void CWing::ComputeBodyAxisInertia()
 	m_CoGIxx =  Ixx;
 	m_CoGIyy =  Iyy;
 	m_CoGIzz =  Izz;
-	m_CoGIxz = -Ixz;
+	m_CoGIxz =  Ixz;
 }
 
 
@@ -2853,4 +2853,27 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 			m++;
 		}
 	}
+}
+
+
+bool CWing::IsWingPanel(int nPanel)
+{
+	for(int p=0; p<m_MatSize; p++)
+	{
+		if(nPanel==m_pPanel[p].m_iElement) return true;
+	}
+	return false;
+}
+
+
+bool CWing::IsWingNode(int nNode)
+{
+	for(int p=0; p<m_MatSize; p++)
+	{
+		if(nNode==m_pPanel[p].m_iLA) return true;
+		if(nNode==m_pPanel[p].m_iLB) return true;
+		if(nNode==m_pPanel[p].m_iTA) return true;
+		if(nNode==m_pPanel[p].m_iTB) return true;
+	}
+	return false;
 }

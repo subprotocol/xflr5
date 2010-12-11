@@ -108,7 +108,6 @@ private:
 	void ComputeStabilityDerivatives();
 	void ComputeStabilityInertia();
 	bool ComputeTrimmedConditions();
-	void SetControlPositions(double t);
 	bool SolveEigenvalues();
 	void BuildRotationMatrix();
 	void BuildStateMatrices();

@@ -94,6 +94,7 @@ private:
 	void reject();
 
 	void WheelEvent(QWheelEvent *event);
+	void MouseDoubleClickEvent(QMouseEvent *event);
 	void MouseMoveEvent(QMouseEvent *event);
 	void MousePressEvent(QMouseEvent *event) ;
 	void MouseReleaseEvent(QMouseEvent *event) ;
@@ -220,8 +221,6 @@ private:
 	QPoint m_MousePos;
 	QPoint m_ptPopUp;
 	QPoint m_LastPoint, m_PointDown;
-
-	QRect m_rCltRect, m_3DWingRect;
 
 
 	CVector m_RealPopUp;

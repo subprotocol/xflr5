@@ -123,6 +123,27 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
+
+
+void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event )
+{
+	if(m_iView == 3)
+	{
+		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
+		pMiarex->mouseDoubleClickEvent(event );
+	}
+	else if(m_iView == 5)
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->mouseDoubleClickEvent(event);
+	}
+	else if(m_iView == 7)
+	{
+		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
+		pDlg->MouseDoubleClickEvent(event);
+	}
+}
+
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
 	if(m_iView == 3)
@@ -253,8 +274,8 @@ void GLWidget::resizeGL(int width, int height)
 	}
 	else if(m_iView == 7)
 	{
-		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->m_3DWingRect = m_rCltRect;
+//		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
+//		pDlg->m_3DWingRect = m_rCltRect;
 	}
 }
 

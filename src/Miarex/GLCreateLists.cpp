@@ -1198,14 +1198,7 @@ void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel)
 				glVertex3d((pPanel[p].CtrlPt.x + pPanel[p].Normal.x * 0.04),
 						   (pPanel[p].CtrlPt.y + pPanel[p].Normal.y * 0.04),
 						   (pPanel[p].CtrlPt.z + pPanel[p].Normal.z * 0.04));
-/*				glVertex3d(pPanel[p].CollPt.x, pPanel[p].CollPt.y, pPanel[p].CollPt.z);
-				glVertex3d(pPanel[p].CollPt.x+pPanel[p].Normal.x *0.01,
-						   pPanel[p].CollPt.y+pPanel[p].Normal.y *0.01,
-						   pPanel[p].CollPt.z+pPanel[p].Normal.z *0.01);
-				glVertex3d(pPanel[p].CollPt.x, pPanel[p].CollPt.y, pPanel[p].CollPt.z);
-				glVertex3d(pPanel[p].CollPt.x+pPanel[p].l.x *0.01,
-						   pPanel[p].CollPt.y+pPanel[p].l.y *0.01,
-						   pPanel[p].CollPt.z+pPanel[p].l.z *0.01);*/
+
 			}
 			glEnd();
 		}
@@ -1665,8 +1658,8 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 	pMiarex->m_pPanelDlg->m_pWing   = Wing[0];
 
 
-	//Tilt the geometry w.r.t. aoa
-	pMiarex->RotateGeomY(pWOpp->m_Alpha, RefPoint);
+//Tilt the geometry w.r.t. aoa
+//	pMiarex->RotateGeomY(pWOpp->m_Alpha, RefPoint);
 
 	glNewList(VLMSTREAMLINES,GL_COMPILE);
 	{
@@ -1725,6 +1718,8 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 					if(bFound)
 					{
+						C.RotateY(RefPoint, pWOpp->m_Alpha);
+						D.RotateY(RefPoint, pWOpp->m_Alpha);
 						if(!C.IsSame(D1))
 						{
 							C.x += p3DScales->m_XOffset;
@@ -2401,14 +2396,15 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 	c = pWOpp->m_EigenValue[pStabView->m_iCurrentMode];
 	sum  = c.real() * 2.0;                         // is a real number
 	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
-	OmegaN = abs(c.imag());
-	Omega1 = sqrt(prod);
+	OmegaN = fabs(c.imag());
+	if(OmegaN>PRECISION)	Omega1 = sqrt(prod);
+	else                    Omega1 = 0.0;
 	Sigma1 = sum /2.0;
-	if(prod > PRECISION) Dsi = -Sigma1/Omega1;
+	if(Omega1>PRECISION) Dsi = -Sigma1/Omega1;
 	else                 Dsi = 0.0;
 
 
-	ZPos = pMiarex->m_r3DCltRect.bottom()- 15 * dD ;
+	ZPos = pMiarex->m_r3DCltRect.bottom()- 14 * dD ;
 	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 	glNewList(MODELEGEND,GL_COMPILE);
 	{
@@ -2454,16 +2450,12 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
-		strange = QString(QObject::tr("Damping Constant           = %1 s-1")).arg(Sigma1, 8,'f',3);
-		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
-		ZPos +=dD;
-
 		strange = QString(QObject::tr("Damping Ratio              = %1 ")).arg(Dsi, 8,'f',3);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
 		if(c.imag()>=0.0) strange = QString("Eigenvalue    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-		else              strange = QString("Eigenvalue     = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+		else              strange = QString("Eigenvalue    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 		pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 		ZPos +=dD;
 
@@ -2471,26 +2463,26 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 		{
 			angle = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3];
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][0]/u0;
-			if(c.imag()>=0.0) strange = QString("u/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("u/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("u/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("u/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][1]/u0;
-			if(c.imag()>=0.0) strange = QString("w/u0         = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("w/u0         = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("w/u0          = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("w/u0          = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][2]/(2.0*u0/mac);
-			if(c.imag()>=0.0) strange = QString("q/(2.u0.MAC) = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("q/(2.u0.MAC) = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("q/(2.u0.MAC)  = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("q/(2.u0.MAC)  = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
 			c = pWOpp->m_EigenVector[pStabView->m_iCurrentMode][3]/angle;
-			if(c.imag()>=0.0) strange = QString("theta(rad)   = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-			else              strange = QString("theta(rad)   = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+			if(c.imag()>=0.0) strange = QString("theta(rad)    = %1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
+			else              strange = QString("theta(rad)    = %1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			pGLWidget->renderText(LeftPos, ZPos, strange, pMainFrame->m_TextFont);
 			ZPos +=dD;
 		}
@@ -2623,7 +2615,7 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 
 			for(i=0; i<pWOpp->m_nFlaps; i++)
 			{
-				Result = QString(QObject::tr("Flap Moment[%1] = %2")).arg(i+1).arg(pWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 12,'f',4);
+				Result = QString(QObject::tr("Flap Moment[%1] = %2")).arg(i+1).arg(pWOpp->m_FlapMoment[i]*pMainFrame->m_NmtoUnit, 7,'g',3);
 				GetMomentUnit(str, pMainFrame->m_MomentUnit);
 				Result += str;
 				YPos += dD;

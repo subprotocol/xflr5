@@ -225,7 +225,7 @@ void CBody::ComputeBodyAxisInertia()
 		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz += m_MassValue[i] * (LA.x*LA.z);
+		Ixz -= m_MassValue[i] * (LA.x*LA.z);
 	}
 
 	m_TotalMass = TotalMass;
@@ -233,7 +233,7 @@ void CBody::ComputeBodyAxisInertia()
 	m_CoGIxx =  Ixx;
 	m_CoGIyy =  Iyy;
 	m_CoGIzz =  Izz;
-	m_CoGIxz = -Ixz;
+	m_CoGIxz =  Ixz;
 }
 
 void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
@@ -381,7 +381,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 				CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
 				CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
 				CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
-				CoGIxz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+				CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
 			}
 		}
 	}
@@ -435,7 +435,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			CoGIxx += SectionArea*rho * ( (Pt.y-CoG.y)*(Pt.y-CoG.y) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
 			CoGIyy += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.z-CoG.z)*(Pt.z-CoG.z) );
 			CoGIzz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.x-CoG.x) + (Pt.y-CoG.y)*(Pt.y-CoG.y) );
-			CoGIxz += SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
+			CoGIxz -= SectionArea*rho * ( (Pt.x-CoG.x)*(Pt.z-CoG.z) );
 
 			xpos += dl;
 		}

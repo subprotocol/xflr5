@@ -69,7 +69,8 @@ protected:
 	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
 
-
+	bool IsWingPanel(int nPanel);
+	bool IsWingNode(int nNode);
 
 	bool LLTInitialize(double mass);
 	bool LLTSetLinearSolution();
