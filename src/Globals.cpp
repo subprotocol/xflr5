@@ -1409,7 +1409,7 @@ double Det44(double *aij)
 //	returns the determinant of a 4x4 matrix
 
 	static int i,j,k,l,p,q;
-	static double det, sign, a33[9];
+	static double det, sign, a33[16];
 
 	det = 0.0;
 	for(i=0; i<4; i++)
@@ -1506,7 +1506,7 @@ complex<double> Det44(complex<double> *aij)
 
 	static int i,j,k,l,p,q;
 	static double sign;
-	static complex<double> det, a33[9];
+	static complex<double> det, a33[16];
 	det = 0.0;
 
 	i=0;

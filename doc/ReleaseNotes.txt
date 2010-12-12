@@ -16,6 +16,7 @@
 
 
 xflr5 v6.02 Beta November xxxth, 2010
+	- added an option to load a background image in the foil direct design module
 	- corrected some errors in CoG and inertia automatic calculations, with impact on results
 	- did some deep code cleaning
 	- re-organized the panel analysis code to perform only one far field calculation per operating point

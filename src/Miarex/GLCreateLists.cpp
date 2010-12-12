@@ -171,7 +171,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List)
 	glEndList();
 
 	//OUTLINE
-	glNewList(List+1,GL_COMPILE);
+	glNewList(List+4,GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
 
@@ -2048,7 +2048,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 	glEndList();
 
 	//BOTTOM TRANSITION
-	glNewList(List+1,GL_COMPILE);
+	glNewList(List+4,GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
 		glEnable (GL_LINE_STIPPLE);

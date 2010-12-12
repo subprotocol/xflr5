@@ -277,6 +277,7 @@ private:
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *SplinesAct, *SplinedPointsAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
 	QAction *AFoilTableColumns, *AFoilTableColumnWidths;
+	QAction *AFoilLoadImage, *AFoilClearImage;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
@@ -399,7 +400,6 @@ public:
 	int m_MomentUnit;
 
 	void *m_pStabView;
-
 };
 
 #endif // MAINFRAME_H

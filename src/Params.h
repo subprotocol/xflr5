@@ -38,6 +38,7 @@
 #define PANELMETHOD         3
 
 //3D analysis parameters
+#define MAXWINGS            4 //wing, wing2, elevator, fin, in that order
 #define MAXPANELS          50 // max number of sections on a half wing
 #define MAXSTATIONS       500 // max number of stations for LLT or VLM analysis
 #define MAXCHORDPANELS	  100
@@ -75,13 +76,15 @@
 //MIAREX
 
 //3D OpenGl list references
-#define PANELCP                 1227
 
-#define VLMWINGLIFT             1230
-#define LIFTFORCE               1231
-#define VLMMOMENTS              1232
+#define VLMSTREAMLINES          1220
+#define SURFACESPEEDS           1221
 
-#define VLMWING2LIFT		1233
+#define LIFTFORCE               1222
+#define VLMMOMENTS              1223
+
+#define VLMWINGLIFT             1232
+#define VLMWING2LIFT		    1233
 #define VLMSTABLIFT             1234
 #define VLMFINLIFT              1235
 
@@ -91,56 +94,53 @@
 #define VLMFINDRAG              1239
 
 #define VLMWINGWASH             1241
-#define VLMWING2WASH		1242
+#define VLMWING2WASH	        1242
 #define VLMSTABWASH             1243
 #define VLMFINWASH              1244
 
-#define VLMCTRLPTS              1250
-#define VLMVORTICES             1251
+#define VLMWINGTOPTRANS         1245
+#define VLMWING2TOPTRANS        1246
+#define VLMSTABTOPTRANS         1247
+#define VLMFINTOPTRANS          1248
 
-#define VLMSTREAMLINES          1255
-#define SURFACESPEEDS           1256
+#define VLMWINGBOTTRANS         1249
+#define VLMWING2BOTTRANS        1250
+#define VLMSTABBOTTRANS         1251
+#define VLMFINBOTTRANS          1252
 
-#define WINGSURFACES            1258
-#define WINGOUTLINE             1259
+#define WINGSURFACES            1300
+#define WING2SURFACES		    1301
+#define STABSURFACES		    1302
+#define FINSURFACES 	        1303
 
-#define WING2SURFACES		1260
-#define WING2OUTLINE		1261
+#define WINGOUTLINE             1304
+#define WING2OUTLINE            1305
+#define STABOUTLINE             1306
+#define FINOUTLINE              1307
 
-#define STABSURFACES		1265
-#define STABOUTLINE             1266
+#define MESHPANELS              1372
+#define MESHBACK                1373
 
-#define FINSURFACES 		1270
-#define FINOUTLINE              1271
+#define WINGLEGEND              1376
+#define WOPPLEGEND              1377
+#define WOPPCPLEGENDCLR		    1378
+#define WOPPCPLEGENDTXT		    1379
 
-#define MESHPANELS              1272
-#define MESHBACK                1273
+#define WINGWAKEPANELS		    1383
+#define PANELCP                 1384
+#define VLMCTRLPTS              1385
+#define VLMVORTICES             1386
 
-#define WINGLEGEND              1276
-#define WOPPLEGEND              1277
-#define WOPPCPLEGENDCLR		1278
-#define WOPPCPLEGENDTXT		1279
 
-#define WINGWAKEPANELS		1283
+#define BODYGEOM            1400
+#define BODYSURFACES        1401
+#define BODYMESHPANELS      1402
+#define BODYMESHBACK        1403
 
-#define VLMWINGTOPTRANS     1293
-#define VLMWINGBOTTRANS     1294
-#define VLMWING2TOPTRANS    1295
-#define VLMWING2BOTTRANS    1296
-#define VLMSTABTOPTRANS     1297
-#define VLMSTABBOTTRANS     1298
-#define VLMFINTOPTRANS      1299
-#define VLMFINBOTTRANS      1300
+#define ARCBALL             1414
+#define ARCPOINT            1415
 
-#define BODYGEOM            1302
-#define BODYSURFACES        1303
-#define BODYMESHPANELS      1312
-#define BODYMESHBACK        1313
-
-#define ARCBALL             1314
-#define ARCPOINT            1315
-
-#define MODELEGEND          1316
+#define MODELEGEND          1416
 
 
 #define QUESTION (BB || !BB) //Shakespeare

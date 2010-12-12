@@ -737,9 +737,15 @@ void MainFrame::CreateAFoilActions()
 
 	AFoilTableColumnWidths = new QAction(tr("Reset column widths"), this);
 	connect(AFoilTableColumnWidths, SIGNAL(triggered()), pAFoil, SLOT(OnColumnWidths()));
+
+	AFoilLoadImage = new QAction(tr("Load background image")   +"\tCtrl+Shift+I", this);
+	connect(AFoilLoadImage, SIGNAL(triggered()), pAFoil, SLOT(OnLoadBackImage()));
+	AFoilClearImage = new QAction(tr("Clear background image") +"\tCtrl+Shift+I", this);
+
+	connect(AFoilClearImage, SIGNAL(triggered()), pAFoil, SLOT(OnClearBackImage()));
 }
 
-
+//
 void MainFrame::CreateAFoilMenus()
 {
 	AFoilViewMenu = menuBar()->addMenu(tr("&View"));
@@ -757,6 +763,9 @@ void MainFrame::CreateAFoilMenus()
 	AFoilViewMenu->addAction(m_pShowLegend);
 	AFoilViewMenu->addAction(AFoilLECircle);
 	AFoilViewMenu->addAction(AFoilGridAct);
+	AFoilViewMenu->addSeparator();
+	AFoilViewMenu->addAction(AFoilLoadImage);
+	AFoilViewMenu->addAction(AFoilClearImage);
 	AFoilViewMenu->addSeparator();
 	AFoilViewMenu->addAction(saveViewToImageFileAct);
 
@@ -811,6 +820,9 @@ void MainFrame::CreateAFoilMenus()
 	AFoilCtxMenu->addAction(m_pShowLegend);
 	AFoilCtxMenu->addAction(AFoilLECircle);
 	AFoilCtxMenu->addAction(AFoilGridAct);
+	AFoilCtxMenu->addSeparator();
+	AFoilCtxMenu->addAction(AFoilLoadImage);
+	AFoilCtxMenu->addAction(AFoilClearImage);
 	AFoilCtxMenu->addSeparator();
 	AFoilCtxMenu->addAction(saveViewToImageFileAct);
 	AFoilCtxMenu->addSeparator();
@@ -2561,9 +2573,8 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 			{
 				pMiarex->m_pCurPlane = NULL;
 				pMiarex->m_pCurWing  = NULL;
-				pMiarex->m_pCurStab  = NULL;
-				pMiarex->m_pCurFin   = NULL;
 				pMiarex->m_pCurBody  = NULL;
+				for(int iw=0; iw<MAXWINGS; iw++) pMiarex->m_pWingList[iw] = NULL;
 			}
 			break;
 		}
@@ -5080,8 +5091,8 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	//saves only the UFO with its associated plrs, foils and other results
 	CPlane *pPlane   = pMiarex->m_pCurPlane;
 	CWing *pWing     = pMiarex->m_pCurWing;
-	CWing *pStab     = pMiarex->m_pCurStab;
-	CWing *pFin      = pMiarex->m_pCurFin;
+	CWing *pStab     = pMiarex->m_pWingList[2];
+	CWing *pFin      = pMiarex->m_pWingList[3];
 	CWPolar *pWPolar = NULL;
 //	CWOpp *pWOpp     = NULL;
 	CFoil *pFoil  = NULL;
@@ -6024,21 +6035,15 @@ void MainFrame::SetGraphSettings(Graph *pGraph)
 
 	pXInverse->m_QGraph.CopySettings(pGraph, false);
 
-	pMiarex->m_WingGraph1.CopySettings(pGraph, false);
-	pMiarex->m_WingGraph2.CopySettings(pGraph, false);
-	pMiarex->m_WingGraph3.CopySettings(pGraph, false);
-	pMiarex->m_WingGraph4.CopySettings(pGraph, false);
-	pMiarex->m_WPlrGraph1.CopySettings(pGraph, false);
-	pMiarex->m_WPlrGraph2.CopySettings(pGraph, false);
-	pMiarex->m_WPlrGraph3.CopySettings(pGraph, false);
-	pMiarex->m_WPlrGraph4.CopySettings(pGraph, false);
 	pMiarex->m_LongRLGraph.CopySettings(pGraph, false);
 	pMiarex->m_LatRLGraph.CopySettings(pGraph, false);
 	pMiarex->m_CpGraph.CopySettings(pGraph, false);
-	pMiarex->m_TimeGraph1.CopySettings(pGraph, false);
-	pMiarex->m_TimeGraph2.CopySettings(pGraph, false);
-	pMiarex->m_TimeGraph3.CopySettings(pGraph, false);
-	pMiarex->m_TimeGraph4.CopySettings(pGraph, false);
+	for(int ig=0; ig<4; ig++)
+	{
+		pMiarex->m_WPlrGraph[ig].CopySettings(pGraph, false);
+		pMiarex->m_WingGraph[ig].CopySettings(pGraph, false);
+		pMiarex->m_TimeGraph[ig].CopySettings(pGraph, false);
+	}
 }
 
 

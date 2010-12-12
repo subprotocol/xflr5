@@ -73,16 +73,10 @@ void InertiaDlg::ComputeInertia()
 	CVector TotalCoG, MassPos;
 
 	CWing *pWing[4];
-	CVector WingPos[4];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
 	if(m_pPlane)
 	{
-		WingPos[0] = m_pPlane->m_LEWing;
-		WingPos[1] = m_pPlane->m_LEWing2;
-		WingPos[2] = m_pPlane->m_LEStab;
-		WingPos[3] = m_pPlane->m_LEFin;
-
 		pWing[0] =  &m_pPlane->m_Wing;
 		if(m_pPlane->m_bBiplane) pWing[1] = &m_pPlane->m_Wing2;
 		if(m_pPlane->m_bStab)    pWing[2] = &m_pPlane->m_Stab;
@@ -149,7 +143,7 @@ void InertiaDlg::ComputeInertia()
 				for(i=0; i<pWing[iw]->m_NMass; i++)
 				{
 					TotalMass += pWing[iw]->m_MassValue[i];
-					TotalCoG  += (pWing[iw]->m_MassPosition[i]+WingPos[iw]) * pWing[iw]->m_MassValue[i];
+					TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
 				}
 			}
 		}
@@ -193,7 +187,7 @@ void InertiaDlg::ComputeInertia()
 			{
 				for(i=0; i<pWing[iw]->m_NMass; i++)
 				{
-					MassPos = WingPos[iw] + pWing[iw]->m_MassPosition[i];
+					MassPos = m_pPlane->m_WingLE[iw] + pWing[iw]->m_MassPosition[i];
 					TotalIxx  += pWing[iw]->m_MassValue[i] * ((MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y)
 															 +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
 					TotalIyy  += pWing[iw]->m_MassValue[i] * ((MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
@@ -231,8 +225,6 @@ void InertiaDlg::ComputeInertia()
 	m_pctrlTotalIyy->SetValue(TotalIyy*Unit);
 	m_pctrlTotalIzz->SetValue(TotalIzz*Unit);
 	m_pctrlTotalIxz->SetValue(TotalIxz*Unit);
-
-
 }
 
 

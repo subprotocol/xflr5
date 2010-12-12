@@ -92,7 +92,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_pWingList[0] = m_pWingList[1] = m_pWingList[2] = m_pWingList[3] = NULL;
 	m_pBody  = NULL;
 
-	m_pWing   = m_pWing2 = m_pStab = m_pFin = NULL;
+	m_pWing   = NULL;
 	m_pWPolar = NULL;
 	m_pPlane  = NULL;
 	m_ppSurface = NULL;
@@ -967,10 +967,9 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 	CWing::s_Density   = m_pWPolar->m_Density;
 
+	for(int iw=0; iw<MAXWINGS; iw++)
+		if(m_pWingList[iw])m_pWingList[iw]->m_bWingOut = false;
 	m_pWing->m_bWingOut                = false;
-	if(m_pWing2) m_pWing2->m_bWingOut  = false;
-	if(m_pStab) m_pStab->m_bWingOut    = false;
-	if(m_pFin)  m_pFin->m_bWingOut     = false;
 
 	if(QInf >0.0) 
 	{
@@ -1608,38 +1607,15 @@ void PanelAnalysisDlg::InitDialog()
 	QString str = "";
 
 	m_b3DSymetric = m_pWing->m_bSymetric;
-	if(!m_pWing->m_bSymetric) str += tr("     Main wing is asymmetric")+"\n";
 
-	if(fabs(m_pWPolar->m_Beta)>0.000001)
+	for(int iw=0; iw<MAXWINGS; iw++)
 	{
-		str += tr("     Sideslip is asymmetric")+"\n";
-		m_b3DSymetric = false;
-	}
-
-	if(m_pWing2)
-	{
-		if(!m_pWing2->m_bSymetric)
+		if(m_pWingList[iw])
 		{
-			m_b3DSymetric = false;
-			str += tr("     2nd wing is asymmetric")+"\n";
-		}
-	}
-
-	if(m_pStab)
-	{
-		if(!m_pStab->m_bSymetric)
-		{
-			m_b3DSymetric = false;
-			str += tr("     Elevator is asymmetric")+"\n";
-		}
-	}
-
-	if(m_pFin)
-	{
-		if(m_pFin->m_bDoubleFin && !m_pFin->m_bSymetric)
-		{
-			m_b3DSymetric = false;
-			str += tr("     The fin is asymmetric")+"\n";
+			if(!m_pWingList[iw]->m_bSymetric)
+			{
+				m_b3DSymetric = false;
+			}
 		}
 	}
 
@@ -2080,7 +2056,8 @@ void PanelAnalysisDlg::SetFileHeader()
 	out << "\n";
 	out << pMainFrame->m_VersionName;
 	out << "\n";
-	out << m_pWing->m_WingName;
+	if(m_pPlane)     out << m_pPlane->m_PlaneName;
+	else if(m_pWing) out << m_pWing->m_WingName;
 	out << "\n";
 
 
@@ -2302,9 +2279,9 @@ void PanelAnalysisDlg::StartAnalysis()
 	{
 		QString len, str;
 		GetLengthUnit(len, pMainFrame->m_LengthUnit);
-		if(fabs(m_pPlane->m_LEWing.z-m_pPlane->m_LEStab.z)<.0001)
+		if(fabs(m_pPlane->m_WingLE[0].z-m_pPlane->m_WingLE[2].z)<.0001)
 		{	
-			str = QString("%1 ").arg(m_pPlane->m_LEWing.z*pMainFrame->m_mtoUnit, 7, 'g', 3);
+			str = QString("%1 ").arg(m_pPlane->m_WingLE[0].z*pMainFrame->m_mtoUnit, 7, 'g', 3);
 			strong = tr("Warning: The wing and elevator lie in the same plane z=")+str+len+"\n";
 			AddString(strong);
 			strong = tr("It is recommended to slightly offset the wing or the elevator to avoid numerical instabilities")+"\n\n";
@@ -2318,12 +2295,6 @@ void PanelAnalysisDlg::StartAnalysis()
 	else if(m_pWPolar->m_Type==STABILITYPOLAR) strong = tr("Type 7 - Stability polar");
 	AddString(strong);
 	m_bCancel = false;
-
-
-	m_pWingList[0] = m_pWing;
-	m_pWingList[1] = m_pWing2;
-	m_pWingList[2] = m_pStab;
-	m_pWingList[3] = m_pFin;
 
 	m_SymSize = 0;
 	int PlusSize=0;
@@ -4063,14 +4034,14 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
-				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->m_LEWing, Quat);
+				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->m_WingLE[0], Quat);
 			}
 		}
 		pos = m_pWing->m_MatSize;
 		NCtrls = 1;
 	}
 
-	if(m_pPlane && m_pStab)
+	if(m_pPlane && m_pWingList[2])
 	{
 		//Elevator tilt
 		if(m_pWPolar->m_bActiveControl[1] )
@@ -4078,12 +4049,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			H.Set(0.0, 1.0, 0.0);
 			Quat.Set(DeltaAngle*180.0/PI, H);
 
-			for(p=0; p<m_pStab->m_MatSize; p++)
+			for(p=0; p<m_pWingList[2]->m_MatSize; p++)
 			{
-				(m_pStab->m_pPanel+p)->RotateBC(m_pPlane->m_LEStab, Quat);
+				(m_pWingList[2]->m_pPanel+p)->RotateBC(m_pPlane->m_WingLE[2], Quat);
 			}
 		}
-		pos += m_pStab->m_MatSize;
+		pos += m_pWingList[2]->m_MatSize;
 		NCtrls = 2;
 	}
 

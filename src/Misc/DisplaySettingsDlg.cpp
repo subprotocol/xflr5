@@ -193,14 +193,12 @@ void DisplaySettingsDlg::reject()
 	pXDirect->m_pTrGraph->CopySettings(&m_MemGraph);
 	pXDirect->m_pUserGraph->CopySettings(&m_MemGraph);
 
-	pMiarex->m_WingGraph1.CopySettings(&m_MemGraph);
-	pMiarex->m_WingGraph2.CopySettings(&m_MemGraph);
-	pMiarex->m_WingGraph3.CopySettings(&m_MemGraph);
-	pMiarex->m_WingGraph4.CopySettings(&m_MemGraph);
-	pMiarex->m_WPlrGraph1.CopySettings(&m_MemGraph);
-	pMiarex->m_WPlrGraph2.CopySettings(&m_MemGraph);
-	pMiarex->m_WPlrGraph3.CopySettings(&m_MemGraph);
-	pMiarex->m_WPlrGraph4.CopySettings(&m_MemGraph);
+	for(int ig=0; ig<4; ig++)
+	{
+		pMiarex->m_WingGraph[ig].CopySettings(&m_MemGraph);
+		pMiarex->m_TimeGraph[ig].CopySettings(&m_MemGraph);
+		pMiarex->m_WPlrGraph[ig].CopySettings(&m_MemGraph);
+	}
 
 	pXInverse->m_QGraph.CopySettings(&m_MemGraph);
 	pXInverse->m_QGraph.SetInverted(true);
@@ -225,18 +223,18 @@ void DisplaySettingsDlg::OnGraphSettings()
 	dlg.m_GraphArray[4] = pXDirect->m_pTrGraph;
 	dlg.m_GraphArray[5] = pXDirect->m_pUserGraph;
 
-	dlg.m_GraphArray[6] = &pMiarex->m_WingGraph1;
-	dlg.m_GraphArray[7] = &pMiarex->m_WingGraph2;
-	dlg.m_GraphArray[8] = &pMiarex->m_WingGraph3;
-	dlg.m_GraphArray[9] = &pMiarex->m_WingGraph4;
-	dlg.m_GraphArray[10] = &pMiarex->m_WPlrGraph1;
-	dlg.m_GraphArray[11] = &pMiarex->m_WPlrGraph2;
-	dlg.m_GraphArray[12] = &pMiarex->m_WPlrGraph3;
-	dlg.m_GraphArray[13] = &pMiarex->m_WPlrGraph4;
-	dlg.m_GraphArray[14] = &pMiarex->m_TimeGraph1;
-	dlg.m_GraphArray[15] = &pMiarex->m_TimeGraph2;
-	dlg.m_GraphArray[16] = &pMiarex->m_TimeGraph3;
-	dlg.m_GraphArray[17] = &pMiarex->m_TimeGraph4;
+	dlg.m_GraphArray[6] = pMiarex->m_WingGraph;
+	dlg.m_GraphArray[7] = pMiarex->m_WingGraph+1;
+	dlg.m_GraphArray[8] = pMiarex->m_WingGraph+2;
+	dlg.m_GraphArray[9] = pMiarex->m_WingGraph+3;
+	dlg.m_GraphArray[10] = pMiarex->m_WPlrGraph;
+	dlg.m_GraphArray[11] = pMiarex->m_WPlrGraph+1;
+	dlg.m_GraphArray[12] = pMiarex->m_WPlrGraph+2;
+	dlg.m_GraphArray[13] = pMiarex->m_WPlrGraph+3;
+	dlg.m_GraphArray[14] = pMiarex->m_TimeGraph;
+	dlg.m_GraphArray[15] = pMiarex->m_TimeGraph+1;
+	dlg.m_GraphArray[16] = pMiarex->m_TimeGraph+2;
+	dlg.m_GraphArray[17] = pMiarex->m_TimeGraph+3;
 	dlg.m_GraphArray[18] = &pMiarex->m_LongRLGraph;
 	dlg.m_GraphArray[19] = &pMiarex->m_LatRLGraph;
 

@@ -223,7 +223,6 @@ private:
 	CPanel m_SymPanel;
 	
 public:
-	CWing * m_pWingList[4];
 	double m_Ai[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
 	double m_Cl[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
 	double m_ICd[4*VLMMAXRHS * MAXSTATIONS];
@@ -232,9 +231,7 @@ public:
 	CVector m_WingForce[4*VLMMAXRHS];
 	double m_WingIDrag[4*VLMMAXRHS];
 	CWing *m_pWing; //pointer to the geometry class of the wing
-	CWing *m_pWing2;//pointer to the geometry class of a biplane's second wing 
-	CWing *m_pStab;
-	CWing *m_pFin;
+	CWing * m_pWingList[4]; //pointer to the plane's four wings
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
 
 public://stability analysis method and variables

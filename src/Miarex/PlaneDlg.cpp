@@ -96,7 +96,7 @@ void PlaneDlg::ComputePlane(void)
 {
 	if(m_pPlane->m_bStab)
 	{
-		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_LEWing.x -m_pPlane->m_Wing.m_TChord[0]/4.0;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_WingLE[0].x -m_pPlane->m_Wing.m_TChord[0]/4.0;
 		double area = m_pPlane->m_Wing.m_ProjectedArea;
 		if(m_pPlane->m_bBiplane) area += m_pPlane->m_Wing2.m_ProjectedArea;
 
@@ -154,10 +154,10 @@ void PlaneDlg::InitDialog()
 	m_bChanged = false;
 
 	m_pPlane->m_bDoubleSymFin = true;
-	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_LEWing, 0.0, m_pPlane->m_WingTilt);//necessary for eventual inertia calculations
-	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_LEWing2, 0.0, m_pPlane->m_WingTilt2);//necessary for eventual inertia calculations
-	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_LEStab, 0.0, m_pPlane->m_StabTilt);//necessary for eventual inertia calculations
-	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_LEFin, -90.0, m_pPlane->m_FinTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_WingLE[0], 0.0, m_pPlane->m_WingTiltAngle[0]);//necessary for eventual inertia calculations
+	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_WingLE[1], 0.0, m_pPlane->m_WingTiltAngle[1]);//necessary for eventual inertia calculations
+	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_WingLE[2], 0.0, m_pPlane->m_WingTiltAngle[2]);//necessary for eventual inertia calculations
+	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_WingLE[3], -90.0, m_pPlane->m_WingTiltAngle[3]);//necessary for eventual inertia calculations
 }
 
 
@@ -276,7 +276,7 @@ void PlaneDlg::OnDefineWing()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing.Duplicate(&s_SaveWing);
-	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_LEWing, 0.0, m_pPlane->m_WingTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Wing.CreateSurfaces(m_pPlane->m_WingLE[0], 0.0, m_pPlane->m_WingTiltAngle[0]);//necessary for eventual inertia calculations
 }
 
 
@@ -295,7 +295,7 @@ void PlaneDlg::OnDefineFin()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Fin.Duplicate(&s_SaveWing);
-	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_LEFin, -90.0, m_pPlane->m_FinTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Fin.CreateSurfaces(m_pPlane->m_WingLE[3], -90.0, m_pPlane->m_WingTiltAngle[3]);//necessary for eventual inertia calculations
 }
 
 
@@ -313,7 +313,7 @@ void PlaneDlg::OnDefineStab()
 		m_bChanged = true;
 	}
 	else  m_pPlane->m_Stab.Duplicate(&s_SaveWing);
-	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_LEStab, 0.0, m_pPlane->m_StabTilt);//necessary for eventual inertia calculations
+	m_pPlane->m_Stab.CreateSurfaces(m_pPlane->m_WingLE[2], 0.0, m_pPlane->m_WingTiltAngle[2]);//necessary for eventual inertia calculations
 }
 
 
@@ -332,7 +332,7 @@ void PlaneDlg::OnDefineWing2()
 		m_bChanged = true;
 	}
 	else   m_pPlane->m_Wing2.Duplicate(&s_SaveWing);
-	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_LEWing2, 0.0, m_pPlane->m_WingTilt2);//necessary for eventual inertia calculations
+	m_pPlane->m_Wing2.CreateSurfaces(m_pPlane->m_WingLE[1], 0.0, m_pPlane->m_WingTiltAngle[1]);//necessary for eventual inertia calculations
 }
 
 
@@ -660,23 +660,23 @@ void PlaneDlg::ReadParams()
 	QString strong;
 
 	OnPlaneName();
-	m_pPlane->m_WingTilt      = m_pctrlWingTilt->GetValue();
-	m_pPlane->m_WingTilt2     = m_pctrlWingTilt2->GetValue();
-	m_pPlane->m_StabTilt      = m_pctrlStabTilt->GetValue();
-	m_pPlane->m_FinTilt       = m_pctrlFinTilt->GetValue();
+	m_pPlane->m_WingTiltAngle[0]     = m_pctrlWingTilt->GetValue();
+	m_pPlane->m_WingTiltAngle[1]     = m_pctrlWingTilt2->GetValue();
+	m_pPlane->m_WingTiltAngle[2]     = m_pctrlStabTilt->GetValue();
+	m_pPlane->m_WingTiltAngle[3]     = m_pctrlFinTilt->GetValue();
 
-	m_pPlane->m_LEWing.x      = m_pctrlXLEWing->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_LEWing.z      = m_pctrlZLEWing->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[0].x     = m_pctrlXLEWing->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[0].z     = m_pctrlZLEWing->GetValue() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_LEStab.x      = m_pctrlXLEStab->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_LEStab.z      = m_pctrlZLEStab->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[1].x     = m_pctrlXLEWing2->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[1].z     = m_pctrlZLEWing2->GetValue() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_LEWing2.x     = m_pctrlXLEWing2->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_LEWing2.z     = m_pctrlZLEWing2->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[2].x     = m_pctrlXLEStab->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[2].z     = m_pctrlZLEStab->GetValue() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_LEFin.x       = m_pctrlXLEFin->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_LEFin.y       = m_pctrlYLEFin->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_LEFin.z       = m_pctrlZLEFin->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].x     = m_pctrlXLEFin->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].y     = m_pctrlYLEFin->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].z     = m_pctrlZLEFin->GetValue() / pMainFrame->m_mtoUnit;
 
 	m_pPlane->m_BodyPos.x     = m_pctrlXBody->GetValue() / pMainFrame->m_mtoUnit;
 	m_pPlane->m_BodyPos.z     = m_pctrlZBody->GetValue() / pMainFrame->m_mtoUnit;
@@ -742,19 +742,19 @@ void PlaneDlg::SetParams()
 	}
 
 	m_pctrlPlaneName->setText(m_pPlane->m_PlaneName);
-	m_pctrlWingTilt->SetValue(m_pPlane->m_WingTilt);
-	m_pctrlWingTilt2->SetValue(m_pPlane->m_WingTilt2);
-	m_pctrlStabTilt->SetValue(m_pPlane->m_StabTilt);
-	m_pctrlFinTilt->SetValue(m_pPlane->m_FinTilt);
+	m_pctrlWingTilt->SetValue(m_pPlane->m_WingTiltAngle[0]);
+	m_pctrlWingTilt2->SetValue(m_pPlane->m_WingTiltAngle[1]);
+	m_pctrlStabTilt->SetValue(m_pPlane->m_WingTiltAngle[2]);
+	m_pctrlFinTilt->SetValue(m_pPlane->m_WingTiltAngle[3]);
 
-	m_pctrlXLEWing->SetValue(m_pPlane->m_LEWing.x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEWing->SetValue(m_pPlane->m_LEWing.z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEWing->SetValue(m_pPlane->m_WingLE[0].x * pMainFrame->m_mtoUnit);
+	m_pctrlZLEWing->SetValue(m_pPlane->m_WingLE[0].z * pMainFrame->m_mtoUnit);
 
-	m_pctrlXLEStab->SetValue(m_pPlane->m_LEStab.x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEStab->SetValue(m_pPlane->m_LEStab.z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEWing2->SetValue(m_pPlane->m_WingLE[1].x * pMainFrame->m_mtoUnit);
+	m_pctrlZLEWing2->SetValue(m_pPlane->m_WingLE[1].z * pMainFrame->m_mtoUnit);
 
-	m_pctrlXLEWing2->SetValue(m_pPlane->m_LEWing2.x * pMainFrame->m_mtoUnit);
-	m_pctrlZLEWing2->SetValue(m_pPlane->m_LEWing2.z * pMainFrame->m_mtoUnit);
+	m_pctrlXLEStab->SetValue(m_pPlane->m_WingLE[2].x * pMainFrame->m_mtoUnit);
+	m_pctrlZLEStab->SetValue(m_pPlane->m_WingLE[2].z * pMainFrame->m_mtoUnit);
 
 	m_pctrlXBody->SetValue(m_pPlane->m_BodyPos.x * pMainFrame->m_mtoUnit);
 	m_pctrlZBody->SetValue(m_pPlane->m_BodyPos.z * pMainFrame->m_mtoUnit);
@@ -762,9 +762,9 @@ void PlaneDlg::SetParams()
 	m_pctrlBiplane->setChecked(m_pPlane->m_bBiplane);
 	OnBiplane();
 
-	m_pctrlXLEFin->SetValue(m_pPlane->m_LEFin.x* pMainFrame->m_mtoUnit);
-	m_pctrlYLEFin->SetValue(m_pPlane->m_LEFin.y* pMainFrame->m_mtoUnit);
-	m_pctrlZLEFin->SetValue(m_pPlane->m_LEFin.z* pMainFrame->m_mtoUnit);
+	m_pctrlXLEFin->SetValue(m_pPlane->m_WingLE[3].x* pMainFrame->m_mtoUnit);
+	m_pctrlYLEFin->SetValue(m_pPlane->m_WingLE[3].y* pMainFrame->m_mtoUnit);
+	m_pctrlZLEFin->SetValue(m_pPlane->m_WingLE[3].z* pMainFrame->m_mtoUnit);
 	m_pctrlFinCheck->setChecked(m_pPlane->m_bFin);
 	m_pctrlDoubleFin->setChecked(m_pPlane->m_bDoubleFin);
 	m_pctrlSymFin->setChecked(m_pPlane->m_bSymFin);
@@ -801,7 +801,7 @@ void PlaneDlg::SetResults()
 	ComputePlane();
 	if(m_pPlane->m_bStab)
 	{
-		double SLA = m_pPlane->m_LEStab.x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0;
+		double SLA = m_pPlane->m_WingLE[2].x + m_pPlane->m_Stab.m_TChord[0]/4.0 - m_pPlane->m_Wing.m_TChord[0]/4.0;
 		str = QString("%1").arg(SLA*pMainFrame->m_mtoUnit,5,'f',2);
 	}
 	else  str=" ";

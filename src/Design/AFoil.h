@@ -120,6 +120,9 @@ private slots:
 	void OnFoilTableCtxMenu(const QPoint & position);
 	void OnAFoilTableColumns();
 	void OnColumnWidths();
+	void OnLoadBackImage();
+	void OnClearBackImage();
+
 
 private:
 
@@ -212,7 +215,8 @@ private:
 	CSF *m_pSF;
 	CPF *m_pPF;
 
-	QPoint m_ptOffset;
+	QPoint m_ptOffset;//the foil's leading edge position in screen coordinates
+	QPoint m_ViewportTrans; // the translation of the viewport
 	QPoint m_ptPopUp;
 	QPoint m_PointDown;
 
@@ -229,6 +233,9 @@ private:
 	Picture m_UndoPic[MAXPICTURESIZE];
 
 	int m_CurrentColumn;
+
+	bool m_bIsImageLoaded;
+	QPixmap m_BackImage;
 };
 
 #endif // QAFOIL_H

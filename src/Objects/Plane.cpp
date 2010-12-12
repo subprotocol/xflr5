@@ -73,16 +73,15 @@ CPlane::CPlane()
 
 	m_XCmRef        =   0.0;
 	m_TailVolume    =   0.0;
-	m_WingTilt      =   0.0;
-	m_WingTilt2     =   0.0;
-	m_LEStab.x      = 0.600;
-	m_LEStab.y      =   0.0;
-	m_LEStab.z      =   0.0;
-	m_StabTilt      =   0.0;
-	m_FinTilt       =   0.0;
-	m_LEFin.x       = 0.650;
-	m_LEFin.y       =   0.0;
-	m_LEFin.z       =   0.0;
+	m_WingLE[2].x      = 0.600;
+	m_WingLE[2].y      =   0.0;
+	m_WingLE[2].z      =   0.0;
+
+	m_WingLE[3].x       = 0.650;
+	m_WingLE[3].y       =   0.0;
+	m_WingLE[3].z       =   0.0;
+
+	for(int iw=0; iw<MAXWINGS; iw++) m_WingTiltAngle[iw] = 0.0;
 	
 	m_BodyPos.Set(0.0, 0.0, 0.0);
 
@@ -119,14 +118,10 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	double Ixx, Iyy, Izz, Ixz, PlaneMass;
 	CVector Pt;
 	CVector CoGBody;
-	CVector WingPos[4], CoGWing[4];
+	CVector CoGWing[4];
 	CWing *pWing[4];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 
-	WingPos[0] = m_LEWing;
-	WingPos[1] = m_LEWing2;
-	WingPos[2] = m_LEStab;
-	WingPos[3] = m_LEFin;
 
 	pWing[0] = &m_Wing;
 	if(m_bBiplane) pWing[1] = &m_Wing2;
@@ -211,15 +206,10 @@ void CPlane::ComputeBodyAxisInertia()
 	int i, iw;
 	CVector LA, VolumeCoG, TotalCoG;
 	CWing *pWing[4];
-	CVector WingPos[4];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
 	double Ixx, Iyy, Izz, Ixz,  VolumeMass, TotalMass;
 	Ixx = Iyy = Izz = Ixz = TotalMass = VolumeMass = 0.0;
 
-	WingPos[0] = m_LEWing;
-	WingPos[1] = m_LEWing2;
-	WingPos[2] = m_LEStab;
-	WingPos[3] = m_LEFin;
 
 	pWing[0] = &m_Wing;
 	if(m_bBiplane) pWing[1] = &m_Wing2;
@@ -245,7 +235,7 @@ void CPlane::ComputeBodyAxisInertia()
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
 				TotalMass += pWing[iw]->m_MassValue[i];
-				TotalCoG +=  (pWing[iw]->m_MassPosition[i]+ WingPos[iw]) * pWing[iw]->m_MassValue[i];
+				TotalCoG +=  (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
 			}
 		}
 	}
@@ -280,7 +270,7 @@ void CPlane::ComputeBodyAxisInertia()
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				LA = (pWing[iw]->m_MassPosition[i] + WingPos[i]) - TotalCoG;
+				LA = (pWing[iw]->m_MassPosition[i] + m_WingLE[i]) - TotalCoG;
 				Ixx += pWing[iw]->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
 				Iyy += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
 				Izz += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
@@ -318,7 +308,7 @@ void CPlane::ComputePlane(void)
 	int i;
 	if(m_bStab)
 	{
-		double SLA = m_LEStab.x + m_Stab.m_TChord[0]/4.0 - m_Wing.m_TChord[0]/4.0;
+		double SLA = m_WingLE[2].x + m_Stab.m_TChord[0]/4.0 - m_Wing.m_TChord[0]/4.0;
 		double area = m_Wing.m_ProjectedArea;
 		if(m_bBiplane) area += m_Wing2.m_ProjectedArea;
 
@@ -350,14 +340,12 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_bStab         = pPlane->m_bStab;
 	m_bBiplane      = pPlane->m_bBiplane;
 
-	m_WingTilt   = pPlane->m_WingTilt;
-	m_WingTilt2  = pPlane->m_WingTilt2;
-	m_StabTilt   = pPlane->m_StabTilt;
+	for(int iw=0; iw<MAXWINGS; iw++)
+	{
+		m_WingTiltAngle [iw] = pPlane->m_WingTiltAngle[iw];
+		m_WingLE[iw] = pPlane->m_WingLE[iw];
+	}
 
-	m_LEWing.Copy(pPlane->m_LEWing);
-	m_LEWing2.Copy(pPlane->m_LEWing2);
-	m_LEFin.Copy(pPlane->m_LEFin);
-	m_LEStab.Copy(pPlane->m_LEStab);
 	m_BodyPos.Copy(pPlane->m_BodyPos);
 
 	m_Wing.Duplicate(&pPlane->m_Wing);
@@ -446,13 +434,13 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << 0;
 		if(m_bBiplane)       ar <<1; else ar <<0;
 
-		ar << m_LEWing2.x << m_LEWing2.y << m_LEWing2.z << m_WingTilt2;
-		ar << m_LEStab.x << m_LEStab.y << m_LEStab.z;
-		ar << m_WingTilt << m_StabTilt << m_FinTilt;
-		ar << m_LEFin.x << m_LEFin.y << m_LEFin.z;
+		ar << m_WingLE[1].x << m_WingLE[1].y << m_WingLE[1].z << m_WingTiltAngle[1];
+		ar << m_WingLE[2].x << m_WingLE[2].y << m_WingLE[2].z;
+		ar << m_WingTiltAngle[0] << m_WingTiltAngle[2] << m_WingTiltAngle[3] ;
+		ar << m_WingLE[3].x << m_WingLE[3].y << m_WingLE[3].z;
 		ar << m_BodyPos.x << m_BodyPos.z;
 
-		ar << m_LEWing.x << m_LEWing.z;
+		ar << m_WingLE[0].x << m_WingLE[0].z;
 
 		if(m_bBody && m_pBody)
 		{
@@ -519,14 +507,14 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 //			if(k) m_bCheckPanels = true;  else m_bCheckPanels = false;
 			ar >>k;
 			if(k) m_bBiplane = true;  else m_bBiplane = false;
-			ar >> m_LEWing2.x >> m_LEWing2.y >> m_LEWing2.z >> m_WingTilt2;
+			ar >> m_WingLE[1].x >> m_WingLE[1].y >> m_WingLE[1].z >> m_WingTiltAngle[1];
 		}
-		ar >> m_LEStab.x >> m_LEStab.y >> m_LEStab.z;
-		ar >> m_WingTilt >> m_StabTilt;
+		ar >>  m_WingLE[2].x >>  m_WingLE[2].y >>  m_WingLE[2].z;
+		ar >> m_WingTiltAngle[0] >> m_WingTiltAngle[2];
 		if(ArchiveFormat>=1003){
-			ar >> m_FinTilt;
+			ar >> m_WingTiltAngle[3];
 		}
-		ar >> m_LEFin.x >> m_LEFin.y >> m_LEFin.z;
+		ar >> m_WingLE[3].x >> m_WingLE[3].y >> m_WingLE[3].z;
 
 		if(ArchiveFormat>=1010)
 		{
@@ -534,7 +522,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ArchiveFormat>=1009)
 		{
-			ar>> m_LEWing.x >> m_LEWing.z;
+			ar>> m_WingLE[0].x >> m_WingLE[0].z;
 		}
 
 		if(ArchiveFormat<1004)
@@ -548,12 +536,12 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat<1006)
 		{
 			//convert to m
-			m_LEStab.x /= 1000.0;
-			m_LEStab.y /= 1000.0;
-			m_LEStab.z /= 1000.0;
-			m_LEFin.x  /= 1000.0;
-			m_LEFin.y  /= 1000.0;
-			m_LEFin.z  /= 1000.0;
+			m_WingLE[2].x /= 1000.0;
+			m_WingLE[2].y /= 1000.0;
+			m_WingLE[2].z /= 1000.0;
+			m_WingLE[3].x  /= 1000.0;
+			m_WingLE[3].y  /= 1000.0;
+			m_WingLE[3].z  /= 1000.0;
 		}
 		if(ArchiveFormat>=1008)
 		{

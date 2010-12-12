@@ -468,9 +468,11 @@ protected:
 	bool m_bAnimateMode;			// true if there is an animation going on for a Mode
 	bool m_bAnimateWOppPlus;		// true if the animation is going in aoa crescending order
 	bool m_bTransGraph;			// true if a graph is being dragged
-	bool m_bShowWing2;			// true if the biplane's second wing OpPoint results should be displayed
-	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
-	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
+
+	bool m_bShowWingCurve[MAXWINGS];
+//	bool m_bShowWing2;			// true if the biplane's second wing OpPoint results should be displayed
+//	bool m_bShowStab;			// true if the stabilisator (elevator) OpPoint results should be displayed
+//	bool m_bShowFin;			// true if the fin OpPoint results should be displayed
 	bool m_bLogFile;			// true if the log file warning is turned on
 	bool m_bResetWake;
 
@@ -539,18 +541,12 @@ protected:
 
 	QRect m_rSingleRect;
 
-	QGraph m_WingGraph1;			// the WOpp graphs
-	QGraph m_WingGraph2;
-	QGraph m_WingGraph3;
-	QGraph m_WingGraph4;
-	QGraph m_WPlrGraph1;			// the WPolar graphs
-	QGraph m_WPlrGraph2;
-	QGraph m_WPlrGraph3;
-	QGraph m_WPlrGraph4;
+	QGraph m_WingGraph[4];			// the WOpp graphs
+	QGraph m_WPlrGraph[4];			// the WPolar graphs
+	QGraph  m_TimeGraph[4];				// time response in stability view
 	QGraph m_CpGraph;			// cross flow Cp Graph in 3D panel analysis
 	QGraph m_LongRLGraph;			// root locus graph for Longitudinal modes
 	QGraph m_LatRLGraph;			// root locus graph for Longitudinal modes
-	QGraph m_TimeGraph1,m_TimeGraph2,m_TimeGraph3,m_TimeGraph4;				//
 	QGraph* m_pCurGraph;			// currently active graph
 	QGraph* m_pCurWPlrGraph;			// currently active WPolar graph
 	QGraph* m_pCurWingGraph;			// currently active WOpp graph
@@ -558,15 +554,13 @@ protected:
 	QGraph* m_pCurTimeGraph;			// currently active time graph
 
 	CWing *m_pCurWing;			// the currently selected wing
-	CWing * m_pCurWing2;			// the currently selected Plane's 2nd wing, if any
-	CWing * m_pCurStab;			// the currently selected Plane's elevator
-	CWing * m_pCurFin;			// the currently selected Plane's fin
 	CWPolar * m_pCurWPolar;			// the currently selected WPolar
 	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
 	CPlane * m_pCurPlane;			// the currently selected Plane
 	CBody *m_pCurBody;
 
 	CWing *m_pWingList[4];
+	CWOpp *m_pWOpp[4];
 
 	QColor m_WingColor, m_StabColor, m_FinColor;
 

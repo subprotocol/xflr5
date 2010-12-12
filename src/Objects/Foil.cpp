@@ -32,7 +32,6 @@
 
 
 
-
 CFoil::CFoil()
 {
 	m_nFoilStyle = 0;
@@ -847,23 +846,30 @@ double CFoil::NormalizeGeometry()
 
 	//reset origin
 	for (i=0; i<nb; i++) xb[i] -= xmin;
-	
-	//set length to 1.
-	for(i=0; i<nb; i++){
+
+	//set length to 1. and cancel y offset
+	for(i=0; i<nb; i++)
+	{
 		xb[i] = xb[i]/length;
 		yb[i] = yb[i]/length;
 	}
-
-
+	double yTrans = yb[0];
+	for(i=0; i<nb; i++)	yb[i] -= yTrans;
 
 	//reset origin
-	for (i=0; i<n; i++)	x[i] -= xmin;
-	
-	//set length to 1.
-	for(i=0; i<n; i++){
+	for (i=0; i<n; i++)
+	{
+		x[i] -= xmin;
+	}
+
+	//set length to 1. and cancel y offset
+	for(i=0; i<n; i++)
+	{
 		x[i] = x[i]/length;
 		y[i] = y[i]/length;
 	}
+	yTrans = y[0];
+	for(i=0; i<n; i++)	y[i] -= yTrans;
 
 	return length;
 }

@@ -78,6 +78,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bShowLegend  = true;
 	m_bStored      = false;
 	m_bXDown = m_bYDown = m_bZDown = false;
+	m_bIsImageLoaded = false;
+
 
 	memset(&m_TmpPic,0, sizeof(Picture));
 	memset(m_UndoPic, 0, MAXPICTURESIZE * sizeof(Picture));
@@ -118,6 +120,8 @@ QAFoil::QAFoil(QWidget *parent)
 	m_fScaleY    = 1.0;
 	m_ptOffset.rx() = 0;
 	m_ptOffset.ry() = 0;
+
+	m_ViewportTrans = QPoint(0,0);
 
 	m_pBufferFoil = new CFoil();
 
@@ -169,13 +173,6 @@ void QAFoil::DrawScale(QPainter &painter, double scalex, double scaley, QPoint O
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	int dD = fm.height();
 	int dW = fm.width("0.1");
-
-/*	QPen NPen(m_NeutralColor);
-	NPen.setStyle(GetStyle(m_NeutralStyle));
-	NPen.setWidth(m_NeutralWidth);
-	painter.setPen(NPen);
-
-	painter.drawLine(m_rCltRect.right(),m_ptOffset.y(), m_rCltRect.left(),m_ptOffset.y());*/
 
 	int TickSize, xTextOff, offy;
 
@@ -601,6 +598,19 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 		case Qt::Key_Z:
 			m_bZDown = true;
 			break;	
+		case Qt::Key_I:
+			if (event->modifiers().testFlag(Qt::ControlModifier) & event->modifiers().testFlag(Qt::ShiftModifier))
+			{
+				if(!m_bIsImageLoaded)
+				{
+					OnLoadBackImage();
+				}
+				else
+				{
+					OnClearBackImage();
+				}
+			}
+			break;
 		default:
 			QWidget::keyPressEvent(event);
 	}
@@ -751,10 +761,15 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 		//translate
 		m_ptOffset.rx() += point.x() - m_PointDown.x();
 		m_ptOffset.ry() += point.y() - m_PointDown.y();
+		m_ViewportTrans.rx() += point.x() - m_PointDown.x();
+		m_ViewportTrans.ry() += point.y() - m_PointDown.y();
+//qDebug()<<m_ViewportTrans.x()<<point.x() << m_PointDown.x();
 
 		m_PointDown.rx() = point.x();
 		m_PointDown.ry() = point.y();
 		m_MousePos = Real;
+
+
 		UpdateView();
 		return;
 	}
@@ -1238,7 +1253,7 @@ void QAFoil::OnAFoilNormalizeFoil()
 {
 	if(!g_pCurFoil) return;
 	double length = g_pCurFoil->NormalizeGeometry();
-
+	g_pCurFoil->InitFoil();
 	QString str = QString(tr("Foil has been normalized from %1  to 1.000")).arg(length,7,'f',3);
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
@@ -1510,7 +1525,6 @@ void QAFoil::OnAFoilSetTEGap()
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
 		SelectFoil(pFoil);
-
 	}
 	else
 	{
@@ -2583,8 +2597,29 @@ void QAFoil::PaintView(QPainter &painter)
 	painter.save();
 
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	double xscale = m_fScale          /m_fRefScale;
+	double yscale = m_fScale*m_fScaleY/m_fRefScale;
+	int w = (int)((double)m_BackImage.width() *xscale);
+	int h = (int)((double)m_BackImage.height()*yscale);
+
+	//zoom from the center of the viewport
+	QPoint VCenter = QPoint((int)((m_rCltRect.right() + m_rCltRect.left()  )/2),
+							(int)((m_rCltRect.top()   + m_rCltRect.bottom())/2));
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
+
+	//draw the background image in the viewport
+	if(m_bIsImageLoaded)
+	{
+		//the coordinates of the top left corner are measured from the center of the viewport
+		double xtop = VCenter.x() + m_ViewportTrans.x() - (int)((double)m_BackImage.width() /2.*xscale);
+		double ytop = VCenter.y() + m_ViewportTrans.y() - (int)((double)m_BackImage.height()/2.*yscale);
+
+		painter.drawPixmap(xtop, ytop, w,h, m_BackImage);
+	}
+
+	m_ptOffset.rx() = VCenter.x() + m_ViewportTrans.x() - (int)(0.5 *m_fScale);
+	m_ptOffset.ry() = VCenter.y() + m_ViewportTrans.y() ;
 
 	painter.setFont(pMainFrame->m_TextFont);
 
@@ -2606,6 +2641,7 @@ void QAFoil::PaintView(QPainter &painter)
 	painter.drawText(5,34, str);
 	str = QString(tr("y  = %1")).arg(m_MousePos.y,7,'f',4);
 	painter.drawText(5,46, str);
+
 
 	painter.restore();
 }
@@ -2845,16 +2881,13 @@ void QAFoil::SetScale()
 
 	m_fScale = m_fRefScale;
 
-//	double width  = (double)m_rCltRect.width();
-//	double height = (double)m_rCltRect.height();
-//	double clippedh = height/width * 20.0;
-
 	m_ptOffset.rx() = 75;
 	m_ptOffset.ry() = (int)(m_rCltRect.height()/2);
 
 	m_pSF->SetViewRect(m_rCltRect);
 	m_pPF->SetViewRect(m_rCltRect);
 
+	m_ViewportTrans = QPoint(0,0);
 }
 
 
@@ -2862,8 +2895,6 @@ void QAFoil::SetScale(QRect CltRect)
 {
 	//scale is set by ChildView
 	m_rCltRect = CltRect;
-
-//	int width = m_rCltRect.width();
 
 	SetScale();
 }
@@ -3155,12 +3186,12 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 	if(event->delta()>0)
 	{
 		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
-		else                           ZoomFactor = 1.06;
+		else                            ZoomFactor = 1.06;
 	}
 	else
 	{
 		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
-		else                           ZoomFactor = 1./1.06;
+		else                            ZoomFactor = 1./1.06;
 	}
 
 	scale = m_fScale;
@@ -3170,24 +3201,18 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 		if (m_bXDown)
 		{
 			m_fScale  *= ZoomFactor;
-			m_fScaleY *= 1/ZoomFactor;
+			m_fScaleY *= 1./ZoomFactor;
 		}
-		else if (m_bYDown)
-		{
-			m_fScaleY *= ZoomFactor;
-		}
-		else 
-		{
-			m_fScale *= ZoomFactor;
-		}
+		else if (m_bYDown) m_fScaleY *= ZoomFactor;
+		else  m_fScale *= ZoomFactor;
 	}
-	else
-	{
-		m_fScaleY *= ZoomFactor;
-	}
+	else m_fScaleY *= ZoomFactor;
 
-	int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);
+
+	int a = (int)((m_rCltRect.right() + m_rCltRect.left()  )/2);
 	m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
+	m_ViewportTrans.rx() = (int)((m_ViewportTrans.x())*m_fScale           /scale);
+	m_ViewportTrans.ry() = (int)((m_ViewportTrans.y())*m_fScale /scale);
 
 	UpdateView();
 }
@@ -3242,6 +3267,26 @@ void QAFoil::OnAFoilTableColumns()
 		m_pctrlFoilTable->setColumnHidden(11, !dlg.m_bLEYHinge);
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
+}
+
+
+void QAFoil::OnLoadBackImage()
+{
+	MainFrame*pMainFrame = (MainFrame*)m_pMainFrame;
+	QString PathName;
+	PathName = QFileDialog::getOpenFileName(this, tr("Open Image File"),
+											pMainFrame->m_LastDirName,
+											"Image files (*.png *.jpg *.bmp)");
+	m_bIsImageLoaded = m_BackImage.load(PathName);
+
+	UpdateView();
+}
+
+
+void QAFoil::OnClearBackImage()
+{
+	m_bIsImageLoaded = false;
+	UpdateView();
 }
 
 

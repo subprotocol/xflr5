@@ -39,10 +39,12 @@ public:
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 private:
-	CWOpp m_WingWOpp;		// the wing's operating point
-	CWOpp m_Wing2WOpp;		// the second wing's operating point
-	CWOpp m_StabWOpp;		// the elevator's operating point
-	CWOpp m_FinWOpp;		// the fin's operating point
+//	CWOpp m_WingWOpp;		// the wing's operating point
+//	CWOpp m_Wing2WOpp;		// the second wing's operating point
+//	CWOpp m_StabWOpp;		// the elevator's operating point
+//	CWOpp m_FinWOpp;		// the fin's operating point
+
+	CWOpp m_PlaneWOpp[MAXWINGS];
 
 	QString m_PlaneName;		// the plane's name to which the POpp belongs
 	QString m_PlrName;		// the polar's name to which the POpp belongs
@@ -57,8 +59,9 @@ private:
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
-	bool m_bBiplane; 		// if a biplane
-	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
+	bool m_bWing[4];  // main wing, 2nd wing, elevator, fin
+//	bool m_bBiplane; 		// if a biplane
+//	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
 	bool m_bOut;			// true if the point is unconverged (interpolation outside the polar mesh)
 	bool m_bIsVisible;

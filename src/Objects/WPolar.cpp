@@ -88,7 +88,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	int i,j,l;
 	int size = (int)m_Alpha.size();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CWOpp *pWOpp = &pPOpp->m_WingWOpp;
+	CWOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
 
 	if(size)
 	{

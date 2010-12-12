@@ -40,9 +40,9 @@ CPOpp::CPOpp()
 
 	m_bIsVisible  = true;
 	m_bShowPoints = false;
-	m_bBiplane    = false;
-	m_bStab       = false;
-	m_bFin        = false;
+	for (int iw=0; iw<MAXWINGS; iw++) m_bWing[iw] = false;
+	m_bWing[0] = true;
+
 	m_bOut        = false;
 	m_bVLM1       = true;
 
@@ -79,9 +79,11 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		//write variables
 		WriteCString(ar, m_PlaneName);
 		WriteCString(ar, m_PlrName);
-		if(m_bBiplane)    ar << 1; else ar<<0;
-		if(m_bStab)       ar << 1; else ar<<0;
-		if(m_bFin)        ar << 1; else ar<<0;
+		for(int iw=1; iw<MAXWINGS; iw++)
+		{
+			if(m_bWing[iw])    ar << 1; else ar<<0;
+		}
+
 		if(m_bIsVisible)  ar << 1; else ar<<0;
 		if(m_bShowPoints) ar << 1; else ar<<0;
 		if(m_bOut)        ar << 1; else ar<<0;
@@ -101,10 +103,10 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar << m_VLMType;
 
-		m_WingWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
-		if(m_bBiplane)	m_Wing2WOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
-		if(m_bStab)		m_StabWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
-		if(m_bFin)		m_FinWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat);
+		for(int iw=0; iw<MAXWINGS; iw++)
+		{
+			if(m_bWing[iw])	m_PlaneWOpp[iw].SerializeWOpp(ar, bIsStoring, ProjectFormat);
+		}
 	}
 	else
 	{
@@ -117,26 +119,22 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1005)
 		{
 			ar >> a;
-			if (a!=0 && a!=1)
-			{
-				return false;
-			}
-			if(a) m_bBiplane = true; else m_bBiplane = false;
+			if (a!=0 && a!=1) return false;
+			if(a) m_bWing[1] = true; else m_bWing[1] = false;
 		}
 
 		ar >> a;
 		if (a!=0 && a!=1) return false;
+		if(a) m_bWing[2] = true; else m_bWing[2] = false;
 
-		if(a) m_bStab = true; else m_bStab = false;
 		ar >> a;
 		if (a!=0 && a!=1) return false;
+		if(a) m_bWing[3] = true; else m_bWing[3] = false;
 
-
-		if(a) m_bFin = true; else m_bFin = false;
 		ar >> a;
 		if (a!=0 && a!=1) return false;
-
 		if(a) m_bIsVisible = true; else m_bIsVisible = false;
+
 		ar >> a;
 		if (a!=0 && a!=1) return false;
 
@@ -228,32 +226,32 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar >> m_VLMType;
 
-		if (!m_WingWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
+		if (!m_PlaneWOpp[0].SerializeWOpp(ar, bIsStoring, ProjectFormat))
 		{
 			return false;
 		}
 
 		if(ArchiveFormat>=1005)
 		{
-			if(m_bBiplane)
+			if(m_bWing[1])
 			{
-				if (!m_Wing2WOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
+				if (!m_PlaneWOpp[1].SerializeWOpp(ar, bIsStoring, ProjectFormat))
 				{
 					return false;
 				}
 			}
 		}
-		if(m_bStab)
+		if(m_bWing[2])
 		{
-			if (!m_StabWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
+			if (!m_PlaneWOpp[2].SerializeWOpp(ar, bIsStoring, ProjectFormat))
 			{
 				return false;
 			}
 
 		}
-		if(m_bFin)
+		if(m_bWing[3])
 		{
-			if (!m_FinWOpp.SerializeWOpp(ar, bIsStoring, ProjectFormat))
+			if (!m_PlaneWOpp[3].SerializeWOpp(ar, bIsStoring, ProjectFormat))
 			{
 				return false;
 			}

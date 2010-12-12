@@ -58,9 +58,8 @@ protected:
 	bool m_bActive;
 	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
 	bool m_bBiplane;
-	double m_StabTilt;
-	double m_FinTilt;
-	double m_WingTilt, m_WingTilt2;
+	double m_WingTiltAngle[MAXWINGS];
+//	double m_StabTilt, m_FinTilt, m_WingTilt, m_WingTilt2;
 	double m_XCmRef;
 
 	int m_NMass;
@@ -72,7 +71,9 @@ protected:
 	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 	double m_VolumeMass, m_TotalMass;
 
-	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2, m_BodyPos;
+	CVector m_WingLE[MAXWINGS];
+//	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2,
+	CVector m_BodyPos;
 	QString m_PlaneDescription;
 
 private:
