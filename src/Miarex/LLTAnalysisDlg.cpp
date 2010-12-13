@@ -407,6 +407,9 @@ void LLTAnalysisDlg::StartAnalysis()
 	m_bError      = false;
 	m_bFinished   = false;
 
+	if(m_pWing && m_pWPolar) m_pWing->m_Type=m_pWPolar->m_Type;
+	else return;
+
 	m_pctrlTextOutput->clear();
 
 	if (m_pWPolar->m_Type!=4)
