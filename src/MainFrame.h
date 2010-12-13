@@ -30,6 +30,7 @@
 #include <QComboBox>
 #include <QRadioButton>
 #include <QLabel>
+#include <QPointer>
 #include <QTranslator>
 #include <QtGui/QMainWindow>
 #include "GLWidget.h"
@@ -87,6 +88,7 @@ public:
 	MainFrame(QWidget *parent = 0, Qt::WFlags flags = 0);
 
 	int LoadXFLR5File(QString PathName);
+        static MainFrame* self();
 
 public slots:
 	void OnAFoil();
@@ -212,6 +214,7 @@ private:
 	void *m_pXDirect;
 	void *m_pMiarex;
 	void *m_pAFoil;
+        static QPointer<MainFrame> _self;
 
 	TwoDWidget *m_p2DWidget;
 	QStackedWidget *m_pctrlCentralWidget;
@@ -362,7 +365,7 @@ private:
 
 	int m_iApp;
 
-	bool m_bSaved;
+        bool m_bSaved;
 	bool m_bSaveOpps;
 	bool m_bSaveWOpps;
 	bool m_bSaveSettings;

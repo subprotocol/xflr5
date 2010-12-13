@@ -1,8 +1,9 @@
 /****************************************************************************
 
-	QFLR5 Application
+        XFLR5Application Class
 
-	Copyright (C) 2008-2010 Andre Deperrois XFLR5@yahoo.com
+    Copyright (C) 2008 Andre Deperrois XFLR5@yahoo.com
+                       Francesco Meschia francesco.meschia@gmail.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,23 +20,22 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+#ifndef XFLR5APPLICATION_H
+#define XFLR5APPLICATION_H
 
-
-#include <QtGui/QApplication>
-#include "XFLR5Application.h"
+#include <QApplication>
 #include "MainFrame.h"
-#include <QSplashScreen>
-#include <QMessageBox>
 
-CFoil *g_pCurFoil;	//make it common to all applications
-
-int main(int argc, char *argv[])
+class XFLR5Application : public QApplication
 {
-#if QT_VERSION >= 0x040600
-        QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
-#endif
-        XFLR5Application app(argc, argv);
-        app.exec();
+    Q_OBJECT
+    private:
+        //MainFrame *mainFrame;
+    protected:
+        bool event(QEvent *);
+    public:
+        XFLR5Application(int&, char**);
+    //    void setQFLR5MainWindow(MainFrame *);
+};
 
-}
-
+#endif // XFLR5APPLICATION_H

@@ -8,7 +8,6 @@ SOURCES += src/MainFrame.cpp \
     src/Globals.cpp \
     src/TwoDWidget.cpp \
     src/GLWidget.cpp \
-    src/QFLR5Application.cpp \
     src/Miarex/ArcBall.cpp \
     src/Miarex/BodyGridDlg.cpp \
     src/Miarex/BodyScaleDlg.cpp \
@@ -105,11 +104,10 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-    src/Design/AFoilTableDlg.cpp
-
+    src/Design/AFoilTableDlg.cpp \
+    src/XFLR5Application.cpp
 HEADERS += src/MainFrame.h \
     src/Params.h \
-    src/QFLR5Application.h \
     src/Globals.h \
     src/TwoDWidget.h \
     src/GLWidget.h \
@@ -209,15 +207,12 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
-    src/Design/AFoilTableDlg.h
-
-
+    src/Design/AFoilTableDlg.h \
+    src/XFLR5Application.h
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \
     translations/xflr5v6_fr.ts
-
 RESOURCES += xflr5.qrc
-
 win32 { 
     TARGET = XFLR5
     RC_FILE = win/xflr5.rc
@@ -229,31 +224,22 @@ unix {
     isEmpty(PREFIX):PREFIX = /usr
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
-    
     target.path = $$BINDIR
-
+    
     # MAKE INSTALL
     INSTALLS += target
-	target.path = $$BINDIR
+    target.path = $$BINDIR
 }
-
-
 macx { 
     TARGET = XFLR5
     TEMPLATE = app
+    // CONFIG += i386
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
-    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
-    CONFIG += x86 \
-        ppc
+    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.6.sdk
     OTHER_FILES += mac/Info.plist
     LIBS += -framework \
         CoreFoundation
     QMAKE_INFO_PLIST = mac/Info.plist
     ICON = mac/xflr5.icns
 }
-
 OTHER_FILES += doc/ReleaseNotes.txt
-
-#QMAKE_CFLAGS += -pg
-#QMAKE_CXXFLAGS += -pg
-#QMAKE_LFLAGS += -pg

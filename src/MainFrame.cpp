@@ -60,6 +60,7 @@
 
 extern CFoil* g_pCurFoil;
 
+QPointer<MainFrame> MainFrame::_self = 0L;
 
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -934,6 +935,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrl3DScalesWidget->setWidget(pGL3DScales);
 	m_pctrl3DScalesWidget->setVisible(false);
 	m_pctrl3DScalesWidget->setFloating(true);
+        m_pctrl3DScalesWidget->move(60,60);
 
 	StabViewDlg::s_pMainFrame = this;
 	StabViewDlg::s_pMiarex = m_pMiarex;
@@ -946,7 +948,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrlStabViewWidget->setWidget(pStabView);
 	m_pctrlStabViewWidget->setVisible(false);
 	m_pctrlStabViewWidget->setFloating(true);
-
+        m_pctrlStabViewWidget->move(60,60);
 
 	m_pctrlCentralWidget = new QStackedWidget;
 	m_pctrlCentralWidget->addWidget(m_p2DWidget);
@@ -3310,6 +3312,13 @@ bool MainFrame::LoadSettings()
 }
 
 
+MainFrame* MainFrame::self() {
+    if (!_self) {
+        _self = new MainFrame(0L, 0L);
+    }
+    return _self;
+}
+
 int MainFrame::LoadXFLR5File(QString PathName)
 {
 	QFile XFile(PathName);
@@ -3321,11 +3330,13 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	}
 	QXDirect * pXDirect = (QXDirect*)m_pXDirect;
 	QString end;
-	end = PathName.right(4);
+        //QFileInfo fileinfo(XFile);
+        end = PathName.right(4);
 	end = end.toLower();
-	int pos = PathName.lastIndexOf("/");
-	if(pos>0) m_LastDirName = PathName.left(pos);
-	
+        //QString dir = fileinfo.canonicalPath();
+
+        int pos = PathName.lastIndexOf("/");
+        if(pos>0) m_LastDirName = PathName.left(pos);
 	if(end==".plr")
 	{
 		QDataStream ar(&XFile);
