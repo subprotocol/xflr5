@@ -88,7 +88,7 @@ XFLR5Application::XFLR5Application(int &argc, char** argv) : QApplication(argc, 
     if(StyleName.length())	qApp->setStyle(StyleName);
 
 
-    //MainFrame *w = MainFrame::self();
+	MainFrame *w = MainFrame::self();
     //this->setQFLR5MainWindow(MainFrame::self());
     MainFrame::self()->resize(sz);
     MainFrame::self()->move(pt);
@@ -104,10 +104,10 @@ XFLR5Application::XFLR5Application(int &argc, char** argv) : QApplication(argc, 
     if(Extension.compare(".wpa",Qt::CaseInsensitive)==0 ||
        Extension.compare(".plr",Qt::CaseInsensitive)==0)
     {
-            int iApp = w.LoadXFLR5File(PathName);
+			int iApp = w->LoadXFLR5File(PathName);
 
-            if (iApp == MIAREX)             w.OnMiarex();
-            else if (iApp == XFOILANALYSIS) w.OnXDirect();
+			if (iApp == MIAREX)             w->OnMiarex();
+			else if (iApp == XFOILANALYSIS) w->OnXDirect();
     }
 #endif
 

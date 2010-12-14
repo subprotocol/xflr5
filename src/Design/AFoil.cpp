@@ -763,7 +763,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 		m_ptOffset.ry() += point.y() - m_PointDown.y();
 		m_ViewportTrans.rx() += point.x() - m_PointDown.x();
 		m_ViewportTrans.ry() += point.y() - m_PointDown.y();
-//qDebug()<<m_ViewportTrans.x()<<point.x() << m_PointDown.x();
 
 		m_PointDown.rx() = point.x();
 		m_PointDown.ry() = point.y();

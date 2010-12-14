@@ -970,7 +970,7 @@ void WPolarDlg::SetReynolds()
 		double QCl =  sqrt(2.* 9.81 /m_Density* m_Weight /area) * pMainFrame->m_mstoUnit;
 		str = QString("%1").arg(QCl,5,'f',2);
 		str += strUnit;
-		strange = tr("Qinf.sqrt(Cl) =");
+		strange = tr("Vinf.sqrt(Cl) =");
 		m_pctrlQInfCl->setText(strange+str);
 
 		double RRe = m_pWing->m_TChord[0] * QCl/m_Viscosity;

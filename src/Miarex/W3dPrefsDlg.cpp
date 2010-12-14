@@ -41,6 +41,7 @@ W3dPrefsDlg::W3dPrefsDlg()
 	connect(m_pctrlInducedDrag, SIGNAL(clicked()), SLOT(OnIDrag()));
 	connect(m_pctrlViscousDrag, SIGNAL(clicked()), SLOT(OnVDrag()));
 	connect(m_pctrlDownwash, SIGNAL(clicked()), SLOT(OnDownwash()));
+	connect(m_pctrlStreamLines, SIGNAL(clicked()), SLOT(OnStreamLines()));
 	connect(m_pctrlWakePanels, SIGNAL(clicked()), SLOT(OnWakePanels()));
 	connect(m_pctrlShowWake, SIGNAL(clicked()), SLOT(OnShowWake()));
 }
@@ -59,6 +60,7 @@ void W3dPrefsDlg::InitDialog()
 	m_pctrlViscousDrag->SetStyle(m_VDragStyle, m_VDragWidth, m_VDragColor);
 	m_pctrlDownwash->SetStyle(m_DownwashStyle, m_DownwashWidth, m_DownwashColor);
 	m_pctrlWakePanels->SetStyle(m_WakeStyle, m_WakeWidth, m_WakeColor);
+	m_pctrlStreamLines->SetStyle(m_StreamLinesStyle, m_StreamLinesWidth, m_StreamLinesColor);
 	m_pctrlShowWake->setChecked(m_bWakePanels);
 	m_pctrlShowWake->setChecked(m_bWakePanels);
 }
@@ -76,6 +78,7 @@ void W3dPrefsDlg::SetupLayout()
 	QLabel *lab9 = new QLabel(tr("Viscous Drag"));
 	QLabel *lab10 = new QLabel(tr("Downwash"));
 	QLabel *lab11 = new QLabel(tr("WakePanels"));
+	QLabel *lab12 = new QLabel(tr("Streamlines"));
 	m_pctrlAxis     = new LineButton;
 	m_pctrlOutline  = new LineButton;
 	m_pctrlVLMMesh  = new LineButton;
@@ -87,6 +90,7 @@ void W3dPrefsDlg::SetupLayout()
 	m_pctrlViscousDrag = new LineButton;
 	m_pctrlDownwash    = new LineButton;
 	m_pctrlWakePanels  = new LineButton;
+	m_pctrlStreamLines  = new LineButton;
 	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 
 	QGridLayout *PrefsLayout = new QGridLayout;
@@ -101,6 +105,7 @@ void W3dPrefsDlg::SetupLayout()
 	PrefsLayout->addWidget(lab9,9,1);
 	PrefsLayout->addWidget(lab10,10,1);
 	PrefsLayout->addWidget(lab11,11,1);
+	PrefsLayout->addWidget(lab12,12,1);
 
 	PrefsLayout->addWidget(m_pctrlAxis,1,2);
 	PrefsLayout->addWidget(m_pctrlOutline,2,2);
@@ -113,7 +118,8 @@ void W3dPrefsDlg::SetupLayout()
 	PrefsLayout->addWidget(m_pctrlViscousDrag,9,2);
 	PrefsLayout->addWidget(m_pctrlDownwash,10,2);
 	PrefsLayout->addWidget(m_pctrlWakePanels,11,2);
-	PrefsLayout->addWidget(m_pctrlShowWake,12,1,1,2);
+	PrefsLayout->addWidget(m_pctrlStreamLines,12,2);
+	PrefsLayout->addWidget(m_pctrlShowWake,13,1,1,2);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("OK"));
@@ -287,6 +293,23 @@ void W3dPrefsDlg::OnDownwash()
 	repaint();
 }
 
+void W3dPrefsDlg::OnStreamLines()
+{
+	LinePickerDlg LPdlg;
+	LPdlg.SetColor(m_StreamLinesColor);
+	LPdlg.SetStyle(m_StreamLinesStyle);
+	LPdlg.SetWidth(m_StreamLinesWidth);
+	LPdlg.InitDialog();
+
+	if (QDialog::Accepted == LPdlg.exec())
+	{
+		m_StreamLinesColor = LPdlg.GetColor();
+		m_StreamLinesStyle = LPdlg.GetStyle();
+		m_StreamLinesWidth = LPdlg.GetWidth();
+	}
+	repaint();
+}
+
 void W3dPrefsDlg::OnWakePanels()
 {
 	LinePickerDlg LPdlg;
@@ -303,7 +326,6 @@ void W3dPrefsDlg::OnWakePanels()
 	}
 	repaint();
 }
-
 
 void W3dPrefsDlg::OnVLMMesh()
 {

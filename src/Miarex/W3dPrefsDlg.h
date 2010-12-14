@@ -50,8 +50,10 @@ private slots:
 	void OnVDrag();
 	void OnDownwash();
 	void OnWakePanels();
+	void OnStreamLines();
 	void OnVLMMesh();
 	void OnShowWake();
+
 
 private:
 	void SetupLayout();
@@ -59,7 +61,8 @@ private:
 	void *m_pMiarex;
 
 	LineButton *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
-	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash, *m_pctrlWakePanels;
+	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;
+	LineButton *m_pctrlStreamLines, *m_pctrlWakePanels;
 	QCheckBox *m_pctrlShowWake;
 
 	int m_3DAxisStyle, m_3DAxisWidth;
@@ -82,6 +85,8 @@ private:
 	QColor m_VDragColor;
 	int m_DownwashStyle, m_DownwashWidth;
 	QColor m_DownwashColor;
+	int m_StreamLinesStyle, m_StreamLinesWidth;
+	QColor m_StreamLinesColor;
 	int m_WakeStyle, m_WakeWidth;
 	QColor m_WakeColor;
 

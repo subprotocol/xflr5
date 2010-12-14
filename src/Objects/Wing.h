@@ -156,8 +156,6 @@ protected:
 	double m_MassValue[MAXMASSES];
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
-	CVector m_CoG;
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	double m_GChord;	// mean geometric chord
 	double m_yMac;		// mean aerodynamic chord span position
@@ -232,7 +230,9 @@ public:
 	double m_ProjectedArea;		// wing surface projected on xy plane;
 	double m_AR;		// Aspect ratio
 	double m_TR;		// Taper ratio
-	
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+	CVector m_CoG;
+
 	int m_MatSize;	// Max Size for the VLMMatrix
 	CPanel *m_pPanel;			//pointer to the VLM Panel array
 

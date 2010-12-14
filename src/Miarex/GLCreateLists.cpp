@@ -1320,7 +1320,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 
 		glLineWidth((GLfloat)(width*2.0));
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea
+		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WSpan
 			  *pWOpp->m_QInf*pWOpp->m_QInf	*pWOpp->m_GCm/3.0;
 
 		amp *= pMiarex->m_LiftScale*factor;
@@ -1365,7 +1365,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 
 		//Resulting Rolling Moment Arc vector
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea
+		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WMAChord
 						*pWOpp->m_QInf*pWOpp->m_QInf
 						*pWOpp->m_GRm/3.0;
 
@@ -1403,13 +1403,13 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 
 		//Resulting Yawing Moment Arc vector
 
-		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea
+		amp = 0.5*pWPolar->m_Density * pWPolar->m_WArea * pWPolar->m_WSpan
 						*pWOpp->m_QInf*pWOpp->m_QInf
 						*(pWOpp->m_GYm)/3.0;
 
 		amp *= pMiarex->m_LiftScale*factor;
 
-		if (amp>0.0) sign = 1.0; else sign = -1.0;
+		if (amp>0.0) sign = -1.0; else sign = 1.0;
 
 		glBegin(GL_LINE_STRIP);
 		{
@@ -1667,9 +1667,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 		glEnable (GL_LINE_STIPPLE);
 
-		color = QColor(100,255,190);
-		style = pMiarex->m_WakeStyle;
-		width = pMiarex->m_WakeWidth;
+		color = pMiarex->m_StreamLinesColor;
+		style = pMiarex->m_StreamLinesStyle;
+		width = pMiarex->m_StreamLinesWidth;
 
 		glLineWidth(pMiarex->m_WakeWidth);
 
@@ -2527,6 +2527,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 
 void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 {
+	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
 
@@ -2541,6 +2542,8 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 	YPos = pMiarex->m_r3DCltRect.bottom()- 12 * dD;
 	YPos -= pWOpp->m_nFlaps * dD;
 	XPos = pMiarex->m_r3DCltRect.right() - 10 ;
+
+	if(pWOpp->m_Type==STABILITYPOLAR) YPos -= dD;
 
 	glNewList(WOPPLEGEND,GL_COMPILE);
 	{
@@ -2584,34 +2587,46 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("Cl/Cd = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
+			Result = QString(QObject::tr("CL/Cd = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("GCm = %1 ")).arg(pWOpp->m_GCm,9,'f',4);
+			Result = QString(QObject::tr("Cl = %1 ")).arg(pWOpp->m_GRm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("Rolling Moment = %1 ")).arg(pWOpp->m_GRm, 9,'f',4);
+			Result = QString(QObject::tr("Cm = %1 ")).arg(pWOpp->m_GCm,9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("Induced Moment = %1 ")).arg(pWOpp->m_IYm, 9,'f',4);
-			YPos += dD;
-			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
-
-			Result = QString(QObject::tr("Airfoil Yawing Moment = %1 ")).arg(pWOpp->m_GYm, 9,'f',4);
+			Result = QString(QObject::tr("Cn = %1 ")).arg(pWOpp->m_GYm, 9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
 			GetLengthUnit(str, pMainFrame->m_LengthUnit);
 			l = str.length();
-			if (l==1)     Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
-			else if(l==2) Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			else if(l>=3) Result = QString(QObject::tr("XCP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			if(pWOpp->m_Type==STABILITYPOLAR)
+			{
+				if (l==1)     Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 8,'f',3);
+				else if(l==2) Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 7,'f',2);
+				else if(l>=3) Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 7,'f',2);
+				Result += str;
+				YPos += dD;
+				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+			}
+
+			if (l==1)     Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
+			else if(l==2) Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			else if(l>=3) Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
+			Result = QString(QObject::tr("X_CG = %1 ")).arg(pWing->m_CoG.x*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			Result += str;
+			YPos += dD;
+			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
+
 
 			for(i=0; i<pWOpp->m_nFlaps; i++)
 			{

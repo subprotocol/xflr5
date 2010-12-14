@@ -362,6 +362,9 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WakeStyle      = 0;
 	m_WakeWidth      = 1;
 	m_WakeColor      = QColor(0, 150, 200);
+	m_StreamLinesStyle  = 0;
+	m_StreamLinesWidth  = 1;
+	m_StreamLinesColor  = QColor(200, 150, 255);
 
 	m_CpColor = QColor(255,0,0);
 	m_CpStyle = 0;
@@ -6539,7 +6542,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bShowWingCurve[1]    = pSettings->value("ShowWing2").toBool();
 		m_bShowWingCurve[2]    = pSettings->value("ShowStab").toBool();
 		m_bShowWingCurve[3]    = pSettings->value("ShowFin").toBool();
-	m_bShowWingCurve[0] = true;
+		m_bShowWingCurve[0] = true;
 
 		m_bStoreWOpp    = pSettings->value("StoreWOpp").toBool();
 		m_bSequence     = pSettings->value("Sequence").toBool();
@@ -6641,6 +6644,11 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		g = pSettings->value("CpColorGreen").toInt();
 		b = pSettings->value("CpColorBlue").toInt();
 		m_CpColor = QColor(r,g,b);
+
+		m_StreamLinesStyle = pSettings->value("StreamLinesStyle", 0).toInt();
+		m_StreamLinesWidth = pSettings->value("StreamLinesWidth", 1).toInt();
+		m_StreamLinesColor = pSettings->value("StreamLinesColor", QColor(150, 140, 255)).value<QColor>();
+
 
 		CWing::s_CvPrec       = pSettings->value("CvPrec").toDouble();
 		CWing::s_RelaxMax     = pSettings->value("RelaxMax").toDouble();
@@ -7277,6 +7285,9 @@ void QMiarex::On3DPrefs()
 	SDlg.m_DownwashColor  = m_DownwashColor;
 	SDlg.m_DownwashStyle  = m_DownwashStyle;
 	SDlg.m_DownwashWidth  = m_DownwashWidth;
+	SDlg.m_StreamLinesColor      = m_StreamLinesColor;
+	SDlg.m_StreamLinesStyle      = m_StreamLinesStyle;
+	SDlg.m_StreamLinesWidth      = m_StreamLinesWidth;
 	SDlg.m_WakeColor      = m_WakeColor;
 	SDlg.m_WakeStyle      = m_WakeStyle;
 	SDlg.m_WakeWidth      = m_WakeWidth;
@@ -7318,11 +7329,16 @@ void QMiarex::On3DPrefs()
 		m_WakeColor      = SDlg.m_WakeColor;
 		m_WakeStyle      = SDlg.m_WakeStyle;
 		m_WakeWidth      = SDlg.m_WakeWidth;
+		m_StreamLinesColor      = SDlg.m_StreamLinesColor;
+		m_StreamLinesStyle      = SDlg.m_StreamLinesStyle;
+		m_StreamLinesWidth      = SDlg.m_StreamLinesWidth;
+
 		m_bResetglWake = true;
 		m_bResetglBody = true;
 		m_bResetglGeom = true;
 		m_bResetglMesh = true;
 		m_bResetglOpp  = true;
+		m_bResetglStream = true;
 
 		UpdateView();
 	}
@@ -11153,7 +11169,7 @@ void QMiarex::OnUFOInertia()
 		if(bHasResults)
 		{
 			ModDlg dlg;
-			dlg.m_Question = tr("The modification will erase all Type 7 results associated to this Plane.\nContinue ?");
+			dlg.m_Question = tr("The modification will erase all polar results associated to this Plane.\nContinue ?");
 			dlg.InitDialog();
 			int Ans = dlg.exec();
 
@@ -11199,7 +11215,7 @@ void QMiarex::OnUFOInertia()
 			for (int i=0; i< m_poaWPolar->size(); i++)
 			{
 				pWPolar = (CWPolar*)m_poaWPolar->at(i);
-				if(pWPolar->m_Type==STABILITYPOLAR && pWPolar->m_UFOName==UFOName)
+				if(pWPolar && pWPolar->m_UFOName==UFOName && pWPolar->m_bAutoInertia)
 				{
 					pWPolar->ResetWPlr();
 					if(m_pCurPlane)     pWPolar->SetInertia(m_pCurPlane, true);
@@ -12350,7 +12366,11 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("CpColorRed", m_CpColor.red() );
 		pSettings->setValue("CpColorGreen", m_CpColor.green() );
 		pSettings->setValue("CpColorBlue", m_CpColor.blue() );
-		
+
+		pSettings->setValue("StreamLinesStyle", m_StreamLinesStyle);
+		pSettings->setValue("StreamLinesWidth", m_StreamLinesWidth);
+		pSettings->setValue("StreamLinesColor", m_StreamLinesColor);
+
 		pSettings->setValue("CvPrec", CWing::s_CvPrec);
 		pSettings->setValue("RelaxMax", CWing::s_RelaxMax);
 		pSettings->setValue("NLLTStations", CWing::s_NLLTStations);

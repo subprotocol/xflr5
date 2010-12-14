@@ -601,6 +601,9 @@ public:
 	int m_WakeStyle, m_WakeWidth;
 	QColor m_WakeColor;
 
+	int m_StreamLinesStyle, m_StreamLinesWidth;
+	QColor m_StreamLinesColor;
+
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;
 	bool m_bShowCp, m_bShowCpPoints;

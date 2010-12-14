@@ -79,8 +79,6 @@ private:
 
 	// general aerodynamic data - specific to a polar
 	double m_Viscosity;
-	double m_WMAChord;// for moment calculations
-	double m_WSpan;//for moment calculations
 	double m_Height;//for ground effect
 	double m_BankAngle;
 
@@ -156,6 +154,8 @@ public:
 	double m_WArea;//for lift and drag calculations
 	int m_Type;
 	double m_Weight;
+	double m_WMAChord;// for moment calculations
+	double m_WSpan;//for moment calculations
 
 	bool m_bVLM1;
 };

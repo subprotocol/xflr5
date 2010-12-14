@@ -2739,8 +2739,9 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_GRm += GeomMoment.dot(WindDirection);
 
 			m_VYm += DragMoment.dot(WindNormal);
+
 //			m_IYm += -m_ICd[m] * m_StripArea[m] * PtC4Strip.y ;
-			m_IYm += -GeomMoment.dot(WindNormal);
+			m_IYm += GeomMoment.dot(WindNormal);
 
 			m_VCm += DragMoment.y;
 			m_ICm += GeomMoment.y;
