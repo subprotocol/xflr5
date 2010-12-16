@@ -43,7 +43,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar);
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);		
-void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
+void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp);
 void GLCreateModeLegend(void *pQMiarex, CWing *pWing, CWOpp *pWOpp);
 
 #endif // GLCREATELISTS_H

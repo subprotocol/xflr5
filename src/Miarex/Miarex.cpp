@@ -5183,7 +5183,7 @@ void QMiarex::GLDraw3D()
 		{
 			glDeleteLists(WOPPLEGEND,3);
 			m_GLList -= 3;
-			GLCreateWOppLegend(this, m_pCurWing, m_pCurWOpp);
+			GLCreateWOppLegend(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp);
 			GLCreateCpLegend(this);
 		}
 		m_bResetglLegend = false;
@@ -5785,7 +5785,9 @@ bool QMiarex::InitializePanels()
 	memcpy(&m_MemPanel, &m_Panel, m_MatSize* sizeof(CPanel));
 	memcpy(&m_MemNode,  &m_Node,  m_nNodes * sizeof(CVector));
 
+
 	dlg.setValue(100);
+
 	return true;
 }
 
@@ -13541,7 +13543,7 @@ void QMiarex::SetScale()
 }
 
 
-void QMiarex::SetUFO(QString UFOName)
+void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 {
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	int i;
@@ -13728,14 +13730,17 @@ void QMiarex::SetUFO(QString UFOName)
 	}
 
 
-	if (m_pCurWPolar)
+	if(!bNoPolar)
 	{
-		// try to set the same as the existing polar... Special for Marc
-		SetWPlr(false, m_pCurWPolar->m_PlrName);
-	}
-	else
-	{
-		SetWPlr();
+		if (m_pCurWPolar)
+		{
+			// try to set the same as the existing polar... Special for Marc
+			SetWPlr(false, m_pCurWPolar->m_PlrName);
+		}
+		else
+		{
+			SetWPlr();
+		}
 	}
 
 	SetScale();
@@ -13772,7 +13777,7 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 5);
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 2);
 	m_pctrlAlphaMax     = new FloatEdit(1., 2);
 	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
 
@@ -14107,7 +14112,6 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		int pos = pMainFrame->m_pctrlWPolar->findText(m_pCurWPolar->m_PlrName);
 		if (pos>=0)		pMainFrame->m_pctrlWPolar->setCurrentIndex(pos);
 	}
-
 	InitializePanels();
 
 
@@ -15169,7 +15173,9 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 				{
 					if(m_pCurWPolar->m_bActiveControl[NCtrls])
 					{
+
 						angle = m_pCurWPolar->m_MinControl[NCtrls] + t * (m_pCurWPolar->m_MaxControl[NCtrls] - m_pCurWPolar->m_MinControl[NCtrls]);
+
 						strange =  "        Setting "+pWing->m_WingName +" ";
 						strange += QString("flap %1 angle to %2").arg(nFlap).arg(angle, 5, 'f',2);
 						strange += QString::fromUtf8("°\n");
@@ -15178,7 +15184,6 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 						//cancel initial angle, if any
 						if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
 							angle -= (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
-
 						if(fabs(angle)>PRECISION)
 						{
 //							pWing->m_Surface[j].RotateFlap(angle, bBCOnly);

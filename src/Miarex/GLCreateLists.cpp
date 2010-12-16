@@ -2525,7 +2525,7 @@ void GLCreateModeLegend(void *pQMiarex, CWing*pWing, CWOpp *pWOpp)
 
 
 
-void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
+void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
@@ -2622,7 +2622,7 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("X_CG = %1 ")).arg(pWing->m_CoG.x*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			Result = QString(QObject::tr("X_CG = %1 ")).arg(pWPolar->m_CoG.x*pMainFrame->m_mtoUnit, 7, 'f', 2);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);

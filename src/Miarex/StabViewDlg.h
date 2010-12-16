@@ -74,7 +74,6 @@ private:
 //	void FillControlNames();
 	void FillEigenThings();
 	void FillCurveList();
-	void ReadForcedInput(double *in);
 	void SetMode(int iMode=-1);
 	void SetupLayout();
 	void SetControls();

@@ -510,19 +510,6 @@ void StabViewDlg::OnResponseType()
 }
 
 
-void StabViewDlg::ReadForcedInput(double *in)
-{
-	int i;
-	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
-
-	for(i=0; i<pWPolar->m_nControls; i++)
-	{
-//		in[i]    = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble();
-	}
-}
-
-
 
 void StabViewDlg::SetMode(int iMode)
 {

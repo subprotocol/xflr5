@@ -95,7 +95,6 @@ private:
 	double m_TotalWakeLength;
 	double m_WakePanelFactor;
 
-	CVector m_CoG;
 	
 	//Inertia properties
 	bool m_bAutoInertia;
@@ -156,6 +155,7 @@ public:
 	double m_Weight;
 	double m_WMAChord;// for moment calculations
 	double m_WSpan;//for moment calculations
+	CVector m_CoG;
 
 	bool m_bVLM1;
 };

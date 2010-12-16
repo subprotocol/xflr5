@@ -3746,6 +3746,7 @@ void MainFrame::OnMiarex()
 	pMiarex->SetUFO();
 	pMiarex->m_bArcball = false;
 	UpdateUFOs();
+
 	SetMenus();
 	SetCentralWidget();
 	pMiarex->SetControls();
@@ -4119,7 +4120,7 @@ void MainFrame::OnSelChangeUFO(int i)
 	QString strong;
 //	int sel = m_pctrlUFO->currentIndex();
 	if (i >=0) strong = m_pctrlUFO->itemText(i);
-	pMiarex->SetUFO(strong);
+	pMiarex->SetUFO(strong,true);
 
 	m_iApp = MIAREX;
 	UpdateWPolars();

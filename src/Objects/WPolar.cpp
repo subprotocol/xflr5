@@ -1466,7 +1466,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(m_PolarFormat>=1011)
 		{
-			ar >> f; 			m_TotalWakeLength  = f;
+			ar >> f; 			m_TotalWakeLength = f;
 			ar >> f; 			m_WakePanelFactor = f;
 		}
 

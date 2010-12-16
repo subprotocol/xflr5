@@ -2812,6 +2812,9 @@ bool PanelAnalysisDlg::ControlLoop()
 		outString.clear();
 
 		pMiarex->SetControlPositions(m_pPanel, m_pNode, m_Ctrl, m_NCtrls, outString, true);
+//for(int p=0; p<m_MatSize; ++p)	qDebug("%13.9f   %13.9f   %13.9f   %13.9f   %13.9f   %13.9f",
+//								 m_pPanel[p].CtrlPt.x, m_pPanel[p].CtrlPt.y, m_pPanel[p].CtrlPt.z,
+//								 m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
 
 		AddString(outString);
 		if(m_bCancel) break;

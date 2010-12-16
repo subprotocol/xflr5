@@ -259,7 +259,7 @@ private:
 	CWOpp* InsertWOpp(CWOpp *pNewPoint);
 	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
 	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
-	void SetUFO(QString UFOName="");
+	void SetUFO(QString UFOName="", bool bNoPolar=false);
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
 	void ReadAnalysisData();
