@@ -49,6 +49,7 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 	{
 		QString strong;
 		QComboBox *editor = new QComboBox(parent);
+		editor->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 		//fill comboboxes here
 		if(index.column()==5)
 		{

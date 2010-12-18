@@ -1735,22 +1735,12 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlStabilityButton->setDefaultAction(StabilityAct);
 	m_pctrlStabilityButton->setCheckable(true);
 
-/*	m_pctrlRootLocusButton = new QToolButton;
-	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
-	m_pctrlRootLocusButton->setCheckable(true);
-
-	m_pctrlModalViewButton = new QToolButton;
-	m_pctrlModalViewButton->setDefaultAction(ModalViewAct);
-	m_pctrlModalViewButton->setCheckable(true);*/
-
-	QSizePolicy szPolicy;
-	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
-	m_pctrlUFO->setSizePolicy(szPolicy);
-	m_pctrlWPolar->setSizePolicy(szPolicy);
-
-/*	m_pctrlUFO->setMinimumWidth(150);
+	m_pctrlUFO->setMinimumWidth(150);
 	m_pctrlWPolar->setMinimumWidth(150);
-	m_pctrlWOpp->setMinimumWidth(80);*/
+	m_pctrlWOpp->setMinimumWidth(80);
+	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);
@@ -1805,14 +1795,12 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlOppView->setDefaultAction(OpPointsAct);
 	m_pctrlOppView->setCheckable(true);
 
-	QSizePolicy szPolicy;
-	szPolicy.setHorizontalPolicy(QSizePolicy::MinimumExpanding);
-	m_pctrlFoil->setSizePolicy(szPolicy);
-	m_pctrlPolar->setSizePolicy(szPolicy);
-
-/*	m_pctrlFoil->setMinimumWidth(150);
+	m_pctrlFoil->setMinimumWidth(150);
 	m_pctrlPolar->setMinimumWidth(150);
-	m_pctrlOpPoint->setMinimumWidth(80);*/
+	m_pctrlOpPoint->setMinimumWidth(80);
+	m_pctrlFoil->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlOpPoint->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
 	m_pctrlXDirectToolBar = addToolBar(tr("Foil"));
 	m_pctrlXDirectToolBar->addAction(newProjectAct);
@@ -5602,7 +5590,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
 //			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
-			if(!pWPolar->m_PolarFormat==1020 || pWPolar->m_Type!=STABILITYPOLAR)//v601 stability polars are obsolete
+			if(pWPolar->m_PolarFormat!=1020 || pWPolar->m_Type!=STABILITYPOLAR)//v601 stability polars are obsolete
 				pWPolar = pMiarex->AddWPolar(pWPolar);
 		}
 
