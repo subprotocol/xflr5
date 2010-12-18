@@ -2332,7 +2332,7 @@ void PanelAnalysisDlg::StartAnalysis()
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
 		m_Ib[1][1] = m_pWPolar->m_CoGIyy;
 		m_Ib[2][2] = m_pWPolar->m_CoGIzz;
-		m_Ib[0][2] = m_Ib[2][0] = -m_pWPolar->m_CoGIxz; //TODO check minus sign
+		m_Ib[0][2] = m_Ib[2][0] = m_pWPolar->m_CoGIxz;
 		m_Ib[1][0] = m_Ib[1][2] = m_Ib[0][1] = m_Ib[2][1] = 0.0;
 
 		ControlLoop();

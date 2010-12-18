@@ -107,6 +107,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 		QMessageBox::warning(this, tr("Warning"), tr("Your system does not provide support for OpenGL.\nXFLR5 will not operate correctly."));
 	}
 
+
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
 	m_AreaUnit    = 1;
@@ -5601,7 +5602,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
 //			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
-			pWPolar = pMiarex->AddWPolar(pWPolar);
+			if(!pWPolar->m_PolarFormat==1020 || pWPolar->m_Type!=STABILITYPOLAR)//v601 stability polars are obsolete
+				pWPolar = pMiarex->AddWPolar(pWPolar);
 		}
 
 		//THEN WOPPS

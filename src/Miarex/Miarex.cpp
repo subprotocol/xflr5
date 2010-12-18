@@ -6909,7 +6909,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 		else if(m_pCurGraph && m_pCurGraph->IsInDrawRect(point))
 		{
 			MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-			pMainFrame->statusBar()->showMessage(QString("X = %1, Y = %2").arg(m_pCurGraph->ClientTox(event->x())).arg(m_pCurGraph->ClientToy(event->y())));
+			pMainFrame->statusBar()->showMessage(QString("X =%1, Y = %2").arg(m_pCurGraph->ClientTox(event->x())).arg(m_pCurGraph->ClientToy(event->y())));
 		}
 	}
 	m_LastPoint = point;
@@ -11156,11 +11156,11 @@ void QMiarex::OnUFOInertia()
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
 		if(pWPolar->m_Alpha.size() && pWPolar->m_UFOName==UFOName)
 		{
-			if(pWPolar->m_Type==STABILITYPOLAR)
-			{
+//			if(pWPolar->m_Type==STABILITYPOLAR)
+//			{
 				bHasResults = true;
 				break;
-			}
+//			}
 		}
 	}
 
@@ -11697,16 +11697,18 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 	int i;
 	int margin = 10;
 	int dwidth, dheight;
-	
+
+
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dheight = fm.height();
 	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
-	int ZPos    = m_r2DCltRect.height()-11*dheight;
 
 	D = 0;
 	int RightPos = m_r2DCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
-	ZPos	 = m_r2DCltRect.height()-11*dheight;
+	int ZPos	 = m_r2DCltRect.height()-13*dheight;
+
+	if(m_pCurWOpp && m_pCurWOpp->m_Type==STABILITYPOLAR) ZPos -=dheight;
 	if(m_pCurWOpp && m_pCurWOpp->m_bOut) ZPos -= dheight;
 	if(m_pCurWOpp) ZPos -= dheight*m_pCurWOpp->m_nFlaps;
 
@@ -11714,9 +11716,9 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 	{
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		int l = str.length();
-		if(l==2)      Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-		else if(l==3) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-		else if(l==4) Result = QString(tr("QInf = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+		if(l==2)      Result = QString(tr("V = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+		else if(l==3) Result = QString(tr("V = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+		else if(l==4) Result = QString(tr("V = %1 ")).arg(m_pCurWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
 		else          Result = tr("No unit defined for speed...");
 
 		Result += str;
@@ -11772,9 +11774,24 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
 		l = str.length();
-		if (l==1)     Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,8,'f',3);
-		else if(l==2) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
-		else if(l>=3) Result = QString(tr("XCP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit,7,'f',2);
+		int c, d;
+		if(l==1) {c=8, d=3;}
+		else if(l==2) {c=7, d=3;}
+		else {c=6, d=3;}
+		if(m_pCurWOpp->m_Type==STABILITYPOLAR)
+		{
+			Result = QString(QObject::tr("X_NP = %1 ")).arg(m_pCurWOpp->m_XNP*pMainFrame->m_mtoUnit, c,'f',d);
+			Result += str;
+			D+=dheight;
+			painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+		}
+
+		Result = QString(QObject::tr("X_CP = %1 ")).arg(m_pCurWOpp->m_XCP*pMainFrame->m_mtoUnit, c, 'f', d);
+		Result += str;
+		D+=dheight;
+		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
+
+		Result = QString(QObject::tr("X_CG = %1 ")).arg(m_pCurWPolar->m_CoG.x*pMainFrame->m_mtoUnit, c, 'f', d);
 		Result += str;
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
@@ -13506,7 +13523,7 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
 			int nCtrls;
 			QString strong;
-			SetControlPositions(m_Panel, m_Node, m_pCurPOpp->m_Ctrl, nCtrls,strong, false);//TODO restore
+			SetControlPositions(m_Panel, m_Node, m_pCurPOpp->m_Ctrl, nCtrls,strong, true);
 			m_bResetglMesh = true;
 		}
 	}

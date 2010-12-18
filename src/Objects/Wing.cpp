@@ -622,7 +622,6 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			CreateXPoints(m_NXPanels[j], m_XPanelDist[j], pFoilA,  pFoilB,
 						  m_Surface[m_NSurfaces].m_xPointA, m_Surface[m_NSurfaces].m_xPointB,
 						  m_Surface[m_NSurfaces].m_NXLead,  m_Surface[m_NSurfaces].m_NXFlap);
-
 			m_Surface[m_NSurfaces].SetFlap();
 			m_Surface[m_NSurfaces].Init();
 			m_Surface[m_NSurfaces].m_bIsLeftSurf   = true;
@@ -792,10 +791,12 @@ bool CWing::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB,
 	if(pFoilA && pFoilA->m_bTEFlap) xHingeA=pFoilA->m_TEXHinge/100.0; else xHingeA=1.0;
 	if(pFoilB && pFoilB->m_bTEFlap) xHingeB=pFoilB->m_TEXHinge/100.0; else xHingeB=1.0;
 
-	NXFlapA = (int)((1.0-xHingeA) * NXPanels);
-	NXFlapB = (int)((1.0-xHingeB) * NXPanels);
+	NXFlapA = (int)((1.0-xHingeA) * (double)NXPanels *1.000123);// to avoid numerical errors if exact division
+	NXFlapB = (int)((1.0-xHingeB) * (double)NXPanels *1.000123);
+
 	if(pFoilA && pFoilA->m_bTEFlap && NXFlapA==0) NXFlapA++;
 	if(pFoilB && pFoilB->m_bTEFlap && NXFlapB==0) NXFlapB++;
+
 	NXLeadA = NXPanels - NXFlapA;
 	NXLeadB = NXPanels - NXFlapB;
 

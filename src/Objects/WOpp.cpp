@@ -171,7 +171,6 @@ void CWOpp::GetBWStyle(QColor &color, int &style, int &width)
 	color = m_Color;
 	style = m_Style;
 	width = m_Width;
-//	GetBWColor(color, style, width); //TODO
 }
 
 

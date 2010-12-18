@@ -2237,7 +2237,6 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 
 double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, double Cl, int PlrVar, bool &bOutRe, bool &bError)
 {
-	//TODO : check this GetPlrPoint duplicate with CMAinFrame
 /*	Var
 	0 =	m_Alpha;
 	1 = m_Cl;

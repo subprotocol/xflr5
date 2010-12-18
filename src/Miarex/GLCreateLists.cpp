@@ -2563,9 +2563,9 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *p
 
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 			l = str.length();
-			if     (l==2) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
-			else if(l==3) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
-			else if(l==4) Result = QString(QObject::tr("QInf = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
+			if     (l==2) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,7,'f',2);
+			else if(l==3) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,6,'f',1);
+			else if(l==4) Result = QString(QObject::tr("V = %1 ")).arg(pWOpp->m_QInf*pMainFrame->m_mstoUnit,5,'f',1);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
@@ -2587,7 +2587,7 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *p
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("CL/Cd = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
+			Result = QString(QObject::tr("CL/CD = %1 ")).arg(pWOpp->m_CL/(pWOpp->m_InducedDrag+pWOpp->m_ViscousDrag),9,'f',4);
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
@@ -2605,24 +2605,24 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *p
 
 			GetLengthUnit(str, pMainFrame->m_LengthUnit);
 			l = str.length();
+			int c, d;
+			if(l==1) {c=8, d=3;}
+			else if(l==2) {c=7, d=3;}
+			else {c=6, d=3;}
 			if(pWOpp->m_Type==STABILITYPOLAR)
 			{
-				if (l==1)     Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 8,'f',3);
-				else if(l==2) Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 7,'f',2);
-				else if(l>=3) Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, 7,'f',2);
+				Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, c,'f',d);
 				Result += str;
 				YPos += dD;
 				pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 			}
 
-			if (l==1)     Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 8, 'f', 3);
-			else if(l==2) Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
-			else if(l>=3) Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			Result = QString(QObject::tr("X_CP = %1 ")).arg(pWOpp->m_XCP*pMainFrame->m_mtoUnit, c, 'f', d);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 
-			Result = QString(QObject::tr("X_CG = %1 ")).arg(pWPolar->m_CoG.x*pMainFrame->m_mtoUnit, 7, 'f', 2);
+			Result = QString(QObject::tr("X_CG = %1 ")).arg(pWPolar->m_CoG.x*pMainFrame->m_mtoUnit, c, 'f', d);
 			Result += str;
 			YPos += dD;
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);

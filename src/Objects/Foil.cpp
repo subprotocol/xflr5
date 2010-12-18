@@ -1328,7 +1328,7 @@ void CFoil::SetLEFlap()
 
 void CFoil::SetTEFlap()
 {
-	int i, j, k, l, p, i1, i2;//TODO : k used uninitialized
+	int i, j, k, l, p, i1, i2;
 	double xh, yh, dx, dy;
 	CVector M;
 	bool bIntersect;
@@ -1508,6 +1508,8 @@ void CFoil::SetTEFlap()
 	i2 = iUpperh+1;
 	p=0;
 	bIntersect = false;
+
+	k=0;
 	for (j=i2; j<m_iExt; j++)
 	{
 		for (k=i1;k>0; k--)

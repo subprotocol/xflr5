@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
 #endif
         XFLR5Application app(argc, argv);
-        app.exec();
+		return app.exec();
 
 }
 
