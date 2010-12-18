@@ -7358,21 +7358,32 @@ void QMiarex::On3DPickCenter()
 
 void QMiarex::OnAllWingGraphScales()
 {
-	//resets the scale of the current graph
+	//resets the scale of all graphs
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	double halfspan = m_pCurWing->m_PlanformSpan/2.0;
-
-	for(int ig=0; ig<4; ig++)
+	if(m_iView == WOPPVIEW)
 	{
-		m_WingGraph[ig].SetAuto(true);
-		m_WingGraph[ig].ResetXLimits();
-		m_WingGraph[ig].ResetYLimits();
-		m_WingGraph[ig].SetAutoX(false);
-		if(m_bHalfWing) m_WingGraph[ig].SetXMin(0.0);
-		else m_WingGraph[ig].SetXMin(-halfspan*pMainFrame->m_mtoUnit);
-		m_WingGraph[ig].SetXMax( halfspan*pMainFrame->m_mtoUnit);
-	}
+		double halfspan = m_pCurWing->m_PlanformSpan/2.0;
 
+		for(int ig=0; ig<4; ig++)
+		{
+			m_WingGraph[ig].SetAuto(true);
+			m_WingGraph[ig].ResetXLimits();
+			m_WingGraph[ig].ResetYLimits();
+			m_WingGraph[ig].SetAutoX(false);
+			if(m_bHalfWing) m_WingGraph[ig].SetXMin(0.0);
+			else m_WingGraph[ig].SetXMin(-halfspan*pMainFrame->m_mtoUnit);
+			m_WingGraph[ig].SetXMax( halfspan*pMainFrame->m_mtoUnit);
+		}
+	}
+	else if(m_iView==WSTABVIEW && m_iStabilityView==0)
+	{
+		for(int ig=0; ig<4; ig++)
+		{
+			m_TimeGraph[ig].SetAuto(true);
+			m_TimeGraph[ig].ResetXLimits();
+			m_TimeGraph[ig].ResetYLimits();
+		}
+	}
 	UpdateView();
 }
 
@@ -8010,6 +8021,7 @@ void QMiarex::OnCurveWidth(int index)
 
 void QMiarex::OnDefineStabPolar()
 {
+	StopAnimate();
 	m_bArcball = false;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
@@ -8158,6 +8170,8 @@ void QMiarex::OnDefineStabPolar()
 
 void QMiarex::OnDefineWPolar()
 {
+	StopAnimate();
+
 	if(!m_pCurWing) return;
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	int i,j;
@@ -8513,13 +8527,18 @@ void QMiarex::OnDeleteUFOWOpps()
 void QMiarex::OnDeleteUFOWPolars()
 {
 	if(!m_pCurWing) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
-	QString Name;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	CWPolar *pWPolar;
+	QString Name, strong;
+
 	if(m_pCurPlane) Name = m_pCurPlane->m_PlaneName;
 	else            Name = m_pCurWing->m_WingName;
 
-	CWPolar *pWPolar;
+	strong = tr("Are you sure you want to delete the polars associated to :\n") +  Name +"?\n";
+	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
+												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
+
 	for(int i=m_poaWPolar->size()-1; i>=0; i--)
 	{
 		pWPolar  = (CWPolar *)m_poaWPolar->at(i);
@@ -14995,7 +15014,7 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 	if(event->delta()>0)
 	{
 		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
-		else                           ZoomFactor = 1.06;
+		else                            ZoomFactor = 1.06;
 	}
 	else
 	{

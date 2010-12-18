@@ -3051,15 +3051,19 @@ bool GL3dWingDlg::VLMSetAutoMesh(int total)
 
 void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 {
+	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
+	double ZoomFactor;
 	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
 
 	if(m_pglWidget->geometry().contains(glPoint)) m_pglWidget->setFocus();	//The mouse button has been wheeled
-	//Process the message
-//	point is in client coordinates
+
+	if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+	else                            ZoomFactor = 1.06;
+
 	if(m_pglWidget->geometry().contains(glPoint))
 	{
-		if(event->delta()<0) m_glScaled *= (GLfloat)1.06;
-		else                 m_glScaled /= (GLfloat)1.06;
+		if(event->delta()>0) m_glScaled *= ZoomFactor;
+		else                 m_glScaled /= ZoomFactor;
 	}
 
 	UpdateView();

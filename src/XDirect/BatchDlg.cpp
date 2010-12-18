@@ -1155,7 +1155,7 @@ void BatchDlg::ReLoop()
 	int ia, iRe, nRe, series, total, MaxSeries;
 	double SpMin, SpMax, SpInc;
 
-	QPoint Place(m_pctrlGraphOutput->rect().left()+m_RmsGraph.GetMargin()*2, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
+	QPoint Place(m_pctrlGraphOutput->rect().left()+20, m_pctrlGraphOutput->rect().top()+m_RmsGraph.GetMargin()/2);
 
 	if(!m_bFromList) nRe = (int)fabs((m_ReMax-m_ReMin)/m_ReInc);
 	else             nRe = m_NRe-1;
@@ -1221,7 +1221,8 @@ void BatchDlg::ReLoop()
 						strong+=str;
 						UpdateOutput(str);
 
-						str = QString("Re=%1  /  Alpha=%2").arg(pXFoil->reinf1,8,'f',0).arg(alphadeg,5,'f',2);
+						str = m_pFoil->m_FoilName+" / ";
+						str += QString("Re=%1  /  Alpha=%2").arg(pXFoil->reinf1,8,'f',0).arg(alphadeg,5,'f',2);
 						str += QString::fromUtf8("°");
 						m_pctrlGraphOutput->SetTitle(str, Place);
 
