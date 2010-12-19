@@ -8,8 +8,8 @@ SOURCES += src/MainFrame.cpp \
     src/Globals.cpp \
     src/TwoDWidget.cpp \
     src/GLWidget.cpp \
-	src/XFLR5Application.cpp \
-	src/Miarex/ArcBall.cpp \
+    src/XFLR5Application.cpp \
+    src/Miarex/ArcBall.cpp \
     src/Miarex/BodyGridDlg.cpp \
     src/Miarex/BodyScaleDlg.cpp \
     src/Miarex/BodyTableDelegate.cpp \
@@ -105,15 +105,15 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-	src/Design/AFoilTableDlg.cpp
+    src/Design/AFoilTableDlg.cpp
 
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/Globals.h \
     src/TwoDWidget.h \
     src/GLWidget.h \
-	src/XFLR5Application.h \
-	src/Miarex/Miarex.h \
+    src/XFLR5Application.h \
+    src/Miarex/Miarex.h \
     src/Miarex/W3dPrefsDlg.h \
     src/Miarex/GLCreateLists.h \
     src/Miarex/WingScaleDlg.h \
@@ -209,7 +209,7 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
-	src/Design/AFoilTableDlg.h
+    src/Design/AFoilTableDlg.h
 
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \
@@ -229,7 +229,6 @@ unix {
     isEmpty(PREFIX):PREFIX = /usr
     BINDIR = $$PREFIX/bin
     DATADIR = $$PREFIX/share
-    target.path = $$BINDIR
     
     # MAKE INSTALL
     INSTALLS += target

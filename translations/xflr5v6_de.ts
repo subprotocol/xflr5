@@ -988,9 +988,8 @@ CPCALC: local speed too large
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../src/Misc/DisplaySettingsDlg.cpp" line="154"/>
         <source>Warning</source>
-        <translation>Warnung</translation>
+        <translation type="obsolete">Warnung</translation>
     </message>
 </context>
 <context>
@@ -6868,7 +6867,7 @@ Max = %1</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3276"/>
+        <location filename="../src/Design/AFoil.cpp" line="3277"/>
         <source>Open Image File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6925,79 +6924,79 @@ Max = %1</translation>
         <translation type="obsolete">Splined Punkte</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3000"/>
+        <location filename="../src/Design/AFoil.cpp" line="3001"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3001"/>
+        <location filename="../src/Design/AFoil.cpp" line="3002"/>
         <source>Thickness (%)</source>
         <translation>Dicke(%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3002"/>
-        <location filename="../src/Design/AFoil.cpp" line="3004"/>
+        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3005"/>
         <source>at (%)</source>
         <translation>bei (%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3004"/>
         <source>Camber (%)</source>
         <translation>Wölbung (%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3005"/>
-        <location filename="../src/Design/AFoil.cpp" line="3013"/>
+        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3014"/>
         <source>Points</source>
         <translation>Punkte</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3007"/>
         <source>TE Flap (</source>
         <translation>T.E.(Hinterkanten) Klappe (</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3007"/>
+        <location filename="../src/Design/AFoil.cpp" line="3008"/>
         <source>TE XHinge</source>
         <translation>Hinterkaten X-Position der Aufhängung (TE XHinge)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3008"/>
+        <location filename="../src/Design/AFoil.cpp" line="3009"/>
         <source>TE YHinge</source>
         <translation>Hinterkaten Y-Position der Aufhängung (TE YHinge)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3009"/>
+        <location filename="../src/Design/AFoil.cpp" line="3010"/>
         <source>LE Flap (</source>
         <translation>L.E (Vorderkanten) Klappe (</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3010"/>
+        <location filename="../src/Design/AFoil.cpp" line="3011"/>
         <source>LE XHinge</source>
         <translation>Vorderkaten X-Position der Aufhängung (LE XHinge)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3011"/>
+        <location filename="../src/Design/AFoil.cpp" line="3012"/>
         <source>LE YHinge</source>
         <translation>Vorderkaten Y-Position der Aufhängung (LE YHinge)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3012"/>
+        <location filename="../src/Design/AFoil.cpp" line="3013"/>
         <source>Show</source>
         <translation type="unfinished">Anzeigen</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3014"/>
+        <location filename="../src/Design/AFoil.cpp" line="3015"/>
         <source>Centerline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3015"/>
+        <location filename="../src/Design/AFoil.cpp" line="3016"/>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3017"/>
+        <location filename="../src/Design/AFoil.cpp" line="3018"/>
         <source>Foils</source>
         <translation>Profile</translation>
     </message>
@@ -7006,8 +7005,6 @@ Max = %1</translation>
     <name>QMiarex</name>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="195"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
         <source>Cd</source>
         <translation>Cd</translation>
     </message>
@@ -7046,10 +7043,8 @@ Max = %1</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
         <source>Cl/Cd</source>
-        <translation>Cl/Cd</translation>
+        <translation type="obsolete">Cl/Cd</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="207"/>
@@ -8081,6 +8076,42 @@ Trotzdem überschreiben? (Resultate gehen verloren)</translation>
         <translation>Darstellung</translation>
     </message>
     <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
+        <source>VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
+        <source>ICD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
+        <source>CL/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
+        <source>CL^(3/2)/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
+        <source>1/Rt(CL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14611"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14719"/>
         <source>Pitching Moment</source>
@@ -8287,16 +8318,12 @@ Trotzdem überschreiben? (Resultate gehen verloren)</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
         <source>VCd</source>
-        <translation>VCd</translation>
+        <translation type="obsolete">VCd</translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
         <source>ICd</source>
-        <translation>ICd</translation>
+        <translation type="obsolete">ICd</translation>
     </message>
     <message>
         <source>VYm</source>
@@ -8307,16 +8334,12 @@ Trotzdem überschreiben? (Resultate gehen verloren)</translation>
         <translation type="obsolete">IYm</translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
         <source>Cl^(3/2)/Cd</source>
-        <translation>Cl^(3/2)/Cd</translation>
+        <translation type="obsolete">Cl^(3/2)/Cd</translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
         <source>1/Rt(Cl)</source>
-        <translation>1/Rt(Cl)</translation>
+        <translation type="obsolete">1/Rt(Cl)</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14591"/>
@@ -10516,8 +10539,18 @@ stagnation point in mixed-inverse</source>
         <translation type="unfinished">3D Paneele</translation>
     </message>
     <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="782"/>
+        <source>Wing analysis methods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="785"/>
         <source>Mix 3D Panels/VLM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="788"/>
+        <source>Plane analysis methods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11567,6 +11600,11 @@ Paneelen Methode ist nicht verfügbar</translation>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="626"/>
         <source>Auto Analysis Name</source>
         <translation>Name der automatischen Analyse</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/WPolarDlg.cpp" line="740"/>
+        <source>Wing analysis methods</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="973"/>

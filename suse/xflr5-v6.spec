@@ -1,7 +1,7 @@
 # This is a spec file for the installation of XFLR5 v6
 %define name xflr5
-%define release 1
-%define version 6.01
+%define release 2
+%define version 6.02
 
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
@@ -88,9 +88,34 @@ echo %{_bindir}/%{name}
 
 
 %changelog
+*Sun Dec 19 2010 A. Deperrois
+XFLR5v6.02 beta rpm release
+- added an option to load a background image in the foil direct design module
+- corrected some errors in CoG and inertia automatic calculations, with impact on results
+- did some deep code cleaning
+- re-organized the panel analysis code to perform only one far field calculation per operating point
+- optimized the panel method for increased speed of execution
+- corrected the mesh edition for NURBS bodies
+- changed the export format for graphs
+- implemented the stability method for mixed panel/vlm method
+- implemented the stability method for full 3D panel method
+- corrected the bug which lead to incorrect results in 3D panel with Neumann B.C.
+- corrected the error in the jump in potential at the wing's trailing edage in full 3d panel method
+- set the estimation of inertia properties at the time of polar definition instead of evaluating at the time of analysis
+- fixed the bug which could cause a crash when dragging a point in splines design
+- corrected the asymetric transition location for symetric wings
+- corrected the source strength influence of thick panels on thin surfaces, with impact on results for planes with body
+- corrected the Cp 3D color display for VLM2 analysis
+- added the influence of pressure forces acting on the body to induced pitching moment coefficient
+- added calculation of neutral point position based on Cma/Cza ratio
+- corrected various minor bugs
+- made several minor enhancements
+
 *Thu Oct 14 2010 A. Deperrois
 XFLR5v6.01 beta rpm release
-Corrected some important bugs - see Release notes for details
+- Corrected the incorrect balance speed in 3D type 2 polars for planes
+- Corrected the final moment calculation in stability analysis
+- Corrected the incorrect lift calculation in stability analysis
 
 *Sat Sep 19 2010 A. Deperrois
 XFLR5v6.00 beta rpm release

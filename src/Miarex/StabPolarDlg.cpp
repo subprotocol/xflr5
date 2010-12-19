@@ -779,13 +779,13 @@ void StabPolarDlg::SetupLayout()
 		m_pctrlWingMethod3 = new QRadioButton(tr("3D Panels"));
 		WingMethodLayout->addWidget(m_pctrlWingMethod2);
 		WingMethodLayout->addWidget(m_pctrlWingMethod3);
-		QGroupBox *WingMethodBox = new QGroupBox("Wing analysis methods");
+		QGroupBox *WingMethodBox = new QGroupBox(tr("Wing analysis methods"));
 		WingMethodBox->setLayout(WingMethodLayout);
 
 		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
 		QHBoxLayout *PlaneMethodLayout = new QHBoxLayout;
 		PlaneMethodLayout->addWidget(m_pctrlPanelMethod);
-		QGroupBox *PlaneMethodBox = new QGroupBox("Plane analysis methods");
+		QGroupBox *PlaneMethodBox = new QGroupBox(tr("Plane analysis methods"));
 		PlaneMethodBox->setLayout(PlaneMethodLayout);
 
 		m_pctrlAnalysisControls->addWidget(WingMethodBox);

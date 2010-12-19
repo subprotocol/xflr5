@@ -6497,14 +6497,14 @@ Poursuivre néanmoins ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="9048"/>
         <source>ICn   = %1     PCn   = %2 
 </source>
-        <translation type="unfinished">ICn   = %1     PCn   = %2 
+        <translation>ICn   = %1     PCn   = %2 
 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9049"/>
         <source>ICn=, %1,PCn=, %2
 </source>
-        <translation type="unfinished">ICn=, %1,PCn=, %2
+        <translation>ICn=, %1,PCn=, %2
 </translation>
     </message>
     <message>
@@ -6709,14 +6709,14 @@ Poursuivre néanmoins ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="9056"/>
         <source>XNP   = %1
 </source>
-        <translation type="unfinished">XNP   = %1
+        <translation>XNP   = %1
 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9057"/>
         <source>XNP=, %1
 </source>
-        <translation type="unfinished">XNP=, %1
+        <translation>XNP=, %1
 </translation>
     </message>
     <message>
@@ -6832,7 +6832,7 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
         <location filename="../src/Miarex/Miarex.cpp" line="11739"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11740"/>
         <source>V = %1 </source>
-        <translation type="unfinished">V = %1 </translation>
+        <translation>V = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="11741"/>
@@ -7112,37 +7112,37 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
         <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
         <source>VCD</source>
-        <translation type="unfinished">VCX</translation>
+        <translation>VCD</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
         <source>ICD</source>
-        <translation type="unfinished">ICX</translation>
+        <translation>ICD</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
         <source>CD</source>
-        <translation type="unfinished">CX</translation>
+        <translation>CD</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14573"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14681"/>
         <source>Cn</source>
-        <translation type="unfinished">Cn</translation>
+        <translation>Cn</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14576"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14684"/>
         <source>VCn</source>
-        <translation type="unfinished">VCn</translation>
+        <translation>VCn</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14579"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14687"/>
         <source>ICn</source>
-        <translation type="unfinished">ICn</translation>
+        <translation>ICn</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
@@ -7421,7 +7421,7 @@ Faut-il poursuivre cependant ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="14644"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14752"/>
         <source>XNP</source>
-        <translation type="unfinished">XNP</translation>
+        <translation>XNP</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14780"/>
@@ -7755,12 +7755,12 @@ Poursuite cependant...</translation>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1863"/>
         <source>B.C. = Dirichlet</source>
-        <translation type="unfinished">Cond limites. = Dirichlet</translation>
+        <translation>Cond. limites = Dirichlet</translation>
     </message>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1864"/>
         <source>B.C. = Neumann</source>
-        <translation type="unfinished">Cond limites. = Neumann</translation>
+        <translation>Cond. limites = Neumann</translation>
     </message>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1868"/>
@@ -7775,12 +7775,12 @@ Poursuite cependant...</translation>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1870"/>
         <source>Inviscid</source>
-        <translation type="unfinished">Non visquex</translation>
+        <translation>Non visqueux</translation>
     </message>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1872"/>
         <source>Ref. Area = </source>
-        <translation type="unfinished">Surface de référence = </translation>
+        <translation>Aire de référence = </translation>
     </message>
     <message>
         <location filename="../src/Objects/WPolar.cpp" line="1891"/>
@@ -8203,30 +8203,30 @@ Poursuite cependant...</translation>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2598"/>
         <source>Cm = %1 </source>
-        <translation type="unfinished">Cm = %1 </translation>
+        <translation>Cm = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2602"/>
         <source>Cn = %1 </source>
-        <translation type="unfinished">Cn = %1 </translation>
+        <translation>Cn = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2614"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11802"/>
         <source>X_NP = %1 </source>
-        <translation type="unfinished">X_NP = %1 </translation>
+        <translation>X_NP = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2620"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11808"/>
         <source>X_CP = %1 </source>
-        <translation type="unfinished">X_CP = %1 </translation>
+        <translation>X_CP = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2625"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11813"/>
         <source>X_CG = %1 </source>
-        <translation type="unfinished">X_CG = %1 </translation>
+        <translation>X_CG = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2633"/>
@@ -8415,7 +8415,7 @@ de point de stagnation dans le mode inverse mixte</translation>
     <message>
         <location filename="../src/XDirect/XDirect.cpp" line="2889"/>
         <source>Export Directory</source>
-        <translation type="unfinished">Répertoire d&apos;exportation</translation>
+        <translation>Répertoire d&apos;exportation</translation>
     </message>
     <message>
         <location filename="../src/XDirect/XDirect.cpp" line="2920"/>
@@ -9459,7 +9459,7 @@ Surface inférieure
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="778"/>
         <source>VLM</source>
-        <translation type="unfinished">VLM</translation>
+        <translation>VLM</translation>
     </message>
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="779"/>
@@ -9469,7 +9469,7 @@ Surface inférieure
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="785"/>
         <source>Mix 3D Panels/VLM</source>
-        <translation type="unfinished">Mixte panneaux 3D/VLM</translation>
+        <translation>Mixte panneaux 3D/VLM</translation>
     </message>
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="500"/>
@@ -9522,7 +9522,7 @@ Surface inférieure
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="659"/>
         <source>Note : the analysis may be of the viscous type
 only if all the flap controls are inactive</source>
-        <translation>Note : l’analyse ne peut être de type visqueyux
+        <translation>Note : l’analyse ne peut être de type visqueux
 que si toutes les commandes de volets sont inactives</translation>
     </message>
     <message>
@@ -9564,6 +9564,16 @@ que si toutes les commandes de volets sont inactives</translation>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="698"/>
         <source>Reference Area for Aero Coefficients</source>
         <translation>Aire de référence pour les coef. aérodynamiques</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="782"/>
+        <source>Wing analysis methods</source>
+        <translation>Méthodes d&apos;analyse</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="788"/>
+        <source>Plane analysis methods</source>
+        <translation>Méthodes d&apos;analyse</translation>
     </message>
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="827"/>
@@ -9712,12 +9722,12 @@ que si toutes les commandes de volets sont inactives</translation>
     <message>
         <location filename="../src/Miarex/StabViewDlg.cpp" line="668"/>
         <source>Ramp Time</source>
-        <translation type="unfinished">Temps de montée</translation>
+        <translation>Temps de commande</translation>
     </message>
     <message>
         <location filename="../src/Miarex/StabViewDlg.cpp" line="669"/>
         <source>Ramp Amp.</source>
-        <translation type="unfinished"></translation>
+        <translation>Amplitude</translation>
     </message>
     <message>
         <location filename="../src/Miarex/StabViewDlg.cpp" line="676"/>
@@ -10530,6 +10540,11 @@ Les cadres ont un nombre de points par face différent</translation>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="734"/>
         <source>VLM</source>
         <translation>VLM</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/WPolarDlg.cpp" line="740"/>
+        <source>Wing analysis methods</source>
+        <translation>Méthodes d&apos;analyse</translation>
     </message>
     <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="743"/>

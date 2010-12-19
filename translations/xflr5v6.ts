@@ -821,11 +821,6 @@ CPCALC: local speed too large
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../src/Misc/DisplaySettingsDlg.cpp" line="154"/>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>EditPlrDlg</name>
@@ -6204,7 +6199,7 @@ A reduction of the number of wing panels is required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3276"/>
+        <location filename="../src/Design/AFoil.cpp" line="3277"/>
         <source>Open Image File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6221,79 +6216,79 @@ A reduction of the number of wing panels is required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3000"/>
+        <location filename="../src/Design/AFoil.cpp" line="3001"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3001"/>
+        <location filename="../src/Design/AFoil.cpp" line="3002"/>
         <source>Thickness (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3002"/>
-        <location filename="../src/Design/AFoil.cpp" line="3004"/>
+        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3005"/>
         <source>at (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3004"/>
         <source>Camber (%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3005"/>
-        <location filename="../src/Design/AFoil.cpp" line="3013"/>
+        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3014"/>
         <source>Points</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3007"/>
         <source>TE Flap (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3007"/>
+        <location filename="../src/Design/AFoil.cpp" line="3008"/>
         <source>TE XHinge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3008"/>
+        <location filename="../src/Design/AFoil.cpp" line="3009"/>
         <source>TE YHinge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3009"/>
+        <location filename="../src/Design/AFoil.cpp" line="3010"/>
         <source>LE Flap (</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3010"/>
+        <location filename="../src/Design/AFoil.cpp" line="3011"/>
         <source>LE XHinge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3011"/>
+        <location filename="../src/Design/AFoil.cpp" line="3012"/>
         <source>LE YHinge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3012"/>
+        <location filename="../src/Design/AFoil.cpp" line="3013"/>
         <source>Show</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3014"/>
+        <location filename="../src/Design/AFoil.cpp" line="3015"/>
         <source>Centerline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3015"/>
+        <location filename="../src/Design/AFoil.cpp" line="3016"/>
         <source>Style</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3017"/>
+        <location filename="../src/Design/AFoil.cpp" line="3018"/>
         <source>Foils</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6302,8 +6297,6 @@ A reduction of the number of wing panels is required</source>
     <name>QMiarex</name>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="195"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
         <source>Cd</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6339,12 +6332,6 @@ A reduction of the number of wing panels is required</source>
         <location filename="../src/Miarex/Miarex.cpp" line="14579"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14687"/>
         <source>ICn</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
-        <source>Cl/Cd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7116,6 +7103,42 @@ Continue ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
+        <source>VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
+        <source>ICD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
+        <source>CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
+        <source>CL/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
+        <source>CL^(3/2)/CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
+        <source>1/Rt(CL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14611"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14719"/>
         <source>Pitching Moment</source>
@@ -7244,30 +7267,6 @@ Continue ?</source>
         <location filename="../src/Miarex/Miarex.cpp" line="14549"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14657"/>
         <source>CL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
-        <source>VCd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
-        <source>ICd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
-        <source>Cl^(3/2)/Cd</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
-        <source>1/Rt(Cl)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9416,6 +9415,11 @@ stagnation point in mixed-inverse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="782"/>
+        <source>Wing analysis methods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="785"/>
         <source>Mix 3D Panels/VLM</source>
         <translation type="unfinished"></translation>
@@ -9469,6 +9473,11 @@ only if all the flap controls are inactive</source>
     <message>
         <location filename="../src/Miarex/StabPolarDlg.cpp" line="698"/>
         <source>Reference Area for Aero Coefficients</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/StabPolarDlg.cpp" line="788"/>
+        <source>Plane analysis methods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10371,6 +10380,11 @@ Frames have different number of side points</source>
     <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="735"/>
         <source>3D Panels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/WPolarDlg.cpp" line="740"/>
+        <source>Wing analysis methods</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

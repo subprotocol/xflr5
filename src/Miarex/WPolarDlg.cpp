@@ -737,7 +737,7 @@ void WPolarDlg::SetupLayout()
 		WingMethodLayout->addWidget(m_pctrlWingMethod1);
 		WingMethodLayout->addWidget(m_pctrlWingMethod2);
 		WingMethodLayout->addWidget(m_pctrlWingMethod3);
-		QGroupBox *WingMethodBox = new QGroupBox("Wing analysis methods");
+		QGroupBox *WingMethodBox = new QGroupBox(tr("Wing analysis methods"));
 		WingMethodBox->setLayout(WingMethodLayout);
 
 		m_pctrlPanelMethod = new QRadioButton(tr("Mix 3D Panels/VLM"));
