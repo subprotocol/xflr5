@@ -830,11 +830,6 @@ CpCalc : vitesse locale trop élevée
         <source>Cancel</source>
         <translation>Abandonner</translation>
     </message>
-    <message>
-        <location filename="../src/Misc/DisplaySettingsDlg.cpp" line="154"/>
-        <source>Warning</source>
-        <translation>Attention</translation>
-    </message>
 </context>
 <context>
     <name>EditPlrDlg</name>
@@ -3718,12 +3713,12 @@ Réduisez la taille du maillage</translation>
     <message>
         <location filename="../src/MainFrame.cpp" line="743"/>
         <source>Load background image</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger l’image d’arrière plan</translation>
     </message>
     <message>
         <location filename="../src/MainFrame.cpp" line="745"/>
         <source>Clear background image</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer l’image d’arrière-plan</translation>
     </message>
     <message>
         <location filename="../src/MainFrame.cpp" line="753"/>
@@ -5681,26 +5676,6 @@ Poursuivre cependant ?</translation>
         <translation>       Calcul du fuselage...</translation>
     </message>
     <message>
-        <source>     Main wing is asymmetric</source>
-        <translation type="obsolete">     L&apos;aile principale est asymétrique</translation>
-    </message>
-    <message>
-        <source>     Sideslip is asymmetric</source>
-        <translation type="obsolete">     Le dérapage est asymétrique</translation>
-    </message>
-    <message>
-        <source>     2nd wing is asymmetric</source>
-        <translation type="obsolete">     La seconde aile est asymétrique</translation>
-    </message>
-    <message>
-        <source>     Elevator is asymmetric</source>
-        <translation type="obsolete">     Le stabilisateur horizontal est asymétrique</translation>
-    </message>
-    <message>
-        <source>     The fin is asymmetric</source>
-        <translation type="obsolete">     La dérive est asymétrique</translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/PanelAnalysisDlg.cpp" line="2292"/>
         <source>Type 1 - Fixed speed polar</source>
         <translation>Type 1  Polaire à vitessse constante</translation>
@@ -6169,59 +6144,59 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
         <translation>Profil avec splines reliant les points</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3000"/>
+        <location filename="../src/Design/AFoil.cpp" line="3001"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3001"/>
+        <location filename="../src/Design/AFoil.cpp" line="3002"/>
         <source>Thickness (%)</source>
         <translation>Épaisseur (%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3002"/>
-        <location filename="../src/Design/AFoil.cpp" line="3004"/>
+        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3005"/>
         <source>at (%)</source>
         <translation>à (%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3003"/>
+        <location filename="../src/Design/AFoil.cpp" line="3004"/>
         <source>Camber (%)</source>
         <translation>Cambrure (%)</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3005"/>
-        <location filename="../src/Design/AFoil.cpp" line="3013"/>
+        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3014"/>
         <source>Points</source>
         <translation>Points</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3006"/>
+        <location filename="../src/Design/AFoil.cpp" line="3007"/>
         <source>TE Flap (</source>
         <translation>Volet de bord de fuite (</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3007"/>
+        <location filename="../src/Design/AFoil.cpp" line="3008"/>
         <source>TE XHinge</source>
         <translation>Position X articulation BF</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3008"/>
+        <location filename="../src/Design/AFoil.cpp" line="3009"/>
         <source>TE YHinge</source>
         <translation>Position Y articulation BF</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3009"/>
+        <location filename="../src/Design/AFoil.cpp" line="3010"/>
         <source>LE Flap (</source>
         <translation>Volet de bord d&apos;attaque (</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3010"/>
+        <location filename="../src/Design/AFoil.cpp" line="3011"/>
         <source>LE XHinge</source>
         <translation>Position X articulation BA</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3011"/>
+        <location filename="../src/Design/AFoil.cpp" line="3012"/>
         <source>LE YHinge</source>
         <translation>Position Y articulation BA</translation>
     </message>
@@ -6306,24 +6281,24 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
         <translation>y  = %1</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3012"/>
+        <location filename="../src/Design/AFoil.cpp" line="3013"/>
         <source>Show</source>
         <translation>Afficher</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3014"/>
+        <location filename="../src/Design/AFoil.cpp" line="3015"/>
         <source>Centerline</source>
         <translation>Courbure</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3015"/>
+        <location filename="../src/Design/AFoil.cpp" line="3016"/>
         <source>Style</source>
         <translation>Style</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3276"/>
+        <location filename="../src/Design/AFoil.cpp" line="3277"/>
         <source>Open Image File</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un fichier image</translation>
     </message>
     <message>
         <location filename="../src/Design/AFoil.cpp" line="2118"/>
@@ -6338,7 +6313,7 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
         <translation>Abandonner les modifications des splines ?</translation>
     </message>
     <message>
-        <location filename="../src/Design/AFoil.cpp" line="3017"/>
+        <location filename="../src/Design/AFoil.cpp" line="3018"/>
         <source>Foils</source>
         <translation>Profils</translation>
     </message>
@@ -6347,8 +6322,6 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
     <name>QMiarex</name>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="195"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
         <source>Cd</source>
         <translation>Cx</translation>
     </message>
@@ -6367,12 +6340,6 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="14755"/>
         <source>Alpha</source>
         <translation>Alpha</translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
-        <source>Cl/Cd</source>
-        <translation>Cz/Cx</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="207"/>
@@ -6426,18 +6393,6 @@ Il faut réduire le nombre de panneaux d&apos;aile</translation>
 </source>
         <translation>Mémoire insuffisante pour enregistrer l&apos;OpPoint
 </translation>
-    </message>
-    <message>
-        <source>Wing2_</source>
-        <translation type="obsolete">Aile2_</translation>
-    </message>
-    <message>
-        <source>Elevator_</source>
-        <translation type="obsolete">Stabilisateur_</translation>
-    </message>
-    <message>
-        <source>Fin_</source>
-        <translation type="obsolete">Dérive_</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="3990"/>
@@ -6524,10 +6479,6 @@ Poursuivre néanmoins ?</translation>
         <translation>Le point se trouve en dehors de l&apos;enveloppe de vol</translation>
     </message>
     <message>
-        <source>QInf = %1 </source>
-        <translation type="obsolete">QInf = %1 </translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="5308"/>
         <source>Time =</source>
         <translation>Temps = </translation>
@@ -6540,7 +6491,7 @@ Poursuivre néanmoins ?</translation>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9045"/>
         <source>Cm   =</source>
-        <translation type="unfinished">Cm   =</translation>
+        <translation>Cm   =</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9048"/>
@@ -6575,10 +6526,6 @@ Poursuivre néanmoins ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="11776"/>
         <source>GCm = %1 </source>
         <translation>GCm = %1 </translation>
-    </message>
-    <message>
-        <source>XCP = %1 </source>
-        <translation type="obsolete">XCP = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="5641"/>
@@ -6617,14 +6564,6 @@ Il faut réduire le nombre de panneaux</translation>
 Aborting Calculation</source>
         <translation>...
 Abandon des calculs</translation>
-    </message>
-    <message>
-        <source>Could not find the elevator&apos;s foil </source>
-        <translation type="obsolete">Profil du stabilisateur horizontal introuvable </translation>
-    </message>
-    <message>
-        <source>Could not find the fin&apos;s foil </source>
-        <translation type="obsolete">Profil de la dérive introuvable </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="7567"/>
@@ -6725,40 +6664,14 @@ Poursuivre néanmoins ?</translation>
         <translation>Flexion =</translation>
     </message>
     <message>
-        <source>Main Wing Data
-</source>
-        <translation type="obsolete">Données principales de l&apos;aile
-</translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9216"/>
         <source>Flap </source>
         <translation>Volet </translation>
     </message>
     <message>
-        <source> moment = </source>
-        <translation type="obsolete"> moment = </translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="4201"/>
         <source>Cm total</source>
         <translation>Cm total</translation>
-    </message>
-    <message>
-        <source>Wing Graph 1</source>
-        <translation type="obsolete">Diagramme 1 de l&apos;aile</translation>
-    </message>
-    <message>
-        <source>Wing Graph 2</source>
-        <translation type="obsolete">Diagramme 2 de l&apos;aile</translation>
-    </message>
-    <message>
-        <source>Wing Graph 3</source>
-        <translation type="obsolete">Diagramme 3 de l&apos;aile</translation>
-    </message>
-    <message>
-        <source>Wing Graph 4</source>
-        <translation type="obsolete">Diagramme 4 de l&apos;aile</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="324"/>
@@ -6786,6 +6699,13 @@ Poursuivre néanmoins ?</translation>
         <translation>Diagramme Cp</translation>
     </message>
     <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="8538"/>
+        <source>Are you sure you want to delete the polars associated to :
+</source>
+        <translation>Êtes-vous certain de vouloir supprimer les polaires associées à :
+</translation>
+    </message>
+    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9056"/>
         <source>XNP   = %1
 </source>
@@ -6797,24 +6717,6 @@ Poursuivre néanmoins ?</translation>
         <source>XNP=, %1
 </source>
         <translation type="unfinished">XNP=, %1
-</translation>
-    </message>
-    <message>
-        <source>Secondary Wing Data
-</source>
-        <translation type="obsolete">Données de la deuxième aile
-</translation>
-    </message>
-    <message>
-        <source>Elevator Data
-</source>
-        <translation type="obsolete">Données du stabilisateur horizontal
-</translation>
-    </message>
-    <message>
-        <source>Fin Data
-</source>
-        <translation type="obsolete">Données de la dérive
 </translation>
     </message>
     <message>
@@ -6850,24 +6752,6 @@ Poursuivre néanmoins ?</translation>
         <source>Strip %1
 </source>
         <translation>Bande %1
-</translation>
-    </message>
-    <message>
-        <source>Wing2 Cp Coefficients
-</source>
-        <translation type="obsolete">Coefficients Cp de la deuxième aile
-</translation>
-    </message>
-    <message>
-        <source>Elevator Cp Coefficients
-</source>
-        <translation type="obsolete">Coefficients Cp du stabilisateur horizontal
-</translation>
-    </message>
-    <message>
-        <source>Fin Cp Coefficients
-</source>
-        <translation type="obsolete">Coefficients Cp de la dérive
 </translation>
     </message>
     <message>
@@ -6932,12 +6816,6 @@ n&apos;a pu être trouvé. Les polaires ne seront pas enregistrées</translation
 </translation>
     </message>
     <message>
-        <source>The modification will erase all Type 7 results associated to this Plane.
-Continue ?</source>
-        <translation type="obsolete">La modification va effacer tous les résultats de Type 7 associés à cet appareil.
-Faut-il poursuivre ?</translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="11405"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11611"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11723"/>
@@ -6954,7 +6832,7 @@ Faut-il poursuivre ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="11739"/>
         <location filename="../src/Miarex/Miarex.cpp" line="11740"/>
         <source>V = %1 </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">V = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="11741"/>
@@ -7228,7 +7106,25 @@ Faut-il poursuivre ?</translation>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14006"/>
         <source>Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le bouton, cliquer ensuitre sur l’objet pour le centrer dans la vue ; vous pouvez aussi faire un double-clic sur l’objet</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
+        <source>VCD</source>
+        <translation type="unfinished">VCX</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
+        <source>ICD</source>
+        <translation type="unfinished">ICX</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14558"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14666"/>
+        <source>CD</source>
+        <translation type="unfinished">CX</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14573"/>
@@ -7247,6 +7143,24 @@ Faut-il poursuivre ?</translation>
         <location filename="../src/Miarex/Miarex.cpp" line="14687"/>
         <source>ICn</source>
         <translation type="unfinished">ICn</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14582"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14690"/>
+        <source>CL/CD</source>
+        <translation>CZ/CX</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
+        <source>CL^(3/2)/CD</source>
+        <translation>CZ^(3/2)/CX</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
+        <source>1/Rt(CL)</source>
+        <translation>1/Rt(CZ)</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14611"/>
@@ -7272,22 +7186,17 @@ Faut-il poursuivre ?</translation>
         <translation>Envergure =</translation>
     </message>
     <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="8538"/>
-        <source>Are you sure you want to delete the polars associated to :
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/Miarex.cpp" line="9247"/>
         <source>Cp Coefficients
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Coefficients Cp</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="11193"/>
         <source>The modification will erase all polar results associated to this Plane.
 Continue ?</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette modification va effacer tous les résultats des polaires associés à cet avion.
+Faut-il poursuivre cependant ?</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="11631"/>
@@ -7398,19 +7307,7 @@ Continue ?</source>
         <location filename="../src/Miarex/Miarex.cpp" line="14549"/>
         <location filename="../src/Miarex/Miarex.cpp" line="14657"/>
         <source>CL</source>
-        <translation type="unfinished">CZ</translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14552"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14660"/>
-        <source>VCd</source>
-        <translation>VCx</translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14555"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14663"/>
-        <source>ICd</source>
-        <translation>ICx</translation>
+        <translation>CZ</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14564"/>
@@ -7423,18 +7320,6 @@ Continue ?</source>
         <location filename="../src/Miarex/Miarex.cpp" line="14675"/>
         <source>ICm</source>
         <translation>ICm</translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14585"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14693"/>
-        <source>Cl^(3/2)/Cd</source>
-        <translation>Cz^(3/2)/Cx</translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/Miarex.cpp" line="14588"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="14696"/>
-        <source>1/Rt(Cl)</source>
-        <translation>1/Rt(Cz)</translation>
     </message>
     <message>
         <location filename="../src/Miarex/Miarex.cpp" line="14591"/>
@@ -8269,55 +8154,6 @@ Poursuite cependant...</translation>
         <translation>Fréquence propre amortie = %1 Hz</translation>
     </message>
     <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2566"/>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2567"/>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2568"/>
-        <source>V = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2590"/>
-        <source>CL/CD = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2594"/>
-        <source>Cl = %1 </source>
-        <translation type="unfinished">Cz = %1 </translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2598"/>
-        <source>Cm = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2602"/>
-        <source>Cn = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2614"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="11802"/>
-        <source>X_NP = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2620"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="11808"/>
-        <source>X_CP = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/Miarex/GLCreateLists.cpp" line="2625"/>
-        <location filename="../src/Miarex/Miarex.cpp" line="11813"/>
-        <source>X_CG = %1 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Damping Constant           = %1 s-1</source>
-        <translation type="obsolete">Constante d&apos;amortissement = %1 s-1</translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2453"/>
         <source>Damping Ratio              = %1 </source>
         <translation>Facteur d&apos;amortissement = %1</translation>
@@ -8328,8 +8164,16 @@ Poursuite cependant...</translation>
         <translation>Le point se trouve en dehors de l&apos;enveloppe de vol</translation>
     </message>
     <message>
-        <source>QInf = %1 </source>
-        <translation type="obsolete">QInf = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2566"/>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2567"/>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2568"/>
+        <source>V = %1 </source>
+        <translation>V = %1 </translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2590"/>
+        <source>CL/CD = %1 </source>
+        <translation>CZ/CX = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2573"/>
@@ -8352,28 +8196,37 @@ Poursuite cependant...</translation>
         <translation>Rendement = %1 </translation>
     </message>
     <message>
-        <source>Cl/Cd = %1 </source>
-        <translation type="obsolete">Cz/Cx = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2594"/>
+        <source>Cl = %1 </source>
+        <translation>Cz = %1 </translation>
     </message>
     <message>
-        <source>GCm = %1 </source>
-        <translation type="obsolete">GCm = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2598"/>
+        <source>Cm = %1 </source>
+        <translation type="unfinished">Cm = %1 </translation>
     </message>
     <message>
-        <source>Rolling Moment = %1 </source>
-        <translation type="obsolete">Moment de roulis = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2602"/>
+        <source>Cn = %1 </source>
+        <translation type="unfinished">Cn = %1 </translation>
     </message>
     <message>
-        <source>Induced Moment = %1 </source>
-        <translation type="obsolete">Moment induit = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2614"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11802"/>
+        <source>X_NP = %1 </source>
+        <translation type="unfinished">X_NP = %1 </translation>
     </message>
     <message>
-        <source>Airfoil Yawing Moment = %1 </source>
-        <translation type="obsolete">Moment de lacet du profil = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2620"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11808"/>
+        <source>X_CP = %1 </source>
+        <translation type="unfinished">X_CP = %1 </translation>
     </message>
     <message>
-        <source>XCP = %1 </source>
-        <translation type="obsolete">XCP = %1 </translation>
+        <location filename="../src/Miarex/GLCreateLists.cpp" line="2625"/>
+        <location filename="../src/Miarex/Miarex.cpp" line="11813"/>
+        <source>X_CG = %1 </source>
+        <translation type="unfinished">X_CG = %1 </translation>
     </message>
     <message>
         <location filename="../src/Miarex/GLCreateLists.cpp" line="2633"/>
@@ -8401,7 +8254,7 @@ Poursuite cependant...</translation>
     <message>
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="172"/>
         <source>Upper side points</source>
-        <translation type="unfinished">Points d&apos;extrados</translation>
+        <translation>Points d&apos;extrados</translation>
     </message>
     <message>
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="173"/>
@@ -9506,12 +9359,12 @@ Surface inférieure
     <message>
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="144"/>
         <source>Upper side</source>
-        <translation type="unfinished">Face supérieure</translation>
+        <translation>Face supérieure</translation>
     </message>
     <message>
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="145"/>
         <source>Lower side</source>
-        <translation type="unfinished">Face inférieure</translation>
+        <translation>Face inférieure</translation>
     </message>
     <message>
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="148"/>
@@ -10354,7 +10207,7 @@ Les cadres ont un nombre de points par face différent</translation>
     <message>
         <location filename="../src/Miarex/W3dPrefsDlg.cpp" line="81"/>
         <source>Streamlines</source>
-        <translation type="unfinished"></translation>
+        <translation>Lignes de courant</translation>
     </message>
     <message>
         <location filename="../src/Miarex/W3dPrefsDlg.cpp" line="94"/>
@@ -10624,10 +10477,6 @@ Les cadres ont un nombre de points par face différent</translation>
         <translation>Re au saumon =</translation>
     </message>
     <message>
-        <source>Qinf.sqrt(Cl) =</source>
-        <translation type="obsolete">Qinf.sqrt(Cz) =</translation>
-    </message>
-    <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="978"/>
         <source>Root Re.sqrt(Cl) =</source>
         <translation>Re emplanture.sqrt(Cz) =</translation>
@@ -10700,7 +10549,7 @@ Les cadres ont un nombre de points par face différent</translation>
     <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="973"/>
         <source>Vinf.sqrt(Cl) =</source>
-        <translation type="unfinished"></translation>
+        <translation>Vinf.sqrt(Cz) =</translation>
     </message>
     <message>
         <location filename="../src/Miarex/WPolarDlg.cpp" line="810"/>
