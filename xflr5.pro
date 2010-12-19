@@ -8,7 +8,8 @@ SOURCES += src/MainFrame.cpp \
     src/Globals.cpp \
     src/TwoDWidget.cpp \
     src/GLWidget.cpp \
-    src/Miarex/ArcBall.cpp \
+	src/XFLR5Application.cpp \
+	src/Miarex/ArcBall.cpp \
     src/Miarex/BodyGridDlg.cpp \
     src/Miarex/BodyScaleDlg.cpp \
     src/Miarex/BodyTableDelegate.cpp \
@@ -104,14 +105,15 @@ SOURCES += src/MainFrame.cpp \
     src/Design/LECircleDlg.cpp \
     src/Design/AFoil.cpp \
     src/Design/SplineCtrlsDlg.cpp \
-    src/Design/AFoilTableDlg.cpp \
-    src/XFLR5Application.cpp
+	src/Design/AFoilTableDlg.cpp
+
 HEADERS += src/MainFrame.h \
     src/Params.h \
     src/Globals.h \
     src/TwoDWidget.h \
     src/GLWidget.h \
-    src/Miarex/Miarex.h \
+	src/XFLR5Application.h \
+	src/Miarex/Miarex.h \
     src/Miarex/W3dPrefsDlg.h \
     src/Miarex/GLCreateLists.h \
     src/Miarex/WingScaleDlg.h \
@@ -207,16 +209,19 @@ HEADERS += src/MainFrame.h \
     src/Design/LECircleDlg.h \
     src/Design/SplineCtrlsDlg.h \
     src/Design/FoilTableDelegate.h \
-    src/Design/AFoilTableDlg.h \
-    src/XFLR5Application.h
+	src/Design/AFoilTableDlg.h
+
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \
     translations/xflr5v6_fr.ts
+
 RESOURCES += xflr5.qrc
+
 win32 { 
     TARGET = XFLR5
     RC_FILE = win/xflr5.rc
 }
+
 unix { 
     TARGET = xflr5
     
@@ -230,6 +235,7 @@ unix {
     INSTALLS += target
     target.path = $$BINDIR
 }
+
 macx { 
     TARGET = XFLR5
     TEMPLATE = app

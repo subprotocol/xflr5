@@ -14549,13 +14549,13 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("CL"));
 			break;
 		case 2:
-			pGraph->SetXTitle(tr("VCd"));
+			pGraph->SetXTitle(tr("VCD"));
 			break;
 		case 3:
-			pGraph->SetXTitle(tr("ICd"));
+			pGraph->SetXTitle(tr("ICD"));
 			break;
 		case 4:
-			pGraph->SetXTitle(tr("Cd"));
+			pGraph->SetXTitle(tr("CD"));
 			break;
 		case 5:
 			pGraph->SetXTitle(tr("Cm"));// Total Pitching moment coef.
@@ -14579,21 +14579,21 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("ICn"));// Induced yawing moment
 			break;
 		case 12:
-			pGraph->SetXTitle(tr("Cl/Cd"));
+			pGraph->SetXTitle(tr("CL/CD"));
 			break;
 		case 13:
-			pGraph->SetXTitle(tr("Cl^(3/2)/Cd"));
+			pGraph->SetXTitle(tr("CL^(3/2)/CD"));
 			break;
 		case 14:
-			pGraph->SetXTitle(tr("1/Rt(Cl)"));
+			pGraph->SetXTitle(tr("1/Rt(CL)"));
 			break;
 		case 15:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Lift (N)"));
-			else pGraph->SetXTitle(tr("Lift (lbf)"));
+			else                            pGraph->SetXTitle(tr("Lift (lbf)"));
 			break;
 		case 16:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Drag (N)"));
-			else pGraph->SetXTitle(tr("Drag (lbf)"));
+			else                            pGraph->SetXTitle(tr("Drag (lbf)"));
 			break;
 		case 17:
 			pGraph->SetXTitle(tr("Vx ")+StrSpeed);
@@ -14657,13 +14657,13 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("CL"));
 			break;
 		case 2:
-			pGraph->SetYTitle(tr("VCd"));
+			pGraph->SetYTitle(tr("VCD"));
 			break;
 		case 3:
-			pGraph->SetYTitle(tr("ICd"));
+			pGraph->SetYTitle(tr("ICD"));
 			break;
 		case 4:
-			pGraph->SetYTitle(tr("Cd"));
+			pGraph->SetYTitle(tr("CD"));
 			break;
 		case 5:
 			pGraph->SetYTitle(tr("Cm"));// Total Pitching moment coef.
@@ -14687,21 +14687,21 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("ICn"));// Induced yawing moment
 			break;
 		case 12:
-			pGraph->SetYTitle(tr("Cl/Cd"));
+			pGraph->SetYTitle(tr("CL/CD"));
 			break;
 		case 13:
-			pGraph->SetYTitle(tr("Cl^(3/2)/Cd"));
+			pGraph->SetYTitle(tr("CL^(3/2)/CD"));
 			break;
 		case 14:
-			pGraph->SetYTitle(tr("1/Rt(Cl)"));
+			pGraph->SetYTitle(tr("1/Rt(CL)"));
 			break;
 		case 15:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Lift (N)"));
-			else pGraph->SetYTitle(tr("Lift (lbf)"));
+			else                            pGraph->SetYTitle(tr("Lift (lbf)"));
 			break;
 		case 16:
 			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Drag (N)"));
-			else pGraph->SetYTitle(tr("Drag (lbf)"));
+			else                            pGraph->SetYTitle(tr("Drag (lbf)"));
 			break;
 		case 17:
 			pGraph->SetYTitle(tr("Vx ")+StrSpeed);

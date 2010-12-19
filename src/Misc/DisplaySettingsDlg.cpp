@@ -150,8 +150,8 @@ void DisplaySettingsDlg::InitDialog()
 
 void DisplaySettingsDlg::OnStyleChanged(const QString &StyleName)
 {
-//	qApp->setStyle(StyleName);
-	QMessageBox::information(window(), tr("Warning"), "The new style will take effect at the next session");
+	qApp->setStyle(StyleName);
+//	QMessageBox::information(window(), tr("Warning"), "The new style will take effect at the next session");
 
 	m_StyleName = StyleName;
 }

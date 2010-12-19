@@ -2665,6 +2665,7 @@ void QAFoil::PaintSplines(QPainter &painter)
 			CtrlPen.setStyle(Qt::SolidLine);
 			CtrlPen.setColor(m_pSF->m_FoilColor);
 			painter.setPen(CtrlPen);
+
 			m_pSF->DrawCtrlPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
 
 			if (m_pSF->m_bCenterLine)

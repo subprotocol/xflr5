@@ -103,34 +103,34 @@ void CSpline::DrawCtrlPoints(QPainter &painter, double const &scalex, double con
 	width  = 3;
 
 	static QPen PointPen;
+	static QBrush NoBrush(Qt::NoBrush);
 	PointPen.setWidth(1);
 
 	painter.setPen(PointPen);
+	painter.setBrush(NoBrush);
+
 	for (i=0; i<m_iCtrlPoints; i++)
 	{
 		pt.rx() = (int)( m_Input[i].x*scalex + Offset.x());
 		pt.ry() = (int)(-m_Input[i].y*scaley + Offset.y());
 
-//		if(m_rViewRect.contains(pt))
-//		{
-			if (m_iSelect==i) 
-			{
-				PointPen.setWidth(2);
-				PointPen.setColor(QColor(0,0,150));
-			}
-			else if(m_iHighlight==i) 
-			{
-				PointPen.setWidth(2);
-				PointPen.setColor(QColor(255,0,0));
-			}
-			else
-			{
-				PointPen.setWidth(1);
-				PointPen.setColor(m_Color);
-			}
-			painter.setPen(PointPen);
-			painter.drawEllipse(pt.x()-width, pt.y()-width, 2*width, 2*width);
-//		}
+		if (m_iSelect==i)
+		{
+			PointPen.setWidth(2);
+			PointPen.setColor(QColor(0,0,150));
+		}
+		else if(m_iHighlight==i)
+		{
+			PointPen.setWidth(2);
+			PointPen.setColor(QColor(255,0,0));
+		}
+		else
+		{
+			PointPen.setWidth(1);
+			PointPen.setColor(m_Color);
+		}
+		painter.setPen(PointPen);
+		painter.drawEllipse(pt.x()-width, pt.y()-width, 2*width, 2*width);
 	}
 	painter.restore();
 }
