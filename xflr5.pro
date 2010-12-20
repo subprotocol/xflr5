@@ -236,11 +236,24 @@ unix {
 }
 
 macx { 
+    CONFIG(release, debug|release) { 
+        OBJECTS_DIR = ./build/release
+        MOC_DIR = ./build/release
+        RCC_DIR = ./build/release
+        UI_HEADERS_DIR = ./build/release
+    }
+    CONFIG(debug, debug|release) { 
+        OBJECTS_DIR = ./build/debug
+        MOC_DIR = ./build/debug
+        RCC_DIR = ./build/debug
+        UI_HEADERS_DIR = ./build/debug
+    }
     TARGET = XFLR5
     TEMPLATE = app
-    // CONFIG += i386
+    CONFIG += i386 \
+        ppc
     QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
-    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.6.sdk
+    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
     OTHER_FILES += mac/Info.plist
     LIBS += -framework \
         CoreFoundation

@@ -71,11 +71,11 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
 #ifdef Q_WS_MAC
         // F.Meschia 20101101 -- this is unnecessary, in fact, so I commented it out
-        /*
+
         QDir dir(qApp->applicationDirPath());
         dir.cdUp();
         jpegPluginPath = dir.canonicalPath() + "/PlugIns/imageformats/libqjpeg.dylib";
-        */
+
 #endif
 #ifdef Q_WS_WIN
 	QDir dir(qApp->applicationDirPath());
@@ -86,7 +86,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	jpegPluginPath = dir.canonicalPath() + "/imageformats/libqjpeg.so";
 #endif
 
-#ifndef Q_WS_MAC
         if (dir.exists(jpegPluginPath))
 	{
 		QPluginLoader jpegPluginLoad(jpegPluginPath);
@@ -97,7 +96,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 			QMessageBox::information(window(), tr("Info"), errorMessage);
 		}
 	}
-#endif
 
 	setWindowTitle(m_VersionName);
 	setWindowIcon(QIcon(":/images/xflr5_64.png"));
