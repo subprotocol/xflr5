@@ -1,0 +1,16 @@
+Source: xflr5
+Section: x11
+Priority: extra
+Maintainer: Karoliina Salminen <karoliina.t.salminen@gmail.com>
+Build-Depends: debhelper (>= 5), libc6 (>= 2.1.3), libgcc1 (>= 1:4.1.1), libgl1-mesa | libgl1, libgl1-mesa-glx | libgl1, libglu1-mesa | libglu1, libqt4-opengl (>= 4.6.0), libqtcore4 (>= 4.6.0), libqtgui4 (>= 4.6.0), libstdc++6 (>= 4.1.1)
+Standards-Version: 3.7.2
+
+Package: xflr5
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: XFLR5 is an analysis tool for airfoils, 
+ wings and planes operating at low Reynolds Numbers.
+ It includes 
+ 1. XFoil's Direct and Inverse analysis capabilities
+ 2. Wing design analysis based on the Lifiting Line 
+    Theory and the Vortex Lattice Method

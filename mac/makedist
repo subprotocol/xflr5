@@ -1,0 +1,12 @@
+#!/bin/sh
+#set -x
+rm -r mac_release/XFLR5/*
+cp -r XFLR5.app mac_release/XFLR5/
+macdeployqt mac_release/XFLR5/XFLR5.app
+cp License.txt mac_release/XFLR5/
+cp ReadMe.txt mac_release/XFLR5/
+cp doc/ReleaseNotes.txt mac_release/XFLR5/
+cp doc/Guidelines.pdf mac_release/XFLR5/
+rm mac_release/XFLR5.dmg
+hdiutil create mac_release/XFLR5.dmg -srcfolder mac_release/XFLR5
+hdiutil internet-enable -yes mac_release/XFLR5.dmg
