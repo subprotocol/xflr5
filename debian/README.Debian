@@ -1,0 +1,7 @@
+qflr5 for Ubuntu/Debian
+-----------------------
+
+Debianized the package.
+QFLR5 is an aifoil and wing simulation software by Andre Deperrois <xflr5@yahoo.com>.
+
+ -- Karoliina Salminen <karoliina.t.salminen@gmail.com>  Fri, 15 May 2009 11:54:02 +0300
