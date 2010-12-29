@@ -43,7 +43,6 @@ void * BatchThreadDlg::s_pXDirect;
 
 BatchThreadDlg::BatchThreadDlg(void *pParent)
 {
-
 	QString str = tr("Multi-threaded batch analysis");
 	setWindowTitle(str);
 
@@ -812,7 +811,7 @@ void BatchThreadDlg::StartThread()
 		bool bAllFinished = true;
 		for (int it=0; it<m_nThreads; it++)
 		{
-			if(!m_pXFoilTask[it].m_bIsFinished)
+			if(m_pXFoilTask+it && !m_pXFoilTask[it].m_bIsFinished)
 			{
 				bAllFinished = false;
 				break;

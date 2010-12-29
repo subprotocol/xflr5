@@ -4092,6 +4092,7 @@ bool XFoil::InitXFoilAnalysis(CPolar *pPolar)
 			}
 		}
 	}
+	return true;
 }
 
 

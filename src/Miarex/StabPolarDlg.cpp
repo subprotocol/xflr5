@@ -1125,7 +1125,7 @@ void StabPolarDlg::OnAVLControls()
 	FillControlList();
 	SetWPolarName();
 
-	QShowEvent *event;
+	QShowEvent *event = NULL;
 	showEvent(event);
 }
 

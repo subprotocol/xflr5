@@ -212,6 +212,8 @@ void BatchDlg::SetupLayout()
 	QGroupBox *TransVarsGroup = new QGroupBox(tr("Forced transitions"));
 	{
 		QGridLayout *TransVars = new QGridLayout;
+		TransVars->setColumnStretch(0,4);
+		TransVars->setColumnStretch(1,1);
 		QLabel *TopTransLabel = new QLabel(tr("Top transition location (x/c)"));
 		QLabel *BotTransLabel = new QLabel(tr("Bottom transition location (x/c)"));
 		TopTransLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
