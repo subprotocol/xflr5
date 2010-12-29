@@ -121,7 +121,7 @@ void XFoilAnalysisDlg::SetupLayout()
 
 void XFoilAnalysisDlg::reject()
 {
-	m_pXFoil->m_bCancel = true;
+	XFoil::s_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
 	m_pXFile->close();
@@ -131,7 +131,7 @@ void XFoilAnalysisDlg::reject()
 
 void XFoilAnalysisDlg::accept()
 {
-	m_pXFoil->m_bCancel = true;
+	XFoil::s_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;
 	m_pXFile->close();
@@ -387,7 +387,7 @@ void XFoilAnalysisDlg::OnCancelAnalysis()
 {
 	m_bSkip = true;
 	m_bExit = true;
-	m_pXFoil->m_bCancel = true;
+	XFoil::s_bCancel= true;
 	if(m_bFinished) reject();
 }
 
@@ -538,7 +538,7 @@ void XFoilAnalysisDlg::StartAnalysis()
 	m_bSkip     = false;
 	m_bExit     = false;
 	m_bFinished = false;
-	m_pXFoil->m_bCancel = false;
+	XFoil::s_bCancel = false;
 
 	//all set to launch the analysis
 	if (!m_bType4)

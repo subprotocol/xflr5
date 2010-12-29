@@ -46,6 +46,7 @@ class QXDirect : public QWidget
 	friend class TwoDWidget;
 	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
 	friend class FoilPolarDlg;
 	friend class QFoilGeomDlg;
 	friend class QTEGapDlg;
@@ -79,6 +80,7 @@ private slots:
 	void OnAnimate(bool bChecked);
 	void OnAnimateSpeed(int val);
 	void OnBatchAnalysis();
+	void OnMultiThreadedBatchAnalysis();
 	void OnCpi();
 	void OnCurOppOnly();
 	void OnCurveStyle(int index);
@@ -212,8 +214,8 @@ protected:
 	void UpdateCurve();
 
 
-	bool InitXFoil(CFoil *pFoil=NULL);
-	void InitXFoil2();
+//	bool InitXFoil(CFoil *pFoil=NULL);
+//	void InitXFoil2();
 
 	void * GetVariable(CPolar *pPolar, int iVar);
 	OpPoint* GetOpPoint(double Alpha);

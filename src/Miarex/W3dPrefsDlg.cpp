@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QCheckBox>
 #include <QGridLayout>
+#include <QColorDialog>
 #include "W3dPrefsDlg.h"
 #include "../Misc/LinePickerDlg.h"
 
@@ -44,6 +45,7 @@ W3dPrefsDlg::W3dPrefsDlg()
 	connect(m_pctrlStreamLines, SIGNAL(clicked()), SLOT(OnStreamLines()));
 	connect(m_pctrlWakePanels, SIGNAL(clicked()), SLOT(OnWakePanels()));
 	connect(m_pctrlShowWake, SIGNAL(clicked()), SLOT(OnShowWake()));
+	connect(m_pctrlMassColor, SIGNAL(clicked()), SLOT(OnMasses()));
 }
 
 
@@ -61,7 +63,7 @@ void W3dPrefsDlg::InitDialog()
 	m_pctrlDownwash->SetStyle(m_DownwashStyle, m_DownwashWidth, m_DownwashColor);
 	m_pctrlWakePanels->SetStyle(m_WakeStyle, m_WakeWidth, m_WakeColor);
 	m_pctrlStreamLines->SetStyle(m_StreamLinesStyle, m_StreamLinesWidth, m_StreamLinesColor);
-	m_pctrlShowWake->setChecked(m_bWakePanels);
+	m_pctrlMassColor->SetColor(m_MassColor);
 	m_pctrlShowWake->setChecked(m_bWakePanels);
 }
 
@@ -79,6 +81,21 @@ void W3dPrefsDlg::SetupLayout()
 	QLabel *lab10 = new QLabel(tr("Downwash"));
 	QLabel *lab11 = new QLabel(tr("WakePanels"));
 	QLabel *lab12 = new QLabel(tr("Streamlines"));
+	QLabel *lab13 = new QLabel(tr("Masses"));
+	lab1->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab2->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab3->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab4->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab5->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab6->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab7->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab8->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab9->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab10->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab11->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab12->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab13->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+
 	m_pctrlAxis     = new LineButton;
 	m_pctrlOutline  = new LineButton;
 	m_pctrlVLMMesh  = new LineButton;
@@ -91,21 +108,27 @@ void W3dPrefsDlg::SetupLayout()
 	m_pctrlDownwash    = new LineButton;
 	m_pctrlWakePanels  = new LineButton;
 	m_pctrlStreamLines  = new LineButton;
+	m_pctrlMassColor = new ColorButton;
 	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 
 	QGridLayout *PrefsLayout = new QGridLayout;
+	PrefsLayout->setColumnStretch(1,1);
+	PrefsLayout->setColumnStretch(2,2);
+	PrefsLayout->setColumnStretch(3,1);
+	PrefsLayout->setColumnStretch(4,2);
 	PrefsLayout->addWidget(lab1,1,1);
 	PrefsLayout->addWidget(lab2,2,1);
 	PrefsLayout->addWidget(lab3,3,1);
 	PrefsLayout->addWidget(lab4,4,1);
 	PrefsLayout->addWidget(lab5,5,1);
 	PrefsLayout->addWidget(lab6,6,1);
-	PrefsLayout->addWidget(lab7,7,1);
-	PrefsLayout->addWidget(lab8,8,1);
-	PrefsLayout->addWidget(lab9,9,1);
-	PrefsLayout->addWidget(lab10,10,1);
-	PrefsLayout->addWidget(lab11,11,1);
-	PrefsLayout->addWidget(lab12,12,1);
+	PrefsLayout->addWidget(lab7,1,3);
+	PrefsLayout->addWidget(lab8,2,3);
+	PrefsLayout->addWidget(lab9,3,3);
+	PrefsLayout->addWidget(lab10,4,3);
+	PrefsLayout->addWidget(lab11,5,3);
+	PrefsLayout->addWidget(lab12,6,3);
+	PrefsLayout->addWidget(lab13,7,3);
 
 	PrefsLayout->addWidget(m_pctrlAxis,1,2);
 	PrefsLayout->addWidget(m_pctrlOutline,2,2);
@@ -113,13 +136,14 @@ void W3dPrefsDlg::SetupLayout()
 	PrefsLayout->addWidget(m_pctrlTopTrans,4,2);
 	PrefsLayout->addWidget(m_pctrlBotTrans,5,2);
 	PrefsLayout->addWidget(m_pctrlLift,6,2);
-	PrefsLayout->addWidget(m_pctrlMoments,7,2);
-	PrefsLayout->addWidget(m_pctrlInducedDrag,8,2);
-	PrefsLayout->addWidget(m_pctrlViscousDrag,9,2);
-	PrefsLayout->addWidget(m_pctrlDownwash,10,2);
-	PrefsLayout->addWidget(m_pctrlWakePanels,11,2);
-	PrefsLayout->addWidget(m_pctrlStreamLines,12,2);
-	PrefsLayout->addWidget(m_pctrlShowWake,13,1,1,2);
+	PrefsLayout->addWidget(m_pctrlShowWake,7,1,1,2);
+	PrefsLayout->addWidget(m_pctrlMoments,1,4);
+	PrefsLayout->addWidget(m_pctrlInducedDrag,2,4);
+	PrefsLayout->addWidget(m_pctrlViscousDrag,3,4);
+	PrefsLayout->addWidget(m_pctrlDownwash,4,4);
+	PrefsLayout->addWidget(m_pctrlWakePanels,5,4);
+	PrefsLayout->addWidget(m_pctrlStreamLines,6,4);
+	PrefsLayout->addWidget(m_pctrlMassColor,7,4);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("OK"));
@@ -133,14 +157,29 @@ void W3dPrefsDlg::SetupLayout()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	MainLayout->addStretch(1);
 	MainLayout->addLayout(PrefsLayout);
 	MainLayout->addStretch(1);
+	MainLayout->addSpacing(20);
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
 
 	setLayout(MainLayout);
 }
 
+void W3dPrefsDlg::OnMasses()
+{
+	bool bOK = true;
+
+	QRgb rgb = m_MassColor.rgba();
+	rgb = QColorDialog::getRgba(rgb, &bOK);
+	if(bOK)
+	{
+		m_MassColor = QColor::fromRgba(rgb);
+		m_pctrlMassColor->SetColor(m_MassColor);
+	}
+	repaint();
+}
 
 void W3dPrefsDlg::OnWingColor()
 {

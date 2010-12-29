@@ -191,6 +191,7 @@ private slots:
 	void OnPanels();
 	void OnVortices();
 	void OnFoilNames();
+	void OnMasses();
 	void OnDownwash();
 	void OnMoment();
 	void OnResetWingScale();
@@ -368,7 +369,7 @@ private:
 	LineDelegate *m_pStyleDelegate, *m_pWidthDelegate;
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
-	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices;
+	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices, *m_pctrlMasses;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 	QSlider *m_pctrlClipPlanePos;
 
@@ -432,6 +433,7 @@ protected:
 	bool m_b3DCp, m_bDownwash; 	// defines whether the corresponding data should be displayed
 	bool m_bMoments;							// defines whether the corresponfing data should be displayed
 	bool m_bFoilNames;
+	bool m_bShowMasses;
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
 	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
@@ -603,6 +605,8 @@ public:
 
 	int m_StreamLinesStyle, m_StreamLinesWidth;
 	QColor m_StreamLinesColor;
+
+	QColor m_MassColor;
 
 	QColor m_CpColor;
 	int m_CpStyle, m_CpWidth;

@@ -16,6 +16,8 @@
 
 
 xflr5 v6.03 (Beta ?) 2011
+	- added multi-threading capability for foil batch analysis
+	- added an option to display the position of point masses in 3d-view
 	- in the export to AVL of point masses, corrected the missing addition of wing x & z position
 	- modified the export format to AVL of with wing flaps
 	- added an option to highlight the currently selected operating point, or the mode in root locs view

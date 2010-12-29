@@ -50,11 +50,14 @@ public:
 private:
 	void SetupLayout();
 	void showEvent(QShowEvent *event);
+	void SetEnabled();
+
 
 private slots:
 	void OnSlider(int pos);
 	void OnChanged();
 	void OnDefaults();
+	void OnLight();
 
 private:
 	QSlider *m_pctrlRed;
@@ -77,6 +80,7 @@ private:
 	QCheckBox *m_pctrlShade;
 	QCheckBox *m_pctrlSmooth;
 	QCheckBox *m_pctrlLocalView;
+	QCheckBox *m_pctrlLight;
 
 	QPushButton *m_pctrlDefaults, *m_pctrlClose;
 
@@ -92,6 +96,7 @@ private:
 	int m_iMatShininess;
 	bool m_bCullFaces, m_bShade, m_bSmooth, m_bLocalView, m_bDepthTest;
 	bool m_bColorMaterial;
+	bool m_bLight;
 
 public:
 

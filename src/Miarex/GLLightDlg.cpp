@@ -83,6 +83,8 @@ GLLightDlg::GLLightDlg()
 	connect(m_pctrlSmooth, SIGNAL(clicked()), this, SLOT(OnChanged()));
 	connect(m_pctrlLocalView, SIGNAL(clicked()), this, SLOT(OnChanged()));
 
+	connect(m_pctrlLight, SIGNAL(clicked()), this, SLOT(OnLight()));
+
 }
 
 void GLLightDlg::SetupLayout()
@@ -266,7 +268,9 @@ void GLLightDlg::SetupLayout()
 	TopLayout->addLayout(LeftSide);
 	TopLayout->addLayout(RightSide);
 
+	m_pctrlLight = new QCheckBox(tr("Light"));
 	QVBoxLayout *MainLayout = new QVBoxLayout;
+	MainLayout->addWidget(m_pctrlLight);;
 	MainLayout->addLayout(TopLayout);
 	MainLayout->addLayout(CommandButtons);
 
@@ -297,6 +301,7 @@ void GLLightDlg::OnDefaults()
 {
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 
+	m_bLight = true;
 	m_bCullFaces = false;
 	m_bShade     = true;
 	m_bSmooth    = true;
@@ -323,7 +328,7 @@ void GLLightDlg::OnDefaults()
 	m_ZLight   =  0.68f;
 
 	SetParams();
-
+	SetEnabled();
 	pMiarex->UpdateView();
 }
 
@@ -331,6 +336,8 @@ void GLLightDlg::OnDefaults()
 
 void GLLightDlg::ReadParams(void)
 {
+	m_bLight = m_pctrlLight->isChecked();
+
 	m_Red     = (float)m_pctrlRed->value()    /100.0f;
 	m_Green   = (float)m_pctrlGreen->value()  /100.0f;
 	m_Blue    = (float)m_pctrlBlue->value()   /100.0f;
@@ -361,6 +368,7 @@ void GLLightDlg::ReadParams(void)
 
 void GLLightDlg::SetParams(void)
 {
+	m_pctrlLight->setChecked(m_bLight);
 	float factor = 50.0f;
 	m_pctrlXLight->setValue((int)((m_XLight+1.0)*factor));
 	m_pctrlYLight->setValue((int)((m_YLight+1.0)*factor));
@@ -455,5 +463,51 @@ bool GLLightDlg::SaveSettings(QSettings *pSettings)
 void GLLightDlg::showEvent(QShowEvent *event)
 {
 	SetParams();
+	SetEnabled();
 }
+
+
+void GLLightDlg::OnLight()
+{
+	m_bLight = m_pctrlLight->isChecked();
+	SetEnabled();
+}
+
+
+void GLLightDlg::SetEnabled()
+{
+	m_pctrlRed->setEnabled(m_bLight);
+	m_pctrlGreen->setEnabled(m_bLight);
+	m_pctrlBlue->setEnabled(m_bLight);
+
+	m_pctrlAmbient->setEnabled(m_bLight);
+	m_pctrlDiffuse->setEnabled(m_bLight);
+	m_pctrlSpecular->setEnabled(m_bLight);
+
+	m_pctrlMatAmbient->setEnabled(m_bLight);
+	m_pctrlMatSpecular->setEnabled(m_bLight);
+	m_pctrlMatDiffuse->setEnabled(m_bLight);
+	m_pctrlMatEmission->setEnabled(m_bLight);
+	m_pctrlMatShininess->setEnabled(m_bLight);
+
+	m_pctrlCullFaces->setEnabled(m_bLight);
+	m_pctrlColorMaterial->setEnabled(m_bLight);
+	m_pctrlSmooth->setEnabled(m_bLight);
+	m_pctrlShade->setEnabled(m_bLight);
+	m_pctrlLocalView->setEnabled(m_bLight);
+	m_pctrlDepthTest->setEnabled(m_bLight);
+
+	m_pctrlXLight->setEnabled(m_bLight);
+	m_pctrlYLight->setEnabled(m_bLight);
+	m_pctrlZLight->setEnabled(m_bLight);
+
+}
+
+
+
+
+
+
+
+
 

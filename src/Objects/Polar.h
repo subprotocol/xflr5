@@ -34,9 +34,12 @@ class CPolar
 	friend class QMiarex;
 	friend class QXDirect;
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
+	friend class XFoilTask;
 	friend class XFoilAnalysisDlg;
 	friend class EditPlrDlg;
 	friend class PolarPropsDlg;
+	friend class XFoil;
 
 private:
 	static void *s_pMainFrame;

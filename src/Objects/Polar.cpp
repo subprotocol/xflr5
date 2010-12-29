@@ -212,7 +212,7 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 {
 	int i;
 	bool bInserted = false;
-    int size = (int)m_Alpha.size();
+	int size = (int)m_Alpha.size();
 	if(size)
 	{
 		for ( i=0; i<size; i++)

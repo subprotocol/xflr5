@@ -33,6 +33,7 @@
 #include <math.h>
 #include <complex>
 #include "../Objects/Foil.h"
+#include "../Objects/Polar.h"
 
 using namespace std;
 	//------ derived dimensioning limit parameters
@@ -69,6 +70,7 @@ class XFoil
 	friend class NacaFoilDlg;
 	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
 
 
 //-----Specific Inverse MDES-------------------------------
@@ -191,6 +193,8 @@ public:
 	bool mrcl(double cls, double &m_cls, double &r_cls);
 	bool fcpmin();
 	bool Initialize();
+	bool InitXFoilGeometry(CFoil *pFoil);
+	bool InitXFoilAnalysis(CPolar *pPolar);
 	void pangen();
 	bool Preprocess();
 	bool restoreblData(int icom);
@@ -362,7 +366,7 @@ private:
 //	QString name, namepol, codepol, nameref;
 //	QString ispars;
 
-	bool m_bCancel;
+	static bool s_bCancel;
 
 	bool m_bFullReport;
 //	bool lpacc,lqvdes,,lqrefl,lcpref,lforef,lpfile,lpfilx;

@@ -23,7 +23,12 @@
 #define BATCHDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QDialog>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QLabel>
+#include <QRadioButton>
+#include <QTextEdit>
 #include "../Graph/QGraph.h"
 #include "../Graph/GraphWidget.h"
 #include "../Objects/Foil.h"

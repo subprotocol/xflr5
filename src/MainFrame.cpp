@@ -44,6 +44,7 @@
 #include "Graph/GraphDlg.h"
 #include "XDirect/XDirect.h"
 #include "XDirect/BatchDlg.h"
+#include "XDirect/BatchThreadDlg.h"
 #include "XDirect/NacaFoilDlg.h"
 #include "XDirect/InterpolateFoilsDlg.h"
 #include "XDirect/CAddDlg.h"
@@ -65,7 +66,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = "XFLR5 v6.03 Beta";
+	m_VersionName = "XFLR5 v6.Thread";
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
@@ -1067,6 +1068,9 @@ void MainFrame::CreateDockWindows()
 	BatchDlg::s_pXFoil            = pXDirect->m_pXFoil;
 	BatchDlg::s_pMainFrame        = this;
 	BatchDlg::s_pXDirect          = m_pXDirect;
+	BatchThreadDlg::s_pXFoil            = pXDirect->m_pXFoil;
+	BatchThreadDlg::s_pMainFrame        = this;
+	BatchThreadDlg::s_pXDirect          = m_pXDirect;
 
 	GraphDlg::s_pMainFrame = this;
 	GraphDlg::s_ActivePage = 0;
@@ -1934,9 +1938,13 @@ void MainFrame::CreateXDirectActions()
 	definePolar->setStatusTip(tr("Defines a single analysis/polar"));
 	connect(definePolar, SIGNAL(triggered()), pXDirect, SLOT(OnDefinePolar()));
 
-	defineBatch = new QAction(tr("Batch Analysis")+"Shift+F6", this);
+	defineBatch = new QAction(tr("Batch Analysis")+"\tShift+F6", this);
 	defineBatch->setStatusTip(tr("Launches a batch of analysis calculation for a specified range or list of Reynolds numbers"));
 	connect(defineBatch, SIGNAL(triggered()), pXDirect, SLOT(OnBatchAnalysis()));
+
+	MultiThreadedBatchAct = new QAction(tr("Multi-threaded Batch Analysis")+"\tCtrl+F6", this);
+	MultiThreadedBatchAct->setStatusTip(tr("Launches a batch of analysis calculation using all available computer CPU cores"));
+	connect(MultiThreadedBatchAct, SIGNAL(triggered()), pXDirect, SLOT(OnMultiThreadedBatchAnalysis()));
 
 	deletePolar = new QAction(tr("Delete"), this);
 	deletePolar->setStatusTip(tr("Deletes the currently selected polar"));
@@ -2163,11 +2171,16 @@ void MainFrame::CreateXDirectMenus()
 	DesignMenu->addAction(InterpolateFoils);
 	DesignMenu->addAction(NacaFoils);
 
+	XFoilAnalysisMenu = menuBar()->addMenu(tr("Analysis"));
+	XFoilAnalysisMenu->addAction(definePolar);
+	XFoilAnalysisMenu->addAction(defineBatch);
+	XFoilAnalysisMenu->addAction(MultiThreadedBatchAct);
+	XFoilAnalysisMenu->addSeparator();
+	XFoilAnalysisMenu->addAction(resetXFoil);
+	XFoilAnalysisMenu->addAction(viewXFoilAdvanced);
+	XFoilAnalysisMenu->addAction(viewLogFile);
+
 	PolarMenu = menuBar()->addMenu(tr("&Polars"));
-	PolarMenu->addAction(definePolar);
-	PolarMenu->addAction(defineBatch);
-	PolarMenu->addAction(exportAllPolars);
-	PolarMenu->addSeparator();
 	currentPolarMenu = PolarMenu->addMenu(tr("Current Polar"));
 	currentPolarMenu->addAction(ShowPolarProps);
 	currentPolarMenu->addAction(editCurPolar);
@@ -2182,6 +2195,8 @@ void MainFrame::CreateXDirectMenus()
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(m_pImportXFoilPolar);
 //	PolarMenu->addAction(m_pImportJavaFoilPolar);
+	PolarMenu->addSeparator();
+	PolarMenu->addAction(exportAllPolars);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(XDirectPolarFilter);
 	PolarMenu->addSeparator();
@@ -2201,7 +2216,6 @@ void MainFrame::CreateXDirectMenus()
 	GraphPolarMenu->addSeparator();
 	GraphPolarMenu->addAction(highlightOppAct);
 
-	PolarMenu->addSeparator();
 
 	OpPointMenu = menuBar()->addMenu(tr("Operating Points"));
 	currentOppMenu = OpPointMenu->addMenu(tr("Current OpPoint"));
@@ -2235,11 +2249,6 @@ void MainFrame::CreateXDirectMenus()
 	OpPointMenu->addAction(hideAllOpPoints);
 	OpPointMenu->addAction(showAllOpPoints);
 
-	XFoilAnalysisMenu = menuBar()->addMenu(tr("Analysis"));
-	XFoilAnalysisMenu->addAction(resetXFoil);
-	XFoilAnalysisMenu->addAction(viewXFoilAdvanced);
-	XFoilAnalysisMenu->addAction(viewLogFile);
-
 	//XDirect foil Context Menu
 	OperFoilCtxMenu = new QMenu(tr("Context Menu"),this);
 	OperFoilCtxMenu->addMenu(currentFoilMenu);
@@ -2259,6 +2268,7 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(definePolar);
 	OperFoilCtxMenu->addAction(defineBatch);
+	OperFoilCtxMenu->addAction(MultiThreadedBatchAct);
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(showAllPolars);
 	OperFoilCtxMenu->addAction(hideAllPolars);
@@ -2289,6 +2299,7 @@ void MainFrame::CreateXDirectMenus()
 	OperPolarCtxMenu->addSeparator();//_______________
 	OperPolarCtxMenu->addAction(definePolar);
 	OperPolarCtxMenu->addAction(defineBatch);
+	OperPolarCtxMenu->addAction(MultiThreadedBatchAct);
 	OperPolarCtxMenu->addSeparator();//_______________
 	OperPolarCtxMenu->addAction(showAllPolars);
 	OperPolarCtxMenu->addAction(hideAllPolars);
@@ -5810,9 +5821,9 @@ void MainFrame::SetMenus()
 		menuBar()->addMenu(XDirectViewMenu);
 		menuBar()->addMenu(FoilMenu);
 		menuBar()->addMenu(DesignMenu);
+		menuBar()->addMenu(XFoilAnalysisMenu);
 		menuBar()->addMenu(PolarMenu);
 		menuBar()->addMenu(OpPointMenu);
-		menuBar()->addMenu(XFoilAnalysisMenu);
 		menuBar()->addMenu(optionsMenu);
 		menuBar()->addMenu(helpMenu);
 	}
@@ -5837,7 +5848,6 @@ void MainFrame::SetMenus()
 	}
 	else if(m_iApp== MIAREX)
 	{
-
 		menuBar()->clear();
 		menuBar()->addMenu(fileMenu);
 		menuBar()->addMenu(MiarexViewMenu);

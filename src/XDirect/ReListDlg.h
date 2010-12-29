@@ -35,6 +35,8 @@ class ReListDlg : public QDialog
 {
 	Q_OBJECT
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
+
 public:
 	ReListDlg();
 	void InitDialog();

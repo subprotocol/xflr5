@@ -60,6 +60,7 @@ class MainFrame : public QMainWindow
 	friend class BodyGridDlg;
 	friend class XFoilAnalysisDlg;
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
 	friend class InterpolateFoilsDlg;
 	friend class WingDlg;
 	friend class WPolarDlg;
@@ -317,6 +318,7 @@ private:
 
 	//XDirect Actions
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch, *resetCurPolar;
+	QAction *MultiThreadedBatchAct;
 	QAction *restoreToolbarsAct;
 	QAction *exportCurPolar, *exportAllPolars, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
 	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;

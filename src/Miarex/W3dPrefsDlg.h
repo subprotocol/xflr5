@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include "../Misc/LineButton.h"
+#include "../Misc/ColorButton.h"
 
 
 
@@ -53,7 +54,7 @@ private slots:
 	void OnStreamLines();
 	void OnVLMMesh();
 	void OnShowWake();
-
+	void OnMasses();
 
 private:
 	void SetupLayout();
@@ -63,6 +64,9 @@ private:
 	LineButton *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
 	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;
 	LineButton *m_pctrlStreamLines, *m_pctrlWakePanels;
+
+	ColorButton *m_pctrlMassColor;
+
 	QCheckBox *m_pctrlShowWake;
 
 	int m_3DAxisStyle, m_3DAxisWidth;
@@ -89,6 +93,8 @@ private:
 	QColor m_StreamLinesColor;
 	int m_WakeStyle, m_WakeWidth;
 	QColor m_WakeColor;
+
+	QColor m_MassColor;
 
 	bool m_bWakePanels;
 

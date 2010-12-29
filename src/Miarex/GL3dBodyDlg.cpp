@@ -39,7 +39,6 @@
 #include <QHeaderView>
 #include <math.h>
 
-
 //2D
 #define BODYAXIALLINES      1304
 #define BODYFRAME		    1305
@@ -188,6 +187,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	connect(m_pctrlAxes,       SIGNAL(clicked()), this, SLOT(OnAxes()));
 	connect(m_pctrlPanels,     SIGNAL(clicked()), this, SLOT(OnPanels()));
 	connect(m_pctrlLight,      SIGNAL(clicked()), this, SLOT(OnLight()));
+	connect(m_pctrlShowMasses, SIGNAL(clicked()), this, SLOT(OnShowMasses()));
 	connect(m_pctrlSurfaces,   SIGNAL(clicked()), this, SLOT(OnSurfaces()));
 	connect(m_pctrlOutline,    SIGNAL(clicked()), this, SLOT(OnOutline()));
 	connect(m_pctrlFlatPanels, SIGNAL(clicked()), this, SLOT(OnLineType()));
@@ -2725,7 +2725,7 @@ void GL3dBodyDlg::GLInverseMatrix()
 void GL3dBodyDlg::GLRenderBody()
 {
 	int width;
-
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	GLdouble pts[4];
 
@@ -2873,6 +2873,7 @@ void GL3dBodyDlg::GLRenderBody()
 
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
+
 			if(m_pBody && m_pFrame && (m_bOutline||m_bSurfaces)) glCallList(BODYFRAME3D);
 			if(m_bOutline && m_pBody)	glCallList(BODYGEOM);
 			if(m_bVLMPanels && m_pBody)
@@ -2880,6 +2881,23 @@ void GL3dBodyDlg::GLRenderBody()
 				if(!m_bSurfaces)//else panels will be filled by Cp color
 					glCallList(BODYMESHBACK);
 				glCallList(BODYMESHPANELS);
+			}
+
+			if(m_bShowMasses)
+			{
+				glColor3d(pMiarex->m_MassColor.redF(),pMiarex->m_MassColor.greenF(),pMiarex->m_MassColor.blueF());
+				double radius = .02;//2cm
+
+				for(int im=0; im<m_pBody->m_NMass; im++)
+				{
+					glPushMatrix();
+					{
+						glTranslated(m_pBody->m_MassPosition[im].x,m_pBody->m_MassPosition[im].y,m_pBody->m_MassPosition[im].z);
+						GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
+						m_pglWidget->renderText(0.0, 0.0, 0.02, m_pBody->m_MassTag[im]);
+					}
+					glPopMatrix();
+				}
 			}
 		}
 		glPopMatrix();
@@ -2890,7 +2908,6 @@ void GL3dBodyDlg::GLRenderBody()
 		glDisable(GL_CLIP_PLANE4);
 	}
 	glPopMatrix();
-
 	glFinish();
 }
 
@@ -3099,6 +3116,7 @@ void GL3dBodyDlg::InitDialog()
 	m_pctrlPanels->setChecked(m_bVLMPanels);
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlLight->setChecked(m_bglLight);
+	m_pctrlShowMasses->setChecked(m_bShowMasses);
 	m_pctrlSurfaces->setChecked(m_bSurfaces);
 	m_pctrlOutline->setChecked(m_bOutline);
 	m_pctrlClipPlanePos->setValue((int)(m_ClipPlanePos*100.0));
@@ -3859,6 +3877,14 @@ void GL3dBodyDlg::OnInsert()
 void GL3dBodyDlg::OnLight()
 {
 	m_bglLight = m_pctrlLight->isChecked();
+	UpdateView();
+}
+
+
+
+void GL3dBodyDlg::OnShowMasses()
+{
+	m_bShowMasses = m_pctrlShowMasses->isChecked();
 	UpdateView();
 }
 
@@ -4709,16 +4735,18 @@ void GL3dBodyDlg::SetupLayout()
 	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
 	m_pctrlOutline    = new QCheckBox(tr("Outline"));
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
+	m_pctrlShowMasses = new QCheckBox(tr("Masses"));
 	m_pctrlAxes->setSizePolicy(szPolicyMinimum);
 	m_pctrlLight->setSizePolicy(szPolicyMinimum);
 	m_pctrlSurfaces->setSizePolicy(szPolicyMinimum);
 	m_pctrlOutline->setSizePolicy(szPolicyMinimum);
 	m_pctrlPanels->setSizePolicy(szPolicyMinimum);
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
-	ThreeDParams->addWidget(m_pctrlLight, 1,2);
+	ThreeDParams->addWidget(m_pctrlPanels, 1,2);
+	ThreeDParams->addWidget(m_pctrlLight, 1,3);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-	ThreeDParams->addWidget(m_pctrlPanels, 2,3);
+	ThreeDParams->addWidget(m_pctrlShowMasses, 2,3);
 
 	m_pctrlX          = new QPushButton(tr("X"));
 	m_pctrlY          = new QPushButton(tr("Y"));

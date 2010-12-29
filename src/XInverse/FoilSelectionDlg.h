@@ -33,6 +33,7 @@ class FoilSelectionDlg : public QDialog
 	Q_OBJECT
 	friend class QXInverse;
 	friend class BatchDlg;
+	friend class BatchThreadDlg;
 
 public:
     FoilSelectionDlg();

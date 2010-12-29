@@ -37,6 +37,8 @@ SOURCES += src/MainFrame.cpp \
     src/Miarex/WingScaleDlg.cpp \
     src/Miarex/WPolarDlg.cpp \
     src/XDirect/BatchDlg.cpp \
+    src/XDirect/BatchThreadDlg.cpp \
+    src/XDirect/XFoilTask.cpp \
     src/XDirect/CAddDlg.cpp \
     src/XDirect/FoilCoordDlg.cpp \
     src/XDirect/FoilGeomDlg.cpp \
@@ -158,6 +160,8 @@ HEADERS += src/MainFrame.h \
     src/XDirect/FlapDlg.h \
     src/XDirect/CAddDlg.h \
     src/XDirect/BatchDlg.h \
+    src/XDirect/BatchThreadDlg.h \
+    src/XDirect/XFoilTask.h \
     src/XInverse/XInverse.h \
     src/XInverse/InverseOptionsDlg.h \
     src/XInverse/FoilSelectionDlg.h \

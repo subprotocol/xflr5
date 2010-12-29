@@ -35,7 +35,8 @@
 #include "TwoDPanelDlg.h"
 #include "InterpolateFoilsDlg.h"
 #include "NacaFoilDlg.h"
-#include "BatchDlg.h" 
+#include "BatchDlg.h"
+#include "BatchThreadDlg.h"
 #include "FoilCoordDlg.h"
 #include "FoilGeomDlg.h"
 #include "TEGapDlg.h"
@@ -1133,115 +1134,6 @@ QGraph* QXDirect::GetGraph(QPoint &pt)
 
 
 
-bool QXDirect::InitXFoil(CFoil *pFoil)
-{
-	//loads pFoil in XFoil,
-	//calculates normal vectors,
-	//and sets results in current foil
-
-	if(!pFoil) 
-	{
-		pFoil = g_pCurFoil;
-	}
-	if(!pFoil) return false;
-	   
-	int i, k;
-
-	m_pXFoil->m_FoilName = pFoil->m_FoilName;
-	for (i =0; i<pFoil->n; i++)
-	{
-		m_pXFoil->xb[i+1] = pFoil->x[i];
-		m_pXFoil->yb[i+1] = pFoil->y[i];
-	}
-
-	m_pXFoil->nb = pFoil->n;
-//	if(pFoil->m_bTEFlap){
-//		m_pXFoil->lflap  = true;
-//		m_pXFoil->lbflap = true;
-//	}
-//	else {
-		m_pXFoil->lflap  = false;
-		m_pXFoil->lbflap = false;
-//	}
-
-	m_pXFoil->ddef = 0.0;
-	m_pXFoil->xbf  = 1.0;
-	m_pXFoil->ybf  = 0.0;
-
-	m_pXFoil->lscini = false;
-	m_pXFoil->lqspec = false;
-	m_pXFoil->lvisc  = false;
-//	m_pXFoil->acrit      = pFoil->m_NCrit;
-//	m_pXFoil->xstrip[1]  = pFoil->m_XTopTr;
-//	m_pXFoil->xstrip[2]  = pFoil->m_XBotTr;
-
-	if(m_pCurPolar)
-	{
-		m_pXFoil->acrit      = m_pCurPolar->m_ACrit;
-		m_pXFoil->xstrip[1]  = m_pCurPolar->m_XTop;
-		m_pXFoil->xstrip[2]  = m_pCurPolar->m_XBot;
-	}
-
-	if(m_pXFoil->Preprocess())
-	{
-		m_pXFoil->CheckAngles();
-		for (k=0; k<m_pXFoil->n;k++)
-		{
-			pFoil->nx[k] = m_pXFoil->nx[k+1];
-			pFoil->ny[k] = m_pXFoil->ny[k+1];
-		}
-		pFoil->n = m_pXFoil->n;
-		return true;
-	}
-	else
-	{
-		QMessageBox::warning(window(), tr("Warning"), tr("Unrecognized foil format")+" "+pFoil->m_FoilName);
-		return false;
-	}
-}
-
-void QXDirect::InitXFoil2()
-{
-	//Sets Analysis parameters in XFoil
-	if(!m_pCurPolar) return;
-
-	m_pXFoil->lblini = false;
-	m_pXFoil->lipan = false;
-	m_bInitBL = !m_pXFoil->lblini;
-	m_pctrlInitBL->setChecked(m_bInitBL);
-
-	m_pXFoil->m_bTrace = false;
-
-	m_pXFoil->reinf1 = m_pCurPolar->m_Reynolds;
-	if (m_pCurPolar->m_Type == 4) m_pXFoil->alfa = m_pCurPolar->m_ASpec*PI/180.0;
-
-	m_pXFoil->minf1  = m_pCurPolar->m_Mach;
-
-	m_pXFoil->retyp  = m_pCurPolar->m_ReType;
-	m_pXFoil->matyp  = m_pCurPolar->m_MaType;
-
-	if(m_pCurPolar)
-	{
-		m_pXFoil->acrit      = m_pCurPolar->m_ACrit;
-		m_pXFoil->xstrip[1]  = m_pCurPolar->m_XTop;
-		m_pXFoil->xstrip[2]  = m_pCurPolar->m_XBot;
-	}
-
-	m_pXFoil->lalfa = true;
-	m_pXFoil->qinf  = 1.0;
-
-	if (m_pCurPolar->m_Mach > 0.000001)
-	{
-		if(!m_pXFoil->SetMach())
-		{
-			QString str;
-			str = tr("... Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-			QMessageBox::warning(window(), tr("Warning"),str);
-
-		}
-	}
-}
-
 void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 {
 	if(!pNewPoint) return;
@@ -1428,8 +1320,9 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			OnOpPoints();
 			break;
 		case Qt::Key_F6:
-			if (event->modifiers().testFlag(Qt::ShiftModifier)) OnBatchAnalysis();
-			else                                                OnDefinePolar();
+			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnBatchAnalysis();
+			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnMultiThreadedBatchAnalysis();
+			else                                                       OnDefinePolar();
 			break;
 		case Qt::Key_F8:
 			if(m_bPolar) return;
@@ -1994,6 +1887,82 @@ void QXDirect::OnBatchAnalysis()
 }
 
 
+void QXDirect::OnMultiThreadedBatchAnalysis()
+{
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!g_pCurFoil) 		return;
+
+	if(QThread::idealThreadCount()<2)
+	{
+		QString strange = QString(tr("Not enough threads available for multithreading\nONly %1")).arg(QThread::idealThreadCount());
+		QMessageBox::warning(pMainFrame, tr("Warning"), strange);
+		return;
+
+	}
+
+	m_bPolar = true;
+	OnPolars();
+	UpdateView();
+
+	BatchThreadDlg BDlg;
+	BDlg.move(pMainFrame->m_DlgPos);
+	BDlg.m_pCurFoil  = g_pCurFoil;
+	BDlg.m_Mach      = 0.0;
+	BDlg.m_ReMin     = m_Reynolds;
+	BDlg.m_ReMax     = m_ReynoldsMax;
+	BDlg.m_ReInc     = m_ReynoldsDelta;
+	BDlg.m_Type      = 1;
+	BDlg.m_IterLim   = m_IterLim;
+	BDlg.m_bAlpha    = true;
+	BDlg.m_AlphaMin  = m_Alpha;
+	BDlg.m_AlphaMax  = m_AlphaMax;
+	BDlg.m_AlphaInc  = m_AlphaDelta;
+	BDlg.m_ClMin     = m_Cl;
+	BDlg.m_ClMax     = m_ClMax;
+	BDlg.m_ClInc     = m_ClDelta;
+	BDlg.m_NCrit     = m_NCrit;
+	BDlg.m_XTopTr    = m_XTopTr;
+	BDlg.m_XBotTr    = m_XBotTr;
+	BDlg.m_ReList    = m_ReList;
+	BDlg.m_MachList  = m_MachList;
+	BDlg.m_NCritList = m_NCritList;
+	BDlg.m_NRe       = m_NRe;
+	BDlg.m_bFromList = m_bFromList;
+	BDlg.m_bFromZero = m_bFromZero;
+	BDlg.InitDialog();
+
+	if(BDlg.exec()==QDialog::Accepted) pMainFrame->SetSaveState(false);
+	pMainFrame->m_DlgPos = BDlg.pos();
+
+	m_Reynolds         = BDlg.m_ReMin;
+	m_ReynoldsMax      = BDlg.m_ReMax;
+	m_ReynoldsDelta    = BDlg.m_ReInc;
+	m_Alpha            = BDlg.m_AlphaMin;
+	m_AlphaMax         = BDlg.m_AlphaMax;
+	m_AlphaDelta       = BDlg.m_AlphaInc;
+	m_Cl               = BDlg.m_ClMin;
+	m_ClMax            = BDlg.m_ClMax;
+	m_ClDelta          = BDlg.m_ClInc;
+	m_Mach             = BDlg.m_Mach;
+	m_Type             = BDlg.m_Type;
+	m_NCrit            = BDlg.m_NCrit;
+	m_XTopTr           = BDlg.m_XTopTr;
+	m_XBotTr           = BDlg.m_XBotTr;
+	m_NRe              = BDlg.m_NRe;
+	m_bAlpha           = BDlg.m_bAlpha;
+	m_bFromList        = BDlg.m_bFromList;
+	m_bFromZero        = BDlg.m_bFromZero;
+
+	SetPolar();
+	pMainFrame->UpdatePolars();
+
+	m_pCurOpp = NULL;
+
+	SetControls();
+	UpdateView();
+}
+
+
 void QXDirect::OnCadd()
 {
 	StopAnimate();
@@ -2037,7 +2006,7 @@ void QXDirect::OnCadd()
 	{
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
 	m_bShowPanels = bState;
@@ -3082,7 +3051,7 @@ void QXDirect::OnFoilCoordinates()
 		m_BufferFoil.m_TEYHinge = Yh;
 //		SetFoilFlap(&m_BufferFoil);
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
 	m_BufferFoil.m_iHighLight = -1;
@@ -3131,7 +3100,7 @@ void QXDirect::OnFoilGeom()
 	{
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
 	UpdateView();
@@ -3728,7 +3697,7 @@ void QXDirect::OnInterpolateFoils()
 	else
 	{
 		SetBufferFoil();// restore buffer foil.. from current foil
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
 	pMainFrame->m_DlgPos = dlg.pos();
@@ -3811,7 +3780,7 @@ void QXDirect::OnNacaFoils()
 		g_pCurFoil = (CFoil*)ptr0;
 		m_pCurOpp  = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
 	SetControls();
@@ -3828,7 +3797,7 @@ void QXDirect::OnNormalizeFoil()
 
 
 	double length = g_pCurFoil->NormalizeGeometry();
-	InitXFoil();
+	m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	SetBufferFoil();
 	str = QString(tr("The foil has been normalized from %1  to 1.000")).arg(length,7,'f',3);
 	pMainFrame->SetSaveState(false);
@@ -3987,7 +3956,7 @@ void QXDirect::OnPanels()
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
 
@@ -4206,8 +4175,11 @@ void QXDirect::OnResetXFoil()
 	m_pXFoil->Initialize();
 	m_pXFoil->lblini = false;
 	m_pXFoil->lipan  = false;
-	InitXFoil();
-	InitXFoil2();
+	m_pXFoil->InitXFoilGeometry(g_pCurFoil);
+	m_pXFoil->InitXFoilAnalysis(m_pCurPolar);
+	m_bInitBL = true;
+	m_pctrlInitBL->setChecked(m_bInitBL);
+
 }
 
 
@@ -4369,7 +4341,7 @@ void QXDirect::OnSetFlap()
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = dlg.pos();
 	m_bPressure = bPressure;
@@ -4418,7 +4390,7 @@ void QXDirect::OnSetLERadius()
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = Ldlg.pos();
 
@@ -4472,7 +4444,7 @@ void QXDirect::OnSetTEGap()
 		//reset everything
 		m_pCurOpp = (OpPoint*)ptr;
 		SetBufferFoil();
-		InitXFoil();
+		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 	pMainFrame->m_DlgPos = Gdlg.pos();
 
@@ -5740,7 +5712,7 @@ CFoil* QXDirect::SetFoil(CFoil* pFoil)
 		}
 	}
 
-	if(g_pCurFoil && !InitXFoil())
+	if(g_pCurFoil && !m_pXFoil->InitXFoilGeometry(g_pCurFoil))
 	{
 		DeleteFoil(false);
 		g_pCurFoil = NULL;
@@ -5795,7 +5767,7 @@ CFoil* QXDirect::SetFoil(QString FoilName)
 
 	if(g_pCurFoil)
 	{
-		if(!InitXFoil())
+		if(!m_pXFoil->InitXFoilGeometry(g_pCurFoil))
 		{
 			g_pCurFoil=NULL;
 			DeleteFoil(false);
@@ -5983,11 +5955,7 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 
 	if(m_pCurPolar)
 	{
-		if(m_pCurPolar->m_FoilName == g_pCurFoil->m_FoilName)
-		{
-			InitXFoil2();
-		}
-		else
+		if(m_pCurPolar->m_FoilName != g_pCurFoil->m_FoilName)
 		{
 			CPolar *pOldPolar;
 			bool bFound = false;
@@ -5995,10 +5963,9 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 			{
 				pOldPolar = (CPolar*)m_poaPolar->at(i);
 				if ((pOldPolar->m_FoilName == g_pCurFoil->m_FoilName) &&
-					(pOldPolar->m_PlrName  == m_pCurPolar->m_PlrName))
+					(pOldPolar->m_PlrName == m_pCurPolar->m_PlrName))
 				{
 					m_pCurPolar = pOldPolar;
-					InitXFoil2();
 					bFound = true;
 					break;
 				}
@@ -6009,8 +5976,11 @@ CPolar * QXDirect::SetPolar(CPolar *pPolar)
 				m_pCurOpp   = NULL;
 			}
 		}
+		m_bInitBL = true;
+		m_pctrlInitBL->setChecked(m_bInitBL);
 	}
 
+	m_pXFoil->InitXFoilAnalysis(m_pCurPolar);
 	if (m_bPolar) CreatePolarCurves();
 	SetAnalysisParams();
 	SetOpp();
@@ -6052,18 +6022,19 @@ CPolar * QXDirect::SetPolar(QString PlrName)
 
 	if(m_pCurPolar && (m_pCurPolar->m_FoilName == g_pCurFoil->m_FoilName))
 	{
-		InitXFoil2();
+		m_pXFoil->InitXFoilAnalysis(m_pCurPolar);
 	}
 	else
 	{
 		m_pCurPolar = NULL;
 		m_pCurOpp = NULL;
 	}
+	m_bInitBL = true;
+	m_pctrlInitBL->setChecked(m_bInitBL);
 
 	if(m_pCurOpp)
 	{
-		if (m_pCurOpp->m_strFoilName != g_pCurFoil->m_FoilName ||
-			m_pCurOpp->m_strPlrName  != PlrName)
+		if (m_pCurOpp->m_strFoilName != g_pCurFoil->m_FoilName || m_pCurOpp->m_strPlrName  != PlrName)
 		{
 //			does the Opp exist for these Foil/plrs ?
 			OpPoint *pOpp;

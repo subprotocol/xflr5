@@ -28,6 +28,7 @@
 #include "StabViewDlg.h"
 #include "../Misc/ProgressDlg.h"
 
+
 void GLCreateGeom(void *pQMiarex, CWing *pWing, int List)
 {
 	if(!pWing) return;

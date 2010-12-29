@@ -365,6 +365,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_StreamLinesStyle  = 0;
 	m_StreamLinesWidth  = 1;
 	m_StreamLinesColor  = QColor(200, 150, 255);
+	m_MassColor = QColor(150, 150, 200);
+
 
 	m_CpColor = QColor(255,0,0);
 	m_CpStyle = 0;
@@ -411,6 +413,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bHalfWing          = false;
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
+	m_bShowMasses        = false;
 	m_bLongitudinal      = true;
 	m_bCurWOppOnly       = true;
 	m_bStoreWOpp         = true;
@@ -548,6 +551,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlPanels, SIGNAL(clicked()), SLOT(OnPanels()));
 	connect(m_pctrlVortices, SIGNAL(clicked()), SLOT(OnVortices()));
 	connect(m_pctrlFoilNames, SIGNAL(clicked()), SLOT(OnFoilNames()));
+	connect(m_pctrlMasses, SIGNAL(clicked()), SLOT(OnMasses()));
 	connect(m_pctrlClipPlanePos, SIGNAL(sliderMoved(int)), this, SLOT(OnClipPlane(int)));
 	connect(m_pctrlLight, SIGNAL(clicked()), SLOT(OnLight()));
 
@@ -5380,6 +5384,8 @@ void QMiarex::GLRenderView()
 	//
 	// Renders the 3D view
 	//
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
@@ -5449,7 +5455,76 @@ void QMiarex::GLRenderView()
 		if(m_bAxes)  GLDrawAxes();
 
 		GLCallViewLists();
-		if(m_bFoilNames) GLDrawFoils();
+		if(m_bFoilNames)
+		{
+			GLDrawFoils();
+		}
+		if(m_bShowMasses)
+		{
+			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
+			double radius = .02;//2cm
+			for(int iw=0; iw<MAXWINGS; iw++)
+			{
+				if(m_pWingList[iw])
+				{
+					for(int im=0; im<m_pWingList[iw]->m_NMass; im++)
+					{
+						glPushMatrix();
+						{
+							glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
+									   m_pWingList[iw]->m_MassPosition[im].y,
+									   m_pWingList[iw]->m_MassPosition[im].z);
+							if(m_pCurPlane)
+							{
+								glTranslated(m_pCurPlane->m_WingLE[iw].x,
+										   m_pCurPlane->m_WingLE[iw].y,
+										   m_pCurPlane->m_WingLE[iw].z);
+							}
+							GLRenderSphere(m_MassColor,radius,18,18);
+							pGLWidget->renderText(0.0, 0.0, 0.0 +.02, m_pWingList[iw]->m_MassTag[im]);
+
+						}
+						glPopMatrix();
+					}
+				}
+			}
+			if(m_pCurPlane)
+			{
+				for(int im=0; im<m_pCurPlane->m_NMass; im++)
+				{
+					glPushMatrix();
+					{
+						glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
+						GLRenderSphere(m_MassColor,radius,18,18);
+						pGLWidget->renderText(0.0,0.0,0.0+.02, m_pCurPlane->m_MassTag[im]);
+					}
+					glPopMatrix();
+				}
+
+			}
+			if(m_pCurBody)
+			{
+				for(int im=0; im<m_pCurBody->m_NMass; im++)
+				{
+					glPushMatrix();
+					{
+						glTranslated(m_pCurBody->m_MassPosition[im].x,m_pCurBody->m_MassPosition[im].y,m_pCurBody->m_MassPosition[im].z);
+						if(m_pCurPlane)
+						{
+							glTranslated(m_pCurPlane->m_BodyPos.x,
+									   m_pCurPlane->m_BodyPos.y,
+									   m_pCurPlane->m_BodyPos.z);
+						}
+
+						GLRenderSphere(m_MassColor,radius,18,18);
+
+						pGLWidget->renderText(0.0, 0.0, 0.0+.02, m_pCurBody->m_MassTag[im]);
+					}
+					glPopMatrix();
+				}
+
+			}
+		}
 
 		glLoadIdentity();
 		glDisable(GL_CLIP_PLANE1);
@@ -6664,6 +6739,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_StreamLinesWidth = pSettings->value("StreamLinesWidth", 1).toInt();
 		m_StreamLinesColor = pSettings->value("StreamLinesColor", QColor(150, 140, 255)).value<QColor>();
 
+		m_MassColor = pSettings->value("MassColor", QColor(100, 100, 200)).value<QColor>();
 
 		CWing::s_CvPrec       = pSettings->value("CvPrec").toDouble();
 		CWing::s_RelaxMax     = pSettings->value("RelaxMax").toDouble();
@@ -6775,7 +6851,6 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 //qDebug()<<CurveName;
 			if(m_iView==WPOLARVIEW)
 			{
-
 			}
 			else if(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW)
 			{
@@ -6790,7 +6865,6 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 						MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 						StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 						pStabView->SetMode(iMode-1);
-
 					}
 				}
 			}
@@ -7339,6 +7413,8 @@ void QMiarex::On3DPrefs()
 	SDlg.m_WakeColor      = m_WakeColor;
 	SDlg.m_WakeStyle      = m_WakeStyle;
 	SDlg.m_WakeWidth      = m_WakeWidth;
+	SDlg.m_MassColor      = m_MassColor;
+
 	SDlg.InitDialog();
 
 	if(SDlg.exec() == QDialog::Accepted)
@@ -7380,6 +7456,7 @@ void QMiarex::On3DPrefs()
 		m_StreamLinesColor      = SDlg.m_StreamLinesColor;
 		m_StreamLinesStyle      = SDlg.m_StreamLinesStyle;
 		m_StreamLinesWidth      = SDlg.m_StreamLinesWidth;
+		m_MassColor      = SDlg.m_MassColor;
 
 		m_bResetglWake = true;
 		m_bResetglBody = true;
@@ -9460,6 +9537,13 @@ void QMiarex::OnFoilNames()
 }
 
 
+void QMiarex::OnMasses()
+{
+	m_bShowMasses = m_pctrlMasses->isChecked();
+	UpdateView();
+}
+
+
 
 void QMiarex::OnGL3DScale()
 {
@@ -11077,8 +11161,11 @@ void QMiarex::OnSetupLight()
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
 	m_bShowLight = true;
 	UpdateView();
+	m_GLLightDlg.m_bLight = m_bglLight;
 	m_GLLightDlg.m_pMiarex = this;
 	m_GLLightDlg.exec();
+
+	m_bglLight = m_GLLightDlg.m_bLight;
 
 	m_bShowLight = false;
 
@@ -12485,6 +12572,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("StreamLinesStyle", m_StreamLinesStyle);
 		pSettings->setValue("StreamLinesWidth", m_StreamLinesWidth);
 		pSettings->setValue("StreamLinesColor", m_StreamLinesColor);
+
+		pSettings->setValue("MassColor", m_MassColor);
 
 		pSettings->setValue("CvPrec", CWing::s_CvPrec);
 		pSettings->setValue("RelaxMax", CWing::s_RelaxMax);
@@ -14063,13 +14152,15 @@ void QMiarex::SetupLayout()
 	m_pctrlPanels     = new QCheckBox(tr("Panels"));
 	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
 	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
+	m_pctrlMasses     = new QCheckBox(tr("Masses"));
 
 	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
-	ThreeDParams->addWidget(m_pctrlLight, 1,2);
+//	ThreeDParams->addWidget(m_pctrlLight, 1,2);
+	ThreeDParams->addWidget(m_pctrlPanels, 1,2);
 	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
 	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-	ThreeDParams->addWidget(m_pctrlPanels, 3,1);
-	ThreeDParams->addWidget(m_pctrlFoilNames, 3,2);
+	ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
+	ThreeDParams->addWidget(m_pctrlMasses, 3,2);
 
 	QGridLayout *ThreeDView = new QGridLayout;
 	m_pctrlX          = new QPushButton("X");

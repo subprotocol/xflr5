@@ -92,6 +92,7 @@ private slots:
 	void OnUndo();
 	void OnRedo();
 	void OnBodyName();
+	void OnShowMasses();
 	void OnSelChangeXDegree(int sel);
 	void OnSelChangeHoopDegree(int sel);
 	void OnOK();
@@ -167,8 +168,8 @@ private:
 
 	QWidget *m_pctrlControlsWidget;
 
-	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter, *m_pctrlGLLight;
+	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlShowMasses;
+	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 	QPushButton *m_pctrlUndo, *m_pctrlRedo;
 	QPushButton *m_pctrlOK, *m_pctrlCancel;
 
@@ -202,6 +203,7 @@ private:
 	bool m_bResetFrame;
 
 	bool m_bChanged;
+	bool m_bShowMasses;
 
 	QPoint m_MousePos;
 	QPoint m_ptPopUp;

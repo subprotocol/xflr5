@@ -75,6 +75,7 @@ private slots:
 	void OnOutline();
 	void OnPanels();
 	void OnFoilNames();
+	void OnShowMasses();
 
 	void OnOK();
 	void OnCellChanged(QWidget *pWidget);
@@ -171,6 +172,7 @@ private:
 
 	QPushButton *OKButton, *CancelButton;
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
+	QCheckBox *m_pctrlShowMasses;
 	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
 
 	QPushButton *m_pctrlInertiaButton;
@@ -204,6 +206,7 @@ private:
 	bool m_bResetglWing;
 	bool m_bResetglSectionHighlight;
 	bool m_bFoilNames;
+	bool m_bShowMasses;
 
 	int m_iSection;
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
