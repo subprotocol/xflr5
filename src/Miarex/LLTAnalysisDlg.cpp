@@ -357,9 +357,7 @@ void LLTAnalysisDlg::SetupLayout()
 	setMinimumWidth(r.width()/2);
 
 	m_pctrlTextOutput = new QTextEdit;
-	QFont CourierFont = QFont("Courier",10);
-	CourierFont.setStyleHint(QFont::Courier);
-	m_pctrlTextOutput->setFont(CourierFont);
+	m_pctrlTextOutput->setFontFamily("Courier");
 	m_pctrlTextOutput->setReadOnly(true);
 	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);

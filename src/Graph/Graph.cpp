@@ -1325,6 +1325,7 @@ CCurve*  Graph::GetClosestPoint(const double &x, const double &y, double &xSel, 
 	static double dist, dmax, x1, y1;
 	dmax = 1.e40;
 	CCurve *pOldCurve, *pCurveSel;
+	pCurveSel = NULL;
 	
 	for(i=0; i<m_oaCurves.size(); i++)
 	{
@@ -1362,7 +1363,6 @@ CCurve* Graph::GetCurvePoint(const int &xClt, const int &yClt,int &nSel)
 		if((xClt-xc)*(xClt-xc) + (yClt-yc)*(yClt-yc) <16)//sqrt(16) pixels distance
 		{
 			nSel = n;
-//qDebug("Returning %13.7f  %13.7f  %p   %d",pOldCurve->x[nSel],pOldCurve->y[nSel], pOldCurve, n);
 			return pOldCurve;
 		}
 	}

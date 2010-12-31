@@ -67,7 +67,6 @@ protected:
 	CVector m_MassPosition[MAXMASSES];
 	QString m_MassTag[MAXMASSES];
 
-	CVector m_CoG;
 	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 	double m_VolumeMass, m_TotalMass;
 
@@ -89,6 +88,7 @@ public:
 	QString m_PlaneName;
 	bool m_bFin, m_bStab;
 	double m_TailVolume;
+	CVector m_CoG;
 
 	double GetTotalMass();
 };

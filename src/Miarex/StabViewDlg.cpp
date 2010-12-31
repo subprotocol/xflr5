@@ -64,10 +64,6 @@ void StabViewDlg::Connect()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
-	connect(m_pctrlTimeView, SIGNAL(clicked()), pMiarex, SLOT(OnTimeView()));
-	connect(m_pctrlRootLocus, SIGNAL(clicked()), pMiarex, SLOT(OnRootLocusView()));
-	connect(m_pctrl3DMode, SIGNAL(clicked()), pMiarex, SLOT(OnModalView()));
-
 	connect(m_pctrlLongDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
 	connect(m_pctrlLatDynamics, SIGNAL(clicked()), pMiarex, SLOT(OnStabilityDirection()));
 
@@ -550,7 +546,7 @@ void StabViewDlg::SetMode(int iMode)
 		m_phi[0] = m_phi[1] = m_phi[2] = m_phi[3] = 0.0;
 	}
 
-	pMiarex->m_bResetglModeLegend = true;
+	pMiarex->m_bResetglLegend = true;
 
 //	if(pMiarex->m_pCurRLStabGraph && pMiarex->m_pCurWPolar) pMiarex->m_pCurRLStabGraph->DeselectPoint();
 
@@ -572,30 +568,18 @@ void StabViewDlg::SetupLayout()
 
 
 	//____________Stability direction__________
-	m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
-	m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
-	QHBoxLayout *StabilityDirLayout = new QHBoxLayout;
-	StabilityDirLayout->addStretch(1);
-	StabilityDirLayout->addWidget(m_pctrlLongDynamics);
-	StabilityDirLayout->addStretch(1);
-	StabilityDirLayout->addWidget(m_pctrlLatDynamics);
-	StabilityDirLayout->addStretch(1);
 	QGroupBox *StabilityDirBox = new QGroupBox(tr("Stability direction"));
-	StabilityDirBox->setLayout(StabilityDirLayout);
-
-
-		//____________Stability view______________________
-	QGroupBox *StabilityTypeBox = new QGroupBox(tr("Stability post-processing"));
-	QVBoxLayout *StabilityTypeLayout = new QVBoxLayout;
-	m_pctrlTimeView = new QRadioButton(tr("Time View"));
-	m_pctrlRootLocus = new QRadioButton(tr("Root Locus"));
-	m_pctrl3DMode = new QRadioButton(tr("3D Mode Animation"));
-	StabilityTypeLayout->addWidget(m_pctrlTimeView);
-	StabilityTypeLayout->addWidget(m_pctrlRootLocus);
-	StabilityTypeLayout->addWidget(m_pctrl3DMode);
-	StabilityTypeLayout->addStretch(1);
-	StabilityTypeBox->setLayout(StabilityTypeLayout);
-
+	{
+		m_pctrlLongDynamics = new QRadioButton(tr("Longitudinal"));
+		m_pctrlLatDynamics = new QRadioButton(tr("Lateral"));
+		QHBoxLayout *StabilityDirLayout = new QHBoxLayout;
+		StabilityDirLayout->addStretch(1);
+		StabilityDirLayout->addWidget(m_pctrlLongDynamics);
+		StabilityDirLayout->addStretch(1);
+		StabilityDirLayout->addWidget(m_pctrlLatDynamics);
+		StabilityDirLayout->addStretch(1);
+		StabilityDirBox->setLayout(StabilityDirLayout);
+	}
 
 	//_______________________Time view Parameters
 	QGroupBox *TimeBox = new QGroupBox(tr("Time Graph Params"));
@@ -914,7 +898,6 @@ void StabViewDlg::SetupLayout()
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
 	MainLayout->addWidget(StabilityDirBox);
-	MainLayout->addWidget(StabilityTypeBox);
 	MainLayout->addWidget(m_pctrlStackWidget);
 	setLayout(MainLayout);
 }
@@ -928,10 +911,6 @@ void StabViewDlg::SetControls()
 	QString str;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 
-	m_pctrlTimeView->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==0);
-	m_pctrlRootLocus->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==1);
-	m_pctrl3DMode->setChecked(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==3);
-
 	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
 	m_pctrlLatDynamics->setChecked(!pMiarex->m_bLongitudinal);
 
@@ -939,6 +918,7 @@ void StabViewDlg::SetControls()
 	{
 //		m_pControlModel->setRowCount(0);
 	}
+
 	if(pMiarex->m_iStabilityView==0)
 	{
 		m_pctrlStackWidget->setCurrentIndex(0);

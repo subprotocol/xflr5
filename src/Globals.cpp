@@ -2042,7 +2042,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			if (Re < pPolar->m_Reynolds)
@@ -2050,12 +2050,12 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 				bOutRe = true;
 				//interpolate Alpha on this polar
 				pX = (QList <double> *) GetPlrVariable(pPolar, PlrVar);
-				size = (int)pPolar->m_Alpha.size();
+				size = pPolar->m_Alpha.size();
 				if(Alpha < pPolar->m_Alpha[0])
 				{
 					return (*pX)[0];
 				}
-				if(Alpha > pPolar->m_Alpha[size-1])
+				else if(Alpha > pPolar->m_Alpha[size-1])
 				{
 					return (*pX)[size-1];
 				}
@@ -2084,7 +2084,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			pPolar->GetAlphaLimits(amin, amax);
@@ -2115,7 +2115,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 			bError = true;
 			return 0.000;
 		}
-		size = (int)pPolar1->m_Alpha.size();
+		size = pPolar1->m_Alpha.size();
 		if(!size)
 		{
 			bError = true;

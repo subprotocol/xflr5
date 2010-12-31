@@ -104,9 +104,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_QInfinite[i]  =  pWOpp->m_QInf;
 					m_Cl[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
-					m_ICd[i]        =  pWOpp->m_InducedDrag;
-					m_PCd[i]        =  pWOpp->m_ViscousDrag;
-					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        =  pWOpp->m_ICD;
+					m_PCd[i]        =  pWOpp->m_VCD;
+					m_TCd[i]        =  pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
 					m_VCm[i]        =  pWOpp->m_VCm;
@@ -131,9 +131,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_QInfinite.insert(i, pWOpp->m_QInf);
 					m_Cl.insert(i,   pWOpp->m_CL);
 					m_CY.insert(i,   pWOpp->m_CY);
-					m_ICd.insert(i,  pWOpp->m_InducedDrag);
-					m_PCd.insert(i,  pWOpp->m_ViscousDrag);
-					m_TCd.insert(i,  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i,  pWOpp->m_ICD);
+					m_PCd.insert(i,  pWOpp->m_VCD);
+					m_TCd.insert(i,  pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i,  pWOpp->m_GCm);
 					m_VCm.insert(i,  pWOpp->m_VCm);
@@ -177,9 +177,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Alpha[i]      = pWOpp->m_Alpha;
 					m_Cl[i]         = pWOpp->m_CL;
 					m_CY[i]         = pWOpp->m_CY;
-					m_ICd[i]        = pWOpp->m_InducedDrag;
-					m_PCd[i]        = pWOpp->m_ViscousDrag;
-					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        = pWOpp->m_ICD;
+					m_PCd[i]        = pWOpp->m_VCD;
+					m_TCd[i]        = pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        = pWOpp->m_GCm;
 					m_VCm[i]        = pWOpp->m_VCm;
@@ -204,9 +204,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Alpha.insert(i,     pWOpp->m_Alpha);
 					m_Cl.insert(i,        pWOpp->m_CL);
 					m_CY.insert(i,        pWOpp->m_CY);
-					m_ICd.insert(i,       pWOpp->m_InducedDrag);
-					m_PCd.insert(i,       pWOpp->m_ViscousDrag);
-					m_TCd.insert(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i,       pWOpp->m_ICD);
+					m_PCd.insert(i,       pWOpp->m_VCD);
+					m_TCd.insert(i,       pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i,       pWOpp->m_GCm);
 					m_VCm.insert(i,       pWOpp->m_VCm);
@@ -251,9 +251,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Alpha[i]      = pWOpp->m_Alpha;
 					m_Cl[i]         = pWOpp->m_CL;
 					m_CY[i]         = pWOpp->m_CY;
-					m_ICd[i]        = pWOpp->m_InducedDrag;
-					m_PCd[i]        = pWOpp->m_ViscousDrag;
-					m_TCd[i]        = pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        = pWOpp->m_ICD;
+					m_PCd[i]        = pWOpp->m_VCD;
+					m_TCd[i]        = pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        = pWOpp->m_GCm;
 					m_VCm[i]        = pWOpp->m_VCm;
@@ -283,9 +283,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Alpha.insert(i,     pWOpp->m_Alpha);
 					m_Cl.insert(i,        pWOpp->m_CL);
 					m_CY.insert(i,        pWOpp->m_CY);
-					m_ICd.insert(i,       pWOpp->m_InducedDrag);
-					m_PCd.insert(i,       pWOpp->m_ViscousDrag);
-					m_TCd.insert(i,       pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i,       pWOpp->m_ICD);
+					m_PCd.insert(i,       pWOpp->m_VCD);
+					m_TCd.insert(i,       pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i,       pWOpp->m_GCm);
 					m_VCm.insert(i,       pWOpp->m_VCm);
@@ -351,9 +351,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_Alpha.append(pWOpp->m_Alpha);
 		m_Cl.append(pWOpp->m_CL);
 		m_CY.append(pWOpp->m_CY);
-		m_ICd.append(pWOpp->m_InducedDrag);
-		m_PCd.append(pWOpp->m_ViscousDrag);
-		m_TCd.append(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+		m_ICd.append(pWOpp->m_ICD);
+		m_PCd.append(pWOpp->m_VCD);
+		m_TCd.append(pWOpp->m_ICD + pWOpp->m_VCD);
 
 		m_GCm.append(pWOpp->m_GCm);
 		m_VCm.append(pWOpp->m_VCm);
@@ -412,9 +412,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha[i]      =  pWOpp->m_Alpha;
 					m_Cl[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
-					m_ICd[i]        =  pWOpp->m_InducedDrag;
-					m_PCd[i]        =  pWOpp->m_ViscousDrag;
-					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        =  pWOpp->m_ICD;
+					m_PCd[i]        =  pWOpp->m_VCD;
+					m_TCd[i]        =  pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
 					m_VCm[i]        =  pWOpp->m_VCm;
@@ -439,9 +439,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha.insert(i, pWOpp->m_Alpha);
 					m_Cl.insert(i,  pWOpp->m_CL);
 					m_CY.insert(i,  pWOpp->m_CY);
-					m_ICd.insert(i, pWOpp->m_InducedDrag);
-					m_PCd.insert(i, pWOpp->m_ViscousDrag);
-					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i, pWOpp->m_ICD);
+					m_PCd.insert(i, pWOpp->m_VCD);
+					m_TCd.insert(i, pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
 					m_VCm.insert(i, pWOpp->m_VCm);
@@ -486,9 +486,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha[i]      =  pWOpp->m_Alpha;
 					m_Cl[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
-					m_ICd[i]        =  pWOpp->m_InducedDrag;
-					m_PCd[i]        =  pWOpp->m_ViscousDrag;
-					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        =  pWOpp->m_ICD;
+					m_PCd[i]        =  pWOpp->m_VCD;
+					m_TCd[i]        =  pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
 					m_VCm[i]        =  pWOpp->m_VCm;
@@ -514,9 +514,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha.insert(i, pWOpp->m_Alpha);
 					m_Cl.insert(i, pWOpp->m_CL);
 					m_CY.insert(i, pWOpp->m_CY);
-					m_ICd.insert(i, pWOpp->m_InducedDrag);
-					m_PCd.insert(i, pWOpp->m_ViscousDrag);
-					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i, pWOpp->m_ICD);
+					m_PCd.insert(i, pWOpp->m_VCD);
+					m_TCd.insert(i, pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
 					m_VCm.insert(i, pWOpp->m_VCm);
@@ -561,9 +561,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha[i]      =  pWOpp->m_Alpha;
 					m_Cl[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
-					m_ICd[i]        =  pWOpp->m_InducedDrag;
-					m_PCd[i]        =  pWOpp->m_ViscousDrag;
-					m_TCd[i]        =  pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag;
+					m_ICd[i]        =  pWOpp->m_ICD;
+					m_PCd[i]        =  pWOpp->m_VCD;
+					m_TCd[i]        =  pWOpp->m_ICD + pWOpp->m_VCD;
 
 					m_GCm[i]        =  pWOpp->m_GCm;
 					m_VCm[i]        =  pWOpp->m_VCm;
@@ -596,9 +596,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Alpha.insert(i, pWOpp->m_Alpha);
 					m_Cl.insert(i, pWOpp->m_CL);
 					m_CY.insert(i, pWOpp->m_CY);
-					m_ICd.insert(i, pWOpp->m_InducedDrag);
-					m_PCd.insert(i, pWOpp->m_ViscousDrag);
-					m_TCd.insert(i, pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+					m_ICd.insert(i, pWOpp->m_ICD);
+					m_PCd.insert(i, pWOpp->m_VCD);
+					m_TCd.insert(i, pWOpp->m_ICD + pWOpp->m_VCD);
 
 					m_GCm.insert(i, pWOpp->m_GCm);
 					m_VCm.insert(i, pWOpp->m_VCm);
@@ -656,9 +656,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_Alpha.append(pWOpp->m_Alpha);
 		m_Cl.append(pWOpp->m_CL);
 		m_CY.append(pWOpp->m_CY);
-		m_ICd.append(pWOpp->m_InducedDrag);
-		m_PCd.append(pWOpp->m_ViscousDrag);
-		m_TCd.append(pWOpp->m_InducedDrag + pWOpp->m_ViscousDrag);
+		m_ICd.append(pWOpp->m_ICD);
+		m_PCd.append(pWOpp->m_VCD);
+		m_TCd.append(pWOpp->m_ICD + pWOpp->m_VCD);
 
 		m_GCm.append(pWOpp->m_GCm);
 		m_VCm.append(pWOpp->m_VCm);
@@ -1702,18 +1702,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	PolarProperties.clear();
 
 	strong = QString(QObject::tr("Type")+" %1").arg(m_Type);
-	if(m_Type==1)      strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_Type==2) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_Type==4) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
-	else if(m_Type==7) strong += " ("+QObject::tr("Stability analysis") +")\n";
+	if(m_Type==FIXEDSPEEDPOLAR)     strong += " ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_Type==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_Type==FIXEDAOAPOLAR)  strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
+	else if(m_Type==STABILITYPOLAR) strong += " ("+QObject::tr("Stability analysis") +")\n";
 	PolarProperties += strong;
 
-	if(m_Type==1)
+	if(m_Type==FIXEDSPEEDPOLAR)
 	{
 		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf,10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
-	else if(m_Type==4)
+	else if(m_Type==FIXEDAOAPOLAR)
 	{
 		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_ASpec,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
@@ -1783,46 +1783,46 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		//wing first
 		int nFlap = 0;
 		if(pWing)
-	{
-		for (j=0; j<pWing->m_NSurfaces; j++)
 		{
-			if(pWing->m_Surface[j].m_bTEFlap)
+			for (j=0; j<pWing->m_NSurfaces; j++)
 			{
-				if(m_bActiveControl[iCtrl])
+				if(pWing->m_Surface[j].m_bTEFlap)
 				{
-					strong = QString("Wing Flap %1 : %2/%3\n")
-									.arg(nFlap+1)
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
+					if(m_bActiveControl[iCtrl])
+					{
+						strong = QString("Wing Flap %1 : %2/%3\n")
+										.arg(nFlap+1)
+										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					nFlap++;
+					iCtrl++;
 				}
-				nFlap++;
-				iCtrl++;
 			}
 		}
-	}
 
 		//elevator next and last
 		nFlap = 0;
 		if(pStab)
-	{
-		for (j=0; j<pStab->m_NSurfaces; j++)
 		{
-			if(pStab->m_Surface[j].m_bTEFlap)
+			for (j=0; j<pStab->m_NSurfaces; j++)
 			{
-				if(m_bActiveControl[iCtrl])
+				if(pStab->m_Surface[j].m_bTEFlap)
 				{
-					strong = QString("Elev. Flap %1 : %2/%3\n")
-									.arg(nFlap+1)
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
+					if(m_bActiveControl[iCtrl])
+					{
+						strong = QString("Elev. Flap %1 : %2/%3\n")
+										.arg(nFlap+1)
+										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					nFlap++;
+					iCtrl++;
 				}
-				nFlap++;
-				iCtrl++;
 			}
 		}
-	}
 
 		nFlap = 0;
 		if(pFin)

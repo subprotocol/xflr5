@@ -69,11 +69,6 @@ OpPoint::OpPoint()
 
 }
 
-OpPoint::~OpPoint()
-{
-
-}
-
 
 // This Object is  used to store the data issued from an XFoil Calculation
 // an array of OperatingPoints is a CPolar
@@ -235,6 +230,59 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType)
 	return true;
 }
 
+
+void OpPoint::GetOppProperties(QString &OpPointProperties)
+{
+	QString strong;
+	OpPointProperties.clear();
+
+	strong  = QString(QObject::tr("Re")+"    = %1 ").arg(Reynolds,7,'f',0);
+	OpPointProperties += strong +"\n";
+
+	strong  = QString(QObject::tr("Alpha")+" = %1").arg(Alpha,6,'f',2);
+	OpPointProperties += strong +QString::fromUtf8("°")+"\n";
+
+	strong  = QString(QObject::tr("Mach")+"  = %1 ").arg(Mach,7,'f',3);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("NCrit")+" = %1 ").arg(ACrit,5,'f',1);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("CL")+"    = %1 ").arg(Cl,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("CD")+"    = %1 ").arg(Cd,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("Cm")+"    = %1 ").arg(Cm,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("Cdp")+"   = %1 ").arg(Cdp,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("Cpmn")+"  = %1 ").arg(Cpmn,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("XCP")+"   = %1 ").arg(m_XCP,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("Top Transition")+" = %1 ").arg(Xtr1,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	strong  = QString(QObject::tr("Bot Transition")+" = %1 ").arg(Xtr2,9,'f',5);
+	OpPointProperties += strong + "\n";
+
+	if(m_bTEFlap)
+	{
+		strong  = QString(QObject::tr("T.E. Flap moment")+" = %1 ").arg(m_TEHMom,9,'f',5);
+		OpPointProperties += strong + "\n";
+	}
+	if(m_bLEFlap)
+	{
+		strong  = QString(QObject::tr("L.E. Flap moment")+" = %1 ").arg(m_LEHMom,9,'f',5);
+		OpPointProperties += strong + "\n";
+	}
+}
 
 
 

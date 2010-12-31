@@ -216,7 +216,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
-//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_uRHS[p]);
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -2083,12 +2082,10 @@ void PanelAnalysisDlg::SetupLayout()
 	setMinimumWidth(r.width()/2);
 
 	m_pctrlTextOutput = new QTextEdit;
-	QFont CourierFont = QFont("Courier",10);
-	CourierFont.setStyleHint(QFont::Courier);
-	m_pctrlTextOutput->setFont(CourierFont);	
 	m_pctrlTextOutput->setReadOnly(true);
 	m_pctrlTextOutput->setLineWrapMode(QTextEdit::NoWrap);
 	m_pctrlTextOutput->setWordWrapMode(QTextOption::NoWrap);
+	m_pctrlTextOutput->setFontFamily("Courier");
 
 	m_pctrlProgress = new QProgressBar;
 	m_pctrlProgress->setOrientation(Qt::Horizontal);
@@ -2812,9 +2809,6 @@ bool PanelAnalysisDlg::ControlLoop()
 		outString.clear();
 
 		pMiarex->SetControlPositions(m_pPanel, m_pNode, m_Ctrl, m_NCtrls, outString, true);
-//for(int p=0; p<m_MatSize; ++p)	qDebug("%13.9f   %13.9f   %13.9f   %13.9f   %13.9f   %13.9f",
-//								 m_pPanel[p].CtrlPt.x, m_pPanel[p].CtrlPt.y, m_pPanel[p].CtrlPt.z,
-//								 m_pPanel[p].Normal.x, m_pPanel[p].Normal.y, m_pPanel[p].Normal.z);
 
 		AddString(outString);
 		if(m_bCancel) break;
@@ -3565,7 +3559,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	//Build the unit RHS vectors along x and z in Body Axis
 	CreateUnitRHS();
 	if (m_bCancel) return false;
-//for(int p=0; p<m_MatSize; p++) qDebug("%13.7f", m_uRHS[p]);
+
 	// build the influence matrix in Body Axis
 	BuildInfluenceMatrix();
 	if (m_bCancel) return false;
@@ -4133,10 +4127,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	memcpy(m_cRHS, m_RHS, m_MatSize*sizeof(double));
 
 	Forces(m_cRHS, m_Sigma, m_AlphaEq, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-//qDebug("Force0    %13.7f   %13.7f   %13.7f   ", Force0.x, Force0.y, Force0.z);
-//qDebug("Force     %13.7f   %13.7f   %13.7f   ", Force.x, Force.y, Force.z);
-//qDebug("Moment0   %13.7f   %13.7f   %13.7f   ", Moment0.x, Moment0.y, Moment0.z);
-//qDebug("Moment    %13.7f   %13.7f   %13.7f   ", Moment.x, Moment.y, Moment.z);
+
 	// make the forward difference with nominal results
 	// which gives the stability derivative for a rotation of control ic
 	Xde = (Force-Force0).dot(is)/DeltaAngle;

@@ -163,6 +163,7 @@ private slots:
 	void OnUePlot();
 	void OnHPlot();
 
+	void OnOpPointProps();
 	void OnPolarProps();
 	void OnRenameFoil();
 

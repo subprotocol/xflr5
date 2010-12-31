@@ -39,12 +39,21 @@ class CWOpp
 	friend class CPOpp;
 	friend class StabViewDlg;
 	friend class PanelAnalysisDlg;
+	friend class PolarPropsDlg;
 
 public:
 	CWOpp();
 
+private:
+//________________METHODS____________________________________
+	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool Export(QTextStream &out, int FileType);
+	void GetBWStyle(QColor &color, int &style, int &width);
+	void GetWOppProperties(QString &WOppProperties);
+	double GetMaxLift();
 
 private:
+	static void *s_pMiarex, *s_pMainFrame;
 	QString m_WingName;	// the wing name to which the WOpp belongs
 	QString m_PlrName; 	// the polar name to which the WOpp belongs
 
@@ -89,11 +98,6 @@ private:
 	double m_BLong[MAXCONTROLS][4];
 	double m_BLat[MAXCONTROLS][4];
 	
-//________________METHODS____________________________________
-	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
-	bool Export(QTextStream &out, int FileType);
-	void GetBWStyle(QColor &color, int &style, int &width);
-	double GetMaxLift();
 
 public:
 	bool m_bOut;		// true if the WOpp is the result of an unconverged calculation
@@ -126,11 +130,11 @@ public:
 	CVector m_F[MAXSTATIONS];		// Stripforce
 	double m_FlapMoment[MAXPANELS]; 		// flap hinge moments
 
-	double m_ViscousDrag;			// wing viscous drag
-	double m_InducedDrag;			// wing induced drag
+	double m_CL;				// Wing lift coefficient
+	double m_VCD;			// wing viscous drag coefficient
+	double m_ICD;			// wing induced drag coefficient
 	double m_XCP, m_YCP;		// centre of pressure position relative to the wing's XCref
 	double m_GCm;		// wing pitching moment
-	double m_CL;				// Wing lift coefficient
 	double m_GRm;			// wing rolling moment
 	double m_VCm;		// pitching moment induced by viscous drag forces
 	double m_ICm;		// pitching moment induced by pressure forces

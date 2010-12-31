@@ -22,7 +22,6 @@
 #ifndef POLARPROPSDLG_H
 #define POLARPROPSDLG_H
 #include <QTextEdit>
-#include <QLabel>
 #include <QDialog>
 #include "../Objects/Polar.h"
 #include "../Objects/WPolar.h"
@@ -43,9 +42,11 @@ public:
 private:
 	void SetupLayout();
 
-	QLabel *m_pctrlPolarDescription;
+	QTextEdit *m_pctrlDescription;
 	CPolar *m_pPolar;
 	CWPolar *m_pWPolar;
+	CWOpp *m_pWOpp;
+	OpPoint *m_pOpp;
 
 	static void *s_pMainFrame;
 	void *m_pXDirect;

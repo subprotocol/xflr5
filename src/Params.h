@@ -88,7 +88,7 @@
 #define VLMMOMENTS              1223
 
 #define VLMWINGLIFT             1232
-#define VLMWING2LIFT		    1233
+#define VLMWING2LIFT            1233
 #define VLMSTABLIFT             1234
 #define VLMFINLIFT              1235
 
@@ -98,7 +98,7 @@
 #define VLMFINDRAG              1239
 
 #define VLMWINGWASH             1241
-#define VLMWING2WASH	        1242
+#define VLMWING2WASH            1242
 #define VLMSTABWASH             1243
 #define VLMFINWASH              1244
 
@@ -113,9 +113,9 @@
 #define VLMFINBOTTRANS          1252
 
 #define WINGSURFACES            1300
-#define WING2SURFACES		    1301
-#define STABSURFACES		    1302
-#define FINSURFACES 	        1303
+#define WING2SURFACES           1301
+#define STABSURFACES            1302
+#define FINSURFACES             1303
 
 #define WINGOUTLINE             1304
 #define WING2OUTLINE            1305
@@ -127,10 +127,10 @@
 
 #define WINGLEGEND              1376
 #define WOPPLEGEND              1377
-#define WOPPCPLEGENDCLR		    1378
-#define WOPPCPLEGENDTXT		    1379
+#define WOPPCPLEGENDCLR         1378
+#define WOPPCPLEGENDTXT         1379
 
-#define WINGWAKEPANELS		    1383
+#define WINGWAKEPANELS          1383
 #define PANELCP                 1384
 #define VLMCTRLPTS              1385
 #define VLMVORTICES             1386

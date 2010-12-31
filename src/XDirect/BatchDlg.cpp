@@ -358,7 +358,9 @@ void BatchDlg::AlphaLoop()
 				if (!pXFoil->specal())
 				{
 					str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-					QMessageBox::information(this, tr("Warning"), str);
+//					QMessageBox::information(this, tr("Warning"), str);
+					UpdateOutput(str);
+
 					m_bCancel = true;
 					CleanUp();
 					return;
@@ -722,6 +724,7 @@ bool BatchDlg::InitXFoil2()
 			QString str;
 			str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
 //			QMessageBox::information(window(), tr("Warning"), str);
+			UpdateOutput(str);
 			WriteString(str);
 		}
 	}
@@ -762,7 +765,9 @@ bool BatchDlg::Iterate()
 	{
 		pXFoil->lvconv = false;//point is unconverged
 		str =tr("CpCalc: local speed too large\n Compressibility corrections invalid");
-		QMessageBox::information(this, tr("Warning"), str);
+//		QMessageBox::information(this, tr("Warning"), str);
+		UpdateOutput(str);
+		WriteString(str);
 		m_bCancel = true;
 		CleanUp();
 		return true;
@@ -797,8 +802,10 @@ bool BatchDlg::Iterate()
 	{
 		pXFoil->lvconv = false;//point is unconverged
 		str =tr("CpCalc: local speed too large\n Compressibility corrections invalid");
-		QMessageBox::information(this, tr("Warning"), str);
+//		QMessageBox::information(this, tr("Warning"), str);
 		m_bCancel = true;
+		UpdateOutput(str);
+		WriteString(str);
 		CleanUp();
 		pXFoil->lblini = false;
 		pXFoil->lipan  = false;
@@ -1244,7 +1251,9 @@ void BatchDlg::ReLoop()
 						if (!pXFoil->specal())
 						{
 							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-							QMessageBox::information(this, tr("Warning"), str);
+//							QMessageBox::information(this, tr("Warning"), str);
+							UpdateOutput(str);
+							WriteString(str);
 							m_bCancel = true;
 							CleanUp();
 							return;
@@ -1262,7 +1271,9 @@ void BatchDlg::ReLoop()
 						if(!pXFoil->speccl())
 						{
 							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-							QMessageBox::information(this, tr("Warning"), str);
+//							QMessageBox::information(this, tr("Warning"), str);
+							UpdateOutput(str);
+							WriteString(str);
 							m_bCancel = true;
 							CleanUp();
 							return;
@@ -1309,12 +1320,12 @@ void BatchDlg::ReLoop()
 			SpMax = m_SpMin;
 			SpInc = -SpInc;
 		}
-//		strong+="\n";
+		strong+="\n";
 		if(m_bCancel) break;
 
 	}//end Re loop
 
-//	WriteString(strong);
+	WriteString(strong);
 }
 
 

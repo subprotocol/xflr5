@@ -24,7 +24,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
-#include <QHeaderView>
+#include <QtDebug>
 
 #include "../XDirect/XDirect.h"
 #include "../Miarex/Miarex.h"
@@ -35,11 +35,13 @@ void * PolarPropsDlg::s_pMainFrame;
 
 PolarPropsDlg::PolarPropsDlg()
 {
-	setWindowTitle(tr("Polar Properties"));
+	setWindowTitle(tr("Object Properties"));
 	m_pMiarex     = NULL;
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
 	m_pWPolar     = NULL;
+	m_pWOpp       = NULL;
+	m_pOpp        = NULL;
 
 	SetupLayout();
 }
@@ -47,11 +49,18 @@ PolarPropsDlg::PolarPropsDlg()
 
 void PolarPropsDlg::SetupLayout()
 {
-	QLabel *lab = new QLabel("");
-	m_pctrlPolarDescription = new QLabel;
-	QVBoxLayout *PropertiesLayout = new QVBoxLayout;
-	PropertiesLayout->addWidget(lab);
-	PropertiesLayout->addWidget(m_pctrlPolarDescription);
+	setMinimumHeight(400);
+	setMinimumWidth(450);
+
+	m_pctrlDescription = new QTextEdit;
+	m_pctrlDescription->setFontFamily("Courier");
+	m_pctrlDescription->setReadOnly(true);
+	m_pctrlDescription->setLineWrapMode(QTextEdit::NoWrap);
+	m_pctrlDescription->setWordWrapMode(QTextOption::NoWrap);
+
+//	QVBoxLayout *PropertiesLayout = new QVBoxLayout;
+//	PropertiesLayout->addWidget(lab);
+//	PropertiesLayout->addWidget(m_pctrlDescription);
 
 	QPushButton *OKButton = new QPushButton(tr("OK"));
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -61,10 +70,11 @@ void PolarPropsDlg::SetupLayout()
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
 
 	QVBoxLayout * MainLayout = new QVBoxLayout(this);
-	MainLayout->addLayout(PropertiesLayout);
-	MainLayout->addStretch(1);
+	MainLayout->addWidget(m_pctrlDescription);
+//	MainLayout->addStretch(1);
+	MainLayout->addSpacing(20);
 	MainLayout->addLayout(CommandButtons);
-	MainLayout->addStretch(1);
+//	MainLayout->addStretch(1);
 
 	setLayout(MainLayout);
 }
@@ -74,8 +84,24 @@ void PolarPropsDlg::InitDialog()
 {
 	QString strange;
 
-	if(m_pXDirect && m_pPolar)      m_pPolar->GetPolarProperties(strange);
-	else if(m_pMiarex && m_pWPolar) m_pWPolar->GetPolarProperties(strange);
+	if(m_pXDirect)
+	{
+		if(m_pPolar)     m_pPolar->GetPolarProperties(strange);
+		else if(m_pOpp)  m_pOpp->GetOppProperties(strange);
+	}
+	else if(m_pMiarex)
+	{
+		if(m_pWPolar)    m_pWPolar->GetPolarProperties(strange);
+		else if(m_pWOpp) m_pWOpp->GetWOppProperties(strange);
+	}
 
-	m_pctrlPolarDescription->setText(strange);
+	m_pctrlDescription->setText(strange);
 }
+
+
+
+
+
+
+
+

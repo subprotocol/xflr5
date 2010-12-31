@@ -82,7 +82,7 @@ private:
 
 	static void *s_pMiarex, *s_pMainFrame;
 
-	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
+//	QRadioButton *m_pctrlTimeView, *m_pctrlRootLocus, *m_pctrl3DMode;
 
 	QRadioButton *m_pctrlLongDynamics,*m_pctrlLatDynamics;
 	QRadioButton *m_pctrlRLMode1,*m_pctrlRLMode2,*m_pctrlRLMode3,*m_pctrlRLMode4;

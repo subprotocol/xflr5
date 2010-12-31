@@ -35,11 +35,11 @@ class OpPoint
 	friend class MainFrame;
 	friend class CPolar;
 	friend class QXDirect;
+	friend class PolarPropsDlg;
 
 	// An operating point is the result of an XFoil calculation
-	// for given Reynolds 
+	// for a given Reynolds
 public:
-	virtual ~OpPoint();
 	OpPoint();
 
 private:
@@ -62,17 +62,18 @@ private:
 	double m_TEHMom, m_LEHMom, XForce, YForce;
 	double Cpmn;
 
-    QString m_strFoilName;
-    QString m_strPlrName;
+	QString m_strFoilName;
+	QString m_strPlrName;
 
 	bool m_bIsVisible, m_bShowPoints;
 	int m_Style, m_Width;
-    QColor m_Color;
+	QColor m_Color;
 	
 
 private:
 	bool ExportOpp(QTextStream &out, QString Version, int FileType);
 	bool Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
+	void GetOppProperties(QString &OpPointProperties);
 };
 
 #endif

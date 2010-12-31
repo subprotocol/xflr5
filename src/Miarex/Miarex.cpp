@@ -441,7 +441,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bResetglWake       = true;
 	m_bResetglLegend     = true;
 	m_bResetglFlow       = true;
-	m_bResetglModeLegend = true;
 
 	m_bDragPoint         = false;
 	m_bArcball           = false;
@@ -480,9 +479,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 	m_pLLTDlg = new LLTAnalysisDlg;
 	CWing::s_pLLTDlg        = m_pLLTDlg;
-
-
-
 
 
 	m_pPanelDlg = new PanelAnalysisDlg;
@@ -804,8 +800,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pWOpp->m_CL                  = m_pPanelDlg->m_CL;
 			pWOpp->m_CX                  = m_pPanelDlg->m_CX;
 			pWOpp->m_CY                  = m_pPanelDlg->m_CY;
-			pWOpp->m_InducedDrag         = m_pPanelDlg->m_InducedDrag;
-			pWOpp->m_ViscousDrag         = m_pPanelDlg->m_ViscousDrag;
+			pWOpp->m_ICD                 = m_pPanelDlg->m_InducedDrag;
+			pWOpp->m_VCD                 = m_pPanelDlg->m_ViscousDrag;
 
 			pWOpp->m_GCm                 = m_pPanelDlg->m_GCm;
 			pWOpp->m_VCm                 = m_pPanelDlg->m_VCm;
@@ -1178,7 +1174,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_CL                  = m_pCurWing->m_CL;
 //			pNewPoint->m_CY                  = m_pCurWing->m_CY;
 //			pNewPoint->m_CX                  = m_pCurWing->m_CX;
-			pNewPoint->m_InducedDrag         = m_pCurWing->m_InducedDrag;
+			pNewPoint->m_ICD                 = m_pCurWing->m_InducedDrag;
 
 			pNewPoint->m_GCm                 = m_pCurWing->m_GCm;
 			pNewPoint->m_VCm                 = m_pCurWing->m_VCm;
@@ -1190,7 +1186,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_XCP                 = m_pCurWing->m_XCP;
 			pNewPoint->m_YCP                 = m_pCurWing->m_YCP;
-			pNewPoint->m_ViscousDrag         = m_pCurWing->m_ViscousDrag;
+			pNewPoint->m_VCD                 = m_pCurWing->m_ViscousDrag;
 
 			for (l=1; l<m_pCurWing->m_NStation; l++)
 			{
@@ -1228,8 +1224,8 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 			pNewPoint->m_CL                  = m_pPanelDlg->m_CL;
 			pNewPoint->m_CY                  = m_pPanelDlg->m_CY;
 			pNewPoint->m_CX                  = m_pPanelDlg->m_CX;
-			pNewPoint->m_InducedDrag         = m_pPanelDlg->m_InducedDrag;
-			pNewPoint->m_ViscousDrag         = m_pPanelDlg->m_ViscousDrag;
+			pNewPoint->m_ICD                 = m_pPanelDlg->m_InducedDrag;
+			pNewPoint->m_VCD                 = m_pPanelDlg->m_ViscousDrag;
 
 			pNewPoint->m_GCm                 = m_pPanelDlg->m_GCm;
 			pNewPoint->m_VCm                 = m_pPanelDlg->m_VCm;
@@ -1537,12 +1533,12 @@ void QMiarex::SetControls()
 	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
-	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
-	else                   pMainFrame->m_pctrlStabViewWidget->hide();
+//	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
+//	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
 
-	if(m_pCurWPolar) pMainFrame->StabilityAct->setEnabled(true);
-	else             pMainFrame->StabilityAct->setEnabled(false);
+	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
+	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
 
 	if(m_pCurWPolar)
 	{
@@ -1561,13 +1557,13 @@ void QMiarex::SetControls()
 	pMainFrame->m_pctrlWPolarView->setChecked(m_iView==WPOLARVIEW);
 	pMainFrame->m_pctrl3dView->setChecked(m_iView==W3DVIEW);
 	pMainFrame->m_pctrlCpView->setChecked(m_iView==WCPVIEW);
-	pMainFrame->m_pctrlStabilityButton->setChecked(m_iView==WSTABVIEW);
 
 	pMainFrame->WOppAct->setChecked(m_iView==WOPPVIEW);
 	pMainFrame->WPolarAct->setChecked(m_iView==WPOLARVIEW);
-	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW);
+	pMainFrame->W3DAct->setChecked(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW));
 	pMainFrame->CpViewAct->setChecked(m_iView==WCPVIEW);
-	pMainFrame->StabilityAct->setChecked(m_iView==WSTABVIEW);
+	pMainFrame->StabTimeAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW);
+	pMainFrame->RootLocusAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW);
 
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
 	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
@@ -2713,8 +2709,8 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_Span                = m_pCurWPolar->m_WSpan;
 	pWOpp->m_MAChord             = pWing->m_MAChord;
 	pWOpp->m_CL                  = pWing->m_CL;
-	pWOpp->m_InducedDrag         = pWing->m_InducedDrag;
-	pWOpp->m_ViscousDrag         = pWing->m_ViscousDrag;
+	pWOpp->m_ICD                 = pWing->m_InducedDrag;
+	pWOpp->m_VCD                 = pWing->m_ViscousDrag;
 
 	pWOpp->m_GCm                 = pWing->m_GCm;
 	pWOpp->m_VCm                 = pWing->m_VCm;
@@ -4601,52 +4597,6 @@ void QMiarex::GLToClient(CVector const &real, QPoint &point)
 }
 
 
-void QMiarex::GLCallModeLists()
-{
-	//
-	// calls the existing OpenGL lists for display in the 3D mode view
-	//
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-
-	if(m_bOutline)
-	{
-		for(int iw=0; iw<MAXWINGS; iw++)
-			if(m_pWingList[iw])   glCallList(WINGOUTLINE+iw);
-
-		if(m_pCurPlane)  glTranslated((m_pCurPlane)->m_BodyPos.x, 0.0, (m_pCurPlane)->m_BodyPos.z);
-		if(m_pCurBody)	 glCallList(BODYGEOM);
-		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->m_BodyPos.x, 0.0, -(m_pCurPlane)->m_BodyPos.z);
-	}
-
-	if(m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}
-	else
-	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-	}
-
-	if(m_bSurfaces)
-	{
-		for(int iw=0; iw<MAXWINGS; iw++)
-		{
-			if(m_pWingList[iw])  glCallList(WINGSURFACES+iw);
-		}
-		if(m_pCurBody)
-		{
-			if(m_pCurPlane)	glTranslated((m_pCurPlane)->m_BodyPos.x, 0.0, (m_pCurPlane)->m_BodyPos.z);
-			glCallList(BODYSURFACES);
-			if(m_pCurPlane)	glTranslated(-(m_pCurPlane)->m_BodyPos.x, 0.0, -(m_pCurPlane)->m_BodyPos.z);
-		}
-	}
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LIGHT0);
-}
-
 
 void QMiarex::GLCallViewLists()
 {
@@ -4659,7 +4609,6 @@ void QMiarex::GLCallViewLists()
 	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod ==3 && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
-
 	if(m_bMoments && m_pCurWOpp)			glCallList(VLMMOMENTS);
 
 	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglStream)
@@ -4668,11 +4617,10 @@ void QMiarex::GLCallViewLists()
 	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglFlow)
 		glCallList(SURFACESPEEDS);
 
-
 	if (m_pCurWOpp)                                      glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod ==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
 	if(m_bVLMPanels && m_pCurWing)
@@ -4704,7 +4652,7 @@ void QMiarex::GLCallViewLists()
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
 
 		if(m_pCurPlane)  glTranslated((m_pCurPlane)->m_BodyPos.x, 0.0, (m_pCurPlane)->m_BodyPos.z);
-		if(m_pCurBody)	 glCallList(BODYGEOM);
+		if(m_pCurBody)	  glCallList(BODYGEOM);
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->m_BodyPos.x, 0.0, -(m_pCurPlane)->m_BodyPos.z);
 	}
 
@@ -4722,7 +4670,9 @@ void QMiarex::GLCallViewLists()
 	if(m_bSurfaces)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
-			if(m_pWingList[iw])  glCallList(WINGSURFACES+iw);
+		{
+			if(m_pWingList[iw]) glCallList(WINGSURFACES+iw);
+		}
 
 		if(m_pCurBody)
 		{
@@ -5039,7 +4989,7 @@ void QMiarex::GLDraw3D()
 		m_bResetglGeom = false;
 	}
 
-	if(m_bResetglMesh && m_bVLMPanels && m_iView==W3DVIEW)
+	if(m_bResetglMesh && m_bVLMPanels && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
 		if(glIsList(MESHPANELS))
 		{
@@ -5155,7 +5105,7 @@ void QMiarex::GLDraw3D()
 				}
 				if(m_pWingList[iw])
 				{
-					GLCreateDownwash(this, m_pWingList[iw],m_pWOpp[iw], VLMWING2WASH);
+					GLCreateDownwash(this, m_pWingList[iw],m_pWOpp[iw], VLMWINGWASH+iw);
 				}
 			}
 		}
@@ -5179,7 +5129,7 @@ void QMiarex::GLDraw3D()
 		m_bResetglOpp = false;
 	}
 
-	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && m_iView==W3DVIEW)
+	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
 		if(glIsList(WINGLEGEND))
 		{
@@ -5306,79 +5256,6 @@ void QMiarex::GLInverseMatrix()
 	}
 }
 
-
-void QMiarex::GLRenderMode()
-{
-	//
-	// Renders the modal view
-	//
-	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	QString strong = QString(tr("Time =")+"%1s").arg(m_ModeTime,6,'f',3);
-
-	GLCreateModeLegend(this, m_pCurWing, m_pCurWOpp);
-
-	glDisable(GL_CLIP_PLANE1);
-
-	// Clear the viewport
-	glFlush();
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glPushMatrix();
-	{
-		GLSetupLight();
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-
-//		pGLWidget->renderText(m_r3DCltRect.left(), m_r3DCltRect.top(), strong, pMainFrame->m_TextFont);
-		pGLWidget->renderText(15, 15, strong, pMainFrame->m_TextFont);
-
-		glLoadIdentity();
-		if(m_bCrossPoint && m_bArcball)
-		{
-			glPushMatrix();
-			{
-				glTranslated(m_UFOOffset.x, m_UFOOffset.y,  0.0);
-				m_ArcBall.RotateCrossPoint();
-				glRotated(m_ArcBall.angle, m_ArcBall.p.x, m_ArcBall.p.y, m_ArcBall.p.z);
-				glCallList(ARCPOINT);
-			}
-			glPopMatrix();
-		}
-		if(m_bArcball)
-		{
-			glPushMatrix();
-			{
-				glTranslated(m_UFOOffset.x, m_UFOOffset.y,  0.0);
-				m_ArcBall.Rotate();
-				glCallList(ARCBALL);
-			}
-			glPopMatrix();
-		}
-		glTranslated(m_UFOOffset.x, m_UFOOffset.y,  0.0);
-
-		m_ArcBall.Rotate();
-
-		glScaled(m_glScaled, m_glScaled, m_glScaled);
-		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
-
-		if(m_bAxes)  GLDrawAxes();
-		glTranslated(m_ModeState[0], m_ModeState[1], m_ModeState[2]);
-		glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
-		glRotated(m_ModeState[4]*180.0/PI, 0.0, 1.0 ,0.0);
-		glRotated(m_ModeState[5]*180.0/PI, 0.0, 0.0 ,1.0);
-		if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
-
-		GLCallModeLists();
-		glCallList(MODELEGEND);
-	}
-
-	glPopMatrix();
-}
-
-
 void QMiarex::GLRenderView()
 {
 	//
@@ -5404,6 +5281,14 @@ void QMiarex::GLRenderView()
 		GLSetupLight();
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
+
+		if(m_pCurWOpp && m_pCurWOpp->m_Type==STABILITYPOLAR)
+		{
+			MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+			QString strong = QString(tr("Time =")+"%1s").arg(m_ModeTime,6,'f',3);
+			pGLWidget->renderText(15, 15, strong, pMainFrame->m_TextFont);
+		}
+
 		if(m_bShowLight)
 		{
 			glDisable(GL_LIGHTING);
@@ -5453,11 +5338,19 @@ void QMiarex::GLRenderView()
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 		if(m_bAxes)  GLDrawAxes();
 
-		GLCallViewLists();
-		if(m_bFoilNames)
+		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{
-			GLDrawFoils();
+			glTranslated(m_ModeState[0], m_ModeState[1], m_ModeState[2]);
+			glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
+			glRotated(m_ModeState[4]*180.0/PI, 0.0, 1.0 ,0.0);
+			glRotated(m_ModeState[5]*180.0/PI, 0.0, 0.0 ,1.0);
+			if(fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 		}
+
+		GLCallViewLists();
+
+		if(m_bFoilNames) GLDrawFoils();
+
 		if(m_bShowMasses)
 		{
 			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
@@ -6513,8 +6406,9 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F8:
 		{
-			if (event->modifiers().testFlag(Qt::ShiftModifier)) OnStabilityView();
-			else                                                OnWPolars();
+			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnRootLocusView();
+			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnTimeView();
+			else                                                       OnWPolars();
 			break;
 		}
 		case Qt::Key_F9:
@@ -6847,20 +6741,17 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 		{
 			QString CurveName;
 			pCloseCurve->GetTitle(CurveName);
-//qDebug()<<CurveName;
 			if(m_iView==WPOLARVIEW)
 			{
 			}
 			else if(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW)
 			{
-//qDebug()<<CurveName.left(CurveName.length()-7);
 				if(m_pCurWPolar)
 				{
 					if(m_pCurWPolar->m_PlrName==CurveName.left(CurveName.length()-7))
 					{
 						//then we select and highlight the mode
 						int iMode = CurveName.right(1).toInt();
-//qDebug()<<m_pCurWPolar->m_Alpha[n]<<m_pCurWPolar->m_Ctrl[n]<<"iMode="<<iMode;
 						MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 						StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 						pStabView->SetMode(iMode-1);
@@ -7259,15 +7150,21 @@ void QMiarex::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdo
 
 void QMiarex::On3DView()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+
 	m_bArcball = false;
+	m_iStabilityView = 3;
 	if(m_iView==W3DVIEW)
 	{
 		SetControls();
 		UpdateView();
+		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+		{
+			pMainFrame->m_pctrlStabViewWidget->show();
+		}
 		return;
 	}
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bIs3DScaleSet = false;
 
 	if(m_pCurPlane)
@@ -7285,13 +7182,18 @@ void QMiarex::On3DView()
 		m_bResetglBody = true;
 	}
 	else m_pCurBody = NULL;
+	SetControls();
 
 	pMainFrame->SetCentralWidget();
 
-	SetControls();
-	UpdateView();
-}
+	if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+	{
+		pMainFrame->m_pctrlStabViewWidget->show();
+	}
 
+	UpdateView();
+	return;
+}
 
 
 
@@ -7774,23 +7676,16 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 
-	if(m_iView!=WSTABVIEW) 
+	if(m_iView!=WSTABVIEW && m_iView!=W3DVIEW)
 	{
 		m_pTimerMode->stop();
 		return; //nothing to animate
 	}
-	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_Type==7 || !m_pCurWOpp) 
+	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_Type==STABILITYPOLAR || !m_pCurWOpp)
 	{
 		m_pTimerMode->stop();
 		return; //nothing to animate
 	}
-	
-	if(m_iStabilityView!=STAB3DVIEW)
-	{
-		m_pTimerMode->stop();
-		return; //nothing to animate
-	}
-
 
 	norm = m_ModeNorm * pStabView->m_ModeAmplitude;
 	vabs = pStabView->m_vabs;
@@ -8756,6 +8651,7 @@ void QMiarex::OnDownwash()
 {
 	m_bDownwash = m_pctrlDownwash->isChecked();
 	UpdateView();
+qDebug()<<"OnDownwash"<<m_bDownwash;
 }
 
 
@@ -9159,13 +9055,13 @@ void QMiarex::OnExportCurWOpp()
 	out << strong;
 
 	if(type==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
-		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,11, 'f', 6)
-		.arg(m_pCurWOpp->m_InducedDrag,11, 'f', 6)
-		.arg(m_pCurWOpp->m_ViscousDrag,11, 'f', 6);
+		.arg(m_pCurWOpp->m_ICD+m_pCurWOpp->m_VCD,11, 'f', 6)
+		.arg(m_pCurWOpp->m_ICD,11, 'f', 6)
+		.arg(m_pCurWOpp->m_VCD,11, 'f', 6);
 	else        strong = QString(tr("Cd=,%1,ICd=, %2,PCd=, %3\n"))
-		.arg(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag,11, 'f', 6)
-		.arg(m_pCurWOpp->m_InducedDrag,11, 'f', 6)
-		.arg(m_pCurWOpp->m_ViscousDrag,11, 'f', 6);
+		.arg(m_pCurWOpp->m_ICD+m_pCurWOpp->m_VCD,11, 'f', 6)
+		.arg(m_pCurWOpp->m_ICD,11, 'f', 6)
+		.arg(m_pCurWOpp->m_VCD,11, 'f', 6);
 	out << strong;
 
 	strong = QString(tr("Cl   = ")+sep+"%1\n").arg(m_pCurWOpp->m_GRm, 11,'g',6);
@@ -11049,33 +10945,6 @@ void QMiarex::OnStabilityDirection()
 
 
 
-void QMiarex::OnStabilityView()
-{
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	if (m_bAnimateWOpp) StopAnimate();
-
-	if(m_iView==WSTABVIEW)
-	{
-		SetControls();
-		UpdateView();
-		return;
-	}
-
-	m_iView=WSTABVIEW;
-	m_pCurGraph = NULL;
-
-	pMainFrame->SetCentralWidget();
-
-	if(m_iStabilityView==STABTIMEVIEW)       SetWingLegendPos();
-	else if(m_iStabilityView==STABPOLARVIEW) SetWPlrLegendPos();
-	CreateStabilityCurves();
-	SetCurveParams();
-	SetControls();
-
-	UpdateView();
-}
-
-
 void QMiarex::OnTimeView()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
@@ -11087,6 +10956,21 @@ void QMiarex::OnTimeView()
 	SetWingLegendPos();
 	CreateStabilityCurves();
 	
+	pMainFrame->SetCentralWidget();
+	SetCurveParams();
+	SetControls();
+	UpdateView();
+}
+
+
+void QMiarex::OnRootLocusView()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	StopAnimate();
+	m_iView = WSTABVIEW;
+	m_iStabilityView = STABPOLARVIEW;
+	SetWPlrLegendPos();
+	CreateStabilityCurves();
 	pMainFrame->SetCentralWidget();
 	SetCurveParams();
 	SetControls();
@@ -11107,19 +10991,7 @@ void QMiarex::OnModalView()
 	UpdateView();
 }
 
-void QMiarex::OnRootLocusView()
-{
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	StopAnimate();
-	m_iView = WSTABVIEW;
-	m_iStabilityView = STABPOLARVIEW;
-	SetWPlrLegendPos();
-	CreateStabilityCurves();
-	pMainFrame->SetCentralWidget();
-	SetCurveParams();
-	SetControls();
-	UpdateView();
-}
+
 
 void QMiarex::OnStreamlines()
 {
@@ -11179,21 +11051,6 @@ void QMiarex::OnStoreWOpp()
 	m_bStoreWOpp = m_pctrlStoreWOpp->isChecked();
 }
 
-
-void QMiarex::OnTimeGraph()
-{
-	m_iStabilityView = STABTIMEVIEW;
-	m_pCurGraph = m_TimeGraph;
-	CreateStabilityCurves();
-
-	if(m_iView!=WSTABVIEW) OnStabilityView();
-	else
-	{
-		SetWPlrLegendPos();
-		UpdateView();
-	}
-	SetControls();
-}
 
 
 
@@ -11265,6 +11122,7 @@ void QMiarex::OnVelocityScale(int pos)
 	m_bResetglDownwash = true;
 	UpdateView();
 }
+
 
 void QMiarex::OnVortices()
 {
@@ -11922,17 +11780,17 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 
-		Result = QString(tr("Drag Coef. = %1 ")).arg(m_pCurWOpp->m_ViscousDrag+m_pCurWOpp->m_InducedDrag, 9,'f',4);
+		Result = QString(tr("Drag Coef. = %1 ")).arg(m_pCurWOpp->m_VCD+m_pCurWOpp->m_ICD, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
 		/*		oswald=CZ^2/CXi/PI/allongement;*/
 		double cxielli=m_pCurWOpp->m_CL*m_pCurWOpp->m_CL/PI/m_pCurWing->m_AR;
-		Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_InducedDrag, 9,'f',4);
+		Result = QString(tr("Efficiency = %1 ")).arg(cxielli/m_pCurWOpp->m_ICD, 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
-		Result = QString(tr("Cl/Cd = %1 ")).arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_InducedDrag+m_pCurWOpp->m_ViscousDrag), 9,'f',4);
+		Result = QString(tr("Cl/Cd = %1 ")).arg(m_pCurWOpp->m_CL/(m_pCurWOpp->m_ICD+m_pCurWOpp->m_VCD), 9,'f',4);
 		D+=dheight;
 		painter.drawText(RightPos, ZPos+D, dwidth, dheight, Qt::AlignRight | Qt::AlignTop, Result);
 
@@ -12873,7 +12731,6 @@ void QMiarex::Set3DScale()
 		m_UFOOffset.x = 0.0;
 		m_UFOOffset.y = 0.0;
 	}
-	m_bResetglModeLegend = true;
 }
 
 
@@ -12881,7 +12738,6 @@ void QMiarex::Set3DScale()
 void QMiarex::SetAnalysisParams()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-//	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 	m_pctrlSequence->setChecked(m_bSequence);
 
 	m_pctrlAlphaMax->setEnabled(m_bSequence);
@@ -14452,6 +14308,8 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	m_pPanelDlg->m_NSurfaces   = m_NSurfaces;
 	m_pPanelDlg->m_NWakeColumn = m_NWakeColumn;
 
+	if(m_pCurWPolar) pMainFrame->m_pctrlStabViewWidget->setVisible(m_pCurWPolar->m_Type==STABILITYPOLAR);
+
 	QApplication::restoreOverrideCursor();
 }
 
@@ -15144,7 +15002,7 @@ void QMiarex::UpdateUnits()
 		}
 		else if(m_iView==WCPVIEW) CreateCpCurves();
 		else if(m_iView==W3DVIEW) m_bResetglLegend = true;
-		else if(m_iView==WSTABVIEW) m_bResetglModeLegend = true;
+		else if(m_iView==WSTABVIEW) m_bResetglLegend = true;
 	}
 	SetCurveParams();
 	UpdateView();
@@ -15255,6 +15113,19 @@ void QMiarex::OnWPolarProps()
 	pMainFrame->m_DlgPos = dlg.pos();
 }
 
+
+void QMiarex::OnWOppProps()
+{
+	if(!m_pCurWOpp) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	PolarPropsDlg dlg;
+	dlg.m_pMiarex = this;
+	dlg.m_pWOpp = m_pCurWOpp;
+	dlg.InitDialog();
+	dlg.move(pMainFrame->m_DlgPos);
+	dlg.exec();
+	pMainFrame->m_DlgPos = dlg.pos();
+}
 
 
 void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly)

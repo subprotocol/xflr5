@@ -211,10 +211,9 @@ private slots:
 	void OnImportWPolar();
 	void OnUFOInertia();
 	void OnWPolarProps();
+	void OnWOppProps();
 	void OnReadAnalysisData();
 
-	void OnTimeGraph();
-	void OnStabilityView();
 	void OnRootLocusView();
 	void OnModalView();
 	void OnTimeView();
@@ -234,12 +233,10 @@ private:
 
 	void GLDrawFoils();
 	void GLInverseMatrix();
-	void GLRenderMode();
 	void GLRenderView();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLSetupLight();
 	void GLDrawAxes();
-	void GLCallModeLists();
 	void GLCallViewLists();
 	void GLDraw3D();
 	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
@@ -614,7 +611,6 @@ public:
 	bool m_bglLight;
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
 	bool m_bLongitudinal;
-	bool m_bResetglModeLegend;		// true if the mode properties need to be refreshed
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 
 	void* m_pMainFrame ;			// a pointer to the frame class

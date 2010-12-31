@@ -27,7 +27,7 @@
 #include "../XDirect/XDirect.h"
 #include "../XInverse/XInverse.h"
 #include "../Graph/GraphDlg.h"
-
+#include <QtDebug>
 
 DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 {
@@ -285,19 +285,21 @@ void DisplaySettingsDlg::OnTextColor()
 void DisplaySettingsDlg::OnTextFont()
 {
 	bool ok;
+	QFont TextFont;
+	TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
 
 #ifdef Q_WS_MAC
 	//20090604 Mac OS Native font dialog does not work well under QT 4.5.1
 	//QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
         //QFont font = QFontDialog::getFont(&ok, m_TextFont, this, "",QFontDialog::DontUseNativeDialog);
-        QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
+	   TextFont = QFontDialog::getFont(&ok, m_TextFont, this);
 #else
-	QFont font = QFontDialog::getFont(&ok, m_TextFont, this);
+	TextFont = QFontDialog::getFont(&ok, m_TextFont, this);
 #endif
 
 	if (ok)
 	{
-		m_TextFont = font;
+		m_TextFont = TextFont;
 		m_pctrlTextFont->setText(m_TextFont.family());
 		m_pctrlTextFont->setFont(m_TextFont);
 		m_pctrlTextClr->setFont(m_TextFont);

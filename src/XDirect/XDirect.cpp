@@ -6619,6 +6619,21 @@ void QXDirect::wheelEvent (QWheelEvent *event )
 
 
 
+void QXDirect::OnOpPointProps()
+{
+	if(!m_pCurPolar) return;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	PolarPropsDlg dlg;
+	dlg.m_pXDirect = this;
+	dlg.m_pOpp = m_pCurOpp;
+	dlg.InitDialog();
+	dlg.move(pMainFrame->m_DlgPos);
+	dlg.exec();
+	pMainFrame->m_DlgPos = dlg.pos();
+}
+
+
+
 void QXDirect::OnPolarProps()
 {
 	if(!m_pCurPolar) return;

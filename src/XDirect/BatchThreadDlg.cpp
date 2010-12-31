@@ -29,6 +29,7 @@
 #include <QGroupBox>
 #include <QDir>
 #include <QDateTime>
+#include <QCoreApplication>
 #include <QThread>
 #include <QThreadPool>
 #include <QtDebug>
@@ -36,6 +37,7 @@
 
 //bool BatchThreadDlg::s_bStoreOpp = false;
 bool BatchThreadDlg::s_bCurrentFoil=true;
+bool BatchThreadDlg::s_bUpdatePolarView = false;
 void * BatchThreadDlg::s_pXFoil;
 void * BatchThreadDlg::s_pMainFrame;
 void * BatchThreadDlg::s_pXDirect;
@@ -217,8 +219,13 @@ void BatchThreadDlg::SetupLayout()
 	}
 
 
-
-	m_pctrlInitBL         = new QCheckBox(tr("Initialize BLs between polars"));
+	QHBoxLayout *OptionsLayout = new QHBoxLayout;
+	m_pctrlInitBL          = new QCheckBox(tr("Initialize BLs between polars"));
+	m_pctrlUpdatePolarView = new QCheckBox(tr("Update polar view"));
+	m_pctrlUpdatePolarView->setStatusTip(tr("Update the polar graphs after the completion ofeach foil/polar pair"));
+	OptionsLayout->addWidget(m_pctrlInitBL);
+	OptionsLayout->addStretch(1);
+	OptionsLayout->addWidget(m_pctrlUpdatePolarView);
 
 	//_*_*_*_*_*_*_**_*_*_**_*_*_*_
 	m_pctrlTextOutput = new QTextEdit;
@@ -250,7 +257,7 @@ void BatchThreadDlg::SetupLayout()
 
 	QVBoxLayout *RightSide = new QVBoxLayout;
 //	RightSide->addStretch(1);
-	RightSide->addWidget(m_pctrlInitBL);
+	RightSide->addLayout(OptionsLayout);
 	RightSide->addWidget(m_pctrlTextOutput,1);
 //	RightSide->addStretch(1);
 
@@ -363,12 +370,11 @@ void BatchThreadDlg::keyPressEvent(QKeyEvent *event)
 		{
 			if(m_bIsRunning)
 			{
-				m_bCancel    = true;
+				OnAnalyze();//will cancel the threads
 			}
 			else
 			{
-				reject();
-				//close the dialog box
+				OnClose(); // will close the dialog box
 			}
 			break;
 		}
@@ -380,13 +386,9 @@ void BatchThreadDlg::keyPressEvent(QKeyEvent *event)
 
 void BatchThreadDlg::InitDialog()
 {
-//	CRect WndRect;
-//	GetWindowRect(WndRect);
-//	SetWindowPos(NULL,GetSystemMetrics(SM_CXSCREEN)-WndRect.Width()-10,60,0,0,SWP_NOSIZE);
-
 	if(!m_pCurFoil) return;
-	m_Type = 1; //no choice...
-//	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
+
+	m_Type = FIXEDSPEEDPOLAR; //no choice...
 
 	m_pctrlFoil1->setChecked(s_bCurrentFoil);
 	m_pctrlFoil2->setChecked(!s_bCurrentFoil);
@@ -395,28 +397,22 @@ void BatchThreadDlg::InitDialog()
 	m_pctrlMach->SetPrecision(2);
 
 
-	if(m_Type!=4)
-	{
-		m_pctrlReMin->SetPrecision(0);
-		m_pctrlReMax->SetPrecision(0);
-		m_pctrlReDelta->SetPrecision(0);
+	m_pctrlReMin->SetPrecision(0);
+	m_pctrlReMax->SetPrecision(0);
+	m_pctrlReDelta->SetPrecision(0);
 
-		m_pctrlSpecMin->SetPrecision(1);
-		m_pctrlSpecMax->SetPrecision(1);
-		m_pctrlSpecDelta->SetPrecision(1);
-	}
-
+	m_pctrlSpecMin->SetPrecision(1);
+	m_pctrlSpecMax->SetPrecision(1);
+	m_pctrlSpecDelta->SetPrecision(1);
 
 	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
-	if(m_Type!=4)
-	{
-		m_pctrlReMin->SetValue(m_ReMin);
-		m_pctrlReMax->SetValue(m_ReMax);
-		m_pctrlReDelta->SetValue(m_ReInc);
-		m_pctrlSpecMin->SetValue(m_AlphaMin);
-		m_pctrlSpecMax->SetValue(m_AlphaMax);
-		m_pctrlSpecDelta->SetValue(m_AlphaInc);
-	}
+	m_pctrlReMin->SetValue(m_ReMin);
+	m_pctrlReMax->SetValue(m_ReMax);
+	m_pctrlReDelta->SetValue(m_ReInc);
+	m_pctrlSpecMin->SetValue(m_AlphaMin);
+	m_pctrlSpecMax->SetValue(m_AlphaMax);
+	m_pctrlSpecDelta->SetValue(m_AlphaInc);
+
 
 	m_pctrlMach->SetValue(m_Mach);
 	m_pctrlNCrit->SetValue(m_NCrit);
@@ -435,6 +431,7 @@ void BatchThreadDlg::InitDialog()
 	else             m_pctrlFromZero->setChecked(false);
 
 	m_pctrlInitBL->setChecked(true);
+	m_pctrlUpdatePolarView->setChecked(s_bUpdatePolarView);
 }
 
 
@@ -475,9 +472,9 @@ void BatchThreadDlg::OnAnalyze()
 {
 	if(m_bIsRunning)
 	{
-		XFoil::s_bCancel = true;
-		XFoilTask::s_bCancel = true;
 		m_bCancel = true;
+		XFoilTask::s_bCancel = true;
+		XFoil::s_bCancel = true;
 		return;
 	}
 	m_bCancel    = false;
@@ -509,6 +506,7 @@ void BatchThreadDlg::OnAnalyze()
 
 void BatchThreadDlg::OnClose()
 {
+	s_bUpdatePolarView = m_pctrlUpdatePolarView->isChecked();
 	m_bCancel = true;
 	XFoilTask::s_bCancel = true;
 	QThreadPool::globalInstance()->waitForDone();
@@ -788,22 +786,25 @@ void BatchThreadDlg::timerEvent(QTimerEvent *event)
 {
 	// used out of purpose as a convenient way to receive a notification
 	// of the analysis pair which has ended its analysis
-	QString str = "   ...Finished "+m_pXFoilTask[event->timerId()].m_pFoil->m_FoilName+" / "
-							 +m_pXFoilTask[event->timerId()].m_pPolar->m_PlrName+"\n";
+	qApp->processEvents();
 
-	UpdateOutput(str);
-	m_pXFoilTask[event->timerId()].m_bIsFinished = true;
+	if(m_pXFoilTask)
+	{
+		QString str = "   ...Finished "+m_pXFoilTask[event->timerId()].m_pFoil->m_FoilName+" / "
+								 +m_pXFoilTask[event->timerId()].m_pPolar->m_PlrName+"\n";
+
+		UpdateOutput(str);
+		m_pXFoilTask[event->timerId()].m_bIsFinished = true;
+	}
+
 	//time to launch another analysis, if any is left
-	StartThread();
-}
-
-
-
-void BatchThreadDlg::StartThread()
-{
-	Analysis *pAnalysis;
 	QString strong;
 	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
+	if(m_pctrlUpdatePolarView->isChecked())
+	{
+		pXDirect->CreatePolarCurves();
+		pXDirect->UpdateView();
+	}
 
 	if(m_AnalysisPair.size()<=0 || m_bCancel)
 	{
@@ -811,7 +812,7 @@ void BatchThreadDlg::StartThread()
 		bool bAllFinished = true;
 		for (int it=0; it<m_nThreads; it++)
 		{
-			if(m_pXFoilTask+it && !m_pXFoilTask[it].m_bIsFinished)
+			if(m_pXFoilTask && !m_pXFoilTask[it].m_bIsFinished)
 			{
 				bAllFinished = false;
 				break;
@@ -840,10 +841,16 @@ void BatchThreadDlg::StartThread()
 				}
 			}
 		}
-		return;
 	}
+	else  StartThread(); // analyze a new pair
+}
 
 
+
+void BatchThreadDlg::StartThread()
+{
+	Analysis *pAnalysis;
+	QString strong;
 	//  browse through the array until we find an available thread
 	if(QThreadPool::globalInstance()->activeThreadCount()<m_nThreads)
 	{
@@ -851,7 +858,7 @@ void BatchThreadDlg::StartThread()
 		//on the other hand, this loop will run permanently;
 		for (int it=0; it<m_nThreads; it++)
 		{
-			if(m_pXFoilTask[it].m_bIsFinished)
+			if(m_pXFoilTask && m_pXFoilTask[it].m_bIsFinished)
 			{
 				m_pXFoilTask[it].m_bIsFinished = false;
 				m_pXFoilTask[it].m_Id = it;

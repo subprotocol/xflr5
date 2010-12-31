@@ -105,8 +105,6 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Your system does not provide support for OpenGL.\nXFLR5 will not operate correctly."));
 	}
-
-
 	m_bMaximized = true;
 	m_LengthUnit  = 0;
 	m_AreaUnit    = 1;
@@ -122,7 +120,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_BackgroundColor = QColor(0, 5, 10);
 	m_TextColor       = QColor(220,220,220);
 
-	m_TextFont.setStyleHint(QFont::TypeWriter);
+	m_TextFont.setStyleHint(QFont::TypeWriter, QFont::OpenGLCompatible);
 	m_TextFont.setFamily(m_TextFont.defaultFamily());
 	m_TextFont.setPointSize(10);
 
@@ -600,6 +598,11 @@ void MainFrame::CreateActions()
 	ShowPolarProps->setShortcut(QKeySequence(Qt::ALT + Qt::Key_Return));
 	connect(ShowPolarProps, SIGNAL(triggered()), this, SLOT(OnPolarProps()));
 
+	ShowWOppProps = new QAction(tr("Properties"), this);
+	ShowWOppProps->setStatusTip(tr("Show the properties of the currently selected operating point"));
+	connect(ShowWOppProps, SIGNAL(triggered()), this, SLOT(OnWOppProps()));
+
+
 	CreateAFoilActions();
 	CreateXDirectActions();
 	CreateXInverseActions();
@@ -937,7 +940,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrl3DScalesWidget->setWidget(pGL3DScales);
 	m_pctrl3DScalesWidget->setVisible(false);
 	m_pctrl3DScalesWidget->setFloating(true);
-        m_pctrl3DScalesWidget->move(60,60);
+	m_pctrl3DScalesWidget->move(60,60);
 
 	StabViewDlg::s_pMainFrame = this;
 	StabViewDlg::s_pMiarex = m_pMiarex;
@@ -950,7 +953,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrlStabViewWidget->setWidget(pStabView);
 	m_pctrlStabViewWidget->setVisible(false);
 	m_pctrlStabViewWidget->setFloating(true);
-        m_pctrlStabViewWidget->move(60,60);
+	m_pctrlStabViewWidget->move(60,60);
 
 	m_pctrlCentralWidget = new QStackedWidget;
 	m_pctrlCentralWidget->addWidget(m_p2DWidget);
@@ -1039,6 +1042,9 @@ void MainFrame::CreateDockWindows()
 
 	CWPolar::s_pMainFrame  = this;
 	CWPolar::s_pMiarex  = m_pMiarex;
+
+	CWOpp::s_pMainFrame  = this;
+	CWOpp::s_pMiarex  = m_pMiarex;
 
 	LLTAnalysisDlg::s_pMainFrame = this;
 	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
@@ -1147,11 +1153,16 @@ void MainFrame::CreateMiarexActions()
 //	WPolarAct->setShortcut(Qt::Key_F8);
 	connect(WPolarAct, SIGNAL(triggered()), pMiarex, SLOT(OnWPolars()));
 
-	StabilityAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Stability Analysis")+"\tShift+F8", this);
-	StabilityAct->setCheckable(true);
-	StabilityAct->setStatusTip(tr("Switch to stability analysis post-processing"));
-//	StabilityAct->setShortcut(tr("Shift+F8"));
-	connect(StabilityAct, SIGNAL(triggered()), pMiarex, SLOT(OnStabilityView()));
+	StabTimeAct = new QAction(QIcon(":/images/OnStabView.png"),tr("Time Response Vew")+"\tShift+F8", this);
+	StabTimeAct->setCheckable(true);
+	StabTimeAct->setStatusTip(tr("Switch to stability analysis post-processing"));
+//	StabTimeAct->setShortcut(tr("Shift+F8"));
+	connect(StabTimeAct, SIGNAL(triggered()), pMiarex, SLOT(OnTimeView()));
+
+	RootLocusAct = new QAction(QIcon(":/images/OnRootLocus.png"),tr("Root Locus View")+"\tCtrl+F8", this);
+	RootLocusAct->setCheckable(true);
+	RootLocusAct->setStatusTip(tr("Switch to root locus view"));
+	connect(RootLocusAct, SIGNAL(triggered()), pMiarex, SLOT(OnRootLocusView()));
 
 	W3DAct = new QAction(QIcon(":/images/On3DView.png"), tr("3D View")+"\tF4", this);
 	W3DAct->setCheckable(true);
@@ -1469,9 +1480,10 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu = menuBar()->addMenu(tr("&View"));
 	MiarexViewMenu->addAction(WOppAct);
 	MiarexViewMenu->addAction(WPolarAct);
-	MiarexViewMenu->addAction(StabilityAct);
 	MiarexViewMenu->addAction(W3DAct);
 	MiarexViewMenu->addAction(CpViewAct);
+	MiarexViewMenu->addAction(StabTimeAct);
+	MiarexViewMenu->addAction(RootLocusAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(W3DPrefsAct);
 	MiarexViewMenu->addAction(W3DScalesAct);
@@ -1558,6 +1570,7 @@ void MainFrame::CreateMiarexMenus()
 
 	MiarexWOppMenu = menuBar()->addMenu(tr("&OpPoint"));
 	CurWOppMenu = MiarexWOppMenu->addMenu(tr("Current OpPoint"));
+	CurWOppMenu->addAction(ShowWOppProps);
 	CurWOppMenu->addAction(exportCurWOpp);
 	CurWOppMenu->addAction(deleteCurWOpp);
 	MiarexWOppMenu->addSeparator();
@@ -1742,8 +1755,12 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlCpView->setCheckable(true);
 	
 	m_pctrlStabilityButton = new QToolButton;
-	m_pctrlStabilityButton->setDefaultAction(StabilityAct);
+	m_pctrlStabilityButton->setDefaultAction(StabTimeAct);
 	m_pctrlStabilityButton->setCheckable(true);
+
+	m_pctrlRootLocusButton = new QToolButton;
+	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
+	m_pctrlRootLocusButton->setCheckable(true);
 
 	m_pctrlUFO->setMinimumWidth(150);
 	m_pctrlWPolar->setMinimumWidth(150);
@@ -1762,6 +1779,7 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlStabilityButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
 
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
@@ -2219,6 +2237,7 @@ void MainFrame::CreateXDirectMenus()
 
 	OpPointMenu = menuBar()->addMenu(tr("Operating Points"));
 	currentOppMenu = OpPointMenu->addMenu(tr("Current OpPoint"));
+	currentOppMenu->addAction(ShowWOppProps);
 	currentOppMenu->addAction(exportCurOpp);
 	currentOppMenu->addAction(deleteCurOpp);
 	CpGraphMenu = OpPointMenu->addMenu(tr("Cp Graph"));
@@ -2258,6 +2277,7 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addMenu(DesignMenu);
 	OperFoilCtxMenu->addSeparator();//_______________
 	CurOppCtxMenu = OperFoilCtxMenu->addMenu(tr("Current OpPoint"));
+	CurOppCtxMenu->addAction(ShowWOppProps);
 	CurOppCtxMenu->addAction(exportCurOpp);
 	CurOppCtxMenu->addAction(deleteCurOpp);
 
@@ -6766,5 +6786,20 @@ void MainFrame::OnPolarProps()
 	{
 		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->OnWPolarProps();
+	}
+}
+
+
+void MainFrame::OnWOppProps()
+{
+	if(m_iApp==XFOILANALYSIS)
+	{
+		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+		pXDirect->OnOpPointProps();
+	}
+	else if(m_iApp==MIAREX)
+	{
+		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		pMiarex->OnWOppProps();
 	}
 }

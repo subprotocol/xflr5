@@ -96,7 +96,7 @@ protected:
 	FloatEdit *m_pctrlNCrit, *m_pctrlXTopTr, *m_pctrlXBotTr;
 	QLabel *m_pctrlSpecVar;
 	QLabel *m_pctrlMaType, *m_pctrlReType;
-	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero;
+	QCheckBox *m_pctrlInitBL, *m_pctrlFromZero, *m_pctrlUpdatePolarView;
 	QPushButton *m_pctrlClose, *m_pctrlAnalyze;
 	QTextEdit *m_pctrlTextOutput;
 
@@ -105,6 +105,7 @@ protected:
 	static void* s_pXDirect;
 	static void * s_pMainFrame;
 	static bool s_bCurrentFoil;
+	static bool s_bUpdatePolarView;
 
 	double	m_Mach;
 

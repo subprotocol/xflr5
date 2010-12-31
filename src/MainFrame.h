@@ -126,6 +126,7 @@ private slots:
 	void OnUnits();
 	void OnSaveUFOAsProject();
 	void OnPolarProps();
+	void OnWOppProps();
 	void openRecentFile();
 
 
@@ -215,7 +216,8 @@ private:
 	void *m_pXDirect;
 	void *m_pMiarex;
 	void *m_pAFoil;
-        static QPointer<MainFrame> _self;
+	void *m_pStabView;
+	static QPointer<MainFrame> _self;
 
 	TwoDWidget *m_p2DWidget;
 	QStackedWidget *m_pctrlCentralWidget;
@@ -285,12 +287,12 @@ private:
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;
 
 	//Miarex Actions
-	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabilityAct;//, *RootLocusAct, *ModalViewAct;
+	QAction *WPolarAct, *WOppAct, *W3DAct, *CpViewAct, *StabTimeAct, *RootLocusAct;
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
 	QAction *renameCurWPolar, *editCurWPolar,*exportCurWPolar, *resetCurWPolar;
-	QAction *ShowPolarProps;
+	QAction *ShowPolarProps, *ShowWOppProps;
 	QAction *deleteCurWPolar, *deleteCurWOpp;
 	QAction *twoGraphs, *fourGraphs;
 	QAction *Graph1,*Graph2,*Graph3,*Graph4;
@@ -313,7 +315,7 @@ private:
 	QAction *ManageUFOs;
 	QAction *m_pImportWPolar, *m_pUFOInertia;
 	QToolButton *m_pctrl3dView, *m_pctrlWPolarView, *m_pctrlWOppView, *m_pctrlCpView;
-	QToolButton *m_pctrlStabilityButton;//, *m_pctrlRootLocusButton, *m_pctrlModalViewButton;
+	QToolButton *m_pctrlStabilityButton, *m_pctrlRootLocusButton;//, *m_pctrlModalViewButton;
 
 
 	//XDirect Actions
@@ -407,7 +409,6 @@ public:
 	int m_ForceUnit;
 	int m_MomentUnit;
 
-	void *m_pStabView;
 };
 
 #endif // MAINFRAME_H

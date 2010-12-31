@@ -19,6 +19,10 @@
 
 *****************************************************************************/
 
+#define GLMIAREXVIEW  3
+#define GLBODYVIEW  5
+#define GLWINGVIEW  7
+
 
 #include <QtDebug>
 #include <QtGui>
@@ -39,7 +43,7 @@ GLWidget::GLWidget(QWidget *parent)
 {
 	m_pParent = parent;
 	m_wndTextColor = QColor(200,200,200);
-	m_iView = 3;
+	m_iView = GLMIAREXVIEW;
 
 	setAutoFillBackground(false);
 
@@ -49,17 +53,17 @@ GLWidget::GLWidget(QWidget *parent)
 
 void GLWidget::contextMenuEvent (QContextMenuEvent * event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex *pMiarex = (QMiarex *)s_pMiarex;
 		pMiarex->contextMenuEvent(event);
 	}
-	else  if(m_iView == 5)
+	else  if(m_iView ==GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->ShowContextMenu(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->ShowContextMenu(event);
@@ -68,17 +72,17 @@ void GLWidget::contextMenuEvent (QContextMenuEvent * event)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->mousePressEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->mousePressEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->MousePressEvent(event);
@@ -87,17 +91,17 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->mouseReleaseEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->mouseReleaseEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->MouseReleaseEvent(event);
@@ -106,17 +110,17 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->mouseMoveEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->mouseMoveEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->MouseMoveEvent(event);
@@ -127,17 +131,17 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->mouseDoubleClickEvent(event );
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->mouseDoubleClickEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->MouseDoubleClickEvent(event);
@@ -146,17 +150,17 @@ void GLWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->wheelEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->wheelEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->WheelEvent(event);
@@ -172,17 +176,17 @@ void GLWidget::initializeGL()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->keyPressEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->keyPressEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->keyPressEvent(event);
@@ -191,17 +195,17 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {
-	if(m_iView == 3)
+	if(m_iView ==GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->keyReleaseEvent(event);
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->keyReleaseEvent(event);
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		pDlg->keyReleaseEvent(event);
@@ -213,7 +217,7 @@ void GLWidget::paintGL()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-	if(m_iView == 3)
+	if(m_iView==GLMIAREXVIEW)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
@@ -221,17 +225,17 @@ void GLWidget::paintGL()
 		if(pMiarex->m_iView==W3DVIEW)        pMiarex->GLRenderView();
 		else if(pMiarex->m_iView==WSTABVIEW)
 		{
-			pMiarex->GLRenderMode();
+			pMiarex->GLRenderView();
 		}
 	}
-	else if(m_iView == 5)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		pDlg->GLDraw3D();
 		pDlg->GLRenderBody();
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -264,7 +268,7 @@ void GLWidget::resizeGL(int width, int height)
 	if(w>h)	m_GLViewRect.SetRect(-s, s*h/w, s, -s*h/w);
 	else    m_GLViewRect.SetRect(-s*w/h, s, s*w/h, -s*h/w);
 
-	if(m_iView == 3)
+	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 		pMiarex->m_ArcBall.GetMatrix();
@@ -272,7 +276,7 @@ void GLWidget::resizeGL(int width, int height)
 		pMiarex->m_bIs3DScaleSet = false;
 		pMiarex->Set3DScale();
 	}
-	else if(m_iView == 7)
+	else if(m_iView == GLWINGVIEW)
 	{
 //		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 //		pDlg->m_3DWingRect = m_rCltRect;
