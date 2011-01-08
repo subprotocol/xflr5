@@ -38,7 +38,7 @@ class CPolar
 	friend class XFoilTask;
 	friend class XFoilAnalysisDlg;
 	friend class EditPlrDlg;
-	friend class PolarPropsDlg;
+	friend class ObjectPropsDlg;
 	friend class XFoil;
 
 private:

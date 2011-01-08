@@ -27,7 +27,7 @@
 #include "../MainFrame.h"
 #include "../Graph/GraphDlg.h"
 #include "../Misc/EditPlrDlg.h"
-#include "../Misc/PolarPropsDlg.h"
+#include "../Misc/ObjectPropsDlg.h"
 #include "../Misc/PolarFilterDlg.h"
 #include "../Misc/RenameDlg.h"
 #include "XDirect.h"
@@ -6411,7 +6411,7 @@ void QXDirect::SetupLayout()
 	m_pctrlShowBL        = new QCheckBox(tr("Show BL"));
 	m_pctrlShowPressure  = new QCheckBox(tr("Show Pressure"));
 //	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight Current OpPoint"));
-//	m_pctrlHighlightOpp->setStatusTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
+//	m_pctrlHighlightOpp->setToolTip(tr("Highlights the currently selected OpPoint, if any, on the currently selected polar curve"));
 	m_pctrlAnimate       = new QCheckBox(tr("Animate"));
 	m_pctrlAnimateSpeed  = new QSlider(Qt::Horizontal);
 	m_pctrlAnimateSpeed->setMinimum(0);
@@ -6623,7 +6623,7 @@ void QXDirect::OnOpPointProps()
 {
 	if(!m_pCurPolar) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	PolarPropsDlg dlg;
+	ObjectPropsDlg dlg;
 	dlg.m_pXDirect = this;
 	dlg.m_pOpp = m_pCurOpp;
 	dlg.InitDialog();
@@ -6638,7 +6638,7 @@ void QXDirect::OnPolarProps()
 {
 	if(!m_pCurPolar) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	PolarPropsDlg dlg;
+	ObjectPropsDlg dlg;
 	dlg.m_pXDirect = this;
 	dlg.m_pPolar = m_pCurPolar;
 	dlg.InitDialog();

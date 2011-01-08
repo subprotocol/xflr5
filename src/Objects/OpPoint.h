@@ -35,7 +35,7 @@ class OpPoint
 	friend class MainFrame;
 	friend class CPolar;
 	friend class QXDirect;
-	friend class PolarPropsDlg;
+	friend class ObjectPropsDlg;
 
 	// An operating point is the result of an XFoil calculation
 	// for a given Reynolds

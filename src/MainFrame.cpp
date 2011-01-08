@@ -34,7 +34,7 @@
 #include "Miarex/ManageUFOsDlg.h"
 #include "Miarex/UFOTableDelegate.h"
 #include "Misc/AboutQ5.h"
-#include "Misc/PolarPropsDlg.h"
+#include "Misc/ObjectPropsDlg.h"
 #include "Misc/DisplaySettingsDlg.h"
 #include "Misc/RenameDlg.h"
 #include "Misc/LinePickerDlg.h"
@@ -600,6 +600,7 @@ void MainFrame::CreateActions()
 
 	ShowWOppProps = new QAction(tr("Properties"), this);
 	ShowWOppProps->setStatusTip(tr("Show the properties of the currently selected operating point"));
+	ShowWOppProps->setShortcut(QKeySequence(Qt::ALT + Qt::SHIFT + Qt::Key_Return));
 	connect(ShowWOppProps, SIGNAL(triggered()), this, SLOT(OnWOppProps()));
 
 
@@ -1033,7 +1034,7 @@ void MainFrame::CreateDockWindows()
 	CWing::s_pMiarex       = m_pMiarex;
 
 	CPolar::s_pMainFrame     = this;
-	PolarPropsDlg::s_pMainFrame = this;
+	ObjectPropsDlg::s_pMainFrame = this;
 
 	pGL3DScales->m_pMainFrame    = this;
 	pGL3DScales->m_pMiarex       = m_pMiarex;

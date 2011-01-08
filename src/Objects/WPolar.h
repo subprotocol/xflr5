@@ -38,7 +38,7 @@ class CWPolar
 	friend class LLTAnalysisDlg;
 	friend class PanelAnalysisDlg;
 	friend class EditPlrDlg;
-	friend class PolarPropsDlg;
+	friend class ObjectPropsDlg;
 	friend class StabViewDlg;
 	friend class ManageBodiesDlg;
 

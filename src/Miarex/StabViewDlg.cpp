@@ -33,7 +33,7 @@
 #include <complex>
 #include <QtDebug>
 
-#define MODEPOINTS            100
+//#define MODEPOINTS            100
 
 
 using namespace std;
@@ -84,8 +84,6 @@ void StabViewDlg::Connect()
 	connect(m_pctrlAnimateRestart ,SIGNAL(clicked()), this, SLOT(OnAnimateRestart()));
 	connect(m_pctrlDeltat, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 	connect(m_pctrlModeStep, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
-	connect(m_pctrlRampAmplitude, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
-	connect(m_pctrlRampTime, SIGNAL(editingFinished()), this, SLOT(OnReadData()));
 //	connect(m_pCtrlDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	connect(m_pctrlInitCondResponse, SIGNAL(clicked()), this, SLOT(OnResponseType()));
@@ -97,86 +95,30 @@ void StabViewDlg::Connect()
 	connect(m_pctrlRenameCurve, SIGNAL(clicked()), this, SLOT(OnRenameCurve()));
 	connect(m_pctrlCurveList,   SIGNAL(activated(int)), this, SLOT(OnSelChangeCurve(int)));
 	
-/*	m_pControlModel = new QStandardItemModel;
-	m_pControlModel->setRowCount(5);//temporary
+	m_pControlModel = new QStandardItemModel;
+	m_pControlModel->setRowCount(20);//temporary
 	m_pControlModel->setColumnCount(2);
-	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
-	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Ramp ")+QString::fromUtf8("(°)"));
+	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Time (s)"));
+	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Angle ")+QString::fromUtf8("(°)"));
 //	m_pControlModel->setHeaderData(2, Qt::Horizontal, tr("Ramp (s)"));
+
+	QModelIndex ind;
+	for(int i=0; i<m_pControlModel->rowCount(); i++)
+	{
+		ind = m_pControlModel->index(i, 0, QModelIndex());
+		m_pControlModel->setData(ind, (double)i);
+		ind = m_pControlModel->index(i, 1, QModelIndex());
+		m_pControlModel->setData(ind, 0.0);
+	}
 
 	m_pctrlControlTable->setModel(m_pControlModel);
 	m_pctrlControlTable->setWindowTitle(tr("Controls"));
-	m_pctrlControlTable->setColumnWidth(0,75);
-	m_pctrlControlTable->setColumnWidth(1,60);
+	m_pctrlControlTable->setColumnWidth(0,50);
+	m_pctrlControlTable->setColumnWidth(1,40);
 //	m_pctrlControlTable->setColumnWidth(2,60);
 	QHeaderView *HorizontalHeader = m_pctrlControlTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);	*/
+	HorizontalHeader->setStretchLastSection(true);
 }
-
-/*
-void StabViewDlg::FillControlNames()
-{
-	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	CWPolar *pWPolar = pMiarex->m_pCurWPolar;
-	QModelIndex ind;
-	int i;
-	QString strong;
-	
-	CPlane *pPlane = pMiarex->m_pCurPlane;
-	CWing  *pWing  = pMiarex->m_pCurWing;
-	CWing  *pStab  = pMiarex->m_pCurStab;
-	CWing  *pFin   = pMiarex->m_pCurFin;
-	
-	if(!pWPolar || pWPolar->m_Type!=7) return;
-
-	m_pControlModel->setRowCount(pWPolar->m_nControls);
-	
-	int nControls = 0;
-	if(pPlane)
-	{
-		ind = m_pControlModel->index(nControls, 0, QModelIndex());
-		m_pControlModel->setData(ind, tr("Wing Tilt (")+QString::fromUtf8("°")+")");
-		++nControls;
-		
-		if(pStab)
-		{
-			ind = m_pControlModel->index(nControls, 0, QModelIndex());
-			m_pControlModel->setData(ind, tr("Elevator Tilt ")+QString::fromUtf8("(°)"));
-			++nControls;
-		}
-	}
-	for(i=0; i<pWing->m_nFlaps; i++)
-	{
-		ind = m_pControlModel->index(i+nControls, 0, QModelIndex());
-		strong = QString(tr("Wing Flap angle %1 ")+QString::fromUtf8("(°)")).arg(i+1);
-		m_pControlModel->setData(ind, strong);
-	}
-	nControls += pWing->m_nFlaps;
-
-
-	if(pStab)
-	{
-		for(i=0; i<pStab->m_nFlaps; i++)
-		{
-			ind = m_pControlModel->index(i+nControls, 0, QModelIndex());
-			strong = QString(tr("Elevator Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
-			m_pControlModel->setData(ind, strong);
-
-		}
-		nControls += pStab->m_nFlaps;
-	}
-	if(pFin)
-	{
-		for(i=0; i<pFin->m_nFlaps; i++)
-		{
-			ind = m_pControlModel->index(i+nControls, 0, QModelIndex());
-			strong = QString(tr("Fin Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
-			m_pControlModel->setData(ind, strong);
-
-		}
-		nControls += pFin->m_nFlaps;
-	}
-}*/
 
 
 void StabViewDlg::FillEigenThings()
@@ -279,7 +221,6 @@ void StabViewDlg::FillEigenThings()
 
 void StabViewDlg::keyPressEvent(QKeyEvent *event)
 {
-	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -297,7 +238,8 @@ void StabViewDlg::keyPressEvent(QKeyEvent *event)
 		}
 		default:
 		{
-			pMiarex->keyPressEvent(event);
+//			QMiarex * pMiarex = (QMiarex*)s_pMiarex;
+//			pMiarex->keyPressEvent(event);
 		}
 //		event->ignore();
 	}
@@ -487,8 +429,6 @@ void StabViewDlg::OnReadData()
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	pMiarex->m_Modedt = m_pctrlModeStep->GetValue();
 	pMiarex->m_Deltat = m_pctrlDeltat->GetValue();
-	pMiarex->m_RampAmplitude = m_pctrlRampAmplitude->GetValue();
-	pMiarex->m_RampTime = m_pctrlRampTime->GetValue();
 }
 
 
@@ -634,42 +574,24 @@ void StabViewDlg::SetupLayout()
 		QGroupBox *ForcedResponseBox = new QGroupBox(tr("Forced Response"));
 		{
 			QVBoxLayout *ForcedResponse = new QVBoxLayout;
-/*			m_pctrlControlTable = new QTableView(this);
+			QLabel *ForcedText = new QLabel(tr("Control function"));
+			m_pctrlControlTable = new QTableView(this);
+			m_pctrlControlTable->setToolTip(tr("Enter the function of the control vs. time"));
 			m_pctrlControlTable->setMinimumHeight(150);
 			m_pctrlControlTable->setSelectionMode(QAbstractItemView::SingleSelection);
 			m_pctrlControlTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-			m_pCtrlDelegate = new CtrlTableDelegate;
-			int  *precision = new int[6];
-			precision[0]  = 0;
+			m_pCtrlDelegate = new FloatEditDelegate;
+			int  *precision = new int[3];
+			precision[0]  = 3;
 			precision[1]  = 3;
 			precision[2]  = 3;
-			precision[3]  = 3;
-			precision[4]  = 3;
-			precision[5]  = 3;
-			m_pCtrlDelegate->m_Precision = precision;
+
+			m_pCtrlDelegate->SetPrecision(precision);
 			m_pctrlControlTable->setItemDelegate(m_pCtrlDelegate);
-			m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;*/
-			QGridLayout *RampLayout = new QGridLayout;
-			{
-				QLabel *RampTimeLabel   = new QLabel(tr("Ramp Time")+"=");
-				QLabel *RampAmpLabel  = new QLabel(tr("Ramp Amp.")+"=");
-				QLabel *AmpLab         = new QLabel(QString::fromUtf8("°"));
-				QLabel *TimeLab3       = new QLabel("s");
-				m_pctrlRampTime  = new FloatEdit(0.1,3);
-				m_pctrlRampTime->setToolTip(tr("Define the total time in which the controls will be actuated"));
-				m_pctrlRampTime->setAlignment(Qt::AlignRight);
-				m_pctrlRampAmplitude  = new FloatEdit(0.0,2);
-				m_pctrlRampAmplitude->setToolTip(tr("Define the value of control actuation"));
-				m_pctrlRampAmplitude->setAlignment(Qt::AlignRight);
-				RampLayout->addWidget(RampAmpLabel,1,1);
-				RampLayout->addWidget(m_pctrlRampAmplitude,1,2);
-				RampLayout->addWidget(AmpLab,1,3);
-				RampLayout->addWidget(RampTimeLabel,2,1);
-				RampLayout->addWidget(m_pctrlRampTime,2,2);
-				RampLayout->addWidget(TimeLab3,2,3);
-			}
-//			ForcedResponse->addWidget(m_pctrlControlTable);
-			ForcedResponse->addLayout(RampLayout);
+//			m_pCtrlDelegate->m_pCtrlModel = m_pControlModel;
+
+			ForcedResponse->addWidget(ForcedText);
+			ForcedResponse->addWidget(m_pctrlControlTable);
 			ForcedResponse->addStretch(1);
 			ForcedResponseBox->setLayout(ForcedResponse);
 		}
@@ -695,6 +617,7 @@ void StabViewDlg::SetupLayout()
 		m_pctrlInitialConditionsWidget->addWidget(ModalTimeBox);
 		m_pctrlInitialConditionsWidget->setCurrentIndex(0);
 
+		QGroupBox *CurveSettings = new QGroupBox(tr("Curve Settings"));
 		m_pctrlTotalTime = new FloatEdit(5,3);
 		m_pctrlTotalTime->setToolTip(tr("Define the total time range for the graphs"));
 		m_pctrlDeltat    = new FloatEdit(.01,3);
@@ -727,12 +650,17 @@ void StabViewDlg::SetupLayout()
 		CurveLayout->addWidget(m_pctrlRenameCurve,2,1);
 		CurveLayout->addWidget(m_pctrlDeleteCurve,2,2);
 
-		TimeParams->addLayout(ResponseTypeLayout);
+		QVBoxLayout *TimeLayout = new QVBoxLayout;
+
+		TimeLayout->addLayout(DtLayout);
+		TimeLayout->addWidget(m_pctrlCurveList);
+		TimeLayout->addLayout(CurveLayout);
+		CurveSettings->setLayout(TimeLayout);
+
 	//	TimeParams->addLayout(InitialConditionsLayout);
+		TimeParams->addLayout(ResponseTypeLayout);
 		TimeParams->addWidget(m_pctrlInitialConditionsWidget);
-		TimeParams->addLayout(DtLayout);
-		TimeParams->addWidget(m_pctrlCurveList);
-		TimeParams->addLayout(CurveLayout);
+		TimeParams->addWidget(CurveSettings);
 		TimeParams->addStretch(5);
 
 		TimeBox->setLayout(TimeParams);
@@ -747,6 +675,10 @@ void StabViewDlg::SetupLayout()
 		m_pctrlRLMode2 = new QRadioButton("2");
 		m_pctrlRLMode3 = new QRadioButton("3");
 		m_pctrlRLMode4 = new QRadioButton("4");
+		m_pctrlRLMode1->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+		m_pctrlRLMode2->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+		m_pctrlRLMode3->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
+		m_pctrlRLMode4->setToolTip(tr("Press Ctrl+H to highlight the mode on the root locus plot"));
 		RLModeLayout->addWidget(m_pctrlRLMode1);
 		RLModeLayout->addWidget(m_pctrlRLMode2);
 		RLModeLayout->addWidget(m_pctrlRLMode3);
@@ -960,9 +892,6 @@ void StabViewDlg::SetControls()
 		m_pctrlUnit3->setText("rad/s");
 	}
 
-	m_pctrlRampTime->SetValue(pMiarex->m_RampTime);
-	m_pctrlRampAmplitude->SetValue(pMiarex->m_RampAmplitude);
-
 	m_pctrlStabVar1->SetValue(pMiarex->m_TimeInput[0]);
 	m_pctrlStabVar2->SetValue(pMiarex->m_TimeInput[1]);
 	m_pctrlStabVar3->SetValue(pMiarex->m_TimeInput[2]);
@@ -995,7 +924,6 @@ void StabViewDlg::SetControls()
 	m_pctrlDeleteCurve->setEnabled(m_pctrlCurveList->count());
 	m_pctrlCurveList->setEnabled(m_pctrlCurveList->count());
 
-	m_pctrlRampTime->setEnabled(bEnableTimeCtrl);
 
 	m_pctrlTimeMode1->setEnabled(bEnableTimeCtrl);
 	m_pctrlTimeMode2->setEnabled(bEnableTimeCtrl);
@@ -1005,8 +933,6 @@ void StabViewDlg::SetControls()
 	m_pctrlStabVar1->setEnabled(bEnableTimeCtrl);
 	m_pctrlStabVar2->setEnabled(bEnableTimeCtrl);
 	m_pctrlStabVar3->setEnabled(bEnableTimeCtrl);
-	m_pctrlRampAmplitude->setEnabled(bEnableTimeCtrl);
-	m_pctrlRampTime->setEnabled(bEnableTimeCtrl);
 	m_pctrlDeltat->setEnabled(bEnableTimeCtrl);
 	m_pctrlTotalTime->setEnabled(bEnableTimeCtrl);
 
@@ -1182,6 +1108,34 @@ void StabViewDlg::FillCurveList()
 		m_pctrlCurveList->setCurrentIndex(sel);
 	}
 }
+
+
+double StabViewDlg::GetControlInput(const double &time)
+{
+	static double t1, t2, in1, in2;
+	t1 = t2 = 0.0;
+	t1 = m_pControlModel->index(0, 0, QModelIndex()).data().toDouble();
+	for(int i=1; i<m_pControlModel->rowCount()-1; i++)
+	{
+		t2 = m_pControlModel->index(i, 0, QModelIndex()).data().toDouble();
+		if(t1<=time && time<t2)
+		{
+			in1 = m_pControlModel->index(i-1, 1, QModelIndex()).data().toDouble();
+			in2 = m_pControlModel->index(i,   1, QModelIndex()).data().toDouble();
+			return (in1 + (time-t1) * (in2-in1)/(t2-t1))*PI/180.0;
+		}
+		t1 = t2;
+	}
+	return 0.0;
+}
+
+
+
+
+
+
+
+
 
 
 

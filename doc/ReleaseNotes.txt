@@ -21,6 +21,8 @@ xflr5 v6.03 (Beta ?) 2011
 	- in the export to AVL of point masses, corrected the missing addition of wing x & z position
 	- modified the export format to AVL of with wing flaps
 	- added an option to highlight the currently selected operating point, or the mode in root locs view
+	- changed the interface for stability analysis
+	- added a properties dialog box option for operating points
 	- corrected various minor bugs
 	- made several minor enhancements
 

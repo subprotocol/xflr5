@@ -222,7 +222,7 @@ void BatchThreadDlg::SetupLayout()
 	QHBoxLayout *OptionsLayout = new QHBoxLayout;
 	m_pctrlInitBL          = new QCheckBox(tr("Initialize BLs between polars"));
 	m_pctrlUpdatePolarView = new QCheckBox(tr("Update polar view"));
-	m_pctrlUpdatePolarView->setStatusTip(tr("Update the polar graphs after the completion ofeach foil/polar pair"));
+	m_pctrlUpdatePolarView->setToolTip(tr("Update the polar graphs after the completion of each foil/polar pair"));
 	OptionsLayout->addWidget(m_pctrlInitBL);
 	OptionsLayout->addStretch(1);
 	OptionsLayout->addWidget(m_pctrlUpdatePolarView);

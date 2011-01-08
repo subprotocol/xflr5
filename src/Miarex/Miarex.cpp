@@ -34,7 +34,7 @@
 #include "../Misc/RenameDlg.h"
 #include "../Misc/ProgressDlg.h"
 #include "../Misc/EditPlrDlg.h"
-#include "../Misc/PolarPropsDlg.h"
+#include "../Misc/ObjectPropsDlg.h"
 #include "../Misc/PolarFilterDlg.h"
 #include "../Graph/GraphDlg.h"
 #include "GLCreateLists.h"
@@ -3050,16 +3050,11 @@ void QMiarex::CreateStabRungeKuttaCurves()
 {
 	// Builds the forced response from the state matrix and the forced input matrix
 	// using a Runge-Kutta integration scheme
-	// The forced input is a ramp of all controls simultaneaously
-	// from 0 to amp x Control_amplitude in a time RampTime
-	// i.e.:
-	//	u(t) = min( amp x Control_amplitude, 
-	//                  t * amp x Control_amplitude/RampTime)
-	//	with t>0
+	// The forced input is interpolated in the control history defined in the input table
 
 	static int i, j, TotalPoints, PlotInterval;
-//	static double in[MAXCONTROLS];
-	static double t, dt, RampTime, RampAmp, u_t;
+
+	static double t, dt, ctrl_t;
 	static CCurve *pCurve0, *pCurve1, *pCurve2, *pCurve3;
 	static double A[4][4], B[MAXCONTROLS][4];
 	static double m[5][4];
@@ -3101,9 +3096,9 @@ void QMiarex::CreateStabRungeKuttaCurves()
 
 	// Rebuild the Forced Response matrix
 	//read the initial step condition
-//	pStabView->ReadForcedInput(in);
-	RampAmp     = m_RampAmplitude*PI/180.0;
-	RampTime    = m_RampTime;           //s
+//	pStabView->ReadForcedInput(time,input);
+//	RampAmp     = m_RampAmplitude*PI/180.0;
+//	RampTime    = m_RampTime;           //s
 
 	m_Deltat    = pStabView->m_pctrlDeltat->GetValue();
 	m_TotalTime = pStabView->m_pctrlTotalTime->GetValue();
@@ -3131,12 +3126,11 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[0][2] = A[2][0]*y[0] + A[2][1]*y[1] + A[2][2]*y[2] + A[2][3]*y[3];
 		m[0][3] = A[3][0]*y[0] + A[3][1]*y[1] + A[3][2]*y[2] + A[3][3]*y[3];
 
-		if(RampTime<=0.0) u_t = 0.0;
-		else              u_t = qMin(1.0, t/RampTime);
-		m[0][0] += B[j][0] * RampAmp*u_t;
-		m[0][1] += B[j][1] * RampAmp*u_t;
-		m[0][2] += B[j][2] * RampAmp*u_t;
-		m[0][3] += B[j][3] * RampAmp*u_t;
+		ctrl_t = pStabView->GetControlInput(t);
+		m[0][0] += B[j][0] * ctrl_t;
+		m[0][1] += B[j][1] * ctrl_t;
+		m[0][2] += B[j][2] * ctrl_t;
+		m[0][3] += B[j][3] * ctrl_t;
 
 		//middle point m2
 		yp[0] = y[0] + dt/2.0 * m[0][0];
@@ -3149,13 +3143,11 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[1][2] = A[2][0]*yp[0] + A[2][1]*yp[1] + A[2][2]*yp[2] + A[2][3]*yp[3];
 		m[1][3] = A[3][0]*yp[0] + A[3][1]*yp[1] + A[3][2]*yp[2] + A[3][3]*yp[3];
 
-		if(RampTime<=0.0) u_t = 0.0;
-		else              u_t = qMin(1.0, (t+dt/2.0)/RampTime);
-
-		m[1][0] += B[j][0] * RampAmp*u_t;
-		m[1][1] += B[j][1] * RampAmp*u_t;
-		m[1][2] += B[j][2] * RampAmp*u_t;
-		m[1][3] += B[j][3] * RampAmp*u_t;
+		ctrl_t = pStabView->GetControlInput(t+dt/2.0);
+		m[1][0] += B[j][0] * ctrl_t;
+		m[1][1] += B[j][1] * ctrl_t;
+		m[1][2] += B[j][2] * ctrl_t;
+		m[1][3] += B[j][3] * ctrl_t;
 
 		//second point m3
 		yp[0] = y[0] + dt/2.0 * m[1][0];
@@ -3168,13 +3160,12 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[2][2] = A[2][0]*yp[0] + A[2][1]*yp[1] + A[2][2]*yp[2] + A[2][3]*yp[3];
 		m[2][3] = A[3][0]*yp[0] + A[3][1]*yp[1] + A[3][2]*yp[2] + A[3][3]*yp[3];
 
-		if(RampTime<=0.0) u_t = 0.0;
-		else              u_t = qMin(1.0, (t+dt/2.0)/RampTime);
+		ctrl_t = pStabView->GetControlInput(t+dt/2.0);
 
-		m[2][0] += B[j][0] * RampAmp*u_t;
-		m[2][1] += B[j][1] * RampAmp*u_t;
-		m[2][2] += B[j][2] * RampAmp*u_t;
-		m[2][3] += B[j][3] * RampAmp*u_t;
+		m[2][0] += B[j][0] * ctrl_t;
+		m[2][1] += B[j][1] * ctrl_t;
+		m[2][2] += B[j][2] * ctrl_t;
+		m[2][3] += B[j][3] * ctrl_t;
 
 		//third point m4
 		yp[0] = y[0] + dt * m[2][0];
@@ -3187,13 +3178,12 @@ void QMiarex::CreateStabRungeKuttaCurves()
 		m[3][2] = A[2][0]*yp[0] + A[2][1]*yp[1] + A[2][2]*yp[2] + A[2][3]*yp[3];
 		m[3][3] = A[3][0]*yp[0] + A[3][1]*yp[1] + A[3][2]*yp[2] + A[3][3]*yp[3];
 
-		if(RampTime<=0.0) u_t = 0.0;
-		else              u_t = qMin(1.0, (t+dt)/RampTime);
+		ctrl_t = pStabView->GetControlInput(t+dt);
 
-		m[3][0] += B[j][0] * RampAmp*u_t;
-		m[3][1] += B[j][1] * RampAmp*u_t;
-		m[3][2] += B[j][2] * RampAmp*u_t;
-		m[3][3] += B[j][3] * RampAmp*u_t;
+		m[3][0] += B[j][0] * ctrl_t;
+		m[3][1] += B[j][1] * ctrl_t;
+		m[3][2] += B[j][2] * ctrl_t;
+		m[3][3] += B[j][3] * ctrl_t;
 
 		//final slope m5
 		m[4][0] = 1./6. * (m[0][0] + 2.0*m[1][0] + 2.0*m[2][0] + m[3][0]);
@@ -5085,7 +5075,7 @@ void QMiarex::GLDraw3D()
 				}
 				if(m_pWingList[iw])
 				{
-					GLCreateDrag(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp, VLMWINGDRAG);
+					GLCreateDrag(this, m_pWingList[iw], m_pCurWPolar, m_pWOpp[iw], VLMWINGDRAG+iw);
 				}
 			}
 		}
@@ -15104,7 +15094,7 @@ void QMiarex::OnWPolarProps()
 {
 	if(!m_pCurWPolar) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	PolarPropsDlg dlg;
+	ObjectPropsDlg dlg;
 	dlg.m_pMiarex = this;
 	dlg.m_pWPolar = m_pCurWPolar;
 	dlg.InitDialog();
@@ -15118,7 +15108,7 @@ void QMiarex::OnWOppProps()
 {
 	if(!m_pCurWOpp) return;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	PolarPropsDlg dlg;
+	ObjectPropsDlg dlg;
 	dlg.m_pMiarex = this;
 	dlg.m_pWOpp = m_pCurWOpp;
 	dlg.InitDialog();

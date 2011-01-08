@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	PolarPropsDlg Class
+	ObjectPropsDlg Class
 	Copyright (C) 2010 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,14 +19,14 @@
 
 *****************************************************************************/
 
-#ifndef POLARPROPSDLG_H
-#define POLARPROPSDLG_H
+#ifndef ObjectPropsDlg_H
+#define ObjectPropsDlg_H
 #include <QTextEdit>
 #include <QDialog>
 #include "../Objects/Polar.h"
 #include "../Objects/WPolar.h"
 
-class PolarPropsDlg : public QDialog
+class ObjectPropsDlg : public QDialog
 {
 	Q_OBJECT
 
@@ -36,7 +36,7 @@ class PolarPropsDlg : public QDialog
 
 
 public:
-	PolarPropsDlg();
+	ObjectPropsDlg();
 	void InitDialog();
 
 private:
@@ -54,4 +54,4 @@ private:
 
 };
 
-#endif // POLARPROPSDLG_H
+#endif // ObjectPropsDlg_H

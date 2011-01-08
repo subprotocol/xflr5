@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	PolarPropsDlg Class
+	ObjectPropsDlg Class
 	Copyright (C) 2010 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
@@ -19,23 +19,20 @@
 
 *****************************************************************************/
 
-#include "PolarPropsDlg.h"
-#include "PolarPropsDlg.h"
+#include "ObjectPropsDlg.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
-#include <QtDebug>
 
 #include "../XDirect/XDirect.h"
 #include "../Miarex/Miarex.h"
 #include "../MainFrame.h"
 #include "../Globals.h"
 
-void * PolarPropsDlg::s_pMainFrame;
+void * ObjectPropsDlg::s_pMainFrame;
 
-PolarPropsDlg::PolarPropsDlg()
+ObjectPropsDlg::ObjectPropsDlg()
 {
-	setWindowTitle(tr("Object Properties"));
 	m_pMiarex     = NULL;
 	m_pXDirect    = NULL;
 	m_pPolar      = NULL;
@@ -47,7 +44,7 @@ PolarPropsDlg::PolarPropsDlg()
 }
 
 
-void PolarPropsDlg::SetupLayout()
+void ObjectPropsDlg::SetupLayout()
 {
 	setMinimumHeight(400);
 	setMinimumWidth(450);
@@ -80,19 +77,36 @@ void PolarPropsDlg::SetupLayout()
 }
 
 
-void PolarPropsDlg::InitDialog()
+void ObjectPropsDlg::InitDialog()
 {
 	QString strange;
 
 	if(m_pXDirect)
 	{
-		if(m_pPolar)     m_pPolar->GetPolarProperties(strange);
-		else if(m_pOpp)  m_pOpp->GetOppProperties(strange);
+		if(m_pPolar)
+		{
+			m_pPolar->GetPolarProperties(strange);
+			setWindowTitle(tr("Polar Properties"));
+
+		}
+		else if(m_pOpp)
+		{
+			m_pOpp->GetOppProperties(strange);
+			setWindowTitle(tr("Operating Point Properties"));
+		}
 	}
 	else if(m_pMiarex)
 	{
-		if(m_pWPolar)    m_pWPolar->GetPolarProperties(strange);
-		else if(m_pWOpp) m_pWOpp->GetWOppProperties(strange);
+		if(m_pWPolar)
+		{
+			m_pWPolar->GetPolarProperties(strange);
+			setWindowTitle(tr("Polar Properties"));
+		}
+		else if(m_pWOpp)
+		{
+			m_pWOpp->GetWOppProperties(strange);
+			setWindowTitle(tr("Operating Point Properties"));
+		}
 	}
 
 	m_pctrlDescription->setText(strange);

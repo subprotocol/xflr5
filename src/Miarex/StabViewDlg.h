@@ -37,7 +37,7 @@
 #include <QStandardItemModel>
 #include "../Misc/FloatEdit.h"
 #include "../Graph/Curve.h"
-#include "CtrlTableDelegate.h"
+#include "../Misc/FloatEditDelegate.h"
 
 
 class StabViewDlg : public QWidget
@@ -49,7 +49,6 @@ class StabViewDlg : public QWidget
 
 public:
 	StabViewDlg(QWidget *parent = NULL);
-
 private slots:
 	void OnAnimate();
 	void OnAnimateRestart();
@@ -74,11 +73,12 @@ private:
 //	void FillControlNames();
 	void FillEigenThings();
 	void FillCurveList();
+	double GetControlInput(const double &time);
 	void SetMode(int iMode=-1);
 	void SetupLayout();
 	void SetControls();
 	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width, bool const& bCurve, bool const& bPoints);
-	
+
 
 	static void *s_pMiarex, *s_pMainFrame;
 
@@ -96,7 +96,7 @@ private:
 	
 	QLabel *m_pctrlStabLabel1, *m_pctrlStabLabel2, *m_pctrlStabLabel3;
 	FloatEdit  *m_pctrlStabVar1, *m_pctrlStabVar2, *m_pctrlStabVar3;
-	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat, *m_pctrlRampTime, *m_pctrlRampAmplitude;
+	FloatEdit *m_pctrlTotalTime, *m_pctrlDeltat;
 	QPushButton *m_pctrlPlotStabGraph;
 	QPushButton *m_pctrlAddCurve, *m_pctrlDeleteCurve, *m_pctrlRenameCurve;
 	QComboBox *m_pctrlCurveList;
@@ -108,9 +108,9 @@ private:
 
 	QRadioButton *m_pctrlModalResponse, *m_pctrlInitCondResponse, *m_pctrlForcedResponse;
 
-//	QTableView *m_pctrlControlTable;
-//	QStandardItemModel *m_pControlModel;
-//	CtrlTableDelegate *m_pCtrlDelegate;
+	QTableView *m_pctrlControlTable;
+	QStandardItemModel *m_pControlModel;
+	FloatEditDelegate *m_pCtrlDelegate;
 
 	double m_ModeAmplitude;
 	double m_vabs[4], m_phi[4];
