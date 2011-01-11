@@ -307,7 +307,7 @@ private:
 	void UpdateCurve();
 	void PaintWing(QPainter &painter, QPoint ORef, double scale);
 	void PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence);
-	void RotateGeomZ(double const &Beta, CVector const &P);
+	void RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P);
 	void CreateWOpp(CWOpp *pWOpp, CWing *pWing);
 	void EditCurPlane();
 	void PaintWingLegend(QPainter &painter);

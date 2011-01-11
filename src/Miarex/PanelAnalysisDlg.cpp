@@ -1588,10 +1588,10 @@ void PanelAnalysisDlg::InitDialog()
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
-		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
-		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
-		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
-		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
+//		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
+//		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
+//		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
+//		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
 	}
 
 	m_pctrlTextOutput->clear();

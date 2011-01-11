@@ -633,6 +633,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
 	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
 	double sign;
+	factor = pMiarex->m_VelocityScale/20.0;
 
 	//DOWNWASH
 	glNewList(List,GL_COMPILE);
@@ -669,7 +670,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 
 					dih = -pWing->GetDihedral(yob)*PI/180.0;
 					amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
-					amp *= pMiarex->m_VelocityScale/2.0;
+					amp *= factor;
 					glBegin(GL_LINES);
 					{
 						glVertex3d(xt, yt, zt);
@@ -689,7 +690,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 
 						dih = -pWing->GetDihedral(yob)*PI/180.0;
 						amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
-						amp *= pMiarex->m_VelocityScale/2.0;
+						amp *= factor;
 
 						glVertex3d(xt + amp * cos(dih)* sina,
 								   yt + amp * sin(dih),
@@ -700,8 +701,6 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 			}
 			else
 			{
-				factor = pMiarex->m_VelocityScale/2.0;
-
 				p = 0;
 				i = 0;
 				for (j=0; j<pWing->m_NSurfaces; j++)

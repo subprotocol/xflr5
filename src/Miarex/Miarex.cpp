@@ -4613,6 +4613,7 @@ void QMiarex::GLCallViewLists()
 	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
+
 	if(m_bVLMPanels && m_pCurWing)
 	{
 		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
@@ -4624,6 +4625,7 @@ void QMiarex::GLCallViewLists()
 	}
 
 	//the lift position has been calculated in absolute coordinates, so we don't rotate it with beta
+	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 	if(m_bXCP && m_pCurWOpp)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
@@ -4631,7 +4633,6 @@ void QMiarex::GLCallViewLists()
 		glCallList(LIFTFORCE);
 	}
 
-	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
@@ -8641,7 +8642,6 @@ void QMiarex::OnDownwash()
 {
 	m_bDownwash = m_pctrlDownwash->isChecked();
 	UpdateView();
-qDebug()<<"OnDownwash"<<m_bDownwash;
 }
 
 
@@ -12230,26 +12230,26 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 }
 
 
-void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
+void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P)
 {
 	int n, p, pw, kw, lw;
 //	double cosb = cos(Beta*PI/180.0);
 //	double sinb = sin(Beta*PI/180.0);
 	int iLA, iLB, iTA, iTB;
-	CVector LATB, TALB, Pt, Ptr, Trans;
+	CVector LATB, TALB, Pt, Trans;
 
-	for (n=0; n< m_nNodes; n++)	m_Node[n].RotateZ(P, Beta);
+	for (n=0; n< m_nNodes; n++)	pNode[n].RotateZ(P, Beta);
 
 	for (p=0; p< m_MatSize; p++)
 	{
-		iLA = m_Panel[p].m_iLA; iLB = m_Panel[p].m_iLB;
-		iTA = m_Panel[p].m_iTA; iTB = m_Panel[p].m_iTB;
+		iLA = pPanel[p].m_iLA; iLB = pPanel[p].m_iLB;
+		iTA = pPanel[p].m_iTA; iTB = pPanel[p].m_iTB;
 
-		LATB = m_Node[iLA] - m_Node[iTB];
-		TALB = m_Node[iTA] - m_Node[iLB];
+		LATB = pNode[iLA] - pNode[iTB];
+		TALB = pNode[iTA] - pNode[iLB];
 
-		if(m_Panel[p].m_iPos>=0)		m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
-		else if (m_Panel[p].m_iPos==-1)	m_Panel[p].SetFrame(m_Node[iLB], m_Node[iLA], m_Node[iTB], m_Node[iTA]);
+		if(pPanel[p].m_iPos>=0)	       pPanel[p].SetFrame(pNode[iLA], pNode[iLB], pNode[iTA], pNode[iTB]);
+		else if (pPanel[p].m_iPos==-1) pPanel[p].SetFrame(pNode[iLB], pNode[iLA], pNode[iTB], pNode[iTA]);
 	}
 
 	// the wake array is not rotated but translated to remain at the wing's trailing edge
@@ -12259,40 +12259,40 @@ void QMiarex::RotateGeomZ(double const &Beta, CVector const &P)
 	for (kw=0; kw<m_NWakeColumn; kw++)
 	{
 		//consider the first panel of the column;
-		Pt = m_WakeNode[m_WakePanel[pw].m_iLA];
+		Pt = pWakeNode[pWakePanel[pw].m_iLA];
 		Pt.RotateZ(P, Beta);
 		//define the translation to be applied to the column's left points
-		Trans = Pt-m_WakeNode[m_WakePanel[pw].m_iLA] ;
+		Trans = Pt-pWakeNode[pWakePanel[pw].m_iLA] ;
 
 		//each wake column has m_NXWakePanels ... translate all left A nodes
 		for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
 		{
-			if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLA] += Trans;
-			m_WakeNode[m_WakePanel[pw].m_iTA] += Trans;
+			if(lw==0) pWakeNode[pWakePanel[pw].m_iLA] += Trans;
+			pWakeNode[pWakePanel[pw].m_iTA] += Trans;
 			pw++;
 		}
 	}
 	pw -= m_pCurWPolar->m_NXWakePanels;
 	//consider the first panel of the column;
-	Pt = m_WakeNode[m_WakePanel[pw].m_iLB];
+	Pt = pWakeNode[pWakePanel[pw].m_iLB];
 	Pt.RotateZ(P, Beta);
 	//define the translation to be applied to the column's left points
-	Trans = Pt - m_WakeNode[m_WakePanel[pw].m_iLB];
+	Trans = Pt - pWakeNode[pWakePanel[pw].m_iLB];
 
 	//each wake column has m_NXWakePanels ... translate all left A nodes
 	for(lw=0; lw<m_pCurWPolar->m_NXWakePanels; lw++)
 	{
-		if(lw==0) m_WakeNode[m_WakePanel[pw].m_iLB] += Trans;
-		m_WakeNode[m_WakePanel[pw].m_iTB] += Trans;
+		if(lw==0) pWakeNode[pWakePanel[pw].m_iLB] += Trans;
+		pWakeNode[pWakePanel[pw].m_iTB] += Trans;
 		pw++;
 	}
 
 	//Reset panel frame : CollPt has been translated
 	for (pw=0; pw< m_WakeSize; pw++)
 	{
-		iLA = m_WakePanel[pw].m_iLA; iLB = m_WakePanel[pw].m_iLB;
-		iTA = m_WakePanel[pw].m_iTA; iTB = m_WakePanel[pw].m_iTB;
-		m_WakePanel[pw].SetFrame(m_WakeNode[iLA], m_WakeNode[iLB], m_WakeNode[iTA], m_WakeNode[iTB]);
+		iLA = pWakePanel[pw].m_iLA; iLB = pWakePanel[pw].m_iLB;
+		iTA = pWakePanel[pw].m_iTA; iTB = pWakePanel[pw].m_iTB;
+		pWakePanel[pw].SetFrame(pWakeNode[iLA], pWakeNode[iLB], pWakeNode[iTA], pWakeNode[iTB]);
 	}
 }
 
@@ -14172,7 +14172,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	CVector RefPoint(0.0, 0.0, 0.0);
 	if(m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001)
 	{
-		RotateGeomZ(m_pCurWPolar->m_Beta, RefPoint);
+		RotateGeomZ(m_MemPanel, m_MemNode, m_WakePanel, m_WakeNode, m_pCurWPolar->m_Beta, RefPoint);
 	}
 
 	if(m_pCurWPolar && m_pCurWPolar->m_UFOName==UFOName)
@@ -15158,8 +15158,8 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 			else
 			{
 				angle = m_pCurWPolar->m_MinControl[0] + t * (m_pCurWPolar->m_MaxControl[0] - m_pCurWPolar->m_MinControl[0]);
-				angle -= m_pCurPlane->m_WingTiltAngle[0];//cancel initial tilt set in plane definition
 				strange = QString("         Setting the wing tilt to %1").arg(angle, 5, 'f',2);
+				angle -= m_pCurPlane->m_WingTiltAngle[0];//cancel initial tilt set in plane definition
 			}
 
 			strange += "\n";
@@ -15211,8 +15211,8 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 				else
 				{
 					angle = m_pCurWPolar->m_MinControl[1] + t * (m_pCurWPolar->m_MaxControl[1] - m_pCurWPolar->m_MinControl[1]);
-					angle -= m_pCurPlane->m_WingTiltAngle[2];//cancel initial tilt set in plane definition
 					strange = QString("         Setting the elevator tilt to %1").arg(angle, 5, 'f',2);
+					angle -= m_pCurPlane->m_WingTiltAngle[2];//cancel initial tilt set in plane definition
 				}
 
 				strange += "\n";
@@ -15277,11 +15277,11 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 						else
 						{
 							angle = m_pCurWPolar->m_MinControl[NCtrls] + t * (m_pCurWPolar->m_MaxControl[NCtrls] - m_pCurWPolar->m_MinControl[NCtrls]);
+							strange =  "        Setting "+pWing->m_WingName +" ";
+							strange += QString("flap %1 angle to %2").arg(nFlap+1).arg(angle, 5, 'f',2);
 							//cancel initial angle, if any
 							if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
 								angle -= (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
-							strange =  "        Setting "+pWing->m_WingName +" ";
-							strange += QString("flap %1 angle to %2").arg(nFlap+1).arg(angle, 5, 'f',2);
 						}
 
 						strange += "\n";

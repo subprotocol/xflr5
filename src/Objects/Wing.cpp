@@ -2596,8 +2596,8 @@ int CWing::VLMGetPanelTotal()
 
 
 void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Gamma, double &XCP, double &YCP,
-							   double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
-							   CWPolar *pWPolar, CVector CoG)
+						 double &GCm, double &VCm, double &ICm, double &GRm, double &GYm, double &VYm,double &IYm,
+						 CWPolar *pWPolar, CVector CoG)
 
 {
 	//  Calculates the wing aero coefficients
@@ -2625,6 +2625,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	CVector HingeLeverArm,  PtC4Strip, PtLEStrip, ForcePt, SurfaceNormal, LeverArmC4CoG, LeverArmPanelC4, LeverArmPanelCoG;
 	CVector Force, PanelForce, StripForce, DragVector, Moment0, HingeMoment, DragMoment, GeomMoment;
 	CVector WindNormal, WindDirection;
+	CVector Origin(0.0,0.0,0.0);
 
 	//initialize
 	m_GRm =0.0;
@@ -2670,7 +2671,10 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 
 			m_Surface[j].GetLeadingPt(k, PtLEStrip);
 			m_Surface[j].GetC4(k, PtC4Strip, tau);
-
+			if(pWPolar->m_Beta>0.0)
+			{
+				PtC4Strip.RotateZ(Origin, pWPolar->m_Beta);
+			}
 
 			LeverArmC4CoG = PtC4Strip - CoG;
 
@@ -2735,7 +2739,6 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			// add viscous properties, if required
 			if(pWPolar->m_bViscous) DragVector.x   = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
 			else                    DragVector.x = 0.0;
-
 			// global moments, in N.m/q
 			DragMoment =  LeverArmC4CoG * DragVector;
 
