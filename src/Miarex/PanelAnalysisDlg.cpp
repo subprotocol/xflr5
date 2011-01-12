@@ -1588,10 +1588,10 @@ void PanelAnalysisDlg::InitDialog()
 	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
-//		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
-//		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
-//		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
-//		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
+		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
+		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
+		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
+		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
 	}
 
 	m_pctrlTextOutput->clear();
@@ -3252,7 +3252,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 					}
 
 					PanelLeverArm = m_pPanel[p].VortexPos - m_CoG;
-					Moment += PanelForce * PanelLeverArm;                     // N.m/rho
+					Moment += PanelLeverArm * PanelForce;                     // N.m/rho
 					p++;
 				}
 
@@ -3296,7 +3296,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 			PanelForce = m_pPanel[p].Normal * (-Cp) * m_pPanel[p].Area *1/2.*QInf*QInf;      // Newtons/rho
 
 			PanelLeverArm = m_pPanel[p].CollPt - m_CoG;
-			Moment += PanelForce * PanelLeverArm;                     // N.m/rho
+			Moment += PanelLeverArm * PanelForce;                     // N.m/rho
 		}
 	}
 
@@ -3743,13 +3743,14 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	js.Set(  0.0, 1.0,   0.0);
 	ks.Set( sina, 0.0, -cosa);
 
-	V0 = WindDirection * u0; //is the steady state velocity vector, if no sideslip
+	V0 = is * (-u0); //is the steady state velocity vector, if no sideslip
 
 	//______________________________________________________________________________
 	// RHS for unit speed vectors
-	Vi = V0 + is * deltaspeed;
-	Vj = V0 + js * deltaspeed;
-	Vk = V0 + ks * deltaspeed;
+	// The change in wind velocity is opposite to the change in plane velocity
+	Vi = V0 - is * deltaspeed; //a positive increase in axial speed is a positive increase in wind speed
+	Vj = V0 - js * deltaspeed; //a plane movement to the right is a wind flow to the left, i.e. negative y
+	Vk = V0 - ks * deltaspeed; //a plane movement downwards (Z_stability>0) is a positive increase of V in geometry axes
 
 	for (p=0; p<m_MatSize; p++)
 	{
@@ -3775,15 +3776,18 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	//______________________________________________________________________________
 	// RHS for unit rotation vectors around Stability axis
 	// stability axis origin is CoG
+
 	for (p=0; p<m_MatSize; p++)
 	{
 		//re-use existing memory to define the velocity field
 		if(m_pPanel[p].m_iPos==0) CGM = m_pPanel[p].VortexPos - m_CoG;
 		else                      CGM = m_pPanel[p].CollPt    - m_CoG;
 
-		Ris = is*CGM *deltarotation+V0;
-		Rjs = js*CGM *deltarotation+V0;
-		Rks = ks*CGM *deltarotation+V0;
+		// a rotation of the plane about a vector is the opposite of a rotation of the freestream about this vector
+		Ris = is*CGM * (-deltarotation) + V0;
+		Rjs = js*CGM * (-deltarotation) + V0;
+		Rks = ks*CGM * (-deltarotation) + V0;
+
 		m_RHS[59*m_MatSize+p] = Ris.x;
 		m_RHS[60*m_MatSize+p] = Ris.y;
 		m_RHS[61*m_MatSize+p] = Ris.z;
@@ -3845,56 +3849,48 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	//________________________________________________
 	// 1st ORDER STABILITY DERIVATIVES
 	// x-derivatives________________________
-	alpha = atan2(Vi.z, Vi.x);
-	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
-	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
-	alpha *= 180.0/PI;
+	alpha = atan2(Vi.z, Vi.x) * 180.0/PI;// =m_AlphaEq....
 	Forces(m_uRHS, m_Sigma, alpha, m_RHS+50*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Xu = (Force.dot(WindDirection)-Force0.dot(is))/deltaspeed;
-	Zu = (Force.dot(WindNormal)   -Force0.dot(ks))/deltaspeed;
-	Mu = 0.0;
-	Mu = (Moment-Moment0).dot(js)/deltaspeed;
+	Xu = (Force - Force0).dot(is)   /deltaspeed;
+	Zu = (Force - Force0).dot(ks)   /deltaspeed;
+	Mu = (Moment- Moment0).dot(js)  /deltaspeed;
 
 	// y-derivatives________________________
-	alpha = atan2(Vj.z, Vj.x);
-	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
-	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
-	alpha *= 180.0/PI;
+	alpha = atan2(Vj.z, Vj.x)*180.0/PI;// =m_AlphaEq....
 	Forces(m_vRHS, m_Sigma+m_MatSize, alpha, m_RHS+53*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Yv = (Force.dot(js)-Force0.dot(js))/deltaspeed;
-	Lv = (Moment.dot(WindDirection)-Moment0.dot(is))/deltaspeed;
-	Nv = (Moment.dot(WindNormal)-Moment0.dot(ks))/deltaspeed;
+	Yv = (Force - Force0).dot(js)   /deltaspeed;
+//	Lv = (Moment.dot(WindDirection) - Moment0.dot(is)) /deltaspeed;
+	Nv = (Moment.dot(WindNormal)    - Moment0.dot(ks)) /deltaspeed;
+	Lv = (Moment - Moment0).dot(is) /deltaspeed;
+	Nv = (Moment - Moment0).dot(ks) /deltaspeed;
 
 	// z-derivatives________________________
-	alpha = atan2(Vk.z, Vk.x);
-	WindDirection.Set(-cos(alpha), 0.0, -sin(alpha));
-	WindNormal.Set(sin(alpha), 0.0, -cos(alpha));
-	alpha *= 180.0/PI;
+	alpha = atan2(Vk.z, Vk.x)* 180.0/PI;
 	Forces(m_wRHS, m_Sigma+2*m_MatSize, alpha, m_RHS+56*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Xw = (Force.dot(WindDirection)-Force0.dot(is))/deltaspeed;
-	Zw = (Force.dot(WindNormal)   -Force0.dot(ks))/deltaspeed;
-	Mw = (Moment.dot(js)-Moment0.dot(js))/deltaspeed;
+	Xw = (Force - Force0).dot(is)   /deltaspeed;
+	Zw = (Force - Force0).dot(ks)   /deltaspeed;
+	Mw = (Moment - Moment0).dot(js) /deltaspeed;
 
 	m_Progress +=1;
 	qApp->processEvents();
 
 	// p-derivatives
 	Forces(m_pRHS, m_Sigma+3*m_MatSize, m_AlphaEq, m_RHS+59*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Yp = (Force-Force0).dot(js)/deltarotation;
-	Lp = (Moment-Moment0).dot(is)/deltarotation;
-	Np = (Moment-Moment0).dot(ks)/deltarotation;
+	Yp = (Force-Force0).dot(js)   /deltarotation;
+	Lp = (Moment-Moment0).dot(is) /deltarotation;
+	Np = (Moment-Moment0).dot(ks) /deltarotation;
 
 	// q-derivatives
 	Forces(m_qRHS, m_Sigma+4*m_MatSize, m_AlphaEq, m_RHS+62*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Xq = (Force-Force0).dot(is)  /deltarotation;
-	Zq = (Force-Force0).dot(ks)  /deltarotation;
-	Mq = (Moment-Moment0).dot(js)/deltarotation;
+	Xq = (Force-Force0).dot(is)   /deltarotation;
+	Zq = (Force-Force0).dot(ks)   /deltarotation;
+	Mq = (Moment-Moment0).dot(js) /deltarotation;
 
 	// r-derivatives
 	Forces(m_rRHS, m_Sigma+5*m_MatSize, m_AlphaEq, m_RHS+65*m_MatSize, Force, Moment, m_pWPolar->m_bTiltedGeom);
-	Yr = (Force-Force0).dot(js)/deltarotation;
-	Lr = (Moment-Moment0).dot(is)/deltarotation;
-	Nr = (Moment-Moment0).dot(ks)/deltarotation;
+	Yr = (Force-Force0).dot(js)   /deltarotation;
+	Lr = (Moment-Moment0).dot(is) /deltarotation;
+	Nr = (Moment-Moment0).dot(ks) /deltarotation;
 
 	m_Progress +=1;
 	qApp->processEvents();
@@ -3902,11 +3898,22 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	//________________________________________________
 	// 2nd ORDER STABILITY DERIVATIVES
 	// Zwp & Mwp ... ?
+	// M. Drela's answer to the question posted on Yahoo Groups:
 
-	// not sure why, but z signs are inverted
-	Zu = -Zu;
-	Zw = -Zw;
-	Zq = -Zq;
+	/*	« May I take this opportunity to ask you about the stability derivatives w.r.t. alpha dot ?
+	Are they ignored in AVL and if so, is it a safe assumption ?
+
+	Yes, the _alphadot derivatives are ignored, for the simple reason that there's no way to do it
+	in an algorithmic way for a general configuration. The usual estimates in Etkin or Nelson assume
+	 a "typical" tailed airplane configuration, with a small tail and a well-defined tail arm.
+	These estimates won't work for other configurations like canard, tandem, or flying wing.
+
+	Normally, only the Cm_alphadot derivative is significant, and slightly augments the pitch-damping
+	derivative Cm_q. Leaving it out therefore underpredicts pitch damping slightly, so this is a
+	conservative approximation. And pitch damping is not a major concern in any case.
+	Simple static pitch stability is more important, and that's not affected by alphadot.
+
+	All this is for a conventional configuration. Not sure what the impact is on the pitch damping of flying wings. »*/
 }
 
 

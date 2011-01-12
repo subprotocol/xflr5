@@ -2674,6 +2674,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			if(pWPolar->m_Beta>0.0)
 			{
 				PtC4Strip.RotateZ(Origin, pWPolar->m_Beta);
+				PtLEStrip.RotateZ(Origin, pWPolar->m_Beta);
 			}
 
 			LeverArmC4CoG = PtC4Strip - CoG;

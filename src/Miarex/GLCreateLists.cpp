@@ -1491,7 +1491,7 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==1)
+			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -1539,14 +1539,14 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 					{
 						pWing->m_Surface[j].GetLeadingPt(k, C);
 						amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / pWing->m_MAChord * pMiarex->m_LiftScale/1000.0;
-						C.x = pWOpp->m_XCPSpanAbs[i];
+						C.x += pWOpp->m_XCPSpanRel[i] * pWing->m_Surface[j].GetChord(k);
 
 						glBegin(GL_LINES);
 						{
 							glVertex3d(C.x, C.y, C.z);
 							glVertex3d(C.x + pWOpp->m_F[i].x*amp,//F is in Body axes
-									   C.y + pWOpp->m_F[i].y*amp,
-									   C.z + pWOpp->m_F[i].z*amp);
+									 C.y + pWOpp->m_F[i].y*amp,
+									 C.z + pWOpp->m_F[i].z*amp);
 						}
 						glEnd();
 						i++;
@@ -1567,10 +1567,10 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 							k=0;
 							pWing->m_Surface[j].GetLeadingPt(k, C);
 							amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / pWing->m_MAChord * pMiarex->m_LiftScale/1000.0;
-							C.x = pWOpp->m_XCPSpanAbs[i];
+							C.x += pWOpp->m_XCPSpanRel[i] * pWing->m_Surface[j].GetChord(k);
 							glVertex3d(C.x + pWOpp->m_F[i].x*amp,
-									   C.y + pWOpp->m_F[i].y*amp,
-									   C.z + pWOpp->m_F[i].z*amp);
+									 C.y + pWOpp->m_F[i].y*amp,
+									 C.z + pWOpp->m_F[i].z*amp);
 
 						}
 						glEnd();
@@ -1581,7 +1581,7 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 						{
 							pWing->m_Surface[j].GetLeadingPt(k, C);
 							amp = pWOpp->m_Chord[i] / pWOpp->m_StripArea[i] / pWing->m_MAChord * pMiarex->m_LiftScale/1000.0;
-							C.x = pWOpp->m_XCPSpanAbs[i];
+							C.x += pWOpp->m_XCPSpanRel[i] * pWing->m_Surface[j].GetChord(k);
 							CL.x = C.x + pWOpp->m_F[i].x*amp;
 							CL.y = C.y + pWOpp->m_F[i].y*amp;
 							CL.z = C.z + pWOpp->m_F[i].z*amp;

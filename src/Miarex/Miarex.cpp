@@ -4624,8 +4624,8 @@ void QMiarex::GLCallViewLists()
 		glCallList(PANELCP);
 	}
 
-	//the lift position has been calculated in absolute coordinates, so we don't rotate it with beta
 	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
+
 	if(m_bXCP && m_pCurWOpp)
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
