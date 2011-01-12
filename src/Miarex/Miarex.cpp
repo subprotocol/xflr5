@@ -840,19 +840,30 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 				pPOpp->m_PlaneWOpp[0].m_XNP = m_pPanelDlg->XNP;
 
+				pPOpp->m_PlaneWOpp[0].CXu =  m_pPanelDlg->CXu;
+				pPOpp->m_PlaneWOpp[0].CZu =  m_pPanelDlg->CZu;
+				pPOpp->m_PlaneWOpp[0].Cmu =  m_pPanelDlg->Cmu;
+
+				pPOpp->m_PlaneWOpp[0].CXa =  m_pPanelDlg->CXa;
 				pPOpp->m_PlaneWOpp[0].CLa = -m_pPanelDlg->CZa;
-				pPOpp->m_PlaneWOpp[0].CLq = -m_pPanelDlg->CZq;
 				pPOpp->m_PlaneWOpp[0].Cma =  m_pPanelDlg->Cma;
+
+				pPOpp->m_PlaneWOpp[0].CXq =  m_pPanelDlg->CXq;
+				pPOpp->m_PlaneWOpp[0].CLq = -m_pPanelDlg->CZq;
 				pPOpp->m_PlaneWOpp[0].Cmq =  m_pPanelDlg->Cmq;
+
 				pPOpp->m_PlaneWOpp[0].CYb =  m_pPanelDlg->CYb;
-				pPOpp->m_PlaneWOpp[0].CYp =  m_pPanelDlg->CYp;
-				pPOpp->m_PlaneWOpp[0].CYr =  m_pPanelDlg->CYr;
 				pPOpp->m_PlaneWOpp[0].Clb =  m_pPanelDlg->Clb;
-				pPOpp->m_PlaneWOpp[0].Clp =  m_pPanelDlg->Clp;
-				pPOpp->m_PlaneWOpp[0].Clr =  m_pPanelDlg->Clr;
 				pPOpp->m_PlaneWOpp[0].Cnb =  m_pPanelDlg->Cnb;
+
+				pPOpp->m_PlaneWOpp[0].CYp =  m_pPanelDlg->CYp;
+				pPOpp->m_PlaneWOpp[0].Clp =  m_pPanelDlg->Clp;
 				pPOpp->m_PlaneWOpp[0].Cnp =  m_pPanelDlg->Cnp;
+
+				pPOpp->m_PlaneWOpp[0].CYr =  m_pPanelDlg->CYr;
+				pPOpp->m_PlaneWOpp[0].Clr =  m_pPanelDlg->Clr;
 				pPOpp->m_PlaneWOpp[0].Cnr =  m_pPanelDlg->Cnr;
+
 				//Only one control derivative for all the controls of the polar
 				pPOpp->m_PlaneWOpp[0].m_nControls = 1;
 				pPOpp->m_PlaneWOpp[0].CXe[0] = m_pPanelDlg->CXe;
@@ -1299,19 +1310,30 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 
 			pNewPoint->m_XNP = m_pPanelDlg->XNP;
 
+			pNewPoint->CXu =  m_pPanelDlg->CXu;
+			pNewPoint->CZu =  m_pPanelDlg->CZu;
+			pNewPoint->Cmu =  m_pPanelDlg->Cmu;
+
+			pNewPoint->CXa =  m_pPanelDlg->CXa;
 			pNewPoint->CLa = -m_pPanelDlg->CZa;
+			pNewPoint->Cma =  m_pPanelDlg->Cma;
+
+			pNewPoint->CXq =  m_pPanelDlg->CXq;
 			pNewPoint->CLq = -m_pPanelDlg->CZq;
-			pNewPoint->Cma = m_pPanelDlg->Cma;
-			pNewPoint->Cmq = m_pPanelDlg->Cmq;
-			pNewPoint->CYb = m_pPanelDlg->CYb;
-			pNewPoint->CYp = m_pPanelDlg->CYp;
-			pNewPoint->CYr = m_pPanelDlg->CYr;
-			pNewPoint->Clb = m_pPanelDlg->Clb;
-			pNewPoint->Clp = m_pPanelDlg->Clp;
-			pNewPoint->Clr = m_pPanelDlg->Clr;
-			pNewPoint->Cnb = m_pPanelDlg->Cnb;
-			pNewPoint->Cnp = m_pPanelDlg->Cnp;
-			pNewPoint->Cnr = m_pPanelDlg->Cnr;
+			pNewPoint->Cmq =  m_pPanelDlg->Cmq;
+
+			pNewPoint->CYb =  m_pPanelDlg->CYb;
+			pNewPoint->Clb =  m_pPanelDlg->Clb;
+			pNewPoint->Cnb =  m_pPanelDlg->Cnb;
+
+			pNewPoint->CYp =  m_pPanelDlg->CYp;
+			pNewPoint->Clp =  m_pPanelDlg->Clp;
+			pNewPoint->Cnp =  m_pPanelDlg->Cnp;
+
+			pNewPoint->CYr =  m_pPanelDlg->CYr;
+			pNewPoint->Clr =  m_pPanelDlg->Clr;
+			pNewPoint->Cnr =  m_pPanelDlg->Cnr;
+
 			//Only one control derivative for all the controls of the polar
 			pNewPoint->m_nControls = 1;
 			pNewPoint->CXe[0] = m_pPanelDlg->CXe;

@@ -88,7 +88,7 @@ private:
 
 
 	//non dimensional stability derivatives
-	double CLa, CLq, Cma, Cmq, CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
+	double CXu, CZu, Cmu, CXa, CLa, Cma, CXq, CLq, Cmq, CYb, CYp, CYr, Clb, Clp, Clr, Cnb, Cnp, Cnr;
 	//non-dimensional control derivatives
 	double CXe[MAXCONTROLS],CYe[MAXCONTROLS],CZe[MAXCONTROLS];
 	double CLe[MAXCONTROLS],CMe[MAXCONTROLS],CNe[MAXCONTROLS];

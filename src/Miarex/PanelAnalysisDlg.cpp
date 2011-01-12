@@ -3900,7 +3900,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	// Zwp & Mwp ... ?
 	// M. Drela's answer to the question posted on Yahoo Groups:
 
-	/*	« May I take this opportunity to ask you about the stability derivatives w.r.t. alpha dot ?
+	/*	May I take this opportunity to ask you about the stability derivatives w.r.t. alpha dot ?
 	Are they ignored in AVL and if so, is it a safe assumption ?
 
 	Yes, the _alphadot derivatives are ignored, for the simple reason that there's no way to do it
@@ -3913,7 +3913,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	conservative approximation. And pitch damping is not a major concern in any case.
 	Simple static pitch stability is more important, and that's not affected by alphadot.
 
-	All this is for a conventional configuration. Not sure what the impact is on the pitch damping of flying wings. »*/
+	All this is for a conventional configuration. Not sure what the impact is on the pitch damping of flying wings. */
 }
 
 

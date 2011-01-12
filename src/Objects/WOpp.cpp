@@ -71,7 +71,8 @@ CWOpp::CWOpp()
 	m_YCP                 = 0.0;
 	m_XNP	              = 0.0;
 
-	CLa = CLq = Cma = Cmq = CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
+	CXu = CZu = Cmu = 0.0;
+	CXa = CLa = Cma = CXq = CLq = Cmq = CYb = CYp = CYr = Clb = Clp = Clr = Cnb = Cnp = Cnr = 0.0;
 
 	memset(m_ALong, 0, 16*sizeof(double));	
 	memset(m_ALat, 0, 16*sizeof(double));	
@@ -188,8 +189,9 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat>=6) ar << 1019;
+		if(ProjectFormat>=6) ar << 1020;
 		else                 ar << 1015;
+		//1020 : added CXa/CXu/CZu/Cmu + changed the provisions to zero
 		//1019 : added Neutral point position + Provision for more int and float saves
 		//1018 : added non dimensional stability control derivatives
 		//1017 : added non dimensional stability derivatives
@@ -271,6 +273,10 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 					ar << (float)(m_EigenVector[k][l].real()) << (float)(m_EigenVector[k][l].imag());
 				}
 			}
+
+
+			ar<<(float)CXa <<(float)CXq <<(float)CXu <<(float)CZu <<(float)Cmu;
+
 			ar << (float)CLa << (float)CLq << (float)Cma << (float)Cmq;
 			ar << (float)CYb << (float)CYp << (float)CYr << (float)Clb << (float)Clp << (float)Clr << (float)Cnb << (float)Cnp << (float)Cnr;
 			ar << m_nControls;
@@ -291,8 +297,8 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ProjectFormat>5)
 		{
 			//provision
-			for(int i=0; i<20; i++) ar<<(float)i;
-			for(int i=0; i<20; i++) ar<<i;
+			for(int i=0; i<20; i++) ar<<(float)0.0f;
+			for(int i=0; i<20; i++) ar<<0;
 		}
 	}
 	else
@@ -503,6 +509,15 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				}
 			}
 		}
+		if(ArchiveFormat>=1020)
+		{
+			// Non dimensional stability derivatives
+			ar>>f;   CXa= f;
+			ar>>f;   CXq= f;
+			ar>>f;   CXu= f;
+			ar>>f;   CZu= f;
+			ar>>f;   Cmu= f;
+		}
 		if(ArchiveFormat>=1017)
 		{
 			// Non dimensional stability derivatives
@@ -674,29 +689,39 @@ void CWOpp::GetWOppProperties(QString &WOppProperties)
 	{
 		WOppProperties += "\n\n";
 		WOppProperties += QObject::tr("Non-dimensional Stability Derivatives:")+"\n";
+		strong  = QString(QObject::tr("CXu")+"  = %1").arg(CXu,9,'f',5);
+		WOppProperties += strong +"\n";
+		strong  = QString(QObject::tr("CLu")+"  = %1").arg(-CZu,9,'f',5);
+		WOppProperties += strong +"\n";
+		strong  = QString(QObject::tr("Cmu")+"  = %1").arg(Cmu,9,'f',5);
+		WOppProperties += strong +"\n\n";
+		strong  = QString(QObject::tr("CXa")+"  = %1").arg(CXa,9,'f',5);
+		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("CLa")+"  = %1").arg(CLa,9,'f',5);
 		WOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("CLq")+"  = %1").arg(CLa,9,'f',5);
-		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cma")+"  = %1").arg(Cma,9,'f',5);
+		WOppProperties += strong +"\n\n";
+		strong  = QString(QObject::tr("CXq")+"  = %1").arg(CXq,9,'f',5);
+		WOppProperties += strong +"\n";
+		strong  = QString(QObject::tr("CLq")+"  = %1").arg(CLq,9,'f',5);
 		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cmq")+"  = %1").arg(Cmq,9,'f',5);
-		WOppProperties += strong +"\n";
+		WOppProperties += strong +"\n\n";
 		strong  = QString(QObject::tr("CYb")+"  = %1").arg(CYb,9,'f',5);
-		WOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("CYp")+"  = %1").arg(CYp,9,'f',5);
-		WOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("CYr")+"  = %1").arg(CYr,9,'f',5);
 		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Clb")+"  = %1").arg(Clb,9,'f',5);
 		WOppProperties += strong +"\n";
+		strong  = QString(QObject::tr("Cnb")+"  = %1").arg(Cnb,9,'f',5);
+		WOppProperties += strong +"\n\n";
+		strong  = QString(QObject::tr("CYp")+"  = %1").arg(CYp,9,'f',5);
+		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Clp")+"  = %1").arg(Clp,9,'f',5);
 		WOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("Clr")+"  = %1").arg(Clr,9,'f',5);
-		WOppProperties += strong +"\n";
-		strong  = QString(QObject::tr("Cnb")+"  = %1").arg(Cnb,9,'f',5);
-		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cnp")+"  = %1").arg(Cnp,9,'f',5);
+		WOppProperties += strong +"\n\n";
+		strong  = QString(QObject::tr("CYr")+"  = %1").arg(CYr,9,'f',5);
+		WOppProperties += strong +"\n";
+		strong  = QString(QObject::tr("Clr")+"  = %1").arg(Clr,9,'f',5);
 		WOppProperties += strong +"\n";
 		strong  = QString(QObject::tr("Cnr")+"  = %1").arg(Cnr,9,'f',5);
 		WOppProperties += strong +"\n\n";
