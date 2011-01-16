@@ -31,6 +31,7 @@
 #include <QDateTime>
 #include <QApplication>
 #include <QMessageBox>
+#include <QtDebug>
 
 bool BatchDlg::s_bStoreOpp = false;
 bool BatchDlg::s_bCurrentFoil=true;
@@ -1049,29 +1050,29 @@ void BatchDlg::OnEditReList()
 }
 
 
+
 void BatchDlg::OnFoilList()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QXDirect  *pXDirect   = (QXDirect*)s_pXDirect;
 	FoilSelectionDlg dlg;
 	dlg.SetSelectionMode(true);
-//	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_poaFoil = pXDirect->m_poaFoil;
-	dlg.m_FoilName = m_pFoil->m_FoilName;
+	if(m_pFoil) dlg.m_FoilName = m_pFoil->m_FoilName;
+	dlg.m_FoilList.clear();
+	for(int i=0; i<m_FoilList.size(); i++)
+	{
+		dlg.m_FoilList.append(m_FoilList.at(i));
+	}
 	dlg.InitDialog();
 
 	m_FoilList.clear();
 	if(QDialog::Accepted == dlg.exec())
 	{
-		CFoil *pFoil;
-		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
-
 		for(int i=0; i<dlg.m_FoilList.count();i++)
 		{
 			m_FoilList.append(dlg.m_FoilList.at(i));
 		}
 	}
-//	pMainFrame->m_DlgPos = dlg.pos();	
 }
 
 

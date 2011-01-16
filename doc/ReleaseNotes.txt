@@ -16,7 +16,8 @@
 
 
 xflr5 v6.03 (Beta ?) 2011
-	- corrected the calcualtions with sideslip
+	- modified the geometry connection between panels with dihedral and twist - may slightly impact the results
+	- corrected the calculations with sideslip
 	- added multi-threading capability for foil batch analysis
 	- added an option to display the position of point masses in 3d-view
 	- in the export to AVL of point masses, corrected the missing addition of wing x & z position

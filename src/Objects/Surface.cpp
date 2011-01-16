@@ -61,7 +61,6 @@ CSurface::CSurface()
 {
 	m_bTEFlap = false;
 
-	m_Dihedral = 0.0;
 	m_Length   = 0.0;
 	m_TwistA   = 0.0;
 	m_TwistB   = 0.0;
@@ -74,6 +73,7 @@ CSurface::CSurface()
 	m_XDistType = 0;
 	m_YDistType = 3;
 
+	m_pLeftSurface = m_pRightSurface = NULL;
 	m_pFoilA   = NULL;
 	m_pFoilB   = NULL;
 	m_NElements = 0;
@@ -97,9 +97,7 @@ CSurface::CSurface()
 	memset(m_FlapPanel, 0, sizeof(m_FlapPanel));
 }
 
-CSurface::~CSurface()
-{
-}
+
 
 void CSurface::AddFlapPanel(CPanel *pPanel)
 {
@@ -191,12 +189,10 @@ void CSurface::Copy(CSurface const &Surface)
 	m_LB.Copy(Surface.m_LB);
 	m_TA.Copy(Surface.m_TA);
 	m_TB.Copy(Surface.m_TB);
-	m_Dihedral  = Surface.m_Dihedral;
 	m_XDistType = Surface.m_XDistType;
 	m_YDistType = Surface.m_YDistType;
 	m_NElements = Surface.m_NElements;
 
-	m_Dihedral  = Surface.m_Dihedral;
 	m_Length    = Surface.m_Length;
 	m_NXPanels  = Surface.m_NXPanels;
 	m_NYPanels  = Surface.m_NYPanels;
@@ -228,6 +224,65 @@ void CSurface::Copy(CSurface const &Surface)
 	memcpy(m_xPointA, Surface.m_xPointA, sizeof(m_xPointA));
 	memcpy(m_xPointB, Surface.m_xPointB, sizeof(m_xPointB));
 }
+
+
+void CSurface::CreateXZSymetric(CSurface const &Surface)
+{
+	//reflects the surface about the XZ plane
+	m_LA.x =  Surface.m_LB.x;
+	m_LA.y = -Surface.m_LB.y;
+	m_LA.z =  Surface.m_LB.z;
+	m_LB.x =  Surface.m_LA.x;
+	m_LB.y = -Surface.m_LA.y;
+	m_LB.z =  Surface.m_LA.z;
+
+	m_TA.x =  Surface.m_TB.x;
+	m_TA.y = -Surface.m_TB.y;
+	m_TA.z =  Surface.m_TB.z;
+	m_TB.x =  Surface.m_TA.x;
+	m_TB.y = -Surface.m_TA.y;
+	m_TB.z =  Surface.m_TA.z;
+
+	m_Length    = Surface.m_Length;
+
+	m_XDistType = Surface.m_XDistType;
+	m_YDistType = Surface.m_YDistType;
+	m_NXPanels  = Surface.m_NXPanels;
+	m_NYPanels  = Surface.m_NYPanels;
+	m_NElements = Surface.m_NElements;
+
+	Normal.x  =  Surface.Normal.x;
+	Normal.y  = -Surface.Normal.y;
+	Normal.z  =  Surface.Normal.z;
+
+	NormalA.x  =  Surface.NormalB.x;
+	NormalA.y  = -Surface.NormalB.y;
+	NormalA.z  =  Surface.NormalB.z;
+
+	NormalB.x  =  Surface.NormalA.x;
+	NormalB.y  = -Surface.NormalA.y;
+	NormalB.z  =  Surface.NormalA.z;
+
+	m_pFoilA = Surface.m_pFoilB;
+	m_pFoilB = Surface.m_pFoilA;
+
+	m_TwistA = Surface.m_TwistB;
+	m_TwistB = Surface.m_TwistA;
+
+	m_bIsTipLeft  = Surface.m_bIsTipRight;
+	m_bIsTipRight = Surface.m_bIsTipLeft;
+
+	m_bIsLeftSurf  = Surface.m_bIsRightSurf;
+	m_bIsRightSurf = Surface.m_bIsLeftSurf;
+
+	m_bIsInSymPlane = Surface.m_bIsInSymPlane;
+
+	m_NXFlap = Surface.m_NXFlap;
+	m_NXLead = Surface.m_NXLead;
+	memcpy(m_xPointA, Surface.m_xPointB, sizeof(m_xPointA));
+	memcpy(m_xPointB, Surface.m_xPointA, sizeof(m_xPointB));
+}
+
 
 
 void CSurface::GetC4(int k, CVector &Pt, double &tau)
@@ -1050,7 +1105,9 @@ void CSurface::SetTwist()
 }
 
 
-void CSurface::SetTwist_Old()
+
+
+void CSurface::SetTwist_old()
 {
 	double xc4,zc4;
 	CVector O(0.0,0.0,0.0);
@@ -1088,13 +1145,76 @@ void CSurface::Translate(CVector const &T)
 
 
 
+void CSurface::CreateXPoints()
+{
+	//
+	// Creates the points at the surfaces two end sections
+	// The points will be used later to create the mesh
+	// the chordwise panel distribution is set i.a.w. with the flap hinges, if any;
+	//
+	int l;
+	int NXFlapA, NXFlapB, NXLeadA, NXLeadB;
+	double dl, dl2;
+	double xHingeA, xHingeB;
+	if(m_pFoilA && m_pFoilA->m_bTEFlap) xHingeA=m_pFoilA->m_TEXHinge/100.0; else xHingeA=1.0;
+	if(m_pFoilB && m_pFoilB->m_bTEFlap) xHingeB=m_pFoilB->m_TEXHinge/100.0; else xHingeB=1.0;
 
+	NXFlapA = (int)((1.0-xHingeA) * (double)m_NXPanels*1.000123);// to avoid numerical errors if exact division
+	NXFlapB = (int)((1.0-xHingeB) * (double)m_NXPanels *1.000123);
 
+	if(m_pFoilA && m_pFoilA->m_bTEFlap && NXFlapA==0) NXFlapA++;
+	if(m_pFoilB && m_pFoilB->m_bTEFlap && NXFlapB==0) NXFlapB++;
 
+	NXLeadA = m_NXPanels - NXFlapA;
+	NXLeadB = m_NXPanels - NXFlapB;
 
+	m_NXFlap  = qMax(NXFlapA, NXFlapB);
+	if(m_NXFlap>m_NXPanels/2) m_NXFlap=(int)m_NXPanels/2;
+	m_NXLead  = m_NXPanels - m_NXFlap;
 
-	
+	for(l=0; l<NXFlapA; l++)
+	{
+		dl =  (double)l;
+		dl2 = (double)NXFlapA;
+		if(m_XDistType==1)
+			m_xPointA[l] = 1.0 - (1.0-xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
+		else
+			m_xPointA[l] = 1.0 - (1.0-xHingeA) * (dl/dl2);
+	}
 
+	for(l=0; l<NXLeadA; l++)
+	{
+		dl =  (double)l;
+		dl2 = (double)NXLeadA;
+		if(m_XDistType==1)
+			m_xPointA[l+NXFlapA] = xHingeA - (xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
+		else
+			m_xPointA[l+NXFlapA] = xHingeA - (xHingeA) * (dl/dl2);
+	}
+
+	for(l=0; l<NXFlapB; l++)
+	{
+		dl =  (double)l;
+		dl2 = (double)NXFlapB;
+		if(m_XDistType==1)
+			m_xPointB[l] = 1.0 - (1.0-xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
+		else
+			m_xPointB[l] = 1.0 - (1.0-xHingeB) * (dl/dl2);
+	}
+
+	for(l=0; l<NXLeadB; l++)
+	{
+		dl =  (double)l;
+		dl2 = (double)NXLeadB;
+		if(m_XDistType==1)
+			m_xPointB[l+NXFlapB] = xHingeB - (xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
+		else
+			m_xPointB[l+NXFlapB] = xHingeB - (xHingeB) * (dl/dl2);
+	}
+
+	m_xPointA[m_NXPanels] = 0.0;
+	m_xPointB[m_NXPanels] = 0.0;
+}
 
 
 

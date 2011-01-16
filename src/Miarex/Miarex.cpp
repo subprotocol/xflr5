@@ -2773,7 +2773,7 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_MaxBending = Cb;
 }
 
-
+#define MAXGRAPHS 4
 void QMiarex::CreateWOppCurves()
 {
 	//Create the WOpp graph curves
@@ -2782,7 +2782,7 @@ void QMiarex::CreateWOppCurves()
 	//declare the variables as static to save memory allocation times
 	static CWOpp *pWOpp = NULL;;
 	static CPOpp *pPOpp = NULL;
-	static CCurve *pWingCurve[MAXWINGS][4];
+	static CCurve *pWingCurve[MAXWINGS][MAXGRAPHS];
 	static QString str;
 	static int i,k;
 
@@ -2791,11 +2791,31 @@ void QMiarex::CreateWOppCurves()
 	if(m_bCurWOppOnly)
 	{
 		if(!m_pCurWOpp || !m_pCurWOpp->m_bIsVisible) return;
-		if(m_pCurWOpp)
+
+		if (m_pCurPOpp)
+		{
+			for(int iw=0; iw<MAXWINGS; iw++)
+			{
+				if(m_pCurPOpp->m_bIsVisible && m_bShowWingCurve[iw] && m_pCurPOpp->m_bWing[iw])
+				{
+					for(int ic=0; ic<MAXGRAPHS; ic++)
+					{
+						pWingCurve[iw][ic]  = m_WingGraph[ic].AddCurve();
+						pWingCurve[iw][ic]->ShowPoints(m_pCurPOpp->m_bShowPoints);
+						pWingCurve[iw][ic]->SetStyle(m_pCurPOpp->m_Style);
+						pWingCurve[iw][ic]->SetColor(m_pCurPOpp->m_Color);
+						pWingCurve[iw][ic]->SetWidth(m_pCurPOpp->m_Width);
+						pWingCurve[iw][ic]->SetTitle(str);
+						FillWOppCurve(m_pCurPOpp->m_PlaneWOpp+iw, m_WingGraph+ic, pWingCurve[iw][ic]);
+					}
+				}
+			}
+		}
+		else if(m_pCurWOpp)
 		{
 			if(m_pCurWOpp->m_bIsVisible && m_bShowWingCurve[0])
 			{
-				for(int ic=0; ic<4; ic++)
+				for(int ic=0; ic<MAXGRAPHS; ic++)
 				{
 					pWingCurve[0][ic]    = m_WingGraph[ic].AddCurve();
 
@@ -2808,27 +2828,6 @@ void QMiarex::CreateWOppCurves()
 				}
 			}
 		}
-		else if (m_pCurPOpp)
-		{
-			for(int iw=0; iw<MAXWINGS; iw++)
-			{
-				if(m_pCurPOpp->m_bIsVisible && m_bShowWingCurve[iw] && m_pCurPOpp->m_bWing[iw])
-				{
-
-					for(int ic=0; ic<4; ic++)
-					{
-						pWingCurve[iw][ic]  = m_WingGraph[ic].AddCurve();
-						pWingCurve[iw][ic]->ShowPoints(m_pCurPOpp->m_bShowPoints);
-						pWingCurve[iw][ic]->SetStyle(m_pCurPOpp->m_Style);
-						pWingCurve[iw][ic]->SetColor(m_pCurPOpp->m_Color);
-						pWingCurve[iw][ic]->SetWidth(m_pCurPOpp->m_Width);
-						pWingCurve[iw][ic]->SetTitle(str);
-						FillWOppCurve(&m_pCurPOpp->m_PlaneWOpp[iw], m_WingGraph+ic, pWingCurve[iw][ic]);
-					}
-
-				}
-			}
-		}
 	}
 	else
 	{
@@ -2838,7 +2837,7 @@ void QMiarex::CreateWOppCurves()
 			if (pWOpp->m_bIsVisible)
 			{
 				str = QString("Q=%1 - Alpha=%2").arg(pWOpp->m_QInf,5,'f',2).arg(pWOpp->m_Alpha,5,'f',2);
-				for(int ic=0; ic<4; ic++)
+				for(int ic=0; ic<MAXGRAPHS; ic++)
 				{
 					pWingCurve[0][ic] = m_WingGraph[ic].AddCurve();
 					pWingCurve[0][ic]->ShowPoints(pWOpp->m_bShowPoints);
@@ -2860,7 +2859,7 @@ void QMiarex::CreateWOppCurves()
 				{
 					if(m_bShowWingCurve[iw] && pPOpp->m_bWing[iw])
 					{
-						for(int ic=0; ic<4; ic++)
+						for(int ic=0; ic<MAXGRAPHS; ic++)
 						{
 							pWingCurve[iw][ic]    = m_WingGraph[ic].AddCurve();
 							pWingCurve[iw][ic]->ShowPoints(pPOpp->m_bShowPoints);
@@ -2886,7 +2885,7 @@ void QMiarex::CreateWOppCurves()
 		if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD) nStart = 1;
 		else nStart = 0;
 
-		for(int ig=0; ig<4; ig++)
+		for(int ig=0; ig<MAXGRAPHS; ig++)
 		{
 			if(m_WingGraph[ig].GetYVariable()==3)
 			{
@@ -4641,6 +4640,13 @@ void QMiarex::GLCallViewLists()
 		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
 		glCallList(MESHPANELS);
 	}
+
+	if(m_bVortices && m_pCurWing)
+	{
+		glCallList(VLMCTRLPTS);
+		glCallList(VLMVORTICES);
+	}
+
 	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 	{
 		glCallList(PANELCP);
@@ -4697,11 +4703,6 @@ void QMiarex::GLCallViewLists()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
 
-	if(m_bVortices && m_pCurWing)
-	{
-		glCallList(VLMCTRLPTS);
-		glCallList(VLMVORTICES);
-	}
 
 	if((m_bICd || m_bVCd) && m_pCurWOpp )
 	{
@@ -5274,6 +5275,7 @@ void QMiarex::GLRenderView()
 	//
 	// Renders the 3D view
 	//
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -5366,28 +5368,52 @@ void QMiarex::GLRenderView()
 
 		if(m_bShowMasses)
 		{
+			QString MassUnit;
+			GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
 			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
 			double radius = .02;//2cm
+			double zdist = 25.0/(double)m_r3DCltRect.width();
+
 			for(int iw=0; iw<MAXWINGS; iw++)
 			{
 				if(m_pWingList[iw])
 				{
+					glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
+					glPushMatrix();
+					{
+						if(m_pCurPlane)
+						{
+							glTranslated(m_pCurPlane->m_WingLE[iw].x,
+									   m_pCurPlane->m_WingLE[iw].y,
+									   m_pCurPlane->m_WingLE[iw].z);
+
+							pGLWidget->renderText(0.0, 0.0, zdist,
+											  m_pWingList[iw]->m_WingName+
+											  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
+											  MassUnit);
+						}
+					}
+					glPopMatrix();
+
+					glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
 					for(int im=0; im<m_pWingList[iw]->m_NMass; im++)
 					{
 						glPushMatrix();
 						{
-							glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
-									   m_pWingList[iw]->m_MassPosition[im].y,
-									   m_pWingList[iw]->m_MassPosition[im].z);
 							if(m_pCurPlane)
 							{
 								glTranslated(m_pCurPlane->m_WingLE[iw].x,
 										   m_pCurPlane->m_WingLE[iw].y,
 										   m_pCurPlane->m_WingLE[iw].z);
 							}
+							glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
+									   m_pWingList[iw]->m_MassPosition[im].y,
+									   m_pWingList[iw]->m_MassPosition[im].z);
 							GLRenderSphere(m_MassColor,radius,18,18);
-							pGLWidget->renderText(0.0, 0.0, 0.0 +.02, m_pWingList[iw]->m_MassTag[im]);
-
+							pGLWidget->renderText(0.0, 0.0, 0.0 +.02,
+											  m_pWingList[iw]->m_MassTag[im]
+											  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+											  +MassUnit);
 						}
 						glPopMatrix();
 					}
@@ -5395,13 +5421,17 @@ void QMiarex::GLRenderView()
 			}
 			if(m_pCurPlane)
 			{
+				glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
 				for(int im=0; im<m_pCurPlane->m_NMass; im++)
 				{
 					glPushMatrix();
 					{
 						glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
 						GLRenderSphere(m_MassColor,radius,18,18);
-						pGLWidget->renderText(0.0,0.0,0.0+.02, m_pCurPlane->m_MassTag[im]);
+						pGLWidget->renderText(0.0,0.0,0.0+.02,
+										  m_pCurPlane->m_MassTag[im]
+										  +QString(" %1").arg(m_pCurPlane->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+										  +MassUnit);
 					}
 					glPopMatrix();
 				}
@@ -5409,6 +5439,23 @@ void QMiarex::GLRenderView()
 			}
 			if(m_pCurBody)
 			{
+				glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
+				glPushMatrix();
+				{
+					if(m_pCurPlane)
+					{
+						glTranslated(m_pCurPlane->m_BodyPos.x+m_pCurBody->m_FramePosition[0].x,
+								   m_pCurPlane->m_BodyPos.y+m_pCurBody->m_FramePosition[0].y,
+								   m_pCurPlane->m_BodyPos.z+m_pCurBody->m_FramePosition[0].z);
+
+						pGLWidget->renderText(0.0, 0.0, zdist,
+										  m_pCurBody->m_BodyName+
+										  QString(" %1").arg(m_pCurBody->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
+										  MassUnit);
+					}
+				}
+				glPopMatrix();
+				glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
 				for(int im=0; im<m_pCurBody->m_NMass; im++)
 				{
 					glPushMatrix();
@@ -5423,11 +5470,13 @@ void QMiarex::GLRenderView()
 
 						GLRenderSphere(m_MassColor,radius,18,18);
 
-						pGLWidget->renderText(0.0, 0.0, 0.0+.02, m_pCurBody->m_MassTag[im]);
+						pGLWidget->renderText(0.0, 0.0, 0.0+.02,
+										  m_pCurBody->m_MassTag[im]
+										  +QString(" %1").arg(m_pCurBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+										  +MassUnit);
 					}
 					glPopMatrix();
 				}
-
 			}
 		}
 
@@ -5710,12 +5759,11 @@ bool QMiarex::InitializePanels()
 			ptr += m_pWingList[iw]->m_MatSize;
 
 			//create symetry properties between panels
-			if((m_pWingList[iw]->m_bIsFin && !m_pWingList[iw]->m_bDoubleFin)
-				|| !m_pWingList[iw]->m_bSymetric)
+			if((m_pWingList[iw]->m_bIsFin && !m_pWingList[iw]->m_bDoubleFin) || !m_pWingList[iw]->m_bSymetric)
 			{
 				for(p=0; p<m_pWingList[iw]->m_MatSize; p++) m_pWingList[iw]->m_pPanel[p].m_iSym=-1;
-			}
 
+			}
 
 			HalfSize = m_pWingList[iw]->m_MatSize/2;
 			p  = HalfSize-1;
@@ -5745,6 +5793,7 @@ bool QMiarex::InitializePanels()
 			}
 		}
 	}
+
 
 	if(bBodyEl)
 	{
@@ -6507,6 +6556,9 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 {
 	int k;
 	int r,g,b;
+	QString strong;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 
 	pSettings->beginGroup("Miarex");
 	{
@@ -6704,7 +6756,19 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_pCurTimeGraph = m_TimeGraph+k-1;
 
 		m_StabPolarDlg.m_bAVLControls = pSettings->value("AVLControls", true).toBool();
- 	}
+
+		for(int i=0; i<20; i++)
+		{
+			strong = QString("ForcedTime%1").arg(i);
+			pStabView->m_Time[i] = pSettings->value(strong, (double)i).toDouble();
+		}
+		for(int i=0; i<20; i++)
+		{
+			strong = QString("ForcedAmplitude%1").arg(i);
+			pStabView->m_Amplitude[i] = pSettings->value(strong, 0.0).toDouble();
+		}
+		pStabView->UpdateControlModelData();
+	}
 	pSettings->endGroup();
 
 	m_GL3dBody.LoadSettings(pSettings);
@@ -7606,12 +7670,10 @@ void QMiarex::OnAnalyze()
 			return;
 		}
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
-//		VLMAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
 	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
-//		StabAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
 
 	m_bHighlightOpp = bHigh;
@@ -9401,10 +9463,17 @@ void QMiarex::OnExporttoAVL()
 			 .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
 	out << strong;
 
-	strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
-			 .arg(0.0,8,'f',3)
-			 .arg(0.0,8,'f',3)
-			 .arg(0.0,8,'f',3);
+	if(m_pCurPlane)
+		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
+				 .arg(m_pCurPlane->m_CoG.x,8,'f',3)
+				 .arg(m_pCurPlane->m_CoG.y,8,'f',3)
+				 .arg(m_pCurPlane->m_CoG.z,8,'f',3);
+	else if(m_pCurWing)
+		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
+				 .arg(m_pCurWing->m_CoG.x,8,'f',3)
+				 .arg(m_pCurWing->m_CoG.y,8,'f',3)
+				 .arg(m_pCurWing->m_CoG.z,8,'f',3);
+
 	out << strong;
 
 	out << (" 0.00                        | CDp  (optional)\n");
@@ -12098,6 +12167,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 
 
 	m_pPanelDlg->move(pMainFrame->m_DlgPos);
+
 	m_pPanelDlg->InitDialog();
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
@@ -12321,7 +12391,11 @@ void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CV
 
 bool QMiarex::SaveSettings(QSettings *pSettings)
 {
+	QString strong;
 	int k=0;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+
 	pSettings->beginGroup("Miarex");
 	{
 		pSettings->setValue("bXTop", m_bXTop);
@@ -12508,6 +12582,18 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("TimeGraph",k);
 
 		pSettings->setValue("AVLControls", m_StabPolarDlg.m_bAVLControls);
+
+		pStabView->ReadControlModelData();
+		for(int i=0; i<20; i++)
+		{
+			strong = QString("ForcedTime%1").arg(i);
+			pSettings->setValue(strong, pStabView->m_Time[i]);
+		}
+		for(int i=0; i<20; i++)
+		{
+			strong = QString("ForcedAmplitude%1").arg(i);
+			pSettings->setValue(strong, pStabView->m_Amplitude[i]);
+		}
 
  	}
 	pSettings->endGroup();

@@ -113,12 +113,22 @@ void FoilSelectionDlg::InitDialog()
 {
 	if(!m_poaFoil) return;
 	CFoil *pFoil;
+
 	for (int i=0; i<m_poaFoil->size(); i++)
 	{
 		pFoil = (CFoil*)m_poaFoil->at(i);
 		m_pctrlNameList->addItem(pFoil->m_FoilName);
-		if(pFoil->m_FoilName==m_FoilName) m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), true);
-		else                              m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), false);
+		m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), false);
+		for(int j=0; j<m_FoilList.size();j++)
+		{
+			if(m_FoilList.at(j)==pFoil->m_FoilName)
+			{
+				m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), true);
+				break;
+			}
+		}
+//		if(pFoil->m_FoilName==m_FoilName) m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), true);
+//		else                              m_pctrlNameList->setItemSelected(m_pctrlNameList->item(i), false);
 	}
 }
 

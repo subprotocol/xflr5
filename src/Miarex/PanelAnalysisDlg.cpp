@@ -216,7 +216,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
-
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//compute wake contribution
@@ -253,6 +252,7 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	for(int q=0; q<nrhs; q++)
 		ComputeBalanceSpeeds(m_Alpha+q*m_AlphaDelta, q);
+
 
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
@@ -773,6 +773,7 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 				WingForce.Set(0.0, 0.0, 0.0);
 				m_pWingList[i]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 				m_WingForce[q*4+i] = WingForce;
+
 				Force             += WingForce;
 				//save the results... will save another FF calculation when computing operating point
 				m_WingIDrag[q*4+i] = IDrag;
@@ -820,7 +821,7 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 		TempCl = Lift/m_pWPolar->m_WArea;
 		if(Lift<=0.0)
 		{
-			strong = QString(tr("   Found a negative lift for Alpha=%1.... skipping the angle...")+"\n").arg(Alpha, 5,'f',2);
+			strong = "           "+QString(tr("Found a negative lift for Alpha=%1.... skipping the angle...")+"\n").arg(Alpha, 5,'f',2);
 			AddString(strong);
 			m_bPointOut = true;
 			m_bWarning  = true;
@@ -829,7 +830,7 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 		else
 		{
 			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
-			strong = QString("   QInf = %1").arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
+			strong = QString("           Alpha=%1   QInf=%2").arg(Alpha, 5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
 			GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 			strong+= strange + "\n";
 			AddString(strong);
@@ -843,6 +844,9 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	int p, q, pp, i;
 	//______________________________________________________________________________________
 	// Scale RHS and Sigma i.a.w. speeds (so far we have unit doublet and source strengths)
+
+	QString strong="\n";
+	AddString(strong);
 
 	static double SigmaRef[VLMMAXMATSIZE * VLMMAXRHS];
 	memcpy(SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
@@ -1579,6 +1583,7 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 
 void PanelAnalysisDlg::InitDialog()
 {
+
 	m_Progress = 0.0;
 	m_pctrlProgress->setValue(m_Progress);
 	QString FileName = QDir::tempPath() + "/XFLR5.log";

@@ -70,7 +70,6 @@ void CPanel::Reset()
 	m_iWakeColumn = -1;
 
 	memset(lij, 0, sizeof(lij));
-
 }
 
 

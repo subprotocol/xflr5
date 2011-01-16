@@ -54,7 +54,7 @@ public:
 
 // Implementation
 protected:
-	bool CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
+	void CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
 	int  VLMGetPanelTotal(void);
 	void VLMSetBending();
@@ -81,7 +81,6 @@ protected:
 	double Sigma(int m);
 	double Eta(int m);
 	double AlphaInduced(int k);
-	bool CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
 	void Duplicate(CWing *pWing);
 	void ComputeChords(int NStation=0);

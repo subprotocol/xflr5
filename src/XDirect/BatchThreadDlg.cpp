@@ -544,28 +544,28 @@ void BatchThreadDlg::OnEditReList()
 
 void BatchThreadDlg::OnFoilList()
 {
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QXDirect  *pXDirect   = (QXDirect*)s_pXDirect;
 	FoilSelectionDlg dlg;
 	dlg.SetSelectionMode(true);
-//	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_poaFoil = pXDirect->m_poaFoil;
-	dlg.m_FoilName = m_pCurFoil->m_FoilName;
+
+	dlg.m_FoilList.clear();
+	for(int i=0; i<m_FoilList.size(); i++)
+	{
+		dlg.m_FoilList.append(m_FoilList.at(i));
+	}
 	dlg.InitDialog();
 
 	m_FoilList.clear();
 	if(QDialog::Accepted == dlg.exec())
 	{
-		CFoil *pFoil;
-		pFoil = pMainFrame->GetFoil(dlg.m_FoilName);
-
 		for(int i=0; i<dlg.m_FoilList.count();i++)
 		{
 			m_FoilList.append(dlg.m_FoilList.at(i));
 		}
 	}
-//	pMainFrame->m_DlgPos = dlg.pos();	
 }
+
 
 
 void BatchThreadDlg::OnFoilSelectionType()
@@ -775,10 +775,6 @@ void BatchThreadDlg::StartAnalysis()
 	UpdateOutput(strong);
 
 	for(int it=0; it<m_nThreads; it++)	StartThread();
-
-//qDebug()<<"activeThreads"<<QThreadPool::globalInstance()->activeThreadCount();
-
-
 }
 
 

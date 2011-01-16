@@ -78,7 +78,8 @@ private:
 	void SetupLayout();
 	void SetControls();
 	void SetTimeCurveStyle(QColor const &Color, int const&Style, int const &Width, bool const& bCurve, bool const& bPoints);
-
+	void ReadControlModelData();
+	void UpdateControlModelData();
 
 	static void *s_pMiarex, *s_pMainFrame;
 
@@ -118,6 +119,7 @@ private:
 public:
 	int m_iCurrentMode;	
 	CCurve *m_pCurve;
+	double m_Time[20], m_Amplitude[20];
 };
 
 #endif // STABVIEWDLG_H

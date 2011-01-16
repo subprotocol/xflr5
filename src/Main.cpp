@@ -32,10 +32,10 @@ CFoil *g_pCurFoil;	//make it common to all applications
 int main(int argc, char *argv[])
 {
 #if QT_VERSION >= 0x040600
-        QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
+	QGL::setPreferredPaintEngine (QPaintEngine::OpenGL);
 #endif
-        XFLR5Application app(argc, argv);
-		return app.exec();
+	XFLR5Application app(argc, argv);
+	return app.exec();
 
 }
 

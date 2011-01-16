@@ -49,6 +49,11 @@ StabViewDlg::StabViewDlg(QWidget *parent)
 	m_iCurrentMode = 0;
 	m_ModeAmplitude = 1.0;
 	m_pCurve = NULL;
+	for(int i=0; i<20; i++)
+	{
+		m_Time[i] = (double)i;
+		m_Amplitude[i] = 0.0;
+	}
 	SetupLayout();
 	Connect();
 }
@@ -102,14 +107,6 @@ void StabViewDlg::Connect()
 	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Angle ")+QString::fromUtf8("(°)"));
 //	m_pControlModel->setHeaderData(2, Qt::Horizontal, tr("Ramp (s)"));
 
-	QModelIndex ind;
-	for(int i=0; i<m_pControlModel->rowCount(); i++)
-	{
-		ind = m_pControlModel->index(i, 0, QModelIndex());
-		m_pControlModel->setData(ind, (double)i);
-		ind = m_pControlModel->index(i, 1, QModelIndex());
-		m_pControlModel->setData(ind, 0.0);
-	}
 
 	m_pctrlControlTable->setModel(m_pControlModel);
 	m_pctrlControlTable->setWindowTitle(tr("Controls"));
@@ -118,6 +115,29 @@ void StabViewDlg::Connect()
 //	m_pctrlControlTable->setColumnWidth(2,60);
 	QHeaderView *HorizontalHeader = m_pctrlControlTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
+}
+
+
+void StabViewDlg::UpdateControlModelData()
+{
+	QModelIndex ind;
+	for(int i=0; i<m_pControlModel->rowCount(); i++)
+	{
+		ind = m_pControlModel->index(i, 0, QModelIndex());
+		m_pControlModel->setData(ind, m_Time[i]);
+		ind = m_pControlModel->index(i, 1, QModelIndex());
+		m_pControlModel->setData(ind, m_Amplitude[i]);
+	}
+}
+
+
+void StabViewDlg::ReadControlModelData()
+{
+	for(int i=0; i<m_pControlModel->rowCount(); i++)
+	{
+		m_Time[i]      = m_pControlModel->index(i, 0, QModelIndex()).data().toDouble();
+		m_Amplitude[i] = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble();
+	}
 }
 
 
@@ -530,7 +550,7 @@ void StabViewDlg::SetupLayout()
 		m_pctrlInitCondResponse = new QRadioButton(tr("Initial Conditions Response"));
 		m_pctrlInitCondResponse->setToolTip("Display the time response for specific initial conditions");
 		m_pctrlForcedResponse = new QRadioButton(tr("Forced Response"));
-		m_pctrlForcedResponse->setToolTip("Display the time response for a given control actuation in the form of a user-specified ramp");
+		m_pctrlForcedResponse->setToolTip("Display the time response for a given control actuation in the form of a user-specified function of time");
 		ResponseTypeLayout->addWidget(m_pctrlInitCondResponse);
 		ResponseTypeLayout->addWidget(m_pctrlForcedResponse);
 		ResponseTypeLayout->addWidget(m_pctrlModalResponse);

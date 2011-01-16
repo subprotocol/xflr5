@@ -521,15 +521,17 @@ void CWing::ComputeBodyAxisInertia()
 }
 
 
-bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
+
+void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
 	//
 	// Constructs the surface objects based on the input data
-	// The surfaces are constructed from port to starboard
+	// The surfaces are constructed from root to tip, and reordered from let tip to right tip
 	// One surface object for each of the wing's panels
+	//A is the surface's left side, B is the right side
 	//
+
 	int j, nSurf;
-	CFoil *pFoilA, *pFoilB;
 	CVector PLA, PTA, PLB, PTB, Offset, T1;
 	CVector Trans(T.x, 0.0, T.z);
 	CVector O(0.0,0.0,0.0);
@@ -537,18 +539,20 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	double MinPanelSize;
 
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-	QMiarex    *pMiarex = (QMiarex*)   s_pMiarex;
+	QMiarex   *pMiarex     = (QMiarex*)s_pMiarex;
+
 	if(pMiarex->m_MinPanelSize>0.0) MinPanelSize = pMiarex->m_MinPanelSize;
 	else                            MinPanelSize = 0.0;
-	//first generate the surfaces - from left tip to right tip
-	// so start with left wing, in reverse order
+
 	m_NSurfaces = 0;
 	m_MatSize = 0;
 
+
+	//define the normal of each surface
+	nSurf=0;
 	VNormal[0].Set(0.0, 0.0, 1.0);
 	VNSide[0].Set(0.0, 0.0, 1.0);
 
-	nSurf=0;
 	for(j=0; j<m_NPanel;j++)
 	{
 		if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
@@ -558,162 +562,172 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			nSurf++;
 		}
 	}
+	m_NSurfaces = nSurf;
+	//define the normals at panel junctions : average between the normals of the two connecting sufaces
 	for(j=0; j<nSurf;j++)
 	{
 		VNSide[j+1] = VNormal[j]+VNormal[j+1];
 		VNSide[j+1].Normalize();
 	}
 
-	for (j=m_NPanel-1; j>=0; j--)
+	//we start with the center panel, moving towards the left wing tip
+	//however, the calculations are written for surfaces ordered from left tip to right tip,
+	//so we number them the opposite way
+	nSurf = 0;
+	int is = m_NSurfaces-1;
+	for (j=0; j<m_NPanel; j++)
 	{
-		//do not create a surface if its length is less than the critical size
 		if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
 		{
-			m_Surface[m_NSurfaces].m_pFoilA   = pMainFrame->GetFoil(m_LFoil[j+1]);
-			m_Surface[m_NSurfaces].m_pFoilB   = pMainFrame->GetFoil(m_LFoil[j]);
+			m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_LFoil[j+1]);
+			m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_LFoil[j]);
 
-			m_Surface[m_NSurfaces].m_Dihedral = -m_TDihedral[j];
-			m_Surface[m_NSurfaces].m_Length   =  m_TPos[j+1] - m_TPos[j];
+			m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 
-			PLB.x =  m_TOffset[j];		PLA.x =  m_TOffset[j+1];
-			PLB.y = -m_TPos[j];			PLA.y = -m_TPos[j+1];
-			PLB.z =  0.0;				PLA.z =  0.0;
+			PLA.x =  m_TOffset[j+1];			PLB.x =  m_TOffset[j];
+			PLA.y = -m_TPos[j+1];			PLB.y = -m_TPos[j];
+			PLA.z =  0.0;					PLB.z =  0.0;
+			PTA.x =  PLA.x+m_TChord[j+1];		PTB.x = PLB.x+m_TChord[j];
+			PTA.y =  PLA.y;				PTB.y = PLB.y;
+			PTA.z =  0.0;					PTB.z =  0.0;
 
-			PTB.x = PLB.x+m_TChord[j];	PTA.x = PLA.x+m_TChord[j+1];
-			PTB.y = PLB.y;				PTA.y = PLA.y;
-			PTB.z =  0.0;				PTA.z =  0.0;
+			m_Surface[is].m_LA.Copy(PLA);
+			m_Surface[is].m_TA.Copy(PTA);
+			m_Surface[is].m_LB.Copy(PLB);
+			m_Surface[is].m_TB.Copy(PTB);
 
-			m_Surface[m_NSurfaces].m_TwistA   =  m_TTwist[j+1];
-			m_Surface[m_NSurfaces].m_TwistB   =  m_TTwist[j];
+			m_Surface[is].SetNormal(); // is (0,0,1)
 
-			m_Surface[m_NSurfaces].m_LA.Copy(PLA);
-			m_Surface[m_NSurfaces].m_LB.Copy(PLB);
-			m_Surface[m_NSurfaces].m_TA.Copy(PTA);
-			m_Surface[m_NSurfaces].m_TB.Copy(PTB);
-			m_Surface[m_NSurfaces].SetNormal();
-			m_Surface[m_NSurfaces].RotateX(PLB, -m_TDihedral[j]);
-			m_Surface[m_NSurfaces].NormalA.Set(VNSide[nSurf].x,   -VNSide[nSurf].y,   VNSide[nSurf].z);
-			m_Surface[m_NSurfaces].NormalB.Set(VNSide[nSurf-1].x, -VNSide[nSurf-1].y, VNSide[nSurf-1].z);
+			m_Surface[is].m_TwistA   =  m_TTwist[j+1];
+			m_Surface[is].m_TwistB   =  m_TTwist[j];
 
-			nSurf--;
+			m_Surface[is].SetTwist_old();
 
-			m_Surface[m_NSurfaces].SetTwist();
+			m_Surface[is].RotateX(m_Surface[is].m_LB, -m_TDihedral[j]);
+			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x,   -VNSide[nSurf+1].y,   VNSide[nSurf+1].z);
+			m_Surface[is].NormalB.Set(VNSide[nSurf].x, -VNSide[nSurf].y, VNSide[nSurf].z);
+			if(is<m_NSurfaces-1)
+			{
+				//translate the surface to the left tip of the previous surface and merge points
+				T1 = m_Surface[is+1].m_LA - m_Surface[is].m_LB;
+				m_Surface[is].Translate(T1);
+				m_Surface[is].m_LB = m_Surface[is+1].m_LA;
+				m_Surface[is].m_TB = m_Surface[is+1].m_TA;
+			}
+			nSurf++;
 
-			T1.x = 0.0;
-			T1.y = -m_TYProj[j] - PLB.y;
-			T1.z = GetZPos(m_TPos[j]);
-			m_Surface[m_NSurfaces].Translate(T1);
-
-			m_Surface[m_NSurfaces].m_NXPanels = m_NXPanels[j];
-			m_Surface[m_NSurfaces].m_NYPanels = m_NYPanels[j];
+			m_Surface[is].m_NXPanels = m_NXPanels[j];
+			m_Surface[is].m_NYPanels = m_NYPanels[j];
 
 			//AVL coding + invert sine and -sine for left wing
-			m_Surface[m_NSurfaces].m_XDistType = m_XPanelDist[j];
+			m_Surface[is].m_XDistType = m_XPanelDist[j];
 
-			if(m_YPanelDist[j] ==2)        m_Surface[m_NSurfaces].m_YDistType = -2;
-			else if(m_YPanelDist[j] ==  1) m_Surface[m_NSurfaces].m_YDistType =  1;
-			else if(m_YPanelDist[j] == -2) m_Surface[m_NSurfaces].m_YDistType =  2;
-			else                           m_Surface[m_NSurfaces].m_YDistType =  0;
-//			m_MatSize += m_NXPanels[j]*m_NYPanels[j];
+			if(m_YPanelDist[j] ==2)        m_Surface[is].m_YDistType = -2;
+			else if(m_YPanelDist[j] ==  1) m_Surface[is].m_YDistType =  1;
+			else if(m_YPanelDist[j] == -2) m_Surface[is].m_YDistType =  2;
+			else                           m_Surface[is].m_YDistType =  0;
 
-			pFoilA = m_Surface[m_NSurfaces].m_pFoilA;
-			pFoilB = m_Surface[m_NSurfaces].m_pFoilB;
-
-			CreateXPoints(m_NXPanels[j], m_XPanelDist[j], pFoilA,  pFoilB,
-						  m_Surface[m_NSurfaces].m_xPointA, m_Surface[m_NSurfaces].m_xPointB,
-						  m_Surface[m_NSurfaces].m_NXLead,  m_Surface[m_NSurfaces].m_NXFlap);
-			m_Surface[m_NSurfaces].SetFlap();
-			m_Surface[m_NSurfaces].Init();
-			m_Surface[m_NSurfaces].m_bIsLeftSurf   = true;
-			m_Surface[m_NSurfaces].m_bIsInSymPlane = false;
-			m_NSurfaces++;
+			m_Surface[is].CreateXPoints();
+			m_Surface[is].SetFlap();
+			m_Surface[is].Init();
+			m_Surface[is].m_bIsLeftSurf   = true;
+			m_Surface[is].m_bIsInSymPlane = false;
+			--is;
 		}
 	}
 	m_Surface[m_NSurfaces-1].m_bIsCenterSurf = true;//previous left center surface
 	m_Surface[m_NSurfaces].m_bIsCenterSurf   = true;//next right center surface
 
 	// we only need a right wing in the following cases
-	//   - if its an 'ordinary wing'
-	//   - if its a fin, symetrical about the fuselage x-axis
-	//   - if its a symetrical double fin
+	//   - if it's an 'ordinary wing'
+	//   - if it's a fin, symetrical about the fuselage x-axis
+	//   - if it's a symetrical double fin
 	if(!m_bIsFin || (m_bIsFin && m_bSymFin) || (m_bIsFin && m_bDoubleFin))
 	{
+		is = nSurf;
 		for (j=0; j<m_NPanel; j++)
 		{
-			if(fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
+			if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
 			{
-				m_Surface[m_NSurfaces].m_Dihedral = m_TDihedral[j];
-				m_Surface[m_NSurfaces].m_Length   = m_TPos[j+1] - m_TPos[j];
-				m_Surface[m_NSurfaces].m_TwistA   = m_TTwist[j];
-				m_Surface[m_NSurfaces].m_TwistB   = m_TTwist[j+1];
-				m_Surface[m_NSurfaces].m_pFoilA   = pMainFrame->GetFoil(m_RFoil[j]);
-				m_Surface[m_NSurfaces].m_pFoilB   = pMainFrame->GetFoil(m_RFoil[j+1]);
+				m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_RFoil[j+1]);
+				m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_RFoil[j]);
 
-				PLA.x =  m_TOffset[j];		PLB.x =  m_TOffset[j+1];
-				PLA.y =  m_TPos[j];			PLB.y =  m_TPos[j+1];
-				PLA.z =  0.0;				PLB.z =  0.0;
+				m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 
+				PLA.x = m_TOffset[j];		PLB.x = m_TOffset[j+1];
+				PLA.y = m_TPos[j];			PLB.y = m_TPos[j+1];
+				PLA.z = 0.0;				PLB.z = 0.0;
 				PTA.x = PLA.x+m_TChord[j];	PTB.x = PLB.x+m_TChord[j+1];
 				PTA.y = PLA.y;				PTB.y = PLB.y;
 				PTA.z = 0.0;				PTB.z = 0.0;
 
-				m_Surface[m_NSurfaces].m_LA.Copy(PLA);
-				m_Surface[m_NSurfaces].m_LB.Copy(PLB);
-				m_Surface[m_NSurfaces].m_TA.Copy(PTA);
-				m_Surface[m_NSurfaces].m_TB.Copy(PTB);
-				//Set surface normals
-				m_Surface[m_NSurfaces].SetNormal();
-				m_Surface[m_NSurfaces].RotateX(PLA, m_TDihedral[j]);
+				m_Surface[is].m_LA.Copy(PLA);
+				m_Surface[is].m_TA.Copy(PTA);
+				m_Surface[is].m_LB.Copy(PLB);
+				m_Surface[is].m_TB.Copy(PTB);
 
-				m_Surface[m_NSurfaces].NormalA.Set(VNSide[nSurf].x,   VNSide[nSurf].y,   VNSide[nSurf].z);
-				m_Surface[m_NSurfaces].NormalB.Set(VNSide[nSurf+1].x, VNSide[nSurf+1].y, VNSide[nSurf+1].z);
+				m_Surface[is].SetNormal(); // is (0,0,1)
 
-				nSurf++;
+				m_Surface[is].m_TwistA   =  m_TTwist[j];
+				m_Surface[is].m_TwistB   =  m_TTwist[j+1];
 
-				m_Surface[m_NSurfaces].SetTwist();
+				m_Surface[is].SetTwist_old();
+				m_Surface[is].RotateX(m_Surface[is].m_LA, m_TDihedral[j]);
+				m_Surface[is].NormalA.Set(VNSide[is-nSurf].x,   VNSide[is-nSurf].y,   VNSide[is-nSurf].z);
+				m_Surface[is].NormalB.Set(VNSide[is-nSurf+1].x, VNSide[is-nSurf+1].y, VNSide[is-nSurf+1].z);
 
-				T1.x = 0.0;
-				T1.y = +m_TYProj[j] - PLA.y;
-				T1.z = GetZPos(m_TPos[j]);
-				m_Surface[m_NSurfaces].Translate(T1);
+				if(is>(int)(double)m_NSurfaces/2)
+				{
+					//translate the surface to the left tip of the previous surface and merge points
+					T1 = m_Surface[is-1].m_LB - m_Surface[is].m_LA ;
+					m_Surface[is].Translate(T1);
+					m_Surface[is].m_LA = m_Surface[is-1].m_LB;
+					m_Surface[is].m_TA = m_Surface[is-1].m_TB;
+				}
 
-				m_Surface[m_NSurfaces].m_NXPanels   = m_NXPanels[j];
-				m_Surface[m_NSurfaces].m_NYPanels   = m_NYPanels[j];
-				m_Surface[m_NSurfaces].m_XDistType  = m_XPanelDist[j];
-				m_Surface[m_NSurfaces].m_YDistType  = m_YPanelDist[j];//AVL coding
+				m_Surface[is].m_NXPanels = m_NXPanels[j];
+				m_Surface[is].m_NYPanels = m_NYPanels[j];
 
-//				m_MatSize += m_NXPanels[j]*m_NYPanels[j];
+				//AVL coding + invert sine and -sine for left wing
+				m_Surface[is].m_XDistType = m_XPanelDist[j];
 
-				pFoilA = m_Surface[m_NSurfaces].m_pFoilA;
-				pFoilB = m_Surface[m_NSurfaces].m_pFoilB;
+				if(m_YPanelDist[j] ==2)        m_Surface[is].m_YDistType = 2;
+				else if(m_YPanelDist[j] ==  1) m_Surface[is].m_YDistType =  1;
+				else if(m_YPanelDist[j] == -2) m_Surface[is].m_YDistType = -2;
+				else                           m_Surface[is].m_YDistType =  0;
 
-				CreateXPoints(m_NXPanels[j], m_XPanelDist[j], pFoilA,  pFoilB,
-											  m_Surface[m_NSurfaces].m_xPointA,  m_Surface[m_NSurfaces].m_xPointB,
-											  m_Surface[m_NSurfaces].m_NXLead,   m_Surface[m_NSurfaces].m_NXFlap);
-				m_Surface[m_NSurfaces].SetFlap();
-				m_Surface[m_NSurfaces].Init();
-				m_Surface[m_NSurfaces].m_bIsRightSurf  = true;
-				m_Surface[m_NSurfaces].m_bIsInSymPlane = false;
-				m_NSurfaces++;
+				m_Surface[is].CreateXPoints();
+				m_Surface[is].SetFlap();
+				m_Surface[is].Init();
+				m_Surface[is].m_bIsLeftSurf   = false;
+				m_Surface[is].m_bIsRightSurf  = true;
+				m_Surface[is].m_bIsInSymPlane = false;
+				is++;
 			}
 		}
 	}
-
-
 	CVector Or(0.0,0.0,0.0);
 	if(!m_bIsFin || (m_bIsFin && m_bSymFin))
 	{
+		m_NSurfaces*=2;
 		for (j=0; j<m_NSurfaces; j++)
 		{
 			m_Surface[j].RotateX(Or, XTilt);
 			m_Surface[j].RotateY(Or, YTilt);
 			m_Surface[j].Translate(Trans);
+			if(m_bIsFin && m_bSymFin)
+			{
+				m_Surface[j].m_bIsInSymPlane = true;
+				m_Surface[j].m_bIsLeftSurf   = true;
+				m_Surface[j].m_bIsRightSurf  = false;
+			}
 		}
 	}
 	else
 	{
 		if(m_bDoubleFin)
 		{
+			m_NSurfaces*=2;
 			//rotate surfaces symetrically
 			int ns2 = (int)(m_NSurfaces/2);
 			Offset.Set(0.0, -T.y, 0.0);
@@ -769,87 +783,9 @@ bool CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	if(m_TPos[0]>0.0001) 	m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
 
 	if(m_bIsFin && m_bDoubleFin) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
-
+//for(int is=0; is<m_NSurfaces; is++)qDebug()<<m_WingName<<is<<m_Surface[is].m_bIsInSymPlane;
 	m_bWingOut = false;
-
-	return true;
 }
-
-
-bool CWing::CreateXPoints(int NXPanels, int XDist, CFoil *pFoilA, CFoil *pFoilB, double *xPointA, double *xPointB, int &NXLead, int &NXFlap)
-{
-	//
-	// Creates the points at the surfaces two end sections
-	// The points will be used later to create the mesh
-	// the chordwise panel distribution is set i.a.w. with the flap hinges, if any;
-	//
-	int l;
-	int NXFlapA, NXFlapB, NXLeadA, NXLeadB;
-	double dl, dl2;
-	double xHingeA, xHingeB;
-
-	if(pFoilA && pFoilA->m_bTEFlap) xHingeA=pFoilA->m_TEXHinge/100.0; else xHingeA=1.0;
-	if(pFoilB && pFoilB->m_bTEFlap) xHingeB=pFoilB->m_TEXHinge/100.0; else xHingeB=1.0;
-
-	NXFlapA = (int)((1.0-xHingeA) * (double)NXPanels *1.000123);// to avoid numerical errors if exact division
-	NXFlapB = (int)((1.0-xHingeB) * (double)NXPanels *1.000123);
-
-	if(pFoilA && pFoilA->m_bTEFlap && NXFlapA==0) NXFlapA++;
-	if(pFoilB && pFoilB->m_bTEFlap && NXFlapB==0) NXFlapB++;
-
-	NXLeadA = NXPanels - NXFlapA;
-	NXLeadB = NXPanels - NXFlapB;
-
-	NXFlap  = qMax(NXFlapA, NXFlapB);
-	if(NXFlap>NXPanels/2) NXFlap=(int)NXPanels/2;
-	NXLead  = NXPanels - NXFlap;
-
-	for(l=0; l<NXFlapA; l++)
-	{
-		dl =  (double)l;
-		dl2 = (double)NXFlapA;
-		if(XDist==1)
-			xPointA[l] = 1.0 - (1.0-xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
-		else
-			xPointA[l] = 1.0 - (1.0-xHingeA) * (dl/dl2);
-	}
-
-	for(l=0; l<NXLeadA; l++)
-	{
-		dl =  (double)l;
-		dl2 = (double)NXLeadA;
-		if(XDist==1)
-			xPointA[l+NXFlapA] = xHingeA - (xHingeA)/2.0 * (1.0-cos(dl*PI /dl2));
-		else
-			xPointA[l+NXFlapA] = xHingeA - (xHingeA) * (dl/dl2);
-	}
-
-	for(l=0; l<NXFlapB; l++)
-	{
-		dl =  (double)l;
-		dl2 = (double)NXFlapB;
-		if(XDist==1)
-			xPointB[l] = 1.0 - (1.0-xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
-		else
-			xPointB[l] = 1.0 - (1.0-xHingeB) * (dl/dl2);
-	}
-
-	for(l=0; l<NXLeadB; l++)
-	{
-		dl =  (double)l;
-		dl2 = (double)NXLeadB;
-		if(XDist==1)
-			xPointB[l+NXFlapB] = xHingeB - (xHingeB)/2.0 * (1.0-cos(dl*PI /dl2));
-		else
-			xPointB[l+NXFlapB] = xHingeB - (xHingeB) * (dl/dl2);
-	}
-
-	xPointA[NXPanels] = 0.0;
-	xPointB[NXPanels] = 0.0;
-	return true;
-}
-
-
 
 
 
@@ -1830,7 +1766,7 @@ bool CWing::LLTInitialize(double mass)
 
 
 void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-						 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
+					CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
 {
 	// calculates the induced lift and drag from the vortices or wake panels strength
 	// using a farfield method
@@ -1961,7 +1897,6 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 						//induced force
 						dF  = Wg * m_pPanel[pp].Vortex;
 						dF *= Mu[pp+pos];       // N/rho
-
 						StripForce += dF;       // N/rho
 					}
 
@@ -2798,7 +2733,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
 
 	// Calculate the Reynolds number on each strip
-	for (m=0; m<m_NStation; m++)    m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
+	for (m=0; m<m_NStation; m++)  m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
 
 	if(!bViscous)
 	{

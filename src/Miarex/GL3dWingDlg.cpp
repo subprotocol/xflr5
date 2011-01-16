@@ -57,7 +57,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 {
 	setWindowTitle(tr("Wing Edition"));
 	setWindowFlags(Qt::Window);
-	setSizeGripEnabled(true);
+//	setSizeGripEnabled(true);
 
 	m_pWing = NULL;
 

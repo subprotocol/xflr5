@@ -143,7 +143,6 @@ protected:
 
 	QFile *m_pXFile;
 
-	CFoil *m_pFoil;
 	CFoil *m_pCurFoil;
 
 	QFont m_RFont;

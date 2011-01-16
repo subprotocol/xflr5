@@ -41,7 +41,10 @@ class CSurface : public QObject
 	friend class CWPolar;
 
 public:
-    void AddFlapPanel(CPanel *pPanel);
+
+	CSurface();
+
+	void AddFlapPanel(CPanel *pPanel);
 	void Copy(CSurface const &Surface);
 	void GetC4(int k, CVector &Pt, double &tau);
 	void GetLeadingPt(int k, CVector &C);
@@ -61,8 +64,10 @@ public:
 	void SetFlap();
 	void SetSidePoints(CBody *pBody, double dx, double dz);
 	void SetTwist();
-	void SetTwist_Old();
+	void SetTwist_old();
 	void Translate(CVector const &T);
+	void CreateXZSymetric(CSurface const &Surface);
+	void CreateXPoints();
 
 	bool IsFlapPanel(int const &p);
 	bool IsFlapNode(int const &nNode);
@@ -76,8 +81,6 @@ public:
 	double GetFoilArea(double const &tau);
 	double GetPanelWidth(int const &k);
 
-	CSurface();
-	virtual ~CSurface();
 
 private :
 	CVector SideA[MAXCHORDPANELS];	 
@@ -101,7 +104,6 @@ private :
 	CVector NA, NB;
 
 	double m_TwistA, m_TwistB;
-	double m_Dihedral;
 	double m_Length;// along span-y direction...
 	double y1, y2, xLA, xTA, xLB, xTB;
 	double chordA, chordB, zA, zB, Chord, Length;
@@ -120,6 +122,8 @@ private :
 
 	CVector m_HingePoint;
 	CVector m_HingeVector;
+
+	CSurface *m_pLeftSurface, *m_pRightSurface;
 
 public:
 	bool m_bJoinRight; //true if the surface's right side should be connected to the next right surface's right left side - for panel analysis only

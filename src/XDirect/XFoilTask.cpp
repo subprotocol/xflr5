@@ -53,8 +53,6 @@ void XFoilTask::run()
 		return;
 	}
 
-//qDebug() << "thread" << m_Id <<m_pFoil->m_FoilName<<m_pPolar->m_PlrName;//<< QThread::currentThread();
-
 	if(m_pPolar->m_Type!=4) AlphaSequence();
 	else
 	{
