@@ -11348,6 +11348,8 @@ void QMiarex::OnUFOInertia()
 		}
 		SetWPlr();
 		pMainFrame->SetSaveState(false);
+		if(m_iView==WPOLARVIEW) CreateWPolarCurves();
+		UpdateView();
 	}
 	else
 	{
@@ -14223,17 +14225,16 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	if(m_pCurPlane)     UFOName = m_pCurPlane->m_PlaneName;
 	else if(m_pCurWing) UFOName = m_pCurWing->m_WingName;
 	else return;
-	
 
-//	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	if(!WPlrName.length() && m_pCurWPolar)	WPlrName = m_pCurWPolar->m_PlrName;
+
 	if(bCurrent) pWPolar = m_pCurWPolar;
 	else
 	{
 		for (i=0; i<m_poaWPolar->size(); i++)
 		{
 			pOldWPolar = (CWPolar*) m_poaWPolar->at(i);
-			if (pOldWPolar->m_UFOName == UFOName &&
-				pOldWPolar->m_PlrName == WPlrName)
+			if (pOldWPolar->m_UFOName == UFOName &&	pOldWPolar->m_PlrName == WPlrName)
 			{
 				pWPolar = pOldWPolar;
 				break;

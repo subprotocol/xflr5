@@ -1624,6 +1624,7 @@ void PanelAnalysisDlg::InitDialog()
 	}
 
 	if(m_pWPolar->m_Type==STABILITYPOLAR ) m_b3DSymetric=false;
+	if(fabs(m_pWPolar->m_Beta)>0)          m_b3DSymetric=false;
 
 	if (m_b3DSymetric) AddString(tr("Perfoming symmetric calculation")+"\n");
 	else

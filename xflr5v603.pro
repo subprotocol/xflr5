@@ -265,3 +265,9 @@ macx {
     ICON = mac/xflr5.icns
 }
 OTHER_FILES += doc/ReleaseNotes.txt
+
+
+#QMAKE_CFLAGS+=-pg
+#QMAKE_CXXFLAGS+=-pg
+#QMAKE_LFLAGS+=-pg
+

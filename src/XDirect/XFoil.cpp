@@ -1095,39 +1095,39 @@ bool XFoil::blsolve()
 		//
 		//------ normalize first row
 		pivot = 1.0 / va[1][1][iv];
-		va[1][2][iv] = va[1][2][iv] * pivot;
-		for (l=iv;l<= nsys;l++) vm[1][l][iv] = vm[1][l][iv]*pivot;
-		vdel[1][1][iv] = vdel[1][1][iv]*pivot;
-		vdel[1][2][iv] = vdel[1][2][iv]*pivot;
+		va[1][2][iv] *= pivot;
+		for (l=iv;l<= nsys;l++) vm[1][l][iv] *= pivot;
+		vdel[1][1][iv] *= pivot;
+		vdel[1][2][iv] *= pivot;
 		//
 		//------ eliminate lower first column in va block
 		for (k=2; k<= 3; k++)
 		{
 			vtmp = va[k][1][iv];
-			va[k][2][iv] = va[k][2][iv] - vtmp*va[1][2][iv];
-			for (int l=iv; l<=nsys; l++) vm[k][l][iv] = vm[k][l][iv] - vtmp*vm[1][l][iv];
-			vdel[k][1][iv] = vdel[k][1][iv] - vtmp*vdel[1][1][iv];
-			vdel[k][2][iv] = vdel[k][2][iv] - vtmp*vdel[1][2][iv];
+			va[k][2][iv] -= vtmp*va[1][2][iv];
+			for (int l=iv; l<=nsys; l++) vm[k][l][iv] -= vtmp*vm[1][l][iv];
+			vdel[k][1][iv] -= vtmp*vdel[1][1][iv];
+			vdel[k][2][iv] -= vtmp*vdel[1][2][iv];
 		}
 		//
 		//------ normalize second row
 		pivot = 1.0 / va[2][2][iv];
-		for (l=iv; l<= nsys; l++) vm[2][l][iv] = vm[2][l][iv]*pivot;
-		vdel[2][1][iv] = vdel[2][1][iv]*pivot;
-		vdel[2][2][iv] = vdel[2][2][iv]*pivot;
+		for (l=iv; l<= nsys; l++) vm[2][l][iv] *=pivot;
+		vdel[2][1][iv] *= pivot;
+		vdel[2][2][iv] *= pivot;
 		//
 		//------ eliminate lower second column in va block
 		k = 3;
 		vtmp = va[k][2][iv];
-		for (l=iv; l<=nsys; l++) vm[k][l][iv] = vm[k][l][iv] - vtmp*vm[2][l][iv];
-		vdel[k][1][iv] = vdel[k][1][iv] - vtmp*vdel[2][1][iv];
-		vdel[k][2][iv] = vdel[k][2][iv] - vtmp*vdel[2][2][iv];
+		for (l=iv; l<=nsys; l++) vm[k][l][iv] -= vtmp*vm[2][l][iv];
+		vdel[k][1][iv] -= vtmp*vdel[2][1][iv];
+		vdel[k][2][iv] -= vtmp*vdel[2][2][iv];
 
 		//------ normalize third row
 		pivot = 1.0/vm[3][iv][iv];
-		for (l=ivp; l<=nsys; l++) vm[3][l][iv] = vm[3][l][iv]*pivot;
-		vdel[3][1][iv] = vdel[3][1][iv]*pivot;
-		vdel[3][2][iv] = vdel[3][2][iv]*pivot;
+		for (l=ivp; l<=nsys; l++) vm[3][l][iv] *= pivot;
+		vdel[3][1][iv] *= pivot;
+		vdel[3][2][iv] *= pivot;
 		//
 		//
 		//------ eliminate upper third column in va block
@@ -1135,20 +1135,20 @@ bool XFoil::blsolve()
 		vtmp2 = vm[2][iv][iv];
 		for(l=ivp;l<= nsys;l++)
 		{
-			vm[1][l][iv] = vm[1][l][iv] - vtmp1*vm[3][l][iv];
-			vm[2][l][iv] = vm[2][l][iv] - vtmp2*vm[3][l][iv];
+			vm[1][l][iv] -= vtmp1*vm[3][l][iv];
+			vm[2][l][iv] -= vtmp2*vm[3][l][iv];
 		}
-		vdel[1][1][iv] = vdel[1][1][iv] - vtmp1*vdel[3][1][iv];
-		vdel[2][1][iv] = vdel[2][1][iv] - vtmp2*vdel[3][1][iv];
-		vdel[1][2][iv] = vdel[1][2][iv] - vtmp1*vdel[3][2][iv];
-		vdel[2][2][iv] = vdel[2][2][iv] - vtmp2*vdel[3][2][iv];
+		vdel[1][1][iv] -= vtmp1*vdel[3][1][iv];
+		vdel[2][1][iv] -= vtmp2*vdel[3][1][iv];
+		vdel[1][2][iv] -= vtmp1*vdel[3][2][iv];
+		vdel[2][2][iv] -= vtmp2*vdel[3][2][iv];
 		//
 		//------ eliminate upper second column in va block
 		vtmp = va[1][2][iv];
-		for (l=ivp; l<=nsys;l++) vm[1][l][iv] = vm[1][l][iv] - vtmp*vm[2][l][iv];
+		for (l=ivp; l<=nsys;l++) vm[1][l][iv] -= vtmp*vm[2][l][iv];
 
-		vdel[1][1][iv] = vdel[1][1][iv] - vtmp*vdel[2][1][iv];
-		vdel[1][2][iv] = vdel[1][2][iv] - vtmp*vdel[2][2][iv];
+		vdel[1][1][iv] -= vtmp*vdel[2][1][iv];
+		vdel[1][2][iv] -= vtmp*vdel[2][2][iv];
 		//
 		//
 		if(iv!=nsys)
@@ -1160,10 +1160,9 @@ bool XFoil::blsolve()
 				vtmp1 = vb[k][ 1][ivp];
 				vtmp2 = vb[k][ 2][ivp];
 				vtmp3 = vm[k][iv][ivp];
-				for(l=ivp; l<= nsys;l++) vm[k][l][ivp] = vm[k][l][ivp]
-					-(vtmp1*vm[1][l][iv]+ vtmp2*vm[2][l][iv]+vtmp3*vm[3][l][iv]);
-				vdel[k][1][ivp] = vdel[k][1][ivp]-(vtmp1*vdel[1][1][iv]+vtmp2*vdel[2][1][iv]+ vtmp3*vdel[3][1][iv]);
-				vdel[k][2][ivp] = vdel[k][2][ivp]-(vtmp1*vdel[1][2][iv]+vtmp2*vdel[2][2][iv]+ vtmp3*vdel[3][2][iv]);
+				for(l=ivp; l<= nsys;l++) vm[k][l][ivp] -= (vtmp1*vm[1][l][iv]+ vtmp2*vm[2][l][iv]+vtmp3*vm[3][l][iv]);
+				vdel[k][1][ivp] -= (vtmp1*vdel[1][1][iv]+vtmp2*vdel[2][1][iv]+ vtmp3*vdel[3][1][iv]);
+				vdel[k][2][ivp] -= (vtmp1*vdel[1][2][iv]+vtmp2*vdel[2][2][iv]+ vtmp3*vdel[3][2][iv]);
 			}
 			//
 			if(iv==ivte1)
@@ -1177,10 +1176,10 @@ bool XFoil::blsolve()
 					vtmp2 = vz[k][2];
 					for (l=ivp;l<= nsys;l++)
 					{
-						vm[k][l][ivz] = vm[k][l][ivz]-(vtmp1*vm[1][l][iv]+ vtmp2*vm[2][l][iv]);
+						vm[k][l][ivz] -=(vtmp1*vm[1][l][iv]+ vtmp2*vm[2][l][iv]);
 					}
-					vdel[k][1][ivz] = vdel[k][1][ivz]-(vtmp1*vdel[1][1][iv]+ vtmp2*vdel[2][1][iv]);
-					vdel[k][2][ivz] = vdel[k][2][ivz]-(vtmp1*vdel[1][2][iv]+ vtmp2*vdel[2][2][iv]);
+					vdel[k][1][ivz] -= (vtmp1*vdel[1][1][iv]+ vtmp2*vdel[2][1][iv]);
+					vdel[k][2][ivz] -= (vtmp1*vdel[1][2][iv]+ vtmp2*vdel[2][2][iv]);
 				}
 			}
 			//
@@ -1196,23 +1195,23 @@ bool XFoil::blsolve()
 					//
 					if(fabs(vtmp1)>vaccel)
 					{
-						for(l=ivp;l<= nsys;l++) vm[1][l][kv] = vm[1][l][kv] - vtmp1*vm[3][l][iv];
-						vdel[1][1][kv] = vdel[1][1][kv] - vtmp1*vdel[3][1][iv];
-						vdel[1][2][kv] = vdel[1][2][kv] - vtmp1*vdel[3][2][iv];
+						for(l=ivp;l<= nsys;l++) vm[1][l][kv] -= vtmp1*vm[3][l][iv];
+						vdel[1][1][kv] -= vtmp1*vdel[3][1][iv];
+						vdel[1][2][kv] -= vtmp1*vdel[3][2][iv];
 					}
 					//
 					if(fabs(vtmp2)>vaccel)
 					{
-						for (l=ivp;l<=nsys;l++) vm[2][l][kv] = vm[2][l][kv] - vtmp2*vm[3][l][iv];
-						vdel[2][1][kv] = vdel[2][1][kv] - vtmp2*vdel[3][1][iv];
-						vdel[2][2][kv] = vdel[2][2][kv] - vtmp2*vdel[3][2][iv];
+						for (l=ivp;l<=nsys;l++) vm[2][l][kv] -= vtmp2*vm[3][l][iv];
+						vdel[2][1][kv] -= vtmp2*vdel[3][1][iv];
+						vdel[2][2][kv] -= vtmp2*vdel[3][2][iv];
 					}
 					//
 					if(fabs(vtmp3)>vaccel)
 					{
-						for(l=ivp;l<=nsys;l++) vm[3][l][kv] = vm[3][l][kv] - vtmp3*vm[3][l][iv];
-						vdel[3][1][kv] = vdel[3][1][kv] - vtmp3*vdel[3][1][iv];
-						vdel[3][2][kv] = vdel[3][2][kv] - vtmp3*vdel[3][2][iv];
+						for(l=ivp;l<=nsys;l++) vm[3][l][kv] -= vtmp3*vm[3][l][iv];
+						vdel[3][1][kv] -= vtmp3*vdel[3][1][iv];
+						vdel[3][2][kv] -= vtmp3*vdel[3][2][iv];
 					}
 					//
 				}
@@ -1227,16 +1226,16 @@ bool XFoil::blsolve()
 		vtmp = vdel[3][1][iv];
 		for (kv=iv-1; kv>=1;kv--)
 		{
-			vdel[1][1][kv] = vdel[1][1][kv] - vm[1][iv][kv]*vtmp;
-			vdel[2][1][kv] = vdel[2][1][kv] - vm[2][iv][kv]*vtmp;
-			vdel[3][1][kv] = vdel[3][1][kv] - vm[3][iv][kv]*vtmp;
+			vdel[1][1][kv] -= vm[1][iv][kv]*vtmp;
+			vdel[2][1][kv] -= vm[2][iv][kv]*vtmp;
+			vdel[3][1][kv] -= vm[3][iv][kv]*vtmp;
 		}
 		vtmp = vdel[3][2][iv];
 		for (kv=iv-1; kv>=1;kv--)
 		{
-			vdel[1][2][kv] = vdel[1][2][kv] - vm[1][iv][kv]*vtmp;
-			vdel[2][2][kv] = vdel[2][2][kv] - vm[2][iv][kv]*vtmp;
-			vdel[3][2][kv] = vdel[3][2][kv] - vm[3][iv][kv]*vtmp;
+			vdel[1][2][kv] -= vm[1][iv][kv]*vtmp;
+			vdel[2][2][kv] -= vm[2][iv][kv]*vtmp;
+			vdel[3][2][kv] -= vm[3][iv][kv]*vtmp;
 		}
 		//
 	}
