@@ -4050,11 +4050,11 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 		{
 			//rotate the normals and control point positions
 			H.Set(0.0, 1.0, 0.0);
-
 			if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION)
-			   SignedDeltaAngle *= m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
+			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
 			else SignedDeltaAngle = DeltaAngle;
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
+			qDebug()<<SignedDeltaAngle;
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
@@ -4070,12 +4070,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	{
 		//Elevator tilt
 		if ((!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[1]) ||
-			( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[1])>PRECISION))
+		    ( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[1])>PRECISION))
 		{
 			H.Set(0.0, 1.0, 0.0);
 
 			if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[1])>PRECISION)
-			   SignedDeltaAngle *= m_pWPolar->m_MaxControl[1]/fabs(m_pWPolar->m_MaxControl[1]);
+			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[1]/fabs(m_pWPolar->m_MaxControl[1]);
 			else SignedDeltaAngle = DeltaAngle;
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
 
@@ -4099,7 +4099,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
 				if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION)
-				   SignedDeltaAngle *= m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[0]);
+				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[0]);
 				else SignedDeltaAngle = DeltaAngle;
 				Quat.Set(SignedDeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 
@@ -4210,6 +4210,256 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 	Cm *= m_pWPolar->m_Density;
 
 	return Cm;
+}
+
+
+
+void PanelAnalysisDlg::VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
+{
+	//Quadrilateral VLM FORMULATION
+	// LA, LB, TA, TB are the vortex's four corners
+	// LA and LB are at the 3/4 point of panel nx
+	// TA and TB are at the 3/4 point of panel nx+1
+	//
+	//    LA__________LB               |
+	//    |           |                |
+	//    |           |                | freestream speed
+	//    |           |                |
+	//    |           |                \/
+	//    |           |
+	//    TA__________TB
+	//
+	//
+	//
+	// C is the point where the induced speed is calculated
+	// V is the resulting speed
+	//
+	// Vectorial operations are written explicitly to save computing times (4x more efficient)
+	//
+	double CoreSize = 0.0001;
+	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
+
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	R[0].x = LB.x;
+	R[0].y = LB.y;
+	R[0].z = LB.z;
+	R[1].x = TB.x;
+	R[1].y = TB.y;
+	R[1].z = TB.z;
+	R[2].x = TA.x;
+	R[2].y = TA.y;
+	R[2].z = TA.z;
+	R[3].x = LA.x;
+	R[3].y = LA.y;
+	R[3].z = LA.z;
+	R[4].x = LB.x;
+	R[4].y = LB.y;
+	R[4].z = LB.z;
+
+	for (int i=0; i<4; i++)
+	{
+		r0.x = R[i+1].x - R[i].x;
+		r0.y = R[i+1].y - R[i].y;
+		r0.z = R[i+1].z - R[i].z;
+		r1.x = C.x - R[i].x;
+		r1.y = C.y - R[i].y;
+		r1.z = C.z - R[i].z;
+		r2.x = C.x - R[i+1].x;
+		r2.y = C.y - R[i+1].y;
+		r2.z = C.z - R[i+1].z;
+
+		Psi.x = r1.y*r2.z - r1.z*r2.y;
+		Psi.y =-r1.x*r2.z + r1.z*r2.x;
+		Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+		r1v = sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z));
+		r2v = sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		//get the distance of the TestPoint to the panel's side
+		t.x =  r1.y*r0.z - r1.z*r0.y;
+		t.y = -r1.x*r0.z + r1.z*r0.x;
+		t.z =  r1.x*r0.y - r1.y*r0.x;
+
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > CoreSize * CoreSize)
+		{
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
+
+			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/r1v - (r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/r2v;
+			V.x += Psi.x * Omega/4.0/PI;
+			V.y += Psi.y * Omega/4.0/PI;
+			V.z += Psi.z * Omega/4.0/PI;
+		}
+	}
+}
+
+
+
+void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll)
+{
+	// CLASSIC VLM FORMULATION/
+	//
+	//    LA__________LB               |
+	//    |           |                |
+	//    |           |                | freestream speed
+	//    |           |                |
+	//    |           |                \/
+	//    |           |
+	//    \/          \/
+	//
+	// Note : the geometry has been rotated by sideslip, hence, there is no need to align the trailing vortices with sideslip
+	//
+	// V is the resulting speed at point C
+	//
+	// Vectorial operations are written inline to save computing times
+	// -->longer code, but 4x more efficient....
+
+	double CoreSize = 0.0001;
+	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
+
+	V.x = 0.0;
+	V.y = 0.0;
+	V.z = 0.0;
+
+	if(bAll)
+	{
+		r0.x = B.x - A.x;
+		r0.y = B.y - A.y;
+		r0.z = B.z - A.z;
+
+		r1.x = C.x - A.x;
+		r1.y = C.y - A.y;
+		r1.z = C.z - A.z;
+
+		r2.x = C.x - B.x;
+		r2.y = C.y - B.y;
+		r2.z = C.z - B.z;
+
+		Psi.x = r1.y*r2.z - r1.z*r2.y;
+		Psi.y =-r1.x*r2.z + r1.z*r2.x;
+		Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+		//get the distance of the TestPoint to the panel's side
+		t.x =  r1.y*r0.z - r1.z*r0.y;
+		t.y = -r1.x*r0.z + r1.z*r0.x;
+		t.z =  r1.x*r0.y - r1.y*r0.x;
+
+		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) >CoreSize * CoreSize)
+		{
+			Psi.x /= ftmp;
+			Psi.y /= ftmp;
+			Psi.z /= ftmp;
+
+			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+				   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+			V.x = Psi.x * Omega/4.0/PI;
+			V.y = Psi.y * Omega/4.0/PI;
+			V.z = Psi.z * Omega/4.0/PI;
+		}
+	}
+
+	// We create Far points to align the trailing vortices with the reference axis
+	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
+	// If this approximation is not valid, then the geometry should be tilted in the polar definition
+
+	// calculate left contribution
+	Far.x = A.x +  10000.0; //10 km... should be enough
+	Far.y = A.y;
+	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*PI/180.0);
+
+	r0.x = A.x - Far.x;
+	r0.y = A.y - Far.y;
+	r0.z = A.z - Far.z;
+
+	r1.x = C.x - A.x;
+	r1.y = C.y - A.y;
+	r1.z = C.z - A.z;
+
+	r2.x = C.x - Far.x;
+	r2.y = C.y - Far.y;
+	r2.z = C.z - Far.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+	t.x=1.0; t.y=0.0; t.z=0.0;
+
+	h.x =  r1.y*t.z - r1.z*t.y;
+	h.y = -r1.x*t.z + r1.z*t.x;
+	h.z =  r1.x*t.y - r1.y*t.x;
+
+	//Next add 'left' semi-infinite contribution
+	//eq.6-56
+
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
+	{
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
+
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
+	}
+
+	// calculate right vortex contribution
+	Far.x = B.x +  10000.0;
+	Far.y = B.y ;
+	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*PI/180.0);
+
+	r0.x = Far.x - B.x;
+	r0.y = Far.y - B.y;
+	r0.z = Far.z - B.z;
+
+	r1.x = C.x - Far.x;
+	r1.y = C.y - Far.y;
+	r1.z = C.z - Far.z;
+
+	r2.x = C.x - B.x;
+	r2.y = C.y - B.y;
+	r2.z = C.z - B.z;
+
+	Psi.x = r1.y*r2.z - r1.z*r2.y;
+	Psi.y =-r1.x*r2.z + r1.z*r2.x;
+	Psi.z = r1.x*r2.y - r1.y*r2.x;
+
+	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
+
+	//Last add 'right' semi-infinite contribution
+	//eq.6-57
+	h.x =  r2.y*t.z - r2.z*t.y;
+	h.y = -r2.x*t.z + r2.z*t.x;
+	h.z =  r2.x*t.y - r2.y*t.x;
+
+	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
+	{
+		Psi.x /= ftmp;
+		Psi.y /= ftmp;
+		Psi.z /= ftmp;
+
+		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
+			-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+
+		V.x += Psi.x * Omega/4.0/PI;
+		V.y += Psi.y * Omega/4.0/PI;
+		V.z += Psi.z * Omega/4.0/PI;
+	}
 }
 
 

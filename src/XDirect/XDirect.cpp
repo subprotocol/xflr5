@@ -1894,10 +1894,9 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 
 	if(QThread::idealThreadCount()<2)
 	{
-		QString strange = QString(tr("Not enough threads available for multithreading\nONly %1")).arg(QThread::idealThreadCount());
+		QString strange = tr("Not enough threads available for multithreading");
 		QMessageBox::warning(pMainFrame, tr("Warning"), strange);
 		return;
-
 	}
 
 	m_bPolar = true;

@@ -101,6 +101,8 @@ private:
 	void UpdateView();
 	void WriteString(QString strong);
 	void VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, CVector &V, bool bAll);
+	void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V);
+	void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll=true);
 
 	void GetDoubletDerivative(const int &p, double *Mu, double &Cp, CVector &VTotl, double const &QInf, double Vx, double Vy, double Vz);
 	void GetVortexCp(const int &p, double *Gamma, double *Cp, CVector &VInf);
@@ -165,7 +167,6 @@ private:
 	double *m_pCoreSize;
 	double side, sign, dist, S, GL;
 	double RNUM, DNOM, PN, A, B, PA, PB, SM, SL, AM, AL, Al, pjk, CJKi;
-	double ftmp, Omega, r1v, r2v;
 
 	double XNP;//Neutral point x-position resulting from stability analysis
 	double CXu, CZu, Cmu, CXq, CZq, Cmq, CXa, CZa, Cma; // Non dimensional stability derivatives
@@ -191,7 +192,6 @@ private:
 	CVector m_Speed[VLMMAXMATSIZE];
 
 	CVector *m_pR[5];
-	CVector r0, r1, r2, Psi, t;
 	CVector PJK, a, b, s, T1, T2, T, h;
 
 	QString m_strOut;
@@ -221,6 +221,9 @@ private:
 	CVector VG, CG;
 	double phiG;
 	CPanel m_SymPanel;
+	CVector R[5];
+	CVector r0, r1, r2, Psi, t, Far;
+	double r1v,r2v,ftmp, Omega;
 	
 public:
 	double m_Ai[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation

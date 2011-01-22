@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Globals Class
-	Copyright (C) 2008-2010 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2008-2011 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -731,352 +731,6 @@ void Trace(QString msg, double f)
 }
 
 
-/*
-void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
-{
-	//Quadrilateral VLM FORMULATION
-	// LA, LB, TA, TB are the vortex's four corners
-	// LA and LB are at the 3/4 point of panel nx
-	// TA and TB are at the 3/4 point of panel nx+1
-	//
-	//    LA__________LB               |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    TA__________TB
-	//
-	//
-	//
-	// C is the point where the induced speed is calculated
-	// V is the resulting speed
-	//
-	// Vectorial operations are written explicitly to save computing times (4x more efficient)
-	//
-	double CoreSize = 0.000001;
-//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
-
-	static int i;
-	static QVector3D R[5];
-	static QVector3D r0, r1, r2, Psi, t;
-	static double r1v,r2v,ftmp, Omega;
-
-	V.x = 0.0;
-	V.y = 0.0;
-	V.z = 0.0;
-
-	R[0].setX(LB.x);
-	R[0].setY(LB.y);
-	R[0].setZ(LB.z);
-	R[1].setX(TB.x);
-	R[1].setY(TB.y);
-	R[1].setZ(TB.z);
-	R[2].setX(TA.x);
-	R[2].setY(TA.y);
-	R[2].setZ(TA.z);
-	R[3].setX(LA.x);
-	R[3].setY(LA.y);
-	R[3].setZ(LA.z);
-	R[4].setX(LB.x);
-	R[4].setY(LB.y);
-	R[4].setZ(LB.z);
-
-	for (i=0; i<4; i++)
-	{
-		r0.setX(R[i+1].x() - R[i].x());
-		r0.setY(R[i+1].y() - R[i].y());
-		r0.setZ(R[i+1].z() - R[i].z());
-
-		r1.setX(C.x - R[i].x());
-		r1.setY(C.y - R[i].y());
-		r1.setZ(C.z - R[i].z());
-		r2.setX(C.x - R[i+1].x());
-		r2.setY(C.y - R[i+1].y());
-		r2.setZ(C.z - R[i+1].z());
-
-		Psi.setX( r1.y()*r2.z() - r1.z()*r2.y());
-		Psi.setY(-r1.x()*r2.z() + r1.z()*r2.x());
-		Psi.setZ( r1.x()*r2.y() - r1.y()*r2.x());
-
-		ftmp = Psi.x()*Psi.x() + Psi.y()*Psi.y() + Psi.z()*Psi.z();
-
-		r1v = sqrt((r1.x()*r1.x() + r1.y()*r1.y() + r1.z()*r1.z()));
-		r2v = sqrt((r2.x()*r2.x() + r2.y()*r2.y() + r2.z()*r2.z()));
-
-		//get the distance of the TestPoint to the panel's side
-		t.setX( r1.y()*r0.z() - r1.z()*r0.y());
-		t.setY(-r1.x()*r0.z() + r1.z()*r0.x());
-		t.setZ( r1.x()*r0.y() - r1.y()*r0.x());
-
-		if ((t.x()*t.x()+t.y()*t.y()+t.z()*t.z())/(r0.x()*r0.x()+r0.y()*r0.y()+r0.z()*r0.z()) > CoreSize * CoreSize)
-		{
-			Psi /= ftmp;
-
-			Omega = (r0.x()*r1.x() + r0.y()*r1.y() + r0.z()*r1.z())/r1v - (r0.x()*r2.x() + r0.y()*r2.y() + r0.z()*r2.z())/r2v;
-			V.x += Psi.x() * Omega/4.0/PI;
-			V.y += Psi.y() * Omega/4.0/PI;
-			V.z += Psi.z() * Omega/4.0/PI;
-		}
-	}
-}*/
-
-
-void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V)
-{
-	//Quadrilateral VLM FORMULATION
-	// LA, LB, TA, TB are the vortex's four corners
-	// LA and LB are at the 3/4 point of panel nx
-	// TA and TB are at the 3/4 point of panel nx+1
-	//
-	//    LA__________LB               |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    TA__________TB
-	//
-	//
-	//
-	// C is the point where the induced speed is calculated
-	// V is the resulting speed
-	//
-	// Vectorial operations are written explicitly to save computing times (4x more efficient)
-	//
-	double CoreSize = 0.000001;
-//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
-
-	static int i;
-	static CVector R[5];
-	static CVector r0, r1, r2, Psi, t;
-	static double r1v,r2v,ftmp, Omega;
-
-	V.x = 0.0;
-	V.y = 0.0;
-	V.z = 0.0;
-
-	R[0].x = LB.x;
-	R[0].y = LB.y;
-	R[0].z = LB.z;
-	R[1].x = TB.x;
-	R[1].y = TB.y;
-	R[1].z = TB.z;
-	R[2].x = TA.x;
-	R[2].y = TA.y;
-	R[2].z = TA.z;
-	R[3].x = LA.x;
-	R[3].y = LA.y;
-	R[3].z = LA.z;
-	R[4].x = LB.x;
-	R[4].y = LB.y;
-	R[4].z = LB.z;
-
-	for (i=0; i<4; i++)
-	{
-		r0.x = R[i+1].x - R[i].x;
-		r0.y = R[i+1].y - R[i].y;
-		r0.z = R[i+1].z - R[i].z;
-		r1.x = C.x - R[i].x;
-		r1.y = C.y - R[i].y;
-		r1.z = C.z - R[i].z;
-		r2.x = C.x - R[i+1].x;
-		r2.y = C.y - R[i+1].y;
-		r2.z = C.z - R[i+1].z;
-
-		Psi.x = r1.y*r2.z - r1.z*r2.y;
-		Psi.y =-r1.x*r2.z + r1.z*r2.x;
-		Psi.z = r1.x*r2.y - r1.y*r2.x;
-
-		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
-
-		r1v = sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z));
-		r2v = sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
-
-		//get the distance of the TestPoint to the panel's side
-		t.x =  r1.y*r0.z - r1.z*r0.y;
-		t.y = -r1.x*r0.z + r1.z*r0.x;
-		t.z =  r1.x*r0.y - r1.y*r0.x;
-
-		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) > CoreSize * CoreSize)
-		{
-			Psi.x /= ftmp;
-			Psi.y /= ftmp;
-			Psi.z /= ftmp;
-
-			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/r1v - (r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/r2v;
-			V.x += Psi.x * Omega/4.0/PI;
-			V.y += Psi.y * Omega/4.0/PI;
-			V.z += Psi.z * Omega/4.0/PI;
-		}
-	}
-}
-
-
-
-void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll)
-{
-	// CLASSIC VLM FORMULATION/
-	//
-	//    LA__________LB               |
-	//    |           |                |
-	//    |           |                | freestream speed
-	//    |           |                |
-	//    |           |                \/
-	//    |           |
-	//    \/          \/
-	//
-	// Note : the geometry has been rotated by sideslip, hence, there is no need to align the trailing vortices with sideslip
-	//
-	// V is the resulting speed at point C
-	//
-	// Vectorial operations are written inline to save computing times
-	// -->longer code, but 4x more efficient....
-
-	static CVector r0, r1, r2, Psi, t, h, Far;
-	static double  ftmp, Omega;
-	static double CoreSize = 0.000001;
-//	if(fabs(*m_pCoreSize)>1.e-10) CoreSize = *m_pCoreSize;
-
-	V.x = 0.0;
-	V.y = 0.0;
-	V.z = 0.0;
-
-	if(bAll)
-	{
-		r0.x = B.x - A.x;
-		r0.y = B.y - A.y;
-		r0.z = B.z - A.z;
-
-		r1.x = C.x - A.x;
-		r1.y = C.y - A.y;
-		r1.z = C.z - A.z;
-
-		r2.x = C.x - B.x;
-		r2.y = C.y - B.y;
-		r2.z = C.z - B.z;
-
-		Psi.x = r1.y*r2.z - r1.z*r2.y;
-		Psi.y =-r1.x*r2.z + r1.z*r2.x;
-		Psi.z = r1.x*r2.y - r1.y*r2.x;
-
-		ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
-
-		//get the distance of the TestPoint to the panel's side
-		t.x =  r1.y*r0.z - r1.z*r0.y;
-		t.y = -r1.x*r0.z + r1.z*r0.x;
-		t.z =  r1.x*r0.y - r1.y*r0.x;
-
-		if ((t.x*t.x+t.y*t.y+t.z*t.z)/(r0.x*r0.x+r0.y*r0.y+r0.z*r0.z) >CoreSize * CoreSize)
-		{
-			Psi.x /= ftmp;
-			Psi.y /= ftmp;
-			Psi.z /= ftmp;
-
-			Omega = (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-				   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
-
-			V.x = Psi.x * Omega/4.0/PI;
-			V.y = Psi.y * Omega/4.0/PI;
-			V.z = Psi.z * Omega/4.0/PI;
-		}
-	}
-
-	// We create Far points to align the trailing vortices with the reference axis
-	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
-	// If this approximation is not valid, then the geometry should be tilted in the polar definition
-
-	// calculate left contribution
-	Far.x = A.x +  10000.0; //10 km... should be enough
-	Far.y = A.y;
-	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*PI/180.0);
-
-	r0.x = A.x - Far.x;
-	r0.y = A.y - Far.y;
-	r0.z = A.z - Far.z;
-
-	r1.x = C.x - A.x;
-	r1.y = C.y - A.y;
-	r1.z = C.z - A.z;
-
-	r2.x = C.x - Far.x;
-	r2.y = C.y - Far.y;
-	r2.z = C.z - Far.z;
-
-	Psi.x = r1.y*r2.z - r1.z*r2.y;
-	Psi.y =-r1.x*r2.z + r1.z*r2.x;
-	Psi.z = r1.x*r2.y - r1.y*r2.x;
-
-	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
-
-	t.x=1.0; t.y=0.0; t.z=0.0;
-
-	h.x =  r1.y*t.z - r1.z*t.y;
-	h.y = -r1.x*t.z + r1.z*t.x;
-	h.z =  r1.x*t.y - r1.y*t.x;
-
-	//Next add 'left' semi-infinite contribution
-	//eq.6-56
-
-	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
-	{
-		Psi.x /= ftmp;
-		Psi.y /= ftmp;
-		Psi.z /= ftmp;
-
-		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
-
-		V.x += Psi.x * Omega/4.0/PI;
-		V.y += Psi.y * Omega/4.0/PI;
-		V.z += Psi.z * Omega/4.0/PI;
-	}
-
-	// calculate right vortex contribution
-	Far.x = B.x +  10000.0;
-	Far.y = B.y ;
-	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*PI/180.0);
-
-	r0.x = Far.x - B.x;
-	r0.y = Far.y - B.y;
-	r0.z = Far.z - B.z;
-
-	r1.x = C.x - Far.x;
-	r1.y = C.y - Far.y;
-	r1.z = C.z - Far.z;
-
-	r2.x = C.x - B.x;
-	r2.y = C.y - B.y;
-	r2.z = C.z - B.z;
-
-	Psi.x = r1.y*r2.z - r1.z*r2.y;
-	Psi.y =-r1.x*r2.z + r1.z*r2.x;
-	Psi.z = r1.x*r2.y - r1.y*r2.x;
-
-	ftmp = Psi.x*Psi.x + Psi.y*Psi.y + Psi.z*Psi.z;
-
-	//Last add 'right' semi-infinite contribution
-	//eq.6-57
-	h.x =  r2.y*t.z - r2.z*t.y;
-	h.y = -r2.x*t.z + r2.z*t.x;
-	h.z =  r2.x*t.y - r2.y*t.x;
-
-	if ((h.x*h.x+h.y*h.y+h.z*h.z) > CoreSize * CoreSize)
-	{
-		Psi.x /= ftmp;
-		Psi.y /= ftmp;
-		Psi.z /= ftmp;
-
-		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-			-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
-
-		V.x += Psi.x * Omega/4.0/PI;
-		V.y += Psi.y * Omega/4.0/PI;
-		V.z += Psi.z * Omega/4.0/PI;
-	}
-}
-
-
 
 void WriteCOLORREF(QDataStream &ar, QColor const &color)
 {
@@ -1108,9 +762,9 @@ void WriteCString(QDataStream &ar, QString const &strong)
 
 double GLGetRed(double tau)
 {
-	if(tau>2.0/3.0)       return 1.0;
-	else if(tau>1.0/3.0)  return (3.0*(tau-1.0/3.0));
-	else				  return 0.0;
+	if(tau>2.0/3.0)      return 1.0;
+	else if(tau>1.0/3.0) return (3.0*(tau-1.0/3.0));
+	else                 return 0.0;
 }
 
 
@@ -1119,15 +773,15 @@ double GLGetGreen(double tau)
 	if(tau<0.f || tau>1.0) 	return 0.0;
 	else if(tau<1.0/4.0) 	return (4.0*tau);
 	else if(tau>3.0/4.0) 	return (1.0-4.0*(tau-3.0/4.0));
-	else					return 1.0;
+	else                    return 1.0;
 }
 
 
 double GLGetBlue(double tau)
 {
-	if(tau>2.0/3.0) 		return 0.0;
-	else if(tau>1.0/3.0)	return (1.0-3.0*(tau-1.0/3.0));
-	else		    		return 1.0;
+	if(tau>2.0/3.0)      return 0.0;
+	else if(tau>1.0/3.0) return (1.0-3.0*(tau-1.0/3.0));
+	else                 return 1.0;
 }
 
 
@@ -1656,10 +1310,10 @@ void TestEigen()
 {
 	double A[4][4];
 	double p[5];
-/*	A[0][0] = -0.0069; 	A[1][0] =  0.0139; 	A[2][0] =   0.0;	A[3][0] = -9.81;
+/*	A[0][0] = -0.0069; 	A[1][0] =  0.0139; 	A[2][0] =   0.0;    A[3][0] = -9.81;
 	A[0][1] = -0.0905; 	A[1][1] = -0.3149; 	A[2][1] = 235.8928; A[3][1] =  0.0;
-	A[0][2] =  0.0004;	A[1][2] = -0.0034;	A[2][2] = -0.4282; 	A[3][2] = 0.0;
-	A[0][3] =  0.0000;	A[1][3] =  0.0000;	A[2][3] =  1.0;		A[3][3] = 0.0;*/
+	A[0][2] =  0.0004;	A[1][2] = -0.0034;	A[2][2] = -0.4282;  A[3][2] = 0.0;
+	A[0][3] =  0.0000;	A[1][3] =  0.0000;	A[2][3] =  1.0;     A[3][3] = 0.0;*/
 
 	A[0][0] =-1.00; A[0][1] =  1.0;	A[0][2] =  1.0;	A[0][3] = -1.0;
 	A[1][0] = 1.00; A[1][1] =  1.0;	A[1][2] =  2.0; A[1][3] = -1.0;
@@ -2906,7 +2560,8 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			pPolar = (CPolar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil0->m_FoilName) size++;
 		}
-		if(size){
+		if(size)
+		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
 				pPolar = (CPolar*)m_poaPolar->at(i);
@@ -2958,7 +2613,8 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 			pPolar = (CPolar*)m_poaPolar->at(i);
 			if(pPolar->m_FoilName == pFoil1->m_FoilName) size++;
 		}
-		if(size){
+		if(size)
+		{
 			for (i=0; i<m_poaPolar->size(); i++)
 			{
 				pPolar = (CPolar*)m_poaPolar->at(i);
@@ -2980,15 +2636,17 @@ void GetLinearizedPolar(QList<void*>*m_poaPolar, CFoil *pFoil0, CFoil *pFoil1, d
 				}
 			}
 		}
-		if(pPolar1 && pPolar2){
+		if(pPolar1 && pPolar2)
+		{
 			pPolar1->GetLinearizedCl(AlphaTemp1, SlopeTemp1);
 			pPolar2->GetLinearizedCl(AlphaTemp2, SlopeTemp2);
 			Alpha01 = AlphaTemp1 +
-					 (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
-			Slope1  = SlopeTemp1 +
-					 (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+			         (AlphaTemp2-AlphaTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
+			Slope1  =  SlopeTemp1 +
+			          (SlopeTemp2-SlopeTemp1) * (Re-pPolar1->m_Reynolds)/(pPolar2->m_Reynolds-pPolar1->m_Reynolds);
 		}
-		else {
+		else 
+		{
 			Alpha01 = 0.0;
 			Slope1 = 2.0*PI *PI/180.0;
 		}
@@ -3111,6 +2769,7 @@ bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, doub
 
 	return true;
 }
+
 
 double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d)
 {

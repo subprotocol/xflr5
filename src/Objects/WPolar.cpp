@@ -149,6 +149,15 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i, pWOpp->m_XNP);
 
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
+
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -223,6 +232,14 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
 					m_XNP.insert(i,       pWOpp->m_XNP);
 
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -302,6 +319,14 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Ctrl.insert(i,       pWOpp->m_Ctrl);
 					m_XNP.insert(i,       pWOpp->m_XNP);
 
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -369,6 +394,16 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
 		m_XNP.append(pWOpp->m_XNP);
+
+		m_ShortPeriodDamping.append(0.0);
+		m_ShortPeriodFrequency.append(0.0);
+		m_PhugoidDamping.append(0.0);
+		m_PhugoidFrequency.append(0.0);
+		m_DutchRollDamping.append(0.0);
+		m_DutchRollFrequency.append(0.0);
+		m_RollDamping.append(0.0);
+		m_SpiralDamping.append(0.0);
+
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
 		m_Cl32Cd.append(0.0);
@@ -458,6 +493,16 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i,  pWOpp->m_XNP);
 
+
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
+
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -533,6 +578,15 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i,  pWOpp->m_XNP);
 
+
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -615,6 +669,16 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Ctrl.insert(i, pWOpp->m_Ctrl);
 					m_XNP.insert(i, pWOpp->m_XNP);
 
+
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
+
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -674,6 +738,16 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_MaxBending.append(pWOpp->m_MaxBending);
 		m_Ctrl.append(pWOpp->m_Ctrl);
 		m_XNP.append(pWOpp->m_XNP);
+
+
+		m_ShortPeriodDamping.append(0.0);
+		m_ShortPeriodFrequency.append(0.0);
+		m_PhugoidDamping.append(0.0);
+		m_PhugoidFrequency.append(0.0);
+		m_DutchRollDamping.append(0.0);
+		m_DutchRollFrequency.append(0.0);
+		m_RollDamping.append(0.0);
+		m_SpiralDamping.append(0.0);
 
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
@@ -770,6 +844,15 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_Ctrl.insert(i, 0.0);
 					m_XNP.insert(i, 0.0);
 
+					m_ShortPeriodDamping.insert(i,0.0);
+					m_ShortPeriodFrequency.insert(i,0.0);
+					m_PhugoidDamping.insert(i,0.0);
+					m_PhugoidFrequency.insert(i,0.0);
+					m_DutchRollDamping.insert(i,0.0);
+					m_DutchRollFrequency.insert(i,0.0);
+					m_RollDamping.insert(i,0.0);
+					m_SpiralDamping.insert(i,0.0);
+
 					m_1Cl.insert(i,0.0);//make room for computed values
 					m_ClCd.insert(i,0.0);
 					m_Cl32Cd.insert(i,0.0);
@@ -816,6 +899,16 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 		m_MaxBending.append(0.0);
 		m_Ctrl.append(0.0);
 		m_XNP.append(0.0);
+
+		m_ShortPeriodDamping.append(0.0);
+		m_ShortPeriodFrequency.append(0.0);
+		m_PhugoidDamping.append(0.0);
+		m_PhugoidFrequency.append(0.0);
+		m_DutchRollDamping.append(0.0);
+		m_DutchRollFrequency.append(0.0);
+		m_RollDamping.append(0.0);
+		m_SpiralDamping.append(0.0);
+
 		m_1Cl.append(0.0);//make room for computed values
 		m_ClCd.append(0.0);
 		m_Cl32Cd.append(0.0);
@@ -877,12 +970,55 @@ void CWPolar::CalculatePoint(int i)
 	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/PI/m_ICd[i]/AR;
 
 	m_SM[i]        = (m_XCP[i]-m_CoG.x)/m_WMAChord *100.00;
+
+	complex<double> c;
+	double OmegaN, Omega1, Dsi, Sigma1;
+	double sum, prod;
+
+	c = m_EigenValue[2][i];
+	sum  = c.real() * 2.0;                          // is a real number
+	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
+	OmegaN = fabs(c.imag());
+	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
+	else                 Omega1 = 0.0;
+	Sigma1 = sum /2.0;
+	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
+	else                   Dsi = 0.0;
+	m_PhugoidDamping[i] = Dsi;
+	m_PhugoidFrequency[i] = fabs(c.imag()/2.0/PI);
+
+	c = m_EigenValue[0][i];
+	sum  = c.real() * 2.0;                          // is a real number
+	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
+	OmegaN = fabs(c.imag());
+	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
+	else                 Omega1 = 0.0;
+	Sigma1 = sum /2.0;
+	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
+	else                   Dsi = 0.0;
+	m_ShortPeriodDamping[i] = Dsi;
+	m_ShortPeriodFrequency[i] = fabs(c.imag()/2.0/PI);
+
+	c = m_EigenValue[5][i];
+	sum  = c.real() * 2.0;                          // is a real number
+	prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
+	OmegaN = fabs(c.imag());
+	if(OmegaN>PRECISION) Omega1 = sqrt(prod);
+	else                 Omega1 = 0.0;
+	Sigma1 = sum /2.0;
+	if(Omega1 > PRECISION) Dsi = -Sigma1/Omega1;
+	else                   Dsi = 0.0;
+	m_DutchRollDamping[i] = Dsi;
+	m_DutchRollFrequency[i] = fabs(c.imag()/2.0/PI);
+
+	m_RollDamping[i]= m_EigenValue[4][i].real();
+	m_SpiralDamping[i]= m_EigenValue[7][i].real();
 }
 
 
 /*	N =  Cn.q.s.b
 	L =  Ct.q.s.b
-	R =  Cm.q.s.c'
+	M =  Cm.q.s.c'
 */
 
 
@@ -937,6 +1073,14 @@ void CWPolar::Copy(CWPolar *pWPolar)
 		m_SM.insert(i,         pWPolar-> m_SM[i]);
 		m_Ctrl.insert(i,       pWPolar-> m_Ctrl[i]);
 		m_XNP.insert(i,        pWPolar->m_XNP[i]);
+		m_ShortPeriodDamping.insert(i,    pWPolar->m_ShortPeriodDamping[i]);
+		m_ShortPeriodFrequency.insert(i,  pWPolar->m_ShortPeriodFrequency[i]);
+		m_PhugoidDamping.insert(i,        pWPolar->m_PhugoidDamping[i]);
+		m_PhugoidFrequency.insert(i,      pWPolar->m_PhugoidFrequency[i]);
+		m_DutchRollDamping.insert(i,pWPolar->m_DutchRollDamping[i]);
+		m_DutchRollFrequency.insert(i,pWPolar->m_DutchRollFrequency[i]);
+		m_RollDamping.insert(i,pWPolar->m_RollDamping[i]);
+		m_SpiralDamping.insert(i,pWPolar->m_SpiralDamping[i]);
 
 		m_L.insert(i,          pWPolar-> m_L[i]);
 		m_D.insert(i,          pWPolar-> m_D[i]);
@@ -1159,6 +1303,30 @@ void * CWPolar::GetUFOPlrVariable(int iVar)
 		case 32:
 			pVar = &m_XNP;
 			break;
+		case 33:
+			pVar = &m_PhugoidFrequency;
+			break;
+		case 34:
+			pVar = &m_PhugoidDamping;
+			break;
+		case 35:
+			pVar = &m_ShortPeriodFrequency;
+			break;
+		case 36:
+			pVar = &m_ShortPeriodDamping;
+			break;
+		case 37:
+			pVar = &m_DutchRollFrequency;
+			break;
+		case 38:
+			pVar = &m_DutchRollDamping;
+			break;
+		case 39:
+			pVar = &m_RollDamping;
+			break;
+		case 40:
+			pVar = &m_SpiralDamping;
+			break;
 		default:
 			pVar = &m_Alpha;
 			break;
@@ -1193,6 +1361,16 @@ void CWPolar::Remove(int i)
 	m_SM.removeAt(i);
 	m_Ctrl.removeAt(i);
 	m_XNP.removeAt(i);
+	m_ShortPeriodDamping.removeAt(i);
+	m_ShortPeriodFrequency.removeAt(i);
+	m_PhugoidFrequency.removeAt(i);
+	m_PhugoidDamping.removeAt(i);
+
+	m_DutchRollDamping.removeAt(i);
+	m_DutchRollFrequency.removeAt(i);
+	m_RollDamping.removeAt(i);
+	m_SpiralDamping.removeAt(i);
+
 	m_ClCd.removeAt(i);
 	m_1Cl.removeAt(i);
 	m_Cl32Cd.removeAt(i);
@@ -1244,6 +1422,16 @@ void CWPolar::ResetWPlr()
 	m_SM.clear();
 	m_Ctrl.clear();
 	m_XNP.clear();
+	m_ShortPeriodDamping.clear();
+	m_ShortPeriodFrequency.clear();
+	m_PhugoidDamping.clear();
+	m_PhugoidFrequency.clear();
+
+	m_DutchRollDamping.clear();
+	m_DutchRollFrequency.clear();
+	m_RollDamping.clear();
+	m_SpiralDamping.clear();
+
 	m_ClCd.clear();
 	m_1Cl.clear();
 	m_Cl32Cd.clear();
@@ -1365,10 +1553,10 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			{
 				ar <<(float)m_EigenValue[0][i].real() <<(float)m_EigenValue[1][i].real() <<(float)m_EigenValue[2][i].real() <<(float)m_EigenValue[3][i].real();
 				ar <<(float)m_EigenValue[0][i].imag() <<(float)m_EigenValue[1][i].imag() <<(float)m_EigenValue[2][i].imag() <<(float)m_EigenValue[3][i].imag();
-				ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real(); 
+				ar <<(float)m_EigenValue[4][i].real() <<(float)m_EigenValue[5][i].real() <<(float)m_EigenValue[6][i].real() <<(float)m_EigenValue[7][i].real();
 				ar <<(float)m_EigenValue[4][i].imag() <<(float)m_EigenValue[5][i].imag() <<(float)m_EigenValue[6][i].imag() <<(float)m_EigenValue[7][i].imag();
 			}
-	
+
 			if(m_bAutoInertia) ar<<1; else ar<<0;
 			ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
 		}
@@ -1575,48 +1763,55 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 					}
 				}
 			}
-//			if(!bExists)
-//			{
-				m_Alpha.append(Alpha);
-				m_Cl.append(Cl);
-				m_CY.append(CY);
-				m_ICd.append(ICd);
-				m_PCd.append(PCd);
-				m_TCd.append(ICd+PCd);
 
-				m_GCm.append(GCm);
-				m_VCm.append(VCm);
-				m_ICm.append(ICm);
-				m_GRm.append(GRm);
-				m_GYm.append(GYm);
-				m_VYm.append(VYm);
-				m_IYm.append(IYm);
+			m_Alpha.append(Alpha);
+			m_Cl.append(Cl);
+			m_CY.append(CY);
+			m_ICd.append(ICd);
+			m_PCd.append(PCd);
+			m_TCd.append(ICd+PCd);
 
-				m_QInfinite.append(QInfinite);
+			m_GCm.append(GCm);
+			m_VCm.append(VCm);
+			m_ICm.append(ICm);
+			m_GRm.append(GRm);
+			m_GYm.append(GYm);
+			m_VYm.append(VYm);
+			m_IYm.append(IYm);
 
-				m_XCP.append(XCP);
-				m_YCP.append(YCP);
-				m_MaxBending.append(Cb);
-				m_Ctrl.append(Ctrl);
-				m_XNP.append(XNP);
+			m_QInfinite.append(QInfinite);
 
-				m_1Cl.append(0.0);
-				m_ClCd.append(0.0);
-				m_Cl32Cd.append(0.0);
-				m_Vx.append(0.0);
-				m_Vz.append(0.0);
-				m_L.append(0.0);
-				m_D.append(0.0);
-				m_Gamma.append(0.0);
-				m_Rm.append(0.0);
-				m_Pm.append(0.0);
-				m_Ym.append(0.0);
-				m_VertPower.append(0.0);
-				m_Oswald.append(0.0);
-				m_SM.append(0.0);
+			m_XCP.append(XCP);
+			m_YCP.append(YCP);
+			m_MaxBending.append(Cb);
+			m_Ctrl.append(Ctrl);
+			m_XNP.append(XNP);
 
-				CalculatePoint((int)m_Alpha.size()-1);
-//			}
+			m_PhugoidDamping.append(0.0);
+			m_PhugoidFrequency.append(0.0);
+			m_ShortPeriodDamping.append(0.0);
+			m_ShortPeriodFrequency.append(0.0);
+			m_DutchRollDamping.append(0.0);
+			m_DutchRollFrequency.append(0.0);
+			m_RollDamping.append(0.0);
+			m_SpiralDamping.append(0.0);
+
+
+			m_1Cl.append(0.0);
+			m_ClCd.append(0.0);
+			m_Cl32Cd.append(0.0);
+			m_Vx.append(0.0);
+			m_Vz.append(0.0);
+			m_L.append(0.0);
+			m_D.append(0.0);
+			m_Gamma.append(0.0);
+			m_Rm.append(0.0);
+			m_Pm.append(0.0);
+			m_Ym.append(0.0);
+			m_VertPower.append(0.0);
+			m_Oswald.append(0.0);
+			m_SM.append(0.0);
+
 		}
 		if(m_PolarFormat>1012)
 		{
@@ -1656,6 +1851,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_EigenValue[5][i] = complex<double>(r1,i1);
 				m_EigenValue[6][i] = complex<double>(r2,i2);
 				m_EigenValue[7][i] = complex<double>(r3,i3);
+				CalculatePoint(i);
 			}
 		}
 		if(m_PolarFormat>=1020)
@@ -1687,6 +1883,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	return true;
 }
+
 
 
 void CWPolar::GetPolarProperties(QString &PolarProperties)

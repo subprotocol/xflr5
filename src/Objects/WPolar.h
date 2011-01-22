@@ -138,6 +138,10 @@ private:
 	QList <double> m_PhugoidDamping;
 	QList <double> m_ShortPeriodFrequency;
 	QList <double> m_ShortPeriodDamping;
+	QList <double> m_DutchRollFrequency;
+	QList <double> m_DutchRollDamping;
+	QList <double> m_RollDamping;
+	QList <double> m_SpiralDamping;
 
 	complex<double> m_EigenValue[8][MAXPOLARPOINTS]; //until we have a QList<complex<double>> ?
 

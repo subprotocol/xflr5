@@ -68,8 +68,6 @@ void ReadCString(QDataStream &ar, QString &strong);
 void WriteCString(QDataStream &ar, QString const &strong);
 void ReadCOLORREF(QDataStream &ar, QColor &color);
 void WriteCOLORREF(QDataStream &ar, QColor const &color);
-void VLMQmn(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &C, CVector &V);
-void VLMCmn(CVector const &A, CVector const &B, CVector const &C, CVector &V, bool const &bAll=true);
 
 void Trace(int n);
 void Trace(QString msg);

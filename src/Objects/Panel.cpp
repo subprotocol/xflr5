@@ -286,7 +286,7 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 
 	dist = 10000.0;
 
-    if(fabs(s)>0.0)
+	if(fabs(s)>0.0)
 	{
 		dist = r/s;
 
@@ -353,7 +353,7 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 double CPanel::GetWidth()
 {
 	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
-				+(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
+	            +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
 }
 
 

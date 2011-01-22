@@ -1559,8 +1559,8 @@ void QMiarex::SetControls()
 //	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
 
-	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
-	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
+//	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
+//	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
 
 	if(m_pCurWPolar)
 	{
@@ -7238,6 +7238,7 @@ void QMiarex::On3DView()
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{
 			pMainFrame->m_pctrlStabViewWidget->show();
+			qDebug()<<"Showing 3D first";
 		}
 		return;
 	}
@@ -7266,6 +7267,7 @@ void QMiarex::On3DView()
 	if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		pMainFrame->m_pctrlStabViewWidget->show();
+qDebug()<<"Showing 3D";
 	}
 
 	UpdateView();
@@ -8903,11 +8905,18 @@ void QMiarex::OnEditCurWPolar()
 	pMainFrame->m_DlgPos = dlg.pos();
 	m_pCurWPolar->m_bShowPoints = bPoints;
 
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
+	if(m_iView==WPOLARVIEW)
+	{
+		CreateWPolarCurves();
+		if(m_pCurWPolar)
+		{
+			QString PolarProps;
+			m_pCurWPolar->GetPolarProperties(PolarProps);
+			m_pctrlPolarProps1->setText(PolarProps);
+		}
+	}
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 
-//	pMainFrame->UpdateWOpps();
-//	SetWOpp(true);
 	UpdateView();
 }
 
@@ -13651,8 +13660,8 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
 
 		//select m_pCurPOpp in the listbox
-		if(m_pCurWPolar->m_Type != 4) strong = QString("%1").arg(m_pCurPOpp->m_Alpha,8,'f',2);
-		else                          strong = QString("%1").arg(m_pCurPOpp->m_QInf,8,'f',2);
+		if(m_pCurWPolar->m_Type != 4) strong = QString("%1").arg(m_pCurPOpp->m_Alpha, 8,'f',2);
+		else                          strong = QString("%1").arg(m_pCurPOpp->m_QInf,  8,'f',2);
 
 		int pos = pMainFrame->m_pctrlWOpp->findText(strong);
 
@@ -14307,7 +14316,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 					SpanPos = 0;
 					for (j=0; j<m_pWingList[iw]->m_NSurfaces; j++)	NStation += m_pWingList[iw]->m_Surface[j].m_NYPanels;
 
-					for (j=(int)m_pWingList[iw]->m_NSurfaces/2; j<m_pWingList[iw]->m_NSurfaces; j++)
+					for (j=(int)(m_pWingList[iw]->m_NSurfaces/2); j<m_pWingList[iw]->m_NSurfaces; j++)
 					{
 						for(k=0; k<m_pWingList[iw]->m_Surface[j].m_NYPanels; k++)
 						{
@@ -14771,6 +14780,30 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 		case 32:
 			pGraph->SetXTitle(tr("XNP"));
 			break;
+		case 33:
+			pGraph->SetXTitle(tr("Ph. Freq(Hz)"));
+			break;
+		case 34:
+			pGraph->SetXTitle(tr("Ph. Damping"));
+			break;
+		case 35:
+			pGraph->SetXTitle(tr("SP Freq (Hz)"));
+			break;
+		case 36:
+			pGraph->SetXTitle(tr("SP Damping"));
+			break;
+		case 37:
+			pGraph->SetXTitle(tr("DR Freq(Hz)"));
+			break;
+		case 38:
+			pGraph->SetXTitle(tr("DR Damping"));
+			break;
+		case 39:
+			pGraph->SetXTitle(tr("Roll Damping"));
+			break;
+		case 40:
+			pGraph->SetXTitle(tr("Spiral Damping"));
+			break;
 		default:
 			pGraph->SetXTitle(tr("Alpha"));
 			break;
@@ -14878,6 +14911,30 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			break;
 		case 32:
 			pGraph->SetYTitle(tr("XNP"));
+			break;
+		case 33:
+			pGraph->SetYTitle(tr("Ph. Freq(Hz)"));
+			break;
+		case 34:
+			pGraph->SetYTitle(tr("Ph. Damping"));
+			break;
+		case 35:
+			pGraph->SetYTitle(tr("SP Freq (Hz)"));
+			break;
+		case 36:
+			pGraph->SetYTitle(tr("SP Damping"));
+			break;
+		case 37:
+			pGraph->SetYTitle(tr("DR Freq(Hz)"));
+			break;
+		case 38:
+			pGraph->SetYTitle(tr("DR Damping"));
+			break;
+		case 39:
+			pGraph->SetYTitle(tr("Roll Damping"));
+			break;
+		case 40:
+			pGraph->SetYTitle(tr("Spiral Damping"));
 			break;
 		default:
 			pGraph->SetYTitle(tr("Alpha"));

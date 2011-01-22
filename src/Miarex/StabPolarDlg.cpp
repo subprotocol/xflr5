@@ -166,7 +166,7 @@ void StabPolarDlg::FillControlList()
 		if(!m_bAVLControls)
 		{
 			ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-			if(m_bActiveControl[0])	m_pControlModel->setData(ind, 1);
+			if(m_bActiveControl[0]) m_pControlModel->setData(ind, 1);
 			else                    m_pControlModel->setData(ind, 0);
 
 			ind = m_pControlModel->index(m_nControls, 2, QModelIndex());
@@ -230,7 +230,7 @@ void StabPolarDlg::FillControlList()
 		}
 		else
 		{
-			ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
+			ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
 			m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
 		}
 	}
@@ -590,7 +590,6 @@ void StabPolarDlg::ReadCtrlData()
 		m_MinControl[i] = m_MaxControl[i] = 0.0;
 		m_bActiveControl[i]=false;
 	}
-
 	SetViscous();
 
 }
@@ -1116,7 +1115,6 @@ void StabPolarDlg::OnAVLControls()
 	}
 	else
 	{
-
 		m_pControlModel->setColumnCount(2);
 		m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
 		m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Gain")+QString::fromUtf8("(°/unit)"));

@@ -212,6 +212,14 @@ void GraphDlg::FillVariableList()
 		m_pctrlXSel->addItem(tr("Control Variable"));			//30
 		m_pctrlXSel->addItem(tr("Cy - Lateral force coef."));	//31
 		m_pctrlXSel->addItem(tr("Neutral Point x-position"));	//32
+		m_pctrlXSel->addItem(tr("Phugoid Frequency"));	//33
+		m_pctrlXSel->addItem(tr("Phugoid Damping"));	//34
+		m_pctrlXSel->addItem(tr("Short Period Frequency"));	//33
+		m_pctrlXSel->addItem(tr("Short Period Damping"));	//34
+		m_pctrlXSel->addItem(tr("Dutch Roll Frequency"));	//37
+		m_pctrlXSel->addItem(tr("Dutch Roll Damping"));	//38
+		m_pctrlXSel->addItem(tr("Roll Damping"));	//39
+		m_pctrlXSel->addItem(tr("Spiral Damping"));	//40
 
 
 		//Y variable
@@ -251,6 +259,14 @@ void GraphDlg::FillVariableList()
 		m_pctrlYSel->addItem(tr("Control Variable"));			//30
 		m_pctrlYSel->addItem(tr("Cy - Lateral force coef."));	//31
 		m_pctrlYSel->addItem(tr("Neutral Point x-position"));	//32
+		m_pctrlYSel->addItem(tr("Phugoid Frequency"));	//33
+		m_pctrlYSel->addItem(tr("Phugoid Damping"));	//34
+		m_pctrlYSel->addItem(tr("Short Period Frequency"));	//35
+		m_pctrlYSel->addItem(tr("Short Period Damping"));	//36
+		m_pctrlYSel->addItem(tr("Dutch Roll Frequency"));	//37
+		m_pctrlYSel->addItem(tr("Dutch Roll Damping"));	//38
+		m_pctrlYSel->addItem(tr("Roll Damping"));	//39
+		m_pctrlYSel->addItem(tr("Spiral Damping"));	//40
 	}
 	else if(m_iGraphType == 64)
 	{

@@ -1779,8 +1779,8 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlMiarexToolBar->addWidget(m_pctrlWPolarView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrl3dView);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlCpView);
-	m_pctrlMiarexToolBar->addWidget(m_pctrlStabilityButton);
 	m_pctrlMiarexToolBar->addWidget(m_pctrlRootLocusButton);
+	m_pctrlMiarexToolBar->addWidget(m_pctrlStabilityButton);
 
 	m_pctrlMiarexToolBar->addSeparator();
 	m_pctrlMiarexToolBar->addWidget(m_pctrlUFO);
@@ -2690,6 +2690,14 @@ void MainFrame::DeleteProject()
 	pMiarex->m_pCurWPolar = NULL;
 	pMiarex->m_pCurWOpp   = NULL;
 	pMiarex->m_pCurBody   = NULL;
+	pMiarex->m_bStream = false;
+
+	UpdateUFOs();
+	pMiarex->SetUFO();
+	if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
+	else if(pMiarex->m_iView==WOPPVIEW) pMiarex->CreateWOppCurves();
+	else if(pMiarex->m_iView==WCPVIEW)  pMiarex->CreateCpCurves();
+	if(m_iApp==MIAREX) pMiarex->SetControls();
 
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	pXDirect->m_pXFoil->m_FoilName = "";
@@ -2697,13 +2705,6 @@ void MainFrame::DeleteProject()
 	pXDirect->m_pCurPolar = NULL;
 	pXDirect->m_pCurOpp   = NULL;
 	pXDirect->SetFoil();
-
-	UpdateUFOs();
-	pMiarex->SetUFO();
-	if(pMiarex->m_iView==WPOLARVIEW)    pMiarex->CreateWPolarCurves();
-	else if(pMiarex->m_iView==WOPPVIEW)	pMiarex->CreateWOppCurves();
-	else if(pMiarex->m_iView==WCPVIEW)	pMiarex->CreateCpCurves();
-	if(m_iApp==MIAREX) pMiarex->SetControls();
 
 	UpdateFoils();
 	if(pXDirect->m_bPolar) pXDirect->CreatePolarCurves();
@@ -3951,8 +3952,10 @@ void MainFrame::OnRestoreToolbars()
 		m_pctrlXInverseWidget->hide();
 		m_pctrlMiarexWidget->show();
 		m_pctrlMiarexToolBar->show();
+		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+		if(pMiarex->m_iView==WSTABVIEW) m_pctrlStabViewWidget->show();
+		else                            m_pctrlStabViewWidget->hide();
 	}
-
 }
 
 

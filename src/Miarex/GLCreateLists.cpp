@@ -1627,7 +1627,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 	double ds, *Gamma, *Mu, *Sigma;
 	QColor color;
 
-	CVector C, D, D1, V1, VT, VInf, dF;
+	CVector C, D, D1, VA, VAT, VB, VBT, VT, VInf, TC, TD;
 	CVector RefPoint(0.0,0.0,0.0);
 
 	D1.Set(987654321.0, 0.0, 0.0);
@@ -1718,8 +1718,37 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 					if(bFound)
 					{
-						C.RotateY(RefPoint, pWOpp->m_Alpha);
-						D.RotateY(RefPoint, pWOpp->m_Alpha);
+						TC = C;
+						TD = D;
+						TC.RotateY(RefPoint, pWOpp->m_Alpha);
+						TD.RotateY(RefPoint, pWOpp->m_Alpha);
+						TC -= C;
+						TD -= D;
+						if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
+						{
+							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
+							VA.Set(pNode[pWing->m_pPanel[p].m_iTA] - pNode[pWing->m_pPanel[p].m_iLA]);
+							VA. Normalize();
+							VB.Set(pNode[pWing->m_pPanel[p].m_iTB] - pNode[pWing->m_pPanel[p].m_iLB]);
+							VB. Normalize();
+							if(pWing->m_pPanel[p].m_iPos ==-1)
+							{
+								//corresponding upper panel is the next one coming up
+								for (i=p; i<pWing->m_MatSize;i++)
+									if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
+								VAT = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
+								VAT.Normalize();
+								VA = VA+VAT;
+								VA.Normalize();//VA is parallel to the bisector angle
+
+								VBT = pNode[pWing->m_pPanel[i].m_iTB] - pNode[pWing->m_pPanel[i].m_iLB];
+								VBT.Normalize();
+								VB = VB+VBT;
+								VB.Normalize();//VB is parallel to the bisector angle
+							}
+							VA.RotateY(pWOpp->m_Alpha);
+							VB.RotateY(pWOpp->m_Alpha);
+						}
 						if(!C.IsSame(D1))
 						{
 							C.x += p3DScales->m_XOffset;
@@ -1727,31 +1756,14 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 							ds = p3DScales->m_DeltaL;
 
-/*							// One very special case is where we initiate the streamlines exactly at the T.E.
+							// One very special case is where we initiate the streamlines exactly at the T.E.
 							// without offset either in X ou Z directions
-							if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
-							{
-								//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-								V1.Set(pNode[pWing->m_pPanel[p].m_iTA] - pNode[pWing->m_pPanel[p].m_iLA]);
-								V1. Normalize();
-
-								if(pWing->m_pPanel[p].m_iPos ==-1)
-								{
-									//corresponding upper panel is the next one coming up
-									for (i=p; i<pWing->m_MatSize;i++)
-										if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
-									V2 = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
-									V2.Normalize();
-									V1 = V1+V2;
-									V1.Normalize();//V1 is parallel to the bisector angle
-								}
-							}*/
-							V1.Set(0.0,0.0,0.0);
+//							V1.Set(0.0,0.0,0.0);
 							glBegin(GL_LINE_STRIP);
 							{
-								glVertex3d(C.x, C.y, C.z);
-								C   += V1* ds;
-								glVertex3d(C.x, C.y, C.z);
+								glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
+								C   += VA *ds;
+								glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
 								ds *= p3DScales->m_XFactor;
 
 								for (i=1; i< p3DScales->m_NX ;i++)
@@ -1761,7 +1773,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 									VT += VInf;
 									VT.Normalize();
 									C   += VT* ds;
-									glVertex3d(C.x, C.y, C.z);
+									glVertex3d(C.x+TC.x, C.y+TC.y, C.z+TC.z);
 									ds *= p3DScales->m_XFactor;
 								}
 							}
@@ -1774,13 +1786,13 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 						ds = p3DScales->m_DeltaL;
 
-						V1.Set(0.0,0.0,0.0);
+//						V1.Set(0.0,0.0,0.0);
 
 						glBegin(GL_LINE_STRIP);
 						{
-							glVertex3d(D.x, D.y, D.z);
-							D   += V1* ds;
-							glVertex3d(D.x, D.y, D.z);
+							glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
+							D   += VB *ds;
+							glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
 							ds *= p3DScales->m_XFactor;
 
 							for (i=1; i< p3DScales->m_NX ;i++)
@@ -1790,7 +1802,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 								VT += VInf;
 								VT.Normalize();
 								D   += VT* ds;
-								glVertex3d(D.x, D.y, D.z);
+								glVertex3d(D.x+TD.x, D.y+TD.y, D.z+TD.z);
 								ds *= p3DScales->m_XFactor;
 							}
 						}
