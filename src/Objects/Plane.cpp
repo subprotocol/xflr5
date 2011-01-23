@@ -138,8 +138,10 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 	{
 		if(pWing[iw] && pWing[iw]->m_VolumeMass>PRECISION)
 		{
+			//the inertia of the wings are base on the surface geometry;
+			//these surfaces have been translated to the LE position as they were created
 			pWing[iw]->ComputeVolumeInertia(CoGWing[iw], Ixx, Iyy, Izz, Ixz);
-			CoG += CoGWing[iw] * pWing[iw]->m_VolumeMass;
+			CoG += CoGWing[iw] * pWing[iw]->m_VolumeMass;// so we do not add again the LE position
 			PlaneMass += pWing[iw]->m_VolumeMass;
 			CoGIxx += Ixx;
 			CoGIyy += Iyy;
@@ -153,7 +155,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		if(m_pBody->m_VolumeMass>PRECISION)
 		{
 			m_pBody->ComputeVolumeInertia(CoGBody, Ixx, Iyy, Izz, Ixz);
-			CoG += CoGBody * m_pBody->m_VolumeMass;
+			CoG += (CoGBody+m_BodyPos) * m_pBody->m_VolumeMass;
 			PlaneMass += m_pBody->m_VolumeMass;
 			CoGIxx += Ixx;
 			CoGIyy += Iyy;
@@ -249,7 +251,7 @@ void CPlane::ComputeBodyAxisInertia()
 			TotalCoG  += (pBody->m_MassPosition[i]+m_BodyPos) * pBody->m_MassValue[i];
 		}
 	}
-	if(TotalMass>PRECISION)	TotalCoG = TotalCoG/TotalMass;
+	if(TotalMass>PRECISION) TotalCoG = TotalCoG/TotalMass;
 	else                    TotalCoG.Set(0.0,0.0,0.0);
 
 	// The CoG position is now available, so calculate the inertia w.r.t the TotalCoG, including point masses

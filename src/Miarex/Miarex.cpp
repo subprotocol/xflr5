@@ -511,9 +511,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_pctrlVDrag->setChecked(m_bVCd);
 	m_pctrlLift->setChecked(m_bXCP);
 
-	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
-	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
-	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 
 	connect(m_pctrlSequence, SIGNAL(clicked()), this, SLOT(OnSequence()));
 	connect(m_pctrlStoreWOpp, SIGNAL(clicked()), this, SLOT(OnStoreWOpp()));
@@ -563,6 +560,10 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlIso, SIGNAL(clicked()), SLOT(On3DIso()));
 	connect(m_pctrlReset, SIGNAL(clicked()), SLOT(On3DReset()));
 	connect(m_pctrlPickCenter, SIGNAL(clicked()), SLOT(On3DPickCenter()));
+
+	connect(m_pctrlAlphaMin, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaMax, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
+	connect(m_pctrlAlphaDelta, SIGNAL(editingFinished()), this, SLOT(OnReadAnalysisData()));
 }
 
 
@@ -631,13 +632,6 @@ CBody* QMiarex::AddBody(CBody *pBody)
 	return NULL;
 }
 
-
-void QMiarex::OnReadAnalysisData()
-{
-	m_AlphaMin   = m_pctrlAlphaMin->GetValue();
-	m_AlphaMax   = m_pctrlAlphaMax->GetValue();
-	m_AlphaDelta = m_pctrlAlphaDelta->GetValue();
-}
 
 
 CPlane* QMiarex::AddPlane(CPlane *pPlane)
@@ -1172,7 +1166,7 @@ void QMiarex::AddWOpp(bool bPointOut, double *Gamma, double *Sigma, double *Cp)
 		pNewPoint->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
 
 		pNewPoint->m_Type                = m_pCurWPolar->m_Type;
-		pNewPoint->m_Weight              = m_pCurWPolar->m_Weight;
+		pNewPoint->m_Weight              = m_pCurWPolar->m_Mass;
 
 		double Cb =0.0;
 
@@ -2727,7 +2721,7 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
 	pWOpp->m_Phi                 = m_pCurWPolar->m_BankAngle;
 
-	pWOpp->m_Weight              = m_pCurWPolar->m_Weight;
+	pWOpp->m_Weight              = m_pCurWPolar->m_Mass;
 	pWOpp->m_Span                = m_pCurWPolar->m_WSpan;
 	pWOpp->m_MAChord             = pWing->m_MAChord;
 	pWOpp->m_CL                  = pWing->m_CL;
@@ -3983,14 +3977,15 @@ void QMiarex::EditCurPlane()
 		}
 	}
 	//save a copy just in case user changes his mind (users !...)
-	CPlane* pSavePlane= new CPlane;
+	CPlane* pModPlane= new CPlane;
 
 	PlaneDlg PlaneDlg;
-	PlaneDlg.m_pPlane = m_pCurPlane;
+	pModPlane->Duplicate(m_pCurPlane);
+	PlaneDlg.m_pPlane = pModPlane;
 
-	pSavePlane->Duplicate(m_pCurPlane);
 	PlaneDlg.m_bAcceptName = false;
 	PlaneDlg.InitDialog();
+
 	if(QDialog::Accepted == PlaneDlg.exec())
 	{
 		if(PlaneDlg.m_bChanged)
@@ -4005,35 +4000,36 @@ void QMiarex::EditCurPlane()
 				if (Ans == QDialog::Rejected)
 				{
 					//restore geometry
-					m_pCurPlane->Duplicate(pSavePlane);
-					delete pSavePlane; // clean up
+//					m_pCurPlane->Duplicate(pSavePlane);
+					delete pModPlane; // clean up
 					return;
 				}
 				else if(Ans==20)
 				{
 					//save mods to a new plane object
-					CPlane* pNewPlane= new CPlane();
-					pNewPlane->Duplicate(m_pCurPlane);
+//					CPlane* pNewPlane= new CPlane();
+//					pNewPlane->Duplicate(pModPlane);
 					//restore geometry for initial plane
-					m_pCurPlane->Duplicate(pSavePlane);
+//					m_pCurPlane->Duplicate(pSavePlane);
 
-					if(!SetModPlane(pNewPlane))
+					if(!SetModPlane(pModPlane))
 					{
-						delete pNewPlane;
+						delete pModPlane;
 					}
 					else
 					{
-						m_pCurPlane = AddPlane(pNewPlane);
+						m_pCurPlane = AddPlane(pModPlane);
 					}
 					SetUFO();
 					pMainFrame->UpdateUFOs();
 					UpdateView();
-					delete pSavePlane; // clean up
+//					delete pSavePlane; // clean up
 					return;
 				}
 			}
 
 			//then modifications are automatically recorded
+			m_pCurPlane->Duplicate(pModPlane);
 			pMainFrame->DeletePlane(m_pCurPlane, true);// will also set new surface and Aerochord in WPolars
 			m_bResetglGeom = true;
 			m_bResetglMesh = true;
@@ -4054,11 +4050,11 @@ void QMiarex::EditCurPlane()
 	else
 	{
 		// restore original
-		m_pCurPlane->Duplicate(pSavePlane);
-		delete pSavePlane; // clean up
+//		m_pCurPlane->Duplicate(pSavePlane);
+		delete pModPlane; // clean up
 		return ;
 	}
-	delete pSavePlane; // clean up
+	delete pModPlane; // clean up
 }
 
 
@@ -5216,6 +5212,151 @@ void QMiarex::GLDraw3D()
 }
 
 
+void QMiarex::GLDrawMasses()
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+	QString MassUnit;
+	GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
+	glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
+	double radius = .01;//2cm
+	double zdist = 25.0/(double)m_r3DCltRect.width();
+
+	for(int iw=0; iw<MAXWINGS; iw++)
+	{
+		if(m_pWingList[iw])
+		{
+//			glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
+			glColor3d(0.0, 0.0, 0.7);
+			glPushMatrix();
+			{
+				if(m_pCurPlane)
+				{
+					glTranslated(m_pCurPlane->m_WingLE[iw].x,
+							   m_pCurPlane->m_WingLE[iw].y,
+							   m_pCurPlane->m_WingLE[iw].z);
+
+					pGLWidget->renderText(0.0, 0.0, zdist,
+									  m_pWingList[iw]->m_WingName+
+									  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
+									  MassUnit);
+				}
+			}
+			glPopMatrix();
+
+			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
+			for(int im=0; im<m_pWingList[iw]->m_NMass; im++)
+			{
+				glPushMatrix();
+				{
+					if(m_pCurPlane)
+					{
+						glTranslated(m_pCurPlane->m_WingLE[iw].x,
+								   m_pCurPlane->m_WingLE[iw].y,
+								   m_pCurPlane->m_WingLE[iw].z);
+					}
+					glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
+							   m_pWingList[iw]->m_MassPosition[im].y,
+							   m_pWingList[iw]->m_MassPosition[im].z);
+					GLRenderSphere(m_MassColor,radius,18,18);
+					pGLWidget->renderText(0.0, 0.0, 0.0 +.02,
+									  m_pWingList[iw]->m_MassTag[im]
+									  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+									  +MassUnit);
+				}
+				glPopMatrix();
+			}
+		}
+	}
+	if(m_pCurPlane)
+	{
+		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
+		for(int im=0; im<m_pCurPlane->m_NMass; im++)
+		{
+			glPushMatrix();
+			{
+				glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
+				GLRenderSphere(m_MassColor,radius,18,18);
+				pGLWidget->renderText(0.0,0.0,0.0+.02,
+								  m_pCurPlane->m_MassTag[im]
+								  +QString(" %1").arg(m_pCurPlane->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+								  +MassUnit);
+			}
+			glPopMatrix();
+		}
+
+	}
+	if(m_pCurBody)
+	{
+//		glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
+		glColor3d(0.0, 0.0, 0.7);
+
+		glPushMatrix();
+		{
+			if(m_pCurPlane)
+			{
+				glTranslated(m_pCurPlane->m_BodyPos.x+m_pCurBody->m_FramePosition[0].x,
+						   m_pCurPlane->m_BodyPos.y+m_pCurBody->m_FramePosition[0].y,
+						   m_pCurPlane->m_BodyPos.z+m_pCurBody->m_FramePosition[0].z);
+
+				pGLWidget->renderText(0.0, 0.0, zdist,
+								  m_pCurBody->m_BodyName+
+								  QString(" %1").arg(m_pCurBody->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
+								  MassUnit);
+			}
+		}
+		glPopMatrix();
+		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
+		for(int im=0; im<m_pCurBody->m_NMass; im++)
+		{
+			glPushMatrix();
+			{
+				glTranslated(m_pCurBody->m_MassPosition[im].x,m_pCurBody->m_MassPosition[im].y,m_pCurBody->m_MassPosition[im].z);
+				if(m_pCurPlane)
+				{
+					glTranslated(m_pCurPlane->m_BodyPos.x,
+							   m_pCurPlane->m_BodyPos.y,
+							   m_pCurPlane->m_BodyPos.z);
+				}
+
+				GLRenderSphere(m_MassColor,radius,18,18);
+
+				pGLWidget->renderText(0.0, 0.0, 0.0+.02,
+								  m_pCurBody->m_MassTag[im]
+								  +QString(" %1").arg(m_pCurBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
+								  +MassUnit);
+			}
+			glPopMatrix();
+		}
+	}
+	//plot CG
+	if(m_pCurPlane || m_pCurWing)
+	{
+		CVector CoG;
+		double Mass=0.0;
+		if(m_pCurPlane)
+		{
+			CoG = m_pCurPlane->m_CoG;
+			Mass = m_pCurPlane->m_TotalMass;
+		}
+		else if(m_pCurWing)
+		{
+			CoG = m_pCurWing->m_CoG;
+			Mass = m_pCurWing->m_TotalMass;
+		}
+		glPushMatrix();
+		{
+			glTranslated(CoG.x,CoG.y,CoG.z);
+			GLRenderSphere(QColor(255,0,0),radius,18,18);
+			pGLWidget->renderText(0.0, 0.0, 0.0+.02,
+							  "CoG "+QString("%1").arg(Mass*pMainFrame->m_kgtoUnit, 7,'g',3)
+							  +MassUnit);
+		}
+		glPopMatrix();
+	}
+}
+
+
 void QMiarex::GLDrawFoils()
 {
 	//
@@ -5275,7 +5416,6 @@ void QMiarex::GLRenderView()
 	//
 	// Renders the 3D view
 	//
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
@@ -5366,119 +5506,8 @@ void QMiarex::GLRenderView()
 
 		if(m_bFoilNames) GLDrawFoils();
 
-		if(m_bShowMasses)
-		{
-			QString MassUnit;
-			GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
-			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-			double radius = .02;//2cm
-			double zdist = 25.0/(double)m_r3DCltRect.width();
+		if(m_bShowMasses) GLDrawMasses();
 
-			for(int iw=0; iw<MAXWINGS; iw++)
-			{
-				if(m_pWingList[iw])
-				{
-					glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
-					glPushMatrix();
-					{
-						if(m_pCurPlane)
-						{
-							glTranslated(m_pCurPlane->m_WingLE[iw].x,
-									   m_pCurPlane->m_WingLE[iw].y,
-									   m_pCurPlane->m_WingLE[iw].z);
-
-							pGLWidget->renderText(0.0, 0.0, zdist,
-											  m_pWingList[iw]->m_WingName+
-											  QString(" %1").arg(m_pWingList[iw]->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
-											  MassUnit);
-						}
-					}
-					glPopMatrix();
-
-					glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-					for(int im=0; im<m_pWingList[iw]->m_NMass; im++)
-					{
-						glPushMatrix();
-						{
-							if(m_pCurPlane)
-							{
-								glTranslated(m_pCurPlane->m_WingLE[iw].x,
-										   m_pCurPlane->m_WingLE[iw].y,
-										   m_pCurPlane->m_WingLE[iw].z);
-							}
-							glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
-									   m_pWingList[iw]->m_MassPosition[im].y,
-									   m_pWingList[iw]->m_MassPosition[im].z);
-							GLRenderSphere(m_MassColor,radius,18,18);
-							pGLWidget->renderText(0.0, 0.0, 0.0 +.02,
-											  m_pWingList[iw]->m_MassTag[im]
-											  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
-											  +MassUnit);
-						}
-						glPopMatrix();
-					}
-				}
-			}
-			if(m_pCurPlane)
-			{
-				glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-				for(int im=0; im<m_pCurPlane->m_NMass; im++)
-				{
-					glPushMatrix();
-					{
-						glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
-						GLRenderSphere(m_MassColor,radius,18,18);
-						pGLWidget->renderText(0.0,0.0,0.0+.02,
-										  m_pCurPlane->m_MassTag[im]
-										  +QString(" %1").arg(m_pCurPlane->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
-										  +MassUnit);
-					}
-					glPopMatrix();
-				}
-
-			}
-			if(m_pCurBody)
-			{
-				glColor3d(m_MassColor.redF()*.75, m_MassColor.greenF()*.75, m_MassColor.blueF()*.75);
-				glPushMatrix();
-				{
-					if(m_pCurPlane)
-					{
-						glTranslated(m_pCurPlane->m_BodyPos.x+m_pCurBody->m_FramePosition[0].x,
-								   m_pCurPlane->m_BodyPos.y+m_pCurBody->m_FramePosition[0].y,
-								   m_pCurPlane->m_BodyPos.z+m_pCurBody->m_FramePosition[0].z);
-
-						pGLWidget->renderText(0.0, 0.0, zdist,
-										  m_pCurBody->m_BodyName+
-										  QString(" %1").arg(m_pCurBody->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+
-										  MassUnit);
-					}
-				}
-				glPopMatrix();
-				glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-				for(int im=0; im<m_pCurBody->m_NMass; im++)
-				{
-					glPushMatrix();
-					{
-						glTranslated(m_pCurBody->m_MassPosition[im].x,m_pCurBody->m_MassPosition[im].y,m_pCurBody->m_MassPosition[im].z);
-						if(m_pCurPlane)
-						{
-							glTranslated(m_pCurPlane->m_BodyPos.x,
-									   m_pCurPlane->m_BodyPos.y,
-									   m_pCurPlane->m_BodyPos.z);
-						}
-
-						GLRenderSphere(m_MassColor,radius,18,18);
-
-						pGLWidget->renderText(0.0, 0.0, 0.0+.02,
-										  m_pCurBody->m_MassTag[im]
-										  +QString(" %1").arg(m_pCurBody->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
-										  +MassUnit);
-					}
-					glPopMatrix();
-				}
-			}
-		}
 
 		glLoadIdentity();
 		glDisable(GL_CLIP_PLANE1);
@@ -7238,7 +7267,6 @@ void QMiarex::On3DView()
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{
 			pMainFrame->m_pctrlStabViewWidget->show();
-			qDebug()<<"Showing 3D first";
 		}
 		return;
 	}
@@ -7267,7 +7295,6 @@ void QMiarex::On3DView()
 	if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		pMainFrame->m_pctrlStabViewWidget->show();
-qDebug()<<"Showing 3D";
 	}
 
 	UpdateView();
@@ -7286,6 +7313,7 @@ void QMiarex::On3DCp()
 	}
 	UpdateView();
 }
+
 
 void QMiarex::On3DIso()
 {
@@ -7607,25 +7635,25 @@ void QMiarex::OnAnalyze()
 	m_pctrlSurfVel->setChecked(false);
 
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	ReadAnalysisData();
+	OnReadAnalysisData();
 
-	if(m_pCurWPolar->m_Type <4)
-	{
-		V0     = m_AlphaMin;
-		VMax   = m_AlphaMax;
-		VDelta = m_AlphaDelta;
-	}
-	else if(m_pCurWPolar->m_Type==4)
+	if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
 	{
 		V0     = m_QInfMin;
 		VMax   = m_QInfMax;
 		VDelta = m_QInfDelta;
 	}
-	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6 || m_pCurWPolar->m_Type==7)
+	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		V0     = m_ControlMin;
 		VMax   = m_ControlMax;
 		VDelta = m_ControlDelta;
+	}
+	else if(m_pCurWPolar->m_Type <4)
+	{
+		V0     = m_AlphaMin;
+		VMax   = m_AlphaMax;
+		VDelta = m_AlphaDelta;
 	}
 	else
 	{
@@ -8150,7 +8178,7 @@ void QMiarex::OnDefineStabPolar()
 		m_WngAnalysis.m_bThinSurfaces   = m_StabPolarDlg.m_bThinSurfaces;
 
 		//Then add WPolar to array
-		pCurWPolar->m_Weight          = m_StabPolarDlg.m_Mass;
+		pCurWPolar->m_Mass          = m_StabPolarDlg.m_Mass;
 
 		pCurWPolar->m_bAutoInertia    = m_StabPolarDlg.m_bAutoInertia;
 		pCurWPolar->m_CoG.x           = m_StabPolarDlg.m_CoG.x;
@@ -8310,7 +8338,7 @@ void QMiarex::OnDefineWPolar()
 		}
 		pNewWPolar->m_Type            = m_WngAnalysis.m_PolarType;
 		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
-		pNewWPolar->m_Weight          = m_WngAnalysis.m_Weight;
+		pNewWPolar->m_Mass            = m_WngAnalysis.m_Weight;
 		pNewWPolar->m_CoG             = m_WngAnalysis.m_CoG;
 		pNewWPolar->m_Beta            = m_WngAnalysis.m_Beta;
 		pNewWPolar->m_ASpec           = m_WngAnalysis.m_Alpha;
@@ -8809,7 +8837,9 @@ void QMiarex::OnEditCurBody()
 	m_GL3dBody.SetBody(m_pCurBody);
 	m_GL3dBody.m_bEnableName = false;
 	m_GL3dBody.InitDialog();
-	m_GL3dBody.setWindowState(Qt::WindowMaximized);
+	m_GL3dBody.move(GL3dBodyDlg::s_WindowPos);
+	m_GL3dBody.resize(GL3dBodyDlg::s_WindowSize);
+	if(GL3dBodyDlg::s_bWindowMaximized) m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -9496,7 +9526,7 @@ void QMiarex::OnExporttoAVL()
 
 	for(int iw=1; iw<MAXWINGS; iw++)
 	{
-		if(m_pWingList[iw]) m_pWingList[iw]->ExportAVLWing(out, index+1, 0.0, 0.0, 0.0, 0.0, m_pCurPlane->m_WingTiltAngle[iw]);
+		if(m_pWingList[iw]) m_pWingList[iw]->ExportAVLWing(out, index+iw, 0.0, 0.0, 0.0, 0.0, m_pCurPlane->m_WingTiltAngle[iw]);
 	}
 	XFile.close();
 }
@@ -9834,7 +9864,9 @@ void QMiarex::OnImportBody()
 		memBody.Duplicate(m_pCurBody);
 		m_GL3dBody.SetBody(m_pCurBody);
 		m_GL3dBody.m_bEnableName = false;
-		m_GL3dBody.setWindowState(Qt::WindowMaximized);
+		m_GL3dBody.move(GL3dBodyDlg::s_WindowPos);
+		m_GL3dBody.resize(GL3dBodyDlg::s_WindowSize);
+		if(GL3dBodyDlg::s_bWindowMaximized) m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 		if(m_GL3dBody.exec() == QDialog::Accepted)
 		{
@@ -10052,7 +10084,9 @@ void QMiarex::OnNewBody()
 	CBody *pBody = new CBody;
 
 	m_GL3dBody.SetBody(pBody);
-	m_GL3dBody.setWindowState(Qt::WindowMaximized);
+	m_GL3dBody.move(GL3dBodyDlg::s_WindowPos);
+	m_GL3dBody.resize(GL3dBodyDlg::s_WindowSize);
+	if(GL3dBodyDlg::s_bWindowMaximized) m_GL3dBody.setWindowState(Qt::WindowMaximized);
 	m_GL3dBody.InitDialog();
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
@@ -10193,26 +10227,14 @@ void QMiarex::OnPanels()
 }
 
 
-void QMiarex::ReadAnalysisData()
+void QMiarex::OnReadAnalysisData()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitLLTCalc = m_pctrlInitLLTCalc->isChecked();
 
-	if(m_pCurWPolar->m_Type <4)
-	{
-		m_AlphaMin   = m_pctrlAlphaMin->GetValue();
-		m_AlphaMax   = m_pctrlAlphaMax->GetValue();
-		m_AlphaDelta = fabs(m_pctrlAlphaDelta->GetValue());
-
-		if(fabs(m_AlphaDelta)<0.01)
-		{
-			m_AlphaDelta = 0.01;
-			m_pctrlAlphaDelta->SetValue(0.01);
-		}
-	}
-	else if(m_pCurWPolar->m_Type==4)
+	if(m_pCurWPolar && m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
 	{
 		m_QInfMin   = m_pctrlAlphaMin->GetValue()         /pMainFrame->m_mstoUnit;
 		m_QInfMax   = m_pctrlAlphaMax->GetValue()         /pMainFrame->m_mstoUnit;
@@ -10223,7 +10245,7 @@ void QMiarex::ReadAnalysisData()
 			m_pctrlAlphaDelta->SetValue(1.0);
 		}
 	}
-	else if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6 || m_pCurWPolar->m_Type==7)
+	else if(m_pCurWPolar && (m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6 || m_pCurWPolar->m_Type==STABILITYPOLAR))
 	{
 		m_ControlMin   = m_pctrlAlphaMin->GetValue()         /pMainFrame->m_mstoUnit;
 		m_ControlMax   = m_pctrlAlphaMax->GetValue()         /pMainFrame->m_mstoUnit;
@@ -10232,6 +10254,18 @@ void QMiarex::ReadAnalysisData()
 		{
 			m_ControlDelta = 0.001;
 			m_pctrlAlphaDelta->SetValue(0.001);
+		}
+	}
+	else if(m_pCurWPolar)
+	{
+		m_AlphaMin   = m_pctrlAlphaMin->GetValue();
+		m_AlphaMax   = m_pctrlAlphaMax->GetValue();
+		m_AlphaDelta = fabs(m_pctrlAlphaDelta->GetValue());
+
+		if(fabs(m_AlphaDelta)<0.01)
+		{
+			m_AlphaDelta = 0.01;
+			m_pctrlAlphaDelta->SetValue(0.01);
 		}
 	}
 }
@@ -10503,14 +10537,23 @@ void QMiarex::OnResetCurWPolar()
 	m_pCurWOpp = NULL;
 	m_pCurPOpp = NULL;
 
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
+	if(m_iView==WPOLARVIEW)
+	{
+		CreateWPolarCurves();
+		if(m_pCurWPolar)
+		{
+			QString PolarProps;
+			m_pCurWPolar->GetPolarProperties(PolarProps);
+			m_pctrlPolarProps1->setText(PolarProps);
+		}
+	}
 	else if(m_iView==WSTABVIEW) CreateStabilityCurves();
 	else if(m_iView==WOPPVIEW)  CreateWOppCurves();
 	else if(m_iView==WCPVIEW)   CreateCpCurves();
 
+
 	pMainFrame->SetSaveState(false);
 	UpdateView();
-
 }
 
 
@@ -11326,7 +11369,7 @@ void QMiarex::OnUFOInertia()
 			}
 
 			//last case, user wants to overwrite, so reset all type 7 polars and WOpps and POpps associated to the UFO
-			for (int i=0; i< m_poaWPolar->size(); i++)
+			for (int i=0; i<m_poaWPolar->size(); i++)
 			{
 				pWPolar = (CWPolar*)m_poaWPolar->at(i);
 				if(pWPolar && pWPolar->m_UFOName==UFOName && pWPolar->m_bAutoInertia)
@@ -11397,6 +11440,7 @@ void QMiarex::OnWOpps()
 
 	UpdateView();
 }
+
 
 
 void QMiarex::OnWPolars()
@@ -11758,7 +11802,7 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 
 	if(m_pCurWPolar)
 	{
-		if(m_pCurWPolar->m_AnalysisMethod!=4)  Mass = m_pCurWPolar->m_Weight;
+		if(m_pCurWPolar->m_AnalysisMethod!=4)  Mass = m_pCurWPolar->m_Mass;
 		else
 		{
 			if(m_pCurPlane)
@@ -12152,15 +12196,16 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_pBody          = m_pCurBody;
 	m_pPanelDlg->m_pWing          = m_pCurWing;
 	for(int iw=0; iw<4; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
+qDebug()<<"anlayze"<<m_pWingList[0]<<m_pWingList[1] <<m_pWingList[2] <<m_pWingList[3];
 
-	if(m_pCurWPolar->m_Type==4)
+	if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
 	{
 		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 		m_pPanelDlg->m_QInf       = V0;
 		m_pPanelDlg->m_QInfMax    = VMax;
 		m_pPanelDlg->m_QInfDelta  = VDelta;
 	}
-	else if(m_pCurWPolar->m_Type==7)
+	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 
@@ -12406,6 +12451,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 	int k=0;
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+
+	OnReadAnalysisData();
 
 	pSettings->beginGroup("Miarex");
 	{
@@ -13790,11 +13837,11 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 		m_pCurWing = &m_pCurPlane->m_Wing;
 		m_pWingList[0] = &m_pCurPlane->m_Wing;
 		if(m_pCurPlane->m_bBody)    m_pCurBody  = m_pCurPlane->m_pBody;
-		else						m_pCurBody  = NULL;
+		else                        m_pCurBody  = NULL;
 		if(m_pCurPlane->m_bBiplane) m_pWingList[1] = &m_pCurPlane->m_Wing2;
-		else						m_pWingList[1] = NULL;
-		if(m_pCurPlane->m_bStab)	m_pWingList[2]  = &m_pCurPlane->m_Stab;
-		else						m_pWingList[2]  = NULL;
+		else                        m_pWingList[1] = NULL;
+		if(m_pCurPlane->m_bStab)    m_pWingList[2]  = &m_pCurPlane->m_Stab;
+		else                        m_pWingList[2]  = NULL;
 		if(m_pCurPlane->m_bFin)
 		{
 			m_pWingList[3]  = &m_pCurPlane->m_Fin;
@@ -13809,7 +13856,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 		m_pCurPOpp  = NULL;
 		m_pCurBody  = NULL;
 		m_pWingList[0] = m_pCurWing;
-		m_pWingList[1] =m_pWingList[2] =m_pWingList[3] = NULL;
+		m_pWingList[1] = m_pWingList[2] =m_pWingList[3] = NULL;
 	}
 
 
@@ -13870,7 +13917,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 		if(pWPolar->m_Type==STABILITYPOLAR)
 		{
 			pWPolar->m_AnalysisMethod=PANELMETHOD;
-			if(fabs(pWPolar->m_Weight)<PRECISION)
+			if(fabs(pWPolar->m_Mass)<PRECISION)
 			{
 				//very special case, the polar was generated by v600 or v601
 				// need to reload inertia data from plane inertia
@@ -13879,7 +13926,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 
 				if(pWing)
 				{
-					pWPolar->m_Weight = pWing->m_TotalMass;
+					pWPolar->m_Mass = pWing->m_TotalMass;
 					pWPolar->m_CoG    = pWing->m_CoG;
 					pWPolar->m_CoGIxx = pWing->m_CoGIxx;
 					pWPolar->m_CoGIyy = pWing->m_CoGIyy;
@@ -13888,7 +13935,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 				}
 				else if(pPlane)
 				{
-					pWPolar->m_Weight = pPlane->m_TotalMass;
+					pWPolar->m_Mass = pPlane->m_TotalMass;
 					pWPolar->m_CoG    = pPlane->m_CoG;
 					pWPolar->m_CoGIxx = pPlane->m_CoGIxx;
 					pWPolar->m_CoGIyy = pPlane->m_CoGIyy;
@@ -13947,7 +13994,7 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 2);
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 5);
 	m_pctrlAlphaMax     = new FloatEdit(1., 2);
 	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
 
@@ -14374,7 +14421,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		{
 			if(m_pCurPlane)
 			{
-				m_pCurWPolar->m_Weight = m_pCurPlane->GetTotalMass();
+				m_pCurWPolar->m_Mass = m_pCurPlane->GetTotalMass();
 				m_pCurWPolar->m_CoG    = m_pCurPlane->m_CoG;
 				m_pCurWPolar->m_CoGIxx = m_pCurPlane->m_CoGIxx;
 				m_pCurWPolar->m_CoGIyy = m_pCurPlane->m_CoGIyy;
@@ -14383,7 +14430,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 			}
 			else if(m_pCurWing)
 			{
-				m_pCurWPolar->m_Weight = m_pCurWing->GetTotalMass();
+				m_pCurWPolar->m_Mass = m_pCurWing->GetTotalMass();
 				m_pCurWPolar->m_CoG    = m_pCurWing->m_CoG;
 				m_pCurWPolar->m_CoGIxx = m_pCurWing->m_CoGIxx;
 				m_pCurWPolar->m_CoGIyy = m_pCurWing->m_CoGIyy;

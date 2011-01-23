@@ -96,10 +96,6 @@ private:
 	double m_WakePanelFactor;
 
 	
-	//Inertia properties
-	bool m_bAutoInertia;
-	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
-
 	// the rest is litterature
 	QList <double> m_Alpha; //angle of attack
 	QList <double> m_Cl;    //lift coef.
@@ -156,9 +152,13 @@ public:
 	double m_Density  ;
 	double m_WArea;//for lift and drag calculations
 	int m_Type;
-	double m_Weight;
 	double m_WMAChord;// for moment calculations
 	double m_WSpan;//for moment calculations
+
+	//Inertia properties
+	double m_Mass;
+	bool m_bAutoInertia;
+	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 	CVector m_CoG;
 
 	bool m_bVLM1;

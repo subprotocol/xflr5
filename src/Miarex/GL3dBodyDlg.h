@@ -1,4 +1,4 @@
-/****************************************************************************
+		/****************************************************************************
 
 	GL3dBodyDlg Class
 	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
@@ -163,6 +163,10 @@ private:
 	static void *s_pMiarex;
 	static void *s_pMainFrame;
 	static void *s_pGLLightDlg;
+
+	static QPoint s_WindowPos;
+	static QSize  s_WindowSize;
+	static bool s_bWindowMaximized;
 
 	GLWidget *m_pglWidget;
 

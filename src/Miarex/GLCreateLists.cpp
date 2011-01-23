@@ -2329,7 +2329,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 			ZPos +=dD;
 			if(pWPolar)
 			{
-				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Weight;
+				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
 				else
 				{
 					if(pPlane)     Mass = pPlane->GetTotalMass();

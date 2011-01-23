@@ -58,6 +58,9 @@
 void* GL3dBodyDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dBodyDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dBodyDlg::s_pGLLightDlg;
+QPoint GL3dBodyDlg::s_WindowPos=QPoint(0,0);
+QSize  GL3dBodyDlg::s_WindowSize=QSize(700, 500);
+bool GL3dBodyDlg::s_bWindowMaximized=false;
 
 
 QList <void*> *GL3dBodyDlg::s_poaBody;
@@ -3923,6 +3926,9 @@ void GL3dBodyDlg::OnOK()
 		m_pBody->m_BodyStyle = m_pctrlBodyStyle->GetStyle();
 		m_pBody->m_BodyWidth = m_pctrlBodyStyle->GetWidth();
 	}
+	s_bWindowMaximized= isMaximized();
+	s_WindowPos = pos();
+	s_WindowSize = size();
 	accept();
 }
 
@@ -4294,6 +4300,9 @@ void GL3dBodyDlg::reject()
 		}
 	}
 	else m_pBody = NULL;
+	s_bWindowMaximized= isMaximized();
+	s_WindowPos = pos();
+	s_WindowSize = size();
 	done(QDialog::Rejected);
 }
 

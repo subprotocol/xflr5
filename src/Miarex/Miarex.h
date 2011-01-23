@@ -232,6 +232,7 @@ private:
 	void GLToClient(CVector const &real, QPoint &point);
 
 	void GLDrawFoils();
+	void GLDrawMasses();
 	void GLInverseMatrix();
 	void GLRenderView();
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
@@ -260,7 +261,6 @@ private:
 	void SetUFO(QString UFOName="", bool bNoPolar=false);
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
-	void ReadAnalysisData();
 	void SnapClient(QString const &FileName);
 	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
 	bool SetPOpp(bool bCurrent, double Alpha = 0.0);

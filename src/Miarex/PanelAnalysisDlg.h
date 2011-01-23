@@ -263,8 +263,8 @@ public://stability analysis method and variables
 	double m_R[3][3];	//Rotation matrix
 
 	//COG position in Body axis
-	CVector m_CoG;
-	double m_Mass;
+//	CVector m_CoG;
+//	double m_Mass;
 
 	double m_Ib[3][3];	//Inertia tensor in body axis
 	double m_Is[3][3];	//Inertia tensor in stability axis

@@ -783,7 +783,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	if(m_TPos[0]>0.0001) 	m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
 
 	if(m_bIsFin && m_bDoubleFin) m_Surface[(int)(m_NSurfaces/2)-1].m_bJoinRight   = false;
-//for(int is=0; is<m_NSurfaces; is++)qDebug()<<m_WingName<<is<<m_Surface[is].m_bIsInSymPlane;
+
 	m_bWingOut = false;
 }
 
@@ -2629,6 +2629,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 					ForcePt = m_pPanel[p].VortexPos;
 					PanelForce  = WindDirection * m_pPanel[p].Vortex;
 					PanelForce *= 2.0 * Gamma[p] /QInf;                                 //Newtons/q
+//qDebug("%3d   Gamma=%13.7f    Gammap1=%13.7f", p, Gamma[p]/QInf, Gamma[p+1]/QInf	);
 
 					if(!pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 					{

@@ -123,7 +123,7 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_Ctrl = 0.0;
 	Theta0 = 0.0;
 	u0     = 0.0;
-	m_Mass = 0.0;
+//	m_Mass = 0.0;
 
 	//Dimensional stability derivatives
 	Xu = Xw = Zu = Zw = Zq = Mu = Mw = Mq = Zwp = Mwp = 0.0;
@@ -250,12 +250,14 @@ bool PanelAnalysisDlg::AlphaLoop()
 	ComputeFarField(1.0, m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
 
+
 	for(int q=0; q<nrhs; q++)
 		ComputeBalanceSpeeds(m_Alpha+q*m_AlphaDelta, q);
 
 
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
+
 
 	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
@@ -808,9 +810,9 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 
 	Force.Set(0.0,0.0,0.0);
 
-	for(int i=0; i<4; i++)
+	for(int iw=0; iw<MAXWINGS; iw++)
 	{
-		if(m_pWingList[i]) Force += m_WingForce[q*4+i];
+		if(m_pWingList[iw]) Force += m_WingForce[q*4+iw];
 	}
 
 	if (m_pWPolar->m_Type==FIXEDSPEEDPOLAR) m_3DQInf[q] = m_pWPolar->m_QInf;
@@ -829,7 +831,7 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 		}
 		else
 		{
-			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Weight/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
+			m_3DQInf[q] =  sqrt(2.0* 9.81 * m_pWPolar->m_Mass/m_pWPolar->m_Density/TempCl/m_pWPolar->m_WArea);
 			strong = QString("           Alpha=%1   QInf=%2").arg(Alpha, 5,'f',2).arg(m_3DQInf[q]*pMainFrame->m_mstoUnit,5,'f',2);
 			GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 			strong+= strange + "\n";
@@ -1010,7 +1012,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				//Compute moment coefficients
 				m_pWingList[iw]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
 				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, 
-				                                   m_pWPolar, m_CoG);
+											m_pWPolar, m_pWPolar->m_CoG);
 
 
 				m_pWingList[iw]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
@@ -1583,6 +1585,7 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 
 void PanelAnalysisDlg::InitDialog()
 {
+
 
 	m_Progress = 0.0;
 	m_pctrlProgress->setValue(m_Progress);
@@ -2317,21 +2320,18 @@ void PanelAnalysisDlg::StartAnalysis()
 
 	qApp->processEvents();
 
+
 	if(m_pWPolar->m_Type<3)
 	{
-		m_CoG.Set(m_pWPolar->m_CoG);
 		if(m_pWPolar->m_bTiltedGeom) UnitLoop();
 		else                         AlphaLoop();
 	}
 	else if(m_pWPolar->m_Type==FIXEDAOAPOLAR)
 	{
-		m_CoG.Set(m_pWPolar->m_CoG);
 		ReLoop();
 	}
 	else if(m_pWPolar->m_Type==STABILITYPOLAR)
 	{
-		m_Mass = m_pWPolar->m_Weight;
-		m_CoG.Set(m_pWPolar->m_CoG);
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
 		m_Ib[1][1] = m_pWPolar->m_CoGIyy;
 		m_Ib[2][2] = m_pWPolar->m_CoGIzz;
@@ -2748,16 +2748,16 @@ bool PanelAnalysisDlg::ControlLoop()
 	strInertia = strmass+"."+strlen+QString::fromUtf8("²");
 
 
-	str = QString("   Mass=%1 ").arg(m_Mass*pMainFrame->m_kgtoUnit, 12,'f',3)+strmass+"\n";
+	str = QString("   Mass=%1 ").arg(m_pWPolar->m_Mass*pMainFrame->m_kgtoUnit, 12,'f',3)+strmass+"\n";
 	AddString(str);
 
 	str = "\n   ___Center of Gravity Position - Body axis____\n";
 	AddString(str);
-	str = QString("    CoG_x=%1 ").arg(m_CoG.x * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_x=%1 ").arg(m_pWPolar->m_CoG.x * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
-	str = QString("    CoG_y=%1 ").arg(m_CoG.y * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_y=%1 ").arg(m_pWPolar->m_CoG.y * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
-	str = QString("    CoG_z=%1 ").arg(m_CoG.z * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
+	str = QString("    CoG_z=%1 ").arg(m_pWPolar->m_CoG.z * pMainFrame->m_mtoUnit, 12,'f',4)+strlen+"\n";
 	AddString(str);
 
 	str = "\n   ___Inertia - Body Axis - CoG Origin____\n";
@@ -3018,7 +3018,7 @@ void PanelAnalysisDlg::ComputeNDStabDerivatives()
 {
 	QString str;
 	double b, S, mac, q, theta0, Cw0, Cx0, Cz0;
-	double mass = m_pWPolar->m_Weight;
+	double mass = m_pWPolar->m_Mass;
 	double rho = m_pWPolar->m_Density;
 
 	q = 1./2. * m_pWPolar->m_Density * u0 * u0;
@@ -3257,7 +3257,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 						PanelForce -= PanelForcep1;
 					}
 
-					PanelLeverArm = m_pPanel[p].VortexPos - m_CoG;
+					PanelLeverArm = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
 					Moment += PanelLeverArm * PanelForce;                     // N.m/rho
 					p++;
 				}
@@ -3275,7 +3275,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 				bOut = bOut || bOutRe || bError;
 				ViscousDrag += PCd ;                                         // Newtons/rho
 
-				LeverArm   = PtC4 - m_CoG;
+				LeverArm   = PtC4 - m_pWPolar->m_CoG;
 
 				ViscousMoment.x += PCd * (WindDirection.y*LeverArm.z - WindDirection.z*LeverArm.y);   // N.m/rho
 				ViscousMoment.y += PCd * (WindDirection.z*LeverArm.x - WindDirection.x*LeverArm.z);
@@ -3301,7 +3301,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 			GetDoubletDerivative(p, Mu, Cp, VLocal, QInf, Velocity.x, Velocity.y, Velocity.z);
 			PanelForce = m_pPanel[p].Normal * (-Cp) * m_pPanel[p].Area *1/2.*QInf*QInf;      // Newtons/rho
 
-			PanelLeverArm = m_pPanel[p].CollPt - m_CoG;
+			PanelLeverArm = m_pPanel[p].CollPt - m_pWPolar->m_CoG;
 			Moment += PanelLeverArm * PanelForce;                     // N.m/rho
 		}
 	}
@@ -3384,7 +3384,7 @@ bool PanelAnalysisDlg::GetZeroMomentAngle()
 	if(iter>=CM_ITER_MAX || m_bCancel) return false;
 
 	m_AlphaEq = a*180.0/PI;
-	Cm = ComputeCm(m_AlphaEq);// for information only, should be zero
+	Cm = ComputeCm(m_AlphaEq, true);// for information only, should be zero
 
 	return true;
 }
@@ -3402,6 +3402,7 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	static double Ipxx, Ipzz, Ipzx;
 	static double Ixx,Iyy,Izz, Izx;
 	QString strange;
+	double Mass = m_pWPolar->m_Mass;
 
 	//use inertia measured in stability axis, CoG origin
 	Ixx = m_Is[0][0];
@@ -3410,20 +3411,20 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	Izx = m_Is[0][2];
 
 	//____________________Longitudinal stability_____________
-	m_ALong[0][0] = Xu/m_Mass;
-	m_ALong[0][1] = Xw/m_Mass;
+	m_ALong[0][0] = Xu/Mass;
+	m_ALong[0][1] = Xw/Mass;
 	m_ALong[0][2] = 0.0;
 	m_ALong[0][3] = -9.81*cos(Theta0*PI/180.0);
 
-	m_ALong[1][0] =  Zu                              /(m_Mass-Zwp);
-	m_ALong[1][1] =  Zw                              /(m_Mass-Zwp);
-	m_ALong[1][2] = (Zq+m_Mass*u0)                   /(m_Mass-Zwp);
-	m_ALong[1][3] = -9.81*m_Mass*sin(Theta0*PI/180.0)/(m_Mass-Zwp);
+	m_ALong[1][0] =  Zu                            /(Mass-Zwp);
+	m_ALong[1][1] =  Zw                            /(Mass-Zwp);
+	m_ALong[1][2] = (Zq+Mass*u0)                   /(Mass-Zwp);
+	m_ALong[1][3] = -9.81*Mass*sin(Theta0*PI/180.0)/(Mass-Zwp);
 
-	m_ALong[2][0] = (Mu + Mwp*Zu/(m_Mass-Zwp))                   /Iyy;
-	m_ALong[2][1] = (Mw + Mwp*Zw/(m_Mass-Zwp))                   /Iyy;
-	m_ALong[2][2] = (Mq + Mwp*(Zq+m_Mass*u0)/(m_Mass-Zwp))       /Iyy;
-	m_ALong[2][3] = (Mwp*(-m_Mass*9.81*sin(Theta0))/(m_Mass-Zwp))/Iyy;
+	m_ALong[2][0] = (Mu + Mwp*Zu/(Mass-Zwp))                 /Iyy;
+	m_ALong[2][1] = (Mw + Mwp*Zw/(Mass-Zwp))                 /Iyy;
+	m_ALong[2][2] = (Mq + Mwp*(Zq+Mass*u0)/(Mass-Zwp))       /Iyy;
+	m_ALong[2][3] = (Mwp*(-Mass*9.81*sin(Theta0))/(Mass-Zwp))/Iyy;
 
 	m_ALong[3][0] = 0.0;
 	m_ALong[3][1] = 0.0;
@@ -3450,9 +3451,9 @@ void PanelAnalysisDlg::BuildStateMatrices()
 	Ipzz = (Ixx * Izz - Izx*Izx)/Ixx;
 	Ipzx =  Izx/(Ixx * Izz - Izx*Izx);
 
-	m_ALat[0][0] = Yv/m_Mass;
-	m_ALat[0][1] = Yp/m_Mass;
-	m_ALat[0][2] = Yr/m_Mass - u0;
+	m_ALat[0][0] = Yv/Mass;
+	m_ALat[0][1] = Yp/Mass;
+	m_ALat[0][2] = Yr/Mass - u0;
 	m_ALat[0][3] = 9.81 * cos(Theta0*PI/180.0);
 
 	m_ALat[1][0] = Lv/Ipxx+Ipzx*Nv;
@@ -3489,12 +3490,12 @@ void PanelAnalysisDlg::BuildStateMatrices()
 //	for(i=0; i<m_pWPolar->m_nControls; i++)
 	{
 		// per radian
-		m_BLong[0] = Xde/m_Mass;
-		m_BLong[1] = Zde/m_Mass;
+		m_BLong[0] = Xde/Mass;
+		m_BLong[1] = Zde/Mass;
 		m_BLong[2] = Mde/Iyy;
 		m_BLong[3] = 0.0;
 
-		m_BLat[0] = Yde/m_Mass;
+		m_BLat[0] = Yde/Mass;
 		m_BLat[1] = Lde/Ipxx+Nde*Ipzx;
 		m_BLat[2] = Lde*Ipzx+Nde/Ipzz;
 		m_BLat[3] = 0.0;
@@ -3659,7 +3660,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	}
 	else
 	{
-		u0 =  sqrt( 2.0* 9.81 * m_Mass /m_pWPolar->m_Density/m_pWPolar->m_WArea / VerticalCl );
+		u0 =  sqrt( 2.0* 9.81 * m_pWPolar->m_Mass /m_pWPolar->m_Density/m_pWPolar->m_WArea / VerticalCl );
 		strong = QString("VInf = %2").arg(u0*pMainFrame->m_mstoUnit,0,'f',5);
 		GetSpeedUnit(strange, pMainFrame->m_SpeedUnit);
 		strong+= strange + "\n";
@@ -3786,8 +3787,8 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	for (p=0; p<m_MatSize; p++)
 	{
 		//re-use existing memory to define the velocity field
-		if(m_pPanel[p].m_iPos==0) CGM = m_pPanel[p].VortexPos - m_CoG;
-		else                      CGM = m_pPanel[p].CollPt    - m_CoG;
+		if(m_pPanel[p].m_iPos==0) CGM = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
+		else                      CGM = m_pPanel[p].CollPt    - m_pWPolar->m_CoG;
 
 		// a rotation of the plane about a vector is the opposite of a rotation of the freestream about this vector
 		Ris = is*CGM * (-deltarotation) + V0;
@@ -4054,7 +4055,6 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
 			else SignedDeltaAngle = DeltaAngle;
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
-			qDebug()<<SignedDeltaAngle;
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
@@ -4193,7 +4193,6 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 
 			PanelForce  = WindDirection * m_pPanel[p].Vortex;
 			PanelForce *= 2.0 * Gamma;                                       //Newtons/q   (QInf = unit)
-
 			if(!m_pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 			{
 				Force       = WindDirection * m_pPanel[p].Vortex;
@@ -4202,13 +4201,13 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 			}
 			m_Cp[p] = PanelForce.dot(m_pPanel[p].Normal)/m_pPanel[p].Area; //todo : remove, for information only
 		}
-		PanelLeverArm.x = ForcePt.x - m_CoG.x;
-		PanelLeverArm.y = ForcePt.y - m_CoG.y;
-		PanelLeverArm.z = ForcePt.z - m_CoG.z;
+		PanelLeverArm.x = ForcePt.x - m_pWPolar->m_CoG.x;
+		PanelLeverArm.y = ForcePt.y - m_pWPolar->m_CoG.y;
+		PanelLeverArm.z = ForcePt.z - m_pWPolar->m_CoG.z;
 		Cm += -PanelLeverArm.x * PanelForce.z + PanelLeverArm.z*PanelForce.x; //N.m/rho
 	}
-	Cm *= m_pWPolar->m_Density;
 
+	Cm *= m_pWPolar->m_Density;
 	return Cm;
 }
 

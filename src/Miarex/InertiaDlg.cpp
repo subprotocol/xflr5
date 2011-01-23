@@ -161,23 +161,23 @@ void InertiaDlg::ComputeInertia()
 	else                    TotalCoG.Set(0.0,0.0,0.0);
 
 	//Total inertia in CoG referential
-	TotalIxx = m_CoGIxx + m_VolumeMass * ((m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
-										 +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
-	TotalIyy = m_CoGIyy + m_VolumeMass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
-										 +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
-	TotalIzz = m_CoGIzz + m_VolumeMass * ((m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
-										 +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
-	TotalIxz = m_CoGIxz - m_VolumeMass *  (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
+	TotalIxx = m_CoGIxx + m_VolumeMass * ( (m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
+								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
+	TotalIyy = m_CoGIyy + m_VolumeMass * ( (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
+								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
+	TotalIzz = m_CoGIzz + m_VolumeMass * ( (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
+								   +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
+	TotalIxz = m_CoGIxz - m_VolumeMass *   (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
 
 	for(i=0; i<m_NMass; i++)
 	{
-		TotalIxx  += m_MassValue[i] * ((m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y)
-									  +(m_MassPosition[i].z-TotalCoG.z)*(m_MassPosition[i].z-TotalCoG.z));
-		TotalIyy  += m_MassValue[i] * ((m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].x-TotalCoG.x)
-									  +(m_MassPosition[i].z-TotalCoG.z)*(m_MassPosition[i].z-TotalCoG.z));
-		TotalIzz  += m_MassValue[i] * ((m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].x-TotalCoG.x)
-									  +(m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y));
-		TotalIxz  -= m_MassValue[i] *  (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].z-TotalCoG.z) ;
+		TotalIxx  += m_MassValue[i] * ( (m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y)
+								 +(m_MassPosition[i].z-TotalCoG.z)*(m_MassPosition[i].z-TotalCoG.z));
+		TotalIyy  += m_MassValue[i] * ( (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].x-TotalCoG.x)
+								 +(m_MassPosition[i].z-TotalCoG.z)*(m_MassPosition[i].z-TotalCoG.z));
+		TotalIzz  += m_MassValue[i] * ( (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].x-TotalCoG.x)
+								 +(m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y));
+		TotalIxz  -= m_MassValue[i] *   (m_MassPosition[i].x-TotalCoG.x)*(m_MassPosition[i].z-TotalCoG.z) ;
 	}
 
 	if(m_pPlane)
@@ -189,13 +189,13 @@ void InertiaDlg::ComputeInertia()
 				for(i=0; i<pWing[iw]->m_NMass; i++)
 				{
 					MassPos = m_pPlane->m_WingLE[iw] + pWing[iw]->m_MassPosition[i];
-					TotalIxx  += pWing[iw]->m_MassValue[i] * ((MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y)
-															 +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
-					TotalIyy  += pWing[iw]->m_MassValue[i] * ((MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
-															 +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
-					TotalIzz  += pWing[iw]->m_MassValue[i] * ((MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
-															 +(MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y));
-					TotalIxz  -= pWing[iw]->m_MassValue[i] *  (MassPos.x-TotalCoG.x)*(MassPos.z-TotalCoG.z) ;
+					TotalIxx  += pWing[iw]->m_MassValue[i] * ( (MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y)
+													  +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
+					TotalIyy  += pWing[iw]->m_MassValue[i] * ( (MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
+													  +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
+					TotalIzz  += pWing[iw]->m_MassValue[i] * ( (MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
+													  +(MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y));
+					TotalIxz  -= pWing[iw]->m_MassValue[i] *   (MassPos.x-TotalCoG.x)*(MassPos.z-TotalCoG.z) ;
 				}
 			}
 		}
@@ -205,13 +205,13 @@ void InertiaDlg::ComputeInertia()
 			for(i=0; i<m_pPlane->m_pBody->m_NMass; i++)
 			{
 				MassPos = m_pPlane->m_BodyPos + m_MassPosition[i];
-				TotalIxx  += m_pPlane->m_pBody->m_MassValue[i] * ((MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y)
-																 +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
-				TotalIyy  += m_pPlane->m_pBody->m_MassValue[i] * ((MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
-																 +(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
-				TotalIzz  += m_pPlane->m_pBody->m_MassValue[i] * ((MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
-																 +(MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y));
-				TotalIxz  -= m_pPlane->m_pBody->m_MassValue[i] *  (MassPos.x-TotalCoG.x)*(MassPos.z-TotalCoG.z) ;
+				TotalIxx  += m_pPlane->m_pBody->m_MassValue[i] * ( (MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y)
+														+(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
+				TotalIyy  += m_pPlane->m_pBody->m_MassValue[i] * ( (MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
+														+(MassPos.z-TotalCoG.z)*(MassPos.z-TotalCoG.z));
+				TotalIzz  += m_pPlane->m_pBody->m_MassValue[i] * ( (MassPos.x-TotalCoG.x)*(MassPos.x-TotalCoG.x)
+														+(MassPos.y-TotalCoG.y)*(MassPos.y-TotalCoG.y));
+				TotalIxz  -= m_pPlane->m_pBody->m_MassValue[i] *   (MassPos.x-TotalCoG.x)*(MassPos.z-TotalCoG.z) ;
 			}
 		}
 	}
@@ -323,6 +323,7 @@ void InertiaDlg::InitDialog()
 	m_pctrlStabInertia->setEnabled(false);
 	m_pctrlFinInertia->setEnabled(false);
 	m_pctrlBodyInertia->setEnabled(false);
+
 	if(m_pWing)
 	{
 		m_VolumeMass = m_pWing->m_VolumeMass;

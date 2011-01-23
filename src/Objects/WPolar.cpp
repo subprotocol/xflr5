@@ -60,7 +60,7 @@ CWPolar::CWPolar()
 	m_BankAngle = 0.0;
 	m_Beta      = 0.0;
 	m_QInf      = 10.0;
-	m_Weight    = 1.0;
+	m_Mass    = 1.0;
 //	m_XCmRef    = 0.0;
 	m_ASpec     = 0.0;
 	m_WArea     = 0.0;
@@ -90,7 +90,6 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	int size = (int)m_Alpha.size();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CWOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
-
 	if(size)
 	{
 		for (i=0; i<size; i++)
@@ -177,7 +176,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					break;
 				}
 			}
-			else if(m_Type==4)
+			else if(m_Type==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
 				if (fabs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -259,10 +258,10 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					break;
 				}
 			}
-			else if(m_Type==5 || m_Type==6 || m_Type==7)
+			else if(m_Type==STABILITYPOLAR)
 			{
 				// Control or stability analysis, sort by control value
-				if (fabs(pPOpp->m_Ctrl - m_Ctrl[i]) < 0.001)
+				if (fabs(pPOpp->m_Alpha < m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
@@ -522,7 +521,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else if (m_Type==4)
+			else if (m_Type==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
 				if (fabs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -606,10 +605,10 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else if (m_Type==5 || m_Type==6 || m_Type==7)
+			else if (m_Type==STABILITYPOLAR)
 			{
 				// Control or Stability Polar, sort by crescending ctrl value
-				if (fabs(pWOpp->m_Ctrl - m_Ctrl[i]) < 0.001)
+				if (fabs(pWOpp->m_Alpha < m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -948,7 +947,7 @@ void CWPolar::CalculatePoint(int i)
 
 	if(fabs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
-	m_Vz[i] = (double)sqrt(2*m_Weight*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
+	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
 
 	//dynamic pressure
@@ -962,7 +961,7 @@ void CWPolar::CalculatePoint(int i)
 	m_Pm[i] = q * m_WArea * m_GCm[i] * m_WMAChord;// in N.m
 
 	//power for horizontal flight
-	m_VertPower[i] = m_Weight * 9.81 * m_Vz[i];
+	m_VertPower[i] = m_Mass * 9.81 * m_Vz[i];
 
 	double AR      = m_WSpan*m_WSpan/m_WArea;
 
@@ -1509,7 +1508,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if (m_bShowPoints) ar << 1; else ar << 0;
 		ar << m_Type;
 		ar << (float)m_QInf;
-		ar << (float)m_Weight;
+		ar << (float)m_Mass;
 		ar << (float)m_ASpec ;
 		ar << (float)m_Beta ;
 		if(ProjectFormat<5) ar << (float)m_CoG.x;
@@ -1679,7 +1678,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		m_Type = n;
 
 		ar >> f;	m_QInf = f;
-		ar >> f;	m_Weight = f;
+		ar >> f;	m_Mass = f;
 		ar >> f;	m_ASpec = f;
 		if(m_PolarFormat>=1015) ar >> f;	m_Beta = f;
 		if(m_PolarFormat<1018 && m_PolarFormat>=1002)
@@ -2049,7 +2048,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		PolarProperties += "Using plane inertia\n";
 	}
 
-	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,10,'f',3);
+	strong  = QString(QObject::tr("Mass")+" = %1 ").arg(m_Mass*pMainFrame->m_kgtoUnit,10,'f',3);
 	PolarProperties += strong + massunit + "\n";
 
 	strong  = QString(QObject::tr("CoG.x")+" = %1 ").arg(m_CoG.x*pMainFrame->m_mtoUnit,10,'g',4);
@@ -2113,7 +2112,7 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 	if(bPlane)
 	{
 		pPlane = (CPlane*)ptr;
-		m_Weight = pPlane->m_TotalMass;
+		m_Mass = pPlane->m_TotalMass;
 		m_CoG = pPlane->m_CoG;
 		m_CoGIxx = pPlane->m_CoGIxx;
 		m_CoGIyy = pPlane->m_CoGIyy;
@@ -2123,7 +2122,7 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 	else
 	{
 		pWing  = (CWing*)ptr;
-		m_Weight = pWing->m_TotalMass;
+		m_Mass = pWing->m_TotalMass;
 		m_CoG = pWing->m_CoG;
 		m_CoGIxx = pWing->m_CoGIxx;
 		m_CoGIyy = pWing->m_CoGIyy;
