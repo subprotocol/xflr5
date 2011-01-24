@@ -2629,7 +2629,6 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 					ForcePt = m_pPanel[p].VortexPos;
 					PanelForce  = WindDirection * m_pPanel[p].Vortex;
 					PanelForce *= 2.0 * Gamma[p] /QInf;                                 //Newtons/q
-//qDebug("%3d   Gamma=%13.7f    Gammap1=%13.7f", p, Gamma[p]/QInf, Gamma[p+1]/QInf	);
 
 					if(!pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 					{
@@ -2688,6 +2687,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 
 			m_VCm += DragMoment.y;
 			m_ICm += GeomMoment.y;
+
 			m_CmAirf[m]    *= 1.0                          /m_Chord[m]/m_StripArea[m];
 			m_Cm[m]         = (GeomMoment.y + DragMoment.y)/m_Chord[m]/m_StripArea[m];
 			m++;

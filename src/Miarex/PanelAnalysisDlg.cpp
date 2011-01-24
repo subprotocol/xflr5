@@ -216,6 +216,8 @@ bool PanelAnalysisDlg::AlphaLoop()
 
 	CreateUnitRHS();
 	if (m_bCancel) return true;
+
+
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//compute wake contribution
@@ -289,12 +291,12 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 			if(m_pPanel[p].m_iPos!=0)
 			{
 				//Thick surfaces, 3D-panel type BC, use collocation point
-				C    = m_pPanel[p].CollPt;
+				C = m_pPanel[p].CollPt;
 			}
 			else
 			{
 				//Thin surface, VLM type BC, use control point
-				C    = m_pPanel[p].CtrlPt;
+				C = m_pPanel[p].CtrlPt;
 			}
 			CC.x =  C.x;//symmetric point, just in case
 			CC.y = -C.y;
@@ -318,8 +320,8 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 						phi += phiSym;
 					}
 
-					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)   m_aij[m*Size+mm] = V.dot(m_pPanel[p].Normal);
-					else if(m_pWPolar->m_bDirichlet)	                    m_aij[m*Size+mm] = phi;
+					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0) m_aij[m*Size+mm] = V.dot(m_pPanel[p].Normal);
+					else if(m_pWPolar->m_bDirichlet)                      m_aij[m*Size+mm] = phi;
 					mm++;
 				}
 			}
@@ -333,13 +335,13 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 
 void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, int nval)
 {
-	// Creates the RHS of linear problem, using boundary condition 
+	// Creates the RHS of the linear problem, using boundary conditions
 	// BC may be of the Neumann or Dirichlet type depending on the analysis type and on the geometry
 	//
 	// if 3d-panel, use NASA 4023 equation (20) & (22)
 	// 
 	// Compute with a unit speed
-	// We'll scale the results to speed later depending on the polar type
+	// The results are scaled to speed later depending on the polar type
 	//
 	
 	int p, pp, q;
@@ -441,9 +443,10 @@ void PanelAnalysisDlg::CreateUnitRHS()
 	CVector VInf;
 
 	VInf.Set(1.0, 0.0, 0.0);
-	CreateRHS(m_uRHS,  VInf, NULL, true);
+	CreateRHS(m_uRHS,  VInf);
 	VInf.Set(0.0, 0.0, 1.0);
 	CreateRHS(m_wRHS, VInf);
+
 }
 
 
@@ -2244,7 +2247,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	//
 	// Second case :
 	// If the analysis is for a plane, the full 3D method is not applicable since the 
-	// junctions between wing and body, or between fin and elevator cannot be adequately 
+	// junctions between wing and body, or between fin and elevator, cannot be adequately 
 	// represented as closed surfaces. This would require a 3D CAD programe. 
 	// Therefore, in this case, the wings are modelled as thin surfaces.
 	// Trial tests using the method of NASA TN 4023 have not been conclusive. With a uniform doublet

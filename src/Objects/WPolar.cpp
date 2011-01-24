@@ -261,7 +261,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 			else if(m_Type==STABILITYPOLAR)
 			{
 				// Control or stability analysis, sort by control value
-				if (fabs(pPOpp->m_Alpha < m_Alpha[i])<0.0001)
+				if (fabs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
@@ -608,7 +608,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 			else if (m_Type==STABILITYPOLAR)
 			{
 				// Control or Stability Polar, sort by crescending ctrl value
-				if (fabs(pWOpp->m_Alpha < m_Alpha[i])<0.0001)
+				if (fabs(pWOpp->m_Alpha - m_Alpha[i])<0.0001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;

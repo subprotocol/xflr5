@@ -3976,7 +3976,7 @@ void QMiarex::EditCurPlane()
 			break;
 		}
 	}
-	//save a copy just in case user changes his mind (users !...)
+
 	CPlane* pModPlane= new CPlane;
 
 	PlaneDlg PlaneDlg;
@@ -4000,18 +4000,12 @@ void QMiarex::EditCurPlane()
 				if (Ans == QDialog::Rejected)
 				{
 					//restore geometry
-//					m_pCurPlane->Duplicate(pSavePlane);
 					delete pModPlane; // clean up
 					return;
 				}
 				else if(Ans==20)
 				{
 					//save mods to a new plane object
-//					CPlane* pNewPlane= new CPlane();
-//					pNewPlane->Duplicate(pModPlane);
-					//restore geometry for initial plane
-//					m_pCurPlane->Duplicate(pSavePlane);
-
 					if(!SetModPlane(pModPlane))
 					{
 						delete pModPlane;
@@ -4023,7 +4017,6 @@ void QMiarex::EditCurPlane()
 					SetUFO();
 					pMainFrame->UpdateUFOs();
 					UpdateView();
-//					delete pSavePlane; // clean up
 					return;
 				}
 			}
@@ -12196,7 +12189,6 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->m_pBody          = m_pCurBody;
 	m_pPanelDlg->m_pWing          = m_pCurWing;
 	for(int iw=0; iw<4; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
-qDebug()<<"anlayze"<<m_pWingList[0]<<m_pWingList[1] <<m_pWingList[2] <<m_pWingList[3];
 
 	if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
 	{
