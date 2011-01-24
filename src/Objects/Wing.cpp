@@ -2724,6 +2724,8 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 	double tau = 0.0;
 	CVector PtC4;
 
+	OutString.clear();
+
 	WingVDrag = 0.0;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -2744,6 +2746,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 		}
 		return;
 	}
+
 	//Interpolate the viscous properties from the foil's type 1 polar mesh
 	m=0;
 	for (int j=0; j<m_NSurfaces; j++)
@@ -2766,7 +2769,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 			if(bPointOutCl)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
+				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit, 9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
@@ -2774,24 +2777,25 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 
 				string = QString(QObject::tr(",  Cl = %1 could not be interpolated")+"\n").arg(m_Cl[m],6,'f',2);
 				strong+= string;
-				OutString = strong;
+				OutString += strong;
 
 				m_bWingOut = true;
 			}
 			else if(bPointOutRe)
 			{
 				GetLengthUnit(string, pMainFrame->m_LengthUnit);
-				strong = QString(QObject::tr("       Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
+				strong = QString(QObject::tr("           Span pos = %1 ")).arg(m_SpanPos[m]*pMainFrame->m_mtoUnit,9,'f',2);
 				strong += string;
 				strong += ",  Re = ";
 				ReynoldsFormat(string, m_Re[m]);
 				strong += string;
 				string = QString(QObject::tr(",  Cl = %1 is outside the flight envelope")+"\n").arg(m_Cl[m],6,'f',2);
 				strong += string;
-				OutString = strong;
+				OutString += strong;
 
 				m_bWingOut = true;
 			}
+
 			// Sum the total viscous drag of this wing
 			WingVDrag  += m_PCd[m] * m_StripArea[m];
 			m++;
