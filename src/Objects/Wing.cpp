@@ -649,8 +649,8 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 		{
 			if (fabs(m_TPos[j]-m_TPos[j+1]) > MinPanelSize)
 			{
-				m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_RFoil[j+1]);
-				m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_RFoil[j]);
+				m_Surface[is].m_pFoilA   = pMainFrame->GetFoil(m_RFoil[j]);
+				m_Surface[is].m_pFoilB   = pMainFrame->GetFoil(m_RFoil[j+1]);
 
 				m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 

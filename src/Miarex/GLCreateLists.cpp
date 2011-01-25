@@ -1610,6 +1610,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 		return;
 	}
 
+	double memcoresize = pMiarex->GetCoreSize();
+	pMiarex->SetCoreSize(0.0005); //mm, just for the time needed to build the streamlines
+
 	CWing *pWing;
 
 	ProgressDlg dlg;
@@ -1821,6 +1824,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 		glDisable (GL_LINE_STIPPLE);
 	}
 	glEndList();
+
+	//restore things as they were
+	pMiarex->SetCoreSize(memcoresize);
 }
 
 

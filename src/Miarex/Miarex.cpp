@@ -15533,4 +15533,13 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 		}
 	}
 }
+double QMiarex::GetCoreSize()
+{
+	return m_CoreSize;
+}
+
+void QMiarex::SetCoreSize(double CoreSize)
+{
+	m_CoreSize = CoreSize;
+}
 

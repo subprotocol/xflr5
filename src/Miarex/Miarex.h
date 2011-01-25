@@ -218,7 +218,7 @@ private slots:
 	void OnModalView();
 	void OnTimeView();
 
-private:
+public:
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);
@@ -317,6 +317,9 @@ private:
 	int CreateElements(CSurface *pSurface);
 	int IsWakeNode(CVector &Pt);
 	int IsNode(CVector &Pt);
+
+	double GetCoreSize();
+	void SetCoreSize(double CoreSize);
 
 //	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
 //	double GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);

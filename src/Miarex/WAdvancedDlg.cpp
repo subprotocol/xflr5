@@ -41,7 +41,7 @@ WAdvancedDlg::WAdvancedDlg()
 	m_Iter      = 100;
 
 	m_MaxWakeIter     = 1;
-	m_CoreSize        = 0.0;
+	m_CoreSize        = 0.0001;// 0.1mm
 	m_WakeInterNodes  = 6;
 	m_MinPanelSize    = .001;
 
@@ -296,7 +296,7 @@ void WAdvancedDlg::OnResetDefaults()
 	m_Iter             = 100;
 	m_NStation         = 20;
 	m_MaxWakeIter      = 5;
-	m_CoreSize         = 0.00001;
+	m_CoreSize         = 0.0001;
 	m_MinPanelSize     = .001;
 	m_WakeInterNodes   = 6;
 	m_bLogFile         = true;
