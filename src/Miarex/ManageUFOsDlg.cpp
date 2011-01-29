@@ -25,6 +25,7 @@
 #include <QStringList>
 #include <QMessageBox>
 #include "Miarex.h"
+#include "../Globals.h"
 #include "../MainFrame.h"
 #include "ManageUFOsDlg.h"
 
@@ -160,15 +161,21 @@ void ManageUFOsDlg::SetupLayout()
 
 	m_pUFOModel = new QStandardItemModel;
 	m_pUFOModel->setRowCount(10);//temporary
-	m_pUFOModel->setColumnCount(6);
+	m_pUFOModel->setColumnCount(8);
 
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strArea, strLength;
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	GetAreaUnit(strArea, pMainFrame->m_AreaUnit);
 	m_pUFOModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
-	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Wing Span"));
-	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("AR"));
-	m_pUFOModel->setHeaderData(3, Qt::Horizontal, tr("TR"));
-	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8("°)");
-	m_pUFOModel->setHeaderData(4, Qt::Horizontal, str);
-	m_pUFOModel->setHeaderData(5, Qt::Horizontal, tr("Tail Volume"));
+	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Span")+" ("+strLength+")");
+	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("Area")+" ("+strArea+")");
+	m_pUFOModel->setHeaderData(3, Qt::Horizontal, tr("M.A.C.")+" ("+strLength+")");
+	m_pUFOModel->setHeaderData(4, Qt::Horizontal, tr("AR"));
+	m_pUFOModel->setHeaderData(5, Qt::Horizontal, tr("TR"));
+	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8(" (°)");
+	m_pUFOModel->setHeaderData(6, Qt::Horizontal, str);
+	m_pUFOModel->setHeaderData(7, Qt::Horizontal, tr("Tail Volume"));
 
 	m_pctrlUFOTable->setModel(m_pUFOModel);
 	m_pctrlUFOTable->setWindowTitle(tr("UFOs"));
@@ -185,11 +192,13 @@ void ManageUFOsDlg::SetupLayout()
 	int  *precision = new int[12];
 	precision[0]  = 2;
 	precision[1]  = 3;
-	precision[2]  = 2;
-	precision[3]  = 2;
-	precision[4]  = 3;
-	precision[5]  = 3;
-	precision[6]  = 0;
+	precision[2]  = 3;
+	precision[3]  = 3;
+	precision[4]  = 2;
+	precision[5]  = 2;
+	precision[6]  = 3;
+	precision[7]  = 3;
+	precision[8]  = 0;
 
 	m_pUFODelegate->m_Precision = precision;
 }
@@ -228,18 +237,24 @@ void ManageUFOsDlg::FillWingRow(int row)
 	if(pWing->m_WingDescription.length()) m_pUFOModel->setData(ind, pWing->m_WingDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformSpan);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*pMainFrame->m_mtoUnit);
 
 	ind = m_pUFOModel->index(row, 2, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_AR);
+	m_pUFOModel->setData(ind, pWing->m_PlanformArea*pMainFrame->m_m2toUnit);
 
 	ind = m_pUFOModel->index(row, 3, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_TR);
+	m_pUFOModel->setData(ind, pWing->m_MAChord*pMainFrame->m_mtoUnit);
 
 	ind = m_pUFOModel->index(row, 4, QModelIndex());
-	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+	m_pUFOModel->setData(ind, pWing->m_AR);
 
 	ind = m_pUFOModel->index(row, 5, QModelIndex());
+	m_pUFOModel->setData(ind, pWing->m_TR);
+
+	ind = m_pUFOModel->index(row, 6, QModelIndex());
+	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+
+	ind = m_pUFOModel->index(row, 7, QModelIndex());
 	m_pUFOModel->setData(ind,0);
 }
 
@@ -248,6 +263,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex ind;
+
 	if(row>=pMainFrame->m_oaPlane.size()) return;
 
 	CPlane *pPlane = (CPlane*)pMainFrame->m_oaPlane.at(row);
@@ -259,18 +275,24 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 	if(pPlane->m_PlaneDescription.length()) m_pUFOModel->setData(ind, pPlane->m_PlaneDescription, Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row+n, 1, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_PlanformSpan);
+	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*pMainFrame->m_mtoUnit);
 
 	ind = m_pUFOModel->index(row+n, 2, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_AR);
+	m_pUFOModel->setData(ind, pWing->m_PlanformArea*pMainFrame->m_m2toUnit);
 
 	ind = m_pUFOModel->index(row+n, 3, QModelIndex());
-	m_pUFOModel->setData(ind, pWing->m_TR);
+	m_pUFOModel->setData(ind, pWing->m_MAChord*pMainFrame->m_mtoUnit);
 
 	ind = m_pUFOModel->index(row+n, 4, QModelIndex());
-	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+	m_pUFOModel->setData(ind, pWing->m_AR);
 
 	ind = m_pUFOModel->index(row+n, 5, QModelIndex());
+	m_pUFOModel->setData(ind, pWing->m_TR);
+
+	ind = m_pUFOModel->index(row+n, 6, QModelIndex());
+	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+
+	ind = m_pUFOModel->index(row+n, 7, QModelIndex());
 	m_pUFOModel->setData(ind,pPlane->m_TailVolume);
 }
 
@@ -285,6 +307,7 @@ void ManageUFOsDlg::OnRename()
 
 	FillUFOTable();
 	pMainFrame->SetSaveState(false);
+	qDebug("Rename");
 }
 
 
@@ -378,16 +401,18 @@ void ManageUFOsDlg::OnUFOClicked(QModelIndex index)
 void ManageUFOsDlg::resizeEvent(QResizeEvent *event)
 {
 	int w = m_pctrlUFOTable->width();
-	int w8 = (int)((double)w/10.0);
+	int w8 = (int)((double)w/12.0);
 //	int w10 = (int)((double)w/10.0);
 
 	m_pctrlUFOTable->setColumnWidth(1,w8);
-	m_pctrlUFOTable->setColumnWidth(2,w8);
 	m_pctrlUFOTable->setColumnWidth(3,w8);
+	m_pctrlUFOTable->setColumnWidth(2,w8);
 	m_pctrlUFOTable->setColumnWidth(4,w8);
 	m_pctrlUFOTable->setColumnWidth(5,w8);
+	m_pctrlUFOTable->setColumnWidth(6,w8);
+	m_pctrlUFOTable->setColumnWidth(7,w8);
 	
-	m_pctrlUFOTable->setColumnWidth(0,w-5*w8-40);
+	m_pctrlUFOTable->setColumnWidth(0,w-7*w8-40);
 }
 
 
