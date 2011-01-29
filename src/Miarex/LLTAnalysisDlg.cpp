@@ -59,27 +59,25 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 	m_bWarning    = false;
 	m_bError      = false;
 	m_bFinished   = false;
+	m_bInitCalc   = true;
+	m_bSequence   = false;
+	m_bAlpha      = true;
 
 	m_Iterations =  0;
 	m_IterLim    = 20;
 
-	m_bSequence  = false;
-	m_bAlpha     = true;
-
 	m_LegendPlace.rx() = 0;
 	m_LegendPlace.ry() = 0;
 
-	m_AlphaMin   = 0.0;
-	m_AlphaMax   = 1.0;
-	m_AlphaDelta = 0.5;
-
+	m_AlphaMin = m_AlphaMax = m_AlphaDelta = 0.;
+	m_ReMin = m_ReMax = m_ReDelta = 0.0;
 
 	m_pXFile       = NULL;
 	s_pMiarex      = NULL;
 	s_pMainFrame   = NULL;
+
+	m_LLT.m_pParent = this;
 }
-
-
 
 
 
@@ -90,17 +88,17 @@ bool LLTAnalysisDlg::AlphaLoop()
 	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	int i,iter;
 
-	CWing::s_AlphaLLT = m_AlphaMin;
+//	CWing::s_AlphaLLT = m_AlphaMin;
 
 	str = tr("Launching analysis....")+"\n\n";
 	UpdateOutput(str);
 	str = QString(tr("Max iterations     = %1")+"\n").arg(m_IterLim);
 	UpdateOutput(str);
-	str = QString(tr("Alpha precision    = %1 deg")+"\n").arg(CWing::s_CvPrec,0,'f',6);
+	str = QString(tr("Alpha precision    = %1 deg")+"\n").arg(LLTAnalysis::s_CvPrec,0,'f',6);
 	UpdateOutput(str);
-	str = QString(tr("Relaxation factor  = %1")+"\n").arg(CWing::s_RelaxMax,0,'f',1);
+	str = QString(tr("Relaxation factor  = %1")+"\n").arg(LLTAnalysis::s_RelaxMax,0,'f',1);
 	UpdateOutput(str);
-	str = QString(tr("Number of stations = %1")+"\n\n").arg(CWing::s_NLLTStations);
+	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
 	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -fabs(m_AlphaDelta);
@@ -108,14 +106,17 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 	if(!m_bSequence) ia = 0;
 
-	if(!m_pWing->LLTInitialize(m_pWPolar->m_Mass)) return false;
+	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
 	m_IterGraph.SetYMinGrid(false, true, QColor(100,100,100), 2, 1, 4);
 
+	double Alpha;
+
 	for (i=0; i<=ia; i++)
 	{
+		Alpha = m_AlphaMin +(double)i * m_AlphaDelta;
 		if(m_bCancel) 
 		{
 			str = tr("Analysis cancelled on user request....")+"\n";
@@ -126,50 +127,55 @@ bool LLTAnalysisDlg::AlphaLoop()
 		m_IterGraph.SetYMax(0.5);
 		CCurve *pCurve = m_IterGraph.GetCurve(0);
 		pCurve->ResetCurve();
-		m_State=0;
-		m_pWing->LLTInitCl();//with new angle...
-		if(m_pWing->m_bInitCalc) m_pWing->LLTSetLinearSolution();
 
-		str= QString(tr("Calculating Alpha = %1... ")).arg(CWing::s_AlphaLLT,5,'f',2);
+		m_LLT.LLTInitCl(m_pWPolar->m_QInf, Alpha);
+		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(Alpha);
+
+		str= QString(tr("Calculating Alpha = %1... ")).arg(Alpha,5,'f',2);
 		UpdateOutput(str);
-		iter = Iterate();
+
+		iter = m_LLT.LLTIterate(m_pWPolar->m_QInf, Alpha);
 
 		if (m_bSkip)
 		{
+			if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(Alpha, 6,'f',2).arg(iter);
+			else                                 str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(m_pWPolar->m_QInf,  8,'f',2).arg(iter);
+			UpdateOutput(str);
 			m_bSkip = false;
-			m_pWing->m_bInitCalc = true;
+			m_bInitCalc = true;
 		}
 		else if (iter==-1 && !m_bCancel)
 		{
 			str= QString(tr("    ...negative Lift... Aborting")+"\n");
 			m_bError = true;
+			m_bInitCalc = true;
 			UpdateOutput(str);
-			m_pWing->m_bInitCalc = true;
 		}
 		else if (iter<m_IterLim && !m_bCancel)
 		{
 			//converged, 
 			str= QString(tr("    ...converged after %1 iterations")+"\n").arg(iter);
 			UpdateOutput(str);
-			m_pWing->LLTComputeWing();// generates wing results,
-			if (m_pWing->m_bWingOut) m_bWarning = true;
-			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-/*			if(m_pWing->m_bWingOut)
+			m_LLT.LLTComputeWing(m_pWPolar->m_QInf, Alpha, str);// generates wing results,
+			UpdateOutput(str);
+			if (m_LLT.m_bWingOut) m_bWarning = true;
+			pMiarex->AddWOpp(m_pWPolar->m_QInf, Alpha, m_LLT.m_bWingOut);// Adds WOpp point and adds result to polar
+			if(pMiarex->m_iView==WPOLARVIEW)
 			{
-				str= QString("\n");
-				UpdateOutput(str);
-			}*/
-			m_pWing->m_bInitCalc = false;
+				pMiarex->CreateWPolarCurves();
+				pMiarex->UpdateView();
+			}
+			m_bInitCalc = false;
 		}
 		else 
 		{
-			if (m_pWing->m_bWingOut) m_bWarning = true;
+			if (m_LLT.m_bWingOut) m_bWarning = true;
 			m_bError = true;
 			str= QString(tr("    ...unconverged after %2 iterations")+"\n").arg(iter);
 			UpdateOutput(str);
-			m_pWing->m_bInitCalc = true;
+			m_bInitCalc = true;
 		}
-		CWing::s_AlphaLLT += m_AlphaDelta;
+		qApp->processEvents();
 	}
 
 	return true;
@@ -208,67 +214,11 @@ void LLTAnalysisDlg::InitDialog()
 
 	m_IterGraph.SetMargin(40);
 	if(pMainFrame) m_IterGraph.CopySettings(&pMainFrame->m_RefGraph,false);
+
+	m_LLT.m_IterLim = m_IterLim;
 }
 
 
-
-int LLTAnalysisDlg::Iterate()
-{
-	QString str;
-	CCurve *pCurve = m_IterGraph.GetCurve(0);
-
-	int resp=0;
-	int   iter = 0;
-	bool  bConverged = false;
-
-	while(iter<m_IterLim && !m_bSkip)
-	{
-		if(m_bCancel) break;
-		iter++;
-		resp = m_pWing->LLTIterate();
-		if(resp == 1) 
-		{
-			bConverged = true;
-			m_State=1;
-			pCurve->AddPoint((double)iter, m_pWing->m_Maxa);
-			UpdateView();
-			return iter;
-		}
-		else if (resp==-1) 
-		{
-			bConverged = false;
-			break;// Type 2, lift <0
-		}
-		// else continue iterations
-
-		pCurve->AddPoint((double)iter, m_pWing->m_Maxa);
-		UpdateView();
-		qApp->processEvents();
-	}
-	if(m_bSkip)
-	{
-		if(m_pWPolar->m_Type!=4) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(CWing::s_AlphaLLT, 6,'f',2).arg(iter);
-		else                     str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(CWing::s_QInfLLT,  8,'f',2).arg(iter);
-		UpdateOutput(str);
-	}
-	else if (resp<0)
-	{ 
-		//negative lift
-		m_State=2;
-		UpdateView();
-		m_pWing->m_bInitCalc = true;
-		return -1;
-	}
-	else if(!bConverged && !m_bCancel)
-	{
-		m_State=2;
-		UpdateView();
-
-		m_pWing->m_bInitCalc = true;
-		return m_IterLim;
-	}
-	return iter;
-}
 
 
 void LLTAnalysisDlg::keyPressEvent(QKeyEvent *event)
@@ -394,6 +344,7 @@ void LLTAnalysisDlg::SetupLayout()
 
 void LLTAnalysisDlg::StartAnalysis()
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	//all set to launch the analysis
 	if(!m_pWPolar || !m_pWing) return;
 
@@ -410,10 +361,14 @@ void LLTAnalysisDlg::StartAnalysis()
 
 	m_pctrlTextOutput->clear();
 
+	m_LLT.m_poaPolar = &pMainFrame->m_oaPolar;
+	m_LLT.m_pWing = m_pWing;
+	m_LLT.m_pWPolar = m_pWPolar;
+	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
+
+
 	if (m_pWPolar->m_Type!=4)
 	{
-		CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-		CWing::s_QInfLLT   = m_pWPolar->m_QInf;
 		AlphaLoop() ;
 	}
 	else
@@ -471,18 +426,17 @@ bool LLTAnalysisDlg::ReLoop()
 	QMiarex* pMiarex = (QMiarex*)s_pMiarex;
 	CCurve *pCurve = m_IterGraph.GetCurve(0);
 
-	CWing::s_QInfLLT = m_AlphaMin;
-	//Alpha has been set at CMiarex::SetWPlr
+	//Alpha has been set in CMiarex::SetWPlr
 
 	str = tr("Launching analysis....")+"\n\n";
 	UpdateOutput(str);
 	str = QString(tr("Max iterations     = %1")+"\n").arg(m_IterLim);
 	UpdateOutput(str);
-	str = QString(tr("Alpha precision    = %1 deg")+"\n").arg(CWing::s_CvPrec,0,'f',6);
+	str = QString(tr("Alpha precision    = %1 deg")+"\n").arg(LLTAnalysis::s_CvPrec,0,'f',6);
 	UpdateOutput(str);
-	str = QString(tr("Relaxation factor  = %1")+"\n").arg(CWing::s_RelaxMax,0,'f',1);
+	str = QString(tr("Relaxation factor  = %1")+"\n").arg(LLTAnalysis::s_RelaxMax,0,'f',1);
 	UpdateOutput(str);
-	str = QString(tr("Number of stations = %1")+"\n\n").arg(CWing::s_NLLTStations);
+	str = QString(tr("Number of stations = %1")+"\n\n").arg(LLTAnalysis::s_NLLTStations);
 	UpdateOutput(str);
 	
 	if(m_AlphaMax<m_AlphaMin) m_AlphaDelta = -(double)fabs(m_AlphaDelta);
@@ -493,14 +447,17 @@ bool LLTAnalysisDlg::ReLoop()
 	str = tr("Initializing analysis...")+"\n";
 	UpdateOutput(str);
 
-	if(!m_pWing->LLTInitialize(m_pWPolar->m_Mass)) return false;
+	m_LLT.LLTInitialize(m_AlphaMin);
+	//	CWing::s_QInfLLT = m_AlphaMin;
 
 	m_IterGraph.ResetLimits();
 	m_IterGraph.SetXMax((double)m_IterLim);
 	m_IterGraph.SetYMinGrid(false, true, QColor(100,100,100), 2, 1, 4);
 
+	double QInf;
 	for (i=0; i<=ia; i++)
 	{
+		QInf = m_AlphaMin + (double)i * m_AlphaDelta;
 		if(m_bCancel) 
 		{
 			str = tr("Analysis cancelled on user request....")+"\n";
@@ -510,13 +467,13 @@ bool LLTAnalysisDlg::ReLoop()
 		m_IterGraph.SetYMin(0.0);
 		m_IterGraph.SetYMax(0.5);
 		pCurve->ResetCurve();
-		m_State=0;
-		if(m_pWing->m_bInitCalc)m_pWing->LLTSetLinearSolution();
-		m_pWing->LLTInitCl();//with new angle...
+
+		if(m_bInitCalc) m_LLT.LLTSetLinearSolution(m_pWPolar->m_ASpec);
+		 m_LLT.LLTInitCl(QInf, m_pWPolar->m_ASpec);
 		
-		str = QString(tr("Calculating QInf = %1... ")).arg(CWing::s_QInfLLT,6,'f',2);
+		str = QString(tr("Calculating QInf = %1... ")).arg(QInf,6,'f',2);
 		UpdateOutput(str);
-		iter = Iterate();
+		iter = m_LLT.LLTIterate(QInf, m_pWPolar->m_ASpec);
 
 		if(iter<0)
 		{
@@ -525,42 +482,56 @@ bool LLTAnalysisDlg::ReLoop()
 			m_bWarning = true;
 			str = QString("\n");
 			UpdateOutput(str);
-			m_pWing->m_bInitCalc = true;
+			m_bInitCalc = true;
 		}
 		else if (m_bSkip)
 		{
+			if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(m_pWPolar->m_ASpec, 6,'f',2).arg(iter);
+			else                                 str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(QInf,  8,'f',2).arg(iter);
+			UpdateOutput(str);
 			m_bSkip = false;
-			m_pWing->m_bInitCalc = true;
+			m_bInitCalc = true;
 		}
 		else if (iter<m_IterLim  && !m_bCancel)
 		{
 			//converged, 
 			str = QString(tr("    ...converged after %1 iterations")+"\n").arg(iter);
 			UpdateOutput(str);
-			m_pWing->LLTComputeWing();// generates wing results, 
-			if (m_pWing->m_bWingOut) m_bWarning = true;
-			pMiarex->AddWOpp(m_pWing->m_bWingOut);// Adds WOpp point and adds result to polar
-/*			if(m_pWing->m_bWingOut)
+			m_LLT.LLTComputeWing(QInf, m_pWPolar->m_ASpec,str);// generates wing results,
+			UpdateOutput(str);
+			if (m_LLT.m_bWingOut) m_bWarning = true;
+			pMiarex->AddWOpp(QInf, m_pWPolar->m_ASpec, m_LLT.m_bWingOut);// Adds WOpp point and adds result to polar
+			if(pMiarex->m_iView==WPOLARVIEW)
+			{
+				pMiarex->CreateWPolarCurves();
+				pMiarex->UpdateView();
+			}
+/*			if(m_LLT.m_bWingOut)
 			{
 				str = QString("\n");
 				UpdateOutput(str);
 			}*/
-			m_pWing->m_bInitCalc = false;
+			m_bInitCalc = false;
 		}
 		else
 		{
-			if (m_pWing->m_bWingOut) m_bWarning = true;
+			if (m_LLT.m_bWingOut) m_bWarning = true;
 			m_bError = true;
 			str = QString(tr("    ...unconverged after %1 iterations")+"\n").arg(iter);
 			UpdateOutput(str);
-			m_pWing->m_bInitCalc = true;
+			m_bInitCalc = true;
 		}
-		CWing::s_QInfLLT += m_AlphaDelta;
-
+		qApp->processEvents();
 	}
 	return true;
 }
 
 
+void LLTAnalysisDlg::UpdateGraph(int x, double y)
+{
+	CCurve *pCurve = m_IterGraph.GetCurve(0);
+	pCurve->AddPoint((double)x,y);
+	UpdateView();
+}
 
 

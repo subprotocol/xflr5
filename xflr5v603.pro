@@ -21,6 +21,7 @@ SOURCES += src/MainFrame.cpp \
     src/Miarex/GL3dBodyDlg.cpp \
     src/Miarex/GLLightDlg.cpp \
     src/Miarex/LLTAnalysisDlg.cpp \
+    src/Miarex/LLTAnalysis.cpp \
     src/Miarex/ImportWingDlg.cpp \
     src/Miarex/InertiaDlg.cpp \
     src/Miarex/Miarex.cpp \
@@ -131,6 +132,7 @@ HEADERS += src/MainFrame.h \
     src/Miarex/InertiaDlg.h \
     src/Miarex/StabPolarDlg.h \
     src/Miarex/LLTAnalysisDlg.h \
+    src/Miarex/LLTAnalysis.h \
     src/Miarex/ImportWingDlg.h \
     src/Miarex/GLLightDlg.h \
     src/Miarex/ArcBall.h \

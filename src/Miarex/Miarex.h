@@ -256,15 +256,14 @@ public:
 	CWing * GetWing(QString WingName);
 	CBody *GetBody(QString BodyName);
 	CWOpp* InsertWOpp(CWOpp *pNewPoint);
-	void AddWOpp(bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
+	void AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma = NULL, double *Sigma = NULL, double *Cp = NULL);
 	void AddPOpp(bool bPointOut, double *Cp, double *Gamma = NULL, double *Sigma=NULL, CPOpp *pPOpp = NULL);
 	void SetUFO(QString UFOName="", bool bNoPolar=false);
 	void SetWPlr(bool bCurrent = true, QString WPlrName = "");
 	void DeleteBody(CBody *pThisBody);
 	void SnapClient(QString const &FileName);
-	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
-	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 	void SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int &NCtrls, QString &out, bool bBCOnly=true);
+	void RotateGeomY(double const &Angle, CVector const &P);
 
 	void DuplicatePlane();
 	void LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, bool bInitCalc);
@@ -335,6 +334,8 @@ public:
 	bool SetModBody(CBody *pModBody);
 	bool LoadSettings(QSettings *pSettings);
 	bool SaveSettings(QSettings *pSettings);
+	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
+	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
 
 
 	QString RenameUFO(QString UFOName);
@@ -426,34 +427,34 @@ protected:
 	QList<void *> *m_poaBody;			// a pointer to the Body array
 
 
-	bool m_bDragPoint;
-	bool m_bArcball;			//true if the arcball is to be displayed
-	bool m_bCrossPoint;			//true if the control point on the arcball is to be displayed
-	bool m_bPickCenter;			//true if the user is in the process of picking a new center for OpenGL display
-	bool m_b3DCp, m_bDownwash; 	// defines whether the corresponding data should be displayed
-	bool m_bMoments;							// defines whether the corresponfing data should be displayed
-	bool m_bFoilNames;
-	bool m_bShowMasses;
+	bool m_bArcball;                   //true if the arcball is to be displayed
+	bool m_bCrossPoint;                //true if the control point on the arcball is to be displayed
+	bool m_bPickCenter;                //true if the user is in the process of picking a new center for OpenGL display
+	bool m_b3DCp;                      // true if the Cp Colors are to be displayed on the 3D openGl view
+	bool m_bDownwash;                  // true if the arrows represeting downwash are to be displayed on the 3D openGl view
+	bool m_bMoments;                   // true if the arrows representing moments are to be displayed on the 3D openGl view
+	bool m_bFoilNames;                 // true if the foil names are to be displayed on the openGL 3D view
+	bool m_bShowMasses;                // true if the point masses are to be displayed on the openGL 3D view
 	bool m_bVortices;				// defines whether the corresponfing data should be displayed
-	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels;
-	bool m_bXTop, m_bXBot, m_bXCP; 	// defines whether the corresponfing data should be displayed
-	bool m_bHighlightOpp;
+	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels; // true if the surfaces, outline, axes or panels are to be displayed
+	bool m_bXTop, m_bXBot, m_bXCP;     // defines whether the corresponfing data should be displayed
+	bool m_bHighlightOpp;              // true if the currently selected operating point is to be highlighted on the polar graph
 	bool m_bBreak;
 
-	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be refreshed
-	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be refreshed
-	bool m_bResetglWake;			// true if the wake OpenGL list needs to be refreshed
-	bool m_bResetglOpp, m_bResetglLift, m_bResetglDrag, m_bResetglDownwash;			// true if the OpenGL lists need to be refreshed
-	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be refreshed
+	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be re-generated
+	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be re-generated
+	bool m_bResetglWake;			// true if the wake OpenGL list needs to be re-generated
+	bool m_bResetglOpp, m_bResetglLift, m_bResetglDrag, m_bResetglDownwash;			// true if the OpenGL lists need to be re-generated
+	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be re-generated
 	bool m_bResetglLegend;          //needs to be reset is window has been resized
-	bool m_bResetglBody;
-	bool m_bResetglBodyMesh;
-	bool m_bResetglFlow;			// true if the crossflow OpenGL list needs to be refreshed
-	bool m_bWakePanels;
-	bool m_bShowCpScale;		//true if the Cp Scale in Miarex is to be displayed
-	bool m_bIs2DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
-	bool m_bIs3DScaleSet;		// true if the 3D scale has been set, false if needs to be reset
-	bool m_bShowLight;			// true if the virtual light is to be displayed
+	bool m_bResetglBody;          // true if the openGL list for the body needs to be re-generated
+	bool m_bResetglBodyMesh;      // true if the openGL list for panel mesh needs to be re-generated
+	bool m_bResetglFlow;          // true if the crossflow OpenGL list needs to be refreshed
+	bool m_bWakePanels;           // true if the Cp Scale in Miarex is to be displayed
+	bool m_bShowCpScale;          // true if the Cp Scale in Miarex is to be displayed
+	bool m_bIs2DScaleSet;         // true if the 3D scale has been set, false if needs to be reset
+	bool m_bIs3DScaleSet;         // true if the 3D scale has been set, false if needs to be reset
+	bool m_bShowLight;            // true if the virtual light is to be displayed
 	bool m_bAutoScales;
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 
@@ -519,6 +520,7 @@ protected:
 	double m_WingScale;			// scale for 2D display
 	double m_LastWOpp;			// last WOPP selected, try to set the same if it exists, for the new polar
 
+	//the min/max/delta values for sequential analysis, depending on the polar type
 	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
 	double m_QInfMin, m_QInfMax, m_QInfDelta;
 	double m_ControlMin, m_ControlMax, m_ControlDelta;
@@ -538,10 +540,8 @@ protected:
 	QPoint m_ptOffset;			// client offset position for wing display
 	QPoint m_WPlrLegendOffset;		// client offset position for wing polar legend
 	QPoint m_WingLegendOffset;		// client offset position for WOPP polar legend
-	QPoint m_ptPopUp;
-	CVector m_RealPopUp;
 
-	QRect m_rSingleRect;
+	QRect m_rSingleRect;			// the drawing rectangle for single graph view
 
 	QGraph m_WingGraph[4];			// the WOpp graphs
 	QGraph m_WPlrGraph[4];			// the WPolar graphs
@@ -555,16 +555,14 @@ protected:
 	QGraph* m_pCurRLStabGraph;      // currently active Root Locus Graph
 	QGraph* m_pCurTimeGraph;			// currently active time graph
 
-	CWing *m_pCurWing;			// the currently selected wing
-	CWPolar * m_pCurWPolar;			// the currently selected WPolar
-	CWOpp * m_pCurWOpp;			// the currently selected Wing Operating Point
-	CPlane * m_pCurPlane;			// the currently selected Plane
-	CBody *m_pCurBody;
+	CWing *m_pCurWing;             // the currently selected wing
+	CWPolar * m_pCurWPolar;        // the currently selected WPolar
+	CWOpp * m_pCurWOpp;			 // the currently selected Wing Operating Point
+	CPlane * m_pCurPlane;          // the currently selected Plane
+	CBody *m_pCurBody;             // the currently selected body
 
-	CWing *m_pWingList[4];
-	CWOpp *m_pWOpp[4];
-
-	QColor m_WingColor, m_StabColor, m_FinColor;
+	CWing *m_pWingList[4];         // pointers to the four wings of the currently selected plane
+	CWOpp *m_pWOpp[4];             // pointers to the operating points of the four wings of the currently selected plane
 
 	CVector P,W,V,T;
 	
@@ -613,10 +611,10 @@ public:
 	bool m_bShowCp, m_bShowCpPoints;
 	bool m_bglLight;
 	bool m_bAutoCpScale;		//true if the Cp scale should be set automatically
-	bool m_bLongitudinal;
+	bool m_bLongitudinal;         // true if longitudinal stability results are to be displayed, false if lateral
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 
-	void* m_pMainFrame ;			// a pointer to the frame class
+	void* m_pMainFrame;          // a pointer to the frame class
 	void *m_p2DWidget;
 	void *m_pGLWidget;
 
@@ -625,22 +623,21 @@ public:
 	int m_nNodes;				// the current number of nodes for the currently loaded UFO
 	int m_nWakeNodes;			// Size of the node array if there is a wake
 
-	double m_LegendMin, m_LegendMax;
-	double m_LiftScale, m_DragScale, m_VelocityScale;
-	double m_glScaled;//zoom factor for UFO
+	double m_LegendMin, m_LegendMax;                   //minimum value of hte Cp scale in 3D view
+	double m_LiftScale, m_DragScale, m_VelocityScale;  //maximum value of hte Cp scale in 3D view
+	double m_glScaled; //zoom factor for UFO
 
 	QRect m_r2DCltRect, m_r3DCltRect; // the client and drawing rectangle
 	CPOpp * m_pCurPOpp;			// the currently selected Plane Operating Point
-	LLTAnalysisDlg *m_pLLTDlg;
-	PanelAnalysisDlg *m_pPanelDlg;			// the dialog class which manages the Panel calculations
-	CVector m_MemNode[2*VLMMAXMATSIZE];	// used if the analysis should be performed on the tilted geometry
-	CVector m_WakeNode[2*VLMMAXMATSIZE];	// the reference current wake node array
-	CVector m_RefWakeNode[2*VLMMAXMATSIZE]; 	// the reference wake node array if wake needs to be reset
-	CPanel m_MemPanel[VLMMAXMATSIZE];		// used if the analysis should be performed on the tilted geometry
-	CPanel m_WakePanel[VLMMAXMATSIZE];	// the reference current wake panel array
-	CPanel m_RefWakePanel[VLMMAXMATSIZE]; 	// the reference wake panel array if wake needs to be reset
+	LLTAnalysisDlg *m_pLLTDlg;                  // the dialog class which manages the LLT calculations
+	PanelAnalysisDlg *m_pPanelDlg;              // the dialog class which manages the Panel calculations
+	CVector m_MemNode[2*VLMMAXMATSIZE];         // used if the analysis should be performed on the tilted geometry
+	CVector m_WakeNode[2*VLMMAXMATSIZE];        // the reference current wake node array
+	CVector m_RefWakeNode[2*VLMMAXMATSIZE];     // the reference wake node array if wake needs to be reset
+	CPanel m_MemPanel[VLMMAXMATSIZE];           // used if the analysis should be performed on the tilted geometry
+	CPanel m_WakePanel[VLMMAXMATSIZE];          // the reference current wake panel array
+	CPanel m_RefWakePanel[VLMMAXMATSIZE];       // the reference wake panel array if wake needs to be reset
 
-	void RotateGeomY(double const &Angle, CVector const &P);
 	
 };
 

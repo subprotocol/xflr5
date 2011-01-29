@@ -280,8 +280,6 @@ public://stability analysis method and variables
 
 	bool m_bTrace;
 
-
-
 };
 
 #endif // PANELANALYSISDLG_H

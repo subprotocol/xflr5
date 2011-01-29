@@ -37,6 +37,7 @@ class CWing
 	friend class CSurface;
 	friend class WingDlg;
 	friend class LLTAnalysisDlg;
+	friend class LLTAnalysis;
 	friend class PanelAnalysisDlg;
 	friend class PlaneDlg;
 	friend class ImportWingDlg;
@@ -66,24 +67,16 @@ protected:
 						 CWPolar *pWPolar, CVector CoG);
 
 
-	void PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString);
+	void PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString);
 	void PanelSetBending(bool bThinSurface);
 
 	bool IsWingPanel(int nPanel);
 	bool IsWingNode(int nNode);
 
-	bool LLTInitialize(double mass);
-	bool LLTSetLinearSolution();
-	void LLTSetBending();
-	void LLTInitCl();
-	void LLTComputeWing();
-	int  LLTIterate();
-	double Sigma(int m);
-	double Eta(int m);
-	double AlphaInduced(int k);
 	void GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t);
 	void Duplicate(CWing *pWing);
 	void ComputeChords(int NStation=0);
+	void ComputeChords(int NStation, double *Chord, double *Offset, double *Twist);
 	void ComputeDihedrals();
 	void ComputeGeometry();
 	void ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz);
@@ -110,17 +103,17 @@ protected:
 
 	static void* s_pMainFrame;		//pointer to the Frame window
 	static void* s_pMiarex;	//pointer to the Miarex Application window
-	static void* s_pLLTDlg;	//pointer to the VLM analysis dialog class
+//	static void* s_pLLTDlg;	//pointer to the VLM analysis dialog class
 	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
 	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
-	static int s_NLLTStations;
-	static double s_CvPrec;	// Precision required for LLT convergence
-	static double s_RelaxMax;	// relaxation factor for LLT convergence
+//	static int s_NLLTStations;
+//	static double s_CvPrec;	// Precision required for LLT convergence
+//	static double s_RelaxMax;	// relaxation factor for LLT convergence
 
-	static double s_Density, s_Viscosity; //fluid properties
-	static double s_QInfLLT;		// Freestream speed
-	static double s_AlphaLLT;		// angle of attack
+//	static double s_Density, s_Viscosity; //fluid properties
+//	static double s_QInfLLT;		// Freestream speed
+//	static double s_AlphaLLT;		// angle of attack
 
 	static bool s_bCancel;
 
@@ -129,7 +122,6 @@ protected:
 	static bool s_bTrace;		// true if the messages need to be traces
 	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
 
-	bool m_bInitCalc;	//
 //	bool m_bVLMAutoMesh; 	// true if the mesh should be set automatically
 	bool m_bWingOut;	// true if the wing OpPoint is outside the flight envelope of the available Type1 polars
 	bool m_bConverged;	// true if LLT || VLM calculation has converged
@@ -175,17 +167,17 @@ protected:
 	// Span Coefficients  resulting from VLM or LLT calculation
 	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
 	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
-	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
+	double m_ICd[MAXSTATIONS+1];		//Induced Drag coefficient at stations
+	double m_PCd[MAXSTATIONS+1];		//Viscous Drag coefficient at stations
+	double m_Re[MAXSTATIONS+1];		//Reynolds number at stations
+	double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
+	double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
 	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
 	double m_CmAirf[MAXSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
 	double m_XCPSpanRel[MAXSTATIONS+1];	//Center of Pressure pos at stations
 	double m_XCPSpanAbs[MAXSTATIONS+1];	//Center of Pressure pos at stations
-	double m_Re[MAXSTATIONS+1];		//Reynolds number at stations
 	double m_Chord[MAXSTATIONS+1];		//chord at stations
 	double m_Offset[MAXSTATIONS+1];		//offset at LLT stations
-	double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
-	double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
 	double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
 	double m_StripArea[MAXSTATIONS+1];
 	double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations

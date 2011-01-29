@@ -751,8 +751,8 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 		if(m_pWingList[i]) ThinSize += (double)m_pWingList[i]->m_MatSize;
 	}
 
-	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-	CWing::s_Density   = m_pWPolar->m_Density;
+//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+//	CWing::s_Density   = m_pWPolar->m_Density;
 
 	for (q=0; q<nval;q++)
 	{
@@ -972,8 +972,8 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 	else                         m_OpAlpha = Alpha;
 
 	CWing::s_bTrace	   = true;
-	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-	CWing::s_Density   = m_pWPolar->m_Density;
+//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+//	CWing::s_Density   = m_pWPolar->m_Density;
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 		if(m_pWingList[iw])m_pWingList[iw]->m_bWingOut = false;
@@ -1006,7 +1006,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
 
 				//Get viscous interpolations
-				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, WingVDrag, m_pWPolar->m_bViscous, OutString);
+				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, m_pWPolar, WingVDrag, m_pWPolar->m_bViscous, OutString);
 				VDrag += WingVDrag;
 
 				AddString(OutString);
@@ -1068,7 +1068,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		if(m_pWPolar->m_Type==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
 		if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp+qrhs*m_MatSize, Mu, Sigma);
-		else         pMiarex->AddWOpp(m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
+		else         pMiarex->AddWOpp(QInf, Alpha, m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
 
 		AddString("\n");
 	}
@@ -3630,8 +3630,8 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 
 	AddString("      Calculating speed to balance the weight...");
 
-	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-	CWing::s_Density   = m_pWPolar->m_Density;
+//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
+//	CWing::s_Density   = m_pWPolar->m_Density;
 
 	WindNormal.Set(-sin(m_AlphaEq*PI/180.0), 0.0, cos(m_AlphaEq*PI/180.0));
 	VInf.Set(       cos(m_AlphaEq*PI/180.0), 0.0, sin(m_AlphaEq*PI/180.0));
@@ -4463,5 +4463,7 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 		V.z += Psi.z * Omega/4.0/PI;
 	}
 }
+
+
 
 

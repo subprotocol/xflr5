@@ -28,6 +28,7 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QPoint>
+#include "LLTAnalysis.h"
 #include "../Graph/QGraph.h"
 #include "../Graph/GraphWidget.h"
 #include "../Objects/WPolar.h"
@@ -45,6 +46,7 @@ public:
 	LLTAnalysisDlg();
 
 	void InitDialog();
+	void UpdateGraph(int x, double y);
 
 private slots:
 	void OnCancelAnalysis();
@@ -65,7 +67,6 @@ private:
 
 	bool AlphaLoop();
 	bool ReLoop();
-	int Iterate();
 
 	QPushButton *m_pctrlCancel, *m_pctrlSkip;
 	GraphWidget * m_pGraphWidget;
@@ -75,8 +76,8 @@ private:
 	bool m_bSequence;
 	bool m_bSkip, m_bExit, m_bCancel, m_bWarning, m_bError;
 	bool m_bFinished;
+	bool m_bInitCalc;
 
-	int m_State;
 	int m_Iterations, m_IterLim;
 
 	double m_AlphaMin, m_AlphaMax, m_AlphaDelta;
@@ -93,6 +94,8 @@ private:
 
 	CWing   *m_pWing;
 	CWPolar *m_pWPolar;
+
+	LLTAnalysis m_LLT;
 
 };
 

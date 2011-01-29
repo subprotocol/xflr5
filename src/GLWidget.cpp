@@ -38,6 +38,7 @@
 void *GLWidget::s_pMiarex;
 void *GLWidget::s_pMainFrame;
 
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {

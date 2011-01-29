@@ -41,18 +41,18 @@ CPanel  *CWing::m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 void* CWing::s_pMainFrame;		//pointer to the Frame window
 void* CWing::s_pMiarex;	//pointer to the Miarex Application window
-void* CWing::s_pLLTDlg;	//pointer to the LLT analysis dialog class
+//void* CWing::s_pLLTDlg;	//pointer to the LLT analysis dialog class
 void* CWing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 bool CWing::s_bCancel;
 bool CWing::s_bVLMSymetric;
 bool CWing::s_bTrace;
-int CWing::s_NLLTStations;//pointer to the 3DPanel analysis dialog class
-double CWing::s_CvPrec;	// Precision required for LLT convergence
-double CWing::s_RelaxMax;	// relaxation factor for LLT convergence
-double CWing::s_Density;
-double CWing::s_Viscosity; //fluid properties
-double CWing::s_QInfLLT;		// Freestream speed
-double CWing::s_AlphaLLT;		// angle of attack
+//int CWing::s_NLLTStations;//pointer to the 3DPanel analysis dialog class
+//double CWing::s_CvPrec;	// Precision required for LLT convergence
+//double CWing::s_RelaxMax;	// relaxation factor for LLT convergence
+//double CWing::s_Density;
+//double CWing::s_Viscosity; //fluid properties
+//double CWing::s_QInfLLT;		// Freestream speed
+//double CWing::s_AlphaLLT;		// angle of attack
 
 
 CWing::CWing()
@@ -111,7 +111,6 @@ CWing::CWing()
 	m_bDoubleSymFin = false;
 	m_bTrans        = false;
 	m_bLLT          = false;
-	m_bInitCalc     = false;
 	m_bSymetric     = true;
 	m_bWingOut      = false;
 	m_bConverged    = true;
@@ -123,8 +122,6 @@ CWing::CWing()
 	m_WingColor =  QColor(203,222,222);
 
 	m_QInf0    = 0.0;
-	s_QInfLLT     = 0.0;
-	m_Maxa     = 0.0;
 
 	m_pXFile     = NULL;
 	m_pPanel     = NULL;
@@ -146,8 +143,6 @@ CWing::CWing()
 	m_YCP               = 0.0;
 
 	m_Type = 1;
-	s_Viscosity = 0.0;
-	s_Density   = 0.0;
 
 	m_AVLIndex = -(int)(qrand()/10000);//improbable value...
 
@@ -155,7 +150,6 @@ CWing::CWing()
 
 	m_NSurfaces = 0;
 
-	s_AlphaLLT   = 0.0;
 
 	m_AR         = 0.0;// Aspect ratio
 	m_TR         = 0.0;// Taper ratio
@@ -198,43 +192,6 @@ CWing::CWing()
 	}
 }
 
-
-
-double CWing::AlphaInduced(int k)
-{
-	// Calculates the induced angle from the lift coefficient and
-	// from the Beta factor in LLT
-
-	double ai = 0.0;
-
-	for (int m=1; m<m_NStation; m++)
-	{
-		ai += Beta(m,k) * m_Cl[m] * m_Chord[m]/m_PlanformSpan;
-	}
-	return ai;
-}
-
-
-
-double CWing::Beta(int m, int k)
-{
-	//Auxiliary calculation of the Beta factor in LLT
-	double b;
-	double fk = (double)k;
-	double fm = (double)m;
-	double fr = (double)m_NStation;
-
-	if (m==k) b = 180.0*fr/8.0/PI/sin(fk*PI/fr);
-	else if (IsEven(m+k)) b=0.0;
-	else
-	{
-		double c1 = 180.0/4.0/PI/fr/sin(fk*PI/fr);
-		double c2 =   1.0/(1.0-cos((fk+fm)*PI/fr))
-					- 1.0/(1.0-cos((fk-fm)*PI/fr));
-		b = c1 * c2;
-	}
-	return b;
-}
 
 
 void CWing::ComputeDihedrals()
@@ -800,7 +757,8 @@ void CWing::ComputeChords(int NStation)
 	double SpanPosition[MAXSTATIONS];
 	CVector C;
 
-	if(NStation !=0){//LLT based
+	if(NStation !=0)
+	{//LLT based
 		m_NStation = NStation;
 
 		for (k=0; k<=NStation; k++)
@@ -860,6 +818,87 @@ void CWing::ComputeChords(int NStation)
 				m_Offset[m] = C.x-x0;
 
 				m_Twist[m]  = m_Surface[j].GetTwist(k);
+				m++;
+			}
+		}
+		m_NStation = m;
+	}
+}
+
+
+
+void CWing::ComputeChords(int NStation, double *Chord, double *Offset, double *Twist)
+{
+	//
+	// Calculates the chord lengths at each position of the NStation in LLT calculations
+	//
+	int j,k,l,m;
+	double y, yob, tau;
+	double x0,y0,y1,y2;
+	double SpanPosition[MAXSTATIONS];
+	CVector C;
+
+	if(NStation !=0)
+	{//LLT based
+		m_NStation = NStation;
+
+		for (k=0; k<=NStation; k++)
+		{
+			yob   = cos(k*PI/NStation);
+			y = fabs(yob * m_PlanformSpan/2);
+			for (l=0; l<=m_NPanel; l++)
+			{
+				if(m_TPos[l] < y && y <=m_TPos[l+1])
+				{
+					tau = (y-m_TPos[l])/(m_TPos[l+1]-m_TPos[l]);
+					Chord[k]  = m_TChord[l]+(m_TChord[l+1]-m_TChord[l]) * tau;
+					Offset[k] = m_TOffset[l]+(m_TOffset[l+1]-m_TOffset[l]) * tau;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		//VLM Mesh based
+		m_NStation    = 0;
+		m = 0;
+
+		x0 = m_Surface[m_NSurfaces/2].m_LA.x;
+		y0 = m_Surface[m_NSurfaces/2].m_LA.y;
+
+		for (j=m_NSurfaces/2; j<m_NSurfaces; j++)
+		{
+			for (k=0; k<m_Surface[j].m_NYPanels; k++)
+			{
+				//calculate span positions at each station
+				m_Surface[j].GetyDist(k, y1, y2);
+				SpanPosition[m] = y0 + (y1+y2)/2.0*m_Surface[j].m_Length;
+				m++;
+			}
+			y0+=m_Surface[j].m_Length;
+		}
+
+		m_NStation = 2*m;
+		for (m=0; m<m_NStation/2; m++)
+		{
+			m_SpanPos[m] = -SpanPosition[m_NStation/2-m-1];
+			m_SpanPos[m+m_NStation/2] = SpanPosition[m];
+		}
+
+		m=0;
+		for (j=0; j<m_NSurfaces; j++)
+		{
+			for (k=0; k<m_Surface[j].m_NYPanels; k++)
+			{
+				//calculate chords and offsets at each station
+				Chord[m]     = m_Surface[j].GetChord(k);
+//				m_StripArea[m] = m_Chord[m]* m_Surface[j].Getdl(k);
+
+				m_Surface[j].GetLeadingPt(k, C);
+				Offset[m] = C.x-x0;
+
+				Twist[m]  = m_Surface[j].GetTwist(k);
 				m++;
 			}
 		}
@@ -1097,13 +1136,6 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 }
 
 
-
-double CWing::Eta(int m)
-{
-	//Auxiliary calculation of the Eta factor in LLT
-
-	return PI/2.0/(double)m_NStation * sin((double)m*PI/(double)m_NStation) ;
-}
 
 
 double CWing::GetAverageSweep()
@@ -1372,398 +1404,6 @@ double CWing::GetZPos(double y)
 
 
 
-void CWing::LLTInitCl()
-{
-	//Initializes the Reynolds number and lift coefficient for the initial iteration in LLT
-
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	CFoil *pFoil0 = NULL;
-	CFoil *pFoil1 = NULL;
-	double yob, tau;
-	int k;
-	bool bOutRe, bError;
-	for (k=1; k<s_NLLTStations; k++)
-	{
-		yob   = cos(k*PI/s_NLLTStations);
-		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
-		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_AlphaLLT + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
-	}
-	if(m_Type == 2)
-	{
-		double Lift=0.0;// required for Type 2
-		for (k=1; k<s_NLLTStations; k++)
-		{
-			Lift += Eta(k) * m_Cl[k] * m_Chord[k] /m_PlanformSpan;
-		}
-		if(Lift<=0.0) return;
-		s_QInfLLT  = m_QInf0 / sqrt(Lift);
-		for (k=1; k<s_NLLTStations; k++)
-		{
-			m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
-		}
-	}
-}
-
-
-
-int CWing::LLTIterate()
-{
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	int k ;
-	CFoil* pFoil0  = NULL;
-	CFoil* pFoil1  = NULL;
-	double a, yob, tau, anext;
-	bool bOutRe, bError;
-
-	m_Maxa = 0.0;
-
-	for (k=1; k<s_NLLTStations; k++)
-	{
-		a        = m_Ai[k];
-		anext    = -AlphaInduced(k);
-		m_Ai[k]  = a +(anext-a)/s_RelaxMax;
-		m_Maxa   = qMax(m_Maxa, fabs(a-anext));
-	}
-
-	double Lift=0.0;// required for Type 2
-	for (k=1; k<s_NLLTStations; k++)
-	{
-		yob     = cos(k*PI/s_NLLTStations);
-		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k],
-								 s_AlphaLLT + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
-		if (m_Type == 2)
-		{
-			Lift += Eta(k) * m_Cl[k] * m_Chord[k];
-		}
-	}
-
-	if(m_Type == 2)
-	{
-		Lift *= m_AR /m_PlanformSpan;
-		if(Lift<=0.0)
-		{
-			return -1;
-		}
-		s_QInfLLT  = m_QInf0 / sqrt(Lift);
-
-		for (k=1; k<s_NLLTStations; k++)
-		{
-			m_Re[k] = m_Chord[k] * s_QInfLLT /s_Viscosity;
-			yob     = cos(k*PI/s_NLLTStations);
-			GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-			m_Cl[k] = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[k], s_AlphaLLT + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
-		}
-	}
-
-	if (m_Maxa<s_CvPrec)
-	{
-		m_bConverged = true;
-		return 1;
-	}
-
-	return 0;
-}
-
-
-
-void CWing::LLTComputeWing()
-{
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	LLTAnalysisDlg *pLLTDlg = (LLTAnalysisDlg*)s_pLLTDlg;
-	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
-	if(!pWPolar) return;
-
-	CFoil* pFoil0 = NULL;
-	CFoil* pFoil1 = NULL;
-	QString strong, string;
-	int m;
-
-	double yob, tau, c4, arad, zpos;
-	double Integral0           = 0.0;
-	double Integral1           = 0.0;
-	double Integral2           = 0.0;
-	double InducedDrag         = 0.0;
-	double ViscousDrag         = 0.0;
-	double InducedYawingMoment = 0.0;
-	double ViscousYawingMoment = 0.0;
-	double PitchingMoment      = 0.0;
-	double VCm                 = 0.0;
-	double ICm                 = 0.0;
-	double eta, sigma;
-	double Cm0;
-	double ViscCm[MAXSTATIONS+1], InducedCm[MAXSTATIONS+1];
-
-	bool bOutRe, bError;
-	bool bPointOutRe, bPointOutAlpha;
-	m_bWingOut = false;
-
-	for (m=1; m<s_NLLTStations; m++)
-	{
-		bPointOutRe    = false;
-		bPointOutAlpha = false;
-		yob   = cos((double)m*PI/(double)s_NLLTStations);
-		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-
-		m_Cl[m]     = GetCl(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],
-							s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
-		if(bOutRe) bPointOutRe = true;
-		if(bError)
-			bPointOutAlpha = true;
-
-		m_PCd[m]    = GetCd(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, m_AR, bOutRe, bError);
-		if(bOutRe) bPointOutRe = true;
-		if(bError) bPointOutAlpha = true;
-
-		m_ICd[m]    = -m_Cl[m] * (m_Ai[m]* PI/180.0);
-
-		m_XTrTop[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m] + m_Twist[m], tau, true, bOutRe, bError);
-		if(bOutRe) bPointOutRe = true;
-		if(bError) bPointOutAlpha = true;
-
-		m_XTrBot[m] = GetXTr(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, false, bOutRe, bError);
-		if(bOutRe) bPointOutRe = true;
-		if(bError) bPointOutAlpha = true;
-
-		m_CmAirf[m] = GetCm(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
-		if(bOutRe) bPointOutRe = true;
-		if(bError) bPointOutAlpha = true;
-
-		m_XCPSpanRel[m] = GetXCp(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m], s_AlphaLLT+m_Ai[m]+m_Twist[m], tau, bOutRe, bError);
-
-		if(fabs(m_XCPSpanRel[m])<0.000001)
-		{
-			//plr mesh was generated prior to v3.15, i.e., without XCp calculations
-			Cm0 = GetCm0(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[m],tau, bOutRe, bError);
-			if(m_Cl[m]!=0.0) m_XCPSpanRel[m] = 0.25 - Cm0/m_Cl[m];
-			else             m_XCPSpanRel[m] = 0.25;
-//			bError = false;
-		}
-		if(bOutRe) bPointOutRe = true;
-		if(bError) bPointOutAlpha = true;
-
-		arad = (s_AlphaLLT+m_Ai[m]+m_Twist[m])*PI/180.0;
-//		arad = (s_Alpha-m_Ai[m])*PI/180.0;
-		c4   = GetC4(yob, pWPolar->m_CoG.x)/m_Chord[m];
-		zpos = GetZPos(yob*m_PlanformSpan/2.0)/m_Chord[m];
-
-		m_Cm[m]      = m_CmAirf[m]- c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
-		ViscCm[m]    = (-c4 *sin(arad) + zpos*cos(arad))* m_PCd[m];
-		InducedCm[m] = m_CmAirf[m]- c4  * m_Cl[m]*cos(arad) - zpos* m_Cl[m]*sin(arad);
-
-		eta = Eta(m);
-		sigma = Sigma(m);
-		Integral0           += eta   * m_Cl[m]  * m_Chord[m];
-		Integral1           += sigma * m_Cl[m]  * m_Chord[m];
-		Integral2           += eta   * m_Cl[m]  * m_Chord[m] * (m_Offset[m]+m_XCPSpanRel[m]*m_Chord[m]);
-		InducedDrag         += eta   * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
-		ViscousDrag         += eta   * m_PCd[m] * m_Chord[m];
-		InducedYawingMoment += sigma * m_Cl[m]  * m_Chord[m] * (-m_Ai[m]);
-		ViscousYawingMoment += sigma * m_PCd[m] * m_Chord[m];
-		PitchingMoment      += eta   * m_Cm[m]      * m_Chord[m] * m_Chord[m];
-		VCm                 += eta   * ViscCm[m]    * m_Chord[m] * m_Chord[m];
-		ICm                 += eta   * InducedCm[m] * m_Chord[m] * m_Chord[m];
-
-		if(bPointOutAlpha)
-		{
-			GetLengthUnit(string, pMainFrame->m_LengthUnit);
-			strong = QString(QObject::tr("       Span pos = %1 ")).arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
-			strong += string;
-			strong += ",  Re = ";
-			ReynoldsFormat(string, m_Re[m]);
-			strong += string;
-
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 could not be interpolated")+"\n").arg(s_AlphaLLT+m_Ai[m] + m_Twist[m],6,'f',1);
-			strong+=string;
-
-			pLLTDlg->UpdateOutput(strong);
-			m_bWingOut = true;
-			m_bConverged = false;
-		}
-		else if(bPointOutRe)
-		{
-			GetLengthUnit(string, pMainFrame->m_LengthUnit);
-			strong = QString(QObject::tr("       Span pos = %1 ")).arg(cos(m*PI/s_NLLTStations)*m_PlanformSpan/2.0*pMainFrame->m_mtoUnit,9,'f',2);
-			strong += string;
-			strong += ",  Re = ";
-			ReynoldsFormat(string, m_Re[m]);
-			strong += string;
-
-			string = QString(QObject::tr(" ,  A+Ai+Twist = %1 is outside the flight envelope")+"\n").arg(s_AlphaLLT+m_Ai[m] + m_Twist[m],6,'f',1);
-			strong+=string;
-
-			pLLTDlg->UpdateOutput(strong);
-			m_bWingOut = true;
-		}
-	}
-
-	m_CL            =  Integral0   * m_AR /m_PlanformSpan;
-	m_InducedDrag   =  InducedDrag * m_AR /m_PlanformSpan  * PI / 180.0;
-	m_ViscousDrag   =  ViscousDrag / m_GChord;
-
-	m_VYm = ViscousYawingMoment /m_GChord;
-	m_IYm = InducedYawingMoment /m_PlanformSpan * PI * m_AR /180.0;
-	m_GYm = m_VYm + m_IYm;
-//	m_GCm = PitchingMoment / m_GChord / m_MAChord;
-	m_VCm = VCm / m_GChord / m_MAChord;
-	m_ICm = ICm / m_GChord / m_MAChord;
-	m_GCm = m_VCm + m_ICm;
-
-	m_GRm = -Integral1   * m_AR /m_PlanformSpan;
-
-	if(m_CL !=0.0)	m_XCP = Integral2 * m_AR /m_PlanformSpan/m_CL;
-	else            m_XCP = 0.0;
-	if(m_bSymetric) m_YCP = 0.0;
-	else            m_YCP = m_AR/m_CL * Integral1;
-
-	LLTSetBending();
-}
-
-
-void CWing::LLTSetBending()
-{
-	//bending moment
-
-	int j,jj;
-	double yj, yjm, yjp;
-	double dy;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	CWPolar* pWPolar = pMiarex->m_pCurWPolar;
-
-	for (j=0; j<=s_NLLTStations; j++)		m_SpanPos[j] = m_PlanformSpan/2.0 * cos(j*PI/s_NLLTStations);
-
-	for (j=1; j<s_NLLTStations; j++)
-	{
-		yjp = m_SpanPos[j-1];
-		yjm = m_SpanPos[j+1];
-		yj  = m_SpanPos[j];
-
-		dy = (yjp-yj)/2.0 + (yj-yjm)/2.0;
-
-		m_StripArea[j] = m_Chord[j]*dy;//m2
-	}
-
-	//dynamic pressure, kg/m3
-	double q = 0.5*pWPolar->m_Density * s_QInfLLT * s_QInfLLT;
-
-	double bm;
-	double y, yy;
-
-	for (j=1; j<s_NLLTStations; j++)
-	{
-		y = m_SpanPos[j];
-		bm = 0.0;
-		if (y>=0)
-		{
-			for (jj=0; jj<j; jj++)
-			{
-				yy =  m_SpanPos[jj];
-				bm += (yy-y) * m_Cl[jj] * m_StripArea[jj];
-			}
-		}
-		else
-		{
-			for (jj=j+1; jj<s_NLLTStations; jj++)
-			{
-				yy =  m_SpanPos[jj];
-				bm += (y-yy) * m_Cl[jj] * m_StripArea[jj];
-			}
-		}
-		m_BendingMoment[j] = bm*q;
-	}
-}
-
-bool CWing::LLTSetLinearSolution()
-{
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	double aij[MAXSTATIONS*MAXSTATIONS];// coefficient matrix
-	double rhs[MAXSTATIONS+1];//right hand side
-
-	memset(aij, 0, sizeof(aij));
-	memset(rhs, 0, sizeof(rhs));
-
-	CFoil *pFoil0, *pFoil1;
-	int i,j,p;
-	double fr  = s_NLLTStations;
-	double fj, t0, st0, snt0, c, a0, slope, tau, yob;
-	double cs = m_TChord[0];
-
-	for (i=1; i<s_NLLTStations; i++)
-	{
-		c   = m_Chord[i];
-		t0  = i * PI/fr;
-		st0 = sin(t0);
-		for (j=1; j<s_NLLTStations; j++)
-		{
-			fj = double(j);
-			snt0 = sin(fj*t0);
-			p = (i-1)*(s_NLLTStations-1)+j-1;
-			aij[p]  = snt0 + c*PI/m_PlanformSpan/2.0* fj*snt0/st0;
-		}
-		yob   = cos(i*PI/s_NLLTStations);
-		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);
-		rhs[i] = c/cs * (s_AlphaLLT-a0+m_Twist[i])/180.0*PI;
-	}
-	
-	bool bCancel = false;
-	if(!Gauss(aij,s_NLLTStations-1, rhs+1,0,&bCancel)) return false;
-
-
-	for (i=1; i<s_NLLTStations; i++)
-	{
-		t0  = i * PI/fr;
-		m_Cl[i] = 0.0;
-		for (j=1; j<s_NLLTStations; j++)
-		{
-			fj = double(j);
-			snt0 = sin(fj*t0);
-			m_Cl[i] += rhs[j]* snt0;
-		}
-		yob   = cos(i*PI/s_NLLTStations);
-		GetFoils(&pFoil0, &pFoil1, yob*m_PlanformSpan/2.0, tau);
-		GetLinearizedPolar(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau, a0, slope);
-		a0 = GetZeroLiftAngle(pMiarex->m_poaPolar, pFoil0, pFoil1, m_Re[i], tau);//better approximation ?
-		m_Cl[i] *= slope*180.0/PI*cs/m_Chord[i];
-		m_Ai[i]  = -(s_AlphaLLT-a0+m_Twist[i]) + m_Cl[i]/slope;
-	}
-	return true;
-}
-
-
-bool CWing::LLTInitialize(double mass)
-{
-	//
-	// Initializes the LLT calculation
-	//
-	double y;
-	int k;
-
-	if(m_Type == 2)	m_QInf0 = sqrt(2.*mass* 9.81 /s_Density/m_PlanformArea);
-	else            m_QInf0 = 0.0;
-
-	m_bConverged = true;
-	m_bWingOut = false;
-
-	ComputeChords(s_NLLTStations);
-	for (k=0; k<=s_NLLTStations; k++)
-	{
-		y   = cos(k*PI/s_NLLTStations)* m_PlanformSpan/2.0;
-		m_Twist[k] = GetTwist(y);
-	}
-
-	for (k=0; k<=s_NLLTStations; k++)
-	{
-		m_Re[k] = m_Chord[k] * s_QInfLLT/s_Viscosity;
-	}
-
-	return true;
-}
-
 
 void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
 					CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
@@ -1798,7 +1438,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 	VInf = WindDirection * QInf;
 
 	//dynamic pressure, kg/m3
-	double q = 0.5 * s_Density * QInf * QInf;
+	double q = 0.5 * pWPolar->m_Density * QInf * QInf;
 
 	m_CL      = 0.0;
 	WingIDrag = 0.0;
@@ -1864,7 +1504,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 				Wg += VInf;
 
 				StripForce  = m_pPanel[p].Vortex * Wg;
-				StripForce *= GammaStrip[m] * s_Density / q;  // N/q
+				StripForce *= GammaStrip[m] * pWPolar->m_Density / q;  // N/q
 
 				//____________________________
 				// Project on wind axes
@@ -2503,12 +2143,6 @@ void CWing::SetTwist(double Twist)
 
 
 
-double CWing::Sigma(int m)
-{
-	//Auxiliary calculation of the sigma factor in LLT
-	return PI/8.0/(double)m_NStation * sin(2.*(double)m*PI/(double)m_NStation) ;
-}
-
 
 
 int CWing::VLMGetPanelTotal()
@@ -2578,7 +2212,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 	WindDirection.Set( cosa, 0.0, sina);
 
 	// Calculate the Reynolds number on each strip
-	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
+	for (m=0; m< m_NStation; m++) m_Re[m] = m_Chord[m] * QInf /pWPolar->m_Viscosity;
 
 	m = p = nFlap = 0;
 
@@ -2661,7 +2295,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 						//then p is on the flap, so add its contribution
 						HingeLeverArm = ForcePt - m_Surface[j].m_HingePoint;
 						HingeMoment = HingeLeverArm * PanelForce;//N.m/q
-						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* s_Density * QInf * QInf/2.0;  //N.m
+						m_FlapMoment[nFlap] += HingeMoment.dot(m_Surface[j].m_HingeVector)* pWPolar->m_Density * QInf * QInf/2.0;  //N.m
 					}
 				}
 				p++;
@@ -2710,7 +2344,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 }
 
 
-void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bool bViscous, QString &OutString)
+void CWing::PanelComputeViscous(double QInf, double Alpha, CWPolar *pWPolar, double &WingVDrag, bool bViscous, QString &OutString)
 {
 	// In input, takes the speed QInf and the distribution of lift coefficients m_Cl[] along the span
 	// In output, returns for each span station
@@ -2736,7 +2370,7 @@ void CWing::PanelComputeViscous(double QInf, double Alpha, double &WingVDrag, bo
 	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
 
 	// Calculate the Reynolds number on each strip
-	for (m=0; m<m_NStation; m++)  m_Re[m] = m_Chord[m] * QInf /s_Viscosity;
+	for (m=0; m<m_NStation; m++)  m_Re[m] = m_Chord[m] * QInf /pWPolar->m_Viscosity;
 
 	if(!bViscous)
 	{

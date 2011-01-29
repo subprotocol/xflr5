@@ -877,7 +877,7 @@ void WPolarDlg::SetWPolarName()
 	else if(m_AnalysisMethod==VLMMETHOD)
 	{
 		if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
-		else		         m_WPolarName += "-VLM2";
+		else		           m_WPolarName += "-VLM2";
 	}
 	else if(m_AnalysisMethod==PANELMETHOD)
 	{
@@ -886,7 +886,7 @@ void WPolarDlg::SetWPolarName()
 		if(m_bThinSurfaces)
 		{
 			if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
-			else		         m_WPolarName += "-VLM2";
+			else		           m_WPolarName += "-VLM2";
 		}
 	}
 
@@ -898,7 +898,7 @@ void WPolarDlg::SetWPolarName()
 	if(!m_bPlaneInertia)
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		strong = QString("-%1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
+		strong = QString("-%1").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
 		if(m_PolarType==FIXEDLIFTPOLAR)   m_WPolarName += strong+str;
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
 		strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
