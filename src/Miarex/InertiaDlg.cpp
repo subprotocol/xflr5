@@ -45,7 +45,7 @@ InertiaDlg::InertiaDlg()
 
 	m_PtRef.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
-	m_NMass = 3;
+	m_NMass = 0;
 
 	m_VolumeMass = 0.0;
 
@@ -54,7 +54,7 @@ InertiaDlg::InertiaDlg()
 
 	for(int i=0; i< MAXMASSES; i++)
 	{
-		m_MassTag[i] = QString(tr("Description %1")).arg(i);
+		m_MassTag[i].clear();
 	}
 
 	m_bChanged = false;
@@ -65,7 +65,11 @@ InertiaDlg::InertiaDlg()
 
 void InertiaDlg::ComputeInertia()
 {
+	//
+	// Computes the inertia in the frame of reference with origin at the CoG
+	//
 	//assumes that the data has been read
+
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, iw;
 	double TotalMass, TotalIxx, TotalIyy, TotalIzz, TotalIxz;
@@ -92,8 +96,8 @@ void InertiaDlg::ComputeInertia()
 	m_VolumeCoG.Set(0.0, 0.0, 0.0);
 	m_PtRef.Set(0.0, 0.0, 0.0);
 
-	//First evaluate the object's inertia
-
+	// First evaluate the object's volume inertia, i.e. wihtout point masses,
+	// in the frame of reference with origin at the object's self CoG
 	if(m_pWing)
 	{
 		m_pWing->m_VolumeMass = m_VolumeMass;
@@ -109,9 +113,8 @@ void InertiaDlg::ComputeInertia()
 		m_pPlane->ComputeVolumeInertia(m_VolumeMass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
 
-	//and display the results
-
-	//Volume masses
+	// and display the results
+	// Volume masses, in object's CoG frame of reference
 	m_pctrlXCoG->SetValue(m_VolumeCoG.x*pMainFrame->m_mtoUnit);
 	m_pctrlYCoG->SetValue(m_VolumeCoG.y*pMainFrame->m_mtoUnit);
 	m_pctrlZCoG->SetValue(m_VolumeCoG.z*pMainFrame->m_mtoUnit);
@@ -121,14 +124,11 @@ void InertiaDlg::ComputeInertia()
 	m_pctrlCoGIzz->SetValue(m_CoGIzz*Unit);
 	m_pctrlCoGIxz->SetValue(m_CoGIxz*Unit);
 	
-
-	//_______________________________________________
-	//Total masses = volume + point masses of all elements part of the object
+	// take into account all point masses to calculate the total CoG and total mass
 	TotalCoG.Set(m_VolumeMass*m_VolumeCoG.x, m_VolumeMass*m_VolumeCoG.y, m_VolumeMass*m_VolumeCoG.z);
 	TotalMass = m_VolumeMass;
 	TotalIxx = TotalIyy = TotalIzz = TotalIxz = 0.0;
 
-//
 	for(i=0; i<m_NMass; i++)
 	{
 		TotalMass += m_MassValue[i];
@@ -161,6 +161,7 @@ void InertiaDlg::ComputeInertia()
 	else                    TotalCoG.Set(0.0,0.0,0.0);
 
 	//Total inertia in CoG referential
+	//Apply Huyghens theorem to convert the object"s inertia to the new frame
 	TotalIxx = m_CoGIxx + m_VolumeMass * ( (m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y)
 								   +(m_VolumeCoG.z-TotalCoG.z)*(m_VolumeCoG.z-TotalCoG.z));
 	TotalIyy = m_CoGIyy + m_VolumeMass * ( (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.x-TotalCoG.x)
@@ -169,6 +170,8 @@ void InertiaDlg::ComputeInertia()
 								   +(m_VolumeCoG.y-TotalCoG.y)*(m_VolumeCoG.y-TotalCoG.y));
 	TotalIxz = m_CoGIxz - m_VolumeMass *   (m_VolumeCoG.x-TotalCoG.x)*(m_VolumeCoG.z-TotalCoG.z) ;
 
+
+	//add the inertia contribution of all point masses in the Total CoG frame of reference
 	for(i=0; i<m_NMass; i++)
 	{
 		TotalIxx  += m_MassValue[i] * ( (m_MassPosition[i].y-TotalCoG.y)*(m_MassPosition[i].y-TotalCoG.y)
@@ -216,6 +219,7 @@ void InertiaDlg::ComputeInertia()
 		}
 	}
 
+	//display the results
 	m_pctrlTotalMass->SetValue(TotalMass*pMainFrame->m_kgtoUnit);
 	
 	m_pctrlXTotalCoG->SetValue(TotalCoG.x*pMainFrame->m_mtoUnit);
@@ -231,6 +235,9 @@ void InertiaDlg::ComputeInertia()
 
 void InertiaDlg::FillMassModel()
 {
+	//
+	// Fill the table with the object's point masses
+	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	
@@ -421,6 +428,9 @@ void InertiaDlg::OnCellChanged(QWidget *pWidget)
 
 void InertiaDlg::OnExportToAVL()
 {
+	//
+	// Export the mass and inertia data to AVL format
+	//
 	if (!m_pWing && !m_pBody && !m_pPlane) return;
 	QString filter =".mass";
 
@@ -661,6 +671,7 @@ void InertiaDlg::OnOK()
 		}
 		m_pWing->m_NMass = j;
 		m_pWing->ComputeBodyAxisInertia();
+qDebug()<<"StabPolarDlg winginertia"<<m_pWing->m_CoGIxx<<m_pWing->m_CoGIyy<<m_pWing->m_CoGIzz<<m_pWing->m_CoGIxz;
 	}
 	else if(m_pBody)
 	{
@@ -693,6 +704,7 @@ void InertiaDlg::OnOK()
 		}
 		m_pPlane->m_NMass = j;
 		m_pPlane->ComputeBodyAxisInertia();
+qDebug()<<"StabPolarDlg planeinertia"<<m_pPlane->m_CoGIxx<<m_pPlane->m_CoGIyy<<m_pPlane->m_CoGIzz<<m_pPlane->m_CoGIxz;
 	}
 	accept();
 }

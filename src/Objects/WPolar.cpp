@@ -1952,7 +1952,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 				PolarProperties +=strong;
 			}
 			iCtrl=1;
-			if(pPlane->m_bStab)
+			if(pPlane->Stab())
 			{
 				if(m_bActiveControl[iCtrl])
 				{
@@ -1969,9 +1969,9 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 		pStab = pFin = pWing = NULL;
 		if(pPlane)
 		{
-			pWing = &pPlane->m_Wing;
-			if(pPlane->m_bStab) pStab=&pPlane->m_Stab; else pStab=NULL;
-			if(pPlane->m_bFin)  pFin=&pPlane->m_Fin; else pFin=NULL;
+			pWing = pPlane->Wing();
+			pStab = pPlane->Stab();
+			pFin  = pPlane->Fin();
 		}
 		else pWing = pMiarex->GetWing(m_UFOName);
 
@@ -2112,8 +2112,8 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 	if(bPlane)
 	{
 		pPlane = (CPlane*)ptr;
-		m_Mass = pPlane->m_TotalMass;
-		m_CoG = pPlane->m_CoG;
+		m_Mass = pPlane->TotalMass();
+		m_CoG = pPlane->CoG();
 		m_CoGIxx = pPlane->m_CoGIxx;
 		m_CoGIyy = pPlane->m_CoGIyy;
 		m_CoGIzz = pPlane->m_CoGIzz;
@@ -2122,7 +2122,7 @@ void CWPolar::SetInertia(void *ptr, bool bPlane)
 	else
 	{
 		pWing  = (CWing*)ptr;
-		m_Mass = pWing->m_TotalMass;
+		m_Mass = pWing->TotalMass();
 		m_CoG = pWing->m_CoG;
 		m_CoGIxx = pWing->m_CoGIxx;
 		m_CoGIyy = pWing->m_CoGIyy;

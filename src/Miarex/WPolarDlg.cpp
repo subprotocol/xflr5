@@ -394,19 +394,19 @@ void WPolarDlg::OnPlaneInertia()
 	{
 		if(m_pPlane)
 		{
-			m_pctrlWeight->SetValue(m_pPlane->GetTotalMass() * pMainFrame->m_kgtoUnit);
-			m_pctrlXCmRef->SetValue(m_pPlane->m_CoG.x * pMainFrame->m_mtoUnit);
-			m_pctrlZCmRef->SetValue(m_pPlane->m_CoG.z * pMainFrame->m_mtoUnit);
-			m_Weight    = m_pPlane->GetTotalMass();
-			m_CoG.x     = m_pPlane->m_CoG.x;
-			m_CoG.z     = m_pPlane->m_CoG.z;
+			m_pctrlWeight->SetValue(m_pPlane->TotalMass() * pMainFrame->m_kgtoUnit);
+			m_pctrlXCmRef->SetValue(m_pPlane->CoG().x * pMainFrame->m_mtoUnit);
+			m_pctrlZCmRef->SetValue(m_pPlane->CoG().z * pMainFrame->m_mtoUnit);
+			m_Weight    = m_pPlane->TotalMass();
+			m_CoG.x     = m_pPlane->CoG().x;
+			m_CoG.z     = m_pPlane->CoG().z;
 		}
 		else if(m_pWing)
 		{
-			m_pctrlWeight->SetValue(m_pWing->GetTotalMass() * pMainFrame->m_kgtoUnit);
+			m_pctrlWeight->SetValue(m_pWing->TotalMass() * pMainFrame->m_kgtoUnit);
 			m_pctrlXCmRef->SetValue(m_pWing->m_CoG.x * pMainFrame->m_mtoUnit);
 			m_pctrlZCmRef->SetValue(m_pWing->m_CoG.z * pMainFrame->m_mtoUnit);
-			m_Weight    = m_pWing->GetTotalMass();
+			m_Weight    = m_pWing->TotalMass();
 			m_CoG.x     = m_pWing->m_CoG.x;
 			m_CoG.z     = m_pWing->m_CoG.z;
 		}
@@ -493,8 +493,14 @@ void WPolarDlg::OnOK()
 		}
 	}
 
+	if(fabs(m_Weight)<PRECISION && m_PolarType==FIXEDLIFTPOLAR)
+	{
+		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 2 polars"));
+		m_pctrlWeight->setFocus();
+		return;
+	}
 
-	if(m_pPlane && m_AnalysisMethod==3) m_bThinSurfaces = true;
+	if(m_pPlane && m_AnalysisMethod==PANELMETHOD) m_bThinSurfaces = true;
 
 	accept();
 }

@@ -132,7 +132,7 @@ void ManageUFOsDlg::SetupLayout()
 	CommandButtons->addWidget(CloseButton);
 	CommandButtons->addStretch(1);
 
-	m_pctrlUFOTable   = new QTableView(this);
+	m_pctrlUFOTable = new QTableView(this);
 	m_pctrlUFOTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlUFOTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlUFOTable->horizontalHeader()->setStretchLastSection(true);
@@ -196,9 +196,9 @@ void ManageUFOsDlg::SetupLayout()
 	precision[3]  = 3;
 	precision[4]  = 2;
 	precision[5]  = 2;
-	precision[6]  = 3;
-	precision[7]  = 3;
-	precision[8]  = 0;
+	precision[6]  = 1;
+	precision[7]  = 2;
+	precision[8]  = 3;
 
 	m_pUFODelegate->m_Precision = precision;
 }
@@ -252,10 +252,10 @@ void ManageUFOsDlg::FillWingRow(int row)
 	m_pUFOModel->setData(ind, pWing->m_TR);
 
 	ind = m_pUFOModel->index(row, 6, QModelIndex());
-	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+	m_pUFOModel->setData(ind,pWing->AverageSweep());
 
 	ind = m_pUFOModel->index(row, 7, QModelIndex());
-	m_pUFOModel->setData(ind,0);
+	m_pUFOModel->setData(ind,0.0);
 }
 
 
@@ -290,7 +290,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 	m_pUFOModel->setData(ind, pWing->m_TR);
 
 	ind = m_pUFOModel->index(row+n, 6, QModelIndex());
-	m_pUFOModel->setData(ind,pWing->GetAverageSweep());
+	m_pUFOModel->setData(ind,pWing->AverageSweep());
 
 	ind = m_pUFOModel->index(row+n, 7, QModelIndex());
 	m_pUFOModel->setData(ind,pPlane->m_TailVolume);
@@ -302,12 +302,11 @@ void ManageUFOsDlg::OnRename()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	if(m_pPlane)      pMiarex->RenameUFO(m_pPlane->m_PlaneName);
+	if(m_pPlane)      pMiarex->RenameUFO(m_pPlane->PlaneName());
 	else if (m_pWing) pMiarex->RenameUFO(m_pWing->m_WingName);
 
 	FillUFOTable();
 	pMainFrame->SetSaveState(false);
-	qDebug("Rename");
 }
 
 
@@ -322,8 +321,8 @@ void ManageUFOsDlg::OnDelete()
 	if(m_pPlane) strong = tr("Are you sure you want to delete the plane :\n") +  m_pPlane->m_PlaneName +"?\n";
 	else 	     strong = tr("Are you sure you want to delete the wing :\n") +   m_pWing->m_WingName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
-												  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
-												  QMessageBox::Cancel)) return;
+										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
+										 QMessageBox::Cancel)) return;
 
 	if(m_pPlane) pMainFrame->DeletePlane(m_pPlane);
 	else         pMainFrame->DeleteWing(m_pWing, false);

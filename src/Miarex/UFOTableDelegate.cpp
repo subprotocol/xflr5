@@ -58,41 +58,8 @@ QWidget *UFOTableDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
 bool UFOTableDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
 						 const QModelIndex &index)
 {
-	return false;
-	// make sure that the item is checkable
-	Qt::ItemFlags flags = model->flags(index);
-	if (!(flags & Qt::ItemIsUserCheckable) || !(flags & Qt::ItemIsEnabled))
-		return false;
+	return false;//don't edit anything!
 
-	// make sure that we have a check state
-	QVariant value = index.data(Qt::CheckStateRole);
-	if (!value.isValid())
-		return false;
-
-	// make sure that we have the right event type
-	if (event->type() == QEvent::MouseButtonRelease)
-	{
-		const int textMargin = QApplication::style()->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1;
-		QRect checkRect = QStyle::alignedRect(option.direction, Qt::AlignCenter,
-											  check(option, option.rect, Qt::Checked).size(),
-											  QRect(option.rect.x() + textMargin, option.rect.y(),
-													option.rect.width() - (2 * textMargin), option.rect.height()));
-
-		if (!checkRect.contains(static_cast<QMouseEvent*>(event)->pos())) return false;
-	}
-	else if (event->type() == QEvent::KeyPress)
-	{
-		if (   static_cast<QKeyEvent*>(event)->key() != Qt::Key_Space
-			&& static_cast<QKeyEvent*>(event)->key() != Qt::Key_Select)
-			return false;
-	}
-	else
-	{
-		return false;
-	}
-
-	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
-	return model->setData(index, state, Qt::CheckStateRole);
 }
 
 
@@ -117,20 +84,14 @@ void UFOTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else if(index.column()==1 || index.column()==2 || index.column()==3|| index.column()==4|| index.column()==5)
+	else
 	{
 		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
 		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toDouble(), 0,'f',m_Precision[index.column()]);
 		drawDisplay(painter, myOption, myOption.rect, strong);
 		drawFocus(painter, myOption, myOption.rect);
 	}
-	else if(index.column()==6)
-	{
-		myOption.displayAlignment = Qt::AlignRight | Qt::AlignVCenter;
-		strong = QString("%1").arg(index.model()->data(index, Qt::DisplayRole).toInt());
-		drawDisplay(painter, myOption, myOption.rect, strong);
-		drawFocus(painter, myOption, myOption.rect);
-	}
+
 }
 
 

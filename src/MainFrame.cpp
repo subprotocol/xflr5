@@ -1055,8 +1055,9 @@ void MainFrame::CreateDockWindows()
 	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
 	ManageUFOsDlg::s_pMainFrame = this;
 
-	CPlane::s_pMainFrame   = this;
-	CPlane::s_pMiarex      = m_pMiarex;
+	CPlane::SetParents(this, m_pMiarex);
+//	CPlane::s_pMainFrame   = this;
+//	CPlane::s_pMiarex      = m_pMiarex;
 
 	StabPolarDlg::s_pMainFrame = this;
 	StabPolarDlg::s_pMiarex = m_pMiarex;
@@ -2542,7 +2543,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 {
-	if(!pPlane || !pPlane->m_PlaneName.length()) return ;
+	if(!pPlane || !pPlane->PlaneName().length()) return ;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	CWPolar* pWPolar;
 	CPOpp * pPOpp;
@@ -2553,7 +2554,7 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 	for (i=(int)m_oaPOpp.size()-1; i>=0; i--)
 	{
 		pPOpp = (CPOpp*)m_oaPOpp.at(i);
-		if(pPOpp->m_PlaneName == pPlane->m_PlaneName)
+		if(pPOpp->m_PlaneName == pPlane->PlaneName())
 		{
 			m_oaPOpp.removeAt(i);
 			delete pPOpp;
@@ -2566,7 +2567,7 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 	for (i=(int)m_oaWPolar.size()-1; i>=0; i--)
 	{
 		pWPolar = (CWPolar*)m_oaWPolar.at(i);
-		if (pWPolar->m_UFOName == pPlane->m_PlaneName)
+		if (pWPolar->m_UFOName == pPlane->PlaneName())
 		{
 			if(!bResultsOnly)
 			{
@@ -4013,7 +4014,7 @@ void MainFrame::OnSaveUFOAsProject()
 	pMiarex->m_bArcball = false;
 
 	QString strong;
-	if(pMiarex->m_pCurPlane)     strong = pMiarex->m_pCurPlane->m_PlaneName;
+	if(pMiarex->m_pCurPlane)     strong = pMiarex->m_pCurPlane->PlaneName();
 	else if(pMiarex->m_pCurWing) strong = pMiarex->m_pCurWing->m_WingName;
 	else
 	{
@@ -5148,7 +5149,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	CFoil *pFoil  = NULL;
 	CPolar * pPolar  = NULL;
 
-	if(pPlane) UFOName = pPlane->m_PlaneName;
+	if(pPlane) UFOName = pPlane->PlaneName();
 	else       UFOName = pWing->m_WingName;
 
 	int i,j;
@@ -5365,10 +5366,10 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 
 	// next the bodies
 
-	if(pPlane && pPlane->m_bBody && pPlane->m_pBody)
+	if(pPlane && pPlane->Body())
 	{
 		ar << 1;
-		pPlane->m_pBody->SerializeBody(ar, true, ProjectFormat);
+		pPlane->Body()->SerializeBody(ar, true, ProjectFormat);
 	}
 	else ar <<0; //no plane
 
@@ -6146,7 +6147,7 @@ void MainFrame::UpdateUFOs()
 	for (i=0; i<m_oaPlane.size(); i++)
 	{
 		pPlane = (CPlane*)m_oaPlane[i];
-		UFONames.append(pPlane->m_PlaneName);
+		UFONames.append(pPlane->PlaneName());
 	}
 	UFONames.sort();
 	m_pctrlUFO->addItems(UFONames);
@@ -6157,7 +6158,7 @@ void MainFrame::UpdateUFOs()
 		//select the current Wing, if any...
 		if(pCurPlane)
 		{
-			int pos = m_pctrlUFO->findText(pCurPlane->m_PlaneName);
+			int pos = m_pctrlUFO->findText(pCurPlane->PlaneName());
 			if(pos>=0)
 			{
 				m_pctrlUFO->setCurrentIndex(pos);
@@ -6223,7 +6224,7 @@ void MainFrame::UpdateWPolars()
 	CWing   *pCurWing  = pMiarex->m_pCurWing;
 	CWPolar *pCurWPlr  = pMiarex->m_pCurWPolar;
 
-	if(pCurPlane)      UFOName = pCurPlane->m_PlaneName;
+	if(pCurPlane)      UFOName = pCurPlane->PlaneName();
 	else if(pCurWing)  UFOName = pCurWing->m_WingName;
 	else               UFOName = "";
 
@@ -6322,7 +6323,7 @@ void MainFrame::UpdateWOpps()
 		for (i=0; i<m_oaPOpp.size(); i++)
 		{
 			pPOpp = (CPOpp*)m_oaPOpp[i];
-			if (pPOpp->m_PlaneName == pCurPlane->m_PlaneName &&	pPOpp->m_PlrName   == pCurWPlr->m_PlrName)
+			if (pPOpp->m_PlaneName == pCurPlane->PlaneName() &&	pPOpp->m_PlrName   == pCurWPlr->m_PlrName)
 			{
 				size++;
 			}
@@ -6334,7 +6335,7 @@ void MainFrame::UpdateWOpps()
 			for (int i=0; i<m_oaPOpp.size(); i++)
 			{
 				pPOpp = (CPOpp*)m_oaPOpp[i];
-				if (pPOpp->m_PlaneName == pCurPlane->m_PlaneName &&
+				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() &&
 					pPOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
 					if(pCurWPlr->m_Type != 4) str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);

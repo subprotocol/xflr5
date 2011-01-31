@@ -200,41 +200,45 @@ void CBody::ComputeBodyAxisInertia()
 	//  - the center of gravity is calculated from component masses and is NOT the CoG defined in the polar
 
 	int i;
-	CVector LA, VolumeCoG, TotalCoG;
-	double Ixx, Iyy, Izz, Ixz,  VolumeMass, TotalMass;
-	Ixx = Iyy = Izz = Ixz = TotalMass = VolumeMass = 0.0;
+	CVector LA, VolumeCoG;
+	double Ixx, Iyy, Izz, Ixz, VolumeMass;
+	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
 	ComputeVolumeInertia(VolumeCoG, Ixx, Iyy, Izz, Ixz);
-	TotalMass = m_VolumeMass;
+	m_TotalMass = m_VolumeMass;
 
-	TotalCoG = VolumeCoG *m_VolumeMass;
+	m_CoG = VolumeCoG *m_VolumeMass;
 
 	// add point masses
 	for(i=0; i<m_NMass; i++)
 	{
-		TotalMass += m_MassValue[i];
-		TotalCoG += m_MassPosition[i] * m_MassValue[i];
+		m_TotalMass += m_MassValue[i];
+		m_CoG += m_MassPosition[i] * m_MassValue[i];
 	}
 
-	TotalCoG = TotalCoG/TotalMass;
+	if(m_TotalMass>0) m_CoG = m_CoG/m_TotalMass;
+	else              m_CoG.Set(0.0,0.0,0.0);
 
 	// The CoG position is now available, so calculate the inertia w.r.t the CoG
+	// using Huyghens theorem
+	//LA is the displacement vector from the centre of mass to the new axis
+	LA = m_CoG-VolumeCoG;
+	m_CoGIxx = Ixx + m_VolumeMass * (LA.y*LA.y + LA.z*LA.z);
+	m_CoGIyy = Iyy + m_VolumeMass * (LA.x*LA.x + LA.z*LA.z);
+	m_CoGIzz = Izz + m_VolumeMass * (LA.x*LA.x + LA.y*LA.y);
+	m_CoGIxz = Ixz + m_VolumeMass * LA.x*LA.z;
+
 	for(i=0; i<m_NMass; i++)
 	{
-		LA = m_MassPosition[i] - TotalCoG;
-		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz -= m_MassValue[i] * (LA.x*LA.z);
+		LA = m_MassPosition[i] - m_CoG;
+		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+		m_CoGIyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+		m_CoGIzz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+		m_CoGIxz -= m_MassValue[i] * (LA.x*LA.z);
 	}
-
-	m_TotalMass = TotalMass;
-	m_CoG = TotalCoG;
-	m_CoGIxx =  Ixx;
-	m_CoGIyy =  Iyy;
-	m_CoGIzz =  Izz;
-	m_CoGIxz =  Ixz;
 }
+
+
 
 void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
@@ -1843,7 +1847,7 @@ void CBody::UpdateFramePos(int iFrame)
 	}
 }
 
-double CBody::GetTotalMass()
+double CBody::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
 	for(int i=0; i<m_NMass; i++)

@@ -53,7 +53,18 @@ public:
 
 	CWing();   // standard constructor
 
-// Implementation
+	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
+	double GetOffset(double yob);
+	double GetChord(double yob);
+	double Getyrel(double SpanPos);
+	double GetDihedral(double yob);
+
+	double AverageSweep();
+	double TotalMass();
+	CVector CoG();
+	QString WingName();
+
+
 protected:
 	void CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
@@ -103,34 +114,17 @@ protected:
 
 	static void* s_pMainFrame;		//pointer to the Frame window
 	static void* s_pMiarex;	//pointer to the Miarex Application window
-//	static void* s_pLLTDlg;	//pointer to the VLM analysis dialog class
 	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
 	static CVector *m_pWakeNode;			//pointer to the VLM wake node array
 	static CPanel *m_pWakePanel;			//pointer to the VLM Wake Panel array
-//	static int s_NLLTStations;
-//	static double s_CvPrec;	// Precision required for LLT convergence
-//	static double s_RelaxMax;	// relaxation factor for LLT convergence
-
-//	static double s_Density, s_Viscosity; //fluid properties
-//	static double s_QInfLLT;		// Freestream speed
-//	static double s_AlphaLLT;		// angle of attack
-
-	static bool s_bCancel;
 
 	QFile * m_pXFile;	// a pointer to the output .log file
 
-	static bool s_bTrace;		// true if the messages need to be traces
 	static bool s_bVLMSymetric;	// true if the vlm calculation is symmetric
 
-//	bool m_bVLMAutoMesh; 	// true if the mesh should be set automatically
 	bool m_bWingOut;	// true if the wing OpPoint is outside the flight envelope of the available Type1 polars
-	bool m_bConverged;	// true if LLT || VLM calculation has converged
 	bool m_bSymetric;	// true if the wing's geometry is symmetric
-	bool m_bLLT;		// true if performing an LLT calculation, false if VLM
-	bool m_bTrans;		// true if the wing is being dragged
-	bool m_bChanged;	// true if the user has made changes to the wing's definition
 
-	int m_Type;		// the LLT analysis type
 	int m_NStation;		// number of stations for wing calculation
 	int m_nNodes;		// the number of VLM panel nodes
 	int m_AVLIndex;		// need to export to AVL
@@ -139,8 +133,6 @@ protected:
 	double m_FlapMoment[2*MAXPANELS];
 
 	double m_QInf0;
-//	double m_Span;		// wing span
-//	double m_Weight;    // Wing weight - used to initialize LLT for type 2 analysis
 
 	double m_VolumeMass, m_TotalMass;    //for inertia calculations
 	int m_NMass;
@@ -226,15 +218,6 @@ public:
 
 	int m_MatSize;	// Max Size for the VLMMatrix
 	CPanel *m_pPanel;			//pointer to the VLM Panel array
-
-	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
-	double GetOffset(double yob);
-	double GetChord(double yob);
-	double Getyrel(double SpanPos);
-	double GetDihedral(double yob);
-	double GetTotalMass();
-	double GetAverageSweep();
-
 
 };
 

@@ -2187,7 +2187,7 @@ void GL3dWingDlg::OnScaleWing()
 {
 	WingScaleDlg dlg;
 	dlg.m_pMainFrame = s_pMainFrame;
-	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->m_TChord[0], m_pWing->GetAverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
+	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->m_TChord[0], m_pWing->AverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
 
 	if(QDialog::Accepted == dlg.exec())
 	{
@@ -2618,7 +2618,7 @@ void GL3dWingDlg::SetWingData()
 	else                                         str = tr("Undefined");
 	m_pctrlTaperRatio->setText(str);
 
-	str = QString("%1").arg(m_pWing->GetAverageSweep(),5,'f',2);
+	str = QString("%1").arg(m_pWing->AverageSweep(),5,'f',2);
 	m_pctrlSweep->setText(str);
 
 	int VLMTotal=100;

@@ -28,69 +28,81 @@
 
 class CPlane
 {
-	friend class QMiarex;
-	friend class MainFrame;
-	friend class CBody;
-	friend class CWing;
-	friend class CWPolar;
+//	friend class QMiarex;
+//	friend class MainFrame;
+//	friend class CBody;
+//	friend class CWing;
+//	friend class CWPolar;
+//	friend class WPolarDlg;
 	friend class PlaneDlg;
 	friend class PanelAnalysisDlg;
 	friend class ManageBodiesDlg;
 	friend class StabPolarDlg;
 	friend class ManageUFOsDlg;
 	friend class InertiaDlg;
-	friend class WPolarDlg;
 
 
 public:
 	CPlane();
+	static void SetParents(void *pMainFrame, void*pMiarex);
 
-
-protected:
-
-	static void * s_pMiarex;
-	static void * s_pMainFrame;
-	CBody *m_pBody;
-	CWing m_Wing, m_Wing2;
-	CWing m_Stab;
-	CWing m_Fin;
-	bool m_bBody;
-	bool m_bActive;
-	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
-	bool m_bBiplane;
-	double m_WingTiltAngle[MAXWINGS];
-//	double m_StabTilt, m_FinTilt, m_WingTilt, m_WingTilt2;
-	double m_XCmRef;
-
-	int m_NMass;
-	double m_MassValue[MAXMASSES];
-	CVector m_MassPosition[MAXMASSES];
-	QString m_MassTag[MAXMASSES];
-
-	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
-	double m_VolumeMass, m_TotalMass;
-
-	CVector m_WingLE[MAXWINGS];
-//	CVector m_LEStab, m_LEFin, m_LEWing, m_LEWing2,
-	CVector m_BodyPos;
-	QString m_PlaneDescription;
-
-private:
-	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
+	bool IsBiPlane();
+	double TotalMass();
+	double TailVolume();
+	CWing *Wing();
+	CWing *Wing2();
+	CWing *Stab();
+	CWing *Fin();
+	CBody *Body();
+	QString PlaneName();
+	QString &rPlaneName();
+	CVector CoG();
 	void Duplicate(CPlane *pPlane);
+	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	void ComputePlane(void);
-	
+	void CreateSurfaces();
+	void RenameWings();
+	void SetBody(CBody *pBody);
+
 	void ComputeVolumeInertia(double &Mass, CVector &CoG, double &Ixx, double &Iyy, double &Izz, double &Ixz);
 	void ComputeBodyAxisInertia();
 
+	CVector BodyPos();
+	CVector WingLE(int iw);
+	double WingTiltAngle(int iw);
 
-public:
-	QString m_PlaneName;
+private:
+	static void * s_pMiarex;
+	static void * s_pMainFrame;
+	CWing m_Wing, m_Wing2;
+	CWing m_Stab;
+	CWing m_Fin;
+	CBody *m_pBody;
+
+	bool m_bBody;
+	bool m_bBiplane;
+	double m_XCmRef;
+
+	double m_VolumeMass, m_TotalMass;
+
+	QString m_PlaneDescription;
 	bool m_bFin, m_bStab;
 	double m_TailVolume;
 	CVector m_CoG;
+	QString m_PlaneName;
 
-	double GetTotalMass();
+	CVector m_WingLE[MAXWINGS];
+	double m_WingTiltAngle[MAXWINGS];
+	CVector m_BodyPos;
+
+public:
+	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
+	int m_NMass;
+	QString m_MassTag[MAXMASSES];
+	double m_MassValue[MAXMASSES];
+	CVector m_MassPosition[MAXMASSES];
+	bool m_bDoubleFin, m_bSymFin, m_bDoubleSymFin;
+
 };
 
 #endif

@@ -971,7 +971,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 	if(m_pWPolar->m_bTiltedGeom) Alpha     = m_OpAlpha;
 	else                         m_OpAlpha = Alpha;
 
-	CWing::s_bTrace	   = true;
+//	CWing::s_bTrace	   = true;
 //	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
 //	CWing::s_Density   = m_pWPolar->m_Density;
 
@@ -1670,7 +1670,7 @@ void PanelAnalysisDlg::keyPressEvent(QKeyEvent *event)
 void PanelAnalysisDlg::OnCancelAnalysis()
 {
 	if(m_pXFile->isOpen()) m_pXFile->close();
-	CWing::s_bCancel        = true;
+//	CWing::s_bCancel        = true;
 	m_bCancel = true;
 	m_bSkip = true;
 	m_bExit = true;

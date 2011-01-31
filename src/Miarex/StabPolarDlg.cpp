@@ -78,7 +78,7 @@ StabPolarDlg::StabPolarDlg()
 	
 	m_bViscous  = true;
 	m_PolarType = STABILITYPOLAR;
-	
+
 	m_WPolarName = "T7";
 	SetupLayout();
 	Connect();
@@ -119,7 +119,7 @@ void StabPolarDlg::FillUFOInertia()
 
 	if(m_pPlane)
 	{
-		m_Mass = m_pPlane->GetTotalMass();
+		m_Mass = m_pPlane->TotalMass();
 		m_CoG = m_pPlane->m_CoG;
 
 		m_CoGIxx = m_pPlane->m_CoGIxx;
@@ -129,7 +129,7 @@ void StabPolarDlg::FillUFOInertia()
 	}
 	else if(m_pWing)
 	{
-		m_Mass = m_pWing->GetTotalMass();
+		m_Mass = m_pWing->TotalMass();
 		m_CoG = m_pWing->m_CoG;
 		m_CoGIxx = m_pWing->m_CoGIxx;
 		m_CoGIyy = m_pWing->m_CoGIyy;
@@ -500,6 +500,13 @@ void StabPolarDlg::OnOK()
 
 	ReadCtrlData();
 	ReadParams();
+
+	if(fabs(m_Mass)<PRECISION)
+	{
+		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 7 polars"));
+		m_pctrlMass->setFocus();
+		return;
+	}
 
 	bool bActive = false;
 

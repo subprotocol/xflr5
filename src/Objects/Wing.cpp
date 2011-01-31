@@ -41,18 +41,9 @@ CPanel  *CWing::m_pWakePanel;			//pointer to the VLM Wake Panel array
 
 void* CWing::s_pMainFrame;		//pointer to the Frame window
 void* CWing::s_pMiarex;	//pointer to the Miarex Application window
-//void* CWing::s_pLLTDlg;	//pointer to the LLT analysis dialog class
 void* CWing::s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class
-bool CWing::s_bCancel;
 bool CWing::s_bVLMSymetric;
-bool CWing::s_bTrace;
-//int CWing::s_NLLTStations;//pointer to the 3DPanel analysis dialog class
-//double CWing::s_CvPrec;	// Precision required for LLT convergence
-//double CWing::s_RelaxMax;	// relaxation factor for LLT convergence
-//double CWing::s_Density;
-//double CWing::s_Viscosity; //fluid properties
-//double CWing::s_QInfLLT;		// Freestream speed
-//double CWing::s_AlphaLLT;		// angle of attack
+
 
 
 CWing::CWing()
@@ -102,20 +93,13 @@ CWing::CWing()
 	memset(m_MassPosition, 0, sizeof(m_MassPosition));
 	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString(QObject::tr("Description %1")).arg(i);
 
-
-	s_bTrace        = true;
-
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
 	m_bSymFin       = false;
 	m_bDoubleSymFin = false;
-	m_bTrans        = false;
-	m_bLLT          = false;
 	m_bSymetric     = true;
 	m_bWingOut      = false;
-	m_bConverged    = true;
 	s_bVLMSymetric  = false;
-	m_bChanged      = false;
 
 	m_WingName        = QObject::tr("Wing Name");
 	m_WingDescription = "";
@@ -142,23 +126,16 @@ CWing::CWing()
 	m_XCP               = 0.0;
 	m_YCP               = 0.0;
 
-	m_Type = 1;
-
 	m_AVLIndex = -(int)(qrand()/10000);//improbable value...
 
 	m_MatSize    = 0;
-
 	m_NSurfaces = 0;
-
 
 	m_AR         = 0.0;// Aspect ratio
 	m_TR         = 0.0;// Taper ratio
 	m_GChord     = 0.0;// mean geometric chord
 	m_MAChord    = 0.0;// mean aero chord
 	m_yMac       = 0.0;
-//	s_CvPrec     = 0.01;
-//	s_RelaxMax   = 10.0;
-//	s_NLLTStations  = 20;
 	m_ProjectedArea = 0.0;
 	m_ProjectedSpan = 0.0;
 
@@ -290,15 +267,16 @@ void CWing::ComputeGeometry()
 
 void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, double &CoGIzz, double &CoGIxz)
 {
-	// Returns the inertia properties of the structuure based on the imput mass and on the existing geometry
+	//
+	// Returns the inertia properties of the structure based on the object's mass and on the existing geometry
 	//   in input:
 	//     Mass = mass of the wing, excluding point masses
 	//   in output:
 	//     CoG  = center of gravity position
 	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
 	//
-	static double ElemVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
-	static CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
+	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
+	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
 	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
@@ -332,7 +310,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	//we consider the whole wing, i.e. all left and right surfaces
 	//note : in avl documentation, each side is considered separately
 
-	//first get the CoG - necessary for future application of Huyghens/Steiner theorem
+	//first get the CoG - necessary for future application of Huygens/Steiner theorem
 	int p = 0;
 	for (j=0; j<m_NSurfaces; j++)
 	{
@@ -433,48 +411,51 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 
 void CWing::ComputeBodyAxisInertia()
 {
+	//
 	// Calculates the inertia tensor in geometrical (body) axis :
-	//  - adds the volume inertia AND the point masses of all components
-	//  - the body axis is the frame in which all the geometry has been defined
-	//  - the origin=BodyFrame;
-	//  - the center of gravity is calculated from component masses and is NOT the CoG defined in the polar
+	//  - adds the volume inertia AND the inertia of point masses of all components
+	//  - the body axis is the frame in which the geometry has been defined
+	//
 
 	int i;
-	CVector LA, VolumeCoG, TotalCoG;
-	double Ixx, Iyy, Izz, Ixz,  VolumeMass, TotalMass;
-	Ixx = Iyy = Izz = Ixz = TotalMass = VolumeMass = 0.0;
+	CVector LA, VolumeCoG;
+	double Ixx, Iyy, Izz, Ixz, VolumeMass;
+	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
+	//Get the volume inertia properties in the volume CoG frame of reference
 	ComputeVolumeInertia(VolumeCoG, Ixx, Iyy, Izz, Ixz);
-	TotalMass = m_VolumeMass;
+	m_TotalMass = m_VolumeMass;
 
-	TotalCoG = VolumeCoG *m_VolumeMass;
+	m_CoG = VolumeCoG *m_VolumeMass;
 
 	// add point masses
 	for(i=0; i<m_NMass; i++)
 	{
-		TotalMass += m_MassValue[i];
-		TotalCoG  += m_MassPosition[i] * m_MassValue[i];
+		m_TotalMass += m_MassValue[i];
+		m_CoG       += m_MassPosition[i] * m_MassValue[i];
 	}
 
-	if(TotalMass>0.0) TotalCoG = TotalCoG/TotalMass;
-	else              TotalCoG.Set(0.0,0.0,0.0);
+	if(m_TotalMass>0.0) m_CoG = m_CoG/m_TotalMass;
+	else                m_CoG.Set(0.0,0.0,0.0);
 
 	// The CoG position is now available, so calculate the inertia w.r.t the CoG
+	// using Huygens theorem
+	//LA is the displacement vector from the centre of mass to the new axis
+	LA = m_CoG-VolumeCoG;
+	m_CoGIxx = Ixx + m_VolumeMass * (LA.y*LA.y+ LA.z*LA.z);
+	m_CoGIyy = Iyy + m_VolumeMass * (LA.x*LA.x+ LA.z*LA.z);
+	m_CoGIzz = Izz + m_VolumeMass * (LA.x*LA.x+ LA.y*LA.y);
+	m_CoGIxz = Ixz - m_VolumeMass *  LA.x*LA.z;
+
+	//add the contribution of point masses to total inertia
 	for(i=0; i<m_NMass; i++)
 	{
-		LA = m_MassPosition[i] - TotalCoG;
-		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz -= m_MassValue[i] * (LA.x*LA.z);
+		LA = m_MassPosition[i] - m_CoG;
+		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+		m_CoGIyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+		m_CoGIzz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+		m_CoGIxz -= m_MassValue[i] * (LA.x*LA.z);
 	}
-
-	m_TotalMass = TotalMass;
-	m_CoG = TotalCoG;
-	m_CoGIxx =  Ixx;
-	m_CoGIyy =  Iyy;
-	m_CoGIzz =  Izz;
-	m_CoGIxz =  Ixz;
 }
 
 
@@ -1138,13 +1119,14 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 
 
 
-double CWing::GetAverageSweep()
+double CWing::AverageSweep()
 {
 	double xroot = m_TChord[0]/4.0;
 	double xtip  = m_TOffset[m_NPanel] + m_TChord[m_NPanel]/4.0;
 //	double sweep = (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
 	return (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
 }
+
 
 double CWing::GetC4(double yob, double xRef)
 {
@@ -1240,17 +1222,25 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 }
 
 
+CVector CWing::CoG()
+{
+	return m_CoG;
+}
 
 
-double CWing::GetTotalMass()
+double CWing::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
 	for(int i=0; i<m_NMass; i++)
 		TotalMass += m_MassValue[i];
 	return TotalMass;
-//	return m_TotalMass;
 }
 
+
+QString CWing::WingName()
+{
+	return m_WingName;
+}
 
 double CWing::GetOffset(double yob)
 {
@@ -1418,7 +1408,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 	int j, k, l, p, pp, m, mm;
 	double InducedAngle, IYm, cosa, sina;
 	double GammaStrip[MAXSTATIONS];
-	static CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
+	CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
 
 	if(pWPolar->m_bTiltedGeom)
 	{
@@ -1554,7 +1544,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 			p  += coef*m_Surface[j].m_NXPanels;
 
 			// Calculate resulting vector force
-			Force     += StripForce;                            // N/q
+			Force     += StripForce;                          // N/q
 			m_F[m]     = StripForce * q;	                    // Newtons
 
 			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
@@ -1593,155 +1583,6 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
 }
 
-
-
-/*
-void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-						 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
-{
-	// calculates the induced lift and drag from the vortices or wake panels strength
-	// using a farfield method
-	// Downwash is evaluated at a distance 100 times the span downstream (i.e. infinite)
-
-	PanelAnalysisDlg *pPanelDlg = (PanelAnalysisDlg*)s_p3DPanelDlg;
-
-	int nw, iTA, iTB;
-	int j, k, l, p, pp, m;
-	double InducedAngle, IYm, cosa, sina;
-	double GammaStrip[MAXSTATIONS];
-	static CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
-
-	if(pWPolar->m_bTiltedGeom)
-	{
-		cosa = 1.0;
-		sina = 0.0;
-	}
-	else
-	{
-		cosa = cos(Alpha*PI/180.0);
-		sina = sin(Alpha*PI/180.0);
-	}
-
-	//   Define wind axis
-	WindNormal.Set(   -sina, 0.0, cosa);
-	WindDirection.Set( cosa, 0.0, sina);
-
-	VInf = WindDirection * QInf;
-
-	//dynamic pressure, kg/m3
-	double q = 0.5 * s_Density * QInf * QInf;
-
-	m_CL      = 0.0;
-	WingIDrag = 0.0;
-	IYm       = 0.0;
-
-	int coef = 2;
-	if (pWPolar->m_bThinSurfaces) coef = 1;
-
-	p=0;
-	m=0;
-	for (j=0; j<m_NSurfaces; j++)
-	{
-		if(m_Surface[j].m_bIsTipLeft && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
-
-		for (k=0; k<m_Surface[j].m_NYPanels; k++)
-		{
-			pp = p;
-			m_StripArea[m] = 0.0;
-			StripForce.Set(0.0,0.0,0.0);
-			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
-			{
-				m_StripArea[m]  += m_pPanel[pp].Area;
-				pp++;
-			}
-			m_StripArea[m] /= (double)coef;
-
-			if(!pWPolar->m_bThinSurfaces)
-			{
-				// ____________________________
-				// Downwash calculation
-				//
-				// Since we place the trailing point at the end of the wake panels, it sees only the effect
-				// of the upstream part of the wake because the downstream part isn't modelled.
-				// If we were to model the downstream part, the total induced speed would be twice larger,
-				// so just add a factor 2 to account for this.
-				nw  = m_pPanel[p].m_iWake;
-				iTA = pWakePanel[nw].m_iTA;
-				iTB = pWakePanel[nw].m_iTB;
-				C = (pWakeNode[iTA] + pWakeNode[iTB])/2.0;
-
-				pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
-				InducedAngle = atan2(Wg.dot(WindNormal), QInf);
-				m_Ai[m]      = 2.0 * InducedAngle*180/PI;
-
-
-				// ____________________________
-				// Lift calculation
-				//
-				// Method 1 : Sum panel pressure forces over the top and bottom strip.
-				// The induced drag is calculated by projection of the strip force on the wind direction
-				// General experience in published literature shows this isn't such a good idea
-
-
-				// Method 2 : Far-field plane integration
-				// This is the method generally recommended
-				GammaStrip[m] = (-Mu[pos+p+coef*m_Surface[j].m_NXPanels-1] + Mu[pos+p]) *4.0*PI;
-				Wg += VInf;
-
-				StripForce  = m_pPanel[p].Vortex * Wg;
-				StripForce *= GammaStrip[m] * s_Density / q;  // N/q
-				//____________________________
-				// Project on wind axes
-				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
-				m_ICd[m]   = StripForce.dot(WindDirection)/m_StripArea[m];
-				WingIDrag += StripForce.dot(WindDirection);          // N/q
-			}
-			else
-			{
-				pp=p;
-				for(l=0; l<m_Surface[j].m_NXPanels; l++)
-				{
-					if(pWPolar->m_bVLM1 || m_pPanel[pp].m_bIsTrailing)
-					{
-						C = m_pPanel[pp].CtrlPt;
-						C.x = m_PlanformSpan * 100.0;
-
-						pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg);
-						Wg += VInf; //total speed vector
-
-						//induced force
-						dF  = Wg * m_pPanel[pp].Vortex;
-						dF *= Mu[pp+pos];			// N/rho
-
-						StripForce += dF;       // N/rho
-					}
-					pp++;
-				}
-				StripForce *= 2./QInf/QInf; //N/q
-
-				//____________________________
-				// Project on wind axes
-				m_Cl[m]    = StripForce.dot(WindNormal)   /m_StripArea[m];
-				m_ICd[m]   = StripForce.dot(WindDirection)/m_StripArea[m]/2.;
-				m_CL      += StripForce.dot(WindNormal);                // N/q
-				WingIDrag += StripForce.dot(WindDirection)/2.;          // N/q
-			}
-			p  += coef*m_Surface[j].m_NXPanels;
-
-			// Calculate resulting vector force
-			Force         += StripForce;                                // N/q
-			m_F[m]         = StripForce * q;	                        //Newtons
-
-			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
-
-			m++;
-		}
-		if(m_Surface[j].m_bIsTipRight && !pWPolar->m_bThinSurfaces) p+=m_Surface[j].m_NXPanels;//tip patch panels
-	}
-
-	m_InducedDrag = WingIDrag; // save this wing's induced drag (unused though...)
-}
-*/
 
 
 void CWing::PanelSetBending(bool bThinSurface)

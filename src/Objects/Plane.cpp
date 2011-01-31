@@ -89,7 +89,7 @@ CPlane::CPlane()
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeMass = m_TotalMass = 0.0;
 
-	m_bActive       = false;
+//	m_bActive       = false;
 	m_bBody         = false;
 	m_bFin          = true;
 	m_bDoubleFin    = false;
@@ -209,8 +209,8 @@ void CPlane::ComputeBodyAxisInertia()
 	CVector LA, VolumeCoG, TotalCoG;
 	CWing *pWing[4];
 	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
-	double Ixx, Iyy, Izz, Ixz,  VolumeMass, TotalMass;
-	Ixx = Iyy = Izz = Ixz = TotalMass = VolumeMass = 0.0;
+	double Ixx, Iyy, Izz, Ixz,  VolumeMass;
+	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
 
 	pWing[0] = &m_Wing;
@@ -219,15 +219,15 @@ void CPlane::ComputeBodyAxisInertia()
 	if(m_bFin)     pWing[3] = &m_Fin;
 
 	ComputeVolumeInertia(VolumeMass, VolumeCoG, Ixx, Iyy, Izz, Ixz);
-	TotalMass = VolumeMass;
+	m_TotalMass = VolumeMass;
 
-	TotalCoG = VolumeCoG *VolumeMass;
+	m_CoG = VolumeCoG *VolumeMass;
 
 	// add point masses
 	for(i=0; i<m_NMass; i++)
 	{
-		TotalMass += m_MassValue[i];
-		TotalCoG += m_MassPosition[i] * m_MassValue[i];
+		m_TotalMass += m_MassValue[i];
+		m_CoG += m_MassPosition[i] * m_MassValue[i];
 	}
 
 	for(iw=0; iw<4; iw++)
@@ -236,8 +236,8 @@ void CPlane::ComputeBodyAxisInertia()
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				TotalMass += pWing[iw]->m_MassValue[i];
-				TotalCoG +=  (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
+				m_TotalMass += pWing[iw]->m_MassValue[i];
+				m_CoG +=  (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
 			}
 		}
 	}
@@ -247,23 +247,30 @@ void CPlane::ComputeBodyAxisInertia()
 		CBody *pBody = m_pBody;
 		for(i=0; i<pBody->m_NMass; i++)
 		{
-			TotalMass += pBody->m_MassValue[i];
-			TotalCoG  += (pBody->m_MassPosition[i]+m_BodyPos) * pBody->m_MassValue[i];
+			m_TotalMass += pBody->m_MassValue[i];
+			m_CoG  += (pBody->m_MassPosition[i]+m_BodyPos) * pBody->m_MassValue[i];
 		}
 	}
-	if(TotalMass>PRECISION) TotalCoG = TotalCoG/TotalMass;
-	else                    TotalCoG.Set(0.0,0.0,0.0);
+	if(m_TotalMass>PRECISION) m_CoG = m_CoG/m_TotalMass;
+	else                      m_CoG.Set(0.0,0.0,0.0);
 
-	// The CoG position is now available, so calculate the inertia w.r.t the TotalCoG, including point masses
-	// TotalCoG is the new origin for this calculation, so we transfer the other inertias using Huyghens/Steiner theorem
+
+	// The CoG position is now available, so calculate the inertia w.r.t the Total CoG, including point masses
+	// The total CoG is the new origin for this calculation, so we transfer the other inertias using Huyghens/Steiner theorem
+	//LA is the displacement vector from the centre of mass to the new axis
+	LA = m_CoG-VolumeCoG;
+	m_CoGIxx = Ixx + VolumeMass * (LA.y*LA.y+ LA.z*LA.z);
+	m_CoGIyy = Iyy + VolumeMass * (LA.x*LA.x+ LA.z*LA.z);
+	m_CoGIzz = Izz + VolumeMass * (LA.x*LA.x+ LA.y*LA.y);
+	m_CoGIxz = Ixz - VolumeMass *  LA.x*LA.z;
 
 	for(i=0; i<m_NMass; i++)
 	{
-		LA = m_MassPosition[i] - TotalCoG;
-		Ixx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-		Iyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-		Izz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		Ixz -= m_MassValue[i] * (LA.x*LA.z);
+		LA = m_MassPosition[i] - m_CoG;
+		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+		m_CoGIyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+		m_CoGIzz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+		m_CoGIxz -= m_MassValue[i] * (LA.x*LA.z);
 	}
 
 	for(iw=0; iw<4; iw++)
@@ -272,11 +279,11 @@ void CPlane::ComputeBodyAxisInertia()
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				LA = (pWing[iw]->m_MassPosition[i] + m_WingLE[i]) - TotalCoG;
-				Ixx += pWing[iw]->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-				Iyy += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-				Izz += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-				Ixz -= pWing[iw]->m_MassValue[i] * (LA.x*LA.z);
+				LA = (pWing[iw]->m_MassPosition[i] + m_WingLE[i]) - m_CoG;
+				m_CoGIxx += pWing[iw]->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+				m_CoGIyy += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+				m_CoGIzz += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+				m_CoGIxz -= pWing[iw]->m_MassValue[i] * (LA.x*LA.z);
 			}
 		}
 	}
@@ -286,20 +293,13 @@ void CPlane::ComputeBodyAxisInertia()
 		CBody *pBody = m_pBody;
 		for(i=0; i<pBody->m_NMass; i++)
 		{
-			LA = (pBody->m_MassPosition[i] + m_BodyPos) - TotalCoG;
-			Ixx += pBody->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-			Iyy += pBody->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-			Izz += pBody->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			Ixz -= pBody->m_MassValue[i] * (LA.x*LA.z);
+			LA = (pBody->m_MassPosition[i] + m_BodyPos) - m_CoG;
+			m_CoGIxx += pBody->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
+			m_CoGIyy += pBody->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
+			m_CoGIzz += pBody->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
+			m_CoGIxz -= pBody->m_MassValue[i] * (LA.x*LA.z);
 		}
 	}
-
-	m_TotalMass = TotalMass;
-	m_CoG = TotalCoG;
-	m_CoGIxx =  Ixx;
-	m_CoGIyy =  Iyy;
-	m_CoGIzz =  Izz;
-	m_CoGIxz =  Ixz;
 }
 
 
@@ -325,7 +325,6 @@ void CPlane::ComputePlane(void)
 		m_TailVolume = ProjectedArea * SLA / area/m_Wing.m_MAChord ;
 	}
 	else m_TailVolume = 0.0;
-	
 	m_Fin.m_bDoubleFin = m_bDoubleFin;
 	m_Fin.m_bSymFin    = m_bSymFin;
 }
@@ -341,6 +340,8 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_bDoubleSymFin = pPlane->m_bDoubleSymFin;
 	m_bStab         = pPlane->m_bStab;
 	m_bBiplane      = pPlane->m_bBiplane;
+
+	m_TailVolume    = pPlane->m_TailVolume;
 
 	for(int iw=0; iw<MAXWINGS; iw++)
 	{
@@ -380,16 +381,22 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_PlaneDescription = pPlane->m_PlaneDescription;
 }
 
+double CPlane::TailVolume()
+{
+	if(m_bStab) return m_TailVolume;
+	else        return 0.0;
+}
 
-double CPlane::GetTotalMass()
+
+double CPlane::TotalMass()
 {
 	static double Mass;
 	
-	Mass = m_Wing.GetTotalMass();
-	if(m_bBiplane) Mass += m_Wing2.GetTotalMass();
-	if(m_bStab)    Mass += m_Stab.GetTotalMass();
-	if(m_bFin)     Mass += m_Fin.GetTotalMass();
-	if(m_bBody && m_pBody)    Mass += m_pBody->GetTotalMass();
+	Mass = m_Wing.TotalMass();
+	if(m_bBiplane) Mass += m_Wing2.TotalMass();
+	if(m_bStab)    Mass += m_Stab.TotalMass();
+	if(m_bFin)     Mass += m_Fin.TotalMass();
+	if(m_bBody && m_pBody)    Mass += m_pBody->TotalMass();
 	
 	for(int i=0; i<m_NMass; i++)
 		Mass += m_MassValue[i];
@@ -581,19 +588,98 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 }
 
 
+bool CPlane::IsBiPlane()
+{
+	return m_bBiplane;
+}
+
+CWing *CPlane::Wing()
+{
+	return &m_Wing;
+}
+
+CWing *CPlane::Wing2()
+{
+	if(m_bBiplane) return &m_Wing2;
+	else           return NULL;
+}
+
+CWing *CPlane::Stab()
+{
+	if(m_bStab) return &m_Stab;
+	else        return NULL;
+}
+
+CWing *CPlane::Fin()
+{
+	if(m_bFin) return &m_Fin;
+	else       return NULL;
+}
+
+CBody *CPlane::Body()
+{
+	if(m_bBody) return m_pBody;
+	else        return NULL;
+}
+
+QString CPlane::PlaneName()
+{
+	return m_PlaneName;
+}
+
+QString &CPlane::rPlaneName()
+{
+	return m_PlaneName;
+}
+
+CVector CPlane::CoG()
+{
+	return m_CoG;
+}
+
+void CPlane::SetParents(void *pMainFrame, void*pMiarex)
+{
+	s_pMainFrame = pMainFrame;
+	s_pMiarex    = pMiarex;
+}
 
 
+void CPlane::RenameWings()
+{
+	m_Wing.m_WingName  = m_PlaneName+"_Wing";
+	m_Wing2.m_WingName = m_PlaneName+"_Wing2";
+	m_Stab.m_WingName  = m_PlaneName+"_Elev";
+	m_Fin.m_WingName   = m_PlaneName+"_Fin";
+}
 
 
+void CPlane::CreateSurfaces()
+{
+	m_Wing.CreateSurfaces(m_WingLE[0],  0.0, m_WingTiltAngle[0]);
+	m_Wing2.CreateSurfaces(m_WingLE[1], 0.0, m_WingTiltAngle[1]);
+	m_Stab.CreateSurfaces(m_WingLE[2],  0.0, m_WingTiltAngle[2]);
+	m_Fin.CreateSurfaces(m_WingLE[3], -90.0, m_WingTiltAngle[3]);
+}
 
 
+void CPlane::SetBody(CBody *pBody)
+{
+	m_pBody = pBody;
+}
 
 
+CVector CPlane::WingLE(int iw)
+{
+	return m_WingLE[iw];
+}
 
 
+CVector CPlane::BodyPos()
+{
+	return m_BodyPos;
+}
 
-
-
-
-
-
+double CPlane::WingTiltAngle(int iw)
+{
+	return m_WingTiltAngle[iw];
+}

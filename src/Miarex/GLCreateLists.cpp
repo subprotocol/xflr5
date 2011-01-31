@@ -2005,7 +2005,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 		glLineWidth((GLfloat)pMiarex->m_XTopWidth);
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==1)
+			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -2048,7 +2048,8 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					{
 						glBegin(GL_LINE_STRIP);
 						{
-							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++){
+							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
+							{
 								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
@@ -2066,7 +2067,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 	glEndList();
 
 	//BOTTOM TRANSITION
-	glNewList(List+4,GL_COMPILE);
+	glNewList(List+MAXWINGS,GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
 		glEnable (GL_LINE_STIPPLE);
@@ -2085,7 +2086,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 		glLineWidth((GLfloat)pMiarex->m_XBotWidth);
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==1)
+			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
 			{
 				glBegin(GL_LINE_STRIP);
 				{
@@ -2272,7 +2273,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 	total = 12;
 	if(pWPolar) total +=2;
-	if(pPlane && pPlane->m_bStab)  total ++;
+	if(pPlane && pPlane->Stab())  total ++;
 	ZPos = pMiarex->m_r3DCltRect.bottom()- total * dD ;
 	LeftPos = pMiarex->m_r3DCltRect.left() +15;
 
@@ -2290,7 +2291,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 		{
 			GetLengthUnit(length,pMainFrame->m_LengthUnit);
 			GetAreaUnit(surface,pMainFrame->m_AreaUnit);
-			if(pPlane)     UFOName = pPlane->m_PlaneName;
+			if(pPlane)     UFOName = pPlane->PlaneName();
 			else if(pWing) UFOName = pWing->m_WingName;
 
 			pGLWidget->renderText(LeftPos, ZPos, UFOName, pMainFrame->m_TextFont);
@@ -2317,13 +2318,15 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 			double xcog;
 			if(pWPolar)     xcog = pWPolar->m_CoG.x;
-			else if(pPlane) xcog = pPlane->m_CoG.x;
+			else if(pPlane) xcog = pPlane->CoG().x;
 			else if(pWing)  xcog = pWing->m_CoG.x;
 			Result = QString(QObject::tr("X_CG           = %1 ")).arg(xcog*pMainFrame->m_mtoUnit, a,'f',b);
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(pWing->m_PlanformArea * pMainFrame->m_m2toUnit, a,'f',b);
+			double Area = pWing->m_ProjectedArea;
+			if(pPlane && pPlane->IsBiPlane()) Area+=pPlane->Wing2()->m_ProjectedArea;
+			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);
 
@@ -2338,8 +2341,8 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
 				else
 				{
-					if(pPlane)     Mass = pPlane->GetTotalMass();
-					else if(pWing) Mass = pWing->GetTotalMass();
+					if(pPlane)     Mass = pPlane->TotalMass();
+					else if(pWing) Mass = pWing->TotalMass();
 				}
 				GetWeightUnit(str, pMainFrame->m_WeightUnit);
 				str1 = QString(QObject::tr("Plane Mass     = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit,c,'f',d);
@@ -2348,15 +2351,15 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 				ZPos +=dD;
 				GetAreaUnit(strong, pMainFrame->m_AreaUnit);
-				str1 = QString(QObject::tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/pWPolar->m_WArea/pMainFrame->m_m2toUnit, a,'f',b);
+				str1 = QString(QObject::tr("Wing Load      = %1 ")).arg(Mass*pMainFrame->m_kgtoUnit/Area/pMainFrame->m_m2toUnit, a,'f',b);
 				Result = str1 + str+"/" + strong;
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
 			}
 
-			if(pPlane && pPlane->m_bStab)
+			if(pPlane && pPlane->Stab())
 			{
-				Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->m_TailVolume,c,'f',d);
+				Result = QString(QObject::tr("Tail Volume    = %1")).arg(pPlane->TailVolume(),c,'f',d);
 				pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 				ZPos +=dD;
 			}
@@ -2373,7 +2376,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 			ZPos +=dD;
 
-			Result = QString(QObject::tr("Root-Tip Sweep = %1")).arg(pWing->GetAverageSweep(),c,'f',d);
+			Result = QString(QObject::tr("Root-Tip Sweep = %1")).arg(pWing->AverageSweep(),c,'f',d);
 			pGLWidget->renderText(LeftPos, ZPos, Result, pMainFrame->m_TextFont);
 		}
 
