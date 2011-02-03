@@ -1529,8 +1529,8 @@ void QMiarex::SetControls()
 	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
-//	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
-//	else                   pMainFrame->m_pctrlStabViewWidget->hide();
+	if(m_iView==WSTABVIEW) pMainFrame->m_pctrlStabViewWidget->show();
+	else                   pMainFrame->m_pctrlStabViewWidget->hide();
 
 
 //	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
@@ -1632,9 +1632,9 @@ void QMiarex::SetControls()
 	m_pctrlDownwash->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVortices->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlMoment->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
-	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
-	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
-	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=1);
+	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
+	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
+	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 
 	pMainFrame->highlightWOppAct->setChecked(m_bHighlightOpp);
 	pMainFrame->CurBodyMenu->setEnabled(m_pCurBody);
@@ -5180,10 +5180,9 @@ void QMiarex::GLDrawMasses()
 					glTranslated(m_pCurPlane->WingLE(iw).x,
 							   m_pCurPlane->WingLE(iw).y,
 							   m_pCurPlane->WingLE(iw).z);
-					if(m_pWingList[iw]->m_bIsFin)
-					{
-						glTranslated(0.0,0.0, m_pWingList[iw]->m_ProjectedSpan/2.0);
-					}
+					if(m_pWingList[iw]->m_bIsFin) glTranslated(0.0,0.0, m_pWingList[iw]->m_ProjectedSpan/4.0);
+					else                          glTranslated(0.0, m_pWingList[iw]->m_ProjectedSpan/4.0,0.0);
+
 
 					pGLWidget->renderText(0.0, 0.0, zdist,
 									  m_pWingList[iw]->m_WingName+
@@ -14507,6 +14506,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	{
 		m_bCurveVisible = m_pCurWPolar->m_bIsVisible;
 		m_bCurvePoints  = m_pCurWPolar->m_bShowPoints;
+//qDebug()<<"SetWPlr AuotInertia"<<m_pCurWPolar->m_bAutoInertia <<m_pCurPlane->m_CoGIxx <<m_pCurPlane->m_CoGIyy <<m_pCurPlane->m_CoGIzz;
 
 		if(m_pCurWPolar->m_bAutoInertia)
 		{

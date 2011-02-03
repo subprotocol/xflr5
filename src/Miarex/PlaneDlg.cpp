@@ -594,6 +594,7 @@ void PlaneDlg::OnOK()
 	}
 
 	m_pPlane->ComputeBodyAxisInertia();
+qDebug()<<m_pPlane->m_CoGIxx<<m_pPlane->m_CoGIyy<<m_pPlane->m_CoGIzz<<m_pPlane->m_CoGIxz;
 	accept();
 }
 

@@ -199,24 +199,23 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 
 void CPlane::ComputeBodyAxisInertia()
 {
+	//
 	// Initializes the inertia tensor in geometrical (body) axis :
-	//  - add the volume inertia AND the point masses of all components
+	//  - adds the volume inertia AND the point masses of all components
 	//  - the body axis is the frame in which all the geometry has been defined
-	//  - the origin=BodyFrame;
-	//  - the center of gravity is calculated from component masses and is NOT the CoG defined in the polar
+	//  - the origin is the plane's CoG, taking into account all masses
+	//
 
 	int i, iw;
-	CVector LA, VolumeCoG, TotalCoG;
-	CWing *pWing[4];
-	pWing[0] = pWing[1] = pWing[2] = pWing[3] = NULL;
+	CVector VolumeCoG, MassPos;
+	CWing *pWing[MAXWINGS];
 	double Ixx, Iyy, Izz, Ixz,  VolumeMass;
 	Ixx = Iyy = Izz = Ixz = VolumeMass = 0.0;
 
-
 	pWing[0] = &m_Wing;
-	if(m_bBiplane) pWing[1] = &m_Wing2;
-	if(m_bStab)    pWing[2] = &m_Stab;
-	if(m_bFin)     pWing[3] = &m_Fin;
+	if(m_bBiplane) pWing[1] = &m_Wing2; else pWing[1] = NULL;
+	if(m_bStab)    pWing[2] = &m_Stab;  else pWing[2] = NULL;
+	if(m_bFin)     pWing[3] = &m_Fin;   else pWing[3] = NULL;
 
 	ComputeVolumeInertia(VolumeMass, VolumeCoG, Ixx, Iyy, Izz, Ixz);
 	m_TotalMass = VolumeMass;
@@ -227,63 +226,61 @@ void CPlane::ComputeBodyAxisInertia()
 	for(i=0; i<m_NMass; i++)
 	{
 		m_TotalMass += m_MassValue[i];
-		m_CoG += m_MassPosition[i] * m_MassValue[i];
+		m_CoG       += m_MassPosition[i] * m_MassValue[i];
 	}
 
-	for(iw=0; iw<4; iw++)
+	for(iw=0; iw<MAXWINGS; iw++)
 	{
 		if(pWing[iw])
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				m_TotalMass += pWing[iw]->m_MassValue[i];
-				m_CoG +=  (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
+				m_TotalMass +=  pWing[iw]->m_MassValue[i];
+				m_CoG       += (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
 			}
 		}
 	}
 
 	if(m_bBody)
 	{
-		CBody *pBody = m_pBody;
-		for(i=0; i<pBody->m_NMass; i++)
+		for(i=0; i<m_pBody->m_NMass; i++)
 		{
-			m_TotalMass += pBody->m_MassValue[i];
-			m_CoG  += (pBody->m_MassPosition[i]+m_BodyPos) * pBody->m_MassValue[i];
+			m_TotalMass +=  m_pBody->m_MassValue[i];
+			m_CoG       += (m_pBody->m_MassPosition[i]+m_BodyPos) * m_pBody->m_MassValue[i];
 		}
 	}
 	if(m_TotalMass>PRECISION) m_CoG = m_CoG/m_TotalMass;
 	else                      m_CoG.Set(0.0,0.0,0.0);
 
-
 	// The CoG position is now available, so calculate the inertia w.r.t the Total CoG, including point masses
-	// The total CoG is the new origin for this calculation, so we transfer the other inertias using Huyghens/Steiner theorem
-	//LA is the displacement vector from the centre of mass to the new axis
-	LA = m_CoG-VolumeCoG;
-	m_CoGIxx = Ixx + VolumeMass * (LA.y*LA.y+ LA.z*LA.z);
-	m_CoGIyy = Iyy + VolumeMass * (LA.x*LA.x+ LA.z*LA.z);
-	m_CoGIzz = Izz + VolumeMass * (LA.x*LA.x+ LA.y*LA.y);
-	m_CoGIxz = Ixz - VolumeMass *  LA.x*LA.z;
+	// The total CoG is the new origin for this calculation, so we transfer the other inertias using Huygens/Steiner theorem
+	// LA is the displacement vector from the centre of mass to the new axis
+	MassPos = m_CoG - VolumeCoG;
+	m_CoGIxx = Ixx + VolumeMass * (MassPos.y*MassPos.y+ MassPos.z*MassPos.z);
+	m_CoGIyy = Iyy + VolumeMass * (MassPos.x*MassPos.x+ MassPos.z*MassPos.z);
+	m_CoGIzz = Izz + VolumeMass * (MassPos.x*MassPos.x+ MassPos.y*MassPos.y);
+	m_CoGIxz = Ixz - VolumeMass *  MassPos.x*MassPos.z;
 
 	for(i=0; i<m_NMass; i++)
 	{
-		LA = m_MassPosition[i] - m_CoG;
-		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-		m_CoGIyy += m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-		m_CoGIzz += m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-		m_CoGIxz -= m_MassValue[i] * (LA.x*LA.z);
+		MassPos = m_CoG - m_MassPosition[i];
+		m_CoGIxx += m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+		m_CoGIyy += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+		m_CoGIzz += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+		m_CoGIxz -= m_MassValue[i] * (MassPos.x*MassPos.z);
 	}
 
-	for(iw=0; iw<4; iw++)
+	for(iw=0; iw<MAXWINGS; iw++)
 	{
 		if(pWing[iw])
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				LA = (pWing[iw]->m_MassPosition[i] + m_WingLE[i]) - m_CoG;
-				m_CoGIxx += pWing[iw]->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-				m_CoGIyy += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-				m_CoGIzz += pWing[iw]->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-				m_CoGIxz -= pWing[iw]->m_MassValue[i] * (LA.x*LA.z);
+				MassPos = m_CoG - (pWing[iw]->m_MassPosition[i] + m_WingLE[iw]);
+				m_CoGIxx += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+				m_CoGIyy += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+				m_CoGIzz += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+				m_CoGIxz -= pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.z);
 			}
 		}
 	}
@@ -293,11 +290,11 @@ void CPlane::ComputeBodyAxisInertia()
 		CBody *pBody = m_pBody;
 		for(i=0; i<pBody->m_NMass; i++)
 		{
-			LA = (pBody->m_MassPosition[i] + m_BodyPos) - m_CoG;
-			m_CoGIxx += pBody->m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
-			m_CoGIyy += pBody->m_MassValue[i] * (LA.x*LA.x + LA.z*LA.z);
-			m_CoGIzz += pBody->m_MassValue[i] * (LA.x*LA.x + LA.y*LA.y);
-			m_CoGIxz -= pBody->m_MassValue[i] * (LA.x*LA.z);
+			MassPos = m_CoG - (pBody->m_MassPosition[i] + m_BodyPos);
+			m_CoGIxx += pBody->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+			m_CoGIyy += pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+			m_CoGIzz += pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+			m_CoGIxz -= pBody->m_MassValue[i] * (MassPos.x*MassPos.z);
 		}
 	}
 }

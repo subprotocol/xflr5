@@ -415,6 +415,7 @@ void CWing::ComputeBodyAxisInertia()
 	// Calculates the inertia tensor in geometrical (body) axis :
 	//  - adds the volume inertia AND the inertia of point masses of all components
 	//  - the body axis is the frame in which the geometry has been defined
+	//  - the origin is the plane's CoG, taking into account all masses
 	//
 
 	int i;

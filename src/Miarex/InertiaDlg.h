@@ -60,14 +60,15 @@ private slots:
 	void OnExportToAVL();
 
 private:
+	void keyPressEvent(QKeyEvent *event);
 	void resizeEvent(QResizeEvent *event);
 	void showEvent(QShowEvent *event);
 	void FillMassModel();
 	void ComputeInertia();
-	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
+//	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
+	void ComputeBodyAxisInertia();
 	void SetupLayout();
 	void ReadData();
-	void keyPressEvent(QKeyEvent *event);
 
 	CBody *m_pBody;
 	CWing *m_pWing;
