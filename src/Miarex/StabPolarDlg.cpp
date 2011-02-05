@@ -130,7 +130,7 @@ void StabPolarDlg::FillUFOInertia()
 	else if(m_pWing)
 	{
 		m_Mass = m_pWing->TotalMass();
-		m_CoG = m_pWing->m_CoG;
+		m_CoG = m_pWing->CoG();
 		m_CoGIxx = m_pWing->m_CoGIxx;
 		m_CoGIyy = m_pWing->m_CoGIyy;
 		m_CoGIzz = m_pWing->m_CoGIzz;

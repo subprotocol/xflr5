@@ -22,7 +22,6 @@
 #include "Plane.h"
 #include "../Miarex/Miarex.h"
 #include "../Globals.h"
-#include <QtDebug>
 #include <math.h>
 
 void*	CPlane::s_pMainFrame;
@@ -71,7 +70,6 @@ CPlane::CPlane()
 
 	m_Fin.ComputeGeometry();
 
-	m_XCmRef        =   0.0;
 	m_TailVolume    =   0.0;
 	m_WingLE[2].x      = 0.600;
 	m_WingLE[2].y      =   0.0;
@@ -252,6 +250,7 @@ void CPlane::ComputeBodyAxisInertia()
 	if(m_TotalMass>PRECISION) m_CoG = m_CoG/m_TotalMass;
 	else                      m_CoG.Set(0.0,0.0,0.0);
 
+
 	// The CoG position is now available, so calculate the inertia w.r.t the Total CoG, including point masses
 	// The total CoG is the new origin for this calculation, so we transfer the other inertias using Huygens/Steiner theorem
 	// LA is the displacement vector from the centre of mass to the new axis
@@ -284,7 +283,6 @@ void CPlane::ComputeBodyAxisInertia()
 			}
 		}
 	}
-
 	if(Body())
 	{
 		CBody *pBody = m_pBody;
@@ -634,3 +632,5 @@ double CPlane::WingTiltAngle(int iw)
 {
 	return m_WingTiltAngle[iw];
 }
+
+

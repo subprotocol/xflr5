@@ -25,7 +25,6 @@
 #include "../MainFrame.h"
 #include "../Globals.h"
 #include "InertiaDlg.h"
-//#include <QTextEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
@@ -120,6 +119,7 @@ void InertiaDlg::ComputeInertia()
 	{
 		m_pPlane->ComputeVolumeInertia(m_VolumeMass, m_VolumeCoG, m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz);
 	}
+
 	// and display the results
 	m_pctrlXCoG->SetValue(m_VolumeCoG.x*pMainFrame->m_mtoUnit);
 	m_pctrlYCoG->SetValue(m_VolumeCoG.y*pMainFrame->m_mtoUnit);
@@ -164,7 +164,6 @@ void InertiaDlg::ComputeInertia()
 
 	if(TotalMass>PRECISION) TotalCoG *= 1.0/TotalMass;
 	else                    TotalCoG.Set(0.0,0.0,0.0);
-//qDebug("Total mass         %13.7f     %13.7f     %13.7f     %13.7f     %13.7f InertiaDlg", m_CoGIxx, m_CoGIyy, m_CoGIzz, m_VolumeMass, m_VolumeCoG.x);
 
 	//Total inertia in CoG referential
 	//Apply Huyghens theorem to convert the object's inertia to the new frame
@@ -174,42 +173,47 @@ void InertiaDlg::ComputeInertia()
 	TotalIzz = m_CoGIzz + m_VolumeMass * (LA.x*LA.x+ LA.y*LA.y);
 	TotalIxz = m_CoGIxz - m_VolumeMass *  LA.x*LA.z;
 
-
 	//add the inertia contribution of all point masses in the Total CoG frame of reference
 	for(i=0; i<m_NMass; i++)
 	{
-		MassPos = TotalCoG - m_MassPosition[i];
-		TotalIxx  += m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-		TotalIyy  += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-		TotalIzz  += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-		TotalIxz  -= m_MassValue[i] * (MassPos.x*MassPos.z);
-	}
-
-
-	for(iw=0; iw<MAXWINGS; iw++)
-	{
-		if(pWing[iw])
+		if(m_MassValue[i]>PRECISION)
 		{
-			for(i=0; i<pWing[iw]->m_NMass; i++)
-			{
-				MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
-				TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-				TotalIyy  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-				TotalIzz  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-				TotalIxz  -= pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.z);
-			}
+			MassPos = TotalCoG - m_MassPosition[i];
+			TotalIxx  += m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+			TotalIyy  += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+			TotalIzz  += m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+			TotalIxz  -= m_MassValue[i] * (MassPos.x*MassPos.z);
 		}
 	}
 
-	if(m_pPlane && m_pPlane->Body())
+
+	if(m_pPlane || m_pWing)
 	{
-		for(i=0; i<m_pPlane->Body()->m_NMass; i++)
+		for(iw=0; iw<MAXWINGS; iw++)
 		{
-			MassPos = TotalCoG - (m_pPlane->BodyPos() + m_MassPosition[i]);
-			TotalIxx  += m_pPlane->Body()->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-			TotalIyy  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-			TotalIzz  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-			TotalIxz  -= m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.z);
+			if(pWing[iw])
+			{
+				for(i=0; i<pWing[iw]->m_NMass; i++)
+				{
+					MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
+					TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+					TotalIyy  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+					TotalIzz  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+					TotalIxz  -= pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.z);
+				}
+			}
+		}
+
+		if(m_pPlane && m_pPlane->Body())
+		{
+			for(i=0; i<m_pPlane->Body()->m_NMass; i++)
+			{
+				MassPos = TotalCoG - (m_pPlane->BodyPos() + m_pPlane->Body()->m_MassPosition[i]);
+				TotalIxx  += m_pPlane->Body()->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+				TotalIyy  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+				TotalIzz  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+				TotalIxz  -= m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.z);
+			}
 		}
 	}
 
@@ -573,9 +577,9 @@ void InertiaDlg::OnExportToAVL()
 						 .arg(m_pPlane->Body()->m_CoGIxx/Iunit,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIyy/Iunit,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIzz/Iunit,10, 'g', 3)
-			             .arg(0.0,10, 'g', 3)
+						 .arg(0.0,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIxz/Iunit,10, 'g', 3)
-			             .arg(0.0,10, 'g', 3);
+						 .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
 	}
@@ -697,11 +701,7 @@ void InertiaDlg::OnOK()
 	}
 
 	ComputeBodyAxisInertia();
-/*
-if(m_pWing)        qDebug()<<"StabPolarDlg BodyAxisInertia"<<m_pWing->m_CoGIxx << m_pWing->m_CoGIyy  << m_pWing->m_CoGIzz  << m_pWing->m_CoGIxz;
-else if (m_pPlane) qDebug()<<"StabPolarDlg BodyAxisInertia"<<m_pPlane->m_CoGIxx<< m_pPlane->m_CoGIyy << m_pPlane->m_CoGIzz << m_pPlane->m_CoGIxz;
-else if (m_pBody)  qDebug()<<"StabPolarDlg BodyAxisInertia"<<m_pBody->m_CoGIxx << m_pBody->m_CoGIyy  << m_pBody->m_CoGIzz  << m_pBody->m_CoGIxz;
-*/
+
 	accept();
 }
 
@@ -1070,6 +1070,7 @@ void InertiaDlg::OnWingInertia()
 	ComputeInertia();
 }
 
+
 void InertiaDlg::OnWing2Inertia()
 {
 	if(!m_pPlane->BiPlane()) return;
@@ -1082,6 +1083,7 @@ void InertiaDlg::OnWing2Inertia()
 	dlg.exec();
 	ComputeInertia();
 }
+
 
 void InertiaDlg::OnStabInertia()
 {
@@ -1096,6 +1098,7 @@ void InertiaDlg::OnStabInertia()
 	ComputeInertia();
 }
 
+
 void InertiaDlg::OnFinInertia()
 {
 	if(!m_pPlane->Fin()) return;
@@ -1108,6 +1111,7 @@ void InertiaDlg::OnFinInertia()
 	dlg.exec();
 	ComputeInertia();
 }
+
 
 void InertiaDlg::OnBodyInertia()
 {

@@ -57,9 +57,9 @@ public:
 	QString& rPlaneDescription() {return m_PlaneDescription;}
 	CWing *Wing()  {return &m_Wing;}
 	CWing *Wing2() {if(m_bBiplane) return &m_Wing2; else return NULL;}
-	CWing *Stab()  {if(m_bStab) return &m_Stab; else return NULL;}
-	CWing *Fin()   {if(m_bFin) return &m_Fin; else return NULL;}
-	CBody *Body()  {if(m_bBody) return m_pBody; else return NULL;}
+	CWing *Stab()  {if(m_bStab)    return &m_Stab;  else return NULL;}
+	CWing *Fin()   {if(m_bFin)     return &m_Fin;   else return NULL;}
+	CBody *Body()  {if(m_bBody)    return m_pBody;  else return NULL;}
 	CVector CoG()  {return m_CoG;}
 
 	void Duplicate(CPlane *pPlane);
@@ -86,7 +86,6 @@ private:
 
 	bool m_bBody;
 	bool m_bBiplane;
-	double m_XCmRef;
 
 	double m_VolumeMass, m_TotalMass;
 
