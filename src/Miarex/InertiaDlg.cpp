@@ -98,7 +98,7 @@ void InertiaDlg::ComputeInertia()
 		if(m_pPlane->Stab())    pWing[2] = m_pPlane->Stab();
 		if(m_pPlane->Fin())     pWing[3] = m_pPlane->Fin();
 	}
-	else
+	else if(m_pWing)
 	{
 		pWing[0] = m_pWing;
 	}
@@ -153,7 +153,8 @@ void InertiaDlg::ComputeInertia()
 			}
 		}
 	}
-	if(m_pPlane->Body())
+
+	if(m_pPlane && m_pPlane->Body())
 	{
 		for(i=0; i<m_pPlane->Body()->m_NMass; i++)
 		{
