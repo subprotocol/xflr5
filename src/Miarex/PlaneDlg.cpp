@@ -112,8 +112,11 @@ void PlaneDlg::ComputePlane(void)
 	}
 	else m_pPlane->m_TailVolume = 0.0;
 
-	m_pPlane->Fin()->m_bDoubleFin = m_pPlane->m_bDoubleFin;
-	m_pPlane->Fin()->m_bSymFin    = m_pPlane->m_bSymFin;
+	if(m_pPlane->Fin())
+	{
+		m_pPlane->Fin()->m_bDoubleFin = m_pPlane->m_bDoubleFin;
+		m_pPlane->Fin()->m_bSymFin    = m_pPlane->m_bSymFin;
+	}
 }
 
 
@@ -594,7 +597,7 @@ void PlaneDlg::OnOK()
 	}
 
 	m_pPlane->ComputeBodyAxisInertia();
-qDebug()<<m_pPlane->m_CoGIxx<<m_pPlane->m_CoGIyy<<m_pPlane->m_CoGIzz<<m_pPlane->m_CoGIxz;
+//qDebug()<<m_pPlane->m_CoGIxx<<m_pPlane->m_CoGIyy<<m_pPlane->m_CoGIzz<<m_pPlane->m_CoGIxz;
 	accept();
 }
 
@@ -651,7 +654,7 @@ void PlaneDlg::OnSelChangeBodyList(int pos)
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	int sel = m_pctrlBodyList->currentIndex();
 	if (sel >= 0) strong = m_pctrlBodyList->itemText(sel);
-	m_pPlane->m_pBody = pMiarex->GetBody(strong);
+	m_pPlane->SetBody(pMiarex->GetBody(strong));
 }
 
 
@@ -684,6 +687,8 @@ void PlaneDlg::ReadParams()
 	m_pPlane->m_BodyPos.x = m_pctrlXBody->GetValue() / pMainFrame->m_mtoUnit;
 	m_pPlane->m_BodyPos.z = m_pctrlZBody->GetValue() / pMainFrame->m_mtoUnit;
 
+	if(m_pctrlBiplane->isChecked())   m_pPlane->m_bBiplane = true;
+	else                              m_pPlane->m_bBiplane = false;
 	if(m_pctrlStabCheck->isChecked()) m_pPlane->m_bStab = true;
 	else                              m_pPlane->m_bStab = false;
 	if(m_pctrlFinCheck->isChecked())  m_pPlane->m_bFin  = true;
@@ -717,7 +722,6 @@ void PlaneDlg::reject()
 void PlaneDlg::SetParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString strong;
 	int i, pos;
 	CBody *pBody = NULL;
 

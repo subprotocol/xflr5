@@ -268,11 +268,11 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 
 	CPlane *pPlane = (CPlane*)pMainFrame->m_oaPlane.at(row);
 	if(!pPlane) return;
-	CWing *pWing = &pPlane->m_Wing;
+	CWing *pWing = pPlane->Wing();
 
 	ind = m_pUFOModel->index(row+n, 0, QModelIndex());
-	m_pUFOModel->setData(ind,pPlane->m_PlaneName);
-	if(pPlane->m_PlaneDescription.length()) m_pUFOModel->setData(ind, pPlane->m_PlaneDescription, Qt::ToolTipRole);
+	m_pUFOModel->setData(ind,pPlane->PlaneName());
+	if(pPlane->PlaneDescription().length()) m_pUFOModel->setData(ind, pPlane->PlaneDescription(), Qt::ToolTipRole);
 
 	ind = m_pUFOModel->index(row+n, 1, QModelIndex());
 	m_pUFOModel->setData(ind, pWing->m_PlanformSpan*pMainFrame->m_mtoUnit);
@@ -293,7 +293,7 @@ void ManageUFOsDlg::FillPlaneRow(int row, int n)
 	m_pUFOModel->setData(ind,pWing->AverageSweep());
 
 	ind = m_pUFOModel->index(row+n, 7, QModelIndex());
-	m_pUFOModel->setData(ind,pPlane->m_TailVolume);
+	m_pUFOModel->setData(ind,pPlane->TailVolume());
 }
 
 
@@ -318,7 +318,7 @@ void ManageUFOsDlg::OnDelete()
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
-	if(m_pPlane) strong = tr("Are you sure you want to delete the plane :\n") +  m_pPlane->m_PlaneName +"?\n";
+	if(m_pPlane) strong = tr("Are you sure you want to delete the plane :\n") +  m_pPlane->PlaneName() +"?\n";
 	else 	     strong = tr("Are you sure you want to delete the wing :\n") +   m_pWing->m_WingName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
@@ -363,7 +363,7 @@ void ManageUFOsDlg::OnDescriptionChanged()
 {
 	if(m_pPlane)
 	{
-		m_pPlane->m_PlaneDescription = m_pctrlDescription->toPlainText();
+		m_pPlane->rPlaneDescription() = m_pctrlDescription->toPlainText();
 	}
 	else if(m_pWing)
 	{
@@ -392,7 +392,7 @@ void ManageUFOsDlg::OnUFOClicked(QModelIndex index)
 	else
 	{
 		m_pPlane = pMiarex->GetPlane(UFOName);
-		if(m_pPlane) m_pctrlDescription->setText(m_pPlane->m_PlaneDescription);
+		if(m_pPlane) m_pctrlDescription->setText(m_pPlane->PlaneDescription());
 	}
 }
 

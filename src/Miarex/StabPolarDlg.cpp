@@ -120,7 +120,7 @@ void StabPolarDlg::FillUFOInertia()
 	if(m_pPlane)
 	{
 		m_Mass = m_pPlane->TotalMass();
-		m_CoG = m_pPlane->m_CoG;
+		m_CoG = m_pPlane->CoG();
 
 		m_CoGIxx = m_pPlane->m_CoGIxx;
 		m_CoGIyy = m_pPlane->m_CoGIyy;
@@ -380,8 +380,8 @@ void StabPolarDlg::InitDialog()
 		if(m_pFin) m_nControls+=m_pFin->m_nFlaps;
 	}
 
-	if(m_pPlane) m_pctrlUFOName->setText(m_pPlane->m_PlaneName);
-	else         m_pctrlUFOName->setText(m_pWing->m_WingName);
+	if(m_pPlane) m_pctrlUFOName->setText(m_pPlane->PlaneName());
+	else         m_pctrlUFOName->setText(m_pWing->WingName());
 
 	m_pctrlAutoName->setChecked(m_bAutoName);
 

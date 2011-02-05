@@ -2325,7 +2325,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 			ZPos +=dD;
 			double Area = pWing->m_ProjectedArea;
-			if(pPlane && pPlane->IsBiPlane()) Area+=pPlane->Wing2()->m_ProjectedArea;
+			if(pPlane && pPlane->BiPlane()) Area+=pPlane->Wing2()->m_ProjectedArea;
 			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);

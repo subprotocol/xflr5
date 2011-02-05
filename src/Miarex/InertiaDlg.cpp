@@ -94,10 +94,10 @@ void InertiaDlg::ComputeInertia()
 
 	if(m_pPlane)
 	{
-		pWing[0] =  &m_pPlane->m_Wing;
-		if(m_pPlane->m_bBiplane) pWing[1] = &m_pPlane->m_Wing2;
-		if(m_pPlane->m_bStab)    pWing[2] = &m_pPlane->m_Stab;
-		if(m_pPlane->m_bFin)     pWing[3] = &m_pPlane->m_Fin;
+		pWing[0] =  m_pPlane->Wing();
+		if(m_pPlane->BiPlane()) pWing[1] = m_pPlane->Wing2();
+		if(m_pPlane->Stab())    pWing[2] = m_pPlane->Stab();
+		if(m_pPlane->Fin())     pWing[3] = m_pPlane->Fin();
 	}
 	else
 	{
@@ -149,16 +149,16 @@ void InertiaDlg::ComputeInertia()
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
 				TotalMass +=  pWing[iw]->m_MassValue[i];
-				TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
+				TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->WingLE(iw)) * pWing[iw]->m_MassValue[i];
 			}
 		}
 	}
-	if(m_pPlane->m_bBody)
+	if(m_pPlane->Body())
 	{
-		for(i=0; i<m_pPlane->m_pBody->m_NMass; i++)
+		for(i=0; i<m_pPlane->Body()->m_NMass; i++)
 		{
-			TotalMass +=  m_pPlane->m_pBody->m_MassValue[i];
-			TotalCoG  += (m_pPlane->m_pBody->m_MassPosition[i]+m_pPlane->m_BodyPos) * m_pPlane->m_pBody->m_MassValue[i];
+			TotalMass +=  m_pPlane->Body()->m_MassValue[i];
+			TotalCoG  += (m_pPlane->Body()->m_MassPosition[i]+m_pPlane->BodyPos()) * m_pPlane->Body()->m_MassValue[i];
 		}
 	}
 
@@ -192,7 +192,7 @@ void InertiaDlg::ComputeInertia()
 		{
 			for(i=0; i<pWing[iw]->m_NMass; i++)
 			{
-				MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->m_WingLE[iw]);
+				MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
 				TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
 				TotalIyy  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
 				TotalIzz  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
@@ -201,15 +201,15 @@ void InertiaDlg::ComputeInertia()
 		}
 	}
 
-	if(m_pPlane && m_pPlane->m_bBody)
+	if(m_pPlane && m_pPlane->Body())
 	{
-		for(i=0; i<m_pPlane->m_pBody->m_NMass; i++)
+		for(i=0; i<m_pPlane->Body()->m_NMass; i++)
 		{
-			MassPos = TotalCoG - (m_pPlane->m_BodyPos + m_MassPosition[i]);
-			TotalIxx  += m_pPlane->m_pBody->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
-			TotalIyy  += m_pPlane->m_pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
-			TotalIzz  += m_pPlane->m_pBody->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
-			TotalIxz  -= m_pPlane->m_pBody->m_MassValue[i] * (MassPos.x*MassPos.z);
+			MassPos = TotalCoG - (m_pPlane->BodyPos() + m_MassPosition[i]);
+			TotalIxx  += m_pPlane->Body()->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
+			TotalIyy  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
+			TotalIzz  += m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
+			TotalIxz  -= m_pPlane->Body()->m_MassValue[i] * (MassPos.x*MassPos.z);
 		}
 	}
 
@@ -357,11 +357,11 @@ void InertiaDlg::InitDialog()
 	}
 	else if (m_pPlane)
 	{
-		m_VolumeMass = m_pPlane->m_Wing.m_VolumeMass;
-		if(m_pPlane->m_bBiplane) m_VolumeMass += m_pPlane->m_Wing2.m_VolumeMass;
-		if(m_pPlane->m_bStab)    m_VolumeMass += m_pPlane->m_Stab.m_VolumeMass;
-		if(m_pPlane->m_bFin)     m_VolumeMass += m_pPlane->m_Fin.m_VolumeMass;
-		if(m_pPlane->m_bBody && m_pPlane->m_pBody) m_VolumeMass += m_pPlane->m_pBody->m_VolumeMass;
+		m_VolumeMass = m_pPlane->Wing()->m_VolumeMass;
+		if(m_pPlane->BiPlane()) m_VolumeMass += m_pPlane->Wing2()->m_VolumeMass;
+		if(m_pPlane->Stab())    m_VolumeMass += m_pPlane->Stab()->m_VolumeMass;
+		if(m_pPlane->Fin())     m_VolumeMass += m_pPlane->Fin()->m_VolumeMass;
+		if(m_pPlane->Body())    m_VolumeMass += m_pPlane->Body()->m_VolumeMass;
 
 		m_NMass = m_pPlane->m_NMass;
 		for(int i=0; i<m_pPlane->m_NMass; i++)
@@ -375,11 +375,11 @@ void InertiaDlg::InitDialog()
 		m_pctrlVolumeMassLabel->setText(tr("Volume Mass:"));
 		m_pctrlVolumeMass->setEnabled(false);
 		m_pctrlWingInertia->setEnabled(true);
-		if(m_pPlane->m_bBiplane) m_pctrlWing2Inertia->setEnabled(true);
-		if(m_pPlane->m_bStab)    m_pctrlStabInertia->setEnabled(true);
-		if(m_pPlane->m_bFin)     m_pctrlFinInertia->setEnabled(true);
-		if(m_pPlane->m_bBody)    m_pctrlBodyInertia->setEnabled(true);
-		setWindowTitle(tr("Inertia properties for ")+m_pPlane->m_PlaneName);
+		if(m_pPlane->BiPlane()) m_pctrlWing2Inertia->setEnabled(true);
+		if(m_pPlane->Stab())    m_pctrlStabInertia->setEnabled(true);
+		if(m_pPlane->Fin())     m_pctrlFinInertia->setEnabled(true);
+		if(m_pPlane->Body())    m_pctrlBodyInertia->setEnabled(true);
+		setWindowTitle(tr("Inertia properties for ")+m_pPlane->PlaneName());
 	}
 	if(m_pPlane) m_pctrlTopStack->setCurrentIndex(1);
 	else         m_pctrlTopStack->setCurrentIndex(0);
@@ -438,10 +438,10 @@ void InertiaDlg::OnExportToAVL()
 
 	if(m_pPlane)
 	{
-		pWing[0] =  &m_pPlane->m_Wing;
-		if(m_pPlane->m_bBiplane) pWing[1] = &m_pPlane->m_Wing2;
-		if(m_pPlane->m_bStab)    pWing[2] = &m_pPlane->m_Stab;
-		if(m_pPlane->m_bFin)     pWing[3] = &m_pPlane->m_Fin;
+		pWing[0] =  m_pPlane->Wing();
+		if(m_pPlane->BiPlane()) pWing[1] = m_pPlane->Wing2();
+		if(m_pPlane->Stab())    pWing[2] = m_pPlane->Stab();
+		if(m_pPlane->Fin())     pWing[3] = m_pPlane->Fin();
 	}
 	else
 	{
@@ -449,7 +449,7 @@ void InertiaDlg::OnExportToAVL()
 	}
 
 
-	if(m_pPlane)     FileName = m_pPlane->m_PlaneName;
+	if(m_pPlane)     FileName = m_pPlane->PlaneName();
 	else if(m_pWing) FileName = m_pWing->m_WingName;
 	else if(m_pBody) FileName = m_pBody->m_BodyName;
 	FileName.replace("/", " ");
@@ -476,7 +476,7 @@ void InertiaDlg::OnExportToAVL()
 
 	out << "#-------------------------------------------------\n";
 	out << "#\n";
-	if(m_pPlane)      out << "#   "+m_pPlane->m_PlaneName+"\n";
+	if(m_pPlane)      out << "#   "+m_pPlane->PlaneName()+"\n";
 	else if(m_pWing)  out << "#   "+m_pWing->m_WingName+"\n";
 	else if(m_pBody)  out << "#   "+m_pBody->m_BodyName+"\n";
 	out << "#\n";
@@ -563,18 +563,18 @@ void InertiaDlg::OnExportToAVL()
 			}
 		}
 
-		if(m_pPlane->m_bBody)
+		if(m_pPlane->Body())
 		{
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body's inertia"))
-						 .arg(m_pPlane->m_pBody->m_VolumeMass /Munit, 10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoG.x/Lunit, 10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoG.y/Lunit, 10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoG.z/Lunit, 10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoGIxx/Iunit,10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoGIyy/Iunit,10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoGIzz/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_VolumeMass /Munit, 10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoG.x/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoG.y/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoG.z/Lunit, 10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoGIxx/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoGIyy/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoGIzz/Iunit,10, 'g', 3)
 			             .arg(0.0,10, 'g', 3)
-						 .arg(m_pPlane->m_pBody->m_CoGIxz/Iunit,10, 'g', 3)
+						 .arg(m_pPlane->Body()->m_CoGIxz/Iunit,10, 'g', 3)
 			             .arg(0.0,10, 'g', 3);
 			out << strong+"\n";
 		}
@@ -604,13 +604,13 @@ void InertiaDlg::OnExportToAVL()
 			{
 				for (int i=0; i<pWing[iw]->m_NMass; i++)
 				{
-					if(m_pPlane->m_Wing.m_MassValue[i]>0.0)
+					if(m_pPlane->Wing()->m_MassValue[i]>0.0)
 					{
 						strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
 							.arg(pWing[iw]->m_MassValue[i] / Munit,    10, 'g', 3)
-							.arg((pWing[iw]->m_MassPosition[i].x+m_pPlane->m_WingLE[iw].x)/Lunit, 10, 'g', 3)
-							.arg((pWing[iw]->m_MassPosition[i].y+m_pPlane->m_WingLE[iw].y)/Lunit, 10, 'g', 3)
-							.arg((pWing[iw]->m_MassPosition[i].z+m_pPlane->m_WingLE[iw].z)/Lunit, 10, 'g', 3);
+							.arg((pWing[iw]->m_MassPosition[i].x+m_pPlane->WingLE(iw).x)/Lunit, 10, 'g', 3)
+							.arg((pWing[iw]->m_MassPosition[i].y+m_pPlane->WingLE(iw).y)/Lunit, 10, 'g', 3)
+							.arg((pWing[iw]->m_MassPosition[i].z+m_pPlane->WingLE(iw).z)/Lunit, 10, 'g', 3);
 
 						strong += " ! " + pWing[iw]->m_MassTag[i];
 						out << strong+"\n";
@@ -619,19 +619,19 @@ void InertiaDlg::OnExportToAVL()
 			}
 		}
 
-		if(m_pPlane->m_bBody)
+		if(m_pPlane->Body())
 		{
 			//fin
-			for (int i=0; i<m_pPlane->m_Fin.m_NMass; i++)
+			for (int i=0; i<m_pPlane->Fin()->m_NMass; i++)
 			{
-				if(m_pPlane->m_Fin.m_MassValue[i]>0.0)
+				if(m_pPlane->Fin()->m_MassValue[i]>0.0)
 				{
 					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
-						.arg(m_pPlane->m_pBody->m_MassValue[i] / Munit,    10, 'g', 3)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].x/Lunit, 10, 'g', 3)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].y/Lunit, 10, 'g', 3)
-						.arg(m_pPlane->m_pBody->m_MassPosition[i].z/Lunit, 10, 'g', 3);
-					strong += " ! " + m_pPlane->m_pBody->m_MassTag[i];
+						.arg(m_pPlane->Body()->m_MassValue[i] / Munit,    10, 'g', 3)
+						.arg(m_pPlane->Body()->m_MassPosition[i].x/Lunit, 10, 'g', 3)
+						.arg(m_pPlane->Body()->m_MassPosition[i].y/Lunit, 10, 'g', 3)
+						.arg(m_pPlane->Body()->m_MassPosition[i].z/Lunit, 10, 'g', 3);
+					strong += " ! " + m_pPlane->Body()->m_MassTag[i];
 					out << strong+"\n";
 				}
 			}
@@ -1060,7 +1060,8 @@ void InertiaDlg::showEvent(QShowEvent *event)
 void InertiaDlg::OnWingInertia()
 {
 	InertiaDlg dlg;
-	dlg.m_pWing  = &m_pPlane->m_Wing;
+	if(!m_pPlane->Wing()) return;
+	dlg.m_pWing  = m_pPlane->Wing();
 	dlg.m_pPlane = NULL;
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
@@ -1071,9 +1072,9 @@ void InertiaDlg::OnWingInertia()
 
 void InertiaDlg::OnWing2Inertia()
 {
-	if(!m_pPlane->m_bBiplane) return;
+	if(!m_pPlane->BiPlane()) return;
 	InertiaDlg dlg;
-	dlg.m_pWing  = &m_pPlane->m_Wing2;
+	dlg.m_pWing  = m_pPlane->Wing2();
 	dlg.m_pPlane = NULL;
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
@@ -1084,9 +1085,9 @@ void InertiaDlg::OnWing2Inertia()
 
 void InertiaDlg::OnStabInertia()
 {
-	if(!m_pPlane->m_bStab) return;
+	if(!m_pPlane->Stab()) return;
 	InertiaDlg dlg;
-	dlg.m_pWing  = &m_pPlane->m_Stab;
+	dlg.m_pWing  = m_pPlane->Stab();
 	dlg.m_pPlane = NULL;
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
@@ -1097,9 +1098,9 @@ void InertiaDlg::OnStabInertia()
 
 void InertiaDlg::OnFinInertia()
 {
-	if(!m_pPlane->m_bFin) return;
+	if(!m_pPlane->Fin()) return;
 	InertiaDlg dlg;
-	dlg.m_pWing  = &m_pPlane->m_Fin;
+	dlg.m_pWing  = m_pPlane->Fin();
 	dlg.m_pPlane = NULL;
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
@@ -1110,9 +1111,9 @@ void InertiaDlg::OnFinInertia()
 
 void InertiaDlg::OnBodyInertia()
 {
-	if(!m_pPlane->m_bBody) return;
+	if(!m_pPlane->Body()) return;
 	InertiaDlg dlg;
-	dlg.m_pBody  = m_pPlane->m_pBody;
+	dlg.m_pBody  = m_pPlane->Body();
 	dlg.m_pPlane = NULL;
 	dlg.m_pWing  = NULL;
 	dlg.InitDialog();

@@ -150,7 +150,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		}
 	}
 
-	if(m_bBody)
+	if(Body())
 	{
 		if(m_pBody->m_VolumeMass>PRECISION)
 		{
@@ -184,7 +184,7 @@ void CPlane::ComputeVolumeInertia(double &Mass, CVector & CoG, double &CoGIxx, d
 		}
 	}
 
-	if(m_bBody)
+	if(Body())
 	{
 		Pt = CoGBody - CoG;
 		CoGIxx += m_pBody->m_VolumeMass * (Pt.y*Pt.y + Pt.z*Pt.z);
@@ -241,7 +241,7 @@ void CPlane::ComputeBodyAxisInertia()
 		}
 	}
 
-	if(m_bBody)
+	if(Body())
 	{
 		for(i=0; i<m_pBody->m_NMass; i++)
 		{
@@ -285,7 +285,7 @@ void CPlane::ComputeBodyAxisInertia()
 		}
 	}
 
-	if(m_bBody)
+	if(Body())
 	{
 		CBody *pBody = m_pBody;
 		for(i=0; i<pBody->m_NMass; i++)
@@ -393,7 +393,7 @@ double CPlane::TotalMass()
 	if(m_bBiplane) Mass += m_Wing2.TotalMass();
 	if(m_bStab)    Mass += m_Stab.TotalMass();
 	if(m_bFin)     Mass += m_Fin.TotalMass();
-	if(m_bBody && m_pBody)    Mass += m_pBody->TotalMass();
+	if(Body())    Mass += m_pBody->TotalMass();
 	
 	for(int i=0; i<m_NMass; i++)
 		Mass += m_MassValue[i];
@@ -557,6 +557,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if(k)  m_bBody=true; else m_bBody=false;
 			ReadCString(ar,strong);
 			m_pBody = pMiarex->GetBody(strong);
+			if(!m_pBody) m_bBody=false;
 		}
 		else m_pBody = NULL;
 
@@ -585,54 +586,6 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 }
 
 
-bool CPlane::IsBiPlane()
-{
-	return m_bBiplane;
-}
-
-CWing *CPlane::Wing()
-{
-	return &m_Wing;
-}
-
-CWing *CPlane::Wing2()
-{
-	if(m_bBiplane) return &m_Wing2;
-	else           return NULL;
-}
-
-CWing *CPlane::Stab()
-{
-	if(m_bStab) return &m_Stab;
-	else        return NULL;
-}
-
-CWing *CPlane::Fin()
-{
-	if(m_bFin) return &m_Fin;
-	else       return NULL;
-}
-
-CBody *CPlane::Body()
-{
-	if(m_bBody) return m_pBody;
-	else        return NULL;
-}
-
-QString CPlane::PlaneName()
-{
-	return m_PlaneName;
-}
-
-QString &CPlane::rPlaneName()
-{
-	return m_PlaneName;
-}
-
-CVector CPlane::CoG()
-{
-	return m_CoG;
-}
 
 void CPlane::SetParents(void *pMainFrame, void*pMiarex)
 {
@@ -662,6 +615,7 @@ void CPlane::CreateSurfaces()
 void CPlane::SetBody(CBody *pBody)
 {
 	m_pBody = pBody;
+	if(!m_pBody) m_bBody = false;
 }
 
 

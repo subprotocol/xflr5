@@ -37,6 +37,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QHeaderView>
+#include <QtDebug>
 #include <math.h>
 
 //2D
@@ -69,7 +70,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 {
 	setWindowTitle(tr("Body Edition"));
 	setWindowFlags(Qt::Window);
-	setSizeGripEnabled(true);
+//	setSizeGripEnabled(true);
 //	setAttribute(Qt::WA_QuitOnClose );
 
 	m_pBody = NULL;
@@ -1850,7 +1851,8 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 			m_pglWidget->renderText(m_FrameScaledOffset.x+(double)i*m_BodyGridDlg.m_Unit2*m_FrameScale-LabelWidth/2,
 									m_FrameScaledOffset.y-0.04,
 									0.0,
-									strong);
+									strong,
+									pMainFrame->m_TextFont);
 		}
 		for(i=1; i<fabs(m_FrameScaledOffset.x-(m_VerticalSplit))/m_BodyGridDlg.m_Unit2/m_FrameScale; i++)
 		{
@@ -1858,7 +1860,8 @@ void GL3dBodyDlg::GLDrawBodyFrameScale()
 			m_pglWidget->renderText(m_FrameScaledOffset.x-(double)i*m_BodyGridDlg.m_Unit2*m_FrameScale-LabelWidth/2,
 									m_FrameScaledOffset.y-0.04,
 									0.0,
-									strong);
+									strong,
+									pMainFrame->m_TextFont);
 		}
 	}
 
@@ -2729,6 +2732,7 @@ void GL3dBodyDlg::GLRenderBody()
 {
 	int width;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	GLdouble pts[4];
 
@@ -2888,8 +2892,19 @@ void GL3dBodyDlg::GLRenderBody()
 
 			if(m_bShowMasses)
 			{
+				QString MassUnit;
+				GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
+
 				glColor3d(pMiarex->m_MassColor.redF(),pMiarex->m_MassColor.greenF(),pMiarex->m_MassColor.blueF());
-				double radius = .02;//2cm
+				double radius = .01;
+				glPushMatrix();
+				{
+					glTranslated(m_pBody->m_FramePosition[0].x,m_pBody->m_FramePosition[0].y,m_pBody->m_FramePosition[0].z);
+
+					m_pglWidget->renderText(0.0, 0.0, m_pBody->GetLength()/10.0,
+									  m_pBody->m_BodyName+QString(" %1").arg(m_pBody->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+MassUnit);
+				}
+				glPopMatrix();
 
 				for(int im=0; im<m_pBody->m_NMass; im++)
 				{
@@ -2897,6 +2912,7 @@ void GL3dBodyDlg::GLRenderBody()
 					{
 						glTranslated(m_pBody->m_MassPosition[im].x,m_pBody->m_MassPosition[im].y,m_pBody->m_MassPosition[im].z);
 						GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
+
 						m_pglWidget->renderText(0.0, 0.0, 0.02, m_pBody->m_MassTag[im]);
 					}
 					glPopMatrix();

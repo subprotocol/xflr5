@@ -34,29 +34,34 @@ class CPlane
 //	friend class CWing;
 //	friend class CWPolar;
 //	friend class WPolarDlg;
+//	friend class InertiaDlg;
 	friend class PlaneDlg;
-	friend class PanelAnalysisDlg;
-	friend class ManageBodiesDlg;
-	friend class StabPolarDlg;
-	friend class ManageUFOsDlg;
-	friend class InertiaDlg;
+//	friend class PanelAnalysisDlg;
+//	friend class ManageBodiesDlg;
+//	friend class StabPolarDlg;
+//	friend class ManageUFOsDlg;
 
 
 public:
 	CPlane();
 	static void SetParents(void *pMainFrame, void*pMiarex);
 
-	bool IsBiPlane();
+
 	double TotalMass();
 	double TailVolume();
-	CWing *Wing();
-	CWing *Wing2();
-	CWing *Stab();
-	CWing *Fin();
-	CBody *Body();
-	QString PlaneName();
-	QString &rPlaneName();
-	CVector CoG();
+
+	bool BiPlane(){return m_bBiplane;}
+	const QString& PlaneName() const {return m_PlaneName;}
+	QString& rPlaneName() {return m_PlaneName;}
+	const QString& PlaneDescription() const {return m_PlaneDescription;}
+	QString& rPlaneDescription() {return m_PlaneDescription;}
+	CWing *Wing()  {return &m_Wing;}
+	CWing *Wing2() {if(m_bBiplane) return &m_Wing2; else return NULL;}
+	CWing *Stab()  {if(m_bStab) return &m_Stab; else return NULL;}
+	CWing *Fin()   {if(m_bFin) return &m_Fin; else return NULL;}
+	CBody *Body()  {if(m_bBody) return m_pBody; else return NULL;}
+	CVector CoG()  {return m_CoG;}
+
 	void Duplicate(CPlane *pPlane);
 	bool SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	void ComputePlane(void);

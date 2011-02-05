@@ -8286,13 +8286,13 @@ void QMiarex::OnDefineStabPolar()
 		if(pCurWPolar->m_RefAreaType==PLANFORMAREA)
 		{
 			pCurWPolar->m_WArea        = m_pCurWing->m_PlanformArea;
-			if(m_pCurPlane && m_pCurPlane->IsBiPlane()) pCurWPolar->m_WArea += m_pCurPlane->Wing2()->m_PlanformArea;
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pCurWPolar->m_WArea += m_pCurPlane->Wing2()->m_PlanformArea;
 			pCurWPolar->m_WSpan        = m_pCurWing->m_PlanformSpan;
 		}
 		else
 		{
 			pCurWPolar->m_WArea        = m_pCurWing->m_ProjectedArea;
-			if(m_pCurPlane && m_pCurPlane->IsBiPlane()) pCurWPolar->m_WArea += m_pCurPlane->Wing2()->m_ProjectedArea;
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pCurWPolar->m_WArea += m_pCurPlane->Wing2()->m_ProjectedArea;
 			pCurWPolar->m_WSpan        = m_pCurWing->m_ProjectedSpan;
 		}
 		pCurWPolar->m_bVLM1           = m_bVLM1;
@@ -8418,13 +8418,13 @@ void QMiarex::OnDefineWPolar()
 		{
 			pNewWPolar->m_WSpan = m_pCurWing->m_PlanformSpan;
 			pNewWPolar->m_WArea = m_pCurWing->m_PlanformArea;
-			if(m_pCurPlane && m_pCurPlane->IsBiPlane()) pNewWPolar->m_WArea += m_pCurPlane->Wing2()->m_PlanformArea;
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->Wing2()->m_PlanformArea;
 		}
 		else
 		{
 			pNewWPolar->m_WSpan = m_pCurWing->m_ProjectedSpan;
 			pNewWPolar->m_WArea = m_pCurWing->m_ProjectedArea;
-			if(m_pCurPlane && m_pCurPlane->IsBiPlane()) pNewWPolar->m_WArea += m_pCurPlane->Wing2()->m_ProjectedArea;
+			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->Wing2()->m_ProjectedArea;
 		}
 		pNewWPolar->m_Type            = m_WngAnalysis.m_PolarType;
 		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
@@ -13480,7 +13480,7 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 				}
 			}
 
-			pModPlane->PlaneName() = RDlg.m_strName;
+			pModPlane->rPlaneName() = RDlg.m_strName;
 			pModPlane->Wing()->m_WingName = pModPlane->PlaneName()+"_Wing";
 			pModPlane->Wing2()->m_WingName = pModPlane->PlaneName()+"_Wing2";
 			pModPlane->Stab()->m_WingName  = pModPlane->PlaneName()+"_Elev";

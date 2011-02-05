@@ -896,19 +896,19 @@ void CWing::Duplicate(CWing *pWing)
 	// Copies the wing data from an existing wing
 	//
 	int i;
-	s_pMainFrame		= pWing->s_pMainFrame;
+	s_pMainFrame    = pWing->s_pMainFrame;
 	s_pMiarex       = pWing->s_pMiarex;
-	m_NStation		= pWing->m_NStation;
-	m_NPanel		= pWing->m_NPanel;
-	m_PlanformSpan			= pWing->m_PlanformSpan;
-	m_ProjectedSpan	= pWing->m_ProjectedSpan;
+	m_NStation      = pWing->m_NStation;
+	m_NPanel        = pWing->m_NPanel;
+	m_PlanformSpan  = pWing->m_PlanformSpan;
+	m_ProjectedSpan = pWing->m_ProjectedSpan;
 	m_PlanformArea  = pWing->m_PlanformArea;
 	m_ProjectedArea = pWing->m_ProjectedArea;
-	m_AR			= pWing->m_AR;
-	m_TR			= pWing->m_TR;
-	m_GChord		= pWing->m_GChord;
-	m_MAChord		= pWing->m_MAChord;
-	m_WingName		= pWing->m_WingName;
+	m_AR			 = pWing->m_AR;
+	m_TR			 = pWing->m_TR;
+	m_GChord		 = pWing->m_GChord;
+	m_MAChord		 = pWing->m_MAChord;
+	m_WingName      = pWing->m_WingName;
 	m_bSymetric     = pWing->m_bSymetric;
 	m_bIsFin        = pWing->m_bIsFin;
 	m_bSymFin       = pWing->m_bSymFin;
@@ -1223,10 +1223,7 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 }
 
 
-CVector CWing::CoG()
-{
-	return m_CoG;
-}
+
 
 
 double CWing::TotalMass()
@@ -1238,10 +1235,7 @@ double CWing::TotalMass()
 }
 
 
-QString CWing::WingName()
-{
-	return m_WingName;
-}
+
 
 double CWing::GetOffset(double yob)
 {

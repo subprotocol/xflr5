@@ -61,8 +61,12 @@ public:
 
 	double AverageSweep();
 	double TotalMass();
-	CVector CoG();
-	QString WingName();
+
+	CVector CoG() {return m_CoG;}
+	const QString& WingName() const {return m_WingName;}
+	QString& rWingName() {return m_WingName;}
+	const QString& WingDescription() const {return m_WingDescription;}
+	QString& rWingDescription() {return m_WingDescription;}
 
 
 protected:

@@ -58,7 +58,7 @@ bool ManageBodiesDlg::IsInUse(CBody *pBody)
 	for (i=0; i<m_poaPlane->count();i++)
 	{
 		pOldPlane = (CPlane*)m_poaPlane->at(i);
-		if(pOldPlane->m_bBody && pOldPlane->m_pBody == m_pBody)
+		if(pOldPlane->Body() && pOldPlane->Body()==m_pBody)
 		{
 			return true;
 		}
@@ -85,10 +85,9 @@ void ManageBodiesDlg::OnDelete()
 		for (i=0; i<m_poaPlane->count();i++)
 		{
 			pOldPlane = (CPlane*)m_poaPlane->at(i);
-			if(pOldPlane->m_pBody == m_pBody)
+			if(pOldPlane->Body() == m_pBody)
 			{
-				pOldPlane->m_bBody = false;
-				pOldPlane->m_pBody = NULL;
+				pOldPlane->SetBody(NULL);
 				pMainFrame->DeletePlane(pOldPlane, true);
 			}
 			pMiarex->m_bResetglGeom = true;
@@ -163,13 +162,13 @@ void ManageBodiesDlg::OnEdit()
 	for (i=0; i< pMiarex->m_poaPlane->size(); i++)
 	{
 		pPlane = (CPlane*)m_poaPlane->at(i);
-		if(pPlane->m_bBody && pPlane->m_pBody==m_pBody)
+		if(pPlane->Body() && pPlane->Body()==m_pBody)
 		{
 			// Does this plane have results
 			for(int j=0; j<pMiarex->m_poaWPolar->size(); j++)
 			{
 				pWPolar = (CWPolar*)pMiarex->m_poaWPolar->at(j);
-				if(pWPolar->m_UFOName==pPlane->m_PlaneName && pWPolar->m_Alpha.size())
+				if(pWPolar->m_UFOName==pPlane->PlaneName() && pWPolar->m_Alpha.size())
 				{
 					bUsed = true;
 					break;
@@ -217,7 +216,7 @@ void ManageBodiesDlg::OnEdit()
 				for (i=0; i<pMiarex->m_poaPlane->count();i++)
 				{
 					pPlane = (CPlane*)pMiarex->m_poaPlane->at(i);
-					if(pPlane->m_pBody == m_pBody)
+					if(pPlane->Body() == m_pBody)
 					{
 						pMainFrame->DeletePlane(pPlane, true);
 					}

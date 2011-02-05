@@ -2071,8 +2071,8 @@ void PanelAnalysisDlg::SetFileHeader()
 	QString str = dt.toString("dd.MM.yyyy  hh:mm:ss");
 	out << str<<"\n";
 
-	if(m_pPlane)     out << m_pPlane->m_PlaneName;
-	else if(m_pWing) out << m_pWing->m_WingName;
+	if(m_pPlane)     out << m_pPlane->PlaneName();
+	else if(m_pWing) out << m_pWing->WingName();
 	out << "\n";
 
 	out << m_pWPolar->m_PlrName;
@@ -2288,9 +2288,9 @@ void PanelAnalysisDlg::StartAnalysis()
 	{
 		QString len, str;
 		GetLengthUnit(len, pMainFrame->m_LengthUnit);
-		if(fabs(m_pPlane->m_WingLE[0].z-m_pPlane->m_WingLE[2].z)<.0001)
+		if(fabs(m_pPlane->WingLE(0).z-m_pPlane->WingLE(2).z)<.0001)
 		{	
-			str = QString("%1 ").arg(m_pPlane->m_WingLE[0].z*pMainFrame->m_mtoUnit, 7, 'g', 3);
+			str = QString("%1 ").arg(m_pPlane->WingLE(0).z*pMainFrame->m_mtoUnit, 7, 'g', 3);
 			strong = tr("Warning: The wing and elevator lie in the same plane z=")+str+len+"\n";
 			AddString(strong);
 			strong = tr("It is recommended to slightly offset the wing or the elevator to avoid numerical instabilities")+"\n\n";
@@ -4061,7 +4061,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
 			{
-				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->m_WingLE[0], Quat);
+				(m_pWing->m_pPanel+p)->RotateBC(m_pPlane->WingLE(0), Quat);
 			}
 		}
 
@@ -4084,7 +4084,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 
 			for(p=0; p<m_pWingList[2]->m_MatSize; p++)
 			{
-				(m_pWingList[2]->m_pPanel+p)->RotateBC(m_pPlane->m_WingLE[2], Quat);
+				(m_pWingList[2]->m_pPanel+p)->RotateBC(m_pPlane->WingLE(2), Quat);
 			}
 		}
 		pos += m_pWingList[2]->m_MatSize;
