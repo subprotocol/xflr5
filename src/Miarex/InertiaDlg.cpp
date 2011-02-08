@@ -66,7 +66,7 @@ void InertiaDlg::ComputeBodyAxisInertia()
 {
 	if(m_pPlane)     m_pPlane->ComputeBodyAxisInertia();
 	else if(m_pWing) m_pWing->ComputeBodyAxisInertia();
-	else if(m_pBody) m_pPlane->ComputeBodyAxisInertia();
+        else if(m_pBody) m_pBody->ComputeBodyAxisInertia();
 }
 
 
