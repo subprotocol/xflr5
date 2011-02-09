@@ -141,15 +141,17 @@ void InertiaDlg::ComputeInertia()
 		TotalCoG  += m_MassPosition[i] * m_MassValue[i];
 	}
 
-
-	for(iw=0; iw<MAXWINGS; iw++)
+	if(m_pPlane)
 	{
-		if(pWing[iw])
+		for(iw=0; iw<MAXWINGS; iw++)
 		{
-			for(i=0; i<pWing[iw]->m_NMass; i++)
+			if(pWing[iw])
 			{
-				TotalMass +=  pWing[iw]->m_MassValue[i];
-				TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->WingLE(iw)) * pWing[iw]->m_MassValue[i];
+				for(i=0; i<pWing[iw]->m_NMass; i++)
+				{
+					TotalMass +=  pWing[iw]->m_MassValue[i];
+					TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->WingLE(iw)) * pWing[iw]->m_MassValue[i];
+				}
 			}
 		}
 	}

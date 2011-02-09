@@ -5094,7 +5094,7 @@ void QMiarex::GLDraw3D()
 		{
 			glDeleteLists(WOPPLEGEND,3);
 			m_GLList -= 3;
-			GLCreateWOppLegend(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp);
+			GLCreateWOppLegend(this, m_pCurWing, m_pCurWOpp);
 			GLCreateCpLegend(this);
 		}
 		m_bResetglLegend = false;
@@ -14085,9 +14085,9 @@ void QMiarex::SetupLayout()
 	AlphaDeltaLab->setAlignment(Qt::AlignRight);
 	AlphaMinLab->setAlignment(Qt::AlignRight);
 	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 5);
-	m_pctrlAlphaMax     = new FloatEdit(1., 2);
-	m_pctrlAlphaDelta   = new FloatEdit(0.5, 2);
+	m_pctrlAlphaMin     = new FloatEdit(0.0, 3);
+	m_pctrlAlphaMax     = new FloatEdit(1., 3);
+	m_pctrlAlphaDelta   = new FloatEdit(0.5, 3);
 
 	m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
 	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));

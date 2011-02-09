@@ -2389,7 +2389,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 
 
-void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 {
 	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
