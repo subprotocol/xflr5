@@ -1,7 +1,7 @@
 # This is a spec file for the installation of XFLR5 v6
 %define name xflr5
 %define release 2
-%define version 6.02
+%define version 6.03
 
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
@@ -13,9 +13,9 @@ Source: %{name}-%{version}.tar.gz
 Packager: x-andre
 Group: Applications/Engineering
 %if 0%{?fedora_version}  
-BuildRequires: qt-devel >= 4.4.3 gcc-c++  , Mesa-devel
+BuildRequires: qt-devel >= 4.7.0 gcc-c++  , Mesa-devel
 %else  
-BuildRequires: libqt4-devel >= 4.4.3 gcc-c++  , Mesa-devel
+BuildRequires: libqt4-devel >= 4.7.0 gcc-c++  , Mesa-devel
 %endif  
 
 %description
@@ -23,9 +23,7 @@ XFLR5 is a design tool intended for the design and analysis of reduced scaled mo
 It includes the XFoil program for the analysis of airfoils.
 It includes a non-linear Lifting Line method (LLT), two Vortex Lattice Methods (VLM),
 and a 3D panel first-order method for the analysis of wings and planes.
-
 XFLR5 v5 is a re-write of XFLR5 v4 using Qt4 libraries instead of Microsoft's MFC.
-
 XFLR5 v6 introduces stability and control analysis
 
 %prep
@@ -88,6 +86,20 @@ echo %{_bindir}/%{name}
 
 
 %changelog
+*Sun Feb 13 2011 A. Deperrois
+XFLR5v6.03 beta rpm release
+- modified the geometry connection between panels with dihedral and twist - may slightly impact the results
+- corrected the calculations with sideslip
+- added multi-threading capability for foil batch analysis
+- added an option to display the position of point masses in 3d-view
+- in the export to AVL of point masses, corrected the missing addition of wing x & z position
+- modified the export format to AVL of with wing flaps
+- added an option to highlight the currently selected operating point, or the mode in root locs view
+- changed the interface for stability analysis
+- added a properties dialog box option for operating points
+- corrected various minor bugs
+- made several minor enhancements
+
 *Sun Dec 19 2010 A. Deperrois
 XFLR5v6.02 beta rpm release
 - added an option to load a background image in the foil direct design module

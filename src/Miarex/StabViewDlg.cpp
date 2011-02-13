@@ -33,10 +33,6 @@
 #include <complex>
 #include <QtDebug>
 
-//#define MODEPOINTS            100
-
-
-using namespace std;
 
 void *StabViewDlg::s_pMiarex;
 void *StabViewDlg::s_pMainFrame;
