@@ -1529,8 +1529,8 @@ void QMiarex::SetControls()
 	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
-        if(m_iView==WSTABVIEW || (m_iView==W3DVIEW && this->m_pCurWPolar && this->m_pCurWPolar->m_Type==STABILITYPOLAR)) pMainFrame->m_pctrlStabViewWidget->show();
-        else pMainFrame->m_pctrlStabViewWidget->hide();
+	if(m_iView==WSTABVIEW || (m_iView==W3DVIEW && this->m_pCurWPolar && this->m_pCurWPolar->m_Type==STABILITYPOLAR)) pMainFrame->m_pctrlStabViewWidget->show();
+	else pMainFrame->m_pctrlStabViewWidget->hide();
 
 //	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
 //	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);

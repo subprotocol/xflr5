@@ -1,4 +1,4 @@
-Procedure to follow for those who wish to translate the code to another language:
+Procedure to follow to translate the code to another language:
 
 1. Download and install the QtCreator package from Nokia : http://qt.nokia.com/downloads
 

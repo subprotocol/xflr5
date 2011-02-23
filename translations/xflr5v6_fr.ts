@@ -490,6 +490,169 @@ CpCalc : vitesse locale trop élevée
     </message>
 </context>
 <context>
+    <name>BatchThreadDlg</name>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="48"/>
+        <source>Multi-threaded batch analysis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="100"/>
+        <source>Foil Selection</source>
+        <translation type="unfinished">Sélection du profil</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="103"/>
+        <source>Current foil only</source>
+        <translation type="unfinished">Profil actif seulement</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="104"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="105"/>
+        <source>Foil list</source>
+        <translation type="unfinished">Liste des profils</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="113"/>
+        <source>Batch Variables</source>
+        <translation type="unfinished">Variables de traitement</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="116"/>
+        <source>Range</source>
+        <translation type="unfinished">Plage</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="117"/>
+        <source>Re List</source>
+        <translation type="unfinished">Liste de Re</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="118"/>
+        <source>Edit List</source>
+        <translation type="unfinished">Éditer la liste</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="125"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="176"/>
+        <source>Min</source>
+        <translation type="unfinished">Min</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="126"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="177"/>
+        <source>Max</source>
+        <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="127"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="178"/>
+        <source>Increment</source>
+        <translation type="unfinished">Pas</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="134"/>
+        <source>NCrit=</source>
+        <translation type="unfinished">NCrit=</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="163"/>
+        <source>Analysis Range</source>
+        <translation type="unfinished">Plage d&apos;analyse</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="165"/>
+        <source>Specify:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="166"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="445"/>
+        <source>Alpha</source>
+        <translation type="unfinished">Alpha</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="167"/>
+        <source>Cl</source>
+        <translation type="unfinished">Cz</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="168"/>
+        <source>From Zero</source>
+        <translation type="unfinished">Depuis zéro</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="182"/>
+        <source>Spec =</source>
+        <translation type="unfinished">Spéc =</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="202"/>
+        <source>Forced Transitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="207"/>
+        <source>Top transition location (x/c)</source>
+        <translation type="unfinished">Emplacement de la transition supérieure (x/c)</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="208"/>
+        <source>Bottom transition location (x/c)</source>
+        <translation type="unfinished">Emplacement de la transition inférieure (x/c)</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="223"/>
+        <source>Initialize BLs between polars</source>
+        <translation type="unfinished">Initialiser la couche limite entre les polaires</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="224"/>
+        <source>Update polar view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="225"/>
+        <source>Update the polar graphs after the completion of each foil/polar pair</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="239"/>
+        <source>Close</source>
+        <translation type="unfinished">Fermer</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="240"/>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="293"/>
+        <source>Analyze</source>
+        <translation type="unfinished">Analyser</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="453"/>
+        <source>CL</source>
+        <translation type="unfinished">CZ</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="728"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Abandonner</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="827"/>
+        <source>
+_____Analysis cancelled_____
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/BatchThreadDlg.cpp" line="828"/>
+        <source>
+_____Analysis completed_____
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BodyGridDlg</name>
     <message>
         <location filename="../src/Miarex/BodyGridDlg.cpp" line="116"/>
@@ -5654,6 +5817,26 @@ Poursuivre cependant ?</translation>
     </message>
 </context>
 <context>
+    <name>ObjectPropsDlg</name>
+    <message>
+        <location filename="../src/Misc/ObjectPropsDlg.cpp" line="62"/>
+        <source>OK</source>
+        <translation type="unfinished">Accepter</translation>
+    </message>
+    <message>
+        <location filename="../src/Misc/ObjectPropsDlg.cpp" line="89"/>
+        <location filename="../src/Misc/ObjectPropsDlg.cpp" line="103"/>
+        <source>Polar Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Misc/ObjectPropsDlg.cpp" line="95"/>
+        <location filename="../src/Misc/ObjectPropsDlg.cpp" line="108"/>
+        <source>Operating Point Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PanelAnalysisDlg</name>
     <message>
         <location filename="../src/Miarex/PanelAnalysisDlg.cpp" line="176"/>
@@ -8638,6 +8821,48 @@ CpCalc : vitesse locale trop élevée
         <location filename="../src/Design/SplineCtrlsDlg.cpp" line="173"/>
         <source>Lower side points</source>
         <translation>Points d&apos;intrados</translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/LLTAnalysis.cpp" line="230"/>
+        <location filename="../src/Miarex/LLTAnalysis.cpp" line="244"/>
+        <source>       Span pos = %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/LLTAnalysis.cpp" line="236"/>
+        <source> ,  A+Ai+Twist = %1 could not be interpolated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/Miarex/LLTAnalysis.cpp" line="250"/>
+        <source> ,  A+Ai+Twist = %1 is outside the flight envelope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/XFoilTask.cpp" line="154"/>
+        <source>Invalid Analysis Settings
+CpCalc: local speed too large
+ Compressibility corrections invalid </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/XFoilTask.cpp" line="165"/>
+        <source>Cl = %1</source>
+        <translation type="unfinished">Cz = %1</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/XFoilTask.cpp" line="184"/>
+        <source>   ...converged after %1 iterations
+</source>
+        <translation type="unfinished">   ...convergence après %1 itérations
+</translation>
+    </message>
+    <message>
+        <location filename="../src/XDirect/XFoilTask.cpp" line="191"/>
+        <source>   ...unconverged after %1 iterations
+</source>
+        <translation type="unfinished">   ...pas de convergence après %1 itérations
+</translation>
     </message>
 </context>
 <context>

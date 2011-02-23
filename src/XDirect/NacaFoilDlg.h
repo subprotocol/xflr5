@@ -25,6 +25,8 @@
 #include <QDialog>
 #include <QtGui>
 #include "../Objects/Foil.h"
+#include "../Misc/FloatEdit.h"
+
 
 class NacaFoilDlg : public QDialog
 {
@@ -40,7 +42,7 @@ private slots:
 
 public:
 	NacaFoilDlg();
-	void SetLayout();
+	void SetupLayout();
 	void GenerateFoil();
 	void keyPressEvent(QKeyEvent *event);
 
@@ -50,14 +52,13 @@ public:
 
 	CFoil *m_pBufferFoil;
 	QPushButton *OKButton, *CancelButton;
-	QLineEdit *m_pctrlNumber;
-	QLineEdit *m_pctrlPanels;
+	FloatEdit *m_pctrlNumber;
+	FloatEdit *m_pctrlPanels;
 	QLabel * m_pctrlMessage;
 
-	bool m_bApplied;
 	bool m_bGenerated;
-	int m_Digits;
-
+	static int s_Digits;
+	static int s_Panels;
 };
 
 #endif // NACAFOIL_H

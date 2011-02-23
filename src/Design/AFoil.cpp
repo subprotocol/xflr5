@@ -1676,10 +1676,10 @@ void QAFoil::OnAFoilNacaFoils()
 		//then duplicate the buffer foil and add it
 		QString str;
 
-		if(dlg.m_Digits>0 && log10((double)dlg.m_Digits)<4)
-			str = QString("%1").arg(dlg.m_Digits,4,10,QChar('0'));
+		if(dlg.s_Digits>0 && log10((double)dlg.s_Digits)<4)
+			str = QString("%1").arg(dlg.s_Digits,4,10,QChar('0'));
 		else
-			str = QString("%1").arg(dlg.m_Digits);
+			str = QString("%1").arg(dlg.s_Digits);
 		str = "NACA "+ str;
 
 		CFoil *pNewFoil    = new CFoil();

@@ -27,37 +27,39 @@
 
 
 void *NacaFoilDlg::s_pXFoil;
-
+int NacaFoilDlg::s_Digits = 0;
+int NacaFoilDlg::s_Panels = 100;
 
 NacaFoilDlg::NacaFoilDlg()
 {
 	setWindowTitle(tr("NACA Foils"));
 	m_pAFoil = NULL;
 	m_pXDirect = NULL;
-	m_bApplied   = false;
 	m_bGenerated = false;
 	m_pBufferFoil = NULL;
-	m_Digits = 4;
-	SetLayout();	
+
+	SetupLayout();
+	m_pctrlNumber->SetValue(s_Digits);
+	m_pctrlPanels->SetValue(s_Panels);
 }
 
-void NacaFoilDlg::SetLayout()
-{
 
+void NacaFoilDlg::SetupLayout()
+{
 	QGridLayout *MainGrid = new QGridLayout;
 	QLabel *NacaNumber   = new QLabel(tr("4 or 5 digits"));
 	QLabel *PanelNumber  = new QLabel(tr("Number of Panels"));
 
-	m_pctrlNumber = new QLineEdit("0000");
-	m_pctrlPanels = new QLineEdit("100");
+	m_pctrlNumber = new FloatEdit(0,0);
+	m_pctrlPanels = new FloatEdit(100,0);
 	m_pctrlMessage = new QLabel();
 	m_pctrlMessage->setMinimumWidth(120);
 
-	QValidator *PanelValid = new QIntValidator(0, IQX, this);
-	m_pctrlPanels->setValidator(PanelValid);
+//	QValidator *PanelValid = new QIntValidator(0, IQX, this);
+//	m_pctrlPanels->setValidator(PanelValid);
 
-	QValidator *NacaValid = new QIntValidator(0, 100000000, this);
-	m_pctrlNumber->setValidator(NacaValid);
+//	QValidator *NacaValid = new QIntValidator(0, 100000000, this);
+//	m_pctrlNumber->setValidator(NacaValid);
 
 	m_pctrlNumber->setAlignment(Qt::AlignRight);
 	m_pctrlPanels->setAlignment(Qt::AlignRight);
@@ -91,37 +93,35 @@ void NacaFoilDlg::SetLayout()
 
 	connect(m_pctrlNumber, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
 	connect(m_pctrlPanels, SIGNAL(editingFinished()), this, SLOT(EditingFinished()));
-
 }
 
 
 void NacaFoilDlg::EditingFinished()
 {
+	s_Digits = m_pctrlNumber->text().toInt();
+	s_Panels = m_pctrlPanels->GetValue();
+
 	GenerateFoil();
 	OKButton->setFocus();
 }
 
+
 void NacaFoilDlg::GenerateFoil()
 {
-	if(m_bApplied) return;
 	int itype;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
-	m_bApplied   = true;
 	pXFoil->lflap = false;
 	pXFoil->lbflap = false;
 
-	m_Digits = m_pctrlNumber->text().toInt();
-	int panels = (int)(m_pctrlPanels->text().toInt()/2);
+	if(s_Digits<=25099) itype = 5;
+	if(s_Digits<=9999 ) itype = 4;
 
-	if(m_Digits<=25099) itype = 5;
-	if(m_Digits<=9999 ) itype = 4;
-
-	if(itype==4) pXFoil->naca4(m_Digits, panels);
+	if(itype==4) pXFoil->naca4(s_Digits, (int)(s_Panels/2));
 	else if(itype==5)
 	{
-		int three  = m_Digits/100;
+		int three  = s_Digits/100;
 		if(three!=210 && three !=220 && three !=230 && three !=240 && three !=250)
 		{
 			m_pctrlNumber->selectAll();
@@ -129,7 +129,7 @@ void NacaFoilDlg::GenerateFoil()
 			m_bGenerated = false;
 			return;
 		}
-		if(!pXFoil->naca5(m_Digits, panels))
+		if(!pXFoil->naca5(s_Digits, s_Panels))
 		{
 			m_bGenerated = false;
 			m_pctrlMessage->setText(tr("Illegal NACA Number"));
@@ -184,15 +184,13 @@ void NacaFoilDlg::keyPressEvent(QKeyEvent *event)
 			{
 				OnOK();
 			}
-			break;
+			return;
 		}
 		case Qt::Key_Escape:
 		{
 			reject();
 			return;
 		}
-		default:
-			event->ignore();
 	}
 }
 

@@ -15,7 +15,15 @@
 *******************************************************************************
 
 
-xflr5 v6.03 (Beta ?) 2011
+
+
+xflr5 v6.04  2011
+	- corrected the bug which caused the disapperance of the left stability toolbar when switching to 3D view
+	- corrected the bug which prevented from changing the default number of panels in naca foil generation
+
+
+
+xflr5 v6.03 February 13th, 2011
 	- modified the geometry connection between panels with dihedral and twist - may slightly impact the results
 	- corrected the calculations with sideslip
 	- added multi-threading capability for foil batch analysis
