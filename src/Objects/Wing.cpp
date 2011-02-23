@@ -1012,7 +1012,10 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 	CSurface ASurface;
 	int iFlap = 1;
 //	int iSurface = 0;
-	for(j=(int)(m_NSurfaces/2); j<m_NSurfaces; j++)
+
+        int startIndex = (m_bIsFin ? 0 : (int)(m_NSurfaces/2));
+
+        for(j=startIndex; j<m_NSurfaces; j++)
 	{
 		ASurface.Copy(m_Surface[j]);
 

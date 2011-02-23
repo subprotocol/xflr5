@@ -629,9 +629,9 @@ void InertiaDlg::OnExportToAVL()
 		if(m_pPlane->Body())
 		{
 			//fin
-			for (int i=0; i<m_pPlane->Fin()->m_NMass; i++)
+                        for (int i=0; i<m_pPlane->Body()->m_NMass; i++)
 			{
-				if(m_pPlane->Fin()->m_MassValue[i]>0.0)
+                                if(m_pPlane->Body()->m_MassValue[i]>0.0)
 				{
 					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
 						.arg(m_pPlane->Body()->m_MassValue[i] / Munit,    10, 'g', 3)

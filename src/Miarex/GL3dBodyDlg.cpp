@@ -61,7 +61,11 @@ void* GL3dBodyDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dBodyDlg::s_pGLLightDlg;
 QPoint GL3dBodyDlg::s_WindowPos=QPoint(0,0);
 QSize  GL3dBodyDlg::s_WindowSize=QSize(700, 500);
+#ifdef Q_WS_MAC
+bool GL3dBodyDlg::s_bWindowMaximized=true;
+#else
 bool GL3dBodyDlg::s_bWindowMaximized=false;
+#endif
 
 
 QList <void*> *GL3dBodyDlg::s_poaBody;
