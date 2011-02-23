@@ -9604,21 +9604,21 @@ void QMiarex::OnExporttoAVL()
 	out << ("\n");
 
 	strong = QString("%1   %2   %3  | Sref   Cref   Bref\n")
-			 .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_m2toUnit, 8, 'f', 3)
+                         .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit, 8, 'f', 3)
 			 .arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,       8, 'f', 3)
 			 .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
 	out << strong;
 
 	if(m_pCurPlane)
 		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
-				 .arg(m_pCurPlane->CoG().x,8,'f',3)
-				 .arg(m_pCurPlane->CoG().y,8,'f',3)
-				 .arg(m_pCurPlane->CoG().z,8,'f',3);
+                                 .arg(m_pCurPlane->CoG().x*pMainFrame->m_mtoUnit,8,'f',3)
+                                 .arg(m_pCurPlane->CoG().y*pMainFrame->m_mtoUnit,8,'f',3)
+                                 .arg(m_pCurPlane->CoG().z*pMainFrame->m_mtoUnit,8,'f',3);
 	else if(m_pCurWing)
 		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
-				 .arg(m_pCurWing->m_CoG.x,8,'f',3)
-				 .arg(m_pCurWing->m_CoG.y,8,'f',3)
-				 .arg(m_pCurWing->m_CoG.z,8,'f',3);
+                                 .arg(m_pCurWing->m_CoG.x*pMainFrame->m_mtoUnit,8,'f',3)
+                                 .arg(m_pCurWing->m_CoG.y*pMainFrame->m_mtoUnit,8,'f',3)
+                                 .arg(m_pCurWing->m_CoG.z*pMainFrame->m_mtoUnit,8,'f',3);
 
 	out << strong;
 
