@@ -4165,8 +4165,8 @@ void GL3dBodyDlg::OnNURBSPanels()
 	TakePicture();
 	StorePicture();
 
-	m_pBody->m_nhPanels = m_pctrlNHoopPanels->GetValue();
-	m_pBody->m_nxPanels = m_pctrlNXPanels->GetValue();
+	m_pBody->m_nhPanels = m_pctrlNHoopPanels->Value();
+	m_pBody->m_nxPanels = m_pctrlNXPanels->Value();
 //	m_pBody->SetKnots();
 	m_bResetglBody   = true;
 	m_bResetglBody2D = true;

@@ -263,14 +263,13 @@ void TwoDPanelDlg::ReadParams()
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
 
 	pXFoil->npan   = m_pctrlNPanels->text().toInt();
-	pXFoil->cvpar  = m_pctrlCVpar->GetValue();
-	pXFoil->cterat = m_pctrlCTErat->GetValue();
-	pXFoil->ctrrat = m_pctrlCTRrat->GetValue();
-	pXFoil->xsref1 = m_pctrlXsRef1->GetValue();
-	pXFoil->xsref2 = m_pctrlXsRef2->GetValue();
-	pXFoil->xpref1 = m_pctrlXpRef1->GetValue();
-	pXFoil->xpref2 = m_pctrlXpRef2->GetValue();
-
+	pXFoil->cvpar  = m_pctrlCVpar->Value();
+	pXFoil->cterat = m_pctrlCTErat->Value();
+	pXFoil->ctrrat = m_pctrlCTRrat->Value();
+	pXFoil->xsref1 = m_pctrlXsRef1->Value();
+	pXFoil->xsref2 = m_pctrlXsRef2->Value();
+	pXFoil->xpref1 = m_pctrlXpRef1->Value();
+	pXFoil->xpref2 = m_pctrlXpRef2->Value();
 }
 
 

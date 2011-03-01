@@ -239,8 +239,8 @@ void GL3DScales::OnCpScale()
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
-	pMiarex->m_LegendMax = m_pctrlLegendMax->GetValue();
-	pMiarex->m_LegendMin = m_pctrlLegendMin->GetValue();
+	pMiarex->m_LegendMax = m_pctrlLegendMax->Value();
+	pMiarex->m_LegendMin = m_pctrlLegendMin->Value();
 	m_pctrlLegendMin->setEnabled(!pMiarex->m_bAutoCpScale);
 	m_pctrlLegendMax->setEnabled(!pMiarex->m_bAutoCpScale);
 
@@ -253,8 +253,8 @@ void GL3DScales::OnCpScale()
 void GL3DScales::OnApply()
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
-	pMiarex->m_LegendMax = m_pctrlLegendMax->GetValue();
-	pMiarex->m_LegendMin = m_pctrlLegendMin->GetValue();
+	pMiarex->m_LegendMax = m_pctrlLegendMax->Value();
+	pMiarex->m_LegendMin = m_pctrlLegendMin->Value();
 	pMiarex->m_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
 
 	ReadStreamParams();
@@ -299,11 +299,11 @@ void GL3DScales::showEvent(QShowEvent *event)
 void GL3DScales::ReadStreamParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_NX = m_pctrlNXPoint->GetValue();
-	m_XOffset = m_pctrlXOffset->GetValue() / pMainFrame->m_mtoUnit;
-	m_ZOffset = m_pctrlZOffset->GetValue() / pMainFrame->m_mtoUnit;
-	m_DeltaL  = m_pctrlDeltaL->GetValue()  / pMainFrame->m_mtoUnit;
-	m_XFactor = m_pctrlXFactor->GetValue();
+	m_NX = m_pctrlNXPoint->Value();
+	m_XOffset = m_pctrlXOffset->Value() / pMainFrame->m_mtoUnit;
+	m_ZOffset = m_pctrlZOffset->Value() / pMainFrame->m_mtoUnit;
+	m_DeltaL  = m_pctrlDeltaL->Value()  / pMainFrame->m_mtoUnit;
+	m_XFactor = m_pctrlXFactor->Value();
 
 	if(m_pctrlLE->isChecked())	        m_pos=0;
 	else if(m_pctrlTE->isChecked())     m_pos=1;

@@ -30,6 +30,7 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QCheckBox>
 #include "../Objects/WPolar.h"
 #include "../Objects/Plane.h"
 #include "../Objects/CVector.h"

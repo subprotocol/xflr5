@@ -314,16 +314,16 @@ void WAdvancedDlg::OnResetDefaults()
 void WAdvancedDlg::ReadParams()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_Relax           = m_pctrlRelax->GetValue();
-	m_AlphaPrec       = m_pctrlAlphaPrec->GetValue();
-	m_MaxWakeIter     = m_pctrlMaxWakeIter->GetValue();
-	m_CoreSize        = m_pctrlCoreSize->GetValue() / pMainFrame->m_mtoUnit;
-	m_MinPanelSize    = m_pctrlMinPanelSize->GetValue() / pMainFrame->m_mtoUnit;
-	m_VortexPos       = m_pctrlVortexPos->GetValue()/100.0;
-	m_ControlPos      = m_pctrlControlPos->GetValue()/100.0;
-	m_WakeInterNodes  = (int)m_pctrlInterNodes->GetValue();
-	m_Iter            = (int)m_pctrlIterMax->GetValue();;
-	m_NStation        = (int)m_pctrlNStation->GetValue();
+	m_Relax           = m_pctrlRelax->Value();
+	m_AlphaPrec       = m_pctrlAlphaPrec->Value();
+	m_MaxWakeIter     = m_pctrlMaxWakeIter->Value();
+	m_CoreSize        = m_pctrlCoreSize->Value() / pMainFrame->m_mtoUnit;
+	m_MinPanelSize    = m_pctrlMinPanelSize->Value() / pMainFrame->m_mtoUnit;
+	m_VortexPos       = m_pctrlVortexPos->Value()/100.0;
+	m_ControlPos      = m_pctrlControlPos->Value()/100.0;
+	m_WakeInterNodes  = (int)m_pctrlInterNodes->Value();
+	m_Iter            = (int)m_pctrlIterMax->Value();;
+	m_NStation        = (int)m_pctrlNStation->Value();
 	m_bDirichlet      = m_pctrlDirichlet->isChecked();
 	m_bTrefftz        = true;
 	m_bResetWake      = m_pctrlResetWake->isChecked();

@@ -465,7 +465,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 {
 	//
 	// Constructs the surface objects based on the input data
-	// The surfaces are constructed from root to tip, and reordered from let tip to right tip
+	// The surfaces are constructed from root to tip, and re-ordered from let tip to right tip
 	// One surface object for each of the wing's panels
 	//A is the surface's left side, B is the right side
 	//
@@ -485,7 +485,6 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 	m_NSurfaces = 0;
 	m_MatSize = 0;
-
 
 	//define the normal of each surface
 	nSurf=0;
@@ -545,7 +544,8 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_Surface[is].RotateX(m_Surface[is].m_LB, -m_TDihedral[j]);
 			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x,   -VNSide[nSurf+1].y,   VNSide[nSurf+1].z);
 			m_Surface[is].NormalB.Set(VNSide[nSurf].x, -VNSide[nSurf].y, VNSide[nSurf].z);
-			if(is<m_NSurfaces-1)
+
+			if(j>0)
 			{
 				//translate the surface to the left tip of the previous surface and merge points
 				T1 = m_Surface[is+1].m_LA - m_Surface[is].m_LB;
@@ -553,6 +553,12 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 				m_Surface[is].m_LB = m_Surface[is+1].m_LA;
 				m_Surface[is].m_TB = m_Surface[is+1].m_TA;
 			}
+			else
+			{
+				//translate the surface by the initial offset
+				m_Surface[is].Translate(CVector(0.0,-m_TOffset[0],0.0));
+			}
+
 			nSurf++;
 
 			m_Surface[is].m_NXPanels = m_NXPanels[j];
@@ -614,14 +620,19 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 				m_Surface[is].RotateX(m_Surface[is].m_LA, m_TDihedral[j]);
 				m_Surface[is].NormalA.Set(VNSide[is-nSurf].x,   VNSide[is-nSurf].y,   VNSide[is-nSurf].z);
 				m_Surface[is].NormalB.Set(VNSide[is-nSurf+1].x, VNSide[is-nSurf+1].y, VNSide[is-nSurf+1].z);
-
-				if(is>(int)(double)m_NSurfaces/2)
+//				if(is>(int)((double)m_NSurfaces/2.))
+				if(j>0)
 				{
 					//translate the surface to the left tip of the previous surface and merge points
 					T1 = m_Surface[is-1].m_LB - m_Surface[is].m_LA ;
 					m_Surface[is].Translate(T1);
 					m_Surface[is].m_LA = m_Surface[is-1].m_LB;
 					m_Surface[is].m_TA = m_Surface[is-1].m_TB;
+				}
+				else
+				{
+					//translate the surface by the initial offset
+					m_Surface[is].Translate(CVector(0.0,m_TOffset[0],0.0));
 				}
 
 				m_Surface[is].m_NXPanels = m_NXPanels[j];
@@ -1121,10 +1132,10 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 }
 
 
-
-
 double CWing::AverageSweep()
 {
+	//returns the wing's average sweep from root to tip
+	//measured at the quarter chord
 	double xroot = m_TChord[0]/4.0;
 	double xtip  = m_TOffset[m_NPanel] + m_TChord[m_NPanel]/4.0;
 //	double sweep = (atan2(xtip-xroot, m_PlanformSpan/2.0)) * 180.0/PI;
@@ -1132,7 +1143,7 @@ double CWing::AverageSweep()
 }
 
 
-double CWing::GetC4(double yob, double xRef)
+double CWing::C4(double yob, double xRef)
 {
 	//returns the quarter-chord point xposition relative to XCmRef
 	double Chord, Offset, tau;
@@ -1151,7 +1162,8 @@ double CWing::GetC4(double yob, double xRef)
 	return C4;
 }
 
-double CWing::GetChord(double yob)
+
+double CWing::Chord(double yob)
 {
 	double Chord = 0.0;
 	double tau;
@@ -1169,7 +1181,7 @@ double CWing::GetChord(double yob)
 }
 
 
-double CWing::GetDihedral(double yob)
+double CWing::Dihedral(double yob)
 {
 	int i;
 	double y;
@@ -1240,7 +1252,7 @@ double CWing::TotalMass()
 
 
 
-double CWing::GetOffset(double yob)
+double CWing::Offset(double yob)
 {
 	double tau, y;
 	double Offset = 0.0;
@@ -1259,7 +1271,7 @@ double CWing::GetOffset(double yob)
 
 
 
-double CWing::GetTwist(double y)
+double CWing::Twist(double y)
 {
 	int l;
 	double tau;
@@ -1296,6 +1308,7 @@ double CWing::GetTwist(double y)
 
 void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 {
+	//returns the wing's absolute positions yv and zv from the relative value xrel and the planform span y
 	double tau;
 	double twist, chord;
 	double z0, z1, nx, ny;
@@ -1322,8 +1335,8 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 
 			yv *= sign;
 			//	add washout calculated about chord quarter line :
-			twist = GetTwist(fy)*PI/180.;
-			chord = GetChord(fy*2./m_PlanformSpan);
+			twist = Twist(fy)*PI/180.;
+			chord = Chord(fy*2./m_PlanformSpan);
 			zv -= (xrel-0.25)*chord*sin(twist);
 
 			CFoil *pFoil0 = NULL;
@@ -1353,7 +1366,7 @@ void CWing::GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos)
 }
 
 
-double CWing::Getyrel(double SpanPos)
+double CWing::yrel(double SpanPos)
 {
 	double y = fabs(SpanPos);
 	for(int i=0; i<m_NPanel; i++)
@@ -1367,7 +1380,8 @@ double CWing::Getyrel(double SpanPos)
 	return 1.0;
 }
 
-double CWing::GetZPos(double y)
+
+double CWing::ZPos(double y)
 {
 	double tau;
 	double ZPos =0.0;

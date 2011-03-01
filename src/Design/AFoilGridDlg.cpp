@@ -339,10 +339,10 @@ void AFoilGridDlg::OnYMinShow(bool bShow)
 
 void AFoilGridDlg::OnOK()
 {
-	m_XUnit = m_pctrlXUnit->GetValue();
-	m_YUnit = m_pctrlYUnit->GetValue();
-	m_XMinUnit = m_pctrlXMinUnit->GetValue();
-	m_YMinUnit = m_pctrlYMinUnit->GetValue();
+	m_XUnit = m_pctrlXUnit->Value();
+	m_YUnit = m_pctrlYUnit->Value();
+	m_XMinUnit = m_pctrlXMinUnit->Value();
+	m_YMinUnit = m_pctrlYMinUnit->Value();
 	accept();
 }
 
@@ -351,10 +351,10 @@ void AFoilGridDlg::OnApply()
 	if(!m_pAFoil) return;
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 
-	m_XUnit = m_pctrlXUnit->GetValue();
-	m_YUnit = m_pctrlYUnit->GetValue();
-	m_XMinUnit = m_pctrlXMinUnit->GetValue();
-	m_YMinUnit = m_pctrlYMinUnit->GetValue();
+	m_XUnit = m_pctrlXUnit->Value();
+	m_YUnit = m_pctrlYUnit->Value();
+	m_XMinUnit = m_pctrlXMinUnit->Value();
+	m_YMinUnit = m_pctrlYMinUnit->Value();
 
 	pAFoil->m_bScale       = m_bScale;
 

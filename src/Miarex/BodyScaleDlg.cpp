@@ -196,11 +196,11 @@ void BodyScaleDlg::OnRadio()
 
 void BodyScaleDlg::OnOK()
 {
-	m_FrameID = m_pctrlFrameID->GetValue()-1;
+	m_FrameID = m_pctrlFrameID->Value()-1;
 
-	m_XFactor = m_pctrlXScaleFactor->GetValue();
-	m_YFactor = m_pctrlYScaleFactor->GetValue();
-	m_ZFactor = m_pctrlZScaleFactor->GetValue();
+	m_XFactor = m_pctrlXScaleFactor->Value();
+	m_YFactor = m_pctrlYScaleFactor->Value();
+	m_ZFactor = m_pctrlZScaleFactor->Value();
 
 	QDialog::accept();
 }
@@ -209,7 +209,7 @@ void BodyScaleDlg::OnOK()
 void BodyScaleDlg::OnEditingFinished()
 {
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
-	m_FrameID = m_pctrlFrameID->GetValue()-1;
+	m_FrameID = m_pctrlFrameID->Value()-1;
 	pGL3dBodyDlg->m_pBody->m_iActiveFrame = m_FrameID;
 	pGL3dBodyDlg->m_pFrame = pGL3dBodyDlg->m_pBody->GetFrame(pGL3dBodyDlg->m_pBody->m_iActiveFrame);
 	pGL3dBodyDlg->m_bResetglBody2D = true;

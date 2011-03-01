@@ -1238,14 +1238,14 @@ void QXInverse::OnExecute()
 
 	if(m_bFullInverse)
 	{
-		SetTAngle(m_pctrlTAngle->GetValue());
-		SetTGap(m_pctrlTGapx->GetValue(),m_pctrlTGapy->GetValue());
+		SetTAngle(m_pctrlTAngle->Value());
+		SetTGap(m_pctrlTGapx->Value(),m_pctrlTGapy->Value());
 		m_pctrlOutput->setPlainText(" ");
 		ExecMDES();
 	}
 	else
 	{
-		pXFoil->niterq = m_pctrlIter->GetValue();
+		pXFoil->niterq = m_pctrlIter->Value();
 		m_pctrlMOutput->setPlainText(" ");
 		ExecQDES();
 	}
@@ -1293,7 +1293,7 @@ void QXInverse::OnFilter()
 	CancelSpline();
 	if (m_bZoomPlus) ReleaseZoom();
 
-	double filt = m_pctrlFilterParam->GetValue();
+	double filt = m_pctrlFilterParam->Value();
 	pXFoil->Filter(filt);
 	CreateMCurve();
 	UpdateView();
@@ -1561,13 +1561,13 @@ void QXInverse::OnSpecInv()
 
 	if(m_pctrlSpecAlpha->isChecked())
 	{
-		pXFoil->alqsp[1] = m_pctrlSpec->GetValue()*PI/180.0;
+		pXFoil->alqsp[1] = m_pctrlSpec->Value()*PI/180.0;
 		pXFoil->iacqsp = 1;
 		pXFoil->qspcir();
 	}
 	else if(m_pctrlSpecCl->isChecked())
 	{
-		pXFoil->clqsp[1] = m_pctrlSpec->GetValue();
+		pXFoil->clqsp[1] = m_pctrlSpec->Value();
 		pXFoil->iacqsp = 2;
 		pXFoil->qspcir();
 	}

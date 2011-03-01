@@ -52,7 +52,7 @@ LEDlg::LEDlg()
 void LEDlg::SetupLayout()
 {
 	QHBoxLayout *LEValue = new QHBoxLayout;
-	QLabel *lab1 = new QLabel(tr("New approximate L.E. new/old ratio"));
+	QLabel *lab1 = new QLabel(tr("Approximate new/old ratio for L.E. radius"));
 	lab1->setMinimumWidth(200);
 	lab1->setAlignment(Qt::AlignRight);
 	QLabel *lab2 = new QLabel(tr("ratio"));
@@ -185,8 +185,8 @@ void LEDlg::OnApply()
 		return;
 	}
 
-	m_pctrlLE->GetValue(m_LErfac);
-	m_pctrlBlend->GetValue(m_Blend);
+	m_LErfac = m_pctrlLE->Value();
+	m_Blend = m_pctrlBlend->Value();
 
 	pXFoil->lerad(m_LErfac,m_Blend/100.0);
 

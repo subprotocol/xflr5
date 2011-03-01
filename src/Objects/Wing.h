@@ -54,13 +54,17 @@ public:
 	CWing();   // standard constructor
 
 	void GetViewYZPos(double xrel, double y, double &yv, double &zv, int pos);
-	double GetOffset(double yob);
-	double GetChord(double yob);
-	double Getyrel(double SpanPos);
-	double GetDihedral(double yob);
 
+	double yrel(double SpanPos);
+	double Chord(double yob);
+	double Offset(double yob);
+	double Dihedral(double yob);
+	double Twist(double y);
 	double AverageSweep();
 	double TotalMass();
+	double C4(double yob, double xRef);
+	double ZPos(double y);
+	double Beta(int m, int k);
 
 	CVector CoG() {return m_CoG;}
 	const QString& WingName() const {return m_WingName;}
@@ -69,7 +73,6 @@ public:
 	QString& rWingDescription() {return m_WingDescription;}
 
 
-protected:
 	void CreateSurfaces(CVector const &T, double XTilt, double YTilt);//generic surface, LLT, VLM or Panel
 
 	int  VLMGetPanelTotal(void);
@@ -105,17 +108,13 @@ protected:
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 	bool ExportAVLWing(QTextStream &out, int index, double x, double y, double z, double Thetax, double Thetay);
 
-	double GetC4(double yob, double xRef);
-	double GetTwist(double y);
-	double GetZPos(double y);
-	double Beta(int m, int k);
 
 //	bool SplineInterpolation(int n, double *x, double *y,  double *a, double *b, double *c, double *d);
 //	double GetInterpolation(double t, double *y, int m, double *a, double *b, double *c, double *d);
 
 
 //__________________________Variables_______________________
-
+private:
 	static void* s_pMainFrame;		//pointer to the Frame window
 	static void* s_pMiarex;	//pointer to the Miarex Application window
 	static void* s_p3DPanelDlg;//pointer to the 3DPanel analysis dialog class

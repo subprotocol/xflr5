@@ -413,9 +413,9 @@ void WPolarDlg::OnPlaneInertia()
 	}
 	else
 	{
-		m_Weight    = m_pctrlWeight->GetValue() / pMainFrame->m_kgtoUnit;
-		m_CoG.x     = m_pctrlXCmRef->GetValue() / pMainFrame->m_mtoUnit;
-		m_CoG.z     = m_pctrlZCmRef->GetValue() / pMainFrame->m_mtoUnit;
+		m_Weight    = m_pctrlWeight->Value() / pMainFrame->m_kgtoUnit;
+		m_CoG.x     = m_pctrlXCmRef->Value() / pMainFrame->m_mtoUnit;
+		m_CoG.z     = m_pctrlZCmRef->Value() / pMainFrame->m_mtoUnit;
 	}
 	m_bPlaneInertia = m_pctrlPlaneInertia->isChecked();
 	SetWPolarName();
@@ -560,23 +560,23 @@ void WPolarDlg::OnWPolarType()
 void WPolarDlg::ReadValues()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	m_Alpha     = m_pctrlAlpha->GetValue();
-	m_Beta      = m_pctrlBeta->GetValue();
-	m_Weight    = m_pctrlWeight->GetValue() / pMainFrame->m_kgtoUnit;
-	m_CoG.x     = m_pctrlXCmRef->GetValue() / pMainFrame->m_mtoUnit;
-	m_CoG.z     = m_pctrlZCmRef->GetValue() / pMainFrame->m_mtoUnit;
-	m_QInf      = m_pctrlQInf->GetValue() / pMainFrame->m_mstoUnit;
-	m_Height    = m_pctrlHeight->GetValue() / pMainFrame->m_mtoUnit;
+	m_Alpha     = m_pctrlAlpha->Value();
+	m_Beta      = m_pctrlBeta->Value();
+	m_Weight    = m_pctrlWeight->Value() / pMainFrame->m_kgtoUnit;
+	m_CoG.x     = m_pctrlXCmRef->Value() / pMainFrame->m_mtoUnit;
+	m_CoG.z     = m_pctrlZCmRef->Value() / pMainFrame->m_mtoUnit;
+	m_QInf      = m_pctrlQInf->Value() / pMainFrame->m_mstoUnit;
+	m_Height    = m_pctrlHeight->Value() / pMainFrame->m_mtoUnit;
 
 	if(m_pctrlUnit1->isChecked())
 	{
-		m_Viscosity = m_pctrlViscosity->GetValue();
-		m_Density   = m_pctrlDensity->GetValue();
+		m_Viscosity = m_pctrlViscosity->Value();
+		m_Density   = m_pctrlDensity->Value();
 	}
 	else
 	{
-		m_Density   = m_pctrlDensity->GetValue() / 0.00194122;
-		m_Viscosity = m_pctrlViscosity->GetValue() / 10.7182881;
+		m_Density   = m_pctrlDensity->Value() / 0.00194122;
+		m_Viscosity = m_pctrlViscosity->Value() / 10.7182881;
 	}
 
 	if(m_pctrlArea1->isChecked())

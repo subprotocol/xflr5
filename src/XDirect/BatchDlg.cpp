@@ -1132,34 +1132,34 @@ void BatchDlg::ReadParams()
 {
 	if(m_Type !=4)
 	{
-		m_ReInc = m_pctrlReDelta->GetValue();
-		m_ReMax = m_pctrlReMax->GetValue();
-		m_ReMin = m_pctrlReMin->GetValue();
+		m_ReInc = m_pctrlReDelta->Value();
+		m_ReMax = m_pctrlReMax->Value();
+		m_ReMin = m_pctrlReMin->Value();
 
-		m_SpInc = m_pctrlSpecDelta->GetValue();
-		m_SpMax = m_pctrlSpecMax->GetValue();
-		m_SpMin = m_pctrlSpecMin->GetValue();
+		m_SpInc = m_pctrlSpecDelta->Value();
+		m_SpMax = m_pctrlSpecMax->Value();
+		m_SpMin = m_pctrlSpecMin->Value();
 	}
 	else
 	{
-		m_SpInc = m_pctrlReDelta->GetValue();
-		m_SpMax = m_pctrlReMax->GetValue();
-		m_SpMin = m_pctrlReMin->GetValue();
+		m_SpInc = m_pctrlReDelta->Value();
+		m_SpMax = m_pctrlReMax->Value();
+		m_SpMin = m_pctrlReMin->Value();
 
-		m_ReInc = m_pctrlSpecDelta->GetValue();
-		m_ReMax = m_pctrlSpecMax->GetValue();
-		m_ReMin = m_pctrlSpecMin->GetValue();
+		m_ReInc = m_pctrlSpecDelta->Value();
+		m_ReMax = m_pctrlSpecMax->Value();
+		m_ReMin = m_pctrlSpecMin->Value();
 	}
 
 	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
 	if(m_ReMax<=0.0) m_ReMax = fabs(m_ReMax);
 	m_SpInc = fabs(m_SpInc);
 
-	m_Mach     = m_pctrlMach->GetValue();
+	m_Mach     = m_pctrlMach->Value();
 	if(m_Mach<=0.0) m_Mach = 0.0;
-	m_NCrit    = m_pctrlNCrit->GetValue();
-	m_XTopTr   = m_pctrlXTopTr->GetValue();
-	m_XBotTr   = m_pctrlXBotTr->GetValue();
+	m_NCrit    = m_pctrlNCrit->Value();
+	m_XTopTr   = m_pctrlXTopTr->Value();
+	m_XBotTr   = m_pctrlXBotTr->Value();
 	
 	s_bStoreOpp = m_pctrlStoreOpp->isChecked();
 }

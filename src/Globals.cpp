@@ -753,7 +753,6 @@ void WriteCString(QDataStream &ar, QString const &strong)
 	char *text;
 	textline = strong.toAscii();
 	text = textline.data();
-
 	ar << qi;
 	ar.writeRawData(text, qi);
 }

@@ -102,7 +102,7 @@ void WingDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 	if(index.column()!=5 && index.column()!=7 && index.column()!=9)
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue();
+		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 	else

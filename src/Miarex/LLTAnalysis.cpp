@@ -205,8 +205,8 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 
 		arad = (Alpha+m_Ai[m]+m_Twist[m])*PI/180.0;
 //		arad = (s_Alpha-m_Ai[m])*PI/180.0;
-		c4   = m_pWing->GetC4(yob, m_pWPolar->m_CoG.x)/m_Chord[m];
-		zpos = m_pWing->GetZPos(yob*m_pWing->m_PlanformSpan/2.0)/m_Chord[m];
+		c4   = m_pWing->C4(yob, m_pWPolar->m_CoG.x)/m_Chord[m];
+		zpos = m_pWing->ZPos(yob*m_pWing->m_PlanformSpan/2.0)/m_Chord[m];
 
 		m_Cm[m]      = m_CmAirf[m]- c4  * (m_Cl[m]*cos(arad) + m_PCd[m]*sin(arad)) - zpos* (m_Cl[m]*sin(arad) - m_PCd[m]*cos(arad));
 		ViscCm[m]    = (-c4 *sin(arad) + zpos*cos(arad))* m_PCd[m];
@@ -511,7 +511,7 @@ void LLTAnalysis::LLTInitialize(double QInf)
 	for (k=0; k<=s_NLLTStations; k++)
 	{
 		y   = cos(k*PI/s_NLLTStations)* m_pWing->m_PlanformSpan/2.0;
-		m_Twist[k] = m_pWing->GetTwist(y);
+		m_Twist[k] = m_pWing->Twist(y);
 	}
 
 	for (k=0; k<=s_NLLTStations; k++)

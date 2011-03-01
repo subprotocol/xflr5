@@ -284,10 +284,10 @@ void InterpolateFoilsDlg::Update()
 
 void InterpolateFoilsDlg::OnFrac()
 {
-	if(m_pctrlFrac->GetValue()>100.0) m_pctrlFrac->SetValue(100.0);
-	if(m_pctrlFrac->GetValue()<0.0)   m_pctrlFrac->SetValue(0.0);
+	if(m_pctrlFrac->Value()>100.0) m_pctrlFrac->SetValue(100.0);
+	if(m_pctrlFrac->Value()<0.0)   m_pctrlFrac->SetValue(0.0);
 
-	m_Frac = m_pctrlFrac->GetValue();
+	m_Frac = m_pctrlFrac->Value();
 	m_pctrlSlider->setSliderPosition((int)m_Frac);
 	Update();
 }

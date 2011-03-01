@@ -272,7 +272,7 @@ void StabViewDlg::OnAnimate()
 		pMiarex->m_iStabilityView=3;
 		pMiarex->SetControls();
 		
-		pMiarex->m_Modedt = m_pctrlModeStep->GetValue();
+		pMiarex->m_Modedt = m_pctrlModeStep->Value();
 		pMiarex->m_bAnimateMode  = true;
 		int speed = m_pctrlAnimationSpeed->value();
 		pMiarex->m_pTimerMode->setInterval(400-speed);
@@ -443,8 +443,8 @@ void StabViewDlg::OnModeSelection()
 void StabViewDlg::OnReadData()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	pMiarex->m_Modedt = m_pctrlModeStep->GetValue();
-	pMiarex->m_Deltat = m_pctrlDeltat->GetValue();
+	pMiarex->m_Modedt = m_pctrlModeStep->Value();
+	pMiarex->m_Deltat = m_pctrlDeltat->Value();
 }
 
 

@@ -742,7 +742,7 @@ void InertiaDlg::ReadData()
 	}
 	m_NMass = i;
 
-	m_VolumeMass = m_pctrlVolumeMass->GetValue() / pMainFrame->m_kgtoUnit;
+	m_VolumeMass = m_pctrlVolumeMass->Value() / pMainFrame->m_kgtoUnit;
 }
 
 

@@ -110,17 +110,11 @@ double FloatEdit::ReadValue()
 }
 
 
-double FloatEdit::GetValue()
+double FloatEdit::Value()
 {
 	return m_Value;
 }
 
-
-bool FloatEdit::GetValue(double &f)
-{
-	f = m_Value;
-    return true;
-}
 
 
 void FloatEdit::keyPressEvent(QKeyEvent *event)

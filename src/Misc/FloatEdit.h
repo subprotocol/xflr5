@@ -35,8 +35,7 @@ public:
 	FloatEdit(double d, int precision=2);
 
 	void DefineValue(double f);
-	double GetValue();
-	bool GetValue(double &f);
+	double Value();
 	void SetMin(double f);
 	void SetMax(double f);
 	void SetValue(double f);

@@ -125,7 +125,7 @@ void UFOTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 	else
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue();
+		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 }

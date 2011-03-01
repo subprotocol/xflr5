@@ -246,8 +246,8 @@ void FoilGeomDlg::Apply()
 
 	if(!m_bApplied)
 	{
-		double thickness = m_pctrlThickness->GetValue()/100.0;
-		double camber    = m_pctrlCamber->GetValue()/100.0;
+		double thickness = m_pctrlThickness->Value()/100.0;
+		double camber    = m_pctrlCamber->Value()/100.0;
 		pXFoil->tcset(camber, thickness);
 		m_pctrlCamberSlide->setSliderPosition((int)(camber*100*10));
 		m_pctrlThickSlide->setSliderPosition((int)(thickness*100*10));
@@ -256,8 +256,8 @@ void FoilGeomDlg::Apply()
 
 	if(!m_bAppliedX)
 	{
-		double Xthickness = m_pctrlXThickness->GetValue()/100.0;
-		double Xcamber    = m_pctrlXCamber->GetValue()/100.0;
+		double Xthickness = m_pctrlXThickness->Value()/100.0;
+		double Xcamber    = m_pctrlXCamber->Value()/100.0;
 		pXFoil->hipnt(Xcamber, Xthickness);
 		m_pctrlXCamberSlide->setSliderPosition((int)(Xcamber*100*10));
 		m_pctrlXThickSlide->setSliderPosition((int)(Xthickness*100*10));
@@ -398,7 +398,7 @@ void FoilGeomDlg::OnRestore()
 void FoilGeomDlg::OnCamber()
 {
 	m_bApplied = false;
-	m_fCamber = m_pctrlCamber->GetValue();
+	m_fCamber = m_pctrlCamber->Value();
 	m_pctrlCamberSlide->setValue(m_fCamber*10.0);
 	Apply();
 }
@@ -424,7 +424,7 @@ void FoilGeomDlg::OnOK()
 void FoilGeomDlg::OnThickness()
 {
 	m_bApplied = false;
-	m_fThickness = m_pctrlThickness->GetValue();
+	m_fThickness = m_pctrlThickness->Value();
 	m_pctrlThickSlide->setValue(m_fThickness*10.0);
 	Apply();
 }
@@ -450,7 +450,7 @@ void FoilGeomDlg::OnXCamberSlide(int pos)
 void FoilGeomDlg::OnXCamber()
 {
 	m_bAppliedX = false;
-	m_fXCamber = m_pctrlXCamber->GetValue();
+	m_fXCamber = m_pctrlXCamber->Value();
 	m_pctrlXCamberSlide->setValue(m_fXCamber*10.0);
 	Apply();
 }
@@ -469,7 +469,7 @@ void FoilGeomDlg::OnXThickSlide(int pos)
 void FoilGeomDlg::OnXThickness()
 {
 	m_bAppliedX = false;
-	m_fXThickness = m_pctrlXThickness->GetValue();
+	m_fXThickness = m_pctrlXThickness->Value();
 	m_pctrlXThickSlide->setValue(m_fXThickness*10.0);
 	Apply();
 }

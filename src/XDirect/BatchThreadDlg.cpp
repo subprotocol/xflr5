@@ -613,21 +613,21 @@ void BatchThreadDlg::ReadParams()
 
 	if(m_Type !=4)
 	{
-		m_ReInc = m_pctrlReDelta->GetValue();
-		m_ReMax = m_pctrlReMax->GetValue();
-		m_ReMin = m_pctrlReMin->GetValue();
+		m_ReInc = m_pctrlReDelta->Value();
+		m_ReMax = m_pctrlReMax->Value();
+		m_ReMin = m_pctrlReMin->Value();
 
 		if(m_bAlpha)
 		{
-			m_AlphaInc = fabs(m_pctrlSpecDelta->GetValue());
-			m_AlphaMax = m_pctrlSpecMax->GetValue();
-			m_AlphaMin = m_pctrlSpecMin->GetValue();
+			m_AlphaInc = fabs(m_pctrlSpecDelta->Value());
+			m_AlphaMax = m_pctrlSpecMax->Value();
+			m_AlphaMin = m_pctrlSpecMin->Value();
 		}
 		else
 		{
-			m_ClInc = fabs(m_pctrlSpecDelta->GetValue());
-			m_ClMin = m_pctrlSpecMin->GetValue();
-			m_ClMax = m_pctrlSpecMax->GetValue();
+			m_ClInc = fabs(m_pctrlSpecDelta->Value());
+			m_ClMin = m_pctrlSpecMin->Value();
+			m_ClMax = m_pctrlSpecMax->Value();
 		}
 	}
 
@@ -635,11 +635,11 @@ void BatchThreadDlg::ReadParams()
 	if(m_ReMax<=0.0) m_ReMax = fabs(m_ReMax);
 
 
-	m_Mach     = m_pctrlMach->GetValue();
+	m_Mach     = m_pctrlMach->Value();
 	if(m_Mach<=0.0) m_Mach = 0.0;
-	m_NCrit    = m_pctrlNCrit->GetValue();
-	m_XTopTr   = m_pctrlXTopTr->GetValue();
-	m_XBotTr   = m_pctrlXBotTr->GetValue();
+	m_NCrit    = m_pctrlNCrit->Value();
+	m_XTopTr   = m_pctrlXTopTr->Value();
+	m_XBotTr   = m_pctrlXBotTr->Value();
 	
 }
 

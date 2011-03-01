@@ -72,7 +72,7 @@ void FloatEditDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	if(m_Precision[index.column()]>=0)
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue();
+		double value = floatEdit->Value();
 		model->setData(index, value, Qt::EditRole);
 	}
 	else

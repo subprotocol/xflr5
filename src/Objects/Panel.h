@@ -51,7 +51,8 @@ public:
 	CVector GlobalToLocal(CVector const &V);
 	CVector GlobalToLocal(double const &Vx, double const &Vy, double const &Vz);
 	CVector LocalToGlobal(CVector const &V);
-	double GetWidth();
+
+	double Width();
 
 protected:	
 	bool m_bIsInSymPlane;

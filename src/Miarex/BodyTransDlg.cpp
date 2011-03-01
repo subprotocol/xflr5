@@ -91,10 +91,10 @@ void BodyTransDlg::OnOK()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bFrameOnly = m_pctrlFrameOnly->isChecked();
-	m_FrameID    = m_pctrlFrameID->GetValue();
-	m_XTrans     = m_pctrlXTransFactor->GetValue() / pMainFrame->m_mtoUnit;
-	m_YTrans     = m_pctrlYTransFactor->GetValue() / pMainFrame->m_mtoUnit;
-	m_ZTrans     = m_pctrlZTransFactor->GetValue() / pMainFrame->m_mtoUnit;
+	m_FrameID    = m_pctrlFrameID->Value();
+	m_XTrans     = m_pctrlXTransFactor->Value() / pMainFrame->m_mtoUnit;
+	m_YTrans     = m_pctrlYTransFactor->Value() / pMainFrame->m_mtoUnit;
+	m_ZTrans     = m_pctrlZTransFactor->Value() / pMainFrame->m_mtoUnit;
 	accept();
 }
 

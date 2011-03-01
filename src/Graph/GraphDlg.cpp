@@ -321,26 +321,26 @@ void GraphDlg::OnActivePage(int index)
 void GraphDlg::OnApply()
 {
 	m_pGraph->SetAutoX(m_pctrlXAuto->isChecked());
-	m_pGraph->SetXMin(m_pctrlXMin->GetValue());
-	m_pGraph->SetXMax(m_pctrlXMax->GetValue());
-	m_pGraph->SetX0(m_pctrlXOrigin->GetValue());
-	m_pGraph->SetXUnit(m_pctrlXUnit->GetValue());
+	m_pGraph->SetXMin(m_pctrlXMin->Value());
+	m_pGraph->SetXMax(m_pctrlXMax->Value());
+	m_pGraph->SetX0(m_pctrlXOrigin->Value());
+	m_pGraph->SetXUnit(m_pctrlXUnit->Value());
 
 	m_pGraph->SetAutoY(m_pctrlYAuto->isChecked());
-	m_pGraph->SetYMin(m_pctrlYMin->GetValue());
-	m_pGraph->SetYMax(m_pctrlYMax->GetValue());
-	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
-	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
+	m_pGraph->SetYMin(m_pctrlYMin->Value());
+	m_pGraph->SetYMax(m_pctrlYMax->Value());
+	m_pGraph->SetY0(m_pctrlYOrigin->Value());
+	m_pGraph->SetYUnit(m_pctrlYUnit->Value());
 
 	double MinUnit;
 	if(!m_pctrlAutoXMinUnit->isChecked())
 	{
-		MinUnit = m_pctrlXMinorUnit->GetValue();
+		MinUnit = m_pctrlXMinorUnit->Value();
 		m_pGraph->SetXMinorUnit(MinUnit);
 	}
 	if(!m_pctrlAutoYMinUnit->isChecked())
 	{
-		MinUnit = m_pctrlYMinorUnit->GetValue();
+		MinUnit = m_pctrlYMinorUnit->Value();
 		m_pGraph->SetYMinorUnit(MinUnit);
 	}
 
@@ -495,21 +495,21 @@ void GraphDlg::OnLabelFont()
 void GraphDlg::OnOK()
 {
 	m_pGraph->SetAutoX(m_pctrlXAuto->isChecked());
-	m_pGraph->SetXMin(m_pctrlXMin->GetValue());
-	m_pGraph->SetXMax(m_pctrlXMax->GetValue());
-	m_pGraph->SetX0(m_pctrlXOrigin->GetValue());
-	m_pGraph->SetXUnit(m_pctrlXUnit->GetValue());
+	m_pGraph->SetXMin(m_pctrlXMin->Value());
+	m_pGraph->SetXMax(m_pctrlXMax->Value());
+	m_pGraph->SetX0(m_pctrlXOrigin->Value());
+	m_pGraph->SetXUnit(m_pctrlXUnit->Value());
 
 	m_pGraph->SetAutoY(m_pctrlYAuto->isChecked());
-	m_pGraph->SetYMin(m_pctrlYMin->GetValue());
-	m_pGraph->SetYMax(m_pctrlYMax->GetValue());
-	m_pGraph->SetY0(m_pctrlYOrigin->GetValue());
-	m_pGraph->SetYUnit(m_pctrlYUnit->GetValue());
+	m_pGraph->SetYMin(m_pctrlYMin->Value());
+	m_pGraph->SetYMax(m_pctrlYMax->Value());
+	m_pGraph->SetY0(m_pctrlYOrigin->Value());
+	m_pGraph->SetYUnit(m_pctrlYUnit->Value());
 
 	double MinUnit;
 	if(!m_pctrlAutoXMinUnit->isChecked())
 	{
-		MinUnit = m_pctrlXMinorUnit->GetValue();
+		MinUnit = m_pctrlXMinorUnit->Value();
 		m_pGraph->SetXMinorUnit(MinUnit);
 		m_pGraph->SetAutoXMinUnit(false);
 	}
@@ -518,7 +518,7 @@ void GraphDlg::OnOK()
 
 	if(!m_pctrlAutoYMinUnit->isChecked())
 	{
-		MinUnit = m_pctrlYMinorUnit->GetValue();
+		MinUnit = m_pctrlYMinorUnit->Value();
 		m_pGraph->SetYMinorUnit(MinUnit);
 		m_pGraph->SetAutoYMinUnit(false);
 	}

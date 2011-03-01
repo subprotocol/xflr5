@@ -236,6 +236,7 @@ private:
 
 	bool m_bIsImageLoaded;
 	QPixmap m_BackImage;
+	int m_BackImageWidth, m_BackImageHeight;
 };
 
 #endif // QAFOIL_H

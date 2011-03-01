@@ -350,7 +350,7 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 }
 
 
-double CPanel::GetWidth()
+double CPanel::Width()
 {
 	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
 	            +(s_pNode[m_iLB].z - s_pNode[m_iLA].z)*(s_pNode[m_iLB].z - s_pNode[m_iLA].z));
@@ -361,6 +361,8 @@ void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 {
 	// HA is the rotation center
 	//rotates the panels properties which are used in control analysis
+	Qt.Conjugate(Vortex);
+
 	W.x = VortexPos.x - HA.x;
 	W.y = VortexPos.y - HA.y;
 	W.z = VortexPos.z - HA.z;
@@ -368,6 +370,22 @@ void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 	VortexPos.x = W.x + HA.x;
 	VortexPos.y = W.y + HA.y;
 	VortexPos.z = W.z + HA.z;
+
+	W.x = A.x - HA.x;
+	W.y = A.y - HA.y;
+	W.z = A.z - HA.z;
+	Qt.Conjugate(W);
+	A.x = W.x + HA.x;
+	A.y = W.y + HA.y;
+	A.z = W.z + HA.z;
+
+	W.x = B.x - HA.x;
+	W.y = B.y - HA.y;
+	W.z = B.z - HA.z;
+	Qt.Conjugate(W);
+	B.x = W.x + HA.x;
+	B.y = W.y + HA.y;
+	B.z = W.z + HA.z;
 
 	W.x = CtrlPt.x - HA.x;
 	W.y = CtrlPt.y - HA.y;

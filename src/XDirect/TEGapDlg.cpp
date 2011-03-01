@@ -187,8 +187,8 @@ void TEGapDlg::OnApply()
 		return;
 	}
 
-	m_pctrlGap->GetValue(m_Gap);
-	m_pctrlBlend->GetValue(m_Blend);
+	m_Gap = m_pctrlGap->Value();
+	m_Blend = m_pctrlBlend->Value();
 
 	pXFoil->tgap(m_Gap/100.0,m_Blend/100.0);
 	if(pXFoil->n>IQX)

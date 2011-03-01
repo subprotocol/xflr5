@@ -665,10 +665,10 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
+					xt = pWing->Offset(yob) + pWing->Chord(yob);
 					pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
 
-					dih = -pWing->GetDihedral(yob)*PI/180.0;
+					dih = -pWing->Dihedral(yob)*PI/180.0;
 					amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
 					amp *= factor;
 					glBegin(GL_LINES);
@@ -685,10 +685,10 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					for (i=1; i<pWOpp->m_NStation; i++)
 					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWing->GetChord(yob);
+						xt = pWing->Offset(yob) + pWing->Chord(yob);
 						pWing->GetViewYZPos(1., pWOpp->m_SpanPos[i], yt,zt,0);
 
-						dih = -pWing->GetDihedral(yob)*PI/180.0;
+						dih = -pWing->Dihedral(yob)*PI/180.0;
 						amp = pWOpp->m_QInf*sin(pWOpp->m_Ai[i]*PI/180.0);
 						amp *= factor;
 
@@ -820,9 +820,9 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
+					xt = pWing->Offset(yob) + pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
-					dih = pWing->GetDihedral(yob)*PI/180.0;
+					dih = pWing->Dihedral(yob)*PI/180.0;
 					amp1 = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*pMiarex->m_DragScale/coef;
 					amp2 = q0*pWOpp->m_PCd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord*pMiarex->m_DragScale/coef;
 					if(pMiarex->m_bICd)
@@ -875,10 +875,10 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 						for (i=1; i<pWOpp->m_NStation; i++)
 						{
 							yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
+							xt = pWing->Offset(yob) + pWOpp->m_Chord[i];
 							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 
-							dih = pWing->GetDihedral(yob)*PI/180.0;
+							dih = pWing->Dihedral(yob)*PI/180.0;
 
 							amp  = q0*pWOpp->m_ICd[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 							amp *= pMiarex->m_DragScale/coef;
@@ -900,10 +900,10 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 						for (i=1; i<pWOpp->m_NStation; i++)
 						{
 							yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-							xt = pWing->GetOffset(yob) + pWOpp->m_Chord[i];
+							xt = pWing->Offset(yob) + pWOpp->m_Chord[i];
 							pWing->GetViewYZPos(1.0, pWOpp->m_SpanPos[i],yt,zt,0);
 
-							dih = pWing->GetDihedral(yob)*PI/180.0;
+							dih = pWing->Dihedral(yob)*PI/180.0;
 							amp=0.0;
 							if(pMiarex->m_bICd) amp+=pWOpp->m_ICd[i];
 							amp +=pWOpp->m_PCd[i];
@@ -1496,9 +1496,9 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
 					yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-					xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
+					xt = pWing->Offset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
 					pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i], yt, zt, 0);
-					dih = -pWing->GetDihedral(yob)*PI/180.0;
+					dih = -pWing->Dihedral(yob)*PI/180.0;
 					amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 					amp *= pMiarex->m_LiftScale/1000.0;
 
@@ -1516,10 +1516,10 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 					for (i=1; i<pWOpp->m_NStation; i++)
 					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
+						xt = pWing->Offset(yob) + pWOpp->m_XCPSpanRel[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XCPSpanRel[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = -pWing->GetDihedral(yob)*PI/180.0;
+						dih = -pWing->Dihedral(yob)*PI/180.0;
 						amp = q0*pWOpp->m_Cl[i]*pWOpp->m_Chord[i]/pWOpp->m_MAChord;
 						amp *= pMiarex->m_LiftScale/1000.0;
 
@@ -2012,10 +2012,10 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					for (i=1; i<pWOpp->m_NStation; i++)
 					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XTrTop[i]*pWOpp->m_Chord[i];
+						xt = pWing->Offset(yob) + pWOpp->m_XTrTop[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = pWing->GetDihedral(yob)*PI/180.0;
+						dih = pWing->Dihedral(yob)*PI/180.0;
 						glVertex3d(xt,yt,zt);
 					}
 				}
@@ -2032,7 +2032,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						{
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
@@ -2050,7 +2050,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						{
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrTop[m],pWOpp->m_XTrTop[m],yrel,Pt,1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 
@@ -2093,10 +2093,10 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					for (i=1; i<pWOpp->m_NStation; i++)
 					{
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
-						xt = pWing->GetOffset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
+						xt = pWing->Offset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrBot[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = pWing->GetDihedral(yob)*PI/180.0;
+						dih = pWing->Dihedral(yob)*PI/180.0;
 
 						glVertex3d(xt,yt, zt);
 					}
@@ -2114,7 +2114,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						{
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;
@@ -2132,7 +2132,7 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						{
 							for(k=0; k<pWing->m_Surface[j].m_NYPanels; k++)
 							{
-								yrel = pWing->Getyrel(pWOpp->m_SpanPos[m]);
+								yrel = pWing->yrel(pWOpp->m_SpanPos[m]);
 								pWing->m_Surface[j].GetPoint(pWOpp->m_XTrBot[m],pWOpp->m_XTrBot[m],yrel,Pt,-1);
 								glVertex3d(Pt.x, Pt.y, Pt.z);
 								m++;

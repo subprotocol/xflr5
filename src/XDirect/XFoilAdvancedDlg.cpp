@@ -125,7 +125,7 @@ void XFoilAdvancedDlg::OnOK()
 {
 	QString str = m_pctrlIterLimit->text();
 	m_IterLimit = str.toInt();
-	m_VAccel = m_pctrlVAccel->GetValue();
+	m_VAccel = m_pctrlVAccel->Value();
 	m_bInitBL = m_pctrlInitBL->isChecked();
 	m_bFullReport = m_pctrlFullReport->isChecked();
 	done(1);

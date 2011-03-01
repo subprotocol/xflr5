@@ -139,15 +139,15 @@ void FlapDlg::ReadParams()
 {
 	if(m_pctrlLEFlapCheck->isChecked()) m_bLEFlap = true;
 	else						        m_bLEFlap = false;
-	m_LEFlapAngle = m_pctrlLEFlapAngle->GetValue();
-	m_LEXHinge    = m_pctrlLEXHinge->GetValue();
-	m_LEYHinge    = m_pctrlLEYHinge->GetValue();
+	m_LEFlapAngle = m_pctrlLEFlapAngle->Value();
+	m_LEXHinge    = m_pctrlLEXHinge->Value();
+	m_LEYHinge    = m_pctrlLEYHinge->Value();
 
 	if(m_pctrlTEFlapCheck->isChecked()) m_bTEFlap = true;
 	else								m_bTEFlap = false;
-	m_TEFlapAngle = m_pctrlTEFlapAngle->GetValue();
-	m_TEXHinge    = m_pctrlTEXHinge->GetValue();
-	m_TEYHinge    = m_pctrlTEYHinge->GetValue();
+	m_TEFlapAngle = m_pctrlTEFlapAngle->Value();
+	m_TEXHinge    = m_pctrlTEXHinge->Value();
+	m_TEYHinge    = m_pctrlTEYHinge->Value();
 
 	if(m_LEXHinge>=m_TEXHinge && m_bLEFlap && m_bTEFlap)
 	{

@@ -673,6 +673,7 @@ void MainFrame::CreateAFoilActions()
 	connect(AFoilDelete, SIGNAL(triggered()), pAFoil, SLOT(OnDelete()));
 
 	AFoilRename = new QAction(tr("Rename..."), this);
+	AFoilRename->setShortcut(Qt::Key_F2);
 	connect(AFoilRename, SIGNAL(triggered()), pAFoil, SLOT(OnRenameFoil()));
 
 	AFoilExport = new QAction(tr("Export..."), this);
@@ -5629,7 +5630,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			pWPolar = new CWPolar;
 			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 			//force compatibilty
-			if(pWPolar->m_AnalysisMethod==4 && pWPolar->m_Type==7) pWPolar->m_bThinSurfaces = true;
+			if(pWPolar->m_AnalysisMethod==PANELMETHOD && pWPolar->m_Type==STABILITYPOLAR) pWPolar->m_bThinSurfaces = true;
 
 			if (!bWPolarOK)
 			{

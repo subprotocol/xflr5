@@ -236,10 +236,10 @@ void WingScaleDlg::ReadData()
 	m_bSweep = m_pctrlSweep->isChecked();
 	m_bTwist = m_pctrlTwist->isChecked();
 
-	m_NewSpan  = m_pctrlNewSpan->GetValue()  / pMainFrame->m_mtoUnit;
-	m_NewChord = m_pctrlNewChord->GetValue() / pMainFrame->m_mtoUnit;
-	m_NewSweep = m_pctrlNewSweep->GetValue();
-	m_NewTwist = m_pctrlNewTwist->GetValue();
+	m_NewSpan  = m_pctrlNewSpan->Value()  / pMainFrame->m_mtoUnit;
+	m_NewChord = m_pctrlNewChord->Value() / pMainFrame->m_mtoUnit;
+	m_NewSweep = m_pctrlNewSweep->Value();
+	m_NewTwist = m_pctrlNewTwist->Value();
 }
 
 

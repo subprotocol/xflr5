@@ -597,7 +597,6 @@ void PlaneDlg::OnOK()
 	}
 
 	m_pPlane->ComputeBodyAxisInertia();
-//qDebug()<<m_pPlane->m_CoGIxx<<m_pPlane->m_CoGIyy<<m_pPlane->m_CoGIzz<<m_pPlane->m_CoGIxz;
 	accept();
 }
 
@@ -666,26 +665,26 @@ void PlaneDlg::ReadParams()
 	QString strong;
 
 	OnPlaneName();
-	m_pPlane->m_WingTiltAngle[0] = m_pctrlWingTilt->GetValue();
-	m_pPlane->m_WingTiltAngle[1] = m_pctrlWingTilt2->GetValue();
-	m_pPlane->m_WingTiltAngle[2] = m_pctrlStabTilt->GetValue();
-	m_pPlane->m_WingTiltAngle[3] = m_pctrlFinTilt->GetValue();
+	m_pPlane->m_WingTiltAngle[0] = m_pctrlWingTilt->Value();
+	m_pPlane->m_WingTiltAngle[1] = m_pctrlWingTilt2->Value();
+	m_pPlane->m_WingTiltAngle[2] = m_pctrlStabTilt->Value();
+	m_pPlane->m_WingTiltAngle[3] = m_pctrlFinTilt->Value();
 
-	m_pPlane->m_WingLE[0].x = m_pctrlXLEWing->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[0].z = m_pctrlZLEWing->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[0].x = m_pctrlXLEWing->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[0].z = m_pctrlZLEWing->Value() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_WingLE[1].x = m_pctrlXLEWing2->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[1].z = m_pctrlZLEWing2->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[1].x = m_pctrlXLEWing2->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[1].z = m_pctrlZLEWing2->Value() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_WingLE[2].x = m_pctrlXLEStab->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[2].z = m_pctrlZLEStab->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[2].x = m_pctrlXLEStab->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[2].z = m_pctrlZLEStab->Value() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_WingLE[3].x = m_pctrlXLEFin->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[3].y = m_pctrlYLEFin->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_WingLE[3].z = m_pctrlZLEFin->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].x = m_pctrlXLEFin->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].y = m_pctrlYLEFin->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_WingLE[3].z = m_pctrlZLEFin->Value() / pMainFrame->m_mtoUnit;
 
-	m_pPlane->m_BodyPos.x = m_pctrlXBody->GetValue() / pMainFrame->m_mtoUnit;
-	m_pPlane->m_BodyPos.z = m_pctrlZBody->GetValue() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_BodyPos.x = m_pctrlXBody->Value() / pMainFrame->m_mtoUnit;
+	m_pPlane->m_BodyPos.z = m_pctrlZBody->Value() / pMainFrame->m_mtoUnit;
 
 	if(m_pctrlBiplane->isChecked())   m_pPlane->m_bBiplane = true;
 	else                              m_pPlane->m_bBiplane = false;

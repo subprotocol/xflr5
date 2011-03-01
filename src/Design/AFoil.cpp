@@ -80,6 +80,7 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bXDown = m_bYDown = m_bZDown = false;
 	m_bIsImageLoaded = false;
 
+	m_BackImageWidth = m_BackImageHeight = 0;
 
 	memset(&m_TmpPic,0, sizeof(Picture));
 	memset(m_UndoPic, 0, MAXPICTURESIZE * sizeof(Picture));
@@ -2598,21 +2599,21 @@ void QAFoil::PaintView(QPainter &painter)
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	double xscale = m_fScale          /m_fRefScale;
 	double yscale = m_fScale*m_fScaleY/m_fRefScale;
-	int w = (int)((double)m_BackImage.width() *xscale);
-	int h = (int)((double)m_BackImage.height()*yscale);
 
 	//zoom from the center of the viewport
 	QPoint VCenter = QPoint((int)((m_rCltRect.right() + m_rCltRect.left()  )/2),
-							(int)((m_rCltRect.top()   + m_rCltRect.bottom())/2));
+					    (int)((m_rCltRect.top()   + m_rCltRect.bottom())/2));
 
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 
 	//draw the background image in the viewport
 	if(m_bIsImageLoaded)
 	{
+		int w = (int)((double)m_BackImageWidth  * xscale);
+		int h = (int)((double)m_BackImageHeight * yscale);
 		//the coordinates of the top left corner are measured from the center of the viewport
-		double xtop = VCenter.x() + m_ViewportTrans.x() - (int)((double)m_BackImage.width() /2.*xscale);
-		double ytop = VCenter.y() + m_ViewportTrans.y() - (int)((double)m_BackImage.height()/2.*yscale);
+		double xtop = VCenter.x() + m_ViewportTrans.x() - (int)((double)m_BackImageWidth  /2.*xscale);
+		double ytop = VCenter.y() + m_ViewportTrans.y() - (int)((double)m_BackImageHeight /2.*yscale);
 
 		painter.drawPixmap(xtop, ytop, w,h, m_BackImage);
 	}
@@ -3278,6 +3279,11 @@ void QAFoil::OnLoadBackImage()
 											pMainFrame->m_LastDirName,
 											"Image files (*.png *.jpg *.bmp)");
 	m_bIsImageLoaded = m_BackImage.load(PathName);
+	if(m_bIsImageLoaded)
+	{
+		m_BackImageWidth = m_BackImage.width();
+		m_BackImageHeight = m_BackImage.height();
+	}
 
 	UpdateView();
 }

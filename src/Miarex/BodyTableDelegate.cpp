@@ -52,7 +52,7 @@ void BodyTableDelegate::setEditorData(QWidget *editor, const QModelIndex &index)
 void BodyTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
 	FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-	double value = floatEdit->GetValue();
+	double value = floatEdit->Value();
 	model->setData(index, value, Qt::EditRole);
 }
 

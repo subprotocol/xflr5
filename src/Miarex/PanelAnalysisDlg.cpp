@@ -217,7 +217,6 @@ bool PanelAnalysisDlg::AlphaLoop()
 	CreateUnitRHS();
 	if (m_bCancel) return true;
 
-
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
 		//compute wake contribution
@@ -322,6 +321,7 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 
 					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0) m_aij[m*Size+mm] = V.dot(m_pPanel[p].Normal);
 					else if(m_pWPolar->m_bDirichlet)                      m_aij[m*Size+mm] = phi;
+
 					mm++;
 				}
 			}
@@ -1070,6 +1070,17 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp+qrhs*m_MatSize, Mu, Sigma);
 		else         pMiarex->AddWOpp(QInf, Alpha, m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
 
+		if(pMiarex->m_iView==WPOLARVIEW)
+		{
+			pMiarex->CreateWPolarCurves();
+			pMiarex->UpdateView();
+		}
+		else if(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==STABPOLARVIEW)
+		{
+			pMiarex->CreateStabRLCurves();
+			pMiarex->UpdateView();
+		}
+
 		AddString("\n");
 	}
 	else m_bPointOut = true;
@@ -1588,22 +1599,20 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 
 void PanelAnalysisDlg::InitDialog()
 {
-
-
 	m_Progress = 0.0;
 	m_pctrlProgress->setValue(m_Progress);
 	QString FileName = QDir::tempPath() + "/XFLR5.log";
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 
-	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
+/*	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//back-up the current geometry if the analysis is to be performed on the tilted geometry
 		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
 		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
 		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
 		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
-	}
+	}*/
 
 	m_pctrlTextOutput->clear();
 
@@ -2357,6 +2366,7 @@ void PanelAnalysisDlg::StartAnalysis()
 		memcpy(m_pWakePanel, m_pRefWakePanel, m_WakeSize * sizeof(CPanel));
 		memcpy(m_pWakeNode,  m_pRefWakeNode,  m_nWakeNodes * sizeof(CVector));
 	}
+
 	m_bIsFinished = true;
 	m_pctrlCancel->setText(tr("Close"));
 }
@@ -3570,10 +3580,10 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 	CreateUnitRHS();
 	if (m_bCancel) return false;
 
+
 	// build the influence matrix in Body Axis
 	BuildInfluenceMatrix();
 	if (m_bCancel) return false;
-
 
 	if(!m_pWPolar->m_bThinSurfaces)
 	{
@@ -4050,12 +4060,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	{
 		//Wing tilt
 		if ((!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[0]) ||
-			( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION))
+		    ( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION))
 		{
 			//rotate the normals and control point positions
 			H.Set(0.0, 1.0, 0.0);
 			if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION)
-			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
+				SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
 			else SignedDeltaAngle = DeltaAngle;
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
 

@@ -17,9 +17,12 @@
 
 
 
-xflr5 v6.04  2011
+xflr5 v6.04  March 2011
+	- modified the setting of boundary conditions in T7 analysis with activated controls - impact on balanced aoa
+	- modified the wing construction process to allow for a gap in the middle of the wing
 	- corrected the bug which caused the disapperance of the left stability toolbar when switching to 3D view
 	- corrected the bug which prevented from changing the default number of panels in naca foil generation
+	- continued the code cleaning process
 
 
 

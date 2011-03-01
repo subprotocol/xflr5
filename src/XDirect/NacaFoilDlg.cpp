@@ -99,7 +99,7 @@ void NacaFoilDlg::SetupLayout()
 void NacaFoilDlg::EditingFinished()
 {
 	s_Digits = m_pctrlNumber->text().toInt();
-	s_Panels = m_pctrlPanels->GetValue();
+	s_Panels = m_pctrlPanels->Value();
 
 	GenerateFoil();
 	OKButton->setFocus();

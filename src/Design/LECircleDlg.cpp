@@ -111,7 +111,7 @@ void LECircleDlg::keyPressEvent(QKeyEvent *event)
 
 void LECircleDlg::OnOK()
 {
-	m_Radius = m_pctrlRadius->GetValue();
+	m_Radius = m_pctrlRadius->Value();
 	m_bShowRadius = m_pctrlShow->isChecked();
 	accept();
 }

@@ -549,7 +549,7 @@ void StabPolarDlg::OnOK()
 	}
 
 	if(m_pctrlViscous->isChecked()) m_bViscous = true;
-//	m_QInf = m_pctrlQInf->GetValue();
+//	m_QInf = m_pctrlQInf->Value();
 
 	accept();
 }
@@ -608,26 +608,26 @@ void StabPolarDlg::ReadParams()
 
 	if(m_pctrlUnit1->isChecked())
 	{
-		m_Density   = m_pctrlDensity->GetValue();
-		m_Viscosity = m_pctrlViscosity->GetValue();
+		m_Density   = m_pctrlDensity->Value();
+		m_Viscosity = m_pctrlViscosity->Value();
 	}
 	else
 	{
-		m_Density   = m_pctrlDensity->GetValue()   / 0.00194122;
-		m_Viscosity = m_pctrlViscosity->GetValue() / 10.7182881;
+		m_Density   = m_pctrlDensity->Value()   / 0.00194122;
+		m_Viscosity = m_pctrlViscosity->Value() / 10.7182881;
 	}
 
-	m_SideSlip  = m_pctrlBeta->GetValue();
-	m_BankAngle = m_pctrlPhi->GetValue();
+	m_SideSlip  = m_pctrlBeta->Value();
+	m_BankAngle = m_pctrlPhi->Value();
 	SetDensity();
 
-	m_Mass  = m_pctrlMass->GetValue() / pMainFrame->m_kgtoUnit;
-	m_CoG.x = m_pctrlCoGx->GetValue() / pMainFrame->m_mtoUnit;
-	m_CoG.z = m_pctrlCoGz->GetValue() / pMainFrame->m_mtoUnit;
-	m_CoGIxx = m_pctrlIxx->GetValue()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIyy = m_pctrlIyy->GetValue()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIzz = m_pctrlIzz->GetValue()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIxz = m_pctrlIxz->GetValue()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	m_Mass  = m_pctrlMass->Value() / pMainFrame->m_kgtoUnit;
+	m_CoG.x = m_pctrlCoGx->Value() / pMainFrame->m_mtoUnit;
+	m_CoG.z = m_pctrlCoGz->Value() / pMainFrame->m_mtoUnit;
+	m_CoGIxx = m_pctrlIxx->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	m_CoGIyy = m_pctrlIyy->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	m_CoGIzz = m_pctrlIzz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	m_CoGIxz = m_pctrlIxz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
 }
 
 

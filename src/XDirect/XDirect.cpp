@@ -5474,22 +5474,22 @@ void QXDirect::ReadParams()
 	{
 		if(m_bAlpha)
 		{
-			m_Alpha      = m_pctrlAlphaMin->GetValue();
-			m_AlphaMax   = m_pctrlAlphaMax->GetValue();
-			m_AlphaDelta = m_pctrlAlphaDelta->GetValue();
+			m_Alpha      = m_pctrlAlphaMin->Value();
+			m_AlphaMax   = m_pctrlAlphaMax->Value();
+			m_AlphaDelta = m_pctrlAlphaDelta->Value();
 		}
 		else
 		{
-			m_Cl      = m_pctrlAlphaMin->GetValue();
-			m_ClMax   = m_pctrlAlphaMax->GetValue();
-			m_ClDelta = m_pctrlAlphaDelta->GetValue();
+			m_Cl      = m_pctrlAlphaMin->Value();
+			m_ClMax   = m_pctrlAlphaMax->Value();
+			m_ClDelta = m_pctrlAlphaDelta->Value();
 		}
 	}
 	else
 	{
-		m_Reynolds      = m_pctrlAlphaMin->GetValue();
-		m_ReynoldsMax   = m_pctrlAlphaMax->GetValue();
-		m_ReynoldsDelta = m_pctrlAlphaDelta->GetValue();
+		m_Reynolds      = m_pctrlAlphaMin->Value();
+		m_ReynoldsMax   = m_pctrlAlphaMax->Value();
+		m_ReynoldsDelta = m_pctrlAlphaDelta->Value();
 	}
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitBL   = m_pctrlInitBL->isChecked();

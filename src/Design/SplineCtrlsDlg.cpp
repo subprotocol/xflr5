@@ -334,8 +334,8 @@ void SplineCtrlsDlg::ReadData()
 		m_SF.m_Extrados.m_iDegree = m_pctrlDegExtrados->currentIndex()+2;
 		m_SF.m_Intrados.m_iDegree = m_pctrlDegIntrados->currentIndex()+2;
 
-		m_SF.m_Extrados.m_iRes = m_pctrlOutExtrados->GetValue();
-		m_SF.m_Intrados.m_iRes = m_pctrlOutExtrados->GetValue();
+		m_SF.m_Extrados.m_iRes = m_pctrlOutExtrados->Value();
+		m_SF.m_Intrados.m_iRes = m_pctrlOutExtrados->Value();
 		m_SF.m_bSymetric = m_pctrlSymetric->isChecked();
 	}
 	else
@@ -357,8 +357,8 @@ void SplineCtrlsDlg::ReadData()
 			m_PF.m_Intrados.m_ctrlPoint[i].y = index.data().toDouble();
 		}
 
-		m_PF.m_Extrados.m_Freq = m_pctrlOutExtrados->GetValue();
-		m_PF.m_Intrados.m_Freq = m_pctrlOutIntrados->GetValue();
+		m_PF.m_Extrados.m_Freq = m_pctrlOutExtrados->Value();
+		m_PF.m_Intrados.m_Freq = m_pctrlOutIntrados->Value();
 		m_PF.m_bSymetric = m_pctrlSymetric->isChecked();
 	}
 }
@@ -408,7 +408,7 @@ void SplineCtrlsDlg::OnSelChangeDegree()
 void SplineCtrlsDlg::OnEditingFinished()
 {
 	int i;
-	i = m_pctrlOutExtrados->GetValue();
+	i = m_pctrlOutExtrados->Value();
 	if(m_bSymetric) m_pctrlOutIntrados->SetValue(i);
 }
 

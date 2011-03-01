@@ -245,7 +245,7 @@ void FoilTableDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 	else
 	{
 		FloatEdit *floatEdit = static_cast<FloatEdit*>(editor);
-		double value = floatEdit->GetValue()/100.0;
+		double value = floatEdit->Value()/100.0;
 		model->setData(index, value, Qt::EditRole);
 	}
 }
