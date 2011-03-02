@@ -876,6 +876,8 @@ void StabPolarDlg::SetupLayout()
 
 	m_pCtrlDelegate->m_Precision = precision;
 
+	QLabel* SignLabel = new QLabel(tr("Note: + sign means trailing edge down"));
+
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
 	OKButton->setDefault(true);
@@ -890,6 +892,8 @@ void StabPolarDlg::SetupLayout()
 	MainLayout->addWidget(NameGroup);
 	MainLayout->addLayout(DataLayout);
 	MainLayout->addWidget(m_pctrlControlTable);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(SignLabel);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
@@ -918,7 +922,6 @@ void StabPolarDlg::SetWPolarName()
 	}
 
 	nCtrl = 0;
-
 
 	if(!m_bAVLControls)
 	{

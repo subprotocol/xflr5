@@ -296,8 +296,9 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ProjectFormat>5)	{f = m_XNP; ar <<f;}
 		if(ProjectFormat>5)
 		{
+			ar<<(float)m_Ctrl;
 			//provision
-			for(int i=0; i<20; i++) ar<<(float)0.0f;
+			for(int i=1; i<20; i++) ar<<(float)0.0f;
 			for(int i=0; i<20; i++) ar<<0;
 		}
 	}
@@ -569,8 +570,10 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		else m_XNP = 0.0;
 		if(ArchiveFormat>=1019)
 		{
+			ar>>f; m_Ctrl=f;
+
 			//provision
-			for(int i=0; i<20; i++)
+			for(int i=1; i<20; i++)
 			{
 				ar>>f;
 			}

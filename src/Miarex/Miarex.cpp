@@ -814,8 +814,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 				pPOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
 
 				pWOpp->m_Ctrl             = m_pPanelDlg->m_Ctrl;
-				pWOpp->m_QInf            = m_pPanelDlg->u0;
-				pWOpp->m_Alpha           = m_pPanelDlg->m_AlphaEq;
+				pWOpp->m_QInf             = m_pPanelDlg->u0;
+				pWOpp->m_Alpha            = m_pPanelDlg->m_AlphaEq;
 
 				for(i=0; i<4; i++)
 				{
@@ -4218,6 +4218,9 @@ void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 	static int i;
 	static double x,y;
 	static QString UFOName;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+
 	if(m_pCurPlane)     UFOName=m_pCurPlane->PlaneName();
 	else if(m_pCurWing) UFOName=m_pCurWing->WingName();
 
@@ -4228,19 +4231,16 @@ void QMiarex::FillStabCurve(CCurve *pCurve, CWPolar *pWPolar, int iMode)
 		x = pWPolar->m_EigenValue[iMode][i].real();
 		y = pWPolar->m_EigenValue[iMode][i].imag()/2./PI;
 
-
 		pCurve->AddPoint(x, y);
 		if(m_pCurWOpp && m_bHighlightOpp)
 		{
 			if(fabs(pWPolar->m_Ctrl[i]-m_pCurWOpp->m_Ctrl)<0.0001)
 			{
-				MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-				StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
 				if(m_pCurPOpp && m_pCurPlane && (pWPolar->m_UFOName==m_pCurPlane->PlaneName()) && (m_pCurPOpp->m_PlrName==pWPolar->m_PlrName))
 				{
 					if(iMode==pStabView->m_iCurrentMode) pCurve->SetSelected(i);
 				}
-				else if(m_pCurWOpp && m_pCurWing  && (pWPolar->m_UFOName==m_pCurWing->WingName())   && (m_pCurWOpp->m_PlrName ==pWPolar->m_PlrName))
+				else if(m_pCurWOpp && m_pCurWing  && (pWPolar->m_UFOName==m_pCurWing->WingName()) && (m_pCurWOpp->m_PlrName ==pWPolar->m_PlrName))
 				{
 					if(iMode==pStabView->m_iCurrentMode) pCurve->SetSelected(i);
 				}
@@ -4309,7 +4309,9 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 					if(m_pCurPOpp && m_pCurPlane
 					   && pWPolar->m_UFOName==m_pCurPlane->PlaneName()
 					   && m_pCurPOpp->m_PlrName ==pWPolar->m_PlrName)
+					{
 						pCurve->SetSelected(i);
+					}
 					else if(m_pCurWOpp && m_pCurWing
 							&& pWPolar->m_UFOName==m_pCurWing->WingName()
 							&& m_pCurWOpp->m_PlrName ==pWPolar->m_PlrName)
