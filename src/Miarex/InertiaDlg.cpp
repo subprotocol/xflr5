@@ -198,7 +198,8 @@ void InertiaDlg::ComputeInertia()
 			{
 				for(i=0; i<pWing[iw]->m_NMass; i++)
 				{
-					MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
+                                    MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + (m_pPlane != NULL ? m_pPlane->WingLE(iw) : CVector(0.0, 0.0, 0.0)));
+                                        //MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
 					TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
 					TotalIyy  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
 					TotalIzz  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
@@ -572,17 +573,28 @@ void InertiaDlg::OnExportToAVL()
 
 		if(m_pPlane->Body())
 		{
+                        m_pPlane->Body()->ComputeVolumeInertia(CoG, CoGIxx, CoGIyy, CoGIzz, CoGIxz);
 			strong = QString(tr("%1 %2 %3 %4 %5 %6 %7 %8 %9 %10 ! Body's inertia"))
-						 .arg(m_pPlane->Body()->m_VolumeMass /Munit, 10, 'g', 3)
-						 .arg(m_pPlane->Body()->m_CoG.x/Lunit, 10, 'g', 3)
-						 .arg(m_pPlane->Body()->m_CoG.y/Lunit, 10, 'g', 3)
-						 .arg(m_pPlane->Body()->m_CoG.z/Lunit, 10, 'g', 3)
+                                 .arg(m_pPlane->Body()->m_VolumeMass /Munit, 10, 'g', 3)
+                                 .arg(CoG.x/Lunit, 10, 'g', 3)
+                                 .arg(CoG.y/Lunit, 10, 'g', 3)
+                                 .arg(CoG.z/Lunit, 10, 'g', 3)
+                                 .arg(CoGIxx/Iunit,10, 'g', 3)
+                                 .arg(CoGIyy/Iunit,10, 'g', 3)
+                                 .arg(CoGIzz/Iunit,10, 'g', 3)
+                                 .arg(0.0,10, 'g', 3)
+                                 .arg(CoGIxz/Iunit,10, 'g', 3)
+                                 .arg(0.0,10, 'g', 3);
+                                /*		 .arg(m_pPlane->Body()->m_VolumeMass /Munit, 10, 'g', 3)
+                                                 .arg(m_pPlane->Body()->m_VolumeCoG.x/Lunit, 10, 'g', 3)
+                                                 .arg(m_pPlane->Body()->m_VolumeCoG.y/Lunit, 10, 'g', 3)
+                                                 .arg(m_pPlane->Body()->m_VolumeCoG.z/Lunit, 10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIxx/Iunit,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIyy/Iunit,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIzz/Iunit,10, 'g', 3)
 						 .arg(0.0,10, 'g', 3)
 						 .arg(m_pPlane->Body()->m_CoGIxz/Iunit,10, 'g', 3)
-						 .arg(0.0,10, 'g', 3);
+                                                 .arg(0.0,10, 'g', 3); */
 			out << strong+"\n";
 		}
 	}
