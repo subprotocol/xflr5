@@ -199,7 +199,6 @@ void InertiaDlg::ComputeInertia()
 				for(i=0; i<pWing[iw]->m_NMass; i++)
 				{
                                     MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + (m_pPlane != NULL ? m_pPlane->WingLE(iw) : CVector(0.0, 0.0, 0.0)));
-                                        //MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + m_pPlane->WingLE(iw));
 					TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
 					TotalIyy  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.z*MassPos.z);
 					TotalIzz  += pWing[iw]->m_MassValue[i] * (MassPos.x*MassPos.x + MassPos.y*MassPos.y);
