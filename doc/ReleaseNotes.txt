@@ -18,6 +18,8 @@
 
 
 xflr5 v6.04  March 2011
+	- fixed the incorrect setting of AVL-type controls for flaps in T7 analysis
+	- added the missing write operation in the project file of the control variable for wing operating points
 	- modified the setting of boundary conditions in T7 analysis with activated controls - impact on balanced aoa
 	- modified the wing construction process to allow for a gap in the middle of the wing
 	- corrected the bug which caused the disapperance of the left stability toolbar when switching to 3D view

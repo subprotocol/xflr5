@@ -446,7 +446,6 @@ void PanelAnalysisDlg::CreateUnitRHS()
 	CreateRHS(m_uRHS,  VInf);
 	VInf.Set(0.0, 0.0, 1.0);
 	CreateRHS(m_wRHS, VInf);
-
 }
 
 
@@ -2190,7 +2189,7 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	}
 
 
-	//   Define unit local velocity vectore, necessary for moment calculations in stability analysis of 3D panels
+	//   Define unit local velocity vector, necessary for moment calculations in stability analysis of 3D panels
 	CVector u(1.0, 0.0, 0.0);
 	CVector w(0.0, 0.0, 1.0);
 	double Cp;
@@ -2203,7 +2202,6 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 		}
 		if(m_bCancel) return false;
 	}
-
 
 	return true;
 }
@@ -4111,11 +4109,12 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 				( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION))
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
+				//TODO : proportional to max setting ???
 				if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION)
-				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[0]);
+				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[NCtrls]);
 				else SignedDeltaAngle = DeltaAngle;
-				Quat.Set(SignedDeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 
+				Quat.Set(SignedDeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);
 				for(p=0; p<m_MatSize;p++)
 				{
 					if(m_ppSurface[j]->IsFlapPanel(p))

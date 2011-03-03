@@ -307,7 +307,8 @@ void StabPolarDlg::SetViscous()
 
 	for(int i=nCtrl; i<m_nControls; i++)
 	{
-		if(m_bActiveControl[i])
+		if((!m_bAVLControls&&m_bActiveControl[i]) ||
+		   ( m_bAVLControls&&fabs(m_MaxControl[i])>PRECISION))
 		{
 			bViscous = false;
 			break;

@@ -15590,7 +15590,6 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 							if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
 								angle -= (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
 						}
-
 						strange += "\n";
 						out +=strange;
 
