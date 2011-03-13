@@ -13486,9 +13486,10 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 
 			pModPlane->rPlaneName() = RDlg.m_strName;
 			pModPlane->Wing()->m_WingName = pModPlane->PlaneName()+"_Wing";
-			pModPlane->Wing2()->m_WingName = pModPlane->PlaneName()+"_Wing2";
-			pModPlane->Stab()->m_WingName  = pModPlane->PlaneName()+"_Elev";
-			pModPlane->Fin()->m_WingName   = pModPlane->PlaneName()+"_Fin";
+			if(pModPlane->Wing2()) pModPlane->Wing2()->m_WingName = pModPlane->PlaneName()+"_Wing2";
+			if(pModPlane->Stab())  pModPlane->Stab()->m_WingName  = pModPlane->PlaneName()+"_Elev";
+			if(pModPlane->Fin())   pModPlane->Fin()->m_WingName   = pModPlane->PlaneName()+"_Fin";
+
 			//place the Plane in alphabetical order in the array
 			//remove the current Plane from the array
 			for (l=0; l<m_poaPlane->size();l++)
