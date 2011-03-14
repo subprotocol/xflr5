@@ -2510,7 +2510,7 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 			delete pOpPoint;
 		}
 	}
-	for (j= (int)m_oaPolar.size()-1;j>=0; j--)
+	for (j= m_oaPolar.size()-1;j>=0; j--)
 	{
 		pPolar = (CPolar*)m_oaPolar.at(j);
 		if(pPolar->m_FoilName == pFoil->m_FoilName)
@@ -2552,7 +2552,7 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 	SetSaveState(false);
 	int i;
 	//first remove all POpps associated to the plane
-	for (i=(int)m_oaPOpp.size()-1; i>=0; i--)
+	for (i=m_oaPOpp.size()-1; i>=0; i--)
 	{
 		pPOpp = (CPOpp*)m_oaPOpp.at(i);
 		if(pPOpp->m_PlaneName == pPlane->PlaneName())
@@ -2565,7 +2565,7 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 	pMiarex->m_pCurPOpp = NULL;
 	pMiarex->m_pCurWOpp = NULL;
 	//next remove all PPolars associated to the plane
-	for (i=(int)m_oaWPolar.size()-1; i>=0; i--)
+	for (i=m_oaWPolar.size()-1; i>=0; i--)
 	{
 		pWPolar = (CWPolar*)m_oaWPolar.at(i);
 		if (pWPolar->m_UFOName == pPlane->PlaneName())
@@ -2601,7 +2601,7 @@ void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
 	if(bResultsOnly) return;
 
 
-	for (i=(int)m_oaPlane.size()-1; i>=0; i--)
+	for (i=m_oaPlane.size()-1; i>=0; i--)
 	{
 		pOldPlane = (CPlane*)m_oaPlane.at(i);
 		if (pOldPlane == pPlane)
@@ -2740,7 +2740,7 @@ void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 
 	//first remove all WOpps associated to the wing
 	CWOpp * pWOpp;
-	for (i=(int)m_oaWOpp.size()-1; i>=0; i--)
+	for (i=m_oaWOpp.size()-1; i>=0; i--)
 	{
 		pWOpp = (CWOpp*)m_oaWOpp.at(i);
 		if(pWOpp->m_WingName == pThisWing->m_WingName)
@@ -2772,7 +2772,7 @@ void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
 			{
 				pWPolar->ResetWPlr();
 				//results only... means that the geometry have been edited... update polar
-				if( pWPolar->m_RefAreaType==1)
+				if( pWPolar->m_RefAreaType==PLANFORMAREA)
 				{
 					pWPolar->m_WArea     = pMiarex->m_pCurWing->m_PlanformArea;
 					pWPolar->m_WSpan     = pMiarex->m_pCurWing->m_PlanformSpan;
@@ -4850,7 +4850,7 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 			else
 			{
 				//So delete any foil with that name
-				for (l=(int)m_oaFoil.size()-1;l>=0; l--)
+				for (l=m_oaFoil.size()-1;l>=0; l--)
 				{
 					pOldFoil = (CFoil*)m_oaFoil.at(l);
 					if(pOldFoil->m_FoilName == strong)
@@ -5330,8 +5330,8 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 
 	//write the number of foils
 	ar << 100001;//unused
-	ar << (int)FoilList.size();
-	for (i=0; i<(int)FoilList.size(); i++)
+	ar << FoilList.size();
+	for (i=0; i<FoilList.size(); i++)
 	{
 		pFoil = GetFoil(FoilList[i]);
 		pFoil->Serialize(ar, true, ProjectFormat);
@@ -5456,7 +5456,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
 		else                                      ar << 0;
 
-		ar << (int)m_oaWing.size() ;//number of wings
+		ar << m_oaWing.size() ;//number of wings
 		// Store the wings
 		for (i=0; i<m_oaWing.size();i++)
 		{
@@ -5464,7 +5464,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			pWing->SerializeWing(ar, true, ProjectFormat);
 		}
 		// now store all the WPolars
-		ar << (int)m_oaWPolar.size();
+		ar << m_oaWPolar.size();
 		for (i=0; i<m_oaWPolar.size();i++)
 		{
 			pWPolar = (CWPolar*)m_oaWPolar.at(i);
@@ -5473,7 +5473,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		// next store all the WOpps
 		if(m_bSaveWOpps)
 		{
-			ar << (int)m_oaWOpp.size();
+			ar << m_oaWOpp.size();
 			for (i=0; i<m_oaWOpp.size();i++)
 			{
 				pWOpp = (CWOpp*)m_oaWOpp.at(i);
@@ -5486,7 +5486,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		WritePolars(ar, NULL, ProjectFormat);
 
 		// next the bodies
-		ar << (int)m_oaBody.size();
+		ar << m_oaBody.size();
 		for (i=0; i<m_oaBody.size();i++)
 		{
 			pBody = (CBody*)m_oaBody.at(i);
@@ -5494,7 +5494,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		}
 
 		// last write the planes...
-		ar << (int)m_oaPlane.size();
+		ar << m_oaPlane.size();
 		for (i=0; i<m_oaPlane.size();i++)
 		{
 			pPlane = (CPlane*)m_oaPlane.at(i);
@@ -5504,7 +5504,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		if(m_bSaveWOpps)
 		{
 			// not forgetting their POpps
-			ar << (int)m_oaPOpp.size();
+			ar << m_oaPOpp.size();
 			for (i=0; i<m_oaPOpp.size();i++)
 			{
 				pPOpp = (CPOpp*)m_oaPOpp.at(i);
@@ -6725,7 +6725,7 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		//100002 : means we are serializings opps in the new numbered format
 		//100001 : transferred NCrit, XTopTr, XBotTr to polar file
 		//first write foils
-		ar << (int)m_oaFoil.size();
+		ar << m_oaFoil.size();
 
 		for (i=0; i<m_oaFoil.size(); i++)
 		{
@@ -6734,7 +6734,7 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 
 		//then write polars
-		ar << (int)m_oaPolar.size();
+		ar << m_oaPolar.size();
 		CPolar * pPolar ;
 		for (i=0; i<m_oaPolar.size();i++)
 		{
@@ -6743,7 +6743,7 @@ void MainFrame::WritePolars(QDataStream &ar, CFoil *pFoil, int ProjectFormat)
 		}
 		if(m_bSaveOpps)
 		{
-			ar << (int)m_oaOpp.size();
+			ar << m_oaOpp.size();
 			OpPoint * pOpp ;
 			for (i=0; i<m_oaOpp.size();i++)
 			{

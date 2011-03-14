@@ -8616,7 +8616,7 @@ void QMiarex::OnDeleteCurUFO()
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
 	if(m_pCurPlane) pMainFrame->DeletePlane(m_pCurPlane);
-	else            pMainFrame->DeleteWing(m_pCurWing, false);
+	else            pMainFrame->DeleteWing(m_pCurWing);
 
 	SetUFO();
 	pMainFrame->UpdateUFOs();
@@ -9147,14 +9147,14 @@ void QMiarex::OnEditUFO()
 				else
 				{
 					//user wants to overwrite
-					pMainFrame->DeleteWing(m_pCurWing);
+					pMainFrame->DeleteWing(m_pCurWing,true);
 					m_pCurWing = AddWing(pModWing);
 				}
 			}
 			else
 			{
 				//No results, delete the old wing and record the changes without prompting the user
-				pMainFrame->DeleteWing(m_pCurWing);
+				pMainFrame->DeleteWing(m_pCurWing,true);
 				m_pCurWing = AddWing(pModWing);
 			}
 
@@ -13423,25 +13423,25 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
 							if (pWPolar->m_UFOName == pPlane->PlaneName())
 							{
-								m_poaWPolar->removeAt(l);
+/*								m_poaWPolar->removeAt(l);
 								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
-								delete pWPolar;
+								delete pWPolar;*/
+								pWPolar->ResetWPlr();
 							}
 						}
+
 						for (l=m_poaPOpp->size()-1;l>=0; l--)
 						{
 							pPOpp = (CPOpp*)m_poaPOpp->at(l);
 							if (pPOpp->m_PlaneName == pPlane->PlaneName())
 							{
 								m_poaPOpp->removeAt(l);
-								if(pPOpp==m_pCurPOpp)
-								{
-									m_pCurPOpp = NULL;
-									m_pCurWOpp = NULL;
-								}
 								delete pPOpp;
 							}
 						}
+
+						m_pCurPOpp = NULL;
+						m_pCurWOpp = NULL;
 						m_poaPlane->removeAt(k);
 						if(pPlane==m_pCurPlane) m_pCurPlane = NULL;
 						delete pPlane;
@@ -13462,9 +13462,10 @@ bool QMiarex::SetModPlane(CPlane *pModPlane)
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
 							if (pWPolar->m_UFOName == pWing->m_WingName)
 							{
-								m_poaWPolar->removeAt(l);
+								pWPolar->ResetWPlr();
+/*								m_poaWPolar->removeAt(l);
 								if(pWPolar==m_pCurWPolar) m_pCurWPolar = NULL;
-								delete pWPolar;
+								delete pWPolar;*/
 							}
 						}
 						for (l=m_poaWOpp->size()-1;l>=0; l--)
@@ -13553,6 +13554,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 		pPlane = (CPlane*)m_poaPlane->at(k);
 		NameList.append(pPlane->PlaneName());
 	}
+
 	RenameDlg RDlg(this);
 	RDlg.move(pMainFrame->m_DlgPos);
 	RDlg.m_pstrArray = & NameList;
@@ -13620,7 +13622,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 				return true;
 			}
 		}
-		else if(resp ==10)
+		else if(resp==10)
 		{
 			//user wants to overwrite
 			pOldWing  = GetWing(RDlg.m_strName);
@@ -13637,15 +13639,13 @@ bool QMiarex::SetModWing(CWing *pModWing)
 							pWPolar = (CWPolar*)m_poaWPolar->at(l);
 							if (pWPolar->m_UFOName == pWing->m_WingName)
 							{
-								m_poaWPolar->removeAt(l);
+								pWPolar->ResetWPlr();
+/*								m_poaWPolar->removeAt(l);
 								if(pWPolar==m_pCurWPolar)
 								{
 									m_pCurWPolar = NULL;
-									m_pCurPOpp   = NULL;
-									m_pCurWOpp   = NULL;
-//									pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
 								}
-								delete pWPolar;
+								delete pWPolar;*/
 							}
 						}
 						for (l=m_poaWOpp->size()-1;l>=0; l--)
@@ -13654,13 +13654,11 @@ bool QMiarex::SetModWing(CWing *pModWing)
 							if (pWOpp->m_WingName == pWing->m_WingName)
 							{
 								m_poaWOpp->removeAt(l);
-								if(pWOpp==m_pCurWOpp){
-									m_pCurWOpp = NULL;
-									m_pCurPOpp = NULL;
-								}
 								delete pWOpp;
 							}
 						}
+						m_pCurWOpp = NULL;
+						m_pCurPOpp = NULL;
 						m_poaWing->removeAt(k);
 						if(pWing==m_pCurWing) m_pCurWing = NULL;
 						delete pWing;
@@ -13684,7 +13682,8 @@ bool QMiarex::SetModWing(CWing *pModWing)
 								pWPolar = (CWPolar*)m_poaWPolar->at(l);
 								if (pWPolar->m_UFOName == pPlane->PlaneName())
 								{
-									m_poaWPolar->removeAt(l);
+									pWPolar->ResetWPlr();
+/*									m_poaWPolar->removeAt(l);
 									if(pWPolar==m_pCurWPolar)
 									{
 										m_pCurWPolar = NULL;
@@ -13692,7 +13691,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 										m_pCurWOpp   = NULL;
 //										pMainFrame->m_WOperDlgBar.EnableAnalysis(false);
 									}
-									delete pWPolar;
+									delete pWPolar;*/
 								}
 							}
 							for (l=m_poaPOpp->size()-1;l>=0; l--)
@@ -13701,14 +13700,11 @@ bool QMiarex::SetModWing(CWing *pModWing)
 								if (pPOpp->m_PlaneName == pPlane->PlaneName())
 								{
 									m_poaPOpp->removeAt(l);
-									if(pPOpp==m_pCurPOpp)
-									{
-										m_pCurPOpp = NULL;
-										m_pCurPOpp = NULL;
-									}
 									delete pPOpp;
 								}
 							}
+							m_pCurPOpp = NULL;
+							m_pCurPOpp = NULL;
 							m_poaPlane->removeAt(k);
 							delete pPlane;
 							bExists = false;
