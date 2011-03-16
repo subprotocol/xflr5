@@ -2338,7 +2338,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 			ZPos +=dD;
 			if(pWPolar)
 			{
-				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
+				if(!pWPolar->m_bAutoInertia)  Mass = pWPolar->m_Mass;
 				else
 				{
 					if(pPlane)     Mass = pPlane->TotalMass();

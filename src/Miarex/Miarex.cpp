@@ -11909,7 +11909,7 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 
 	if(m_pCurWPolar)
 	{
-		if(m_pCurWPolar->m_AnalysisMethod!=4)  Mass = m_pCurWPolar->m_Mass;
+		if(!m_pCurWPolar->m_bAutoInertia)  Mass = m_pCurWPolar->m_Mass;
 		else
 		{
 			if(m_pCurPlane)     Mass = m_pCurPlane->TotalMass();

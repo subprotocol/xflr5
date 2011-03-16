@@ -202,9 +202,9 @@ void WPolarDlg::InitDialog()
 	if(m_UnitType==1) m_pctrlUnit1->setChecked(true);
 	else              m_pctrlUnit2->setChecked(true);
 
-	if(m_PolarType==1) m_pctrlType1->setChecked(true);
-	else if(m_PolarType==2) m_pctrlType2->setChecked(true);
-	else if(m_PolarType==4) m_pctrlType4->setChecked(true);
+	if(m_PolarType==FIXEDSPEEDPOLAR)     m_pctrlType1->setChecked(true);
+	else if(m_PolarType==FIXEDLIFTPOLAR) m_pctrlType2->setChecked(true);
+	else if(m_PolarType==FIXEDAOAPOLAR)  m_pctrlType4->setChecked(true);
 
 
 	OnUnit();

@@ -770,12 +770,13 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 		strong = tr("        Calculating point ") + QString("%1").arg(alpha,7,'f',2)+QString::fromUtf8("°....\n");
 		AddString(strong);
 
-		for(i=0; i<4; i++)
+		for(i=0; i<MAXWINGS; i++)
 		{
 			if(m_pWingList[i])
 			{
 				WingForce.Set(0.0, 0.0, 0.0);
 				m_pWingList[i]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
+
 				m_WingForce[q*4+i] = WingForce;
 
 				Force             += WingForce;
@@ -4378,13 +4379,12 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 			V.z = Psi.z * Omega/4.0/PI;
 		}
 	}
-
 	// We create Far points to align the trailing vortices with the reference axis
 	// The trailing vortex legs are not aligned with the free-stream, i.a.w. the small angle approximation
 	// If this approximation is not valid, then the geometry should be tilted in the polar definition
 
 	// calculate left contribution
-	Far.x = A.x +  10000.0; //10 km... should be enough
+	Far.x = A.x +  1.0e10;
 	Far.y = A.y;
 	Far.z = A.z;// + (Far.x-A.x) * tan(m_Alpha*PI/180.0);
 
@@ -4422,7 +4422,7 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 		Psi.z /= ftmp;
 
 		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-				-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+			   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
 		V.x += Psi.x * Omega/4.0/PI;
 		V.y += Psi.y * Omega/4.0/PI;
@@ -4430,7 +4430,7 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 	}
 
 	// calculate right vortex contribution
-	Far.x = B.x +  10000.0;
+	Far.x = B.x +  1.0e10;
 	Far.y = B.y ;
 	Far.z = B.z;// + (Far.x-B.x) * tan(m_Alpha*PI/180.0);
 
@@ -4465,7 +4465,7 @@ void PanelAnalysisDlg::VLMCmn(CVector const &A, CVector const &B, CVector const 
 		Psi.z /= ftmp;
 
 		Omega =  (r0.x*r1.x + r0.y*r1.y + r0.z*r1.z)/sqrt((r1.x*r1.x + r1.y*r1.y + r1.z*r1.z))
-			-(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
+			   -(r0.x*r2.x + r0.y*r2.y + r0.z*r2.z)/sqrt((r2.x*r2.x + r2.y*r2.y + r2.z*r2.z));
 
 		V.x += Psi.x * Omega/4.0/PI;
 		V.y += Psi.y * Omega/4.0/PI;
