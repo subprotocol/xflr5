@@ -413,6 +413,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
 	m_bShowMasses        = false;
+	m_bPressureArrows    = false;
 	m_bLongitudinal      = true;
 	m_bCurWOppOnly       = true;
 	m_bStoreWOpp         = true;
@@ -518,7 +519,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 
-	connect(m_pctrlHalfWing, SIGNAL(clicked()), this, SLOT(OnHalfWing()));
+	connect(m_pctrlPressureArrows, SIGNAL(clicked()), this, SLOT(OnPressureArrows()));
 	connect(m_pctrlLift, SIGNAL(clicked()), this, SLOT(OnShowLift()));
 	connect(m_pctrlIDrag, SIGNAL(clicked()), this, SLOT(OnShowIDrag()));
 	connect(m_pctrlVDrag, SIGNAL(clicked()), this, SLOT(OnShowVDrag()));
@@ -1560,6 +1561,7 @@ void QMiarex::SetControls()
 	pMainFrame->StabTimeAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABTIMEVIEW);
 	pMainFrame->RootLocusAct->setChecked(m_iView==WSTABVIEW && m_iStabilityView==STABPOLARVIEW);
 
+	pMainFrame->HalfWingAct->setChecked(m_bHalfWing);
 	pMainFrame->showEllipticCurve->setChecked(m_bShowElliptic);
 	pMainFrame->showXCmRefLocation->setChecked(m_bXCmRef);
 	pMainFrame->showWing2Curve->setChecked(m_bShowWingCurve[1]);
@@ -1608,7 +1610,6 @@ void QMiarex::SetControls()
 
 	m_pctrlStoreWOpp->setEnabled(m_pCurWPolar);
 
-	m_pctrlHalfWing->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->showCurWOppOnly->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->showAllWOpps->setEnabled(m_iView==WOPPVIEW);
 	pMainFrame->hideAllWOpps->setEnabled(m_iView==WOPPVIEW);
@@ -1631,6 +1632,7 @@ void QMiarex::SetControls()
 	m_pctrlDownwash->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVortices->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlMoment->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
+	m_pctrlPressureArrows->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
@@ -4591,6 +4593,10 @@ void QMiarex::GLCallViewLists()
 	{
 		glCallList(PANELCP);
 	}
+	if(m_bPressureArrows && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+	{
+		glCallList(PANELPRESSUREARROWS);
+	}
 
 	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
 
@@ -4954,15 +4960,10 @@ void QMiarex::GLDraw3D()
 		GLCreateMesh(this, m_Node, m_Panel);
 		if(glIsList(VLMCTRLPTS))
 		{
-			glDeleteLists(VLMCTRLPTS,1);
-			m_GLList-=1;
+			glDeleteLists(VLMCTRLPTS,2);
+			m_GLList-=2;
 		}
 		GLCreateCtrlPts(this, m_Panel);
-		if(glIsList(VLMVORTICES))
-		{
-			glDeleteLists(VLMVORTICES,1);
-			m_GLList-=1;
-		}
 		GLCreateVortices(this, m_Panel, m_Node, m_pCurWPolar);
 		m_bResetglMesh = false;
 	}
@@ -4993,6 +4994,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(VLMMOMENTS,1);
 			m_GLList -=1;
 		}
+
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
 			if(glIsList(VLMWINGLIFT))
@@ -5022,6 +5024,14 @@ void QMiarex::GLDraw3D()
 			GLCreateLiftForce(this, m_pCurWPolar, m_pCurWOpp);
 			GLCreateMoments(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp);
 		}
+
+		if(glIsList(PANELPRESSUREARROWS))
+		{
+			glDeleteLists(PANELPRESSUREARROWS,1);
+			m_GLList -=1;
+		}
+		GLCreatePressureArrows(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
+
 		m_bResetglLift = false;
 	}
 
@@ -5073,7 +5083,7 @@ void QMiarex::GLDraw3D()
 			if(glIsList(PANELCP))
 			{
 				glDeleteLists(PANELCP,1);
-				m_GLList--;
+				m_GLList-=1;
 			}
 
 			GLCreateCp(this, m_Node, m_Panel, m_pCurWOpp, m_pCurPOpp);
@@ -6557,7 +6567,9 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 	{
 		m_bXTop         = pSettings->value("bXTop", false).toBool();
 		m_bXBot         = pSettings->value("bXBot", false).toBool();
-		m_bXCP          = pSettings->value("bXCP", true).toBool();
+		m_bXCP          = pSettings->value("bXCP", false).toBool();
+		m_bPressureArrows = pSettings->value("bPressureArrows", false).toBool();
+		qDebug() <<m_bPressureArrows;
 		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
 		m_bICd          = pSettings->value("bICd", true).toBool();
 		m_bVCd          = pSettings->value("bVCd", true).toBool();
@@ -9761,7 +9773,7 @@ void QMiarex::OnGraphSettings()
 
 void QMiarex::OnHalfWing()
 {
-	m_bHalfWing = m_pctrlHalfWing->isChecked();
+	m_bHalfWing = !m_bHalfWing;
 	if(m_iView==WOPPVIEW)
 	{
 		m_bIs2DScaleSet = false;
@@ -9770,6 +9782,7 @@ void QMiarex::OnHalfWing()
 		OnAdjustToWing();
 		UpdateView();
 	}
+	SetControls();
 }
 
 
@@ -10930,6 +10943,16 @@ void QMiarex::OnShowXCmRef()
 }
 
 
+void QMiarex::OnPressureArrows()
+{
+	m_bPressureArrows	 = m_pctrlPressureArrows->isChecked();
+	if(m_iView == W3DVIEW)
+	{
+		if(!m_bAnimateWOpp) UpdateView();
+	}
+}
+
+
 void QMiarex::OnShowLift()
 {
 	m_bXCP	 = m_pctrlLift->isChecked();
@@ -10938,7 +10961,6 @@ void QMiarex::OnShowLift()
 		if(!m_bAnimateWOpp) UpdateView();
 	}
 }
-
 
 void QMiarex::OnShowIDrag()
 {
@@ -12556,6 +12578,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("bXTop", m_bXTop);
 		pSettings->setValue("bXBot", m_bXBot  );
 		pSettings->setValue("bXCP", m_bXCP);
+		pSettings->setValue("bPressureArrows", m_bPressureArrows);
 		pSettings->setValue("bXCmRef", m_bXCmRef  );
 		pSettings->setValue("bICd", m_bICd  );
 		pSettings->setValue("bVCd", m_bVCd  );
@@ -13044,6 +13067,7 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlPanels->setChecked(m_bVLMPanels);
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlCp->setChecked(m_b3DCp);
+	m_pctrlPressureArrows->setChecked(m_bPressureArrows);
 	m_pctrlDownwash->setChecked(m_bDownwash);
 	m_pctrlMoment->setChecked(m_bMoments);
 	m_pctrlTrans->setChecked(m_bXTop);
@@ -14130,18 +14154,19 @@ void QMiarex::SetupLayout()
 
 //_______________________Display
 	QGridLayout *CheckDispLayout = new QGridLayout;
-	m_pctrlHalfWing      = new QCheckBox(tr("1/2 wing"));
-	m_pctrlLift          = new QCheckBox(tr("Lift"));
-	m_pctrlIDrag         = new QCheckBox(tr("Ind. Drag"));
-	m_pctrlVDrag         = new QCheckBox(tr("Visc. Drag"));
-	m_pctrlTrans         = new QCheckBox(tr("Trans."));
-	m_pctrlMoment        = new QCheckBox(tr("Moment"));
-	m_pctrlDownwash      = new QCheckBox(tr("Downw."));
-	m_pctrlCp            = new QCheckBox(tr("Cp"));
-	m_pctrlSurfVel       = new QCheckBox(tr("Surf. Vel."));
-	m_pctrlStream        = new QCheckBox(tr("Stream"));
-	m_pctrlWOppAnimate   = new QCheckBox(tr("Animate"));
-//	m_pctrlHighlightOpp  = new QCheckBox(tr("Highlight OpPoint"));
+	m_pctrlPressureArrows = new QCheckBox(tr("Pressure"));
+	m_pctrlPressureArrows->setToolTip(tr("Display the pressure 1/2.rho.V2.Cp acting on the panel"));
+	m_pctrlLift           = new QCheckBox(tr("Lift"));
+	m_pctrlIDrag          = new QCheckBox(tr("Ind. Drag"));
+	m_pctrlVDrag          = new QCheckBox(tr("Visc. Drag"));
+	m_pctrlTrans          = new QCheckBox(tr("Trans."));
+	m_pctrlMoment         = new QCheckBox(tr("Moment"));
+	m_pctrlDownwash       = new QCheckBox(tr("Downw."));
+	m_pctrlCp             = new QCheckBox(tr("Cp"));
+	m_pctrlSurfVel        = new QCheckBox(tr("Surf. Vel."));
+	m_pctrlStream         = new QCheckBox(tr("Stream"));
+	m_pctrlWOppAnimate    = new QCheckBox(tr("Animate"));
+//	m_pctrlHighlightOpp   = new QCheckBox(tr("Highlight OpPoint"));
 
 
 	m_pctrlAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
@@ -14150,8 +14175,8 @@ void QMiarex::SetupLayout()
 	m_pctrlAnimateWOppSpeed->setSliderPosition(250);
 	m_pctrlAnimateWOppSpeed->setTickInterval(50);
 	m_pctrlAnimateWOppSpeed->setTickPosition(QSlider::TicksBelow);
-	CheckDispLayout->addWidget(m_pctrlHalfWing, 1, 1);
-	CheckDispLayout->addWidget(m_pctrlCp,       1, 2);
+	CheckDispLayout->addWidget(m_pctrlCp,       1,1);
+	CheckDispLayout->addWidget(m_pctrlPressureArrows, 1, 2);
 	CheckDispLayout->addWidget(m_pctrlLift,     2, 1);
 	CheckDispLayout->addWidget(m_pctrlMoment,   2, 2);
 	CheckDispLayout->addWidget(m_pctrlIDrag,    3, 1);
@@ -14163,7 +14188,7 @@ void QMiarex::SetupLayout()
 	CheckDispLayout->addWidget(m_pctrlWOppAnimate,  6, 1);
 	CheckDispLayout->addWidget(m_pctrlAnimateWOppSpeed,6,2);
 
-	QGroupBox *DisplayBox = new QGroupBox(tr("Display"));
+	QGroupBox *DisplayBox = new QGroupBox(tr("Results"));
 	DisplayBox->setLayout(CheckDispLayout);
 
 	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
@@ -14300,7 +14325,7 @@ void QMiarex::SetupLayout()
 	ThreeDViewControls->addLayout(ThreeDView);
 	ThreeDViewControls->addLayout(ClipLayout);
 	ThreeDViewControls->addStretch(1);
-	QGroupBox *ThreeDViewBox = new QGroupBox;
+	QGroupBox *ThreeDViewBox = new QGroupBox(tr("Display"));
 	ThreeDViewBox->setLayout(ThreeDViewControls);
 
 //_________________________Main Layout

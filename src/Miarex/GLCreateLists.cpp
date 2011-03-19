@@ -370,7 +370,6 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List)
 
 
 
-
 void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 	if(!pWOpp && !pPOpp)
@@ -509,7 +508,6 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
-
 }
 
 
@@ -2338,7 +2336,7 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 			ZPos +=dD;
 			if(pWPolar)
 			{
-				if(!pWPolar->m_bAutoInertia)  Mass = pWPolar->m_Mass;
+				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
 				else
 				{
 					if(pPlane)     Mass = pPlane->TotalMass();
@@ -2508,5 +2506,196 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 	}*/
+}
+
+
+void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+{
+	//
+	// Creates an OpenGl list of pressure arrows on the panels
+	//
+	if((!pWOpp && !pPOpp) || !pWPolar)
+	{
+		glNewList(PANELPRESSUREARROWS,GL_COMPILE);
+		glEndList();
+		return;
+	}
+
+	QMiarex * pMiarex = (QMiarex*)pQMiarex;
+	int p, nPanels;
+	double force, angle, cosa, sina2, cosa2, color;
+	double *tab;
+	Quaternion Qt; // Quaternion operator to align the reference arrow to the panel's normal
+	CVector Omega; //rotation vector to align the reference arrow to the panel's normal
+	CVector O;
+	//The vectors defining the reference arrow
+	CVector R(0.0,0.0,1.0);
+	CVector R1( 0.05, 0.0, -0.1);
+	CVector R2(-0.05, 0.0, -0.1);
+	//The three vectors defining the arrow on the panel
+	CVector P, P1, P2;
+
+	if(pPOpp)
+	{
+		tab = pPOpp->m_Cp;
+		nPanels = pPOpp->m_NPanels;
+	}
+	else
+	{
+		tab = pWOpp->m_Cp;
+		nPanels = pWOpp->m_NVLMPanels;
+	}
+
+	//define the range of values to set the colors in accordance
+	double rmin, rmax, range;
+	rmin = 1.e10;
+	rmax = -rmin;
+	for (p=0; p<pMiarex->m_MatSize; p++)
+	{
+		if(tab[p]>rmax) rmax = tab[p];
+		if(tab[p]<rmin) rmin = tab[p];
+	}
+	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale/1000.;
+	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale/1000.;
+	range = rmax - rmin;
+
+	glNewList(PANELPRESSUREARROWS, GL_COMPILE);
+	{
+		pMiarex->m_GLList++;
+		glLineWidth(1.0);
+//		glColor3d(pMiarex->m_XCPColor.redF(), pMiarex->m_XCPColor.greenF(), pMiarex->m_XCPColor.blueF());
+
+		for (p=0; p<pMiarex->m_MatSize; p++)
+		{
+			// plot Cp ? f ? f/s=q.Cp ?
+			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *tab[p];
+			force *= pMiarex->m_LiftScale/1000.;
+			color = (force-rmin)/range;
+			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+
+			if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
+			else                                     O = pPanel[p].CollPt;
+
+			// Rotate the reference arrow to align it with the panel normal
+
+			if(R==P)
+			{
+				Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
+			}
+			else
+			{
+				cosa   = R.dot(pPanel[p].Normal);
+				sina2  = sqrt((1.0 - cosa)*0.5);
+				cosa2  = sqrt((1.0 + cosa)*0.5);
+				angle = acos(cosa2)*180.0/PI;
+
+				Omega = R * pPanel[p].Normal;//crossproduct
+				Omega.Normalize();
+				Omega *=sina2;
+				Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
+			}
+
+			Qt.Conjugate(R,  P);
+			Qt.Conjugate(R1, P1);
+			Qt.Conjugate(R2, P2);
+
+			// Scale the pressure vector
+			P  *= force;
+			P1 *= force;
+			P2 *= force;
+
+			// Plot
+			if(pWPolar->m_bThinSurfaces)
+			{
+				glBegin(GL_LINES);
+				{
+					glVertex3d(O.x, O.y, O.z);
+					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+				}
+				glEnd();
+
+				if(force>0)
+				{
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+					}
+					glEnd();
+				}
+				else
+				{
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+					}
+					glEnd();
+				}
+			}
+			else
+			{
+				if(tab[p]>0)
+				{
+					// compression, point towards the surface
+//					P.Set(-P.x, -P.y, -P.z);
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x-P1.x, O.y-P1.y, O.z-P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y+P.y, O.z);
+						glVertex3d(O.x-P2.x, O.y-P2.y, O.z-P2.z);
+					}
+					glEnd();
+				}
+				else
+				{
+					// depression, point outwards from the surface
+					P.Set(-P.x, -P.y, -P.z);
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x-P1.x, O.y+P.y-P1.y, O.z+P.z-P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x-P2.x, O.y+P.y-P2.y, O.z+P.z-P2.z);
+					}
+					glEnd();
+				}
+			}
+		}
+	}
+	glEndList();
 }
 

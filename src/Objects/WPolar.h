@@ -45,26 +45,23 @@ class CWPolar
 
 public:
 	CWPolar();
+	void AddPoint(CWOpp* pWOpp);
+	void AddPoint(CPOpp* pPOpp);
+	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
+	void CalculatePoint(int i);
+	void Export(QTextStream &out, int FileType);
+	void GetPolarProperties(QString &Properties);
+	void Remove(int i);
+	void SetInertia(void *ptr, bool bPlane);
+	void *GetUFOPlrVariable(int iVar);
+	void ResetWPlr();
+	void Copy(CWPolar *pWPolar);
+	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 	static void* s_pMainFrame;
 	static void* s_pMiarex;
 
 private:
-
-	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
-
-	void AddPoint(CWOpp* pWOpp);
-	void AddPoint(CPOpp* pPOpp);
-	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
-	void CalculatePoint(int i);
-	void Copy(CWPolar *pWPolar);
-	void Export(QTextStream &out, int FileType);
-	void GetPolarProperties(QString &Properties);
-	void Remove(int i);
-	void ResetWPlr();
-	void SetInertia(void *ptr, bool bPlane);
-	void *GetUFOPlrVariable(int iVar);
-
 	int m_PolarFormat;
 	int m_RefAreaType;
 	double m_QInf;
@@ -85,7 +82,6 @@ private:
 
 	bool m_bIsVisible;
 	bool m_bShowPoints;
-	bool m_bThinSurfaces;
 	bool m_bGround;
 	bool m_bWakeRollUp;
 	bool m_bDirichlet;
@@ -159,6 +155,7 @@ public:
 	//Inertia properties
 	double m_Mass;
 	bool m_bAutoInertia;
+	bool m_bThinSurfaces;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
 	CVector m_CoG;
 

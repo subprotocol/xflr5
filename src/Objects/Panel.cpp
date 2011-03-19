@@ -349,6 +349,10 @@ bool CPanel::Intersect(CVector const &A, CVector const &U, CVector &I, double &d
 	return false;
 }
 
+double CPanel::GetArea()
+{
+	return Area;
+}
 
 double CPanel::Width()
 {

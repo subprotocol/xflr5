@@ -1198,6 +1198,10 @@ void MainFrame::CreateMiarexActions()
 	DefineWingAct->setStatusTip(tr("Shows a dialogbox for editing a new wing definition"));
 	connect(DefineWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewWing()));
 
+	HalfWingAct = new QAction(tr("Half Wing"), this);
+	HalfWingAct->setCheckable(true);
+	connect(HalfWingAct, SIGNAL(triggered()), pMiarex, SLOT(OnHalfWing()));
+
 	DefinePlaneAct = new QAction(tr("Define a New Plane")+"\tCtrl+F3", this);
 	DefinePlaneAct->setStatusTip(tr("Shows a dialogbox to create a new plane definition"));
 	connect(DefinePlaneAct, SIGNAL(triggered()), pMiarex, SLOT(OnNewPlane()));
@@ -1582,6 +1586,7 @@ void MainFrame::CreateMiarexMenus()
 	MiarexWOppMenu->addAction(hideAllWOpps);
 	MiarexWOppMenu->addAction(deleteAllWOpps);
 	MiarexWOppMenu->addSeparator();
+	MiarexWOppMenu->addAction(HalfWingAct);
 	MiarexWOppMenu->addAction(showEllipticCurve);
 	MiarexWOppMenu->addAction(showXCmRefLocation);
 	MiarexWOppMenu->addAction(showWing2Curve);
@@ -1629,6 +1634,7 @@ void MainFrame::CreateMiarexMenus()
 	WOppCtxMenu->addMenu(WOppGraphMenu);
 	WOppCtxMenu->addAction(ResetWingGraphScale);
 	WOppCtxMenu->addSeparator();
+	WOppCtxMenu->addAction(HalfWingAct);
 	WOppCtxMenu->addAction(showEllipticCurve);
 	WOppCtxMenu->addAction(showXCmRefLocation);
 	WOppCtxMenu->addAction(showWing2Curve);

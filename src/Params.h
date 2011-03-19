@@ -131,10 +131,12 @@
 #define WOPPCPLEGENDTXT         1379
 
 #define WINGWAKEPANELS          1383
-#define PANELCP                 1384
+
 #define VLMCTRLPTS              1385
 #define VLMVORTICES             1386
 
+#define PANELCP                 1390
+#define PANELPRESSUREARROWS     1391
 
 #define BODYGEOM            1400
 #define BODYSURFACES        1401

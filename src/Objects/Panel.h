@@ -53,6 +53,7 @@ public:
 	CVector LocalToGlobal(CVector const &V);
 
 	double Width();
+	double GetArea();
 
 protected:	
 	bool m_bIsInSymPlane;
