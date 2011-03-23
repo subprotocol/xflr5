@@ -3255,6 +3255,23 @@ bool GL3dBodyDlg::LoadSettings(QSettings *pSettings)
 }
 
 
+void GL3dBodyDlg::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	QPoint point(event->pos().x(), event->pos().y());
+
+	CVector Real;
+	bool bCtrl = false;
+	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+
+	ClientToGL(point, Real);
+
+	if(m_pglWidget->m_rCltRect.contains(point)) m_pglWidget->setFocus();
+
+	Set3DRotationCenter(point);
+	m_bPickCenter = false;
+	m_pctrlPickCenter->setChecked(false);
+}
+
 
 void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 {

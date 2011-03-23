@@ -28,6 +28,7 @@
 #include "../Objects/POpp.h"
 #include "../Objects/WPolar.h"
 
+
 void GLCreateGeom(void *pQMiarex, CWing *pWing, int List);
 void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
 void GLCreateCpLegend(void *pQMiarex);

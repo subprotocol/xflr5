@@ -2516,15 +2516,24 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 	//
 	if((!pWOpp && !pPOpp) || !pWPolar)
 	{
-		glNewList(PANELPRESSUREARROWS,GL_COMPILE);
+		glNewList(PANELFORCEARROWS,GL_COMPILE);
+		glEndList();
+		glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
 		glEndList();
 		return;
 	}
 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	int p, nPanels;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	int p, nPanels,i;
 	double force, angle, cosa, sina2, cosa2, color;
+	double labellength, ClientToGL;
+	double f, fi,dD, ZPos,dz,Right1, Right2;
+	double rmin, rmax, range, delta;
+	double XPos, w, h;
 	double *tab;
+	double coef = 1.;
 	Quaternion Qt; // Quaternion operator to align the reference arrow to the panel's normal
 	CVector Omega; //rotation vector to align the reference arrow to the panel's normal
 	CVector O;
@@ -2534,7 +2543,13 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 	CVector R2(-0.05, 0.0, -0.1);
 	//The three vectors defining the arrow on the panel
 	CVector P, P1, P2;
+	QString strong, strForce;
+	QFontMetrics fm(pMainFrame->m_TextFont);
 
+	w = (double)pMiarex->m_r3DCltRect.width();
+	h = (double)pMiarex->m_r3DCltRect.height();
+
+	GetForceUnit(strForce, pMainFrame->m_ForceUnit);
 	if(pPOpp)
 	{
 		tab = pPOpp->m_Cp;
@@ -2547,19 +2562,18 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 	}
 
 	//define the range of values to set the colors in accordance
-	double rmin, rmax, range;
 	rmin = 1.e10;
 	rmax = -rmin;
 	for (p=0; p<pMiarex->m_MatSize; p++)
 	{
-		if(tab[p]>rmax) rmax = tab[p];
-		if(tab[p]<rmin) rmin = tab[p];
+		if(tab[p]*pPanel[p].GetArea()>rmax) rmax = tab[p]*pPanel[p].GetArea();
+		if(tab[p]*pPanel[p].GetArea()<rmin) rmin = tab[p]*pPanel[p].GetArea();
 	}
-	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale/1000.;
-	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale/1000.;
+	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
+	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	range = rmax - rmin;
-
-	glNewList(PANELPRESSUREARROWS, GL_COMPILE);
+//qDebug()<<"Range="<<range<<rmin<<rmax;
+	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
 		glLineWidth(1.0);
@@ -2568,8 +2582,8 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 		for (p=0; p<pMiarex->m_MatSize; p++)
 		{
 			// plot Cp ? f ? f/s=q.Cp ?
-			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *tab[p];
-			force *= pMiarex->m_LiftScale/1000.;
+			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *tab[p]*pPanel[p].GetArea();
+			force *= pMiarex->m_LiftScale *coef;
 			color = (force-rmin)/range;
 			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 
@@ -2697,5 +2711,53 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 		}
 	}
 	glEndList();
-}
 
+
+
+	if(w>h)
+	{
+		XPos  = 1.0;
+		dz    = h/w*1.0/20.0;
+		ZPos  = h/w - 23.0*dz;
+		ClientToGL = 2.0/w;
+	}
+	else
+	{
+		XPos = w/h;
+		dz    = 1.0/20.0;
+		ZPos  = 1.0 - 23.0*dz;
+		ClientToGL = 2.0/h;
+	}
+
+	dD      = 12.0/w*2.0;
+
+	Right1  = .94*XPos;
+	Right2  = .98*XPos;
+
+	delta = range / 20.0;
+
+	glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
+	{
+		pMiarex->m_GLList++;
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
+
+		glPolygonMode(GL_FRONT,GL_LINE);
+
+		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		// Draw the labels
+		for (i=0; i<=20; i ++)
+		{
+			f = rmin + (double)i * delta;
+			fi = (double)i*dz ;
+			strong = QString("%1").arg(f, 5,'g',3);
+			labellength = (fm.width(strong)+5) * ClientToGL;
+			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
+//qDebug()<<"f="<<f;
+		}
+
+		labellength = (fm.width(strong)+5) * ClientToGL;
+		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strForce, pMainFrame->m_TextFont);
+	}
+	glEndList();
+}

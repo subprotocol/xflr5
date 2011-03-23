@@ -229,9 +229,10 @@ void GetLengthUnit(QString &str, int unit)
 
 void GetForceUnit(QString &str, int unit)
 {
-	switch(unit){
+	switch(unit)
+	{
 		case 0:{
-			str="N.m";
+			str="N";
 			break;
 		}
 		case 1:{

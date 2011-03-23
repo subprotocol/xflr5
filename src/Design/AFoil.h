@@ -156,6 +156,7 @@ private:
 	void UpdateView();
 
 	void wheelEvent(QWheelEvent *event);
+	void mouseDoubleClickEvent (QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mousePressEvent(QMouseEvent *event) ;
 	void mouseReleaseEvent(QMouseEvent *event) ;

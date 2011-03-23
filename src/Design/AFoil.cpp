@@ -739,6 +739,26 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 }
 
 
+void QAFoil::mouseDoubleClickEvent (QMouseEvent * event)
+{
+	if(!hasFocus()) setFocus();
+
+	QPoint point = event->pos();
+	QPoint center;
+	//translate
+	center.rx() = (int)(m_rCltRect.width()/2);
+	center.ry() = (int)(m_rCltRect.height()/2);
+
+	m_ptOffset.rx() += -point.x() + center.x();
+	m_ptOffset.ry() += -point.y() + center.y();
+	m_ViewportTrans.rx() += -point.x() + center.x();
+	m_ViewportTrans.ry() += -point.y() + center.y();
+
+	UpdateView();
+	return;
+}
+
+
 void QAFoil::mouseMoveEvent(QMouseEvent *event)
 {
 	if(!hasFocus()) setFocus();

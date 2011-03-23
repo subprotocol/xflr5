@@ -136,7 +136,8 @@
 #define VLMVORTICES             1386
 
 #define PANELCP                 1390
-#define PANELPRESSUREARROWS     1391
+#define PANELFORCEARROWS     1391
+#define PANELFORCELEGENDTXT     1392
 
 #define BODYGEOM            1400
 #define BODYSURFACES        1401

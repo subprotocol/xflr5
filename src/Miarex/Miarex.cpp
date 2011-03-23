@@ -4595,7 +4595,7 @@ void QMiarex::GLCallViewLists()
 	}
 	if(m_bPressureArrows && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 	{
-		glCallList(PANELPRESSUREARROWS);
+		glCallList(PANELFORCEARROWS);
 	}
 
 	if (m_pCurWPolar && fabs(m_pCurWPolar->m_Beta)>0.001) glRotated(-m_pCurWPolar->m_Beta, 0.0, 0.0, 1.0);
@@ -4982,6 +4982,16 @@ void QMiarex::GLDraw3D()
 		m_bResetglWake = false;
 	}
 
+	if((m_bResetglLegend || m_bResetglLift || m_bResetglOpp) && m_iView==W3DVIEW)
+	{
+		if(glIsList(PANELFORCEARROWS))
+		{
+			glDeleteLists(PANELFORCEARROWS,2);
+			m_GLList -=2;
+		}
+		GLCreatePressureArrows(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
+	}
+
 	if((m_bResetglLift || m_bResetglOpp) && m_iView==W3DVIEW)
 	{
 		if(glIsList(LIFTFORCE))
@@ -5025,12 +5035,6 @@ void QMiarex::GLDraw3D()
 			GLCreateMoments(this, m_pCurWing, m_pCurWPolar, m_pCurWOpp);
 		}
 
-		if(glIsList(PANELPRESSUREARROWS))
-		{
-			glDeleteLists(PANELPRESSUREARROWS,1);
-			m_GLList -=1;
-		}
-		GLCreatePressureArrows(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
 
 		m_bResetglLift = false;
 	}
@@ -5476,6 +5480,11 @@ void QMiarex::GLRenderView()
 		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
 			glCallList(WOPPCPLEGENDTXT);
+			glCallList(WOPPCPLEGENDCLR);
+		}
+		else if (m_bPressureArrows && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
+		{
+			glCallList(PANELFORCELEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
 		}
 	}
@@ -6569,7 +6578,6 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bXBot         = pSettings->value("bXBot", false).toBool();
 		m_bXCP          = pSettings->value("bXCP", false).toBool();
 		m_bPressureArrows = pSettings->value("bPressureArrows", false).toBool();
-		qDebug() <<m_bPressureArrows;
 		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
 		m_bICd          = pSettings->value("bICd", true).toBool();
 		m_bVCd          = pSettings->value("bVCd", true).toBool();
@@ -14154,8 +14162,8 @@ void QMiarex::SetupLayout()
 
 //_______________________Display
 	QGridLayout *CheckDispLayout = new QGridLayout;
-	m_pctrlPressureArrows = new QCheckBox(tr("Pressure"));
-	m_pctrlPressureArrows->setToolTip(tr("Display the pressure 1/2.rho.V2.Cp acting on the panel"));
+	m_pctrlPressureArrows = new QCheckBox(tr("Panel Forces"));
+	m_pctrlPressureArrows->setToolTip(tr("Display the force 1/2.rho.V2.S.Cp acting on the panel"));
 	m_pctrlLift           = new QCheckBox(tr("Lift"));
 	m_pctrlIDrag          = new QCheckBox(tr("Ind. Drag"));
 	m_pctrlVDrag          = new QCheckBox(tr("Visc. Drag"));

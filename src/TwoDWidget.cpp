@@ -166,6 +166,11 @@ void TwoDWidget::mouseDoubleClickEvent ( QMouseEvent * event )
 		QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 		pXDirect->mouseDoubleClickEvent(event );
 	}
+	else if(pMainFrame->m_iApp == DIRECTDESIGN && m_pAFoil)
+	{
+		QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+		pAFoil->mouseDoubleClickEvent(event);
+	}
 	else if(pMainFrame->m_iApp == MIAREX && m_pMiarex)
 	{
 		QMiarex* pMiarex = (QMiarex*)m_pMiarex;
