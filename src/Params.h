@@ -58,6 +58,11 @@
 #define MAXPOLARPOINTS   1000
 #define MAXMODEFRAMES     200
 
+#define BODYPANELTYPE       1
+#define BODYSPLINETYPE      2
+
+
+
 //XFoil Direct Parameters
 #define IQX  302	//300 = number of surface panel nodes + 6
 #define IQX2 151	//IQX/2 added arcds
@@ -148,7 +153,6 @@
 #define ARCPOINT            1415
 
 #define MODELEGEND          1416
-
 
 #define QUESTION (BB || !BB) //Shakespeare
 

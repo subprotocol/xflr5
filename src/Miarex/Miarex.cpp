@@ -413,7 +413,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
 	m_bShowMasses        = false;
-	m_bPressureArrows    = false;
+	m_bPanelForce    = false;
 	m_bLongitudinal      = true;
 	m_bCurWOppOnly       = true;
 	m_bStoreWOpp         = true;
@@ -519,7 +519,7 @@ QMiarex::QMiarex(QWidget *parent)
 	connect(m_pctrlShowPoints, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 	connect(m_pctrlShowCurve, SIGNAL(clicked()), this, SLOT(OnShowCurve()));
 
-	connect(m_pctrlPressureArrows, SIGNAL(clicked()), this, SLOT(OnPressureArrows()));
+	connect(m_pctrlPanelForce, SIGNAL(clicked()), this, SLOT(OnPanelForce()));
 	connect(m_pctrlLift, SIGNAL(clicked()), this, SLOT(OnShowLift()));
 	connect(m_pctrlIDrag, SIGNAL(clicked()), this, SLOT(OnShowIDrag()));
 	connect(m_pctrlVDrag, SIGNAL(clicked()), this, SLOT(OnShowVDrag()));
@@ -1632,7 +1632,7 @@ void QMiarex::SetControls()
 	m_pctrlDownwash->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVortices->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlMoment->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
-	m_pctrlPressureArrows->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
+	m_pctrlPanelForce->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlCp->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlStream->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
 	m_pctrlSurfVel->setEnabled(m_iView==W3DVIEW && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod!=LLTMETHOD);
@@ -1820,7 +1820,7 @@ int QMiarex::CreateBodyElements()
 	}
 	else dpx=dpz=0.0;
 
-	if(m_pCurBody->m_LineType==1)
+	if(m_pCurBody->m_LineType==BODYPANELTYPE)
 	{
 		nx = 0;
 		for(i=0; i<m_pCurBody->m_NStations-1; i++) nx+=m_pCurBody->m_xPanels[i];
@@ -1948,7 +1948,7 @@ int QMiarex::CreateBodyElements()
 			}
 		}
 	}
-	else if(m_pCurBody->m_LineType==2)
+	else if(m_pCurBody->m_LineType==BODYSPLINETYPE)
 	{
 		FullSize = 2*nx*nh;
 		//start with left side... same as for wings
@@ -4593,7 +4593,7 @@ void QMiarex::GLCallViewLists()
 	{
 		glCallList(PANELCP);
 	}
-	if(m_bPressureArrows && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+	if(m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
 	{
 		glCallList(PANELFORCEARROWS);
 	}
@@ -4789,8 +4789,8 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pCurBody->m_LineType==1)	     m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
-		else if(m_pCurBody->m_LineType==2) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
+		if(m_pCurBody->m_LineType==BODYPANELTYPE)	   m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
+		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHPANELS))
@@ -4989,7 +4989,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(PANELFORCEARROWS,2);
 			m_GLList -=2;
 		}
-		GLCreatePressureArrows(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
+		GLCreatePanelForce(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
 	}
 
 	if((m_bResetglLift || m_bResetglOpp) && m_iView==W3DVIEW)
@@ -5482,7 +5482,7 @@ void QMiarex::GLRenderView()
 			glCallList(WOPPCPLEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
 		}
-		else if (m_bPressureArrows && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
+		else if (m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
 			glCallList(PANELFORCELEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
@@ -6577,7 +6577,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bXTop         = pSettings->value("bXTop", false).toBool();
 		m_bXBot         = pSettings->value("bXBot", false).toBool();
 		m_bXCP          = pSettings->value("bXCP", false).toBool();
-		m_bPressureArrows = pSettings->value("bPressureArrows", false).toBool();
+		m_bPanelForce = pSettings->value("bPanelForce", false).toBool();
 		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
 		m_bICd          = pSettings->value("bICd", true).toBool();
 		m_bVCd          = pSettings->value("bVCd", true).toBool();
@@ -7306,10 +7306,13 @@ void QMiarex::On3DCp()
 	// The user has toggled the switch for the display of Cp coefficients
 	//
 	m_b3DCp = m_pctrlCp->isChecked();
+
 	if(m_b3DCp)
 	{
 		m_bSurfaces = false;
 		m_pctrlSurfaces->setChecked(false);
+		m_bPanelForce = false;
+		m_pctrlPanelForce->setChecked(false);
 	}
 	UpdateView();
 }
@@ -10951,9 +10954,14 @@ void QMiarex::OnShowXCmRef()
 }
 
 
-void QMiarex::OnPressureArrows()
+void QMiarex::OnPanelForce()
 {
-	m_bPressureArrows	 = m_pctrlPressureArrows->isChecked();
+	m_bPanelForce	 = m_pctrlPanelForce->isChecked();
+	if(m_bPanelForce)
+	{
+		m_b3DCp =false;
+		m_pctrlCp->setChecked(false);
+	}
 	if(m_iView == W3DVIEW)
 	{
 		if(!m_bAnimateWOpp) UpdateView();
@@ -12586,7 +12594,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("bXTop", m_bXTop);
 		pSettings->setValue("bXBot", m_bXBot  );
 		pSettings->setValue("bXCP", m_bXCP);
-		pSettings->setValue("bPressureArrows", m_bPressureArrows);
+		pSettings->setValue("bPanelForce", m_bPanelForce);
 		pSettings->setValue("bXCmRef", m_bXCmRef  );
 		pSettings->setValue("bICd", m_bICd  );
 		pSettings->setValue("bVCd", m_bVCd  );
@@ -13075,7 +13083,7 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlPanels->setChecked(m_bVLMPanels);
 	m_pctrlAxes->setChecked(m_bAxes);
 	m_pctrlCp->setChecked(m_b3DCp);
-	m_pctrlPressureArrows->setChecked(m_bPressureArrows);
+	m_pctrlPanelForce->setChecked(m_bPanelForce);
 	m_pctrlDownwash->setChecked(m_bDownwash);
 	m_pctrlMoment->setChecked(m_bMoments);
 	m_pctrlTrans->setChecked(m_bXTop);
@@ -14162,8 +14170,8 @@ void QMiarex::SetupLayout()
 
 //_______________________Display
 	QGridLayout *CheckDispLayout = new QGridLayout;
-	m_pctrlPressureArrows = new QCheckBox(tr("Panel Forces"));
-	m_pctrlPressureArrows->setToolTip(tr("Display the force 1/2.rho.V2.S.Cp acting on the panel"));
+	m_pctrlPanelForce = new QCheckBox(tr("Panel Forces"));
+	m_pctrlPanelForce->setToolTip(tr("Display the force 1/2.rho.V2.S.Cp acting on the panel"));
 	m_pctrlLift           = new QCheckBox(tr("Lift"));
 	m_pctrlIDrag          = new QCheckBox(tr("Ind. Drag"));
 	m_pctrlVDrag          = new QCheckBox(tr("Visc. Drag"));
@@ -14184,7 +14192,7 @@ void QMiarex::SetupLayout()
 	m_pctrlAnimateWOppSpeed->setTickInterval(50);
 	m_pctrlAnimateWOppSpeed->setTickPosition(QSlider::TicksBelow);
 	CheckDispLayout->addWidget(m_pctrlCp,       1,1);
-	CheckDispLayout->addWidget(m_pctrlPressureArrows, 1, 2);
+	CheckDispLayout->addWidget(m_pctrlPanelForce, 1, 2);
 	CheckDispLayout->addWidget(m_pctrlLift,     2, 1);
 	CheckDispLayout->addWidget(m_pctrlMoment,   2, 2);
 	CheckDispLayout->addWidget(m_pctrlIDrag,    3, 1);

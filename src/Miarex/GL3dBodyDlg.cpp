@@ -745,7 +745,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 	nx = pBody->m_nxPanels;
 	nh = pBody->m_nhPanels;
 
-	if(pBody->m_LineType==1) //LINES
+	if(pBody->m_LineType==BODYPANELTYPE) //LINES
 	{
 		glNewList(BODYMESHPANELS,GL_COMPILE);
 		{
@@ -1002,7 +1002,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 		}
 		glEndList();
 	}
-	else if(pBody->m_LineType==2) //NURBS
+	else if(pBody->m_LineType==BODYSPLINETYPE) //NURBS
 	{
 		pBody->SetPanelPos();
 		p = 0;
@@ -1423,7 +1423,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 		}
 		glEnd();
 
-		if(m_pBody->m_LineType==1)
+		if(m_pBody->m_LineType==BODYPANELTYPE)
 		{
 			//Top Line
 			glBegin(GL_LINE_STRIP);
@@ -1631,7 +1631,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
-		if(m_pBody->m_LineType ==2)
+		if(m_pBody->m_LineType ==BODYSPLINETYPE)
 		{
 			u = m_pBody->Getu(m_pBody->m_FramePosition[m_pBody->m_iActiveFrame].x);
 
@@ -1689,7 +1689,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 			{
 				if(j!=m_pBody->m_iActiveFrame)
 				{
-					if(m_pBody->m_LineType ==2)
+					if(m_pBody->m_LineType ==BODYSPLINETYPE)
 					{
 						u = m_pBody->Getu(m_pBody->m_FramePosition[j].x);
 
@@ -1765,7 +1765,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
 
-		if(m_pBody->m_LineType ==2)
+		if(m_pBody->m_LineType ==BODYSPLINETYPE)
 		{
 			u = m_pBody->Getu(m_pBody->m_FramePosition[m_pBody->m_iActiveFrame].x);
 
@@ -2601,8 +2601,8 @@ void GL3dBodyDlg::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pBody->m_LineType==1)	    GLCreateBody3DFlatPanels(m_pBody);
-		else if(m_pBody->m_LineType==2)	GLCreateBody3DSplines(m_pBody);
+		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(m_pBody);
+		else if(m_pBody->m_LineType==BODYSPLINETYPE)	GLCreateBody3DSplines(m_pBody);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHPANELS))
@@ -3934,7 +3934,7 @@ void GL3dBodyDlg::OnLineType()
 	m_bChanged = true;
 	if(m_pctrlFlatPanels->isChecked())
 	{
-		m_pBody->m_LineType = 1;
+		m_pBody->m_LineType = BODYPANELTYPE;
 		m_pctrlNXPanels->setEnabled(false);
 		m_pctrlNHoopPanels->setEnabled(false);
 		m_pctrlXDegree->setEnabled(false);
@@ -3942,7 +3942,7 @@ void GL3dBodyDlg::OnLineType()
 	}
 	else
 	{
-		m_pBody->m_LineType = 2;
+		m_pBody->m_LineType = BODYSPLINETYPE;
 		m_pctrlNXPanels->setEnabled(true);
 		m_pctrlNHoopPanels->setEnabled(true);
 		m_pctrlXDegree->setEnabled(true);
@@ -4457,7 +4457,7 @@ void GL3dBodyDlg::Set3DRotationCenter(QPoint point)
 
 
 
-	if(m_pBody->m_LineType==2)
+	if(m_pBody->m_LineType==BODYSPLINETYPE)
 	{
 		nx = qMin(500, m_NXPoints);
 		nh = qMax(m_NHoopPoints, 3);
@@ -4501,7 +4501,7 @@ void GL3dBodyDlg::Set3DRotationCenter(QPoint point)
 			}
 		}
 	}
-	else if(m_pBody->m_LineType==1)
+	else if(m_pBody->m_LineType==BODYPANELTYPE)
 	{
 		int inh, inx;
 		CVector Tj, Tjp1, LA, LB, TA, TB, TALB, LATB, N;
@@ -4582,8 +4582,8 @@ void GL3dBodyDlg::SetBody(CBody *pBody)
 	m_pFrameDelegate->SetPointers(m_Precision,&m_pBody->m_NStations);
 	m_pPointDelegate->SetPointers(m_Precision,&m_pBody->m_NSideLines);
 
-	if(m_pBody->m_LineType==1) m_pctrlFlatPanels->setChecked(true);
-	else                       m_pctrlBSplines->setChecked(true);
+	if(m_pBody->m_LineType==BODYPANELTYPE)       m_pctrlFlatPanels->setChecked(true);
+	else if(m_pBody->m_LineType==BODYSPLINETYPE) m_pctrlBSplines->setChecked(true);
 
 	m_pctrlBodyStyle->SetStyle(m_pBody->m_BodyStyle);
 	m_pctrlBodyStyle->SetWidth(m_pBody->m_BodyWidth);
@@ -4598,14 +4598,14 @@ void GL3dBodyDlg::SetBody(CBody *pBody)
 	m_pFrame = m_pBody->m_Frame+ m_pBody->m_iActiveFrame;
 	m_bResetglBody2D = true;
 
-	if(m_pBody->m_LineType==1)
+	if(m_pBody->m_LineType==BODYPANELTYPE)
 	{
 		m_pctrlNXPanels->setEnabled(false);
 		m_pctrlNHoopPanels->setEnabled(false);
 		m_pctrlXDegree->setEnabled(false);
 		m_pctrlHoopDegree->setEnabled(false);
 	}
-	else
+	else if(m_pBody->m_LineType==BODYSPLINETYPE)
 	{
 		m_pctrlNXPanels->setEnabled(true);
 		m_pctrlNHoopPanels->setEnabled(true);

@@ -383,26 +383,21 @@ bool ReadAVLString(QTextStream &in, int &Line, QString &strong)
 {
 	bool bComment = true;
 	int pos;
-	QString str;
 
 	while(bComment && !in.atEnd())
 	{
 		bComment = false;
 
 		strong = in.readLine();
-//		bRead = pXFile->ReadString(strong);
 		if(in.atEnd()) return false;
 
-
+		strong = strong.trimmed();
 		pos = strong.indexOf("#",0);
-		if(pos==0)		bComment = true;
-
+		if(pos>=0) strong = strong.left(pos);
 		pos = strong.indexOf("!",0);
-		if(pos==0)		bComment = true;
+		if(pos>=0) strong = strong.left(pos);
 
-		str = strong;
-		str.replace(" ", "");
-		if(str.isEmpty())	bComment = true;
+		if(strong.isEmpty()) bComment = true;
 
 		Line++;
 	}

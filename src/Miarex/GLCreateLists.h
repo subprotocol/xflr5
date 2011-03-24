@@ -45,5 +45,5 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);		
 void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
-void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
+void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
 #endif // GLCREATELISTS_H

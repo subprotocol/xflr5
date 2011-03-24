@@ -155,7 +155,7 @@ private slots:
 	void OnInitLLTCalc();
 	void OnStoreWOpp();
 	void OnHalfWing();
-	void OnPressureArrows();
+	void OnPanelForce();
 	void OnScaleWing();
 	void OnShowLift();
 	void OnShowIDrag();
@@ -358,7 +358,7 @@ private:
 	QCheckBox *m_pctrlStoreWOpp;
 	QPushButton *m_pctrlAnalyze;
 
-	QCheckBox *m_pctrlPressureArrows, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans, *m_pctrlWOppAnimate;
+	QCheckBox *m_pctrlPanelForce, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans, *m_pctrlWOppAnimate;
 	QSlider *m_pctrlAnimateWOppSpeed;
 //	QCheckBox *m_pctrlHighlightOpp;
 	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
@@ -440,7 +440,7 @@ protected:
 	bool m_bSurfaces, m_bOutline, m_bAxes, m_bVLMPanels; // true if the surfaces, outline, axes or panels are to be displayed
 	bool m_bXTop, m_bXBot, m_bXCP;     // defines whether the corresponfing data should be displayed
 	bool m_bHighlightOpp;              // true if the currently selected operating point is to be highlighted on the polar graph
-	bool m_bPressureArrows;
+	bool m_bPanelForce;
 	bool m_bBreak;
 
 	bool m_bResetglGeom;			// true if the geometry OpenGL list needs to be re-generated

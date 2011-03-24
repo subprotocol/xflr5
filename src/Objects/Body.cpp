@@ -70,7 +70,7 @@ CBody::CBody()
 
 	m_iActiveFrame =  1;
 	m_iHighlight   = -1;
-	m_LineType     =  2;
+	m_LineType     =  BODYSPLINETYPE;
 
 	m_nxDegree = 3;
 	m_nhDegree = 3;
@@ -258,7 +258,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	CoG.Set(0.0, 0.0, 0.0);
 	CoGIxx = CoGIyy = CoGIzz = CoGIxz = 0.0;
 
-	if(m_LineType==1)
+	if(m_LineType==BODYPANELTYPE)
 	{
 		// we use the panel division
 		//first get the wetted area
@@ -389,7 +389,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			}
 		}
 	}
-	else if(m_LineType==2)
+	else if(m_LineType==BODYSPLINETYPE)
 	{
 		int NSections = 20;//why not ?
 		xpos = m_FramePosition[0].x;
@@ -516,17 +516,34 @@ bool CBody::ExportDefinition()
 
 	QTextStream out(&XFile);
 
+	strong = "\n# This file defines a body geometry\n";
+	out << strong;
+	strong = "# The frames are defined from nose to tail\n";
+	out << strong;
+	strong = "# The numer of sidelines is defined by the number of points of the first frame\n";
+	out << strong;
+	strong = "# Each of the next frames should have the same number of points as the first\n";
+	out << strong;
+	strong = QString("# The maximum number of sidelines is %1\n").arg(MAXSIDELINES);
+	out << strong;
+	strong = QString("# The maximum number of frames is %1\n").arg(MAXBODYFRAMES);
+	out << strong;
+	strong = "# For each frame, the points are defined for the right half of the body, \n";
+	out << strong;
+	strong = "# in the clockwise direction aft looking forward\n\n";
+	out << strong;
+
 	out << (m_BodyName+"\n\n");
 	out << ("BODYTYPE\n");
-	if(m_LineType==1) out << ("1        # Flat Panels\n\n");
-	if(m_LineType==2) out << ("2        # B-Splines\n\n");
+	if(m_LineType==BODYPANELTYPE)  out << (" 1        # Flat Panels (1) or NURBS (2)\n\n");
+	if(m_LineType==BODYSPLINETYPE) out << (" 2        # Flat Panels (1) or NURBS (2)\n\n");
 
 	out << ("OFFSET\n");
 	out << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
 
 	for(i=0; i<m_NStations; i++)
 	{
-		out << ("FRAME\n\n");
+		out << ("FRAME\n");
 		for(j=0;j<m_NSideLines; j++)
 		{
 			strong = QString("%1     %2    %3\n")
@@ -732,7 +749,7 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 double CBody::GetSectionArcLength(double x)
 {
 	//NURBS only
-	if(m_LineType==1) return 0.0;
+	if(m_LineType==BODYPANELTYPE) return 0.0;
 	// aproximate arc length, used for inertia estimations
 	double length = 0.0;
 	double ux = Getu(x);
@@ -925,10 +942,11 @@ bool CBody::ImportDefinition()
 			bRead  = ReadAVLString(in, Line, strong);
 			if(!bRead) break;
 			res = strong.toInt(&bOK);
+
 			if(bOK)
 			{
 				m_LineType = res;
-				if(m_LineType !=1 && m_LineType !=2) m_LineType = 1;
+				if(m_LineType !=BODYPANELTYPE && m_LineType !=BODYSPLINETYPE) m_LineType = BODYPANELTYPE;
 			}
 		}
 		else if (strong.indexOf("OFFSET") >=0)
@@ -1220,8 +1238,8 @@ void CBody::InterpolateSurface()
 
 bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 {
-	if(m_LineType==1) return IntersectPanels(A,B,I);
-	else              return IntersectNURBS(A,B,I, bRight);
+	if(m_LineType==BODYPANELTYPE)        return IntersectPanels(A,B,I);
+	else if (m_LineType==BODYSPLINETYPE) return IntersectNURBS(A,B,I, bRight);
 }
 
 
@@ -1461,16 +1479,11 @@ bool CBody::IsInNURBSBody(CVector Pt)
 int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit)
 {
 	double x,y,z;
-	double theta[MAXSIDELINES];
-	double angle;
-	QByteArray textline;
-//	const char *text;
+
 	QString strong;
-	int i, j, k, res;
+	int i, res;
 	i = 0;
 	x=y=z=0.0;
-
-	memset(theta, 0, sizeof(theta));
 
 	bool bRead =true;
 	while (bRead)
@@ -1485,26 +1498,10 @@ int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &U
 		}
 		else 
 		{
-			angle = atan2(z, y);
-			for (j=0; j<i; j++)
-			{
-				if(angle> theta[j]) 
-				{
-					for(k=i; k>j; k--)
-					{
-						theta[k] = theta [k-1];
-						pFrame->m_Point[k].x = pFrame->m_Point[k-1].x;
-						pFrame->m_Point[k].y = pFrame->m_Point[k-1].y;
-						pFrame->m_Point[k].z = pFrame->m_Point[k-1].z;
-					}
-					break;
-				}
-			}
-			// insert at proper place
-			pFrame->m_Point[j].x = x / Unit;
-			pFrame->m_Point[j].y = y / Unit;
-			pFrame->m_Point[j].z = z / Unit;
-			theta[j] = angle;
+
+			pFrame->m_Point[i].x = x / Unit;
+			pFrame->m_Point[i].y = y / Unit;
+			pFrame->m_Point[i].z = z / Unit;
 			i++;
 		}
 		if(i>=MAXSIDELINES)

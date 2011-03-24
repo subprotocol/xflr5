@@ -2509,7 +2509,7 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 }
 
 
-void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 	//
 	// Creates an OpenGl list of pressure arrows on the panels
@@ -2619,7 +2619,7 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 			P2 *= force;
 
 			// Plot
-			if(pWPolar->m_bThinSurfaces)
+			if(pPanel[p].m_iPos==0)
 			{
 				glBegin(GL_LINES);
 				{
@@ -2753,7 +2753,6 @@ void GLCreatePressureArrows(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 			strong = QString("%1").arg(f, 5,'g',3);
 			labellength = (fm.width(strong)+5) * ClientToGL;
 			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
-//qDebug()<<"f="<<f;
 		}
 
 		labellength = (fm.width(strong)+5) * ClientToGL;
