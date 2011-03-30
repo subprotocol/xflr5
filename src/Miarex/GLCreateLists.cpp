@@ -2782,7 +2782,6 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
         double rmin, rmax, range, delta;
         double XPos, w, h;
         double *tab;
-        double coef = 1.;
         QString strong, strForce;
         QFontMetrics fm(pMainFrame->m_TextFont);
 
@@ -2809,8 +2808,8 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
                 if(tab[p]*pPanel[p].GetArea()>rmax) rmax = tab[p]*pPanel[p].GetArea();
                 if(tab[p]*pPanel[p].GetArea()<rmin) rmin = tab[p]*pPanel[p].GetArea();
         }
-        rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
-        rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
+	   rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
+	   rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
         range = rmax - rmin;
 
 

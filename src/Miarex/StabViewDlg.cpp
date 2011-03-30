@@ -44,6 +44,7 @@ StabViewDlg::StabViewDlg(QWidget *parent)
 	setWindowFlags(Qt::Tool);
 	m_iCurrentMode = 0;
 	m_ModeAmplitude = 1.0;
+	m_ModeInterval = 200;
 	m_pCurve = NULL;
 	for(int i=0; i<20; i++)
 	{
@@ -296,6 +297,7 @@ void StabViewDlg::OnAnimationAmplitude(int val)
 
 void StabViewDlg::OnAnimationSpeed(int val)
 {
+	m_ModeInterval = val;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	pMiarex->m_pTimerMode->setInterval(400-val);
 }
@@ -784,7 +786,7 @@ void StabViewDlg::SetupLayout()
 			m_pctrlAnimationSpeed  = new QDial();
 			m_pctrlAnimationSpeed->setMinimum(0);
 			m_pctrlAnimationSpeed->setMaximum(400);
-			m_pctrlAnimationSpeed->setSliderPosition(200);
+			m_pctrlAnimationSpeed->setSliderPosition(m_ModeInterval);
 			m_pctrlAnimationSpeed->setNotchesVisible(true);
 			m_pctrlAnimationSpeed->setSingleStep(20);
 

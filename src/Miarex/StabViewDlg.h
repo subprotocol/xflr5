@@ -113,6 +113,7 @@ private:
 	QStandardItemModel *m_pControlModel;
 	FloatEditDelegate *m_pCtrlDelegate;
 
+	int m_ModeInterval;
 	double m_ModeAmplitude;
 	double m_vabs[4], m_phi[4];
 
