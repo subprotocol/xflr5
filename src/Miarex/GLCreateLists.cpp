@@ -512,7 +512,7 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 
 
 
-void GLCreateCpLegend(void *pQMiarex)
+void GLDrawCpLegend(void *pQMiarex)
 {
 	int i;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
@@ -523,7 +523,6 @@ void GLCreateCpLegend(void *pQMiarex)
 	double labellength, ClientToGL;
 
 	double f, fi,dD, ZPos,dz,Right1, Right2;
-	double color = 0.0;
 	double range, delta;
 
 	QFontMetrics fm(pMainFrame->m_TextFont);
@@ -558,9 +557,9 @@ void GLCreateCpLegend(void *pQMiarex)
 	delta = range / 20;
 
 
-	glNewList(WOPPCPLEGENDTXT,GL_COMPILE);
+        //glNewList(WOPPCPLEGENDTXT,GL_COMPILE);
 	{
-		pMiarex->m_GLList++;
+                //pMiarex->m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 //		glBegin(GL_LINES);
@@ -584,33 +583,74 @@ void GLCreateCpLegend(void *pQMiarex)
 		labellength = (fm.width(strong)+5) * ClientToGL;
 		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strong, pMainFrame->m_TextFont);
 	}
-	glEndList();
-
-	glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
-	{
-		pMiarex->m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
-
-		glPolygonMode(GL_FRONT,GL_FILL);
-
-		glBegin(GL_QUAD_STRIP);
-		{
-			for (i=0; i<=20; i++)
-			{
-				fi = (double)i*dz;
-				color += 0.05;
-
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(Right1, ZPos+fi, 0.0);
-				glVertex3d(Right2, ZPos+fi, 0.0);
-			}
-		}
-		glEnd();
-	}
-	glEndList();
+        //glEndList();
 }
 
+void GLCreateCpLegendClr(void *pQMiarex)
+{
+        int i;
+        QMiarex *pMiarex = (QMiarex*)pQMiarex;
+
+        double ClientToGL;
+
+        double fi,dD, ZPos,dz,Right1, Right2;
+        double color = 0.0;
+        double range, delta;
+
+        double w = (double)pMiarex->m_r3DCltRect.width();
+        double h = (double)pMiarex->m_r3DCltRect.height();
+        double XPos;
+
+        if(w>h)
+        {
+                XPos  = 1.0;
+//		ZPos  = h/w * (-1.0 + 2.0/3.0);
+                dz    = h/w*1.0/20.0;
+                ZPos  = h/w - 23.0*dz;
+                ClientToGL = 2.0/w;
+        }
+        else
+        {
+                XPos = w/h;
+//		ZPos  = (-1.0 + 2.0/3.0);
+                dz    = 1.0/20.0;
+                ZPos  = 1.0 - 23.0*dz;
+                ClientToGL = 2.0/h;
+        }
+
+        dD      = 12.0/w*2.0;
+
+        Right1  = .94*XPos;
+        Right2  = .98*XPos;
+
+        range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
+        delta = range / 20;
+
+
+        glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
+        {
+                pMiarex->m_GLList++;
+                glDisable(GL_LIGHTING);
+                glDisable(GL_LIGHT0);
+
+                glPolygonMode(GL_FRONT,GL_FILL);
+
+                glBegin(GL_QUAD_STRIP);
+                {
+                        for (i=0; i<=20; i++)
+                        {
+                                fi = (double)i*dz;
+                                color += 0.05;
+
+                                glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+                                glVertex3d(Right1, ZPos+fi, 0.0);
+                                glVertex3d(Right2, ZPos+fi, 0.0);
+                        }
+                }
+                glEnd();
+        }
+        glEndList();
+}
 
 void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 {
@@ -2253,7 +2293,7 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 
 
 
-void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar)
+void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
@@ -2279,12 +2319,12 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 	a=8; b=3;
 	c=7; d=2;
 
-	glNewList(WINGLEGEND,GL_COMPILE);
+        //glNewList(WINGLEGEND,GL_COMPILE);
 	{
-		pMiarex->m_GLList++;
+                //pMiarex->m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-
+                glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 		if(pWing)
 		{
 			GetLengthUnit(length,pMainFrame->m_LengthUnit);
@@ -2296,9 +2336,9 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 			ZPos +=dD;
 
-			str1 = QString(QObject::tr("Wing Span      = %1 ")).arg(pWing->m_PlanformSpan*pMainFrame->m_mtoUnit, a,'f',b);
+                        str1 = QString(QObject::tr("Wing Span      = %1 ")).arg(pWing->m_PlanformSpan*pMainFrame->m_mtoUnit, a,'f',b);
 			strong = str1 + length;
-			pGLWidget->renderText(LeftPos, ZPos, strong, pMainFrame->m_TextFont);
+                        pGLWidget->renderText(LeftPos, ZPos, QString(strong), pMainFrame->m_TextFont);
 
 			ZPos +=dD;
 			str1 = QString(QObject::tr("XYProj. Span   = %1 ")).arg(pWing->m_ProjectedSpan*pMainFrame->m_mtoUnit,a,'f',b);
@@ -2380,14 +2420,14 @@ void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *p
 
 		//END Write wing data
 	}
-	glEndList();
+        //glEndList();
 }
 
 
 
 
 
-void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
+void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 {
 	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
@@ -2406,13 +2446,13 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 
 	if(pWOpp->m_Type==STABILITYPOLAR) YPos -= dD;
 
-	glNewList(WOPPLEGEND,GL_COMPILE);
+        //glNewList(WOPPLEGEND,GL_COMPILE);
 	{
-		pMiarex->m_GLList++;
+                //pMiarex->m_GLList++;
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-
+                 glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
 		if(pWOpp)
 		{
 			if(pWOpp->m_bOut)
@@ -2499,18 +2539,13 @@ void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 			pGLWidget->renderText(XPos-fm.width(Result), YPos, Result, pMainFrame->m_TextFont);
 		}
 	}
-	glEndList();
-
-/*	if(m_bglLight)
-	{
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-	}*/
+        //glEndList();
 }
 
 
 void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
+
 	//
 	// Creates an OpenGl list of pressure arrows on the panels
 	//
@@ -2524,12 +2559,10 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	}
 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
-	int p, nPanels,i;
+        int p, nPanels;
 	double force, angle, cosa, sina2, cosa2, color;
-	double labellength, ClientToGL;
-	double f, fi,dD, ZPos,dz,Right1, Right2;
+        double ClientToGL;
+        double dD, ZPos,dz,Right1, Right2;
 	double rmin, rmax, range, delta;
 	double XPos, w, h;
 	double *tab;
@@ -2543,14 +2576,11 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	CVector R2(-0.05, 0.0, -0.1);
 	//The three vectors defining the arrow on the panel
 	CVector P, P1, P2;
-	QString strong, strForce;
-	QFontMetrics fm(pMainFrame->m_TextFont);
 
 	w = (double)pMiarex->m_r3DCltRect.width();
 	h = (double)pMiarex->m_r3DCltRect.height();
 
-	GetForceUnit(strForce, pMainFrame->m_ForceUnit);
-	if(pPOpp)
+        if(pPOpp)
 	{
 		tab = pPOpp->m_Cp;
 		nPanels = pPOpp->m_NPanels;
@@ -2572,6 +2602,8 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	range = rmax - rmin;
+
+
 //qDebug()<<"Range="<<range<<rmin<<rmax;
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
@@ -2735,28 +2767,97 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	Right2  = .98*XPos;
 
 	delta = range / 20.0;
+}
 
-	glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
-	{
-		pMiarex->m_GLList++;
-		glDisable(GL_LIGHTING);
-		glDisable(GL_LIGHT0);
 
-		glPolygonMode(GL_FRONT,GL_LINE);
+void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+{
 
-		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-		// Draw the labels
-		for (i=0; i<=20; i ++)
-		{
-			f = rmin + (double)i * delta;
-			fi = (double)i*dz ;
-			strong = QString("%1").arg(f, 5,'g',3);
-			labellength = (fm.width(strong)+5) * ClientToGL;
-			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
-		}
+        QMiarex * pMiarex = (QMiarex*)pQMiarex;
+        GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+        MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+        int p, nPanels,i;
+        double labellength, ClientToGL;
+        double f, fi,dD, ZPos,dz,Right1, Right2;
+        double rmin, rmax, range, delta;
+        double XPos, w, h;
+        double *tab;
+        double coef = 1.;
+        QString strong, strForce;
+        QFontMetrics fm(pMainFrame->m_TextFont);
 
-		labellength = (fm.width(strong)+5) * ClientToGL;
-		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strForce, pMainFrame->m_TextFont);
-	}
-	glEndList();
+        w = (double)pMiarex->m_r3DCltRect.width();
+        h = (double)pMiarex->m_r3DCltRect.height();
+
+        GetForceUnit(strForce, pMainFrame->m_ForceUnit);
+        if(pPOpp)
+        {
+                tab = pPOpp->m_Cp;
+                nPanels = pPOpp->m_NPanels;
+        }
+        else
+        {
+                tab = pWOpp->m_Cp;
+                nPanels = pWOpp->m_NVLMPanels;
+        }
+
+        //define the range of values to set the colors in accordance
+        rmin = 1.e10;
+        rmax = -rmin;
+        for (p=0; p<pMiarex->m_MatSize; p++)
+        {
+                if(tab[p]*pPanel[p].GetArea()>rmax) rmax = tab[p]*pPanel[p].GetArea();
+                if(tab[p]*pPanel[p].GetArea()<rmin) rmin = tab[p]*pPanel[p].GetArea();
+        }
+        rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
+        rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
+        range = rmax - rmin;
+
+
+        if(w>h)
+        {
+                XPos  = 1.0;
+                dz    = h/w*1.0/20.0;
+                ZPos  = h/w - 23.0*dz;
+                ClientToGL = 2.0/w;
+        }
+        else
+        {
+                XPos = w/h;
+                dz    = 1.0/20.0;
+                ZPos  = 1.0 - 23.0*dz;
+                ClientToGL = 2.0/h;
+        }
+
+        dD      = 12.0/w*2.0;
+
+        Right1  = .94*XPos;
+        Right2  = .98*XPos;
+
+        delta = range / 20.0;
+
+
+        //glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
+        {
+                //pMiarex->m_GLList++;
+                glDisable(GL_LIGHTING);
+                glDisable(GL_LIGHT0);
+
+                glPolygonMode(GL_FRONT,GL_LINE);
+
+                glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+                // Draw the labels
+                for (i=0; i<=20; i ++)
+                {
+                        f = rmin + (double)i * delta;
+                        fi = (double)i*dz ;
+                        strong = QString("%1").arg(f, 5,'g',3);
+                        labellength = (fm.width(strong)+5) * ClientToGL;
+                        pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
+                }
+                labellength = (fm.width(strong)+5) * ClientToGL;
+                pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strForce, pMainFrame->m_TextFont);
+
+        }
+        //glEndList();
 }

@@ -31,7 +31,8 @@
 
 void GLCreateGeom(void *pQMiarex, CWing *pWing, int List);
 void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
-void GLCreateCpLegend(void *pQMiarex);
+void GLDrawCpLegend(void *pQMiarex);
+void GLCreateCpLegendClr(void *pQMiarex);
 void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, int List);
 void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel);
@@ -43,7 +44,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp);
 void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar);
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
-void GLCreateWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);		
-void GLCreateWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
+void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);
+void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
 void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
+void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
+
 #endif // GLCREATELISTS_H

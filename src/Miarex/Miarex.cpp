@@ -4986,8 +4986,8 @@ void QMiarex::GLDraw3D()
 	{
 		if(glIsList(PANELFORCEARROWS))
 		{
-			glDeleteLists(PANELFORCEARROWS,2);
-			m_GLList -=2;
+                        glDeleteLists(PANELFORCEARROWS,1);
+                        m_GLList -=1;
 		}
 		GLCreatePanelForce(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
 	}
@@ -5098,20 +5098,19 @@ void QMiarex::GLDraw3D()
 
 	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
-		if(glIsList(WINGLEGEND))
-		{
-			glDeleteLists(WINGLEGEND,1);
-			m_GLList -= 1;
-		}
-		GLCreateWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar);
+                //if(glIsList(WINGLEGEND))
+                //{
+                //	glDeleteLists(WINGLEGEND,1);
+                //	m_GLList -= 1;
+                //}
+                //GLCreateWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar);
 
-		if(m_pCurWOpp)
-		{
-			glDeleteLists(WOPPLEGEND,3);
-			m_GLList -= 3;
-			GLCreateWOppLegend(this, m_pCurWing, m_pCurWOpp);
-			GLCreateCpLegend(this);
-		}
+                if(m_pCurWOpp)
+                {
+                        glDeleteLists(WOPPCPLEGENDCLR,1);
+                        m_GLList -= 1;
+                        GLCreateCpLegendClr(this);
+                }
 		m_bResetglLegend = false;
 	}
 
@@ -5475,17 +5474,19 @@ void QMiarex::GLRenderView()
 
 		glLoadIdentity();
 		glDisable(GL_CLIP_PLANE1);
-		if(m_pCurWing)			glCallList(WINGLEGEND);
-		if(m_pCurWOpp)			glCallList(WOPPLEGEND);
+                if(m_pCurWing)			GLDrawWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar); //glCallList(WINGLEGEND);
+		if(m_pCurWOpp)			GLDrawWOppLegend(this, m_pCurWing, m_pCurWOpp); // glCallList(WOPPLEGEND);
 		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
-			glCallList(WOPPCPLEGENDTXT);
-			glCallList(WOPPCPLEGENDCLR);
+                        GLDrawCpLegend(this);
+                        //glCallList(WOPPCPLEGENDTXT);
+                        glCallList(WOPPCPLEGENDCLR);
 		}
 		else if (m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
 		{
-			glCallList(PANELFORCELEGENDTXT);
-			glCallList(WOPPCPLEGENDCLR);
+                        GLDrawPanelForceLegend(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
+                        //glCallList(PANELFORCELEGENDTXT);
+                        glCallList(WOPPCPLEGENDCLR);
 		}
 	}
 	glPopMatrix();
@@ -14161,7 +14162,7 @@ void QMiarex::SetupLayout()
 	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
 	AnalysisGroup->addWidget(m_pctrlSequence);
 	AnalysisGroup->addLayout(SequenceGroup);
-	AnalysisGroup->addStretch(1);
+        AnalysisGroup->addStretch(1);
 	AnalysisGroup->addLayout(AnalysisSettings);
 	AnalysisGroup->addWidget(m_pctrlAnalyze);
 
@@ -14213,7 +14214,7 @@ void QMiarex::SetupLayout()
 //	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);
 	QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
 	PolarPropsLayout->addWidget(m_pctrlPolarProps1);
-	PolarPropsLayout->addStretch(1);
+        PolarPropsLayout->addStretch(1);
 	PolarPropsBox->setLayout(PolarPropsLayout);
 
 //_______________________Curve params
@@ -14256,7 +14257,7 @@ void QMiarex::SetupLayout()
 
 	CurveGroup->addLayout(ShowCurve);
 	CurveGroup->addLayout(CurveStyleLayout);
-	CurveGroup->addStretch(1);
+        CurveGroup->addStretch(1);
 	QGroupBox *CurveBox = new QGroupBox(tr("Curve settings"));
 	CurveBox->setLayout(CurveGroup);
 
