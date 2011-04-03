@@ -4972,6 +4972,7 @@ bool MainFrame::SaveProject(QString PathName)
 	m_FileName = PathName;
 	fp.close();
 
+	SaveSettings();
 	QApplication::restoreOverrideCursor();
 	return true;
 }

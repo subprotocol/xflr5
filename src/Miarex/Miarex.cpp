@@ -776,7 +776,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD)
 		{
-			QMessageBox::warning(window(),tr("Warning"),"OldVLM polar\n");
+			QMessageBox::warning(pMainFrame,tr("Warning"),"OldVLM polar\n");
 
 		}
 		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
@@ -1113,7 +1113,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 	pNewPoint = new CWOpp();
 	if(pNewPoint == NULL)
 	{
-		QMessageBox::warning(window(),tr("Warning"),tr("Not enough memory to store the OpPoint\n"));
+		QMessageBox::warning(pMainFrame,tr("Warning"),tr("Not enough memory to store the OpPoint\n"));
 		return;
 	}
 	else
@@ -1207,7 +1207,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 		else if(m_pCurWPolar->m_AnalysisMethod==VLMMETHOD)
 		{
 			//obsolete
-			QMessageBox::warning(window(),tr("Warning"),"OldVLM Polar\n");
+			QMessageBox::warning(pMainFrame,tr("Warning"),"OldVLM Polar\n");
 		}
 		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pPanelDlg)
 		{
@@ -5674,19 +5674,21 @@ bool QMiarex::InitializePanels()
 	//
 
 	if(!m_pCurWing) return false;
-	int j, k, l, Nel, p, pp, HalfSize;
+	int j, k, l, Nel, p, pp, HalfSize, nx, nh;
+	QString strong;
 
-	QProgressDialog dlg(this);
+/*	QProgressDialog dlg(this);
 	dlg.setLabelText(tr("Creating Elements... please Wait"));
 	dlg.setMinimum(0);
 	dlg.setMaximum(100);
 	dlg.setWindowModality(Qt::WindowModal);
-	dlg.setValue(0);
+	dlg.setValue(0);*/
 
 	// first check that the total number of panels that will be created does not exceed
 	// the limit set by the parameter VLMMAXMATSIZE
 	m_MatSize = 0;
 
+	//Count the wing panels
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		m_MatSize += m_pSurface[j]->m_NXPanels * m_pSurface[j]->m_NYPanels ;
@@ -5702,25 +5704,34 @@ bool QMiarex::InitializePanels()
 		}
 	}
 
+	// add the number of body panels
 	bool bBodyEl = false;
 	if(m_pCurBody)
 	{
-		m_MatSize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
+		if(m_pCurBody->m_LineType==BODYPANELTYPE)
+		{
+			nx = 0;
+			for(int i=0; i<m_pCurBody->m_NStations-1; i++) nx+=m_pCurBody->m_xPanels[i];
+			nh = 0;
+			for(int i=0; i<m_pCurBody->m_NSideLines-1; i++) nh+=m_pCurBody->m_hPanels[i];
+			m_MatSize += nx*nh*2;
+		}
+		else m_MatSize += 2 * m_pCurBody->m_nxPanels * m_pCurBody->m_nhPanels;
 
 		//create the body elements only if there is a body, and the analysis is not of the VLM Type
 		if(!m_pCurWPolar)                                     bBodyEl = true;//no risk...
 		else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)  bBodyEl = true;
 		else                                                  bBodyEl = false;
 	}
-
 	if(m_MatSize>VLMMAXMATSIZE)
 	{
-		QString strong;
-		strong = QString(tr("The total number of panels is %1\n The Max Number is %2\nA reduction of the number of panels is required"))
+		strong = QString(tr("The total number of panels is %1. The Max Number is %2.\nA reduction of the number of panels is required"))
 						  .arg(m_MatSize).arg(VLMMAXMATSIZE);
-		QMessageBox::warning(this,tr("Warning"),strong);
 		m_MatSize = 0;
 		m_nNodes  = 0;
+
+		MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+		QMessageBox::warning(pMainFrame, "Warning", strong);
 		return false;
 	}
 
@@ -5737,7 +5748,7 @@ bool QMiarex::InitializePanels()
 
 	CPanel *ptr = m_Panel;
 
-	dlg.setValue(5);
+//	dlg.setValue(5);
 	int NXWakePanels;
 	if(m_pCurWPolar)	NXWakePanels = m_pCurWPolar->m_NXWakePanels;
 	else                NXWakePanels = 1;
@@ -5824,7 +5835,7 @@ bool QMiarex::InitializePanels()
 	memcpy(&m_MemNode,  &m_Node,  m_nNodes * sizeof(CVector));
 
 
-	dlg.setValue(100);
+//	dlg.setValue(100);
 
 	return true;
 }
@@ -7664,12 +7675,12 @@ void QMiarex::OnAnalyze()
 
 	if(!m_pCurWing)
 	{
-		QMessageBox::warning(this, tr("Warning"), tr("Please define a wing or a plane object before running a calculation"));
+		QMessageBox::warning(pMainFrame, tr("Warning"), tr("Please define a wing or a plane object before running a calculation"));
 		return;
 	}
 	if(!m_pCurWPolar)
 	{
-		QMessageBox::warning(this, tr("Warning"), tr("Please define an analysis/polar before running a calculation"));
+		QMessageBox::warning(pMainFrame, tr("Warning"), tr("Please define an analysis/polar before running a calculation"));
 		return;
 	}
 	
@@ -7717,14 +7728,14 @@ void QMiarex::OnAnalyze()
 				{
 					QString strong;
 					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_RFoil[l] +tr("...\nAborting Calculation");
-					QMessageBox::warning(this, tr("Warning"), strong);
+					QMessageBox::warning(pMainFrame, tr("Warning"), strong);
 					return;
 				}
 				if (!pMainFrame->GetFoil(m_pWingList[iw]->m_LFoil[l]))
 				{
 					QString strong;
 					strong = m_pWingList[iw]->m_WingName + ": "+tr("Could not find the wing's foil ")+ m_pWingList[iw]->m_LFoil[l] +tr("...\nAborting Calculation");
-					QMessageBox::warning(this, tr("Warning"), strong);
+					QMessageBox::warning(pMainFrame, tr("Warning"), strong);
 					return;
 				}
 			}
@@ -14476,13 +14487,6 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 
 	if(m_pCurWPolar && m_pCurWPolar->m_UFOName==UFOName)
 	{
-//		CWing::s_AlphaLLT     = m_pCurWPolar->m_ASpec;//in case its a Type 4 polar
-//		CWing::s_QInfLLT      = m_pCurWPolar->m_QInf;
-//		CWing::s_Density      = m_pCurWPolar->m_Density;
-//		CWing::s_Viscosity    = m_pCurWPolar->m_Viscosity;
-//		CWing::s_bVLM1        = m_pCurWPolar->m_bVLM1;
-//		m_pCurWing->m_bVLMSymetric = m_pCurWing->m_bSymetric;
-
 		if(m_pCurWPolar->m_AnalysisMethod>1)
 		{
 			for(int iw=0; iw<MAXWINGS; iw++)
@@ -15135,6 +15139,7 @@ void QMiarex::showEvent(QShowEvent *event)
 void QMiarex::SnapClient(QString const &FileName)
 {
 	int NbBytes, bitsPerPixel;
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 
 	QSize size(m_r3DCltRect.width(),m_r3DCltRect.height());
 	GLWidget * pGLWidget = (GLWidget*)m_pGLWidget;
@@ -15142,7 +15147,7 @@ void QMiarex::SnapClient(QString const &FileName)
 
 	if(!GLFormat.rgba())
 	{
-		QMessageBox::warning(this,tr("Warning"),tr("OpenGL color format is not recognized... Sorry"));
+		QMessageBox::warning(pMainFrame,tr("Warning"),tr("OpenGL color format is not recognized... Sorry"));
 		return;
 	}
 
@@ -15152,12 +15157,12 @@ void QMiarex::SnapClient(QString const &FileName)
 	{
 		case 8:
 		{
-			QMessageBox::warning(this,tr("Warning"),tr("Cannot (yet ?) save 8 bit depth opengl screen images... Sorry"));
+			QMessageBox::warning(pMainFrame,tr("Warning"),tr("Cannot (yet ?) save 8 bit depth opengl screen images... Sorry"));
 			return;
 		}
 		case 16:
 		{
-			QMessageBox::warning(this,tr("Warning"),tr("Cannot (yet ?) save 16 bit depth opengl screen images... Sorry"));
+			QMessageBox::warning(pMainFrame,tr("Warning"),tr("Cannot (yet ?) save 16 bit depth opengl screen images... Sorry"));
 			size.setWidth(width - size.width() % 2);
 			return;
 		}
@@ -15174,7 +15179,7 @@ void QMiarex::SnapClient(QString const &FileName)
 		}
 		default:
 		{
-			QMessageBox::warning(this,tr("Warning"),tr("Unidentified bit depth... Sorry"));
+			QMessageBox::warning(pMainFrame,tr("Warning"),tr("Unidentified bit depth... Sorry"));
 			return;
 		}
 	}
@@ -15195,7 +15200,7 @@ void QMiarex::SnapClient(QString const &FileName)
 			  FlippedImaged = Image.mirrored();	//flip vertically
 			  FlippedImaged.save(FileName);
 #else
-			  QMessageBox::warning(this,tr("Warning"),"The version of Qt used to compile the code is older than 4.4 and does not support 24 bit images... Sorry");
+			  QMessageBox::warning(pMainFrame,tr("Warning"),"The version of Qt used to compile the code is older than 4.4 and does not support 24 bit images... Sorry");
 #endif
 			  break;
 		}

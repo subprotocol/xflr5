@@ -61,7 +61,7 @@ void AboutQ5::SetupLayout()
 	QLabel *lab5  = new QLabel(tr("This program is distributed in the hope that it will be useful,"));
 	QLabel *lab6  = new QLabel(tr("but WITHOUT ANY WARRANTY; without even the implied warranty of"));
 	QLabel *lab7  = new QLabel(tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));
-	QLabel *lab8  = new QLabel(tr("This program has been developped exclusively for the analysis of model aircraft"));
+	QLabel *lab8  = new QLabel(tr("This program has been developed exclusively for the analysis of model aircraft"));
 	QLabel *lab9  = new QLabel(tr("Any other usage is strongly disapproved"));
 	QLabel *lab10 = new QLabel(tr("Program distributed  under the terms of the GNU General Public License"));
 	QLabel *lab11 = new QLabel(tr("German translation by Martin Willner (mjw@mjw.co.at)"));

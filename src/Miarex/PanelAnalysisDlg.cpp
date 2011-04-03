@@ -1641,7 +1641,7 @@ void PanelAnalysisDlg::InitDialog()
 	if(m_pWPolar->m_Type==STABILITYPOLAR ) m_b3DSymetric=false;
 	if(fabs(m_pWPolar->m_Beta)>0)          m_b3DSymetric=false;
 
-	if (m_b3DSymetric) AddString(tr("Perfoming symmetric calculation")+"\n");
+	if (m_b3DSymetric) AddString(tr("Performing symmetric calculation")+"\n");
 	else
 	{
 		str = tr("Performing asymmetric calculation : ")+ str +"\n";
@@ -2729,7 +2729,7 @@ bool PanelAnalysisDlg::ControlLoop()
 	//	Loop for each control value
 	//          Update the geometry, design variables
 	//          Build the influence matrix
-	//          Perfom LU matrix decomposition
+	//          Perform LU matrix decomposition
 	//          Solve a first time the VLM problem to find the trimmed conditions:
 	//              - solve for unit RHS
 	//              - iterate to find equilibrium aoa such that Cm=0 in steady level flight or banked turn
