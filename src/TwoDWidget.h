@@ -11,6 +11,8 @@ class TwoDWidget : public QWidget
 
 	friend class MainFrame;
 	friend class QXDirect;
+	friend class QMiarex;
+
 public:
 	TwoDWidget(QWidget *parent = 0);
 //	void UpdateView();
@@ -26,6 +28,7 @@ protected:
 	void resizeEvent ( QResizeEvent * event );
 	void paintEvent(QPaintEvent *event);
 	void mouseDoubleClickEvent ( QMouseEvent * event );
+	void contextMenuEvent (QContextMenuEvent * event);
  
 private:
 //	QRect m_rCltRect;          // The client window rectangle

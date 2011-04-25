@@ -1157,14 +1157,7 @@ void QXInverse::mouseReleaseEvent(QMouseEvent *event)
 		}
 	}
 
-	if(m_QGraph.IsInDrawRect(point))
-	{
-		p2DWidget->setCursor(Qt::CrossCursor);
-	}
-	else 
-	{
-		p2DWidget->setCursor(Qt::ArrowCursor);
-	}
+	p2DWidget->setCursor(Qt::CrossCursor);
 	UpdateView();
 }
 

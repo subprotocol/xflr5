@@ -1604,10 +1604,9 @@ void QXDirect::mousePressEvent(QMouseEvent *event)
 void QXDirect::mouseReleaseEvent(QMouseEvent *event)
 {
 	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
-	QPoint pt(event->x(), event->y()); //client coordinates
 
 	m_bTrans = false;
-	p2DWidget->setCursor(Qt::ArrowCursor);
+	p2DWidget->setCursor(Qt::CrossCursor);
 }
 
 
@@ -2369,6 +2368,7 @@ void QXDirect::OnDeleteCurFoil()
 
 void QXDirect::OnDelCurOpp()
 {
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	OpPoint* pOpPoint = m_pCurOpp;
 	StopAnimate();
 
@@ -2380,10 +2380,9 @@ void QXDirect::OnDelCurOpp()
 	strong += str;
 	strong += "  ?";
 
-	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), strong,
+	if (QMessageBox::Yes == QMessageBox::question(pMainFrame, tr("Question"), strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 	{
-		MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 		pMainFrame->RemoveOpPoint(true);
 		pMainFrame->UpdateOpps();
 		SetOpp();
@@ -2405,7 +2404,7 @@ void QXDirect::OnDeleteCurPolar()
 	str = tr("Are you sure you want to delete the polar :\n  ") + m_pCurPolar->m_PlrName;
 	str += tr("\n and all the associated OpPoints ?");
 
-	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), str,
+	if (QMessageBox::Yes == QMessageBox::question(pMainFrame, tr("Question"), str,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 	{
 		// start by removing all OpPoints
@@ -2507,7 +2506,7 @@ void QXDirect::OnDeleteFoilPolars()
 
 	strong = tr("Are you sure you want to delete polars and OpPoints\n");
 	strong +=tr("associated to ")+g_pCurFoil->m_FoilName  + " ?";
-	if (QMessageBox::Yes == QMessageBox::question(window(), tr("Question"), strong,
+	if (QMessageBox::Yes == QMessageBox::question(pMainFrame, tr("Question"), strong,
 		QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 
 	{
@@ -3657,12 +3656,12 @@ void QXDirect::OnInitBL()
 
 void QXDirect::OnInterpolateFoils()
 {
+	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 	if(m_poaFoil->size()<2)
 	{
-		QMessageBox::warning(window(), tr("Warning"), tr("At least two foils are required"));
+		QMessageBox::warning(pMainFrame, tr("Warning"), tr("At least two foils are required"));
 		return;
 	}
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
 	StopAnimate();
 

@@ -425,53 +425,11 @@ void MainFrame::closeEvent (QCloseEvent * event)
 void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 {
 	QPoint CltPt = event->pos();
-	QPoint ScreenPt = event->pos();
-	ScreenPt.rx() += geometry().x();
-	ScreenPt.ry() += geometry().y();
+	QPoint ScreenPt = event->globalPos();
+//qDebug()<<"Mainframe event"<<event->globalPos().x()<<event->globalPos().y();;
+	if(m_pctrlCentralWidget->currentIndex()==0) m_p2DWidget->contextMenuEvent(event);
+	else                                        m_pGLWidget->contextMenuEvent(event);
 
-
-	switch(m_iApp)
-	{
-		case MIAREX:
-		{
-			W3DScalesAct->setChecked(m_pctrl3DScalesWidget->isVisible());
-			QMiarex *pMiarex = (QMiarex*)m_pMiarex;
-			pMiarex->m_pCurGraph = pMiarex->GetGraph(CltPt);
-			if(pMiarex->m_iView==WOPPVIEW)         WOppCtxMenu->exec(ScreenPt);
-			else if (pMiarex->m_iView==WPOLARVIEW) WPlrCtxMenu->exec(ScreenPt);
-			else if (pMiarex->m_iView==WCPVIEW)    WCpCtxMenu->exec(ScreenPt);
-			else if(pMiarex->m_iView==WSTABVIEW)
-			{
-				if(pMiarex->m_iStabilityView==0)      WTimeCtxMenu->exec(ScreenPt);
-				else if(pMiarex->m_iStabilityView==1) WPlrCtxMenu->exec(ScreenPt);
-				else                                  W3DStabCtxMenu->exec(ScreenPt);
-			}
-			else if (pMiarex->m_iView==W3DVIEW)    W3DCtxMenu->exec(ScreenPt);
-			break;
-		}
-		case XFOILANALYSIS:
-		{
-			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-			pXDirect->m_pCurGraph = pXDirect->GetGraph(CltPt);
-			if(pXDirect->m_bPolar) 	OperPolarCtxMenu->exec(ScreenPt);
-			else                    OperFoilCtxMenu->exec(ScreenPt);
-			break;
-		}
-		case DIRECTDESIGN:
-		{
-			QRect rr = QRect(m_pctrlCentralWidget->x()+pos().x(), m_pctrlCentralWidget->y()+pos().y(),
-			                 m_pctrlCentralWidget->x()+pos().x()+m_p2DWidget->width(), m_pctrlCentralWidget->y()+pos().y()+m_p2DWidget->height());
-			if(rr.contains(ScreenPt))	AFoilCtxMenu->exec(ScreenPt);
-//			else we have the customContextMenuRequested signal for the foil table
-			break;
-		}
-		case INVERSEDESIGN:
-		{
-//			QXInverse *pXInverse = (QXInverse*)m_pXInverse;
-			InverseContextMenu->exec(ScreenPt);
-			break;
-		}
-	}
 }
 
 

@@ -5074,15 +5074,11 @@ void GL3dBodyDlg::ShowContextMenu(QContextMenuEvent * event)
 	CtxMenu->addAction(m_pExportBodyGeom);
 
 	QPoint CltPt = event->pos();
-	QPoint ScreenPt = event->pos();
-
 	m_ptPopUp.rx() = CltPt.x();
 	m_ptPopUp.ry() = CltPt.y();
 	ClientToGL(m_ptPopUp, m_RealPopUp);
 
-	ScreenPt.rx() += geometry().x();
-	ScreenPt.ry() += geometry().y();
-	CtxMenu->exec(ScreenPt);
+	CtxMenu->exec(event->globalPos());
 
 	m_pglWidget->setCursor(Qt::CrossCursor);
 }

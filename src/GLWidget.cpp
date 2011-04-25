@@ -52,12 +52,19 @@ GLWidget::GLWidget(QWidget *parent)
 	setCursor(Qt::CrossCursor);
 }
 
+
 void GLWidget::contextMenuEvent (QContextMenuEvent * event)
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QPoint ScreenPt = event->globalPos();
 	if(m_iView == GLMIAREXVIEW)
 	{
 		QMiarex *pMiarex = (QMiarex *)s_pMiarex;
-		pMiarex->contextMenuEvent(event);
+		if(pMiarex->m_iView==WSTABVIEW && pMiarex->m_iStabilityView==STAB3DVIEW)
+		{
+			pMainFrame->W3DStabCtxMenu->exec(ScreenPt);
+		}
+		else if (pMiarex->m_iView==W3DVIEW) pMainFrame->W3DCtxMenu->exec(ScreenPt);
 	}
 	else  if(m_iView ==GLBODYVIEW)
 	{
@@ -66,8 +73,8 @@ void GLWidget::contextMenuEvent (QContextMenuEvent * event)
 	}
 	else if(m_iView == GLWINGVIEW)
 	{
-		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
-		pDlg->ShowContextMenu(event);
+//		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
+//		pDlg->ShowContextMenu(event);
 	}
 }
 

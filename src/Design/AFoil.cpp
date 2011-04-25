@@ -2136,7 +2136,7 @@ void QAFoil::OnNewSplines()
 	{
 		if(m_pSF->m_bModified)
 		{
-			if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
+			if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), tr("Discard changes to Splines ?"),
 														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			{
 				return;
@@ -2150,7 +2150,7 @@ void QAFoil::OnNewSplines()
 	{
 		if(m_pPF->m_bModified)
 		{
-			if (QMessageBox::Yes != QMessageBox::question(this, tr("Question"), tr("Discard changes to Splines ?"),
+			if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), tr("Discard changes to Splines ?"),
 														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 			{
 				return;

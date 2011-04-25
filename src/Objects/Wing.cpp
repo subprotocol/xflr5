@@ -1997,7 +1997,6 @@ void CWing::SetTwist(double Twist)
 
 
 
-
 int CWing::VLMGetPanelTotal()
 {
 	QMiarex *pMiarex = (QMiarex*) s_pMiarex;

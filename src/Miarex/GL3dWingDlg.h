@@ -180,7 +180,6 @@ private:
 	QSlider *m_pctrlClipPlanePos;
 
 	QAction *m_pResetScales;
-	QAction *m_pUndo, *m_pRedo;
 
 	QMenu *m_pContextMenu;
 	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection;

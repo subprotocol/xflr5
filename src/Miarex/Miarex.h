@@ -220,6 +220,7 @@ private slots:
 	void OnTimeView();
 
 public:
+	void contextMenuEvent (QContextMenuEvent * event);
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);

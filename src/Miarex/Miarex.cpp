@@ -9183,7 +9183,7 @@ void QMiarex::OnEditUFO()
 				{
 					//user wants to overwrite
 					pMainFrame->DeleteWing(m_pCurWing,true);
-					m_pCurWing = AddWing(pModWing);
+//					m_pCurWing = AddWing(pModWing);
 				}
 			}
 			else
@@ -15688,5 +15688,16 @@ double QMiarex::GetCoreSize()
 void QMiarex::SetCoreSize(double CoreSize)
 {
 	m_CoreSize = CoreSize;
+}
+
+
+void QMiarex::contextMenuEvent (QContextMenuEvent * event)
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	TwoDWidget *p2DWidget = (TwoDWidget*)m_p2DWidget;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+
+	if(pMainFrame->m_pctrlCentralWidget->currentIndex()==0) p2DWidget->contextMenuEvent(event);
+	else                                                    pGLWidget->contextMenuEvent(event);
 }
 

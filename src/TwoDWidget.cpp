@@ -283,3 +283,54 @@ void TwoDWidget::paintEvent(QPaintEvent *event)
 }
 
 
+void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
+{
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	QPoint ScreenPt = event->globalPos();
+
+	switch(pMainFrame->m_iApp)
+	{
+		case MIAREX:
+		{
+			QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+			if(event->reason()==QContextMenuEvent::Keyboard)
+			{
+				ScreenPt.rx() = pMiarex->m_LastPoint.x()+pMainFrame->pos().x()+geometry().x();
+				ScreenPt.ry() = pMiarex->m_LastPoint.y()+pMainFrame->pos().y()+geometry().y();
+//qDebug()<<"TwoD"<<pMiarex->m_LastPoint.y()<<pMainFrame->pos().y()<<geometry().y();
+			}
+
+			pMiarex->m_pCurGraph = pMiarex->GetGraph(ScreenPt);
+			if(pMiarex->m_iView==WOPPVIEW)         pMainFrame->WOppCtxMenu->exec(ScreenPt);
+			else if (pMiarex->m_iView==WPOLARVIEW)
+			{
+				pMainFrame->WPlrCtxMenu->exec(ScreenPt);
+			}
+			else if (pMiarex->m_iView==WCPVIEW)    pMainFrame->WCpCtxMenu->exec(ScreenPt);
+			else if(pMiarex->m_iView==WSTABVIEW)
+			{
+				if(pMiarex->m_iStabilityView==STABTIMEVIEW)       pMainFrame->WTimeCtxMenu->exec(ScreenPt);
+				else if(pMiarex->m_iStabilityView==STABPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
+			}
+			break;
+		}
+		case XFOILANALYSIS:
+		{
+			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+			pXDirect->m_pCurGraph = pXDirect->GetGraph(ScreenPt);
+			if(pXDirect->m_bPolar) pMainFrame->OperPolarCtxMenu->exec(ScreenPt);
+			else                   pMainFrame->OperFoilCtxMenu->exec(ScreenPt);
+			break;
+		}
+		case DIRECTDESIGN:
+		{
+			pMainFrame->AFoilCtxMenu->exec(ScreenPt);
+			break;
+		}
+		case INVERSEDESIGN:
+		{
+			pMainFrame->InverseContextMenu->exec(ScreenPt);
+			break;
+		}
+	}
+}
