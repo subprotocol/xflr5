@@ -849,7 +849,7 @@ bool CBody::ImportDefinition()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	int res, i, j, Line, NSideLines;
-	QString strong, FileName;
+	QString strong;
 	bool bRead;
 
 	double mtoUnit,xo,yo,zo;
@@ -1240,6 +1240,7 @@ bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 {
 	if(m_LineType==BODYPANELTYPE)        return IntersectPanels(A,B,I);
 	else if (m_LineType==BODYSPLINETYPE) return IntersectNURBS(A,B,I, bRight);
+	return false;
 }
 
 
@@ -1398,7 +1399,8 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I)
 			
 			r = (C.x-A.x)*N.x + (C.y-A.y)*N.y + (C.z-A.z)*N.z ;
 			s = (U.x*N.x + U.y*N.y + U.z*N.z);
-            if(fabs(s)>0.0)
+
+			if(fabs(s)>0.0)
 			{
 				t = r/s;
 				P = A + U * t;

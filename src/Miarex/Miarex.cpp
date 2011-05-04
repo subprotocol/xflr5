@@ -9183,7 +9183,7 @@ void QMiarex::OnEditUFO()
 				{
 					//user wants to overwrite
 					pMainFrame->DeleteWing(m_pCurWing,true);
-//					m_pCurWing = AddWing(pModWing);
+					m_pCurWing->Duplicate(pModWing);
 				}
 			}
 			else
@@ -9207,6 +9207,8 @@ void QMiarex::OnEditUFO()
 				else if(m_iView==WCPVIEW)   CreateCpCurves();
 			}
 		}
+
+		m_pCurWing->m_WingColor = pModWing->m_WingColor;
 		SetUFO();
 		pMainFrame->UpdateUFOs();
 		m_bResetglStream = true;

@@ -302,10 +302,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 
 			pMiarex->m_pCurGraph = pMiarex->GetGraph(ScreenPt);
 			if(pMiarex->m_iView==WOPPVIEW)         pMainFrame->WOppCtxMenu->exec(ScreenPt);
-			else if (pMiarex->m_iView==WPOLARVIEW)
-			{
-				pMainFrame->WPlrCtxMenu->exec(ScreenPt);
-			}
+			else if (pMiarex->m_iView==WPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
 			else if (pMiarex->m_iView==WCPVIEW)    pMainFrame->WCpCtxMenu->exec(ScreenPt);
 			else if(pMiarex->m_iView==WSTABVIEW)
 			{
