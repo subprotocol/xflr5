@@ -9215,7 +9215,7 @@ void QMiarex::OnEditUFO()
 		m_bIs2DScaleSet = false;
 		SetScale();
 		SetWGraphScale();
-		OnAdjustToWing() ;
+		OnAdjustToWing();
 		UpdateView();
 	}
 	else

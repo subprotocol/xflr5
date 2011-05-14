@@ -17,7 +17,7 @@
 
 
 
-xflr5 v6.04  March 2011
+xflr5 v6.04 beta, May 14th, 2011
 	- added a settings save at each project save
 	- added and option to view forces on panels as coloured arrows
 	- fixed the incorrect setting of AVL-type controls for flaps in T7 analysis
