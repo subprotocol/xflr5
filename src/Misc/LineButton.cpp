@@ -21,7 +21,6 @@
 
 #include "LineButton.h"
 #include <QPainter>
-#include <QtDebug>
 #include "../Globals.h"
 
 LineButton::LineButton()

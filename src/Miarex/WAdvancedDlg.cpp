@@ -30,10 +30,11 @@
 #include <QMessageBox>
 
 
+void *WAdvancedDlg::s_pMainFrame;
+
 WAdvancedDlg::WAdvancedDlg()
 {
 	setWindowTitle(tr("Wing Analysis Advanced Settings"));
-	m_pMainFrame  = NULL;
 
 	m_NStation  = 20;
 	m_AlphaPrec = 0.01;
@@ -266,7 +267,7 @@ void WAdvancedDlg::InitDialog()
 	SetParams();
 
 	QString len;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	GetLengthUnit(len,pMainFrame->m_LengthUnit);
 
 	m_pctrlAStat->setText(len);
@@ -313,7 +314,7 @@ void WAdvancedDlg::OnResetDefaults()
 
 void WAdvancedDlg::ReadParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_Relax           = m_pctrlRelax->Value();
 	m_AlphaPrec       = m_pctrlAlphaPrec->Value();
 	m_MaxWakeIter     = m_pctrlMaxWakeIter->Value();
@@ -335,7 +336,7 @@ void WAdvancedDlg::ReadParams()
 
 void WAdvancedDlg::SetParams()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_pctrlIterMax->SetValue(m_Iter);
 	m_pctrlRelax->SetValue(m_Relax);
 	m_pctrlAlphaPrec->SetValue(m_AlphaPrec);

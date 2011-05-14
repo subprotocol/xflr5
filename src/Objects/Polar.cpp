@@ -24,7 +24,7 @@
 #include "../MainFrame.h"
 #include "../Globals.h"
 #include "../XDirect/XFoil.h"
-#include <QtDebug>
+
 
 void *CPolar::s_pMainFrame;
 

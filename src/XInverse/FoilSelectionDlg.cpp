@@ -24,7 +24,7 @@
 #include <QPushButton>
 #include "../Objects/Foil.h"
 #include "FoilSelectionDlg.h"
-#include <QtDebug>
+
 
 
 FoilSelectionDlg::FoilSelectionDlg()

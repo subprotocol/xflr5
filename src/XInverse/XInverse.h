@@ -35,6 +35,7 @@
 #include "../Misc/FloatEdit.h"
 #include "../XDirect/XFoil.h"
 #include "../Graph/QGraph.h"
+#include "../Graph/GraphDlg.h"
 #include "../Objects/Spline.h"
 
 
@@ -130,6 +131,9 @@ private:
 	double qincom(double qc, double qinf, double tklam);
 
 private:
+
+	GraphDlg m_GraphDlg;
+
 	QTextEdit *m_pctrlOutput;
 	QLabel *m_pctrlSpecif;
 	QRadioButton *m_pctrlSpecAlpha, *m_pctrlSpecCl;

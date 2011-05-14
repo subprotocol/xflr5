@@ -26,7 +26,6 @@
 #include <math.h>
 #include <QPainter>
 #include <QFontMetrics>
-#include <QtDebug>
 
 QGraph::QGraph()
 {

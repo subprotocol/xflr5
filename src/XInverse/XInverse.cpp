@@ -30,7 +30,6 @@
 #include "../Globals.h"
 #include "../MainFrame.h"
 #include "../Objects/Foil.h"
-#include "../Graph/GraphDlg.h"
 
 
 extern CFoil* g_pCurFoil;
@@ -1298,29 +1297,28 @@ void QXInverse::OnFilter()
 void QXInverse::OnGraphSettings()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	GraphDlg dlg;
-	dlg.move(pMainFrame->m_DlgPos);
 
-	dlg.m_iGraphType = 31;
-	dlg.m_XSel = 0;
-	dlg.m_YSel = 0;
-	dlg.m_pGraph = &m_QGraph;
+	m_GraphDlg.move(pMainFrame->m_DlgPos);
+	m_GraphDlg.m_iGraphType = 31;
+	m_GraphDlg.m_XSel = 0;
+	m_GraphDlg.m_YSel = 0;
+	m_GraphDlg.m_pGraph = &m_QGraph;
 
 
 	QGraph graph;
 	graph.CopySettings(&m_QGraph);
-	dlg.m_pMemGraph = &m_QGraph;
-	dlg.m_pGraph = &m_QGraph;
-	dlg.SetParams();
+	m_GraphDlg.m_pMemGraph = &m_QGraph;
+	m_GraphDlg.m_pGraph = &m_QGraph;
+	m_GraphDlg.SetParams();
 
-	if(dlg.exec() == QDialog::Accepted)
+	if(m_GraphDlg.exec() == QDialog::Accepted)
 	{
 	}
 	else
 	{
 		m_QGraph.CopySettings(&graph);
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_GraphDlg.pos();
 	UpdateView();
 }
 

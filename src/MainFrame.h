@@ -42,6 +42,9 @@
 #include "Objects/OpPoint.h"
 #include "Objects/Plane.h"
 #include "Graph/QGraph.h"
+#include "Misc/DisplaySettingsDlg.h"
+#include "Misc/RenameDlg.h"
+#include "Misc/UnitsDlg.h"
 
 
 class MainFrame : public QMainWindow
@@ -212,6 +215,11 @@ public:
 	QString m_GraphExportFilter;
 
 private:
+	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
+	DisplaySettingsDlg m_DisplaySettingsDlg;
+	RenameDlg m_RenameDlg;
+	UnitsDlg m_UnitsDlg;
+
 	void *m_pXInverse;
 	void *m_pXDirect;
 	void *m_pMiarex;

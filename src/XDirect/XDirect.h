@@ -38,6 +38,25 @@
 #include "../Graph/QGraph.h"
 #include "XFoil.h"
 #include "XFoilAnalysisDlg.h"
+#include "../Graph/GraphDlg.h"
+#include "BatchDlg.h"
+#include "BatchThreadDlg.h"
+#include "FoilPolarDlg.h"
+#include "XFoilAdvancedDlg.h"
+#include "../Misc/RenameDlg.h"
+#include "../Misc/PolarFilterDlg.h"
+
+#include "TwoDPanelDlg.h"
+#include "InterpolateFoilsDlg.h"
+#include "NacaFoilDlg.h"
+#include "FoilCoordDlg.h"
+#include "FoilGeomDlg.h"
+#include "TEGapDlg.h"
+#include "LEDlg.h"
+#include "FlapDlg.h"
+#include "CAddDlg.h"
+#include "XDirectStyleDlg.h"
+#include "ManageFoilsDlg.h"
 
 
 class QXDirect : public QWidget
@@ -232,6 +251,25 @@ protected:
 	OpPoint* AddOpPoint(CPolar *pPolar = NULL, bool bStoreOpp=false);
 
 private:
+	XFoilAdvancedDlg m_XFoilAdvancedDlg;
+	GraphDlg m_GraphDlg;
+	BatchDlg m_BatchDlg;
+	BatchThreadDlg m_BatchThreadDlg;
+	FoilPolarDlg m_FoilPolarDlg;
+	RenameDlg m_RenameDlg;
+
+	TwoDPanelDlg        m_TwoDPanelDlg;
+	InterpolateFoilsDlg m_InterpolateFoilsDlg;
+	NacaFoilDlg         m_NacaFoilDlg;
+	FoilCoordDlg        m_FoilCoordDlg;
+	FoilGeomDlg         m_FoilGeomDlg;
+	TEGapDlg            m_TEGapDlg;
+	LEDlg               m_LEDlg;
+	FlapDlg             m_FlapDlg;
+	CAddDlg             m_CAddDlg;
+	XDirectStyleDlg     m_XDirectStyleDlg;
+	ManageFoilsDlg      m_ManageFoilsDlg;
+	PolarFilterDlg      m_PolarFilterDlg;
 
 	QStackedWidget *m_pctrlMiddleControls;
 

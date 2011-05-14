@@ -2186,7 +2186,6 @@ void GL3dWingDlg::OnSetupLight()
 void GL3dWingDlg::OnScaleWing()
 {
 	WingScaleDlg dlg;
-	dlg.m_pMainFrame = s_pMainFrame;
 	dlg.InitDialog(m_pWing->m_PlanformSpan, m_pWing->m_TChord[0], m_pWing->AverageSweep(), m_pWing->m_TTwist[m_pWing->m_NPanel]);
 
 	if(QDialog::Accepted == dlg.exec())
@@ -2547,11 +2546,16 @@ void GL3dWingDlg::SetCurrentSection(int section)
 		m_pctrlDeleteSection->setEnabled(true);
 
 		QString str;
-		str = QString(tr("Insert after section %1")).arg(m_iSection+1);
+		str = tr("Insert after section") +" %1";
+		str = QString(str).arg(m_iSection+1);
 		m_pctrlInsertAfter->setText(str);
-		str = QString(tr("Insert before section %1")).arg(m_iSection+1);
+
+		str = tr("Insert before section") +" %1";
+		str = QString(str).arg(m_iSection+1);
 		m_pctrlInsertBefore->setText(str);
-		str = QString(tr("Delete section %1")).arg(m_iSection+1);
+
+		str = tr("Delete section") +" %1";
+		str = QString(str).arg(m_iSection+1);
 		m_pctrlDeleteSection->setText(str);
 	}
 	m_bResetglSectionHighlight = true;
@@ -2663,9 +2667,9 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlSymetric     = new QCheckBox(tr("Symetric"));
 	m_pctrlRightSide    = new QRadioButton(tr("Right Side"));
 	m_pctrlLeftSide     = new QRadioButton(tr("Left Side"));
-	m_pctrlInsertBefore   = new QPushButton(tr("Insert Before"));
-	m_pctrlInsertAfter    = new QPushButton(tr("Insert After"));
-	m_pctrlDeleteSection  = new QPushButton(tr("Delete Section"));
+	m_pctrlInsertBefore   = new QPushButton("Insert Before");
+	m_pctrlInsertAfter    = new QPushButton("Insert After");
+	m_pctrlDeleteSection  = new QPushButton("Delete Section");
 
 	SymLayout->addWidget(m_pctrlSymetric);
 	SymLayout->addWidget(m_pctrlRightSide);

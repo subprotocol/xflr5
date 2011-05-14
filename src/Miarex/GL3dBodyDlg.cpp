@@ -37,7 +37,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QtDebug>
 #include <math.h>
 
 //2D

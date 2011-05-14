@@ -33,10 +33,10 @@ class WAdvancedDlg : public QDialog
 {
 	Q_OBJECT
 	friend class QMiarex;
-
+	friend class MainFrame;
 
 public:
-    WAdvancedDlg();
+	WAdvancedDlg();
 	void InitDialog();
 
 private slots:
@@ -85,7 +85,7 @@ private:
 	double m_CoreSize;
 	double m_MinPanelSize;
 
-	void* m_pMainFrame;
+	static void* s_pMainFrame;
 };
 
 #endif // WADVANCEDDLG_H

@@ -25,10 +25,11 @@
 
 extern CFoil *g_pCurFoil;
 
+void *FoilPolarDlg::s_pXDirect;
+
 FoilPolarDlg::FoilPolarDlg(void *pParent)
 {
 	setWindowTitle(tr("Foil Polar Definition"));
-	m_pParent = pParent;
 	m_Type     = 1;
 	m_NCrit    = 9.0;
 	m_XTopTr   = 1.0;
@@ -184,12 +185,13 @@ void FoilPolarDlg::EditingFinished()
 
 void FoilPolarDlg::InitDialog()
 {
-	QXDirect* pXDirect = (QXDirect*)m_pParent;
+	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 
 	if(pXDirect && g_pCurFoil) m_FoilName = g_pCurFoil->m_FoilName;
+	else                       m_FoilName = "";
 
-	QString str = tr("Analysis parameters for ")+ m_FoilName;
-	setWindowTitle(str);
+	QString str = tr("Analysis parameters for ");
+	setWindowTitle(str+ m_FoilName);
 
 	m_pctrlReynolds->SetValue(m_Reynolds);
 	m_pctrlMach->SetValue(m_Mach);

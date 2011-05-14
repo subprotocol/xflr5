@@ -35,10 +35,7 @@
 #include "Miarex/UFOTableDelegate.h"
 #include "Misc/AboutQ5.h"
 #include "Misc/ObjectPropsDlg.h"
-#include "Misc/DisplaySettingsDlg.h"
-#include "Misc/RenameDlg.h"
 #include "Misc/LinePickerDlg.h"
-#include "Misc/UnitsDlg.h"
 #include "Misc/SaveOptionsDlg.h"
 #include "Misc/TranslatorDlg.h"
 #include "Graph/GraphDlg.h"
@@ -424,12 +421,8 @@ void MainFrame::closeEvent (QCloseEvent * event)
 
 void MainFrame::contextMenuEvent (QContextMenuEvent * event)
 {
-	QPoint CltPt = event->pos();
-	QPoint ScreenPt = event->globalPos();
-//qDebug()<<"Mainframe event"<<event->globalPos().x()<<event->globalPos().y();;
 	if(m_pctrlCentralWidget->currentIndex()==0) m_p2DWidget->contextMenuEvent(event);
 	else                                        m_pGLWidget->contextMenuEvent(event);
-
 }
 
 
@@ -847,7 +840,35 @@ void MainFrame::CreateAFoilToolbar()
 
 
 void MainFrame::CreateDockWindows()
-{		
+{
+	QMiarex::s_pMainFrame          = this;
+	WAdvancedDlg::s_pMainFrame     = this;
+	WPolarDlg::s_pMainFrame        = this;
+	ManageUFOsDlg::s_pMainFrame    = this;
+	StabViewDlg::s_pMainFrame      = this;
+	GL3dBodyDlg::s_pMainFrame      = this;
+	GL3dWingDlg::s_pMainFrame      = this;
+	GLWidget::s_pMainFrame         = this;
+	PlaneDlg::s_pMainFrame         = this;
+	CPolar::s_pMainFrame           = this;
+	ObjectPropsDlg::s_pMainFrame   = this;
+	CWing::s_pMainFrame            = this;
+	CBody::s_pMainFrame            = this;
+	CWPolar::s_pMainFrame          = this;
+	CWOpp::s_pMainFrame            = this;
+	LLTAnalysisDlg::s_pMainFrame   = this;
+	PanelAnalysisDlg::s_pMainFrame = this;
+	InertiaDlg::s_pMainFrame       = this;
+	XFoilAnalysisDlg::s_pMainFrame = this;
+	StabPolarDlg::s_pMainFrame     = this;
+	BodyGridDlg::s_pMainFrame      = this;
+	BatchDlg::s_pMainFrame         = this;
+	BatchThreadDlg::s_pMainFrame   = this;
+	GraphDlg::s_pMainFrame         = this;
+	ManageBodiesDlg::s_pMainFrame  = this;
+	PanelAnalysisDlg::s_pMainFrame = this;
+	WingScaleDlg::s_pMainFrame     = this;
+
 	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
@@ -884,12 +905,13 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXInverseWidget->setVisible(false);
 	m_pctrlXInverseWidget->setFloating(true);
 
-	m_pMiarex = new QMiarex(this);
+	m_pMiarex = new QMiarex;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->setAttribute(Qt::WA_DeleteOnClose, false);
 	m_pctrlMiarexWidget->setWidget(pMiarex);
 	m_pctrlMiarexWidget->setVisible(false);
 	m_pctrlMiarexWidget->setFloating(true);
+
 
 	m_pGL3DScales = new GL3DScales(this);
 	GL3DScales * pGL3DScales = (GL3DScales*)m_pGL3DScales;
@@ -902,7 +924,6 @@ void MainFrame::CreateDockWindows()
 	m_pctrl3DScalesWidget->setFloating(true);
 	m_pctrl3DScalesWidget->move(60,60);
 
-	StabViewDlg::s_pMainFrame = this;
 	StabViewDlg::s_pMiarex = m_pMiarex;
 	m_pStabView = new StabViewDlg(this);
 	StabViewDlg * pStabView = (StabViewDlg*)m_pStabView;
@@ -938,9 +959,8 @@ void MainFrame::CreateDockWindows()
 	sizepol.setVerticalPolicy(QSizePolicy::Expanding);
 	m_p2DWidget->setSizePolicy(sizepol);
 
-	pMiarex->m_pMainFrame    = this;
-	pMiarex->m_p2DWidget = m_p2DWidget;
-	pMiarex->m_pGLWidget = m_pGLWidget;
+	QMiarex::s_p2DWidget = m_p2DWidget;
+	QMiarex::s_pGLWidget = m_pGLWidget;
 	pMiarex->m_ArcBall.m_pGLWidget = m_pGLWidget;
 	pMiarex->m_poaBody   = &m_oaBody;
 	pMiarex->m_poaPlane  = &m_oaPlane;
@@ -973,58 +993,37 @@ void MainFrame::CreateDockWindows()
 	pXInverse->m_p2DWidget        = m_p2DWidget;
 	pXInverse->m_poaFoil          = &m_oaFoil;
 
-	GL3dBodyDlg::s_pMainFrame = this;
-	GL3dBodyDlg::s_pMiarex    = m_pMiarex;
+
 	GL3dBodyDlg::s_poaBody    = &m_oaBody;
-
-	GL3dWingDlg::s_pMainFrame = this;
-	GL3dWingDlg::s_pMiarex    = m_pMiarex;
 	GL3dWingDlg::s_poaFoil     = &m_oaFoil;
-
-	GLWidget::s_pMainFrame = this;
-	GLWidget::s_pMiarex = m_pMiarex;
-
-	PlaneDlg::s_pMainFrame = this;
-	PlaneDlg::s_pMiarex    = m_pMiarex;
 	PlaneDlg::s_poaBody    = &m_oaBody;
 	PlaneDlg::s_poaWing    = &m_oaWing;
 
-	CWing::s_pMainFrame    = this;
-	CWing::s_pMiarex       = m_pMiarex;
-
-	CPolar::s_pMainFrame     = this;
-	ObjectPropsDlg::s_pMainFrame = this;
-
-	pGL3DScales->m_pMainFrame    = this;
-	pGL3DScales->m_pMiarex       = m_pMiarex;
-
-	CBody::s_pMainFrame    = this;
-
-	CWPolar::s_pMainFrame  = this;
-	CWPolar::s_pMiarex  = m_pMiarex;
-
-	CWOpp::s_pMainFrame  = this;
-	CWOpp::s_pMiarex  = m_pMiarex;
-
-	LLTAnalysisDlg::s_pMainFrame = this;
-	LLTAnalysisDlg::s_pMiarex    = m_pMiarex;
-
-	PanelAnalysisDlg::s_pMainFrame = this;
-	PanelAnalysisDlg::s_pMiarex    = m_pMiarex;
+	GL3dBodyDlg::s_pMiarex      = m_pMiarex;
+	GL3dWingDlg::s_pMiarex      = m_pMiarex;
+	GLWidget::s_pMiarex         = m_pMiarex;
+	PlaneDlg::s_pMiarex         = m_pMiarex;
+	CWing::s_pMiarex            = m_pMiarex;
+	CWPolar::s_pMiarex          = m_pMiarex;
+	CWOpp::s_pMiarex            = m_pMiarex;
+	LLTAnalysisDlg::s_pMiarex   = m_pMiarex;
+	PanelAnalysisDlg::s_pMiarex = m_pMiarex;
 	ManageUFOsDlg::s_pMiarex    = m_pMiarex;
-	ManageUFOsDlg::s_pMainFrame = this;
+	StabPolarDlg::s_pMiarex     = m_pMiarex;
+	UFOTableDelegate::s_pMiarex = m_pMiarex;
+	WPolarDlg::s_pMiarex        = m_pMiarex;
+	ManageBodiesDlg::s_pMiarex  = m_pMiarex;
+
+	pGL3DScales->m_pMiarex      = m_pMiarex;
+	pGL3DScales->m_pMainFrame    = this;
+
 
 	CPlane::SetParents(this, m_pMiarex);
 //	CPlane::s_pMainFrame   = this;
 //	CPlane::s_pMiarex      = m_pMiarex;
 
-	StabPolarDlg::s_pMainFrame = this;
-	StabPolarDlg::s_pMiarex = m_pMiarex;
 
-	InertiaDlg::s_pMainFrame = this;
-	XFoilAnalysisDlg::s_pMainFrame  = this;
 	XFoilAnalysisDlg::s_pXDirect = m_pXDirect;
-	BodyGridDlg::s_pMainFrame = this;
 	NacaFoilDlg::s_pXFoil         = pXDirect->m_pXFoil;
 	InterpolateFoilsDlg::s_pXFoil = pXDirect->m_pXFoil;
 	CAddDlg::s_pXFoil             = pXDirect->m_pXFoil;
@@ -1033,16 +1032,12 @@ void MainFrame::CreateDockWindows()
 	TEGapDlg::s_pXFoil            = pXDirect->m_pXFoil;
 	LEDlg::s_pXFoil               = pXDirect->m_pXFoil;
 	BatchDlg::s_pXFoil            = pXDirect->m_pXFoil;
-	BatchDlg::s_pMainFrame        = this;
 	BatchDlg::s_pXDirect          = m_pXDirect;
-	BatchThreadDlg::s_pXFoil            = pXDirect->m_pXFoil;
-	BatchThreadDlg::s_pMainFrame        = this;
-	BatchThreadDlg::s_pXDirect          = m_pXDirect;
+	BatchThreadDlg::s_pXFoil      = pXDirect->m_pXFoil;
+	BatchThreadDlg::s_pXDirect    = m_pXDirect;
+	FoilPolarDlg::s_pXDirect      = m_pXDirect;
 
-	GraphDlg::s_pMainFrame = this;
 	GraphDlg::s_ActivePage = 0;
-
-	UFOTableDelegate::s_pMiarex = m_pMiarex;
 }
 
 
@@ -1451,8 +1446,8 @@ void MainFrame::CreateMiarexMenus()
 	MiarexViewMenu->addAction(RootLocusAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(W3DPrefsAct);
-	MiarexViewMenu->addAction(W3DScalesAct);
 	MiarexViewMenu->addAction(W3DLightAct);
+	MiarexViewMenu->addAction(W3DScalesAct);
 	MiarexViewMenu->addSeparator();
 	MiarexViewMenu->addAction(saveViewToImageFileAct);
 
@@ -4275,33 +4270,33 @@ void MainFrame::OnStyle()
 	QMiarex *pMiarex     = (QMiarex*)m_pMiarex;
 //	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
 
-	DisplaySettingsDlg dlg(this);
-	dlg.move(m_DlgPos);
-	dlg.m_BackgroundColor = m_BackgroundColor;
-	dlg.m_TextColor       = m_TextColor;
-	dlg.m_TextFont        = m_TextFont;
-	dlg.m_pRefGraph       = &m_RefGraph;
-	dlg.m_StyleName       = m_StyleName;
-	dlg.m_bReverseZoom    = m_bReverseZoom;
+	m_DisplaySettingsDlg.m_pMainFrame = this;
+	m_DisplaySettingsDlg.move(m_DlgPos);
+	m_DisplaySettingsDlg.m_BackgroundColor = m_BackgroundColor;
+	m_DisplaySettingsDlg.m_TextColor       = m_TextColor;
+	m_DisplaySettingsDlg.m_TextFont        = m_TextFont;
+	m_DisplaySettingsDlg.m_pRefGraph       = &m_RefGraph;
+	m_DisplaySettingsDlg.m_StyleName       = m_StyleName;
+	m_DisplaySettingsDlg.m_bReverseZoom    = m_bReverseZoom;
 
-	dlg.InitDialog();
+	m_DisplaySettingsDlg.InitDialog();
 
-	if(dlg.exec() ==QDialog::Accepted)
+	if(m_DisplaySettingsDlg.exec() ==QDialog::Accepted)
 	{
-		m_BackgroundColor = dlg.m_BackgroundColor;
-		m_TextColor       = dlg.m_TextColor;
-		m_TextFont        = dlg.m_TextFont;
-		m_StyleName       = dlg.m_StyleName;
-		m_bReverseZoom    = dlg.m_pctrlReverseZoom->isChecked();
+		m_BackgroundColor = m_DisplaySettingsDlg.m_BackgroundColor;
+		m_TextColor       = m_DisplaySettingsDlg.m_TextColor;
+		m_TextFont        = m_DisplaySettingsDlg.m_TextFont;
+		m_StyleName       = m_DisplaySettingsDlg.m_StyleName;
+		m_bReverseZoom    = m_DisplaySettingsDlg.m_pctrlReverseZoom->isChecked();
 
 		pMiarex->m_bResetglLegend = true;
 
-		if(dlg.m_bIsGraphModified)
+		if(m_DisplaySettingsDlg.m_bIsGraphModified)
 		{
 			SetGraphSettings(&m_RefGraph);
 		}
 	}
-	m_DlgPos = dlg.pos();
+	m_DlgPos = m_DisplaySettingsDlg.pos();
 
 	pXDirect->m_pCpGraph->SetInverted(true);
 	pMiarex->m_CpGraph.SetInverted(true);
@@ -4311,24 +4306,23 @@ void MainFrame::OnStyle()
 
 void MainFrame::OnUnits()
 {
-	UnitsDlg dlg;
-	dlg.move(m_DlgPos);
-	dlg.m_Length = m_LengthUnit;
-	dlg.m_Area   = m_AreaUnit;
-	dlg.m_Weight = m_WeightUnit;
-	dlg.m_Speed  = m_SpeedUnit;
-	dlg.m_Force  = m_ForceUnit;
-	dlg.m_Moment = m_MomentUnit;
-	dlg.InitDialog();
+	m_UnitsDlg.move(m_DlgPos);
+	m_UnitsDlg.m_Length = m_LengthUnit;
+	m_UnitsDlg.m_Area   = m_AreaUnit;
+	m_UnitsDlg.m_Weight = m_WeightUnit;
+	m_UnitsDlg.m_Speed  = m_SpeedUnit;
+	m_UnitsDlg.m_Force  = m_ForceUnit;
+	m_UnitsDlg.m_Moment = m_MomentUnit;
+	m_UnitsDlg.InitDialog();
 
-	if(dlg.exec()==QDialog::Accepted)
+	if(m_UnitsDlg.exec()==QDialog::Accepted)
 	{
-		m_LengthUnit = dlg.m_Length;
-		m_AreaUnit   = dlg.m_Area;
-		m_WeightUnit = dlg.m_Weight;
-		m_SpeedUnit  = dlg.m_Speed;
-		m_ForceUnit  = dlg.m_Force;
-		m_MomentUnit = dlg.m_Moment;
+		m_LengthUnit = m_UnitsDlg.m_Length;
+		m_AreaUnit   = m_UnitsDlg.m_Area;
+		m_WeightUnit = m_UnitsDlg.m_Weight;
+		m_SpeedUnit  = m_UnitsDlg.m_Speed;
+		m_ForceUnit  = m_UnitsDlg.m_Force;
+		m_MomentUnit = m_UnitsDlg.m_Moment;
 
 		SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 				 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
@@ -4341,7 +4335,7 @@ void MainFrame::OnUnits()
 			pMiarex->UpdateUnits();
 		}
 	}
-	m_DlgPos = dlg.pos();
+	m_DlgPos = m_UnitsDlg.pos();
 }
 
 
@@ -4725,17 +4719,17 @@ void MainFrame::RenameFoil(CFoil *pFoil)
 			pOldFoil = (CFoil*)m_oaFoil.at(k);
 			NameList.append(pOldFoil->m_FoilName);
 		}
-		RenameDlg dlg(this);
-		dlg.move(m_DlgPos);
-		dlg.m_pstrArray = & NameList;
-		dlg.m_strQuestion = tr("Enter the foil's new name");
-		dlg.m_strName = OldName;
-		bool bExists = false;
-		dlg.InitDialog();
-		int resp = dlg.exec();
-		m_DlgPos = dlg.pos();
 
-		strong = dlg.m_strName;
+		m_RenameDlg.move(m_DlgPos);
+		m_RenameDlg.m_pstrArray = & NameList;
+		m_RenameDlg.m_strQuestion = tr("Enter the foil's new name");
+		m_RenameDlg.m_strName = OldName;
+		bool bExists = false;
+		m_RenameDlg.InitDialog();
+		int resp = m_RenameDlg.exec();
+		m_DlgPos = m_RenameDlg.pos();
+
+		strong = m_RenameDlg.m_strName;
 
 		if(QDialog::Accepted == resp)
 		{
@@ -5903,22 +5897,22 @@ CFoil* MainFrame::SetModFoil(CFoil* pNewFoil, bool bKeepExistingFoil)
 				pFoil = (CFoil*)m_oaFoil.at(k);
 				NameList.append(pFoil->m_FoilName);
 			}
-			RenameDlg dlg(this);
-			dlg.move(m_DlgPos);
-			dlg.m_pstrArray = & NameList;
-			dlg.m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
-			dlg.m_strName = pNewFoil->m_FoilName;
-			dlg.InitDialog();
+
+			m_RenameDlg.move(m_DlgPos);
+			m_RenameDlg.m_pstrArray = & NameList;
+			m_RenameDlg.m_strQuestion = tr("A foil of that name already exists\nPlease enter a new name");
+			m_RenameDlg.m_strName = pNewFoil->m_FoilName;
+			m_RenameDlg.InitDialog();
 
 			bool exists = false;
 			QString strong;
-			int resp = dlg.exec();
-			m_DlgPos = dlg.pos();
-			strong = dlg.m_strName;
+			int resp = m_RenameDlg.exec();
+			m_DlgPos = m_RenameDlg.pos();
+			strong = m_RenameDlg.m_strName;
 
 			if(QDialog::Accepted == resp)
 			{
-				strong = dlg.m_strName;
+				strong = m_RenameDlg.m_strName;
 				for (l=0; l<m_oaFoil.size(); l++)
 				{
 					pOldFoil = (CFoil*)m_oaFoil.at(l);

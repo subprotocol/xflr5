@@ -23,7 +23,6 @@
 #ifndef TWODPANELDLG_H
 #define TWODPANELDLG_H
 
-#include <QtGui>
 #include <QDialog>
 #include "../Misc/FloatEdit.h"
 

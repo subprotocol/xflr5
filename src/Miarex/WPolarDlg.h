@@ -70,7 +70,8 @@ private slots:
 	void OnPlaneInertia();
 
 private:
-	void *m_pMainFrame, *m_pMiarex;
+	static void *s_pMainFrame;
+	static void* s_pMiarex;
 
 	QList <void *> *m_poaWPolar;
 	CPlane *m_pPlane;

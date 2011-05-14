@@ -66,6 +66,7 @@ FlapDlg::FlapDlg(void *pParent)
 
 }
 
+
 void FlapDlg::SetupLayout()
 {
 	QGridLayout *FlapData = new QGridLayout;
@@ -79,7 +80,7 @@ void FlapDlg::SetupLayout()
 	m_pctrlLEFlapAngle = new FloatEdit;
 
 	QLabel *lab1 = new QLabel(tr("Flap Angle"));
-	QLabel *lab2 = new QLabel(QString::fromUtf8("°")+(" (+ is down)"));
+	QLabel *lab2 = new QLabel(QString::fromUtf8("° (")+tr("+ is down") +")");
 	QLabel *lab3 = new QLabel(tr("Hinge X Position"));
 	QLabel *lab4 = new QLabel(tr("% Chord"));
 	QLabel *lab5 = new QLabel(tr("Hinge Y Position"));

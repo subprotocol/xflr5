@@ -28,6 +28,8 @@
 #include <QString>
 #include "../Misc/FloatEdit.h"
 
+
+
 class FoilPolarDlg : public QDialog
 {
     friend class QOperWidget;
@@ -37,54 +39,54 @@ class FoilPolarDlg : public QDialog
 public:
 	FoilPolarDlg(void *pParent=NULL);
 
-    void ReadParams();
-    void keyPressEvent(QKeyEvent *event);
-    void InitDialog();
-    void SetPlrName();
+	void ReadParams();
+	void keyPressEvent(QKeyEvent *event);
+	void InitDialog();
+	void SetPlrName();
 	void SetupLayout();
 
-    void *m_pParent;
+	static void *s_pXDirect;
 
 	QRadioButton *m_pctrlAuto1;
 	QRadioButton *m_pctrlAuto2;
 
-    QLabel *m_pctrlReLabel;
-    QLabel *m_pctrlMachLabel;
+	QLabel *m_pctrlReLabel;
+	QLabel *m_pctrlMachLabel;
 
-    QLineEdit *m_pctrlAnalysisName;
-    QRadioButton *m_rbtype1;
-    QRadioButton *m_rbtype2;
-    QRadioButton *m_rbtype3;
-    QRadioButton *m_rbtype4;
+	QLineEdit *m_pctrlAnalysisName;
+	QRadioButton *m_rbtype1;
+	QRadioButton *m_rbtype2;
+	QRadioButton *m_rbtype3;
+	QRadioButton *m_rbtype4;
 
 	FloatEdit *m_pctrlReynolds;
 	FloatEdit *m_pctrlMach;
 
-    QPushButton *OKButton;
-    QPushButton *CancelButton;
+	QPushButton *OKButton;
+	QPushButton *CancelButton;
 
 	FloatEdit *m_pctrlNCrit;
 	FloatEdit *m_pctrlTopTrans;
 	FloatEdit *m_pctrlBotTrans;
 
-    bool  m_bAutoName;
-    int   m_Type;
-    int   m_MaTypDef, m_ReTypDef;
-    double m_Reynolds;
-    double m_Mach;
-    double m_ReDef;
-    double m_ASpec;
-    double m_XTopTr, m_XBotTr;
-    double m_NCrit;
-    QString m_FoilName;
-    QString m_PlrName;
+	bool  m_bAutoName;
+	int   m_Type;
+	int   m_MaTypDef, m_ReTypDef;
+	double m_Reynolds;
+	double m_Mach;
+	double m_ReDef;
+	double m_ASpec;
+	double m_XTopTr, m_XBotTr;
+	double m_NCrit;
+	QString m_FoilName;
+	QString m_PlrName;
 
 public slots:
-    void OnAutoName();
+	void OnAutoName();
 	void OnOK();
-    void OnPolarType();
+	void OnPolarType();
 	void OnNameChanged();
-    void EditingFinished();
+	void EditingFinished();
 
 };
 

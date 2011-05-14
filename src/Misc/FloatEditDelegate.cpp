@@ -20,8 +20,8 @@
 *****************************************************************************/
 
 
-#include <QtDebug>
- #include "FloatEditDelegate.h"
+#include "FloatEditDelegate.h"
+
 
 FloatEditDelegate::FloatEditDelegate(QObject *parent)
 : QItemDelegate(parent)

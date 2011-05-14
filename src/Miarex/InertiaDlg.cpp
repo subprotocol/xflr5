@@ -21,7 +21,6 @@
 
 //performs an automatic evaluation of the object's CoG an inertia properties
 
-#include <QtDebug>
 #include "../MainFrame.h"
 #include "../Globals.h"
 #include "InertiaDlg.h"

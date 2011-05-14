@@ -26,8 +26,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QPushButton>
-#include <QtGui>
-
+#include <QKeyEvent>
 
 class PolarFilterDlg : public QDialog
 {

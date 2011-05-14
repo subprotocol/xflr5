@@ -26,7 +26,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QtDebug>
 
 
 GLLightDlg::GLLightDlg()

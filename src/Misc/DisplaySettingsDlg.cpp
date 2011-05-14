@@ -19,15 +19,19 @@
 
 *****************************************************************************/
 
-
-#include <QtGui>
 #include "DisplaySettingsDlg.h"
 #include "../MainFrame.h"
 #include "../Miarex/Miarex.h"
 #include "../XDirect/XDirect.h"
 #include "../XInverse/XInverse.h"
 #include "../Graph/GraphDlg.h"
-#include <QtDebug>
+#include <QApplication>
+#include <QGroupBox>
+#include <QColorDialog>
+#include <QFontDialog>
+#include <QStyleFactory>
+
+
 
 DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 {

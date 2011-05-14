@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 
-#include <QtDebug>
 #include <QGroupBox>
 #include <QGridLayout>
 #include <QHBoxLayout>

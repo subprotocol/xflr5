@@ -27,7 +27,7 @@
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QtDebug>
+
 
 void *CBody::s_pMainFrame;
 double CBody::s_xKnots[MAXBODYFRAMES*2];

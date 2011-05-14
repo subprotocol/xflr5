@@ -31,11 +31,12 @@
 #include <QMessageBox>
 
 
+void *ManageBodiesDlg::s_pMainFrame;
+void *ManageBodiesDlg::s_pMiarex;
+
 ManageBodiesDlg::ManageBodiesDlg()
 {
 	m_pGL3dBodyDlg = NULL;
-	m_pMiarex = NULL;
-	m_pMainFrame = NULL;
 	m_pBody = NULL;
 	setWindowTitle(tr("Body Management"));
 	SetupLayout();
@@ -71,8 +72,8 @@ void ManageBodiesDlg::OnDelete()
 {
 	if(!m_pBody) return;
 
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
 	int i;
@@ -110,7 +111,7 @@ void ManageBodiesDlg::OnDelete()
 
 void ManageBodiesDlg::OnDoubleClickTable(const QModelIndex &index)
 {
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	if(index.row()>=0)
 	{
 		QListWidgetItem* pItem =  m_pctrlNameList->item(index.row());
@@ -128,7 +129,7 @@ void ManageBodiesDlg::OnDoubleClickTable(const QModelIndex &index)
 void ManageBodiesDlg::OnDescriptionChanged()
 {
 	if(m_pBody) m_pBody->m_BodyDescription = m_pctrlDescription->toPlainText();
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	pMainFrame->SetSaveState(false);
 }
 
@@ -138,7 +139,7 @@ void ManageBodiesDlg::OnDuplicate()
 	if(!m_pBody) return;
 
 
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	CBody *pBody = new CBody;
 	pBody->Duplicate(m_pBody);
@@ -151,8 +152,8 @@ void ManageBodiesDlg::OnDuplicate()
 void ManageBodiesDlg::OnEdit()
 {
 	if(!m_pBody) return;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 
 	bool bUsed = false;
@@ -266,7 +267,7 @@ void ManageBodiesDlg::OnExportGeometry()
 
 void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 {
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	QListWidgetItem *pOldItem ;
 
 	CBody *pBody = pMiarex->GetBody(pItem->text());
@@ -287,8 +288,8 @@ void ManageBodiesDlg::OnNameList(QListWidgetItem *pItem)
 
 void ManageBodiesDlg::OnNew()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
 	CBody *pBody = new CBody;
 	pGL3dBodyDlg->SetBody(pBody);
@@ -305,7 +306,7 @@ void ManageBodiesDlg::OnNew()
 void ManageBodiesDlg::OnRename()
 {
 	if(!m_pBody) return;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 	pMiarex->SetModBody(m_pBody);
 	UpdateBodyList();
@@ -319,7 +320,7 @@ void ManageBodiesDlg::SetBody(CBody *pBody)
 {
 	int i;
 	QListWidgetItem *pItem ;
-	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
 
 //	if(!pBody) pBody = m_pBody;
 	if(pBody)

@@ -21,7 +21,7 @@
 
 #include "FloatEdit.h"
 #include <math.h>
-#include <QtDebug>
+
 
 FloatEdit::FloatEdit(QWidget *pParent)
 {

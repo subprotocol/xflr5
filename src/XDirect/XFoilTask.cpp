@@ -26,7 +26,7 @@
 #include <QCoreApplication>
 #include <QApplication>
 #include <QTimerEvent>
-#include <QtDebug>
+
 
 
 bool XFoilTask::s_bAutoInitBL = false;

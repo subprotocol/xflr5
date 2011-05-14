@@ -36,6 +36,7 @@ class ManageBodiesDlg : public QDialog
 	Q_OBJECT
 
 	friend class CBody;
+	friend class MainFrame;
 	friend class QMiarex;
 
 public:
@@ -59,8 +60,10 @@ private:
 	void SetupLayout();
 	void UpdateBodyList();
 	bool IsInUse(CBody *pBody);
-	void *m_pMainFrame;
-	void *m_pMiarex;
+
+	static void *s_pMainFrame;
+	static void *s_pMiarex;
+
 	void *m_pGL3dBodyDlg;
 
 	QList <void*> *m_poaBody;

@@ -29,7 +29,7 @@
 #include <QStandardItemModel>
 #include "../Misc/FloatEditDelegate.h"
 #include "../Objects/Foil.h"
-#include "../Design/AFoil.h"
+
 
 class FoilCoordDlg : public QDialog
 {

@@ -28,7 +28,6 @@
 #include "../Globals.h"
 #include <QTextStream>
 #include <QMessageBox>
-#include <QtDebug>
 
 
 

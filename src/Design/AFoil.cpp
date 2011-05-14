@@ -19,28 +19,15 @@
 
 *****************************************************************************/
  
-//QSelectionModel *selections = tableView->selectionModel();
-//QModelIndexList selected = selections->selectedIndexex();
-
 #include <QtGui>
 
 #include "../Globals.h"
 #include "../MainFrame.h"
-#include "../XDirect/NacaFoilDlg.h"
-#include "../XDirect/CAddDlg.h"
-#include "../XDirect/TwoDPanelDlg.h"
-#include "../XDirect/TEGapDlg.h"
-#include "../XDirect/LEDlg.h"
-#include "../XDirect/FlapDlg.h"
-#include "../XDirect/FoilCoordDlg.h"
-#include "../XDirect/FoilGeomDlg.h"
-#include "../XDirect/InterpolateFoilsDlg.h"
 #include "../Misc/LinePickerDlg.h"
 #include "AFoil.h"
 #include "AFoilGridDlg.h"
 #include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
-#include "LECircleDlg.h"
 
 extern CFoil *g_pCurFoil;
 
@@ -1299,15 +1286,14 @@ void QAFoil::OnAFoilCadd()
 
 	UpdateView();
 
-	CAddDlg Adlg;
-	Adlg.m_pBufferFoil = m_pBufferFoil;
-	Adlg.m_pMemFoil    = g_pCurFoil;
-	Adlg.m_pXDirect    = NULL;
-	Adlg.m_pAFoil      = this;
-	Adlg.move(pMainFrame->m_DlgPos);
-	Adlg.InitDialog();
+	m_CAddDlg.m_pBufferFoil = m_pBufferFoil;
+	m_CAddDlg.m_pMemFoil    = g_pCurFoil;
+	m_CAddDlg.m_pXDirect    = NULL;
+	m_CAddDlg.m_pAFoil      = this;
+	m_CAddDlg.move(pMainFrame->m_DlgPos);
+	m_CAddDlg.InitDialog();
 
-	if(QDialog::Accepted == Adlg.exec())
+	if(QDialog::Accepted == m_CAddDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1329,7 +1315,7 @@ void QAFoil::OnAFoilCadd()
 		m_pXFoil->m_FoilName ="";
 
 	}
-	pMainFrame->m_DlgPos = Adlg.pos();
+	pMainFrame->m_DlgPos = m_CAddDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1338,19 +1324,19 @@ void QAFoil::OnAFoilCadd()
 void QAFoil::OnAFoilLECircle()
 {
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	LECircleDlg dlg;
-	dlg.m_Radius      = m_LERad;
-	dlg.m_bShowRadius = m_bLECircle;
-	dlg.m_pAFoil      = this;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.InitDialog();
 
-	if(dlg.exec()==QDialog::Accepted)
+	m_LECircleDlg.m_Radius      = m_LERad;
+	m_LECircleDlg.m_bShowRadius = m_bLECircle;
+	m_LECircleDlg.m_pAFoil      = this;
+	m_LECircleDlg.move(pMainFrame->m_DlgPos);
+	m_LECircleDlg.InitDialog();
+
+	if(m_LECircleDlg.exec()==QDialog::Accepted)
 	{
-		m_LERad = dlg.m_Radius;
-		m_bLECircle = dlg.m_bShowRadius;
+		m_LERad = m_LECircleDlg.m_Radius;
+		m_bLECircle = m_LECircleDlg.m_bShowRadius;
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_LECircleDlg.pos();
 	UpdateView();
 }
 
@@ -1371,15 +1357,14 @@ void QAFoil::OnAFoilPanels()
 
 	UpdateView();
 
-	TwoDPanelDlg Pdlg;
-	Pdlg.m_pBufferFoil = m_pBufferFoil;
-	Pdlg.m_pMemFoil    = g_pCurFoil;
-	Pdlg.m_pXDirect    = NULL;
-	Pdlg.m_pAFoil      = this;
-	Pdlg.move(pMainFrame->m_DlgPos);
-	Pdlg.InitDialog();
+	m_TwoDPanelDlg.m_pBufferFoil = m_pBufferFoil;
+	m_TwoDPanelDlg.m_pMemFoil    = g_pCurFoil;
+	m_TwoDPanelDlg.m_pXDirect    = NULL;
+	m_TwoDPanelDlg.m_pAFoil      = this;
+	m_TwoDPanelDlg.move(pMainFrame->m_DlgPos);
+	m_TwoDPanelDlg.InitDialog();
 
-	if(QDialog::Accepted == Pdlg.exec())
+	if(QDialog::Accepted == m_TwoDPanelDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1401,7 +1386,7 @@ void QAFoil::OnAFoilPanels()
 
 	}
 
-	pMainFrame->m_DlgPos = Pdlg.pos();
+	pMainFrame->m_DlgPos = m_TwoDPanelDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1422,16 +1407,15 @@ void QAFoil::OnAFoilFoilCoordinates()
 
 	UpdateView();
 
-	FoilCoordDlg dlg;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.m_pMemFoil    = g_pCurFoil;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.m_pXDirect    = NULL;
-	dlg.m_pAFoil      = this;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.InitDialog();
+	m_FoilCoordDlg.move(pMainFrame->m_DlgPos);
+	m_FoilCoordDlg.m_pMemFoil    = g_pCurFoil;
+	m_FoilCoordDlg.m_pBufferFoil = m_pBufferFoil;
+	m_FoilCoordDlg.m_pXDirect    = NULL;
+	m_FoilCoordDlg.m_pAFoil      = this;
+	m_FoilCoordDlg.move(pMainFrame->m_DlgPos);
+	m_FoilCoordDlg.InitDialog();
 
-	if(QDialog::Accepted == dlg.exec())
+	if(QDialog::Accepted == m_FoilCoordDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1452,7 +1436,7 @@ void QAFoil::OnAFoilFoilCoordinates()
 		SelectFoil(g_pCurFoil);
 		m_pXFoil->m_FoilName ="";
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_FoilCoordDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1524,15 +1508,14 @@ void QAFoil::OnAFoilSetTEGap()
 
 	UpdateView();
 
-	TEGapDlg Gdlg;
-	Gdlg.m_pBufferFoil = m_pBufferFoil;
-	Gdlg.m_pMemFoil    = g_pCurFoil;
-	Gdlg.m_pXDirect    = NULL;
-	Gdlg.m_pAFoil      = this;
-	Gdlg.move(pMainFrame->m_DlgPos);
-	Gdlg.InitDialog();
+	m_TEGapDlg.m_pBufferFoil = m_pBufferFoil;
+	m_TEGapDlg.m_pMemFoil    = g_pCurFoil;
+	m_TEGapDlg.m_pXDirect    = NULL;
+	m_TEGapDlg.m_pAFoil      = this;
+	m_TEGapDlg.move(pMainFrame->m_DlgPos);
+	m_TEGapDlg.InitDialog();
 
-	if(QDialog::Accepted == Gdlg.exec())
+	if(QDialog::Accepted == m_TEGapDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1555,7 +1538,7 @@ void QAFoil::OnAFoilSetTEGap()
 		//Thanks Jean-Marc !
 	}
 
-	pMainFrame->m_DlgPos = Gdlg.pos();
+	pMainFrame->m_DlgPos = m_TEGapDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1577,15 +1560,14 @@ void QAFoil::OnAFoilSetLERadius()
 
 	UpdateView();
 
-	LEDlg Ldlg;
-	Ldlg.m_pBufferFoil = m_pBufferFoil;
-	Ldlg.m_pMemFoil    = g_pCurFoil;
-	Ldlg.m_pXDirect    = NULL;
-	Ldlg.m_pAFoil      = this;
-	Ldlg.move(pMainFrame->m_DlgPos);
-	Ldlg.InitDialog();
+	m_LEDlg.m_pBufferFoil = m_pBufferFoil;
+	m_LEDlg.m_pMemFoil    = g_pCurFoil;
+	m_LEDlg.m_pXDirect    = NULL;
+	m_LEDlg.m_pAFoil      = this;
+	m_LEDlg.move(pMainFrame->m_DlgPos);
+	m_LEDlg.InitDialog();
 
-	if(QDialog::Accepted == Ldlg.exec())
+	if(QDialog::Accepted == m_LEDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1607,7 +1589,7 @@ void QAFoil::OnAFoilSetLERadius()
 
 	}
 
-	pMainFrame->m_DlgPos = Ldlg.pos();
+	pMainFrame->m_DlgPos = m_LEDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1634,16 +1616,15 @@ void QAFoil::OnAFoilInterpolateFoils()
 
 	UpdateView();
 
-	InterpolateFoilsDlg dlg;
-	dlg.m_poaFoil = m_poaFoil;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.m_pMainFrame = m_pMainFrame;
-	dlg.m_pXDirect  = NULL;
-	dlg.m_pAFoil    = this;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.InitDialog();
+	m_InterpolateFoilsDlg.m_poaFoil = m_poaFoil;
+	m_InterpolateFoilsDlg.m_pBufferFoil = m_pBufferFoil;
+	m_InterpolateFoilsDlg.m_pMainFrame = m_pMainFrame;
+	m_InterpolateFoilsDlg.m_pXDirect  = NULL;
+	m_InterpolateFoilsDlg.m_pAFoil    = this;
+	m_InterpolateFoilsDlg.move(pMainFrame->m_DlgPos);
+	m_InterpolateFoilsDlg.InitDialog();
 
-	if(QDialog::Accepted == dlg.exec())
+	if(QDialog::Accepted == m_InterpolateFoilsDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1652,7 +1633,7 @@ void QAFoil::OnAFoilInterpolateFoils()
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = dlg.m_NewFoilName;
+		pNewFoil->m_FoilName = m_InterpolateFoilsDlg.m_NewFoilName;
 
 		CFoil * pFoil = pMainFrame->SetModFoil(pNewFoil);
 		FillFoilTable();
@@ -1664,13 +1645,12 @@ void QAFoil::OnAFoilInterpolateFoils()
 	{
 		FillFoilTable();
 		SelectFoil(g_pCurFoil);
-//		dlg.m_pXFoil->m_FoilName ="";
-
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_InterpolateFoilsDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
+
 
 void QAFoil::OnAFoilNacaFoils()
 {
@@ -1686,21 +1666,20 @@ void QAFoil::OnAFoilNacaFoils()
 
 	UpdateView();
 
-	NacaFoilDlg dlg;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.m_pXDirect = NULL;
-	dlg.m_pAFoil = this;
-	dlg.move(pMainFrame->m_DlgPos);
+	m_NacaFoilDlg.m_pBufferFoil = m_pBufferFoil;
+	m_NacaFoilDlg.m_pXDirect = NULL;
+	m_NacaFoilDlg.m_pAFoil = this;
+	m_NacaFoilDlg.move(pMainFrame->m_DlgPos);
 
-	if(QDialog::Accepted == dlg.exec())
+	if(QDialog::Accepted == m_NacaFoilDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		QString str;
 
-		if(dlg.s_Digits>0 && log10((double)dlg.s_Digits)<4)
-			str = QString("%1").arg(dlg.s_Digits,4,10,QChar('0'));
+		if(m_NacaFoilDlg.s_Digits>0 && log10((double)m_NacaFoilDlg.s_Digits)<4)
+			str = QString("%1").arg(m_NacaFoilDlg.s_Digits,4,10,QChar('0'));
 		else
-			str = QString("%1").arg(dlg.s_Digits);
+			str = QString("%1").arg(m_NacaFoilDlg.s_Digits);
 		str = "NACA "+ str;
 
 		CFoil *pNewFoil    = new CFoil();
@@ -1723,7 +1702,7 @@ void QAFoil::OnAFoilNacaFoils()
 
 	}
 
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_NacaFoilDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }
@@ -1744,16 +1723,15 @@ void QAFoil::OnAFoilSetFlap()
 
 	UpdateView();
 
-	FlapDlg dlg;
-	dlg.m_pAFoil      = this;
-	dlg.m_pXDirect    = NULL;
-	dlg.m_pXFoil      = m_pXFoil;
-	dlg.m_pMemFoil    = g_pCurFoil;
-	dlg.m_pBufferFoil = m_pBufferFoil;
-	dlg.move(pMainFrame->m_DlgPos);
-	dlg.InitDialog();
+	m_FlapDlg.m_pAFoil      = this;
+	m_FlapDlg.m_pXDirect    = NULL;
+	m_FlapDlg.m_pXFoil      = m_pXFoil;
+	m_FlapDlg.m_pMemFoil    = g_pCurFoil;
+	m_FlapDlg.m_pBufferFoil = m_pBufferFoil;
+	m_FlapDlg.move(pMainFrame->m_DlgPos);
+	m_FlapDlg.InitDialog();
 
-	if(QDialog::Accepted == dlg.exec())
+	if(QDialog::Accepted == m_FlapDlg.exec())
 	{
 		//then duplicate the buffer foil and add it
 		CFoil *pNewFoil = new CFoil();
@@ -1772,7 +1750,7 @@ void QAFoil::OnAFoilSetFlap()
 		SelectFoil(g_pCurFoil);
 		m_pXFoil->m_FoilName ="";
 	}
-	pMainFrame->m_DlgPos = dlg.pos();
+	pMainFrame->m_DlgPos = m_FlapDlg.pos();
 	m_pBufferFoil->m_bVisible = false;
 	UpdateView();
 }

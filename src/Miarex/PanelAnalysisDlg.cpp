@@ -33,7 +33,7 @@
 #include "../Globals.h"
 #include "../Objects/CVector.h"
 #include "Miarex.h"
-#include <QtDebug>
+
 
 void *PanelAnalysisDlg::s_pMiarex;
 void *PanelAnalysisDlg::s_pMainFrame;
@@ -97,8 +97,6 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_pPlane  = NULL;
 	m_ppSurface = NULL;
 
-	s_pMiarex        = NULL;
-	s_pMainFrame     = NULL;
 	m_pWPolar        = NULL;
 
 //	m_ppPanel        = NULL;

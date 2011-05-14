@@ -32,7 +32,7 @@
 #include <QGroupBox>
 #include <QMessageBox>
 #include <math.h>
-#include <QtDebug>
+
 
 QList <void*> *PlaneDlg::s_poaWing;
 QList <void*> *PlaneDlg::s_poaBody;

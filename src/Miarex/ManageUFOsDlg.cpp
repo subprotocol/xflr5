@@ -36,7 +36,7 @@ void *ManageUFOsDlg::s_pMiarex;
 
 ManageUFOsDlg::ManageUFOsDlg()
 {
-	setWindowTitle(tr("UFO Management"));
+	setWindowTitle(tr("Object Management"));
 
 	m_pWing      = NULL;
 	m_pPlane     = NULL;

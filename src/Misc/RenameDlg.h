@@ -50,6 +50,7 @@ public:
 	void keyPressEvent(QKeyEvent *event);
 	void SetupLayout();
 
+
 	QLabel      *m_pctrlMessage;
 	QLineEdit   *m_pctrlName;
 	QListWidget *m_pctrlNameList;
@@ -66,8 +67,6 @@ public:
 	bool m_bEnableOverwrite;
 	bool m_bExists;
 
-	void *m_pMainFrame;
-	void *m_pXDirect;
 };
 
 #endif // RENAMEDLG_H

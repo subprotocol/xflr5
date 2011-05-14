@@ -297,7 +297,6 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 			{
 				ScreenPt.rx() = pMiarex->m_LastPoint.x()+pMainFrame->pos().x()+geometry().x();
 				ScreenPt.ry() = pMiarex->m_LastPoint.y()+pMainFrame->pos().y()+geometry().y();
-//qDebug()<<"TwoD"<<pMiarex->m_LastPoint.y()<<pMainFrame->pos().y()<<geometry().y();
 			}
 
 			pMiarex->m_pCurGraph = pMiarex->GetGraph(ScreenPt);

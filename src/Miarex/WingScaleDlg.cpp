@@ -22,18 +22,16 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QLabel>
-#include <QtDebug>
 #include "WingScaleDlg.h"
 #include "../MainFrame.h"
 #include "../Globals.h"
 
 
-
+void * WingScaleDlg::s_pMainFrame;
 
 WingScaleDlg::WingScaleDlg(void *pParent)
 {
 	setWindowTitle(tr("Scale Wing Dlg"));
-	m_pMainFrame = NULL;
 	m_bSweep = m_bSpan = m_bChord = m_bTwist = false;
 
 	m_NewSweep = m_NewChord = m_NewTwist = m_NewSpan = false;
@@ -151,7 +149,7 @@ void WingScaleDlg::SetupLayout()
 void WingScaleDlg::InitDialog(double const &RefSpan, double const &RefChord, double const &RefSweep, double const &RefTwist)
 {
 	QString len;
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	GetLengthUnit(len, pMainFrame->m_LengthUnit);
 	m_pctrlUnit20->setText(len);
 	m_pctrlUnit21->setText(len);
@@ -229,7 +227,7 @@ void WingScaleDlg::EnableControls()
 
 void WingScaleDlg::ReadData()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	m_bSpan  = m_pctrlSpan->isChecked();
 	m_bChord = m_pctrlChord->isChecked();

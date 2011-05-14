@@ -21,7 +21,6 @@
 
 #include "ColorButton.h"
 #include <QPainter>
-#include <QtDebug>
 
 ColorButton::ColorButton()
 {

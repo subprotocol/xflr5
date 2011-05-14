@@ -24,7 +24,6 @@
 #include "Curve.h"
 #include "math.h"
 #include "Graph.h"
-#include <QtDebug>
 
 
 

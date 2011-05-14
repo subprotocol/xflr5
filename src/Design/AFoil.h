@@ -33,12 +33,22 @@
 
 #include "../Params.h"
 #include "FoilTableDelegate.h"
+#include "LECircleDlg.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
 #include "../Objects/Foil.h"
 #include "../Objects/Sf.h"
 #include "../Objects/Pf.h"
 #include "../XDirect/XFoil.h"
+#include "../XDirect/NacaFoilDlg.h"
+#include "../XDirect/CAddDlg.h"
+#include "../XDirect/TwoDPanelDlg.h"
+#include "../XDirect/TEGapDlg.h"
+#include "../XDirect/LEDlg.h"
+#include "../XDirect/FlapDlg.h"
+#include "../XDirect/FoilCoordDlg.h"
+#include "../XDirect/FoilGeomDlg.h"
+#include "../XDirect/InterpolateFoilsDlg.h"
 
 
 struct Picture
@@ -167,6 +177,16 @@ private:
 
 
 private:
+	TwoDPanelDlg        m_TwoDPanelDlg;
+	InterpolateFoilsDlg m_InterpolateFoilsDlg;
+	NacaFoilDlg         m_NacaFoilDlg;
+	FoilGeomDlg         m_FoilGeomDlg;
+	TEGapDlg            m_TEGapDlg;
+	LEDlg               m_LEDlg;
+	FlapDlg             m_FlapDlg;
+	CAddDlg             m_CAddDlg;
+	FoilCoordDlg        m_FoilCoordDlg;
+	LECircleDlg         m_LECircleDlg;
 	LineButton *m_pctrlFoilStyle;
 
 	QTableView *m_pctrlFoilTable;

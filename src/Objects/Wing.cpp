@@ -33,7 +33,7 @@
 #include "../Globals.h"
 #include "../Miarex/Miarex.h"
 #include "../Miarex/LLTAnalysisDlg.h"
-#include <QtDebug>
+
 
 
 CVector *CWing::m_pWakeNode;			//pointer to the VLM wake node array

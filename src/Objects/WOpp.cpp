@@ -26,7 +26,7 @@
 #include "../Globals.h"
 #include <math.h>
 #include <QTextStream>
-#include <QtDebug>
+
 
 void *CWOpp::s_pMainFrame;
 void *CWOpp::s_pMiarex;

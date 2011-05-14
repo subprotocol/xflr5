@@ -55,7 +55,7 @@ public:
 	QLabel *m_pctrlRefSpan, *m_pctrlRefChord, *m_pctrlRefSweep, *m_pctrlRefTwist;
 	QLabel *m_pctrlSpanRatio, *m_pctrlChordRatio, *m_pctrlSweepRatio, *m_pctrlTwistRatio;
 	QLabel *m_pctrlUnit20, *m_pctrlUnit21;
-	void *m_pMainFrame;
+	static void *s_pMainFrame;
 
 	bool m_bSweep, m_bSpan, m_bChord, m_bTwist;
 	double m_NewSweep, m_NewChord, m_NewTwist, m_NewSpan;

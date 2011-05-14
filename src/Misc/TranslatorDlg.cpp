@@ -96,15 +96,15 @@ void TranslatorDlg::InitDialog()
 	qmFiles.sort();
 	qmFileForLanguage.insert("English", "English");
 	m_pctrlLanguageList->addItem("English (default)");
-	for (int i = 0; i < qmFiles.size(); ++i)
+
+	for (int i=0; i<qmFiles.count(); ++i)
 	{
 		qmFileForLanguage.insert(languageName(qmFiles[i]), qmFiles[i]);
 		m_pctrlLanguageList->addItem(languageName(qmFiles[i]));
-
 	}
 
 	m_pctrlLanguageList->setCurrentRow(0);
-	for (int i = 0; i < qmFiles.size(); ++i)
+	for (int i=0; i<qmFiles.count(); ++i)
 	{
 		if(qmFiles[i]==m_LanguageFilePath)
 		{

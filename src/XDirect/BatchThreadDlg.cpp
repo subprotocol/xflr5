@@ -32,7 +32,6 @@
 #include <QCoreApplication>
 #include <QThread>
 #include <QThreadPool>
-#include <QtDebug>
 
 
 //bool BatchThreadDlg::s_bStoreOpp = false;
@@ -824,8 +823,8 @@ void BatchThreadDlg::timerEvent(QTimerEvent *event)
 				delete [] m_pXFoilTask;
 				m_pXFoilTask = NULL;
 
-				if(m_bCancel) strong = tr("\n_____Analysis cancelled_____\n");
-				else          strong = tr("\n_____Analysis completed_____\n");
+				if(m_bCancel) strong = "\n_____Analysis cancelled_____\n";
+				else          strong = "\n_____Analysis completed_____\n";
 				UpdateOutput(strong);
 
 				CleanUp();

@@ -31,7 +31,8 @@
 #include <QDateTime>
 #include <QApplication>
 #include <QMessageBox>
-#include <QtDebug>
+
+
 
 bool BatchDlg::s_bStoreOpp = false;
 bool BatchDlg::s_bCurrentFoil=true;

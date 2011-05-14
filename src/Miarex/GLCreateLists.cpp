@@ -516,8 +516,8 @@ void GLDrawCpLegend(void *pQMiarex)
 {
 	int i;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
 	QString strong;
 
 	double labellength, ClientToGL;
@@ -1133,7 +1133,7 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
 	QColor color;
 	int iLA, iLB, iTA, iTB;
@@ -1640,7 +1640,7 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==1)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
@@ -1871,7 +1871,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
 	if(!pWOpp || pWOpp->m_AnalysisMethod==1)
 	{
@@ -2296,8 +2296,8 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
 	static int dD, ZPos, LeftPos, total;
 	static double Mass;
 	QString Result, str, strong, str1;
@@ -2431,9 +2431,9 @@ void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 {
 	if(!pWing || !pWOpp) return;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
-	GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
 	int dD, YPos, XPos;
 	QString Result, str;
 	int l;
@@ -2604,7 +2604,6 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	range = rmax - rmin;
 
 
-//qDebug()<<"Range="<<range<<rmin<<rmax;
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
 		pMiarex->m_GLList++;
@@ -2772,10 +2771,9 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 
 void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
-
         QMiarex * pMiarex = (QMiarex*)pQMiarex;
-        GLWidget *pGLWidget = (GLWidget*)pMiarex->m_pGLWidget;
-        MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+	   GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
+	   MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
         int p, nPanels,i;
         double labellength, ClientToGL;
         double f, fi,dD, ZPos,dz,Right1, Right2;

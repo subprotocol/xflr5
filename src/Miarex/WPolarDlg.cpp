@@ -32,12 +32,12 @@
 #include <math.h>
 
 
+void* WPolarDlg::s_pMainFrame;
+void* WPolarDlg::s_pMiarex;
+
 WPolarDlg::WPolarDlg()
 {
 	setWindowTitle(tr("Analysis Definition"));
-	m_pMainFrame = NULL;
-	m_pMiarex    = NULL;
-
 	m_pWing      = NULL;
 	m_pPlane     = NULL;
 
@@ -54,7 +54,7 @@ WPolarDlg::WPolarDlg()
 	m_Density    = 1.225;
 	m_Viscosity  = 1.5e-5;
 	m_Height     = 0.0;
-	m_pWing	     = NULL;
+	m_pWing	   = NULL;
 	m_pPlane     = NULL;
 
 	m_CoG.Set(0.0,0.0,0.0);
@@ -168,7 +168,7 @@ void WPolarDlg::EnableControls()
 
 void WPolarDlg::InitDialog()
 {
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str, str1;
 
 	int i;
@@ -389,7 +389,7 @@ void WPolarDlg::OnTiltedGeom()
 
 void WPolarDlg::OnPlaneInertia()
 {
-	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	if(m_pctrlPlaneInertia->isChecked())
 	{
 		if(m_pPlane)
@@ -559,7 +559,7 @@ void WPolarDlg::OnWPolarType()
 
 void WPolarDlg::ReadValues()
 {
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	m_Alpha     = m_pctrlAlpha->Value();
 	m_Beta      = m_pctrlBeta->Value();
 	m_Weight    = m_pctrlWeight->Value() / pMainFrame->m_kgtoUnit;
@@ -860,9 +860,9 @@ void WPolarDlg::SetWPolarName()
 {
 	if(!m_bAutoName) return;
 	QString str, strong;
-	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	if (m_PolarType==FIXEDSPEEDPOLAR)
 	{
@@ -951,7 +951,7 @@ void WPolarDlg::SetWPolarName()
 void WPolarDlg::SetReynolds()
 {
 	QString strange, str, strUnit;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	GetSpeedUnit(strUnit, pMainFrame->m_SpeedUnit);
 
 	if (m_PolarType ==FIXEDSPEEDPOLAR)
@@ -1003,7 +1003,7 @@ void WPolarDlg::SetReynolds()
 void WPolarDlg::SetWingLoad()
 {
 	QString str,str1, str2;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	double area;
 	if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
 	else area = m_pWing->m_ProjectedArea;

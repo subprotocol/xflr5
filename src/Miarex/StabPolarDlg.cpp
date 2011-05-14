@@ -31,7 +31,6 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <math.h>
-#include <QtDebug>
 
 void *StabPolarDlg::s_pMainFrame;
 void *StabPolarDlg::s_pMiarex;

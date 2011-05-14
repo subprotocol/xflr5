@@ -23,10 +23,11 @@
 
 #include "RenameDlg.h"
 
+
+
 RenameDlg::RenameDlg(void *pParent)
 {
 	setWindowTitle(tr("Rename"));
-	m_pMainFrame =pParent;
 	m_bEnableOverwrite = true;
 	m_bExists = true;
 	m_pstrArray = NULL;

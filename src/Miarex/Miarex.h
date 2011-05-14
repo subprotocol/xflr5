@@ -24,6 +24,7 @@
 
 #include "../Params.h"
 #include <QWidget>
+#include "WAdvancedDlg.h"
 #include <QPixmap>
 #include <QCheckBox>
 #include <QSlider>
@@ -42,6 +43,24 @@
 #include "StabPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
+
+#include "ManageBodiesDlg.h"
+#include "ManageUFOsDlg.h"
+#include "../Misc/ModDlg.h"
+#include "../Misc/RenameDlg.h"
+#include "../Misc/ProgressDlg.h"
+#include "../Misc/EditPlrDlg.h"
+#include "../Misc/ObjectPropsDlg.h"
+#include "../Misc/PolarFilterDlg.h"
+#include "../Graph/GraphDlg.h"
+#include "GLLightDlg.h"
+#include "GL3DScales.h"
+#include "StabViewDlg.h"
+#include "PlaneDlg.h"
+#include "WingScaleDlg.h"
+#include "W3dPrefsDlg.h"
+#include "InertiaDlg.h"
+
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
 #include "../Misc/LineCbBox.h"
@@ -346,6 +365,21 @@ public:
 //____________________Variables______________________________________
 //
 private:
+
+	//the dialog boxes are declared as member variables to enable translations... seems to be a Qt bug
+	WAdvancedDlg m_WAdvancedDlg;
+	ManageBodiesDlg m_ManageBodiesDlg;
+	ManageUFOsDlg m_ManageUFOsDlg;
+	PolarFilterDlg m_PolarFilterDlg;
+	InertiaDlg m_InertiaDlg;
+	PlaneDlg m_PlaneDlg;
+	ModDlg m_ModDlg;
+	RenameDlg m_RenameDlg;
+	EditPlrDlg m_EditPlrDlg;
+	GraphDlg m_GraphDlg;
+	WingScaleDlg m_WingScaleDlg;
+	W3dPrefsDlg m_W3dPrefsDlg;
+
 	QTimer *m_pTimerWOpp, *m_pTimerMode;
 
 	QPushButton *m_pctrlKeepCpSection, *m_pctrlResetCpSection;
@@ -361,7 +395,6 @@ private:
 
 	QCheckBox *m_pctrlPanelForce, *m_pctrlLift, *m_pctrlIDrag, *m_pctrlVDrag, *m_pctrlTrans, *m_pctrlWOppAnimate;
 	QSlider *m_pctrlAnimateWOppSpeed;
-//	QCheckBox *m_pctrlHighlightOpp;
 	QCheckBox *m_pctrlMoment,  *m_pctrlDownwash, *m_pctrlCp,*m_pctrlSurfVel, *m_pctrlStream;
 
 	QCheckBox *m_pctrlShowCurve;
@@ -617,9 +650,9 @@ public:
 	bool m_bLongitudinal;         // true if longitudinal stability results are to be displayed, false if lateral
 	bool m_bICd, m_bVCd, m_bStream, m_bSpeeds;  	// defines whether the corresponfing data should be displayed
 
-	void* m_pMainFrame;          // a pointer to the frame class
-	void *m_p2DWidget;
-	void *m_pGLWidget;
+	static void *s_pMainFrame;          // a pointer to the frame class
+	static void *s_p2DWidget;
+	static void *s_pGLWidget;
 
 	int m_MatSize;			    // the matrix size
 	int m_WakeSize;				// Size of the Matrix if there is a wake
