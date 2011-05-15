@@ -2262,6 +2262,7 @@ void MainFrame::CreateXDirectMenus()
 	OperFoilCtxMenu->addAction(resetFoilScale);
 	OperFoilCtxMenu->addAction(showPanels);
 	OperFoilCtxMenu->addAction(showNeutralLine);
+	OperFoilCtxMenu->addAction(XDirectStyleAct);
 	OperFoilCtxMenu->addSeparator();//_______________
 	OperFoilCtxMenu->addAction(saveViewToImageFileAct);
 	//End XDirect foil Context Menu

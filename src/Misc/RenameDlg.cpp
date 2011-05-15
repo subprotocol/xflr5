@@ -102,6 +102,7 @@ void RenameDlg::SetupLayout()
 void RenameDlg::InitDialog()
 {
 	m_pctrlNote->setText(m_Note);
+	m_pctrlNameList->clear();
 
 	if(!m_bEnableOverwrite) OverwriteButton->setEnabled(false);
 

@@ -73,8 +73,6 @@ LLTAnalysisDlg::LLTAnalysisDlg()
 	m_ReMin = m_ReMax = m_ReDelta = 0.0;
 
 	m_pXFile       = NULL;
-	s_pMiarex      = NULL;
-	s_pMainFrame   = NULL;
 
 	m_LLT.m_pParent = this;
 }

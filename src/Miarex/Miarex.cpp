@@ -13579,7 +13579,6 @@ bool QMiarex::SetModWing(CWing *pModWing)
 		pPlane = (CPlane*)m_poaPlane->at(k);
 		NameList.append(pPlane->PlaneName());
 	}
-
 	m_RenameDlg.move(pMainFrame->m_DlgPos);
 	m_RenameDlg.m_pstrArray = & NameList;
 	m_RenameDlg.m_strQuestion = tr("Enter the new name for the wing :");
