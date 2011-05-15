@@ -215,9 +215,12 @@ void RenameDlg::OnSelChangeList(int item)
 {
 	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
 
-	QString str = pItem->text();
-	m_pctrlName->setText(str);
-	m_pctrlName->selectAll();
+	if(pItem)
+	{
+		QString str = pItem->text();
+		m_pctrlName->setText(str);
+		m_pctrlName->selectAll();
+	}
 }
 
 
@@ -227,9 +230,12 @@ void RenameDlg::OnDoubleClickList(QListWidgetItem * pItem)
 {
 //	QListWidgetItem *pItem =  m_pctrlNameList->currentItem();
 
-	QString str = pItem->text();
-	m_pctrlName->setText(str);
-	OnOK();
+	if(pItem)
+	{
+		QString str = pItem->text();
+		m_pctrlName->setText(str);
+		OnOK();
+	}
 }
 
 
