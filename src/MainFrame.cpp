@@ -63,7 +63,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = QString::fromLatin1("XFLR5 v6.04");
+	m_VersionName = QString::fromLatin1("XFLR5 v6.04 Beta");
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
