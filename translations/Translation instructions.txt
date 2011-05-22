@@ -1,0 +1,24 @@
+Procedure to follow to translate the code to another language:
+
+1. Download and install the QtCreator package from Nokia : http://qt.nokia.com/downloads
+
+2. Launch QtLinguist which comes with the package
+
+3. Load the xflr5.ts file
+
+4. Select the destination language, then save the file with the appropriate extension
+   For instance xflr5_pt.ts for Portuguese, xflr5_jp.ts for Japanese, etc.
+
+5. Please notify the Project in case somebody else wishes to start the same translation, to avoid doing the work twice:
+   x-andre at users.sourceforge.net
+
+6. Translate the sentences (approximately 1480)
+
+7. In TranslatorDlg.cpp, translate the word "English" to the name of the language, in that language. For instance, for a translation to French, "English" would be translated to "Français"
+
+8. If you wish to test the result : From the QtLinguist File menu, select "Release".
+   It will generate a compiled file xlfr5_xx.qm, which is to be placed in the "translations" directory
+
+9. Send the translated file "xflr5_xx.ts" to the Project
+
+10. Occasionnaly, some translation updates may be required for future releases
