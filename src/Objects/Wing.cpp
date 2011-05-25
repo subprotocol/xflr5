@@ -962,6 +962,7 @@ void CWing::Duplicate(CWing *pWing)
 	}
 
 	m_WingDescription = pWing->m_WingDescription;
+	m_WingColor       = pWing->m_WingColor;
 }
 
 

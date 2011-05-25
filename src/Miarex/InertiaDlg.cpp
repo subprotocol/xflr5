@@ -242,6 +242,7 @@ void InertiaDlg::FillMassModel()
 	QModelIndex index;
 	
 	m_pMassModel->setRowCount(MAXMASSES);
+qDebug()<<"Filling"<<m_NMass;
 	for(int i=0; i<m_NMass; i++)
 	{
 		index = m_pMassModel->index(i, 0, QModelIndex());
@@ -370,6 +371,7 @@ void InertiaDlg::InitDialog()
 		if(m_pPlane->Body())    m_VolumeMass += m_pPlane->Body()->m_VolumeMass;
 
 		m_NMass = m_pPlane->m_NMass;
+qDebug()<<"INitializing"<<m_NMass;
 		for(int i=0; i<m_pPlane->m_NMass; i++)
 		{
 			m_MassValue[i] = m_pPlane->m_MassValue[i];
@@ -711,6 +713,7 @@ void InertiaDlg::OnOK()
 			}
 		}
 		m_pPlane->m_NMass = j;
+qDebug()<<"Plane masses"<<j;
 	}
 
 	ComputeBodyAxisInertia();

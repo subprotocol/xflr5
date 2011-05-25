@@ -322,7 +322,7 @@ void ManageUFOsDlg::OnDelete()
 	else 	     strong = tr("Are you sure you want to delete the wing :\n") +   m_pWing->m_WingName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong,
 										 QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel,
-										 QMessageBox::Cancel)) return;
+										 QMessageBox::Yes)) return;
 
 	if(m_pPlane) pMainFrame->DeletePlane(m_pPlane);
 	else         pMainFrame->DeleteWing(m_pWing, false);

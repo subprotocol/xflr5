@@ -33,6 +33,7 @@
 #include "../Globals.h"
 #include <math.h>
 
+
 void *QMiarex::s_pMainFrame;
 void *QMiarex::s_p2DWidget;
 void *QMiarex::s_pGLWidget;
@@ -8786,20 +8787,44 @@ void QMiarex::OnDeleteUFOWPolars()
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CWPolar *pWPolar;
-	QString Name, strong;
+	QString UFOName, strong;
 
-	if(m_pCurPlane) Name = m_pCurPlane->PlaneName();
-	else            Name = m_pCurWing->WingName();
+	if(m_pCurPlane) UFOName = m_pCurPlane->PlaneName();
+	else            UFOName = m_pCurWing->WingName();
 
-	strong = tr("Are you sure you want to delete the polars associated to :\n") +  Name +"?\n";
+	strong = tr("Are you sure you want to delete the polars associated to :\n") +  UFOName +"?\n";
 	if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 
-	for(int i=m_poaWPolar->size()-1; i>=0; i--)
+	for(int j=m_poaWPolar->size()-1; j>=0; j--)
 	{
-		pWPolar  = (CWPolar *)m_poaWPolar->at(i);
-		if(pWPolar && pWPolar->m_UFOName==Name)
+		pWPolar  = (CWPolar *)m_poaWPolar->at(j);
+		if(pWPolar && pWPolar->m_UFOName==UFOName)
 		{
-			m_poaWPolar->removeAt(i);
+			//first remove all WOpps and POpps associated to the Wing Polar
+			CWOpp * pWOpp;
+			for (int i=m_poaWOpp->size()-1; i>=0; i--)
+			{
+				pWOpp = (CWOpp*)m_poaWOpp->at(i);
+				if (pWOpp->m_PlrName == pWPolar->m_PlrName   &&  pWOpp->m_WingName == UFOName)
+				{
+					m_poaWOpp->removeAt(i);
+					delete pWOpp;
+				}
+			}
+
+			CPOpp * pPOpp;
+			for (int i=m_poaPOpp->size()-1; i>=0; i--)
+			{
+				pPOpp = (CPOpp*)m_poaPOpp->at(i);
+				if (pPOpp->m_PlrName == pWPolar->m_PlrName   &&  pPOpp->m_PlaneName== UFOName)
+				{
+					m_poaPOpp->removeAt(i);
+					delete pPOpp;
+				}
+			}
+
+			//then remove the polar
+			m_poaWPolar->removeAt(j);
 			delete pWPolar;
 		}
 	}
@@ -8838,7 +8863,7 @@ void QMiarex::OnDeleteCurWPolar()
 	for (i=m_poaWOpp->size()-1; i>=0; i--)
 	{
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if (pWOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pWOpp->m_WingName == UFOName)
+		if (pWOpp->m_PlrName == m_pCurWPolar->m_PlrName   &&  pWOpp->m_WingName == UFOName)
 		{
 			m_poaWOpp->removeAt(i);
 			delete pWOpp;
@@ -8850,7 +8875,7 @@ void QMiarex::OnDeleteCurWPolar()
 	for (i=m_poaPOpp->size()-1; i>=0; i--)
 	{
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
-		if (pPOpp->m_PlrName  == m_pCurWPolar->m_PlrName &&	pPOpp->m_PlaneName == UFOName)
+		if (pPOpp->m_PlrName  == m_pCurWPolar->m_PlrName  &&  pPOpp->m_PlaneName == UFOName)
 		{
 			m_poaPOpp->removeAt(i);
 			delete pPOpp;
@@ -9110,7 +9135,6 @@ void QMiarex::OnEditUFO()
 			break;
 		}
 	}
-
 	for (i=0; i< m_poaWOpp->size(); i++)
 	{
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
@@ -9167,9 +9191,8 @@ void QMiarex::OnEditUFO()
 			}
 			else
 			{
-				//No results, delete the old wing and record the changes without prompting the user
-				pMainFrame->DeleteWing(m_pCurWing,true);
-				m_pCurWing = AddWing(pModWing);
+				//No results, record the changes without prompting the user
+				m_pCurWing->Duplicate(pModWing);
 			}
 
 			if(m_iView==W3DVIEW)
