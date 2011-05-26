@@ -90,6 +90,7 @@ private:
 	QRadioButton *m_pctrlTimeMode1,*m_pctrlTimeMode2,*m_pctrlTimeMode3,*m_pctrlTimeMode4;
 	QLineEdit *m_pctrlEigenValue, *m_pctrlEigenVector1, *m_pctrlEigenVector2, *m_pctrlEigenVector3, *m_pctrlEigenVector4;
 
+	QLabel *m_pctrlModeProperties;
 //	QSlider *m_pctrlAnimationSpeed, *m_pctrlAnimationAmplitude;
 	QDial *m_pctrlAnimationSpeed, *m_pctrlAnimationAmplitude;
 	QPushButton *m_pctrlAnimate, *m_pctrlAnimateRestart;

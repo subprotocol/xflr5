@@ -140,25 +140,27 @@ void StabViewDlg::ReadControlModelData()
 void StabViewDlg::FillEigenThings()
 {
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-//	FillControlNames();
+	complex<double> c;
+	double OmegaN, Omega1, Dsi, Sigma1;
+	double sum, prod;
+	QString strange;
+	double u0, mac, span;
+	complex<double> angle;
+
+	QString ModeDescription = tr("Mode Properties:")+"\n";
+
 	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
-		complex<double> c;
-		double OmegaN, Omega1, Dsi, Sigma1;
-		double sum, prod;
-		QString strange;
 		//We normalize the mode before display and only for display purposes
-		double u0, mac, span;
-		complex<double> angle;
-
 		u0   = pMiarex->m_pCurWOpp->m_QInf;
 		mac  = pMiarex->m_pCurWing->m_MAChord;
 		span = pMiarex->m_pCurWing->m_PlanformSpan;
 
 		c = pMiarex->m_pCurWOpp->m_EigenValue[m_iCurrentMode];
-		if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
-		else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
+		if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),9,'f',4).arg(c.imag(),9,'f',4);
+		else              strange = QString("%1-%2i").arg(c.real(),9,'f',4).arg(fabs(c.imag()),9,'f',4);
 		m_pctrlEigenValue->setText(strange);
+		ModeDescription.append("Lambda="+strange+"\n");
 
 		sum  = c.real() * 2.0;                          // is a real number
 		prod = c.real()*c.real() + c.imag()*c.imag();  // is a positive real number
@@ -172,6 +174,12 @@ void StabViewDlg::FillEigenThings()
 		m_pctrlFreqN->SetValue(OmegaN/2.0/PI);
 		m_pctrlFreq1->SetValue(Omega1/2.0/PI);
 		m_pctrlDsi->SetValue(Dsi);
+		strange = QString("FN=%1 Hz").arg(OmegaN/2.0/PI,6,'f',3);
+		ModeDescription.append(strange+"\n");
+		strange = QString("F1=%1 Hz").arg(Omega1/2.0/PI,6,'f',3);
+		ModeDescription.append(strange+"\n");
+		strange = QString("Xi=%1").arg(Dsi,6,'f',3);
+		ModeDescription.append(strange+"\n");
 
 		if(pMiarex->m_bLongitudinal && pMiarex->m_pCurWOpp)
 		{
@@ -180,21 +188,25 @@ void StabViewDlg::FillEigenThings()
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector1->setText(strange);
+			ModeDescription.append("v1="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][1]/u0;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector2->setText(strange);
+			ModeDescription.append("v2="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][2]/(2.0*u0/mac);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector3->setText(strange);
+			ModeDescription.append("v3="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3]/angle;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector4->setText(strange);
+			ModeDescription.append("v4="+strange+"\n");
 		}
 		else if(!pMiarex->m_bLongitudinal && pMiarex->m_pCurWOpp)
 		{
@@ -204,33 +216,40 @@ void StabViewDlg::FillEigenThings()
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector1->setText(strange);
+			ModeDescription.append("v1="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][1]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector2->setText(strange);
+			ModeDescription.append("v2="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][2]/(2.0*u0/span);
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector3->setText(strange);
+			ModeDescription.append("v3="+strange+"\n");
 
 			c = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3]/angle;
 			if(c.imag()>=0.0) strange = QString("%1+%2i").arg(c.real(),10,'f',5).arg(c.imag(),10,'f',5);
 			else              strange = QString("%1-%2i").arg(c.real(),10,'f',5).arg(fabs(c.imag()),10,'f',5);
 			m_pctrlEigenVector4->setText(strange);
+			ModeDescription.append("v4="+strange+"\n");
+
 		}
+		m_pctrlModeProperties->setText(ModeDescription);
 	}
 	else
 	{
-		m_pctrlEigenValue->setText("");
-		m_pctrlEigenVector1->setText("");
-		m_pctrlEigenVector2->setText("");
-		m_pctrlEigenVector3->setText("");
-		m_pctrlEigenVector4->setText("");
-		m_pctrlFreqN->setText("");
-		m_pctrlFreq1->setText("");
-		m_pctrlDsi->setText("");
+		m_pctrlEigenValue->clear();
+		m_pctrlEigenVector1->clear();
+		m_pctrlEigenVector2->clear();
+		m_pctrlEigenVector3->clear();
+		m_pctrlEigenVector4->clear();
+		m_pctrlFreqN->clear();
+		m_pctrlFreq1->clear();
+		m_pctrlDsi->clear();
+		m_pctrlModeProperties->clear();
 	}
 }
 
@@ -478,7 +497,7 @@ void StabViewDlg::SetMode(int iMode)
 		if(!pMiarex->m_bLongitudinal) m_iCurrentMode += 4;
 	}
 	else if(m_iCurrentMode<0) m_iCurrentMode=0;
-	
+
 	m_pctrlRLMode1->setChecked(m_iCurrentMode%4==0);
 	m_pctrlRLMode2->setChecked(m_iCurrentMode%4==1);
 	m_pctrlRLMode3->setChecked(m_iCurrentMode%4==2);
@@ -620,11 +639,13 @@ void StabViewDlg::SetupLayout()
 			m_pctrlTimeMode2 = new QRadioButton("Mode 2");
 			m_pctrlTimeMode3 = new QRadioButton("Mode 3");
 			m_pctrlTimeMode4 = new QRadioButton("Mode 4");
+			m_pctrlModeProperties = new QLabel("Mode Properties");
 			ModalTimeLayout->addWidget(m_pctrlTimeMode1);
 			ModalTimeLayout->addWidget(m_pctrlTimeMode2);
 			ModalTimeLayout->addWidget(m_pctrlTimeMode3);
 			ModalTimeLayout->addWidget(m_pctrlTimeMode4);
 			ModalTimeLayout->addStretch(1);
+			ModalTimeLayout->addWidget(m_pctrlModeProperties);
 			ModalTimeBox->setLayout(ModalTimeLayout);
 		}
 
@@ -868,7 +889,7 @@ void StabViewDlg::SetControls()
 //		m_pControlModel->setRowCount(0);
 	}
 
-	if(pMiarex->m_iStabilityView==0)
+	if(pMiarex->m_iStabilityView==STABTIMEVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(0);
 		m_pctrlInitialConditionsWidget->setCurrentIndex(pMiarex->m_StabilityResponseType);
@@ -877,18 +898,17 @@ void StabViewDlg::SetControls()
 		m_pctrlForcedResponse->setChecked(pMiarex->m_StabilityResponseType==1);
 		m_pctrlModalResponse->setChecked(pMiarex->m_StabilityResponseType==2);
 	}
-	else if(pMiarex->m_iStabilityView==1)
+	else if(pMiarex->m_iStabilityView==STABPOLARVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(1);
 		m_pctrlModeViewType->setCurrentIndex(0);
-		SetMode(m_iCurrentMode);
 	}
-	else if(pMiarex->m_iStabilityView==3)
+	else if(pMiarex->m_iStabilityView==STAB3DVIEW)
 	{
 		m_pctrlStackWidget->setCurrentIndex(1);
 		m_pctrlModeViewType->setCurrentIndex(1);
-		SetMode(m_iCurrentMode);
 	}
+	SetMode(m_iCurrentMode);
 
 	if(pMiarex->m_bLongitudinal)
 	{
