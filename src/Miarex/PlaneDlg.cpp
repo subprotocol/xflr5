@@ -726,6 +726,8 @@ void PlaneDlg::SetParams()
 
 	if(m_pPlane->Body()) m_pctrlBody->setChecked(true);
 	else                  m_pctrlBody->setChecked(false);
+
+	m_pctrlBodyList->clear();
 	for(i=0; i<s_poaBody->size(); i++)
 	{
 		pBody = (CBody*)s_poaBody->at(i);

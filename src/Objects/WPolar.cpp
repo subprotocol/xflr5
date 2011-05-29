@@ -1944,21 +1944,31 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 
 		if(pPlane)
 		{
-			if(m_bActiveControl[iCtrl])
+			if(!m_bAVLControls&&m_bActiveControl[iCtrl])
 			{
-				strong = QString("Wing Tilt : %1/%2\n")
+				strong = QString(QString::fromUtf8("Wing Tilt: %1°/%2°\n"))
 								.arg(m_MinControl[iCtrl],5,'f',2)
 								.arg(m_MaxControl[iCtrl],5,'f',2);
+				PolarProperties +=strong;
+			}
+			else if(m_bAVLControls&&m_MaxControl[iCtrl])
+			{
+				strong = QString(QString::fromUtf8("Wing Tilt: gain=%1°/unit\n")).arg(m_MaxControl[iCtrl],0,'f',2);
 				PolarProperties +=strong;
 			}
 			iCtrl=1;
 			if(pPlane->Stab())
 			{
-				if(m_bActiveControl[iCtrl])
+				if(!m_bAVLControls&&m_bActiveControl[iCtrl])
 				{
-					strong = QString("Elevator Tilt : %1/%2\n")
+					strong = QString(QString::fromUtf8("Elevator Tilt : %1°/%2°\n"))
 									.arg(m_MinControl[iCtrl],5,'f',2)
 									.arg(m_MaxControl[iCtrl],5,'f',2);
+					PolarProperties +=strong;
+				}
+				else if(m_bAVLControls&&m_MaxControl[iCtrl])
+				{
+					strong = QString(QString::fromUtf8("Elev. Tilt: gain=%1°/unit\n")).arg(m_MaxControl[iCtrl],0,'f',2);
 					PolarProperties +=strong;
 				}
 				iCtrl=2;
@@ -1984,11 +1994,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 			{
 				if(pWing->m_Surface[j].m_bTEFlap)
 				{
-					if(m_bActiveControl[iCtrl])
+					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
 					{
-						strong = QString("Wing Flap %1 : %2/%3\n")
+						strong = QString(QString::fromUtf8("Wing Flap %1: %2°/%3°\n"))
 										.arg(nFlap+1)
 										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					{
+						strong = QString(QString::fromUtf8("Wing Flap %1: g=%2°/unit\n"))
+										.arg(nFlap+1)
 										.arg(m_MaxControl[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
@@ -1998,7 +2015,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 			}
 		}
 
-		//elevator next and last
+		//elevator next
 		nFlap = 0;
 		if(pStab)
 		{
@@ -2006,11 +2023,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 			{
 				if(pStab->m_Surface[j].m_bTEFlap)
 				{
-					if(m_bActiveControl[iCtrl])
+					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
 					{
-						strong = QString("Elev. Flap %1 : %2/%3\n")
+						strong = QString(QString::fromUtf8("Elev. Flap %1: %2°/%3°\n"))
 										.arg(nFlap+1)
 										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					{
+						strong = QString(QString::fromUtf8("Elev. Flap %1: gain=%2°/unit\n"))
+										.arg(nFlap+1)
 										.arg(m_MaxControl[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
@@ -2027,11 +2051,18 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 			{
 				if(pFin->m_Surface[j].m_bTEFlap)
 				{
-					if(m_bActiveControl[iCtrl])
+					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
 					{
-						strong = QString("Fin Flap %1 : %2/%3\n")
+						strong = QString(QString::fromUtf8("Fin Flap %1: %2°/%3°\n"))
 										.arg(nFlap+1)
 										.arg(m_MinControl[iCtrl],5,'f',2)
+										.arg(m_MaxControl[iCtrl],5,'f',2);
+						PolarProperties +=strong;
+					}
+					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					{
+						strong = QString(QString::fromUtf8("Fin Flap %1: gain=%2°/unit\n"))
+										.arg(nFlap+1)
 										.arg(m_MaxControl[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
