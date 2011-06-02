@@ -1,7 +1,7 @@
 # This is a spec file for the installation of XFLR5 v6
 %define name xflr5
-%define release 2
-%define version 6.03
+%define release 1
+%define version 6.04
 
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
@@ -86,6 +86,19 @@ echo %{_bindir}/%{name}
 
 
 %changelog
+*Sun May 15 2011 A. Deperrois
+xflr5 v6.04 beta, May 14th, 2011
+- added a settings save at each project save
+- added and option to view forces on panels as coloured arrows
+- fixed the incorrect setting of AVL-type controls for flaps in T7 analysis
+- added the missing write operation in the project file of the control variable for wing operating points
+- modified the setting of boundary conditions in T7 analysis with activated controls - impact on balanced aoa
+- modified the wing construction process to allow for a gap in the middle of the wing
+- corrected the bug which caused the disapperance of the left stability toolbar when switching to 3D view
+- corrected the bug which prevented from changing the default number of panels in naca foil generation
+- continued the code cleaning process
+
+
 *Sun Feb 13 2011 A. Deperrois
 XFLR5v6.03 beta rpm release
 - modified the geometry connection between panels with dihedral and twist - may slightly impact the results
