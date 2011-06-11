@@ -1476,8 +1476,6 @@ void MainFrame::CreateMiarexMenus()
 	currentUFOMenu->addAction(hideUFOWOpps);
 	currentUFOMenu->addAction(showUFOWOpps);
 	currentUFOMenu->addAction(deleteUFOWOpps);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(resetWingScale);
 
 	MiarexBodyMenu = menuBar()->addMenu(tr("&Body"));
 	MiarexBodyMenu->addAction(defineBody);
@@ -3619,6 +3617,7 @@ void MainFrame::OnInsertProject()
 	}
 	else if(m_iApp == DIRECTDESIGN)
 	{
+		pAFoil->FillFoilTable();
 		pAFoil->SelectFoil();
 	}
 	UpdateView();

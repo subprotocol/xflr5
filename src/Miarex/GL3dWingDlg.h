@@ -101,7 +101,6 @@ private:
 	void MouseReleaseEvent(QMouseEvent *event) ;
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
-	void ShowContextMenu(QContextMenuEvent * event);
 	void showEvent(QShowEvent *event);
 	void contextMenuEvent(QContextMenuEvent *event);
 	void resizeEvent(QResizeEvent *event);

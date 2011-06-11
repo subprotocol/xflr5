@@ -201,15 +201,8 @@ void GL3dWingDlg::ComputeGeometry()
 void GL3dWingDlg::contextMenuEvent(QContextMenuEvent *event)
 {
 	// Display the context menu
-	QPoint ScreenPt = event->pos();
-	ScreenPt.rx() += geometry().x();
-	ScreenPt.ry() += geometry().y();
-
-	QRect TableRect = m_pctrlWingTable->geometry();
-
-	if(TableRect.contains(ScreenPt))	m_pContextMenu->exec(ScreenPt);
+	if(m_pctrlWingTable->geometry().contains(event->pos())) m_pContextMenu->exec(event->globalPos());
 }
-
 
 
 void GL3dWingDlg::Connect()
@@ -2693,10 +2686,10 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
-									  QAbstractItemView::DoubleClicked |
-									  QAbstractItemView::SelectedClicked |
-									  QAbstractItemView::EditKeyPressed |
-									  QAbstractItemView::AnyKeyPressed);
+							    QAbstractItemView::DoubleClicked |
+							    QAbstractItemView::SelectedClicked |
+							    QAbstractItemView::EditKeyPressed |
+							    QAbstractItemView::AnyKeyPressed);
 	QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 //	HorizontalHeader->setResizeMode(QHeaderView::Stretch);
@@ -2947,26 +2940,6 @@ void GL3dWingDlg::SetupLayout()
 	MainLayout->setStretchFactor(RightLayout, 1);
 
 	setLayout(MainLayout);
-}
-
-
-void GL3dWingDlg::ShowContextMenu(QContextMenuEvent * event)
-{
-	QMenu *CtxMenu = new QMenu(tr("Context Menu"),this);
-//	CtxMenu->addAction(m_pInsertPoint);
-
-	QPoint CltPt = event->pos();
-	QPoint ScreenPt = event->pos();
-
-	m_ptPopUp.rx() = CltPt.x();
-	m_ptPopUp.ry() = CltPt.y();
-	ClientToGL(m_ptPopUp, m_RealPopUp);
-
-	ScreenPt.rx() += geometry().x();
-	ScreenPt.ry() += geometry().y();
-	CtxMenu->exec(ScreenPt);
-
-	m_pglWidget->setCursor(Qt::CrossCursor);
 }
 
 

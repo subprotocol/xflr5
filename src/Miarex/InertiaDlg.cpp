@@ -31,6 +31,8 @@
 #include <QTextStream>
 #include <QFileDialog>
 
+#define MAXMASSES 5
+
 void *InertiaDlg::s_pMainFrame;
 
 InertiaDlg::InertiaDlg()
@@ -56,6 +58,14 @@ InertiaDlg::InertiaDlg()
 	}
 
 	m_bChanged = false;
+
+	m_pInsertMassRow  = new QAction(tr("Insert Before"), this);
+	m_pDeleteMassRow = new QAction(tr("Delete"), this);
+
+	m_pContextMenu = new QMenu(tr("Point Mass"),this);
+	m_pContextMenu->addAction(m_pInsertMassRow);
+	m_pContextMenu->addAction(m_pDeleteMassRow);
+
 
 	SetupLayout();
 }
@@ -233,6 +243,14 @@ void InertiaDlg::ComputeInertia()
 }
 
 
+
+void InertiaDlg::contextMenuEvent(QContextMenuEvent *event)
+{
+	// Display the context menu
+	if(m_pctrlMassView->geometry().contains(event->pos())) m_pContextMenu->exec(event->globalPos());
+}
+
+
 void InertiaDlg::FillMassModel()
 {
 	//
@@ -242,8 +260,8 @@ void InertiaDlg::FillMassModel()
 	QModelIndex index;
 	
 	m_pMassModel->setRowCount(MAXMASSES);
-qDebug()<<"Filling"<<m_NMass;
-	for(int i=0; i<m_NMass; i++)
+
+	for(int i=0; i<MAXMASSES; i++)
 	{
 		index = m_pMassModel->index(i, 0, QModelIndex());
 		m_pMassModel->setData(index, m_MassValue[i]*pMainFrame->m_kgtoUnit);
@@ -285,37 +303,6 @@ void InertiaDlg::InitDialog()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString str, str1, strong;
 
-	m_pMassModel = new QStandardItemModel;
-	m_pMassModel->setRowCount(10);//temporary
-	m_pMassModel->setColumnCount(5);
-
-	GetWeightUnit(str, pMainFrame->m_WeightUnit);
-	m_pMassModel->setHeaderData(0, Qt::Horizontal, tr("Mass") +" ("+str+")");
-	GetLengthUnit(str, pMainFrame->m_LengthUnit);
-	m_pMassModel->setHeaderData(1, Qt::Horizontal, tr("x") +" ("+str+")");
-	m_pMassModel->setHeaderData(2, Qt::Horizontal, tr("y")+" ("+str+")");
-	m_pMassModel->setHeaderData(3, Qt::Horizontal, tr("z")+" ("+str+")");
-	m_pMassModel->setHeaderData(4, Qt::Horizontal, tr("Description"));
-
-	m_pctrlMassView->setModel(m_pMassModel);
-	m_pctrlMassView->setColumnWidth(0,70);
-	m_pctrlMassView->setColumnWidth(1,55);
-	m_pctrlMassView->setColumnWidth(2,55);
-	m_pctrlMassView->setColumnWidth(3,55);
-	m_pctrlMassView->setColumnWidth(4,70);
-
-	m_pFloatDelegate = new FloatEditDelegate;
-	m_pctrlMassView->setItemDelegate(m_pFloatDelegate);
-	int  *precision = new int[5];
-	precision[0] = 3;
-	precision[1] = 3;
-	precision[2] = 3;
-	precision[3] = 3;
-	precision[4] = -1;// Not a number, will be detected as such by FloatEditDelegate
-	m_pFloatDelegate->SetPrecision(precision);
-
-	connect(m_pFloatDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
-
 	GetWeightUnit(str, pMainFrame->m_WeightUnit);
 	m_pctrlMassUnit->setText(str);
 	m_pctrlMassUnit2->setText(str);
@@ -331,6 +318,10 @@ void InertiaDlg::InitDialog()
 	m_pctrlStabInertia->setEnabled(false);
 	m_pctrlFinInertia->setEnabled(false);
 	m_pctrlBodyInertia->setEnabled(false);
+
+	int rc = m_pMassModel->rowCount();
+	m_pMassModel->removeRows(0, rc);
+	m_pMassModel->setRowCount(MAXMASSES);
 
 	if(m_pWing)
 	{
@@ -371,7 +362,7 @@ void InertiaDlg::InitDialog()
 		if(m_pPlane->Body())    m_VolumeMass += m_pPlane->Body()->m_VolumeMass;
 
 		m_NMass = m_pPlane->m_NMass;
-qDebug()<<"INitializing"<<m_NMass;
+
 		for(int i=0; i<m_pPlane->m_NMass; i++)
 		{
 			m_MassValue[i] = m_pPlane->m_MassValue[i];
@@ -661,6 +652,72 @@ void InertiaDlg::OnExportToAVL()
 }
 
 
+void InertiaDlg::OnInsertMassRow()
+{
+	int i, sel;
+	sel = m_pctrlMassView->currentIndex().row();
+	if(m_NMass>=MAXMASSES) return;
+	for (i=MAXMASSES-1; i>sel; i--)
+	{
+		m_MassTag[i]      = m_MassTag[i-1];
+		m_MassValue[i]    = m_MassValue[i-1];
+		m_MassPosition[i] = m_MassPosition[i-1];
+	}
+	m_MassValue[sel]=0.0;
+	m_MassTag[sel].clear();
+	m_MassPosition[sel].Set(0.0,0.0,0.0);
+
+	FillMassModel();
+
+	QModelIndex index = m_pMassModel->index(sel, 0, QModelIndex());
+	m_pctrlMassView->setCurrentIndex(index);
+	m_pctrlMassView->openPersistentEditor(index);
+}
+
+
+void InertiaDlg::OnDeleteMassRow()
+{
+	int i, sel;
+	sel = m_pctrlMassView->currentIndex().row();
+//	setFocus();
+	for (i=sel; i<MAXMASSES-1; i++)
+	{
+		m_MassValue[i]    = m_MassValue[i+1];
+		m_MassTag[i]      = m_MassTag[i+1];
+		m_MassPosition[i] = m_MassPosition[i+1];
+	}
+
+	m_MassValue[MAXMASSES-1]=0.0;
+	m_MassTag[MAXMASSES-1].clear();
+	m_MassPosition[MAXMASSES-1].Set(0.0,0.0,0.0);
+
+	m_NMass--;
+
+	FillMassModel();
+
+	QModelIndex index = m_pMassModel->index(sel, 0, QModelIndex());
+	m_pctrlMassView->setCurrentIndex(index);
+	m_pctrlMassView->openPersistentEditor(index);
+}
+
+
+void InertiaDlg::CleanEmptyRows()
+{
+	QModelIndex index;
+	bool bOK;
+	double val;
+
+	for (int i=m_pMassModel->rowCount()-1; i>=0; i--)
+	{
+		index = m_pMassModel->index(i, 0, QModelIndex());
+		val = index.data().toDouble(&bOK);
+		if(!bOK || fabs(val)<PRECISION)
+		{
+			m_pMassModel->removeRow(i);
+		}
+	}
+}
+
 
 void InertiaDlg::OnOK()
 {
@@ -713,7 +770,6 @@ void InertiaDlg::OnOK()
 			}
 		}
 		m_pPlane->m_NMass = j;
-qDebug()<<"Plane masses"<<j;
 	}
 
 	ComputeBodyAxisInertia();
@@ -725,36 +781,43 @@ qDebug()<<"Plane masses"<<j;
 void InertiaDlg::ReadData()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QModelIndex index ;
+	QModelIndex index;
 	bool bOK;
 	double val;
 	int i;
+	m_NMass=0;
+
 	for (i=0; i<MAXMASSES; i++)
 	{
+		m_MassValue[i] = 0.0;
+		m_MassTag[i].clear();
+		m_MassPosition[i].Set(0.0,0.0,0.0);
+
 		index = m_pMassModel->index(i, 0, QModelIndex());
 		val = index.data().toDouble(&bOK);
-		if(bOK)
+
+		if(bOK && fabs(val)>PRECISION)
 		{
-			m_MassValue[i]=val/pMainFrame->m_kgtoUnit;
+			m_MassValue[m_NMass]=val/pMainFrame->m_kgtoUnit;
+
+			index = m_pMassModel->index(i, 1, QModelIndex());
+			val = index.data().toDouble(&bOK);
+			if(bOK) m_MassPosition[m_NMass].x=val/pMainFrame->m_mtoUnit;
+
+			index = m_pMassModel->index(i, 2, QModelIndex());
+			val = index.data().toDouble(&bOK);
+			if(bOK) m_MassPosition[m_NMass].y=val/pMainFrame->m_mtoUnit;
+
+			index = m_pMassModel->index(i, 3, QModelIndex());
+			val = index.data().toDouble(&bOK);
+			if(bOK) m_MassPosition[m_NMass].z=val/pMainFrame->m_mtoUnit;
+
+			index = m_pMassModel->index(i, 4, QModelIndex());
+			m_MassTag[m_NMass] = index.data().toString();
+
+			m_NMass++;
 		}
-
-		index = m_pMassModel->index(i, 1, QModelIndex());
-		val = index.data().toDouble(&bOK);
-		if(bOK) m_MassPosition[i].x=val/pMainFrame->m_mtoUnit;
-
-		index = m_pMassModel->index(i, 2, QModelIndex());
-		val = index.data().toDouble(&bOK);
-		if(bOK) m_MassPosition[i].y=val/pMainFrame->m_mtoUnit;
-
-		index = m_pMassModel->index(i, 3, QModelIndex());
-		val = index.data().toDouble(&bOK);
-		if(bOK) m_MassPosition[i].z=val/pMainFrame->m_mtoUnit;
-
-		index = m_pMassModel->index(i, 4, QModelIndex());
-		m_MassTag[i] = index.data().toString();
 	}
-	m_NMass = i;
-
 	m_VolumeMass = m_pctrlVolumeMass->Value() / pMainFrame->m_kgtoUnit;
 }
 
@@ -775,6 +838,11 @@ void InertiaDlg::resizeEvent(QResizeEvent *event)
 
 void InertiaDlg::SetupLayout()
 {
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strMass, strLength;
+	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+
 	QSizePolicy szPolicyExpanding;
 	szPolicyExpanding.setHorizontalPolicy(QSizePolicy::Expanding);
 	szPolicyExpanding.setVerticalPolicy(QSizePolicy::Expanding);
@@ -923,20 +991,51 @@ void InertiaDlg::SetupLayout()
 	m_pctrlTopStack->addWidget(ObjectSelectionBox);
 
 	//___________________Point Masses__________________________
-	QGroupBox *PointMassBox = new QGroupBox(tr("Additional Point Masses"));
-	QVBoxLayout *MassLayout = new QVBoxLayout;
+//	QGroupBox *PointMassBox = new QGroupBox(tr("Additional Point Masses"));
+	QLabel *PointMasses = new QLabel(tr("Additional Point Masses"));
+//	QVBoxLayout *MassLayout = new QVBoxLayout;
 	m_pctrlMassView = new QTableView(this);
 	m_pctrlMassView->setMinimumHeight(150);
 //	m_pctrlMassView->setMinimumWidth(350);
 //	m_pctrlMassView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlMassView->horizontalHeader()->setStretchLastSection(true);
-	MassLayout->addWidget(m_pctrlMassView);
-	PointMassBox->setLayout(MassLayout);
+//	MassLayout->addWidget(m_pctrlMassView);
+//	PointMassBox->setLayout(MassLayout);
 	m_pctrlMassView->setEditTriggers(QAbstractItemView::CurrentChanged |
-									 QAbstractItemView::DoubleClicked |
-									 QAbstractItemView::SelectedClicked |
-									 QAbstractItemView::EditKeyPressed |
-									 QAbstractItemView::AnyKeyPressed);
+							   QAbstractItemView::DoubleClicked |
+							   QAbstractItemView::EditKeyPressed |
+							   QAbstractItemView::AnyKeyPressed);
+
+	m_pMassModel = new QStandardItemModel;
+	m_pMassModel->setRowCount(10);//temporary
+	m_pMassModel->setColumnCount(5);
+
+	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
+	m_pMassModel->setHeaderData(0, Qt::Horizontal, tr("Mass") +" ("+strMass+")");
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	m_pMassModel->setHeaderData(1, Qt::Horizontal, tr("x") +" ("+strLength+")");
+	m_pMassModel->setHeaderData(2, Qt::Horizontal, tr("y")+" ("+strLength+")");
+	m_pMassModel->setHeaderData(3, Qt::Horizontal, tr("z")+" ("+strLength+")");
+	m_pMassModel->setHeaderData(4, Qt::Horizontal, tr("Description"));
+
+	m_pctrlMassView->setModel(m_pMassModel);
+	m_pctrlMassView->setColumnWidth(0,70);
+	m_pctrlMassView->setColumnWidth(1,55);
+	m_pctrlMassView->setColumnWidth(2,55);
+	m_pctrlMassView->setColumnWidth(3,55);
+	m_pctrlMassView->setColumnWidth(4,70);
+
+	m_pFloatDelegate = new FloatEditDelegate;
+	m_pctrlMassView->setItemDelegate(m_pFloatDelegate);
+	int  *precision = new int[5];
+	precision[0] = 3;
+	precision[1] = 3;
+	precision[2] = 3;
+	precision[3] = 3;
+	precision[4] = -1;// Not a number, will be detected as such by FloatEditDelegate
+	m_pFloatDelegate->SetPrecision(precision);
+
+	connect(m_pFloatDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	//________________Total Mass, Center of gravity, and inertias__________
 	QGroupBox *TotalMassBox = new QGroupBox(tr("Total Mass = Volume + point masses"));
@@ -1048,7 +1147,9 @@ void InertiaDlg::SetupLayout()
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlTopStack);
 	MainLayout->addStretch(1);
-	MainLayout->addWidget(PointMassBox);
+//	MainLayout->addWidget(PointMassBox);
+	MainLayout->addWidget(PointMasses);
+	MainLayout->addWidget(m_pctrlMassView);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(TotalMassBox);
 	MainLayout->addStretch(1);
@@ -1064,6 +1165,8 @@ void InertiaDlg::SetupLayout()
 	connect(CancelButton,        SIGNAL(clicked()), this, SLOT(reject()));
 	connect(ExportAVLButton,     SIGNAL(clicked()), this, SLOT(OnExportToAVL()));
 	connect(m_pctrlVolumeMass,   SIGNAL(editingFinished()), SLOT(OnCellChanged()));
+	connect(m_pInsertMassRow,   SIGNAL(triggered()), SLOT(OnInsertMassRow()));
+	connect(m_pDeleteMassRow,   SIGNAL(triggered()), SLOT(OnDeleteMassRow()));
 }
 
 

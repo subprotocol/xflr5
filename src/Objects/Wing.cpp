@@ -2160,7 +2160,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			m_XCPSpanAbs[m]    =  CPStrip/NForce ;
 
 			// add viscous properties, if required
-			if(pWPolar->m_bViscous) DragVector.x   = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
+			if(pWPolar->m_bViscous) DragVector.x = m_PCd[m] * m_StripArea[m];// N/q //TODO : orient along wind direction rather than x-axis
 			else                    DragVector.x = 0.0;
 			// global moments, in N.m/q
 			DragMoment =  LeverArmC4CoG * DragVector;

@@ -18,7 +18,8 @@
 
 
 xflr5 v6.05 beta, May xxxth, 2011
-	-
+	- Minor corrections and improvements
+	- Added the japanese translation to the repository - thanks to Koichi
 
 
 xflr5 v6.04 beta, May 14th, 2011

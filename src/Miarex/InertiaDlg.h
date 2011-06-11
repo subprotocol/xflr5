@@ -58,14 +58,18 @@ private slots:
 	void OnFinInertia();
 	void OnCellChanged(QWidget *pWidget=NULL);
 	void OnExportToAVL();
+	void OnInsertMassRow();
+	void OnDeleteMassRow();
 
 private:
+	void contextMenuEvent(QContextMenuEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 	void resizeEvent(QResizeEvent *event);
 	void showEvent(QShowEvent *event);
 	void FillMassModel();
 	void ComputeInertia();
 //	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
+	void CleanEmptyRows();
 	void ComputeBodyAxisInertia();
 	void SetupLayout();
 	void ReadData();
@@ -91,6 +95,9 @@ private:
 	FloatEdit *m_pctrlTotalIxx, *m_pctrlTotalIyy, *m_pctrlTotalIzz, *m_pctrlTotalIxz;
 	FloatEdit *m_pctrlXTotalCoG,*m_pctrlYTotalCoG,*m_pctrlZTotalCoG;
 	FloatEdit *m_pctrlTotalMass;
+
+	QMenu *m_pContextMenu;
+	QAction *m_pInsertMassRow, *m_pDeleteMassRow;
 
 	double m_VolumeMass;
 	CVector m_VolumeCoG;

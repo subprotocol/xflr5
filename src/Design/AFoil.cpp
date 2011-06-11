@@ -2501,7 +2501,7 @@ void QAFoil::PaintLegend(QPainter &painter)
 	{
 		CFoil* pRefFoil;
 		QString strong;
-		QPoint Place(m_rCltRect.right()-350, 20);
+		QPoint Place(m_rCltRect.right()-250, 10);
 		int LegendSize, ypos, x1, n, k, delta;
 
 		LegendSize = 20;

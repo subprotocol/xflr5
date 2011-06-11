@@ -58,6 +58,20 @@ void ManageUFOsDlg::InitDialog(QString &UFOName)
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QString strong;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strArea, strLength;
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+	GetAreaUnit(strArea, pMainFrame->m_AreaUnit);
+	m_pUFOModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
+	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Span")+" ("+strLength+")");
+	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("Area")+" ("+strArea+")");
+	m_pUFOModel->setHeaderData(3, Qt::Horizontal, tr("M.A.C.")+" ("+strLength+")");
+	m_pUFOModel->setHeaderData(4, Qt::Horizontal, tr("AR"));
+	m_pUFOModel->setHeaderData(5, Qt::Horizontal, tr("TR"));
+	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8(" (°)");
+	m_pUFOModel->setHeaderData(6, Qt::Horizontal, str);
+	m_pUFOModel->setHeaderData(7, Qt::Horizontal, tr("Tail Volume"));
+
 
 	if(m_pUFOModel->rowCount())
 	{
@@ -162,20 +176,6 @@ void ManageUFOsDlg::SetupLayout()
 	m_pUFOModel = new QStandardItemModel;
 	m_pUFOModel->setRowCount(10);//temporary
 	m_pUFOModel->setColumnCount(8);
-
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString strArea, strLength;
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
-	GetAreaUnit(strArea, pMainFrame->m_AreaUnit);
-	m_pUFOModel->setHeaderData(0, Qt::Horizontal, tr("Name"));
-	m_pUFOModel->setHeaderData(1, Qt::Horizontal, tr("Span")+" ("+strLength+")");
-	m_pUFOModel->setHeaderData(2, Qt::Horizontal, tr("Area")+" ("+strArea+")");
-	m_pUFOModel->setHeaderData(3, Qt::Horizontal, tr("M.A.C.")+" ("+strLength+")");
-	m_pUFOModel->setHeaderData(4, Qt::Horizontal, tr("AR"));
-	m_pUFOModel->setHeaderData(5, Qt::Horizontal, tr("TR"));
-	QString str = tr("Rt-Tip Sweep") +QString::fromUtf8(" (°)");
-	m_pUFOModel->setHeaderData(6, Qt::Horizontal, str);
-	m_pUFOModel->setHeaderData(7, Qt::Horizontal, tr("Tail Volume"));
 
 	m_pctrlUFOTable->setModel(m_pUFOModel);
 	m_pctrlUFOTable->setWindowTitle(tr("UFOs"));
