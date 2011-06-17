@@ -2223,6 +2223,7 @@ void QXDirect::OnCurveColor()
 	UpdateCurve();
 }
 
+
 void QXDirect::OnCurveStyle(int index)
 {
 	m_CurveStyle = index;
@@ -2230,15 +2231,13 @@ void QXDirect::OnCurveStyle(int index)
 	UpdateCurve();
 }
 
+
 void QXDirect::OnCurveWidth(int index)
 {
 	m_CurveWidth = index+1;
 	FillComboBoxes();
 	UpdateCurve();
 }
-
-
-
 
 
 void QXDirect::OnDefinePolar()

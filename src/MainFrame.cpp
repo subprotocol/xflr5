@@ -868,6 +868,7 @@ void MainFrame::CreateDockWindows()
 	ManageBodiesDlg::s_pMainFrame  = this;
 	PanelAnalysisDlg::s_pMainFrame = this;
 	WingScaleDlg::s_pMainFrame     = this;
+	FoilPolarDlg::s_pMainFrame     = this;
 
 	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

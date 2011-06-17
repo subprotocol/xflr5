@@ -44,8 +44,10 @@ public:
 	void InitDialog();
 	void SetPlrName();
 	void SetupLayout();
+	void SetDensity();
 
 	static void *s_pXDirect;
+	static void *s_pMainFrame;
 
 	QRadioButton *m_pctrlAuto1;
 	QRadioButton *m_pctrlAuto2;
@@ -62,6 +64,13 @@ public:
 	FloatEdit *m_pctrlReynolds;
 	FloatEdit *m_pctrlMach;
 
+	FloatEdit *m_pctrlChord, *m_pctrlMass, *m_pctrlSpan;
+	QLabel *m_pctrlLengthUnit1, *m_pctrlLengthUnit2, *m_pctrlMassUnit;
+
+	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
+	QLabel *m_pctrlRho, *m_pctrlNu, *m_pctrlViscosityUnit, *m_pctrlDensityUnit;
+	FloatEdit *m_pctrlDensity, *m_pctrlViscosity;
+
 	QPushButton *OKButton;
 	QPushButton *CancelButton;
 
@@ -70,9 +79,12 @@ public:
 	FloatEdit *m_pctrlBotTrans;
 
 	bool  m_bAutoName;
-	int   m_Type;
-	int   m_MaTypDef, m_ReTypDef;
+	int m_Type;
+	int m_MaTypDef, m_ReTypDef;
+	int m_UnitType;
 	double m_Reynolds;
+	double m_Viscosity, m_Density;
+	double m_Chord, m_Span, m_Mass;
 	double m_Mach;
 	double m_ReDef;
 	double m_ASpec;
@@ -87,7 +99,8 @@ public slots:
 	void OnPolarType();
 	void OnNameChanged();
 	void EditingFinished();
-
+	void OnUnit();
+	void OnEditingFinished();
 };
 
 #endif // FOILPOLARDLG_H

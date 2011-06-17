@@ -763,12 +763,12 @@ void WPolarDlg::SetupLayout()
 		m_pctrlUnit1 = new QRadioButton(tr("International"));
 		m_pctrlUnit2 = new QRadioButton(tr("Imperial"));
 		m_pctrlRho = new QLabel("r =");
-		m_pctrlDensity = new FloatEdit(1.500e-5,3);
+		m_pctrlDensity = new FloatEdit(1.225,3);
 		m_pctrlDensityUnit = new QLabel("kg/m3");
 		m_pctrlNu = new QLabel("n =");
 		m_pctrlRho->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 		m_pctrlNu->setAlignment(Qt::AlignRight | Qt::AlignCenter);
-		m_pctrlViscosity = new FloatEdit(1.225,3);
+		m_pctrlViscosity = new FloatEdit(1.500e-5,3);
 		m_pctrlViscosityUnit = new QLabel("m2/s");
 		m_pctrlRho->setFont(SymbolFont);
 		m_pctrlNu->setFont(SymbolFont);

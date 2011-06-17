@@ -2307,7 +2307,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dD = fm.height();//pixels
 
-// Write wing data
+	// Write wing data
 
 	total = 12;
 	if(pWPolar) total +=2;
@@ -2324,7 +2324,8 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
                 //pMiarex->m_GLList++;
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
-                glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+
 		if(pWing)
 		{
 			GetLengthUnit(length,pMainFrame->m_LengthUnit);
@@ -2362,8 +2363,8 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 			pGLWidget->renderText(LeftPos, ZPos, Result+length, pMainFrame->m_TextFont);
 
 			ZPos +=dD;
-			double Area = pWing->m_ProjectedArea;
-			if(pPlane && pPlane->BiPlane()) Area+=pPlane->Wing2()->m_ProjectedArea;
+			double Area = pWing->m_PlanformArea;
+			if(pPlane && pPlane->BiPlane()) Area+=pPlane->Wing2()->m_PlanformArea;
 			str1 = QString(QObject::tr("Wing Area      = %1 ")).arg(Area * pMainFrame->m_m2toUnit, a,'f',b);
 			str1 +=surface;
 			pGLWidget->renderText(LeftPos, ZPos, str1, pMainFrame->m_TextFont);

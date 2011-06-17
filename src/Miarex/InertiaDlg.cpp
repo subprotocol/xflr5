@@ -31,7 +31,7 @@
 #include <QTextStream>
 #include <QFileDialog>
 
-#define MAXMASSES 5
+
 
 void *InertiaDlg::s_pMainFrame;
 
