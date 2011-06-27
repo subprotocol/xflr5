@@ -181,6 +181,7 @@ void StabViewDlg::FillEigenThings()
 		strange = QString("Xi=%1").arg(Dsi,6,'f',3);
 		ModeDescription.append(strange+"\n");
 
+
 		if(pMiarex->m_bLongitudinal && pMiarex->m_pCurWOpp)
 		{
 			angle = pMiarex->m_pCurWOpp->m_EigenVector[m_iCurrentMode][3];

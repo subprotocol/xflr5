@@ -2951,6 +2951,7 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 	str=("                    _____________________________________________________________________________________________________\n");
 	AddString(str);
 
+	i=0;
 	str = QString("      Eigenvector: %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
 			  .arg(m_vLong[i].real(),    9, 'g', 4).arg(m_vLong[i].imag(),    9, 'g', 4)
 			  .arg(m_vLong[i+4].real(),  9, 'g', 4).arg(m_vLong[i+4].imag(),  9, 'g', 4)
@@ -3002,6 +3003,7 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 	str=("                    _____________________________________________________________________________________________________\n");
 	AddString(str);
 
+	i=0;
 	str = QString("      Eigenvector: %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
 			  .arg(m_vLat[i].real(),    9, 'g', 4).arg(m_vLat[i].imag(),    9, 'g', 4)
 			  .arg(m_vLat[i+4].real(),  9, 'g', 4).arg(m_vLat[i+4].imag(),  9, 'g', 4)
