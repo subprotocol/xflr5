@@ -106,6 +106,8 @@ void GraphDlg::Connect()
 
 void GraphDlg::FillVariableList()
 {
+	m_pctrlXSel->clear();
+	m_pctrlYSel->clear();
 	if(m_iGraphType == 31)
 	{
 		m_pctrlXSel->addItem(tr("X - Chord"));

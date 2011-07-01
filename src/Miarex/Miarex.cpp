@@ -2850,8 +2850,8 @@ void QMiarex::CreateWPolarCurves()
 		   ((m_bType1 && pWPolar->m_Type == FIXEDSPEEDPOLAR) ||
 			(m_bType2 && pWPolar->m_Type == FIXEDLIFTPOLAR) ||
 			(m_bType4 && pWPolar->m_Type == FIXEDAOAPOLAR) ||
-		    (m_bType5 && pWPolar->m_Type == 5) ||
-		    (m_bType6 && pWPolar->m_Type == 6) ||
+			(m_bType5 && pWPolar->m_Type == 5) ||
+			(m_bType6 && pWPolar->m_Type == 6) ||
 			(m_bType7 && pWPolar->m_Type == STABILITYPOLAR)))
 		{
 
@@ -2942,10 +2942,10 @@ void QMiarex::CreateStabTimeCurves()
 	if(m_StabilityResponseType==0)
 	{
 		//start with the user input initial conditions
-		in[0] = complex<double>(m_TimeInput[0], 0.0);
-		in[1] = complex<double>(m_TimeInput[1], 0.0);
-		in[2] = complex<double>(m_TimeInput[2], 0.0);
-		in[3] = complex<double>(m_TimeInput[3], 0.0);
+		in[0] = complex<double>(m_TimeInput[0]*PI/180.0, 0.0);
+		in[1] = complex<double>(m_TimeInput[1]*PI/180.0, 0.0);
+		in[2] = complex<double>(m_TimeInput[2]*PI/180.0, 0.0);
+		in[3] = complex<double>(m_TimeInput[3]*PI/180.0, 0.0);
 	}
 	else if(m_StabilityResponseType==2)
 	{
@@ -2992,8 +2992,9 @@ void QMiarex::CreateStabTimeCurves()
 			if(abs(q[0])>1.e10 || abs(q[1])>1.e10 || abs(q[2])>1.e10  || abs(q[3])>1.e10 ) break;
 
 			pCurve0->AddPoint(t, y[0].real());
-			pCurve1->AddPoint(t, y[1].real());
-			pCurve2->AddPoint(t, y[2].real());
+			if(m_bLongitudinal) pCurve1->AddPoint(t, y[1].real());
+			else                pCurve1->AddPoint(t, y[1].real()*180.0/PI);
+			pCurve2->AddPoint(t, y[2].real()*180.0/PI);
 			pCurve3->AddPoint(t, y[3].real()*180.0/PI);
 		}
 	}

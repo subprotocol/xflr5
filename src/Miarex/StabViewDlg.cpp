@@ -879,7 +879,7 @@ void StabViewDlg::SetControls()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-	QString str;
+	QString str, strong;
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 
 	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
@@ -911,6 +911,7 @@ void StabViewDlg::SetControls()
 	}
 	SetMode(m_iCurrentMode);
 
+	strong = QString::fromUtf8("°/s");
 	if(pMiarex->m_bLongitudinal)
 	{
 		m_pctrlStabLabel1->setText(tr("u0="));
@@ -918,7 +919,7 @@ void StabViewDlg::SetControls()
 		m_pctrlStabLabel3->setText(tr("q0="));
 		m_pctrlUnit1->setText(str);
 		m_pctrlUnit2->setText(str);
-		m_pctrlUnit3->setText("rad/s");
+		m_pctrlUnit3->setText(strong);
 	}
 	else
 	{
@@ -926,8 +927,8 @@ void StabViewDlg::SetControls()
 		m_pctrlStabLabel2->setText(tr("p0="));
 		m_pctrlStabLabel3->setText(tr("r0="));
 		m_pctrlUnit1->setText(str);
-		m_pctrlUnit2->setText("rad/s");
-		m_pctrlUnit3->setText("rad/s");
+		m_pctrlUnit2->setText(strong);
+		m_pctrlUnit3->setText(strong);
 	}
 
 	m_pctrlStabVar1->SetValue(pMiarex->m_TimeInput[0]);
