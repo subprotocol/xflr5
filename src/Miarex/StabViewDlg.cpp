@@ -274,8 +274,8 @@ void StabViewDlg::keyPressEvent(QKeyEvent *event)
 		}
 		default:
 		{
-//			QMiarex * pMiarex = (QMiarex*)s_pMiarex;
-//			pMiarex->keyPressEvent(event);
+			QMiarex * pMiarex = (QMiarex*)s_pMiarex;
+			pMiarex->keyPressEvent(event);
 		}
 //		event->ignore();
 	}

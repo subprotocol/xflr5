@@ -6580,7 +6580,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		m_bXTop         = pSettings->value("bXTop", false).toBool();
 		m_bXBot         = pSettings->value("bXBot", false).toBool();
 		m_bXCP          = pSettings->value("bXCP", false).toBool();
-		m_bPanelForce = pSettings->value("bPanelForce", false).toBool();
+		m_bPanelForce   = pSettings->value("bPanelForce", false).toBool();
 		m_bXCmRef       = pSettings->value("bXCmRef").toBool();
 		m_bICd          = pSettings->value("bICd", true).toBool();
 		m_bVCd          = pSettings->value("bVCd", true).toBool();
@@ -6785,6 +6785,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		}
 		pStabView->UpdateControlModelData();
 	}
+
 	pSettings->endGroup();
 
 	m_GL3dBody.LoadSettings(pSettings);
@@ -12776,7 +12777,6 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 //		pSettings->setValue("ForcedResponse", m_bForcedResponse);
 		pSettings->setValue("StabCurveType",m_StabilityResponseType);
 		
-
 		pSettings->setValue("StabTimeView", m_iStabTimeView);
 		if(m_pCurTimeGraph == m_TimeGraph)        k=1;
 		else if(m_pCurTimeGraph == m_TimeGraph+1) k=2;

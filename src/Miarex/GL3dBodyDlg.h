@@ -155,9 +155,10 @@ private:
 	bool LoadSettings(QSettings *pSettings);
 	bool SaveSettings(QSettings *pSettings);
 
-	void TakePicture();
+	void ResizeTables();
 	void SetPicture();
 	void StorePicture();
+	void TakePicture();
 
 
 private:

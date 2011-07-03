@@ -87,7 +87,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 {
 	bool bInserted = false;
 	int i,j,l;
-	int size = (int)m_Alpha.size();
+	int size = m_Alpha.size();
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CWOpp *pWOpp = &pPOpp->m_PlaneWOpp[0];
 	if(size)
@@ -341,18 +341,15 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Oswald.insert(i, 0.0);
 					m_SM.insert(i, 0.0);
 
-					if(m_Type==7)
-					{
-						//make room
-						for(l=0; l<8; l++)
-							for(j=m_Alpha.size(); j>i; j--)
-							{
-								m_EigenValue[l][j] = m_EigenValue[l][j-1];
-							}
+					//make room
+					for(l=0; l<8; l++)
+						for(j=m_Alpha.size(); j>i; j--)
+						{
+							m_EigenValue[l][j] = m_EigenValue[l][j-1];
+						}
 
-						//store the eigenthings
-						for(l=0; l<8; l++)	m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
-					}
+					//store the eigenthings
+					for(l=0; l<8; l++)	m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
 
 					bInserted = true;
 					break;
@@ -418,7 +415,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_Oswald.append(0.0);
 		m_SM.append(0.0);
 
-		if(m_Type==7)
+		if(m_Type==STABILITYPOLAR)
 		{
 			//store the eigenthings
 			for (l=0; l<8; l++) m_EigenValue[l][size] = pWOpp->m_EigenValue[l];
@@ -433,7 +430,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	bool bInserted = false;
 	int l;
 	int i=0;
-	int size = (int)m_Alpha.size();
+	int size = m_Alpha.size();
 	if(size)
 	{
 		for (i=0; i<size; i++)
@@ -633,14 +630,13 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
 
-					if(m_Type==7)
+
+					//store the eigenthings
+					for(l=0; l<8; l++)
 					{
-						//store the eigenthings
-						for(l=0; l<8; l++)
-						{
-							m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
-						}
+						m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
 					}
+
 					bInserted = true;
 					break;
 				}
@@ -693,17 +689,14 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Oswald.insert(i, 0.0);
 					m_SM.insert(i, 0.0);
 					
-					if(m_Type==7)
+					//make room
+					for(l=0; l<8; l++)
+						for(int j=m_Alpha.size(); j>i; j--)
+							m_EigenValue[l][j] = m_EigenValue[l][j-1];
+					//store the eigenthings
+					for(l=0; l<8; l++)
 					{
-						//make room
-						for(l=0; l<8; l++)
-							for(int j=m_Alpha.size(); j>i; j--)
-								m_EigenValue[l][j] = m_EigenValue[l][j-1];
-						//store the eigenthings
-						for(l=0; l<8; l++)
-						{
-							m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
-						}
+						m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
 					}
 
 					bInserted = true;
@@ -763,7 +756,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_Oswald.append(0.0);
 		m_SM.append(0.0);
 
-		if(m_Type==7)
+		if(m_Type==STABILITYPOLAR)
 		{
 			int size = m_Alpha.size();
 			if(size>=MAXPOLARPOINTS) return;
@@ -783,7 +776,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 {
 	bool bInserted = false;
 	int i;
-	int size = (int)m_Alpha.size();
+	int size = m_Alpha.size();
 
 	if(size)
 	{
@@ -1034,11 +1027,11 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	m_bThinSurfaces = pWPolar->m_bThinSurfaces;
 	m_nControls     = pWPolar->m_nControls;
 
-	int size  = (int)m_Alpha.size();
+	int size  = m_Alpha.size();
 	for(i=size-1; i>=0; i--)
 		Remove(i);
 
-	size  = (int)pWPolar->m_Alpha.size();
+	size  = pWPolar->m_Alpha.size();
 
 	for(i=0; i<size; i++)
 	{
@@ -1517,8 +1510,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar << m_RefAreaType;
 
-		ar <<(int)m_Alpha.size();
-		for (i=0; i< (int)m_Alpha.size(); i++)
+		ar <<m_Alpha.size();
+		for (i=0; i< m_Alpha.size(); i++)
 		{
 			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
 

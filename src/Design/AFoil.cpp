@@ -3021,9 +3021,9 @@ void QAFoil::SetupLayout()
 	m_pctrlFoilTable->setItemDelegate(m_pFoilDelegate);
 	m_pFoilDelegate->m_pFoilModel = m_pFoilModel;
 
-	int unitwidth = (int)(750.0/16.0);
+/*	int unitwidth = (int)(750.0/16.0);
 	m_pctrlFoilTable->setColumnWidth(0, 3*unitwidth);
-	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);
+	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);*/
 	m_pctrlFoilTable->setColumnHidden(9, true);
 	m_pctrlFoilTable->setColumnHidden(10, true);
 	m_pctrlFoilTable->setColumnHidden(11, true);
@@ -3208,9 +3208,9 @@ void QAFoil::wheelEvent(QWheelEvent *event)
 	else m_fScaleY *= ZoomFactor;
 
 
-	int a = (int)((m_rCltRect.right() + m_rCltRect.left()  )/2);
+	int a = (int)((m_rCltRect.right() + m_rCltRect.left())/2);
 	m_ptOffset.rx() = a + (int)((m_ptOffset.x()-a)*m_fScale/scale);
-	m_ViewportTrans.rx() = (int)((m_ViewportTrans.x())*m_fScale           /scale);
+	m_ViewportTrans.rx() = (int)((m_ViewportTrans.x())*m_fScale /scale);
 	m_ViewportTrans.ry() = (int)((m_ViewportTrans.y())*m_fScale /scale);
 
 	UpdateView();
@@ -3222,7 +3222,7 @@ void QAFoil::OnColumnWidths()
 {
 	int unitwidth = (int)((double)m_pctrlFoilTable->width()/16.0);
 	m_pctrlFoilTable->setColumnWidth(0, 3*unitwidth);
-	for(int i=1; i<16; i++)		m_pctrlFoilTable->setColumnWidth(i, unitwidth);
+	for(int i=1; i<16; i++) m_pctrlFoilTable->setColumnWidth(i, unitwidth);
 	m_pctrlFoilTable->setColumnHidden(9, true);
 	m_pctrlFoilTable->setColumnHidden(10, true);
 	m_pctrlFoilTable->setColumnHidden(11, true);
@@ -3293,6 +3293,19 @@ void QAFoil::OnClearBackImage()
 	UpdateView();
 }
 
+
+void QAFoil::resizeEvent(QResizeEvent *event)
+{
+	int ncol = m_pctrlFoilTable->horizontalHeader()->count() - m_pctrlFoilTable->horizontalHeader()->hiddenSectionCount();
+	//add 1 to get double width for the name
+	ncol++;
+
+	//get column width and spare 10% for horizontal header
+	int unitwidth = (int)((double)(m_pctrlFoilTable->width())/(double)ncol/1.1);
+
+	m_pctrlFoilTable->setColumnWidth(0, 2*unitwidth);
+	for(int i=1; i<16; i++)	m_pctrlFoilTable->setColumnWidth(i, unitwidth);
+}
 
 
 

@@ -58,8 +58,8 @@
 void* GL3dBodyDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dBodyDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dBodyDlg::s_pGLLightDlg;
-QPoint GL3dBodyDlg::s_WindowPos=QPoint(0,0);
-QSize  GL3dBodyDlg::s_WindowSize=QSize(700, 500);
+QPoint GL3dBodyDlg::s_WindowPos=QPoint(20,20);
+QSize  GL3dBodyDlg::s_WindowSize=QSize(900, 700);
 #ifdef Q_WS_MAC
 bool GL3dBodyDlg::s_bWindowMaximized=true;
 #else
@@ -3094,8 +3094,8 @@ void GL3dBodyDlg::GLToClient(CVector const &real, QPoint &point)
 	double w = (double)m_pglWidget->geometry().width();
 	double scale;
 
-	if(w>=h) scale = (double)m_pglWidget->geometry().width()  / 2.0;
-	else     scale = (double)m_pglWidget->geometry().height() / 2.0;
+	if(w>=h) scale = (double)m_pglWidget->geometry().width()  /2.0;
+	else     scale = (double)m_pglWidget->geometry().height() /2.0;
 
 //	point.rx() =  (int)(scale *(1.0 + real.x));
 	point.rx() = (int)(w/2.0 + real.x*scale);
@@ -3248,6 +3248,8 @@ bool GL3dBodyDlg::LoadSettings(QSettings *pSettings)
 		m_BodyGridDlg.m_MinorUnit2 = pSettings->value("MinorUnit2").toDouble();
 		m_BodyGridDlg.m_bScale     = pSettings->value("bScale").toBool();
 
+		s_WindowPos =  pSettings->value("BodyWindowPos", QPoint(20,20)).toPoint();
+		s_WindowSize = pSettings->value("BodyWindowSize", QSize(900,700)).toSize();
 	}
 	pSettings->endGroup();
 	return true;
@@ -4351,14 +4353,7 @@ void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 	m_bResetglBody2D = true;
 	SetBodyScale();
 
-	int w4 = (int)(m_pctrlFrameTable->width()/4);
-	m_pctrlFrameTable->setColumnWidth(0,w4);
-	m_pctrlFrameTable->setColumnWidth(1,w4);
-	m_pctrlFrameTable->setColumnWidth(2,w4);
-	w4 = (int)(m_pctrlPointTable->width()/4);
-	m_pctrlPointTable->setColumnWidth(0,w4);
-	m_pctrlPointTable->setColumnWidth(1,w4);
-	m_pctrlPointTable->setColumnWidth(2,w4);
+	ResizeTables();
 }
 
 
@@ -4387,6 +4382,9 @@ bool GL3dBodyDlg::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("Unit2", m_BodyGridDlg.m_Unit2);
 		pSettings->setValue("MinorUnit2", m_BodyGridDlg.m_MinorUnit2);
 		pSettings->setValue("bScale", m_BodyGridDlg.m_bScale);
+
+		pSettings->setValue("BodyWindowPos",s_WindowPos);
+		pSettings->setValue("BodyWindowSize",s_WindowSize);
 
 	}
 	pSettings->endGroup();
@@ -5092,8 +5090,22 @@ void GL3dBodyDlg::showEvent(QShowEvent *event)
 	m_bIs3DScaleSet = false;
 	SetBodyScale();
 
+	ResizeTables();
 
 	UpdateView();
+}
+
+
+void GL3dBodyDlg::ResizeTables()
+{
+	int ColumnWidth = (int)((double)(m_pctrlFrameTable->width())/3.25);
+	m_pctrlFrameTable->setColumnWidth(0,ColumnWidth);
+	m_pctrlFrameTable->setColumnWidth(1,ColumnWidth);
+//	m_pctrlFrameTable->setColumnWidth(2,ColumnWidth);
+	ColumnWidth = (int)((double)(m_pctrlPointTable->width())/3.25);
+	m_pctrlPointTable->setColumnWidth(0,ColumnWidth);
+	m_pctrlPointTable->setColumnWidth(1,ColumnWidth);
+//	m_pctrlPointTable->setColumnWidth(2,ColumnWidth);
 }
 
 

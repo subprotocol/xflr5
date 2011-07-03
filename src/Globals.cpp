@@ -2783,11 +2783,11 @@ double GetInterpolation(double t, double *y, int m, double *a, double *b, double
 
 int Compare(complex<double> a, complex<double>b)
 {
-	if(a.real()>b.real())         return  1;
+	if(a.real()>b.real())       return  1;
 	else if (a.real()<b.real()) return -1;
 	else
 	{	//same real part
-		if(a.imag()>b.imag()) return  1;
+		if(a.imag()>b.imag())         return  1;
 		else if (a.imag()<b.imag())   return -1;
 		else return 0;
 	}
