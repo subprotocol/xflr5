@@ -32,7 +32,7 @@
 #include <QDateTime> 
 #include <QByteArray>
 #include <math.h>
-#include <QDebug>
+
 
 void ExpFormat(double &f, int &exp)
 {

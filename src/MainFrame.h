@@ -166,6 +166,8 @@ private:
 	void RemoveOpPoint(bool bCurrent);
 	void SetCurrentFoil(CFoil* pFoil);
 	void SaveSettings();
+	void SelectOpPoint(OpPoint *pOpp);
+	void SelectWOpp(double x);
 	void SetCentralWidget();
 	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
@@ -187,7 +189,6 @@ private:
 	bool SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFormat =6);
 	bool SerializeUFOProject(QDataStream &ar, int ProjectFormat=5);
 	bool DeleteFoil(CFoil *pFoil, bool bAsk=true);
-	bool SelectOpPoint(OpPoint *pOpp);
 
 	void AddFoil(CFoil *pFoil);
 	void RenameFoil(CFoil *pFoil);

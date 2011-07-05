@@ -4333,7 +4333,7 @@ CBody * QMiarex::GetBody(QString BodyName)
 
 
 
-CPOpp * QMiarex::GetPOpp(double Alpha)
+CPOpp * QMiarex::GetPOpp(double x)
 {
 	//
 	// returns a pointer to the WOpp corresponding to aoa Alpha,
@@ -4347,10 +4347,11 @@ CPOpp * QMiarex::GetPOpp(double Alpha)
 	for (i=0; i<m_poaPOpp->size(); i++)
 	{
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
-		if ((pPOpp->m_PlaneName == m_pCurPlane->PlaneName()) &&	(pPOpp->m_PlrName   == m_pCurWPolar->m_PlrName))
+		if ((pPOpp->m_PlaneName == m_pCurPlane->PlaneName()) && (pPOpp->m_PlrName == m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pPOpp->m_QInf - Alpha)<0.005)  return pPOpp;
-			else if(fabs(pPOpp->m_Alpha - Alpha)<0.005)	                      return pPOpp;
+			if     (m_pCurWPolar->m_Type<4 && fabs(pPOpp->m_Alpha - x)<0.005)               return pPOpp;
+			else if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR  && fabs(pPOpp->m_QInf - x)<0.005)  return pPOpp;
+			else if(m_pCurWPolar->m_Type==STABILITYPOLAR && fabs(pPOpp->m_Ctrl - x)<0.005)  return pPOpp;
 		}
 	}
 	return NULL;
@@ -4388,7 +4389,6 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 	{
 		if(m_iWPlrView==1)
 		{
-
 			return m_pCurWPlrGraph;
 		}
 		else if (m_iWPlrView==2)
@@ -4400,7 +4400,7 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 		else
 		{
 			for(int ig=0; ig<4; ig++)
-				if(m_WPlrGraph[ig].IsInDrawRect(pt)){return m_WPlrGraph+ig;}
+				if(m_WPlrGraph[ig].IsInDrawRect(pt)) {return m_WPlrGraph+ig;}
 		}
 	}
 	else if(m_iView==WSTABVIEW)
@@ -4430,7 +4430,6 @@ QGraph* QMiarex::GetGraph(QPoint &pt)
 		m_pCurGraph = &m_CpGraph;
 		return m_pCurGraph;
 	}
-
 	return NULL;
 }
 
@@ -4472,7 +4471,7 @@ CWing * QMiarex::GetWing(QString WingName)
 }
 
 
-CWOpp* QMiarex::GetWOpp(double Alpha)
+CWOpp* QMiarex::GetWOpp(double x)
 {
 	//
 	// returns a pointer to the WOpp corresponding to aoa Alpha,
@@ -4485,10 +4484,11 @@ CWOpp* QMiarex::GetWOpp(double Alpha)
 	for (i=0; i<m_poaWOpp->size(); i++)
 	{
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
-		if ((pWOpp->m_WingName == m_pCurWing->WingName()) &&(pWOpp->m_PlrName == m_pCurWPolar->m_PlrName))
+		if ((pWOpp->m_WingName==m_pCurWing->WingName()) &&(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type==4 && fabs(pWOpp->m_QInf - Alpha)<0.005) return pWOpp;
-			else if(fabs(pWOpp->m_Alpha - Alpha)<0.005)                      return pWOpp;
+			if(m_pCurWPolar->m_Type<4 && fabs(pWOpp->m_Alpha - x)<0.005)                   return pWOpp;
+			else if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR && fabs(pWOpp->m_QInf - x)<0.005)  return pWOpp;
+			else if(m_pCurWPolar->m_Type==STABILITYPOLAR && fabs(pWOpp->m_Ctrl - x)<0.005) return pWOpp;
 		}
 	}
 	return NULL;
@@ -6868,14 +6868,15 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	//
 	if(!hasFocus()) setFocus();
 	static CVector Real;
-	static QPoint Delta, point;
 	static bool bCtrl;
+	static QPoint Delta, point;
 	static double xu, yu, x1, y1, xmin, xmax, ymin, ymax;
 
 	Delta.setX(event->pos().x() - m_LastPoint.x());
 	Delta.setY(event->pos().y() - m_LastPoint.y());
 	point = event->pos();
 	m_pCurGraph = GetGraph(point);
+
 	bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
@@ -7047,6 +7048,11 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 
 		Set3DRotationCenter();
 		UpdateView();
+	}
+	else if (event->buttons() & Qt::RightButton)
+	{
+		QPoint point = event->pos();
+		m_pCurGraph = GetGraph(point);
 	}
 	else if (event->buttons() & Qt::LeftButton)
 	{
@@ -11583,6 +11589,7 @@ void QMiarex::OnWOpps()
 	}
 
 	m_pCurGraph = NULL;
+
 	m_iView=WOPPVIEW;
 
 	pMainFrame->SetCentralWidget();
@@ -11611,8 +11618,8 @@ void QMiarex::OnWPolars()
 	}
 
 	m_iView=WPOLARVIEW;
-	if(!m_pCurWPlrGraph)	m_pCurGraph = NULL;
-	else                    m_pCurGraph = m_pCurWPlrGraph;
+	if(!m_pCurWPlrGraph) m_pCurGraph = NULL;
+	else                 m_pCurGraph = m_pCurWPlrGraph;
 
 	pMainFrame->SetCentralWidget();
 
@@ -13775,7 +13782,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 
 
 
-bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
+bool QMiarex::SetPOpp(bool bCurrent, double x)
 {
 	// set the WOpp, if valid
 	// else set the current WOpp, if any
@@ -13785,10 +13792,9 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 
 	CPOpp *pPOpp = NULL;
 	if(bCurrent) pPOpp = m_pCurPOpp;
-	else         pPOpp = GetPOpp(Alpha);
+	else         pPOpp = GetPOpp(x);
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong;
-	double x;
 	bool bOK;
 
 	m_bResetglMesh   = true;
@@ -13847,13 +13853,10 @@ bool QMiarex::SetPOpp(bool bCurrent, double Alpha)
 		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
 
 		//select m_pCurPOpp in the listbox
-		if(m_pCurWPolar->m_Type != 4) strong = QString("%1").arg(m_pCurPOpp->m_Alpha, 8,'f',2);
-		else                          strong = QString("%1").arg(m_pCurPOpp->m_QInf,  8,'f',2);
-
-		int pos = pMainFrame->m_pctrlWOpp->findText(strong);
-
-		if(pos >=0) pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
-		else pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
+		if(m_pCurWPolar->m_Type < 4)                    pMainFrame->SelectWOpp(m_pCurPOpp->m_Alpha);
+		else if(m_pCurWPolar->m_Type == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurPOpp->m_QInf);
+		else if(m_pCurWPolar->m_Type == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurPOpp->m_Ctrl);
+		;
 
 		//if we have a type 7 polar, set the panels in the control's position
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
@@ -14680,7 +14683,7 @@ void QMiarex::SetWPlrLegendPos()
 }
 
 
-bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
+bool QMiarex::SetWOpp(bool bCurrent, double x)
 {
 	m_bResetglMesh   = true;
 	m_bResetglOpp    = true;
@@ -14707,7 +14710,8 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 	// else set the comboBox's first, if any
 	// else set it to NULL
 	QString strong;
-	if(m_pCurPlane)	  return SetPOpp(bCurrent, Alpha);
+	if(m_pCurPlane)	  return SetPOpp(bCurrent, x);
+
 	CWOpp *pWOpp = NULL;
 	if(bCurrent)
 	{
@@ -14718,8 +14722,7 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 			if(pWOpp->m_WingName != m_pCurWing->WingName() || pWOpp->m_PlrName!=m_pCurWPolar->m_PlrName) pWOpp=NULL;
 		}
 	}
-	else         pWOpp = GetWOpp(Alpha);
-
+	else pWOpp = GetWOpp(x);
 
 
 	if(!pWOpp)
@@ -14768,27 +14771,17 @@ bool QMiarex::SetWOpp(bool bCurrent, double Alpha)
 //		m_WakePanelFactor =		m_pCurWOpp->m_WakeFactor;
 
 		//select m_pCurWOpp in the listbox
-		if(m_pCurWPolar->m_Type != 4) strong = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
-		else                          strong = QString("%1").arg(m_pCurWOpp->m_QInf,8,'f',2);
-
-		int pos = pMainFrame->m_pctrlWOpp->findText(strong);
-		if(pos >=0)
-		{
-			pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
-		}
-		else
-		{
-			pMainFrame->m_pctrlWOpp->setCurrentIndex(0);
-		}
+		if(m_pCurWPolar->m_Type < 4)                    pMainFrame->SelectWOpp(m_pCurWOpp->m_Alpha);
+		else if(m_pCurWPolar->m_Type == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurWOpp->m_QInf);
+		else if(m_pCurWPolar->m_Type == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurWOpp->m_Ctrl);
 
 		//if we have a type 7 polar, set the panels in the control's position
-
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{
 			//set the controls
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
 			m_pPanelDlg->m_pPlane         = m_pCurPlane;
-			for(int iw=0; iw<4; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
+			for(int iw=0; iw<MAXWINGS; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
 			m_pPanelDlg->m_pBody          = m_pCurBody;
 			int  nCtrls;
 			QString strong;

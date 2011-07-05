@@ -148,7 +148,7 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_pRemovePoint      = new QAction(tr("Remove"), this);
 	m_pScaleBody        = new QAction(tr("Scale"), this);
 	m_pGrid             = new QAction(tr("Grid Setup"), this);
-	m_pResetScales      = new QAction(tr("Reset Scales"), this);
+	m_pResetScales      = new QAction(tr("Reset Scales")+("\t(R)"), this);
 	m_pShowCurFrameOnly = new QAction(tr("Show Current Frame Only"), this);
 	m_pShowCurFrameOnly->setCheckable(true);
 	m_pInertia          = new QAction(tr("Inertia..."), this);
@@ -3172,6 +3172,11 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 			else event->ignore();
 			break;
 		}
+		case Qt::Key_R:
+		{
+			OnResetScales();
+			break;
+		}
 		case Qt::Key_Y:
 		{
 			if(bCtrl)
@@ -3389,9 +3394,12 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 	}
 	else if (event->buttons() & Qt::MidButton)
 	{
-		//rotate
-		m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
-		UpdateView();
+		if(m_BodyRect.contains(point))
+		{
+			//rotate
+			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+			UpdateView();
+		}
 	}
 	else 
 	{
@@ -3451,12 +3459,15 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 	}
 	if (event->buttons() & Qt::MidButton)
 	{
-		m_bArcball = true;
-		m_ArcBall.Start(event->pos().x(), m_pglWidget->m_rCltRect.height()-event->pos().y());
-		m_bCrossPoint = true;
+		if(m_BodyRect.contains(point))
+		{
+			m_bArcball = true;
+			m_ArcBall.Start(event->pos().x(), m_pglWidget->m_rCltRect.height()-event->pos().y());
+			m_bCrossPoint = true;
 
-		Set3DRotationCenter();
-		UpdateView();
+			Set3DRotationCenter();
+			UpdateView();
+		}
 	}
 	else if (event->buttons() & Qt::LeftButton)
 	{
@@ -4136,6 +4147,7 @@ void GL3dBodyDlg::OnScaleBody()
 	}
 }
 
+
 void GL3dBodyDlg::OnSelChangeXDegree(int sel)
 {
 	if(!m_pBody) return;
@@ -4621,8 +4633,6 @@ void GL3dBodyDlg::SetBodyScale()
 	double length, height;
 	QPoint P1, P2;
 	CVector V1, V2;
-
-	QRect CltRect = m_pglWidget->geometry();
 
 	if(m_bIs3DScaleSet /*&& !m_bAutoScales*/) return;
 

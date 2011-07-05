@@ -287,6 +287,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QPoint ScreenPt = event->globalPos();
+	QPoint CltPt = event->pos();
 
 	switch(pMainFrame->m_iApp)
 	{
@@ -299,7 +300,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 				ScreenPt.ry() = pMiarex->m_LastPoint.y()+pMainFrame->pos().y()+geometry().y();
 			}
 
-			pMiarex->m_pCurGraph = pMiarex->GetGraph(ScreenPt);
+			pMiarex->m_pCurGraph = pMiarex->GetGraph(CltPt);
 			if(pMiarex->m_iView==WOPPVIEW)         pMainFrame->WOppCtxMenu->exec(ScreenPt);
 			else if (pMiarex->m_iView==WPOLARVIEW) pMainFrame->WPlrCtxMenu->exec(ScreenPt);
 			else if (pMiarex->m_iView==WCPVIEW)    pMainFrame->WCpCtxMenu->exec(ScreenPt);
@@ -313,7 +314,7 @@ void TwoDWidget::contextMenuEvent (QContextMenuEvent * event)
 		case XFOILANALYSIS:
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
-			pXDirect->m_pCurGraph = pXDirect->GetGraph(ScreenPt);
+			pXDirect->m_pCurGraph = pXDirect->GetGraph(CltPt);
 			if(pXDirect->m_bPolar) pMainFrame->OperPolarCtxMenu->exec(ScreenPt);
 			else                   pMainFrame->OperFoilCtxMenu->exec(ScreenPt);
 			break;

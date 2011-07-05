@@ -18,6 +18,7 @@
 
 
 xflr5 v6.05 beta, May xxxth, 2011
+	- For Type 7 polars, listed the contril value instead of the aoa in the top drop down box
 	- Minor corrections and improvements
 	- Added the japanese translation to the repository - thanks to Koichi
 	- Added a calculation form to determine Re.sqrt(Cl) for foil Type 2 polars

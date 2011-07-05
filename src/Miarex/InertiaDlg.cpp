@@ -1001,10 +1001,13 @@ void InertiaDlg::SetupLayout()
 	m_pctrlMassView->horizontalHeader()->setStretchLastSection(true);
 //	MassLayout->addWidget(m_pctrlMassView);
 //	PointMassBox->setLayout(MassLayout);
-	m_pctrlMassView->setEditTriggers(QAbstractItemView::CurrentChanged |
-							   QAbstractItemView::DoubleClicked |
-							   QAbstractItemView::EditKeyPressed |
+	m_pctrlMassView->setEditTriggers(
+							   QAbstractItemView::CurrentChanged |
+//							   QAbstractItemView::DoubleClicked |
+//							   QAbstractItemView::EditKeyPressed |
 							   QAbstractItemView::AnyKeyPressed);
+
+//	m_pctrlMassView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	m_pMassModel = new QStandardItemModel;
 	m_pMassModel->setRowCount(10);//temporary

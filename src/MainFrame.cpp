@@ -3532,7 +3532,6 @@ void MainFrame::OnExportCurGraph()
 	if(pos>0) type=2; else type=1;
 
 	pGraph->ExportToFile(XFile, type);
-
 }
 
 
@@ -4142,7 +4141,7 @@ void MainFrame::OnSelChangeWPolar(int i)
 
 	QString strong;
 //	int sel = m_pctrlWPolar->currentIndex();
-	if (i >=0) strong = m_pctrlWPolar->itemText(i);
+	if (i>=0) strong = m_pctrlWPolar->itemText(i);
 	m_iApp = MIAREX;
 	pMiarex->SetWPlr(false, strong);
 	pMiarex->SetWOpp(true);
@@ -4153,6 +4152,7 @@ void MainFrame::OnSelChangeWPolar(int i)
 
 void MainFrame::OnSelChangeWOpp(int i)
 {
+	QString strong;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->StopAnimate();
 
@@ -4166,9 +4166,7 @@ void MainFrame::OnSelChangeWOpp(int i)
 		return;
 	}
 
-	QString strong;
-
-	if (i >=0) strong = m_pctrlWOpp->itemText(i);
+	if (i>=0) strong = m_pctrlWOpp->itemText(i);
 	else
 	{
 		m_pctrlWOpp->setCurrentIndex(0);
@@ -4177,11 +4175,11 @@ void MainFrame::OnSelChangeWOpp(int i)
 	if(strong.length())
 	{
 		bool bOK;
-		double Alpha = strong.toDouble(&bOK);
+		double x = strong.toDouble(&bOK);
 		if(bOK)
 		{
 			m_iApp = MIAREX;
-			pMiarex->SetWOpp(false, Alpha);
+			pMiarex->SetWOpp(false, x);
 			pMiarex->UpdateView();
 		}
 		else
@@ -5054,13 +5052,13 @@ void MainFrame::SetCentralWidget()
 
 
 
-bool MainFrame::SelectOpPoint(OpPoint *pOpp)
+void MainFrame::SelectOpPoint(OpPoint *pOpp)
 {
 	//Selects pOpp in the combobox and returns true
 	//On error, selects the first and returns false
 	QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 	CPolar *pCurPlr    = pXDirect->m_pCurPolar;
-	if(!pOpp || !pCurPlr) return false;
+	if(!pOpp || !pCurPlr) return;
 
 	double alpha, Re;
 
@@ -5072,7 +5070,6 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 			if(fabs(alpha-pOpp->Alpha)<0.001)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
-				return true;
 			}
 		}
 		else
@@ -5081,13 +5078,49 @@ bool MainFrame::SelectOpPoint(OpPoint *pOpp)
 			if(fabs(Re-pOpp->Reynolds)<1.0)
 			{
 				m_pctrlOpPoint->setCurrentIndex(i);
-				return true;
 			}
 		}
 	}
-	return false;
 }
 
+
+
+void MainFrame::SelectWOpp(double x)
+{
+	//Selects pOpp in the combobox and returns true
+	//On error, selects the first and returns false
+	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	CWPolar *pCurWPlr    = pMiarex->m_pCurWPolar;
+	double alpha;
+
+	for(int i=0; i<m_pctrlWOpp->count(); i++)
+	{
+		if(pCurWPlr->m_Type <4)
+		{
+			alpha = m_pctrlWOpp->itemText(i).toDouble();
+			if(fabs(alpha-x)<0.001)
+			{
+				m_pctrlWOpp->setCurrentIndex(i);
+			}
+		}
+		else if(pCurWPlr->m_Type == FIXEDAOAPOLAR)
+		{
+			double QInf = m_pctrlWOpp->itemText(i).toDouble();
+			if(fabs(QInf-x)<1.0)
+			{
+				m_pctrlWOpp->setCurrentIndex(i);
+			}
+		}
+		else if(pCurWPlr->m_Type == STABILITYPOLAR)
+		{
+			double Ctrl = m_pctrlWOpp->itemText(i).toDouble();
+			if(fabs(Ctrl-x)<1.0)
+			{
+				m_pctrlWOpp->setCurrentIndex(i);
+			}
+		}
+	}
+}
 
 
 
@@ -6262,18 +6295,17 @@ void MainFrame::UpdateWOpps()
 	CWOpp *pWOpp;
 	CPOpp *pPOpp;
 	int i;
-	QString strong, str;
-        m_pctrlWOpp->clear();
+	QString str;
+	m_pctrlWOpp->clear();
 
 	CPlane  *pCurPlane   = pMiarex->m_pCurPlane;
 	CWing   *pCurWing    = pMiarex->m_pCurWing;
 	CWPolar *pCurWPlr    = pMiarex->m_pCurWPolar;
 
-	if (!pCurWing || !pCurWing->m_WingName.length() ||	!pCurWPlr || !pCurWPlr->m_PlrName.length())
+	if (!pCurWing || !pCurWing->m_WingName.length() || !pCurWPlr || !pCurWPlr->m_PlrName.length())
 	{
 		m_pctrlWOpp->setEnabled(false);
 		pMiarex->m_pCurWOpp = NULL;
-//		pMiarex->SetWOpp(true);
 		return;
 	}
 
@@ -6284,7 +6316,7 @@ void MainFrame::UpdateWOpps()
 		for (i=0; i<m_oaPOpp.size(); i++)
 		{
 			pPOpp = (CPOpp*)m_oaPOpp[i];
-			if (pPOpp->m_PlaneName == pCurPlane->PlaneName() &&	pPOpp->m_PlrName   == pCurWPlr->m_PlrName)
+			if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName   == pCurWPlr->m_PlrName)
 			{
 				size++;
 			}
@@ -6296,20 +6328,21 @@ void MainFrame::UpdateWOpps()
 			for (int i=0; i<m_oaPOpp.size(); i++)
 			{
 				pPOpp = (CPOpp*)m_oaPOpp[i];
-				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() &&
-					pPOpp->m_PlrName == pCurWPlr->m_PlrName)
+				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
-					if(pCurWPlr->m_Type != 4) str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else                      str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					if(pCurWPlr->m_Type <4)                   str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 
 					m_pctrlWOpp->addItem(str);
 				}
 			}
-//			Miarex.SetPOpp(true);
+
 			if(pMiarex->m_pCurPOpp)
 			{
-					if(pCurWPlr->m_Type != 4) str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else                      str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					if(pCurWPlr->m_Type<4)                    str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6322,7 +6355,6 @@ void MainFrame::UpdateWOpps()
 			// otherwise disable control
 			m_pctrlWOpp->setEnabled(false);
 			pMiarex->m_pCurPOpp = NULL;
-//			Miarex.SetPOpp(true);
 		}
 	}
 	else
@@ -6332,8 +6364,7 @@ void MainFrame::UpdateWOpps()
 		for (i=0; i<m_oaWOpp.size(); i++)
 		{
 			pWOpp = (CWOpp*)m_oaWOpp[i];
-			if (pWOpp->m_WingName == pCurWing->m_WingName &&
-				pWOpp->m_PlrName  == pCurWPlr->m_PlrName)
+			if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName  == pCurWPlr->m_PlrName)
 			{
 				size++;
 			}
@@ -6345,31 +6376,26 @@ void MainFrame::UpdateWOpps()
 			for (int i=0; i<m_oaWOpp.size(); i++)
 			{
 				pWOpp = (CWOpp*)m_oaWOpp[i];
-				if (pWOpp->m_WingName == pCurWing->m_WingName &&
-					pWOpp->m_PlrName == pCurWPlr->m_PlrName)
+				if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
 
-					if(pCurWPlr->m_Type != 4) str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-					else                      str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+					if(pCurWPlr->m_Type<4)                     str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+					else  if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+					else  if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 					m_pctrlWOpp->addItem(str);
 				}
 			}
-//			Miarex.SetWOpp(true);
+
 			if(pMiarex->m_pCurWOpp)
 			{
-				if(pCurWPlr->m_Type != 4) str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-				else                      str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+				if(pCurWPlr->m_Type<4)                    str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+				else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+				else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
-				if(pos >=0)
-				{
-					m_pctrlWOpp->setCurrentIndex(pos);
-				}
-				else
-				{
-					m_pctrlWOpp->setCurrentIndex(0);
-				}
+				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
+				else        m_pctrlWOpp->setCurrentIndex(0);
 			}
 			else
 			{

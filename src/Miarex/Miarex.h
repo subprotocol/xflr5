@@ -268,8 +268,8 @@ public:
 	CWPolar* AddWPolar(CWPolar* pWPolar);
 	CWPolar* GetWPolar(QString WPolarName);
 	CWing* AddWing(CWing *pWing);
-	CWOpp* GetWOpp(double Alpha);
-	CPOpp* GetPOpp(double Alpha);
+	CWOpp* GetWOpp(double x);
+	CPOpp* GetPOpp(double x);
 	CBody* AddBody(CBody *pBody);
 
 	CPlane * AddPlane(CPlane *pPlane);
@@ -355,8 +355,8 @@ public:
 	bool SetModBody(CBody *pModBody);
 	bool LoadSettings(QSettings *pSettings);
 	bool SaveSettings(QSettings *pSettings);
-	bool SetWOpp(bool bCurrent, double Alpha = 0.0);
-	bool SetPOpp(bool bCurrent, double Alpha = 0.0);
+	bool SetWOpp(bool bCurrent, double x = 0.0);
+	bool SetPOpp(bool bCurrent, double x = 0.0);
 
 
 	QString RenameUFO(QString UFOName);

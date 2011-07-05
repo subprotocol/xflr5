@@ -169,6 +169,8 @@ public:
 	void SetDefaults();
 	void SetGraphName(QString GraphName);
 	void GetGraphName(QString &GraphName);
+
+	QString GetGraphName();
 	
 	CCurve* GetCurve(int nIndex);
 	CCurve* GetCurve(QString CurveTitle);

@@ -61,7 +61,7 @@ bool FloatEdit::IsInBounds()
 
 
 
-void FloatEdit::focusOutEvent ( QFocusEvent * event )
+void FloatEdit::focusOutEvent (QFocusEvent *event)
 {
 	QString str;
 	double f = ReadValue();
@@ -82,7 +82,7 @@ void FloatEdit::focusOutEvent ( QFocusEvent * event )
 }
 
 
-void FloatEdit::focusInEvent(QFocusEvent * event)
+void FloatEdit::focusInEvent(QFocusEvent *event)
 {
 /*	QString str;
 	str = QString("%1").arg(m_Value,'g');

@@ -387,6 +387,10 @@ void Graph::GetGraphName(QString &GraphName)
 	GraphName = m_GraphName;
 }
 
+QString Graph::GetGraphName()
+{
+	return m_GraphName;
+}
 
 QColor Graph::GetTitleColor()
 {
