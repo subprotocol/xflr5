@@ -5114,7 +5114,7 @@ void MainFrame::SelectWOpp(double x)
 		else if(pCurWPlr->m_Type == STABILITYPOLAR)
 		{
 			double Ctrl = m_pctrlWOpp->itemText(i).toDouble();
-			if(fabs(Ctrl-x)<1.0)
+			if(fabs(Ctrl-x)<.001)
 			{
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
@@ -6333,7 +6333,6 @@ void MainFrame::UpdateWOpps()
 					if(pCurWPlr->m_Type <4)                   str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
 					else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
 					else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
-
 					m_pctrlWOpp->addItem(str);
 				}
 			}

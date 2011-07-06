@@ -230,6 +230,8 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			return false;
 		}
 
+		m_Ctrl = m_PlaneWOpp[0].m_Ctrl; //forgot to save the variable in the POpp serialization...
+
 		if(ArchiveFormat>=1005)
 		{
 			if(m_bWing[1])
