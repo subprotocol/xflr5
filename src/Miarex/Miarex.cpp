@@ -9256,7 +9256,7 @@ void QMiarex::OnExportCurWOpp()
 	if(!m_pCurWOpp)return ;// is there anything to export ?
 
 	int iStrip,j,k,l,p, coef;
-	int type;
+	int exporttype;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString filter;
 	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
@@ -9281,7 +9281,7 @@ void QMiarex::OnExportCurWOpp()
 	pos = FileName.lastIndexOf(".csv");
 	if (pos>0) pMainFrame->m_ExportFileType = 2;
 	else       pMainFrame->m_ExportFileType = 1;
-	type = pMainFrame->m_ExportFileType;
+	exporttype = pMainFrame->m_ExportFileType;
 
 
 	QFile XFile(FileName);
@@ -9290,7 +9290,7 @@ void QMiarex::OnExportCurWOpp()
 
 	QTextStream out(&XFile);
 
-	if(type==1) sep = ""; else sep=",";
+	if(exporttype==1) sep = ""; else sep=",";
 
 
 	out << pMainFrame->m_VersionName;
@@ -9326,7 +9326,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString("Cy    = "+sep+"%1\n").arg(m_pCurWOpp->m_CY,11, 'f', 6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
+	if(exporttype==1) strong = QString(tr("Cd    = %1     ICd   = %2     PCd   = %3\n"))
 		.arg(m_pCurWOpp->m_ICD+m_pCurWOpp->m_VCD,11, 'f', 6)
 		.arg(m_pCurWOpp->m_ICD,11, 'f', 6)
 		.arg(m_pCurWOpp->m_VCD,11, 'f', 6);
@@ -9341,15 +9341,15 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Cm   =")+sep+" %1\n").arg(m_pCurWOpp->m_GCm, 11,'g',6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("ICn   = %1     PCn   = %2 \n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
+	if(exporttype==1) strong = QString(tr("ICn   = %1     PCn   = %2 \n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	else        strong = QString(tr("ICn=, %1,PCn=, %2\n")).arg(m_pCurWOpp->m_IYm, 11, 'f', 6).arg(m_pCurWOpp->m_GYm, 11, 'f', 6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
+	if(exporttype==1) strong = QString(tr("XCP   = %1     YCP   = %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
 	else        strong = QString(tr("XCP=, %1, YCP=, %2 \n")).arg(m_pCurWOpp->m_XCP, 11, 'f', 6).arg(m_pCurWOpp->m_YCP, 11, 'f', 6);
 	out << strong;
 
-	if(type==1) strong = QString(tr("XNP   = %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
+	if(exporttype==1) strong = QString(tr("XNP   = %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
 	else        strong = QString(tr("XNP=, %1\n")).arg(m_pCurWOpp->m_XNP, 11, 'f', 6);
 	out << strong;
 
@@ -9360,7 +9360,7 @@ void QMiarex::OnExportCurWOpp()
 	if(m_pCurWPolar->m_Type==STABILITYPOLAR)
 	{
 		//export non dimensional stability derivatives
-		if(type==1) 
+		if(exporttype==1)
 		{
 //			complex<double> c, angle;
 			double u0 = m_pCurWOpp->m_QInf;
@@ -9391,11 +9391,11 @@ void QMiarex::OnExportCurWOpp()
 					  .arg(m_pCurWOpp->m_EigenVector[2][1].real()/u0, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[2][1].imag()/u0, 9, 'g', 4)
 					  .arg(m_pCurWOpp->m_EigenVector[3][1].real()/u0, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[3][1].imag()/u0, 9, 'g', 4);
 			out << strong;
-			strong = QString("     q/(2.u0.MAC): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
-					  .arg(m_pCurWOpp->m_EigenVector[0][2].real()/2/u0/mac, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[0][2].imag()/2/u0/mac, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[1][2].real()/2/u0/mac, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[1][2].imag()/2/u0/mac, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[2][2].real()/2/u0/mac, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[2][2].imag()/2/u0/mac, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[3][2].real()/2/u0/mac, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[3][2].imag()/2/u0/mac, 9, 'g', 4);
+			strong = QString("     q/(2.u0/MAC): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
+					  .arg(m_pCurWOpp->m_EigenVector[0][2].real()/(2.*u0/mac), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[0][2].imag()/(2.*u0/mac), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[1][2].real()/(2.*u0/mac), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[1][2].imag()/(2.*u0/mac), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[2][2].real()/(2.*u0/mac), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[2][2].imag()/(2.*u0/mac), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[3][2].real()/(2.*u0/mac), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[3][2].imag()/(2.*u0/mac), 9, 'g', 4);
 			out << strong;
 			strong = QString("       theta(rad): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
 					  .arg(1.0, 9, 'g', 4).arg(0.0, 9, 'g', 4)
@@ -9427,17 +9427,17 @@ void QMiarex::OnExportCurWOpp()
 					  .arg(m_pCurWOpp->m_EigenVector[6][0].real()/u0, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[6][0].imag()/u0, 9, 'g', 4)
 					  .arg(m_pCurWOpp->m_EigenVector[7][0].real()/u0, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[7][0].imag()/u0, 9, 'g', 4);
 			out << strong;
-			strong = QString("    p/(2.u0.Span): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
-					  .arg(m_pCurWOpp->m_EigenVector[4][1].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[4][1].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[5][1].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[5][1].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[6][1].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[6][1].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[7][1].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[7][1].imag()/2.0/u0/b, 9, 'g', 4);
+			strong = QString("    p/(2.u0/Span): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
+					  .arg(m_pCurWOpp->m_EigenVector[4][1].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[4][1].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[5][1].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[5][1].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[6][1].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[6][1].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[7][1].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[7][1].imag()/(2.0*u0/b), 9, 'g', 4);
 			out << strong;
-			strong = QString("    r/(2.u0.Span): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
-					  .arg(m_pCurWOpp->m_EigenVector[4][2].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[4][2].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[5][2].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[5][2].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[6][2].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[6][2].imag()/2.0/u0/b, 9, 'g', 4)
-					  .arg(m_pCurWOpp->m_EigenVector[7][2].real()/2.0/u0/b, 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[7][2].imag()/2.0/u0/b, 9, 'g', 4);
+			strong = QString("    r/(2.u0/Span): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
+					  .arg(m_pCurWOpp->m_EigenVector[4][2].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[4][2].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[5][2].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[5][2].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[6][2].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[6][2].imag()/(2.0*u0/b), 9, 'g', 4)
+					  .arg(m_pCurWOpp->m_EigenVector[7][2].real()/(2.0*u0/b), 9, 'g', 4).arg(m_pCurWOpp->m_EigenVector[7][2].imag()/(2.0*u0/b), 9, 'g', 4);
 			out << strong;
 			strong = QString("         phi(rad): %1+%2i   |   %3+%4i   |   %5+%6i   |   %7+%8i\n")
 					  .arg(1.0, 9, 'g', 4).arg(0.0, 9, 'g', 4)
@@ -9515,7 +9515,7 @@ void QMiarex::OnExportCurWOpp()
 				out << strong;
 			}
 			out << ("\n");
-			m_pWOpp[iw]->Export(out, type);
+			m_pWOpp[iw]->Export(out, exporttype);
 		}
 	}
 
@@ -9529,18 +9529,18 @@ void QMiarex::OnExportCurWOpp()
 		{
 			coef = 2;
 		}
-		if(type==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
-		else        out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
+		if(exporttype==1) out << tr(" Panel     CtrlPt.x        CtrlPt.y        CtrlPt.z             Cp\n");
+		else              out << tr("Panel,CtrlPt.x,CtrlPt.y,CtrlPt.z,Cp\n");
 
-		if(type==1) Format = "%1     %2     %3     %4     %5\n";
-		else        Format = "%1,%2,%3,%4,%5\n";
+		if(exporttype==1) Format = "%1     %2     %3     %4     %5\n";
+		else              Format = "%1,%2,%3,%4,%5\n";
 
 
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
 			if(m_pWingList[iw])
 			{
-				out << m_pWingList[iw]->m_WingName+ tr("Cp Coefficients\n");
+				out << m_pWingList[iw]->m_WingName+ tr("Cp Coefficients")+"\n";
 				p=0;
 				iStrip = 0;
 				for (j=0; j<m_pWingList[iw]->m_NSurfaces; j++)
@@ -13018,7 +13018,7 @@ void QMiarex::Set3DScale()
 	}
 	else if(m_pCurBody)
 	{
-		m_glScaled = (GLfloat)(3./4.*2.0*m_GLScale/m_pCurBody->GetLength());
+		m_glScaled = (GLfloat)(3./4.*2.0*m_GLScale/m_pCurBody->Length());
 		m_glViewportTrans.x = 0.0;
 		m_glViewportTrans.y = 0.0;
 		m_glViewportTrans.z = 0.0;

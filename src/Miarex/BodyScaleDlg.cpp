@@ -169,6 +169,11 @@ void BodyScaleDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			break;
+		}
 		default:
 			event->ignore();
 	}

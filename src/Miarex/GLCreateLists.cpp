@@ -830,8 +830,6 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 	else if(Vstyle == 4) 	VDash = 0x7E66;
 	else					VDash = 0xFFFF;
 
-
-
 	Ir = Icolor.redF();
 	Ig = Icolor.greenF();
 	Ib = Icolor.blueF();
@@ -849,11 +847,11 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 		glEnable (GL_LINE_STIPPLE);
 		glPolygonMode(GL_FRONT,GL_LINE);
 
-		double q0 = 0.5*pWPolar->m_Density * pWPolar->m_WArea*pWOpp->m_QInf*pWOpp->m_QInf;
+		double q0 = 0.5 * pWPolar->m_Density * pWPolar->m_WArea * pWOpp->m_QInf * pWOpp->m_QInf;
 
 		if(pWOpp)
 		{
-			if(pWOpp->m_AnalysisMethod==1)
+			if(pWOpp->m_AnalysisMethod==LLTMETHOD)
 			{
 				for (i=1; i<pWOpp->m_NStation; i++)
 				{
@@ -977,8 +975,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 							{
 								glVertex3d(C.x, C.y, C.z);
 								glVertex3d(C.x + amp1*cosa * cosb,
-										   C.y + amp1*cosa * sinb,
-										   C.z - amp1*sina);
+										 C.y + amp1*cosa * sinb,
+										 C.z - amp1*sina);
 							}
 							glEnd();
 						}
@@ -993,17 +991,17 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 								{
 									glVertex3d(C.x, C.y, C.z);
 									glVertex3d(C.x + amp2*cosa*cosb,
-											   C.y + amp2*cosa*sinb,
-											   C.z - amp2*sina);
+											 C.y + amp2*cosa*sinb,
+											 C.z - amp2*sina);
 								}
 								else
 								{
 									glVertex3d(C.x + amp1*cosa*cosb,
-											   C.y + amp1*cosa*sinb,
-											   C.z - amp1*sina);
+											 C.y + amp1*cosa*sinb,
+											 C.z - amp1*sina);
 									glVertex3d(C.x + (amp1+amp2)*cosa*cosb,
-											   C.y + (amp1+amp2)*cosa*sinb,
-											   C.z - (amp1+amp2)*sina);
+											 C.y + (amp1+amp2)*cosa*sinb,
+											 C.z - (amp1+amp2)*sina);
 								}
 							}
 							glEnd();
@@ -1030,8 +1028,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/pWing->m_MAChord;
 									amp *= pMiarex->m_DragScale/coef;
 									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
+											 C.y + amp*cosa*sinb,
+											 C.z - amp*sina);
 									i++;
 								}
 							}
@@ -1058,8 +1056,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 									amp *= pMiarex->m_DragScale/coef;
 
 									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
+											 C.y + amp*cosa*sinb,
+											 C.z - amp*sina);
 									i++;
 								}
 							}
@@ -1085,8 +1083,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 									amp = q0*(pWOpp->m_ICd[i])*pWOpp->m_Chord[i]/pWing->m_MAChord;
 									amp *= pMiarex->m_DragScale/coef;
 									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
+											 C.y + amp*cosa*sinb,
+											 C.z - amp*sina);
 									i++;
 								}
 							}
@@ -1113,8 +1111,8 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 									amp *= pMiarex->m_DragScale/coef;
 
 									glVertex3d(C.x + amp*cosa*cosb,
-											   C.y + amp*cosa*sinb,
-											   C.z - amp*sina);
+											 C.y + amp*cosa*sinb,
+											 C.z - amp*sina);
 									i++;
 								}
 							}

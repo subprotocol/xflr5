@@ -394,7 +394,7 @@ void CBody::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 		int NSections = 20;//why not ?
 		xpos = m_FramePosition[0].x;
 
-		dl = GetLength()/(double)(NSections-1);
+		dl = Length()/(double)(NSections-1);
 
 		for (j=0; j<NSections-1; j++)
 		{
@@ -710,11 +710,15 @@ CFrame * CBody::GetFrame(int iSelect)
 	return NULL;
 }
 
-double CBody::GetLength()
+double CBody::Length()
 {
 	return fabs(m_FramePosition[m_NStations-1].x - m_FramePosition[0].x);
 }
 
+CVector CBody::LeadingPoint()
+{
+	return m_FramePosition[0];
+}
 
 void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 {

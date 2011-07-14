@@ -34,7 +34,7 @@ BodyTransDlg::BodyTransDlg()
 	setWindowTitle(tr("Body Translation"));
 	m_XTrans = m_YTrans = m_ZTrans = 0.0;
 	m_bFrameOnly = false;
-	m_FrameID = 0;
+	m_FrameID = 1;
 
 	SetupLayout();
 }
@@ -51,7 +51,7 @@ void BodyTransDlg::InitDialog()
 	m_pctrlYTransFactor->setEnabled(false);
 
 	m_pctrlFrameOnly->setChecked(m_bFrameOnly);
-	m_pctrlFrameID->SetValue(m_FrameID);
+	m_pctrlFrameID->SetValue(m_FrameID+1);
 	m_pctrlFrameID->setEnabled(m_bFrameOnly);
 
 	QString length;
@@ -81,6 +81,11 @@ void BodyTransDlg::keyPressEvent(QKeyEvent *event)
 			}
 			break;
 		}
+		case Qt::Key_Escape:
+		{
+			reject();
+			break;
+		}
 		default:
 			event->ignore();
 	}
@@ -91,7 +96,7 @@ void BodyTransDlg::OnOK()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	m_bFrameOnly = m_pctrlFrameOnly->isChecked();
-	m_FrameID    = m_pctrlFrameID->Value();
+	m_FrameID    = m_pctrlFrameID->Value()-1;
 	m_XTrans     = m_pctrlXTransFactor->Value() / pMainFrame->m_mtoUnit;
 	m_YTrans     = m_pctrlYTransFactor->Value() / pMainFrame->m_mtoUnit;
 	m_ZTrans     = m_pctrlZTransFactor->Value() / pMainFrame->m_mtoUnit;

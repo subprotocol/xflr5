@@ -50,12 +50,14 @@ public:
 	int RemoveFrame(int n);
 	int ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit);
 
-	double GetLength();
+	double Length();
 	double Getu(double x);
 	double Getv(double u, CVector r, bool bRight);
 	double GetSectionArcLength(double x);
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 	double TotalMass();
+
+	CVector LeadingPoint();
 
 	void ComputeAero(double *Cp, double &XCP, double &YCP,
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
@@ -106,10 +108,10 @@ public:
 	int m_np;
 	double  m_x[IBX], m_y[IBX];	// the point coordinates of the overlayed body
 
-    QString m_BodyName;
+	QString m_BodyName;
 	QString m_BodyDescription;
 
-    QColor m_BodyColor;
+	QColor m_BodyColor;
 
 	CVector m_FramePosition[MAXBODYFRAMES];
 	CFrame m_Frame[MAXBODYFRAMES];	// the frames at the stations

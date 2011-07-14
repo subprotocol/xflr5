@@ -431,8 +431,8 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
 		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
-								  0.0, 1.0, 3,                          pBody->m_NSideLines,
-				rightpts);
+			   0.0, 1.0, 3, pBody->m_NSideLines,
+			   rightpts);
 
 		glPolygonMode(GL_FRONT,GL_FILL);
 		glEnable(GL_MAP2_VERTEX_3);
@@ -440,7 +440,7 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 		glMapGrid2f(8, 0.0, 1.0, 8, 0.0, 1.0);
 
 //		glPushMatrix ();
-			glEvalMesh2(GL_FILL, 0, 8, 0, 8);
+		glEvalMesh2(GL_FILL, 0, 8, 0, 8);
 	/*		for (j = 0; j <= 8; j++) {
 				glBegin(GL_LINE_STRIP);
 					for (i = 0; i <= 15; i++)
@@ -454,15 +454,15 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 //		glPopMatrix();
 
 		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
-								  0.0, 1.0, 3,                          pBody->m_NSideLines,
-				leftpts);
+			   0.0, 1.0, 3,pBody->m_NSideLines,
+			   leftpts);
 
 //		glEnable(GL_MAP2_VERTEX_3);
 //		glEnable(GL_AUTO_NORMAL);
 //		glMapGrid2f(8, 0.0, 1.0, 8, 0.0, 1.0);
 
 //		glPushMatrix ();
-			glEvalMesh2(GL_FILL, 0, 8, 0, 8);
+		glEvalMesh2(GL_FILL, 0, 8, 0, 8);
 	/*		for (j = 0; j <= 8; j++) {
 				glBegin(GL_LINE_STRIP);
 					for (i = 0; i <= 15; i++)
@@ -1953,17 +1953,17 @@ void GL3dBodyDlg::GLDrawBodyLineScale()
 		{
 			strong = QString("%1").arg((double)i*unit, 6,'f', 2);
 			m_pglWidget->renderText(m_BodyScaledOffset.x+(double)i*m_BodyGridDlg.m_Unit*m_BodyScale - LabelWidth/2.0,
-									m_BodyScaledOffset.y-0.04,
-									0.0,
-									strong);
+							    m_BodyScaledOffset.y-0.04,
+							    0.0,
+							   strong);
 		}
 		for(i=1; i<fabs(m_BodyScaledOffset.x-(-1.0))/m_BodyGridDlg.m_Unit/m_BodyScale; i++)
 		{
 			strong = QString("%1").arg(-(double)i*unit, 6,'f', 2);
 			m_pglWidget->renderText(m_BodyScaledOffset.x-(double)i*m_BodyGridDlg.m_Unit*m_BodyScale - LabelWidth/2.0,
-									m_BodyScaledOffset.y-0.04,
-									0.0,
-									strong);
+							    m_BodyScaledOffset.y-0.04,
+							    0.0,
+							    strong);
 		}
 	}
 
@@ -2183,7 +2183,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 			if     (pMiarex->m_3DAxisStyle == 1) glLineStipple (1, 0x1111);
 			else if(pMiarex->m_3DAxisStyle == 2) glLineStipple (1, 0x0F0F);
 			else if(pMiarex->m_3DAxisStyle == 3) glLineStipple (1, 0x1C47);
-			else								 glLineStipple (1, 0xFFFF);
+			else                                 glLineStipple (1, 0xFFFF);
 
 			// BodyLine axis____________
 
@@ -2208,7 +2208,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		if     (m_BodyGridDlg.m_Style == 1) glLineStipple (1, 0x1111);
 		else if(m_BodyGridDlg.m_Style == 2) glLineStipple (1, 0x0F0F);
 		else if(m_BodyGridDlg.m_Style == 3) glLineStipple (1, 0x1C47);
-		else								glLineStipple (1, 0xFFFF);
+		else                                glLineStipple (1, 0xFFFF);
 
 		glBegin(GL_LINES);
 		{
@@ -2258,7 +2258,7 @@ void GL3dBodyDlg::GLCreateBodyGrid()
 		if     (m_BodyGridDlg.m_MinStyle == 1) glLineStipple (1, 0x1111);
 		else if(m_BodyGridDlg.m_MinStyle == 2) glLineStipple (1, 0x0F0F);
 		else if(m_BodyGridDlg.m_MinStyle == 3) glLineStipple (1, 0x1C47);
-		else								   glLineStipple (1, 0xFFFF);
+		else                                   glLineStipple (1, 0xFFFF);
 
 		glBegin(GL_LINES);
 		{
@@ -2324,8 +2324,8 @@ void GL3dBodyDlg::GLCreateCtrlPts()
 			{
 				glVertex3d(m_pPanel[p].CtrlPt.x, m_pPanel[p].CtrlPt.y, m_pPanel[p].CtrlPt.z);
 				glVertex3d((m_pPanel[p].CtrlPt.x + m_pPanel[p].Normal.x * 0.04),
-						   (m_pPanel[p].CtrlPt.y + m_pPanel[p].Normal.y * 0.04),
-						   (m_pPanel[p].CtrlPt.z + m_pPanel[p].Normal.z * 0.04));
+						 (m_pPanel[p].CtrlPt.y + m_pPanel[p].Normal.y * 0.04),
+						 (m_pPanel[p].CtrlPt.z + m_pPanel[p].Normal.z * 0.04));
 /*				glVertex3d(m_pPanel[p].CollPt.x, m_pPanel[p].CollPt.y, m_pPanel[p].CollPt.z);
 				glVertex3d(m_pPanel[p].CollPt.x+m_pPanel[p].Normal.x *0.01,
 						   m_pPanel[p].CollPt.y+m_pPanel[p].Normal.y *0.01,
@@ -2904,7 +2904,7 @@ void GL3dBodyDlg::GLRenderBody()
 				{
 					glTranslated(m_pBody->m_FramePosition[0].x,m_pBody->m_FramePosition[0].y,m_pBody->m_FramePosition[0].z);
 
-					m_pglWidget->renderText(0.0, 0.0, m_pBody->GetLength()/10.0,
+					m_pglWidget->renderText(0.0, 0.0, m_pBody->Length()/10.0,
 									  m_pBody->m_BodyName+QString(" %1").arg(m_pBody->m_VolumeMass*pMainFrame->m_kgtoUnit, 7,'g',3)+MassUnit);
 				}
 				glPopMatrix();
@@ -3326,8 +3326,8 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 				m_BodyOffset.x  +=  (double)Delta.x()*2.0/(double)m_pglWidget->m_rCltRect.width()/m_BodyScale;
 				m_BodyOffset.y  += -(double)Delta.y()*2.0/(double)m_pglWidget->m_rCltRect.width()/m_BodyScale;
 				m_BodyScaledOffset.Set((1.0-m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
-									   (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-										0.0);
+								   (1.0-m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+								   0.0);
 				UpdateView();
 			}
 			else if(m_FrameRect.contains(point) && m_pFrame)
@@ -3335,8 +3335,8 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 				m_FrameOffset.x +=  (double)Delta.x()*2.0/(double)m_pglWidget->m_rCltRect.width()/m_FrameScale;
 				m_FrameOffset.y += -(double)Delta.y()*2.0/(double)m_pglWidget->m_rCltRect.width()/m_FrameScale;
 				m_FrameScaledOffset.Set((1.0-m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
-										(1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
-										 0.0);
+								    (1.0-m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+								    0.0);
 				UpdateView();
 			}
 		}
@@ -4630,7 +4630,7 @@ void GL3dBodyDlg::SetBody(CBody *pBody)
 void GL3dBodyDlg::SetBodyScale()
 {
 	int k;
-	double length, height;
+	double height;
 	QPoint P1, P2;
 	CVector V1, V2;
 
@@ -4649,7 +4649,7 @@ void GL3dBodyDlg::SetBodyScale()
 	m_UFOOffset.x = (GLfloat)(m_pglWidget->m_GLViewRect.left + m_VerticalSplit  )/2.0;
 	m_UFOOffset.y = (GLfloat)(m_pglWidget->m_GLViewRect.bottom + m_HorizontalSplit)/2.0;
   
-	m_glScaled = (GLfloat)(3./4.* (m_VerticalSplit+1.0) / m_pBody->GetLength());
+	m_glScaled = (GLfloat)(3./4.* (m_VerticalSplit+1.0) / m_pBody->Length());
 
 	m_ArcBall.GetMatrix();
 	CVector eye(0.0,0.0,1.0);
@@ -4658,12 +4658,10 @@ void GL3dBodyDlg::SetBodyScale()
 
 	Set3DRotationCenter();
 
-
-	m_BodyScalingCenter.x  = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.left)    /2.0;
-	m_BodyScalingCenter.y  = (m_pglWidget->m_GLViewRect.top  + m_HorizontalSplit)                 /2.0;
-	m_FrameScalingCenter.x = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.right)   /2.0;
+	m_BodyScalingCenter.x  = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.left)   /2.0;
+	m_BodyScalingCenter.y  = (m_pglWidget->m_GLViewRect.top  + m_HorizontalSplit)                /2.0;
+	m_FrameScalingCenter.x = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.right)  /2.0;
 	m_FrameScalingCenter.y = (m_pglWidget->m_GLViewRect.top  + m_pglWidget->m_GLViewRect.bottom) /2.0;
-
 
 	V1.Set(m_pglWidget->m_GLViewRect.left, m_pglWidget->m_GLViewRect.top, 0.0);
 	V2.Set(m_VerticalSplit,                m_HorizontalSplit,             0.0);
@@ -4688,8 +4686,7 @@ void GL3dBodyDlg::SetBodyScale()
 
 	if(m_pBody)
 	{
-		length =   m_pBody->m_FramePosition[m_pBody->m_NStations-1].x  - m_pBody->m_FramePosition[0].x;
-		m_BodyScale = (m_VerticalSplit-(-1.0) - 0.3)/length;
+		m_BodyScale = (m_VerticalSplit-m_pglWidget->m_GLViewRect.left)*.7/m_pBody->Length();
 
 		height = 0.0;
 		for(k=0; k<m_pBody->m_NStations; k++)
@@ -4705,19 +4702,20 @@ void GL3dBodyDlg::SetBodyScale()
 	}
 
 	m_FrameOffset.Set((m_VerticalSplit + m_pglWidget->m_GLViewRect.right)/2.0,
-					  (m_pglWidget->m_GLViewRect.top +m_pglWidget->m_GLViewRect.bottom )/2.0,
-					  0.0);
-	m_BodyOffset.Set((2.0*m_pglWidget->m_GLViewRect.left+m_VerticalSplit)/3.0,
-					 (m_pglWidget->m_GLViewRect.top+m_HorizontalSplit)/2.0 ,
-					 0.0);
+				   (m_pglWidget->m_GLViewRect.top +m_pglWidget->m_GLViewRect.bottom)/2.0,
+				   0.0);
+
+	m_BodyOffset.Set((m_pglWidget->m_GLViewRect.left+m_VerticalSplit)/2.0-m_pBody->Length()/2.0-m_pBody->LeadingPoint().x,
+				  (m_pglWidget->m_GLViewRect.top+m_HorizontalSplit)/2.0,
+				  0.0);
 
 	m_FrameScaledOffset.Set((1.0 - m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
 	                        (1.0 - m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
-	                         0.0);
+					    0.0);
 
 	m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
 	                       (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-	                        0.0);
+					   0.0);
 
 	CFrame::s_rViewRect = m_FrameRect;
 	CBody::s_rViewRect  = m_BodyLineRect;
@@ -4739,8 +4737,6 @@ void GL3dBodyDlg::SetFrame(int iFrame)
 
 	m_bResetglBody2D = true;
 }
-
-
 
 
 void GL3dBodyDlg::SetPicture()
@@ -5151,8 +5147,8 @@ void  GL3dBodyDlg::wheelEvent(QWheelEvent *event)
 		if(event->delta()<0) m_BodyScale *= 1.06;
 		else                 m_BodyScale /= 1.06;
 		m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
-							   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-								0.0);
+						   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+						   0.0);
 		m_bResetglBody2D=true;
 	}
 	else if(m_FrameRect.contains(point))
