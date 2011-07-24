@@ -52,7 +52,6 @@ private slots:
 
 private:
 	void showEvent(QShowEvent *event);
-	void hideEvent(QHideEvent *event);
 	void keyPressEvent(QKeyEvent *event);
 
 	void SetupLayout();

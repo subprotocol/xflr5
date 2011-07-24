@@ -916,6 +916,9 @@ void MainFrame::CreateDockWindows()
 
 	m_pGL3DScales = new GL3DScales(this);
 	GL3DScales * pGL3DScales = (GL3DScales*)m_pGL3DScales;
+	pGL3DScales->m_pMiarex      = m_pMiarex;
+	pGL3DScales->m_pMainFrame    = this;
+
 	pGL3DScales->setAttribute(Qt::WA_DeleteOnClose, false);
 	m_pctrl3DScalesWidget = new QDockWidget(tr("3D Scales"), this);
 	m_pctrl3DScalesWidget->setAllowedAreas(Qt::LeftDockWidgetArea);
@@ -1015,8 +1018,6 @@ void MainFrame::CreateDockWindows()
 	WPolarDlg::s_pMiarex        = m_pMiarex;
 	ManageBodiesDlg::s_pMiarex  = m_pMiarex;
 
-	pGL3DScales->m_pMiarex      = m_pMiarex;
-	pGL3DScales->m_pMainFrame    = this;
 
 
 	CPlane::SetParents(this, m_pMiarex);

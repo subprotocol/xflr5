@@ -312,12 +312,6 @@ void GL3DScales::showEvent(QShowEvent *event)
 	InitDialog();
 }
 
-void GL3DScales::hideEvent(QHideEvent *event)
-{
-	MainFrame *pMainFrame =(MainFrame*)m_pMainFrame;
-	pMainFrame->W3DScalesAct->setChecked(false);
-}
-
 
 void GL3DScales::ReadStreamParams()
 {
