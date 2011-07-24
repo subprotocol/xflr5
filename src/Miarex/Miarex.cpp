@@ -1649,6 +1649,8 @@ void QMiarex::SetControls()
 	m_pctrlSpanPos->SetValue(m_CurSpanPos);
 	m_pctrlCpSectionSlider->setValue((int)(m_CurSpanPos*100.0));
 
+	pMainFrame->W3DScalesAct->setChecked(pMainFrame->m_pctrl3DScalesWidget->isVisible());
+
 	SetCurveParams();
 }
 
@@ -9727,7 +9729,7 @@ void QMiarex::OnGL3DScale()
 		return;
 	}
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	if(pMainFrame->m_pctrl3DScalesWidget->isVisible())	pMainFrame->m_pctrl3DScalesWidget->hide();
+	if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
 	else                                               pMainFrame->m_pctrl3DScalesWidget->show();
 
 	pMainFrame->W3DScalesAct->setChecked(pMainFrame->m_pctrl3DScalesWidget->isVisible());

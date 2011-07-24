@@ -671,7 +671,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
 	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
 	double sign;
-	factor = pMiarex->m_VelocityScale/20.0;
+	factor = pMiarex->m_VelocityScale/100.0;
 
 	//DOWNWASH
 	glNewList(List,GL_COMPILE);
@@ -713,8 +713,8 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					{
 						glVertex3d(xt, yt, zt);
 						glVertex3d(xt + amp * cos(dih)* sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)* cosa);
+								 yt + amp * sin(dih),
+								 zt + amp * cos(dih)* cosa);
 					}
 					glEnd();
 				}
@@ -731,8 +731,8 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						amp *= factor;
 
 						glVertex3d(xt + amp * cos(dih)* sina,
-								   yt + amp * sin(dih),
-								   zt + amp * cos(dih)* cosa);
+								 yt + amp * sin(dih),
+								 zt + amp * cos(dih)* cosa);
 					}
 				}
 				glEnd();
@@ -1893,7 +1893,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 	CVector C, V, VT;
 	CVector RefPoint(0.0,0.0,0.0);
 
-	factor = 0.2;
+	factor = pMiarex->m_VelocityScale/100.0;
 	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
 	if(pPOpp)
 	{
@@ -1945,7 +1945,6 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 					pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
 
 					VT += V;
-					VT *= pMiarex->m_VelocityScale/100.0;
 //					if(!pWPolar->m_bTiltedGeom)
 						C.RotateY(RefPoint, pWOpp->m_Alpha);
 						//Tilt the geometry w.r.t. sideslip

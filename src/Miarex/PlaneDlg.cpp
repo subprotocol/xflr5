@@ -1015,6 +1015,7 @@ void PlaneDlg::SetupLayout()
 	QGroupBox *BodyBox = new QGroupBox(tr("Body"));
 	{
 		QHBoxLayout *BodyName = new QHBoxLayout;
+		QLabel *BodyWarning = new QLabel(tr("Warning:\nIncluding the body in the analysis is not recommended.\nCheck the guidelines for explanations."));
 		m_pctrlBody = new QCheckBox(tr("Body"));
 		m_pctrlEditBody = new QPushButton(tr("Edit..."));
 		m_pctrlBodyList = new QComboBox;
@@ -1040,6 +1041,7 @@ void PlaneDlg::SetupLayout()
 		BodyPos->addWidget(m_pctrlZBody,2,2);
 		BodyPos->addWidget(m_pctrlLen11,2,3);
 		QVBoxLayout *BodyLayout = new QVBoxLayout;
+		BodyLayout->addWidget(BodyWarning);
 		BodyLayout->addLayout(BodyName);
 		BodyLayout->addLayout(BodyPos);
 		BodyBox->setLayout(BodyLayout);

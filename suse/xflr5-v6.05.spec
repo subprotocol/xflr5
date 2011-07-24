@@ -1,7 +1,7 @@
 # This is a spec file for the installation of XFLR5 v6
 %define name xflr5
 %define release 1
-%define version 6.04
+%define version 6.05
 
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
@@ -86,6 +86,13 @@ echo %{_bindir}/%{name}
 
 
 %changelog
+*Sun Jul 24 2011 A. Deperrois
+xflr5 v6.05 beta, July 15th, 2011
+- For Type 7 polars, listed the control value instead of the aoa in the top drop down box
+- Added a calculation form to determine Re.sqrt(Cl) for foil Type 2 polars
+- Added the Japanese translation to the repository - thanks to Koichi
+- Minor corrections and improvements
+
 *Sun May 15 2011 A. Deperrois
 xflr5 v6.04 beta, May 14th, 2011
 - added a settings save at each project save

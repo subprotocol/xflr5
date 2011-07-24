@@ -219,7 +219,8 @@ HEADERS += src/MainFrame.h \
 
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \
-    translations/xflr5v6_fr.ts
+    translations/xflr5v6_fr.ts \
+    translations/xflr5v6_ja.ts
 
 RESOURCES += xflr5.qrc
 
