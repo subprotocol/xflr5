@@ -398,7 +398,6 @@ private:
 	QColor m_BorderClr;
 
 	int m_ImageFormat;
-	int m_ExportFileType;
 
 public:
  	QFont m_TextFont;
@@ -418,6 +417,7 @@ public:
 	int m_SpeedUnit;
 	int m_ForceUnit;
 	int m_MomentUnit;
+	int m_ExportFileType;
 
 };
 

@@ -116,7 +116,7 @@ CWOpp::CWOpp()
 }
 
 
-bool CWOpp::Export(QTextStream &out, int FileType)
+bool CWOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
 {
 	QString Header, strong, Format;
 	int k;
@@ -589,7 +589,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWOpp::GetWOppProperties(QString &WOppProperties)
+void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strange, lenunit, massunit, speedunit;

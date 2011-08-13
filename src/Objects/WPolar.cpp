@@ -51,7 +51,7 @@ CWPolar::CWPolar()
 	m_WakePanelFactor =1.1;
 
 	m_AnalysisMethod = 0;
-	m_Type   = 1;
+	m_Type   = FIXEDSPEEDPOLAR;
 	m_RefAreaType = 1;
 	m_Style  = 0;
 	m_Width  = 1;
@@ -285,11 +285,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_MaxBending[i] = pWOpp->m_MaxBending;
 					m_Ctrl[i]       = pWOpp->m_Ctrl;
 					m_XNP[i]        = pWOpp->m_XNP;
-					if(m_Type==7)
-					{
-						//store the eigenthings
-						for(l=0; l<8; l++) m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
-					}
+					//store the eigenthings
+					for(l=0; l<8; l++) m_EigenValue[l][i] = pWOpp->m_EigenValue[l];
+
 					bInserted = true;
 					break;
 				}
@@ -1095,27 +1093,41 @@ void CWPolar::Copy(CWPolar *pWPolar)
 }
 
 
-void CWPolar::Export(QTextStream &out, int FileType)
+void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 {
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int j;
 	QString Header, strong, str;
+
 	if (FileType==1)
 	{
-		strong =pMainFrame->m_VersionName + "\n\n";
-		out << strong;
+		if(!bDataOnly)
+		{
+			strong =pMainFrame->m_VersionName + "\n\n";
+			out << strong;
 
-		strong ="Wing name :        "+ m_UFOName + "\n";
-		out << strong;
+			strong ="Wing name :        "+ m_UFOName + "\n";
+			out << strong;
 
-		strong ="Wing polar name :  "+ m_PlrName + "\n";
-		out << strong;
+			strong ="Wing polar name :  "+ m_PlrName + "\n";
+			out << strong;
 
-		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-		str +="\n\n";
-		strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
-		strong +=str;
-		out << strong;
+			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+			str +="\n\n";
+
+			if(m_Type==FIXEDSPEEDPOLAR)
+			{
+				strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
+				strong +=str + "\n";
+			}
+			else if(m_Type==FIXEDAOAPOLAR)
+			{
+				strong = QString("Alpha = %1").arg(m_ASpec) + QString::fromUtf8("°") + "\n";
+			}
+			else strong = "\n";
+
+			out << strong;
+		}
 
 		Header = "   alpha      CL          ICd        PCd        TCd        CY        Cm         Rm         Ym       IYm       QInf        XCP\n";
 		out << Header;
@@ -1142,20 +1154,23 @@ void CWPolar::Export(QTextStream &out, int FileType)
 	}
 	else if (FileType==2)
 	{
-		strong =pMainFrame->m_VersionName + "\n\n";
-		out << strong;
+		if(!bDataOnly)
+		{
+			strong =pMainFrame->m_VersionName + "\n\n";
+			out << strong;
 
-		strong ="Wing name :, "+ m_UFOName + "\n";
-		out << strong;
+			strong ="Wing name :, "+ m_UFOName + "\n";
+			out << strong;
 
-		strong ="Wing polar name :, "+ m_PlrName + "\n";
-		out << strong;
+			strong ="Wing polar name :, "+ m_PlrName + "\n";
+			out << strong;
 
-		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-		str +="\n\n";
-		strong = QString("Freestream speed :, %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
-		strong +=str;
-		out << strong;
+			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
+			str +="\n\n";
+			strong = QString("Freestream speed :, %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,3,'f',1);
+			strong +=str;
+			out << strong;
+		}
 
 		Header = "alpha, CL, ICd, PCd, TCd, CY, GCm, GRm,GYm, IYm, QInf, XCP\n";
 		out << Header;
@@ -1878,7 +1893,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWPolar::GetPolarProperties(QString &PolarProperties)
+void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, lenunit, massunit, speedunit;
@@ -2124,8 +2139,14 @@ void CWPolar::GetPolarProperties(QString &PolarProperties)
 	PolarProperties += strong;
 
 	strong = QString(QObject::tr("Data points") +" = %1\n").arg(m_Alpha.size());
-	PolarProperties += strong;
+	PolarProperties += "\n"+strong;
 
+	if(!bData) return;
+	QTextStream out;
+	strong.clear();
+	out.setString(&strong);
+	Export(out, pMainFrame->m_ExportFileType, true);
+	PolarProperties += "\n"+strong;
 }
 
 

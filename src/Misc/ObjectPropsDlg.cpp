@@ -47,7 +47,7 @@ ObjectPropsDlg::ObjectPropsDlg()
 void ObjectPropsDlg::SetupLayout()
 {
 	setMinimumHeight(400);
-	setMinimumWidth(450);
+	setMinimumWidth(700);
 
 	m_pctrlDescription = new QTextEdit;
 	m_pctrlDescription->setFontFamily("Courier");
@@ -85,13 +85,13 @@ void ObjectPropsDlg::InitDialog()
 	{
 		if(m_pPolar)
 		{
-			m_pPolar->GetPolarProperties(strange);
+			m_pPolar->GetPolarProperties(strange, true);
 			setWindowTitle(tr("Polar Properties"));
 
 		}
 		else if(m_pOpp)
 		{
-			m_pOpp->GetOppProperties(strange);
+			m_pOpp->GetOppProperties(strange, true);
 			setWindowTitle(tr("Operating Point Properties"));
 		}
 	}
@@ -99,12 +99,12 @@ void ObjectPropsDlg::InitDialog()
 	{
 		if(m_pWPolar)
 		{
-			m_pWPolar->GetPolarProperties(strange);
+			m_pWPolar->GetPolarProperties(strange, true);
 			setWindowTitle(tr("Polar Properties"));
 		}
 		else if(m_pWOpp)
 		{
-			m_pWOpp->GetWOppProperties(strange);
+			m_pWOpp->GetWOppProperties(strange, true);
 			setWindowTitle(tr("Operating Point Properties"));
 		}
 	}

@@ -47,9 +47,9 @@ public:
 private:
 //________________METHODS____________________________________
 	bool SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
-	bool Export(QTextStream &out, int FileType);
+	bool Export(QTextStream &out, int FileType, bool bDataOnly=false);
 	void GetBWStyle(QColor &color, int &style, int &width);
-	void GetWOppProperties(QString &WOppProperties);
+	void GetWOppProperties(QString &WOppProperties, bool bData=false);
 	double GetMaxLift();
 
 private:

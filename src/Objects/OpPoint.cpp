@@ -27,6 +27,9 @@
 
 #include "OpPoint.h"
 #include "../Globals.h"
+#include "../MainFrame.h"
+
+void *OpPoint::s_pMainFrame;
 
 OpPoint::OpPoint()
 {
@@ -196,22 +199,25 @@ bool OpPoint::Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat)
 }
 
 
-bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType)
+bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType, bool bDataOnly)
 {
 	int k;
 	QString strong;
 
-	out << Version+"\n";
+	if(!bDataOnly)
+	{
+		out << Version+"\n";
 
-	strong = m_strFoilName + "\n";
-	out<< strong;
-	strong = m_strPlrName + "\n";
-	out<< strong;
-	if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
-								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
-	else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
-								   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
-	out<< strong;
+		strong = m_strFoilName + "\n";
+		out<< strong;
+		strong = m_strPlrName + "\n";
+		out<< strong;
+		if(FileType==1) strong=QString("Alpha = %1,  Re = %2,  Ma = %3,  ACrit =%4 \n\n")
+									   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
+		else            strong=QString("Alpha =, %1,  Re =, %2,  Ma =, %3,  ACrit =, %4 \n\n")
+									   .arg(Alpha,5,'f',1).arg(Reynolds,8,'f',0).arg(Mach,6,'f',4).arg(ACrit,4,'f',1);
+		out<< strong;
+	}
 
 	if(FileType==1) out << "   x        Cpi      Cpv        Qi        Qv\n";
 	else            out << "x,Cpi,Cpv,Qi,Qv\n";
@@ -231,7 +237,7 @@ bool OpPoint::ExportOpp(QTextStream &out, QString Version, int FileType)
 }
 
 
-void OpPoint::GetOppProperties(QString &OpPointProperties)
+void OpPoint::GetOppProperties(QString &OpPointProperties, bool bData)
 {
 	QString strong;
 	OpPointProperties.clear();
@@ -282,6 +288,14 @@ void OpPoint::GetOppProperties(QString &OpPointProperties)
 		strong  = QString(QObject::tr("L.E. Flap moment")+" = %1 ").arg(m_LEHMom,9,'f',5);
 		OpPointProperties += strong + "\n";
 	}
+
+	if(!bData) return;
+	QTextStream out;
+	strong.clear();
+	out.setString(&strong);
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	ExportOpp(out, pMainFrame->m_VersionName, pMainFrame->m_ExportFileType, true);
+	OpPointProperties += "\n"+strong;
 }
 
 

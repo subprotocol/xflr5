@@ -43,6 +43,7 @@ public:
 	OpPoint();
 
 private:
+	static void *s_pMainFrame;
 	bool m_bVisc, m_bDispSurf;
 	bool m_bTEFlap, m_bLEFlap;
 //	int Format;
@@ -71,9 +72,9 @@ private:
 	
 
 private:
-	bool ExportOpp(QTextStream &out, QString Version, int FileType);
+	bool ExportOpp(QTextStream &out, QString Version, int FileType, bool bDataOnly=false);
 	bool Serialize(QDataStream &ar, bool bIsStoring, int ArchiveFormat=0);
-	void GetOppProperties(QString &OpPointProperties);
+	void GetOppProperties(QString &OpPointProperties, bool bData=false);
 };
 
 #endif

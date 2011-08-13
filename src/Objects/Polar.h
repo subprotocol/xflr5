@@ -64,8 +64,8 @@ private:
 
 	void AddData(OpPoint* pOpPoint);
 	void AddData(void* ptrXFoil);
-	void ExportPolar(QTextStream &out, int FileType);
-	void GetPolarProperties(QString &PolarProperties);
+	void ExportPolar(QTextStream &out, int FileType, bool bDataOnly=false);
+	void GetPolarProperties(QString &PolarProperties, bool bData=false);
 	void ResetPolar();
 
 	CPolar();

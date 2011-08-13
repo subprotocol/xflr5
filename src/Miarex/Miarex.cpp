@@ -9634,9 +9634,8 @@ void QMiarex::OnExporttoAVL()
 	else            FileName = m_pCurWing->WingName();
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export UFO"),
-                                                        pMainFrame->m_LastDirName + "/"+FileName,
-							tr("AVL Text File (*.avl)"),
-							&filter);
+									pMainFrame->m_LastDirName + "/"+FileName,
+									tr("AVL Text File (*.avl)"), &filter);
 	if(!FileName.length()) return;
 
 	int pos = FileName.lastIndexOf("/");
@@ -9660,10 +9659,11 @@ void QMiarex::OnExporttoAVL()
 	out << ("\n");
 
 	strong = QString("%1   %2   %3  | Sref   Cref   Bref\n")
-                         .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit, 8, 'f', 3)
-			 .arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,       8, 'f', 3)
-			 .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
+				  .arg(m_pCurWing->m_PlanformArea*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit, 8, 'f', 3)
+				  .arg(m_pCurWing->m_MAChord*pMainFrame->m_mtoUnit,       8, 'f', 3)
+				  .arg(m_pCurWing->m_PlanformSpan*pMainFrame->m_mtoUnit,  8, 'f', 3);
 	out << strong;
+	out << "# Note : check consistency of area unit above with length units of the file";
 
 	if(m_pCurPlane)
 		strong = QString("%1  %2  %3          | Xref   Yref   Zref\n")
@@ -15409,8 +15409,6 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 		}
 	}
 }
-
-
 
 
 void QMiarex::OnWPolarProps()

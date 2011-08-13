@@ -50,37 +50,41 @@ CPolar::CPolar()
 
 
 
-void CPolar::ExportPolar(QTextStream &out, int FileType)
+void CPolar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 {
 	QString Header, strong;
 	int j;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	strong =pMainFrame->m_VersionName + "\n\n";
-	out << strong;
-	strong =(" Calculated polar for: ");
-	strong += m_FoilName + "\n\n";
-	out << strong;
-	strong = QString(" %1 %2").arg(m_ReType).arg(m_MaType);
-	if(m_ReType==1) strong += (" Reynolds number fixed       ");
-	else if(m_ReType==2) strong += (" Reynolds number ~ 1/sqrt(CL)");
-	else if(m_ReType==3) strong += (" Reynolds number ~ 1/CL      ");
-	if(m_MaType==1) strong += ("   Mach number fixed         ");
-	else if(m_MaType==2) strong += ("   Mach number ~ 1/sqrt(CL)  ");
-	else if(m_MaType==3) strong += ("   Mach number ~ 1/CL        ");
-	strong +="\n\n";
-	out << strong;
-	strong=QString((" xtrf =   %1 (top)        %2 (bottom)\n"))
-					.arg(m_XTop,0,'f',3).arg(m_XBot,0,'f',3);
-	out << strong;
 
-	strong = QString(" Mach = %1     Re = %2 e 6     Ncrit = %3\n\n")
-			 .arg(m_Mach,7,'f',3).arg(m_Reynolds/1.e6,9,'f',3).arg(m_ACrit,7,'f',3);
-	out << strong;
+	if(!bDataOnly)
+	{
+		strong =pMainFrame->m_VersionName + "\n\n";
+		out << strong;
+		strong =(" Calculated polar for: ");
+		strong += m_FoilName + "\n\n";
+		out << strong;
+		strong = QString(" %1 %2").arg(m_ReType).arg(m_MaType);
+		if(m_ReType==1) strong += (" Reynolds number fixed       ");
+		else if(m_ReType==2) strong += (" Reynolds number ~ 1/sqrt(CL)");
+		else if(m_ReType==3) strong += (" Reynolds number ~ 1/CL      ");
+		if(m_MaType==1) strong += ("   Mach number fixed         ");
+		else if(m_MaType==2) strong += ("   Mach number ~ 1/sqrt(CL)  ");
+		else if(m_MaType==3) strong += ("   Mach number ~ 1/CL        ");
+		strong +="\n\n";
+		out << strong;
+		strong=QString((" xtrf =   %1 (top)        %2 (bottom)\n"))
+						.arg(m_XTop,0,'f',3).arg(m_XBot,0,'f',3);
+		out << strong;
+
+		strong = QString(" Mach = %1     Re = %2 e 6     Ncrit = %3\n\n")
+				 .arg(m_Mach,7,'f',3).arg(m_Reynolds/1.e6,9,'f',3).arg(m_ACrit,7,'f',3);
+		out << strong;
+	}
 
 	if(m_Type != 4)
 	{
-		if(FileType==1)	Header = ("  alpha     CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
-		else            Header = ("alpha,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
+		if(FileType==1) Header = ("  alpha     CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
+		else            Header = ("alpha,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
 		out << Header;
 		if(FileType==1)
 		{
@@ -89,7 +93,7 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 		}
 		for (j=0; j<m_Alpha.size(); j++)
 		{
-			if(FileType==1)	strong = QString(" %1  %2  %3  %4  %5")
+			if(FileType==1) strong = QString(" %1  %2  %3  %4  %5")
 											.arg(m_Alpha[j],7,'f',3)
 											.arg(m_Cl[j],7,'f',4)
 											.arg(m_Cd[j],8,'f',5)
@@ -116,8 +120,8 @@ void CPolar::ExportPolar(QTextStream &out, int FileType)
 	}
 	else 
 	{
-		if(FileType==1) Header=QString(("  alpha     Re      CL        CD       CDp       CM    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
-		else            Header=QString(("alpha,Re,CL,CD,CDp,CM,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
+		if(FileType==1) Header=QString(("  alpha     Re      CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge     XCp    \n"));
+		else            Header=QString(("alpha,Re,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n"));
 		out << Header;
 		if(FileType==1)
 		{
@@ -721,7 +725,7 @@ void CPolar::GetBWStyle(QColor &color, int &style, int &width)
 }
 
 
-void CPolar::GetPolarProperties(QString &PolarProperties)
+void CPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 {
 	QString strong;
 	PolarProperties = m_PlrName +"\n\n";
@@ -777,5 +781,13 @@ void CPolar::GetPolarProperties(QString &PolarProperties)
 	PolarProperties += strong;
 
 	strong = QString(QObject::tr("Number of data points") +" = %1").arg(m_Alpha	.size());
-	PolarProperties += strong;
+	PolarProperties += "\n" +strong;
+
+	if(!bData) return;
+	QTextStream out;
+	strong.clear();
+	out.setString(&strong);
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	ExportPolar(out, pMainFrame->m_ExportFileType, true);
+	PolarProperties += "\n"+strong;
 }

@@ -37,12 +37,20 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	static int j, l ;
-	static double x;
+	static double x, xDistrib[SIDEPOINTS];
 	static CVector Pt, PtA, PtB, PtNormal, A, B, C, D, N, BD, AC;
 	static CVector PtILeft[2*SIDEPOINTS],PtIRight[2*SIDEPOINTS];
 	static CFoil * pFoilA, *pFoilB;
 
 	N.Set(0.0, 0.0, 0.0);
+
+	double xx;
+	double param = 50;// increase to refine L.E. and T.E.
+	for(int i=0; i<SIDEPOINTS; i++)
+	{
+		xx = (double)i/(double)(SIDEPOINTS-1);
+		xDistrib[i] = (asinh(param*(xx-0.5))/asinh(param/2.)+1.)/2.;
+	}
 
 	glNewList(List, GL_COMPILE);
 	{
@@ -65,7 +73,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 			{
 				for (l=0; l<SIDEPOINTS; l++)
 				{
-					x = (double)l/(double)(SIDEPOINTS-1);
+					x = xDistrib[l];
 					pWing->m_Surface[j].GetPoint(x,x,0.0,PtA, PtNormal,1);
 					pWing->m_Surface[j].GetPoint(x,x,1.0,PtB, PtNormal,1);
 
@@ -95,7 +103,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 			{
 				for (l=0; l<SIDEPOINTS; l++)
 				{
-					x = (double)l/(double)(SIDEPOINTS-1);
+					x = xDistrib[l];
 					pWing->m_Surface[j].GetPoint(x,x,0.0,PtA, PtNormal,-1);
 					pWing->m_Surface[j].GetPoint(x,x,1.0,PtB, PtNormal,-1);
 
@@ -139,7 +147,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 
 					for (l=0; l<SIDEPOINTS; l++)
 					{
-						x = (double)l/(double)(SIDEPOINTS-1);
+						x = xDistrib[l];
 						pWing->m_Surface[j].GetPoint(x,x,0.0,Pt, PtNormal,1);
 
 						glVertex3d(Pt.x, Pt.y, Pt.z);
@@ -171,7 +179,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 
 					for (l=0; l<SIDEPOINTS; l++)
 					{
-						x = (double)l/(double)(SIDEPOINTS-1);
+						x = xDistrib[l];
 						pWing->m_Surface[j].GetPoint(x,x,1.0,Pt, PtNormal,1);
 
 						glVertex3d(Pt.x, Pt.y, Pt.z);
@@ -221,7 +229,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 					}
 					else
 					{
-						x = (double)l/(double)(SIDEPOINTS-1);
+						x = xDistrib[l];
 						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, 1);
 						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, 1);
 					}
@@ -264,7 +272,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 					}
 					else
 					{
-						x = (double)l/(double)(SIDEPOINTS-1);
+						x = xDistrib[l];
 						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, 1);
 						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, 1);
 					}
@@ -285,7 +293,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 					}
 					else
 					{
-						x = (double)l/(double)(SIDEPOINTS-1);
+						x = xDistrib[l];
 						pWing->m_Surface[j].GetPoint(x ,x ,0.0 ,PtA, PtNormal, -1);
 						pWing->m_Surface[j].GetPoint(x, x, 1.0, PtB, PtNormal, -1);
 					}

@@ -49,8 +49,8 @@ public:
 	void AddPoint(CPOpp* pPOpp);
 	void AddPoint(double alpha, double CL, double ICd, double PCd, double CY, double GCm, double VCm, double ICm, double GRm, double GYm, double IYm, double QInf, double XCP);
 	void CalculatePoint(int i);
-	void Export(QTextStream &out, int FileType);
-	void GetPolarProperties(QString &Properties);
+	void Export(QTextStream &out, int FileType, bool bDataOnly=false);
+	void GetPolarProperties(QString &Properties, bool bData=false);
 	void Remove(int i);
 	void SetInertia(void *ptr, bool bPlane);
 	void *GetUFOPlrVariable(int iVar);

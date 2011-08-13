@@ -859,6 +859,7 @@ void MainFrame::CreateDockWindows()
 	CBody::s_pMainFrame            = this;
 	CWPolar::s_pMainFrame          = this;
 	CWOpp::s_pMainFrame            = this;
+	OpPoint::s_pMainFrame          = this;
 	LLTAnalysisDlg::s_pMainFrame   = this;
 	PanelAnalysisDlg::s_pMainFrame = this;
 	InertiaDlg::s_pMainFrame       = this;

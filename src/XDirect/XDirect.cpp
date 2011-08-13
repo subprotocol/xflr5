@@ -3326,7 +3326,7 @@ void QXDirect::OnImportXFoilPolar()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CPolar *pPolar = new CPolar;
 	double Re, alpha, CL, CD, CDp, CM, Xt, Xb,Cpmn, HMom;
-	QString FileName, PolarName, FoilName;
+	QString FoilName;
 	QString strong, str;
 
 	QString PathName;
