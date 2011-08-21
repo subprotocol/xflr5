@@ -4974,7 +4974,6 @@ void QXDirect::PaintCoupleGraphs(QPainter &painter)
 
 void QXDirect::PaintOpPoint(QPainter &painter)
 {
-	static QColor color;
 	static double Alpha, FoilScale;
 	FoilScale = m_fFoilScale;
 	QString Result, str, str1;
@@ -4982,6 +4981,15 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 
 	if (m_rCltRect.width()<150 || m_rCltRect.height()<150) return;
+
+
+	if(m_bCpGraph)
+	{
+		//Draw Cp Graph
+		m_pCpGraph->DrawGraph(painter);
+		QPoint Place(m_rCltRect.right()-330, m_rCltRect.top() + 20);
+		m_pCpGraph->DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);//Graph::DrawLegend uses graph's legend font and color
+	}
 
 	if(m_bNeutralLine)
 	{
@@ -5008,13 +5016,6 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		if(m_bBL && m_pCurOpp)       PaintBL(painter, m_pCurOpp, m_fFoilScale);
 	}
 
-	if(m_bCpGraph)
-	{
-		//Draw Cp Graph
-		m_pCpGraph->DrawGraph(painter);
-		QPoint Place(m_rCltRect.right()-330, m_rCltRect.top() + 20);
-		m_pCpGraph->DrawLegend(painter, Place, pMainFrame->m_TextFont, pMainFrame->m_TextColor);//Graph::DrawLegend uses graph's legend font and color
-	}
 
 	// Write Titles and results
 	QString strong;
