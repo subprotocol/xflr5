@@ -3370,7 +3370,7 @@ void QXDirect::OnImportXFoilPolar()
 	pPolar->m_FoilName = FoilName;
 
 	bRead  = ReadAVLString(in, Line, strong);// analysis type
-
+qDebug()<<strong;
 	textline = strong.toAscii();
 	text = textline.constData();
 	res = sscanf(text, "%d%d", &pPolar->m_ReType,&pPolar->m_MaType);
@@ -3381,7 +3381,7 @@ void QXDirect::OnImportXFoilPolar()
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
-
+qDebug()<<"OK";
 	if     (pPolar->m_ReType ==1 && pPolar->m_MaType ==1) pPolar->m_Type = 1;
 	else if(pPolar->m_ReType ==2 && pPolar->m_MaType ==2) pPolar->m_Type = 2;
 	else if(pPolar->m_ReType ==3 && pPolar->m_MaType ==1) pPolar->m_Type = 3;
@@ -3391,28 +3391,30 @@ void QXDirect::OnImportXFoilPolar()
 	bRead  = ReadAVLString(in, Line, strong);
 	if(strong.length() < 34)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
+qDebug()<<strong<<"OK2";
 	textline = strong.mid(9,6).toAscii();
 	text = textline.constData();
 	res  = sscanf(text, "%lf", &pPolar->m_XTop);
 	if(res !=1)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 
 	}
+
 	textline = strong.mid(28,6).toAscii();
 	text = textline.constData();
 	res += sscanf(text, "%lf", &pPolar->m_XBot);
 	if(res !=2)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
@@ -3420,19 +3422,20 @@ void QXDirect::OnImportXFoilPolar()
 
 	// Mach     Re     NCrit
 	bRead  = ReadAVLString(in, Line, strong);// blank line
-	if(strong.length() < 58)
+	if(strong.length() < 57)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
+
 	textline = strong.mid(8,6).toAscii();
 	text = textline.constData();
 	res  = sscanf(text, "%lf", &pPolar->m_Mach);// Mach
 	if(res!=1)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
@@ -3443,7 +3446,7 @@ void QXDirect::OnImportXFoilPolar()
 	res += sscanf(text, "%lf", &Re);// Re
 	if(res!=2)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
@@ -3454,7 +3457,7 @@ void QXDirect::OnImportXFoilPolar()
 	Re = Re*1000000.0;
 	if(res !=3)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
