@@ -10077,6 +10077,7 @@ void QMiarex::OnImportWPolar()
 
 	QTextStream in(&XFile);
 	int res, Line;
+	Line = 0;
 
 	bool bRead;
 	bRead  = ReadAVLString(in, Line, strong);// XFoil or XFLR5 version

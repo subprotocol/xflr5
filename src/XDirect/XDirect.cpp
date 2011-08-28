@@ -3326,10 +3326,7 @@ void QXDirect::OnImportXFoilPolar()
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	CPolar *pPolar = new CPolar;
 	double Re, alpha, CL, CD, CDp, CM, Xt, Xb,Cpmn, HMom;
-	QString FoilName;
-	QString strong, str;
-
-	QString PathName;
+	QString FoilName, PathName, strong, str;
 
 	QByteArray textline;
 	const char *text;
@@ -3351,8 +3348,9 @@ void QXDirect::OnImportXFoilPolar()
 
 	QTextStream in(&XFile);
 	int res, Line;
+	bool bOK, bOK2, bRead;
+	Line = 0;
 
-	bool bRead;
 	bRead  = ReadAVLString(in, Line, strong);// XFoil or XFLR5 version
 	bRead  = ReadAVLString(in, Line, strong);// Foil Name
 
@@ -3370,18 +3368,16 @@ void QXDirect::OnImportXFoilPolar()
 	pPolar->m_FoilName = FoilName;
 
 	bRead  = ReadAVLString(in, Line, strong);// analysis type
-qDebug()<<strong;
-	textline = strong.toAscii();
-	text = textline.constData();
-	res = sscanf(text, "%d%d", &pPolar->m_ReType,&pPolar->m_MaType);
-	if(res !=2)
+
+	pPolar->m_ReType = strong.mid(0,2).toInt(&bOK);
+	pPolar->m_MaType= strong.mid(2,2).toInt(&bOK2);
+	if(!bOK || !bOK2)
 	{
-		str = tr("Error reading at line xx. The polar(s) will not be stored");
+		str = QString("Error reading line %1: Unrecognized Mach and Reynolds type.\nThe polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
-qDebug()<<"OK";
 	if     (pPolar->m_ReType ==1 && pPolar->m_MaType ==1) pPolar->m_Type = 1;
 	else if(pPolar->m_ReType ==2 && pPolar->m_MaType ==2) pPolar->m_Type = 2;
 	else if(pPolar->m_ReType ==3 && pPolar->m_MaType ==1) pPolar->m_Type = 3;
@@ -3391,30 +3387,26 @@ qDebug()<<"OK";
 	bRead  = ReadAVLString(in, Line, strong);
 	if(strong.length() < 34)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
-qDebug()<<strong<<"OK2";
-	textline = strong.mid(9,6).toAscii();
-	text = textline.constData();
-	res  = sscanf(text, "%lf", &pPolar->m_XTop);
-	if(res !=1)
+
+	pPolar->m_XTop = strong.mid(9,6).toDouble(&bOK);
+	if(!bOK)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading Bottom Transition value at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 
 	}
 
-	textline = strong.mid(28,6).toAscii();
-	text = textline.constData();
-	res += sscanf(text, "%lf", &pPolar->m_XBot);
-	if(res !=2)
+	pPolar->m_XTop = strong.mid(28,6).toDouble(&bOK);
+	if(!bOK)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading Top Transition value at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
@@ -3422,42 +3414,37 @@ qDebug()<<strong<<"OK2";
 
 	// Mach     Re     NCrit
 	bRead  = ReadAVLString(in, Line, strong);// blank line
-	if(strong.length() < 57)
+	if(strong.length() < 50)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
 
-	textline = strong.mid(8,6).toAscii();
-	text = textline.constData();
-	res  = sscanf(text, "%lf", &pPolar->m_Mach);// Mach
-	if(res!=1)
+	pPolar->m_Mach = strong.mid(8,6).toDouble(&bOK);
+	if(!bOK)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading Mach Number at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
 
-	textline = strong.mid(24,18).toAscii();
-	text = textline.constData();
-	res += sscanf(text, "%lf", &Re);// Re
-	if(res!=2)
+	Re = strong.mid(24,10).toDouble(&bOK);
+	if(!bOK)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading Reynolds Number at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
-	textline = strong.mid(52,8).toAscii();
-	text = textline.constData();
-	res += sscanf(text, "%lf", &pPolar->m_ACrit);// NCrit
-	Re = Re*1000000.0;
-	if(res !=3)
+	Re *=1000000.0;
+
+	pPolar->m_ACrit = strong.mid(52,8).toDouble(&bOK);
+	if(!bOK)
 	{
-		str = QString("Error reading at line %1. The polar(s) will not be stored").arg(Line);
+		str = QString("Error reading NCrit at line %1. The polar(s) will not be stored").arg(Line);
 		delete pPolar;
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
