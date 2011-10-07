@@ -127,7 +127,7 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	m_ImageFormat = 2;
 	m_ExportFileType = 1;
 	m_bReverseZoom = false;
-
+	m_bAlphaChannel = false;
 	m_bSaveOpps  = false;
 	m_bSaveWOpps = true;
 	m_bSaveSettings = true;
@@ -3309,7 +3309,8 @@ bool MainFrame::LoadSettings()
 			else break;
 		}while(n<MAXRECENTFILES);
 
-                m_bReverseZoom = settings.value("ReverseZoom").toBool();
+		m_bReverseZoom = settings.value("ReverseZoom").toBool();
+		m_bAlphaChannel = settings.value("AlphaChannel").toBool();
 	}
 
 	return true;
@@ -4285,7 +4286,7 @@ void MainFrame::OnStyle()
 	m_DisplaySettingsDlg.m_pRefGraph       = &m_RefGraph;
 	m_DisplaySettingsDlg.m_StyleName       = m_StyleName;
 	m_DisplaySettingsDlg.m_bReverseZoom    = m_bReverseZoom;
-
+	m_DisplaySettingsDlg.m_bAlphaChannel   = m_bAlphaChannel;
 	m_DisplaySettingsDlg.InitDialog();
 
 	if(m_DisplaySettingsDlg.exec() ==QDialog::Accepted)
@@ -4295,7 +4296,8 @@ void MainFrame::OnStyle()
 		m_TextFont        = m_DisplaySettingsDlg.m_TextFont;
 		m_StyleName       = m_DisplaySettingsDlg.m_StyleName;
 		m_bReverseZoom    = m_DisplaySettingsDlg.m_pctrlReverseZoom->isChecked();
-
+		m_bAlphaChannel   = m_DisplaySettingsDlg.m_pctrlAlphaChannel->isChecked();
+		pMiarex->m_bResetglGeom = true;
 		pMiarex->m_bResetglLegend = true;
 
 		if(m_DisplaySettingsDlg.m_bIsGraphModified)
@@ -5005,6 +5007,7 @@ void MainFrame::SaveSettings()
 		settings.setValue("DlgPos_y", m_DlgPos.y());
 		settings.setValue("RecentFileSize", m_RecentFiles.size());
 		settings.setValue("ReverseZoom", m_bReverseZoom);
+		settings.setValue("AlphaChannel", m_bAlphaChannel);
 
 		QString RecentF;
 		for(int i=0; i<m_RecentFiles.size() && i<MAXRECENTFILES; i++)

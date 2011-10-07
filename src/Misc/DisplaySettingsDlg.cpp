@@ -39,7 +39,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 	m_pMainFrame = pParent;
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
-
+	m_bAlphaChannel = false;
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));
@@ -99,6 +99,7 @@ void DisplaySettingsDlg::SetupLayout()
 	FontBox->setLayout(FontLayout);
 
 	m_pctrlReverseZoom = new QCheckBox(tr("Reverse zoom direction using mouse wheel"));
+	m_pctrlAlphaChannel = new QCheckBox(tr("Enable 3D transparency"));
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	OKButton = new QPushButton(tr("OK"));
@@ -121,6 +122,8 @@ void DisplaySettingsDlg::SetupLayout()
 	MainLayout->addWidget(GraphBox);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(m_pctrlReverseZoom);
+	MainLayout->addStretch(1);
+	MainLayout->addWidget(m_pctrlAlphaChannel);
 	MainLayout->addSpacing(20);
 	MainLayout->addStretch(1);
 	MainLayout->addLayout(CommandButtons);
@@ -138,7 +141,7 @@ void DisplaySettingsDlg::InitDialog()
 	m_pctrlTextFont->setText(FontName);
 	m_pctrlStyles->setCurrentIndex(m_pctrlStyles->findText(m_StyleName));
 	m_pctrlReverseZoom->setChecked(m_bReverseZoom);
-
+	m_pctrlAlphaChannel->setChecked(m_bAlphaChannel);
 	QPalette palette = m_pctrlTextClr->palette();
 	QColor listColor = palette.color(QPalette::Button);
 	if(listColor.isValid())

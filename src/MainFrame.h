@@ -418,6 +418,7 @@ public:
 	int m_ForceUnit;
 	int m_MomentUnit;
 	int m_ExportFileType;
+	bool m_bAlphaChannel;
 
 };
 

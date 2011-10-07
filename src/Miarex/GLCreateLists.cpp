@@ -34,6 +34,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 {
 	if(!pWing) return;
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	static int j, l ;
@@ -56,14 +57,20 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 	{
 		pMiarex->m_GLList++;
 
-		glColor4d(pWing->m_WingColor.redF(),pWing->m_WingColor.greenF(),pWing->m_WingColor.blueF(), pWing->m_WingColor.alphaF());
+		if(pMainFrame->m_bAlphaChannel)
+		{
+			glColor4d(pWing->m_WingColor.redF(),pWing->m_WingColor.greenF(),pWing->m_WingColor.blueF(), pWing->m_WingColor.alphaF());
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glColor3d(pWing->m_WingColor.redF(),pWing->m_WingColor.greenF(),pWing->m_WingColor.blueF());
+			glDisable (GL_BLEND);
+		}
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glEnable (GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 		glPolygonOffset(1.0, 1.0);
 
 		//top surface
