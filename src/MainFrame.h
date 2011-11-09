@@ -169,6 +169,7 @@ private:
 	void SelectOpPoint(OpPoint *pOpp);
 	void SelectWOpp(double x);
 	void SetCentralWidget();
+	void SetDlgPos(QDialog &Dlg);
 	void SetGraphSettings(Graph *pGraph);
 	void SetProjectName(QString PathName);
 	void SetMenus();
@@ -201,7 +202,6 @@ private:
 	CPolar* AddPolar(CPolar *pPolar);
 	OpPoint *GetOpp(double Alpha);
 	QColor GetColor(int type);
-
 
 	//recent file
 	QString ShortenFileName(QString &PathName);

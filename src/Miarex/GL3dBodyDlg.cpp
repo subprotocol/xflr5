@@ -528,7 +528,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	double xinc, hinc, u;
 	CVector N, LATB, TALB;
 	CVector LA, LB, TA, TB;
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	nx = qMin(500, m_NXPoints);
@@ -558,11 +558,20 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	{
 		m_GLList++;
 
-		glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
-
+		if(pMainFrame->m_bAlphaChannel)
+		{
+			glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glColor3d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF());
+			glDisable (GL_BLEND);
+		}
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glPolygonOffset(1.0, 1.0);
 
 		glEnable (GL_BLEND);
@@ -1177,23 +1186,31 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 	int style, width;
 	CVector P1, P2, P3, P4, N, P1P3, P2P4, Tj, Tjp1;
 
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	glNewList(BODYSURFACES,GL_COMPILE);
 	{
 		m_GLList++;
 
-		glEnable (GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable (GL_LINE_STIPPLE);
-		glPolygonMode(GL_FRONT,GL_FILL);
+		if(pMainFrame->m_bAlphaChannel)
+		{
+			glColor4d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF(), pBody->m_BodyColor.alphaF());
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glColor3d(pBody->m_BodyColor.redF(),pBody->m_BodyColor.greenF(),pBody->m_BodyColor.blueF());
+			glDisable (GL_BLEND);
+		}
+		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POLYGON_OFFSET_FILL);
-		glPolygonOffset(1.0,1.0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonOffset(1.0, 1.0);
+
+		glDisable (GL_LINE_STIPPLE);
 		glLineWidth(1.0);
-
-		color = pBody->m_BodyColor;
-
-		glColor4d(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 
 		for (k=0; k<pBody->m_NSideLines-1;k++)
 		{

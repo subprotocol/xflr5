@@ -33,7 +33,6 @@
 #include "../Globals.h"
 #include <math.h>
 
-
 void *QMiarex::s_pMainFrame;
 void *QMiarex::s_p2DWidget;
 void *QMiarex::s_pGLWidget;
@@ -487,6 +486,8 @@ QMiarex::QMiarex(QWidget *parent)
 	GL3dWingDlg::s_pGLLightDlg = &m_GLLightDlg;
 	GL3dBodyDlg::s_pGLLightDlg = &m_GLLightDlg;
 
+	QEvent event(QEvent::Resize);
+	QApplication::sendEvent(&m_WingDlg, &event);
 	SetupLayout();
 
 //	m_pctrlHalfWing->setChecked(m_bHalfWing);
@@ -9163,6 +9164,7 @@ void QMiarex::OnEditUFO()
 	m_WingDlg.m_bAcceptName= false;
 	m_WingDlg.InitDialog(pModWing);
 
+//	pMainFrame->SetDlgPos(m_WingDlg);
 
 	if(QDialog::Accepted == m_WingDlg.exec())
 	{
@@ -9236,6 +9238,7 @@ void QMiarex::OnEditUFO()
 	{
 		delete pModWing; // clean up
 	}
+//	pMainFrame->m_DlgPos = m_WingDlg.pos();
 }
 
 
@@ -13710,6 +13713,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 				}
 			}
 			else if(pOldPlane)
+
 			{
 //				if(pOldPlane->m_bActive) QMessageBox::warning(window(), tr("Warning"),tr("Cannot overwrite current plane"));
 //				else

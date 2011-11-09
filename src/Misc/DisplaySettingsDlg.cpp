@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	QDipSettingsDlg Class
+	DisplaySettingsDlg Class
 	Copyright (C) 2008-2008 Andre Deperrois xflr5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify

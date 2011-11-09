@@ -52,6 +52,9 @@
 #include "XDirect/LEDlg.h"
 #include "XInverse/XInverse.h"
 
+#include <QDesktopWidget>
+
+
 #ifdef Q_WS_MAC
 	#include <CoreFoundation/CoreFoundation.h>
 #endif
@@ -4298,6 +4301,7 @@ void MainFrame::OnStyle()
 		m_bReverseZoom    = m_DisplaySettingsDlg.m_pctrlReverseZoom->isChecked();
 		m_bAlphaChannel   = m_DisplaySettingsDlg.m_pctrlAlphaChannel->isChecked();
 		pMiarex->m_bResetglGeom = true;
+		pMiarex->m_bResetglBody = true;
 		pMiarex->m_bResetglLegend = true;
 
 		if(m_DisplaySettingsDlg.m_bIsGraphModified)
@@ -6804,4 +6808,22 @@ void MainFrame::OnWOppProps()
 		QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 		pMiarex->OnWOppProps();
 	}
+}
+
+
+
+void MainFrame::SetDlgPos(QDialog &Dlg)
+{
+	QPoint Position = m_DlgPos;
+	QDesktopWidget desk;
+
+	if(Dlg.frameGeometry().width() +m_DlgPos.x()>desk.width())  Position.rx() += desk.width() -(Dlg.frameGeometry().width() +m_DlgPos.x());
+	if(Dlg.frameGeometry().height()+m_DlgPos.y()>desk.height()) Position.ry() += desk.height()-(Dlg.frameGeometry().height()+m_DlgPos.y());
+
+	if(m_DlgPos.x()<0) Position.rx()=0;
+
+	if(Dlg.width()>desk.rect().width())   Position.rx()=0;
+	if(Dlg.height()>desk.rect().height()) Position.ry()=0;
+
+	Dlg.move(Position);
 }
