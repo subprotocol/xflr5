@@ -251,7 +251,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << m_NVLMPanels;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
 		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
-		if(m_AnalysisMethod==3)
+		if(m_AnalysisMethod==PANELMETHOD)
 		{
 			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
 		}
@@ -263,7 +263,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			ar << (float)m_FlapMoment[k];
 		}
-		if(ProjectFormat>=6)
+		if(ProjectFormat>5)
 		{
 			for(k=0; k<8;k++)
 			{

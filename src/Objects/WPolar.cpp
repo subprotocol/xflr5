@@ -1495,7 +1495,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	{
 		//write variables
 		if(ProjectFormat>5) ar << m_PolarFormat; // identifies the format of the file
-		else                ar << 1016;
+		else                ar << 1018;
 		WriteCString(ar,m_UFOName);
 		WriteCString(ar,m_PlrName);
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
@@ -1531,7 +1531,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
 
 			ar << (float)m_GCm[i];
-			if(ProjectFormat>=5) ar << (float)m_VCm[i] << (float)m_ICm[i];
+			ar << (float)m_VCm[i] << (float)m_ICm[i];
 
 			ar << (float)m_GRm[i];
 
@@ -1568,7 +1568,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			ar<<(float)m_CoGIxx<<(float)m_CoGIyy<<(float)m_CoGIzz<<(float)m_CoGIxz;
 		}
 
-		if(ProjectFormat>=5)
+		if(ProjectFormat>5)
 		{
 			//float provision
 			for(int i=0; i<20; i++) ar<<(float)i;
@@ -1688,7 +1688,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar >> f;	m_QInf = f;
 		ar >> f;	m_Mass = f;
 		ar >> f;	m_ASpec = f;
-		if(m_PolarFormat>=1015) ar >> f;	m_Beta = f;
+		if(m_PolarFormat>=1015)
+		{
+			ar >> f;
+			m_Beta = f;
+		}
+		else m_Beta = 0.0;
 		if(m_PolarFormat<1018 && m_PolarFormat>=1002)
 		{
 			ar >> f;			m_CoG.x = f;

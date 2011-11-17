@@ -301,17 +301,25 @@ void InertiaDlg::FillMassModel()
 void InertiaDlg::InitDialog()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	QString str, str1, strong;
+	QString strong, strMass, strLength;
 
-	GetWeightUnit(str, pMainFrame->m_WeightUnit);
-	m_pctrlMassUnit->setText(str);
-	m_pctrlMassUnit2->setText(str);
-	GetLengthUnit(str1, pMainFrame->m_LengthUnit);
-	m_pctrlLengthUnit->setText(str1);
-	m_pctrlLengthUnit2->setText(str1);
-	strong = str+"."+str1+QString::fromUtf8("²");
+	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
+	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
+
+	m_pctrlMassUnit->setText(strMass);
+	m_pctrlMassUnit2->setText(strMass);
+	m_pctrlLengthUnit->setText(strLength);
+	m_pctrlLengthUnit2->setText(strLength);
+	strong = strMass+"."+strLength+QString::fromUtf8("²");
 	m_pctrlInertiaUnit1->setText(strong);
 	m_pctrlInertiaUnit2->setText(strong);
+
+	m_pMassModel->setHeaderData(0, Qt::Horizontal, tr("Mass") +" ("+strMass+")");
+	m_pMassModel->setHeaderData(1, Qt::Horizontal, tr("x") +" ("+strLength+")");
+	m_pMassModel->setHeaderData(2, Qt::Horizontal, tr("y")+" ("+strLength+")");
+	m_pMassModel->setHeaderData(3, Qt::Horizontal, tr("z")+" ("+strLength+")");
+	m_pMassModel->setHeaderData(4, Qt::Horizontal, tr("Description"));
+
 
 	m_pctrlWingInertia->setEnabled(false);
 	m_pctrlWing2Inertia->setEnabled(false);
@@ -1012,14 +1020,6 @@ void InertiaDlg::SetupLayout()
 	m_pMassModel = new QStandardItemModel;
 	m_pMassModel->setRowCount(10);//temporary
 	m_pMassModel->setColumnCount(5);
-
-	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
-	m_pMassModel->setHeaderData(0, Qt::Horizontal, tr("Mass") +" ("+strMass+")");
-	GetLengthUnit(strLength, pMainFrame->m_LengthUnit);
-	m_pMassModel->setHeaderData(1, Qt::Horizontal, tr("x") +" ("+strLength+")");
-	m_pMassModel->setHeaderData(2, Qt::Horizontal, tr("y")+" ("+strLength+")");
-	m_pMassModel->setHeaderData(3, Qt::Horizontal, tr("z")+" ("+strLength+")");
-	m_pMassModel->setHeaderData(4, Qt::Horizontal, tr("Description"));
 
 	m_pctrlMassView->setModel(m_pMassModel);
 	m_pctrlMassView->setColumnWidth(0,70);

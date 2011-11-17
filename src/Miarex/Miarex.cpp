@@ -5176,6 +5176,7 @@ void QMiarex::GLDrawMasses()
 	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 	QString MassUnit;
 	GetWeightUnit(MassUnit, pMainFrame->m_WeightUnit);
+
 	glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
 	double radius = .01;//2cm
 	double zdist = 25.0/(double)m_r3DCltRect.width();
@@ -11477,7 +11478,7 @@ void QMiarex::OnUFOInertia()
 	for (int i=0; i< m_poaWPolar->size(); i++)
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		if(pWPolar->m_Alpha.size() && pWPolar->m_UFOName==UFOName)
+		if(pWPolar->m_Alpha.size() && pWPolar->m_UFOName==UFOName && pWPolar->m_bAutoInertia)
 		{
 //			if(pWPolar->m_Type==STABILITYPOLAR)
 //			{
@@ -11535,7 +11536,7 @@ void QMiarex::OnUFOInertia()
 				return;
 			}
 
-			//last case, user wants to overwrite, so reset all type 7 polars and WOpps and POpps associated to the UFO
+			//last case, user wants to overwrite, so reset all polars, WOpps and POpps with autoinertia associated to the UFO
 			for (int i=0; i<m_poaWPolar->size(); i++)
 			{
 				pWPolar = (CWPolar*)m_poaWPolar->at(i);
@@ -11544,26 +11545,27 @@ void QMiarex::OnUFOInertia()
 					pWPolar->ResetWPlr();
 					if(m_pCurPlane)     pWPolar->SetInertia(m_pCurPlane, true);
 					else if(m_pCurWing) pWPolar->SetInertia(m_pCurWing, false);
+					for (int i=m_poaWOpp->size()-1; i>=0; i--)
+					{
+						CWOpp *pWOpp = (CWOpp*)m_poaWOpp->at(i);
+						if(pWOpp && pWOpp->m_WingName==UFOName && pWOpp->m_PlrName==pWPolar->m_PlrName)
+						{
+							m_poaWOpp->removeAt(i);
+							delete pWOpp;
+						}
+					}
+					for (int i=m_poaPOpp->size()-1; i>=0; i--)
+					{
+						CPOpp *pPOpp = (CPOpp*)m_poaPOpp->at(i);
+						if(pPOpp && pPOpp->m_PlaneName==UFOName && pPOpp->m_PlrName==pWPolar->m_PlrName)
+						{
+							m_poaPOpp->removeAt(i);
+							delete pPOpp;
+						}
+					}
 				}
 			}
-			for (int i=m_poaWOpp->size()-1; i>=0; i--)
-			{
-				CWOpp *pWOpp = (CWOpp*)m_poaWOpp->at(i);
-				if(pWOpp && pWOpp->m_WingName==UFOName)
-				{
-					m_poaWOpp->removeAt(i);
-					delete pWOpp;
-				}
-			}
-			for (int i=m_poaPOpp->size()-1; i>=0; i--)
-			{
-				CPOpp *pPOpp = (CPOpp*)m_poaPOpp->at(i);
-				if(pPOpp && pPOpp->m_PlaneName==UFOName)
-				{
-					m_poaPOpp->removeAt(i);
-					delete pPOpp;
-				}
-			}
+
 			m_pCurWOpp = NULL;
 			m_pCurPOpp = NULL;
 		}

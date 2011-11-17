@@ -1702,8 +1702,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{	// storing code
-		if(ProjectFormat>=5)      ar << 1010;
-		else if(ProjectFormat==4) ar << 1007;
+		if(ProjectFormat>5)       ar << 1010;
+		else if(ProjectFormat==5) ar << 1009;
 			//1010 : added storage of alpha channel + added a provision for ints and floats
 			//1009 : QFLR5 v0.03 : added mass properties for inertia calculations
 			//1008 : QFLR5 v0.02 : Added wing description field
@@ -1750,7 +1750,9 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
 			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
 			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
-
+		}
+		if(ProjectFormat>5)
+		{
 			ar << m_WingColor.alpha();
 			for(int i=0; i<20; i++) ar<<(float)0.0f;
 			for(int i=0; i<20; i++) ar<<0;

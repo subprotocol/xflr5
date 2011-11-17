@@ -3338,13 +3338,13 @@ int MainFrame::LoadXFLR5File(QString PathName)
 	}
 	QXDirect * pXDirect = (QXDirect*)m_pXDirect;
 	QString end;
-        //QFileInfo fileinfo(XFile);
-        end = PathName.right(4);
+	//QFileInfo fileinfo(XFile);
+	end = PathName.right(4);
 	end = end.toLower();
-        //QString dir = fileinfo.canonicalPath();
+	//QString dir = fileinfo.canonicalPath();
 
-        int pos = PathName.lastIndexOf("/");
-        if(pos>0) m_LastDirName = PathName.left(pos);
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) m_LastDirName = PathName.left(pos);
 	if(end==".plr")
 	{
 		QDataStream ar(&XFile);
@@ -3427,15 +3427,21 @@ int MainFrame::LoadXFLR5File(QString PathName)
 					g_pCurFoil = pXDirect->SetFoil();
 					UpdateFoils();
 					UpdateView();
+					QApplication::restoreOverrideCursor();
 				}
-				else DeleteProject();
+				else
+				{
+					QApplication::restoreOverrideCursor();
+					QMessageBox::warning(this,tr("Warning"), tr("Error reading the file"));
+					DeleteProject();
+				}
 
 				AddRecentFile(PathName);
 				SetSaveState(true);
 				SetProjectName(PathName);
 
 				XFile.close();
-				QApplication::restoreOverrideCursor();
+
 
 				pXDirect->SetControls();
 
