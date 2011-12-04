@@ -54,7 +54,6 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_QInfMax    = 0.0;
 	m_QInfDelta  = 0.0;
 
-	m_pWPolar = NULL;
 	RFF = 10.0;
 	eps = 1.e-7;
 	
@@ -97,7 +96,6 @@ PanelAnalysisDlg::PanelAnalysisDlg()
 	m_pPlane  = NULL;
 	m_ppSurface = NULL;
 
-	m_pWPolar        = NULL;
 
 //	m_ppPanel        = NULL;
 	m_pPanel         = NULL;

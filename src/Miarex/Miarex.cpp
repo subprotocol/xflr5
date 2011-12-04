@@ -3990,8 +3990,8 @@ void QMiarex::EditCurPlane()
 			else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
 			else if(m_iView==WOPPVIEW)	CreateWOppCurves();
 			else if(m_iView==WCPVIEW)	CreateCpCurves();
-
 		}
+
 		SetUFO();
 		pMainFrame->UpdateUFOs();
 		m_bIs2DScaleSet = false;
@@ -6566,10 +6566,6 @@ void QMiarex::LLTAnalyze(double V0, double VMax, double VDelta, bool bSequence, 
 	pMainFrame->m_DlgPos= m_pLLTDlg->pos();
 	pMainFrame->UpdateWOpps();
 	SetWOpp(false, V0);
-
-	if(m_iView==WPOLARVIEW)     CreateWPolarCurves();
-
-	UpdateView();
 }
 
 
@@ -6913,18 +6909,9 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 			}
 		}
 		else if ((event->buttons() & Qt::MidButton) && !bCtrl)
-		//scaling
 		{
-			// we zoom the graph or the wing
-
-			if(m_pCurWing)
-			{	//zoom 3D wing
-//				if(pt.y()-m_LastPoint.y()>0) m_glScaled *= (GLfloat)1.02;
-//				else                         m_glScaled /= (GLfloat)1.02;
-
-				m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
-				UpdateView();
-			}
+			m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
+			UpdateView();
 		}
 	}
 	else
@@ -12402,12 +12389,6 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 
 	if(m_pCurPlane)     SetPOpp(false, m_pPanelDlg->m_Alpha);
 	else if(m_pCurWing) SetWOpp(false, m_pPanelDlg->m_Alpha);
-
-	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
-	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
-
-	UpdateView();
-
 }
 
 
@@ -13707,6 +13688,7 @@ bool QMiarex::SetModWing(CWing *pModWing)
 						m_pCurWOpp = NULL;
 						m_pCurPOpp = NULL;
 						m_poaWing->removeAt(k);
+
 						if(pWing==m_pCurWing) m_pCurWing = NULL;
 						delete pWing;
 						bExists = false;
@@ -14102,6 +14084,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 
 
 
+
 void QMiarex::SetupLayout()
 {
 	QSizePolicy szPolicyExpanding;
@@ -14118,255 +14101,291 @@ void QMiarex::SetupLayout()
 
 	setSizePolicy(szPolicyMaximum);
 //_______________________Analysis
-	m_pctrlSequence = new QCheckBox(tr("Sequence"));
-	QGridLayout *SequenceGroup = new QGridLayout;
-	QLabel *AlphaMinLab   = new QLabel(tr("Start="));
-	QLabel *AlphaMaxLab   = new QLabel(tr("End="));
-	QLabel *AlphaDeltaLab = new QLabel(tr("D="));
-	AlphaDeltaLab->setFont(QFont("Symbol"));
-	AlphaDeltaLab->setAlignment(Qt::AlignRight);
-	AlphaMinLab->setAlignment(Qt::AlignRight);
-	AlphaMaxLab->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMin     = new FloatEdit(0.0, 3);
-	m_pctrlAlphaMax     = new FloatEdit(1., 3);
-	m_pctrlAlphaDelta   = new FloatEdit(0.5, 3);
-
-	m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
-	m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
-	m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
-
-/*	m_pctrlAlphaMin->setMinimumHeight(20);
-	m_pctrlAlphaMax->setMinimumHeight(20);
-	m_pctrlAlphaDelta->setMinimumHeight(20);*/
-	m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
-	m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
-	SequenceGroup->addWidget(AlphaMinLab,1,1);
-	SequenceGroup->addWidget(AlphaMaxLab,2,1);
-	SequenceGroup->addWidget(AlphaDeltaLab,3,1);
-	SequenceGroup->addWidget(m_pctrlAlphaMin,1,2);
-	SequenceGroup->addWidget(m_pctrlAlphaMax,2,2);
-	SequenceGroup->addWidget(m_pctrlAlphaDelta,3,2);
-	SequenceGroup->addWidget(m_pctrlUnit1,1,3);
-	SequenceGroup->addWidget(m_pctrlUnit2,2,3);
-	SequenceGroup->addWidget(m_pctrlUnit3,3,3);
-
-	m_pctrlInitLLTCalc = new QCheckBox(tr("Init LLT"));
-	m_pctrlStoreWOpp    = new QCheckBox(tr("Store OpPoint"));
-	m_pctrlAnalyze     = new QPushButton(tr("Analyze"));
-
-	QHBoxLayout *AnalysisSettings = new QHBoxLayout;
-	AnalysisSettings->addWidget(m_pctrlInitLLTCalc);
-	AnalysisSettings->addWidget(m_pctrlStoreWOpp);
-
-	QVBoxLayout *AnalysisGroup = new QVBoxLayout;
-	AnalysisGroup->addWidget(m_pctrlSequence);
-	AnalysisGroup->addLayout(SequenceGroup);
-        AnalysisGroup->addStretch(1);
-	AnalysisGroup->addLayout(AnalysisSettings);
-	AnalysisGroup->addWidget(m_pctrlAnalyze);
 
 	QGroupBox *AnalysisBox = new QGroupBox(tr("Analysis settings"));
-	AnalysisBox->setLayout(AnalysisGroup);
+	{
+		QVBoxLayout *AnalysisGroupLayout = new QVBoxLayout;
+		{
+			m_pctrlSequence = new QCheckBox(tr("Sequence"));
+			QGridLayout *SequenceGroupLayout = new QGridLayout;
+			{
+				QLabel *AlphaMinLab   = new QLabel(tr("Start="));
+				QLabel *AlphaMaxLab   = new QLabel(tr("End="));
+				QLabel *AlphaDeltaLab = new QLabel(tr("D="));
+				AlphaDeltaLab->setFont(QFont("Symbol"));
+				AlphaDeltaLab->setAlignment(Qt::AlignRight);
+				AlphaMinLab->setAlignment(Qt::AlignRight);
+				AlphaMaxLab->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaMin     = new FloatEdit(0.0, 3);
+				m_pctrlAlphaMax     = new FloatEdit(1., 3);
+				m_pctrlAlphaDelta   = new FloatEdit(0.5, 3);
+
+				m_pctrlUnit1 = new QLabel(QString::fromUtf8("°"));
+				m_pctrlUnit2 = new QLabel(QString::fromUtf8("°"));
+				m_pctrlUnit3 = new QLabel(QString::fromUtf8("°"));
+
+			/*	m_pctrlAlphaMin->setMinimumHeight(20);
+				m_pctrlAlphaMax->setMinimumHeight(20);
+				m_pctrlAlphaDelta->setMinimumHeight(20);*/
+				m_pctrlAlphaMin->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaMax->setAlignment(Qt::AlignRight);
+				m_pctrlAlphaDelta->setAlignment(Qt::AlignRight);
+				SequenceGroupLayout->addWidget(AlphaMinLab,1,1);
+				SequenceGroupLayout->addWidget(AlphaMaxLab,2,1);
+				SequenceGroupLayout->addWidget(AlphaDeltaLab,3,1);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaMin,1,2);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaMax,2,2);
+				SequenceGroupLayout->addWidget(m_pctrlAlphaDelta,3,2);
+				SequenceGroupLayout->addWidget(m_pctrlUnit1,1,3);
+				SequenceGroupLayout->addWidget(m_pctrlUnit2,2,3);
+				SequenceGroupLayout->addWidget(m_pctrlUnit3,3,3);
+			}
+			QHBoxLayout *AnalysisSettingsLayout = new QHBoxLayout;
+			{
+				m_pctrlInitLLTCalc = new QCheckBox(tr("Init LLT"));
+				m_pctrlStoreWOpp    = new QCheckBox(tr("Store OpPoint"));
+				AnalysisSettingsLayout->addWidget(m_pctrlInitLLTCalc);
+				AnalysisSettingsLayout->addWidget(m_pctrlStoreWOpp);
+			}
+
+			m_pctrlAnalyze     = new QPushButton(tr("Analyze"));
+
+			AnalysisGroupLayout->addWidget(m_pctrlSequence);
+			AnalysisGroupLayout->addLayout(SequenceGroupLayout);
+			AnalysisGroupLayout->addStretch(1);
+			AnalysisGroupLayout->addLayout(AnalysisSettingsLayout);
+			AnalysisGroupLayout->addWidget(m_pctrlAnalyze);
+		}
+
+		AnalysisBox->setLayout(AnalysisGroupLayout);
+	}
 
 //_______________________Display
-	QGridLayout *CheckDispLayout = new QGridLayout;
-	m_pctrlPanelForce = new QCheckBox(tr("Panel Forces"));
-	m_pctrlPanelForce->setToolTip(tr("Display the force 1/2.rho.V2.S.Cp acting on the panel"));
-	m_pctrlLift           = new QCheckBox(tr("Lift"));
-	m_pctrlIDrag          = new QCheckBox(tr("Ind. Drag"));
-	m_pctrlVDrag          = new QCheckBox(tr("Visc. Drag"));
-	m_pctrlTrans          = new QCheckBox(tr("Trans."));
-	m_pctrlMoment         = new QCheckBox(tr("Moment"));
-	m_pctrlDownwash       = new QCheckBox(tr("Downw."));
-	m_pctrlCp             = new QCheckBox(tr("Cp"));
-	m_pctrlSurfVel        = new QCheckBox(tr("Surf. Vel."));
-	m_pctrlStream         = new QCheckBox(tr("Stream"));
-	m_pctrlWOppAnimate    = new QCheckBox(tr("Animate"));
-//	m_pctrlHighlightOpp   = new QCheckBox(tr("Highlight OpPoint"));
-
-
-	m_pctrlAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
-	m_pctrlAnimateWOppSpeed->setMinimum(0);
-	m_pctrlAnimateWOppSpeed->setMaximum(500);
-	m_pctrlAnimateWOppSpeed->setSliderPosition(250);
-	m_pctrlAnimateWOppSpeed->setTickInterval(50);
-	m_pctrlAnimateWOppSpeed->setTickPosition(QSlider::TicksBelow);
-	CheckDispLayout->addWidget(m_pctrlCp,       1,1);
-	CheckDispLayout->addWidget(m_pctrlPanelForce, 1, 2);
-	CheckDispLayout->addWidget(m_pctrlLift,     2, 1);
-	CheckDispLayout->addWidget(m_pctrlMoment,   2, 2);
-	CheckDispLayout->addWidget(m_pctrlIDrag,    3, 1);
-	CheckDispLayout->addWidget(m_pctrlVDrag,    3, 2);
-	CheckDispLayout->addWidget(m_pctrlTrans,    4, 1);
-	CheckDispLayout->addWidget(m_pctrlDownwash, 4, 2);
-	CheckDispLayout->addWidget(m_pctrlSurfVel,  5, 1);
-	CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
-	CheckDispLayout->addWidget(m_pctrlWOppAnimate,  6, 1);
-	CheckDispLayout->addWidget(m_pctrlAnimateWOppSpeed,6,2);
-
 	QGroupBox *DisplayBox = new QGroupBox(tr("Results"));
-	DisplayBox->setLayout(CheckDispLayout);
+	{
+		QGridLayout *CheckDispLayout = new QGridLayout;
+		{
+			m_pctrlPanelForce = new QCheckBox(tr("Panel Forces"));
+			m_pctrlPanelForce->setToolTip(tr("Display the force 1/2.rho.V2.S.Cp acting on the panel"));
+			m_pctrlLift           = new QCheckBox(tr("Lift"));
+			m_pctrlIDrag          = new QCheckBox(tr("Ind. Drag"));
+			m_pctrlVDrag          = new QCheckBox(tr("Visc. Drag"));
+			m_pctrlTrans          = new QCheckBox(tr("Trans."));
+			m_pctrlMoment         = new QCheckBox(tr("Moment"));
+			m_pctrlDownwash       = new QCheckBox(tr("Downw."));
+			m_pctrlCp             = new QCheckBox(tr("Cp"));
+			m_pctrlSurfVel        = new QCheckBox(tr("Surf. Vel."));
+			m_pctrlStream         = new QCheckBox(tr("Stream"));
+			m_pctrlWOppAnimate    = new QCheckBox(tr("Animate"));
+		//	m_pctrlHighlightOpp   = new QCheckBox(tr("Highlight OpPoint"));
+
+
+			m_pctrlAnimateWOppSpeed  = new QSlider(Qt::Horizontal);
+			m_pctrlAnimateWOppSpeed->setMinimum(0);
+			m_pctrlAnimateWOppSpeed->setMaximum(500);
+			m_pctrlAnimateWOppSpeed->setSliderPosition(250);
+			m_pctrlAnimateWOppSpeed->setTickInterval(50);
+			m_pctrlAnimateWOppSpeed->setTickPosition(QSlider::TicksBelow);
+			CheckDispLayout->addWidget(m_pctrlCp,       1,1);
+			CheckDispLayout->addWidget(m_pctrlPanelForce, 1, 2);
+			CheckDispLayout->addWidget(m_pctrlLift,     2, 1);
+			CheckDispLayout->addWidget(m_pctrlMoment,   2, 2);
+			CheckDispLayout->addWidget(m_pctrlIDrag,    3, 1);
+			CheckDispLayout->addWidget(m_pctrlVDrag,    3, 2);
+			CheckDispLayout->addWidget(m_pctrlTrans,    4, 1);
+			CheckDispLayout->addWidget(m_pctrlDownwash, 4, 2);
+			CheckDispLayout->addWidget(m_pctrlSurfVel,  5, 1);
+			CheckDispLayout->addWidget(m_pctrlStream,   5, 2);
+			CheckDispLayout->addWidget(m_pctrlWOppAnimate,  6, 1);
+			CheckDispLayout->addWidget(m_pctrlAnimateWOppSpeed,6,2);
+
+		}
+		DisplayBox->setLayout(CheckDispLayout);
+	}
 
 	QGroupBox *PolarPropsBox = new QGroupBox(tr("Polar properties"));
-	m_pctrlPolarProps1 = new QTextEdit;
-	m_pctrlPolarProps1->setReadOnly(true);
-//	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);
-	QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
-	PolarPropsLayout->addWidget(m_pctrlPolarProps1);
-        PolarPropsLayout->addStretch(1);
-	PolarPropsBox->setLayout(PolarPropsLayout);
+	{
+		m_pctrlPolarProps1 = new QTextEdit;
+		m_pctrlPolarProps1->setReadOnly(true);
+	//	m_pctrlPolarProps1->setWordWrapMode(QTextOption::NoWrap);
+		QHBoxLayout *PolarPropsLayout = new QHBoxLayout;
+		{
+			PolarPropsLayout->addWidget(m_pctrlPolarProps1);
+			PolarPropsLayout->addStretch(1);
+		}
+		PolarPropsBox->setLayout(PolarPropsLayout);
+	}
 
 //_______________________Curve params
-	QVBoxLayout *CurveGroup = new QVBoxLayout;
-	m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
-	m_pctrlShowPoints = new QCheckBox(tr("Points"));
-//	m_pctrlShowCurve->setMinimumHeight(10);
-//	m_pctrlShowPoints->setMinimumHeight(10);
-	m_pctrlCurveStyle = new LineCbBox();
-	m_pctrlCurveWidth = new LineCbBox();
-	m_pctrlCurveColor = new LineButton;
-	for (int i=0; i<5; i++)
-	{
-		m_pctrlCurveStyle->addItem(tr("item"));
-		m_pctrlCurveWidth->addItem(tr("item"));
-	}
-	m_pStyleDelegate = new LineDelegate;
-	m_pWidthDelegate = new LineDelegate;
-	m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
-	m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
-
-	QHBoxLayout *ShowCurve = new QHBoxLayout;
-	ShowCurve->addWidget(m_pctrlShowCurve);
-	ShowCurve->addWidget(m_pctrlShowPoints);
-
-	QGridLayout *CurveStyleLayout = new QGridLayout;
-	QLabel *lab200 = new QLabel(tr("Style"));
-	QLabel *lab201 = new QLabel(tr("Width"));
-	QLabel *lab202 = new QLabel(tr("Color"));
-	lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
-	CurveStyleLayout->addWidget(lab200,1,1);
-	CurveStyleLayout->addWidget(lab201,2,1);
-	CurveStyleLayout->addWidget(lab202,3,1);
-	CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
-	CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
-	CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
-	CurveStyleLayout->setColumnStretch(2,5);
-
-	CurveGroup->addLayout(ShowCurve);
-	CurveGroup->addLayout(CurveStyleLayout);
-        CurveGroup->addStretch(1);
 	QGroupBox *CurveBox = new QGroupBox(tr("Curve settings"));
-	CurveBox->setLayout(CurveGroup);
+	{
+		QVBoxLayout *CurveGroupLayout = new QVBoxLayout;
+		{
+			m_pctrlShowCurve  = new QCheckBox(tr("Curve"));
+			m_pctrlShowPoints = new QCheckBox(tr("Points"));
+		//	m_pctrlShowCurve->setMinimumHeight(10);
+		//	m_pctrlShowPoints->setMinimumHeight(10);
+			m_pctrlCurveStyle = new LineCbBox();
+			m_pctrlCurveWidth = new LineCbBox();
+			m_pctrlCurveColor = new LineButton;
+			for (int i=0; i<5; i++)
+			{
+				m_pctrlCurveStyle->addItem(tr("item"));
+				m_pctrlCurveWidth->addItem(tr("item"));
+			}
+			m_pStyleDelegate = new LineDelegate;
+			m_pWidthDelegate = new LineDelegate;
+			m_pctrlCurveStyle->setItemDelegate(m_pStyleDelegate);
+			m_pctrlCurveWidth->setItemDelegate(m_pWidthDelegate);
 
+			QHBoxLayout *ShowCurve = new QHBoxLayout;
+			{
+				ShowCurve->addWidget(m_pctrlShowCurve);
+				ShowCurve->addWidget(m_pctrlShowPoints);
+			}
+
+			QGridLayout *CurveStyleLayout = new QGridLayout;
+			{
+				QLabel *lab200 = new QLabel(tr("Style"));
+				QLabel *lab201 = new QLabel(tr("Width"));
+				QLabel *lab202 = new QLabel(tr("Color"));
+				lab200->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+				lab201->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+				lab202->setAlignment(Qt::AlignRight |Qt::AlignVCenter);
+				CurveStyleLayout->addWidget(lab200,1,1);
+				CurveStyleLayout->addWidget(lab201,2,1);
+				CurveStyleLayout->addWidget(lab202,3,1);
+				CurveStyleLayout->addWidget(m_pctrlCurveStyle,1,2);
+				CurveStyleLayout->addWidget(m_pctrlCurveWidth,2,2);
+				CurveStyleLayout->addWidget(m_pctrlCurveColor,3,2);
+				CurveStyleLayout->setColumnStretch(2,5);
+			}
+
+			CurveGroupLayout->addLayout(ShowCurve);
+			CurveGroupLayout->addLayout(CurveStyleLayout);
+			CurveGroupLayout->addStretch(1);
+		}
+		CurveBox->setLayout(CurveGroupLayout);
+	}
 //_______________________Cp Params
-	QVBoxLayout *CpParams = new QVBoxLayout;
-	m_pctrlCpSectionSlider = new QSlider(Qt::Horizontal);
-	m_pctrlCpSectionSlider->setMinimum(-100);
-	m_pctrlCpSectionSlider->setMaximum(100);
-	m_pctrlCpSectionSlider->setSliderPosition(00);
-	m_pctrlCpSectionSlider->setTickInterval(10);
-	m_pctrlCpSectionSlider->setTickPosition(QSlider::TicksBelow);
-	QHBoxLayout *CpPos = new QHBoxLayout;
-	QLabel *label1000 = new QLabel(tr("Span Position"));
-	m_pctrlSpanPos = new FloatEdit(0.0, 3);
-	CpPos->addWidget(label1000);
-	CpPos->addWidget(m_pctrlSpanPos);
-	QHBoxLayout *CpSections = new QHBoxLayout;
-	m_pctrlKeepCpSection  = new QPushButton(tr("Keep"));
-	m_pctrlResetCpSection = new QPushButton(tr("Reset"));
-	CpSections->addWidget(m_pctrlKeepCpSection);
-	CpSections->addWidget(m_pctrlResetCpSection);
-	CpParams->addWidget(m_pctrlCpSectionSlider);
-	CpParams->addLayout(CpPos);
-	CpParams->addLayout(CpSections);
-	CpParams->addStretch(1);
 	QGroupBox *CpBox = new QGroupBox(tr("Cp Sections"));
-	CpBox->setLayout(CpParams);
+	{
+		QVBoxLayout *CpParams = new QVBoxLayout;
+		{
+			m_pctrlCpSectionSlider = new QSlider(Qt::Horizontal);
+			m_pctrlCpSectionSlider->setMinimum(-100);
+			m_pctrlCpSectionSlider->setMaximum(100);
+			m_pctrlCpSectionSlider->setSliderPosition(00);
+			m_pctrlCpSectionSlider->setTickInterval(10);
+			m_pctrlCpSectionSlider->setTickPosition(QSlider::TicksBelow);
+			QHBoxLayout *CpPos = new QHBoxLayout;
+			{
+				QLabel *label1000 = new QLabel(tr("Span Position"));
+				m_pctrlSpanPos = new FloatEdit(0.0, 3);
+				CpPos->addWidget(label1000);
+				CpPos->addWidget(m_pctrlSpanPos);
+			}
+			QHBoxLayout *CpSections = new QHBoxLayout;
+			{
+				m_pctrlKeepCpSection  = new QPushButton(tr("Keep"));
+				m_pctrlResetCpSection = new QPushButton(tr("Reset"));
+				CpSections->addWidget(m_pctrlKeepCpSection);
+				CpSections->addWidget(m_pctrlResetCpSection);
+			}
+			CpParams->addWidget(m_pctrlCpSectionSlider);
+			CpParams->addLayout(CpPos);
+			CpParams->addLayout(CpSections);
+			CpParams->addStretch(1);
+		}
+		CpBox->setLayout(CpParams);
+	}
 
 
 //_______________________3D view controls
-	QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
-	QGridLayout *ThreeDParams = new QGridLayout;
-	m_pctrlAxes       = new QCheckBox(tr("Axes"));
-	m_pctrlLight      = new QCheckBox(tr("Light"));
-	m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
-	m_pctrlOutline    = new QCheckBox(tr("Outline"));
-	m_pctrlPanels     = new QCheckBox(tr("Panels"));
-	m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
-	m_pctrlVortices   = new QCheckBox(tr("Vortices"));
-	m_pctrlMasses     = new QCheckBox(tr("Masses"));
-
-	ThreeDParams->addWidget(m_pctrlAxes, 1,1);
-//	ThreeDParams->addWidget(m_pctrlLight, 1,2);
-	ThreeDParams->addWidget(m_pctrlPanels, 1,2);
-	ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
-	ThreeDParams->addWidget(m_pctrlOutline, 2,2);
-	ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
-	ThreeDParams->addWidget(m_pctrlMasses, 3,2);
-
-	QGridLayout *ThreeDView = new QGridLayout;
-	m_pctrlX          = new QPushButton("X");
-	m_pctrlY          = new QPushButton("Y");
-	m_pctrlZ          = new QPushButton("Z");
-	m_pctrlIso        = new QPushButton("Iso");
-
-
-	ThreeDView->addWidget(m_pctrlX,1,1);
-	ThreeDView->addWidget(m_pctrlY,1,2);
-	ThreeDView->addWidget(m_pctrlZ,2,1);
-	ThreeDView->addWidget(m_pctrlIso,2,2);
-
-	m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
-	m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
-	m_pctrlReset          = new QPushButton(tr("Reset"));
-	m_pctrlPickCenter->setCheckable(true);
-
-	ThreeDView->addWidget(m_pctrlReset,3,1);
-	ThreeDView->addWidget(m_pctrlPickCenter,3,2);
-
-	QHBoxLayout *ClipLayout = new QHBoxLayout;
-	QLabel *ClipLabel = new QLabel(tr("Clip:"));
-	m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
-	m_pctrlClipPlanePos->setMinimum(-300);
-	m_pctrlClipPlanePos->setMaximum(300);
-	m_pctrlClipPlanePos->setSliderPosition(0);
-	m_pctrlClipPlanePos->setTickInterval(30);
-	m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
-	ClipLayout->addWidget(ClipLabel);
-	ClipLayout->addWidget(m_pctrlClipPlanePos,1);
-
-	ThreeDViewControls->addLayout(ThreeDParams);
-	ThreeDViewControls->addLayout(ThreeDView);
-	ThreeDViewControls->addLayout(ClipLayout);
-	ThreeDViewControls->addStretch(1);
 	QGroupBox *ThreeDViewBox = new QGroupBox(tr("Display"));
-	ThreeDViewBox->setLayout(ThreeDViewControls);
+	{
+		QVBoxLayout *ThreeDViewControls = new QVBoxLayout;
+		{
+			QGridLayout *ThreeDParams = new QGridLayout;
+			{
+				m_pctrlAxes       = new QCheckBox(tr("Axes"));
+				m_pctrlLight      = new QCheckBox(tr("Light"));
+				m_pctrlSurfaces   = new QCheckBox(tr("Surfaces"));
+				m_pctrlOutline    = new QCheckBox(tr("Outline"));
+				m_pctrlPanels     = new QCheckBox(tr("Panels"));
+				m_pctrlFoilNames  = new QCheckBox(tr("Foil Names"));
+				m_pctrlVortices   = new QCheckBox(tr("Vortices"));
+				m_pctrlMasses     = new QCheckBox(tr("Masses"));
+
+				ThreeDParams->addWidget(m_pctrlAxes, 1,1);
+			//	ThreeDParams->addWidget(m_pctrlLight, 1,2);
+				ThreeDParams->addWidget(m_pctrlPanels, 1,2);
+				ThreeDParams->addWidget(m_pctrlSurfaces, 2,1);
+				ThreeDParams->addWidget(m_pctrlOutline, 2,2);
+				ThreeDParams->addWidget(m_pctrlFoilNames, 3,1);
+				ThreeDParams->addWidget(m_pctrlMasses, 3,2);
+			}
+
+			QGridLayout *ThreeDView = new QGridLayout;
+			{
+				m_pctrlX          = new QPushButton("X");
+				m_pctrlY          = new QPushButton("Y");
+				m_pctrlZ          = new QPushButton("Z");
+				m_pctrlIso        = new QPushButton("Iso");
+
+				ThreeDView->addWidget(m_pctrlX,1,1);
+				ThreeDView->addWidget(m_pctrlY,1,2);
+				ThreeDView->addWidget(m_pctrlZ,2,1);
+				ThreeDView->addWidget(m_pctrlIso,2,2);
+
+				m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
+				m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
+				m_pctrlReset          = new QPushButton(tr("Reset"));
+				m_pctrlPickCenter->setCheckable(true);
+
+				ThreeDView->addWidget(m_pctrlReset,3,1);
+				ThreeDView->addWidget(m_pctrlPickCenter,3,2);
+			}
+
+			QHBoxLayout *ClipLayout = new QHBoxLayout;
+			{
+				QLabel *ClipLabel = new QLabel(tr("Clip:"));
+				m_pctrlClipPlanePos = new QSlider(Qt::Horizontal);
+				m_pctrlClipPlanePos->setMinimum(-300);
+				m_pctrlClipPlanePos->setMaximum(300);
+				m_pctrlClipPlanePos->setSliderPosition(0);
+				m_pctrlClipPlanePos->setTickInterval(30);
+				m_pctrlClipPlanePos->setTickPosition(QSlider::TicksBelow);
+				ClipLayout->addWidget(ClipLabel);
+				ClipLayout->addWidget(m_pctrlClipPlanePos,1);
+			}
+			ThreeDViewControls->addLayout(ThreeDParams);
+			ThreeDViewControls->addLayout(ThreeDView);
+			ThreeDViewControls->addLayout(ClipLayout);
+			ThreeDViewControls->addStretch(1);
+
+		}
+		ThreeDViewBox->setLayout(ThreeDViewControls);
+	}
 
 //_________________________Main Layout
-	m_pctrlMiddleControls = new QStackedWidget;
-	m_pctrlMiddleControls->addWidget(DisplayBox);
-	m_pctrlMiddleControls->addWidget(PolarPropsBox);
-	m_pctrlMiddleControls->addWidget(CpBox);
-
-	m_pctrBottomControls = new QStackedWidget;
-	m_pctrBottomControls->addWidget(CurveBox);
-	m_pctrBottomControls->addWidget(ThreeDViewBox);
-
 	QVBoxLayout *mainLayout = new QVBoxLayout;
-        //mainLayout->addStretch(1);
-	mainLayout->addWidget(AnalysisBox);
-        //mainLayout->addStretch(1);
-	mainLayout->addWidget(m_pctrlMiddleControls);
-        //mainLayout->addStretch(1);
-	mainLayout->addWidget(m_pctrBottomControls);
-        //mainLayout->addStretch(1);
+	{
+		m_pctrlMiddleControls = new QStackedWidget;
+		m_pctrlMiddleControls->addWidget(DisplayBox);
+		m_pctrlMiddleControls->addWidget(PolarPropsBox);
+		m_pctrlMiddleControls->addWidget(CpBox);
 
+		m_pctrBottomControls = new QStackedWidget;
+		m_pctrBottomControls->addWidget(CurveBox);
+		m_pctrBottomControls->addWidget(ThreeDViewBox);
+
+		mainLayout->addWidget(AnalysisBox);
+		mainLayout->addWidget(m_pctrlMiddleControls);
+		mainLayout->addWidget(m_pctrBottomControls);
+	}
 	setLayout(mainLayout);
 }
-
 
 
 

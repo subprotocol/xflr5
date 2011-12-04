@@ -196,6 +196,7 @@ void PlaneDlg::keyPressEvent(QKeyEvent *event)
 
 void PlaneDlg::OnBiplane()
 {
+	m_bChanged = true;
 	m_pPlane->m_bBiplane = m_pctrlBiplane->isChecked();
 	if(m_pPlane->Wing2())
 	{

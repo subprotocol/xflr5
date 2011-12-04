@@ -27,10 +27,8 @@
 #include "Body.h"
 #include "CVector.h"
 
-class CSurface : public QObject
+class CSurface
 {
-	Q_OBJECT
-
 	friend class CWing;
 	friend class QMiarex;
 	friend class MainFrame;
