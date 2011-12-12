@@ -1447,261 +1447,300 @@ void MainFrame::CreateMiarexMenus()
 {
 	//MainMenu for Miarex Application
 	MiarexViewMenu = menuBar()->addMenu(tr("&View"));
-	MiarexViewMenu->addAction(WOppAct);
-	MiarexViewMenu->addAction(WPolarAct);
-	MiarexViewMenu->addAction(W3DAct);
-	MiarexViewMenu->addAction(CpViewAct);
-	MiarexViewMenu->addAction(StabTimeAct);
-	MiarexViewMenu->addAction(RootLocusAct);
-	MiarexViewMenu->addSeparator();
-	MiarexViewMenu->addAction(W3DPrefsAct);
-	MiarexViewMenu->addAction(W3DLightAct);
-	MiarexViewMenu->addAction(W3DScalesAct);
-	MiarexViewMenu->addSeparator();
-	MiarexViewMenu->addAction(saveViewToImageFileAct);
+	{
+		MiarexViewMenu->addAction(WOppAct);
+		MiarexViewMenu->addAction(WPolarAct);
+		MiarexViewMenu->addAction(W3DAct);
+		MiarexViewMenu->addAction(CpViewAct);
+		MiarexViewMenu->addAction(StabTimeAct);
+		MiarexViewMenu->addAction(RootLocusAct);
+		MiarexViewMenu->addSeparator();
+		MiarexViewMenu->addAction(W3DPrefsAct);
+		MiarexViewMenu->addAction(W3DLightAct);
+		MiarexViewMenu->addAction(W3DScalesAct);
+		MiarexViewMenu->addSeparator();
+		MiarexViewMenu->addAction(saveViewToImageFileAct);
+	}
 
 
 	UFOMenu = menuBar()->addMenu(tr("&Wing-Plane"));
-	UFOMenu->addAction(DefineWingAct);
-	UFOMenu->addAction(DefinePlaneAct);
-	UFOMenu->addAction(ManageUFOs);
-	currentUFOMenu = UFOMenu->addMenu(tr("Current UFO"));
-	currentUFOMenu->addAction(EditUFOAct);
-	currentUFOMenu->addAction(renameCurUFO);
-	currentUFOMenu->addAction(duplicateCurUFO);
-	currentUFOMenu->addAction(deleteCurUFO);
-	currentUFOMenu->addAction(SaveUFOAsProject);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(scaleWingAct);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(m_pUFOInertia);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(exporttoAVL);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(hideUFOWPlrs);
-	currentUFOMenu->addAction(showUFOWPlrs);
-	currentUFOMenu->addAction(deleteUFOWPlrs);
-	currentUFOMenu->addSeparator();
-	currentUFOMenu->addAction(hideUFOWOpps);
-	currentUFOMenu->addAction(showUFOWOpps);
-	currentUFOMenu->addAction(deleteUFOWOpps);
+	{
+		UFOMenu->addAction(DefineWingAct);
+		UFOMenu->addAction(DefinePlaneAct);
+		UFOMenu->addAction(ManageUFOs);
+		currentUFOMenu = UFOMenu->addMenu(tr("Current UFO"));
+		{
+			currentUFOMenu->addAction(EditUFOAct);
+			currentUFOMenu->addAction(renameCurUFO);
+			currentUFOMenu->addAction(duplicateCurUFO);
+			currentUFOMenu->addAction(deleteCurUFO);
+			currentUFOMenu->addAction(SaveUFOAsProject);
+			currentUFOMenu->addSeparator();
+			currentUFOMenu->addAction(scaleWingAct);
+			currentUFOMenu->addSeparator();
+			currentUFOMenu->addAction(m_pUFOInertia);
+			currentUFOMenu->addSeparator();
+			currentUFOMenu->addAction(exporttoAVL);
+			currentUFOMenu->addSeparator();
+			currentUFOMenu->addAction(hideUFOWPlrs);
+			currentUFOMenu->addAction(showUFOWPlrs);
+			currentUFOMenu->addAction(deleteUFOWPlrs);
+			currentUFOMenu->addSeparator();
+			currentUFOMenu->addAction(hideUFOWOpps);
+			currentUFOMenu->addAction(showUFOWOpps);
+			currentUFOMenu->addAction(deleteUFOWOpps);
+		}
+	}
 
 	MiarexBodyMenu = menuBar()->addMenu(tr("&Body"));
-	MiarexBodyMenu->addAction(defineBody);
-	MiarexBodyMenu->addAction(importBody);
-	CurBodyMenu = MiarexBodyMenu->addMenu(tr("Current Body"));
-	CurBodyMenu->addAction(EditCurBody);
-	CurBodyMenu->addAction(exportBodyDef);
-	CurBodyMenu->addAction(exportBodyGeom);
-//	CurBodyMenu->addAction(m_pBodyInertia);
-	MiarexBodyMenu->addSeparator();
-	MiarexBodyMenu->addAction(ManageBodies);
-
+	{
+		MiarexBodyMenu->addAction(defineBody);
+		MiarexBodyMenu->addAction(importBody);
+		CurBodyMenu = MiarexBodyMenu->addMenu(tr("Current Body"));
+		{
+			CurBodyMenu->addAction(EditCurBody);
+			CurBodyMenu->addAction(exportBodyDef);
+			CurBodyMenu->addAction(exportBodyGeom);
+		}
+		MiarexBodyMenu->addSeparator();
+		MiarexBodyMenu->addAction(ManageBodies);
+	}
 	MiarexWPlrMenu = menuBar()->addMenu(tr("&Polars"));
-	MiarexWPlrMenu->addAction(defineWPolar);
-	MiarexWPlrMenu->addAction(defineStabPolar);
-//	MiarexWPlrMenu->addAction(defineCtrlPolar);
-	CurWPlrMenu = MiarexWPlrMenu->addMenu(tr("Current Polar"));
-	CurWPlrMenu->addAction(ShowPolarProps);
-	CurWPlrMenu->addAction(editCurWPolar);
-	CurWPlrMenu->addAction(renameCurWPolar);
-	CurWPlrMenu->addAction(deleteCurWPolar);
-	CurWPlrMenu->addAction(exportCurWPolar);
-	CurWPlrMenu->addAction(resetCurWPolar);
-	CurWPlrMenu->addSeparator();
-	CurWPlrMenu->addAction(showAllWPlrOpps);
-	CurWPlrMenu->addAction(hideAllWPlrOpps);
-	CurWPlrMenu->addAction(deleteAllWPlrOpps);
-	MiarexWPlrMenu->addSeparator();
-	MiarexWPlrMenu->addAction(m_pImportWPolar);
-	MiarexWPlrMenu->addSeparator();
-	MiarexWPlrMenu->addAction(MiarexPolarFilter);
-	MiarexWPlrMenu->addSeparator();
-	MiarexWPlrMenu->addAction(hideAllWPlrs);
-	MiarexWPlrMenu->addAction(showAllWPlrs);
-	MiarexWPlrMenu->addSeparator();
-	WPlrGraphMenu = MiarexWPlrMenu->addMenu(tr("Graphs"));
-	WPlrGraphMenu->addAction(Graph1);
-	WPlrGraphMenu->addAction(Graph2);
-	WPlrGraphMenu->addAction(Graph3);
-	WPlrGraphMenu->addAction(Graph4);
-	WPlrGraphMenu->addSeparator();
-	WPlrGraphMenu->addAction(twoGraphs);
-	WPlrGraphMenu->addAction(fourGraphs);
-	WPlrGraphMenu->addSeparator();
-	WPlrGraphMenu->addAction(allWPolarGraphsSettings);
-	WPlrGraphMenu->addAction(allWPolarGraphsScalesAct);
-	WPlrGraphMenu->addAction(resetWPlrLegend);
-	WPlrGraphMenu->addSeparator();
-	WPlrGraphMenu->addAction(highlightWOppAct);
+	{
+		MiarexWPlrMenu->addAction(defineWPolar);
+		MiarexWPlrMenu->addAction(defineStabPolar);
+
+		CurWPlrMenu = MiarexWPlrMenu->addMenu(tr("Current Polar"));
+		{
+			CurWPlrMenu->addAction(ShowPolarProps);
+			CurWPlrMenu->addAction(editCurWPolar);
+			CurWPlrMenu->addAction(renameCurWPolar);
+			CurWPlrMenu->addAction(deleteCurWPolar);
+			CurWPlrMenu->addAction(exportCurWPolar);
+			CurWPlrMenu->addAction(resetCurWPolar);
+			CurWPlrMenu->addSeparator();
+			CurWPlrMenu->addAction(showAllWPlrOpps);
+			CurWPlrMenu->addAction(hideAllWPlrOpps);
+			CurWPlrMenu->addAction(deleteAllWPlrOpps);
+		}
+
+		MiarexWPlrMenu->addSeparator();
+		MiarexWPlrMenu->addAction(m_pImportWPolar);
+		MiarexWPlrMenu->addSeparator();
+		MiarexWPlrMenu->addAction(MiarexPolarFilter);
+		MiarexWPlrMenu->addSeparator();
+		MiarexWPlrMenu->addAction(hideAllWPlrs);
+		MiarexWPlrMenu->addAction(showAllWPlrs);
+		MiarexWPlrMenu->addSeparator();
+
+		WPlrGraphMenu = MiarexWPlrMenu->addMenu(tr("Graphs"));
+		{
+			WPlrGraphMenu->addAction(Graph1);
+			WPlrGraphMenu->addAction(Graph2);
+			WPlrGraphMenu->addAction(Graph3);
+			WPlrGraphMenu->addAction(Graph4);
+			WPlrGraphMenu->addSeparator();
+			WPlrGraphMenu->addAction(twoGraphs);
+			WPlrGraphMenu->addAction(fourGraphs);
+			WPlrGraphMenu->addSeparator();
+			WPlrGraphMenu->addAction(allWPolarGraphsSettings);
+			WPlrGraphMenu->addAction(allWPolarGraphsScalesAct);
+			WPlrGraphMenu->addAction(resetWPlrLegend);
+			WPlrGraphMenu->addSeparator();
+			WPlrGraphMenu->addAction(highlightWOppAct);
+		}
+	}
 
 	MiarexWOppMenu = menuBar()->addMenu(tr("&OpPoint"));
-	CurWOppMenu = MiarexWOppMenu->addMenu(tr("Current OpPoint"));
-	CurWOppMenu->addAction(ShowWOppProps);
-	CurWOppMenu->addAction(exportCurWOpp);
-	CurWOppMenu->addAction(deleteCurWOpp);
-	MiarexWOppMenu->addSeparator();
-	MiarexWOppMenu->addAction(showCurWOppOnly);
-	MiarexWOppMenu->addAction(showAllWOpps);
-	MiarexWOppMenu->addAction(hideAllWOpps);
-	MiarexWOppMenu->addAction(deleteAllWOpps);
-	MiarexWOppMenu->addSeparator();
-	MiarexWOppMenu->addAction(HalfWingAct);
-	MiarexWOppMenu->addAction(showEllipticCurve);
-	MiarexWOppMenu->addAction(showXCmRefLocation);
-	MiarexWOppMenu->addAction(showWing2Curve);
-	MiarexWOppMenu->addAction(showStabCurve);
-	MiarexWOppMenu->addAction(showFinCurve);
-	MiarexWOppMenu->addSeparator();
-	WOppGraphMenu = MiarexWOppMenu->addMenu(tr("Graphs"));
-	WOppGraphMenu->addAction(Graph1);
-	WOppGraphMenu->addAction(Graph2);
-	WOppGraphMenu->addAction(Graph3);
-	WOppGraphMenu->addAction(Graph4);
-	WOppGraphMenu->addSeparator();
-	WOppGraphMenu->addAction(twoGraphs);
-	WOppGraphMenu->addAction(fourGraphs);
-	WOppGraphMenu->addSeparator();
-	WOppGraphMenu->addAction(allWingGraphsSettings);
-	WOppGraphMenu->addAction(allWingGraphsScalesAct);
-	WOppGraphMenu->addAction(resetWOppLegend);
+	{
+		CurWOppMenu = MiarexWOppMenu->addMenu(tr("Current OpPoint"));
+		{
+			CurWOppMenu->addAction(ShowWOppProps);
+			CurWOppMenu->addAction(exportCurWOpp);
+			CurWOppMenu->addAction(deleteCurWOpp);
+		}
+		MiarexWOppMenu->addSeparator();
+		MiarexWOppMenu->addAction(showCurWOppOnly);
+		MiarexWOppMenu->addAction(showAllWOpps);
+		MiarexWOppMenu->addAction(hideAllWOpps);
+		MiarexWOppMenu->addAction(deleteAllWOpps);
+		MiarexWOppMenu->addSeparator();
+		MiarexWOppMenu->addAction(HalfWingAct);
+		MiarexWOppMenu->addAction(showEllipticCurve);
+		MiarexWOppMenu->addAction(showXCmRefLocation);
+		MiarexWOppMenu->addAction(showWing2Curve);
+		MiarexWOppMenu->addAction(showStabCurve);
+		MiarexWOppMenu->addAction(showFinCurve);
+		MiarexWOppMenu->addSeparator();
+
+		WOppGraphMenu = MiarexWOppMenu->addMenu(tr("Graphs"));
+		{
+			WOppGraphMenu->addAction(Graph1);
+			WOppGraphMenu->addAction(Graph2);
+			WOppGraphMenu->addAction(Graph3);
+			WOppGraphMenu->addAction(Graph4);
+			WOppGraphMenu->addSeparator();
+			WOppGraphMenu->addAction(twoGraphs);
+			WOppGraphMenu->addAction(fourGraphs);
+			WOppGraphMenu->addSeparator();
+			WOppGraphMenu->addAction(allWingGraphsSettings);
+			WOppGraphMenu->addAction(allWingGraphsScalesAct);
+			WOppGraphMenu->addAction(resetWOppLegend);
+		}
+	}
 
 	//Miarex Analysis Menu
 	MiarexAnalysisMenu  = menuBar()->addMenu(tr("&Analysis"));
-	MiarexAnalysisMenu->addAction(viewLogFile);
-	MiarexAnalysisMenu->addAction(advancedSettings);
+	{
+		MiarexAnalysisMenu->addAction(viewLogFile);
+		MiarexAnalysisMenu->addAction(advancedSettings);
+	}
 
 
 	//WOpp View Context Menu
 	WOppCtxMenu = new QMenu(tr("Context Menu"),this);
-	WOppCtxMenu->addMenu(currentUFOMenu);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addMenu(CurBodyMenu);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addMenu(CurWPlrMenu);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addMenu(CurWOppMenu);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addAction(showCurWOppOnly);
-	WOppCtxMenu->addAction(showAllWOpps);
-	WOppCtxMenu->addAction(hideAllWOpps);
-	WOppCtxMenu->addAction(deleteAllWOpps);
-	WOppCtxMenu->addSeparator();
-	WOppCurGraphMenu = WOppCtxMenu->addMenu(tr("Current Graph"));
-	WOppCurGraphMenu->addAction(MiarexGraphDlg);
-	WOppCurGraphMenu->addAction(exportCurGraphAct);
-	WOppCtxMenu->addMenu(WOppCurGraphMenu);
-	WOppCtxMenu->addMenu(WOppGraphMenu);
-	WOppCtxMenu->addAction(ResetWingGraphScale);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addAction(HalfWingAct);
-	WOppCtxMenu->addAction(showEllipticCurve);
-	WOppCtxMenu->addAction(showXCmRefLocation);
-	WOppCtxMenu->addAction(showWing2Curve);
-	WOppCtxMenu->addAction(showStabCurve);
-	WOppCtxMenu->addAction(showFinCurve);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addAction(resetWingScale);
-	WOppCtxMenu->addSeparator();
-	WOppCtxMenu->addAction(viewLogFile);
-	WOppCtxMenu->addAction(saveViewToImageFileAct);
+	{
+		WOppCtxMenu->addMenu(currentUFOMenu);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addMenu(CurBodyMenu);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addMenu(CurWPlrMenu);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addMenu(CurWOppMenu);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addAction(showCurWOppOnly);
+		WOppCtxMenu->addAction(showAllWOpps);
+		WOppCtxMenu->addAction(hideAllWOpps);
+		WOppCtxMenu->addAction(deleteAllWOpps);
+		WOppCtxMenu->addSeparator();
+		WOppCurGraphMenu = WOppCtxMenu->addMenu(tr("Current Graph"));
+		{
+			WOppCurGraphMenu->addAction(MiarexGraphDlg);
+			WOppCurGraphMenu->addAction(exportCurGraphAct);
+		}
+		WOppCtxMenu->addMenu(WOppCurGraphMenu);
+		WOppCtxMenu->addMenu(WOppGraphMenu);
+		WOppCtxMenu->addAction(ResetWingGraphScale);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addAction(HalfWingAct);
+		WOppCtxMenu->addAction(showEllipticCurve);
+		WOppCtxMenu->addAction(showXCmRefLocation);
+		WOppCtxMenu->addAction(showWing2Curve);
+		WOppCtxMenu->addAction(showStabCurve);
+		WOppCtxMenu->addAction(showFinCurve);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addAction(resetWingScale);
+		WOppCtxMenu->addSeparator();
+		WOppCtxMenu->addAction(viewLogFile);
+		WOppCtxMenu->addAction(saveViewToImageFileAct);
+	}
 
 	//WOpp View Context Menu
 	WCpCtxMenu = new QMenu(tr("Context Menu"),this);
-	WCpCtxMenu->addMenu(currentUFOMenu);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addMenu(CurBodyMenu);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addMenu(CurWPlrMenu);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addMenu(CurWOppMenu);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addMenu(WOppCurGraphMenu);
-	WCpCtxMenu->addAction(ResetWingGraphScale);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addAction(showWing2Curve);
-	WCpCtxMenu->addAction(showStabCurve);
-	WCpCtxMenu->addAction(showFinCurve);
-	WCpCtxMenu->addSeparator();
-	WCpCtxMenu->addAction(viewLogFile);
-	WCpCtxMenu->addAction(saveViewToImageFileAct);
+	{
+		WCpCtxMenu->addMenu(currentUFOMenu);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addMenu(CurBodyMenu);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addMenu(CurWPlrMenu);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addMenu(CurWOppMenu);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addMenu(WOppCurGraphMenu);
+		WCpCtxMenu->addAction(ResetWingGraphScale);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addAction(showWing2Curve);
+		WCpCtxMenu->addAction(showStabCurve);
+		WCpCtxMenu->addAction(showFinCurve);
+		WCpCtxMenu->addSeparator();
+		WCpCtxMenu->addAction(viewLogFile);
+		WCpCtxMenu->addAction(saveViewToImageFileAct);
+	}
 
 	//WTime View Context Menu
 	WTimeCtxMenu = new QMenu(tr("Context Menu"),this);
-	WTimeCtxMenu->addMenu(currentUFOMenu);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addMenu(CurBodyMenu);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addMenu(CurWPlrMenu);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addMenu(CurWOppMenu);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addAction(showCurWOppOnly);
-	WTimeCtxMenu->addAction(showAllWOpps);
-	WTimeCtxMenu->addAction(hideAllWOpps);
-	WTimeCtxMenu->addAction(deleteAllWOpps);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addMenu(WOppCurGraphMenu);
-	WTimeCtxMenu->addMenu(WOppGraphMenu);
-	WTimeCtxMenu->addSeparator();
-	WTimeCtxMenu->addAction(viewLogFile);
-	WTimeCtxMenu->addAction(saveViewToImageFileAct);
-
+	{
+		WTimeCtxMenu->addMenu(currentUFOMenu);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addMenu(CurBodyMenu);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addMenu(CurWPlrMenu);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addMenu(CurWOppMenu);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addAction(showCurWOppOnly);
+		WTimeCtxMenu->addAction(showAllWOpps);
+		WTimeCtxMenu->addAction(hideAllWOpps);
+		WTimeCtxMenu->addAction(deleteAllWOpps);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addMenu(WOppCurGraphMenu);
+		WTimeCtxMenu->addMenu(WOppGraphMenu);
+		WTimeCtxMenu->addSeparator();
+		WTimeCtxMenu->addAction(viewLogFile);
+		WTimeCtxMenu->addAction(saveViewToImageFileAct);
+	}
 
 	//Polar View Context Menu
 	WPlrCtxMenu = new QMenu(tr("Context Menu"),this);
-	WPlrCtxMenu->addMenu(currentUFOMenu);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addMenu(CurBodyMenu);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addMenu(CurWPlrMenu);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addMenu(WPlrGraphMenu);
-	WPlrCurGraphMenu = WPlrCtxMenu->addMenu(tr("Current Graph"));
-	WPlrCurGraphMenu->addAction(MiarexGraphDlg);
-	WPlrCurGraphMenu->addAction(exportCurGraphAct);
-	WPlrCtxMenu->addAction(resetCurGraphScales);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addAction(hideAllWPlrs);
-	WPlrCtxMenu->addAction(showAllWPlrs);
-	WPlrCtxMenu->addSeparator();
-	WPlrCtxMenu->addAction(viewLogFile);
-	WPlrCtxMenu->addAction(saveViewToImageFileAct);
-
-	//W3D View Context Menu
-	W3DStabCtxMenu = new QMenu(tr("Context Menu"),this);
-	W3DStabCtxMenu->addMenu(currentUFOMenu);
-	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addMenu(CurBodyMenu);
-	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addMenu(CurWPlrMenu);
-	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addMenu(CurWOppMenu);
-	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addAction(W3DLightAct);
-	W3DStabCtxMenu->addSeparator();
-	W3DStabCtxMenu->addAction(viewLogFile);
-	W3DStabCtxMenu->addAction(saveViewToImageFileAct);
+	{
+		WPlrCtxMenu->addMenu(currentUFOMenu);
+		WPlrCtxMenu->addSeparator();
+		WPlrCtxMenu->addMenu(CurBodyMenu);
+		WPlrCtxMenu->addSeparator();
+		WPlrCtxMenu->addMenu(CurWPlrMenu);
+		WPlrCtxMenu->addSeparator();
+		WPlrCtxMenu->addMenu(WPlrGraphMenu);
+		WPlrCurGraphMenu = WPlrCtxMenu->addMenu(tr("Current Graph"));
+		{
+			WPlrCurGraphMenu->addAction(MiarexGraphDlg);
+			WPlrCurGraphMenu->addAction(exportCurGraphAct);
+		}
+		WPlrCtxMenu->addAction(resetCurGraphScales);
+		WPlrCtxMenu->addSeparator();
+		WPlrCtxMenu->addAction(hideAllWPlrs);
+		WPlrCtxMenu->addAction(showAllWPlrs);
+		WPlrCtxMenu->addSeparator();
+		WPlrCtxMenu->addAction(viewLogFile);
+		WPlrCtxMenu->addAction(saveViewToImageFileAct);
+	}
 
 	//W3D View Context Menu
 	W3DCtxMenu = new QMenu(tr("Context Menu"),this);
-	W3DCtxMenu->addMenu(currentUFOMenu);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addMenu(CurBodyMenu);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addMenu(CurWPlrMenu);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addMenu(CurWOppMenu);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addAction(deleteAllWOpps);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addAction(W3DScalesAct);
-	W3DCtxMenu->addAction(W3DLightAct);
-	W3DCtxMenu->addSeparator();
-	W3DCtxMenu->addAction(viewLogFile);
-	W3DCtxMenu->addAction(saveViewToImageFileAct);
-}
+	{
+		W3DCtxMenu->addMenu(currentUFOMenu);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addMenu(CurBodyMenu);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addMenu(CurWPlrMenu);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addMenu(CurWOppMenu);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addAction(deleteAllWOpps);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addAction(W3DScalesAct);
+		W3DCtxMenu->addAction(W3DLightAct);
+		W3DCtxMenu->addSeparator();
+		W3DCtxMenu->addAction(viewLogFile);
+		W3DCtxMenu->addAction(saveViewToImageFileAct);
+	}
 
+	//W3D Stab View Context Menu
+	W3DStabCtxMenu = new QMenu(tr("Context Menu"),this);
+	{
+		W3DStabCtxMenu->addMenu(currentUFOMenu);
+		W3DStabCtxMenu->addSeparator();
+		W3DStabCtxMenu->addMenu(CurBodyMenu);
+		W3DStabCtxMenu->addSeparator();
+		W3DStabCtxMenu->addMenu(CurWPlrMenu);
+		W3DStabCtxMenu->addSeparator();
+		W3DStabCtxMenu->addMenu(CurWOppMenu);
+		W3DStabCtxMenu->addSeparator();
+		W3DStabCtxMenu->addAction(W3DLightAct);
+		W3DStabCtxMenu->addSeparator();
+		W3DStabCtxMenu->addAction(viewLogFile);
+		W3DStabCtxMenu->addAction(saveViewToImageFileAct);
+	}
+}
 
 
 void MainFrame::CreateMiarexToolbar()

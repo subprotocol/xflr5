@@ -49,13 +49,12 @@ private:
 	QComboBox	*m_pctrlSpeed;
 	QComboBox	*m_pctrlLength;
 	QComboBox	*m_pctrlForce;
-	QLabel *m_pctrlForceFactor;
-	QLabel *m_pctrlLengthFactor;
-	QLabel *m_pctrlSpeedFactor;
-	QLabel *m_pctrlSurfaceFactor;
-	QLabel *m_pctrlWeightFactor;
-	QLabel *m_pctrltrQuestionFactor;
-	QLabel *m_pctrlMomentFactor;
+	QLabel *m_pctrlForceFactor, *m_pctrlForceInvFactor;
+	QLabel *m_pctrlLengthFactor, *m_pctrlLengthInvFactor;
+	QLabel *m_pctrlSpeedFactor, *m_pctrlSpeedInvFactor;
+	QLabel *m_pctrlSurfaceFactor, *m_pctrlSurfaceInvFactor;
+	QLabel *m_pctrlWeightFactor, *m_pctrlWeightInvFactor;
+	QLabel *m_pctrlMomentFactor, *m_pctrlMomentInvFactor;
 	QLabel *m_pctrlQuestion;
 
 private:

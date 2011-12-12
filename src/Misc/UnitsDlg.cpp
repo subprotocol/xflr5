@@ -68,6 +68,8 @@ void UnitsDlg::SetupLayout()
 	m_pctrlSpeedFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlForceFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
 	m_pctrlMomentFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+
+
 	UnitsLayout->addWidget(m_pctrlLengthFactor, 1,2);
 	UnitsLayout->addWidget(m_pctrlSurfaceFactor, 2,2);
 	UnitsLayout->addWidget(m_pctrlSpeedFactor, 3,2);
@@ -75,12 +77,12 @@ void UnitsDlg::SetupLayout()
 	UnitsLayout->addWidget(m_pctrlForceFactor, 5,2);
 	UnitsLayout->addWidget(m_pctrlMomentFactor, 6,2);
 
-	m_pctrlLength = new QComboBox;
+	m_pctrlLength  = new QComboBox;
 	m_pctrlSurface = new QComboBox;
-	m_pctrlSpeed = new QComboBox;
-	m_pctrlWeight = new QComboBox;
-	m_pctrlForce = new QComboBox;
-	m_pctrlMoment = new QComboBox;
+	m_pctrlSpeed   = new QComboBox;
+	m_pctrlWeight  = new QComboBox;
+	m_pctrlForce   = new QComboBox;
+	m_pctrlMoment  = new QComboBox;
 	UnitsLayout->addWidget(m_pctrlLength,  1,3);
 	UnitsLayout->addWidget(m_pctrlSurface, 2,3);
 	UnitsLayout->addWidget(m_pctrlSpeed,   3,3);
@@ -88,6 +90,27 @@ void UnitsDlg::SetupLayout()
 	UnitsLayout->addWidget(m_pctrlForce,   5,3);
 	UnitsLayout->addWidget(m_pctrlMoment,  6,3);
 
+
+	m_pctrlLengthInvFactor = new QLabel(" ");
+	m_pctrlSurfaceInvFactor = new QLabel(" ");
+	m_pctrlWeightInvFactor = new QLabel(" ");
+	m_pctrlSpeedInvFactor = new QLabel(" ");
+	m_pctrlForceInvFactor = new QLabel(" ");
+	m_pctrlMomentInvFactor = new QLabel(" ");
+	m_pctrlLengthInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlSurfaceInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlWeightInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlSpeedInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlForceInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	m_pctrlMomentInvFactor->setAlignment(Qt::AlignRight | Qt::AlignCenter);
+	UnitsLayout->addWidget(m_pctrlLengthInvFactor, 1,4);
+	UnitsLayout->addWidget(m_pctrlSurfaceInvFactor, 2,4);
+	UnitsLayout->addWidget(m_pctrlSpeedInvFactor, 3,4);
+	UnitsLayout->addWidget(m_pctrlWeightInvFactor, 4,4);
+	UnitsLayout->addWidget(m_pctrlForceInvFactor, 5,4);
+	UnitsLayout->addWidget(m_pctrlMomentInvFactor, 6,4);
+	UnitsLayout->setColumnStretch(4,2);
+	UnitsLayout->setColumnMinimumWidth(4,220);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
@@ -103,6 +126,7 @@ void UnitsDlg::SetupLayout()
 	MainLayout->addWidget(m_pctrlQuestion);
 	MainLayout->addLayout(UnitsLayout);
 	MainLayout->addStretch(1);
+	MainLayout->addSpacing(20);
 	MainLayout->addLayout(CommandButtons);
 	MainLayout->addStretch(1);
 
@@ -197,25 +221,38 @@ void UnitsDlg::OnSelChanged(const QString &strong)
 	GetLengthUnit(str,m_Length);
 	strange= QString("     1 m = %1").arg(m_mtoUnit,15,'f',5);
 	m_pctrlLengthFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 m").arg(1./m_mtoUnit,15,'f',5);
+	m_pctrlLengthInvFactor->setText(strange);
+
 
 	GetAreaUnit(str,m_Area);
 	strange= QString(QString::fromUtf8("     1 m² = %1")).arg(m_m2toUnit,15,'f',5);
 	m_pctrlSurfaceFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 m").arg(1./m_m2toUnit,15,'f',5);
+	m_pctrlSurfaceInvFactor->setText(strange);
 
 	GetWeightUnit(str,m_Weight);
 	strange= QString("     1 kg = %1").arg(m_kgtoUnit,15,'f',5);
 	m_pctrlWeightFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 kg").arg(1./m_kgtoUnit,15,'f',5);
+	m_pctrlWeightInvFactor->setText(strange);
 
 	GetSpeedUnit(str,m_Speed);
 	strange= QString("     1 m/s = %1").arg(m_mstoUnit,15,'f',5);
 	m_pctrlSpeedFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 m/s").arg(1./m_mstoUnit,15,'f',5);
+	m_pctrlSpeedInvFactor->setText(strange);
 
 	GetForceUnit(str,m_Force);
 	strange= QString("     1 N = %1").arg(m_NtoUnit,15,'f',5);
 	m_pctrlForceFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 N").arg(1./m_NtoUnit,15,'f',5);
+	m_pctrlForceInvFactor->setText(strange);
 
 	GetMomentUnit(str,m_Moment);
 	strange= QString("     1 N.m = %1").arg(m_NmtoUnit,15,'f',5);
 	m_pctrlMomentFactor->setText(strange);
+	strange= "1 "+str+" = " +QString("%1 N.m").arg(1./m_NmtoUnit,15,'f',5);
+	m_pctrlMomentInvFactor->setText(strange);
 
 }
