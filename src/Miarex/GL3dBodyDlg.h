@@ -1,4 +1,4 @@
-		/****************************************************************************
+/****************************************************************************
 
 	GL3dBodyDlg Class
 	Copyright (C) 2009 Andre Deperrois xflr5@yahoo.com
@@ -33,13 +33,13 @@
 #include <QTableView>
 #include <QPushButton>
 #include <QSettings>
-#include "../GLWidget.h"
 #include "ArcBall.h"
 #include "BodyGridDlg.h"
 #include "BodyTableDelegate.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/LineButton.h"
 #include "../Objects/Body.h"
+#include "../GLWidget.h"
 
 
 class GL3dBodyDlg : public QDialog
@@ -137,16 +137,12 @@ private:
 	void GLCreateBodyGrid();
 	void GLCreateBodyOverlay();
 	void GLRenderBody();
-	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
-	void GLSetupLight();
-	void GLDrawAxes();
 	void GLCallViewLists();
 	void GLDraw3D();
 	void GLDrawBodyLegend();
 	void GLDrawBodyLineScale();
 	void GLDrawBodyFrameScale();
 	void SetBodyScale();
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
 	void SetBody(CBody *pBody);
@@ -165,12 +161,12 @@ private:
 	static void *s_pMiarex;
 	static void *s_pMainFrame;
 	static void *s_pGLLightDlg;
+	GLWidget *m_pglWidget;
 
 	static QPoint s_WindowPos;
 	static QSize  s_WindowSize;
 	static bool s_bWindowMaximized;
 
-	GLWidget *m_pglWidget;
 
 	QWidget *m_pctrlControlsWidget;
 

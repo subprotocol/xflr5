@@ -6,15 +6,24 @@
 #define MAXRECENTFILES         8
 #define SETTINGSFORMAT    100623
 #define PRECISION  0.00000000001 //values are assumed 0 if less than this value
+#define MAXCOLORS   30
 
 // Applications
 #define XFOILANALYSIS  1
 #define DIRECTDESIGN   2
 #define INVERSEDESIGN  3
 #define MIAREX         4
-#define XBODY          5
+#define SAIL7          5
 
-//View parameters
+//GLVIEW
+#define GLMIAREXVIEW  3
+#define GLBODYVIEW  5
+#define GLWINGVIEW  7
+#define GLSAIL7VIEW  11
+#define GLBOATVIEW  13
+
+
+//Miarex View parameters
 #define WOPPVIEW            1
 #define WPOLARVIEW          2
 #define W3DVIEW             3
@@ -23,6 +32,13 @@
 #define STABTIMEVIEW		0
 #define STABPOLARVIEW		1
 #define STAB3DVIEW		    3
+
+//Sail7 View
+#define SAILOPPVIEW          1
+#define SAILPOLARVIEW        2
+#define SAIL3DVIEW           3
+#define MAXSAILS            10
+#define MAXSAILPANELS       30
 
 
 //Polar types
@@ -153,6 +169,12 @@
 #define ARCPOINT            1415
 
 #define MODELEGEND          1416
+
+#define SOLIDLINE           0
+#define DASHLINE            1
+#define DOTLINE             2
+#define DASHDOTLINE         3
+#define DASHDOTDOTLINE      4
 
 #define QUESTION (BB || !BB) //Shakespeare
 

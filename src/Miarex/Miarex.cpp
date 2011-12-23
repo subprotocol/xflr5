@@ -4686,92 +4686,6 @@ void QMiarex::GLCallViewLists()
 }
 
 
-
-void QMiarex::GLDrawAxes()
-{
-	//
-	// Draws the axis in the OpenGL view
-	//
-
-	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
-	double l = .8;
-//	if(m_pCurWing) l=1.1*m_pCurwing->m_PlanformSpan/2.0;
-	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
-	glPolygonMode(GL_FRONT,GL_LINE);
-	glLineWidth((GLfloat)(m_3DAxisWidth));
-
-	glColor3d(m_3DAxisColor.redF(),m_3DAxisColor.greenF(),m_3DAxisColor.blueF());
-
-	glEnable (GL_LINE_STIPPLE);
-	if(m_3DAxisStyle == 1) 		glLineStipple (1, 0x1111);
-	else if(m_3DAxisStyle== 2) 	glLineStipple (1, 0x0F0F);
-	else if(m_3DAxisStyle== 3) 	glLineStipple (1, 0x1C47);
-	else						glLineStipple (1, 0xFFFF);// Solid
-
-	// X axis____________
-	glBegin(GL_LINES);
-		glVertex3d(-.8, 0.0, 0.0);
-		glVertex3d( .8, 0.0, 0.0);
-	glEnd();
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d( 1.0*l,   0.0,   0.0);
-		glVertex3d( 0.98*l,  0.015*l, 0.015*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 1.0*l,  0.0,    0.0);
-		glVertex3d( 0.98*l,-0.015*l,-0.015*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//XLabel
-	pGLWidget->renderText( l, 0.0, 0.0, "X", pMainFrame->m_TextFont);
-
-
-	// Y axis____________
-	glEnable (GL_LINE_STIPPLE);
-	glBegin(GL_LINES);
-		glVertex3d(0.0, -l, 0.0);
-		glVertex3d(0.0,  l, 0.0);
-	glEnd();
-
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,     1.0*l,  0.0);
-		glVertex3d( 0.015*l, 0.98*l, 0.015*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,     1.0*l,  0.0);
-		glVertex3d(-0.015*l, 0.98*l,-0.015*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//Y Label
-	pGLWidget->renderText( 0.0, l, 0.0, "Y", pMainFrame->m_TextFont);
-
-
-	// Z axis____________
-	glEnable (GL_LINE_STIPPLE);
-	glBegin(GL_LINES);
-		glVertex3d(0.0, 0.0, -l);
-		glVertex3d(0.0, 0.0,  l);
-	glEnd();
-
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d(  0.0,   0.0, 1.0*l);
-		glVertex3d( 0.015*l,  0.015*l,  0.98*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,    0.0, 1.0*l);
-		glVertex3d(-0.015*l, -0.015*l,  0.98*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//ZLabel
-	pGLWidget->renderText( 0.0, 0.0, l, "Z", pMainFrame->m_TextFont);
-
-	glDisable (GL_LINE_STIPPLE);
-}
-
-
 void QMiarex::GLDraw3D()
 {
 	//
@@ -4785,121 +4699,12 @@ void QMiarex::GLDraw3D()
 	}
 
 	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
-
+	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 	glClearColor(pMainFrame->m_BackgroundColor.redF(), pMainFrame->m_BackgroundColor.greenF(), pMainFrame->m_BackgroundColor.blueF(),0.0);
 
 	if(!glIsList(ARCBALL))
 	{
-		int row, col, NumAngles, NumCircles;
-		double R, lat_incr, lon_incr, phi, theta;
-		m_ArcBall.GetMatrix();
-		CVector eye(0.0,0.0,1.0);
-		CVector up(0.0,1.0,0.0);
-		m_ArcBall.SetZoom(0.45,eye,up);
-
-		glNewList(ARCBALL,GL_COMPILE);
-		{
-			m_GLList++;
-			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-
-			glColor3d(0.3,0.3,.5);
-			glLineWidth(1.0);
-
-			R = m_ArcBall.ab_sphere;
-
-			NumAngles  = 50;
-			NumCircles =  6;
-			lat_incr =  90.0 / NumAngles;
-			lon_incr = 360.0 / NumCircles;
-
-			for (col = 0; col < NumCircles; col++)
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					phi = (col * lon_incr) * PI/180.0;
-
-					for (row = 1; row < NumAngles-1; row++)
-					{
-						theta = (row * lat_incr) * PI/180.0;
-						glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
-					}
-				}
-				glEnd();
-				glBegin(GL_LINE_STRIP);
-				{
-					phi = (col * lon_incr ) * PI/180.0;
-
-					for (row = 1; row < NumAngles-1; row++)
-					{
-						theta = -(row * lat_incr) * PI/180.0;
-						glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
-					}
-				}
-				glEnd();
-			}
-
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=1; col<35; col++)
-				{
-					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
-					glVertex3d(R * cos(phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(phi) * cos(theta)*m_GLScale);
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=1; col<35; col++)
-				{
-					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
-					glVertex3d(R * cos(-phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(-phi) * cos(theta)*m_GLScale);
-				}
-			}
-			glEnd();
-		}
-		glEndList();
-
-		glNewList(ARCPOINT,GL_COMPILE);
-		{
-			m_GLList++;
-			glPolygonMode(GL_FRONT,GL_LINE);
-
-			glColor3d(0.3,0.1,.2);
-			glLineWidth(2.0);
-
-			NumAngles  = 10;
-
-			lat_incr = 30.0 / NumAngles;
-			lon_incr = 30.0 / NumAngles;
-
-			glBegin(GL_LINE_STRIP);
-			{
-				phi = 0.0;//longitude
-
-				for (row = -NumAngles; row < NumAngles; row++)
-				{
-					theta = (row * lat_incr) * PI/180.0;
-					glVertex3d(R*cos(phi)*cos(theta)*m_GLScale, R*sin(theta)*m_GLScale, R*sin(phi)*cos(theta)*m_GLScale);
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=-NumAngles; col<NumAngles; col++)
-				{
-					phi = (0.0 + (double)col*30.0/NumAngles) * PI/180.0;
-					glVertex3d(R * cos(phi) * cos(theta)*m_GLScale, R * sin(theta)*m_GLScale, R * sin(phi) * cos(theta)*m_GLScale);
-				}
-			}
-			glEnd();
-		}
-		glEndList();
+		pGLWidget->CreateArcballList(m_ArcBall, m_GLScale);
 	}
 
 
@@ -5220,7 +5025,7 @@ void QMiarex::GLDrawMasses()
 					glTranslated(m_pWingList[iw]->m_MassPosition[im].x,
 							   m_pWingList[iw]->m_MassPosition[im].y,
 							   m_pWingList[iw]->m_MassPosition[im].z);
-					GLRenderSphere(m_MassColor,radius,18,18);
+					pGLWidget->GLRenderSphere(m_MassColor,radius,18,18);
 					pGLWidget->renderText(0.0, 0.0, 0.0 +.02,
 									  m_pWingList[iw]->m_MassTag[im]
 									  +QString(" %1").arg(m_pWingList[iw]->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
@@ -5238,7 +5043,7 @@ void QMiarex::GLDrawMasses()
 			glPushMatrix();
 			{
 				glTranslated(m_pCurPlane->m_MassPosition[im].x,m_pCurPlane->m_MassPosition[im].y,m_pCurPlane->m_MassPosition[im].z);
-				GLRenderSphere(m_MassColor,radius,18,18);
+				pGLWidget->GLRenderSphere(m_MassColor,radius,18,18);
 				pGLWidget->renderText(0.0,0.0,0.0+.02,
 								  m_pCurPlane->m_MassTag[im]
 								  +QString(" %1").arg(m_pCurPlane->m_MassValue[im]*pMainFrame->m_kgtoUnit, 7,'g',3)
@@ -5281,7 +5086,7 @@ void QMiarex::GLDrawMasses()
 							   m_pCurPlane->BodyPos().z);
 				}
 
-				GLRenderSphere(m_MassColor,radius,18,18);
+				pGLWidget->GLRenderSphere(m_MassColor,radius,18,18);
 
 				pGLWidget->renderText(0.0, 0.0, 0.0+.02,
 								  m_pCurBody->m_MassTag[im]
@@ -5309,7 +5114,7 @@ void QMiarex::GLDrawMasses()
 		glPushMatrix();
 		{
 			glTranslated(CoG.x,CoG.y,CoG.z);
-			GLRenderSphere(QColor(255,0,0),radius,18,18);
+			pGLWidget->GLRenderSphere(QColor(255,0,0),radius,18,18);
 			pGLWidget->renderText(0.0, 0.0, 0.0+.02,
 							  "CoG "+QString("%1").arg(Mass*pMainFrame->m_kgtoUnit, 7,'g',3)
 							  +MassUnit);
@@ -5380,6 +5185,10 @@ void QMiarex::GLRenderView()
 	// Renders the OpenGl 3D view
 	//
 	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
+	double LightFactor;
+	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,.1);
+	else           LightFactor = 1.0;
+
 	static GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
@@ -5396,7 +5205,7 @@ void QMiarex::GLRenderView()
 		if(m_ClipPlanePos>4.9999) 	glDisable(GL_CLIP_PLANE1);
 		else						glEnable(GL_CLIP_PLANE1);
 
-		GLSetupLight();
+		pGLWidget->GLSetupLight(m_GLLightDlg, m_UFOOffset.y,LightFactor);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
@@ -5413,15 +5222,15 @@ void QMiarex::GLRenderView()
 			glDisable(GL_LIGHT0);
 			glPushMatrix();
 			{
-				glTranslated(( m_GLLightDlg.m_XLight+ m_UFOOffset.x)*m_GLScale,
-								 ( m_GLLightDlg.m_YLight+ m_UFOOffset.y)*m_GLScale,
-									m_GLLightDlg.m_ZLight*m_GLScale);
-				double radius = (m_GLLightDlg.m_ZLight+2.0)/40.0*m_GLScale;
+				glTranslated(( m_GLLightDlg.s_XLight+ m_UFOOffset.x)*m_GLScale,
+							 ( m_GLLightDlg.s_YLight+ m_UFOOffset.y)*m_GLScale,
+							   m_GLLightDlg.s_ZLight*m_GLScale);
+				double radius = (m_GLLightDlg.s_ZLight+2.0)/40.0*m_GLScale;
 				QColor color;
-				color = QColor((int)(m_GLLightDlg.m_Red  *255),
-							(int)(m_GLLightDlg.m_Green*255),
-							(int)(m_GLLightDlg.m_Blue *255));
-				GLRenderSphere(color,radius,18,18);
+				color = QColor((int)(m_GLLightDlg.s_Red  *255),
+							   (int)(m_GLLightDlg.s_Green*255),
+							   (int)(m_GLLightDlg.s_Blue *255));
+				pGLWidget->GLRenderSphere(color,radius,18,18);
 			}
 			glPopMatrix();
 		}
@@ -5454,7 +5263,7 @@ void QMiarex::GLRenderView()
 
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
-		if(m_bAxes)  GLDrawAxes();
+		if(m_bAxes)  pGLWidget->GLDrawAxes(1, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
 
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{
@@ -5492,167 +5301,6 @@ void QMiarex::GLRenderView()
 	glPopMatrix();
 	glDisable(GL_CLIP_PLANE1);
 }
-
-
-void QMiarex::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes)
-{
-	//
-	// Render the sphere representing the light or point masses
-	//
-	static double start_lat, start_lon,lat_incr, lon_incr, R;
-	static double phi1, phi2, theta1, theta2;
-	static GLdouble u[3], v[3], w[3], n[3];
-	static int row, col;
-
-	glDisable(GL_TEXTURE_2D);
-	glPolygonMode(GL_FRONT,GL_FILL);
-	glBegin(GL_TRIANGLES);
-	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
-
-	start_lat = -90;
-	start_lon = 0.0;
-	R = radius;
-
-	lat_incr = 180.0 / NumLatitudes;
-	lon_incr = 360.0 / NumLongitudes;
-
-	for (col = 0; col < NumLongitudes; col++)
-	{
-		phi1 = (start_lon + col * lon_incr) * PI/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
-
-		for (row = 0; row < NumLatitudes; row++)
-		{
-			theta1 = (start_lat + row * lat_incr) * PI/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
-
-			u[0] = R * cos(phi1) * cos(theta1);//x
-			u[1] = R * sin(theta1);//y
-			u[2] = R * sin(phi1) * cos(theta1);//z
-
-			v[0] = R * cos(phi1) * cos(theta2);//x
-			v[1] = R * sin(theta2);//y
-			v[2] = R * sin(phi1) * cos(theta2);//z
-
-			w[0] = R * cos(phi2) * cos(theta2);//x
-			w[1] = R * sin(theta2);//y
-			w[2] = R * sin(phi2) * cos(theta2);//z
-
-			NormalVector(u,v,w,n);
-
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(v);
-			glVertex3dv(w);
-
-			v[0] = R * cos(phi2) * cos(theta1);//x
-			v[1] = R * sin(theta1);//y
-			v[2] = R * sin(phi2) * cos(theta1);//z
-
-			NormalVector(u,w,v,n);
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(w);
-			glVertex3dv(v);
-		}
-	}
-	glEnd();
-}
-
-
-void QMiarex::GLSetupLight()
-{
-	//
-	// Sets the light parameters for the OpenGl display
-	//
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);    // the ambient light
-	glDisable(GL_LIGHT1);
-	glDisable(GL_LIGHT2);
-	glDisable(GL_LIGHT3);
-	glDisable(GL_LIGHT4);
-	glDisable(GL_LIGHT5);
-	glDisable(GL_LIGHT6);
-	glDisable(GL_LIGHT7);
-
-	float fLightAmbient0[4];
-	float fLightDiffuse0[4];
-	float fLightSpecular0[4];
-	float fLightPosition0[4];
-
-	float LightFactor = 1.0f;
-	if(m_pCurWing)      LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);
-//	if(LightFactor>1.0) LightFactor = 1.0f;
-
-	// the ambient light conditions.
-	fLightAmbient0[0] = LightFactor*m_GLLightDlg.m_Ambient * m_GLLightDlg.m_Red; // red component
-	fLightAmbient0[1] = LightFactor*m_GLLightDlg.m_Ambient * m_GLLightDlg.m_Green; // green component
-	fLightAmbient0[2] = LightFactor*m_GLLightDlg.m_Ambient * m_GLLightDlg.m_Blue; // blue component
-	fLightAmbient0[3] = 1.0; // alpha
-
-	fLightDiffuse0[0] = LightFactor*m_GLLightDlg.m_Diffuse * m_GLLightDlg.m_Red; // red component
-	fLightDiffuse0[1] = LightFactor*m_GLLightDlg.m_Diffuse * m_GLLightDlg.m_Green; // green component
-	fLightDiffuse0[2] = LightFactor*m_GLLightDlg.m_Diffuse * m_GLLightDlg.m_Blue; // blue component
-	fLightDiffuse0[3] = 1.0; // alpha
-
-	fLightSpecular0[0] = LightFactor*m_GLLightDlg.m_Specular * m_GLLightDlg.m_Red; // red component
-	fLightSpecular0[1] = LightFactor*m_GLLightDlg.m_Specular * m_GLLightDlg.m_Green; // green component
-	fLightSpecular0[2] = LightFactor*m_GLLightDlg.m_Specular * m_GLLightDlg.m_Blue; // blue component
-	fLightSpecular0[3] = 1.0; // alpha
-
-	// And finally, its position
-
-	fLightPosition0[0] = (GLfloat)((m_GLLightDlg.m_XLight));
-	fLightPosition0[1] = (GLfloat)((m_GLLightDlg.m_YLight + m_UFOOffset.y));
-	fLightPosition0[2] = (GLfloat)((m_GLLightDlg.m_ZLight));
-	fLightPosition0[3] = 1.0; // W (positional light)
-
-
-
-	// Enable the basic light
-	glLightfv(GL_LIGHT0, GL_AMBIENT,  fLightAmbient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,  fLightDiffuse0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, fLightSpecular0);
-	glLightfv(GL_LIGHT0, GL_POSITION, fLightPosition0);
-
-
-	float fMatAmbient[4]   = {m_GLLightDlg.m_MatAmbient,  m_GLLightDlg.m_MatAmbient,   m_GLLightDlg.m_MatAmbient,  1.0f};
-	float fMatSpecular[4]  = {m_GLLightDlg.m_MatSpecular, m_GLLightDlg.m_MatSpecular,  m_GLLightDlg.m_MatSpecular, 1.0f};
-	float fMatDiffuse[4]   = {m_GLLightDlg.m_MatDiffuse,  m_GLLightDlg.m_MatDiffuse,   m_GLLightDlg.m_MatDiffuse,  1.0f};
-	float fMatEmission[4]  = {m_GLLightDlg.m_MatEmission, m_GLLightDlg.m_MatEmission,  m_GLLightDlg.m_MatEmission, 1.0f};
-
-	if(m_GLLightDlg.m_bColorMaterial)
-	{
-		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-//		glColorMaterial(GL_FRONT, GL_AMBIENT);
-//		glColorMaterial(GL_FRONT, GL_DIFFUSE);
-//		glColorMaterial(GL_FRONT, GL_SPECULAR);
-
-	}
-	else
-	{
-		glDisable(GL_COLOR_MATERIAL);
-
-	}
-	glMaterialfv(GL_FRONT, GL_SPECULAR,  fMatSpecular);
-	glMaterialfv(GL_FRONT, GL_AMBIENT,   fMatAmbient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE,   fMatDiffuse);
-	glMaterialfv(GL_FRONT, GL_EMISSION,  fMatEmission);
-	glMateriali( GL_FRONT, GL_SHININESS, m_GLLightDlg.m_iMatShininess);
-
-	if(m_GLLightDlg.m_bDepthTest)  glEnable(GL_DEPTH_TEST);     else glDisable(GL_DEPTH_TEST);
-	if(m_GLLightDlg.m_bCullFaces)  glEnable(GL_CULL_FACE);      else glDisable(GL_CULL_FACE);
-	if(m_GLLightDlg.m_bSmooth)     glEnable(GL_POLYGON_SMOOTH); else glDisable(GL_POLYGON_SMOOTH);
-	if(m_GLLightDlg.m_bShade)      glShadeModel(GL_SMOOTH);     else glShadeModel(GL_FLAT);
-
-	if(m_GLLightDlg.m_bLocalView) glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,0);
-	else                          glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,1);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
-}
-
 
 
 bool QMiarex::InitializePanels()
@@ -7218,43 +6866,6 @@ void QMiarex::mouseReleaseEvent(QMouseEvent *event)
 	m_bTrans = false;
 }
 
-
-
-void QMiarex::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3])
-{
-	//
-	// calculate two vectors, using the middle point as the common origin
-	//
-
-	GLdouble v1[3], v2[3], d;
-	v1[0] = p3[0] - p1[0];
-	v1[1] = p3[1] - p1[1];
-	v1[2] = p3[2] - p1[2];
-	v2[0] = p3[0] - p2[0];
-	v2[1] = p3[1] - p2[1];
-	v2[2] = p3[2] - p2[2];
-
-	// calculate the cross product of the two vectors
-	n[0] = v1[1] * v2[2] - v2[1] * v1[2];
-	n[1] = v1[2] * v2[0] - v2[2] * v1[0];
-	n[2] = v1[0] * v2[1] - v2[0] * v1[1];
-
-	// normalize the vector
-	d = ( n[0] * n[0] + n[1] * n[1] + n[2] * n[2] );
-	// try to catch very small vectors
-	if (d < (GLdouble)0.00000001)
-	{
-		d = (GLdouble)100000000.0;
-	}
-	else
-	{
-		d = (GLdouble)1.0 / sqrt(d);
-	}
-
-	n[0] *= d;
-	n[1] *= d;
-	n[2] *= d;
-}
 
 
 void QMiarex::On3DView()
@@ -11319,17 +10930,23 @@ void QMiarex::OnSurfaceSpeeds()
 void QMiarex::OnSetupLight()
 {
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
+	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
+
 	m_bShowLight = true;
 	UpdateView();
-	m_GLLightDlg.m_bLight = m_bglLight;
-	m_GLLightDlg.m_pMiarex = this;
+	GLLightDlg::s_bLight = m_bglLight;
+	m_GLLightDlg.m_pGLWidget = s_pGLWidget;
+
 	m_GLLightDlg.exec();
 
-	m_bglLight = m_GLLightDlg.m_bLight;
+	m_bglLight = GLLightDlg::s_bLight;
 
 	m_bShowLight = false;
 
-	GLSetupLight();
+	double LightFactor;
+	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);
+	else           LightFactor = 1.0;
+	pGLWidget->GLSetupLight(m_GLLightDlg, m_UFOOffset.y, LightFactor);
 	UpdateView();
 }
 

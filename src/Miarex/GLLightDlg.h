@@ -35,14 +35,17 @@ class GLLightDlg : public QDialog
 	Q_OBJECT
 
 	friend class QMiarex;
+	friend class QSail7;
+	friend class GLWidget;
 	friend class GL3dBodyDlg;
 	friend class GL3dWingDlg;
 
 public:
-    GLLightDlg();
+	GLLightDlg();
 	void InitDialog();
 	void Apply();
 	void ReadParams(void);
+	void SetDefaults(double size);
 	void SetParams(void);
 	bool LoadSettings(QSettings *pSettings);
 	bool SaveSettings(QSettings *pSettings);
@@ -87,16 +90,18 @@ private:
 private:
 	void *m_pGL3dBodyDlg;
 	void *m_pGL3dWingDlg;
-	void *m_pMiarex;
+	void *m_pGLWidget;
 
-	float m_Ambient, m_Diffuse, m_Specular;
-	float m_MatAmbient, m_MatDiffuse, m_MatSpecular, m_MatEmission;
-	float m_Red, m_Green, m_Blue;
-	float m_XLight, m_YLight, m_ZLight;
-	int m_iMatShininess;
-	bool m_bCullFaces, m_bShade, m_bSmooth, m_bLocalView, m_bDepthTest;
-	bool m_bColorMaterial;
-	bool m_bLight;
+	static float s_Ambient, s_Diffuse, s_Specular;
+	static float s_MatAmbient, s_MatDiffuse, s_MatSpecular, s_MatEmission;
+	static float s_Red, s_Green, s_Blue;
+	static float s_XLight, s_YLight, s_ZLight;
+	static int s_iMatShininess;
+	static bool s_bCullFaces, s_bShade, s_bSmooth, s_bLocalView, s_bDepthTest;
+	static bool s_bColorMaterial;
+	static bool s_bLight;
+
+	double m_Size;
 
 public:
 

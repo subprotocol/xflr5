@@ -34,9 +34,9 @@
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
-#include "../GLWidget.h"
 #include "ArcBall.h"
 #include "WingDelegate.h"
+#include "../GLWidget.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/ColorButton.h"
 #include "../Misc/LineButton.h"
@@ -129,12 +129,8 @@ private:
 	void GLDrawFoils();
 	void GLCreateSectionHighlight();
 	void GLInverseMatrix();
-	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
-	void GLSetupLight();
-	void GLDrawAxes();
 	void GLCallViewLists();
 	void GLDraw3D();
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
 	void SetWingScale();
@@ -150,6 +146,7 @@ private:
 	static void *s_pGLLightDlg;
 	static QList <void*> *s_poaFoil;
 	static QList <void*> *s_poaWing;
+	GLWidget *m_pGLWidget;
 
 	QLineEdit *m_pctrlWingName;
 	QTextEdit *m_pctrlWingDescription;
@@ -184,7 +181,6 @@ private:
 	QAction *m_pInsertBefore, *m_pInsertAfter, *m_pDeleteSection;
 
 	QWidget *m_pctrlControlsWidget;
-	GLWidget *m_pglWidget;
 
 	CWing *m_pWing;
 

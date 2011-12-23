@@ -256,12 +256,8 @@ public:
 	void GLDrawMasses();
 	void GLInverseMatrix();
 	void GLRenderView();
-	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
-	void GLSetupLight();
-	void GLDrawAxes();
 	void GLCallViewLists();
 	void GLDraw3D();
-	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
 

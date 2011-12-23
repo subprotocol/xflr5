@@ -26,6 +26,8 @@
 #include <QGLWidget>
 #include "Params.h"
 #include "Objects/CRectangle.h"
+#include "Miarex/ArcBall.h"
+#include "Miarex/GLLightDlg.h"
 
 class GLWidget : public QGLWidget 
 {
@@ -39,7 +41,11 @@ class GLWidget : public QGLWidget
 
 public:
 	GLWidget(QWidget *parent = 0);
-
+	void CreateArcballList(ArcBall &ArcBall, double GLScale);
+	void NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3]);
+	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
+	void GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth);
+	void GLSetupLight(GLLightDlg &glLightParams, double Offset_y, double LightFactor);
 
 private:
 
@@ -58,6 +64,7 @@ private:
 private slots:
 
 private:
+
 	void *m_pParent;
 	static void *s_pMiarex;
 	static void *s_pMainFrame;

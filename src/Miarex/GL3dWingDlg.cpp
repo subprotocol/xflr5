@@ -48,6 +48,7 @@
 void* GL3dWingDlg::s_pMainFrame;		//pointer to the Frame window
 void* GL3dWingDlg::s_pMiarex;	//pointer to the Miarex Application window
 void *GL3dWingDlg::s_pGLLightDlg;
+
 QList <void*> *GL3dWingDlg::s_poaWing;
 QList <void*> *GL3dWingDlg::s_poaFoil;
 	
@@ -113,7 +114,7 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_ArcBall.m_pOffy    = &m_UFOOffset.y;
 	m_ArcBall.m_pTransx  = &m_glViewportTrans.x;
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
-	m_ArcBall.m_pRect    = &m_pglWidget->m_rCltRect;
+	m_ArcBall.m_pRect    = &m_pGLWidget->m_rCltRect;
 
 	m_pResetScales   = new QAction(tr("Reset Scales"), this);
 	m_pInsertBefore  = new QAction(tr("Insert Before"), this);
@@ -168,9 +169,10 @@ bool GL3dWingDlg::CheckWing()
 
 void GL3dWingDlg::ClientToGL(QPoint const &point, CVector &real)
 {
-	if(!m_pglWidget) return;
-	double h2 = (double)m_pglWidget->m_rCltRect.height() /2.0;
-	double w2 = (double)m_pglWidget->m_rCltRect.width()  /2.0;
+	if(!m_pGLWidget) return;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+	double h2 = (double)pGLWidget->m_rCltRect.height() /2.0;
+	double w2 = (double)pGLWidget->m_rCltRect.width()  /2.0;
 
 	if(w2>h2)
 	{
@@ -975,91 +977,11 @@ void GL3dWingDlg::GLDraw3D()
 }
 
 
-void GL3dWingDlg::GLDrawAxes()
-{
-	double l = .8;
-//	if(m_pWing) l=1.1*m_pWing->m_Span/2.0;
-	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	glPolygonMode(GL_FRONT,GL_LINE);
-	glLineWidth((GLfloat)(pMiarex->m_3DAxisWidth));
-
-	glColor3d(pMiarex->m_3DAxisColor.redF(),pMiarex->m_3DAxisColor.greenF(),pMiarex->m_3DAxisColor.blueF());
-
-// X axis____________
-	glEnable (GL_LINE_STIPPLE);
-	if(pMiarex->m_3DAxisStyle == 1)     glLineStipple (1, 0x1111);
-	else if(pMiarex->m_3DAxisStyle== 2) glLineStipple (1, 0x0F0F);
-	else if(pMiarex->m_3DAxisStyle== 3) glLineStipple (1, 0x1C47);
-	else                                glLineStipple (1, 0xFFFF);// Solid
-
-
-	glBegin(GL_LINES);
-		glVertex3d(-.8, 0.0, 0.0);
-		glVertex3d( .8, 0.0, 0.0);
-	glEnd();
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d( 1.0*l,   0.0,   0.0);
-		glVertex3d( 0.98*l,  0.015*l, 0.015*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 1.0*l,  0.0,    0.0);
-		glVertex3d( 0.98*l,-0.015*l,-0.015*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//XLabel
-	m_pglWidget->renderText( .8, 0.0, 0.0, "X");
-
-
-// Y axis____________
-	glEnable (GL_LINE_STIPPLE);
-	glBegin(GL_LINES);
-		glVertex3d(0.0, -.8, 0.0);
-		glVertex3d(0.0,  .8, 0.0);
-	glEnd();
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,     1.0*l,  0.0);
-		glVertex3d( 0.015*l, 0.98*l, 0.015*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,     1.0*l,  0.0);
-		glVertex3d(-0.015*l, 0.98*l,-0.015*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//Y Label
-	m_pglWidget->renderText(0.0,  .8, 0.0,"Y");
-
-
-// Z axis____________
-	glEnable (GL_LINE_STIPPLE);
-	glBegin(GL_LINES);
-		glVertex3d(0.0, 0.0, -.8);
-		glVertex3d(0.0, 0.0,  .8);
-	glEnd();
-
-
-	//Arrow
-	glBegin(GL_LINES);
-		glVertex3d(  0.0,   0.0, 1.0*l);
-		glVertex3d( 0.015*l,  0.015*l,  0.98*l);
-	glEnd();
-	glBegin(GL_LINES);
-		glVertex3d( 0.0,    0.0, 1.0*l);
-		glVertex3d(-0.015*l, -0.015*l,  0.98*l);
-	glEnd();
-	glDisable (GL_LINE_STIPPLE);
-	//ZLabel
-	m_pglWidget->renderText(0.0, 0.0, .8, "Z");
-
-	glDisable (GL_LINE_STIPPLE);
-}
-
-
 
 void GL3dWingDlg::GLDrawFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	int j;
 	CFoil *pFoil;
 
@@ -1069,14 +991,14 @@ void GL3dWingDlg::GLDrawFoils()
 	{
 		pFoil = m_pWing->m_Surface[j].m_pFoilA;
 
-		if(pFoil) m_pglWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
+		if(pFoil) pGLWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
 								    pFoil->m_FoilName);
 
 	}
 
 	j = m_pWing->m_NSurfaces-1;
 	pFoil = m_pWing->m_Surface[j].m_pFoilB;
-	if(pFoil) m_pglWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
+	if(pFoil) pGLWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
 							    pFoil->m_FoilName);
 
 }
@@ -1101,74 +1023,12 @@ void GL3dWingDlg::GLInverseMatrix()
 
 
 
-void GL3dWingDlg::GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes)
-{
-	glDisable(GL_TEXTURE_2D);
-	glPolygonMode(GL_FRONT,GL_FILL);
-	glBegin(GL_TRIANGLES);
-	glColor3d(cr.redF(),cr.greenF(),cr.blueF());
-
-	double start_lat = -90;
-	double start_lon = 0.0;
-	double R = radius;
-
-	double lat_incr = 180.0 / NumLatitudes;
-	double lon_incr = 360.0 / NumLongitudes;
-
-	double phi1, phi2, theta1, theta2;
-	GLdouble u[3], v[3], w[3], n[3];
-
-	int row, col;
-
-	for (col = 0; col < NumLongitudes; col++)
-	{
-		phi1 = (start_lon + col * lon_incr) * PI/180.0;
-		phi2 = (start_lon + (col + 1) * lon_incr) * PI/180.0;
-
-		for (row = 0; row < NumLatitudes; row++)
-		{
-			theta1 = (start_lat + row * lat_incr) * PI/180.0;
-			theta2 = (start_lat + (row + 1) * lat_incr) * PI/180.0;
-
-			u[0] = R * cos(phi1) * cos(theta1);//x
-			u[1] = R * sin(theta1);//y
-			u[2] = R * sin(phi1) * cos(theta1);//z
-
-			v[0] = R * cos(phi1) * cos(theta2);//x
-			v[1] = R * sin(theta2);//y
-			v[2] = R * sin(phi1) * cos(theta2);//z
-
-			w[0] = R * cos(phi2) * cos(theta2);//x
-			w[1] = R * sin(theta2);//y
-			w[2] = R * sin(phi2) * cos(theta2);//z
-
-			NormalVector(u,v,w,n);
-
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(v);
-			glVertex3dv(w);
-
-			v[0] = R * cos(phi2) * cos(theta1);//x
-			v[1] = R * sin(theta1);//y
-			v[2] = R * sin(phi2) * cos(theta1);//z
-
-			NormalVector(u,w,v,n);
-			glNormal3dv(n);
-			glVertex3dv(u);
-			glVertex3dv(w);
-			glVertex3dv(v);
-		}
-	}
-	glEnd();
-}
-
-
 
 void GL3dWingDlg::GLRenderView()
 {
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
@@ -1182,7 +1042,7 @@ void GL3dWingDlg::GLRenderView()
 
 	glPushMatrix();
 	{
-		GLSetupLight();
+		pGLWidget->GLSetupLight(pMiarex->m_GLLightDlg, m_UFOOffset.y, 1.0);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 /*		if(m_bShowLight)
@@ -1233,7 +1093,7 @@ void GL3dWingDlg::GLRenderView()
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
-		if(m_bAxes)  GLDrawAxes();
+		if(m_bAxes)  pGLWidget->GLDrawAxes(1, pMiarex->m_3DAxisColor, pMiarex->m_3DAxisStyle, pMiarex->m_3DAxisWidth);
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
@@ -1286,8 +1146,8 @@ void GL3dWingDlg::GLRenderView()
 			{
 				glTranslated(m_pWing->m_MassPosition[im].x,m_pWing->m_MassPosition[im].y,m_pWing->m_MassPosition[im].z);
 				double radius = .02;//2cm
-				GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
-				m_pglWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_MassTag[im]);
+				pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
+				pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_MassTag[im]);
 
 			}
 			glPopMatrix();
@@ -1305,106 +1165,16 @@ void GL3dWingDlg::GLRenderView()
 
 
 
-
-void GL3dWingDlg::GLSetupLight()
-{
-	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);    // the ambient light
-	glDisable(GL_LIGHT1);
-	glDisable(GL_LIGHT2);
-	glDisable(GL_LIGHT3);
-	glDisable(GL_LIGHT4);
-	glDisable(GL_LIGHT5);
-	glDisable(GL_LIGHT6);
-	glDisable(GL_LIGHT7);
-
-	float fLightAmbient0[4];
-	float fLightDiffuse0[4];
-	float fLightSpecular0[4];
-	float fLightPosition0[4];
-
-	float LightFactor = 1.0f;
-//	if(LightFactor>1.0) LightFactor = 1.0f;
-
-	// the ambient light conditions.
-	fLightAmbient0[0] = LightFactor*pGLLightDlg->m_Ambient * pGLLightDlg->m_Red; // red component
-	fLightAmbient0[1] = LightFactor*pGLLightDlg->m_Ambient * pGLLightDlg->m_Green; // green component
-	fLightAmbient0[2] = LightFactor*pGLLightDlg->m_Ambient * pGLLightDlg->m_Blue; // blue component
-	fLightAmbient0[3] = 1.0; // alpha
-
-	fLightDiffuse0[0] = LightFactor*pGLLightDlg->m_Diffuse * pGLLightDlg->m_Red; // red component
-	fLightDiffuse0[1] = LightFactor*pGLLightDlg->m_Diffuse * pGLLightDlg->m_Green; // green component
-	fLightDiffuse0[2] = LightFactor*pGLLightDlg->m_Diffuse * pGLLightDlg->m_Blue; // blue component
-	fLightDiffuse0[3] = 1.0; // alpha
-
-	fLightSpecular0[0] = LightFactor*pGLLightDlg->m_Specular * pGLLightDlg->m_Red; // red component
-	fLightSpecular0[1] = LightFactor*pGLLightDlg->m_Specular * pGLLightDlg->m_Green; // green component
-	fLightSpecular0[2] = LightFactor*pGLLightDlg->m_Specular * pGLLightDlg->m_Blue; // blue component
-	fLightSpecular0[3] = 1.0; // alpha
-
-	// And finally, its position
-
-	fLightPosition0[0] = (GLfloat)((pGLLightDlg->m_XLight));
-	fLightPosition0[1] = (GLfloat)((pGLLightDlg->m_YLight + m_UFOOffset.y));
-	fLightPosition0[2] = (GLfloat)((pGLLightDlg->m_ZLight));
-	fLightPosition0[3] = 1.0; // W (positional light)
-
-
-
-	// Enable the basic light
-	glLightfv(GL_LIGHT0, GL_AMBIENT,  fLightAmbient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,  fLightDiffuse0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, fLightSpecular0);
-	glLightfv(GL_LIGHT0, GL_POSITION, fLightPosition0);
-
-
-	float fMatAmbient[4]   = {pGLLightDlg->m_MatAmbient,  pGLLightDlg->m_MatAmbient,   pGLLightDlg->m_MatAmbient,1.0f};
-	float fMatSpecular[4]  = {pGLLightDlg->m_MatSpecular, pGLLightDlg->m_MatSpecular,  pGLLightDlg->m_MatSpecular,1.0f};
-	float fMatDiffuse[4]   = {pGLLightDlg->m_MatDiffuse,  pGLLightDlg->m_MatDiffuse,   pGLLightDlg->m_MatDiffuse,1.0f};
-	float fMatEmission[4]  = {pGLLightDlg->m_MatEmission, pGLLightDlg->m_MatEmission,  pGLLightDlg->m_MatEmission,1.0f};
-
-	if(pGLLightDlg->m_bColorMaterial)
-	{
-		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-//		glColorMaterial(GL_FRONT, GL_AMBIENT);
-//		glColorMaterial(GL_FRONT, GL_DIFFUSE);
-//		glColorMaterial(GL_FRONT, GL_SPECULAR);
-
-	}
-	else
-	{
-		glDisable(GL_COLOR_MATERIAL);
-
-	}
-	glMaterialfv(GL_FRONT, GL_SPECULAR,  fMatSpecular);
-	glMaterialfv(GL_FRONT, GL_AMBIENT,   fMatAmbient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE,   fMatDiffuse);
-	glMaterialfv(GL_FRONT, GL_EMISSION,  fMatEmission);
-	glMateriali(GL_FRONT, GL_SHININESS,  pGLLightDlg->m_iMatShininess);
-
-	if(pGLLightDlg->m_bDepthTest)  glEnable(GL_DEPTH_TEST);     else glDisable(GL_DEPTH_TEST);
-	if(pGLLightDlg->m_bCullFaces)  glEnable(GL_CULL_FACE);      else glDisable(GL_CULL_FACE);
-	if(pGLLightDlg->m_bSmooth)     glEnable(GL_POLYGON_SMOOTH); else glDisable(GL_POLYGON_SMOOTH);
-	if(pGLLightDlg->m_bShade)      glShadeModel(GL_SMOOTH);     else glShadeModel(GL_FLAT);
-
-	if(pGLLightDlg->m_bLocalView) glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,0);
-	else                          glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER ,1);
-
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
-}
-
-
 void GL3dWingDlg::GLToClient(CVector const &real, QPoint &point)
 {
-	if(!m_pglWidget) return;
-	double h = (double)m_pglWidget->geometry().height();
-	double w = (double)m_pglWidget->geometry().width();
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+	if(!pGLWidget) return;
+	double h = (double)pGLWidget->geometry().height();
+	double w = (double)pGLWidget->geometry().width();
 	double scale;
 
-	if(w>=h) scale = (double)m_pglWidget->geometry().width()  / 2.0;
-	else     scale = (double)m_pglWidget->geometry().height() / 2.0;
+	if(w>=h) scale = (double)pGLWidget->geometry().width()  / 2.0;
+	else     scale = (double)pGLWidget->geometry().height() / 2.0;
 
 //	point.rx() =  (int)(scale *(1.0 + real.x));
 	point.rx() = (int)(w/2.0 + real.x*scale);
@@ -1581,15 +1351,16 @@ void GL3dWingDlg::MouseDoubleClickEvent(QMouseEvent *event)
 
 void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 {
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	QPoint point(event->pos().x(), event->pos().y());
-	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
+	QPoint glPoint(event->pos().x() + pGLWidget->geometry().x(), event->pos().y()+pGLWidget->geometry().y());
 	m_MousePos = event->pos();
 	CVector Real;
 
 	QPoint Delta(point.x() - m_LastPoint.x(), point.y() - m_LastPoint.y());
 	ClientToGL(point, Real);
 
-//	if(!m_pglWidget->hasFocus()) m_pglWidget->setFocus();
+//	if(!m_pGLWidget->hasFocus()) m_pGLWidget->setFocus();
 
 	bool bCtrl = false;
 
@@ -1597,19 +1368,19 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 
 	if (event->buttons()   & Qt::LeftButton)
 	{
-		if(bCtrl&& m_pglWidget->geometry().contains(glPoint))
+		if(bCtrl&& pGLWidget->geometry().contains(glPoint))
 		{
 			//rotate
-			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+			m_ArcBall.Move(point.x(), pGLWidget->m_rCltRect.height()-point.y());
 			UpdateView();
 		}
 		else if(m_bTrans)
 		{
 			//translate
-			if(m_pglWidget->geometry().contains(glPoint))
+			if(pGLWidget->geometry().contains(glPoint))
 			{
-				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
-				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/m_pglWidget->m_rCltRect.width());
+				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/pGLWidget->m_rCltRect.width());
+				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/pGLWidget->m_rCltRect.width());
 
 				m_glRotCenter.x = MatOut[0][0]*(m_glViewportTrans.x) + MatOut[0][1]*(-m_glViewportTrans.y) + MatOut[0][2]*m_glViewportTrans.z;
 				m_glRotCenter.y = MatOut[1][0]*(m_glViewportTrans.x) + MatOut[1][1]*(-m_glViewportTrans.y) + MatOut[1][2]*m_glViewportTrans.z;
@@ -1624,7 +1395,7 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 	{
 		if(m_pWing)
 		{		
-			m_ArcBall.Move(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+			m_ArcBall.Move(point.x(), pGLWidget->m_rCltRect.height()-point.y());
 			UpdateView();
 		}
 	}
@@ -1637,10 +1408,11 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 {
 	// the event has been sent by GLWidget, so event is in GL Widget coordinates
 	// but m_3DWingRect is in window client coordinates
-	// the difference is m_pglWidget->geometry() !
+	// the difference is m_pGLWidget->geometry() !
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 
 	QPoint point(event->pos().x(), event->pos().y());
-	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
+	QPoint glPoint(event->pos().x() + pGLWidget->geometry().x(), event->pos().y()+pGLWidget->geometry().y());
 
 	CVector Real;
 	bool bCtrl = false;
@@ -1648,12 +1420,12 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 
 	ClientToGL(point, Real);
 
-	if(m_pglWidget->geometry().contains(glPoint)) m_pglWidget->setFocus();
+	if(pGLWidget->geometry().contains(glPoint)) pGLWidget->setFocus();
 	
 	if (event->buttons() & Qt::MidButton)
 	{
 		m_bArcball = true;
-		m_ArcBall.Start(event->pos().x(), m_pglWidget->m_rCltRect.height()-event->pos().y());
+		m_ArcBall.Start(event->pos().x(), pGLWidget->m_rCltRect.height()-event->pos().y());
 		m_bCrossPoint = true;
 
 		Set3DRotationCenter();
@@ -1671,15 +1443,15 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 		{
 			m_bTrans=true;
 	
-			if(m_pWing && m_pglWidget->geometry().contains(glPoint))
+			if(m_pWing && pGLWidget->geometry().contains(glPoint))
 			{
-				m_ArcBall.Start(point.x(), m_pglWidget->m_rCltRect.height()-point.y());
+				m_ArcBall.Start(point.x(), pGLWidget->m_rCltRect.height()-point.y());
 				m_bCrossPoint = true;
 				Set3DRotationCenter();
 				if (!bCtrl)
 				{
 					m_bTrans = true;
-					m_pglWidget->setCursor(Qt::ClosedHandCursor);
+					pGLWidget->setCursor(Qt::ClosedHandCursor);
 	
 				}
 					UpdateView();
@@ -1697,7 +1469,8 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 
 void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 {
-	m_pglWidget->setCursor(Qt::CrossCursor);
+	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+	pGLWidget->setCursor(Qt::CrossCursor);
 	
 	m_bTrans = false;
 	m_bDragPoint  = false;
@@ -1720,40 +1493,6 @@ void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 }
 
 
-
-void GL3dWingDlg::NormalVector(GLdouble p1[3], GLdouble p2[3],  GLdouble p3[3], GLdouble n[3])
-{
-	GLdouble v1[3], v2[3], d;
-	// calculate two vectors, using the middle point
-	// as the common origin
-	v1[0] = p3[0] - p1[0];
-	v1[1] = p3[1] - p1[1];
-	v1[2] = p3[2] - p1[2];
-	v2[0] = p3[0] - p2[0];
-	v2[1] = p3[1] - p2[1];
-	v2[2] = p3[2] - p2[2];
-
-	// calculate the cross product of the two vectors
-	n[0] = v1[1] * v2[2] - v2[1] * v1[2];
-	n[1] = v1[2] * v2[0] - v2[2] * v1[0];
-	n[2] = v1[0] * v2[1] - v2[0] * v1[1];
-
-	// normalize the vector
-	d = ( n[0] * n[0] + n[1] * n[1] + n[2] * n[2] );
-	// try to catch very small vectors
-	if (d < (GLdouble)0.00000001)
-	{
-		d = (GLdouble)100000000.0;
-	}
-	else
-	{
-		d = (GLdouble)1.0 / sqrt(d);
-	}
-
-	n[0] *= d;
-	n[1] *= d;
-	n[2] *= d;
-}
 
 
 
@@ -2160,20 +1899,6 @@ void GL3dWingDlg::OnResetMesh()
 	UpdateView();
 }
 
-/*
-void GL3dWingDlg::OnSetupLight()
-{
-	GLLightDlg *pGLLightDlg = (GLLightDlg *)s_pGLLightDlg;
-	m_bShowLight = true;
-	UpdateView();
-	pGLLightDlg->m_pGL3dWingDlg = this;
-	pGLLightDlg->exec();
-
-	m_bShowLight = false;
-
-	GLSetupLight();
-	UpdateView();
-}*/
 
 
 void GL3dWingDlg::OnScaleWing()
@@ -2631,9 +2356,9 @@ void GL3dWingDlg::SetupLayout()
 	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
 	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 
-	m_pglWidget = new GLWidget(this);
-	m_pglWidget->m_iView = 7;
-	m_ArcBall.m_pGLWidget = m_pglWidget;
+	m_pGLWidget = new GLWidget(this);
+	m_pGLWidget->m_iView = 7;
+	m_ArcBall.m_pGLWidget = m_pGLWidget;
 
 /*_____________Start Top Layout Here____________*/
 	QVBoxLayout *DefLayout = new QVBoxLayout;
@@ -2686,7 +2411,7 @@ void GL3dWingDlg::SetupLayout()
 
 	QVBoxLayout *LeftLayout = new QVBoxLayout;
 	LeftLayout->addWidget(m_pctrlControlsWidget);
-	LeftLayout->addWidget(m_pglWidget,1);
+	LeftLayout->addWidget(m_pGLWidget,1);
 
 	m_pctrlLength1    = new QLabel("mm");
 	m_pctrlLength2    = new QLabel("mm");
@@ -2932,7 +2657,7 @@ void GL3dWingDlg::showEvent(QShowEvent *event)
 	m_bChanged = false;
 	m_bResetglWing = true;
 	SetWingScale();
-//	m_3DWingRect = m_pglWidget->geometry();
+//	m_3DWingRect = m_pGLWidget->geometry();
 
 	double w = (double)m_pctrlWingTable->width()*.97;
 	int w6  = (int)(w/6.);
@@ -2958,7 +2683,7 @@ void GL3dWingDlg::showEvent(QShowEvent *event)
 
 void GL3dWingDlg::UpdateView()
 {
-	if(isVisible()) m_pglWidget->updateGL();
+	if(isVisible()) m_pGLWidget->updateGL();
 }
 
 
@@ -3036,14 +2761,14 @@ void  GL3dWingDlg::WheelEvent(QWheelEvent *event)
 {
 	MainFrame*pMainFrame = (MainFrame*)s_pMainFrame;
 	double ZoomFactor;
-	QPoint glPoint(event->pos().x() + m_pglWidget->geometry().x(), event->pos().y()+m_pglWidget->geometry().y());
+	QPoint glPoint(event->pos().x() + m_pGLWidget->geometry().x(), event->pos().y()+m_pGLWidget->geometry().y());
 
-	if(m_pglWidget->geometry().contains(glPoint)) m_pglWidget->setFocus();	//The mouse button has been wheeled
+	if(m_pGLWidget->geometry().contains(glPoint)) m_pGLWidget->setFocus();	//The mouse button has been wheeled
 
 	if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
 	else                            ZoomFactor = 1.06;
 
-	if(m_pglWidget->geometry().contains(glPoint))
+	if(m_pGLWidget->geometry().contains(glPoint))
 	{
 		if(event->delta()>0) m_glScaled *= ZoomFactor;
 		else                 m_glScaled /= ZoomFactor;
