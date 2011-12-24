@@ -249,9 +249,6 @@ public:
 	void showEvent(QShowEvent *event);
 	void mouseDoubleClickEvent (QMouseEvent *event);
 
-	void ClientToGL(QPoint const &point, CVector &real);
-	void GLToClient(CVector const &real, QPoint &point);
-
 	void GLDrawFoils();
 	void GLDrawMasses();
 	void GLInverseMatrix();

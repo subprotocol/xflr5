@@ -288,6 +288,12 @@ void GLWidget::resizeGL(int width, int height)
 //		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 //		pDlg->m_3DWingRect = m_rCltRect;
 	}
+	if(m_iView == GLBODYVIEW)
+	{
+		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
+		pDlg->m_bIs3DScaleSet = false;
+		pDlg->SetBodyScale();
+	}
 }
 
 
@@ -692,4 +698,57 @@ void GLWidget::GLSetupLight(GLLightDlg &glLightParams, double Offset_y, double L
 
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
 }
+
+
+void GLWidget::ClientToGL(QPoint const &point, CVector &real)
+{
+	//
+	// In input, takes the 2D point in screen client area coordinates
+	// In output, returns the 2D OpenGL point
+	//
+	static double h2, w2;
+	h2 = (double)geometry().height() /2.0;
+	w2 = (double)geometry().width()  /2.0;
+
+	if(w2>h2)
+	{
+		real.x =  ((double)point.x() - w2) / w2;
+		real.y = -((double)point.y() - h2) / w2;
+	}
+	else
+	{
+		real.x =  ((double)point.x() - w2) / h2;
+		real.y = -((double)point.y() - h2) / h2;
+	}
+}
+
+
+
+void GLWidget::GLToClient(CVector const &real, QPoint &point)
+{
+	//
+	//converts an opengl 2D vector to screen client coordinates
+	//
+	static double dx, dy, h2, w2;
+
+	h2 = m_GLViewRect.height() /2.0;
+	w2 = m_GLViewRect.width()  /2.0;
+
+	dx = ( real.x + w2)/2.0;
+	dy = (-real.y + h2)/2.0;
+
+	if(w2>h2)
+	{
+		point.setX((int)(dx * (double)geometry().width()));
+		point.setY((int)(dy * (double)geometry().width()));
+	}
+	else
+	{
+		point.setX((int)(dx * (double)geometry().height()));
+		point.setY((int)(dy * (double)geometry().height()));
+	}
+}
+
+
+
 

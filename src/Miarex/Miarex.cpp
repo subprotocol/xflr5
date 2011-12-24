@@ -1673,27 +1673,6 @@ void QMiarex::SetControls()
 }
 
 
-void QMiarex::ClientToGL(QPoint const &point, CVector &real)
-{
-	//
-	// In input, takes the 2D point in screen client area coordinates
-	// In output, returns the 2D OpenGL point
-	//
-	static double h2, w2;
-	h2 = (double)m_r3DCltRect.height() /2.0;
-	w2 = (double)m_r3DCltRect.width()  /2.0;
-
-	if(w2>h2)
-	{
-		real.x =  ((double)point.x() - w2) / w2;
-		real.y = -((double)point.y() - h2) / w2;
-	}
-	else
-	{
-		real.x =  ((double)point.x() - w2) / h2;
-		real.y = -((double)point.y() - h2) / h2;
-	}
-}
 
 
 void QMiarex::CreateCpCurves()
@@ -4538,28 +4517,6 @@ CWPolar* QMiarex::GetWPolar(QString WPolarName)
 }
 
 
-
-void QMiarex::GLToClient(CVector const &real, QPoint &point)
-{
-	//
-	//converts an opengl 2D vector to screen client coordinates
-	//
-	if(!s_pGLWidget) return;
-	static double dx, dy, h2, w2;
-
-	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
-	h2 = pGLWidget->m_GLViewRect.height() /2.0;
-	w2 = pGLWidget->m_GLViewRect.width()  /2.0;
-
-	dx =  real.x + w2;
-	dy = -real.y + h2;
-
-	point.setX((int)(dx * m_r3DCltRect.width()));
-	point.setY((int)(dy * m_r3DCltRect.height()));
-}
-
-
-
 void QMiarex::GLCallViewLists()
 {
 	//
@@ -4628,7 +4585,7 @@ void QMiarex::GLCallViewLists()
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
 
 		if(m_pCurPlane)  glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-		if(m_pCurBody)	  glCallList(BODYGEOM);
+		if(m_pCurBody)	 glCallList(BODYGEOM);
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 	}
 
@@ -6473,7 +6430,7 @@ void QMiarex::mouseDoubleClickEvent (QMouseEvent * event)
 		GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 
 		CVector Real;
-		ClientToGL(point, Real);
+		pGLWidget->ClientToGL(point, Real);
 		if(m_r3DCltRect.contains(point)) pGLWidget->setFocus();
 
 		Set3DRotationCenter(point);
@@ -6524,6 +6481,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	static bool bCtrl;
 	static QPoint Delta, point;
 	static double xu, yu, x1, y1, xmin, xmax, ymin, ymax;
+	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 
 	Delta.setX(event->pos().x() - m_LastPoint.x());
 	Delta.setY(event->pos().y() - m_LastPoint.y());
@@ -6534,7 +6492,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
 	{
-		ClientToGL(point, Real);
+		pGLWidget->ClientToGL(point, Real);
 
 		if (event->buttons() & Qt::LeftButton)
 		{
@@ -6679,6 +6637,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 	//
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	StabViewDlg *pStabView =(StabViewDlg*)pMainFrame->m_pStabView;
+	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 	static complex<double> eigenvalue;
 	static int i,j,k, isel, jsel,xval, yval;
 	static double diff, dmax;
@@ -6704,7 +6663,6 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 
 		if(m_iView==W3DVIEW || (m_iView==WSTABVIEW && m_iStabilityView==STAB3DVIEW))
 		{
-			GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 		//	point is in client coordinates
 
 			CVector Real;
@@ -6715,7 +6673,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 				bCtrl =true;
 			}
 
-			ClientToGL(point, Real);
+			pGLWidget->ClientToGL(point, Real);
 			if(m_r3DCltRect.contains(point)) pGLWidget->setFocus();
 
 			if(m_bPickCenter)
@@ -12523,11 +12481,12 @@ void QMiarex::Set3DRotationCenter(QPoint point)
 	int  i, j, p;
 	CVector I, A, B, AA, BB, PP, U;
 	double dmin, dist;
+	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 
 	i=-1;
 	dmin = 100000.0;
 
-	ClientToGL(point, B);
+	pGLWidget->ClientToGL(point, B);
 
 	B.x += -m_UFOOffset.x - m_glViewportTrans.x*m_glScaled;
 	B.y += -m_UFOOffset.y + m_glViewportTrans.y*m_glScaled;

@@ -167,26 +167,6 @@ bool GL3dWingDlg::CheckWing()
 
 
 
-void GL3dWingDlg::ClientToGL(QPoint const &point, CVector &real)
-{
-	if(!m_pGLWidget) return;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	double h2 = (double)pGLWidget->m_rCltRect.height() /2.0;
-	double w2 = (double)pGLWidget->m_rCltRect.width()  /2.0;
-
-	if(w2>h2)
-	{
-		real.x =  ((double)point.x() - w2) / w2;
-		real.y = -((double)point.y() - h2) / w2;
-	}
-	else
-	{
-		real.x =  ((double)point.x() - w2) / h2;
-		real.y = -((double)point.y() - h2) / h2;
-	}
-}
-
-
 void GL3dWingDlg::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
@@ -824,8 +804,6 @@ void GL3dWingDlg::GLDraw3D()
 
 	if(m_bResetglWing)
 	{
-		int row, col, NumAngles, NumCircles;
-		double R, lat_incr, lon_incr, phi, theta;
 		m_ArcBall.GetMatrix();
 		CVector eye(0.0,0.0,1.0);
 		CVector up(0.0,1.0,0.0);
@@ -836,109 +814,9 @@ void GL3dWingDlg::GLDraw3D()
 			glDeleteLists(ARCBALL,2);
 			m_GLList-=2;
 		}
-		glNewList(ARCBALL,GL_COMPILE);
-		{
-			m_GLList++;
-			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+		m_pGLWidget->CreateArcballList(m_ArcBall, 1.0);
+		m_GLList+=2;
 
-			glColor3d(0.3,0.3,.5);
-			glLineWidth(1.0);
-
-			R = m_ArcBall.ab_sphere;
-
-			NumAngles  = 50;
-			NumCircles =  6;
-			lat_incr =  90.0 / NumAngles;
-			lon_incr = 360.0 / NumCircles;
-
-			for (col = 0; col < NumCircles; col++)
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					phi = (col * lon_incr) * PI/180.0;
-
-					for (row = 1; row < NumAngles-1; row++)
-					{
-						theta = (row * lat_incr) * PI/180.0;
-						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
-					}
-				}
-				glEnd();
-				glBegin(GL_LINE_STRIP);
-				{
-					phi = (col * lon_incr ) * PI/180.0;
-
-					for (row = 1; row < NumAngles-1; row++)
-					{
-						theta = -(row * lat_incr) * PI/180.0;
-						glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
-					}
-				}
-				glEnd();
-			}
-
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=1; col<35; col++)
-				{
-					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
-					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=1; col<35; col++)
-				{
-					phi = (0.0 + (double)col*360.0/72.0) * PI/180.0;
-					glVertex3d(R * cos(-phi) * cos(theta), R * sin(theta), R * sin(-phi) * cos(theta));
-				}
-			}
-			glEnd();
-		}
-		glEndList();
-
-		glNewList(ARCPOINT,GL_COMPILE);
-		{
-			m_GLList++;
-			glPolygonMode(GL_FRONT,GL_LINE);
-
-			glColor3d(0.3,0.1,.2);
-			glLineWidth(2.0);
-
-			NumAngles  = 10;
-
-			lat_incr = 30.0 / NumAngles;
-			lon_incr = 30.0 / NumAngles;
-
-			glBegin(GL_LINE_STRIP);
-			{
-				phi = 0.0;//longitude
-
-				for (row = -NumAngles; row < NumAngles; row++)
-				{
-					theta = (row * lat_incr) * PI/180.0;
-					glVertex3d(R*cos(phi)*cos(theta), R*sin(theta), R*sin(phi)*cos(theta));
-				}
-			}
-			glEnd();
-
-			glBegin(GL_LINE_STRIP);
-			{
-				theta = 0.;
-				for(col=-NumAngles; col<NumAngles; col++)
-				{
-					phi = (0.0 + (double)col*30.0/NumAngles) * PI/180.0;
-					glVertex3d(R * cos(phi) * cos(theta), R * sin(theta), R * sin(phi) * cos(theta));
-				}
-			}
-			glEnd();
-		}
-		glEndList();
 	}
 
 	if(m_bResetglSectionHighlight || m_bResetglWing)
@@ -981,7 +859,7 @@ void GL3dWingDlg::GLDraw3D()
 void GL3dWingDlg::GLDrawFoils()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+
 	int j;
 	CFoil *pFoil;
 
@@ -991,14 +869,14 @@ void GL3dWingDlg::GLDrawFoils()
 	{
 		pFoil = m_pWing->m_Surface[j].m_pFoilA;
 
-		if(pFoil) pGLWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
+		if(pFoil) m_pGLWidget->renderText(m_pWing->m_Surface[j].m_TA.x, m_pWing->m_Surface[j].m_TA.y, m_pWing->m_Surface[j].m_TA.z,
 								    pFoil->m_FoilName);
 
 	}
 
 	j = m_pWing->m_NSurfaces-1;
 	pFoil = m_pWing->m_Surface[j].m_pFoilB;
-	if(pFoil) pGLWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
+	if(pFoil) m_pGLWidget->renderText(m_pWing->m_Surface[j].m_TB.x, m_pWing->m_Surface[j].m_TB.y, m_pWing->m_Surface[j].m_TB.z,
 							    pFoil->m_FoilName);
 
 }
@@ -1028,7 +906,7 @@ void GL3dWingDlg::GLRenderView()
 {
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
+
 	GLdouble pts[4];
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;  //x=m_VerticalSplit
 	glClipPlane(GL_CLIP_PLANE1, pts);
@@ -1042,7 +920,7 @@ void GL3dWingDlg::GLRenderView()
 
 	glPushMatrix();
 	{
-		pGLWidget->GLSetupLight(pMiarex->m_GLLightDlg, m_UFOOffset.y, 1.0);
+		m_pGLWidget->GLSetupLight(pMiarex->m_GLLightDlg, m_UFOOffset.y, 1.0);
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 /*		if(m_bShowLight)
@@ -1093,7 +971,7 @@ void GL3dWingDlg::GLRenderView()
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 
-		if(m_bAxes)  pGLWidget->GLDrawAxes(1, pMiarex->m_3DAxisColor, pMiarex->m_3DAxisStyle, pMiarex->m_3DAxisWidth);
+		if(m_bAxes)  m_pGLWidget->GLDrawAxes(1, pMiarex->m_3DAxisColor, pMiarex->m_3DAxisStyle, pMiarex->m_3DAxisWidth);
 
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
@@ -1146,8 +1024,8 @@ void GL3dWingDlg::GLRenderView()
 			{
 				glTranslated(m_pWing->m_MassPosition[im].x,m_pWing->m_MassPosition[im].y,m_pWing->m_MassPosition[im].z);
 				double radius = .02;//2cm
-				pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
-				pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_MassTag[im]);
+				m_pGLWidget->GLRenderSphere(pMiarex->m_MassColor,radius,18,18);
+				m_pGLWidget->renderText(0.0, 0.0, 0.02, m_pWing->m_MassTag[im]);
 
 			}
 			glPopMatrix();
@@ -1164,22 +1042,6 @@ void GL3dWingDlg::GLRenderView()
 }
 
 
-
-void GL3dWingDlg::GLToClient(CVector const &real, QPoint &point)
-{
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	if(!pGLWidget) return;
-	double h = (double)pGLWidget->geometry().height();
-	double w = (double)pGLWidget->geometry().width();
-	double scale;
-
-	if(w>=h) scale = (double)pGLWidget->geometry().width()  / 2.0;
-	else     scale = (double)pGLWidget->geometry().height() / 2.0;
-
-//	point.rx() =  (int)(scale *(1.0 + real.x));
-	point.rx() = (int)(w/2.0 + real.x*scale);
-	point.ry() = (int)(h/2.0 - real.y*scale);
-}
 
 
 bool GL3dWingDlg::InitDialog(CWing *pWing)
@@ -1351,14 +1213,13 @@ void GL3dWingDlg::MouseDoubleClickEvent(QMouseEvent *event)
 
 void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 {
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 	QPoint point(event->pos().x(), event->pos().y());
-	QPoint glPoint(event->pos().x() + pGLWidget->geometry().x(), event->pos().y()+pGLWidget->geometry().y());
+	QPoint glPoint(event->pos().x() + m_pGLWidget->geometry().x(), event->pos().y()+m_pGLWidget->geometry().y());
 	m_MousePos = event->pos();
 	CVector Real;
 
 	QPoint Delta(point.x() - m_LastPoint.x(), point.y() - m_LastPoint.y());
-	ClientToGL(point, Real);
+	m_pGLWidget->ClientToGL(point, Real);
 
 //	if(!m_pGLWidget->hasFocus()) m_pGLWidget->setFocus();
 
@@ -1368,19 +1229,19 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 
 	if (event->buttons()   & Qt::LeftButton)
 	{
-		if(bCtrl&& pGLWidget->geometry().contains(glPoint))
+		if(bCtrl&& m_pGLWidget->geometry().contains(glPoint))
 		{
 			//rotate
-			m_ArcBall.Move(point.x(), pGLWidget->m_rCltRect.height()-point.y());
+			m_ArcBall.Move(point.x(), m_pGLWidget->m_rCltRect.height()-point.y());
 			UpdateView();
 		}
 		else if(m_bTrans)
 		{
 			//translate
-			if(pGLWidget->geometry().contains(glPoint))
+			if(m_pGLWidget->geometry().contains(glPoint))
 			{
-				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/pGLWidget->m_rCltRect.width());
-				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/pGLWidget->m_rCltRect.width());
+				m_glViewportTrans.x += (GLfloat)(Delta.x()*2.0/m_glScaled/m_pGLWidget->m_rCltRect.width());
+				m_glViewportTrans.y += (GLfloat)(Delta.y()*2.0/m_glScaled/m_pGLWidget->m_rCltRect.width());
 
 				m_glRotCenter.x = MatOut[0][0]*(m_glViewportTrans.x) + MatOut[0][1]*(-m_glViewportTrans.y) + MatOut[0][2]*m_glViewportTrans.z;
 				m_glRotCenter.y = MatOut[1][0]*(m_glViewportTrans.x) + MatOut[1][1]*(-m_glViewportTrans.y) + MatOut[1][2]*m_glViewportTrans.z;
@@ -1395,7 +1256,7 @@ void GL3dWingDlg::MouseMoveEvent(QMouseEvent *event)
 	{
 		if(m_pWing)
 		{		
-			m_ArcBall.Move(point.x(), pGLWidget->m_rCltRect.height()-point.y());
+			m_ArcBall.Move(point.x(), m_pGLWidget->m_rCltRect.height()-point.y());
 			UpdateView();
 		}
 	}
@@ -1409,23 +1270,22 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 	// the event has been sent by GLWidget, so event is in GL Widget coordinates
 	// but m_3DWingRect is in window client coordinates
 	// the difference is m_pGLWidget->geometry() !
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
 
 	QPoint point(event->pos().x(), event->pos().y());
-	QPoint glPoint(event->pos().x() + pGLWidget->geometry().x(), event->pos().y()+pGLWidget->geometry().y());
+	QPoint glPoint(event->pos().x() + m_pGLWidget->geometry().x(), event->pos().y()+m_pGLWidget->geometry().y());
 
 	CVector Real;
 	bool bCtrl = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 
-	ClientToGL(point, Real);
+	m_pGLWidget->ClientToGL(point, Real);
 
-	if(pGLWidget->geometry().contains(glPoint)) pGLWidget->setFocus();
+	if(m_pGLWidget->geometry().contains(glPoint)) m_pGLWidget->setFocus();
 	
 	if (event->buttons() & Qt::MidButton)
 	{
 		m_bArcball = true;
-		m_ArcBall.Start(event->pos().x(), pGLWidget->m_rCltRect.height()-event->pos().y());
+		m_ArcBall.Start(event->pos().x(), m_pGLWidget->m_rCltRect.height()-event->pos().y());
 		m_bCrossPoint = true;
 
 		Set3DRotationCenter();
@@ -1443,18 +1303,21 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 		{
 			m_bTrans=true;
 	
-			if(m_pWing && pGLWidget->geometry().contains(glPoint))
+			if(m_pWing && m_pGLWidget->geometry().contains(glPoint))
 			{
-				m_ArcBall.Start(point.x(), pGLWidget->m_rCltRect.height()-point.y());
+				m_ArcBall.Start(point.x(), m_pGLWidget->m_rCltRect.height()-point.y());
 				m_bCrossPoint = true;
 				Set3DRotationCenter();
 				if (!bCtrl)
 				{
 					m_bTrans = true;
-					pGLWidget->setCursor(Qt::ClosedHandCursor);
-	
+					m_pGLWidget->setCursor(Qt::ClosedHandCursor);
 				}
-					UpdateView();
+				else
+				{
+					m_bArcball = true;
+				}
+				UpdateView();
 			}
 		}
 	}
@@ -1469,8 +1332,7 @@ void GL3dWingDlg::MousePressEvent(QMouseEvent *event)
 
 void GL3dWingDlg::MouseReleaseEvent(QMouseEvent *event)
 {
-	GLWidget *pGLWidget = (GLWidget*)m_pGLWidget;
-	pGLWidget->setCursor(Qt::CrossCursor);
+	m_pGLWidget->setCursor(Qt::CrossCursor);
 	
 	m_bTrans = false;
 	m_bDragPoint  = false;
@@ -2151,7 +2013,7 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 	i=-1;
 	dmin = 100000.0;
 
-	ClientToGL(point, B);
+	m_pGLWidget->ClientToGL(point, B);
 
 	B.x += -m_UFOOffset.x - m_glViewportTrans.x*m_glScaled;
 	B.y += -m_UFOOffset.y + m_glViewportTrans.y*m_glScaled;

@@ -43,7 +43,7 @@ CBody::CBody()
 
 	m_BodyName = QObject::tr("BodyName");
 
-	m_BodyColor = QColor(210,240,240);
+	m_BodyColor = QColor(200,228, 216);
 	m_BodyStyle = 0;
 	m_BodyWidth = 1;
 

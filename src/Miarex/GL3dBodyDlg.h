@@ -123,8 +123,6 @@ private:
 	void InitDialog();
 	void SetFrame(int iFrame);
 	void SetupLayout();
-	void ClientToGL(QPoint const &point, CVector &real);
-	void GLToClient(CVector const &real, QPoint &point);
 	void GLCreateCtrlPts();
 	void GLInverseMatrix();
 	void GLCreateBody2DBodySection();

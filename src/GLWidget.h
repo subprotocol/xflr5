@@ -46,6 +46,9 @@ public:
 	void GLRenderSphere(QColor cr, double radius, int NumLongitudes, int NumLatitudes);
 	void GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int AxisWidth);
 	void GLSetupLight(GLLightDlg &glLightParams, double Offset_y, double LightFactor);
+	void ClientToGL(QPoint const &point, CVector &real);
+	void GLToClient(CVector const &real, QPoint &point);
+
 
 private:
 

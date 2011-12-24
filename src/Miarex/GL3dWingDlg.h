@@ -122,8 +122,6 @@ private:
 	bool InitDialog(CWing *pWing);
 	void Connect();
 	void SetupLayout();
-	void ClientToGL(QPoint const &point, CVector &real);
-	void GLToClient(CVector const &real, QPoint &point);
 	void GLCreateMesh();
 	void GLRenderView();
 	void GLDrawFoils();
