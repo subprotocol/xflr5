@@ -1,7 +1,7 @@
 /****************************************************************************
 
     WPolar Class
-	Copyright (C) 2005-2010 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2005-2012 Andre Deperrois XFLR5@yahoo.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1928,7 +1928,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
 	}
 
-	if(m_Beta>PRECISION)
+	if(fabs(m_Beta)>PRECISION)
 	{
 		strong  = QString(QObject::tr("Beta")+" = %1").arg(m_Beta,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";

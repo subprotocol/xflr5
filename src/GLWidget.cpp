@@ -421,7 +421,7 @@ void GLWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, int Ax
 	//
 
 	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
-	double l = .8*length;
+	double l = .6*length;
 
 	glPolygonMode(GL_FRONT,GL_LINE);
 	glLineWidth((GLfloat)(AxisWidth));

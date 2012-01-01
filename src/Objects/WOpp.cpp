@@ -628,7 +628,7 @@ void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 	strong  = QString(QObject::tr("Mass")+"  = %1 ").arg(m_Weight*pMainFrame->m_kgtoUnit,7,'f',3);
 	WOppProperties += strong + massunit + "\n";
 
-	if(m_Beta>PRECISION)
+	if(fabs(m_Beta)>PRECISION)
 	{
 		strong  = QString(QObject::tr("Beta")+"  = %1").arg(m_Beta,7,'f',2);
 		WOppProperties += strong +QString::fromUtf8("°")+"\n\n";

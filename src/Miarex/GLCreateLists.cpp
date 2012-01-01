@@ -2920,3 +2920,5 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
         }
         //glEndList();
 }
+
+

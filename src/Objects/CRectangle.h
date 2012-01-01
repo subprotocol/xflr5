@@ -19,11 +19,6 @@
 
 *****************************************************************************/
 
-//////////////////////////////////////////////////////////////////////
-//
-// Re-writing of the MFC CRect class
-//
-//////////////////////////////////////////////////////////////////////
 
 #ifndef CRECTANGLE_H
 #define CRECTANGLE_H
@@ -33,29 +28,130 @@
 class CRectangle
 {
 public:
-    CRectangle(void);
-    ~CRectangle(void);
-    CRectangle(double l,double t,double r,double b);
-    CRectangle(CVector TopLeft, CVector BottomRight);
-	CRectangle(CRectangle const &Rect);
+	CRectangle(void)
+	{
+			left   = 0;
+			right  = 0;
+			top    = 0;
+			bottom = 0;
+	};
 
-    double left;
-    double top;
-    double right;
-    double bottom;
+	CRectangle(double const &l, double const &t, double const&r, double const&b)
+	{
+			left   = l;
+			right  = r;
+			top    = t;
+			bottom = b;
+	};
 
-    bool IsRectEmpty();
-    bool PtInRect(CVector pt);
-    double width();
-    double height();
-    void SetRectEmpty();
-    void DeflateRect(double x, double y);
-    void DeflateRect(double l, double t, double r, double b);
-    void InflateRect(double x, double y);
-	void InflateRect(double l, double t, double r, double b);
-	void SetRect(double l, double t, double r, double b);
-	void SetRect(CRectangle const &Rect);
-	void NormalizeRect();
-    void CopyRect(CRectangle *pRect);
+	CRectangle(CVector const &TopLeft, CVector const &BottomRight)
+	{
+			left   = TopLeft.x;
+			right  = BottomRight.x;
+			top    = TopLeft.y;
+			bottom = BottomRight.y;
+	};
+
+	void CopyRect(CRectangle *pRect)
+	{
+		left   = pRect->left;
+		right  = pRect->right;
+		top    = pRect->top;
+		bottom = pRect->bottom;
+	};
+
+
+	CRectangle(CRectangle const &Rect)
+	{
+		left   = Rect.left;
+		right  = Rect.right;
+		top    = Rect.top;
+		bottom = Rect.bottom;
+	}
+//	~CRectangle(void);
+
+
+	bool IsRectEmpty()
+	{
+		if(bottom==top && right==left) return true;
+		else                           return false;
+	};
+	bool PtInRect(CVector const &pt)
+	{
+		if(left<pt.x && pt.x<right && bottom<pt.y && pt.y<top ) return true;
+		return false;
+	};
+	double width(){return (right-left);};
+	double height(){return(top-bottom);};
+	void SetRectEmpty(){left = right = top = bottom = 0;};
+	void DeflateRect(double const &x, double const&y)
+	{
+		//DeflateRect adds units to the left and top and subtracts units from the right and bottom
+		left   +=x;
+		right  -=x;
+		top    +=y;
+		bottom -=y;
+	};
+
+	void DeflateRect(double const &l, double const &t, double const&r, double const&b)
+	{
+		//DeflateRect adds units to the left and top and subtracts units from the right and bottom
+		left   +=l;
+		right  -=r;
+		top    +=t;
+		bottom -=b;
+	};
+
+	void InflateRect(double const &x, double const&y)
+	{
+		//InflateRect subtracts units from the left and top and adds units to the right and bottom
+		left   -=x;
+		right  +=x;
+		top    -=y;
+		bottom +=y;
+	};
+	void InflateRect(double const &l, double const &t, double const&r, double const&b)
+	{
+		//InflateRect subtracts units from the left and top and adds units to the right and bottom
+		left   -=l;
+		right  +=r;
+		top    -=t;
+		bottom +=b;
+	};
+	void SetRect(double const &l, double const &t, double const&r, double const&b)
+	{
+		left   =l;
+		right  =r;
+		top    =t;
+		bottom =b;
+	};
+	void SetRect(CRectangle const &Rect)
+	{
+		left   = Rect.left;
+		right  = Rect.right;
+		top    = Rect.top;
+		bottom = Rect.bottom;
+	};
+	void NormalizeRect()
+	{
+		double tmp;
+		if (left > right)
+		{
+			tmp = left;
+			left = right;
+			right = tmp;
+		}
+		if(bottom>top)
+		{
+			tmp = bottom;
+			bottom = top;
+			top = tmp;
+		}
+	};
+
+	double left;
+	double top;
+	double right;
+	double bottom;
 };
 #endif

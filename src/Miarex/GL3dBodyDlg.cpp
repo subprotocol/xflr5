@@ -4705,7 +4705,7 @@ void GL3dBodyDlg::showEvent(QShowEvent *event)
 
 void GL3dBodyDlg::ResizeTables()
 {
-	int ColumnWidth = (int)((double)(m_pctrlFrameTable->width())/2.25);
+	int ColumnWidth = (int)((double)(m_pctrlFrameTable->width())/2.5);
 	m_pctrlFrameTable->setColumnWidth(0,ColumnWidth);
 	m_pctrlFrameTable->setColumnWidth(1,ColumnWidth);
 //	m_pctrlFrameTable->setColumnWidth(2,ColumnWidth);

@@ -252,6 +252,7 @@ void GL3DScales::InitDialog()
 	m_pctrlNXPoint->SetValue(m_NX);
 }
 
+
 void GL3DScales::OnCpScale()
 {
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
@@ -261,7 +262,7 @@ void GL3DScales::OnCpScale()
 	m_pctrlLegendMin->setEnabled(!pMiarex->m_bAutoCpScale);
 	m_pctrlLegendMax->setEnabled(!pMiarex->m_bAutoCpScale);
 
-	pMiarex->m_bResetglOpp = true;
+	pMiarex->m_bResetglPanelCp = true;
 	pMiarex->m_bResetglLegend = true;
 	pMiarex->UpdateView();
 }
@@ -285,6 +286,7 @@ void GL3DScales::OnLiftScale(int pos)
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
 	pMiarex->m_LiftScale    = pos/100.0/sqrt(1.01-pos/100.0);
 	pMiarex->m_bResetglLift = true;
+	pMiarex->m_bResetglPanelForce = true;
 	pMiarex->UpdateView();
 }
 

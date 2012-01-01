@@ -451,9 +451,12 @@ bool Rewind1Line(QTextStream &in, int &Line, QString &strong)
 }
 
 
+
 void ReynoldsFormat(QString &str, double f)
 {
 	int i, q, r, exp;
+	f = (int(f/1000.0))*1000.0;
+
 	exp = (int)log10(f);
 	r = exp%3;
 	q = (exp-r)/3;

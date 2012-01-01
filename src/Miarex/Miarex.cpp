@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	Miarex
-			Copyright (C) 2008-2010 Andre Deperrois XFLR5@yahoo.com
+			Copyright (C) 2008-2012 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 // This class is associated to the MMI of 3D analysis
 // It dispatches user commands towards object definition, analysis and post-processing
 //
+
 
 #include <QGLWidget>
 #include <QAction>
@@ -399,7 +400,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bTransGraph        = true;
 	m_bFoilNames         = false;
 	m_bShowMasses        = false;
-	m_bPanelForce    = false;
+	m_bPanelForce        = false;
 	m_bLongitudinal      = true;
 	m_bCurWOppOnly       = true;
 	m_bStoreWOpp         = true;
@@ -427,6 +428,8 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bResetglWake       = true;
 	m_bResetglLegend     = true;
 	m_bResetglFlow       = true;
+	m_bResetglPanelForce = true;
+	m_bResetglPanelCp    = true;
 
 	m_bArcball           = false;
 	m_bStream            = false;
@@ -1617,7 +1620,7 @@ void QMiarex::SetControls()
 
 	m_pctrlLift->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlTrans->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
-	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
+	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp && m_pCurWPolar->m_Type!=STABILITYPOLAR);
 	m_pctrlAnimateWOppSpeed->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlIDrag->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVDrag->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
@@ -4648,6 +4651,8 @@ void QMiarex::GLDraw3D()
 	//
 	// creates the OpenGL lists for 3D display
 	//
+
+
 	if (!m_pCurWing)
 	{
 		m_bResetglGeom = true;
@@ -4662,8 +4667,8 @@ void QMiarex::GLDraw3D()
 	if(!glIsList(ARCBALL))
 	{
 		pGLWidget->CreateArcballList(m_ArcBall, m_GLScale);
+		m_GLList++;
 	}
-
 
 	if(m_bResetglBody && m_pCurBody)
 	{
@@ -4848,13 +4853,8 @@ void QMiarex::GLDraw3D()
 		m_bResetglDownwash = false;
 	}
 
-	if(m_bResetglOpp && m_iView==W3DVIEW)
+	if((m_bResetglPanelForce || m_bResetglOpp) && m_iView==W3DVIEW)
 	{
-		if(glIsList(PANELCP))
-		{
-			glDeleteLists(PANELCP,1);
-			m_GLList-=1;
-		}
 		if(glIsList(PANELFORCEARROWS))
 		{
 			glDeleteLists(PANELFORCEARROWS,1);
@@ -4862,11 +4862,25 @@ void QMiarex::GLDraw3D()
 		}
 		if (m_pCurWing && m_pCurWOpp)
 		{
-			GLCreateCp(this, m_Node, m_Panel, m_pCurWOpp, m_pCurPOpp);
 			GLCreatePanelForce(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
 		}
+		m_bResetglPanelForce = false;
+	}
 
-		m_bResetglOpp = false;
+	if((m_bResetglPanelCp || m_bResetglOpp) && m_iView==W3DVIEW)
+	{
+		if(glIsList(PANELCP))
+		{
+			glDeleteLists(PANELCP,1);
+			m_GLList-=1;
+		}
+
+		if (m_pCurWing && m_pCurWOpp)
+		{
+			GLCreateCp(this, m_Node, m_Panel, m_pCurWOpp, m_pCurPOpp);
+		}
+
+		m_bResetglPanelCp = false;
 	}
 
 	if((m_bResetglLegend || m_bResetglOpp || m_bResetglGeom) && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
@@ -4926,6 +4940,7 @@ void QMiarex::GLDraw3D()
 			}
 		}
 	}
+	m_bResetglOpp = false;
 }
 
 
@@ -5220,7 +5235,7 @@ void QMiarex::GLRenderView()
 
 		glScaled(m_glScaled, m_glScaled, m_glScaled);
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
-		if(m_bAxes)  pGLWidget->GLDrawAxes(1, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
+		if(m_bAxes)  pGLWidget->GLDrawAxes(1.0/m_glScaled, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
 
 		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
 		{

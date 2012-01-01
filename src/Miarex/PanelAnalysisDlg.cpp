@@ -3676,7 +3676,7 @@ bool PanelAnalysisDlg::ComputeTrimmedConditions()
 		strong+= strange + "\n";
 		if(m_bTrace) AddString(strong);
 
-		if(m_pWPolar->m_BankAngle>PRECISION)
+		if(fabs(m_pWPolar->m_BankAngle)>PRECISION)
 		{
 			m_radius = u0*u0/9.81/tan(phi);
 			m_W      = u0/m_radius;

@@ -474,6 +474,7 @@ protected:
 	bool m_bResetglMesh;			// true if the mesh OpenGL list needs to be re-generated
 	bool m_bResetglWake;			// true if the wake OpenGL list needs to be re-generated
 	bool m_bResetglOpp, m_bResetglLift, m_bResetglDrag, m_bResetglDownwash;			// true if the OpenGL lists need to be re-generated
+	bool m_bResetglPanelForce, m_bResetglPanelCp;
 	bool m_bResetglStream;			// true if the streamlines OpenGL list needs to be re-generated
 	bool m_bResetglLegend;          //needs to be reset is window has been resized
 	bool m_bResetglBody;          // true if the openGL list for the body needs to be re-generated
