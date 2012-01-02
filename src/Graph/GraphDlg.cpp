@@ -188,7 +188,7 @@ void GraphDlg::FillVariableList()
 		m_pctrlXSel->addItem(tr("Total pitching moment coef."));//5
 		m_pctrlXSel->addItem(tr("Viscous pitching moment coef."));//6
 		m_pctrlXSel->addItem(tr("Induced pitching moment coef."));//7
-		m_pctrlXSel->addItem(tr("Total rolling moment coef."));		//8
+		m_pctrlXSel->addItem(tr("Total rolling moment coef."));	//8
 		m_pctrlXSel->addItem(tr("Total yawing moment coef."));  //9
 		m_pctrlXSel->addItem(tr("Viscous yawing moment coef."));//10
 		m_pctrlXSel->addItem(tr("Induced yawing moment coef."));//11
@@ -196,32 +196,33 @@ void GraphDlg::FillVariableList()
 		m_pctrlXSel->addItem(tr("Glide ratio Cl/Cd"));			//12
 		m_pctrlXSel->addItem(tr("Power factor Cl^(3/2)/Cd"));	//13
 		m_pctrlXSel->addItem(tr("1/Rt(Cl)"));					//14
-		m_pctrlXSel->addItem(tr("Lift"));						//15
-		m_pctrlXSel->addItem(tr("Drag"));						//16
-		m_pctrlXSel->addItem(tr("Vx"));							//17
-		m_pctrlXSel->addItem(tr("Vz"));							//18
-		m_pctrlXSel->addItem(tr("VInf"));						//19
-		m_pctrlXSel->addItem(tr("Descent angle atan(Cd/Cl)"));	//20
-		m_pctrlXSel->addItem(tr("Pitching Moment"));			//21
-		m_pctrlXSel->addItem(tr("Rolling Moment"));				//22
-		m_pctrlXSel->addItem(tr("Yawing Moment"));				//23
-		m_pctrlXSel->addItem(tr("Centre of pressure X-Pos"));	//24
-		m_pctrlXSel->addItem(tr("Centre of pressure Y-Pos"));	//25
-		m_pctrlXSel->addItem(tr("Bending moment"));				//26
-		m_pctrlXSel->addItem(tr("m.g.Vz"));						//27
-		m_pctrlXSel->addItem(tr("Efficiency"));					//28
-		m_pctrlXSel->addItem(tr("(XCp-Xcg)/MAC"));				//29
-		m_pctrlXSel->addItem(tr("Control Variable"));			//30
-		m_pctrlXSel->addItem(tr("Cy - Lateral force coef."));	//31
-		m_pctrlXSel->addItem(tr("Neutral Point x-position"));	//32
-		m_pctrlXSel->addItem(tr("Phugoid Frequency"));	//33
-		m_pctrlXSel->addItem(tr("Phugoid Damping"));	//34
-		m_pctrlXSel->addItem(tr("Short Period Frequency"));	//33
-		m_pctrlXSel->addItem(tr("Short Period Damping"));	//34
-		m_pctrlXSel->addItem(tr("Dutch Roll Frequency"));	//37
-		m_pctrlXSel->addItem(tr("Dutch Roll Damping"));	//38
-		m_pctrlXSel->addItem(tr("Roll Damping"));	//39
-		m_pctrlXSel->addItem(tr("Spiral Damping"));	//40
+		m_pctrlXSel->addItem(tr("FX (Drag)"));					//15
+		m_pctrlXSel->addItem(tr("FY (Side force)"));			//16
+		m_pctrlXSel->addItem(tr("FZ (Lift)"));					//17
+		m_pctrlXSel->addItem(tr("Vx"));							//18
+		m_pctrlXSel->addItem(tr("Vz"));							//19
+		m_pctrlXSel->addItem(tr("VInf"));						//20
+		m_pctrlXSel->addItem(tr("Descent angle atan(Cd/Cl)"));	//21
+		m_pctrlXSel->addItem(tr("Pitching Moment"));			//22
+		m_pctrlXSel->addItem(tr("Rolling Moment"));				//23
+		m_pctrlXSel->addItem(tr("Yawing Moment"));				//24
+		m_pctrlXSel->addItem(tr("Centre of pressure X-Pos"));	//25
+		m_pctrlXSel->addItem(tr("Centre of pressure Y-Pos"));	//26
+		m_pctrlXSel->addItem(tr("Bending moment"));				//27
+		m_pctrlXSel->addItem(tr("m.g.Vz"));						//28
+		m_pctrlXSel->addItem(tr("Efficiency"));					//29
+		m_pctrlXSel->addItem(tr("(XCp-Xcg)/MAC"));				//30
+		m_pctrlXSel->addItem(tr("Control Variable"));			//31
+		m_pctrlXSel->addItem(tr("Cy - Lateral force coef."));	//32
+		m_pctrlXSel->addItem(tr("Neutral Point x-position"));	//33
+		m_pctrlXSel->addItem(tr("Phugoid Frequency"));	        //34
+		m_pctrlXSel->addItem(tr("Phugoid Damping"));	        //35
+		m_pctrlXSel->addItem(tr("Short Period Frequency"));	    //36
+		m_pctrlXSel->addItem(tr("Short Period Damping"));	    //37
+		m_pctrlXSel->addItem(tr("Dutch Roll Frequency"));	    //38
+		m_pctrlXSel->addItem(tr("Dutch Roll Damping"));         //39
+		m_pctrlXSel->addItem(tr("Roll Damping"));	            //40
+		m_pctrlXSel->addItem(tr("Spiral Damping"));	            //41
 
 
 		//Y variable
@@ -243,32 +244,33 @@ void GraphDlg::FillVariableList()
 		m_pctrlYSel->addItem(tr("Glide ratio Cl/Cd"));			//12
 		m_pctrlYSel->addItem(tr("Power factor Cl^(3/2)/Cd"));	//13
 		m_pctrlYSel->addItem(tr("1/Rt(Cl)"));					//14
-		m_pctrlYSel->addItem(tr("Lift"));						//15
-		m_pctrlYSel->addItem(tr("Drag"));						//16
-		m_pctrlYSel->addItem(tr("Vx"));							//17
-		m_pctrlYSel->addItem(tr("Vz"));							//18
-		m_pctrlYSel->addItem(tr("VInf"));						//19
-		m_pctrlYSel->addItem(tr("Descent angle atan(Cd/Cl)"));	//20
-		m_pctrlYSel->addItem(tr("Pitching Moment"));			//21
-		m_pctrlYSel->addItem(tr("Rolling Moment"));				//22
-		m_pctrlYSel->addItem(tr("Yawing Moment"));				//23
-		m_pctrlYSel->addItem(tr("Centre of pressure X-Pos"));	//24
-		m_pctrlYSel->addItem(tr("Centre of pressure Y-Pos"));	//25
-		m_pctrlYSel->addItem(tr("Bending moment"));				//26
-		m_pctrlYSel->addItem(tr("m.g.Vz"));						//27
-		m_pctrlYSel->addItem(tr("Efficiency"));					//28
-		m_pctrlYSel->addItem(tr("(XCp-Xcg)/MAC"));				//29
-		m_pctrlYSel->addItem(tr("Control Variable"));			//30
-		m_pctrlYSel->addItem(tr("Cy - Lateral force coef."));	//31
-		m_pctrlYSel->addItem(tr("Neutral Point x-position"));	//32
-		m_pctrlYSel->addItem(tr("Phugoid Frequency"));	//33
-		m_pctrlYSel->addItem(tr("Phugoid Damping"));	//34
-		m_pctrlYSel->addItem(tr("Short Period Frequency"));	//35
-		m_pctrlYSel->addItem(tr("Short Period Damping"));	//36
-		m_pctrlYSel->addItem(tr("Dutch Roll Frequency"));	//37
-		m_pctrlYSel->addItem(tr("Dutch Roll Damping"));	//38
-		m_pctrlYSel->addItem(tr("Roll Damping"));	//39
-		m_pctrlYSel->addItem(tr("Spiral Damping"));	//40
+		m_pctrlYSel->addItem(tr("FX (Drag)"));					//15
+		m_pctrlYSel->addItem(tr("FY (Side force)"));			//16
+		m_pctrlYSel->addItem(tr("FZ (Lift)"));					//17
+		m_pctrlYSel->addItem(tr("Vx"));							//18
+		m_pctrlYSel->addItem(tr("Vz"));							//19
+		m_pctrlYSel->addItem(tr("VInf"));						//20
+		m_pctrlYSel->addItem(tr("Descent angle atan(Cd/Cl)"));	//21
+		m_pctrlYSel->addItem(tr("Pitching Moment"));			//22
+		m_pctrlYSel->addItem(tr("Rolling Moment"));				//23
+		m_pctrlYSel->addItem(tr("Yawing Moment"));				//24
+		m_pctrlYSel->addItem(tr("Centre of pressure X-Pos"));	//25
+		m_pctrlYSel->addItem(tr("Centre of pressure Y-Pos"));	//26
+		m_pctrlYSel->addItem(tr("Bending moment"));				//27
+		m_pctrlYSel->addItem(tr("m.g.Vz"));						//28
+		m_pctrlYSel->addItem(tr("Efficiency"));					//29
+		m_pctrlYSel->addItem(tr("(XCp-Xcg)/MAC"));				//30
+		m_pctrlYSel->addItem(tr("Control Variable"));			//31
+		m_pctrlYSel->addItem(tr("Cy - Lateral force coef."));	//32
+		m_pctrlYSel->addItem(tr("Neutral Point x-position"));	//33
+		m_pctrlYSel->addItem(tr("Phugoid Frequency"));	        //34
+		m_pctrlYSel->addItem(tr("Phugoid Damping"));	        //35
+		m_pctrlYSel->addItem(tr("Short Period Frequency"));	    //36
+		m_pctrlYSel->addItem(tr("Short Period Damping"));	    //37
+		m_pctrlYSel->addItem(tr("Dutch Roll Frequency"));	    //38
+		m_pctrlYSel->addItem(tr("Dutch Roll Damping"));         //39
+		m_pctrlYSel->addItem(tr("Roll Damping"));	            //40
+		m_pctrlYSel->addItem(tr("Spiral Damping"));	            //41
 	}
 	else if(m_iGraphType == 64)
 	{

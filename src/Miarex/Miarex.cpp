@@ -4276,22 +4276,23 @@ void QMiarex::FillWPlrCurve(CCurve *pCurve, CWPolar *pWPolar, int XVar, int YVar
 		if((YVar==14 || YVar==17 || YVar==18) && y<0) bAdd = false;
 
 		//Set user units
-		if(XVar==15 || XVar==16)              x *= pMainFrame->m_NtoUnit; //force
-		if(YVar==15 || YVar==16)              y *= pMainFrame->m_NtoUnit; //force
-		if(XVar==17 || XVar==18 || XVar==19)  x *= pMainFrame->m_mstoUnit;//speed
-		if(YVar==17 || YVar==18 || YVar==19)  y *= pMainFrame->m_mstoUnit;//speed
+		if(XVar==15 || XVar==16 || XVar==17)  x *= pMainFrame->m_NtoUnit; //force
+		if(YVar==15 || YVar==16 || YVar==17)  y *= pMainFrame->m_NtoUnit; //force
 
-		if(XVar==21 || XVar==22 || XVar==23)  x *= pMainFrame->m_NmtoUnit;//moment
-		if(YVar==21 || YVar==22 || YVar==23)  y *= pMainFrame->m_NmtoUnit;//moment
+		if(XVar==18 || XVar==19 || XVar==20)  x *= pMainFrame->m_mstoUnit;//speed
+		if(YVar==18 || YVar==19 || YVar==20)  y *= pMainFrame->m_mstoUnit;//speed
 
-		if(XVar==24 || XVar==25)              x *= pMainFrame->m_mtoUnit;//force
-		if(YVar==24 || YVar==25)              y *= pMainFrame->m_mtoUnit;//force
+		if(XVar==22 || XVar==23 || XVar==24)  x *= pMainFrame->m_NmtoUnit;//moment
+		if(YVar==22 || YVar==23 || YVar==24)  y *= pMainFrame->m_NmtoUnit;//moment
 
-		if(XVar==26)                          x *= pMainFrame->m_NmtoUnit;//moment
-		if(YVar==26)                          y *= pMainFrame->m_NmtoUnit;//moment
+		if(XVar==25 || XVar==26)              x *= pMainFrame->m_mtoUnit;//force
+		if(YVar==25 || YVar==26)              y *= pMainFrame->m_mtoUnit;//force
 
-		if(XVar==32)                          x *= pMainFrame->m_mtoUnit;//length
-		if(YVar==32)                          y *= pMainFrame->m_mtoUnit;//length
+		if(XVar==27)                          x *= pMainFrame->m_NmtoUnit;//moment
+		if(YVar==27)                          y *= pMainFrame->m_NmtoUnit;//moment
+
+		if(XVar==33)                          x *= pMainFrame->m_mtoUnit;//length
+		if(YVar==33)                          y *= pMainFrame->m_mtoUnit;//length
 
 
 		if(bAdd)
@@ -14498,83 +14499,87 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetXTitle(tr("1/Rt(CL)"));
 			break;
 		case 15:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Lift (N)"));
-			else                            pGraph->SetXTitle(tr("Lift (lbf)"));
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Fx (N)"));
+			else                            pGraph->SetXTitle(tr("Fx (lbf)"));
 			break;
 		case 16:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Drag (N)"));
-			else                            pGraph->SetXTitle(tr("Drag (lbf)"));
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Fy (N)"));
+			else                            pGraph->SetXTitle(tr("Fy (lbf)"));
 			break;
 		case 17:
-			pGraph->SetXTitle(tr("Vx ")+StrSpeed);
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetXTitle(tr("Fz (N)"));
+			else                            pGraph->SetXTitle(tr("Fz (lbf)"));
 			break;
 		case 18:
-			pGraph->SetXTitle(tr("Vz ")+StrSpeed);
+			pGraph->SetXTitle(tr("Vx ")+StrSpeed);
 			break;
 		case 19:
-			pGraph->SetXTitle(tr("V ")+StrSpeed);
+			pGraph->SetXTitle(tr("Vz ")+StrSpeed);
 			break;
 		case 20:
-			pGraph->SetXTitle(tr("Gamma"));
+			pGraph->SetXTitle(tr("V ")+StrSpeed);
 			break;
 		case 21:
-			pGraph->SetXTitle(tr("Pitching Moment"));
+			pGraph->SetXTitle(tr("Gamma"));
 			break;
 		case 22:
-			pGraph->SetXTitle(tr("Rolling Moment"));
+			pGraph->SetXTitle(tr("Pitching Moment"));
 			break;
 		case 23:
-			pGraph->SetXTitle(tr("Yawing Moment"));
+			pGraph->SetXTitle(tr("Rolling Moment"));
 			break;
 		case 24:
-			pGraph->SetXTitle(tr("XCP ")+ StrLength);
+			pGraph->SetXTitle(tr("Yawing Moment"));
 			break;
 		case 25:
-			pGraph->SetXTitle(tr("YCP ")+ StrLength);
+			pGraph->SetXTitle(tr("XCP ")+ StrLength);
 			break;
 		case 26:
-			pGraph->SetXTitle(tr("BM ")+ StrMoment);
+			pGraph->SetXTitle(tr("YCP ")+ StrLength);
 			break;
 		case 27:
-			pGraph->SetXTitle(tr("m.g.Vz (W)"));
+			pGraph->SetXTitle(tr("BM ")+ StrMoment);
 			break;
 		case 28:
-			pGraph->SetXTitle(tr("Efficiency"));
+			pGraph->SetXTitle(tr("m.g.Vz (W)"));
 			break;
 		case 29:
-			pGraph->SetXTitle(tr("(XCp-XCG)/MAC(%)"));
+			pGraph->SetXTitle(tr("Efficiency"));
 			break;
 		case 30:
-			pGraph->SetXTitle(tr("ctrl"));
+			pGraph->SetXTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
 		case 31:
-			pGraph->SetXTitle(tr("CY"));
+			pGraph->SetXTitle(tr("ctrl"));
 			break;
 		case 32:
-			pGraph->SetXTitle(tr("XNP"));
+			pGraph->SetXTitle(tr("CY"));
 			break;
 		case 33:
-			pGraph->SetXTitle(tr("Ph. Freq(Hz)"));
+			pGraph->SetXTitle(tr("XNP"));
 			break;
 		case 34:
-			pGraph->SetXTitle(tr("Ph. Damping"));
+			pGraph->SetXTitle(tr("Ph. Freq(Hz)"));
 			break;
 		case 35:
-			pGraph->SetXTitle(tr("SP Freq (Hz)"));
+			pGraph->SetXTitle(tr("Ph. Damping"));
 			break;
 		case 36:
-			pGraph->SetXTitle(tr("SP Damping"));
+			pGraph->SetXTitle(tr("SP Freq (Hz)"));
 			break;
 		case 37:
-			pGraph->SetXTitle(tr("DR Freq(Hz)"));
+			pGraph->SetXTitle(tr("SP Damping"));
 			break;
 		case 38:
-			pGraph->SetXTitle(tr("DR Damping"));
+			pGraph->SetXTitle(tr("DR Freq(Hz)"));
 			break;
 		case 39:
-			pGraph->SetXTitle(tr("Roll Damping"));
+			pGraph->SetXTitle(tr("DR Damping"));
 			break;
 		case 40:
+			pGraph->SetXTitle(tr("Roll Damping"));
+			break;
+		case 41:
 			pGraph->SetXTitle(tr("Spiral Damping"));
 			break;
 		default:
@@ -14630,83 +14635,87 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			pGraph->SetYTitle(tr("1/Rt(CL)"));
 			break;
 		case 15:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Lift (N)"));
-			else                            pGraph->SetYTitle(tr("Lift (lbf)"));
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Fx (N)"));
+			else                            pGraph->SetYTitle(tr("Fx (lbf)"));
 			break;
 		case 16:
-			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Drag (N)"));
-			else                            pGraph->SetYTitle(tr("Drag (lbf)"));
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Fy (N)"));
+			else                            pGraph->SetYTitle(tr("Fy (lbf)"));
 			break;
 		case 17:
-			pGraph->SetYTitle(tr("Vx ")+StrSpeed);
+			if(pMainFrame->m_ForceUnit==0)	pGraph->SetYTitle(tr("Fz (N)"));
+			else                            pGraph->SetYTitle(tr("Fz (lbf)"));
 			break;
 		case 18:
-			pGraph->SetYTitle(tr("Vz ")+StrSpeed);
+			pGraph->SetYTitle(tr("Vx ")+StrSpeed);
 			break;
 		case 19:
-			pGraph->SetYTitle(tr("V ")+StrSpeed);
+			pGraph->SetYTitle(tr("Vz ")+StrSpeed);
 			break;
 		case 20:
-			pGraph->SetYTitle(tr("Gamma"));
+			pGraph->SetYTitle(tr("V ")+StrSpeed);
 			break;
 		case 21:
-			pGraph->SetYTitle(tr("Pitching Moment"));
+			pGraph->SetYTitle(tr("Gamma"));
 			break;
 		case 22:
-			pGraph->SetYTitle(tr("Rolling Moment"));
+			pGraph->SetYTitle(tr("Pitching Moment"));
 			break;
 		case 23:
-			pGraph->SetYTitle(tr("Yawing Moment"));
+			pGraph->SetYTitle(tr("Rolling Moment"));
 			break;
 		case 24:
-			pGraph->SetYTitle(tr("XCP ")+ StrLength);
+			pGraph->SetYTitle(tr("Yawing Moment"));
 			break;
 		case 25:
-			pGraph->SetYTitle(tr("YCP ")+ StrLength);
+			pGraph->SetYTitle(tr("XCP ")+ StrLength);
 			break;
 		case 26:
-			pGraph->SetYTitle(tr("BM ")+ StrMoment);
+			pGraph->SetYTitle(tr("YCP ")+ StrLength);
 			break;
 		case 27:
-			pGraph->SetYTitle(tr("m.g.Vz (W)"));
+			pGraph->SetYTitle(tr("BM ")+ StrMoment);
 			break;
 		case 28:
-			pGraph->SetYTitle(tr("Efficiency"));
+			pGraph->SetYTitle(tr("m.g.Vz (W)"));
 			break;
 		case 29:
-			pGraph->SetYTitle(tr("(XCp-XCG)/MAC(%)"));
+			pGraph->SetYTitle(tr("Efficiency"));
 			break;
 		case 30:
-			pGraph->SetYTitle(tr("ctrl"));
+			pGraph->SetYTitle(tr("(XCp-XCG)/MAC(%)"));
 			break;
 		case 31:
-			pGraph->SetYTitle(tr("CY"));
+			pGraph->SetYTitle(tr("ctrl"));
 			break;
 		case 32:
-			pGraph->SetYTitle(tr("XNP"));
+			pGraph->SetYTitle(tr("CY"));
 			break;
 		case 33:
-			pGraph->SetYTitle(tr("Ph. Freq(Hz)"));
+			pGraph->SetYTitle(tr("XNP"));
 			break;
 		case 34:
-			pGraph->SetYTitle(tr("Ph. Damping"));
+			pGraph->SetYTitle(tr("Ph. Freq(Hz)"));
 			break;
 		case 35:
-			pGraph->SetYTitle(tr("SP Freq (Hz)"));
+			pGraph->SetYTitle(tr("Ph. Damping"));
 			break;
 		case 36:
-			pGraph->SetYTitle(tr("SP Damping"));
+			pGraph->SetYTitle(tr("SP Freq (Hz)"));
 			break;
 		case 37:
-			pGraph->SetYTitle(tr("DR Freq(Hz)"));
+			pGraph->SetYTitle(tr("SP Damping"));
 			break;
 		case 38:
-			pGraph->SetYTitle(tr("DR Damping"));
+			pGraph->SetYTitle(tr("DR Freq(Hz)"));
 			break;
 		case 39:
-			pGraph->SetYTitle(tr("Roll Damping"));
+			pGraph->SetYTitle(tr("DR Damping"));
 			break;
 		case 40:
+			pGraph->SetYTitle(tr("Roll Damping"));
+			break;
+		case 41:
 			pGraph->SetYTitle(tr("Spiral Damping"));
 			break;
 		default:
@@ -14714,6 +14723,7 @@ void QMiarex::SetWGraphTitles(Graph* pGraph)
 			break;
 	}
 }
+
 
 
 void QMiarex::showEvent(QShowEvent *event)

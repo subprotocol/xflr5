@@ -95,7 +95,7 @@ private:
 	
 	// the rest is litterature
 	QList <double> m_Alpha; //angle of attack
-	QList <double> m_Cl;    //lift coef.
+	QList <double> m_CL;    //lift coef.
 	QList <double> m_CY;    //Side Force
 	QList <double> m_ICd;   //induced drag coef.
 	QList <double> m_PCd;   //profile drag coef.
@@ -110,8 +110,9 @@ private:
 	QList <double> m_ClCd;  //glide ratio
 	QList <double> m_Cl32Cd;  //powerfactor
 	QList <double> m_QInfinite;  //free stream speed - type2 Wpolars
-	QList <double> m_L;//Wing lift
-	QList <double> m_D;//Wing Drag
+	QList <double> m_FX;//Wing Drag
+	QList <double> m_FY;//Wing Side force
+	QList <double> m_FZ;//Wing Lift
 	QList <double> m_1Cl;//1/Cl, special for Matthieu
 	QList <double> m_Vx;//horizontal speed
 	QList <double> m_Vz;//Sink speed = sqrt(2mg/rho/S)/powerfactor

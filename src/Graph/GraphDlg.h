@@ -27,7 +27,7 @@
 #include <QListWidget>
 #include <QLabel>
 #include <QCheckBox>
-//#include <QtGui>
+
 #include "../Graph/Graph.h"
 #include "../Misc/FloatEdit.h"
 #include "../Misc/ColorButton.h"

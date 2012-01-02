@@ -101,7 +101,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
 					m_QInfinite[i]  =  pWOpp->m_QInf;
-					m_Cl[i]         =  pWOpp->m_CL;
+					m_CL[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
 					m_ICd[i]        =  pWOpp->m_ICD;
 					m_PCd[i]        =  pWOpp->m_VCD;
@@ -128,7 +128,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					// sort by crescending alphas
 					m_Alpha.insert(i, pWOpp->m_Alpha);
 					m_QInfinite.insert(i, pWOpp->m_QInf);
-					m_Cl.insert(i,   pWOpp->m_CL);
+					m_CL.insert(i,   pWOpp->m_CL);
 					m_CY.insert(i,   pWOpp->m_CY);
 					m_ICd.insert(i,  pWOpp->m_ICD);
 					m_PCd.insert(i,  pWOpp->m_VCD);
@@ -162,8 +162,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -183,7 +184,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
-					m_Cl[i]         = pWOpp->m_CL;
+					m_CL[i]         = pWOpp->m_CL;
 					m_CY[i]         = pWOpp->m_CY;
 					m_ICd[i]        = pWOpp->m_ICD;
 					m_PCd[i]        = pWOpp->m_VCD;
@@ -210,7 +211,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				{
 					// sort by crescending speed
 					m_Alpha.insert(i,     pWOpp->m_Alpha);
-					m_Cl.insert(i,        pWOpp->m_CL);
+					m_CL.insert(i,        pWOpp->m_CL);
 					m_CY.insert(i,        pWOpp->m_CY);
 					m_ICd.insert(i,       pWOpp->m_ICD);
 					m_PCd.insert(i,       pWOpp->m_VCD);
@@ -244,8 +245,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -265,7 +267,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				{
 					// then erase former result
 					m_Alpha[i]      = pWOpp->m_Alpha;
-					m_Cl[i]         = pWOpp->m_CL;
+					m_CL[i]         = pWOpp->m_CL;
 					m_CY[i]         = pWOpp->m_CY;
 					m_ICd[i]        = pWOpp->m_ICD;
 					m_PCd[i]        = pWOpp->m_VCD;
@@ -295,7 +297,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 				{
 					// sort by crescending control values
 					m_Alpha.insert(i,     pWOpp->m_Alpha);
-					m_Cl.insert(i,        pWOpp->m_CL);
+					m_CL.insert(i,        pWOpp->m_CL);
 					m_CY.insert(i,        pWOpp->m_CY);
 					m_ICd.insert(i,       pWOpp->m_ICD);
 					m_PCd.insert(i,       pWOpp->m_VCD);
@@ -329,8 +331,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -368,7 +371,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 			return;
 		}
 		m_Alpha.append(pWOpp->m_Alpha);
-		m_Cl.append(pWOpp->m_CL);
+		m_CL.append(pWOpp->m_CL);
 		m_CY.append(pWOpp->m_CY);
 		m_ICd.append(pWOpp->m_ICD);
 		m_PCd.append(pWOpp->m_VCD);
@@ -403,8 +406,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_Cl32Cd.append(0.0);
 		m_Vx.append(0.0);
 		m_Vz.append(0.0);
-		m_L.append(0.0);
-		m_D.append(0.0);
+		m_FZ.append(0.0);
+		m_FY.append(0.0);
+		m_FX.append(0.0);
 		m_Gamma.append(0.0);
 		m_Rm.append(0.0);
 		m_Pm.append(0.0);
@@ -439,7 +443,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
-					m_Cl[i]         =  pWOpp->m_CL;
+					m_CL[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
 					m_ICd[i]        =  pWOpp->m_ICD;
 					m_PCd[i]        =  pWOpp->m_VCD;
@@ -466,7 +470,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				{
 					// sort by crescending alphas
 					m_Alpha.insert(i, pWOpp->m_Alpha);
-					m_Cl.insert(i,  pWOpp->m_CL);
+					m_CL.insert(i,  pWOpp->m_CL);
 					m_CY.insert(i,  pWOpp->m_CY);
 					m_ICd.insert(i, pWOpp->m_ICD);
 					m_PCd.insert(i, pWOpp->m_VCD);
@@ -502,8 +506,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -523,7 +528,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
-					m_Cl[i]         =  pWOpp->m_CL;
+					m_CL[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
 					m_ICd[i]        =  pWOpp->m_ICD;
 					m_PCd[i]        =  pWOpp->m_VCD;
@@ -551,7 +556,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				{
 					// sort by crescending alphas
 					m_Alpha.insert(i, pWOpp->m_Alpha);
-					m_Cl.insert(i, pWOpp->m_CL);
+					m_CL.insert(i, pWOpp->m_CL);
 					m_CY.insert(i, pWOpp->m_CY);
 					m_ICd.insert(i, pWOpp->m_ICD);
 					m_PCd.insert(i, pWOpp->m_VCD);
@@ -586,8 +591,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -607,7 +613,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
-					m_Cl[i]         =  pWOpp->m_CL;
+					m_CL[i]         =  pWOpp->m_CL;
 					m_CY[i]         =  pWOpp->m_CY;
 					m_ICd[i]        =  pWOpp->m_ICD;
 					m_PCd[i]        =  pWOpp->m_VCD;
@@ -641,7 +647,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 				else if (pWOpp->m_Ctrl < m_Ctrl[i])
 				{
 					m_Alpha.insert(i, pWOpp->m_Alpha);
-					m_Cl.insert(i, pWOpp->m_CL);
+					m_CL.insert(i, pWOpp->m_CL);
 					m_CY.insert(i, pWOpp->m_CY);
 					m_ICd.insert(i, pWOpp->m_ICD);
 					m_PCd.insert(i, pWOpp->m_VCD);
@@ -677,8 +683,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -708,7 +715,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	{
 		// data is appended at the end
 		m_Alpha.append(pWOpp->m_Alpha);
-		m_Cl.append(pWOpp->m_CL);
+		m_CL.append(pWOpp->m_CL);
 		m_CY.append(pWOpp->m_CY);
 		m_ICd.append(pWOpp->m_ICD);
 		m_PCd.append(pWOpp->m_VCD);
@@ -744,8 +751,9 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_Cl32Cd.append(0.0);
 		m_Vx.append(0.0);
 		m_Vz.append(0.0);
-		m_L.append(0.0);
-		m_D.append(0.0);
+		m_FZ.append(0.0);
+		m_FY.append(0.0);
+		m_FX.append(0.0);
 		m_Gamma.append(0.0);
 		m_Rm.append(0.0);
 		m_Pm.append(0.0);
@@ -786,7 +794,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 				{
 					// then erase former result
 					m_Alpha[i]      =  alpha;
-					m_Cl[i]         =  CL;
+					m_CL[i]         =  CL;
 					m_CY[i]         =  CY;
 					m_ICd[i]        =  ICd;
 					m_PCd[i]        =  PCd;
@@ -813,7 +821,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 				{
 					// sort by crescending alphas
 					m_Alpha.insert(i, alpha);
-					m_Cl.insert(i,  CL);
+					m_CL.insert(i,  CL);
 					m_CY.insert(i,  CY);
 					m_ICd.insert(i, ICd);
 					m_PCd.insert(i, PCd);
@@ -848,8 +856,9 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 					m_Cl32Cd.insert(i,0.0);
 					m_Vx.insert(i,0.0);
 					m_Vz.insert(i,0.0);
-					m_L.insert(i,0.0);
-					m_D.insert(i,0.0);
+					m_FZ.insert(i,0.0);
+					m_FY.insert(i,0.0);
+					m_FX.insert(i,0.0);
 					m_Gamma.insert(i,0.0);
 					m_Rm.insert(i, 0.0);
 					m_Pm.insert(i, 0.0);
@@ -869,7 +878,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 	{
 		// data is appended at the end
 		m_Alpha.append(alpha);
-		m_Cl.append(CL);
+		m_CL.append(CL);
 		m_CY.append(CY);
 		m_ICd.append(ICd);
 		m_PCd.append(PCd);
@@ -904,8 +913,9 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 		m_Cl32Cd.append(0.0);
 		m_Vx.append(0.0);
 		m_Vz.append(0.0);
-		m_L.append(0.0);
-		m_D.append(0.0);
+		m_FZ.append(0.0);
+		m_FY.append(0.0);
+		m_FX.append(0.0);
 		m_Gamma.append(0.0);
 		m_Rm.append(0.0);
 		m_Pm.append(0.0);
@@ -921,22 +931,22 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 void CWPolar::CalculatePoint(int i)
 {
 	//finish calculations
-//	double cl = m_Cl[i];
+//	double cl = m_CL[i];
 //	double tcd = m_TCd[i];
 //	double Qinf =  m_QInfinite[i];
 
-	m_ClCd[i]   =  m_Cl[i]/m_TCd[i];
+	m_ClCd[i]   =  m_CL[i]/m_TCd[i];
 
-	if(m_Cl[i]>0.0) {
-		m_1Cl[i]    = (double)(1./sqrt(m_Cl[i]));
-		m_Cl32Cd[i] = (double)pow(m_Cl[i],1.5)/m_TCd[i];
+	if(m_CL[i]>0.0) {
+		m_1Cl[i]    = (double)(1./sqrt(m_CL[i]));
+		m_Cl32Cd[i] = (double)pow(m_CL[i],1.5)/m_TCd[i];
 	}
 	else {
 		m_1Cl[i]    = -1.0;//will not be plotted
-		m_Cl32Cd[i] =  -(double)pow(-m_Cl[i],1.5)/m_TCd[i];
+		m_Cl32Cd[i] =  -(double)pow(-m_CL[i],1.5)/m_TCd[i];
 	}
 
-	if(fabs(m_Cl[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_Cl[i]) * 180.0/PI;
+	if(fabs(m_CL[i])>0.) m_Gamma[i]  =  atan(m_TCd[i]/m_CL[i]) * 180.0/PI;
 	else m_Gamma[i] = 90.0;
 	m_Vz[i] = (double)sqrt(2*m_Mass*9.81/m_Density/m_WArea)/m_Cl32Cd[i];
 	m_Vx[i] = m_QInfinite[i] * (double)cos(m_Gamma[i]*PI/180.0);
@@ -944,8 +954,9 @@ void CWPolar::CalculatePoint(int i)
 	//dynamic pressure
 	double q =  0.5 * m_Density * m_QInfinite[i]*m_QInfinite[i];
 
-	m_L[i]  = q * m_Cl[i]*m_WArea;
-	m_D[i]  = q * m_TCd[i]*m_WArea;
+	m_FZ[i]  = q * m_CL[i]*m_WArea;
+	m_FY[i]  = q * m_CY[i]*m_WArea;
+	m_FX[i]  = q * m_TCd[i]*m_WArea;
 
 	m_Rm[i] = q * m_WArea * m_GRm[i] * m_WSpan;// in N.m
 	m_Ym[i] = q * m_WArea * m_GYm[i] * m_WSpan;// in N.m
@@ -957,7 +968,7 @@ void CWPolar::CalculatePoint(int i)
 	double AR      = m_WSpan*m_WSpan/m_WArea;
 
 	if(m_ICd[i]==0.0)	m_Oswald[i] = 0.0;
-	else				m_Oswald[i] = m_Cl[i]*m_Cl[i]/PI/m_ICd[i]/AR;
+	else				m_Oswald[i] = m_CL[i]*m_CL[i]/PI/m_ICd[i]/AR;
 
 	m_SM[i]        = (m_XCP[i]-m_CoG.x)/m_WMAChord *100.00;
 
@@ -1034,7 +1045,7 @@ void CWPolar::Copy(CWPolar *pWPolar)
 	for(i=0; i<size; i++)
 	{
 		m_Alpha.insert(i,      pWPolar->m_Alpha[i]);
-		m_Cl.insert(i,         pWPolar-> m_Cl[i]);
+		m_CL.insert(i,         pWPolar-> m_CL[i]);
 		m_CY.insert(i,         pWPolar-> m_CY[i]);
 		m_ICd.insert(i,        pWPolar-> m_ICd[i]);
 		m_PCd.insert(i,        pWPolar-> m_PCd[i]);
@@ -1072,8 +1083,9 @@ void CWPolar::Copy(CWPolar *pWPolar)
 		m_RollDamping.insert(i,pWPolar->m_RollDamping[i]);
 		m_SpiralDamping.insert(i,pWPolar->m_SpiralDamping[i]);
 
-		m_L.insert(i,          pWPolar-> m_L[i]);
-		m_D.insert(i,          pWPolar-> m_D[i]);
+		m_FZ.insert(i,         pWPolar-> m_FZ[i]);
+		m_FY.insert(i,         pWPolar-> m_FY[i]);
+		m_FX.insert(i,         pWPolar-> m_FX[i]);
 		m_Vx.insert(i,         pWPolar-> m_Vx[i]);
 
 		m_Vz.insert(i,         pWPolar-> m_Vz[i]);
@@ -1137,7 +1149,7 @@ void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 		{
 			strong = QString(" %1  %2  %3  %4  %5  %6  %7  %8  %9  %10  %11  %12\n")
 					 .arg(m_Alpha[j],8,'f',3)
-					 .arg(m_Cl[j], 9,'f',6)
+					 .arg(m_CL[j], 9,'f',6)
 					 .arg(m_ICd[j],9,'f',6)
 					 .arg(m_PCd[j],9,'f',6)
 					 .arg(m_TCd[j],9,'f',6)
@@ -1181,7 +1193,7 @@ void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 //			strong.Format(" %8.3f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %9.6f,  %8.4f,  %9.4f\n",
 			strong = QString(" %1,  %2,  %3,  %4,  %5,  %6,  %7,  %8,  %9,  %10,  %11,  %12\n")
 					 .arg(m_Alpha[j],8,'f',3)
-					 .arg(m_Cl[j], 9,'f',6)
+					 .arg(m_CL[j], 9,'f',6)
 					 .arg(m_ICd[j],9,'f',6)
 					 .arg(m_PCd[j],9,'f',6)
 					 .arg(m_TCd[j],9,'f',6)
@@ -1215,7 +1227,7 @@ void * CWPolar::GetUFOPlrVariable(int iVar)
 			pVar = &m_Alpha;
 			break;
 		case 1:
-			pVar = &m_Cl;
+			pVar = &m_CL;
 			break;
 		case 2:
 			pVar = &m_PCd;
@@ -1254,84 +1266,87 @@ void * CWPolar::GetUFOPlrVariable(int iVar)
 			pVar = &m_Cl32Cd;
 			break;
 		case 14:
-			pVar = &m_Cl;
+			pVar = &m_1Cl;
 			break;
 		case 15:
-			pVar = &m_L;
+			pVar = &m_FX;
 			break;
 		case 16:
-			pVar = &m_D;
+			pVar = &m_FY;
 			break;
 		case 17:
-			pVar = &m_Vx;
+			pVar = &m_FZ;
 			break;
 		case 18:
-			pVar = &m_Vz;
+			pVar = &m_Vx;
 			break;
 		case 19:
-			pVar = &m_QInfinite;
+			pVar = &m_Vz;
 			break;
 		case 20:
-			pVar = &m_Gamma;
+			pVar = &m_QInfinite;
 			break;
 		case 21:
-			pVar = &m_Pm;
+			pVar = &m_Gamma;
 			break;
 		case 22:
-			pVar = &m_Rm;
+			pVar = &m_Pm;
 			break;
 		case 23:
-			pVar = &m_Ym;
+			pVar = &m_Rm;
 			break;
 		case 24:
-			pVar = &m_XCP;
+			pVar = &m_Ym;
 			break;
 		case 25:
-			pVar = &m_YCP;
+			pVar = &m_XCP;
 			break;
 		case 26:
-			pVar = &m_MaxBending;
+			pVar = &m_YCP;
 			break;
 		case 27:
-			pVar = &m_VertPower;
+			pVar = &m_MaxBending;
 			break;
 		case 28:
-			pVar = &m_Oswald;
+			pVar = &m_VertPower;
 			break;
 		case 29:
-			pVar = &m_SM;
+			pVar = &m_Oswald;
 			break;
 		case 30:
-			pVar = &m_Ctrl;
+			pVar = &m_SM;
 			break;
 		case 31:
-			pVar = &m_CY;
+			pVar = &m_Ctrl;
 			break;
 		case 32:
-			pVar = &m_XNP;
+			pVar = &m_CY;
 			break;
 		case 33:
-			pVar = &m_PhugoidFrequency;
+			pVar = &m_XNP;
 			break;
 		case 34:
-			pVar = &m_PhugoidDamping;
+			pVar = &m_PhugoidFrequency;
 			break;
 		case 35:
-			pVar = &m_ShortPeriodFrequency;
+			pVar = &m_PhugoidDamping;
 			break;
 		case 36:
-			pVar = &m_ShortPeriodDamping;
+			pVar = &m_ShortPeriodFrequency;
 			break;
 		case 37:
-			pVar = &m_DutchRollFrequency;
+			pVar = &m_ShortPeriodDamping;
 			break;
 		case 38:
-			pVar = &m_DutchRollDamping;
+			pVar = &m_DutchRollFrequency;
 			break;
 		case 39:
-			pVar = &m_RollDamping;
+			pVar = &m_DutchRollDamping;
 			break;
 		case 40:
+			pVar = &m_RollDamping;
+			break;
+		case 41:
 			pVar = &m_SpiralDamping;
 			break;
 		default:
@@ -1345,7 +1360,7 @@ void CWPolar::Remove(int i)
 {
 	int size = m_Alpha.size();
 	m_Alpha.removeAt(i);
-	m_Cl.removeAt(i);
+	m_CL.removeAt(i);
 	m_CY.removeAt(i);
 	m_ICd.removeAt(i);
 	m_PCd.removeAt(i);
@@ -1384,8 +1399,9 @@ void CWPolar::Remove(int i)
 
 	m_QInfinite.removeAt(i);
 	m_Gamma.removeAt(i);
-	m_L.removeAt(i);
-	m_D.removeAt(i);
+	m_FZ.removeAt(i);
+	m_FY.removeAt(i);
+	m_FX.removeAt(i);
 	m_Vx.removeAt(i);
 
 	m_Vz.removeAt(i);
@@ -1406,7 +1422,7 @@ void CWPolar::ResetWPlr()
 {
 	int size = m_Alpha.size();
 	m_Alpha.clear();
-	m_Cl.clear();
+	m_CL.clear();
 	m_CY.clear();
 	m_ICd.clear();
 	m_PCd.clear();
@@ -1445,8 +1461,9 @@ void CWPolar::ResetWPlr()
 
 	m_QInfinite.clear();
 	m_Gamma.clear();
-	m_L.clear();
-	m_D.clear();
+	m_FZ.clear();
+	m_FY.clear();
+	m_FX.clear();
 	m_Vx.clear();
 
 	m_Vz.clear();
@@ -1528,7 +1545,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar <<m_Alpha.size();
 		for (i=0; i< m_Alpha.size(); i++)
 		{
-			ar << (float)m_Alpha[i] << (float)m_Cl[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
+			ar << (float)m_Alpha[i] << (float)m_CL[i] << (float)m_CY[i] << (float)m_ICd[i] << (float)m_PCd[i] ;
 
 			ar << (float)m_GCm[i];
 			ar << (float)m_VCm[i] << (float)m_ICm[i];
@@ -1777,7 +1794,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			}
 
 			m_Alpha.append(Alpha);
-			m_Cl.append(Cl);
+			m_CL.append(Cl);
 			m_CY.append(CY);
 			m_ICd.append(ICd);
 			m_PCd.append(PCd);
@@ -1814,8 +1831,9 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			m_Cl32Cd.append(0.0);
 			m_Vx.append(0.0);
 			m_Vz.append(0.0);
-			m_L.append(0.0);
-			m_D.append(0.0);
+			m_FZ.append(0.0);
+			m_FY.append(0.0);
+			m_FX.append(0.0);
 			m_Gamma.append(0.0);
 			m_Rm.append(0.0);
 			m_Pm.append(0.0);
