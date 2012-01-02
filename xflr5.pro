@@ -58,7 +58,6 @@ SOURCES += src/MainFrame.cpp \
     src/XDirect/XFoilAdvancedDlg.cpp \
     src/XDirect/XDirect.cpp \
     src/Objects/Body.cpp \
-    src/Objects/CRectangle.cpp \
     src/Objects/CVector.cpp \
     src/Objects/Foil.cpp \
     src/Objects/Frame.cpp \
