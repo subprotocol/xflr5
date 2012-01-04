@@ -44,7 +44,7 @@ void AboutQ5::SetupLayout()
 	QLabel *lab1  = new QLabel(pMainFrame->m_VersionName);
 	lab1->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
 	QLabel *XFLR5Link = new QLabel;
-	XFLR5Link->setText("<a href=http://xflr5.sourceforge.net/xflr5.htm>http://xflr5.sourceforge.net/xflr5.htm</a>");
+	XFLR5Link->setText("<a href=http://www.xflr5.com>http://www.xflr5.com</a>");
 	XFLR5Link->setOpenExternalLinks(true);
 	XFLR5Link->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
 	XFLR5Link->setAlignment(Qt::AlignVCenter| Qt::AlignLeft);
@@ -65,7 +65,9 @@ void AboutQ5::SetupLayout()
 	QLabel *lab9  = new QLabel(tr("Any other usage is strongly disapproved"));
 	QLabel *lab10 = new QLabel(tr("Program distributed  under the terms of the GNU General Public License"));
 	QLabel *lab11 = new QLabel(tr("German translation by Martin Willner (mjw@mjw.co.at)"));
-	QLabel *lab12 = new QLabel(tr("French translation by Jean-Luc Coulon"));
+	QLabel *lab12 = new QLabel(tr("Japanese translation by IKUSU, Koichi Akabe, Misatus, dynamicsoar, hide253"));
+	QLabel *lab13 = new QLabel(tr("icchy_07, ina111, ohayo_cycling, ohisa_64, ozawa64."));
+	QLabel *lab14 = new QLabel(tr("French translation by Jean-Luc Coulon"));
 
 	QPushButton *OKButton = new QPushButton(tr("OK"));
 	connect(OKButton, SIGNAL(clicked()),this, SLOT(accept()));
@@ -83,6 +85,9 @@ void AboutQ5::SetupLayout()
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab11);
 	MainLayout->addWidget(lab12);
+	MainLayout->addWidget(lab13);
+	MainLayout->addWidget(lab14);
+	MainLayout->addSpacing(20);
 	MainLayout->addStretch(1);
 	MainLayout->addWidget(lab5);
 	MainLayout->addWidget(lab6);

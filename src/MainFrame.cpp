@@ -5594,10 +5594,12 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			ar >> m_WeightUnit;
 			ar >> m_SpeedUnit;
 			ar >> m_ForceUnit;
+
 			if(ArchiveFormat>=100005)
 			{
 				ar >> m_MomentUnit;
 			}
+
 			SetUnits(m_LengthUnit, m_AreaUnit, m_SpeedUnit, m_WeightUnit, m_ForceUnit, m_MomentUnit,
 					 m_mtoUnit, m_m2toUnit, m_mstoUnit, m_kgtoUnit, m_NtoUnit, m_NmtoUnit);
 
@@ -5864,6 +5866,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		}
 
 		if(m_iApp==MIAREX) pMiarex->SetUFO();
+
+		pMiarex->UpdateUnits();
 
 		QApplication::restoreOverrideCursor();
 		return true;

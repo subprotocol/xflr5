@@ -773,17 +773,17 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 				WingForce.Set(0.0, 0.0, 0.0);
 				m_pWingList[i]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 
-				m_WingForce[q*4+i] = WingForce;
+				m_WingForce[q*MAXWINGS+i] = WingForce;
 
 				Force             += WingForce;
 				//save the results... will save another FF calculation when computing operating point
-				m_WingIDrag[q*4+i] = IDrag;
+				m_WingIDrag[q*MAXWINGS+i] = IDrag;
 
-				memcpy(m_Cl  + q*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Cl,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_ICd + q*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_ICd, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_Ai  + q*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Ai,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_F   + q*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_F,   m_pWingList[i]->m_NStation*sizeof(CVector));
-				memcpy(m_Vd  + q*4*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Vd,  m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_Cl  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Cl,  m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_ICd + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_ICd, m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_Ai  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Ai,  m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_F   + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_F,   m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_Vd  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Vd,  m_pWingList[i]->m_NStation*sizeof(CVector));
 
 				pos += m_pWingList[i]->m_MatSize;
 

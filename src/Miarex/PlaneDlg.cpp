@@ -721,17 +721,14 @@ void PlaneDlg::SetParams()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, pos;
 	CBody *pBody = NULL;
-
 	if(m_pPlane->Body()) m_pctrlBody->setChecked(true);
-	else                  m_pctrlBody->setChecked(false);
-
+	else                 m_pctrlBody->setChecked(false);
 	m_pctrlBodyList->clear();
 	for(i=0; i<s_poaBody->size(); i++)
 	{
 		pBody = (CBody*)s_poaBody->at(i);
 		m_pctrlBodyList->addItem(pBody->m_BodyName);
 	}
-
 	if(m_pPlane->Body() && pBody)
 	{
 		pos = m_pctrlBodyList->findText(m_pPlane->m_pBody->m_BodyName);
@@ -739,8 +736,12 @@ void PlaneDlg::SetParams()
 	}
 	else
 	{
-		if(m_pctrlBodyList->count()) m_pctrlBodyList->setCurrentIndex(0);
-		else						 m_pctrlBody->setEnabled(false);
+		if(m_pctrlBodyList->count())
+		{
+			m_pctrlBodyList->setCurrentIndex(0);
+			m_pctrlBody->setEnabled(true);
+		}
+		else m_pctrlBody->setEnabled(false);
 		m_pctrlBodyList->setEnabled(false);
 		m_pctrlXBody->setEnabled(false);
 		m_pctrlZBody->setEnabled(false);

@@ -192,8 +192,6 @@ private:
 
 	CVector m_Speed[VLMMAXMATSIZE];
 
-	CVector *m_pR[5];
-	CVector PJK, a, b, s, T1, T2, T, h;
 
 	QString m_strOut;
 	QString m_VersionName;
@@ -212,10 +210,7 @@ private:
 
 	
 	CWPolar *m_pWPolar;
-
 	CBody *m_pBody;
-
-
 	CPlane *m_pPlane;
 
 	//temp data
@@ -225,17 +220,19 @@ private:
 	CVector R[5];
 	CVector r0, r1, r2, Psi, t, Far;
 	double r1v,r2v,ftmp, Omega;
-	
+	CVector *m_pR[5];
+	CVector PJK, a, b, s, T1, T2, T, h;
+
 public:
-	double m_Ai[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
-	double m_Cl[ 4*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
-	double m_ICd[4*VLMMAXRHS * MAXSTATIONS];
-	CVector m_F[ 4*VLMMAXRHS * MAXSTATIONS];
-	CVector m_Vd[ 4*VLMMAXRHS * MAXSTATIONS];
-	CVector m_WingForce[4*VLMMAXRHS];
-	double m_WingIDrag[4*VLMMAXRHS];
+	double m_Ai[ MAXWINGS*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
+	double m_Cl[ MAXWINGS*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
+	double m_ICd[MAXWINGS*VLMMAXRHS * MAXSTATIONS];
+	CVector m_F[ MAXWINGS*VLMMAXRHS * MAXSTATIONS];
+	CVector m_Vd[ MAXWINGS*VLMMAXRHS * MAXSTATIONS];
+	CVector m_WingForce[MAXWINGS*VLMMAXRHS];
+	double m_WingIDrag[MAXWINGS*VLMMAXRHS];
 	CWing *m_pWing; //pointer to the geometry class of the wing
-	CWing * m_pWingList[4]; //pointer to the plane's four wings
+	CWing * m_pWingList[MAXWINGS]; //pointer to the plane's four wings
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
 
 public://stability analysis method and variables
