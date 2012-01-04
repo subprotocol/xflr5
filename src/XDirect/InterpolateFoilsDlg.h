@@ -25,7 +25,10 @@
 #define INTERPOLATEFOILSDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QLabel>
+#include <QSlider>
 #include "../Objects/Foil.h"
 #include "../Misc/FloatEdit.h"
 

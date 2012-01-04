@@ -29,6 +29,7 @@
 #include <QPushButton>
 #include <QTableView>
 #include <QStandardItemModel>
+
 #include "../Params.h"
 #include "../Misc/FloatEditDelegate.h"
 #include "../Misc/FloatEdit.h"

@@ -24,7 +24,8 @@
 #define FOILPOLARDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QRadioButton>
+#include <QLabel>
 #include <QString>
 #include "../Misc/FloatEdit.h"
 

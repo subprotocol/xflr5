@@ -19,7 +19,10 @@
 
 *****************************************************************************/
 
-#include <QtGui>
+#include <QApplication>
+#include <QDir>
+#include <QDateTime>
+
 
 #include "XFoilAnalysisDlg.h"
 #include "XDirect.h"

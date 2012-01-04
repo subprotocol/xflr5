@@ -20,9 +20,15 @@
 *****************************************************************************/
 
 
-#include <QtGui>
+#include <QKeyEvent>
+#include <QColorDialog>
+#include <QLabel>
+#include <QGridLayout>
+
 #include "LinePickerDlg.h"
 #include "../Globals.h"
+
+
 
 LinePickerDlg::LinePickerDlg(void *pParent)
 {

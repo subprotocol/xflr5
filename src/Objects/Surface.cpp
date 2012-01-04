@@ -46,7 +46,6 @@
 #include <math.h>
 #include "Surface.h"
 #include "../Objects/Quaternion.h"
-#include <QtDebug>
 
 
 CVector CSurface::LA;//save time by preventing allocation & release of memory

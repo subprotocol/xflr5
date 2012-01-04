@@ -22,7 +22,7 @@
 
 
 #include "RenameDlg.h"
-
+#include <QMessageBox>
 
 
 RenameDlg::RenameDlg(void *pParent)

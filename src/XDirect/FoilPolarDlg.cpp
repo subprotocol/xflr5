@@ -19,6 +19,8 @@
 
 *****************************************************************************/
 
+#include <QGroupBox>
+
 #include "FoilPolarDlg.h"
 #include "XDirect.h"
 #include "../Globals.h"

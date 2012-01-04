@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
+#include <QMessageBox>
 
-#include <QtGui>
 #include "LEDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"

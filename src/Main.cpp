@@ -21,7 +21,6 @@
 *****************************************************************************/
 
 
-#include <QtGui/QApplication>
 #include "XFLR5Application.h"
 #include "MainFrame.h"
 #include <QSplashScreen>

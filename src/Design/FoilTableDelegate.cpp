@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
+#include <QApplication>
 
-#include <QtGui>
 #include "FoilTableDelegate.h"
 #include "AFoil.h"
 #include "../Globals.h"

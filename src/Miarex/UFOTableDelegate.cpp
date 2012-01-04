@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 
-#include <QtGui>
 #include "UFOTableDelegate.h"
 #include "Miarex.h"
 

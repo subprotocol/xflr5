@@ -19,6 +19,9 @@
 
 *****************************************************************************/
 
+#include <QMessageBox>
+
+
 #include "TwoDPanelDlg.h"
 #include "../Params.h"
 #include "XFoil.h"

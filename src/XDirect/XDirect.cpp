@@ -19,8 +19,16 @@
 
 *****************************************************************************/
 
-#include <QtGui>
 #include <QCheckBox>
+#include <QTimer>
+#include <QAction>
+#include <QMenu>
+#include <QStatusBar>
+#include <QMessageBox>
+#include <QColorDialog>
+#include <QFileDialog>
+#include <QGroupBox>
+#include <QThread>
 #include <math.h>
  
 #include "../Globals.h"

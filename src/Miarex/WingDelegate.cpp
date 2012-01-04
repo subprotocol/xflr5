@@ -20,7 +20,6 @@
 *****************************************************************************/
  
 
-//#include <QtGui>
 #include "../Objects/Foil.h"
 #include "WingDelegate.h"
 #include "GL3dWingDlg.h"

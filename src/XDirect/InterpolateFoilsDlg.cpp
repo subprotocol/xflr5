@@ -19,6 +19,8 @@
 
 *****************************************************************************/
 
+#include <QGroupBox>
+
 #include "InterpolateFoilsDlg.h"
 #include "../MainFrame.h"
 #include "XFoil.h"

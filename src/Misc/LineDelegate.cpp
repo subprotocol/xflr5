@@ -20,7 +20,6 @@
 *****************************************************************************/
 
 
-#include <QtGui>
 
 #include "LineDelegate.h"
 #include "../Globals.h"

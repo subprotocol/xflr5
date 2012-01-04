@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	PlaneDlg Class
-	Copyright (C) 2009 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2009-2012 Andre Deperrois XFLR5@yahoo.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -19,6 +19,13 @@
 
 *****************************************************************************/
 
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGroupBox>
+#include <QMessageBox>
+#include <math.h>
+
 
 #include "../Globals.h"
 #include "../MainFrame.h" 
@@ -26,12 +33,6 @@
 #include "PlaneDlg.h"
 #include "ImportWingDlg.h"
 #include "InertiaDlg.h"
-#include <QGridLayout>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGroupBox>
-#include <QMessageBox>
-#include <math.h>
 
 
 QList <void*> *PlaneDlg::s_poaWing;
@@ -519,13 +520,14 @@ void PlaneDlg::OnInertia()
 	}
 	else
 	{
+		//restore everything
 		m_pPlane->m_NMass = NMass;
 	
 		for(int i=0; i< MAXMASSES; i++)
 		{
-			MassValue[i]    = m_pPlane->m_MassValue[i];
-			MassPosition[i] = m_pPlane->m_MassPosition[i];
-			MassTag[i]      = m_pPlane->m_MassTag[i];
+			m_pPlane->m_MassValue[i]    = MassValue[i];
+			m_pPlane->m_MassPosition[i] = MassPosition[i];
+			m_pPlane->m_MassTag[i]      = MassTag[i];
 		}
 	}
 }

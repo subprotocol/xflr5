@@ -19,7 +19,6 @@
 
 *****************************************************************************/
 
-#include <QtGui>
 #include "AboutQ5.h"
 #include "../MainFrame.h"
 #include <QBitmap>
@@ -57,7 +56,7 @@ void AboutQ5::SetupLayout()
 
 	QLabel *lab2  = new QLabel(tr("Copyright (C) M. Drela and H. Youngren 2000 - XFoil v6.94"));
 	QLabel *lab3  = new QLabel(tr("Copyright (C) Matthieu Scherrer 2004 - Miarex v1.00"));
-	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2011"));
+	QLabel *lab4  = new QLabel(tr("Copyright (C) Andre Deperrois 2003-2012"));
 	QLabel *lab5  = new QLabel(tr("This program is distributed in the hope that it will be useful,"));
 	QLabel *lab6  = new QLabel(tr("but WITHOUT ANY WARRANTY; without even the implied warranty of"));
 	QLabel *lab7  = new QLabel(tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."));

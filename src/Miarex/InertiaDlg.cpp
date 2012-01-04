@@ -21,16 +21,18 @@
 
 //performs an automatic evaluation of the object's CoG an inertia properties
 
-#include "../MainFrame.h"
-#include "../Globals.h"
-#include "InertiaDlg.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QHeaderView>
 #include <QTextStream>
 #include <QFileDialog>
+#include <QAction>
+#include <QMenu>
 
+#include "../MainFrame.h"
+#include "../Globals.h"
+#include "InertiaDlg.h"
 
 
 void *InertiaDlg::s_pMainFrame;
@@ -1188,7 +1190,7 @@ void InertiaDlg::OnWingInertia()
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
 	dlg.move(pos().x()+25, pos().y()+25);
-	dlg.exec();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
 	ComputeInertia();
 }
 
@@ -1202,7 +1204,7 @@ void InertiaDlg::OnWing2Inertia()
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
 	dlg.move(pos().x()+25, pos().y()+25);
-	dlg.exec();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
 	ComputeInertia();
 }
 
@@ -1216,7 +1218,7 @@ void InertiaDlg::OnStabInertia()
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
 	dlg.move(pos().x()+25, pos().y()+25);
-	dlg.exec();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
 	ComputeInertia();
 }
 
@@ -1230,7 +1232,7 @@ void InertiaDlg::OnFinInertia()
 	dlg.m_pBody  = NULL;
 	dlg.InitDialog();
 	dlg.move(pos().x()+25, pos().y()+25);
-	dlg.exec();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
 	ComputeInertia();
 }
 
@@ -1244,6 +1246,6 @@ void InertiaDlg::OnBodyInertia()
 	dlg.m_pWing  = NULL;
 	dlg.InitDialog();
 	dlg.move(pos().x()+25, pos().y()+25);
-	dlg.exec();
+	if(dlg.exec()==QDialog::Accepted) m_bChanged=true;
 	ComputeInertia();
 }

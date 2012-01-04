@@ -21,7 +21,6 @@
 *****************************************************************************/
 
 #include <QFileOpenEvent>
-#include <QtGui/QApplication>
 #include <QSplashScreen>
 #include <QMessageBox>
 #include "XFLR5Application.h"

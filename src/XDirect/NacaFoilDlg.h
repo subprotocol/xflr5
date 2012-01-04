@@ -23,7 +23,7 @@
 #define NACAFOILDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QLabel>
 #include "../Objects/Foil.h"
 #include "../Misc/FloatEdit.h"
 

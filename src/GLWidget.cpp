@@ -24,7 +24,6 @@
 #define GLWINGVIEW  7
 
 
-#include <QtGui>
 #include <QtOpenGL>
 #include "MainFrame.h"
 #include "Miarex/Miarex.h" 

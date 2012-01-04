@@ -19,7 +19,9 @@
 
 *****************************************************************************/
 
-#include <QtGui>
+#include <QMessageBox>
+
+
 #include "TEGapDlg.h"
 #include "XFoil.h"
 #include "XDirect.h"

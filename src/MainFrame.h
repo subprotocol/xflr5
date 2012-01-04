@@ -32,7 +32,7 @@
 #include <QLabel>
 #include <QPointer>
 #include <QTranslator>
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include "GLWidget.h"
 #include <QList>
 #include "TwoDWidget.h"

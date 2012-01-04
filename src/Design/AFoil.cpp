@@ -18,8 +18,14 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
- 
-#include <QtGui>
+
+#include <QAction>
+#include <QMenu>
+#include <QStatusBar>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDesktopWidget>
+#include <QHeaderView>
 
 #include "../Globals.h"
 #include "../MainFrame.h"

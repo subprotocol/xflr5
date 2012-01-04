@@ -21,8 +21,10 @@
 
 #include <QGroupBox>
 #include <QGridLayout>
-#include <QtGui>
- 
+#include <QAction>
+#include <QMessageBox>
+#include <QStatusBar>
+
 #include "XInverse.h" 
 #include "InverseOptionsDlg.h"
 #include "FoilSelectionDlg.h"

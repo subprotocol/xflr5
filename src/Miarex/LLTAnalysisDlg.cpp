@@ -19,8 +19,14 @@
 
 *****************************************************************************/
 
-#include <QtGui>
 #include <math.h>
+#include <QApplication>
+#include <QDir>
+#include <QDateTime>
+#include <QDesktopWidget>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+
 #include "LLTAnalysisDlg.h"
 #include "Miarex.h"
 #include "../MainFrame.h"

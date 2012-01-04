@@ -19,10 +19,14 @@
 
 *****************************************************************************/
 
+#include <QMessageBox>
+
 #include "CAddDlg.h"
 #include "XDirect.h"
 #include "../Design/AFoil.h"
 #include "XFoil.h"
+
+
 
 void *CAddDlg::s_pXFoil;
 

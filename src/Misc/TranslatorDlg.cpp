@@ -28,7 +28,6 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QTranslator>
-#include <QtDebug>
 
 TranslatorDlg::TranslatorDlg(void *pParent)
 {

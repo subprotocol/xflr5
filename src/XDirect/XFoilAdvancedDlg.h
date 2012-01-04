@@ -25,7 +25,10 @@
 #define XFOILADVANCEDDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QCheckBox>
+#include <QHBoxLayout>
+#include <QPushButton>
+
 
 #include "../Misc/FloatEdit.h"
 

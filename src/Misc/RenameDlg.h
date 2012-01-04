@@ -24,7 +24,13 @@
 #define RENAMEDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QKeyEvent>
+#include <QHBoxLayout>
+#include <QListWidget>
 
 class RenameDlg : public QDialog
 {

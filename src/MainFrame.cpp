@@ -53,7 +53,7 @@
 #include "XInverse/XInverse.h"
 
 #include <QDesktopWidget>
-
+#include <QtGui>
 
 #ifdef Q_WS_MAC
 	#include <CoreFoundation/CoreFoundation.h>
@@ -66,7 +66,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = QString::fromLatin1("XFLR5 v6.06 beta");
+	m_VersionName = QString::fromLatin1("XFLR5 v6.06");
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time

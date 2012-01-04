@@ -23,7 +23,10 @@
 #define CADDDLG_H
 
 #include <QDialog>
-#include <QtGui>
+#include <QLabel>
+#include <QRadioButton>
+
+
 #include "../Objects/Foil.h"
 #include "../Misc/FloatEdit.h"
 

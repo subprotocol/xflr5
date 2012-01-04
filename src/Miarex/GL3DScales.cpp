@@ -25,6 +25,8 @@
 #include "GL3DScales.h"
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QDockWidget>
+
 
 GL3DScales::GL3DScales(QWidget *parent)
 {
