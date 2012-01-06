@@ -537,8 +537,8 @@ void StabViewDlg::SetupLayout()
 	szPolicyMinimum.setHorizontalPolicy(QSizePolicy::Minimum);
 	szPolicyMinimum.setVerticalPolicy(QSizePolicy::Minimum);
 	QSizePolicy szPolicyMaximum;
-	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Expanding);
-	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Expanding);
+	szPolicyMaximum.setHorizontalPolicy(QSizePolicy::Maximum);
+	szPolicyMaximum.setVerticalPolicy(QSizePolicy::Maximum);
 	setSizePolicy(szPolicyMaximum);
 
 	QFont SymbolFont("Symbol");
