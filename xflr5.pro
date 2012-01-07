@@ -237,8 +237,8 @@ unix {
     DATADIR = $$PREFIX/share
     
     # MAKE INSTALL
-    INSTALLS += target
-    target.path = $$BINDIR
+	INSTALLS += target
+	target.path = $$BINDIR
 }
 
 macx { 

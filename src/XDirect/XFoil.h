@@ -2,7 +2,7 @@
 
     XFoil Class
 	Copyright (C) 2000 Mark Drela 
-	Copyright (C) 2003 Andre Deperrois xflr5@yahoo.com
+	Copyright (C) 2003 Andre Deperrois adeperrois@xflr5.com
 	
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
