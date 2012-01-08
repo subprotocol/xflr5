@@ -741,7 +741,7 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 
 	AddString(tr("      Calculating aerodynamic coefficients in the far field plane")+"\n");
 
-	for(i=0; i<4; i++)
+	for(i=0; i<MAXWINGS; i++)
 	{
 		if(m_pWingList[i]) ThinSize += (double)m_pWingList[i]->m_MatSize;
 	}
@@ -884,14 +884,14 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	//scale the strip force and downwash fields
 	for (q=0; q<nval;q++)
 	{
-		for(i=0; i<4; i++)
+		for(i=0; i<MAXWINGS; i++)
 		{
 			if(m_pWingList[i])
 			{
 				for(int m=0; m<m_pWingList[i]->m_NStation; m++)
 				{
-					m_F[ m+ q*4*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
-					m_Vd[m+ q*4*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					m_F[ m+ q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					m_Vd[m+ q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
 				}
 			}
 		}
@@ -986,20 +986,20 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		pos = 0;
 
-		for(int iw=0; iw<4; iw++)
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
 			if(m_pWingList[iw])
 			{
 				AddString(tr("         Calculating wing...") + m_pWingList[iw]->m_WingName+"\n");
 				//restore the saved FF results
-				Force += m_WingForce[qrhs*4+iw];
-				IDrag += m_WingIDrag[qrhs*4+iw];
+				Force += m_WingForce[qrhs*MAXWINGS+iw];
+				IDrag += m_WingIDrag[qrhs*MAXWINGS+iw];
 
-				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
-				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*4*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
 
 				//Get viscous interpolations
 				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, m_pWPolar, WingVDrag, m_pWPolar->m_bViscous, OutString);
