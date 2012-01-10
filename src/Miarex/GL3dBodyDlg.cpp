@@ -18,7 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-  
+
 #include "../MainFrame.h"
 #include "../GLWidget.h"
 #include "../Globals.h"
@@ -4320,8 +4320,8 @@ void GL3dBodyDlg::SetBodyScale()
 	                       (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
 					   0.0);
 
-	CFrame::s_rViewRect = m_FrameRect;
-	CBody::s_rViewRect  = m_BodyLineRect;
+//	CFrame::s_rViewRect = m_FrameRect;
+//	CBody::s_rViewRect  = m_BodyLineRect;
 	m_BodyRefScale  = m_BodyScale;
 	m_FrameRefScale = m_FrameScale;
 }
@@ -4343,6 +4343,7 @@ void GL3dBodyDlg::SetFrame(int iFrame)
 void GL3dBodyDlg::SetPicture()
 {
 	m_pBody->Duplicate(m_UndoPic+m_StackPos);
+	m_pBody->SetKnots();
 	FillFrameDataTable();
 	m_pFrame = m_pBody->m_Frame + m_pBody->m_iActiveFrame;
 	FillPointDataTable();

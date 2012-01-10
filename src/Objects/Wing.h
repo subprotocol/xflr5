@@ -25,7 +25,7 @@
 #include "WPolar.h"
 #include "Surface.h"
 #include "Panel.h"
-
+#include <QFile>
 
 class CWing
 {

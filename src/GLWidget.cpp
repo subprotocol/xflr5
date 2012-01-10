@@ -287,7 +287,7 @@ void GLWidget::resizeGL(int width, int height)
 //		GL3dWingDlg *pDlg = (GL3dWingDlg*)m_pParent;
 //		pDlg->m_3DWingRect = m_rCltRect;
 	}
-	if(m_iView == GLBODYVIEW)
+	else if(m_iView == GLBODYVIEW)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->m_bIs3DScaleSet = false;

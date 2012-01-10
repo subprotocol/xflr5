@@ -26,6 +26,9 @@
 #include "Frame.h"
 #include "../Params.h"
 
+#include <QTextStream>
+#include <QColor>
+
 class CBody
 {
 public:
@@ -130,7 +133,6 @@ public:
 	static double s_xKnots[MAXBODYFRAMES*2];
 	static double s_hKnots[MAXSIDELINES*2];
 	static double s_XPanelPos[300];
-	static	QRect s_rViewRect;
 
 };
 #endif

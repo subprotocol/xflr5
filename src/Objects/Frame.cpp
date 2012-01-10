@@ -26,7 +26,6 @@
 #include <math.h>
 
 // CFrame
-QRect CFrame::s_rViewRect;
 int CFrame::s_iSelect;
 
 CFrame::CFrame()

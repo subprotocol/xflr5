@@ -22,8 +22,11 @@
 #ifndef CFRAME_H
 #define CFRAME_H
 
-#include "Spline.h"
+//#include "Spline.h"
+#include "../Params.h"
 #include "CRectangle.h"
+#include <QDataStream>
+#include <QRect>
 
 class CFrame : public QObject
 {
@@ -41,9 +44,8 @@ public:
 	static int s_iSelect;
 	int m_NPoints;			// the number of points defining the frame
 	CVector m_Point[MAXSIDELINES];	// the point's positions
-	CSpline m_Spline;
+//	CSpline m_Spline;
 
-	static QRect s_rViewRect;
 };
 
 

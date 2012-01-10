@@ -33,7 +33,6 @@ void *CBody::s_pMainFrame;
 double CBody::s_xKnots[MAXBODYFRAMES*2];
 double CBody::s_hKnots[MAXSIDELINES*2];
 double CBody::s_XPanelPos[300];
-QRect CBody::s_rViewRect;
 
 
 
@@ -491,7 +490,7 @@ void CBody::Duplicate(CBody *pBody)
 		m_hPanels[i] = pBody->m_hPanels[i];
 	}
 
-	SetKnots();
+//	SetKnots();
 }
 
 
