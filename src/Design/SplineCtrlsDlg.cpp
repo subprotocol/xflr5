@@ -18,6 +18,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
+
 #include "SplineCtrlsDlg.h"
 #include <QGridLayout>
 #include <QGroupBox>
@@ -221,8 +222,6 @@ void SplineCtrlsDlg::SetuLayout()
 	connect(m_pctrlDegIntrados, SIGNAL(activated(int)), this, SLOT(OnSelChangeDegree()));
 	connect(m_pctrlOutExtrados, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
 	connect(m_pctrlOutIntrados, SIGNAL(editingFinished()), this, SLOT(OnEditingFinished()));
-	connect(m_pUpperFloatDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnUpperCellChanged(QWidget *)));
-	connect(m_pLowerFloatDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnLowerCellChanged(QWidget *)));
 }
 
 

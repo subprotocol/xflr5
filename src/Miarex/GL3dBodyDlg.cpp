@@ -38,6 +38,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <math.h>
+#include <QtDebug>
 
 //2D
 #define BODYAXIALLINES      1304
@@ -144,9 +145,8 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_ArcBall.m_pTransy  = &m_glViewportTrans.y;
 	m_ArcBall.m_pRect    = &m_pglWidget->m_rCltRect;
 
-
-	m_pInsertPoint      = new QAction(tr("Insert"), this);
-	m_pRemovePoint      = new QAction(tr("Remove"), this);
+	m_pInsertPoint      = new QAction(tr("Insert") + QString("\tShift+Click"), this);
+	m_pRemovePoint      = new QAction(tr("Remove") + QString("\tCtrl+Click"), this);
 	m_pScaleBody        = new QAction(tr("Scale"), this);
 	m_pGrid             = new QAction(tr("Grid Setup"), this);
 	m_pResetScales      = new QAction(tr("Reset Scales")+("\t(R)"), this);
@@ -2830,7 +2830,10 @@ void GL3dBodyDlg::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_R:
 		{
-			OnResetScales();
+			if(m_FrameRect.contains(m_LastPoint))          SetFrameScale();
+			else if(m_BodyLineRect.contains(m_LastPoint))  SetBodyLineScale();
+			else                                           SetBodyScale();
+			UpdateView();
 			break;
 		}
 		case Qt::Key_Y:
@@ -3100,7 +3103,9 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 
 	CVector Real;
 	bool bCtrl = false;
+	bool bShift = false;
 	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+	if(event->modifiers() & Qt::ShiftModifier) bShift =true;
 
 	m_pglWidget->ClientToGL(point, Real);
 
@@ -3127,6 +3132,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 	}
 	else if (event->buttons() & Qt::LeftButton)
 	{
+		m_ptPopUp = event->pos();
 		m_bTrans=true;
 		if(m_pBody && m_BodyRect.contains(point))
 		{
@@ -3144,13 +3150,14 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			}
 			UpdateView();
 		}
+		else if(bShift)  Insert(Real);
+		else if(bCtrl)   Remove(Real);
 		else if(m_pBody && m_BodyLineRect.contains(point))
 		{
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
 			iF = m_pBody->IsFramePos(Real, m_BodyScale);
-
 			if(iF >=0)
 			{
 				TakePicture();
@@ -3422,7 +3429,6 @@ void GL3dBodyDlg::OnImportBodyDef()
 	{
 		m_pBody = pMiarex->AddBody(pNewBody);
 		SetBody(m_pBody);
-		SetBodyScale();
 	}
 }
 
@@ -3503,17 +3509,21 @@ void GL3dBodyDlg::OnInertia()
 
 void GL3dBodyDlg::OnInsert()
 {
+	Insert(m_RealPopUp);
+}
+
+void GL3dBodyDlg::Insert(CVector Pt)
+{
 	CVector Real;
 	m_bChanged = true;
 	int FrameSel = 0;
-
 	if(m_BodyLineRect.contains(m_ptPopUp))
 	{
 		TakePicture();
 		StorePicture();
 
-		Real.x = (m_RealPopUp.x - m_BodyScaledOffset.x)/m_BodyScale;
-		Real.z = (m_RealPopUp.y - m_BodyScaledOffset.y)/m_BodyScale;
+		Real.x = (Pt.x - m_BodyScaledOffset.x)/m_BodyScale;
+		Real.z = (Pt.y - m_BodyScaledOffset.y)/m_BodyScale;
 		Real.y = 0.0;
 
 		if(m_pFrame)
@@ -3534,10 +3544,10 @@ void GL3dBodyDlg::OnInsert()
 		TakePicture();
 		StorePicture();
 
-		Real.x = (m_RealPopUp.x - m_FrameScaledOffset.x)/m_FrameScale;
-		Real.y = (m_RealPopUp.y - m_FrameScaledOffset.y)/m_FrameScale;
+		Real.x = (Pt.x - m_FrameScaledOffset.x)/m_FrameScale;
+		Real.y = (Pt.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
-
+		qDebug()<<"OnIsert";
 		m_pBody->InsertPoint(Real);
 		m_bResetglBody   = true;
 		m_bResetglBody2D = true;
@@ -3682,6 +3692,12 @@ void GL3dBodyDlg::OnUndo()
 
 void GL3dBodyDlg::OnRemove()
 {
+	Remove(m_RealPopUp);
+}
+
+
+void GL3dBodyDlg::Remove(CVector Pt)
+{
 	int i,n;
 	CVector Real;
 
@@ -3692,8 +3708,8 @@ void GL3dBodyDlg::OnRemove()
 		TakePicture();
 		StorePicture();
 
-		Real.x =  (m_RealPopUp.x - m_BodyScaledOffset.x)/m_BodyScale;
-		Real.y =  (m_RealPopUp.y - m_BodyScaledOffset.y)/m_BodyScale;
+		Real.x =  (Pt.x - m_BodyScaledOffset.x)/m_BodyScale;
+		Real.y =  (Pt.y - m_BodyScaledOffset.y)/m_BodyScale;
 		Real.z = 0.0;
 		n =  m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 		if (n>=0)
@@ -3712,8 +3728,8 @@ void GL3dBodyDlg::OnRemove()
 		TakePicture();
 		StorePicture();
 
-		Real.x =  (m_RealPopUp.x - m_FrameScaledOffset.x)/m_FrameScale;
-		Real.y =  (m_RealPopUp.y - m_FrameScaledOffset.y)/m_FrameScale;
+		Real.x =  (Pt.x - m_FrameScaledOffset.x)/m_FrameScale;
+		Real.y =  (Pt.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
 
 		n =   m_pFrame->IsPoint(Real, m_BodyScale/m_BodyRefScale);
@@ -3740,7 +3756,10 @@ void GL3dBodyDlg::OnResetScales()
 {
 	m_bIs3DScaleSet  = false;
 	m_bResetglBody2D = true;
-	SetBodyScale();
+	if(m_FrameRect.contains(m_ptPopUp))         SetFrameScale();
+	else if(m_BodyLineRect.contains(m_ptPopUp)) SetBodyLineScale();
+	else                                        SetBodyScale();
+
 	UpdateView();
 }
 
@@ -3967,6 +3986,7 @@ void GL3dBodyDlg::resizeEvent(QResizeEvent *event)
 	m_bIs3DScaleSet = false;
 	m_bResetglBody2D = true;
 //	SetBodyScale();
+//	SetRectangles();
 
 	ResizeTables();
 }
@@ -4228,43 +4248,64 @@ void GL3dBodyDlg::SetBody(CBody *pBody)
 	FillPointDataTable();
 }
 
+void GL3dBodyDlg::SetBodyLineScale()
+{
+	if(m_pBody) m_BodyScale = (m_VerticalSplit-m_pglWidget->m_GLViewRect.left)*.7/m_pBody->Length();
+	else        m_BodyScale  = 1.0;
+
+	m_BodyOffset.Set((m_pglWidget->m_GLViewRect.left+m_VerticalSplit)/2.0-m_pBody->Length()/2.0-m_pBody->LeadingPoint().x,
+				  (m_pglWidget->m_GLViewRect.top+m_HorizontalSplit)/2.0,
+				  0.0);
+
+	m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
+						   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+					   0.0);
+	m_BodyRefScale  = m_BodyScale;
+	m_BodyScalingCenter.x  = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.left)   /2.0;
+	m_BodyScalingCenter.y  = (m_pglWidget->m_GLViewRect.top  + m_HorizontalSplit)                /2.0;
+}
 
 
-void GL3dBodyDlg::SetBodyScale()
+void GL3dBodyDlg::SetFrameScale()
 {
 	int k;
 	double height;
-	QPoint P1, P2;
+	if(m_pBody)
+	{
+		height = 0.0;
+		for(k=0; k<m_pBody->m_NStations; k++)
+		{
+			height = qMax(height,fabs( m_pBody->m_Frame[k].m_Point[0].z - m_pBody->m_Frame[k].m_Point[m_pBody->m_Frame[k].m_NPoints-1].z));
+		}
+		m_FrameScale = (1.0-0.5)/height;
+	}
+	else m_FrameScale = 1.0;
+
+	m_FrameOffset.Set((m_VerticalSplit + m_pglWidget->m_GLViewRect.right)/2.0,
+				   (m_pglWidget->m_GLViewRect.top +m_pglWidget->m_GLViewRect.bottom)/2.0,
+				   0.0);
+
+
+	m_FrameScaledOffset.Set((1.0 - m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
+							(1.0 - m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
+						0.0);
+
+	m_FrameRefScale = m_FrameScale;
+	m_FrameScalingCenter.x = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.right)  /2.0;
+	m_FrameScalingCenter.y = (m_pglWidget->m_GLViewRect.top  + m_pglWidget->m_GLViewRect.bottom) /2.0;
+
+
+}
+
+void GL3dBodyDlg::SetRectangles()
+{
 	CVector V1, V2;
-
-	if(m_bIs3DScaleSet /*&& !m_bAutoScales*/) return;
-
-	m_glViewportTrans.x = 0.0;
-	m_glViewportTrans.y = 0.0;
-	m_glViewportTrans.z = 0.0;
-	m_bIs3DScaleSet = true;
+	QPoint P1, P2;
 
 	m_glTop = m_pglWidget->m_GLViewRect.top;
 
 	m_VerticalSplit     = m_pglWidget->m_GLViewRect.width()  /6.0;
 	m_HorizontalSplit   = m_pglWidget->m_GLViewRect.height() /6.0;
-
-	m_UFOOffset.x = (GLfloat)(m_pglWidget->m_GLViewRect.left + m_VerticalSplit  )/2.0;
-	m_UFOOffset.y = (GLfloat)(m_pglWidget->m_GLViewRect.bottom + m_HorizontalSplit)/2.0;
-  
-	m_glScaled = (GLfloat)(3./4.* (m_VerticalSplit+1.0) / m_pBody->Length());
-
-	m_ArcBall.GetMatrix();
-	CVector eye(0.0,0.0,1.0);
-	CVector up(0.0,1.0,0.0);
-	m_ArcBall.SetZoom(0.3,eye,up);
-
-	Set3DRotationCenter();
-
-	m_BodyScalingCenter.x  = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.left)   /2.0;
-	m_BodyScalingCenter.y  = (m_pglWidget->m_GLViewRect.top  + m_HorizontalSplit)                /2.0;
-	m_FrameScalingCenter.x = (m_VerticalSplit                + m_pglWidget->m_GLViewRect.right)  /2.0;
-	m_FrameScalingCenter.y = (m_pglWidget->m_GLViewRect.top  + m_pglWidget->m_GLViewRect.bottom) /2.0;
 
 	V1.Set(m_pglWidget->m_GLViewRect.left, m_pglWidget->m_GLViewRect.top, 0.0);
 	V2.Set(m_VerticalSplit,                m_HorizontalSplit,             0.0);
@@ -4286,45 +4327,40 @@ void GL3dBodyDlg::SetBodyScale()
 	m_pglWidget->GLToClient(V2, P2);
 	m_BodyRect.setTopLeft(P1);
 	m_BodyRect.setBottomRight(P2);
-
-	if(m_pBody)
-	{
-		m_BodyScale = (m_VerticalSplit-m_pglWidget->m_GLViewRect.left)*.7/m_pBody->Length();
-
-		height = 0.0;
-		for(k=0; k<m_pBody->m_NStations; k++)
-		{
-			height = qMax(height,fabs( m_pBody->m_Frame[k].m_Point[0].z - m_pBody->m_Frame[k].m_Point[m_pBody->m_Frame[k].m_NPoints-1].z));
-		}
-		m_FrameScale = (1.0-0.5)/height;
-	}
-	else
-	{
-		m_BodyScale  = 1.0;
-		m_FrameScale = 1.0;
-	}
-
-	m_FrameOffset.Set((m_VerticalSplit + m_pglWidget->m_GLViewRect.right)/2.0,
-				   (m_pglWidget->m_GLViewRect.top +m_pglWidget->m_GLViewRect.bottom)/2.0,
-				   0.0);
-
-	m_BodyOffset.Set((m_pglWidget->m_GLViewRect.left+m_VerticalSplit)/2.0-m_pBody->Length()/2.0-m_pBody->LeadingPoint().x,
-				  (m_pglWidget->m_GLViewRect.top+m_HorizontalSplit)/2.0,
-				  0.0);
-
-	m_FrameScaledOffset.Set((1.0 - m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
-	                        (1.0 - m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
-					    0.0);
-
-	m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
-	                       (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-					   0.0);
-
-//	CFrame::s_rViewRect = m_FrameRect;
-//	CBody::s_rViewRect  = m_BodyLineRect;
-	m_BodyRefScale  = m_BodyScale;
-	m_FrameRefScale = m_FrameScale;
 }
+
+
+void GL3dBodyDlg::SetBodyScale()
+{
+//	if(m_bIs3DScaleSet /*&& !m_bAutoScales*/) return;
+
+	m_glViewportTrans.x = 0.0;
+	m_glViewportTrans.y = 0.0;
+	m_glViewportTrans.z = 0.0;
+	m_bIs3DScaleSet = true;
+
+
+	m_UFOOffset.x = (GLfloat)(m_pglWidget->m_GLViewRect.left + m_VerticalSplit  )/2.0;
+	m_UFOOffset.y = (GLfloat)(m_pglWidget->m_GLViewRect.bottom + m_HorizontalSplit)/2.0;
+  
+	m_glScaled = (GLfloat)(3./4.* (m_VerticalSplit+1.0) / m_pBody->Length());
+
+	m_ArcBall.GetMatrix();
+	CVector eye(0.0,0.0,1.0);
+	CVector up(0.0,1.0,0.0);
+	m_ArcBall.SetZoom(0.3,eye,up);
+
+	Set3DRotationCenter();
+}
+
+
+void GL3dBodyDlg::SetScales(CVector Real)
+{
+	SetBodyScale();
+	SetFrameScale();
+	SetBodyLineScale();
+}
+
 
 
 void GL3dBodyDlg::SetFrame(int iFrame)

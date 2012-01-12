@@ -132,7 +132,8 @@ private slots:
 	void OnColumnWidths();
 	void OnLoadBackImage();
 	void OnClearBackImage();
-
+	void OnInsertCtrlPt();
+	void OnRemoveCtrlPt();
 
 private:
 

@@ -291,7 +291,10 @@ void GLWidget::resizeGL(int width, int height)
 	{
 		GL3dBodyDlg *pDlg = (GL3dBodyDlg*)m_pParent;
 		pDlg->m_bIs3DScaleSet = false;
+		pDlg->SetRectangles();
 		pDlg->SetBodyScale();
+		pDlg->SetBodyLineScale();
+		pDlg->SetFrameScale();
 	}
 }
 

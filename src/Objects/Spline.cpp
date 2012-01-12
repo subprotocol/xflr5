@@ -403,15 +403,18 @@ double CSpline::SplineBlend(int const &i,  int const &p, double const &t)
 	} 
 	else
 	{
-                if (fabs(m_knots[i+p] - m_knots[i])<pres && fabs(m_knots[i+p+1] - m_knots[i+1])<pres)
+		if (fabs(m_knots[i+p] - m_knots[i])<pres && fabs(m_knots[i+p+1] - m_knots[i+1])<pres)
 			return  0.0;
-                else if (fabs(m_knots[i+p] - m_knots[i])<pres)
+
+		else if (fabs(m_knots[i+p] - m_knots[i])<pres)
 			return  (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1, p-1, t);
-                else if (fabs(m_knots[i+p+1]-m_knots[i+1])<pres)
+
+		else if (fabs(m_knots[i+p+1]-m_knots[i+1])<pres)
 			return  (t - m_knots[i])   / (m_knots[i+p] - m_knots[i])   * SplineBlend(i,   p-1, t);
-		else 
+
+		else
 			return  (t - m_knots[i])   / (m_knots[i+p]-m_knots[i])	   * SplineBlend(i,   p-1, t) + 
-			        (m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1 ,p-1, t);
+					(m_knots[i+p+1]-t) / (m_knots[i+p+1]-m_knots[i+1]) * SplineBlend(i+1 ,p-1, t);
 	}
 }
 

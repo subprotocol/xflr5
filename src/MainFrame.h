@@ -291,6 +291,7 @@ private:
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
 	QAction *SplinesAct, *SplinedPointsAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
+	QAction *InsertSplinePt, *RemoveSplinePt;
 	QAction *AFoilTableColumns, *AFoilTableColumnWidths;
 	QAction *AFoilLoadImage, *AFoilClearImage;
 	QToolButton *m_pctrlZoomY, *m_pctrlZoomIn;

@@ -140,7 +140,11 @@ private:
 	void GLDrawBodyLegend();
 	void GLDrawBodyLineScale();
 	void GLDrawBodyFrameScale();
+	void SetScales(CVector Real);
+	void SetRectangles();
 	void SetBodyScale();
+	void SetBodyLineScale();
+	void SetFrameScale();
 	void Set3DRotationCenter();
 	void Set3DRotationCenter(QPoint point);
 	void SetBody(CBody *pBody);
@@ -153,6 +157,9 @@ private:
 	void SetPicture();
 	void StorePicture();
 	void TakePicture();
+
+	void Insert(CVector Pt);
+	void Remove(CVector Pt);
 
 
 private:

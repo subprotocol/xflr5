@@ -602,6 +602,13 @@ void MainFrame::CreateAFoilActions()
 	newSplinesAct->setStatusTip(tr("Reset the splines"));
 	connect(newSplinesAct, SIGNAL(triggered()), pAFoil, SLOT(OnNewSplines()));
 
+	InsertSplinePt = new QAction(tr("Insert Control Point")+"\tShift+Click", this);
+	connect(InsertSplinePt, SIGNAL(triggered()), pAFoil, SLOT(OnInsertCtrlPt()));
+
+	RemoveSplinePt = new QAction(tr("Remove Control Point")+"\tCtrl+Click", this);
+	connect(RemoveSplinePt, SIGNAL(triggered()), pAFoil, SLOT(OnRemoveCtrlPt()));
+
+
 	zoomInAct= new QAction(QIcon(":/images/OnZoomIn.png"), tr("Zoom in"), this);
 	zoomInAct->setStatusTip(tr("Zoom the view by drawing a rectangle in the client area"));
 	connect(zoomInAct, SIGNAL(triggered()), pAFoil, SLOT(OnZoomIn()));
@@ -758,8 +765,8 @@ void MainFrame::CreateAFoilMenus()
 
 
 	AFoilSplineMenu = menuBar()->addMenu(tr("&Splines"));
-	AFoilSplineMenu->addAction(SplinesAct);
-	AFoilSplineMenu->addAction(SplinedPointsAct);
+	AFoilSplineMenu->addAction(InsertSplinePt);
+	AFoilSplineMenu->addAction(RemoveSplinePt);
 	AFoilSplineMenu->addSeparator();
 	AFoilSplineMenu->addAction(UndoAFoilAct);
 	AFoilSplineMenu->addAction(RedoAFoilAct);
@@ -2361,10 +2368,10 @@ void MainFrame::CreateXInverseActions()
 	InverseResetScale->setStatusTip(tr("Resets the scale to fit the screen size"));
 	connect(InverseResetScale, SIGNAL(triggered()), pXInverse, SLOT(OnResetFoilScale()));
 
-	InverseInsertCtrlPt = new QAction(tr("Insert Control Point"), this);
+	InverseInsertCtrlPt = new QAction(tr("Insert Control Point")+"\tShift+Click", this);
 	connect(InverseInsertCtrlPt, SIGNAL(triggered()), pXInverse, SLOT(OnInsertCtrlPt()));
 
-	InverseRemoveCtrlPt = new QAction(tr("Remove Control Point"), this);
+	InverseRemoveCtrlPt = new QAction(tr("Remove Control Point")+"\tCtrl+Click", this);
 	connect(InverseRemoveCtrlPt, SIGNAL(triggered()), pXInverse, SLOT(OnRemoveCtrlPt()));
 
 	InvQInitial = new QAction(tr("Show Q-Initial"), this);

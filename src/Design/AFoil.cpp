@@ -150,6 +150,10 @@ void QAFoil::CheckButtons()
 	pMainFrame->AFoilSetTEGap->setEnabled(g_pCurFoil);
 
 	pMainFrame->m_pShowLegend->setChecked(m_bShowLegend);
+
+	pMainFrame->AFoilSplineMenu->setEnabled(!g_pCurFoil);
+	pMainFrame->InsertSplinePt->setEnabled(!g_pCurFoil);
+	pMainFrame->RemoveSplinePt->setEnabled(!g_pCurFoil);
 	pMainFrame->SplinesAct->setChecked(m_bSF);
 	pMainFrame->SplinedPointsAct->setChecked(!m_bSF);
 }
@@ -168,10 +172,9 @@ void QAFoil::DrawScale(QPainter &painter, double scalex, double scaley, QPoint O
 	int dD = fm.height();
 	int dW = fm.width("0.1");
 
-	int TickSize, xTextOff, offy;
+	int TickSize, offy;
 
 	TickSize = (int)(dD/2);
-	xTextOff = 14;
 	offy = m_ptOffset.y();
 
 	QPen TextPen(pMainFrame->m_TextColor);
@@ -1036,50 +1039,21 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 	}
 	else if(!m_bZoomPlus && (event->buttons() & Qt::LeftButton))
 	{
-		if(m_bSF)
+		if (event->modifiers() & Qt::ShiftModifier)
 		{
-			if (event->modifiers() & Qt::ShiftModifier)
+			//shift --> inserts a point
+			OnInsertCtrlPt();
+		}
+		else if (event->modifiers() & Qt::ControlModifier)
+		{
+			//Ctrl --> removes the point
+			OnRemoveCtrlPt();
+		}
+		else
+		{
+			//Selects the point
+			if(m_bSF)
 			{
-				//shift --> removes the point
-				TakePicture();
-				StorePicture();
-				int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				if (n>=0) 
-				{
-					m_pSF->m_Extrados.RemovePoint(n);
-					m_pSF->Update(true);
-				}
-				else 
-				{
-					int n=m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-					if (n>=0)
-					{
-						m_pSF->m_Intrados.RemovePoint(n);
-						m_pSF->Update(false);
-					}
-				}
-			}
-			else if (event->modifiers() & Qt::ControlModifier) 
-			{
-				//Ctrl --> inserts a point
-				TakePicture();
-				StorePicture();
-
-				if(Real.y>=0) 
-				{
-					m_pSF->m_Extrados.InsertPoint(Real.x,Real.y);
-					m_pSF->Update(true);
-				}
-				else 
-				{
-					m_pSF->m_Intrados.InsertPoint(Real.x,Real.y);
-					m_pSF->Update(false);
-				}
-			}
-			else
-			{ 
-				//Selects the point
-			
 				m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 				m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
@@ -1093,47 +1067,8 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 					m_bTrans = true;
 				}
 			}
-		}
-		else
-		{
-			if (event->modifiers() & Qt::ShiftModifier) 
-			{
-				//shift --> removes the point
-				TakePicture();
-				StorePicture();
-				int n =  m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				if (n>=0) 
-				{
-					m_pPF->m_Extrados.RemovePoint(n);
-					m_pPF->Update();
-				}
-				else 
-				{
-					int n=m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-					if (n>=0) m_pPF->m_Intrados.RemovePoint(n);
-					m_pPF->Update();
-				}
-			}
-			else if (event->modifiers() & Qt::ControlModifier) 
-			{
-				//Ctrl --> inserts a point
-				TakePicture();
-				StorePicture();
-				if(Real.y>=0) 
-				{
-					m_pPF->m_Extrados.InsertPoint(Real.x, Real.y);
-					m_pPF->Update();
-				}
-				else 
-				{
-					m_pPF->m_Intrados.InsertPoint(Real.x, Real.y);
-					m_pPF->Update();
-				}
-				
-			}
 			else
-			{ 
-				//Selects the point
+			{
 				m_pPF->m_Extrados.m_iSelect = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
 				int n = m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) ;
 				if(n==-1) m_pPF->m_Extrados.m_iSelect = n;
@@ -1151,6 +1086,7 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 				}
 			}
 		}
+
 	}
 	UpdateView();	
 
@@ -2327,8 +2263,18 @@ void QAFoil::OnSplineControls()
 		TakePicture();
 		StorePicture();
 
-		if(m_bSF) m_pSF->Copy(&dlg.m_SF);
-		else      m_pPF->Copy(&dlg.m_PF);
+		if(m_bSF)
+		{
+			m_pSF->Copy(&dlg.m_SF);
+			m_pSF->Update(true);
+			m_pSF->Update(false);
+		}
+		else
+		{
+			m_pPF->Copy(&dlg.m_PF);
+			m_pSF->Update(true);
+			m_pSF->Update(false);
+		}
 	}
 }
 
@@ -3311,6 +3257,89 @@ void QAFoil::resizeEvent(QResizeEvent *event)
 
 	m_pctrlFoilTable->setColumnWidth(0, 2*unitwidth);
 	for(int i=1; i<16; i++)	m_pctrlFoilTable->setColumnWidth(i, unitwidth);
+}
+
+
+void QAFoil::OnInsertCtrlPt()
+{
+	//Inserts a point in the spline
+	if(g_pCurFoil) return; // Action can be performed only if the spline foil is selected
+
+	TakePicture();
+	StorePicture();
+	CVector Real = MousetoReal(m_PointDown);
+
+	if(m_bSF)
+	{
+		if(Real.y>=0)
+		{
+			m_pSF->m_Extrados.InsertPoint(Real.x,Real.y);
+			m_pSF->Update(true);
+		}
+		else
+		{
+			m_pSF->m_Intrados.InsertPoint(Real.x,Real.y);
+			m_pSF->Update(false);
+		}
+	}
+	else
+	{
+		if(Real.y>=0)
+		{
+			m_pPF->m_Extrados.InsertPoint(Real.x, Real.y);
+			m_pPF->Update();
+		}
+		else
+		{
+			m_pPF->m_Intrados.InsertPoint(Real.x, Real.y);
+			m_pPF->Update();
+		}
+	}
+}
+
+
+void QAFoil::OnRemoveCtrlPt()
+{
+	//Removes a point in the spline
+	if(g_pCurFoil) return; // Action can be performed only if the spline foil is selected
+	TakePicture();
+	StorePicture();
+
+	CVector Real = MousetoReal(m_PointDown);
+
+	if(m_bSF)
+	{
+		int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+		if (n>=0)
+		{
+			m_pSF->m_Extrados.RemovePoint(n);
+			m_pSF->Update(true);
+		}
+		else
+		{
+			int n=m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>=0)
+			{
+				m_pSF->m_Intrados.RemovePoint(n);
+				m_pSF->Update(false);
+			}
+		}
+	}
+	else
+	{
+		int n =  m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+		if (n>=0)
+		{
+			m_pPF->m_Extrados.RemovePoint(n);
+			m_pPF->Update();
+		}
+		else
+		{
+			int n=m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (n>=0) m_pPF->m_Intrados.RemovePoint(n);
+			m_pPF->Update();
+		}
+	}
 }
 
 
