@@ -18,7 +18,7 @@
 #define GLMIAREXVIEW  3
 #define GLBODYVIEW  5
 #define GLWINGVIEW  7
-#define GLBOATVIEW  13
+
 
 
 //Miarex View parameters
