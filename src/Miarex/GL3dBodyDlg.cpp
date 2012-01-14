@@ -2770,8 +2770,9 @@ void GL3dBodyDlg::InitDialog()
 	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
 	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
 	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
-	m_pPointModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
-	
+	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
+	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+
 /*	int w3 = (int)(m_pctrlFrameTable->width()/3);
 	m_pctrlFrameTable->setColumnWidth(0,w3);
 	m_pctrlFrameTable->setColumnWidth(1,w3);

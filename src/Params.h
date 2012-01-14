@@ -13,13 +13,11 @@
 #define DIRECTDESIGN   2
 #define INVERSEDESIGN  3
 #define MIAREX         4
-#define SAIL7          5
 
 //GLVIEW
 #define GLMIAREXVIEW  3
 #define GLBODYVIEW  5
 #define GLWINGVIEW  7
-#define GLSAIL7VIEW  11
 #define GLBOATVIEW  13
 
 
@@ -32,13 +30,6 @@
 #define STABTIMEVIEW		0
 #define STABPOLARVIEW		1
 #define STAB3DVIEW		    3
-
-//Sail7 View
-#define SAILOPPVIEW          1
-#define SAILPOLARVIEW        2
-#define SAIL3DVIEW           3
-#define MAXSAILS            10
-#define MAXSAILPANELS       30
 
 
 //Polar types

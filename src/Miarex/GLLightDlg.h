@@ -35,7 +35,6 @@ class GLLightDlg : public QDialog
 	Q_OBJECT
 
 	friend class QMiarex;
-	friend class QSail7;
 	friend class GLWidget;
 	friend class GL3dBodyDlg;
 	friend class GL3dWingDlg;
