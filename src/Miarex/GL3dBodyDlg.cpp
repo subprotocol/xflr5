@@ -3548,7 +3548,7 @@ void GL3dBodyDlg::Insert(CVector Pt)
 		Real.x = (Pt.x - m_FrameScaledOffset.x)/m_FrameScale;
 		Real.y = (Pt.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
-		qDebug()<<"OnIsert";
+
 		m_pBody->InsertPoint(Real);
 		m_bResetglBody   = true;
 		m_bResetglBody2D = true;

@@ -20,7 +20,6 @@
 
 *****************************************************************************/
 
-
 #include "XFLR5Application.h"
 #include "MainFrame.h"
 #include <QSplashScreen>
@@ -35,6 +34,5 @@ int main(int argc, char *argv[])
 #endif
 	XFLR5Application app(argc, argv);
 	return app.exec();
-
 }
 

@@ -39,11 +39,6 @@ public:
 	bool SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 private:
-//	CWOpp m_WingWOpp;		// the wing's operating point
-//	CWOpp m_Wing2WOpp;		// the second wing's operating point
-//	CWOpp m_StabWOpp;		// the elevator's operating point
-//	CWOpp m_FinWOpp;		// the fin's operating point
-
 	CWOpp m_PlaneWOpp[MAXWINGS];
 
 	QString m_PlaneName;		// the plane's name to which the POpp belongs
@@ -59,7 +54,7 @@ private:
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
-	bool m_bWing[4];  // main wing, 2nd wing, elevator, fin
+	bool m_bWing[MAXWINGS];  // main wing, 2nd wing, elevator, fin
 //	bool m_bBiplane; 		// if a biplane
 //	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
@@ -72,9 +67,9 @@ private:
 	QColor m_Color;
 
 public:
-	double m_G[VLMMAXMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
-	double m_Sigma[VLMMAXMATSIZE];		// the panel's source strengths
-	double m_Cp[VLMMAXMATSIZE];	// the Cp array
+//	float m_G[VLMMAXMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
+//	float m_Sigma[VLMMAXMATSIZE];		// the panel's source strengths
+//	float m_Cp[VLMMAXMATSIZE];	// the Cp array
 	int m_NPanels;		// the number of VLM or 3D-panels
 };
 #endif

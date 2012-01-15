@@ -437,7 +437,7 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 
 
 
-void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreateCp(void *pQMiarex, CVector *pNode, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 	if(!pWOpp && !pPOpp)
 	{
@@ -448,12 +448,18 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 
 	int p, pp, n, averageInf, averageSup, average100;
-	int nPanels;
 	double color;
 	double lmin, lmax, range;
-	double *tab;
 	double CpInf[2*VLMMAXMATSIZE], CpSup[2*VLMMAXMATSIZE], Cp100[2*VLMMAXMATSIZE];
 	CVector LA,LB,TA,TB;
+	CPanel *pPanel;
+	CWing *pWingList[MAXWINGS];
+	CWOpp *pWOppList[MAXWINGS];
+	for(int ip=0; ip<MAXWINGS; ip++)
+	{
+		pWingList[ip] = pMiarex->m_pWingList[ip];
+		pWOppList[ip] = pMiarex->m_pWOpp[ip];
+	}
 
 	glNewList(PANELCP, GL_COMPILE);
 	{
@@ -462,46 +468,45 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 
-		if(pPOpp)
-		{
-			tab = pPOpp->m_Cp;
-			nPanels = pPOpp->m_NPanels;
-		}
-		else
-		{
-			tab = pWOpp->m_Cp;
-			nPanels = pWOpp->m_NVLMPanels;
-		}
 
 		lmin = 10000.0;
 		lmax = -10000.0;
 		// find min and max Cp for scale set
 		for (n=0; n<pMiarex->m_nNodes; n++)
 		{
-			averageInf = 0; averageSup = 0; average100 = 0;
-			CpInf[n] = 0.0; CpSup[n] = 0.0; Cp100[n] = 0.0;
-			for (pp=0; pp< nPanels; pp++)
+			averageInf = averageSup = average100 = 0;
+			CpInf[n] = CpSup[n] = Cp100[n] = 0.0;
+
+			for(int iw=0; iw<MAXWINGS; iw++)
 			{
-				if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
-					pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
+				if(pWingList[iw])
 				{
-					if(pPanel[pp].m_iPos==1)
+					pPanel = pWingList[iw]->m_pPanel;
+					for (pp=0; pp< pWingList[iw]->m_MatSize; pp++)
 					{
-						CpSup[n] +=tab[pp];
-						averageSup++;
-					}
-					else if(pPanel[pp].m_iPos<=0)
-					{
-						CpInf[n] +=tab[pp];
-						averageInf++;
-					}
-					else if(pPanel[pp].m_iPos==100)
-					{
-						Cp100[n] +=tab[pp];
-						average100++;
+						if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
+							pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
+						{
+							if(pPanel[pp].m_iPos==1)
+							{
+								CpSup[n] += pWOppList[iw]->m_Cp[pp];
+								averageSup++;
+							}
+							else if(pPanel[pp].m_iPos<=0)
+							{
+								CpInf[n] += pWOppList[iw]->m_Cp[pp];
+								averageInf++;
+							}
+							else if(pPanel[pp].m_iPos==100)
+							{
+								Cp100[n] +=pWOppList[iw]->m_Cp[pp];
+								average100++;
+							}
+						}
 					}
 				}
 			}
+
 			if(averageSup>0)
 			{
 				CpSup[n] /= averageSup;
@@ -536,41 +541,47 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 		range = lmax - lmin;
 
 		glLineWidth(1.0);
-		for (p=0; p<pMiarex->m_MatSize; p++)
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			glBegin(GL_QUADS);
+			if(pWingList[iw])
 			{
-				TA.Copy(pNode[pPanel[p].m_iTA]);
-				TB.Copy(pNode[pPanel[p].m_iTB]);
-				LA.Copy(pNode[pPanel[p].m_iLA]);
-				LB.Copy(pNode[pPanel[p].m_iLB]);
+				for (p=0; p<pWingList[iw]->m_MatSize; p++)
+				{
+					glBegin(GL_QUADS);
+					{
+						TA.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iTA]);
+						TB.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iTB]);
+						LA.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iLA]);
+						LB.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iLB]);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(LA.x, LA.y, LA.z);
+						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
+						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
+						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
+						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+						glVertex3d(LA.x, LA.y, LA.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(TA.x, TA.y, TA.z);
+						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
+						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
+						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
+						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+						glVertex3d(TA.x, TA.y, TA.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(TB.x, TB.y, TB.z);
+						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
+						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
+						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
+						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+						glVertex3d(TB.x, TB.y, TB.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
-				else                           color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
-				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-				glVertex3d(LB.x, LB.y, LB.z);
+						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
+						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
+						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
+						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+						glVertex3d(LB.x, LB.y, LB.z);
 
+					}
+					glEnd();
+				}
 			}
-			glEnd();
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
@@ -589,7 +600,7 @@ void GLDrawCpLegend(void *pQMiarex)
 
 	double labellength, ClientToGL;
 
-	double f, fi,dD, ZPos,dz,Right1, Right2;
+	double f, fi,ZPos,dz,Right1;
 	double range, delta;
 
 	QFontMetrics fm(pMainFrame->m_TextFont);
@@ -615,10 +626,10 @@ void GLDrawCpLegend(void *pQMiarex)
 		ClientToGL = 2.0/h;
 	}
 
-	dD      = 12.0/w*2.0;
+//	dD      = 12.0/w*2.0;
 
 	Right1  = .94*XPos;
-	Right2  = .98*XPos;
+//	Right2  = .98*XPos;
 
 	range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
 	delta = range / 20;
@@ -655,69 +666,71 @@ void GLDrawCpLegend(void *pQMiarex)
 
 void GLCreateCpLegendClr(void *pQMiarex)
 {
-        int i;
-        QMiarex *pMiarex = (QMiarex*)pQMiarex;
+	int i;
+	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 
-        double ClientToGL;
+	double ClientToGL;
 
-        double fi,dD, ZPos,dz,Right1, Right2;
-        double color = 0.0;
-        double range, delta;
+	double fi,dD, ZPos,dz,Right1, Right2;
+	double color = 0.0;
+	double range;
 
-        double w = (double)pMiarex->m_r3DCltRect.width();
-        double h = (double)pMiarex->m_r3DCltRect.height();
-        double XPos;
+	double w = (double)pMiarex->m_r3DCltRect.width();
+	double h = (double)pMiarex->m_r3DCltRect.height();
+	double XPos;
 
-        if(w>h)
-        {
-                XPos  = 1.0;
+	if(w>h)
+	{
+		XPos  = 1.0;
 //		ZPos  = h/w * (-1.0 + 2.0/3.0);
-                dz    = h/w*1.0/20.0;
-                ZPos  = h/w - 23.0*dz;
-                ClientToGL = 2.0/w;
-        }
-        else
-        {
-                XPos = w/h;
+		dz    = h/w*1.0/20.0;
+		ZPos  = h/w - 23.0*dz;
+		ClientToGL = 2.0/w;
+	}
+	else
+	{
+		XPos = w/h;
 //		ZPos  = (-1.0 + 2.0/3.0);
-                dz    = 1.0/20.0;
-                ZPos  = 1.0 - 23.0*dz;
-                ClientToGL = 2.0/h;
-        }
+		dz    = 1.0/20.0;
+		ZPos  = 1.0 - 23.0*dz;
+		ClientToGL = 2.0/h;
+	}
 
-        dD      = 12.0/w*2.0;
+	dD      = 12.0/w*2.0;
 
-        Right1  = .94*XPos;
-        Right2  = .98*XPos;
+	Right1  = .94*XPos;
+	Right2  = .98*XPos;
 
-        range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
-        delta = range / 20;
+	range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
 
+	glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
+	{
+		pMiarex->m_GLList++;
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
 
-        glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
-        {
-                pMiarex->m_GLList++;
-                glDisable(GL_LIGHTING);
-                glDisable(GL_LIGHT0);
+//		glPolygonMode(GL_FRONT,GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//		glEnable(GL_POLYGON_OFFSET_FILL);
+//		glPolygonOffset(1.0, 1.0);
 
-                glPolygonMode(GL_FRONT,GL_FILL);
+		glBegin(GL_QUAD_STRIP);
+		{
+			for (i=0; i<=20; i++)
+			{
+				fi = (double)i*dz;
+				color += 0.05;
 
-                glBegin(GL_QUAD_STRIP);
-                {
-                        for (i=0; i<=20; i++)
-                        {
-                                fi = (double)i*dz;
-                                color += 0.05;
-
-                                glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-                                glVertex3d(Right1, ZPos+fi, 0.0);
-                                glVertex3d(Right2, ZPos+fi, 0.0);
-                        }
-                }
-                glEnd();
-        }
-        glEndList();
+				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+				glVertex3d(Right1, ZPos+fi, 0.0);
+				glVertex3d(Right2, ZPos+fi, 0.0);
+			}
+		}
+		glEnd();
+	}
+	glEndList();
 }
+
 
 void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 {
@@ -1702,11 +1715,11 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 }
 
 
-void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==1)
+	if(!pWing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
 		pMiarex->m_GLList++;
@@ -1716,10 +1729,10 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 	double memcoresize = pMiarex->GetCoreSize();
 	pMiarex->SetCoreSize(0.0005); //mm, just for the time needed to build the streamlines
 
-	CWing *pWing;
+//	CWing *pWing;
 
 	ProgressDlg dlg;
-	dlg.setWindowTitle("Streamines calculation");
+	dlg.setWindowTitle("Streamlines calculation");
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);
@@ -1730,7 +1743,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 	bool bFound;
 	int i;
 	int m, p, style, width, iWing;
-	double ds, *Gamma, *Mu, *Sigma;
+//	float Gamma[VLMMAXMATSIZE];
+	float Mu[VLMMAXMATSIZE], Sigma[VLMMAXMATSIZE];
+	double ds;
 	QColor color;
 
 	CVector C, D, D1, VA, VAT, VB, VBT, VT, VInf, TC, TD;
@@ -1738,30 +1753,30 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 	D1.Set(987654321.0, 0.0, 0.0);
 
-	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
 	
+	int pos = 0;
 	if(pMiarex->m_pCurPOpp)
 	{
-		Gamma = pPOpp->m_G;
-		Mu    = pPOpp->m_G;
-		Sigma = pPOpp->m_Sigma;
+		for(int iw=0; iw<MAXWINGS; iw++)
+		{
+			if(pWing[iw])
+			{
+//				memcpy(Gamma+pos, pMiarex->m_pWOpp[iw]->m_G,     pWing[iw]->m_MatSize*sizeof(float));
+				memcpy(Mu+pos,    pMiarex->m_pWOpp[iw]->m_G,     pWing[iw]->m_MatSize*sizeof(float));
+				memcpy(Sigma+pos, pMiarex->m_pWOpp[iw]->m_Sigma, pWing[iw]->m_MatSize*sizeof(float));
+				pos += pWing[iw]->m_MatSize;
+			}
+		}
 	}
 	else if (pWOpp)
 	{
-		Gamma = pWOpp->m_G;
-		Mu    = pWOpp->m_G;
-		Sigma = pWOpp->m_Sigma;
+//		memcpy(Gamma, pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
+		memcpy(Mu,    pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
+		memcpy(Sigma, pWOpp->m_Sigma, pWOpp->m_NVLMPanels*sizeof(float));
 	}
-	else
-	{
-		Gamma = NULL;
-		Mu    = NULL;
-		Sigma = NULL;
-	}
-
 
 //	pMiarex->m_pVLMDlg->m_pWing     = Wing[0];
-	pMiarex->m_pPanelDlg->m_pWing   = Wing[0];
+	pMiarex->m_pPanelDlg->m_pWing   = pWing[0];
 
 
 //Tilt the geometry w.r.t. aoa
@@ -1781,11 +1796,11 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 		style = pMiarex->m_WakeStyle;
 
-		if     (style == 1) 	glLineStipple (1, 0xCFCF);
-		else if(style == 2) 	glLineStipple (1, 0x6666);
-		else if(style == 3) 	glLineStipple (1, 0xFF18);
-		else if(style == 4) 	glLineStipple (1, 0x7E66);
-		else					glLineStipple (1, 0xFFFF);
+		if     (style == DASHLINE)       glLineStipple(1, 0xCFCF);
+		else if(style == DOTLINE)        glLineStipple(1, 0x6666);
+		else if(style == DASHDOTLINE)    glLineStipple(1, 0xFF18);
+		else if(style == DASHDOTDOTLINE) glLineStipple(1, 0x7E66);
+		else				             glLineStipple(1, 0xFFFF);//Solid
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -1793,32 +1808,30 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 
 		m = 0;
 
-		for (iWing=0; iWing<4; iWing++)
+		for (iWing=0; iWing<MAXWINGS; iWing++)
 		{
-			if(Wing[iWing])
+			if(pWing[iWing])
 			{
-				pWing = Wing[iWing];
-
-				for (p=0; p<pWing->m_MatSize; p++)
+				for (p=0; p<pWing[iWing]->m_MatSize; p++)
 				{
 					bFound = false;
 
-					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
+					if(p3DScales->m_pos==0 && pWing[iWing]->m_pPanel[p].m_bIsLeading && pWing[iWing]->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(pNode[pWing->m_pPanel[p].m_iLA]);
-						D.Set(pNode[pWing->m_pPanel[p].m_iLB]);
+						C.Set(pNode[pWing[iWing]->m_pPanel[p].m_iLA]);
+						D.Set(pNode[pWing[iWing]->m_pPanel[p].m_iLB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==1 && pWing[iWing]->m_pPanel[p].m_bIsTrailing && pWing[iWing]->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(pNode[pWing->m_pPanel[p].m_iTA]);
-						D.Set(pNode[pWing->m_pPanel[p].m_iTB]);
+						C.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTA]);
+						D.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==2 && pWing[iWing]->m_pPanel[p].m_bIsLeading && pWing[iWing]->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(0.0, pNode[pWing->m_pPanel[p].m_iLA].y, 0.0);
-						D.Set(0.0, pNode[pWing->m_pPanel[p].m_iLB].y, 0.0);
+						C.Set(0.0, pNode[pWing[iWing]->m_pPanel[p].m_iLA].y, 0.0);
+						D.Set(0.0, pNode[pWing[iWing]->m_pPanel[p].m_iLB].y, 0.0);
 						bFound = true;
 					}
 
@@ -1833,21 +1846,21 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[4], CVector *pNode, CWPolar
 						if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
 						{
 							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-							VA.Set(pNode[pWing->m_pPanel[p].m_iTA] - pNode[pWing->m_pPanel[p].m_iLA]);
+							VA.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTA] - pNode[pWing[iWing]->m_pPanel[p].m_iLA]);
 							VA. Normalize();
-							VB.Set(pNode[pWing->m_pPanel[p].m_iTB] - pNode[pWing->m_pPanel[p].m_iLB]);
+							VB.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTB] - pNode[pWing[iWing]->m_pPanel[p].m_iLB]);
 							VB. Normalize();
-							if(pWing->m_pPanel[p].m_iPos ==-1)
+							if(pWing[iWing]->m_pPanel[p].m_iPos ==-1)
 							{
 								//corresponding upper panel is the next one coming up
-								for (i=p; i<pWing->m_MatSize;i++)
-									if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
-								VAT = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
+								for (i=p; i<pWing[iWing]->m_MatSize;i++)
+									if(pWing[iWing]->m_pPanel[i].m_iPos>0 && pWing[iWing]->m_pPanel[i].m_bIsTrailing) break;
+								VAT = pNode[pWing[iWing]->m_pPanel[i].m_iTA] - pNode[pWing[iWing]->m_pPanel[i].m_iLA];
 								VAT.Normalize();
 								VA = VA+VAT;
 								VA.Normalize();//VA is parallel to the bisector angle
 
-								VBT = pNode[pWing->m_pPanel[i].m_iTB] - pNode[pWing->m_pPanel[i].m_iLB];
+								VBT = pNode[pWing[iWing]->m_pPanel[i].m_iTB] - pNode[pWing[iWing]->m_pPanel[i].m_iLB];
 								VBT.Normalize();
 								VB = VB+VBT;
 								VB.Normalize();//VB is parallel to the bisector angle
@@ -1938,7 +1951,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
-	if(!pWOpp || pWOpp->m_AnalysisMethod==1)
+	if(!pWOpp || pWOpp->m_AnalysisMethod==LLTMETHOD)
 	{
 		glNewList(SURFACESPEEDS, GL_COMPILE);
 		pMiarex->m_GLList++;
@@ -1955,30 +1968,34 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 	int p, style;
 	double factor;
-	double length, sinT, cosT, beta, *Gamma, *Mu, *Sigma;
+	double length, sinT, cosT, beta;
+//	float Gamma[VLMMAXMATSIZE];
+	float Mu[VLMMAXMATSIZE], Sigma[VLMMAXMATSIZE];
 	double x1, x2, y1, y2, z1, z2, xe, ye, ze, dlx, dlz;
 	CVector C, V, VT;
 	CVector RefPoint(0.0,0.0,0.0);
 
 	factor = pMiarex->m_VelocityScale/100.0;
-	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
-	if(pPOpp)
+
+	int pos = 0;
+	if(pMiarex->m_pCurPOpp)
 	{
-		Gamma = pPOpp->m_G;
-		Mu    = pPOpp->m_G;
-		Sigma = pPOpp->m_Sigma;
+		for(int iw=0; iw<MAXWINGS; iw++)
+		{
+			if(pMiarex->m_pWingList[iw])
+			{
+//				memcpy(Gamma+pos, pMiarex->m_pWOpp[iw]->m_G,     pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
+				memcpy(Mu+pos,    pMiarex->m_pWOpp[iw]->m_G,     pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
+				memcpy(Sigma+pos, pMiarex->m_pWOpp[iw]->m_Sigma, pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
+				pos += pMiarex->m_pWingList[iw]->m_MatSize;
+			}
+		}
 	}
 	else if (pWOpp)
 	{
-		Gamma = pWOpp->m_G;
-		Mu    = pWOpp->m_G;
-		Sigma = pWOpp->m_Sigma;
-	}
-	else
-	{
-		Gamma = NULL;
-		Mu    = NULL;
-		Sigma = NULL;
+//		memcpy(Gamma, pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
+		memcpy(Mu,    pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
+		memcpy(Sigma, pWOpp->m_Sigma, pWOpp->m_NVLMPanels*sizeof(float));
 	}
 
 	glNewList(SURFACESPEEDS, GL_COMPILE);
@@ -1999,77 +2016,75 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 		glColor3d(pMiarex->m_WakeColor.redF(), pMiarex->m_WakeColor.greenF(), pMiarex->m_WakeColor.blueF());
 
-		if(Gamma)
+		for (p=0; p<pMiarex->m_MatSize; p++)
 		{
-			for (p=0; p<pMiarex->m_MatSize; p++)
+			VT.Set(pWOpp->m_QInf,0.0,0.0);
+
+			if(pWPolar->m_AnalysisMethod==PANELMETHOD)
 			{
-				VT.Set(pWOpp->m_QInf,0.0,0.0);
+				if(pPanel[p].m_iPos==0) C.Copy(pPanel[p].CtrlPt);
+				else                    C.Copy(pPanel[p].CollPt);
+				pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
 
-				if(pWPolar->m_AnalysisMethod==PANELMETHOD)
-				{
-					if(pPanel[p].m_iPos==0) C.Copy(pPanel[p].CtrlPt);
-					else                    C.Copy(pPanel[p].CollPt);
-					pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
-
-					VT += V;
+				VT += V;
 //					if(!pWPolar->m_bTiltedGeom)
-						C.RotateY(RefPoint, pWOpp->m_Alpha);
-						//Tilt the geometry w.r.t. sideslip
+					C.RotateY(RefPoint, pWOpp->m_Alpha);
+					//Tilt the geometry w.r.t. sideslip
 //						C.RotateZ(RefPoint, -pWOpp->m_Beta);
-				}
-
-				length = VT.VAbs()*factor;
-				xe     = C.x+factor*VT.x;
-				ye     = C.y+factor*VT.y;
-				ze     = C.z+factor*VT.z;
-				if(length>0.0)
-				{
-					cosT   = (xe-C.x)/length;
-					sinT   = (ze-C.z)/length;
-					dlx     = 0.15*length;
-					dlz     = 0.07*length;
-					beta   = atan((ye-C.y)/length)*180.0/PI;
-				}
-				else {
-					cosT   = 0.0;
-					sinT   = 0.0;
-					dlx    = 0.0;
-					dlz    = 0.0;
-				}
-
-				x1 = xe -dlx*cosT - dlz*sinT;
-				y1 = ye;
-				z1 = ze -dlx*sinT + dlz*cosT;
-
-				x2 = xe -dlx*cosT + dlz*sinT;
-				y2 = ye;
-				z2 = ze -dlx*sinT - dlz*cosT;
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(C.x, C.y, C.z);
-					glVertex3d(xe,ye,ze);
-				}
-				glEnd();
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(xe, ye, ze);
-					glVertex3d(x1, y1, z1);
-				}
-				glEnd();
-
-				glBegin(GL_LINES);
-				{
-					glVertex3d(xe, ye, ze);
-					glVertex3d(x2, y2, z2);
-				}
-				glEnd();
-
-				dlg.SetValue(p);
-				if(dlg.IsCanceled()) break;
 			}
+
+			length = VT.VAbs()*factor;
+			xe     = C.x+factor*VT.x;
+			ye     = C.y+factor*VT.y;
+			ze     = C.z+factor*VT.z;
+			if(length>0.0)
+			{
+				cosT   = (xe-C.x)/length;
+				sinT   = (ze-C.z)/length;
+				dlx     = 0.15*length;
+				dlz     = 0.07*length;
+				beta   = atan((ye-C.y)/length)*180.0/PI;
+			}
+			else {
+				cosT   = 0.0;
+				sinT   = 0.0;
+				dlx    = 0.0;
+				dlz    = 0.0;
+			}
+
+			x1 = xe -dlx*cosT - dlz*sinT;
+			y1 = ye;
+			z1 = ze -dlx*sinT + dlz*cosT;
+
+			x2 = xe -dlx*cosT + dlz*sinT;
+			y2 = ye;
+			z2 = ze -dlx*sinT - dlz*cosT;
+
+			glBegin(GL_LINES);
+			{
+				glVertex3d(C.x, C.y, C.z);
+				glVertex3d(xe,ye,ze);
+			}
+			glEnd();
+
+			glBegin(GL_LINES);
+			{
+				glVertex3d(xe, ye, ze);
+				glVertex3d(x1, y1, z1);
+			}
+			glEnd();
+
+			glBegin(GL_LINES);
+			{
+				glVertex3d(xe, ye, ze);
+				glVertex3d(x2, y2, z2);
+			}
+			glEnd();
+
+			dlg.SetValue(p);
+			if(dlg.IsCanceled()) break;
 		}
+
 		glDisable (GL_LINE_STIPPLE);
 	}
 	glEndList();
@@ -2606,7 +2621,7 @@ void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 }
 
 
-void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 
 	//
@@ -2622,12 +2637,12 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	}
 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	int p, nPanels;
+	int p;
 	double force, angle, cosa, sina2, cosa2, color;
 //	double ClientToGL;
 //	double dD, ZPos,dz,Right1, Right2;
 	double rmin, rmax, range, w, h;
-	double *tab;
+
 	double coef = 1.;
 	Quaternion Qt; // Quaternion operator to align the reference arrow to the panel's normal
 	CVector Omega; //rotation vector to align the reference arrow to the panel's normal
@@ -2642,29 +2657,34 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 	w = (double)pMiarex->m_r3DCltRect.width();
 	h = (double)pMiarex->m_r3DCltRect.height();
 
-	if(pPOpp)
+	CWing *pWingList[MAXWINGS];
+	CWOpp *pWOppList[MAXWINGS];
+	for(int ip=0; ip<MAXWINGS; ip++)
 	{
-		tab = pPOpp->m_Cp;
-		nPanels = pPOpp->m_NPanels;
+		pWingList[ip] = pMiarex->m_pWingList[ip];
+		pWOppList[ip] = pMiarex->m_pWOpp[ip];
 	}
-	else
-	{
-		tab = pWOpp->m_Cp;
-		nPanels = pWOpp->m_NVLMPanels;
-	}
+
 
 	//define the range of values to set the colors in accordance
 	rmin = 1.e10;
 	rmax = -rmin;
-	for (p=0; p<pMiarex->m_MatSize; p++)
+	for(int iw=0; iw<MAXWINGS; iw++)
 	{
-		if(tab[p]*pPanel[p].GetArea()>rmax) rmax = tab[p]*pPanel[p].GetArea();
-		if(tab[p]*pPanel[p].GetArea()<rmin) rmin = tab[p]*pPanel[p].GetArea();
+		if(pWingList[iw])
+		{
+			for (p=0; p<pWingList[iw]->m_MatSize; p++)
+			{
+				rmax = qMax(rmax,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
+				rmin = qMin(rmin,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
+			}
+		}
 	}
 	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	range = rmax - rmin;
 
+	CPanel *pPanel;
 
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
@@ -2672,142 +2692,196 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 		glLineWidth(1.0);
 //		glColor3d(pMiarex->m_XCPColor.redF(), pMiarex->m_XCPColor.greenF(), pMiarex->m_XCPColor.blueF());
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			// plot Cp ? f ? f/s=q.Cp ?
-			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *tab[p]*pPanel[p].GetArea();
-			force *= pMiarex->m_LiftScale *coef;
-			color = (force-rmin)/range;
-			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-
-			if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
-			else                                     O = pPanel[p].CollPt;
-
-			// Rotate the reference arrow to align it with the panel normal
-
-			if(R==P)
+			if(pWingList[iw])
 			{
-				Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
-			}
-			else
-			{
-				cosa   = R.dot(pPanel[p].Normal);
-				sina2  = sqrt((1.0 - cosa)*0.5);
-				cosa2  = sqrt((1.0 + cosa)*0.5);
-				angle = acos(cosa2)*180.0/PI;
-
-				Omega = R * pPanel[p].Normal;//crossproduct
-				Omega.Normalize();
-				Omega *=sina2;
-				Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
-			}
-
-			Qt.Conjugate(R,  P);
-			Qt.Conjugate(R1, P1);
-			Qt.Conjugate(R2, P2);
-
-			// Scale the pressure vector
-			P  *= force;
-			P1 *= force;
-			P2 *= force;
-
-			// Plot
-			if(pPanel[p].m_iPos==0)
-			{
-				glBegin(GL_LINES);
+				for (p=0; p<pWingList[iw]->m_MatSize; p++)
 				{
-					glVertex3d(O.x, O.y, O.z);
-					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-				}
-				glEnd();
+					pPanel = pWingList[iw]->m_pPanel;
+					// plot Cp? f? f/s=q.Cp?
+					force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea();
+					force *= pMiarex->m_LiftScale *coef;
+					color = (force-rmin)/range;
+					glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 
-				if(force>0)
-				{
-					glBegin(GL_LINES);
+					if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
+					else                                     O = pPanel[p].CollPt;
+
+					// Rotate the reference arrow to align it with the panel normal
+
+					if(R==P)
 					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+						Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
 					}
-					glEnd();
-					glBegin(GL_LINES);
+					else
 					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+						cosa   = R.dot(pPanel[p].Normal);
+						sina2  = sqrt((1.0 - cosa)*0.5);
+						cosa2  = sqrt((1.0 + cosa)*0.5);
+						angle = acos(cosa2)*180.0/PI;
+
+						Omega = R * pPanel[p].Normal;//crossproduct
+						Omega.Normalize();
+						Omega *=sina2;
+						Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
 					}
-					glEnd();
-				}
-				else
-				{
-					glBegin(GL_LINES);
+
+					Qt.Conjugate(R,  P);
+					Qt.Conjugate(R1, P1);
+					Qt.Conjugate(R2, P2);
+
+					// Scale the pressure vector
+					P  *= force;
+					P1 *= force;
+					P2 *= force;
+
+					// Plot
+					if(pPanel[p].m_iPos==0)
 					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+						glBegin(GL_LINES);
+						{
+							glVertex3d(O.x, O.y, O.z);
+							glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						}
+						glEnd();
+
+						if(force>0)
+						{
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+							}
+							glEnd();
+						}
+						else
+						{
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+							}
+							glEnd();
+						}
 					}
-					glEnd();
-					glBegin(GL_LINES);
+					else
 					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
+						if(pWOppList[iw]->m_Cp[p]>0)
+						{
+							// compression, point towards the surface
+		//					P.Set(-P.x, -P.y, -P.z);
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x, O.y, O.z);
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x, O.y, O.z);
+								glVertex3d(O.x-P1.x, O.y-P1.y, O.z-P1.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x, O.y+P.y, O.z);
+								glVertex3d(O.x-P2.x, O.y-P2.y, O.z-P2.z);
+							}
+							glEnd();
+						}
+						else
+						{
+							// depression, point outwards from the surface
+							P.Set(-P.x, -P.y, -P.z);
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x, O.y, O.z);
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x-P1.x, O.y+P.y-P1.y, O.z+P.z-P1.z);
+							}
+							glEnd();
+							glBegin(GL_LINES);
+							{
+								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+								glVertex3d(O.x+P.x-P2.x, O.y+P.y-P2.y, O.z+P.z-P2.z);
+							}
+							glEnd();
+						}
 					}
-					glEnd();
-				}
-			}
-			else
-			{
-				if(tab[p]>0)
-				{
-					// compression, point towards the surface
-//					P.Set(-P.x, -P.y, -P.z);
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x, O.y, O.z);
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-					}
-					glEnd();
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x, O.y, O.z);
-						glVertex3d(O.x-P1.x, O.y-P1.y, O.z-P1.z);
-					}
-					glEnd();
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x, O.y+P.y, O.z);
-						glVertex3d(O.x-P2.x, O.y-P2.y, O.z-P2.z);
-					}
-					glEnd();
-				}
-				else
-				{
-					// depression, point outwards from the surface
-					P.Set(-P.x, -P.y, -P.z);
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x, O.y, O.z);
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-					}
-					glEnd();
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x-P1.x, O.y+P.y-P1.y, O.z+P.z-P1.z);
-					}
-					glEnd();
-					glBegin(GL_LINES);
-					{
-						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						glVertex3d(O.x+P.x-P2.x, O.y+P.y-P2.y, O.z+P.z-P2.z);
-					}
-					glEnd();
 				}
 			}
 		}
 	}
 	glEndList();
+}
 
 
+void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+{
+	QMiarex * pMiarex = (QMiarex*)pQMiarex;
+	GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
+	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
+	int p, i;
+	double labellength, ClientToGL;
+	double f, fi, ZPos,dz,Right1, Right2;
+	double rmin, rmax, range, delta;
+	double XPos, w, h;
 
-/*	if(w>h)
+	QString strong, strForce;
+	QFontMetrics fm(pMainFrame->m_TextFont);
+
+	w = (double)pMiarex->m_r3DCltRect.width();
+	h = (double)pMiarex->m_r3DCltRect.height();
+
+	GetForceUnit(strForce, pMainFrame->m_ForceUnit);
+
+	CWing *pWingList[MAXWINGS];
+	CWOpp *pWOppList[MAXWINGS];
+	for(int ip=0; ip<MAXWINGS; ip++)
+	{
+		pWingList[ip] = pMiarex->m_pWingList[ip];
+		pWOppList[ip] = pMiarex->m_pWOpp[ip];
+	}
+
+
+	//define the range of values to set the colors in accordance
+	rmin = 1.e10;
+	rmax = -rmin;
+	for(int iw=0; iw<MAXWINGS; iw++)
+	{
+		if(pWingList[iw])
+		{
+			for (p=0; p<pWingList[iw]->m_MatSize; p++)
+			{
+				rmax = qMax(rmax,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
+				rmin = qMin(rmin,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
+			}
+		}
+	}
+	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
+	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
+	range = rmax - rmin;
+
+
+	if(w>h)
 	{
 		XPos  = 1.0;
 		dz    = h/w*1.0/20.0;
@@ -2822,103 +2896,36 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp 
 		ClientToGL = 2.0/h;
 	}
 
-	dD      = 12.0/w*2.0;
+//		dD      = 12.0/w*2.0;
 
 	Right1  = .94*XPos;
 	Right2  = .98*XPos;
 
-	delta = range / 20.0;*/
-}
+	delta = range / 20.0;
 
 
-void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
-{
-        QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	   GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
-	   MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-        int p, nPanels,i;
-        double labellength, ClientToGL;
-        double f, fi,dD, ZPos,dz,Right1, Right2;
-        double rmin, rmax, range, delta;
-        double XPos, w, h;
-        double *tab;
-        QString strong, strForce;
-        QFontMetrics fm(pMainFrame->m_TextFont);
+	//glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
+	{
+		//pMiarex->m_GLList++;
+		glDisable(GL_LIGHTING);
+		glDisable(GL_LIGHT0);
 
-        w = (double)pMiarex->m_r3DCltRect.width();
-        h = (double)pMiarex->m_r3DCltRect.height();
+		glPolygonMode(GL_FRONT,GL_LINE);
 
-        GetForceUnit(strForce, pMainFrame->m_ForceUnit);
-        if(pPOpp)
-        {
-                tab = pPOpp->m_Cp;
-                nPanels = pPOpp->m_NPanels;
-        }
-        else
-        {
-                tab = pWOpp->m_Cp;
-                nPanels = pWOpp->m_NVLMPanels;
-        }
-
-        //define the range of values to set the colors in accordance
-        rmin = 1.e10;
-        rmax = -rmin;
-        for (p=0; p<pMiarex->m_MatSize; p++)
-        {
-                if(tab[p]*pPanel[p].GetArea()>rmax) rmax = tab[p]*pPanel[p].GetArea();
-                if(tab[p]*pPanel[p].GetArea()<rmin) rmin = tab[p]*pPanel[p].GetArea();
-        }
-	   rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
-	   rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
-        range = rmax - rmin;
-
-
-        if(w>h)
-        {
-                XPos  = 1.0;
-                dz    = h/w*1.0/20.0;
-                ZPos  = h/w - 23.0*dz;
-                ClientToGL = 2.0/w;
-        }
-        else
-        {
-                XPos = w/h;
-                dz    = 1.0/20.0;
-                ZPos  = 1.0 - 23.0*dz;
-                ClientToGL = 2.0/h;
-        }
-
-        dD      = 12.0/w*2.0;
-
-        Right1  = .94*XPos;
-        Right2  = .98*XPos;
-
-        delta = range / 20.0;
-
-
-        //glNewList(PANELFORCELEGENDTXT,GL_COMPILE);
-        {
-                //pMiarex->m_GLList++;
-                glDisable(GL_LIGHTING);
-                glDisable(GL_LIGHT0);
-
-                glPolygonMode(GL_FRONT,GL_LINE);
-
-                glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
-                // Draw the labels
-                for (i=0; i<=20; i ++)
-                {
-                        f = rmin + (double)i * delta;
-                        fi = (double)i*dz ;
-                        strong = QString("%1").arg(f, 5,'g',3);
-                        labellength = (fm.width(strong)+5) * ClientToGL;
-                        pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
-                }
-                labellength = (fm.width(strong)+5) * ClientToGL;
-                pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strForce, pMainFrame->m_TextFont);
-
-        }
-        //glEndList();
+		glColor3d(pMainFrame->m_TextColor.redF(),pMainFrame->m_TextColor.greenF(),pMainFrame->m_TextColor.blueF());
+		// Draw the labels
+		for (i=0; i<=20; i ++)
+		{
+			f = rmin + (double)i * delta;
+			fi = (double)i*dz ;
+			strong = QString("%1").arg(f, 5,'g',3);
+			labellength = (fm.width(strong)+5) * ClientToGL;
+			pGLWidget->renderText(Right1-labellength, ZPos+fi, 0.0, strong, pMainFrame->m_TextFont);
+		}
+		labellength = (fm.width(strong)+5) * ClientToGL;
+		pGLWidget->renderText(Right1-labellength, ZPos+21.0*dz,  0.0, strForce, pMainFrame->m_TextFont);
+	}
+	//glEndList();
 }
 
 

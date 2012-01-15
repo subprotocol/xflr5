@@ -588,10 +588,10 @@ void PlaneDlg::OnOK()
 			}
 		}
 	}
-	if(nSurfaces >2*MAXPANELS)
+	if(nSurfaces >2*MAXSPANSECTIONS)
 	{
 		strong = QString(tr("Total number of wing panels =%1\n Max Number =%2\nA reduction of the number of wing panels is required"))
-			.arg(nSurfaces).arg(MAXPANELS);
+			.arg(nSurfaces).arg(MAXSPANSECTIONS);
 		QMessageBox::warning(this, tr("Warning"), strong);
 		return ;
 	}

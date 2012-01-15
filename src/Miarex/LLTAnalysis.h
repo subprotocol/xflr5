@@ -71,25 +71,25 @@ private:
 
     int m_IterLim;
 
-    double m_Chord[MAXSTATIONS+1];		//chord at stations
-    double m_Offset[MAXSTATIONS+1];		//offset at LLT stations
-    double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
-    double m_SpanPos[MAXSTATIONS+1];		//Span position of  LLT stations
-    double m_StripArea[MAXSTATIONS+1];		//Local strip area at  LLT stations
+	double m_Chord[MAXSPANSTATIONS+1];		//chord at stations
+	double m_Offset[MAXSPANSTATIONS+1];		//offset at LLT stations
+	double m_Twist[MAXSPANSTATIONS+1];		//twist at LLT stations
+	double m_SpanPos[MAXSPANSTATIONS+1];		//Span position of  LLT stations
+	double m_StripArea[MAXSPANSTATIONS+1];		//Local strip area at  LLT stations
 
 
-    double m_Re[MAXSTATIONS+1];
-    double m_Cl[MAXSTATIONS+1];
-    double m_Ai[MAXSTATIONS+1];
-    double m_ICd[MAXSTATIONS+1];		//Induced Drag coefficient at stations
-    double m_PCd[MAXSTATIONS+1];		//Viscous Drag coefficient at stations
-    double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
-    double m_CmAirf[MAXSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
-    double m_XCPSpanRel[MAXSTATIONS+1];	//Center of Pressure pos at stations
-    double m_XCPSpanAbs[MAXSTATIONS+1];	//Center of Pressure pos at stations
-    double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations
-    double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
-    double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
+	double m_Re[MAXSPANSTATIONS+1];
+	double m_Cl[MAXSPANSTATIONS+1];
+	double m_Ai[MAXSPANSTATIONS+1];
+	double m_ICd[MAXSPANSTATIONS+1];		//Induced Drag coefficient at stations
+	double m_PCd[MAXSPANSTATIONS+1];		//Viscous Drag coefficient at stations
+	double m_Cm[MAXSPANSTATIONS+1];			//Total pitching moment coefficient at stations
+	double m_CmAirf[MAXSPANSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
+	double m_XCPSpanRel[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
+	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
+	double m_BendingMoment[MAXSPANSTATIONS+1];	//bending moment at stations
+	double m_XTrTop[MAXSPANSTATIONS+1];		//Upper transition location at stations
+	double m_XTrBot[MAXSPANSTATIONS+1];		//Lower transition location at stations
 
     double m_mtoUnit;
     QString m_LengthUnit;

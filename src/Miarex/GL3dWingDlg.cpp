@@ -1571,7 +1571,7 @@ void GL3dWingDlg::OnInsertBefore()
 {
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
 
-	if (m_pWing->m_NPanel==MAXPANELS)
+	if (m_pWing->m_NPanel>=MAXSPANSECTIONS)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
@@ -1628,7 +1628,7 @@ void GL3dWingDlg::OnInsertBefore()
 void GL3dWingDlg::OnInsertAfter()
 {
 	if(m_iSection <0 || m_iSection>m_pWing->m_NPanel) return;
-	if (m_pWing->m_NPanel==MAXPANELS)
+	if (m_pWing->m_NPanel>=MAXSPANSECTIONS)
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
@@ -1699,7 +1699,7 @@ void GL3dWingDlg::OnItemClicked(const QModelIndex &index)
 	if(index.row()>m_pWing->m_NPanel)
 	{
 		//the user has filled a cell in the last line
-		if(index.row()<MAXPANELS-1)
+		if(index.row()<MAXSPANSECTIONS-1)
 		{
 			//so add an item before reading
 			m_pWing->m_NPanel++;
@@ -1926,6 +1926,7 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_NXPanels[sel] =(int)qMax(1.0,d);
+	m_pWing->m_NXPanels[sel] = qMin(m_pWing->m_NXPanels[sel], MAXCHORDPANELS);
 
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();

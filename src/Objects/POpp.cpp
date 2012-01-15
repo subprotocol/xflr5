@@ -51,8 +51,8 @@ CPOpp::CPOpp()
 	m_QInf                = 0.0;
 	m_Ctrl                = 0.0;
 
-	memset(m_Cp, 0, sizeof(m_Cp));
-	memset(m_G,  0, sizeof(m_G));
+//	memset(m_Cp, 0, sizeof(m_Cp));
+//	memset(m_G,  0, sizeof(m_G));
 }
 
 
@@ -66,7 +66,9 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{
-		ar << 1007;
+		if(ProjectFormat>=6) ar << 1008;
+		else                 ar << 1007;
+		//1008 : removed the serialization of Cp, Gamma, Sigma arrays
 		//1007 : added Sideslip Beta
 		//1006 : added Panel's source strengths Sigma
 		//1005 : added second wing results for a biplane
@@ -96,10 +98,12 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << (float)m_Beta;
 
 		ar << m_NPanels;
-		for (k=0; k<=m_NPanels; k++) ar << (float)m_Cp[k];
-		for (k=0; k<=m_NPanels; k++) ar << (float)m_G[k];
-		for (k=0; k<=m_NPanels; k++) ar << (float)m_Sigma[k];
-
+		if(ProjectFormat<6)
+		{
+			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_Cp[k];
+			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_G[k];
+			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_Sigma[k];
+		}
 		ar << m_VLMType;
 
 		for(int iw=0; iw<MAXWINGS; iw++)
@@ -194,32 +198,35 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				ar >> f;
 			}
 		}
-		if(ArchiveFormat>=1002)
+		if(ArchiveFormat>=1002 )
 		{
 			ar >>m_NPanels;
 
-			for (k=0; k<=m_NPanels; k++)
+			if(ArchiveFormat<=1007)
 			{
-				ar >> f;
-				m_Cp[k] = f;
+				for (k=0; k<=m_NPanels; k++)
+				{
+					ar >> f;
+	//				m_Cp[k] = f;
+				}
 			}
 		}
-		if(ArchiveFormat>=1003)
+		if(ArchiveFormat>=1003 && ArchiveFormat<=1007)
 		{
 			for (k=0; k<=m_NPanels; k++)
 			{
 				ar >> f;
-				if(ArchiveFormat<1004)	m_G[k] = f/1000.0;
-				else 					m_G[k] = f;
+//				if(ArchiveFormat<1004)	m_G[k] = f/1000.0;
+//				else 					m_G[k] = f;
 			}
 		}
 
-		if(ArchiveFormat>=1006)
+		if(ArchiveFormat>=1006 && ArchiveFormat<=1007)
 		{
 			for (k=0; k<=m_NPanels; k++)
 			{
 				ar >> f;
-				m_Sigma[k] = f;
+//				m_Sigma[k] = f;
 			}
 		}
 

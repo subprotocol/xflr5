@@ -167,10 +167,11 @@ bool PanelAnalysisDlg::AlphaLoop()
 	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100)
+	else if(nrhs>=VLMMAXRHS)
 	{
-		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
-		nrhs = 100;
+		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+		QMessageBox::warning(this, tr("Warning"), strange);
+		nrhs = VLMMAXRHS;
 	}
 
 	int MaxWakeIter = 1;
@@ -459,8 +460,8 @@ void PanelAnalysisDlg::CreateWakeContribution()
 
 	CVector V, VS, C, CC, TrPt;
 	double phi, phiSym;
-	double PHC[MAXSTATIONS];
-	CVector VHC[MAXSTATIONS];
+	double PHC[MAXSPANSTATIONS];
+	CVector VHC[MAXSPANSTATIONS];
 
 	AddString(tr("      Adding the wake's contribution...")+"\n");
 
@@ -603,8 +604,8 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 
 	static CVector V, VS, C, CC, TrPt;
 	double phi, phiSym;
-	double PHC[MAXSTATIONS];
-	CVector VHC[MAXSTATIONS];
+	double PHC[MAXSPANSTATIONS];
+	CVector VHC[MAXSPANSTATIONS];
 
 	AddString(tr("      Adding the wake's contribution...")+"\n");
 
@@ -779,11 +780,11 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 				//save the results... will save another FF calculation when computing operating point
 				m_WingIDrag[q*MAXWINGS+i] = IDrag;
 
-				memcpy(m_Cl  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Cl,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_ICd + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_ICd, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_Ai  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Ai,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_F   + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_F,   m_pWingList[i]->m_NStation*sizeof(CVector));
-				memcpy(m_Vd  + q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS, m_pWingList[i]->m_Vd,  m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_Cl  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Cl,  m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_ICd + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_ICd, m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_Ai  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Ai,  m_pWingList[i]->m_NStation*sizeof(double));
+				memcpy(m_F   + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_F,   m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_Vd  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Vd,  m_pWingList[i]->m_NStation*sizeof(CVector));
 
 				pos += m_pWingList[i]->m_MatSize;
 
@@ -890,8 +891,8 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 			{
 				for(int m=0; m<m_pWingList[i]->m_NStation; m++)
 				{
-					m_F[ m+ q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
-					m_Vd[m+ q*MAXWINGS*MAXSTATIONS + i*MAXSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					m_F[ m+ q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
 				}
 			}
 		}
@@ -995,11 +996,11 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				Force += m_WingForce[qrhs*MAXWINGS+iw];
 				IDrag += m_WingIDrag[qrhs*MAXWINGS+iw];
 
-				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
-				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*MAXWINGS*MAXSTATIONS + iw*MAXSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
 
 				//Get viscous interpolations
 				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, m_pWPolar, WingVDrag, m_pWPolar->m_bViscous, OutString);
@@ -1593,6 +1594,41 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 }
 
 
+void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma, CVector &VT, bool bAll)
+{
+	CVector V;
+	int pp, pw, lw;
+	double phi, sign;
+
+	VT.Set(0.0,0.0,0.0);
+
+	for (pp=0; pp<m_MatSize;pp++)
+	{
+		if(m_bCancel) return;
+
+		if(m_pPanel[pp].m_iPos!=0) //otherwise Sigma[pp] =0.0, so contribution is zero also
+		{
+			GetSourceInfluence(C, m_pPanel+pp, V, phi);
+			VT += V * Sigma[pp] ;
+		}
+		GetDoubletInfluence(C, m_pPanel+pp, V, phi, false, bAll);
+
+		VT += V * Mu[pp];
+
+		// Is the panel pp shedding a wake ?
+		if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_iPos!=0)
+		{
+			//If so, we need to add the contribution of the wake column shedded by this panel
+			if(m_pPanel[pp].m_iPos==-1) sign=-1.0; else sign=1.0;
+			pw = m_pPanel[pp].m_iWake;
+			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
+			{
+				GetDoubletInfluence(C, m_pWakePanel+pw+lw, V, phi, true, bAll);
+				VT += V * Mu[pp]*sign;
+			}
+		}
+	}
+}
 void PanelAnalysisDlg::InitDialog()
 {
 	m_Progress = 0.0;
@@ -1808,10 +1844,11 @@ bool PanelAnalysisDlg::ReLoop()
 	nrhs  = (int)fabs((m_QInfMax-m_QInf)*1.0001/m_QInfDelta) +1 ;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100)
+	else if(nrhs>=VLMMAXRHS)
 	{
-		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
-		nrhs = 100;
+		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+		QMessageBox::warning(this, tr("Warning"), strange);
+		nrhs = VLMMAXRHS;
 	}
 
 //	int MaxWakeIter = 1;
@@ -2395,10 +2432,11 @@ bool PanelAnalysisDlg::UnitLoop()
 	nrhs  = (int)fabs((m_AlphaMax-m_Alpha)*1.0001/m_AlphaDelta) + 1;
 
 	if(!m_bSequence) nrhs = 1;
-	else if(nrhs>=100)
+	else if(nrhs>=VLMMAXRHS)
 	{
-		QMessageBox::warning(this, tr("Warning"),tr("The number of points to be calculated will be limited to 100"));
-		nrhs = 100;
+		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+		QMessageBox::warning(this, tr("Warning"), strange);
+		nrhs = VLMMAXRHS;
 	}
 
 	if(!m_pWPolar->m_bWakeRollUp) MaxWakeIter = 1;
@@ -2785,10 +2823,11 @@ bool PanelAnalysisDlg::ControlLoop()
 
 	if(!m_bSequence) nrhs = 1;
 	else if(nrhs==0) nrhs = 1;//compute at least nominal control positions, even if none is active nor defined
-	else if(nrhs>=100)
+	else if(nrhs>=VLMMAXRHS)
 	{
-		QMessageBox::warning(this, tr("Warning"), "The number of points to be calculated will be limited to 100");
-		nrhs = 100;
+		QString strange = QString("The number of points to be calculated will be limited to %1").arg(VLMMAXRHS);
+		QMessageBox::warning(this, tr("Warning"), strange);
+		nrhs = VLMMAXRHS;
 	}
 
 	double TotalTime = 10.0*(double)m_MatSize/400.      //BuildInfluenceMatrix

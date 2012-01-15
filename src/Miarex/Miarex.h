@@ -443,7 +443,7 @@ protected:
 	CVector m_L[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)]; //temporary points to save calculation times for body NURBS surfaces
 	CVector m_T[(MAXBODYFRAMES+1)*(MAXSIDELINES+1)];
 
-	CSurface *m_pSurface[8*MAXPANELS];	// An array with the pointers to the wings surfaces
+	CSurface *m_pSurface[8*MAXSPANSECTIONS];	// An array with the pointers to the wings surfaces
 
 	QList<void *> *m_poaFoil;			// a pointer to the foil array
 	QList<void *> *m_poaPolar;			// a pointer to the foil polar array
@@ -591,8 +591,6 @@ protected:
 	CPlane * m_pCurPlane;          // the currently selected Plane
 	CBody *m_pCurBody;             // the currently selected body
 
-	CWing *m_pWingList[4];         // pointers to the four wings of the currently selected plane
-	CWOpp *m_pWOpp[4];             // pointers to the operating points of the four wings of the currently selected plane
 
 	CVector P,W,V,T;
 	
@@ -668,7 +666,9 @@ public:
 	CPanel m_WakePanel[VLMMAXMATSIZE];          // the reference current wake panel array
 	CPanel m_RefWakePanel[VLMMAXMATSIZE];       // the reference wake panel array if wake needs to be reset
 
-	
+	CWing *m_pWingList[MAXWINGS];         // pointers to the four wings of the currently selected plane
+	CWOpp *m_pWOpp[MAXWINGS];             // pointers to the operating points of the four wings of the currently selected plane
+
 };
 
 #endif // QMIAREX_H

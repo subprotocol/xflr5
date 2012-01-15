@@ -224,16 +224,17 @@ private:
 	CVector PJK, a, b, s, T1, T2, T, h;
 
 public:
-	double m_Ai[ MAXWINGS*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
-	double m_Cl[ MAXWINGS*VLMMAXRHS * MAXSTATIONS]; //temporary results from far field calculation
-	double m_ICd[MAXWINGS*VLMMAXRHS * MAXSTATIONS];
-	CVector m_F[ MAXWINGS*VLMMAXRHS * MAXSTATIONS];
-	CVector m_Vd[ MAXWINGS*VLMMAXRHS * MAXSTATIONS];
+	double m_Ai[ MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS]; //temporary results from far field calculation
+	double m_Cl[ MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS]; //temporary results from far field calculation
+	double m_ICd[MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS];
+	CVector m_F[ MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS];
+	CVector m_Vd[ MAXWINGS*VLMMAXRHS * MAXSPANSTATIONS];
 	CVector m_WingForce[MAXWINGS*VLMMAXRHS];
 	double m_WingIDrag[MAXWINGS*VLMMAXRHS];
 	CWing *m_pWing; //pointer to the geometry class of the wing
 	CWing * m_pWingList[MAXWINGS]; //pointer to the plane's four wings
 	void GetSpeedVector(CVector const &C, double *Mu, double *Sigma, CVector &VT, bool bAll=true);
+	void GetSpeedVector(CVector const &C, float *Mu,  float *Sigma,  CVector &VT, bool bAll=true);
 
 public://stability analysis method and variables
 

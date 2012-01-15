@@ -40,7 +40,6 @@
 #include "Objects/Foil.h"
 #include "Objects/Polar.h"
 #include "Objects/OpPoint.h"
-#include "Objects/Plane.h"
 #include "Graph/QGraph.h"
 #include "Misc/DisplaySettingsDlg.h"
 #include "Misc/RenameDlg.h"
@@ -160,8 +159,8 @@ private:
 
 	void ClientToGL(QPoint const &point, CVector &real);
 	void DeleteProject();
-	void DeletePlane(CPlane *pPlane, bool bResultsOnly = false);
-	void DeleteWing(CWing *pThisWing, bool bResultsOnly = false);
+	void DeletePlane(void *pPlanePtr, bool bResultsOnly = false);
+	void DeleteWing(void *pWingPtr, bool bResultsOnly = false);
 	void GLToClient(CVector const &real, QPoint &point);
 	void RemoveOpPoint(bool bCurrent);
 	void SetCurrentFoil(CFoil* pFoil);

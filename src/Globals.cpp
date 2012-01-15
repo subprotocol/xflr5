@@ -2693,8 +2693,8 @@ bool SplineInterpolation(int n, double *x, double *y, double *a, double *b, doub
 	if(n>50) return false;
 	int i,size;
 
-	double M[16*MAXSTATIONS*MAXSTATIONS];// size is 4 coefs x maxstations
-	double RHS[4*MAXSTATIONS*MAXSTATIONS];
+	double M[16*MAXSPANSTATIONS*MAXSPANSTATIONS];// size is 4 coefs x MAXSPANSTATIONS
+	double RHS[4*MAXSPANSTATIONS*MAXSPANSTATIONS];
 
 	memset(M, 0, 16*n*n*sizeof(double));
 	memset(RHS, 0, 4*n*sizeof(double));

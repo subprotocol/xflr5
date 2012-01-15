@@ -139,7 +139,7 @@ private:
 	int m_AVLIndex;		// need to export to AVL
 
 	int m_nFlaps;		// the number of T.E. flaps, numbered from left wing to right wing
-	double m_FlapMoment[2*MAXPANELS];
+	double m_FlapMoment[2*MAXSPANSECTIONS];
 
 	double m_QInf0;
 
@@ -159,30 +159,30 @@ private:
 	double m_GYm, m_VYm, m_IYm;		// Induced Yawing Moment
 	double m_GRm;		// Geometric Rolling Moment
 
-	int m_NXPanels[MAXPANELS+1]; 		// VLM Panels along chord, for each Wing Panel
-	int m_NYPanels[MAXPANELS+1]; 		// VLM Panels along span, for each Wing Panel
-	int m_XPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
-	int m_YPanelDist[MAXPANELS+1];		// VLM Panel distribution type, for each Wing Panel
+	int m_NXPanels[MAXSPANSECTIONS+1]; 		// VLM Panels along chord, for each Wing Panel
+	int m_NYPanels[MAXSPANSECTIONS+1]; 		// VLM Panels along span, for each Wing Panel
+	int m_XPanelDist[MAXSPANSECTIONS+1];		// VLM Panel distribution type, for each Wing Panel
+	int m_YPanelDist[MAXSPANSECTIONS+1];		// VLM Panel distribution type, for each Wing Panel
 
 
 	// Span Coefficients  resulting from VLM or LLT calculation
-	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
-	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
-	double m_ICd[MAXSTATIONS+1];		//Induced Drag coefficient at stations
-	double m_PCd[MAXSTATIONS+1];		//Viscous Drag coefficient at stations
-	double m_Re[MAXSTATIONS+1];		//Reynolds number at stations
-	double m_XTrTop[MAXSTATIONS+1];		//Upper transition location at stations
-	double m_XTrBot[MAXSTATIONS+1];		//Lower transition location at stations
-	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
-	double m_CmAirf[MAXSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
-	double m_XCPSpanRel[MAXSTATIONS+1];	//Center of Pressure pos at stations
-	double m_XCPSpanAbs[MAXSTATIONS+1];	//Center of Pressure pos at stations
-	double m_Chord[MAXSTATIONS+1];		//chord at stations
-	double m_Offset[MAXSTATIONS+1];		//offset at LLT stations
-	double m_Twist[MAXSTATIONS+1];		//twist at LLT stations
-	double m_StripArea[MAXSTATIONS+1];
-	double m_BendingMoment[MAXSTATIONS+1];	//bending moment at stations
-	double m_SpanPos[MAXSTATIONS+1];	//span positions of LLT stations
+	double m_Ai[MAXSPANSTATIONS+1];		//Induced angles, in degrees
+	double m_Cl[MAXSPANSTATIONS+1];		//Lift coefficient at stations
+	double m_ICd[MAXSPANSTATIONS+1];		//Induced Drag coefficient at stations
+	double m_PCd[MAXSPANSTATIONS+1];		//Viscous Drag coefficient at stations
+	double m_Re[MAXSPANSTATIONS+1];		//Reynolds number at stations
+	double m_XTrTop[MAXSPANSTATIONS+1];		//Upper transition location at stations
+	double m_XTrBot[MAXSPANSTATIONS+1];		//Lower transition location at stations
+	double m_Cm[MAXSPANSTATIONS+1];			//Total pitching moment coefficient at stations
+	double m_CmAirf[MAXSPANSTATIONS+1];		//Aill part of Pitching moment coefficient at stations
+	double m_XCPSpanRel[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
+	double m_XCPSpanAbs[MAXSPANSTATIONS+1];	//Center of Pressure pos at stations
+	double m_Chord[MAXSPANSTATIONS+1];		//chord at stations
+	double m_Offset[MAXSPANSTATIONS+1];		//offset at LLT stations
+	double m_Twist[MAXSPANSTATIONS+1];		//twist at LLT stations
+	double m_StripArea[MAXSPANSTATIONS+1];
+	double m_BendingMoment[MAXSPANSTATIONS+1];	//bending moment at stations
+	double m_SpanPos[MAXSPANSTATIONS+1];	//span positions of LLT stations
 	double m_xHinge[MAXCHORDPANELS];		//chorwise position of flap hinges
 	double m_xPanel[MAXCHORDPANELS];	//chorwise position of VLM panels
 
@@ -191,8 +191,8 @@ private:
 	QStringList m_RFoil;			// name of the right foils
 	QStringList m_LFoil;			// name of the left foils
 
-	CVector m_Vd[MAXSTATIONS];		// downwash vector at span stations
-	CVector m_F[MAXSTATIONS];		// lift vector at span stations
+	CVector m_Vd[MAXSPANSTATIONS];		// downwash vector at span stations
+	CVector m_F[MAXSPANSTATIONS];		// lift vector at span stations
 
 public:	
 	QString m_WingName;	//the wing's name
@@ -202,16 +202,16 @@ public:
 	int m_NSurfaces; 	// The number of VLM Surfaces (=2 x Wing Panels)
 	int m_NPanel;		// number of span panels in wing definition
 
-	CSurface m_Surface[2*MAXPANELS];
+	CSurface m_Surface[2*MAXSPANSECTIONS];
 
-	double m_TChord[MAXPANELS+1];		// Chord length at each panel side
-	double m_TLength[MAXPANELS+1];		// the length of each panel
-	double m_TPos[MAXPANELS+1];		// b-position of each panel end on developed surface
-	double m_TYProj[MAXPANELS+1];		// b-position of each panel end projected on horizontal surface
-	double m_TOffset[MAXPANELS+1];		// b-position of each panel end
-	double m_TDihedral[MAXPANELS+1];	// b-position of each panel end
-	double m_TZPos[MAXPANELS+1];		// vertical offset - calculation result only
-	double m_TTwist[MAXPANELS+1];		//Twist value of each foil (measured to the wing root)
+	double m_TChord[MAXSPANSECTIONS+1];		// Chord length at each panel side
+	double m_TLength[MAXSPANSECTIONS+1];		// the length of each panel
+	double m_TPos[MAXSPANSECTIONS+1];		// b-position of each panel end on developed surface
+	double m_TYProj[MAXSPANSECTIONS+1];		// b-position of each panel end projected on horizontal surface
+	double m_TOffset[MAXSPANSECTIONS+1];		// b-position of each panel end
+	double m_TDihedral[MAXSPANSECTIONS+1];	// b-position of each panel end
+	double m_TZPos[MAXSPANSECTIONS+1];		// vertical offset - calculation result only
+	double m_TTwist[MAXSPANSECTIONS+1];		//Twist value of each foil (measured to the wing root)
 	
 	double m_MAChord;	// mean aerodynamic chord
 	double m_PlanformSpan;

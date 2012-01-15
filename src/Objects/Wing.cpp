@@ -154,7 +154,7 @@ CWing::CWing()
 	m_TOffset[1] = 0.060;
 
 	double length = m_TLength[0];
-	for (i=0; i<=MAXPANELS; i++)
+	for (i=0; i<=MAXSPANSECTIONS; i++)
 	{
 		length += m_TLength[i];
 		m_TPos[i]     = length;
@@ -162,7 +162,7 @@ CWing::CWing()
 	}
 
 
-	for (i=0;i<=MAXPANELS; i++)
+	for (i=0;i<=MAXSPANSECTIONS; i++)
 	{
 		m_RFoil.append(" ");
 		m_LFoil.append(" ");
@@ -275,8 +275,8 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	//     CoG  = center of gravity position
 	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
 	//
-	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
-	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXPANELS];
+	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS];
+	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS];
 	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
@@ -474,7 +474,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	CVector PLA, PTA, PLB, PTB, Offset, T1;
 	CVector Trans(T.x, 0.0, T.z);
 	CVector O(0.0,0.0,0.0);
-	CVector VNormal[MAXPANELS+1], VNSide[MAXPANELS+1];
+	CVector VNormal[MAXSPANSECTIONS+1], VNSide[MAXSPANSECTIONS+1];
 	double MinPanelSize;
 
 	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
@@ -747,7 +747,7 @@ void CWing::ComputeChords(int NStation)
 	int j,k,l,m;
 	double y, yob, tau;
 	double x0,y0,y1,y2;
-	double SpanPosition[MAXSTATIONS];
+	double SpanPosition[MAXSPANSTATIONS];
 	CVector C;
 
 	if(NStation !=0)
@@ -828,7 +828,7 @@ void CWing::ComputeChords(int NStation, double *Chord, double *Offset, double *T
 	int j,k,l,m;
 	double y, yob, tau;
 	double x0,y0,y1,y2;
-	double SpanPosition[MAXSTATIONS];
+	double SpanPosition[MAXSPANSTATIONS];
 	CVector C;
 
 	if(NStation !=0)
@@ -926,7 +926,7 @@ void CWing::Duplicate(CWing *pWing)
 	m_bDoubleFin    = pWing->m_bDoubleFin;
 	m_bDoubleSymFin = pWing->m_bDoubleSymFin;
 
-	for (i=0; i<=MAXPANELS; i++)
+	for (i=0; i<=MAXSPANSECTIONS; i++)
 	{
 		m_TChord[i]     = pWing->m_TChord[i];
 		m_TPos[i]       = pWing->m_TPos[i];
@@ -1420,7 +1420,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 	int nw, iTA, iTB;
 	int j, k, l, p, pp, m, mm;
 	double InducedAngle, IYm, cosa, sina;
-	double GammaStrip[MAXSTATIONS];
+	double GammaStrip[MAXSPANSTATIONS];
 	CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
 
 	if(pWPolar->m_bTiltedGeom)
@@ -1600,7 +1600,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 
 void CWing::PanelSetBending(bool bThinSurface)
 {
-	double ypos[MAXSTATIONS+1], zpos[MAXSTATIONS+1];
+	double ypos[MAXSPANSTATIONS+1], zpos[MAXSPANSTATIONS+1];
 	int j,k,jj,coef,p;
 	double bm;
 	CVector Dist(0.0,0.0,0.0);
@@ -1672,7 +1672,8 @@ void CWing::ScaleChord(double NewChord)
 	// Scales the wing chord-wise so that the root chord is set to the NewChord value
 
 	double ratio = NewChord/m_TChord[0];
-	for (int i=0; i<=MAXPANELS; i++){
+	for (int i=0; i<=MAXSPANSECTIONS; i++)
+	{
 		m_TChord[i]    *= ratio;
 		m_TOffset[i]   *= ratio;
 	}
@@ -1684,7 +1685,8 @@ void CWing::ScaleSpan(double NewSpan)
 {
 	// Scales the wing span-wise to the NewSpan value
 
-	for (int i=0; i<=MAXPANELS; i++){
+	for (int i=0; i<=MAXSPANSECTIONS; i++)
+	{
 		m_TPos[i]      *= NewSpan/m_PlanformSpan;
 		m_TLength[i]   *= NewSpan/m_PlanformSpan;
 	}
@@ -1889,9 +1891,9 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			total += m_NYPanels[i];
 		}
 
-		if(total*2>=MAXSTATIONS)
+		if(total*2>=MAXSPANSTATIONS)
 		{
-			double ratio = MAXSTATIONS/total/2.0;
+			double ratio = MAXSPANSTATIONS/total/2.0;
 			for (i=0; i<=m_NPanel; i++)
 			{
 				m_NYPanels[i] = (int) (ratio*m_NYPanels[i]);

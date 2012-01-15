@@ -75,16 +75,16 @@ private:
 	double m_FirstWakePanel;
 	double m_WakeFactor;
 	double m_Weight;
-	double m_Twist[MAXSTATIONS+1];		// twist at span stations
+	float m_Twist[MAXSPANSTATIONS+1];		// twist at span stations
 
 	//RESULTS
-	double m_Re[MAXSTATIONS+1];		// Reynolds number at stations
-	double m_Cm[MAXSTATIONS+1];			//Total pitching moment coefficient at stations
-	double m_CmAirf[MAXSTATIONS+1];		//airfoil Pitching moment coefficient at stations about 1/4 chord point
-	double m_BendingMoment[MAXSTATIONS+1];
+	float m_Re[MAXSPANSTATIONS+1];		// Reynolds number at stations
+	float m_Cm[MAXSPANSTATIONS+1];			//Total pitching moment coefficient at stations
+	float m_CmAirf[MAXSPANSTATIONS+1];		//airfoil Pitching moment coefficient at stations about 1/4 chord point
+	float m_BendingMoment[MAXSPANSTATIONS+1];
 
 	double m_CY, m_CX;			//Side force, drag coefficients
-	double m_MaxBending;		// max bending moment along the span
+	float m_MaxBending;		// max bending moment along the span
 
 
 	//non dimensional stability derivatives
@@ -111,24 +111,24 @@ public:
 	double m_Span;
 	double m_MAChord;
 	double m_QInf;
-	double m_Cp[VLMMAXMATSIZE];		// lift coeffs for each panel
-	double m_G[VLMMAXMATSIZE];			// vortice or doublet strengths
-	double m_Sigma[VLMMAXMATSIZE];		// source strengths
+	float m_Cp[VLMMAXMATSIZE];		// lift coeffs for each panel
+	float m_G[VLMMAXMATSIZE];			// vortice or doublet strengths
+	float m_Sigma[VLMMAXMATSIZE];		// source strengths
 	double m_Alpha, m_Beta, m_Phi;
-	double m_SpanPos[MAXSTATIONS+1];	// station spanwise positions
-	double m_Ai[MAXSTATIONS+1];		//Induced angles, in degrees
-	double m_Chord[MAXSTATIONS+1];		// chord at stations
-	double m_ICd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_PCd[MAXSTATIONS+1];		//Drag coefficient at stations
-	double m_Cl[MAXSTATIONS+1];		//Lift coefficient at stations
-	double m_XCPSpanRel[MAXSTATIONS+1];	//Centre of pressure position at stations
-	double m_XCPSpanAbs[MAXSTATIONS+1];	//Centre of pressure position at stations
-	double m_StripArea[MAXSTATIONS+1];	
-	double m_XTrTop[MAXSTATIONS+1];		// Transition location - top
-	double m_XTrBot[MAXSTATIONS+1];		// Transition location - bottom
-	CVector m_Vd[MAXSTATIONS];		// speed deflection at trailing edge
-	CVector m_F[MAXSTATIONS];		// Stripforce
-	double m_FlapMoment[MAXPANELS]; 		// flap hinge moments
+	float m_SpanPos[MAXSPANSTATIONS+1];	// station spanwise positions
+	float m_Ai[MAXSPANSTATIONS+1];		//Induced angles, in degrees
+	float m_Chord[MAXSPANSTATIONS+1];		// chord at stations
+	float m_ICd[MAXSPANSTATIONS+1];		//Drag coefficient at stations
+	float m_PCd[MAXSPANSTATIONS+1];		//Drag coefficient at stations
+	float m_Cl[MAXSPANSTATIONS+1];		//Lift coefficient at stations
+	float m_XCPSpanRel[MAXSPANSTATIONS+1];	//Centre of pressure position at stations
+	float m_XCPSpanAbs[MAXSPANSTATIONS+1];	//Centre of pressure position at stations
+	float m_StripArea[MAXSPANSTATIONS+1];
+	float m_XTrTop[MAXSPANSTATIONS+1];		// Transition location - top
+	float m_XTrBot[MAXSPANSTATIONS+1];		// Transition location - bottom
+	CVector m_Vd[MAXSPANSTATIONS];		// speed deflection at trailing edge
+	CVector m_F[MAXSPANSTATIONS];		// Stripforce
+	double m_FlapMoment[MAXSPANSECTIONS]; 		// flap hinge moments
 
 	double m_CL;				// Wing lift coefficient
 	double m_VCD;			// wing viscous drag coefficient

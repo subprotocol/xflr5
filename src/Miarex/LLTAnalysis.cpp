@@ -154,7 +154,7 @@ void LLTAnalysis::LLTComputeWing(double QInf, double Alpha, QString &ErrorMessag
 	double ICm                 = 0.0;
 	double eta, sigma;
 	double Cm0;
-	double ViscCm[MAXSTATIONS+1], InducedCm[MAXSTATIONS+1];
+	double ViscCm[MAXSPANSTATIONS+1], InducedCm[MAXSPANSTATIONS+1];
 
 	bool bOutRe, bError;
 	bool bPointOutRe, bPointOutAlpha;
@@ -319,8 +319,8 @@ void LLTAnalysis::LLTSetBending(double QInf)
 
 bool LLTAnalysis::LLTSetLinearSolution(double Alpha)
 {
-	double aij[MAXSTATIONS*MAXSTATIONS];// coefficient matrix
-	double rhs[MAXSTATIONS+1];//right hand side
+	double aij[MAXSPANSTATIONS*MAXSPANSTATIONS];// coefficient matrix
+	double rhs[MAXSPANSTATIONS+1];//right hand side
 
 	memset(aij, 0, sizeof(aij));
 	memset(rhs, 0, sizeof(rhs));

@@ -50,10 +50,10 @@
 
 //3D analysis parameters
 #define MAXWINGS            4 //wing, wing2, elevator, fin, in that order
-#define MAXPANELS          50 // max number of sections on a half wing
-#define MAXSTATIONS       500 // max number of stations for LLT or VLM analysis
-#define MAXCHORDPANELS	  100
-#define VLMMAXMATSIZE    5000
+#define MAXSPANSECTIONS    30 // max number of sections on a half wing
+#define MAXSPANSTATIONS   250 // max number of stations for LLT or VLM analysis
+#define MAXCHORDPANELS	   50 // max number of panels in the chordwise direction
+#define VLMMAXMATSIZE    5000 // max number of VLM panels over the whole plane
 #define VLMHALF          2500
 #define VLMMAXRHS         100 // max number of points which may be calculated in a single sequence
 #define MAXCONTROLS        40 // max controls per wing section
@@ -61,7 +61,7 @@
 #define MAXPICTURESIZE     40 // maximum number of undo operations in direct design
 #define MAXBODYFRAMES      60
 #define MAXSIDELINES       40
-#define MAXMASSES          40
+#define MAXMASSES          30
 #define MAXPOLARPOINTS   1000
 #define MAXMODEFRAMES     200
 
@@ -166,6 +166,9 @@
 #define DOTLINE             2
 #define DASHDOTLINE         3
 #define DASHDOTDOTLINE      4
+
+#define MAXGRAPHS 4
+
 
 #define QUESTION (BB || !BB) //Shakespeare
 

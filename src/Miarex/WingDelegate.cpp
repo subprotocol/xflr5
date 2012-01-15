@@ -41,7 +41,7 @@ QWidget *WingDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
 		editor->SetPrecision(m_Precision[index.column()]);
 		if(index.column()==6) editor->SetMax(MAXCHORDPANELS-1);
-		if(index.column()==8) editor->SetMax(MAXSTATIONS-1);
+		if(index.column()==8) editor->SetMax(MAXSPANSTATIONS-1);
 		return editor;
 	}
 	else

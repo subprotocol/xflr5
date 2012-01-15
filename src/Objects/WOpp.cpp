@@ -26,7 +26,7 @@
 #include "../Globals.h"
 #include <math.h>
 #include <QTextStream>
-
+#include <QtDebug>
 
 void *CWOpp::s_pMainFrame;
 void *CWOpp::s_pMiarex;
@@ -449,6 +449,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			}
 		}
+
 		if(ArchiveFormat>=1009)
 		{
 			for (p=0; p<m_NVLMPanels;p++)
@@ -459,7 +460,8 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ArchiveFormat>1010)
 		{
-			if(m_AnalysisMethod==3){
+			if(m_AnalysisMethod==PANELMETHOD)
+			{
 				for (p=0; p<m_NVLMPanels;p++)
 				{
 					ar >> f; m_Sigma[p] = f;

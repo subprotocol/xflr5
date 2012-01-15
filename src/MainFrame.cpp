@@ -27,7 +27,6 @@
 #include "Miarex/GL3dWingDlg.h"
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
-#include "Miarex/GL3DScales.h"
 #include "Miarex/StabViewDlg.h"
 #include "Miarex/PlaneDlg.h"
 #include "Miarex/StabViewDlg.h"
@@ -312,7 +311,7 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 					}
 					else if(pPolar->m_Type == pOldPlr->m_Type)
 					{
-						if (pPolar->m_Type !=4)
+						if (pPolar->m_Type != FIXEDAOAPOLAR)
 						{
 							//sort by re Nbr
 							if(pPolar->m_Reynolds < pOldPlr->m_Reynolds)
@@ -2555,8 +2554,9 @@ bool MainFrame::DeleteFoil(CFoil *pFoil, bool bAsk)
 
 
 
-void MainFrame::DeletePlane(CPlane *pPlane, bool bResultsOnly)
+void MainFrame::DeletePlane(void *pPlanePtr, bool bResultsOnly)
 {
+	CPlane *pPlane = (CPlane*)pPlanePtr;
 	if(!pPlane || !pPlane->PlaneName().length()) return ;
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
 	CWPolar* pWPolar;
@@ -2639,6 +2639,7 @@ void MainFrame::DeleteProject()
 	// clear everything
 	int i;
 	void *pObj;
+
 	for (i=m_oaPlane.size()-1; i>=0; i--)
 	{
 		pObj = m_oaPlane.at(i);
@@ -2740,16 +2741,14 @@ void MainFrame::DeleteProject()
 
 
 
-void MainFrame::DeleteWing(CWing *pThisWing, bool bResultsOnly)
+void MainFrame::DeleteWing(void *pWingPtr, bool bResultsOnly)
 {
-	if(!pThisWing)
-	{
-		return;
-	}
-	SetSaveState(false);
 	int i;
-
 	QMiarex *pMiarex = (QMiarex*)m_pMiarex;
+	if(!pWingPtr) return;
+	CWing *pThisWing = (CWing*)pWingPtr;
+
+	SetSaveState(false);
 
 	//first remove all WOpps associated to the wing
 	CWOpp * pWOpp;
@@ -3021,7 +3020,7 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 		{
 			if (pOpPoint->m_strPlrName == pCurPolar->m_PlrName)
 			{
-				if(pCurPolar->m_Type !=4)
+				if(pCurPolar->m_Type != FIXEDAOAPOLAR)
 				{
 					if(fabs(pOpPoint->Alpha - Alpha) <0.001)
 					{
@@ -5131,7 +5130,7 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 
 	for(int i=0; i<m_pctrlOpPoint->count(); i++)
 	{
-		if(pCurPlr->m_Type !=4)
+		if(pCurPlr->m_Type != FIXEDAOAPOLAR)
 		{
 			alpha = m_pctrlOpPoint->itemText(i).toDouble();
 			if(fabs(alpha-pOpp->Alpha)<0.001)
@@ -6656,7 +6655,7 @@ void MainFrame::UpdateOpps()
 			pOpp = (OpPoint*)m_oaOpp[i];
 			if (pOpp->m_strFoilName == g_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
 			{
-				if (pCurPlr->m_Type !=4)
+				if (pCurPlr->m_Type !=FIXEDAOAPOLAR)
 				{
 //					if(fabs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
 					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
@@ -6672,7 +6671,7 @@ void MainFrame::UpdateOpps()
 		if (pXDirect->m_pCurOpp && pXDirect->m_pCurOpp->m_strFoilName==g_pCurFoil->m_FoilName)
 		{
 			//select it
-			if (pCurPlr->m_Type !=4)
+			if (pCurPlr->m_Type !=FIXEDAOAPOLAR)
 			{
 				str = QString("%8.2f").arg(pXDirect->m_pCurOpp->Alpha);
 			}
