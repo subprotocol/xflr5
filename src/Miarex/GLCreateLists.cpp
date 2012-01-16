@@ -711,8 +711,6 @@ void GLCreateCpLegendClr(void *pQMiarex)
 
 //		glPolygonMode(GL_FRONT,GL_FILL);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//		glEnable(GL_POLYGON_OFFSET_FILL);
-//		glPolygonOffset(1.0, 1.0);
 
 		glBegin(GL_QUAD_STRIP);
 		{

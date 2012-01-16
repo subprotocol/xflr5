@@ -141,6 +141,7 @@ bool GL3dWingDlg::CheckWing()
 		m_pctrlWingName->setFocus();
 		return false;
 	}
+
 	for (int k=1; k<=m_pWing->m_NPanel; k++)
 	{
 		if(m_pWing->m_TPos[k]*1.00001 < m_pWing->m_TPos[k-1])
@@ -148,6 +149,20 @@ bool GL3dWingDlg::CheckWing()
 			QMessageBox::warning(this, tr("Warning"), tr("Warning : Panel sequence is inconsistent"));
 			return false;
 		}
+	}
+
+	int NYPanels = 0;
+	for(int j=0; j<m_pWing->m_NPanel; j++)
+	{
+		NYPanels += m_pWing->m_NYPanels[j];
+	}
+	if(NYPanels*2>=MAXSPANSTATIONS)
+	{
+		QString strange = QString(" %1").arg(MAXSPANSTATIONS/2);
+		strange = tr("Too many spanwise panels.\nThe maximum number is")+strange;
+
+		QMessageBox::warning(this, tr("Warning"), strange);
+		return false;
 	}
 
 	if(VLMGetPanelTotal()>VLMMAXMATSIZE/2)
@@ -1850,7 +1865,7 @@ void GL3dWingDlg::OnWingColor()
 
 void GL3dWingDlg::ReadParams()
 {
-	m_pWing->m_WingName        = m_pctrlWingName->text();
+	m_pWing->m_WingName = m_pctrlWingName->text();
 	QString strange = m_pctrlWingDescription->toPlainText();
 	if(strange == tr("Wing Description")) strange="";
 	m_pWing->m_WingDescription = strange;
@@ -1886,7 +1901,7 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	pItem = m_pWingModel->item(sel,1);
 	strong =pItem->text();
 	strong.replace(" ","");
-	 d =strong.toDouble(&bOK);
+	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_TChord[sel] =d / pMainFrame->m_mtoUnit;
 
 	pItem = m_pWingModel->item(sel,2);
@@ -1900,7 +1915,6 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong.replace(" ","");
 	d =strong.toDouble(&bOK);
 	if(bOK) m_pWing->m_TDihedral[sel] =d;
-
 
 	pItem = m_pWingModel->item(sel,4);
 	strong =pItem->text();
@@ -1931,9 +1945,9 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	pItem = m_pWingModel->item(sel,7);
 	strong =pItem->text();
 	strong.replace(" ","");
-	if(strong==tr("Uniform"))		m_pWing->m_XPanelDist[sel] = 0;
-	else if(strong==tr("Cosine"))	m_pWing->m_XPanelDist[sel] = 1;
-	else if(strong==tr("Sine"))		m_pWing->m_XPanelDist[sel] = 2;
+	if(strong==tr("Uniform"))		m_pWing->m_XPanelDist[sel] =  0;
+	else if(strong==tr("Cosine"))	m_pWing->m_XPanelDist[sel] =  1;
+	else if(strong==tr("Sine"))		m_pWing->m_XPanelDist[sel] =  2;
 	else if(strong==tr("-Sine"))	m_pWing->m_XPanelDist[sel] = -2;
 
 	pItem = m_pWingModel->item(sel,8);
@@ -1946,11 +1960,10 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	strong =pItem->text();
 	strong.replace(" ","");
 
-	if(strong==tr("Uniform"))		m_pWing->m_YPanelDist[sel] = 0;
-	else if(strong==tr("Cosine"))	m_pWing->m_YPanelDist[sel] = 1;
-	else if(strong==tr("Sine"))		m_pWing->m_YPanelDist[sel] = 2;
+	if(strong==tr("Uniform"))		m_pWing->m_YPanelDist[sel] =  0;
+	else if(strong==tr("Cosine"))	m_pWing->m_YPanelDist[sel] =  1;
+	else if(strong==tr("Sine"))		m_pWing->m_YPanelDist[sel] =  2;
 	else if(strong==tr("-Sine"))	m_pWing->m_YPanelDist[sel] = -2;
-
 }
 
 

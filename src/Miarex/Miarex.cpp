@@ -1181,22 +1181,22 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 
 			for (l=1; l<m_pCurWing->m_NStation; l++)
 			{
-				pNewPoint->m_SpanPos[l]       = -m_pLLTDlg->m_LLT.m_SpanPos[l];
-				pNewPoint->m_StripArea[l]     =  m_pLLTDlg->m_LLT.m_StripArea[l];
-				pNewPoint->m_Ai[l]            =  m_pLLTDlg->m_LLT.m_Ai[m_NStation-l];
-				pNewPoint->m_Cl[l]            =  m_pLLTDlg->m_LLT.m_Cl[m_NStation-l];
-				pNewPoint->m_PCd[l]           =  m_pLLTDlg->m_LLT.m_PCd[m_NStation-l];
-				pNewPoint->m_ICd[l]           =  m_pLLTDlg->m_LLT.m_ICd[m_NStation-l];
-				pNewPoint->m_Cm[l]            =  m_pLLTDlg->m_LLT.m_Cm[m_NStation-l];
-				pNewPoint->m_CmAirf[l]        =  m_pLLTDlg->m_LLT.m_CmAirf[m_NStation-l];
-				pNewPoint->m_XCPSpanRel[l]    =  m_pLLTDlg->m_LLT.m_XCPSpanRel[m_NStation-l];
-				pNewPoint->m_XCPSpanAbs[l]    =  m_pLLTDlg->m_LLT.m_XCPSpanAbs[m_NStation-l];
-				pNewPoint->m_Re[l]            =  m_pLLTDlg->m_LLT.m_Re[m_NStation-l];
-				pNewPoint->m_Chord[l]         =  m_pLLTDlg->m_LLT.m_Chord[m_NStation-l];
-				pNewPoint->m_Twist[l]         =  m_pLLTDlg->m_LLT.m_Twist[m_NStation-l];
-				pNewPoint->m_XTrTop[l]        =  m_pLLTDlg->m_LLT.m_XTrTop[m_NStation-l];
-				pNewPoint->m_XTrBot[l]        =  m_pLLTDlg->m_LLT.m_XTrBot[m_NStation-l];
-				pNewPoint->m_BendingMoment[l] =  m_pLLTDlg->m_LLT.m_BendingMoment[m_NStation-l];
+				pNewPoint->m_SpanPos[l]       = -(float)m_pLLTDlg->m_LLT.m_SpanPos[l];
+				pNewPoint->m_StripArea[l]     =  (float)m_pLLTDlg->m_LLT.m_StripArea[l];
+				pNewPoint->m_Ai[l]            =  (float)m_pLLTDlg->m_LLT.m_Ai[m_NStation-l];
+				pNewPoint->m_Cl[l]            =  (float)m_pLLTDlg->m_LLT.m_Cl[m_NStation-l];
+				pNewPoint->m_PCd[l]           =  (float)m_pLLTDlg->m_LLT.m_PCd[m_NStation-l];
+				pNewPoint->m_ICd[l]           =  (float)m_pLLTDlg->m_LLT.m_ICd[m_NStation-l];
+				pNewPoint->m_Cm[l]            =  (float)m_pLLTDlg->m_LLT.m_Cm[m_NStation-l];
+				pNewPoint->m_CmAirf[l]        =  (float)m_pLLTDlg->m_LLT.m_CmAirf[m_NStation-l];
+				pNewPoint->m_XCPSpanRel[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanRel[m_NStation-l];
+				pNewPoint->m_XCPSpanAbs[l]    =  (float)m_pLLTDlg->m_LLT.m_XCPSpanAbs[m_NStation-l];
+				pNewPoint->m_Re[l]            =  (float)m_pLLTDlg->m_LLT.m_Re[m_NStation-l];
+				pNewPoint->m_Chord[l]         =  (float)m_pLLTDlg->m_LLT.m_Chord[m_NStation-l];
+				pNewPoint->m_Twist[l]         =  (float)m_pLLTDlg->m_LLT.m_Twist[m_NStation-l];
+				pNewPoint->m_XTrTop[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrTop[m_NStation-l];
+				pNewPoint->m_XTrBot[l]        =  (float)m_pLLTDlg->m_LLT.m_XTrBot[m_NStation-l];
+				pNewPoint->m_BendingMoment[l] =  (float)m_pLLTDlg->m_LLT.m_BendingMoment[m_NStation-l];
 				memset(pNewPoint->m_Cp, 0, sizeof(pNewPoint->m_Cp));
 				if(fabs(m_pLLTDlg->m_LLT.m_BendingMoment[l])>fabs(Cb))	Cb = m_pLLTDlg->m_LLT.m_BendingMoment[l];
 			}
@@ -1235,6 +1235,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 
 			for (l=0; l<m_pCurWing->m_NStation; l++)
 			{
+				pNewPoint->m_Ai[l]         = (float)m_pCurWing->m_Ai[l];
 				pNewPoint->m_SpanPos[l]    = (float)m_pCurWing->m_SpanPos[l];
 				pNewPoint->m_StripArea[l]  = (float)m_pCurWing->m_StripArea[l];
 				pNewPoint->m_Re[l]         = (float)m_pCurWing->m_Re[l];
@@ -1256,7 +1257,6 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 
 			memcpy(pNewPoint->m_Vd,            m_pCurWing->m_Vd, sizeof(pNewPoint->m_Vd));
 			memcpy(pNewPoint->m_F,             m_pCurWing->m_F,  sizeof(pNewPoint->m_F));
-			memcpy(pNewPoint->m_Ai,            m_pCurWing->m_Ai, sizeof(pNewPoint->m_Ai));
 
 			for(int ip=0; ip<m_pCurWing->m_MatSize; ip++)
 			{
@@ -2729,27 +2729,27 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_XCP                 = pWing->m_XCP;
 	pWOpp->m_YCP                 = pWing->m_YCP;
 
-	memcpy(pWOpp->m_Ai,            pWing->m_Ai,            sizeof(pWing->m_Ai));
-	memcpy(pWOpp->m_Cl,            pWing->m_Cl,            sizeof(pWing->m_Cl));
-	memcpy(pWOpp->m_PCd,           pWing->m_PCd,           sizeof(pWing->m_PCd));
-	memcpy(pWOpp->m_ICd,           pWing->m_ICd,           sizeof(pWing->m_ICd));
-	memcpy(pWOpp->m_Cm,            pWing->m_Cm,            sizeof(pWing->m_Cm));
-	memcpy(pWOpp->m_CmAirf,        pWing->m_CmAirf,        sizeof(pWing->m_CmAirf));
-	memcpy(pWOpp->m_XCPSpanRel,    pWing->m_XCPSpanRel,    sizeof(pWing->m_XCPSpanRel));
-	memcpy(pWOpp->m_XCPSpanAbs,    pWing->m_XCPSpanAbs,    sizeof(pWing->m_XCPSpanAbs));
-	memcpy(pWOpp->m_Re,            pWing->m_Re,            sizeof(pWing->m_Re));
-	memcpy(pWOpp->m_Chord,         pWing->m_Chord,         sizeof(pWing->m_Chord));
-	memcpy(pWOpp->m_Twist,         pWing->m_Twist,         sizeof(pWing->m_Twist));
-	memcpy(pWOpp->m_XTrTop,        pWing->m_XTrTop,        sizeof(pWing->m_XTrTop));
-	memcpy(pWOpp->m_XTrBot,        pWing->m_XTrBot,        sizeof(pWing->m_XTrBot));
-	memcpy(pWOpp->m_BendingMoment, pWing->m_BendingMoment, sizeof(pWing->m_BendingMoment));
-	memcpy(pWOpp->m_Vd,            pWing->m_Vd,            sizeof(pWOpp->m_Vd));
-	memcpy(pWOpp->m_F,             pWing->m_F,             sizeof(pWOpp->m_F));
-
 	double Cb =0.0;
 
-	for (int l=0; l<pWing->m_NStation; l++)
+	for(int l=0; l<pWing->m_NStation; l++)
 	{
+		pWOpp->m_Ai[l] =            (float)pWing->m_Ai[l];
+		pWOpp->m_Cl[l] =            (float)pWing->m_Cl[l];
+		pWOpp->m_PCd[l] =           (float)pWing->m_PCd[l];
+		pWOpp->m_ICd[l] =           (float)pWing->m_ICd[l];
+		pWOpp->m_Cm[l] =            (float)pWing->m_Cm[l];
+		pWOpp->m_CmAirf[l] =        (float)pWing->m_CmAirf[l];
+		pWOpp->m_XCPSpanRel[l] =    (float)pWing->m_XCPSpanRel[l];
+		pWOpp->m_XCPSpanAbs[l] =    (float)pWing->m_XCPSpanAbs[l];
+		pWOpp->m_Re[l] =            (float)pWing->m_Re[l];
+		pWOpp->m_Chord[l] =         (float)pWing->m_Chord[l];
+		pWOpp->m_Twist[l] =         (float)pWing->m_Twist[l];
+		pWOpp->m_XTrTop[l] =        (float)pWing->m_XTrTop[l];
+		pWOpp->m_XTrBot[l] =        (float)pWing->m_XTrBot[l];
+		pWOpp->m_BendingMoment[l] = (float)pWing->m_BendingMoment[l];
+		pWOpp->m_Vd[l] =            pWing->m_Vd[l];
+		pWOpp->m_F[l] =             pWing->m_F[l];
+
 		pWOpp->m_SpanPos[l]   = pWing->m_SpanPos[l];
 		pWOpp->m_StripArea[l] = pWing->m_StripArea[l];
 		Cb = qMax(Cb, pWing->m_BendingMoment[l]);

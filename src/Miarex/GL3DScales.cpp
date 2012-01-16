@@ -276,7 +276,6 @@ void GL3DScales::OnApply()
 	pMiarex->m_LegendMax = m_pctrlLegendMax->Value();
 	pMiarex->m_LegendMin = m_pctrlLegendMin->Value();
 	pMiarex->m_bAutoCpScale = m_pctrlAutoCpScale->isChecked();
-
 	ReadStreamParams();
 	pMiarex->m_bResetglStream = true;
 	pMiarex->UpdateView();

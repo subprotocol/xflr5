@@ -38,7 +38,7 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <math.h>
-#include <QtDebug>
+
 
 //2D
 #define BODYAXIALLINES      1304

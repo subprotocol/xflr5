@@ -1870,8 +1870,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			}
 			else
 				ar >> m_NXPanels[i];
-			m_NXPanels[i] = qMax(1,m_NXPanels[i] );
-			m_NXPanels[i] = qMin(MAXCHORDPANELS, m_NXPanels[i]);
+//			m_NXPanels[i] = qMax(1,m_NXPanels[i] );
+//			m_NXPanels[i] = qMin(MAXCHORDPANELS, m_NXPanels[i]);
 		}
 
 		for (i=0; i<=m_NPanel; i++)
@@ -1882,8 +1882,8 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				m_NYPanels[i] = (int)f;
 			}
 			else 	ar >> m_NYPanels[i];
-			m_NYPanels[i] = qMax(1,m_NYPanels[i] );
-			m_NYPanels[i] = qMin(50, m_NYPanels[i]);
+//			m_NYPanels[i] = qMax(1,m_NYPanels[i] );
+//			m_NYPanels[i] = qMin(100, m_NYPanels[i]);
 		}
 		int total = 0;
 		for (i=0; i<m_NPanel; i++)
