@@ -490,7 +490,7 @@ void CBody::Duplicate(CBody *pBody)
 		m_hPanels[i] = pBody->m_hPanels[i];
 	}
 
-//	SetKnots();
+	SetKnots();
 }
 
 

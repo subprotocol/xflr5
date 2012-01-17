@@ -4380,7 +4380,7 @@ void GL3dBodyDlg::SetFrame(int iFrame)
 void GL3dBodyDlg::SetPicture()
 {
 	m_pBody->Duplicate(m_UndoPic+m_StackPos);
-	m_pBody->SetKnots();
+//	m_pBody->SetKnots();
 	FillFrameDataTable();
 	m_pFrame = m_pBody->m_Frame + m_pBody->m_iActiveFrame;
 	FillPointDataTable();

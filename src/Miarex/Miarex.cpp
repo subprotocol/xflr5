@@ -1719,12 +1719,7 @@ void QMiarex::CreateCpCurves()
 	}
 
 	int coef = 2;
-	bool b2Sides = true;
-	if(m_pCurWPolar->m_bThinSurfaces)
-	{
-		b2Sides = false;
-		coef = 1;
-	}
+	if(m_pCurWPolar->m_bThinSurfaces) coef = 1;
 
 	m_CurSpanPos = qMax(-1.0, m_CurSpanPos);
 	m_CurSpanPos = qMin( 1.0, m_CurSpanPos);
@@ -4621,7 +4616,10 @@ void QMiarex::GLCallViewLists()
 	{
 		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(m_pWingList[iw]) glCallList(WINGSURFACES+iw);
+			if(m_pWingList[iw])
+			{
+				glCallList(WINGSURFACES+iw);
+			}
 		}
 
 		if(m_pCurBody)
@@ -4691,7 +4689,7 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(BODYGEOM,2);
 			m_GLList -=2;
 		}
-		if(m_pCurBody->m_LineType==BODYPANELTYPE)	   m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
+		if(m_pCurBody->m_LineType==BODYPANELTYPE)	    m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
 		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
 
 		m_bResetglBody = false;
