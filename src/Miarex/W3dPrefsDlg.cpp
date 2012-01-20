@@ -174,7 +174,7 @@ void W3dPrefsDlg::OnMasses()
 	if(Color.isValid()) m_MassColor = Color;
 	m_pctrlMassColor->SetColor(m_MassColor);
 
-	repaint();
+	update();
 }
 
 void W3dPrefsDlg::OnWingColor()
@@ -189,9 +189,10 @@ void W3dPrefsDlg::OnWingColor()
 		m_OutlineColor = LPdlg.GetColor();
 		m_OutlineStyle = LPdlg.GetStyle();
 		m_OutlineWidth = LPdlg.GetWidth();
+		m_pctrlOutline->SetStyle(m_OutlineStyle, m_OutlineWidth, m_OutlineColor);
 	}
-	repaint();
 }
+
 
 void W3dPrefsDlg::On3DAxis()
 {
@@ -206,9 +207,10 @@ void W3dPrefsDlg::On3DAxis()
 		m_3DAxisColor = LPdlg.GetColor();
 		m_3DAxisStyle = LPdlg.GetStyle();
 		m_3DAxisWidth = LPdlg.GetWidth();
+		m_pctrlAxis->SetStyle(m_3DAxisStyle,m_3DAxisWidth, m_3DAxisColor);
 	}
-	repaint();
 }
+
 
 void W3dPrefsDlg::OnTopTrans()
 {
@@ -223,8 +225,8 @@ void W3dPrefsDlg::OnTopTrans()
 		m_TopColor = LPdlg.GetColor();
 		m_TopStyle = LPdlg.GetStyle();
 		m_TopWidth = LPdlg.GetWidth();
+		m_pctrlTopTrans->SetStyle(m_TopStyle, m_TopWidth, m_TopColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnBotTrans()
@@ -240,8 +242,8 @@ void W3dPrefsDlg::OnBotTrans()
 		m_BotColor = LPdlg.GetColor();
 		m_BotStyle = LPdlg.GetStyle();
 		m_BotWidth = LPdlg.GetWidth();
+		m_pctrlBotTrans->SetStyle(m_BotStyle, m_BotWidth, m_BotColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnIDrag()
@@ -257,8 +259,8 @@ void W3dPrefsDlg::OnIDrag()
 		m_IDragColor = LPdlg.GetColor();
 		m_IDragStyle = LPdlg.GetStyle();
 		m_IDragWidth = LPdlg.GetWidth();
+		m_pctrlInducedDrag->SetStyle(m_IDragStyle, m_IDragWidth, m_IDragColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnVDrag()
@@ -274,8 +276,8 @@ void W3dPrefsDlg::OnVDrag()
 		m_VDragColor = LPdlg.GetColor();
 		m_VDragStyle = LPdlg.GetStyle();
 		m_VDragWidth = LPdlg.GetWidth();
+		m_pctrlViscousDrag->SetStyle(m_VDragStyle, m_VDragWidth, m_VDragColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnXCP()
@@ -291,9 +293,10 @@ void W3dPrefsDlg::OnXCP()
 		m_XCPColor = LPdlg.GetColor();
 		m_XCPStyle = LPdlg.GetStyle();
 		m_XCPWidth = LPdlg.GetWidth();
+		m_pctrlLift->SetStyle(m_XCPStyle, m_XCPWidth, m_XCPColor);
 	}
-	repaint();
 }
+
 void W3dPrefsDlg::OnMoments()
 {
 	LinePickerDlg LPdlg;
@@ -307,8 +310,8 @@ void W3dPrefsDlg::OnMoments()
 		m_MomentColor = LPdlg.GetColor();
 		m_MomentStyle = LPdlg.GetStyle();
 		m_MomentWidth = LPdlg.GetWidth();
+		m_pctrlMoments->SetStyle(m_MomentStyle, m_MomentWidth, m_MomentColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnDownwash()
@@ -324,8 +327,8 @@ void W3dPrefsDlg::OnDownwash()
 		m_DownwashColor = LPdlg.GetColor();
 		m_DownwashStyle = LPdlg.GetStyle();
 		m_DownwashWidth = LPdlg.GetWidth();
+		m_pctrlDownwash->SetStyle(m_DownwashStyle, m_DownwashWidth, m_DownwashColor);
 	}
-	repaint();
 }
 
 void W3dPrefsDlg::OnStreamLines()
@@ -341,9 +344,11 @@ void W3dPrefsDlg::OnStreamLines()
 		m_StreamLinesColor = LPdlg.GetColor();
 		m_StreamLinesStyle = LPdlg.GetStyle();
 		m_StreamLinesWidth = LPdlg.GetWidth();
+		m_pctrlStreamLines->SetStyle(m_StreamLinesStyle, m_StreamLinesWidth, m_StreamLinesColor);
 	}
-	repaint();
+	update();
 }
+
 
 void W3dPrefsDlg::OnWakePanels()
 {
@@ -358,9 +363,10 @@ void W3dPrefsDlg::OnWakePanels()
 		m_WakeColor = LPdlg.GetColor();
 		m_WakeStyle = LPdlg.GetStyle();
 		m_WakeWidth = LPdlg.GetWidth();
+		m_pctrlWakePanels->SetStyle(m_WakeStyle, m_WakeWidth, m_WakeColor);
 	}
-	repaint();
 }
+
 
 void W3dPrefsDlg::OnVLMMesh()
 {
@@ -375,9 +381,10 @@ void W3dPrefsDlg::OnVLMMesh()
 		m_VLMColor = LPdlg.GetColor();
 		m_VLMStyle = LPdlg.GetStyle();
 		m_VLMWidth = LPdlg.GetWidth();
+		m_pctrlVLMMesh->SetStyle(m_VLMStyle, m_VLMWidth, m_VLMColor);
 	}
-	repaint();
 }
+
 
 void W3dPrefsDlg::OnShowWake()
 {

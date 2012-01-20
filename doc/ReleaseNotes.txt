@@ -17,6 +17,7 @@
 
 
 xflr5 v6.06, January xxxth, 2011
+	- changed and hopefully improved the algorithm which intersects wing surfaces and body
 	- code cleaning
 	- minor bug corrections and enhancements
 	- reduced the maximum size of sections, masses, and chorwise panels on a wing to reduce global memory usage

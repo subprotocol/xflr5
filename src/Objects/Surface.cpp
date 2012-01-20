@@ -892,7 +892,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 		TBody.Translate(dx, 0.0, dz);
 	}
 
-	cosdA= Normal.dot(NormalA);
+	cosdA = Normal.dot(NormalA);
 	cosdB = Normal.dot(NormalB);
 	chordA  = GetChord(0.0);//todo : compare with |m_LA-m_TA|
 	chordB  = GetChord(1.0);

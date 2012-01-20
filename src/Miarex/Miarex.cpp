@@ -885,8 +885,10 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 //			if(Cp) memcpy(pPOpp->m_Cp, Cp,  sizeof(pPOpp->m_Cp));
 //			if(Gamma)	memcpy(pPOpp->m_G,  Gamma,   sizeof(pPOpp->m_G));
 //			if(Sigma)	memcpy(pPOpp->m_Sigma,  Sigma,   sizeof(pPOpp->m_G));
-//			if(Gamma) pPOpp->m_G[ip]     = (float)Gamma[ip];
-//			if(Sigma) pPOpp->m_Sigma[ip] = (float)Sigma[ip];
+
+			pPOpp->m_Cp[ip]              = (float)Cp[ip];
+			if(Gamma) pPOpp->m_G[ip]     = (float)Gamma[ip];
+			if(Sigma) pPOpp->m_Sigma[ip] = (float)Sigma[ip];
 		}
 
 		p = 0;
@@ -2158,7 +2160,7 @@ int QMiarex::CreateBodyElements()
 }
 
 
-int QMiarex::CreateElements(CSurface *pSurface)
+int QMiarex::CreateWingElements(CSurface *pSurface)
 {
 	//
 	// Creates the panel elements that will be used either by the VLM or the Panel method.
@@ -4663,14 +4665,14 @@ void QMiarex::GLDraw3D()
 	//
 	// creates the OpenGL lists for 3D display
 	//
-
-
 	if (!m_pCurWing)
 	{
 		m_bResetglGeom = true;
 		m_bResetglMesh = true;
 		m_bResetglOpp  = true;
 	}
+
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	MainFrame * pMainFrame =(MainFrame*)s_pMainFrame;
 	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
@@ -4889,7 +4891,7 @@ void QMiarex::GLDraw3D()
 
 		if (m_pCurWing && m_pCurWOpp)
 		{
-			GLCreateCp(this, m_Node, m_pCurWOpp, m_pCurPOpp);
+			GLCreateCp(this, m_Node, m_Panel, m_pCurWOpp, m_pCurPOpp);
 		}
 
 		m_bResetglPanelCp = false;
@@ -4946,6 +4948,8 @@ void QMiarex::GLDraw3D()
 		}
 	}
 	m_bResetglOpp = false;
+
+	QApplication::restoreOverrideCursor();
 }
 
 
@@ -5395,7 +5399,7 @@ bool QMiarex::InitializePanels()
 			for(j=0; j<m_pWingList[iw]->m_NSurfaces;j++)
 			{
 				m_pWingList[iw]->m_Surface[j].ResetFlap();
-				Nel = CreateElements(m_pWingList[iw]->m_Surface+j);
+				Nel = CreateWingElements(m_pWingList[iw]->m_Surface+j);
 				m_pWingList[iw]->m_MatSize += Nel;
 			}
 			m_pWingList[iw]->m_pPanel = ptr;

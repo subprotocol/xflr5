@@ -59,6 +59,7 @@ public:
 	double GetSectionArcLength(double x);
 	double SplineBlend(int const &index, int const &p, double const &t, double *knots);
 	double TotalMass();
+	double DistToNURBSBody(CVector Pt);
 
 	CVector LeadingPoint();
 

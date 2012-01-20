@@ -327,7 +327,7 @@ public:
 	void PaintCurWOppLegend(QPainter &painter);
 
 	int CreateBodyElements();
-	int CreateElements(CSurface *pSurface);
+	int CreateWingElements(CSurface *pSurface);
 	int IsWakeNode(CVector &Pt);
 	int IsNode(CVector &Pt);
 

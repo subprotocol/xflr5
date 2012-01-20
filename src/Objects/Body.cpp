@@ -27,6 +27,8 @@
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QtDebug>
+
 
 
 void *CBody::s_pMainFrame;
@@ -725,14 +727,16 @@ void CBody::GetPoint(double u, double v, bool bRight, CVector &Pt)
 {
 	//returns the point corresponding to the parametric values u and v
 	//assumes that the knots have been set previously
-	CVector V, Vh;
-	int i,j;
+	static CVector V, Vh;
+	static int i,j;
+
+	V.x= V.y=V.z = 0.0;
 
 	if(u>=1.0) u=0.99999999999;
 	if(v>=1.0) v=0.99999999999;
 	for(i=0; i<m_NStations; i++)
 	{
-		Vh.Set(0.0,0.0,0.0);
+		Vh.x= Vh.y=Vh.z = 0.0;
 		for(j=0; j<m_NSideLines; j++)
 		{
 			cs =  SplineBlend(j, m_nhDegree, v, s_hKnots);
@@ -1249,16 +1253,16 @@ bool CBody::Intersect(CVector A, CVector B, CVector &I, bool bRight)
 }
 
 
+
 bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 {
 	//intersect line AB with right or left body surface
 	//intersection point is I
-	CVector N, tmp, M0, M1;
-	double u, v, dist, t, tp;
+	static CVector tmp, M0, M1, J;
+	double dist2, t;
 	int iter = 0;
 	int itermax = 20;
-	double dmax = 1.0e-5;
-	dist = 1000.0;//m
+	dist2 = 1000.0;//m
 
 	M0.Set(0.0, A.y, A.z);
 	M1.Set(0.0, B.y, B.z);
@@ -1268,7 +1272,7 @@ bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 		tmp = A;		A   = B;		B   = tmp;
 	}
 	//M0 is the outside Point, M1 is the inside point
-	M0 = A; M1 = B; 
+	M0 = A; M1 = B;
 
 	//define which side to intersect with
 	if(M0.y>=0.0) bRight = true; else bRight = false;
@@ -1279,34 +1283,60 @@ bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 		I = M1;
 		return false;
 	}
- 
+
+	J.Set(0.0,0.0,0.0);
 	I = (M0+M1)/2.0; t=0.5;
 
-	while(dist>dmax && iter<itermax)
+	while(iter<itermax && dist2>1.e-07)
 	{
-		//first we get the u parameter corresponding to point I
-		tp = t;
-		u = Getu(I.x);
-		t_Q.Set(I.x, 0.0, 0.0);
-		t_r = (I-t_Q);
-		v = Getv(u, t_r, bRight);
-		GetPoint(u, v, bRight, t_N);
-
-		//project t_N on M0M1 line
-		t = - ( (M0.x - t_N.x) * (M1.x-M0.x) + (M0.y - t_N.y) * (M1.y-M0.y) + (M0.z - t_N.z)*(M1.z-M0.z))
-			 /( (M1.x -  M0.x) * (M1.x-M0.x) + (M1.y -  M0.y) * (M1.y-M0.y) + (M1.z -  M0.z)*(M1.z-M0.z));
-
-		I.x = M0.x + t * (M1.x-M0.x);
-		I.y = M0.y + t * (M1.y-M0.y);
-		I.z = M0.z + t * (M1.z-M0.z);
-
-//		dist = sqrt((t_N.x-I.x)*(t_N.x-I.x) + (t_N.y-I.y)*(t_N.y-I.y) + (t_N.z-I.z)*(t_N.z-I.z));
-		dist = fabs(t-tp);
-		iter++; 
+		if(IsInNURBSBody(I))
+		{
+			M1.x = I.x;
+			M1.y = I.y;
+			M1.z = I.z;
+		}
+		else
+		{
+			M0.x = I.x;
+			M0.y = I.y;
+			M0.z = I.z;
+		}
+		I.x = (M0.x+M1.x)/2.0;
+		I.y = (M0.y+M1.y)/2.0;
+		I.z = (M0.z+M1.z)/2.0;
+		dist2 = (I.x-J.x)*(I.x-J.x) + (I.y-J.y)*(I.y-J.y) + (I.z-J.z)*(I.z-J.z);
+		J.x = I.x;
+		J.y = I.y;
+		J.z = I.z;
+		iter++;
 	}
-
-	return dist<dmax;
+//	qDebug()<<"Iter="<<iter<<"dist="<<dist2;
+	return iter<itermax;
 }
+
+/*
+while(dist>dmax && iter<itermax)
+{
+	//first we get the u parameter corresponding to point I
+	tp = t;
+	u = Getu(I.x);
+	t_Q.Set(I.x, 0.0, 0.0);
+	t_r = (I-t_Q);
+	v = Getv(u, t_r, bRight);
+	GetPoint(u, v, bRight, t_N);
+
+	//project t_N on M0M1 line
+	t = - ( (M0.x - t_N.x) * (M1.x-M0.x) + (M0.y - t_N.y) * (M1.y-M0.y) + (M0.z - t_N.z)*(M1.z-M0.z))
+		 /( (M1.x -  M0.x) * (M1.x-M0.x) + (M1.y -  M0.y) * (M1.y-M0.y) + (M1.z -  M0.z)*(M1.z-M0.z));
+
+	I.x = M0.x + t * (M1.x-M0.x);
+	I.y = M0.y + t * (M1.y-M0.y);
+	I.z = M0.z + t * (M1.z-M0.z);
+
+	dist = fabs(t-tp);
+	iter++;
+}
+*/
 
 
 bool CBody::IntersectPanels(CVector A, CVector B, CVector &I)
@@ -1466,23 +1496,44 @@ int CBody::IsFramePos(CVector Real, double ZoomFactor)
 
 bool CBody::IsInNURBSBody(CVector Pt)
 {
-	double u, v;
-	bool bRight;
+	static double u, v;
+	static bool bRight;
 
 	u = Getu(Pt.x);
-	t_r.Set(0.0, Pt.y, Pt.z);
+	t_r.x = 0.0;
+	t_r.y = Pt.y;
+	t_r.z = Pt.z;
 
-	if(Pt.y>=0.0) bRight = true;	else bRight = false;
+	bRight = (Pt.y>=0.0);
 
 	v = Getv(u, t_r, bRight);
 	GetPoint(u, v, bRight, t_N);
 
 	t_N.x = 0.0;
 
-	if(t_r.VAbs()>t_N.VAbs()) return false;
-	return true;
+	return (t_r.VAbs()<=t_N.VAbs());
 }
 
+
+double CBody::DistToNURBSBody(CVector Pt)
+{
+	static double u, v;
+	static bool bRight;
+
+	u = Getu(Pt.x);
+	t_r.x = 0.0;
+	t_r.y = Pt.y;
+	t_r.z = Pt.z;
+
+	bRight = (Pt.y>=0.0);
+
+	v = Getv(u, t_r, bRight);
+	GetPoint(u, v, bRight, t_N);
+
+	t_N.x = 0.0;
+
+	return t_N.VAbs()/t_r.VAbs();
+}
 
 
 int CBody::ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit)

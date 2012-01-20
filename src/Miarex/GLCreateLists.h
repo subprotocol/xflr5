@@ -29,7 +29,7 @@
 #include "../Objects/WPolar.h"
 
 void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody=NULL);
-void GLCreateCp(void *pQMiarex, CVector *pNode,  CWOpp *pWOpp, CPOpp *pPOpp);
+void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
 void GLDrawCpLegend(void *pQMiarex);
 void GLCreateCpLegendClr(void *pQMiarex);
 void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);

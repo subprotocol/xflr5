@@ -48,15 +48,12 @@ private:
 	double m_Beta;
 	double m_Bank;
 	double m_Ctrl;			//Control Variable
-//	double m_Weight;		// the plane's weight
 	
 	int m_NStation;			// unused
 	int m_Type;			// analysis type
 	int m_VLMType;			// for future use
 
 	bool m_bWing[MAXWINGS];  // main wing, 2nd wing, elevator, fin
-//	bool m_bBiplane; 		// if a biplane
-//	bool m_bStab, m_bFin;		// if there is an elevator and a fin, respectively
 	bool m_bVLM1;			// true if the POpp is the result of a classic VLM analysis
 	bool m_bOut;			// true if the point is unconverged (interpolation outside the polar mesh)
 	bool m_bIsVisible;
@@ -67,9 +64,9 @@ private:
 	QColor m_Color;
 
 public:
-//	float m_G[VLMMAXMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
-//	float m_Sigma[VLMMAXMATSIZE];		// the panel's source strengths
-//	float m_Cp[VLMMAXMATSIZE];	// the Cp array
+	float m_G[VLMMAXMATSIZE];		// the VLM vortex strengths, or the panel's doublet's strengths
+	float m_Sigma[VLMMAXMATSIZE];		// the panel's source strengths
+	float m_Cp[VLMMAXMATSIZE];	// the Cp array
 	int m_NPanels;		// the number of VLM or 3D-panels
 };
 #endif

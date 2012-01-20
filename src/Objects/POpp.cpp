@@ -51,8 +51,9 @@ CPOpp::CPOpp()
 	m_QInf                = 0.0;
 	m_Ctrl                = 0.0;
 
-//	memset(m_Cp, 0, sizeof(m_Cp));
-//	memset(m_G,  0, sizeof(m_G));
+	memset(m_Cp,    0, sizeof(m_Cp));
+	memset(m_Sigma, 0, sizeof(m_Sigma));
+	memset(m_G,     0, sizeof(m_G));
 }
 
 
@@ -62,12 +63,13 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 	int ArchiveFormat;
 	int a, k;
 //	int p, p0;
-	float f;
+	float f, g, h;
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat>=6) ar << 1008;
+		if(ProjectFormat>=6) ar << 1009;
 		else                 ar << 1007;
+		//1009 : restored the serialization of Cp, Gamma, Sigma arrays...
 		//1008 : removed the serialization of Cp, Gamma, Sigma arrays
 		//1007 : added Sideslip Beta
 		//1006 : added Panel's source strengths Sigma
@@ -100,9 +102,13 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << m_NPanels;
 		if(ProjectFormat<6)
 		{
-			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_Cp[k];
-			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_G[k];
-			for (k=0; k<=m_NPanels; k++) ar << 0.0f; // (float)m_Sigma[k];
+			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_Cp[k];
+			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_G[k];
+			for (k=0; k<=m_NPanels; k++) ar <<  (float)m_Sigma[k];
+		}
+		else
+		{
+			for (k=0; k<m_NPanels; k++) ar<<(float)m_Cp[k]<<(float)m_Sigma[k]<<(float)m_G[k];
 		}
 		ar << m_VLMType;
 
@@ -227,6 +233,17 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			{
 				ar >> f;
 //				m_Sigma[k] = f;
+			}
+		}
+
+		if(ArchiveFormat>=1009)
+		{
+			for (k=0; k<m_NPanels; k++)
+			{
+				ar >> f >> g >> h;
+				m_Cp[k]    = f;
+				m_Sigma[k] = g;
+				m_G[k]     = h;
 			}
 		}
 

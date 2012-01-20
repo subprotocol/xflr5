@@ -35,7 +35,6 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 	if(!pWing) return;
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 	static int j, l ;
 	static double x, xDistrib[SIDEPOINTS];
@@ -432,12 +431,11 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 		glDisable (GL_LINE_STIPPLE);
 	}
 	glEndList();
-	QApplication::restoreOverrideCursor();
 }
 
 
 
-void GLCreateCp(void *pQMiarex, CVector *pNode, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 	if(!pWOpp && !pPOpp)
 	{
@@ -448,18 +446,12 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CWOpp *pWOpp, CPOpp *pPOpp)
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 
 	int p, pp, n, averageInf, averageSup, average100;
+	int nPanels;
 	double color;
 	double lmin, lmax, range;
+	float *tab;
 	double CpInf[2*VLMMAXMATSIZE], CpSup[2*VLMMAXMATSIZE], Cp100[2*VLMMAXMATSIZE];
 	CVector LA,LB,TA,TB;
-	CPanel *pPanel;
-	CWing *pWingList[MAXWINGS];
-	CWOpp *pWOppList[MAXWINGS];
-	for(int ip=0; ip<MAXWINGS; ip++)
-	{
-		pWingList[ip] = pMiarex->m_pWingList[ip];
-		pWOppList[ip] = pMiarex->m_pWOpp[ip];
-	}
 
 	glNewList(PANELCP, GL_COMPILE);
 	{
@@ -468,45 +460,46 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CWOpp *pWOpp, CPOpp *pPOpp)
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 
+		if(pPOpp)
+		{
+			tab = pPOpp->m_Cp;
+			nPanels = pPOpp->m_NPanels;
+		}
+		else
+		{
+			tab = pWOpp->m_Cp;
+			nPanels = pWOpp->m_NVLMPanels;
+		}
 
 		lmin = 10000.0;
 		lmax = -10000.0;
 		// find min and max Cp for scale set
 		for (n=0; n<pMiarex->m_nNodes; n++)
 		{
-			averageInf = averageSup = average100 = 0;
-			CpInf[n] = CpSup[n] = Cp100[n] = 0.0;
-
-			for(int iw=0; iw<MAXWINGS; iw++)
+			averageInf = 0; averageSup = 0; average100 = 0;
+			CpInf[n] = 0.0; CpSup[n] = 0.0; Cp100[n] = 0.0;
+			for (pp=0; pp< nPanels; pp++)
 			{
-				if(pWingList[iw])
+				if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
+					pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
 				{
-					pPanel = pWingList[iw]->m_pPanel;
-					for (pp=0; pp< pWingList[iw]->m_MatSize; pp++)
+					if(pPanel[pp].m_iPos==1)
 					{
-						if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
-							pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
-						{
-							if(pPanel[pp].m_iPos==1)
-							{
-								CpSup[n] += pWOppList[iw]->m_Cp[pp];
-								averageSup++;
-							}
-							else if(pPanel[pp].m_iPos<=0)
-							{
-								CpInf[n] += pWOppList[iw]->m_Cp[pp];
-								averageInf++;
-							}
-							else if(pPanel[pp].m_iPos==100)
-							{
-								Cp100[n] +=pWOppList[iw]->m_Cp[pp];
-								average100++;
-							}
-						}
+						CpSup[n] +=tab[pp];
+						averageSup++;
+					}
+					else if(pPanel[pp].m_iPos<=0)
+					{
+						CpInf[n] +=tab[pp];
+						averageInf++;
+					}
+					else if(pPanel[pp].m_iPos==100)
+					{
+						Cp100[n] +=tab[pp];
+						average100++;
 					}
 				}
 			}
-
 			if(averageSup>0)
 			{
 				CpSup[n] /= averageSup;
@@ -541,53 +534,46 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CWOpp *pWOpp, CPOpp *pPOpp)
 		range = lmax - lmin;
 
 		glLineWidth(1.0);
-		for(int iw=0; iw<MAXWINGS; iw++)
+		for (p=0; p<pMiarex->m_MatSize; p++)
 		{
-			if(pWingList[iw])
+			glBegin(GL_QUADS);
 			{
-				for (p=0; p<pWingList[iw]->m_MatSize; p++)
-				{
-					glBegin(GL_QUADS);
-					{
-						TA.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iTA]);
-						TB.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iTB]);
-						LA.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iLA]);
-						LB.Copy(pNode[pWingList[iw]->m_pPanel[p].m_iLB]);
+				TA.Copy(pNode[pPanel[p].m_iTA]);
+				TB.Copy(pNode[pPanel[p].m_iTB]);
+				LA.Copy(pNode[pPanel[p].m_iLA]);
+				LB.Copy(pNode[pPanel[p].m_iLB]);
 
-						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
-						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
-						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iLA]-lmin)/range;
-						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-						glVertex3d(LA.x, LA.y, LA.z);
+				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
+				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
+				else                           color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
+				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+				glVertex3d(LA.x, LA.y, LA.z);
 
-						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
-						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
-						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iTA]-lmin)/range;
-						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-						glVertex3d(TA.x, TA.y, TA.z);
+				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
+				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
+				else                           color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
+				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+				glVertex3d(TA.x, TA.y, TA.z);
 
-						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
-						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
-						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iTB]-lmin)/range;
-						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-						glVertex3d(TB.x, TB.y, TB.z);
+				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
+				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
+				else                           color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
+				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+				glVertex3d(TB.x, TB.y, TB.z);
 
-						if(pPanel[p].m_iPos==1)      color = (CpSup[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
-						else if(pPanel[p].m_iPos<=0) color = (CpInf[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
-						else                         color = (Cp100[pWingList[iw]->m_pPanel[p].m_iLB]-lmin)/range;
-						glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
-						glVertex3d(LB.x, LB.y, LB.z);
+				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
+				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
+				else                           color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
+				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+				glVertex3d(LB.x, LB.y, LB.z);
 
-					}
-					glEnd();
-				}
 			}
+			glEnd();
 		}
 		glDisable(GL_POLYGON_OFFSET_FILL);
 	}
 	glEndList();
 }
-
 
 
 void GLDrawCpLegend(void *pQMiarex)
@@ -1713,11 +1699,11 @@ void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pW
 }
 
 
-void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
+void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, CWPolar *pWPolar, CWOpp *pWOpp)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
-	if(!pWing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD)
+	if(!Wing[0] || !pWOpp || !pWPolar || pWPolar->m_AnalysisMethod==LLTMETHOD)
 	{
 		glNewList(VLMSTREAMLINES,GL_COMPILE); glEndList();
 		pMiarex->m_GLList++;
@@ -1727,10 +1713,10 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 	double memcoresize = pMiarex->GetCoreSize();
 	pMiarex->SetCoreSize(0.0005); //mm, just for the time needed to build the streamlines
 
-//	CWing *pWing;
+	CWing *pWing;
 
 	ProgressDlg dlg;
-	dlg.setWindowTitle("Streamlines calculation");
+	dlg.setWindowTitle("Streamines calculation");
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);
@@ -1741,9 +1727,8 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 	bool bFound;
 	int i;
 	int m, p, style, width, iWing;
-//	float Gamma[VLMMAXMATSIZE];
-	float Mu[VLMMAXMATSIZE], Sigma[VLMMAXMATSIZE];
 	double ds;
+	float *Gamma, *Mu, *Sigma;
 	QColor color;
 
 	CVector C, D, D1, VA, VAT, VB, VBT, VT, VInf, TC, TD;
@@ -1751,30 +1736,30 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 
 	D1.Set(987654321.0, 0.0, 0.0);
 
-	
-	int pos = 0;
+	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
+
 	if(pMiarex->m_pCurPOpp)
 	{
-		for(int iw=0; iw<MAXWINGS; iw++)
-		{
-			if(pWing[iw])
-			{
-//				memcpy(Gamma+pos, pMiarex->m_pWOpp[iw]->m_G,     pWing[iw]->m_MatSize*sizeof(float));
-				memcpy(Mu+pos,    pMiarex->m_pWOpp[iw]->m_G,     pWing[iw]->m_MatSize*sizeof(float));
-				memcpy(Sigma+pos, pMiarex->m_pWOpp[iw]->m_Sigma, pWing[iw]->m_MatSize*sizeof(float));
-				pos += pWing[iw]->m_MatSize;
-			}
-		}
+		Gamma = pPOpp->m_G;
+		Mu    = pPOpp->m_G;
+		Sigma = pPOpp->m_Sigma;
 	}
 	else if (pWOpp)
 	{
-//		memcpy(Gamma, pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
-		memcpy(Mu,    pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
-		memcpy(Sigma, pWOpp->m_Sigma, pWOpp->m_NVLMPanels*sizeof(float));
+		Gamma = pWOpp->m_G;
+		Mu    = pWOpp->m_G;
+		Sigma = pWOpp->m_Sigma;
+	}
+	else
+	{
+		Gamma = NULL;
+		Mu    = NULL;
+		Sigma = NULL;
 	}
 
+
 //	pMiarex->m_pVLMDlg->m_pWing     = Wing[0];
-	pMiarex->m_pPanelDlg->m_pWing   = pWing[0];
+	pMiarex->m_pPanelDlg->m_pWing   = Wing[0];
 
 
 //Tilt the geometry w.r.t. aoa
@@ -1794,11 +1779,11 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 
 		style = pMiarex->m_WakeStyle;
 
-		if     (style == DASHLINE)       glLineStipple(1, 0xCFCF);
-		else if(style == DOTLINE)        glLineStipple(1, 0x6666);
-		else if(style == DASHDOTLINE)    glLineStipple(1, 0xFF18);
-		else if(style == DASHDOTDOTLINE) glLineStipple(1, 0x7E66);
-		else				             glLineStipple(1, 0xFFFF);//Solid
+		if     (style == 1) 	glLineStipple (1, 0xCFCF);
+		else if(style == 2) 	glLineStipple (1, 0x6666);
+		else if(style == 3) 	glLineStipple (1, 0xFF18);
+		else if(style == 4) 	glLineStipple (1, 0x7E66);
+		else					glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -1806,30 +1791,32 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 
 		m = 0;
 
-		for (iWing=0; iWing<MAXWINGS; iWing++)
+		for (iWing=0; iWing<4; iWing++)
 		{
-			if(pWing[iWing])
+			if(Wing[iWing])
 			{
-				for (p=0; p<pWing[iWing]->m_MatSize; p++)
+				pWing = Wing[iWing];
+
+				for (p=0; p<pWing->m_MatSize; p++)
 				{
 					bFound = false;
 
-					if(p3DScales->m_pos==0 && pWing[iWing]->m_pPanel[p].m_bIsLeading && pWing[iWing]->m_pPanel[p].m_iPos<=0)
+					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(pNode[pWing[iWing]->m_pPanel[p].m_iLA]);
-						D.Set(pNode[pWing[iWing]->m_pPanel[p].m_iLB]);
+						C.Set(pNode[pWing->m_pPanel[p].m_iLA]);
+						D.Set(pNode[pWing->m_pPanel[p].m_iLB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==1 && pWing[iWing]->m_pPanel[p].m_bIsTrailing && pWing[iWing]->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTA]);
-						D.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTB]);
+						C.Set(pNode[pWing->m_pPanel[p].m_iTA]);
+						D.Set(pNode[pWing->m_pPanel[p].m_iTB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==2 && pWing[iWing]->m_pPanel[p].m_bIsLeading && pWing[iWing]->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
 					{
-						C.Set(0.0, pNode[pWing[iWing]->m_pPanel[p].m_iLA].y, 0.0);
-						D.Set(0.0, pNode[pWing[iWing]->m_pPanel[p].m_iLB].y, 0.0);
+						C.Set(0.0, pNode[pWing->m_pPanel[p].m_iLA].y, 0.0);
+						D.Set(0.0, pNode[pWing->m_pPanel[p].m_iLB].y, 0.0);
 						bFound = true;
 					}
 
@@ -1844,21 +1831,21 @@ void GLCreateStreamLines(void *pQMiarex, CWing *pWing[MAXWINGS], CVector *pNode,
 						if(p3DScales->m_pos==1 && fabs(p3DScales->m_XOffset)<0.001 && fabs(p3DScales->m_ZOffset)<0.001)
 						{
 							//apply Kutta's condition : initial speed vector is parallel to the T.E. bisector angle
-							VA.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTA] - pNode[pWing[iWing]->m_pPanel[p].m_iLA]);
+							VA.Set(pNode[pWing->m_pPanel[p].m_iTA] - pNode[pWing->m_pPanel[p].m_iLA]);
 							VA. Normalize();
-							VB.Set(pNode[pWing[iWing]->m_pPanel[p].m_iTB] - pNode[pWing[iWing]->m_pPanel[p].m_iLB]);
+							VB.Set(pNode[pWing->m_pPanel[p].m_iTB] - pNode[pWing->m_pPanel[p].m_iLB]);
 							VB. Normalize();
-							if(pWing[iWing]->m_pPanel[p].m_iPos ==-1)
+							if(pWing->m_pPanel[p].m_iPos ==-1)
 							{
 								//corresponding upper panel is the next one coming up
-								for (i=p; i<pWing[iWing]->m_MatSize;i++)
-									if(pWing[iWing]->m_pPanel[i].m_iPos>0 && pWing[iWing]->m_pPanel[i].m_bIsTrailing) break;
-								VAT = pNode[pWing[iWing]->m_pPanel[i].m_iTA] - pNode[pWing[iWing]->m_pPanel[i].m_iLA];
+								for (i=p; i<pWing->m_MatSize;i++)
+									if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
+								VAT = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
 								VAT.Normalize();
 								VA = VA+VAT;
 								VA.Normalize();//VA is parallel to the bisector angle
 
-								VBT = pNode[pWing[iWing]->m_pPanel[i].m_iTB] - pNode[pWing[iWing]->m_pPanel[i].m_iLB];
+								VBT = pNode[pWing->m_pPanel[i].m_iTB] - pNode[pWing->m_pPanel[i].m_iLB];
 								VBT.Normalize();
 								VB = VB+VBT;
 								VB.Normalize();//VB is parallel to the bisector angle
