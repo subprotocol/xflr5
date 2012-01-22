@@ -252,13 +252,12 @@ private:
 	QCursor m_hcCross;
 
 	Picture m_TmpPic;
-	Picture m_UndoPic[MAXPICTURESIZE];
+	Picture m_UndoPic[MAXSTACKPOS];
 
 	int m_CurrentColumn;
 
 	bool m_bIsImageLoaded;
 	QPixmap m_BackImage;
-	int m_BackImageWidth, m_BackImageHeight;
 };
 
 #endif // QAFOIL_H

@@ -73,10 +73,9 @@ QAFoil::QAFoil(QWidget *parent)
 	m_bXDown = m_bYDown = m_bZDown = false;
 	m_bIsImageLoaded = false;
 
-	m_BackImageWidth = m_BackImageHeight = 0;
 
 	memset(&m_TmpPic,0, sizeof(Picture));
-	memset(m_UndoPic, 0, MAXPICTURESIZE * sizeof(Picture));
+	memset(m_UndoPic, 0, MAXSTACKPOS* sizeof(Picture));
 
 	m_LERad   = 1.0;
 
@@ -697,19 +696,19 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		m_NeutralColor = QColor(r,g,b);
 		m_bNeutralLine = pSettings->value("NeutralLine").toBool();
 		
-		style  = pSettings->value("SFStyle").toInt();
-		width  = pSettings->value("SFWidth").toInt();
-		r = pSettings->value("SFColorRed").toInt();
-		g = pSettings->value("SFColorGreen").toInt();
-		b = pSettings->value("SFColorBlue").toInt();
+		style  = pSettings->value("SFStyle", SOLIDLINE).toInt();
+		width  = pSettings->value("SFWidth",1).toInt();
+		r = pSettings->value("SFColorRed",216).toInt();
+		g = pSettings->value("SFColorGreen",183).toInt();
+		b = pSettings->value("SFColorBlue",83).toInt();
 		color = QColor(r,g,b);
 		m_pSF->SetCurveParams(style, width, color);
 
-		style  = pSettings->value("PFStyle").toInt();
-		width  = pSettings->value("PFWidth").toInt();
-		r = pSettings->value("PFColorRed").toInt();
-		g = pSettings->value("PFColorGreen").toInt();
-		b = pSettings->value("PFColorBlue").toInt();
+		style  = pSettings->value("PFStyle", SOLIDLINE).toInt();
+		width  = pSettings->value("PFWidth", 1).toInt();
+		r = pSettings->value("PFColorRed",216).toInt();
+		g = pSettings->value("PFColorGreen",183).toInt();
+		b = pSettings->value("PFColorBlue",183).toInt();
 		color = QColor(r,g,b);
 		m_pPF->SetCurveParams(style, width, color);
 
@@ -719,6 +718,11 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		m_pPF->m_bVisible    = pSettings->value("PFVisible").toBool();
 		m_pPF->m_bOutPoints  = pSettings->value("PFOutPoints").toBool();
 		m_pPF->m_bCenterLine = pSettings->value("PFCenterLine").toBool();
+
+		m_pSF->m_Intrados.m_iRes =  pSettings->value("LowerRes",30).toInt();
+		m_pSF->m_Extrados.m_iRes =  pSettings->value("UpperRes",30).toInt();
+
+
 		m_bLECircle          = pSettings->value("LECircle").toBool();
 		m_bScale             = pSettings->value("Scale").toBool();
 		m_bShowLegend        = pSettings->value("Legend").toBool();
@@ -2557,13 +2561,13 @@ void QAFoil::PaintView(QPainter &painter)
 	painter.fillRect(m_rCltRect, pMainFrame->m_BackgroundColor);
 
 	//draw the background image in the viewport
-	if(m_bIsImageLoaded)
+	if(m_bIsImageLoaded && !m_BackImage.isNull())
 	{
-		int w = (int)((double)m_BackImageWidth  * xscale);
-		int h = (int)((double)m_BackImageHeight * yscale);
+		int w = (int)((double)m_BackImage.width()* xscale);
+		int h = (int)((double)m_BackImage.height()* yscale);
 		//the coordinates of the top left corner are measured from the center of the viewport
-		double xtop = VCenter.x() + m_ViewportTrans.x() - (int)((double)m_BackImageWidth  /2.*xscale);
-		double ytop = VCenter.y() + m_ViewportTrans.y() - (int)((double)m_BackImageHeight /2.*yscale);
+		double xtop = VCenter.x() + m_ViewportTrans.x() - (int)((double)m_BackImage.width()  /2.*xscale);
+		double ytop = VCenter.y() + m_ViewportTrans.y() - (int)((double)m_BackImage.height() /2.*yscale);
 
 		painter.drawPixmap(xtop, ytop, w,h, m_BackImage);
 	}
@@ -2804,6 +2808,11 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("PFVisible", m_pPF->m_bVisible);
 		pSettings->setValue("PFOutPoints", m_pPF->m_bOutPoints);
 		pSettings->setValue("PFCenterLine", m_pPF->m_bCenterLine);
+
+		pSettings->setValue("LowerRes", m_pSF->m_Intrados.m_iRes);
+		pSettings->setValue("UpperRes", m_pSF->m_Extrados.m_iRes);
+
+
 		pSettings->setValue("LECircle", m_bLECircle);
 		pSettings->setValue("Scale", m_bScale);
 		pSettings->setValue("Legend", m_bShowLegend );
@@ -3053,7 +3062,7 @@ void QAFoil::ShowFoil(CFoil* pFoil, bool bShow)
 
 void QAFoil::StorePicture()
 {
-	if(m_StackPos>=50)
+	if(m_StackPos>=MAXSTACKPOS)
 	{
 		for (int i=1; i<MAXSTACKPOS; i++)
 		{
@@ -3229,11 +3238,6 @@ void QAFoil::OnLoadBackImage()
 											pMainFrame->m_LastDirName,
 											"Image files (*.png *.jpg *.bmp)");
 	m_bIsImageLoaded = m_BackImage.load(PathName);
-	if(m_bIsImageLoaded)
-	{
-		m_BackImageWidth = m_BackImage.width();
-		m_BackImageHeight = m_BackImage.height();
-	}
 
 	UpdateView();
 }

@@ -3253,7 +3253,7 @@ bool MainFrame::LoadSettings()
 {
 	QPoint pt;
 	bool bFloat;
-	int a, SettingsFormat;
+	int SettingsFormat;
 	QSize size;
 	
 
@@ -3341,7 +3341,7 @@ bool MainFrame::LoadSettings()
 		m_DlgPos.rx() = settings.value("DlgPos_x").toInt();
 		m_DlgPos.ry() = settings.value("DlgPos_y").toInt();
 
-		a = settings.value("RecentFileSize").toInt();
+//		a = settings.value("RecentFileSize").toInt();
 		QString RecentF,strange;
 		m_RecentFiles.clear();
 		int n=0;

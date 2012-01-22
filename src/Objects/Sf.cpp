@@ -31,7 +31,7 @@ CSF::CSF()
 {
 	m_FoilStyle = 0;
 	m_FoilWidth = 1;
-	m_FoilColor   = QColor(50,180,130);
+	m_FoilColor   = QColor(119, 183, 83);
 	m_OutPoints    = 0;
 	m_bVisible     = true;
 	m_bOutPoints   = false;

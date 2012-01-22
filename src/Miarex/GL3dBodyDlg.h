@@ -41,6 +41,8 @@
 #include "../Objects/Body.h"
 #include "../GLWidget.h"
 
+#define MAXBODYSTACK  20
+
 
 class GL3dBodyDlg : public QDialog
 {
@@ -204,7 +206,7 @@ private:
 	QAction *m_pInertia;
 
 	CBody m_TmpPic;
-	CBody m_UndoPic[20];
+	CBody m_UndoPic[MAXBODYSTACK];
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	bool m_bStored;
 	bool m_bResetFrame;

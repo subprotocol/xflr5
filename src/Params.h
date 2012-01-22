@@ -55,10 +55,8 @@
 #define MAXCHORDPANELS	   50 // max number of panels in the chordwise direction
 #define VLMMAXMATSIZE    5000 // max number of VLM panels over the whole plane
 #define VLMHALF          2500
-#define VLMMAXRHS         100 // max number of points which may be calculated in a single sequence
+#define VLMMAXRHS          50 // max number of points which may be calculated in a single sequence
 #define MAXCONTROLS        40 // max controls per wing section
-#define SPLINECONTROLSIZE  50 // maximum number of control points
-#define MAXPICTURESIZE     40 // maximum number of undo operations in direct design
 #define MAXBODYFRAMES      60
 #define MAXSIDELINES       40
 #define MAXMASSES          30
@@ -68,6 +66,9 @@
 #define BODYPANELTYPE       1
 #define BODYSPLINETYPE      2
 
+//Direct Design
+#define MAXSTACKPOS        50 // max number of undo pictures on the stack in direct design
+#define SPLINECONTROLSIZE  50 // maximum number of control points
 
 
 //XFoil Direct Parameters
@@ -86,8 +87,6 @@
 #define IMX4 16 // = IMX/4 added arcds
 
 
-//Foil Direct design
-#define MAXSTACKPOS               50 // max number of undo pictures on the stack
 
 //MIAREX
 

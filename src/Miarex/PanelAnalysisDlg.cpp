@@ -175,8 +175,8 @@ bool PanelAnalysisDlg::AlphaLoop()
 	}
 
 	int MaxWakeIter = 1;
-	int Size= m_MatSize;
-	if(m_b3DSymetric) Size = m_SymSize;
+//	int Size= m_MatSize;
+//	if(m_b3DSymetric) Size = m_SymSize;
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
@@ -600,7 +600,7 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 	//    is set arbitrarily to the geometrical orgin so that phi = V.dot(WindDirectio) x point_position
 	//______________________________________________________________________________________
 	//
-	int kw, lw, pw, p, pp, Size;
+	int kw, lw, pw, p, pp;
 
 	static CVector V, VS, C, CC, TrPt;
 	double phi, phiSym;
@@ -609,8 +609,8 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 
 	AddString(tr("      Adding the wake's contribution...")+"\n");
 
-	if(m_b3DSymetric) Size = m_SymSize;
-	else              Size = m_MatSize;
+//	if(m_b3DSymetric) Size = m_SymSize;
+//	else              Size = m_MatSize;
 
 	int m, mm;
 	m = mm = 0;
@@ -733,7 +733,7 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 
 	QString strong;
 	int i, q, pos;
-	double alpha, Lift, IDrag, *Mu, *Sigma;
+	double alpha, IDrag, *Mu, *Sigma;
 	double ThinSize = 0.0;
 	CVector WindNormal, Force, WingForce;
 
@@ -759,7 +759,7 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 		}
 		else alpha = m_OpAlpha;
 		WindNormal.Set(-sin(alpha*PI/180.0),   0.0, cos(alpha*PI/180.0));
-		Lift = 0.0;
+//		Lift = 0.0;
 		pos = 0;
 		Mu     = m_Mu    + q*m_MatSize;
 		Sigma  = m_Sigma + q*m_MatSize;
@@ -1266,7 +1266,7 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 	//following VSAERO theory manual
 	//the on-body tangential perturbation speed is the derivative of the doublet strength
 	int p, q;
-	static double Alpha, *Mu, * Sigma, *Cp;
+	static double Alpha, *Mu, *Cp;
 	static CVector Qp, VInf, VLocal;
 	double Speed2, cosa, sina;
 
@@ -1285,7 +1285,7 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			VInf = Qp * m_3DQInf[q];
 
 			Mu     = m_Mu    + q * m_MatSize;
-			Sigma  = m_Sigma + q * m_MatSize;
+//			Sigma  = m_Sigma + q * m_MatSize;
 			Cp     = m_Cp    + q * m_MatSize;
 
 			for (p=0; p<m_MatSize; p++)
@@ -1315,7 +1315,7 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			VInf = Qp * m_3DQInf[q];
 
 			Mu     = m_Mu    + q * m_MatSize;
-			Sigma  = m_Sigma + q * m_MatSize;
+//			Sigma  = m_Sigma + q * m_MatSize;
 			Cp     = m_Cp    + q * m_MatSize;
 
 			for (p=0; p<m_MatSize; p++)
@@ -1835,7 +1835,7 @@ void PanelAnalysisDlg::RelaxWake()
 bool PanelAnalysisDlg::ReLoop()
 {
 	QString str;
-	int nrhs, Size;
+	int nrhs;
 	double Alpha = 0.0;
 
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
@@ -1853,8 +1853,8 @@ bool PanelAnalysisDlg::ReLoop()
 
 //	int MaxWakeIter = 1;
 
-	if(m_b3DSymetric) Size = m_SymSize;
-	else              Size = m_MatSize;
+//	if(m_b3DSymetric) Size = m_SymSize;
+//	else              Size = m_MatSize;
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
@@ -2248,15 +2248,15 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 	// The doublet and source strengths are for a unit speed
 	// The scaling to speed is performed at the next step, depending on the polar type
 	//
-	int  nrhs, q, p;
+	int  q, p;
 	double alpha, cosa, sina;
 
-	int Size = m_MatSize;
-	if(m_b3DSymetric) Size = m_SymSize;
+//	int Size = m_MatSize;
+//	if(m_b3DSymetric) Size = m_SymSize;
 
 	AddString("      Calculating doublet strength...\n");
-	if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) nrhs = nval;
-	else                                 nrhs = 0;
+//	if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) nrhs = nval;
+//	else                                 nrhs = 0;
 
 	//______________________________________________________________________________________
 	//	reconstruct all results from cosine and sine unit vectors
@@ -2442,8 +2442,8 @@ bool PanelAnalysisDlg::UnitLoop()
 	if(!m_pWPolar->m_bWakeRollUp) MaxWakeIter = 1;
 	else                          MaxWakeIter = qMax(m_MaxWakeIter, 1);
 
-	int Size = m_MatSize;
-	if(m_b3DSymetric) Size = m_SymSize;
+//	int Size = m_MatSize;
+//	if(m_b3DSymetric) Size = m_SymSize;
 
 
 	//ESTIMATED UNIT TIMES FOR OPERATIONS
@@ -3066,7 +3066,7 @@ bool PanelAnalysisDlg::SolveEigenvalues()
 void PanelAnalysisDlg::ComputeNDStabDerivatives()
 {
 	QString str;
-	double b, S, mac, q, theta0, Cw0, Cx0, Cz0;
+	double b, S, mac, q, theta0, Cw0;
 	double mass = m_pWPolar->m_Mass;
 	double rho = m_pWPolar->m_Density;
 
@@ -3077,8 +3077,8 @@ void PanelAnalysisDlg::ComputeNDStabDerivatives()
 	theta0 = 0.0;//steady level flight only ?
 
 	Cw0 = mass * 9.81/q/S; //E&R p.127
-	Cx0 =  Cw0 * sin(theta0); //E&R p.119
-	Cz0 = -Cw0 * cos(theta0); //E&R p.118
+//	Cx0 =  Cw0 * sin(theta0); //E&R p.119
+//	Cz0 = -Cw0 * cos(theta0); //E&R p.118
 
 	//E&R p. 118, table 4.4
 	CXu = (Xu - rho * u0*S*Cw0*sin(theta0))/(0.5*rho*u0*S);
@@ -4046,7 +4046,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	//
 	static CVector WindDirection, H, Force, Moment, V0, is, js, ks;
 	static int j, p, pos, NCtrls;
-	static double DeltaAngle, SignedDeltaAngle, q,S,b,mac,cosa, sina;
+	static double DeltaAngle, SignedDeltaAngle, q, S, b, mac, cosa, sina;
 	QString str;
 	Quaternion Quat;
 

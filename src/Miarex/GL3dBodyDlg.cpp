@@ -4674,14 +4674,14 @@ void GL3dBodyDlg::SetupLayout()
 void GL3dBodyDlg::StorePicture()
 {
 	int i;
-	if(m_StackPos>=20)
+	if(m_StackPos>=MAXBODYSTACK)
 	{
-		for (i=1; i<20; i++)
+		for (i=1; i<MAXBODYSTACK; i++)
 		{
 			m_UndoPic[i-1].Duplicate(m_UndoPic+i);
 		}
-		m_StackPos = 19;
-		m_StackSize = 19;
+		m_StackPos = MAXBODYSTACK-1;
+		m_StackSize = MAXBODYSTACK-1;
 	}
 	m_UndoPic[m_StackPos].Duplicate(&m_TmpPic);
 
