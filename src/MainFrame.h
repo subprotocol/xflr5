@@ -103,6 +103,7 @@ public slots:
 private slots:
 	void AboutQFLR5();
 	void OnCurFoilStyle();
+	void OnDuplicateFoil();
 	void OnGuidelines();
 	void OnExportCurGraph();
 	void OnInsertProject();

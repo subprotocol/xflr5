@@ -109,7 +109,6 @@ private slots:
 	void OnDelCurOpp();
 	void OnDeleteCurPolar();
 	void OnDeleteFoilPolars();
-	void OnDuplicateFoil();
 	void OnEditCurPolar();
 	void OnExportCurFoil();
 	void OnExportCurOpp();

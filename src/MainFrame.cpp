@@ -744,6 +744,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilDesignMenu->addAction(AFoilRename);
 	AFoilDesignMenu->addAction(AFoilDelete);
 	AFoilDesignMenu->addAction(AFoilExport);
+	AFoilDesignMenu->addAction(DuplicateFoil);
 	AFoilDesignMenu->addSeparator();
 	AFoilDesignMenu->addAction(HideAllFoils);
 	AFoilDesignMenu->addAction(ShowAllFoils);
@@ -805,6 +806,7 @@ void MainFrame::CreateAFoilMenus()
 	AFoilTableCtxMenu->addAction(AFoilRename);
 	AFoilTableCtxMenu->addAction(AFoilDelete);
 	AFoilTableCtxMenu->addAction(AFoilExport);
+	AFoilTableCtxMenu->addAction(DuplicateFoil);
 	AFoilTableCtxMenu->addSeparator();
 	AFoilTableCtxMenu->addAction(AFoilNormalizeFoil);
 	AFoilTableCtxMenu->addAction(AFoilDerotateFoil);
@@ -2091,7 +2093,7 @@ void MainFrame::CreateXDirectActions()
 	connect(NacaFoils, SIGNAL(triggered()), pXDirect, SLOT(OnNacaFoils()));
 
 	DuplicateFoil = new QAction(tr("Duplicate"), this);
-	connect(DuplicateFoil, SIGNAL(triggered()), pXDirect, SLOT(OnDuplicateFoil()));
+	connect(DuplicateFoil, SIGNAL(triggered()), this, SLOT(OnDuplicateFoil()));
 
 	setCpVarGraph = new QAction(tr("Cp Variable"), this);
 	setCpVarGraph->setCheckable(true);
@@ -2170,10 +2172,10 @@ void MainFrame::CreateXDirectMenus()
 	currentFoilMenu = FoilMenu->addMenu(tr("Current Foil"));
 	currentFoilMenu->addAction(setCurFoilStyle);
 	currentFoilMenu->addSeparator();
-	currentFoilMenu->addAction(DuplicateFoil);
 	currentFoilMenu->addAction(exportCurFoil);
 	currentFoilMenu->addAction(renameCurFoil);
 	currentFoilMenu->addAction(deleteCurFoil);
+	currentFoilMenu->addAction(DuplicateFoil);
 	currentFoilMenu->addSeparator();
 	currentFoilMenu->addAction(showFoilPolars);
 	currentFoilMenu->addAction(hideFoilPolars);
@@ -6881,4 +6883,37 @@ void MainFrame::SetDlgPos(QDialog &Dlg)
 	if(Dlg.height()>desk.rect().height()) Position.ry()=0;
 
 	Dlg.move(Position);
+}
+
+
+
+void MainFrame::OnDuplicateFoil()
+{
+	if(!g_pCurFoil) return;
+	CFoil *pNewFoil = new CFoil();
+	pNewFoil->CopyFoil(g_pCurFoil);
+	pNewFoil->InitFoil();
+
+	if(SetModFoil(pNewFoil))
+	{
+		if(m_iApp==XFOILANALYSIS)
+		{
+			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
+			pXDirect->m_BufferFoil.CopyFoil(pNewFoil);
+			pXDirect->SetFoil();
+		}
+		else if(m_iApp==DIRECTDESIGN)
+		{
+			QAFoil *pAFoil= (QAFoil*)m_pAFoil;
+			//then duplicate the buffer foil and add it
+			CFoil *pNewFoil = new CFoil();
+			pNewFoil->CopyFoil(pAFoil->m_pBufferFoil);
+			pAFoil->FillFoilTable();
+			pAFoil->SelectFoil(pNewFoil);
+		}
+
+		UpdateFoils();
+		UpdateView();
+		SetSaveState(false);
+	}
 }

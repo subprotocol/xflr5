@@ -354,7 +354,7 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 	l=0;
 
 	QColor color;
-	int style, width;
+//	int style, width;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
@@ -456,20 +456,16 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 
 		glLineWidth(pMiarex->m_OutlineWidth);
 
-		color = pMiarex->m_OutlineColor;
-		style = pMiarex->m_OutlineStyle;
-		width = pMiarex->m_OutlineWidth;
-
-		if     (style == DASHLINE)       glLineStipple (1, 0xCFCF);
-		else if(style == DOTLINE)        glLineStipple (1, 0x6666);
-		else if(style == DASHDOTLINE)    glLineStipple (1, 0xFF18);
-		else if(style == DASHDOTDOTLINE) glLineStipple (1, 0x7E66);
-		else                             glLineStipple (1, 0xFFFF);
+		if     (pMiarex->m_OutlineStyle == DASHLINE)       glLineStipple (1, 0xCFCF);
+		else if(pMiarex->m_OutlineStyle == DOTLINE)        glLineStipple (1, 0x6666);
+		else if(pMiarex->m_OutlineStyle == DASHDOTLINE)    glLineStipple (1, 0xFF18);
+		else if(pMiarex->m_OutlineStyle == DASHDOTDOTLINE) glLineStipple (1, 0x7E66);
+		else                                               glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
 		glMap2f(GL_MAP2_VERTEX_3, 0.0, 1.0, pBody->m_NSideLines*3, pBody->m_NStations,
-								  0.0, 1.0, 3,                       pBody->m_NSideLines,
+								  0.0, 1.0, 3,                     pBody->m_NSideLines,
 				rightpts);
 
 		glPolygonMode(GL_FRONT,GL_LINE);
@@ -4775,25 +4771,36 @@ void  GL3dBodyDlg::wheelEvent(QWheelEvent *event)
 	//The mouse button has been wheeled
 	//Process the message
 //	point is in client coordinates
+	static double ZoomFactor;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+
+	if(event->delta()>0)
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1./1.06;
+		else                            ZoomFactor = 1.06;
+	}
+	else
+	{
+		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
+		else                            ZoomFactor = 1./1.06;
+	}
 
 	if(m_BodyRect.contains(point))
 	{
-		if(event->delta()<0) m_glScaled *= (GLfloat)1.06;
-		else                 m_glScaled /= (GLfloat)1.06;
+		m_glScaled *= ZoomFactor;
 	}
 	else if(m_BodyLineRect.contains(point))
 	{
-		if(event->delta()<0) m_BodyScale *= 1.06;
-		else                 m_BodyScale /= 1.06;
+		m_BodyScale *= ZoomFactor;
+
 		m_BodyScaledOffset.Set((1.0 - m_BodyScale)*m_BodyScalingCenter.x + m_BodyScale * m_BodyOffset.x,
-						   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
-						   0.0);
+							   (1.0 - m_BodyScale)*m_BodyScalingCenter.y + m_BodyScale * m_BodyOffset.y,
+								0.0);
 		m_bResetglBody2D=true;
 	}
 	else if(m_FrameRect.contains(point))
 	{
-		if(event->delta()<0) m_FrameScale *= 1.06;
-		else                 m_FrameScale /= 1.06;
+		m_FrameScale *= ZoomFactor;
 		m_FrameScaledOffset.Set((1.0 - m_FrameScale)*m_FrameScalingCenter.x + m_FrameScale * m_FrameOffset.x,
 								(1.0 - m_FrameScale)*m_FrameScalingCenter.y + m_FrameScale * m_FrameOffset.y,
 								 0.0);

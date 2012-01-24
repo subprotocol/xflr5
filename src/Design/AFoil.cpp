@@ -35,6 +35,7 @@
 #include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
 
+
 extern CFoil *g_pCurFoil;
 
 

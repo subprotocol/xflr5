@@ -2637,24 +2637,6 @@ void QXDirect::OnDbPlot()
 }
 
 
-void QXDirect::OnDuplicateFoil()
-{
-	if(!g_pCurFoil) return;
-	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
-	CFoil *pNewFoil = new CFoil();
-	pNewFoil->CopyFoil(g_pCurFoil);
-	pNewFoil->InitFoil();
-
-	m_BufferFoil.CopyFoil(pNewFoil);
-	if(pMainFrame->SetModFoil(pNewFoil))
-	{
-		SetFoil();
-		pMainFrame->UpdateFoils();
-		UpdateView();
-		pMainFrame->SetSaveState(false);
-	}
-	else delete pNewFoil;
-}
 
 
 void QXDirect::OnEditCurPolar()

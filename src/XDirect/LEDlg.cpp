@@ -186,9 +186,9 @@ void LEDlg::OnApply()
 	}
 
 	m_LErfac = m_pctrlLE->Value();
-	m_Blend = m_pctrlBlend->Value();
+	m_Blend = m_pctrlBlend->Value()/100.0;
 
-	pXFoil->lerad(m_LErfac,m_Blend/100.0);
+	pXFoil->lerad(m_LErfac,m_Blend);
 
 	if(pXFoil->n>IQX)
 	{

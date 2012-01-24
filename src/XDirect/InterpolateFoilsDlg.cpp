@@ -124,6 +124,8 @@ void InterpolateFoilsDlg::InitDialog()
 
 	int i;
 	CFoil* pFoil;
+	m_pctrlFoil1->clear();
+	m_pctrlFoil2->clear();
 	for (i=0; i<m_poaFoil->size(); i++)
 	{
 		pFoil = (CFoil*)m_poaFoil->at(i);

@@ -15012,7 +15012,7 @@ void QMiarex::wheelEvent(QWheelEvent *event)
 	else
 	{
 		if(!pMainFrame->m_bReverseZoom) ZoomFactor = 1.06;
-		else                           ZoomFactor = 1./1.06;
+		else                            ZoomFactor = 1./1.06;
 	}
 
 	if(m_iView==W3DVIEW || (m_iView==WSTABVIEW&&m_iStabilityView==STAB3DVIEW))
