@@ -1753,10 +1753,6 @@ void MainFrame::CreateMiarexMenus()
 
 void MainFrame::CreateMiarexToolbar()
 {
-	m_pctrlUFO    = new QComboBox();
-	m_pctrlWPolar = new QComboBox;
-	m_pctrlWOpp   = new QComboBox;
-
 	m_pctrl3dView = new QToolButton;
 	m_pctrl3dView->setDefaultAction(W3DAct);
 	m_pctrl3dView->setCheckable(true);
@@ -1778,12 +1774,18 @@ void MainFrame::CreateMiarexToolbar()
 	m_pctrlRootLocusButton->setDefaultAction(RootLocusAct);
 	m_pctrlRootLocusButton->setCheckable(true);
 
+	m_pctrlUFO    = new QComboBox();
+	m_pctrlWPolar = new QComboBox;
+	m_pctrlWOpp   = new QComboBox;
 	m_pctrlUFO->setMinimumWidth(150);
 	m_pctrlWPolar->setMinimumWidth(150);
 	m_pctrlWOpp->setMinimumWidth(80);
 	m_pctrlUFO->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlWPolar->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 	m_pctrlWOpp->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+	m_pctrlUFO->setMaxVisibleItems(23);
+	m_pctrlWPolar->setMaxVisibleItems(23);
+	m_pctrlWOpp->setMaxVisibleItems(23);
 
 	m_pctrlMiarexToolBar = addToolBar(tr("UFO"));
 	m_pctrlMiarexToolBar->addAction(newProjectAct);
@@ -1828,10 +1830,6 @@ void MainFrame::CreateToolbars()
 
 void MainFrame::CreateXDirectToolbar()
 {
-	m_pctrlFoil    = new QComboBox;
-	m_pctrlPolar   = new QComboBox;
-	m_pctrlOpPoint = new QComboBox;
-
 	m_pctrlPolarView = new QToolButton;
 	m_pctrlPolarView->setDefaultAction(PolarsAct);
 	m_pctrlPolarView->setCheckable(true);
@@ -1839,6 +1837,12 @@ void MainFrame::CreateXDirectToolbar()
 	m_pctrlOppView->setDefaultAction(OpPointsAct);
 	m_pctrlOppView->setCheckable(true);
 
+	m_pctrlFoil    = new QComboBox;
+	m_pctrlPolar   = new QComboBox;
+	m_pctrlOpPoint = new QComboBox;
+	m_pctrlFoil->setMaxVisibleItems(23);
+	m_pctrlPolar->setMaxVisibleItems(23);
+	m_pctrlOpPoint->setMaxVisibleItems(23);
 	m_pctrlFoil->setMinimumWidth(150);
 	m_pctrlPolar->setMinimumWidth(150);
 	m_pctrlOpPoint->setMinimumWidth(80);

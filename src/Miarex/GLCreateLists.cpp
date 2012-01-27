@@ -1716,7 +1716,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 	CWing *pWing;
 
 	ProgressDlg dlg;
-	dlg.setWindowTitle("Streamines calculation");
+	dlg.setWindowTitle("Streamlines calculation");
 	dlg.InitDialog(0, pMiarex->m_MatSize);
 	dlg.setWindowModality(Qt::WindowModal);
 	dlg.SetValue(0);

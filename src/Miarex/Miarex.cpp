@@ -8760,10 +8760,6 @@ void QMiarex::OnEditUFO()
 	m_WingDlg.m_bAcceptName= false;
 	m_WingDlg.InitDialog(pModWing);
 
-	m_WingDlg.move(GL3dWingDlg::s_WindowPos);
-	m_WingDlg.resize(GL3dWingDlg::s_WindowSize);
-	if(GL3dWingDlg::s_bWindowMaximized) m_WingDlg.setWindowState(Qt::WindowMaximized);
-
 	if(QDialog::Accepted == m_WingDlg.exec())
 	{
 		if(m_WingDlg.m_bChanged)

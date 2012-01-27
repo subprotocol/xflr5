@@ -2534,6 +2534,9 @@ void GL3dWingDlg::SetupLayout()
 
 void GL3dWingDlg::showEvent(QShowEvent *event)
 {
+	move(s_WindowPos);
+	resize(s_WindowSize);
+	if(s_bWindowMaximized) setWindowState(Qt::WindowMaximized);
 
 //	InitDialog();
 //	resizeEvent(NULL);
