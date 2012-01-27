@@ -489,8 +489,8 @@ QMiarex::QMiarex(QWidget *parent)
 	GL3dWingDlg::s_pGLLightDlg = &m_GLLightDlg;
 	GL3dBodyDlg::s_pGLLightDlg = &m_GLLightDlg;
 
-	QEvent event(QEvent::Resize);
-	QApplication::sendEvent(&m_WingDlg, &event);
+//	QEvent event(QEvent::Resize);
+//	QApplication::sendEvent(&m_WingDlg, &event);
 	SetupLayout();
 
 //	m_pctrlHalfWing->setChecked(m_bHalfWing);
@@ -5380,9 +5380,9 @@ bool QMiarex::InitializePanels()
 	CPanel *ptr = m_Panel;
 
 //	dlg.setValue(5);
-	int NXWakePanels;
-	if(m_pCurWPolar)	NXWakePanels = m_pCurWPolar->m_NXWakePanels;
-	else                NXWakePanels = 1;
+//	int NXWakePanels;
+//	if(m_pCurWPolar)	NXWakePanels = m_pCurWPolar->m_NXWakePanels;
+//	else                NXWakePanels = 1;
 
 	int coef = 1;
 	if(m_pCurWPolar)
@@ -8607,7 +8607,7 @@ void QMiarex::OnEditCurBody()
 	m_GL3dBody.InitDialog();
 	m_GL3dBody.move(GL3dBodyDlg::s_WindowPos);
 	m_GL3dBody.resize(GL3dBodyDlg::s_WindowSize);
-        if(GL3dBodyDlg::s_bWindowMaximized) m_GL3dBody.setWindowState(Qt::WindowMaximized);
+	if(GL3dBodyDlg::s_bWindowMaximized) m_GL3dBody.setWindowState(Qt::WindowMaximized);
 
 	if(m_GL3dBody.exec() == QDialog::Accepted)
 	{
@@ -8760,7 +8760,9 @@ void QMiarex::OnEditUFO()
 	m_WingDlg.m_bAcceptName= false;
 	m_WingDlg.InitDialog(pModWing);
 
-//	pMainFrame->SetDlgPos(m_WingDlg);
+	m_WingDlg.move(GL3dWingDlg::s_WindowPos);
+	m_WingDlg.resize(GL3dWingDlg::s_WindowSize);
+	if(GL3dWingDlg::s_bWindowMaximized) m_WingDlg.setWindowState(Qt::WindowMaximized);
 
 	if(QDialog::Accepted == m_WingDlg.exec())
 	{
@@ -11532,13 +11534,13 @@ void QMiarex::PaintWingLegend(QPainter &painter)
 	QString Result, str, strong;
 	QString str1;
 	static double Mass;
-	static int margin, dwidth, dheight;
+	static int margin,dheight;
 
 	margin = 10;
 
 	QFontMetrics fm(pMainFrame->m_TextFont);
 	dheight = fm.height();
-	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
+//	dwidth = fm.width(tr("abcdefghijklmnopqrstuvwxyz012345678"));
 	int D = 0;
 	int LeftPos = margin;
 	int ZPos    = m_r2DCltRect.height()-11*dheight;
@@ -11902,11 +11904,11 @@ void QMiarex::PaintXCmRef(QPainter & painter, QPoint ORef, double scale)
 	QPoint O(ORef);
 	QPoint offset;
 
-	double scalex, scaley;
+	double scaley;
 
 	offset.rx() = ORef.x();
 	offset.ry() = ORef.y();
-	scalex  = scale;
+//	scalex  = scale;
 	scaley  = scale;
 	O.rx() = offset.x();
 	O.ry() = offset.y();

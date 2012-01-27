@@ -53,6 +53,10 @@ QList <void*> *GL3dWingDlg::s_poaWing;
 QList <void*> *GL3dWingDlg::s_poaFoil;
 	
 
+QPoint GL3dWingDlg::s_WindowPos=QPoint(20,20);
+QSize  GL3dWingDlg::s_WindowSize=QSize(900, 700);
+bool GL3dWingDlg::s_bWindowMaximized=false;
+
 
 GL3dWingDlg::GL3dWingDlg(void *pParent)
 {
@@ -395,7 +399,7 @@ void GL3dWingDlg::GLCreateMesh()
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
 	QColor color;
-	int style, width, j,l,k;
+	int width, j,l,k;
 	CVector A, B, C, D, N, LATB, TALB;
 
 	glNewList(MESHPANELS,GL_COMPILE);
@@ -405,7 +409,7 @@ void GL3dWingDlg::GLCreateMesh()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		color = pMiarex->m_VLMColor;
-		style = pMiarex->m_VLMStyle;
+//		style = pMiarex->m_VLMStyle;
 		width = pMiarex->m_VLMWidth;
 
 		glLineWidth(width);
@@ -537,7 +541,7 @@ void GL3dWingDlg::GLCreateMesh()
 		glPolygonOffset(1.0, 1.0);
 
 		color = pMainFrame->m_BackgroundColor;
-		style = pMiarex->m_VLMStyle;
+//		style = pMiarex->m_VLMStyle;
 		width = pMiarex->m_VLMWidth;
 
 		glColor3d(color.redF(),color.greenF(),color.blueF());
@@ -1156,10 +1160,10 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 
 void GL3dWingDlg::keyPressEvent(QKeyEvent *event)
 {
-	bool bShift = false;
-	bool bCtrl  = false;
-	if(event->modifiers() & Qt::ShiftModifier)   bShift =true;
-	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+//	bool bShift = false;
+//	bool bCtrl  = false;
+//	if(event->modifiers() & Qt::ShiftModifier)   bShift =true;
+//	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
 
 	switch (event->key())
 	{
@@ -1483,14 +1487,13 @@ void GL3dWingDlg::OnDeleteSection()
 		return;
 	}
 
-	int ny, k, size, total;
+	int ny, k, size;
 
 	size = m_pWingModel->rowCount();
 	if(size<=2) return;
 
 	ny = m_pWing->m_NYPanels[m_iSection-1] + m_pWing->m_NYPanels[m_iSection];
 
-	total = VLMGetPanelTotal();
 	for (k=m_iSection; k<size-1; k++)
 	{
 		m_pWing->m_TPos[k]      = m_pWing->m_TPos[k+1];
@@ -1540,7 +1543,6 @@ void GL3dWingDlg::OnInertia()
 
 	//save inertia properties
 	int NMass;
-	double MassValue[MAXMASSES];
 	CVector MassPosition[MAXMASSES];
 	QString MassTag[MAXMASSES];
 
@@ -1548,7 +1550,7 @@ void GL3dWingDlg::OnInertia()
 
 	for(int i=0; i< MAXMASSES; i++)
 	{
-		MassValue[i]    = m_pWing->m_MassValue[i];
+//		MassValue[i]    = m_pWing->m_MassValue[i];
 		MassPosition[i] = m_pWing->m_MassPosition[i];
 		MassTag[i]      = m_pWing->m_MassTag[i];
 	}
@@ -1565,7 +1567,7 @@ void GL3dWingDlg::OnInertia()
 
 		for(int i=0; i< MAXMASSES; i++)
 		{
-			MassValue[i]    = m_pWing->m_MassValue[i];
+//			MassValue[i]    = m_pWing->m_MassValue[i];
 			MassPosition[i] = m_pWing->m_MassPosition[i];
 			MassTag[i]      = m_pWing->m_MassTag[i];
 		}
@@ -1596,8 +1598,9 @@ void GL3dWingDlg::OnInsertBefore()
 		QMessageBox::warning(this, tr("Warning"), tr("No insertion possible before the first section"));
 		return;
 	}
-	int k,n,total, ny;
-	total = VLMGetPanelTotal();
+
+	int k,n, ny;
+
 	n  = m_iSection;
 	for (k=m_pWing->m_NPanel; k>=n; k--)
 	{
@@ -1648,13 +1651,12 @@ void GL3dWingDlg::OnInsertAfter()
 		QMessageBox::warning(this, tr("Warning"), tr("The maximum number of panels has been reached"));
 		return;
 	}
-	int k,n,ny,total;
+	int k,n,ny;
 
 	n  = m_iSection;
 
 	if(n<0) n=m_pWing->m_NPanel;
 	ny = m_pWing->m_NYPanels[n];
-	total = VLMGetPanelTotal();
 
 	for (k=m_pWing->m_NPanel+1; k>n; k--)
 	{
@@ -1743,6 +1745,10 @@ void GL3dWingDlg::OnOK()
 
 	m_pWing->ComputeGeometry();
 	m_pWing->ComputeBodyAxisInertia();
+
+	s_bWindowMaximized= isMaximized();
+	s_WindowPos = pos();
+	s_WindowSize = size();
 
 	accept();
 }
@@ -1981,6 +1987,10 @@ void GL3dWingDlg::reject()
 		}
 		else if(QMessageBox::Cancel == Ans) return;
 	}
+
+	s_bWindowMaximized= isMaximized();
+	s_WindowPos = pos();
+	s_WindowSize = size();
 //	reject();
 	done(QDialog::Rejected);
 }
@@ -2020,12 +2030,10 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 	//finds the closest panel under the point,
 	//and changes the rotation vector and viewport translation
 	int  i, j;
-	CVector N, LATB, TALB, LA, LB, TA, TB;
+	CVector N, LA, LB, TA, TB;
 	CVector I, A, B, AA, BB, PP, U;
-	double dmin;
 
 	i=-1;
-	dmin = 100000.0;
 
 	m_pGLWidget->ClientToGL(point, B);
 
@@ -2072,7 +2080,6 @@ void GL3dWingDlg::Set3DRotationCenter(QPoint point)
 										AA, U, I, dist);
 		if(bIntersect)
 		{
-			dmin = dist;
 			PP.Set(I);
 			break;
 		}
@@ -2268,10 +2275,10 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
-							    QAbstractItemView::DoubleClicked |
-							    QAbstractItemView::SelectedClicked |
-							    QAbstractItemView::EditKeyPressed |
-							    QAbstractItemView::AnyKeyPressed);
+									  QAbstractItemView::DoubleClicked |
+									  QAbstractItemView::SelectedClicked |
+									  QAbstractItemView::EditKeyPressed |
+									  QAbstractItemView::AnyKeyPressed);
 	QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
 	HorizontalHeader->setStretchLastSection(true);
 //	HorizontalHeader->setResizeMode(QHeaderView::Stretch);
@@ -2372,7 +2379,7 @@ void GL3dWingDlg::SetupLayout()
 	lab26->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(lab20,6,1);
 	DataLayout->addWidget(lab21,7,1);
-	DataLayout->addWidget(lab22,8,1);
+//	DataLayout->addWidget(lab22,8,1);
 	DataLayout->addWidget(lab23,9,1);
 	DataLayout->addWidget(lab24,10,1);
 	DataLayout->addWidget(lab25,11,1);
@@ -2394,14 +2401,14 @@ void GL3dWingDlg::SetupLayout()
 	m_pctrlNFlaps->setAlignment(Qt::AlignRight);
 	DataLayout->addWidget(m_pctrlGeomChord,    6,2);
 	DataLayout->addWidget(m_pctrlMAC,          7,2);
-	DataLayout->addWidget(m_pctrlMACSpanPos,   8,2);
+//	DataLayout->addWidget(m_pctrlMACSpanPos,   8,2);
 	DataLayout->addWidget(m_pctrlAspectRatio,  9,2);
 	DataLayout->addWidget(m_pctrlTaperRatio,  10,2);
 	DataLayout->addWidget(m_pctrlSweep,       11,2);
 	DataLayout->addWidget(m_pctrlNFlaps,      12,2);
 	DataLayout->addWidget(m_pctrlLength3, 6, 3);
 	DataLayout->addWidget(m_pctrlLength4, 7, 3);
-	DataLayout->addWidget(m_pctrlLength5, 8, 3);
+//	DataLayout->addWidget(m_pctrlLength5, 8, 3);
 	QLabel *lab30 = new QLabel(QString::fromUtf8("°"));
 	lab30->setAlignment(Qt::AlignLeft);
 	DataLayout->addWidget(lab30, 11, 3);

@@ -62,11 +62,7 @@ void *GL3dBodyDlg::s_pGLLightDlg;
 
 QPoint GL3dBodyDlg::s_WindowPos=QPoint(20,20);
 QSize  GL3dBodyDlg::s_WindowSize=QSize(900, 700);
-#ifdef Q_WS_MAC
-bool GL3dBodyDlg::s_bWindowMaximized=true;
-#else
 bool GL3dBodyDlg::s_bWindowMaximized=false;
-#endif
 
 
 QList <void*> *GL3dBodyDlg::s_poaBody;

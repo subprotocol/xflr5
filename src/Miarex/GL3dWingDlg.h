@@ -144,6 +144,11 @@ private:
 	static void *s_pGLLightDlg;
 	static QList <void*> *s_poaFoil;
 	static QList <void*> *s_poaWing;
+	static QPoint s_WindowPos;
+	static QSize  s_WindowSize;
+	static bool s_bWindowMaximized;
+
+
 	GLWidget *m_pGLWidget;
 
 	QLineEdit *m_pctrlWingName;

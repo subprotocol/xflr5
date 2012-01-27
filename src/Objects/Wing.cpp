@@ -128,7 +128,7 @@ CWing::CWing()
 
 	m_AVLIndex = -(int)(qrand()/10000);//improbable value...
 
-	m_MatSize    = 0;
+	m_MatSize   = 0;
 	m_NSurfaces = 0;
 
 	m_AR         = 0.0;// Aspect ratio
@@ -141,9 +141,9 @@ CWing::CWing()
 
 	m_NPanel        =  1;
 	m_nFlaps        =  0;
-	m_NYPanels[0]   = 12;
-	m_NXPanels[0]   =  8;
-	m_NXPanels[1]   =  8;
+	m_NYPanels[0]   = 19;
+	m_NXPanels[0]   = 13;
+	m_NXPanels[1]   = 13;
 	m_YPanelDist[0] = 0;
 
 	m_TChord[0]  =  .180;
