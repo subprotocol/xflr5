@@ -107,10 +107,6 @@ GL3dWingDlg::GL3dWingDlg(void *pParent)
 	m_PointDown.setY(0);
 
 
-	m_Precision[0] = 3;
-	m_Precision[1] = 3;
-	m_Precision[2] = 0;
-
 	memset(MatIn,  0, 16*sizeof(double));
 	memset(MatOut, 0, 16*sizeof(double));
 
@@ -1138,9 +1134,9 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	connect(m_pWingDelegate,  SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
 
 	int  *precision = new int[10];
-	precision[0] = 2;//five digits for x and y coordinates
-	precision[1] = 2;
-	precision[2] = 2;
+	precision[0] = 3;
+	precision[1] = 3;
+	precision[2] = 3;
 	precision[3] = 1;
 	precision[4] = 2;
 	precision[5] = 1;

@@ -209,7 +209,6 @@ private:
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
 	int m_GLList;
 //	int m_iView;
-	int m_Precision[10];
 
 //	double m_yMAC;
 	double m_glTop, m_HorizontalSplit, m_VerticalSplit;//screen split ratio for body 3D view

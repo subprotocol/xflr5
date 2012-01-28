@@ -3,6 +3,8 @@
 %define release 1
 %define version 6.05
 
+# norootforbuild
+
 BuildRoot: %{_tmppath}/%{name}-%{version}
 Summary: XFLR5 is an analysis tool for airfoils and planes operating at low Re numbers
 License: GPL
