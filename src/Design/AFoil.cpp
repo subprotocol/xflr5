@@ -2574,8 +2574,8 @@ void QAFoil::PaintView(QPainter &painter)
 		painter.drawPixmap(xtop, ytop, w,h, m_BackImage);
 	}
 
-	m_ptOffset.rx() = VCenter.x() + m_ViewportTrans.x() - (int)(0.5 *m_fScale);
-	m_ptOffset.ry() = VCenter.y() + m_ViewportTrans.y() ;
+//	m_ptOffset.rx() = VCenter.x() + m_ViewportTrans.x() - (int)(0.5 *m_fScale);
+//	m_ptOffset.ry() = VCenter.y() + m_ViewportTrans.y() ;
 
 	painter.setFont(pMainFrame->m_TextFont);
 
