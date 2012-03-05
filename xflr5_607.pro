@@ -63,7 +63,6 @@ SOURCES += src/MainFrame.cpp \
     src/Objects/Frame.cpp \
     src/Objects/OpPoint.cpp \
     src/Objects/Panel.cpp \
-    src/Objects/Pf.cpp \
     src/Objects/Plane.cpp \
     src/Objects/Polar.cpp \
     src/Objects/POpp.cpp \
@@ -179,7 +178,6 @@ HEADERS += src/MainFrame.h \
     src/Objects/Polar.h \
     src/Objects/CVector.h \
     src/Objects/Plane.h \
-    src/Objects/Pf.h \
     src/Objects/CRectangle.h \
     src/Objects/Panel.h \
     src/Objects/Frame.h \

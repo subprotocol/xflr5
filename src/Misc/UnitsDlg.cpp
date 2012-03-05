@@ -229,6 +229,7 @@ void UnitsDlg::OnSelChanged(const QString &strong)
 	strange= QString(QString::fromUtf8("     1 m² = %1")).arg(m_m2toUnit,15,'f',5);
 	m_pctrlSurfaceFactor->setText(strange);
 	strange= "1 "+str+" = " +QString("%1 m").arg(1./m_m2toUnit,15,'f',5);
+	strange += QString::fromUtf8("²");
 	m_pctrlSurfaceInvFactor->setText(strange);
 
 	GetWeightUnit(str,m_Weight);

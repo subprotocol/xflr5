@@ -61,8 +61,8 @@ public:
 	void SetNormal();
 	void SetFlap();
 	void SetSidePoints(CBody *pBody, double dx, double dz);
-	void SetTwist();
-	void SetTwist_old();
+	void SetTwist1();
+	void SetTwist2();
 	void Translate(CVector const &T);
 	void CreateXZSymetric(CSurface const &Surface);
 	void CreateXPoints();

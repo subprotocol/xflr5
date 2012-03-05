@@ -577,14 +577,8 @@ void MainFrame::CreateAFoilActions()
 	
 	SplinesAct= new QAction(tr("Use Splines"), this);
 	SplinesAct->setStatusTip(tr("Define a foil using one B-Spline for each foil side"));
-	SplinesAct->setCheckable(true);
 	connect(SplinesAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplines()));
 
-	SplinedPointsAct= new QAction(tr("Use Splined Points"), this);
-	SplinedPointsAct->setStatusTip(tr("Define a foil using one 3rd order B-Spline between two control points"));
-	SplinedPointsAct->setCheckable(true);
-	connect(SplinedPointsAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplinedPoints()));
-	
 	storeSplineAct= new QAction(QIcon(":/images/OnStoreFoil.png"), tr("Store Splines as Foil"), this);
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
@@ -3248,7 +3242,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 				}
 			}
 		}
-		pXDirect->InsertOpPoint(pOpp);
+//		pXDirect->InsertOpPoint(pOpp);
 	}
 
 	return true;
@@ -5221,7 +5215,8 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	int i,j;
 
 	// storing code
-	ar << 100013;
+	ar << 100014;
+	// 100014 : removed Point Foil
 	// 100013 : Added CoG serialization
 	// 100012 : Added sideslip
 	// 100011 : Added Body serialization
@@ -5452,7 +5447,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 
 	QAFoil *pAFoil = (QAFoil*)m_pAFoil;
 	pAFoil->m_pSF->Serialize(ar, true);
-	pAFoil->m_pPF->Serialize(ar, true);
+//	pAFoil->m_pPF->Serialize(ar, true);
 
 	return true;
 }
@@ -5480,7 +5475,8 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 	if (bIsStoring)
 	{
 		// storing code
-		ar << 100013;
+		ar << 100014;
+		// 100014 : Removed Point Foil
 		// 100013 : Added CoG serialization
 		// 100012 : Added sideslip
 		// 100011 : Added Body serialization
@@ -5579,7 +5575,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		else ar << 0;
 
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
-		pAFoil->m_pPF->Serialize(ar, bIsStoring);
+//		pAFoil->m_pPF->Serialize(ar, bIsStoring);
 
 		QApplication::restoreOverrideCursor();
 		return true;
@@ -5740,7 +5736,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				return false;
 			}
 
-			if(pWOpp->m_AnalysisMethod==1 || ArchiveFormat >=100006)//former VLM version was flawed
+			if(pWOpp->m_AnalysisMethod==LLTMETHOD || ArchiveFormat >=100006)//former VLM version was flawed
 				pMiarex->InsertWOpp(pWOpp);
 
 			else delete pWOpp;
@@ -5748,7 +5744,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 
 		ar >> n;
 		//=100000 ... unused
-
 		//THEN FOILS, POLARS and OPPS
 		if(ArchiveFormat>=100009)
 		{
@@ -5813,7 +5808,6 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		if(ArchiveFormat>=100006)
 		{ //read the planes
 			ar >> n;
-			// last read the planes
 			for (i=0; i<n;i++)
 			{
 				pPlane = new CPlane();
@@ -5865,11 +5859,10 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				pMiarex->AddPOpp(false, NULL, NULL, NULL, pPOpp);
 			}
 		}
-
 		pMiarex->m_pCurPOpp = NULL;
 
 		pAFoil->m_pSF->Serialize(ar, bIsStoring);
-		pAFoil->m_pPF->Serialize(ar, bIsStoring);
+//		pAFoil->m_pPF->Serialize(ar, bIsStoring);
 
 		for (i=0; i<m_oaWing.size();i++)
 		{

@@ -101,8 +101,8 @@ public:
 	void ComputeBodyAxisInertia();
 
 	void InsertSection(double TPos, double TChord, double TOffset, double TZPos, double Twist, QString Foil,int NChord, int NSpan, int SSpan);
-	void SetSweep(double Sweep);
-	void SetTwist(double Twist);
+	void ScaleSweep(double Sweep);
+	void ScaleTwist(double Twist);
 	void ScaleSpan(double NewSpan);
 	void ScaleChord(double NewChord);
 	bool SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat);

@@ -166,18 +166,10 @@ void FoilTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opt
 		//get a link to the foil to get its style
 		if(index.row()==0)
 		{
-			if(pAFoil->m_bSF)
-			{
-				color = pAFoil->m_pSF->m_FoilColor;
-				style = pAFoil->m_pSF->m_FoilStyle;
-				width = pAFoil->m_pSF->m_FoilWidth;
-			}
-			else
-			{
-				color = pAFoil->m_pPF->m_FoilColor;
-				style = pAFoil->m_pPF->m_FoilStyle;
-				width = pAFoil->m_pPF->m_FoilWidth;
-			}
+
+			color = pAFoil->m_pSF->m_FoilColor;
+			style = pAFoil->m_pSF->m_FoilStyle;
+			width = pAFoil->m_pSF->m_FoilWidth;
 		}
 		else
 		{

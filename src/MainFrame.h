@@ -290,7 +290,7 @@ private:
 	QAction *AFoilLECircle, *m_pShowLegend;
 	QAction *UndoAFoilAct, *RedoAFoilAct;
 	QAction *HideAllFoils, *ShowAllFoils, *ShowCurrentFoil, *HideCurrentFoil;
-	QAction *SplinesAct, *SplinedPointsAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
+	QAction *SplinesAct, *storeSplineAct, *newSplinesAct, *splineControlsAct, *exportSplinesToFileAct;
 	QAction *InsertSplinePt, *RemoveSplinePt;
 	QAction *AFoilTableColumns, *AFoilTableColumnWidths;
 	QAction *AFoilLoadImage, *AFoilClearImage;

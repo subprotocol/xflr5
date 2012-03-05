@@ -27,7 +27,6 @@
 #include <QPushButton>
 #include "../Misc/FloatEdit.h"
 #include "../Objects/Sf.h"
-#include "../Objects/Pf.h"
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QCheckBox>
@@ -68,13 +67,9 @@ private:
 	FloatEditDelegate *m_pUpperFloatDelegate, *m_pLowerFloatDelegate;
 
 protected:
-	bool m_bSF;
 	bool m_bSymetric;
 	CSF *m_pSF;
-	CPF *m_pPF;
-
 	CSF m_SF; //work splines
-	CPF m_PF;
 };
 
 #endif // SPLINECTRLSDLG_H

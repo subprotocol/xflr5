@@ -31,7 +31,6 @@ SplineCtrlsDlg::SplineCtrlsDlg()
 	setWindowTitle(tr("Spline Parameters"));
 	m_bSymetric = false;
 	m_pSF = NULL;
-	m_pPF = NULL;
 	SetuLayout();
 }
 
@@ -52,26 +51,12 @@ void SplineCtrlsDlg::InitDialog()
 	m_pctrlDegExtrados->setEnabled(true);
 	m_pctrlDegIntrados->setEnabled(true);
 
-	if(m_bSF)
-	{
-		m_pctrlDegExtrados->setCurrentIndex(m_pSF->m_Extrados.m_iDegree-2);
-		m_pctrlDegIntrados->setCurrentIndex(m_pSF->m_Intrados.m_iDegree-2);
-		m_pctrlOutExtrados->SetValue(m_pSF->m_Extrados.m_iRes);
-		m_pctrlOutIntrados->SetValue(m_pSF->m_Intrados.m_iRes);
-	}
-	else
-	{
-		m_pctrlDegExtrados->setEnabled(false);
-		m_pctrlDegIntrados->setEnabled(false);
-		m_pctrlOutExtrados->SetMin(3);
-		m_pctrlOutExtrados->SetMax(30);
-		m_pctrlOutIntrados->SetMin(3);
-		m_pctrlOutIntrados->SetMax(30);
 
-		m_pctrlOutExtrados->SetValue(m_pPF->m_Extrados.m_Freq);
-		m_pctrlOutIntrados->SetValue(m_pPF->m_Intrados.m_Freq);
-//		m_pctrlOutText->SetWindowText("Output density:");
-	}
+	m_pctrlDegExtrados->setCurrentIndex(m_pSF->m_Extrados.m_iDegree-2);
+	m_pctrlDegIntrados->setCurrentIndex(m_pSF->m_Intrados.m_iDegree-2);
+	m_pctrlOutExtrados->SetValue(m_pSF->m_Extrados.m_iRes);
+	m_pctrlOutIntrados->SetValue(m_pSF->m_Intrados.m_iRes);
+
 
 	//upper point list
 	m_pUpperListModel = new QStandardItemModel;
@@ -118,7 +103,6 @@ void SplineCtrlsDlg::InitDialog()
 	connect(m_pLowerFloatDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnLowerCellChanged(QWidget *)));
 
 	if(m_pSF) m_SF.Copy(m_pSF);
-	if(m_pPF) m_PF.Copy(m_pPF);
 
 	m_pctrlSymetric->setChecked(m_bSymetric);
 
@@ -231,14 +215,7 @@ void SplineCtrlsDlg::OnUpperCellChanged(QWidget *FloatEdit)
 	if(m_bSymetric)
 	{
 		ReadData();
-		if(m_bSF)
-		{
-			m_SF.m_Intrados.CopySymetric(&m_SF.m_Extrados);
-		}
-		else
-		{
-			m_PF.m_Intrados.CopySymetric(&m_PF.m_Intrados);
-		}
+		m_SF.m_Intrados.CopySymetric(&m_SF.m_Extrados);
 		FillPointLists();
 	}
 }
@@ -250,116 +227,61 @@ void SplineCtrlsDlg::OnLowerCellChanged(QWidget *FloatEdit)
 
 void SplineCtrlsDlg::FillPointLists()
 {
-	if(m_bSF)
+	m_pUpperListModel->setRowCount(m_SF.m_Extrados.m_iCtrlPoints);
+	for (int i=0; i<m_SF.m_Extrados.m_iCtrlPoints; i++)
 	{
-		m_pUpperListModel->setRowCount(m_SF.m_Extrados.m_iCtrlPoints);
-		for (int i=0; i<m_SF.m_Extrados.m_iCtrlPoints; i++)
-		{
-			QModelIndex index = m_pUpperListModel->index(i, 0, QModelIndex());
-			m_pUpperListModel->setData(index, i+1);
+		QModelIndex index = m_pUpperListModel->index(i, 0, QModelIndex());
+		m_pUpperListModel->setData(index, i+1);
 
-			QModelIndex Xindex =m_pUpperListModel->index(i, 1, QModelIndex());
-			m_pUpperListModel->setData(Xindex, m_SF.m_Extrados.m_Input[i].x);
+		QModelIndex Xindex =m_pUpperListModel->index(i, 1, QModelIndex());
+		m_pUpperListModel->setData(Xindex, m_SF.m_Extrados.m_Input[i].x);
 
-			QModelIndex Zindex =m_pUpperListModel->index(i, 2, QModelIndex());
-			m_pUpperListModel->setData(Zindex, m_SF.m_Extrados.m_Input[i].y);
-		}
-
-		m_pLowerListModel->setRowCount(m_SF.m_Intrados.m_iCtrlPoints);
-		for (int i=0; i<m_SF.m_Intrados.m_iCtrlPoints; i++)
-		{
-			QModelIndex index = m_pLowerListModel->index(i, 0, QModelIndex());
-			m_pLowerListModel->setData(index, i+1);
-
-			QModelIndex Xindex =m_pLowerListModel->index(i, 1, QModelIndex());
-			m_pLowerListModel->setData(Xindex, m_SF.m_Intrados.m_Input[i].x);
-
-			QModelIndex Zindex =m_pLowerListModel->index(i, 2, QModelIndex());
-			m_pLowerListModel->setData(Zindex, m_SF.m_Intrados.m_Input[i].y);
-		}
+		QModelIndex Zindex =m_pUpperListModel->index(i, 2, QModelIndex());
+		m_pUpperListModel->setData(Zindex, m_SF.m_Extrados.m_Input[i].y);
 	}
-	else if(m_pPF)
+
+	m_pLowerListModel->setRowCount(m_SF.m_Intrados.m_iCtrlPoints);
+	for (int i=0; i<m_SF.m_Intrados.m_iCtrlPoints; i++)
 	{
-		m_pUpperListModel->setRowCount(m_PF.m_Extrados.m_iPoints);
-		for (int i=0; i<m_PF.m_Extrados.m_iPoints; i++)
-		{
-			QModelIndex index = m_pUpperListModel->index(i, 0, QModelIndex());
-			m_pUpperListModel->setData(index, i+1);
+		QModelIndex index = m_pLowerListModel->index(i, 0, QModelIndex());
+		m_pLowerListModel->setData(index, i+1);
 
-			QModelIndex Xindex =m_pUpperListModel->index(i, 1, QModelIndex());
-			m_pUpperListModel->setData(Xindex, m_PF.m_Extrados.m_ctrlPoint[i].x);
+		QModelIndex Xindex =m_pLowerListModel->index(i, 1, QModelIndex());
+		m_pLowerListModel->setData(Xindex, m_SF.m_Intrados.m_Input[i].x);
 
-			QModelIndex Zindex =m_pUpperListModel->index(i, 2, QModelIndex());
-			m_pUpperListModel->setData(Zindex,m_PF.m_Extrados.m_ctrlPoint[i].y);
-		}
-
-		m_pLowerListModel->setRowCount(m_PF.m_Intrados.m_iPoints);
-		for (int i=0; i<m_PF.m_Intrados.m_iPoints; i++)
-		{
-			QModelIndex index = m_pLowerListModel->index(i, 0, QModelIndex());
-			m_pLowerListModel->setData(index, i+1);
-
-			QModelIndex Xindex =m_pLowerListModel->index(i, 1, QModelIndex());
-			m_pLowerListModel->setData(Xindex, m_PF.m_Intrados.m_ctrlPoint[i].x);
-
-			QModelIndex Zindex =m_pLowerListModel->index(i, 2, QModelIndex());
-			m_pLowerListModel->setData(Zindex, m_PF.m_Intrados.m_ctrlPoint[i].y);
-		}
+		QModelIndex Zindex =m_pLowerListModel->index(i, 2, QModelIndex());
+		m_pLowerListModel->setData(Zindex, m_SF.m_Intrados.m_Input[i].y);
 	}
 }
 
 
 void SplineCtrlsDlg::ReadData()
 {
-	if(m_bSF)
+
+	for (int i=0; i<m_SF.m_Extrados.m_iCtrlPoints; i++)
 	{
-		for (int i=0; i<m_SF.m_Extrados.m_iCtrlPoints; i++)
-		{
-			QModelIndex index = m_pUpperListModel->index(i, 1, QModelIndex());
-			m_SF.m_Extrados.m_Input[i].x = index.data().toDouble();
+		QModelIndex index = m_pUpperListModel->index(i, 1, QModelIndex());
+		m_SF.m_Extrados.m_Input[i].x = index.data().toDouble();
 
-			index = m_pUpperListModel->index(i, 2, QModelIndex());
-			m_SF.m_Extrados.m_Input[i].y = index.data().toDouble();
-		}
-		for (int i=0; i<m_SF.m_Intrados.m_iCtrlPoints; i++)
-		{
-			QModelIndex index = m_pLowerListModel->index(i, 1, QModelIndex());
-			m_SF.m_Intrados.m_Input[i].x = index.data().toDouble();
-
-			index = m_pLowerListModel->index(i, 2, QModelIndex());
-			m_SF.m_Intrados.m_Input[i].y = index.data().toDouble();
-		}
-
-		m_SF.m_Extrados.m_iDegree = m_pctrlDegExtrados->currentIndex()+2;
-		m_SF.m_Intrados.m_iDegree = m_pctrlDegIntrados->currentIndex()+2;
-
-		m_SF.m_Extrados.m_iRes = m_pctrlOutExtrados->Value();
-		m_SF.m_Intrados.m_iRes = m_pctrlOutExtrados->Value();
-		m_SF.m_bSymetric = m_pctrlSymetric->isChecked();
+		index = m_pUpperListModel->index(i, 2, QModelIndex());
+		m_SF.m_Extrados.m_Input[i].y = index.data().toDouble();
 	}
-	else
+	for (int i=0; i<m_SF.m_Intrados.m_iCtrlPoints; i++)
 	{
-		for (int i=0; i<m_PF.m_Extrados.m_iPoints; i++)
-		{
-			QModelIndex index = m_pUpperListModel->index(i, 1, QModelIndex());
-			m_PF.m_Extrados.m_ctrlPoint[i].x = index.data().toDouble();
+		QModelIndex index = m_pLowerListModel->index(i, 1, QModelIndex());
+		m_SF.m_Intrados.m_Input[i].x = index.data().toDouble();
 
-			index = m_pUpperListModel->index(i, 2, QModelIndex());
-			m_PF.m_Extrados.m_ctrlPoint[i].y = index.data().toDouble();
-		}
-		for (int i=0; i<m_PF.m_Intrados.m_iPoints; i++)
-		{
-			QModelIndex index = m_pLowerListModel->index(i, 1, QModelIndex());
-			m_PF.m_Intrados.m_ctrlPoint[i].x = index.data().toDouble();
-
-			index = m_pLowerListModel->index(i, 2, QModelIndex());
-			m_PF.m_Intrados.m_ctrlPoint[i].y = index.data().toDouble();
-		}
-
-		m_PF.m_Extrados.m_Freq = m_pctrlOutExtrados->Value();
-		m_PF.m_Intrados.m_Freq = m_pctrlOutIntrados->Value();
-		m_PF.m_bSymetric = m_pctrlSymetric->isChecked();
+		index = m_pLowerListModel->index(i, 2, QModelIndex());
+		m_SF.m_Intrados.m_Input[i].y = index.data().toDouble();
 	}
+
+	m_SF.m_Extrados.m_iDegree = m_pctrlDegExtrados->currentIndex()+2;
+	m_SF.m_Intrados.m_iDegree = m_pctrlDegIntrados->currentIndex()+2;
+
+	m_SF.m_Extrados.m_iRes = m_pctrlOutExtrados->Value();
+	m_SF.m_Intrados.m_iRes = m_pctrlOutExtrados->Value();
+	m_SF.m_bSymetric = m_pctrlSymetric->isChecked();
+
 }
 
 
@@ -375,17 +297,10 @@ void SplineCtrlsDlg::OnSymetric()
 	if(m_bSymetric)
 	{
 		ReadData();
-		if(m_bSF)
-		{
-			m_SF.m_Intrados.CopySymetric(&m_SF.m_Extrados);
-			m_pctrlDegIntrados->setCurrentIndex(m_SF.m_Intrados.m_iDegree-2);
-			m_pctrlOutIntrados->SetValue(m_SF.m_Intrados.m_iRes);
-		}
-		else
-		{
-			m_PF.m_Intrados.CopySymetric(&m_PF.m_Extrados);
-			m_pctrlOutIntrados->SetValue(m_PF.m_Intrados.m_Freq);
-		}
+
+		m_SF.m_Intrados.CopySymetric(&m_SF.m_Extrados);
+		m_pctrlDegIntrados->setCurrentIndex(m_SF.m_Intrados.m_iDegree-2);
+		m_pctrlOutIntrados->SetValue(m_SF.m_Intrados.m_iRes);
 	}
 	m_pctrlLowerList->setEnabled(!m_bSymetric);
 	m_pctrlDegIntrados->setEnabled(!m_bSymetric);

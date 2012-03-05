@@ -43,6 +43,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <QMessageBox>
+#include <QtDebug>
 #include <math.h>
 #include "Surface.h"
 #include "../Objects/Quaternion.h"
@@ -1010,7 +1011,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 }
 
 
-void CSurface::SetTwist()
+void CSurface::SetTwist1()
 {
 	static CVector A4, B4, L, U, T, O;
 	O.Set(0.0,0.0,0.0);
@@ -1053,29 +1054,35 @@ void CSurface::SetTwist()
 
 
 
-
-void CSurface::SetTwist_old()
+void CSurface::SetTwist2()
 {
 	double xc4,zc4;
 	CVector O(0.0,0.0,0.0);
 
+	CVector LA = m_LA;
+	CVector TA = m_TA;
+	CVector LB = m_LB;
+	CVector TB = m_TB;
+
 	//"A" section first
 	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
 	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
-	m_LA.x = xc4 + (m_LA.x-xc4) * cos(m_TwistA *PI/180.0);
-	m_LA.z = zc4 - (m_LA.x-xc4) * sin(m_TwistA *PI/180.0);
-	m_TA.x = xc4 + (m_TA.x-xc4) * cos(m_TwistA *PI/180.0);
-	m_TA.z = zc4 - (m_TA.x-xc4) * sin(m_TwistA *PI/180.0);
+	m_LA.x = xc4 + (LA.x-xc4) * cos(m_TwistA *PI/180.0) - (LA.z-zc4) * sin(m_TwistA *PI/180.0);
+	m_LA.z = zc4 - (LA.x-xc4) * sin(m_TwistA *PI/180.0) + (LA.z-zc4) * cos(m_TwistA *PI/180.0);
+	m_TA.x = xc4 + (TA.x-xc4) * cos(m_TwistA *PI/180.0) - (TA.z-zc4) * sin(m_TwistA *PI/180.0);
+	m_TA.z = zc4 - (TA.x-xc4) * sin(m_TwistA *PI/180.0) + (TA.z-zc4) * cos(m_TwistA *PI/180.0);
 	NormalA.RotateY(O, m_TwistA);
 
 	//"B" Section next
 	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
 	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
-	m_LB.x = xc4 + (m_LB.x-xc4) * cos(m_TwistB *PI/180.0);
-	m_LB.z = zc4 - (m_LB.x-xc4) * sin(m_TwistB *PI/180.0);
-	m_TB.x = xc4 + (m_TB.x-xc4) * cos(m_TwistB *PI/180.0);
-	m_TB.z = zc4 - (m_TB.x-xc4) * sin(m_TwistB *PI/180.0);
+	m_LB.x = xc4 + (LB.x-xc4) * cos(m_TwistB *PI/180.0) - (LB.z-zc4) * sin(m_TwistB *PI/180.0);
+	m_LB.z = zc4 - (LB.x-xc4) * sin(m_TwistB *PI/180.0) + (LB.z-zc4) * cos(m_TwistB *PI/180.0);;
+	m_TB.x = xc4 + (TB.x-xc4) * cos(m_TwistB *PI/180.0) - (TB.z-zc4) * sin(m_TwistB *PI/180.0);;
+	m_TB.z = zc4 - (TB.x-xc4) * sin(m_TwistB *PI/180.0) + (TB.z-zc4) * cos(m_TwistB *PI/180.0);;
 	NormalB.RotateY(O, m_TwistB);
+
+//	qDebug()	<< (m_LA-m_TA).VAbs()<< (m_LB-m_TB).VAbs();
 }
 
 

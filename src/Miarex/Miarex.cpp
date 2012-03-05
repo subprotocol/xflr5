@@ -5464,9 +5464,6 @@ bool QMiarex::InitializePanels()
 	memcpy(&m_MemNode,  &m_Node,  m_nNodes * sizeof(CVector));
 
 
-//	for(int i=0; i<m_nNodes; i++)		qDebug("%13.7f    %13.7f    %13.7f    ",m_Node[i].x,m_Node[i].y,m_Node[i].z);
-
-
 //	dlg.setValue(100);
 
 	return true;
@@ -10371,8 +10368,8 @@ void QMiarex::OnScaleWing()
 				pNewPlane->Duplicate(m_pCurPlane);
 				if(m_WingScaleDlg.m_bSpan)  pNewPlane->Wing()->ScaleSpan(m_WingScaleDlg.m_NewSpan);
 				if(m_WingScaleDlg.m_bChord) pNewPlane->Wing()->ScaleChord(m_WingScaleDlg.m_NewChord);
-				if(m_WingScaleDlg.m_bSweep) pNewPlane->Wing()->SetSweep(m_WingScaleDlg.m_NewSweep);
-				if(m_WingScaleDlg.m_bTwist) pNewPlane->Wing()->SetTwist(m_WingScaleDlg.m_NewTwist);
+				if(m_WingScaleDlg.m_bSweep) pNewPlane->Wing()->ScaleSweep(m_WingScaleDlg.m_NewSweep);
+				if(m_WingScaleDlg.m_bTwist) pNewPlane->Wing()->ScaleTwist(m_WingScaleDlg.m_NewTwist);
 				pNewPlane->ComputePlane();
 				if(SetModPlane(pNewPlane))
 				{
@@ -10390,8 +10387,8 @@ void QMiarex::OnScaleWing()
 				pNewWing->Duplicate(m_pCurWing);
 				if(m_WingScaleDlg.m_bSpan)  pNewWing->ScaleSpan(m_WingScaleDlg.m_NewSpan);
 				if(m_WingScaleDlg.m_bChord) pNewWing->ScaleChord(m_WingScaleDlg.m_NewChord);
-				if(m_WingScaleDlg.m_bSweep) pNewWing->SetSweep(m_WingScaleDlg.m_NewSweep);
-				if(m_WingScaleDlg.m_bTwist) pNewWing->SetTwist(m_WingScaleDlg.m_NewTwist);
+				if(m_WingScaleDlg.m_bSweep) pNewWing->ScaleSweep(m_WingScaleDlg.m_NewSweep);
+				if(m_WingScaleDlg.m_bTwist) pNewWing->ScaleTwist(m_WingScaleDlg.m_NewTwist);
 				if(AddWing(pNewWing))
 				{
 					m_pCurWing = pNewWing;

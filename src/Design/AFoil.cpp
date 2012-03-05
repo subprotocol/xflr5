@@ -58,11 +58,6 @@ QAFoil::QAFoil(QWidget *parent)
 	m_pSF->m_bModified = false;
 	m_pSF->InitSplineFoil();
 
-	m_pPF = new CPF();
-	m_pPF->m_bModified = false;
-	m_pPF->InitSplinedFoil();
-
-	m_bSF          = true;
 	m_bZoomPlus    = false;
 	m_bZoomYOnly   = false;
 	m_bTrans       = false;
@@ -154,8 +149,6 @@ void QAFoil::CheckButtons()
 	pMainFrame->AFoilSplineMenu->setEnabled(!g_pCurFoil);
 	pMainFrame->InsertSplinePt->setEnabled(!g_pCurFoil);
 	pMainFrame->RemoveSplinePt->setEnabled(!g_pCurFoil);
-	pMainFrame->SplinesAct->setChecked(m_bSF);
-	pMainFrame->SplinedPointsAct->setChecked(!m_bSF);
 }
 
 
@@ -389,32 +382,15 @@ void QAFoil::FillFoilTable()
 	Thickness = xThickness = Camber = xCamber = 0;
 	int points = 0;
 
-	if(m_bSF)
+	if(m_pSF)
 	{
-		if(m_pSF) 
-		{
-			name = tr("Spline foil");
-			Thickness  = m_pSF->m_fThickness;
-			xThickness = m_pSF->m_fxThickMax;
-			Camber     = m_pSF->m_fCamber;
-			xCamber    = m_pSF->m_fxCambMax;
-			points     = m_pSF->m_OutPoints;
-		}
+		name = tr("Spline foil");
+		Thickness  = m_pSF->m_fThickness;
+		xThickness = m_pSF->m_fxThickMax;
+		Camber     = m_pSF->m_fCamber;
+		xCamber    = m_pSF->m_fxCambMax;
+		points     = m_pSF->m_OutPoints;
 	}
-	else
-	{
-		if(m_pPF) 
-		{
-			name = tr("Splined points foil");
-			Thickness  = m_pPF->m_fThickness;
-			xThickness = m_pPF->m_fxThickMax;
-			Camber     = m_pPF->m_fCamber;
-			xCamber    = m_pPF->m_fxCambMax;
-			points     =  (m_pPF->m_Extrados.m_iPoints)*(m_pPF->m_Extrados.m_Freq-1)
-						 +(m_pPF->m_Intrados.m_iPoints)*(m_pPF->m_Intrados.m_Freq-1);//+1;
-		}
-	}
-
 
 	ind = m_pFoilModel->index(0, 0, QModelIndex());
 	m_pFoilModel->setData(ind,name);
@@ -430,53 +406,32 @@ void QAFoil::FillFoilTable()
 
 	ind = m_pFoilModel->index(0, 4, QModelIndex());
 	m_pFoilModel->setData(ind,xCamber);
-	
+
 	ind = m_pFoilModel->index(0, 5, QModelIndex());
 	m_pFoilModel->setData(ind, points);
 
 	ind = m_pFoilModel->index(0,12, QModelIndex());
-	if(m_bSF) 
-	{
-		if(m_pSF->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
-		else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
-	else
-	{
-		if(m_pPF->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
-		else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
+	if(m_pSF->m_bVisible) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
+	else                  m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
+
 	QStandardItem *pItem = m_pFoilModel->item(0,12);
 	pItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);
 
-	
+
 	ind = m_pFoilModel->index(0,13, QModelIndex());
-	if(m_bSF) 
-	{
-		if(m_pSF->m_bOutPoints) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
-		else                    m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
-	else
-	{
-		if(m_pPF->m_bOutPoints) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
-		else                    m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
+	if(m_pSF->m_bOutPoints) m_pFoilModel->setData(ind, Qt::Checked, Qt::CheckStateRole);
+	else                    m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
+
 	pItem = m_pFoilModel->item(0,13);
-	pItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);	
-	
-	
+	pItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);
+
+
 	ind = m_pFoilModel->index(0,14, QModelIndex());
-	if(m_bSF) 
-	{
-		if(m_pSF->m_bCenterLine) m_pFoilModel->setData(ind, Qt::Checked,   Qt::CheckStateRole);
-		else                     m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
-	else 
-	{
-		if(m_pPF->m_bCenterLine) m_pFoilModel->setData(ind, Qt::Checked,   Qt::CheckStateRole);
-		else                     m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
-	}
+	if(m_pSF->m_bCenterLine) m_pFoilModel->setData(ind, Qt::Checked,   Qt::CheckStateRole);
+	else                     m_pFoilModel->setData(ind, Qt::Unchecked, Qt::CheckStateRole);
+
 	pItem = m_pFoilModel->item(0,14);
-	pItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);	
+	pItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsUserCheckable);
 
 
 	for(i=0; i<m_poaFoil->size(); i++)
@@ -655,7 +610,6 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 
 	pSettings->beginGroup("DirectDesign");
 	{
-		m_bSF         = pSettings->value("ShowSF").toBool();
 		m_bXGrid      = pSettings->value("XMajGrid").toBool();
 		m_bYGrid      = pSettings->value("YMajGrid").toBool();
 		m_bXMinGrid   = pSettings->value("XMinGrid").toBool();
@@ -705,20 +659,10 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		color = QColor(r,g,b);
 		m_pSF->SetCurveParams(style, width, color);
 
-		style  = pSettings->value("PFStyle", SOLIDLINE).toInt();
-		width  = pSettings->value("PFWidth", 1).toInt();
-		r = pSettings->value("PFColorRed",216).toInt();
-		g = pSettings->value("PFColorGreen",183).toInt();
-		b = pSettings->value("PFColorBlue",183).toInt();
-		color = QColor(r,g,b);
-		m_pPF->SetCurveParams(style, width, color);
 
 		m_pSF->m_bVisible    = pSettings->value("SFVisible").toBool();
 		m_pSF->m_bOutPoints  = pSettings->value("SFOutPoints").toBool();
 		m_pSF->m_bCenterLine = pSettings->value("SFCenterLine").toBool();
-		m_pPF->m_bVisible    = pSettings->value("PFVisible").toBool();
-		m_pPF->m_bOutPoints  = pSettings->value("PFOutPoints").toBool();
-		m_pPF->m_bCenterLine = pSettings->value("PFCenterLine").toBool();
 
 		m_pSF->m_Intrados.m_iRes =  pSettings->value("LowerRes",30).toInt();
 		m_pSF->m_Extrados.m_iRes =  pSettings->value("UpperRes",30).toInt();
@@ -800,114 +744,45 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 		// user is dragging the point
 		if(m_rCltRect.contains(point))
 		{
-			if(m_bSF)
+			int n = m_pSF->m_Extrados.m_iSelect;
+			if (n>=0 && n<=m_pSF->m_Extrados.m_iCtrlPoints)
 			{
-				int n = m_pSF->m_Extrados.m_iSelect;
-				if (n>=0 && n<=m_pSF->m_Extrados.m_iCtrlPoints) 
+				if(!m_bStored) StorePicture();//save for undo only the first time
+//					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
+				m_pSF->m_Extrados.m_Input[n].x = m_MousePos.x;
+				m_pSF->m_Extrados.m_Input[n].y = m_MousePos.y;
+				m_pSF->Update(true);
+				if(m_pSF->m_bSymetric)
+				{
+					m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
+					m_pSF->m_Intrados.m_Input[n].y = -m_MousePos.y;
+					m_pSF->Update(false);
+				}
+				m_pSF->m_bModified = true;
+				pMainFrame->SetSaveState(false);
+			}
+			else
+			{
+				int n = m_pSF->m_Intrados.m_iSelect;
+				if (n>=0 && n<=m_pSF->m_Intrados.m_iCtrlPoints)
 				{
 					if(!m_bStored) StorePicture();//save for undo only the first time
-//					if(n==1) m_MousePos.x = 0.0;// we can't move point 1 for vertical slope
-					m_pSF->m_Extrados.m_Input[n].x = m_MousePos.x;
-					m_pSF->m_Extrados.m_Input[n].y = m_MousePos.y;
-					m_pSF->Update(true);
+
+					m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
+					m_pSF->m_Intrados.m_Input[n].y = m_MousePos.y;
+					m_pSF->Update(false);
+
 					if(m_pSF->m_bSymetric)
 					{
-						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
-						m_pSF->m_Intrados.m_Input[n].y = -m_MousePos.y;
-						m_pSF->Update(false);
+						m_pSF->m_Extrados.m_Input[n].x =  m_MousePos.x;
+						m_pSF->m_Extrados.m_Input[n].y = -m_MousePos.y;
+						m_pSF->Update(true);
 					}
 					m_pSF->m_bModified = true;
 					pMainFrame->SetSaveState(false);
 				}
-				else
-				{
-					int n = m_pSF->m_Intrados.m_iSelect;
-					if (n>=0 && n<=m_pSF->m_Intrados.m_iCtrlPoints)
-					{
-						if(!m_bStored) StorePicture();//save for undo only the first time
-
-						m_pSF->m_Intrados.m_Input[n].x = m_MousePos.x;
-						m_pSF->m_Intrados.m_Input[n].y = m_MousePos.y;
-						m_pSF->Update(false);
-
-						if(m_pSF->m_bSymetric)
-						{
-							m_pSF->m_Extrados.m_Input[n].x =  m_MousePos.x;
-							m_pSF->m_Extrados.m_Input[n].y = -m_MousePos.y;
-							m_pSF->Update(true);
-						}
-						m_pSF->m_bModified = true;
-						pMainFrame->SetSaveState(false);
-					}
-				}
 			}
-			else
-			{
-				int n = m_pPF->m_Extrados.m_iSelect;
-				if (n>=0 && n<m_pPF->m_Extrados.m_iPoints) 
-				{
-					if(!m_bStored) StorePicture();//save for undo only the first time
-					m_pPF->m_Extrados.m_ctrlPoint[n].x = m_MousePos.x;
-					m_pPF->m_Extrados.m_ctrlPoint[n].y = m_MousePos.y;
-					if(m_pPF->m_bSymetric)
-					{
-						m_pPF->m_Intrados.m_ctrlPoint[n].x =  m_MousePos.x;
-						m_pPF->m_Intrados.m_ctrlPoint[n].y = -m_MousePos.y;
-					}
-					m_pPF->m_bModified = true;
-					pMainFrame->SetSaveState(false);
-				}
-				else
-				{
-					n = m_pPF->m_Intrados.m_iSelect;
-					if (n>=0 && n<m_pPF->m_Intrados.m_iPoints)
-					{
-						if(!m_bStored) StorePicture();//save for undo only the first time
-						m_pPF->m_Intrados.m_ctrlPoint[n].x = m_MousePos.x;
-						m_pPF->m_Intrados.m_ctrlPoint[n].y = m_MousePos.y;
-						m_pPF->m_bModified = true;
-						pMainFrame->SetSaveState(false);
-						if(m_pPF->m_bSymetric)
-						{
-							m_pPF->m_Extrados.m_ctrlPoint[n].x =  m_MousePos.x;
-							m_pPF->m_Extrados.m_ctrlPoint[n].y = -m_MousePos.y;
-						}
-					}
-				}
-				if(n<0) 
-				{
-					//check for rear point
-					if(m_pPF->m_Extrados.m_iSelect == -1)
-					{
-						if(!m_bStored) StorePicture();//save for undo only the first time
-						m_pPF->m_Extrados.m_RearPoint.x = m_MousePos.x;
-						m_pPF->m_Extrados.m_RearPoint.y = m_MousePos.y;
-						if(m_pPF->m_bSymetric)
-						{
-							m_pPF->m_Intrados.m_RearPoint.x =  m_MousePos.x;
-							m_pPF->m_Intrados.m_RearPoint.y = -m_MousePos.y;
-						}
-						m_pPF->m_bModified = true;
-						pMainFrame->SetSaveState(false);
-						m_pPF->Update();
-					}
-					else if(m_pPF->m_Intrados.m_iSelect == -1)
-					{
-						if(!m_bStored) StorePicture();//save for undo only the first time
-						m_pPF->m_Intrados.m_RearPoint.x = m_MousePos.x;
-						m_pPF->m_Intrados.m_RearPoint.y = m_MousePos.y;
-						m_pPF->m_bModified = true;
-						if(m_pPF->m_bSymetric)
-						{
-							m_pPF->m_Extrados.m_RearPoint.x =  m_MousePos.x;
-							m_pPF->m_Extrados.m_RearPoint.y = -m_MousePos.y;
-						}
-												pMainFrame->SetSaveState(false);
-						m_pPF->Update();
-					}
-				}
-				m_pPF->CompMidLine();
-			}
+
 			FillFoilTable();
 		}
 	}
@@ -962,7 +837,7 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 	{
 		//not zooming, check if mouse passes over control point and highlight
 
-		if(m_bSF && m_pSF->m_bVisible)
+		if(m_pSF->m_bVisible)
 		{
 			int n = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 			if (n>0 && n<m_pSF->m_Extrados.m_iCtrlPoints)
@@ -989,38 +864,6 @@ void QAFoil::mouseMoveEvent(QMouseEvent *event)
 				}
 			}
 			UpdateView();
-		}
-		else if (m_pPF->m_bVisible)
-		{
-			bool bFound = false;
-			int n = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pPF->m_Extrados.m_iPoints)
-			{
-				m_pPF->m_Extrados.m_iHighlight = n;
-				bFound = true;
-			}
-			else if(m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
-			{
-				m_pPF->m_Extrados.m_iHighlight = -1;
-				bFound = true;
-			}
-
-			n = m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>0 && n<=m_pPF->m_Intrados.m_iPoints)
-			{
-				m_pPF->m_Intrados.m_iHighlight = n;
-				bFound = true;
-			}
-			else if(m_pPF->m_Intrados.IsRearPoint(Real, m_fScale/m_fRefScale) == -1)
-			{
-				m_pPF->m_Intrados.m_iHighlight = -1;
-				bFound = true;
-			}
-			if(!bFound)
-			{
-				m_pPF->m_Extrados.m_iHighlight = -10;
-				m_pPF->m_Intrados.m_iHighlight = -10;
-			}
 		}
 	}
 	UpdateView();
@@ -1057,44 +900,22 @@ void QAFoil::mousePressEvent(QMouseEvent *event)
 		else
 		{
 			//Selects the point
-			if(m_bSF)
+
+			m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+			if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
 			{
-				m_pSF->m_Extrados.m_iSelect = m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				m_pSF->m_Intrados.m_iSelect = m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-				if (m_pSF->m_Extrados.m_iSelect>=0 || m_pSF->m_Intrados.m_iSelect>=0)
-				{
-					TakePicture();
-				}
-
-				if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10)
-				{
-					p2DWidget->setCursor(m_hcMove);
-					m_bTrans = true;
-				}
-			}
-			else
-			{
-				m_pPF->m_Extrados.m_iSelect = m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
-				int n = m_pPF->m_Extrados.IsRearPoint(Real, m_fScale/m_fRefScale) ;
-				if(n==-1) m_pPF->m_Extrados.m_iSelect = n;
-
-				m_pPF->m_Intrados.m_iSelect = m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale) ;
-				n = m_pPF->m_Intrados.IsRearPoint(Real, m_fScale/m_fRefScale) ;
-				if(n==-1) m_pPF->m_Intrados.m_iSelect = n;
-
 				TakePicture();
+			}
 
-				if(m_pPF->m_Extrados.m_iSelect ==-10 && m_pPF->m_Intrados.m_iSelect ==-10)
-				{
-					p2DWidget->setCursor(m_hcMove);
-					m_bTrans = true;
-				}
+			if(m_pSF->m_Extrados.m_iSelect ==-10 && m_pSF->m_Intrados.m_iSelect ==-10)
+			{
+				p2DWidget->setCursor(m_hcMove);
+				m_bTrans = true;
 			}
 		}
-
 	}
 	UpdateView();	
-
 }
 
 
@@ -1151,14 +972,7 @@ void QAFoil::mouseReleaseEvent(QMouseEvent *event)
 
 	else 
 	{
-		if(m_bSF)
-		{
-			m_pSF->CompMidLine();
-		}
-		else
-		{
-			m_pPF->CompMidLine();
-		}
+		m_pSF->CompMidLine();
 		p2DWidget->setCursor(m_hcCross);
 	}
 
@@ -1776,44 +1590,22 @@ void QAFoil::OnExportSplinesToFile()
 	// deselect points so as not to interfere with other mouse commands
 	m_pSF->m_Intrados.m_iSelect = -10;
 	m_pSF->m_Extrados.m_iSelect = -10;
-	m_pPF->m_Intrados.m_iSelect = -10;
-	m_pPF->m_Extrados.m_iSelect = -10;
 
 	//check that the number of output points is consistent with the array's size
-	if(m_bSF)
+
+	if(m_pSF->m_Extrados.m_iRes>IQX2)
 	{
-		if(m_pSF->m_Extrados.m_iRes>IQX2)
-		{
-			strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
-		if(m_pSF->m_Intrados.m_iRes>IQX2)
-		{
-			strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
+		strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
+		QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
+		return;
 	}
-	else
+	if(m_pSF->m_Intrados.m_iRes>IQX2)
 	{
-		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
-		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
+		strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
+		QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
+		return;
 	}
 
-	QFile DestFile;
 
 	FileName.replace("/", " ");
 	FileName = QFileDialog::getSaveFileName(this, tr("Export Splines"), 
@@ -1834,16 +1626,8 @@ void QAFoil::OnExportSplinesToFile()
 
 	strOut = FoilName + "\n";
 	out << strOut;
-	if(m_bSF)
-	{
-//				XFile.WriteString("1\n");
-		m_pSF->ExportToFile(out);
-	}
-	else
-	{
-//				XFile.WriteString("2\n");
-		m_pPF->ExportToFile(out);
-	}
+
+	m_pSF->ExportToFile(out);
 	XFile.close();
 }
 
@@ -1877,24 +1661,15 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 		g_pCurFoil = NULL;
 		if(index.column()==12)
 		{
-			if(m_bSF) m_pSF->m_bVisible = !m_pSF->m_bVisible;
-			else      m_pPF->m_bVisible = !m_pPF->m_bVisible;
-
+			m_pSF->m_bVisible = !m_pSF->m_bVisible;
 		}
 		else if(index.column()==13)
 		{
-			if(m_bSF) m_pSF->m_bOutPoints = !m_pSF->m_bOutPoints;
-			else     
-			{
-				m_pPF->m_bOutPoints = !m_pPF->m_bOutPoints;
-				m_pPF->SetOutPoints(m_pPF->m_bOutPoints);
-			}
+			m_pSF->m_bOutPoints = !m_pSF->m_bOutPoints;
 		}
 		else if(index.column()==14)
 		{
-			if(m_bSF) m_pSF->m_bCenterLine = !m_pSF->m_bCenterLine;
-			else      m_pPF->m_bCenterLine = !m_pPF->m_bCenterLine;
-
+			m_pSF->m_bCenterLine = !m_pSF->m_bCenterLine;
 		}
 	}
 	UpdateView();
@@ -1926,19 +1701,11 @@ void QAFoil::OnFoilStyle()
 	if(!g_pCurFoil)
 	{
 		LinePickerDlg dlg;
-		if(m_bSF) dlg.InitDialog(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
-		else      dlg.InitDialog(m_pPF->m_FoilStyle, m_pPF->m_FoilWidth, m_pPF->m_FoilColor);
+		dlg.InitDialog(m_pSF->m_FoilStyle, m_pSF->m_FoilWidth, m_pSF->m_FoilColor);
 
 		if(QDialog::Accepted==dlg.exec())
 		{
-			if(m_bSF)
-			{
-				m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
-			}
-			else
-			{
-				m_pPF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
-			}
+			m_pSF->SetCurveParams(dlg.GetStyle(), dlg.GetWidth(), dlg.GetColor());
 			UpdateView();
 		}
 	}
@@ -2057,35 +1824,17 @@ void QAFoil::OnHideCurrentFoil()
 void QAFoil::OnNewSplines()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_bSF) 
+	if(m_pSF->m_bModified)
 	{
-		if(m_pSF->m_bModified)
+		if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), tr("Discard changes to Splines ?"),
+													  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
 		{
-			if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), tr("Discard changes to Splines ?"),
-														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-			{
-				return;
-			}
+			return;
 		}
-		m_pSF->InitSplineFoil();
-		TakePicture();
-		StorePicture();
 	}
-	else      
-	{
-		if(m_pPF->m_bModified)
-		{
-			if (QMessageBox::Yes != QMessageBox::question(pMainFrame, tr("Question"), tr("Discard changes to Splines ?"),
-														  QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel))
-			{
-				return;
-			}
-		}
-		m_pPF->InitSplinedFoil();
-		TakePicture();
-		StorePicture();
-	}
-	
+	m_pSF->InitSplineFoil();
+	TakePicture();
+	StorePicture();
 
 	m_StackPos  = 0;
 	m_StackSize = 0;
@@ -2153,81 +1902,41 @@ void QAFoil::OnShowLegend()
 void QAFoil::OnStoreSplines()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	if(m_bSF)
+
+	if(m_pSF->m_Extrados.m_iRes>IQX2)
 	{
-		if(m_pSF->m_Extrados.m_iRes>IQX2)
-		{
-			QString strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
-		if(m_pSF->m_Intrados.m_iRes>IQX2)
-		{
-			QString strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
+		QString strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
+		QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
+		return;
+	}
+	if(m_pSF->m_Intrados.m_iRes>IQX2)
+	{
+		QString strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
+		QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
+		return;
+	}
 
 
-		CFoil *pNewFoil = new CFoil();
-		m_pSF->ExportToBuffer(pNewFoil);
+	CFoil *pNewFoil = new CFoil();
+	m_pSF->ExportToBuffer(pNewFoil);
 
-		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
-		pNewFoil->m_nFoilStyle = 0;
-		pNewFoil->m_nFoilWidth = 1;
-		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = "";
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-		else
-		{
-			FillFoilTable();
-			SelectFoil();
-		}
+	pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
+	pNewFoil->m_nFoilStyle = 0;
+	pNewFoil->m_nFoilWidth = 1;
+	pNewFoil->m_bPoints = false;
+	pNewFoil->m_FoilName = "";
+	if(pMainFrame->SetModFoil(pNewFoil))
+	{
+		g_pCurFoil = NULL;
+		FillFoilTable();
+		SelectFoil(pNewFoil);
 	}
 	else
 	{
-		int size = m_pPF->m_Extrados.m_iPoints * (m_pPF->m_Extrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			QString strong = QString(tr("Too many output points on upper surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
-
-		size = m_pPF->m_Intrados.m_iPoints * (m_pPF->m_Intrados.m_Freq-1) ;//+ 1;
-		if(size>IQX2)
-		{
-			QString strong = QString(tr("Too many output points on lower surface\n Max =%1")).arg(IQX2);
-			QMessageBox::warning(pMainFrame, tr("Warning"), strong, QMessageBox::Ok);
-			return;
-		}
-
-		CFoil *pNewFoil = new CFoil();
-		m_pPF->ExportToBuffer(pNewFoil);
-		pNewFoil->m_FoilColor  = pMainFrame->GetColor(0);
-		pNewFoil->m_nFoilStyle = 0;
-		pNewFoil->m_nFoilWidth = 1;
-		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = "";
-		if(pMainFrame->SetModFoil(pNewFoil))
-		{
-			g_pCurFoil = NULL;
-			FillFoilTable();
-			SelectFoil(pNewFoil);
-		}
-/*		else
-		{
-			delete pNewFoil;
-			pNewFoil = NULL;
-			FillFoilTable();
-			SelectFoil();
-		}*/
+		FillFoilTable();
+		SelectFoil();
 	}
+
 	UpdateView();
 }
 
@@ -2259,8 +1968,6 @@ void QAFoil::OnSplineControls()
 {
 	SplineCtrlsDlg dlg;
 	dlg.m_pSF = m_pSF;
-	dlg.m_pPF = m_pPF;
-	dlg.m_bSF = m_bSF;
 	dlg.InitDialog();
 
 	if(dlg.exec() == QDialog::Accepted)
@@ -2268,18 +1975,10 @@ void QAFoil::OnSplineControls()
 		TakePicture();
 		StorePicture();
 
-		if(m_bSF)
-		{
-			m_pSF->Copy(&dlg.m_SF);
-			m_pSF->Update(true);
-			m_pSF->Update(false);
-		}
-		else
-		{
-			m_pPF->Copy(&dlg.m_PF);
-			m_pSF->Update(true);
-			m_pSF->Update(false);
-		}
+		m_pSF->Copy(&dlg.m_SF);
+		m_pSF->Update(true);
+		m_pSF->Update(false);
+
 	}
 }
 
@@ -2288,13 +1987,10 @@ void QAFoil::OnSplineControls()
 void QAFoil::OnSplines()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_bSF = true;
 	m_StackSize = 0;
 	m_StackPos = 0;
 	TakePicture();
 	StorePicture();
-	pMainFrame->SplinesAct->setChecked(m_bSF);
-	pMainFrame->SplinedPointsAct->setChecked(!m_bSF);
 	FillFoilTable();
 	UpdateView();
 }
@@ -2303,13 +1999,10 @@ void QAFoil::OnSplines()
 void QAFoil::OnSplinedPoints()
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
-	m_bSF = false;
 	m_StackSize = 0;
 	m_StackPos = 0;
 	TakePicture();
 	StorePicture();
-	pMainFrame->SplinesAct->setChecked(m_bSF);
-	pMainFrame->SplinedPointsAct->setChecked(!m_bSF);
 	FillFoilTable();
 	UpdateView();
 }
@@ -2473,49 +2166,26 @@ void QAFoil::PaintLegend(QPainter &painter)
 		QPen LegendPen;
 
 		k=0;
-		if(m_bSF)
-		{
-			if(m_pSF->m_bVisible)
-			{
-				LegendPen.setColor(m_pSF->m_FoilColor);
-				LegendPen.setStyle(GetStyle(m_pSF->m_FoilStyle));
-				LegendPen.setWidth(m_pSF->m_FoilWidth);
 
-				painter.setPen(LegendPen);
-				painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
-				if(m_pSF->m_bOutPoints )
-				{
+		if(m_pSF->m_bVisible)
+		{
+			LegendPen.setColor(m_pSF->m_FoilColor);
+			LegendPen.setStyle(GetStyle(m_pSF->m_FoilStyle));
+			LegendPen.setWidth(m_pSF->m_FoilWidth);
+
+			painter.setPen(LegendPen);
+			painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
+			if(m_pSF->m_bOutPoints )
+			{
 //					x1 = Place.x + (int)(0.5*LegendSize);
 //					pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
-					x1 = Place.x() + (int)(0.5*LegendSize);
-					painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
-				}
-				painter.setPen(TextPen);
-				painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, m_pSF->m_strFoilName);
+				x1 = Place.x() + (int)(0.5*LegendSize);
+				painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
 			}
+			painter.setPen(TextPen);
+			painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, m_pSF->m_strFoilName);
 		}
-		else
-		{
-			if(m_pPF->m_bVisible)
-			{
-				LegendPen.setColor(m_pPF->m_FoilColor);
-				LegendPen.setStyle(GetStyle(m_pPF->m_FoilStyle));
-				LegendPen.setWidth(m_pPF->m_FoilWidth);
 
-				painter.setPen(LegendPen);
-				painter.drawLine(Place.x(), Place.y() + ypos*k, Place.x() + (int)(LegendSize), Place.y() + ypos*k);
-
-				if(m_pPF->m_bOutPoints)
-				{
-//					x1 = Place.x + (int)(0.5*LegendSize);
-//					pDC->Rectangle(x1-2, Place.y + ypos*k-2, x1+2, Place.y + ypos*k+2);
-					x1 = Place.x() + (int)(0.5*LegendSize);
-					painter.drawRect(x1-2, Place.y() + ypos*k-2, 4,4);
-				}
-				painter.setPen(TextPen);
-				painter.drawText(Place.x() + (int)(1.5*LegendSize), Place.y() + ypos*k+delta, m_pPF->m_strFoilName);
-			}
-		}
 		k++;
 		for (n=0; n < m_poaFoil->size(); n++)
 		{
@@ -2613,53 +2283,26 @@ void QAFoil::PaintSplines(QPainter &painter)
 	QBrush FillBrush(pMainFrame->m_BackgroundColor);
 	painter.setBrush(FillBrush);
 
-	if (m_bSF)
+	if(m_pSF->m_bVisible)
 	{
-		if(m_pSF->m_bVisible)
+		m_pSF->DrawFoil(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
+
+		CtrlPen.setStyle(Qt::SolidLine);
+		CtrlPen.setColor(m_pSF->m_FoilColor);
+		painter.setPen(CtrlPen);
+
+		m_pSF->DrawCtrlPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
+
+		if (m_pSF->m_bCenterLine)
 		{
-			m_pSF->DrawFoil(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-
-			CtrlPen.setStyle(Qt::SolidLine);
-			CtrlPen.setColor(m_pSF->m_FoilColor);
-			painter.setPen(CtrlPen);
-
-			m_pSF->DrawCtrlPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-
-			if (m_pSF->m_bCenterLine)
-			{
-				m_pSF->DrawMidLine(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-			}
-			if (m_pSF->m_bOutPoints)
-			{
-				m_pSF->DrawOutPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-			}
+			m_pSF->DrawMidLine(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
+		}
+		if (m_pSF->m_bOutPoints)
+		{
+			m_pSF->DrawOutPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
 		}
 	}
-	else if(m_pPF->m_bVisible)
-	{
-		SplinePen.setStyle(GetStyle(m_pPF->m_FoilStyle));
-		SplinePen.setWidth(m_pPF->m_FoilWidth);
-		SplinePen.setColor(m_pPF->m_FoilColor);
-		painter.setPen(SplinePen);
 
-		m_pPF->DrawFoil(painter, m_fScale, m_fScale*m_fScaleY, m_ptOffset);
-
-/*		CtrlPen.setStyle(Qt::SolidLine);
-		CtrlPen.setColor(m_pPF->m_FoilColor);
-		painter.setPen(CtrlPen);*/
-
-		m_pPF->DrawCtrlPoints(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-
-
-		if (m_pPF->m_bCenterLine)
-		{
-			CenterPen.setColor(m_pPF->m_FoilColor);
-			CenterPen.setStyle(Qt::DashLine);
-			painter.setPen(CenterPen);
-
-			m_pPF->DrawMidLine(painter, m_fScale,m_fScale*m_fScaleY, m_ptOffset);
-		}
-	}
 	painter.restore();
 }
 
@@ -2753,7 +2396,6 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 {
 	pSettings->beginGroup("DirectDesign");
 	{
-		pSettings->setValue("ShowSF", m_bSF);
 		pSettings->setValue("XMajGrid", m_bXGrid);
 		pSettings->setValue("YMajGrid", m_bYGrid);
 		pSettings->setValue("XMinGrid", m_bXMinGrid);
@@ -2798,18 +2440,9 @@ void QAFoil::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("SFColorGreen", m_pSF->m_FoilColor.green());
 		pSettings->setValue("SFColorBlue", m_pSF->m_FoilColor.blue());
 
-		pSettings->setValue("PFStyle", m_pPF->m_FoilStyle);
-		pSettings->setValue("PFWidth", m_pPF->m_FoilWidth);
-		pSettings->setValue("PFColorRed", m_pPF->m_FoilColor.red());
-		pSettings->setValue("PFColorGreen", m_pPF->m_FoilColor.green());
-		pSettings->setValue("PFColorBlue", m_pPF->m_FoilColor.blue());
-	
 		pSettings->setValue("SFVisible", m_pSF->m_bVisible);
 		pSettings->setValue("SFOutPoints", m_pSF->m_bOutPoints);
 		pSettings->setValue("SFCenterLine", m_pSF->m_bCenterLine);
-		pSettings->setValue("PFVisible", m_pPF->m_bVisible);
-		pSettings->setValue("PFOutPoints", m_pPF->m_bOutPoints);
-		pSettings->setValue("PFCenterLine", m_pPF->m_bCenterLine);
 
 		pSettings->setValue("LowerRes", m_pSF->m_Intrados.m_iRes);
 		pSettings->setValue("UpperRes", m_pSF->m_Extrados.m_iRes);
@@ -2847,7 +2480,6 @@ void QAFoil::SetScale()
 	m_ptOffset.ry() = (int)(m_rCltRect.height()/2);
 
 	m_pSF->SetViewRect(m_rCltRect);
-	m_pPF->SetViewRect(m_rCltRect);
 
 	m_ViewportTrans = QPoint(0,0);
 }
@@ -2866,54 +2498,27 @@ void QAFoil::SetPicture()
 {
 //	double gap;
 	int i;
-	if(m_bSF)
+
+	 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
+	 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
+	for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
 	{
-		 m_pSF->m_Extrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iExt;
-		 m_pSF->m_Intrados.m_iCtrlPoints = m_UndoPic[m_StackPos].m_iInt;
-		for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
-		{
-			m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
-			m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_StackPos].yExt[i];
-		}
-		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++)
-		{
-			m_pSF->m_Intrados.m_Input[i].x = m_UndoPic[m_StackPos].xInt[i];
-			m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_StackPos].yInt[i];
-		}
+		m_pSF->m_Extrados.m_Input[i].x = m_UndoPic[m_StackPos].xExt[i];
+		m_pSF->m_Extrados.m_Input[i].y = m_UndoPic[m_StackPos].yExt[i];
+	}
+	for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++)
+	{
+		m_pSF->m_Intrados.m_Input[i].x = m_UndoPic[m_StackPos].xInt[i];
+		m_pSF->m_Intrados.m_Input[i].y = m_UndoPic[m_StackPos].yInt[i];
+	}
 
 //		gap =   m_pSF->m_Extrados.m_Input[m_pSF->m_Extrados.m_iCtrlPoints].y
 //			  - m_pSF->m_Intrados.m_Input[m_pSF->m_Intrados.m_iCtrlPoints].y;
 
-		m_pSF->UpdateKnots();
-		m_pSF->Update(true);
-		m_pSF->Update(false);
-	}
-	else
-	{
-		 m_pPF->m_Extrados.m_iPoints = m_UndoPic[m_StackPos].m_iExt;
-		 m_pPF->m_Intrados.m_iPoints = m_UndoPic[m_StackPos].m_iInt;
+	m_pSF->UpdateKnots();
+	m_pSF->Update(true);
+	m_pSF->Update(false);
 
-		 m_pPF->m_Extrados.m_RearPoint.x = m_UndoPic[m_StackPos].ExtRearPt.x;
-		 m_pPF->m_Extrados.m_RearPoint.y = m_UndoPic[m_StackPos].ExtRearPt.y;
-		 m_pPF->m_Intrados.m_RearPoint.x = m_UndoPic[m_StackPos].IntRearPt.x;
-		 m_pPF->m_Intrados.m_RearPoint.y = m_UndoPic[m_StackPos].IntRearPt.y;
-
-		for (i=0; i<=m_UndoPic[m_StackPos].m_iExt; i++)
-		{
-			m_pPF->m_Extrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xExt[i];
-			m_pPF->m_Extrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yExt[i];
-		}
-		for (i=0; i<=m_UndoPic[m_StackPos].m_iInt; i++)
-		{
-			m_pPF->m_Intrados.m_ctrlPoint[i].x = m_UndoPic[m_StackPos].xInt[i];
-			m_pPF->m_Intrados.m_ctrlPoint[i].y = m_UndoPic[m_StackPos].yInt[i];
-		}
-//		gap =   m_pPF->m_Extrados.m_ctrlPoint[m_pPF->m_Extrados.m_iPoints].y
-//			  - m_pPF->m_Intrados.m_ctrlPoint[m_pPF->m_Intrados.m_iPoints].y;
-
-		m_pPF->Update();
-		m_pPF->Update();
-	}
 //	SetGap(gap);
 	UpdateView();
 }
@@ -3084,40 +2689,18 @@ void QAFoil::TakePicture()
 {
 	int i;
 	m_bStored = false;
-	if(m_bSF)
-	{
-		m_TmpPic.m_iExt = m_pSF->m_Extrados.m_iCtrlPoints;
-		for (i=0; i<=m_TmpPic.m_iExt; i++)
-		{
-			m_TmpPic.xExt[i] = m_pSF->m_Extrados.m_Input[i].x;
-			m_TmpPic.yExt[i] = m_pSF->m_Extrados.m_Input[i].y;
-		}
-		m_TmpPic.m_iInt = m_pSF->m_Intrados.m_iCtrlPoints;
-		for (i=0; i<=m_TmpPic.m_iInt; i++)
-		{
-			m_TmpPic.xInt[i] = m_pSF->m_Intrados.m_Input[i].x;
-			m_TmpPic.yInt[i] = m_pSF->m_Intrados.m_Input[i].y;
-		}
-	}
-	else
-	{
-		m_TmpPic.m_iExt = m_pPF->m_Extrados.m_iPoints;
-		for (i=0; i<=m_TmpPic.m_iExt; i++)
-		{
-			m_TmpPic.xExt[i] = m_pPF->m_Extrados.m_ctrlPoint[i].x;
-			m_TmpPic.yExt[i] = m_pPF->m_Extrados.m_ctrlPoint[i].y;
-		}
-		m_TmpPic.ExtRearPt.x = m_pPF->m_Extrados.m_RearPoint.x;
-		m_TmpPic.ExtRearPt.y = m_pPF->m_Extrados.m_RearPoint.y;
 
-		m_TmpPic.m_iInt = m_pPF->m_Intrados.m_iPoints;
-		for (i=0; i<=m_TmpPic.m_iInt; i++)
-		{
-			m_TmpPic.xInt[i] = m_pPF->m_Intrados.m_ctrlPoint[i].x;
-			m_TmpPic.yInt[i] = m_pPF->m_Intrados.m_ctrlPoint[i].y;
-		}
-		m_TmpPic.IntRearPt.x = m_pPF->m_Intrados.m_RearPoint.x;
-		m_TmpPic.IntRearPt.y = m_pPF->m_Intrados.m_RearPoint.y;
+	m_TmpPic.m_iExt = m_pSF->m_Extrados.m_iCtrlPoints;
+	for (i=0; i<=m_TmpPic.m_iExt; i++)
+	{
+		m_TmpPic.xExt[i] = m_pSF->m_Extrados.m_Input[i].x;
+		m_TmpPic.yExt[i] = m_pSF->m_Extrados.m_Input[i].y;
+	}
+	m_TmpPic.m_iInt = m_pSF->m_Intrados.m_iCtrlPoints;
+	for (i=0; i<=m_TmpPic.m_iInt; i++)
+	{
+		m_TmpPic.xInt[i] = m_pSF->m_Intrados.m_Input[i].x;
+		m_TmpPic.yInt[i] = m_pSF->m_Intrados.m_Input[i].y;
 	}
 }
 
@@ -3275,32 +2858,18 @@ void QAFoil::OnInsertCtrlPt()
 	StorePicture();
 	CVector Real = MousetoReal(m_PointDown);
 
-	if(m_bSF)
+
+	if(Real.y>=0)
 	{
-		if(Real.y>=0)
-		{
-			m_pSF->m_Extrados.InsertPoint(Real.x,Real.y);
-			m_pSF->Update(true);
-		}
-		else
-		{
-			m_pSF->m_Intrados.InsertPoint(Real.x,Real.y);
-			m_pSF->Update(false);
-		}
+		m_pSF->m_Extrados.InsertPoint(Real.x,Real.y);
+		m_pSF->Update(true);
 	}
 	else
 	{
-		if(Real.y>=0)
-		{
-			m_pPF->m_Extrados.InsertPoint(Real.x, Real.y);
-			m_pPF->Update();
-		}
-		else
-		{
-			m_pPF->m_Intrados.InsertPoint(Real.x, Real.y);
-			m_pPF->Update();
-		}
+		m_pSF->m_Intrados.InsertPoint(Real.x,Real.y);
+		m_pSF->Update(false);
 	}
+
 }
 
 
@@ -3313,37 +2882,19 @@ void QAFoil::OnRemoveCtrlPt()
 
 	CVector Real = MousetoReal(m_PointDown);
 
-	if(m_bSF)
+	int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+	if (n>=0)
 	{
-		int n =  m_pSF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-		if (n>=0)
-		{
-			m_pSF->m_Extrados.RemovePoint(n);
-			m_pSF->Update(true);
-		}
-		else
-		{
-			int n=m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>=0)
-			{
-				m_pSF->m_Intrados.RemovePoint(n);
-				m_pSF->Update(false);
-			}
-		}
+		m_pSF->m_Extrados.RemovePoint(n);
+		m_pSF->Update(true);
 	}
 	else
 	{
-		int n =  m_pPF->m_Extrados.IsControlPoint(Real, m_fScale/m_fRefScale);
+		int n=m_pSF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
 		if (n>=0)
 		{
-			m_pPF->m_Extrados.RemovePoint(n);
-			m_pPF->Update();
-		}
-		else
-		{
-			int n=m_pPF->m_Intrados.IsControlPoint(Real, m_fScale/m_fRefScale);
-			if (n>=0) m_pPF->m_Intrados.RemovePoint(n);
-			m_pPF->Update();
+			m_pSF->m_Intrados.RemovePoint(n);
+			m_pSF->Update(false);
 		}
 	}
 }

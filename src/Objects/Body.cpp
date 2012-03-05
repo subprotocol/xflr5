@@ -1310,7 +1310,6 @@ bool CBody::IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight)
 		J.z = I.z;
 		iter++;
 	}
-//	qDebug()<<"Iter="<<iter<<"dist="<<dist2;
 	return iter<itermax;
 }
 

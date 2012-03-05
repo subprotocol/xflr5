@@ -17,7 +17,9 @@
 
 
 xflr5 v6.07, March xxth, 2012
+	- Corrected the bug which modified the chord length as twist increases
 	- Corrected a bug leading to incorrect results in stability derivatives with active controls (CPanel::RotateBC())
+	- Removed the Points Foil option
 	- Other minor corrections
 
 

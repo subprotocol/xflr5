@@ -1783,8 +1783,8 @@ void GL3dWingDlg::OnScaleWing()
 		{
 			if(dlg.m_bSpan)  m_pWing->ScaleSpan(dlg.m_NewSpan);
 			if(dlg.m_bChord) m_pWing->ScaleChord(dlg.m_NewChord);
-			if(dlg.m_bSweep) m_pWing->SetSweep(dlg.m_NewSweep);
-			if(dlg.m_bTwist) m_pWing->SetTwist(dlg.m_NewTwist);
+			if(dlg.m_bSweep) m_pWing->ScaleSweep(dlg.m_NewSweep);
+			if(dlg.m_bTwist) m_pWing->ScaleTwist(dlg.m_NewTwist);
 		}
 
 		FillDataTable();

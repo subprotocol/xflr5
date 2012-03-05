@@ -38,7 +38,6 @@
 #include "../Misc/LineButton.h"
 #include "../Objects/Foil.h"
 #include "../Objects/Sf.h"
-#include "../Objects/Pf.h"
 #include "../XDirect/XFoil.h"
 #include "../XDirect/NacaFoilDlg.h"
 #include "../XDirect/CAddDlg.h"
@@ -198,7 +197,6 @@ private:
 	void * m_pMainFrame;
 
 	bool m_bScale;
-	bool m_bSF;//else m_bPF
 	bool m_bZoomPlus;
 	bool m_bZoomYOnly;
 	bool m_bNeutralLine;
@@ -235,7 +233,6 @@ private:
 
 	CFoil *m_pCurFoil;
 	CSF *m_pSF;
-	CPF *m_pPF;
 
 	QPoint m_ptOffset;//the foil's leading edge position in screen coordinates
 	QPoint m_ViewportTrans; // the translation of the viewport

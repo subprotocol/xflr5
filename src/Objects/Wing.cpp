@@ -539,7 +539,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_Surface[is].m_TwistA   =  m_TTwist[j+1];
 			m_Surface[is].m_TwistB   =  m_TTwist[j];
 
-			m_Surface[is].SetTwist_old();
+			m_Surface[is].SetTwist2();
 
 			m_Surface[is].RotateX(m_Surface[is].m_LB, -m_TDihedral[j]);
 			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x,   -VNSide[nSurf+1].y,   VNSide[nSurf+1].z);
@@ -616,7 +616,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 				m_Surface[is].m_TwistA   =  m_TTwist[j];
 				m_Surface[is].m_TwistB   =  m_TTwist[j+1];
 
-				m_Surface[is].SetTwist_old();
+				m_Surface[is].SetTwist2();
 				m_Surface[is].RotateX(m_Surface[is].m_LA, m_TDihedral[j]);
 				m_Surface[is].NormalA.Set(VNSide[is-nSurf].x,   VNSide[is-nSurf].y,   VNSide[is-nSurf].z);
 				m_Surface[is].NormalB.Set(VNSide[is-nSurf+1].x, VNSide[is-nSurf+1].y, VNSide[is-nSurf+1].z);
@@ -1033,7 +1033,7 @@ bool CWing::ExportAVLWing(QTextStream &out, int index, double x, double y, doubl
 
 		//Remove the twist, since AVL processes it as a mod of the angle of attack thru the dAInc command
 		ASurface.m_TwistA = ASurface.m_TwistB = 0.0;
-		ASurface.SetTwist();
+		ASurface.SetTwist1();
 		out << ("#______________\nSECTION                                                     |  (keyword)\n");
 
 		strong = QString("%1 %2 %3 %4 %5  %6  %7   | Xle Yle Zle   Chord Ainc   [ Nspan Sspace ]\n")
@@ -1423,16 +1423,16 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 	double GammaStrip[MAXSPANSTATIONS];
 	CVector C, Wg, dF, StripForce, WindDirection, WindNormal, VInf;
 
-	if(pWPolar->m_bTiltedGeom)
+/*	if(pWPolar->m_bTiltedGeom)
 	{
 		cosa = 1.0;
 		sina = 0.0;
 	}
 	else
-	{
+	{*/
 		cosa = cos(Alpha*PI/180.0);
 		sina = sin(Alpha*PI/180.0);
-	}
+//	}
 
 	//   Define wind axis
 	WindNormal.Set(   -sina, 0.0, cosa);
@@ -1560,7 +1560,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 			Force     += StripForce;                          // N/q
 			m_F[m]     = StripForce * q;	                    // Newtons
 
-			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
+//			if(pWPolar->m_bTiltedGeom) m_F[m].RotateY(-Alpha);
 
 			if(s_bVLMSymetric)
 			{
@@ -1957,7 +1957,7 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 
 
-void CWing::SetSweep(double Sweep)
+void CWing::ScaleSweep(double Sweep)
 {
 	//
 	// Sets the average sweep measured at the quarter-chord to the new value Sweep
@@ -1988,21 +1988,23 @@ void CWing::SetSweep(double Sweep)
 }
 
 
-void CWing::SetTwist(double Twist)
+void CWing::ScaleTwist(double Twist)
 {
 	//
-	// Sets the twist to the new value
+	// Scales the twist to the new value
 	//
 	if(fabs(m_TTwist[m_NPanel])>0.0001)
 	{
 		//scale each panel's twist
 		double ratio = Twist/m_TTwist[m_NPanel];
 
-		for(int i=1; i<=m_NPanel; i++){
+		for(int i=1; i<=m_NPanel; i++)
+		{
 			m_TTwist[i] *= ratio;
 		}
 	}
-	else{
+	else
+	{
 		//Set each panel's twist in the ratio of the span position
 		for(int i=1; i<=m_NPanel; i++){
 			m_TTwist[i] = Twist*m_TPos[i]/(m_PlanformSpan/2.0);
