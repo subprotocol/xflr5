@@ -142,8 +142,8 @@ bool LLTAnalysisDlg::AlphaLoop()
 
 		if (m_bSkip)
 		{
-			if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(Alpha, 6,'f',2).arg(iter);
-			else                                 str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(m_pWPolar->m_QInf,  8,'f',2).arg(iter);
+			if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(Alpha, 6,'f',2).arg(iter);
+			else                                       str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(m_pWPolar->m_QInf,  8,'f',2).arg(iter);
 			UpdateOutput(str);
 			m_bSkip = false;
 			m_bInitCalc = true;
@@ -368,7 +368,7 @@ void LLTAnalysisDlg::StartAnalysis()
 	m_LLT.LLTInitialize(m_pWPolar->m_QInf);
 
 
-	if (m_pWPolar->m_Type!=4)
+	if (m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 	{
 		AlphaLoop() ;
 	}
@@ -487,8 +487,8 @@ bool LLTAnalysisDlg::ReLoop()
 		}
 		else if (m_bSkip)
 		{
-			if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(m_pWPolar->m_ASpec, 6,'f',2).arg(iter);
-			else                                 str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(QInf,  8,'f',2).arg(iter);
+			if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR) str = QString(tr("Alpha = %1, skipped after %2 iterations ")+"\n").arg(m_pWPolar->m_ASpec, 6,'f',2).arg(iter);
+			else                                       str = QString(tr("QInf = %1 skipped after %2 iterations ")+"\n"  ).arg(QInf,  8,'f',2).arg(iter);
 			UpdateOutput(str);
 			m_bSkip = false;
 			m_bInitCalc = true;

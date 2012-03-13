@@ -123,7 +123,7 @@ protected:
 	bool m_bCancel;
 	bool m_bIsRunning;
 
-	int m_Type;
+	enumPolarType m_PolarType;
 	int m_IterLim;
 
 	int m_nAnalysis; // number of analysis to run

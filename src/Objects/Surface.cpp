@@ -287,11 +287,11 @@ void CSurface::CreateXZSymetric(CSurface const &Surface)
 
 void CSurface::GetC4(int k, CVector &Pt, double &tau)
 {
-	GetPanel(k,m_NXPanels-1,0);
+	GetPanel(k,m_NXPanels-1,MIDSURFACE);
 	double xl = (LA.x+LB.x)/2.0;
 	double yl = (LA.y+LB.y)/2.0;
 	double zl = (LA.z+LB.z)/2.0;
-	GetPanel(k,0,0);
+	GetPanel(k,0,MIDSURFACE);
 	double xt = (TA.x+TB.x)/2.0;
 	double yt = (TA.y+TB.y)/2.0;
 	double zt = (TA.z+TB.z)/2.0;
@@ -355,7 +355,7 @@ void CSurface::GetNormal(double yrel, CVector &N)
 
 void CSurface::GetLeadingPt(int k, CVector &C)
 {
-	GetPanel(k,m_NXPanels-1, 0);
+	GetPanel(k,m_NXPanels-1, MIDSURFACE);
 
 	C.x    = (LA.x+LB.x)/2.0;
 	C.y    = (LA.y+LB.y)/2.0;
@@ -370,14 +370,14 @@ double CSurface::GetOffset(double const &tau)
 }
 
 
-void CSurface::GetPanel(int const &k, int const &l, int const &pos)
+void CSurface::GetPanel(int const &k, int const &l, enumPanelPosition const &pos)
 {
 	// Assumption : side points have been set for this surface
 	// Loads the corner points of the panel k,l in PTA, PTB, PLA, PLB
 	// Method used to generate the panels
 
 	GetyDist(k,y1,y2);
-	if(pos==0)
+	if(pos==MIDSURFACE)
 	{
 		LA.x = SideA[l+1].x * (1.0-y1) + SideB[l+1].x* y1;
 		LA.y = SideA[l+1].y * (1.0-y1) + SideB[l+1].y* y1;
@@ -392,7 +392,7 @@ void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 		TB.y = SideA[l].y   * (1.0-y2) + SideB[l].y  * y2;
 		TB.z = SideA[l].z   * (1.0-y2) + SideB[l].z  * y2;
 	}
-	else if (pos==-1)
+	else if (pos==BOTSURFACE)
 	{
 		LA = SideA_B[l+1] * (1.0-y1) + SideB_B[l+1]* y1;
 		TA = SideA_B[l]   * (1.0-y1) + SideB_B[l]  * y1;
@@ -412,7 +412,7 @@ void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 		TB.y = SideA_B[l].y   * (1.0-y2) + SideB_B[l].y  * y2;
 		TB.z = SideA_B[l].z   * (1.0-y2) + SideB_B[l].z  * y2;
 	}
-	else if (pos==1)
+	else if (pos==TOPSURFACE)
 	{
 		LA.x = SideA_T[l+1].x * (1.0-y1) + SideB_T[l+1].x* y1;
 		LA.y = SideA_T[l+1].y * (1.0-y1) + SideB_T[l+1].y* y1;
@@ -432,7 +432,7 @@ void CSurface::GetPanel(int const &k, int const &l, int const &pos)
 
 double CSurface::GetPanelWidth(int const &k)
 {
-	GetPanel(k, 0, 0);
+	GetPanel(k, 0, MIDSURFACE);
 	return fabs(LA.y-LB.y);
 }
 
@@ -584,7 +584,7 @@ double CSurface::GetStripSpanPos(int const &k)
 
 	for(l=0; l<m_NXPanels; l++)
 	{
-		GetPanel(k,l, 0);
+		GetPanel(k,l, MIDSURFACE);
 		YPos += (LA.y+LB.y+TA.y+TB.y)/4.0;
 		ZPos += (LA.z+LB.z+TA.z+TB.z)/4.0;
 	}
@@ -601,7 +601,7 @@ double CSurface::GetStripSpanPos(int const &k)
 
 void CSurface::GetTrailingPt(int k, CVector &C)
 {
-	GetPanel(k,0,0);
+	GetPanel(k,0,MIDSURFACE);
 
 	C.x    = (TA.x+TB.x)/2.0;
 	C.y    = (TA.y+TB.y)/2.0;
@@ -612,7 +612,7 @@ void CSurface::GetTrailingPt(int k, CVector &C)
 
 double CSurface::GetTwist(int const &k)
 {
-	GetPanel(k, 0, 0);
+	GetPanel(k, 0, MIDSURFACE);
 	double y = (LA.y+LB.y+TA.y+TB.y)/4.0;
 	return  m_TwistA + (m_TwistB-m_TwistA) *(y-m_LA.y)/(m_LB.y-m_LA.y);
 }
@@ -766,7 +766,7 @@ bool CSurface::RotateFlap(double const &Angle, bool bBCOnly)
 		for(l=0; l<m_nFlapPanels; l++)
 		{
 			k = m_FlapPanel[l];
-			if(s_pPanel[k].m_iPos==-1)
+			if(s_pPanel[k].m_Pos==BOTSURFACE)
 			{
 				s_pPanel[k].SetFrame(
 					s_pNode[s_pPanel[k].m_iLB],
@@ -898,6 +898,8 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 	chordA  = GetChord(0.0);//todo : compare with |m_LA-m_TA|
 	chordB  = GetChord(1.0);
 
+	cosdA = cosdB = 1.0;
+
 	//SideA, SideB are mid points (VLM) or bottom points (3DPanels)
 	//SideA_T, SideB_T, are top points (3DPanels);
 	if(m_pFoilA && m_pFoilB)
@@ -926,6 +928,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 		SideA_B[0] = m_TA;
 		SideB_B[0] = m_TB;
 	}
+
 	if(pBody && m_bIsCenterSurf && m_bIsLeftSurf)
 	{
 		if(TBody.Intersect(SideA_B[0], SideB_B[0], SideB_B[0], false)) m_bJoinRight = false;
@@ -936,7 +939,7 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 	{
 		TBody.Intersect(SideA_B[0], SideB_B[0], SideA_B[0], true);
 		TBody.Intersect(SideA_T[0], SideB_T[0], SideA_T[0], true);
-		TBody.Intersect(SideA[0],   SideB[0],     SideA[0], true);
+		TBody.Intersect(SideA[0],   SideB[0],   SideA[0],   true);
 	}
 
 
@@ -1008,81 +1011,6 @@ void CSurface::SetSidePoints(CBody * pBody, double dx, double dz)
 	Node = (SideB_B[0] + SideB_T[0])/2.0;
 	SideB_B[0].Set(Node);
 	SideB_T[0].Set(Node);
-}
-
-
-void CSurface::SetTwist1()
-{
-	static CVector A4, B4, L, U, T, O;
-	O.Set(0.0,0.0,0.0);
-
-	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
-	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
-	L = B4 - A4;
-	L.Normalize();
-
-	// create a vector perpendicular to NormalA and x-axis
-	T.x = 0.0;
-	T.y = +NormalA.z;
-	T.z = -NormalA.y;
-	//rotate around this axis
-	U = m_LA-A4;
-	U.Rotate(T, m_TwistA);
-	m_LA = A4+ U;
-
-	U = m_TA-A4;
-	U.Rotate(T, m_TwistA);
-	m_TA = A4 + U;
-
-	NormalA.Rotate(T, m_TwistA);
-
-	// create a vector perpendicular to NormalB and x-axis
-	T.x = 0.0;
-	T.y = +NormalB.z;
-	T.z = -NormalB.y;
-
-	U = m_LB-B4;
-	U.Rotate(T, m_TwistB);
-	m_LB = B4+ U;
-
-	U = m_TB-B4;
-	U.Rotate(T, m_TwistB);
-	m_TB = B4 + U;
-
-	NormalB.Rotate(T, m_TwistB);
-}
-
-
-
-void CSurface::SetTwist2()
-{
-	double xc4,zc4;
-	CVector O(0.0,0.0,0.0);
-
-	CVector LA = m_LA;
-	CVector TA = m_TA;
-	CVector LB = m_LB;
-	CVector TB = m_TB;
-
-	//"A" section first
-	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
-	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
-	m_LA.x = xc4 + (LA.x-xc4) * cos(m_TwistA *PI/180.0) - (LA.z-zc4) * sin(m_TwistA *PI/180.0);
-	m_LA.z = zc4 - (LA.x-xc4) * sin(m_TwistA *PI/180.0) + (LA.z-zc4) * cos(m_TwistA *PI/180.0);
-	m_TA.x = xc4 + (TA.x-xc4) * cos(m_TwistA *PI/180.0) - (TA.z-zc4) * sin(m_TwistA *PI/180.0);
-	m_TA.z = zc4 - (TA.x-xc4) * sin(m_TwistA *PI/180.0) + (TA.z-zc4) * cos(m_TwistA *PI/180.0);
-	NormalA.RotateY(O, m_TwistA);
-
-	//"B" Section next
-	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
-	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
-	m_LB.x = xc4 + (LB.x-xc4) * cos(m_TwistB *PI/180.0) - (LB.z-zc4) * sin(m_TwistB *PI/180.0);
-	m_LB.z = zc4 - (LB.x-xc4) * sin(m_TwistB *PI/180.0) + (LB.z-zc4) * cos(m_TwistB *PI/180.0);;
-	m_TB.x = xc4 + (TB.x-xc4) * cos(m_TwistB *PI/180.0) - (TB.z-zc4) * sin(m_TwistB *PI/180.0);;
-	m_TB.z = zc4 - (TB.x-xc4) * sin(m_TwistB *PI/180.0) + (TB.z-zc4) * cos(m_TwistB *PI/180.0);;
-	NormalB.RotateY(O, m_TwistB);
-
-//	qDebug()	<< (m_LA-m_TA).VAbs()<< (m_LB-m_TB).VAbs();
 }
 
 
@@ -1170,6 +1098,79 @@ void CSurface::CreateXPoints()
 	m_xPointB[m_NXPanels] = 0.0;
 }
 
+
+
+void CSurface::SetTwist1()
+{
+	static CVector A4, B4, L, U, T, O;
+	O.Set(0.0,0.0,0.0);
+
+	A4 = m_LA *3.0/4.0 + m_TA * 1/4.0;
+	B4 = m_LB *3.0/4.0 + m_TB * 1/4.0;
+	L = B4 - A4;
+	L.Normalize();
+
+	// create a vector perpendicular to NormalA and x-axis
+	T.x = 0.0;
+	T.y = +NormalA.z;
+	T.z = -NormalA.y;
+	//rotate around this axis
+	U = m_LA-A4;
+	U.Rotate(T, m_TwistA);
+	m_LA = A4+ U;
+
+	U = m_TA-A4;
+	U.Rotate(T, m_TwistA);
+	m_TA = A4 + U;
+
+	NormalA.Rotate(T, m_TwistA);
+
+	// create a vector perpendicular to NormalB and x-axis
+	T.x = 0.0;
+	T.y = +NormalB.z;
+	T.z = -NormalB.y;
+
+	U = m_LB-B4;
+	U.Rotate(T, m_TwistB);
+	m_LB = B4+ U;
+
+	U = m_TB-B4;
+	U.Rotate(T, m_TwistB);
+	m_TB = B4 + U;
+
+	NormalB.Rotate(T, m_TwistB);
+}
+
+
+
+void CSurface::SetTwist2()
+{
+	double xc4,zc4;
+	CVector O(0.0,0.0,0.0);
+
+	CVector LA = m_LA;
+	CVector TA = m_TA;
+	CVector LB = m_LB;
+	CVector TB = m_TB;
+
+	//"A" section first
+	xc4 = m_LA.x + (m_TA.x-m_LA.x)/4.0;
+	zc4 = m_LA.z + (m_TA.z-m_LA.z)/4.0;
+	m_LA.x = xc4 + (LA.x-xc4) * cos(m_TwistA *PI/180.0) - (LA.z-zc4) * sin(m_TwistA *PI/180.0);
+	m_LA.z = zc4 - (LA.x-xc4) * sin(m_TwistA *PI/180.0) + (LA.z-zc4) * cos(m_TwistA *PI/180.0);
+	m_TA.x = xc4 + (TA.x-xc4) * cos(m_TwistA *PI/180.0) - (TA.z-zc4) * sin(m_TwistA *PI/180.0);
+	m_TA.z = zc4 - (TA.x-xc4) * sin(m_TwistA *PI/180.0) + (TA.z-zc4) * cos(m_TwistA *PI/180.0);
+	NormalA.RotateY(O, m_TwistA);
+
+	//"B" Section next
+	xc4 = m_LB.x + (m_TB.x-m_LB.x)/4.0;
+	zc4 = m_LB.z + (m_TB.z-m_LB.z)/4.0;
+	m_LB.x = xc4 + (LB.x-xc4) * cos(m_TwistB *PI/180.0) - (LB.z-zc4) * sin(m_TwistB *PI/180.0);
+	m_LB.z = zc4 - (LB.x-xc4) * sin(m_TwistB *PI/180.0) + (LB.z-zc4) * cos(m_TwistB *PI/180.0);;
+	m_TB.x = xc4 + (TB.x-xc4) * cos(m_TwistB *PI/180.0) - (TB.z-zc4) * sin(m_TwistB *PI/180.0);;
+	m_TB.z = zc4 - (TB.x-xc4) * sin(m_TwistB *PI/180.0) + (TB.z-zc4) * cos(m_TwistB *PI/180.0);;
+	NormalB.RotateY(O, m_TwistB);
+}
 
 
 

@@ -105,7 +105,7 @@ void LLTAnalysis::LLTInitCl(double &QInf, double const Alpha)
 		m_Cl[k] = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k] + m_Twist[k], tau, bOutRe, bError);
 	}
 
-	if(m_pWPolar->m_Type==FIXEDLIFTPOLAR)
+	if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
 	{
 		double Lift=0.0;// required for Type 2
 		for (k=1; k<s_NLLTStations; k++)
@@ -454,13 +454,13 @@ int LLTAnalysis::LLTIterate(double &QInf, double Alpha)
 			yob     = cos(k*PI/s_NLLTStations);
 			m_pWing->GetFoils(&pFoil0, &pFoil1, yob*m_pWing->m_PlanformSpan/2.0, tau);
 			m_Cl[k] = GetCl(m_poaPolar, pFoil0, pFoil1, m_Re[k], Alpha + m_Ai[k]+ m_Twist[k], tau, bOutRe, bError);
-			if (m_pWPolar->m_Type == FIXEDLIFTPOLAR)
+			if (m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
 			{
 				Lift += Eta(k) * m_Cl[k] * m_Chord[k];
 			}
 		}
 
-		if(m_pWPolar->m_Type == FIXEDLIFTPOLAR)
+		if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
 		{
 			Lift *= m_pWing->m_AR / m_pWing->m_PlanformSpan;
 			if(Lift<=0.0)  return -1;
@@ -501,7 +501,7 @@ void LLTAnalysis::LLTInitialize(double QInf)
 	m_bWingOut = false;
 	m_bConverged = false;
 
-	if(m_pWPolar->m_Type == FIXEDLIFTPOLAR)	m_QInf0 = sqrt(2.*m_pWPolar->m_Mass* 9.81 /m_pWPolar->m_Density/m_pWing->m_PlanformArea);
+	if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)	m_QInf0 = sqrt(2.*m_pWPolar->m_Mass* 9.81 /m_pWPolar->m_Density/m_pWing->m_PlanformArea);
 	else                                    m_QInf0 = 0.0;
 
 	m_bConverged = true;

@@ -80,9 +80,9 @@ private:
 	QString m_WPolarName;
 	QString m_UFOName;
 
-	int m_PolarType; // fixed speed, fixed lift, fixed aoa
+	enumPolarType m_WPolarType; // fixed speed, fixed lift, fixed aoa
 	int m_UnitType;//1= International, 2= English
-	int m_AnalysisMethod; //0=LLT; 1=VLM1; 2=VLM2; 3=Panels
+	enumAnalysisMethod m_AnalysisMethod;
 
 	bool m_bAutoName;
 	bool m_bThinSurfaces;//true if Plane Panel calculation on middle surface, false if on top & bottom

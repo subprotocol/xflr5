@@ -356,7 +356,7 @@ private:
 	double m_Mach;
 	double m_ASpec;
 	double m_NCrit, m_XTopTr, m_XBotTr;
-	int m_Type;
+	enumPolarType m_PolarType;
 
 
 	CFoil m_BufferFoil;		// used for screen drawing and temporary geometric mods

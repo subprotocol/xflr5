@@ -137,7 +137,7 @@ private:
 	
 	int m_UnitType;//1= International, 2= Imperial
 	int m_nControls;
-	int m_PolarType;
+	enumPolarType m_WPolarType;
 	int m_RefAreaType;
 
 	double m_MinControl[MAXWINGS*MAXCONTROLS], m_MaxControl[MAXWINGS*MAXCONTROLS];//4 wings altogether, MAXCONTROLS on each

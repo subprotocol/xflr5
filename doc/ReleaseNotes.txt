@@ -7,7 +7,7 @@
                      A tool for the design of Airfoils, Wings and Planes
                           operating at low Reynolds numbers
 
-						  Copyright (C) 2003-2011
+						  Copyright (C) 2003-2012
 
                                      Andre Deperrois
 
@@ -17,10 +17,14 @@
 
 
 xflr5 v6.07, March xxth, 2012
-	- Corrected the bug which modified the chord length as twist increases
+	- Corrected the bug in wing analysis with ground effect
+	- Corrected the bug in type 4 analysis for wings and planes
+	- Corrected the bug which modified the chord length as twist increases : impact results for wings with high dihedral
+	- Fixed the crash bug when defining wings with more than 16 span sections
 	- Corrected a bug leading to incorrect results in stability derivatives with active controls (CPanel::RotateBC())
-	- Removed the Points Foil option
+	- Removed the Splined Points Foil option
 	- Other minor corrections
+	- Code cleaning
 
 
 xflr5 v6.06, January 28th, 2012

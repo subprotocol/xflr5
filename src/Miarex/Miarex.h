@@ -341,7 +341,6 @@ public:
 
 	bool InitializePanels();
 	bool CreateWakeElems(int PanelIndex);
-	bool VLMIsSameSide(int p, int pp);
 	bool Intersect(CVector const &LA, CVector const &LB, CVector const &TA, CVector const &TB, CVector const &Normal, CVector const &A,  CVector const &U,  CVector &I, double &dist);
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
@@ -351,6 +350,7 @@ public:
 	bool SetWOpp(bool bCurrent, double x = 0.0);
 	bool SetPOpp(bool bCurrent, double x = 0.0);
 
+	bool VLMIsSameSide(int p, int pp) {return m_Panel[p].m_Pos==m_Panel[pp].m_Pos;};
 
 	QString RenameUFO(QString UFOName);
 	QGraph* GetGraph(QPoint &pt);

@@ -28,6 +28,8 @@
 #include "Quaternion.h"
 #include "CVector.h"
 
+typedef enum {BOTSURFACE, MIDSURFACE, TOPSURFACE, SIDESURFACE, BODYSURFACE} enumPanelPosition;
+
 class CPanel
 {
 	friend class CSurface;
@@ -67,8 +69,8 @@ protected:
 	int m_iWakeColumn;
 
 	//Local frame of refernce
-	CVector VortexPos;
-	CVector Vortex;
+	CVector VortexPos; // the vortex mid position
+	CVector Vortex; // the vortex vector
 	CVector P1, P2, P3, P4;//point's local coordinates
 	CVector m, l;
 
@@ -81,19 +83,19 @@ protected:
 	static CVector smp, smq, MidA, MidB;
 	static CVector ILA, ILB, ITA, ITB, T, V, W, P, LATB, TALB;
 
-	static double m_VortexPos;//between 0 and 1
-	static double m_CtrlPos;//between 0 and 1
+	static double s_VortexPos;//between 0 and 1; usually the vortex is positioned at the panel's quarter chord : s_VortexPos=0.25
+	static double s_CtrlPos;//between 0 and 1; usually the control point is positioned at the panel's 3/4 chord : s_VortexPos=0.75
 	static double det;
 	static double mat[9];
 
 public:
+	enumPanelPosition m_Pos; // defines if the panel is positioned on a top, middle, bottom, side or body surface
 	bool m_bIsLeading, m_bIsTrailing;
 	int m_iLA, m_iLB, m_iTA, m_iTB;//Corner Node numbers
-	int m_iPos;//-1 is bottom surface, 0 is middle, 1 is top;
-	CVector Normal;
-	CVector CtrlPt;
-	CVector CollPt;
-	CVector A, B;
+	CVector Normal; // the unit vector normal to the panel
+	CVector CtrlPt; // the control point for VLM analysis or 3D/Thin panels
+	CVector CollPt; // the collocation point for 3d panel analysis
+	CVector VA, VB; //the left and right end points of the vortex on this panel
 };
 
 #endif

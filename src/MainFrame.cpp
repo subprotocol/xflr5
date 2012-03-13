@@ -65,7 +65,7 @@ QPointer<MainFrame> MainFrame::_self = 0L;
 MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
-	m_VersionName = QString::fromLatin1("XFLR5 v6.06");
+	m_VersionName = QString::fromLatin1("XFLR5 v6.07");
 	QString jpegPluginPath;
 
 	//Jpeg format requires a specific plugin to be loaded dynmically at run time
@@ -303,15 +303,15 @@ CPolar* MainFrame::AddPolar(CPolar *pPolar)
 
 				else if (pPolar->m_FoilName == pOldPlr->m_FoilName)
 				{
-					if(pPolar->m_Type < pOldPlr->m_Type)
+					if(pPolar->m_PolarType < pOldPlr->m_PolarType)
 					{
 						m_oaPolar.insert(j, pPolar);
 						bInserted = true;
 						break;
 					}
-					else if(pPolar->m_Type == pOldPlr->m_Type)
+					else if(pPolar->m_PolarType == pOldPlr->m_PolarType)
 					{
-						if (pPolar->m_Type != FIXEDAOAPOLAR)
+						if (pPolar->m_PolarType != FIXEDAOAPOLAR)
 						{
 							//sort by re Nbr
 							if(pPolar->m_Reynolds < pOldPlr->m_Reynolds)
@@ -3020,7 +3020,7 @@ OpPoint *MainFrame::GetOpp(double Alpha)
 		{
 			if (pOpPoint->m_strPlrName == pCurPolar->m_PlrName)
 			{
-				if(pCurPolar->m_Type != FIXEDAOAPOLAR)
+				if(pCurPolar->m_PolarType != FIXEDAOAPOLAR)
 				{
 					if(fabs(pOpPoint->Alpha - Alpha) <0.001)
 					{
@@ -3123,7 +3123,7 @@ bool MainFrame::LoadPolarFileV3(QDataStream &ar, bool bIsStoring, int ArchiveFor
 	CPolar *pPolar = NULL;
 	CPolar *pOldPlr;
 	OpPoint *pOpp, *pOldOpp;
-	QXDirect *pXDirect =(QXDirect*)m_pXDirect;
+//	QXDirect *pXDirect =(QXDirect*)m_pXDirect;
 
 	//first read all available foils
 	int i,l,n;
@@ -5130,7 +5130,7 @@ void MainFrame::SelectOpPoint(OpPoint *pOpp)
 
 	for(int i=0; i<m_pctrlOpPoint->count(); i++)
 	{
-		if(pCurPlr->m_Type != FIXEDAOAPOLAR)
+		if(pCurPlr->m_PolarType != FIXEDAOAPOLAR)
 		{
 			alpha = m_pctrlOpPoint->itemText(i).toDouble();
 			if(fabs(alpha-pOpp->Alpha)<0.001)
@@ -5161,7 +5161,7 @@ void MainFrame::SelectWOpp(double x)
 
 	for(int i=0; i<m_pctrlWOpp->count(); i++)
 	{
-		if(pCurWPlr->m_Type <4)
+		if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)
 		{
 			alpha = m_pctrlWOpp->itemText(i).toDouble();
 			if(fabs(alpha-x)<0.001)
@@ -5169,7 +5169,7 @@ void MainFrame::SelectWOpp(double x)
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
 		}
-		else if(pCurWPlr->m_Type == FIXEDAOAPOLAR)
+		else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)
 		{
 			double QInf = m_pctrlWOpp->itemText(i).toDouble();
 			if(fabs(QInf-x)<1.0)
@@ -5177,7 +5177,7 @@ void MainFrame::SelectWOpp(double x)
 				m_pctrlWOpp->setCurrentIndex(i);
 			}
 		}
-		else if(pCurWPlr->m_Type == STABILITYPOLAR)
+		else if(pCurWPlr->m_WPolarType==STABILITYPOLAR)
 		{
 			double Ctrl = m_pctrlWOpp->itemText(i).toDouble();
 			if(fabs(Ctrl-x)<.001)
@@ -5235,7 +5235,12 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << m_ForceUnit;
 	ar << m_MomentUnit;
 
-	ar << pMiarex->m_WngAnalysis.m_PolarType;
+	if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+	else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+	else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+	else if(pMiarex->m_WngAnalysis.m_WPolarType==STABILITYPOLAR)  ar<<7;
+	else ar << 0;
+
 	ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 	ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 	ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
@@ -5245,7 +5250,11 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 	ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
 	ar << (float)pMiarex->m_WngAnalysis.m_Beta;
-	ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
+
+	if(pMiarex->m_WngAnalysis.m_AnalysisMethod==LLTMETHOD)        ar << 1;
+	else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==VLMMETHOD)   ar << 2;
+	else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==PANELMETHOD) ar << 3;
+
 
 	if (pMiarex->m_bVLM1)  ar << 1;
 	else				 ar << 0;
@@ -5495,7 +5504,12 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << m_ForceUnit;
 		ar << m_MomentUnit;
 
-		ar << pMiarex->m_WngAnalysis.m_PolarType;
+		if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+		else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+		else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(pMiarex->m_WngAnalysis.m_WPolarType==STABILITYPOLAR)  ar<<7;
+		else ar << 0;
+
 		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
 		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
 		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
@@ -5506,7 +5520,10 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
 		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
 		ar << (float)pMiarex->m_WngAnalysis.m_Beta;
-		ar << pMiarex->m_WngAnalysis.m_AnalysisMethod;
+
+		if(pMiarex->m_WngAnalysis.m_AnalysisMethod==LLTMETHOD)        ar << 1;
+		else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==VLMMETHOD)   ar << 2;
+		else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==PANELMETHOD) ar << 3;
 
 		if (pMiarex->m_bVLM1)   ar << 1;
 		else                    ar << 0;
@@ -5613,7 +5630,12 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 
 			if(ArchiveFormat>=100004)
 			{
-				ar >> pMiarex->m_WngAnalysis.m_PolarType;
+				ar >>k;
+				if(k==1)      pMiarex->m_WngAnalysis.m_WPolarType = FIXEDSPEEDPOLAR;
+				else if(k==2) pMiarex->m_WngAnalysis.m_WPolarType = FIXEDLIFTPOLAR;
+				else if(k==4) pMiarex->m_WngAnalysis.m_WPolarType = FIXEDAOAPOLAR;
+				else if(k==7) pMiarex->m_WngAnalysis.m_WPolarType = STABILITYPOLAR;
+
 				ar >> f; pMiarex->m_WngAnalysis.m_Weight=f;
 				ar >> f; pMiarex->m_WngAnalysis.m_QInf=f;
 				if(ArchiveFormat>=100013)
@@ -5636,7 +5658,11 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				{
 					ar >>f; pMiarex->m_WngAnalysis.m_Beta=f;
 				}
-				ar >> pMiarex->m_WngAnalysis.m_AnalysisMethod;
+
+				ar >> k;
+				if(k==1)      pMiarex->m_WngAnalysis.m_AnalysisMethod=LLTMETHOD;
+				else if(k==2) pMiarex->m_WngAnalysis.m_AnalysisMethod=VLMMETHOD;
+				else if(k==3) pMiarex->m_WngAnalysis.m_AnalysisMethod=PANELMETHOD;
 			}
 			if(ArchiveFormat>=100006)
 			{
@@ -5693,7 +5719,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			pWPolar = new CWPolar;
 			bWPolarOK = pWPolar->SerializeWPlr(ar, bIsStoring, ProjectFormat);
 			//force compatibilty
-			if(pWPolar->m_AnalysisMethod==PANELMETHOD && pWPolar->m_Type==STABILITYPOLAR) pWPolar->m_bThinSurfaces = true;
+			if(pWPolar->m_AnalysisMethod==PANELMETHOD && pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bThinSurfaces = true;
 
 			if (!bWPolarOK)
 			{
@@ -5702,9 +5728,9 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				return false;
 			}
 			if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)	pWPolar->ResetWPlr();//former VLM version was flawed
-//			if(pWPolar->m_Type==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
+//			if(pWPolar->m_WPolarType==STABILITYPOLAR)	pWPolar->m_bThinSurfaces = true;
 
-			if(pWPolar->m_PolarFormat!=1020 || pWPolar->m_Type!=STABILITYPOLAR)//v601 stability polars are obsolete
+			if(pWPolar->m_PolarFormat!=1020 || pWPolar->m_WPolarType!=STABILITYPOLAR)//v601 stability polars are obsolete
 				pWPolar = pMiarex->AddWPolar(pWPolar);
 		}
 
@@ -5839,7 +5865,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 						QApplication::restoreOverrideCursor();
 						return false;
 					}
-					if(!pWPolar->m_AnalysisMethod==1 && ArchiveFormat <100003)
+					if(!pWPolar->m_AnalysisMethod==LLTMETHOD && ArchiveFormat <100003)
 						pWPolar->ResetWPlr();
 					pMiarex->AddWPolar(pWPolar);
 				}
@@ -6385,7 +6411,7 @@ void MainFrame::UpdateWOpps()
 		for (i=0; i<m_oaPOpp.size(); i++)
 		{
 			pPOpp = (CPOpp*)m_oaPOpp[i];
-			if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName   == pCurWPlr->m_PlrName)
+			if (pPOpp->m_PlaneName==pCurPlane->PlaneName() && pPOpp->m_PlrName==pCurWPlr->m_PlrName)
 			{
 				size++;
 			}
@@ -6399,18 +6425,18 @@ void MainFrame::UpdateWOpps()
 				pPOpp = (CPOpp*)m_oaPOpp[i];
 				if (pPOpp->m_PlaneName == pCurPlane->PlaneName() && pPOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
-					if(pCurWPlr->m_Type <4)                   str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 					m_pctrlWOpp->addItem(str);
 				}
 			}
 
 			if(pMiarex->m_pCurPOpp)
 			{
-					if(pCurWPlr->m_Type<4)                    str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
-					else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
-					else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pPOpp->m_Alpha,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pPOpp->m_QInf,8,'f',2);
+					else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pPOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6447,9 +6473,9 @@ void MainFrame::UpdateWOpps()
 				if (pWOpp->m_WingName == pCurWing->m_WingName && pWOpp->m_PlrName == pCurWPlr->m_PlrName)
 				{
 
-					if(pCurWPlr->m_Type<4)                     str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-					else  if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
-					else  if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
+					if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)         str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+					else  if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+					else  if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 					m_pctrlWOpp->addItem(str);
 				}
@@ -6457,9 +6483,9 @@ void MainFrame::UpdateWOpps()
 
 			if(pMiarex->m_pCurWOpp)
 			{
-				if(pCurWPlr->m_Type<4)                    str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
-				else if(pCurWPlr->m_Type==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
-				else if(pCurWPlr->m_Type==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
+				if(pCurWPlr->m_WPolarType<FIXEDAOAPOLAR)        str = QString("%1").arg(pWOpp->m_Alpha,8,'f',2);
+				else if(pCurWPlr->m_WPolarType==FIXEDAOAPOLAR)  str = QString("%1").arg(pWOpp->m_QInf,8,'f',2);
+				else if(pCurWPlr->m_WPolarType==STABILITYPOLAR) str = QString("%1").arg(pWOpp->m_Ctrl,8,'f',2);
 
 				int pos = m_pctrlWOpp->findText(str);
 				if(pos >=0) m_pctrlWOpp->setCurrentIndex(pos);
@@ -6654,7 +6680,7 @@ void MainFrame::UpdateOpps()
 			pOpp = (OpPoint*)m_oaOpp[i];
 			if (pOpp->m_strFoilName == g_pCurFoil->m_FoilName && pOpp->m_strPlrName  == pCurPlr->m_PlrName)
 			{
-				if (pCurPlr->m_Type !=FIXEDAOAPOLAR)
+				if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 				{
 //					if(fabs(pOpp->Alpha)<0.0001) pOpp->Alpha = 0.0001;
 					str = QString("%1").arg(pOpp->Alpha,8,'f',2);
@@ -6670,7 +6696,7 @@ void MainFrame::UpdateOpps()
 		if (pXDirect->m_pCurOpp && pXDirect->m_pCurOpp->m_strFoilName==g_pCurFoil->m_FoilName)
 		{
 			//select it
-			if (pCurPlr->m_Type !=FIXEDAOAPOLAR)
+			if (pCurPlr->m_PolarType !=FIXEDAOAPOLAR)
 			{
 				str = QString("%8.2f").arg(pXDirect->m_pCurOpp->Alpha);
 			}

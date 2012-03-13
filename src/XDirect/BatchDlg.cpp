@@ -487,8 +487,10 @@ void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 	m_pCurPolar = new CPolar;
 	m_pCurPolar->m_FoilName   = m_pFoil->m_FoilName;
 	m_pCurPolar->m_bIsVisible = true;
-	m_pCurPolar->m_Type = m_Type;
-	switch (m_pCurPolar->m_Type)
+
+	m_pCurPolar->m_PolarType = m_PolarType;
+
+	switch (m_pCurPolar->m_PolarType)
 	{
 		case 1:
 			m_pCurPolar->m_MaType = 1;
@@ -511,7 +513,7 @@ void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 			m_pCurPolar->m_MaType = 1;
 			break;
 	}
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_pCurPolar->m_Reynolds = Spec;
 	}
@@ -601,7 +603,7 @@ void BatchDlg::InitDialog()
 		m_SpInc     = m_ClInc;
 	}
 
-	if(m_Type!=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_pctrlReMin->SetPrecision(0);
 		m_pctrlReMax->SetPrecision(0);
@@ -623,7 +625,7 @@ void BatchDlg::InitDialog()
 	}
 
 	if(m_ReMin<=0.0) m_ReMin = fabs(m_ReInc);
-	if(m_Type!=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_pctrlReMin->SetValue(m_ReMin);
 		m_pctrlReMax->SetValue(m_ReMax);
@@ -650,10 +652,10 @@ void BatchDlg::InitDialog()
 	else         m_rbspec2->setChecked(true);
 	OnAcl();
 
-	if(m_Type==1)      m_rbtype1->setChecked(true);
-	else if(m_Type==2) m_rbtype2->setChecked(true);
-	else if(m_Type==3) m_rbtype3->setChecked(true);
-	else if(m_Type==4) m_rbtype4->setChecked(true);
+	if(m_PolarType==FIXEDSPEEDPOLAR)       m_rbtype1->setChecked(true);
+	else if(m_PolarType==FIXEDLIFTPOLAR)   m_rbtype2->setChecked(true);
+	else if(m_PolarType==RUBBERCHORDPOLAR) m_rbtype3->setChecked(true);
+	else if(m_PolarType==FIXEDAOAPOLAR)    m_rbtype4->setChecked(true);
 	OnType1();
 
 
@@ -688,7 +690,7 @@ bool BatchDlg::InitXFoil2()
 	pXFoil->reinf1 = m_ReMin;
 	pXFoil->minf1  = m_Mach;
 
-	switch (m_Type)
+	switch (m_PolarType)
 	{
 		case 1:
 			pXFoil->retyp  = 1;
@@ -843,7 +845,7 @@ bool BatchDlg::Iterate()
 
 void BatchDlg::OnAcl()
 {
-	if(m_Type==4) return;
+	if(m_PolarType==FIXEDAOAPOLAR) return;
 	if(m_rbspec1->isChecked())
 	{
 		m_pctrlSpecVar->setText(tr("Alpha ="));
@@ -892,21 +894,21 @@ void BatchDlg::OnType1()
 		m_pctrlReType->setText(tr("Reynolds ="));
 		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(true);
-		m_Type = 1;
+		m_PolarType = FIXEDSPEEDPOLAR;
 	}
 	else if(m_rbtype2->isChecked())
 	{
 		m_pctrlReType->setText(tr("Re.sqrt(Cl) ="));
 		m_pctrlMaType->setText(tr("Ma.sqrt(Cl) ="));
 		m_pctrlEditList->setEnabled(true);
-		m_Type = 2;
+		m_PolarType = FIXEDLIFTPOLAR;
 	}
 	else if(m_rbtype3->isChecked())
 	{
 		m_pctrlReType->setText(tr("Re.Cl ="));
 		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(true);
-		m_Type = 3;
+		m_PolarType = RUBBERCHORDPOLAR;
 	}
 	else if(m_rbtype4->isChecked())
 	{
@@ -914,10 +916,10 @@ void BatchDlg::OnType1()
 		m_pctrlMaType->setText(tr("Mach ="));
 		m_pctrlEditList->setEnabled(false);
 		m_rbspec1->setChecked(true);
-		m_Type = 4;
+		m_PolarType = FIXEDAOAPOLAR;
 	}
 
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_pctrlReMin->SetPrecision(0);
 		m_pctrlReMax->SetPrecision(0);
@@ -1000,8 +1002,8 @@ void BatchDlg::OnAnalyze()
 	m_bInitBL = m_pctrlInitBL->isChecked();
 	s_bStoreOpp = m_pctrlStoreOpp->isChecked();
 
-	if(m_Type!=4) Analysis2();
-	else          Analysis3();
+	if(m_PolarType!=FIXEDAOAPOLAR) Analysis2();
+	else                           Analysis3();
 
 	pXFoil->lvisc = true;
 	pXFoil->m_bTrace = false;
@@ -1131,7 +1133,7 @@ void BatchDlg::OnSkipPolar()
 
 void BatchDlg::ReadParams()
 {
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_ReInc = m_pctrlReDelta->Value();
 		m_ReMax = m_pctrlReMax->Value();
@@ -1382,18 +1384,18 @@ void BatchDlg::SetFileHeader()
 
 void BatchDlg::SetPlrName()
 {
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		double R = m_pCurPolar->m_Reynolds/1000000.;
 		m_pCurPolar->m_PlrName = QString("T%1_Re%2_M%3")
-								 .arg(m_pCurPolar->m_Type)
+								 .arg(m_pCurPolar->m_PolarType)
 								 .arg(R,0,'f',3)
 								 .arg( m_pCurPolar->m_Mach,0,'f',2);
 	}
 	else
 	{
 		m_pCurPolar->m_PlrName = QString("T%1_Al%2_M%3")
-								 .arg(m_pCurPolar->m_Type)
+								 .arg(m_pCurPolar->m_PolarType)
 								 .arg(m_pCurPolar->m_ASpec,5,'f',2)
 								 .arg(m_pCurPolar->m_Mach,0,'f',2);
 	}
@@ -1414,8 +1416,8 @@ void BatchDlg::StartAnalysis()
 	m_pctrlAnalyze->setText(tr("Cancel"));
 	if(s_bCurrentFoil)
 	{
-		if(m_Type !=4) 	ReLoop();
-		else            AlphaLoop();
+		if(m_PolarType!=FIXEDAOAPOLAR) ReLoop();
+		else                           AlphaLoop();
 	}
 	else
 	{
@@ -1429,8 +1431,8 @@ void BatchDlg::StartAnalysis()
 
 			strong = tr("Analyzing ")+pFoil->m_FoilName+("\n");
 			UpdateOutput(strong);
-			if(m_Type !=4) 	ReLoop();
-			else            AlphaLoop();
+			if(m_PolarType!=FIXEDAOAPOLAR) ReLoop();
+			else                           AlphaLoop();
 			strong = "\n\n";
 			UpdateOutput(strong);
 		}

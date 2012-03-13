@@ -32,21 +32,10 @@
 #define STAB3DVIEW		    3
 
 
-//Polar types
-#define FIXEDSPEEDPOLAR     1
-#define FIXEDLIFTPOLAR      2
-#define RUBBERCHORDPOLAR    3
-#define FIXEDAOAPOLAR       4
-#define STABILITYPOLAR      7
-
 //Polar reference area and span
 #define PLANFORMAREA        1
 #define PROJECTEDAREA       2
 
-// 3D Analysis methods
-#define LLTMETHOD           1
-#define VLMMETHOD           2
-#define PANELMETHOD         3
 
 //3D analysis parameters
 #define MAXWINGS            4 //wing, wing2, elevator, fin, in that order
@@ -150,10 +139,10 @@
 #define PANELFORCEARROWS        1391
 #define PANELFORCELEGENDTXT     1392
 
-#define BODYGEOM            1400
-#define BODYSURFACES        1401
-#define BODYMESHPANELS      1402
-#define BODYMESHBACK        1403
+#define GLBODYGEOM            1400
+#define GLBODYSURFACES        1401
+#define GLBODYMESHPANELS      1402
+#define GLBODYMESHBACK        1403
 
 #define ARCBALL             1414
 #define ARCPOINT            1415
@@ -167,6 +156,9 @@
 #define DASHDOTDOTLINE      4
 
 #define MAXGRAPHS 4
+
+typedef enum{LLTMETHOD, VLMMETHOD, PANELMETHOD} enumAnalysisMethod;
+typedef enum{FIXEDSPEEDPOLAR, FIXEDLIFTPOLAR, RUBBERCHORDPOLAR, FIXEDAOAPOLAR, STABILITYPOLAR} enumPolarType;
 
 
 #define QUESTION (BB || !BB) //Shakespeare

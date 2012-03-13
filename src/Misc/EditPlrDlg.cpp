@@ -57,7 +57,7 @@ void EditPlrDlg::FillTable()
 	m_pctrlAlphaList->clear();
 	if(m_pXDirect && m_pPolar)
 	{
-		if(m_pPolar->m_Type !=4)
+		if(m_pPolar->m_PolarType!=FIXEDAOAPOLAR)
 		{
 			for (int i=0; i<m_pPolar->m_Alpha.size(); i++)
 			{
@@ -77,7 +77,7 @@ void EditPlrDlg::FillTable()
 
 	else if(m_pMiarex && m_pWPolar)
 	{
-		if(m_pWPolar->m_Type !=4)
+		if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 		{
 			for (int i=0; i<m_pWPolar->m_Alpha.size(); i++)
 			{

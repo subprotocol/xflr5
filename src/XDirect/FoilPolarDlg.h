@@ -28,7 +28,7 @@
 #include <QLabel>
 #include <QString>
 #include "../Misc/FloatEdit.h"
-
+#include "../Objects/Polar.h"
 
 
 class FoilPolarDlg : public QDialog
@@ -80,7 +80,7 @@ public:
 	FloatEdit *m_pctrlBotTrans;
 
 	bool  m_bAutoName;
-	int m_Type;
+	enumPolarType m_PolarType;
 	int m_MaTypDef, m_ReTypDef;
 	int m_UnitType;
 	double m_Reynolds;

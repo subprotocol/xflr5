@@ -122,7 +122,8 @@ protected:
 	bool m_bCancel, m_bSkipPoint, m_bSkipPolar;
 	bool m_bIsRunning;
 
-	int m_Type;
+	enumPolarType m_PolarType;
+
 	int m_Iterations;
 	int m_IterLim;
 	double m_NCrit;

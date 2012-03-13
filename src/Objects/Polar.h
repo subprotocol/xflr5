@@ -90,7 +90,7 @@ public:
 
 	QString m_FoilName;
 	double m_Reynolds;
-	int m_Type;// the Polar format type - used for Serialize action
+	enumPolarType m_PolarType;// the Polar format type - used for Serialize action
 
 	QList <double> m_Alpha;
 	QList <double> m_Cl;

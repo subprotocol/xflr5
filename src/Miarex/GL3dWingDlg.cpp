@@ -412,7 +412,7 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(k,l,1);
+						m_pWing->m_Surface[j].GetPanel(k,l,TOPSURFACE);
 
 						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
 						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
@@ -431,7 +431,7 @@ void GL3dWingDlg::GLCreateMesh()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(k,l,-1);
+						m_pWing->m_Surface[j].GetPanel(k,l,BOTSURFACE);
 
 						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
 						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
@@ -466,10 +466,10 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					glBegin(GL_QUADS);
 					{
-						m_pWing->m_Surface[j].GetPanel(0,l,1);
+						m_pWing->m_Surface[j].GetPanel(0,l,TOPSURFACE);
 						A = m_pWing->m_Surface[j].TA;
 						B = m_pWing->m_Surface[j].LA;
-						m_pWing->m_Surface[j].GetPanel(0,l,-1);
+						m_pWing->m_Surface[j].GetPanel(0,l,BOTSURFACE);
 						C = m_pWing->m_Surface[j].LA;
 						D = m_pWing->m_Surface[j].TA;
 
@@ -494,10 +494,10 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					glBegin(GL_QUADS);
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,TOPSURFACE);
 						A = m_pWing->m_Surface[j].TB;
 						B = m_pWing->m_Surface[j].LB;
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,-1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,BOTSURFACE);
 						C = m_pWing->m_Surface[j].LB;
 						D = m_pWing->m_Surface[j].TB;
 
@@ -546,7 +546,7 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(k,l,1);
+						m_pWing->m_Surface[j].GetPanel(k,l,TOPSURFACE);
 
 						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
 						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
@@ -565,7 +565,7 @@ void GL3dWingDlg::GLCreateMesh()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(k,l,-1);
+						m_pWing->m_Surface[j].GetPanel(k,l,BOTSURFACE);
 
 						LATB = m_pWing->m_Surface[j].TB - m_pWing->m_Surface[j].LA;
 						TALB = m_pWing->m_Surface[j].LB - m_pWing->m_Surface[j].TA;
@@ -600,10 +600,10 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					glBegin(GL_QUADS);
 					{
-						m_pWing->m_Surface[j].GetPanel(0,l,1);
+						m_pWing->m_Surface[j].GetPanel(0,l,TOPSURFACE);
 						A = m_pWing->m_Surface[j].TA;
 						B = m_pWing->m_Surface[j].LA;
-						m_pWing->m_Surface[j].GetPanel(0,l,-1);
+						m_pWing->m_Surface[j].GetPanel(0,l,BOTSURFACE);
 						C = m_pWing->m_Surface[j].LA;
 						D = m_pWing->m_Surface[j].TA;
 
@@ -628,10 +628,10 @@ void GL3dWingDlg::GLCreateMesh()
 				{
 					glBegin(GL_QUADS);
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,TOPSURFACE);
 						A = m_pWing->m_Surface[j].TB;
 						B = m_pWing->m_Surface[j].LB;
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,-1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1,l,BOTSURFACE);
 						C = m_pWing->m_Surface[j].LB;
 						D = m_pWing->m_Surface[j].TB;
 
@@ -691,7 +691,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(0, l, 1);
+						m_pWing->m_Surface[j].GetPanel(0, l, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TA.x,
 								   m_pWing->m_Surface[j].TA.y,
 								   m_pWing->m_Surface[j].TA.z);
@@ -703,7 +703,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(0, l, -1);
+						m_pWing->m_Surface[j].GetPanel(0, l, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TA.x,
 								   m_pWing->m_Surface[j].TA.y,
 								   m_pWing->m_Surface[j].TA.z);
@@ -718,7 +718,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, 1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TB.x,
 								   m_pWing->m_Surface[j].TB.y,
 								   m_pWing->m_Surface[j].TB.z);
@@ -730,7 +730,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, -1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TB.x,
 								   m_pWing->m_Surface[j].TB.y,
 								   m_pWing->m_Surface[j].TB.z);
@@ -749,7 +749,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(0, l, 1);
+						m_pWing->m_Surface[j].GetPanel(0, l, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TA.x,
 								   m_pWing->m_Surface[j].TA.y,
 								   m_pWing->m_Surface[j].TA.z);
@@ -761,7 +761,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(0, l, -1);
+						m_pWing->m_Surface[j].GetPanel(0, l, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TA.x,
 								   m_pWing->m_Surface[j].TA.y,
 								   m_pWing->m_Surface[j].TA.z);
@@ -777,7 +777,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 				{
 					for (l=0; l<m_pWing->m_Surface[j].m_NXPanels; l++)
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, 1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, TOPSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TB.x,
 								   m_pWing->m_Surface[j].TB.y,
 								   m_pWing->m_Surface[j].TB.z);
@@ -789,7 +789,7 @@ void GL3dWingDlg::GLCreateSectionHighlight()
 
 					for (l=m_pWing->m_Surface[j].m_NXPanels-1; l>=0; l--)
 					{
-						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, -1);
+						m_pWing->m_Surface[j].GetPanel(m_pWing->m_Surface[j].m_NYPanels-1, l, BOTSURFACE);
 						glVertex3d(m_pWing->m_Surface[j].TB.x,
 								   m_pWing->m_Surface[j].TB.y,
 								   m_pWing->m_Surface[j].TB.z);

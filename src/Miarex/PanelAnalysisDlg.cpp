@@ -248,14 +248,11 @@ bool PanelAnalysisDlg::AlphaLoop()
 	ComputeFarField(1.0, m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
 
-
 	for(int q=0; q<nrhs; q++)
 		ComputeBalanceSpeeds(m_Alpha+q*m_AlphaDelta, q);
 
-
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
-
 
 	ComputeOnBodyCp(m_Alpha, m_AlphaDelta, nrhs);
 	if (m_bCancel) return true;
@@ -284,7 +281,7 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 		if(!m_b3DSymetric || m_pPanel[p].m_bIsLeftPanel)
 		{
 			//for each Boundary Condition point
-			if(m_pPanel[p].m_iPos!=0)
+			if(m_pPanel[p].m_Pos!=MIDSURFACE)
 			{
 				//Thick surfaces, 3D-panel type BC, use collocation point
 				C = m_pPanel[p].CollPt;
@@ -316,8 +313,8 @@ void PanelAnalysisDlg::BuildInfluenceMatrix()
 						phi += phiSym;
 					}
 
-					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0) m_aij[m*Size+mm] = V.dot(m_pPanel[p].Normal);
-					else if(m_pWPolar->m_bDirichlet)                      m_aij[m*Size+mm] = phi;
+					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE) m_aij[m*Size+mm] = V.dot(m_pPanel[p].Normal);
+					else if(m_pWPolar->m_bDirichlet)                              m_aij[m*Size+mm] = phi;
 
 					mm++;
 				}
@@ -343,7 +340,7 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 	
 	int p, pp, q;
 	double alpha;
-	CVector QInf[VLMMAXRHS];
+	CVector WindDirection;
 
 	AddString(tr("      Creating source strengths...")+"\n");
 
@@ -351,13 +348,13 @@ void PanelAnalysisDlg::CreateSourceStrength(double Alpha0, double AlphaDelta, in
 	for (q=0; q<nval;q++)
 	{
 		alpha = Alpha0+q*AlphaDelta;
-		QInf[q].Set(cos(alpha*PI/180.0), 0.0, sin(alpha*PI/180.0));
+		WindDirection.Set(cos(alpha*PI/180.0), 0.0, sin(alpha*PI/180.0));
 
-		for (pp=0; pp< m_MatSize; pp++)
+		for (pp=0; pp<m_MatSize; pp++)
 		{
 			if(m_bCancel) return;
-			if(m_pPanel[pp].m_iPos!=0) m_Sigma[p] = -1.0/4.0/PI* QInf[q].dot(m_pPanel[pp].Normal);
-			else                       m_Sigma[p] =  0.0;
+			if(m_pPanel[pp].m_Pos!=MIDSURFACE) m_Sigma[p] = -1.0/4.0/PI* WindDirection.dot(m_pPanel[pp].Normal);
+			else                               m_Sigma[p] =  0.0;
 			p++;
 		}
 	}
@@ -390,20 +387,20 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField, bool
 
 		if(!m_b3DSymetric || m_pPanel[p].m_bIsLeftPanel)
 		{
-			if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+			if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 			{
 				// first term of RHS is -V.n  
 				RHS[m] = - m_pPanel[p].Normal.dot(VPanel);
 			}
 			else if(m_pWPolar->m_bDirichlet) RHS[m] = 0.0;
-			if(m_pPanel[p].m_iPos!=0) C = m_pPanel[p].CollPt;
+			if(m_pPanel[p].m_Pos!=MIDSURFACE) C = m_pPanel[p].CollPt;
 			else                      C = m_pPanel[p].CtrlPt;
 
 			for (pp=0; pp<m_MatSize; pp++)
 			{
 				// Consider only the panels positioned on thick surfaces, 
 				// since the source strength is zero on thin surfaces
-				if(m_pPanel[pp].m_iPos!=0)
+				if(m_pPanel[pp].m_Pos!=MIDSURFACE)
 				{
 					// Define the source strength on panel pp
 					sigmapp = -1.0/4.0/PI * m_pPanel[pp].Normal.dot(VPanel);
@@ -411,7 +408,7 @@ void PanelAnalysisDlg::CreateRHS(double *RHS, CVector VInf, double *VField, bool
 					// Add to RHS the source influence of panel pp on panel p
 					GetSourceInfluence(C, m_pPanel+pp, V, phi);
 
-					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+					if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 					{
 						// Apply Neumann B.C.
 						// NASA4023 eq. (22) and (23)
@@ -526,10 +523,10 @@ void PanelAnalysisDlg::CreateWakeContribution()
 						// Get trailing point where the jup in potential is evaluated v6.02
 						TrPt = (m_pNode[m_pPanel[pp].m_iTA] + m_pNode[m_pPanel[pp].m_iTB])/2.0;
 
-						if(m_pPanel[pp].m_iPos == 0)
+						if(m_pPanel[pp].m_Pos==MIDSURFACE)
 						{
 							//The panel shedding a wake is on a thin surface
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//then add the velocity contribution of the wake column to the matrix coefficient
 								m_aijWake[m*Size+mm] += VHC[m_pPanel[pp].m_iWakeColumn].dot(m_pPanel[p].Normal);
@@ -542,10 +539,10 @@ void PanelAnalysisDlg::CreateWakeContribution()
 								//we do not add the term Phi_inf_KWPUM - Phi_inf_KWPLM (eq. 44) since it is 0, thin edge
 							}
 						}
-						else if(m_pPanel[pp].m_iPos == -1)
+						else if(m_pPanel[pp].m_Pos==BOTSURFACE)
 						{
 							//the panel sedding a wake is on the bottom side, substract
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//use Neumann B.C.
 								m_aijWake[m*Size+mm] -= VHC[m_pPanel[pp].m_iWakeColumn].dot(m_pPanel[p].Normal);
@@ -560,10 +557,10 @@ void PanelAnalysisDlg::CreateWakeContribution()
 								m_wWake[m] +=  TrPt.z * PHC[m_pPanel[pp].m_iWakeColumn];
 							}
 						}
-						else if(m_pPanel[pp].m_iPos == 1)
+						else if(m_pPanel[pp].m_Pos==TOPSURFACE)
 						{
 							//the panel sedding a wake is on the top side, add
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//use Neumann B.C.
 								m_aijWake[m*Size+mm] += VHC[m_pPanel[pp].m_iWakeColumn].dot(m_pPanel[p].Normal);
@@ -669,10 +666,10 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 						TrPt = (m_pNode[m_pPanel[pp].m_iTA] + m_pNode[m_pPanel[pp].m_iTB])/2.0;
 						// If so, we need to add the contributions of the wake column
 						// shedded by this panel to the RHS and to the Matrix
-						if(m_pPanel[pp].m_iPos == 0)
+						if(m_pPanel[pp].m_Pos==MIDSURFACE)
 						{
 							//The panel shedding a wake is on a thin surface
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//then add the velocity contribution of the wake column to the matrix coefficient
 								//we do not add the term Phi_inf_KWPUM - Phi_inf_KWPLM (eq. 44) since it is 0, thin edge
@@ -683,10 +680,10 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 								//we do not add the term Phi_inf_KWPUM - Phi_inf_KWPLM (eq. 44) since it is 0, thin edge
 							}
 						}
-						else if(m_pPanel[pp].m_iPos == -1)//bottom side, substract
+						else if(m_pPanel[pp].m_Pos==BOTSURFACE)//bottom side, substract
 						{
 							//evaluate the potential on the bottom side panel pp which is shedding a wake
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//use Neumann B.C.
 								pWakeContrib[m] -= TrPt.dot(WindDirection) * VHC[m_pPanel[pp].m_iWakeColumn].dot(m_pPanel[p].Normal);
@@ -696,10 +693,10 @@ void PanelAnalysisDlg::CreateWakeContribution(double *pWakeContrib, CVector Wind
 								pWakeContrib[m] += TrPt.dot(WindDirection) * PHC[m_pPanel[pp].m_iWakeColumn];
 							}
 						}
-						else if(m_pPanel[pp].m_iPos == 1)  //top side, add
+						else if(m_pPanel[pp].m_Pos==TOPSURFACE)  //top side, add
 						{
 							//evaluate the potential on the top side panel pp which is shedding a wake
-							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_iPos==0)
+							if(!m_pWPolar->m_bDirichlet || m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								//use Neumann B.C.
 								pWakeContrib[m] += TrPt.dot(WindDirection) * VHC[m_pPanel[pp].m_iWakeColumn].dot(m_pPanel[p].Normal);
@@ -732,34 +729,29 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 	//______________________________________________________________________________________
 
 	QString strong;
-	int i, q, pos;
+	int q, pos;
 	double alpha, IDrag, *Mu, *Sigma;
 	double ThinSize = 0.0;
-	CVector WindNormal, Force, WingForce;
+	CVector WindNormal, WingForce;
 
 	//______________________________________________________________________________________
 	// Scale the speeds i.a.w. the polar's type
 
 	AddString(tr("      Calculating aerodynamic coefficients in the far field plane")+"\n");
 
-	for(i=0; i<MAXWINGS; i++)
+	for(int iw=0; iw<MAXWINGS; iw++)
 	{
-		if(m_pWingList[i]) ThinSize += (double)m_pWingList[i]->m_MatSize;
+		if(m_pWingList[iw]) ThinSize += (double)m_pWingList[iw]->m_MatSize;
 	}
 
-//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-//	CWing::s_Density   = m_pWPolar->m_Density;
 
 	for (q=0; q<nval;q++)
 	{
-		Force.Set(0.0,0.0,0.0);
-		if(m_pWPolar->m_Type!=FIXEDAOAPOLAR)
-		{
-			alpha = Alpha0 + q*AlphaDelta;
-		}
-		else alpha = m_OpAlpha;
+		if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR) alpha = Alpha0 + q*AlphaDelta;
+		else                                       alpha = m_OpAlpha;
+
 		WindNormal.Set(-sin(alpha*PI/180.0),   0.0, cos(alpha*PI/180.0));
-//		Lift = 0.0;
+
 		pos = 0;
 		Mu     = m_Mu    + q*m_MatSize;
 		Sigma  = m_Sigma + q*m_MatSize;
@@ -767,28 +759,27 @@ void PanelAnalysisDlg::ComputeFarField(double QInf, double Alpha0, double AlphaD
 		strong = tr("        Calculating point ") + QString("%1").arg(alpha,7,'f',2)+QString::fromUtf8("°....\n");
 		AddString(strong);
 
-		for(i=0; i<MAXWINGS; i++)
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			if(m_pWingList[i])
+			if(m_pWingList[iw])
 			{
 				WingForce.Set(0.0, 0.0, 0.0);
-				m_pWingList[i]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
+				m_pWingList[iw]->PanelTrefftz(QInf, alpha, Mu, Sigma, pos, WingForce, IDrag, m_pWPolar, m_pWakePanel, m_pWakeNode);
 
-				m_WingForce[q*MAXWINGS+i] = WingForce;
 
-				Force             += WingForce;
 				//save the results... will save another FF calculation when computing operating point
-				m_WingIDrag[q*MAXWINGS+i] = IDrag;
+				m_WingForce[q*MAXWINGS+iw] = WingForce;
+				m_WingIDrag[q*MAXWINGS+iw] = IDrag;
 
-				memcpy(m_Cl  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Cl,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_ICd + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_ICd, m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_Ai  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Ai,  m_pWingList[i]->m_NStation*sizeof(double));
-				memcpy(m_F   + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_F,   m_pWingList[i]->m_NStation*sizeof(CVector));
-				memcpy(m_Vd  + q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS, m_pWingList[i]->m_Vd,  m_pWingList[i]->m_NStation*sizeof(CVector));
+				memcpy(m_Cl  + q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_Cl,  m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_ICd + q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_ICd, m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_Ai  + q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_Ai,  m_pWingList[iw]->m_NStation*sizeof(double));
+				memcpy(m_F   + q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_F,   m_pWingList[iw]->m_NStation*sizeof(CVector));
+				memcpy(m_Vd  + q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_Vd,  m_pWingList[iw]->m_NStation*sizeof(CVector));
 
-				pos += m_pWingList[i]->m_MatSize;
+				pos += m_pWingList[iw]->m_MatSize;
 
-				m_Progress += 10.0 * (double)m_pWingList[i]->m_MatSize/ThinSize *(double)m_MatSize/400.;
+				m_Progress += 10.0 * (double)m_pWingList[iw]->m_MatSize/ThinSize *(double)m_MatSize/400.;
 				qApp->processEvents();
 				if(m_bCancel)return;
 			}
@@ -815,9 +806,9 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 		if(m_pWingList[iw]) Force += m_WingForce[q*4+iw];
 	}
 
-	if (m_pWPolar->m_Type==FIXEDSPEEDPOLAR) m_3DQInf[q] = m_pWPolar->m_QInf;
+	if (m_pWPolar->m_WPolarType==FIXEDSPEEDPOLAR) m_3DQInf[q] = m_pWPolar->m_QInf;
 
-	else if(m_pWPolar->m_Type==FIXEDLIFTPOLAR)
+	else if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR)
 	{
 		Lift =  Force.dot(WindNormal) ;//N/q, for 1/ms
 		TempCl = Lift/m_pWPolar->m_WArea;
@@ -843,7 +834,7 @@ void PanelAnalysisDlg::ComputeBalanceSpeeds(double Alpha, int q)
 
 void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 {
-	int p, q, pp, i;
+	int p, q, pp;
 	//______________________________________________________________________________________
 	// Scale RHS and Sigma i.a.w. speeds (so far we have unit doublet and source strengths)
 
@@ -854,7 +845,7 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	memcpy(SigmaRef, m_Sigma, nval*m_MatSize*sizeof(double));
 	memcpy(m_RHSRef, m_Mu,    nval*m_MatSize*sizeof(double));
 
-	if(m_pWPolar->m_Type!=FIXEDAOAPOLAR)
+	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 	{
 		p=0;
 		for (q=0; q<nval;q++)
@@ -883,16 +874,38 @@ void PanelAnalysisDlg::ScaleResultstoSpeed(int nval)
 	}
 
 	//scale the strip force and downwash fields
-	for (q=0; q<nval;q++)
+	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 	{
-		for(i=0; i<MAXWINGS; i++)
+		for (q=0; q<nval;q++)
 		{
-			if(m_pWingList[i])
+			for(int iw=0; iw<MAXWINGS; iw++)
 			{
-				for(int m=0; m<m_pWingList[i]->m_NStation; m++)
+				if(m_pWingList[iw])
 				{
-					m_F[ m+ q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
-					m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + i*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					for(int m=0; m<m_pWingList[iw]->m_NStation; m++)
+					{
+						m_F[ m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+						m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] *= m_3DQInf[q] * m_3DQInf[q];
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (q=0; q<nval;q++)
+		{
+			for(int iw=0; iw<MAXWINGS; iw++)
+			{
+				if(m_pWingList[iw])
+				{
+					for(int m=0; m<m_pWingList[iw]->m_NStation; m++)
+					{
+						m_F[ m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] = m_F[ m] * m_3DQInf[q] * m_3DQInf[q];
+						m_Vd[m+ q*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS] = m_Vd[m] * m_3DQInf[q] * m_3DQInf[q];
+					}
+					m_WingForce[q*MAXWINGS+iw] = m_WingForce[iw];
+					m_WingIDrag[q*MAXWINGS+iw] = m_WingIDrag[iw];
 				}
 			}
 		}
@@ -907,7 +920,7 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 	int q;
 	QString str, strong;
 
-	if(m_pWPolar->m_Type !=FIXEDAOAPOLAR)
+	if(m_pWPolar->m_WPolarType !=FIXEDAOAPOLAR)
 	{
 		for (q=0; q<nrhs; q++)
 		{
@@ -968,10 +981,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 	if(m_pWPolar->m_bTiltedGeom) Alpha     = m_OpAlpha;
 	else                         m_OpAlpha = Alpha;
 
-//	CWing::s_bTrace	   = true;
-//	CWing::s_Viscosity = m_pWPolar->m_Viscosity;
-//	CWing::s_Density   = m_pWPolar->m_Density;
-
 	for(int iw=0; iw<MAXWINGS; iw++)
 		if(m_pWingList[iw])m_pWingList[iw]->m_bWingOut = false;
 	m_pWing->m_bWingOut                = false;
@@ -993,14 +1002,26 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 			{
 				AddString(tr("         Calculating wing...") + m_pWingList[iw]->m_WingName+"\n");
 				//restore the saved FF results
+				if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
+				{
+
+					memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+					memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
+				}
+				else
+				{
+					memcpy(m_pWingList[iw]->m_Cl,  m_Cl  , m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_ICd, m_ICd , m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_Ai,  m_Ai  , m_pWingList[iw]->m_NStation*sizeof(double));
+					memcpy(m_pWingList[iw]->m_F,   m_F   , m_pWingList[iw]->m_NStation*sizeof(CVector));
+					memcpy(m_pWingList[iw]->m_Vd,  m_Vd  , m_pWingList[iw]->m_NStation*sizeof(CVector));
+				}
+
 				Force += m_WingForce[qrhs*MAXWINGS+iw];
 				IDrag += m_WingIDrag[qrhs*MAXWINGS+iw];
-
-				memcpy(m_pWingList[iw]->m_Cl,  m_Cl  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_ICd, m_ICd + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_Ai,  m_Ai  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(double));
-				memcpy(m_pWingList[iw]->m_F,   m_F   + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
-				memcpy(m_pWingList[iw]->m_Vd,  m_Vd  + qrhs*MAXWINGS*MAXSPANSTATIONS + iw*MAXSPANSTATIONS, m_pWingList[iw]->m_NStation*sizeof(CVector));
 
 				//Get viscous interpolations
 				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, m_pWPolar, WingVDrag, m_pWPolar->m_bViscous, OutString);
@@ -1009,10 +1030,11 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 				AddString(OutString);
 				if(m_pWingList[iw]->m_bWingOut)  m_bPointOut = true;
 
+
 				//Compute moment coefficients
 				m_pWingList[iw]->PanelComputeOnBody(QInf, Alpha, m_Cp+qrhs*m_MatSize+pos, m_Mu+qrhs*m_MatSize+pos,
-				                                   XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm, 
-											m_pWPolar, m_pWPolar->m_CoG);
+													XCP, YCP, m_GCm, m_VCm, m_ICm, m_GRm, m_GYm, m_VYm, m_IYm,
+													m_pWPolar, m_pWPolar->m_CoG);
 
 
 				m_pWingList[iw]->PanelSetBending(m_pWPolar->m_bThinSurfaces);
@@ -1063,7 +1085,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 		if(m_bPointOut) m_bWarning = true;
 
-		if(m_pWPolar->m_Type==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
+		if(m_pWPolar->m_WPolarType==STABILITYPOLAR) m_Alpha = m_AlphaEq; // so it is set by default at the end of the analyis
 		if(m_pPlane) pMiarex->AddPOpp(m_bPointOut, m_Cp+qrhs*m_MatSize, Mu, Sigma);
 		else         pMiarex->AddWOpp(QInf, Alpha, m_bPointOut, Mu, Sigma, m_Cp+qrhs*m_MatSize);
 
@@ -1267,13 +1289,13 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 	//the on-body tangential perturbation speed is the derivative of the doublet strength
 	int p, q;
 	static double Alpha, *Mu, *Cp;
-	static CVector Qp, VInf, VLocal;
+	static CVector WindDirection, VInf, VLocal;
 	double Speed2, cosa, sina;
 
 	//______________________________________________________________________________________
 	AddString(tr("      Computing On-Body Speeds...")+"\n");
 
-	if(m_pWPolar->m_Type != FIXEDAOAPOLAR)
+	if(m_pWPolar->m_WPolarType != FIXEDAOAPOLAR)
 	{
 		for (q=0; q<nval; q++)
 		{
@@ -1281,8 +1303,8 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			Alpha = V0 + (double)q * VDelta;
 			cosa = cos(Alpha*PI/180.0);
 			sina = sin(Alpha*PI/180.0);
-			Qp.Set(cosa, 0.0, sina);
-			VInf = Qp * m_3DQInf[q];
+			WindDirection.Set(cosa, 0.0, sina);
+			VInf = WindDirection * m_3DQInf[q];
 
 			Mu     = m_Mu    + q * m_MatSize;
 //			Sigma  = m_Sigma + q * m_MatSize;
@@ -1290,14 +1312,14 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 
 			for (p=0; p<m_MatSize; p++)
 			{
-				if(m_pPanel[p].m_iPos!=0)
+				if(m_pPanel[p].m_Pos!=MIDSURFACE)
 				{
 					VLocal  = m_pPanel[p].GlobalToLocal(VInf);
 					VLocal += m_uVl[p]*cosa*m_3DQInf[q] + m_wVl[p]*sina*m_3DQInf[q];
 					Speed2 = VLocal.x*VLocal.x + VLocal.y*VLocal.y;
 					Cp[p]  = 1.0-Speed2/m_3DQInf[q]/m_3DQInf[q];
 				}
-				else GetVortexCp(p, Mu, Cp, Qp);
+				else GetVortexCp(p, Mu, Cp, WindDirection);
 
 				if(m_bCancel) return;
 			}
@@ -1306,13 +1328,13 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			qApp->processEvents();
 		}
 	}
-	else
+	else //FIXEDAOAPOLAR
 	{
 		//   Define wind axis
-		Qp.Set(cos(m_Alpha*PI/180.0), 0.0, sin(m_Alpha*PI/180.0));
+		WindDirection.Set(cos(m_Alpha*PI/180.0), 0.0, sin(m_Alpha*PI/180.0));
 		for (q=0; q<nval; q++)
 		{
-			VInf = Qp * m_3DQInf[q];
+			VInf = WindDirection * m_3DQInf[q];
 
 			Mu     = m_Mu    + q * m_MatSize;
 //			Sigma  = m_Sigma + q * m_MatSize;
@@ -1322,8 +1344,8 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 			{
 				if(m_bCancel) break;
 
-				if(m_pPanel[p].m_iPos!=0) GetDoubletDerivative(p, Mu, Cp[p], VLocal, m_3DQInf[q], VInf.x, VInf.y, VInf.z);
-				else                      GetVortexCp(p, Mu, Cp, Qp);
+				if(m_pPanel[p].m_Pos!=MIDSURFACE) GetDoubletDerivative(p, Mu, Cp[p], VLocal, m_3DQInf[q], VInf.x, VInf.y, VInf.z);
+				else                              GetVortexCp(p, Mu, Cp, WindDirection);
 			}
 
 			m_Progress += 1.0  *(double)nval/(double)nval;
@@ -1340,29 +1362,6 @@ void PanelAnalysisDlg::ComputeOnBodyCp(double V0, double VDelta, int nval)
 	}
 	AddString("\n");
 }
-
-
-
-void PanelAnalysisDlg::ComputeSurfSpeeds(double *Mu, double *Sigma)
-{
-	int p;
-	CVector C;
-	CVector Q(m_3DQInf[0]*cos(m_Alpha*PI/180.0),0.0,m_3DQInf[0]*sin(m_Alpha*PI/180.0));
-
-	for (p=0; p<m_MatSize; p++)
-	{
-		if(m_bCancel) return;
-		C = m_pPanel[p].CollPt;//+ m_pPanel[p].Normal*m_pPanel[p].Size/100.0;
-		C += m_pPanel[p].Normal*0.001;
-
-		GetSpeedVector(C, Mu, Sigma, m_Speed[p]);
-		m_Speed[p] += Q;
-
-	}
-}
-
-
-
 
 
 void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector &V, double &phi, bool bWake)
@@ -1402,7 +1401,7 @@ void PanelAnalysisDlg::DoubletNASA4023(CVector const &C, CPanel *pPanel, CVector
 		return;
 	}
 
-	if(pPanel->m_iPos>=0)
+	if(pPanel->m_Pos>=MIDSURFACE)
 	{
 		m_pR[0] = pNode + pPanel->m_iLA;
 		m_pR[1] = pNode + pPanel->m_iTA;
@@ -1513,7 +1512,7 @@ void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVe
 	// if the panel pPanel is located on a thin surface, then its the influence of a vortex
 	// if it is on a thick surface, then its a doublet
 
-	if(pPanel->m_iPos!=0 || pPanel->m_bIsWakePanel)	DoubletNASA4023(C, pPanel, V, phi, bWake);
+	if(pPanel->m_Pos!=MIDSURFACE || pPanel->m_bIsWakePanel)	DoubletNASA4023(C, pPanel, V, phi, bWake);
 	else
 	{
 		VLMGetVortexInfluence(pPanel, C, V, bAll);
@@ -1524,10 +1523,10 @@ void PanelAnalysisDlg::GetDoubletInfluence(CVector const &C, CPanel *pPanel, CVe
 	{
 		CG.Set(C.x, C.y, -C.z-2.0*m_pWPolar->m_Height);
 
-		if(pPanel->m_iPos!=0 || pPanel->m_bIsWakePanel)	DoubletNASA4023(C, pPanel, VG, phiG, bWake);
+		if(pPanel->m_Pos!=MIDSURFACE || pPanel->m_bIsWakePanel)	DoubletNASA4023(CG, pPanel, VG, phiG, bWake);
 		else
 		{
-			VLMGetVortexInfluence(pPanel, C, VG, bAll);
+			VLMGetVortexInfluence(pPanel, CG, VG, bAll);
 			phiG = 0.0;
 		}
 		V.x += VG.x;
@@ -1569,7 +1568,7 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 	{
 		if(m_bCancel) return;
 
-		if(m_pPanel[pp].m_iPos!=0) //otherwise Sigma[pp] =0.0, so contribution is zero also
+		if(m_pPanel[pp].m_Pos!=MIDSURFACE) //otherwise Sigma[pp] =0.0, so contribution is zero also
 		{
 			GetSourceInfluence(C, m_pPanel+pp, V, phi);
 			VT += V * Sigma[pp] ;
@@ -1579,10 +1578,10 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, double *Mu, double *Sigm
 		VT += V * Mu[pp];
 
 		// Is the panel pp shedding a wake ?
-		if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_iPos!=0)
+		if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_Pos!=MIDSURFACE)
 		{
 			//If so, we need to add the contribution of the wake column shedded by this panel
-			if(m_pPanel[pp].m_iPos==-1) sign=-1.0; else sign=1.0;
+			if(m_pPanel[pp].m_Pos==BOTSURFACE) sign=-1.0; else sign=1.0;
 			pw = m_pPanel[pp].m_iWake;
 			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
 			{
@@ -1606,7 +1605,7 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma,
 	{
 		if(m_bCancel) return;
 
-		if(m_pPanel[pp].m_iPos!=0) //otherwise Sigma[pp] =0.0, so contribution is zero also
+		if(m_pPanel[pp].m_Pos!=MIDSURFACE) //otherwise Sigma[pp] =0.0, so contribution is zero also
 		{
 			GetSourceInfluence(C, m_pPanel+pp, V, phi);
 			VT += V * Sigma[pp] ;
@@ -1616,10 +1615,10 @@ void PanelAnalysisDlg::GetSpeedVector(CVector const &C, float *Mu, float *Sigma,
 		VT += V * Mu[pp];
 
 		// Is the panel pp shedding a wake ?
-		if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_iPos!=0)
+		if(m_pPanel[pp].m_bIsTrailing && m_pPanel[pp].m_Pos!=MIDSURFACE)
 		{
 			//If so, we need to add the contribution of the wake column shedded by this panel
-			if(m_pPanel[pp].m_iPos==-1) sign=-1.0; else sign=1.0;
+			if(m_pPanel[pp].m_Pos==BOTSURFACE) sign=-1.0; else sign=1.0;
 			pw = m_pPanel[pp].m_iWake;
 			for(lw=0; lw<m_pWPolar->m_NXWakePanels; lw++)
 			{
@@ -1670,7 +1669,7 @@ void PanelAnalysisDlg::InitDialog()
 		}
 	}
 
-	if(m_pWPolar->m_Type==STABILITYPOLAR ) m_b3DSymetric=false;
+	if(m_pWPolar->m_WPolarType==STABILITYPOLAR ) m_b3DSymetric=false;
 	if(fabs(m_pWPolar->m_Beta)>0)          m_b3DSymetric=false;
 
 	if (m_b3DSymetric) AddString(tr("Performing symmetric calculation")+"\n");
@@ -1898,7 +1897,7 @@ bool PanelAnalysisDlg::ReLoop()
 	}
 	else Alpha = m_Alpha;
 
-	str = QString(tr("   Solving the problem... ")+"\n");
+	str = QString(tr("\n   Solving the problem... ")+"\n");
 	AddString(str);
 
 	BuildInfluenceMatrix();
@@ -1914,6 +1913,7 @@ bool PanelAnalysisDlg::ReLoop()
 	{
 		//compute wake contribution
 		CreateWakeContribution();
+
 		//add wake contribution to matrix and RHS
 		for(int p=0; p<m_MatSize; p++)
 		{
@@ -1925,8 +1925,6 @@ bool PanelAnalysisDlg::ReLoop()
 			}
 		}
 	}
-
-
 	if (m_bCancel) return true;
 
 	if (!SolveUnitRHS())
@@ -1939,12 +1937,11 @@ bool PanelAnalysisDlg::ReLoop()
 	CreateDoubletStrength(Alpha, m_AlphaDelta, 1);
 	if (m_bCancel) return true;
 
-	ComputeFarField(m_QInf, m_OpAlpha, 0.0, 1);
+	ComputeFarField(1.0, m_OpAlpha, 0.0, 1);
 	if (m_bCancel) return true;
 
 	for(int q=0; q<nrhs; q++)
 		m_3DQInf[q] = m_QInf+q*m_QInfDelta;
-		//ComputeBalanceSpeeds(m_Alpha, q);
 
 	ScaleResultstoSpeed(nrhs);
 	if (m_bCancel) return true;
@@ -1991,7 +1988,7 @@ void PanelAnalysisDlg::SourceNASA4023(CVector const &C, CPanel *pPanel, CVector 
 	}
 
 
-	if(pPanel->m_iPos>=0)
+	if(pPanel->m_Pos>=MIDSURFACE)
 	{
 		m_pR[0] = m_pNode + pPanel->m_iLA;
 		m_pR[1] = m_pNode + pPanel->m_iTA;
@@ -2229,7 +2226,7 @@ bool PanelAnalysisDlg::SolveUnitRHS()
 	double Cp;
 	for (p=0; p<m_MatSize; p++)
 	{
-		if(m_pPanel[p].m_iPos!=0)
+		if(m_pPanel[p].m_Pos!=MIDSURFACE)
 		{
 			GetDoubletDerivative(p, m_uRHS, Cp, m_uVl[p], 1.0, u.x, u.y, u.z);
 			GetDoubletDerivative(p, m_wRHS, Cp, m_wVl[p], 1.0, w.x, w.y, w.z);
@@ -2255,7 +2252,7 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 //	if(m_b3DSymetric) Size = m_SymSize;
 
 	AddString("      Calculating doublet strength...\n");
-//	if(m_pWPolar->m_Type!=FIXEDAOAPOLAR) nrhs = nval;
+//	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR) nrhs = nval;
 //	else                                 nrhs = 0;
 
 	//______________________________________________________________________________________
@@ -2267,7 +2264,7 @@ void PanelAnalysisDlg::CreateDoubletStrength(double Alpha0, double AlphaDelta, i
 		sina = sin(alpha*PI/180.0);
 		for(p=0; p<m_MatSize; p++)
 		{
-			m_Mu[p+q*m_MatSize] = cosa * m_uRHS[p] + sina * m_wRHS[p];
+			m_Mu[p+q*m_MatSize] = cosa*m_uRHS[p] + sina*m_wRHS[p];
 		}
 	}
 }
@@ -2338,10 +2335,10 @@ void PanelAnalysisDlg::StartAnalysis()
 		}
 	}
 
-	if(m_pWPolar->m_Type==FIXEDSPEEDPOLAR)     strong = tr("Type 1 - Fixed speed polar");
-	else if(m_pWPolar->m_Type==FIXEDLIFTPOLAR) strong = tr("Type 2 - Fixed lift polar");
-	else if(m_pWPolar->m_Type==FIXEDAOAPOLAR)  strong = tr("Type 4 - Fixed angle of attack polar");
-	else if(m_pWPolar->m_Type==STABILITYPOLAR) strong = tr("Type 7 - Stability polar");
+	if(m_pWPolar->m_WPolarType==FIXEDSPEEDPOLAR)     strong = tr("Type 1 - Fixed speed polar");
+	else if(m_pWPolar->m_WPolarType==FIXEDLIFTPOLAR) strong = tr("Type 2 - Fixed lift polar");
+	else if(m_pWPolar->m_WPolarType==FIXEDAOAPOLAR)  strong = tr("Type 4 - Fixed angle of attack polar");
+	else if(m_pWPolar->m_WPolarType==STABILITYPOLAR) strong = tr("Type 7 - Stability polar");
 	AddString(strong);
 	m_bCancel = false;
 
@@ -2364,16 +2361,16 @@ void PanelAnalysisDlg::StartAnalysis()
 	qApp->processEvents();
 
 
-	if(m_pWPolar->m_Type<3)
+	if(m_pWPolar->m_WPolarType<FIXEDAOAPOLAR)
 	{
 		if(m_pWPolar->m_bTiltedGeom) UnitLoop();
 		else                         AlphaLoop();
 	}
-	else if(m_pWPolar->m_Type==FIXEDAOAPOLAR)
+	else if(m_pWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
 		ReLoop();
 	}
-	else if(m_pWPolar->m_Type==STABILITYPOLAR)
+	else if(m_pWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		m_Ib[0][0] = m_pWPolar->m_CoGIxx;
 		m_Ib[1][1] = m_pWPolar->m_CoGIyy;
@@ -2389,7 +2386,7 @@ void PanelAnalysisDlg::StartAnalysis()
 	AddString(strong);
 	pTimer->stop();
 
-	if(m_pWPolar && (m_pWPolar->m_Type==STABILITYPOLAR || m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
+	if(m_pWPolar && (m_pWPolar->m_WPolarType==STABILITYPOLAR || m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
 	{
 		//restore the panels and nodes;
 		memcpy(m_pPanel, m_pMemPanel, m_MatSize * sizeof(CPanel));
@@ -2587,11 +2584,11 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 	if(m_pWPolar->m_bVLM1)
 	{
 		//just get the horseshoe vortex's influence
-		VLMCmn(pPanel->A, pPanel->B, C, V, bAll);
+		VLMCmn(pPanel->VA, pPanel->VB, C, V, bAll);
 		if(m_pWPolar->m_bGround)
 		{
-			AA = pPanel->A;
-			BB = pPanel->B;
+			AA = pPanel->VA;
+			BB = pPanel->VB;
 			AA.z = -AA.z - 2.0*m_pWPolar->m_Height;//correction in V4.0
 			BB.z = -BB.z - 2.0*m_pWPolar->m_Height;
 			VLMCmn(AA, BB, C, VG, bAll);
@@ -2608,13 +2605,13 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 		{
 			if(bAll)
 			{
-				VLMQmn(pPanel->A, pPanel->B, m_pPanel[p-1].A, m_pPanel[p-1].B, C, V);
+				VLMQmn(pPanel->VA, pPanel->VB, m_pPanel[p-1].VA, m_pPanel[p-1].VB, C, V);
 				if(m_pWPolar->m_bGround)
 				{
-					AA  = pPanel->A;
-					BB  = pPanel->B;
-					AA1 = m_pPanel[p-1].A;
-					BB1 = m_pPanel[p-1].B;
+					AA  = pPanel->VA;
+					BB  = pPanel->VB;
+					AA1 = m_pPanel[p-1].VA;
+					BB1 = m_pPanel[p-1].VB;
 					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
 					BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
 					AA1.z = -AA1.z - 2.0*m_pWPolar->m_Height;
@@ -2633,16 +2630,16 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 			{
 				// since Panel p+1 does not exist...
 				// we define the points AA=A+1 and BB=B+1
-				AA1.x = m_pNode[pPanel->m_iTA].x + (m_pNode[pPanel->m_iTA].x-pPanel->A.x)/3.0;
+				AA1.x = m_pNode[pPanel->m_iTA].x + (m_pNode[pPanel->m_iTA].x-pPanel->VA.x)/3.0;
 				AA1.y = m_pNode[pPanel->m_iTA].y;
 				AA1.z = m_pNode[pPanel->m_iTA].z;
-				BB1.x = m_pNode[pPanel->m_iTB].x + (m_pNode[pPanel->m_iTB].x-pPanel->B.x)/3.0;
+				BB1.x = m_pNode[pPanel->m_iTB].x + (m_pNode[pPanel->m_iTB].x-pPanel->VB.x)/3.0;
 				BB1.y = m_pNode[pPanel->m_iTB].y;
 				BB1.z = m_pNode[pPanel->m_iTB].z;
 				if(m_pWPolar->m_bGround)
 				{
-					AA  = pPanel->A;
-					BB  = pPanel->B;
+					AA  = pPanel->VA;
+					BB  = pPanel->VB;
 					AAG = AA1;
 					BBG = BB1;
 					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
@@ -2653,7 +2650,7 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 				// first we get the quad vortex's influence
 				if (bAll)
 				{
-					VLMQmn(pPanel->A, pPanel->B, AA1, BB1, C, V);
+					VLMQmn(pPanel->VA, pPanel->VB, AA1, BB1, C, V);
 					if(m_pWPolar->m_bGround)
 					{
 						VLMQmn(AA, BB, AAG, BBG, C, VG);
@@ -2684,13 +2681,13 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 				// first close the wing's last vortex ring at T.E.
 				if (bAll)
 				{
-					VLMQmn(pPanel->A, pPanel->B, m_pWakePanel[pw].A, m_pWakePanel[pw].B, C, V);
+					VLMQmn(pPanel->VA, pPanel->VB, m_pWakePanel[pw].VA, m_pWakePanel[pw].VB, C, V);
 					if(m_pWPolar->m_bGround)
 					{
-						AA  = pPanel->A;
-						BB  = pPanel->B;
-						AAG = m_pWakePanel[pw].A;
-						BBG = m_pWakePanel[pw].B;
+						AA  = pPanel->VA;
+						BB  = pPanel->VB;
+						AAG = m_pWakePanel[pw].VA;
+						BBG = m_pWakePanel[pw].VB;
 						AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
 						BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
 						AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
@@ -2709,15 +2706,15 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 				{
 					for (lw=0; lw<m_pWPolar->m_NXWakePanels-1; lw++)
 					{
-						VLMQmn(m_pWakePanel[pw  ].A, m_pWakePanel[pw  ].B,
-							   m_pWakePanel[pw+1].A, m_pWakePanel[pw+1].B, C, VT);
+						VLMQmn(m_pWakePanel[pw  ].VA, m_pWakePanel[pw  ].VB,
+							   m_pWakePanel[pw+1].VA, m_pWakePanel[pw+1].VB, C, VT);
 						V += VT;
 						if(m_pWPolar->m_bGround)
 						{
-							AA  = m_pWakePanel[pw].A;
-							BB  = m_pWakePanel[pw].B;
-							AAG = m_pWakePanel[pw+1].A;
-							BBG = m_pWakePanel[pw+1].B;
+							AA  = m_pWakePanel[pw].VA;
+							BB  = m_pWakePanel[pw].VB;
+							AAG = m_pWakePanel[pw+1].VA;
+							BBG = m_pWakePanel[pw+1].VB;
 							AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
 							BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
 							AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
@@ -3240,7 +3237,7 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 			}
 
 			//Get the strip's lifting force
-			if(m_pPanel[p].m_iPos!=0)
+			if(m_pPanel[p].m_Pos!=MIDSURFACE)
 			{
 				StripArea /=2.0;
 				//FF force
@@ -3835,7 +3832,7 @@ void PanelAnalysisDlg::ComputeStabilityDerivatives()
 	for (p=0; p<m_MatSize; p++)
 	{
 		//re-use existing memory to define the velocity field
-		if(m_pPanel[p].m_iPos==0) CGM = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
+		if(m_pPanel[p].m_Pos==MIDSURFACE) CGM = m_pPanel[p].VortexPos - m_pWPolar->m_CoG;
 		else                      CGM = m_pPanel[p].CollPt    - m_pWPolar->m_CoG;
 
 		// a rotation of the plane about a vector is the opposite of a rotation of the freestream about this vector
@@ -4220,7 +4217,7 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 	for(p=0; p<m_MatSize; p++)
 	{
 		//write vector operations in-line, more efficient
-		if(m_pPanel[p].m_iPos!=0)
+		if(m_pPanel[p].m_Pos!=MIDSURFACE)
 		{
 			//first calculate Cp for this angle
 			VLocal  = m_pPanel[p].GlobalToLocal(VInf);

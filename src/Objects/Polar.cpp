@@ -35,7 +35,7 @@ CPolar::CPolar()
 	m_Style = 0;// = PS_SOLID
 	m_Width = 1;
 	m_ASpec = 0.0;
-	m_Type   = 1;
+	m_PolarType = FIXEDSPEEDPOLAR;
 	m_ReType = 1;
 	m_MaType = 1;
 	m_Reynolds = 100000.0;
@@ -81,7 +81,7 @@ void CPolar::ExportPolar(QTextStream &out, int FileType, bool bDataOnly)
 		out << strong;
 	}
 
-	if(m_Type != 4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		if(FileType==1) Header = ("  alpha     CL        CD       CDp       Cm    Top Xtr Bot Xtr   Cpmin    Chinge    XCp    \n");
 		else            Header = ("alpha,CL,CD,CDp,Cm,Top Xtr,Bot Xtr,Cpmin,Chinge,XCp\n");
@@ -213,7 +213,7 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
 	{
 		for ( i=0; i<size; i++)
 		{
-			if(m_Type != 4)
+			if(m_PolarType!=FIXEDAOAPOLAR)
 			{
                 if (fabs(Alpha - m_Alpha[i]) < 0.001)
 				{
@@ -235,13 +235,13 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
                     if (Cl>=0.0) m_Cl32Cd[i] = pow(Cl, 1.5)/ Cd;
                     else         m_Cl32Cd[i] = -pow(-Cl, 1.5)/ Cd;
 
-					if(m_Type == 1)	       m_Re[i] =  Reynolds;
-                    else if (m_Type == 2)
+					if(m_PolarType==FIXEDSPEEDPOLAR)	       m_Re[i] =  Reynolds;
+					else if (m_PolarType==FIXEDLIFTPOLAR)
                     {
 						if(Cl>0.0) m_Re[i] =  Reynolds/ sqrt(Cl);
 						else m_Re[i] = 0.0;
 					}
-                    else if (m_Type == 3)
+					else if (m_PolarType==RUBBERCHORDPOLAR)
                     {
 						if(Cl>0.0) m_Re[i] =  Reynolds/(Cl);
 						else m_Re[i] = 0.0;
@@ -272,14 +272,13 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
                     if (Cl>=0.0) m_Cl32Cd.insert(i,pow(Cl, 1.5)/ Cd);
                     else         m_Cl32Cd.insert(i,-pow(-Cl, 1.5)/ Cd);
 
-                    if(m_Type == 1)	 m_Re.insert(i, Reynolds);
-                    else if (m_Type == 2)
+					if(m_PolarType==FIXEDSPEEDPOLAR)	 m_Re.insert(i, Reynolds);
+					else if (m_PolarType==FIXEDLIFTPOLAR)
                     {
                         if(Cl>0) m_Re.insert(i, Reynolds/sqrt(Cl));
                         else m_Re[i] = 0.0;
                     }
-
-                    else if (m_Type == 3)
+					else if (m_PolarType==RUBBERCHORDPOLAR)
                     {
                         if(Cl>0.0) m_Re.insert(i, Reynolds/Cl);
                         else       m_Re.insert(i, 0.0);
@@ -291,7 +290,7 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
             }
 			else
 			{
-				//m_Type 4 polar, sort by Reynolds numbers
+				//m_PolarType 4 polar, sort by Reynolds numbers
                 if (fabs(Reynolds - m_Re[i]) < 0.1)
 				{
 					// then erase former result
@@ -362,13 +361,13 @@ void CPolar::AddPoint(double Alpha, double Cd, double Cdp, double Cl, double Cm,
         if (Cl>=0.0) m_Cl32Cd.insert(size,(double)pow(Cl, 1.5)/ Cd);
         else         m_Cl32Cd.insert(size,-(double)pow(-Cl, 1.5)/ Cd);
 
-        if(m_Type == 1 || m_Type ==4) m_Re.insert(size, Reynolds);
-        else if (m_Type == 2)
+		if(m_PolarType==FIXEDSPEEDPOLAR || m_PolarType==FIXEDAOAPOLAR) m_Re.insert(size, Reynolds);
+		else if (m_PolarType==FIXEDLIFTPOLAR)
         {
             if(Cl>0) m_Re.insert(size, Reynolds/(double) sqrt(Cl));
             else     m_Re.insert(size, 0.0);
         }
-        else if (m_Type == 3)
+		else if (m_PolarType==RUBBERCHORDPOLAR)
         {
             if(Cl>0.0) m_Re.insert(size, Reynolds/Cl);
             else     m_Re.insert(size, 0.0);
@@ -406,7 +405,7 @@ void CPolar::Copy(CPolar *pPolar)
 
 void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 {
-    int i, j, n, l;
+	int i, j, n, l, k;
 	int ArchiveFormat;// identifies the format of the file
 	float f;
 //	qint32 colorref;
@@ -423,7 +422,14 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 		// 1003 : re-instated NCrit, XtopTr and XBotTr with polar
 		WriteCString(ar, m_FoilName);
 		WriteCString(ar, m_PlrName);
-        ar << m_Type << m_MaType << m_ReType  ;
+
+		if(m_PolarType==FIXEDSPEEDPOLAR)       ar<<1;
+		else if(m_PolarType==FIXEDLIFTPOLAR)   ar<<2;
+		else if(m_PolarType==RUBBERCHORDPOLAR) ar<<3;
+		else if(m_PolarType==FIXEDAOAPOLAR)    ar<<4;
+		else ar << 0;
+
+		ar << m_MaType << m_ReType  ;
         ar << (int)m_Reynolds << (float)m_Mach ;
         ar << (float)m_ASpec;
         ar << n << (float)m_ACrit;
@@ -473,11 +479,19 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 			m_FoilName ="";
 			return;
 		}
-		ar >> m_Type >> m_MaType >> m_ReType;
-		if(m_Type!=1 && m_Type!=2 && m_Type!=3 && m_Type!=4) {
+
+		ar >>k;
+		if(k==1)      m_PolarType = FIXEDSPEEDPOLAR;
+		else if(k==2) m_PolarType = FIXEDLIFTPOLAR;
+		else if(k==3) m_PolarType = RUBBERCHORDPOLAR;
+		else if(k==4) m_PolarType = FIXEDAOAPOLAR;
+		else {
 			m_FoilName ="";
 			return;
 		}
+
+		ar >> m_MaType >> m_ReType;
+
 		if(m_MaType!=1 && m_MaType!=2 && m_MaType!=3) {
 			m_FoilName ="";
 			return;
@@ -540,7 +554,7 @@ void CPolar::Serialize(QDataStream &ar, bool bIsStoring)
 			else                    XCp = 0.0;
 
 			bExists = false;
-			if(m_Type!=4)
+			if(m_PolarType!=FIXEDAOAPOLAR)
 			{
                 for (j=0; j<m_Alpha.size(); j++)
 				{
@@ -732,37 +746,37 @@ void CPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 //	PolarProperties += QObject::tr("Parent foil")+" = "+ m_FoilName+"\n";
 
-//	strong = QString(QObject::tr("Analysis Type")+" = %1\n").arg(m_Type);
+//	strong = QString(QObject::tr("Analysis Type")+" = %1\n").arg(m_PolarType);
 	PolarProperties.clear();
 
-	strong = QString(QObject::tr("Type")+" = %1").arg(m_Type);
-	if(m_Type==FIXEDSPEEDPOLAR)      strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_Type==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_Type==FIXEDAOAPOLAR) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
+	strong = QString(QObject::tr("Type")+" = %1").arg(m_PolarType);
+	if(m_PolarType==FIXEDSPEEDPOLAR)      strong += " ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_PolarType==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_PolarType==FIXEDAOAPOLAR) strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
 	PolarProperties += strong;
 
-	if(m_Type==FIXEDSPEEDPOLAR)
+	if(m_PolarType==FIXEDSPEEDPOLAR)
 	{
 		strong = QString(QObject::tr("Reynolds number")+" = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
-	else if(m_Type==FIXEDLIFTPOLAR)
+	else if(m_PolarType==FIXEDLIFTPOLAR)
 	{
 		strong = QString("Re.sqrt(Cl) = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString("Ma.sqrt(Cl) = %1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
-	else if(m_Type==3)
+	else if(m_PolarType==RUBBERCHORDPOLAR)
 	{
 		strong = QString(QObject::tr("Re.Cl")+" = %1\n").arg(m_Reynolds,0,'f',0);
 		PolarProperties += strong;
 		strong = QString(QObject::tr("Mach number") + " = %1\n").arg(m_Mach,5,'f',2);
 		PolarProperties += strong;
 	}
-	else if(m_Type==FIXEDAOAPOLAR)
+	else if(m_PolarType==FIXEDAOAPOLAR)
 	{
 		strong = QString(QObject::tr("Alpha")+" = %1"+QString::fromUtf8("°")+"\n").arg(m_ASpec,7,'f',2);
 		PolarProperties += strong;

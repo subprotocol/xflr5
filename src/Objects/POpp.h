@@ -50,7 +50,7 @@ private:
 	double m_Ctrl;			//Control Variable
 	
 	int m_NStation;			// unused
-	int m_Type;			// analysis type
+	enumPolarType m_WPolarType;			// analysis type
 	int m_VLMType;			// for future use
 
 	bool m_bWing[MAXWINGS];  // main wing, 2nd wing, elevator, fin

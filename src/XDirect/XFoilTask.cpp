@@ -53,7 +53,7 @@ void XFoilTask::run()
 		return;
 	}
 
-	if(m_pPolar->m_Type!=4) AlphaSequence();
+	if(m_pPolar->m_PolarType!=FIXEDAOAPOLAR) AlphaSequence();
 	else
 	{
 		m_bIsFinished = true;

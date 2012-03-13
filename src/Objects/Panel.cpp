@@ -25,8 +25,8 @@
 #include "Panel.h"
 #include <math.h>
 
-double CPanel::m_VortexPos = 0.25;
-double CPanel::m_CtrlPos   = 0.75;
+double CPanel::s_VortexPos = 0.25;
+double CPanel::s_CtrlPos   = 0.75;
 double CPanel::mat[9];
 double CPanel::det;
 CVector CPanel::smp, CPanel::smq, CPanel::MidA, CPanel::MidB;
@@ -55,9 +55,10 @@ void CPanel::Reset()
 	m_bIsLeftPanel   = false;
 	m_bIsWakePanel   = false;
 
+	m_Pos         =  MIDSURFACE;
+
 	m_iElement    = -1;
 	m_iSym        = -1;
-	m_iPos        =  0;
 	m_iLA         =  0;
 	m_iLB         =  0;
 	m_iTA         =  0;
@@ -95,34 +96,34 @@ void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, C
 	Area = Normal.VAbs()/2.0;
 	Normal.Normalize();
 
-	A.x = LA.x*(1.0-m_VortexPos)+TA.x*m_VortexPos;
-	A.y = LA.y*(1.0-m_VortexPos)+TA.y*m_VortexPos;
-	A.z = LA.z*(1.0-m_VortexPos)+TA.z*m_VortexPos;
+	VA.x = LA.x*(1.0-s_VortexPos)+TA.x*s_VortexPos;
+	VA.y = LA.y*(1.0-s_VortexPos)+TA.y*s_VortexPos;
+	VA.z = LA.z*(1.0-s_VortexPos)+TA.z*s_VortexPos;
 
-	B.x = LB.x*(1.0-m_VortexPos)+TB.x*m_VortexPos;
-	B.y = LB.y*(1.0-m_VortexPos)+TB.y*m_VortexPos;
-	B.z = LB.z*(1.0-m_VortexPos)+TB.z*m_VortexPos;
+	VB.x = LB.x*(1.0-s_VortexPos)+TB.x*s_VortexPos;
+	VB.y = LB.y*(1.0-s_VortexPos)+TB.y*s_VortexPos;
+	VB.z = LB.z*(1.0-s_VortexPos)+TB.z*s_VortexPos;
 
-	Vortex.x = B.x - A.x;
-	Vortex.y = B.y - A.y;
-	Vortex.z = B.z - A.z;
+	Vortex.x = VB.x - VA.x;
+	Vortex.y = VB.y - VA.y;
+	Vortex.z = VB.z - VA.z;
 
 	dl = Vortex.VAbs();
 
-	VortexPos.x = (A.x+B.x)/2.0;
-	VortexPos.y = (A.y+B.y)/2.0;
-	VortexPos.z = (A.z+B.z)/2.0;
+	VortexPos.x = (VA.x+VB.x)/2.0;
+	VortexPos.y = (VA.y+VB.y)/2.0;
+	VortexPos.z = (VA.z+VB.z)/2.0;
 
     if(fabs(LA.y)<1.e-5 && fabs(TA.y)<1.e-5 && fabs(LB.y)<1.e-5 && fabs(TB.y)<1.e-5) m_bIsInSymPlane = true;
 	else m_bIsInSymPlane = false;
 
-	MidA.x = LA.x*(1.0-m_CtrlPos)+TA.x*m_CtrlPos;
-	MidA.y = LA.y*(1.0-m_CtrlPos)+TA.y*m_CtrlPos;
-	MidA.z = LA.z*(1.0-m_CtrlPos)+TA.z*m_CtrlPos;
+	MidA.x = LA.x*(1.0-s_CtrlPos)+TA.x*s_CtrlPos;
+	MidA.y = LA.y*(1.0-s_CtrlPos)+TA.y*s_CtrlPos;
+	MidA.z = LA.z*(1.0-s_CtrlPos)+TA.z*s_CtrlPos;
 
-	MidB.x = LB.x*(1.0-m_CtrlPos)+TB.x*m_CtrlPos;
-	MidB.y = LB.y*(1.0-m_CtrlPos)+TB.y*m_CtrlPos;
-	MidB.z = LB.z*(1.0-m_CtrlPos)+TB.z*m_CtrlPos;
+	MidB.x = LB.x*(1.0-s_CtrlPos)+TB.x*s_CtrlPos;
+	MidB.y = LB.y*(1.0-s_CtrlPos)+TB.y*s_CtrlPos;
+	MidB.z = LB.z*(1.0-s_CtrlPos)+TB.z*s_CtrlPos;
 
 	CtrlPt.x = (MidA.x+MidB.x)/2.0;
 	CtrlPt.y = (MidA.y+MidB.y)/2.0;
@@ -133,7 +134,7 @@ void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, C
 	CollPt.z = (LA.z + LB.z + TA.z + TB.z)/4.0;
 
 	//Use VSAERO figure 8. p23
-//	if(m_iPos==0 || m_iPos==1 || m_iPos==100)
+//	if(m_iPos==THINSURFACE || m_Pos==TOPSURFACE || m_Pos==BODYSURFACE)
 //	{
 		m.x = (LB.x + TB.x) *0.5 - CollPt.x;
 		m.y = (LB.y + TB.y) *0.5 - CollPt.y;
@@ -174,7 +175,8 @@ void CPanel::SetFrame(CVector const &LA, CVector const &LB, CVector const &TA, C
 	lij[7]=m.z;
 	lij[8]=Normal.z;
 	Invert33(lij);
-	if(m_iPos>0)
+
+	if(m_Pos>MIDSURFACE)
 	{
 		P1.x = lij[0]*(LA.x-CollPt.x) + lij[1]*(LA.y-CollPt.y) + lij[2]*(LA.z-CollPt.z);
 		P1.y = lij[3]*(LA.x-CollPt.x) + lij[4]*(LA.y-CollPt.y) + lij[5]*(LA.z-CollPt.z);
@@ -354,6 +356,7 @@ double CPanel::GetArea()
 	return Area;
 }
 
+
 double CPanel::Width()
 {
 	return sqrt( (s_pNode[m_iLB].y - s_pNode[m_iLA].y)*(s_pNode[m_iLB].y - s_pNode[m_iLA].y)
@@ -375,21 +378,21 @@ void CPanel::RotateBC(CVector const &HA, Quaternion &Qt)
 	VortexPos.y = W.y + HA.y;
 	VortexPos.z = W.z + HA.z;
 
-	W.x = A.x - HA.x;
-	W.y = A.y - HA.y;
-	W.z = A.z - HA.z;
+	W.x = VA.x - HA.x;
+	W.y = VA.y - HA.y;
+	W.z = VA.z - HA.z;
 	Qt.Conjugate(W);
-	A.x = W.x + HA.x;
-	A.y = W.y + HA.y;
-	A.z = W.z + HA.z;
+	VA.x = W.x + HA.x;
+	VA.y = W.y + HA.y;
+	VA.z = W.z + HA.z;
 
-	W.x = B.x - HA.x;
-	W.y = B.y - HA.y;
-	W.z = B.z - HA.z;
+	W.x = VB.x - HA.x;
+	W.y = VB.y - HA.y;
+	W.z = VB.z - HA.z;
 	Qt.Conjugate(W);
-	B.x = W.x + HA.x;
-	B.y = W.y + HA.y;
-	B.z = W.z + HA.z;
+	VB.x = W.x + HA.x;
+	VB.y = W.y + HA.y;
+	VB.z = W.z + HA.z;
 
 	W.x = CtrlPt.x - HA.x;
 	W.y = CtrlPt.y - HA.y;
@@ -450,8 +453,8 @@ void CPanel::RotatePanel(CVector const &O, Quaternion &Qt)
 	s_pNode[m_iTB].y = W.y + O.y;
 	s_pNode[m_iTB].z = W.z + O.z;
 
-	if(m_iPos==-1) SetFrame(s_pNode[m_iLB], s_pNode[m_iLA], s_pNode[m_iTB], s_pNode[m_iTA]);
-	else           SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
+	if(m_Pos==BOTSURFACE) SetFrame(s_pNode[m_iLB], s_pNode[m_iLA], s_pNode[m_iTB], s_pNode[m_iTA]);
+	else                  SetFrame(s_pNode[m_iLA], s_pNode[m_iLB], s_pNode[m_iTA], s_pNode[m_iTB]);
 }
 
 

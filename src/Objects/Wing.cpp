@@ -28,6 +28,7 @@
 
 
 #include  <math.h>
+#include <QtDebug>
 #include "Wing.h"
 #include "../MainFrame.h"
 #include "../Globals.h"
@@ -275,8 +276,8 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 	//     CoG  = center of gravity position
 	//     CoGIxx, CoGIyy, CoGIzz, CoGIxz = inertia of properties calculated at the CoG
 	//
-	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS];
-	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS];
+	double ElemVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
+	CVector PtVolume[NXSTATIONS*NYSTATIONS*MAXSPANSECTIONS*2];
 	int j,k,l;
 	double rho, LocalSpan, LocalVolume;
 	double LocalChord,  LocalArea,  tau;
@@ -312,6 +313,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 
 	//first get the CoG - necessary for future application of Huygens/Steiner theorem
 	int p = 0;
+
 	for (j=0; j<m_NSurfaces; j++)
 	{
 		LocalSpan = m_Surface[j].m_Length/(double)NYStations;
@@ -329,7 +331,6 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			PtC4.z = (Pt.z + Pt1.z)/2.0;
 
 //			CoGCheck += LocalVolume * PtC4;
-
 			for(l=0; l<NXStations; l++)
 			{
 				//browse mid-section
@@ -362,6 +363,7 @@ void CWing::ComputeVolumeInertia(CVector &CoG, double &CoGIxx, double &CoGIyy, d
 			}
 		}
 	}
+
 	if(checkVolume>PRECISION) rho = m_VolumeMass/checkVolume;
 	else                      rho = 0.0;
 
@@ -536,14 +538,14 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 			m_Surface[is].SetNormal(); // is (0,0,1)
 
-			m_Surface[is].m_TwistA   =  m_TTwist[j+1];
-			m_Surface[is].m_TwistB   =  m_TTwist[j];
-
-			m_Surface[is].SetTwist2();
-
 			m_Surface[is].RotateX(m_Surface[is].m_LB, -m_TDihedral[j]);
 			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x,   -VNSide[nSurf+1].y,   VNSide[nSurf+1].z);
 			m_Surface[is].NormalB.Set(VNSide[nSurf].x, -VNSide[nSurf].y, VNSide[nSurf].z);
+
+			m_Surface[is].m_TwistA   =  m_TTwist[j+1];
+			m_Surface[is].m_TwistB   =  m_TTwist[j];
+			m_Surface[is].SetTwist2();
+
 
 			if(j>0)
 			{
@@ -613,14 +615,14 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 				m_Surface[is].SetNormal(); // is (0,0,1)
 
-				m_Surface[is].m_TwistA   =  m_TTwist[j];
-				m_Surface[is].m_TwistB   =  m_TTwist[j+1];
-
-				m_Surface[is].SetTwist2();
 				m_Surface[is].RotateX(m_Surface[is].m_LA, m_TDihedral[j]);
 				m_Surface[is].NormalA.Set(VNSide[is-nSurf].x,   VNSide[is-nSurf].y,   VNSide[is-nSurf].z);
 				m_Surface[is].NormalB.Set(VNSide[is-nSurf+1].x, VNSide[is-nSurf+1].y, VNSide[is-nSurf+1].z);
-//				if(is>(int)((double)m_NSurfaces/2.))
+
+				m_Surface[is].m_TwistA   =  m_TTwist[j];
+				m_Surface[is].m_TwistB   =  m_TTwist[j+1];
+				m_Surface[is].SetTwist2();
+
 				if(j>0)
 				{
 					//translate the surface to the left tip of the previous surface and merge points
@@ -1409,7 +1411,7 @@ double CWing::ZPos(double y)
 
 
 void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, int pos, CVector &Force, double &WingIDrag,
-					CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
+						 CWPolar *pWPolar, CPanel *pWakePanel, CVector *pWakeNode)
 {
 	// calculates the induced lift and drag from the vortices or wake panels strength
 	// using a farfield method
@@ -2123,7 +2125,7 @@ void CWing::PanelComputeOnBody(double QInf, double Alpha, double *Cp, double *Ga
 			for (l=0; l<coef*m_Surface[j].m_NXPanels; l++)
 			{
 				// Get the force acting on the panel
-				if(m_pPanel[p].m_iPos!=0)
+				if(m_pPanel[p].m_Pos!=MIDSURFACE)
 				{
 					ForcePt = m_pPanel[p].CollPt;
 					PanelForce = m_pPanel[p].Normal * (-Cp[p]) * m_pPanel[p].Area;      // Newtons/q

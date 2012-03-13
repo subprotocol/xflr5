@@ -4067,7 +4067,7 @@ bool XFoil::InitXFoilAnalysis(CPolar *pPolar)
 	lipan = false;
 
 	reinf1 = pPolar->m_Reynolds;
-	if (pPolar->m_Type == 4) alfa = pPolar->m_ASpec*PI/180.0;
+	if (pPolar->m_PolarType==FIXEDAOAPOLAR) alfa = pPolar->m_ASpec*PI/180.0;
 
 	minf1  = pPolar->m_Mach;
 	retyp  = pPolar->m_ReType;

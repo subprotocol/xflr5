@@ -138,10 +138,10 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 			{
 				glBegin(GL_QUAD_STRIP);
 				{
-					pWing->m_Surface[j].GetPanel(0, 0, -1);
+					pWing->m_Surface[j].GetPanel(0, 0, BOTSURFACE);
 					C. Copy(pWing->m_Surface[0].LA);
 					D. Copy(pWing->m_Surface[0].TA);
-					pWing->m_Surface[j].GetPanel(0, 0, 1);
+					pWing->m_Surface[j].GetPanel(0, 0, TOPSURFACE);
 					A. Copy(pWing->m_Surface[0].TA);
 					B. Copy(pWing->m_Surface[0].LA);
 
@@ -170,10 +170,10 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 				//Tip right surface
 				glBegin(GL_QUAD_STRIP);
 				{
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, 1);
+					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, TOPSURFACE);
 					A. Copy(pWing->m_Surface[0].TB);
 					B. Copy(pWing->m_Surface[0].LB);
-					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, -1);
+					pWing->m_Surface[j].GetPanel(pWing->m_Surface[j].m_NYPanels-1,0, BOTSURFACE);
 					C. Copy(pWing->m_Surface[0].LB);
 					D. Copy(pWing->m_Surface[0].TB);
 
@@ -316,11 +316,11 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 		{
 			glBegin(GL_LINES);
 			{
-				pWing->m_Surface[j].GetPanel(0,pWing->m_Surface[j].m_NXPanels-1, 0);
+				pWing->m_Surface[j].GetPanel(0,pWing->m_Surface[j].m_NXPanels-1, MIDSURFACE);
 				glVertex3d(pWing->m_Surface[j].LA.x,
 						   pWing->m_Surface[j].LA.y,
 						   pWing->m_Surface[j].LA.z);
-				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1,pWing->m_Surface[j].m_NXPanels-1, 0);
+				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1,pWing->m_Surface[j].m_NXPanels-1, MIDSURFACE);
 				glVertex3d(pWing->m_Surface[j].LB.x,
 						   pWing->m_Surface[j].LB.y,
 						   pWing->m_Surface[j].LB.z);
@@ -332,11 +332,11 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 		{
 			glBegin(GL_LINES);
 			{
-				pWing->m_Surface[j].GetPanel(0,0, 0);
+				pWing->m_Surface[j].GetPanel(0,0, MIDSURFACE);
 				glVertex3d(pWing->m_Surface[j].TA.x,
 						   pWing->m_Surface[j].TA.y,
 						   pWing->m_Surface[j].TA.z);
-				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1, 0, 0);
+				pWing->m_Surface[j].GetPanel( pWing->m_Surface[j].m_NYPanels-1, 0, MIDSURFACE);
 				glVertex3d(pWing->m_Surface[j].TB.x,
 						   pWing->m_Surface[j].TB.y,
 						   pWing->m_Surface[j].TB.z);
@@ -483,17 +483,17 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 				if (pNode[pPanel[pp].m_iLA].IsSame(pNode[n]) || pNode[pPanel[pp].m_iTA].IsSame(pNode[n]) ||
 					pNode[pPanel[pp].m_iTB].IsSame(pNode[n]) || pNode[pPanel[pp].m_iLB].IsSame(pNode[n]))
 				{
-					if(pPanel[pp].m_iPos==1)
+					if(pPanel[pp].m_Pos==TOPSURFACE)
 					{
 						CpSup[n] +=tab[pp];
 						averageSup++;
 					}
-					else if(pPanel[pp].m_iPos<=0)
+					else if(pPanel[pp].m_Pos<=MIDSURFACE)
 					{
 						CpInf[n] +=tab[pp];
 						averageInf++;
 					}
-					else if(pPanel[pp].m_iPos==100)
+					else if(pPanel[pp].m_Pos==BODYSURFACE)
 					{
 						Cp100[n] +=tab[pp];
 						average100++;
@@ -543,26 +543,26 @@ void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CP
 				LA.Copy(pNode[pPanel[p].m_iLA]);
 				LB.Copy(pNode[pPanel[p].m_iLB]);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iLA]-lmin)/range;
+				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLA]-lmin)/range;
 				else                           color = (Cp100[pPanel[p].m_iLA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LA.x, LA.y, LA.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iTA]-lmin)/range;
+				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTA]-lmin)/range;
 				else                           color = (Cp100[pPanel[p].m_iTA]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TA.x, TA.y, TA.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iTB]-lmin)/range;
+				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iTB]-lmin)/range;
 				else                           color = (Cp100[pPanel[p].m_iTB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(TB.x, TB.y, TB.z);
 
-				if(pPanel[p].m_iPos==1) color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
-				else if(pPanel[p].m_iPos<=0) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
+				if(pPanel[p].m_Pos==TOPSURFACE) color = (CpSup[pPanel[p].m_iLB]-lmin)/range;
+				else if(pPanel[p].m_Pos<=MIDSURFACE) color = (CpInf[pPanel[p].m_iLB]-lmin)/range;
 				else                           color = (Cp100[pPanel[p].m_iLB]-lmin)/range;
 				glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
 				glVertex3d(LB.x, LB.y, LB.z);
@@ -1800,19 +1800,19 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 				{
 					bFound = false;
 
-					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
+					if(p3DScales->m_pos==0 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(pNode[pWing->m_pPanel[p].m_iLA]);
 						D.Set(pNode[pWing->m_pPanel[p].m_iLB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==1 && pWing->m_pPanel[p].m_bIsTrailing && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(pNode[pWing->m_pPanel[p].m_iTA]);
 						D.Set(pNode[pWing->m_pPanel[p].m_iTB]);
 						bFound = true;
 					}
-					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_iPos<=0)
+					else if(p3DScales->m_pos==2 && pWing->m_pPanel[p].m_bIsLeading && pWing->m_pPanel[p].m_Pos<=MIDSURFACE)
 					{
 						C.Set(0.0, pNode[pWing->m_pPanel[p].m_iLA].y, 0.0);
 						D.Set(0.0, pNode[pWing->m_pPanel[p].m_iLB].y, 0.0);
@@ -1834,11 +1834,11 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 							VA. Normalize();
 							VB.Set(pNode[pWing->m_pPanel[p].m_iTB] - pNode[pWing->m_pPanel[p].m_iLB]);
 							VB. Normalize();
-							if(pWing->m_pPanel[p].m_iPos ==-1)
+							if(pWing->m_pPanel[p].m_Pos==BOTSURFACE)
 							{
 								//corresponding upper panel is the next one coming up
 								for (i=p; i<pWing->m_MatSize;i++)
-									if(pWing->m_pPanel[i].m_iPos>0 && pWing->m_pPanel[i].m_bIsTrailing) break;
+									if(pWing->m_pPanel[i].m_Pos>MIDSURFACE && pWing->m_pPanel[i].m_bIsTrailing) break;
 								VAT = pNode[pWing->m_pPanel[i].m_iTA] - pNode[pWing->m_pPanel[i].m_iLA];
 								VAT.Normalize();
 								VA = VA+VAT;
@@ -2006,8 +2006,8 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 			if(pWPolar->m_AnalysisMethod==PANELMETHOD)
 			{
-				if(pPanel[p].m_iPos==0) C.Copy(pPanel[p].CtrlPt);
-				else                    C.Copy(pPanel[p].CollPt);
+				if(pPanel[p].m_Pos==MIDSURFACE) C.Copy(pPanel[p].CtrlPt);
+				else                            C.Copy(pPanel[p].CollPt);
 				pMiarex->m_pPanelDlg->GetSpeedVector(C, Mu, Sigma, V);
 
 				VT += V;
@@ -2270,32 +2270,32 @@ void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *p
 		{
 			if(!pPanel[p].m_bIsTrailing)
 			{
-				if(pPanel[p].m_iPos<=0)
+				if(pPanel[p].m_Pos<=MIDSURFACE)
 				{
-					A = pPanel[p].A;
-					B = pPanel[p].B;
-					C = pPanel[p-1].B;
-					D = pPanel[p-1].A;
+					A = pPanel[p].VA;
+					B = pPanel[p].VB;
+					C = pPanel[p-1].VB;
+					D = pPanel[p-1].VA;
 				}
 				else
 				{
-					A = pPanel[p].A;
-					B = pPanel[p].B;
-					C = pPanel[p+1].B;
-					D = pPanel[p+1].A;
+					A = pPanel[p].VA;
+					B = pPanel[p].VB;
+					C = pPanel[p+1].VB;
+					D = pPanel[p+1].VA;
 				}
 			}
 			else
 			{
-				A = pPanel[p].A;
-				B = pPanel[p].B;
+				A = pPanel[p].VA;
+				B = pPanel[p].VB;
 				// we define point AA=A+1 and BB=B+1
 				C.x =  pNode[pPanel[p].m_iTB].x
-					+ (pNode[pPanel[p].m_iTB].x-pPanel[p].B.x)/3.0;
+					+ (pNode[pPanel[p].m_iTB].x-pPanel[p].VB.x)/3.0;
 				C.y =  pNode[pPanel[p].m_iTB].y;
 				C.z =  pNode[pPanel[p].m_iTB].z;
 				D.x =  pNode[pPanel[p].m_iTA].x
-					+ (pNode[pPanel[p].m_iTA].x-pPanel[p].A.x)/3.0;
+					+ (pNode[pPanel[p].m_iTA].x-pPanel[p].VA.x)/3.0;
 				D.y =  pNode[pPanel[p].m_iTA].y;
 				D.z =  pNode[pPanel[p].m_iTA].z;
 			}
@@ -2440,7 +2440,7 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 			ZPos +=dD;
 			if(pWPolar)
 			{
-				if(pWPolar->m_Type!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
+				if(pWPolar->m_WPolarType!=STABILITYPOLAR)  Mass = pWPolar->m_Mass;
 				else
 				{
 					if(pPlane)     Mass = pPlane->TotalMass();
@@ -2506,7 +2506,7 @@ void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 	YPos = pMiarex->m_r3DCltRect.bottom()- 14 * dD;
 	XPos = pMiarex->m_r3DCltRect.right() - 10 ;
 
-	if(pWOpp->m_Type==STABILITYPOLAR) YPos -= dD;
+	if(pWOpp->m_WPolarType==STABILITYPOLAR) YPos -= dD;
 
         //glNewList(WOPPLEGEND,GL_COMPILE);
 	{
@@ -2587,7 +2587,7 @@ void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
 			if(l==1) {c=8, d=3;}
 			else if(l==2) {c=7, d=3;}
 			else {c=6, d=3;}
-			if(pWOpp->m_Type==STABILITYPOLAR)
+			if(pWOpp->m_WPolarType==STABILITYPOLAR)
 			{
 				Result = QString(QObject::tr("X_NP = %1 ")).arg(pWOpp->m_XNP*pMainFrame->m_mtoUnit, c,'f',d);
 				Result += str;
@@ -2721,7 +2721,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 					P2 *= force;
 
 					// Plot
-					if(pPanel[p].m_iPos==0)
+					if(pPanel[p].m_Pos==MIDSURFACE)
 					{
 						glBegin(GL_LINES);
 						{

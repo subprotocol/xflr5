@@ -1674,7 +1674,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	for (i = 0; i< m_poaPolar->size(); i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
 			if(n>=2) break;
@@ -1693,7 +1693,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Alpha.size()>0)
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			if (Re < pPolar->m_Reynolds)
@@ -1735,7 +1735,7 @@ double GetPlrPointFromAlpha(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, do
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Alpha.size()>0)
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Alpha.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			pPolar->GetAlphaLimits(amin, amax);
@@ -1922,7 +1922,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 	for (i = 0; i< m_poaPolar->size(); i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName))
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName))
 		{
 			n++;
 			if(n>=2) break;
@@ -1941,7 +1941,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName) && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			if (Re < pPolar->m_Reynolds)
@@ -1982,7 +1982,7 @@ double GetPlrPointFromCl(QList<void*>*m_poaPolar, CFoil *pFoil, double Re, doubl
 	for (i=0; i< nPolars; i++)
 	{
 		pPolar = (CPolar*)m_poaPolar->at(i);
-		if((pPolar->m_Type == 1) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
+		if((pPolar->m_PolarType==FIXEDSPEEDPOLAR) && (pPolar->m_FoilName == pFoil->m_FoilName)  && pPolar->m_Cl.size()>0)
 		{
 			// we have found the first type 1 polar for this foil
 			pPolar->GetClLimits(Clmin, Clmax);

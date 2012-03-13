@@ -55,7 +55,7 @@ CWOpp::CWOpp()
 	m_NVLMPanels   = 0;
 	m_nFlaps       = 0;
 	m_nControls    = 0;
-	m_AnalysisMethod = 0;
+	m_AnalysisMethod = LLTMETHOD;
 
 	m_Alpha               = 0.0;
 	m_Beta                = 0.0;
@@ -126,8 +126,8 @@ bool CWOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
 	out << Header;
 
 	int nStart;
-	if(m_AnalysisMethod==1) nStart = 1;
-	else                    nStart = 0;
+	if(m_AnalysisMethod==LLTMETHOD) nStart = 1;
+	else                            nStart = 0;
 
 	if(FileType==1) Format = "%1  %2   %3   %4   %5   %6   %7   %8    %9   %10   %11   %12\n";
 	else            Format = "%1,%2,%3,%4,%5,%6,%7,%8,%9,%10,%11,%12\n";
@@ -158,8 +158,9 @@ bool CWOpp::Export(QTextStream &out, int FileType, bool bDataOnly)
 double CWOpp::GetMaxLift()
 {
 	int i,nStart;
-	if(m_AnalysisMethod==1) nStart = 1;
-	else nStart = 0;
+	if(m_AnalysisMethod==LLTMETHOD) nStart = 1;
+	else                            nStart = 0;
+
 	double maxlift = 0.0;
 	for (i=nStart; i<m_NStation; i++)
 	{
@@ -217,14 +218,27 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(m_bIsVisible)   ar << 1; else ar<<0;
 		if(m_bShowPoints)  ar << 1; else ar<<0;
 		if(m_bOut)         ar << 1; else ar<<0;
-		ar << m_AnalysisMethod;
+
+		if(m_AnalysisMethod==LLTMETHOD)        ar<<1;
+		else if(m_AnalysisMethod==VLMMETHOD)   ar<<2;
+		else if(m_AnalysisMethod==PANELMETHOD) ar<<3;
+
+
+
 		if(m_bVLM1)        ar << 1; else ar<<0;
 		if(m_bThinSurface) ar << 1; else ar<<0;
 		if(m_bTiltedGeom)  ar << 1; else ar<<0;
 
 		ar << m_Style << m_Width;
 		WriteCOLORREF(ar,m_Color);
-		ar << m_Type << m_NStation;
+
+		if(m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+		else if(m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+		else if(m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(m_WPolarType==STABILITYPOLAR)  ar<<7;
+		else ar << 0;
+
+		ar << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << (float)m_Weight << (float)m_Span << (float)m_MAChord;
 		ar << (float)m_CL << (float)m_VCD << (float)m_ICD ;
 		ar << (float)m_Beta;
@@ -249,8 +263,9 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		for (k=0; k<=m_NStation; k++) ar << (float)m_SpanPos[k] << (float)m_StripArea[k];
 		ar << m_NVLMPanels;
-		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p] ;
-		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p] ;
+		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Cp[p];
+		for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_G[p];
+
 		if(m_AnalysisMethod==PANELMETHOD)
 		{
 			for (p=0; p<m_NVLMPanels;p++)	ar << (float)m_Sigma[p] ;
@@ -324,10 +339,11 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		if(a) m_bOut = true; else m_bOut = false;
 
-		ar >> m_AnalysisMethod;
-		if (a<=0 && a>=10) return false;
-
-		if(m_AnalysisMethod==0) m_AnalysisMethod=2;
+		ar>>k;
+		if(k==1)      m_AnalysisMethod=LLTMETHOD;
+		else if(k==2) m_AnalysisMethod=VLMMETHOD;
+		else if(k==3) m_AnalysisMethod=PANELMETHOD;
+		else return false;
 
 		if(ArchiveFormat>=1005)
 		{
@@ -349,7 +365,15 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar >> m_Style >> m_Width;
 		ReadCOLORREF(ar,m_Color);
-		ar >> m_Type >> m_NStation;
+
+		ar >>k;
+		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
+		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
+		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
+		else if(k==7) m_WPolarType = STABILITYPOLAR;
+		else return false;
+
+		ar >> m_NStation;
 		ar >> f; m_Alpha =f;
 		ar >> f; m_QInf =f;
 		ar >> f; m_Weight =f;
@@ -371,7 +395,7 @@ bool CWOpp::SerializeWOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar >> f; m_VYm =f;
 		ar >> f; m_IYm =f;
 
-		if(ArchiveFormat<1014 && m_AnalysisMethod>1)
+		if(ArchiveFormat<1014 && m_AnalysisMethod>LLTMETHOD)
 		{
 			m_GCm = m_GRm = m_GYm = m_VYm = m_IYm = 0.0;
 		}
@@ -602,18 +626,17 @@ void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 
 	WOppProperties.clear();
 
-	strong = QString(QObject::tr("Type")+" %1").arg(m_Type);
-	if(m_Type==FIXEDSPEEDPOLAR)     strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_Type==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_Type==FIXEDAOAPOLAR)  strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
-	else if(m_Type==STABILITYPOLAR) strong += " ("+QObject::tr("Stability analysis") +")\n";
+	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong += "Type 1 ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_WPolarType==FIXEDLIFTPOLAR) strong += "Type 2 ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += "Type 3 ("+QObject::tr("Fixed angle of attack") +")\n";
+	else if(m_WPolarType==STABILITYPOLAR) strong += "Type 4 ("+QObject::tr("Stability analysis") +")\n";
 	WOppProperties += strong;
 
 //	WOppProperties += QObject::tr("Method")+" = ";
-	if(m_AnalysisMethod==LLTMETHOD)                              WOppProperties +=QObject::tr("LLT");
+	if(m_AnalysisMethod==LLTMETHOD)                             WOppProperties +=QObject::tr("LLT");
 	else if(m_AnalysisMethod==PANELMETHOD && !m_bThinSurface)   WOppProperties +=QObject::tr("3D-Panels");
-	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)            WOppProperties +=QObject::tr("3D-Panels/VLM1");
-	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)           WOppProperties +=QObject::tr("3D-Panels/VLM2");
+	else if(m_AnalysisMethod==PANELMETHOD && m_bVLM1)           WOppProperties +=QObject::tr("3D-Panels/VLM1");
+	else if(m_AnalysisMethod==PANELMETHOD && !m_bVLM1)          WOppProperties +=QObject::tr("3D-Panels/VLM2");
 	WOppProperties +="\n";
 
 
@@ -636,7 +659,7 @@ void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 		WOppProperties += strong +QString::fromUtf8("°")+"\n\n";
 	}
 
-	if(m_Type==STABILITYPOLAR)
+	if(m_WPolarType==STABILITYPOLAR)
 	{
 		strong  = QString(QObject::tr("Control value")+" = %1").arg(m_Ctrl,5,'f',2);
 		WOppProperties += strong +"\n";
@@ -690,7 +713,7 @@ void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 	}
 
 
-	if(m_Type==STABILITYPOLAR)
+	if(m_WPolarType==STABILITYPOLAR)
 	{
 		WOppProperties += "\n\n";
 		WOppProperties += QObject::tr("Non-dimensional Stability Derivatives:")+"\n";

@@ -27,7 +27,6 @@
 #include "POpp.h"
 
 
-
 class CWPolar
 {
 	friend class CWing;
@@ -145,11 +144,12 @@ private:
 	bool   m_bActiveControl[4*MAXCONTROLS];
 
 public:
-	int m_AnalysisMethod;
+	enumAnalysisMethod m_AnalysisMethod;
+	enumPolarType m_WPolarType;
+
 	double m_Beta;
 	double m_Density  ;
 	double m_WArea;//for lift and drag calculations
-	int m_Type;
 	double m_WMAChord;// for moment calculations
 	double m_WSpan;//for moment calculations
 

@@ -390,7 +390,7 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 		}
 	}
 
-	glNewList(BODYSURFACES,GL_COMPILE);
+	glNewList(GLBODYSURFACES,GL_COMPILE);
 	{
 		m_GLList++;
 //		glShadeModel(GL_FLAT);
@@ -446,7 +446,7 @@ void GL3dBodyDlg::GLCreateBodyBezier(CBody *pBody)
 	}
 	glEndList();
 
-	glNewList(BODYGEOM,GL_COMPILE);
+	glNewList(GLBODYGEOM,GL_COMPILE);
 	{
 		m_GLList++;
 
@@ -518,7 +518,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 		}
 	}
 
-	glNewList(BODYSURFACES, GL_COMPILE);
+	glNewList(GLBODYSURFACES, GL_COMPILE);
 	{
 		m_GLList++;
 
@@ -617,7 +617,7 @@ void GL3dBodyDlg::GLCreateBody3DSplines(CBody *pBody)
 	}
 	glEndList();
 
-	glNewList(BODYGEOM,GL_COMPILE);
+	glNewList(GLBODYGEOM,GL_COMPILE);
 	{
 		m_GLList++;
 
@@ -704,7 +704,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 {
 	if(!pBody)
 	{
-		glNewList(BODYMESHPANELS,GL_COMPILE);
+		glNewList(GLBODYMESHPANELS,GL_COMPILE);
 		{
 			m_GLList++;
 			glEndList();
@@ -726,7 +726,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 
 	if(pBody->m_LineType==BODYPANELTYPE) //LINES
 	{
-		glNewList(BODYMESHPANELS,GL_COMPILE);
+		glNewList(GLBODYMESHPANELS,GL_COMPILE);
 		{
 			m_GLList++;
 
@@ -852,7 +852,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 			glDisable (GL_LINE_STIPPLE);
 		}
 		glEndList();
-		glNewList(BODYMESHBACK,GL_COMPILE);
+
+		glNewList(GLBODYMESHBACK,GL_COMPILE);
 		{
 			m_GLList++;
 
@@ -995,7 +996,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 				p++;
 			}
 		}
-		glNewList(BODYMESHPANELS,GL_COMPILE);
+
+		glNewList(GLBODYMESHPANELS,GL_COMPILE);
 		{
 			m_GLList++;
 
@@ -1065,7 +1067,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 		}
 		glEndList();
 
-		glNewList(BODYMESHBACK,GL_COMPILE);
+		glNewList(GLBODYMESHBACK,GL_COMPILE);
 		{
 			m_GLList++;
 
@@ -1155,7 +1157,7 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	glNewList(BODYSURFACES,GL_COMPILE);
+	glNewList(GLBODYSURFACES,GL_COMPILE);
 	{
 		m_GLList++;
 
@@ -1234,7 +1236,7 @@ void GL3dBodyDlg::GLCreateBody3DFlatPanels(CBody *pBody)
 	}
 	glEndList();
 
-	glNewList(BODYGEOM,GL_COMPILE);
+	glNewList(GLBODYGEOM,GL_COMPILE);
 	{
 		m_GLList++;
 
@@ -2415,18 +2417,18 @@ void GL3dBodyDlg::GLDraw3D()
 
 	if(m_bResetglBody && m_pBody)
 	{
-		if(glIsList(BODYGEOM))
+		if(glIsList(GLBODYGEOM))
 		{
-			glDeleteLists(BODYGEOM,2);
+			glDeleteLists(GLBODYGEOM,2);
 			m_GLList -=2;
 		}
 		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(m_pBody);
 		else if(m_pBody->m_LineType==BODYSPLINETYPE)	GLCreateBody3DSplines(m_pBody);
 
 		m_bResetglBody = false;
-		if(glIsList(BODYMESHPANELS))
+		if(glIsList(GLBODYMESHPANELS))
 		{
-			glDeleteLists(BODYMESHPANELS,2);
+			glDeleteLists(GLBODYMESHPANELS,2);
 			m_GLList -=2;
 		}
 		GLCreateBodyMesh(m_pBody);
@@ -2435,9 +2437,9 @@ void GL3dBodyDlg::GLDraw3D()
 
 	if(m_bResetglBodyMesh && m_pBody)
 	{
-		if(glIsList(BODYMESHPANELS))
+		if(glIsList(GLBODYMESHPANELS))
 		{
-			glDeleteLists(BODYMESHPANELS,2);
+			glDeleteLists(GLBODYMESHPANELS,2);
 			m_GLList -=2;
 		}
 		GLCreateBodyMesh(m_pBody);
@@ -2698,18 +2700,18 @@ void GL3dBodyDlg::GLRenderBody()
 				glDisable(GL_LIGHT0);
 			}
 
-			if(m_bSurfaces && m_pBody)	glCallList(BODYSURFACES);
+			if(m_bSurfaces && m_pBody)	glCallList(GLBODYSURFACES);
 
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
 
 			if(m_pBody && m_pFrame && (m_bOutline||m_bSurfaces)) glCallList(BODYFRAME3D);
-			if(m_bOutline && m_pBody)	glCallList(BODYGEOM);
+			if(m_bOutline && m_pBody)	glCallList(GLBODYGEOM);
 			if(m_bVLMPanels && m_pBody)
 			{
 				if(!m_bSurfaces)//else panels will be filled by Cp color
-					glCallList(BODYMESHBACK);
-				glCallList(BODYMESHPANELS);
+					glCallList(GLBODYMESHBACK);
+				glCallList(GLBODYMESHPANELS);
 			}
 
 			if(m_bShowMasses)

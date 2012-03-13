@@ -68,8 +68,8 @@ QMiarex::QMiarex(QWidget *parent)
 	LLTAnalysis::s_RelaxMax  =  20.0;
 	LLTAnalysis::s_NLLTStations = 20;
 
-	m_Panel[0].m_VortexPos = 0.25;
-	m_Panel[0].m_CtrlPos   = 0.75;
+	CPanel::s_VortexPos = 0.25;
+	CPanel::s_CtrlPos   = 0.75;
 
 //	m_WngAnalysis.m_WakePanelFactor = 1.10;
 //	m_WngAnalysis.m_TotalWakeLength = 100.00;
@@ -698,8 +698,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 	// 
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	CPOpp *pOldPOpp;
-	CWOpp *pWOpp;
+	CPOpp *pOldPOpp=NULL;
+	CWOpp *pWOpp=NULL;
 	int i,j,l,p;
 	double Cb = 0.0;
 
@@ -710,7 +710,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		if(!m_bKeepOutOpps && bPointOut) return;
 
 		pPOpp = new CPOpp();
-		if(pPOpp == NULL) return;
+		if(pPOpp==NULL) return;
 
 		pPOpp->m_Color = pMainFrame->GetColor(6);
 		bool bFound;
@@ -746,7 +746,8 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 
 		pPOpp->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 		pPOpp->m_PlrName             = m_pCurWPolar->m_PlrName;
-		pWOpp->m_Type                = m_pCurWPolar->m_Type;
+		pWOpp->m_WPolarType          = m_pCurWPolar->m_WPolarType;
+		pPOpp->m_WPolarType          = m_pCurWPolar->m_WPolarType;
 
 		pPOpp->m_NStation            = m_pCurWing->m_NStation;
 
@@ -760,7 +761,6 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 		{
 			if(fabs(m_pCurWing->m_BendingMoment[l])>fabs(Cb))	Cb = m_pCurWing->m_BendingMoment[l];
 		}
-
 
 		pWOpp->m_MaxBending = (float)Cb;
 
@@ -798,7 +798,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			pPOpp->m_Beta                = m_pCurWPolar->m_Beta;
 			pWOpp->m_Beta                = m_pCurWPolar->m_Beta;
 
-			if(m_pCurWPolar->m_Type==STABILITYPOLAR)
+			if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 			{
 				pPOpp->m_Alpha            = m_pPanelDlg->m_AlphaEq;
 				pPOpp->m_QInf             = m_pPanelDlg->u0;
@@ -925,7 +925,7 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 			{
 				if (pPOpp->m_PlrName == pOldPOpp->m_PlrName)
 				{
-					if(pPOpp->m_Type <3)
+					if(pPOpp->m_WPolarType<FIXEDAOAPOLAR)
 					{
 						if(fabs(pPOpp->m_Alpha - pOldPOpp->m_Alpha)<0.005)
 						{
@@ -954,9 +954,9 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 							i = m_poaPOpp->size();// to break
 						}
 					}
-					else if (pPOpp->m_Type==4)
+					else if (pPOpp->m_WPolarType==FIXEDAOAPOLAR)
 					{
-						if(fabs(pPOpp->m_QInf - pOldPOpp->m_QInf)<0.001)
+						if(fabs(pPOpp->m_QInf - pOldPOpp->m_QInf)<0.1)
 						{
 							//replace existing point
 							pPOpp->m_Color = pOldPOpp->m_Color;
@@ -1152,7 +1152,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 		pNewPoint->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 		pNewPoint->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
 
-		pNewPoint->m_Type                = m_pCurWPolar->m_Type;
+		pNewPoint->m_WPolarType          = m_pCurWPolar->m_WPolarType;
 		pNewPoint->m_Weight              = m_pCurWPolar->m_Mass;
 
 		double Cb =0.0;
@@ -1357,7 +1357,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			{
 				if (pNewPoint->m_PlrName == pWOpp->m_PlrName)
 				{
-					if(pNewPoint->m_Type !=4)
+					if(pNewPoint->m_WPolarType!=FIXEDAOAPOLAR)
 					{
 						if(fabs(pNewPoint->m_Alpha - pWOpp->m_Alpha)<0.005)
 						{
@@ -1384,7 +1384,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 					}
 					else
 					{
-						if(fabs(pNewPoint->m_QInf - pWOpp->m_QInf)<0.005)
+						if(fabs(pNewPoint->m_QInf - pWOpp->m_QInf)<0.1)
 						{
 							//replace existing point
 							pNewPoint->m_Color = pWOpp->m_Color;
@@ -1540,11 +1540,11 @@ void QMiarex::SetControls()
 	else if(m_iView==WSTABVIEW) m_pctrlMiddleControls->setCurrentIndex(1);
 	else                        m_pctrlMiddleControls->setCurrentIndex(0);
 
-	if(m_iView==WSTABVIEW || (m_iView==W3DVIEW && this->m_pCurWPolar && this->m_pCurWPolar->m_Type==STABILITYPOLAR)) pMainFrame->m_pctrlStabViewWidget->show();
+	if(m_iView==WSTABVIEW || (m_iView==W3DVIEW && this->m_pCurWPolar && this->m_pCurWPolar->m_WPolarType==STABILITYPOLAR)) pMainFrame->m_pctrlStabViewWidget->show();
 	else pMainFrame->m_pctrlStabViewWidget->hide();
 
-//	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
-//	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR);
+//	pMainFrame->StabTimeAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR);
+//	pMainFrame->RootLocusAct->setEnabled(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR);
 
 	if(m_pCurWPolar)
 	{
@@ -1635,7 +1635,7 @@ void QMiarex::SetControls()
 
 	m_pctrlLift->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlTrans->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
-	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp && m_pCurWPolar->m_Type!=STABILITYPOLAR);
+	m_pctrlWOppAnimate->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp && m_pCurWPolar->m_WPolarType!=STABILITYPOLAR);
 	m_pctrlAnimateWOppSpeed->setEnabled((m_iView==WOPPVIEW||m_iView==W3DVIEW) && m_pCurWOpp);
 	m_pctrlIDrag->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
 	m_pctrlVDrag->setEnabled(m_iView==W3DVIEW && m_pCurWOpp);
@@ -1740,7 +1740,7 @@ void QMiarex::CreateCpCurves()
 		SpanInc = -m_pCurWing->m_PlanformSpan/2.0;
 		for (p=0; p<m_pCurWing->m_MatSize; p++)
 		{
-			if(m_pCurWing->m_pPanel[p].m_bIsTrailing && m_pCurWing->m_pPanel[p].m_iPos<=0)
+			if(m_pCurWing->m_pPanel[p].m_bIsTrailing && m_pCurWing->m_pPanel[p].m_Pos<=MIDSURFACE)
 			{
 				SpanInc += m_pCurWing->m_pPanel[p].Width();
 				if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pCurWing->m_PlanformSpan<0.001)
@@ -1761,7 +1761,7 @@ void QMiarex::CreateCpCurves()
 				SpanInc = -m_pWingList[iw]->m_PlanformSpan/2.0;
 				for (p=0; p<m_pWingList[iw]->m_MatSize; p++)
 				{
-					if(m_pWingList[iw]->m_pPanel[p].m_bIsTrailing && m_pWingList[iw]->m_pPanel[p].m_iPos<=0)
+					if(m_pWingList[iw]->m_pPanel[p].m_bIsTrailing && m_pWingList[iw]->m_pPanel[p].m_Pos<=MIDSURFACE)
 					{
 						SpanInc += m_pWingList[iw]->m_pPanel[p].Width();
 						if(SpanPos<=SpanInc || fabs(SpanPos-SpanInc)/m_pWingList[iw]->m_PlanformSpan<0.001)
@@ -1921,7 +1921,7 @@ int QMiarex::CreateBodyElements()
 						m_Panel[m_MatSize].m_bIsInSymPlane  = false;
 						m_Panel[m_MatSize].m_bIsLeading     = false;
 						m_Panel[m_MatSize].m_bIsTrailing    = false;
-						m_Panel[m_MatSize].m_iPos     = 100;
+						m_Panel[m_MatSize].m_Pos = BODYSURFACE;
 						m_Panel[m_MatSize].m_iElement = m_MatSize;
 						m_Panel[m_MatSize].m_iSym     = -1;
 						m_Panel[m_MatSize].m_bIsLeftPanel  = true;
@@ -2031,7 +2031,7 @@ int QMiarex::CreateBodyElements()
 				m_Panel[m_MatSize].m_bIsInSymPlane  = false;
 				m_Panel[m_MatSize].m_bIsLeading     = false;
 				m_Panel[m_MatSize].m_bIsTrailing    = false;
-				m_Panel[m_MatSize].m_iPos     = 100;
+				m_Panel[m_MatSize].m_Pos = BODYSURFACE;
 				m_Panel[m_MatSize].m_iElement = m_MatSize;
 				m_Panel[m_MatSize].m_iSym     = -1;
 				m_Panel[m_MatSize].m_bIsLeftPanel  = true;
@@ -2127,7 +2127,7 @@ int QMiarex::CreateBodyElements()
 			m_Panel[m_MatSize].m_bIsInSymPlane  = false;
 			m_Panel[m_MatSize].m_bIsLeading     = false;
 			m_Panel[m_MatSize].m_bIsTrailing    = false;
-			m_Panel[m_MatSize].m_iPos = 100;
+			m_Panel[m_MatSize].m_Pos = BODYSURFACE;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 			m_Panel[m_MatSize].m_iSym = -1;
 			m_Panel[i].m_iSym = m_MatSize;
@@ -2178,7 +2178,7 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 	int n0, n1, n2, n3;
 
 	int InitialSize = m_MatSize;
-	int side;
+	enumPanelPosition side;
 	CVector LA, LB, TA, TB;
 
 	if ((!m_pCurWPolar && pSurface->m_bIsTipLeft) ||
@@ -2192,11 +2192,11 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 			m_Panel[m_MatSize].m_bIsWakePanel   = false;
 			m_Panel[m_MatSize].m_bIsInSymPlane  = false; //even if part of a fin
 
-			pSurface->GetPanel(0, l, -1);
+			pSurface->GetPanel(0, l, BOTSURFACE);
 			LA.Copy(pSurface->LA);
 			TA.Copy(pSurface->TA);
 
-			pSurface->GetPanel(0, l, +1);
+			pSurface->GetPanel(0, l, TOPSURFACE);
 			LB.Copy(pSurface->LA);
 			TB.Copy(pSurface->TA);
 
@@ -2232,7 +2232,7 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 				m_nNodes++;
 			}
 
-			m_Panel[m_MatSize].m_iPos = 50;
+			m_Panel[m_MatSize].m_Pos = SIDESURFACE;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 			m_Panel[m_MatSize].m_iSym  = -1;
 			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
@@ -2253,12 +2253,12 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 	for (k=0; k<pSurface->m_NYPanels; k++)
 	{
 		//add "horizontal" panels, mid side, or following a strip from bot to top if 3D Panel
-		if(!m_pCurWPolar)                                         side = -1;
-		else if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)        side =  0;
+		if(!m_pCurWPolar)                                         side = BOTSURFACE;
+		else if(m_pCurWPolar->m_AnalysisMethod==LLTMETHOD)        side = MIDSURFACE;
 		else
 		{
-			if(m_pCurWPolar->m_bThinSurfaces)				      side = 0;
-			else if (m_pCurWPolar->m_AnalysisMethod==PANELMETHOD) side =-1; //start with lower surf, as recommended by K&P
+			if(m_pCurWPolar->m_bThinSurfaces)				      side = MIDSURFACE;
+			else if (m_pCurWPolar->m_AnalysisMethod==PANELMETHOD) side = BOTSURFACE; //start with lower surf, as recommended by K&P
 		}
 		//from T.E. to L.E.
 		for (l=0; l<pSurface->m_NXPanels; l++)
@@ -2319,23 +2319,23 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 				m_nNodes++;
 			}
 
-			m_Panel[m_MatSize].m_iPos = side;
+			m_Panel[m_MatSize].m_Pos = side;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 			m_Panel[m_MatSize].m_iSym  = -1;
 			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
 
-			if(side==0)         m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
-			else if (side==-1)  m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
+			if(side==MIDSURFACE)        m_Panel[m_MatSize].SetFrame(pSurface->LA, pSurface->LB, pSurface->TA, pSurface->TB);
+			else if (side==BOTSURFACE)  m_Panel[m_MatSize].SetFrame(pSurface->LB, pSurface->LA, pSurface->TB, pSurface->TA);
 
 			// set neighbour panels
 			// valid only for Panel 2-sided Analysis
 			// we are on the bottom or middle surface
 			m_Panel[m_MatSize].m_iPD = m_MatSize-1;
 			m_Panel[m_MatSize].m_iPU = m_MatSize+1;
-			if(l==0)                                 m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
-			if(l==pSurface->m_NXPanels-1 && side==0) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
+			if(l==0)                                         m_Panel[m_MatSize].m_iPD = -1;// no panel downstream
+			if(l==pSurface->m_NXPanels-1 && side==MIDSURFACE) m_Panel[m_MatSize].m_iPU = -1;// no panel upstream
 
-			if(side !=0)
+			if(side!=MIDSURFACE)
 			{
 				//wings are modelled as thick surfaces
 				m_Panel[m_MatSize].m_iPL = m_MatSize + 2*pSurface->m_NXPanels;
@@ -2377,7 +2377,7 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 			(m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bThinSurfaces))
 		{ //add top side if 3D Panels
 
-			side = 1; //next upper surf, as recommended by K&P
+			side = TOPSURFACE; //next upper surf, as recommended by K&P
 			//from L.E. to T.E.
 			for (l=pSurface->m_NXPanels-1;l>=0; l--)
 			{
@@ -2424,7 +2424,7 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 					m_nNodes++;
 				}
 
-				m_Panel[m_MatSize].m_iPos = side;
+				m_Panel[m_MatSize].m_Pos = side;
 				m_Panel[m_MatSize].m_iElement = m_MatSize;
 				m_Panel[m_MatSize].m_iSym  = -1;
 				m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
@@ -2475,11 +2475,11 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 			m_Panel[m_MatSize].m_bIsWakePanel   = false;
 			m_Panel[m_MatSize].m_bIsInSymPlane  = false;//even if part of a fin
 
-			pSurface->GetPanel(k,l,1);
+			pSurface->GetPanel(k,l,TOPSURFACE);
 			LA.Copy(pSurface->LB);
 			TA.Copy(pSurface->TB);
 
-			pSurface->GetPanel(k,l,-1);
+			pSurface->GetPanel(k,l,BOTSURFACE);
 			LB.Copy(pSurface->LB);
 			TB.Copy(pSurface->TB);
 
@@ -2520,7 +2520,7 @@ int QMiarex::CreateWingElements(CSurface *pSurface)
 			m_Panel[m_MatSize].m_iPL = -1;
 			m_Panel[m_MatSize].m_iPR = -1;
 
-			m_Panel[m_MatSize].m_iPos = 50;
+			m_Panel[m_MatSize].m_Pos = SIDESURFACE;
 			m_Panel[m_MatSize].m_iElement = m_MatSize;
 			m_Panel[m_MatSize].m_iSym  = -1;
 			m_Panel[m_MatSize].m_bIsLeftPanel  = pSurface->m_bIsLeftSurf;
@@ -2634,7 +2634,7 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 
 		m_WakePanel[mw].Normal = LATB * TALB;
 
-		m_WakePanel[mw].m_iPos = 0;
+		m_WakePanel[mw].m_Pos = MIDSURFACE;
 		m_WakePanel[mw].m_bIsWakePanel = true;
 		m_WakePanel[mw].Area =  m_WakePanel[mw].Normal.VAbs()/2.0;
 		m_WakePanel[mw].Normal.Normalize();
@@ -2690,7 +2690,7 @@ void QMiarex::CreateWOpp(CWOpp *pWOpp, CWing *pWing)
 	pWOpp->m_NStation            = pWing->m_NStation;
 	pWOpp->m_NVLMPanels          = pWing->m_MatSize;
 	pWOpp->m_PlrName             = m_pCurWPolar->m_PlrName;
-	pWOpp->m_Type                = m_pCurWPolar->m_Type;
+	pWOpp->m_WPolarType          = m_pCurWPolar->m_WPolarType;
 	pWOpp->m_bVLM1               = m_pCurWPolar->m_bVLM1;
 	pWOpp->m_bThinSurface        = m_pCurWPolar->m_bThinSurfaces;
 	pWOpp->m_bTiltedGeom         = m_pCurWPolar->m_bTiltedGeom;
@@ -2857,12 +2857,10 @@ void QMiarex::CreateWPolarCurves()
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(k);
 		if (pWPolar->m_bIsVisible && pWPolar->m_Alpha.size()>0 &&
-		   ((m_bType1 && pWPolar->m_Type == FIXEDSPEEDPOLAR) ||
-			(m_bType2 && pWPolar->m_Type == FIXEDLIFTPOLAR) ||
-			(m_bType4 && pWPolar->m_Type == FIXEDAOAPOLAR) ||
-			(m_bType5 && pWPolar->m_Type == 5) ||
-			(m_bType6 && pWPolar->m_Type == 6) ||
-			(m_bType7 && pWPolar->m_Type == STABILITYPOLAR)))
+		   ((m_bType1 && pWPolar->m_WPolarType==FIXEDSPEEDPOLAR) ||
+			(m_bType2 && pWPolar->m_WPolarType==FIXEDLIFTPOLAR) ||
+			(m_bType4 && pWPolar->m_WPolarType==FIXEDAOAPOLAR) ||
+			(m_bType7 && pWPolar->m_WPolarType==STABILITYPOLAR)))
 		{
 
 			for(int ig=0; ig<4; ig++)
@@ -3047,7 +3045,7 @@ void QMiarex::CreateStabRungeKuttaCurves()
 	//We need a WOpp
 	if(!m_pCurWOpp) return;//nothing to plot
 	//Check that the current polar is of the stability type
-	if(!m_pCurWPolar || m_pCurWPolar->m_Type!=STABILITYPOLAR) return;
+	if(!m_pCurWPolar || m_pCurWPolar->m_WPolarType!=STABILITYPOLAR) return;
 
 	if(m_bLongitudinal) 
 	{
@@ -3208,7 +3206,7 @@ void QMiarex::CreateStabRLCurves()
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(k);
 		if ((pWPolar->m_bIsVisible||pWPolar->m_bShowPoints)
-			&& pWPolar->m_Alpha.size()>0 && (m_bType7 && pWPolar->m_Type == 7))
+			&& pWPolar->m_Alpha.size()>0 && (m_bType7 && pWPolar->m_WPolarType==STABILITYPOLAR))
 		{
 			pLongCurve1 = m_LongRLGraph.AddCurve();
 			pLongCurve2 = m_LongRLGraph.AddCurve();
@@ -3535,8 +3533,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 		
 		if(fabs(m_pCurWOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(m_pCurWOpp->m_Beta,5,'f',2);
 		else                             str4 ="";
-		if(m_pCurWOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(m_pCurWOpp->m_Ctrl,5,'f',2);
-		else                             str5 ="";
+		if(m_pCurWOpp->m_WPolarType==STABILITYPOLAR) str5 = QString("_Ctrl=%1").arg(m_pCurWOpp->m_Ctrl,5,'f',2);
+		else                                         str5 ="";
 
 
 		if(m_pCurWOpp->m_AnalysisMethod==LLTMETHOD)  str6="_LLT";
@@ -3628,8 +3626,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						
 						if(fabs(pWOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(pWOpp->m_Beta,5,'f',2);
 						else                        str4 ="";
-						if(pWOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pWOpp->m_Ctrl,5,'f',2);
-						else                        str5 ="";
+						if(pWOpp->m_WPolarType==STABILITYPOLAR) str5 = QString("_Ctrl=%1").arg(pWOpp->m_Ctrl,5,'f',2);
+						else                                    str5 ="";
 
 						if(pWOpp->m_AnalysisMethod==LLTMETHOD) str6 ="_LLT";
 						else if(pWOpp->m_AnalysisMethod==VLMMETHOD)
@@ -3684,8 +3682,8 @@ void QMiarex::DrawWOppLegend(QPainter &painter, QPoint place, int bottom)
 						
 						if(fabs(pPOpp->m_Beta)>0.0) str4 = QString("_b=%1").arg(pPOpp->m_Beta,5,'f',2);
 						else                        str4 ="";
-						if(pPOpp->m_Type>=5)        str5 = QString("_Ctrl=%1").arg(pPOpp->m_Ctrl,5,'f',2);
-						else                        str5 ="";
+						if(pPOpp->m_WPolarType==STABILITYPOLAR) str5 = QString("_Ctrl=%1").arg(pPOpp->m_Ctrl,5,'f',2);
+						else                                    str5 ="";
 						
 						if(pPOpp->m_PlaneWOpp[0].m_AnalysisMethod==VLMMETHOD)
 						{
@@ -3793,15 +3791,13 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			pWPolar = (CWPolar*)m_poaWPolar->at(l);
 
 			if (pWPolar->m_Alpha.size() &&
-				(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_Type==STABILITYPOLAR)) &&
-				((pWPolar->m_Type==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+				(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_WPolarType==STABILITYPOLAR)) &&
+				((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 				  pWPolar->m_UFOName == str.at(k) &&
-				((pWPolar->m_Type == 1 && m_bType1) ||
-				 (pWPolar->m_Type == 2 && m_bType2) ||
-				 (pWPolar->m_Type == 4 && m_bType4) ||
-				 (pWPolar->m_Type == 5 && m_bType5) ||
-				 (pWPolar->m_Type == 6 && m_bType6) ||
-				 (pWPolar->m_Type == 7 && m_bType7)))
+				((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
+				 (pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && m_bType2) ||
+				 (pWPolar->m_WPolarType==FIXEDAOAPOLAR   && m_bType4) ||
+				 (pWPolar->m_WPolarType==STABILITYPOLAR  && m_bType7)))
 			{
 					UFOPlrs++;
 			}
@@ -3830,15 +3826,13 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 				if(str.at(k) == pWPolar->m_UFOName)
 				{
 					if (pWPolar->m_Alpha.size() &&
-						(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_Type==STABILITYPOLAR)) &&
-						((pWPolar->m_Type==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+						(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_WPolarType==STABILITYPOLAR)) &&
+						((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 						  pWPolar->m_UFOName == str.at(k) &&
-						((pWPolar->m_Type == 1 && m_bType1) ||
-						 (pWPolar->m_Type == 2 && m_bType2) ||
-						 (pWPolar->m_Type == 4 && m_bType4) ||
-						 (pWPolar->m_Type == 5 && m_bType5) ||
-						 (pWPolar->m_Type == 6 && m_bType6) ||
-						 (pWPolar->m_Type == 7 && m_bType7)))
+						((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
+						 (pWPolar->m_WPolarType==FIXEDLIFTPOLAR && m_bType2) ||
+						 (pWPolar->m_WPolarType==FIXEDAOAPOLAR && m_bType4) ||
+						 (pWPolar->m_WPolarType==STABILITYPOLAR && m_bType7)))
 					{
 
 						LegendPen.setColor(pWPolar->m_Color);
@@ -4360,9 +4354,9 @@ CPOpp * QMiarex::GetPOpp(double x)
 		pPOpp = (CPOpp*)m_poaPOpp->at(i);
 		if ((pPOpp->m_PlaneName == m_pCurPlane->PlaneName()) && (pPOpp->m_PlrName == m_pCurWPolar->m_PlrName))
 		{
-			if     (m_pCurWPolar->m_Type<4 && fabs(pPOpp->m_Alpha - x)<0.005)               return pPOpp;
-			else if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR  && fabs(pPOpp->m_QInf - x)<0.005)  return pPOpp;
-			else if(m_pCurWPolar->m_Type==STABILITYPOLAR && fabs(pPOpp->m_Ctrl - x)<0.005)  return pPOpp;
+			if     (m_pCurWPolar->m_WPolarType< FIXEDAOAPOLAR && fabs(pPOpp->m_Alpha - x)<0.005)               return pPOpp;
+			else if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR  && fabs(pPOpp->m_QInf - x)<0.005)  return pPOpp;
+			else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR && fabs(pPOpp->m_Ctrl - x)<0.005)  return pPOpp;
 		}
 	}
 	return NULL;
@@ -4497,9 +4491,9 @@ CWOpp* QMiarex::GetWOpp(double x)
 		pWOpp = (CWOpp*)m_poaWOpp->at(i);
 		if ((pWOpp->m_WingName==m_pCurWing->WingName()) &&(pWOpp->m_PlrName==m_pCurWPolar->m_PlrName))
 		{
-			if(m_pCurWPolar->m_Type<4 && fabs(pWOpp->m_Alpha - x)<0.005)                   return pWOpp;
-			else if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR && fabs(pWOpp->m_QInf - x)<0.005)  return pWOpp;
-			else if(m_pCurWPolar->m_Type==STABILITYPOLAR && fabs(pWOpp->m_Ctrl - x)<0.005) return pWOpp;
+			if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR && fabs(pWOpp->m_Alpha - x)<0.005)                   return pWOpp;
+			else if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR && fabs(pWOpp->m_QInf - x)<0.005)  return pWOpp;
+			else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR && fabs(pWOpp->m_Ctrl - x)<0.005) return pWOpp;
 		}
 	}
 	return NULL;
@@ -4539,21 +4533,21 @@ void QMiarex::GLCallViewLists()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_LIGHT0);
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod ==3 && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
 	if(m_bMoments && m_pCurWOpp) glCallList(VLMMOMENTS);
 
-	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglStream)
+	if (m_pCurWOpp && m_bStream && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglStream)
 		glCallList(VLMSTREAMLINES);//streamlines are not rotated
 
-	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisMethod>=2 && !m_bResetglFlow)
+	if(m_pCurWOpp && m_bSpeeds && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD && !m_bResetglFlow)
 		glCallList(SURFACESPEEDS);
 
 	if (m_pCurWOpp) glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
 
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==3 && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
+	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
 		glCallList(WINGWAKEPANELS);
 
 
@@ -4569,11 +4563,11 @@ void QMiarex::GLCallViewLists()
 		glCallList(VLMVORTICES);
 	}
 
-	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+	if(m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 	{
 		glCallList(PANELCP);
 	}
-	if(m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+	if(m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 	{
 		glCallList(PANELFORCEARROWS);
 	}
@@ -4597,7 +4591,7 @@ void QMiarex::GLCallViewLists()
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
 
 		if(m_pCurPlane)  glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-		if(m_pCurBody)	 glCallList(BODYGEOM);
+		if(m_pCurBody)	 glCallList(GLBODYGEOM);
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 	}
 
@@ -4625,7 +4619,7 @@ void QMiarex::GLCallViewLists()
 		if(m_pCurBody)
 		{
 			if(m_pCurPlane)	glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-			glCallList(BODYSURFACES);
+			glCallList(GLBODYSURFACES);
 			if(m_pCurPlane)	glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 		}
 	}
@@ -4684,18 +4678,18 @@ void QMiarex::GLDraw3D()
 
 	if(m_bResetglBody && m_pCurBody)
 	{
-		if(glIsList(BODYGEOM))
+		if(glIsList(GLBODYGEOM))
 		{
-			glDeleteLists(BODYGEOM,2);
+			glDeleteLists(GLBODYGEOM,2);
 			m_GLList -=2;
 		}
 		if(m_pCurBody->m_LineType==BODYPANELTYPE)	    m_GL3dBody.GLCreateBody3DFlatPanels(m_pCurBody);
 		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) m_GL3dBody.GLCreateBody3DSplines(m_pCurBody);
 
 		m_bResetglBody = false;
-		if(glIsList(BODYMESHPANELS))
+		if(glIsList(GLBODYMESHPANELS))
 		{
-			glDeleteLists(BODYMESHPANELS,2);
+			glDeleteLists(GLBODYMESHPANELS,2);
 			m_GLList -=2;
 		}
 		m_GL3dBody.GLCreateBodyMesh(m_pCurBody);
@@ -4704,9 +4698,9 @@ void QMiarex::GLDraw3D()
 
 	if(m_bResetglBodyMesh && m_pCurBody)
 	{
-		if(glIsList(BODYMESHPANELS))
+		if(glIsList(GLBODYMESHPANELS))
 		{
-			glDeleteLists(BODYMESHPANELS,2);
+			glDeleteLists(GLBODYMESHPANELS,2);
 			m_GLList -=2;
 		}
 //		GLCreateBodyMesh();
@@ -4921,7 +4915,7 @@ void QMiarex::GLDraw3D()
 		if(m_bStream)
 		{
 			//no need to recalculate if not showing
-			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 			{
 				GLCreateStreamLines(this, m_pWingList, m_Node, m_pCurWPolar, m_pCurWOpp);
 				m_bResetglStream = false;
@@ -4938,7 +4932,7 @@ void QMiarex::GLDraw3D()
 		}
 		if(m_bSpeeds)
 		{
-			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2)
+			if(m_pCurWing && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 			{
 				GLCreateSurfSpeeds(this, m_Panel, m_pCurWPolar, m_pCurWOpp);
 				m_bResetglFlow = false;
@@ -5188,7 +5182,7 @@ void QMiarex::GLRenderView()
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 
-		if(m_pCurWOpp && m_pCurWOpp->m_Type==STABILITYPOLAR)
+		if(m_pCurWOpp && m_pCurWOpp->m_WPolarType==STABILITYPOLAR)
 		{
 			MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 			QString strong = QString(tr("Time =")+"%1s").arg(m_ModeTime,6,'f',3);
@@ -5244,7 +5238,7 @@ void QMiarex::GLRenderView()
 		glTranslated(m_glRotCenter.x, m_glRotCenter.y, m_glRotCenter.z);
 		if(m_bAxes)  pGLWidget->GLDrawAxes(1.0/m_glScaled, m_3DAxisColor, m_3DAxisStyle, m_3DAxisWidth);
 
-		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 		{
 			glTranslated(m_ModeState[0], m_ModeState[1], m_ModeState[2]);
 			glRotated(m_ModeState[3]*180.0/PI, 1.0, 0.0 ,0.0);
@@ -5266,13 +5260,13 @@ void QMiarex::GLRenderView()
 		if(m_pCurWing)			GLDrawWingLegend(this, m_pCurWing, m_pCurPlane, m_pCurWPolar); //glCallList(WINGLEGEND);
 		if(m_pCurWOpp)			GLDrawWOppLegend(this, m_pCurWing, m_pCurWOpp); // glCallList(WOPPLEGEND);
 
-		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
+		if (m_b3DCp && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 		{
 			GLDrawCpLegend(this);
 			//glCallList(WOPPCPLEGENDTXT);
 			glCallList(WOPPCPLEGENDCLR);
 		}
-		else if (m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=2 )
+		else if (m_bPanelForce && m_pCurWOpp && m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 		{
 			GLDrawPanelForceLegend(this, m_pCurWPolar,m_Panel,m_pCurWOpp, m_pCurPOpp);
 			//glCallList(PANELFORCELEGENDTXT);
@@ -5488,7 +5482,7 @@ CWOpp* QMiarex::InsertWOpp(CWOpp *pNewPoint)
 		{
 			if (pNewPoint->m_PlrName == pWOpp->m_PlrName)
 			{
-				if(pNewPoint->m_Type !=4)
+				if(pNewPoint->m_WPolarType!=FIXEDAOAPOLAR)
 				{
 					if(fabs(pNewPoint->m_Alpha - pWOpp->m_Alpha)<0.005)
 					{
@@ -5671,7 +5665,7 @@ void QMiarex::JoinSurfaces(CSurface *pLeftSurf, CSurface *pRightSurf, int pl, in
 	// Use VSAERO method
 	//
 
-	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisMethod!=3) return;//panel analysis only
+	if(!m_pCurWPolar || m_pCurWPolar->m_AnalysisMethod!=PANELMETHOD) return;//panel analysis only
 
 	//pl and pr are respectively the left surface's and the right surface's first panel index
 	int ls, lr, lclose, ppl, ppr;
@@ -6396,8 +6390,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 		m_WakeInterNodes    = pSettings->value("WakeInterNodes").toInt();
 		m_MaxWakeIter       = pSettings->value("MaxWakeIter").toInt();
-		CPanel::m_CtrlPos   = pSettings->value("CtrlPos").toDouble();
-		CPanel::m_VortexPos = pSettings->value("VortexPos").toDouble();
+		CPanel::s_CtrlPos   = pSettings->value("CtrlPos").toDouble();
+		CPanel::s_VortexPos = pSettings->value("VortexPos").toDouble();
 		m_CoreSize          = pSettings->value("CoreSize").toDouble();
 		m_MinPanelSize      = pSettings->value("MinPanelSize").toDouble();
 
@@ -6744,7 +6738,7 @@ void QMiarex::mousePressEvent(QMouseEvent *event)
 			if(m_r2DCltRect.contains(point)) p2DWidget->setFocus();
 			
 			if(m_pCurGraph && m_iView==WSTABVIEW && (m_iStabilityView==STABPOLARVIEW)
-			   && m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+			   && m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 			{
 				//first we try to see if the user intended to select a mode;
 				//if not, then we initiate the graph translation
@@ -6877,7 +6871,7 @@ void QMiarex::On3DView()
 	{
 		SetControls();
 		UpdateView();
-		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 		{
 			pMainFrame->m_pctrlStabViewWidget->show();
 		}
@@ -6901,7 +6895,7 @@ void QMiarex::On3DView()
 
 	pMainFrame->SetCentralWidget();
 
-	if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		pMainFrame->m_pctrlStabViewWidget->show();
 	}
@@ -7290,19 +7284,19 @@ void QMiarex::OnAnalyze()
 	// may sure that the latest parameters are loaded
 	OnReadAnalysisData();
 
-	if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
+	if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
 		V0     = m_QInfMin;
 		VMax   = m_QInfMax;
 		VDelta = m_QInfDelta;
 	}
-	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
+	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		V0     = m_ControlMin;
 		VMax   = m_ControlMax;
 		VDelta = m_ControlDelta;
 	}
-	else if(m_pCurWPolar->m_Type <4)
+	else if(m_pCurWPolar->m_WPolarType <FIXEDAOAPOLAR)
 	{
 		V0     = m_AlphaMin;
 		VMax   = m_AlphaMax;
@@ -7345,7 +7339,7 @@ void QMiarex::OnAnalyze()
 	}
 	else if(m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
 	{
-		if(m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6)
+		if(m_pCurWPolar->m_WPolarType>STABILITYPOLAR)
 		{
 			QString strong;
 			strong = tr("Control polars are not supported in XFLR5 v6.\nPlease use stability polars instead.");
@@ -7354,7 +7348,7 @@ void QMiarex::OnAnalyze()
 		}
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
-	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
+	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		PanelAnalyze(V0, VMax, VDelta, m_bSequence);
 	}
@@ -7452,7 +7446,7 @@ void QMiarex::OnAnimateModeSingle(bool bStep)
 		m_pTimerMode->stop();
 		return; //nothing to animate
 	}
-	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_Type==STABILITYPOLAR || !m_pCurWOpp)
+	if(!m_pCurWing || !m_pCurWPolar || !m_pCurWPolar->m_WPolarType==STABILITYPOLAR || !m_pCurWOpp)
 	{
 		m_pTimerMode->stop();
 		return; //nothing to animate
@@ -7612,7 +7606,7 @@ void QMiarex::OnAnimateWOppSingle()
 			}
 
 			//select current WOpp in Combobox
-			if(m_pCurWPolar->m_Type != 4) str = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
+			if(m_pCurWPolar->m_WPolarType!=FIXEDAOAPOLAR) str = QString("%1").arg(m_pCurWOpp->m_Alpha,8,'f',2);
 			else                          str = QString("%1").arg(m_pCurWOpp->m_QInf,8,'f',2);
 			pos = pMainFrame->m_pctrlWOpp->findText(str);
 			if(pos>=0) pMainFrame->m_pctrlWOpp->setCurrentIndex(pos);
@@ -7696,8 +7690,8 @@ void QMiarex::OnAdvancedSettings()
 	m_WAdvancedDlg.m_bKeepOutOpps    = m_bKeepOutOpps;
 	m_WAdvancedDlg.m_bLogFile        = m_bLogFile;
 	m_WAdvancedDlg.m_MinPanelSize    = m_MinPanelSize;
-	m_WAdvancedDlg.m_ControlPos      = CPanel::m_CtrlPos;
-	m_WAdvancedDlg.m_VortexPos       = CPanel::m_VortexPos;
+	m_WAdvancedDlg.m_ControlPos      = CPanel::s_CtrlPos;
+	m_WAdvancedDlg.m_VortexPos       = CPanel::s_VortexPos;
 	m_WAdvancedDlg.m_WakeInterNodes  = m_WakeInterNodes;
 	m_WAdvancedDlg.m_bVLM1           = m_bVLM1;
 
@@ -7719,8 +7713,8 @@ void QMiarex::OnAdvancedSettings()
 		m_bVLM1                = m_WAdvancedDlg.m_bVLM1;
 		m_InducedDragPoint     = m_WAdvancedDlg.m_InducedDragPoint;
 
-		CPanel::m_CtrlPos      = m_WAdvancedDlg.m_ControlPos;
-		CPanel::m_VortexPos    = m_WAdvancedDlg.m_VortexPos;
+		CPanel::s_CtrlPos      = m_WAdvancedDlg.m_ControlPos;
+		CPanel::s_VortexPos    = m_WAdvancedDlg.m_VortexPos;
 
 		if(m_WAdvancedDlg.m_bLogFile) m_bLogFile = true; else m_bLogFile = false;
 		m_bResetglWake    = true;
@@ -7898,7 +7892,7 @@ void QMiarex::OnDefineStabPolar()
 		pCurWPolar->m_CoGIzz          = m_StabPolarDlg.m_CoGIzz;
 		pCurWPolar->m_CoGIxz          = m_StabPolarDlg.m_CoGIxz;
 		
-		pCurWPolar->m_Type            = m_StabPolarDlg.m_PolarType;
+		pCurWPolar->m_WPolarType      = m_StabPolarDlg.m_WPolarType;
 		pCurWPolar->m_Beta            = m_StabPolarDlg.m_SideSlip;
 		pCurWPolar->m_BankAngle       = m_StabPolarDlg.m_BankAngle;
 		pCurWPolar->m_PlrName         = m_StabPolarDlg.m_WPolarName;
@@ -8055,7 +8049,7 @@ void QMiarex::OnDefineWPolar()
 			pNewWPolar->m_WArea = m_pCurWing->m_ProjectedArea;
 			if(m_pCurPlane && m_pCurPlane->BiPlane()) pNewWPolar->m_WArea += m_pCurPlane->Wing2()->m_ProjectedArea;
 		}
-		pNewWPolar->m_Type            = m_WngAnalysis.m_PolarType;
+		pNewWPolar->m_WPolarType      = m_WngAnalysis.m_WPolarType;
 		pNewWPolar->m_QInf            = m_WngAnalysis.m_QInf;
 		pNewWPolar->m_Mass            = m_WngAnalysis.m_Weight;
 		pNewWPolar->m_CoG             = m_WngAnalysis.m_CoG;
@@ -8956,7 +8950,7 @@ void QMiarex::OnExportCurWOpp()
 	strong = QString(tr("Bend. =")+sep+" %1\n\n").arg(m_pCurWOpp->m_MaxBending, 11, 'f', 6);
 	out << strong;
 
-	if(m_pCurWPolar->m_Type==STABILITYPOLAR)
+	if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		//export non dimensional stability derivatives
 		if(exporttype==1)
@@ -9118,7 +9112,7 @@ void QMiarex::OnExportCurWOpp()
 		}
 	}
 
-	if(m_pCurWOpp->m_AnalysisMethod>=2)
+	if(m_pCurWOpp->m_AnalysisMethod>=VLMMETHOD)
 	{
 		if(m_pCurPOpp) out << tr("Main Wing Cp Coefficients\n");
 		else           out << tr("Wing Cp Coefficients\n");
@@ -9154,7 +9148,7 @@ void QMiarex::OnExportCurWOpp()
 
 						for(l=0; l<m_pWingList[iw]->m_Surface[j].m_NXPanels * coef; l++)
 						{
-							if(m_pWingList[iw]->m_pPanel[p].m_iPos==0)
+							if(m_pWingList[iw]->m_pPanel[p].m_Pos==MIDSURFACE)
 							{
 								strong = QString(Format).arg(p,4).arg(m_pWingList[iw]->m_pPanel[p].CtrlPt.x,11,'e',3).arg(m_pWingList[iw]->m_pPanel[p].CtrlPt.y,11,'e',3).arg(m_pWingList[iw]->m_pPanel[p].CtrlPt.z,11,'e',3).arg(m_pWOpp[iw]->m_Cp[p],11,'f',4);
 							}
@@ -9429,7 +9423,7 @@ void QMiarex::OnHideAllWPolars()
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
 		pWPolar->m_bIsVisible = false;
-		if(pWPolar->m_Type==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
+		if(pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
 	}
 	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
 	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
@@ -9566,7 +9560,7 @@ void QMiarex::OnHideUFOWPolars()
 		if (pWPolar->m_UFOName == UFOName)
 		{
 			pWPolar->m_bIsVisible = false;
-			if(pWPolar->m_Type==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
+			if(pWPolar->m_WPolarType==STABILITYPOLAR) pWPolar->m_bShowPoints = false;
 		}
 	}
 
@@ -9982,7 +9976,7 @@ void QMiarex::OnReadAnalysisData()
 	m_bSequence = m_pctrlSequence->isChecked();
 	m_bInitLLTCalc = m_pctrlInitLLTCalc->isChecked();
 
-	if(m_pCurWPolar && m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
+	if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
 		m_QInfMin   = m_pctrlAlphaMin->Value()         /pMainFrame->m_mstoUnit;
 		m_QInfMax   = m_pctrlAlphaMax->Value()         /pMainFrame->m_mstoUnit;
@@ -9993,7 +9987,7 @@ void QMiarex::OnReadAnalysisData()
 			m_pctrlAlphaDelta->SetValue(1.0);
 		}
 	}
-	else if(m_pCurWPolar && (m_pCurWPolar->m_Type==5 || m_pCurWPolar->m_Type==6 || m_pCurWPolar->m_Type==STABILITYPOLAR))
+	else if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		m_ControlMin   = m_pctrlAlphaMin->Value()         /pMainFrame->m_mstoUnit;
 		m_ControlMax   = m_pctrlAlphaMax->Value()         /pMainFrame->m_mstoUnit;
@@ -11077,7 +11071,7 @@ void QMiarex::OnUFOInertia()
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
 		if(pWPolar->m_Alpha.size() && pWPolar->m_UFOName==UFOName && pWPolar->m_bAutoInertia)
 		{
-//			if(pWPolar->m_Type==STABILITYPOLAR)
+//			if(pWPolar->m_WPolarType==STABILITYPOLAR)
 //			{
 				bHasResults = true;
 				break;
@@ -11647,7 +11641,7 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 	int RightPos = m_r2DCltRect.right()-margin-fm.width(tr("abcdefghijklmnopqrstuvwxyz01234567"));
 	int ZPos	 = m_r2DCltRect.height()-13*dheight;
 
-	if(m_pCurWOpp && m_pCurWOpp->m_Type==STABILITYPOLAR) ZPos -=dheight;
+	if(m_pCurWOpp && m_pCurWOpp->m_WPolarType==STABILITYPOLAR) ZPos -=dheight;
 	if(m_pCurWOpp && m_pCurWOpp->m_bOut) ZPos -= dheight;
 	if(m_pCurWOpp) ZPos -= dheight*m_pCurWOpp->m_nFlaps;
 
@@ -11717,7 +11711,7 @@ void QMiarex::PaintCurWOppLegend(QPainter &painter)
 		if(l==1) {c=8, d=3;}
 		else if(l==2) {c=7, d=3;}
 		else {c=6, d=3;}
-		if(m_pCurWOpp->m_Type==STABILITYPOLAR)
+		if(m_pCurWOpp->m_WPolarType==STABILITYPOLAR)
 		{
 			Result = QString(QObject::tr("X_NP = %1 ")).arg(m_pCurWOpp->m_XNP*pMainFrame->m_mtoUnit, c,'f',d);
 			Result += str;
@@ -11961,14 +11955,14 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 
 	for(int iw=0; iw<MAXWINGS; iw++) m_pPanelDlg->m_pWingList[iw] = m_pWingList[iw];
 
-	if(m_pCurWPolar->m_Type==FIXEDAOAPOLAR)
+	if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
 	{
 		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 		m_pPanelDlg->m_QInf       = V0;
 		m_pPanelDlg->m_QInfMax    = VMax;
 		m_pPanelDlg->m_QInfDelta  = VDelta;
 	}
-	else if(m_pCurWPolar->m_Type==STABILITYPOLAR)
+	else if(m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		m_pPanelDlg->m_Alpha      = m_pCurWPolar->m_ASpec;
 
@@ -12082,8 +12076,8 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 		LATB = m_Node[iLA] - m_Node[iTB];
 		TALB = m_Node[iTA] - m_Node[iLB];
 
-		if(m_Panel[p].m_iPos==0 || m_Panel[p].m_iPos==1)	m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
-				else if (m_Panel[p].m_iPos==-1)					m_Panel[p].SetFrame(m_Node[iLB], m_Node[iLA], m_Node[iTB], m_Node[iTA]);
+		if(m_Panel[p].m_Pos==MIDSURFACE || m_Panel[p].m_Pos==TOPSURFACE) m_Panel[p].SetFrame(m_Node[iLA], m_Node[iLB], m_Node[iTA], m_Node[iTB]);
+		else if (m_Panel[p].m_Pos==BOTSURFACE)                           m_Panel[p].SetFrame(m_Node[iLB], m_Node[iLA], m_Node[iTB], m_Node[iTA]);
 	}
 
 	// the wake array is not rotated but translated to remain at the wing's trailing edge
@@ -12150,8 +12144,8 @@ void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CV
 		LATB = pNode[iLA] - pNode[iTB];
 		TALB = pNode[iTA] - pNode[iLB];
 
-		if(pPanel[p].m_iPos>=0)	       pPanel[p].SetFrame(pNode[iLA], pNode[iLB], pNode[iTA], pNode[iTB]);
-		else if (pPanel[p].m_iPos==-1) pPanel[p].SetFrame(pNode[iLB], pNode[iLA], pNode[iTB], pNode[iTA]);
+		if(pPanel[p].m_Pos>=MIDSURFACE)       pPanel[p].SetFrame(pNode[iLA], pNode[iLB], pNode[iTA], pNode[iTB]);
+		else if (pPanel[p].m_Pos==BOTSURFACE) pPanel[p].SetFrame(pNode[iLB], pNode[iLA], pNode[iTB], pNode[iTA]);
 	}
 
 	// the wake array is not rotated but translated to remain at the wing's trailing edge
@@ -12370,8 +12364,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 
 		pSettings->setValue("WakeInterNodes", m_WakeInterNodes);
 		pSettings->setValue("MaxWakeIter", m_MaxWakeIter);
-		pSettings->setValue("CtrlPos", CPanel::m_CtrlPos);
-		pSettings->setValue("VortexPos", CPanel::m_VortexPos);
+		pSettings->setValue("CtrlPos",   CPanel::s_CtrlPos);
+		pSettings->setValue("VortexPos", CPanel::s_VortexPos);
 		pSettings->setValue("CoreSize", m_CoreSize);
 		pSettings->setValue("MinPanelSize", m_MinPanelSize);
 		pSettings->setValue("TotalTime", m_TotalTime);
@@ -12383,7 +12377,6 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("TimeIn2", m_TimeInput[2]);
 		pSettings->setValue("TimeIn3", m_TimeInput[3]);
 		pSettings->setValue("DynamicsMode", m_bLongitudinal);
-//		pSettings->setValue("ForcedResponse", m_bForcedResponse);
 		pSettings->setValue("StabCurveType",m_StabilityResponseType);
 		
 		pSettings->setValue("StabTimeView", m_iStabTimeView);
@@ -12680,19 +12673,19 @@ void QMiarex::SetAnalysisParams()
 	m_pctrlInitLLTCalc->setChecked(m_bInitLLTCalc);
 	m_pctrlStoreWOpp->setChecked(m_bStoreWOpp);
 
-	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->m_Type <3))
+	if (!m_pCurWPolar || (m_pCurWPolar && m_pCurWPolar->m_WPolarType <FIXEDAOAPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_AlphaMin);
 		m_pctrlAlphaMax->SetValue(m_AlphaMax);
 		m_pctrlAlphaDelta->SetValue(m_AlphaDelta);
 	}
-	else if(m_pCurWPolar  && m_pCurWPolar->m_Type ==FIXEDAOAPOLAR)
+	else if(m_pCurWPolar  && m_pCurWPolar->m_WPolarType ==FIXEDAOAPOLAR)
 	{
 		m_pctrlAlphaMin->SetValue(m_QInfMin*pMainFrame->m_mstoUnit);
 		m_pctrlAlphaMax->SetValue(m_QInfMax*pMainFrame->m_mstoUnit);
 		m_pctrlAlphaDelta->SetValue(m_QInfDelta*pMainFrame->m_mstoUnit);
 	}
-	else if(m_pCurWPolar && (m_pCurWPolar->m_Type==STABILITYPOLAR))
+	else if(m_pCurWPolar && (m_pCurWPolar->m_WPolarType==STABILITYPOLAR))
 	{
 		m_pctrlAlphaMin->SetValue(m_ControlMin);
 		m_pctrlAlphaMax->SetValue(m_ControlMax);
@@ -12784,13 +12777,13 @@ void QMiarex::SetCurveParams()
 	
 	if(m_pCurWPolar)
 	{
-		if(m_pCurWPolar->m_Type<4)
+		if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR)
 		{
 			m_pctrlUnit1->setText(QString::fromUtf8("°"));
 			m_pctrlUnit2->setText(QString::fromUtf8("°"));
 			m_pctrlUnit3->setText(QString::fromUtf8("°"));
 		}
-		else if(m_pCurWPolar->m_Type==4)
+		else if(m_pCurWPolar->m_WPolarType==FIXEDAOAPOLAR)
 		{
 			QString str;
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
@@ -13441,13 +13434,13 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 		if(m_pCurWPolar) m_pCurWPolar->m_AMem = m_pCurPOpp->m_Alpha;
 
 		//select m_pCurPOpp in the listbox
-		if(m_pCurWPolar->m_Type < 4)                    pMainFrame->SelectWOpp(m_pCurPOpp->m_Alpha);
-		else if(m_pCurWPolar->m_Type == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurPOpp->m_QInf);
-		else if(m_pCurWPolar->m_Type == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurPOpp->m_Ctrl);
+		if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR)          pMainFrame->SelectWOpp(m_pCurPOpp->m_Alpha);
+		else if(m_pCurWPolar->m_WPolarType == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurPOpp->m_QInf);
+		else if(m_pCurWPolar->m_WPolarType == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurPOpp->m_Ctrl);
 		;
 
 		//if we have a type 7 polar, set the panels in the control's position
-		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 		{
 			//set the controls
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
@@ -13641,7 +13634,7 @@ void QMiarex::SetUFO(QString UFOName, bool bNoPolar)
 	for(i=0; i<m_poaWPolar->size(); i++)
 	{
 		pWPolar = (CWPolar*)m_poaWPolar->at(i);
-		if(pWPolar->m_Type==STABILITYPOLAR)
+		if(pWPolar->m_WPolarType==STABILITYPOLAR)
 		{
 			pWPolar->m_AnalysisMethod=PANELMETHOD;
 			if(fabs(pWPolar->m_Mass)<PRECISION)
@@ -14107,7 +14100,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 
 	if(m_pCurWPolar && m_pCurWPolar->m_UFOName==UFOName)
 	{
-		if(m_pCurWPolar->m_AnalysisMethod>1)
+		if(m_pCurWPolar->m_AnalysisMethod>LLTMETHOD)
 		{
 			for(int iw=0; iw<MAXWINGS; iw++)
 			{
@@ -14220,7 +14213,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 	m_pPanelDlg->m_NSurfaces   = m_NSurfaces;
 	m_pPanelDlg->m_NWakeColumn = m_NWakeColumn;
 
-	if(m_pCurWPolar) pMainFrame->m_pctrlStabViewWidget->setVisible(m_pCurWPolar->m_Type==STABILITYPOLAR);
+	if(m_pCurWPolar) pMainFrame->m_pctrlStabViewWidget->setVisible(m_pCurWPolar->m_WPolarType==STABILITYPOLAR);
 
 	QApplication::restoreOverrideCursor();
 }
@@ -14394,12 +14387,12 @@ bool QMiarex::SetWOpp(bool bCurrent, double x)
 //		m_WakePanelFactor =		m_pCurWOpp->m_WakeFactor;
 
 		//select m_pCurWOpp in the listbox
-		if(m_pCurWPolar->m_Type < 4)                    pMainFrame->SelectWOpp(m_pCurWOpp->m_Alpha);
-		else if(m_pCurWPolar->m_Type == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurWOpp->m_QInf);
-		else if(m_pCurWPolar->m_Type == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurWOpp->m_Ctrl);
+		if(m_pCurWPolar->m_WPolarType<FIXEDAOAPOLAR)          pMainFrame->SelectWOpp(m_pCurWOpp->m_Alpha);
+		else if(m_pCurWPolar->m_WPolarType == FIXEDAOAPOLAR)  pMainFrame->SelectWOpp(m_pCurWOpp->m_QInf);
+		else if(m_pCurWPolar->m_WPolarType == STABILITYPOLAR) pMainFrame->SelectWOpp(m_pCurWOpp->m_Ctrl);
 
 		//if we have a type 7 polar, set the panels in the control's position
-		if(m_pCurWPolar && m_pCurWPolar->m_Type==STABILITYPOLAR)
+		if(m_pCurWPolar && m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 		{
 			//set the controls
 			m_pPanelDlg->m_pWPolar        = m_pCurWPolar;
@@ -14985,12 +14978,6 @@ void QMiarex::UpdateView()
 }
 
 
-
-bool QMiarex::VLMIsSameSide(int p, int pp)
-{
-	if(m_Panel[p].m_iPos==m_Panel[pp].m_iPos) return true;
-	return false;
-}
 
 
 void QMiarex::wheelEvent(QWheelEvent *event)

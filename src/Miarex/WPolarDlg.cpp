@@ -44,12 +44,13 @@ WPolarDlg::WPolarDlg()
 	m_WPolarName = "WPolar Name";
 
 	m_bAutoName = true;
-	
+
+	m_WPolarType = FIXEDSPEEDPOLAR;
+
 	m_QInf       = 10.0;//m/s
 	m_Weight     = 0.0;
 	m_Alpha      = 0.0;
 	m_Beta       = 0.0;
-	m_PolarType  = FIXEDSPEEDPOLAR;
 	m_WingLoad   = 0.0;
 	m_Density    = 1.225;
 	m_Viscosity  = 1.5e-5;
@@ -122,7 +123,7 @@ void WPolarDlg::Connect()
 
 void WPolarDlg::EnableControls()
 {
-	switch (m_PolarType)
+	switch (m_WPolarType)
 	{
 		case 1:
 		{
@@ -175,7 +176,7 @@ void WPolarDlg::InitDialog()
 
 	if(m_pPlane)
 	{
-		if(m_AnalysisMethod==0 || m_AnalysisMethod==1) m_AnalysisMethod=VLMMETHOD;
+		m_AnalysisMethod=VLMMETHOD;
 //		m_pctrlWingMethod1->setEnabled(false);
 		m_pctrlAnalysisControls->setCurrentIndex(1);
 	}
@@ -202,9 +203,9 @@ void WPolarDlg::InitDialog()
 	if(m_UnitType==1) m_pctrlUnit1->setChecked(true);
 	else              m_pctrlUnit2->setChecked(true);
 
-	if(m_PolarType==FIXEDSPEEDPOLAR)     m_pctrlType1->setChecked(true);
-	else if(m_PolarType==FIXEDLIFTPOLAR) m_pctrlType2->setChecked(true);
-	else if(m_PolarType==FIXEDAOAPOLAR)  m_pctrlType4->setChecked(true);
+	if(m_WPolarType==FIXEDSPEEDPOLAR)     m_pctrlType1->setChecked(true);
+	else if(m_WPolarType==FIXEDLIFTPOLAR) m_pctrlType2->setChecked(true);
+	else if(m_WPolarType==FIXEDAOAPOLAR)  m_pctrlType4->setChecked(true);
 
 
 	OnUnit();
@@ -250,7 +251,7 @@ void WPolarDlg::InitDialog()
 	if(bWarning)
 	{
 //		m_pctrlWingMethod4->setEnabled(false);
-		if(m_AnalysisMethod==3) m_AnalysisMethod=2;
+		if(m_AnalysisMethod==PANELMETHOD) m_AnalysisMethod=VLMMETHOD;
 	}
 
 	if(m_bViscous)		m_pctrlViscous->setChecked(true);
@@ -259,7 +260,6 @@ void WPolarDlg::InitDialog()
 
 	OnTiltedGeom();
 
-	if(m_AnalysisMethod==0) m_AnalysisMethod=VLMMETHOD;//former m_bLLT=false;
 	if(m_AnalysisMethod==LLTMETHOD)
 	{
 		m_pctrlWingMethod1->setChecked(true);
@@ -493,7 +493,7 @@ void WPolarDlg::OnOK()
 		}
 	}
 
-	if(fabs(m_Weight)<PRECISION && m_PolarType==FIXEDLIFTPOLAR)
+	if(fabs(m_Weight)<PRECISION && m_WPolarType==FIXEDLIFTPOLAR)
 	{
 		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 2 polars"));
 		m_pctrlWeight->setFocus();
@@ -541,15 +541,15 @@ void WPolarDlg::OnWPolarType()
 {
 	if (m_pctrlType1->isChecked())
 	{
-		m_PolarType = 1;
+		m_WPolarType = FIXEDSPEEDPOLAR;
 	}
 	else if(m_pctrlType2->isChecked())
 	{
-		m_PolarType = 2;
+		m_WPolarType = FIXEDLIFTPOLAR;
 	}
 	else if(m_pctrlType4->isChecked())
 	{
-		m_PolarType = 4;
+		m_WPolarType = FIXEDAOAPOLAR;
 	}
 	EnableControls();
 	SetReynolds();
@@ -864,17 +864,17 @@ void WPolarDlg::SetWPolarName()
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
-	if (m_PolarType==FIXEDSPEEDPOLAR)
+	if (m_WPolarType==FIXEDSPEEDPOLAR)
 	{
 		GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 		m_WPolarName = QString("T1-%1 ").arg(m_QInf * pMainFrame->m_mstoUnit,0,'f',1);
 		m_WPolarName += str;
 	}
-	else if(m_PolarType==FIXEDLIFTPOLAR)
+	else if(m_WPolarType==FIXEDLIFTPOLAR)
 	{
 		m_WPolarName = QString("T2");
 	}
-	else if(m_PolarType==FIXEDAOAPOLAR)
+	else if(m_WPolarType==FIXEDAOAPOLAR)
 	{
 		m_WPolarName = QString(QString::fromUtf8("T4-%1°")).arg(m_Alpha,0,'f',3);
 	}
@@ -896,16 +896,11 @@ void WPolarDlg::SetWPolarName()
 		}
 	}
 
-/*	if(m_bThinSurfaces && m_AnalysisMethod==3)
-	{
-		m_WPolarName += "-Thin";
-	}*/
-
 	if(!m_bPlaneInertia)
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
 		strong = QString("-%1").arg(m_Weight*pMainFrame->m_kgtoUnit,0,'f',3);
-		if(m_PolarType==FIXEDLIFTPOLAR)   m_WPolarName += strong+str;
+		if(m_WPolarType==FIXEDLIFTPOLAR)   m_WPolarName += strong+str;
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
 		strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
 		m_WPolarName += strong + str;
@@ -954,7 +949,7 @@ void WPolarDlg::SetReynolds()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	GetSpeedUnit(strUnit, pMainFrame->m_SpeedUnit);
 
-	if (m_PolarType ==FIXEDSPEEDPOLAR)
+	if (m_WPolarType ==FIXEDSPEEDPOLAR)
 	{
 		double RRe = m_pWing->m_TChord[0] * m_QInf/m_Viscosity;
 		ReynoldsFormat(str, RRe);
@@ -968,7 +963,7 @@ void WPolarDlg::SetReynolds()
 
 		m_pctrlQInfCl->setText(" ");
 	}
-	else if (m_PolarType ==FIXEDLIFTPOLAR)
+	else if (m_WPolarType ==FIXEDLIFTPOLAR)
 	{
 		double area;
 		if (m_RefAreaType==1) area =m_pWing->m_PlanformArea;
@@ -989,7 +984,7 @@ void WPolarDlg::SetReynolds()
 		strange = tr("Tip Re.sqrt(Cl) =");
 		m_pctrlSRe->setText(strange+str);
 	}
-	else if (m_PolarType ==FIXEDAOAPOLAR)
+	else if (m_WPolarType ==FIXEDAOAPOLAR)
 	{
 		m_pctrlQInfCl->setText(" ");
 		m_pctrlRRe->setText(" ");

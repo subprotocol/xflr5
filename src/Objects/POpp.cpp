@@ -34,7 +34,7 @@ CPOpp::CPOpp()
 	m_Color       = QColor(255,0,0);
 	m_Style       = 0;
 	m_Width       = 1;
-	m_Type        = 1;
+	m_WPolarType  = FIXEDSPEEDPOLAR;
 	m_VLMType     = 1;
 
 	m_bIsVisible  = true;
@@ -95,7 +95,14 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar << m_Style << m_Width;
 		WriteCOLORREF(ar, m_Color);
-		ar << m_Type << m_NStation;
+
+		if(m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+		else if(m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+		else if(m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(m_WPolarType==STABILITYPOLAR)  ar<<7;
+		else ar << 0;
+
+		ar << m_NStation;
 		ar << (float)m_Alpha << (float)m_QInf << 0.0f;//<< (float)m_Weight;
 		ar << (float)m_Beta;
 
@@ -166,7 +173,16 @@ bool CPOpp::SerializePOpp(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ar >> m_Style >> m_Width;
 		ReadCOLORREF(ar, m_Color);
-		ar >> m_Type >> m_NStation;
+
+		ar >>k;
+		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
+		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
+		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
+		else if(k==7) m_WPolarType = STABILITYPOLAR;
+		else return false;
+
+
+		ar >> m_NStation;
 		ar >> f;		m_Alpha = f;
 		ar >> f;        m_QInf  = f;
 		ar >> f;//        m_Weight = f;

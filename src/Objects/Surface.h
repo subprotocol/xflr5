@@ -48,7 +48,7 @@ public:
 	void GetLeadingPt(int k, CVector &C);
 	void GetNormal(double yrel, CVector &N);
 	void GetTrailingPt(int k, CVector &C);
-	void GetPanel(int const &k, int const &l, int const &pos);
+	void GetPanel(int const &k, int const &l, const enumPanelPosition &pos);
 	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, int const &pos=0);
 	void GetPoint(double const &xArel, double const &xBrel, double const &yrel, CVector &Point, CVector &PtNormal, int const &pos=0);
 	void GetSection(double const &tau, double &Chord, double &Area, CVector &PtC4);

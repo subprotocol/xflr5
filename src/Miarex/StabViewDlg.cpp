@@ -149,7 +149,7 @@ void StabViewDlg::FillEigenThings()
 
 	QString ModeDescription = tr("Mode Properties:")+"\n";
 
-	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWPolar->m_Type==STABILITYPOLAR)
+	if(pMiarex->m_pCurWing && pMiarex->m_pCurWOpp && pMiarex->m_pCurWPolar->m_WPolarType==STABILITYPOLAR)
 	{
 		//We normalize the mode before display and only for display purposes
 		u0   = pMiarex->m_pCurWOpp->m_QInf;
@@ -885,7 +885,7 @@ void StabViewDlg::SetControls()
 	m_pctrlLongDynamics->setChecked(pMiarex->m_bLongitudinal);
 	m_pctrlLatDynamics->setChecked(!pMiarex->m_bLongitudinal);
 
-	if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->m_Type!=7)
+	if(pMiarex->m_pCurWPolar && pMiarex->m_pCurWPolar->m_WPolarType!=STABILITYPOLAR)
 	{
 //		m_pControlModel->setRowCount(0);
 	}
@@ -956,7 +956,7 @@ void StabViewDlg::SetControls()
 	//   - the polar's type is 7
 	//   - we have an active wopp
 	//   - the StabilityView is0
-	bool bEnableTimeCtrl = pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_Type==7 && pMiarex->m_iStabilityView==0;
+	bool bEnableTimeCtrl = pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_WPolarType==STABILITYPOLAR && pMiarex->m_iStabilityView==0;
 	m_pctrlAddCurve->setEnabled(bEnableTimeCtrl);
 	m_pctrlRenameCurve->setEnabled(m_pctrlCurveList->count());
 	m_pctrlPlotStabGraph->setEnabled(m_pctrlCurveList->count());
@@ -979,7 +979,7 @@ void StabViewDlg::SetControls()
 	//   - the polar's type is 7
 	//   - we have an active wopp
 	//   - the StabilityView is 3
-	bool bEnable3DAnimation = pMiarex->m_iStabilityView==3 && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_Type==7;
+	bool bEnable3DAnimation = pMiarex->m_iStabilityView==3 && pMiarex->m_pCurWOpp && pMiarex->m_pCurWOpp->m_WPolarType==STABILITYPOLAR;
 	m_pctrlAnimate->setEnabled(bEnable3DAnimation);
 	m_pctrlAnimateRestart->setEnabled(bEnable3DAnimation);
 	m_pctrlAnimationAmplitude->setEnabled(bEnable3DAnimation);

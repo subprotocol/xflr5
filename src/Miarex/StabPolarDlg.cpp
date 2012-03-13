@@ -76,7 +76,7 @@ StabPolarDlg::StabPolarDlg()
 	m_nControls = 0;
 	
 	m_bViscous  = true;
-	m_PolarType = STABILITYPOLAR;
+	m_WPolarType = STABILITYPOLAR;
 
 	m_WPolarName = "T7";
 	SetupLayout();

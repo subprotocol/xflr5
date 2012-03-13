@@ -306,8 +306,10 @@ CPolar * BatchThreadDlg::CreatePolar(CFoil *pFoil, double Spec, double Mach, dou
 	CPolar *pNewPolar = new CPolar;
 	pNewPolar->m_FoilName   = pFoil->m_FoilName;
 	pNewPolar->m_bIsVisible = true;
-	pNewPolar->m_Type = m_Type;
-	switch (pNewPolar->m_Type)
+
+	pNewPolar->m_PolarType = m_PolarType;
+
+	switch (pNewPolar->m_PolarType)
 	{
 		case 1:
 			pNewPolar->m_MaType = 1;
@@ -330,7 +332,7 @@ CPolar * BatchThreadDlg::CreatePolar(CFoil *pFoil, double Spec, double Mach, dou
 			pNewPolar->m_MaType = 1;
 			break;
 	}
-	if(m_Type !=4)  pNewPolar->m_Reynolds = Spec;
+	if(m_PolarType!=FIXEDAOAPOLAR)  pNewPolar->m_Reynolds = Spec;
 	else            pNewPolar->m_ASpec    = Spec;
 
 	pNewPolar->m_Mach  = Mach;
@@ -387,7 +389,7 @@ void BatchThreadDlg::InitDialog()
 {
 	if(!m_pCurFoil) return;
 
-	m_Type = FIXEDSPEEDPOLAR; //no choice...
+	m_PolarType = FIXEDSPEEDPOLAR; //no choice...
 
 	m_pctrlFoil1->setChecked(s_bCurrentFoil);
 	m_pctrlFoil2->setChecked(!s_bCurrentFoil);
@@ -437,7 +439,7 @@ void BatchThreadDlg::InitDialog()
 
 void BatchThreadDlg::OnAcl()
 {
-	if(m_Type==4) return;
+	if(m_PolarType==FIXEDAOAPOLAR) return;
 	m_bAlpha = m_pctrlAlpha->isChecked();
 	if(m_bAlpha)
 	{
@@ -610,7 +612,7 @@ void BatchThreadDlg::ReadParams()
 {
 	m_bAlpha = m_pctrlAlpha->isChecked();
 
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		m_ReInc = m_pctrlReDelta->Value();
 		m_ReMax = m_pctrlReMax->Value();
@@ -675,18 +677,18 @@ void BatchThreadDlg::SetFileHeader()
 
 void BatchThreadDlg::SetPlrName(CPolar *pNewPolar)
 {
-	if(m_Type !=4)
+	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
 		double R = pNewPolar->m_Reynolds/1000000.;
 		pNewPolar->m_PlrName = QString("T%1_Re%2_M%3")
-								 .arg(pNewPolar->m_Type)
+								 .arg(pNewPolar->m_PolarType)
 								 .arg(R,0,'f',3)
 								 .arg( pNewPolar->m_Mach,0,'f',2);
 	}
 	else
 	{
 		pNewPolar->m_PlrName = QString("T%1_Al%2_M%3")
-								 .arg(pNewPolar->m_Type)
+								 .arg(pNewPolar->m_PolarType)
 								 .arg(pNewPolar->m_ASpec,5,'f',2)
 								 .arg(pNewPolar->m_Mach,0,'f',2);
 	}

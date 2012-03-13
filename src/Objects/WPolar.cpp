@@ -50,8 +50,8 @@ CWPolar::CWPolar()
 	m_TotalWakeLength = 1.0;
 	m_WakePanelFactor =1.1;
 
-	m_AnalysisMethod = 0;
-	m_Type   = FIXEDSPEEDPOLAR;
+	m_AnalysisMethod = LLTMETHOD;
+	m_WPolarType   = FIXEDSPEEDPOLAR;
 	m_RefAreaType = 1;
 	m_Style  = 0;
 	m_Width  = 1;
@@ -94,9 +94,9 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 	{
 		for (i=0; i<size; i++)
 		{
-			if(m_Type <4)
+			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
-				if (fabs(pPOpp->m_Alpha - m_Alpha[i]) < 0.001)
+				if (fabs(pPOpp->m_Alpha-m_Alpha[i]) < 0.001)
 				{
 					// then erase former result
 					m_Alpha[i]      =  pWOpp->m_Alpha;
@@ -177,7 +177,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					break;
 				}
 			}
-			else if(m_Type==FIXEDAOAPOLAR)
+			else if(m_WPolarType==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
 				if (fabs(pPOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -260,7 +260,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 					break;
 				}
 			}
-			else if(m_Type==STABILITYPOLAR)
+			else if(m_WPolarType==STABILITYPOLAR)
 			{
 				// Control or stability analysis, sort by control value
 				if (fabs(pPOpp->m_Alpha - m_Alpha[i])<0.0001)
@@ -417,7 +417,7 @@ void CWPolar::AddPoint(CPOpp *pPOpp)
 		m_Oswald.append(0.0);
 		m_SM.append(0.0);
 
-		if(m_Type==STABILITYPOLAR)
+		if(m_WPolarType==STABILITYPOLAR)
 		{
 			//store the eigenthings
 			for (l=0; l<8; l++) m_EigenValue[l][size] = pWOpp->m_EigenValue[l];
@@ -437,7 +437,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 	{
 		for (i=0; i<size; i++)
 		{
-			if(m_Type <4)
+			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
 				if (fabs(pWOpp->m_Alpha - m_Alpha[i]) < 0.001)
 				{
@@ -521,7 +521,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else if (m_Type==FIXEDAOAPOLAR)
+			else if (m_WPolarType==FIXEDAOAPOLAR)
 			{
 				// type 4, sort by speed
 				if (fabs(pWOpp->m_QInf - m_QInfinite[i]) < 0.001)
@@ -606,7 +606,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 					break;
 				}
 			}
-			else if (m_Type==STABILITYPOLAR)
+			else if (m_WPolarType==STABILITYPOLAR)
 			{
 				// Control or Stability Polar, sort by crescending ctrl value
 				if (fabs(pWOpp->m_Alpha - m_Alpha[i])<0.0001)
@@ -762,7 +762,7 @@ void CWPolar::AddPoint(CWOpp *pWOpp)
 		m_Oswald.append(0.0);
 		m_SM.append(0.0);
 
-		if(m_Type==STABILITYPOLAR)
+		if(m_WPolarType==STABILITYPOLAR)
 		{
 			int size = m_Alpha.size();
 			if(size>=MAXPOLARPOINTS) return;
@@ -788,7 +788,7 @@ void CWPolar::AddPoint(double alpha, double CL,  double ICd, double PCd, double 
 	{
 		for (i=0; i<size; i++)
 		{
-			if(m_Type <4)
+			if(m_WPolarType<FIXEDAOAPOLAR)
 			{
 				if (fabs(alpha - m_Alpha[i]) < 0.001)
 				{
@@ -1127,12 +1127,12 @@ void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 			GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
 			str +="\n\n";
 
-			if(m_Type==FIXEDSPEEDPOLAR)
+			if(m_WPolarType==FIXEDSPEEDPOLAR)
 			{
 				strong = QString("Freestream speed : %1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
 				strong +=str + "\n";
 			}
-			else if(m_Type==FIXEDAOAPOLAR)
+			else if(m_WPolarType==FIXEDAOAPOLAR)
 			{
 				strong = QString("Alpha = %1").arg(m_ASpec) + QString::fromUtf8("°") + "\n";
 			}
@@ -1482,7 +1482,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	int n;
 	float f,r0,r1,r2,r3,i0,i1,i2,i3;
-	int i, j;
+	int i, j, k;
 
 	m_PolarFormat = 1022;
 	// 1022 : added XNP position and provision for 50 more variables
@@ -1518,7 +1518,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << (float)m_WArea << (float)m_WMAChord << (float)m_WSpan ;
 		ar << m_Style  << m_Width;
 		WriteCOLORREF(ar, m_Color);
-		ar << m_AnalysisMethod;
+
+		if(m_AnalysisMethod==LLTMETHOD)        ar<<1;
+		else if(m_AnalysisMethod==VLMMETHOD)   ar<<2;
+		else if(m_AnalysisMethod==PANELMETHOD) ar<<3;
+		else                                   ar<<0;
+
 		if (m_bVLM1)         ar << 1; else ar << 0;
 		if (m_bThinSurfaces) ar << 1; else ar << 0;
 		if (m_bTiltedGeom)   ar << 1; else ar << 0;
@@ -1531,7 +1536,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		if (m_bIsVisible)  ar << 1; else ar << 0;
 		if (m_bShowPoints) ar << 1; else ar << 0;
-		ar << m_Type;
+
+		if(m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+		else if(m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+		else if(m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(m_WPolarType==STABILITYPOLAR)  ar<<7;
+		else ar << 0;
+
 		ar << (float)m_QInf;
 		ar << (float)m_Mass;
 		ar << (float)m_ASpec ;
@@ -1627,10 +1638,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		ReadCOLORREF(ar, m_Color);
 
-		ar >> m_AnalysisMethod;
-		if (m_AnalysisMethod<0 || m_AnalysisMethod>10) return false;
+		ar>>k;
+		if(k==1)      m_AnalysisMethod=LLTMETHOD;
+		else if(k==2) m_AnalysisMethod=VLMMETHOD;
+		else if(k==3) m_AnalysisMethod=PANELMETHOD;
+		else return false;
 
-		if(m_AnalysisMethod==0 || m_AnalysisMethod==2)
+		if(m_AnalysisMethod==VLMMETHOD)
 		{
 			m_AnalysisMethod=PANELMETHOD;
 			m_bThinSurfaces = true;
@@ -1698,9 +1712,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if(n) m_bShowPoints =true; else m_bShowPoints = false;
 		}
 
-		ar >> n;
-		if (n<1 || n>10) return false;
-		m_Type = n;
+		ar >>k;
+		if(k==1)      m_WPolarType = FIXEDSPEEDPOLAR;
+		else if(k==2) m_WPolarType = FIXEDLIFTPOLAR;
+		else if(k==4) m_WPolarType = FIXEDAOAPOLAR;
+		else if(k==7) m_WPolarType = STABILITYPOLAR;
+		else return false;
+
 
 		ar >> f;	m_QInf = f;
 		ar >> f;	m_Mass = f;
@@ -1740,7 +1758,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		float Alpha,  Cl, CY, ICd, PCd, GCm, GRm, GYm, VCm, ICm, VYm, IYm, QInfinite, XCP, YCP, Ctrl, Cb, XNP;
 		f = Alpha =  Cl = CY = ICd = PCd = GCm = GRm = GYm = VCm = ICm = VYm = IYm = QInfinite = XCP = YCP = Ctrl = Cb =0.0;
-		bool bExists;
+//		bool bExists;
 		for (i=0; i< n; i++)
 		{
 			ar >> Alpha >> Cl;
@@ -1769,14 +1787,12 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if (m_PolarFormat>=1022) ar >> XNP;
 			else					 XNP = 0.0;
 
-			bExists = false;
-			if(m_Type!=4)
+			if(m_WPolarType!=FIXEDAOAPOLAR)
 			{
 				for (j=0; j<m_Alpha.size(); j++)
 				{
 					if(fabs(Alpha-m_Alpha[j])<0.001)
 					{
-						bExists = true;
 						break;
 					}
 				}
@@ -1787,7 +1803,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 				{
 					if(fabs(QInfinite-m_QInfinite[j])<0.001)
 					{
-						bExists = true;
 						break;
 					}
 				}
@@ -1865,7 +1880,6 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		{
 			n = m_Alpha.size();
 
-			//			if(m_AnalysisMethod==4) n++;
 			for(i=0; i< n; i++)
 			{
 				ar>>r0>>r1>>r2>>r3;
@@ -1928,19 +1942,19 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	PolarProperties.clear();
 
-	strong = QString(QObject::tr("Type")+" %1").arg(m_Type);
-	if(m_Type==FIXEDSPEEDPOLAR)     strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_Type==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_Type==FIXEDAOAPOLAR)  strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
-	else if(m_Type==STABILITYPOLAR) strong += " ("+QObject::tr("Stability analysis") +")\n";
+	strong = QString(QObject::tr("Type")+" %1").arg(m_WPolarType);
+	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong += " ("+QObject::tr("Fixed speed") +")\n";
+	else if(m_WPolarType==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
+	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
+	else if(m_WPolarType==STABILITYPOLAR) strong += " ("+QObject::tr("Stability analysis") +")\n";
 	PolarProperties += strong;
 
-	if(m_Type==FIXEDSPEEDPOLAR)
+	if(m_WPolarType==FIXEDSPEEDPOLAR)
 	{
 		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf,10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
-	else if(m_Type==FIXEDAOAPOLAR)
+	else if(m_WPolarType==FIXEDAOAPOLAR)
 	{
 		strong  = QString(QObject::tr("Alpha =")+"%1").arg(m_ASpec,7,'f',2);
 		PolarProperties += strong +QString::fromUtf8("°")+"\n";
@@ -1961,7 +1975,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 
 	//Control data
-	if(m_Type==STABILITYPOLAR)
+	if(m_WPolarType==STABILITYPOLAR)
 	{
 		int j;
 		QMiarex *pMiarex= (QMiarex*)s_pMiarex;
@@ -2119,7 +2133,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 	strong  = QString(QObject::tr("CoG.z")+" = %1 ").arg(m_CoG.z*pMainFrame->m_mtoUnit,10,'g',4);
 	PolarProperties += strong + lenunit + "\n";
 
-	if(m_Type==STABILITYPOLAR)
+	if(m_WPolarType==STABILITYPOLAR)
 	{
 		strong  = QString("Ixx = %1 ").arg(m_CoGIxx*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_kgtoUnit,10,'g',4);
 		PolarProperties += strong + inertiaunit + "\n";

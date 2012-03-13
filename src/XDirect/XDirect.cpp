@@ -85,7 +85,7 @@ QXDirect::QXDirect(QWidget *parent)
 
 	m_bXPressed = m_bYPressed = false;
 
-	m_Type            = 1;
+	m_PolarType       = FIXEDSPEEDPOLAR;
 
 	m_bTrans          = false;
 	m_bType1          = true;
@@ -462,7 +462,7 @@ OpPoint* QXDirect::AddOpPoint(CPolar *pPolar, bool bStoreOpp)
 
 	if(m_pXFoil->lvconv && pPolar)
 	{
-		if(pPolar->m_Type ==2 || pPolar->m_Type ==3)
+		if(pPolar->m_PolarType==FIXEDLIFTPOLAR || pPolar->m_PolarType==RUBBERCHORDPOLAR)
 		{
 			if(pNewPoint && pNewPoint->Reynolds<1.00e8)
 			{
@@ -707,10 +707,10 @@ void QXDirect::CreatePolarCurves()
 
 		if (pPolar->m_bIsVisible && pPolar->m_Alpha.size()>0)
 		{
-                        if (	(pPolar->m_Type == 1 && m_bType1) ||
-                                (pPolar->m_Type == 2 && m_bType2) ||
-                                (pPolar->m_Type == 3 && m_bType3) ||
-                                (pPolar->m_Type == 4 && m_bType4))
+						if (	(pPolar->m_PolarType==FIXEDSPEEDPOLAR  && m_bType1) ||
+								(pPolar->m_PolarType==FIXEDLIFTPOLAR   && m_bType2) ||
+								(pPolar->m_PolarType==RUBBERCHORDPOLAR && m_bType3) ||
+								(pPolar->m_PolarType==FIXEDAOAPOLAR    && m_bType4))
 			{
 				CCurve* pPolarCurve = m_pPolarGraph->AddCurve();
 				CCurve* pCmCurve    = m_pCmGraph->AddCurve();
@@ -1011,7 +1011,7 @@ OpPoint* QXDirect::GetOpPoint(double Alpha)
 		{
 			if (pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName)
 			{
-				if(m_pCurPolar->m_Type !=4)
+				if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 				{
 					if(fabs(pOpPoint->Alpha - Alpha) <0.01)
 					{
@@ -1423,11 +1423,16 @@ void QXDirect::LoadSettings(QSettings *pSettings)
 		m_XBotTr         = pSettings->value("XBotTr").toDouble();
 		m_Mach           = pSettings->value("Mach").toDouble();
 		m_ASpec          = pSettings->value("ASpec").toDouble();
-		m_Type           = pSettings->value("Type").toInt();
 		m_pXFoil->vaccel = pSettings->value("VAccel").toDouble();
 		m_bAutoInitBL    = pSettings->value("AutoInitBL").toBool();
 		m_NRe            = pSettings->value("NReynolds").toInt();
 		m_pXFoil->m_bFullReport = pSettings->value("FullReport").toBool();
+
+		b = pSettings->value("Type").toInt();
+		if(b==1) m_PolarType = FIXEDSPEEDPOLAR;
+		else if(b==2) m_PolarType = FIXEDLIFTPOLAR;
+		else if(b==3) m_PolarType = RUBBERCHORDPOLAR;
+		else if(b==4) m_PolarType = FIXEDAOAPOLAR;
 
 		for (int i=0; i<m_NRe; i++)
 		{
@@ -1748,8 +1753,8 @@ void QXDirect::OnAnimateSingle()
 			m_pCurOpp = pOpPoint;
 
 			//select current OpPoint in Combobox
-			if(m_pCurPolar->m_Type != 4) str = QString("%1").arg(m_pCurOpp->Alpha,8,'f',2);
-			else                         str = QString("%1").arg(m_pCurOpp->Reynolds,8,'f',2);
+			if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) str = QString("%1").arg(m_pCurOpp->Alpha,8,'f',2);
+			else                                        str = QString("%1").arg(m_pCurOpp->Reynolds,8,'f',2);
 			pos = pMainFrame->m_pctrlOpPoint->findText(str);
 			if(pos>=0) pMainFrame->m_pctrlOpPoint->setCurrentIndex(pos);
 
@@ -1786,7 +1791,7 @@ void QXDirect::OnAnalyze()
 
 	m_XFdlg.m_bSequence = m_bSequence;
 	m_XFdlg.m_bAlpha = m_bAlpha;
-	m_XFdlg.m_bType4 = (m_pCurPolar->m_Type==4);
+	m_XFdlg.m_bType4 = (m_pCurPolar->m_PolarType==FIXEDAOAPOLAR);
 
 	m_XFdlg.m_FoilName = g_pCurFoil->m_FoilName;
 	m_XFdlg.m_IterLim = m_IterLim;
@@ -1831,7 +1836,7 @@ void QXDirect::OnBatchAnalysis()
 	m_BatchDlg.m_ReMin     = m_Reynolds;
 	m_BatchDlg.m_ReMax     = m_ReynoldsMax;
 	m_BatchDlg.m_ReInc     = m_ReynoldsDelta;
-	m_BatchDlg.m_Type      = 1;
+	m_BatchDlg.m_PolarType = FIXEDSPEEDPOLAR;
 	m_BatchDlg.m_IterLim   = m_IterLim;
 	m_BatchDlg.m_bAlpha    = true;
 	m_BatchDlg.m_SpMin     = m_Alpha;
@@ -1867,7 +1872,7 @@ void QXDirect::OnBatchAnalysis()
 	m_ClMax            = m_BatchDlg.m_ClMax;
 	m_ClDelta          = m_BatchDlg.m_ClInc;
 	m_Mach             = m_BatchDlg.m_Mach;
-	m_Type             = m_BatchDlg.m_Type;
+	m_PolarType        = m_BatchDlg.m_PolarType;
 	m_NCrit            = m_BatchDlg.m_NCrit;
 	m_XTopTr           = m_BatchDlg.m_XTopTr;
 	m_XBotTr           = m_BatchDlg.m_XBotTr;
@@ -1908,7 +1913,7 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	m_BatchThreadDlg.m_ReMin     = m_Reynolds;
 	m_BatchThreadDlg.m_ReMax     = m_ReynoldsMax;
 	m_BatchThreadDlg.m_ReInc     = m_ReynoldsDelta;
-	m_BatchThreadDlg.m_Type      = 1;
+	m_BatchThreadDlg.m_PolarType = FIXEDSPEEDPOLAR;
 	m_BatchThreadDlg.m_IterLim   = m_IterLim;
 	m_BatchThreadDlg.m_bAlpha    = true;
 	m_BatchThreadDlg.m_AlphaMin  = m_Alpha;
@@ -1941,7 +1946,7 @@ void QXDirect::OnMultiThreadedBatchAnalysis()
 	m_ClMax            = m_BatchThreadDlg.m_ClMax;
 	m_ClDelta          = m_BatchThreadDlg.m_ClInc;
 	m_Mach             = m_BatchThreadDlg.m_Mach;
-	m_Type             = m_BatchThreadDlg.m_Type;
+	m_PolarType        = m_BatchThreadDlg.m_PolarType;
 	m_NCrit            = m_BatchThreadDlg.m_NCrit;
 	m_XTopTr           = m_BatchThreadDlg.m_XTopTr;
 	m_XBotTr           = m_BatchThreadDlg.m_XBotTr;
@@ -2256,13 +2261,13 @@ void QXDirect::OnDefinePolar()
 
 
 	m_FoilPolarDlg.move(pMainFrame->m_DlgPos);
-	m_FoilPolarDlg.m_NCrit    = m_NCrit;
-	m_FoilPolarDlg.m_XBotTr   = m_XBotTr;
-	m_FoilPolarDlg.m_XTopTr   = m_XTopTr;
-	m_FoilPolarDlg.m_Mach     = m_Mach;
-	m_FoilPolarDlg.m_Reynolds = m_Reynolds;
-	m_FoilPolarDlg.m_Type     = m_Type;
-	m_FoilPolarDlg.m_ASpec    = m_ASpec;
+	m_FoilPolarDlg.m_NCrit     = m_NCrit;
+	m_FoilPolarDlg.m_XBotTr    = m_XBotTr;
+	m_FoilPolarDlg.m_XTopTr    = m_XTopTr;
+	m_FoilPolarDlg.m_Mach      = m_Mach;
+	m_FoilPolarDlg.m_Reynolds  = m_Reynolds;
+	m_FoilPolarDlg.m_PolarType = m_PolarType;
+	m_FoilPolarDlg.m_ASpec     = m_ASpec;
 
 	m_FoilPolarDlg.InitDialog();
 
@@ -2275,23 +2280,23 @@ void QXDirect::OnDefinePolar()
 		m_pCurPolar->m_FoilName = g_pCurFoil->m_FoilName;
 		m_pCurPolar->m_PlrName = m_FoilPolarDlg.m_PlrName;
 		m_pCurPolar->m_bIsVisible = true;
-		m_pCurPolar->m_Type = m_FoilPolarDlg.m_Type;
+		m_pCurPolar->m_PolarType = m_FoilPolarDlg.m_PolarType;
 
-		switch (m_pCurPolar->m_Type)
+		switch (m_pCurPolar->m_PolarType)
 		{
-			case 1:
+			case FIXEDSPEEDPOLAR:
 				m_pCurPolar->m_MaType = 1;
 				m_pCurPolar->m_ReType = 1;
 				break;
-			case 2:
+			case FIXEDLIFTPOLAR:
 				m_pCurPolar->m_MaType = 2;
 				m_pCurPolar->m_ReType = 2;
 				break;
-			case 3:
+			case RUBBERCHORDPOLAR:
 				m_pCurPolar->m_MaType = 1;
 				m_pCurPolar->m_ReType = 3;
 				break;
-			case 4:
+			case FIXEDAOAPOLAR:
 				m_pCurPolar->m_MaType = 1;
 				m_pCurPolar->m_ReType = 1;
 				break;
@@ -2301,13 +2306,13 @@ void QXDirect::OnDefinePolar()
 				break;
 		}
 
-		m_Type     = m_FoilPolarDlg.m_Type;
-		m_NCrit    = m_FoilPolarDlg.m_NCrit;
-		m_XBotTr   = m_FoilPolarDlg.m_XBotTr;
-		m_XTopTr   = m_FoilPolarDlg.m_XTopTr;
-		m_Mach     = m_FoilPolarDlg.m_Mach;
-		m_Reynolds = m_FoilPolarDlg.m_Reynolds;
-		m_ASpec    = m_FoilPolarDlg.m_ASpec;
+		m_PolarType = m_FoilPolarDlg.m_PolarType;
+		m_NCrit     = m_FoilPolarDlg.m_NCrit;
+		m_XBotTr    = m_FoilPolarDlg.m_XBotTr;
+		m_XTopTr    = m_FoilPolarDlg.m_XTopTr;
+		m_Mach      = m_FoilPolarDlg.m_Mach;
+		m_Reynolds  = m_FoilPolarDlg.m_Reynolds;
+		m_ASpec     = m_FoilPolarDlg.m_ASpec;
 
 		m_pCurPolar->m_Reynolds = m_FoilPolarDlg.m_Reynolds;
 		m_pCurPolar->m_Mach     = m_FoilPolarDlg.m_Mach;
@@ -2369,8 +2374,8 @@ void QXDirect::OnDelCurOpp()
 	if (!pOpPoint) return;
 	QString strong,str;
 	strong = tr("Are you sure you want to delete the Operating Point\n");
-	if(m_pCurPolar->m_Type !=4) str = QString("Alpha = %1").arg(pOpPoint->Alpha,0,'f',2);
-	else str = QString("Reynolds = %1").arg(pOpPoint->Reynolds,0,'f',0);
+	if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) str = QString("Alpha = %1").arg(pOpPoint->Alpha,0,'f',2);
+	else                                        str = QString("Reynolds = %1").arg(pOpPoint->Reynolds,0,'f',0);
 	strong += str;
 	strong += "  ?";
 
@@ -3368,10 +3373,10 @@ void QXDirect::OnImportXFoilPolar()
 		QMessageBox::warning(pMainFrame, tr("Warning"), str);
 		return;
 	}
-	if     (pPolar->m_ReType ==1 && pPolar->m_MaType ==1) pPolar->m_Type = 1;
-	else if(pPolar->m_ReType ==2 && pPolar->m_MaType ==2) pPolar->m_Type = 2;
-	else if(pPolar->m_ReType ==3 && pPolar->m_MaType ==1) pPolar->m_Type = 3;
-	else                                                  pPolar->m_Type = 1;
+	if     (pPolar->m_ReType ==1 && pPolar->m_MaType ==1) pPolar->m_PolarType = FIXEDSPEEDPOLAR;
+	else if(pPolar->m_ReType ==2 && pPolar->m_MaType ==2) pPolar->m_PolarType = FIXEDLIFTPOLAR;
+	else if(pPolar->m_ReType ==3 && pPolar->m_MaType ==1) pPolar->m_PolarType = RUBBERCHORDPOLAR;
+	else                                                  pPolar->m_PolarType = FIXEDSPEEDPOLAR;
 
 
 	bRead  = ReadAVLString(in, Line, strong);
@@ -3473,7 +3478,7 @@ void QXDirect::OnImportXFoilPolar()
 
 	Re = pPolar->m_Reynolds/1000000.0;
 	pPolar->m_PlrName = QString("T%1_Re%2_M%3")
-						.arg(pPolar->m_Type)
+						.arg(pPolar->m_PolarType)
 						.arg(Re,0,'f',2)
 						.arg(pPolar->m_Mach,0,'f',2);
 	str = QString("_N%1").arg(pPolar->m_ACrit,0,'f',1);
@@ -3557,7 +3562,7 @@ void QXDirect::OnImportJavaFoilPolar()
 			pPolar->m_FoilName = FoilName;
 			pPolar->m_Reynolds = Re;;
 			pPolar->m_PlrName = QString("T%1_Re2_M3_JavaFoil")
-								.arg(pPolar->m_Type)
+								.arg(pPolar->m_PolarType)
 								.arg(pPolar->m_Reynolds/1000000.0,0,'f',2)
 								.arg(pPolar->m_Mach,0,'f',2);
 
@@ -5068,8 +5073,8 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 		if(m_pCurOpp->m_bTEFlap) Back++;
 		if(m_pCurOpp->m_bLEFlap) Back++;
 		if(m_pCurOpp->m_bVisc && fabs(m_pCurOpp->Cd)>0.0) Back++;
-		if(m_pCurPolar->m_Type==2 ) Back++;
-		if(m_pCurPolar->m_Type!=1 && m_pCurPolar->m_Type!=4) Back++;
+		if(m_pCurPolar->m_PolarType==FIXEDLIFTPOLAR) Back++;
+		if(m_pCurPolar->m_PolarType!=FIXEDSPEEDPOLAR && m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR) Back++;
 	}
 
 	int dwidth = fm.width(tr("TE Hinge Moment/span = 123456789"));
@@ -5081,10 +5086,10 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 	if(m_pCurPolar)
 	{
-		str1 = QString(tr("Polar Type =         %1")).arg( m_pCurPolar->m_Type);
+		str1 = QString(tr("Polar Type =         %1")).arg( m_pCurPolar->m_PolarType);
 		painter.drawText(XPos,ZPos, dwidth, dD, Qt::AlignRight | Qt::AlignTop, str1);
 		D += dD;
-		if(m_pCurPolar->m_Type ==1)
+		if(m_pCurPolar->m_PolarType ==1)
 		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong ="Reynolds = " + strong;
@@ -5094,7 +5099,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 		}
-		if(m_pCurPolar->m_Type ==2)
+		if(m_pCurPolar->m_PolarType==FIXEDLIFTPOLAR)
 		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong = tr("Re.sqrt(Cl) = ") + strong;
@@ -5105,7 +5110,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 		}
-		if(m_pCurPolar->m_Type ==3)
+		if(m_pCurPolar->m_PolarType==RUBBERCHORDPOLAR)
 		{
 			ReynoldsFormat(strong, m_pCurPolar->m_Reynolds );
 			strong = tr("Re.sqrt(Cl) = ") + strong;
@@ -5116,7 +5121,7 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
 			D += dD;
 		}
-		if(m_pCurPolar->m_Type ==4)
+		if(m_pCurPolar->m_PolarType==FIXEDAOAPOLAR)
 		{
 			strong = QString("Alpha = %1 "+QString::fromUtf8("°")).arg(m_pCurPolar->m_ASpec,10,'f',2);
 			painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, strong);
@@ -5139,20 +5144,20 @@ void QXDirect::PaintOpPoint(QPainter &painter)
 
 		if(m_pCurOpp)
 		{
-			if(m_pCurPolar->m_Type!=1)
+			if(m_pCurPolar->m_PolarType!=FIXEDSPEEDPOLAR)
 			{
 				ReynoldsFormat(Result, m_pCurOpp->Reynolds);
 				Result = "Re = "+ Result;
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
-			if(m_pCurPolar->m_Type==2)
+			if(m_pCurPolar->m_PolarType==FIXEDLIFTPOLAR)
 			{
 				Result = QString("Ma = %1").arg(m_pCurOpp->Mach, 9, 'f', 4);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
 				D += dD;
 			}
-			if(m_pCurPolar->m_Type!=4)
+			if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 			{
 				Result = QString(tr("       Alpha = %1 ")+QString::fromUtf8("°")).arg(m_pCurOpp->Alpha, 7, 'f', 2);
 				painter.drawText(XPos,ZPos+D, dwidth, dD, Qt::AlignRight | Qt::AlignTop, Result);
@@ -5287,10 +5292,10 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 				pPolar->m_PlrName.length() &&
 				pPolar->m_bIsVisible &&
 				pPolar->m_FoilName == str.at(k) &&
-                                ((pPolar->m_Type == 1 && m_bType1) ||
-                                 (pPolar->m_Type == 2 && m_bType2) ||
-                                 (pPolar->m_Type == 3 && m_bType3) ||
-                                 (pPolar->m_Type == 4 && m_bType4)))
+								((pPolar->m_PolarType==FIXEDSPEEDPOLAR  && m_bType1) ||
+								 (pPolar->m_PolarType==FIXEDLIFTPOLAR   && m_bType2) ||
+								 (pPolar->m_PolarType==RUBBERCHORDPOLAR && m_bType3) ||
+								 (pPolar->m_PolarType==FIXEDAOAPOLAR    && m_bType4)))
 					FoilPlrs++;
 		}
 		if (FoilPlrs)
@@ -5316,10 +5321,10 @@ void QXDirect::PaintPolarLegend(QPoint place, int bottom, QPainter &painter)
 			if(str.at(k) == pPolar->m_FoilName)
 			{
 				if (pPolar->m_Alpha.size() && pPolar->m_PlrName.length() && pPolar->m_bIsVisible &&
-                                        ((pPolar->m_Type == 1 && m_bType1) ||
-                                         (pPolar->m_Type == 2 && m_bType2) ||
-                                         (pPolar->m_Type == 3 && m_bType3) ||
-                                         (pPolar->m_Type == 4 && m_bType4)))
+										((pPolar->m_PolarType==FIXEDSPEEDPOLAR  && m_bType1) ||
+										 (pPolar->m_PolarType==FIXEDLIFTPOLAR   && m_bType2) ||
+										 (pPolar->m_PolarType==RUBBERCHORDPOLAR && m_bType3) ||
+										 (pPolar->m_PolarType==FIXEDAOAPOLAR    && m_bType4)))
 				{
 					//is there anything to draw ?
 					LegendPen.setColor(pPolar->m_Color);
@@ -5425,7 +5430,7 @@ void QXDirect::ReadParams()
 	else if (m_pctrlSpec3->isChecked()) m_bAlpha = false;
 
 
-	if(m_pCurPolar->m_Type !=4)
+	if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 	{
 		if(m_bAlpha)
 		{
@@ -5514,11 +5519,15 @@ void QXDirect::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("XBotTr", m_XBotTr);
 		pSettings->setValue("Mach", m_Mach);
 		pSettings->setValue("ASpec", m_ASpec);
-		pSettings->setValue("Type", m_Type);
 		pSettings->setValue("VAccel", m_pXFoil->vaccel);
 		pSettings->setValue("AutoInitBL", m_bAutoInitBL);
 		pSettings->setValue("FullReport", m_pXFoil->m_bFullReport);
 		pSettings->setValue("NReynolds", m_NRe);
+
+		if(m_PolarType==FIXEDSPEEDPOLAR)      pSettings->setValue("Type", 1);
+		else if(m_PolarType==FIXEDSPEEDPOLAR) pSettings->setValue("Type", 2);
+		else if(m_PolarType==FIXEDAOAPOLAR)   pSettings->setValue("Type", 4);
+		else if(m_PolarType==STABILITYPOLAR)  pSettings->setValue("Type", 7);
 
 		for (int i=0; i<m_NRe; i++)
 		{
@@ -5551,7 +5560,7 @@ void QXDirect::SetAnalysisParams()
 
 	if(m_pCurPolar)
 	{
-		if(m_pCurPolar->m_Type != 4)
+		if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 		{
 			m_pctrlAlphaMin->SetPrecision(2);
 			m_pctrlAlphaMax->SetPrecision(2);
@@ -5633,7 +5642,7 @@ void QXDirect::SetCurveParams()
 	}
 	if(m_pCurPolar)
 	{
-		if(m_pCurPolar->m_Type!=4)
+		if(m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 		{
 			m_pctrlUnit1->setText(QString::fromUtf8("°"));
 			m_pctrlUnit2->setText(QString::fromUtf8("°"));
@@ -5797,7 +5806,7 @@ void QXDirect::SetFoilScale()
 
 void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
 {
-	bool bFound;
+//	bool bFound;
 	int i;
 	double hmom, hfx, hfy;
 	double dx, dy, xmid, ymid, pmid;
@@ -5834,8 +5843,8 @@ void QXDirect::SetHingeMoments(OpPoint *pOpPoint)
 			}
 		}
 		//Next add top chunk left out in the previous loop
-		bFound = false;
-/*		for (i=0;i<g_pCurFoil->n-1;i++){
+/*		bFound = false;
+		for (i=0;i<g_pCurFoil->n-1;i++){
 			if(g_pCurFoil->x[i]>xof && g_pCurFoil->x[i+1]<xof){
 				bFound =true;
 				break;
@@ -6108,7 +6117,7 @@ void QXDirect::SetOpPointSequence()
 	}
 
 
-	if(m_pCurPolar && m_pCurPolar->m_Type != 4)
+	if(m_pCurPolar && m_pCurPolar->m_PolarType!=FIXEDAOAPOLAR)
 	{
 		if(m_pctrlSpec3->isChecked())
 		{
@@ -6132,7 +6141,7 @@ void QXDirect::SetOpPointSequence()
 		m_pctrlSpec2->setEnabled(true);
 		m_pctrlSpec3->setEnabled(false);
 	}
-	else if(m_pCurPolar && m_pCurPolar->m_Type == 4)
+	else if(m_pCurPolar && m_pCurPolar->m_PolarType==FIXEDAOAPOLAR)
 	{
 		m_pctrlSpec3->setChecked(true);
 		m_bAlpha = true;		// no choice with type 4 polars

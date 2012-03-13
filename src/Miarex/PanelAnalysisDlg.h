@@ -79,7 +79,6 @@ private:
 	void ComputeAeroCoefs(double V0, double VDelta, int nrhs);
 	void ComputeOnBodyCp(double V0, double VDelta, int nval);
 	void ComputePlane(double Alpha, double QInf, int qrhs);
-	void ComputeSurfSpeeds(double *Mu, double *Sigma);
 	void ComputeFarField(double QInf, double Alpha0, double AlphaDelta, int nval);
 	void ComputeBalanceSpeeds(double Alpha, int q);
 	void CreateDoubletStrength(double Alpha0, double AlphaDelta, int nval);
@@ -261,9 +260,6 @@ public://stability analysis method and variables
 	double m_BLat[4];
 	double m_R[3][3];	//Rotation matrix
 
-	//COG position in Body axis
-//	CVector m_CoG;
-//	double m_Mass;
 
 	double m_Ib[3][3];	//Inertia tensor in body axis
 	double m_Is[3][3];	//Inertia tensor in stability axis
@@ -278,7 +274,6 @@ public://stability analysis method and variables
 	double m_radius, m_W, m_p, m_q, m_r; //trimmed flight data
 
 	bool m_bTrace;
-
 };
 
 #endif // PANELANALYSISDLG_H
