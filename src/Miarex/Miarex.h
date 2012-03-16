@@ -29,6 +29,7 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QStackedWidget>
+#include <QToolButton>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QList>
@@ -287,6 +288,7 @@ public:
 	void SetWingLegendPos();
 	void SetupLayout();
 	void SetControls();
+	void SetViewControls();
 	void CreateCpCurves();
 	void CreateWPolarCurves();
 	void CreateWOppCurves();
@@ -399,7 +401,11 @@ private:
 
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels;
 	QCheckBox *m_pctrlFoilNames, *m_pctrlVortices, *m_pctrlMasses;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
+
+	QAction *m_pXView, *m_pYView, *m_pZView, *m_pIsoView;
+	QToolButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso;
+
+	QPushButton *m_pctrlReset, *m_pctrlPickCenter;
 	QSlider *m_pctrlClipPlanePos;
 
 	//stability widgets
@@ -484,7 +490,6 @@ protected:
 	bool m_bShowCpScale;          // true if the Cp Scale in Miarex is to be displayed
 	bool m_bIs2DScaleSet;         // true if the 3D scale has been set, false if needs to be reset
 	bool m_bIs3DScaleSet;         // true if the 3D scale has been set, false if needs to be reset
-	bool m_bShowLight;            // true if the virtual light is to be displayed
 	bool m_bAutoScales;
 	bool m_bXPressed, m_bYPressed; //true if the corresponding key is pressed
 

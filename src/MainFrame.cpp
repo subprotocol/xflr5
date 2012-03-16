@@ -892,11 +892,11 @@ void MainFrame::CreateDockWindows()
 	m_pctrlMiarexWidget = new QDockWidget("Miarex", this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlMiarexWidget);
+	m_pctrlMiarexWidget->move(960,60);
 
 	m_pctrlAFoilWidget = new QDockWidget("AFoil", this);
 	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
 	addDockWidget(Qt::BottomDockWidgetArea, m_pctrlAFoilWidget);
-	m_pctrlMiarexWidget->move(960,60);
 	
 	m_p2DWidget = new TwoDWidget(this);
 	m_pGLWidget = new GLWidget(this);

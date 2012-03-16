@@ -445,7 +445,6 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bPickCenter        = false;
 	m_bAutoCpScale	     = false;
 	m_bShowCpScale       = true;
-	m_bShowLight         = false;
 	m_bIs2DScaleSet      = false;
 	m_bIs3DScaleSet      = false;
 //	m_bForcedResponse    = true;
@@ -1690,6 +1689,14 @@ void QMiarex::SetControls()
 	SetCurveParams();
 }
 
+
+void QMiarex::SetViewControls()
+{
+	m_pctrlX->setChecked(false);
+	m_pctrlY->setChecked(false);
+	m_pctrlZ->setChecked(false);
+	m_pctrlIso->setChecked(false);
+}
 
 
 
@@ -5189,7 +5196,7 @@ void QMiarex::GLRenderView()
 			pGLWidget->renderText(15, 15, strong, pMainFrame->m_TextFont);
 		}
 
-		if(m_bShowLight)
+		if(m_GLLightDlg.isVisible())
 		{
 			glDisable(GL_LIGHTING);
 			glDisable(GL_LIGHT0);
@@ -5823,19 +5830,6 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	switch (event->key())
 	{
-/*		case Qt::Key_M:
-		{
-			for(int i=m_poaWPolar->size()-1; i>=0; i--)
-			{
-				CWPolar *pWPolar = (CWPolar*)m_poaWPolar->at(i);
-				delete pWPolar;
-				m_poaWPolar->removeAt(i);
-			}
-			m_pCurWOpp = NULL;
-			m_pCurPOpp = NULL;
-			m_pCurWPolar = NULL;
-			pMainFrame->UpdateUFOs();
-		}*/
 		case Qt::Key_Return:
 		{
 			if (event->modifiers().testFlag(Qt::AltModifier))
@@ -5857,11 +5851,13 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_Escape:
 		{
+
 			StopAnimate();
 			m_bBreak = true;
 			if(m_pCurGraph) m_pCurGraph->DeselectPoint();
 			
-			if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
+			if(m_GLLightDlg.isVisible()) m_GLLightDlg.hide();
+			else if(pMainFrame->m_pctrl3DScalesWidget->isVisible()) pMainFrame->m_pctrl3DScalesWidget->hide();
 			UpdateView();
 			break;
 		}
@@ -6529,6 +6525,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 		{
 			if(bCtrl)//rotate
 			{
+				SetViewControls();
 				m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
 				UpdateView();
 			}
@@ -6547,6 +6544,7 @@ void QMiarex::mouseMoveEvent(QMouseEvent *event)
 		}
 		else if ((event->buttons() & Qt::MidButton) && !bCtrl)
 		{
+			SetViewControls();
 			m_ArcBall.Move(point.x(), m_r3DCltRect.height()-point.y());
 			UpdateView();
 		}
@@ -6929,6 +6927,8 @@ void QMiarex::On3DIso()
 	//
 	// The user has requested a perspective view in the 3D display
 	//
+	SetViewControls();
+	m_pctrlIso->setChecked(true);
 	m_ArcBall.ab_quat[0]	= -0.65987748f;
 	m_ArcBall.ab_quat[1]	=  0.38526487f;
 	m_ArcBall.ab_quat[2]	= -0.64508355f;
@@ -6957,6 +6957,8 @@ void QMiarex::On3DTop()
 	//
 	// The user has requested a top view in the 3D display
 	//
+	SetViewControls();
+	m_pctrlZ->setChecked(true);
 	m_ArcBall.SetQuat(sqrt(2.0)/2.0, 0.0, 0.0, -sqrt(2.0)/2.0);
 	Set3DRotationCenter();
 	UpdateView();
@@ -6968,6 +6970,8 @@ void QMiarex::On3DLeft()
 	//
 	// The user has requested a left view in the 3D display
 	//
+	SetViewControls();
+	m_pctrlY->setChecked(true);
 	m_ArcBall.SetQuat(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0, 0.0);// rotate by 90 deg around x
 	Set3DRotationCenter();
 	UpdateView();
@@ -6979,6 +6983,9 @@ void QMiarex::On3DFront()
 	//
 	// The user has requested a front view in the 3D display
 	//
+	SetViewControls();
+	m_pctrlX->setChecked(true);
+
 	Quaternion Qt1(sqrt(2.0)/2.0, 0.0,           -sqrt(2.0)/2.0, 0.0);// rotate by 90 deg around y
 	Quaternion Qt2(sqrt(2.0)/2.0, -sqrt(2.0)/2.0, 0.0,           0.0);// rotate by 90 deg around x
 
@@ -10919,16 +10926,13 @@ void QMiarex::OnSetupLight()
 	if(m_iView!=W3DVIEW && m_iView!=WSTABVIEW) return;
 	GLWidget *pGLWidget = (GLWidget*)s_pGLWidget;
 
-	m_bShowLight = true;
-	UpdateView();
 	GLLightDlg::s_bLight = m_bglLight;
 	m_GLLightDlg.m_pGLWidget = s_pGLWidget;
 
-	m_GLLightDlg.exec();
+	m_GLLightDlg.show();
 
 	m_bglLight = GLLightDlg::s_bLight;
 
-	m_bShowLight = false;
 
 	double LightFactor;
 	if(m_pCurWing) LightFactor =  (GLfloat)pow(m_pCurWing->m_PlanformSpan/2.0,0.1);
@@ -13931,25 +13935,53 @@ void QMiarex::SetupLayout()
 				ThreeDParams->addWidget(m_pctrlMasses, 3,2);
 			}
 
-			QGridLayout *ThreeDView = new QGridLayout;
+			QVBoxLayout *ThreeDView = new QVBoxLayout;
 			{
-				m_pctrlX          = new QPushButton("X");
-				m_pctrlY          = new QPushButton("Y");
-				m_pctrlZ          = new QPushButton("Z");
-				m_pctrlIso        = new QPushButton("Iso");
+				QHBoxLayout *AxisViewLayout = new QHBoxLayout;
+				{
+					m_pctrlX          = new QToolButton;
+					m_pctrlY          = new QToolButton;
+					m_pctrlZ          = new QToolButton;
+					m_pctrlIso        = new QToolButton;
+					if(m_pctrlX->iconSize().height()<=48)
+					{
+						m_pctrlX->setIconSize(QSize(32,32));
+						m_pctrlY->setIconSize(QSize(32,32));
+						m_pctrlZ->setIconSize(QSize(32,32));
+						m_pctrlIso->setIconSize(QSize(32,32));
+					}
+					m_pXView   = new QAction(QIcon(":/images/OnXView.png"), tr("X View"), this);
+					m_pYView   = new QAction(QIcon(":/images/OnYView.png"), tr("X View"), this);
+					m_pZView   = new QAction(QIcon(":/images/OnZView.png"), tr("X View"), this);
+					m_pIsoView = new QAction(QIcon(":/images/OnIsoView.png"), tr("X View"), this);
+					m_pXView->setCheckable(true);
+					m_pYView->setCheckable(true);
+					m_pZView->setCheckable(true);
+					m_pIsoView->setCheckable(true);
 
-				ThreeDView->addWidget(m_pctrlX,1,1);
-				ThreeDView->addWidget(m_pctrlY,1,2);
-				ThreeDView->addWidget(m_pctrlZ,2,1);
-				ThreeDView->addWidget(m_pctrlIso,2,2);
+					m_pctrlX->setDefaultAction(m_pXView);
+					m_pctrlY->setDefaultAction(m_pYView);
+					m_pctrlZ->setDefaultAction(m_pZView);
+					m_pctrlIso->setDefaultAction(m_pIsoView);
+					AxisViewLayout->addWidget(m_pctrlX);
+					AxisViewLayout->addWidget(m_pctrlY);
+					AxisViewLayout->addWidget(m_pctrlZ);
+					AxisViewLayout->addWidget(m_pctrlIso);
+				}
 
-				m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
-				m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
-				m_pctrlReset          = new QPushButton(tr("Reset"));
-				m_pctrlPickCenter->setCheckable(true);
 
-				ThreeDView->addWidget(m_pctrlReset,3,1);
-				ThreeDView->addWidget(m_pctrlPickCenter,3,2);
+				QHBoxLayout *ViewResetLayout = new QHBoxLayout;
+				{
+					m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
+					m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
+					m_pctrlReset          = new QPushButton(tr("Reset"));
+					m_pctrlPickCenter->setCheckable(true);
+
+					ViewResetLayout->addWidget(m_pctrlReset);
+					ViewResetLayout->addWidget(m_pctrlPickCenter);
+				}
+				ThreeDView->addLayout(AxisViewLayout);
+				ThreeDView->addLayout(ViewResetLayout);
 			}
 
 			QHBoxLayout *ClipLayout = new QHBoxLayout;
@@ -13965,6 +13997,7 @@ void QMiarex::SetupLayout()
 				ClipLayout->addWidget(m_pctrlClipPlanePos,1);
 			}
 			ThreeDViewControls->addLayout(ThreeDParams);
+			ThreeDViewControls->addStretch(1);
 			ThreeDViewControls->addLayout(ThreeDView);
 			ThreeDViewControls->addLayout(ClipLayout);
 			ThreeDViewControls->addStretch(1);
