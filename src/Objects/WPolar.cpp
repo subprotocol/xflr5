@@ -1942,11 +1942,10 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	PolarProperties.clear();
 
-	strong = QString(QObject::tr("Type")+" %1").arg(m_WPolarType);
-	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong += " ("+QObject::tr("Fixed speed") +")\n";
-	else if(m_WPolarType==FIXEDLIFTPOLAR) strong += " ("+QObject::tr("Fixed lift") +")\n";
-	else if(m_WPolarType==FIXEDAOAPOLAR)  strong += " ("+QObject::tr("Fixed angle of attack") +")\n";
-	else if(m_WPolarType==STABILITYPOLAR) strong += " ("+QObject::tr("Stability analysis") +")\n";
+	if(m_WPolarType==FIXEDSPEEDPOLAR)     strong = "Type 1: "+QObject::tr("Fixed speed") +"\n";
+	else if(m_WPolarType==FIXEDLIFTPOLAR) strong = "Type 2: "+QObject::tr("Fixed lift") +"\n";
+	else if(m_WPolarType==FIXEDAOAPOLAR)  strong = "Type 4: "+QObject::tr("Fixed angle of attack") +"\n";
+	else if(m_WPolarType==STABILITYPOLAR) strong = "Type 7: "+QObject::tr("Stability analysis") +"\n";
 	PolarProperties += strong;
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)
