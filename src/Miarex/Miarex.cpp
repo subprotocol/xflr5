@@ -982,6 +982,35 @@ void QMiarex::AddPOpp(bool bPointOut, double *Cp, double *Gamma, double *Sigma, 
 							i = m_poaPOpp->size();// to break
 						}
 					}
+					else if(pPOpp->m_WPolarType==STABILITYPOLAR)
+					{
+						if(fabs(pPOpp->m_Ctrl - pOldPOpp->m_Ctrl)<0.005)
+						{
+							//replace existing point
+							pPOpp->m_Color = pOldPOpp->m_Color;
+							pPOpp->m_Style = pOldPOpp->m_Style;
+							pPOpp->m_Width = pOldPOpp->m_Width;
+							pPOpp->m_bIsVisible  = pOldPOpp->m_bIsVisible;
+							pPOpp->m_bShowPoints = pOldPOpp->m_bShowPoints;
+							if (m_pCurPOpp == pOldPOpp)
+							{
+								m_pCurPOpp = NULL;
+								m_pCurWOpp = NULL;
+							}
+							m_poaPOpp->removeAt(i);
+							delete pOldPOpp;
+							m_poaPOpp->insert(i, pPOpp);
+							bIsInserted = true;
+							i = m_poaPOpp->size();// to break
+						}
+						else if (pPOpp->m_Ctrl > pOldPOpp->m_Ctrl)
+						{
+							//insert point
+							m_poaPOpp->insert(i, pPOpp);
+							bIsInserted = true;
+							i = m_poaPOpp->size();// to break
+						}
+					}
 				}
 			}
 		}
@@ -1356,7 +1385,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 			{
 				if (pNewPoint->m_PlrName == pWOpp->m_PlrName)
 				{
-					if(pNewPoint->m_WPolarType!=FIXEDAOAPOLAR)
+					if(pNewPoint->m_WPolarType<FIXEDAOAPOLAR)
 					{
 						if(fabs(pNewPoint->m_Alpha - pWOpp->m_Alpha)<0.005)
 						{
@@ -1381,7 +1410,7 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 							i = m_poaWOpp->size();// to break
 						}
 					}
-					else
+					else if(pNewPoint->m_WPolarType==FIXEDAOAPOLAR)
 					{
 						if(fabs(pNewPoint->m_QInf - pWOpp->m_QInf)<0.1)
 						{
@@ -1399,6 +1428,31 @@ void QMiarex::AddWOpp(double QInf, double Alpha, bool bPointOut, double *Gamma, 
 							i = m_poaWOpp->size();// to break
 						}
 						else if (pNewPoint->m_QInf > pWOpp->m_QInf)
+						{
+							//insert point
+							m_poaWOpp->insert(i, pNewPoint);
+							bIsInserted = true;
+							i = m_poaWOpp->size();// to break
+						}
+					}
+					else if(pNewPoint->m_WPolarType==STABILITYPOLAR)
+					{
+						if(fabs(pNewPoint->m_Ctrl - pWOpp->m_Ctrl)<0.001)
+						{
+							//replace existing point
+							pNewPoint->m_Color = pWOpp->m_Color;
+							pNewPoint->m_Style = pWOpp->m_Style;
+							pNewPoint->m_Width = pWOpp->m_Width;
+							pNewPoint->m_bIsVisible  = pWOpp->m_bIsVisible;
+							pNewPoint->m_bShowPoints = pWOpp->m_bShowPoints;
+							if (m_pCurWOpp == pWOpp) m_pCurWOpp = NULL;
+							m_poaWOpp->removeAt(i);
+							delete pWOpp;
+							m_poaWOpp->insert(i, pNewPoint);
+							bIsInserted = true;
+							i = m_poaWOpp->size();// to break
+						}
+						else if (pNewPoint->m_Ctrl > pWOpp->m_Ctrl)
 						{
 							//insert point
 							m_poaWOpp->insert(i, pNewPoint);
@@ -6421,6 +6475,16 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 			pStabView->m_Amplitude[i] = pSettings->value(strong, 0.0).toDouble();
 		}
 		pStabView->UpdateControlModelData();
+
+		m_StabPolarDlg.m_bAutoInertia = pSettings->value("StabPolarAutoInertia", true).toBool();
+		m_StabPolarDlg.m_Mass   = pSettings->value("StabPolarMass", 0.0).toDouble();
+		m_StabPolarDlg.m_CoG.x  = pSettings->value("StabPolarCoGx", 0.0).toDouble();
+		m_StabPolarDlg.m_CoG.y  = pSettings->value("StabPolarCoGy", 0.0).toDouble();
+		m_StabPolarDlg.m_CoG.z  = pSettings->value("StabPolarCoGz", 0.0).toDouble();
+		m_StabPolarDlg.m_CoGIxx = pSettings->value("StabPolarCoGIxx", 0.0).toDouble();
+		m_StabPolarDlg.m_CoGIyy = pSettings->value("StabPolarCoGIyy", 0.0).toDouble();
+		m_StabPolarDlg.m_CoGIzz = pSettings->value("StabPolarCoGIzz", 0.0).toDouble();
+		m_StabPolarDlg.m_CoGIxz = pSettings->value("StabPolarCoGIxz", 0.0).toDouble();
 	}
 
 	pSettings->endGroup();
@@ -12404,7 +12468,16 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 			pSettings->setValue(strong, pStabView->m_Amplitude[i]);
 		}
 
- 	}
+		pSettings->setValue("StabPolarAutoInertia", m_StabPolarDlg.m_bAutoInertia);
+		pSettings->setValue("StabPolarMass",   m_StabPolarDlg.m_Mass);
+		pSettings->setValue("StabPolarCoGx",   m_StabPolarDlg.m_CoG.x);
+		pSettings->setValue("StabPolarCoGy",   m_StabPolarDlg.m_CoG.y);
+		pSettings->setValue("StabPolarCoGz",   m_StabPolarDlg.m_CoG.z);
+		pSettings->setValue("StabPolarCoGIxx", m_StabPolarDlg.m_CoGIxx);
+		pSettings->setValue("StabPolarCoGIyy", m_StabPolarDlg.m_CoGIyy);
+		pSettings->setValue("StabPolarCoGIzz", m_StabPolarDlg.m_CoGIzz);
+		pSettings->setValue("StabPolarCoGIxz", m_StabPolarDlg.m_CoGIxz);
+	}
 	pSettings->endGroup();
 
 	m_CpGraph.SaveSettings(pSettings);

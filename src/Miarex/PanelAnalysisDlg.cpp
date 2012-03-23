@@ -3296,8 +3296,8 @@ void PanelAnalysisDlg::Forces(double *Mu, double *Sigma, double alpha, double *V
 
 					if(!m_pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)
 					{
-						PanelForcep1       = Velocity * m_pPanel[p].Vortex;
-						PanelForcep1      *= Mu[p+1];                          //Newtons/rho
+						PanelForcep1  = Velocity * m_pPanel[p].Vortex;
+						PanelForcep1 *= Mu[p+1];                          //Newtons/rho
 
 						PanelForce -= PanelForcep1;
 					}
@@ -4040,7 +4040,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	//   - re-generate the RHS vector
 	//   - the geometry is reset at the next iteration loop
 	//
-	static CVector WindDirection, H, Force, Moment, V0, is, js, ks;
+	CVector WindDirection, H, Force, Moment, V0, is, js, ks;
 	static int j, p, pos, NCtrls;
 	static double DeltaAngle, SignedDeltaAngle, q, S, b, mac, cosa, sina;
 	QString str;
@@ -4143,8 +4143,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 				( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION))
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
-				//TODO : proportional to max setting ???
-				if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION)
+				if(fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION)
 				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[NCtrls]);
 				else SignedDeltaAngle = DeltaAngle;
 
@@ -4236,7 +4235,6 @@ double PanelAnalysisDlg::ComputeCm(double Alpha, bool bTrace)
 			Gamma   = m_uRHS[p]  *cosa + m_wRHS[p]  *sina;
 			Gammap1 = m_uRHS[p+1]*cosa + m_wRHS[p+1]*sina;
 			ForcePt = m_pPanel[p].VortexPos;
-
 			PanelForce  = WindDirection * m_pPanel[p].Vortex;
 			PanelForce *= 2.0 * Gamma;                                       //Newtons/q   (QInf = unit)
 			if(!m_pWPolar->m_bVLM1 && !m_pPanel[p].m_bIsLeading)

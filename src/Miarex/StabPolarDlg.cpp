@@ -1,7 +1,7 @@
 /****************************************************************************
 
 	StabPolarDlg Class
-	Copyright (C) 2010 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2010-2012 Andre Deperrois adeperrois@xflr5.com
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -1173,20 +1173,30 @@ void StabPolarDlg::showEvent(QShowEvent *event)
 
 void StabPolarDlg::OnAutoInertia()
 {
-//	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
-	if(m_pctrlPlaneInertia->isChecked())
+	if(m_bAutoInertia)
 	{
 		FillUFOInertia();
+	}
+	else
+	{
+		m_pctrlMass->SetValue(m_Mass*pMainFrame->m_kgtoUnit);
+		m_pctrlCoGx->SetValue(m_CoG.x*pMainFrame->m_mtoUnit);
+		m_pctrlCoGz->SetValue(m_CoG.z*pMainFrame->m_mtoUnit);
+		m_pctrlIxx->SetValue(m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIyy->SetValue(m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIzz->SetValue(m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIxz->SetValue(m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+
 	}
 	m_pctrlMass->setEnabled(!m_bAutoInertia);
 	m_pctrlCoGx->setEnabled(!m_bAutoInertia);
 	m_pctrlCoGz->setEnabled(!m_bAutoInertia);
 	m_pctrlIxx->setEnabled(!m_bAutoInertia);
-	m_pctrlIxx->setEnabled(!m_bAutoInertia);
 	m_pctrlIyy->setEnabled(!m_bAutoInertia);
 	m_pctrlIzz->setEnabled(!m_bAutoInertia);
 	m_pctrlIxz->setEnabled(!m_bAutoInertia);
+
 	SetWPolarName();
-//	EnableControls();
 }
