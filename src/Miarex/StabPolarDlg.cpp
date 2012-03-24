@@ -43,7 +43,7 @@ StabPolarDlg::StabPolarDlg()
 	m_bAutoName = true;
 	m_bAutoInertia = true;
 	m_bThinSurfaces = true;
-	m_bAVLControls = false;
+	m_bAVLControls = true;
 
 	m_CoG.Set(0.0,0.0,0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
@@ -112,7 +112,7 @@ void StabPolarDlg::Connect()
 
 	connect(m_pctrlPlaneInertia, SIGNAL(clicked()), this, SLOT(OnAutoInertia()));
 
-	connect(m_pctrlAVLControls, SIGNAL(clicked()), this, SLOT(OnAVLControls()));
+//	connect(m_pctrlAVLControls, SIGNAL(clicked()), this, SLOT(OnAVLControls()));
 
 	connect(OKButton,     SIGNAL(clicked()), this, SLOT(OnOK()));
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -402,10 +402,23 @@ void StabPolarDlg::InitDialog()
 
 	m_pctrlPlaneInertia->setChecked(m_bAutoInertia);
 	m_pctrlViscous->setChecked(m_bViscous);
-	m_pctrlAVLControls->setChecked(m_bAVLControls);
+//	m_pctrlAVLControls->setChecked(m_bAVLControls);
 
 	OnAutoInertia();
-	OnAVLControls();
+
+	m_bAVLControls = true;
+
+	m_pControlModel->setColumnCount(2);
+	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
+	m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Gain")+QString::fromUtf8("(°/unit)"));
+	m_pCtrlDelegate->m_Precision[1] = 2;
+
+	FillControlList();
+	SetWPolarName();
+
+//	QShowEvent *event = NULL;
+//	showEvent(event);
+
 
 	m_pctrlControlTable->setFocus();
 }
@@ -844,12 +857,12 @@ void StabPolarDlg::SetupLayout()
 		m_pctrlAnalysisControls->addWidget(WingMethodBox);
 		m_pctrlAnalysisControls->addWidget(PlaneMethodBox);
 	}
-	m_pctrlAVLControls = new QCheckBox(tr("AVL Controls"));
+//	m_pctrlAVLControls = new QCheckBox(tr("AVL Controls"));
 
 	QVBoxLayout *RightSideLayout = new QVBoxLayout;
 	RightSideLayout->addWidget(InertiaBox);
 	RightSideLayout->addWidget(m_pctrlAnalysisControls);
-	RightSideLayout->addWidget(m_pctrlAVLControls);
+//	RightSideLayout->addWidget(m_pctrlAVLControls);
 
 
 	QHBoxLayout *DataLayout = new QHBoxLayout;
@@ -1117,34 +1130,6 @@ void StabPolarDlg::OnMethod()
 }
 
 
-void StabPolarDlg::OnAVLControls()
-{
-//	ReadCtrlData();
-	m_bAVLControls = m_pctrlAVLControls->isChecked();
-
-	if(!m_bAVLControls)
-	{
-		m_pControlModel->setColumnCount(4);
-		m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
-		m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Active"));
-		m_pControlModel->setHeaderData(2, Qt::Horizontal, tr("Min"));
-		m_pControlModel->setHeaderData(3, Qt::Horizontal, tr("Max"));
-		m_pCtrlDelegate->m_Precision[1] = 0;
-	}
-	else
-	{
-		m_pControlModel->setColumnCount(2);
-		m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
-		m_pControlModel->setHeaderData(1, Qt::Horizontal, tr("Gain")+QString::fromUtf8("(°/unit)"));
-		m_pCtrlDelegate->m_Precision[1] = 2;
-	}
-	FillControlList();
-	SetWPolarName();
-
-	QShowEvent *event = NULL;
-	showEvent(event);
-}
-
 
 void StabPolarDlg::showEvent(QShowEvent *event)
 {
@@ -1166,7 +1151,7 @@ void StabPolarDlg::showEvent(QShowEvent *event)
 	else
 	{
 		m_pctrlControlTable->setColumnWidth(0,w2);
-		m_pctrlControlTable->setColumnWidth(1,w3);
+		m_pctrlControlTable->setColumnWidth(1,2*w6);
 	}
 }
 

@@ -882,17 +882,14 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXDirectWidget = new QDockWidget("XDirect", this);
 	m_pctrlXDirectWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXDirectWidget);
-	m_pctrlXDirectWidget->move(960,60);
 
 	m_pctrlXInverseWidget = new QDockWidget("XInverse", this);
 	m_pctrlXInverseWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlXInverseWidget);
-	m_pctrlXInverseWidget->move(960,60);
 
 	m_pctrlMiarexWidget = new QDockWidget("Miarex", this);
 	m_pctrlMiarexWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 	addDockWidget(Qt::RightDockWidgetArea, m_pctrlMiarexWidget);
-	m_pctrlMiarexWidget->move(960,60);
 
 	m_pctrlAFoilWidget = new QDockWidget("AFoil", this);
 	m_pctrlAFoilWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea);
@@ -907,6 +904,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXDirectWidget->setWidget(pXDirect);
 	m_pctrlXDirectWidget->setVisible(false);
 	m_pctrlXDirectWidget->setFloating(true);
+	m_pctrlXDirectWidget->move(960,60);
 
 	m_pXInverse = new QXInverse(this);
 	QXInverse *pXInverse = (QXInverse*)m_pXInverse;
@@ -914,6 +912,7 @@ void MainFrame::CreateDockWindows()
 	m_pctrlXInverseWidget->setWidget(pXInverse);
 	m_pctrlXInverseWidget->setVisible(false);
 	m_pctrlXInverseWidget->setFloating(true);
+	m_pctrlXInverseWidget->move(960,60);
 
 	m_pMiarex = new QMiarex;
 	QMiarex * pMiarex = (QMiarex*)m_pMiarex;
@@ -921,13 +920,13 @@ void MainFrame::CreateDockWindows()
 	m_pctrlMiarexWidget->setWidget(pMiarex);
 	m_pctrlMiarexWidget->setVisible(false);
 	m_pctrlMiarexWidget->setFloating(true);
+	m_pctrlMiarexWidget->move(960,60);
 
 
 	m_pGL3DScales = new GL3DScales(this);
 	GL3DScales * pGL3DScales = (GL3DScales*)m_pGL3DScales;
 	pGL3DScales->m_pMiarex      = m_pMiarex;
 	pGL3DScales->m_pMainFrame    = this;
-
 	pGL3DScales->setAttribute(Qt::WA_DeleteOnClose, false);
 	m_pctrl3DScalesWidget = new QDockWidget(tr("3D Scales"), this);
 	m_pctrl3DScalesWidget->setAllowedAreas(Qt::LeftDockWidgetArea);

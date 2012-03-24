@@ -17,9 +17,11 @@
 
 
 xflr5 v6.07, March xxth, 2012
+	- Corrected the incorrect aileron control derivatives
 	- Corrected the bug in wing analysis with ground effect
 	- Corrected the bug in type 4 analysis for wings and planes
 	- Corrected the bug which modified the chord length as twist increases : impact results for wings with high dihedral
+	- Removed the option for Min/Max type controls in Stabillity Polars
 	- Fixed the crash bug when defining wings with more than 16 span sections
 	- Corrected a bug leading to incorrect results in stability derivatives with active controls (CPanel::RotateBC())
 	- Removed the Splined Points Foil option

@@ -63,7 +63,7 @@ private slots:
 	void OnCellChanged(QWidget *pWidget);
 	void OnMethod();
 	void OnAutoInertia();
-	void OnAVLControls();
+
 
 private:
 	void keyPressEvent(QKeyEvent *event);
@@ -89,7 +89,7 @@ private:
 	QCheckBox *m_pctrlViscous;
 	QCheckBox *m_pctrlAutoName;
 	QCheckBox *m_pctrlPlaneInertia;
-	QCheckBox *m_pctrlAVLControls;
+//	QCheckBox *m_pctrlAVLControls;
 
 	QRadioButton *m_pctrlUnit1, *m_pctrlUnit2;
 	QRadioButton *m_pctrlArea1, *m_pctrlArea2;
