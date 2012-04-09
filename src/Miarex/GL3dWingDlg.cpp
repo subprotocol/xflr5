@@ -2415,6 +2415,7 @@ void GL3dWingDlg::SetupLayout()
 
 	m_pctrlWingDescription = new QTextEdit();
 	m_pctrlWingDescription->setToolTip(tr("Enter here a short description for the wing"));
+	m_pctrlWingDescription->setSizePolicy(szPolicyMaximum);
 
 	QLabel *WingDescription = new QLabel(tr("Description:"));
 
@@ -2445,32 +2446,55 @@ void GL3dWingDlg::SetupLayout()
 		ThreeDParams->addWidget(m_pctrlShowMasses, 3,2);
 	}
 
+	QVBoxLayout *ThreeDView = new QVBoxLayout;
+	{
+		QHBoxLayout *AxisViewLayout = new QHBoxLayout;
+		{
+			m_pctrlX          = new QToolButton;
+			m_pctrlY          = new QToolButton;
+			m_pctrlZ          = new QToolButton;
+			m_pctrlIso        = new QToolButton;
+			if(m_pctrlX->iconSize().height()<=48)
+			{
+				m_pctrlX->setIconSize(QSize(32,32));
+				m_pctrlY->setIconSize(QSize(32,32));
+				m_pctrlZ->setIconSize(QSize(32,32));
+				m_pctrlIso->setIconSize(QSize(32,32));
+			}
+			m_pXView   = new QAction(QIcon(":/images/OnXView.png"), tr("X View"), this);
+			m_pYView   = new QAction(QIcon(":/images/OnYView.png"), tr("Y View"), this);
+			m_pZView   = new QAction(QIcon(":/images/OnZView.png"), tr("Z View"), this);
+			m_pIsoView = new QAction(QIcon(":/images/OnIsoView.png"), tr("Iso View"), this);
+			m_pXView->setCheckable(true);
+			m_pYView->setCheckable(true);
+			m_pZView->setCheckable(true);
+			m_pIsoView->setCheckable(true);
 
-	QHBoxLayout*AxisView = new QHBoxLayout;
-	{
-		m_pctrlX          = new QPushButton(tr("X"));
-		m_pctrlY          = new QPushButton(tr("Y"));
-		m_pctrlZ          = new QPushButton(tr("Z"));
-		m_pctrlX->setSizePolicy(szPolicyMinimum);
-		m_pctrlY->setSizePolicy(szPolicyMinimum);
-		m_pctrlZ->setSizePolicy(szPolicyMinimum);
-		AxisView->addWidget(m_pctrlX);
-		AxisView->addWidget(m_pctrlY);
-		AxisView->addWidget(m_pctrlZ);
+			m_pctrlX->setDefaultAction(m_pXView);
+			m_pctrlY->setDefaultAction(m_pYView);
+			m_pctrlZ->setDefaultAction(m_pZView);
+			m_pctrlIso->setDefaultAction(m_pIsoView);
+			AxisViewLayout->addWidget(m_pctrlX);
+			AxisViewLayout->addWidget(m_pctrlY);
+			AxisViewLayout->addWidget(m_pctrlZ);
+			AxisViewLayout->addWidget(m_pctrlIso);
+		}
+
+
+		QHBoxLayout *ViewResetLayout = new QHBoxLayout;
+		{
+			m_pctrlPickCenter     = new QPushButton(tr("Pick Center"));
+			m_pctrlPickCenter->setToolTip(tr("Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object"));
+			m_pctrlReset          = new QPushButton(tr("Reset"));
+			m_pctrlPickCenter->setCheckable(true);
+
+			ViewResetLayout->addWidget(m_pctrlReset);
+			ViewResetLayout->addWidget(m_pctrlPickCenter);
+		}
+		ThreeDView->addLayout(AxisViewLayout);
+		ThreeDView->addLayout(ViewResetLayout);
 	}
-	QHBoxLayout* ThreeDView = new QHBoxLayout;
-	{
-		m_pctrlIso        = new QPushButton(tr("Iso"));
-		m_pctrlPickCenter = new QPushButton(tr("Pick Center"));
-		m_pctrlReset      = new QPushButton(tr("Reset Scales"));
-		m_pctrlPickCenter->setSizePolicy(szPolicyMinimum);
-		m_pctrlPickCenter->setCheckable(true);
-		m_pctrlReset->setSizePolicy(szPolicyMinimum);
-		m_pctrlIso->setSizePolicy(szPolicyMinimum);
-		ThreeDView->addWidget(m_pctrlIso);
-		ThreeDView->addWidget(m_pctrlReset);
-		ThreeDView->addWidget(m_pctrlPickCenter);
-	}
+
 
 
 	QHBoxLayout *ThreeDViewControls = new QHBoxLayout;
@@ -2518,18 +2542,20 @@ void GL3dWingDlg::SetupLayout()
 	{
 		All3DControls->addStretch(1);
 		All3DControls->addLayout(ThreeDParams);
-		All3DControls->addLayout(AxisView);
 		All3DControls->addLayout(ThreeDView);
 		All3DControls->addLayout(ThreeDViewControls);
 		All3DControls->addStretch(1);
 		All3DControls->addLayout(WingModCommands);
 		All3DControls->addStretch(1);
+		All3DControls->addSpacing(20);
 		All3DControls->addLayout(CommandButtons);
 	}
 
 	RightLayout->addWidget(WingDescription);
 	RightLayout->addWidget(m_pctrlWingDescription);
+	RightLayout->addStretch();
 	RightLayout->addLayout(DataLayout);
+	RightLayout->addSpacing(20);
 	RightLayout->addLayout(All3DControls);
 
 	QHBoxLayout *MainLayout = new QHBoxLayout;

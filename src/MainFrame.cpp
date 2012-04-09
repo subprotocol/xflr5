@@ -128,10 +128,10 @@ MainFrame::MainFrame(QWidget *parent, Qt::WFlags flags)
 
 	m_ImageFormat = 2;
 	m_ExportFileType = 1;
-	m_bReverseZoom = false;
-	m_bAlphaChannel = false;
-	m_bSaveOpps  = false;
-	m_bSaveWOpps = true;
+	m_bReverseZoom  = false;
+	m_bAlphaChannel = true;
+	m_bSaveOpps     = false;
+	m_bSaveWOpps    = true;
 	m_bSaveSettings = true;
 
 	m_StyleName.clear();
@@ -3356,8 +3356,8 @@ bool MainFrame::LoadSettings()
 			else break;
 		}while(n<MAXRECENTFILES);
 
-		m_bReverseZoom = settings.value("ReverseZoom").toBool();
-		m_bAlphaChannel = settings.value("AlphaChannel").toBool();
+		m_bReverseZoom = settings.value("ReverseZoom", false).toBool();
+		m_bAlphaChannel = settings.value("AlphaChannel", true).toBool();
 	}
 
 	return true;

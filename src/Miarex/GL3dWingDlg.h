@@ -31,6 +31,7 @@
 #include <QSettings>
 #include <QLabel>
 #include <QRadioButton>
+#include <QToolButton>
 #include <QStandardItemModel>
 #include <QTableView>
 #include <QPushButton>
@@ -172,7 +173,10 @@ private:
 	QPushButton *OKButton, *CancelButton;
 	QCheckBox *m_pctrlAxes, *m_pctrlLight, *m_pctrlSurfaces, *m_pctrlOutline, *m_pctrlPanels, *m_pctrlFoilNames;
 	QCheckBox *m_pctrlShowMasses;
-	QPushButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso, *m_pctrlReset, *m_pctrlPickCenter;
+	QPushButton *m_pctrlReset, *m_pctrlPickCenter;
+
+	QToolButton *m_pctrlX, *m_pctrlY, *m_pctrlZ, *m_pctrlIso;
+	QAction *m_pXView, *m_pYView, *m_pZView, *m_pIsoView;
 
 	QPushButton *m_pctrlInertiaButton;
 

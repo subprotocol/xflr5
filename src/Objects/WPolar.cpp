@@ -1210,8 +1210,6 @@ void CWPolar::Export(QTextStream &out, int FileType, bool bDataOnly)
 		}
 	}
 	out << "\n\n";
-
-	return ;
 }
 
 

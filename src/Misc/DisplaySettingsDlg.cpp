@@ -39,7 +39,7 @@ DisplaySettingsDlg::DisplaySettingsDlg(void *pParent)
 	m_pMainFrame = pParent;
 	m_bIsGraphModified = false;
 	m_bReverseZoom = false;
-	m_bAlphaChannel = false;
+	m_bAlphaChannel = true;
 	SetupLayout();
 
 	connect(m_pctrlStyles, SIGNAL(activated(const QString &)),this, SLOT(OnStyleChanged(const QString &)));
