@@ -301,6 +301,7 @@ void GLWidget::resizeGL(int width, int height)
 
 
 
+
 void GLWidget::CreateArcballList(ArcBall &ArcBall, double GLScale)
 {
 	int row, col, NumAngles, NumCircles;

@@ -418,7 +418,7 @@ bool GLLightDlg::LoadSettings(QSettings *pSettings)
 
 void GLLightDlg::SetDefaults(double size)
 {
-	s_Red   = 1.0f;
+/*	s_Red   = 1.0f;
 	s_Green = 1.0f;
 	s_Blue  = 1.0f;
 
@@ -430,6 +430,31 @@ void GLLightDlg::SetDefaults(double size)
 	s_MatDiffuse   = -0.43f;
 	s_MatSpecular  = -0.08f;
 	s_MatEmission  = -0.04f;
+	s_iMatShininess = 0;
+
+	s_XLight   =  0.56f * m_Size;//.2
+	s_YLight   =  0.02f * m_Size;//1.2
+	s_ZLight   =  5.0f * m_Size;//20
+
+	s_bLight = true;
+	s_bCullFaces = false;
+	s_bShade     = true;
+	s_bSmooth    = true;
+	s_bLocalView = true;
+	s_bDepthTest = true;
+	s_bColorMaterial = true;*/
+	s_Red   = 1.0f;
+	s_Green = 1.0f;
+	s_Blue  = 1.0f;
+
+	s_Diffuse      = 0.83f;
+	s_Ambient      = 0.18f;
+	s_Specular     = 0.05f;
+
+	s_MatAmbient   = -0.51f;
+	s_MatDiffuse   = -0.43f;
+	s_MatSpecular  = -0.08f;
+	s_MatEmission  = -0.06f;
 	s_iMatShininess = 0;
 
 	s_XLight   =  0.56f * m_Size;//.2

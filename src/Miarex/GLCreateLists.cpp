@@ -2653,22 +2653,19 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 	//define the range of values to set the colors in accordance
 	rmin = 1.e10;
 	rmax = -rmin;
-	for(int iw=0; iw<MAXWINGS; iw++)
+
+
+	for (int p=0; p<pMiarex->m_MatSize; p++)
 	{
-		if(pWingList[iw])
-		{
-			for (p=0; p<pWingList[iw]->m_MatSize; p++)
-			{
-				rmax = qMax(rmax,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
-				rmin = qMin(rmin,pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea());
-			}
-		}
+		rmax = qMax(rmax, pPOpp->m_Cp[p] * pMiarex->m_Panel[p].GetArea());
+		rmin = qMin(rmin, pPOpp->m_Cp[p] * pMiarex->m_Panel[p].GetArea());
 	}
+
 	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	range = rmax - rmin;
 
-	CPanel *pPanel;
+	CPanel *pPanel = pMiarex->m_Panel;
 
 	glNewList(PANELFORCEARROWS, GL_COMPILE);
 	{
@@ -2676,143 +2673,138 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 		glLineWidth(1.0);
 //		glColor3d(pMiarex->m_XCPColor.redF(), pMiarex->m_XCPColor.greenF(), pMiarex->m_XCPColor.blueF());
 
-		for(int iw=0; iw<MAXWINGS; iw++)
+
+		for (p=0; p<pMiarex->m_MatSize; p++)
 		{
-			if(pWingList[iw])
+			// plot Cp? f? f/s=q.Cp?
+			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *pPOpp->m_Cp[p]*pPanel[p].GetArea();
+			force *= pMiarex->m_LiftScale *coef;
+			color = (force-rmin)/range;
+			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+
+			if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
+			else                                     O = pPanel[p].CollPt;
+
+			// Rotate the reference arrow to align it with the panel normal
+
+			if(R==P)
 			{
-				for (p=0; p<pWingList[iw]->m_MatSize; p++)
+				Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
+			}
+			else
+			{
+				cosa   = R.dot(pPanel[p].Normal);
+				sina2  = sqrt((1.0 - cosa)*0.5);
+				cosa2  = sqrt((1.0 + cosa)*0.5);
+				angle = acos(cosa2)*180.0/PI;
+
+				Omega = R * pPanel[p].Normal;//crossproduct
+				Omega.Normalize();
+				Omega *=sina2;
+				Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
+			}
+
+			Qt.Conjugate(R,  P);
+			Qt.Conjugate(R1, P1);
+			Qt.Conjugate(R2, P2);
+
+			// Scale the pressure vector
+			P  *= force;
+			P1 *= force;
+			P2 *= force;
+
+			// Plot
+			if(pPanel[p].m_Pos==MIDSURFACE)
+			{
+				glBegin(GL_LINES);
 				{
-					pPanel = pWingList[iw]->m_pPanel;
-					// plot Cp? f? f/s=q.Cp?
-					force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *pWOppList[iw]->m_Cp[p]*pWingList[iw]->m_pPanel[p].GetArea();
-					force *= pMiarex->m_LiftScale *coef;
-					color = (force-rmin)/range;
-					glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
+					glVertex3d(O.x, O.y, O.z);
+					glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+				}
+				glEnd();
 
-					if(pWPolar->m_AnalysisMethod==VLMMETHOD) O = pPanel[p].CtrlPt;
-					else                                     O = pPanel[p].CollPt;
-
-					// Rotate the reference arrow to align it with the panel normal
-
-					if(R==P)
+				if(force>0)
+				{
+					glBegin(GL_LINES);
 					{
-						Qt.Set(0.0, 0.0,0.0,1.0); //Null quaternion
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
 					}
-					else
+					glEnd();
+					glBegin(GL_LINES);
 					{
-						cosa   = R.dot(pPanel[p].Normal);
-						sina2  = sqrt((1.0 - cosa)*0.5);
-						cosa2  = sqrt((1.0 + cosa)*0.5);
-						angle = acos(cosa2)*180.0/PI;
-
-						Omega = R * pPanel[p].Normal;//crossproduct
-						Omega.Normalize();
-						Omega *=sina2;
-						Qt.Set(cosa2, Omega.x, Omega.y, Omega.z);
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
 					}
-
-					Qt.Conjugate(R,  P);
-					Qt.Conjugate(R1, P1);
-					Qt.Conjugate(R2, P2);
-
-					// Scale the pressure vector
-					P  *= force;
-					P1 *= force;
-					P2 *= force;
-
-					// Plot
-					if(pPanel[p].m_Pos==MIDSURFACE)
+					glEnd();
+				}
+				else
+				{
+					glBegin(GL_LINES);
 					{
-						glBegin(GL_LINES);
-						{
-							glVertex3d(O.x, O.y, O.z);
-							glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-						}
-						glEnd();
-
-						if(force>0)
-						{
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
-							}
-							glEnd();
-						}
-						else
-						{
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
-							}
-							glEnd();
-						}
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P1.x, O.y+P.y+P1.y, O.z+P.z+P1.z);
 					}
-					else
+					glEnd();
+					glBegin(GL_LINES);
 					{
-						if(pWOppList[iw]->m_Cp[p]>0)
-						{
-							// compression, point towards the surface
-		//					P.Set(-P.x, -P.y, -P.z);
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x, O.y, O.z);
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x, O.y, O.z);
-								glVertex3d(O.x-P1.x, O.y-P1.y, O.z-P1.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x, O.y+P.y, O.z);
-								glVertex3d(O.x-P2.x, O.y-P2.y, O.z-P2.z);
-							}
-							glEnd();
-						}
-						else
-						{
-							// depression, point outwards from the surface
-							P.Set(-P.x, -P.y, -P.z);
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x, O.y, O.z);
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x-P1.x, O.y+P.y-P1.y, O.z+P.z-P1.z);
-							}
-							glEnd();
-							glBegin(GL_LINES);
-							{
-								glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
-								glVertex3d(O.x+P.x-P2.x, O.y+P.y-P2.y, O.z+P.z-P2.z);
-							}
-							glEnd();
-						}
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x+P2.x, O.y+P.y+P2.y, O.z+P.z+P2.z);
 					}
+					glEnd();
+				}
+			}
+			else
+			{
+				if(pPOpp->m_Cp[p]>0)
+				{
+					// compression, point towards the surface
+//					P.Set(-P.x, -P.y, -P.z);
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x-P1.x, O.y-P1.y, O.z-P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x-P2.x, O.y-P2.y, O.z-P2.z);
+					}
+					glEnd();
+				}
+				else
+				{
+					// depression, point outwards from the surface
+					P.Set(-P.x, -P.y, -P.z);
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x, O.y, O.z);
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x-P1.x, O.y+P.y-P1.y, O.z+P.z-P1.z);
+					}
+					glEnd();
+					glBegin(GL_LINES);
+					{
+						glVertex3d(O.x+P.x, O.y+P.y, O.z+P.z);
+						glVertex3d(O.x+P.x-P2.x, O.y+P.y-P2.y, O.z+P.z-P2.z);
+					}
+					glEnd();
 				}
 			}
 		}
+
 	}
 	glEndList();
 }

@@ -432,11 +432,12 @@ private:
 	WPolarDlg    m_WngAnalysis;
 	StabPolarDlg m_StabPolarDlg;
 
+public:
+	CPanel m_Panel[VLMMAXMATSIZE];		// the panel array for the currently loaded UFO
 
 private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
 protected:
-	CPanel m_Panel[VLMMAXMATSIZE];		// the panel array for the currently loaded UFO
 
 	CVector m_Node[2*VLMMAXMATSIZE];		// the node array for the currently loaded UFO
 	CVector m_TempWakeNode[2*VLMMAXMATSIZE];	// the temporary wake node array during relaxation calc
