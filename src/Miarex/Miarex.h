@@ -40,8 +40,6 @@
 #include "GL3dWingDlg.h"
 #include "GL3dBodyDlg.h"
 #include "GLLightDlg.h"
-#include "WPolarDlg.h"
-#include "StabPolarDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
 
@@ -159,12 +157,12 @@ private slots:
 	void OnRenameCurWPolar();
 	void OnDeleteCurUFO();
 	void OnDeleteCurWPolar();
-	void OnEditCurWPolar();
 	void OnExportCurWPolar();
 	void OnResetCurWPolar();
 	void OnDeleteCurWOpp();
 	void OnDefineWPolar();
 	void OnDefineStabPolar();
+	void OnEditCurWPolar();
 	void OnDeleteUFOWPolars();
 	void OnDuplicateCurUFO();
 	void OnAnimateWOpp();
@@ -336,6 +334,8 @@ public:
 	double GetCoreSize();
 	void SetCoreSize(double CoreSize);
 
+	QString UFOName();
+
 //	double GetZeroLiftAngle(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau);
 //	double GetVar(int nVar, CFoil *pFoil0, CFoil *pFoil1, double Re, double Cl, double Tau, bool &bOutRe, bool &bError);
 //	void GetLinearizedPolar(CFoil *pFoil0, CFoil *pFoil1, double Re, double Tau, double &Alpha0, double &Slope);
@@ -347,6 +347,7 @@ public:
 	bool SetModWing(CWing *pWing);
 	bool SetModPlane(CPlane *pModPlane);
 	bool SetModBody(CBody *pModBody);
+	bool SetModWPolar(CWPolar *pModWPolar);
 	bool LoadSettings(QSettings *pSettings);
 	bool SaveSettings(QSettings *pSettings);
 	bool SetWOpp(bool bCurrent, double x = 0.0);
@@ -429,11 +430,7 @@ private:
 	GL3dWingDlg  m_WingDlg;
 	GL3dBodyDlg  m_GL3dBody;
 	GLLightDlg   m_GLLightDlg;
-	WPolarDlg    m_WngAnalysis;
-	StabPolarDlg m_StabPolarDlg;
 
-public:
-	CPanel m_Panel[VLMMAXMATSIZE];		// the panel array for the currently loaded UFO
 
 private:
 	QLabel *m_pctrlUnit1, *m_pctrlUnit2, *m_pctrlUnit3;
@@ -668,6 +665,7 @@ public:
 	CVector m_MemNode[2*VLMMAXMATSIZE];         // used if the analysis should be performed on the tilted geometry
 	CVector m_WakeNode[2*VLMMAXMATSIZE];        // the reference current wake node array
 	CVector m_RefWakeNode[2*VLMMAXMATSIZE];     // the reference wake node array if wake needs to be reset
+	CPanel m_Panel[VLMMAXMATSIZE];		        // the panel array for the currently loaded UFO
 	CPanel m_MemPanel[VLMMAXMATSIZE];           // used if the analysis should be performed on the tilted geometry
 	CPanel m_WakePanel[VLMMAXMATSIZE];          // the reference current wake panel array
 	CPanel m_RefWakePanel[VLMMAXMATSIZE];       // the reference wake panel array if wake needs to be reset

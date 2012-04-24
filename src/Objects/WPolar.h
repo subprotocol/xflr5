@@ -55,6 +55,7 @@ public:
 	void *GetUFOPlrVariable(int iVar);
 	void ResetWPlr();
 	void Copy(CWPolar *pWPolar);
+	void DuplicateSpec(CWPolar *pWPolar);
 	bool SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat);
 
 	static void* s_pMainFrame;

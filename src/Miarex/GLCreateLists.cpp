@@ -655,11 +655,9 @@ void GLCreateCpLegendClr(void *pQMiarex)
 	int i;
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
 
-	double ClientToGL;
 
-	double fi,dD, ZPos,dz,Right1, Right2;
+	double fi, ZPos,dz,Right1, Right2;
 	double color = 0.0;
-	double range;
 
 	double w = (double)pMiarex->m_r3DCltRect.width();
 	double h = (double)pMiarex->m_r3DCltRect.height();
@@ -671,7 +669,6 @@ void GLCreateCpLegendClr(void *pQMiarex)
 //		ZPos  = h/w * (-1.0 + 2.0/3.0);
 		dz    = h/w*1.0/20.0;
 		ZPos  = h/w - 23.0*dz;
-		ClientToGL = 2.0/w;
 	}
 	else
 	{
@@ -679,15 +676,10 @@ void GLCreateCpLegendClr(void *pQMiarex)
 //		ZPos  = (-1.0 + 2.0/3.0);
 		dz    = 1.0/20.0;
 		ZPos  = 1.0 - 23.0*dz;
-		ClientToGL = 2.0/h;
 	}
-
-	dD      = 12.0/w*2.0;
 
 	Right1  = .94*XPos;
 	Right2  = .98*XPos;
-
-	range = (pMiarex->m_LegendMax - pMiarex->m_LegendMin);
 
 	glNewList(WOPPCPLEGENDCLR,GL_COMPILE);
 	{
@@ -734,7 +726,6 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 
 	double sina = -sin(pWOpp->m_Alpha*PI/180.0);
 	double cosa =  cos(pWOpp->m_Alpha*PI/180.0);
-	double sign;
 	factor = pMiarex->m_VelocityScale/100.0;
 
 	//DOWNWASH
@@ -811,7 +802,7 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 					{
 //						m_pSurface[j+surf0]->GetTrailingPt(k, C);
 						pWing->m_Surface[j].GetTrailingPt(k, C);
-						if (pWOpp->m_Vd[i].z>0) sign = 1.0; else sign = -1.0;
+//						if (pWOpp->m_Vd[i].z>0) sign = 1.0; else sign = -1.0;
 						glBegin(GL_LINES);
 						{
 							glVertex3d(C.x, C.y, C.z);
@@ -1199,7 +1190,7 @@ void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
 
 	QColor color;
 	int iLA, iLB, iTA, iTB;
-	int style, width, p;
+	int p;
 	CVector  N;
 	N.Set(0.0, 0.0, 0.0);
 
@@ -1212,8 +1203,8 @@ void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
 //		glPolygonOffset(1.0, 1.0);
 
 		color = pMiarex->m_VLMColor;
-		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
+//		style = pMiarex->m_VLMStyle;
+//		width = pMiarex->m_VLMWidth;
 
 		glLineWidth(1.0);
 
@@ -1248,8 +1239,8 @@ void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
 		glPolygonOffset(1.0, 1.0);
 
 		color = pMainFrame->m_BackgroundColor;
-		style = pMiarex->m_VLMStyle;
-		width = pMiarex->m_VLMWidth;
+//		style = pMiarex->m_VLMStyle;
+//		width = pMiarex->m_VLMWidth;
 
 		glColor3d(color.redF(),color.greenF(),color.blueF());
 
@@ -1726,9 +1717,9 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 	GL3DScales *p3DScales = (GL3DScales *)pMainFrame->m_pGL3DScales;
 	bool bFound;
 	int i;
-	int m, p, style, width, iWing;
+	int m, p, style,  iWing;
 	double ds;
-	float *Gamma, *Mu, *Sigma;
+	float *Mu, *Sigma;
 	QColor color;
 
 	CVector C, D, D1, VA, VAT, VB, VBT, VT, VInf, TC, TD;
@@ -1740,19 +1731,16 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 	if(pMiarex->m_pCurPOpp)
 	{
-		Gamma = pPOpp->m_G;
 		Mu    = pPOpp->m_G;
 		Sigma = pPOpp->m_Sigma;
 	}
 	else if (pWOpp)
 	{
-		Gamma = pWOpp->m_G;
 		Mu    = pWOpp->m_G;
 		Sigma = pWOpp->m_Sigma;
 	}
 	else
 	{
-		Gamma = NULL;
 		Mu    = NULL;
 		Sigma = NULL;
 	}
@@ -1772,7 +1760,7 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 		color = pMiarex->m_StreamLinesColor;
 		style = pMiarex->m_StreamLinesStyle;
-		width = pMiarex->m_StreamLinesWidth;
+//		width = pMiarex->m_StreamLinesWidth;
 
 		glLineWidth(pMiarex->m_WakeWidth);
 
@@ -1952,34 +1940,30 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 	int p, style;
 	double factor;
-	double length, sinT, cosT, beta;
-//	float Gamma[VLMMAXMATSIZE];
-	float Mu[VLMMAXMATSIZE], Sigma[VLMMAXMATSIZE];
+	double length, sinT, cosT;
+
+	float *Mu, *Sigma;
 	double x1, x2, y1, y2, z1, z2, xe, ye, ze, dlx, dlz;
 	CVector C, V, VT;
 	CVector RefPoint(0.0,0.0,0.0);
 
 	factor = pMiarex->m_VelocityScale/100.0;
 
-	int pos = 0;
+	CPOpp *pPOpp = pMiarex->m_pCurPOpp;
 	if(pMiarex->m_pCurPOpp)
 	{
-		for(int iw=0; iw<MAXWINGS; iw++)
-		{
-			if(pMiarex->m_pWingList[iw])
-			{
-//				memcpy(Gamma+pos, pMiarex->m_pWOpp[iw]->m_G,     pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
-				memcpy(Mu+pos,    pMiarex->m_pWOpp[iw]->m_G,     pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
-				memcpy(Sigma+pos, pMiarex->m_pWOpp[iw]->m_Sigma, pMiarex->m_pWingList[iw]->m_MatSize*sizeof(float));
-				pos += pMiarex->m_pWingList[iw]->m_MatSize;
-			}
-		}
+		Mu    = pPOpp->m_G;
+		Sigma = pPOpp->m_Sigma;
 	}
 	else if (pWOpp)
 	{
-//		memcpy(Gamma, pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
-		memcpy(Mu,    pWOpp->m_G,     pWOpp->m_NVLMPanels*sizeof(float));
-		memcpy(Sigma, pWOpp->m_Sigma, pWOpp->m_NVLMPanels*sizeof(float));
+		Mu    = pWOpp->m_G;
+		Sigma = pWOpp->m_Sigma;
+	}
+	else
+	{
+		Mu    = NULL;
+		Sigma = NULL;
 	}
 
 	glNewList(SURFACESPEEDS, GL_COMPILE);
@@ -2027,9 +2011,9 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 				sinT   = (ze-C.z)/length;
 				dlx     = 0.15*length;
 				dlz     = 0.07*length;
-				beta   = atan((ye-C.y)/length)*180.0/PI;
 			}
-			else {
+			else
+			{
 				cosT   = 0.0;
 				sinT   = 0.0;
 				dlx    = 0.0;
@@ -2080,7 +2064,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 {
 	int i,j,k,m, style;
-	double yrel, xt, yt, zt, yob, dih;
+	double yrel, xt, yt, zt, yob ;
 	CVector Pt;
 
 	QMiarex*pMiarex = (QMiarex*)pQMiarex;
@@ -2116,7 +2100,6 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						xt = pWing->Offset(yob) + pWOpp->m_XTrTop[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrTop[i], pWOpp->m_SpanPos[i],yt,zt,0);
 
-						dih = pWing->Dihedral(yob)*PI/180.0;
 						glVertex3d(xt,yt,zt);
 					}
 				}
@@ -2196,8 +2179,6 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 						yob = 2.0*pWOpp->m_SpanPos[i]/pWOpp->m_Span;
 						xt = pWing->Offset(yob) + pWOpp->m_XTrBot[i]*pWOpp->m_Chord[i];
 						pWing->GetViewYZPos(pWOpp->m_XTrBot[i], pWOpp->m_SpanPos[i],yt,zt,0);
-
-						dih = pWing->Dihedral(yob)*PI/180.0;
 
 						glVertex3d(xt,yt, zt);
 					}
@@ -2622,11 +2603,9 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	int p;
-	double force, angle, cosa, sina2, cosa2, color;
-//	double ClientToGL;
-//	double dD, ZPos,dz,Right1, Right2;
-	double rmin, rmax, range, w, h;
-
+	float *Cp;
+	double force, cosa, sina2, cosa2, color;
+	double rmin, rmax, range;
 	double coef = 1.;
 	Quaternion Qt; // Quaternion operator to align the reference arrow to the panel's normal
 	CVector Omega; //rotation vector to align the reference arrow to the panel's normal
@@ -2638,28 +2617,21 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 	//The three vectors defining the arrow on the panel
 	CVector P, P1, P2;
 
-	w = (double)pMiarex->m_r3DCltRect.width();
-	h = (double)pMiarex->m_r3DCltRect.height();
-
-	CWing *pWingList[MAXWINGS];
-	CWOpp *pWOppList[MAXWINGS];
-	for(int ip=0; ip<MAXWINGS; ip++)
-	{
-		pWingList[ip] = pMiarex->m_pWingList[ip];
-		pWOppList[ip] = pMiarex->m_pWOpp[ip];
-	}
-
 
 	//define the range of values to set the colors in accordance
 	rmin = 1.e10;
 	rmax = -rmin;
 
 
+	if(pPOpp)      Cp = pPOpp->m_Cp;
+	else if(pWOpp) Cp = pWOpp->m_Cp;
+
 	for (int p=0; p<pMiarex->m_MatSize; p++)
 	{
-		rmax = qMax(rmax, pPOpp->m_Cp[p] * pMiarex->m_Panel[p].GetArea());
-		rmin = qMin(rmin, pPOpp->m_Cp[p] * pMiarex->m_Panel[p].GetArea());
+		rmax = qMax(rmax, Cp[p] * pMiarex->m_Panel[p].GetArea());
+		rmin = qMin(rmin, Cp[p] * pMiarex->m_Panel[p].GetArea());
 	}
+
 
 	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
 	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMiarex->m_LiftScale *coef;
@@ -2677,7 +2649,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 		for (p=0; p<pMiarex->m_MatSize; p++)
 		{
 			// plot Cp? f? f/s=q.Cp?
-			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf *pPOpp->m_Cp[p]*pPanel[p].GetArea();
+			force = 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf * Cp[p]*pPanel[p].GetArea();
 			force *= pMiarex->m_LiftScale *coef;
 			color = (force-rmin)/range;
 			glColor3d(GLGetRed(color),GLGetGreen(color),GLGetBlue(color));
@@ -2696,7 +2668,6 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 				cosa   = R.dot(pPanel[p].Normal);
 				sina2  = sqrt((1.0 - cosa)*0.5);
 				cosa2  = sqrt((1.0 + cosa)*0.5);
-				angle = acos(cosa2)*180.0/PI;
 
 				Omega = R * pPanel[p].Normal;//crossproduct
 				Omega.Normalize();
@@ -2756,7 +2727,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 			}
 			else
 			{
-				if(pPOpp->m_Cp[p]>0)
+				if(Cp[p]>0)
 				{
 					// compression, point towards the surface
 //					P.Set(-P.x, -P.y, -P.z);
@@ -2810,14 +2781,14 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 }
 
 
-void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
+void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar)
 {
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	GLWidget *pGLWidget = (GLWidget*)pMiarex->s_pGLWidget;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 	int p, i;
 	double labellength, ClientToGL;
-	double f, fi, ZPos,dz,Right1, Right2;
+	double f, fi, ZPos,dz,Right1;
 	double rmin, rmax, range, delta;
 	double XPos, w, h;
 
@@ -2852,8 +2823,8 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 			}
 		}
 	}
-	rmin *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
-	rmax *= 0.5*pWPolar->m_Density *pWOpp->m_QInf*pWOpp->m_QInf  *pMainFrame->m_NtoUnit;
+	rmin *= 0.5*pWPolar->m_Density *pWOppList[0]->m_QInf*pWOppList[0]->m_QInf  *pMainFrame->m_NtoUnit;
+	rmax *= 0.5*pWPolar->m_Density *pWOppList[0]->m_QInf*pWOppList[0]->m_QInf  *pMainFrame->m_NtoUnit;
 	range = rmax - rmin;
 
 
@@ -2875,7 +2846,6 @@ void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CW
 //		dD      = 12.0/w*2.0;
 
 	Right1  = .94*XPos;
-	Right2  = .98*XPos;
 
 	delta = range / 20.0;
 

@@ -712,7 +712,7 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 		return;
 	}
 	int i,j,k,l;
-	int p, style, width, nx, nh;
+	int p,  nx, nh;
 	double uk, v, dj, dj1, dl1;
 	CVector N, LATB, TALB, LA, LB, TA, TB;
 	CVector PLA, PLB, PTA, PTB;
@@ -735,8 +735,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 			glDisable (GL_LINE_STIPPLE);
 
 			color = pMiarex->m_VLMColor;
-			style = pMiarex->m_VLMStyle;
-			width = pMiarex->m_VLMWidth;
+//			style = pMiarex->m_VLMStyle;
+//			width = pMiarex->m_VLMWidth;
 
 			glColor3d(color.redF(),color.greenF(),color.blueF());
 
@@ -864,8 +864,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 			glPolygonOffset(1.0, 1.0);
 
 			color = pMainFrame->m_BackgroundColor;
-			style = pMiarex->m_VLMStyle;
-			width = pMiarex->m_VLMWidth;
+//			style = pMiarex->m_VLMStyle;
+//			width = pMiarex->m_VLMWidth;
 
 			glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -1005,8 +1005,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 			glEnable(GL_DEPTH_TEST);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			color = pMiarex->m_VLMColor;
-			style = pMiarex->m_VLMStyle;
-			width = pMiarex->m_VLMWidth;
+//			style = pMiarex->m_VLMStyle;
+//			width = pMiarex->m_VLMWidth;
 
 			glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -1078,8 +1078,8 @@ void GL3dBodyDlg::GLCreateBodyMesh(CBody *pBody)
 			glDisable (GL_LINE_STIPPLE);
 
 			color = pMainFrame->m_BackgroundColor;
-			style = pMiarex->m_VLMStyle;
-			width = pMiarex->m_VLMWidth;
+//			style = pMiarex->m_VLMStyle;
+//			width = pMiarex->m_VLMWidth;
 
 			glColor3d(color.redF(), color.greenF(), color.blueF());
 
@@ -1372,7 +1372,7 @@ void GL3dBodyDlg::GLCreateBodyOverlay()
 
 void GL3dBodyDlg::GLCreateBody2DBodySection()
 {
-	int i,k,style, width;
+	int i, k, width;
 
 	QColor color;
 
@@ -1399,7 +1399,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 		glColor3d(color.redF(), color.greenF(), color.blueF());
 
 		//Middle Line
-		style = DASHLINE;
+//		style = DASHLINE;
 		glLineStipple (1, 0xCFCF);
 		glBegin(GL_LINE_STRIP);
 		{
@@ -1481,7 +1481,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 
 void GL3dBodyDlg::GLCreateBodyPoints()
 {
-	int k,style, width;
+	int k, width;
 	QColor color;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 //	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
@@ -1503,7 +1503,7 @@ void GL3dBodyDlg::GLCreateBodyPoints()
 		glPolygonMode(GL_FRONT,GL_LINE);
 
 		color = m_pBody->m_BodyColor;
-		style = 0;
+//		style = 0;
 		width = 1;
 		glLineWidth(width);
 
@@ -1547,7 +1547,7 @@ void GL3dBodyDlg::GLCreateBodyPoints()
 		glPolygonMode(GL_FRONT,GL_LINE);
 
 		color = m_pBody->m_BodyColor;
-		style = 0;
+//		style = 0;
 		width = 1;
 
 		glLineWidth(width);
@@ -1587,7 +1587,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 {
 	int j,k;
 	CVector Point;
-	double xinc, hinc, u, v;
+	double hinc, u, v;
 	int nh,style, width;
 	QColor color;
 //	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
@@ -1602,7 +1602,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 	}
 
 	nh = 20;
-	xinc = 0.1;
+//	xinc = 0.1;
 	hinc = 1.0/(double)(nh-1);
 
 	glNewList(BODYFRAME,GL_COMPILE);//create 2D Splines or Lines
@@ -2453,7 +2453,7 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strong, strLengthUnit;
 
-	int style, width;
+	int width;
 	QColor color;
 
 	GetLengthUnit(strLengthUnit, pMainFrame->m_LengthUnit);
@@ -2467,7 +2467,7 @@ void GL3dBodyDlg::GLDrawBodyLegend()
 	glPolygonMode(GL_FRONT,GL_LINE);
 
 	color = pMainFrame->m_TextColor;
-	style = 0;
+//	style = 0;
 	width = 3;
 
 	glLineWidth((float)width);
@@ -2555,7 +2555,7 @@ void GL3dBodyDlg::GLInverseMatrix()
 
 void GL3dBodyDlg::GLRenderBody()
 {
-	int width;
+//	int width;
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	GLdouble pts[4];
@@ -2575,7 +2575,6 @@ void GL3dBodyDlg::GLRenderBody()
 	pts[0]= 0.0; pts[1]=0.0; pts[2]=-1.0; pts[3]= m_ClipPlanePos;
 	glClipPlane(GL_CLIP_PLANE5, pts);
 
-	width = m_rCltRect.width();
 
 	glPushMatrix();
 	{
@@ -3433,7 +3432,7 @@ void GL3dBodyDlg::OnFrameCellChanged(QWidget *pWidget)
 	TakePicture();
 	StorePicture();
 	m_bChanged = true;
-	int n = m_pBody->m_iActiveFrame;
+//	int n = m_pBody->m_iActiveFrame;
 	ReadFrameSectionData(m_pBody->m_iActiveFrame);
 	m_bResetglBody   = true;
 	m_bResetglBody2D = true;
@@ -3469,7 +3468,7 @@ void GL3dBodyDlg::OnInertia()
 
 	//save inertia properties
 	int NMass;
-	double MassValue[MAXMASSES];
+//	double MassValue[MAXMASSES];
 	CVector MassPosition[MAXMASSES];
 	QString MassTag[MAXMASSES];
 
@@ -3477,7 +3476,7 @@ void GL3dBodyDlg::OnInertia()
 
 	for(int i=0; i< MAXMASSES; i++)
 	{
-		MassValue[i]    = m_pBody->m_MassValue[i];
+//		MassValue[i]    = m_pBody->m_MassValue[i];
 		MassPosition[i] = m_pBody->m_MassPosition[i];
 		MassTag[i]      = m_pBody->m_MassTag[i];
 	}
@@ -3494,7 +3493,7 @@ void GL3dBodyDlg::OnInertia()
 
 		for(int i=0; i< MAXMASSES; i++)
 		{
-			MassValue[i]    = m_pBody->m_MassValue[i];
+//			MassValue[i]    = m_pBody->m_MassValue[i];
 			MassPosition[i] = m_pBody->m_MassPosition[i];
 			MassTag[i]      = m_pBody->m_MassTag[i];
 		}
@@ -3506,6 +3505,7 @@ void GL3dBodyDlg::OnInsert()
 {
 	Insert(m_RealPopUp);
 }
+
 
 void GL3dBodyDlg::Insert(CVector Pt)
 {
@@ -3622,7 +3622,6 @@ void GL3dBodyDlg::OnPanels()
 	m_bVLMPanels = m_pctrlPanels->isChecked();
 	UpdateView();
 }
-
 
 
 void GL3dBodyDlg::OnPointCellChanged(QWidget *pWidget)

@@ -46,6 +46,6 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar);
 void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp);
 void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *pPOpp);
-void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp);
+void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar);
 
 #endif // GLCREATELISTS_H

@@ -28,6 +28,8 @@
 #include "Miarex/GL3dBodyDlg.h"
 #include "Miarex/GL3DScales.h"
 #include "Miarex/StabViewDlg.h"
+#include "Miarex/WPolarDlg.h"
+#include "Miarex/StabPolarDlg.h"
 #include "Miarex/PlaneDlg.h"
 #include "Miarex/StabViewDlg.h"
 #include "Miarex/ManageUFOsDlg.h"
@@ -1298,8 +1300,11 @@ void MainFrame::CreateMiarexActions()
 
 	defineWPolar = new QAction(tr("Define an Analysis")+" \t(F6)", this);
 	defineWPolar->setStatusTip(tr("Define an analysis for the current wing or plane"));
-//	defineWPolar->setShortcut(tr("F6"));
 	connect(defineWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnDefineWPolar()));
+
+	editWPolar = new QAction(tr("Edit...")+" \t(Ctrl+F6)", this);
+	editWPolar->setStatusTip(tr("Modify the analysis parameters of this polar"));
+	connect(editWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWPolar()));
 
 /*	defineCtrlPolar = new QAction(tr("Define a Control Analysis")+"\t(Ctrl+F6)", this);
 	defineCtrlPolar->setStatusTip(tr("Define a control analysis for the current wing or plane"));
@@ -1418,10 +1423,6 @@ void MainFrame::CreateMiarexActions()
 	renameCurWPolar->setStatusTip(tr("Rename the currently selected polar"));
 	connect(renameCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnRenameCurWPolar()));
 
-	editCurWPolar = new QAction(tr("Edit ..."), this);
-	editCurWPolar->setStatusTip(tr("Edit the points of the currently selected polar"));
-	connect(editCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnEditCurWPolar()));
-
 	exportCurWPolar = new QAction(tr("Export ..."), this);
 	exportCurWPolar->setStatusTip(tr("Export the currently selected polar to a text or csv file"));
 	connect(exportCurWPolar, SIGNAL(triggered()), pMiarex, SLOT(OnExportCurWPolar()));
@@ -1514,7 +1515,7 @@ void MainFrame::CreateMiarexMenus()
 		CurWPlrMenu = MiarexWPlrMenu->addMenu(tr("Current Polar"));
 		{
 			CurWPlrMenu->addAction(ShowPolarProps);
-			CurWPlrMenu->addAction(editCurWPolar);
+			CurWPlrMenu->addAction(editWPolar);
 			CurWPlrMenu->addAction(renameCurWPolar);
 			CurWPlrMenu->addAction(deleteCurWPolar);
 			CurWPlrMenu->addAction(exportCurWPolar);
@@ -5221,7 +5222,7 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	// 100011 : Added Body serialization
 	// 100010 : Converted to I.S. units
 	// 100009 : added serialization of opps in numbered format
-	// 100008 : Added m_WngAnalysis.m_bTiltedGeom, m_WngAnalysis.m_bWakeRollUp
+	// 100008 : Added m_WPolarDlg.m_bTiltedGeom, m_WPolarDlg.m_bWakeRollUp
 	// 100006 : version 2.99Beta001 format
 	// 100005 : version 2.00 format
 	//Archive format introduced in Beta V22
@@ -5234,35 +5235,35 @@ bool MainFrame::SerializeUFOProject(QDataStream &ar, int ProjectFormat)
 	ar << m_ForceUnit;
 	ar << m_MomentUnit;
 
-	if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
-	else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
-	else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
-	else if(pMiarex->m_WngAnalysis.m_WPolarType==STABILITYPOLAR)  ar<<7;
+	if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+	else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+	else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+	else if(WPolarDlg::s_WPolar.m_WPolarType==STABILITYPOLAR)  ar<<7;
 	else ar << 0;
 
-	ar << (float)pMiarex->m_WngAnalysis.m_Weight;
-	ar << (float)pMiarex->m_WngAnalysis.m_QInf;
-	ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
-	ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
-	ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
-	ar << (float)pMiarex->m_WngAnalysis.m_Density;
-	ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
-	ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
-	ar << (float)pMiarex->m_WngAnalysis.m_Beta;
+	ar << (float)WPolarDlg::s_WPolar.m_Mass;
+	ar << (float)WPolarDlg::s_WPolar.m_QInf;
+	ar << (float)WPolarDlg::s_WPolar.m_CoG.x;
+	ar << (float)WPolarDlg::s_WPolar.m_CoG.y;
+	ar << (float)WPolarDlg::s_WPolar.m_CoG.z;
+	ar << (float)WPolarDlg::s_WPolar.m_Density;
+	ar << (float)WPolarDlg::s_WPolar.m_Viscosity;
+	ar << (float)WPolarDlg::s_WPolar.m_ASpec;
+	ar << (float)WPolarDlg::s_WPolar.m_Beta;
 
-	if(pMiarex->m_WngAnalysis.m_AnalysisMethod==LLTMETHOD)        ar << 1;
-	else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==VLMMETHOD)   ar << 2;
-	else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==PANELMETHOD) ar << 3;
+	if(WPolarDlg::s_WPolar.m_AnalysisMethod==LLTMETHOD)        ar << 1;
+	else if(WPolarDlg::s_WPolar.m_AnalysisMethod==VLMMETHOD)   ar << 2;
+	else if(WPolarDlg::s_WPolar.m_AnalysisMethod==PANELMETHOD) ar << 3;
 
 
 	if (pMiarex->m_bVLM1)  ar << 1;
 	else				 ar << 0;
-//		if (pMiarex->m_WngAnalysis.m_bMiddle) ar << 1; else ar << 0;
+//		if (WPolarDlg::m_bMiddle) ar << 1; else ar << 0;
 	ar <<1;
-	if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
-	else									  ar << 0;
-	if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
-	else									  ar << 0;
+	if (WPolarDlg::s_WPolar.m_bTiltedGeom) ar << 1;
+	else                                               ar << 0;
+	if (WPolarDlg::s_WPolar.m_bWakeRollUp) ar << 1;
+	else                                               ar << 0;
 
 	// Store the wing, if any
 	if(!pPlane)
@@ -5490,7 +5491,7 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		// 100011 : Added Body serialization
 		// 100010 : Converted to I.S. units
 		// 100009 : added serialization of opps in numbered format
-		// 100008 : Added m_WngAnalysis.m_bTiltedGeom, m_WngAnalysis.m_bWakeRollUp
+		// 100008 : Added m_WPolarDlg.m_bTiltedGeom, m_WPolarDlg.m_bWakeRollUp
 		// 100006 : version 2.99Beta001 format
 		// 100005 : version 2.00 format
 		//Archive format introduced in Beta V22
@@ -5503,35 +5504,35 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 		ar << m_ForceUnit;
 		ar << m_MomentUnit;
 
-		if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
-		else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
-		else if(pMiarex->m_WngAnalysis.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
-		else if(pMiarex->m_WngAnalysis.m_WPolarType==STABILITYPOLAR)  ar<<7;
+		if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDSPEEDPOLAR)      ar<<1;
+		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDLIFTPOLAR)  ar<<2;
+		else if(WPolarDlg::s_WPolar.m_WPolarType==FIXEDAOAPOLAR)   ar<<4;
+		else if(WPolarDlg::s_WPolar.m_WPolarType==STABILITYPOLAR)  ar<<7;
 		else ar << 0;
 
-		ar << (float)pMiarex->m_WngAnalysis.m_Weight;
-		ar << (float)pMiarex->m_WngAnalysis.m_QInf;
-		ar << (float)pMiarex->m_WngAnalysis.m_CoG.x;
-		ar << (float)pMiarex->m_WngAnalysis.m_CoG.y;
-		ar << (float)pMiarex->m_WngAnalysis.m_CoG.z;
+		ar << (float)WPolarDlg::s_WPolar.m_Mass;
+		ar << (float)WPolarDlg::s_WPolar.m_QInf;
+		ar << (float)WPolarDlg::s_WPolar.m_CoG.x;
+		ar << (float)WPolarDlg::s_WPolar.m_CoG.y;
+		ar << (float)WPolarDlg::s_WPolar.m_CoG.z;
 		
-		ar << (float)pMiarex->m_WngAnalysis.m_Density;
-		ar << (float)pMiarex->m_WngAnalysis.m_Viscosity;
-		ar << (float)pMiarex->m_WngAnalysis.m_Alpha;
-		ar << (float)pMiarex->m_WngAnalysis.m_Beta;
+		ar << (float)WPolarDlg::s_WPolar.m_Density;
+		ar << (float)WPolarDlg::s_WPolar.m_Viscosity;
+		ar << (float)WPolarDlg::s_WPolar.m_ASpec;
+		ar << (float)WPolarDlg::s_WPolar.m_Beta;
 
-		if(pMiarex->m_WngAnalysis.m_AnalysisMethod==LLTMETHOD)        ar << 1;
-		else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==VLMMETHOD)   ar << 2;
-		else if(pMiarex->m_WngAnalysis.m_AnalysisMethod==PANELMETHOD) ar << 3;
+		if(WPolarDlg::s_WPolar.m_AnalysisMethod==LLTMETHOD)        ar << 1;
+		else if(WPolarDlg::s_WPolar.m_AnalysisMethod==VLMMETHOD)   ar << 2;
+		else if(WPolarDlg::s_WPolar.m_AnalysisMethod==PANELMETHOD) ar << 3;
 
 		if (pMiarex->m_bVLM1)   ar << 1;
 		else                    ar << 0;
 
 		ar <<123;
-		if (pMiarex->m_WngAnalysis.m_bTiltedGeom) ar << 1;
-		else                                      ar << 0;
-		if (pMiarex->m_WngAnalysis.m_bWakeRollUp) ar << 1;
-		else                                      ar << 0;
+		if (WPolarDlg::s_WPolar.m_bTiltedGeom) ar << 1;
+		else                                               ar << 0;
+		if (WPolarDlg::s_WPolar.m_bWakeRollUp) ar << 1;
+		else                                               ar << 0;
 
 		ar << m_oaWing.size() ;//number of wings
 		// Store the wings
@@ -5630,38 +5631,38 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			if(ArchiveFormat>=100004)
 			{
 				ar >>k;
-				if(k==1)      pMiarex->m_WngAnalysis.m_WPolarType = FIXEDSPEEDPOLAR;
-				else if(k==2) pMiarex->m_WngAnalysis.m_WPolarType = FIXEDLIFTPOLAR;
-				else if(k==4) pMiarex->m_WngAnalysis.m_WPolarType = FIXEDAOAPOLAR;
-				else if(k==7) pMiarex->m_WngAnalysis.m_WPolarType = STABILITYPOLAR;
+				if(k==1)      WPolarDlg::s_WPolar.m_WPolarType = FIXEDSPEEDPOLAR;
+				else if(k==2) WPolarDlg::s_WPolar.m_WPolarType = FIXEDLIFTPOLAR;
+				else if(k==4) WPolarDlg::s_WPolar.m_WPolarType = FIXEDAOAPOLAR;
+				else if(k==7) WPolarDlg::s_WPolar.m_WPolarType = STABILITYPOLAR;
 
-				ar >> f; pMiarex->m_WngAnalysis.m_Weight=f;
-				ar >> f; pMiarex->m_WngAnalysis.m_QInf=f;
+				ar >> f; WPolarDlg::s_WPolar.m_Mass=f;
+				ar >> f; WPolarDlg::s_WPolar.m_QInf=f;
 				if(ArchiveFormat>=100013)
 				{
-					ar >> f; pMiarex->m_WngAnalysis.m_CoG.x=f;
-					ar >> f; pMiarex->m_WngAnalysis.m_CoG.y=f;
-					ar >> f; pMiarex->m_WngAnalysis.m_CoG.z=f;
+					ar >> f; WPolarDlg::s_WPolar.m_CoG.x=f;
+					ar >> f; WPolarDlg::s_WPolar.m_CoG.y=f;
+					ar >> f; WPolarDlg::s_WPolar.m_CoG.z=f;
 				}
 				else
 				{
-					ar >> f; pMiarex->m_WngAnalysis.m_CoG.x=f;
-					pMiarex->m_WngAnalysis.m_CoG.y=0;
-					pMiarex->m_WngAnalysis.m_CoG.z=0;
+					ar >> f; WPolarDlg::s_WPolar.m_CoG.x=f;
+					WPolarDlg::s_WPolar.m_CoG.y=0;
+					WPolarDlg::s_WPolar.m_CoG.z=0;
 				}
-				if(ArchiveFormat<100010) pMiarex->m_WngAnalysis.m_CoG.x=f/1000.0;
-				ar >> f; pMiarex->m_WngAnalysis.m_Density=f;
-				ar >> f; pMiarex->m_WngAnalysis.m_Viscosity=f;
-				ar >> f; pMiarex->m_WngAnalysis.m_Alpha=f;
+				if(ArchiveFormat<100010) WPolarDlg::s_WPolar.m_CoG.x=f/1000.0;
+				ar >> f; WPolarDlg::s_WPolar.m_Density   = f;
+				ar >> f; WPolarDlg::s_WPolar.m_Viscosity = f;
+				ar >> f; WPolarDlg::s_WPolar.m_ASpec     = f;
 				if(ArchiveFormat>=100012)
 				{
-					ar >>f; pMiarex->m_WngAnalysis.m_Beta=f;
+					ar >>f; WPolarDlg::s_WPolar.m_Beta=f;
 				}
 
 				ar >> k;
-				if(k==1)      pMiarex->m_WngAnalysis.m_AnalysisMethod=LLTMETHOD;
-				else if(k==2) pMiarex->m_WngAnalysis.m_AnalysisMethod=VLMMETHOD;
-				else if(k==3) pMiarex->m_WngAnalysis.m_AnalysisMethod=PANELMETHOD;
+				if(k==1)      WPolarDlg::s_WPolar.m_AnalysisMethod=LLTMETHOD;
+				else if(k==2) WPolarDlg::s_WPolar.m_AnalysisMethod=VLMMETHOD;
+				else if(k==3) WPolarDlg::s_WPolar.m_AnalysisMethod=PANELMETHOD;
 			}
 			if(ArchiveFormat>=100006)
 			{
@@ -5670,19 +5671,19 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 				else   pMiarex->m_bVLM1 = false;
 
 				ar >> k;
-//					if (k) pMiarex->m_WngAnalysis.m_bMiddle = true;
-//					else   pMiarex->m_WngAnalysis.m_bMiddle = false;
+//					if (k) WPolarDlg::m_bMiddle = true;
+//					else   WPolarDlg::m_bMiddle = false;
 			}
 
 			if(ArchiveFormat>=100008)
 			{
 				ar >> k;
-				if (k) pMiarex->m_WngAnalysis.m_bTiltedGeom = true;
-				else   pMiarex->m_WngAnalysis.m_bTiltedGeom = false;
+				if (k) WPolarDlg::s_WPolar.m_bTiltedGeom = true;
+				else   WPolarDlg::s_WPolar.m_bTiltedGeom = false;
 
 				ar >> k;
-				if (k) pMiarex->m_WngAnalysis.m_bWakeRollUp = true;
-				else   pMiarex->m_WngAnalysis.m_bWakeRollUp = false;
+				if (k) WPolarDlg::s_WPolar.m_bWakeRollUp = true;
+				else   WPolarDlg::s_WPolar.m_bWakeRollUp = false;
 			}
 			// and read n again
 			ar >> n;
@@ -6327,7 +6328,7 @@ void MainFrame::UpdateWPolars()
 
 	int size = 0;
 	//count the number of WPolars associated to the current Wing
-	for (i=0; i<m_oaWPolar.size(); i++)
+	for(i=0; i<m_oaWPolar.size(); i++)
 	{
 		pWPolar = (CWPolar*)m_oaWPolar[i];
 		if(pWPolar->m_UFOName == UFOName)
@@ -6335,7 +6336,7 @@ void MainFrame::UpdateWPolars()
 			size++;
 		}
 	}
-	if (size)
+	if(size)
 	{
 		// if any
 		m_pctrlWPolar->setEnabled(true);

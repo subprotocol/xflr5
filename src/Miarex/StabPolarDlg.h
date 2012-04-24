@@ -34,6 +34,7 @@
 #include "CtrlTableDelegate.h"
 #include "../Misc/FloatEdit.h"
 #include "../Objects/Plane.h"
+//#include "../Objects/WPolar.h"
 
 
 
@@ -45,7 +46,7 @@ class StabPolarDlg : public QDialog
 
 public:
 	StabPolarDlg();
-	void InitDialog();
+	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar);
 
 private:
 	void SetupLayout();
@@ -111,41 +112,31 @@ private:
 
 	static void *s_pMainFrame;
 	static void *s_pMiarex;
+	static CWPolar s_StabPolar;
 
-	QList <void*> *m_poaXPolar;
+	CPlane *m_pPlane;
+	CWing *m_pWingList[MAXWINGS];         // pointers to the four wings of the currently selected plane
 
-	QString m_WPolarName, m_UFOName;
 	bool m_bAutoName;
-	bool m_bThinSurfaces;
+	int m_UnitType;//1= International, 2= Imperial
 
+/*	bool m_bThinSurfaces;
 	double m_Density, m_Viscosity;
 	double m_SideSlip, m_BankAngle;
 	double m_WingTilt;
 	double m_StabTilt;
-
 	double m_Mass;
-	
-	CPlane *m_pPlane;
-	CWing *m_pWing;
-	CWing *m_pWing2;
-	CWing *m_pStab;
-	CWing *m_pFin;
-
 	bool m_bAutoInertia;
 	CVector m_CoG;
 	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
-	
-	int m_UnitType;//1= International, 2= Imperial
 	int m_nControls;
 	enumPolarType m_WPolarType;
 	int m_RefAreaType;
-
 	double m_MinControl[MAXWINGS*MAXCONTROLS], m_MaxControl[MAXWINGS*MAXCONTROLS];//4 wings altogether, MAXCONTROLS on each
 	bool m_bActiveControl[MAXWINGS*MAXCONTROLS];
-
 	bool m_bViscous;
+	bool m_bAVLControls;*/
 
-	bool m_bAVLControls;
 };
 
 #endif // STABPOLARDLG_H

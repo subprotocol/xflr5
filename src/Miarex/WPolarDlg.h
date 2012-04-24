@@ -50,7 +50,7 @@ private:
 	void SetReynolds();
 	void SetWingLoad();
 	void ReadValues();
-	void InitDialog();
+	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar=NULL);
 	void SetDensity();
 	void EnableControls();
 
@@ -71,40 +71,20 @@ private slots:
 
 private:
 	static void *s_pMainFrame;
-	static void* s_pMiarex;
+	static void *s_pMiarex;
 
-	QList <void *> *m_poaWPolar;
+//	QList <void *> *m_poaWPolar;
 	CPlane *m_pPlane;
 	CWing *m_pWing;
 
-	QString m_WPolarName;
-	QString m_UFOName;
+//	QString m_WPolarName;
+//	QString m_UFOName;
 
-	enumPolarType m_WPolarType; // fixed speed, fixed lift, fixed aoa
-	int m_UnitType;//1= International, 2= English
-	enumAnalysisMethod m_AnalysisMethod;
-
+	static CWPolar s_WPolar;
 	bool m_bAutoName;
-	bool m_bThinSurfaces;//true if Plane Panel calculation on middle surface, false if on top & bottom
-	bool m_bWakeRollUp;//true if wake roll up is to be taken into account in calculation
-	bool m_bTiltedGeom;//true if calculation is performed on the tilted geometry, at alpha=0.0
-	bool m_bViscous;
-	bool m_bGround;
-	bool m_bPlaneInertia;
-
-	double m_QInf, m_Weight, m_Alpha;
-	double m_Beta;
-	double m_Density, m_Viscosity;
+	int m_UnitType;//1= International, 2= English
 	double m_WingLoad;
-	double m_Height;
-
-	int m_NXWakePanels;
-	double m_TotalWakeLength;//percent MAC
-	double m_WakePanelFactor;
-
-	int m_RefAreaType;
-
-	CVector m_CoG;
+//	enumPolarType m_WPolarType; // fixed speed, fixed lift, fixed aoa
 
 	QStackedWidget *m_pctrlAnalysisControls;
 
@@ -133,7 +113,7 @@ private:
 	QLabel *m_pctrlSRe;
 	QLabel *m_pctrlRRe;
 	QLabel *m_pctrlQInfCl;
-	QLabel *m_pctrlWingName;
+	QLabel *m_pctrlUFOName;
 	QLabel *m_pctrlWingLoad;
 	QLabel *m_pctrlSpeedUnit;
 	QLabel *m_pctrlWeightUnit;

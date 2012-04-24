@@ -31,54 +31,54 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <math.h>
+#include <QtDebug>
+
+
 
 void *StabPolarDlg::s_pMainFrame;
 void *StabPolarDlg::s_pMiarex;
+CWPolar StabPolarDlg::s_StabPolar;
 
 StabPolarDlg::StabPolarDlg()
 {
 	setWindowTitle(tr("Stability Polar Definition"));
-	m_WPolarName = "Stability Polar Name";
 
 	m_bAutoName = true;
-	m_bAutoInertia = true;
-	m_bThinSurfaces = true;
-	m_bAVLControls = true;
+	s_StabPolar.m_bAutoInertia = true;
+	s_StabPolar.m_bThinSurfaces = true;
+	s_StabPolar.m_bThinSurfaces = true;
 
-	m_CoG.Set(0.0,0.0,0.0);
-	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
+	s_StabPolar.m_CoG.Set(0.0,0.0,0.0);
+	s_StabPolar.m_CoGIxx = s_StabPolar.m_CoGIyy = s_StabPolar.m_CoGIzz = s_StabPolar.m_CoGIxz = 0.0;
 
-	m_WingTilt = 0.0;
-	m_StabTilt = 0.0;
-	m_Mass     = 0.0;
+	s_StabPolar.m_Mass     = 0.0;
 
-	m_pWing  = NULL;
-	m_pWing2 = NULL;
-	m_pStab  = NULL;
-	m_pFin   = NULL;
+	m_pWingList[0]  = NULL;
+	m_pWingList[1] = NULL;
+	m_pWingList[2]  = NULL;
+	m_pWingList[3]   = NULL;
 	m_pctrlControlTable = NULL;
 	m_pControlModel   = NULL;
 	m_pCtrlDelegate   = NULL;
 
-	memset(m_MinControl, 0, sizeof(m_MinControl));
-	memset(m_MaxControl, 0, sizeof(m_MaxControl));
-	memset(m_bActiveControl, 0, sizeof(m_bActiveControl));
+	memset(s_StabPolar.m_MinControl, 0, sizeof(s_StabPolar.m_MinControl));
+	memset(s_StabPolar.m_MaxControl, 0, sizeof(s_StabPolar.m_MaxControl));
+	memset(s_StabPolar.m_bActiveControl, 0, sizeof(s_StabPolar.m_bActiveControl));
 
-	m_RefAreaType = 1;
+	s_StabPolar.m_RefAreaType = 1;
 	m_UnitType    = 1;
 
-	m_Density    = 1.225;
-	m_Viscosity  = 1.5e-5;
+	s_StabPolar.m_Density    = 1.225;
+	s_StabPolar.m_Viscosity  = 1.5e-5;
 
-	m_SideSlip  = 0.0;
-	m_BankAngle = 0.0;
+	s_StabPolar.m_Beta  = 0.0;
+	s_StabPolar.m_BankAngle = 0.0;
 
-	m_nControls = 0;
+	s_StabPolar.m_nControls = 0;
 	
-	m_bViscous  = true;
-	m_WPolarType = STABILITYPOLAR;
+	s_StabPolar.m_bViscous  = true;
+	s_StabPolar.m_WPolarType = STABILITYPOLAR;
 
-	m_WPolarName = "T7";
 	SetupLayout();
 	Connect();
 }
@@ -126,180 +126,180 @@ void StabPolarDlg::FillUFOInertia()
 
 	if(m_pPlane)
 	{
-		m_Mass = m_pPlane->TotalMass();
-		m_CoG = m_pPlane->CoG();
+		s_StabPolar.m_Mass = m_pPlane->TotalMass();
+		s_StabPolar.m_CoG = m_pPlane->CoG();
 
-		m_CoGIxx = m_pPlane->m_CoGIxx;
-		m_CoGIyy = m_pPlane->m_CoGIyy;
-		m_CoGIzz = m_pPlane->m_CoGIzz;
-		m_CoGIxz = m_pPlane->m_CoGIxz;
+		s_StabPolar.m_CoGIxx = m_pPlane->m_CoGIxx;
+		s_StabPolar.m_CoGIyy = m_pPlane->m_CoGIyy;
+		s_StabPolar.m_CoGIzz = m_pPlane->m_CoGIzz;
+		s_StabPolar.m_CoGIxz = m_pPlane->m_CoGIxz;
 	}
-	else if(m_pWing)
+	else if(m_pWingList[0])
 	{
-		m_Mass = m_pWing->TotalMass();
-		m_CoG = m_pWing->CoG();
-		m_CoGIxx = m_pWing->m_CoGIxx;
-		m_CoGIyy = m_pWing->m_CoGIyy;
-		m_CoGIzz = m_pWing->m_CoGIzz;
-		m_CoGIxz = m_pWing->m_CoGIxz;
+		s_StabPolar.m_Mass = m_pWingList[0]->TotalMass();
+		s_StabPolar.m_CoG = m_pWingList[0]->CoG();
+		s_StabPolar.m_CoGIxx = m_pWingList[0]->m_CoGIxx;
+		s_StabPolar.m_CoGIyy = m_pWingList[0]->m_CoGIyy;
+		s_StabPolar.m_CoGIzz = m_pWingList[0]->m_CoGIzz;
+		s_StabPolar.m_CoGIxz = m_pWingList[0]->m_CoGIxz;
 	}
 
-	m_pctrlMass->SetValue(m_Mass*pMainFrame->m_kgtoUnit);
-	m_pctrlCoGx->SetValue(m_CoG.x*pMainFrame->m_mtoUnit);
-	m_pctrlCoGz->SetValue(m_CoG.z*pMainFrame->m_mtoUnit);
-	m_pctrlIxx->SetValue(m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIyy->SetValue(m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIzz->SetValue(m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-	m_pctrlIxz->SetValue(m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+	m_pctrlMass->SetValue(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit);
+	m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit);
+	m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit);
+	m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+	m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+	m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+	m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
 }
 
 
 
 void StabPolarDlg::FillControlList()
 {
-	m_pControlModel->setRowCount(m_nControls);//temporary
+	m_pControlModel->setRowCount(s_StabPolar.m_nControls);//temporary
 	QString str, strong;
 	QModelIndex ind;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	int i;
 	GetLengthUnit(str, pMainFrame->m_LengthUnit);
 
-	m_nControls = 0;
+	s_StabPolar.m_nControls = 0;
 	if(m_pPlane)
 	{
-		ind = m_pControlModel->index(m_nControls, 0, QModelIndex());
+		ind = m_pControlModel->index(s_StabPolar.m_nControls, 0, QModelIndex());
 		m_pControlModel->setData(ind, tr("Wing Tilt (")+QString::fromUtf8("°")+")");
 
-		if(!m_bAVLControls)
+		if(!s_StabPolar.m_bThinSurfaces)
 		{
-			ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-			if(m_bActiveControl[0]) m_pControlModel->setData(ind, 1);
+			ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+			if(s_StabPolar.m_bActiveControl[0]) m_pControlModel->setData(ind, 1);
 			else                    m_pControlModel->setData(ind, 0);
 
-			ind = m_pControlModel->index(m_nControls, 2, QModelIndex());
-			m_pControlModel->setData(ind, m_MinControl[0]);
+			ind = m_pControlModel->index(s_StabPolar.m_nControls, 2, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MinControl[0]);
 
-			ind = m_pControlModel->index(m_nControls, 3, QModelIndex());
-			m_pControlModel->setData(ind, m_MaxControl[0]);
+			ind = m_pControlModel->index(s_StabPolar.m_nControls, 3, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[0]);
 		}
 		else
 		{
-			ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-			m_pControlModel->setData(ind, m_MaxControl[0]);
+			ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[0]);
 		}
 
-		++m_nControls;
+		++s_StabPolar.m_nControls;
 
-		if(m_pStab)
+		if(m_pWingList[2])
 		{
-			ind = m_pControlModel->index(m_nControls, 0, QModelIndex());
+			ind = m_pControlModel->index(s_StabPolar.m_nControls, 0, QModelIndex());
 			m_pControlModel->setData(ind, tr("Elevator Tilt ")+QString::fromUtf8("(°)"));
 
-			if(!m_bAVLControls)
+			if(!s_StabPolar.m_bThinSurfaces)
 			{
-				ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-				if(m_bActiveControl[1])	m_pControlModel->setData(ind, 1);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+				if(s_StabPolar.m_bActiveControl[1])	m_pControlModel->setData(ind, 1);
 				else                    m_pControlModel->setData(ind, 0);
 
-				ind = m_pControlModel->index(m_nControls, 2, QModelIndex());
-				m_pControlModel->setData(ind, m_MinControl[1]);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 2, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MinControl[1]);
 
-				ind = m_pControlModel->index(m_nControls, 3, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[1]);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 3, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[1]);
 			}
 			else
 			{
-				ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[1]);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[1]);
 			}
 
-			++m_nControls;
+			++s_StabPolar.m_nControls;
 		}
 	}
 
-	for(i=0; i<m_pWing->m_nFlaps; i++)
+	for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 	{
-		ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
+		ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 0, QModelIndex());
 		strong = QString(tr("Wing Flap angle %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 		m_pControlModel->setData(ind, strong);
 
-		if(!m_bAVLControls)
+		if(!s_StabPolar.m_bThinSurfaces)
 		{
-			ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
-			if(m_bActiveControl[i+m_nControls]) m_pControlModel->setData(ind, 1);
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
+			if(s_StabPolar.m_bActiveControl[i+s_StabPolar.m_nControls]) m_pControlModel->setData(ind, 1);
 			else                                m_pControlModel->setData(ind, 0);
 
-			ind = m_pControlModel->index(i+m_nControls, 2, QModelIndex());
-			m_pControlModel->setData(ind, m_MinControl[i+m_nControls]);
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 2, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MinControl[i+s_StabPolar.m_nControls]);
 
-			ind = m_pControlModel->index(i+m_nControls, 3, QModelIndex());
-			m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 3, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 		}
 		else
 		{
-			ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
-			m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
+			m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 		}
 	}
-	m_nControls += m_pWing->m_nFlaps;
+	s_StabPolar.m_nControls += m_pWingList[0]->m_nFlaps;
 
 
-	if(m_pStab)
+	if(m_pWingList[2])
 	{
-		for(i=0; i<m_pStab->m_nFlaps; i++)
+		for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 		{
-			ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 0, QModelIndex());
 			strong = QString(tr("Elevator Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
-			if(!m_bAVLControls)
+			if(!s_StabPolar.m_bThinSurfaces)
 			{
-				ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
-				if(m_bActiveControl[i+m_nControls]) m_pControlModel->setData(ind, 1);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
+				if(s_StabPolar.m_bActiveControl[i+s_StabPolar.m_nControls]) m_pControlModel->setData(ind, 1);
 				else                                m_pControlModel->setData(ind, 0);
 
-				ind = m_pControlModel->index(i+m_nControls, 2, QModelIndex());
-				m_pControlModel->setData(ind, m_MinControl[i+m_nControls]);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 2, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MinControl[i+s_StabPolar.m_nControls]);
 
-				ind = m_pControlModel->index(i+m_nControls, 3, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 3, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 			}
 			else
 			{
-				ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 			}
 		}
-		m_nControls += m_pStab->m_nFlaps;
+		s_StabPolar.m_nControls += m_pWingList[2]->m_nFlaps;
 	}
-	if(m_pFin)
+	if(m_pWingList[3])
 	{
-		for(i=0; i<m_pFin->m_nFlaps; i++)
+		for(i=0; i<m_pWingList[3]->m_nFlaps; i++)
 		{
-			ind = m_pControlModel->index(i+m_nControls, 0, QModelIndex());
+			ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 0, QModelIndex());
 			strong = QString(tr("Fin Flap %1 ")+QString::fromUtf8("(°)")).arg(i+1);
 			m_pControlModel->setData(ind, strong);
 
-			if(!m_bAVLControls)
+			if(!s_StabPolar.m_bThinSurfaces)
 			{
 
-				ind = m_pControlModel->index(i+m_nControls, 1, QModelIndex());
-				if(m_bActiveControl[i+m_nControls]) m_pControlModel->setData(ind, 1);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 1, QModelIndex());
+				if(s_StabPolar.m_bActiveControl[i+s_StabPolar.m_nControls]) m_pControlModel->setData(ind, 1);
 				else                                m_pControlModel->setData(ind, 0);
 
-				ind = m_pControlModel->index(i+m_nControls, 2, QModelIndex());
-				m_pControlModel->setData(ind, m_MinControl[i+m_nControls]);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 2, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MinControl[i+s_StabPolar.m_nControls]);
 
-				ind = m_pControlModel->index(i+m_nControls, 3, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+				ind = m_pControlModel->index(i+s_StabPolar.m_nControls, 3, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 			}
 			else
 			{
-				ind = m_pControlModel->index(m_nControls, 1, QModelIndex());
-				m_pControlModel->setData(ind, m_MaxControl[i+m_nControls]);
+				ind = m_pControlModel->index(s_StabPolar.m_nControls, 1, QModelIndex());
+				m_pControlModel->setData(ind, s_StabPolar.m_MaxControl[i+s_StabPolar.m_nControls]);
 			}
 		}
-		m_nControls += m_pFin->m_nFlaps;
+		s_StabPolar.m_nControls += m_pWingList[3]->m_nFlaps;
 	}
 }
 
@@ -310,12 +310,12 @@ void StabPolarDlg::SetViscous()
 	int nCtrl = 0;
 
 	if(m_pPlane) nCtrl++;
-	if(m_pPlane && m_pStab) nCtrl++;
+	if(m_pPlane && m_pWingList[2]) nCtrl++;
 
-	for(int i=nCtrl; i<m_nControls; i++)
+	for(int i=nCtrl; i<s_StabPolar.m_nControls; i++)
 	{
-		if((!m_bAVLControls&&m_bActiveControl[i]) ||
-		   ( m_bAVLControls&&fabs(m_MaxControl[i])>PRECISION))
+		if((!s_StabPolar.m_bThinSurfaces&&s_StabPolar.m_bActiveControl[i]) ||
+		   ( s_StabPolar.m_bThinSurfaces&&fabs(s_StabPolar.m_MaxControl[i])>PRECISION))
 		{
 			bViscous = false;
 			break;
@@ -326,20 +326,36 @@ void StabPolarDlg::SetViscous()
 	{
 		m_pctrlViscous->setChecked(false);
 		m_pctrlViscous->setEnabled(false);
-		m_bViscous = false;
+		s_StabPolar.m_bViscous = false;
 	}
 	else
 	{
-		if(m_bViscous) m_pctrlViscous->setChecked(true);
+		if(s_StabPolar.m_bViscous) m_pctrlViscous->setChecked(true);
 		m_pctrlViscous->setEnabled(true);
 	}
 }
 
 
-void StabPolarDlg::InitDialog()
+void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QString strLen, strMass, strInertia;
+
+	m_pPlane = pPlane;
+	if(m_pPlane)
+	{
+		m_pWingList[0] = pPlane->Wing();
+		m_pWingList[1] = pPlane->Wing2();
+		m_pWingList[2] = pPlane->Stab();
+		m_pWingList[3] = pPlane->Fin();
+	}
+	else
+	{
+		m_pWingList[0] = pWing;
+		m_pWingList[1] = NULL;
+		m_pWingList[2] = NULL;
+		m_pWingList[3] = NULL;
+	}
 
 	GetLengthUnit(strLen, pMainFrame->m_LengthUnit);
 	GetWeightUnit(strMass, pMainFrame->m_WeightUnit);
@@ -362,11 +378,38 @@ void StabPolarDlg::InitDialog()
 	else              m_pctrlUnit2->setChecked(true);
 	OnUnit();
 
-	if(m_RefAreaType==1) m_pctrlArea1->setChecked(true);
-	else                 m_pctrlArea2->setChecked(true);
+	if(s_StabPolar.m_RefAreaType==1) m_pctrlArea1->setChecked(true);
+	else                             m_pctrlArea2->setChecked(true);
 
-	m_pctrlUFOName->setText(m_UFOName);
-	m_pctrlWPolarName->setText(m_WPolarName);
+	if(pWPolar && pWPolar->m_WPolarType==STABILITYPOLAR)
+	{
+		m_bAutoName = false;
+		m_pctrlAutoName->setChecked(false);
+		m_pctrlWPolarName->setText(pWPolar->m_PlrName);
+		s_StabPolar.DuplicateSpec(pWPolar);
+	}
+	else
+	{
+		m_bAutoName = true;
+		m_pctrlAutoName->setChecked(true);
+	}
+
+	if(m_pPlane)
+	{
+		s_StabPolar.m_AnalysisMethod=VLMMETHOD;
+		s_StabPolar.m_UFOName = m_pPlane->PlaneName();
+		m_pctrlUFOName->setText(m_pPlane->PlaneName());
+		m_pctrlAnalysisControls->setCurrentIndex(1);
+	}
+	else if(m_pWingList[0])
+	{
+		s_StabPolar.m_UFOName = m_pWingList[0]->WingName();
+		m_pctrlUFOName->setText(m_pWingList[0]->WingName());
+		m_pctrlAnalysisControls->setCurrentIndex(0);
+	}
+	else return;
+
+	m_pctrlWPolarName->setText(s_StabPolar.m_PlrName);
 
 	if(m_pPlane)
 	{
@@ -374,39 +417,38 @@ void StabPolarDlg::InitDialog()
 	}
 	else m_pctrlAnalysisControls->setCurrentIndex(0);
 
-	m_nControls = 0;
-	m_nControls += m_pWing->m_nFlaps;
+	s_StabPolar.m_nControls = 0;
+	s_StabPolar.m_nControls += m_pWingList[0]->m_nFlaps;
 
 	if(m_pPlane) 
 	{
-		m_nControls++; // Wing Tilt
-		if(m_pStab)
+		s_StabPolar.m_nControls++; // Wing Tilt
+		if(m_pWingList[2])
 		{
-			m_nControls++;//stab tilt
-			m_nControls += m_pStab->m_nFlaps;
+			s_StabPolar.m_nControls++;//stab tilt
+			s_StabPolar.m_nControls += m_pWingList[2]->m_nFlaps;
 		}
-		if(m_pFin) m_nControls+=m_pFin->m_nFlaps;
+		if(m_pWingList[3]) s_StabPolar.m_nControls+=m_pWingList[3]->m_nFlaps;
 	}
 
 	if(m_pPlane) m_pctrlUFOName->setText(m_pPlane->PlaneName());
-	else         m_pctrlUFOName->setText(m_pWing->WingName());
+	else         m_pctrlUFOName->setText(m_pWingList[0]->WingName());
 
-	m_pctrlAutoName->setChecked(m_bAutoName);
 
-	m_pctrlBeta->SetValue(m_SideSlip);
-	m_pctrlPhi->SetValue(m_BankAngle);
+	m_pctrlBeta->SetValue(s_StabPolar.m_Beta);
+	m_pctrlPhi->SetValue(s_StabPolar.m_BankAngle);
 
-	m_pctrlWingMethod2->setChecked(m_bThinSurfaces);
-	m_pctrlWingMethod3->setChecked(!m_bThinSurfaces);
+	m_pctrlWingMethod2->setChecked(s_StabPolar.m_bThinSurfaces);
+	m_pctrlWingMethod3->setChecked(!s_StabPolar.m_bThinSurfaces);
 	if(m_pPlane) m_pctrlPanelMethod->setChecked(true);
 
-	m_pctrlPlaneInertia->setChecked(m_bAutoInertia);
-	m_pctrlViscous->setChecked(m_bViscous);
-//	m_pctrlAVLControls->setChecked(m_bAVLControls);
+	m_pctrlPlaneInertia->setChecked(s_StabPolar.m_bAutoInertia);
+	m_pctrlViscous->setChecked(s_StabPolar.m_bViscous);
+//	m_pctrlAVLControls->setChecked(s_StabPolar.m_bThinSurfaces);
 
 	OnAutoInertia();
 
-	m_bAVLControls = true;
+	s_StabPolar.m_bThinSurfaces = true;
 
 	m_pControlModel->setColumnCount(2);
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
@@ -461,11 +503,11 @@ void StabPolarDlg::OnArea()
 {
 	if(m_pctrlArea1->isChecked())
 	{
-		m_RefAreaType = 1;
+		s_StabPolar.m_RefAreaType = 1;
 	}
 	else if(m_pctrlArea2->isChecked())
 	{
-		m_RefAreaType = 2;
+		s_StabPolar.m_RefAreaType = 2;
 	}
 	SetWPolarName();
 }
@@ -500,14 +542,14 @@ void StabPolarDlg::OnUnit()
 	if(m_pctrlUnit1->isChecked())
 	{
 		m_UnitType   = 1;
-		m_pctrlViscosity->SetValue(m_Viscosity);
+		m_pctrlViscosity->SetValue(s_StabPolar.m_Viscosity);
 		m_pctrlDensityUnit->setText("kg/m3");
 		m_pctrlViscosityUnit->setText("m"+QString::fromUtf8("²")+"/s");
 	}
 	else 
 	{
 		m_UnitType   = 2;
-		m_pctrlViscosity->SetValue(m_Viscosity* 10.7182881);
+		m_pctrlViscosity->SetValue(s_StabPolar.m_Viscosity* 10.7182881);
 		m_pctrlDensityUnit->setText("slugs/ft3");
 		m_pctrlViscosityUnit->setText("ft"+QString::fromUtf8("²")+"/s");
 	}
@@ -522,7 +564,7 @@ void StabPolarDlg::OnOK()
 	ReadCtrlData();
 	ReadParams();
 
-	if(fabs(m_Mass)<PRECISION)
+	if(fabs(s_StabPolar.m_Mass)<PRECISION)
 	{
 		QMessageBox::warning(this, tr("Warning"),tr("Mass must be non-zero for type 7 polars"));
 		m_pctrlMass->setFocus();
@@ -531,9 +573,9 @@ void StabPolarDlg::OnOK()
 
 	bool bActive = false;
 
-	for(i=0; i<m_nControls; i++)
+	for(i=0; i<s_StabPolar.m_nControls; i++)
 	{
-		bActive = bActive || m_bActiveControl[i];
+		bActive = bActive || s_StabPolar.m_bActiveControl[i];
 		if(bActive) break;
 	}
 /*	if(!bActive)
@@ -542,35 +584,16 @@ void StabPolarDlg::OnOK()
 		if (QMessageBox::Yes != QMessageBox::question(window(), tr("Question"), strong, QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel)) return;
 	}*/
 
-	for(i=m_nControls; i<4*MAXCONTROLS; i++) m_bActiveControl[i] = false;
+	for(i=s_StabPolar.m_nControls; i<4*MAXCONTROLS; i++) s_StabPolar.m_bActiveControl[i] = false;
 
-	CWPolar * pWPolarNew;
-	m_WPolarName = m_pctrlWPolarName->text();
 
-	int LineLength = m_WPolarName.length();
-
-	if(!LineLength)
+	if(!m_pctrlWPolarName->text().length())
 	{
 		QMessageBox::warning(this, tr("Warning"), tr("Must enter a name"));
 		m_pctrlWPolarName->setFocus();
 		return;
 	}
-	else
-	{
-		int size = (int)m_poaXPolar->size();
-		for (int j=0; j<size; j++)
-		{
-			pWPolarNew = (CWPolar*)m_poaXPolar->at(j);
-			if (pWPolarNew->m_PlrName == m_WPolarName && pWPolarNew->m_UFOName  == m_UFOName)
-			{
-				QMessageBox::warning(this,tr("Warning"), tr("The polar's name already exists"));
-				return;
-			}
-		}
-	}
-
-	if(m_pctrlViscous->isChecked()) m_bViscous = true;
-//	m_QInf = m_pctrlQInf->Value();
+	s_StabPolar.m_PlrName = m_pctrlWPolarName->text();
 
 	accept();
 }
@@ -579,7 +602,7 @@ void StabPolarDlg::OnOK()
 
 void StabPolarDlg::OnViscous()
 {
-	m_bViscous = m_pctrlViscous->isChecked();
+	s_StabPolar.m_bViscous = m_pctrlViscous->isChecked();
 	SetWPolarName();
 }
 
@@ -596,27 +619,27 @@ void StabPolarDlg::ReadCtrlData()
 {
 	int i, k;
 
-	for(i=0; i<m_nControls; i++)
+	for(i=0; i<s_StabPolar.m_nControls; i++)
 	{
 		k    = m_pControlModel->index(i, 1, QModelIndex()).data().toInt();
-		if(!m_bAVLControls)
+		if(!s_StabPolar.m_bThinSurfaces)
 		{
-			if(k) m_bActiveControl[i] = true;
-			else  m_bActiveControl[i] = false;
+			if(k) s_StabPolar.m_bActiveControl[i] = true;
+			else  s_StabPolar.m_bActiveControl[i] = false;
 
-			m_MinControl[i] = m_pControlModel->index(i, 2, QModelIndex()).data().toDouble();
-			m_MaxControl[i] = m_pControlModel->index(i, 3, QModelIndex()).data().toDouble();
+			s_StabPolar.m_MinControl[i] = m_pControlModel->index(i, 2, QModelIndex()).data().toDouble();
+			s_StabPolar.m_MaxControl[i] = m_pControlModel->index(i, 3, QModelIndex()).data().toDouble();
 		}
 		else
 		{
-			m_MaxControl[i] = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble(); //is the gain, AVL-like
+			s_StabPolar.m_MaxControl[i] = m_pControlModel->index(i, 1, QModelIndex()).data().toDouble(); //is the gain, AVL-like
 		}
 	}
 
-	for(i=m_nControls; i<4*MAXCONTROLS; i++)
+	for(i=s_StabPolar.m_nControls; i<4*MAXCONTROLS; i++)
 	{
-		m_MinControl[i] = m_MaxControl[i] = 0.0;
-		m_bActiveControl[i]=false;
+		s_StabPolar.m_MinControl[i] = s_StabPolar.m_MaxControl[i] = 0.0;
+		s_StabPolar.m_bActiveControl[i]=false;
 	}
 	SetViscous();
 
@@ -629,26 +652,28 @@ void StabPolarDlg::ReadParams()
 
 	if(m_pctrlUnit1->isChecked())
 	{
-		m_Density   = m_pctrlDensity->Value();
-		m_Viscosity = m_pctrlViscosity->Value();
+		s_StabPolar.m_Density   = m_pctrlDensity->Value();
+		s_StabPolar.m_Viscosity = m_pctrlViscosity->Value();
 	}
 	else
 	{
-		m_Density   = m_pctrlDensity->Value()   / 0.00194122;
-		m_Viscosity = m_pctrlViscosity->Value() / 10.7182881;
+		s_StabPolar.m_Density   = m_pctrlDensity->Value()   / 0.00194122;
+		s_StabPolar.m_Viscosity = m_pctrlViscosity->Value() / 10.7182881;
 	}
 
-	m_SideSlip  = m_pctrlBeta->Value();
-	m_BankAngle = m_pctrlPhi->Value();
+	s_StabPolar.m_Beta  = m_pctrlBeta->Value();
+	s_StabPolar.m_BankAngle = m_pctrlPhi->Value();
 	SetDensity();
 
-	m_Mass  = m_pctrlMass->Value() / pMainFrame->m_kgtoUnit;
-	m_CoG.x = m_pctrlCoGx->Value() / pMainFrame->m_mtoUnit;
-	m_CoG.z = m_pctrlCoGz->Value() / pMainFrame->m_mtoUnit;
-	m_CoGIxx = m_pctrlIxx->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIyy = m_pctrlIyy->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIzz = m_pctrlIzz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
-	m_CoGIxz = m_pctrlIxz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_Mass  = m_pctrlMass->Value() / pMainFrame->m_kgtoUnit;
+	s_StabPolar.m_CoG.x = m_pctrlCoGx->Value() / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_CoG.z = m_pctrlCoGz->Value() / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_CoGIxx = m_pctrlIxx->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_CoGIyy = m_pctrlIyy->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_CoGIzz = m_pctrlIzz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+	s_StabPolar.m_CoGIxz = m_pctrlIxz->Value()  / pMainFrame->m_kgtoUnit / pMainFrame->m_mtoUnit / pMainFrame->m_mtoUnit;
+
+	s_StabPolar.m_bViscous = m_pctrlViscous->isChecked();
 }
 
 
@@ -659,21 +684,21 @@ void StabPolarDlg::SetDensity()
 	int exp, precision;
 	if(m_pctrlUnit1->isChecked())
 	{
-		exp = (int)log(m_Density);
+		exp = (int)log(s_StabPolar.m_Density);
 		if(exp>1) precision = 1;
 		else if(exp<-4) precision = 4;
 		else precision = 3-exp;
 		m_pctrlDensity->SetPrecision(precision);
-		m_pctrlDensity->SetValue(m_Density);
+		m_pctrlDensity->SetValue(s_StabPolar.m_Density);
 	}
 	else
 	{
-		exp = (int)log(m_Density* 0.00194122);
+		exp = (int)log(s_StabPolar.m_Density* 0.00194122);
 		if(exp>1) precision = 1;
 		else if(exp<-4) precision = 4;
 		else precision = 3-exp;
 		m_pctrlDensity->SetPrecision(precision);
-		m_pctrlDensity->SetValue(m_Density* 0.00194122);
+		m_pctrlDensity->SetValue(s_StabPolar.m_Density* 0.00194122);
 	}
 }
 
@@ -933,76 +958,76 @@ void StabPolarDlg::SetWPolarName()
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 
 	GetSpeedUnit(str, pMainFrame->m_SpeedUnit);
-	m_WPolarName = "T7";
+	QString WPolarName = "T7";
 
-	if(!m_pPlane && !m_bThinSurfaces) m_WPolarName += "-Panel";
-	if(m_bThinSurfaces)
+	if(!m_pPlane && !s_StabPolar.m_bThinSurfaces) WPolarName += "-Panel";
+	if(s_StabPolar.m_bThinSurfaces)
 	{
-		if(pMiarex->m_bVLM1) m_WPolarName += "-VLM1";
-		else		         m_WPolarName += "-VLM2";
+		if(pMiarex->m_bVLM1) WPolarName += "-VLM1";
+		else		         WPolarName += "-VLM2";
 	}
 
 	nCtrl = 0;
 
-	if(!m_bAVLControls)
+	if(!s_StabPolar.m_bThinSurfaces)
 	{
 		if(m_pPlane)
 		{
-			if(m_bActiveControl[0] && m_pPlane)
+			if(s_StabPolar.m_bActiveControl[0] && m_pPlane)
 			{
 				strong = QString(QString::fromUtf8("-Wing(%1°/%2°)"))
-								   .arg(m_MinControl[0],0,'f',1)
-								   .arg(m_MaxControl[0],0,'f',1);
-				m_WPolarName += strong;
+								   .arg(s_StabPolar.m_MinControl[0],0,'f',1)
+								   .arg(s_StabPolar.m_MaxControl[0],0,'f',1);
+				WPolarName += strong;
 			}
 			nCtrl++;
 		}
-		if(m_pPlane && m_pStab)
+		if(m_pPlane && m_pWingList[2])
 		{
-			if(m_bActiveControl[1])
+			if(s_StabPolar.m_bActiveControl[1])
 			{
-				strong = QString(QString::fromUtf8("-Elev(%1°/%2°)")).arg(m_MinControl[1],0,'f',1).arg(m_MaxControl[1],0,'f',1);
-				m_WPolarName += strong;
+				strong = QString(QString::fromUtf8("-Elev(%1°/%2°)")).arg(s_StabPolar.m_MinControl[1],0,'f',1).arg(s_StabPolar.m_MaxControl[1],0,'f',1);
+				WPolarName += strong;
 			}
 			nCtrl++;
 		}
 
-		for(i=0; i<m_pWing->m_nFlaps; i++)
+		for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 		{
-			if(m_bActiveControl[i+nCtrl])
+			if(s_StabPolar.m_bActiveControl[i+nCtrl])
 			{
 				strong = QString(QString::fromUtf8("-WF%1(%2°/%3°)"))
 						 .arg(i+1)
-						 .arg(m_MinControl[i+nCtrl],0,'f',1)
-						 .arg(m_MaxControl[i+nCtrl],0,'f',1);
-				m_WPolarName += strong;
+						 .arg(s_StabPolar.m_MinControl[i+nCtrl],0,'f',1)
+						 .arg(s_StabPolar.m_MaxControl[i+nCtrl],0,'f',1);
+				WPolarName += strong;
 			}
 		}
-		nCtrl += m_pWing->m_nFlaps;
+		nCtrl += m_pWingList[0]->m_nFlaps;
 
-		if(m_pPlane && m_pStab)
+		if(m_pPlane && m_pWingList[2])
 		{
-			for(i=0; i<m_pStab->m_nFlaps; i++)
+			for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 			{
-				if(m_bActiveControl[i+nCtrl])
+				if(s_StabPolar.m_bActiveControl[i+nCtrl])
 				{
 					strong = QString(QString::fromUtf8("-EF%1(%2°/%3°)"))
-							 .arg(i+1).arg(m_MinControl[i+nCtrl]).arg(m_MaxControl[i+nCtrl]);
-					m_WPolarName += strong;
+							 .arg(i+1).arg(s_StabPolar.m_MinControl[i+nCtrl]).arg(s_StabPolar.m_MaxControl[i+nCtrl]);
+					WPolarName += strong;
 				}
 			}
-			nCtrl += m_pStab->m_nFlaps;
+			nCtrl += m_pWingList[2]->m_nFlaps;
 		}
 
-		if(m_pPlane && m_pFin)
+		if(m_pPlane && m_pWingList[3])
 		{
-			for(i=0; i<m_pFin->m_nFlaps; i++)
+			for(i=0; i<m_pWingList[3]->m_nFlaps; i++)
 			{
-				if(m_bActiveControl[i+nCtrl])
+				if(s_StabPolar.m_bActiveControl[i+nCtrl])
 				{
 					strong = QString(QString::fromUtf8("-FF%1(%2°/%3°)"))
-							 .arg(i+1).arg(m_MinControl[i+nCtrl]).arg(m_MaxControl[i+nCtrl]);
-					m_WPolarName += strong;
+							 .arg(i+1).arg(s_StabPolar.m_MinControl[i+nCtrl]).arg(s_StabPolar.m_MaxControl[i+nCtrl]);
+					WPolarName += strong;
 				}
 			}
 		}
@@ -1011,105 +1036,105 @@ void StabPolarDlg::SetWPolarName()
 	{
 		if(m_pPlane)
 		{
-			if(fabs(m_MaxControl[0])>PRECISION)
+			if(fabs(s_StabPolar.m_MaxControl[0])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-Wing(g%1)"))
-								   .arg(m_MaxControl[0],0,'f',2);
-				m_WPolarName += strong;
+								   .arg(s_StabPolar.m_MaxControl[0],0,'f',2);
+				WPolarName += strong;
 			}
 			nCtrl++;
 		}
-		if(m_pPlane && m_pStab)
+		if(m_pPlane && m_pWingList[2])
 		{
-			if(fabs(m_MaxControl[1])>PRECISION)
+			if(fabs(s_StabPolar.m_MaxControl[1])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-Elev(g%1)"))
-								   .arg(m_MaxControl[1],0,'f',2);
-				m_WPolarName += strong;
+								   .arg(s_StabPolar.m_MaxControl[1],0,'f',2);
+				WPolarName += strong;
 			}
 			nCtrl++;
 		}
 
-		for(i=0; i<m_pWing->m_nFlaps; i++)
+		for(i=0; i<m_pWingList[0]->m_nFlaps; i++)
 		{
-			if(fabs(m_MaxControl[i+nCtrl])>PRECISION)
+			if(fabs(s_StabPolar.m_MaxControl[i+nCtrl])>PRECISION)
 			{
 				strong = QString(QString::fromUtf8("-WF%1(g%2)"))
 							 .arg(i+1)
-							 .arg(m_MaxControl[i+nCtrl],0,'f',2);
-				m_WPolarName += strong;
+							 .arg(s_StabPolar.m_MaxControl[i+nCtrl],0,'f',2);
+				WPolarName += strong;
 			}
 		}
-		nCtrl += m_pWing->m_nFlaps;
+		nCtrl += m_pWingList[0]->m_nFlaps;
 
-		if(m_pPlane && m_pStab)
+		if(m_pPlane && m_pWingList[2])
 		{
-			for(i=0; i<m_pStab->m_nFlaps; i++)
+			for(i=0; i<m_pWingList[2]->m_nFlaps; i++)
 			{
-				if(fabs(m_MaxControl[i+nCtrl])>PRECISION)
+				if(fabs(s_StabPolar.m_MaxControl[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-EF%1(g%2)"))
 							 .arg(i+1)
-							 .arg(m_MaxControl[i+nCtrl],0,'f',2);
-					m_WPolarName += strong;
+							 .arg(s_StabPolar.m_MaxControl[i+nCtrl],0,'f',2);
+					WPolarName += strong;
 				}
 			}
-			nCtrl += m_pStab->m_nFlaps;
+			nCtrl += m_pWingList[2]->m_nFlaps;
 		}
 
-		if(m_pPlane && m_pFin)
+		if(m_pPlane && m_pWingList[3])
 		{
-			for(i=0; i<m_pFin->m_nFlaps; i++)
+			for(i=0; i<m_pWingList[3]->m_nFlaps; i++)
 			{
-				if(fabs(m_MaxControl[i+nCtrl])>PRECISION)
+				if(fabs(s_StabPolar.m_MaxControl[i+nCtrl])>PRECISION)
 				{
 					strong = QString(QString::fromUtf8("-FF%1(g%2)"))
 							 .arg(i+1)
-							 .arg(m_MaxControl[i+nCtrl],0,'f',2);
-					m_WPolarName += strong;
+							 .arg(s_StabPolar.m_MaxControl[i+nCtrl],0,'f',2);
+					WPolarName += strong;
 				}
 			}
 		}
 	}
 
 
-	if(fabs(m_SideSlip) > .001)
+	if(fabs(s_StabPolar.m_Beta) > .001)
 	{
-		strong = QString(QString::fromUtf8("-b%1°")).arg(m_SideSlip,0,'f',1);
-		m_WPolarName += strong;
+		strong = QString(QString::fromUtf8("-b%1°")).arg(s_StabPolar.m_Beta,0,'f',1);
+		WPolarName += strong;
 	}
 	
-	if(fabs(m_BankAngle) > .001)
+	if(fabs(s_StabPolar.m_BankAngle) > .001)
 	{
-		strong = QString(QString::fromUtf8("-B%1°")).arg(m_BankAngle,0,'f',1);
-		m_WPolarName += strong;
+		strong = QString(QString::fromUtf8("-B%1°")).arg(s_StabPolar.m_BankAngle,0,'f',1);
+		WPolarName += strong;
 	}
 
-	if(!m_bAutoInertia)
+	if(!s_StabPolar.m_bAutoInertia)
 	{
 		GetWeightUnit(str, pMainFrame->m_WeightUnit);
-		strong = QString("-%1").arg(m_Mass*pMainFrame->m_kgtoUnit,0,'f',3);
-		m_WPolarName += strong+str;
+		strong = QString("-%1").arg(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit,0,'f',3);
+		WPolarName += strong+str;
 		GetLengthUnit(str, pMainFrame->m_LengthUnit);
-		strong = QString("-x%1").arg(m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
-		m_WPolarName += strong + str;
+		strong = QString("-x%1").arg(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit,0,'f',3);
+		WPolarName += strong + str;
 
-		if(fabs(m_CoG.z)>=.000001)
+		if(fabs(s_StabPolar.m_CoG.z)>=.000001)
 		{
-			strong = QString("-z%1").arg(m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
-			m_WPolarName += strong + str;
+			strong = QString("-z%1").arg(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit,0,'f',3);
+			WPolarName += strong + str;
 		}
 	}
 //	else m_WPolarName += "-Plane_Inertia";
 
-	if(!m_bViscous)
+	if(!s_StabPolar.m_bViscous)
 	{
-		m_WPolarName += "-Inviscid";
+		WPolarName += "-Inviscid";
 	}
-	if(m_RefAreaType==PROJECTEDAREA) m_WPolarName += "-proj_area";
+	if(s_StabPolar.m_RefAreaType==PROJECTEDAREA) WPolarName += "-proj_area";
 	
 	
-	m_pctrlWPolarName->setText(m_WPolarName);
+	m_pctrlWPolarName->setText(WPolarName);
 }
 
 
@@ -1118,11 +1143,11 @@ void StabPolarDlg::OnMethod()
 {
 	if (m_pctrlWingMethod2->isChecked())
 	{
-		m_bThinSurfaces = true;
+		s_StabPolar.m_bThinSurfaces = true;
 	}
 	else if (m_pctrlWingMethod3->isChecked())
 	{
-		m_bThinSurfaces = false;
+		s_StabPolar.m_bThinSurfaces = false;
 	}
 
 //	EnableControls();
@@ -1133,15 +1158,13 @@ void StabPolarDlg::OnMethod()
 
 void StabPolarDlg::showEvent(QShowEvent *event)
 {
-	int w, w2, w3, w4, w5, w6;
+	int w, w2, w3, w6;
 	w = m_pctrlControlTable->width();
 	w2 = (int)((double)w/2.0);
 	w3 = (int)((double)w/3.0);
-	w4 = (int)((double)w/4.0);
-	w5 = (int)((double)w/5.0);
 	w6 = (int)((double)w/6.0);
 
-	if(!m_bAVLControls)
+	if(!s_StabPolar.m_bThinSurfaces)
 	{
 		m_pctrlControlTable->setColumnWidth(0,w3);
 		m_pctrlControlTable->setColumnWidth(1,w6);
@@ -1159,29 +1182,29 @@ void StabPolarDlg::showEvent(QShowEvent *event)
 void StabPolarDlg::OnAutoInertia()
 {
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
-	if(m_bAutoInertia)
+	s_StabPolar.m_bAutoInertia = m_pctrlPlaneInertia->isChecked();
+	if(s_StabPolar.m_bAutoInertia)
 	{
 		FillUFOInertia();
 	}
 	else
 	{
-		m_pctrlMass->SetValue(m_Mass*pMainFrame->m_kgtoUnit);
-		m_pctrlCoGx->SetValue(m_CoG.x*pMainFrame->m_mtoUnit);
-		m_pctrlCoGz->SetValue(m_CoG.z*pMainFrame->m_mtoUnit);
-		m_pctrlIxx->SetValue(m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIyy->SetValue(m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIzz->SetValue(m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
-		m_pctrlIxz->SetValue(m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlMass->SetValue(s_StabPolar.m_Mass*pMainFrame->m_kgtoUnit);
+		m_pctrlCoGx->SetValue(s_StabPolar.m_CoG.x*pMainFrame->m_mtoUnit);
+		m_pctrlCoGz->SetValue(s_StabPolar.m_CoG.z*pMainFrame->m_mtoUnit);
+		m_pctrlIxx->SetValue(s_StabPolar.m_CoGIxx*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIyy->SetValue(s_StabPolar.m_CoGIyy*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIzz->SetValue(s_StabPolar.m_CoGIzz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
+		m_pctrlIxz->SetValue(s_StabPolar.m_CoGIxz*pMainFrame->m_kgtoUnit*pMainFrame->m_mtoUnit*pMainFrame->m_mtoUnit);
 
 	}
-	m_pctrlMass->setEnabled(!m_bAutoInertia);
-	m_pctrlCoGx->setEnabled(!m_bAutoInertia);
-	m_pctrlCoGz->setEnabled(!m_bAutoInertia);
-	m_pctrlIxx->setEnabled(!m_bAutoInertia);
-	m_pctrlIyy->setEnabled(!m_bAutoInertia);
-	m_pctrlIzz->setEnabled(!m_bAutoInertia);
-	m_pctrlIxz->setEnabled(!m_bAutoInertia);
+	m_pctrlMass->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlCoGx->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlCoGz->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlIxx->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlIyy->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlIzz->setEnabled(!s_StabPolar.m_bAutoInertia);
+	m_pctrlIxz->setEnabled(!s_StabPolar.m_bAutoInertia);
 
 	SetWPolarName();
 }

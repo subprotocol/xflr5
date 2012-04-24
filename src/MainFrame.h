@@ -301,7 +301,7 @@ private:
 	QAction *W3DPrefsAct, *W3DLightAct, *W3DScalesAct;
 	QAction *DefineWingAct, *DefinePlaneAct, *EditUFOAct, *SaveUFOAsProject;
 	QAction *renameCurUFO, *deleteCurUFO, *duplicateCurUFO;
-	QAction *renameCurWPolar, *editCurWPolar,*exportCurWPolar, *resetCurWPolar;
+	QAction *renameCurWPolar, *editWPolar,*exportCurWPolar, *resetCurWPolar;
 	QAction *ShowPolarProps, *ShowWOppProps;
 	QAction *deleteCurWPolar, *deleteCurWOpp;
 	QAction *twoGraphs, *fourGraphs;

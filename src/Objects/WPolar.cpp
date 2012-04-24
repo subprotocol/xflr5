@@ -26,7 +26,7 @@
 #include "../Miarex/Miarex.h"
 #include <math.h>
 #include <QMessageBox>
-
+#include <QtDebug>
 
 void *CWPolar::s_pMainFrame;
 void *CWPolar::s_pMiarex;
@@ -1023,18 +1023,80 @@ void CWPolar::CalculatePoint(int i)
 */
 
 
+void CWPolar::DuplicateSpec(CWPolar *pWPolar)
+{
+	m_UFOName   = pWPolar->m_UFOName;
+	m_PlrName   = pWPolar->m_PlrName;
+
+	m_WPolarType  = pWPolar->m_WPolarType;
+
+	m_QInf      = pWPolar->m_QInf;
+	m_ASpec     = pWPolar->m_ASpec;
+	m_AMem      = pWPolar->m_AMem;
+	m_Beta      = pWPolar->m_Beta;
+
+	m_Style  = pWPolar->m_Style;
+	m_Width  = pWPolar->m_Width;
+	m_Color  = pWPolar->m_Color;
+
+
+	// general aerodynamic data - specific to a polar
+	m_Viscosity   = pWPolar->m_Viscosity;
+	m_Density     = pWPolar->m_Density ;
+	m_Height      = pWPolar->m_Height;//for ground effect
+	m_BankAngle   = pWPolar->m_BankAngle;
+
+
+	m_NXWakePanels      = pWPolar->m_NXWakePanels;
+	m_TotalWakeLength   = pWPolar->m_TotalWakeLength;
+	m_WakePanelFactor   = pWPolar->m_WakePanelFactor;
+
+
+	m_bGround         = pWPolar->m_bGround;
+	m_bDirichlet      = pWPolar->m_bDirichlet;
+	m_bIsVisible      = pWPolar->m_bIsVisible;
+	m_bShowPoints     = pWPolar->m_bShowPoints;
+	m_bTiltedGeom     = pWPolar->m_bTiltedGeom;
+	m_bViscous        = pWPolar->m_bViscous;
+	m_bVLM1           = pWPolar->m_bVLM1;
+	m_bWakeRollUp     = pWPolar->m_bWakeRollUp;
+	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
+	m_bThinSurfaces   = pWPolar->m_bThinSurfaces;
+	m_bVLM1           = pWPolar->m_bVLM1;
+	m_bAVLControls    = pWPolar->m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
+
+
+	m_nControls       = pWPolar->m_nControls;
+	memcpy(m_MinControl, pWPolar->m_MinControl, 4*MAXCONTROLS*sizeof(double));
+	memcpy(m_MaxControl, pWPolar->m_MaxControl, 4*MAXCONTROLS*sizeof(double));
+	memcpy(m_bActiveControl, pWPolar->m_bActiveControl, 4*MAXCONTROLS*sizeof(bool));
+
+
+	m_RefAreaType = pWPolar->m_RefAreaType;
+	m_WArea       = pWPolar->m_WArea;//for lift and drag calculations
+	m_WMAChord    = pWPolar->m_WMAChord;// for moment calculations
+	m_WSpan       = pWPolar->m_WSpan;//for moment calculations
+
+	//Inertia properties
+	m_Mass = pWPolar->m_Mass;
+	m_bAutoInertia = pWPolar->m_bAutoInertia;
+	m_bThinSurfaces = pWPolar->m_bThinSurfaces;
+	m_CoGIxx = pWPolar->m_CoGIxx;
+	m_CoGIyy = pWPolar->m_CoGIyy;
+	m_CoGIzz = pWPolar->m_CoGIzz;
+	m_CoGIxz = pWPolar->m_CoGIxz;
+
+	m_CoG = pWPolar->m_CoG;
+
+}
+
+
+
 void CWPolar::Copy(CWPolar *pWPolar)
 {
 	int i;
-	m_bIsVisible    = pWPolar->m_bIsVisible;
-	m_bShowPoints   = pWPolar->m_bShowPoints;
-	m_bTiltedGeom   = pWPolar->m_bTiltedGeom;
-	m_bViscous      = pWPolar->m_bViscous;
-	m_bVLM1         = pWPolar->m_bVLM1;
-	m_bWakeRollUp   = pWPolar->m_bWakeRollUp;
-	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
-	m_bThinSurfaces = pWPolar->m_bThinSurfaces;
-	m_nControls     = pWPolar->m_nControls;
+
+	DuplicateSpec(pWPolar);
 
 	int size  = m_Alpha.size();
 	for(i=size-1; i>=0; i--)
