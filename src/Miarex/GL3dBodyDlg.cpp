@@ -3062,7 +3062,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			int n = m_pBody->IsFramePos(Real, m_BodyScale);
+			int n = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 			m_pBody->m_iHighlight = -10;
 			if (n>=0 && n<=m_pBody->m_NStations)
 			{
@@ -3076,7 +3076,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
-			int n = m_pFrame->IsPoint(Real, m_FrameScale);
+			int n = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			m_pFrame->m_iHighlight = -10;
 			if (n>=0 && n<=m_pFrame->m_NPoints)
 			{
@@ -3151,7 +3151,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			iF = m_pBody->IsFramePos(Real, m_BodyScale);
+			iF = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 			if(iF >=0)
 			{
 				TakePicture();
@@ -3174,7 +3174,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.z = 0.0;
 
-			CFrame::s_iSelect = m_pFrame->IsPoint(Real, m_FrameScale);
+			CFrame::s_iSelect = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			if(CFrame::s_iSelect >=0)
 			{
 				TakePicture();
@@ -3726,7 +3726,7 @@ void GL3dBodyDlg::Remove(CVector Pt)
 		Real.y =  (Pt.y - m_FrameScaledOffset.y)/m_FrameScale;
 		Real.z = 0.0;
 
-		n =   m_pFrame->IsPoint(Real, m_BodyScale/m_BodyRefScale);
+		n =   m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 		if (n>=0)
 		{
 			for (i=0; i<m_pBody->m_NStations;i++)
