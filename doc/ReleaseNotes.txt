@@ -21,6 +21,7 @@ xflr5 v6.07, April xxth, 2012
 	- Corrected the bug in wing analysis with ground effect
 	- Corrected the bug in type 4 analysis for wings and planes
 	- Corrected the bug which modified the chord length as twist increases : impact results for wings with high dihedral
+	- Cleaned, corrected, and improved the code for B-Splines
 	- Removed the option for Min/Max type controls in Stabillity Polars
 	- Added an option to edit Wing Polar paramaters
 	- Fixed the crash bug when defining wings with more than 16 span sections
@@ -548,7 +549,7 @@ v2.005 October 26th,2005 (Limited release only)
 	Added option to start batch calculations from alpha=0 to improve convergences
 	Added memorizing of Alpha for each polar in Wing Analysis (Special for Marc)
 	Corrected spline commands in XInverse
-	Corrected sweep and twist scaling bug in Wing Design/Scale Wing
+	Corrected sweep and twist scaling bug in Wing design/Scale Wing
 	Solved a few more minor bugs (no impact on results)
 	Made a few cosmetic improvements
 
@@ -836,7 +837,7 @@ v0.36	January 13th, 2004
 v0.35	January 10th, 2004
 	Resized controls to fit 800x600 screens
 	Defined macro parameters for XFoil arrays
-	Resized snew[4*IBX], isys[IVX][ISX], qinvu[IZX][3], in  XDirect/XFoil.h
+	Resized snew[4*IBX], isys[IVX][ISX], qinvu[IZX][3], in  xdirect/XFoil.h
 	Resized usav[IVX+1][ISX] in XFoil::setbl()
 	Added Grid option for graphs
 	Added single polar graph option
@@ -845,7 +846,7 @@ v0.35	January 10th, 2004
 
 
 v0.34	December 26th, 2003
-	Corrected ipan/va/vb/vz/vm/vdel array sizing bug in XDirect/XFoil.h
+	Corrected ipan/va/vb/vz/vm/vdel array sizing bug in xdirect/XFoil.h
 	Corrected qnew and q_ac array sizing bug in Xfoil::update()
 	Forced 'Apply' request when exiting PANE menu
 	Added recognition of '#' comment character in Foil files
