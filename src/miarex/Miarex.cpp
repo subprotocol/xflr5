@@ -4651,7 +4651,7 @@ void QMiarex::GLCallViewLists()
 			if(m_pWingList[iw])  glCallList(WINGOUTLINE+iw);
 
 		if(m_pCurPlane)  glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-		if(m_pCurBody)	 glCallList(GLBODYGEOM);
+		if(m_pCurBody)	 glCallList(BODYGEOMBASE+MAXBODIES);
 		if(m_pCurPlane)  glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 	}
 
@@ -4679,7 +4679,7 @@ void QMiarex::GLCallViewLists()
 		if(m_pCurBody)
 		{
 			if(m_pCurPlane)	glTranslated((m_pCurPlane)->BodyPos().x, 0.0, (m_pCurPlane)->BodyPos().z);
-			glCallList(GLBODYSURFACES);
+			glCallList(BODYGEOMBASE);
 			if(m_pCurPlane)	glTranslated(-(m_pCurPlane)->BodyPos().x, 0.0, -(m_pCurPlane)->BodyPos().z);
 		}
 	}
@@ -4738,34 +4738,18 @@ void QMiarex::GLDraw3D()
 
 	if(m_bResetglBody && m_pCurBody)
 	{
-		if(glIsList(GLBODYGEOM))
+		if(glIsList(BODYGEOMBASE))
 		{
-			glDeleteLists(GLBODYGEOM,2);
+			glDeleteLists(BODYGEOMBASE,1);
+			glDeleteLists(BODYGEOMBASE+MAXBODIES,1);
 			m_GLList -=2;
 		}
-		if(m_pCurBody->m_LineType==BODYPANELTYPE)	    GLCreateBody3DFlatPanels(s_pMainFrame, BODYSURFACE, m_pCurBody);
-		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYSURFACE, m_pCurBody);
+		if(m_pCurBody->m_LineType==BODYPANELTYPE)	    GLCreateBody3DFlatPanels(s_pMainFrame, BODYGEOMBASE, m_pCurBody);
+		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pCurBody, m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
 
 		m_bResetglBody = false;
-		if(glIsList(GLBODYMESHPANELS))
-		{
-			glDeleteLists(GLBODYMESHPANELS,2);
-			m_GLList -=2;
-		}
-		GLCreateBodyMesh(s_pMainFrame, GLBODYMESHPANELS, m_pCurBody);
-		m_bResetglBodyMesh = false;
 	}
 
-	if(m_bResetglBodyMesh && m_pCurBody)
-	{
-		if(glIsList(GLBODYMESHPANELS))
-		{
-			glDeleteLists(GLBODYMESHPANELS,2);
-			m_GLList -=2;
-		}
-//		GLCreateBodyMesh();
-		m_bResetglBodyMesh = false;
-	}
 
 	if(m_bResetglGeom  && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{

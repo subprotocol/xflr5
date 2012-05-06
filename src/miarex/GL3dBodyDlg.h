@@ -50,7 +50,6 @@ class GL3dBodyDlg : public QDialog
 	friend class QSail7;
 	friend class QMiarex;
 	friend class ThreeDWidget;
-	friend class ThreeDWidget;
 	friend class GLLightDlg;
 	friend class BodyScaleDlg;
 	friend class ManageBodiesDlg;

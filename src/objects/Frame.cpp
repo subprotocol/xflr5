@@ -215,8 +215,32 @@ void CFrame::CopyPoints(QList<CVector> *m_pPointList)
 	}
 }
 
+
 void CFrame::AppendPoint(CVector const& Pt)
 {
 	m_CtrlPoint.append(Pt);
 }
+
+
+void CFrame::SetuPosition(double u, int iAxis)
+{
+	m_uPosition=u;
+	for(int ic=0; ic<m_CtrlPoint.size(); ic++)
+	{
+		if(iAxis==1)      m_CtrlPoint[ic].x = u;
+		else if(iAxis==2) m_CtrlPoint[ic].y = u;
+		else if(iAxis==3) m_CtrlPoint[ic].z = u;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
 

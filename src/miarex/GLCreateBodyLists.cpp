@@ -17,10 +17,10 @@
 static CVector m_T[(NXPOINTS+1)*(NHOOPPOINTS+1)]; //temporary points to save calculation times for body NURBS surfaces
 
 
-void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody)
+void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int nh)
 {
 	int i,j,k,l;
-	int p, nx, nh;
+	int p;
 	double v;
 
 	CVector Point;
@@ -29,8 +29,9 @@ void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody)
 	CVector LA, LB, TA, TB;
 	MainFrame *pMainFrame = (MainFrame*)pParent;
 
-	nx = qMin(500, NXPOINTS);
-	nh = qMax(NHOOPPOINTS, 3);
+	nx = qMin(nx, NXPOINTS);
+	nh = qMax(3, nh);
+	nh = qMin(nh, NHOOPPOINTS);
 
 	p = 0;
 	for (k=0; k<=nx; k++)
@@ -256,10 +257,10 @@ void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody)
 
 				glBegin(GL_QUADS);
 				{
-					P1 = pBody->Frame(j)->m_CtrlPoint[k];			P1.x = pBody->Frame(j)->m_uPosition;
-					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];		P2.x = pBody->Frame(j+1)->m_uPosition;
-					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];		P3.x = pBody->Frame(j+1)->m_uPosition;
-					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];		P4.x = pBody->Frame(j)->m_uPosition;
+					P1 = pBody->Frame(j)->m_CtrlPoint[k];       P1.x = pBody->Frame(j)->m_uPosition;
+					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];     P2.x = pBody->Frame(j+1)->m_uPosition;
+					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];   P3.x = pBody->Frame(j+1)->m_uPosition;
+					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];     P4.x = pBody->Frame(j)->m_uPosition;
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;

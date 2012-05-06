@@ -136,8 +136,7 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 		wx = 0.0;
 		for(int jv=0; jv<m_nvLines; jv++)
 		{
-			cs = SplineBlend(jv, m_ivDegree, v, m_vKnots);
-//			if(i==0 || (i==m_nvLines-1)) cs *= m_EdgeWeight;
+			cs = SplineBlend(jv, m_ivDegree, v, m_vKnots) * Weight(jv, m_nvLines);
 
 			Vv.x += m_pFrame[iu]->m_CtrlPoint[jv].x * cs;
 			Vv.y += m_pFrame[iu]->m_CtrlPoint[jv].y * cs;
@@ -145,7 +144,7 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 
 			wx += cs;
 		}
-		bs = SplineBlend(iu, m_iuDegree, u, m_uKnots);
+		bs = SplineBlend(iu, m_iuDegree, u, m_uKnots) * Weight(iu, m_pFrame.size());
 
 		V.x += Vv.x * bs;
 		V.y += Vv.y * bs;
@@ -158,6 +157,28 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 	Pt.y = V.y / weight;
 	Pt.z = V.z / weight;
 }
+
+
+double NURBSSurface::Weight(int i, int N)
+{
+	// returns the weight of the control point
+	// i is the index of the point along the edge
+	// N is total number of points along the edge
+//	if(fabs(m_EdgeWeight-1.0)<PRECISION) return 1.0;
+
+
+//	if(i<N/2) qDebug()<< (int)((N-1)/2-i);
+//	else      qDebug()<< i-(int)(N/2);
+
+	double w;
+	if(i<N/2) w= pow(m_EdgeWeight, (int)((N-1)/2-i));
+	else      w= pow(m_EdgeWeight, i-(int)(N/2));
+
+//	qDebug()<<i<<N<<	w;
+	return w;
+	return 1.0;//unused
+}
+
 
 /*
 void NURBSSurface::GetPoint(double u, double v, CVector &Pt)

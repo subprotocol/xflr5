@@ -85,13 +85,17 @@ W3dPrefsDlg::W3dPrefsDlg()
 	connect(m_pctrlAxis, SIGNAL(clicked()), SLOT(On3DAxis()));
 	connect(m_pctrlOutline, SIGNAL(clicked()), SLOT(OnWingColor()));
 	connect(m_pctrlVLMMesh, SIGNAL(clicked()), SLOT(OnVLMMesh()));
+	connect(m_pctrlTopTrans, SIGNAL(clicked()), SLOT(OnTopTrans()));
+	connect(m_pctrlBotTrans, SIGNAL(clicked()), SLOT(OnBotTrans()));
 	connect(m_pctrlLift, SIGNAL(clicked()), SLOT(OnXCP()));
 	connect(m_pctrlMoments, SIGNAL(clicked()), SLOT(OnMoments()));
 	connect(m_pctrlInducedDrag, SIGNAL(clicked()), SLOT(OnIDrag()));
+	connect(m_pctrlViscousDrag, SIGNAL(clicked()), SLOT(OnVDrag()));
 	connect(m_pctrlDownwash, SIGNAL(clicked()), SLOT(OnDownwash()));
 	connect(m_pctrlStreamLines, SIGNAL(clicked()), SLOT(OnStreamLines()));
 	connect(m_pctrlWakePanels, SIGNAL(clicked()), SLOT(OnWakePanels()));
 	connect(m_pctrlShowWake, SIGNAL(clicked()), SLOT(OnShowWake()));
+	connect(m_pctrlMassColor, SIGNAL(clicked()), SLOT(OnMasses()));
 }
 
 
@@ -115,31 +119,44 @@ void W3dPrefsDlg::SetupLayout()
 	QLabel *lab1 = new QLabel(tr("Axis"));
 	QLabel *lab2 = new QLabel(tr("Outline"));
 	QLabel *lab3 = new QLabel(tr("VLM Mesh"));
+	QLabel *lab4 = new QLabel(tr("Top transition"));
+	QLabel *lab5 = new QLabel(tr("Bottom transition"));
 	QLabel *lab6 = new QLabel(tr("Lift"));
 	QLabel *lab7 = new QLabel(tr("Moments"));
 	QLabel *lab8 = new QLabel(tr("Induced Drag"));
+	QLabel *lab9 = new QLabel(tr("Viscous Drag"));
 	QLabel *lab10 = new QLabel(tr("Downwash"));
 	QLabel *lab11 = new QLabel(tr("WakePanels"));
 	QLabel *lab12 = new QLabel(tr("Streamlines"));
+	QLabel *lab13 = new QLabel(tr("Masses"));
+
 	lab1->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab2->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab3->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab4->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab5->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab6->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab7->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab8->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab9->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab10->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab11->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 	lab12->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
+	lab13->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
 
 	m_pctrlAxis     = new LineButton;
 	m_pctrlOutline  = new LineButton;
 	m_pctrlVLMMesh  = new LineButton;
+	m_pctrlTopTrans = new LineButton;
+	m_pctrlBotTrans = new LineButton;
 	m_pctrlLift     = new LineButton;
 	m_pctrlMoments  = new LineButton;
 	m_pctrlInducedDrag = new LineButton;
+	m_pctrlViscousDrag = new LineButton;
 	m_pctrlDownwash    = new LineButton;
 	m_pctrlWakePanels  = new LineButton;
 	m_pctrlStreamLines  = new LineButton;
+	m_pctrlMassColor = new ColorButton;
 	m_pctrlShowWake = new QCheckBox(tr("Show Wake Panels"));
 
 	QGridLayout *PrefsLayout = new QGridLayout;
@@ -150,26 +167,31 @@ void W3dPrefsDlg::SetupLayout()
 	PrefsLayout->addWidget(lab1,1,1);
 	PrefsLayout->addWidget(lab2,2,1);
 	PrefsLayout->addWidget(lab3,3,1);
-	PrefsLayout->addWidget(lab11,4,1);
-
-	PrefsLayout->addWidget(lab6,1,3);
-	PrefsLayout->addWidget(lab7,2,3);
-	PrefsLayout->addWidget(lab8,3,3);
+	PrefsLayout->addWidget(lab4,4,1);
+	PrefsLayout->addWidget(lab5,5,1);
+	PrefsLayout->addWidget(lab6,6,1);
+	PrefsLayout->addWidget(lab7,1,3);
+	PrefsLayout->addWidget(lab8,2,3);
+	PrefsLayout->addWidget(lab9,3,3);
 	PrefsLayout->addWidget(lab10,4,3);
-	PrefsLayout->addWidget(lab12,5,3);
+	PrefsLayout->addWidget(lab11,5,3);
+	PrefsLayout->addWidget(lab12,6,3);
+	PrefsLayout->addWidget(lab13,7,3);
 
 	PrefsLayout->addWidget(m_pctrlAxis,1,2);
 	PrefsLayout->addWidget(m_pctrlOutline,2,2);
 	PrefsLayout->addWidget(m_pctrlVLMMesh,3,2);
-	PrefsLayout->addWidget(m_pctrlWakePanels,4,2);
-
+	PrefsLayout->addWidget(m_pctrlTopTrans,4,2);
+	PrefsLayout->addWidget(m_pctrlBotTrans,5,2);
+	PrefsLayout->addWidget(m_pctrlLift,6,2);
 	PrefsLayout->addWidget(m_pctrlShowWake,7,1,1,2);
-
-	PrefsLayout->addWidget(m_pctrlLift,1,4);
-	PrefsLayout->addWidget(m_pctrlMoments,2,4);
-	PrefsLayout->addWidget(m_pctrlInducedDrag,3,4);
+	PrefsLayout->addWidget(m_pctrlMoments,1,4);
+	PrefsLayout->addWidget(m_pctrlInducedDrag,2,4);
+	PrefsLayout->addWidget(m_pctrlViscousDrag,3,4);
 	PrefsLayout->addWidget(m_pctrlDownwash,4,4);
-	PrefsLayout->addWidget(m_pctrlStreamLines,5,4);
+	PrefsLayout->addWidget(m_pctrlWakePanels,5,4);
+	PrefsLayout->addWidget(m_pctrlStreamLines,6,4);
+	PrefsLayout->addWidget(m_pctrlMassColor,7,4);
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
 	QPushButton *OKButton = new QPushButton(tr("OK"));
@@ -229,6 +251,40 @@ void W3dPrefsDlg::On3DAxis()
 
 
 
+void W3dPrefsDlg::OnTopTrans()
+{
+	LinePickerDlg LPdlg;
+	LPdlg.SetColor(s_TopColor);
+	LPdlg.SetStyle(s_TopStyle);
+	LPdlg.SetWidth(s_TopWidth);
+	LPdlg.InitDialog();
+
+	if (QDialog::Accepted == LPdlg.exec())
+	{
+		s_TopColor = LPdlg.GetColor();
+		s_TopStyle = LPdlg.GetStyle();
+		s_TopWidth = LPdlg.GetWidth();
+		m_pctrlTopTrans->SetStyle(s_TopStyle, s_TopWidth, s_TopColor);
+	}
+}
+
+void W3dPrefsDlg::OnBotTrans()
+{
+	LinePickerDlg LPdlg;
+	LPdlg.SetColor(s_BotColor);
+	LPdlg.SetStyle(s_BotStyle);
+	LPdlg.SetWidth(s_BotWidth);
+	LPdlg.InitDialog();
+
+	if (QDialog::Accepted == LPdlg.exec())
+	{
+		s_BotColor = LPdlg.GetColor();
+		s_BotStyle = LPdlg.GetStyle();
+		s_BotWidth = LPdlg.GetWidth();
+		m_pctrlBotTrans->SetStyle(s_BotStyle, s_BotWidth, s_BotColor);
+	}
+}
+
 void W3dPrefsDlg::OnIDrag()
 {
 	LinePickerDlg LPdlg;
@@ -242,10 +298,26 @@ void W3dPrefsDlg::OnIDrag()
 		s_IDragColor = LPdlg.GetColor();
 		s_IDragStyle = LPdlg.GetStyle();
 		s_IDragWidth = LPdlg.GetWidth();
+		m_pctrlInducedDrag->SetStyle(s_IDragStyle, s_IDragWidth, s_IDragColor);
 	}
-	repaint();
 }
 
+void W3dPrefsDlg::OnVDrag()
+{
+	LinePickerDlg LPdlg;
+	LPdlg.SetColor(s_VDragColor);
+	LPdlg.SetStyle(s_VDragStyle);
+	LPdlg.SetWidth(s_VDragWidth);
+	LPdlg.InitDialog();
+
+	if (QDialog::Accepted == LPdlg.exec())
+	{
+		s_VDragColor = LPdlg.GetColor();
+		s_VDragStyle = LPdlg.GetStyle();
+		s_VDragWidth = LPdlg.GetWidth();
+		m_pctrlViscousDrag->SetStyle(s_VDragStyle, s_VDragWidth, s_VDragColor);
+	}
+}
 
 void W3dPrefsDlg::OnXCP()
 {
@@ -349,6 +421,15 @@ void W3dPrefsDlg::OnVLMMesh()
 	repaint();
 }
 
+void W3dPrefsDlg::OnMasses()
+{
+	QColor Color = QColorDialog::getColor(s_MassColor,
+								   this, "Select the color", QColorDialog::ShowAlphaChannel);
+	if(Color.isValid()) s_MassColor = Color;
+	m_pctrlMassColor->SetColor(s_MassColor);
+
+	update();
+}
 
 void W3dPrefsDlg::OnShowWake()
 {

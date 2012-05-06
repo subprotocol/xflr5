@@ -140,10 +140,8 @@
 #define PANELFORCEARROWS        1391
 #define PANELFORCELEGENDTXT     1392
 
-#define GLBODYGEOM            1400
-#define GLBODYSURFACES        1401
-#define GLBODYMESHPANELS      1402
-#define GLBODYMESHBACK        1403
+//#define GLBODYMESHPANELS      1402
+//#define GLBODYMESHBACK        1403
 
 #define ARCBALL             1414
 #define ARCPOINT            1415

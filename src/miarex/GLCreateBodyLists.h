@@ -16,7 +16,7 @@
 #include "../params.h"
 
 void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody);
-void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody);
+void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int nh);
 void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody);
 
 #endif

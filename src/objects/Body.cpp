@@ -20,8 +20,8 @@
 *****************************************************************************/
 
 
-#include "../mainframe.h"
 #include "Body.h"
+#include "../mainframe.h"
 #include "../globals.h"
 #include "../misc/UnitsDlg.h"
 #include <math.h>
@@ -63,6 +63,46 @@ CBody::CBody()
 	m_SplineSurface.m_iuDegree = 3;
 	m_SplineSurface.m_ivDegree = 3;
 
+/*	m_NSideLines = 4;
+	m_SplineSurface.m_nvLines = m_NSideLines;
+	for(int ifr=0; ifr<4; ifr++)
+	{
+		m_SplineSurface.m_pFrame.append(new CFrame);
+		m_SplineSurface.m_pFrame[ifr]->m_CtrlPoint.clear();
+		for(int is=0; is<m_NSideLines; is++)
+		{
+			m_SplineSurface.m_pFrame[ifr]->m_CtrlPoint.append(CVector(0.0,0.0,0.0));
+		}
+	}
+
+	m_SplineSurface.m_nvLines = m_NSideLines;
+	m_SplineSurface.m_pFrame[0]->SetuPosition(-1.0, 1);
+	m_SplineSurface.m_pFrame[1]->SetuPosition( 0.0, 1);
+	m_SplineSurface.m_pFrame[2]->SetuPosition( 3.0,1);
+	m_SplineSurface.m_pFrame[3]->SetuPosition( 6.0,1);
+
+	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[0].Set(-1.0, 0.0, 0.2);
+	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[1].Set(-1.0, 0.0, 0.2);
+	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[2].Set(-1.0, 0.0, 0.2);
+	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[3].Set(-1.0, 0.0, 0.2);
+
+	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[0].Set(0.0, 0.0, -0.0);
+	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[1].Set(0.0, 2.0, -0.0);
+	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[2].Set(0.0, 0.8, -1.0);
+	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[3].Set(0.0, 0.0, -1.5);
+
+	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[0].Set(3.0, 0.0, 0.0);
+	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[1].Set(3.0, 1.5, 0.0);
+	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[2].Set(3.0, 0.5,-0.5);
+	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[3].Set(3.0, 0.0,-1.0);
+
+	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[0].Set(6.0,  0.0, .0);
+	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[1].Set(6.0,  0.0, .0);
+	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[2].Set(6.0,  0.0, .0);
+	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[3].Set(6.0,  0.0, .0);*/
+
+
+
 	m_NSideLines = 5;
 	m_SplineSurface.m_nvLines = m_NSideLines;
 	for(int ifr=0; ifr<7; ifr++)
@@ -75,19 +115,19 @@ CBody::CBody()
 		}
 	}
 
-	Frame(0)->SetuPosition(-0.10);
-	Frame(1)->SetuPosition(-0.0936);
-	Frame(2)->SetuPosition(-0.0067);
-	Frame(3)->SetuPosition( 0.0943);
-	Frame(4)->SetuPosition( 0.242);
-	Frame(5)->SetuPosition( 0.636);
-	Frame(6)->SetuPosition( 0.660);
+	Frame(0)->SetuPosition(-0.10,1);
+	Frame(1)->SetuPosition(-0.0936,1);
+	Frame(2)->SetuPosition(-0.0067,1);
+	Frame(3)->SetuPosition( 0.0943,1);
+	Frame(4)->SetuPosition( 0.242,1);
+	Frame(5)->SetuPosition( 0.636,1);
+	Frame(6)->SetuPosition( 0.660,1);
 
-	Frame(0)->m_CtrlPoint[0].Set(-0.110, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[1].Set(-0.110, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[2].Set(-0.110, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[3].Set(-0.110, 0.0, -0.0124);
-	Frame(0)->m_CtrlPoint[4].Set(-0.110, 0.0, -0.0124);
+	Frame(0)->m_CtrlPoint[0].Set(-0.10, 0.0, -0.0124);
+	Frame(0)->m_CtrlPoint[1].Set(-0.10, 0.0, -0.0124);
+	Frame(0)->m_CtrlPoint[2].Set(-0.10, 0.0, -0.0124);
+	Frame(0)->m_CtrlPoint[3].Set(-0.10, 0.0, -0.0124);
+	Frame(0)->m_CtrlPoint[4].Set(-0.10, 0.0, -0.0124);
 
 	Frame(1)->m_CtrlPoint[0].Set(-0.0936, 0.000,  0.0035);
 	Frame(1)->m_CtrlPoint[1].Set(-0.0936, 0.011,  0.0003);
@@ -126,33 +166,6 @@ CBody::CBody()
 	Frame(6)->m_CtrlPoint[4].Set(0.660, 0.00, -0.0);
 
 
-
-/*	m_NSideLines = 4;
-	m_SplineSurface.m_nvLines = m_NSideLines;
-	m_SplineSurface.m_pFrame[0]->m_uPosition = -1.0;
-	m_SplineSurface.m_pFrame[1]->m_uPosition = -0.0;
-	m_SplineSurface.m_pFrame[2]->m_uPosition =  3.0;
-	m_SplineSurface.m_pFrame[3]->m_uPosition =  6.0;
-
-	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[0].Set(-1.0, 0.0, 0.2);
-	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[1].Set(-1.0, 0.0, 0.2);
-	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[2].Set(-1.0, 0.0, 0.2);
-	m_SplineSurface.m_pFrame[0]->m_CtrlPoint[3].Set(-1.0, 0.0, 0.2);
-
-	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[0].Set(0.0, 0.0, -0.0);
-	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[1].Set(0.0, 2.0, -0.0);
-	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[2].Set(0.0, 0.8, -1.0);
-	m_SplineSurface.m_pFrame[1]->m_CtrlPoint[3].Set(0.0, 0.0, -1.5);
-
-	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[0].Set(3.0, 0.0, 0.0);
-	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[1].Set(3.0, 1.5, 0.0);
-	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[2].Set(3.0, 0.5,-0.5);
-	m_SplineSurface.m_pFrame[2]->m_CtrlPoint[3].Set(3.0, 0.0,-1.0);
-
-	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[0].Set(6.0,  0.0, .0);
-	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[1].Set(6.0,  0.0, .0);
-	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[2].Set(6.0,  0.0, .0);
-	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[3].Set(6.0,  0.0, .0);*/
 
 	SetKnots();
 
@@ -1298,7 +1311,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << 0;//ar << m_NStations; again ?
 		for (k=0; k<FrameSize(); k++)
 		{
-			ar << (float)FramePosition(k) << 0.0;// << (float)m_FramePosition[k].z;
+			ar << (float)FramePosition(k) << 0.0f;// << (float)m_FramePosition[k].z;
 		}
 		if(ProjectFormat>=5)
 		{
@@ -1352,7 +1365,7 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		for (k=0; k<nStations;k++)
 		{
-			ar >> f; m_SplineSurface.m_pFrame[k]->m_uPosition =f;
+			ar >> f; m_SplineSurface.m_pFrame[k]->SetuPosition(f,1);
 			ar >> f; //m_FramePosition[k].z =f;
 		}
 		if(ArchiveFormat>=1004)
@@ -1737,7 +1750,11 @@ double CBody::TotalMass()
 
 
 
-
+void CBody::SetEdgeWeight(double w)
+{
+	m_EdgeWeight = w;
+	m_SplineSurface.m_EdgeWeight = w;
+}
 
 
 

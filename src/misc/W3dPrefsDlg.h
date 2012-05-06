@@ -48,24 +48,29 @@ public:
 private slots:
 	void On3DAxis();
 	void OnWingColor();
+	void OnTopTrans();
+	void OnBotTrans();
 	void OnXCP();
 	void OnMoments();
 	void OnIDrag();
+	void OnVDrag();
 	void OnDownwash();
 	void OnWakePanels();
 	void OnStreamLines();
 	void OnVLMMesh();
 	void OnShowWake();
+	void OnMasses();
 
 private:
 	void SetupLayout();
 	void SaveSettings(QSettings *pSettings);
 	void LoadSettings(QSettings *pSettings);
 
-	LineButton *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh;
-	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlDownwash;
+	LineButton *m_pctrlAxis, *m_pctrlOutline, *m_pctrlVLMMesh, *m_pctrlTopTrans, *m_pctrlBotTrans;
+	LineButton *m_pctrlLift, *m_pctrlMoments, *m_pctrlInducedDrag, *m_pctrlViscousDrag, *m_pctrlDownwash;
 	LineButton *m_pctrlStreamLines, *m_pctrlWakePanels;
 
+	ColorButton *m_pctrlMassColor;
 
 	QCheckBox *m_pctrlShowWake;
 

@@ -74,6 +74,7 @@ public:
 	void Translate(CVector T, bool bFrameOnly=false, int FrameID=0);
 	void SetKnots();
 	void SetPanelPos();
+	void SetEdgeWeight(double w);
 
 	CFrame *Frame(int k);
 	CFrame *ActiveFrame();

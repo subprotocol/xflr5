@@ -36,6 +36,7 @@ public:
 	void InsertFrame(CFrame *pNewFrame);
 	CFrame *AppendFrame();
 
+	double Weight(int i, int N);
 
 	int FrameSize() {return m_pFrame.size();};
 

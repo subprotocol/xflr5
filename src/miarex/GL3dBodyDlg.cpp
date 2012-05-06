@@ -82,9 +82,24 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	setWindowFlags(Qt::Window);
 //	setSizeGripEnabled(true);
 
+/*	qDebug()<<"_____N=10:";
+	int N=10;
+//	qDebug()<<(int)7.1 <<(int)7.5<< (int)7.5001<< (int)7.9<< (int)(N/2) << (int)((double)N/2.0);
+	for(int i=0; i<N; i++)
+	{
+		m_TmpPic.m_SplineSurface.Weight(i, N);
+	}
+	qDebug()<<"_____N=11:";
+	N=11;
+//	qDebug()<<(int)7.1 <<(int)7.5<< (int)7.5001<< (int)7.9<< (int)(N/2) << (int)((double)N/2.0);
+	for(int i=0; i<N; i++)
+	{
+		m_TmpPic.m_SplineSurface.Weight(i, N);
+	}*/
+
 	m_pBody = NULL;
 
-	m_RefLength = 1.; //=1 meter, for standard RC planes
+	m_RefLength = 2.; //=2 meters, for standard RC planes
 //	m_RefLength = 10.;//=10 meters, for large bodies
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
@@ -95,8 +110,8 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 
 	m_ClipPlanePos = 5.0;
 
-	m_NXPoints    = 30;
-	m_NHoopPoints = 20;
+	m_NXPoints    = 19;
+	m_NHoopPoints = 13;
 
 	m_glViewportTrans.x  = 0.0;
 	m_glViewportTrans.y  = 0.0;
@@ -1427,7 +1442,7 @@ void GL3dBodyDlg::GLDraw3D()
 			m_GLList -=2;
 		}
 		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(s_pMainFrame, BODYGEOMBASE, m_pBody);
-		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pBody);
+		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pBody, m_NXPoints, m_NHoopPoints);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHBASE))
@@ -2735,7 +2750,7 @@ void GL3dBodyDlg::OnEdgeWeight()
 	StorePicture();
 
 	double w= m_pctrlEdgeWeight->value();
-	m_pBody->m_EdgeWeight = exp(w);
+	m_pBody->SetEdgeWeight(exp(w));
 
 	m_bResetglBody   = true;
 	m_bResetglBody2D = true;
@@ -3462,9 +3477,9 @@ void GL3dBodyDlg::SetupLayout()
 			m_pctrlNHoopPanels = new FloatEdit;
 			m_pctrlEdgeWeight = new QSlider(Qt::Horizontal);
 			m_pctrlEdgeWeight->setMinimum(1	);
-			m_pctrlEdgeWeight->setMaximum(101);
-			m_pctrlEdgeWeight->setSliderPosition(0);
-			m_pctrlEdgeWeight->setTickInterval(11);
+			m_pctrlEdgeWeight->setMaximum(11);
+			m_pctrlEdgeWeight->setSliderPosition(1);
+			m_pctrlEdgeWeight->setTickInterval(1);
 			m_pctrlEdgeWeight->setTickPosition(QSlider::TicksBelow);
 			m_pctrlEdgeWeight->setSizePolicy(szPolicyMinimum);
 

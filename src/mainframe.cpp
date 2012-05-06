@@ -3373,6 +3373,7 @@ MainFrame* MainFrame::self() {
     return _self;
 }
 
+
 int MainFrame::LoadXFLR5File(QString PathName)
 {
 	QFile XFile(PathName);
@@ -5824,11 +5825,16 @@ bool MainFrame::SerializeProject(QDataStream &ar, bool bIsStoring, int ProjectFo
 			{
 				pBody = new CBody();
 
-				if (!pBody->SerializeBody(ar, bIsStoring, ProjectFormat))
+				if (pBody->SerializeBody(ar, bIsStoring, ProjectFormat))
 				{
-					if(pPOpp) delete pPOpp;
+					pMiarex->AddBody(pBody);
 				}
-				pMiarex->AddBody(pBody);
+				else
+				{
+					if(pBody) delete pBody;
+					QApplication::restoreOverrideCursor();
+					return false;
+				}
 			}
 		}
 

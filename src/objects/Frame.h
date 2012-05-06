@@ -44,7 +44,7 @@ public:
 	void CopyFrame(CFrame *pFrame);
 	void CopyPoints(QList<CVector> *m_pPointList);
 
-	void SetuPosition(double u) {m_uPosition=u;};
+	void SetuPosition(double u, int iAxis);
 
 	int PointSize() {return m_CtrlPoint.size();};
 
