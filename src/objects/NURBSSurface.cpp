@@ -7,6 +7,7 @@
 *****************************************************************************/
 
 
+#include "../params.h"
 #include "../globals.h"
 #include "NURBSSurface.h"
 #include <QtDebug>
@@ -36,7 +37,8 @@ NURBSSurface::NURBSSurface()
 	m_iRes = 31;
 
 	m_Bunch  = 0.0;
-	m_EdgeWeight = 1.0;
+	m_EdgeWeightu = 1.0;
+	m_EdgeWeightv = 1.0;
 
 	eps = 1.0e-06;
 
@@ -88,8 +90,8 @@ double NURBSSurface::Getv(double u, CVector r)
 {
 	double sine = 10000.0;
 
-	if(u<=0.0)             return 0.0;
-	if(u>=1.0)             return 0.0;
+	if(u<=0.0)          return 0.0;
+	if(u>=1.0)          return 0.0;
 	if(r.VAbs()<1.0e-5) return 0.0;
 
 	int iter=0;
@@ -136,7 +138,7 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 		wx = 0.0;
 		for(int jv=0; jv<m_nvLines; jv++)
 		{
-			cs = SplineBlend(jv, m_ivDegree, v, m_vKnots) * Weight(jv, m_nvLines);
+			cs = SplineBlend(jv, m_ivDegree, v, m_vKnots) * Weight(m_EdgeWeightv, jv, m_nvLines);
 
 			Vv.x += m_pFrame[iu]->m_CtrlPoint[jv].x * cs;
 			Vv.y += m_pFrame[iu]->m_CtrlPoint[jv].y * cs;
@@ -144,7 +146,7 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 
 			wx += cs;
 		}
-		bs = SplineBlend(iu, m_iuDegree, u, m_uKnots) * Weight(iu, m_pFrame.size());
+		bs = SplineBlend(iu, m_iuDegree, u, m_uKnots) * Weight(m_EdgeWeightu, iu, m_pFrame.size());
 
 		V.x += Vv.x * bs;
 		V.y += Vv.y * bs;
@@ -159,69 +161,31 @@ void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
 }
 
 
+double NURBSSurface::Weight(double const &d, const int &i, int const &N)
+{
+	// returns the weight of the control point
+	// i is the index of the point along the edge
+	// N is total number of points along the edge
+
+	if(fabs(d-1.0)<PRECISION) return 1.0;
+	if(i<(N+1)/2)             return pow(d, i);
+	else                      return pow(d, N-i-1);
+}
+
+
+/*
 double NURBSSurface::Weight(int i, int N)
 {
 	// returns the weight of the control point
 	// i is the index of the point along the edge
 	// N is total number of points along the edge
-//	if(fabs(m_EdgeWeight-1.0)<PRECISION) return 1.0;
+
+	if(fabs(m_EdgeWeight-1.0)<PRECISION) return 1.0;
+	if(i<N/2)                            return 1./pow(m_EdgeWeight, (int)((N-1)/2-i));
+	else                                 return 1./pow(m_EdgeWeight, i-(int)(N/2));
+}*/
 
 
-//	if(i<N/2) qDebug()<< (int)((N-1)/2-i);
-//	else      qDebug()<< i-(int)(N/2);
-
-	double w;
-	if(i<N/2) w= pow(m_EdgeWeight, (int)((N-1)/2-i));
-	else      w= pow(m_EdgeWeight, i-(int)(N/2));
-
-//	qDebug()<<i<<N<<	w;
-	return w;
-	return 1.0;//unused
-}
-
-
-/*
-void NURBSSurface::GetPoint(double u, double v, CVector &Pt)
-{
-	//returns the point corresponding to the parametric values u and v
-	//assumes that the knots have been set previously
-
-	//Scan v-direction first, then u-direction
-	CVector V, Vu;
-	double wv, weight;
-
-	if(u>=1.0) u=0.99999999999;
-	if(v>=1.0) v=0.99999999999;
-
-	weight = 0.0;
-	for(int iu=0; iu<m_nuLines; iu++)  // the frames
-	{
-		Vu.Set(0.0,0.0,0.0);
-		wv = 0.0;
-		for(int jv=0; jv<m_nvLines; jv++)
-		{
-			cs = SplineBlend(jv, m_ivDegree, v, m_vKnots);
-
-			Vu.x += m_pFrame[jv]->m_CtrlPoint[iu].x * cs;
-			Vu.y += m_pFrame[jv]->m_CtrlPoint[iu].y * cs;
-			Vu.z += m_pFrame[jv]->m_uPosition       * cs;
-
-			wv += cs;
-		}
-		bs = SplineBlend(iu, m_iuDegree, u, m_uKnots);
-
-		V.x += Vu.x * bs;
-		V.y += Vu.y * bs;
-		V.z += Vu.z * bs;
-
-		weight += wv * bs;
-	}
-
-	Pt.x = V.x / weight;
-	Pt.y = V.y / weight;
-	Pt.z = V.z / weight;
-}
-*/
 
 void NURBSSurface::SetPanelPos()
 {
@@ -244,9 +208,6 @@ void NURBSSurface::SetPanelPos()
 		m_vPanelPos[i] =0.5-((0.5-y)/(0.5-norm))/2.0;
 	}
 }
-
-
-
 
 
 bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
@@ -353,27 +314,22 @@ void NURBSSurface::SetKnots()
 }
 
 
-bool NURBSSurface::SetXDegree(int nxDegree)
+int NURBSSurface::SetvDegree(int nvDegree)
 {
-	if(m_nvLines>nxDegree)
-	{
-		m_ivDegree = nxDegree;
-		return true;
-	}
-	return false;
+	if(m_nvLines>nvDegree) m_ivDegree = nvDegree;
+	else                   m_ivDegree = m_nvLines-1;
+	return m_ivDegree;
 }
 
 
 
-bool NURBSSurface::SetZDegree(int nzDegree)
+int NURBSSurface::SetuDegree(int nuDegree)
 {
-	if(m_pFrame.size()>nzDegree)
-	{
-		m_iuDegree = nzDegree;
-		return true;
-	}
-	return false;
+	if(FrameSize()>nuDegree) m_iuDegree = nuDegree;
+	else                     m_iuDegree = FrameSize()-1;
+	return m_iuDegree;
 }
+
 
 void NURBSSurface::RemoveFrame(int iFrame)
 {

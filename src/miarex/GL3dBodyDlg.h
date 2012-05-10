@@ -209,8 +209,6 @@ private:
 	QAction *m_pExportBodyDef, *m_pImportBodyDef, *m_pExportBodyGeom, *m_pTranslateBody;// *m_pSetupLight;
 	QAction *m_pGrid;
 
-	double m_RefLength;//Order of magnitude for the body's length
-
 	CBody m_TmpPic;
 	CBody m_UndoPic[20];
 	int m_StackPos, m_StackSize;// undo : current stack position and current stack size
@@ -257,8 +255,8 @@ private:
 
 	int m_GLList;
 //	int m_iView;
-	int m_NHoopPoints;			//hoop resolution for NURBS bodies
-	int m_NXPoints;				//longitudinal resolution for NURBS Bodies
+static int s_NHoopPoints;			//hoop resolution for NURBS bodies
+static int s_NXPoints;				//longitudinal resolution for NURBS Bodies
 	int m_Precision[10];
 
 	double m_ClipPlanePos;

@@ -32,7 +32,8 @@ class UnitsDlg : public QDialog
 {
 	Q_OBJECT
 	friend class MainFrame;
-	friend class Miarex;
+	friend class QMiarex;
+	friend class GL3dBodyDlg;
 	friend class CBody;
 
 public:

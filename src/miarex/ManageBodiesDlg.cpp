@@ -21,13 +21,14 @@
 
 #include "../mainframe.h"
 #include "Miarex.h"
+#include "GL3dBodyDlg.h"
 #include "ManageBodiesDlg.h"
 #include "../objects/Plane.h"
 #include "../misc/ModDlg.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QListWidgetItem>
-#include "GL3dBodyDlg.h"
+#include <QFileDialog>
 #include <QMessageBox>
 
 
@@ -252,15 +253,62 @@ void ManageBodiesDlg::OnEdit()
 void ManageBodiesDlg::OnExportDefinition()
 {
 	if(!m_pBody) return;
-	m_pBody->ExportDefinition();
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	QString FileName;
+
+	FileName = m_pBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("Text Format (*.txt)"));
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+
+	QTextStream out(&XFile);
+
+	m_pBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
 }
 
 
 void ManageBodiesDlg::OnExportGeometry()
 {
 	if(!m_pBody) return;
-	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
-	m_pBody->ExportGeometry(pGL3dBodyDlg->m_NXPoints, pGL3dBodyDlg->m_NHoopPoints);
+	QString LengthUnit, FileName;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+
+	FileName = m_pBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	int type = 1;
+
+	QString filter =".csv";
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
+											pMainFrame->m_LastDirName ,
+											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+											&filter);
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) type = 2;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+	m_pBody->ExportGeometry(out, pMainFrame->m_mtoUnit, type, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
+
 }
 
 

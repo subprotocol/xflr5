@@ -23,18 +23,17 @@
 #define CFRAME_H
 
 #include "CVector.h"
-#include "../params.h"
 #include <QDataStream>
 #include <QList>
 
 class CFrame
 {
 public:
-	CFrame();
+	CFrame(int nCtrlPts=0);
 	~CFrame();
     bool SerializeFrame(QDataStream &ar, bool bIsStoring);
 
-	int IsPoint(CVector const &Point, double const &RefLength, const double &ZoomFactor);
+	int IsPoint(CVector const &Point, double const &ZoomFactor);
 	void AppendPoint(CVector const& Pt);
 	void InsertPoint(int n);
 	void InsertPoint(int n, const CVector &Pt);

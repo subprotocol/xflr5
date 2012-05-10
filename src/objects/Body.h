@@ -23,9 +23,7 @@
 #define CBODY_H
 
 #include "Panel.h"
-#include "Frame.h"
 #include "NURBSSurface.h"
-#include "../params.h"
 #include <QTextStream>
 #include <QColor>
 
@@ -41,13 +39,13 @@ public:
 	bool IntersectPanels(CVector A, CVector B, CVector &I);
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat=0);
-	bool ImportDefinition() ;
-	bool ExportDefinition() ;
+	bool ImportDefinition(QTextStream &inStream, double mtoUnit);
+	bool ExportDefinition(QTextStream &outStream, double mtoUnit) ;
 
 
 	int InsertFrame(CVector Real);
 	int InsertPoint(CVector Real);
-	int IsFramePos(CVector Real, const double &RefLength, double ZoomFactor);
+	int IsFramePos(CVector Real, double ZoomFactor);
 	int RemoveFrame(int n);
 	int ReadFrame(QTextStream &in, int &Line, CFrame *pFrame, double const &Unit);
 
@@ -62,7 +60,7 @@ public:
 					 double &GCm, double &GRm, double &GYm, double &Alpha, CVector &CoG);
 //	void ComputeCenterLine();
 	void Duplicate(CBody *pBody);
-	void ExportGeometry(int nx, int nh);
+	void ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh);
 	void GetPoint(double u, double v, bool bRight, CVector &Pt);
 	void InsertSideLine(int SideLine);
 	void InterpolateCurve(CVector *D, CVector *P, double *v, double *knots, int degree, int Size);
@@ -74,7 +72,7 @@ public:
 	void Translate(CVector T, bool bFrameOnly=false, int FrameID=0);
 	void SetKnots();
 	void SetPanelPos();
-	void SetEdgeWeight(double w);
+	void SetEdgeWeight(double uw, double vw);
 
 	CFrame *Frame(int k);
 	CFrame *ActiveFrame();
@@ -89,8 +87,6 @@ public:
 
 	//____________________VARIABLES_____________________________________________
 
-	static void* s_pMainFrame;
-
 	NURBSSurface m_SplineSurface;
 
 	int m_NSideLines;
@@ -104,7 +100,6 @@ public:
 	int m_BodyStyle, m_BodyWidth;
 
 	double m_Bunch;
-	double m_EdgeWeight;
 
 	CVector m_CoG;
 	double m_VolumeMass, m_TotalMass;	    //for inertia calculations

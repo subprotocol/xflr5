@@ -19,34 +19,37 @@
 
 *****************************************************************************/
 
-
+#include "../params.h"
 #include "Frame.h"
 #include <math.h>
 #include <QtDebug>
 
 
-
-CFrame::CFrame()
+CFrame::CFrame(int nCtrlPts)
 {
 	m_uPosition = 0.0;
 	m_CtrlPoint.clear();
-
+	for(int ic=0; ic<nCtrlPts; ic++)
+	{
+		m_CtrlPoint.append(CVector(0.0,0.0,0.0));
+	}
 	m_iHighlight = -1;
 	m_iSelect    =  0;
 }
+
 
 CFrame::~CFrame()
 {
 }
 
-int CFrame::IsPoint(const CVector &Point, const double &RefLength, const double &ZoomFactor)
+int CFrame::IsPoint(const CVector &Point, const double &ZoomFactor)
 {
     int l;
 	for(l=0; l<m_CtrlPoint.size(); l++)
 	{
 		if(sqrt(  (Point.x-m_CtrlPoint[l].x)*(Point.x-m_CtrlPoint[l].x)
 				+ (Point.y-m_CtrlPoint[l].y)*(Point.y-m_CtrlPoint[l].y)
-				+ (Point.z-m_CtrlPoint[l].z)*(Point.z-m_CtrlPoint[l].z))<0.003*RefLength/ZoomFactor)
+				+ (Point.z-m_CtrlPoint[l].z)*(Point.z-m_CtrlPoint[l].z))<0.005*REFLENGTH/ZoomFactor)
 			  return l;
 //        if (fabs(Point.x-m_CtrlPoint[l].y)<0.005/ZoomFactor && fabs(Point.y-m_CtrlPoint[l].z)<0.005/ZoomFactor) return l;
 	}

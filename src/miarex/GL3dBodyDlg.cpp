@@ -19,6 +19,7 @@
 
 *****************************************************************************/
 
+//#include "../params.h"
 #include "../mainframe.h"
 #include "../threedwidget.h"
 #include "../globals.h"
@@ -65,6 +66,10 @@ bool GL3dBodyDlg::s_bAxes = true;
 bool GL3dBodyDlg::s_bVLMPanels = false;
 
 
+int GL3dBodyDlg::s_NHoopPoints = 13;
+int GL3dBodyDlg::s_NXPoints = 19;
+
+
 QPoint GL3dBodyDlg::s_WindowPos=QPoint(20,20);
 QSize  GL3dBodyDlg::s_WindowSize=QSize(900, 700);
 #ifdef Q_WS_MAC
@@ -99,8 +104,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 
 	m_pBody = NULL;
 
-	m_RefLength = 2.; //=2 meters, for standard RC planes
-//	m_RefLength = 10.;//=10 meters, for large bodies
 	m_BodyOffset.Set( 0.20, -0.12, 0.0);
 	m_FrameOffset.Set(0.80, -0.50, 0.0);
 	m_HorizontalSplit = -0.45;
@@ -109,9 +112,6 @@ GL3dBodyDlg::GL3dBodyDlg(void *pParent)
 	m_GLList = 0;
 
 	m_ClipPlanePos = 5.0;
-
-	m_NXPoints    = 19;
-	m_NHoopPoints = 13;
 
 	m_glViewportTrans.x  = 0.0;
 	m_glViewportTrans.y  = 0.0;
@@ -1442,7 +1442,7 @@ void GL3dBodyDlg::GLDraw3D()
 			m_GLList -=2;
 		}
 		if(m_pBody->m_LineType==BODYPANELTYPE)	     GLCreateBody3DFlatPanels(s_pMainFrame, BODYGEOMBASE, m_pBody);
-		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pBody, m_NXPoints, m_NHoopPoints);
+		else if(m_pBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pBody, s_NXPoints, s_NHoopPoints);
 
 		m_bResetglBody = false;
 		if(glIsList(BODYMESHBASE))
@@ -2006,7 +2006,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.x = (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y = (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			int n = m_pBody->IsFramePos(Real, m_RefLength, m_BodyScale/m_BodyRefScale);
+			int n = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 			m_pBody->m_iHighlight = -10;
 			if (n>=0 && n<=m_pBody->FrameSize())
 			{
@@ -2021,7 +2021,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			Real.y = (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.x = m_pFrame->m_uPosition;
 
-			int n = m_pFrame->IsPoint(Real, m_RefLength, m_FrameScale/m_FrameRefScale);
+			int n = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			m_pFrame->m_iHighlight = -10;
 			if (n>=0 && n<=m_pFrame->m_CtrlPoint.size())
 			{
@@ -2096,7 +2096,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.x =  (Real.x - m_BodyScaledOffset.x)/m_BodyScale;
 			Real.y =  (Real.y - m_BodyScaledOffset.y)/m_BodyScale;
 			Real.z = 0.0;
-			iF = m_pBody->IsFramePos(Real, m_RefLength, m_BodyScale/m_BodyRefScale);
+			iF = m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 			if(iF >=0)
 			{
 				TakePicture();
@@ -2119,7 +2119,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 			Real.y =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.x = m_pFrame->m_uPosition;
 
-			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, m_RefLength, m_FrameScale/m_FrameRefScale);
+			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			if(m_pFrame->m_iSelect >=0)
 			{
 				TakePicture();
@@ -2354,27 +2354,152 @@ void GL3dBodyDlg::OnClipPlane()
 void GL3dBodyDlg::OnExportBodyDef()
 {
 	if(!m_pBody) return;
-	m_pBody->ExportDefinition();
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	QString FileName;
+
+	FileName = m_pBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("Text Format (*.txt)"));
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+
+	QTextStream out(&XFile);
+
+	m_pBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
+	XFile.close();
+
 }
 
 
 void GL3dBodyDlg::OnExportBodyGeom()
 {
 	if(!m_pBody) return;
-	m_pBody->ExportGeometry(m_NXPoints, m_NHoopPoints);
+	QString LengthUnit, FileName;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+
+	FileName = m_pBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	int type = 1;
+
+	QString filter =".csv";
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
+											pMainFrame->m_LastDirName ,
+											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+											&filter);
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) type = 2;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+	m_pBody->ExportGeometry(out, pMainFrame->m_mtoUnit, type, s_NXPoints, s_NHoopPoints);
 }
 
 
 void GL3dBodyDlg::OnImportBodyDef()
 {
-//	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	CBody *pNewBody = new CBody();
 	if(!pNewBody) return;
-	if(!pNewBody->ImportDefinition())
+
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+
+
+	double mtoUnit;
+
+	UnitsDlg Dlg;
+
+	Dlg.m_bLengthOnly = true;
+	Dlg.m_Length    = pMainFrame->m_LengthUnit;
+	Dlg.m_Area      = pMainFrame->m_AreaUnit;
+	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
+	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
+	Dlg.m_Force     = pMainFrame->m_ForceUnit;
+	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
+	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
+	Dlg.InitDialog();
+
+	if(Dlg.exec() == QDialog::Accepted)
+	{
+		switch(Dlg.m_Length)
+		{
+			case 0:{//mdm
+				mtoUnit  = 1000.0;
+				break;
+			}
+			case 1:{//cm
+				mtoUnit  = 100.0;
+				break;
+			}
+			case 2:{//dm
+				mtoUnit  = 10.0;
+				break;
+			}
+			case 3:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+			case 4:{//in
+				mtoUnit  = 1000.0/25.4;
+				break;
+			}
+			case 5:{///ft
+				mtoUnit  = 1000.0/25.4/12.0;
+				break;
+			}
+			default:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+		}
+	}
+	else return;
+
+	QString PathName;
+
+	PathName = QFileDialog::getOpenFileName(pMainFrame, QObject::tr("Open File"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("All files (*.*)"));
+	if(!PathName.length()) return;
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+
+	QFile XFile(PathName);
+	if (!XFile.open(QIODevice::ReadOnly))
+	{
+		QString strange = QObject::tr("Could not read the file\n")+PathName;
+		QMessageBox::warning(pMainFrame, QObject::tr("Warning"), strange);
+		return;
+	}
+
+	QTextStream in(&XFile);
+
+	if(!pNewBody->ImportDefinition(in, pMainFrame->m_mtoUnit))
 	{
 		delete pNewBody;
 		return;
 	}
+
+	XFile.close();
 
 	SetBody(pNewBody);
 }
@@ -2620,7 +2745,7 @@ void GL3dBodyDlg::Remove(CVector Pt)
 		Real.y =  (Pt.y - m_BodyScaledOffset.y)/m_BodyScale;
 		Real.z = 0.0;
 
-		n =  m_pBody->IsFramePos(Real, m_RefLength, m_BodyScale/m_BodyRefScale);
+		n =  m_pBody->IsFramePos(Real, m_BodyScale/m_BodyRefScale);
 		if (n>=0)
 		{
 			n = m_pBody->RemoveFrame(n);
@@ -2641,7 +2766,7 @@ void GL3dBodyDlg::Remove(CVector Pt)
 		Real.y =  (Pt.x - m_FrameScaledOffset.x)/m_FrameScale;
 		Real.x = 0.0;
 
-		n =   m_pFrame->IsPoint(Real, m_RefLength, m_FrameScale/m_FrameRefScale);
+		n =   m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 		if (n>=0)
 		{
 			for (i=0; i<m_pBody->FrameSize();i++)
@@ -2749,8 +2874,8 @@ void GL3dBodyDlg::OnEdgeWeight()
 	TakePicture();
 	StorePicture();
 
-	double w= m_pctrlEdgeWeight->value();
-	m_pBody->SetEdgeWeight(exp(w));
+	double w= (double)m_pctrlEdgeWeight->value()/100.0 + 1.0;
+	m_pBody->SetEdgeWeight(w, w);
 
 	m_bResetglBody   = true;
 	m_bResetglBody2D = true;
@@ -3066,6 +3191,8 @@ void GL3dBodyDlg::SetControls()
 	m_pctrlUndo->setEnabled(m_StackPos>0);
 	m_pctrlRedo->setEnabled(m_StackPos<m_StackSize);
 
+	m_pctrlEdgeWeight->setSliderPosition((int)((m_pBody->m_SplineSurface.m_EdgeWeightu-1.0)*100.0));
+
 	if(m_pBody && m_pBody->m_LineType==BODYPANELTYPE)
 	{
 		m_pctrlNXPanels->setEnabled(false);
@@ -3120,6 +3247,7 @@ bool GL3dBodyDlg::SetBody(CBody *pBody)
 	SetControls();
 	FillFrameDataTable();
 	FillPointDataTable();
+
 
 	m_pctrlBodyName->setText(pBody->m_BodyName);
 	return true;
@@ -3476,10 +3604,10 @@ void GL3dBodyDlg::SetupLayout()
 			m_pctrlNXPanels = new FloatEdit;
 			m_pctrlNHoopPanels = new FloatEdit;
 			m_pctrlEdgeWeight = new QSlider(Qt::Horizontal);
-			m_pctrlEdgeWeight->setMinimum(1	);
-			m_pctrlEdgeWeight->setMaximum(11);
+			m_pctrlEdgeWeight->setMinimum(0);
+			m_pctrlEdgeWeight->setMaximum(100);
 			m_pctrlEdgeWeight->setSliderPosition(1);
-			m_pctrlEdgeWeight->setTickInterval(1);
+			m_pctrlEdgeWeight->setTickInterval(10);
 			m_pctrlEdgeWeight->setTickPosition(QSlider::TicksBelow);
 			m_pctrlEdgeWeight->setSizePolicy(szPolicyMinimum);
 

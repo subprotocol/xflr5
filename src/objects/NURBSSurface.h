@@ -11,7 +11,7 @@
 #define SPLINESURFACE_H
 
 
-#include "../params.h"
+//#include "../params.h"
 #include "Frame.h"
 
 #define MAXVLINES      17
@@ -28,15 +28,15 @@ public:
 	void GetPoint(double u, double v, CVector &Pt);
 	void SetPanelPos();
 	bool IntersectNURBS(CVector A, CVector B, CVector &I);
-	bool SetXDegree(int nxDegree);
-	bool SetZDegree(int nzDegree);
+	int SetvDegree(int nvDegree);
+	int SetuDegree(int nuDegree);
 
 	void ClearFrames();
 	void RemoveFrame(int iFrame);
 	void InsertFrame(CFrame *pNewFrame);
 	CFrame *AppendFrame();
 
-	double Weight(int i, int N);
+	double Weight(const double &d, int const &i, int const &N);
 
 	int FrameSize() {return m_pFrame.size();};
 
@@ -59,7 +59,7 @@ public:
 	int m_np;
 
 	double m_Bunch;
-	double m_EdgeWeight; // for a full NURBS. Unused, though, not practical
+	double m_EdgeWeightu, m_EdgeWeightv; // for a full NURBS. Unused, though, not practical
 
 	QList<CFrame*> m_pFrame;	// the frames at the stations
 

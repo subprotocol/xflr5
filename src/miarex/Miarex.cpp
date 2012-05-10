@@ -4745,7 +4745,7 @@ void QMiarex::GLDraw3D()
 			m_GLList -=2;
 		}
 		if(m_pCurBody->m_LineType==BODYPANELTYPE)	    GLCreateBody3DFlatPanels(s_pMainFrame, BODYGEOMBASE, m_pCurBody);
-		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pCurBody, m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
+		else if(m_pCurBody->m_LineType==BODYSPLINETYPE) GLCreateBody3DSplines(s_pMainFrame, BODYGEOMBASE, m_pCurBody, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
 
 		m_bResetglBody = false;
 	}
@@ -6414,8 +6414,8 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 
 		m_Iter         = pSettings->value("Iter").toInt();
 		m_NStation     = pSettings->value("NStation").toInt();
-		m_GL3dBody.m_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
-		m_GL3dBody.m_NXPoints     = pSettings->value("NXPoints").toInt();
+		GL3dBodyDlg::s_NHoopPoints  = pSettings->value("NHoopPoints").toInt();
+		GL3dBodyDlg::s_NXPoints     = pSettings->value("NXPoints").toInt();
 		m_InducedDragPoint  = pSettings->value("InducedDragPoint").toInt();
 
 		m_LiftScale     = pSettings->value("LiftScale").toDouble();
@@ -8799,14 +8799,62 @@ void QMiarex::OnEditUFO()
 void QMiarex::OnExportBodyDef()
 {
 	if(!m_pCurBody) return;
-	m_pCurBody->ExportDefinition();
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	QString FileName;
+
+	FileName = m_pCurBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("Text Format (*.txt)"));
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+
+	QTextStream out(&XFile);
+
+	m_pCurBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
+	XFile.close();
 }
 
 
 void QMiarex::OnExportBodyGeom()
 {
 	if(!m_pCurBody) return;
-	m_pCurBody->ExportGeometry(m_GL3dBody.m_NXPoints, m_GL3dBody.m_NHoopPoints);
+	QString LengthUnit, FileName;
+	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
+	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
+
+	FileName = m_pCurBody->m_BodyName;
+	FileName.replace("/", " ");
+
+	int type = 1;
+
+	QString filter =".csv";
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
+											pMainFrame->m_LastDirName ,
+											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+											&filter);
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) type = 2;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+	m_pCurBody->ExportGeometry(out, pMainFrame->m_mtoUnit, type, GL3dBodyDlg::s_NXPoints, GL3dBodyDlg::s_NHoopPoints);
 }
 
 
@@ -9564,11 +9612,90 @@ void QMiarex::OnImportBody()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	CBody *pNewBody = new CBody();
 	if(!pNewBody) return;
-	if(!pNewBody->ImportDefinition())
+
+
+	double mtoUnit,xo,yo,zo;
+	xo = yo = zo = 0.0;
+
+//	FrameSize() = 0;
+
+	UnitsDlg Dlg;
+
+	Dlg.m_bLengthOnly = true;
+	Dlg.m_Length    = pMainFrame->m_LengthUnit;
+	Dlg.m_Area      = pMainFrame->m_AreaUnit;
+	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
+	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
+	Dlg.m_Force     = pMainFrame->m_ForceUnit;
+	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
+	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
+	Dlg.InitDialog();
+
+	if(Dlg.exec() == QDialog::Accepted)
+	{
+		switch(Dlg.m_Length)
+		{
+			case 0:{//mdm
+				mtoUnit  = 1000.0;
+				break;
+			}
+			case 1:{//cm
+				mtoUnit  = 100.0;
+				break;
+			}
+			case 2:{//dm
+				mtoUnit  = 10.0;
+				break;
+			}
+			case 3:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+			case 4:{//in
+				mtoUnit  = 1000.0/25.4;
+				break;
+			}
+			case 5:{///ft
+				mtoUnit  = 1000.0/25.4/12.0;
+				break;
+			}
+			default:{//m
+				mtoUnit  = 1.0;
+				break;
+			}
+		}
+	}
+	else return;
+
+	QString PathName;
+//	bool bOK;
+//	QByteArray textline;
+//	const char *text;
+
+	PathName = QFileDialog::getOpenFileName(pMainFrame, QObject::tr("Open File"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("All files (*.*)"));
+	if(!PathName.length()) return;
+	int pos = PathName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
+
+	QFile XFile(PathName);
+	if (!XFile.open(QIODevice::ReadOnly))
+	{
+		QString strange = QObject::tr("Could not read the file\n")+PathName;
+		QMessageBox::warning(pMainFrame, QObject::tr("Warning"), strange);
+		return;
+	}
+
+	QTextStream in(&XFile);
+
+	if(!pNewBody->ImportDefinition(in, pMainFrame->m_mtoUnit))
 	{
 		delete pNewBody;
 		return;
 	}
+	XFile.close();
+
 
 	if(!SetModBody(pNewBody))
 	{
@@ -12318,8 +12445,8 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		pSettings->setValue("Iter", m_Iter);
 		pSettings->setValue("NStation", m_NStation);
 		pSettings->setValue("InducedDragPoint", m_InducedDragPoint);
-		pSettings->setValue("NHoopPoints", m_GL3dBody.m_NHoopPoints);
-		pSettings->setValue("NXPoints", m_GL3dBody.m_NXPoints);
+		pSettings->setValue("NHoopPoints", GL3dBodyDlg::s_NHoopPoints);
+		pSettings->setValue("NXPoints", GL3dBodyDlg::s_NXPoints);
 
 		pSettings->setValue("LiftScale", m_LiftScale);
 		pSettings->setValue("DragScale", m_DragScale);

@@ -21,22 +21,19 @@
 
 
 #include "Body.h"
-#include "../mainframe.h"
 #include "../globals.h"
-#include "../misc/UnitsDlg.h"
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QtDebug>
 
-void *CBody::s_pMainFrame;
 double CBody::s_XPanelPos[300];
 
 
 CBody::CBody()
 {
 	int i;
-	m_BodyName = QObject::tr("BodyName");
+	m_BodyName = QObject::tr("Body Name");
 
 	m_BodyColor = QColor(200,228, 216);
 	m_BodyStyle = 0;
@@ -56,14 +53,14 @@ CBody::CBody()
 	m_iRes = 31;
 
 	m_Bunch  = 0.0;
-	m_EdgeWeight = 1.0;
 
 	eps = 1.0e-06;
 
 	m_SplineSurface.m_iuDegree = 3;
 	m_SplineSurface.m_ivDegree = 3;
 
-/*	m_NSideLines = 4;
+#ifdef SAIL7APP
+	m_NSideLines = 4;
 	m_SplineSurface.m_nvLines = m_NSideLines;
 	for(int ifr=0; ifr<4; ifr++)
 	{
@@ -99,10 +96,10 @@ CBody::CBody()
 	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[0].Set(6.0,  0.0, .0);
 	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[1].Set(6.0,  0.0, .0);
 	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[2].Set(6.0,  0.0, .0);
-	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[3].Set(6.0,  0.0, .0);*/
+	m_SplineSurface.m_pFrame[3]->m_CtrlPoint[3].Set(6.0,  0.0, .0);
+#endif
 
-
-
+#ifdef XFLR5
 	m_NSideLines = 5;
 	m_SplineSurface.m_nvLines = m_NSideLines;
 	for(int ifr=0; ifr<7; ifr++)
@@ -165,7 +162,7 @@ CBody::CBody()
 	Frame(6)->m_CtrlPoint[3].Set(0.660, 0.00, -0.0);
 	Frame(6)->m_CtrlPoint[4].Set(0.660, 0.00, -0.0);
 
-
+#endif
 
 	SetKnots();
 
@@ -267,123 +264,78 @@ void CBody::Duplicate(CBody *pBody)
 }
 
 
-bool CBody::ExportDefinition()
+bool CBody::ExportDefinition(QTextStream &outStream, double mtoUnit)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	QString strong;
 	int i, j;
-	QString strong,  FileName;
-
-	FileName = m_BodyName;
-	FileName.replace("/", " ");
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
-											pMainFrame->m_LastDirName,
-											QObject::tr("Text Format (*.txt)"));
-	if(!FileName.length()) return false;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
-
-	QTextStream out(&XFile);
 
 	strong = "\n# This file defines a body geometry\n";
-	out << strong;
+	outStream << strong;
 	strong = "# The frames are defined from nose to tail\n";
-	out << strong;
+	outStream << strong;
 	strong = "# The numer of sidelines is defined by the number of points of the first frame\n";
-	out << strong;
+	outStream << strong;
 	strong = "# Each of the next frames should have the same number of points as the first\n";
-	out << strong;
+	outStream << strong;
 	strong = QString("# The maximum number of sidelines is %1\n").arg(MAXSIDELINES);
-	out << strong;
+	outStream << strong;
 	strong = QString("# The maximum number of frames is %1\n").arg(MAXBODYFRAMES);
-	out << strong;
+	outStream << strong;
 	strong = "# For each frame, the points are defined for the right half of the body, \n";
-	out << strong;
+	outStream << strong;
 	strong = "# in the clockwise direction aft looking forward\n\n";
-	out << strong;
+	outStream << strong;
 
-	out << (m_BodyName+"\n\n");
-	out << ("BODYTYPE\n");
-	if(m_LineType==BODYPANELTYPE)  out << (" 1        # Flat Panels (1) or NURBS (2)\n\n");
-	if(m_LineType==BODYSPLINETYPE) out << (" 2        # Flat Panels (1) or NURBS (2)\n\n");
+	outStream << (m_BodyName+"\n\n");
+	outStream << ("BODYTYPE\n");
+	if(m_LineType==BODYPANELTYPE)  outStream << (" 1        # Flat Panels (1) or NURBS (2)\n\n");
+	if(m_LineType==BODYSPLINETYPE) outStream << (" 2        # Flat Panels (1) or NURBS (2)\n\n");
 
-	out << ("OFFSET\n");
-	out << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
+	outStream << ("OFFSET\n");
+	outStream << ("0.0     0.0     0.0     #Total body offset (Y-coord is ignored)\n\n");
 
 	for(i=0; i<FrameSize(); i++)
 	{
-		out << ("FRAME\n");
+		outStream << ("FRAME\n");
 		for(j=0;j<m_NSideLines; j++)
 		{
 			strong = QString("%1     %2    %3\n")
-					 .arg(m_SplineSurface.m_pFrame[i]->m_uPosition    * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * pMainFrame->m_mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * pMainFrame->m_mtoUnit,14,'f',7);
-			out << (strong);
+					 .arg(m_SplineSurface.m_pFrame[i]->m_uPosition      * mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * mtoUnit,14,'f',7);
+			outStream << (strong);
 		}
-		out << ("\n");
+		outStream << ("\n");
 	}
 
-	XFile.close();
 	return true;
 
 }
 
 
-void CBody::ExportGeometry(int nx, int nh)
+void CBody::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh)
 {
 	QString strong, LengthUnit,str, FileName;
 	int k,l;
 	double u, v;
 	CVector Point;
 
-	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	GetLengthUnit(LengthUnit, pMainFrame->m_LengthUnit);
-
-	FileName = m_BodyName;
-	FileName.replace("/", " ");
-
-	int type = 1;
-
-	QString filter =".csv";
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Geometry"),
-											pMainFrame->m_LastDirName ,
-											QObject::tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
-											&filter);
-	if(!FileName.length()) return;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-	pos = FileName.lastIndexOf(".csv");
-	if (pos>0) type = 2;
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
-
-	QTextStream out(&XFile);
 
 	if(type==1)	str="";
 	else		str=", ";
 
-	out  << (m_BodyName);
-	out  << ("\n\n");
+	outStream  << (m_BodyName);
+	outStream  << ("\n\n");
 
-	out  << (("Right Surface Points\n"));
+	outStream  << (("Right Surface Points\n"));
 	if(type==1) strong = "        x("+LengthUnit+")          y("+LengthUnit+")          z("+LengthUnit+")\n";
 	else        strong = " x("+LengthUnit+"),"+"y("+LengthUnit+"),"+"z("+LengthUnit+")\n";
-	out  << (strong);
+	outStream  << (strong);
 
 	for (k=0; k<nx; k++)
 	{
 		strong = QString(("  Cross Section ")+str+"%1\n").arg(k+1,3);
-		out  << (strong);
+		outStream  << (strong);
 
 		u = (double)k / (double)(nx-1);
 
@@ -393,15 +345,15 @@ void CBody::ExportGeometry(int nx, int nh)
 			GetPoint(u,  v, true, Point);
 
 			strong = QString("   %1"+str+"     %2"+str+"     %3\n")
-					 .arg(Point.x * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(Point.y * pMainFrame->m_mtoUnit,10,'f',3)
-					 .arg(Point.z * pMainFrame->m_mtoUnit,10,'f',3);
-			out  << (strong);
+					 .arg(Point.x * mtoUnit,10,'f',3)
+					 .arg(Point.y * mtoUnit,10,'f',3)
+					 .arg(Point.z * mtoUnit,10,'f',3);
+			outStream  << (strong);
 		}
-		out  << ("\n");
+		outStream  << ("\n");
 	}
 
-	out  << ("\n\n");
+	outStream  << ("\n\n");
 }
 
 
@@ -567,91 +519,18 @@ double CBody::Getv(double u, CVector r, bool bRight)
 
 
 
-bool CBody::ImportDefinition()
+bool CBody::ImportDefinition(QTextStream &inStream, double mtoUnit)
 {
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
 	int res, i, j, Line, NSideLines;
 	QString strong;
-	bool bRead;
-
-	double mtoUnit,xo,yo,zo;
-	xo = yo = zo = 0.0;
-
-//	FrameSize() = 0;
-
-	UnitsDlg Dlg;
-
-	Dlg.m_bLengthOnly = true;
-	Dlg.m_Length    = pMainFrame->m_LengthUnit;
-	Dlg.m_Area      = pMainFrame->m_AreaUnit;
-	Dlg.m_Speed     = pMainFrame->m_SpeedUnit;
-	Dlg.m_Weight    = pMainFrame->m_WeightUnit;
-	Dlg.m_Force     = pMainFrame->m_ForceUnit;
-	Dlg.m_Moment    = pMainFrame->m_MomentUnit;
-	Dlg.m_Question = QObject::tr("Choose the length unit to read this file :");
-	Dlg.InitDialog();
-
-	if(Dlg.exec() == QDialog::Accepted)
-	{
-		switch(Dlg.m_Length)
-		{
-			case 0:{//mdm
-				mtoUnit  = 1000.0;
-				break;
-			}
-			case 1:{//cm
-				mtoUnit  = 100.0;
-				break;
-			}
-			case 2:{//dm
-				mtoUnit  = 10.0;
-				break;
-			}
-			case 3:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-			case 4:{//in
-				mtoUnit  = 1000.0/25.4;
-				break;
-			}
-			case 5:{///ft
-				mtoUnit  = 1000.0/25.4/12.0;
-				break;
-			}
-			default:{//m
-				mtoUnit  = 1.0;
-				break;
-			}
-		}
-	}
-	else return false;
-
-	QString PathName;
-	bool bOK;
+	bool bRead, bOK;
 	QByteArray textline;
 	const char *text;
-
-	PathName = QFileDialog::getOpenFileName(pMainFrame, QObject::tr("Open File"),
-											pMainFrame->m_LastDirName,
-											QObject::tr("All files (*.*)"));
-	if(!PathName.length())		return false;
-	int pos = PathName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = PathName.left(pos);
-
-	QFile XFile(PathName);
-	if (!XFile.open(QIODevice::ReadOnly))
-	{
-		QString strange = QObject::tr("Could not read the file\n")+PathName;
-		QMessageBox::warning(pMainFrame, QObject::tr("Warning"), strange);
-		return false;
-	}
-
-	QTextStream in(&XFile);
+	double xo,yo,zo;
+	xo = yo = zo = 0.0;
 
 	Line = 0;
-	bRead  = ReadAVLString(in, Line, strong);
+	bRead  = ReadAVLString(inStream, Line, strong);
 	m_BodyName = strong.trimmed();
 	m_SplineSurface.ClearFrames();
 	//Header data
@@ -659,11 +538,11 @@ bool CBody::ImportDefinition()
 	bRead = true;
 	while (bRead)
 	{
-		bRead  = ReadAVLString(in, Line, strong);
+		bRead  = ReadAVLString(inStream, Line, strong);
 		if(!bRead) break;
 		if (strong.indexOf("BODYTYPE") >=0)
 		{
-			bRead  = ReadAVLString(in, Line, strong);
+			bRead  = ReadAVLString(inStream, Line, strong);
 			if(!bRead) break;
 			res = strong.toInt(&bOK);
 
@@ -675,7 +554,7 @@ bool CBody::ImportDefinition()
 		}
 		else if (strong.indexOf("OFFSET") >=0)
 		{
-			bRead  = ReadAVLString(in, Line, strong);
+			bRead  = ReadAVLString(inStream, Line, strong);
 			if(!bRead) break;
 
 			textline = strong.toAscii();
@@ -692,7 +571,7 @@ bool CBody::ImportDefinition()
 		else if (strong.indexOf("FRAME", 0)  >=0)
 		{
 			CFrame *pNewFrame = new CFrame;
-			NSideLines = ReadFrame(in, Line, pNewFrame, mtoUnit);
+			NSideLines = ReadFrame(inStream, Line, pNewFrame, mtoUnit);
 
 			if (NSideLines)
 			{
@@ -702,7 +581,6 @@ bool CBody::ImportDefinition()
 		}
 	}
 
-	XFile.close();
 
 
 	for(i=1; i<FrameSize(); i++)
@@ -710,7 +588,7 @@ bool CBody::ImportDefinition()
 		if(m_SplineSurface.m_pFrame[i]->m_CtrlPoint.size() != m_SplineSurface.m_pFrame[i-1]->m_CtrlPoint.size())
 		{
 			QString strong = QObject::tr("Error reading ")+m_BodyName+QObject::tr("\nFrames have different number of side points");
-			QMessageBox::warning(pMainFrame, QObject::tr("Error"),strong);
+//			QMessageBox::warning(window(), QObject::tr("Error"),strong); //TODO
 			return false;
 		}
 	}
@@ -773,26 +651,26 @@ int CBody::InsertPoint(CVector Real)
 
 int CBody::InsertFrame(CVector Real)
 {
-	int k, n;
+	int k, n=0;
 
 	if(Real.x<m_SplineSurface.m_pFrame[0]->m_uPosition)
 	{
-		m_SplineSurface.m_pFrame.prepend(m_SplineSurface.m_pFrame.first());
+		m_SplineSurface.m_pFrame.prepend(new CFrame(m_NSideLines));
 		for (k=0; k<m_NSideLines; k++)
 		{
-			m_SplineSurface.m_pFrame.first()->m_CtrlPoint[k].Set(0.0,0.0,0.0);
+			m_SplineSurface.m_pFrame.first()->m_CtrlPoint[k].Set(0.0,0.0,Real.z);
 		}
-		m_SplineSurface.m_pFrame.first()->m_uPosition = Real.x;
+		m_SplineSurface.m_pFrame.first()->SetuPosition(Real.x, 1);
 	}
 	else if(Real.x>m_SplineSurface.m_pFrame.last()->m_uPosition)
 	{
-		m_SplineSurface.m_pFrame.append(m_SplineSurface.m_pFrame.last());
+		m_SplineSurface.m_pFrame.append(new CFrame(m_NSideLines));
 		
 		for (k=0; k<m_NSideLines; k++)
 		{
-			m_SplineSurface.m_pFrame.last()->m_CtrlPoint[k].Set(0.0,0.0,0.0);
+			m_SplineSurface.m_pFrame.last()->m_CtrlPoint[k].Set(0.0,0.0,Real.z);
 		}
-		m_SplineSurface.m_pFrame.last()->m_uPosition = Real.x;
+		m_SplineSurface.m_pFrame.last()->SetuPosition(Real.x, 1);
 	}
 	else
 	{
@@ -800,12 +678,10 @@ int CBody::InsertFrame(CVector Real)
 		{
 			if(m_SplineSurface.m_pFrame[n]->m_uPosition<=Real.x  &&  Real.x<m_SplineSurface.m_pFrame[n+1]->m_uPosition)
 			{
-				m_SplineSurface.m_pFrame.insert(n+1, new CFrame);
-				m_SplineSurface.m_pFrame[n+1]->m_uPosition = Real.x;
+				m_SplineSurface.m_pFrame.insert(n+1, new CFrame(m_NSideLines));
 
 				for (k=0; k<m_NSideLines; k++)
 				{
-					m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint.append(CVector(0.0,0.0,0.0));
 					m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[k].x = (m_SplineSurface.m_pFrame[n]->m_CtrlPoint[k].x + m_SplineSurface.m_pFrame[n+2]->m_CtrlPoint[k].x)/2.0;
 					m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[k].y = (m_SplineSurface.m_pFrame[n]->m_CtrlPoint[k].y + m_SplineSurface.m_pFrame[n+2]->m_CtrlPoint[k].y)/2.0;
 					m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[k].z = (m_SplineSurface.m_pFrame[n]->m_CtrlPoint[k].z + m_SplineSurface.m_pFrame[n+2]->m_CtrlPoint[k].z)/2.0;
@@ -813,13 +689,15 @@ int CBody::InsertFrame(CVector Real)
 				break;
 			}
 		}
-	}
-
-	double trans = Real.z - (m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[0].z + m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[m_NSideLines-1].z)/2.0;
-		           
-	for (k=0; k<m_NSideLines; k++)
-	{
-		m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[k].z += trans;
+		if(n+1<FrameSize())
+		{
+			m_SplineSurface.m_pFrame[n+1]->SetuPosition(Real.x, 1);
+			double trans = Real.z - (m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[0].z + m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[m_NSideLines-1].z)/2.0;
+			for (k=0; k<m_NSideLines; k++)
+			{
+				m_SplineSurface.m_pFrame[n+1]->m_CtrlPoint[k].z += trans;
+			}
+		}
 	}
 
 	m_iActiveFrame = n+1;
@@ -1144,13 +1022,13 @@ bool CBody::IntersectPanels(CVector A, CVector B, CVector &I)
 
 
 
-int CBody::IsFramePos(CVector Real, double const &RefLength, double ZoomFactor)
+int CBody::IsFramePos(CVector Real, double ZoomFactor)
 {
 	int k;
 	for (k=0; k<FrameSize(); k++)
 	{
-		if (fabs(Real.x-m_SplineSurface.m_pFrame[k]->m_uPosition)<0.003*RefLength/ZoomFactor &&
-			fabs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())     <0.003*RefLength/ZoomFactor)
+		if (fabs(Real.x-m_SplineSurface.m_pFrame[k]->m_uPosition) < 0.003 *REFLENGTH/ZoomFactor &&
+			fabs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())      < 0.003 *REFLENGTH/ZoomFactor)
 			return k;
 	}
 	return -10;
@@ -1750,10 +1628,10 @@ double CBody::TotalMass()
 
 
 
-void CBody::SetEdgeWeight(double w)
+void CBody::SetEdgeWeight(double uw, double vw)
 {
-	m_EdgeWeight = w;
-	m_SplineSurface.m_EdgeWeight = w;
+	m_SplineSurface.m_EdgeWeightu = uw;
+	m_SplineSurface.m_EdgeWeightv = vw;
 }
 
 
