@@ -26,7 +26,7 @@
 #include "../globals.h"
 #include <math.h>
 #include <QTextStream>
-#include <QtDebug>
+
 
 void *CWOpp::s_pMainFrame;
 void *CWOpp::s_pMiarex;
@@ -644,7 +644,7 @@ void CWOpp::GetWOppProperties(QString &WOppProperties, bool bData)
 
 	if(m_bOut) WOppProperties += "Point is out of the flight envelope\n";
 
-	strong  = QString(QObject::tr("VInf")+"  =%1 ").arg(m_QInf,7,'f',3);
+	strong  = QString(QObject::tr("VInf")+"  =%1 ").arg(m_QInf*pMainFrame->m_mstoUnit,7,'f',3);
 	WOppProperties += "\n"+strong + speedunit+"\n";
 
 	strong  = QString(QObject::tr("Alpha")+" =%1").arg(m_Alpha,7,'f',2);

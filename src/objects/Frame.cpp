@@ -19,11 +19,12 @@
 
 *****************************************************************************/
 
-#include "../params.h"
+
 #include "Frame.h"
 #include <math.h>
 #include <QtDebug>
 
+#define REFLENGTH 10.0
 
 CFrame::CFrame(int nCtrlPts)
 {

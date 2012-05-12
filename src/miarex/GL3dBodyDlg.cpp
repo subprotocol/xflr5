@@ -19,7 +19,7 @@
 
 *****************************************************************************/
 
-//#include "../params.h"
+
 #include "../mainframe.h"
 #include "../threedwidget.h"
 #include "../globals.h"
@@ -3232,10 +3232,6 @@ bool GL3dBodyDlg::SetBody(CBody *pBody)
 	m_pBody = pBody;
 	if(!m_pBody) return false;
 
-//	m_pFrameDelegate->SetPointers(m_Precision,&m_pBody->m_NStations);
-//	m_pPointDelegate->SetPointers(m_Precision,&m_pBody->m_NSideLines);
-	m_pFrameDelegate->SetPointer(m_Precision);
-	m_pPointDelegate->SetPointer(m_Precision);
 
 	if(m_pBody->m_LineType==BODYPANELTYPE)       m_pctrlFlatPanels->setChecked(true);
 	else if(m_pBody->m_LineType==BODYSPLINETYPE) m_pctrlBSplines->setChecked(true);
@@ -3721,42 +3717,48 @@ void GL3dBodyDlg::SetupLayout()
 		m_pctrlHoopDegree->addItem(str);
 	}
 
+	//Setup Frame table
+	m_pctrlFrameTable->horizontalHeader()->setStretchLastSection(true);
+
 	m_pFrameModel = new QStandardItemModel;
 	m_pFrameModel->setRowCount(10);//temporary
 	m_pFrameModel->setColumnCount(2);
+	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
+	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
 	m_pctrlFrameTable->setModel(m_pFrameModel);
+
 	QItemSelectionModel *selectionModelFrame = new QItemSelectionModel(m_pFrameModel);
 	m_pctrlFrameTable->setSelectionModel(selectionModelFrame);
+	connect(selectionModelFrame, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnFrameItemClicked(QModelIndex)));
+
 	m_pFrameDelegate = new BodyTableDelegate;
 	m_pctrlFrameTable->setItemDelegate(m_pFrameDelegate);
+	int *pFramePrecision = new int[2];
+	pFramePrecision[0] = 3;//five digits for x and y coordinates
+	pFramePrecision[1] = 0;
+	m_pFrameDelegate->SetPointer(pFramePrecision);
+
+	//Setup Point Table
+	m_pctrlPointTable->horizontalHeader()->setStretchLastSection(true);
 
 	m_pPointModel = new QStandardItemModel;
 	m_pPointModel->setRowCount(10);//temporary
 	m_pPointModel->setColumnCount(3);
-	m_pctrlPointTable->setModel(m_pPointModel);
-	QItemSelectionModel *selectionModelPoint = new QItemSelectionModel(m_pPointModel);
-	m_pctrlPointTable->setSelectionModel(selectionModelPoint);
-	m_pPointDelegate = new BodyTableDelegate;
-	m_pctrlPointTable->setItemDelegate(m_pPointDelegate);
-
-	connect(selectionModelPoint, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnPointItemClicked(QModelIndex)));
-	connect(selectionModelFrame, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnFrameItemClicked(QModelIndex)));
-
-	m_Precision[0] = 3;//five digits for x and y coordinates
-	m_Precision[1] = 3;
-	m_Precision[2] = 0;
-
-	m_pFrameModel->setHeaderData(0, Qt::Horizontal, "x ("+length+")");
-	m_pFrameModel->setHeaderData(1, Qt::Horizontal, tr("NPanels"));
 	m_pPointModel->setHeaderData(0, Qt::Horizontal, "y ("+length+")");
 	m_pPointModel->setHeaderData(1, Qt::Horizontal, "z ("+length+")");
 	m_pPointModel->setHeaderData(2, Qt::Horizontal, tr("NPanels"));
+	m_pctrlPointTable->setModel(m_pPointModel);
+	QItemSelectionModel *selectionModelPoint = new QItemSelectionModel(m_pPointModel);
+	m_pctrlPointTable->setSelectionModel(selectionModelPoint);
+	connect(selectionModelPoint, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnPointItemClicked(QModelIndex)));
 
-	QHeaderView *HorizontalHeader = m_pctrlFrameTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);
-	HorizontalHeader = m_pctrlPointTable->horizontalHeader();
-	HorizontalHeader->setStretchLastSection(true);
-
+	m_pPointDelegate = new BodyTableDelegate;
+	m_pctrlPointTable->setItemDelegate(m_pPointDelegate);
+	int *pPointPrecision = new int[3];
+	pPointPrecision[0] = 3;//five digits for x and y coordinates
+	pPointPrecision[1] = 3;
+	pPointPrecision[2] = 0;
+	m_pPointDelegate->SetPointer(pPointPrecision);
 }
 
 

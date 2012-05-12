@@ -582,7 +582,7 @@ void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody)
 						glEnd();
 					}
 					//body right side
-					for (k=pBody->m_NSideLines-1; k>=0; k--)
+					for (k=pBody->m_NSideLines-2; k>=0; k--)
 					{
 						//build the four corner points of the strips
 						PLA.x = (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;

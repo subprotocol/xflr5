@@ -1027,8 +1027,8 @@ int CBody::IsFramePos(CVector Real, double ZoomFactor)
 	int k;
 	for (k=0; k<FrameSize(); k++)
 	{
-		if (fabs(Real.x-m_SplineSurface.m_pFrame[k]->m_uPosition) < 0.003 *REFLENGTH/ZoomFactor &&
-			fabs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())      < 0.003 *REFLENGTH/ZoomFactor)
+		if (fabs(Real.x-m_SplineSurface.m_pFrame[k]->m_uPosition) < 0.005 *REFLENGTH/ZoomFactor &&
+			fabs(Real.y-m_SplineSurface.m_pFrame[k]->zPos())      < 0.005 *REFLENGTH/ZoomFactor)
 			return k;
 	}
 	return -10;

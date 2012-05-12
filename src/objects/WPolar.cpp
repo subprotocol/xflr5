@@ -2010,7 +2010,7 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 
 	if(m_WPolarType==FIXEDSPEEDPOLAR)
 	{
-		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf,10,'g',2);
+		strong  = QString(QObject::tr("VInf =")+"%1 ").arg(m_QInf*pMainFrame->m_mstoUnit,10,'g',2);
 		PolarProperties += strong + speedunit+"\n";
 	}
 	else if(m_WPolarType==FIXEDAOAPOLAR)
