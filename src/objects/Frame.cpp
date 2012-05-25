@@ -238,7 +238,14 @@ void CFrame::SetuPosition(double u, int iAxis)
 }
 
 
-
+void CFrame::RotateFrameY(double Angle)
+{
+	CVector RotationCenter = m_CtrlPoint.first();//TODO : or point on L.E. ?
+	for(int ic=0; ic<m_CtrlPoint.size(); ic++)
+	{
+		m_CtrlPoint[ic].RotateY(RotationCenter, Angle);
+	}
+}
 
 
 

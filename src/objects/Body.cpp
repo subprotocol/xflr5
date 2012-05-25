@@ -1135,11 +1135,10 @@ void CBody::Scale(double XFactor, double YFactor, double ZFactor, bool bFrameOnl
 		if((bFrameOnly &&  i==FrameID) || !bFrameOnly)
 		{
 			if(!bFrameOnly) m_SplineSurface.m_pFrame[i]->m_uPosition *= XFactor;
-//			m_SplineSurface.m_pFrame[i]->m_Position.y *= YFactor;
-//			m_SplineSurface.m_pFrame[i]->m_Position.z *= ZFactor;
 
 			for(j=0; j<m_SplineSurface.m_pFrame[i]->m_CtrlPoint.size(); j++)
 			{
+				m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].x  = m_SplineSurface.m_pFrame[i]->m_uPosition;
 				m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y *= YFactor;
 				m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z *= ZFactor;
 			}
@@ -1156,8 +1155,9 @@ bool CBody::SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 	if(bIsStoring)
 	{
-		if(ProjectFormat>=5)      ar << 1005;
-		else if(ProjectFormat==4) ar << 1002;
+		if(ProjectFormat==4) ar << 1002;
+		else                 ar << 1005;
+
 		//1005 : added body alpha color + provisions
 		//1004 : QFLRv0.03	: added mass properties for inertia calculations
 		//1003 : QFLR5 v0.02 : added body description field

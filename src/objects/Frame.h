@@ -44,6 +44,7 @@ public:
 	void CopyPoints(QList<CVector> *m_pPointList);
 
 	void SetuPosition(double u, int iAxis);
+	void RotateFrameY(double Angle);
 
 	int PointSize() {return m_CtrlPoint.size();};
 

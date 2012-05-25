@@ -38,7 +38,7 @@ public:
 	bool Intersect(CVector A, CVector B, CVector &I, bool bRight);
 	bool IntersectPanels(CVector A, CVector B, CVector &I);
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
-	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat=0);
+	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	bool ImportDefinition(QTextStream &inStream, double mtoUnit);
 	bool ExportDefinition(QTextStream &outStream, double mtoUnit) ;
 

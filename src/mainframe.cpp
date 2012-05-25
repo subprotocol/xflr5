@@ -1321,12 +1321,12 @@ void MainFrame::CreateMiarexActions()
 	connect(MiarexGraphDlg, SIGNAL(triggered()), pMiarex, SLOT(OnGraphSettings()));
 
 	twoGraphs = new QAction(tr("Two Graphs")+"\t(T)", this);
-	twoGraphs->setStatusTip(tr("Display the first two operating point graphs"));
+	twoGraphs->setStatusTip(tr("Display the first two graphs"));
 	twoGraphs->setCheckable(true);
 	connect(twoGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnTwoGraphs()));
 	
 	fourGraphs = new QAction(tr("All Graphs")+"\t(A)", this);
-	fourGraphs->setStatusTip(tr("Display all four operating point graphs"));
+	fourGraphs->setStatusTip(tr("Display all four graphs"));
 	fourGraphs->setCheckable(true);
 	connect(fourGraphs, SIGNAL(triggered()), pMiarex, SLOT(OnFourGraphs()));
 
@@ -6929,7 +6929,7 @@ void MainFrame::OnDuplicateFoil()
 		{
 			QXDirect *pXDirect = (QXDirect*)m_pXDirect;
 			pXDirect->m_BufferFoil.CopyFoil(pNewFoil);
-			pXDirect->SetFoil();
+			pXDirect->SetFoil(pNewFoil);
 		}
 		else if(m_iApp==DIRECTDESIGN)
 		{

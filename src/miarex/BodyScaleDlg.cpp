@@ -26,16 +26,15 @@
 #include <QLabel>
 #include "../mainframe.h"
 #include "../globals.h"
-#include "../objects/Wing.h"
 #include "../misc/LinePickerDlg.h"
 #include "BodyScaleDlg.h"
-#include "GL3dBodyDlg.h"
+#include "./GL3dBodyDlg.h"
 
 
 BodyScaleDlg::BodyScaleDlg(void *pParent )
 {
 	setWindowTitle(tr("Body Scale Dialog"));
-	m_pGL3dBodyDlg = pParent;
+	m_pBodyDlg = pParent;
 	m_XFactor = 1.0;
 	m_YFactor = 1.0;
 	m_ZFactor = 1.0;
@@ -212,13 +211,12 @@ void BodyScaleDlg::OnOK()
 
 void BodyScaleDlg::OnEditingFinished()
 {
-	GL3dBodyDlg *pGL3dBodyDlg = (GL3dBodyDlg*)m_pGL3dBodyDlg;
+	GL3dBodyDlg *pBodyDlg = (GL3dBodyDlg*)m_pBodyDlg;
 	m_FrameID = m_pctrlFrameID->Value()-1;
-	pGL3dBodyDlg->m_pBody->m_iActiveFrame = m_FrameID;
-	pGL3dBodyDlg->m_pFrame = pGL3dBodyDlg->m_pBody->Frame(pGL3dBodyDlg->m_pBody->m_iActiveFrame);
-	pGL3dBodyDlg->m_bResetglBody2D = true;
-	pGL3dBodyDlg->UpdateView();
-
+	pBodyDlg->m_pBody->m_iActiveFrame = m_FrameID;
+	pBodyDlg->m_pFrame = pBodyDlg->m_pBody->ActiveFrame();
+	pBodyDlg->m_bResetglBody2D = true;
+	pBodyDlg->UpdateView();
 }
 
 

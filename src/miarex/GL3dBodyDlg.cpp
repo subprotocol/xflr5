@@ -3838,7 +3838,7 @@ void GL3dBodyDlg::ResizeTables()
 	m_pctrlFrameTable->setColumnWidth(0,ColumnWidth);
 	m_pctrlFrameTable->setColumnWidth(1,ColumnWidth);
 //	m_pctrlFrameTable->setColumnWidth(2,ColumnWidth);
-	ColumnWidth = (int)((double)(m_pctrlPointTable->width())/3.25);
+	ColumnWidth = (int)((double)(m_pctrlPointTable->width())/3.5);
 	m_pctrlPointTable->setColumnWidth(0,ColumnWidth);
 	m_pctrlPointTable->setColumnWidth(1,ColumnWidth);
 //	m_pctrlPointTable->setColumnWidth(2,ColumnWidth);

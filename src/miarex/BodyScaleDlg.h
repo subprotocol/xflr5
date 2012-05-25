@@ -65,7 +65,7 @@ private:
 
 
 private:
-	void *m_pGL3dBodyDlg;
+	void *m_pBodyDlg;
 	double m_XFactor, m_YFactor, m_ZFactor;
 	bool m_bFrameOnly;
 	int m_FrameID;

@@ -54,7 +54,7 @@ private:
 	void Analysis3();
 	void CleanUp();
 	void CreatePolar(double Spec, double Mach, double NCrit);
-	bool InitXFoil2();
+//	bool InitXFoil2();
 	bool Iterate();
 	void keyPressEvent(QKeyEvent *event);
 	void OutputIter(int iter);

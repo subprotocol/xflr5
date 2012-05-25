@@ -22,6 +22,7 @@
 
 #include <QFileOpenEvent>
 #include <QSplashScreen>
+#include <QDateTime>
 #include <QMessageBox>
 #include "XFLR5Application.h"
 #include "mainframe.h"
@@ -50,6 +51,8 @@ XFLR5Application::XFLR5Application(int &argc, char** argv) : QApplication(argc, 
 #else
 	QSettings settings(QSettings::IniFormat,QSettings::UserScope,"XFLR5");
 #endif
+
+	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	bool bMaximized = true;
 	bool bOK;

@@ -247,7 +247,7 @@ double CFoil::DeRotate()
 void CFoil::DrawFoil(QPainter &painter, double const &alpha, double const &scalex, double const &scaley, QPoint const &Offset)
 {
 	static double xa, ya, sina, cosa;
-	static QPoint pt, From, To;
+	static QPoint From, To;
 	static QRect R;
 	static int k;
 	static QPen FoilPen, HighPen;

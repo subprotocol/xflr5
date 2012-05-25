@@ -104,7 +104,7 @@ CWing::CWing()
 
 	m_WingName        = QObject::tr("Wing Name");
 	m_WingDescription = "";
-	m_WingColor =  QColor(203,222,222);
+	m_WingColor.setHsv((int)(((double)qrand()/(double)RAND_MAX)*255), 31, 203, 140);
 
 	m_QInf0    = 0.0;
 

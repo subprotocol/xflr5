@@ -1057,6 +1057,12 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_iSection = 0;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
+	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
+	m_bSurfaces = pMiarex->m_bSurfaces;
+	m_bOutline = pMiarex->m_bOutline;
+	m_bVLMPanels = pMiarex->m_bVLMPanels;
+	m_bglLight = pMiarex->m_bglLight;
+
 	GetAreaUnit(str, pMainFrame->m_AreaUnit);
 	m_pctrlAreaUnit1->setText(str);
 	m_pctrlAreaUnit2->setText(str);
@@ -1088,6 +1094,7 @@ bool GL3dWingDlg::InitDialog(CWing *pWing)
 	m_pctrlLeftSide->setEnabled(!m_pWing->m_bSymetric);
 	m_pctrlRightSide->setChecked(m_bRightSide);
 	m_pctrlLeftSide->setChecked(!m_bRightSide);
+
 
 	m_pctrlSurfaces->setChecked(m_bSurfaces);
 	m_pctrlOutline->setChecked(m_bOutline);

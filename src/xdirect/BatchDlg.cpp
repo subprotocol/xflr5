@@ -681,84 +681,6 @@ void BatchDlg::InitDialog()
 
 
 
-bool BatchDlg::InitXFoil2()
-{
-	XFoil *pXFoil = (XFoil*)s_pXFoil;
-	pXFoil->Initialize();
-	pXFoil->pXFile = m_pXFile;
-
-	pXFoil->reinf1 = m_ReMin;
-	pXFoil->minf1  = m_Mach;
-
-	switch (m_PolarType)
-	{
-		case 1:
-			pXFoil->retyp  = 1;
-			pXFoil->matyp  = 1;
-			break;
-		case 2:
-			pXFoil->retyp  = 2;
-			pXFoil->matyp  = 2;
-			break;
-		case 3:
-			pXFoil->retyp  = 3;
-			pXFoil->matyp  = 1;
-			break;
-		case 4:
-			pXFoil->retyp  = 1;
-			pXFoil->matyp  = 1;
-			break;
-		default:
-			pXFoil->retyp  = 1;
-			pXFoil->matyp  = 1;
-			break;
-	}
-
-	pXFoil->lalfa = true;
-	pXFoil->qinf = 1.0;
-
-	pXFoil->acrit      = m_NCrit;
-	pXFoil->xstrip[1]  = m_XTopTr;
-	pXFoil->xstrip[2]  = m_XBotTr;
-
-	if (m_Mach !=0.0)
-	{
-		if(!pXFoil->SetMach())
-		{
-			QString str;
-			str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-//			QMessageBox::information(window(), tr("Warning"), str);
-			UpdateOutput(str);
-			WriteString(str);
-		}
-	}
-
-	for(int i =0; i<m_pFoil->n; i++)
-	{
-		pXFoil->xb[i+1] = m_pFoil->x[i];
-		pXFoil->yb[i+1] = m_pFoil->y[i];
-	}
-	pXFoil->nb     = m_pFoil->n;
-	pXFoil->lbflap = false;
-	pXFoil->ddef   = 0.0;
-	pXFoil->xbf    = 1.0;
-	pXFoil->ybf    = 0.0;
-// end "load"
-
-	if(pXFoil->Preprocess())
-	{
-		pXFoil->abcopy();
-	}
-	else
-	{
-			//what do I do now ?
-	}
-
-	return true;
-}
-
-
-
 bool BatchDlg::Iterate()
 {
 	QString str;
@@ -1171,7 +1093,6 @@ void BatchDlg::ReadParams()
 void BatchDlg::ReLoop()
 {
 	XFoil *pXFoil = (XFoil*)s_pXFoil;
-//	QXDirect* pXDirect = (QXDirect*)s_pXDirect;
 	QString str;
 	QString strong = "";
 
@@ -1186,7 +1107,12 @@ void BatchDlg::ReLoop()
 
 	for (iRe=0; iRe<=nRe; iRe++)
 	{
-		if(!m_bFromList) pXFoil->reinf1 = m_ReMin + iRe *m_ReInc;
+		if(!m_bFromList)
+		{
+			pXFoil->reinf1 = m_ReMin + iRe *m_ReInc;
+			pXFoil->minf1  = m_Mach;
+			pXFoil->acrit  = m_NCrit;
+		}
 		else
 		{
 			pXFoil->reinf1 = m_ReList[iRe];
