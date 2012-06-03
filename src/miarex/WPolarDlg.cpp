@@ -44,7 +44,7 @@ WPolarDlg::WPolarDlg()
 
 	m_bAutoName = true;
 
-	s_WPolar.m_WPolarType = FIXEDSPEEDPOLAR;
+/*	s_WPolar.m_WPolarType = FIXEDSPEEDPOLAR;
 	s_WPolar.m_AnalysisMethod = LLTMETHOD;
 
 	s_WPolar.m_QInf       = 10.0;//m/s
@@ -64,7 +64,7 @@ WPolarDlg::WPolarDlg()
 	s_WPolar.m_bViscous      = true;
 	s_WPolar.m_bGround       = false;
 	s_WPolar.m_RefAreaType = 1;
-	s_WPolar.m_bAutoInertia = false;
+	s_WPolar.m_bAutoInertia = false;*/
 
 	m_pWing	   = NULL;
 	m_pPlane     = NULL;
