@@ -1493,7 +1493,6 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 				pPanelDlg->GetSpeedVector(C, Mu, Sigma, Wg, false);
 				m_Vd[m] = Wg;
 				InducedAngle = atan2(Wg.dot(WindNormal), QInf);
-//				m_Ai[m]      = 2.0 * InducedAngle*180/PI;
 				m_Ai[m]      =       InducedAngle*180/PI;
 
 				// ____________________________
@@ -1501,7 +1500,7 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 				//
 				// Method 1 : Sum panel pressure forces over the top and bottom strip.
 				// The induced drag is calculated by projection of the strip force on the wind direction
-				// General experience in published literature shows this isn't such a good idea
+				// General experience in published literature shows that this isn't such a good idea
 
 				// Method 2 : Far-field plane integration
 				// This is the method generally recommended
@@ -1533,7 +1532,6 @@ void CWing::PanelTrefftz(double QInf, double Alpha, double *Mu, double *Sigma, i
 						{
 							m_Vd[m]      = Wg;
 							InducedAngle = atan2(Wg.dot(WindNormal), QInf);
-//							m_Ai[m]      = 2.0 * InducedAngle*180/PI;
 							m_Ai[m]      = InducedAngle*180/PI;
 						}
 

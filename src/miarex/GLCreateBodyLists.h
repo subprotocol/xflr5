@@ -2,7 +2,7 @@
 
 	GLCreateLists 
 
-	Copyright (C) 2012 Andre Deperrois XFLR5@yahoo.com
+	Copyright (C) 2012 Andre Deperrois sail7@xflr5.com
 		 All rights reserved
 
 *****************************************************************************/
@@ -13,7 +13,6 @@
 
 #include <QtOpenGL>
 #include "../objects/Body.h"
-#include "../params.h"
 
 void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody);
 void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int nh);

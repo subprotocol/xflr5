@@ -1,7 +1,7 @@
 /****************************************************************************
 
 		 SplineSurface Class
-		 Copyright (C) 2012 Andre Deperrois XFLR5@yahoo.com
+		 Copyright (C) 2012 Andre Deperrois sail7@xflr5.com
 		 All rights reserved
 
 *****************************************************************************/
@@ -21,9 +21,9 @@ class NURBSSurface
 {
 
 public:
-	NURBSSurface();
+	NURBSSurface(int iAxis=0);
 	void SetKnots();
-	double Getu(double z);
+	double Getu(double pos, double v);
 	double Getv(double u, CVector r);
 	void GetPoint(double u, double v, CVector &Pt);
 	void SetPanelPos();
@@ -70,6 +70,7 @@ public:
 //	CVector P0, P1, P2, PI;
 	double m_vPanelPos[300];
 
+	int m_uAxis, m_vAxis;
 };
 
 #endif // SPLINESURFACE_H

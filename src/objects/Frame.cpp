@@ -23,12 +23,11 @@
 #include "Frame.h"
 #include <math.h>
 #include <QtDebug>
-
-#define REFLENGTH 10.0
+#include "../params.h"
 
 CFrame::CFrame(int nCtrlPts)
 {
-	m_uPosition = 0.0;
+	m_Position.Set(0.0,0.0,0.0);
 	m_CtrlPoint.clear();
 	for(int ic=0; ic<nCtrlPts; ic++)
 	{
@@ -50,7 +49,7 @@ int CFrame::IsPoint(const CVector &Point, const double &ZoomFactor)
 	{
 		if(sqrt(  (Point.x-m_CtrlPoint[l].x)*(Point.x-m_CtrlPoint[l].x)
 				+ (Point.y-m_CtrlPoint[l].y)*(Point.y-m_CtrlPoint[l].y)
-				+ (Point.z-m_CtrlPoint[l].z)*(Point.z-m_CtrlPoint[l].z))<0.005*REFLENGTH/ZoomFactor)
+				+ (Point.z-m_CtrlPoint[l].z)*(Point.z-m_CtrlPoint[l].z))<0.05*Height()/ZoomFactor)
 			  return l;
 //        if (fabs(Point.x-m_CtrlPoint[l].y)<0.005/ZoomFactor && fabs(Point.y-m_CtrlPoint[l].z)<0.005/ZoomFactor) return l;
 	}
@@ -179,14 +178,15 @@ int CFrame::InsertPoint(const CVector &Real, int iAxis)
 
 double CFrame::Height()
 {
-	double hmin	=  10.0;
+	return (m_CtrlPoint.last() - m_CtrlPoint.first()).VAbs();
+/*	double hmin	=  10.0;
 	double hmax = -10.0;
 	for(int k=0; k<m_CtrlPoint.size(); k++)
 	{
 		if(m_CtrlPoint[k].z<hmin) hmin = m_CtrlPoint[k].z;
 		if(m_CtrlPoint[k].z>hmax) hmax = m_CtrlPoint[k].z;
 	}
-	return fabs(hmax-hmin);
+	return fabs(hmax-hmin);*/
 }
 
 
@@ -205,7 +205,7 @@ double CFrame::zPos()
 
 void CFrame::CopyFrame(CFrame *pFrame)
 {
-	m_uPosition = pFrame->m_uPosition;
+	m_Position = pFrame->m_Position;
 	CopyPoints(&pFrame->m_CtrlPoint);
 }
 
@@ -226,24 +226,36 @@ void CFrame::AppendPoint(CVector const& Pt)
 }
 
 
-void CFrame::SetuPosition(double u, int iAxis)
+void CFrame::SetPosition(CVector Pos)
 {
-	m_uPosition=u;
-	for(int ic=0; ic<m_CtrlPoint.size(); ic++)
-	{
-		if(iAxis==1)      m_CtrlPoint[ic].x = u;
-		else if(iAxis==2) m_CtrlPoint[ic].y = u;
-		else if(iAxis==3) m_CtrlPoint[ic].z = u;
-	}
+	m_Position = Pos;
 }
+
+void CFrame::SetuPosition(double u)
+{
+	m_Position.x = u;
+}
+
+void CFrame::SetvPosition(double v)
+{
+	m_Position.y = v;
+}
+
+void CFrame::SetwPosition(double w)
+{
+	m_Position.z = w;
+}
+
 
 
 void CFrame::RotateFrameY(double Angle)
 {
-	CVector RotationCenter = m_CtrlPoint.first();//TODO : or point on L.E. ?
+	if(!m_CtrlPoint.size()) return;
+
+//	CVector RotationCenter = m_CtrlPoint.first();
 	for(int ic=0; ic<m_CtrlPoint.size(); ic++)
 	{
-		m_CtrlPoint[ic].RotateY(RotationCenter, Angle);
+		m_CtrlPoint[ic].RotateY(m_Position, Angle);
 	}
 }
 

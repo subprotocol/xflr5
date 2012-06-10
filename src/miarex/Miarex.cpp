@@ -8003,7 +8003,6 @@ void QMiarex::OnDefineWPolar()
 	pNewWPolar->m_WMAChord     = m_pCurWing->m_MAChord;
 
 	WPolarDlg dlg;
-
 	dlg.InitDialog(m_pCurPlane, m_pCurWing);
 
 	dlg.move(pMainFrame->m_DlgPos);
@@ -8047,6 +8046,7 @@ void QMiarex::OnDefineWPolar()
 		m_bResetglWake = true;
 
 		SetWPlr();
+
 
 		pMainFrame->UpdateWPolars();
 		UpdateView();

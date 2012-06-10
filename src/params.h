@@ -8,7 +8,6 @@
 #define SETTINGSFORMAT    100623
 #define PRECISION  0.00000000001 //values are assumed 0 if less than this value
 #define MAXCOLORS   30
-#define REFLENGTH   1.0
 
 // Applications
 #define XFOILANALYSIS  1

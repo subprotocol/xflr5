@@ -1,7 +1,7 @@
 /****************************************************************************
 
 		 SplineSurface Class
-		 Copyright (C) 2012 Andre Deperrois XFLR5@yahoo.com
+		 Copyright (C) 2012 Andre Deperrois sail7@xflr5.com
 		 All rights reserved
 
 *****************************************************************************/
@@ -16,10 +16,13 @@
 void *NURBSSurface::s_pMainFrame;
 
 
-NURBSSurface::NURBSSurface()
+NURBSSurface::NURBSSurface(int iAxis)
 {
 	m_pFrame.clear();
 	m_pFrame.reserve(10);
+
+	m_uAxis = iAxis;//directed in x direction, mainly
+	m_vAxis = 2;//directed in y direction, mainly
 
 //	m_nuLines = 0;
 	m_nvLines = 0;
@@ -52,17 +55,17 @@ NURBSSurface::NURBSSurface()
 
 
 
-double NURBSSurface::Getu(double z)
+double NURBSSurface::Getu(double pos, double v)
 {
-	if(z<=m_pFrame.first()->m_uPosition)             return 0.0;
-	if(z>=m_pFrame.last()->m_uPosition) return 1.0;
-	if(fabs(m_pFrame.last()->m_uPosition - m_pFrame.first()->m_uPosition)<0.0000001) return 0.0;
+	if(pos<=m_pFrame.first()->m_Position[m_uAxis]) return 0.0;
+	if(pos>=m_pFrame.last()->m_Position[m_uAxis])  return 1.0;
+	if(fabs(m_pFrame.last()->m_Position[m_uAxis] - m_pFrame.first()->m_Position[m_uAxis])<0.0000001) return 0.0;
 
 	int iter=0;
-	double u2, u1, b, c, u, v, zz, zh;
+	double u2, u1, b, c, u,  zz, zh;
 	u1 = 0.0; u2 = 1.0;
 
-	v = 0.0;//use top line, but doesn't matter
+//	v = 0.0;//use top line, but doesn't matter
 	while(fabs(u2-u1)>1.0e-6 && iter<200)
 	{
 		u=(u1+u2)/2.0;
@@ -73,17 +76,18 @@ double NURBSSurface::Getu(double z)
 			for(int jv=0; jv<m_nvLines; jv++)
 			{
 				c =  SplineBlend(jv, m_ivDegree, v, m_vKnots);
-				zh += m_pFrame[iu]->m_uPosition * c;
+				zh += m_pFrame[iu]->m_Position[m_uAxis] * c;
 			}
 			b = SplineBlend(iu, m_iuDegree, u, m_uKnots);
 			zz += zh * b;
 		}
-		if(zz>z) u2 = u;
+		if(zz>pos) u2 = u;
 		else     u1 = u;
 		iter++;
 	}
 	return (u1+u2)/2.0;
 }
+
 
 
 double NURBSSurface::Getv(double u, CVector r)
@@ -231,7 +235,6 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 	//M0 is the outside Point, M1 is the inside point
 	M0 = A; M1 = B;
 
-
 /*	if(!IsInNURBSBody(M1))
 	{
 		//consider no intersection (not quite true in special high dihedral cases)
@@ -245,7 +248,7 @@ bool NURBSSurface::IntersectNURBS(CVector A, CVector B, CVector &I)
 	{
 		//first we get the u parameter corresponding to point I
 		tp = t;
-		u = Getu(I.z);
+		u = Getu(I.z, 0.0);
 		t_Q.Set(I.x, 0.0, 0.0);
 		t_r = (I-t_Q);
 		v = Getv(u, t_r);
@@ -272,6 +275,8 @@ void NURBSSurface::SetKnots()
 {
 	int j;
 	double b;
+	if(!m_pFrame.size())return;
+	if(!m_pFrame.first()->m_CtrlPoint.size())return;
 
 	// z-dir knots
 	m_iuDegree = qMin(m_iuDegree, m_pFrame.size());
@@ -342,6 +347,7 @@ void NURBSSurface::RemoveFrame(int iFrame)
 
 void NURBSSurface::ClearFrames()
 {
+	if(!m_pFrame.size()) return;
 	for(int ifr=m_pFrame.size()-1; ifr>=0; ifr--)
 	{
 		RemoveFrame(ifr);
@@ -353,7 +359,7 @@ void NURBSSurface::InsertFrame(CFrame *pNewFrame)
 {
 	for(int ifr=0; ifr<m_pFrame.size(); ifr++)
 	{
-		if(pNewFrame->m_uPosition<m_pFrame.at(ifr)->m_uPosition)
+		if(pNewFrame->m_Position[m_uAxis] < m_pFrame.at(ifr)->m_Position[m_uAxis])
 		{
 			m_pFrame.insert(ifr, pNewFrame);
 			return;

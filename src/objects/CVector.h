@@ -1,7 +1,7 @@
 /****************************************************************************
 
     CVector Class
-	Copyright (C) 2008 Andre Deperrois adeperrois@xflr5.com
+	Copyright (C) 2008 Andre Deperrois sail7@xflr5.com
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public:
 	double y;
 	double z;
 
-	//inline costructors
+	//inline constructors
 	CVector()
 	{
 		x  = 0.0;
@@ -48,11 +48,18 @@ public:
 	};
 
 	//inline operators
+	double operator[](const int &i)
+	{
+		if(i==0) return x;
+		if(i==1) return y;
+		if(i==2) return z;
+	}
+
 	bool operator ==(CVector const &V)
 	{
 		//used only to compare point positions
 		return (V.x-x)*(V.x-x) + (V.y-y)*(V.y-y) + (V.z-z)*(V.z-z)<0.000000001;
-	};		
+	};
 	
 	void operator =(CVector const &T)
 	{
@@ -103,13 +110,14 @@ public:
 		return T;
 	};
 	
-	CVector operator +(CVector const &V)
+	CVector operator +(CVector const &V) const
 	{
 		CVector T(x+V.x, y+V.y, z+V.z);
 		return T;
 	};
 	
-	CVector operator -(CVector const &V)
+
+	CVector operator -(CVector const &V) const
 	{
 		CVector T(x-V.x, y-V.y, z-V.z);
 		return T;
@@ -170,13 +178,27 @@ public:
 		z += T.z;
 	};
 
+	void Translate(const double &tx, const double &ty, const double &tz)
+	{
+		x += tx;
+		y += ty;
+		z += tz;
+	};
+
+	int size() const
+	{
+		return 3;//dimension
+	}
+
 	//other methods
 	void Rotate(CVector const &R, double Angle);
 	void Rotate(CVector &O, CVector const &R, double Angle);
 	void RotateX(CVector const &O, double XTilt);
 	void RotateY(CVector const &O, double YTilt);
 	void RotateZ(CVector const &O, double ZTilt);
+	void RotateX(double Bank);
 	void RotateY(double YTilt);
+	void RotateZ(double ZRot);
 
  
 };

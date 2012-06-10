@@ -2,7 +2,7 @@
 
 	GLCreateLists 
 
-		 Copyright (C) 2012 Andre Deperrois XFLR5@yahoo.com
+		 Copyright (C) 2012 Andre Deperrois sail7@xflr5.com
 		 All rights reserved
 
 *****************************************************************************/
@@ -10,6 +10,7 @@
 #include "GLCreateBodyLists.h"
 #include "../misc/W3dPrefsDlg.h"
 #include "../mainframe.h"
+#include "../params.h"
 
 #define NXPOINTS 87
 #define NHOOPPOINTS 53
@@ -24,7 +25,7 @@ void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int n
 	double v;
 
 	CVector Point;
-	double xinc, hinc, u;
+	double hinc, u;
 	CVector N, LATB, TALB;
 	CVector LA, LB, TA, TB;
 	MainFrame *pMainFrame = (MainFrame*)pParent;
@@ -152,13 +153,13 @@ void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int n
 
 		glColor3d(W3dPrefsDlg::s_OutlineColor.redF(), W3dPrefsDlg::s_OutlineColor.greenF(), W3dPrefsDlg::s_OutlineColor.blueF());
 
-		xinc = 0.1; hinc=1./(double)(nh-1);
+		hinc=1./(double)(nh-1);
 		u=0.0; v = 0.0;
 
 		// sides
 		for (i=0; i<pBody->FrameSize(); i++)
 		{
-			u = pBody->Getu(pBody->Frame(i)->m_uPosition);
+			u = pBody->Getu(pBody->Frame(i)->m_Position.x);
 
 			glBegin(GL_LINE_STRIP);
 			{
@@ -185,29 +186,25 @@ void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int n
 		}
 
 		//top line
-		u=0.0;
 		glBegin(GL_LINE_STRIP);
 		{
 			v = 0.0;
-			for (i=0; i<=nh; i++)
+			for (int iu=0; iu<=nh; iu++)
 			{
-				pBody->GetPoint(u,v, true, Point);
+				pBody->GetPoint((double)iu/(double)nh,v, true, Point);
 				glVertex3d(Point.x, Point.y, Point.z);
-				u += xinc;
 			}
 		}
 		glEnd();
 
 		//bottom line
-		u=0.0;
 		glBegin(GL_LINE_STRIP);
 		{
 			v = 1.0;
-			for (i=0; i<=nh; i++)
+			for (int iu=0; iu<=nh; iu++)
 			{
-				pBody->GetPoint(u,v, true, Point);
+				pBody->GetPoint((double)iu/(double)nh,v, true, Point);
 				glVertex3d(Point.x, Point.y, Point.z);
-				u += xinc;
 			}
 		}
 		glEnd();
@@ -252,15 +249,15 @@ void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody)
 		{
 			for (j=0; j<pBody->FrameSize()-1;j++)
 			{
-				Tj.Set(pBody->Frame(j)->m_uPosition,     0.0, 0.0);
-				Tjp1.Set(pBody->Frame(j+1)->m_uPosition, 0.0, 0.0);
+				Tj.Set(pBody->Frame(j)->m_Position.x,     0.0, 0.0);
+				Tjp1.Set(pBody->Frame(j+1)->m_Position.x, 0.0, 0.0);
 
 				glBegin(GL_QUADS);
 				{
-					P1 = pBody->Frame(j)->m_CtrlPoint[k];       P1.x = pBody->Frame(j)->m_uPosition;
-					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];     P2.x = pBody->Frame(j+1)->m_uPosition;
-					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];   P3.x = pBody->Frame(j+1)->m_uPosition;
-					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];     P4.x = pBody->Frame(j)->m_uPosition;
+					P1 = pBody->Frame(j)->m_CtrlPoint[k];       P1.x = pBody->Frame(j)->m_Position.x;
+					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];     P2.x = pBody->Frame(j+1)->m_Position.x;
+					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];   P3.x = pBody->Frame(j+1)->m_Position.x;
+					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];     P4.x = pBody->Frame(j)->m_Position.x;
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -319,15 +316,15 @@ void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody)
 		{
 			for (j=0; j<pBody->FrameSize()-1;j++)
 			{
-				Tj.Set(pBody->Frame(j)->m_uPosition,     0.0, 0.0);
-				Tjp1.Set(pBody->Frame(j+1)->m_uPosition, 0.0, 0.0);
+				Tj.Set(pBody->Frame(j)->m_Position.x,     0.0, 0.0);
+				Tjp1.Set(pBody->Frame(j+1)->m_Position.x, 0.0, 0.0);
 
 				glBegin(GL_QUADS);
 				{
-					P1 = pBody->Frame(j)->m_CtrlPoint[k];		P1.x = pBody->Frame(j)->m_uPosition;
-					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];		P2.x = pBody->Frame(j+1)->m_uPosition;
-					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];	P3.x = pBody->Frame(j+1)->m_uPosition;
-					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];		P4.x = pBody->Frame(j)->m_uPosition;
+					P1 = pBody->Frame(j)->m_CtrlPoint[k];		P1.x = pBody->Frame(j)->m_Position.x;
+					P2 = pBody->Frame(j+1)->m_CtrlPoint[k];		P2.x = pBody->Frame(j+1)->m_Position.x;
+					P3 = pBody->Frame(j+1)->m_CtrlPoint[k+1];	P3.x = pBody->Frame(j+1)->m_Position.x;
+					P4 = pBody->Frame(j)->m_CtrlPoint[k+1];		P4.x = pBody->Frame(j)->m_Position.x;
 
 					P1P3 = P3-P1;
 					P2P4 = P4-P2;
@@ -410,19 +407,19 @@ void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody)
 					for (k=0; k<pBody->m_NSideLines-1; k++)
 					{
 						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * pBody->Frame(i)->m_uPosition        +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLB.x =  (1.0- dj) * pBody->Frame(i)->m_Position.x       +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLB.y = -(1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].y   -  dj * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PLB.z =  (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].z   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PTB.x =  (1.0-dj1) * pBody->Frame(i)->m_uPosition        + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTB.x =  (1.0-dj1) * pBody->Frame(i)->m_Position.x       + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTB.y = -(1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].y   - dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PTB.z =  (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].z   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PLA.x =  (1.0- dj) * pBody->Frame(i)->m_uPosition        +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLA.x =  (1.0- dj) * pBody->Frame(i)->m_Position.x       +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLA.y = -(1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].y -  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PLA.z =  (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].z +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTA.x =  (1.0-dj1) * pBody->Frame(i)->m_uPosition        + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTA.x =  (1.0-dj1) * pBody->Frame(i)->m_Position.x       + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTA.y = -(1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PTA.z =  (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
@@ -459,19 +456,19 @@ void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody)
 					for (k=pBody->m_NSideLines-2; k>=0; k--)
 					{
 						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLA.x = (1.0- dj) * pBody->Frame(i)->m_Position.x     +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLA.y = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].y   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PLA.z = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].z   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PTA.x = (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTA.x = (1.0-dj1) * pBody->Frame(i)->m_Position.x     + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTA.y = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].y   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PTA.z = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].z   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PLB.x = (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLB.x = (1.0- dj) * pBody->Frame(i)->m_Position.x     +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLB.y = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].y +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PLB.z = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].z +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTB.x = (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTB.x = (1.0-dj1) * pBody->Frame(i)->m_Position.x     + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTB.y = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PTB.z = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
@@ -536,19 +533,19 @@ void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody)
 					for (k=0; k<pBody->m_NSideLines-1; k++)
 					{
 						//build the four corner points of the strips
-						PLB.x =  (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLB.x =  (1.0- dj) * pBody->Frame(i)->m_Position.x        +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLB.y = -(1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].y   -  dj * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PLB.z =  (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].z   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PTB.x =  (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTB.x =  (1.0-dj1) * pBody->Frame(i)->m_Position.x        + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTB.y = -(1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].y   - dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PTB.z =  (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].z   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PLA.x =  (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLA.x =  (1.0- dj) * pBody->Frame(i)->m_Position.x        +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLA.y = -(1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].y -  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PLA.z =  (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].z +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTA.x =  (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTA.x =  (1.0-dj1) * pBody->Frame(i)->m_Position.x        + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTA.y = -(1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].y - dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PTA.z =  (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
@@ -585,19 +582,19 @@ void GLCreateBodyMesh(void *pParent, int iList, CBody *pBody)
 					for (k=pBody->m_NSideLines-2; k>=0; k--)
 					{
 						//build the four corner points of the strips
-						PLA.x = (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLA.x = (1.0- dj) * pBody->Frame(i)->m_Position.x        +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLA.y = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].y   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PLA.z = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k].z   +  dj * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PTA.x = (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTA.x = (1.0-dj1) * pBody->Frame(i)->m_Position.x        + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTA.y = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].y   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].y;
 						PTA.z = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k].z   + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k].z;
 
-						PLB.x = (1.0- dj) * pBody->Frame(i)->m_uPosition      +  dj * pBody->Frame(i+1)->m_uPosition;
+						PLB.x = (1.0- dj) * pBody->Frame(i)->m_Position.x        +  dj * pBody->Frame(i+1)->m_Position.x;
 						PLB.y = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].y +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PLB.z = (1.0- dj) * pBody->Frame(i)->m_CtrlPoint[k+1].z +  dj * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 
-						PTB.x = (1.0-dj1) * pBody->Frame(i)->m_uPosition      + dj1 * pBody->Frame(i+1)->m_uPosition;
+						PTB.x = (1.0-dj1) * pBody->Frame(i)->m_Position.x        + dj1 * pBody->Frame(i+1)->m_Position.x;
 						PTB.y = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].y + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].y;
 						PTB.z = (1.0-dj1) * pBody->Frame(i)->m_CtrlPoint[k+1].z + dj1 * pBody->Frame(i+1)->m_CtrlPoint[k+1].z;
 

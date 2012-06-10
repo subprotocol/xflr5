@@ -66,8 +66,8 @@ bool GL3dBodyDlg::s_bAxes = true;
 bool GL3dBodyDlg::s_bVLMPanels = false;
 
 
-int GL3dBodyDlg::s_NHoopPoints = 13;
-int GL3dBodyDlg::s_NXPoints = 19;
+int GL3dBodyDlg::s_NHoopPoints = 37;
+int GL3dBodyDlg::s_NXPoints = 47;
 
 
 QPoint GL3dBodyDlg::s_WindowPos=QPoint(20,20);
@@ -248,7 +248,7 @@ void GL3dBodyDlg::FillFrameCell(int iItem, int iSubItem)
 		case 0:
 		{
 			ind = m_pFrameModel->index(iItem, 0, QModelIndex());
-			m_pFrameModel->setData(ind, m_pBody->Frame(iItem)->m_uPosition * pMainFrame->m_mtoUnit);
+			m_pFrameModel->setData(ind, m_pBody->Frame(iItem)->m_Position.x * pMainFrame->m_mtoUnit);
 			break;
 		}
 		case 1:
@@ -285,7 +285,7 @@ void GL3dBodyDlg::FillFrameTableRow(int row)
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
 	ind = m_pFrameModel->index(row, 0, QModelIndex());
-	m_pFrameModel->setData(ind, m_pBody->Frame(row)->m_uPosition * pMainFrame->m_mtoUnit);
+	m_pFrameModel->setData(ind, m_pBody->Frame(row)->m_Position.x * pMainFrame->m_mtoUnit);
 
 	ind = m_pFrameModel->index(row, 1, QModelIndex());
 	m_pFrameModel->setData(ind, m_pBody->m_xPanels[row]);
@@ -408,9 +408,9 @@ void GL3dBodyDlg::GLCreateBodyOverlay()
 		//Middle Line
 		glBegin(GL_LINE_STRIP);
 		{
-/*			double BodyLength = m_pBody->Frame(m_pBody->FrameSize()-1)->m_uPosition -m_pBody->Frame(0)->m_uPosition;
+/*			double BodyLength = m_pBody->Frame(m_pBody->FrameSize()-1)->m_Position.x -m_pBody->Frame(0)->m_Position.x;
 			for (k=0; k<m_pBody->m_np;k++)
-				glVertex3d(m_pBody->m_x[k] * BodyLength + m_pBody->Frame(0)->m_uPosition,
+				glVertex3d(m_pBody->m_x[k] * BodyLength + m_pBody->Frame(0)->m_Position.x,
 						   m_pBody->m_y[k] * BodyLength, 0.0);*/
 		}
 		glEnd();
@@ -458,7 +458,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 			for (k=0; k<m_pBody->FrameSize();k++)
 			{
 				zpos = (m_pBody->Frame(k)->m_CtrlPoint.first().z +m_pBody->Frame(k)->m_CtrlPoint.last().z )/2.0;
-				glVertex3d(m_pBody->Frame(k)->m_uPosition,
+				glVertex3d(m_pBody->Frame(k)->m_Position.x,
 						   zpos	,
 						   0.0);
 			}
@@ -473,7 +473,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 			glBegin(GL_LINE_STRIP);
 			{
 				for (k=0; k<m_pBody->FrameSize();k++)
-					glVertex3d(m_pBody->Frame(k)->m_uPosition,
+					glVertex3d(m_pBody->Frame(k)->m_Position.x,
 							   m_pBody->Frame(k)->m_CtrlPoint[0].z,
 							   0.0);
 			}
@@ -483,7 +483,7 @@ void GL3dBodyDlg::GLCreateBody2DBodySection()
 			glBegin(GL_LINE_STRIP);
 			{
 				for (k=0; k<m_pBody->FrameSize();k++)
-					glVertex3d(m_pBody->Frame(k)->m_uPosition,
+					glVertex3d(m_pBody->Frame(k)->m_Position.x,
 							   m_pBody->Frame(k)->m_CtrlPoint[ m_pBody->Frame(k)->m_CtrlPoint.size()-1].z,
 							   0.0);
 			}
@@ -582,9 +582,9 @@ void GL3dBodyDlg::GLCreateBodyPoints()
 				glColor3d(color.redF(), color.greenF(), color.blueF());
 			}
 			zpos = (m_pBody->Frame(k)->m_CtrlPoint.first().z + m_pBody->Frame(k)->m_CtrlPoint.last().z ) /2.0;
-			glRectd(m_pBody->Frame(k)->m_uPosition -0.006/m_BodyScale,
+			glRectd(m_pBody->Frame(k)->m_Position.x -0.006/m_BodyScale,
 					zpos                            -0.006/m_BodyScale,
-					m_pBody->Frame(k)->m_uPosition +0.006/m_BodyScale,
+					m_pBody->Frame(k)->m_Position.x +0.006/m_BodyScale,
 					zpos                            +0.006/m_BodyScale);
 		}
 	}
@@ -684,7 +684,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 		{
 			if(m_pBody->ActiveFrame())
 			{
-				u = m_pBody->Getu(m_pBody->ActiveFrame()->m_uPosition);
+				u = m_pBody->Getu(m_pBody->ActiveFrame()->m_Position.x);
 
 				glBegin(GL_LINE_STRIP);
 				{
@@ -743,7 +743,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 				{
 					if(m_pBody->m_LineType ==BODYSPLINETYPE)
 					{
-						u = m_pBody->Getu(m_pBody->Frame(j)->m_uPosition);
+						u = m_pBody->Getu(m_pBody->Frame(j)->m_Position.x);
 
 						glBegin(GL_LINE_STRIP);
 						{
@@ -824,7 +824,7 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 		{
 			if(m_pBody->ActiveFrame())
 			{
-				u = m_pBody->Getu(m_pBody->ActiveFrame()->m_uPosition);
+				u = m_pBody->Getu(m_pBody->ActiveFrame()->m_Position.x);
 
 				glBegin(GL_LINE_STRIP);
 					v = 0.0;
@@ -850,12 +850,12 @@ void GL3dBodyDlg::GLCreateBodyFrames()
 		{
 			glBegin(GL_LINE_STRIP);
 				for (k=0; k<m_pFrame->m_CtrlPoint.size();k++)
-					glVertex3d( m_pBody->ActiveFrame()->m_uPosition,
+					glVertex3d( m_pBody->ActiveFrame()->m_Position.x,
 								m_pFrame->m_CtrlPoint[k].y, m_pFrame->m_CtrlPoint[k].z);
 			glEnd();
 			glBegin(GL_LINE_STRIP);
 			for (k=0; k<m_pFrame->m_CtrlPoint.size();k++)
-					glVertex3d( m_pBody->ActiveFrame()->m_uPosition,
+					glVertex3d( m_pBody->ActiveFrame()->m_Position.x,
 							   -m_pFrame->m_CtrlPoint[k].y, m_pFrame->m_CtrlPoint[k].z);
 			glEnd();
 		}
@@ -1941,7 +1941,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 			{
 				//dragging a point
 				m_pFrame = m_pBody->ActiveFrame();
-				m_pBody->Frame(n)->m_uPosition = Real.x;
+				m_pBody->Frame(n)->m_Position.x = Real.x;
 
 				double zpos = (m_pBody->Frame(n)->m_CtrlPoint.first().z + m_pBody->Frame(n)->m_CtrlPoint.last().z)/2.0;
 				for(int ic=0; ic<m_pBody->Frame(n)->m_CtrlPoint.size(); ic++)
@@ -1959,7 +1959,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 		{
 			Real.x =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
 			Real.y =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
-			Real.z =   m_pFrame->m_uPosition;
+			Real.z =   m_pFrame->m_Position.x;
 
 			if(m_pFrame)	n = m_pFrame->m_iSelect;
 			else			n = -10;
@@ -2019,7 +2019,7 @@ void GL3dBodyDlg::mouseMoveEvent(QMouseEvent *event)
 		{
 			Real.z = (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.y = (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
-			Real.x = m_pFrame->m_uPosition;
+			Real.x = m_pFrame->m_Position.x;
 
 			int n = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			m_pFrame->m_iHighlight = -10;
@@ -2117,7 +2117,7 @@ void GL3dBodyDlg::mousePressEvent(QMouseEvent *event)
 		{
 			Real.z =  (Real.y - m_FrameScaledOffset.y)/m_FrameScale;
 			Real.y =  (Real.x - m_FrameScaledOffset.x)/m_FrameScale;
-			Real.x = m_pFrame->m_uPosition;
+			Real.x = m_pFrame->m_Position.x;
 
 			m_pFrame->m_iSelect = m_pFrame->IsPoint(Real, m_FrameScale/m_FrameRefScale);
 			if(m_pFrame->m_iSelect >=0)
@@ -2968,7 +2968,7 @@ void GL3dBodyDlg::ReadFrameSectionData(int sel)
 	strong = pItem->text();
 	strong.replace(" ","");
 	d = strong.toDouble(&bOK);
-	if(bOK) m_pBody->Frame(sel)->m_uPosition = d / pMainFrame->m_mtoUnit;
+	if(bOK) m_pBody->Frame(sel)->m_Position.x = d / pMainFrame->m_mtoUnit;
 
 	pItem = m_pFrameModel->item(sel,1);
 	strong = pItem->text();
@@ -3838,10 +3838,10 @@ void GL3dBodyDlg::ResizeTables()
 	m_pctrlFrameTable->setColumnWidth(0,ColumnWidth);
 	m_pctrlFrameTable->setColumnWidth(1,ColumnWidth);
 //	m_pctrlFrameTable->setColumnWidth(2,ColumnWidth);
-	ColumnWidth = (int)((double)(m_pctrlPointTable->width())/3.5);
+	ColumnWidth = (int)((double)(m_pctrlPointTable->width())/4);
 	m_pctrlPointTable->setColumnWidth(0,ColumnWidth);
 	m_pctrlPointTable->setColumnWidth(1,ColumnWidth);
-//	m_pctrlPointTable->setColumnWidth(2,ColumnWidth);
+	m_pctrlPointTable->setColumnWidth(2,ColumnWidth);
 }
 
 

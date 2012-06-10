@@ -920,7 +920,7 @@ void PanelAnalysisDlg::ComputeAeroCoefs(double V0, double VDelta, int nrhs)
 	int q;
 	QString str, strong;
 
-	if(m_pWPolar->m_WPolarType !=FIXEDAOAPOLAR)
+	if(m_pWPolar->m_WPolarType!=FIXEDAOAPOLAR)
 	{
 		for (q=0; q<nrhs; q++)
 		{
@@ -1022,7 +1022,6 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 
 				Force += m_WingForce[qrhs*MAXWINGS+iw];
 				IDrag += m_WingIDrag[qrhs*MAXWINGS+iw];
-
 				//Get viscous interpolations
 				m_pWingList[iw]->PanelComputeViscous(QInf, Alpha, m_pWPolar, WingVDrag, m_pWPolar->m_bViscous, OutString);
 				VDrag += WingVDrag;
@@ -1059,6 +1058,7 @@ void PanelAnalysisDlg::ComputePlane(double Alpha, double QInf, int qrhs)
 		m_CL          =       Force.dot(WindNormal)    /m_pWPolar->m_WArea;
 		m_CX          =       Force.dot(WindDirection) /m_pWPolar->m_WArea;
 		m_CY          =       Force.dot(WindSide)      /m_pWPolar->m_WArea;
+
 		m_InducedDrag =  1.0*IDrag/m_pWPolar->m_WArea;
 		m_ViscousDrag =  1.0*VDrag/m_pWPolar->m_WArea;
 

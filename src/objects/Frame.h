@@ -43,7 +43,11 @@ public:
 	void CopyFrame(CFrame *pFrame);
 	void CopyPoints(QList<CVector> *m_pPointList);
 
-	void SetuPosition(double u, int iAxis);
+	void SetPosition(CVector Pos);
+	void SetuPosition(double u);
+	void SetvPosition(double v);
+	void SetwPosition(double w);
+
 	void RotateFrameY(double Angle);
 
 	int PointSize() {return m_CtrlPoint.size();};
@@ -53,7 +57,7 @@ public:
 
 	int m_iHighlight, m_iSelect;
 
-	double m_uPosition;
+	CVector m_Position;
 	QList <CVector> m_CtrlPoint;	// the point's positions
 };
 
