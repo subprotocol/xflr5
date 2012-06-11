@@ -2606,7 +2606,7 @@ bool QMiarex::CreateWakeElems(int PanelIndex)
 	int l, n0, n1,n2, n3;
 	double dxA, dxB;
 	int mw = m_WakeSize;// number of wake panels
-	CVector N, LATB, TALB;
+	CVector LATB, TALB;
 	CVector LA, LB, TA,TB;//wake panel's corner points
 
 	int NXWakePanels;

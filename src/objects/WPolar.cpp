@@ -47,7 +47,7 @@ CWPolar::CWPolar()
 	m_bAVLControls  = false;
 
 	m_NXWakePanels = 1;
-	m_TotalWakeLength = 1.0;
+	m_TotalWakeLength = 100.0;
 	m_WakePanelFactor =1.1;
 
 	m_AnalysisMethod = LLTMETHOD;

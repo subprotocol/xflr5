@@ -3634,8 +3634,8 @@ void GL3dBodyDlg::SetupLayout()
 			SplineParams->addWidget(m_pctrlHoopDegree,2,3);
 			SplineParams->addWidget(m_pctrlNXPanels,3,2);
 			SplineParams->addWidget(m_pctrlNHoopPanels,3,3);
-			SplineParams->addWidget(labWeight,4,1);
-			SplineParams->addWidget(m_pctrlEdgeWeight,4,2,1,2);
+//			SplineParams->addWidget(labWeight,4,1);
+//			SplineParams->addWidget(m_pctrlEdgeWeight,4,2,1,2);
 			SplineParams->addWidget(labBunch,5,1);
 			SplineParams->addWidget(m_pctrlPanelBunch,5,2,1,2);
 		}
