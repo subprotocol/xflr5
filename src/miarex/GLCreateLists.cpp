@@ -434,7 +434,6 @@ void GLCreateGeom(void *pQMiarex, CWing *pWing, int List, CBody *pBody)
 }
 
 
-
 void GLCreateCp(void *pQMiarex, CVector *pNode, CPanel *pPanel, CWOpp *pWOpp, CPOpp *pPOpp)
 {
 	if(!pWOpp && !pPOpp)
@@ -650,6 +649,7 @@ void GLDrawCpLegend(void *pQMiarex)
         //glEndList();
 }
 
+
 void GLCreateCpLegendClr(void *pQMiarex)
 {
 	int i;
@@ -714,7 +714,8 @@ void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 	// pWOpp is related to the pWing
 
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
+
+	if(!pWing || !pWOpp) return;
 	
 	QColor color;
 	int style, width;
@@ -1298,8 +1299,112 @@ void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel)
 }
 
 
+void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar)
+{
+	int p;
+	CVector A, B, C, D, AC, BD;
+	glEnable (GL_LINE_STIPPLE);
+	glLineStipple (1, 0xFFFF);
+
+	QMiarex *pMiarex = (QMiarex*)pQMiarex;
+
+	glNewList(VLMVORTICES,GL_COMPILE);
+	{
+		pMiarex->m_GLList++;
+
+		glPolygonMode(GL_FRONT,GL_LINE);
+		glLineWidth(1.0);
+		glColor3d(0.7,0.0,0.0);
+		for (p=0; p<pMiarex->m_MatSize; p++)
+		{
+			if(!pPanel[p].m_bIsTrailing)
+			{
+				if(pPanel[p].m_Pos<=MIDSURFACE)
+				{
+					A = pPanel[p].VA;
+					B = pPanel[p].VB;
+					C = pPanel[p-1].VB;
+					D = pPanel[p-1].VA;
+				}
+				else
+				{
+					A = pPanel[p].VA;
+					B = pPanel[p].VB;
+					C = pPanel[p+1].VB;
+					D = pPanel[p+1].VA;
+				}
+			}
+			else
+			{
+				A = pPanel[p].VA;
+				B = pPanel[p].VB;
+				// we define point AA=A+1 and BB=B+1
+				C.x =  pNode[pPanel[p].m_iTB].x
+					+ (pNode[pPanel[p].m_iTB].x-pPanel[p].VB.x)/3.0;
+				C.y =  pNode[pPanel[p].m_iTB].y;
+				C.z =  pNode[pPanel[p].m_iTB].z;
+				D.x =  pNode[pPanel[p].m_iTA].x
+					+ (pNode[pPanel[p].m_iTA].x-pPanel[p].VA.x)/3.0;
+				D.y =  pNode[pPanel[p].m_iTA].y;
+				D.z =  pNode[pPanel[p].m_iTA].z;
+			}
+
+			//next we "shrink" the points to avoid confusion with panels sides
+			AC = C-A;
+			BD = D-B;
+
+			AC *= 0.03;
+			A  += AC;
+			C  -= AC;
+			BD *= 0.03;
+			B  += BD;
+			D  -= BD;
+
+			if(pWPolar && pWPolar->m_bVLM1)
+			{
+				glLineStipple (1, 0xFFFF);
+				glBegin(GL_LINES);
+				{
+					glVertex3d(A.x, A.y, A.z);
+					glVertex3d(B.x, B.y, B.z);
+				}
+				glEnd();
+				glLineStipple (1, 0x0F0F);
+				glBegin(GL_LINES);
+				{
+					glVertex3d(A.x, A.y, A.z);
+					glVertex3d(D.x, D.y, D.z);
+				}
+				glEnd();
+				glBegin(GL_LINES);
+				{
+					glVertex3d(B.x, B.y, B.z);
+					glVertex3d(C.x, C.y, C.z);
+				}
+				glEnd();
+			}
+			else if(!pWPolar || (pWPolar && !pWPolar->m_bVLM1))
+			{
+				glBegin(GL_LINE_STRIP);
+				{
+					glVertex3d(A.x, A.y, A.z);
+					glVertex3d(B.x, B.y, B.z);
+					glVertex3d(C.x, C.y, C.z);
+					glVertex3d(D.x, D.y, D.z);
+					glVertex3d(A.x, A.y, A.z);
+				}
+				glEnd();
+			}
+		}
+		glDisable (GL_LINE_STIPPLE);
+	}
+	glEndList();
+}
+
+
 void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp)
 {
+	if(!pWPolar || !pWOpp) return;
 	int style, width;
 	QColor color;
 	double forcez,forcex,glx, gly;
@@ -1307,7 +1412,6 @@ void GLCreateLiftForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp)
 	double sign;
 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-//	MainFrame *pMainFrame = (MainFrame*)pMiarex->m_pMainFrame;
 
 	glNewList(LIFTFORCE, GL_COMPILE);
 	{
@@ -1378,6 +1482,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 //	- The yaw is about the vertical body axis, positive with the nose to starboard.
 //	- Pitch is about an axis perpendicular to the longitudinal plane of symmetry, positive nose up.
 //	-- Wikipedia flight dynamics --
+	if(!pWing || !pWPolar || !pWOpp) return;
 
 	int i;
 	int style, width;
@@ -1544,6 +1649,7 @@ void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOp
 
 void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp, int List)
 {
+	if(!pWing || !pWPolar || !pWOpp) return;
 	int i,j,k;
 	int style, width;
 	CVector C, CL;
@@ -1923,7 +2029,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
-	if(!pWOpp || pWOpp->m_AnalysisMethod==LLTMETHOD)
+	if(!pWPolar || !pWOpp || pWOpp->m_AnalysisMethod==LLTMETHOD)
 	{
 		glNewList(SURFACESPEEDS, GL_COMPILE);
 		pMiarex->m_GLList++;
@@ -2063,6 +2169,7 @@ void GLCreateSurfSpeeds(void *pQMiarex, CPanel *pPanel, CWPolar *pWPolar, CWOpp 
 
 void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 {
+	if(!pWing || !pWOpp) return;
 	int i,j,k,m, style;
 	double yrel, xt, yt, zt, yob ;
 	CVector Pt;
@@ -2231,112 +2338,6 @@ void GLCreateTrans(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List)
 }
 
 
-void GLCreateVortices(void *pQMiarex, CPanel *pPanel, CVector *pNode, CWPolar *pWPolar)
-{
-	int p;
-	CVector A, B, C, D, AC, BD;
-	glEnable (GL_LINE_STIPPLE);
-	glLineStipple (1, 0xFFFF);
-
-	QMiarex *pMiarex = (QMiarex*)pQMiarex;
-	
-	glNewList(VLMVORTICES,GL_COMPILE);
-	{
-		pMiarex->m_GLList++;
-
-		glPolygonMode(GL_FRONT,GL_LINE);
-		glLineWidth(1.0);
-		glColor3d(0.7,0.0,0.0);
-		for (p=0; p<pMiarex->m_MatSize; p++)
-		{
-			if(!pPanel[p].m_bIsTrailing)
-			{
-				if(pPanel[p].m_Pos<=MIDSURFACE)
-				{
-					A = pPanel[p].VA;
-					B = pPanel[p].VB;
-					C = pPanel[p-1].VB;
-					D = pPanel[p-1].VA;
-				}
-				else
-				{
-					A = pPanel[p].VA;
-					B = pPanel[p].VB;
-					C = pPanel[p+1].VB;
-					D = pPanel[p+1].VA;
-				}
-			}
-			else
-			{
-				A = pPanel[p].VA;
-				B = pPanel[p].VB;
-				// we define point AA=A+1 and BB=B+1
-				C.x =  pNode[pPanel[p].m_iTB].x
-					+ (pNode[pPanel[p].m_iTB].x-pPanel[p].VB.x)/3.0;
-				C.y =  pNode[pPanel[p].m_iTB].y;
-				C.z =  pNode[pPanel[p].m_iTB].z;
-				D.x =  pNode[pPanel[p].m_iTA].x
-					+ (pNode[pPanel[p].m_iTA].x-pPanel[p].VA.x)/3.0;
-				D.y =  pNode[pPanel[p].m_iTA].y;
-				D.z =  pNode[pPanel[p].m_iTA].z;
-			}
-
-			//next we "shrink" the points to avoid confusion with panels sides
-			AC = C-A;
-			BD = D-B;
-
-			AC *= 0.03;
-			A  += AC;
-			C  -= AC;
-			BD *= 0.03;
-			B  += BD;
-			D  -= BD;
-
-			if(pWPolar && pWPolar->m_bVLM1)
-			{
-				glLineStipple (1, 0xFFFF);
-				glBegin(GL_LINES);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(B.x, B.y, B.z);
-				}
-				glEnd();
-				glLineStipple (1, 0x0F0F);
-				glBegin(GL_LINES);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(D.x, D.y, D.z);
-				}
-				glEnd();
-				glBegin(GL_LINES);
-				{
-					glVertex3d(B.x, B.y, B.z);
-					glVertex3d(C.x, C.y, C.z);
-				}
-				glEnd();
-			}
-			else if(!pWPolar || (pWPolar && !pWPolar->m_bVLM1))
-			{
-				glBegin(GL_LINE_STRIP);
-				{
-					glVertex3d(A.x, A.y, A.z);
-					glVertex3d(B.x, B.y, B.z);
-					glVertex3d(C.x, C.y, C.z);
-					glVertex3d(D.x, D.y, D.z);
-					glVertex3d(A.x, A.y, A.z);
-				}
-				glEnd();
-			}
-		}
-		glDisable (GL_LINE_STIPPLE);
-	}
-	glEndList();
-}
-
-
-
-
-
 void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWPolar)
 {
 	QMiarex *pMiarex = (QMiarex*)pQMiarex;
@@ -2467,7 +2468,6 @@ void GLDrawWingLegend(void *pQMiarex, CWing *pWing, CPlane *pPlane, CWPolar *pWP
 	}
         //glEndList();
 }
-
 
 
 void GLDrawWOppLegend(void* pQMiarex, CWing *pWing, CWOpp *pWOpp)
@@ -2783,6 +2783,7 @@ void GLCreatePanelForce(void *pQMiarex, CWPolar *pWPolar, CWOpp *pWOpp, CPOpp *p
 
 void GLDrawPanelForceLegend(void *pQMiarex, CWPolar *pWPolar)
 {
+	if(!pWPolar) return;
 	QMiarex * pMiarex = (QMiarex*)pQMiarex;
 	ThreeDWidget *pGLWidget = (ThreeDWidget*)pMiarex->s_p3dWidget;
 	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;

@@ -4866,16 +4866,15 @@ void QMiarex::GLDraw3D()
 				m_GLList -=1;
 			}
 		}
-		if (m_pWingList[0] && m_pWOpp[0])
+
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			for(int iw=0; iw<MAXWINGS; iw++)
+			if(m_pWingList[iw] && m_pWOpp[iw])
 			{
-				if(m_pWingList[iw])
-				{
-					GLCreateDrag(this, m_pWingList[iw], m_pCurWPolar, m_pWOpp[iw], VLMWINGDRAG+iw);
-				}
+				GLCreateDrag(this, m_pWingList[iw], m_pCurWPolar, m_pWOpp[iw], VLMWINGDRAG+iw);
 			}
 		}
+
 		m_bResetglDrag = false;
 	}
 
@@ -4889,14 +4888,11 @@ void QMiarex::GLDraw3D()
 				m_GLList--;
 			}
 		}
-		if(m_pWingList[0] && m_pWOpp[0])
+		for(int iw=0; iw<MAXWINGS; iw++)
 		{
-			for(int iw=0; iw<MAXWINGS; iw++)
+			if(m_pWingList[iw] && m_pWOpp[iw])
 			{
-				if(m_pWingList[iw])
-				{
-					GLCreateDownwash(this, m_pWingList[iw],m_pWOpp[iw], VLMWINGWASH+iw);
-				}
+				GLCreateDownwash(this, m_pWingList[iw],m_pWOpp[iw], VLMWINGWASH+iw);
 			}
 		}
 
@@ -6927,17 +6923,8 @@ void QMiarex::On3DView()
 
 	m_bIs3DScaleSet = false;
 
-	if(m_pCurPlane) m_pCurBody = m_pCurPlane->Body();
-	else            m_pCurBody = NULL;
-
 	m_iView =W3DVIEW;
 
-	if(m_pCurPlane && m_pCurPlane->Body())
-	{
-		m_pCurBody = m_pCurPlane->Body();
-		m_bResetglBody = true;
-	}
-	else m_pCurBody = NULL;
 	SetControls();
 
 	pMainFrame->SetCentralWidget();
@@ -14410,6 +14397,7 @@ void QMiarex::SetWPlr(bool bCurrent, QString WPlrName)
 		m_pCurWPolar = NULL;
 		m_pCurPOpp = NULL;
 		m_pCurWOpp = NULL;
+		for(int iw=0; iw<MAXWINGS; iw++) m_pWOpp[iw] = NULL;
 		pMainFrame->UpdateWOpps();
 	}
 
