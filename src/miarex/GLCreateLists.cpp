@@ -1184,34 +1184,30 @@ void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, 
 }
 
 
-void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
+void GLCreateMesh(int iList, int size, CPanel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack)
 {
-	QMiarex * pMiarex = (QMiarex*)pQMiarex;
-	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
+//	MainFrame *pMainFrame = (MainFrame*)pMiarex->s_pMainFrame;
 
-	QColor color;
 	int iLA, iLB, iTA, iTB;
 	int p;
 	CVector  N;
 	N.Set(0.0, 0.0, 0.0);
 
-	glNewList(MESHPANELS,GL_COMPILE);
+	glNewList(iList,GL_COMPILE);
 	{
-		pMiarex->m_GLList++;
 		glEnable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //		glEnable(GL_POLYGON_OFFSET_FILL);
 //		glPolygonOffset(1.0, 1.0);
 
-		color = pMiarex->m_VLMColor;
 //		style = pMiarex->m_VLMStyle;
 //		width = pMiarex->m_VLMWidth;
 
 		glLineWidth(1.0);
 
-		glColor3d(color.redF(),color.greenF(),color.blueF());
+		glColor3d(PanelColor.redF(),PanelColor.greenF(),PanelColor.blueF());
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
+		for (p=0; p<size; p++)
 		{
 				glBegin(GL_QUADS);
 				{
@@ -1231,24 +1227,25 @@ void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel)
 	}
 	glEndList();
 
-	glNewList(MESHBACK,GL_COMPILE);
+	if(!bBack) return;
+
+	glNewList(iList+1,GL_COMPILE);
 	{
-		pMiarex->m_GLList++;
 		glEnable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_POLYGON_OFFSET_FILL);
 		glPolygonOffset(1.0, 1.0);
 
-		color = pMainFrame->m_BackgroundColor;
+//		color = pMainFrame->m_BackgroundColor;
 //		style = pMiarex->m_VLMStyle;
 //		width = pMiarex->m_VLMWidth;
 
-		glColor3d(color.redF(),color.greenF(),color.blueF());
+		glColor3d(BackColor.redF(),BackColor.greenF(),BackColor.blueF());
 
 		glLineWidth(1.0);
 		glDisable (GL_LINE_STIPPLE);
 
-		for (p=0; p<pMiarex->m_MatSize; p++)
+		for (p=0; p<size; p++)
 		{
 				glBegin(GL_QUADS);
 				{

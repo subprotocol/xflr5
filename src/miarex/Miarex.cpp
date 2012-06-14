@@ -178,8 +178,6 @@ QMiarex::QMiarex(QWidget *parent)
 
 		m_WPlrGraph[ig].SetXMajGrid(true, QColor(120,120,120),2,1);
 		m_WPlrGraph[ig].SetYMajGrid(true, QColor(120,120,120),2,1);
-		m_WPlrGraph[ig].SetXTitle(tr("Cd"));
-		m_WPlrGraph[ig].SetYTitle(tr("Cl"));
 		m_WPlrGraph[ig].SetXMin(-0.0);
 		m_WPlrGraph[ig].SetXMax( 0.1);
 		m_WPlrGraph[ig].SetYMin(-0.01);
@@ -187,6 +185,16 @@ QMiarex::QMiarex(QWidget *parent)
 		m_WPlrGraph[ig].SetType(0);
 		m_WPlrGraph[ig].SetMargin(50);
 	}
+
+	m_WPlrGraph[0].SetGraphName(tr("Wing Polar Graph 1"));
+	m_WPlrGraph[1].SetGraphName(tr("Wing Polar Graph 2"));
+	m_WPlrGraph[2].SetGraphName(tr("Wing Polar Graph 3"));
+	m_WPlrGraph[3].SetGraphName(tr("Wing Polar Graph 4"));
+	m_WPlrGraph[0].SetVariables(4,1);
+	m_WPlrGraph[1].SetVariables(0,1);
+	m_WPlrGraph[2].SetVariables(0,5);
+	m_WPlrGraph[3].SetVariables(0,12);
+	for(int ig=0; ig<4; ig++) SetWGraphTitles(m_WPlrGraph+ig);
 
 	m_CpGraph.SetXMajGrid(true, QColor(120,120,120),2,1);
 	m_CpGraph.SetYMajGrid(true, QColor(120,120,120),2,1);
@@ -267,6 +275,10 @@ QMiarex::QMiarex(QWidget *parent)
 	m_WingGraph[1].SetYVariable(1);
 	m_WingGraph[2].SetYVariable(2);
 	m_WingGraph[3].SetYVariable(3);
+	m_WingGraph[0].SetGraphName("Wing Graph 1");
+	m_WingGraph[1].SetGraphName("Wing Graph 2");
+	m_WingGraph[2].SetGraphName("Wing Graph 3");
+	m_WingGraph[3].SetGraphName("Wing Graph 4");
 
 	m_CpColor = QColor(255,100,150);
 	m_CpStyle = 0;
@@ -274,10 +286,7 @@ QMiarex::QMiarex(QWidget *parent)
 	m_bShowCpPoints = false;
 	m_bShowCp       = true;
 
-	m_WPlrGraph[0].SetVariables(4,1);
-	m_WPlrGraph[1].SetVariables(0,1);
-	m_WPlrGraph[2].SetVariables(0,5);
-	m_WPlrGraph[3].SetVariables(0,12);
+
 
 	m_iView = W3DVIEW;
 	m_iWingView = 1;
@@ -301,15 +310,6 @@ QMiarex::QMiarex(QWidget *parent)
 	memset(m_RHS, 0, sizeof(m_RHS));
 	memset(m_RHSRef, 0, sizeof(m_RHSRef));
 
-	m_WingGraph[0].SetGraphName("Wing Graph 1");
-	m_WingGraph[1].SetGraphName("Wing Graph 2");
-	m_WingGraph[2].SetGraphName("Wing Graph 3");
-	m_WingGraph[3].SetGraphName("Wing Graph 4");
-
-	m_WPlrGraph[0].SetGraphName(tr("Wing Polar Graph 1"));
-	m_WPlrGraph[1].SetGraphName(tr("Wing Polar Graph 2"));
-	m_WPlrGraph[2].SetGraphName(tr("Wing Polar Graph 3"));
-	m_WPlrGraph[3].SetGraphName(tr("Wing Polar Graph 4"));
 
 	m_CpGraph.SetGraphName(tr("Cp Graph"));
 
@@ -4606,11 +4606,6 @@ void QMiarex::GLCallViewLists()
 
 	if (m_pCurWOpp) glRotated(m_pCurWOpp->m_Alpha, 0.0, 1.0, 0.0);
 
-
-	if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD && !m_pCurWPolar->m_bTiltedGeom && m_bWakePanels)
-		glCallList(WINGWAKEPANELS);
-
-
 	if(m_bVLMPanels && m_pCurWing)
 	{
 		if(!(m_b3DCp&&m_pCurWOpp) && !m_bSurfaces) glCallList(MESHBACK);
@@ -4776,6 +4771,21 @@ void QMiarex::GLDraw3D()
 		m_bResetglGeom = false;
 	}
 
+	if((m_bResetglMesh||m_bResetglWake) && m_iView==W3DVIEW)
+	{
+		if(glIsList(WINGWAKEPANELS))
+		{
+			glDeleteLists(WINGWAKEPANELS,1);
+			m_GLList-=1;
+		}
+
+		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
+		{
+			GLCreateMesh(WINGWAKEPANELS, m_WakeSize, m_WakePanel, m_WakeNode, m_WakeColor, pMainFrame->m_BackgroundColor, false);
+		}
+		m_bResetglWake = false;
+	}
+
 	if(m_bResetglMesh && m_bVLMPanels && (m_iView==W3DVIEW || m_iView==WSTABVIEW))
 	{
 		if(glIsList(MESHPANELS))
@@ -4783,7 +4793,9 @@ void QMiarex::GLDraw3D()
 			glDeleteLists(MESHPANELS,2);
 			m_GLList-=2;
 		}
-		GLCreateMesh(this, m_Node, m_Panel);
+		GLCreateMesh(MESHPANELS, m_MatSize, m_Panel, m_Node, m_VLMColor, pMainFrame->m_BackgroundColor);
+		m_GLList+=2;
+
 		if(glIsList(VLMCTRLPTS))
 		{
 			glDeleteLists(VLMCTRLPTS,2);
@@ -4794,19 +4806,6 @@ void QMiarex::GLDraw3D()
 		m_bResetglMesh = false;
 	}
 
-	if(m_bResetglWake && m_iView==W3DVIEW)
-	{
-		if(glIsList(WINGWAKEPANELS))
-		{
-//			glDeleteLists(WINGWAKEPANELS,1);
-//			m_GLList-=1;
-		}
-		if (m_pCurWPolar && m_pCurWPolar->m_AnalysisMethod==PANELMETHOD)
-		{
-//			GLCreateWakePanels(WINGWAKEPANELS);
-		}
-		m_bResetglWake = false;
-	}
 
 	if((m_bResetglLift || m_bResetglOpp) && m_iView==W3DVIEW)
 	{
@@ -5496,6 +5495,8 @@ bool QMiarex::InitializePanels()
 	//back-up the current geometry
 	memcpy(&m_MemPanel, &m_Panel, m_MatSize* sizeof(CPanel));
 	memcpy(&m_MemNode,  &m_Node,  m_nNodes * sizeof(CVector));
+	memcpy(&m_RefWakePanel, &m_WakePanel, m_WakeSize* sizeof(CPanel));
+	memcpy(&m_RefWakeNode,  &m_WakeNode,  m_nWakeNodes * sizeof(CVector));
 
 
 //	dlg.setValue(100);
@@ -12061,7 +12062,7 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 	m_pPanelDlg->InitDialog();
 	m_pPanelDlg->show();
 	m_pPanelDlg->StartAnalysis();
-	m_bResetglMesh = true; //TODO remove
+//	m_bResetglMesh = true;
 
 	if(!m_bLogFile || !m_pPanelDlg->m_bWarning) m_pPanelDlg->hide();
 
@@ -12071,6 +12072,8 @@ void QMiarex::PanelAnalyze(double V0, double VMax, double VDelta, bool bSequence
 
 	if(m_pCurPlane)     SetPOpp(false, m_pPanelDlg->m_Alpha);
 	else if(m_pCurWing) SetWOpp(false, m_pPanelDlg->m_Alpha);
+
+	m_bResetglWake=true; //TODO remove
 }
 
 
@@ -12206,8 +12209,6 @@ void QMiarex::RotateGeomY(double const &Angle, CVector const &P)
 void QMiarex::RotateGeomZ(CPanel *pPanel, CVector *pNode, CPanel *pWakePanel, CVector *pWakeNode, double const &Beta, CVector const &P)
 {
 	int n, p, pw, kw, lw;
-//	double cosb = cos(Beta*PI/180.0);
-//	double sinb = sin(Beta*PI/180.0);
 	int iLA, iLB, iTA, iTB;
 	CVector LATB, TALB, Pt, Trans;
 
@@ -13589,9 +13590,9 @@ bool QMiarex::SetPOpp(bool bCurrent, double x)
 	QString strong;
 	bool bOK;
 
-	m_bResetglMesh   = true;
+//	m_bResetglMesh   = true;
+//	m_bResetglWake   = true;
 	m_bResetglOpp    = true;
-	m_bResetglWake   = true;
 	m_bResetglStream = true;
 	m_bResetglFlow   = true;
 	m_bResetglLegend = true;
@@ -14540,9 +14541,9 @@ void QMiarex::SetWPlrLegendPos()
 
 bool QMiarex::SetWOpp(bool bCurrent, double x)
 {
-	m_bResetglMesh   = true;
+//	m_bResetglMesh   = true;
+//	m_bResetglWake   = true;
 	m_bResetglOpp    = true;
-	m_bResetglWake   = true;
 	m_bResetglStream = true;
 	m_bResetglFlow   = true;
 	m_bResetglLegend = true;

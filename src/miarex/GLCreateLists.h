@@ -34,7 +34,7 @@ void GLDrawCpLegend(void *pQMiarex);
 void GLCreateCpLegendClr(void *pQMiarex);
 void GLCreateDownwash(void *pQMiarex, CWing *pWing, CWOpp *pWOpp, int List);
 void GLCreateDrag(void *pQMiarex, CWing *pWing, CWPolar* pWPolar, CWOpp *pWOpp, int List);
-void GLCreateMesh(void *pQMiarex, CVector *pNode, CPanel *pPanel);
+void GLCreateMesh(int iList, int size, CPanel *pPanel, CVector *pNode, QColor PanelColor, QColor BackColor, bool bBack=true);
 void GLCreateCtrlPts(void *pQMiarex, CPanel *pPanel);
 void GLCreateLiftStrip(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp, int List);
 void GLCreateMoments(void *pQMiarex, CWing *pWing, CWPolar *pWPolar, CWOpp *pWOpp);

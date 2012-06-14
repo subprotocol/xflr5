@@ -1636,15 +1636,6 @@ void PanelAnalysisDlg::InitDialog()
 	m_pXFile = new QFile(FileName);
 	if (!m_pXFile->open(QIODevice::WriteOnly | QIODevice::Text)) m_pXFile = NULL;
 
-/*	if(m_pWPolar && (m_pWPolar->m_bTiltedGeom || m_pWPolar->m_bWakeRollUp))
-	{
-		//back-up the current geometry if the analysis is to be performed on the tilted geometry
-		memcpy(m_pMemPanel, m_pPanel, m_MatSize * sizeof(CPanel));
-		memcpy(m_pMemNode,  m_pNode,  m_nNodes * sizeof(CVector));
-		memcpy(m_pRefWakePanel, m_pWakePanel, m_WakeSize * sizeof(CPanel));
-		memcpy(m_pRefWakeNode,  m_pWakeNode,  m_nWakeNodes * sizeof(CVector));
-	}*/
-
 	m_pctrlTextOutput->clear();
 
 	m_bPointOut = false;
@@ -2585,17 +2576,6 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 	{
 		//just get the horseshoe vortex's influence
 		VLMCmn(pPanel->VA, pPanel->VB, C, V, bAll);
-/*		if(m_pWPolar->m_bGround)
-		{
-			AA = pPanel->VA;
-			BB = pPanel->VB;
-			AA.z = -AA.z - 2.0*m_pWPolar->m_Height;//correction in V4.0
-			BB.z = -BB.z - 2.0*m_pWPolar->m_Height;
-			VLMCmn(AA, BB, C, VG, bAll);
-			V.x += VG.x;
-			V.y += VG.y;
-			V.z -= VG.z;
-		}*/
 	}
 	else
 	{
@@ -2606,21 +2586,6 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 			if(bAll)
 			{
 				VLMQmn(pPanel->VA, pPanel->VB, m_pPanel[p-1].VA, m_pPanel[p-1].VB, C, V);
-/*				if(m_pWPolar->m_bGround)
-				{
-					AA  = pPanel->VA;
-					BB  = pPanel->VB;
-					AA1 = m_pPanel[p-1].VA;
-					BB1 = m_pPanel[p-1].VB;
-					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
-					BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
-					AA1.z = -AA1.z - 2.0*m_pWPolar->m_Height;
-					BB1.z = -BB1.z - 2.0*m_pWPolar->m_Height;
-					VLMQmn(AA, BB, AA1, BB1, C, VG);
-					V.x += VG.x;
-					V.y += VG.y;
-					V.z -= VG.z;
-				}*/
 			}
 		}
 		else
@@ -2636,40 +2601,17 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 				BB1.x = m_pNode[pPanel->m_iTB].x + (m_pNode[pPanel->m_iTB].x-pPanel->VB.x)/3.0;
 				BB1.y = m_pNode[pPanel->m_iTB].y;
 				BB1.z = m_pNode[pPanel->m_iTB].z;
-/*				if(m_pWPolar->m_bGround)
-				{
-					AA  = pPanel->VA;
-					BB  = pPanel->VB;
-					AAG = AA1;
-					BBG = BB1;
-					AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
-					BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
-					AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
-					BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
-				}*/
+
 				// first we get the quad vortex's influence
 				if (bAll)
 				{
 					VLMQmn(pPanel->VA, pPanel->VB, AA1, BB1, C, V);
-/*					if(m_pWPolar->m_bGround)
-					{
-						VLMQmn(AA, BB, AAG, BBG, C, VG);
-						V.x += VG.x;
-						V.y += VG.y;
-						V.z -= VG.z;
-					}*/
+
 				}
 
 				//we just add a trailing horseshoe vortex's influence to simulate the wake
 				VLMCmn(AA1,BB1,C,VT,bAll);
 
-/*				if(m_pWPolar->m_bGround)
-				{
-					VLMCmn(AAG, BBG, C, VG);
-					V.x += VG.x;
-					V.y += VG.y;
-					V.z -= VG.z;
-				}*/
 				V.x += VT.x;
 				V.y += VT.y;
 				V.z += VT.z;
@@ -2682,22 +2624,6 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 				if (bAll)
 				{
 					VLMQmn(pPanel->VA, pPanel->VB, m_pWakePanel[pw].VA, m_pWakePanel[pw].VB, C, V);
-/*					if(m_pWPolar->m_bGround)
-					{
-						AA  = pPanel->VA;
-						BB  = pPanel->VB;
-						AAG = m_pWakePanel[pw].VA;
-						BBG = m_pWakePanel[pw].VB;
-						AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
-						BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
-						AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
-						BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
-
-						VLMQmn(AA, BB, AAG, BBG, C, VG);
-						V.x += VG.x;
-						V.y += VG.y;
-						V.z -= VG.z;
-					}*/
 				}
 
 				//each wake panel has the same vortex strength than the T.E. panel
@@ -2709,22 +2635,7 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 						VLMQmn(m_pWakePanel[pw  ].VA, m_pWakePanel[pw  ].VB,
 							   m_pWakePanel[pw+1].VA, m_pWakePanel[pw+1].VB, C, VT);
 						V += VT;
-/*						if(m_pWPolar->m_bGround)
-						{
-							AA  = m_pWakePanel[pw].VA;
-							BB  = m_pWakePanel[pw].VB;
-							AAG = m_pWakePanel[pw+1].VA;
-							BBG = m_pWakePanel[pw+1].VB;
-							AA.z  = -AA.z - 2.0*m_pWPolar->m_Height;
-							BB.z  = -BB.z - 2.0*m_pWPolar->m_Height;
-							AAG.z = -AAG.z - 2.0*m_pWPolar->m_Height;
-							BBG.z = -BBG.z - 2.0*m_pWPolar->m_Height;
 
-							VLMQmn(AA, BB, AAG, BBG, C, VG);
-							V.x += VG.x;
-							V.y += VG.y;
-							V.z -= VG.z;
-						}*/
 						pw++;
 					}
 				}
@@ -2735,13 +2646,6 @@ void PanelAnalysisDlg::VLMGetVortexInfluence(CPanel *pPanel, CVector const &C, C
 //
 //				VLMCmn(m_pWakePanel[pw].A, m_pWakePanel[pw].B,C,VT,bAll);
 //				V += VT;
-//				if(m_pWPolar->m_bGround)
-//				{
-//					VLMCmn(AAG, BBG, C, VG);
-//					V.x += VG.x;
-//					V.y += VG.y;
-//					V.z -= VG.z;
-//				}
 //
 // simple really !
 //
