@@ -7894,17 +7894,18 @@ void QMiarex::OnDefineStabPolar()
 	m_bArcball = false;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 
-	StabPolarDlg dlg;
 	StabPolarDlg::s_StabPolar.m_Viscosity     = WPolarDlg::s_WPolar.m_Viscosity;
 	StabPolarDlg::s_StabPolar.m_Density       = WPolarDlg::s_WPolar.m_Density;
 	StabPolarDlg::s_StabPolar.m_RefAreaType   = WPolarDlg::s_WPolar.m_RefAreaType;
 	StabPolarDlg::s_StabPolar.m_bThinSurfaces = WPolarDlg::s_WPolar.m_bThinSurfaces;
 
 
-	dlg.InitDialog(m_pCurPlane, m_pCurWing, m_pCurWPolar);
-	dlg.move(pMainFrame->m_DlgPos);
-	int res = dlg.exec();
-	pMainFrame->m_DlgPos = dlg.pos();
+	StabPolarDlg m_StabPolarDlg;
+
+	m_StabPolarDlg.InitDialog(m_pCurPlane, m_pCurWing);
+	m_StabPolarDlg.move(pMainFrame->m_DlgPos);
+	int res = m_StabPolarDlg.exec();
+	pMainFrame->m_DlgPos = m_StabPolarDlg.pos();
 
 	if(res == QDialog::Accepted)
 	{

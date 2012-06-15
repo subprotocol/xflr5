@@ -17,6 +17,7 @@
 
 
 xflr5 v6.07, April xxth, 2012
+	- fixed the issue with incorrect 3D-panel calculations
 	- Corrected the incorrect aileron control derivatives
 	- Corrected the bug in wing analysis with ground effect
 	- Corrected the bug in type 4 analysis for wings and planes

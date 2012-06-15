@@ -86,7 +86,7 @@ private:
 	QLabel *m_pctrlMassUnit, *m_pctrlMassUnit2, *m_pctrlLengthUnit, *m_pctrlLengthUnit2;
 	QLabel *m_pctrlVolumeMassLabel, *m_pctrlTotalMassLabel;
 	QLabel *m_pctrlInertiaUnit1, *m_pctrlInertiaUnit2;
-	QTableView *m_pctrlMassView;
+	QTableView *m_pctrlMassTable;
 	QStandardItemModel *m_pMassModel;
 	FloatEditDelegate *m_pFloatDelegate;
 	FloatEdit *m_pctrlCoGIxx, *m_pctrlCoGIyy, *m_pctrlCoGIzz, *m_pctrlCoGIxz;

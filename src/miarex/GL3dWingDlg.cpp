@@ -1481,6 +1481,7 @@ void GL3dWingDlg::OnDeleteSection()
 		QMessageBox::warning(this, tr("Warning"),tr("The first section cannot be deleted"));
 		return;
 	}
+	m_pctrlWingTable->closePersistentEditor(m_pctrlWingTable->currentIndex());
 
 	int ny, k, size;
 
@@ -1514,6 +1515,8 @@ void GL3dWingDlg::OnDeleteSection()
 	m_bResetglWing = true;
 	UpdateView();
 }
+
+
 
 void GL3dWingDlg::OnFoilNames()
 {
@@ -1626,6 +1629,7 @@ void GL3dWingDlg::OnInsertBefore()
 	m_pWing->m_NPanel++;
 
 	FillDataTable();
+	m_pctrlWingTable->closePersistentEditor(m_pctrlWingTable->currentIndex());
 	ComputeGeometry();
 	SetWingData();
 
@@ -1697,6 +1701,8 @@ void GL3dWingDlg::OnInsertAfter()
 //	m_pWing->m_bVLMAutoMesh = true;
 
 	FillDataTable();
+	m_pctrlWingTable->closePersistentEditor(m_pctrlWingTable->currentIndex());
+
 	ComputeGeometry();
 	SetWingData();
 	m_bChanged = true;
@@ -2267,9 +2273,6 @@ void GL3dWingDlg::SetupLayout()
 
 			m_pctrlWingTable = new QTableView(this);
 			m_pctrlWingTable->setWindowTitle(QObject::tr("Wing definition"));
-		//	m_pctrlWingTable->setMinimumWidth(700);
-		//	m_pctrlWingTable->setMinimumHeight(200);
-		//	m_pctrlWingTable->setMaximumHeight((int)(r.height()/4));
 			m_pctrlWingTable->setSelectionMode(QAbstractItemView::SingleSelection);
 			m_pctrlWingTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 			m_pctrlWingTable->setEditTriggers(QAbstractItemView::CurrentChanged |
@@ -2279,9 +2282,6 @@ void GL3dWingDlg::SetupLayout()
 											  QAbstractItemView::AnyKeyPressed);
 			QHeaderView *HorizontalHeader = m_pctrlWingTable->horizontalHeader();
 			HorizontalHeader->setStretchLastSection(true);
-		//	HorizontalHeader->setResizeMode(QHeaderView::Stretch);
-		//	m_pctrlWingTable->setSizePolicy(szPolicyMaximum);
-		//	m_pctrlWingTable->setCornerButtonEnabled (false);
 		}
 
 		DefLayout->addLayout(NameLayout);

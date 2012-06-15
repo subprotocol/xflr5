@@ -41,7 +41,6 @@
 #include "GL3dBodyDlg.h"
 #include "PanelAnalysisDlg.h"
 #include "LLTAnalysisDlg.h"
-
 #include "ManageBodiesDlg.h"
 #include "ManageUFOsDlg.h"
 #include "../misc/ModDlg.h"
@@ -375,6 +374,7 @@ private:
 	GraphDlg m_GraphDlg;
 	WingScaleDlg m_WingScaleDlg;
 	W3dPrefsDlg m_W3dPrefsDlg;
+
 
 	QTimer *m_pTimerWOpp, *m_pTimerMode;
 

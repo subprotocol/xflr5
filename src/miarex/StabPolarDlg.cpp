@@ -44,14 +44,6 @@ StabPolarDlg::StabPolarDlg()
 	setWindowTitle(tr("Stability Polar Definition"));
 
 	m_bAutoName = true;
-	s_StabPolar.m_bAutoInertia = true;
-	s_StabPolar.m_bThinSurfaces = true;
-	s_StabPolar.m_bThinSurfaces = true;
-
-	s_StabPolar.m_CoG.Set(0.0,0.0,0.0);
-	s_StabPolar.m_CoGIxx = s_StabPolar.m_CoGIyy = s_StabPolar.m_CoGIzz = s_StabPolar.m_CoGIxz = 0.0;
-
-	s_StabPolar.m_Mass     = 0.0;
 
 	m_pWingList[0]  = NULL;
 	m_pWingList[1] = NULL;
@@ -60,6 +52,13 @@ StabPolarDlg::StabPolarDlg()
 	m_pctrlControlTable = NULL;
 	m_pControlModel   = NULL;
 	m_pCtrlDelegate   = NULL;
+
+/*	s_StabPolar.m_bAutoInertia = true;
+
+	s_StabPolar.m_CoG.Set(0.0,0.0,0.0);
+	s_StabPolar.m_CoGIxx = s_StabPolar.m_CoGIyy = s_StabPolar.m_CoGIzz = s_StabPolar.m_CoGIxz = 0.0;
+
+	s_StabPolar.m_Mass     = 0.0;
 
 	memset(s_StabPolar.m_MinControl, 0, sizeof(s_StabPolar.m_MinControl));
 	memset(s_StabPolar.m_MaxControl, 0, sizeof(s_StabPolar.m_MaxControl));
@@ -77,6 +76,8 @@ StabPolarDlg::StabPolarDlg()
 	s_StabPolar.m_nControls = 0;
 	
 	s_StabPolar.m_bViscous  = true;
+	s_StabPolar.m_bThinSurfaces = true;
+	s_StabPolar.m_AnalysisMethod = VLMMETHOD; */
 	s_StabPolar.m_WPolarType = STABILITYPOLAR;
 
 	SetupLayout();
@@ -438,9 +439,22 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 	m_pctrlBeta->SetValue(s_StabPolar.m_Beta);
 	m_pctrlPhi->SetValue(s_StabPolar.m_BankAngle);
 
-	m_pctrlWingMethod2->setChecked(s_StabPolar.m_bThinSurfaces);
-	m_pctrlWingMethod3->setChecked(!s_StabPolar.m_bThinSurfaces);
+	if(s_StabPolar.m_AnalysisMethod==LLTMETHOD)
+	{
+		s_StabPolar.m_AnalysisMethod = VLMMETHOD;
+		s_StabPolar.m_bThinSurfaces = true;
+	}
+
 	if(m_pPlane) m_pctrlPanelMethod->setChecked(true);
+	else
+	{
+		m_pctrlPanelMethod->setChecked(false);
+
+		m_pctrlWingMethod2->setChecked(s_StabPolar.m_AnalysisMethod==VLMMETHOD);
+		m_pctrlWingMethod3->setChecked(s_StabPolar.m_AnalysisMethod==PANELMETHOD);
+//		m_pctrlWingMethod2->setChecked(s_StabPolar.m_bThinSurfaces);
+//		m_pctrlWingMethod3->setChecked(!s_StabPolar.m_bThinSurfaces);
+	}
 
 	m_pctrlPlaneInertia->setChecked(s_StabPolar.m_bAutoInertia);
 	m_pctrlViscous->setChecked(s_StabPolar.m_bViscous);
@@ -448,7 +462,6 @@ void StabPolarDlg::InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar)
 
 	OnAutoInertia();
 
-	s_StabPolar.m_bThinSurfaces = true;
 
 	m_pControlModel->setColumnCount(2);
 	m_pControlModel->setHeaderData(0, Qt::Horizontal, tr("Control Name"));
@@ -1144,10 +1157,12 @@ void StabPolarDlg::OnMethod()
 	if (m_pctrlWingMethod2->isChecked())
 	{
 		s_StabPolar.m_bThinSurfaces = true;
+		s_StabPolar.m_AnalysisMethod = VLMMETHOD;
 	}
 	else if (m_pctrlWingMethod3->isChecked())
 	{
 		s_StabPolar.m_bThinSurfaces = false;
+		s_StabPolar.m_AnalysisMethod = PANELMETHOD;
 	}
 
 //	EnableControls();

@@ -46,7 +46,7 @@ class StabPolarDlg : public QDialog
 
 public:
 	StabPolarDlg();
-	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar);
+	void InitDialog(CPlane *pPlane, CWing *pWing, CWPolar *pWPolar=NULL);
 
 private:
 	void SetupLayout();
