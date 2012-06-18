@@ -40,7 +40,7 @@ public:
 	bool IntersectNURBS(CVector A, CVector B, CVector &I, bool bRight);
 	bool SerializeBody(QDataStream &ar, bool bIsStoring, int ProjectFormat=5);
 	bool ImportDefinition(QTextStream &inStream, double mtoUnit);
-	bool ExportDefinition(QTextStream &outStream, double mtoUnit) ;
+	bool ExportDefinition() ;
 
 
 	int InsertFrame(CVector Real);
@@ -86,6 +86,7 @@ public:
 
 
 	//____________________VARIABLES_____________________________________________
+	static void* s_pMainFrame;		//pointer to the Frame window
 
 	NURBSSurface m_SplineSurface;
 

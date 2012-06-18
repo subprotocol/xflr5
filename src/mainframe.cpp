@@ -864,6 +864,7 @@ void MainFrame::CreateDockWindows()
 	CPolar::s_pMainFrame           = this;
 	ObjectPropsDlg::s_pMainFrame   = this;
 	CWing::s_pMainFrame            = this;
+	CBody::s_pMainFrame            = this;
 	CWPolar::s_pMainFrame          = this;
 	CWOpp::s_pMainFrame            = this;
 	OpPoint::s_pMainFrame          = this;

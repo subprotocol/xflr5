@@ -22,11 +22,13 @@
 
 #include "Body.h"
 #include "../globals.h"
+#include "../mainframe.h"
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QtDebug>
 
+void *CBody::s_pMainFrame;
 double CBody::s_XPanelPos[300];
 
 
@@ -273,10 +275,28 @@ void CBody::Duplicate(CBody *pBody)
 }
 
 
-bool CBody::ExportDefinition(QTextStream &outStream, double mtoUnit)
+bool CBody::ExportDefinition()
 {
-	QString strong;
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
 	int i, j;
+	QString strong,  FileName;
+
+	FileName = m_BodyName;
+	FileName.replace("/", " ");
+
+	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
+											pMainFrame->m_LastDirName,
+											QObject::tr("Text Format (*.txt)"));
+	if(!FileName.length()) return false;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
+
+	QTextStream outStream(&XFile);
 
 	strong = "\n# This file defines a body geometry\n";
 	outStream << strong;
@@ -309,9 +329,9 @@ bool CBody::ExportDefinition(QTextStream &outStream, double mtoUnit)
 		for(j=0;j<m_NSideLines; j++)
 		{
 			strong = QString("%1     %2    %3\n")
-					 .arg(m_SplineSurface.m_pFrame[i]->m_Position.x      * mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * mtoUnit,14,'f',7)
-					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * mtoUnit,14,'f',7);
+					 .arg(m_SplineSurface.m_pFrame[i]->m_Position.x     * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].y * pMainFrame->m_mtoUnit,14,'f',7)
+					 .arg(m_SplineSurface.m_pFrame[i]->m_CtrlPoint[j].z * pMainFrame->m_mtoUnit,14,'f',7);
 			outStream << (strong);
 		}
 		outStream << ("\n");
@@ -324,7 +344,7 @@ bool CBody::ExportDefinition(QTextStream &outStream, double mtoUnit)
 
 void CBody::ExportGeometry(QTextStream &outStream, int type, double mtoUnit, int nx, int nh)
 {
-	QString strong, LengthUnit,str, FileName;
+	QString strong, LengthUnit,str;
 	int k,l;
 	double u, v;
 	CVector Point;

@@ -2354,28 +2354,7 @@ void GL3dBodyDlg::OnClipPlane()
 void GL3dBodyDlg::OnExportBodyDef()
 {
 	if(!m_pBody) return;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName;
-
-	FileName = m_pBody->m_BodyName;
-	FileName.replace("/", " ");
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
-											pMainFrame->m_LastDirName,
-											QObject::tr("Text Format (*.txt)"));
-	if(!FileName.length()) return;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-
-	QTextStream out(&XFile);
-
-	m_pBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
-	XFile.close();
+	m_pBody->ExportDefinition();
 
 }
 
@@ -2422,7 +2401,6 @@ void GL3dBodyDlg::OnImportBodyDef()
 
 
 	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-
 
 	double mtoUnit;
 
@@ -2493,7 +2471,7 @@ void GL3dBodyDlg::OnImportBodyDef()
 
 	QTextStream in(&XFile);
 
-	if(!pNewBody->ImportDefinition(in, pMainFrame->m_mtoUnit))
+	if(!pNewBody->ImportDefinition(in, mtoUnit))
 	{
 		delete pNewBody;
 		return;
@@ -3592,7 +3570,6 @@ void GL3dBodyDlg::SetupLayout()
 			QLabel *lab2 = new QLabel(tr("Hoop"));
 			QLabel *lab3 = new QLabel(tr("Degree"));
 			QLabel *lab4 = new QLabel(tr("Panels"));
-			QLabel *labWeight = new QLabel(tr("Edge Weight"));
 			QLabel *labBunch = new QLabel(tr("Panel bunch"));
 
 			m_pctrlXDegree = new QComboBox;

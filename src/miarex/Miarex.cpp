@@ -8788,28 +8788,7 @@ void QMiarex::OnEditUFO()
 void QMiarex::OnExportBodyDef()
 {
 	if(!m_pCurBody) return;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName;
-
-	FileName = m_pCurBody->m_BodyName;
-	FileName.replace("/", " ");
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
-											pMainFrame->m_LastDirName,
-											QObject::tr("Text Format (*.txt)"));
-	if(!FileName.length()) return;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-
-	QTextStream out(&XFile);
-
-	m_pCurBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
-	XFile.close();
+	m_pCurBody->ExportDefinition();
 }
 
 
@@ -9603,8 +9582,8 @@ void QMiarex::OnImportBody()
 	if(!pNewBody) return;
 
 
-	double mtoUnit,xo,yo,zo;
-	xo = yo = zo = 0.0;
+	double mtoUnit,yo,zo;
+	yo = zo = 0.0;
 
 //	FrameSize() = 0;
 
@@ -9678,7 +9657,7 @@ void QMiarex::OnImportBody()
 
 	QTextStream in(&XFile);
 
-	if(!pNewBody->ImportDefinition(in, pMainFrame->m_mtoUnit))
+	if(!pNewBody->ImportDefinition(in, mtoUnit))
 	{
 		delete pNewBody;
 		return;

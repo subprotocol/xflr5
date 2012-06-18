@@ -1,7 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
-QT += opengl
+QT += opengl + xml
 TEMPLATE = app
 SOURCES += \
 	src/XFLR5Application.cpp \
@@ -109,7 +109,8 @@ SOURCES += \
     src/objects/NURBSSurface.cpp \
     src/misc/GLLightDlg.cpp \
     src/threedwidget.cpp \
-    src/twodwidget.cpp
+    src/twodwidget.cpp \
+    src/miarex/NURBSDomDoc.cpp
 
 HEADERS += \
 	src/XFLR5Application.h \
@@ -218,7 +219,8 @@ HEADERS += \
     src/objects/NURBSSurface.h \
     src/misc/GLLightDlg.h \
     src/twodwidget.h \
-    src/threedwidget.h
+    src/threedwidget.h \
+    src/miarex/NURBSDomDoc.h
 
 TRANSLATIONS = translations/xflr5v6.ts \
     translations/xflr5v6_de.ts \

@@ -253,27 +253,7 @@ void ManageBodiesDlg::OnEdit()
 void ManageBodiesDlg::OnExportDefinition()
 {
 	if(!m_pBody) return;
-	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
-	QString FileName;
-
-	FileName = m_pBody->m_BodyName;
-	FileName.replace("/", " ");
-
-	FileName = QFileDialog::getSaveFileName(pMainFrame, QObject::tr("Export Body Definition"),
-											pMainFrame->m_LastDirName,
-											QObject::tr("Text Format (*.txt)"));
-	if(!FileName.length()) return;
-
-	int pos = FileName.lastIndexOf("/");
-	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
-
-	QFile XFile(FileName);
-
-	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-
-	QTextStream out(&XFile);
-
-	m_pBody->ExportDefinition(out, pMainFrame->m_mtoUnit);
+	m_pBody->ExportDefinition();
 }
 
 
