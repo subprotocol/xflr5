@@ -73,7 +73,7 @@ int GL3dBodyDlg::s_NXPoints = 47;
 QPoint GL3dBodyDlg::s_WindowPos=QPoint(20,20);
 QSize  GL3dBodyDlg::s_WindowSize=QSize(900, 700);
 #ifdef Q_WS_MAC
-bool BodyDlg::s_bWindowMaximized=true;
+bool GL3dBodyDlg::s_bWindowMaximized=true;
 #else
 bool GL3dBodyDlg::s_bWindowMaximized=false;
 #endif
