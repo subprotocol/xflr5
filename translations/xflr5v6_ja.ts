@@ -1209,11 +1209,11 @@ CpCalc: local speed too large
     </message>
     <message>
         <source>Insert</source>
-        <translation>挿入</translation>
+        <translation type="obsolete">挿入</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>削除</translation>
+        <translation type="obsolete">削除</translation>
     </message>
     <message>
         <source>Scale</source>
@@ -1234,7 +1234,7 @@ CpCalc: local speed too large
     </message>
     <message>
         <source>Inertia...</source>
-        <translation>慣性の設定</translation>
+        <translation type="obsolete">慣性の設定</translation>
     </message>
     <message>
         <source>Undo</source>
@@ -1271,12 +1271,12 @@ CpCalc: local speed too large
     </message>
     <message>
         <source>Resolution cannot exceed %1</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>警告</translation>
+        <translation type="obsolete">警告</translation>
     </message>
     <message>
         <source>Frame %1</source>
@@ -1326,19 +1326,19 @@ CpCalc: local speed too large
     </message>
     <message>
         <source>X</source>
-        <translation>X視点</translation>
+        <translation type="obsolete">X視点</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation>Y視点</translation>
+        <translation type="obsolete">Y視点</translation>
     </message>
     <message>
         <source>Z</source>
-        <translation>Z視点</translation>
+        <translation type="obsolete">Z視点</translation>
     </message>
     <message>
         <source>Iso</source>
-        <translation>斜め視点</translation>
+        <translation type="obsolete">斜め視点</translation>
     </message>
     <message>
         <source>Pick Center</source>
@@ -1418,6 +1418,34 @@ CpCalc: local speed too large
         <source>Context Menu</source>
         <translation type="unfinished">
             </translation>
+    </message>
+    <message>
+        <source>Insert Point</source>
+        <translation type="unfinished">点の挿入</translation>
+    </message>
+    <message>
+        <source>Remove Point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Z View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iso View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Panel bunch</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1646,19 +1674,19 @@ Reduce the mesh size</source>
     </message>
     <message>
         <source>X</source>
-        <translation>X</translation>
+        <translation type="obsolete">X</translation>
     </message>
     <message>
         <source>Y</source>
-        <translation>Y</translation>
+        <translation type="obsolete">Y</translation>
     </message>
     <message>
         <source>Z</source>
-        <translation>Z</translation>
+        <translation type="obsolete">Z</translation>
     </message>
     <message>
         <source>Iso</source>
-        <translation>Iso</translation>
+        <translation type="obsolete">Iso</translation>
     </message>
     <message>
         <source>Pick Center</source>
@@ -1692,6 +1720,35 @@ Reduce the mesh size</source>
     <message>
         <source>Context Menu</source>
         <translation type="obsolete">右クリックメニュー</translation>
+    </message>
+    <message>
+        <source>Too many spanwise panels.
+The maximum number is</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Z View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iso View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate the button, then click on the object to center it in the viewport; alternatively, double click on the object</source>
+        <translation type="unfinished">ボタンを有効にしてからオブジェクト上の点をクリックして画面の中央に移動します ; もしくはオブジェクト上の点をダブルクリックしてください</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">リセット</translation>
     </message>
 </context>
 <context>
@@ -2929,11 +2986,11 @@ Reduce the mesh size</source>
     </message>
     <message>
         <source>Use Splined Points</source>
-        <translation>スプライン補間された点を使用</translation>
+        <translation type="obsolete">スプライン補間された点を使用</translation>
     </message>
     <message>
         <source>Define a foil using one 3rd order B-Spline between two control points</source>
-        <translation>各制御点2点間について3次のB-スプライン曲線を使用して翼型を定義します</translation>
+        <translation type="obsolete">各制御点2点間について3次のB-スプライン曲線を使用して翼型を定義します</translation>
     </message>
     <message>
         <source>Store Splines as Foil</source>
@@ -3305,11 +3362,11 @@ Reduce the mesh size</source>
     </message>
     <message>
         <source>Display the first two operating point graphs</source>
-        <translation>最初の二つの計算点のグラフを表示</translation>
+        <translation type="obsolete">最初の二つの計算点のグラフを表示</translation>
     </message>
     <message>
         <source>Display all four operating point graphs</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -3410,7 +3467,7 @@ Reduce the mesh size</source>
     </message>
     <message>
         <source>Edit the points of the currently selected polar</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -3748,7 +3805,7 @@ Reduce the mesh size</source>
     </message>
     <message>
         <source>Edit ...</source>
-        <translation>編集 ...</translation>
+        <translation type="obsolete">編集 ...</translation>
     </message>
     <message>
         <source>Export ...</source>
@@ -4390,6 +4447,18 @@ Please enter a new name</source>
         <source>Error reading the file</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Modify the analysis parameters of this polar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display the first two graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display all four graphs</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManageBodiesDlg</name>
@@ -4704,7 +4773,7 @@ Continue ?</source>
     </message>
     <message>
         <source>The number of points to be calculated will be limited to 100</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -4860,6 +4929,11 @@ Continue ?</source>
         <source>      Wake iteration %1</source>
         <translation type="unfinished">
             </translation>
+    </message>
+    <message>
+        <source>
+   Solving the problem... </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5120,7 +5194,7 @@ Check the guidelines for explanations.</source>
     </message>
     <message>
         <source>Splined points foil</source>
-        <translation>点をスプライン曲線で結んだ翼型</translation>
+        <translation type="obsolete">点をスプライン曲線で結んだ翼型</translation>
     </message>
     <message>
         <source>Foil has been de-rotated by %1 degrees</source>
@@ -5259,12 +5333,16 @@ Check the guidelines for explanations.</source>
         <source>Foils</source>
         <translation>翼型</translation>
     </message>
+    <message>
+        <source>The minimum number of control points has been reached for this spline degree</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QMiarex</name>
     <message>
         <source>Cd</source>
-        <translation>Cd</translation>
+        <translation type="obsolete">Cd</translation>
     </message>
     <message>
         <source>Cl</source>
@@ -5471,7 +5549,7 @@ Aborting Calculation</source>
     </message>
     <message>
         <source>The polar already exists</source>
-        <translation>そのポーラーは既に存在しています</translation>
+        <translation type="obsolete">そのポーラーは既に存在しています</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the plane :
@@ -6185,6 +6263,26 @@ Continue ?</source>
         <source>Fz (lbf)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enter the new name for the Polar:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Y View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Z View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iso View</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -6368,7 +6466,7 @@ Continue ?</source>
     </message>
     <message>
         <source>Splined Points Foil</source>
-        <translation>スプライン曲線翼型</translation>
+        <translation type="obsolete">スプライン曲線翼型</translation>
     </message>
     <message>
         <source>Spline Foil</source>
@@ -6404,7 +6502,7 @@ proceeding anyway...</source>
     </message>
     <message>
         <source>BodyName</source>
-        <translation>ボディの名前</translation>
+        <translation type="obsolete">ボディの名前</translation>
     </message>
     <message>
         <source>Export Body Definition</source>
@@ -6433,7 +6531,7 @@ proceeding anyway...</source>
     </message>
     <message>
         <source>Text file (*.txt)</source>
-        <translation>テキストファイル (*.txt)</translation>
+        <translation type="obsolete">テキストファイル (*.txt)</translation>
     </message>
     <message>
         <source>Could not read the file
@@ -6457,7 +6555,7 @@ Frames have different number of side points</source>
     </message>
     <message>
         <source>Error</source>
-        <translation>エラー</translation>
+        <translation type="obsolete">エラー</translation>
     </message>
     <message>
         <source>Please select a Frame before inserting a point</source>
@@ -7125,6 +7223,14 @@ CpCalc: local speed too large
 </source>
         <translation type="unfinished">
             </translation>
+    </message>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Body Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7861,6 +7967,10 @@ Bottom Side
         <source> </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>The minimum number of control points has been reached for this spline degree</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReListDlg</name>
@@ -7997,6 +8107,18 @@ Bottom Side
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
+    <message>
+        <source>Point Weight =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">警告</translation>
+    </message>
+    <message>
+        <source>The spline degree must be less than the number of control points</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StabPolarDlg</name>
@@ -8012,11 +8134,11 @@ Bottom Side
     </message>
     <message>
         <source>Min</source>
-        <translation>最小値</translation>
+        <translation type="obsolete">最小値</translation>
     </message>
     <message>
         <source>Max</source>
-        <translation>最大値</translation>
+        <translation type="obsolete">最大値</translation>
     </message>
     <message>
         <source>Controls</source>
@@ -8058,7 +8180,7 @@ Bottom Side
     </message>
     <message>
         <source>The polar&apos;s name already exists</source>
-        <translation>その曲線の名前は既に存在します</translation>
+        <translation type="obsolete">その曲線の名前は既に存在します</translation>
     </message>
     <message>
         <source>Wing Name</source>
@@ -8106,7 +8228,7 @@ Bottom Side
     </message>
     <message>
         <source>Active</source>
-        <translation>有効</translation>
+        <translation type="obsolete">有効</translation>
     </message>
     <message>
         <source>Gain</source>
@@ -8161,7 +8283,7 @@ only if all the flap controls are inactive</source>
     </message>
     <message>
         <source>AVL Controls</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -8751,7 +8873,7 @@ only if all the flap controls are inactive</source>
     <message>
         <source>The number of chordwise VLM-panels across the span is not uniform
  Panel method is disabled</source>
-        <translation type="unfinished">
+        <translation type="obsolete">
             </translation>
     </message>
     <message>
@@ -8760,7 +8882,7 @@ only if all the flap controls are inactive</source>
     </message>
     <message>
         <source>The polar&apos;s name already exists</source>
-        <translation>その曲線の名前は既に存在します</translation>
+        <translation type="obsolete">その曲線の名前は既に存在します</translation>
     </message>
     <message>
         <source>Wing Name</source>
