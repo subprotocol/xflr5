@@ -28,7 +28,6 @@
 
 
 #include  <math.h>
-#include <QtDebug>
 #include "Wing.h"
 #include "../mainframe.h"
 #include "../globals.h"

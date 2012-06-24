@@ -34,7 +34,6 @@
 #include "AFoilGridDlg.h"
 #include "AFoilTableDlg.h"
 #include "SplineCtrlsDlg.h"
-#include <QtDebug>
 
 extern CFoil *g_pCurFoil;
 

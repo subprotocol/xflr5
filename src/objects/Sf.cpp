@@ -24,7 +24,6 @@
 #include "math.h"
 #include "Sf.h"
 #include "../globals.h"
-#include <QtDebug>
 
 
 CSF::CSF()

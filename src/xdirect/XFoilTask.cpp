@@ -91,9 +91,6 @@ bool XFoilTask::AlphaSequence()
 	int ia, series, total, MaxSeries;
 	double SpMin, SpMax, SpInc;
 
-//	str = QString("Re=%1   Ma=%2   Nc=%3\n").arg(XFoilInstance.reinf1,8,'f',0).arg(XFoilInstance.minf1,5,'f',3).arg(XFoilInstance.acrit,5,'f',2);
-//	strong+= str;
-//	UpdateOutput(str);
 	MaxSeries = 1;
 	if(pBatch->m_bAlpha)
 	{

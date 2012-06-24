@@ -4075,22 +4075,20 @@ bool XFoil::InitXFoilAnalysis(CPolar *pPolar)
 	lalfa = true;
 	qinf  = 1.0;
 
-	if(pPolar)
+	acrit      = pPolar->m_ACrit;
+	xstrip[1]  = pPolar->m_XTop;
+	xstrip[2]  = pPolar->m_XBot;
+
+	if (pPolar->m_Mach > 0.000001)
 	{
-		acrit      = pPolar->m_ACrit;
-		xstrip[1]  = pPolar->m_XTop;
-		xstrip[2]  = pPolar->m_XBot;
-		if (pPolar->m_Mach > 0.000001)
+		if(!SetMach())
 		{
-			if(!SetMach())
-			{
-				QString str = QObject::tr("... Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-	//			QMessageBox::warning(window(), tr("Warning"),str);
-				WriteString(str);
-				return false;
-			}
+			QString str = QObject::tr("... Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
+			WriteString(str);
+			return false;
 		}
 	}
+
 	return true;
 }
 

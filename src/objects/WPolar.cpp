@@ -26,7 +26,7 @@
 #include "../miarex/Miarex.h"
 #include <math.h>
 #include <QMessageBox>
-#include <QtDebug>
+
 
 void *CWPolar::s_pMainFrame;
 void *CWPolar::s_pMiarex;

@@ -122,6 +122,7 @@ void XFoilAnalysisDlg::SetupLayout()
 	setLayout(mainLayout);
 }
 
+
 void XFoilAnalysisDlg::reject()
 {
 	XFoil::s_bCancel = true;
@@ -132,6 +133,7 @@ void XFoilAnalysisDlg::reject()
 	QDialog::reject();
 }
 
+
 void XFoilAnalysisDlg::accept()
 {
 	XFoil::s_bCancel = true;
@@ -141,6 +143,7 @@ void XFoilAnalysisDlg::accept()
 
 	QDialog::accept();
 }
+
 
 void XFoilAnalysisDlg::AddOpPoint()
 {
@@ -403,8 +406,6 @@ void XFoilAnalysisDlg::OnSkipPoint()
 
 bool XFoilAnalysisDlg::ReLoop()
 {
-//	double alphadeg;
-//	QMutexLocker locker(&mutex);
 	QString str;
 	int ia;
 	double Re;

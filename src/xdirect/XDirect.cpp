@@ -4140,9 +4140,7 @@ void QXDirect::OnResetXFoil()
 	m_pXFoil->InitXFoilAnalysis(m_pCurPolar);
 	m_bInitBL = true;
 	m_pctrlInitBL->setChecked(m_bInitBL);
-
 }
-
 
 
 

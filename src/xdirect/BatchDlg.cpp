@@ -93,10 +93,10 @@ BatchDlg::BatchDlg(void *pParent)
 	connect(m_pctrlAnalyze, SIGNAL(clicked()), this, SLOT(OnAnalyze()));
 	connect(m_pctrlSkipOpp, SIGNAL(clicked()), this, SLOT(OnSkipPoint()));
 	connect(m_pctrlSkipPolar, SIGNAL(clicked()), this, SLOT(OnSkipPolar()));
-	connect(m_rbtype1, SIGNAL(toggled(bool)), this, SLOT(OnType1()));
-	connect(m_rbtype2, SIGNAL(toggled(bool)), this, SLOT(OnType1()));
-	connect(m_rbtype3, SIGNAL(toggled(bool)), this, SLOT(OnType1()));
-	connect(m_rbtype4, SIGNAL(toggled(bool)), this, SLOT(OnType1()));
+	connect(m_rbtype1, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype2, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype3, SIGNAL(clicked()), this, SLOT(OnPolarType()));
+	connect(m_rbtype4, SIGNAL(clicked()), this, SLOT(OnPolarType()));
 	connect(m_rbspec1, SIGNAL(toggled(bool)), this, SLOT(OnAcl()));
 	connect(m_rbspec2, SIGNAL(toggled(bool)), this, SLOT(OnAcl()));
 	connect(m_rbRange1, SIGNAL(toggled(bool)), this, SLOT(OnRange()));
@@ -328,7 +328,10 @@ void BatchDlg::AlphaLoop()
 		UpdateOutput(str);
 
 		int total = (int)(fabs((m_ReMax-m_ReMin)*1.0001/m_ReInc));
-		CreatePolar(alphadeg, pXFoil->minf1, pXFoil->acrit);// Do something
+		m_pCurPolar = CreatePolar(alphadeg, pXFoil->minf1, pXFoil->acrit);// Do something
+		if(!m_pCurPolar) return;
+
+		pXFoil->InitXFoilAnalysis(m_pCurPolar);
 
 		if (m_bInitBL)
 		{
@@ -384,11 +387,7 @@ void BatchDlg::AlphaLoop()
 
 				if(pXFoil->lvconv)
 				{
-//					str =QString(tr("   ...converged after %1 iterations")+"\n").arg(m_Iterations);
-//					strong+= str;
-//					UpdateOutput(str);
 					AddOpPoint();
-//					m_pCurPolar->AddData(pXFoil);
 				}
 				else if(m_bSkipPoint || m_bSkipPolar)
 				{
@@ -478,65 +477,67 @@ void BatchDlg::CleanUp()
 }
 
 
-void BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
+CPolar *BatchDlg::CreatePolar(double Spec, double Mach, double NCrit)
 {
-//	QXDirect *pXDirect = (QXDirect*)s_pXDirect;
-	if(!m_pFoil) return;
+	if(!m_pFoil) return NULL;
 
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
-	m_pCurPolar = new CPolar;
-	m_pCurPolar->m_FoilName   = m_pFoil->m_FoilName;
-	m_pCurPolar->m_bIsVisible = true;
+	CPolar *pPolar = new CPolar;
+	pPolar->m_FoilName   = m_pFoil->m_FoilName;
+	pPolar->m_bIsVisible = true;
 
-	m_pCurPolar->m_PolarType = m_PolarType;
+	pPolar->m_PolarType = m_PolarType;
 
-	switch (m_pCurPolar->m_PolarType)
+	switch (pPolar->m_PolarType)
 	{
-		case 1:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 1;
+		case FIXEDSPEEDPOLAR:
+			pPolar->m_MaType = 1;
+			pPolar->m_ReType = 1;
 			break;
-		case 2:
-			m_pCurPolar->m_MaType = 2;
-			m_pCurPolar->m_ReType = 2;
+		case FIXEDLIFTPOLAR:
+			pPolar->m_MaType = 2;
+			pPolar->m_ReType = 2;
 			break;
-		case 3:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 3;
+		case RUBBERCHORDPOLAR:
+			pPolar->m_MaType = 1;
+			pPolar->m_ReType = 3;
 			break;
-		case 4:
-			m_pCurPolar->m_MaType = 1;
-			m_pCurPolar->m_ReType = 1;
+		case FIXEDAOAPOLAR:
+			pPolar->m_MaType = 1;
+			pPolar->m_ReType = 1;
 			break;
 		default:
-			m_pCurPolar->m_ReType = 1;
-			m_pCurPolar->m_MaType = 1;
+			pPolar->m_ReType = 1;
+			pPolar->m_MaType = 1;
 			break;
 	}
+
+
 	if(m_PolarType!=FIXEDAOAPOLAR)
 	{
-		m_pCurPolar->m_Reynolds = Spec;
+		pPolar->m_Reynolds = Spec;
 	}
 	else
 	{
-		m_pCurPolar->m_ASpec = Spec;
+		pPolar->m_ASpec = Spec;
 	}
-	m_pCurPolar->m_Mach  = Mach;
-	m_pCurPolar->m_ACrit = NCrit;
-	m_pCurPolar->m_XTop  = m_XTopTr;
-	m_pCurPolar->m_XBot  = m_XBotTr;
+	pPolar->m_Mach  = Mach;
+	pPolar->m_ACrit = NCrit;
+	pPolar->m_XTop  = m_XTopTr;
+	pPolar->m_XBot  = m_XBotTr;
 
-	m_pCurPolar->m_Color = pMainFrame->GetColor(1);
+	pPolar->m_Color = pMainFrame->GetColor(1);
 
-	SetPlrName();
-	CPolar *pPolar = pMainFrame->GetPolar(m_pFoil->m_FoilName, m_pCurPolar->m_PlrName);
+	SetPlrName(pPolar);
+	CPolar *pOldPolar = pMainFrame->GetPolar(m_pFoil->m_FoilName, pPolar->m_PlrName);
 
-	if(pPolar)
+	if(pOldPolar)
 	{
-		delete m_pCurPolar;
-		m_pCurPolar = pPolar;
+		delete pPolar;
+		pPolar = pOldPolar;
 	}
-	else m_pCurPolar = pMainFrame->AddPolar(m_pCurPolar);
+	else pPolar = pMainFrame->AddPolar(pPolar);
+	return pPolar;
 }
 
 
@@ -656,7 +657,7 @@ void BatchDlg::InitDialog()
 	else if(m_PolarType==FIXEDLIFTPOLAR)   m_rbtype2->setChecked(true);
 	else if(m_PolarType==RUBBERCHORDPOLAR) m_rbtype3->setChecked(true);
 	else if(m_PolarType==FIXEDAOAPOLAR)    m_rbtype4->setChecked(true);
-	OnType1();
+	OnPolarType();
 
 
 	if(!m_bFromList)  m_rbRange1->setChecked(true);
@@ -808,9 +809,8 @@ void BatchDlg::OnSpecChanged()
 
 
 
-void BatchDlg::OnType1()
+void BatchDlg::OnPolarType()
 {
-
 	if(m_rbtype1->isChecked())
 	{
 		m_pctrlReType->setText(tr("Reynolds ="));
@@ -1148,8 +1148,11 @@ void BatchDlg::ReLoop()
 
 			total = (int)fabs((SpMax*1.0001-SpMin)/SpInc);//*1.0001 to make sure upper limit is included
 
-			CreatePolar(pXFoil->reinf1, pXFoil->minf1, pXFoil->acrit);
-			
+			m_pCurPolar = CreatePolar(pXFoil->reinf1, pXFoil->minf1, pXFoil->acrit);
+			if(!m_pCurPolar) return;
+
+			pXFoil->InitXFoilAnalysis(m_pCurPolar);
+
 			if (m_bInitBL)
 			{
 				pXFoil->lblini = false;
@@ -1181,7 +1184,6 @@ void BatchDlg::ReLoop()
 						if (!pXFoil->specal())
 						{
 							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-//							QMessageBox::information(this, tr("Warning"), str);
 							UpdateOutput(str);
 							WriteString(str);
 							m_bCancel = true;
@@ -1201,7 +1203,6 @@ void BatchDlg::ReLoop()
 						if(!pXFoil->speccl())
 						{
 							str = tr("Invalid Analysis Settings\nCpCalc: local speed too large\n Compressibility corrections invalid ");
-//							QMessageBox::information(this, tr("Warning"), str);
 							UpdateOutput(str);
 							WriteString(str);
 							m_bCancel = true;
@@ -1308,26 +1309,25 @@ void BatchDlg::SetFileHeader()
 
 
 
-void BatchDlg::SetPlrName()
+void BatchDlg::SetPlrName(CPolar *pPolar)
 {
-	if(m_PolarType!=FIXEDAOAPOLAR)
+	if(pPolar->m_PolarType!=FIXEDAOAPOLAR)
 	{
-		double R = m_pCurPolar->m_Reynolds/1000000.;
-		m_pCurPolar->m_PlrName = QString("T%1_Re%2_M%3")
-								 .arg(m_pCurPolar->m_PolarType)
+		double R = pPolar->m_Reynolds/1000000.;
+		pPolar->m_PlrName = QString("T%1_Re%2_M%3")
+								 .arg(pPolar->m_PolarType+1)
 								 .arg(R,0,'f',3)
-								 .arg( m_pCurPolar->m_Mach,0,'f',2);
+								 .arg( pPolar->m_Mach,0,'f',2);
 	}
 	else
 	{
-		m_pCurPolar->m_PlrName = QString("T%1_Al%2_M%3")
-								 .arg(m_pCurPolar->m_PolarType)
-								 .arg(m_pCurPolar->m_ASpec,5,'f',2)
-								 .arg(m_pCurPolar->m_Mach,0,'f',2);
+		pPolar->m_PlrName = QString("T4_Al%2_M%3")
+								 .arg(pPolar->m_ASpec,5,'f',2)
+								 .arg(pPolar->m_Mach,0,'f',2);
 	}
 	QString str;
-	str = QString("_N%1").arg(m_pCurPolar->m_ACrit,0,'f',1);
-	m_pCurPolar->m_PlrName += str;
+	str = QString("_N%1").arg(pPolar->m_ACrit,0,'f',1);
+	pPolar->m_PlrName += str;
 }
 
 

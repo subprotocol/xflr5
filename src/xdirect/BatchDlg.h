@@ -48,25 +48,26 @@ public:
 	void InitDialog();
 
 private:
+	void keyPressEvent(QKeyEvent *event);
+
 	void AddOpPoint();
 	void AlphaLoop();
 	void Analysis2();
 	void Analysis3();
 	void CleanUp();
-	void CreatePolar(double Spec, double Mach, double NCrit);
-//	bool InitXFoil2();
+	CPolar* CreatePolar(double Spec, double Mach, double NCrit);
 	bool Iterate();
-	void keyPressEvent(QKeyEvent *event);
 	void OutputIter(int iter);
 	void ReadParams();
 	void ReLoop();
 	void ResetCurves();
 	void SetFileHeader();
-	void SetPlrName();
+	void SetPlrName(CPolar *pPolar);
 	void StartAnalysis();
 	void UpdateGraph();
 	void UpdateOutput(QString &str);
 	void WriteString(QString &strong);
+
 
 private slots:
 	void OnSpecChanged();
@@ -74,7 +75,7 @@ private slots:
 	void OnRange();
 	void OnAcl();
 	void OnEditReList();
-	void OnType1();
+	void OnPolarType();
 	void OnClose();
 	void OnFromZero(int state);
 	void OnSkipPoint();
