@@ -259,7 +259,11 @@ void ThreeDWidget::resizeGL(int width, int height)
 	w = (double)width;
 	h = (double)height;
 
+#ifdef Q_WS_MAC
+    glViewport(0,0, width, height);
+#else
 	glViewport((width - side) / 2, (height - side) / 2, side, side);
+#endif
 //	d = qMax(w,h);
 //	glViewport(0,0, d, d);
 
@@ -267,7 +271,11 @@ void ThreeDWidget::resizeGL(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	double s = 1.0;
-	glOrtho(-s,s,-s,s,-100.0*s,100.0*s);
+#ifdef Q_WS_MAC
+    glOrtho(-s,s,-(h*s)/w,(h*s)/w,-100.0*s,100.0*s);
+#else
+    glOrtho(-s,s,-s,s,-100.0*s,100.0*s);
+#endif
 //	glFrustum(-1.0, +1.0, -1.0, 1.0, 5.0, 60.0);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
