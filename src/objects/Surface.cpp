@@ -43,7 +43,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <QMessageBox>
-#include <QtDebug>
 #include <math.h>
 #include "Surface.h"
 #include "../objects/Quaternion.h"

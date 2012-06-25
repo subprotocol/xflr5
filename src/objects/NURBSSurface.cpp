@@ -10,7 +10,6 @@
 #include "../params.h"
 #include "../globals.h"
 #include "NURBSSurface.h"
-#include <QtDebug>
 
 
 void *NURBSSurface::s_pMainFrame;

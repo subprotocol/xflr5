@@ -16,7 +16,8 @@
 
 
 
-xflr5 v6.07, April xxth, 2012
+xflr5 v6.07, June xxth, 2012
+	- fixed type 2 batch polar analysis
 	- fixed the issue with incorrect 3D-panel calculations
 	- Corrected the incorrect aileron control derivatives
 	- Corrected the bug in wing analysis with ground effect

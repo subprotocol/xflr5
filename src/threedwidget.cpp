@@ -18,11 +18,11 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *****************************************************************************/
-
+/*
 #define GLMIAREXVIEW  3
 #define GLBODYVIEW  5
 #define GLWINGVIEW  7
-
+*/
 
 #include <QtOpenGL>
 #include "mainframe.h"

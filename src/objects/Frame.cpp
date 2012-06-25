@@ -22,7 +22,6 @@
 
 #include "Frame.h"
 #include <math.h>
-#include <QtDebug>
 #include "../params.h"
 
 CFrame::CFrame(int nCtrlPts)

@@ -1836,7 +1836,7 @@ void QXDirect::OnBatchAnalysis()
 	m_BatchDlg.m_ReMin     = m_Reynolds;
 	m_BatchDlg.m_ReMax     = m_ReynoldsMax;
 	m_BatchDlg.m_ReInc     = m_ReynoldsDelta;
-	m_BatchDlg.m_PolarType = FIXEDSPEEDPOLAR;
+//	m_BatchDlg.m_PolarType = FIXEDSPEEDPOLAR;
 	m_BatchDlg.m_IterLim   = m_IterLim;
 	m_BatchDlg.m_bAlpha    = true;
 	m_BatchDlg.m_SpMin     = m_Alpha;

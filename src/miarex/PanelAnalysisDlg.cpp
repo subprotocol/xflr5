@@ -33,7 +33,6 @@
 #include "../globals.h"
 #include "../objects/CVector.h"
 #include "Miarex.h"
-#include <QtDebug>
 
 void *PanelAnalysisDlg::s_pMiarex;
 void *PanelAnalysisDlg::s_pMainFrame;

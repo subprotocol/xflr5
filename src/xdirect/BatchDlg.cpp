@@ -883,6 +883,8 @@ void BatchDlg::OnPolarType()
 	}
 }
 
+
+
 void BatchDlg::OutputIter(int iter)
 {
 	XFoil *pXFoil = (XFoil*)s_pXFoil;

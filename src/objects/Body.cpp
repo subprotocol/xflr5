@@ -26,7 +26,6 @@
 #include <math.h>
 #include <QMessageBox>
 #include <QFileDialog>
-#include <QtDebug>
 
 void *CBody::s_pMainFrame;
 double CBody::s_XPanelPos[300];
