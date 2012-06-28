@@ -4603,12 +4603,12 @@ Réduisez la taille du maillage</translation>
     <message>
         <location filename="../src/mainframe.cpp" line="1325"/>
         <source>Display the first two graphs</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les deux premiers diagrammes</translation>
     </message>
     <message>
         <location filename="../src/mainframe.cpp" line="1330"/>
         <source>Display all four graphs</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les quatre diagrammes</translation>
     </message>
     <message>
         <location filename="../src/mainframe.cpp" line="1354"/>
