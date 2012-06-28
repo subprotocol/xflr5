@@ -1,7 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-02-14T15:30:46
 # -------------------------------------------------
-QT += opengl + xml
+QT += opengl
+QT += xml
 TEMPLATE = app
 SOURCES += \
 	src/XFLR5Application.cpp \
@@ -262,10 +263,9 @@ macx {
     }
     TARGET = XFLR5
     TEMPLATE = app
-    CONFIG += i386 \
-        ppc
-    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.4
-    QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.5.sdk
+    CONFIG += i386
+    QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
+    QMAKE_MAC_SDK = /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.6.sdk
     OTHER_FILES += mac/Info.plist
     LIBS += -framework \
         CoreFoundation

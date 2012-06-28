@@ -170,8 +170,14 @@ void LinePickerDlg::OnStyle(int val)
 
 void LinePickerDlg::OnColor()
 {
-	QColor Color = QColorDialog::getColor(m_Color,
-								   this, "Color Selection", QColorDialog::ShowAlphaChannel);
+    QColorDialog::ColorDialogOptions dialogOptions = QColorDialog::ShowAlphaChannel;
+#ifdef Q_WS_MAC
+#if QT_VERSION >= 0x040700
+    dialogOptions |= QColorDialog::DontUseNativeDialog;
+#endif
+#endif
+    QColor Color = QColorDialog::getColor(m_Color,
+                                   this, "Color Selection", dialogOptions);
 	if(Color.isValid()) m_Color = Color;
 
 	FillBoxes();

@@ -18,7 +18,9 @@ void *NURBSSurface::s_pMainFrame;
 NURBSSurface::NURBSSurface(int iAxis)
 {
 	m_pFrame.clear();
-	m_pFrame.reserve(10);
+#if QT_VERSION >= 0x040700
+    m_pFrame.reserve(10);
+#endif
 
 	m_uAxis = iAxis;//directed in x direction, mainly
 	m_vAxis = 2;//directed in y direction, mainly
