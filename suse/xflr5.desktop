@@ -1,0 +1,22 @@
+[Desktop Entry]
+Categories=Engineering
+Comment[en_US]=XFLR5 is an analysis tool for airfoils, wings and planes operating at low Reynolds numbers
+Comment=XFLR5 is an analysis tool for airfoils, wings and planes operating at low Reynolds numbers
+Exec=xflr5 %u
+GenericName[en_US]=XFLR5 v6
+GenericName=XFLR5 v6
+Icon=xflr5.png
+MimeType=
+Name[en_US]=xflr5
+Name=xflr5
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+Version=6.06
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+X-SuSE-translate=true
