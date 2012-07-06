@@ -310,6 +310,7 @@ void PlaneDlg::OnDefineStab()
 	s_SaveWing.Duplicate(m_pPlane->Stab());
 
 	pMiarex->m_WingDlg.m_bAcceptName = false;
+    pMiarex->setParent(this);
 	pMiarex->m_WingDlg.InitDialog(m_pPlane->Stab());
 
 	if(pMiarex->m_WingDlg.exec() == QDialog::Accepted)

@@ -3952,12 +3952,7 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	bool bActive = false;
 	for(int c=0; c<m_NCtrls; c++)
 	{
-		if(!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[c])
-		{
-			bActive = true;
-			break;
-		}
-		if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[c])>PRECISION)
+		if(fabs(m_pWPolar->m_ControlGain[c])>PRECISION)
 		{
 			bActive = true;
 			break;
@@ -3994,14 +3989,14 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	if(m_pPlane)
 	{
 		//Wing tilt
-		if ((!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[0]) ||
-		    ( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION))
+		if(fabs(m_pWPolar->m_ControlGain[0])>PRECISION)
 		{
 			//rotate the normals and control point positions
 			H.Set(0.0, 1.0, 0.0);
-			if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[0])>PRECISION)
-				SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[0]/fabs(m_pWPolar->m_MaxControl[0]);
+			if(fabs(m_pWPolar->m_ControlGain[0])>PRECISION)
+				SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[0]/fabs(m_pWPolar->m_ControlGain[0]);
 			else SignedDeltaAngle = DeltaAngle;
+
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
 
 			for(p=0; p<m_pWing->m_MatSize; p++)
@@ -4017,14 +4012,14 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	if(m_pPlane && m_pWingList[2])
 	{
 		//Elevator tilt
-		if ((!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[1]) ||
-		    ( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[1])>PRECISION))
+		if (fabs(m_pWPolar->m_ControlGain[1])>PRECISION)
 		{
 			H.Set(0.0, 1.0, 0.0);
 
-			if(m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[1])>PRECISION)
-			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[1]/fabs(m_pWPolar->m_MaxControl[1]);
+			if(fabs(m_pWPolar->m_ControlGain[1])>PRECISION)
+			   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[1]/fabs(m_pWPolar->m_ControlGain[1]);
 			else SignedDeltaAngle = DeltaAngle;
+
 			Quat.Set(SignedDeltaAngle*180.0/PI, H);
 
 			for(p=0; p<m_pWingList[2]->m_MatSize; p++)
@@ -4042,12 +4037,11 @@ void PanelAnalysisDlg::ComputeControlDerivatives()
 	{
 		if(m_ppSurface[j]->m_bTEFlap)
 		{
-			if ((!m_pWPolar->m_bAVLControls && m_pWPolar->m_bActiveControl[NCtrls]) ||
-				( m_pWPolar->m_bAVLControls && fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION))
+			if (fabs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
 			{
 				//Add delta rotations to initial control setting and to wing or flap delta rotation
-				if(fabs(m_pWPolar->m_MaxControl[NCtrls])>PRECISION)
-				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_MaxControl[NCtrls]/fabs(m_pWPolar->m_MaxControl[NCtrls]);
+				if(fabs(m_pWPolar->m_ControlGain[NCtrls])>PRECISION)
+				   SignedDeltaAngle = DeltaAngle * m_pWPolar->m_ControlGain[NCtrls]/fabs(m_pWPolar->m_ControlGain[NCtrls]);
 				else SignedDeltaAngle = DeltaAngle;
 
 				Quat.Set(SignedDeltaAngle*180.0/PI, m_ppSurface[j]->m_HingeVector);

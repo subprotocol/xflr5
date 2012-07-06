@@ -44,7 +44,7 @@ CWPolar::CWPolar()
 //	m_bPolar        = true;
 	m_bGround       = false;
 	m_bDirichlet    = true;
-	m_bAVLControls  = false;
+//	m_bAVLControls  = false;
 
 	m_NXWakePanels = 1;
 	m_TotalWakeLength = 100.0;
@@ -72,9 +72,9 @@ CWPolar::CWPolar()
 	m_Viscosity = 1.5e-5;//m2/s
 
 	m_nControls = 0;
-	memset(m_MinControl, 0, sizeof(m_MinControl));
-	memset(m_MaxControl, 0, sizeof(m_MaxControl));
-	memset(m_bActiveControl, 0, sizeof(m_bActiveControl));
+//	memset(m_MinControl, 0, sizeof(m_MinControl));
+	memset(m_ControlGain, 0, sizeof(m_ControlGain));
+//	memset(m_bActiveControl, 0, sizeof(m_bActiveControl));
 	memset(m_EigenValue, 0, 2*8*MAXPOLARPOINTS*sizeof(double));
 	
 	m_bAutoInertia = true;
@@ -1063,13 +1063,13 @@ void CWPolar::DuplicateSpec(CWPolar *pWPolar)
 	m_AnalysisMethod  = pWPolar->m_AnalysisMethod;
 	m_bThinSurfaces   = pWPolar->m_bThinSurfaces;
 	m_bVLM1           = pWPolar->m_bVLM1;
-	m_bAVLControls    = pWPolar->m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
+//	m_bAVLControls    = pWPolar->m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
 
 
 	m_nControls       = pWPolar->m_nControls;
-	memcpy(m_MinControl, pWPolar->m_MinControl, 4*MAXCONTROLS*sizeof(double));
-	memcpy(m_MaxControl, pWPolar->m_MaxControl, 4*MAXCONTROLS*sizeof(double));
-	memcpy(m_bActiveControl, pWPolar->m_bActiveControl, 4*MAXCONTROLS*sizeof(bool));
+//	memcpy(m_MinControl, pWPolar->m_MinControl, 4*MAXCONTROLS*sizeof(double));
+	memcpy(m_ControlGain, pWPolar->m_ControlGain, 4*MAXCONTROLS*sizeof(double));
+//	memcpy(m_bActiveControl, pWPolar->m_bActiveControl, 4*MAXCONTROLS*sizeof(bool));
 
 
 	m_RefAreaType = pWPolar->m_RefAreaType;
@@ -1636,11 +1636,13 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		ar << m_nControls;
 		for(i=0; i<m_nControls; i++)
 		{
-			ar << (float)m_MinControl[i] << (float)m_MaxControl[i];
+//			ar << (float)m_MinControl[i] << (float)m_ControlGain[i];
+			ar << 0.f << (float)m_ControlGain[i];
 		}
 		for(i=0; i<m_nControls; i++)
 		{
-			if(m_bActiveControl[i])	ar<<1 ; else ar <<0;
+//			if(m_bActiveControl[i])	ar<<1 ; else ar <<0;
+			ar <<1;
 		}
 		if(ProjectFormat>5)
 		{
@@ -1662,7 +1664,8 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			for(int i=0; i<20; i++) ar<<(float)i;
 
 			//int provision
-			if(m_bAVLControls) ar<<1; else ar<<0;
+//			if(m_bAVLControls) ar<<1; else ar<<0;
+			ar << 1;
 			for(int i=1; i<20; i++) ar<<i;
 		}
 
@@ -1924,15 +1927,15 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 			if(abs(m_nControls)>1000) m_nControls = 0;
 			for(i=0; i<m_nControls; i++)
 			{
-				ar >> f; m_MinControl[i] = f;
-				ar >> f; m_MaxControl[i] = f;
+				ar >> f; //m_MinControl[i] = f;
+				ar >> f; m_ControlGain[i] = f;
 			}
 			for(i=0; i<m_nControls; i++)
 			{
 				ar >> n;
 				if (n!=0 && n!=1) return false;
 				else {
-					if(n) m_bActiveControl[i] =true; else m_bActiveControl[i] = false;
+//					if(n) m_bActiveControl[i] =true; else m_bActiveControl[i] = false;
 				}
 			}
 		}
@@ -1980,7 +1983,7 @@ bool CWPolar::SerializeWPlr(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 			//int provision
 			ar>>n;
-			if(n) m_bAVLControls = true; else m_bAVLControls=false;
+//			if(n) m_bAVLControls = true; else m_bAVLControls=false;
 			for(int i=1; i<20; i++) ar>>n;
 		}
 	}
@@ -2041,38 +2044,23 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 		CPlane *pPlane = pMiarex->GetPlane(m_UFOName);
 		int iCtrl = 0;
 
-		if(!m_bAVLControls) strong = "Min/max type controls\n";
-		else                strong = "AVL type controls\n";
+		strong = "AVL type controls\n";
 		PolarProperties +=strong;
 
 
 		if(pPlane)
 		{
-			if(!m_bAVLControls&&m_bActiveControl[iCtrl])
+			if(fabs(m_ControlGain[iCtrl]>PRECISION))
 			{
-				strong = QString(QString::fromUtf8("Wing Tilt: %1°/%2°\n"))
-								.arg(m_MinControl[iCtrl],5,'f',2)
-								.arg(m_MaxControl[iCtrl],5,'f',2);
-				PolarProperties +=strong;
-			}
-			else if(m_bAVLControls&&m_MaxControl[iCtrl])
-			{
-				strong = QString(QString::fromUtf8("Wing Tilt: gain=%1°/unit\n")).arg(m_MaxControl[iCtrl],0,'f',2);
+				strong = QString(QString::fromUtf8("Wing Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 				PolarProperties +=strong;
 			}
 			iCtrl=1;
 			if(pPlane->Stab())
 			{
-				if(!m_bAVLControls&&m_bActiveControl[iCtrl])
+				if(fabs(m_ControlGain[iCtrl]>PRECISION))
 				{
-					strong = QString(QString::fromUtf8("Elevator Tilt : %1°/%2°\n"))
-									.arg(m_MinControl[iCtrl],5,'f',2)
-									.arg(m_MaxControl[iCtrl],5,'f',2);
-					PolarProperties +=strong;
-				}
-				else if(m_bAVLControls&&m_MaxControl[iCtrl])
-				{
-					strong = QString(QString::fromUtf8("Elev. Tilt: gain=%1°/unit\n")).arg(m_MaxControl[iCtrl],0,'f',2);
+					strong = QString(QString::fromUtf8("Elev. Tilt: gain=%1°/unit\n")).arg(m_ControlGain[iCtrl],0,'f',2);
 					PolarProperties +=strong;
 				}
 				iCtrl=2;
@@ -2098,19 +2086,11 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pWing->m_Surface[j].m_bTEFlap)
 				{
-					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
-					{
-						strong = QString(QString::fromUtf8("Wing Flap %1: %2°/%3°\n"))
-										.arg(nFlap+1)
-										.arg(m_MinControl[iCtrl],5,'f',2)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
-						PolarProperties +=strong;
-					}
-					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					if(fabs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Wing Flap %1: g=%2°/unit\n"))
 										.arg(nFlap+1)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
+										.arg(m_ControlGain[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
 					nFlap++;
@@ -2127,19 +2107,11 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pStab->m_Surface[j].m_bTEFlap)
 				{
-					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
-					{
-						strong = QString(QString::fromUtf8("Elev. Flap %1: %2°/%3°\n"))
-										.arg(nFlap+1)
-										.arg(m_MinControl[iCtrl],5,'f',2)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
-						PolarProperties +=strong;
-					}
-					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					if(fabs(m_ControlGain[iCtrl]>PRECISION))
 					{
 						strong = QString(QString::fromUtf8("Elev. Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
+										.arg(m_ControlGain[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
 					nFlap++;
@@ -2155,19 +2127,11 @@ void CWPolar::GetPolarProperties(QString &PolarProperties, bool bData)
 			{
 				if(pFin->m_Surface[j].m_bTEFlap)
 				{
-					if(!m_bAVLControls&&m_bActiveControl[iCtrl])
-					{
-						strong = QString(QString::fromUtf8("Fin Flap %1: %2°/%3°\n"))
-										.arg(nFlap+1)
-										.arg(m_MinControl[iCtrl],5,'f',2)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
-						PolarProperties +=strong;
-					}
-					else if(m_bAVLControls&&m_MaxControl[iCtrl])
+					if(fabs(m_ControlGain[iCtrl])>PRECISION)
 					{
 						strong = QString(QString::fromUtf8("Fin Flap %1: gain=%2°/unit\n"))
 										.arg(nFlap+1)
-										.arg(m_MaxControl[iCtrl],5,'f',2);
+										.arg(m_ControlGain[iCtrl],5,'f',2);
 						PolarProperties +=strong;
 					}
 					nFlap++;

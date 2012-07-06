@@ -1860,9 +1860,15 @@ void GL3dWingDlg::OnWingColor()
 {
 	if(!m_pWing) return;
 
+    QColorDialog::ColorDialogOptions dialogOptions = QColorDialog::ShowAlphaChannel;
+#ifdef Q_WS_MAC
+#if QT_VERSION >= 0x040700
+    dialogOptions |= QColorDialog::DontUseNativeDialog;
+#endif
+#endif
 	QColor WingColor = QColorDialog::getColor(m_pWing->m_WingColor,
-									  this, "Select the wing color", QColorDialog::ShowAlphaChannel);
-	if(WingColor.isValid()) m_pWing->m_WingColor = WingColor;
+                                      this, "Select the wing color", dialogOptions);
+    if(WingColor.isValid()) m_pWing->m_WingColor = WingColor;
 
 	m_pctrlWingColor->SetColor(m_pWing->m_WingColor);
 	m_bResetglWing = true;

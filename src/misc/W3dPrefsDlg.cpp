@@ -423,8 +423,14 @@ void W3dPrefsDlg::OnVLMMesh()
 
 void W3dPrefsDlg::OnMasses()
 {
-	QColor Color = QColorDialog::getColor(s_MassColor,
-								   this, "Select the color", QColorDialog::ShowAlphaChannel);
+    QColorDialog::ColorDialogOptions dialogOptions = QColorDialog::ShowAlphaChannel;
+#ifdef Q_WS_MAC
+#if QT_VERSION >= 0x040700
+    dialogOptions |= QColorDialog::DontUseNativeDialog;
+#endif
+#endif
+    QColor Color = QColorDialog::getColor(s_MassColor,
+                                   this, "Select the color", dialogOptions);
 	if(Color.isValid()) s_MassColor = Color;
 	m_pctrlMassColor->SetColor(s_MassColor);
 

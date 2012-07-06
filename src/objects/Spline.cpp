@@ -34,10 +34,14 @@ CSpline::CSpline()
 	m_Color = QColor(70, 200, 120);
 
 	m_CtrlPoint.clear();
-	m_CtrlPoint.reserve(50);
+#if QT_VERSION >= 0x040700
+    m_CtrlPoint.reserve(50);
+#endif
 
 	m_knot.clear();
-	m_knot.reserve(100);
+#if QT_VERSION >= 0x040700
+    m_knot.reserve(100);
+#endif
 
 	m_iHighlight  = -10;
 	m_iSelect     = -10;

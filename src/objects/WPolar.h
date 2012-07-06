@@ -141,8 +141,9 @@ private:
 
 	//control data - Type 5-6-7 polars
 	int m_nControls;
-	double m_MinControl[4*MAXCONTROLS], m_MaxControl[4*MAXCONTROLS];
-	bool   m_bActiveControl[4*MAXCONTROLS];
+//	double m_MinControl[4*MAXCONTROLS];
+	double m_ControlGain[4*MAXCONTROLS];
+//	bool   m_bActiveControl[4*MAXCONTROLS];
 
 public:
 	enumAnalysisMethod m_AnalysisMethod;
@@ -162,8 +163,8 @@ public:
 	CVector m_CoG;
 
 	bool m_bVLM1;
-	bool m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
-						 // false if the control is defined by Active/Min/Max params
+//	bool m_bAVLControls; // true if the control is defined only by its "gain" AVL-like
+//						 // false if the control is defined by Active/Min/Max params
 };
 
 #endif

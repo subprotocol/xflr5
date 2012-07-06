@@ -6443,7 +6443,7 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 		k = pSettings->value("TimeGraph").toInt();
 		m_pCurTimeGraph = m_TimeGraph+k-1;
 
-		StabPolarDlg::s_StabPolar.m_bAVLControls = pSettings->value("AVLControls", true).toBool();
+//		StabPolarDlg::s_StabPolar.m_bAVLControls = pSettings->value("AVLControls", true).toBool();
 
 		for(int i=0; i<20; i++)
 		{
@@ -7948,10 +7948,10 @@ void QMiarex::OnDefineStabPolar()
 		pNewStabPolar->m_ASpec           = 0.0;
 		pNewStabPolar->m_Height          = 0.0;
 
-		for(int i=StabPolarDlg::s_StabPolar.m_nControls; i<4*MAXCONTROLS; i++)
+/*		for(int i=StabPolarDlg::s_StabPolar.m_nControls; i<4*MAXCONTROLS; i++)
 		{
 			pNewStabPolar->m_bActiveControl[i] = false;
-		}
+		}*/
 
 		pNewStabPolar->m_Color = pMainFrame->GetColor(4);
 		pNewStabPolar->m_Width = 2;
@@ -8022,7 +8022,7 @@ void QMiarex::OnDefineWPolar()
 
 		pNewWPolar->m_bVLM1           = m_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
-		pNewWPolar->m_bAVLControls    = false;
+//		pNewWPolar->m_bAVLControls    = false;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		pNewWPolar->m_bIsVisible = true;
@@ -8107,7 +8107,7 @@ void QMiarex::OnEditCurWPolar()
 
 		pNewWPolar->m_bVLM1           = m_bVLM1;
 		pNewWPolar->m_bDirichlet      = m_bDirichlet;
-		pNewWPolar->m_bAVLControls    = false;
+//		pNewWPolar->m_bAVLControls    = false;
 
 		pNewWPolar->m_Color = pMainFrame->GetColor(4);
 		pNewWPolar->m_bIsVisible = true;
@@ -12444,7 +12444,7 @@ bool QMiarex::SaveSettings(QSettings *pSettings)
 		else if(m_pCurTimeGraph == m_TimeGraph+3) k=4;
 		pSettings->setValue("TimeGraph",k);
 
-		pSettings->setValue("AVLControls", StabPolarDlg::s_StabPolar.m_bAVLControls);
+//		pSettings->setValue("AVLControls", StabPolarDlg::s_StabPolar.m_bAVLControls);
 
 		pStabView->ReadControlModelData();
 		for(int i=0; i<20; i++)
@@ -15321,22 +15321,13 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 	if(m_pCurPlane)
 	{
 		//wing incidence
-		if((!m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_bActiveControl[0]) ||
-		   ( m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_MaxControl[0]))
+		if(fabs(m_pCurWPolar->m_ControlGain[0])>0.0)
 		{
 			//wing tilt
-			if(m_pCurWPolar->m_bAVLControls)
-			{
-				angle = m_pCurWPolar->m_MaxControl[0] * t; //maxcontrol is the gain
-					TotalAngle = m_pCurPlane->WingTiltAngle(0) + angle;
-				strange = QString::fromUtf8("         Rotating the wing by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
-			}
-			else
-			{
-				angle = m_pCurWPolar->m_MinControl[0] + t * (m_pCurWPolar->m_MaxControl[0] - m_pCurWPolar->m_MinControl[0]);
-				strange = QString("         Setting the wing tilt to %1").arg(angle, 5, 'f',2);
-				angle -= m_pCurPlane->WingTiltAngle(0);//cancel initial tilt set in plane definition
-			}
+			angle = m_pCurWPolar->m_ControlGain[0] * t; //maxcontrol is the gain
+			TotalAngle = m_pCurPlane->WingTiltAngle(0) + angle;
+			strange = QString::fromUtf8("         Rotating the wing by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
+
 			strange += "\n";
 			out +=strange;
 
@@ -15373,22 +15364,12 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 		if(m_pCurPlane->Stab())
 		{
 			//elevator incidence
-			if((!m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_bActiveControl[1]) ||
-			   ( m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_MaxControl[1]))
+			if(fabs(m_pCurWPolar->m_ControlGain[1])>0.0)
 			{
 				//Elevator tilt
-				if(m_pCurWPolar->m_bAVLControls)
-				{
-					angle = m_pCurWPolar->m_MaxControl[1] * t; //maxcontrol is the gain
-					TotalAngle = m_pCurPlane->WingTiltAngle(2) + angle;
-					strange = QString::fromUtf8("         Rotating the elevator by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
-				}
-				else
-				{
-					angle = m_pCurWPolar->m_MinControl[1] + t * (m_pCurWPolar->m_MaxControl[1] - m_pCurWPolar->m_MinControl[1]);
-					strange = QString("         Setting the elevator tilt to %1").arg(angle, 5, 'f',2);
-					angle -= m_pCurPlane->WingTiltAngle(2);//cancel initial tilt set in plane definition
-				}
+				angle = m_pCurWPolar->m_ControlGain[1] * t; //maxcontrol is the gain
+				TotalAngle = m_pCurPlane->WingTiltAngle(2) + angle;
+				strange = QString::fromUtf8("         Rotating the elevator by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
 
 				strange += "\n";
 				out +=strange;
@@ -15434,30 +15415,18 @@ void QMiarex::SetControlPositions(CPanel *pPanel, CVector *pNode, double t, int 
 			{
 				if(pWing->m_Surface[j].m_bTEFlap)
 				{
-					if((!m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_bActiveControl[NCtrls]) ||
-					   ( m_pCurWPolar->m_bAVLControls&&m_pCurWPolar->m_MaxControl[NCtrls]))
+					if(fabs(m_pCurWPolar->m_ControlGain[NCtrls])>0.0)
 					{
 
-						if(m_pCurWPolar->m_bAVLControls)
-						{
-							angle = m_pCurWPolar->m_MaxControl[NCtrls] * t; //maxcontrol is the gain
+						angle = m_pCurWPolar->m_ControlGain[NCtrls] * t; //maxcontrol is the gain
 
-							if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
-								TotalAngle = angle + (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
-							else
-								TotalAngle = angle;
-
-							strange = QString::fromUtf8("         Rotating the flap by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
-						}
+						if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
+							TotalAngle = angle + (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
 						else
-						{
-							angle = m_pCurWPolar->m_MinControl[NCtrls] + t * (m_pCurWPolar->m_MaxControl[NCtrls] - m_pCurWPolar->m_MinControl[NCtrls]);
-							strange =  "        Setting "+pWing->m_WingName +" ";
-							strange += QString("flap %1 angle to %2").arg(nFlap+1).arg(angle, 5, 'f',2);
-							//cancel initial angle, if any
-							if(pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle && pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle)
-								angle -= (pWing->m_Surface[j].m_pFoilA->m_TEFlapAngle + pWing->m_Surface[j].m_pFoilB->m_TEFlapAngle)/2.0;
-						}
+							TotalAngle = angle;
+
+						strange = QString::fromUtf8("         Rotating the flap by %1°, total angle is %2°").arg(angle, 5, 'f',2).arg(TotalAngle, 5, 'f',2);
+
 						strange += "\n";
 						out +=strange;
 
