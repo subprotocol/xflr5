@@ -182,6 +182,7 @@ private slots:
 	void OnAdvancedSettings();
 	void OnHideUFOWPolars();
 	void OnShowUFOWPolars();
+	void OnShowUFOWPolarsOnly();
 	void OnHideUFOWOpps();
 	void OnShowUFOWOpps();
 	void OnDeleteUFOWOpps();

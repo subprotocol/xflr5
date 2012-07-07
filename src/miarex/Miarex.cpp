@@ -3851,8 +3851,8 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 			pWPolar = (CWPolar*)m_poaWPolar->at(l);
 
 			if (pWPolar->m_Alpha.size() &&
-				(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_WPolarType==STABILITYPOLAR)) &&
-				((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
+				pWPolar->m_bIsVisible  &&
+			   ((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
 				  pWPolar->m_UFOName == str.at(k) &&
 				((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
 				 (pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && m_bType2) ||
@@ -10692,6 +10692,30 @@ void QMiarex::OnShowCurve()
 
 
 
+void QMiarex::OnShowUFOWPolarsOnly()
+{
+	if(!m_pCurWing) return;
+	int i;
+	QString UFOName;
+	if(m_pCurPlane)     UFOName = m_pCurPlane->PlaneName();
+	else if(m_pCurWing) UFOName = m_pCurWing->WingName();
+	else return;
+
+	MainFrame* pMainFrame = (MainFrame*)s_pMainFrame;
+	CWPolar *pWPolar;
+	for (i=0; i<m_poaWPolar->size(); i++)
+	{
+		pWPolar = (CWPolar*)m_poaWPolar->at(i);
+		pWPolar->m_bIsVisible = (pWPolar->m_UFOName == UFOName);
+	}
+
+	if(m_iView==WPOLARVIEW)		CreateWPolarCurves();
+	else if(m_iView==WSTABVIEW)	CreateStabilityCurves();
+
+	SetCurveParams();
+	pMainFrame->SetSaveState(false);
+	UpdateView();
+}
 
 
 void QMiarex::OnShowUFOWPolars()

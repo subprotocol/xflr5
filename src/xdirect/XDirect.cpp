@@ -2896,11 +2896,10 @@ void QXDirect::OnExportCurOpp()
 {
 	if(!g_pCurFoil || !m_pCurPolar || !m_pCurOpp)	return;
 
-	QString filter;
-
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	QString FileName;
 
+	QString filter;
 	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
 	else                                filter = "Comma Separated Values (*.csv)";
 
@@ -2924,6 +2923,120 @@ void QXDirect::OnExportCurOpp()
 
 	m_pCurOpp->ExportOpp(out, pMainFrame->m_VersionName, pMainFrame->m_ExportFileType);
 	XFile.close();
+}
+
+
+void QXDirect::OnExportPolarOpps()
+{
+	MainFrame * pMainFrame = (MainFrame*)m_pMainFrame;
+	if(!m_poaPolar->size())
+	{
+		QMessageBox::warning(pMainFrame, tr("Warning"), "No Operating Points to export to file");
+		return;
+	}
+
+	int i,j;
+	QString FileName;
+
+	QString filter;
+	if(pMainFrame->m_ExportFileType==1) filter = "Text File (*.txt)";
+	else                                filter = "Comma Separated Values (*.csv)";
+
+	FileName = QFileDialog::getSaveFileName(this, tr("Export OpPoint"),
+											pMainFrame->m_LastDirName ,
+											tr("Text File (*.txt);;Comma Separated Values (*.csv)"),
+											&filter);
+
+	if(!FileName.length()) return;
+	if(!FileName.length()) return;
+
+	int pos = FileName.lastIndexOf("/");
+	if(pos>0) pMainFrame->m_LastDirName = FileName.left(pos);
+	pos = FileName.lastIndexOf(".csv");
+	if (pos>0) pMainFrame->m_ExportFileType = 2;
+	else       pMainFrame->m_ExportFileType = 1;
+
+	QFile XFile(FileName);
+
+	if (!XFile.open(QIODevice::WriteOnly | QIODevice::Text)) return ;
+
+	QTextStream out(&XFile);
+
+
+	QString Header, strong;
+	out<<pMainFrame->m_VersionName;
+	out<<"\n\n";
+	strong = g_pCurFoil->m_FoilName + "\n";
+	out << strong;
+
+	OpPoint *pOpPoint;
+
+	for (i=0; i<m_poaOpp->size(); i++)
+	{
+		pOpPoint = (OpPoint*)m_poaOpp->at(i);
+		if(pOpPoint->m_strFoilName == m_pCurPolar->m_FoilName && pOpPoint->m_strPlrName == m_pCurPolar->m_PlrName )
+		{
+			if(pMainFrame->m_ExportFileType==1)
+				strong = QString("Reynolds = %1   Mach = %2  NCrit = %3\n")
+									.arg(pOpPoint->Reynolds, 7, 'f', 0)
+									.arg(pOpPoint->Mach, 4,'f',0)
+									.arg(pOpPoint->ACrit, 3, 'f',1);
+			else
+				strong = QString("Reynolds =, %1,Mach =, %2,NCrit =, %3\n")
+						.arg(pOpPoint->Reynolds, 7, 'f', 0)
+						.arg(pOpPoint->Mach, 4,'f',0)
+						.arg(pOpPoint->ACrit, 3, 'f',1);
+
+			out<<strong;
+			if(pMainFrame->m_ExportFileType==1) Header = QString("  Alpha        Cd        Cl        Cm        XTr1      XTr2   TEHMom    Cpmn\n");
+			else        Header = QString("Alpha,Cd,Cl,Cm,XTr1,XTr2,TEHMom,Cpmn\n");
+			out<<Header;
+
+			if(pMainFrame->m_ExportFileType==1)
+				strong = QString("%1   %2   %3   %4   %5   %6   %7  %8\n")
+					.arg(pOpPoint->Alpha,7,'f',3)
+					.arg(pOpPoint->Cd,9,'f',3)
+					.arg(pOpPoint->Cl,7,'f',3)
+					.arg(pOpPoint->Cm,7,'f',3)
+					.arg(pOpPoint->Xtr1,7,'f',3)
+					.arg(pOpPoint->Xtr2,7,'f',3)
+					.arg(pOpPoint->m_TEHMom,7,'f',4)
+					.arg(pOpPoint->Cpmn,7,'f',4);
+			else
+				strong = QString("%1,%2,%3,%4,%5,%6,%7,%8\n")
+				.arg(pOpPoint->Alpha,7,'f',3)
+				.arg(pOpPoint->Cd,9,'f',3)
+				.arg(pOpPoint->Cl,7,'f',3)
+				.arg(pOpPoint->Cm,7,'f',3)
+				.arg(pOpPoint->Xtr1,7,'f',3)
+				.arg(pOpPoint->Xtr2,7,'f',3)
+				.arg(pOpPoint->m_TEHMom,7,'f',4)
+				.arg(pOpPoint->Cpmn,7,'f',4);
+
+			out<<strong;
+			if(pMainFrame->m_ExportFileType==1) out<< " Cpi          Cpv\n-----------------\n";
+			else                                out << "Cpi,Cpv\n";
+
+			for (j=0; j<pOpPoint->n; j++)
+			{
+				if(pOpPoint->m_bVisc)
+				{
+					if(pMainFrame->m_ExportFileType==1) strong = QString("%1   %2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
+					else                                strong = QString("%1,%2\n").arg(pOpPoint->Cpi[j], 7,'f',4).arg(pOpPoint->Cpv[j], 7, 'f',4);
+				}
+				else
+				{
+					strong=QString("%1\n").arg(pOpPoint->Cpi[j],7,'f',4);
+				}
+
+				out << strong;
+			}
+			out << "\n\n";
+		}
+	}
+	XFile.close();
+
+
 }
 
 
@@ -4486,6 +4599,25 @@ void QXDirect::OnShowCurve()
 }
 
 
+void QXDirect::OnShowFoilPolarsOnly()
+{
+	if(!g_pCurFoil) return;
+	MainFrame * pMainFrame = (MainFrame*) m_pMainFrame;
+	CPolar *pPolar;
+	for (int i=0; i<m_poaPolar->size(); i++)
+	{
+		pPolar = (CPolar*)m_poaPolar->at(i);
+		pPolar->m_bIsVisible = (pPolar->m_FoilName == g_pCurFoil->m_FoilName);
+	}
+	pMainFrame->SetSaveState(false);
+	CreatePolarCurves();
+	SetCurveParams();
+	UpdateView();
+}
+
+
+
+
 void QXDirect::OnShowFoilPolars()
 {
 	if(!g_pCurFoil) return;
@@ -4504,9 +4636,6 @@ void QXDirect::OnShowFoilPolars()
 	SetCurveParams();
 	UpdateView();
 }
-
-
-
 void QXDirect::OnShowFoilOpps()
 {
 	if(!g_pCurFoil || !m_pCurPolar) return;

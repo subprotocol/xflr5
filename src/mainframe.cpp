@@ -1380,6 +1380,9 @@ void MainFrame::CreateMiarexActions()
 	hideUFOWPlrs->setStatusTip(tr("Hide all the polar curves associated to the currently selected wing or plane"));
 	connect(hideUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnHideUFOWPolars()));
 	
+	showUFOWPlrsOnly = new QAction(tr("Show Only Associated Polars"), this);
+	connect(showUFOWPlrsOnly, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWPolarsOnly()));
+
 	showUFOWPlrs = new QAction(tr("Show Associated Polars"), this);
 	showUFOWPlrs->setStatusTip(tr("Show all the polar curves associated to the currently selected wing or plane"));
 	connect(showUFOWPlrs, SIGNAL(triggered()), pMiarex, SLOT(OnShowUFOWPolars()));
@@ -1485,8 +1488,9 @@ void MainFrame::CreateMiarexMenus()
 			currentUFOMenu->addSeparator();
 			currentUFOMenu->addAction(exporttoAVL);
 			currentUFOMenu->addSeparator();
-			currentUFOMenu->addAction(hideUFOWPlrs);
+			currentUFOMenu->addAction(showUFOWPlrsOnly);
 			currentUFOMenu->addAction(showUFOWPlrs);
+			currentUFOMenu->addAction(hideUFOWPlrs);
 			currentUFOMenu->addAction(deleteUFOWPlrs);
 			currentUFOMenu->addSeparator();
 			currentUFOMenu->addAction(hideUFOWOpps);
@@ -1940,6 +1944,9 @@ void MainFrame::CreateXDirectActions()
 	deleteFoilPolars->setStatusTip(tr("Delete all the polars associated to this foil"));
 	connect(deleteFoilPolars, SIGNAL(triggered()), pXDirect, SLOT(OnDeleteFoilPolars()));
 
+	showFoilPolarsOnly = new QAction(tr("Show only associated polars"), this);
+	connect(showFoilPolarsOnly, SIGNAL(triggered()), pXDirect, SLOT(OnShowFoilPolarsOnly()));
+
 	showFoilPolars = new QAction(tr("Show associated polars"), this);
 	connect(showFoilPolars, SIGNAL(triggered()), pXDirect, SLOT(OnShowFoilPolars()));
 
@@ -1957,6 +1964,9 @@ void MainFrame::CreateXDirectActions()
 
 	deletePolarOpps = new QAction(tr("Delete associated OpPoints"), this);
 	connect(deletePolarOpps, SIGNAL(triggered()), pXDirect, SLOT(OnDeletePolarOpps()));
+
+	exportPolarOpps = new QAction(tr("Export associated OpPoints"), this);
+	connect(exportPolarOpps, SIGNAL(triggered()), pXDirect, SLOT(OnExportPolarOpps()));
 
 	hideFoilOpps = new QAction(tr("Hide associated OpPoints"), this);
 	connect(hideFoilOpps, SIGNAL(triggered()), pXDirect, SLOT(OnHideFoilOpps()));
@@ -2176,6 +2186,7 @@ void MainFrame::CreateXDirectMenus()
 	currentFoilMenu->addAction(deleteCurFoil);
 	currentFoilMenu->addAction(DuplicateFoil);
 	currentFoilMenu->addSeparator();
+	currentFoilMenu->addAction(showFoilPolarsOnly);
 	currentFoilMenu->addAction(showFoilPolars);
 	currentFoilMenu->addAction(hideFoilPolars);
 	currentFoilMenu->addAction(deleteFoilPolars);
@@ -2225,6 +2236,7 @@ void MainFrame::CreateXDirectMenus()
 	currentPolarMenu->addAction(showPolarOpps);
 	currentPolarMenu->addAction(hidePolarOpps);
 	currentPolarMenu->addAction(deletePolarOpps);
+	currentPolarMenu->addAction(exportPolarOpps);
 	PolarMenu->addSeparator();
 	PolarMenu->addAction(m_pImportXFoilPolar);
 //	PolarMenu->addAction(m_pImportJavaFoilPolar);

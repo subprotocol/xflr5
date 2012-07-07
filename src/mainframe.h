@@ -313,7 +313,7 @@ private:
 	QAction *MiarexPolarFilter;
 	QAction *allWPolarGraphsScalesAct, *allWingGraphsScalesAct, *allWPolarGraphsSettings, *allWingGraphsSettings;
 	QAction *hideAllWPlrs, *showAllWPlrs;
-	QAction *hideUFOWPlrs, *showUFOWPlrs, *deleteUFOWPlrs;
+	QAction *hideUFOWPlrs, *showUFOWPlrs, *showUFOWPlrsOnly, *deleteUFOWPlrs;
 	QAction *hideUFOWOpps, *showUFOWOpps, *deleteUFOWOpps;
 	QAction *resetWOppLegend, *resetWPlrLegend;
 	QAction *exportCurWOpp, *showCurWOppOnly, *hideAllWOpps, *showAllWOpps, *deleteAllWOpps;
@@ -333,8 +333,8 @@ private:
 	QAction *PolarsAct, *OpPointsAct, *deletePolar, *definePolar, *editCurPolar, *defineBatch, *resetCurPolar;
 	QAction *MultiThreadedBatchAct;
 	QAction *restoreToolbarsAct;
-	QAction *exportCurPolar, *exportAllPolars, *hideFoilPolars, *showFoilPolars, *saveFoilPolars,*deleteFoilPolars;
-	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints;
+	QAction *exportCurPolar, *exportAllPolars, *hideFoilPolars, *showFoilPolars, *showFoilPolarsOnly, *saveFoilPolars,*deleteFoilPolars;
+	QAction *showAllPolars, *hideAllPolars, *showCurOppOnly, *showAllOpPoints, *hideAllOpPoints, *exportPolarOpps;
 	QAction *hideFoilOpps, *showFoilOpps, *deleteFoilOpps;
 	QAction *hidePolarOpps, *showPolarOpps, *deletePolarOpps;
 	QAction *exportCurOpp, *deleteCurOpp, *resetXFoil;

@@ -112,6 +112,7 @@ private slots:
 	void OnEditCurPolar();
 	void OnExportCurFoil();
 	void OnExportCurOpp();
+	void OnExportPolarOpps() ;
 	void OnExportCurPolar();
 	void OnExportAllPolars();
 	void OnHideAllOpps();
@@ -128,6 +129,7 @@ private slots:
 	void OnResetCurPolar();
 	void OnSavePolars();
 	void OnSequence();
+	void OnShowFoilPolarsOnly();
 	void OnShowFoilPolars();
 	void OnShowBL();
 	void OnShowCurve();
