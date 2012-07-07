@@ -46,7 +46,6 @@
 #include "../misc/ModDlg.h"
 #include "../misc/RenameDlg.h"
 #include "../misc/ProgressDlg.h"
-#include "../misc/EditPlrDlg.h"
 #include "../misc/ObjectPropsDlg.h"
 #include "../misc/PolarFilterDlg.h"
 #include "../misc/W3dPrefsDlg.h"
@@ -94,7 +93,6 @@ class QMiarex : public QWidget
 	friend class PlaneDlg;
 	friend class ManageBodiesDlg;
 	friend class ManageUFOsDlg;
-	friend class EditPlrDlg;
 	friend class GL3dWingDlg;
 	friend class DisplaySettingsDlg;
 	friend class UFOTableDelegate;
@@ -371,7 +369,6 @@ private:
 	PlaneDlg m_PlaneDlg;
 	ModDlg m_ModDlg;
 	RenameDlg m_RenameDlg;
-	EditPlrDlg m_EditPlrDlg;
 	GraphDlg m_GraphDlg;
 	WingScaleDlg m_WingScaleDlg;
 	W3dPrefsDlg m_W3dPrefsDlg;

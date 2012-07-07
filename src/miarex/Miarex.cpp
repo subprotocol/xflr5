@@ -3885,14 +3885,25 @@ void QMiarex::DrawWPolarLegend(QPainter &painter, QPoint place, int bottom)
 				pWPolar = (CWPolar*)m_poaWPolar->at(nc);
 				if(str.at(k) == pWPolar->m_UFOName)
 				{
-					if (pWPolar->m_Alpha.size() &&
-						(pWPolar->m_bIsVisible ||(pWPolar->m_bShowPoints&&pWPolar->m_WPolarType==STABILITYPOLAR)) &&
-						((pWPolar->m_WPolarType==STABILITYPOLAR && m_iView==WSTABVIEW) || m_iView!=WSTABVIEW) &&
-						  pWPolar->m_UFOName == str.at(k) &&
-						((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && m_bType1) ||
-						 (pWPolar->m_WPolarType==FIXEDLIFTPOLAR && m_bType2) ||
-						 (pWPolar->m_WPolarType==FIXEDAOAPOLAR && m_bType4) ||
-						 (pWPolar->m_WPolarType==STABILITYPOLAR && m_bType7)))
+					if(!pWPolar->m_Alpha.size())
+					{
+					}
+					else if(m_iView==WPOLARVIEW && !pWPolar->m_bIsVisible)
+					{
+					}
+					else if(m_iView==WSTABVIEW && (!pWPolar->m_bIsVisible && !pWPolar->m_bShowPoints))
+					{
+					}
+					else if(m_iView==WSTABVIEW && pWPolar->m_WPolarType!=STABILITYPOLAR)
+					{
+					}
+					else if((pWPolar->m_WPolarType==FIXEDSPEEDPOLAR && !m_bType1) ||
+							(pWPolar->m_WPolarType==FIXEDLIFTPOLAR  && !m_bType2) ||
+							(pWPolar->m_WPolarType==FIXEDAOAPOLAR   && !m_bType4) ||
+							(pWPolar->m_WPolarType==STABILITYPOLAR  && !m_bType7))
+					{
+					}
+					else
 					{
 
 						LegendPen.setColor(pWPolar->m_Color);

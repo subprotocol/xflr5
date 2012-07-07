@@ -51,6 +51,7 @@ SOURCES += \
 	src/xdirect/XFoilAnalysisDlg.cpp \
 	src/xdirect/XFoilAdvancedDlg.cpp \
 	src/xdirect/XDirect.cpp \
+	src/xdirect/EditPlrDlg.cpp \
 	src/objects/ArcBall.cpp \
 	src/objects/Body.cpp \
 	src/objects/CVector.cpp \
@@ -71,7 +72,6 @@ SOURCES += \
 	src/misc/SaveOptionsDlg.cpp \
 	src/misc/ProgressDlg.cpp \
 	src/misc/ModDlg.cpp \
-	src/misc/EditPlrDlg.cpp \
 	src/misc/PolarFilterDlg.cpp \
 	src/misc/TranslatorDlg.cpp \
 	src/misc/UnitsDlg.cpp \
@@ -160,6 +160,7 @@ HEADERS += \
 	src/xdirect/BatchDlg.h \
 	src/xdirect/BatchThreadDlg.h \
 	src/xdirect/XFoilTask.h \
+	src/xdirect/EditPlrDlg.h \
 	src/xinverse/XInverse.h \
 	src/xinverse/InverseOptionsDlg.h \
 	src/xinverse/FoilSelectionDlg.h \
@@ -196,7 +197,6 @@ HEADERS += \
 	src/misc/ColorButton.h \
 	src/misc/LineCbBox.h \
 	src/misc/LineButton.h \
-	src/misc/EditPlrDlg.h \
 	src/misc/AboutQ5.h \
 	src/misc/FloatEdit.h \
 	src/misc/ProgressDlg.h \

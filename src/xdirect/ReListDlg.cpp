@@ -201,29 +201,29 @@ void ReListDlg::OnInsert()
 		m_NCritList[i] = m_NCritList[i-1];
 	}
 
-        if(sel>0)        m_ReList[sel]    = (m_ReList[sel-1]+m_ReList[sel+1]) /2.0;
-        else if(sel==0)  m_ReList[sel]    = m_ReList[sel+1]                   /2.0;
-        else             m_ReList[0]      = 100000.0;
+	if(sel>0)        m_ReList[sel]    = (m_ReList[sel-1]+m_ReList[sel+1]) /2.0;
+	else if(sel==0)  m_ReList[sel]    = m_ReList[sel+1]                   /2.0;
+	else             m_ReList[0]      = 100000.0;
 
-        if(sel>=0)
-        {
-            m_MachList[sel]  = m_MachList[sel+1];
-            m_NCritList[sel] = m_NCritList[sel+1];
-        }
-        else
-        {
-            sel = 0;
-            m_MachList[sel]  = 0.0;
-            m_NCritList[sel] = 0.0;
-        }
+	if(sel>=0)
+	{
+		m_MachList[sel]  = m_MachList[sel+1];
+		m_NCritList[sel] = m_NCritList[sel+1];
+	}
+	else
+	{
+		sel = 0;
+		m_MachList[sel]  = 0.0;
+		m_NCritList[sel] = 0.0;
+	}
 
 	m_NRe ++;
 
 	FillReModel();
 
-        QModelIndex index = m_pReModel->index(sel, 0, QModelIndex());
-        m_pctrlReView->setCurrentIndex(index);
-        m_pctrlReView->openPersistentEditor(index);
+	QModelIndex index = m_pReModel->index(sel, 0, QModelIndex());
+	m_pctrlReView->setCurrentIndex(index);
+	m_pctrlReView->openPersistentEditor(index);
 }
 
 

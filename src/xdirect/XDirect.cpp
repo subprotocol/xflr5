@@ -33,9 +33,9 @@
  
 #include "../globals.h"
 #include "../mainframe.h"
-#include "../misc/EditPlrDlg.h"
 #include "../misc/ObjectPropsDlg.h"
 #include "XDirect.h"
+#include "EditPlrDlg.h"
 
 #include "TwoDPanelDlg.h"
 #include "InterpolateFoilsDlg.h"
@@ -2655,6 +2655,10 @@ void QXDirect::OnEditCurPolar()
 	EditPlrDlg dlg;
 	dlg.m_pPolar = m_pCurPolar;
 	dlg.m_pXDirect = this;
+	dlg.move(EditPlrDlg::s_WindowPos);
+	dlg.resize(EditPlrDlg::s_WindowSize);
+	if(EditPlrDlg::s_bWindowMaximized) dlg.setWindowState(Qt::WindowMaximized);
+
 	dlg.InitDialog();
 
 	bool bPoints = m_pCurPolar->m_bShowPoints;

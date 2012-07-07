@@ -24,10 +24,12 @@
 
 #include <QDialog>
 #include <QPushButton>
-#include <QListWidget>
+//#include <QListWidget>
+#include <QTableView>
+#include <QStandardItemModel>
+#include "../misc/FloatEditDelegate.h"
 
 #include "../objects/Polar.h"
-#include "../objects/WPolar.h"
 
 
 class EditPlrDlg : public QDialog
@@ -50,18 +52,24 @@ private:
 	void SetupLayout();
 	void FillTable();
 	void keyPressEvent(QKeyEvent *event);
+	void resizeEvent(QResizeEvent*event);
+	void closeEvent(QCloseEvent*event);
 
 private:
 	QPushButton *m_pctrlDeletePoint, *m_pctrlDeleteAllPoints;
 	QPushButton *OKButton, *CancelButton;
 
-	QListWidget *m_pctrlAlphaList;
 	CPolar *m_pPolar;
-	CWPolar *m_pWPolar;
 
+	QTableView *m_pctrlPointTable;
+	QStandardItemModel *m_pPointModel;
+	FloatEditDelegate *m_pFloatDelegate;
 
 	void *m_pXDirect;
-	void *m_pMiarex;
+
+	static QPoint s_WindowPos;
+	static QSize  s_WindowSize;
+	static bool s_bWindowMaximized;
 };
 
 #endif // EDITPLRDLG_H
