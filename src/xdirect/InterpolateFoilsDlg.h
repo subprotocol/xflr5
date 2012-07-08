@@ -59,7 +59,6 @@ public:
 	QComboBox *m_pctrlFoil1, *m_pctrlFoil2;
 	QLabel *m_pctrlCamb1, *m_pctrlCamb2, *m_pctrlThick1, *m_pctrlThick2;
 	QLabel *m_pctrlCamb3, *m_pctrlThick3;
-	QLineEdit *m_pctrlNewFoilName;
 	QSlider *m_pctrlSlider;
 	FloatEdit *m_pctrlFrac;
 	QPushButton *OKButton, *CancelButton;

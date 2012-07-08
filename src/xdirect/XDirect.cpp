@@ -3755,15 +3755,16 @@ void QXDirect::OnInterpolateFoils()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_InterpolateFoilsDlg.move(pMainFrame->m_DlgPos);
-	m_InterpolateFoilsDlg.m_pMainFrame = m_pMainFrame;
-	m_InterpolateFoilsDlg.m_poaFoil     = m_poaFoil;
-	m_InterpolateFoilsDlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
-	m_InterpolateFoilsDlg.m_pXDirect = this;
-	m_InterpolateFoilsDlg.m_pAFoil   = NULL;
-	m_InterpolateFoilsDlg.InitDialog();
+	InterpolateFoilsDlg IFDlg;
+	IFDlg.move(pMainFrame->m_DlgPos);
+	IFDlg.m_pMainFrame = m_pMainFrame;
+	IFDlg.m_poaFoil     = m_poaFoil;
+	IFDlg.m_pBufferFoil = &m_BufferFoil;// work on the buffer foil
+	IFDlg.m_pXDirect = this;
+	IFDlg.m_pAFoil   = NULL;
+	IFDlg.InitDialog();
 
-	if(m_InterpolateFoilsDlg.exec() == QDialog::Accepted)
+	if(IFDlg.exec() == QDialog::Accepted)
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -3771,7 +3772,7 @@ void QXDirect::OnInterpolateFoils()
 		pNewFoil->m_nFoilStyle = 0;
 		pNewFoil->m_nFoilWidth = 1;
 		pNewFoil->m_bPoints = false;
-		pNewFoil->m_FoilName = m_InterpolateFoilsDlg.m_NewFoilName;
+		pNewFoil->m_FoilName = IFDlg.m_NewFoilName;
 		pMainFrame->SetModFoil(pNewFoil);
 		pMainFrame->UpdateFoils();
 	}
@@ -3781,7 +3782,7 @@ void QXDirect::OnInterpolateFoils()
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
-	pMainFrame->m_DlgPos = m_InterpolateFoilsDlg.pos();
+	pMainFrame->m_DlgPos = IFDlg.pos();
 
 	m_bPressure = bPressure;
 	m_bBL       = bBL;

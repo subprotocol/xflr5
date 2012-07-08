@@ -1410,7 +1410,6 @@ void QAFoil::OnAFoilInterpolateFoils()
 		SelectFoil(pFoil);
 
 	}
-
 	else
 	{
 		FillFoilTable();
@@ -2286,7 +2285,7 @@ void QAFoil::PaintSplines(QPainter &painter)
 	painter.save();
 	MainFrame* pMainFrame = (MainFrame*)m_pMainFrame;
 
-	QPen SplinePen, CenterPen, CtrlPen;
+	QPen CtrlPen;
 
 	QBrush FillBrush(pMainFrame->m_BackgroundColor);
 	painter.setBrush(FillBrush);
@@ -2363,10 +2362,7 @@ void QAFoil::PaintFoils(QPainter &painter)
 		style = m_pBufferFoil->m_nFoilStyle;
 		width = m_pBufferFoil->m_nFoilWidth;
 
-
-
 		m_pBufferFoil->DrawFoil(painter, 0.0, m_fScale, m_fScale*m_fScaleY,m_ptOffset);
-
 
 		if (m_pBufferFoil->m_bCenterLine)
 		{

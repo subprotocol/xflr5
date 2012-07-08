@@ -47,7 +47,6 @@
 #include "../misc/PolarFilterDlg.h"
 
 #include "TwoDPanelDlg.h"
-#include "InterpolateFoilsDlg.h"
 #include "NacaFoilDlg.h"
 #include "FoilCoordDlg.h"
 #include "FoilGeomDlg.h"
@@ -260,7 +259,6 @@ private:
 	RenameDlg m_RenameDlg;
 
 	TwoDPanelDlg        m_TwoDPanelDlg;
-	InterpolateFoilsDlg m_InterpolateFoilsDlg;
 	NacaFoilDlg         m_NacaFoilDlg;
 	FoilCoordDlg        m_FoilCoordDlg;
 	FoilGeomDlg         m_FoilGeomDlg;

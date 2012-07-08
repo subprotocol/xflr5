@@ -51,146 +51,161 @@ FoilGeomDlg::FoilGeomDlg()
 	connect(m_pctrlXCamberSlide, SIGNAL(sliderMoved(int)), this, SLOT(OnXCamberSlide(int)));
 	connect(m_pctrlThickSlide, SIGNAL(sliderMoved(int)), this, SLOT(OnThickSlide(int)));
 	connect(m_pctrlXThickSlide, SIGNAL(sliderMoved(int)), this, SLOT(OnXThickSlide(int)));
-
 }
+
 
 void FoilGeomDlg::SetupLayout()
 {
 	QVBoxLayout *CamberData = new QVBoxLayout;
-	m_pctrlCamberSlide = new QSlider;
-	m_pctrlCamberSlide->setOrientation(Qt::Horizontal);
-	m_pctrlCamberSlide->setTickPosition(QSlider::TicksBelow);
-	m_pctrlCamberSlide->setMinimumWidth(200);
-	m_pctrlCamber =new FloatEdit;
-	m_pctrlXCamberSlide = new QSlider;
-	m_pctrlXCamberSlide->setOrientation(Qt::Horizontal);
-	m_pctrlXCamberSlide->setTickPosition(QSlider::TicksBelow);
-	m_pctrlXCamberSlide->setMinimumWidth(200);
-	m_pctrlXCamber = new FloatEdit;
-	QLabel *lab1 = new QLabel(tr("Value"));
-	QLabel *lab2 = new QLabel(tr("%Chord"));
-	QLabel *lab3 = new QLabel(tr("0%"));
-	QLabel *lab4 = new QLabel(tr("10%"));
-	QLabel *lab5 = new QLabel(tr("Max x-pos"));
-	QLabel *lab6 = new QLabel(tr("%Chord"));
-	QLabel *lab7 = new QLabel(tr("0%"));
-	QLabel *lab8 = new QLabel(tr("100%"));
-	lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab1->setMinimumWidth(70);
-	lab2->setMinimumWidth(70);
-	lab3->setMinimumWidth(50);
-	lab4->setMinimumWidth(50);
-	lab5->setMinimumWidth(70);
-	lab6->setMinimumWidth(70);
-	lab7->setMinimumWidth(50);
-	lab8->setMinimumWidth(50);
+	{
+		m_pctrlCamberSlide = new QSlider;
+		m_pctrlCamberSlide->setOrientation(Qt::Horizontal);
+		m_pctrlCamberSlide->setTickPosition(QSlider::TicksBelow);
+		m_pctrlCamberSlide->setMinimumWidth(200);
+		m_pctrlCamber =new FloatEdit;
+		m_pctrlXCamberSlide = new QSlider;
+		m_pctrlXCamberSlide->setOrientation(Qt::Horizontal);
+		m_pctrlXCamberSlide->setTickPosition(QSlider::TicksBelow);
+		m_pctrlXCamberSlide->setMinimumWidth(200);
+		m_pctrlXCamber = new FloatEdit;
+		QLabel *lab1 = new QLabel(tr("Value"));
+		QLabel *lab2 = new QLabel(tr("%Chord"));
+		QLabel *lab3 = new QLabel(tr("0%"));
+		QLabel *lab4 = new QLabel(tr("10%"));
+		QLabel *lab5 = new QLabel(tr("Max x-pos"));
+		QLabel *lab6 = new QLabel(tr("%Chord"));
+		QLabel *lab7 = new QLabel(tr("0%"));
+		QLabel *lab8 = new QLabel(tr("100%"));
+		lab1->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab5->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab3->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab7->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab1->setMinimumWidth(70);
+		lab2->setMinimumWidth(70);
+		lab3->setMinimumWidth(50);
+		lab4->setMinimumWidth(50);
+		lab5->setMinimumWidth(70);
+		lab6->setMinimumWidth(70);
+		lab7->setMinimumWidth(50);
+		lab8->setMinimumWidth(50);
 
-	QHBoxLayout *CambVal = new QHBoxLayout;
-	CambVal->addWidget(lab1);
-	CambVal->addWidget(m_pctrlCamber);
-	CambVal->addWidget(lab2);
-	CambVal->addStretch(1);
-	CambVal->addWidget(lab3);
-	CambVal->addWidget(m_pctrlCamberSlide);
-	CambVal->addWidget(lab4);
+		QHBoxLayout *CambVal = new QHBoxLayout;
+		{
+			CambVal->addWidget(lab1);
+			CambVal->addWidget(m_pctrlCamber);
+			CambVal->addWidget(lab2);
+			CambVal->addStretch(1);
+			CambVal->addWidget(lab3);
+			CambVal->addWidget(m_pctrlCamberSlide);
+			CambVal->addWidget(lab4);
+		}
 
-	QHBoxLayout *XCambVal = new QHBoxLayout;
-	XCambVal->addWidget(lab5);
-	XCambVal->addWidget(m_pctrlXCamber);
-	XCambVal->addWidget(lab6);
-	XCambVal->addStretch(1);
-	XCambVal->addWidget(lab7);
-	XCambVal->addWidget(m_pctrlXCamberSlide);
-	XCambVal->addWidget(lab8);
-
-	CamberData->addLayout(CambVal);
-	CamberData->addLayout(XCambVal);
-
+		QHBoxLayout *XCambVal = new QHBoxLayout;
+		{
+			XCambVal->addWidget(lab5);
+			XCambVal->addWidget(m_pctrlXCamber);
+			XCambVal->addWidget(lab6);
+			XCambVal->addStretch(1);
+			XCambVal->addWidget(lab7);
+			XCambVal->addWidget(m_pctrlXCamberSlide);
+			XCambVal->addWidget(lab8);
+		}
+		CamberData->addLayout(CambVal);
+		CamberData->addLayout(XCambVal);
+	}
 	QGroupBox *CamberGroup = new QGroupBox(tr("Camber"));
 	CamberGroup->setLayout(CamberData);
 
 
 	QVBoxLayout *ThicknessData = new QVBoxLayout;
-	m_pctrlThickSlide = new QSlider;
-	m_pctrlThickSlide->setOrientation(Qt::Horizontal);
-	m_pctrlThickSlide->setTickPosition(QSlider::TicksBelow);
-	m_pctrlThickSlide->setMinimumWidth(200);
-	m_pctrlThickness =new FloatEdit;
-	m_pctrlXThickSlide = new QSlider;
-	m_pctrlXThickSlide->setOrientation(Qt::Horizontal);
-	m_pctrlXThickSlide->setTickPosition(QSlider::TicksBelow);
-	m_pctrlXThickSlide->setMinimumWidth(200);
-	m_pctrlXThickness = new FloatEdit;
-	QLabel *lab11 = new QLabel(tr("Value"));
-	QLabel *lab12 = new QLabel(tr("%Chord"));
-	QLabel *lab13 = new QLabel("0%");
-	QLabel *lab14 = new QLabel("20%");
-	QLabel *lab15 = new QLabel(tr("Max x-pos"));
-	QLabel *lab16 = new QLabel(tr("%Chord"));
-	QLabel *lab17 = new QLabel("0%");
-	QLabel *lab18 = new QLabel("100%");
+	{
+		m_pctrlThickSlide = new QSlider;
+		m_pctrlThickSlide->setOrientation(Qt::Horizontal);
+		m_pctrlThickSlide->setTickPosition(QSlider::TicksBelow);
+		m_pctrlThickSlide->setMinimumWidth(200);
+		m_pctrlThickness =new FloatEdit;
+		m_pctrlXThickSlide = new QSlider;
+		m_pctrlXThickSlide->setOrientation(Qt::Horizontal);
+		m_pctrlXThickSlide->setTickPosition(QSlider::TicksBelow);
+		m_pctrlXThickSlide->setMinimumWidth(200);
+		m_pctrlXThickness = new FloatEdit;
+		QLabel *lab11 = new QLabel(tr("Value"));
+		QLabel *lab12 = new QLabel(tr("%Chord"));
+		QLabel *lab13 = new QLabel("0%");
+		QLabel *lab14 = new QLabel("20%");
+		QLabel *lab15 = new QLabel(tr("Max x-pos"));
+		QLabel *lab16 = new QLabel(tr("%Chord"));
+		QLabel *lab17 = new QLabel("0%");
+		QLabel *lab18 = new QLabel("100%");
 
-	lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab15->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab17->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	lab11->setMinimumWidth(70);
-	lab12->setMinimumWidth(70);
-	lab13->setMinimumWidth(50);
-	lab14->setMinimumWidth(50);
-	lab15->setMinimumWidth(70);
-	lab16->setMinimumWidth(70);
-	lab17->setMinimumWidth(50);
-	lab18->setMinimumWidth(50);
+		lab11->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab15->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab13->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab17->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		lab11->setMinimumWidth(70);
+		lab12->setMinimumWidth(70);
+		lab13->setMinimumWidth(50);
+		lab14->setMinimumWidth(50);
+		lab15->setMinimumWidth(70);
+		lab16->setMinimumWidth(70);
+		lab17->setMinimumWidth(50);
+		lab18->setMinimumWidth(50);
 
-	QHBoxLayout *ThickVal = new QHBoxLayout;
-	ThickVal->addWidget(lab11);
-	ThickVal->addWidget(m_pctrlThickness);
-	ThickVal->addWidget(lab12);
-	ThickVal->addStretch(1);
-	ThickVal->addWidget(lab13);
-	ThickVal->addWidget(m_pctrlThickSlide);
-	ThickVal->addWidget(lab14);
+		QHBoxLayout *ThickVal = new QHBoxLayout;
+		{
+			ThickVal->addWidget(lab11);
+			ThickVal->addWidget(m_pctrlThickness);
+			ThickVal->addWidget(lab12);
+			ThickVal->addStretch(1);
+			ThickVal->addWidget(lab13);
+			ThickVal->addWidget(m_pctrlThickSlide);
+			ThickVal->addWidget(lab14);
+		}
 
-	QHBoxLayout *XThickVal = new QHBoxLayout;
-	XThickVal->addWidget(lab15);
-	XThickVal->addWidget(m_pctrlXThickness);
-	XThickVal->addWidget(lab16);
-	XThickVal->addStretch(1);
-	XThickVal->addWidget(lab17);
-	XThickVal->addWidget(m_pctrlXThickSlide);
-	XThickVal->addWidget(lab18);
+		QHBoxLayout *XThickVal = new QHBoxLayout;
+		{
+			XThickVal->addWidget(lab15);
+			XThickVal->addWidget(m_pctrlXThickness);
+			XThickVal->addWidget(lab16);
+			XThickVal->addStretch(1);
+			XThickVal->addWidget(lab17);
+			XThickVal->addWidget(m_pctrlXThickSlide);
+			XThickVal->addWidget(lab18);
+		}
 
-	ThicknessData->addLayout(ThickVal);
-	ThicknessData->addLayout(XThickVal);
+		ThicknessData->addLayout(ThickVal);
+		ThicknessData->addLayout(XThickVal);
+	}
 
 	QGroupBox *ThicknessGroup = new QGroupBox(tr("Thickness"));
 	ThicknessGroup->setLayout(ThicknessData);
 
 
 	QHBoxLayout *CommandButtons = new QHBoxLayout;
-	OKButton      = new QPushButton(tr("OK"));
-	CancelButton  = new QPushButton(tr("Cancel"));
-	RestoreButton  = new QPushButton(tr("Restore"));
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(RestoreButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(OKButton);
-	CommandButtons->addStretch(1);
-	CommandButtons->addWidget(CancelButton);
-	CommandButtons->addStretch(1);
+	{
+		OKButton      = new QPushButton(tr("OK"));
+		CancelButton  = new QPushButton(tr("Cancel"));
+		RestoreButton  = new QPushButton(tr("Restore"));
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(RestoreButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(OKButton);
+		CommandButtons->addStretch(1);
+		CommandButtons->addWidget(CancelButton);
+		CommandButtons->addStretch(1);
+	}
 
 
 	QVBoxLayout *MainLayout = new QVBoxLayout;
-	MainLayout->addWidget(CamberGroup);
-	MainLayout->addStretch(1);
-	MainLayout->addWidget(ThicknessGroup);
-	MainLayout->addStretch(1);
-	MainLayout->addLayout(CommandButtons);
-	setLayout(MainLayout);
+	{
+		MainLayout->addWidget(CamberGroup);
+		MainLayout->addStretch(1);
+		MainLayout->addWidget(ThicknessGroup);
+		MainLayout->addStretch(1);
+		MainLayout->addLayout(CommandButtons);
+		setLayout(MainLayout);
+	}
+
 	setMinimumWidth(500);
 	setMinimumHeight(300);
 

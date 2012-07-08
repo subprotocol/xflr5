@@ -19,6 +19,7 @@
 
 *****************************************************************************/
 
+#include <QtDebug>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
@@ -84,7 +85,12 @@ void FoilCoordDlg::InitDialog()
 
 //void QAbstractItemDelegate::closeEditor ( QWidget * editor, QAbstractItemDelegate::EndEditHint hint = NoHint )
 	connect(m_pFloatDelegate, SIGNAL(closeEditor(QWidget *)), this, SLOT(OnCellChanged(QWidget *)));
-	connect(m_pctrlCoordView, SIGNAL(activated(const QModelIndex &)), this, SLOT(OnItemClicked(const QModelIndex&)));
+
+	QItemSelectionModel *selectionModel = new QItemSelectionModel(m_pCoordModel);
+	m_pctrlCoordView->setSelectionModel(selectionModel);
+	connect(selectionModel, SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(OnItemClicked(QModelIndex)));
+
+
 //void QAbstractItemView::activated ( const QModelIndex & index )   [signal]
 //void itemChanged ( QStandardItem * item )
 	connect(m_pctrlApply, SIGNAL(clicked()),this, SLOT(OnApply()));

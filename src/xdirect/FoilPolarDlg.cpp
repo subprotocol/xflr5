@@ -31,6 +31,7 @@ extern CFoil *g_pCurFoil;
 void *FoilPolarDlg::s_pXDirect;
 void *FoilPolarDlg::s_pMainFrame;
 
+
 FoilPolarDlg::FoilPolarDlg(void *pParent)
 {
 	setWindowTitle(tr("Foil Polar Definition"));
@@ -45,7 +46,7 @@ FoilPolarDlg::FoilPolarDlg(void *pParent)
 	m_UnitType = 1;
 	m_Viscosity = 1.5e-5;
 	m_Density   = 1.225;
-	m_Chord = m_Span = m_Mass;
+	m_Chord = m_Span = m_Mass = 0.0;
 	SetupLayout();
 }
 
@@ -449,15 +450,37 @@ void FoilPolarDlg::SetPlrName()
 
 	if(m_bAutoName)
 	{
-		if(m_PolarType!=FIXEDAOAPOLAR)
+		switch(m_PolarType)
 		{
-			double Re = m_Reynolds/1000000.;
-			m_PlrName=QString("T%1_Re%2_M%3").arg(m_PolarType+1).arg(Re,4,'f',3).arg(m_Mach,4,'f',2);
+			case FIXEDSPEEDPOLAR:
+			{
+				m_PlrName = QString("T1_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				break;
+			}
+			case FIXEDLIFTPOLAR:
+			{
+				m_PlrName = QString("T2_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				break;
+			}
+			case RUBBERCHORDPOLAR:
+			{
+				m_PlrName = QString("T3_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				break;
+			}
+			case(FIXEDAOAPOLAR):
+			{
+				double Re = m_Reynolds/1000000.;
+				m_PlrName=QString("T%1_Re%2_M%3").arg(m_PolarType+1).arg(Re,4,'f',3).arg(m_Mach,4,'f',2);
+				break;
+			}
+			default:
+			{
+				m_PlrName = QString("T1_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
+				break;
+			}
 		}
-		else
-		{
-			m_PlrName = QString("T4_Al%1_M%2").arg(m_ASpec,5,'f',2).arg(m_Mach,4,'f',2);
-		}
+
+
 		QString str = QString("_N%1").arg(m_NCrit,3,'f',1);
 		m_PlrName += str;
 
