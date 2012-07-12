@@ -629,7 +629,7 @@ void QXInverse::mouseDoubleClickEvent ( QMouseEvent * event )
 
 void QXInverse::mouseMoveEvent(QMouseEvent *event)
 {
-	if(!hasFocus()) setFocus();//to catch keyboard input;
+//	if(!hasFocus()) setFocus();
 	static double x1,y1, xmin, xmax, ymin,  ymax, xpt, ypt, scale, ux, uy, unorm, vx, vy, vnorm, scal;
 	static double xx0,xx1,xx2,yy0,yy1,yy2, dist;
 	static int a, n, ipt;

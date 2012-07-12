@@ -513,6 +513,11 @@ void QAFoil::FillTableRow(int row)
 void QAFoil::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	bool bShift = false;
+	bool bCtrl  = false;
+	if(event->modifiers() & Qt::ShiftModifier)   bShift =true;
+	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+
 	switch (event->key())
 	{
 		case Qt::Key_Escape:
@@ -535,12 +540,31 @@ void QAFoil::keyPressEvent(QKeyEvent *event)
 		}
 		case Qt::Key_F3:
 		{
-			if(!g_pCurFoil) OnSplineControls();
+			if(g_pCurFoil)
+			{
+				if(bShift) OnAFoilCadd();
+				else       OnAFoilPanels();
+			}
 			break;
 		}
 		case Qt::Key_F4:
 		{
 			OnStoreSplines();
+			break;
+		}
+		case Qt::Key_F9:
+		{
+			OnAFoilFoilGeom();
+			break;
+		}
+		case Qt::Key_F10:
+		{
+			OnAFoilSetFlap();
+			break;
+		}
+		case Qt::Key_F11:
+		{
+			OnAFoilInterpolateFoils();
 			break;
 		}
 		case Qt::Key_R:

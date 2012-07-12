@@ -5785,7 +5785,7 @@ bool XFoil::Preprocess()
 
 	scalc(xb,yb,sb,nb);
 	segspl(xb,xbp,sb,nb);
-	segspl(yb,ybp,sb,nb);
+//	segspl(yb,ybp,sb,nb);
 	geopar(xb,xbp,yb,ybp,sb,nb, w1,sble,chordb,areab,radble,angbte,
 		ei11ba,ei22ba,apx1ba,apx2ba,ei11bt,ei22bt,apx1bt,apx2bt);
 

@@ -586,7 +586,7 @@ void MainFrame::CreateAFoilActions()
 	storeSplineAct->setStatusTip(tr("Store the current splines in the foil database"));
 	connect(storeSplineAct, SIGNAL(triggered()), pAFoil, SLOT(OnStoreSplines()));
 
-	splineControlsAct= new QAction(tr("Splines Params")+"\t(F3)", this);
+	splineControlsAct= new QAction(tr("Splines Params"), this);
 	splineControlsAct->setStatusTip(tr("Define parameters for the splines : degree, number of out points"));
 	connect(splineControlsAct, SIGNAL(triggered()), pAFoil, SLOT(OnSplineControls()));
 
@@ -666,16 +666,16 @@ void MainFrame::CreateAFoilActions()
 	AFoilNormalizeFoil = new QAction(tr("Normalize the Foil"), this);
 	connect(AFoilNormalizeFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilNormalizeFoil()));
 
-	AFoilRefineLocalFoil = new QAction(tr("Refine Locally"), this);
-	connect(AFoilRefineLocalFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilCadd()));
-
-	AFoilRefineGlobalFoil = new QAction(tr("Refine Globally"), this);
+	AFoilRefineGlobalFoil = new QAction(tr("Refine Globally")+"\t(F3)", this);
 	connect(AFoilRefineGlobalFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilPanels()));
+
+	AFoilRefineLocalFoil = new QAction(tr("Refine Locally")+"\t(Shift+F3)", this);
+	connect(AFoilRefineLocalFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilCadd()));
 
 	AFoilEditCoordsFoil = new QAction(tr("Edit Foil Coordinates"), this);
 	connect(AFoilEditCoordsFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilFoilCoordinates()));
 
-	AFoilScaleFoil = new QAction(tr("Scale camber and thickness"), this);
+	AFoilScaleFoil = new QAction(tr("Scale camber and thickness")+"\t(F9)", this);
 	connect(AFoilScaleFoil, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilFoilGeom()));
 
 	AFoilSetTEGap = new QAction(tr("Set T.E. Gap"), this);
@@ -691,10 +691,10 @@ void MainFrame::CreateAFoilActions()
 	m_pShowLegend->setCheckable(true);
 	connect(m_pShowLegend, SIGNAL(triggered()), pAFoil, SLOT(OnShowLegend()));
 
-	AFoilSetFlap = new QAction(tr("Set Flap"), this);
+	AFoilSetFlap = new QAction(tr("Set Flap")+"\t(F10)", this);
 	connect(AFoilSetFlap, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilSetFlap()));
 
-	AFoilInterpolateFoils = new QAction(tr("Interpolate Foils"), this);
+	AFoilInterpolateFoils = new QAction(tr("Interpolate Foils")+"\t(F11)", this);
 	connect(AFoilInterpolateFoils, SIGNAL(triggered()), pAFoil, SLOT(OnAFoilInterpolateFoils()));
 
 	AFoilNacaFoils = new QAction(tr("Naca Foils"), this);
@@ -2074,16 +2074,16 @@ void MainFrame::CreateXDirectActions()
 	NormalizeFoil = new QAction(tr("Normalize the Foil"), this);
 	connect(NormalizeFoil, SIGNAL(triggered()), pXDirect, SLOT(OnNormalizeFoil()));
 
-	RefineLocalFoil = new QAction(tr("Refine Locally"), this);
+	RefineLocalFoil = new QAction(tr("Refine Locally")+"\t(Shift+F3)", this);
 	connect(RefineLocalFoil, SIGNAL(triggered()), pXDirect, SLOT(OnCadd()));
 
-	RefineGlobalFoil = new QAction(tr("Refine Globally"), this);
+	RefineGlobalFoil = new QAction(tr("Refine Globally")+"\t(F3)", this);
 	connect(RefineGlobalFoil, SIGNAL(triggered()), pXDirect, SLOT(OnPanels()));
 
 	EditCoordsFoil = new QAction(tr("Edit Foil Coordinates"), this);
 	connect(EditCoordsFoil, SIGNAL(triggered()), pXDirect, SLOT(OnFoilCoordinates()));
 
-	ScaleFoil = new QAction(tr("Scale camber and thickness"), this);
+	ScaleFoil = new QAction(tr("Scale camber and thickness")+"\t(F9)", this);
 	connect(ScaleFoil, SIGNAL(triggered()), pXDirect, SLOT(OnFoilGeom()));
 
 	SetTEGap = new QAction(tr("Set T.E. Gap"), this);
@@ -2092,10 +2092,10 @@ void MainFrame::CreateXDirectActions()
 	SetLERadius = new QAction(tr("Set L.E. Radius"), this);
 	connect(SetLERadius, SIGNAL(triggered()), pXDirect, SLOT(OnSetLERadius()));
 
-	SetFlap = new QAction(tr("Set Flap"), this);
+	SetFlap = new QAction(tr("Set Flap")+"\t(F10)", this);
 	connect(SetFlap, SIGNAL(triggered()), pXDirect, SLOT(OnSetFlap()));
 
-	InterpolateFoils = new QAction(tr("Interpolate Foils"), this);
+	InterpolateFoils = new QAction(tr("Interpolate Foils")+"\t(F11)", this);
 	connect(InterpolateFoils, SIGNAL(triggered()), pXDirect, SLOT(OnInterpolateFoils()));
 
 	NacaFoils = new QAction(tr("Naca Foils"), this);
@@ -2204,8 +2204,8 @@ void MainFrame::CreateXDirectMenus()
 	DesignMenu = menuBar()->addMenu(tr("&Design"));
 	DesignMenu->addAction(NormalizeFoil);
 	DesignMenu->addAction(DerotateFoil);
-	DesignMenu->addAction(RefineLocalFoil);
 	DesignMenu->addAction(RefineGlobalFoil);
+	DesignMenu->addAction(RefineLocalFoil);
 	DesignMenu->addAction(EditCoordsFoil);
 	DesignMenu->addAction(ScaleFoil);
 	DesignMenu->addAction(SetTEGap);

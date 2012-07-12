@@ -259,7 +259,7 @@ void FoilGeomDlg::Apply()
 		return;
 	}
 
-	if(!m_bApplied)
+//	if(!m_bApplied)
 	{
 		double thickness = m_pctrlThickness->Value()/100.0;
 		double camber    = m_pctrlCamber->Value()/100.0;
@@ -269,7 +269,7 @@ void FoilGeomDlg::Apply()
 		m_bApplied = true;
 	}
 
-	if(!m_bAppliedX)
+//	if(!m_bAppliedX)
 	{
 		double Xthickness = m_pctrlXThickness->Value()/100.0;
 		double Xcamber    = m_pctrlXCamber->Value()/100.0;
@@ -305,7 +305,6 @@ void FoilGeomDlg::Apply()
 	m_bModified = true;
 	if(pXDirect) pXDirect->UpdateView();
 	else if(pAFoil) pAFoil->UpdateView();
-
 }
 
 

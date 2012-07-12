@@ -66,9 +66,6 @@ class QXDirect : public QWidget
 	friend class BatchDlg;
 	friend class BatchThreadDlg;
 	friend class FoilPolarDlg;
-	friend class QFoilGeomDlg;
-	friend class QTEGapDlg;
-	friend class QCAddDlg;
 	friend class EditPlrDlg;
 	friend class XDirectStyleDlg;
 	friend class DisplaySettingsDlg;

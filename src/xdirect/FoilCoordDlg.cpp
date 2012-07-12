@@ -19,11 +19,11 @@
 
 *****************************************************************************/
 
-#include <QtDebug>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QStringList>
 #include <QHeaderView>
+
 #include "FoilCoordDlg.h"
 #include "XDirect.h"
 #include "../design/AFoil.h"
@@ -322,3 +322,11 @@ void FoilCoordDlg::SetupLayout()
 }
 
 
+void FoilCoordDlg::showEvent(QShowEvent *event)
+{
+	setWindowModality(Qt::NonModal);
+
+	Qt::WindowFlags flags = windowFlags();
+	flags |= Qt::WindowStaysOnTopHint;
+//	setWindowFlags(flags);
+}

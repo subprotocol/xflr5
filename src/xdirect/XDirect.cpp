@@ -1198,6 +1198,11 @@ void QXDirect::InsertOpPoint(OpPoint *pNewPoint)
 void QXDirect::keyPressEvent(QKeyEvent *event)
 {
 	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
+	bool bShift = false;
+	bool bCtrl  = false;
+	if(event->modifiers() & Qt::ShiftModifier)   bShift =true;
+	if(event->modifiers() & Qt::ControlModifier) bCtrl =true;
+
 	switch (event->key())
 	{
 		case Qt::Key_Return:
@@ -1317,19 +1322,46 @@ void QXDirect::keyPressEvent(QKeyEvent *event)
 			OnRenameFoil();
 			break;
 		}
+		case Qt::Key_F3:
+		{
+			if(bShift) OnCadd();
+			else       OnPanels();
+			break;
+		}
 		case Qt::Key_F5:
+		{
 			if(!m_bPolar) return;
 			OnOpPoints();
 			break;
+		}
 		case Qt::Key_F6:
+		{
 			if (event->modifiers().testFlag(Qt::ShiftModifier))        OnBatchAnalysis();
 			else if (event->modifiers().testFlag(Qt::ControlModifier)) OnMultiThreadedBatchAnalysis();
 			else                                                       OnDefinePolar();
 			break;
+		}
 		case Qt::Key_F8:
+		{
 			if(m_bPolar) return;
 			OnPolars();
 			break;
+		}
+		case Qt::Key_F9:
+		{
+			OnFoilGeom();
+			break;
+		}
+		case Qt::Key_F10:
+		{
+			OnSetFlap();
+			break;
+		}
+		case Qt::Key_F11:
+		{
+			OnInterpolateFoils();
+			break;
+		}
 		default:
 			QWidget::keyPressEvent(event);
 	}
@@ -1988,6 +2020,8 @@ void QXDirect::OnCadd()
 	m_CAddDlg.m_pAFoil      = NULL;
 	m_CAddDlg.InitDialog();
 
+	m_CAddDlg.move(pMainFrame->m_DlgPos);
+
 	m_bShowPanels = true;
 	UpdateView();
 
@@ -2010,6 +2044,7 @@ void QXDirect::OnCadd()
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
+	pMainFrame->m_DlgPos = m_CAddDlg.pos();
 	m_bShowPanels = bState;
 
 	m_bPressure = bPressure;
