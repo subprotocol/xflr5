@@ -64,6 +64,7 @@ public:
 	void SetTwist1();
 	void SetTwist2();
 	void Translate(CVector const &T);
+	void Translate(double tx, double ty, double tz);
 	void CreateXZSymetric(CSurface const &Surface);
 	void CreateXPoints();
 

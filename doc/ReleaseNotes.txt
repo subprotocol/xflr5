@@ -17,8 +17,9 @@
 
 
 xflr5 v6.08, July xxxth, 2012
-	- Corrected the scaling of foil thickness and camber
-	- Corrected the incorrect foil automatic polar name
+	- corrected the scaling of foil thickness and camber
+	- corrected the incorrect foil automatic polar name
+	- corrected the issue with zero-length wing sections
 	- minor bug corrections and enhancements
 
 

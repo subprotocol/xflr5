@@ -487,7 +487,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 	m_NSurfaces = 0;
 	m_MatSize = 0;
 
-	//define the normal of each surface
+	//define the normal to each surface
 	nSurf=0;
 	VNormal[0].Set(0.0, 0.0, 1.0);
 	VNSide[0].Set(0.0, 0.0, 1.0);
@@ -523,11 +523,11 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 			m_Surface[is].m_Length   =  m_TPos[j+1] - m_TPos[j];
 
-			PLA.x =  m_TOffset[j+1];			PLB.x =  m_TOffset[j];
+			PLA.x =  m_TOffset[j+1];		PLB.x =  m_TOffset[j];
 			PLA.y = -m_TPos[j+1];			PLB.y = -m_TPos[j];
 			PLA.z =  0.0;					PLB.z =  0.0;
-			PTA.x =  PLA.x+m_TChord[j+1];		PTB.x = PLB.x+m_TChord[j];
-			PTA.y =  PLA.y;				PTB.y = PLB.y;
+			PTA.x =  PLA.x+m_TChord[j+1];	PTB.x = PLB.x+m_TChord[j];
+			PTA.y =  PLA.y;					PTB.y = PLB.y;
 			PTA.z =  0.0;					PTB.z =  0.0;
 
 			m_Surface[is].m_LA.Copy(PLA);
@@ -538,8 +538,8 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			m_Surface[is].SetNormal(); // is (0,0,1)
 
 			m_Surface[is].RotateX(m_Surface[is].m_LB, -m_TDihedral[j]);
-			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x,   -VNSide[nSurf+1].y,   VNSide[nSurf+1].z);
-			m_Surface[is].NormalB.Set(VNSide[nSurf].x, -VNSide[nSurf].y, VNSide[nSurf].z);
+			m_Surface[is].NormalA.Set(VNSide[nSurf+1].x, -VNSide[nSurf+1].y, VNSide[nSurf+1].z);
+			m_Surface[is].NormalB.Set(VNSide[nSurf].x,   -VNSide[nSurf].y,   VNSide[nSurf].z);
 
 			m_Surface[is].m_TwistA   =  m_TTwist[j+1];
 			m_Surface[is].m_TwistB   =  m_TTwist[j];
@@ -548,11 +548,11 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 
 			if(j>0)
 			{
-				//translate the surface to the left tip of the previous surface and merge points
+				//translate the surface to the left tip of the previous surface
 				T1 = m_Surface[is+1].m_LA - m_Surface[is].m_LB;
-				m_Surface[is].Translate(T1);
-				m_Surface[is].m_LB = m_Surface[is+1].m_LA;
-				m_Surface[is].m_TB = m_Surface[is+1].m_TA;
+				m_Surface[is].Translate(0.0,T1.y,T1.z);
+//				m_Surface[is].m_LB = m_Surface[is+1].m_LA;
+//				m_Surface[is].m_TB = m_Surface[is+1].m_TA;
 			}
 			else
 			{
@@ -626,9 +626,9 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 				{
 					//translate the surface to the left tip of the previous surface and merge points
 					T1 = m_Surface[is-1].m_LB - m_Surface[is].m_LA ;
-					m_Surface[is].Translate(T1);
-					m_Surface[is].m_LA = m_Surface[is-1].m_LB;
-					m_Surface[is].m_TA = m_Surface[is-1].m_TB;
+					m_Surface[is].Translate(0.0, T1.y, T1.z);
+//					m_Surface[is].m_LA = m_Surface[is-1].m_LB;
+//					m_Surface[is].m_TA = m_Surface[is-1].m_TB;
 				}
 				else
 				{

@@ -6959,3 +6959,4 @@ void MainFrame::OnDuplicateFoil()
 		SetSaveState(false);
 	}
 }
+ 

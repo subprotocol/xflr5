@@ -1024,6 +1024,15 @@ void CSurface::Translate(CVector const &T)
 }
 
 
+void CSurface::Translate(double tx, double ty, double tz)
+{
+	m_LA.Translate(tx, ty, tz);
+	m_LB.Translate(tx, ty, tz);
+	m_TA.Translate(tx, ty, tz);
+	m_TB.Translate(tx, ty, tz);
+	m_HingePoint.Translate(tx, ty, tz);
+}
+
 
 
 void CSurface::CreateXPoints()

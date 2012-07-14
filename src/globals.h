@@ -129,3 +129,4 @@ int Compare(complex<double> a, complex<double>b);
 void ComplexSort(complex<double>*array, int ub);
 
 #endif // FUNCTIONS_H
+ 
