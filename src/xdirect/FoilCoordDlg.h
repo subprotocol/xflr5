@@ -58,7 +58,7 @@ private:
 	void ReadSectionData(int sel, double &X, double &Y);
 	void keyPressEvent(QKeyEvent *event);
 	void showEvent(QShowEvent *event);
-
+	void resizeEvent(QResizeEvent *event);
 
 private:
 	QPushButton *m_pctrlInsertPoint, *m_pctrlDeletePoint, *m_pctrlRestore, *m_pctrlApply;

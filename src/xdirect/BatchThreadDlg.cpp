@@ -139,7 +139,7 @@ void BatchThreadDlg::SetupLayout()
 		m_pctrlReMin   = new FloatEdit(100000,0);
 		m_pctrlReMax   = new FloatEdit(150000,0);
 		m_pctrlReDelta = new FloatEdit(50000,0);
-		m_pctrlMach    = new FloatEdit(0.00);
+		m_pctrlMach    = new FloatEdit(0.00, 3);
 
 		BatchVars->addWidget(MinVal, 2, 2);
 		BatchVars->addWidget(MaxVal, 2, 3);
@@ -395,9 +395,6 @@ void BatchThreadDlg::InitDialog()
 	m_pctrlFoil2->setChecked(!s_bCurrentFoil);
 	m_pctrlFoilList->setEnabled(!s_bCurrentFoil);
 	
-	m_pctrlMach->SetPrecision(2);
-
-
 	m_pctrlReMin->SetPrecision(0);
 	m_pctrlReMax->SetPrecision(0);
 	m_pctrlReDelta->SetPrecision(0);
@@ -641,7 +638,7 @@ void BatchThreadDlg::ReadParams()
 	m_NCrit    = m_pctrlNCrit->Value();
 	m_XTopTr   = m_pctrlXTopTr->Value();
 	m_XBotTr   = m_pctrlXBotTr->Value();
-	
+	qDebug("%10.5f", m_Mach);
 }
 
 

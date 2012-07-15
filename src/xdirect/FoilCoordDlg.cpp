@@ -56,16 +56,18 @@ void FoilCoordDlg::FillList()
 		QModelIndex Yindex =m_pCoordModel->index(i, 1, QModelIndex());
 		m_pCoordModel->setData(Yindex, m_pBufferFoil->y[i]);
 	}
-	m_pctrlCoordView->resizeRowsToContents();
-	m_pctrlCoordView->resizeColumnsToContents();
-	m_pctrlCoordView->setWindowTitle(QObject::tr("Foil coordinates"));
-	m_pctrlCoordView->show();
 }
 
 
 void FoilCoordDlg::InitDialog()
 {
 	if(!m_pMemFoil || !m_pBufferFoil) return;
+
+	int w = m_pctrlCoordView->width();
+	m_pctrlCoordView->setColumnWidth(0,(int)(w/2));
+	m_pctrlCoordView->setColumnWidth(1,(int)(w/2));
+	QHeaderView *HorizontalHeader = m_pctrlCoordView->horizontalHeader();
+	HorizontalHeader->setStretchLastSection(true);
 
 	m_pCoordModel = new QStandardItemModel;
 	m_pCoordModel->setRowCount(10);//temporary
@@ -102,6 +104,16 @@ void FoilCoordDlg::InitDialog()
 	connect(CancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
 	FillList();
+}
+
+
+
+void FoilCoordDlg::resizeEvent(QResizeEvent *event)
+{
+	int w2 = (int)((double)m_pctrlCoordView->width()*.7/2);
+
+	m_pctrlCoordView->setColumnWidth(0,w2);
+	m_pctrlCoordView->setColumnWidth(1,w2);
 }
 
 
@@ -326,7 +338,7 @@ void FoilCoordDlg::showEvent(QShowEvent *event)
 {
 	setWindowModality(Qt::NonModal);
 
-	Qt::WindowFlags flags = windowFlags();
-	flags |= Qt::WindowStaysOnTopHint;
+//	Qt::WindowFlags flags = windowFlags();
+//	flags = Qt::Dialog | Qt::WindowStaysOnTopHint;
 //	setWindowFlags(flags);
 }

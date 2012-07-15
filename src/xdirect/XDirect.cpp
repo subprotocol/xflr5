@@ -2014,18 +2014,19 @@ void QXDirect::OnCadd()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_CAddDlg.m_pBufferFoil = &m_BufferFoil;
-	m_CAddDlg.m_pMemFoil    = g_pCurFoil;
-	m_CAddDlg.m_pXDirect    = this;
-	m_CAddDlg.m_pAFoil      = NULL;
-	m_CAddDlg.InitDialog();
+	CAddDlg CAddDlg;
+	CAddDlg.m_pBufferFoil = &m_BufferFoil;
+	CAddDlg.m_pMemFoil    = g_pCurFoil;
+	CAddDlg.m_pXDirect    = this;
+	CAddDlg.m_pAFoil      = NULL;
+	CAddDlg.InitDialog();
 
-	m_CAddDlg.move(pMainFrame->m_DlgPos);
+	CAddDlg.move(pMainFrame->m_DlgPos);
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	if(QDialog::Accepted == m_CAddDlg.exec())
+	if(QDialog::Accepted == CAddDlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -2044,7 +2045,7 @@ void QXDirect::OnCadd()
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
 
-	pMainFrame->m_DlgPos = m_CAddDlg.pos();
+	pMainFrame->m_DlgPos = CAddDlg.pos();
 	m_bShowPanels = bState;
 
 	m_bPressure = bPressure;
@@ -3140,19 +3141,19 @@ void QXDirect::OnFoilCoordinates()
 
 	m_BufferFoil.m_bTEFlap = false;
 //	SetFoilFlap(&m_BufferFoil);
-
-	m_FoilCoordDlg.move(pMainFrame->m_DlgPos);
-	m_FoilCoordDlg.m_pXDirect = this;
-	m_FoilCoordDlg.m_pAFoil = NULL;
-	m_FoilCoordDlg.m_pMemFoil    = g_pCurFoil;
-	m_FoilCoordDlg.m_pBufferFoil = &m_BufferFoil;
-	m_FoilCoordDlg.InitDialog();
+	FoilCoordDlg FoilCoordDlg;
+	FoilCoordDlg.move(pMainFrame->m_DlgPos);
+	FoilCoordDlg.m_pXDirect = this;
+	FoilCoordDlg.m_pAFoil = NULL;
+	FoilCoordDlg.m_pMemFoil    = g_pCurFoil;
+	FoilCoordDlg.m_pBufferFoil = &m_BufferFoil;
+	FoilCoordDlg.InitDialog();
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	int res = m_FoilCoordDlg.exec();
-	pMainFrame->m_DlgPos = m_FoilCoordDlg.pos();
+	int res = FoilCoordDlg.exec();
+	pMainFrame->m_DlgPos = FoilCoordDlg.pos();
 	if(QDialog::Accepted == res)
 	{
 		m_BufferFoil.m_bTEFlap = bFlap;
@@ -3205,14 +3206,15 @@ void QXDirect::OnFoilGeom()
 	CreateOppCurves();
 	UpdateView();
 
-	m_FoilGeomDlg.move(pMainFrame->m_DlgPos);
-	m_FoilGeomDlg.m_pMemFoil = g_pCurFoil;
-	m_FoilGeomDlg.m_pBufferFoil = &m_BufferFoil;
-	m_FoilGeomDlg.m_pXDirect = this;
-	m_FoilGeomDlg.m_pAFoil   = NULL;
-	m_FoilGeomDlg.InitDialog();
+	FoilGeomDlg FoilGeomDlg;
+	FoilGeomDlg.move(pMainFrame->m_DlgPos);
+	FoilGeomDlg.m_pMemFoil = g_pCurFoil;
+	FoilGeomDlg.m_pBufferFoil = &m_BufferFoil;
+	FoilGeomDlg.m_pXDirect = this;
+	FoilGeomDlg.m_pAFoil   = NULL;
+	FoilGeomDlg.InitDialog();
 
-	if(m_FoilGeomDlg.exec() == QDialog::Accepted)
+	if(FoilGeomDlg.exec() == QDialog::Accepted)
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -3230,7 +3232,7 @@ void QXDirect::OnFoilGeom()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_FoilGeomDlg.pos();
+	pMainFrame->m_DlgPos = FoilGeomDlg.pos();
 	UpdateView();
 }
 
@@ -3862,18 +3864,19 @@ void QXDirect::OnNacaFoils()
 	CreateOppCurves();
 	UpdateView();
 
-	m_NacaFoilDlg.move(pMainFrame->m_DlgPos);
-	m_NacaFoilDlg.m_pBufferFoil = &m_BufferFoil;
-	m_NacaFoilDlg.m_pXDirect    = this;
-	m_NacaFoilDlg.m_pAFoil      = NULL;
+	NacaFoilDlg NacaFoilDlg;
+	NacaFoilDlg.move(pMainFrame->m_DlgPos);
+	NacaFoilDlg.m_pBufferFoil = &m_BufferFoil;
+	NacaFoilDlg.m_pXDirect    = this;
+	NacaFoilDlg.m_pAFoil      = NULL;
 
-	if (m_NacaFoilDlg.exec() == QDialog::Accepted)
+	if (NacaFoilDlg.exec() == QDialog::Accepted)
 	{
 		QString str;
-		if(m_NacaFoilDlg.s_Digits>0 && log10((double)m_NacaFoilDlg.s_Digits)<4)
-			str = QString("%1").arg(m_NacaFoilDlg.s_Digits,4,10,QChar('0'));
+		if(NacaFoilDlg.s_Digits>0 && log10((double)NacaFoilDlg.s_Digits)<4)
+			str = QString("%1").arg(NacaFoilDlg.s_Digits,4,10,QChar('0'));
 		else
-			str = QString("%1").arg(m_NacaFoilDlg.s_Digits);
+			str = QString("%1").arg(NacaFoilDlg.s_Digits);
 		str = "NACA "+ str;
 
 		CFoil *pNewFoil = new CFoil;
@@ -3898,7 +3901,7 @@ void QXDirect::OnNacaFoils()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_NacaFoilDlg.pos();
+	pMainFrame->m_DlgPos = NacaFoilDlg.pos();
 	SetControls();
 	UpdateView();
 }
@@ -4042,18 +4045,19 @@ void QXDirect::OnPanels()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_TwoDPanelDlg.move(pMainFrame->m_DlgPos);
-	m_TwoDPanelDlg.m_pXDirect = this;
-	m_TwoDPanelDlg.m_pAFoil   = NULL;
-	m_TwoDPanelDlg.m_pBufferFoil = &m_BufferFoil;
-	m_TwoDPanelDlg.m_pMemFoil    = g_pCurFoil;
+	TwoDPanelDlg TwoDPanelDlg;
+	TwoDPanelDlg.move(pMainFrame->m_DlgPos);
+	TwoDPanelDlg.m_pXDirect = this;
+	TwoDPanelDlg.m_pAFoil   = NULL;
+	TwoDPanelDlg.m_pBufferFoil = &m_BufferFoil;
+	TwoDPanelDlg.m_pMemFoil    = g_pCurFoil;
 
 	m_bShowPanels = true;
 	UpdateView();
 
-	m_TwoDPanelDlg.InitDialog();
+	TwoDPanelDlg.InitDialog();
 
-	if(QDialog::Accepted == m_TwoDPanelDlg.exec())
+	if(QDialog::Accepted == TwoDPanelDlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4072,7 +4076,7 @@ void QXDirect::OnPanels()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_TwoDPanelDlg.pos();
+	pMainFrame->m_DlgPos = TwoDPanelDlg.pos();
 
 	m_bShowPanels = bState;//restore as it was
 	m_bPressure   = bPressure;
@@ -4427,15 +4431,16 @@ void QXDirect::OnSetFlap()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_FlapDlg.move(pMainFrame->m_DlgPos);
-	m_FlapDlg.m_pBufferFoil  = &m_BufferFoil;
-	m_FlapDlg.m_pMemFoil     = g_pCurFoil;
-	m_FlapDlg.m_pXFoil       = m_pXFoil;
-	m_FlapDlg.m_pXDirect     = this;
-	m_FlapDlg.m_pAFoil       = NULL;
-	m_FlapDlg.InitDialog();
+	FlapDlg FlapDlg;
+	FlapDlg.move(pMainFrame->m_DlgPos);
+	FlapDlg.m_pBufferFoil  = &m_BufferFoil;
+	FlapDlg.m_pMemFoil     = g_pCurFoil;
+	FlapDlg.m_pXFoil       = m_pXFoil;
+	FlapDlg.m_pXDirect     = this;
+	FlapDlg.m_pAFoil       = NULL;
+	FlapDlg.InitDialog();
 
-	if(QDialog::Accepted == m_FlapDlg.exec())
+	if(QDialog::Accepted == FlapDlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4454,7 +4459,7 @@ void QXDirect::OnSetFlap()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_FlapDlg.pos();
+	pMainFrame->m_DlgPos = FlapDlg.pos();
 	m_bPressure = bPressure;
 	m_bBL       = bBL;
 	UpdateView();
@@ -4476,14 +4481,15 @@ void QXDirect::OnSetLERadius()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_LEDlg.move(pMainFrame->m_DlgPos);
-	m_LEDlg.m_pBufferFoil = &m_BufferFoil;
-	m_LEDlg.m_pMemFoil    = g_pCurFoil;
-	m_LEDlg.m_pXDirect   = this;
-	m_LEDlg.m_pAFoil     = NULL;
-	m_LEDlg.InitDialog();
+	LEDlg LEDlg;
+	LEDlg.move(pMainFrame->m_DlgPos);
+	LEDlg.m_pBufferFoil = &m_BufferFoil;
+	LEDlg.m_pMemFoil    = g_pCurFoil;
+	LEDlg.m_pXDirect   = this;
+	LEDlg.m_pAFoil     = NULL;
+	LEDlg.InitDialog();
 
-	if(QDialog::Accepted == m_LEDlg.exec())
+	if(QDialog::Accepted == LEDlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4502,7 +4508,7 @@ void QXDirect::OnSetLERadius()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_LEDlg.pos();
+	pMainFrame->m_DlgPos = LEDlg.pos();
 
 	m_bPressure = bPressure;
 	m_bBL       = bBL;
@@ -4527,15 +4533,16 @@ void QXDirect::OnSetTEGap()
 	m_bBL       = false;
 	OnOpPoints();
 
-	m_TEGapDlg.move(pMainFrame->m_DlgPos);
-	m_TEGapDlg.m_pXDirect   = this;
-	m_TEGapDlg.m_pAFoil     = NULL;
-	m_TEGapDlg.m_pBufferFoil = &m_BufferFoil;
-	m_TEGapDlg.m_pMemFoil    = g_pCurFoil;
-	m_TEGapDlg.m_Gap         = g_pCurFoil->m_Gap;
-	m_TEGapDlg.InitDialog();
+	TEGapDlg TEGapDlg;
+	TEGapDlg.move(pMainFrame->m_DlgPos);
+	TEGapDlg.m_pXDirect   = this;
+	TEGapDlg.m_pAFoil     = NULL;
+	TEGapDlg.m_pBufferFoil = &m_BufferFoil;
+	TEGapDlg.m_pMemFoil    = g_pCurFoil;
+	TEGapDlg.m_Gap         = g_pCurFoil->m_Gap;
+	TEGapDlg.InitDialog();
 
-	if(QDialog::Accepted == m_TEGapDlg.exec())
+	if(QDialog::Accepted == TEGapDlg.exec())
 	{
 		CFoil *pNewFoil = new CFoil();
 		pNewFoil->CopyFoil(&m_BufferFoil);
@@ -4555,7 +4562,7 @@ void QXDirect::OnSetTEGap()
 		SetBufferFoil();
 		m_pXFoil->InitXFoilGeometry(g_pCurFoil);
 	}
-	pMainFrame->m_DlgPos = m_TEGapDlg.pos();
+	pMainFrame->m_DlgPos = TEGapDlg.pos();
 
 	m_bPressure = bPressure;
 	m_bBL       = bBL;

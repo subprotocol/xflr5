@@ -46,13 +46,7 @@
 #include "../misc/RenameDlg.h"
 #include "../misc/PolarFilterDlg.h"
 
-#include "TwoDPanelDlg.h"
-#include "NacaFoilDlg.h"
-#include "FoilCoordDlg.h"
-#include "FoilGeomDlg.h"
-#include "TEGapDlg.h"
-#include "LEDlg.h"
-#include "FlapDlg.h"
+
 #include "CAddDlg.h"
 #include "XDirectStyleDlg.h"
 #include "ManageFoilsDlg.h"
@@ -255,14 +249,6 @@ private:
 	FoilPolarDlg m_FoilPolarDlg;
 	RenameDlg m_RenameDlg;
 
-	TwoDPanelDlg        m_TwoDPanelDlg;
-	NacaFoilDlg         m_NacaFoilDlg;
-	FoilCoordDlg        m_FoilCoordDlg;
-	FoilGeomDlg         m_FoilGeomDlg;
-	TEGapDlg            m_TEGapDlg;
-	LEDlg               m_LEDlg;
-	FlapDlg             m_FlapDlg;
-	CAddDlg             m_CAddDlg;
 	XDirectStyleDlg     m_XDirectStyleDlg;
 	ManageFoilsDlg      m_ManageFoilsDlg;
 	PolarFilterDlg      m_PolarFilterDlg;

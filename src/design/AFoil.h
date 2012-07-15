@@ -39,15 +39,6 @@
 #include "../objects/Foil.h"
 #include "../objects/Sf.h"
 #include "../xdirect/XFoil.h"
-#include "../xdirect/NacaFoilDlg.h"
-#include "../xdirect/CAddDlg.h"
-#include "../xdirect/TwoDPanelDlg.h"
-#include "../xdirect/TEGapDlg.h"
-#include "../xdirect/LEDlg.h"
-#include "../xdirect/FlapDlg.h"
-#include "../xdirect/FoilCoordDlg.h"
-#include "../xdirect/FoilGeomDlg.h"
-#include "../xdirect/InterpolateFoilsDlg.h"
 
 
 class QAFoil : public QWidget
@@ -167,16 +158,7 @@ private:
 
 
 private:
-	TwoDPanelDlg        m_TwoDPanelDlg;
-	InterpolateFoilsDlg m_InterpolateFoilsDlg;
-	NacaFoilDlg         m_NacaFoilDlg;
-	FoilGeomDlg         m_FoilGeomDlg;
-	TEGapDlg            m_TEGapDlg;
-	LEDlg               m_LEDlg;
-	FlapDlg             m_FlapDlg;
-	CAddDlg             m_CAddDlg;
-	FoilCoordDlg        m_FoilCoordDlg;
-	LECircleDlg         m_LECircleDlg;
+
 	LineButton *m_pctrlFoilStyle;
 
 	QTableView *m_pctrlFoilTable;

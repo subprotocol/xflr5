@@ -149,7 +149,7 @@ void FoilPolarDlg::SetupLayout()
 	m_pctrlMachLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	m_pctrlReynolds = new FloatEdit();
 	m_pctrlReynolds->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	m_pctrlMach = new FloatEdit();
+	m_pctrlMach = new FloatEdit(0.0, 3);
 	m_pctrlMach->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	ReMachResultsLayout->addWidget(m_pctrlReLabel);
 	ReMachResultsLayout->addWidget(m_pctrlReynolds);
@@ -232,7 +232,6 @@ void FoilPolarDlg::SetupLayout()
 	m_pctrlReynolds->SetMax(1.e10);
 
 
-	m_pctrlMach->SetPrecision(2);
 	m_pctrlMach->SetMin(0.0);
 	m_pctrlMach->SetMax(1000.0);
 
@@ -521,7 +520,7 @@ void FoilPolarDlg::ReadParams()
 
     m_Mach     = m_pctrlMach->text().toDouble();
     m_pctrlMach->clear();
-    m_pctrlMach->insert(str.setNum(m_Mach,'f',2));
+	m_pctrlMach->insert(str.setNum(m_Mach,'f',3));
 
     m_NCrit  = m_pctrlNCrit->text().toDouble();
     m_XTopTr = m_pctrlTopTrans->text().toDouble();

@@ -157,7 +157,7 @@ void BatchDlg::SetupLayout()
 		m_pctrlReMin   = new FloatEdit(100000,0);
 		m_pctrlReMax   = new FloatEdit(150000,0);
 		m_pctrlReDelta = new FloatEdit(50000,0);
-		m_pctrlMach    = new FloatEdit(0.00);
+		m_pctrlMach    = new FloatEdit(0.0, 3);
 
 		QLabel *NCritLabel = new QLabel(tr("NCrit="));
 		NCritLabel->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
@@ -589,8 +589,6 @@ void BatchDlg::InitDialog()
 	m_pctrlFoil2->setChecked(!s_bCurrentFoil);
 	m_pctrlFoilList->setEnabled(!s_bCurrentFoil);
 	
-	m_pctrlMach->SetPrecision(2);
-
 	if(m_bAlpha)
 	{
 		m_SpMin     = m_AlphaMin;
