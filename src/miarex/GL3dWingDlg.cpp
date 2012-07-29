@@ -185,12 +185,10 @@ bool GL3dWingDlg::CheckWing()
 void GL3dWingDlg::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
-//	MainFrame *pMainFrame  = (MainFrame*)s_pMainFrame;
-//	QMiarex    *pMiarex = (QMiarex*)s_pMiarex;
 	m_pWing->ComputeGeometry();
 	m_pWing->CreateSurfaces(CVector(0.0,0.0,0.0), 0.0, 0.0);
-	for (int i=0; i<m_pWing->m_NSurfaces; i++) m_pWing->m_Surface[i].SetSidePoints(NULL, 0.0, 0.0);
 
+	for (int i=0; i<m_pWing->m_NSurfaces; i++) m_pWing->m_Surface[i].SetSidePoints(NULL, 0.0, 0.0);
 }
 
 
@@ -1889,10 +1887,10 @@ void GL3dWingDlg::ReadParams()
 		ReadSectionData(i);
 	}
 
-
 	//Update Geometry
 	ComputeGeometry();
 }
+
 
 
 void GL3dWingDlg::ReadSectionData(int sel)
@@ -1978,6 +1976,7 @@ void GL3dWingDlg::ReadSectionData(int sel)
 	else if(strong==tr("Cosine"))	m_pWing->m_YPanelDist[sel] =  1;
 	else if(strong==tr("Sine"))		m_pWing->m_YPanelDist[sel] =  2;
 	else if(strong==tr("-Sine"))	m_pWing->m_YPanelDist[sel] = -2;
+
 }
 
 

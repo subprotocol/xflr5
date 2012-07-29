@@ -178,6 +178,7 @@ void CWing::ComputeDihedrals()
 	}
 }
 
+
 void CWing::ComputeGeometry()
 {
 	// Computes the wing's characteristics from the panel data
@@ -554,11 +555,6 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 //				m_Surface[is].m_LB = m_Surface[is+1].m_LA;
 //				m_Surface[is].m_TB = m_Surface[is+1].m_TA;
 			}
-			else
-			{
-				//translate the surface by the initial offset
-				m_Surface[is].Translate(CVector(0.0,-m_TOffset[0],0.0));
-			}
 
 			nSurf++;
 
@@ -630,11 +626,6 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 //					m_Surface[is].m_LA = m_Surface[is-1].m_LB;
 //					m_Surface[is].m_TA = m_Surface[is-1].m_TB;
 				}
-				else
-				{
-					//translate the surface by the initial offset
-					m_Surface[is].Translate(CVector(0.0,m_TOffset[0],0.0));
-				}
 
 				m_Surface[is].m_NXPanels = m_NXPanels[j];
 				m_Surface[is].m_NYPanels = m_NYPanels[j];
@@ -657,6 +648,7 @@ void CWing::CreateSurfaces(CVector const &T, double XTilt, double YTilt)
 			}
 		}
 	}
+
 	CVector Or(0.0,0.0,0.0);
 	if(!m_bIsFin || (m_bIsFin && m_bSymFin))
 	{
