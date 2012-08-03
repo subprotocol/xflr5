@@ -1023,7 +1023,7 @@ void GL3dWingDlg::GLRenderView()
 	if(m_bShowMasses)
 	{
 		glColor3d(pMiarex->m_MassColor.redF(),pMiarex->m_MassColor.greenF(),pMiarex->m_MassColor.blueF());
-		for(int im=0; im<m_pWing->m_NMass; im++)
+		for(int im=0; im<m_pWing->m_MassValue.size(); im++)
 		{
 			glPushMatrix();
 			{
@@ -1539,16 +1539,15 @@ void GL3dWingDlg::OnInertia()
 
 	//save inertia properties
 	int NMass;
-	CVector MassPosition[MAXMASSES];
-	QString MassTag[MAXMASSES];
+	QList<double>MassValue;
+	QList<CVector> MassPosition;
+	QStringList MassTag;
 
-	NMass = m_pWing->m_NMass;
-
-	for(int i=0; i< MAXMASSES; i++)
+	for(int i=0; i< m_pWing->m_MassValue.size(); i++)
 	{
-//		MassValue[i]    = m_pWing->m_MassValue[i];
-		MassPosition[i] = m_pWing->m_MassPosition[i];
-		MassTag[i]      = m_pWing->m_MassTag[i];
+		MassValue.append(m_pWing->m_MassValue[i]);
+		MassPosition.append(m_pWing->m_MassPosition[i]);
+		MassTag.append(m_pWing->m_MassTag[i]);
 	}
 
 	dlg.InitDialog();
@@ -1559,13 +1558,15 @@ void GL3dWingDlg::OnInertia()
 	else
 	{
 		// restore saved inertia
-		m_pWing->m_NMass = NMass;
+		m_pWing->m_MassValue.clear();
+		m_pWing->m_MassPosition.clear();
+		m_pWing->m_MassTag.clear();
 
-		for(int i=0; i< MAXMASSES; i++)
+		for(int i=0; i< MassValue.size(); i++)
 		{
-//			MassValue[i]    = m_pWing->m_MassValue[i];
-			MassPosition[i] = m_pWing->m_MassPosition[i];
-			MassTag[i]      = m_pWing->m_MassTag[i];
+			m_pWing->m_MassValue.append(MassValue[i]);
+			m_pWing->m_MassPosition.append(MassPosition[i]);
+			m_pWing->m_MassTag.append(MassTag[i]);
 		}
 	}
 }

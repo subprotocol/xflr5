@@ -50,7 +50,7 @@
 #define MAXCONTROLS        40 // max controls per wing section
 #define MAXBODYFRAMES      60
 #define MAXSIDELINES       40
-#define MAXMASSES          30
+//#define MAXMASSES          30
 #define MAXPOLARPOINTS   1000
 #define MAXMODEFRAMES     200
 

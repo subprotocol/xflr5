@@ -5035,7 +5035,7 @@ void QMiarex::GLDrawMasses()
 			glPopMatrix();
 
 			glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-			for(int im=0; im<m_pWingList[iw]->m_NMass; im++)
+			for(int im=0; im<m_pWingList[iw]->m_MassValue.size(); im++)
 			{
 				glPushMatrix();
 				{
@@ -5061,7 +5061,7 @@ void QMiarex::GLDrawMasses()
 	if(m_pCurPlane)
 	{
 		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-		for(int im=0; im<m_pCurPlane->m_NMass; im++)
+		for(int im=0; im<m_pCurPlane->m_MassValue.size(); im++)
 		{
 			glPushMatrix();
 			{
@@ -5097,7 +5097,7 @@ void QMiarex::GLDrawMasses()
 		}
 		glPopMatrix();
 		glColor3d(m_MassColor.redF(), m_MassColor.greenF(), m_MassColor.blueF());
-		for(int im=0; im<m_pCurBody->m_NMass; im++)
+		for(int im=0; im<m_pCurBody->m_MassValue.size(); im++)
 		{
 			glPushMatrix();
 			{
@@ -5105,8 +5105,8 @@ void QMiarex::GLDrawMasses()
 				if(m_pCurPlane)
 				{
 					glTranslated(m_pCurPlane->BodyPos().x,
-							   m_pCurPlane->BodyPos().y,
-							   m_pCurPlane->BodyPos().z);
+								 m_pCurPlane->BodyPos().y,
+								 m_pCurPlane->BodyPos().z);
 				}
 
 				p3dWidget->GLRenderSphere(m_MassColor,radius,18,18);

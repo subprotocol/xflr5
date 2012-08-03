@@ -47,17 +47,12 @@ InertiaDlg::InertiaDlg()
 
 	m_PtRef.Set(0.0, 0.0, 0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
-	m_NMass = 0;
 
 	m_VolumeMass = 0.0;
 
-	memset(m_MassValue,    0, sizeof(m_MassValue));
-	memset(m_MassPosition, 0, sizeof(m_MassPosition));
-
-	for(int i=0; i< MAXMASSES; i++)
-	{
-		m_MassTag[i].clear();
-	}
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
 
 	m_bChanged = false;
 
@@ -146,7 +141,7 @@ void InertiaDlg::ComputeInertia()
 	TotalMass = m_VolumeMass;
 	TotalIxx = TotalIyy = TotalIzz = TotalIxz = 0.0;
 
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		TotalMass += m_MassValue[i];
 		TotalCoG  += m_MassPosition[i] * m_MassValue[i];
@@ -158,7 +153,7 @@ void InertiaDlg::ComputeInertia()
 		{
 			if(pWing[iw])
 			{
-				for(i=0; i<pWing[iw]->m_NMass; i++)
+				for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
 				{
 					TotalMass +=  pWing[iw]->m_MassValue[i];
 					TotalCoG  += (pWing[iw]->m_MassPosition[i]+m_pPlane->WingLE(iw)) * pWing[iw]->m_MassValue[i];
@@ -169,7 +164,7 @@ void InertiaDlg::ComputeInertia()
 
 	if(m_pPlane && m_pPlane->Body())
 	{
-		for(i=0; i<m_pPlane->Body()->m_NMass; i++)
+		for(i=0; i<m_pPlane->Body()->m_MassValue.size(); i++)
 		{
 			TotalMass +=  m_pPlane->Body()->m_MassValue[i];
 			TotalCoG  += (m_pPlane->Body()->m_MassPosition[i]+m_pPlane->BodyPos()) * m_pPlane->Body()->m_MassValue[i];
@@ -188,7 +183,7 @@ void InertiaDlg::ComputeInertia()
 	TotalIxz = m_CoGIxz - m_VolumeMass *  LA.x*LA.z;
 
 	//add the inertia contribution of all point masses in the Total CoG frame of reference
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		if(m_MassValue[i]>PRECISION)
 		{
@@ -207,7 +202,7 @@ void InertiaDlg::ComputeInertia()
 		{
 			if(pWing[iw])
 			{
-				for(i=0; i<pWing[iw]->m_NMass; i++)
+				for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
 				{
                                     MassPos = TotalCoG - (pWing[iw]->m_MassPosition[i] + (m_pPlane != NULL ? m_pPlane->WingLE(iw) : CVector(0.0, 0.0, 0.0)));
 					TotalIxx  += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
@@ -220,7 +215,7 @@ void InertiaDlg::ComputeInertia()
 
 		if(m_pPlane && m_pPlane->Body())
 		{
-			for(i=0; i<m_pPlane->Body()->m_NMass; i++)
+			for(i=0; i<m_pPlane->Body()->m_MassValue.size(); i++)
 			{
 				MassPos = TotalCoG - (m_pPlane->BodyPos() + m_pPlane->Body()->m_MassPosition[i]);
 				TotalIxx  += m_pPlane->Body()->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
@@ -261,15 +256,16 @@ void InertiaDlg::FillMassModel()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	
-	m_pMassModel->setRowCount(MAXMASSES);
+	m_pMassModel->setRowCount(m_MassValue.size()+1);
 
-	for(int i=0; i<MAXMASSES; i++)
+	int i;
+	for(i=0; i<m_MassValue.size(); i++)
 	{
-		index = m_pMassModel->index(i, 0, QModelIndex());
-		m_pMassModel->setData(index, m_MassValue[i]*pMainFrame->m_kgtoUnit);
-
-		if(m_MassValue[i]>0.0)
+		if(m_MassValue[i]>PRECISION || m_MassTag[i].length())
 		{
+			index = m_pMassModel->index(i, 0, QModelIndex());
+			m_pMassModel->setData(index, m_MassValue[i]*pMainFrame->m_kgtoUnit);
+
 			index = m_pMassModel->index(i, 1, QModelIndex());
 			m_pMassModel->setData(index, m_MassPosition[i].x*pMainFrame->m_mtoUnit);
 
@@ -282,21 +278,23 @@ void InertiaDlg::FillMassModel()
 			index = m_pMassModel->index(i, 4, QModelIndex());
 			m_pMassModel->setData(index, m_MassTag[i]);
 		}
-		else
-		{
-			index = m_pMassModel->index(i, 1, QModelIndex());
-			m_pMassModel->setData(index, 0.0);
-
-			index = m_pMassModel->index(i, 2, QModelIndex());
-			m_pMassModel->setData(index, 0.0);
-
-			index = m_pMassModel->index(i, 3, QModelIndex());
-			m_pMassModel->setData(index, 0.0);
-
-			index = m_pMassModel->index(i, 4, QModelIndex());
-			m_pMassModel->setData(index, "");
-		}
 	}
+
+	//add an extra empty line for a new mass
+	index = m_pMassModel->index(i, 0, QModelIndex());
+	m_pMassModel->setData(index, 0.0);
+
+	index = m_pMassModel->index(i, 1, QModelIndex());
+	m_pMassModel->setData(index, 0.0);
+
+	index = m_pMassModel->index(i, 2, QModelIndex());
+	m_pMassModel->setData(index, 0.0);
+
+	index = m_pMassModel->index(i, 3, QModelIndex());
+	m_pMassModel->setData(index, 0.0);
+
+	index = m_pMassModel->index(i, 4, QModelIndex());
+	m_pMassModel->setData(index, "");
 }
 
 
@@ -331,17 +329,19 @@ void InertiaDlg::InitDialog()
 
 	int rc = m_pMassModel->rowCount();
 	m_pMassModel->removeRows(0, rc);
-	m_pMassModel->setRowCount(MAXMASSES);
+
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
 
 	if(m_pWing)
 	{
 		m_VolumeMass = m_pWing->m_VolumeMass;
-		m_NMass = m_pWing->m_NMass;
-		for(int i=0; i<m_pWing->m_NMass; i++)
+		for(int i=0; i<m_pWing->m_MassValue.size(); i++)
 		{
-			m_MassValue[i] = m_pWing->m_MassValue[i];
-			m_MassPosition[i].Copy(m_pWing->m_MassPosition[i]);
-			m_MassTag[i]   = m_pWing->m_MassTag[i];
+			m_MassValue.append(m_pWing->m_MassValue[i]);
+			m_MassPosition.append(m_pWing->m_MassPosition[i]);
+			m_MassTag.append(m_pWing->m_MassTag[i]);
 		}
 		m_pctrlVolumeMass->SetValue(m_pWing->m_VolumeMass * pMainFrame->m_kgtoUnit); //we only display half a wing, AVL way
 		m_pctrlVolumeMassLabel->setText(tr("Wing Mass:"));
@@ -351,12 +351,11 @@ void InertiaDlg::InitDialog()
 	else if (m_pBody)
 	{
 		m_VolumeMass = m_pBody->m_VolumeMass;
-		m_NMass = m_pBody->m_NMass;
-		for(int i=0; i<m_pBody->m_NMass; i++)
+		for(int i=0; i<m_pBody->m_MassValue.size(); i++)
 		{
-			m_MassValue[i] = m_pBody->m_MassValue[i];
-			m_MassPosition[i].Copy(m_pBody->m_MassPosition[i]);
-			m_MassTag[i]   = m_pBody->m_MassTag[i];
+			m_MassValue.append(m_pBody->m_MassValue[i]);
+			m_MassPosition.append(m_pBody->m_MassPosition[i]);
+			m_MassTag.append(m_pBody->m_MassTag[i]);
 		}
 		m_pctrlVolumeMass->SetValue(m_pBody->m_VolumeMass * pMainFrame->m_kgtoUnit);
 		m_pctrlVolumeMassLabel->setText(tr("Body Mass:"));
@@ -371,13 +370,11 @@ void InertiaDlg::InitDialog()
 		if(m_pPlane->Fin())     m_VolumeMass += m_pPlane->Fin()->m_VolumeMass;
 		if(m_pPlane->Body())    m_VolumeMass += m_pPlane->Body()->m_VolumeMass;
 
-		m_NMass = m_pPlane->m_NMass;
-
-		for(int i=0; i<m_pPlane->m_NMass; i++)
+		for(int i=0; i<m_pPlane->m_MassValue.size(); i++)
 		{
-			m_MassValue[i] = m_pPlane->m_MassValue[i];
-			m_MassPosition[i].Copy(m_pPlane->m_MassPosition[i]);
-			m_MassTag[i]   = m_pPlane->m_MassTag[i];
+			m_MassValue.append(m_pPlane->m_MassValue[i]);
+			m_MassPosition.append(m_pPlane->m_MassPosition[i]);
+			m_MassTag.append(m_pPlane->m_MassTag[i]);
 		}
 
 		m_pctrlVolumeMass->SetValue(m_VolumeMass * pMainFrame->m_kgtoUnit);
@@ -426,6 +423,7 @@ void InertiaDlg::OnCellChanged(QWidget *pWidget)
 	ReadData();
 	ComputeInertia();
 	m_bChanged = true;
+	FillMassModel();//to add an empty line
 }
 
 
@@ -600,7 +598,7 @@ void InertiaDlg::OnExportToAVL()
 		}
 	}
 
-	for (int i=0; i<MAXMASSES; i++)
+	for (int i=0; i<m_MassValue.size(); i++)
 	{
 		if(m_MassValue[i]>0.0)
 		{
@@ -622,7 +620,7 @@ void InertiaDlg::OnExportToAVL()
 		{
 			if(pWing[iw])
 			{
-				for (int i=0; i<pWing[iw]->m_NMass; i++)
+				for (int i=0; i<pWing[iw]->m_MassValue.size(); i++)
 				{
 					if(m_pPlane->Wing()->m_MassValue[i]>0.0)
 					{
@@ -642,9 +640,9 @@ void InertiaDlg::OnExportToAVL()
 		if(m_pPlane->Body())
 		{
 			//fin
-                        for (int i=0; i<m_pPlane->Body()->m_NMass; i++)
+			for (int i=0; i<m_pPlane->Body()->m_MassValue.size(); i++)
 			{
-                                if(m_pPlane->Body()->m_MassValue[i]>0.0)
+				if(m_pPlane->Body()->m_MassValue[i]>0.0)
 				{
 					strong = QString("%1 %2 %3 %4      0.000      0.000      0.000")
 						.arg(m_pPlane->Body()->m_MassValue[i] / Munit,    10, 'g', 3)
@@ -664,18 +662,12 @@ void InertiaDlg::OnExportToAVL()
 
 void InertiaDlg::OnInsertMassRow()
 {
-	int i, sel;
+	int sel;
 	sel = m_pctrlMassTable->currentIndex().row();
-	if(m_NMass>=MAXMASSES) return;
-	for (i=MAXMASSES-1; i>sel; i--)
-	{
-		m_MassTag[i]      = m_MassTag[i-1];
-		m_MassValue[i]    = m_MassValue[i-1];
-		m_MassPosition[i] = m_MassPosition[i-1];
-	}
-	m_MassValue[sel]=0.0;
-	m_MassTag[sel].clear();
-	m_MassPosition[sel].Set(0.0,0.0,0.0);
+
+	m_MassValue.insert(sel, 0.0);
+	m_MassPosition.insert(sel, CVector(0.0,0.0,0.0));
+	m_MassTag.insert(sel, " ");
 
 	FillMassModel();
 	m_pctrlMassTable->closePersistentEditor(m_pctrlMassTable->currentIndex());
@@ -688,22 +680,13 @@ void InertiaDlg::OnInsertMassRow()
 
 void InertiaDlg::OnDeleteMassRow()
 {
-	int i, sel;
+	int sel;
 	m_pctrlMassTable->closePersistentEditor(m_pctrlMassTable->currentIndex());
 	sel = m_pctrlMassTable->currentIndex().row();
-//	setFocus();
-	for (i=sel; i<MAXMASSES-1; i++)
-	{
-		m_MassValue[i]    = m_MassValue[i+1];
-		m_MassTag[i]      = m_MassTag[i+1];
-		m_MassPosition[i] = m_MassPosition[i+1];
-	}
 
-	m_MassValue[MAXMASSES-1]=0.0;
-	m_MassTag[MAXMASSES-1].clear();
-	m_MassPosition[MAXMASSES-1].Set(0.0,0.0,0.0);
-
-	m_NMass--;
+	m_MassValue.removeAt(sel);
+	m_MassPosition.removeAt(sel);
+	m_MassTag.removeAt(sel);
 
 	FillMassModel();
 
@@ -713,75 +696,61 @@ void InertiaDlg::OnDeleteMassRow()
 }
 
 
-void InertiaDlg::CleanEmptyRows()
-{
-	QModelIndex index;
-	bool bOK;
-	double val;
-
-	for (int i=m_pMassModel->rowCount()-1; i>=0; i--)
-	{
-		index = m_pMassModel->index(i, 0, QModelIndex());
-		val = index.data().toDouble(&bOK);
-		if(!bOK || fabs(val)<PRECISION)
-		{
-			m_pMassModel->removeRow(i);
-		}
-	}
-}
 
 
 void InertiaDlg::OnOK()
 {
-	int i,j;
+	int i;
 	ReadData();
 
 	if(m_pWing)
 	{
-		j=0;
 		m_pWing->m_VolumeMass = m_VolumeMass;
-		for(i=0; i< MAXMASSES; i++)
+		m_pWing->m_MassValue.clear();
+		m_pWing->m_MassPosition.clear();
+		m_pWing->m_MassTag.clear();
+
+		for(i=0; i< m_MassValue.size(); i++)
 		{
 			if(m_MassValue[i]>PRECISION)
 			{
-				m_pWing->m_MassValue[j] = m_MassValue[i];
-				m_pWing->m_MassPosition[j].Copy(m_MassPosition[i]);
-				m_pWing->m_MassTag[j]   = m_MassTag[i];
-				j++;
+				m_pWing->m_MassValue.append(m_MassValue[i]);
+				m_pWing->m_MassPosition.append(m_MassPosition[i]);
+				m_pWing->m_MassTag.append(m_MassTag[i]);
 			}			
 		}
-		m_pWing->m_NMass = j;
 	}
 	else if(m_pBody)
 	{
-		j=0;
 		m_pBody->m_VolumeMass = m_VolumeMass;
-		for(i=0; i< MAXMASSES; i++)
+		m_pBody->m_MassValue.clear();
+		m_pBody->m_MassPosition.clear();
+		m_pBody->m_MassTag.clear();
+
+		for(i=0; i< m_MassValue.size(); i++)
 		{
 			if(m_MassValue[i]>PRECISION)
 			{
-				m_pBody->m_MassValue[j] = m_MassValue[i];
-				m_pBody->m_MassPosition[j].Copy(m_MassPosition[i]);
-				m_pBody->m_MassTag[j]   = m_MassTag[i];
-				j++;
+				m_pBody->m_MassValue.append(m_MassValue[i]);
+				m_pBody->m_MassPosition.append(m_MassPosition[i]);
+				m_pBody->m_MassTag.append(m_MassTag[i]);
 			}
 		}
-		m_pBody->m_NMass = j;
 	}
 	else if(m_pPlane)
 	{
-		j=0;
-		for(i=0; i< MAXMASSES; i++)
+		m_pPlane->m_MassValue.clear();
+		m_pPlane->m_MassPosition.clear();
+		m_pPlane->m_MassTag.clear();
+		for(i=0; i< m_MassValue.size(); i++)
 		{
 			if(m_MassValue[i]>PRECISION)
 			{
-				m_pPlane->m_MassValue[j] = m_MassValue[i];
-				m_pPlane->m_MassPosition[j].Copy(m_MassPosition[i]);
-				m_pPlane->m_MassTag[j]   = m_MassTag[i];
-				j++;
+				m_pPlane->m_MassValue.append(m_MassValue[i]);
+				m_pPlane->m_MassPosition.append(m_MassPosition[i]);
+				m_pPlane->m_MassTag.append(m_MassTag[i]);
 			}
 		}
-		m_pPlane->m_NMass = j;
 	}
 
 	ComputeBodyAxisInertia();
@@ -795,39 +764,40 @@ void InertiaDlg::ReadData()
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;
 	QModelIndex index;
 	bool bOK;
-	double val;
+	double mass, x,y,z;
 	int i;
-	m_NMass=0;
+	QString tag;
 
-	for (i=0; i<MAXMASSES; i++)
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
+
+	for (i=0; i<m_pMassModel->rowCount(); i++)
 	{
-		m_MassValue[i] = 0.0;
-		m_MassTag[i].clear();
-		m_MassPosition[i].Set(0.0,0.0,0.0);
-
 		index = m_pMassModel->index(i, 0, QModelIndex());
-		val = index.data().toDouble(&bOK);
+		mass = index.data().toDouble(&bOK);
 
-		if(bOK && fabs(val)>PRECISION)
+		index = m_pMassModel->index(i, 1, QModelIndex());
+		x = index.data().toDouble(&bOK);
+
+		index = m_pMassModel->index(i, 2, QModelIndex());
+		y = index.data().toDouble(&bOK);
+
+		index = m_pMassModel->index(i, 3, QModelIndex());
+		z = index.data().toDouble(&bOK);
+
+		index = m_pMassModel->index(i, 4, QModelIndex());
+		tag = index.data().toString();
+
+		if(fabs(mass)>PRECISION || fabs(x)>PRECISION || fabs(y)>PRECISION || fabs(z)>PRECISION || tag.length())
 		{
-			m_MassValue[m_NMass]=val/pMainFrame->m_kgtoUnit;
+			m_MassValue.append(0.0);
+			m_MassPosition.append(CVector(0.0,0.0,0.0));
+			m_MassTag.append("");
 
-			index = m_pMassModel->index(i, 1, QModelIndex());
-			val = index.data().toDouble(&bOK);
-			if(bOK) m_MassPosition[m_NMass].x=val/pMainFrame->m_mtoUnit;
-
-			index = m_pMassModel->index(i, 2, QModelIndex());
-			val = index.data().toDouble(&bOK);
-			if(bOK) m_MassPosition[m_NMass].y=val/pMainFrame->m_mtoUnit;
-
-			index = m_pMassModel->index(i, 3, QModelIndex());
-			val = index.data().toDouble(&bOK);
-			if(bOK) m_MassPosition[m_NMass].z=val/pMainFrame->m_mtoUnit;
-
-			index = m_pMassModel->index(i, 4, QModelIndex());
-			m_MassTag[m_NMass] = index.data().toString();
-
-			m_NMass++;
+			m_MassValue[i]=mass/pMainFrame->m_kgtoUnit;
+			m_MassPosition[i].Set(x/pMainFrame->m_mtoUnit, y/pMainFrame->m_mtoUnit, z/pMainFrame->m_mtoUnit);
+			m_MassTag[i] = tag;
 		}
 	}
 	m_VolumeMass = m_pctrlVolumeMass->Value() / pMainFrame->m_kgtoUnit;

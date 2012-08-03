@@ -144,10 +144,10 @@ private:
 	double m_QInf0;
 
 	double m_VolumeMass, m_TotalMass;    //for inertia calculations
-	int m_NMass;
-	double m_MassValue[MAXMASSES];
-	CVector m_MassPosition[MAXMASSES];
-	QString m_MassTag[MAXMASSES];
+//	int m_NMass; //number of point mass values
+	QList<double> m_MassValue;
+	QList<CVector> m_MassPosition;
+	QStringList m_MassTag;
 
 	double m_GChord;	// mean geometric chord
 	double m_yMac;		// mean aerodynamic chord span position

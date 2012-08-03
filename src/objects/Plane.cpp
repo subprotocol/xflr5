@@ -96,10 +96,9 @@ CPlane::CPlane()
 	m_bDoubleSymFin = true;
 	m_bBiplane      = false;
 
-	m_NMass = 0;
-	memset(m_MassValue,    0, sizeof(m_MassValue));
-	memset(m_MassPosition, 0, sizeof(m_MassPosition));
-	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString("Description %1").arg(i);
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
 
 
 	m_PlaneName  = QObject::tr("Plane Name");
@@ -221,7 +220,7 @@ void CPlane::ComputeBodyAxisInertia()
 	m_CoG = VolumeCoG *VolumeMass;
 
 	// add point masses
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		m_TotalMass += m_MassValue[i];
 		m_CoG       += m_MassPosition[i] * m_MassValue[i];
@@ -231,7 +230,7 @@ void CPlane::ComputeBodyAxisInertia()
 	{
 		if(pWing[iw])
 		{
-			for(i=0; i<pWing[iw]->m_NMass; i++)
+			for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
 			{
 				m_TotalMass +=  pWing[iw]->m_MassValue[i];
 				m_CoG       += (pWing[iw]->m_MassPosition[i]+ m_WingLE[iw]) * pWing[iw]->m_MassValue[i];
@@ -241,7 +240,7 @@ void CPlane::ComputeBodyAxisInertia()
 
 	if(Body())
 	{
-		for(i=0; i<m_pBody->m_NMass; i++)
+		for(i=0; i<m_pBody->m_MassValue.size(); i++)
 		{
 			m_TotalMass +=  m_pBody->m_MassValue[i];
 			m_CoG       += (m_pBody->m_MassPosition[i]+m_BodyPos) * m_pBody->m_MassValue[i];
@@ -260,7 +259,7 @@ void CPlane::ComputeBodyAxisInertia()
 	m_CoGIzz = Izz + VolumeMass * (MassPos.x*MassPos.x+ MassPos.y*MassPos.y);
 	m_CoGIxz = Ixz - VolumeMass *  MassPos.x*MassPos.z;
 
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		MassPos = m_CoG - m_MassPosition[i];
 		m_CoGIxx += m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
@@ -273,7 +272,7 @@ void CPlane::ComputeBodyAxisInertia()
 	{
 		if(pWing[iw])
 		{
-			for(i=0; i<pWing[iw]->m_NMass; i++)
+			for(i=0; i<pWing[iw]->m_MassValue.size(); i++)
 			{
 				MassPos = m_CoG - (pWing[iw]->m_MassPosition[i] + m_WingLE[iw]);
 				m_CoGIxx += pWing[iw]->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
@@ -286,7 +285,7 @@ void CPlane::ComputeBodyAxisInertia()
 	if(Body())
 	{
 		CBody *pBody = m_pBody;
-		for(i=0; i<pBody->m_NMass; i++)
+		for(i=0; i<pBody->m_MassValue.size(); i++)
 		{
 			MassPos = m_CoG - (pBody->m_MassPosition[i] + m_BodyPos);
 			m_CoGIxx += pBody->m_MassValue[i] * (MassPos.y*MassPos.y + MassPos.z*MassPos.z);
@@ -366,12 +365,15 @@ void CPlane::Duplicate(CPlane *pPlane)
 	m_CoGIyy = pPlane->m_CoGIyy;
 	m_CoGIzz = pPlane->m_CoGIzz;
 	m_CoGIxz = pPlane->m_CoGIxz;
-	m_NMass = pPlane->m_NMass;
-	for(int i=0; i<m_NMass;i++)
+
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
+	for(int i=0; i<pPlane->m_MassValue.size();i++)
 	{
-		m_MassValue[i] = pPlane->m_MassValue[i];
-		m_MassPosition[i].Copy(pPlane->m_MassPosition[i]);
-		m_MassTag[i] = pPlane->m_MassTag[i];
+		m_MassValue.append(pPlane->m_MassValue[i]);
+		m_MassPosition.append(pPlane->m_MassPosition[i]);
+		m_MassTag.append(pPlane->m_MassTag[i]);
 	}
 
 	m_bBody = pPlane->m_bBody ;
@@ -397,7 +399,7 @@ double CPlane::TotalMass()
 	if(m_bFin)     Mass += m_Fin.TotalMass();
 	if(Body())    Mass += m_pBody->TotalMass();
 	
-	for(int i=0; i<m_NMass; i++)
+	for(int i=0; i<m_MassValue.size(); i++)
 		Mass += m_MassValue[i];
 	return Mass;
 }
@@ -407,7 +409,7 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 {
 	QMiarex *pMiarex = (QMiarex*)s_pMiarex;
 
-	int i;
+	int i, nMass;
 	float f,g,h;
 
 	QString strong = "Nobody";
@@ -464,10 +466,10 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		}
 		if(ProjectFormat>=5)
 		{
-			ar << m_NMass;
-			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
-			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
-			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
+			ar << m_MassValue.size();
+			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
+			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+			for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
 		}
 		return true;
 	}
@@ -565,20 +567,25 @@ bool CPlane::SerializePlane(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 
 		if(ArchiveFormat>=1012)
 		{
-			ar >> m_NMass;
-			for(i=0; i<m_NMass; i++)
+			ar >> nMass;
+			m_MassValue.clear();
+			m_MassPosition.clear();
+			m_MassTag.clear();
+			for(i=0; i<nMass; i++)
 			{
 				ar >> f;
-				m_MassValue[i] = f;
+				m_MassValue.append(f);
 			}
-			for(i=0; i<m_NMass; i++)
+			for(i=0; i<nMass; i++)
 			{
 				ar >> f >> g >> h;
-				m_MassPosition[i].x = f;
-				m_MassPosition[i].y = g;
-				m_MassPosition[i].z = h;
+				m_MassPosition.append(CVector(f,g,h));
 			}
-			for(i=0; i<m_NMass; i++) ReadCString(ar, m_MassTag[i]);
+			for(i=0; i<nMass; i++)
+			{
+				m_MassTag.append("");
+				ReadCString(ar, m_MassTag[i]);
+			}
 		}
 
 		ComputePlane();

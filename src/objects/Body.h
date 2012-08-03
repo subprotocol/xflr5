@@ -104,10 +104,10 @@ public:
 
 	CVector m_CoG;
 	double m_VolumeMass, m_TotalMass;	    //for inertia calculations
-	double m_MassValue[MAXMASSES];
-	int m_NMass; //number of point mass values
-	CVector m_MassPosition[MAXMASSES];
-	QString m_MassTag[MAXMASSES];
+//	int m_NMass; //number of point mass values
+	QList<double> m_MassValue;
+	QList<CVector> m_MassPosition;
+	QStringList m_MassTag;
 	double m_CoGIxx,m_CoGIyy,m_CoGIzz,m_CoGIxz;
 
 	QString m_BodyName;

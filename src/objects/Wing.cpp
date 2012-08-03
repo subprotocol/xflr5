@@ -88,10 +88,9 @@ CWing::CWing()
 	m_CoG.Set(0.0,0.0,0.0);
 	m_CoGIxx = m_CoGIyy = m_CoGIzz = m_CoGIxz = 0.0;
 	m_VolumeMass = m_TotalMass = 0.0;
-	m_NMass = 0;
-	memset(m_MassValue,    0, sizeof(m_MassValue));
-	memset(m_MassPosition, 0, sizeof(m_MassPosition));
-	for(int i=0; i< MAXMASSES; i++) m_MassTag[i] = QString(QObject::tr("Description %1")).arg(i);
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
 
 	m_bIsFin        = false;
 	m_bDoubleFin    = false;
@@ -432,7 +431,7 @@ void CWing::ComputeBodyAxisInertia()
 	m_CoG = VolumeCoG *m_VolumeMass;
 
 	// add point masses
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		m_TotalMass += m_MassValue[i];
 		m_CoG       += m_MassPosition[i] * m_MassValue[i];
@@ -451,7 +450,7 @@ void CWing::ComputeBodyAxisInertia()
 	m_CoGIxz = Ixz - m_VolumeMass *  LA.x*LA.z;
 
 	//add the contribution of point masses to total inertia
-	for(i=0; i<m_NMass; i++)
+	for(i=0; i<m_MassValue.size(); i++)
 	{
 		LA = m_MassPosition[i] - m_CoG;
 		m_CoGIxx += m_MassValue[i] * (LA.y*LA.y + LA.z*LA.z);
@@ -946,12 +945,15 @@ void CWing::Duplicate(CWing *pWing)
 	m_CoGIyy = pWing->m_CoGIyy;
 	m_CoGIzz = pWing->m_CoGIzz;
 	m_CoGIxz = pWing->m_CoGIxz;
-	m_NMass = pWing->m_NMass;
-	for(i=0; i<m_NMass;i++)
+
+	m_MassValue.clear();
+	m_MassPosition.clear();
+	m_MassTag.clear();
+	for(i=0; i<pWing->m_MassValue.size();i++)
 	{
-		m_MassValue[i] = pWing->m_MassValue[i];
-		m_MassPosition[i].Copy(pWing->m_MassPosition[i]);
-		m_MassTag[i] = pWing->m_MassTag[i];
+		m_MassValue.append(pWing->m_MassValue[i]);
+		m_MassPosition.append(pWing->m_MassPosition[i]);
+		m_MassTag.append(pWing->m_MassTag[i]);
 	}
 
 	m_WingDescription = pWing->m_WingDescription;
@@ -1238,7 +1240,7 @@ void CWing::GetFoils(CFoil **pFoil0, CFoil **pFoil1, double y, double &t)
 double CWing::TotalMass()
 {
 	double TotalMass = m_VolumeMass;
-	for(int i=0; i<m_NMass; i++)
+	for(int i=0; i<m_MassValue.size(); i++)
 		TotalMass += m_MassValue[i];
 	return TotalMass;
 }
@@ -1739,10 +1741,10 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ProjectFormat>=5)
 		{
 			ar << (float)m_VolumeMass;
-			ar << m_NMass;
-			for(i=0; i<m_NMass; i++) ar << (float)m_MassValue[i];
-			for(i=0; i<m_NMass; i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
-			for(i=0; i<m_NMass; i++)  WriteCString(ar, m_MassTag[i]);
+			ar << m_MassValue.size();
+			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassValue[i];
+			for(i=0; i<m_MassValue.size(); i++) ar << (float)m_MassPosition[i].x << (float)m_MassPosition[i].y << (float)m_MassPosition[i].z;
+			for(i=0; i<m_MassValue.size(); i++)  WriteCString(ar, m_MassTag[i]);
 		}
 		if(ProjectFormat>5)
 		{
@@ -1918,20 +1920,26 @@ bool CWing::SerializeWing(QDataStream &ar, bool bIsStoring, int ProjectFormat)
 		if(ArchiveFormat>=1009)
 		{
 			ar >> f;  m_VolumeMass = f;
-			ar >> m_NMass;
-			for(i=0; i<m_NMass; i++)
+			int nMass;
+			m_MassValue.clear();
+			m_MassPosition.clear();
+			m_MassTag.clear();
+			ar >> nMass;
+			for(i=0; i<nMass; i++)
 			{
 				ar >> f;
-				m_MassValue[i] = f;
+				m_MassValue.append(f);
 			}
-			for(i=0; i<m_NMass; i++)
+			for(i=0; i<nMass; i++)
 			{
 				ar >> f >> g >> h;
-				m_MassPosition[i].x = f;
-				m_MassPosition[i].y = g;
-				m_MassPosition[i].z = h;
+				m_MassPosition.append(CVector(f,g,h));
 			}
-			for(i=0; i<m_NMass; i++) ReadCString(ar, m_MassTag[i]);
+			for(i=0; i<nMass; i++)
+			{
+				m_MassTag.append("");
+				ReadCString(ar, m_MassTag[i]);
+			}
 		}
 
 		if(ArchiveFormat>=1010)

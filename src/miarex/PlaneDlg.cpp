@@ -499,14 +499,12 @@ void PlaneDlg::OnInertia()
 	dlg.m_pPlane = m_pPlane;
 
 	//save inertia properties
-	int NMass;
-	double MassValue[MAXMASSES];
-	CVector MassPosition[MAXMASSES];
-	QString MassTag[MAXMASSES];
+	QList<double> MassValue;
+	QList<CVector> MassPosition;
+	QStringList MassTag;
 	
-	NMass = m_pPlane->m_NMass;
 	
-	for(int i=0; i< MAXMASSES; i++)
+	for(int i=0; i< m_pPlane->m_MassValue.size(); i++)
 	{
 		MassValue[i]    = m_pPlane->m_MassValue[i];
 		MassPosition[i] = m_pPlane->m_MassPosition[i];
@@ -521,9 +519,8 @@ void PlaneDlg::OnInertia()
 	else
 	{
 		//restore everything
-		m_pPlane->m_NMass = NMass;
 	
-		for(int i=0; i< MAXMASSES; i++)
+		for(int i=0; i< MassValue.size(); i++)
 		{
 			m_pPlane->m_MassValue[i]    = MassValue[i];
 			m_pPlane->m_MassPosition[i] = MassPosition[i];

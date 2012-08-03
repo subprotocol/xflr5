@@ -70,7 +70,6 @@ private:
 	void FillMassModel();
 	void ComputeInertia();
 //	void ComputeBodyInertia(double &Ixx, double &Iyy, double &Izz, double &Ixz);
-	void CleanEmptyRows();
 	void ComputeBodyAxisInertia();
 	void SetupLayout();
 	void ReadData();
@@ -105,10 +104,9 @@ private:
 
 	CVector m_PtRef;
 	double m_CoGIxx, m_CoGIyy, m_CoGIzz, m_CoGIxz;
-	double m_MassValue[MAXMASSES];
-	CVector m_MassPosition[MAXMASSES];
-	QString m_MassTag[MAXMASSES];
-	int m_NMass;
+	QList<double> m_MassValue;
+	QList<CVector> m_MassPosition;
+	QStringList m_MassTag;
 
 	bool m_bChanged;
 };
