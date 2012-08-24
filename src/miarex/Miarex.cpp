@@ -36,6 +36,7 @@
 #include "../twodwidget.h"
 #include "../globals.h"
 #include <math.h>
+#include "NURBSDomDoc.h"
 
 void *QMiarex::s_pMainFrame;
 void *QMiarex::s_p2dWidget;
@@ -6135,6 +6136,11 @@ void QMiarex::keyPressEvent(QKeyEvent *event)
 
 			break;
 		}
+		case Qt::Key_F12:
+		{
+			OnUFOInertia();
+			break;
+		}
 		case Qt::Key_F2:
 		{
 			OnRenameCurUFO();
@@ -9132,7 +9138,7 @@ void QMiarex::OnExportCurWOpp()
 				iStrip = 0;
 				for (j=0; j<m_pWingList[iw]->m_NSurfaces; j++)
 				{
-					if(m_pWingList[iw]->m_Surface[j].m_bIsTipLeft) p+= m_pWingList[iw]->m_Surface[j].m_NXPanels;
+					if(m_pWingList[iw]->m_Surface[j].m_bIsTipLeft && !m_pCurWOpp->m_bThinSurface) p+= m_pWingList[iw]->m_Surface[j].m_NXPanels;
 
 					for(k=0; k<m_pWingList[iw]->m_Surface[j].m_NYPanels; k++)
 					{
