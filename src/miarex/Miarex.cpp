@@ -6294,7 +6294,6 @@ bool QMiarex::LoadSettings(QSettings *pSettings)
 	//
 	// Loads the user's saved settings for 3D analysis
 	//
-	int k;
 	int r,g,b;
 	QString strong;
 	MainFrame *pMainFrame = (MainFrame*)s_pMainFrame;

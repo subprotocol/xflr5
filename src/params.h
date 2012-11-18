@@ -132,12 +132,6 @@
 #define BODYFORCELISTBASE       6245
 
 
-#define SOLIDLINE           1
-#define DASHLINE            2
-#define DOTLINE             3
-#define DASHDOTLINE         4
-#define DASHDOTDOTLINE      5
-
 #define MAXGRAPHS 4
 
 typedef enum{LLTMETHOD, VLMMETHOD, PANELMETHOD} enumAnalysisMethod;

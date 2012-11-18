@@ -1872,10 +1872,10 @@ void GLCreateStreamLines(void *pQMiarex, CWing *Wing[MAXWINGS], CVector *pNode, 
 
 		style = pMiarex->m_WakeStyle;
 
-		if     (style == DASHLINE)       glLineStipple (1, 0xCFCF);
-		else if(style == DOTLINE)        glLineStipple (1, 0x6666);
-		else if(style == DASHDOTLINE)    glLineStipple (1, 0xFF18);
-		else if(style == DASHDOTDOTLINE) glLineStipple (1, 0x7E66);
+		if     (style == Qt::DashLine)       glLineStipple (1, 0xCFCF);
+		else if(style == Qt::DotLine)        glLineStipple (1, 0x6666);
+		else if(style == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
+		else if(style == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
 		else					         glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());

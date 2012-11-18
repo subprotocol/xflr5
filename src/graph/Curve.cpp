@@ -37,7 +37,7 @@ CCurve::CCurve()
 	m_bIsVisible = true;
 	m_bShowPoints = false;
 	CurveWidth = 1;
-    CurveStyle = Qt::SolidLine;
+	CurveStyle = Qt::SolidLine;
 	m_iSelected = -1;
 }
 

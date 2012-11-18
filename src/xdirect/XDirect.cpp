@@ -4066,7 +4066,7 @@ void QXDirect::OnPanels()
 	m_bBL       = false;
 	OnOpPoints();
 
-	TwoDPanelDlg dlg(this);
+	TwoDPanelDlg dlg;
 	dlg.move(pMainFrame->m_DlgPos);
 	dlg.m_pXDirect = this;
 	dlg.m_pAFoil   = NULL;
@@ -4275,6 +4275,7 @@ void QXDirect::OnResetFoilScale()
 	if(!m_bAnimate) UpdateView();
 
 }
+
 
 void QXDirect::OnResetGraphLegend()
 {

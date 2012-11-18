@@ -443,10 +443,10 @@ void ThreeDWidget::GLDrawAxes(double length, QColor AxisColor, int AxisStyle, in
 
 	glEnable (GL_LINE_STIPPLE);
 
-	if     (AxisStyle == DASHLINE)       glLineStipple(1, 0xCFCF);
-	else if(AxisStyle == DOTLINE)        glLineStipple(1, 0x6666);
-	else if(AxisStyle == DASHDOTLINE)    glLineStipple(1, 0xFF18);
-	else if(AxisStyle == DASHDOTDOTLINE) glLineStipple(1, 0x7E66);
+	if     (AxisStyle == Qt::DashLine)       glLineStipple(1, 0xCFCF);
+	else if(AxisStyle == Qt::DotLine)        glLineStipple(1, 0x6666);
+	else if(AxisStyle == Qt::DashDotLine)    glLineStipple(1, 0xFF18);
+	else if(AxisStyle == Qt::DashDotDotLine) glLineStipple(1, 0x7E66);
 	else				                 glLineStipple(1, 0xFFFF);//Solid
 
 	// X axis____________

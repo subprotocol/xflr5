@@ -143,13 +143,12 @@ void GLCreateBody3DSplines(void *pParent, int iList, CBody *pBody, int nx, int n
 	{
 		glLineWidth(W3dPrefsDlg::s_OutlineWidth);
 
-
 		glEnable(GL_LINE_STIPPLE);
-		if     (W3dPrefsDlg::s_OutlineStyle == DASHLINE)       glLineStipple (1, 0xCFCF);
-		else if(W3dPrefsDlg::s_OutlineStyle == DOTLINE)        glLineStipple (1, 0x6666);
-		else if(W3dPrefsDlg::s_OutlineStyle == DASHDOTLINE)    glLineStipple (1, 0xFF18);
-		else if(W3dPrefsDlg::s_OutlineStyle == DASHDOTDOTLINE) glLineStipple (1, 0x7E66);
-		else                                                   glLineStipple (1, 0xFFFF);
+		if     (W3dPrefsDlg::s_OutlineStyle == Qt::DashLine)       glLineStipple (1, 0xCFCF);
+		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DotLine)        glLineStipple (1, 0x6666);
+		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
+		else if(W3dPrefsDlg::s_OutlineStyle == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
+		else                                                       glLineStipple (1, 0xFFFF);
 
 		glColor3d(W3dPrefsDlg::s_OutlineColor.redF(), W3dPrefsDlg::s_OutlineColor.greenF(), W3dPrefsDlg::s_OutlineColor.blueF());
 
@@ -304,10 +303,10 @@ void GLCreateBody3DFlatPanels(void *pParent, int iList, CBody *pBody)
 
 		glLineWidth(width);
 
-		if     (style == DASHLINE)       glLineStipple (1, 0xCFCF);
-		else if(style == DOTLINE)        glLineStipple (1, 0x6666);
-		else if(style == DASHDOTLINE)    glLineStipple (1, 0xFF18);
-		else if(style == DASHDOTDOTLINE) glLineStipple (1, 0x7E66);
+		if     (style == Qt::DashLine)       glLineStipple (1, 0xCFCF);
+		else if(style == Qt::DotLine)        glLineStipple (1, 0x6666);
+		else if(style == Qt::DashDotLine)    glLineStipple (1, 0xFF18);
+		else if(style == Qt::DashDotDotLine) glLineStipple (1, 0x7E66);
 		else                             glLineStipple (1, 0xFFFF);
 
 		glColor3d(color.redF(), color.greenF(), color.blueF());

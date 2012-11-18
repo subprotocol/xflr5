@@ -496,8 +496,6 @@ void StabPolarDlg::OnUnit()
 
 void StabPolarDlg::OnOK()
 {
-	int i;
-
 	ReadCtrlData();
 	ReadParams();
 

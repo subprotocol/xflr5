@@ -514,21 +514,21 @@ void W3dPrefsDlg::LoadSettings(QSettings *pSettings)
 	int r,g,b;
 	pSettings->beginGroup("3DPrefs");
 	{
-		s_3DAxisStyle   = pSettings->value("3DAxisStyle",DASHDOTDOTLINE).toInt();
+		s_3DAxisStyle   = pSettings->value("3DAxisStyle",Qt::DashDotDotLine).toInt();
 		s_3DAxisWidth   = pSettings->value("3DAXisWidth",1).toInt();
 		r = pSettings->value("3DAxisColorRed",255).toInt();
 		g = pSettings->value("3DAxisColorGreen",255).toInt();
 		b = pSettings->value("3DAxisColorBlue",255).toInt();
 		s_3DAxisColor   = QColor(r,g,b);
 
-		s_VLMStyle = pSettings->value("VLMStyle", SOLIDLINE).toInt();
+		s_VLMStyle = pSettings->value("VLMStyle", Qt::SolidLine).toInt();
 		s_VLMWidth = pSettings->value("VLMWidth",1).toInt();
 		r = pSettings->value("VLMColorRed",220).toInt();
 		g = pSettings->value("VLMColorGreen",220).toInt();
 		b = pSettings->value("VLMColorBlue",220).toInt();
 		s_VLMColor = QColor(r,g,b);
 
-		s_OutlineStyle = pSettings->value("OutlineStyle",SOLIDLINE).toInt();
+		s_OutlineStyle = pSettings->value("OutlineStyle",Qt::SolidLine).toInt();
 		s_OutlineWidth = pSettings->value("OutlineWidth",1).toInt();
 
 		r = pSettings->value("OutlineColorRed",255).toInt();
@@ -536,42 +536,42 @@ void W3dPrefsDlg::LoadSettings(QSettings *pSettings)
 		b = pSettings->value("OutlineColorBlue",255).toInt();
 		s_OutlineColor = QColor(r,g,b);
 
-		s_XCPStyle = pSettings->value("XCPStyle",SOLIDLINE).toInt();
+		s_XCPStyle = pSettings->value("XCPStyle",Qt::SolidLine).toInt();
 		s_XCPWidth = pSettings->value("XCPWidth",2).toInt();
 		r = pSettings->value("XCPColorRed",0).toInt();
 		g = pSettings->value("XCPColorGreen",200).toInt();
 		b = pSettings->value("XCPColorBlue",50).toInt();
 		s_XCPColor = QColor(r,g,b);
 
-		s_MomentStyle = pSettings->value("MomentStyle",SOLIDLINE).toInt();
+		s_MomentStyle = pSettings->value("MomentStyle",Qt::SolidLine).toInt();
 		s_MomentWidth = pSettings->value("MomentWidth",3).toInt();
 		r = pSettings->value("MomentColorRed",0).toInt();
 		g = pSettings->value("MomentColorGreen",100).toInt();
 		b = pSettings->value("MomentColorBlue",200).toInt();
 		s_MomentColor = QColor(r,g,b);
 
-		s_IDragStyle = pSettings->value("IDragStyle",SOLIDLINE).toInt();
+		s_IDragStyle = pSettings->value("IDragStyle",Qt::SolidLine).toInt();
 		s_IDragWidth = pSettings->value("IDragWidth",1).toInt();
 		r = pSettings->value("IDragColorRed",160).toInt();
 		g = pSettings->value("IDragColorGreen",170).toInt();
 		b = pSettings->value("IDragColorBlue",20).toInt();
 		s_IDragColor = QColor(r,g,b);
 
-		s_DownwashStyle = pSettings->value("DownwashStyle",SOLIDLINE).toInt();
+		s_DownwashStyle = pSettings->value("DownwashStyle",Qt::SolidLine).toInt();
 		s_DownwashWidth = pSettings->value("DownwashWidth",1).toInt();
 		r = pSettings->value("DownwashColorRed",200).toInt();
 		g = pSettings->value("DownwashColorGreen",50).toInt();
 		b = pSettings->value("DownwashColorBlue",50).toInt();
 		s_DownwashColor = QColor(r,g,b);
 
-		s_WakeStyle = pSettings->value("WakeStyle",DASHLINE).toInt();
+		s_WakeStyle = pSettings->value("WakeStyle",Qt::DashLine).toInt();
 		s_WakeWidth = pSettings->value("WakeWidth",1).toInt();
 		r = pSettings->value("WakeColorRed",50).toInt();
 		g = pSettings->value("WakeColorGreen",120).toInt();
 		b = pSettings->value("WakeColorBlue",190).toInt();
 		s_WakeColor = QColor(r,g,b);
 
-		s_CpStyle = pSettings->value("CpStyle",SOLIDLINE).toInt();
+		s_CpStyle = pSettings->value("CpStyle",Qt::SolidLine).toInt();
 		s_CpWidth = pSettings->value("CpWidth",1).toInt();
 		r = pSettings->value("CpColorRed",0).toInt();
 		g = pSettings->value("CpColorGreen",78).toInt();

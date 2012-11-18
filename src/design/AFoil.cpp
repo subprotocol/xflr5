@@ -689,7 +689,7 @@ void QAFoil::LoadSettings(QSettings *pSettings)
 		m_NeutralColor = QColor(r,g,b);
 		m_bNeutralLine = pSettings->value("NeutralLine").toBool();
 		
-		style  = pSettings->value("SFStyle", SOLIDLINE).toInt();
+		style  = pSettings->value("SFStyle", Qt::SolidLine).toInt();
 		width  = pSettings->value("SFWidth",1).toInt();
 		r = pSettings->value("SFColorRed",216).toInt();
 		g = pSettings->value("SFColorGreen",183).toInt();
@@ -1704,7 +1704,7 @@ void QAFoil::FoilVisibleClicked(const QModelIndex& index)
 		{
 			pFoil->m_bCenterLine = !pFoil->m_bCenterLine;
 		}
-
+		pMainFrame->SetSaveState(false);
 	}
 	else if(index.row()==0)
 	{
@@ -1748,6 +1748,7 @@ void QAFoil::OnFoilClicked(const QModelIndex& index)
 
 void QAFoil::OnFoilStyle()
 {
+	MainFrame *pMainFrame = (MainFrame*)m_pMainFrame;
 	if(!g_pCurFoil)
 	{
         LinePickerDlg dlg(this);
@@ -1766,6 +1767,7 @@ void QAFoil::OnFoilStyle()
 
 		if(QDialog::Accepted==dlg.exec())
 		{
+			pMainFrame->SetSaveState(false);
 			g_pCurFoil->m_nFoilStyle = dlg.GetStyle();
 			g_pCurFoil->m_nFoilWidth = dlg.GetWidth();
 			g_pCurFoil->m_FoilColor = dlg.GetColor();
